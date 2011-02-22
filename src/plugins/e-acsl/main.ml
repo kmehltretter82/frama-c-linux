@@ -18,7 +18,7 @@
 (*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
 (*                                                                        *)
 (**************************************************************************)
-
+(*
 let check () =
   try
     ignore (Visit.do_visit false);
@@ -46,7 +46,7 @@ let fail_check =
     "fail_check"
     (Datatype.func Datatype.unit Datatype.unit)
     fail_check
-
+ *)
 module Resulting_projects =
   State_builder.Hashtbl
     (Datatype.String.Hashtbl)
@@ -77,7 +77,7 @@ let generate_code =
 
 let main () =
   let s = Options.Project_name.get () in
-  if s = "" then begin if Options.Check.get () then fail_check () end
+  if s = "" then begin(* if Options.Check.get () then fail_check ()*) end
   else ignore (generate_code s)
 
 let () = Db.Main.extend main

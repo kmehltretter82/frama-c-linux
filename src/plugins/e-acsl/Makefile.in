@@ -37,8 +37,23 @@ PLUGIN_HAS_MLI:=yes
 PLUGIN_DISTRIBUTED:=no
 PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure
 PLUGIN_DISTRIB_BIN:=no
-#PLUGIN_TESTS_DIRS:=security
-#PLUGIN_NO_DEFAULT_TEST:=yes
+
+###########
+# Testing #
+###########
+
+PLUGIN_TESTS_DIRS:=e-acsl-reject e-acsl-runtime
+PLUGIN_NO_DEFAULT_TEST:=yes
+
+tests/test_config: tests/test_config.in Makefile
+	$(SED) -e "s|${FRAMAC_SHARE}|$(FRAMAC_SHARE)|g" \
+	       -e "s|@SEDCMD@|`which sed `|g" $< > $@
+
+tests:: tests/test_config
+
+################
+# Generic part #
+################
 
 include $(FRAMAC_SHARE)/Makefile.dynamic
 

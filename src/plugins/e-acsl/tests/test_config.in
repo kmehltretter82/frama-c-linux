@@ -1,0 +1,2 @@
+CMD: @frama-c@ -cpp-command="gcc -C -E -I. -I${FRAMAC_SHARE}"
+FILTER:@SEDCMD@ -e '/^#[^\n]*/d' -e "s|${FRAMAC_SHARE}|FRAMAC_SHARE|g"
