@@ -28,6 +28,24 @@ assertion checker generator"
    end)
 include P
 
+module Check =
+  False
+    (struct
+      let option_name = "-e-acsl-check"
+      let help = "only perform E-ACSL type checking"
+      let kind = `Correctness
+     end)
+
+module Project_name =
+  EmptyString
+    (struct
+      let option_name = "-e-acsl-runtime"
+      let help = "generate a new project <prj> from the C program where E-ACSL \
+ code is transformed to C code for runtime assertion checking"
+      let kind = `Correctness
+      let arg_name = "prj"
+     end)
+
 (*
 Local Variables:
 compile-command: "make"

@@ -19,12 +19,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Plugin
+exception Typing_error of string
 
-include S (** implementation of Log.S for E-ACSL *)
-
-module Check: BOOL
-module Project_name: STRING
+val do_visit: ?prj:Project.t -> bool -> Visitor.frama_c_visitor
 
 (*
 Local Variables:

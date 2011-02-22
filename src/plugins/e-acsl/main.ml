@@ -19,7 +19,66 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let main () = ()
+let check () =
+  try
+    ignore (Visit.do_visit false);
+    true
+  with Visit.Typing_error s ->
+    Options.error "%s" s;
+    false
+
+let check =
+  Dynamic.register
+    ~plugin:"e-acsl"
+    ~journalize:true
+    "check"
+    (Datatype.func Datatype.unit Datatype.bool)
+    check
+
+let fail_check () =
+  try ignore (Visit.do_visit false)
+  with Visit.Typing_error s -> Options.abort "%s" s
+
+let fail_check =
+  Dynamic.register
+    ~plugin:"e-acsl"
+    ~journalize:true
+    "fail_check"
+    (Datatype.func Datatype.unit Datatype.unit)
+    fail_check
+
+module Resulting_projects =
+  State_builder.Hashtbl
+    (Datatype.String.Hashtbl)
+    (Project.Datatype)
+    (struct
+      let name = "E-ACSL resulting projects"
+      let size = 7
+      let kind = `Correctness
+      let dependencies = [ Ast.self ]
+     end)
+
+let generate_code =
+  Resulting_projects.memo
+    (fun name ->
+      try
+	let visit prj = Visit.do_visit ~prj true in
+	File.create_project_from_visitor name visit
+      with Visit.Typing_error s ->
+	Options.abort "%s" s)
+
+let generate_code =
+  Dynamic.register
+    ~plugin:"e-acsl"
+    ~journalize:true
+    "generate_code"
+    (Datatype.func Datatype.string Project.ty)
+    generate_code
+
+let main () =
+  let s = Options.Project_name.get () in
+  if s = "" then begin if Options.Check.get () then fail_check () end
+  else ignore (generate_code s)
 
 let () = Db.Main.extend main
 

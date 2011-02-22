@@ -19,12 +19,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Plugin
+exception Typing_error of string
 
-include S (** implementation of Log.S for E-ACSL *)
-
-module Check: BOOL
-module Project_name: STRING
+let do_visit ?(prj=Project.current ()) _generate =
+(*  let _p = prj in
+    assert false*) new Visitor.generic_frama_c_visitor prj (Cil.copy_visit ())
 
 (*
 Local Variables:
