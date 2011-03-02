@@ -47,8 +47,8 @@ let mk_if acc e p =
 let convert_named_predicate acc generate p =
   let mk_if e = mk_if acc e p in
   match p.content with
-  | Pfalse -> if generate then mk_if (zero ~loc:unknown_loc) else acc
-  | Ptrue -> if generate then mk_if (one ~loc:unknown_loc) else acc
+  | Pfalse -> if generate then mk_if (one ~loc:unknown_loc) else acc
+  | Ptrue -> if generate then mk_if (zero ~loc:unknown_loc) else acc
   | Papp _ -> not_yet "logic function application"
   | Pseparated _ -> not_yet "separated"
   | Prel _ -> not_yet "relation"

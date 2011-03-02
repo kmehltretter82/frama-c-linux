@@ -63,7 +63,7 @@ let generate_code =
     (fun name ->
       try
 	let visit prj = Visit.do_visit ~prj true in
-	File.create_project_from_visitor name visit
+	File.create_rebuilt_project_from_visitor name visit
       with Visit.Typing_error s ->
 	Options.abort "%s" s)
 
