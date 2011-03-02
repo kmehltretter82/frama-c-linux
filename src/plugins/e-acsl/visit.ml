@@ -56,6 +56,61 @@ let mk_if acc e p =
   let s = Instr(Call(None, f, [ mkString unknown_loc msg ], unknown_loc))in
   mkStmt(If(e, mkBlock [ mkStmt s ], mkBlock [], unknown_loc)) :: acc
 
+(* ************************************************************************** *)
+(* transforming terms and predicates into C expressions (if any) *)
+(* ************************************************************************** *)
+
+let constant_to_exp = function
+  | CInt64 _ -> not_yet "integer"
+  | CStr _ as c -> new_exp unknown_loc (Const c)
+  | CWStr _ -> not_yet "wide character string constant"
+  | CChr _ -> not_yet "character constant"
+  | CReal _ -> not_yet "floating point constant"
+  | CEnum _ -> not_yet "enum constant"
+
+let rec term_to_exp t = match t.term_node with
+  | TConst c -> constant_to_exp c
+  | TLval _ -> not_yet "left value"
+  | TSizeOf _ -> not_yet "sizeof"
+  | TSizeOfE _ -> not_yet "sizeof(expr)"
+  | TSizeOfStr _ -> not_yet "sizeof(string constant)"
+  | TAlignOf _ -> not_yet "alignof"
+  | TAlignOfE _ -> not_yet "alignof(expr)"
+  | TUnOp _ -> not_yet "unary operator"
+  | TBinOp _ -> not_yet "binary operator"
+  | TCastE _ -> not_yet "cast"
+  | TAddrOf _ -> not_yet "taking address"
+  | TStartOf _ -> not_yet "beginning of an array"
+  | Tapp _ -> not_yet "applying logic function"
+  | Tlambda _ -> not_yet "functional"
+  | TDataCons _ -> not_yet "constructor"
+  | Tif _ -> not_yet "conditional"
+  | Told _ -> not_yet "\\old"
+  | Tat _ -> not_yet "\\at"
+  | Tbase_addr _ -> not_yet "base address"
+  | Tblock_length _ -> not_yet "block length"
+  | Tnull -> not_yet "NULL"
+  | TCoerce _ -> not_yet "coercion"
+  | TCoerceE _ -> not_yet "expression coercion"
+  | TUpdate _ -> not_yet "functional update"
+  | Ttypeof _ -> not_yet "typeof"
+  | Ttype _ -> not_yet "C type"
+  | Tempty_set -> not_yet "empty tset"
+  | Tunion _ -> not_yet "union of tsets"
+  | Tinter _ -> not_yet "intersection of tsets"
+  | Tcomprehension _ -> not_yet "tset comprehension"
+  | Trange _ -> not_yet "range"
+  | Tlet _ -> not_yet "let binding"
+
+(* untested *)
+let relation_to_revbinop = function
+  | Rlt -> Ge
+  | Rgt -> Le
+  | Rle -> Gt
+  | Rge -> Lt
+  | Req -> Ne
+  | Rneq -> Eq
+
 (* convert an ACSL named predicate into the opposite C expression (if any).
    E.g. \true is converted into 0. *)
 let rec named_predicate_to_revexp p = match p.content with
@@ -63,7 +118,11 @@ let rec named_predicate_to_revexp p = match p.content with
   | Ptrue -> zero ~loc:unknown_loc
   | Papp _ -> not_yet "logic function application"
   | Pseparated _ -> not_yet "separated"
-  | Prel _ -> not_yet "relation"
+  | Prel(rel, t1, t2) -> (* untested *)
+    let bop = relation_to_revbinop rel in
+    let e1 = term_to_exp t1 in
+    let e2 = term_to_exp t2 in
+    new_exp unknown_loc (BinOp(bop, e1, e2, intType))
   | Pand _ -> not_yet "&&"
   | Por _ -> not_yet "||"
   | Pxor _ -> not_yet "xor"
