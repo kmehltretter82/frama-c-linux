@@ -46,6 +46,7 @@ PLUGIN_TESTS_DIRS:=e-acsl-reject e-acsl-runtime
 PLUGIN_NO_DEFAULT_TEST:=yes
 
 tests/test_config: tests/test_config.in Makefile
+	$(PRINT_MAKING) $@
 	$(SED) -e "s|${FRAMAC_SHARE}|$(FRAMAC_SHARE)|g" \
 	       -e "s|@SEDCMD@|`which sed `|g" $< > $@
 

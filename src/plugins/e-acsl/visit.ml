@@ -30,11 +30,11 @@ let error s = raise (Typing_error s)
 let not_yet s =
   Options.not_yet_implemented "construct `%s' is not yet supported" s
 
-let e_acsl_fail () =
+let e_acsl_header () =
  GText("/*@ terminates \\false;\n\
 assigns \\nothing;\n\
 ensures \\false; */\n\
-void exit(int status);\n\
+extern void exit(int status);\n\
 \n\
 /*@ assigns \\nothing; */ \n\
 extern void eprintf(char * ); \n\
@@ -95,18 +95,19 @@ let convert_rooted acc generate (User a | AI(_, a)) =
 let convert_before_after acc generate (Before r | After r) =
   convert_rooted acc generate r
 
+let first_global = ref true
+
 class e_acsl_visitor prj generate = object
 
   inherit Visitor.generic_frama_c_visitor
     prj
     ((if generate then Cil.copy_visit else Cil.inplace_visit) ())
 
-  val mutable first_global = true
-
   method vglob g =
-    if first_global then
-      ChangeDoChildrenPost([ g ], fun l -> e_acsl_fail () :: l)
-    else
+    if !first_global then begin
+      first_global := false;
+      ChangeDoChildrenPost([ g ], fun l -> e_acsl_header () :: l)
+    end else
       DoChildren
 
   method vstmt_aux stmt =
@@ -125,7 +126,9 @@ class e_acsl_visitor prj generate = object
 end
 
 let do_visit ?(prj=Project.current ()) generate =
-  new e_acsl_visitor prj generate
+  let prj = new e_acsl_visitor prj generate in
+  first_global := true;
+  prj
 
 (*
 Local Variables:

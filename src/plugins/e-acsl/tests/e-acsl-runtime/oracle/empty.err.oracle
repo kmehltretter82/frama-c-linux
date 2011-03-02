@@ -1,0 +1,2 @@
+gcc: autom4te.cache/: linker input file unused because linking not done
+gcc: tests/: linker input file unused because linking not done
