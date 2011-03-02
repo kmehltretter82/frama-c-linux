@@ -55,11 +55,9 @@ let mk_if acc e p =
   let s = Instr(Call(None, f, [ mkString unknown_loc msg ], unknown_loc))in
   mkStmt(If(e, mkBlock [ mkStmt s ], mkBlock [], unknown_loc)) :: acc
 
-let convert_named_predicate acc generate p =
-  let mk_if e = mk_if acc e p in
-  match p.content with
-  | Pfalse -> if generate then mk_if (one ~loc:unknown_loc) else acc
-  | Ptrue -> if generate then mk_if (zero ~loc:unknown_loc) else acc
+let rec named_predicate_to_revexp p = match p.content with
+  | Pfalse -> one ~loc:unknown_loc
+  | Ptrue -> zero ~loc:unknown_loc
   | Papp _ -> not_yet "logic function application"
   | Pseparated _ -> not_yet "separated"
   | Prel _ -> not_yet "relation"
@@ -68,7 +66,7 @@ let convert_named_predicate acc generate p =
   | Pxor _ -> not_yet "xor"
   | Pimplies _ -> not_yet "==>"
   | Piff _ -> not_yet "<==>"
-  | Pnot _ -> not_yet "!"
+  | Pnot p -> named_predicate_to_revexp p
   | Pif _ -> not_yet "_ ? _ : _"
   | Plet _ -> not_yet "let _ = _ in _"
   | Pforall _ -> not_yet "\\forall"
@@ -80,6 +78,9 @@ let convert_named_predicate acc generate p =
   | Pvalid_range _ -> not_yet "\\valid_range"
   | Pfresh _ -> not_yet "\\fresh"
   | Psubtype _ -> not_yet "subtyping relation"
+
+let convert_named_predicate acc generate p =
+  if generate then mk_if acc (named_predicate_to_revexp p) p else acc
 
 let convert_annotation acc generate annot = match annot.annot_content with
   | AAssert(_l, p) -> convert_named_predicate acc generate p

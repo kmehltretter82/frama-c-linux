@@ -1,3 +1,3 @@
 /* run.config
-   COMMENT: testing the empty file
+   COMMENT: empty file
    OPT: -e-acsl-project p -then-on p -print */
