@@ -41,6 +41,7 @@ extern void eprintf(char * ); \n\
 \n\
 void e_acsl_fail(char *msg) { eprintf(msg); exit(1); }")
 
+(* Build a C conditional doing a runtime assertion check. *)
 let mk_if acc e p =
   (* voidType is incorrect: will be resolved later *)
   let f =
@@ -55,6 +56,8 @@ let mk_if acc e p =
   let s = Instr(Call(None, f, [ mkString unknown_loc msg ], unknown_loc))in
   mkStmt(If(e, mkBlock [ mkStmt s ], mkBlock [], unknown_loc)) :: acc
 
+(* convert an ACSL named predicate into the opposite C expression (if any).
+   E.g. \true is converted into 0. *)
 let rec named_predicate_to_revexp p = match p.content with
   | Pfalse -> one ~loc:unknown_loc
   | Ptrue -> zero ~loc:unknown_loc
@@ -79,6 +82,11 @@ let rec named_predicate_to_revexp p = match p.content with
   | Pfresh _ -> not_yet "\\fresh"
   | Psubtype _ -> not_yet "subtyping relation"
 
+(* ************************************************************************** *)
+(* [convert_*] converts a given ACSL annotation into the corresponding C
+   statement (if any) for runtime assertion checking *)
+(* ************************************************************************** *)
+
 let convert_named_predicate acc generate p =
   if generate then mk_if acc (named_predicate_to_revexp p) p else acc
 
@@ -96,8 +104,14 @@ let convert_rooted acc generate (User a | AI(_, a)) =
 let convert_before_after acc generate (Before r | After r) =
   convert_rooted acc generate r
 
+(* ************************************************************************** *)
+(* Visitor *)
+(* ************************************************************************** *)
+
+(* local reference to the below visitor and to [do_visit] *)
 let first_global = ref true
 
+(* the main visitor performing e-acsl checking and C code generator *)
 class e_acsl_visitor prj generate = object
 
   inherit Visitor.generic_frama_c_visitor
