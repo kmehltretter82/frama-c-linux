@@ -30,6 +30,17 @@ let error s = raise (Typing_error s)
 let not_yet s =
   Options.not_yet_implemented "construct `%s' is not yet supported" s
 
+let e_acsl_fail () =
+ GText("/*@ terminates \\false;\n\
+assigns \\nothing;\n\
+ensures \\false; */\n\
+void exit(int status);\n\
+\n\
+/*@ assigns \\nothing; */ \n\
+extern void eprintf(char * ); \n\
+\n\
+void e_acsl_fail(char *msg) { eprintf(msg); exit(1); }")
+
 let mk_if acc e p =
   (* voidType is incorrect: will be resolved later *)
   let f =
@@ -89,6 +100,14 @@ class e_acsl_visitor prj generate = object
   inherit Visitor.generic_frama_c_visitor
     prj
     ((if generate then Cil.copy_visit else Cil.inplace_visit) ())
+
+  val mutable first_global = true
+
+  method vglob g =
+    if first_global then
+      ChangeDoChildrenPost([ g ], fun l -> e_acsl_fail () :: l)
+    else
+      DoChildren
 
   method vstmt_aux stmt =
     let l = Annotations.get_all_annotations stmt in

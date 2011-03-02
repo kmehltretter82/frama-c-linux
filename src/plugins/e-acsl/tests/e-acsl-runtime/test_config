@@ -1,1 +1,1 @@
-OPT: -e-acsl-runtime p -then-on p -print
+OPT: -e-acsl-project p -then-on p -print -val
