@@ -89,10 +89,11 @@ let apply_mpz_set v e =
       | IInt
       | ILong -> "set_si", [ e ]
       | ILongLong | IULongLong ->
-	"set_str",
-	(* [TODO] untested *)
-	(* decimal base for the number given as string *)
-	[ e; integer ~loc:unknown_loc 10 ])
+	assert false)
+    | TPtr(TInt(IChar, _), _) ->
+      "set_str",
+      (* decimal base for the number given as string *)
+      [ e; integer ~loc:unknown_loc 10 ]
     | _ ->
       assert false
   in
