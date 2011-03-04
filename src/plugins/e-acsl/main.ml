@@ -18,13 +18,13 @@
 (*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
 (*                                                                        *)
 (**************************************************************************)
-(*
+
 let check () =
   try
-    ignore (Visit.do_visit false);
+    Visitor.visitFramacFileSameGlobals (Visit.do_visit false) (Ast.get ());
     true
   with Visit.Typing_error s ->
-    Options.error "%s" s;
+    Options.error ~current:true "%s" s;
     false
 
 let check =
@@ -36,8 +36,8 @@ let check =
     check
 
 let fail_check () =
-  try ignore (Visit.do_visit false)
-  with Visit.Typing_error s -> Options.abort "%s" s
+  try Visitor.visitFramacFileSameGlobals (Visit.do_visit false) (Ast.get ());
+  with Visit.Typing_error s -> Options.abort ~current:true "%s" s
 
 let fail_check =
   Dynamic.register
@@ -46,7 +46,7 @@ let fail_check =
     "fail_check"
     (Datatype.func Datatype.unit Datatype.unit)
     fail_check
- *)
+
 module Resulting_projects =
   State_builder.Hashtbl
     (Datatype.String.Hashtbl)
@@ -65,7 +65,7 @@ let generate_code =
 	let visit prj = Visit.do_visit ~prj true in
 	File.create_rebuilt_project_from_visitor name visit
       with Visit.Typing_error s ->
-	Options.abort "%s" s)
+	Options.abort ~current:true "%s" s)
 
 let generate_code =
   Dynamic.register
@@ -77,7 +77,7 @@ let generate_code =
 
 let main () =
   let s = Options.Project_name.get () in
-  if s = "" then begin(* if Options.Check.get () then fail_check ()*) end
+  if s = "" then begin if Options.Check.get () then fail_check () end
   else ignore (generate_code s)
 
 let () = Db.Main.extend main

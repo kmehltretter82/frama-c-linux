@@ -33,7 +33,8 @@ let mk_call ?result fname args =
   mkStmt ~valid_sid:true (Instr(Call(result, f, args, unknown_loc)))
 
 exception Typing_error of string
-let error s = raise (Typing_error s)
+let type_error s = raise (Typing_error s)
+
 let not_yet s =
   Options.not_yet_implemented "construct `%s' is not yet supported" s
 
@@ -77,8 +78,7 @@ let apply_mpz_set v cst =
 	"set_str",
 	[ mkString ~loc:unknown_loc (Int64.to_string n);
 	  integer ~loc:unknown_loc 10 (* decimal base for the number given as
-					 string *) ]
-      )
+					 string *) ])
     | CStr _ | CWStr _ | CChr _ | CReal _ | CEnum _ ->
       assert false
   in
@@ -280,7 +280,7 @@ let rec named_predicate_to_revexp is_global p = match p.content with
   | Pexists _ -> not_yet "\\exists"
   | Pold _ -> not_yet "\\old"
   | Pat _ -> not_yet "\\at"
-  | Pvalid _ -> not_yet "\\valid"
+  | Pvalid _ -> type_error "\\valid"
   | Pvalid_index _ -> not_yet "\\valid_index"
   | Pvalid_range _ -> not_yet "\\valid_range"
   | Pfresh _ -> not_yet "\\fresh"
@@ -291,24 +291,29 @@ let rec named_predicate_to_revexp is_global p = match p.content with
    statement (if any) for runtime assertion checking *)
 (* ************************************************************************** *)
 
-let convert_named_predicate is_global generate p =
-  if generate then
-    let e = named_predicate_to_revexp is_global p in
-    New_block.push_at_end (mk_if e p)
+let convert_named_predicate is_global p =
+  let e = named_predicate_to_revexp is_global p in
+  New_block.push_at_end (mk_if e p)
 
-let convert_annotation is_global generate annot = match annot.annot_content with
-  | AAssert(_l, p) -> convert_named_predicate is_global generate p
-  | AStmtSpec _ -> not_yet "stmt spec"
-  | AInvariant _ -> not_yet "invariant"
-  | AVariant _ -> not_yet "variant"
-  | AAssigns _ -> not_yet "assigns"
-  | APragma _ -> not_yet "pragma"
+let convert_annotation is_global annot =
+  try
+    match annot.annot_content with
+    | AAssert(_l, p) -> convert_named_predicate is_global p
+    | AStmtSpec _ -> not_yet "stmt spec"
+    | AInvariant _ -> not_yet "invariant"
+    | AVariant _ -> not_yet "variant"
+    | AAssigns _ -> not_yet "assigns"
+    | APragma _ -> not_yet "pragma"
+  with Typing_error s ->
+    let msg = Format.sprintf "invalid E-ACSL construct %s." s in
+    if Options.Check.get () then raise (Typing_error msg)
+    else Options.warning ~current:true "%s@\nignoring annotation." msg
 
-let convert_rooted is_global generate (User a | AI(_, a)) =
-  convert_annotation is_global generate a
+let convert_rooted is_global (User a | AI(_, a)) =
+  convert_annotation is_global a
 
-let convert_before_after is_global generate (Before r | After r) =
-  convert_rooted is_global generate r
+let convert_before_after is_global (Before r | After r) =
+  convert_rooted is_global r
 
 (* ************************************************************************** *)
 (* Visitor *)
@@ -327,27 +332,29 @@ class e_acsl_visitor prj generate = object (self)
   val mutable gen_vars = []
 
   method vglob g =
-    (* [TODO] must handle constant expression and global variables
-       (mpz_init and clear [and mpz_set_* for constants]) *)
     if !first_global then begin
       first_global := false;
       ChangeDoChildrenPost([ g ], fun l -> e_acsl_header () :: l)
     end else
       DoChildren
 
+  (* [TODO] handle integer constants in initializer
+     BUT almost impossible without a main entry point *)
+  (*  method vinit v off i = assert false *)
+
   method vfundec f =
     let add_gen_vars f = f.slocals <- gen_vars @ f.slocals; f in
     ChangeDoChildrenPost(f, add_gen_vars)
 
   method vstmt_aux stmt =
-    Options.debug ~level:2 "proceeding stmt %d@." stmt.sid;
+(*    Options.debug ~level:2 "proceeding stmt %d@." stmt.sid;*)
     let is_global = match self#current_kinstr with
       | Kglobal -> true
       | Kstmt _ -> false
     in
-    List.iter
-      (fun ba -> convert_before_after is_global generate ba)
-      (Annotations.get_all_annotations stmt);
+    Annotations.single_iter_stmt
+      (fun ba -> convert_before_after is_global ba)
+      stmt;
     (* new_block and new_vars is set by convert_before_after *)
     let is_empty_block = New_block.is_empty () in
     let new_vars = New_vars.finalize () in
@@ -379,9 +386,9 @@ class e_acsl_visitor prj generate = object (self)
 end
 
 let do_visit ?(prj=Project.current ()) generate =
-  let prj = new e_acsl_visitor prj generate in
+  let vis = new e_acsl_visitor prj generate in
   first_global := true;
-  (prj :> Visitor.frama_c_visitor)
+  (vis :> Visitor.frama_c_visitor)
 
 (*
 Local Variables:

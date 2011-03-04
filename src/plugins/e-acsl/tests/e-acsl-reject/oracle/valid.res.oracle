@@ -1,0 +1,2 @@
+tests/e-acsl-reject/valid.i:5:[e-acsl] user error: invalid E-ACSL construct \valid.
+[kernel] Plug-in e-acsl aborted because of invalid user input.

@@ -1,6 +1,7 @@
 /* run.config
    COMMENT: TODO: this test is incomplete
    COMMENT: comparison operators */
+
 void main() {
   /* /\*@ assert "toto" < "titi"; *\/ */
   /* /\*@ assert "toto" > "titi"; *\/ */
