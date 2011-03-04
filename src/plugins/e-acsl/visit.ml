@@ -25,7 +25,7 @@ open Cil
 
 let unknown_loc = Cil_datatype.Location.unknown
 
-let new_lval v = new_exp unknown_loc (Lval (var v))
+let new_lval v = new_exp ~loc:unknown_loc (Lval (var v))
 
 let mk_call ?result fname args =
   (* the type is incorrect, but it doesn't matter *)
@@ -122,7 +122,7 @@ end = struct
     let v =
       makeVarinfo
 	~logic:false
-	~generated:true (* [TODO] put it to [false]? *)
+	~generated:true
 	is_global
 	false (* is a formal? *)
 	("e_acsl_cst_" ^ string_of_int !var_cpt)
@@ -168,7 +168,7 @@ end
 (* Transforming terms and predicates into C expressions (if any) *)
 (* ************************************************************************** *)
 
-let constant_to_exp _is_global = function
+let constant_to_exp = function
   | CInt64(n, k, s) ->
     (match k with
     | IBool | IChar | IUChar | IUInt | IUShort | IULong ->
@@ -183,19 +183,28 @@ let constant_to_exp _is_global = function
   | CReal _ -> not_yet "floating point constant"
   | CEnum _ -> not_yet "enum constant"
 
-let nocheck_term_to_exp is_global t = match t.term_node with
-  | TConst c -> constant_to_exp is_global c
-  | TLval(TVar { lv_origin = Some v }, TNoOffset) -> new_lval v
-  | TLval _ -> not_yet "complex left value"
-  | TSizeOf _ -> not_yet "sizeof"
-  | TSizeOfE _ -> not_yet "sizeof(expr)"
-  | TSizeOfStr _ -> not_yet "sizeof(string constant)"
-  | TAlignOf _ -> not_yet "alignof"
-  | TAlignOfE _ -> not_yet "alignof(expr)"
+let tlval_to_lval = function
+  | TVar { lv_origin = Some v }, TNoOffset -> Var v, NoOffset
+  | _ -> not_yet "complex left value"
+
+let rec nocheck_term_to_exp is_global t = match t.term_node with
+  | TConst c -> constant_to_exp c
+  | TLval lv -> new_exp ~loc:unknown_loc (Lval (tlval_to_lval lv))
+  | TSizeOf ty -> sizeOf ~loc:unknown_loc ty
+  | TSizeOfE t ->
+    let e = term_to_exp is_global t in
+    sizeOf ~loc:unknown_loc (typeOf e)
+  | TSizeOfStr s -> new_exp ~loc:unknown_loc (SizeOfStr s)
+  | TAlignOf ty -> new_exp ~loc:unknown_loc (AlignOf ty)
+  | TAlignOfE t ->
+    let e = term_to_exp is_global t in
+    new_exp ~loc:unknown_loc (AlignOfE e)
   | TUnOp _ -> not_yet "unary operator"
   | TBinOp _ -> not_yet "binary operator"
-  | TCastE _ -> not_yet "cast"
-  | TAddrOf _ -> not_yet "taking address"
+  | TCastE(ty, t) ->
+    let e = term_to_exp is_global t in
+    mkCast e ty
+  | TAddrOf lv -> mkAddrOf unknown_loc (tlval_to_lval lv)
   | TStartOf _ -> not_yet "beginning of an array"
   | Tapp _ -> not_yet "applying logic function"
   | Tlambda _ -> not_yet "functional"
@@ -203,8 +212,8 @@ let nocheck_term_to_exp is_global t = match t.term_node with
   | Tif _ -> not_yet "conditional"
   | Told _ -> not_yet "\\old"
   | Tat _ -> not_yet "\\at"
-  | Tbase_addr _ -> not_yet "base address"
-  | Tblock_length _ -> not_yet "block length"
+  | Tbase_addr _ -> not_yet "\\base_addr"
+  | Tblock_length _ -> not_yet "\\block_length"
   | Tnull -> not_yet "NULL"
   | TCoerce _ -> not_yet "coercion"
   | TCoerceE _ -> not_yet "expression coercion"
@@ -218,7 +227,7 @@ let nocheck_term_to_exp is_global t = match t.term_node with
   | Trange _ -> not_yet "range"
   | Tlet _ -> not_yet "let binding"
 
-let rec term_to_exp is_global t = match t.term_type with
+and term_to_exp is_global t = match t.term_type with
   | Ctype _ -> nocheck_term_to_exp is_global t
   | Ltype _ -> not_yet "term from an user defined type"
   | Lvar _ -> not_yet "polymorphic term"
@@ -268,7 +277,6 @@ let rec named_predicate_to_revexp is_global p = match p.content with
   | Pimplies _ -> not_yet "==>"
   | Piff _ -> not_yet "<==>"
   | Pnot p ->
-    (* [TODO] not really tested (see not.i) *)
     let e = named_predicate_to_revexp is_global p in
     new_exp unknown_loc (UnOp(Neg, e, TInt(IInt, [])))
   | Pif _ -> not_yet "_ ? _ : _"
