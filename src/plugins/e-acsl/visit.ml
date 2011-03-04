@@ -56,30 +56,44 @@ let mk_if e p =
   let s = mk_call "e_acsl_fail" [ mkString unknown_loc msg ] in
   mkStmt ~valid_sid:true (If(e, mkBlock [ s ], mkBlock [], unknown_loc))
 
+(* ************************************************************************** *)
+(* GMP values *)
+(* ************************************************************************** *)
+
+let mpz_t_torig =
+  { torig_name = "mpz_t";
+    tname = "mpz_t";
+    ttype = TVoid [] (* incorrect but does not matter *);
+    treferenced = false }
+
+let mpz_t_ty = TNamed(mpz_t_torig, [])
+
+let is_mpz_t ty = Cil_datatype.Typ.equal ty mpz_t_ty
+
 let apply_mpz_on_var funname v = mk_call ("mpz_" ^ funname) [ new_lval v ]
 let apply_mpz_init = apply_mpz_on_var "init"
 let apply_mpz_clear = apply_mpz_on_var "clear"
 
-let apply_mpz_set v cst =
-  let fname, args = match cst with
-    | CInt64(n, k, s) ->
+let apply_mpz_set v e =
+  let fname, args = match typeOf e with
+    | TInt(k, _) ->
       (match k with
       | IBool
       | IChar
       | IUChar
       | IUInt
       | IUShort
-      | IULong -> "set_ui", [ kinteger64_repr ~loc:unknown_loc IULong n s ]
+      | IULong -> "set_ui", [ e ]
       | ISChar
       | IShort
       | IInt
-      | ILong -> "set_si", [ kinteger64_repr ~loc:unknown_loc ILong n s ]
+      | ILong -> "set_si", [ e ]
       | ILongLong | IULongLong ->
 	"set_str",
-	[ mkString ~loc:unknown_loc (Int64.to_string n);
-	  integer ~loc:unknown_loc 10 (* decimal base for the number given as
-					 string *) ])
-    | CStr _ | CWStr _ | CChr _ | CReal _ | CEnum _ ->
+	(* [TODO] untested *)
+	(* decimal base for the number given as string *)
+	[ e; integer ~loc:unknown_loc 10 ])
+    | _ ->
       assert false
   in
   mk_call ("mpz_" ^ fname) (new_lval v :: args)
@@ -90,11 +104,11 @@ let apply_mpz_set v cst =
 
 module New_vars: sig
 
-  val push: bool -> typ -> constant option -> varinfo
+  val push: bool -> typ -> exp option -> varinfo
   (* boolean: [true] if global var
      constant option: mpz_t constant associated to the varinfo at init time *)
 
-  val finalize: unit -> (varinfo * constant option) list
+  val finalize: unit -> (varinfo * exp option) list
 
 end = struct
 
@@ -105,41 +119,29 @@ end = struct
      Could be a real issue in practice since **many** variables are generated
      for E-ACSL (at least one variable by integer constant). *)
 
-  (* Memoization is local to a stmt: thus it only merges multiple uses of one
-     constant in one stmt. *)
-  module H = Datatype.Int64.Hashtbl
-  let memo_tbl = H.create 7
-
   let var_cpt = ref 0
   let vlist = ref []
 
-  exception Unknown of int64 option
-
-  let push is_global typ c =
-    try
-      match c with
-      | None -> raise (Unknown None)
-      | Some (CInt64(n, _, _)) ->
-	(try H.find memo_tbl n
-	 with Not_found -> raise (Unknown (Some n)))
-      | Some (CStr _ | CWStr _ | CChr _ | CReal _ | CEnum _) -> assert false
-    with Unknown n ->
-      incr var_cpt;
-      let v =
-	makeVarinfo
-	  ~logic:false
-	  ~generated:true
-	  is_global
-	  false (* is a formal? *)
-	  ("e_acsl_cst_" ^ string_of_int !var_cpt)
-	  typ
-      in
-      (match n with None -> () | Some n -> H.add memo_tbl n v);
-      vlist := (v, c) :: !vlist;
-      v
+  let push is_global ty e =
+    if is_mpz_t ty then begin
+      assert (e <> None);
+      mpz_t_torig.treferenced <- true
+    end else
+      assert (e = None);
+    incr var_cpt;
+    let v =
+      makeVarinfo
+	~logic:false
+	~generated:true (* [TODO] put it to [false]? *)
+	is_global
+	false (* is a formal? *)
+	("e_acsl_cst_" ^ string_of_int !var_cpt)
+	ty
+    in
+    vlist := (v, e) :: !vlist;
+    v
 
   let finalize () =
-    H.clear memo_tbl;
     var_cpt := 0;
     let l = !vlist in
     vlist := [];
@@ -176,31 +178,28 @@ end
 (* Transforming terms and predicates into C expressions (if any) *)
 (* ************************************************************************** *)
 
-let mpz_t_torig =
-  { torig_name = "mpz_t";
-    tname = "mpz_t";
-    ttype = TVoid [] (* incorrect but does not matter *);
-    treferenced = false }
-
-let mpz_t_ty = TNamed(mpz_t_torig, [])
-
-let is_mpz_t ty = Cil_datatype.Typ.equal ty mpz_t_ty
-
-let constant_to_exp is_global = function
-  | CInt64(_, _, _) as c ->
-(*    Options.debug ~level:3 "new variable for constant %S" (Int64.to_string n);*)
-    mpz_t_torig.treferenced <- true;
-    let v = New_vars.push is_global mpz_t_ty (Some c) in
-    new_lval v
+let constant_to_exp _is_global = function
+  | CInt64(n, k, s) ->
+    (match k with
+    | IBool | IChar | IUChar | IUInt | IUShort | IULong ->
+      kinteger64_repr ~loc:unknown_loc IULong n s
+    | ISChar | IShort | IInt | ILong ->
+      kinteger64_repr ~loc:unknown_loc ILong n s
+    | ILongLong | IULongLong ->
+      mkString ~loc:unknown_loc (Int64.to_string n))
   | CStr _ as c -> new_exp unknown_loc (Const c)
   | CWStr _ -> not_yet "wide character string constant"
   | CChr _ -> not_yet "character constant"
   | CReal _ -> not_yet "floating point constant"
   | CEnum _ -> not_yet "enum constant"
 
-let rec term_to_exp is_global t = match t.term_node with
+let lval_to_exp v off = match v, off with
+  | TVar { lv_origin = Some v }, TNoOffset -> new_lval v
+  | _ -> not_yet "complex left value"
+
+let nocheck_term_to_exp is_global t = match t.term_node with
   | TConst c -> constant_to_exp is_global c
-  | TLval _ -> not_yet "left value"
+  | TLval(v, off) -> lval_to_exp v off
   | TSizeOf _ -> not_yet "sizeof"
   | TSizeOfE _ -> not_yet "sizeof(expr)"
   | TSizeOfStr _ -> not_yet "sizeof(string constant)"
@@ -231,6 +230,17 @@ let rec term_to_exp is_global t = match t.term_node with
   | Tcomprehension _ -> not_yet "tset comprehension"
   | Trange _ -> not_yet "range"
   | Tlet _ -> not_yet "let binding"
+
+let rec term_to_exp is_global t = match t.term_type with
+  | Ctype _ -> nocheck_term_to_exp is_global t
+  | Ltype _ -> not_yet "term from an user defined type"
+  | Lvar _ -> not_yet "polymorphic term"
+  | Linteger ->
+    let e = nocheck_term_to_exp is_global t in
+    let v = New_vars.push is_global mpz_t_ty (Some e) in
+    new_lval v
+  | Lreal -> not_yet "real number"
+  | Larrow _ -> not_yet "logic function"
 
 let relation_to_revbinop = function
   | Rlt -> Ge
@@ -368,14 +378,14 @@ class e_acsl_visitor prj generate = object (self)
 	(* [TODO] efficiency could be improved *)
 	gen_vars <-
 	  List.fold_left
-	  (fun acc (v, c) ->
+	  (fun acc (v, e) ->
 	    b.blocals <- v :: b.blocals;
 	    Extlib.may
-	      (fun c ->
+	      (fun e ->
 		let s1 = apply_mpz_init v in
-		let s2 = apply_mpz_set v c in
+		let s2 = apply_mpz_set v e in
 		b.bstmts <- s1 :: s2 :: b.bstmts @ [ apply_mpz_clear v ])
-	      c;
+	      e;
 	    v :: acc)
 	  []
 	  new_vars;

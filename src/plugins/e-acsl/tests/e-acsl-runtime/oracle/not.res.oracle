@@ -28,8 +28,12 @@ void main(void)
 {
   int x ;
   x = 0;
-  /*@ assert \true; */ ;
-  if (x) { /*@ assert \false; */ ; e_acsl_fail((char *)"(\\false)"); }
+  /*@ assert (x ≡ 0); */ ;
+  if ((long )x != 0L) { e_acsl_fail((char *)"((x == 0))"); }
+  if (x) {
+    /*@ assert (x ≢ 0); */ ;
+    if ((long )x == 0L) { e_acsl_fail((char *)"((x != 0))"); }
+  }
   return;
 }
 

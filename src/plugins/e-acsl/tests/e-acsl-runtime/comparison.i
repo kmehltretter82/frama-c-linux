@@ -1,13 +1,15 @@
 /* run.config
-   COMMENT: TODO: this test is incomplete
-   COMMENT: comparison operators */
+   COMMENT: comparison operators
+   COMMENT: will be improved by fixing BTS #744 */
 
 void main() {
-  /* /\*@ assert "toto" < "titi"; *\/ */
-  /* /\*@ assert "toto" > "titi"; *\/ */
-  /* /\*@ assert "toto" <= "titi"; *\/ */
-  /* /\*@ assert "toto" >= "titi"; *\/ */
-  /* /\*@ assert "toto" == "titi"; *\/ */
+  int x = 0, y = 1;
+  /*@ assert x < y; */
+  /*@ assert y > x; */
+  /*@ assert x <= 0; */
+  /*@ assert y >= 1; */
+  char *s = "toto";
+  /*@ assert s == s; */
   /*@ assert "toto" != "titi"; */
   /*@ assert 5 < 18; */
   /*@ assert 32 > 3; */
