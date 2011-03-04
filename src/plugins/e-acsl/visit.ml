@@ -46,7 +46,10 @@ let mk_if e p =
   let msg =
     let b = Buffer.create 97 in
     let fmt = Format.formatter_of_buffer b in
+    let no_uni = Parameters.UseUnicode.get () in
+    Parameters.UseUnicode.off ();
     Format.fprintf fmt "%a@?" Cil.d_predicate_named p;
+    Parameters.UseUnicode.set no_uni;
     Buffer.contents b
   in
   let s = mk_call "e_acsl_fail" [ mkString unknown_loc msg ] in
