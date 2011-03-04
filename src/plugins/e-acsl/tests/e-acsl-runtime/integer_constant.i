@@ -1,5 +1,6 @@
 /* run.config
-   COMMENT: integer constant */
+   COMMENT: integer constant
+   COMMENT: waiting for fixing BTS #745 */
 void main() {
   /*@ assert 0 == 0; */
   /*@ assert 0 != 1; */

@@ -76,26 +76,15 @@ let apply_mpz_clear = apply_mpz_on_var "clear"
 
 let apply_mpz_set v e =
   let fname, args = match typeOf e with
-    | TInt(k, _) ->
-      (match k with
-      | IBool
-      | IChar
-      | IUChar
-      | IUInt
-      | IUShort
-      | IULong -> "set_ui", [ e ]
-      | ISChar
-      | IShort
-      | IInt
-      | ILong -> "set_si", [ e ]
-      | ILongLong | IULongLong ->
-	assert false)
+    | TInt((IBool | IChar | IUChar | IUInt | IUShort | IULong), _) ->
+      "set_ui", [ e ]
+    | TInt((ISChar | IShort | IInt | ILong), _) -> "set_si", [ e ]
+    | TInt((ILongLong | IULongLong), _) -> assert false
     | TPtr(TInt(IChar, _), _) ->
       "set_str",
       (* decimal base for the number given as string *)
       [ e; integer ~loc:unknown_loc 10 ]
-    | _ ->
-      assert false
+    | _ -> assert false
   in
   mk_call ("mpz_" ^ fname) (new_lval v :: args)
 
@@ -194,13 +183,10 @@ let constant_to_exp _is_global = function
   | CReal _ -> not_yet "floating point constant"
   | CEnum _ -> not_yet "enum constant"
 
-let lval_to_exp v off = match v, off with
-  | TVar { lv_origin = Some v }, TNoOffset -> new_lval v
-  | _ -> not_yet "complex left value"
-
 let nocheck_term_to_exp is_global t = match t.term_node with
   | TConst c -> constant_to_exp is_global c
-  | TLval(v, off) -> lval_to_exp v off
+  | TLval(TVar { lv_origin = Some v }, TNoOffset) -> new_lval v
+  | TLval _ -> not_yet "complex left value"
   | TSizeOf _ -> not_yet "sizeof"
   | TSizeOfE _ -> not_yet "sizeof(expr)"
   | TSizeOfStr _ -> not_yet "sizeof(string constant)"
@@ -292,8 +278,8 @@ let rec named_predicate_to_revexp is_global p = match p.content with
   | Pold _ -> not_yet "\\old"
   | Pat _ -> not_yet "\\at"
   | Pvalid _ -> type_error "\\valid"
-  | Pvalid_index _ -> not_yet "\\valid_index"
-  | Pvalid_range _ -> not_yet "\\valid_range"
+  | Pvalid_index _ -> type_error "\\valid_index"
+  | Pvalid_range _ -> type_error "\\valid_range"
   | Pfresh _ -> not_yet "\\fresh"
   | Psubtype _ -> not_yet "subtyping relation"
 
