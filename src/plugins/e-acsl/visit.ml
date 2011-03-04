@@ -38,8 +38,7 @@ let not_yet s =
   Options.not_yet_implemented "construct `%s' is not yet supported" s
 
 (* [TODO] should not generate the type if the user wants to link the resulting
-   program with GMP: use an option for this purpose?
-   [TODO] transform the function to a constant? *)
+   program with GMP: use an option for this purpose? *)
 let e_acsl_header () = GText (Read_header.text ())
 
 (* Build a C conditional doing a runtime assertion check. *)
@@ -103,24 +102,41 @@ end = struct
      Could be a real issue in practice since **many** variables are generated
      for E-ACSL (at least one variable by integer constant). *)
 
+  (* Memoization is local to a stmt: thus it only merges multiple uses of one
+     constant in one stmt. *)
+  module H = Datatype.Int64.Hashtbl
+  let memo_tbl = H.create 7
+
   let var_cpt = ref 0
   let vlist = ref []
 
+  exception Unknown of int64 option
+
   let push is_global typ c =
-    incr var_cpt;
-    let v =
-      makeVarinfo
-	~logic:false
-	~generated:true
-	is_global
-	false (* is a formal? *)
-	("e_acsl_cst_" ^ string_of_int !var_cpt)
-	typ
-    in
-    vlist := (v, c) :: !vlist;
-    v
+    try
+      match c with
+      | None -> raise (Unknown None)
+      | Some (CInt64(n, _, _)) ->
+	(try H.find memo_tbl n
+	 with Not_found -> raise (Unknown (Some n)))
+      | Some (CStr _ | CWStr _ | CChr _ | CReal _ | CEnum _) -> assert false
+    with Unknown n ->
+      incr var_cpt;
+      let v =
+	makeVarinfo
+	  ~logic:false
+	  ~generated:true
+	  is_global
+	  false (* is a formal? *)
+	  ("e_acsl_cst_" ^ string_of_int !var_cpt)
+	  typ
+      in
+      (match n with None -> () | Some n -> H.add memo_tbl n v);
+      vlist := (v, c) :: !vlist;
+      v
 
   let finalize () =
+    H.clear memo_tbl;
     var_cpt := 0;
     let l = !vlist in
     vlist := [];
@@ -168,9 +184,7 @@ let mpz_t_ty = TNamed(mpz_t_torig, [])
 let is_mpz_t ty = Cil_datatype.Typ.equal ty mpz_t_ty
 
 let constant_to_exp is_global = function
-  | CInt64(_n, _, _) as c ->
-    (* [TODO] use memoization in order to create the minimum number of new
-       variables *)
+  | CInt64(_, _, _) as c ->
 (*    Options.debug ~level:3 "new variable for constant %S" (Int64.to_string n);*)
     mpz_t_torig.treferenced <- true;
     let v = New_vars.push is_global mpz_t_ty (Some c) in

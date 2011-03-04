@@ -8,6 +8,10 @@
 
 // [TODO] ne pas générer les typedef si on veut linker avec GMP derrière
 
+// [TODO] utiliser un champ modèle de type integer pour modéliser
+// l'entier exact correspondant à un mpz_t.
+// Not yet implemented in ACSL.
+
 typedef struct {
   int _mp_alloc;
   int _mp_size;
@@ -19,9 +23,6 @@ typedef __mpz_struct mpz_t[1];
 /*****************/
 /* GMP functions */
 /*****************/
-
-// [TODO] utiliser une variable modèle de type integer pour modéliser
-// l'entier exact correspondant à un mpz_t.
 
 /*@ ensures \valid(x);
   @ assigns *x; */
