@@ -23,6 +23,10 @@ open Db_types
 open Cil_types
 open Cil
 
+(* ************************************************************************** *)
+(* General constructs *)
+(* ************************************************************************** *)
+
 let unknown_loc = Cil_datatype.Location.unknown
 
 let new_lval v = new_exp ~loc:unknown_loc (Lval (var v))
@@ -60,46 +64,57 @@ let mk_if e p =
 (* GMP values *)
 (* ************************************************************************** *)
 
-let mpz_t_torig =
+module Mpz : sig
+  val t_ty: typ (* type "mpz_t" *)
+  val is_now_referenced: unit -> unit (* one variable "mpz_t" now exists *)
+  val is_t: typ -> bool (* is the type equal to "mpz_t"? *)
+  val init: varinfo -> stmt (* build stmt "mpz_init(v)" *)
+  val clear: varinfo -> stmt (* build stmt "mpz_clear(v)" *)
+  val set: varinfo -> exp -> stmt
+(* build stmt "mpz_set_*(v, e)" with the good function 'set' according to the
+   type of e *)
+end = struct
+
+  let t_torig =
   { torig_name = "mpz_t";
     tname = "mpz_t";
     ttype = TVoid [] (* incorrect but does not matter *);
     treferenced = false }
 
-let mpz_t_ty = TNamed(mpz_t_torig, [])
+  let is_now_referenced () = t_torig.treferenced <- true
 
-let is_mpz_t ty = Cil_datatype.Typ.equal ty mpz_t_ty
+  let t_ty = TNamed(t_torig, [])
+  let is_t ty = Cil_datatype.Typ.equal ty t_ty
 
-let apply_mpz_on_var funname v = mk_call ("mpz_" ^ funname) [ new_lval v ]
-let apply_mpz_init = apply_mpz_on_var "init"
-let apply_mpz_clear = apply_mpz_on_var "clear"
+  let apply_on_var funname v = mk_call ("mpz_" ^ funname) [ new_lval v ]
+  let init = apply_on_var "init"
+  let clear = apply_on_var "clear"
 
-let apply_mpz_set v e =
-  let fname, args = match typeOf e with
-    | TInt((IBool | IChar | IUChar | IUInt | IUShort | IULong), _) ->
-      "set_ui", [ e ]
-    | TInt((ISChar | IShort | IInt | ILong), _) -> "set_si", [ e ]
-    | TInt((ILongLong | IULongLong), _) -> assert false
-    | TPtr(TInt(IChar, _), _) ->
-      "set_str",
-      (* decimal base for the number given as string *)
-      [ e; integer ~loc:unknown_loc 10 ]
-    | _ -> assert false
-  in
-  mk_call ("mpz_" ^ fname) (new_lval v :: args)
+  let set v e =
+    let fname, args = match typeOf e with
+      | TInt((IBool | IChar | IUChar | IUInt | IUShort | IULong), _) ->
+	"set_ui", [ e ]
+      | TInt((ISChar | IShort | IInt | ILong), _) -> "set_si", [ e ]
+      | TInt((ILongLong | IULongLong), _) -> assert false
+      | TPtr(TInt(IChar, _), _) ->
+	"set_str",
+	(* decimal base for the number given as string *)
+	[ e; integer ~loc:unknown_loc 10 ]
+      | _ -> assert false
+    in
+    mk_call ("mpz_" ^ fname) (new_lval v :: args)
+
+end
 
 (* ************************************************************************** *)
 (* Environments *)
 (* ************************************************************************** *)
 
 module New_vars: sig
-
-  val push: bool -> typ -> exp option -> varinfo
   (* boolean: [true] if global var
      constant option: mpz_t constant associated to the varinfo at init time *)
-
+  val push: bool -> typ -> exp option -> varinfo
   val finalize: unit -> (varinfo * exp option) list
-
 end = struct
 
   (* the finalizer resets the counter in order to keep it small. However, Cil
@@ -113,9 +128,9 @@ end = struct
   let vlist = ref []
 
   let push is_global ty e =
-    if is_mpz_t ty then begin
+    if Mpz.is_t ty then begin
       assert (e <> None);
-      mpz_t_torig.treferenced <- true
+      Mpz.is_now_referenced ()
     end else
       assert (e = None);
     incr var_cpt;
@@ -140,12 +155,10 @@ end = struct
 end
 
 module New_block : sig
-
   val is_empty: unit -> bool
   val push: stmt -> unit
   val push_at_end: stmt -> unit
   val finalize: stmt -> block
-
 end = struct
 
   let blist = ref []
@@ -233,7 +246,7 @@ and term_to_exp is_global t = match t.term_type with
   | Lvar _ -> not_yet "polymorphic term"
   | Linteger ->
     let e = nocheck_term_to_exp is_global t in
-    let v = New_vars.push is_global mpz_t_ty (Some e) in
+    let v = New_vars.push is_global Mpz.t_ty (Some e) in
     new_lval v
   | Lreal -> not_yet "real number"
   | Larrow _ -> not_yet "logic function"
@@ -257,8 +270,8 @@ let rec named_predicate_to_revexp is_global p = match p.content with
     let bop = relation_to_revbinop rel in
     let e1 = term_to_exp is_global t1 in
     let e2 = term_to_exp is_global t2 in
-    if is_mpz_t (typeOf e1) then begin
-      assert (is_mpz_t (typeOf e2));
+    if Mpz.is_t (typeOf e1) then begin
+      assert (Mpz.is_t (typeOf e2));
       let v = New_vars.push is_global intType None in
       let result = var v in
       New_block.push (mk_call ~result "mpz_cmp" [ e1; e2 ]);
@@ -377,9 +390,9 @@ class e_acsl_visitor prj generate = object (self)
 	    b.blocals <- v :: b.blocals;
 	    Extlib.may
 	      (fun e ->
-		let s1 = apply_mpz_init v in
-		let s2 = apply_mpz_set v e in
-		b.bstmts <- s1 :: s2 :: b.bstmts @ [ apply_mpz_clear v ])
+		let s1 = Mpz.init v in
+		let s2 = Mpz.set v e in
+		b.bstmts <- s1 :: s2 :: b.bstmts @ [ Mpz.clear v ])
 	      e;
 	    v :: acc)
 	  []
