@@ -229,7 +229,6 @@ let rec term_to_exp is_global t = match t.term_node with
   | Trange _ -> not_yet "range"
   | Tlet _ -> not_yet "let binding"
 
-(* [TODO] not fully test *)
 let relation_to_revbinop = function
   | Rlt -> Ge
   | Rgt -> Le
