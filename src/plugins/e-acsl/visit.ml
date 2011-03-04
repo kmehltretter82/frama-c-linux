@@ -25,51 +25,164 @@ open Cil
 
 let unknown_loc = Cil_datatype.Location.unknown
 
+let new_lval v = new_exp unknown_loc (Lval (var v))
+
+let mk_call ?result fname args =
+  (* the type is incorrect, but it doesn't matter *)
+  let f = new_lval (makeGlobalVar fname voidType) in
+  mkStmt ~valid_sid:true (Instr(Call(result, f, args, unknown_loc)))
+
 exception Typing_error of string
 let error s = raise (Typing_error s)
 let not_yet s =
   Options.not_yet_implemented "construct `%s' is not yet supported" s
 
-let e_acsl_header () =
- GText("/*@ terminates \\false;\n\
-assigns \\nothing;\n\
-ensures \\false; */\n\
-extern void exit(int status);\n\
-\n\
-/*@ assigns \\nothing; */ \n\
-extern void eprintf(char * ); \n\
-\n\
-void e_acsl_fail(char *msg) { eprintf(msg); exit(1); }")
+(* [TODO] should not generate the type if the user wants to link the resulting
+   program with GMP: use an option for this purpose?
+   [TODO] transform the function to a constant? *)
+let e_acsl_header () = GText (Read_header.text ())
 
 (* Build a C conditional doing a runtime assertion check. *)
-let mk_if acc e p =
-  (* voidType is incorrect: will be resolved later *)
-  let f =
-    new_exp unknown_loc (Lval (var (makeGlobalVar "e_acsl_fail" voidType)))
-  in
+let mk_if e p =
   let msg =
     let b = Buffer.create 97 in
     let fmt = Format.formatter_of_buffer b in
     Format.fprintf fmt "%a@?" Cil.d_predicate_named p;
     Buffer.contents b
   in
-  let s = Instr(Call(None, f, [ mkString unknown_loc msg ], unknown_loc))in
-  mkStmt(If(e, mkBlock [ mkStmt s ], mkBlock [], unknown_loc)) :: acc
+  let s = mk_call "e_acsl_fail" [ mkString unknown_loc msg ] in
+  mkStmt ~valid_sid:true (If(e, mkBlock [ s ], mkBlock [], unknown_loc))
+
+let apply_mpz_on_var funname v = mk_call ("mpz_" ^ funname) [ new_lval v ]
+let apply_mpz_init = apply_mpz_on_var "init"
+let apply_mpz_clear = apply_mpz_on_var "clear"
+
+let apply_mpz_set v cst =
+  let fname, args = match cst with
+    | CInt64(n, k, s) ->
+      (match k with
+      | IBool
+      | IChar
+      | IUChar
+      | IUInt
+      | IUShort
+      | IULong -> "set_ui", [ kinteger64_repr ~loc:unknown_loc IULong n s ]
+      | ISChar
+      | IShort
+      | IInt
+      | ILong -> "set_si", [ kinteger64_repr ~loc:unknown_loc ILong n s ]
+      | ILongLong | IULongLong ->
+	"set_str",
+	[ mkString ~loc:unknown_loc (Int64.to_string n);
+	  integer ~loc:unknown_loc 10 (* decimal base for the number given as
+					 string *) ]
+      )
+    | CStr _ | CWStr _ | CChr _ | CReal _ | CEnum _ ->
+      assert false
+  in
+  mk_call ("mpz_" ^ fname) (new_lval v :: args)
 
 (* ************************************************************************** *)
-(* transforming terms and predicates into C expressions (if any) *)
+(* Environments *)
 (* ************************************************************************** *)
 
-let constant_to_exp = function
-  | CInt64 _ -> not_yet "integer"
+module New_vars: sig
+
+  val push: bool -> typ -> constant option -> varinfo
+  (* boolean: [true] if global var
+     constant option: mpz_t constant associated to the varinfo at init time *)
+
+  val finalize: unit -> (varinfo * constant option) list
+
+end = struct
+
+  (* the finalizer resets the counter in order to keep it small. However, Cil
+     visitor is dummy: it believes that my counter is its own and thus change it
+     to keep it stricly growing. Too bad! :-(
+
+     Could be a real issue in practice since **many** variables are generated
+     for E-ACSL (at least one variable by integer constant). *)
+
+  let var_cpt = ref 0
+  let vlist = ref []
+
+  let push is_global typ c =
+    incr var_cpt;
+    let v =
+      makeVarinfo
+	~logic:false
+	~generated:true
+	is_global
+	false (* is a formal? *)
+	("e_acsl_cst_" ^ string_of_int !var_cpt)
+	typ
+    in
+    vlist := (v, c) :: !vlist;
+    v
+
+  let finalize () =
+    var_cpt := 0;
+    let l = !vlist in
+    vlist := [];
+    l
+
+end
+
+module New_block : sig
+
+  val is_empty: unit -> bool
+  val push: stmt -> unit
+  val push_at_end: stmt -> unit
+  val finalize: stmt -> block
+
+end = struct
+
+  let blist = ref []
+  let slist = ref []
+
+  let push s = blist := s :: !blist
+  let push_at_end s = slist := s :: !slist
+
+  let is_empty () = !blist = [] && !slist = []
+
+  let finalize s =
+    let l = !blist @ !slist @ [ s ] in
+    blist := [];
+    slist := [];
+    mkBlock l
+
+end
+
+(* ************************************************************************** *)
+(* Transforming terms and predicates into C expressions (if any) *)
+(* ************************************************************************** *)
+
+let mpz_t_torig =
+  { torig_name = "mpz_t";
+    tname = "mpz_t";
+    ttype = TVoid [] (* incorrect but does not matter *);
+    treferenced = false }
+
+let mpz_t_ty = TNamed(mpz_t_torig, [])
+
+let is_mpz_t ty = Cil_datatype.Typ.equal ty mpz_t_ty
+
+let constant_to_exp is_global = function
+  | CInt64(_n, _, _) as c ->
+    (* [TODO] use memoization in order to create the minimum number of new
+       variables *)
+(*    Options.debug ~level:3 "new variable for constant %S" (Int64.to_string n);*)
+    mpz_t_torig.treferenced <- true;
+    let v = New_vars.push is_global mpz_t_ty (Some c) in
+    new_lval v
   | CStr _ as c -> new_exp unknown_loc (Const c)
   | CWStr _ -> not_yet "wide character string constant"
   | CChr _ -> not_yet "character constant"
   | CReal _ -> not_yet "floating point constant"
   | CEnum _ -> not_yet "enum constant"
 
-let rec term_to_exp t = match t.term_node with
-  | TConst c -> constant_to_exp c
+let rec term_to_exp is_global t = match t.term_node with
+  | TConst c -> constant_to_exp is_global c
   | TLval _ -> not_yet "left value"
   | TSizeOf _ -> not_yet "sizeof"
   | TSizeOfE _ -> not_yet "sizeof(expr)"
@@ -102,7 +215,7 @@ let rec term_to_exp t = match t.term_node with
   | Trange _ -> not_yet "range"
   | Tlet _ -> not_yet "let binding"
 
-(* untested *)
+(* [TODO] not fully test *)
 let relation_to_revbinop = function
   | Rlt -> Ge
   | Rgt -> Le
@@ -113,22 +226,38 @@ let relation_to_revbinop = function
 
 (* convert an ACSL named predicate into the opposite C expression (if any).
    E.g. \true is converted into 0. *)
-let rec named_predicate_to_revexp p = match p.content with
+let rec named_predicate_to_revexp is_global p = match p.content with
   | Pfalse -> one ~loc:unknown_loc
   | Ptrue -> zero ~loc:unknown_loc
   | Papp _ -> not_yet "logic function application"
   | Pseparated _ -> not_yet "separated"
-  | Prel(rel, t1, t2) -> (* untested *)
+  | Prel(rel, t1, t2) ->
     let bop = relation_to_revbinop rel in
-    let e1 = term_to_exp t1 in
-    let e2 = term_to_exp t2 in
-    new_exp unknown_loc (BinOp(bop, e1, e2, intType))
+    let e1 = term_to_exp is_global t1 in
+    let e2 = term_to_exp is_global t2 in
+    if is_mpz_t (typeOf e1) then begin
+      assert (is_mpz_t (typeOf e2));
+      let v = New_vars.push is_global intType None in
+      let result = var v in
+      New_block.push (mk_call ~result "mpz_cmp" [ e1; e2 ]);
+      let bop =
+	BinOp(bop,
+	      new_exp unknown_loc (Lval result),
+	      zero unknown_loc,
+	      intType)
+      in
+      new_exp unknown_loc bop
+    end else
+      new_exp unknown_loc (BinOp(bop, e1, e2, intType))
   | Pand _ -> not_yet "&&"
   | Por _ -> not_yet "||"
   | Pxor _ -> not_yet "xor"
   | Pimplies _ -> not_yet "==>"
   | Piff _ -> not_yet "<==>"
-  | Pnot p -> named_predicate_to_revexp p
+  | Pnot p ->
+    (* [TODO] not really tested (see not.i) *)
+    let e = named_predicate_to_revexp is_global p in
+    new_exp unknown_loc (UnOp(Neg, e, TInt(IInt, [])))
   | Pif _ -> not_yet "_ ? _ : _"
   | Plet _ -> not_yet "let _ = _ in _"
   | Pforall _ -> not_yet "\\forall"
@@ -146,22 +275,24 @@ let rec named_predicate_to_revexp p = match p.content with
    statement (if any) for runtime assertion checking *)
 (* ************************************************************************** *)
 
-let convert_named_predicate acc generate p =
-  if generate then mk_if acc (named_predicate_to_revexp p) p else acc
+let convert_named_predicate is_global generate p =
+  if generate then
+    let e = named_predicate_to_revexp is_global p in
+    New_block.push_at_end (mk_if e p)
 
-let convert_annotation acc generate annot = match annot.annot_content with
-  | AAssert(_l, p) -> convert_named_predicate acc generate p
+let convert_annotation is_global generate annot = match annot.annot_content with
+  | AAssert(_l, p) -> convert_named_predicate is_global generate p
   | AStmtSpec _ -> not_yet "stmt spec"
   | AInvariant _ -> not_yet "invariant"
   | AVariant _ -> not_yet "variant"
   | AAssigns _ -> not_yet "assigns"
   | APragma _ -> not_yet "pragma"
 
-let convert_rooted acc generate (User a | AI(_, a)) =
-  convert_annotation acc generate a
+let convert_rooted is_global generate (User a | AI(_, a)) =
+  convert_annotation is_global generate a
 
-let convert_before_after acc generate (Before r | After r) =
-  convert_rooted acc generate r
+let convert_before_after is_global generate (Before r | After r) =
+  convert_rooted is_global generate r
 
 (* ************************************************************************** *)
 (* Visitor *)
@@ -171,29 +302,61 @@ let convert_before_after acc generate (Before r | After r) =
 let first_global = ref true
 
 (* the main visitor performing e-acsl checking and C code generator *)
-class e_acsl_visitor prj generate = object
+class e_acsl_visitor prj generate = object (self)
 
   inherit Visitor.generic_frama_c_visitor
     prj
     ((if generate then Cil.copy_visit else Cil.inplace_visit) ())
 
+  val mutable gen_vars = []
+
   method vglob g =
+    (* [TODO] must handle constant expression and global variables
+       (mpz_init and clear [and mpz_set_* for constants]) *)
     if !first_global then begin
       first_global := false;
       ChangeDoChildrenPost([ g ], fun l -> e_acsl_header () :: l)
     end else
       DoChildren
 
+  method vfundec f =
+    let add_gen_vars f = f.slocals <- gen_vars @ f.slocals; f in
+    ChangeDoChildrenPost(f, add_gen_vars)
+
   method vstmt_aux stmt =
-    let l = Annotations.get_all_annotations stmt in
-    match
-      List.fold_right (fun ba acc -> convert_before_after acc generate ba) l []
-    with
-    | [] -> DoChildren
-    | l ->
+    Options.debug ~level:2 "proceeding stmt %d@." stmt.sid;
+    let is_global = match self#current_kinstr with
+      | Kglobal -> true
+      | Kstmt _ -> false
+    in
+    List.iter
+      (fun ba -> convert_before_after is_global generate ba)
+      (Annotations.get_all_annotations stmt);
+    (* new_block and new_vars is set by convert_before_after *)
+    let is_empty_block = New_block.is_empty () in
+    let new_vars = New_vars.finalize () in
+    match is_empty_block, new_vars with
+    | true, [] -> DoChildren
+    | true, _ :: _ -> assert false
+    | false, _ ->
       assert generate;
       let mk_block stmt =
-	mkStmt ~valid_sid:true (Block (mkBlock (l @ [ stmt ])))
+	let b = New_block.finalize stmt in
+	(* [TODO] efficiency could be improved *)
+	gen_vars <-
+	  List.fold_left
+	  (fun acc (v, c) ->
+	    b.blocals <- v :: b.blocals;
+	    Extlib.may
+	      (fun c ->
+		let s1 = apply_mpz_init v in
+		let s2 = apply_mpz_set v c in
+		b.bstmts <- s1 :: s2 :: b.bstmts @ [ apply_mpz_clear v ])
+	      c;
+	    v :: acc)
+	  []
+	  new_vars;
+	mkStmt ~valid_sid:true (Block b)
       in
       ChangeDoChildrenPost(stmt, mk_block)
 
@@ -202,7 +365,7 @@ end
 let do_visit ?(prj=Project.current ()) generate =
   let prj = new e_acsl_visitor prj generate in
   first_global := true;
-  prj
+  (prj :> Visitor.frama_c_visitor)
 
 (*
 Local Variables:
