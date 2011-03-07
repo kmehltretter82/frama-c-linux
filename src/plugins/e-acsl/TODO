@@ -1,0 +1,10 @@
+- relation binaire sur les termes
+
+- améliorer test "comparison.i" quand bug fixed #744
+- améliorer test "integer_constant.i" quand bug fixed #745
+
+en lien avec bts #743:
+- make distrib
+- headers (copyright 2011)
+- license
+- install répertoire share

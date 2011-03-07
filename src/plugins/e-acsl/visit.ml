@@ -330,9 +330,6 @@ let convert_annotation is_global annot =
 let convert_rooted is_global (User a | AI(_, a)) =
   convert_annotation is_global a
 
-let convert_before_after is_global (Before r | After r) =
-  convert_rooted is_global r
-
 (* ************************************************************************** *)
 (* Visitor *)
 (* ************************************************************************** *)
@@ -370,9 +367,7 @@ class e_acsl_visitor prj generate = object (self)
       | Kglobal -> true
       | Kstmt _ -> false
     in
-    Annotations.single_iter_stmt
-      (fun ba -> convert_before_after is_global ba)
-      stmt;
+    Annotations.single_iter_stmt (fun ba -> convert_rooted is_global ba) stmt;
     (* new_block and new_vars is set by convert_before_after *)
     let is_empty_block = New_block.is_empty () in
     let new_vars = New_vars.finalize () in
