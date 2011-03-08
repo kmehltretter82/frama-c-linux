@@ -65,14 +65,14 @@ let mk_if e p =
 (* ************************************************************************** *)
 
 module Mpz : sig
-  val t_ty: typ (* type "mpz_t" *)
+  val t: typ (* type "mpz_t" *)
   val is_now_referenced: unit -> unit (* one variable "mpz_t" now exists *)
   val is_t: typ -> bool (* is the type equal to "mpz_t"? *)
   val init: varinfo -> stmt (* build stmt "mpz_init(v)" *)
   val clear: varinfo -> stmt (* build stmt "mpz_clear(v)" *)
-  val set: varinfo -> exp -> stmt
-(* build stmt "mpz_set_*(v, e)" with the good function 'set' according to the
-   type of e *)
+  val init_set: varinfo -> exp -> stmt
+(* build stmt "mpz_init_set_*(v, e)" with the good function 'set' according to
+   the type of e *)
 end = struct
 
   let t_torig =
@@ -83,26 +83,26 @@ end = struct
 
   let is_now_referenced () = t_torig.treferenced <- true
 
-  let t_ty = TNamed(t_torig, [])
-  let is_t ty = Cil_datatype.Typ.equal ty t_ty
+  let t = TNamed(t_torig, [])
+  let is_t ty = Cil_datatype.Typ.equal ty t
 
   let apply_on_var funname v = mk_call ("mpz_" ^ funname) [ new_lval v ]
   let init = apply_on_var "init"
   let clear = apply_on_var "clear"
 
-  let set v e =
+  let init_set v e =
     let fname, args = match typeOf e with
       | TInt((IBool | IChar | IUChar | IUInt | IUShort | IULong), _) ->
-	"set_ui", [ e ]
-      | TInt((ISChar | IShort | IInt | ILong), _) -> "set_si", [ e ]
+	"ui", [ e ]
+      | TInt((ISChar | IShort | IInt | ILong), _) -> "si", [ e ]
       | TInt((ILongLong | IULongLong), _) -> assert false
       | TPtr(TInt(IChar, _), _) ->
-	"set_str",
+	"str",
 	(* decimal base for the number given as string *)
 	[ e; integer ~loc:unknown_loc 10 ]
       | _ -> assert false
     in
-    mk_call ("mpz_" ^ fname) (new_lval v :: args)
+    mk_call ("mpz_init_set_" ^ fname) (new_lval v :: args)
 
 end
 
@@ -111,9 +111,8 @@ end
 (* ************************************************************************** *)
 
 module New_vars: sig
-  (* constant option: mpz_t constant associated to the varinfo at init time *)
-  val push: typ -> exp option -> varinfo
-  val finalize: unit -> (varinfo * exp option) list
+  val push: typ -> (varinfo -> stmt list) -> varinfo
+  val finalize: unit -> (varinfo * stmt list * bool) list
 end = struct
 
   (* the finalizer resets the counter in order to keep it small. However, Cil
@@ -126,13 +125,10 @@ end = struct
   let var_cpt = ref 0
   let vlist = ref []
 
-  let push ty e =
-    if Mpz.is_t ty then begin
-      assert (e <> None);
-      Mpz.is_now_referenced ()
-    end else
-      assert (e = None);
+  let push ty mk_stmts =
     incr var_cpt;
+    let is_t = Mpz.is_t ty in
+    if is_t then Mpz.is_now_referenced ();
     let v =
       makeVarinfo
 	~logic:false
@@ -142,7 +138,7 @@ end = struct
 	("e_acsl_cst_" ^ string_of_int !var_cpt)
 	ty
     in
-    vlist := (v, e) :: !vlist;
+    vlist := (v, mk_stmts v, is_t) :: !vlist;
     v
 
   let finalize () =
@@ -199,9 +195,20 @@ let tlval_to_lval = function
   | TVar { lv_origin = Some v }, TNoOffset -> Var v, NoOffset
   | _ -> not_yet "complex left value"
 
-let rec nocheck_term_to_exp t = match t.term_node with
-  | TConst c -> constant_to_exp c
-  | TLval lv -> new_exp ~loc:unknown_loc (Lval (tlval_to_lval lv))
+let wrap_leaf e = function
+  | Ctype _ -> e
+  | Ltype _ -> not_yet "term from an user defined type"
+  | Lvar _ -> not_yet "polymorphic term"
+  | Linteger ->
+    let v = New_vars.push Mpz.t (fun v -> [ Mpz.init_set v e ]) in
+    new_lval v
+  | Lreal -> not_yet "real number"
+  | Larrow _ -> not_yet "logic function"
+
+let rec term_to_exp t = match t.term_node with
+  | TConst c -> wrap_leaf (constant_to_exp c) t.term_type
+  | TLval lv ->
+    wrap_leaf (new_exp ~loc:unknown_loc (Lval (tlval_to_lval lv))) t.term_type
   | TSizeOf ty -> sizeOf ~loc:unknown_loc ty
   | TSizeOfE t ->
     let e = term_to_exp t in
@@ -239,17 +246,6 @@ let rec nocheck_term_to_exp t = match t.term_node with
   | Trange _ -> not_yet "range"
   | Tlet _ -> not_yet "let binding"
 
-and term_to_exp t = match t.term_type with
-  | Ctype _ -> nocheck_term_to_exp t
-  | Ltype _ -> not_yet "term from an user defined type"
-  | Lvar _ -> not_yet "polymorphic term"
-  | Linteger ->
-    let e = nocheck_term_to_exp t in
-    let v = New_vars.push Mpz.t_ty (Some e) in
-    new_lval v
-  | Lreal -> not_yet "real number"
-  | Larrow _ -> not_yet "logic function"
-
 let relation_to_revbinop = function
   | Rlt -> Ge
   | Rgt -> Le
@@ -271,12 +267,16 @@ let rec named_predicate_to_revexp p = match p.content with
     let e2 = term_to_exp t2 in
     if Mpz.is_t (typeOf e1) then begin
       assert (Mpz.is_t (typeOf e2));
-      let v = New_vars.push intType None in
-      let result = var v in
-      New_block.push (mk_call ~result "mpz_cmp" [ e1; e2 ]);
+      let v =
+	New_vars.push
+	  intType
+	  (fun v ->
+	    let result = var v in
+	    [ mk_call ~result "mpz_cmp" [ e1; e2 ] ])
+      in
       let bop =
 	BinOp(bop,
-	      new_exp unknown_loc (Lval result),
+	      new_exp unknown_loc (Lval (var v)),
 	      zero unknown_loc,
 	      intType)
       in
@@ -372,20 +372,17 @@ class e_acsl_visitor prj generate = object
       assert generate;
       let mk_block stmt =
 	let b = New_block.finalize stmt in
-	(* [TODO] efficiency could be improved *)
-	gen_vars <-
+	let vars, clears =
 	  List.fold_left
-	  (fun acc (v, e) ->
-	    b.blocals <- v :: b.blocals;
-	    Extlib.may
-	      (fun e ->
-		let s1 = Mpz.init v in
-		let s2 = Mpz.set v e in
-		b.bstmts <- s1 :: s2 :: b.bstmts @ [ Mpz.clear v ])
-	      e;
-	    v :: acc)
-	  []
-	  new_vars;
+	    (fun (vars, clears) (v, stmts, must_clear) ->
+	      b.blocals <- v :: b.blocals;
+	      b.bstmts <- stmts @ b.bstmts;
+	      v :: vars, if must_clear then Mpz.clear v :: clears else clears)
+	    ([], [])
+	    new_vars
+	in
+	gen_vars <- vars;
+	b.bstmts <- b.bstmts @ clears;
 	mkStmt ~valid_sid:true (Block b)
       in
       ChangeDoChildrenPost(stmt, mk_block)

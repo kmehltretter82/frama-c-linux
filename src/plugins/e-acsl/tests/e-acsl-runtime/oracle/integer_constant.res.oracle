@@ -3,28 +3,19 @@
 [value] Initial state computed
 [value] Values of globals at initialization
 PROJECT_FILE:73:[value] Assertion got status valid.
-[value] computing for function mpz_init <-main.
+[value] computing for function mpz_init_set_si <-main.
         Called from PROJECT_FILE:75.
-PROJECT_FILE:75:[value] Function mpz_init: postcondition got status unknown
-[value] Done for function mpz_init
-[value] computing for function mpz_set_si <-main.
+PROJECT_FILE:75:[value] Function mpz_init_set_si: postcondition got status unknown
+[value] Done for function mpz_init_set_si
+[value] computing for function mpz_init_set_si <-main.
         Called from PROJECT_FILE:75.
-PROJECT_FILE:75:[value] Function mpz_set_si: precondition got status valid
-[value] Done for function mpz_set_si
-[value] computing for function mpz_init <-main.
-        Called from PROJECT_FILE:76.
-PROJECT_FILE:76:[value] Function mpz_init: postcondition got status unknown
-[value] Done for function mpz_init
-[value] computing for function mpz_set_si <-main.
-        Called from PROJECT_FILE:76.
-PROJECT_FILE:76:[value] Function mpz_set_si: precondition got status valid
-[value] Done for function mpz_set_si
+[value] Done for function mpz_init_set_si
 [value] computing for function mpz_cmp <-main.
-        Called from PROJECT_FILE:77.
-PROJECT_FILE:77:[value] Function mpz_cmp: precondition got status valid
+        Called from PROJECT_FILE:76.
+PROJECT_FILE:76:[value] Function mpz_cmp: precondition got status valid
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <-main.
-        Called from PROJECT_FILE:78.
+        Called from PROJECT_FILE:77.
 [value] computing for function eprintf <-e_acsl_fail <-main.
         Called from PROJECT_FILE:69.
 [value] Done for function eprintf
@@ -35,73 +26,56 @@ PROJECT_FILE:69:[value] Function exit: postcondition got status invalid
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
 [value] computing for function mpz_clear <-main.
-        Called from PROJECT_FILE:79.
-PROJECT_FILE:79:[value] Function mpz_clear: precondition got status valid
+        Called from PROJECT_FILE:78.
+PROJECT_FILE:78:[value] Function mpz_clear: precondition got status valid
 [value] Done for function mpz_clear
 [value] computing for function mpz_clear <-main.
-        Called from PROJECT_FILE:79.
+        Called from PROJECT_FILE:78.
 [value] Done for function mpz_clear
-PROJECT_FILE:82:[value] Assertion got status valid.
-[value] computing for function mpz_init <-main.
-        Called from PROJECT_FILE:84.
-PROJECT_FILE:84:[value] Function mpz_init: postcondition got status unknown
-[value] Done for function mpz_init
-[value] computing for function mpz_set_si <-main.
-        Called from PROJECT_FILE:84.
-PROJECT_FILE:84:[value] Function mpz_set_si: precondition got status valid
-[value] Done for function mpz_set_si
-[value] computing for function mpz_init <-main.
-        Called from PROJECT_FILE:85.
-PROJECT_FILE:85:[value] Function mpz_init: postcondition got status unknown
-[value] Done for function mpz_init
-[value] computing for function mpz_set_si <-main.
-        Called from PROJECT_FILE:85.
-PROJECT_FILE:85:[value] Function mpz_set_si: precondition got status valid
-[value] Done for function mpz_set_si
+PROJECT_FILE:81:[value] Assertion got status valid.
+[value] computing for function mpz_init_set_si <-main.
+        Called from PROJECT_FILE:83.
+PROJECT_FILE:83:[value] Function mpz_init_set_si: postcondition got status unknown
+[value] Done for function mpz_init_set_si
+[value] computing for function mpz_init_set_si <-main.
+        Called from PROJECT_FILE:83.
+[value] Done for function mpz_init_set_si
 [value] computing for function mpz_cmp <-main.
+        Called from PROJECT_FILE:84.
+PROJECT_FILE:84:[value] Function mpz_cmp: precondition got status valid
+[value] Done for function mpz_cmp
+[value] computing for function e_acsl_fail <-main.
+        Called from PROJECT_FILE:85.
+[value] computing for function eprintf <-e_acsl_fail <-main.
+        Called from PROJECT_FILE:69.
+[value] Done for function eprintf
+[value] computing for function exit <-e_acsl_fail <-main.
+        Called from PROJECT_FILE:69.
+[value] Done for function exit
+[value] Recording results for e_acsl_fail
+[value] Done for function e_acsl_fail
+[value] computing for function mpz_clear <-main.
         Called from PROJECT_FILE:86.
-PROJECT_FILE:86:[value] Function mpz_cmp: precondition got status valid
-[value] Done for function mpz_cmp
-[value] computing for function e_acsl_fail <-main.
-        Called from PROJECT_FILE:87.
-[value] computing for function eprintf <-e_acsl_fail <-main.
-        Called from PROJECT_FILE:69.
-[value] Done for function eprintf
-[value] computing for function exit <-e_acsl_fail <-main.
-        Called from PROJECT_FILE:69.
-[value] Done for function exit
-[value] Recording results for e_acsl_fail
-[value] Done for function e_acsl_fail
-[value] computing for function mpz_clear <-main.
-        Called from PROJECT_FILE:88.
-PROJECT_FILE:88:[value] Function mpz_clear: precondition got status valid
+PROJECT_FILE:86:[value] Function mpz_clear: precondition got status valid
 [value] Done for function mpz_clear
 [value] computing for function mpz_clear <-main.
-        Called from PROJECT_FILE:88.
+        Called from PROJECT_FILE:86.
 [value] Done for function mpz_clear
-PROJECT_FILE:91:[value] Assertion got status valid.
-[value] computing for function mpz_init <-main.
-        Called from PROJECT_FILE:93.
-PROJECT_FILE:93:[value] Function mpz_init: postcondition got status unknown
-[value] Done for function mpz_init
-[value] computing for function mpz_set_str <-main.
-        Called from PROJECT_FILE:94.
-PROJECT_FILE:94:[value] Function mpz_set_str: precondition got status valid
-[value] Done for function mpz_set_str
-[value] computing for function mpz_init <-main.
-        Called from PROJECT_FILE:95.
-PROJECT_FILE:95:[value] Function mpz_init: postcondition got status unknown
-[value] Done for function mpz_init
-[value] computing for function mpz_set_str <-main.
-        Called from PROJECT_FILE:96.
-PROJECT_FILE:96:[value] Function mpz_set_str: precondition got status valid
-[value] Done for function mpz_set_str
+PROJECT_FILE:89:[value] Assertion got status valid.
+[value] computing for function mpz_init_set_str <-main.
+        Called from PROJECT_FILE:91.
+PROJECT_FILE:91:[value] Function mpz_init_set_str: postcondition got status unknown
+[value] Done for function mpz_init_set_str
+[value] computing for function mpz_init_set_str <-main.
+        Called from PROJECT_FILE:92.
+PROJECT_FILE:92:[value] Function mpz_init_set_str: postcondition got status unknown
+[value] Done for function mpz_init_set_str
 [value] computing for function mpz_cmp <-main.
-        Called from PROJECT_FILE:97.
-PROJECT_FILE:97:[value] Function mpz_cmp: precondition got status valid
+        Called from PROJECT_FILE:93.
+PROJECT_FILE:93:[value] Function mpz_cmp: precondition got status valid
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <-main.
-        Called from PROJECT_FILE:99.
+        Called from PROJECT_FILE:95.
 [value] computing for function eprintf <-e_acsl_fail <-main.
         Called from PROJECT_FILE:69.
 [value] Done for function eprintf
@@ -111,18 +85,16 @@ PROJECT_FILE:97:[value] Function mpz_cmp: precondition got status valid
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
 [value] computing for function mpz_clear <-main.
-        Called from PROJECT_FILE:100.
-PROJECT_FILE:100:[value] Function mpz_clear: precondition got status valid
+        Called from PROJECT_FILE:96.
+PROJECT_FILE:96:[value] Function mpz_clear: precondition got status valid
 [value] Done for function mpz_clear
 [value] computing for function mpz_clear <-main.
-        Called from PROJECT_FILE:100.
+        Called from PROJECT_FILE:96.
 [value] Done for function mpz_clear
 [value] Recording results for main
 [value] done for function main
-[from] Computing for function mpz_init
-[from] Done for function mpz_init
-[from] Computing for function mpz_set_si
-[from] Done for function mpz_set_si
+[from] Computing for function mpz_init_set_si
+[from] Done for function mpz_init_set_si
 [from] Computing for function mpz_cmp
 [from] Done for function mpz_cmp
 [from] Computing for function e_acsl_fail
@@ -134,8 +106,8 @@ PROJECT_FILE:69:[from] Non terminating function (no dependencies)
 [from] Done for function e_acsl_fail
 [from] Computing for function mpz_clear
 [from] Done for function mpz_clear
-[from] Computing for function mpz_set_str
-[from] Done for function mpz_set_str
+[from] Computing for function mpz_init_set_str
+[from] Done for function mpz_init_set_str
 [dominators] computing for function main
 [dominators] done for function main
 [value] ====== VALUES COMPUTED ======
@@ -150,18 +122,16 @@ struct __anonstruct___mpz_struct_1 {
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct mpz_t[1];
-/*@ ensures \valid(\at(x,Old));
-    assigns *x;  */
-extern void mpz_init(__mpz_struct * /*[1]*/  x ) ;
 /*@ requires \valid(x);
     assigns *x;  */
 extern void mpz_clear(__mpz_struct * /*[1]*/  x ) ;
-/*@ requires \valid(z);
+/*@ ensures \valid(\at(z,Old));
     assigns *z;  */
-extern void mpz_set_si(__mpz_struct * /*[1]*/  z , long n ) ;
-/*@ requires \valid(z);
+extern void mpz_init_set_si(__mpz_struct * /*[1]*/  z , long n ) ;
+/*@ ensures \valid(\at(z,Old));
     assigns *z;  */
-extern void mpz_set_str(__mpz_struct * /*[1]*/  z , char *str , int base ) ;
+extern void mpz_init_set_str(__mpz_struct * /*[1]*/  z , char *str ,
+                             int base ) ;
 /*@ requires \valid(z1);
     requires \valid(z2);
     assigns \nothing;  */
@@ -183,43 +153,38 @@ void main(void)
 {
   /*@ assert (0 ≡ 0); */ ;
   { mpz_t e_acsl_cst_1 ; mpz_t e_acsl_cst_2 ; int e_acsl_cst_3 ;
-    mpz_init((__mpz_struct *)(e_acsl_cst_1));
-    mpz_set_si((__mpz_struct *)(e_acsl_cst_1),(long )0);
-    mpz_init((__mpz_struct *)(e_acsl_cst_2));
-    mpz_set_si((__mpz_struct *)(e_acsl_cst_2),(long )0);
+    mpz_init_set_si((__mpz_struct *)(e_acsl_cst_1),(long )0);
+    mpz_init_set_si((__mpz_struct *)(e_acsl_cst_2),(long )0);
     e_acsl_cst_3 = mpz_cmp((__mpz_struct *)(e_acsl_cst_1),
                            (__mpz_struct *)(e_acsl_cst_2));
     if (e_acsl_cst_3 != 0) { e_acsl_fail((char *)"((0 == 0))"); }
-    mpz_clear((__mpz_struct *)(e_acsl_cst_2));
     mpz_clear((__mpz_struct *)(e_acsl_cst_1));
+    mpz_clear((__mpz_struct *)(e_acsl_cst_2));
   }
   
   /*@ assert (0 ≢ 1); */ ;
   { mpz_t e_acsl_cst_4 ; mpz_t e_acsl_cst_5 ; int e_acsl_cst_6 ;
-    mpz_init((__mpz_struct *)(e_acsl_cst_4));
-    mpz_set_si((__mpz_struct *)(e_acsl_cst_4),(long )0);
-    mpz_init((__mpz_struct *)(e_acsl_cst_5));
-    mpz_set_si((__mpz_struct *)(e_acsl_cst_5),(long )1);
+    mpz_init_set_si((__mpz_struct *)(e_acsl_cst_4),(long )0);
+    mpz_init_set_si((__mpz_struct *)(e_acsl_cst_5),(long )1);
     e_acsl_cst_6 = mpz_cmp((__mpz_struct *)(e_acsl_cst_4),
                            (__mpz_struct *)(e_acsl_cst_5));
     if (e_acsl_cst_6 == 0) { e_acsl_fail((char *)"((0 != 1))"); }
-    mpz_clear((__mpz_struct *)(e_acsl_cst_5));
     mpz_clear((__mpz_struct *)(e_acsl_cst_4));
+    mpz_clear((__mpz_struct *)(e_acsl_cst_5));
   }
   
   /*@ assert (0xfffffffffffffff ≡ 0xfffffffffffffff); */ ;
   { mpz_t e_acsl_cst_7 ; mpz_t e_acsl_cst_8 ; int e_acsl_cst_9 ;
-    mpz_init((__mpz_struct *)(e_acsl_cst_7));
-    mpz_set_str((__mpz_struct *)(e_acsl_cst_7),(char *)"1152921504606846975",
-                10); mpz_init((__mpz_struct *)(e_acsl_cst_8));
-    mpz_set_str((__mpz_struct *)(e_acsl_cst_8),(char *)"1152921504606846975",
-                10);
+    mpz_init_set_str((__mpz_struct *)(e_acsl_cst_7),
+                     (char *)"1152921504606846975",10);
+    mpz_init_set_str((__mpz_struct *)(e_acsl_cst_8),
+                     (char *)"1152921504606846975",10);
     e_acsl_cst_9 = mpz_cmp((__mpz_struct *)(e_acsl_cst_7),
                            (__mpz_struct *)(e_acsl_cst_8));
     if (e_acsl_cst_9 != 0) {
       e_acsl_fail((char *)"((0xfffffffffffffff == 0xfffffffffffffff))");
-    } mpz_clear((__mpz_struct *)(e_acsl_cst_8));
-    mpz_clear((__mpz_struct *)(e_acsl_cst_7));
+    } mpz_clear((__mpz_struct *)(e_acsl_cst_7));
+    mpz_clear((__mpz_struct *)(e_acsl_cst_8));
   }
   
   return;

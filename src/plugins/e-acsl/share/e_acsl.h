@@ -32,17 +32,17 @@ extern void mpz_init(mpz_t x);
   @ assigns *x; */
 extern void mpz_clear(mpz_t x);
 
-/*@ requires \valid(z);
+/*@ ensures \valid(z);
   @ assigns *z; */
-extern void mpz_set_ui(mpz_t z, unsigned long int n);
+extern void mpz_init_set_ui(mpz_t z, unsigned long int n);
 
-/*@ requires \valid(z);
+/*@ ensures \valid(z);
   @ assigns *z; */
-extern void mpz_set_si(mpz_t z, signed long int n);
+extern void mpz_init_set_si(mpz_t z, signed long int n);
 
-/*@ requires \valid(z);
+/*@ ensures \valid(z);
   @ assigns *z; */
-extern void mpz_set_str(mpz_t z, char *str, int base);
+extern void mpz_init_set_str(mpz_t z, char *str, int base);
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
