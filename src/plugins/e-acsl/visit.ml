@@ -111,9 +111,8 @@ end
 (* ************************************************************************** *)
 
 module New_vars: sig
-  (* boolean: [true] if global var
-     constant option: mpz_t constant associated to the varinfo at init time *)
-  val push: bool -> typ -> exp option -> varinfo
+  (* constant option: mpz_t constant associated to the varinfo at init time *)
+  val push: typ -> exp option -> varinfo
   val finalize: unit -> (varinfo * exp option) list
 end = struct
 
@@ -127,7 +126,7 @@ end = struct
   let var_cpt = ref 0
   let vlist = ref []
 
-  let push is_global ty e =
+  let push ty e =
     if Mpz.is_t ty then begin
       assert (e <> None);
       Mpz.is_now_referenced ()
@@ -138,7 +137,7 @@ end = struct
       makeVarinfo
 	~logic:false
 	~generated:true
-	is_global
+	false (* is a global ? *)
 	false (* is a formal? *)
 	("e_acsl_cst_" ^ string_of_int !var_cpt)
 	ty
@@ -200,22 +199,22 @@ let tlval_to_lval = function
   | TVar { lv_origin = Some v }, TNoOffset -> Var v, NoOffset
   | _ -> not_yet "complex left value"
 
-let rec nocheck_term_to_exp is_global t = match t.term_node with
+let rec nocheck_term_to_exp t = match t.term_node with
   | TConst c -> constant_to_exp c
   | TLval lv -> new_exp ~loc:unknown_loc (Lval (tlval_to_lval lv))
   | TSizeOf ty -> sizeOf ~loc:unknown_loc ty
   | TSizeOfE t ->
-    let e = term_to_exp is_global t in
+    let e = term_to_exp t in
     sizeOf ~loc:unknown_loc (typeOf e)
   | TSizeOfStr s -> new_exp ~loc:unknown_loc (SizeOfStr s)
   | TAlignOf ty -> new_exp ~loc:unknown_loc (AlignOf ty)
   | TAlignOfE t ->
-    let e = term_to_exp is_global t in
+    let e = term_to_exp t in
     new_exp ~loc:unknown_loc (AlignOfE e)
   | TUnOp _ -> not_yet "unary operator"
   | TBinOp _ -> not_yet "binary operator"
   | TCastE(ty, t) ->
-    let e = term_to_exp is_global t in
+    let e = term_to_exp t in
     mkCast e ty
   | TAddrOf lv -> mkAddrOf unknown_loc (tlval_to_lval lv)
   | TStartOf _ -> not_yet "beginning of an array"
@@ -240,13 +239,13 @@ let rec nocheck_term_to_exp is_global t = match t.term_node with
   | Trange _ -> not_yet "range"
   | Tlet _ -> not_yet "let binding"
 
-and term_to_exp is_global t = match t.term_type with
-  | Ctype _ -> nocheck_term_to_exp is_global t
+and term_to_exp t = match t.term_type with
+  | Ctype _ -> nocheck_term_to_exp t
   | Ltype _ -> not_yet "term from an user defined type"
   | Lvar _ -> not_yet "polymorphic term"
   | Linteger ->
-    let e = nocheck_term_to_exp is_global t in
-    let v = New_vars.push is_global Mpz.t_ty (Some e) in
+    let e = nocheck_term_to_exp t in
+    let v = New_vars.push Mpz.t_ty (Some e) in
     new_lval v
   | Lreal -> not_yet "real number"
   | Larrow _ -> not_yet "logic function"
@@ -261,18 +260,18 @@ let relation_to_revbinop = function
 
 (* convert an ACSL named predicate into the opposite C expression (if any).
    E.g. \true is converted into 0. *)
-let rec named_predicate_to_revexp is_global p = match p.content with
+let rec named_predicate_to_revexp p = match p.content with
   | Pfalse -> one ~loc:unknown_loc
   | Ptrue -> zero ~loc:unknown_loc
   | Papp _ -> not_yet "logic function application"
   | Pseparated _ -> not_yet "separated"
   | Prel(rel, t1, t2) ->
     let bop = relation_to_revbinop rel in
-    let e1 = term_to_exp is_global t1 in
-    let e2 = term_to_exp is_global t2 in
+    let e1 = term_to_exp t1 in
+    let e2 = term_to_exp t2 in
     if Mpz.is_t (typeOf e1) then begin
       assert (Mpz.is_t (typeOf e2));
-      let v = New_vars.push is_global intType None in
+      let v = New_vars.push intType None in
       let result = var v in
       New_block.push (mk_call ~result "mpz_cmp" [ e1; e2 ]);
       let bop =
@@ -290,7 +289,7 @@ let rec named_predicate_to_revexp is_global p = match p.content with
   | Pimplies _ -> not_yet "==>"
   | Piff _ -> not_yet "<==>"
   | Pnot p ->
-    let e = named_predicate_to_revexp is_global p in
+    let e = named_predicate_to_revexp p in
     new_exp unknown_loc (UnOp(Neg, e, TInt(IInt, [])))
   | Pif _ -> not_yet "_ ? _ : _"
   | Plet _ -> not_yet "let _ = _ in _"
@@ -309,14 +308,14 @@ let rec named_predicate_to_revexp is_global p = match p.content with
    statement (if any) for runtime assertion checking *)
 (* ************************************************************************** *)
 
-let convert_named_predicate is_global p =
-  let e = named_predicate_to_revexp is_global p in
+let convert_named_predicate p =
+  let e = named_predicate_to_revexp p in
   New_block.push_at_end (mk_if e p)
 
-let convert_annotation is_global annot =
+let convert_annotation annot =
   try
     match annot.annot_content with
-    | AAssert(_l, p) -> convert_named_predicate is_global p
+    | AAssert(_l, p) -> convert_named_predicate p
     | AStmtSpec _ -> not_yet "stmt spec"
     | AInvariant _ -> not_yet "invariant"
     | AVariant _ -> not_yet "variant"
@@ -327,8 +326,7 @@ let convert_annotation is_global annot =
     if Options.Check.get () then raise (Typing_error msg)
     else Options.warning ~current:true "%s@\nignoring annotation." msg
 
-let convert_rooted is_global (User a | AI(_, a)) =
-  convert_annotation is_global a
+let convert_rooted (User a | AI(_, a)) = convert_annotation a
 
 (* ************************************************************************** *)
 (* Visitor *)
@@ -338,7 +336,7 @@ let convert_rooted is_global (User a | AI(_, a)) =
 let first_global = ref true
 
 (* the main visitor performing e-acsl checking and C code generator *)
-class e_acsl_visitor prj generate = object (self)
+class e_acsl_visitor prj generate = object
 
   inherit Visitor.generic_frama_c_visitor
     prj
@@ -363,11 +361,7 @@ class e_acsl_visitor prj generate = object (self)
 
   method vstmt_aux stmt =
 (*    Options.debug ~level:2 "proceeding stmt %d@." stmt.sid;*)
-    let is_global = match self#current_kinstr with
-      | Kglobal -> true
-      | Kstmt _ -> false
-    in
-    Annotations.single_iter_stmt (fun ba -> convert_rooted is_global ba) stmt;
+    Annotations.single_iter_stmt (fun ba -> convert_rooted ba) stmt;
     (* new_block and new_vars is set by convert_before_after *)
     let is_empty_block = New_block.is_empty () in
     let new_vars = New_vars.finalize () in

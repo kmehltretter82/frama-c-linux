@@ -1,5 +1,8 @@
 - relation binaire sur les termes
 
+- use functions mpz_init_set* (optimization)
+      see http://gmplib.org/manual-4.3.2/Simultaneous-Integer-Init-_0026-Assign.html#Simultaneous-Integer-Init-_0026-Assign
+
 - améliorer test "comparison.i" quand bug fixed #744
 - améliorer test "integer_constant.i" quand bug fixed #745
 
