@@ -68,9 +68,10 @@ module Mpz : sig
   val t: typ (* type "mpz_t" *)
   val is_now_referenced: unit -> unit (* one variable "mpz_t" now exists *)
   val is_t: typ -> bool (* is the type equal to "mpz_t"? *)
-  val init: varinfo -> stmt (* build stmt "mpz_init(v)" *)
-  val clear: varinfo -> stmt (* build stmt "mpz_clear(v)" *)
-  val init_set: varinfo -> exp -> stmt
+  val e_got_t: exp -> bool (* is the type of e is equal to "mpz_t"? *)
+  val init: exp -> stmt (* build stmt "mpz_init(v)" *)
+  val clear: exp -> stmt (* build stmt "mpz_clear(v)" *)
+  val init_set: exp -> exp -> stmt
 (* build stmt "mpz_init_set_*(v, e)" with the good function 'set' according to
    the type of e *)
 end = struct
@@ -85,8 +86,9 @@ end = struct
 
   let t = TNamed(t_torig, [])
   let is_t ty = Cil_datatype.Typ.equal ty t
+  let e_got_t e = is_t (typeOf e)
 
-  let apply_on_var funname v = mk_call ("mpz_" ^ funname) [ new_lval v ]
+  let apply_on_var funname e = mk_call ("mpz_" ^ funname) [ e ]
   let init = apply_on_var "init"
   let clear = apply_on_var "clear"
 
@@ -102,7 +104,7 @@ end = struct
 	[ e; integer ~loc:unknown_loc 10 ]
       | _ -> assert false
     in
-    mk_call ("mpz_init_set_" ^ fname) (new_lval v :: args)
+    mk_call ("mpz_init_set_" ^ fname) (v :: args)
 
 end
 
@@ -111,8 +113,9 @@ end
 (* ************************************************************************** *)
 
 module New_vars: sig
-  val push: typ -> (varinfo -> stmt list) -> varinfo
-  val finalize: unit -> (varinfo * stmt list * bool) list
+  val push: typ -> (varinfo -> exp (* the var as exp *) -> stmt) -> exp
+  val push_and_mpz_init: (varinfo -> exp (* the var as exp *) -> stmt) -> exp
+  val finalize: unit -> (varinfo * exp * stmt list * bool) list
 end = struct
 
   (* the finalizer resets the counter in order to keep it small. However, Cil
@@ -125,7 +128,7 @@ end = struct
   let var_cpt = ref 0
   let vlist = ref []
 
-  let push ty mk_stmts =
+  let push_list ty mk_stmts =
     incr var_cpt;
     let is_t = Mpz.is_t ty in
     if is_t then Mpz.is_now_referenced ();
@@ -138,8 +141,14 @@ end = struct
 	("e_acsl_cst_" ^ string_of_int !var_cpt)
 	ty
     in
-    vlist := (v, mk_stmts v, is_t) :: !vlist;
-    v
+    let e = new_lval v in
+    vlist := (v, e, mk_stmts v e, is_t) :: !vlist;
+    e
+
+  let push ty mk_stmt = push_list ty (fun v e -> [ mk_stmt v e ])
+
+  let push_and_mpz_init mk_stmt =
+    push_list Mpz.t (fun v e -> [ Mpz.init e; mk_stmt v e ])
 
   let finalize () =
     var_cpt := 0;
@@ -180,9 +189,9 @@ let constant_to_exp = function
   | CInt64(n, k, s) ->
     (match k with
     | IBool | IChar | IUChar | IUInt | IUShort | IULong ->
-      kinteger64_repr ~loc:unknown_loc IULong n s
+      kinteger64_repr ~loc:unknown_loc k n s
     | ISChar | IShort | IInt | ILong ->
-      kinteger64_repr ~loc:unknown_loc ILong n s
+      kinteger64_repr ~loc:unknown_loc k n s
     | ILongLong | IULongLong ->
       mkString ~loc:unknown_loc (Int64.to_string n))
   | CStr _ as c -> new_exp unknown_loc (Const c)
@@ -195,13 +204,28 @@ let tlval_to_lval = function
   | TVar { lv_origin = Some v }, TNoOffset -> Var v, NoOffset
   | _ -> not_yet "complex left value"
 
+let relation_to_revbinop = function
+  | Rlt -> Ge
+  | Rgt -> Le
+  | Rle -> Gt
+  | Rge -> Lt
+  | Req -> Ne
+  | Rneq -> Eq
+
+let name_of_mpz_arith_bop = function
+  | PlusA -> "mpz_add"
+  | MinusA -> "mpz_sub"
+  | Mult -> "mpz_mul"
+  | Div -> "mpz_cdiv_q"
+  | Mod -> "mpz_mod"
+  | Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr
+  | Shiftlt | Shiftrt | PlusPI | IndexPI | MinusPI | MinusPP -> assert false
+
 let wrap_leaf e = function
   | Ctype _ -> e
   | Ltype _ -> not_yet "term from an user defined type"
   | Lvar _ -> not_yet "polymorphic term"
-  | Linteger ->
-    let v = New_vars.push Mpz.t (fun v -> [ Mpz.init_set v e ]) in
-    new_lval v
+  | Linteger -> New_vars.push Mpz.t (fun _ v -> Mpz.init_set v e)
   | Lreal -> not_yet "real number"
   | Larrow _ -> not_yet "logic function"
 
@@ -218,8 +242,45 @@ let rec term_to_exp t = match t.term_node with
   | TAlignOfE t ->
     let e = term_to_exp t in
     new_exp ~loc:unknown_loc (AlignOfE e)
-  | TUnOp _ -> not_yet "unary operator"
-  | TBinOp _ -> not_yet "binary operator"
+  | TUnOp(Neg | BNot as op, t) ->
+    let e = term_to_exp t in
+    assert (Mpz.e_got_t e);
+    let name = match op with
+      | Neg -> "mpz_neg"
+      | BNot -> "mpz_com"
+      | LNot -> assert false
+    in
+    New_vars.push_and_mpz_init (fun _ ev -> mk_call name [ ev; e ])
+  | TUnOp(LNot, t) ->
+    let e = term_to_exp t in
+    let ty = typeOf e in
+    assert (not (Mpz.is_t ty));
+    new_exp ~loc:unknown_loc (UnOp(LNot, e, ty))
+  | TBinOp(PlusA | MinusA | Mult | Div | Mod as bop, t1, t2) ->
+    (* arithmetic binary operator *)
+    let e1 = term_to_exp t1 in
+    let e2 = term_to_exp t2 in
+    assert (Cil_datatype.Typ.equal (typeOf e1) (typeOf e2));
+    let name = name_of_mpz_arith_bop bop in
+    New_vars.push_and_mpz_init (fun _ e -> mk_call name [ e; e1; e2 ])
+  | TBinOp(Lt | Gt | Le | Ge | Eq | Ne as bop, t1, t2) ->
+    (* comparison operators *)
+    (* [TODO] don't work; see code comment in arith.i *)
+    comparison_to_exp bop t1 t2
+  | TBinOp((LOr | LAnd | BOr | BXor | BAnd), _, _) ->
+    (* left/right shift *)
+    not_yet "missing binary operator"
+  | TBinOp((Shiftlt | Shiftrt), _, _) ->
+    (* left/right shift *)
+    not_yet "left/right shift"
+  | TBinOp(PlusPI | IndexPI | MinusPI | MinusPP as bop, t1, t2) ->
+    (* binary operation over pointers *)
+    (* [TODO] untested *)
+    let e1 = term_to_exp t1 in
+    let e2 = term_to_exp t2 in
+    (* the type of the result is the same than type of the pointer [e1],
+       whatever is [e2] *)
+    new_exp ~loc:unknown_loc (BinOp(bop, e1, e2, typeOf e1))
   | TCastE(ty, t) ->
     let e = term_to_exp t in
     mkCast e ty
@@ -246,13 +307,20 @@ let rec term_to_exp t = match t.term_node with
   | Trange _ -> not_yet "range"
   | Tlet _ -> not_yet "let binding"
 
-let relation_to_revbinop = function
-  | Rlt -> Ge
-  | Rgt -> Le
-  | Rle -> Gt
-  | Rge -> Lt
-  | Req -> Ne
-  | Rneq -> Eq
+and comparison_to_exp bop t1 t2 =
+  let e1 = term_to_exp t1 in
+  let e2 = term_to_exp t2 in
+(*  Options.feedback "ty1=%a; ty2=%a" d_type (typeOf e1) d_type (typeOf e2);*)
+  assert (Cil_datatype.Typ.equal (typeOf e1) (typeOf e2));
+  if Mpz.e_got_t e1 then
+    let e =
+      New_vars.push
+	intType
+	(fun v _ -> mk_call ~result:(var v) "mpz_cmp" [ e1; e2 ])
+    in
+    new_exp unknown_loc (BinOp(bop, e, zero unknown_loc, intType))
+  else
+    new_exp unknown_loc (BinOp(bop, e1, e2, intType))
 
 (* convert an ACSL named predicate into the opposite C expression (if any).
    E.g. \true is converted into 0. *)
@@ -261,28 +329,7 @@ let rec named_predicate_to_revexp p = match p.content with
   | Ptrue -> zero ~loc:unknown_loc
   | Papp _ -> not_yet "logic function application"
   | Pseparated _ -> not_yet "separated"
-  | Prel(rel, t1, t2) ->
-    let bop = relation_to_revbinop rel in
-    let e1 = term_to_exp t1 in
-    let e2 = term_to_exp t2 in
-    if Mpz.is_t (typeOf e1) then begin
-      assert (Mpz.is_t (typeOf e2));
-      let v =
-	New_vars.push
-	  intType
-	  (fun v ->
-	    let result = var v in
-	    [ mk_call ~result "mpz_cmp" [ e1; e2 ] ])
-      in
-      let bop =
-	BinOp(bop,
-	      new_exp unknown_loc (Lval (var v)),
-	      zero unknown_loc,
-	      intType)
-      in
-      new_exp unknown_loc bop
-    end else
-      new_exp unknown_loc (BinOp(bop, e1, e2, intType))
+  | Prel(rel, t1, t2) -> comparison_to_exp (relation_to_revbinop rel) t1 t2
   | Pand _ -> not_yet "&&"
   | Por _ -> not_yet "||"
   | Pxor _ -> not_yet "xor"
@@ -374,10 +421,10 @@ class e_acsl_visitor prj generate = object
 	let b = New_block.finalize stmt in
 	let vars, clears =
 	  List.fold_left
-	    (fun (vars, clears) (v, stmts, must_clear) ->
+	    (fun (vars, clears) (v, e, stmts, must_clear) ->
 	      b.blocals <- v :: b.blocals;
 	      b.bstmts <- stmts @ b.bstmts;
-	      v :: vars, if must_clear then Mpz.clear v :: clears else clears)
+	      v :: vars, if must_clear then Mpz.clear e :: clears else clears)
 	    ([], [])
 	    new_vars
 	in

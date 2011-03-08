@@ -1,7 +1,8 @@
-- relation binaire sur les termes
 
-- use functions mpz_init_set* (optimization)
-      see http://gmplib.org/manual-4.3.2/Simultaneous-Integer-Init-_0026-Assign.html#Simultaneous-Integer-Init-_0026-Assign
+- déboguer opérateurs binaires logiques
+- tester les opérations binaires sur les pointeurs
+
+- amélioration des locs quand possible (genre Prel)
 
 - améliorer test "comparison.i" quand bug fixed #744
 - remettre test "cast.i" quand bug fixed #744
