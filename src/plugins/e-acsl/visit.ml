@@ -265,14 +265,13 @@ let rec term_to_exp t = match t.term_node with
     New_vars.push_and_mpz_init (fun _ e -> mk_call name [ e; e1; e2 ])
   | TBinOp(Lt | Gt | Le | Ge | Eq | Ne as bop, t1, t2) ->
     (* comparison operators *)
-    (* [TODO] don't work; see code comment in arith.i *)
     comparison_to_exp bop t1 t2
-  | TBinOp((LOr | LAnd | BOr | BXor | BAnd), _, _) ->
-    (* left/right shift *)
-    not_yet "missing binary operator"
   | TBinOp((Shiftlt | Shiftrt), _, _) ->
     (* left/right shift *)
     not_yet "left/right shift"
+  | TBinOp((LOr | LAnd | BOr | BXor | BAnd), _, _) ->
+    (* other logic/arith operators  *)
+    not_yet "missing binary operator"
   | TBinOp(PlusPI | IndexPI | MinusPI | MinusPP as bop, t1, t2) ->
     (* binary operation over pointers *)
     (* [TODO] untested *)

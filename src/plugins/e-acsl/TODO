@@ -1,12 +1,12 @@
 
-- déboguer opérateurs binaires logiques
-- tester les opérations binaires sur les pointeurs
+- tester les opérations binaires sur les pointeurs (requiert complex left value)
 
 - amélioration des locs quand possible (genre Prel)
 
 - améliorer test "comparison.i" quand bug fixed #744
 - remettre test "cast.i" quand bug fixed #744
 - améliorer test "integer_constant.i" quand bug fixed #745
+- améliorer test "arith.i" quand bug fixed #744
 
 en lien avec bts #743:
 - make distrib
