@@ -151,29 +151,29 @@ void e_acsl_fail(char *msg )
 
 void main(void) 
 {
-  /*@ assert (0 ≡ 0); */ ;
+  /*@ assert 0 ≡ 0; */ ;
   { mpz_t e_acsl_cst_1 ; mpz_t e_acsl_cst_2 ; int e_acsl_cst_3 ;
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_1),(long )0);
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_2),(long )0);
     e_acsl_cst_3 = mpz_cmp((__mpz_struct *)(e_acsl_cst_1),
                            (__mpz_struct *)(e_acsl_cst_2));
-    if (e_acsl_cst_3 != 0) { e_acsl_fail((char *)"((0 == 0))"); }
+    if (e_acsl_cst_3 != 0) { e_acsl_fail((char *)"(0 == 0)"); }
     mpz_clear((__mpz_struct *)(e_acsl_cst_1));
     mpz_clear((__mpz_struct *)(e_acsl_cst_2));
   }
   
-  /*@ assert (0 ≢ 1); */ ;
+  /*@ assert 0 ≢ 1; */ ;
   { mpz_t e_acsl_cst_4 ; mpz_t e_acsl_cst_5 ; int e_acsl_cst_6 ;
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_4),(long )0);
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_5),(long )1);
     e_acsl_cst_6 = mpz_cmp((__mpz_struct *)(e_acsl_cst_4),
                            (__mpz_struct *)(e_acsl_cst_5));
-    if (e_acsl_cst_6 == 0) { e_acsl_fail((char *)"((0 != 1))"); }
+    if (e_acsl_cst_6 == 0) { e_acsl_fail((char *)"(0 != 1)"); }
     mpz_clear((__mpz_struct *)(e_acsl_cst_4));
     mpz_clear((__mpz_struct *)(e_acsl_cst_5));
   }
   
-  /*@ assert (0xfffffffffffffff ≡ 0xfffffffffffffff); */ ;
+  /*@ assert 0xfffffffffffffff ≡ 0xfffffffffffffff; */ ;
   { mpz_t e_acsl_cst_7 ; mpz_t e_acsl_cst_8 ; int e_acsl_cst_9 ;
     mpz_init_set_str((__mpz_struct *)(e_acsl_cst_7),
                      (char *)"1152921504606846975",10);
@@ -182,7 +182,7 @@ void main(void)
     e_acsl_cst_9 = mpz_cmp((__mpz_struct *)(e_acsl_cst_7),
                            (__mpz_struct *)(e_acsl_cst_8));
     if (e_acsl_cst_9 != 0) {
-      e_acsl_fail((char *)"((0xfffffffffffffff == 0xfffffffffffffff))");
+      e_acsl_fail((char *)"(0xfffffffffffffff == 0xfffffffffffffff)");
     } mpz_clear((__mpz_struct *)(e_acsl_cst_7));
     mpz_clear((__mpz_struct *)(e_acsl_cst_8));
   }

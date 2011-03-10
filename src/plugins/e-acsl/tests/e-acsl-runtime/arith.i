@@ -17,7 +17,10 @@ void main() {
 
   /*@ assert x * 2 + (3 + y) - 4 + (x - y) == -10; */ ;
 
-  //  /*@ assert (0 == 1) == !(0 == 0); */ ;
+  /*@ assert (0 == 1) == !(0 == 0); */ ;
+  /*@ assert (0 <= -1) == (0 > 0); */ ;
+  /*@ assert (0 >= -1) == (0 <= 0); */ ;
+  /*@ assert (0 != 1) == !(0 != 0); */ ;
 
   //  /*@ assert 0 == !1; */ ;
   /* subtyping relation: 0 should be promoted to boolean below

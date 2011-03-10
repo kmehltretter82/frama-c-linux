@@ -28,8 +28,8 @@ void main(void)
 {
   int x ;
   x = 0;
-  /*@ assert (&x ≡ &x); */ ;
-  if (& x != & x) { e_acsl_fail((char *)"((&x == &x))"); }
+  /*@ assert &x ≡ &x; */ ;
+  if (& x != & x) { e_acsl_fail((char *)"(&x == &x)"); }
   return;
 }
 

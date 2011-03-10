@@ -25,8 +25,8 @@ void e_acsl_fail(char *msg )
 
 void main(void) 
 {
-  /*@ assert ("toto" ≢ "titi"); */ ;
-  if ("toto" == "titi") { e_acsl_fail((char *)"((\"toto\" != \"titi\"))"); }
+  /*@ assert "toto" ≢ "titi"; */ ;
+  if ("toto" == "titi") { e_acsl_fail((char *)"(\"toto\" != \"titi\")"); }
   return;
 }
 

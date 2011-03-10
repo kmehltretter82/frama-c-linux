@@ -28,11 +28,11 @@ void main(void)
 {
   int x ;
   x = 0;
-  /*@ assert (x ≡ 0); */ ;
-  if (x != 0) { e_acsl_fail((char *)"((x == 0))"); }
+  /*@ assert x ≡ 0; */ ;
+  if (x != 0) { e_acsl_fail((char *)"(x == 0)"); }
   if (x) {
-    /*@ assert (x ≢ 0); */ ;
-    if (x == 0) { e_acsl_fail((char *)"((x != 0))"); }
+    /*@ assert x ≢ 0; */ ;
+    if (x == 0) { e_acsl_fail((char *)"(x != 0)"); }
   }
   return;
 }
