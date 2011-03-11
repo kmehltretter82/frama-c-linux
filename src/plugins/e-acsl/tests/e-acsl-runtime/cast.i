@@ -1,7 +1,5 @@
 /* run.config
-   DONTRUN:
-   COMMENT: cast
-   COMMENT: waiting for fixing bts #744 */
+   COMMENT: cast */
 
 void main() {
   long x = 0;

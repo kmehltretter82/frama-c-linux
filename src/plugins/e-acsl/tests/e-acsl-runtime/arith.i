@@ -1,5 +1,6 @@
 /* run.config
-   COMMENT: arithmetic operations */
+   COMMENT: arithmetic operations
+   COMMENT: add the last assertion when fixing BTS #751 */
 
 void main() {
   int x = -3;
@@ -22,7 +23,7 @@ void main() {
   /*@ assert (0 >= -1) == (0 <= 0); */ ;
   /*@ assert (0 != 1) == !(0 != 0); */ ;
 
-  //  /*@ assert 0 == !1; */ ;
+  //   /*@ assert 0 == !1; */ ;
   /* subtyping relation: 0 should be promoted to boolean below
-     How to handle this? */
+     How to handle this? See BTS #751 */
 }

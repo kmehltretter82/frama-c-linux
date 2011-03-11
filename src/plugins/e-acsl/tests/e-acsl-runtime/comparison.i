@@ -1,6 +1,5 @@
 /* run.config
-   COMMENT: comparison operators
-   COMMENT: will be improved by fixing BTS #744 */
+   COMMENT: comparison operators */
 
 void main() {
   int x = 0, y = 1;
