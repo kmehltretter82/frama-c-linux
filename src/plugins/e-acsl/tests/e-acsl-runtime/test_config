@@ -1,1 +1,1 @@
-OPT: -e-acsl-project p -then-on p -print -val
+STDOPT: +"-e-acsl-project p" +"-then-on p" +"-print" +"-val"

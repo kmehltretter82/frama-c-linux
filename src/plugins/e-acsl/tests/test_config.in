@@ -1,2 +1,3 @@
 CMD: FRAMAC_SHARE=./share @frama-c@ -cpp-command="gcc -C -E -I. -I${FRAMAC_SHARE}"
+OPT: -e-acsl-check
 FILTER:@SEDCMD@ -e '/^#[^\n]*/d' -e "s|${FRAMAC_SHARE}|FRAMAC_SHARE|g" -e "s|[a-zA-Z/\\]\+frama_c_project_p_[a-z0-9]*|PROJECT_FILE|"

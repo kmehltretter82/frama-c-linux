@@ -51,10 +51,10 @@ let mk_if e p =
   let msg =
     let b = Buffer.create 97 in
     let fmt = Format.formatter_of_buffer b in
-    let no_uni = Parameters.UseUnicode.get () in
-    Parameters.UseUnicode.off ();
+    let no_uni = Parameters.Unicode.get () in
+    Parameters.Unicode.off ();
     Format.fprintf fmt "%a@?" Cil.d_predicate_named p;
-    Parameters.UseUnicode.set no_uni;
+    Parameters.Unicode.set no_uni;
     Buffer.contents b
   in
   let s = mk_call "e_acsl_fail" [ mkString unknown_loc msg ] in
@@ -262,6 +262,15 @@ let rec term_to_exp t = match t.term_node with
     let e2 = term_to_exp t2 in
     assert (Cil_datatype.Typ.equal (typeOf e1) (typeOf e2));
     let name = name_of_mpz_arith_bop bop in
+(*    (* guarding divisions and modulos *)
+    (match bop with
+    | Div | Mod ->
+      let e =
+	if Mpz.e_got_t e2 then
+	  New_vars.push_and_mpz_init (fun _ e -> mk_call "mpz_cmp"
+      New_block.push (mk_if e2 t2
+	(mkStmt ~valid_sid:true (If(e2, , mlBlock [], unknown_loc))
+    | _ -> assert false);*)
     New_vars.push_and_mpz_init (fun _ e -> mk_call name [ e; e1; e2 ])
   | TBinOp(Lt | Gt | Le | Ge | Eq | Ne as bop, t1, t2) ->
     (* comparison operators *)
