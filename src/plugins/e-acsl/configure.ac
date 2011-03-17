@@ -99,9 +99,9 @@ AC_ARG_WITH(gmp-src,
     [directory containing the source of the GMP library]
     ))
 
-if test $with_gmp_src = "yes" -o $with_gmp_src = "no" -o $with_gmp_src = ""; \
+if test "$with_gmp_src" = "yes" -o "$with_gmp_src" = "no" -o "$with_gmp_src" = ""; \
 then
-  AC_MSG_WARN([GMP sources missing: cannot use E-ACSL option -e-acsl-link-gmpsrc. Set the directory containing these sources with --with-gmp-src=<dirname>.])
+  AC_MSG_WARN([GMP sources missing: cannot use E-ACSL option -e-acsl-link-gmpsrc. Set the directory containing these sources with --with-gmp-src=<dirname>. Sources are available from ftp://ftp.gmplib.org/pub/gmp-4.3.2/gmp-4.3.2.tar.bz2])
 else
   GMPSRC_DIR=$with_gmp_src
   AC_CHECK_FILE($GMPSRC_DIR/mpz/init.c,
