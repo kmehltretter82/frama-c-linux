@@ -26,6 +26,10 @@ include S (** implementation of Log.S for E-ACSL *)
 module Check: BOOL
 module Project_name: STRING
 
+module H_link: BOOL
+module Gmpsrc_link: BOOL
+module Use_assert: BOOL
+
 (*
 Local Variables:
 compile-command: "make"

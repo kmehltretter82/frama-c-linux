@@ -46,6 +46,33 @@ module Project_name =
       let arg_name = "prj"
      end)
 
+module H_link =
+  False
+    (struct
+      let option_name = "-e-acsl-link-headers"
+      let help = "include standard headers in the new project \
+(unset by default)"
+      let kind = `Correctness
+     end)
+
+module Gmpsrc_link =
+  False
+    (struct
+      let option_name = "-e-acsl-link-gmpsrc"
+      let help = "link against GMP source code in the new project \
+(unset by default)"
+      let kind = `Correctness
+     end)
+
+module Use_assert =
+  False
+    (struct
+      let option_name = "-e-acsl-use-assert"
+      let help = "use C macro `assert' instead of `exit' in the new project \
+(by default, use it whenever possible)"
+      let kind = `Correctness
+     end)
+
 (*
 Local Variables:
 compile-command: "make"

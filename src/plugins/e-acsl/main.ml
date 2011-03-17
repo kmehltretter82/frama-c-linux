@@ -55,7 +55,11 @@ module Resulting_projects =
       let name = "E-ACSL resulting projects"
       let size = 7
       let kind = `Correctness
-      let dependencies = [ Ast.self ]
+      let dependencies =
+	[ Ast.self;
+	  Options.H_link.self;
+	  Options.Gmpsrc_link.self;
+	  Options.Use_assert.self ]
      end)
 
 let generate_code =

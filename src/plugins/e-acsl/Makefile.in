@@ -38,10 +38,13 @@ PLUGIN_DISTRIBUTED:=no
 PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure
 PLUGIN_DISTRIB_BIN:=no
 
-$(PLUGIN_DIR)/local_config.ml:
+$(PLUGIN_DIR)/local_config.ml: $(PLUGIN_DIR)/Makefile.in
+	$(PRINT_MAKING) $@
 	$(RM) $@
-	$(ECHO) "let may_compile_with_cc = @MAY_COMPILE_WITH_CC@" > $@
+	$(ECHO) "(* This file was automatically generated from $<. Don't edit it. *)" >> $@
+	$(ECHO) "let may_compile_with_cc = @MAY_COMPILE_WITH_CC@" >> $@
 	$(ECHO) "let may_use_assert = @MAY_USE_ASSERT@" >> $@
+	$(ECHO) "let gmpsrc_dir = \"@GMPSRC_DIR@\"" >> $@
 	$(CHMOD_RO) $@
 
 PLUGIN_GENERATED:= $(PLUGIN_DIR)/local_config.ml

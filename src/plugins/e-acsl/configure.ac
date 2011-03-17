@@ -60,7 +60,7 @@ fi
 if test -z $HAVE_STDIO_H; then
   MAY_COMPILE_WITH_CC=false
   MAY_RUN_TESTS=no
-  AC_MSG_WARN([stdio.h missing: cannot use option -e-acsl-hlink.])
+  AC_MSG_WARN([stdio.h missing: cannot use option -e-acsl-link-headers.])
   AC_MSG_WARN([stdio.h missing: non-regression tests unavailable.])
 fi
 
@@ -72,7 +72,7 @@ AC_CHECK_HEADER(assert.h,HAVE_ASSERT_H=yes,)
 if test -z $HAVE_ASSERT_H; then
   MAY_USE_ASSERT=false
   MAY_RUN_TESTS=no
-  AC_MSG_WARN([assert.h missing: will use exit instead of assert.])
+  AC_MSG_WARN([assert.h missing: cannot use E-ACSL option -e-acsl-use-assert.])
   AC_MSG_WARN([assert.h missing: non-regression tests unavailable.])
 fi
 
@@ -84,8 +84,29 @@ AC_CHECK_LIB(gmp,__gmpz_init,HAVE_GMP=yes,) # also set LIBS
 if test -z $HAVE_GMP; then
   MAY_COMPILE_WITH_CC=false
   MAY_RUN_TESTS=no
-  AC_MSG_WARN([GMP library missing: cannot use option -e-acsl-hlink.])
+  AC_MSG_WARN([GMP library missing: cannot use E-ACSL option -e-acsl-link-headers.])
   AC_MSG_WARN([GMP library missing: non-regression tests unavailable.])
+fi
+
+# GMP sources
+#############
+
+GMPSRC_DIR=
+
+AC_ARG_WITH(gmp-src,
+  AC_HELP_STRING(
+    [--with-gmp-src],
+    [directory containing the source of the GMP library]
+    ))
+
+if test $with_gmp_src = "yes" -o $with_gmp_src = "no" -o $with_gmp_src = ""; \
+then
+  AC_MSG_WARN([GMP sources missing: cannot use E-ACSL option -e-acsl-link-gmpsrc. Set the directory containing these sources with --with-gmp-src=<dirname>.])
+else
+  GMPSRC_DIR=$with_gmp_src
+  AC_CHECK_FILE($GMPSRC_DIR/mpz/init.c,
+    AC_MSG_NOTICE([GMP sources got from $GMPSRC_DIR]),
+    AC_MSG_ERROR([Directory $GMPSRC_DIR does not contain GMP sources.]))
 fi
 
 #######################
@@ -95,5 +116,6 @@ fi
 AC_SUBST(MAY_COMPILE_WITH_CC)
 AC_SUBST(MAY_USE_ASSERT)
 AC_SUBST(MAY_RUN_TESTS)
+AC_SUBST(GMPSRC_DIR)
 
 write_plugin_config(Makefile)
