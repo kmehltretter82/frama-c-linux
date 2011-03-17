@@ -19,6 +19,10 @@
 #                                                                        #
 ##########################################################################
 
+########################################
+# E-ACSL as a standard Frama-C plug-in #
+########################################
+
 m4_define([plugin_file],Makefile.in)
 
 m4_define([FRAMAC_SHARE_ENV],
@@ -32,5 +36,64 @@ m4_ifndef([FRAMAC_M4_MACROS], [m4_include(FRAMAC_SHARE/configure.ac)])
 
 check_plugin(e_acsl,PLUGIN_RELATIVE_PATH(plugin_file),
 	     [support for E-ACSL plug-in],yes,yes)
+
+###############################
+# C specific stuff for E-ACSL #
+###############################
+
+MAY_COMPILE_WITH_CC=true
+MAY_USE_ASSERT=true
+MAY_RUN_TESTS=yes
+
+# C compiler and stdio.h
+#########################
+
+AC_CHECK_HEADER(stdio.h,HAVE_STDIO_H=yes,)
+
+# not sure it can actually happens:
+# look like the configure stops on error if no C compiler detected
+if test -z $CC; then
+  MAY_RUN_TESTS=no
+  AC_MSG_WARN([no C compiler: non-regression tests unavailable.])
+fi
+
+if test -z $HAVE_STDIO_H; then
+  MAY_COMPILE_WITH_CC=false
+  MAY_RUN_TESTS=no
+  AC_MSG_WARN([stdio.h missing: cannot use option -e-acsl-hlink.])
+  AC_MSG_WARN([stdio.h missing: non-regression tests unavailable.])
+fi
+
+# assert.h
+##########
+
+AC_CHECK_HEADER(assert.h,HAVE_ASSERT_H=yes,)
+
+if test -z $HAVE_ASSERT_H; then
+  MAY_USE_ASSERT=false
+  MAY_RUN_TESTS=no
+  AC_MSG_WARN([assert.h missing: will use exit instead of assert.])
+  AC_MSG_WARN([assert.h missing: non-regression tests unavailable.])
+fi
+
+# GMP library
+#############
+
+AC_CHECK_LIB(gmp,__gmpz_init,HAVE_GMP=yes,) # also set LIBS
+
+if test -z $HAVE_GMP; then
+  MAY_COMPILE_WITH_CC=false
+  MAY_RUN_TESTS=no
+  AC_MSG_WARN([GMP library missing: cannot use option -e-acsl-hlink.])
+  AC_MSG_WARN([GMP library missing: non-regression tests unavailable.])
+fi
+
+#######################
+# Generating Makefile #
+#######################
+
+AC_SUBST(MAY_COMPILE_WITH_CC)
+AC_SUBST(MAY_USE_ASSERT)
+AC_SUBST(MAY_RUN_TESTS)
 
 write_plugin_config(Makefile)

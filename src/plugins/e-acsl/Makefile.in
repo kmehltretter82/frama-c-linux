@@ -32,15 +32,25 @@ PLUGIN_DIR ?=.
 PLUGIN_ENABLE:=@ENABLE_E_ACSL@
 PLUGIN_DYNAMIC:=@DYNAMIC_E_ACSL@
 PLUGIN_NAME:=E_ACSL
-PLUGIN_CMO:= options read_header visit main
+PLUGIN_CMO:= local_config options read_header visit main
 PLUGIN_HAS_MLI:=yes
 PLUGIN_DISTRIBUTED:=no
 PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure
 PLUGIN_DISTRIB_BIN:=no
 
+$(PLUGIN_DIR)/local_config.ml:
+	$(RM) $@
+	$(ECHO) "let may_compile_with_cc = @MAY_COMPILE_WITH_CC@" > $@
+	$(ECHO) "let may_use_assert = @MAY_USE_ASSERT@" >> $@
+	$(CHMOD_RO) $@
+
+PLUGIN_GENERATED:= $(PLUGIN_DIR)/local_config.ml
+
 ###########
 # Testing #
 ###########
+
+ifeq (@MAY_RUN_TESTS@,yes)
 
 PLUGIN_TESTS_DIRS:=e-acsl-reject e-acsl-runtime
 PLUGIN_NO_DEFAULT_TEST:=yes
@@ -51,6 +61,8 @@ tests/test_config: tests/test_config.in Makefile
 	       -e "s|@SEDCMD@|`which sed `|g" $< > $@
 
 tests:: tests/test_config
+
+endif
 
 ################
 # Generic part #
