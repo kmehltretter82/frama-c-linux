@@ -40,7 +40,7 @@ extern void mpz_init_set_si(mpz_t z, signed long int n);
 
 /*@ ensures \valid(z);
   @ assigns *z; */
-extern void mpz_init_set_str(mpz_t z, char *str, int base);
+extern void mpz_init_set_str(mpz_t z, const char *str, int base);
 
 // finalizer
 
@@ -53,47 +53,47 @@ extern void mpz_clear(mpz_t x);
 /*@ requires \valid(z1);
   @ requires \valid(z2);
   @ assigns \nothing; */
-extern int mpz_cmp(mpz_t z1, mpz_t z2);
+extern int mpz_cmp(const mpz_t z1, const mpz_t z2);
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
   @ assigns *z1; */
-extern int mpz_comp(mpz_t z1, mpz_t z2);
+extern int mpz_comp(mpz_t z1, const mpz_t z2);
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
   @ assigns *z1; */
-extern int mpz_neg(mpz_t z1, mpz_t z2);
-
-/*@ requires \valid(z1);
-  @ requires \valid(z2);
-  @ requires \valid(z3);
-  @ assigns *z1; */
-extern int mpz_add(mpz_t z1, mpz_t z2, mpz_t z3);
+extern int mpz_neg(mpz_t z1, const mpz_t z2);
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
   @ requires \valid(z3);
   @ assigns *z1; */
-extern int mpz_sub(mpz_t z1, mpz_t z2, mpz_t z3);
+extern int mpz_add(mpz_t z1, const mpz_t z2, const mpz_t z3);
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
   @ requires \valid(z3);
   @ assigns *z1; */
-extern int mpz_mul(mpz_t z1, mpz_t z2, mpz_t z3);
+extern int mpz_sub(mpz_t z1, const mpz_t z2, const mpz_t z3);
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
   @ requires \valid(z3);
   @ assigns *z1; */
-extern int mpz_cdiv_q(mpz_t z1, mpz_t z2, mpz_t z3);
+extern int mpz_mul(mpz_t z1, const mpz_t z2, const mpz_t z3);
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
   @ requires \valid(z3);
   @ assigns *z1; */
-extern int mpz_mod(mpz_t z1, mpz_t z2, mpz_t z3);
+extern int mpz_cdiv_q(mpz_t z1, const mpz_t z2, const mpz_t z3);
+
+/*@ requires \valid(z1);
+  @ requires \valid(z2);
+  @ requires \valid(z3);
+  @ assigns *z1; */
+extern int mpz_mod(mpz_t z1, const mpz_t z2, const mpz_t z3);
 
 /************************/
 /* Standard C functions */
@@ -105,10 +105,10 @@ extern int mpz_mod(mpz_t z1, mpz_t z2, mpz_t z3);
 extern void exit(int status);
 
 /*@ assigns \nothing; */
-extern void eprintf(char *);
+extern int printf(const char *, ...);
 
 /*****************************/
 /* Dedicated E-ACSL function */
 /*****************************/
 
-void e_acsl_fail(char *msg) { eprintf(msg); exit(1); }
+void e_acsl_fail(char *msg) { printf(msg); exit(1); }

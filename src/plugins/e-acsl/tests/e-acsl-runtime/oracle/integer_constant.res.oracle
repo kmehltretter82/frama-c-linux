@@ -16,9 +16,9 @@ PROJECT_FILE:122:[value] Function mpz_cmp: precondition got status valid
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <-main.
         Called from PROJECT_FILE:123.
-[value] computing for function eprintf <-e_acsl_fail <-main.
+[value] computing for function printf <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
-[value] Done for function eprintf
+[value] Done for function printf
 [value] computing for function exit <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
 PROJECT_FILE:115:[value] Function exit: postcondition got status invalid
@@ -46,9 +46,9 @@ PROJECT_FILE:130:[value] Function mpz_cmp: precondition got status valid
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <-main.
         Called from PROJECT_FILE:131.
-[value] computing for function eprintf <-e_acsl_fail <-main.
+[value] computing for function printf <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
-[value] Done for function eprintf
+[value] Done for function printf
 [value] computing for function exit <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
 [value] Done for function exit
@@ -76,9 +76,9 @@ PROJECT_FILE:139:[value] Function mpz_cmp: precondition got status valid
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <-main.
         Called from PROJECT_FILE:141.
-[value] computing for function eprintf <-e_acsl_fail <-main.
+[value] computing for function printf <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
-[value] Done for function eprintf
+[value] Done for function printf
 [value] computing for function exit <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
 [value] Done for function exit
@@ -98,8 +98,8 @@ PROJECT_FILE:142:[value] Function mpz_clear: precondition got status valid
 [from] Computing for function mpz_cmp
 [from] Done for function mpz_cmp
 [from] Computing for function e_acsl_fail
-[from] Computing for function eprintf <-e_acsl_fail
-[from] Done for function eprintf
+[from] Computing for function printf <-e_acsl_fail
+[from] Done for function printf
 [from] Computing for function exit <-e_acsl_fail
 [from] Done for function exit
 PROJECT_FILE:115:[from] Non terminating function (no dependencies)
@@ -127,7 +127,7 @@ typedef __mpz_struct mpz_t[1];
 extern void mpz_init_set_si(__mpz_struct * /*[1]*/  z , long n ) ;
 /*@ ensures \valid(\at(z,Old));
     assigns *z;  */
-extern void mpz_init_set_str(__mpz_struct * /*[1]*/  z , char *str ,
+extern void mpz_init_set_str(__mpz_struct * /*[1]*/  z , char const   *str ,
                              int base ) ;
 /*@ requires \valid(x);
     assigns *x;  */
@@ -135,16 +135,17 @@ extern void mpz_clear(__mpz_struct * /*[1]*/  x ) ;
 /*@ requires \valid(z1);
     requires \valid(z2);
     assigns \nothing;  */
-extern int mpz_cmp(__mpz_struct * /*[1]*/  z1 , __mpz_struct * /*[1]*/  z2 ) ;
+extern int mpz_cmp(__mpz_struct const   * /*[1]*/  z1 ,
+                   __mpz_struct const   * /*[1]*/  z2 ) ;
 /*@ terminates \false;
     ensures \false;
     assigns \nothing;  */
 extern void exit(int status ) ;
 /*@ assigns \nothing;  */
-extern void eprintf(char * ) ;
+extern int printf(char const   *  , ...) ;
 void e_acsl_fail(char *msg ) 
 {
-  eprintf(msg);
+  printf((char const   *)msg);
   exit(1);
   return;
 }
@@ -155,8 +156,8 @@ void main(void)
   { mpz_t e_acsl_cst_1 ; mpz_t e_acsl_cst_2 ; int e_acsl_cst_3 ;
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_1),(long )0);
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_2),(long )0);
-    e_acsl_cst_3 = mpz_cmp((__mpz_struct *)(e_acsl_cst_1),
-                           (__mpz_struct *)(e_acsl_cst_2));
+    e_acsl_cst_3 = mpz_cmp((__mpz_struct const   *)(e_acsl_cst_1),
+                           (__mpz_struct const   *)(e_acsl_cst_2));
     if (e_acsl_cst_3 != 0) { e_acsl_fail((char *)"(0 == 0)"); }
     mpz_clear((__mpz_struct *)(e_acsl_cst_1));
     mpz_clear((__mpz_struct *)(e_acsl_cst_2));
@@ -166,8 +167,8 @@ void main(void)
   { mpz_t e_acsl_cst_4 ; mpz_t e_acsl_cst_5 ; int e_acsl_cst_6 ;
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_4),(long )0);
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_5),(long )1);
-    e_acsl_cst_6 = mpz_cmp((__mpz_struct *)(e_acsl_cst_4),
-                           (__mpz_struct *)(e_acsl_cst_5));
+    e_acsl_cst_6 = mpz_cmp((__mpz_struct const   *)(e_acsl_cst_4),
+                           (__mpz_struct const   *)(e_acsl_cst_5));
     if (e_acsl_cst_6 == 0) { e_acsl_fail((char *)"(0 != 1)"); }
     mpz_clear((__mpz_struct *)(e_acsl_cst_4));
     mpz_clear((__mpz_struct *)(e_acsl_cst_5));
@@ -175,12 +176,10 @@ void main(void)
   
   /*@ assert 0xfffffffffffffff ≡ 0xfffffffffffffff; */ ;
   { mpz_t e_acsl_cst_7 ; mpz_t e_acsl_cst_8 ; int e_acsl_cst_9 ;
-    mpz_init_set_str((__mpz_struct *)(e_acsl_cst_7),
-                     (char *)"1152921504606846975",10);
-    mpz_init_set_str((__mpz_struct *)(e_acsl_cst_8),
-                     (char *)"1152921504606846975",10);
-    e_acsl_cst_9 = mpz_cmp((__mpz_struct *)(e_acsl_cst_7),
-                           (__mpz_struct *)(e_acsl_cst_8));
+    mpz_init_set_str((__mpz_struct *)(e_acsl_cst_7),"1152921504606846975",10);
+    mpz_init_set_str((__mpz_struct *)(e_acsl_cst_8),"1152921504606846975",10);
+    e_acsl_cst_9 = mpz_cmp((__mpz_struct const   *)(e_acsl_cst_7),
+                           (__mpz_struct const   *)(e_acsl_cst_8));
     if (e_acsl_cst_9 != 0) {
       e_acsl_fail((char *)"(0xfffffffffffffff == 0xfffffffffffffff)");
     } mpz_clear((__mpz_struct *)(e_acsl_cst_7));

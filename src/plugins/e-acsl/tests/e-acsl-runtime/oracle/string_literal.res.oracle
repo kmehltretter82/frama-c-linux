@@ -15,10 +15,10 @@ PROJECT_FILE:119:[value] Assertion got status valid.
     assigns \nothing;  */
 extern void exit(int status ) ;
 /*@ assigns \nothing;  */
-extern void eprintf(char * ) ;
+extern int printf(char const   *  , ...) ;
 void e_acsl_fail(char *msg ) 
 {
-  eprintf(msg);
+  printf((char const   *)msg);
   exit(1);
   return;
 }

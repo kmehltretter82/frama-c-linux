@@ -25,9 +25,9 @@ PROJECT_FILE:128:[value] Function mpz_cmp: precondition got status valid
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <-main.
         Called from PROJECT_FILE:129.
-[value] computing for function eprintf <-e_acsl_fail <-main.
+[value] computing for function printf <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
-[value] Done for function eprintf
+[value] Done for function printf
 [value] computing for function exit <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
 PROJECT_FILE:115:[value] Function exit: postcondition got status invalid
@@ -68,9 +68,9 @@ PROJECT_FILE:139:[value] Function mpz_cmp: precondition got status valid
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <-main.
         Called from PROJECT_FILE:140.
-[value] computing for function eprintf <-e_acsl_fail <-main.
+[value] computing for function printf <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
-[value] Done for function eprintf
+[value] Done for function printf
 [value] computing for function exit <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
 [value] Done for function exit
@@ -110,9 +110,9 @@ PROJECT_FILE:150:[value] Function mpz_cmp: precondition got status valid
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <-main.
         Called from PROJECT_FILE:151.
-[value] computing for function eprintf <-e_acsl_fail <-main.
+[value] computing for function printf <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
-[value] Done for function eprintf
+[value] Done for function printf
 [value] computing for function exit <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
 [value] Done for function exit
@@ -163,9 +163,9 @@ PROJECT_FILE:163:[value] Function mpz_cmp: precondition got status valid
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <-main.
         Called from PROJECT_FILE:164.
-[value] computing for function eprintf <-e_acsl_fail <-main.
+[value] computing for function printf <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
-[value] Done for function eprintf
+[value] Done for function printf
 [value] computing for function exit <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
 [value] Done for function exit
@@ -223,9 +223,9 @@ PROJECT_FILE:177:[value] Function mpz_cmp: precondition got status valid
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <-main.
         Called from PROJECT_FILE:178.
-[value] computing for function eprintf <-e_acsl_fail <-main.
+[value] computing for function printf <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
-[value] Done for function eprintf
+[value] Done for function printf
 [value] computing for function exit <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
 [value] Done for function exit
@@ -283,9 +283,9 @@ PROJECT_FILE:191:[value] Function mpz_cmp: precondition got status valid
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <-main.
         Called from PROJECT_FILE:192.
-[value] computing for function eprintf <-e_acsl_fail <-main.
+[value] computing for function printf <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
-[value] Done for function eprintf
+[value] Done for function printf
 [value] computing for function exit <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
 [value] Done for function exit
@@ -343,9 +343,9 @@ PROJECT_FILE:206:[value] Function mpz_cmp: precondition got status valid
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <-main.
         Called from PROJECT_FILE:207.
-[value] computing for function eprintf <-e_acsl_fail <-main.
+[value] computing for function printf <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
-[value] Done for function eprintf
+[value] Done for function printf
 [value] computing for function exit <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
 [value] Done for function exit
@@ -403,9 +403,9 @@ PROJECT_FILE:220:[value] Function mpz_cmp: precondition got status valid
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <-main.
         Called from PROJECT_FILE:221.
-[value] computing for function eprintf <-e_acsl_fail <-main.
+[value] computing for function printf <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
-[value] Done for function eprintf
+[value] Done for function printf
 [value] computing for function exit <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
 [value] Done for function exit
@@ -522,9 +522,9 @@ PROJECT_FILE:248:[value] Function mpz_cmp: precondition got status valid
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <-main.
         Called from PROJECT_FILE:249.
-[value] computing for function eprintf <-e_acsl_fail <-main.
+[value] computing for function printf <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
-[value] Done for function eprintf
+[value] Done for function printf
 [value] computing for function exit <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
 [value] Done for function exit
@@ -608,9 +608,9 @@ PROJECT_FILE:266:[value] Function mpz_cmp: precondition got status valid
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <-main.
         Called from PROJECT_FILE:268.
-[value] computing for function eprintf <-e_acsl_fail <-main.
+[value] computing for function printf <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
-[value] Done for function eprintf
+[value] Done for function printf
 [value] computing for function exit <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
 [value] Done for function exit
@@ -664,9 +664,9 @@ PROJECT_FILE:281:[value] Function mpz_cmp: precondition got status valid
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <-main.
         Called from PROJECT_FILE:283.
-[value] computing for function eprintf <-e_acsl_fail <-main.
+[value] computing for function printf <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
-[value] Done for function eprintf
+[value] Done for function printf
 [value] computing for function exit <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
 [value] Done for function exit
@@ -724,9 +724,9 @@ PROJECT_FILE:297:[value] Function mpz_cmp: precondition got status valid
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <-main.
         Called from PROJECT_FILE:299.
-[value] computing for function eprintf <-e_acsl_fail <-main.
+[value] computing for function printf <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
-[value] Done for function eprintf
+[value] Done for function printf
 [value] computing for function exit <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
 [value] Done for function exit
@@ -775,9 +775,9 @@ PROJECT_FILE:311:[value] Function mpz_cmp: precondition got status valid
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <-main.
         Called from PROJECT_FILE:313.
-[value] computing for function eprintf <-e_acsl_fail <-main.
+[value] computing for function printf <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
-[value] Done for function eprintf
+[value] Done for function printf
 [value] computing for function exit <-e_acsl_fail <-main.
         Called from PROJECT_FILE:115.
 [value] Done for function exit
@@ -808,8 +808,8 @@ PROJECT_FILE:315:[value] Function mpz_clear: precondition got status valid
 [from] Computing for function mpz_cmp
 [from] Done for function mpz_cmp
 [from] Computing for function e_acsl_fail
-[from] Computing for function eprintf <-e_acsl_fail
-[from] Done for function eprintf
+[from] Computing for function printf <-e_acsl_fail
+[from] Done for function printf
 [from] Computing for function exit <-e_acsl_fail
 [from] Done for function exit
 PROJECT_FILE:115:[from] Non terminating function (no dependencies)
@@ -856,56 +856,62 @@ extern void mpz_clear(__mpz_struct * /*[1]*/  x ) ;
 /*@ requires \valid(z1);
     requires \valid(z2);
     assigns \nothing;  */
-extern int mpz_cmp(__mpz_struct * /*[1]*/  z1 , __mpz_struct * /*[1]*/  z2 ) ;
+extern int mpz_cmp(__mpz_struct const   * /*[1]*/  z1 ,
+                   __mpz_struct const   * /*[1]*/  z2 ) ;
 /*@ requires \valid(z1);
     requires \valid(z2);
     assigns *z1;  */
-extern int mpz_neg(__mpz_struct * /*[1]*/  z1 , __mpz_struct * /*[1]*/  z2 ) ;
+extern int mpz_neg(__mpz_struct * /*[1]*/  z1 ,
+                   __mpz_struct const   * /*[1]*/  z2 ) ;
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
     assigns *z1; 
 */
-extern int mpz_add(__mpz_struct * /*[1]*/  z1 , __mpz_struct * /*[1]*/  z2 ,
-                   __mpz_struct * /*[1]*/  z3 ) ;
+extern int mpz_add(__mpz_struct * /*[1]*/  z1 ,
+                   __mpz_struct const   * /*[1]*/  z2 ,
+                   __mpz_struct const   * /*[1]*/  z3 ) ;
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
     assigns *z1; 
 */
-extern int mpz_sub(__mpz_struct * /*[1]*/  z1 , __mpz_struct * /*[1]*/  z2 ,
-                   __mpz_struct * /*[1]*/  z3 ) ;
+extern int mpz_sub(__mpz_struct * /*[1]*/  z1 ,
+                   __mpz_struct const   * /*[1]*/  z2 ,
+                   __mpz_struct const   * /*[1]*/  z3 ) ;
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
     assigns *z1; 
 */
-extern int mpz_mul(__mpz_struct * /*[1]*/  z1 , __mpz_struct * /*[1]*/  z2 ,
-                   __mpz_struct * /*[1]*/  z3 ) ;
+extern int mpz_mul(__mpz_struct * /*[1]*/  z1 ,
+                   __mpz_struct const   * /*[1]*/  z2 ,
+                   __mpz_struct const   * /*[1]*/  z3 ) ;
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
     assigns *z1; 
 */
 extern int mpz_cdiv_q(__mpz_struct * /*[1]*/  z1 ,
-                      __mpz_struct * /*[1]*/  z2 ,
-                      __mpz_struct * /*[1]*/  z3 ) ;
+                      __mpz_struct const   * /*[1]*/  z2 ,
+                      __mpz_struct const   * /*[1]*/  z3 ) ;
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
     assigns *z1; 
 */
-extern int mpz_mod(__mpz_struct * /*[1]*/  z1 , __mpz_struct * /*[1]*/  z2 ,
-                   __mpz_struct * /*[1]*/  z3 ) ;
+extern int mpz_mod(__mpz_struct * /*[1]*/  z1 ,
+                   __mpz_struct const   * /*[1]*/  z2 ,
+                   __mpz_struct const   * /*[1]*/  z3 ) ;
 /*@ terminates \false;
     ensures \false;
     assigns \nothing;  */
 extern void exit(int status ) ;
 /*@ assigns \nothing;  */
-extern void eprintf(char * ) ;
+extern int printf(char const   *  , ...) ;
 void e_acsl_fail(char *msg ) 
 {
-  eprintf(msg);
+  printf((char const   *)msg);
   exit(1);
   return;
 }
@@ -924,10 +930,11 @@ void main(void)
     int e_acsl_cst_4 ;
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_1),(long )3);
     mpz_init((__mpz_struct *)(e_acsl_cst_2));
-    mpz_neg((__mpz_struct *)(e_acsl_cst_2),(__mpz_struct *)(e_acsl_cst_1));
+    mpz_neg((__mpz_struct *)(e_acsl_cst_2),
+            (__mpz_struct const   *)(e_acsl_cst_1));
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_3),(long )x);
-    e_acsl_cst_4 = mpz_cmp((__mpz_struct *)(e_acsl_cst_2),
-                           (__mpz_struct *)(e_acsl_cst_3));
+    e_acsl_cst_4 = mpz_cmp((__mpz_struct const   *)(e_acsl_cst_2),
+                           (__mpz_struct const   *)(e_acsl_cst_3));
     if (e_acsl_cst_4 != 0) { e_acsl_fail((char *)"(-3 == x)"); }
     mpz_clear((__mpz_struct *)(e_acsl_cst_1));
     mpz_clear((__mpz_struct *)(e_acsl_cst_2));
@@ -940,9 +947,10 @@ void main(void)
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_5),(long )x);
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_6),(long )3);
     mpz_init((__mpz_struct *)(e_acsl_cst_7));
-    mpz_neg((__mpz_struct *)(e_acsl_cst_7),(__mpz_struct *)(e_acsl_cst_6));
-    e_acsl_cst_8 = mpz_cmp((__mpz_struct *)(e_acsl_cst_5),
-                           (__mpz_struct *)(e_acsl_cst_7));
+    mpz_neg((__mpz_struct *)(e_acsl_cst_7),
+            (__mpz_struct const   *)(e_acsl_cst_6));
+    e_acsl_cst_8 = mpz_cmp((__mpz_struct const   *)(e_acsl_cst_5),
+                           (__mpz_struct const   *)(e_acsl_cst_7));
     if (e_acsl_cst_8 != 0) { e_acsl_fail((char *)"(x == -3)"); }
     mpz_clear((__mpz_struct *)(e_acsl_cst_5));
     mpz_clear((__mpz_struct *)(e_acsl_cst_6));
@@ -956,8 +964,8 @@ void main(void)
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_10),(long )0);
     mpz_init((__mpz_struct *)(e_acsl_cst_11));
     mpz_com(e_acsl_cst_11,e_acsl_cst_10);
-    e_acsl_cst_12 = mpz_cmp((__mpz_struct *)(e_acsl_cst_9),
-                            (__mpz_struct *)(e_acsl_cst_11));
+    e_acsl_cst_12 = mpz_cmp((__mpz_struct const   *)(e_acsl_cst_9),
+                            (__mpz_struct const   *)(e_acsl_cst_11));
     if (e_acsl_cst_12 == 0) { e_acsl_fail((char *)"(0 != ~0)"); }
     mpz_clear((__mpz_struct *)(e_acsl_cst_9));
     mpz_clear((__mpz_struct *)(e_acsl_cst_10));
@@ -970,13 +978,15 @@ void main(void)
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_13),(long )x);
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_14),(long )1);
     mpz_init((__mpz_struct *)(e_acsl_cst_15));
-    mpz_add((__mpz_struct *)(e_acsl_cst_15),(__mpz_struct *)(e_acsl_cst_13),
-            (__mpz_struct *)(e_acsl_cst_14));
+    mpz_add((__mpz_struct *)(e_acsl_cst_15),
+            (__mpz_struct const   *)(e_acsl_cst_13),
+            (__mpz_struct const   *)(e_acsl_cst_14));
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_16),(long )2);
     mpz_init((__mpz_struct *)(e_acsl_cst_17));
-    mpz_neg((__mpz_struct *)(e_acsl_cst_17),(__mpz_struct *)(e_acsl_cst_16));
-    e_acsl_cst_18 = mpz_cmp((__mpz_struct *)(e_acsl_cst_15),
-                            (__mpz_struct *)(e_acsl_cst_17));
+    mpz_neg((__mpz_struct *)(e_acsl_cst_17),
+            (__mpz_struct const   *)(e_acsl_cst_16));
+    e_acsl_cst_18 = mpz_cmp((__mpz_struct const   *)(e_acsl_cst_15),
+                            (__mpz_struct const   *)(e_acsl_cst_17));
     if (e_acsl_cst_18 != 0) { e_acsl_fail((char *)"(x+1 == -2)"); }
     mpz_clear((__mpz_struct *)(e_acsl_cst_13));
     mpz_clear((__mpz_struct *)(e_acsl_cst_14));
@@ -991,13 +1001,15 @@ void main(void)
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_19),(long )x);
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_20),(long )1);
     mpz_init((__mpz_struct *)(e_acsl_cst_21));
-    mpz_sub((__mpz_struct *)(e_acsl_cst_21),(__mpz_struct *)(e_acsl_cst_19),
-            (__mpz_struct *)(e_acsl_cst_20));
+    mpz_sub((__mpz_struct *)(e_acsl_cst_21),
+            (__mpz_struct const   *)(e_acsl_cst_19),
+            (__mpz_struct const   *)(e_acsl_cst_20));
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_22),(long )4);
     mpz_init((__mpz_struct *)(e_acsl_cst_23));
-    mpz_neg((__mpz_struct *)(e_acsl_cst_23),(__mpz_struct *)(e_acsl_cst_22));
-    e_acsl_cst_24 = mpz_cmp((__mpz_struct *)(e_acsl_cst_21),
-                            (__mpz_struct *)(e_acsl_cst_23));
+    mpz_neg((__mpz_struct *)(e_acsl_cst_23),
+            (__mpz_struct const   *)(e_acsl_cst_22));
+    e_acsl_cst_24 = mpz_cmp((__mpz_struct const   *)(e_acsl_cst_21),
+                            (__mpz_struct const   *)(e_acsl_cst_23));
     if (e_acsl_cst_24 != 0) { e_acsl_fail((char *)"(x-1 == -4)"); }
     mpz_clear((__mpz_struct *)(e_acsl_cst_19));
     mpz_clear((__mpz_struct *)(e_acsl_cst_20));
@@ -1012,13 +1024,15 @@ void main(void)
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_25),(long )x);
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_26),(long )3);
     mpz_init((__mpz_struct *)(e_acsl_cst_27));
-    mpz_mul((__mpz_struct *)(e_acsl_cst_27),(__mpz_struct *)(e_acsl_cst_25),
-            (__mpz_struct *)(e_acsl_cst_26));
+    mpz_mul((__mpz_struct *)(e_acsl_cst_27),
+            (__mpz_struct const   *)(e_acsl_cst_25),
+            (__mpz_struct const   *)(e_acsl_cst_26));
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_28),(long )9);
     mpz_init((__mpz_struct *)(e_acsl_cst_29));
-    mpz_neg((__mpz_struct *)(e_acsl_cst_29),(__mpz_struct *)(e_acsl_cst_28));
-    e_acsl_cst_30 = mpz_cmp((__mpz_struct *)(e_acsl_cst_27),
-                            (__mpz_struct *)(e_acsl_cst_29));
+    mpz_neg((__mpz_struct *)(e_acsl_cst_29),
+            (__mpz_struct const   *)(e_acsl_cst_28));
+    e_acsl_cst_30 = mpz_cmp((__mpz_struct const   *)(e_acsl_cst_27),
+                            (__mpz_struct const   *)(e_acsl_cst_29));
     if (e_acsl_cst_30 != 0) { e_acsl_fail((char *)"(x*3 == -9)"); }
     mpz_clear((__mpz_struct *)(e_acsl_cst_25));
     mpz_clear((__mpz_struct *)(e_acsl_cst_26));
@@ -1034,13 +1048,14 @@ void main(void)
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_32),(long )3);
     mpz_init((__mpz_struct *)(e_acsl_cst_33));
     mpz_cdiv_q((__mpz_struct *)(e_acsl_cst_33),
-               (__mpz_struct *)(e_acsl_cst_31),
-               (__mpz_struct *)(e_acsl_cst_32));
+               (__mpz_struct const   *)(e_acsl_cst_31),
+               (__mpz_struct const   *)(e_acsl_cst_32));
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_34),(long )1);
     mpz_init((__mpz_struct *)(e_acsl_cst_35));
-    mpz_neg((__mpz_struct *)(e_acsl_cst_35),(__mpz_struct *)(e_acsl_cst_34));
-    e_acsl_cst_36 = mpz_cmp((__mpz_struct *)(e_acsl_cst_33),
-                            (__mpz_struct *)(e_acsl_cst_35));
+    mpz_neg((__mpz_struct *)(e_acsl_cst_35),
+            (__mpz_struct const   *)(e_acsl_cst_34));
+    e_acsl_cst_36 = mpz_cmp((__mpz_struct const   *)(e_acsl_cst_33),
+                            (__mpz_struct const   *)(e_acsl_cst_35));
     if (e_acsl_cst_36 != 0) { e_acsl_fail((char *)"(x/3 == -1)"); }
     mpz_clear((__mpz_struct *)(e_acsl_cst_31));
     mpz_clear((__mpz_struct *)(e_acsl_cst_32));
@@ -1055,13 +1070,15 @@ void main(void)
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_37),(long )x);
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_38),(long )2);
     mpz_init((__mpz_struct *)(e_acsl_cst_39));
-    mpz_mod((__mpz_struct *)(e_acsl_cst_39),(__mpz_struct *)(e_acsl_cst_37),
-            (__mpz_struct *)(e_acsl_cst_38));
+    mpz_mod((__mpz_struct *)(e_acsl_cst_39),
+            (__mpz_struct const   *)(e_acsl_cst_37),
+            (__mpz_struct const   *)(e_acsl_cst_38));
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_40),(long )1);
     mpz_init((__mpz_struct *)(e_acsl_cst_41));
-    mpz_neg((__mpz_struct *)(e_acsl_cst_41),(__mpz_struct *)(e_acsl_cst_40));
-    e_acsl_cst_42 = mpz_cmp((__mpz_struct *)(e_acsl_cst_39),
-                            (__mpz_struct *)(e_acsl_cst_41));
+    mpz_neg((__mpz_struct *)(e_acsl_cst_41),
+            (__mpz_struct const   *)(e_acsl_cst_40));
+    e_acsl_cst_42 = mpz_cmp((__mpz_struct const   *)(e_acsl_cst_39),
+                            (__mpz_struct const   *)(e_acsl_cst_41));
     if (e_acsl_cst_42 != 0) { e_acsl_fail((char *)"(x%2 == -1)"); }
     mpz_clear((__mpz_struct *)(e_acsl_cst_37));
     mpz_clear((__mpz_struct *)(e_acsl_cst_38));
@@ -1080,33 +1097,40 @@ void main(void)
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_43),(long )x);
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_44),(long )2);
     mpz_init((__mpz_struct *)(e_acsl_cst_45));
-    mpz_mul((__mpz_struct *)(e_acsl_cst_45),(__mpz_struct *)(e_acsl_cst_43),
-            (__mpz_struct *)(e_acsl_cst_44));
+    mpz_mul((__mpz_struct *)(e_acsl_cst_45),
+            (__mpz_struct const   *)(e_acsl_cst_43),
+            (__mpz_struct const   *)(e_acsl_cst_44));
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_46),(long )3);
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_47),(long )y);
     mpz_init((__mpz_struct *)(e_acsl_cst_48));
-    mpz_add((__mpz_struct *)(e_acsl_cst_48),(__mpz_struct *)(e_acsl_cst_46),
-            (__mpz_struct *)(e_acsl_cst_47));
+    mpz_add((__mpz_struct *)(e_acsl_cst_48),
+            (__mpz_struct const   *)(e_acsl_cst_46),
+            (__mpz_struct const   *)(e_acsl_cst_47));
     mpz_init((__mpz_struct *)(e_acsl_cst_49));
-    mpz_add((__mpz_struct *)(e_acsl_cst_49),(__mpz_struct *)(e_acsl_cst_45),
-            (__mpz_struct *)(e_acsl_cst_48));
+    mpz_add((__mpz_struct *)(e_acsl_cst_49),
+            (__mpz_struct const   *)(e_acsl_cst_45),
+            (__mpz_struct const   *)(e_acsl_cst_48));
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_50),(long )4);
     mpz_init((__mpz_struct *)(e_acsl_cst_51));
-    mpz_sub((__mpz_struct *)(e_acsl_cst_51),(__mpz_struct *)(e_acsl_cst_49),
-            (__mpz_struct *)(e_acsl_cst_50));
+    mpz_sub((__mpz_struct *)(e_acsl_cst_51),
+            (__mpz_struct const   *)(e_acsl_cst_49),
+            (__mpz_struct const   *)(e_acsl_cst_50));
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_52),(long )x);
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_53),(long )y);
     mpz_init((__mpz_struct *)(e_acsl_cst_54));
-    mpz_sub((__mpz_struct *)(e_acsl_cst_54),(__mpz_struct *)(e_acsl_cst_52),
-            (__mpz_struct *)(e_acsl_cst_53));
+    mpz_sub((__mpz_struct *)(e_acsl_cst_54),
+            (__mpz_struct const   *)(e_acsl_cst_52),
+            (__mpz_struct const   *)(e_acsl_cst_53));
     mpz_init((__mpz_struct *)(e_acsl_cst_55));
-    mpz_add((__mpz_struct *)(e_acsl_cst_55),(__mpz_struct *)(e_acsl_cst_51),
-            (__mpz_struct *)(e_acsl_cst_54));
+    mpz_add((__mpz_struct *)(e_acsl_cst_55),
+            (__mpz_struct const   *)(e_acsl_cst_51),
+            (__mpz_struct const   *)(e_acsl_cst_54));
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_56),(long )10);
     mpz_init((__mpz_struct *)(e_acsl_cst_57));
-    mpz_neg((__mpz_struct *)(e_acsl_cst_57),(__mpz_struct *)(e_acsl_cst_56));
-    e_acsl_cst_58 = mpz_cmp((__mpz_struct *)(e_acsl_cst_55),
-                            (__mpz_struct *)(e_acsl_cst_57));
+    mpz_neg((__mpz_struct *)(e_acsl_cst_57),
+            (__mpz_struct const   *)(e_acsl_cst_56));
+    e_acsl_cst_58 = mpz_cmp((__mpz_struct const   *)(e_acsl_cst_55),
+                            (__mpz_struct const   *)(e_acsl_cst_57));
     if (e_acsl_cst_58 != 0) {
       e_acsl_fail((char *)"(((x*2+(3+y))-4)+(x-y) == -10)");
     } mpz_clear((__mpz_struct *)(e_acsl_cst_43));
@@ -1131,12 +1155,12 @@ void main(void)
     mpz_t e_acsl_cst_62 ; mpz_t e_acsl_cst_63 ; int e_acsl_cst_64 ;
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_59),(long )0);
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_60),(long )1);
-    e_acsl_cst_61 = mpz_cmp((__mpz_struct *)(e_acsl_cst_59),
-                            (__mpz_struct *)(e_acsl_cst_60));
+    e_acsl_cst_61 = mpz_cmp((__mpz_struct const   *)(e_acsl_cst_59),
+                            (__mpz_struct const   *)(e_acsl_cst_60));
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_62),(long )0);
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_63),(long )0);
-    e_acsl_cst_64 = mpz_cmp((__mpz_struct *)(e_acsl_cst_62),
-                            (__mpz_struct *)(e_acsl_cst_63));
+    e_acsl_cst_64 = mpz_cmp((__mpz_struct const   *)(e_acsl_cst_62),
+                            (__mpz_struct const   *)(e_acsl_cst_63));
     if ((e_acsl_cst_61 == 0) != ! (e_acsl_cst_64 == 0)) {
       e_acsl_fail((char *)"((0==1) == !(0==0))");
     } mpz_clear((__mpz_struct *)(e_acsl_cst_59));
@@ -1152,13 +1176,14 @@ void main(void)
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_65),(long )0);
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_66),(long )1);
     mpz_init((__mpz_struct *)(e_acsl_cst_67));
-    mpz_neg((__mpz_struct *)(e_acsl_cst_67),(__mpz_struct *)(e_acsl_cst_66));
-    e_acsl_cst_68 = mpz_cmp((__mpz_struct *)(e_acsl_cst_65),
-                            (__mpz_struct *)(e_acsl_cst_67));
+    mpz_neg((__mpz_struct *)(e_acsl_cst_67),
+            (__mpz_struct const   *)(e_acsl_cst_66));
+    e_acsl_cst_68 = mpz_cmp((__mpz_struct const   *)(e_acsl_cst_65),
+                            (__mpz_struct const   *)(e_acsl_cst_67));
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_69),(long )0);
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_70),(long )0);
-    e_acsl_cst_71 = mpz_cmp((__mpz_struct *)(e_acsl_cst_69),
-                            (__mpz_struct *)(e_acsl_cst_70));
+    e_acsl_cst_71 = mpz_cmp((__mpz_struct const   *)(e_acsl_cst_69),
+                            (__mpz_struct const   *)(e_acsl_cst_70));
     if ((e_acsl_cst_68 <= 0) != (e_acsl_cst_71 > 0)) {
       e_acsl_fail((char *)"((0<=-1) == (0>0))");
     } mpz_clear((__mpz_struct *)(e_acsl_cst_65));
@@ -1175,13 +1200,14 @@ void main(void)
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_72),(long )0);
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_73),(long )1);
     mpz_init((__mpz_struct *)(e_acsl_cst_74));
-    mpz_neg((__mpz_struct *)(e_acsl_cst_74),(__mpz_struct *)(e_acsl_cst_73));
-    e_acsl_cst_75 = mpz_cmp((__mpz_struct *)(e_acsl_cst_72),
-                            (__mpz_struct *)(e_acsl_cst_74));
+    mpz_neg((__mpz_struct *)(e_acsl_cst_74),
+            (__mpz_struct const   *)(e_acsl_cst_73));
+    e_acsl_cst_75 = mpz_cmp((__mpz_struct const   *)(e_acsl_cst_72),
+                            (__mpz_struct const   *)(e_acsl_cst_74));
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_76),(long )0);
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_77),(long )0);
-    e_acsl_cst_78 = mpz_cmp((__mpz_struct *)(e_acsl_cst_76),
-                            (__mpz_struct *)(e_acsl_cst_77));
+    e_acsl_cst_78 = mpz_cmp((__mpz_struct const   *)(e_acsl_cst_76),
+                            (__mpz_struct const   *)(e_acsl_cst_77));
     if ((e_acsl_cst_75 >= 0) != (e_acsl_cst_78 <= 0)) {
       e_acsl_fail((char *)"((0>=-1) == (0<=0))");
     } mpz_clear((__mpz_struct *)(e_acsl_cst_72));
@@ -1196,12 +1222,12 @@ void main(void)
     mpz_t e_acsl_cst_82 ; mpz_t e_acsl_cst_83 ; int e_acsl_cst_84 ;
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_79),(long )0);
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_80),(long )1);
-    e_acsl_cst_81 = mpz_cmp((__mpz_struct *)(e_acsl_cst_79),
-                            (__mpz_struct *)(e_acsl_cst_80));
+    e_acsl_cst_81 = mpz_cmp((__mpz_struct const   *)(e_acsl_cst_79),
+                            (__mpz_struct const   *)(e_acsl_cst_80));
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_82),(long )0);
     mpz_init_set_si((__mpz_struct *)(e_acsl_cst_83),(long )0);
-    e_acsl_cst_84 = mpz_cmp((__mpz_struct *)(e_acsl_cst_82),
-                            (__mpz_struct *)(e_acsl_cst_83));
+    e_acsl_cst_84 = mpz_cmp((__mpz_struct const   *)(e_acsl_cst_82),
+                            (__mpz_struct const   *)(e_acsl_cst_83));
     if ((e_acsl_cst_81 != 0) != ! (e_acsl_cst_84 != 0)) {
       e_acsl_fail((char *)"((0!=1) == !(0!=0))");
     } mpz_clear((__mpz_struct *)(e_acsl_cst_79));
