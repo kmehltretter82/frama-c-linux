@@ -2,8 +2,8 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-PROJECT_FILE:121:[value] Assertion got status valid.
-PROJECT_FILE:124:[value] Assertion got status valid.
+PROJECT_FILE.i:121:[value] Assertion got status valid.
+PROJECT_FILE.i:124:[value] Assertion got status valid.
 [value] Recording results for main
 [value] done for function main
 [dominators] computing for function main
@@ -20,7 +20,7 @@ extern void exit(int status ) ;
 extern int printf(char const   *  , ...) ;
 void e_acsl_fail(char *msg ) 
 {
-  printf((char const   *)msg);
+  printf("%s\n",msg);
   exit(1);
   return;
 }

@@ -1,5 +1,7 @@
 /* run.config
-   COMMENT: comparison operators */
+   COMMENT: comparison operators
+   EXECNOW: LOG gen_comparison.c BIN gen_comparison.out FRAMAC_SHARE=./share frama-c -load-module E_ACSL ./tests/e-acsl-runtime/comparison.i -e-acsl-project p -e-acsl-include-headers -then-on p -print -ocode ./tests/e-acsl-runtime/result/gen_comparison.c > /dev/null &&  gcc -o ./tests/e-acsl-runtime/result/gen_comparison.out -lgmp ./tests/e-acsl-runtime/result/gen_comparison.c
+*/
 
 void main() {
   int x = 0, y = 1;

@@ -46,20 +46,11 @@ module Project_name =
       let arg_name = "prj"
      end)
 
-module H_link =
+module Include_headers =
   False
     (struct
-      let option_name = "-e-acsl-link-headers"
+      let option_name = "-e-acsl-include-headers"
       let help = "include standard headers in the new project \
-(unset by default)"
-      let kind = `Correctness
-     end)
-
-module Gmpsrc_link =
-  False
-    (struct
-      let option_name = "-e-acsl-link-gmpsrc"
-      let help = "link against GMP source code in the new project \
 (unset by default)"
       let kind = `Correctness
      end)

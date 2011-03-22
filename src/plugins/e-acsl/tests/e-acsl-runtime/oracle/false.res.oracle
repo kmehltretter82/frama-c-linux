@@ -18,7 +18,7 @@ extern void exit(int status ) ;
 extern int printf(char const   *  , ...) ;
 void e_acsl_fail(char *msg ) 
 {
-  printf((char const   *)msg);
+  printf("%s\n",msg);
   exit(1);
   return;
 }

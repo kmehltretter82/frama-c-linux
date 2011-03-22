@@ -44,7 +44,6 @@ $(PLUGIN_DIR)/local_config.ml: $(PLUGIN_DIR)/Makefile.in
 	$(ECHO) "(* This file was automatically generated from $<. Don't edit it. *)" >> $@
 	$(ECHO) "let may_compile_with_cc = @MAY_COMPILE_WITH_CC@" >> $@
 	$(ECHO) "let may_use_assert = @MAY_USE_ASSERT@" >> $@
-	$(ECHO) "let gmpsrc_dir = \"@GMPSRC_DIR@\"" >> $@
 	$(CHMOD_RO) $@
 
 PLUGIN_GENERATED:= $(PLUGIN_DIR)/local_config.ml
@@ -66,6 +65,14 @@ tests/test_config: tests/test_config.in Makefile
 tests:: tests/test_config
 
 endif
+
+###########
+# Install #
+###########
+
+install::
+	$(PRINT_CP) E-ACSL share files
+	$(CP) -R share/e-acsl $(FRAMAC_SHARE)
 
 ################
 # Generic part #

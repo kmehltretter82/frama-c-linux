@@ -21,7 +21,6 @@
 
 val may_compile_with_cc: bool
 val may_use_assert: bool
-val gmpsrc_dir: string
 
 (*
 Local Variables:

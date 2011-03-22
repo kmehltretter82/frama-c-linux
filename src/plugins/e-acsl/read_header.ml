@@ -19,13 +19,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let text =
-  let buf = Buffer.create 97 in
-  fun () ->
-    if Buffer.length buf = 0 then begin
-      let fname = Filename.concat Config.datadir "e_acsl.h" in
+let put_file_in_buffer fname buf =
       try
-	let cin = open_in fname in
+	let cin =
+	  open_in
+	    (Filename.concat Config.datadir (Filename.concat "e-acsl" fname))
+	in
 	try
 	  while true do
 	    let l = input_line cin in
@@ -36,6 +35,25 @@ let text =
 	  close_in cin
       with Sys_error s ->
 	Options.abort "cannot read file `%s': %s" fname s
+
+(* TODO: must be project-compliant. The memoized buffer should be reset when we
+   have to redo the visitor in a different setting. *)
+
+let add_include buf hfile =
+  Buffer.add_string buf (Format.sprintf "#include %S\n" hfile)
+
+let text =
+  let buf = Buffer.create 97 in
+  fun () ->
+    if Buffer.length buf = 0 then begin
+      if Options.Include_headers.get () then begin
+	add_include buf "stdio.h";
+	if Options.Use_assert.get () then add_include buf "assert.h";
+	add_include buf "gmp.h";
+      end else
+	put_file_in_buffer "e_acsl_gmp_types.h" buf;
+      put_file_in_buffer "e_acsl_gmp.h" buf;
+      put_file_in_buffer "e_acsl.h" buf
     end;
     Buffer.contents buf
 
