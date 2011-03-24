@@ -72,7 +72,7 @@ endif
 
 install::
 	$(PRINT_CP) E-ACSL share files
-	$(CP) -R share/e-acsl $(FRAMAC_SHARE)
+	$(CP) -R $(PLUGIN_DIR)/share/e-acsl $(FRAMAC_SHARE)
 
 ################
 # Generic part #
