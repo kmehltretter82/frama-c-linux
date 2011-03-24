@@ -37,6 +37,7 @@ PLUGIN_HAS_MLI:=yes
 PLUGIN_DISTRIBUTED:=no
 PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure
 PLUGIN_DISTRIB_BIN:=no
+PLUGIN_GENERATED:= $(PLUGIN_DIR)/local_config.ml
 
 $(PLUGIN_DIR)/local_config.ml: $(PLUGIN_DIR)/Makefile.in
 	$(PRINT_MAKING) $@
@@ -45,8 +46,6 @@ $(PLUGIN_DIR)/local_config.ml: $(PLUGIN_DIR)/Makefile.in
 	$(ECHO) "let may_compile_with_cc = @MAY_COMPILE_WITH_CC@" >> $@
 	$(ECHO) "let may_use_assert = @MAY_USE_ASSERT@" >> $@
 	$(CHMOD_RO) $@
-
-PLUGIN_GENERATED:= $(PLUGIN_DIR)/local_config.ml
 
 ###########
 # Testing #
