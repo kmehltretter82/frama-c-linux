@@ -45,10 +45,10 @@ __pure__)) ;
 __inline static mp_limb_t __gmpz_getlimbn(mpz_srcptr __gmp_z ,
                                           mp_size_t __gmp_n )  __attribute__((
 __pure__)) ;
-/*@ ensures \valid(\at(z,Old));
+/*@ ensures \valid(\old(z));
     assigns *z;  */
 extern void __gmpz_init_set_si(__mpz_struct * /*[1]*/  z , long n ) ;
-/*@ ensures \valid(\at(z,Old));
+/*@ ensures \valid(\old(z));
     assigns *z;  */
 extern int __gmpz_init_set_str(__mpz_struct * /*[1]*/  z ,
                                char const   *str , int base ) ;

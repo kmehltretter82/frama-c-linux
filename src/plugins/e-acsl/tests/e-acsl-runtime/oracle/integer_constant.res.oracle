@@ -123,10 +123,10 @@ struct __anonstruct___mpz_struct_1 {
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct mpz_t[1];
-/*@ ensures \valid(\at(z,Old));
+/*@ ensures \valid(\old(z));
     assigns *z;  */
 extern void mpz_init_set_si(__mpz_struct * /*[1]*/  z , long n ) ;
-/*@ ensures \valid(\at(z,Old));
+/*@ ensures \valid(\old(z));
     assigns *z;  */
 extern int mpz_init_set_str(__mpz_struct * /*[1]*/  z , char const   *str ,
                             int base ) ;
