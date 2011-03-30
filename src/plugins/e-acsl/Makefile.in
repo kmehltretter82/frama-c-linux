@@ -72,7 +72,7 @@ endif
 install::
 	$(PRINT_CP) E-ACSL share files
 	$(MKDIR) $(FRAMAC_SHARE)/e-acsl
-	$(CP) $(PLUGIN_DIR)/share/e-acsl/* $(FRAMAC_SHARE)/e-acsl
+	$(CP) $(E_ACSL_DIR)/share/e-acsl/* $(FRAMAC_SHARE)/e-acsl
 
 uninstall::
 	$(PRINT_RM) E-ACSL share files
