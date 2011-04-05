@@ -1,5 +1,7 @@
+- mkcall ne devrait pas générer de nouvelles variables pour une même fonction
+- mettre des locations intelligentes
+
 - intégration à la ferme de tests nocturne
-- cas d'utilisation et link avec gmp
 
 - guarde pour les divisions/modulos
 
