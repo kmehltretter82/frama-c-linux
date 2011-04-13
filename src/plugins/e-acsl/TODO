@@ -1,13 +1,28 @@
-- mkcall ne devrait pas générer de nouvelles variables pour une même fonction
-- mettre des locations intelligentes
+- regarder la remarque sur le cas CInt64: distinction signed and unsigned type?
 
-- intégration à la ferme de tests nocturne
+- access pointeurs: ajouter des warnings indiquant que les gardes sont 
+  manquantes
+
+- gestion des initialiseurs des globals: requiert un main
+
+- ajouter des gardes dans les specs devant les termes indéfinis
+
+/*@ assert \forall integer x; -1<= x<= 1 ==>  1/x == 0 || 1/x != 0; */
+
+the plug-in would generate something like
+
+/*@ assert \forall integer x; -1<= x<= 1 ==>  (x != 0&&  1/x == 0) || (x != 0
+&&  1/x != 0); */ 
+
+- mkcall ne devrait pas générer de nouvelles variables pour une même fonction
+
+- mettre des locations intelligentes
 
 - guarde pour les divisions/modulos
 
 - tester les opérations binaires sur les pointeurs (requiert complex left value)
 
-- amélioration des locs quand possible (genre Prel)
+- minimiser le nombre de variables générées
 
 - améliorer test "integer_constant.i" quand bug fixed #745
 - améliorer test "arith.i" quand bug fixed #751

@@ -33,6 +33,7 @@ let new_lval v = new_exp ~loc:unknown_loc (Lval (var v))
 
 let mk_call ?result fname args =
   (* the type is incorrect, but it doesn't matter *)
+  (* [JS 2011/04/12] should not generate a new variable by function name *) 
   let f = new_lval (makeGlobalVar fname voidType) in
   mkStmt ~valid_sid:true (Instr(Call(result, f, args, unknown_loc)))
 
@@ -42,21 +43,14 @@ let type_error s = raise (Typing_error s)
 let not_yet s =
   Options.not_yet_implemented "construct `%s' is not yet supported" s
 
-(* [TODO] should not generate the type if the user wants to link the resulting
-   program with GMP: use an option for this purpose? *)
 let e_acsl_header () = GText (Read_header.text ())
 
 (* Build a C conditional doing a runtime assertion check. *)
 let mk_if e p =
-  let msg =
-    let b = Buffer.create 97 in
-    let fmt = Format.formatter_of_buffer b in
-    let no_uni = Parameters.Unicode.get () in
-    Parameters.Unicode.off ();
-    Format.fprintf fmt "%a@?" Cil.d_predicate_named p;
-    Parameters.Unicode.set no_uni;
-    Buffer.contents b
-  in
+  let no_uni = Parameters.Unicode.get () in
+  Parameters.Unicode.off ();
+  let msg = Pretty_utils.sfprintf "%a@?" Cil.d_predicate_named p in
+  Parameters.Unicode.set no_uni;
   let s = mk_call "e_acsl_fail" [ mkString unknown_loc msg ] in
   mkStmt ~valid_sid:true (If(e, mkBlock [ s ], mkBlock [], unknown_loc))
 
@@ -188,6 +182,8 @@ end
 let constant_to_exp = function
   | CInt64(n, k, s) ->
     (match k with
+    (* [JS 2011/04/12] why 3 distinct cases here (and not only 2)? 
+       Should be something different between signed and unsigned type? *)
     | IBool | IChar | IUChar | IUInt | IUShort | IULong ->
       kinteger64_repr ~loc:unknown_loc k n s
     | ISChar | IShort | IInt | ILong ->
@@ -262,15 +258,17 @@ let rec term_to_exp t = match t.term_node with
     let e2 = term_to_exp t2 in
     assert (Cil_datatype.Typ.equal (typeOf e1) (typeOf e2));
     let name = name_of_mpz_arith_bop bop in
+(* [JS 2011/04/13] TODO: issue with order of generation.
+   New_vars.push_and_mpz_init pushes variables and their initialisations first,
+   while New_block.push pushes stmts just after them. *)
 (*    (* guarding divisions and modulos *)
     (match bop with
     | Div | Mod ->
-      let e =
-	if Mpz.e_got_t e2 then
-	  New_vars.push_and_mpz_init (fun _ e -> mk_call "mpz_cmp"
-      New_block.push (mk_if e2 t2
-	(mkStmt ~valid_sid:true (If(e2, , mlBlock [], unknown_loc))
-    | _ -> assert false);*)
+      let z = Logic_const.tinteger 0 in
+      let guard = comparison_to_exp Eq t2 z in
+      New_block.push (mk_if guard (Logic_const.prel (Req, t2, z)))
+    | _ ->
+      ());*)
     New_vars.push_and_mpz_init (fun _ e -> mk_call name [ e; e1; e2 ])
   | TBinOp(Lt | Gt | Le | Ge | Eq | Ne as bop, t1, t2) ->
     (* comparison operators *)
@@ -350,9 +348,9 @@ let rec named_predicate_to_revexp p = match p.content with
   | Pforall _ -> not_yet "\\forall"
   | Pexists _ -> not_yet "\\exists"
   | Pat _ -> not_yet "\\at"
-  | Pvalid _ -> type_error "\\valid"
-  | Pvalid_index _ -> type_error "\\valid_index"
-  | Pvalid_range _ -> type_error "\\valid_range"
+  | Pvalid _ -> not_yet "\\valid"
+  | Pvalid_index _ -> not_yet "\\valid_index"
+  | Pvalid_range _ -> not_yet "\\valid_range"
   | Pfresh _ -> not_yet "\\fresh"
   | Psubtype _ -> not_yet "subtyping relation"
 
@@ -376,7 +374,7 @@ let convert_annotation annot =
     | APragma _ -> not_yet "pragma"
   with Typing_error s ->
     let msg = Format.sprintf "invalid E-ACSL construct %s." s in
-    if Options.Check.get () then raise (Typing_error msg)
+    if Options.Check.get () then type_error msg
     else Options.warning ~current:true "%s@\nignoring annotation." msg
 
 let convert_rooted (User a | AI(_, a)) = convert_annotation a
@@ -415,7 +413,7 @@ class e_acsl_visitor prj generate = object
   method vstmt_aux stmt =
 (*    Options.debug ~level:2 "proceeding stmt %d@." stmt.sid;*)
     Annotations.single_iter_stmt (fun ba -> convert_rooted ba) stmt;
-    (* new_block and new_vars is set by convert_before_after *)
+    (* new_block and new_vars is set by [convert_rooted] *)
     let is_empty_block = New_block.is_empty () in
     let new_vars = New_vars.finalize () in
     match is_empty_block, new_vars with
