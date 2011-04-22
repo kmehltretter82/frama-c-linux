@@ -21,38 +21,38 @@
 
 open Db_types
 open Cil_types
+open Cil_datatype
 open Cil
 
 (* ************************************************************************** *)
 (* General constructs *)
 (* ************************************************************************** *)
 
-let unknown_loc = Cil_datatype.Location.unknown
+let new_lval ?(loc=Location.unknown) v = new_exp ~loc (Lval (var v))
 
-let new_lval v = new_exp ~loc:unknown_loc (Lval (var v))
-
-let mk_call ?result fname args =
+let mk_call ?(loc=Location.unknown) ?result fname args =
   (* the type is incorrect, but it doesn't matter *)
   (* [JS 2011/04/12] should not generate a new variable by function name *) 
-  let f = new_lval (makeGlobalVar fname voidType) in
-  mkStmt ~valid_sid:true (Instr(Call(result, f, args, unknown_loc)))
+  let f = new_lval ~loc (makeGlobalVar fname voidType) in
+  mkStmt ~valid_sid:true (Instr(Call(result, f, args, loc)))
 
 exception Typing_error of string
 let type_error s = raise (Typing_error s)
 
 let not_yet s =
-  Options.not_yet_implemented "construct `%s' is not yet supported" s
+  Options.not_yet_implemented "construct `%s' is not yet supported." s
 
 let e_acsl_header () = GText (Read_header.text ())
 
 (* Build a C conditional doing a runtime assertion check. *)
 let mk_if e p =
+  let loc = p.loc in
   let no_uni = Parameters.Unicode.get () in
   Parameters.Unicode.off ();
   let msg = Pretty_utils.sfprintf "%a@?" Cil.d_predicate_named p in
   Parameters.Unicode.set no_uni;
-  let s = mk_call "e_acsl_fail" [ mkString unknown_loc msg ] in
-  mkStmt ~valid_sid:true (If(e, mkBlock [ s ], mkBlock [], unknown_loc))
+  let s = mk_call ~loc "e_acsl_fail" [ mkString loc msg ] in
+  mkStmt ~valid_sid:true (If(e, mkBlock [ s ], mkBlock [], loc))
 
 (* ************************************************************************** *)
 (* GMP values *)
@@ -95,7 +95,7 @@ end = struct
       | TPtr(TInt(IChar, _), _) ->
 	"str",
 	(* decimal base for the number given as string *)
-	[ e; integer ~loc:unknown_loc 10 ]
+	[ e; integer ~loc:Location.unknown 10 ]
       | _ -> assert false
     in
     mk_call ("mpz_init_set_" ^ fname) (v :: args)
@@ -130,7 +130,7 @@ end = struct
       makeVarinfo
 	~logic:false
 	~generated:true
-	false (* is a global ? *)
+	false (* is a global? *)
 	false (* is a formal? *)
 	("e_acsl_cst_" ^ string_of_int !var_cpt)
 	ty
@@ -179,18 +179,18 @@ end
 (* Transforming terms and predicates into C expressions (if any) *)
 (* ************************************************************************** *)
 
-let constant_to_exp = function
+let constant_to_exp ?(loc=Location.unknown) = function
   | CInt64(n, k, s) ->
     (match k with
     (* [JS 2011/04/12] why 3 distinct cases here (and not only 2)? 
        Should be something different between signed and unsigned type? *)
     | IBool | IChar | IUChar | IUInt | IUShort | IULong ->
-      kinteger64_repr ~loc:unknown_loc k n s
+      kinteger64_repr ?loc k n s
     | ISChar | IShort | IInt | ILong ->
-      kinteger64_repr ~loc:unknown_loc k n s
+      kinteger64_repr ?loc k n s
     | ILongLong | IULongLong ->
-      mkString ~loc:unknown_loc (Int64.to_string n))
-  | CStr _ as c -> new_exp unknown_loc (Const c)
+      mkString ?loc (Int64.to_string n))
+  | CStr _ as c -> new_exp ?loc (Const c)
   | CWStr _ -> not_yet "wide character string constant"
   | CChr _ -> not_yet "character constant"
   | CReal _ -> not_yet "floating point constant"
@@ -225,19 +225,20 @@ let wrap_leaf e = function
   | Lreal -> not_yet "real number"
   | Larrow _ -> not_yet "logic function"
 
-let rec term_to_exp t = match t.term_node with
-  | TConst c -> wrap_leaf (constant_to_exp c) t.term_type
-  | TLval lv ->
-    wrap_leaf (new_exp ~loc:unknown_loc (Lval (tlval_to_lval lv))) t.term_type
-  | TSizeOf ty -> sizeOf ~loc:unknown_loc ty
+let rec term_to_exp t = 
+  let loc = t.term_loc in
+  match t.term_node with
+  | TConst c -> wrap_leaf (constant_to_exp ~loc c) t.term_type
+  | TLval lv -> wrap_leaf (new_exp ~loc (Lval (tlval_to_lval lv))) t.term_type
+  | TSizeOf ty -> sizeOf ~loc ty
   | TSizeOfE t ->
     let e = term_to_exp t in
-    sizeOf ~loc:unknown_loc (typeOf e)
-  | TSizeOfStr s -> new_exp ~loc:unknown_loc (SizeOfStr s)
-  | TAlignOf ty -> new_exp ~loc:unknown_loc (AlignOf ty)
+    sizeOf ~loc (typeOf e)
+  | TSizeOfStr s -> new_exp ~loc (SizeOfStr s)
+  | TAlignOf ty -> new_exp ~loc (AlignOf ty)
   | TAlignOfE t ->
     let e = term_to_exp t in
-    new_exp ~loc:unknown_loc (AlignOfE e)
+    new_exp ~loc (AlignOfE e)
   | TUnOp(Neg | BNot as op, t) ->
     let e = term_to_exp t in
     assert (Mpz.e_got_t e);
@@ -246,33 +247,36 @@ let rec term_to_exp t = match t.term_node with
       | BNot -> "mpz_com"
       | LNot -> assert false
     in
-    New_vars.push_and_mpz_init (fun _ ev -> mk_call name [ ev; e ])
+    New_vars.push_and_mpz_init (fun _ ev -> mk_call ~loc name [ ev; e ])
   | TUnOp(LNot, t) ->
     let e = term_to_exp t in
     let ty = typeOf e in
     assert (not (Mpz.is_t ty));
-    new_exp ~loc:unknown_loc (UnOp(LNot, e, ty))
+    new_exp ~loc (UnOp(LNot, e, ty))
   | TBinOp(PlusA | MinusA | Mult | Div | Mod as bop, t1, t2) ->
     (* arithmetic binary operator *)
     let e1 = term_to_exp t1 in
     let e2 = term_to_exp t2 in
     assert (Cil_datatype.Typ.equal (typeOf e1) (typeOf e2));
     let name = name_of_mpz_arith_bop bop in
-(* [JS 2011/04/13] TODO: issue with order of generation.
-   New_vars.push_and_mpz_init pushes variables and their initialisations first,
-   while New_block.push pushes stmts just after them. *)
-(*    (* guarding divisions and modulos *)
+    (* guarding divisions and modulos *)
     (match bop with
     | Div | Mod ->
-      let z = Logic_const.tinteger 0 in
-      let guard = comparison_to_exp Eq t2 z in
-      New_block.push (mk_if guard (Logic_const.prel (Req, t2, z)))
+    (* [JS 2011/04/13] TODO: issue with order of generation.
+       New_vars.push_and_mpz_init pushes variables and their initialisations
+       first, while New_block.push pushes stmts just after them. *)
+      Options.warning ~current:true ~once:true
+	"missing guard for ensuring that %a is different of 0"
+	d_term t2;
+    (*      let z = Logic_const.tinteger 0 in
+	    let guard = comparison_to_exp Eq t2 z in
+	    New_block.push (mk_if guard (Logic_const.prel (Req, t2, z)))*)
     | _ ->
-      ());*)
-    New_vars.push_and_mpz_init (fun _ e -> mk_call name [ e; e1; e2 ])
+      ());
+    New_vars.push_and_mpz_init (fun _ e -> mk_call ~loc name [ e; e1; e2 ])
   | TBinOp(Lt | Gt | Le | Ge | Eq | Ne as bop, t1, t2) ->
     (* comparison operators *)
-    comparison_to_exp bop t1 t2
+    comparison_to_exp ~loc bop t1 t2
   | TBinOp((Shiftlt | Shiftrt), _, _) ->
     (* left/right shift *)
     not_yet "left/right shift"
@@ -284,13 +288,17 @@ let rec term_to_exp t = match t.term_node with
     (* [TODO] untested *)
     let e1 = term_to_exp t1 in
     let e2 = term_to_exp t2 in
+    Options.warning ~current:true ~once:true
+      "missing guard for ensuring that %a is a valid pointer"
+      d_term t;
     (* the type of the result is the same than type of the pointer [e1],
        whatever is [e2] *)
-    new_exp ~loc:unknown_loc (BinOp(bop, e1, e2, typeOf e1))
+    new_exp ~loc (BinOp(bop, e1, e2, typeOf e1))
   | TCastE(ty, t) ->
+    (* [TODO] missing guard for ensuring no overflow when casting *)
     let e = term_to_exp t in
     mkCast e ty
-  | TAddrOf lv -> mkAddrOf unknown_loc (tlval_to_lval lv)
+  | TAddrOf lv -> mkAddrOf ~loc (tlval_to_lval lv)
   | TStartOf _ -> not_yet "beginning of an array"
   | Tapp _ -> not_yet "applying logic function"
   | Tlambda _ -> not_yet "functional"
@@ -312,7 +320,7 @@ let rec term_to_exp t = match t.term_node with
   | Trange _ -> not_yet "range"
   | Tlet _ -> not_yet "let binding"
 
-and comparison_to_exp bop t1 t2 =
+and comparison_to_exp ?(loc=Location.unknown) bop t1 t2 =
   let e1 = term_to_exp t1 in
   let e2 = term_to_exp t2 in
 (*  Options.feedback "ty1=%a; ty2=%a" d_type (typeOf e1) d_type (typeOf e2);*)
@@ -323,18 +331,20 @@ and comparison_to_exp bop t1 t2 =
 	intType
 	(fun v _ -> mk_call ~result:(var v) "mpz_cmp" [ e1; e2 ])
     in
-    new_exp unknown_loc (BinOp(bop, e, zero unknown_loc, intType))
+    new_exp ?loc (BinOp(bop, e, zero ?loc, intType))
   else
-    new_exp unknown_loc (BinOp(bop, e1, e2, intType))
+    new_exp ?loc (BinOp(bop, e1, e2, intType))
 
 (* convert an ACSL named predicate into the opposite C expression (if any).
    E.g. \true is converted into 0. *)
-let rec named_predicate_to_revexp p = match p.content with
-  | Pfalse -> one ~loc:unknown_loc
-  | Ptrue -> zero ~loc:unknown_loc
+let rec named_predicate_to_revexp p = 
+  let loc = p.loc in
+  match p.content with
+  | Pfalse -> one ~loc
+  | Ptrue -> zero ~loc
   | Papp _ -> not_yet "logic function application"
   | Pseparated _ -> not_yet "separated"
-  | Prel(rel, t1, t2) -> comparison_to_exp (relation_to_revbinop rel) t1 t2
+  | Prel(rel, t1, t2) -> comparison_to_exp ~loc (relation_to_revbinop rel) t1 t2
   | Pand _ -> not_yet "&&"
   | Por _ -> not_yet "||"
   | Pxor _ -> not_yet "xor"
@@ -342,7 +352,7 @@ let rec named_predicate_to_revexp p = match p.content with
   | Piff _ -> not_yet "<==>"
   | Pnot p ->
     let e = named_predicate_to_revexp p in
-    new_exp unknown_loc (UnOp(Neg, e, TInt(IInt, [])))
+    new_exp ~loc (UnOp(Neg, e, TInt(IInt, [])))
   | Pif _ -> not_yet "_ ? _ : _"
   | Plet _ -> not_yet "let _ = _ in _"
   | Pforall _ -> not_yet "\\forall"

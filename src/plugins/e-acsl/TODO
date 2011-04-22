@@ -1,7 +1,6 @@
-- regarder la remarque sur le cas CInt64: distinction signed and unsigned type?
+- utiliser Options.use_asserts
 
-- access pointeurs: ajouter des warnings indiquant que les gardes sont 
-  manquantes
+- regarder la remarque sur le cas CInt64: distinction signed and unsigned type?
 
 - gestion des initialiseurs des globals: requiert un main
 
@@ -16,9 +15,10 @@ the plug-in would generate something like
 
 - mkcall ne devrait pas générer de nouvelles variables pour une même fonction
 
-- mettre des locations intelligentes
+[TODO?] mettre des locations intelligentes
 
-- guarde pour les divisions/modulos
+- garde pour les casts quand overflows potentiels
+  (même pas de warnings aujourd'hui)
 
 - tester les opérations binaires sur les pointeurs (requiert complex left value)
 
@@ -32,3 +32,5 @@ en lien avec bts #743:
 - headers (copyright 2011)
 - license
 - install répertoire share
+
+VOIR CPAN
