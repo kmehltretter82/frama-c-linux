@@ -15,22 +15,22 @@ PROJECT_FILE.i:124:[value] Assertion got status valid.
 /*@ terminates \false;
     ensures \false;
     assigns \nothing;  */
-extern void exit(int status ) ;
+extern void exit(int status);
 /*@ assigns \nothing;  */
-extern int printf(char const   *  , ...) ;
-void e_acsl_fail(char *msg ) 
+extern int printf(char const * , ...);
+void e_acsl_fail(char *msg)
 {
   printf("%s\n",msg);
   exit(1);
   return;
 }
 
-void main(void) 
+void main(void)
 {
-  int x ;
+  int x;
   x = 0;
-  /*@ assert sizeof(int ) ≡ sizeof(x); */ ;
-  if (4 != 4) { e_acsl_fail((char *)"(sizeof(int ) == sizeof(x))"); }
+  /*@ assert sizeof(int) ≡ sizeof(x); */ ;
+  if (4 != 4) { e_acsl_fail((char *)"(sizeof(int) == sizeof(x))"); }
   /*@ assert sizeof("totototototo") ≡ sizeof(char *); */ ;
   if (4 != 4) {
     e_acsl_fail((char *)"(sizeof(\"totototototo\") == sizeof(char *))");
