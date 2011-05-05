@@ -94,7 +94,7 @@ PROJECT_FILE.i:145:[value] Assertion got status valid.
 [value] Done for function mpz_init
 [value] computing for function mpz_com <- main.
         Called from PROJECT_FILE.i:149.
-[kernel] No code for function mpz_com, default assigns generated
+[kernel] warning: No code for function mpz_com, default assigns generated
 [value] Done for function mpz_com
 [value] computing for function mpz_cmp <- main.
         Called from PROJECT_FILE.i:150.
