@@ -106,9 +106,21 @@ end
 (* ************************************************************************** *)
 
 module New_vars: sig
+
   val push: typ -> (varinfo -> exp (* the var as exp *) -> stmt) -> exp
+  (* the closure as argument indicates how to initialize the given varinfo *)
+
   val push_and_mpz_init: (varinfo -> exp (* the var as exp *) -> stmt) -> exp
+  (* the closure as argument indicates how to initialize the given varinfo *)
+
   val finalize: unit -> (varinfo * exp * stmt list * bool) list
+(* return the environment and reset it in order to be used again. 
+   Each item of the returned list contains:
+   - the generated varinfo
+   - a C expression corresponding to this varinfo
+   - a list of stmts initializing the varinfo to the right value
+   - a boolean which is true iff the generated varinfo is a mpz_t variable. *)
+
 end = struct
 
   (* the finalizer resets the counter in order to keep it small. However, Cil
@@ -181,10 +193,7 @@ end
 let constant_to_exp ?(loc=Location.unknown) = function
   | CInt64(n, k, s) ->
     (match k with
-    (* [JS 2011/04/12] why 3 distinct cases here (and not only 2)? 
-       Should be something different between signed and unsigned type? *)
     | IBool | IChar | IUChar | IUInt | IUShort | IULong ->
-      kinteger64_repr ?loc k n s
     | ISChar | IShort | IInt | ILong ->
       kinteger64_repr ?loc k n s
     | ILongLong | IULongLong ->

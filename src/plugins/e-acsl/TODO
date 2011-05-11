@@ -1,7 +1,5 @@
 - utiliser Options.use_asserts
 
-- regarder la remarque sur le cas CInt64: distinction signed and unsigned type?
-
 - gestion des initialiseurs des globals: requiert un main
 
 - ajouter des gardes dans les specs devant les termes indéfinis
