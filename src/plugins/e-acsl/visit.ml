@@ -46,10 +46,10 @@ let e_acsl_header () = GText (Read_header.text ())
 (* Build a C conditional doing a runtime assertion check. *)
 let mk_if e p =
   let loc = p.loc in
-  let no_uni = Parameters.Unicode.get () in
+  let unicode = Parameters.Unicode.get () in
   Parameters.Unicode.off ();
   let msg = Pretty_utils.sfprintf "%a@?" Cil.d_predicate_named p in
-  Parameters.Unicode.set no_uni;
+  Parameters.Unicode.set unicode;
   let s = mk_call ~loc "e_acsl_fail" [ mkString loc msg ] in
   mkStmt ~valid_sid:true (If(e, mkBlock [ s ], mkBlock [], loc))
 
@@ -131,7 +131,7 @@ end = struct
 	~generated:true
 	false (* is a global? *)
 	false (* is a formal? *)
-	("e_acsl_cst_" ^ string_of_int !var_cpt)
+	("e_acsl_" ^ string_of_int !var_cpt)
 	ty
     in
     let e = new_lval v in
