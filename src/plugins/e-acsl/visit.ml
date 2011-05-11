@@ -23,6 +23,8 @@ open Cil_types
 open Cil_datatype
 open Cil
 
+let self = ref State.dummy
+
 (* ************************************************************************** *)
 (* General constructs *)
 (* ************************************************************************** *)
@@ -107,10 +109,11 @@ end
 
 module New_vars: sig
 
-  val push: typ -> (varinfo -> exp (* the var as exp *) -> stmt) -> exp
+  val push: typ -> (varinfo -> exp (* the var as exp *) -> stmt list) -> exp
   (* the closure as argument indicates how to initialize the given varinfo *)
 
-  val push_and_mpz_init: (varinfo -> exp (* the var as exp *) -> stmt) -> exp
+  val push_and_mpz_init:
+    (varinfo -> exp (* the var as exp *) -> stmt list) -> exp
   (* the closure as argument indicates how to initialize the given varinfo *)
 
   val finalize: unit -> (varinfo * exp * stmt list * bool) list
@@ -150,10 +153,10 @@ end = struct
     vlist := (v, e, mk_stmts v e, is_t) :: !vlist;
     e
 
-  let push ty mk_stmt = push_list ty (fun v e -> [ mk_stmt v e ])
+  let push ty mk_stmts = push_list ty (fun v e -> mk_stmts v e)
 
-  let push_and_mpz_init mk_stmt =
-    push_list Mpz.t (fun v e -> [ Mpz.init e; mk_stmt v e ])
+  let push_and_mpz_init mk_stmts =
+    push_list Mpz.t (fun v e -> Mpz.init e :: mk_stmts v e)
 
   let finalize () =
     var_cpt := 0;
@@ -186,6 +189,15 @@ end = struct
 
 end
 
+module New_annotation : sig
+  val push: stmt -> predicate named -> unit
+  val finalize : (unit -> unit) Queue.t -> unit
+end = struct
+  let q = Queue.create ()
+  let push s p = Queue.add (fun () -> Annotations.add_assert s [ !self ] p) q
+  let finalize dest_q = Queue.transfer q dest_q
+end
+
 (* ************************************************************************** *)
 (* Transforming terms and predicates into C expressions (if any) *)
 (* ************************************************************************** *)
@@ -193,7 +205,7 @@ end
 let constant_to_exp ?(loc=Location.unknown) = function
   | CInt64(n, k, s) ->
     (match k with
-    | IBool | IChar | IUChar | IUInt | IUShort | IULong ->
+    | IBool | IChar | IUChar | IUInt | IUShort | IULong
     | ISChar | IShort | IInt | ILong ->
       kinteger64_repr ?loc k n s
     | ILongLong | IULongLong ->
@@ -229,7 +241,7 @@ let wrap_leaf e = function
   | Ctype _ -> e
   | Ltype _ -> not_yet "term from an user defined type"
   | Lvar _ -> not_yet "polymorphic term"
-  | Linteger -> New_vars.push Mpz.t (fun _ v -> Mpz.init_set v e)
+  | Linteger -> New_vars.push Mpz.t (fun _ v -> [ Mpz.init_set v e ])
   | Lreal -> not_yet "real number"
   | Larrow _ -> not_yet "logic function"
 
@@ -255,7 +267,7 @@ let rec term_to_exp t =
       | BNot -> "mpz_com"
       | LNot -> assert false
     in
-    New_vars.push_and_mpz_init (fun _ ev -> mk_call ~loc name [ ev; e ])
+    New_vars.push_and_mpz_init (fun _ ev -> [ mk_call ~loc name [ ev; e ] ])
   | TUnOp(LNot, t) ->
     let e = term_to_exp t in
     let ty = typeOf e in
@@ -268,20 +280,19 @@ let rec term_to_exp t =
     assert (Cil_datatype.Typ.equal (typeOf e1) (typeOf e2));
     let name = name_of_mpz_arith_bop bop in
     (* guarding divisions and modulos *)
-    (match bop with
-    | Div | Mod ->
-    (* [JS 2011/04/13] TODO: issue with order of generation.
-       New_vars.push_and_mpz_init pushes variables and their initialisations
-       first, while New_block.push pushes stmts just after them. *)
-      Options.warning ~current:true ~once:true
-	"missing guard for ensuring that %a is different of 0"
-	d_term t2;
-    (*      let z = Logic_const.tinteger 0 in
-	    let guard = comparison_to_exp Eq t2 z in
-	    New_block.push (mk_if guard (Logic_const.prel (Req, t2, z)))*)
-    | _ ->
-      ());
-    New_vars.push_and_mpz_init (fun _ e -> mk_call ~loc name [ e; e1; e2 ])
+    let mk_stmts _ e = 
+      let call = mk_call ~loc name [ e; e1; e2 ]  in
+      match bop with
+      | Div | Mod ->
+	let z = Logic_const.tinteger 0 in
+	let guard = comparison_to_exp Eq t2 z in
+	let cond = mk_if guard (Logic_const.prel (Req, t2, z)) in
+	New_annotation.push cond (Logic_const.prel (Rneq, t2, z));
+	[ cond; call ]
+      | _ ->
+	[ call ]
+    in
+    New_vars.push_and_mpz_init mk_stmts
   | TBinOp(Lt | Gt | Le | Ge | Eq | Ne as bop, t1, t2) ->
     (* comparison operators *)
     comparison_to_exp ~loc bop t1 t2
@@ -337,7 +348,7 @@ and comparison_to_exp ?(loc=Location.unknown) bop t1 t2 =
     let e =
       New_vars.push
 	intType
-	(fun v _ -> mk_call ~result:(var v) "mpz_cmp" [ e1; e2 ])
+	(fun v _ -> [ mk_call ~result:(var v) "mpz_cmp" [ e1; e2 ] ])
     in
     new_exp ?loc (BinOp(bop, e, zero ?loc, intType))
   else
@@ -405,7 +416,7 @@ let convert_rooted (User a | AI(_, a)) = convert_annotation a
 let first_global = ref true
 
 (* the main visitor performing e-acsl checking and C code generator *)
-class e_acsl_visitor prj generate = object
+class e_acsl_visitor prj generate = object (self)
 
   inherit Visitor.generic_frama_c_visitor
     prj
@@ -452,6 +463,7 @@ class e_acsl_visitor prj generate = object
 	in
 	gen_vars <- vars;
 	b.bstmts <- b.bstmts @ clears;
+	New_annotation.finalize self#get_filling_actions;
 	mkStmt ~valid_sid:true (Block b)
       in
       ChangeDoChildrenPost(stmt, mk_block)

@@ -21,6 +21,7 @@
 
 exception Typing_error of string
 
+val self: State.t ref
 val do_visit: ?prj:Project.t -> bool -> Visitor.frama_c_visitor
 
 (*

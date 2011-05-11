@@ -11,8 +11,6 @@ the plug-in would generate something like
 /*@ assert \forall integer x; -1<= x<= 1 ==>  (x != 0&&  1/x == 0) || (x != 0
 &&  1/x != 0); */ 
 
-- pour ces gardes, aussi générer une annotation acsl correspondante (?)
-
 - mkcall ne devrait pas générer de nouvelles variables pour une même fonction
 
 [TODO?] mettre des locations intelligentes

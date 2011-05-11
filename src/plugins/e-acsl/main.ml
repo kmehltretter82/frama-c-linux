@@ -59,6 +59,8 @@ module Resulting_projects =
 	[ Ast.self; Options.Include_headers.self; Options.Use_assert.self ]
      end)
 
+let () = Visit.self := Resulting_projects.self
+
 let generate_code =
   Resulting_projects.memo
     (fun name ->
