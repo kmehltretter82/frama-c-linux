@@ -169,21 +169,16 @@ end
 module New_block : sig
   val is_empty: unit -> bool
   val push: stmt -> unit
-  val push_at_end: stmt -> unit
   val finalize: stmt -> block
 end = struct
 
-  let blist = ref []
   let slist = ref []
 
-  let push s = blist := s :: !blist
-  let push_at_end s = slist := s :: !slist
-
-  let is_empty () = !blist = [] && !slist = []
+  let push s = slist := s :: !slist
+  let is_empty () = !slist = []
 
   let finalize s =
-    let l = !blist @ !slist @ [ s ] in
-    blist := [];
+    let l = !slist @ [ s ] in
     slist := [];
     mkBlock l
 
@@ -390,7 +385,7 @@ let rec named_predicate_to_revexp p =
 
 let convert_named_predicate p =
   let e = named_predicate_to_revexp p in
-  New_block.push_at_end (mk_if e p)
+  New_block.push (mk_if e p)
 
 let convert_annotation annot =
   try
