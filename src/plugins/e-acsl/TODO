@@ -1,27 +1,27 @@
+########
+# CODE #
+########
+
 - utiliser Options.use_asserts
-
 - gestion des initialiseurs des globals: requiert un main
-
-- ajouter des gardes dans les specs devant les termes indéfinis
-
-/*@ assert \forall integer x; -1<= x<= 1 ==>  1/x == 0 || 1/x != 0; */
-
-the plug-in would generate something like
-
-/*@ assert \forall integer x; -1<= x<= 1 ==>  (x != 0&&  1/x == 0) || (x != 0
-&&  1/x != 0); */ 
-
 - mkcall ne devrait pas générer de nouvelles variables pour une même fonction
-
 - garde pour les casts quand overflows potentiels
   (même pas de warnings aujourd'hui)
+- minimiser le nombre de variables générées
+- constante entière longue: utiliser la représentation sous forme de string et 
+  rechercher la base appropriée.
+
+#########
+# TESTS #
+#########
 
 - tester les opérations binaires sur les pointeurs (requiert complex left value)
-
-- minimiser le nombre de variables générées
-
 - améliorer test "integer_constant.i" quand bug fixed #745
 - améliorer test "arith.i" quand bug fixed #751
+
+####################
+# AVANT LA DISTRIB #
+####################
 
 en lien avec bts #743:
 - make distrib

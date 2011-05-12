@@ -46,7 +46,7 @@ let not_yet s =
 let e_acsl_header () = GText (Read_header.text ())
 
 (* Build a C conditional doing a runtime assertion check. *)
-let mk_if e p =
+let mk_e_acsl_guard e p =
   let loc = p.loc in
   let unicode = Parameters.Unicode.get () in
   Parameters.Unicode.off ();
@@ -65,10 +65,10 @@ module Mpz : sig
   val is_t: typ -> bool (* is the type equal to "mpz_t"? *)
   val e_got_t: exp -> bool (* is the type of e is equal to "mpz_t"? *)
   val init: exp -> stmt (* build stmt "mpz_init(v)" *)
-  val clear: exp -> stmt (* build stmt "mpz_clear(v)" *)
   val init_set: exp -> exp -> stmt
 (* build stmt "mpz_init_set_*(v, e)" with the good function 'set' according to
    the type of e *)
+  val clear: exp -> stmt (* build stmt "mpz_clear(v)" *)
 end = struct
 
   let t_torig =
@@ -237,7 +237,9 @@ let constant_to_exp ?(loc=Location.unknown) = function
     kinteger64_repr ?loc k n s
   | CInt64(n, (ILongLong | IULongLong), _s) -> 
     (* cannot use the string [s] if any since we do not know the base in which
-       it is written. Such a base is required by GMP. *)
+       it is written. Such a base is required by GMP.
+       [TODO] Actually possible to find the base for the string, but not done
+       yet *)
     mkString ?loc (Int64.to_string n)
   | CStr _ | CWStr _ | CChr _ | CReal _ | CEnum _ as c -> 
     new_exp ?loc (Const c)
@@ -321,7 +323,7 @@ let rec term_to_exp env t =
       let call = mk_call ~loc name [ e; e1; e2 ]  in
       match bop with
       | Div | Mod ->
-	let cond = mk_if guard (Logic_const.prel (Req, t2, zero)) in
+	let cond = mk_e_acsl_guard guard (Logic_const.prel (Req, t2, zero)) in
 	Env.add_assert cond (Logic_const.prel (Rneq, t2, zero));
 	[ cond; call ]
       | _ ->
@@ -465,7 +467,9 @@ let rec named_predicate_to_exp env p =
 let convert_named_predicate env p =
   let e, env = named_predicate_to_exp env p in
   assert (Typ.equal (typeOf e) intType);
-  Env.add_stmt env (mk_if (new_exp ~loc:e.eloc (UnOp(LNot, e, intType))) p)
+  Env.add_stmt
+    env
+    (mk_e_acsl_guard (new_exp ~loc:e.eloc (UnOp(LNot, e, intType))) p)
 
 let convert_annotation env annot =
   try
