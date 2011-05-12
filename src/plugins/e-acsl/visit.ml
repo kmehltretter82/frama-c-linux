@@ -464,7 +464,7 @@ class e_acsl_visitor prj generate = object (self)
 
   val mutable gen_vars = []
 
-  method vglob g =
+  method vglob_aux g =
     if !first_global then begin
       first_global := false;
       ChangeDoChildrenPost([ g ], fun l -> e_acsl_header () :: l)
@@ -474,6 +474,22 @@ class e_acsl_visitor prj generate = object (self)
   (* [TODO] handle integer constants in initializer
      BUT almost impossible without a main entry point *)
   (*  method vinit v off i = assert false *)
+
+  method vvdec vi =
+    try 
+      let kf = Globals.Functions.get vi in
+      let spec = Kernel_function.get_spec kf in
+      if spec.spec_behavior <> [] then not_yet "behaviors clause of function";
+      if spec.spec_variant <> None then not_yet "variant clause of function";
+      if spec.spec_terminates <> None then
+	not_yet "terminates clause of function";
+      if spec.spec_complete_behaviors <> [] then 
+	not_yet "complete behaviors of function";
+      if spec.spec_disjoint_behaviors <> [] then 
+	not_yet "disjoint behaviors of function";
+      DoChildren
+    with Not_found ->
+      DoChildren
 
   method vfundec f =
     let add_gen_vars f = f.slocals <- gen_vars @ f.slocals; f in
