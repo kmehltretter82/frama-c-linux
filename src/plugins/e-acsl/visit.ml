@@ -230,14 +230,17 @@ end
 (* ************************************************************************** *)
 
 let constant_to_exp ?(loc=Location.unknown) = function
-  | CInt64(n, k, s) ->
-    (match k with
-    | IBool | IChar | IUChar | IUInt | IUShort | IULong
-    | ISChar | IShort | IInt | ILong ->
-      kinteger64_repr ?loc k n s
-    | ILongLong | IULongLong ->
-      mkString ?loc (Int64.to_string n))
-  | CStr _ | CWStr _ | CChr _ | CReal _ | CEnum _ as c -> new_exp ?loc (Const c)
+  | CInt64(n, 
+	   (IBool | IChar | IUChar | IUInt | IUShort | IULong
+	       | ISChar | IShort | IInt | ILong as k), 
+	   s) ->
+    kinteger64_repr ?loc k n s
+  | CInt64(n, (ILongLong | IULongLong), _s) -> 
+    (* cannot use the string [s] if any since we do not know the base in which
+       it is written. Such a base is required by GMP. *)
+    mkString ?loc (Int64.to_string n)
+  | CStr _ | CWStr _ | CChr _ | CReal _ | CEnum _ as c -> 
+    new_exp ?loc (Const c)
 
 let tlval_to_lval = function
   | TVar { lv_origin = Some v }, TNoOffset -> Var v, NoOffset
@@ -536,7 +539,8 @@ class e_acsl_visitor prj generate = object (self)
 	stmt 
 	Env.empty
     in
-    if Env.is_empty env then DoChildren
+    if Env.is_empty env then 
+      DoChildren
     else begin
       assert generate;
       let mk_block stmt =
@@ -547,7 +551,6 @@ class e_acsl_visitor prj generate = object (self)
     end
 
   initializer Env.register_actions_queue self#get_filling_actions
-
 
 end
 
