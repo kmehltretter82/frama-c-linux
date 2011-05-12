@@ -237,11 +237,7 @@ let constant_to_exp ?(loc=Location.unknown) = function
       kinteger64_repr ?loc k n s
     | ILongLong | IULongLong ->
       mkString ?loc (Int64.to_string n))
-  | CStr _ as c -> new_exp ?loc (Const c)
-  | CWStr _ -> not_yet "wide character string constant"
-  | CChr _ -> not_yet "character constant"
-  | CReal _ -> not_yet "floating point constant"
-  | CEnum _ -> not_yet "enum constant"
+  | CStr _ | CWStr _ | CChr _ | CReal _ | CEnum _ as c -> new_exp ?loc (Const c)
 
 let tlval_to_lval = function
   | TVar { lv_origin = Some v }, TNoOffset -> Var v, NoOffset
