@@ -107,22 +107,51 @@ end
 (* Environments *)
 (* ************************************************************************** *)
 
+(* Environments handle all the new C constructs
+   (variables, statements and annotations *)
 module Env : sig
   type t
   val empty: t
   val new_var: 
     t -> typ -> (varinfo -> exp (* the var as exp *) -> stmt list) -> exp * t
-  (* the closure as argument indicates how to initialize the given varinfo *)
+  (* [new_var env ty mk_stmts] extends [env] with a fresh variable of type [ty].
+     Return this variable as a C expression already initialized by applying it
+     to [mk_stmts]. *)
+
   val new_var_and_mpz_init:
     t -> (varinfo -> exp (* the var as exp *) -> stmt list) -> exp * t
+  (* Same as [new_var], but dedicated to mpz_t variables initialized by 
+     {!Mpz.init}. *)
+
   val create_from: t -> t
+  (* [create_from env] creates a fresh environment which does not overlap
+     generated variables with [env]. *)
+
   val merge: from:t -> t -> t
+  (* [merge ~from env] copies the generated variables of [from] to [env].
+     Assume that there is no overlaping between [from] and [env]. *)
+
   val add_stmt: t -> stmt -> t
+  (* [add_stmt env s] extends [env] with the new statement [s] *)
+
   val add_assert: stmt -> predicate named -> unit
+  (* [add_assert s p] extends the global environment with an assertion [p]
+     associated to the statement [s]. *)
+
   val register_actions_queue: (unit -> unit) Queue.t -> unit
+  (* To be called once at initialization time: the queue of event of the
+     visitor required for generating annotations. *)
+
   val generated_variables: t -> varinfo list
+  (* All the new variables added in the environement *)
+
   val block : t -> stmt -> block
+  (* [block env s] returns the block of statements including [s] and the new
+     constructs of [env]. *)
+
   val is_empty: t -> bool
+(* Is the given environment empty? *)
+
 end = struct
 
   let queue = ref (Queue.create ())
@@ -235,6 +264,7 @@ let name_of_mpz_arith_bop = function
   | Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr
   | Shiftlt | Shiftrt | PlusPI | IndexPI | MinusPI | MinusPP -> assert false
 
+(* handle leaves of AST terms *)
 let wrap_leaf env e = function
   | Ctype _ -> e, env
   | Ltype _ -> not_yet "term from an user defined type"
@@ -243,6 +273,9 @@ let wrap_leaf env e = function
   | Lreal -> not_yet "real number"
   | Larrow _ -> not_yet "logic function"
 
+(* Convert an ACSL term into a corresponding C expression (if any) in the given
+   environment. Also extend this environment which includes the generating
+   constructs. *)
 let rec term_to_exp env t = 
   let loc = t.term_loc in
   match t.term_node with
@@ -342,6 +375,7 @@ let rec term_to_exp env t =
   | Trange _ -> not_yet "range"
   | Tlet _ -> not_yet "let binding"
 
+(* generate the C code equivalent to [t1 bop t2]. *)
 and comparison_to_exp ?(loc=Location.unknown) env bop t1 t2 =
   let e1, env = term_to_exp env t1 in
   let e2, env = term_to_exp env t2 in
@@ -358,8 +392,9 @@ and comparison_to_exp ?(loc=Location.unknown) env bop t1 t2 =
   else
     new_exp ?loc (BinOp(bop, e1, e2, intType)), env
 
-(* convert an ACSL named predicate into the opposite C expression (if any).
-   E.g. \true is converted into 0. *)
+(* Convert an ACSL named predicate into a corresponding C expression (if
+   any) in the given environment. Also extend this environment which includes
+   the generating constructs. *)
 let rec named_predicate_to_exp env p = 
   let loc = p.loc in
   match p.content with
@@ -370,6 +405,7 @@ let rec named_predicate_to_exp env p =
   | Prel(rel, t1, t2) -> 
     comparison_to_exp ~loc env (relation_to_binop rel) t1 t2
   | Pand(p1, p2) ->
+    (* p1 && p2 <==> if p1 then p2 else false *)
     let e1, env1 = named_predicate_to_exp env p1 in
     let e2, env2 = named_predicate_to_exp (Env.create_from env1) p2 in
     let env = Env.merge ~from:env2 env1 in
@@ -387,6 +423,7 @@ let rec named_predicate_to_exp env p =
 	in
 	[ mkStmt ~valid_sid:true (If(e1, then_block, else_block, loc)) ])
   | Por(p1, p2) -> 
+    (* p1 || p2 <==> if p1 then true else p2 *)
     let e1, env1 = named_predicate_to_exp env p1 in
     let e2, env2 = named_predicate_to_exp (Env.create_from env1) p2 in
     let env = Env.merge ~from:env2 env1 in
