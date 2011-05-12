@@ -549,11 +549,14 @@ void e_acsl_fail(char *msg)
   return;
 }
 
-void main(void)
+int main(void)
 {
+  int __retres;
   /*@ assert "toto" ≢ "titi"; */ ;
-  if ("toto" == "titi") { e_acsl_fail((char *)"(\"toto\" != \"titi\")"); }
-  return;
+  if (! ("toto" != "titi")) { e_acsl_fail((char *)"(\"toto\" != \"titi\")");
+  }
+  __retres = 0;
+  return (__retres);
 }
 
 

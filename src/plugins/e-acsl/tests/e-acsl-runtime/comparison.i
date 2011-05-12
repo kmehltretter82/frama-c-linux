@@ -1,9 +1,9 @@
 /* run.config
    COMMENT: comparison operators
-   EXECNOW: LOG gen_comparison.c BIN gen_comparison.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/comparison.i -e-acsl-project p -e-acsl-include-headers -then-on p -print -ocode ./tests/e-acsl-runtime/result/gen_comparison.c > /dev/null &&  gcc -o ./tests/e-acsl-runtime/result/gen_comparison.out -lgmp ./tests/e-acsl-runtime/result/gen_comparison.c
+   EXECNOW: LOG gen_comparison.c BIN gen_comparison.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/comparison.i -e-acsl-project p -e-acsl-include-headers -then-on p -print -ocode ./tests/e-acsl-runtime/result/gen_comparison.c > /dev/null &&  gcc -o ./tests/e-acsl-runtime/result/gen_comparison.out -lgmp ./tests/e-acsl-runtime/result/gen_comparison.c && ./tests/e-acsl-runtime/result/gen_comparison.out
 */
 
-void main() {
+int main(void) {
   int x = 0, y = 1;
   /*@ assert x < y; */
   /*@ assert y > x; */
@@ -18,4 +18,5 @@ void main() {
   /*@ assert 123 >= 12; */
   /*@ assert 0xff == 0xff; */
   /*@ assert 1 != 2; */
+  return 0;
 }

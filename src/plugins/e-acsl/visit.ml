@@ -106,6 +106,24 @@ end
 (* ************************************************************************** *)
 (* Environments *)
 (* ************************************************************************** *)
+(*
+module New_block : sig
+  val is_empty: unit -> bool
+  val push: stmt -> unit
+  val finalize: stmt -> block
+end = struct
+
+  let stmts = ref []
+
+  let push s = stmts := s :: !stmts
+  let is_empty () = !stmts = []
+
+  let finalize s =
+    let l = s :: !stmts in
+    stmts := [];
+    mkBlock (List.rev l)
+
+end
 
 module New_vars: sig
 
@@ -116,12 +134,11 @@ module New_vars: sig
     (varinfo -> exp (* the var as exp *) -> stmt list) -> exp
   (* the closure as argument indicates how to initialize the given varinfo *)
 
-  val finalize: unit -> (varinfo * exp * stmt list * bool) list
+  val finalize: unit -> (varinfo * exp * bool) list
 (* return the environment and reset it in order to be used again. 
    Each item of the returned list contains:
    - the generated varinfo
    - a C expression corresponding to this varinfo
-   - a list of stmts initializing the varinfo to the right value
    - a boolean which is true iff the generated varinfo is a mpz_t variable. *)
 
 end = struct
@@ -150,7 +167,9 @@ end = struct
 	ty
     in
     let e = new_lval v in
-    vlist := (v, e, mk_stmts v e, is_t) :: !vlist;
+    let stmts = mk_stmts v e in
+    List.iter New_block.push stmts;
+    vlist := (v, e, is_t) :: !vlist;
     e
 
   let push ty mk_stmts = push_list ty (fun v e -> mk_stmts v e)
@@ -166,31 +185,102 @@ end = struct
 
 end
 
-module New_block : sig
-  val is_empty: unit -> bool
-  val push: stmt -> unit
-  val finalize: stmt -> block
-end = struct
-
-  let slist = ref []
-
-  let push s = slist := s :: !slist
-  let is_empty () = !slist = []
-
-  let finalize s =
-    let l = !slist @ [ s ] in
-    slist := [];
-    mkBlock l
-
-end
-
-module New_annotation : sig
+module New_annotations : sig
   val push: stmt -> predicate named -> unit
   val finalize : (unit -> unit) Queue.t -> unit
 end = struct
   let q = Queue.create ()
   let push s p = Queue.add (fun () -> Annotations.add_assert s [ !self ] p) q
   let finalize dest_q = Queue.transfer q dest_q
+end
+  *)
+module Env : sig
+  type t
+  val empty: t
+  val new_var: 
+    t -> typ -> (varinfo -> exp (* the var as exp *) -> stmt list) -> exp * t
+  (* the closure as argument indicates how to initialize the given varinfo *)
+  val new_var_and_mpz_init:
+    t -> (varinfo -> exp (* the var as exp *) -> stmt list) -> exp * t
+  val create_from: t -> t
+  val merge: from:t -> t -> t
+  val add_stmt: t -> stmt -> t
+  val add_assert: stmt -> predicate named -> unit
+  val register_actions_queue: (unit -> unit) Queue.t -> unit
+  val generated_variables: t -> varinfo list
+  val block : t -> stmt -> block
+  val is_empty: t -> bool
+end = struct
+
+  let queue = ref (Queue.create ())
+  let register_actions_queue q = queue := q
+
+  type t = 
+      { var_cpt: int;
+	vars: varinfo list;
+	beginning_of_block: stmt list;
+	end_of_block: stmt list }
+
+  let empty = 
+    { var_cpt = 0; vars = [] ; beginning_of_block = []; end_of_block = [] }
+
+  let create_from env = 
+    { var_cpt = env.var_cpt; 
+      vars = env.vars; 
+      beginning_of_block = [];
+      end_of_block = [] }
+
+  let merge ~from env = { env with var_cpt = from.var_cpt; vars = from.vars }
+
+  let is_empty env = 
+    if env.beginning_of_block = [] then begin
+      assert (env.end_of_block = []);
+      true
+    end else
+      false      
+
+  let add_stmt env s = 
+    { env with beginning_of_block = s :: env.beginning_of_block }
+
+  let add_assert s p = 
+    Queue.add (fun () -> Annotations.add_assert s [ !self ] p) !queue
+
+  let new_var env ty mk_stmts = 
+    let is_t = Mpz.is_t ty in
+    if is_t then Mpz.is_now_referenced ();
+    let n = succ env.var_cpt in
+    let v =
+      makeVarinfo
+	~logic:false
+	~generated:true
+	false (* is a global? *)
+	false (* is a formal? *)
+	("e_acsl_" ^ string_of_int n)
+	ty
+    in
+    let e = new_lval v in
+    let stmts = mk_stmts v e in
+    e,
+    { var_cpt = n;
+      vars = v :: env.vars;
+      beginning_of_block = 
+	List.fold_left (fun l s -> s :: l) env.beginning_of_block stmts;
+      end_of_block = 
+	if is_t then Mpz.clear e :: env.end_of_block else env.end_of_block }
+
+  let new_var_and_mpz_init env mk_stmts = 
+    new_var env Mpz.t (fun v e -> Mpz.init e :: mk_stmts v e)
+
+  let generated_variables env = List.rev env.vars
+
+  let block env s = 
+    let b = 
+      mkBlock 
+	(List.rev env.beginning_of_block @ [ s ] @ List.rev env.end_of_block)
+    in
+    b.blocals <- b.blocals @ List.rev env.vars;
+    b
+
 end
 
 (* ************************************************************************** *)
@@ -215,82 +305,87 @@ let tlval_to_lval = function
   | TVar { lv_origin = Some v }, TNoOffset -> Var v, NoOffset
   | _ -> not_yet "complex left value"
 
-let relation_to_revbinop = function
-  | Rlt -> Ge
-  | Rgt -> Le
-  | Rle -> Gt
-  | Rge -> Lt
-  | Req -> Ne
-  | Rneq -> Eq
+let relation_to_binop = function
+  | Rlt -> Lt
+  | Rgt -> Gt
+  | Rle -> Le
+  | Rge -> Ge
+  | Req -> Eq
+  | Rneq -> Ne
 
 let name_of_mpz_arith_bop = function
   | PlusA -> "mpz_add"
   | MinusA -> "mpz_sub"
   | Mult -> "mpz_mul"
   | Div -> "mpz_cdiv_q"
-  | Mod -> "mpz_mod"
+  | Mod -> "mpz_mod_ui"
   | Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr
   | Shiftlt | Shiftrt | PlusPI | IndexPI | MinusPI | MinusPP -> assert false
 
-let wrap_leaf e = function
-  | Ctype _ -> e
+let wrap_leaf env e = function
+  | Ctype _ -> e, env
   | Ltype _ -> not_yet "term from an user defined type"
   | Lvar _ -> not_yet "polymorphic term"
-  | Linteger -> New_vars.push Mpz.t (fun _ v -> [ Mpz.init_set v e ])
+  | Linteger -> Env.new_var env Mpz.t (fun _ v -> [ Mpz.init_set v e ])
   | Lreal -> not_yet "real number"
   | Larrow _ -> not_yet "logic function"
 
-let rec term_to_exp t = 
+let rec term_to_exp env t = 
   let loc = t.term_loc in
   match t.term_node with
-  | TConst c -> wrap_leaf (constant_to_exp ~loc c) t.term_type
-  | TLval lv -> wrap_leaf (new_exp ~loc (Lval (tlval_to_lval lv))) t.term_type
-  | TSizeOf ty -> sizeOf ~loc ty
+  | TConst c -> wrap_leaf env (constant_to_exp ~loc c) t.term_type
+  | TLval lv -> 
+    wrap_leaf env (new_exp ~loc (Lval (tlval_to_lval lv))) t.term_type
+  | TSizeOf ty -> sizeOf ~loc ty, env
   | TSizeOfE t ->
-    let e = term_to_exp t in
-    sizeOf ~loc (typeOf e)
-  | TSizeOfStr s -> new_exp ~loc (SizeOfStr s)
-  | TAlignOf ty -> new_exp ~loc (AlignOf ty)
+    let e, env = term_to_exp env t in
+    sizeOf ~loc (typeOf e), env
+  | TSizeOfStr s -> new_exp ~loc (SizeOfStr s), env
+  | TAlignOf ty -> new_exp ~loc (AlignOf ty), env
   | TAlignOfE t ->
-    let e = term_to_exp t in
-    new_exp ~loc (AlignOfE e)
+    let e, env = term_to_exp env t in
+    new_exp ~loc (AlignOfE e), env
   | TUnOp(Neg | BNot as op, t) ->
-    let e = term_to_exp t in
+    let e, env = term_to_exp env t in
     assert (Mpz.e_got_t e);
     let name = match op with
       | Neg -> "mpz_neg"
       | BNot -> "mpz_com"
       | LNot -> assert false
     in
-    New_vars.push_and_mpz_init (fun _ ev -> [ mk_call ~loc name [ ev; e ] ])
+    Env.new_var_and_mpz_init env (fun _ ev -> [ mk_call ~loc name [ ev; e ] ])
   | TUnOp(LNot, t) ->
-    let e = term_to_exp t in
+    let e, env = term_to_exp env t in
     let ty = typeOf e in
     assert (not (Mpz.is_t ty));
-    new_exp ~loc (UnOp(LNot, e, ty))
+    new_exp ~loc (UnOp(LNot, e, ty)), env
   | TBinOp(PlusA | MinusA | Mult | Div | Mod as bop, t1, t2) ->
     (* arithmetic binary operator *)
-    let e1 = term_to_exp t1 in
-    let e2 = term_to_exp t2 in
+    let e1, env = term_to_exp env t1 in
+    let e2, env = term_to_exp env t2 in
     assert (Cil_datatype.Typ.equal (typeOf e1) (typeOf e2));
     let name = name_of_mpz_arith_bop bop in
     (* guarding divisions and modulos *)
+    let zero = Logic_const.tinteger 0 in
+    let guard, env = match bop with
+      | Div | Mod ->
+	comparison_to_exp env Eq t2 zero
+      | _ -> Cil_datatype.Exp.dummy, env
+    in
     let mk_stmts _ e = 
       let call = mk_call ~loc name [ e; e1; e2 ]  in
       match bop with
       | Div | Mod ->
-	let z = Logic_const.tinteger 0 in
-	let guard = comparison_to_exp Eq t2 z in
-	let cond = mk_if guard (Logic_const.prel (Req, t2, z)) in
-	New_annotation.push cond (Logic_const.prel (Rneq, t2, z));
+	let cond = mk_if guard (Logic_const.prel (Req, t2, zero)) in
+	Env.add_assert cond (Logic_const.prel (Rneq, t2, zero));
 	[ cond; call ]
       | _ ->
 	[ call ]
     in
-    New_vars.push_and_mpz_init mk_stmts
+    Env.new_var_and_mpz_init env mk_stmts
   | TBinOp(Lt | Gt | Le | Ge | Eq | Ne as bop, t1, t2) ->
     (* comparison operators *)
-    comparison_to_exp ~loc bop t1 t2
+    comparison_to_exp ~loc env bop t1 t2
   | TBinOp((Shiftlt | Shiftrt), _, _) ->
     (* left/right shift *)
     not_yet "left/right shift"
@@ -300,19 +395,19 @@ let rec term_to_exp t =
   | TBinOp(PlusPI | IndexPI | MinusPI | MinusPP as bop, t1, t2) ->
     (* binary operation over pointers *)
     (* [TODO] untested *)
-    let e1 = term_to_exp t1 in
-    let e2 = term_to_exp t2 in
+    let e1, env = term_to_exp env t1 in
+    let e2, env = term_to_exp env t2 in
     Options.warning ~current:true ~once:true
       "missing guard for ensuring that %a is a valid pointer"
       d_term t;
     (* the type of the result is the same than type of the pointer [e1],
        whatever is [e2] *)
-    new_exp ~loc (BinOp(bop, e1, e2, typeOf e1))
+    new_exp ~loc (BinOp(bop, e1, e2, typeOf e1)), env
   | TCastE(ty, t) ->
     (* [TODO] missing guard for ensuring no overflow when casting *)
-    let e = term_to_exp t in
-    mkCast e ty
-  | TAddrOf lv -> mkAddrOf ~loc (tlval_to_lval lv)
+    let e, env = term_to_exp env t in
+    mkCast e ty, env
+  | TAddrOf lv -> mkAddrOf ~loc (tlval_to_lval lv), env
   | TStartOf _ -> not_yet "beginning of an array"
   | Tapp _ -> not_yet "applying logic function"
   | Tlambda _ -> not_yet "functional"
@@ -334,39 +429,74 @@ let rec term_to_exp t =
   | Trange _ -> not_yet "range"
   | Tlet _ -> not_yet "let binding"
 
-and comparison_to_exp ?(loc=Location.unknown) bop t1 t2 =
-  let e1 = term_to_exp t1 in
-  let e2 = term_to_exp t2 in
+and comparison_to_exp ?(loc=Location.unknown) env bop t1 t2 =
+  let e1, env = term_to_exp env t1 in
+  let e2, env = term_to_exp env t2 in
 (*  Options.feedback "ty1=%a; ty2=%a" d_type (typeOf e1) d_type (typeOf e2);*)
   assert (Cil_datatype.Typ.equal (typeOf e1) (typeOf e2));
   if Mpz.e_got_t e1 then
-    let e =
-      New_vars.push
+    let e, env =
+      Env.new_var
+	env
 	intType
 	(fun v _ -> [ mk_call ~result:(var v) "mpz_cmp" [ e1; e2 ] ])
     in
-    new_exp ?loc (BinOp(bop, e, zero ?loc, intType))
+    new_exp ?loc (BinOp(bop, e, zero ?loc, intType)), env
   else
-    new_exp ?loc (BinOp(bop, e1, e2, intType))
+    new_exp ?loc (BinOp(bop, e1, e2, intType)), env
 
 (* convert an ACSL named predicate into the opposite C expression (if any).
    E.g. \true is converted into 0. *)
-let rec named_predicate_to_revexp p = 
+let rec named_predicate_to_exp env p = 
   let loc = p.loc in
   match p.content with
-  | Pfalse -> one ~loc
-  | Ptrue -> zero ~loc
+  | Pfalse -> zero ~loc, env
+  | Ptrue -> one ~loc, env
   | Papp _ -> not_yet "logic function application"
   | Pseparated _ -> not_yet "separated"
-  | Prel(rel, t1, t2) -> comparison_to_exp ~loc (relation_to_revbinop rel) t1 t2
-  | Pand _ -> not_yet "&&"
-  | Por _ -> not_yet "||"
+  | Prel(rel, t1, t2) -> 
+    comparison_to_exp ~loc env (relation_to_binop rel) t1 t2
+  | Pand(p1, p2) ->
+    let e1, env1 = named_predicate_to_exp env p1 in
+    let e2, env2 = named_predicate_to_exp (Env.create_from env1) p2 in
+    let env = Env.merge ~from:env2 env1 in
+    Env.new_var
+      env
+      intType
+      (fun v _ -> 
+	let lv = var v in
+	let then_block = 
+	  let s = mkStmt ~valid_sid:true (Instr (Set(lv, e2, loc))) in
+	  if Env.is_empty env2 then mkBlock [ s ] else Env.block env2 s
+	in
+	let else_block = 
+	  mkBlock [ mkStmt ~valid_sid:true (Instr (Set(lv, zero loc, loc))) ]
+	in
+	[ mkStmt ~valid_sid:true (If(e1, then_block, else_block, loc)) ])
+  | Por(p1, p2) -> 
+    let e1, env1 = named_predicate_to_exp env p1 in
+    let e2, env2 = named_predicate_to_exp (Env.create_from env1) p2 in
+    let env = Env.merge ~from:env2 env1 in
+    Env.new_var
+      env
+      intType
+      (fun v _ -> 
+	let lv = var v in	
+	let then_block = 
+	  mkBlock [ mkStmt ~valid_sid:true (Instr (Set(lv, one loc, loc))) ]
+	in
+	let else_block = 
+	  let s = mkStmt ~valid_sid:true (Instr (Set(lv, e2, loc))) in
+	  if Env.is_empty env2 then mkBlock [ s ] else Env.block env2 s
+	in
+	[ mkStmt ~valid_sid:true (If(e1, then_block, else_block, loc)) ])
   | Pxor _ -> not_yet "xor"
-  | Pimplies _ -> not_yet "==>"
+  | Pimplies(p1, p2) -> 
+    named_predicate_to_exp env (Logic_const.por ((Logic_const.pnot p1), p2))
   | Piff _ -> not_yet "<==>"
   | Pnot p ->
-    let e = named_predicate_to_revexp p in
-    new_exp ~loc (UnOp(Neg, e, TInt(IInt, [])))
+    let e, env = named_predicate_to_exp env p in
+    new_exp ~loc (UnOp(LNot, e, TInt(IInt, []))), env
   | Pif _ -> not_yet "_ ? _ : _"
   | Plet _ -> not_yet "let _ = _ in _"
   | Pforall _ -> not_yet "\\forall"
@@ -383,14 +513,15 @@ let rec named_predicate_to_revexp p =
    statement (if any) for runtime assertion checking *)
 (* ************************************************************************** *)
 
-let convert_named_predicate p =
-  let e = named_predicate_to_revexp p in
-  New_block.push (mk_if e p)
+let convert_named_predicate env p =
+  let e, env = named_predicate_to_exp env p in
+  assert (Typ.equal (typeOf e) intType);
+  Env.add_stmt env (mk_if (new_exp ~loc:e.eloc (UnOp(LNot, e, intType))) p)
 
-let convert_annotation annot =
+let convert_annotation env annot =
   try
     match annot.annot_content with
-    | AAssert(_l, p) -> convert_named_predicate p
+    | AAssert(_l, p) -> convert_named_predicate env p
     | AStmtSpec _ -> not_yet "stmt spec"
     | AInvariant _ -> not_yet "invariant"
     | AVariant _ -> not_yet "variant"
@@ -399,9 +530,10 @@ let convert_annotation annot =
   with Typing_error s ->
     let msg = Format.sprintf "invalid E-ACSL construct %s." s in
     if Options.Check.get () then type_error msg
-    else Options.warning ~current:true "%s@\nignoring annotation." msg
+    else Options.warning ~current:true "%s@\nignoring annotation." msg;
+    env
 
-let convert_rooted (User a | AI(_, a)) = convert_annotation a
+let convert_rooted env (User a | AI(_, a)) = convert_annotation env a
 
 (* ************************************************************************** *)
 (* Visitor *)
@@ -436,32 +568,24 @@ class e_acsl_visitor prj generate = object (self)
 
   method vstmt_aux stmt =
 (*    Options.debug ~level:2 "proceeding stmt %d@." stmt.sid;*)
-    Annotations.single_iter_stmt (fun ba -> convert_rooted ba) stmt;
-    (* new_block and new_vars is set by [convert_rooted] *)
-    let is_empty_block = New_block.is_empty () in
-    let new_vars = New_vars.finalize () in
-    match is_empty_block, new_vars with
-    | true, [] -> DoChildren
-    | true, _ :: _ -> assert false
-    | false, _ ->
+    let env =
+      Annotations.single_fold_stmt
+	(fun ba env -> convert_rooted env ba) 
+	stmt 
+	Env.empty
+    in
+    if Env.is_empty env then DoChildren
+    else begin
       assert generate;
       let mk_block stmt =
-	let b = New_block.finalize stmt in
-	let vars, clears =
-	  List.fold_left
-	    (fun (vars, clears) (v, e, stmts, must_clear) ->
-	      b.blocals <- v :: b.blocals;
-	      b.bstmts <- stmts @ b.bstmts;
-	      v :: vars, if must_clear then Mpz.clear e :: clears else clears)
-	    ([], [])
-	    new_vars
-	in
-	gen_vars <- vars;
-	b.bstmts <- b.bstmts @ clears;
-	New_annotation.finalize self#get_filling_actions;
-	mkStmt ~valid_sid:true (Block b)
+	gen_vars <- Env.generated_variables env;
+	mkStmt ~valid_sid:true (Block (Env.block env stmt))
       in
       ChangeDoChildrenPost(stmt, mk_block)
+    end
+
+  initializer Env.register_actions_queue self#get_filling_actions
+
 
 end
 

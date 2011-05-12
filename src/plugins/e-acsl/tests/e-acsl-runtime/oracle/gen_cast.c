@@ -549,17 +549,19 @@ void e_acsl_fail(char *msg)
   return;
 }
 
-void main(void)
+int main(void)
 {
+  int __retres;
   long x;
   int y;
   x = (long)0;
   y = 0;
   /*@ assert (int)x ≡ y; */ ;
-  if ((int)x != y) { e_acsl_fail((char *)"((int)x == y)"); }
+  if (! ((int)x == y)) { e_acsl_fail((char *)"((int)x == y)"); }
   /*@ assert x ≡ (long)y; */ ;
-  if (x != (long)y) { e_acsl_fail((char *)"(x == (long)y)"); }
-  return;
+  if (! (x == (long)y)) { e_acsl_fail((char *)"(x == (long)y)"); }
+  __retres = 0;
+  return (__retres);
 }
 
 

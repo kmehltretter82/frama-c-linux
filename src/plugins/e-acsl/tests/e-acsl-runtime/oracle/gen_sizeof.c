@@ -554,9 +554,9 @@ void main(void)
   int x;
   x = 0;
   /*@ assert sizeof(int) ≡ sizeof(x); */ ;
-  if (4 != 4) { e_acsl_fail((char *)"(sizeof(int) == sizeof(x))"); }
+  if (! (4 == 4)) { e_acsl_fail((char *)"(sizeof(int) == sizeof(x))"); }
   /*@ assert sizeof("totototototo") ≡ sizeof(char *); */ ;
-  if (4 != 4) {
+  if (! (4 == 4)) {
     e_acsl_fail((char *)"(sizeof(\"totototototo\") == sizeof(char *))");
   }
   return;

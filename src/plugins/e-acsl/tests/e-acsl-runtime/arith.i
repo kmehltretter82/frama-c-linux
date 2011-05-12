@@ -4,7 +4,7 @@
    EXECNOW: LOG gen_arith.c BIN gen_arith.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/arith.i -e-acsl-project p -e-acsl-include-headers -then-on p -print -ocode ./tests/e-acsl-runtime/result/gen_arith.c > /dev/null && gcc -o ./tests/e-acsl-runtime/result/gen_arith.out -lgmp ./tests/e-acsl-runtime/result/gen_arith.c
 */
 
-void main() {
+int main(void) {
   int x = -3;
   int y = 2;
 
@@ -28,4 +28,6 @@ void main() {
   //   /*@ assert 0 == !1; */ ;
   /* subtyping relation: 0 should be promoted to boolean below
      How to handle this? See BTS #751 */
+
+  return 0;
 }

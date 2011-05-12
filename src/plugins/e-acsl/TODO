@@ -13,8 +13,6 @@ the plug-in would generate something like
 
 - mkcall ne devrait pas générer de nouvelles variables pour une même fonction
 
-[TODO?] mettre des locations intelligentes
-
 - garde pour les casts quand overflows potentiels
   (même pas de warnings aujourd'hui)
 

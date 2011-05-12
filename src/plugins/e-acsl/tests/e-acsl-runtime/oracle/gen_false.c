@@ -549,12 +549,14 @@ void e_acsl_fail(char *msg)
   return;
 }
 
-void main(void)
+int main(void)
 {
+  int __retres;
   int x;
   x = 0;
   if (x) { /*@ assert \false; */ ; e_acsl_fail((char *)"(\\false)"); }
-  return;
+  __retres = 0;
+  return (__retres);
 }
 
 
