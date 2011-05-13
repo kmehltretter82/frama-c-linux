@@ -123,9 +123,9 @@ module Env : sig
   (* Same as [new_var], but dedicated to mpz_t variables initialized by 
      {!Mpz.init}. *)
 
-  val create_from: t -> t
-  (* [create_from env] creates a fresh environment which does not overlap
-     generated variables with [env]. *)
+  val no_overlap: from:t -> t -> t
+  (* [no_overlap ~from env] returns env, but ensures that new generated
+     variables will not overlap with those of [from]. *)
 
   val merge: from:t -> t -> t
   (* [merge ~from env] copies the generated variables of [from] to [env].
@@ -149,6 +149,10 @@ module Env : sig
   (* [block env s] returns the block of statements including [s] and the new
      constructs of [env]. *)
 
+  val block_option: t -> stmt -> block option
+  (* [block_option env s] returns the block of statements including [s] and the
+     new constructs of [env], if any. *)
+
   val is_empty: t -> bool
 (* Is the given environment empty? *)
 
@@ -166,17 +170,15 @@ end = struct
   let empty = 
     { var_cpt = 0; vars = [] ; beginning_of_block = []; end_of_block = [] }
 
-  let create_from env = 
-    { var_cpt = env.var_cpt; 
-      vars = env.vars; 
-      beginning_of_block = [];
-      end_of_block = [] }
+  let no_overlap ~from env = 
+    { env with var_cpt = Extlib.max_cpt from.var_cpt env.var_cpt }
 
-  let merge ~from env = { env with var_cpt = from.var_cpt; vars = from.vars }
+  let merge ~from env = 
+    { env with var_cpt = from.var_cpt; vars = env.vars @ from.vars }
 
   let is_empty env = 
     if env.beginning_of_block = [] then begin
-      assert (env.end_of_block = []);
+      assert (env.end_of_block = [] && env.vars = []);
       true
     end else
       false      
@@ -222,6 +224,8 @@ end = struct
     in
     b.blocals <- b.blocals @ List.rev env.vars;
     b
+
+  let block_option env s = if is_empty env then None else Some (block env s)
 
 end
 
@@ -408,7 +412,9 @@ let rec named_predicate_to_exp env p =
   | Pand(p1, p2) ->
     (* p1 && p2 <==> if p1 then p2 else false *)
     let e1, env1 = named_predicate_to_exp env p1 in
-    let e2, env2 = named_predicate_to_exp (Env.create_from env1) p2 in
+    let e2, env2 = 
+      named_predicate_to_exp (Env.no_overlap ~from:env1 Env.empty) p2 
+    in
     let env = Env.merge ~from:env2 env1 in
     Env.new_var
       env
@@ -426,7 +432,9 @@ let rec named_predicate_to_exp env p =
   | Por(p1, p2) -> 
     (* p1 || p2 <==> if p1 then true else p2 *)
     let e1, env1 = named_predicate_to_exp env p1 in
-    let e2, env2 = named_predicate_to_exp (Env.create_from env1) p2 in
+    let e2, env2 = 
+      named_predicate_to_exp (Env.no_overlap ~from:env1 Env.empty) p2 
+    in
     let env = Env.merge ~from:env2 env1 in
     Env.new_var
       env
@@ -464,6 +472,61 @@ let rec named_predicate_to_exp env p =
    statement (if any) for runtime assertion checking *)
 (* ************************************************************************** *)
 
+let convert_preconditions _only_behaviors env _funspec behaviors =
+  if behaviors <> [] then not_yet "requires of behaviors";
+  let p = Logic_const.ptrue in
+  let e, env = named_predicate_to_exp env p in
+  p, e, env
+
+let convert_postconditions only_behaviors env behaviors =
+  let do_behavior p_acc b = 
+    if List.mem b.b_name only_behaviors then begin
+      assert (b.b_assumes = []);
+      List.fold_left
+	(fun p_acc (t, p) ->
+	  match t with
+	  | Normal -> Logic_const.pand (p_acc, Logic_const.unamed p.ip_content)
+	  | Exits | Breaks | Continues | Returns ->
+	    not_yet "abnormal termination case in behavior")
+	p_acc
+	b.b_post_cond
+    end else
+      p_acc
+  in 
+  (* conjunction of postconditions of behaviors *)
+  let p = List.fold_left do_behavior Logic_const.ptrue behaviors in
+  let e, env = named_predicate_to_exp env p in
+  p, e, env
+
+let convert_behaviors only_behaviors env funspec behaviors =
+  (* [TODO] untested *)
+  List.iter
+    (fun b ->
+      if b.b_assumes <> [] then not_yet "assumes clause in behavior";
+      if b.b_assigns <> WritesAny then not_yet "assigns clause in behavior";
+      if b.b_extended <> [] then not_yet "grammar extensions in behavior")
+    behaviors;
+  let pre_p, pre_e, pre_env = 
+    convert_preconditions only_behaviors env funspec behaviors 
+  in
+  let pre_block = Env.block_option pre_env (mk_e_acsl_guard pre_e pre_p) in
+  let post_p, post_e, post_env = 
+    convert_postconditions 
+      only_behaviors (Env.no_overlap ~from:pre_env env) behaviors 
+  in
+  let post_block = Env.block_option post_env (mk_e_acsl_guard post_e post_p) in
+  pre_block, post_block, post_env
+
+let convert_spec only_behaviors env spec =
+  if spec.spec_variant <> None then not_yet "variant clause";
+  if spec.spec_terminates <> None then
+    not_yet "terminates clause";
+  if spec.spec_complete_behaviors <> [] then 
+    not_yet "complete behaviors";
+  if spec.spec_disjoint_behaviors <> [] then 
+    not_yet "disjoint behaviors";
+  convert_behaviors only_behaviors env spec spec.spec_behavior
+
 let convert_named_predicate env p =
   let e, env = named_predicate_to_exp env p in
   assert (Typ.equal (typeOf e) intType);
@@ -474,8 +537,21 @@ let convert_named_predicate env p =
 let convert_annotation env annot =
   try
     match annot.annot_content with
-    | AAssert(_l, p) -> convert_named_predicate env p
-    | AStmtSpec _ -> not_yet "stmt spec"
+    | AAssert(l, p) -> 
+      if l <> [] then not_yet "assertions applied only on some behaviors";
+      convert_named_predicate env p, None
+    | AStmtSpec(only_behaviors, spec) -> 
+      let pre_block, post_block, post_env = 
+	convert_spec only_behaviors env spec 
+      in
+      let env = match pre_block with
+	| None -> env
+	| Some b -> 
+	  Env.add_stmt
+	    (Env.no_overlap ~from:post_env env) 
+	    (mkStmt ~valid_sid:true (Block b))
+      in 
+      env, post_block
     | AInvariant _ -> not_yet "invariant"
     | AVariant _ -> not_yet "variant"
     | AAssigns _ -> not_yet "assigns"
@@ -484,7 +560,7 @@ let convert_annotation env annot =
     let msg = Format.sprintf "invalid E-ACSL construct %s." s in
     if Options.Check.get () then type_error msg
     else Options.warning ~current:true "%s@\nignoring annotation." msg;
-    env
+    env, None
 
 let convert_rooted env (User a | AI(_, a)) = convert_annotation env a
 
@@ -503,6 +579,8 @@ class e_acsl_visitor prj generate = object (self)
     ((if generate then Cil.copy_visit else Cil.inplace_visit) ())
 
   val mutable gen_vars = []
+  val mutable pre_block = None
+  val mutable post_block = None
 
   method vglob_aux g =
     if !first_global then begin
@@ -518,30 +596,40 @@ class e_acsl_visitor prj generate = object (self)
   method vvdec vi =
     try 
       let kf = Globals.Functions.get vi in
-      let spec = Kernel_function.get_spec kf in
-      if spec.spec_behavior <> [] then not_yet "behaviors clause of function";
-      if spec.spec_variant <> None then not_yet "variant clause of function";
-      if spec.spec_terminates <> None then
-	not_yet "terminates clause of function";
-      if spec.spec_complete_behaviors <> [] then 
-	not_yet "complete behaviors of function";
-      if spec.spec_disjoint_behaviors <> [] then 
-	not_yet "disjoint behaviors of function";
+      let pre_b, post_b, env = 
+	convert_spec [] Env.empty (Kernel_function.get_spec kf) 
+      in
+      pre_block <- pre_b;
+      post_block <- post_b;
+      if pre_b <> None then not_yet "precondition in function contract";
+      if post_b <> None then not_yet "postcondition in function contract";
+      gen_vars <- Env.generated_variables env;
       DoChildren
     with Not_found ->
       DoChildren
 
   method vfundec f =
-    let add_gen_vars f = f.slocals <- gen_vars @ f.slocals; f in
+    let contract_vars = gen_vars in
+    let add_gen_vars f = 
+      f.slocals <- contract_vars @ gen_vars @ f.slocals;
+      gen_vars <- [];
+      f
+    in
     ChangeDoChildrenPost(f, add_gen_vars)
 
   method vstmt_aux stmt =
 (*    Options.debug ~level:2 "proceeding stmt %d@." stmt.sid;*)
-    let env =
+    let env, post_stmts =
       Annotations.single_fold_stmt
-	(fun ba env -> convert_rooted env ba) 
+	(fun ba (env, post_stmts) -> 
+	  let env, post_block = convert_rooted env ba in
+	  let post_stmts = match post_block with
+	    | None -> post_stmts
+	    | Some b -> mkStmt ~valid_sid:true (Block b) :: post_stmts
+	  in
+	  env, post_stmts) 
 	stmt 
-	Env.empty
+	(Env.empty, [])
     in
     if Env.is_empty env then 
       DoChildren
@@ -549,7 +637,8 @@ class e_acsl_visitor prj generate = object (self)
       assert generate;
       let mk_block stmt =
 	gen_vars <- Env.generated_variables env;
-	mkStmt ~valid_sid:true (Block (Env.block env stmt))
+	let s = mkStmt ~valid_sid:true (Block (Env.block env stmt)) in
+	mkStmt ~valid_sid:true (Block (mkBlock (s :: post_stmts)))
       in
       ChangeDoChildrenPost(stmt, mk_block)
     end
