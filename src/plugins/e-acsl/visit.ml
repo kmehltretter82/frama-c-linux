@@ -473,7 +473,9 @@ let rec named_predicate_to_exp env p =
 (* ************************************************************************** *)
 
 let convert_preconditions _only_behaviors env _funspec behaviors =
-  if behaviors <> [] then not_yet "requires of behaviors";
+  List.iter
+    (fun b -> if b.b_requires <> [] then not_yet "requires of behaviors")
+    behaviors;
   let p = Logic_const.ptrue in
   let e, env = named_predicate_to_exp env p in
   p, e, env
