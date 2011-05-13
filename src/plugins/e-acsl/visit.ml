@@ -482,7 +482,7 @@ let convert_preconditions _only_behaviors env _funspec behaviors =
 
 let convert_postconditions only_behaviors env behaviors =
   let do_behavior p_acc b = 
-    if List.mem b.b_name only_behaviors then begin
+    if only_behaviors = [] || List.mem b.b_name only_behaviors then begin
       assert (b.b_assumes = []);
       List.fold_left
 	(fun p_acc (t, p) ->
