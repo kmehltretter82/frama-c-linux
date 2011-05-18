@@ -106,7 +106,7 @@ __inline static int __gmpz_fits_uint_p(mpz_srcptr __gmp_z)
   mp_size_t __gmp_n;
   mp_ptr __gmp_p;
   int tmp;
-  __gmp_n = (mp_size_t)__gmp_z->_mp_size;
+  __gmp_n = (long)__gmp_z->_mp_size;
   __gmp_p = __gmp_z->_mp_d;
   if (__gmp_n == (mp_size_t)0) { tmp = 1; }
   else {
@@ -130,7 +130,7 @@ __inline static int __gmpz_fits_ulong_p(mpz_srcptr __gmp_z)
   mp_size_t __gmp_n;
   mp_ptr __gmp_p;
   int tmp;
-  __gmp_n = (mp_size_t)__gmp_z->_mp_size;
+  __gmp_n = (long)__gmp_z->_mp_size;
   __gmp_p = __gmp_z->_mp_d;
   if (__gmp_n == (mp_size_t)0) { tmp = 1; }
   else {
@@ -154,7 +154,7 @@ __inline static int __gmpz_fits_ushort_p(mpz_srcptr __gmp_z)
   mp_size_t __gmp_n;
   mp_ptr __gmp_p;
   int tmp;
-  __gmp_n = (mp_size_t)__gmp_z->_mp_size;
+  __gmp_n = (long)__gmp_z->_mp_size;
   __gmp_p = __gmp_z->_mp_d;
   if (__gmp_n == (mp_size_t)0) { tmp = 1; }
   else {
@@ -179,7 +179,7 @@ __inline static unsigned long __gmpz_get_ui(mpz_srcptr __gmp_z)
   mp_limb_t __gmp_l;
   mp_limb_t tmp;
   __gmp_p = __gmp_z->_mp_d;
-  __gmp_n = (mp_size_t)__gmp_z->_mp_size;
+  __gmp_n = (long)__gmp_z->_mp_size;
   __gmp_l = *(__gmp_p + 0);
   if (__gmp_n != (mp_size_t)0) { tmp = __gmp_l; }
   else { tmp = (unsigned long)0; }
@@ -195,7 +195,7 @@ __inline static mp_limb_t __gmpz_getlimbn(mpz_srcptr __gmp_z,
   mp_limb_t __gmp_result;
   long tmp_1;
   int tmp_0;
-  __gmp_result = (mp_limb_t)0;
+  __gmp_result = (unsigned long)0;
   { /*undefined sequence*/ 
     if (__gmp_n >= (mp_size_t)0) {
       int tmp;
@@ -584,9 +584,7 @@ int main(void)
   }
   
   /*@ assert false ≢ true; */ ;
-  if (! ((unsigned int)false != (unsigned int)true)) {
-    e_acsl_fail((char *)"(false != true)");
-  }
+  if (! (false != true)) { e_acsl_fail((char *)"(false != true)"); }
   __retres = 0;
   return (__retres);
 }

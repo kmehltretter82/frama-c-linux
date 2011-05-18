@@ -112,9 +112,7 @@ int main(void)
   }
   
   /*@ assert false ≢ true; */ ;
-  if (! ((unsigned int)false != (unsigned int)true)) {
-    e_acsl_fail((char *)"(false != true)");
-  }
+  if (! (false != true)) { e_acsl_fail((char *)"(false != true)"); }
   __retres = 0;
   return (__retres);
 }
