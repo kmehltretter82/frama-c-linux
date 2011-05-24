@@ -19,7 +19,39 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val do_visit: ?prj:Project.t -> bool -> Visitor.frama_c_visitor
+open Cil_types
+open Cil_datatype
+open Cil
+
+let t_torig =
+  { torig_name = "mpz_t";
+    tname = "mpz_t";
+    ttype = TVoid [] (* incorrect but does not matter *);
+    treferenced = false }
+
+let is_now_referenced () = t_torig.treferenced <- true
+
+let t = TNamed(t_torig, [])
+let is_t ty = Cil_datatype.Typ.equal ty t
+let e_got_t e = is_t (typeOf e)
+
+let apply_on_var funname e = Misc.mk_call ("mpz_" ^ funname) [ e ]
+let init = apply_on_var "init"
+let clear = apply_on_var "clear"
+
+let init_set v e =
+  let fname, args = match typeOf e with
+    | TInt((IBool | IChar | IUChar | IUInt | IUShort | IULong), _) ->
+      "ui", [ e ]
+    | TInt((ISChar | IShort | IInt | ILong), _) -> "si", [ e ]
+    | TInt((ILongLong | IULongLong), _) -> assert false
+    | TPtr(TInt(IChar, _), _) ->
+      "str",
+	(* decimal base for the number given as string *)
+      [ e; integer ~loc:Location.unknown 10 ]
+    | _ -> assert false
+  in
+  Misc.mk_call ("mpz_init_set_" ^ fname) (v :: args)
 
 (*
 Local Variables:

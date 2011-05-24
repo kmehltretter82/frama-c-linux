@@ -19,7 +19,31 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val do_visit: ?prj:Project.t -> bool -> Visitor.frama_c_visitor
+(** GMP Values. *)
+
+open Cil_types
+
+val t: typ 
+  (** type "mpz_t" *)
+  
+val is_now_referenced: unit -> unit 
+  (** Should be called once one variable of type "mpz_t" exists *)
+
+val is_t: typ -> bool 
+  (** is the type equal to "mpz_t"? *)
+  
+val e_got_t: exp -> bool
+  (** is the type of e is equal to "mpz_t"? *)
+
+val init: exp -> stmt
+  (** build stmt "mpz_init(v)" *)
+
+val init_set: exp -> exp -> stmt
+  (** build stmt "mpz_init_set_*(v, e)" with the good function 'set' according
+      to the type of e *)
+
+val clear: exp -> stmt
+(** build stmt "mpz_clear(v)" *)
 
 (*
 Local Variables:

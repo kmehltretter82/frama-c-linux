@@ -23,212 +23,6 @@ open Cil_types
 open Cil_datatype
 open Cil
 
-let self = ref State.dummy
-
-(* ************************************************************************** *)
-(* General constructs *)
-(* ************************************************************************** *)
-
-let new_lval ?(loc=Location.unknown) v = new_exp ~loc (Lval (var v))
-
-let mk_call ?(loc=Location.unknown) ?result fname args =
-  (* the type is incorrect, but it doesn't matter *)
-  (* [JS 2011/04/12] should not generate a new variable by function name *) 
-  let f = new_lval ~loc (makeGlobalVar fname voidType) in
-  mkStmt ~valid_sid:true (Instr(Call(result, f, args, loc)))
-
-exception Typing_error of string
-let type_error s = raise (Typing_error s)
-
-let not_yet s =
-  Options.not_yet_implemented "construct `%s' is not yet supported." s
-
-let e_acsl_header () = GText (Read_header.text ())
-
-(* Build a C conditional doing a runtime assertion check. *)
-let mk_e_acsl_guard e p =
-  let loc = p.loc in
-  let unicode = Parameters.Unicode.get () in
-  Parameters.Unicode.off ();
-  let msg = Pretty_utils.sfprintf "%a@?" Cil.d_predicate_named p in
-  Parameters.Unicode.set unicode;
-  let s = mk_call ~loc "e_acsl_fail" [ mkString loc msg ] in
-  mkStmt ~valid_sid:true (If(e, mkBlock [ s ], mkBlock [], loc))
-
-(* ************************************************************************** *)
-(* GMP values *)
-(* ************************************************************************** *)
-
-module Mpz : sig
-  val t: typ (* type "mpz_t" *)
-  val is_now_referenced: unit -> unit (* one variable "mpz_t" now exists *)
-  val is_t: typ -> bool (* is the type equal to "mpz_t"? *)
-  val e_got_t: exp -> bool (* is the type of e is equal to "mpz_t"? *)
-  val init: exp -> stmt (* build stmt "mpz_init(v)" *)
-  val init_set: exp -> exp -> stmt
-(* build stmt "mpz_init_set_*(v, e)" with the good function 'set' according to
-   the type of e *)
-  val clear: exp -> stmt (* build stmt "mpz_clear(v)" *)
-end = struct
-
-  let t_torig =
-  { torig_name = "mpz_t";
-    tname = "mpz_t";
-    ttype = TVoid [] (* incorrect but does not matter *);
-    treferenced = false }
-
-  let is_now_referenced () = t_torig.treferenced <- true
-
-  let t = TNamed(t_torig, [])
-  let is_t ty = Cil_datatype.Typ.equal ty t
-  let e_got_t e = is_t (typeOf e)
-
-  let apply_on_var funname e = mk_call ("mpz_" ^ funname) [ e ]
-  let init = apply_on_var "init"
-  let clear = apply_on_var "clear"
-
-  let init_set v e =
-    let fname, args = match typeOf e with
-      | TInt((IBool | IChar | IUChar | IUInt | IUShort | IULong), _) ->
-	"ui", [ e ]
-      | TInt((ISChar | IShort | IInt | ILong), _) -> "si", [ e ]
-      | TInt((ILongLong | IULongLong), _) -> assert false
-      | TPtr(TInt(IChar, _), _) ->
-	"str",
-	(* decimal base for the number given as string *)
-	[ e; integer ~loc:Location.unknown 10 ]
-      | _ -> assert false
-    in
-    mk_call ("mpz_init_set_" ^ fname) (v :: args)
-
-end
-
-(* ************************************************************************** *)
-(* Environments *)
-(* ************************************************************************** *)
-
-(* Environments handle all the new C constructs
-   (variables, statements and annotations *)
-module Env : sig
-  type t
-  val empty: t
-  val new_var: 
-    t -> typ -> (varinfo -> exp (* the var as exp *) -> stmt list) -> exp * t
-  (* [new_var env ty mk_stmts] extends [env] with a fresh variable of type [ty].
-     Return this variable as a C expression already initialized by applying it
-     to [mk_stmts]. *)
-
-  val new_var_and_mpz_init:
-    t -> (varinfo -> exp (* the var as exp *) -> stmt list) -> exp * t
-  (* Same as [new_var], but dedicated to mpz_t variables initialized by 
-     {!Mpz.init}. *)
-
-  val no_overlap: from:t -> t -> t
-  (* [no_overlap ~from env] returns env, but ensures that new generated
-     variables will not overlap with those of [from]. *)
-
-  val merge: from:t -> t -> t
-  (* [merge ~from env] copies the generated variables of [from] to [env].
-     Assume that there is no overlaping between [from] and [env]. *)
-
-  val add_stmt: t -> stmt -> t
-  (* [add_stmt env s] extends [env] with the new statement [s] *)
-
-  val add_assert: stmt -> predicate named -> unit
-  (* [add_assert s p] extends the global environment with an assertion [p]
-     associated to the statement [s]. *)
-
-  val register_actions_queue: (unit -> unit) Queue.t -> unit
-  (* To be called once at initialization time: the queue of event of the
-     visitor required for generating annotations. *)
-
-  val generated_variables: t -> varinfo list
-  (* All the new variables added in the environement *)
-
-  val block : t -> stmt -> block
-  (* [block env s] returns the block of statements including [s] and the new
-     constructs of [env]. *)
-
-  val block_option: t -> stmt -> block option
-  (* [block_option env s] returns the block of statements including [s] and the
-     new constructs of [env], if any. *)
-
-  val is_empty: t -> bool
-(* Is the given environment empty? *)
-
-end = struct
-
-  let queue = ref (Queue.create ())
-  let register_actions_queue q = queue := q
-
-  type t = 
-      { var_cpt: int;
-	vars: varinfo list;
-	beginning_of_block: stmt list;
-	end_of_block: stmt list }
-
-  let empty = 
-    { var_cpt = 0; vars = [] ; beginning_of_block = []; end_of_block = [] }
-
-  let no_overlap ~from env = 
-    { env with var_cpt = Extlib.max_cpt from.var_cpt env.var_cpt }
-
-  let merge ~from env = 
-    { env with var_cpt = from.var_cpt; vars = env.vars @ from.vars }
-
-  let is_empty env = 
-    if env.beginning_of_block = [] then begin
-      assert (env.end_of_block = [] && env.vars = []);
-      true
-    end else
-      false      
-
-  let add_stmt env s = 
-    { env with beginning_of_block = s :: env.beginning_of_block }
-
-  let add_assert s p = 
-    Queue.add (fun () -> Annotations.add_assert s [ !self ] p) !queue
-
-  let new_var env ty mk_stmts = 
-    let is_t = Mpz.is_t ty in
-    if is_t then Mpz.is_now_referenced ();
-    let n = succ env.var_cpt in
-    let v =
-      makeVarinfo
-	~logic:false
-	~generated:true
-	false (* is a global? *)
-	false (* is a formal? *)
-	("e_acsl_" ^ string_of_int n)
-	ty
-    in
-    let e = new_lval v in
-    let stmts = mk_stmts v e in
-    e,
-    { var_cpt = n;
-      vars = v :: env.vars;
-      beginning_of_block = 
-	List.fold_left (fun l s -> s :: l) env.beginning_of_block stmts;
-      end_of_block = 
-	if is_t then Mpz.clear e :: env.end_of_block else env.end_of_block }
-
-  let new_var_and_mpz_init env mk_stmts = 
-    new_var env Mpz.t (fun v e -> Mpz.init e :: mk_stmts v e)
-
-  let generated_variables env = List.rev env.vars
-
-  let block env s = 
-    let b = 
-      mkBlock 
-	(List.rev env.beginning_of_block @ [ s ] @ List.rev env.end_of_block)
-    in
-    b.blocals <- b.blocals @ List.rev env.vars;
-    b
-
-  let block_option env s = if is_empty env then None else Some (block env s)
-
-end
-
 (* ************************************************************************** *)
 (* Transforming terms and predicates into C expressions (if any) *)
 (* ************************************************************************** *)
@@ -240,7 +34,7 @@ let constant_to_exp ?(loc=Location.unknown) = function
 	   s) ->
     kinteger64_repr ?loc k n s
   | CInt64(n, (ILongLong | IULongLong), _s) -> 
-    (* cannot use the string [s] if any since we do not know the base in which
+    (* cannot use the string [s] (if any) since we do not know the base in which
        it is written. Such a base is required by GMP.
        [TODO] Actually possible to find the base for the string, but not done
        yet *)
@@ -250,7 +44,7 @@ let constant_to_exp ?(loc=Location.unknown) = function
 
 let tlval_to_lval = function
   | TVar { lv_origin = Some v }, TNoOffset -> Var v, NoOffset
-  | _ -> not_yet "complex left value"
+  | _ -> Misc.not_yet "complex left value"
 
 let relation_to_binop = function
   | Rlt -> Lt
@@ -272,11 +66,11 @@ let name_of_mpz_arith_bop = function
 (* handle leaves of AST terms *)
 let wrap_leaf env e = function
   | Ctype _ -> e, env
-  | Ltype _ -> not_yet "term from an user defined type"
-  | Lvar _ -> not_yet "polymorphic term"
+  | Ltype _ -> Misc.not_yet "term from an user defined type"
+  | Lvar _ -> Misc.not_yet "polymorphic term"
   | Linteger -> Env.new_var env Mpz.t (fun _ v -> [ Mpz.init_set v e ])
-  | Lreal -> not_yet "real number"
-  | Larrow _ -> not_yet "logic function"
+  | Lreal -> Misc.not_yet "real number"
+  | Larrow _ -> Misc.not_yet "logic function"
 
 (* Convert an ACSL term into a corresponding C expression (if any) in the given
    environment. Also extend this environment which includes the generating
@@ -304,7 +98,8 @@ let rec term_to_exp env t =
       | BNot -> "mpz_com"
       | LNot -> assert false
     in
-    Env.new_var_and_mpz_init env (fun _ ev -> [ mk_call ~loc name [ ev; e ] ])
+    Env.new_var_and_mpz_init
+      env (fun _ ev -> [ Misc.mk_call ~loc name [ ev; e ] ])
   | TUnOp(LNot, t) ->
     let e, env = term_to_exp env t in
     let ty = typeOf e in
@@ -314,20 +109,22 @@ let rec term_to_exp env t =
     (* arithmetic binary operator *)
     let e1, env = term_to_exp env t1 in
     let e2, env = term_to_exp env t2 in
-    assert (Cil_datatype.Typ.equal (typeOf e1) (typeOf e2));
+    assert (Typ.equal (typeOf e1) (typeOf e2));
     let name = name_of_mpz_arith_bop bop in
     (* guarding divisions and modulos *)
     let zero = Logic_const.tinteger 0 in
     let guard, env = match bop with
       | Div | Mod ->
 	comparison_to_exp env Eq t2 zero
-      | _ -> Cil_datatype.Exp.dummy, env
+      | _ -> Exp.dummy, env
     in
     let mk_stmts _ e = 
-      let call = mk_call ~loc name [ e; e1; e2 ]  in
+      let call = Misc.mk_call ~loc name [ e; e1; e2 ]  in
       match bop with
       | Div | Mod ->
-	let cond = mk_e_acsl_guard guard (Logic_const.prel (Req, t2, zero)) in
+	let cond = 
+	  Misc.mk_e_acsl_guard guard (Logic_const.prel (Req, t2, zero)) 
+	in
 	Env.add_assert cond (Logic_const.prel (Rneq, t2, zero));
 	[ cond; call ]
       | _ ->
@@ -339,10 +136,10 @@ let rec term_to_exp env t =
     comparison_to_exp ~loc env bop t1 t2
   | TBinOp((Shiftlt | Shiftrt), _, _) ->
     (* left/right shift *)
-    not_yet "left/right shift"
+    Misc.not_yet "left/right shift"
   | TBinOp((LOr | LAnd | BOr | BXor | BAnd), _, _) ->
     (* other logic/arith operators  *)
-    not_yet "missing binary operator"
+    Misc.not_yet "missing binary operator"
   | TBinOp(PlusPI | IndexPI | MinusPI | MinusPP as bop, t1, t2) ->
     (* binary operation over pointers *)
     (* [TODO] untested *)
@@ -359,39 +156,39 @@ let rec term_to_exp env t =
     let e, env = term_to_exp env t in
     mkCast e ty, env
   | TAddrOf lv -> mkAddrOf ~loc (tlval_to_lval lv), env
-  | TStartOf _ -> not_yet "beginning of an array"
-  | Tapp _ -> not_yet "applying logic function"
-  | Tlambda _ -> not_yet "functional"
-  | TDataCons _ -> not_yet "constructor"
-  | Tif _ -> not_yet "conditional"
-  | Tat _ -> not_yet "\\at"
-  | Tbase_addr _ -> not_yet "\\base_addr"
-  | Tblock_length _ -> not_yet "\\block_length"
-  | Tnull -> not_yet "NULL"
-  | TCoerce _ -> not_yet "coercion"
-  | TCoerceE _ -> not_yet "expression coercion"
-  | TUpdate _ -> not_yet "functional update"
-  | Ttypeof _ -> not_yet "typeof"
-  | Ttype _ -> not_yet "C type"
-  | Tempty_set -> not_yet "empty tset"
-  | Tunion _ -> not_yet "union of tsets"
-  | Tinter _ -> not_yet "intersection of tsets"
-  | Tcomprehension _ -> not_yet "tset comprehension"
-  | Trange _ -> not_yet "range"
-  | Tlet _ -> not_yet "let binding"
+  | TStartOf _ -> Misc.not_yet "beginning of an array"
+  | Tapp _ -> Misc.not_yet "applying logic function"
+  | Tlambda _ -> Misc.not_yet "functional"
+  | TDataCons _ -> Misc.not_yet "constructor"
+  | Tif _ -> Misc.not_yet "conditional"
+  | Tat _ -> Misc.not_yet "\\at"
+  | Tbase_addr _ -> Misc.not_yet "\\base_addr"
+  | Tblock_length _ -> Misc.not_yet "\\block_length"
+  | Tnull -> Misc.not_yet "NULL"
+  | TCoerce _ -> Misc.not_yet "coercion"
+  | TCoerceE _ -> Misc.not_yet "expression coercion"
+  | TUpdate _ -> Misc.not_yet "functional update"
+  | Ttypeof _ -> Misc.not_yet "typeof"
+  | Ttype _ -> Misc.not_yet "C type"
+  | Tempty_set -> Misc.not_yet "empty tset"
+  | Tunion _ -> Misc.not_yet "union of tsets"
+  | Tinter _ -> Misc.not_yet "intersection of tsets"
+  | Tcomprehension _ -> Misc.not_yet "tset comprehension"
+  | Trange _ -> Misc.not_yet "range"
+  | Tlet _ -> Misc.not_yet "let binding"
 
 (* generate the C code equivalent to [t1 bop t2]. *)
 and comparison_to_exp ?(loc=Location.unknown) env bop t1 t2 =
   let e1, env = term_to_exp env t1 in
   let e2, env = term_to_exp env t2 in
-(*  Options.feedback "ty1=%a; ty2=%a" d_type (typeOf e1) d_type (typeOf e2);*)
-  assert (Cil_datatype.Typ.equal (typeOf e1) (typeOf e2));
+  (*  Options.feedback "ty1=%a; ty2=%a" d_type (typeOf e1) d_type (typeOf e2);*)
+  assert (Typ.equal (typeOf e1) (typeOf e2));
   if Mpz.e_got_t e1 then
     let e, env =
       Env.new_var
 	env
 	intType
-	(fun v _ -> [ mk_call ~result:(var v) "mpz_cmp" [ e1; e2 ] ])
+	(fun v _ -> [ Misc.mk_call ~result:(var v) "mpz_cmp" [ e1; e2 ] ])
     in
     new_exp ?loc (BinOp(bop, e, zero ?loc, intType)), env
   else
@@ -405,8 +202,8 @@ let rec named_predicate_to_exp env p =
   match p.content with
   | Pfalse -> zero ~loc, env
   | Ptrue -> one ~loc, env
-  | Papp _ -> not_yet "logic function application"
-  | Pseparated _ -> not_yet "separated"
+  | Papp _ -> Misc.not_yet "logic function application"
+  | Pseparated _ -> Misc.not_yet "separated"
   | Prel(rel, t1, t2) -> 
     comparison_to_exp ~loc env (relation_to_binop rel) t1 t2
   | Pand(p1, p2) ->
@@ -423,7 +220,7 @@ let rec named_predicate_to_exp env p =
 	let lv = var v in
 	let then_block = 
 	  let s = mkStmt ~valid_sid:true (Instr (Set(lv, e2, loc))) in
-	  if Env.is_empty env2 then mkBlock [ s ] else Env.block env2 s
+	  if Env.is_empty_block env2 then mkBlock [ s ] else Env.block env2 s
 	in
 	let else_block = 
 	  mkBlock [ mkStmt ~valid_sid:true (Instr (Set(lv, zero loc, loc))) ]
@@ -446,121 +243,127 @@ let rec named_predicate_to_exp env p =
 	in
 	let else_block = 
 	  let s = mkStmt ~valid_sid:true (Instr (Set(lv, e2, loc))) in
-	  if Env.is_empty env2 then mkBlock [ s ] else Env.block env2 s
+	  if Env.is_empty_block env2 then mkBlock [ s ] else Env.block env2 s
 	in
 	[ mkStmt ~valid_sid:true (If(e1, then_block, else_block, loc)) ])
-  | Pxor _ -> not_yet "xor"
+  | Pxor _ -> Misc.not_yet "xor"
   | Pimplies(p1, p2) -> 
     named_predicate_to_exp env (Logic_const.por ((Logic_const.pnot p1), p2))
-  | Piff _ -> not_yet "<==>"
+  | Piff _ -> Misc.not_yet "<==>"
   | Pnot p ->
     let e, env = named_predicate_to_exp env p in
     new_exp ~loc (UnOp(LNot, e, TInt(IInt, []))), env
-  | Pif _ -> not_yet "_ ? _ : _"
-  | Plet _ -> not_yet "let _ = _ in _"
-  | Pforall _ -> not_yet "\\forall"
-  | Pexists _ -> not_yet "\\exists"
-  | Pat _ -> not_yet "\\at"
-  | Pvalid _ -> not_yet "\\valid"
-  | Pvalid_index _ -> not_yet "\\valid_index"
-  | Pvalid_range _ -> not_yet "\\valid_range"
-  | Pfresh _ -> not_yet "\\fresh"
-  | Psubtype _ -> not_yet "subtyping relation"
+  | Pif _ -> Misc.not_yet "_ ? _ : _"
+  | Plet _ -> Misc.not_yet "let _ = _ in _"
+  | Pforall _ -> Misc.not_yet "\\forall"
+  | Pexists _ -> Misc.not_yet "\\exists"
+  | Pat _ -> Misc.not_yet "\\at"
+  | Pvalid _ -> Misc.not_yet "\\valid"
+  | Pvalid_index _ -> Misc.not_yet "\\valid_index"
+  | Pvalid_range _ -> Misc.not_yet "\\valid_range"
+  | Pfresh _ -> Misc.not_yet "\\fresh"
+  | Psubtype _ -> Misc.not_yet "subtyping relation"
 
 (* ************************************************************************** *)
 (* [convert_*] converts a given ACSL annotation into the corresponding C
    statement (if any) for runtime assertion checking *)
 (* ************************************************************************** *)
 
-let convert_preconditions _only_behaviors env _funspec behaviors =
-  List.iter
-    (fun b -> if b.b_requires <> [] then not_yet "requires of behaviors")
-    behaviors;
-  let p = Logic_const.ptrue in
-  let e, env = named_predicate_to_exp env p in
-  p, e, env
+let convert_preconditions only_behaviors env behaviors =
+  let do_behavior env b = 
+    if only_behaviors = [] || List.mem b.b_name only_behaviors then begin
+      let assumes_pred =
+	List.fold_left
+	  (fun acc p -> Logic_const.pand (acc, Logic_const.unamed p.ip_content))
+	  Logic_const.ptrue
+	  b.b_assumes
+      in
+      List.fold_left
+	(fun env p ->
+	  let p = 
+	    Logic_const.pimplies (assumes_pred, Logic_const.unamed p.ip_content)
+	  in
+	  let e, env = named_predicate_to_exp env p in
+	  Env.add_stmt env (Misc.mk_e_acsl_guard ~reverse:true e p))
+	env
+	b.b_requires
+    end else
+      env
+  in 
+  List.fold_left do_behavior env behaviors
 
 let convert_postconditions only_behaviors env behaviors =
-  let do_behavior p_acc b = 
+  (* generate one guard by postcondition of each behavior *)
+  let do_behavior env b = 
     if only_behaviors = [] || List.mem b.b_name only_behaviors then begin
-      assert (b.b_assumes = []);
       List.fold_left
-	(fun p_acc (t, p) ->
+	(fun env (t, p) ->
 	  match t with
-	  | Normal -> Logic_const.pand (p_acc, Logic_const.unamed p.ip_content)
+	  | Normal -> 
+	    let p = p.ip_content in
+	    if p <> Ptrue && b.b_assumes <> [] then 
+	      Misc.not_yet "assumes in conjunction with ensures in behaviors";
+	    let p = Logic_const.unamed p in
+	    let e, env = named_predicate_to_exp env p in
+	    Env.add_stmt env (Misc.mk_e_acsl_guard ~reverse:true e p)
 	  | Exits | Breaks | Continues | Returns ->
-	    not_yet "abnormal termination case in behavior")
-	p_acc
+	    Misc.not_yet "abnormal termination case in behavior")
+	env
 	b.b_post_cond
     end else
-      p_acc
+      env
   in 
-  (* conjunction of postconditions of behaviors *)
-  let p = List.fold_left do_behavior Logic_const.ptrue behaviors in
-  let e, env = named_predicate_to_exp env p in
-  p, e, env
+  List.fold_left do_behavior env behaviors
 
-let convert_behaviors only_behaviors env funspec behaviors =
-  (* [TODO] untested *)
+let convert_behaviors only_behaviors env behaviors =
   List.iter
     (fun b ->
-      if b.b_assumes <> [] then not_yet "assumes clause in behavior";
-      if b.b_assigns <> WritesAny then not_yet "assigns clause in behavior";
-      if b.b_extended <> [] then not_yet "grammar extensions in behavior")
+      if b.b_assigns <> WritesAny then 
+	Misc.not_yet "assigns clause in behavior";
+      if b.b_extended <> [] then Misc.not_yet "grammar extensions in behavior")
     behaviors;
-  let pre_p, pre_e, pre_env = 
-    convert_preconditions only_behaviors env funspec behaviors 
-  in
-  let pre_block = Env.block_option pre_env (mk_e_acsl_guard pre_e pre_p) in
-  let post_p, post_e, post_env = 
+  let pre_env = convert_preconditions only_behaviors env behaviors in
+  let post_env = 
     convert_postconditions 
       only_behaviors (Env.no_overlap ~from:pre_env env) behaviors 
   in
-  let post_block = Env.block_option post_env (mk_e_acsl_guard post_e post_p) in
-  pre_block, post_block, post_env
+  Env.close_block_option pre_env, Env.close_block_option post_env, post_env
 
 let convert_spec only_behaviors env spec =
-  if spec.spec_variant <> None then not_yet "variant clause";
-  if spec.spec_terminates <> None then
-    not_yet "terminates clause";
-  if spec.spec_complete_behaviors <> [] then 
-    not_yet "complete behaviors";
-  if spec.spec_disjoint_behaviors <> [] then 
-    not_yet "disjoint behaviors";
-  convert_behaviors only_behaviors env spec spec.spec_behavior
+  if spec.spec_variant <> None then Misc.not_yet "variant clause";
+  if spec.spec_terminates <> None then Misc.not_yet "terminates clause";
+  if spec.spec_complete_behaviors <> [] then Misc.not_yet "complete behaviors";
+  if spec.spec_disjoint_behaviors <> [] then Misc.not_yet "disjoint behaviors";
+  convert_behaviors only_behaviors env spec.spec_behavior
 
 let convert_named_predicate env p =
   let e, env = named_predicate_to_exp env p in
   assert (Typ.equal (typeOf e) intType);
-  Env.add_stmt
-    env
-    (mk_e_acsl_guard (new_exp ~loc:e.eloc (UnOp(LNot, e, intType))) p)
+  Env.add_stmt env (Misc.mk_e_acsl_guard ~reverse:true e p)
 
 let convert_annotation env annot =
   try
     match annot.annot_content with
     | AAssert(l, p) -> 
-      if l <> [] then not_yet "assertions applied only on some behaviors";
+      if l <> [] then Misc.not_yet "assertions applied only on some behaviors";
       convert_named_predicate env p, None
     | AStmtSpec(only_behaviors, spec) -> 
       let pre_block, post_block, post_env = 
 	convert_spec only_behaviors env spec 
       in
+      let env = Env.no_overlap ~from:post_env env in
       let env = match pre_block with
 	| None -> env
-	| Some b -> 
-	  Env.add_stmt
-	    (Env.no_overlap ~from:post_env env) 
-	    (mkStmt ~valid_sid:true (Block b))
+	| Some b -> Env.add_stmt env (mkStmt ~valid_sid:true (Block b))
       in 
       env, post_block
-    | AInvariant _ -> not_yet "invariant"
-    | AVariant _ -> not_yet "variant"
-    | AAssigns _ -> not_yet "assigns"
-    | APragma _ -> not_yet "pragma"
-  with Typing_error s ->
+    | AInvariant _ -> Misc.not_yet "invariant"
+    | AVariant _ -> Misc.not_yet "variant"
+    | AAssigns _ -> Misc.not_yet "assigns"
+    | APragma _ -> Misc.not_yet "pragma"
+  with Misc.Typing_error s ->
     let msg = Format.sprintf "invalid E-ACSL construct %s." s in
-    if Options.Check.get () then type_error msg
+    if Options.Check.get () then Misc.type_error msg
     else Options.warning ~current:true "%s@\nignoring annotation." msg;
     env, None
 
@@ -578,7 +381,7 @@ class e_acsl_visitor prj generate = object (self)
 
   inherit Visitor.generic_frama_c_visitor
     prj
-    ((if generate then Cil.copy_visit else Cil.inplace_visit) ())
+    ((if generate then copy_visit else inplace_visit) ())
 
   val mutable gen_vars = []
   val mutable pre_block = None
@@ -587,7 +390,7 @@ class e_acsl_visitor prj generate = object (self)
   method vglob_aux g =
     if !first_global then begin
       first_global := false;
-      ChangeDoChildrenPost([ g ], fun l -> e_acsl_header () :: l)
+      ChangeDoChildrenPost([ g ], fun l -> Misc.e_acsl_header () :: l)
     end else
       DoChildren
 
@@ -595,16 +398,15 @@ class e_acsl_visitor prj generate = object (self)
      BUT almost impossible without a main entry point *)
   (*  method vinit v off i = assert false *)
 
-  method vvdec vi =
-    try 
+  method vvdec vi = 
+    (* TODO: handle functions without code *)
+    try
       let kf = Globals.Functions.get vi in
       let pre_b, post_b, env = 
 	convert_spec [] Env.empty (Kernel_function.get_spec kf) 
       in
       pre_block <- pre_b;
       post_block <- post_b;
-      if pre_b <> None then not_yet "precondition in function contract";
-      if post_b <> None then not_yet "postcondition in function contract";
       gen_vars <- Env.generated_variables env;
       DoChildren
     with Not_found ->
@@ -633,17 +435,40 @@ class e_acsl_visitor prj generate = object (self)
 	stmt 
 	(Env.empty, [])
     in
-    if Env.is_empty env then 
-      DoChildren
-    else begin
-      assert generate;
-      let mk_block stmt =
-	gen_vars <- Env.generated_variables env;
-	let s = mkStmt ~valid_sid:true (Block (Env.block env stmt)) in
-	mkStmt ~valid_sid:true (Block (mkBlock (s :: post_stmts)))
+    (* verify internal invariants *)
+    assert ((Env.is_empty env && post_stmts = []) 
+	    || (not (Env.is_empty env) && generate));
+    let mk_block stmt =
+      gen_vars <- Env.generated_variables env;
+      let s = mkStmt ~valid_sid:true (Block (Env.block env stmt)) in
+      let post_stmts = s :: post_stmts in
+      let post_stmts = 
+	let is_return s = match self#current_kf with
+	  | None -> false
+	  | Some kf -> 
+	    try Stmt.equal s (Kernel_function.find_return kf) 
+	    with Kernel_function.No_Statement -> assert false
+	in
+	if is_return stmt then
+	  match post_block with
+	  | None -> post_stmts
+	  | Some b ->
+	    (* that is the return stmt of a function with a postcondition *)
+	    post_block <- None;
+	    post_stmts @ [ mkStmt ~valid_sid:true (Block b) ]
+	else
+	  post_stmts
       in
-      ChangeDoChildrenPost(stmt, mk_block)
-    end
+      let stmts = match pre_block with
+	| None -> post_stmts
+	| Some b -> 
+	  (* that is the first stmt of a function with a precondition *)
+	  pre_block <- None;
+	  mkStmt ~valid_sid:true (Block b) :: post_stmts
+      in
+      mkStmt ~valid_sid:true (Block (mkBlock stmts))
+    in
+    ChangeDoChildrenPost(stmt, mk_block)
 
   initializer Env.register_actions_queue self#get_filling_actions
 

@@ -23,7 +23,7 @@ let check () =
   try
     Visitor.visitFramacFileSameGlobals (Visit.do_visit false) (Ast.get ());
     true
-  with Visit.Typing_error s ->
+  with Misc.Typing_error s ->
     Options.error ~current:true "%s" s;
     false
 
@@ -37,7 +37,7 @@ let check =
 
 let fail_check () =
   try Visitor.visitFramacFileSameGlobals (Visit.do_visit false) (Ast.get ());
-  with Visit.Typing_error s -> Options.abort ~current:true "%s" s
+  with Misc.Typing_error s -> Options.abort ~current:true "%s" s
 
 let fail_check =
   Dynamic.register
@@ -59,7 +59,7 @@ module Resulting_projects =
 	[ Ast.self; Options.Include_headers.self; Options.Use_assert.self ]
      end)
 
-let () = Visit.self := Resulting_projects.self
+let () = Env.self := Resulting_projects.self
 
 let generate_code =
   Resulting_projects.memo
@@ -80,7 +80,7 @@ let generate_code =
 	    false
 	in
 	File.create_rebuilt_project_from_visitor ~preprocess name visit
-      with Visit.Typing_error s ->
+      with Misc.Typing_error s ->
 	Options.abort ~current:true "%s" s)
 
 let generate_code =

@@ -19,7 +19,32 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val do_visit: ?prj:Project.t -> bool -> Visitor.frama_c_visitor
+(** Utilities for E-ACSL. *)
+
+open Cil_types
+open Cil_datatype
+
+(* ************************************************************************** *)
+(** {2 Handling errors} *)
+(* ************************************************************************** *)
+
+exception Typing_error of string
+val type_error: string -> 'a
+(** @raise Typing_error with  with a message built from the given one. *)
+
+val not_yet: string -> 'a
+(** @raise Log.FeatureRequest with a message built from the given one. *)
+
+(* ************************************************************************** *)
+(** {2 Builders} *)
+(* ************************************************************************** *)
+
+val new_lval: ?loc:Location.t -> varinfo -> exp
+(* [TODO] put it in the Frama-C kernel? *)
+
+val mk_call: ?loc:Location.t -> ?result:lval -> string -> exp list -> stmt
+val mk_e_acsl_guard: ?reverse:bool -> exp -> predicate named -> stmt
+val e_acsl_header: unit -> global
 
 (*
 Local Variables:

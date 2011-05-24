@@ -2,6 +2,10 @@
 # CODE #
 ########
 
+- function contracts for functions only declared
+  ==> le noyau génère un "assigns \nothing" pour ces fonctions...
+  ce assign n'est de toute façon pas gérer
+- multi ensures or multi requirements, their conjunctions and undefinedness
 - utiliser Options.use_asserts
 - gestion des initialiseurs des globals: requiert un main
 - mkcall ne devrait pas générer de nouvelles variables pour une même fonction
@@ -15,6 +19,8 @@
 # TESTS #
 #########
 
+- stmt_contracts et only_behaviors... pas sur que je fasse ce qu'il faut
+- pb test stmt_contracts.i
 - tester les opérations binaires sur les pointeurs (requiert complex left value)
 - tester plusieurs fonctions contenant des annotations
 - améliorer test "integer_constant.i" quand bug fixed #745
