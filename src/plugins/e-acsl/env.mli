@@ -48,9 +48,14 @@ val no_overlap: from:t -> t -> t
   (** [no_overlap ~from env] returns env, but ensures that new generated
      variables will not overlap with those of [from]. *)
   
-val merge: from:t -> t -> t
-  (** [merge ~from env] copies the generated variables of [from] to [env].
-      Assume that there is no overlaping between [from] and [env]. *)
+val merge_function_vars: from:t -> t -> t
+(** [merge_function_vars ~from env] copies the generated variables local to the
+    visited function of [from] to [env]. Assume that there is no overlaping
+    between [from] and [env]. *)
+
+val merge_block_vars: from:t -> t -> t
+(** Like [merge_function_vars] for generated variables local to the built
+    block. *)
 
 val add_stmt: t -> stmt -> t
   (** [add_stmt env s] extends [env] with the new statement [s] *)
@@ -63,8 +68,11 @@ val register_actions_queue: (unit -> unit) Queue.t -> unit
   (** To be called once at initialization time: the queue of event of the
       visitor required for generating annotations. *)
 
-val generated_variables: t -> varinfo list
-  (** All the new variables added in the environement *)
+val generated_function_variables: t -> varinfo list
+(** All the new variables local to the visited function. *)
+
+val generated_block_variables: t -> varinfo list
+(** All the new variables local to the block being built. *)
 
 val block : t -> stmt -> block
   (** [block env s] returns the block of statements including [s] and the new

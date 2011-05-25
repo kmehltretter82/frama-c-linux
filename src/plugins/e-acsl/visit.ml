@@ -212,7 +212,7 @@ let rec named_predicate_to_exp env p =
     let e2, env2 = 
       named_predicate_to_exp (Env.no_overlap ~from:env1 Env.empty) p2 
     in
-    let env = Env.merge ~from:env2 env1 in
+    let env = Env.merge_block_vars ~from:env2 env1 in
     Env.new_var
       env
       intType
@@ -232,7 +232,7 @@ let rec named_predicate_to_exp env p =
     let e2, env2 = 
       named_predicate_to_exp (Env.no_overlap ~from:env1 Env.empty) p2 
     in
-    let env = Env.merge ~from:env2 env1 in
+    let env = Env.merge_block_vars ~from:env2 env1 in
     Env.new_var
       env
       intType
@@ -327,7 +327,9 @@ let convert_behaviors only_behaviors env behaviors =
     convert_postconditions 
       only_behaviors (Env.no_overlap ~from:pre_env env) behaviors 
   in
-  Env.close_block_option pre_env, Env.close_block_option post_env, post_env
+  Env.close_block_option pre_env, 
+  Env.close_block_option post_env,
+  Env.merge_function_vars ~from:pre_env post_env
 
 let convert_spec only_behaviors env spec =
   if spec.spec_variant <> None then Misc.not_yet "variant clause";
@@ -351,7 +353,7 @@ let convert_annotation env annot =
       let pre_block, post_block, post_env = 
 	convert_spec only_behaviors env spec 
       in
-      let env = Env.no_overlap ~from:post_env env in
+      let env = Env.merge_function_vars ~from:post_env env in
       let env = match pre_block with
 	| None -> env
 	| Some b -> Env.add_stmt env (mkStmt ~valid_sid:true (Block b))
@@ -407,13 +409,14 @@ class e_acsl_visitor prj generate = object (self)
       in
       pre_block <- pre_b;
       post_block <- post_b;
-      gen_vars <- Env.generated_variables env;
+      gen_vars <- Env.generated_function_variables env;
       DoChildren
     with Not_found ->
       DoChildren
 
-  method vfundec f =
+  method vfunc f =
     let contract_vars = gen_vars in
+    gen_vars <- [];
     let add_gen_vars f = 
       f.slocals <- contract_vars @ gen_vars @ f.slocals;
       gen_vars <- [];
@@ -439,7 +442,8 @@ class e_acsl_visitor prj generate = object (self)
     assert ((Env.is_empty env && post_stmts = []) 
 	    || (not (Env.is_empty env) && generate));
     let mk_block stmt =
-      gen_vars <- Env.generated_variables env;
+(*      Options.feedback "stmt %a: %a" d_stmt stmt Env.pretty env;*)
+      gen_vars <- Env.generated_function_variables env @ gen_vars;
       let s = mkStmt ~valid_sid:true (Block (Env.block env stmt)) in
       let post_stmts = s :: post_stmts in
       let post_stmts = 
@@ -477,7 +481,7 @@ end
 let do_visit ?(prj=Project.current ()) generate =
   let vis = new e_acsl_visitor prj generate in
   first_global := true;
-  (vis :> Visitor.frama_c_visitor)
+  (vis : Visitor.frama_c_visitor)
 
 (*
 Local Variables:
