@@ -329,7 +329,7 @@ let convert_behaviors only_behaviors env behaviors =
   in
   Env.close_block_option pre_env, 
   Env.close_block_option post_env,
-  Env.merge_function_vars ~from:pre_env post_env
+  Env.merge_function_vars ~from:post_env pre_env
 
 let convert_spec only_behaviors env spec =
   if spec.spec_variant <> None then Misc.not_yet "variant clause";
@@ -350,10 +350,10 @@ let convert_annotation env annot =
       if l <> [] then Misc.not_yet "assertions applied only on some behaviors";
       convert_named_predicate env p, None
     | AStmtSpec(only_behaviors, spec) -> 
-      let pre_block, post_block, post_env = 
+      let pre_block, post_block, new_env = 
 	convert_spec only_behaviors env spec 
       in
-      let env = Env.merge_function_vars ~from:post_env env in
+      let env = Env.merge_function_vars ~from:new_env env in
       let env = match pre_block with
 	| None -> env
 	| Some b -> Env.add_stmt env (mkStmt ~valid_sid:true (Block b))
