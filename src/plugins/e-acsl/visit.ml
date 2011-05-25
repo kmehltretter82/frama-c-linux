@@ -269,36 +269,32 @@ let rec named_predicate_to_exp env p =
    statement (if any) for runtime assertion checking *)
 (* ************************************************************************** *)
 
-let convert_preconditions only_behaviors env behaviors =
+let convert_preconditions env behaviors =
   let do_behavior env b = 
-    if only_behaviors = [] || List.mem b.b_name only_behaviors then begin
-      let assumes_pred =
-	List.fold_left
-	  (fun acc p -> Logic_const.pand (acc, Logic_const.unamed p.ip_content))
-	  Logic_const.ptrue
-	  b.b_assumes
-      in
+    let assumes_pred =
       List.fold_left
-	(fun env p ->
-	  let p = 
-	    Logic_const.pimplies (assumes_pred, Logic_const.unamed p.ip_content)
-	  in
-	  let e, env = named_predicate_to_exp env p in
-	  Env.add_stmt env (Misc.mk_e_acsl_guard ~reverse:true e p))
-	env
-	b.b_requires
-    end else
+	(fun acc p -> Logic_const.pand (acc, Logic_const.unamed p.ip_content))
+	Logic_const.ptrue
+	b.b_assumes
+    in
+    List.fold_left
+      (fun env p ->
+	let p = 
+	  Logic_const.pimplies (assumes_pred, Logic_const.unamed p.ip_content)
+	in
+	let e, env = named_predicate_to_exp env p in
+	Env.add_stmt env (Misc.mk_e_acsl_guard ~reverse:true e p))
       env
+      b.b_requires
   in 
   List.fold_left do_behavior env behaviors
 
-let convert_postconditions only_behaviors env behaviors =
+let convert_postconditions env behaviors =
   (* generate one guard by postcondition of each behavior *)
   let do_behavior env b = 
-    if only_behaviors = [] || List.mem b.b_name only_behaviors then begin
-      List.fold_left
-	(fun env (t, p) ->
-	  match t with
+    List.fold_left
+      (fun env (t, p) ->
+	match t with
 	  | Normal -> 
 	    let p = p.ip_content in
 	    if p <> Ptrue && b.b_assumes <> [] then 
@@ -308,35 +304,36 @@ let convert_postconditions only_behaviors env behaviors =
 	    Env.add_stmt env (Misc.mk_e_acsl_guard ~reverse:true e p)
 	  | Exits | Breaks | Continues | Returns ->
 	    Misc.not_yet "abnormal termination case in behavior")
-	env
-	b.b_post_cond
-    end else
       env
+      b.b_post_cond
   in 
   List.fold_left do_behavior env behaviors
 
-let convert_behaviors only_behaviors env behaviors =
+let convert_behaviors env behaviors =
   List.iter
     (fun b ->
       if b.b_assigns <> WritesAny then 
 	Misc.not_yet "assigns clause in behavior";
       if b.b_extended <> [] then Misc.not_yet "grammar extensions in behavior")
     behaviors;
-  let pre_env = convert_preconditions only_behaviors env behaviors in
-  let post_env = 
-    convert_postconditions 
-      only_behaviors (Env.no_overlap ~from:pre_env env) behaviors 
+  let pre_env = 
+    convert_preconditions (Env.no_overlap ~from:env Env.empty) behaviors 
   in
+  let post_env = 
+    convert_postconditions (Env.no_overlap ~from:pre_env Env.empty) behaviors 
+  in
+  let env = Env.merge_function_vars ~from:pre_env env in
+  let env = Env.merge_function_vars ~from:post_env env in
   Env.close_block_option pre_env, 
   Env.close_block_option post_env,
-  Env.merge_function_vars ~from:post_env pre_env
+  env
 
-let convert_spec only_behaviors env spec =
+let convert_spec env spec =
   if spec.spec_variant <> None then Misc.not_yet "variant clause";
   if spec.spec_terminates <> None then Misc.not_yet "terminates clause";
   if spec.spec_complete_behaviors <> [] then Misc.not_yet "complete behaviors";
   if spec.spec_disjoint_behaviors <> [] then Misc.not_yet "disjoint behaviors";
-  convert_behaviors only_behaviors env spec.spec_behavior
+  convert_behaviors env spec.spec_behavior
 
 let convert_named_predicate env p =
   let e, env = named_predicate_to_exp env p in
@@ -349,9 +346,11 @@ let convert_annotation env annot =
     | AAssert(l, p) -> 
       if l <> [] then Misc.not_yet "assertions applied only on some behaviors";
       convert_named_predicate env p, None
-    | AStmtSpec(only_behaviors, spec) -> 
-      let pre_block, post_block, new_env = 
-	convert_spec only_behaviors env spec 
+    | AStmtSpec(l, spec) ->
+      if l <> [] then 
+        Misc.not_yet "statement contract applied only on some behaviors";
+      let pre_block, post_block, new_env =
+	convert_spec env spec 
       in
       let env = Env.merge_function_vars ~from:new_env env in
       let env = match pre_block with
@@ -405,7 +404,7 @@ class e_acsl_visitor prj generate = object (self)
     try
       let kf = Globals.Functions.get vi in
       let pre_b, post_b, env = 
-	convert_spec [] Env.empty (Kernel_function.get_spec kf) 
+	convert_spec Env.empty (Kernel_function.get_spec kf) 
       in
       pre_block <- pre_b;
       post_block <- post_b;
@@ -432,7 +431,8 @@ class e_acsl_visitor prj generate = object (self)
 	  let env, post_block = convert_rooted env ba in
 	  let post_stmts = match post_block with
 	    | None -> post_stmts
-	    | Some b -> mkStmt ~valid_sid:true (Block b) :: post_stmts
+	    | Some b ->
+              mkStmt ~valid_sid:true (Block b) :: post_stmts
 	  in
 	  env, post_stmts) 
 	stmt 

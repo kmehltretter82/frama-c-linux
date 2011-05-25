@@ -483,16 +483,16 @@ PROJECT_FILE.i:246:[value] assigning non deterministic value for the first time
         Called from PROJECT_FILE.i:306.
 [value] Done for function mpz_clear
 [value] computing for function mpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:314.
+        Called from PROJECT_FILE.i:313.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:314.
+        Called from PROJECT_FILE.i:313.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_cmp <- main.
+        Called from PROJECT_FILE.i:314.
+[value] Done for function mpz_cmp
+[value] computing for function e_acsl_fail <- main.
         Called from PROJECT_FILE.i:315.
-[value] Done for function mpz_cmp
-[value] computing for function e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:316.
 [value] computing for function printf <- e_acsl_fail <- main.
         Called from PROJECT_FILE.i:115.
 [value] Done for function printf
@@ -502,22 +502,22 @@ PROJECT_FILE.i:246:[value] assigning non deterministic value for the first time
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
 [value] computing for function mpz_clear <- main.
-        Called from PROJECT_FILE.i:317.
+        Called from PROJECT_FILE.i:316.
 [value] Done for function mpz_clear
 [value] computing for function mpz_clear <- main.
-        Called from PROJECT_FILE.i:317.
+        Called from PROJECT_FILE.i:316.
 [value] Done for function mpz_clear
 [value] computing for function mpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:321.
+        Called from PROJECT_FILE.i:320.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:321.
+        Called from PROJECT_FILE.i:320.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_cmp <- main.
-        Called from PROJECT_FILE.i:322.
+        Called from PROJECT_FILE.i:321.
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:323.
+        Called from PROJECT_FILE.i:322.
 [value] computing for function printf <- e_acsl_fail <- main.
         Called from PROJECT_FILE.i:115.
 [value] Done for function printf
@@ -527,10 +527,60 @@ PROJECT_FILE.i:246:[value] assigning non deterministic value for the first time
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
 [value] computing for function mpz_clear <- main.
-        Called from PROJECT_FILE.i:324.
+        Called from PROJECT_FILE.i:323.
 [value] Done for function mpz_clear
 [value] computing for function mpz_clear <- main.
-        Called from PROJECT_FILE.i:324.
+        Called from PROJECT_FILE.i:323.
+[value] Done for function mpz_clear
+[value] computing for function mpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:331.
+[value] Done for function mpz_init_set_si
+[value] computing for function mpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:331.
+[value] Done for function mpz_init_set_si
+[value] computing for function mpz_cmp <- main.
+        Called from PROJECT_FILE.i:332.
+[value] Done for function mpz_cmp
+[value] computing for function e_acsl_fail <- main.
+        Called from PROJECT_FILE.i:333.
+[value] computing for function printf <- e_acsl_fail <- main.
+        Called from PROJECT_FILE.i:115.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_fail <- main.
+        Called from PROJECT_FILE.i:115.
+[value] Done for function exit
+[value] Recording results for e_acsl_fail
+[value] Done for function e_acsl_fail
+[value] computing for function mpz_clear <- main.
+        Called from PROJECT_FILE.i:334.
+[value] Done for function mpz_clear
+[value] computing for function mpz_clear <- main.
+        Called from PROJECT_FILE.i:334.
+[value] Done for function mpz_clear
+[value] computing for function mpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:338.
+[value] Done for function mpz_init_set_si
+[value] computing for function mpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:338.
+[value] Done for function mpz_init_set_si
+[value] computing for function mpz_cmp <- main.
+        Called from PROJECT_FILE.i:339.
+[value] Done for function mpz_cmp
+[value] computing for function e_acsl_fail <- main.
+        Called from PROJECT_FILE.i:340.
+[value] computing for function printf <- e_acsl_fail <- main.
+        Called from PROJECT_FILE.i:115.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_fail <- main.
+        Called from PROJECT_FILE.i:115.
+[value] Done for function exit
+[value] Recording results for e_acsl_fail
+[value] Done for function e_acsl_fail
+[value] computing for function mpz_clear <- main.
+        Called from PROJECT_FILE.i:341.
+[value] Done for function mpz_clear
+[value] computing for function mpz_clear <- main.
+        Called from PROJECT_FILE.i:341.
 [value] Done for function mpz_clear
 [value] Recording results for main
 [value] done for function main
@@ -539,7 +589,7 @@ PROJECT_FILE.i:246:[value] assigning non deterministic value for the first time
           NON TERMINATING FUNCTION
 [value] Values for function main:
           __retres ∈ {0}
-          x ∈ {5}
+          x ∈ {7}
           y ∈ {2}
 /* Generated by Frama-C */
 struct __anonstruct___mpz_struct_1 {
@@ -835,27 +885,50 @@ int main(void)
   }
   
   x += y;
-  /*@ requires x ≡ 5;
-      ensures x ≡ 5; */
+  /*@ requires x ≡ 5; */
+  /*@ requires y ≡ 2; */
+  { mpz_t e_acsl_86; mpz_t e_acsl_87; int e_acsl_88;
+    mpz_init_set_si((__mpz_struct *)(e_acsl_86),(long)y);
+    mpz_init_set_si((__mpz_struct *)(e_acsl_87),(long)2);
+    e_acsl_88 = mpz_cmp((__mpz_struct const *)(e_acsl_86),
+                        (__mpz_struct const *)(e_acsl_87));
+    if (! (e_acsl_88 == 0)) { e_acsl_fail((char *)"(y == 2)"); }
+    mpz_clear((__mpz_struct *)(e_acsl_86));
+    mpz_clear((__mpz_struct *)(e_acsl_87));
+  }
+  
+  { mpz_t e_acsl_89; mpz_t e_acsl_90; int e_acsl_91;
+    mpz_init_set_si((__mpz_struct *)(e_acsl_89),(long)x);
+    mpz_init_set_si((__mpz_struct *)(e_acsl_90),(long)5);
+    e_acsl_91 = mpz_cmp((__mpz_struct const *)(e_acsl_89),
+                        (__mpz_struct const *)(e_acsl_90));
+    if (! (e_acsl_91 == 0)) { e_acsl_fail((char *)"(x == 5)"); }
+    mpz_clear((__mpz_struct *)(e_acsl_89));
+    mpz_clear((__mpz_struct *)(e_acsl_90));
+  }
+  
+  x += y;
+  /*@ requires x ≡ 7;
+      ensures x ≡ 7; */
   {
-    { mpz_t e_acsl_86; mpz_t e_acsl_87; int e_acsl_88;
-      mpz_init_set_si((__mpz_struct *)(e_acsl_86),(long)x);
-      mpz_init_set_si((__mpz_struct *)(e_acsl_87),(long)5);
-      e_acsl_88 = mpz_cmp((__mpz_struct const *)(e_acsl_86),
-                          (__mpz_struct const *)(e_acsl_87));
-      if (! (e_acsl_88 == 0)) { e_acsl_fail((char *)"(x == 5)"); }
-      mpz_clear((__mpz_struct *)(e_acsl_86));
-      mpz_clear((__mpz_struct *)(e_acsl_87));
+    { mpz_t e_acsl_92; mpz_t e_acsl_93; int e_acsl_94;
+      mpz_init_set_si((__mpz_struct *)(e_acsl_92),(long)x);
+      mpz_init_set_si((__mpz_struct *)(e_acsl_93),(long)7);
+      e_acsl_94 = mpz_cmp((__mpz_struct const *)(e_acsl_92),
+                          (__mpz_struct const *)(e_acsl_93));
+      if (! (e_acsl_94 == 0)) { e_acsl_fail((char *)"(x == 7)"); }
+      mpz_clear((__mpz_struct *)(e_acsl_92));
+      mpz_clear((__mpz_struct *)(e_acsl_93));
     }
      __retres = 0;
-    { mpz_t e_acsl_89; mpz_t e_acsl_90; int e_acsl_91;
-      mpz_init_set_si((__mpz_struct *)(e_acsl_89),(long)x);
-      mpz_init_set_si((__mpz_struct *)(e_acsl_90),(long)5);
-      e_acsl_91 = mpz_cmp((__mpz_struct const *)(e_acsl_89),
-                          (__mpz_struct const *)(e_acsl_90));
-      if (! (e_acsl_91 == 0)) { e_acsl_fail((char *)"(x == 5)"); }
-      mpz_clear((__mpz_struct *)(e_acsl_89));
-      mpz_clear((__mpz_struct *)(e_acsl_90));
+    { mpz_t e_acsl_95; mpz_t e_acsl_96; int e_acsl_97;
+      mpz_init_set_si((__mpz_struct *)(e_acsl_95),(long)x);
+      mpz_init_set_si((__mpz_struct *)(e_acsl_96),(long)7);
+      e_acsl_97 = mpz_cmp((__mpz_struct const *)(e_acsl_95),
+                          (__mpz_struct const *)(e_acsl_96));
+      if (! (e_acsl_97 == 0)) { e_acsl_fail((char *)"(x == 7)"); }
+      mpz_clear((__mpz_struct *)(e_acsl_95));
+      mpz_clear((__mpz_struct *)(e_acsl_96));
     }
      }
   

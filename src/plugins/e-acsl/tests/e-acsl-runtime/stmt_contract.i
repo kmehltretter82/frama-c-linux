@@ -39,11 +39,11 @@ int main(void) {
   x = x + y;
 
   // TODO: break the CFG and I don't know why :(
-  /* /\*@ requires x == 3; *\/ */
-  /* /\*@ requires y == 2; *\/ */
-  /* x = x + y; */
+  /*@ requires x == 5; */
+  /*@ requires y == 2; */
+  x = x + y;
 
-  /*@ requires x == 5; 
-    @ ensures x == 5; */
+  /*@ requires x == 7; 
+    @ ensures x == 7; */
   return 0;
 }
