@@ -30,7 +30,9 @@ let register_actions_queue q = queue := q
 
 type t = 
     { var_cpt: int; (* counter used for generating variables in a function *)
-      fct_vars: varinfo list; (* generated variables local to a function *)
+      fct_vars: Varinfo.Set.t; (* generated variables local to a function.
+				  Use a set to prevent to add twice a variable
+				  when merging. *)
       block_vars: varinfo list; (* generated variables local to a block.
 				   Subset of field [vars] *)
       beginning_of_block: stmt list; (* list of stmts to be inserted before the
@@ -40,7 +42,7 @@ type t =
       
 let empty = 
   { var_cpt = 0; 
-    fct_vars = [] ; 
+    fct_vars = Varinfo.Set.empty; 
     block_vars = [];
     beginning_of_block = []; 
     end_of_block = [] }
@@ -49,8 +51,9 @@ let no_overlap ~from env =
   { env with var_cpt = Extlib.max_cpt from.var_cpt env.var_cpt }
 
 let merge_function_vars ~from env = 
-  (* [TODO] the same variable may now appear twice in the list *)
-  { env with var_cpt = from.var_cpt; fct_vars = env.fct_vars @ from.fct_vars }
+  { env with 
+    var_cpt = from.var_cpt; 
+    fct_vars = Varinfo.Set.union env.fct_vars from.fct_vars }
 
 let merge_block_vars ~from env =
   let env = merge_function_vars ~from env in
@@ -88,7 +91,7 @@ let new_var env ty mk_stmts =
   let stmts = mk_stmts v e in
   e,
   { var_cpt = n;
-    fct_vars = v :: env.fct_vars;
+    fct_vars = Varinfo.Set.add v env.fct_vars;
     block_vars = v :: env.block_vars;
     beginning_of_block = 
       List.fold_left (fun l s -> s :: l) env.beginning_of_block stmts;
@@ -98,7 +101,10 @@ let new_var env ty mk_stmts =
 let new_var_and_mpz_init env mk_stmts = 
   new_var env Mpz.t (fun v e -> Mpz.init e :: mk_stmts v e)
 
-let generated_function_variables env = List.rev env.fct_vars
+let generated_function_variables env = 
+  List.sort
+    (fun v1 v2 -> String.compare v1.vname v2.vname)
+    (Varinfo.Set.elements env.fct_vars)
 
 let generated_block_variables env = List.rev env.block_vars
 
@@ -123,7 +129,7 @@ let pretty fmt env =
   Format.fprintf fmt "CPT = %d@\n" env.var_cpt;
   Format.fprintf fmt "FCT_VARS = %t@\n"
     (fun fmt ->
-      List.iter (fun v -> Format.fprintf fmt "v%d " v.vid) env.fct_vars);
+      Varinfo.Set.iter (fun v -> Format.fprintf fmt "v%d " v.vid) env.fct_vars);
   Format.fprintf fmt "BLOCK_VARS = %t@\n"
     (fun fmt -> 
       List.iter (fun v -> Format.fprintf fmt "v%d " v.vid) env.block_vars);
