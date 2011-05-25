@@ -45,7 +45,8 @@ let mk_call ?(loc=Location.unknown) ?result fname args =
   (* the type is incorrect, but it doesn't matter *)
   (* [JS 2011/04/12] should not generate a new variable by function name *) 
   (* [TODO] require a projectified table to associate an lval to each name *)
-  let f = new_lval ~loc (makeGlobalVar fname voidType) in
+  let ty = TFun(voidType, None, false, []) in
+  let f = new_lval ~loc (makeGlobalVar fname ty) in
   mkStmt ~valid_sid:true (Instr(Call(result, f, args, loc)))
 
 (* Build a C conditional doing a runtime assertion check. *)
