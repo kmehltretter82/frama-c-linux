@@ -74,9 +74,12 @@ val generated_function_variables: t -> varinfo list
 val generated_block_variables: t -> varinfo list
 (** All the new variables local to the block being built. *)
 
-val block : t -> stmt -> block
+val block: t -> stmt -> block
   (** [block env s] returns the block of statements including [s] and the new
      constructs of [env]. *)
+
+val block_as_stmt: t -> stmt -> stmt
+(** Like [block], but generate the block as a stmt *)
 
 val block_option: t -> stmt -> block option
   (** [block_option env s] returns the block of statements including [s] and the

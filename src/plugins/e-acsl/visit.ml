@@ -220,7 +220,7 @@ let rec named_predicate_to_exp env p =
 	let lv = var v in
 	let then_block = 
 	  let s = mkStmt ~valid_sid:true (Instr (Set(lv, e2, loc))) in
-	  if Env.is_empty_block env2 then mkBlock [ s ] else Env.block env2 s
+	  Env.block env2 s
 	in
 	let else_block = 
 	  mkBlock [ mkStmt ~valid_sid:true (Instr (Set(lv, zero loc, loc))) ]
@@ -243,7 +243,7 @@ let rec named_predicate_to_exp env p =
 	in
 	let else_block = 
 	  let s = mkStmt ~valid_sid:true (Instr (Set(lv, e2, loc))) in
-	  if Env.is_empty_block env2 then mkBlock [ s ] else Env.block env2 s
+	  Env.block env2 s
 	in
 	[ mkStmt ~valid_sid:true (If(e1, then_block, else_block, loc)) ])
   | Pxor _ -> Misc.not_yet "xor"
@@ -444,7 +444,7 @@ class e_acsl_visitor prj generate = object (self)
     let mk_block stmt =
 (*      Options.feedback "stmt %a: %a" d_stmt stmt Env.pretty env;*)
       gen_vars <- Env.generated_function_variables env @ gen_vars;
-      let s = mkStmt ~valid_sid:true (Block (Env.block env stmt)) in
+      let s = Env.block_as_stmt env stmt in
       let post_stmts = s :: post_stmts in
       let post_stmts = 
 	let is_return s = match self#current_kf with

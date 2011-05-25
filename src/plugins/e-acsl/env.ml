@@ -110,6 +110,9 @@ let block env s =
   b.blocals <- b.blocals @ List.rev env.block_vars;
   b
 
+let block_as_stmt env s = 
+  if is_empty_block env then s else mkStmt ~valid_sid:true (Block (block env s))
+
 let block_option env s = 
   if is_empty_block env then None else Some (block env s)
 
