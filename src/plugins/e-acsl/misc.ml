@@ -52,10 +52,10 @@ let mk_call ?(loc=Location.unknown) ?result fname args =
 (* Build a C conditional doing a runtime assertion check. *)
 let mk_e_acsl_guard ?(reverse=false) e p =
   let loc = p.loc in
-  let unicode = Parameters.Unicode.get () in
-  Parameters.Unicode.off ();
+  let unicode = Kernel.Unicode.get () in
+  Kernel.Unicode.off ();
   let msg = Pretty_utils.sfprintf "%a@?" Cil.d_predicate_named p in
-  Parameters.Unicode.set unicode;
+  Kernel.Unicode.set unicode;
   let s = mk_call ~loc "e_acsl_fail" [ mkString loc msg ] in
   let e = if reverse then new_exp ~loc:e.eloc (UnOp(LNot, e, intType)) else e in
   mkStmt ~valid_sid:true (If(e, mkBlock [ s ], mkBlock [], loc))
