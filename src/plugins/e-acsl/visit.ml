@@ -497,6 +497,8 @@ end
 let do_visit ?(prj=Project.current ()) generate =
   let vis = new e_acsl_visitor prj generate in
   first_global := true;
+  (* explicit type annotation in order to check that no new method is introduced
+     by error *)
   (vis : Visitor.frama_c_visitor)
 
 (*
