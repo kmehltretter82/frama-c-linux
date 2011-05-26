@@ -407,7 +407,9 @@ class e_acsl_visitor prj generate = object (self)
 	  (self :> Visitor.frama_c_visitor) 
 	  (Kernel_function.get_spec old_kf)
       in
-      let pre_b, post_b, env = convert_spec Env.empty spec in
+      let pre_b, post_b, env = 
+	Project.on prj (convert_spec Env.empty) spec
+      in
       pre_block <- pre_b;
       post_block <- post_b;
       gen_vars <- Env.generated_function_variables env;
@@ -437,7 +439,9 @@ class e_acsl_visitor prj generate = object (self)
 	      (self :> Visitor.frama_c_visitor)
 	      old_a
 	  in
-	  let env, post_block = convert_code_annotation env a in
+	  let env, post_block = 
+	    Project.on prj (convert_code_annotation env) a
+	  in
 	  let post_stmts = match post_block with
 	    | None -> post_stmts
 	    | Some b ->
