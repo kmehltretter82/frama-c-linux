@@ -340,7 +340,7 @@ let convert_named_predicate env p =
   assert (Typ.equal (typeOf e) intType);
   Env.add_stmt env (Misc.mk_e_acsl_guard ~reverse:true e p)
 
-let convert_annotation env annot =
+let convert_code_annotation env annot =
   try
     match annot.annot_content with
     | AAssert(l, p) -> 
@@ -367,8 +367,6 @@ let convert_annotation env annot =
     if Options.Check.get () then Misc.type_error msg
     else Options.warning ~current:true "%s@\nignoring annotation." msg;
     env, None
-
-let convert_rooted env (User a | AI(_, a)) = convert_annotation env a
 
 (* ************************************************************************** *)
 (* Visitor *)
@@ -402,10 +400,14 @@ class e_acsl_visitor prj generate = object (self)
   method vvdec vi = 
     (* TODO: handle functions without code *)
     try
-      let kf = Globals.Functions.get vi in
-      let pre_b, post_b, env = 
-	convert_spec Env.empty (Kernel_function.get_spec kf) 
+      let old_vi = get_original_varinfo self#behavior vi in
+      let old_kf = Globals.Functions.get old_vi in
+      let spec = 
+	Visitor.visitFramacFunspec
+	  (self :> Visitor.frama_c_visitor) 
+	  (Kernel_function.get_spec old_kf)
       in
+      let pre_b, post_b, env = convert_spec Env.empty spec in
       pre_block <- pre_b;
       post_block <- post_b;
       gen_vars <- Env.generated_function_variables env;
@@ -425,17 +427,24 @@ class e_acsl_visitor prj generate = object (self)
 
   method vstmt_aux stmt =
 (*    Options.debug ~level:2 "proceeding stmt %d@." stmt.sid;*)
+    (* [TODO] BUG HERE since the annotations tbl is the one of the old
+       project. *)
     let env, post_stmts =
       Annotations.single_fold_stmt
-	(fun ba (env, post_stmts) -> 
-	  let env, post_block = convert_rooted env ba in
+	(fun (User old_a | AI(_, old_a)) (env, post_stmts) -> 
+	  let a = 
+	    Visitor.visitFramacCodeAnnotation
+	      (self :> Visitor.frama_c_visitor)
+	      old_a
+	  in
+	  let env, post_block = convert_code_annotation env a in
 	  let post_stmts = match post_block with
 	    | None -> post_stmts
 	    | Some b ->
               mkStmt ~valid_sid:true (Block b) :: post_stmts
 	  in
 	  env, post_stmts) 
-	stmt 
+	(get_original_stmt self#behavior stmt)
 	(Env.empty, [])
     in
     (* verify internal invariants *)
@@ -449,9 +458,12 @@ class e_acsl_visitor prj generate = object (self)
       let post_stmts = 
 	let is_return s = match self#current_kf with
 	  | None -> false
-	  | Some kf -> 
-	    try Stmt.equal s (Kernel_function.find_return kf) 
-	    with Kernel_function.No_Statement -> assert false
+	  | Some old_kf -> 
+	    let old_ret = 
+	      try Kernel_function.find_return old_kf
+	      with Kernel_function.No_Statement -> assert false
+	    in
+	    Stmt.equal s (get_stmt self#behavior old_ret)
 	in
 	if is_return stmt then
 	  match post_block with
