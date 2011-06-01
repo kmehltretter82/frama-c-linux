@@ -263,6 +263,7 @@ let rec named_predicate_to_exp env p =
   | Pvalid_range _ -> Misc.not_yet "\\valid_range"
   | Pfresh _ -> Misc.not_yet "\\fresh"
   | Psubtype _ -> Misc.not_yet "subtyping relation"
+  | Pinitialized _ -> Misc.not_yet "\\initialized"
 
 (* ************************************************************************** *)
 (* [convert_*] converts a given ACSL annotation into the corresponding C

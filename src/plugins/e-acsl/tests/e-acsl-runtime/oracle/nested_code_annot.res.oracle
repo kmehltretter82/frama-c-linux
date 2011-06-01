@@ -175,8 +175,6 @@ PROJECT_FILE.i:115:[from] Non terminating function (no dependencies)
 [from] Done for function e_acsl_fail
 [from] Computing for function mpz_clear
 [from] Done for function mpz_clear
-[dominators] computing for function main
-[dominators] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values for function e_acsl_fail:
           NON TERMINATING FUNCTION

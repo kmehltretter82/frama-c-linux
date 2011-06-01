@@ -4,8 +4,6 @@
 [value] Values of globals at initialization
 [value] Recording results for main
 [value] done for function main
-[dominators] computing for function main
-[dominators] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values for function main:
           __retres ∈ {0}

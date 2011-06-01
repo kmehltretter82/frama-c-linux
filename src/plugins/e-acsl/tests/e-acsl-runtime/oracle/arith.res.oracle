@@ -773,8 +773,6 @@ PROJECT_FILE.i:115:[from] Non terminating function (no dependencies)
 [from] Done for function mpz_cdiv_q
 [from] Computing for function mpz_mod_ui
 [from] Done for function mpz_mod_ui
-[dominators] computing for function main
-[dominators] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values for function e_acsl_fail:
           NON TERMINATING FUNCTION

@@ -34,7 +34,19 @@ PLUGIN_DYNAMIC:=@DYNAMIC_E_ACSL@
 PLUGIN_NAME:=E_ACSL
 PLUGIN_CMO:= local_config options read_header misc mpz env visit main
 PLUGIN_HAS_MLI:=yes
+
+# Enable -warn-error, but do not distribute the plug-in with this option being
+# activated 
+ifeq ($(HAS_OCAML312),yes)
+DEV_FLAGS=-warn-error +a
+else
+DEV_FLAGS=-warn-error A
+endif
+PLUGIN_BFLAGS:=$(DEV_FLAGS)
+PLUGIN_OFLAGS:=$(DEV_FLAGS)
+
 PLUGIN_DISTRIBUTED:=no
+
 PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure
 PLUGIN_DISTRIB_BIN:=no
 PLUGIN_GENERATED:= $(PLUGIN_DIR)/local_config.ml
