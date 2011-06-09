@@ -14,6 +14,7 @@
 - minimiser le nombre de variables générées
 - constante entière longue: utiliser la représentation sous forme de string et 
   rechercher la base appropriée.
+- introduire feature wishes Bernard (voir mail du 9 juin)
 
 #########
 # TESTS #
