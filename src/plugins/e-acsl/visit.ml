@@ -38,7 +38,7 @@ let constant_to_exp ?(loc=Location.unknown) = function
        it is written. Such a base is required by GMP.
        [TODO] Actually possible to find the base for the string, but not done
        yet *)
-    mkString ?loc (Int64.to_string n)
+    mkString ?loc (My_bigint.to_string n)
   | CStr _ | CWStr _ | CChr _ | CReal _ | CEnum _ as c -> 
     new_exp ?loc (Const c)
 
