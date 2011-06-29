@@ -2,39 +2,39 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-PROJECT_FILE.i:124:[value] Assertion got status valid.
-PROJECT_FILE.i:127:[value] Assertion got status valid.
+PROJECT_FILE.i:134:[value] Assertion got status valid.
+PROJECT_FILE.i:137:[value] Assertion got status valid.
 [value] computing for function mpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:129.
+        Called from PROJECT_FILE.i:139.
 PROJECT_FILE.i:29:[value] Function mpz_init_set_si: postcondition got status unknown
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:129.
+        Called from PROJECT_FILE.i:139.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_cmp <- main.
-        Called from PROJECT_FILE.i:130.
+        Called from PROJECT_FILE.i:140.
 PROJECT_FILE.i:45:[value] Function mpz_cmp: precondition got status valid
 PROJECT_FILE.i:46:[value] Function mpz_cmp: precondition got status valid
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:131.
+        Called from PROJECT_FILE.i:141.
 [value] computing for function printf <- e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:115.
+        Called from PROJECT_FILE.i:125.
 [value] Done for function printf
 [value] computing for function exit <- e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:115.
-PROJECT_FILE.i:105:[value] Function exit: postcondition got status invalid
+        Called from PROJECT_FILE.i:125.
+PROJECT_FILE.i:115:[value] Function exit: postcondition got status invalid
 [value] Done for function exit
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
 [value] computing for function mpz_clear <- main.
-        Called from PROJECT_FILE.i:132.
+        Called from PROJECT_FILE.i:142.
 PROJECT_FILE.i:39:[value] Function mpz_clear: precondition got status valid
 [value] Done for function mpz_clear
 [value] computing for function mpz_clear <- main.
-        Called from PROJECT_FILE.i:132.
+        Called from PROJECT_FILE.i:142.
 [value] Done for function mpz_clear
-PROJECT_FILE.i:135:[value] Assertion got status valid.
+PROJECT_FILE.i:145:[value] Assertion got status valid.
 [value] Recording results for main
 [value] done for function main
 [from] Computing for function mpz_init_set_si
@@ -44,10 +44,10 @@ PROJECT_FILE.i:135:[value] Assertion got status valid.
 [from] Computing for function e_acsl_fail
 [from] Computing for function printf <-e_acsl_fail
 [from] Done for function printf
-PROJECT_FILE.i:115:[from] warning: variadic call detected. Using only 1 argument(s).
+PROJECT_FILE.i:125:[from] warning: variadic call detected. Using only 1 argument(s).
 [from] Computing for function exit <-e_acsl_fail
 [from] Done for function exit
-PROJECT_FILE.i:115:[from] Non terminating function (no dependencies)
+PROJECT_FILE.i:125:[from] Non terminating function (no dependencies)
 [from] Done for function e_acsl_fail
 [from] Computing for function mpz_clear
 [from] Done for function mpz_clear

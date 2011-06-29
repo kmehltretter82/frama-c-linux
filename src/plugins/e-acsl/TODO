@@ -21,15 +21,19 @@
 #########
 
 - stmt_contracts et only_behaviors... pas sur que je fasse ce qu'il faut
-- pb test stmt_contracts.i
 - tester les opérations binaires sur les pointeurs (requiert complex left value)
 - tester plusieurs fonctions contenant des annotations
 - améliorer test "integer_constant.i" quand bug fixed #745
 - améliorer test "arith.i" quand bug fixed #751
+- améliorer test "ptr.i" quand bug fixed #751
+- structs
+- unions
 
 ####################
 # AVANT LA DISTRIB #
 ####################
+
+- documentation
 
 en lien avec bts #743:
 - make distrib

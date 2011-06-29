@@ -58,7 +58,7 @@ __inline static int __gmpz_fits_ulong_p(mpz_srcptr __gmp_z) __attribute__((
 __pure__));
 __inline static int __gmpz_fits_ushort_p(mpz_srcptr __gmp_z) __attribute__((
 __pure__));
-__inline static unsigned long __gmpz_get_ui(mpz_srcptr __gmp_z) __attribute__((
+__inline static unsigned long __gmpz_get_ui(__mpz_struct const * /*[1]*/ z) __attribute__((
 __pure__));
 __inline static mp_limb_t __gmpz_getlimbn(mpz_srcptr __gmp_z,
                                           mp_size_t __gmp_n) __attribute__((
@@ -206,16 +206,18 @@ __inline static int __gmpz_fits_ushort_p(mpz_srcptr __gmp_z)
   return (__retres);
 }
 
-__inline static unsigned long __gmpz_get_ui(mpz_srcptr __gmp_z) __attribute__((
+/*@ requires \valid(z);
+    assigns \nothing;  */
+__inline static unsigned long __gmpz_get_ui(__mpz_struct const * /*[1]*/ z) __attribute__((
 __pure__));
-__inline static unsigned long __gmpz_get_ui(mpz_srcptr __gmp_z)
+__inline static unsigned long __gmpz_get_ui(__mpz_struct const * /*[1]*/ z)
 {
   mp_ptr __gmp_p;
   mp_size_t __gmp_n;
   mp_limb_t __gmp_l;
   mp_limb_t tmp;
-  __gmp_p = __gmp_z->_mp_d;
-  __gmp_n = (long)__gmp_z->_mp_size;
+  __gmp_p = z->_mp_d;
+  __gmp_n = (long)z->_mp_size;
   __gmp_l = *(__gmp_p + 0);
   if (__gmp_n != (mp_size_t)0) { tmp = __gmp_l; }
   else { tmp = (unsigned long)0; }

@@ -27,25 +27,6 @@ open Cil
 (* Transforming terms and predicates into C expressions (if any) *)
 (* ************************************************************************** *)
 
-let constant_to_exp ?(loc=Location.unknown) = function
-  | CInt64(n, 
-	   (IBool | IChar | IUChar | IUInt | IUShort | IULong
-	       | ISChar | IShort | IInt | ILong as k), 
-	   s) ->
-    kinteger64_repr ?loc k n s
-  | CInt64(n, (ILongLong | IULongLong), _s) -> 
-    (* cannot use the string [s] (if any) since we do not know the base in which
-       it is written. Such a base is required by GMP.
-       [TODO] Actually possible to find the base for the string, but not done
-       yet *)
-    mkString ?loc (My_bigint.to_string n)
-  | CStr _ | CWStr _ | CChr _ | CReal _ | CEnum _ as c -> 
-    new_exp ?loc (Const c)
-
-let tlval_to_lval = function
-  | TVar { lv_origin = Some v }, TNoOffset -> Var v, NoOffset
-  | _ -> Misc.not_yet "complex left value"
-
 let relation_to_binop = function
   | Rlt -> Lt
   | Rgt -> Gt
@@ -72,15 +53,62 @@ let wrap_leaf env e = function
   | Lreal -> Misc.not_yet "real number"
   | Larrow _ -> Misc.not_yet "logic function"
 
+let constant_to_exp ?(loc=Location.unknown) = function
+  | CInt64(n, 
+	   (IBool | IChar | IUChar | IUInt | IUShort | IULong
+	       | ISChar | IShort | IInt | ILong as k), 
+	   s) ->
+    kinteger64_repr ?loc k n s
+  | CInt64(n, (ILongLong | IULongLong), _s) -> 
+    (* cannot use the string [s] (if any) since we do not know the base in which
+       it is written. Such a base is required by GMP.
+       [TODO] Actually possible to find the base for the string, but not done
+       yet *)
+    mkString ?loc (My_bigint.to_string n)
+  | CStr _ | CWStr _ | CChr _ | CReal _ | CEnum _ as c -> 
+    new_exp ?loc (Const c)
+
+let rec thost_to_host env = function
+  | TVar { lv_origin = Some v } -> Var v, env
+  | TVar { lv_origin = None } -> Misc.not_yet "logic variable"
+  | TResult _typ -> Misc.not_yet "\\result"
+  | TMem t ->
+    (* TODO: still untested *)
+    let e, env = term_to_exp env t in
+    Options.warning ~current:true ~once:true
+      "missing guard for ensuring that %a is a valid memory access"
+      d_term t;
+    Mem e, env
+
+and toffset_to_offset env = function
+  | TNoOffset -> NoOffset, env
+  | TField(f, offset) -> 
+    (* TODO: still untested *)
+    let offset, env = toffset_to_offset env offset in
+    Field(f, offset), env
+  | TIndex(t, offset) -> 
+    let e, env = ptr_arith_term_to_exp env t in
+    Options.warning ~current:true ~once:true
+      "missing guard for ensuring that %a is a valid array index"
+      d_term t;
+    let offset, env = toffset_to_offset env offset in
+    Index(e, offset), env
+
+and tlval_to_lval env (host, offset) = 
+  let host, env = thost_to_host env host in
+  let offset, env = toffset_to_offset env offset in
+  (host, offset), env
+
 (* Convert an ACSL term into a corresponding C expression (if any) in the given
    environment. Also extend this environment which includes the generating
    constructs. *)
-let rec term_to_exp env t = 
+and term_to_exp env t = 
   let loc = t.term_loc in
   match t.term_node with
   | TConst c -> wrap_leaf env (constant_to_exp ~loc c) t.term_type
   | TLval lv -> 
-    wrap_leaf env (new_exp ~loc (Lval (tlval_to_lval lv))) t.term_type
+    let lv, env = tlval_to_lval env lv in
+    wrap_leaf env (new_exp ~loc (Lval lv)) t.term_type
   | TSizeOf ty -> sizeOf ~loc ty, env
   | TSizeOfE t ->
     let e, env = term_to_exp env t in
@@ -143,8 +171,8 @@ let rec term_to_exp env t =
   | TBinOp(PlusPI | IndexPI | MinusPI | MinusPP as bop, t1, t2) ->
     (* binary operation over pointers *)
     (* [TODO] untested *)
-    let e1, env = term_to_exp env t1 in
-    let e2, env = term_to_exp env t2 in
+    let e1, env = ptr_arith_term_to_exp env t1 in
+    let e2, env = ptr_arith_term_to_exp env t2 in
     Options.warning ~current:true ~once:true
       "missing guard for ensuring that %a is a valid pointer"
       d_term t;
@@ -152,11 +180,31 @@ let rec term_to_exp env t =
        whatever is [e2] *)
     new_exp ~loc (BinOp(bop, e1, e2, typeOf e1)), env
   | TCastE(ty, t) ->
-    (* [TODO] missing guard for ensuring no overflow when casting *)
+    (* [TODO] missing guard for ensuring no overflow when casting.
+       Whether the guard should be emit depends on the subtyping relation. *)
     let e, env = term_to_exp env t in
+    let e, env =
+      if Mpz.e_got_t e then begin
+	(* casting mpz_t to C type is unsafe: 
+	   use dedicated gmp functions for coercions *)
+	let name, ty = 
+	  if isSignedInteger ty then "mpz_get_si", longType
+	  else "mpz_get_ui", ulongType
+	in
+	Env.new_var
+	  env
+	  ty
+	  (fun v _ -> [ Misc.mk_call ~loc ~result:(var v) name [ e ] ])
+      end else 
+	e, env
+    in
     mkCast e ty, env
-  | TAddrOf lv -> mkAddrOf ~loc (tlval_to_lval lv), env
-  | TStartOf _ -> Misc.not_yet "beginning of an array"
+  | TAddrOf lv -> 
+    let lv, env = tlval_to_lval env lv in
+    mkAddrOf ~loc lv, env
+  | TStartOf lv -> 
+    let lv, env = tlval_to_lval env lv in
+    mkAddrOrStartOf ~loc lv, env
   | Tapp _ -> Misc.not_yet "applying logic function"
   | Tlambda _ -> Misc.not_yet "functional"
   | TDataCons _ -> Misc.not_yet "constructor"
@@ -164,7 +212,7 @@ let rec term_to_exp env t =
   | Tat _ -> Misc.not_yet "\\at"
   | Tbase_addr _ -> Misc.not_yet "\\base_addr"
   | Tblock_length _ -> Misc.not_yet "\\block_length"
-  | Tnull -> Misc.not_yet "NULL"
+  | Tnull -> mkCast (zero ~loc) (TPtr(TVoid [], [])), env
   | TCoerce _ -> Misc.not_yet "coercion"
   | TCoerceE _ -> Misc.not_yet "expression coercion"
   | TUpdate _ -> Misc.not_yet "functional update"
@@ -177,11 +225,18 @@ let rec term_to_exp env t =
   | Trange _ -> Misc.not_yet "range"
   | Tlet _ -> Misc.not_yet "let binding"
 
+and ptr_arith_term_to_exp env t = match t.term_type with
+  | Linteger -> 
+    (* add cast to prevent generation of mpz_t values for ptr arithmetics *)
+    term_to_exp env (Logic_const.term (TCastE(intType, t)) (Ctype intType)) 
+  | Ctype _ -> term_to_exp env t
+  | Ltype _ | Lvar _ | Lreal | Larrow _ -> assert false
+
 (* generate the C code equivalent to [t1 bop t2]. *)
 and comparison_to_exp ?(loc=Location.unknown) env bop t1 t2 =
   let e1, env = term_to_exp env t1 in
   let e2, env = term_to_exp env t2 in
-  (*  Options.feedback "ty1=%a; ty2=%a" d_type (typeOf e1) d_type (typeOf e2);*)
+(*  Options.feedback "ty1=%a; ty2=%a" d_type (typeOf e1) d_type (typeOf e2);*)
   assert (Typ.equal (typeOf e1) (typeOf e2));
   if Mpz.e_got_t e1 then
     let e, env =
@@ -405,7 +460,7 @@ class e_acsl_visitor prj generate = object (self)
       let old_kf = Globals.Functions.get old_vi in
       let spec = 
 	Visitor.visitFramacFunspec
-	  (self :> Visitor.frama_c_visitor) 
+	  (self :> Visitor.frama_c_visitor)
 	  (Kernel_function.get_spec old_kf)
       in
       let pre_b, post_b, env = 

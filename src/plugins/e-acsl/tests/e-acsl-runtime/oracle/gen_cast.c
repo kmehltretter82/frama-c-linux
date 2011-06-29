@@ -7,6 +7,7 @@ struct __anonstruct___mpz_struct_6 {
    mp_limb_t *_mp_d ;
 };
 typedef struct __anonstruct___mpz_struct_6 __mpz_struct;
+typedef __mpz_struct mpz_t[1];
 typedef mp_limb_t *mp_ptr;
 typedef mp_limb_t const *mp_srcptr;
 typedef long mp_size_t;
@@ -24,17 +25,27 @@ typedef __mpq_struct *mpq_ptr;
 /*@ assigns \nothing;  */
 extern int printf(char const * __restrict __format , ...);
 __inline static void __gmpz_abs(mpz_ptr __gmp_w, mpz_srcptr __gmp_u);
+/*@ requires \valid(x);
+    assigns *x;  */
+extern void __gmpz_clear(__mpz_struct * /*[1]*/ x);
 __inline static int __gmpz_fits_uint_p(mpz_srcptr __gmp_z) __attribute__((
 __pure__));
 __inline static int __gmpz_fits_ulong_p(mpz_srcptr __gmp_z) __attribute__((
 __pure__));
 __inline static int __gmpz_fits_ushort_p(mpz_srcptr __gmp_z) __attribute__((
 __pure__));
-__inline static unsigned long __gmpz_get_ui(mpz_srcptr __gmp_z) __attribute__((
+/*@ requires \valid(z);
+    assigns \nothing;  */
+extern long __gmpz_get_si(__mpz_struct const * /*[1]*/ z) __attribute__((
+__pure__));
+__inline static unsigned long __gmpz_get_ui(__mpz_struct const * /*[1]*/ z) __attribute__((
 __pure__));
 __inline static mp_limb_t __gmpz_getlimbn(mpz_srcptr __gmp_z,
                                           mp_size_t __gmp_n) __attribute__((
 __pure__));
+/*@ ensures \valid(\old(z));
+    assigns *z;  */
+extern void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z, long n);
 __inline static void __gmpz_neg(__mpz_struct * /*[1]*/ z1,
                                 __mpz_struct const * /*[1]*/ z2);
 __inline static int __gmpz_perfect_square_p(mpz_srcptr __gmp_a) __attribute__((
@@ -153,16 +164,18 @@ __inline static int __gmpz_fits_ushort_p(mpz_srcptr __gmp_z)
   return (__retres);
 }
 
-__inline static unsigned long __gmpz_get_ui(mpz_srcptr __gmp_z) __attribute__((
+/*@ requires \valid(z);
+    assigns \nothing;  */
+__inline static unsigned long __gmpz_get_ui(__mpz_struct const * /*[1]*/ z) __attribute__((
 __pure__));
-__inline static unsigned long __gmpz_get_ui(mpz_srcptr __gmp_z)
+__inline static unsigned long __gmpz_get_ui(__mpz_struct const * /*[1]*/ z)
 {
   mp_ptr __gmp_p;
   mp_size_t __gmp_n;
   mp_limb_t __gmp_l;
   mp_limb_t tmp;
-  __gmp_p = __gmp_z->_mp_d;
-  __gmp_n = (long)__gmp_z->_mp_size;
+  __gmp_p = z->_mp_d;
+  __gmp_n = (long)z->_mp_size;
   __gmp_l = *(__gmp_p + 0);
   if (__gmp_n != (mp_size_t)0) { tmp = __gmp_l; }
   else { tmp = (unsigned long)0; }
@@ -560,6 +573,23 @@ int main(void)
   if (! ((int)x == y)) { e_acsl_fail((char *)"((int)x == y)"); }
   /*@ assert x ≡ (long)y; */ ;
   if (! (x == (long)y)) { e_acsl_fail((char *)"(x == (long)y)"); }
+  /*@ assert y ≡ (int)0; */ ;
+  { mpz_t e_acsl_1; long e_acsl_2;
+    __gmpz_init_set_si((__mpz_struct *)(e_acsl_1),(long)0);
+    e_acsl_2 = __gmpz_get_si((__mpz_struct const *)(e_acsl_1));
+    if (! (y == (int)e_acsl_2)) { e_acsl_fail((char *)"(y == (int)0)"); }
+    __gmpz_clear((__mpz_struct *)(e_acsl_1));
+  }
+  
+  /*@ assert (unsigned int)y ≡ (unsigned int)0; */ ;
+  { mpz_t e_acsl_3; unsigned long e_acsl_4;
+    __gmpz_init_set_si((__mpz_struct *)(e_acsl_3),(long)0);
+    e_acsl_4 = __gmpz_get_ui((__mpz_struct const *)(e_acsl_3));
+    if (! ((unsigned int)y == (unsigned int)e_acsl_4)) {
+      e_acsl_fail((char *)"((unsigned int)y == (unsigned int)0)");
+    } __gmpz_clear((__mpz_struct *)(e_acsl_3));
+  }
+  
   __retres = 0;
   return (__retres);
 }

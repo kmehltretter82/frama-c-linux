@@ -73,3 +73,13 @@ extern void mpz_cdiv_q(mpz_t z1, const mpz_t z2, const mpz_t z3);
   @ requires \valid(z3);
   @ assigns *z1; */
 extern void mpz_mod(mpz_t z1, const mpz_t z2, const mpz_t z3);
+
+// coercions to C int
+
+/*@ requires \valid(z); 
+  @ assigns \nothing; */
+extern long mpz_get_si(const mpz_t z);
+
+/*@ requires \valid(z); 
+  @ assigns \nothing; */
+extern unsigned long mpz_get_ui(const mpz_t z);

@@ -38,7 +38,6 @@ int main(void) {
     @   requires x + y == 5; */
   x = x + y;
 
-  // TODO: break the CFG and I don't know why :(
   /*@ requires x == 5; */
   /*@ requires y == 2; */
   x = x + y;

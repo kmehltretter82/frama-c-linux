@@ -1,0 +1,29 @@
+/* run.config
+   COMMENT: pointers and pointer arithmetic
+   EXECNOW: LOG gen_ptr.c BIN gen_ptr.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/ptr.i -e-acsl-project p -e-acsl-include-headers -then-on p -print -ocode ./tests/e-acsl-runtime/result/gen_ptr.c > /dev/null && gcc -o ./tests/e-acsl-runtime/result/gen_ptr.out -lgmp ./tests/e-acsl-runtime/result/gen_ptr.c && ./tests/e-acsl-runtime/result/gen_ptr.out
+*/
+
+int main(void) {
+
+  int x = 1;
+  int t[3] = { 2, 3, 4 };
+  int *p = &x;
+
+  /*@ assert *p == 1; */
+  /*@ assert *t == 2; */
+  /*@ assert *(t+2) == 4; */
+  //  /*@ assert *(t+2*sizeof(int)) == 4; */ // still this fucking subtyping bug
+
+  for(int i = 0; i < 2; i++) {
+       /*@ assert (*(t+i) == i+2); */ ;
+       /*@ assert (*(t+(2-i)) == 4-i); */ ;
+       /*@ assert (*(t+2-i) == 4-i); */ ;
+    ;
+  }
+
+  p = t+2;
+  t[2] = 5;
+  /*@ assert *p == 5; */
+
+  return 0;
+}
