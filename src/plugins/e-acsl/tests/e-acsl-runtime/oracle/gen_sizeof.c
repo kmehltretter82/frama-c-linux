@@ -7,6 +7,7 @@ struct __anonstruct___mpz_struct_6 {
    mp_limb_t *_mp_d ;
 };
 typedef struct __anonstruct___mpz_struct_6 __mpz_struct;
+typedef __mpz_struct mpz_t[1];
 typedef mp_limb_t *mp_ptr;
 typedef mp_limb_t const *mp_srcptr;
 typedef long mp_size_t;
@@ -24,6 +25,15 @@ typedef __mpq_struct *mpq_ptr;
 /*@ assigns \nothing;  */
 extern int printf(char const * __restrict __format , ...);
 __inline static void __gmpz_abs(mpz_ptr __gmp_w, mpz_srcptr __gmp_u);
+/*@ requires \valid(x);
+    assigns *x;  */
+extern void __gmpz_clear(__mpz_struct * /*[1]*/ x);
+/*@ requires \valid(z1);
+    requires \valid(z2);
+    assigns \nothing;  */
+extern int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
+                      __mpz_struct const * /*[1]*/ z2) __attribute__((
+__pure__));
 __inline static int __gmpz_fits_uint_p(mpz_srcptr __gmp_z) __attribute__((
 __pure__));
 __inline static int __gmpz_fits_ulong_p(mpz_srcptr __gmp_z) __attribute__((
@@ -35,6 +45,9 @@ __pure__));
 __inline static mp_limb_t __gmpz_getlimbn(mpz_srcptr __gmp_z,
                                           mp_size_t __gmp_n) __attribute__((
 __pure__));
+/*@ ensures \valid(\old(z));
+    assigns *z;  */
+extern void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z, long n);
 __inline static void __gmpz_neg(__mpz_struct * /*[1]*/ z1,
                                 __mpz_struct const * /*[1]*/ z2);
 __inline static int __gmpz_perfect_square_p(mpz_srcptr __gmp_a) __attribute__((
@@ -556,11 +569,29 @@ void main(void)
   int x;
   x = 0;
   /*@ assert sizeof(int) ≡ sizeof(x); */ ;
-  if (! (4 == 4)) { e_acsl_fail((char *)"(sizeof(int) == sizeof(x))"); }
-  /*@ assert sizeof("totototototo") ≡ sizeof(char *); */ ;
-  if (! (4 == 4)) {
-    e_acsl_fail((char *)"(sizeof(\"totototototo\") == sizeof(char *))");
+  { mpz_t e_acsl_1; mpz_t e_acsl_2; int e_acsl_3;
+    __gmpz_init_set_si((__mpz_struct *)(e_acsl_1),(long)4);
+    __gmpz_init_set_si((__mpz_struct *)(e_acsl_2),(long)4);
+    e_acsl_3 = __gmpz_cmp((__mpz_struct const *)(e_acsl_1),
+                          (__mpz_struct const *)(e_acsl_2));
+    if (! (e_acsl_3 == 0)) {
+      e_acsl_fail((char *)"(sizeof(int) == sizeof(x))");
+    } __gmpz_clear((__mpz_struct *)(e_acsl_1));
+    __gmpz_clear((__mpz_struct *)(e_acsl_2));
   }
+  
+  /*@ assert sizeof("totototototo") ≡ sizeof(char *); */ ;
+  { mpz_t e_acsl_4; mpz_t e_acsl_5; int e_acsl_6;
+    __gmpz_init_set_si((__mpz_struct *)(e_acsl_4),(long)4);
+    __gmpz_init_set_si((__mpz_struct *)(e_acsl_5),(long)4);
+    e_acsl_6 = __gmpz_cmp((__mpz_struct const *)(e_acsl_4),
+                          (__mpz_struct const *)(e_acsl_5));
+    if (! (e_acsl_6 == 0)) {
+      e_acsl_fail((char *)"(sizeof(\"totototototo\") == sizeof(char *))");
+    } __gmpz_clear((__mpz_struct *)(e_acsl_4));
+    __gmpz_clear((__mpz_struct *)(e_acsl_5));
+  }
+  
   return;
 }
 

@@ -26,6 +26,7 @@
 - améliorer test "integer_constant.i" quand bug fixed #745
 - améliorer test "arith.i" quand bug fixed #751
 - améliorer test "ptr.i" quand bug fixed #751
+- test sizeof.i devraient être plus précis quand logic_typing plus précis
 - structs
 - unions
 

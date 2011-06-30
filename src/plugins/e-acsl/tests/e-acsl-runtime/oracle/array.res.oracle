@@ -1,5 +1,7 @@
-:0:[e-acsl] warning: missing guard for ensuring that 0 is a valid array index
-:0:[e-acsl] warning: missing guard for ensuring that 1 is a valid array index
+tests/e-acsl-runtime/array.i:13:[e-acsl] warning: missing guard for ensuring that 0 is a valid array index
+tests/e-acsl-runtime/array.i:13:[e-acsl] warning: missing guard for ensuring that 0 is a valid array index
+tests/e-acsl-runtime/array.i:14:[e-acsl] warning: missing guard for ensuring that 1 is a valid array index
+tests/e-acsl-runtime/array.i:14:[e-acsl] warning: missing guard for ensuring that 1 is a valid array index
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed
@@ -10,26 +12,8 @@ PROJECT_FILE.i:132:[value] entering loop for the first time
 PROJECT_FILE.i:132:[value] assigning non deterministic value for the first time
 PROJECT_FILE.i:135:[value] entering loop for the first time
 PROJECT_FILE.i:138:[value] Assertion got status unknown.
-[value] computing for function mpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:140.
-PROJECT_FILE.i:29:[value] Function mpz_init_set_si: postcondition got status unknown
-[value] Done for function mpz_init_set_si
-[value] computing for function mpz_get_si <- main.
-        Called from PROJECT_FILE.i:140.
-PROJECT_FILE.i:92:[value] Function mpz_get_si: precondition got status valid
-[value] Done for function mpz_get_si
-[value] computing for function mpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:141.
-[value] Done for function mpz_init_set_si
-[value] computing for function mpz_get_si <- main.
-        Called from PROJECT_FILE.i:141.
-[value] Done for function mpz_get_si
-PROJECT_FILE.i:142:[kernel] warning: accessing out of bounds index [-2147483648..2147483647].
-                  assert 0 ≤ (int)e_acsl_2 ∧ (int)e_acsl_2 < 3;
-PROJECT_FILE.i:142:[kernel] warning: accessing out of bounds index [-2147483648..2147483647].
-                  assert 0 ≤ (int)e_acsl_4 ∧ (int)e_acsl_4 < 4;
 [value] computing for function e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:143.
+        Called from PROJECT_FILE.i:139.
 [value] computing for function printf <- e_acsl_fail <- main.
         Called from PROJECT_FILE.i:125.
 [value] Done for function printf
@@ -39,32 +23,9 @@ PROJECT_FILE.i:115:[value] Function exit: postcondition got status invalid
 [value] Done for function exit
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
-[value] computing for function mpz_clear <- main.
-        Called from PROJECT_FILE.i:144.
-PROJECT_FILE.i:39:[value] Function mpz_clear: precondition got status valid
-[value] Done for function mpz_clear
-[value] computing for function mpz_clear <- main.
-        Called from PROJECT_FILE.i:144.
-[value] Done for function mpz_clear
-PROJECT_FILE.i:147:[value] Assertion got status unknown.
-[value] computing for function mpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:149.
-[value] Done for function mpz_init_set_si
-[value] computing for function mpz_get_si <- main.
-        Called from PROJECT_FILE.i:149.
-[value] Done for function mpz_get_si
-[value] computing for function mpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:150.
-[value] Done for function mpz_init_set_si
-[value] computing for function mpz_get_si <- main.
-        Called from PROJECT_FILE.i:150.
-[value] Done for function mpz_get_si
-PROJECT_FILE.i:151:[kernel] warning: accessing out of bounds index [-2147483648..2147483647].
-                  assert 0 ≤ (int)e_acsl_6 ∧ (int)e_acsl_6 < 3;
-PROJECT_FILE.i:151:[kernel] warning: accessing out of bounds index [-2147483648..2147483647].
-                  assert 0 ≤ (int)e_acsl_8 ∧ (int)e_acsl_8 < 4;
+PROJECT_FILE.i:141:[value] Assertion got status unknown.
 [value] computing for function e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:152.
+        Called from PROJECT_FILE.i:142.
 [value] computing for function printf <- e_acsl_fail <- main.
         Called from PROJECT_FILE.i:125.
 [value] Done for function printf
@@ -73,18 +34,8 @@ PROJECT_FILE.i:151:[kernel] warning: accessing out of bounds index [-2147483648.
 [value] Done for function exit
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
-[value] computing for function mpz_clear <- main.
-        Called from PROJECT_FILE.i:153.
-[value] Done for function mpz_clear
-[value] computing for function mpz_clear <- main.
-        Called from PROJECT_FILE.i:153.
-[value] Done for function mpz_clear
 [value] Recording results for main
 [value] done for function main
-[from] Computing for function mpz_init_set_si
-[from] Done for function mpz_init_set_si
-[from] Computing for function mpz_get_si
-[from] Done for function mpz_get_si
 [from] Computing for function e_acsl_fail
 [from] Computing for function printf <-e_acsl_fail
 [from] Done for function printf
@@ -93,8 +44,6 @@ PROJECT_FILE.i:125:[from] warning: variadic call detected. Using only 1 argument
 [from] Done for function exit
 PROJECT_FILE.i:125:[from] Non terminating function (no dependencies)
 [from] Done for function e_acsl_fail
-[from] Computing for function mpz_clear
-[from] Done for function mpz_clear
 [value] ====== VALUES COMPUTED ======
 [value] Values for function e_acsl_fail:
           NON TERMINATING FUNCTION
@@ -105,22 +54,6 @@ PROJECT_FILE.i:125:[from] Non terminating function (no dependencies)
             [1..3] ∈ {0; 2; 4; 6}
           __retres ∈ {0}
 /* Generated by Frama-C */
-struct __anonstruct___mpz_struct_1 {
-   int _mp_alloc ;
-   int _mp_size ;
-   unsigned long *_mp_d ;
-};
-typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
-typedef __mpz_struct mpz_t[1];
-/*@ ensures \valid(\old(z));
-    assigns *z;  */
-extern void mpz_init_set_si(__mpz_struct * /*[1]*/ z, long n);
-/*@ requires \valid(x);
-    assigns *x;  */
-extern void mpz_clear(__mpz_struct * /*[1]*/ x);
-/*@ requires \valid(z);
-    assigns \nothing;  */
-extern long mpz_get_si(__mpz_struct const * /*[1]*/ z);
 /*@ terminates \false;
     ensures \false;
     assigns \nothing;  */
@@ -146,45 +79,9 @@ int main(void)
   }
   
   /*@ assert T1[0] ≡ T2[0]; */ ;
-  { mpz_t e_acsl_1; long e_acsl_2; mpz_t e_acsl_3; long e_acsl_4;
-    mpz_init_set_si((__mpz_struct *)(e_acsl_1),(long)0);
-    e_acsl_2 = mpz_get_si((__mpz_struct const *)(e_acsl_1));
-    mpz_init_set_si((__mpz_struct *)(e_acsl_3),(long)0);
-    e_acsl_4 = mpz_get_si((__mpz_struct const *)(e_acsl_3));
-    /*@ assert 0 ≤ (int)e_acsl_2 ∧ (int)e_acsl_2 < 3;
-          // synthesized
-      
-    */
-    /*@ assert 0 ≤ (int)e_acsl_4 ∧ (int)e_acsl_4 < 4;
-          // synthesized
-      
-    */
-    if (! (T1[(int)e_acsl_2] == T2[(int)e_acsl_4])) {
-      e_acsl_fail((char *)"(T1[0] == T2[0])");
-    } mpz_clear((__mpz_struct *)(e_acsl_1));
-    mpz_clear((__mpz_struct *)(e_acsl_3));
-  }
-  
+  if (! (T1[0] == T2[0])) { e_acsl_fail((char *)"(T1[0] == T2[0])"); }
   /*@ assert T1[1] ≢ T2[1]; */ ;
-  { mpz_t e_acsl_5; long e_acsl_6; mpz_t e_acsl_7; long e_acsl_8;
-    mpz_init_set_si((__mpz_struct *)(e_acsl_5),(long)1);
-    e_acsl_6 = mpz_get_si((__mpz_struct const *)(e_acsl_5));
-    mpz_init_set_si((__mpz_struct *)(e_acsl_7),(long)1);
-    e_acsl_8 = mpz_get_si((__mpz_struct const *)(e_acsl_7));
-    /*@ assert 0 ≤ (int)e_acsl_6 ∧ (int)e_acsl_6 < 3;
-          // synthesized
-      
-    */
-    /*@ assert 0 ≤ (int)e_acsl_8 ∧ (int)e_acsl_8 < 4;
-          // synthesized
-      
-    */
-    if (! (T1[(int)e_acsl_6] != T2[(int)e_acsl_8])) {
-      e_acsl_fail((char *)"(T1[1] != T2[1])");
-    } mpz_clear((__mpz_struct *)(e_acsl_5));
-    mpz_clear((__mpz_struct *)(e_acsl_7));
-  }
-  
+  if (! (T1[1] != T2[1])) { e_acsl_fail((char *)"(T1[1] != T2[1])"); }
   __retres = 0;
   return (__retres);
 }

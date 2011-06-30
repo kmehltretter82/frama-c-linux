@@ -31,9 +31,6 @@ val is_now_referenced: unit -> unit
 
 val is_t: typ -> bool 
   (** is the type equal to "mpz_t"? *)
-  
-val e_got_t: exp -> bool
-  (** is the type of e is equal to "mpz_t"? *)
 
 val init: exp -> stmt
   (** build stmt "mpz_init(v)" *)

@@ -45,7 +45,8 @@ __inline static mp_limb_t __gmpz_getlimbn(mpz_srcptr __gmp_z,
 __pure__));
 /*@ ensures \valid(\old(z));
     assigns *z;  */
-extern void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z, long n);
+extern int __gmpz_init_set_str(__mpz_struct * /*[1]*/ z, char const *str,
+                               int base);
 __inline static void __gmpz_neg(__mpz_struct * /*[1]*/ z1,
                                 __mpz_struct const * /*[1]*/ z2);
 __inline static int __gmpz_perfect_square_p(mpz_srcptr __gmp_a) __attribute__((
@@ -569,24 +570,21 @@ int main(void)
   int y;
   x = (long)0;
   y = 0;
-  /*@ assert (int)x ≡ y; */ ;
-  if (! ((int)x == y)) { e_acsl_fail((char *)"((int)x == y)"); }
-  /*@ assert x ≡ (long)y; */ ;
-  if (! (x == (long)y)) { e_acsl_fail((char *)"(x == (long)y)"); }
-  /*@ assert y ≡ (int)0; */ ;
-  { mpz_t e_acsl_1; long e_acsl_2;
-    __gmpz_init_set_si((__mpz_struct *)(e_acsl_1),(long)0);
-    e_acsl_2 = __gmpz_get_si((__mpz_struct const *)(e_acsl_1));
-    if (! (y == (int)e_acsl_2)) { e_acsl_fail((char *)"(y == (int)0)"); }
-    __gmpz_clear((__mpz_struct *)(e_acsl_1));
+  /*@ assert y ≢ (int)0xfffffffffffffff; */ ;
+  { mpz_t e_acsl_1; int e_acsl_2;
+    __gmpz_init_set_str((__mpz_struct *)(e_acsl_1),"1152921504606846975",10);
+    e_acsl_2 = (int)__gmpz_get_si((__mpz_struct const *)(e_acsl_1));
+    if (! (y != e_acsl_2)) {
+      e_acsl_fail((char *)"(y != (int)0xfffffffffffffff)");
+    } __gmpz_clear((__mpz_struct *)(e_acsl_1));
   }
   
-  /*@ assert (unsigned int)y ≡ (unsigned int)0; */ ;
-  { mpz_t e_acsl_3; unsigned long e_acsl_4;
-    __gmpz_init_set_si((__mpz_struct *)(e_acsl_3),(long)0);
-    e_acsl_4 = __gmpz_get_ui((__mpz_struct const *)(e_acsl_3));
-    if (! ((unsigned int)y == (unsigned int)e_acsl_4)) {
-      e_acsl_fail((char *)"((unsigned int)y == (unsigned int)0)");
+  /*@ assert (unsigned int)y ≢ (unsigned int)0xfffffffffffffff; */ ;
+  { mpz_t e_acsl_3; unsigned int e_acsl_4;
+    __gmpz_init_set_str((__mpz_struct *)(e_acsl_3),"1152921504606846975",10);
+    e_acsl_4 = (unsigned int)__gmpz_get_ui((__mpz_struct const *)(e_acsl_3));
+    if (! ((unsigned int)y != e_acsl_4)) {
+      e_acsl_fail((char *)"((unsigned int)y != (unsigned int)0xfffffffffffffff)");
     } __gmpz_clear((__mpz_struct *)(e_acsl_3));
   }
   

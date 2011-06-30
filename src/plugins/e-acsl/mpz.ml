@@ -33,7 +33,6 @@ let is_now_referenced () = t_torig.treferenced <- true
 
 let t = TNamed(t_torig, [])
 let is_t ty = Cil_datatype.Typ.equal ty t
-let e_got_t e = is_t (typeOf e)
 
 let apply_on_var funname e = Misc.mk_call ("mpz_" ^ funname) [ e ]
 let init = apply_on_var "init"

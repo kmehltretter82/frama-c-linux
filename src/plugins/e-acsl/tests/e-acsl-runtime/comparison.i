@@ -18,5 +18,12 @@ int main(void) {
   /*@ assert 123 >= 12; */
   /*@ assert 0xff == 0xff; */
   /*@ assert 1 != 2; */
+
+  /*@ assert -5 < 18; */
+  /*@ assert 32 > -3; */
+  /*@ assert -12 <= 13; */
+  /*@ assert 123 >= -12; */
+  /*@ assert -0xff == -(+0xff); */
+  /*@ assert +1 != -2; */
   return 0;
 }
