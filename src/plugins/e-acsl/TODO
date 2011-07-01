@@ -21,12 +21,10 @@
 #########
 
 - stmt_contracts et only_behaviors... pas sur que je fasse ce qu'il faut
-- tester les opérations binaires sur les pointeurs (requiert complex left value)
 - tester plusieurs fonctions contenant des annotations
 - améliorer test "integer_constant.i" quand bug fixed #745
-- améliorer test "arith.i" quand bug fixed #751
-- améliorer test "ptr.i" quand bug fixed #751
 - test sizeof.i devraient être plus précis quand logic_typing plus précis
+- !integer: probably broken (TODO dans le code)
 - structs
 - unions
 

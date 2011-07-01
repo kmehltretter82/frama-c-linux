@@ -12,7 +12,7 @@ int main(void) {
   /*@ assert *p == 1; */
   /*@ assert *t == 2; */
   /*@ assert *(t+2) == 4; */
-  //  /*@ assert *(t+2*sizeof(int)) == 4; */ // still this fucking subtyping bug
+  /*@ assert *(t+2*sizeof(int)/sizeof((int)0x0)) == 4; */
 
   for(int i = 0; i < 2; i++) {
        /*@ assert (*(t+i) == i+2); */ ;

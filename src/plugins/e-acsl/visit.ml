@@ -214,31 +214,44 @@ and context_insensitive_term_to_exp env t =
        Such a case is actually possible. *)
     assert (not (Mpz.is_t (typeOf e)));
     new_exp ~loc (UnOp(LNot, e, intType)), env, false
-  | TBinOp(PlusA | MinusA | Mult | Div | Mod as bop, t1, t2) ->
-    (* arithmetic binary operator *)
+  | TBinOp(PlusA | MinusA | Mult as bop, t1, t2) ->
+    (* arithmetic binary operator not safely convertible into C *)
     let e1, env = term_to_exp env Linteger t1 in
     let e2, env = term_to_exp env Linteger t2 in
     assert (Typ.equal (typeOf e1) (typeOf e2));
     let name = name_of_mpz_arith_bop bop in
+    let mk_stmts _ e = [ Misc.mk_call ~loc name [ e; e1; e2 ] ] in
+    let e, env = Env.new_var_and_mpz_init env mk_stmts in
+    e, env, false
+  | TBinOp(Div | Mod as bop, t1, t2) ->
+    (* arithmetic binary operator potentially convertible into C *)
+    let ctx = principal_type_from_term t1 t2 in
+    let e1, env = term_to_exp env ctx t1 in
+    let e2, env = term_to_exp env ctx t2 in
     (* guarding divisions and modulos *)
     let zero = Logic_const.tinteger ~ikind:IInt 0 in
-    let guard, env = match bop with
-      | Div | Mod -> comparison_to_exp env Eq t2 zero
-      | _ -> Exp.dummy, env
+    (* do not generate [e2] from [t2] twice *)
+    let guard, env = comparison_to_exp env ~e1:(e2, ctx) Eq t2 zero in
+    let mk_stmts v e = 
+      let name = name_of_mpz_arith_bop bop in
+      let cond = 
+	Misc.mk_e_acsl_guard guard (Logic_const.prel (Req, t2, zero)) 
+      in
+      Env.add_assert cond (Logic_const.prel (Rneq, t2, zero));
+      let instr = match ctx with
+	| Ctype ty when isIntegralType ty -> 
+	  let e = new_exp ~loc (BinOp(bop, e1, e2, ty)) in
+	  mkStmtOneInstr ~valid_sid:true (Set((Var v, NoOffset), e, loc))
+	| Linteger -> Misc.mk_call ~loc name [ e; e1; e2 ]
+	| _ -> assert false
+      in
+      [ cond; instr ]
     in
-    let mk_stmts _ e = 
-      let call = Misc.mk_call ~loc name [ e; e1; e2 ]  in
-      match bop with
-      | Div | Mod ->
-	let cond = 
-	  Misc.mk_e_acsl_guard guard (Logic_const.prel (Req, t2, zero)) 
-	in
-	Env.add_assert cond (Logic_const.prel (Rneq, t2, zero));
-	[ cond; call ]
-      | _ ->
-	[ call ]
+    let e, env = match ctx with
+      | Ctype ty when isIntegralType ty -> Env.new_var env ty mk_stmts 
+      | Linteger -> Env.new_var_and_mpz_init env mk_stmts
+      | _ -> assert false
     in
-    let e, env = Env.new_var_and_mpz_init env mk_stmts in
     e, env, false
   | TBinOp(Lt | Gt | Le | Ge | Eq | Ne as bop, t1, t2) ->
     (* comparison operators *)
@@ -304,11 +317,20 @@ and term_to_exp env ctx t =
   context_sensitive ~loc:t.term_loc env ctx is_mpz_string e
 
 (* generate the C code equivalent to [t1 bop t2]. *)
-and comparison_to_exp ?(loc=Location.unknown) env bop t1 t2 =
-  let ctx = principal_type_from_term t1 t2 in
+and comparison_to_exp ?(loc=Location.unknown) ?e1 env bop t1 t2 =
+  let ctx = match e1 with
+    | None -> principal_type_from_term t1 t2 
+    | Some(_, ctx) -> 
+(*      Options.feedback "principality oriented by %a" d_logic_type ctx;*)
+      principal_type_from_term { t1 with term_type = ctx } t2
+  in
 (*  Options.feedback "principal type of %a and %a is %a" 
     d_term t1 d_term t2 d_logic_type ctx;*)
-  let e1, env = term_to_exp env ctx t1 in
+  let e1, env = match e1 with
+    | None -> term_to_exp env ctx t1
+    | Some(e1, ctx1) when Cil_datatype.Logic_type.equal ctx ctx1 -> e1, env
+    | Some(e1, _) -> context_sensitive ~loc:e1.eloc env ctx false e1
+  in
   let e2, env = term_to_exp env ctx t2 in
   match ctx with
   | Linteger ->
