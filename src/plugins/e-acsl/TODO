@@ -24,7 +24,6 @@
 - tester plusieurs fonctions contenant des annotations
 - améliorer test "integer_constant.i" quand bug fixed #745
 - test sizeof.i devraient être plus précis quand logic_typing plus précis
-- !integer: probably broken (TODO dans le code)
 - structs
 - unions
 
