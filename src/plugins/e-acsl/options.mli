@@ -23,11 +23,11 @@ open Plugin
 
 include S (** implementation of Log.S for E-ACSL *)
 
-module Check: BOOL
-module Project_name: STRING
+module Check: Bool
+module Project_name: String
 
-module Include_headers: BOOL
-module Use_assert: BOOL
+module Include_headers: Bool
+module Use_assert: Bool
 
 (*
 Local Variables:

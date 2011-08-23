@@ -562,7 +562,7 @@ __inline static mp_limb_t __gmpn_neg_n(mp_ptr __gmp_rp, mp_srcptr __gmp_up,
 extern void exit(int status);
 void e_acsl_fail(char *msg)
 {
-  printf((char const *)"%s\n",msg);
+  printf("%s\n",msg);
   exit(1);
   return;
 }

@@ -72,7 +72,14 @@ let add_stmt env s =
   { env with beginning_of_block = s :: env.beginning_of_block }
 
 let add_assert s p = 
-  Queue.add (fun () -> Annotations.add_assert s [ !self ] p) !queue
+  Queue.add
+    (fun () -> 
+      (* Don't work since the kernel_function does not yet exist in the new
+	 project. Virgile said he was implementing the missing stuff in the
+	 visitor. Wait and see... *)
+      let kf = Kernel_function.find_englobing_kf s in
+      Annotations.add_assert kf s [ !self ] p) 
+    !queue
 
 let new_var env ty mk_stmts = 
   let is_t = Mpz.is_t ty in
