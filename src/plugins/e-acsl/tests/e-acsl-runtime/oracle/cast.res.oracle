@@ -7,11 +7,11 @@ tests/e-acsl-runtime/cast.i:18:[e-acsl] warning: missing guard for ensuring that
 PROJECT_FILE.i:134:[value] Assertion got status valid.
 [value] computing for function mpz_init_set_str <- main.
         Called from PROJECT_FILE.i:136.
-PROJECT_FILE.i:33:[value] Function mpz_init_set_str: postcondition got status unknown
+PROJECT_FILE.i:33:[value] Function mpz_init_set_str: postcondition got status unknown.
 [value] Done for function mpz_init_set_str
 [value] computing for function mpz_get_si <- main.
         Called from PROJECT_FILE.i:137.
-PROJECT_FILE.i:92:[value] Function mpz_get_si: precondition got status valid
+PROJECT_FILE.i:92:[value] Function mpz_get_si: precondition got status valid.
 [value] Done for function mpz_get_si
 [value] computing for function e_acsl_fail <- main.
         Called from PROJECT_FILE.i:138.
@@ -20,13 +20,13 @@ PROJECT_FILE.i:92:[value] Function mpz_get_si: precondition got status valid
 [value] Done for function printf
 [value] computing for function exit <- e_acsl_fail <- main.
         Called from PROJECT_FILE.i:125.
-PROJECT_FILE.i:115:[value] Function exit: postcondition got status invalid
+PROJECT_FILE.i:115:[value] Function exit: postcondition got status invalid.
 [value] Done for function exit
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
 [value] computing for function mpz_clear <- main.
         Called from PROJECT_FILE.i:139.
-PROJECT_FILE.i:39:[value] Function mpz_clear: precondition got status valid
+PROJECT_FILE.i:39:[value] Function mpz_clear: precondition got status valid.
 [value] Done for function mpz_clear
 PROJECT_FILE.i:142:[value] Assertion got status valid.
 [value] computing for function mpz_init_set_str <- main.
@@ -34,7 +34,7 @@ PROJECT_FILE.i:142:[value] Assertion got status valid.
 [value] Done for function mpz_init_set_str
 [value] computing for function mpz_get_ui <- main.
         Called from PROJECT_FILE.i:145.
-PROJECT_FILE.i:96:[value] Function mpz_get_ui: precondition got status valid
+PROJECT_FILE.i:96:[value] Function mpz_get_ui: precondition got status valid.
 [value] Done for function mpz_get_ui
 [value] computing for function e_acsl_fail <- main.
         Called from PROJECT_FILE.i:147.

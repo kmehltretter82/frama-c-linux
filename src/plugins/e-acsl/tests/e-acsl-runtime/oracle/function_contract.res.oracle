@@ -6,29 +6,29 @@
         Y ∈ {2}
 [value] computing for function f <- main.
         Called from PROJECT_FILE.i:346.
-PROJECT_FILE.i:129:[value] Function f: postcondition got status valid
+PROJECT_FILE.i:129:[value] Function f: postcondition got status valid.
 [value] Recording results for f
 [value] Done for function f
 [value] computing for function g <- main.
         Called from PROJECT_FILE.i:347.
-PROJECT_FILE.i:143:[value] Function g: postcondition got status valid
-PROJECT_FILE.i:144:[value] Function g: postcondition got status valid
+PROJECT_FILE.i:143:[value] Function g: postcondition got status valid.
+PROJECT_FILE.i:144:[value] Function g: postcondition got status valid.
 [value] Recording results for g
 [value] Done for function g
 [value] computing for function h <- main.
         Called from PROJECT_FILE.i:348.
-PROJECT_FILE.i:162:[value] Function h: precondition got status valid
+PROJECT_FILE.i:162:[value] Function h: precondition got status valid.
 [value] computing for function mpz_init_set_si <- h <- main.
         Called from PROJECT_FILE.i:166.
-PROJECT_FILE.i:29:[value] Function mpz_init_set_si: postcondition got status unknown
+PROJECT_FILE.i:29:[value] Function mpz_init_set_si: postcondition got status unknown.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_init_set_si <- h <- main.
         Called from PROJECT_FILE.i:166.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_cmp <- h <- main.
         Called from PROJECT_FILE.i:167.
-PROJECT_FILE.i:45:[value] Function mpz_cmp: precondition got status valid
-PROJECT_FILE.i:46:[value] Function mpz_cmp: precondition got status valid
+PROJECT_FILE.i:45:[value] Function mpz_cmp: precondition got status valid.
+PROJECT_FILE.i:46:[value] Function mpz_cmp: precondition got status valid.
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <- h <- main.
         Called from PROJECT_FILE.i:168.
@@ -37,13 +37,13 @@ PROJECT_FILE.i:46:[value] Function mpz_cmp: precondition got status valid
 [value] Done for function printf
 [value] computing for function exit <- e_acsl_fail <- h <- main.
         Called from PROJECT_FILE.i:125.
-PROJECT_FILE.i:115:[value] Function exit: postcondition got status invalid
+PROJECT_FILE.i:115:[value] Function exit: postcondition got status invalid.
 [value] Done for function exit
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
 [value] computing for function mpz_clear <- h <- main.
         Called from PROJECT_FILE.i:169.
-PROJECT_FILE.i:39:[value] Function mpz_clear: precondition got status valid
+PROJECT_FILE.i:39:[value] Function mpz_clear: precondition got status valid.
 [value] Done for function mpz_clear
 [value] computing for function mpz_clear <- h <- main.
         Called from PROJECT_FILE.i:169.
@@ -52,8 +52,8 @@ PROJECT_FILE.i:39:[value] Function mpz_clear: precondition got status valid
 [value] Done for function h
 [value] computing for function i <- main.
         Called from PROJECT_FILE.i:349.
-PROJECT_FILE.i:176:[value] Function i: precondition got status valid
-PROJECT_FILE.i:177:[value] Function i: precondition got status valid
+PROJECT_FILE.i:176:[value] Function i: precondition got status valid.
+PROJECT_FILE.i:177:[value] Function i: precondition got status valid.
 [value] computing for function mpz_init_set_si <- i <- main.
         Called from PROJECT_FILE.i:181.
 [value] Done for function mpz_init_set_si
@@ -108,9 +108,9 @@ PROJECT_FILE.i:177:[value] Function i: precondition got status valid
 [value] Done for function i
 [value] computing for function j <- main.
         Called from PROJECT_FILE.i:350.
-PROJECT_FILE.i:196:[value] Function j, behavior b1: precondition got status valid
-PROJECT_FILE.i:200:[value] Function j, behavior b2: precondition got status valid
-PROJECT_FILE.i:201:[value] Function j, behavior b2: precondition got status valid
+PROJECT_FILE.i:196:[value] Function j, behavior b1: precondition got status valid.
+PROJECT_FILE.i:200:[value] Function j, behavior b2: precondition got status valid.
+PROJECT_FILE.i:201:[value] Function j, behavior b2: precondition got status valid.
 [value] computing for function mpz_init_set_si <- j <- main.
         Called from PROJECT_FILE.i:211.
 [value] Done for function mpz_init_set_si
@@ -141,13 +141,13 @@ PROJECT_FILE.i:201:[value] Function j, behavior b2: precondition got status vali
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_init <- j <- main.
         Called from PROJECT_FILE.i:215.
-PROJECT_FILE.i:21:[value] Function mpz_init: postcondition got status unknown
+PROJECT_FILE.i:21:[value] Function mpz_init: postcondition got status unknown.
 [value] Done for function mpz_init
 [value] computing for function mpz_add <- j <- main.
         Called from PROJECT_FILE.i:216.
-PROJECT_FILE.i:60:[value] Function mpz_add: precondition got status valid
-PROJECT_FILE.i:61:[value] Function mpz_add: precondition got status valid
-PROJECT_FILE.i:62:[value] Function mpz_add: precondition got status valid
+PROJECT_FILE.i:60:[value] Function mpz_add: precondition got status valid.
+PROJECT_FILE.i:61:[value] Function mpz_add: precondition got status valid.
+PROJECT_FILE.i:62:[value] Function mpz_add: precondition got status valid.
 [value] Done for function mpz_add
 [value] computing for function mpz_cmp <- j <- main.
         Called from PROJECT_FILE.i:217.
@@ -205,15 +205,15 @@ PROJECT_FILE.i:62:[value] Function mpz_add: precondition got status valid
 [value] computing for function mpz_clear <- j <- main.
         Called from PROJECT_FILE.i:224.
 [value] Done for function mpz_clear
-PROJECT_FILE.i:197:[value] Function j, behavior b1: postcondition got status valid
-PROJECT_FILE.i:202:[value] Function j, behavior b2: postcondition got status valid
+PROJECT_FILE.i:197:[value] Function j, behavior b1: postcondition got status valid.
+PROJECT_FILE.i:202:[value] Function j, behavior b2: postcondition got status valid.
 [value] Recording results for j
 [value] Done for function j
 [value] computing for function k <- main.
         Called from PROJECT_FILE.i:351.
-PROJECT_FILE.i:247:[value] Function k, behavior b1: assumption got status invalid; precondition not evaluated
-PROJECT_FILE.i:252:[value] Function k, behavior b2: precondition got status valid
-PROJECT_FILE.i:253:[value] Function k, behavior b2: precondition got status valid
+PROJECT_FILE.i:247:[value] Function k, behavior b1: assumption got status invalid; precondition not evaluated.
+PROJECT_FILE.i:252:[value] Function k, behavior b2: precondition got status valid.
+PROJECT_FILE.i:253:[value] Function k, behavior b2: precondition got status valid.
 [value] computing for function mpz_init_set_si <- k <- main.
         Called from PROJECT_FILE.i:266.
 [value] Done for function mpz_init_set_si

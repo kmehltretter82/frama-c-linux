@@ -19,7 +19,7 @@ PROJECT_FILE.i:138:[value] Assertion got status unknown.
 [value] Done for function printf
 [value] computing for function exit <- e_acsl_fail <- main.
         Called from PROJECT_FILE.i:125.
-PROJECT_FILE.i:115:[value] Function exit: postcondition got status invalid
+PROJECT_FILE.i:115:[value] Function exit: postcondition got status invalid.
 [value] Done for function exit
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
