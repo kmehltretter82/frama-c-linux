@@ -2,11 +2,11 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-PROJECT_FILE.i:134:[value] Assertion got status valid.
-PROJECT_FILE.i:137:[value] Assertion got status valid.
+PROJECT_FILE.i:134:[value] Assertion got status unknown.
+PROJECT_FILE.i:137:[value] Assertion got status unknown.
 [value] computing for function mpz_init_set_si <- main.
         Called from PROJECT_FILE.i:139.
-PROJECT_FILE.i:29:[value] Function mpz_init_set_si: postcondition got status unknown.
+PROJECT_FILE.i:29:[value] Function mpz_init_set_si: postcondition got status valid.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_init_set_si <- main.
         Called from PROJECT_FILE.i:139.

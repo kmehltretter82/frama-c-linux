@@ -6,7 +6,7 @@ tests/e-acsl-runtime/nested_code_annot.i:12:[kernel] warning: Body of function m
 PROJECT_FILE.i:134:[value] Assertion got status valid.
 [value] computing for function mpz_init_set_si <- main.
         Called from PROJECT_FILE.i:141.
-PROJECT_FILE.i:29:[value] Function mpz_init_set_si: postcondition got status unknown.
+PROJECT_FILE.i:29:[value] Function mpz_init_set_si: postcondition got status valid.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_init_set_si <- main.
         Called from PROJECT_FILE.i:141.

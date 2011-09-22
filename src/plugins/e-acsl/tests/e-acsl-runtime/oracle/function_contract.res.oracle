@@ -20,7 +20,7 @@ PROJECT_FILE.i:144:[value] Function g: postcondition got status valid.
 PROJECT_FILE.i:162:[value] Function h: precondition got status valid.
 [value] computing for function mpz_init_set_si <- h <- main.
         Called from PROJECT_FILE.i:166.
-PROJECT_FILE.i:29:[value] Function mpz_init_set_si: postcondition got status unknown.
+PROJECT_FILE.i:29:[value] Function mpz_init_set_si: postcondition got status valid.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_init_set_si <- h <- main.
         Called from PROJECT_FILE.i:166.
@@ -141,7 +141,7 @@ PROJECT_FILE.i:201:[value] Function j, behavior b2: precondition got status vali
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_init <- j <- main.
         Called from PROJECT_FILE.i:215.
-PROJECT_FILE.i:21:[value] Function mpz_init: postcondition got status unknown.
+PROJECT_FILE.i:21:[value] Function mpz_init: postcondition got status valid.
 [value] Done for function mpz_init
 [value] computing for function mpz_add <- j <- main.
         Called from PROJECT_FILE.i:216.

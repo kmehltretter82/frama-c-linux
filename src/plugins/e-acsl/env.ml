@@ -71,13 +71,9 @@ let is_empty env = env.var_cpt = 0 && is_empty_block env
 let add_stmt env s = 
   { env with beginning_of_block = s :: env.beginning_of_block }
 
-let add_assert s p = 
+let add_assert kf s p = 
   Queue.add
-    (fun () -> 
-      (* Don't work since the kernel_function does not yet exist in the new
-	 project. Virgile said he was implementing the missing stuff in the
-	 visitor. Wait and see... *)
-      let kf = Kernel_function.find_englobing_kf s in
+    (fun () ->
       Annotations.add_assert kf s [ !self ] p) 
     !queue
 

@@ -141,60 +141,60 @@ let constant_to_exp ?(loc=Location.unknown) = function
   | CStr _ | CWStr _ | CChr _ | CReal _ | CEnum _ as c -> 
     new_exp ?loc (Const c), false
 
-let rec thost_to_host env = function
+let rec thost_to_host kf env = function
   | TVar { lv_origin = Some v } -> Var v, env
   | TVar { lv_origin = None } -> Misc.not_yet "logic variable"
   | TResult _typ -> Misc.not_yet "\\result"
   | TMem t ->
-    let e, env = term_to_exp env (Ctype intType) t in
+    let e, env = term_to_exp kf env (Ctype intType) t in
     Options.warning ~source:(fst e.eloc) ~once:true
       "missing guard for ensuring that %a is a valid memory access"
       d_term t;
     Mem e, env
 
-and toffset_to_offset ?loc env = function
+and toffset_to_offset ?loc kf env = function
   | TNoOffset -> NoOffset, env
   | TField(f, offset) -> 
     (* TODO: still untested *)
-    let offset, env = toffset_to_offset ?loc env offset in
+    let offset, env = toffset_to_offset ?loc kf env offset in
     Field(f, offset), env
   | TIndex(t, offset) -> 
-    let e, env = term_to_exp env (Ctype intType) t in
+    let e, env = term_to_exp kf env (Ctype intType) t in
     Options.warning ~source:(fst e.eloc) ~once:true
       "missing guard for ensuring that %a is a valid array index"
       d_term t;
-    let offset, env = toffset_to_offset env offset in
+    let offset, env = toffset_to_offset kf env offset in
     Index(e, offset), env
 
-and tlval_to_lval env (host, offset) = 
-  let host, env = thost_to_host env host in
-  let offset, env = toffset_to_offset env offset in
+and tlval_to_lval kf env (host, offset) = 
+  let host, env = thost_to_host kf env host in
+  let offset, env = toffset_to_offset kf env offset in
   (host, offset), env
 
-and context_insensitive_term_to_exp env t = 
+and context_insensitive_term_to_exp kf env t = 
   let loc = t.term_loc in
   match t.term_node with
   | TConst c -> 
     let c, is_mpz_string = constant_to_exp ~loc c in
     c, env, is_mpz_string
   | TLval lv -> 
-    let lv, env = tlval_to_lval env lv in
+    let lv, env = tlval_to_lval kf env lv in
     new_exp ~loc (Lval lv), env, false
   | TSizeOf ty -> sizeOf ~loc ty, env, false
   | TSizeOfE t ->
     let ty = t.term_type in
     assert (match ty with Ctype _ -> true | _ -> false);
-    let e, env = term_to_exp env ty t in
+    let e, env = term_to_exp kf env ty t in
     sizeOf ~loc (typeOf e), env, false
   | TSizeOfStr s -> new_exp ~loc (SizeOfStr s), env, false
   | TAlignOf ty -> new_exp ~loc (AlignOf ty), env, false
   | TAlignOfE t ->
     let ty = t.term_type in
     assert (match ty with Ctype _ -> true | _ -> false);
-    let e, env = term_to_exp env ty t in
+    let e, env = term_to_exp kf env ty t in
     new_exp ~loc (AlignOfE e), env, false
   | TUnOp(Neg | BNot as op, t) ->
-    let e, env = term_to_exp env Linteger t in
+    let e, env = term_to_exp kf env Linteger t in
     let name = match op with
       | Neg -> "mpz_neg"
       | BNot -> "mpz_com"
@@ -208,7 +208,7 @@ and context_insensitive_term_to_exp env t =
     e, env, false
   | TUnOp(LNot, t) ->
     let ty = t.term_type in
-    let e, env = term_to_exp env ty t in
+    let e, env = term_to_exp kf env ty t in
     (* TODO: preserve the old behavior. But that is incorrect if [t] is an 
        integer since we have to implement a ! over mpz values.
        Such a case is actually possible. *)
@@ -216,8 +216,8 @@ and context_insensitive_term_to_exp env t =
     new_exp ~loc (UnOp(LNot, e, intType)), env, false
   | TBinOp(PlusA | MinusA | Mult as bop, t1, t2) ->
     (* arithmetic binary operator not safely convertible into C *)
-    let e1, env = term_to_exp env Linteger t1 in
-    let e2, env = term_to_exp env Linteger t2 in
+    let e1, env = term_to_exp kf env Linteger t1 in
+    let e2, env = term_to_exp kf env Linteger t2 in
     assert (Typ.equal (typeOf e1) (typeOf e2));
     let name = name_of_mpz_arith_bop bop in
     let mk_stmts _ e = [ Misc.mk_call ~loc name [ e; e1; e2 ] ] in
@@ -226,18 +226,18 @@ and context_insensitive_term_to_exp env t =
   | TBinOp(Div | Mod as bop, t1, t2) ->
     (* arithmetic binary operator potentially convertible into C *)
     let ctx = principal_type_from_term t1 t2 in
-    let e1, env = term_to_exp env ctx t1 in
-    let e2, env = term_to_exp env ctx t2 in
+    let e1, env = term_to_exp kf env ctx t1 in
+    let e2, env = term_to_exp kf env ctx t2 in
     (* guarding divisions and modulos *)
     let zero = Logic_const.tinteger ~ikind:IInt 0 in
     (* do not generate [e2] from [t2] twice *)
-    let guard, env = comparison_to_exp env ~e1:(e2, ctx) Eq t2 zero in
+    let guard, env = comparison_to_exp kf env ~e1:(e2, ctx) Eq t2 zero in
     let mk_stmts v e = 
       let name = name_of_mpz_arith_bop bop in
       let cond = 
 	Misc.mk_e_acsl_guard guard (Logic_const.prel (Req, t2, zero)) 
       in
-      Env.add_assert cond (Logic_const.prel (Rneq, t2, zero));
+      Env.add_assert kf cond (Logic_const.prel (Rneq, t2, zero));
       let instr = match ctx with
 	| Ctype ty when isIntegralType ty -> 
 	  let e = new_exp ~loc (BinOp(bop, e1, e2, ty)) in
@@ -255,7 +255,7 @@ and context_insensitive_term_to_exp env t =
     e, env, false
   | TBinOp(Lt | Gt | Le | Ge | Eq | Ne as bop, t1, t2) ->
     (* comparison operators *)
-    let e, env = comparison_to_exp ~loc env bop t1 t2 in
+    let e, env = comparison_to_exp ~loc kf env bop t1 t2 in
     e, env, false
   | TBinOp((Shiftlt | Shiftrt), _, _) ->
     (* left/right shift *)
@@ -272,8 +272,8 @@ and context_insensitive_term_to_exp env t =
 	Ctype intType 
       | ty -> ty
     in
-    let e1, env = term_to_exp env (ctx_type t1) t1 in
-    let e2, env = term_to_exp env (ctx_type t2) t2 in
+    let e1, env = term_to_exp kf env (ctx_type t1) t1 in
+    let e2, env = term_to_exp kf env (ctx_type t2) t2 in
     Options.warning ~source:(fst loc) ~once:true
       "missing guard for ensuring that %a is a valid pointer"
       d_term t;
@@ -281,13 +281,13 @@ and context_insensitive_term_to_exp env t =
        whatever is [e2] *)
     new_exp ~loc (BinOp(bop, e1, e2, typeOf e1)), env, false
   | TCastE(ty, t) ->
-    let e, env = term_to_exp env (Ctype ty) t in
+    let e, env = term_to_exp kf env (Ctype ty) t in
     mkCast e ty, env, false
   | TAddrOf lv -> 
-    let lv, env = tlval_to_lval env lv in
+    let lv, env = tlval_to_lval kf env lv in
     mkAddrOf ~loc lv, env, false
   | TStartOf lv -> 
-    let lv, env = tlval_to_lval env lv in
+    let lv, env = tlval_to_lval kf env lv in
     mkAddrOrStartOf ~loc lv, env, false
   | Tapp _ -> Misc.not_yet "applying logic function"
   | Tlambda _ -> Misc.not_yet "functional"
@@ -312,12 +312,12 @@ and context_insensitive_term_to_exp env t =
 (* Convert an ACSL term into a corresponding C expression (if any) in the given
    environment. Also extend this environment which includes the generating
    constructs. *)
-and term_to_exp env ctx t = 
-  let e, env, is_mpz_string = context_insensitive_term_to_exp env t in
+and term_to_exp kf env ctx t = 
+  let e, env, is_mpz_string = context_insensitive_term_to_exp kf env t in
   context_sensitive ~loc:t.term_loc env ctx is_mpz_string e
 
 (* generate the C code equivalent to [t1 bop t2]. *)
-and comparison_to_exp ?(loc=Location.unknown) ?e1 env bop t1 t2 =
+and comparison_to_exp ?(loc=Location.unknown) kf ?e1 env bop t1 t2 =
   let ctx = match e1 with
     | None -> principal_type_from_term t1 t2 
     | Some(_, ctx) -> 
@@ -327,11 +327,11 @@ and comparison_to_exp ?(loc=Location.unknown) ?e1 env bop t1 t2 =
 (*  Options.feedback "principal type of %a and %a is %a" 
     d_term t1 d_term t2 d_logic_type ctx;*)
   let e1, env = match e1 with
-    | None -> term_to_exp env ctx t1
+    | None -> term_to_exp kf env ctx t1
     | Some(e1, ctx1) when Cil_datatype.Logic_type.equal ctx ctx1 -> e1, env
     | Some(e1, _) -> context_sensitive ~loc:e1.eloc env ctx false e1
   in
-  let e2, env = term_to_exp env ctx t2 in
+  let e2, env = term_to_exp kf env ctx t2 in
   match ctx with
   | Linteger ->
     let e, env =
@@ -347,7 +347,7 @@ and comparison_to_exp ?(loc=Location.unknown) ?e1 env bop t1 t2 =
 (* Convert an ACSL named predicate into a corresponding C expression (if
    any) in the given environment. Also extend this environment which includes
    the generating constructs. *)
-let rec named_predicate_to_exp env p = 
+let rec named_predicate_to_exp kf env p = 
   let loc = p.loc in
   match p.content with
   | Pfalse -> zero ~loc, env
@@ -355,13 +355,13 @@ let rec named_predicate_to_exp env p =
   | Papp _ -> Misc.not_yet "logic function application"
   | Pseparated _ -> Misc.not_yet "separated"
   | Prel(rel, t1, t2) -> 
-    let e, env = comparison_to_exp ~loc env (relation_to_binop rel) t1 t2 in
+    let e, env = comparison_to_exp ~loc kf env (relation_to_binop rel) t1 t2 in
     context_sensitive ~loc env (Ctype intType) false e
   | Pand(p1, p2) ->
     (* p1 && p2 <==> if p1 then p2 else false *)
-    let e1, env1 = named_predicate_to_exp env p1 in
+    let e1, env1 = named_predicate_to_exp kf env p1 in
     let e2, env2 = 
-      named_predicate_to_exp (Env.no_overlap ~from:env1 Env.empty) p2 
+      named_predicate_to_exp kf (Env.no_overlap ~from:env1 Env.empty) p2 
     in
     let env = Env.merge_block_vars ~from:env2 env1 in
     Env.new_var
@@ -379,9 +379,9 @@ let rec named_predicate_to_exp env p =
 	[ mkStmt ~valid_sid:true (If(e1, then_block, else_block, loc)) ])
   | Por(p1, p2) -> 
     (* p1 || p2 <==> if p1 then true else p2 *)
-    let e1, env1 = named_predicate_to_exp env p1 in
+    let e1, env1 = named_predicate_to_exp kf env p1 in
     let e2, env2 = 
-      named_predicate_to_exp (Env.no_overlap ~from:env1 Env.empty) p2 
+      named_predicate_to_exp kf (Env.no_overlap ~from:env1 Env.empty) p2 
     in
     let env = Env.merge_block_vars ~from:env2 env1 in
     Env.new_var
@@ -399,10 +399,10 @@ let rec named_predicate_to_exp env p =
 	[ mkStmt ~valid_sid:true (If(e1, then_block, else_block, loc)) ])
   | Pxor _ -> Misc.not_yet "xor"
   | Pimplies(p1, p2) -> 
-    named_predicate_to_exp env (Logic_const.por ((Logic_const.pnot p1), p2))
+    named_predicate_to_exp kf env (Logic_const.por ((Logic_const.pnot p1), p2))
   | Piff _ -> Misc.not_yet "<==>"
   | Pnot p ->
-    let e, env = named_predicate_to_exp env p in
+    let e, env = named_predicate_to_exp kf env p in
     new_exp ~loc (UnOp(LNot, e, TInt(IInt, []))), env
   | Pif _ -> Misc.not_yet "_ ? _ : _"
   | Plet _ -> Misc.not_yet "let _ = _ in _"
@@ -421,7 +421,7 @@ let rec named_predicate_to_exp env p =
    statement (if any) for runtime assertion checking *)
 (* ************************************************************************** *)
 
-let convert_preconditions env behaviors =
+let convert_preconditions kf env behaviors =
   let do_behavior env b = 
     let assumes_pred =
       List.fold_left
@@ -434,14 +434,14 @@ let convert_preconditions env behaviors =
 	let p = 
 	  Logic_const.pimplies (assumes_pred, Logic_const.unamed p.ip_content)
 	in
-	let e, env = named_predicate_to_exp env p in
+	let e, env = named_predicate_to_exp kf env p in
 	Env.add_stmt env (Misc.mk_e_acsl_guard ~reverse:true e p))
       env
       b.b_requires
   in 
   List.fold_left do_behavior env behaviors
 
-let convert_postconditions env behaviors =
+let convert_postconditions kf env behaviors =
   (* generate one guard by postcondition of each behavior *)
   let do_behavior env b = 
     List.fold_left
@@ -452,7 +452,7 @@ let convert_postconditions env behaviors =
 	    if p <> Ptrue && b.b_assumes <> [] then 
 	      Misc.not_yet "assumes in conjunction with ensures in behaviors";
 	    let p = Logic_const.unamed p in
-	    let e, env = named_predicate_to_exp env p in
+	    let e, env = named_predicate_to_exp kf env p in
 	    Env.add_stmt env (Misc.mk_e_acsl_guard ~reverse:true e p)
 	  | Exits | Breaks | Continues | Returns ->
 	    Misc.not_yet "abnormal termination case in behavior")
@@ -461,7 +461,7 @@ let convert_postconditions env behaviors =
   in 
   List.fold_left do_behavior env behaviors
 
-let convert_behaviors env behaviors =
+let convert_behaviors kf env behaviors =
   List.iter
     (fun b ->
       if b.b_assigns <> WritesAny then 
@@ -469,10 +469,11 @@ let convert_behaviors env behaviors =
       if b.b_extended <> [] then Misc.not_yet "grammar extensions in behavior")
     behaviors;
   let pre_env = 
-    convert_preconditions (Env.no_overlap ~from:env Env.empty) behaviors 
+    convert_preconditions kf (Env.no_overlap ~from:env Env.empty) behaviors 
   in
   let post_env = 
-    convert_postconditions (Env.no_overlap ~from:pre_env Env.empty) behaviors 
+    convert_postconditions kf 
+      (Env.no_overlap ~from:pre_env Env.empty) behaviors 
   in
   let env = Env.merge_function_vars ~from:pre_env env in
   let env = Env.merge_function_vars ~from:post_env env in
@@ -480,29 +481,29 @@ let convert_behaviors env behaviors =
   Env.close_block_option post_env,
   env
 
-let convert_spec env spec =
+let convert_spec kf env spec =
   if spec.spec_variant <> None then Misc.not_yet "variant clause";
   if spec.spec_terminates <> None then Misc.not_yet "terminates clause";
   if spec.spec_complete_behaviors <> [] then Misc.not_yet "complete behaviors";
   if spec.spec_disjoint_behaviors <> [] then Misc.not_yet "disjoint behaviors";
-  convert_behaviors env spec.spec_behavior
+  convert_behaviors kf env spec.spec_behavior
 
-let convert_named_predicate env p =
-  let e, env = named_predicate_to_exp env p in
+let convert_named_predicate kf env p =
+  let e, env = named_predicate_to_exp kf env p in
   assert (Typ.equal (typeOf e) intType);
   Env.add_stmt env (Misc.mk_e_acsl_guard ~reverse:true e p)
 
-let convert_code_annotation env annot =
+let convert_code_annotation kf env annot =
   try
     match annot.annot_content with
     | AAssert(l, p) -> 
       if l <> [] then Misc.not_yet "assertions applied only on some behaviors";
-      convert_named_predicate env p, None
+      convert_named_predicate kf env p, None
     | AStmtSpec(l, spec) ->
       if l <> [] then 
         Misc.not_yet "statement contract applied only on some behaviors";
       let pre_block, post_block, new_env =
-	convert_spec env spec 
+	convert_spec kf env spec 
       in
       let env = Env.merge_function_vars ~from:new_env env in
       let env = match pre_block with
@@ -559,8 +560,12 @@ class e_acsl_visitor prj generate = object (self)
 	  (self :> Visitor.frama_c_visitor)
 	  (Kernel_function.get_spec old_kf)
       in
+      (* We definitely are inside a function here. *)
+      let kf =
+        Cil.get_kernel_function self#behavior (Extlib.the self#current_kf)
+      in
       let pre_b, post_b, env = 
-	Project.on prj (convert_spec Env.empty) spec
+	Project.on prj (convert_spec kf Env.empty) spec
       in
       pre_block <- pre_b;
       post_block <- post_b;
@@ -586,13 +591,19 @@ class e_acsl_visitor prj generate = object (self)
     let env, post_stmts =
       Annotations.single_fold_stmt
 	(fun (User old_a | AI(_, old_a)) (env, post_stmts) -> 
-	  let a = 
-	    Visitor.visitFramacCodeAnnotation
-	      (self :> Visitor.frama_c_visitor)
+	  let a =
+            (* [VP] Don't use Visitor here, as it will fill the
+               queue in the middle of the computation...
+             *)
+	    Cil.visitCilCodeAnnotation
+	      (self :> Cil.cilVisitor)
 	      old_a
 	  in
+          let kf =
+            Cil.get_kernel_function self#behavior (Extlib.the self#current_kf)
+          in
 	  let env, post_block = 
-	    Project.on prj (convert_code_annotation env) a
+	    Project.on prj (convert_code_annotation kf env) a
 	  in
 	  let post_stmts = match post_block with
 	    | None -> post_stmts

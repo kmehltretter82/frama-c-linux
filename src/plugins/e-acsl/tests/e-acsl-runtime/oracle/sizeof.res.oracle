@@ -5,7 +5,7 @@
 PROJECT_FILE.i:131:[value] Assertion got status valid.
 [value] computing for function mpz_init_set_si <- main.
         Called from PROJECT_FILE.i:133.
-PROJECT_FILE.i:29:[value] Function mpz_init_set_si: postcondition got status unknown.
+PROJECT_FILE.i:29:[value] Function mpz_init_set_si: postcondition got status valid.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_init_set_si <- main.
         Called from PROJECT_FILE.i:133.

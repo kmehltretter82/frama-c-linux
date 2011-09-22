@@ -60,9 +60,9 @@ val merge_block_vars: from:t -> t -> t
 val add_stmt: t -> stmt -> t
   (** [add_stmt env s] extends [env] with the new statement [s] *)
 
-val add_assert: stmt -> predicate named -> unit
-  (** [add_assert s p] extends the global environment with an assertion [p]
-      associated to the statement [s]. *)
+val add_assert: kernel_function -> stmt -> predicate named -> unit
+  (** [add_assert kf s p] extends the global environment with an assertion [p]
+      associated to the statement [s] in function [kf]. *)
 
 val register_actions_queue: (unit -> unit) Queue.t -> unit
   (** To be called once at initialization time: the queue of event of the

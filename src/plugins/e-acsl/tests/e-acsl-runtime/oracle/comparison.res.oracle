@@ -7,7 +7,7 @@ PROJECT_FILE.i:138:[value] Assertion got status valid.
 PROJECT_FILE.i:141:[value] Assertion got status valid.
 [value] computing for function mpz_init_set_si <- main.
         Called from PROJECT_FILE.i:143.
-PROJECT_FILE.i:29:[value] Function mpz_init_set_si: postcondition got status unknown.
+PROJECT_FILE.i:29:[value] Function mpz_init_set_si: postcondition got status valid.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_init_set_si <- main.
         Called from PROJECT_FILE.i:143.
@@ -62,7 +62,7 @@ PROJECT_FILE.i:149:[value] Assertion got status valid.
         Called from PROJECT_FILE.i:154.
 [value] Done for function mpz_clear
 PROJECT_FILE.i:158:[value] Assertion got status valid.
-PROJECT_FILE.i:161:[value] Assertion got status valid.
+PROJECT_FILE.i:161:[value] Assertion got status unknown.
 PROJECT_FILE.i:164:[value] Assertion got status valid.
 PROJECT_FILE.i:167:[value] Assertion got status valid.
 PROJECT_FILE.i:170:[value] Assertion got status valid.
@@ -75,7 +75,7 @@ PROJECT_FILE.i:182:[value] Assertion got status valid.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_init <- main.
         Called from PROJECT_FILE.i:184.
-PROJECT_FILE.i:21:[value] Function mpz_init: postcondition got status unknown.
+PROJECT_FILE.i:21:[value] Function mpz_init: postcondition got status valid.
 [value] Done for function mpz_init
 [value] computing for function mpz_neg <- main.
         Called from PROJECT_FILE.i:185.

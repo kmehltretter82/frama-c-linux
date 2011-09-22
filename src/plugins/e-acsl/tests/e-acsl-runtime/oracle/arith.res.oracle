@@ -6,24 +6,24 @@
 PROJECT_FILE.i:134:[value] Assertion got status valid.
 [value] computing for function mpz_init_set_si <- main.
         Called from PROJECT_FILE.i:136.
-PROJECT_FILE.i:29:[value] Function mpz_init_set_si: postcondition got status unknown
+PROJECT_FILE.i:29:[value] Function mpz_init_set_si: postcondition got status valid.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_init <- main.
         Called from PROJECT_FILE.i:136.
-PROJECT_FILE.i:21:[value] Function mpz_init: postcondition got status unknown
+PROJECT_FILE.i:21:[value] Function mpz_init: postcondition got status valid.
 [value] Done for function mpz_init
 [value] computing for function mpz_neg <- main.
         Called from PROJECT_FILE.i:137.
-PROJECT_FILE.i:55:[value] Function mpz_neg: precondition got status valid
-PROJECT_FILE.i:56:[value] Function mpz_neg: precondition got status valid
+PROJECT_FILE.i:55:[value] Function mpz_neg: precondition got status valid.
+PROJECT_FILE.i:56:[value] Function mpz_neg: precondition got status valid.
 [value] Done for function mpz_neg
 [value] computing for function mpz_init_set_si <- main.
         Called from PROJECT_FILE.i:137.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_cmp <- main.
         Called from PROJECT_FILE.i:138.
-PROJECT_FILE.i:45:[value] Function mpz_cmp: precondition got status valid
-PROJECT_FILE.i:46:[value] Function mpz_cmp: precondition got status valid
+PROJECT_FILE.i:45:[value] Function mpz_cmp: precondition got status valid.
+PROJECT_FILE.i:46:[value] Function mpz_cmp: precondition got status valid.
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <- main.
         Called from PROJECT_FILE.i:139.
@@ -32,13 +32,13 @@ PROJECT_FILE.i:46:[value] Function mpz_cmp: precondition got status valid
 [value] Done for function printf
 [value] computing for function exit <- e_acsl_fail <- main.
         Called from PROJECT_FILE.i:125.
-PROJECT_FILE.i:115:[value] Function exit: postcondition got status invalid
+PROJECT_FILE.i:115:[value] Function exit: postcondition got status invalid.
 [value] Done for function exit
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
 [value] computing for function mpz_clear <- main.
         Called from PROJECT_FILE.i:140.
-PROJECT_FILE.i:39:[value] Function mpz_clear: precondition got status valid
+PROJECT_FILE.i:39:[value] Function mpz_clear: precondition got status valid.
 [value] Done for function mpz_clear
 [value] computing for function mpz_clear <- main.
         Called from PROJECT_FILE.i:140.
@@ -129,9 +129,9 @@ PROJECT_FILE.i:161:[value] Assertion got status valid.
 [value] Done for function mpz_init
 [value] computing for function mpz_add <- main.
         Called from PROJECT_FILE.i:165.
-PROJECT_FILE.i:60:[value] Function mpz_add: precondition got status valid
-PROJECT_FILE.i:61:[value] Function mpz_add: precondition got status valid
-PROJECT_FILE.i:62:[value] Function mpz_add: precondition got status valid
+PROJECT_FILE.i:60:[value] Function mpz_add: precondition got status valid.
+PROJECT_FILE.i:61:[value] Function mpz_add: precondition got status valid.
+PROJECT_FILE.i:62:[value] Function mpz_add: precondition got status valid.
 [value] Done for function mpz_add
 [value] computing for function mpz_init_set_si <- main.
         Called from PROJECT_FILE.i:165.
@@ -182,9 +182,9 @@ PROJECT_FILE.i:173:[value] Assertion got status valid.
 [value] Done for function mpz_init
 [value] computing for function mpz_sub <- main.
         Called from PROJECT_FILE.i:177.
-PROJECT_FILE.i:66:[value] Function mpz_sub: precondition got status valid
-PROJECT_FILE.i:67:[value] Function mpz_sub: precondition got status valid
-PROJECT_FILE.i:68:[value] Function mpz_sub: precondition got status valid
+PROJECT_FILE.i:66:[value] Function mpz_sub: precondition got status valid.
+PROJECT_FILE.i:67:[value] Function mpz_sub: precondition got status valid.
+PROJECT_FILE.i:68:[value] Function mpz_sub: precondition got status valid.
 [value] Done for function mpz_sub
 [value] computing for function mpz_init_set_si <- main.
         Called from PROJECT_FILE.i:177.
@@ -235,9 +235,9 @@ PROJECT_FILE.i:185:[value] Assertion got status valid.
 [value] Done for function mpz_init
 [value] computing for function mpz_mul <- main.
         Called from PROJECT_FILE.i:189.
-PROJECT_FILE.i:72:[value] Function mpz_mul: precondition got status valid
-PROJECT_FILE.i:73:[value] Function mpz_mul: precondition got status valid
-PROJECT_FILE.i:74:[value] Function mpz_mul: precondition got status valid
+PROJECT_FILE.i:72:[value] Function mpz_mul: precondition got status valid.
+PROJECT_FILE.i:73:[value] Function mpz_mul: precondition got status valid.
+PROJECT_FILE.i:74:[value] Function mpz_mul: precondition got status valid.
 [value] Done for function mpz_mul
 [value] computing for function mpz_init_set_si <- main.
         Called from PROJECT_FILE.i:189.
@@ -285,7 +285,7 @@ PROJECT_FILE.i:197:[value] Assertion got status valid.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_get_si <- main.
         Called from PROJECT_FILE.i:201.
-PROJECT_FILE.i:92:[value] Function mpz_get_si: precondition got status valid
+PROJECT_FILE.i:92:[value] Function mpz_get_si: precondition got status valid.
 [value] Done for function mpz_get_si
 [value] computing for function mpz_init <- main.
         Called from PROJECT_FILE.i:201.
@@ -303,9 +303,9 @@ PROJECT_FILE.i:202:[value] Assertion got status valid.
 [value] Done for function e_acsl_fail
 [value] computing for function mpz_cdiv_q <- main.
         Called from PROJECT_FILE.i:204.
-PROJECT_FILE.i:78:[value] Function mpz_cdiv_q: precondition got status valid
-PROJECT_FILE.i:79:[value] Function mpz_cdiv_q: precondition got status valid
-PROJECT_FILE.i:80:[value] Function mpz_cdiv_q: precondition got status valid
+PROJECT_FILE.i:78:[value] Function mpz_cdiv_q: precondition got status valid.
+PROJECT_FILE.i:79:[value] Function mpz_cdiv_q: precondition got status valid.
+PROJECT_FILE.i:80:[value] Function mpz_cdiv_q: precondition got status valid.
 [value] Done for function mpz_cdiv_q
 [value] computing for function mpz_init_set_si <- main.
         Called from PROJECT_FILE.i:204.
@@ -347,7 +347,7 @@ PROJECT_FILE.i:80:[value] Function mpz_cdiv_q: precondition got status valid
 PROJECT_FILE.i:212:[value] Assertion got status valid.
 [value] computing for function mpz_init_set_str <- main.
         Called from PROJECT_FILE.i:215.
-PROJECT_FILE.i:33:[value] Function mpz_init_set_str: postcondition got status unknown
+PROJECT_FILE.i:33:[value] Function mpz_init_set_str: postcondition got status valid.
 [value] Done for function mpz_init_set_str
 [value] computing for function mpz_init_set_str <- main.
         Called from PROJECT_FILE.i:216.

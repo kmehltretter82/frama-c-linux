@@ -7,7 +7,7 @@ PROJECT_FILE.i:135:[value] Assertion got status valid.
 PROJECT_FILE.i:138:[value] Assertion got status valid.
 [value] computing for function mpz_init_set_str <- main.
         Called from PROJECT_FILE.i:140.
-PROJECT_FILE.i:33:[value] Function mpz_init_set_str: postcondition got status unknown.
+PROJECT_FILE.i:33:[value] Function mpz_init_set_str: postcondition got status valid.
 [value] Done for function mpz_init_set_str
 [value] computing for function mpz_init_set_str <- main.
         Called from PROJECT_FILE.i:141.

@@ -7,7 +7,7 @@ tests/e-acsl-runtime/cast.i:18:[e-acsl] warning: missing guard for ensuring that
 PROJECT_FILE.i:134:[value] Assertion got status valid.
 [value] computing for function mpz_init_set_str <- main.
         Called from PROJECT_FILE.i:136.
-PROJECT_FILE.i:33:[value] Function mpz_init_set_str: postcondition got status unknown.
+PROJECT_FILE.i:33:[value] Function mpz_init_set_str: postcondition got status valid.
 [value] Done for function mpz_init_set_str
 [value] computing for function mpz_get_si <- main.
         Called from PROJECT_FILE.i:137.
