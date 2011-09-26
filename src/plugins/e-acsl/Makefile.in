@@ -100,12 +100,5 @@ include $(FRAMAC_SHARE)/Makefile.dynamic
 # Regenerating the Makefile on need #
 #####################################
 
-ifeq ("$(FRAMAC_INTERNAL)","yes")
-CONFIG_STATUS_DIR=$(FRAMAC_SRC)
-else
-CONFIG_STATUS_DIR=.
-endif
-
-$(E_ACSL_DIR)/Makefile: $(E_ACSL_DIR)/Makefile.in \
-				$(CONFIG_STATUS_DIR)/config.status
-	cd $(CONFIG_STATUS_DIR) && ./config.status
+$(E_ACSL_DIR)/Makefile: $(E_ACSL_DIR)/Makefile.in $(E_ACSL_DIR)/config.status
+	cd $(E_ACSL_DIR) && ./config.status

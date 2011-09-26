@@ -55,7 +55,7 @@ AC_CHECK_HEADER(stdio.h,HAVE_STDIO_H=yes,)
 if test -z $CC; then
   MAY_RUN_TESTS=no
   AC_MSG_WARN([no C compiler: non-regression tests unavailable.])
-fi
+else
 
 if test -z $HAVE_STDIO_H; then
   MAY_COMPILE_WITH_CC=false
@@ -87,6 +87,8 @@ if test -z $HAVE_GMP; then
   AC_MSG_WARN([GMP library missing: cannot use E-ACSL option -e-acsl-include-headers.])
   AC_MSG_WARN([GMP library missing: non-regression tests unavailable.])
 fi
+
+fi # testing $CC
 
 #######################
 # Generating Makefile #
