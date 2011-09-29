@@ -570,7 +570,7 @@ __inline static mp_limb_t __gmpn_neg_n(mp_ptr __gmp_rp, mp_srcptr __gmp_up,
 extern void exit(int status);
 void e_acsl_fail(char *msg)
 {
-  printf((char const *)"%s\n",msg);
+  printf("%s\n",msg);
   exit(1);
   return;
 }
@@ -830,23 +830,23 @@ int main(void)
   
   x += y;
   /*@ requires x ≡ 5; */
-  /*@ requires y ≡ 2; */
   { mpz_t e_acsl_86; mpz_t e_acsl_87; int e_acsl_88;
-    __gmpz_init_set_si((__mpz_struct *)(e_acsl_86),(long)y);
-    __gmpz_init_set_si((__mpz_struct *)(e_acsl_87),(long)2);
+    __gmpz_init_set_si((__mpz_struct *)(e_acsl_86),(long)x);
+    __gmpz_init_set_si((__mpz_struct *)(e_acsl_87),(long)5);
     e_acsl_88 = __gmpz_cmp((__mpz_struct const *)(e_acsl_86),
                            (__mpz_struct const *)(e_acsl_87));
-    if (! (e_acsl_88 == 0)) { e_acsl_fail((char *)"(y == 2)"); }
+    if (! (e_acsl_88 == 0)) { e_acsl_fail((char *)"(x == 5)"); }
     __gmpz_clear((__mpz_struct *)(e_acsl_86));
     __gmpz_clear((__mpz_struct *)(e_acsl_87));
   }
   
+  /*@ requires y ≡ 2; */
   { mpz_t e_acsl_89; mpz_t e_acsl_90; int e_acsl_91;
-    __gmpz_init_set_si((__mpz_struct *)(e_acsl_89),(long)x);
-    __gmpz_init_set_si((__mpz_struct *)(e_acsl_90),(long)5);
+    __gmpz_init_set_si((__mpz_struct *)(e_acsl_89),(long)y);
+    __gmpz_init_set_si((__mpz_struct *)(e_acsl_90),(long)2);
     e_acsl_91 = __gmpz_cmp((__mpz_struct const *)(e_acsl_89),
                            (__mpz_struct const *)(e_acsl_90));
-    if (! (e_acsl_91 == 0)) { e_acsl_fail((char *)"(x == 5)"); }
+    if (! (e_acsl_91 == 0)) { e_acsl_fail((char *)"(y == 2)"); }
     __gmpz_clear((__mpz_struct *)(e_acsl_89));
     __gmpz_clear((__mpz_struct *)(e_acsl_90));
   }

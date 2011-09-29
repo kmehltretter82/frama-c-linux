@@ -293,24 +293,6 @@ PROJECT_FILE.i:229:[value] Assertion got status valid.
 [value] Done for function mpz_clear
 [value] Recording results for main
 [value] done for function main
-[from] Computing for function mpz_init_set_si
-[from] Done for function mpz_init_set_si
-[from] Computing for function mpz_cmp
-[from] Done for function mpz_cmp
-[from] Computing for function e_acsl_fail
-[from] Computing for function printf <-e_acsl_fail
-[from] Done for function printf
-PROJECT_FILE.i:125:[from] warning: variadic call detected. Using only 1 argument(s).
-[from] Computing for function exit <-e_acsl_fail
-[from] Done for function exit
-PROJECT_FILE.i:125:[from] Non terminating function (no dependencies)
-[from] Done for function e_acsl_fail
-[from] Computing for function mpz_clear
-[from] Done for function mpz_clear
-[from] Computing for function mpz_init
-[from] Done for function mpz_init
-[from] Computing for function mpz_neg
-[from] Done for function mpz_neg
 [value] ====== VALUES COMPUTED ======
 [value] Values for function e_acsl_fail:
           NON TERMINATING FUNCTION
