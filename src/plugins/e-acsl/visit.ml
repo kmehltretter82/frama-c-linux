@@ -593,11 +593,8 @@ class e_acsl_visitor prj generate = object (self)
 	(fun (User old_a | AI(_, old_a)) (env, post_stmts) -> 
 	  let a =
             (* [VP] Don't use Visitor here, as it will fill the
-               queue in the middle of the computation...
-             *)
-	    Cil.visitCilCodeAnnotation
-	      (self :> Cil.cilVisitor)
-	      old_a
+               queue in the middle of the computation... *)
+	    Cil.visitCilCodeAnnotation (self :> Cil.cilVisitor) old_a
 	  in
           let kf =
             Cil.get_kernel_function self#behavior (Extlib.the self#current_kf)
@@ -607,8 +604,7 @@ class e_acsl_visitor prj generate = object (self)
 	  in
 	  let post_stmts = match post_block with
 	    | None -> post_stmts
-	    | Some b ->
-              mkStmt ~valid_sid:true (Block b) :: post_stmts
+	    | Some b -> mkStmt ~valid_sid:true (Block b) :: post_stmts
 	  in
 	  env, post_stmts) 
 	(get_original_stmt self#behavior stmt)
@@ -638,7 +634,7 @@ class e_acsl_visitor prj generate = object (self)
 	  | Some b ->
 	    (* that is the return stmt of a function with a postcondition *)
 	    post_block <- None;
-	    post_stmts @ [ mkStmt ~valid_sid:true (Block b) ]
+	    mkStmt ~valid_sid:true (Block b) :: post_stmts
 	else
 	  post_stmts
       in
