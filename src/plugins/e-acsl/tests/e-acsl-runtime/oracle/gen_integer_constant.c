@@ -575,15 +575,13 @@ int main(void)
   /*@ assert 0 ≢ 1; */ ;
   if (! (0 != 1)) { e_acsl_fail((char *)"(0 != 1)"); }
   /*@ assert 1152921504606846975 ≡ 0xfffffffffffffff; */ ;
-  { mpz_t e_acsl_1; mpz_t e_acsl_2; int e_acsl_3;
+  { mpz_t e_acsl_1; int e_acsl_2;
     __gmpz_init_set_str((__mpz_struct *)(e_acsl_1),"1152921504606846975",10);
-    __gmpz_init_set_str((__mpz_struct *)(e_acsl_2),"1152921504606846975",10);
-    e_acsl_3 = __gmpz_cmp((__mpz_struct const *)(e_acsl_1),
-                          (__mpz_struct const *)(e_acsl_2));
-    if (! (e_acsl_3 == 0)) {
+    e_acsl_2 = __gmpz_cmp((__mpz_struct const *)(e_acsl_1),
+                          (__mpz_struct const *)(e_acsl_1));
+    if (! (e_acsl_2 == 0)) {
       e_acsl_fail((char *)"(1152921504606846975 == 0xfffffffffffffff)");
     } __gmpz_clear((__mpz_struct *)(e_acsl_1));
-    __gmpz_clear((__mpz_struct *)(e_acsl_2));
   }
   
   __retres = 0;

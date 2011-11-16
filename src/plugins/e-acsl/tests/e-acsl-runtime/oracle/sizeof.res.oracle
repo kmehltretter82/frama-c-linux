@@ -2,62 +2,62 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-PROJECT_FILE.i:131:[value] Assertion got status valid.
+PROJECT_FILE.i:135:[value] Assertion got status valid.
 [value] computing for function mpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:133.
-PROJECT_FILE.i:29:[value] Function mpz_init_set_si: postcondition got status valid.
+        Called from PROJECT_FILE.i:137.
+PROJECT_FILE.i:33:[value] Function mpz_init_set_si: postcondition got status valid.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:133.
+        Called from PROJECT_FILE.i:137.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_cmp <- main.
-        Called from PROJECT_FILE.i:134.
-PROJECT_FILE.i:45:[value] Function mpz_cmp: precondition got status valid.
-PROJECT_FILE.i:46:[value] Function mpz_cmp: precondition got status valid.
+        Called from PROJECT_FILE.i:138.
+PROJECT_FILE.i:49:[value] Function mpz_cmp: precondition got status valid.
+PROJECT_FILE.i:50:[value] Function mpz_cmp: precondition got status valid.
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:135.
+        Called from PROJECT_FILE.i:139.
 [value] computing for function printf <- e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:125.
+        Called from PROJECT_FILE.i:129.
 [value] Done for function printf
 [value] computing for function exit <- e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:125.
-PROJECT_FILE.i:115:[value] Function exit: postcondition got status invalid.
+        Called from PROJECT_FILE.i:129.
+PROJECT_FILE.i:119:[value] Function exit: postcondition got status invalid.
 [value] Done for function exit
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
 [value] computing for function mpz_clear <- main.
-        Called from PROJECT_FILE.i:136.
-PROJECT_FILE.i:39:[value] Function mpz_clear: precondition got status valid.
+        Called from PROJECT_FILE.i:140.
+PROJECT_FILE.i:43:[value] Function mpz_clear: precondition got status valid.
 [value] Done for function mpz_clear
 [value] computing for function mpz_clear <- main.
-        Called from PROJECT_FILE.i:136.
+        Called from PROJECT_FILE.i:140.
 [value] Done for function mpz_clear
-PROJECT_FILE.i:139:[value] Assertion got status valid.
+PROJECT_FILE.i:143:[value] Assertion got status valid.
 [value] computing for function mpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:141.
+        Called from PROJECT_FILE.i:145.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:141.
+        Called from PROJECT_FILE.i:145.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_cmp <- main.
-        Called from PROJECT_FILE.i:142.
+        Called from PROJECT_FILE.i:146.
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:144.
+        Called from PROJECT_FILE.i:148.
 [value] computing for function printf <- e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:125.
+        Called from PROJECT_FILE.i:129.
 [value] Done for function printf
 [value] computing for function exit <- e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:125.
+        Called from PROJECT_FILE.i:129.
 [value] Done for function exit
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
 [value] computing for function mpz_clear <- main.
-        Called from PROJECT_FILE.i:145.
+        Called from PROJECT_FILE.i:149.
 [value] Done for function mpz_clear
 [value] computing for function mpz_clear <- main.
-        Called from PROJECT_FILE.i:145.
+        Called from PROJECT_FILE.i:149.
 [value] Done for function mpz_clear
 [value] Recording results for main
 [value] done for function main
@@ -75,7 +75,8 @@ struct __anonstruct___mpz_struct_1 {
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct mpz_t[1];
 /*@ ensures \valid(\old(z));
-    assigns *z;  */
+    assigns *z;
+    assigns *z \from n;  */
 extern void mpz_init_set_si(__mpz_struct * /*[1]*/ z, long n);
 /*@ requires \valid(x);
     assigns *x;  */

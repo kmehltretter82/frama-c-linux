@@ -50,7 +50,8 @@ __inline static mp_limb_t __gmpz_getlimbn(mpz_srcptr __gmp_z,
                                           mp_size_t __gmp_n) __attribute__((
 __pure__));
 /*@ ensures \valid(\old(z));
-    assigns *z;  */
+    assigns *z;
+    assigns *z \from n;  */
 extern void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z, long n);
 __inline static void __gmpz_neg(__mpz_struct * /*[1]*/ z1,
                                 __mpz_struct const * /*[1]*/ z2);
@@ -575,14 +576,12 @@ int main(void)
   if (! ("toto" != "titi")) { e_acsl_fail((char *)"(\"toto\" != \"titi\")");
   }
   /*@ assert 'c' ≡ 'c'; */ ;
-  { mpz_t e_acsl_1; mpz_t e_acsl_2; int e_acsl_3;
+  { mpz_t e_acsl_1; int e_acsl_2;
     __gmpz_init_set_si((__mpz_struct *)(e_acsl_1),(long)'c');
-    __gmpz_init_set_si((__mpz_struct *)(e_acsl_2),(long)'c');
-    e_acsl_3 = __gmpz_cmp((__mpz_struct const *)(e_acsl_1),
-                          (__mpz_struct const *)(e_acsl_2));
-    if (! (e_acsl_3 == 0)) { e_acsl_fail((char *)"(\'c\' == \'c\')"); }
+    e_acsl_2 = __gmpz_cmp((__mpz_struct const *)(e_acsl_1),
+                          (__mpz_struct const *)(e_acsl_1));
+    if (! (e_acsl_2 == 0)) { e_acsl_fail((char *)"(\'c\' == \'c\')"); }
     __gmpz_clear((__mpz_struct *)(e_acsl_1));
-    __gmpz_clear((__mpz_struct *)(e_acsl_2));
   }
   
   /*@ assert false ≢ true; */ ;

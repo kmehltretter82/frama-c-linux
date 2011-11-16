@@ -26,77 +26,57 @@ open Cil_types
     Environments handle all the new C constructs (variables, statements and
     annotations. *) 
 
-val self: State.t ref
+val global_state: State.t ref
+(** reference to the E-ACSL global state. Not defined here, yet required *) 
 
 type t
 
-val empty: t
+val dummy: t
+val empty: Visitor.frama_c_visitor -> t
 
-val new_var: 
-  t -> typ -> (varinfo -> exp (* the var as exp *) -> stmt list) -> exp * t
-  (** [new_var env ty mk_stmts] extends [env] with a fresh variable of type
-      [ty]. 
-      @return this variable as a C expression already initialized by applying it
-      to [mk_stmts]. *)
+val new_var:
+  ?global:bool -> t -> term option -> typ -> 
+  (varinfo -> exp (* the var as exp *) -> stmt list)
+  -> exp * t
+(** [new_var env t ty mk_stmts] extends [env] with a fresh variable of type
+    [ty] corresponding to [t]. [global] indicates whether the new variable is
+    global to the current function or local to the local block (default is
+    [false], i.e. local).
+    @return this variable as a C expression already initialized by applying it
+    to [mk_stmts]. *)
 
 val new_var_and_mpz_init:
-  t -> (varinfo -> exp (* the var as exp *) -> stmt list) -> exp * t
-  (** Same as [new_var], but dedicated to mpz_t variables initialized by 
-     {!Mpz.init}. *)
-
-val no_overlap: from:t -> t -> t
-  (** [no_overlap ~from env] returns env, but ensures that new generated
-     variables will not overlap with those of [from]. *)
-  
-val merge_function_vars: from:t -> t -> t
-(** [merge_function_vars ~from env] copies the generated variables local to the
-    visited function of [from] to [env]. Assume that there is no overlaping
-    between [from] and [env]. *)
-
-val merge_block_vars: from:t -> t -> t
-(** Like [merge_function_vars] for generated variables local to the built
-    block. *)
+  ?global:bool -> t -> term option -> 
+  (varinfo -> exp (* the var as exp *) -> stmt list) 
+  -> exp * t
+(** Same as [new_var], but dedicated to mpz_t variables initialized by 
+    {!Mpz.init}. *)
 
 val add_stmt: t -> stmt -> t
   (** [add_stmt env s] extends [env] with the new statement [s] *)
 
-val add_assert: kernel_function -> stmt -> predicate named -> unit
-  (** [add_assert kf s p] extends the global environment with an assertion [p]
-      associated to the statement [s] in function [kf]. *)
+val add_assert: t -> stmt -> predicate named -> unit
+(** [add_assert kf s p] extends the global environment with an assertion [p]
+    associated to the statement [s] in function [kf]. *)
 
-val register_actions_queue: (unit -> unit) Queue.t -> unit
-  (** To be called once at initialization time: the queue of event of the
-      visitor required for generating annotations. *)
+val push: t -> t
+(** Push a new local context in the environment *)
 
-val generated_function_variables: t -> varinfo list
+type where = Before | Middle | After
+val pop_and_get: t -> stmt -> global_clear:bool -> where -> block * t
+(* Pop the last local context and get back the corresponding new block
+   containing the given [stmt] at the given place ([Before] is before the
+   code corresponding to annotations, [After] is after this code and [Middle] is
+   between the stmt corresponding to annotations and the ones for freeing the
+   memory. *)
+
+val pop: t -> t
+(* Pop the last local context (ignore the corresponding new block if any *)
+
+val get_generated_variables: t -> varinfo list
 (** All the new variables local to the visited function. *)
 
-val generated_block_variables: t -> varinfo list
-(** All the new variables local to the block being built. *)
-
-val block: t -> stmt -> block
-  (** [block env s] returns the block of statements including [s] and the new
-     constructs of [env]. *)
-
-val block_as_stmt: t -> stmt -> stmt
-(** Like [block], but generate the block as a stmt *)
-
-val block_option: t -> stmt -> block option
-  (** [block_option env s] returns the block of statements including [s] and the
-      new constructs of [env], if any. *)
-
-val close_block_option: t -> block option
-  (** like [block_option] but includes no additional statement: only include the
-      new constructs of [env], if any. *)
-
-val is_empty: t -> bool
-  (** Is the given environment empty? *)
-
-val is_empty_block: t -> bool
-  (** Does the given environment not contain new statements? *)
-
-val pretty: Format.formatter -> t -> unit
-(** Debugging purpose *)
+val get_visitor: t -> Visitor.generic_frama_c_visitor
 
 (*
 Local Variables:

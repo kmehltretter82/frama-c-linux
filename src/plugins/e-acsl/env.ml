@@ -23,64 +23,63 @@ open Cil_types
 open Cil_datatype
 open Cil
 
-let self = ref State.dummy
+let global_state = ref State.dummy
 
-let queue = ref (Queue.create ())
-let register_actions_queue q = queue := q
+type mpz_tbl = {   
+  new_exps: exp Term.Map.t; (* generated mpz variables as exp from terms *)
+  clear_stmts: stmt list; (* stmts freeing the memory before exiting the 
+			     block *) 
+}
+
+type block_info = {
+  new_block_vars: varinfo list; (* generated variables local to the block *)
+  new_stmts: stmt list; (* generated stmts to put at the beginning of the 
+			   block *) 
+}
+
+type local_env = { block_info: block_info; mpz_tbl: mpz_tbl }
 
 type t = 
-    { var_cpt: int; (* counter used for generating variables in a function *)
-      fct_vars: Varinfo.Set.t; (* generated variables local to a function.
-				  Use a set to prevent to add twice a variable
-				  when merging. *)
-      block_vars: varinfo list; (* generated variables local to a block.
-				   Subset of field [vars] *)
-      beginning_of_block: stmt list; (* list of stmts to be inserted before the
-					visiting node *)
-      end_of_block: stmt list (* list of stmts to be inserted after the visiting
-				 node *) }
-      
-let empty = 
-  { var_cpt = 0; 
-    fct_vars = Varinfo.Set.empty; 
-    block_vars = [];
-    beginning_of_block = []; 
-    end_of_block = [] }
+    { visitor: Visitor.frama_c_visitor; 
+      new_global_vars: varinfo list; (* generated variables at function 
+					level *)
+      global_mpz_tbl: mpz_tbl;
+      env_stack: local_env list;
+      cpt: int; (* counter used when generating variables *) }
 
-let no_overlap ~from env = 
-  { env with var_cpt = Extlib.max_cpt from.var_cpt env.var_cpt }
+let empty_block = 
+  { new_block_vars = [];
+    new_stmts = [] }
 
-let merge_function_vars ~from env = 
-  { env with 
-    var_cpt = from.var_cpt; 
-    fct_vars = Varinfo.Set.union env.fct_vars from.fct_vars }
+let empty_mpz_tbl =
+  { new_exps = Term.Map.empty;
+    clear_stmts = [] }
 
-let merge_block_vars ~from env =
-  let env = merge_function_vars ~from env in
-  { env with block_vars = env.block_vars @ from.block_vars }
+let dummy = 
+  { visitor = new Visitor.frama_c_inplace; 
+    new_global_vars = [];
+    global_mpz_tbl = empty_mpz_tbl; 
+    env_stack = []; 
+    cpt = 0 }
 
-let is_empty_block env = 
-  if env.beginning_of_block = [] then begin
-    assert (env.end_of_block = [] && env.block_vars = []);
-    true
-  end else
-    false      
+let empty v = 
+  { visitor = v; 
+    new_global_vars = [];
+    global_mpz_tbl = empty_mpz_tbl; 
+    env_stack = []; 
+    cpt = 0 }
 
-let is_empty env = env.var_cpt = 0 && is_empty_block env 
+let top env = match env.env_stack with [] -> assert false | hd :: tl -> hd, tl
 
-let add_stmt env s = 
-  { env with beginning_of_block = s :: env.beginning_of_block }
+(* eta-expansion required for typing generalisation *)
+let acc_list_rev acc l = List.fold_left (fun acc x -> x :: acc) acc l
 
-let add_assert kf s p = 
-  Queue.add
-    (fun () ->
-      Annotations.add_assert kf s [ !self ] p) 
-    !queue
-
-let new_var env ty mk_stmts = 
+let do_new_var ?(global=false) env t ty mk_stmts =
+  let local_env, tl_env = top env in
+  let local_block = local_env.block_info in
   let is_t = Mpz.is_t ty in
   if is_t then Mpz.is_now_referenced ();
-  let n = succ env.var_cpt in
+  let n = succ env.cpt in
   let v =
     makeVarinfo
       ~logic:false
@@ -90,62 +89,128 @@ let new_var env ty mk_stmts =
       ("e_acsl_" ^ string_of_int n)
       ty
   in
+(*  Options.feedback "new variable %a (global? %b)" Varinfo.pretty v global;*)
   let e = Misc.new_lval v in
   let stmts = mk_stmts v e in
-  e,
-  { var_cpt = n;
-    fct_vars = Varinfo.Set.add v env.fct_vars;
-    block_vars = v :: env.block_vars;
-    beginning_of_block = 
-      List.fold_left (fun l s -> s :: l) env.beginning_of_block stmts;
-    end_of_block = 
-      if is_t then Mpz.clear e :: env.end_of_block else env.end_of_block }
-
-let new_var_and_mpz_init env mk_stmts = 
-  new_var env Mpz.t (fun v e -> Mpz.init e :: mk_stmts v e)
-
-let generated_function_variables env = 
-  List.sort
-    (fun v1 v2 -> String.compare v1.vname v2.vname)
-    (Varinfo.Set.elements env.fct_vars)
-
-let generated_block_variables env = List.rev env.block_vars
-
-let block env s = 
-  let b = 
-    mkBlock 
-      (List.rev env.beginning_of_block @ [ s ] @ List.rev env.end_of_block)
+  let new_stmts = acc_list_rev local_block.new_stmts stmts in
+  let new_block_vars = 
+    if global then local_block.new_block_vars 
+    else v :: local_block.new_block_vars
   in
-  b.blocals <- b.blocals @ List.rev env.block_vars;
-  b
+  let new_block = { new_block_vars = new_block_vars; new_stmts = new_stmts } in
+  e, 
+  if is_t then 
+    let extend_tbl tbl = 
+(*      Options.feedback "memoizing %a for term %a" 
+	Varinfo.pretty v (fun fmt t -> match t with None -> Format.fprintf fmt
+	  "NONE" | Some t -> Term.pretty fmt t) t;*)
+      { clear_stmts = Mpz.clear e :: tbl.clear_stmts;
+	new_exps = match t with
+	| None -> tbl.new_exps
+	| Some t -> Term.Map.add t e tbl.new_exps }
+    in
+    if global then
+      let local_env = { local_env with block_info = new_block } in
+      (* also memoise the new variable, but must never be used *)
+      { env with
+	cpt = n;
+	new_global_vars = v :: env.new_global_vars;
+	global_mpz_tbl = extend_tbl env.global_mpz_tbl;
+	env_stack = local_env :: tl_env }
+    else
+      let local_env = 
+	{ block_info = new_block; mpz_tbl = extend_tbl local_env.mpz_tbl } 
+      in
+      { env with cpt = n; env_stack = local_env :: tl_env }
+  else
+    let new_global_vars = 
+      if global then v :: env.new_global_vars
+      else env.new_global_vars
+    in
+    { env with
+      new_global_vars = new_global_vars;
+      cpt = n;
+      env_stack = { local_env with block_info = new_block } :: tl_env }
 
-let block_as_stmt env s = 
-  if is_empty_block env then s else mkStmt ~valid_sid:true (Block (block env s))
+exception No_term
 
-let block_option env s = 
-  if is_empty_block env then None else Some (block env s)
+let new_var ?(global=false) env t ty mk_stmts = 
+  let local_env, _ = top env in
+  if global then
+    (* do not use memoisation here: it is incorrect for terms corresponding to
+       impure expressions *)
+    do_new_var ~global env t ty mk_stmts  
+  else
+    try
+      match t with
+      | None -> raise No_term
+      | Some t -> Term.Map.find t local_env.mpz_tbl.new_exps, env
+    with Not_found | No_term -> 
+      do_new_var ~global env t ty mk_stmts  
 
-let close_block_option env = 
-  block_option env (mkStmt ~valid_sid:true (Instr (Skip Location.unknown)))
+let new_var_and_mpz_init ?global env t mk_stmts = 
+  new_var ?global env t Mpz.t (fun v e -> Mpz.init e :: mk_stmts v e)
 
-let pretty fmt env =
-  Format.fprintf fmt "CPT = %d@\n" env.var_cpt;
-  Format.fprintf fmt "FCT_VARS = %t@\n"
-    (fun fmt ->
-      Varinfo.Set.iter (fun v -> Format.fprintf fmt "v%d " v.vid) env.fct_vars);
-  Format.fprintf fmt "BLOCK_VARS = %t@\n"
-    (fun fmt -> 
-      List.iter (fun v -> Format.fprintf fmt "v%d " v.vid) env.block_vars);
-  Format.fprintf fmt "BEGIN BLOCK = %t@\n" 
-    (fun fmt -> 
-      List.iter
-	(fun s -> Format.fprintf fmt "%a@\n" d_stmt s) 
-	env.beginning_of_block);
-  Format.fprintf fmt "EBD BLOCK = %t@." 
-    (fun fmt -> 
-      List.iter
-	(fun s -> Format.fprintf fmt "%a@\n" d_stmt s) 
-	env.end_of_block)
+let current_kf env = 
+  let v = env.visitor in
+  match v#current_kf with
+  | None -> None
+  | Some kf -> Some (Cil.get_kernel_function v#behavior kf)
+
+let get_visitor env = env.visitor
+
+let add_assert env stmt annot = 
+  match current_kf env with
+  | None -> assert false (* TODO: ??? *)
+  | Some kf ->
+    Queue.add
+      (fun () -> Annotations.add_assert kf stmt [ !global_state ] annot) 
+      env.visitor#get_filling_actions
+
+let add_stmt env stmt =
+  let local_env, tl = top env in
+  let block = local_env.block_info in
+  let block = { block with new_stmts = stmt :: block.new_stmts } in
+  { env with env_stack = { local_env with block_info = block } :: tl }
+
+let push env = 
+  (*  Options.feedback "push";*)
+  let local_env = { block_info = empty_block; mpz_tbl = empty_mpz_tbl } in
+  { env with env_stack = local_env :: env.env_stack }
+
+let pop env =
+(*  Options.feedback "pop";*)
+  let _, tl = top env in
+  { env with env_stack = tl }
+
+type where = Before | Middle | After
+let pop_and_get env stmt ~global_clear where =
+(*  Options.feedback "pop_and_get";*)
+  let local_env, tl = top env in
+  let clear = 
+    if global_clear then 
+      env.global_mpz_tbl.clear_stmts @ local_env.mpz_tbl.clear_stmts
+    else
+      local_env.mpz_tbl.clear_stmts
+  in
+(*  Options.feedback "clearing %d mpz (must_clear: %b)" 
+    (List.length clear) must_clear;*)
+  let block = local_env.block_info in
+  let b = 
+    let new_s = block.new_stmts in
+    let stmts = match where with
+      | Before -> stmt :: acc_list_rev (List.rev clear) new_s
+      | Middle -> acc_list_rev (stmt :: List.rev clear) new_s
+      | After -> acc_list_rev (acc_list_rev [ stmt ] clear) new_s
+    in
+    mkBlock stmts
+  in
+(*  List.iter (fun v -> Options.feedback "new_block_vars %a" Varinfo.pretty v)
+    block.new_block_vars;*)
+  b.blocals <- acc_list_rev b.blocals block.new_block_vars;
+  b, { env with env_stack = tl }
+
+let get_generated_variables env = List.rev env.new_global_vars
 
 (*
 Local Variables:

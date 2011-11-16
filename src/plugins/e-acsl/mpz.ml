@@ -39,18 +39,22 @@ let init = apply_on_var "init"
 let clear = apply_on_var "clear"
 
 let init_set v e =
-  let fname, args = match typeOf e with
-    | TInt((IBool | IChar | IUChar | IUInt | IUShort | IULong), _) ->
-      "ui", [ e ]
-    | TInt((ISChar | IShort | IInt | ILong), _) -> "si", [ e ]
-    | TInt((ILongLong | IULongLong), _) -> assert false
-    | TPtr(TInt(IChar, _), _) ->
-      "str",
+  let ty = typeOf e in
+  if is_t ty then
+    Misc.mk_call "mpz_init_set" [ v; e ]
+  else
+    let fname, args = match ty with
+      | TInt((IBool | IChar | IUChar | IUInt | IUShort | IULong), _) ->
+	"ui", [ e ]
+      | TInt((ISChar | IShort | IInt | ILong), _) -> "si", [ e ]
+      | TInt((ILongLong | IULongLong), _) -> assert false
+      | TPtr(TInt(IChar, _), _) ->
+	"str",
 	(* decimal base for the number given as string *)
-      [ e; integer ~loc:Location.unknown 10 ]
-    | _ -> assert false
-  in
-  Misc.mk_call ("mpz_init_set_" ^ fname) (v :: args)
+	[ e; integer ~loc:Location.unknown 10 ]
+      | _ -> assert false
+    in
+    Misc.mk_call ("mpz_init_set_" ^ fname) (v :: args)
 
 (*
 Local Variables:

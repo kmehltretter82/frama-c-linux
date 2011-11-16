@@ -36,7 +36,7 @@ val init: exp -> stmt
   (** build stmt "mpz_init(v)" *)
 
 val init_set: exp -> exp -> stmt
-  (** build stmt "mpz_init_set_*(v, e)" with the good function 'set' according
+  (** build stmt "mpz_init_set*(v, e)" with the good function 'set' according
       to the type of e *)
 
 val clear: exp -> stmt

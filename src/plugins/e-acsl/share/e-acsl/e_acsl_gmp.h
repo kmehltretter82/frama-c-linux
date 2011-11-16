@@ -11,10 +11,14 @@ extern void mpz_init(mpz_t x);
 
 /*@ ensures \valid(z);
   @ assigns *z; */
+extern void mpz_init_set(mpz_t z, const mpz_t z_orig);
+
+/*@ ensures \valid(z);
+  @ assigns *z \from n; */
 extern void mpz_init_set_ui(mpz_t z, unsigned long int n);
 
 /*@ ensures \valid(z);
-  @ assigns *z; */
+  @ assigns *z \from n; */
 extern void mpz_init_set_si(mpz_t z, signed long int n);
 
 /*@ ensures \valid(z);

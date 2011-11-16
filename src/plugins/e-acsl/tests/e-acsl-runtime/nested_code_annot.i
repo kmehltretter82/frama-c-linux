@@ -22,4 +22,5 @@ int main(void) {
       else /*@ assert \false; */ ;
     }
   }
+  return 0;
 }

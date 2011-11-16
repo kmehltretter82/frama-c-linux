@@ -5,61 +5,42 @@
         X ∈ {0}
         Y ∈ {2}
 [value] computing for function f <- main.
-        Called from PROJECT_FILE.i:367.
+        Called from PROJECT_FILE.i:347.
 [value] computing for function mpz_init_set_si <- f <- main.
-        Called from PROJECT_FILE.i:134.
-PROJECT_FILE.i:29:[value] Function mpz_init_set_si: postcondition got status valid.
+        Called from PROJECT_FILE.i:138.
+PROJECT_FILE.i:33:[value] Function mpz_init_set_si: postcondition got status valid.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_init_set_si <- f <- main.
-        Called from PROJECT_FILE.i:134.
+        Called from PROJECT_FILE.i:138.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_cmp <- f <- main.
-        Called from PROJECT_FILE.i:135.
-PROJECT_FILE.i:45:[value] Function mpz_cmp: precondition got status valid.
-PROJECT_FILE.i:46:[value] Function mpz_cmp: precondition got status valid.
+        Called from PROJECT_FILE.i:139.
+PROJECT_FILE.i:49:[value] Function mpz_cmp: precondition got status valid.
+PROJECT_FILE.i:50:[value] Function mpz_cmp: precondition got status valid.
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <- f <- main.
-        Called from PROJECT_FILE.i:136.
+        Called from PROJECT_FILE.i:140.
 [value] computing for function printf <- e_acsl_fail <- f <- main.
-        Called from PROJECT_FILE.i:125.
+        Called from PROJECT_FILE.i:129.
 [value] Done for function printf
 [value] computing for function exit <- e_acsl_fail <- f <- main.
-        Called from PROJECT_FILE.i:125.
-PROJECT_FILE.i:115:[value] Function exit: postcondition got status invalid.
+        Called from PROJECT_FILE.i:129.
+PROJECT_FILE.i:119:[value] Function exit: postcondition got status invalid.
 [value] Done for function exit
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
 [value] computing for function mpz_clear <- f <- main.
-        Called from PROJECT_FILE.i:137.
-PROJECT_FILE.i:39:[value] Function mpz_clear: precondition got status valid.
+        Called from PROJECT_FILE.i:140.
+PROJECT_FILE.i:43:[value] Function mpz_clear: precondition got status valid.
 [value] Done for function mpz_clear
 [value] computing for function mpz_clear <- f <- main.
-        Called from PROJECT_FILE.i:137.
+        Called from PROJECT_FILE.i:141.
 [value] Done for function mpz_clear
-PROJECT_FILE.i:129:[value] Function f: postcondition got status valid.
+PROJECT_FILE.i:133:[value] Function f: postcondition got status valid.
 [value] Recording results for f
 [value] Done for function f
 [value] computing for function g <- main.
-        Called from PROJECT_FILE.i:368.
-[value] computing for function mpz_init_set_si <- g <- main.
-        Called from PROJECT_FILE.i:149.
-[value] Done for function mpz_init_set_si
-[value] computing for function mpz_init_set_si <- g <- main.
-        Called from PROJECT_FILE.i:150.
-[value] Done for function mpz_init_set_si
-[value] computing for function mpz_cmp <- g <- main.
-        Called from PROJECT_FILE.i:150.
-[value] Done for function mpz_cmp
-[value] computing for function e_acsl_fail <- g <- main.
-        Called from PROJECT_FILE.i:151.
-[value] computing for function printf <- e_acsl_fail <- g <- main.
-        Called from PROJECT_FILE.i:125.
-[value] Done for function printf
-[value] computing for function exit <- e_acsl_fail <- g <- main.
-        Called from PROJECT_FILE.i:125.
-[value] Done for function exit
-[value] Recording results for e_acsl_fail
-[value] Done for function e_acsl_fail
+        Called from PROJECT_FILE.i:348.
 [value] computing for function mpz_init_set_si <- g <- main.
         Called from PROJECT_FILE.i:152.
 [value] Done for function mpz_init_set_si
@@ -72,31 +53,44 @@ PROJECT_FILE.i:129:[value] Function f: postcondition got status valid.
 [value] computing for function e_acsl_fail <- g <- main.
         Called from PROJECT_FILE.i:154.
 [value] computing for function printf <- e_acsl_fail <- g <- main.
-        Called from PROJECT_FILE.i:125.
+        Called from PROJECT_FILE.i:129.
 [value] Done for function printf
 [value] computing for function exit <- e_acsl_fail <- g <- main.
-        Called from PROJECT_FILE.i:125.
+        Called from PROJECT_FILE.i:129.
+[value] Done for function exit
+[value] Recording results for e_acsl_fail
+[value] Done for function e_acsl_fail
+[value] computing for function mpz_init_set_si <- g <- main.
+        Called from PROJECT_FILE.i:155.
+[value] Done for function mpz_init_set_si
+[value] computing for function mpz_cmp <- g <- main.
+        Called from PROJECT_FILE.i:155.
+[value] Done for function mpz_cmp
+[value] computing for function e_acsl_fail <- g <- main.
+        Called from PROJECT_FILE.i:156.
+[value] computing for function printf <- e_acsl_fail <- g <- main.
+        Called from PROJECT_FILE.i:129.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_fail <- g <- main.
+        Called from PROJECT_FILE.i:129.
 [value] Done for function exit
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
 [value] computing for function mpz_clear <- g <- main.
-        Called from PROJECT_FILE.i:155.
-[value] Done for function mpz_clear
-[value] computing for function mpz_clear <- g <- main.
-        Called from PROJECT_FILE.i:155.
-[value] Done for function mpz_clear
-[value] computing for function mpz_clear <- g <- main.
-        Called from PROJECT_FILE.i:155.
-[value] Done for function mpz_clear
-[value] computing for function mpz_clear <- g <- main.
         Called from PROJECT_FILE.i:156.
 [value] Done for function mpz_clear
-PROJECT_FILE.i:143:[value] Function g: postcondition got status valid.
-PROJECT_FILE.i:144:[value] Function g: postcondition got status valid.
+[value] computing for function mpz_clear <- g <- main.
+        Called from PROJECT_FILE.i:157.
+[value] Done for function mpz_clear
+[value] computing for function mpz_clear <- g <- main.
+        Called from PROJECT_FILE.i:157.
+[value] Done for function mpz_clear
+PROJECT_FILE.i:146:[value] Function g: postcondition got status valid.
+PROJECT_FILE.i:147:[value] Function g: postcondition got status valid.
 [value] Recording results for g
 [value] Done for function g
 [value] computing for function h <- main.
-        Called from PROJECT_FILE.i:369.
+        Called from PROJECT_FILE.i:349.
 PROJECT_FILE.i:162:[value] Function h: precondition got status valid.
 [value] computing for function mpz_init_set_si <- h <- main.
         Called from PROJECT_FILE.i:166.
@@ -110,15 +104,15 @@ PROJECT_FILE.i:162:[value] Function h: precondition got status valid.
 [value] computing for function e_acsl_fail <- h <- main.
         Called from PROJECT_FILE.i:168.
 [value] computing for function printf <- e_acsl_fail <- h <- main.
-        Called from PROJECT_FILE.i:125.
+        Called from PROJECT_FILE.i:129.
 [value] Done for function printf
 [value] computing for function exit <- e_acsl_fail <- h <- main.
-        Called from PROJECT_FILE.i:125.
+        Called from PROJECT_FILE.i:129.
 [value] Done for function exit
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
 [value] computing for function mpz_clear <- h <- main.
-        Called from PROJECT_FILE.i:169.
+        Called from PROJECT_FILE.i:168.
 [value] Done for function mpz_clear
 [value] computing for function mpz_clear <- h <- main.
         Called from PROJECT_FILE.i:169.
@@ -126,456 +120,420 @@ PROJECT_FILE.i:162:[value] Function h: precondition got status valid.
 [value] Recording results for h
 [value] Done for function h
 [value] computing for function i <- main.
-        Called from PROJECT_FILE.i:370.
+        Called from PROJECT_FILE.i:350.
+PROJECT_FILE.i:175:[value] Function i: precondition got status valid.
 PROJECT_FILE.i:176:[value] Function i: precondition got status valid.
-PROJECT_FILE.i:177:[value] Function i: precondition got status valid.
+[value] computing for function mpz_init_set_si <- i <- main.
+        Called from PROJECT_FILE.i:180.
+[value] Done for function mpz_init_set_si
 [value] computing for function mpz_init_set_si <- i <- main.
         Called from PROJECT_FILE.i:181.
 [value] Done for function mpz_init_set_si
-[value] computing for function mpz_init_set_si <- i <- main.
-        Called from PROJECT_FILE.i:182.
-[value] Done for function mpz_init_set_si
 [value] computing for function mpz_cmp <- i <- main.
-        Called from PROJECT_FILE.i:182.
+        Called from PROJECT_FILE.i:181.
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <- i <- main.
+        Called from PROJECT_FILE.i:182.
+[value] computing for function printf <- e_acsl_fail <- i <- main.
+        Called from PROJECT_FILE.i:129.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_fail <- i <- main.
+        Called from PROJECT_FILE.i:129.
+[value] Done for function exit
+[value] Recording results for e_acsl_fail
+[value] Done for function e_acsl_fail
+[value] computing for function mpz_init_set_si <- i <- main.
         Called from PROJECT_FILE.i:183.
-[value] computing for function printf <- e_acsl_fail <- i <- main.
-        Called from PROJECT_FILE.i:125.
-[value] Done for function printf
-[value] computing for function exit <- e_acsl_fail <- i <- main.
-        Called from PROJECT_FILE.i:125.
-[value] Done for function exit
-[value] Recording results for e_acsl_fail
-[value] Done for function e_acsl_fail
-[value] computing for function mpz_init_set_si <- i <- main.
-        Called from PROJECT_FILE.i:184.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_init_set_si <- i <- main.
-        Called from PROJECT_FILE.i:184.
+        Called from PROJECT_FILE.i:183.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_cmp <- i <- main.
-        Called from PROJECT_FILE.i:185.
+        Called from PROJECT_FILE.i:184.
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <- i <- main.
-        Called from PROJECT_FILE.i:186.
+        Called from PROJECT_FILE.i:185.
 [value] computing for function printf <- e_acsl_fail <- i <- main.
-        Called from PROJECT_FILE.i:125.
+        Called from PROJECT_FILE.i:129.
 [value] Done for function printf
 [value] computing for function exit <- e_acsl_fail <- i <- main.
-        Called from PROJECT_FILE.i:125.
+        Called from PROJECT_FILE.i:129.
 [value] Done for function exit
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
 [value] computing for function mpz_clear <- i <- main.
-        Called from PROJECT_FILE.i:187.
+        Called from PROJECT_FILE.i:185.
 [value] Done for function mpz_clear
 [value] computing for function mpz_clear <- i <- main.
-        Called from PROJECT_FILE.i:187.
+        Called from PROJECT_FILE.i:186.
 [value] Done for function mpz_clear
 [value] computing for function mpz_clear <- i <- main.
-        Called from PROJECT_FILE.i:187.
+        Called from PROJECT_FILE.i:186.
 [value] Done for function mpz_clear
 [value] computing for function mpz_clear <- i <- main.
-        Called from PROJECT_FILE.i:188.
+        Called from PROJECT_FILE.i:186.
 [value] Done for function mpz_clear
 [value] Recording results for i
 [value] Done for function i
 [value] computing for function j <- main.
-        Called from PROJECT_FILE.i:371.
-PROJECT_FILE.i:196:[value] Function j, behavior b1: precondition got status valid.
-PROJECT_FILE.i:200:[value] Function j, behavior b2: precondition got status valid.
-PROJECT_FILE.i:201:[value] Function j, behavior b2: precondition got status valid.
+        Called from PROJECT_FILE.i:351.
+PROJECT_FILE.i:193:[value] Function j, behavior b1: precondition got status valid.
+PROJECT_FILE.i:197:[value] Function j, behavior b2: precondition got status valid.
+PROJECT_FILE.i:198:[value] Function j, behavior b2: precondition got status valid.
 [value] computing for function mpz_init_set_si <- j <- main.
-        Called from PROJECT_FILE.i:211.
+        Called from PROJECT_FILE.i:207.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_init_set_si <- j <- main.
-        Called from PROJECT_FILE.i:211.
+        Called from PROJECT_FILE.i:207.
 [value] Done for function mpz_init_set_si
+[value] computing for function mpz_cmp <- j <- main.
+        Called from PROJECT_FILE.i:208.
+[value] Done for function mpz_cmp
+[value] computing for function e_acsl_fail <- j <- main.
+        Called from PROJECT_FILE.i:209.
+[value] computing for function printf <- e_acsl_fail <- j <- main.
+        Called from PROJECT_FILE.i:129.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_fail <- j <- main.
+        Called from PROJECT_FILE.i:129.
+[value] Done for function exit
+[value] Recording results for e_acsl_fail
+[value] Done for function e_acsl_fail
+[value] computing for function mpz_init_set_si <- j <- main.
+        Called from PROJECT_FILE.i:210.
+[value] Done for function mpz_init_set_si
+[value] computing for function mpz_init_set_si <- j <- main.
+        Called from PROJECT_FILE.i:210.
+[value] Done for function mpz_init_set_si
+[value] computing for function mpz_init <- j <- main.
+        Called from PROJECT_FILE.i:211.
+PROJECT_FILE.i:21:[value] Function mpz_init: postcondition got status valid.
+[value] Done for function mpz_init
+[value] computing for function mpz_add <- j <- main.
+        Called from PROJECT_FILE.i:211.
+PROJECT_FILE.i:64:[value] Function mpz_add: precondition got status valid.
+PROJECT_FILE.i:65:[value] Function mpz_add: precondition got status valid.
+PROJECT_FILE.i:66:[value] Function mpz_add: precondition got status valid.
+[value] Done for function mpz_add
 [value] computing for function mpz_cmp <- j <- main.
         Called from PROJECT_FILE.i:212.
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <- j <- main.
         Called from PROJECT_FILE.i:213.
 [value] computing for function printf <- e_acsl_fail <- j <- main.
-        Called from PROJECT_FILE.i:125.
+        Called from PROJECT_FILE.i:129.
 [value] Done for function printf
 [value] computing for function exit <- e_acsl_fail <- j <- main.
-        Called from PROJECT_FILE.i:125.
+        Called from PROJECT_FILE.i:129.
 [value] Done for function exit
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
 [value] computing for function mpz_init_set_si <- j <- main.
         Called from PROJECT_FILE.i:214.
 [value] Done for function mpz_init_set_si
-[value] computing for function mpz_init_set_si <- j <- main.
+[value] computing for function mpz_cmp <- j <- main.
         Called from PROJECT_FILE.i:214.
-[value] Done for function mpz_init_set_si
-[value] computing for function mpz_init_set_si <- j <- main.
+[value] Done for function mpz_cmp
+[value] computing for function e_acsl_fail <- j <- main.
         Called from PROJECT_FILE.i:215.
-[value] Done for function mpz_init_set_si
-[value] computing for function mpz_init <- j <- main.
+[value] computing for function printf <- e_acsl_fail <- j <- main.
+        Called from PROJECT_FILE.i:129.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_fail <- j <- main.
+        Called from PROJECT_FILE.i:129.
+[value] Done for function exit
+[value] Recording results for e_acsl_fail
+[value] Done for function e_acsl_fail
+[value] computing for function mpz_clear <- j <- main.
         Called from PROJECT_FILE.i:215.
-PROJECT_FILE.i:21:[value] Function mpz_init: postcondition got status valid.
-[value] Done for function mpz_init
-[value] computing for function mpz_add <- j <- main.
+[value] Done for function mpz_clear
+[value] computing for function mpz_clear <- j <- main.
         Called from PROJECT_FILE.i:216.
-PROJECT_FILE.i:60:[value] Function mpz_add: precondition got status valid.
-PROJECT_FILE.i:61:[value] Function mpz_add: precondition got status valid.
-PROJECT_FILE.i:62:[value] Function mpz_add: precondition got status valid.
-[value] Done for function mpz_add
-[value] computing for function mpz_cmp <- j <- main.
+[value] Done for function mpz_clear
+[value] computing for function mpz_clear <- j <- main.
+        Called from PROJECT_FILE.i:216.
+[value] Done for function mpz_clear
+[value] computing for function mpz_clear <- j <- main.
+        Called from PROJECT_FILE.i:216.
+[value] Done for function mpz_clear
+[value] computing for function mpz_clear <- j <- main.
         Called from PROJECT_FILE.i:217.
-[value] Done for function mpz_cmp
-[value] computing for function e_acsl_fail <- j <- main.
-        Called from PROJECT_FILE.i:218.
-[value] computing for function printf <- e_acsl_fail <- j <- main.
-        Called from PROJECT_FILE.i:125.
-[value] Done for function printf
-[value] computing for function exit <- e_acsl_fail <- j <- main.
-        Called from PROJECT_FILE.i:125.
-[value] Done for function exit
-[value] Recording results for e_acsl_fail
-[value] Done for function e_acsl_fail
+[value] Done for function mpz_clear
+[value] computing for function mpz_clear <- j <- main.
+        Called from PROJECT_FILE.i:217.
+[value] Done for function mpz_clear
 [value] computing for function mpz_init_set_si <- j <- main.
-        Called from PROJECT_FILE.i:219.
+        Called from PROJECT_FILE.i:222.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_init_set_si <- j <- main.
-        Called from PROJECT_FILE.i:219.
+        Called from PROJECT_FILE.i:222.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_cmp <- j <- main.
-        Called from PROJECT_FILE.i:220.
+        Called from PROJECT_FILE.i:223.
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <- j <- main.
-        Called from PROJECT_FILE.i:221.
+        Called from PROJECT_FILE.i:224.
 [value] computing for function printf <- e_acsl_fail <- j <- main.
-        Called from PROJECT_FILE.i:125.
+        Called from PROJECT_FILE.i:129.
 [value] Done for function printf
 [value] computing for function exit <- e_acsl_fail <- j <- main.
-        Called from PROJECT_FILE.i:125.
-[value] Done for function exit
-[value] Recording results for e_acsl_fail
-[value] Done for function e_acsl_fail
-[value] computing for function mpz_clear <- j <- main.
-        Called from PROJECT_FILE.i:222.
-[value] Done for function mpz_clear
-[value] computing for function mpz_clear <- j <- main.
-        Called from PROJECT_FILE.i:222.
-[value] Done for function mpz_clear
-[value] computing for function mpz_clear <- j <- main.
-        Called from PROJECT_FILE.i:222.
-[value] Done for function mpz_clear
-[value] computing for function mpz_clear <- j <- main.
-        Called from PROJECT_FILE.i:223.
-[value] Done for function mpz_clear
-[value] computing for function mpz_clear <- j <- main.
-        Called from PROJECT_FILE.i:223.
-[value] Done for function mpz_clear
-[value] computing for function mpz_clear <- j <- main.
-        Called from PROJECT_FILE.i:223.
-[value] Done for function mpz_clear
-[value] computing for function mpz_clear <- j <- main.
-        Called from PROJECT_FILE.i:224.
-[value] Done for function mpz_clear
-[value] computing for function mpz_clear <- j <- main.
-        Called from PROJECT_FILE.i:224.
-[value] Done for function mpz_clear
-[value] computing for function mpz_init_set_si <- j <- main.
-        Called from PROJECT_FILE.i:230.
-[value] Done for function mpz_init_set_si
-[value] computing for function mpz_init_set_si <- j <- main.
-        Called from PROJECT_FILE.i:230.
-[value] Done for function mpz_init_set_si
-[value] computing for function mpz_cmp <- j <- main.
-        Called from PROJECT_FILE.i:231.
-[value] Done for function mpz_cmp
-[value] computing for function e_acsl_fail <- j <- main.
-        Called from PROJECT_FILE.i:232.
-[value] computing for function printf <- e_acsl_fail <- j <- main.
-        Called from PROJECT_FILE.i:125.
-[value] Done for function printf
-[value] computing for function exit <- e_acsl_fail <- j <- main.
-        Called from PROJECT_FILE.i:125.
+        Called from PROJECT_FILE.i:129.
 [value] Done for function exit
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
 [value] computing for function mpz_init_set_si <- j <- main.
-        Called from PROJECT_FILE.i:233.
+        Called from PROJECT_FILE.i:225.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_init_set_si <- j <- main.
-        Called from PROJECT_FILE.i:233.
-[value] Done for function mpz_init_set_si
-[value] computing for function mpz_init_set_si <- j <- main.
-        Called from PROJECT_FILE.i:234.
+        Called from PROJECT_FILE.i:225.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_init <- j <- main.
-        Called from PROJECT_FILE.i:234.
+        Called from PROJECT_FILE.i:226.
 [value] Done for function mpz_init
 [value] computing for function mpz_add <- j <- main.
-        Called from PROJECT_FILE.i:235.
+        Called from PROJECT_FILE.i:226.
 [value] Done for function mpz_add
 [value] computing for function mpz_cmp <- j <- main.
-        Called from PROJECT_FILE.i:236.
+        Called from PROJECT_FILE.i:227.
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <- j <- main.
-        Called from PROJECT_FILE.i:237.
+        Called from PROJECT_FILE.i:228.
 [value] computing for function printf <- e_acsl_fail <- j <- main.
-        Called from PROJECT_FILE.i:125.
+        Called from PROJECT_FILE.i:129.
 [value] Done for function printf
 [value] computing for function exit <- e_acsl_fail <- j <- main.
-        Called from PROJECT_FILE.i:125.
+        Called from PROJECT_FILE.i:129.
 [value] Done for function exit
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
 [value] computing for function mpz_clear <- j <- main.
-        Called from PROJECT_FILE.i:238.
+        Called from PROJECT_FILE.i:229.
 [value] Done for function mpz_clear
 [value] computing for function mpz_clear <- j <- main.
-        Called from PROJECT_FILE.i:238.
+        Called from PROJECT_FILE.i:229.
 [value] Done for function mpz_clear
 [value] computing for function mpz_clear <- j <- main.
-        Called from PROJECT_FILE.i:238.
+        Called from PROJECT_FILE.i:229.
 [value] Done for function mpz_clear
 [value] computing for function mpz_clear <- j <- main.
-        Called from PROJECT_FILE.i:239.
+        Called from PROJECT_FILE.i:230.
 [value] Done for function mpz_clear
 [value] computing for function mpz_clear <- j <- main.
-        Called from PROJECT_FILE.i:239.
+        Called from PROJECT_FILE.i:230.
 [value] Done for function mpz_clear
-[value] computing for function mpz_clear <- j <- main.
-        Called from PROJECT_FILE.i:239.
-[value] Done for function mpz_clear
-PROJECT_FILE.i:197:[value] Function j, behavior b1: postcondition got status valid.
-PROJECT_FILE.i:202:[value] Function j, behavior b2: postcondition got status valid.
+PROJECT_FILE.i:194:[value] Function j, behavior b1: postcondition got status valid.
+PROJECT_FILE.i:199:[value] Function j, behavior b2: postcondition got status valid.
 [value] Recording results for j
 [value] Done for function j
 [value] computing for function k <- main.
-        Called from PROJECT_FILE.i:372.
-PROJECT_FILE.i:247:[value] Function k, behavior b1: assumption got status invalid; precondition not evaluated.
-PROJECT_FILE.i:252:[value] Function k, behavior b2: precondition got status valid.
-PROJECT_FILE.i:253:[value] Function k, behavior b2: precondition got status valid.
+        Called from PROJECT_FILE.i:352.
+PROJECT_FILE.i:237:[value] Function k, behavior b1: assumption got status invalid; precondition not evaluated.
+PROJECT_FILE.i:242:[value] Function k, behavior b2: precondition got status valid.
+PROJECT_FILE.i:243:[value] Function k, behavior b2: precondition got status valid.
 [value] computing for function mpz_init_set_si <- k <- main.
-        Called from PROJECT_FILE.i:266.
+        Called from PROJECT_FILE.i:251.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_init_set_si <- k <- main.
-        Called from PROJECT_FILE.i:267.
-[value] Done for function mpz_init_set_si
-[value] computing for function mpz_cmp <- k <- main.
-        Called from PROJECT_FILE.i:267.
-[value] Done for function mpz_cmp
-[value] computing for function mpz_init_set_si <- k <- main.
-        Called from PROJECT_FILE.i:273.
-[value] Done for function mpz_init_set_si
-[value] computing for function mpz_init_set_si <- k <- main.
-        Called from PROJECT_FILE.i:274.
+        Called from PROJECT_FILE.i:252.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_cmp <- k <- main.
-        Called from PROJECT_FILE.i:275.
+        Called from PROJECT_FILE.i:252.
 [value] Done for function mpz_cmp
-PROJECT_FILE.i:276:[value] assigning non deterministic value for the first time
+[value] computing for function mpz_init_set_si <- k <- main.
+        Called from PROJECT_FILE.i:258.
+[value] Done for function mpz_init_set_si
+[value] computing for function mpz_init_set_si <- k <- main.
+        Called from PROJECT_FILE.i:259.
+[value] Done for function mpz_init_set_si
+[value] computing for function mpz_cmp <- k <- main.
+        Called from PROJECT_FILE.i:260.
+[value] Done for function mpz_cmp
+PROJECT_FILE.i:261:[value] assigning non deterministic value for the first time
 [value] computing for function mpz_clear <- k <- main.
-        Called from PROJECT_FILE.i:277.
+        Called from PROJECT_FILE.i:262.
 [value] Done for function mpz_clear
 [value] computing for function mpz_clear <- k <- main.
-        Called from PROJECT_FILE.i:278.
+        Called from PROJECT_FILE.i:263.
 [value] Done for function mpz_clear
 [value] computing for function e_acsl_fail <- k <- main.
-        Called from PROJECT_FILE.i:279.
+        Called from PROJECT_FILE.i:264.
 [value] computing for function printf <- e_acsl_fail <- k <- main.
-        Called from PROJECT_FILE.i:125.
+        Called from PROJECT_FILE.i:129.
 [value] Done for function printf
 [value] computing for function exit <- e_acsl_fail <- k <- main.
-        Called from PROJECT_FILE.i:125.
+        Called from PROJECT_FILE.i:129.
 [value] Done for function exit
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
 [value] computing for function mpz_init_set_si <- k <- main.
-        Called from PROJECT_FILE.i:280.
-[value] Done for function mpz_init_set_si
-[value] computing for function mpz_init_set_si <- k <- main.
-        Called from PROJECT_FILE.i:280.
+        Called from PROJECT_FILE.i:265.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_cmp <- k <- main.
-        Called from PROJECT_FILE.i:281.
+        Called from PROJECT_FILE.i:265.
 [value] Done for function mpz_cmp
 [value] computing for function mpz_init_set_si <- k <- main.
-        Called from PROJECT_FILE.i:286.
+        Called from PROJECT_FILE.i:270.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_init_set_si <- k <- main.
-        Called from PROJECT_FILE.i:287.
+        Called from PROJECT_FILE.i:271.
 [value] Done for function mpz_init_set_si
+[value] computing for function mpz_cmp <- k <- main.
+        Called from PROJECT_FILE.i:272.
+[value] Done for function mpz_cmp
+[value] computing for function mpz_clear <- k <- main.
+        Called from PROJECT_FILE.i:274.
+[value] Done for function mpz_clear
+[value] computing for function mpz_clear <- k <- main.
+        Called from PROJECT_FILE.i:275.
+[value] Done for function mpz_clear
+[value] computing for function mpz_init_set_si <- k <- main.
+        Called from PROJECT_FILE.i:281.
+[value] Done for function mpz_init_set_si
+[value] computing for function mpz_init_set_si <- k <- main.
+        Called from PROJECT_FILE.i:282.
+[value] Done for function mpz_init_set_si
+[value] computing for function mpz_cmp <- k <- main.
+        Called from PROJECT_FILE.i:283.
+[value] Done for function mpz_cmp
+[value] computing for function mpz_clear <- k <- main.
+        Called from PROJECT_FILE.i:285.
+[value] Done for function mpz_clear
+[value] computing for function mpz_clear <- k <- main.
+        Called from PROJECT_FILE.i:286.
+[value] Done for function mpz_clear
+[value] computing for function e_acsl_fail <- k <- main.
+        Called from PROJECT_FILE.i:287.
+[value] computing for function printf <- e_acsl_fail <- k <- main.
+        Called from PROJECT_FILE.i:129.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_fail <- k <- main.
+        Called from PROJECT_FILE.i:129.
+[value] Done for function exit
+[value] Recording results for e_acsl_fail
+[value] Done for function e_acsl_fail
 [value] computing for function mpz_cmp <- k <- main.
         Called from PROJECT_FILE.i:288.
 [value] Done for function mpz_cmp
-[value] computing for function mpz_clear <- k <- main.
-        Called from PROJECT_FILE.i:290.
-[value] Done for function mpz_clear
-[value] computing for function mpz_clear <- k <- main.
-        Called from PROJECT_FILE.i:291.
-[value] Done for function mpz_clear
 [value] computing for function mpz_init_set_si <- k <- main.
+        Called from PROJECT_FILE.i:293.
+[value] Done for function mpz_init_set_si
+[value] computing for function mpz_init_set_si <- k <- main.
+        Called from PROJECT_FILE.i:294.
+[value] Done for function mpz_init_set_si
+[value] computing for function mpz_cmp <- k <- main.
+        Called from PROJECT_FILE.i:295.
+[value] Done for function mpz_cmp
+[value] computing for function mpz_clear <- k <- main.
         Called from PROJECT_FILE.i:297.
-[value] Done for function mpz_init_set_si
-[value] computing for function mpz_init_set_si <- k <- main.
+[value] Done for function mpz_clear
+[value] computing for function mpz_clear <- k <- main.
         Called from PROJECT_FILE.i:298.
-[value] Done for function mpz_init_set_si
-[value] computing for function mpz_cmp <- k <- main.
-        Called from PROJECT_FILE.i:299.
-[value] Done for function mpz_cmp
-[value] computing for function mpz_clear <- k <- main.
-        Called from PROJECT_FILE.i:301.
 [value] Done for function mpz_clear
-[value] computing for function mpz_clear <- k <- main.
-        Called from PROJECT_FILE.i:302.
-[value] Done for function mpz_clear
-[value] computing for function e_acsl_fail <- k <- main.
-        Called from PROJECT_FILE.i:303.
-[value] computing for function printf <- e_acsl_fail <- k <- main.
-        Called from PROJECT_FILE.i:125.
-[value] Done for function printf
-[value] computing for function exit <- e_acsl_fail <- k <- main.
-        Called from PROJECT_FILE.i:125.
-[value] Done for function exit
-[value] Recording results for e_acsl_fail
-[value] Done for function e_acsl_fail
 [value] computing for function mpz_init_set_si <- k <- main.
-        Called from PROJECT_FILE.i:304.
+        Called from PROJECT_FILE.i:306.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_init_set_si <- k <- main.
-        Called from PROJECT_FILE.i:304.
+        Called from PROJECT_FILE.i:307.
 [value] Done for function mpz_init_set_si
-[value] computing for function mpz_cmp <- k <- main.
-        Called from PROJECT_FILE.i:305.
-[value] Done for function mpz_cmp
+[value] computing for function mpz_init <- k <- main.
+        Called from PROJECT_FILE.i:308.
+[value] Done for function mpz_init
+[value] computing for function mpz_add <- k <- main.
+        Called from PROJECT_FILE.i:309.
+[value] Done for function mpz_add
 [value] computing for function mpz_init_set_si <- k <- main.
         Called from PROJECT_FILE.i:310.
 [value] Done for function mpz_init_set_si
-[value] computing for function mpz_init_set_si <- k <- main.
-        Called from PROJECT_FILE.i:311.
-[value] Done for function mpz_init_set_si
 [value] computing for function mpz_cmp <- k <- main.
-        Called from PROJECT_FILE.i:312.
+        Called from PROJECT_FILE.i:311.
 [value] Done for function mpz_cmp
+[value] computing for function mpz_clear <- k <- main.
+        Called from PROJECT_FILE.i:313.
+[value] Done for function mpz_clear
 [value] computing for function mpz_clear <- k <- main.
         Called from PROJECT_FILE.i:314.
 [value] Done for function mpz_clear
 [value] computing for function mpz_clear <- k <- main.
         Called from PROJECT_FILE.i:315.
 [value] Done for function mpz_clear
-[value] computing for function mpz_init_set_si <- k <- main.
-        Called from PROJECT_FILE.i:323.
-[value] Done for function mpz_init_set_si
-[value] computing for function mpz_init_set_si <- k <- main.
-        Called from PROJECT_FILE.i:324.
-[value] Done for function mpz_init_set_si
-[value] computing for function mpz_init <- k <- main.
-        Called from PROJECT_FILE.i:325.
-[value] Done for function mpz_init
-[value] computing for function mpz_add <- k <- main.
-        Called from PROJECT_FILE.i:326.
-[value] Done for function mpz_add
-[value] computing for function mpz_init_set_si <- k <- main.
-        Called from PROJECT_FILE.i:327.
-[value] Done for function mpz_init_set_si
-[value] computing for function mpz_cmp <- k <- main.
-        Called from PROJECT_FILE.i:328.
-[value] Done for function mpz_cmp
 [value] computing for function mpz_clear <- k <- main.
-        Called from PROJECT_FILE.i:330.
-[value] Done for function mpz_clear
-[value] computing for function mpz_clear <- k <- main.
-        Called from PROJECT_FILE.i:331.
-[value] Done for function mpz_clear
-[value] computing for function mpz_clear <- k <- main.
-        Called from PROJECT_FILE.i:332.
-[value] Done for function mpz_clear
-[value] computing for function mpz_clear <- k <- main.
-        Called from PROJECT_FILE.i:333.
+        Called from PROJECT_FILE.i:316.
 [value] Done for function mpz_clear
 [value] computing for function e_acsl_fail <- k <- main.
-        Called from PROJECT_FILE.i:334.
+        Called from PROJECT_FILE.i:317.
 [value] computing for function printf <- e_acsl_fail <- k <- main.
-        Called from PROJECT_FILE.i:125.
+        Called from PROJECT_FILE.i:129.
 [value] Done for function printf
 [value] computing for function exit <- e_acsl_fail <- k <- main.
-        Called from PROJECT_FILE.i:125.
+        Called from PROJECT_FILE.i:129.
 [value] Done for function exit
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
 [value] computing for function mpz_clear <- k <- main.
-        Called from PROJECT_FILE.i:335.
+        Called from PROJECT_FILE.i:318.
 [value] Done for function mpz_clear
 [value] computing for function mpz_clear <- k <- main.
-        Called from PROJECT_FILE.i:335.
+        Called from PROJECT_FILE.i:318.
 [value] Done for function mpz_clear
 [value] computing for function mpz_clear <- k <- main.
-        Called from PROJECT_FILE.i:335.
-[value] Done for function mpz_clear
-[value] computing for function mpz_clear <- k <- main.
-        Called from PROJECT_FILE.i:336.
-[value] Done for function mpz_clear
-[value] computing for function mpz_clear <- k <- main.
-        Called from PROJECT_FILE.i:336.
-[value] Done for function mpz_clear
-[value] computing for function mpz_clear <- k <- main.
-        Called from PROJECT_FILE.i:336.
+        Called from PROJECT_FILE.i:318.
 [value] Done for function mpz_clear
 [value] Recording results for k
 [value] Done for function k
 [value] computing for function l <- main.
-        Called from PROJECT_FILE.i:373.
-PROJECT_FILE.i:346:[value] Assertion got status valid.
+        Called from PROJECT_FILE.i:353.
+PROJECT_FILE.i:327:[value] Assertion got status valid.
 [value] computing for function mpz_init_set_si <- l <- main.
-        Called from PROJECT_FILE.i:348.
+        Called from PROJECT_FILE.i:329.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_init_set_si <- l <- main.
-        Called from PROJECT_FILE.i:348.
+        Called from PROJECT_FILE.i:329.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_cmp <- l <- main.
-        Called from PROJECT_FILE.i:349.
+        Called from PROJECT_FILE.i:330.
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <- l <- main.
-        Called from PROJECT_FILE.i:350.
+        Called from PROJECT_FILE.i:331.
 [value] computing for function printf <- e_acsl_fail <- l <- main.
-        Called from PROJECT_FILE.i:125.
+        Called from PROJECT_FILE.i:129.
 [value] Done for function printf
 [value] computing for function exit <- e_acsl_fail <- l <- main.
-        Called from PROJECT_FILE.i:125.
+        Called from PROJECT_FILE.i:129.
 [value] Done for function exit
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
 [value] computing for function mpz_clear <- l <- main.
-        Called from PROJECT_FILE.i:351.
+        Called from PROJECT_FILE.i:331.
 [value] Done for function mpz_clear
 [value] computing for function mpz_clear <- l <- main.
-        Called from PROJECT_FILE.i:351.
+        Called from PROJECT_FILE.i:332.
 [value] Done for function mpz_clear
 [value] computing for function mpz_init_set_si <- l <- main.
-        Called from PROJECT_FILE.i:355.
+        Called from PROJECT_FILE.i:336.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_init_set_si <- l <- main.
-        Called from PROJECT_FILE.i:355.
+        Called from PROJECT_FILE.i:336.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_cmp <- l <- main.
-        Called from PROJECT_FILE.i:356.
+        Called from PROJECT_FILE.i:337.
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <- l <- main.
-        Called from PROJECT_FILE.i:357.
+        Called from PROJECT_FILE.i:338.
 [value] computing for function printf <- e_acsl_fail <- l <- main.
-        Called from PROJECT_FILE.i:125.
+        Called from PROJECT_FILE.i:129.
 [value] Done for function printf
 [value] computing for function exit <- e_acsl_fail <- l <- main.
-        Called from PROJECT_FILE.i:125.
+        Called from PROJECT_FILE.i:129.
 [value] Done for function exit
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
 [value] computing for function mpz_clear <- l <- main.
-        Called from PROJECT_FILE.i:358.
+        Called from PROJECT_FILE.i:338.
 [value] Done for function mpz_clear
 [value] computing for function mpz_clear <- l <- main.
-        Called from PROJECT_FILE.i:358.
+        Called from PROJECT_FILE.i:339.
 [value] Done for function mpz_clear
-PROJECT_FILE.i:343:[value] Function l: postcondition got status valid.
+PROJECT_FILE.i:324:[value] Function l: postcondition got status valid.
 [value] Recording results for l
 [value] Done for function l
 [value] Recording results for main
@@ -611,7 +569,8 @@ typedef __mpz_struct mpz_t[1];
     assigns *x;  */
 extern void mpz_init(__mpz_struct * /*[1]*/ x);
 /*@ ensures \valid(\old(z));
-    assigns *z;  */
+    assigns *z;
+    assigns *z \from n;  */
 extern void mpz_init_set_si(__mpz_struct * /*[1]*/ z, long n);
 /*@ requires \valid(x);
     assigns *x;  */
@@ -655,10 +614,9 @@ void f(void)
                        (__mpz_struct const *)(e_acsl_2));
     if (! (e_acsl_3 == 0)) { e_acsl_fail((char *)"(X == 1)"); }
     mpz_clear((__mpz_struct *)(e_acsl_1));
-    mpz_clear((__mpz_struct *)(e_acsl_2));
+    mpz_clear((__mpz_struct *)(e_acsl_2)); return;
   }
   
-  return;
 }
 
 /*@ ensures X ≡ 2;
@@ -667,24 +625,20 @@ void g(void)
 {
   X = 2;
   { mpz_t e_acsl_1; mpz_t e_acsl_2; int e_acsl_3; mpz_t e_acsl_4;
-    mpz_t e_acsl_5; int e_acsl_6;
-    mpz_init_set_si((__mpz_struct *)(e_acsl_1),(long)X);
+    int e_acsl_5; mpz_init_set_si((__mpz_struct *)(e_acsl_1),(long)X);
     mpz_init_set_si((__mpz_struct *)(e_acsl_2),(long)2);
     e_acsl_3 = mpz_cmp((__mpz_struct const *)(e_acsl_1),
                        (__mpz_struct const *)(e_acsl_2));
     if (! (e_acsl_3 == 0)) { e_acsl_fail((char *)"(X == 2)"); }
     mpz_init_set_si((__mpz_struct *)(e_acsl_4),(long)Y);
-    mpz_init_set_si((__mpz_struct *)(e_acsl_5),(long)2);
-    e_acsl_6 = mpz_cmp((__mpz_struct const *)(e_acsl_4),
-                       (__mpz_struct const *)(e_acsl_5));
-    if (! (e_acsl_6 == 0)) { e_acsl_fail((char *)"(Y == 2)"); }
+    e_acsl_5 = mpz_cmp((__mpz_struct const *)(e_acsl_4),
+                       (__mpz_struct const *)(e_acsl_2));
+    if (! (e_acsl_5 == 0)) { e_acsl_fail((char *)"(Y == 2)"); }
     mpz_clear((__mpz_struct *)(e_acsl_1));
     mpz_clear((__mpz_struct *)(e_acsl_2));
-    mpz_clear((__mpz_struct *)(e_acsl_4));
-    mpz_clear((__mpz_struct *)(e_acsl_5));
+    mpz_clear((__mpz_struct *)(e_acsl_4)); return;
   }
   
-  return;
 }
 
 /*@ requires X ≡ 2;  */
@@ -697,10 +651,9 @@ void h(void)
                        (__mpz_struct const *)(e_acsl_2));
     if (! (e_acsl_3 == 0)) { e_acsl_fail((char *)"(X == 2)"); }
     mpz_clear((__mpz_struct *)(e_acsl_1));
-    mpz_clear((__mpz_struct *)(e_acsl_2));
+    mpz_clear((__mpz_struct *)(e_acsl_2)); X ++;
   }
   
-  X ++;
   return;
 }
 
@@ -723,10 +676,9 @@ void i(void)
     mpz_clear((__mpz_struct *)(e_acsl_1));
     mpz_clear((__mpz_struct *)(e_acsl_2));
     mpz_clear((__mpz_struct *)(e_acsl_4));
-    mpz_clear((__mpz_struct *)(e_acsl_5));
+    mpz_clear((__mpz_struct *)(e_acsl_5)); X += Y;
   }
   
-  X += Y;
   return;
 }
 
@@ -744,63 +696,54 @@ void i(void)
 void j(void)
 {
   { mpz_t e_acsl_1; mpz_t e_acsl_2; int e_acsl_3; mpz_t e_acsl_4;
-    mpz_t e_acsl_5; mpz_t e_acsl_6; mpz_t e_acsl_7; int e_acsl_8;
-    mpz_t e_acsl_9; mpz_t e_acsl_10; int e_acsl_11;
-    mpz_init_set_si((__mpz_struct *)(e_acsl_1),(long)X);
+    mpz_t e_acsl_5; mpz_t e_acsl_6; int e_acsl_7; mpz_t e_acsl_8;
+    int e_acsl_9; mpz_init_set_si((__mpz_struct *)(e_acsl_1),(long)X);
     mpz_init_set_si((__mpz_struct *)(e_acsl_2),(long)5);
     e_acsl_3 = mpz_cmp((__mpz_struct const *)(e_acsl_1),
                        (__mpz_struct const *)(e_acsl_2));
     if (! (e_acsl_3 == 0)) { e_acsl_fail((char *)"(X == 5)"); }
-    mpz_init_set_si((__mpz_struct *)(e_acsl_4),(long)X);
-    mpz_init_set_si((__mpz_struct *)(e_acsl_5),(long)3);
-    mpz_init_set_si((__mpz_struct *)(e_acsl_6),(long)Y);
-    mpz_init((__mpz_struct *)(e_acsl_7));
-    mpz_add((__mpz_struct *)(e_acsl_7),(__mpz_struct const *)(e_acsl_5),
-            (__mpz_struct const *)(e_acsl_6));
-    e_acsl_8 = mpz_cmp((__mpz_struct const *)(e_acsl_4),
-                       (__mpz_struct const *)(e_acsl_7));
-    if (! (e_acsl_8 == 0)) { e_acsl_fail((char *)"(X == 3+Y)"); }
-    mpz_init_set_si((__mpz_struct *)(e_acsl_9),(long)Y);
-    mpz_init_set_si((__mpz_struct *)(e_acsl_10),(long)2);
-    e_acsl_11 = mpz_cmp((__mpz_struct const *)(e_acsl_9),
-                        (__mpz_struct const *)(e_acsl_10));
-    if (! (e_acsl_11 == 0)) { e_acsl_fail((char *)"(Y == 2)"); }
+    mpz_init_set_si((__mpz_struct *)(e_acsl_4),(long)3);
+    mpz_init_set_si((__mpz_struct *)(e_acsl_5),(long)Y);
+    mpz_init((__mpz_struct *)(e_acsl_6));
+    mpz_add((__mpz_struct *)(e_acsl_6),(__mpz_struct const *)(e_acsl_4),
+            (__mpz_struct const *)(e_acsl_5));
+    e_acsl_7 = mpz_cmp((__mpz_struct const *)(e_acsl_1),
+                       (__mpz_struct const *)(e_acsl_6));
+    if (! (e_acsl_7 == 0)) { e_acsl_fail((char *)"(X == 3+Y)"); }
+    mpz_init_set_si((__mpz_struct *)(e_acsl_8),(long)2);
+    e_acsl_9 = mpz_cmp((__mpz_struct const *)(e_acsl_5),
+                       (__mpz_struct const *)(e_acsl_8));
+    if (! (e_acsl_9 == 0)) { e_acsl_fail((char *)"(Y == 2)"); }
     mpz_clear((__mpz_struct *)(e_acsl_1));
     mpz_clear((__mpz_struct *)(e_acsl_2));
     mpz_clear((__mpz_struct *)(e_acsl_4));
     mpz_clear((__mpz_struct *)(e_acsl_5));
     mpz_clear((__mpz_struct *)(e_acsl_6));
-    mpz_clear((__mpz_struct *)(e_acsl_7));
-    mpz_clear((__mpz_struct *)(e_acsl_9));
+    mpz_clear((__mpz_struct *)(e_acsl_8)); X = 3;
+  }
+  
+  { mpz_t e_acsl_10; mpz_t e_acsl_11; int e_acsl_12; mpz_t e_acsl_13;
+    mpz_t e_acsl_14; mpz_t e_acsl_15; int e_acsl_16;
+    mpz_init_set_si((__mpz_struct *)(e_acsl_10),(long)X);
+    mpz_init_set_si((__mpz_struct *)(e_acsl_11),(long)3);
+    e_acsl_12 = mpz_cmp((__mpz_struct const *)(e_acsl_10),
+                        (__mpz_struct const *)(e_acsl_11));
+    if (! (e_acsl_12 == 0)) { e_acsl_fail((char *)"(X == 3)"); }
+    mpz_init_set_si((__mpz_struct *)(e_acsl_13),(long)Y);
+    mpz_init_set_si((__mpz_struct *)(e_acsl_14),(long)1);
+    mpz_init((__mpz_struct *)(e_acsl_15));
+    mpz_add((__mpz_struct *)(e_acsl_15),(__mpz_struct const *)(e_acsl_13),
+            (__mpz_struct const *)(e_acsl_14));
+    e_acsl_16 = mpz_cmp((__mpz_struct const *)(e_acsl_10),
+                        (__mpz_struct const *)(e_acsl_15));
+    if (! (e_acsl_16 == 0)) { e_acsl_fail((char *)"(X == Y+1)"); }
     mpz_clear((__mpz_struct *)(e_acsl_10));
-  }
-  
-  X = 3;
-  { mpz_t e_acsl_12; mpz_t e_acsl_13; int e_acsl_14; mpz_t e_acsl_15;
-    mpz_t e_acsl_16; mpz_t e_acsl_17; mpz_t e_acsl_18; int e_acsl_19;
-    mpz_init_set_si((__mpz_struct *)(e_acsl_12),(long)X);
-    mpz_init_set_si((__mpz_struct *)(e_acsl_13),(long)3);
-    e_acsl_14 = mpz_cmp((__mpz_struct const *)(e_acsl_12),
-                        (__mpz_struct const *)(e_acsl_13));
-    if (! (e_acsl_14 == 0)) { e_acsl_fail((char *)"(X == 3)"); }
-    mpz_init_set_si((__mpz_struct *)(e_acsl_15),(long)X);
-    mpz_init_set_si((__mpz_struct *)(e_acsl_16),(long)Y);
-    mpz_init_set_si((__mpz_struct *)(e_acsl_17),(long)1);
-    mpz_init((__mpz_struct *)(e_acsl_18));
-    mpz_add((__mpz_struct *)(e_acsl_18),(__mpz_struct const *)(e_acsl_16),
-            (__mpz_struct const *)(e_acsl_17));
-    e_acsl_19 = mpz_cmp((__mpz_struct const *)(e_acsl_15),
-                        (__mpz_struct const *)(e_acsl_18));
-    if (! (e_acsl_19 == 0)) { e_acsl_fail((char *)"(X == Y+1)"); }
-    mpz_clear((__mpz_struct *)(e_acsl_12));
+    mpz_clear((__mpz_struct *)(e_acsl_11));
     mpz_clear((__mpz_struct *)(e_acsl_13));
-    mpz_clear((__mpz_struct *)(e_acsl_15));
-    mpz_clear((__mpz_struct *)(e_acsl_16));
-    mpz_clear((__mpz_struct *)(e_acsl_17));
-    mpz_clear((__mpz_struct *)(e_acsl_18));
+    mpz_clear((__mpz_struct *)(e_acsl_14));
+    mpz_clear((__mpz_struct *)(e_acsl_15)); return;
   }
   
-  return;
 }
 
 /*@ behavior b1:
@@ -818,102 +761,95 @@ void j(void)
 void k(void)
 {
   { mpz_t e_acsl_1; mpz_t e_acsl_2; int e_acsl_3; int e_acsl_7;
-    mpz_t e_acsl_8; mpz_t e_acsl_9; int e_acsl_10; int e_acsl_14;
-    int e_acsl_18; mpz_t e_acsl_19; mpz_t e_acsl_20; int e_acsl_21;
-    int e_acsl_25; int e_acsl_31;
+    mpz_t e_acsl_8; int e_acsl_9; int e_acsl_13; int e_acsl_17;
+    int e_acsl_18; int e_acsl_22; int e_acsl_28;
     mpz_init_set_si((__mpz_struct *)(e_acsl_1),(long)X);
     mpz_init_set_si((__mpz_struct *)(e_acsl_2),(long)1);
     e_acsl_3 = mpz_cmp((__mpz_struct const *)(e_acsl_1),
                        (__mpz_struct const *)(e_acsl_2));
     if (! (e_acsl_3 == 0)) { e_acsl_7 = 1; }
     else {
-      mpz_t e_acsl_32;
-      mpz_t e_acsl_33;
-      int e_acsl_34;
-      mpz_init_set_si((__mpz_struct *)(e_acsl_32),(long)X);
-      mpz_init_set_si((__mpz_struct *)(e_acsl_33),(long)0);
-      e_acsl_34 = mpz_cmp((__mpz_struct const *)(e_acsl_32),
-                          (__mpz_struct const *)(e_acsl_33));
-      e_acsl_7 = e_acsl_34 == 0;
-      mpz_clear((__mpz_struct *)(e_acsl_32));
-      mpz_clear((__mpz_struct *)(e_acsl_33));
+      mpz_t e_acsl_4;
+      mpz_t e_acsl_5;
+      int e_acsl_6;
+      mpz_init_set_si((__mpz_struct *)(e_acsl_4),(long)X);
+      mpz_init_set_si((__mpz_struct *)(e_acsl_5),(long)0);
+      e_acsl_6 = mpz_cmp((__mpz_struct const *)(e_acsl_4),
+                         (__mpz_struct const *)(e_acsl_5));
+      e_acsl_7 = e_acsl_6 == 0;
+      mpz_clear((__mpz_struct *)(e_acsl_4));
+      mpz_clear((__mpz_struct *)(e_acsl_5));
     } if (! e_acsl_7) { e_acsl_fail((char *)"(X == 1 ==> X == 0)"); }
-    mpz_init_set_si((__mpz_struct *)(e_acsl_8),(long)X);
-    mpz_init_set_si((__mpz_struct *)(e_acsl_9),(long)3);
-    e_acsl_10 = mpz_cmp((__mpz_struct const *)(e_acsl_8),
-                        (__mpz_struct const *)(e_acsl_9));
-    if (e_acsl_10 == 0) {
-      mpz_t e_acsl_35;
-      mpz_t e_acsl_36;
-      int e_acsl_37;
-      mpz_init_set_si((__mpz_struct *)(e_acsl_35),(long)Y);
-      mpz_init_set_si((__mpz_struct *)(e_acsl_36),(long)2);
-      e_acsl_37 = mpz_cmp((__mpz_struct const *)(e_acsl_35),
-                          (__mpz_struct const *)(e_acsl_36));
-      e_acsl_14 = e_acsl_37 == 0;
-      mpz_clear((__mpz_struct *)(e_acsl_35));
-      mpz_clear((__mpz_struct *)(e_acsl_36));
-    } else { e_acsl_14 = 0; } if (! e_acsl_14) { e_acsl_18 = 1; }
+    mpz_init_set_si((__mpz_struct *)(e_acsl_8),(long)3);
+    e_acsl_9 = mpz_cmp((__mpz_struct const *)(e_acsl_1),
+                       (__mpz_struct const *)(e_acsl_8));
+    if (e_acsl_9 == 0) {
+      mpz_t e_acsl_10;
+      mpz_t e_acsl_11;
+      int e_acsl_12;
+      mpz_init_set_si((__mpz_struct *)(e_acsl_10),(long)Y);
+      mpz_init_set_si((__mpz_struct *)(e_acsl_11),(long)2);
+      e_acsl_12 = mpz_cmp((__mpz_struct const *)(e_acsl_10),
+                          (__mpz_struct const *)(e_acsl_11));
+      e_acsl_13 = e_acsl_12 == 0;
+      mpz_clear((__mpz_struct *)(e_acsl_10));
+      mpz_clear((__mpz_struct *)(e_acsl_11));
+    } else { e_acsl_13 = 0; } if (! e_acsl_13) { e_acsl_17 = 1; }
     else {
-      mpz_t e_acsl_38;
-      mpz_t e_acsl_39;
-      int e_acsl_40;
-      mpz_init_set_si((__mpz_struct *)(e_acsl_38),(long)X);
-      mpz_init_set_si((__mpz_struct *)(e_acsl_39),(long)3);
-      e_acsl_40 = mpz_cmp((__mpz_struct const *)(e_acsl_38),
-                          (__mpz_struct const *)(e_acsl_39));
-      e_acsl_18 = e_acsl_40 == 0;
-      mpz_clear((__mpz_struct *)(e_acsl_38));
-      mpz_clear((__mpz_struct *)(e_acsl_39));
+      mpz_t e_acsl_14;
+      mpz_t e_acsl_15;
+      int e_acsl_16;
+      mpz_init_set_si((__mpz_struct *)(e_acsl_14),(long)X);
+      mpz_init_set_si((__mpz_struct *)(e_acsl_15),(long)3);
+      e_acsl_16 = mpz_cmp((__mpz_struct const *)(e_acsl_14),
+                          (__mpz_struct const *)(e_acsl_15));
+      e_acsl_17 = e_acsl_16 == 0;
+      mpz_clear((__mpz_struct *)(e_acsl_14));
+      mpz_clear((__mpz_struct *)(e_acsl_15));
     }
-    if (! e_acsl_18) { e_acsl_fail((char *)"(X == 3 && Y == 2 ==> X == 3)");
-    } mpz_init_set_si((__mpz_struct *)(e_acsl_19),(long)X);
-    mpz_init_set_si((__mpz_struct *)(e_acsl_20),(long)3);
-    e_acsl_21 = mpz_cmp((__mpz_struct const *)(e_acsl_19),
-                        (__mpz_struct const *)(e_acsl_20));
-    if (e_acsl_21 == 0) {
-      mpz_t e_acsl_41;
-      mpz_t e_acsl_42;
-      int e_acsl_43;
-      mpz_init_set_si((__mpz_struct *)(e_acsl_41),(long)Y);
-      mpz_init_set_si((__mpz_struct *)(e_acsl_42),(long)2);
-      e_acsl_43 = mpz_cmp((__mpz_struct const *)(e_acsl_41),
-                          (__mpz_struct const *)(e_acsl_42));
-      e_acsl_25 = e_acsl_43 == 0;
-      mpz_clear((__mpz_struct *)(e_acsl_41));
-      mpz_clear((__mpz_struct *)(e_acsl_42));
-    } else { e_acsl_25 = 0; } if (! e_acsl_25) { e_acsl_31 = 1; }
+    if (! e_acsl_17) { e_acsl_fail((char *)"(X == 3 && Y == 2 ==> X == 3)");
+    }
+    e_acsl_18 = mpz_cmp((__mpz_struct const *)(e_acsl_1),
+                        (__mpz_struct const *)(e_acsl_8));
+    if (e_acsl_18 == 0) {
+      mpz_t e_acsl_19;
+      mpz_t e_acsl_20;
+      int e_acsl_21;
+      mpz_init_set_si((__mpz_struct *)(e_acsl_19),(long)Y);
+      mpz_init_set_si((__mpz_struct *)(e_acsl_20),(long)2);
+      e_acsl_21 = mpz_cmp((__mpz_struct const *)(e_acsl_19),
+                          (__mpz_struct const *)(e_acsl_20));
+      e_acsl_22 = e_acsl_21 == 0;
+      mpz_clear((__mpz_struct *)(e_acsl_19));
+      mpz_clear((__mpz_struct *)(e_acsl_20));
+    } else { e_acsl_22 = 0; } if (! e_acsl_22) { e_acsl_28 = 1; }
     else {
-      mpz_t e_acsl_44;
-      mpz_t e_acsl_45;
-      mpz_t e_acsl_46;
-      mpz_t e_acsl_47;
-      int e_acsl_48;
-      mpz_init_set_si((__mpz_struct *)(e_acsl_44),(long)X);
-      mpz_init_set_si((__mpz_struct *)(e_acsl_45),(long)Y);
-      mpz_init((__mpz_struct *)(e_acsl_46));
-      mpz_add((__mpz_struct *)(e_acsl_46),(__mpz_struct const *)(e_acsl_44),
-              (__mpz_struct const *)(e_acsl_45));
-      mpz_init_set_si((__mpz_struct *)(e_acsl_47),(long)5);
-      e_acsl_48 = mpz_cmp((__mpz_struct const *)(e_acsl_46),
-                          (__mpz_struct const *)(e_acsl_47));
-      e_acsl_31 = e_acsl_48 == 0;
-      mpz_clear((__mpz_struct *)(e_acsl_44));
-      mpz_clear((__mpz_struct *)(e_acsl_45));
-      mpz_clear((__mpz_struct *)(e_acsl_46));
-      mpz_clear((__mpz_struct *)(e_acsl_47));
+      mpz_t e_acsl_23;
+      mpz_t e_acsl_24;
+      mpz_t e_acsl_25;
+      mpz_t e_acsl_26;
+      int e_acsl_27;
+      mpz_init_set_si((__mpz_struct *)(e_acsl_23),(long)X);
+      mpz_init_set_si((__mpz_struct *)(e_acsl_24),(long)Y);
+      mpz_init((__mpz_struct *)(e_acsl_25));
+      mpz_add((__mpz_struct *)(e_acsl_25),(__mpz_struct const *)(e_acsl_23),
+              (__mpz_struct const *)(e_acsl_24));
+      mpz_init_set_si((__mpz_struct *)(e_acsl_26),(long)5);
+      e_acsl_27 = mpz_cmp((__mpz_struct const *)(e_acsl_25),
+                          (__mpz_struct const *)(e_acsl_26));
+      e_acsl_28 = e_acsl_27 == 0;
+      mpz_clear((__mpz_struct *)(e_acsl_23));
+      mpz_clear((__mpz_struct *)(e_acsl_24));
+      mpz_clear((__mpz_struct *)(e_acsl_25));
+      mpz_clear((__mpz_struct *)(e_acsl_26));
     }
-    if (! e_acsl_31) {
+    if (! e_acsl_28) {
       e_acsl_fail((char *)"(X == 3 && Y == 2 ==> X+Y == 5)");
     } mpz_clear((__mpz_struct *)(e_acsl_1));
     mpz_clear((__mpz_struct *)(e_acsl_2));
-    mpz_clear((__mpz_struct *)(e_acsl_8));
-    mpz_clear((__mpz_struct *)(e_acsl_9));
-    mpz_clear((__mpz_struct *)(e_acsl_19));
-    mpz_clear((__mpz_struct *)(e_acsl_20));
+    mpz_clear((__mpz_struct *)(e_acsl_8)); X += Y;
   }
   
-  X += Y;
   return;
 }
 
@@ -938,10 +874,9 @@ int l(void)
                        (__mpz_struct const *)(e_acsl_5));
     if (! (e_acsl_6 == 0)) { e_acsl_fail((char *)"(X == 5)"); }
     mpz_clear((__mpz_struct *)(e_acsl_4));
-    mpz_clear((__mpz_struct *)(e_acsl_5));
+    mpz_clear((__mpz_struct *)(e_acsl_5)); return (X);
   }
   
-  return (X);
 }
 
 int main(void)

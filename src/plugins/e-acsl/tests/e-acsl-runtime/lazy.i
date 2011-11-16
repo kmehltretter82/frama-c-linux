@@ -7,7 +7,7 @@ int main(void) {
   int x = 0, y = 1;
   /*@ assert x == 0 && y == 1; */
   /*@ assert ! (x != 0 && y == 1/0); */
-  /*@ assert x == 1 || y == 1; */
+  /*@ assert y == 1 || x == 1; */
   /*@ assert x == 0 || y == 1/0; */
   /*@ assert x == 0 ==> y == 1; */
   /*@ assert x == 1 ==> y == 1/0; */

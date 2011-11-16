@@ -8,29 +8,29 @@ tests/e-acsl-runtime/array.i:14:[e-acsl] warning: missing guard for ensuring tha
 [value] Values of globals at initialization
         T1[0..2] ∈ {0}
         T2[0..3] ∈ {0}
-PROJECT_FILE.i:132:[value] entering loop for the first time
-PROJECT_FILE.i:132:[value] assigning non deterministic value for the first time
-PROJECT_FILE.i:135:[value] entering loop for the first time
-PROJECT_FILE.i:138:[value] Assertion got status unknown.
+PROJECT_FILE.i:136:[value] entering loop for the first time
+PROJECT_FILE.i:136:[value] assigning non deterministic value for the first time
+PROJECT_FILE.i:139:[value] entering loop for the first time
+PROJECT_FILE.i:142:[value] Assertion got status unknown.
 [value] computing for function e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:139.
+        Called from PROJECT_FILE.i:143.
 [value] computing for function printf <- e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:125.
+        Called from PROJECT_FILE.i:129.
 [value] Done for function printf
 [value] computing for function exit <- e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:125.
-PROJECT_FILE.i:115:[value] Function exit: postcondition got status invalid.
+        Called from PROJECT_FILE.i:129.
+PROJECT_FILE.i:119:[value] Function exit: postcondition got status invalid.
 [value] Done for function exit
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
-PROJECT_FILE.i:141:[value] Assertion got status unknown.
+PROJECT_FILE.i:145:[value] Assertion got status unknown.
 [value] computing for function e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:142.
+        Called from PROJECT_FILE.i:146.
 [value] computing for function printf <- e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:125.
+        Called from PROJECT_FILE.i:129.
 [value] Done for function printf
 [value] computing for function exit <- e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:125.
+        Called from PROJECT_FILE.i:129.
 [value] Done for function exit
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
