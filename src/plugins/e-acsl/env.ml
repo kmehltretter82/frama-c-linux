@@ -56,7 +56,10 @@ let empty_mpz_tbl =
     clear_stmts = [] }
 
 let dummy = 
-  { visitor = new Visitor.frama_c_inplace; 
+  { visitor = 
+      new Visitor.generic_frama_c_visitor 
+	Project_skeleton.dummy
+	(inplace_visit ()); 
     new_global_vars = [];
     global_mpz_tbl = empty_mpz_tbl; 
     env_stack = []; 
