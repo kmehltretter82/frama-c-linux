@@ -157,7 +157,6 @@ let new_var ?(global=false) env t ty mk_stmts =
       match t with
       | None -> raise No_term
       | Some t -> 
-	Options.feedback "memoized %a" Term.pretty t;
 	Term.Map.find t local_env.mpz_tbl.new_exps, env
     with Not_found | No_term -> 
       do_new_var ~global env t ty mk_stmts  

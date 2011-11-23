@@ -1,9 +1,4 @@
-[e-acsl] memoized \old(x)
-[e-acsl] memoized \old(x)
-[e-acsl] memoized \old(x)-\old(x)
 tests/e-acsl-runtime/result.i:7:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
-[e-acsl] memoized \result
-[e-acsl] memoized 0
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed
