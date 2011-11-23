@@ -145,7 +145,16 @@ let constant_to_exp ?(loc=Location.unknown) = function
 let rec thost_to_host env = function
   | TVar { lv_origin = Some v } -> Var v, env
   | TVar { lv_origin = None } -> Misc.not_yet "logic variable"
-  | TResult _typ -> Misc.not_yet "\\result"
+  | TResult _typ -> 
+    let vis = Env.get_visitor env in
+    let kf = Extlib.the vis#current_kf in
+    let stmt = 
+      try Kernel_function.find_return kf 
+      with Kernel_function.No_Statement -> assert false
+    in
+    (match stmt.skind with
+    | Return(Some { enode = Lval (lhost, NoOffset) }, _) -> lhost, env
+    | _ -> assert false)
   | TMem t ->
     let e, env = term_to_exp env (Ctype intType) t in
     Options.warning ~source:(fst e.eloc) ~once:true
@@ -307,7 +316,7 @@ and context_insensitive_term_to_exp env t =
        That is this variable which is the resulting expression. 
        ACSL typing rule ensures that the type of this variable is the same as
        the one of [e]. *)
-    let res, env =
+    let res, new_env =
       Env.new_var ~global:true env
 	(Some t) (typeOf e)
 	(fun lv' e' -> 
@@ -316,15 +325,16 @@ and context_insensitive_term_to_exp env t =
 	     initialize it. *)
 	  new_v := Some (lv', e'); [])
     in
-    let env_ref = ref env in
-    (* visitor modifying in place the labeled statement in order to store [e] in
-       the resulting variable at this location which is the only correct one. *)
+    let env_ref = ref new_env in
+      (* visitor modifying in place the labeled statement in order to store [e]
+	 in the resulting variable at this location which is the only correct
+	 one. *)
     let o = object 
       inherit Visitor.frama_c_inplace
       method vstmt_aux stmt = 
 	let new_lv, new_e = Extlib.the !new_v in
-	(* either a standard C affectation or an mpz one according to type of
-	   [e] *) 
+	  (* either a standard C affectation or an mpz one according to type of
+	     [e] *) 
 	let new_stmt =
 	  if Mpz.is_t (typeOf new_e) then
 	    Mpz.init_set new_e e
@@ -332,23 +342,21 @@ and context_insensitive_term_to_exp env t =
 	    mkStmtOneInstr ~valid_sid:true
 	      (Set((Var new_lv, NoOffset), e, Location.unknown))
 	in
-	assert (!env_ref == env);
-	(* generate the new block of code for the labeled statement and the
-	   corresponding environment *)
-	let block, env = 
-	  Env.pop_and_get env new_stmt ~global_clear:false Env.Middle
+	assert (!env_ref == new_env);
+	  (* generate the new block of code for the labeled statement and the
+	     corresponding environment *)
+	let block, new_env = 
+	  Env.pop_and_get new_env new_stmt ~global_clear:false Env.Middle
 	in
 	let pre = match label with
 	  | LogicLabel(_, s) when s = "Here" || s = "Post" -> true
 	  | StmtLabel _ | LogicLabel _ -> false
 	in
-	env_ref := Env.extend_stmt_in_place env stmt ~pre block;
-(*	Options.feedback "the new stmt is (sid %d): %a" stmt.sid 
-	  Stmt.pretty stmt;*)
+	env_ref := Env.extend_stmt_in_place new_env stmt ~pre block;
 	ChangeTo stmt
     end
     in
-    let bhv = (Env.get_visitor env)#behavior in
+    let bhv = (Env.get_visitor new_env)#behavior in
     let new_stmt = Visitor.visitFramacStmt o (get_stmt bhv stmt) in
     set_stmt bhv stmt new_stmt;
     res, !env_ref, false
@@ -379,11 +387,11 @@ and comparison_to_exp ?(loc=Location.unknown) ?e1 env bop t1 t2 t_opt =
   let ctx = match e1 with
     | None -> principal_type_from_term t1 t2 
     | Some(_, ctx) -> 
-(*      Options.feedback "principality oriented by %a" d_logic_type ctx;*)
+      (*      Options.feedback "principality oriented by %a" d_logic_type ctx;*)
       principal_type_from_term { t1 with term_type = ctx } t2
   in
-(*  Options.feedback "principal type of %a and %a is %a" 
-    d_term t1 d_term t2 d_logic_type ctx;*)
+  (*  Options.feedback "principal type of %a and %a is %a" 
+      d_term t1 d_term t2 d_logic_type ctx;*)
   let e1, env = match e1 with
     | None -> term_to_exp env ctx t1
     | Some(e1, ctx1) when Cil_datatype.Logic_type.equal ctx ctx1 -> e1, env

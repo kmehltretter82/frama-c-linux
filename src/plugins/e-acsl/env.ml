@@ -148,13 +148,17 @@ let new_var ?(global=false) env t ty mk_stmts =
   let local_env, _ = top env in
   if global then
     (* do not use memoisation here: it is incorrect for terms corresponding to
-       impure expressions *)
+       impure expressions
+       [JS 2011/11/23] actually it is correct now since globals are only use for
+       \at *)
     do_new_var ~global env t ty mk_stmts  
   else
     try
       match t with
       | None -> raise No_term
-      | Some t -> Term.Map.find t local_env.mpz_tbl.new_exps, env
+      | Some t -> 
+	Options.feedback "memoized %a" Term.pretty t;
+	Term.Map.find t local_env.mpz_tbl.new_exps, env
     with Not_found | No_term -> 
       do_new_var ~global env t ty mk_stmts  
 

@@ -1,11 +1,11 @@
 à traiter avant la 1ère release:
 - quantifications sans exentension de syntaxe
-- \return
 
 ########
 # CODE #
 ########
 
+- mixed assumes and ensures
 - function contracts for functions only declared
   ==> le noyau génère un "assigns \nothing" pour ces fonctions...
   ce assign n'est de toute façon pas gérer
@@ -25,6 +25,7 @@
 # KNOWN BUGS #
 ##############
 - \at incorrect si StmtLabel faisant référence au stmt courant (voir test at.i)
+- incorrect d'utiliser un \old dans le post-state si pre-state == post-state
 
 #########
 # TESTS #
