@@ -1,6 +1,6 @@
 /* run.config
    COMMENT: \at
-   EXECNOW: LOG gen_at.c BIN gen_at.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/at.i -e-acsl-project p -e-acsl-include-headers -then-on p -print -ocode ./tests/e-acsl-runtime/result/gen_at.c > /dev/null && gcc -o ./tests/e-acsl-runtime/result/gen_at.out ./tests/e-acsl-runtime/result/gen_at.c -lgmp
+   EXECNOW: LOG gen_at.c BIN gen_at.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/at.i -e-acsl-project p -e-acsl-include-headers -then-on p -print -ocode ./tests/e-acsl-runtime/result/gen_at.c > /dev/null && gcc -o ./tests/e-acsl-runtime/result/gen_at.out ./tests/e-acsl-runtime/result/gen_at.c -lgmp && ./tests/e-acsl-runtime/result/gen_at.out
 */
 
 int A = 0;
@@ -16,6 +16,26 @@ void f(void) {
   A = 3;
 }
 
+/* /\*@ requires \valid(p); */
+/*   @ requires \valid(p+1); */
+/*   @ requires \valid(q); */
+/*   @*\/ */
+void g(int *p, int *q) {
+  *p = 0;
+  *(p+1) = 1;
+  *q = 0;
+ L1: *p = 2;
+  *(p+1) = 3;
+  *q = 1;
+ L2: A = 4;
+  /*@ assert (\at(*(p+\at(*q,L1)),L2) == 2); */
+ L3:
+  /*@ assert (\at(*(p+\at(*q,L1)),Here) == 2); */
+  //  /*@ assert (\at(*(p+\at(*q,L1)),L3) == 2); */ // doesn't work yet
+  //  /*@ assert (\at(*(p+\at(*q,L2)),L1)) == 1; */
+  return ;
+}
+
 int main(void) {
 
   int x;
@@ -29,6 +49,9 @@ int main(void) {
   /*@ assert \at(x,L) == 0; */
   /*@ assert \at(x+1,L) == 1; */
   /*@ assert \at(x,L)+1 == 1; */
+
+  int t[2];
+  g(t,&x);
 
   return 0;
 }
