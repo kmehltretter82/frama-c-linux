@@ -21,6 +21,11 @@
 - introduire feature wishes Bernard (voir mail du 9 juin)
 - arithmetic overflows
 
+##############
+# KNOWN BUGS #
+##############
+- \at incorrect si StmtLabel faisant référence au stmt courant (voir test at.i)
+
 #########
 # TESTS #
 #########

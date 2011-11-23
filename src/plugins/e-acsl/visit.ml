@@ -299,22 +299,32 @@ and context_insensitive_term_to_exp env t =
   | Tif _ -> Misc.not_yet "conditional"
   | Tat(t', label) ->
     let stmt = Env.stmt_of_label env label in
-    (*    Options.feedback "proceeding term %a" Term.pretty t;*)
     let ty = t'.term_type in
+    (* convert [t'] to [e] in a separated local env *)
     let e, env = term_to_exp (Env.push env) ty t' in
     let new_v = ref None in
+    (* generate a new variable denoting [\at(t',label)].
+       That is this variable which is the resulting expression. 
+       ACSL typing rule ensures that the type of this variable is the same as
+       the one of [e]. *)
     let res, env =
       Env.new_var ~global:true env
 	(Some t) (typeOf e)
-	(fun lv' e' -> new_v := Some (lv', e'); [])
+	(fun lv' e' -> 
+	  (* store the corresponding left value and expression corresponding to
+	     the new variable. Will be used in the visitor in order to
+	     initialize it. *)
+	  new_v := Some (lv', e'); [])
     in
     let env_ref = ref env in
+    (* visitor modifying in place the labeled statement in order to store [e] in
+       the resulting variable at this location which is the only correct one. *)
     let o = object 
       inherit Visitor.frama_c_inplace
       method vstmt_aux stmt = 
-(*	Options.feedback "labeled stmt sid %d (%a) = %a" 
-	  stmt.sid Project.pretty (Project.current ()) Stmt.pretty stmt;*)
 	let new_lv, new_e = Extlib.the !new_v in
+	(* either a standard C affectation or an mpz one according to type of
+	   [e] *) 
 	let new_stmt =
 	  if Mpz.is_t (typeOf new_e) then
 	    Mpz.init_set new_e e
@@ -323,6 +333,8 @@ and context_insensitive_term_to_exp env t =
 	      (Set((Var new_lv, NoOffset), e, Location.unknown))
 	in
 	assert (!env_ref == env);
+	(* generate the new block of code for the labeled statement and the
+	   corresponding environment *)
 	let block, env = 
 	  Env.pop_and_get env new_stmt ~global_clear:false Env.Middle
 	in
