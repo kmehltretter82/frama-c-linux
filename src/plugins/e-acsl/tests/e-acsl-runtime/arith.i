@@ -18,6 +18,8 @@ int main(void) {
   /*@ assert x/3 == -1; */ ;
   /*@ assert 0xfffffffffff/0xfffffffffff == 1; */ ;
   /*@ assert x % 2 == -1; */ ;
+  /*@ assert -3 % -2 == -1; */ ;
+  /*@ assert 3 % -2 == 1; */ ;
 
   /*@ assert x * 2 + (3 + y) - 4 + (x - y) == -10; */ ;
 

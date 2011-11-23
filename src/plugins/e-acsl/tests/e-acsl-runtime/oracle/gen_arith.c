@@ -882,66 +882,144 @@ int main(void)
     __gmpz_clear((__mpz_struct *)(e_acsl_48));
   }
   
-  /*@ assert ((x*2+(3+y))-4)+(x-y) ≡ -10; */ ;
+  /*@ assert -3%-2 ≡ -1; */ ;
   {
     mpz_t e_acsl_50;
     mpz_t e_acsl_51;
     mpz_t e_acsl_52;
     mpz_t e_acsl_53;
     mpz_t e_acsl_54;
-    mpz_t e_acsl_55;
+    int e_acsl_55;
     mpz_t e_acsl_56;
     mpz_t e_acsl_57;
     mpz_t e_acsl_58;
-    mpz_t e_acsl_59;
-    mpz_t e_acsl_60;
-    mpz_t e_acsl_61;
-    mpz_t e_acsl_62;
-    int e_acsl_63;
-    __gmpz_init_set_si((__mpz_struct *)(e_acsl_50),(long)x);
-    __gmpz_init_set_si((__mpz_struct *)(e_acsl_51),(long)2);
-    __gmpz_init((__mpz_struct *)(e_acsl_52));
-    __gmpz_mul((__mpz_struct *)(e_acsl_52),(__mpz_struct const *)(e_acsl_50),
-               (__mpz_struct const *)(e_acsl_51));
-    __gmpz_init_set_si((__mpz_struct *)(e_acsl_53),(long)3);
-    __gmpz_init_set_si((__mpz_struct *)(e_acsl_54),(long)y);
-    __gmpz_init((__mpz_struct *)(e_acsl_55));
-    __gmpz_add((__mpz_struct *)(e_acsl_55),(__mpz_struct const *)(e_acsl_53),
-               (__mpz_struct const *)(e_acsl_54));
+    int e_acsl_59;
+    __gmpz_init_set_si((__mpz_struct *)(e_acsl_50),(long)3);
+    __gmpz_init((__mpz_struct *)(e_acsl_51));
+    __gmpz_neg((__mpz_struct *)(e_acsl_51),(__mpz_struct const *)(e_acsl_50));
+    __gmpz_init_set_si((__mpz_struct *)(e_acsl_52),(long)2);
+    __gmpz_init((__mpz_struct *)(e_acsl_53));
+    __gmpz_neg((__mpz_struct *)(e_acsl_53),(__mpz_struct const *)(e_acsl_52));
+    __gmpz_init_set_si((__mpz_struct *)(e_acsl_54),(long)0);
+    e_acsl_55 = __gmpz_cmp((__mpz_struct const *)(e_acsl_53),
+                           (__mpz_struct const *)(e_acsl_54));
     __gmpz_init((__mpz_struct *)(e_acsl_56));
-    __gmpz_add((__mpz_struct *)(e_acsl_56),(__mpz_struct const *)(e_acsl_52),
-               (__mpz_struct const *)(e_acsl_55));
-    __gmpz_init_set_si((__mpz_struct *)(e_acsl_57),(long)4);
+    /*@ assert -2 ≢ 0; */ ;
+    if (e_acsl_55 == 0) { e_acsl_fail((char *)"(-2 == 0)"); }
+    __gmpz_tdiv_r((__mpz_struct *)(e_acsl_56),
+                  (__mpz_struct const *)(e_acsl_51),
+                  (__mpz_struct const *)(e_acsl_53));
+    __gmpz_init_set_si((__mpz_struct *)(e_acsl_57),(long)1);
     __gmpz_init((__mpz_struct *)(e_acsl_58));
-    __gmpz_sub((__mpz_struct *)(e_acsl_58),(__mpz_struct const *)(e_acsl_56),
-               (__mpz_struct const *)(e_acsl_57));
-    __gmpz_init((__mpz_struct *)(e_acsl_59));
-    __gmpz_sub((__mpz_struct *)(e_acsl_59),(__mpz_struct const *)(e_acsl_50),
-               (__mpz_struct const *)(e_acsl_54));
-    __gmpz_init((__mpz_struct *)(e_acsl_60));
-    __gmpz_add((__mpz_struct *)(e_acsl_60),(__mpz_struct const *)(e_acsl_58),
-               (__mpz_struct const *)(e_acsl_59));
-    __gmpz_init_set_si((__mpz_struct *)(e_acsl_61),(long)10);
-    __gmpz_init((__mpz_struct *)(e_acsl_62));
-    __gmpz_neg((__mpz_struct *)(e_acsl_62),(__mpz_struct const *)(e_acsl_61));
-    e_acsl_63 = __gmpz_cmp((__mpz_struct const *)(e_acsl_60),
-                           (__mpz_struct const *)(e_acsl_62));
-    if (! (e_acsl_63 == 0)) {
-      e_acsl_fail((char *)"(((x*2+(3+y))-4)+(x-y) == -10)");
-    }
+    __gmpz_neg((__mpz_struct *)(e_acsl_58),(__mpz_struct const *)(e_acsl_57));
+    e_acsl_59 = __gmpz_cmp((__mpz_struct const *)(e_acsl_56),
+                           (__mpz_struct const *)(e_acsl_58));
+    if (! (e_acsl_59 == 0)) { e_acsl_fail((char *)"(-3%-2 == -1)"); }
     __gmpz_clear((__mpz_struct *)(e_acsl_50));
     __gmpz_clear((__mpz_struct *)(e_acsl_51));
     __gmpz_clear((__mpz_struct *)(e_acsl_52));
     __gmpz_clear((__mpz_struct *)(e_acsl_53));
     __gmpz_clear((__mpz_struct *)(e_acsl_54));
-    __gmpz_clear((__mpz_struct *)(e_acsl_55));
     __gmpz_clear((__mpz_struct *)(e_acsl_56));
     __gmpz_clear((__mpz_struct *)(e_acsl_57));
     __gmpz_clear((__mpz_struct *)(e_acsl_58));
-    __gmpz_clear((__mpz_struct *)(e_acsl_59));
+  }
+  
+  /*@ assert 3%-2 ≡ 1; */ ;
+  {
+    mpz_t e_acsl_60;
+    mpz_t e_acsl_61;
+    mpz_t e_acsl_62;
+    mpz_t e_acsl_63;
+    int e_acsl_64;
+    mpz_t e_acsl_65;
+    mpz_t e_acsl_66;
+    int e_acsl_67;
+    __gmpz_init_set_si((__mpz_struct *)(e_acsl_60),(long)3);
+    __gmpz_init_set_si((__mpz_struct *)(e_acsl_61),(long)2);
+    __gmpz_init((__mpz_struct *)(e_acsl_62));
+    __gmpz_neg((__mpz_struct *)(e_acsl_62),(__mpz_struct const *)(e_acsl_61));
+    __gmpz_init_set_si((__mpz_struct *)(e_acsl_63),(long)0);
+    e_acsl_64 = __gmpz_cmp((__mpz_struct const *)(e_acsl_62),
+                           (__mpz_struct const *)(e_acsl_63));
+    __gmpz_init((__mpz_struct *)(e_acsl_65));
+    /*@ assert -2 ≢ 0; */ ;
+    if (e_acsl_64 == 0) { e_acsl_fail((char *)"(-2 == 0)"); }
+    __gmpz_tdiv_r((__mpz_struct *)(e_acsl_65),
+                  (__mpz_struct const *)(e_acsl_60),
+                  (__mpz_struct const *)(e_acsl_62));
+    __gmpz_init_set_si((__mpz_struct *)(e_acsl_66),(long)1);
+    e_acsl_67 = __gmpz_cmp((__mpz_struct const *)(e_acsl_65),
+                           (__mpz_struct const *)(e_acsl_66));
+    if (! (e_acsl_67 == 0)) { e_acsl_fail((char *)"(3%-2 == 1)"); }
     __gmpz_clear((__mpz_struct *)(e_acsl_60));
     __gmpz_clear((__mpz_struct *)(e_acsl_61));
     __gmpz_clear((__mpz_struct *)(e_acsl_62));
+    __gmpz_clear((__mpz_struct *)(e_acsl_63));
+    __gmpz_clear((__mpz_struct *)(e_acsl_65));
+    __gmpz_clear((__mpz_struct *)(e_acsl_66));
+  }
+  
+  /*@ assert ((x*2+(3+y))-4)+(x-y) ≡ -10; */ ;
+  {
+    mpz_t e_acsl_68;
+    mpz_t e_acsl_69;
+    mpz_t e_acsl_70;
+    mpz_t e_acsl_71;
+    mpz_t e_acsl_72;
+    mpz_t e_acsl_73;
+    mpz_t e_acsl_74;
+    mpz_t e_acsl_75;
+    mpz_t e_acsl_76;
+    mpz_t e_acsl_77;
+    mpz_t e_acsl_78;
+    mpz_t e_acsl_79;
+    mpz_t e_acsl_80;
+    int e_acsl_81;
+    __gmpz_init_set_si((__mpz_struct *)(e_acsl_68),(long)x);
+    __gmpz_init_set_si((__mpz_struct *)(e_acsl_69),(long)2);
+    __gmpz_init((__mpz_struct *)(e_acsl_70));
+    __gmpz_mul((__mpz_struct *)(e_acsl_70),(__mpz_struct const *)(e_acsl_68),
+               (__mpz_struct const *)(e_acsl_69));
+    __gmpz_init_set_si((__mpz_struct *)(e_acsl_71),(long)3);
+    __gmpz_init_set_si((__mpz_struct *)(e_acsl_72),(long)y);
+    __gmpz_init((__mpz_struct *)(e_acsl_73));
+    __gmpz_add((__mpz_struct *)(e_acsl_73),(__mpz_struct const *)(e_acsl_71),
+               (__mpz_struct const *)(e_acsl_72));
+    __gmpz_init((__mpz_struct *)(e_acsl_74));
+    __gmpz_add((__mpz_struct *)(e_acsl_74),(__mpz_struct const *)(e_acsl_70),
+               (__mpz_struct const *)(e_acsl_73));
+    __gmpz_init_set_si((__mpz_struct *)(e_acsl_75),(long)4);
+    __gmpz_init((__mpz_struct *)(e_acsl_76));
+    __gmpz_sub((__mpz_struct *)(e_acsl_76),(__mpz_struct const *)(e_acsl_74),
+               (__mpz_struct const *)(e_acsl_75));
+    __gmpz_init((__mpz_struct *)(e_acsl_77));
+    __gmpz_sub((__mpz_struct *)(e_acsl_77),(__mpz_struct const *)(e_acsl_68),
+               (__mpz_struct const *)(e_acsl_72));
+    __gmpz_init((__mpz_struct *)(e_acsl_78));
+    __gmpz_add((__mpz_struct *)(e_acsl_78),(__mpz_struct const *)(e_acsl_76),
+               (__mpz_struct const *)(e_acsl_77));
+    __gmpz_init_set_si((__mpz_struct *)(e_acsl_79),(long)10);
+    __gmpz_init((__mpz_struct *)(e_acsl_80));
+    __gmpz_neg((__mpz_struct *)(e_acsl_80),(__mpz_struct const *)(e_acsl_79));
+    e_acsl_81 = __gmpz_cmp((__mpz_struct const *)(e_acsl_78),
+                           (__mpz_struct const *)(e_acsl_80));
+    if (! (e_acsl_81 == 0)) {
+      e_acsl_fail((char *)"(((x*2+(3+y))-4)+(x-y) == -10)");
+    }
+    __gmpz_clear((__mpz_struct *)(e_acsl_68));
+    __gmpz_clear((__mpz_struct *)(e_acsl_69));
+    __gmpz_clear((__mpz_struct *)(e_acsl_70));
+    __gmpz_clear((__mpz_struct *)(e_acsl_71));
+    __gmpz_clear((__mpz_struct *)(e_acsl_72));
+    __gmpz_clear((__mpz_struct *)(e_acsl_73));
+    __gmpz_clear((__mpz_struct *)(e_acsl_74));
+    __gmpz_clear((__mpz_struct *)(e_acsl_75));
+    __gmpz_clear((__mpz_struct *)(e_acsl_76));
+    __gmpz_clear((__mpz_struct *)(e_acsl_77));
+    __gmpz_clear((__mpz_struct *)(e_acsl_78));
+    __gmpz_clear((__mpz_struct *)(e_acsl_79));
+    __gmpz_clear((__mpz_struct *)(e_acsl_80));
   }
   
   /*@ assert (0≡1) ≡ !(0≡0); */ ;
@@ -950,42 +1028,42 @@ int main(void)
   }
   /*@ assert (0≤-1) ≡ (0>0); */ ;
   {
-    mpz_t e_acsl_64;
-    mpz_t e_acsl_65;
-    mpz_t e_acsl_66;
-    int e_acsl_67;
-    __gmpz_init_set_si((__mpz_struct *)(e_acsl_64),(long)0);
-    __gmpz_init_set_si((__mpz_struct *)(e_acsl_65),(long)1);
-    __gmpz_init((__mpz_struct *)(e_acsl_66));
-    __gmpz_neg((__mpz_struct *)(e_acsl_66),(__mpz_struct const *)(e_acsl_65));
-    e_acsl_67 = __gmpz_cmp((__mpz_struct const *)(e_acsl_64),
-                           (__mpz_struct const *)(e_acsl_66));
-    if (! ((e_acsl_67 <= 0) == (0 > 0))) {
+    mpz_t e_acsl_82;
+    mpz_t e_acsl_83;
+    mpz_t e_acsl_84;
+    int e_acsl_85;
+    __gmpz_init_set_si((__mpz_struct *)(e_acsl_82),(long)0);
+    __gmpz_init_set_si((__mpz_struct *)(e_acsl_83),(long)1);
+    __gmpz_init((__mpz_struct *)(e_acsl_84));
+    __gmpz_neg((__mpz_struct *)(e_acsl_84),(__mpz_struct const *)(e_acsl_83));
+    e_acsl_85 = __gmpz_cmp((__mpz_struct const *)(e_acsl_82),
+                           (__mpz_struct const *)(e_acsl_84));
+    if (! ((e_acsl_85 <= 0) == (0 > 0))) {
       e_acsl_fail((char *)"((0<=-1) == (0>0))");
     }
-    __gmpz_clear((__mpz_struct *)(e_acsl_64));
-    __gmpz_clear((__mpz_struct *)(e_acsl_65));
-    __gmpz_clear((__mpz_struct *)(e_acsl_66));
+    __gmpz_clear((__mpz_struct *)(e_acsl_82));
+    __gmpz_clear((__mpz_struct *)(e_acsl_83));
+    __gmpz_clear((__mpz_struct *)(e_acsl_84));
   }
   
   /*@ assert (0≥-1) ≡ (0≤0); */ ;
   {
-    mpz_t e_acsl_68;
-    mpz_t e_acsl_69;
-    mpz_t e_acsl_70;
-    int e_acsl_71;
-    __gmpz_init_set_si((__mpz_struct *)(e_acsl_68),(long)0);
-    __gmpz_init_set_si((__mpz_struct *)(e_acsl_69),(long)1);
-    __gmpz_init((__mpz_struct *)(e_acsl_70));
-    __gmpz_neg((__mpz_struct *)(e_acsl_70),(__mpz_struct const *)(e_acsl_69));
-    e_acsl_71 = __gmpz_cmp((__mpz_struct const *)(e_acsl_68),
-                           (__mpz_struct const *)(e_acsl_70));
-    if (! ((e_acsl_71 >= 0) == (0 <= 0))) {
+    mpz_t e_acsl_86;
+    mpz_t e_acsl_87;
+    mpz_t e_acsl_88;
+    int e_acsl_89;
+    __gmpz_init_set_si((__mpz_struct *)(e_acsl_86),(long)0);
+    __gmpz_init_set_si((__mpz_struct *)(e_acsl_87),(long)1);
+    __gmpz_init((__mpz_struct *)(e_acsl_88));
+    __gmpz_neg((__mpz_struct *)(e_acsl_88),(__mpz_struct const *)(e_acsl_87));
+    e_acsl_89 = __gmpz_cmp((__mpz_struct const *)(e_acsl_86),
+                           (__mpz_struct const *)(e_acsl_88));
+    if (! ((e_acsl_89 >= 0) == (0 <= 0))) {
       e_acsl_fail((char *)"((0>=-1) == (0<=0))");
     }
-    __gmpz_clear((__mpz_struct *)(e_acsl_68));
-    __gmpz_clear((__mpz_struct *)(e_acsl_69));
-    __gmpz_clear((__mpz_struct *)(e_acsl_70));
+    __gmpz_clear((__mpz_struct *)(e_acsl_86));
+    __gmpz_clear((__mpz_struct *)(e_acsl_87));
+    __gmpz_clear((__mpz_struct *)(e_acsl_88));
   }
   
   /*@ assert (0≢1) ≡ !(0≢0); */ ;
