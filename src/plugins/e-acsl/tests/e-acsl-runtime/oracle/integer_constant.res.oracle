@@ -6,16 +6,16 @@ PROJECT_FILE.i:135:[value] Assertion got status valid.
 PROJECT_FILE.i:139:[value] Assertion got status valid.
 PROJECT_FILE.i:142:[value] Assertion got status valid.
 [value] computing for function mpz_init_set_str <- main.
-        Called from PROJECT_FILE.i:144.
+        Called from PROJECT_FILE.i:146.
 PROJECT_FILE.i:37:[value] Function mpz_init_set_str: postcondition got status valid.
 [value] Done for function mpz_init_set_str
 [value] computing for function mpz_cmp <- main.
-        Called from PROJECT_FILE.i:145.
+        Called from PROJECT_FILE.i:147.
 PROJECT_FILE.i:49:[value] Function mpz_cmp: precondition got status valid.
 PROJECT_FILE.i:50:[value] Function mpz_cmp: precondition got status valid.
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:147.
+        Called from PROJECT_FILE.i:149.
 [value] computing for function printf <- e_acsl_fail <- main.
         Called from PROJECT_FILE.i:129.
 [value] Done for function printf
@@ -26,7 +26,7 @@ PROJECT_FILE.i:119:[value] Function exit: postcondition got status invalid.
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
 [value] computing for function mpz_clear <- main.
-        Called from PROJECT_FILE.i:148.
+        Called from PROJECT_FILE.i:151.
 PROJECT_FILE.i:43:[value] Function mpz_clear: precondition got status valid.
 [value] Done for function mpz_clear
 [value] Recording results for main
@@ -80,13 +80,16 @@ int main(void)
   /*@ assert 0 ≢ 1; */ ;
   if (! (0 != 1)) { e_acsl_fail((char *)"(0 != 1)"); }
   /*@ assert 1152921504606846975 ≡ 0xfffffffffffffff; */ ;
-  { mpz_t e_acsl_1; int e_acsl_2;
+  {
+    mpz_t e_acsl_1;
+    int e_acsl_2;
     mpz_init_set_str((__mpz_struct *)(e_acsl_1),"1152921504606846975",10);
     e_acsl_2 = mpz_cmp((__mpz_struct const *)(e_acsl_1),
                        (__mpz_struct const *)(e_acsl_1));
     if (! (e_acsl_2 == 0)) {
       e_acsl_fail((char *)"(1152921504606846975 == 0xfffffffffffffff)");
-    } mpz_clear((__mpz_struct *)(e_acsl_1));
+    }
+    mpz_clear((__mpz_struct *)(e_acsl_1));
   }
   
   __retres = 0;

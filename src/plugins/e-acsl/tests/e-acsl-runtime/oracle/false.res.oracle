@@ -27,7 +27,9 @@ int main(void)
   int __retres;
   int x;
   x = 0;
-  if (x) { /*@ assert \false; */ ; e_acsl_fail((char *)"(\\false)"); }
+  if (x) {
+    /*@ assert \false; */ ;
+    e_acsl_fail((char *)"(\\false)"); }
   __retres = 0;
   return (__retres);
 }

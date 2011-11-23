@@ -215,6 +215,24 @@ let pop_and_get env stmt ~global_clear where =
 
 let get_generated_variables env = List.rev env.new_global_vars
 
+let stmt_of_label env = function
+  | StmtLabel { contents = stmt } -> stmt
+  | LogicLabel(_, label) when label = "Here" -> 
+    (match env.visitor#current_stmt with
+    | None -> Misc.not_yet "label \"Here\" in function contract"
+    | Some s -> s)
+  | LogicLabel(_, label) when label = "Old" || label = "Pre" -> 
+    (try 
+       Kernel_function.find_first_stmt (Extlib.the env.visitor#current_kf)
+     with Kernel_function.No_Statement ->
+       Misc.not_yet (Format.sprintf "label %S in function without code" label))
+  | LogicLabel(_, label) when label = "Post" -> 
+    (try
+       Kernel_function.find_return (Extlib.the env.visitor#current_kf)
+     with Kernel_function.No_Statement ->
+       Misc.not_yet "label \"Post\" in function without code")
+  | LogicLabel(_, _label) -> assert false
+
 (*
 Local Variables:
 compile-command: "make"

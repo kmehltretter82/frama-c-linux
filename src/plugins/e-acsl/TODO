@@ -1,7 +1,6 @@
 à traiter avant la 1ère release:
 - quantifications sans exentension de syntaxe
 - \return
-- \old et \at
 
 ########
 # CODE #
@@ -20,11 +19,15 @@
 - constante entière longue: utiliser la représentation sous forme de string et 
   rechercher la base appropriée.
 - introduire feature wishes Bernard (voir mail du 9 juin)
+- arithmetic overflows
 
 #########
 # TESTS #
 #########
 
+- plus de tests de divisions et modulos entières
+- exécuter rte
+- testing logic labels
 - tester plusieurs fonctions contenant des annotations
 - améliorer test "integer_constant.i" quand bug fixed #745
 - test sizeof.i devraient être plus précis quand logic_typing plus précis

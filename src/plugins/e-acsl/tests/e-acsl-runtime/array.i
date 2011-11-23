@@ -1,6 +1,6 @@
 /* run.config
    COMMENT: arrays
-   EXECNOW: LOG gen_array.c BIN gen_array.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/array.i -e-acsl-project p -e-acsl-include-headers -then-on p -print -ocode ./tests/e-acsl-runtime/result/gen_array.c > /dev/null && gcc -o ./tests/e-acsl-runtime/result/gen_array.out -lgmp ./tests/e-acsl-runtime/result/gen_array.c && ./tests/e-acsl-runtime/result/gen_array.out
+   EXECNOW: LOG gen_array.c BIN gen_array.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/array.i -e-acsl-project p -e-acsl-include-headers -then-on p -print -ocode ./tests/e-acsl-runtime/result/gen_array.c > /dev/null && gcc -o ./tests/e-acsl-runtime/result/gen_array.out ./tests/e-acsl-runtime/result/gen_array.c -lgmp && ./tests/e-acsl-runtime/result/gen_array.out
 */
 
 int T1[3],T2[4];

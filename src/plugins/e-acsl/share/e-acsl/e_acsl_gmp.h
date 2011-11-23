@@ -70,13 +70,13 @@ extern void mpz_mul(mpz_t z1, const mpz_t z2, const mpz_t z3);
   @ requires \valid(z2);
   @ requires \valid(z3);
   @ assigns *z1; */
-extern void mpz_cdiv_q(mpz_t z1, const mpz_t z2, const mpz_t z3);
+extern void mpz_tdiv_q(mpz_t z1, const mpz_t z2, const mpz_t z3);
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
   @ requires \valid(z3);
   @ assigns *z1; */
-extern void mpz_mod(mpz_t z1, const mpz_t z2, const mpz_t z3);
+extern void mpz_tdiv_r(mpz_t z1, const mpz_t z2, const mpz_t z3);
 
 // coercions to C int
 

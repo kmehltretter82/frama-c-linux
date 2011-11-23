@@ -1,6 +1,6 @@
 /* run.config
    COMMENT: function contract
-   EXECNOW: LOG gen_function_contract.c BIN gen_function_contract.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/function_contract.i -e-acsl-project p -e-acsl-include-headers -then-on p -print -ocode ./tests/e-acsl-runtime/result/gen_function_contract.c > /dev/null && gcc -o ./tests/e-acsl-runtime/result/gen_function_contract.out -lgmp ./tests/e-acsl-runtime/result/gen_function_contract.c && ./tests/e-acsl-runtime/result/gen_function_contract.out
+   EXECNOW: LOG gen_function_contract.c BIN gen_function_contract.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/function_contract.i -e-acsl-project p -e-acsl-include-headers -then-on p -print -ocode ./tests/e-acsl-runtime/result/gen_function_contract.c > /dev/null && gcc -o ./tests/e-acsl-runtime/result/gen_function_contract.out ./tests/e-acsl-runtime/result/gen_function_contract.c -lgmp && ./tests/e-acsl-runtime/result/gen_function_contract.out
 */
 
 int X = 0, Y = 2;

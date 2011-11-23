@@ -1,10 +1,11 @@
 /* run.config
    COMMENT: sizeof
-   EXECNOW: LOG gen_sizeof.c BIN gen_sizeof.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/sizeof.i -e-acsl-project p -e-acsl-include-headers -then-on p -print -ocode ./tests/e-acsl-runtime/result/gen_sizeof.c > /dev/null && gcc -o ./tests/e-acsl-runtime/result/gen_sizeof.out -lgmp ./tests/e-acsl-runtime/result/gen_sizeof.c
+   EXECNOW: LOG gen_sizeof.c BIN gen_sizeof.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/sizeof.i -e-acsl-project p -e-acsl-include-headers -then-on p -print -ocode ./tests/e-acsl-runtime/result/gen_sizeof.c > /dev/null && gcc -o ./tests/e-acsl-runtime/result/gen_sizeof.out ./tests/e-acsl-runtime/result/gen_sizeof.c -lgmp && ./tests/e-acsl-runtime/result/gen_sizeof.out
 */
 
-void main() {
+int main(void) {
   int x = 0;
   /*@ assert sizeof(int) == sizeof(x); */ ;
   /*@ assert sizeof("totototototo") == sizeof(char *); */ ;
+  return 0;
 }

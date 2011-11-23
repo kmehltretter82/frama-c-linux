@@ -78,6 +78,8 @@ val get_generated_variables: t -> varinfo list
 
 val get_visitor: t -> Visitor.generic_frama_c_visitor
 
+val stmt_of_label: t -> logic_label -> stmt
+
 (*
 Local Variables:
 compile-command: "make"

@@ -123,8 +123,8 @@ let name_of_mpz_arith_bop = function
   | PlusA -> "mpz_add"
   | MinusA -> "mpz_sub"
   | Mult -> "mpz_mul"
-  | Div -> "mpz_cdiv_q"
-  | Mod -> "mpz_mod_ui"
+  | Div -> "mpz_tdiv_q"
+  | Mod -> "mpz_tdiv_r"
   | Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr
   | Shiftlt | Shiftrt | PlusPI | IndexPI | MinusPI | MinusPP -> assert false
 
@@ -297,8 +297,9 @@ and context_insensitive_term_to_exp env t =
   | Tlambda _ -> Misc.not_yet "functional"
   | TDataCons _ -> Misc.not_yet "constructor"
   | Tif _ -> Misc.not_yet "conditional"
-  | Tat(t', StmtLabel { contents = stmt } (*_label*)) ->
-(*    Options.feedback "proceeding term %a" Term.pretty t;*)
+  | Tat(t', label) ->
+    let stmt = Env.stmt_of_label env label in
+    (*    Options.feedback "proceeding term %a" Term.pretty t;*)
     let ty = t'.term_type in
     let e, env = term_to_exp (Env.push env) ty t' in
     let new_v = ref None in
@@ -343,7 +344,6 @@ and context_insensitive_term_to_exp env t =
     let new_stmt = Visitor.visitFramacStmt o (get_stmt bhv stmt) in
     set_stmt bhv stmt new_stmt;
     res, !env_ref, false
-  | Tat(_t, LogicLabel(_, _label)) -> Misc.not_yet "builtin logic label in \\at"
   | Tbase_addr _ -> Misc.not_yet "\\base_addr"
   | Tblock_length _ -> Misc.not_yet "\\block_length"
   | Tnull -> mkCast (zero ~loc) (TPtr(TVoid [], [])), env, false

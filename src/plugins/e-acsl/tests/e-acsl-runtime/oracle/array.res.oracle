@@ -8,12 +8,12 @@ tests/e-acsl-runtime/array.i:14:[e-acsl] warning: missing guard for ensuring tha
 [value] Values of globals at initialization
         T1[0..2] ∈ {0}
         T2[0..3] ∈ {0}
-PROJECT_FILE.i:136:[value] entering loop for the first time
-PROJECT_FILE.i:136:[value] assigning non deterministic value for the first time
-PROJECT_FILE.i:139:[value] entering loop for the first time
-PROJECT_FILE.i:142:[value] Assertion got status unknown.
+PROJECT_FILE.i:138:[value] entering loop for the first time
+PROJECT_FILE.i:142:[value] assigning non deterministic value for the first time
+PROJECT_FILE.i:147:[value] entering loop for the first time
+PROJECT_FILE.i:154:[value] Assertion got status unknown.
 [value] computing for function e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:143.
+        Called from PROJECT_FILE.i:155.
 [value] computing for function printf <- e_acsl_fail <- main.
         Called from PROJECT_FILE.i:129.
 [value] Done for function printf
@@ -23,9 +23,9 @@ PROJECT_FILE.i:119:[value] Function exit: postcondition got status invalid.
 [value] Done for function exit
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
-PROJECT_FILE.i:145:[value] Assertion got status unknown.
+PROJECT_FILE.i:157:[value] Assertion got status unknown.
 [value] computing for function e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:146.
+        Called from PROJECT_FILE.i:158.
 [value] computing for function printf <- e_acsl_fail <- main.
         Called from PROJECT_FILE.i:129.
 [value] Done for function printf
@@ -64,10 +64,20 @@ int T2[4];
 int main(void)
 {
   int __retres;
-  { int i; i = 0; while (1) { if (! (i < 3)) { break; } T1[i] = i; i ++; } }
+  { int i;
+    i = 0;
+    while (1) {
+      if (! (i < 3)) { break; }
+      T1[i] = i;
+      i ++; } }
   
-  { int i_0; i_0 = 0;
-    while (1) { if (! (i_0 < 4)) { break; } T2[i_0] = 2 * i_0; i_0 ++; }
+  {
+    int i_0;
+    i_0 = 0;
+    while (1) {
+      if (! (i_0 < 4)) { break; }
+      T2[i_0] = 2 * i_0;
+      i_0 ++; }
   }
   
   /*@ assert T1[0] ≡ T2[0]; */ ;

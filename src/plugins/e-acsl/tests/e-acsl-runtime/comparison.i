@@ -1,6 +1,6 @@
 /* run.config
    COMMENT: comparison operators
-   EXECNOW: LOG gen_comparison.c BIN gen_comparison.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/comparison.i -e-acsl-project p -e-acsl-include-headers -then-on p -print -ocode ./tests/e-acsl-runtime/result/gen_comparison.c > /dev/null &&  gcc -o ./tests/e-acsl-runtime/result/gen_comparison.out -lgmp ./tests/e-acsl-runtime/result/gen_comparison.c && ./tests/e-acsl-runtime/result/gen_comparison.out
+   EXECNOW: LOG gen_comparison.c BIN gen_comparison.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/comparison.i -e-acsl-project p -e-acsl-include-headers -then-on p -print -ocode ./tests/e-acsl-runtime/result/gen_comparison.c > /dev/null &&  gcc -o ./tests/e-acsl-runtime/result/gen_comparison.out ./tests/e-acsl-runtime/result/gen_comparison.c -lgmp && ./tests/e-acsl-runtime/result/gen_comparison.out
 */
 
 int main(void) {

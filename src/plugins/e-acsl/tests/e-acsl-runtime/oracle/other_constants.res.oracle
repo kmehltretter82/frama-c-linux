@@ -5,16 +5,16 @@
 PROJECT_FILE.i:138:[value] Assertion got status unknown.
 PROJECT_FILE.i:141:[value] Assertion got status valid.
 [value] computing for function mpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:142.
+        Called from PROJECT_FILE.i:145.
 PROJECT_FILE.i:33:[value] Function mpz_init_set_si: postcondition got status valid.
 [value] Done for function mpz_init_set_si
 [value] computing for function mpz_cmp <- main.
-        Called from PROJECT_FILE.i:143.
+        Called from PROJECT_FILE.i:146.
 PROJECT_FILE.i:49:[value] Function mpz_cmp: precondition got status valid.
 PROJECT_FILE.i:50:[value] Function mpz_cmp: precondition got status valid.
 [value] Done for function mpz_cmp
 [value] computing for function e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:144.
+        Called from PROJECT_FILE.i:147.
 [value] computing for function printf <- e_acsl_fail <- main.
         Called from PROJECT_FILE.i:129.
 [value] Done for function printf
@@ -25,10 +25,10 @@ PROJECT_FILE.i:119:[value] Function exit: postcondition got status invalid.
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
 [value] computing for function mpz_clear <- main.
-        Called from PROJECT_FILE.i:145.
+        Called from PROJECT_FILE.i:148.
 PROJECT_FILE.i:43:[value] Function mpz_clear: precondition got status valid.
 [value] Done for function mpz_clear
-PROJECT_FILE.i:148:[value] Assertion got status valid.
+PROJECT_FILE.i:152:[value] Assertion got status valid.
 [value] Recording results for main
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
@@ -80,7 +80,9 @@ int main(void)
   if (! ("toto" != "titi")) { e_acsl_fail((char *)"(\"toto\" != \"titi\")");
   }
   /*@ assert 'c' ≡ 'c'; */ ;
-  { mpz_t e_acsl_1; int e_acsl_2;
+  {
+    mpz_t e_acsl_1;
+    int e_acsl_2;
     mpz_init_set_si((__mpz_struct *)(e_acsl_1),(long)'c');
     e_acsl_2 = mpz_cmp((__mpz_struct const *)(e_acsl_1),
                        (__mpz_struct const *)(e_acsl_1));
