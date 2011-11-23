@@ -326,15 +326,11 @@ and context_insensitive_term_to_exp env t =
 	let block, env = 
 	  Env.pop_and_get env new_stmt ~global_clear:false Env.Middle
 	in
-	env_ref := env;
-	let new_stmt = mkStmt ~valid_sid:true (Block block) in
-	
-(*	let stmt = 
-	  mkStmt ~valid_sid:true (Block (mkBlock [ new_stmt; stmt ])) 
+	let pre = match label with
+	  | LogicLabel(_, s) when s = "Here" || s = "Post" -> true
+	  | StmtLabel _ | LogicLabel _ -> false
 	in
-	let stmt = Env.block_as_stmt lenv stmt in*)
-	let sk = stmt.skind in
-	stmt.skind <- Block (mkBlock [ new_stmt; mkStmt ~valid_sid:true sk ]);
+	env_ref := Env.extend_stmt_in_place env stmt ~pre block;
 (*	Options.feedback "the new stmt is (sid %d): %a" stmt.sid 
 	  Stmt.pretty stmt;*)
 	ChangeTo stmt
@@ -690,8 +686,11 @@ class e_acsl_visitor prj generate = object (self)
 	  (* must generate [pre_block] which includes [stmt] before generating
 	     [post_block] *)
 	  let pre_block, env = 
-	    Env.pop_and_get env stmt ~global_clear:false Env.After 
+(*	  Options.feedback "HERE";*)
+	    (*Project.on prj*) (fun () -> Env.pop_and_get env stmt
+	      ~global_clear:false Env.After ) ()
 	  in
+(*	  Options.feedback "DONE";*)
 	  let env = mk_post_env (Env.push env) in
 	  let post_block, env = 
 	    Env.pop_and_get 

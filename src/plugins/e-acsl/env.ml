@@ -35,6 +35,8 @@ type block_info = {
   new_block_vars: varinfo list; (* generated variables local to the block *)
   new_stmts: stmt list; (* generated stmts to put at the beginning of the 
 			   block *) 
+  pre_stmts: stmt list; (* stmts already inserted into the current stmt, but
+			   which should be before [new_stmts]. *)
 }
 
 type local_env = { block_info: block_info; mpz_tbl: mpz_tbl }
@@ -49,7 +51,8 @@ type t =
 
 let empty_block = 
   { new_block_vars = [];
-    new_stmts = [] }
+    new_stmts = [];
+    pre_stmts = [] }
 
 let empty_mpz_tbl =
   { new_exps = Term.Map.empty;
@@ -100,7 +103,11 @@ let do_new_var ?(global=false) env t ty mk_stmts =
     if global then local_block.new_block_vars 
     else v :: local_block.new_block_vars
   in
-  let new_block = { new_block_vars = new_block_vars; new_stmts = new_stmts } in
+  let new_block = 
+    { new_block_vars = new_block_vars; 
+      new_stmts = new_stmts;
+      pre_stmts = local_block.pre_stmts } 
+  in
   e, 
   if is_t then 
     let extend_tbl tbl = 
@@ -176,6 +183,18 @@ let add_stmt env stmt =
   let block = { block with new_stmts = stmt :: block.new_stmts } in
   { env with env_stack = { local_env with block_info = block } :: tl }
 
+let extend_stmt_in_place env stmt ~pre block =
+  let new_stmt = mkStmt ~valid_sid:true (Block block) in
+  let sk = stmt.skind in
+  stmt.skind <- Block (mkBlock [ new_stmt; mkStmt ~valid_sid:true sk ]);
+  if pre then 
+    let local_env, tl_env = top env in
+    let b_info = local_env.block_info in
+    let b_info = { b_info with pre_stmts = new_stmt :: b_info.pre_stmts } in
+    { env with env_stack = { local_env with block_info = b_info } :: tl_env }
+  else
+    env
+
 let push env = 
   (*  Options.feedback "push";*)
   let local_env = { block_info = empty_block; mpz_tbl = empty_mpz_tbl } in
@@ -200,16 +219,29 @@ let pop_and_get env stmt ~global_clear where =
     (List.length clear) must_clear;*)
   let block = local_env.block_info in
   let b = 
+    let pre_stmts, stmt = 
+      let rec extract stmt acc = function
+	| [] -> acc, stmt
+	| _ :: tl ->
+	  match stmt.skind with
+	  | Block { bstmts = [ fst; snd ] } ->
+	    (* [JS 2011/11/23] stmts look the same as expected; but sid are
+	       different and I don't know why ==> thus the assertion does not
+	       hold :-( *)
+(*	    assert (Stmt.equal stmt' fst);*)
+	    extract snd (fst :: acc) tl
+	  | _ -> assert false
+      in
+      extract stmt [] block.pre_stmts
+    in
     let new_s = block.new_stmts in
     let stmts = match where with
       | Before -> stmt :: acc_list_rev (List.rev clear) new_s
       | Middle -> acc_list_rev (stmt :: List.rev clear) new_s
       | After -> acc_list_rev (acc_list_rev [ stmt ] clear) new_s
     in
-    mkBlock stmts
+    mkBlock (acc_list_rev stmts pre_stmts)
   in
-(*  List.iter (fun v -> Options.feedback "new_block_vars %a" Varinfo.pretty v)
-    block.new_block_vars;*)
   b.blocals <- acc_list_rev b.blocals block.new_block_vars;
   b, { env with env_stack = tl }
 
@@ -222,15 +254,11 @@ let stmt_of_label env = function
     | None -> Misc.not_yet "label \"Here\" in function contract"
     | Some s -> s)
   | LogicLabel(_, label) when label = "Old" || label = "Pre" -> 
-    (try 
-       Kernel_function.find_first_stmt (Extlib.the env.visitor#current_kf)
-     with Kernel_function.No_Statement ->
-       Misc.not_yet (Format.sprintf "label %S in function without code" label))
+    (try Kernel_function.find_first_stmt (Extlib.the env.visitor#current_kf)
+     with Kernel_function.No_Statement -> assert false)
   | LogicLabel(_, label) when label = "Post" -> 
-    (try
-       Kernel_function.find_return (Extlib.the env.visitor#current_kf)
-     with Kernel_function.No_Statement ->
-       Misc.not_yet "label \"Post\" in function without code")
+    (try Kernel_function.find_return (Extlib.the env.visitor#current_kf)
+     with Kernel_function.No_Statement -> assert false)
   | LogicLabel(_, _label) -> assert false
 
 (*

@@ -25,8 +25,9 @@
 # TESTS #
 #########
 
+- fonction sans code
+- ajouter -Wall -pedantic -c99
 - exécuter rte
-- testing logic labels
 - tester plusieurs fonctions contenant des annotations
 - améliorer test "integer_constant.i" quand bug fixed #745
 - test sizeof.i devraient être plus précis quand logic_typing plus précis
@@ -38,6 +39,7 @@
 ####################
 
 - documentation
+- e-acsl implementation manual
 
 en lien avec bts #743:
 - make distrib

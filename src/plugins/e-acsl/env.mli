@@ -52,12 +52,14 @@ val new_var_and_mpz_init:
 (** Same as [new_var], but dedicated to mpz_t variables initialized by 
     {!Mpz.init}. *)
 
-val add_stmt: t -> stmt -> t
-  (** [add_stmt env s] extends [env] with the new statement [s] *)
-
 val add_assert: t -> stmt -> predicate named -> unit
 (** [add_assert kf s p] extends the global environment with an assertion [p]
     associated to the statement [s] in function [kf]. *)
+
+val add_stmt: t -> stmt -> t
+  (** [add_stmt env s] extends [env] with the new statement [s] *)
+
+val extend_stmt_in_place: t -> stmt -> pre:bool -> block -> t
 
 val push: t -> t
 (** Push a new local context in the environment *)
