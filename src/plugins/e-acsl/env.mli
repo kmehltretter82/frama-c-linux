@@ -60,6 +60,10 @@ val add_stmt: t -> stmt -> t
   (** [add_stmt env s] extends [env] with the new statement [s] *)
 
 val extend_stmt_in_place: t -> stmt -> pre:bool -> block -> t
+(**  [extend_stmt_in_place env stmt ~pre b] modifies [stmt] in place in order to
+     add the given [block]. If [pre] is [true], then this block is guaranteed
+     to be at the first place of the resulting [stmt] whatever modification
+     will be done by the visitor later. *)
 
 val push: t -> t
 (** Push a new local context in the environment *)

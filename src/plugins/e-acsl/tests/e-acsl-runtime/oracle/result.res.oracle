@@ -1,4 +1,4 @@
-tests/e-acsl-runtime/result.i:7:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
+tests/e-acsl-runtime/result.i:6:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed

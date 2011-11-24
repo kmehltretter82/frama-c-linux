@@ -1,9 +1,8 @@
 /* run.config
    COMMENT: \result
-   EXECNOW: LOG gen_result.c BIN gen_result.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/result.i -e-acsl-project p -e-acsl-include-headers -then-on p -print -ocode ./tests/e-acsl-runtime/result/gen_result.c > /dev/null && gcc -o ./tests/e-acsl-runtime/result/gen_result.out ./tests/e-acsl-runtime/result/gen_result.c -lgmp
+   EXECNOW: LOG gen_result.c BIN gen_result.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/result.i -e-acsl-project p -e-acsl-include-headers -then-on p -print -ocode ./tests/e-acsl-runtime/result/gen_result.c > /dev/null && gcc -o ./tests/e-acsl-runtime/result/gen_result.out ./tests/e-acsl-runtime/result/gen_result.c -lgmp && ./tests/e-acsl-runtime/result/gen_result.out
 */
 
-// && ./tests/e-acsl-runtime/result/gen_result.out
 /*@ ensures \result == (int)(x - x); */
 int f(int x) { 
   x = 0; 

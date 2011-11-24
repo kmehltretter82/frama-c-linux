@@ -363,8 +363,8 @@ and context_insensitive_term_to_exp env t =
   | Tbase_addr _ -> Misc.not_yet "\\base_addr"
   | Tblock_length _ -> Misc.not_yet "\\block_length"
   | Tnull -> mkCast (zero ~loc) (TPtr(TVoid [], [])), env, false
-  | TCoerce _ -> Misc.not_yet "coercion"
-  | TCoerceE _ -> Misc.not_yet "expression coercion"
+  | TCoerce _ -> Misc.not_yet "coercion" (* Jessie specific *)
+  | TCoerceE _ -> Misc.not_yet "expression coercion" (* Jessie specific *)
   | TUpdate _ -> Misc.not_yet "functional update"
   | Ttypeof _ -> Misc.not_yet "typeof"
   | Ttype _ -> Misc.not_yet "C type"
@@ -480,7 +480,7 @@ let rec named_predicate_to_exp env p =
   | Pvalid_index _ -> Misc.not_yet "\\valid_index"
   | Pvalid_range _ -> Misc.not_yet "\\valid_range"
   | Pfresh _ -> Misc.not_yet "\\fresh"
-  | Psubtype _ -> Misc.not_yet "subtyping relation"
+  | Psubtype _ -> Misc.not_yet "subtyping relation" (* Jessie specific? *)
   | Pinitialized _ -> Misc.not_yet "\\initialized"
 
 (* ************************************************************************** *)
@@ -706,11 +706,8 @@ class e_acsl_visitor prj generate = object (self)
 	  (* must generate [pre_block] which includes [stmt] before generating
 	     [post_block] *)
 	  let pre_block, env = 
-(*	  Options.feedback "HERE";*)
-	    (*Project.on prj*) (fun () -> Env.pop_and_get env stmt
-	      ~global_clear:false Env.After ) ()
+	    Env.pop_and_get env stmt ~global_clear:false Env.After
 	  in
-(*	  Options.feedback "DONE";*)
 	  let env = mk_post_env (Env.push env) in
 	  let post_block, env = 
 	    Env.pop_and_get 
