@@ -42,7 +42,9 @@ let context_sensitive ?loc env ctx is_mpz_string t_opt e =
     let e, env = if is_mpz_string then mk_mpz env e else e, env in
     if Mpz.is_t ty || is_mpz_string then
       (* cast the mpz into a C integer *)
-      let name = if isSignedInteger ty' then "mpz_get_si" else "mpz_get_ui" in
+      let name = 
+	if isSignedInteger ty' then "__gmpz_get_si" else "__gmpz_get_ui" 
+      in
       Options.warning
 	?source:(Extlib.opt_map fst loc)
 	~once:true
@@ -120,11 +122,11 @@ let relation_to_binop = function
   | Rneq -> Ne
 
 let name_of_mpz_arith_bop = function
-  | PlusA -> "mpz_add"
-  | MinusA -> "mpz_sub"
-  | Mult -> "mpz_mul"
-  | Div -> "mpz_tdiv_q"
-  | Mod -> "mpz_tdiv_r"
+  | PlusA -> "__gmpz_add"
+  | MinusA -> "__gmpz_sub"
+  | Mult -> "__gmpz_mul"
+  | Div -> "__gmpz_tdiv_q"
+  | Mod -> "__gmpz_tdiv_r"
   | Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr
   | Shiftlt | Shiftrt | PlusPI | IndexPI | MinusPI | MinusPP -> assert false
 
@@ -207,8 +209,8 @@ and context_insensitive_term_to_exp env t =
   | TUnOp(Neg | BNot as op, t') ->
     let e, env = term_to_exp env Linteger t' in
     let name = match op with
-      | Neg -> "mpz_neg"
-      | BNot -> "mpz_com"
+      | Neg -> "__gmpz_neg"
+      | BNot -> "__gmpz_com"
       | LNot -> assert false
     in
     let e, env = 
@@ -405,7 +407,7 @@ and comparison_to_exp ?(loc=Location.unknown) ?e1 env bop t1 t2 t_opt =
 	env
 	t_opt
 	intType
-	(fun v _ -> [ Misc.mk_call ~result:(var v) "mpz_cmp" [ e1; e2 ] ])
+	(fun v _ -> [ Misc.mk_call ~result:(var v) "__gmpz_cmp" [ e1; e2 ] ])
     in
     new_exp ?loc (BinOp(bop, e, zero ?loc, intType)), env
   | _ ->

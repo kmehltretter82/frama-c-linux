@@ -46,12 +46,7 @@ let text =
   let buf = Buffer.create 97 in
   fun () ->
     if Buffer.length buf = 0 then begin
-      if Options.Include_headers.get () then begin
-	add_include buf "stdio.h";
-	if Options.Use_assert.get () then add_include buf "assert.h";
-	add_include buf "gmp.h";
-      end else
-	put_file_in_buffer "e_acsl_gmp_types.h" buf;
+      put_file_in_buffer "e_acsl_gmp_types.h" buf;
       put_file_in_buffer "e_acsl_gmp.h" buf;
       put_file_in_buffer "e_acsl.h" buf
     end;

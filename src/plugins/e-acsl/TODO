@@ -18,8 +18,23 @@
 - minimiser le nombre de variables générées
 - constante entière longue: utiliser la représentation sous forme de string et 
   rechercher la base appropriée.
-- introduire feature wishes Bernard (voir mail du 9 juin)
 - arithmetic overflows
+[Bernard] avoir une fonction 
+  e_acsl_assert(int guard, char *msg, char *kind) {
+    if (guard) e_acsl_fail(msg, kind);
+  }
+à appeler au lieu de générer la garde. La kind est le type de l'annotation 
+(assert, requires, ensures, RTE? ...)
+[Bernard] avoir une fonction
+  e_acsl_trace_behavior(char *bhv_name) {}
+à appeler dès qu'un behavior est activé
+- meilleur schéma de compilation des assumes:
+  if (assume_bhv) {
+    e_acsl_trace_behavior(bhv_name);
+    requires_bhv;
+    run_function;
+    ensures_bhv;
+  }
 
 ##############
 # KNOWN BUGS #
@@ -32,7 +47,6 @@
 #########
 
 - fonction sans code
-- ajouter -Wall -pedantic -c99
 - exécuter rte
 - tester plusieurs fonctions contenant des annotations
 - améliorer test "integer_constant.i" quand bug fixed #745

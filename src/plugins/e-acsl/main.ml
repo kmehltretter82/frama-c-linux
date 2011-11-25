@@ -55,8 +55,7 @@ module Resulting_projects =
       let name = "E-ACSL resulting projects"
       let size = 7
       let kind = `Correctness
-      let dependencies =
-	[ Ast.self; Options.Include_headers.self; Options.Use_assert.self ]
+      let dependencies = [ Ast.self; Options.Use_assert.self ]
      end)
 
 let () = Env.global_state := Resulting_projects.self
@@ -66,20 +65,7 @@ let generate_code =
     (fun name ->
       try
 	let visit prj = Visit.do_visit ~prj true in
-	let preprocess =
-	  if Options.Include_headers.get () then
-	    if Local_config.may_compile_with_cc then begin
-	      if Local_config.may_use_assert then Options.Use_assert.on ();
-	      true
-	    end else begin
-	      Options.warning "option `-e-acsl-include-headers' not available \
-(see configure warning) : ignoring it.";
-	      false
-	    end
-	  else
-	    false
-	in
-	File.create_rebuilt_project_from_visitor ~preprocess name visit
+	File.create_rebuilt_project_from_visitor ~preprocess:false name visit
       with Misc.Typing_error s ->
 	Options.abort ~current:true "%s" s)
 

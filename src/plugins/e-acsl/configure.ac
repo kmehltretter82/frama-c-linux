@@ -41,7 +41,6 @@ check_plugin(e_acsl,PLUGIN_RELATIVE_PATH(plugin_file),
 # C specific stuff for E-ACSL #
 ###############################
 
-MAY_COMPILE_WITH_CC=true
 MAY_USE_ASSERT=true
 MAY_RUN_TESTS=yes
 
@@ -58,9 +57,7 @@ if test -z $CC; then
 else
 
 if test -z $HAVE_STDIO_H; then
-  MAY_COMPILE_WITH_CC=false
   MAY_RUN_TESTS=no
-  AC_MSG_WARN([stdio.h missing: cannot use option -e-acsl-include-headers.])
   AC_MSG_WARN([stdio.h missing: non-regression tests unavailable.])
 fi
 
@@ -73,7 +70,6 @@ if test -z $HAVE_ASSERT_H; then
   MAY_USE_ASSERT=false
   MAY_RUN_TESTS=no
   AC_MSG_WARN([assert.h missing: cannot use E-ACSL option -e-acsl-use-assert.])
-  AC_MSG_WARN([assert.h missing: non-regression tests unavailable.])
 fi
 
 # GMP library
@@ -82,9 +78,7 @@ fi
 AC_CHECK_LIB(gmp,__gmpz_init,HAVE_GMP=yes,) # also set LIBS
 
 if test -z $HAVE_GMP; then
-  MAY_COMPILE_WITH_CC=false
   MAY_RUN_TESTS=no
-  AC_MSG_WARN([GMP library missing: cannot use E-ACSL option -e-acsl-include-headers.])
   AC_MSG_WARN([GMP library missing: non-regression tests unavailable.])
 fi
 

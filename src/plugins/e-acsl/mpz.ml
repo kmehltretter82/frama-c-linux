@@ -34,14 +34,14 @@ let is_now_referenced () = t_torig.treferenced <- true
 let t = TNamed(t_torig, [])
 let is_t ty = Cil_datatype.Typ.equal ty t
 
-let apply_on_var funname e = Misc.mk_call ("mpz_" ^ funname) [ e ]
+let apply_on_var funname e = Misc.mk_call ("__gmpz_" ^ funname) [ e ]
 let init = apply_on_var "init"
 let clear = apply_on_var "clear"
 
 let init_set v e =
   let ty = typeOf e in
   if is_t ty then
-    Misc.mk_call "mpz_init_set" [ v; e ]
+    Misc.mk_call "__gmpz_init_set" [ v; e ]
   else
     let fname, args = match ty with
       | TInt((IBool | IChar | IUChar | IUInt | IUShort | IULong), _) ->
@@ -54,7 +54,7 @@ let init_set v e =
 	[ e; integer ~loc:Location.unknown 10 ]
       | _ -> assert false
     in
-    Misc.mk_call ("mpz_init_set_" ^ fname) (v :: args)
+    Misc.mk_call ("__gmpz_init_set_" ^ fname) (v :: args)
 
 (*
 Local Variables:

@@ -46,15 +46,6 @@ module Project_name =
       let arg_name = "prj"
      end)
 
-module Include_headers =
-  False
-    (struct
-      let option_name = "-e-acsl-include-headers"
-      let help = "include standard headers in the new project \
-(unset by default)"
-      let kind = `Correctness
-     end)
-
 module Use_assert =
   False
     (struct

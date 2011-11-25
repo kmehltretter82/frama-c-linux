@@ -1,6 +1,6 @@
 /* run.config
    COMMENT: \at
-   EXECNOW: LOG gen_at.c BIN gen_at.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/at.i -e-acsl-project p -e-acsl-include-headers -then-on p -print -ocode ./tests/e-acsl-runtime/result/gen_at.c > /dev/null && gcc -o ./tests/e-acsl-runtime/result/gen_at.out ./tests/e-acsl-runtime/result/gen_at.c -lgmp && ./tests/e-acsl-runtime/result/gen_at.out
+   EXECNOW: LOG gen_at.c BIN gen_at.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/at.i -e-acsl-project p -then-on p -print -ocode ./tests/e-acsl-runtime/result/gen_at.c > /dev/null && gcc -pedantic -o ./tests/e-acsl-runtime/result/gen_at.out ./tests/e-acsl-runtime/result/gen_at.c -lgmp && ./tests/e-acsl-runtime/result/gen_at.out
 */
 
 int A = 0;

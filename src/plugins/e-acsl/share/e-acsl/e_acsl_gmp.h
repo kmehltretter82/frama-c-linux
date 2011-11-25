@@ -7,83 +7,83 @@
 
 /*@ ensures \valid(x);
   @ assigns *x; */
-extern void mpz_init(mpz_t x);
+extern void __gmpz_init(mpz_t x);
 
 /*@ ensures \valid(z);
   @ assigns *z; */
-extern void mpz_init_set(mpz_t z, const mpz_t z_orig);
+extern void __gmpz_init_set(mpz_t z, const mpz_t z_orig);
 
 /*@ ensures \valid(z);
   @ assigns *z \from n; */
-extern void mpz_init_set_ui(mpz_t z, unsigned long int n);
+extern void __gmpz_init_set_ui(mpz_t z, unsigned long int n);
 
 /*@ ensures \valid(z);
   @ assigns *z \from n; */
-extern void mpz_init_set_si(mpz_t z, signed long int n);
+extern void __gmpz_init_set_si(mpz_t z, signed long int n);
 
 /*@ ensures \valid(z);
   @ assigns *z; */
-extern int mpz_init_set_str(mpz_t z, const char *str, int base);
+extern int __gmpz_init_set_str(mpz_t z, const char *str, int base);
 
 // finalizer
 
 /*@ requires \valid(x);
   @ assigns *x; */
-extern void mpz_clear(mpz_t x);
+extern void __gmpz_clear(mpz_t x);
 
 // logical and arithmetic operators
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
   @ assigns \nothing; */
-extern int mpz_cmp(const mpz_t z1, const mpz_t z2);
+extern int __gmpz_cmp(const mpz_t z1, const mpz_t z2);
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
   @ assigns *z1; */
-extern int mpz_comp(mpz_t z1, const mpz_t z2);
+extern int __gmpz_comp(mpz_t z1, const mpz_t z2);
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
   @ assigns *z1; */
-extern void mpz_neg(mpz_t z1, const mpz_t z2);
-
-/*@ requires \valid(z1);
-  @ requires \valid(z2);
-  @ requires \valid(z3);
-  @ assigns *z1; */
-extern void mpz_add(mpz_t z1, const mpz_t z2, const mpz_t z3);
+extern void __gmpz_neg(mpz_t z1, const mpz_t z2);
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
   @ requires \valid(z3);
   @ assigns *z1; */
-extern void mpz_sub(mpz_t z1, const mpz_t z2, const mpz_t z3);
+extern void __gmpz_add(mpz_t z1, const mpz_t z2, const mpz_t z3);
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
   @ requires \valid(z3);
   @ assigns *z1; */
-extern void mpz_mul(mpz_t z1, const mpz_t z2, const mpz_t z3);
+extern void __gmpz_sub(mpz_t z1, const mpz_t z2, const mpz_t z3);
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
   @ requires \valid(z3);
   @ assigns *z1; */
-extern void mpz_tdiv_q(mpz_t z1, const mpz_t z2, const mpz_t z3);
+extern void __gmpz_mul(mpz_t z1, const mpz_t z2, const mpz_t z3);
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
   @ requires \valid(z3);
   @ assigns *z1; */
-extern void mpz_tdiv_r(mpz_t z1, const mpz_t z2, const mpz_t z3);
+extern void __gmpz_tdiv_q(mpz_t z1, const mpz_t z2, const mpz_t z3);
+
+/*@ requires \valid(z1);
+  @ requires \valid(z2);
+  @ requires \valid(z3);
+  @ assigns *z1; */
+extern void __gmpz_tdiv_r(mpz_t z1, const mpz_t z2, const mpz_t z3);
 
 // coercions to C int
 
 /*@ requires \valid(z); 
   @ assigns \nothing; */
-extern long mpz_get_si(const mpz_t z);
+extern long __gmpz_get_si(const mpz_t z);
 
 /*@ requires \valid(z); 
   @ assigns \nothing; */
-extern unsigned long mpz_get_ui(const mpz_t z);
+extern unsigned long __gmpz_get_ui(const mpz_t z);
