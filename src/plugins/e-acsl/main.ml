@@ -78,9 +78,10 @@ let generate_code =
     generate_code
 
 let main () =
-  let s = Options.Project_name.get () in
-  if s = "" then begin if Options.Check.get () then fail_check () end
-  else ignore (generate_code s)
+  if Options.Run.get () then 
+    ignore (generate_code (Options.Project_name.get ()))
+  else
+    if Options.Check.get () then fail_check () 
 
 let () = Db.Main.extend main
 

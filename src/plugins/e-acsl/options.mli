@@ -24,6 +24,7 @@ open Plugin
 include S (** implementation of Log.S for E-ACSL *)
 
 module Check: Bool
+module Run: Bool
 module Project_name: String
 
 module Use_assert: Bool

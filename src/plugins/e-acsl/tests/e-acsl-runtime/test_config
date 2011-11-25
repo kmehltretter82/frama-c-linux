@@ -1,1 +1,1 @@
-STDOPT: +"-e-acsl-project p" +"-then-on p" +"-check" +"-print" +"-val"
+STDOPT: +"-e-acsl" +"-then-on e-acsl" +"-check" +"-print" +"-val"

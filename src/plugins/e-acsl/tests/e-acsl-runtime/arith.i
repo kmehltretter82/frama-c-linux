@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: arithmetic operations
    COMMENT: add the last assertion when fixing BTS #751
-   EXECNOW: LOG gen_arith.c BIN gen_arith.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/arith.i -e-acsl-project p -then-on p -print -ocode ./tests/e-acsl-runtime/result/gen_arith.c > /dev/null && gcc -pedantic -o ./tests/e-acsl-runtime/result/gen_arith.out ./tests/e-acsl-runtime/result/gen_arith.c -lgmp && ./tests/e-acsl-runtime/result/gen_arith.out
+   EXECNOW: LOG gen_arith.c BIN gen_arith.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/arith.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_arith.c > /dev/null && gcc -pedantic -o ./tests/e-acsl-runtime/result/gen_arith.out ./tests/e-acsl-runtime/result/gen_arith.c -lgmp && ./tests/e-acsl-runtime/result/gen_arith.out
 */
 
 int main(void) {

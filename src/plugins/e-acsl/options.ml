@@ -36,13 +36,24 @@ module Check =
       let kind = `Correctness
      end)
 
+module Run =
+  False
+    (struct
+      let option_name = "-e-acsl"
+      let help = "generate a new project where E-ACSL annotations are \
+translated to executable C code"
+      let kind = `Correctness
+      let arg_name = "prj"
+     end)
+
 module Project_name =
-  EmptyString
+  String
     (struct
       let option_name = "-e-acsl-project"
-      let help = "generate a new project <prj> from the C program where E-ACSL \
- code is transformed to C code for runtime assertion checking"
+      let help = "the name of the generated project is <prj> \
+(default to \"e-acsl\")"
       let kind = `Correctness
+      let default = "e-acsl"
       let arg_name = "prj"
      end)
 

@@ -1,6 +1,6 @@
 /* run.config
    COMMENT: stmt contract
-   EXECNOW: LOG gen_stmt_contract.c BIN gen_stmt_contract.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/stmt_contract.i -e-acsl-project p -then-on p -print -ocode ./tests/e-acsl-runtime/result/gen_stmt_contract.c > /dev/null && gcc -pedantic -o ./tests/e-acsl-runtime/result/gen_stmt_contract.out ./tests/e-acsl-runtime/result/gen_stmt_contract.c -lgmp && ./tests/e-acsl-runtime/result/gen_stmt_contract.out
+   EXECNOW: LOG gen_stmt_contract.c BIN gen_stmt_contract.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/stmt_contract.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_stmt_contract.c > /dev/null && gcc -pedantic -o ./tests/e-acsl-runtime/result/gen_stmt_contract.out ./tests/e-acsl-runtime/result/gen_stmt_contract.c -lgmp && ./tests/e-acsl-runtime/result/gen_stmt_contract.out
 */
 int main(void) {
   int x = 0, y = 2;
