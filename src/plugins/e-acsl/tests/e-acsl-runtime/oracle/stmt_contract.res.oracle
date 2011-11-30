@@ -543,9 +543,9 @@ PROJECT_FILE.i:312:[value] assigning non deterministic value for the first time
 [value] Recording results for main
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
-[value] Values for function e_acsl_fail:
+[value] Values at end of function e_acsl_fail:
           NON TERMINATING FUNCTION
-[value] Values for function main:
+[value] Values at end of function main:
           __retres ∈ {0}
           x ∈ {7}
           y ∈ {2}

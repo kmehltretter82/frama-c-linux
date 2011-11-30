@@ -346,9 +346,9 @@ PROJECT_FILE.i:256:[value] Assertion got status unknown.
 [value] Recording results for main
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
-[value] Values for function e_acsl_fail:
+[value] Values at end of function e_acsl_fail:
           NON TERMINATING FUNCTION
-[value] Values for function f:
+[value] Values at end of function f:
           A ∈ {3}
           e_acsl_1 ∈ {0}
           e_acsl_5 ∈ {1}
@@ -356,7 +356,7 @@ PROJECT_FILE.i:256:[value] Assertion got status unknown.
           e_acsl_13 ∈ {0}
           e_acsl_14 ∈ {0}
           e_acsl_18 ∈ {3}
-[value] Values for function g:
+[value] Values at end of function g:
           A ∈ {4}
           e_acsl_1 ∈ {0}
           e_acsl_2 ∈ {2}
@@ -365,7 +365,7 @@ PROJECT_FILE.i:256:[value] Assertion got status unknown.
           x ∈ {1}
           t[0] ∈ {2}
            [1] ∈ {3}
-[value] Values for function main:
+[value] Values at end of function main:
           A ∈ {4}
           __retres ∈ {0}
           x ∈ {1}

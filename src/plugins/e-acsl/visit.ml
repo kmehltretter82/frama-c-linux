@@ -103,8 +103,9 @@ let principal_type_from_term t1 t2 =
       Linteger
     | TConst (CInt64(_, k, _)), _ -> 
       (* C-representable constant *)
-      Ctype (TInt (k, []))  
+      Ctype (TInt (k, []))
     | _, _ -> 
+      (* for direct C terms, should be able to infer the corresponding C type *)
       ty
   in
   principal_type (typ t1) (typ t2)

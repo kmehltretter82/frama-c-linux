@@ -19,13 +19,13 @@
 - constante entière longue: utiliser la représentation sous forme de string et 
   rechercher la base appropriée.
 - arithmetic overflows
-[Bernard] avoir une fonction 
+- [Bernard] avoir une fonction 
   e_acsl_assert(int guard, char *msg, char *kind) {
     if (guard) e_acsl_fail(msg, kind);
   }
 à appeler au lieu de générer la garde. La kind est le type de l'annotation 
 (assert, requires, ensures, RTE? ...)
-[Bernard] avoir une fonction
+- [Bernard] avoir une fonction
   e_acsl_trace_behavior(char *bhv_name) {}
 à appeler dès qu'un behavior est activé
 - meilleur schéma de compilation des assumes:
@@ -35,6 +35,10 @@
     run_function;
     ensures_bhv;
   }
+- utiliser Rte (get_rte_annotations dans Oxygen)
+- [Yannick] Logic functions
+- type system for generating C int/float when possible 
+  (generalisation of current Visit.principal_type)
 
 ##############
 # KNOWN BUGS #
@@ -47,7 +51,6 @@
 #########
 
 - fonction sans code
-- exécuter rte
 - tester plusieurs fonctions contenant des annotations
 - améliorer test "integer_constant.i" quand bug fixed #745
 - test sizeof.i devraient être plus précis quand logic_typing plus précis

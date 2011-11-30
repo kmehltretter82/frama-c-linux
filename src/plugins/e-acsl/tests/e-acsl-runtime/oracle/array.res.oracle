@@ -37,9 +37,9 @@ PROJECT_FILE.i:157:[value] Assertion got status unknown.
 [value] Recording results for main
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
-[value] Values for function e_acsl_fail:
+[value] Values at end of function e_acsl_fail:
           NON TERMINATING FUNCTION
-[value] Values for function main:
+[value] Values at end of function main:
           T1[0] ∈ {0; 2}
             [1..2] ∈ {0; 1; 2}
           T2[0] ∈ {0; 2}
