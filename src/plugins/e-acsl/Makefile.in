@@ -1,9 +1,10 @@
 ##########################################################################
 #                                                                        #
-#  This file is part of Frama-C.                                         #
+#  This file is part of the E-ACSL plug-in of Frama-C.                   #
 #                                                                        #
-#  Copyright (C) 2007-2010                                               #
-#    CEA (Commissariat à l'Énergie Atomique)                             #
+#  Copyright (C) 2011                                                    #
+#    CEA (Commissariat à l'énergie atomique et aux énergies              #
+#         alternatives)                                                  #
 #                                                                        #
 #  you can redistribute it and/or modify it under the terms of the GNU   #
 #  Lesser General Public License as published by the Free Software       #
@@ -88,6 +89,17 @@ install::
 uninstall::
 	$(PRINT_RM) E-ACSL share files
 	$(RM) -r $(FRAMAC_SHARE)/e-acsl
+
+##########
+# Header #
+##########
+
+headers::
+	@echo "Applying Headers..."
+	headache -c license/headache_config.txt -h license/CEA_LGPL \
+		*.ml *.mli \
+		Makefile.in configure.ac \
+		share/e-acsl/*.h
 
 ################
 # Generic part #

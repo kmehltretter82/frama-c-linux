@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  This file is part of Frama-C.                                         *)
+(*  This file is part of the E-ACSL plug-in of Frama-C.                   *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2010                                               *)
-(*    CEA (Commissariat à l'Énergie Atomique)                             *)
+(*  Copyright (C) 2011                                                    *)
+(*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
+(*         alternatives)                                                  *)
 (*                                                                        *)
 (*  you can redistribute it and/or modify it under the terms of the GNU   *)
 (*  Lesser General Public License as published by the Free Software       *)
@@ -138,6 +139,72 @@ let is_representable _n k _s = match k with
   | ILongLong | IULongLong ->
     false
 
+let compute_quantif_guards quantif bounded_vars hyps = 
+  let error msg pp x =
+    let msg1 = Pretty_utils.sfprintf msg pp x in
+    let msg2 = 
+      Pretty_utils.sfprintf " in guarded quantification %a"
+	d_predicate_named quantif
+    in
+    Misc.type_error (msg1 ^ msg2)
+  in
+  let vars = 
+    let h = Logic_var.Hashtbl.create 7 in
+    List.iter
+      (fun v -> 
+	(* only allow quantification over integers *)
+	(match v.lv_type with
+	| Ctype ty when isIntegralType ty -> ()
+	| Linteger -> ()
+	| Ctype _ | Ltype _ | Lvar _ | Lreal | Larrow _ -> 
+	  error "non integer variable %a" d_logic_var v);
+	Logic_var.Hashtbl.add h v ()) 
+      bounded_vars;
+    h
+  in
+  let used_vars = Logic_var.Hashtbl.create 7 in
+  let get_guards p =
+    let rec aux acc p = match p.content with
+      | Pand({ content = Prel((Rlt | Rle) as r1, t11, t12) },
+	     { content = Prel((Rlt | Rle) as r2, t21, t22) }) ->
+	(match t12.term_node, t21.term_node with
+	| TLval(TVar x1, TNoOffset), TLval(TVar x2, TNoOffset) -> 
+	  if Logic_var.equal x1 x2 then
+	    if Logic_var.Hashtbl.mem vars x1 then begin
+	      Logic_var.Hashtbl.replace used_vars x1 ();
+	      (t11, r1, x1, r2, t22) :: acc
+	    end else 
+	      error "unbound variable %a" d_logic_var x1
+	  else  
+	    error "invalid guard %a" d_term t21
+	| TLval _, _ -> error "invalid guard %a" d_term t21
+	| _, _ -> error "invalid guard %a" d_term t12)
+      | Pand(p1, p2) -> aux (aux acc p2) p1
+      | _ -> error "invalid guard %a" d_predicate_named p
+    in 
+    aux [] p
+  in
+  let guards = get_guards hyps in
+  (* check that all quantifiers are guarded *)
+  Logic_var.Hashtbl.iter
+    (fun v () -> Logic_var.Hashtbl.remove vars v) 
+    used_vars;
+  let len = Logic_var.Hashtbl.length vars in
+  if len > 0 then begin
+    let msg = 
+      Pretty_utils.sfprintf
+	"unguarded variable%s %tin quantification %a" 
+	(if len = 1 then "" else "s") 
+	(fun fmt -> 
+	  Logic_var.Hashtbl.iter
+	    (fun v () -> Format.fprintf fmt "%a " d_logic_var v)
+	    vars)
+	d_predicate_named quantif
+    in
+    Misc.type_error msg
+  end;
+  guards
+
 let constant_to_exp ?(loc=Location.unknown) = function
   | CInt64(n, k, s) ->
     if is_representable n k s then kinteger64_repr ?loc k n s, false
@@ -147,7 +214,8 @@ let constant_to_exp ?(loc=Location.unknown) = function
 
 let rec thost_to_host env = function
   | TVar { lv_origin = Some v } -> Var v, env
-  | TVar { lv_origin = None } -> Misc.not_yet "logic variable"
+  | TVar ({ lv_origin = None } as logic_v) -> 
+    Var (Env.Logic_binding.get env logic_v), env
   | TResult _typ -> 
     let vis = Env.get_visitor env in
     let kf = Extlib.the vis#current_kf in
@@ -441,11 +509,11 @@ let rec named_predicate_to_exp env p =
       (fun v _ -> 
 	let lv = var v in
 	let then_block, _ = 
-	  let s = mkStmt ~valid_sid:true (Instr (Set(lv, e2, loc))) in
+	  let s = mkStmtOneInstr ~valid_sid:true (Set(lv, e2, loc)) in
 	  Env.pop_and_get env2 s ~global_clear:false Env.Middle
 	in
 	let else_block = 
-	  mkBlock [ mkStmt ~valid_sid:true (Instr (Set(lv, zero loc, loc))) ]
+	  mkBlock [ mkStmtOneInstr ~valid_sid:true (Set(lv, zero loc, loc)) ]
 	in
 	[ mkStmt ~valid_sid:true (If(e1, then_block, else_block, loc)) ])
   | Por(p1, p2) -> 
@@ -476,8 +544,125 @@ let rec named_predicate_to_exp env p =
     new_exp ~loc (UnOp(LNot, e, TInt(IInt, []))), env
   | Pif _ -> Misc.not_yet "_ ? _ : _"
   | Plet _ -> Misc.not_yet "let _ = _ in _"
-  | Pforall _ -> Misc.not_yet "\\forall"
-  | Pexists _ -> Misc.not_yet "\\exists"
+  | Pforall(bounded_vars, { content = Pimplies(hyps, goal) }) -> 
+    (* universal quantification over integers (or a subtype of integer) *)
+    let guards = compute_quantif_guards p bounded_vars hyps in
+    let env = List.fold_left Env.Logic_binding.add env bounded_vars in
+    let var_res = ref Varinfo.dummy in
+    let res, env =
+      (* variable storing the result of the \forall *)
+      Env.new_var env None intType
+	(fun v _ ->
+	  var_res := v;
+	  let lv = var v in
+	  [ mkStmtOneInstr ~valid_sid:true (Set(lv, one ~loc, loc)) ])
+    in
+    let end_loop_ref = ref dummyStmt in
+    let rec mk_for_loop env = function
+      | [] -> 
+	(* innermost loop body: store the result in [res] and go out according
+	   to evaluation of the goal *)
+	let test, env = named_predicate_to_exp (Env.push env) goal in
+ 	let then_block = mkBlock [ mkEmptyStmt ~loc () ] in
+	let else_block = 
+	  mkBlock
+	    [ mkStmtOneInstr
+		~valid_sid:true (Set(var !var_res, zero ~loc, loc));
+	      mkStmt ~valid_sid:true (Goto(end_loop_ref, loc)) ]
+	in
+	let blk, env = 
+	  Env.pop_and_get
+	    env
+	    (mkStmt ~valid_sid:true (If(test, then_block, else_block, loc)))
+	    ~global_clear:false
+	    Env.After
+	in
+	(* TODO: could be optimised if [pop_and_get] would return a list of
+	   stmts *)
+	[ mkStmt ~valid_sid:true (Block blk) ], env
+      | (t1, rel1, logic_x, rel2, t2) :: tl ->
+	let body, env = mk_for_loop env tl in
+	let t_plus_one t =
+	  Logic_const.term ~loc
+	    (TBinOp(PlusA, t, Logic_const.tinteger ~loc ~ikind:IChar 1))
+	    Linteger
+	in
+	let t1 = match rel1 with
+	  | Rlt -> t_plus_one t1
+	  | Rle -> t1
+	  | Rgt | Rge | Req | Rneq -> assert false
+	in
+	let t2, t2', bop2 = match rel2 with
+	  | Rlt -> t2, (*t_plus_one*) (* TODO: again, after implementing case
+					 Linteger  *) t2, Lt
+	  | Rle -> let t2' = t_plus_one t2 in t2', t2', Le
+	  | Rgt | Rge | Req | Rneq -> assert false
+	in
+	let ty = principal_type_from_term t1 t2' in
+	let e1, env = term_to_exp (Env.push env) ty t1 in
+	let e2, env = term_to_exp env ty t2 in
+	let var_x = Env.Logic_binding.get env logic_x in
+	let x = Misc.new_lval var_x in
+	let lv_x = var var_x in
+	(* we increment the loop counter one more time than the value of [t2]
+	   if the relation is [<=]. Thus to prevent overflow, check the type
+	   of [t2 + 1] instead of [t2] *)
+	match ty with
+	| Ctype _cty ->
+	  (* loop counter corresponding to the quantified variable *)
+	  let init_blk, env = 
+	    Env.pop_and_get 
+	      env
+	      (mkStmtOneInstr ~valid_sid:true (Set(lv_x, e1, loc)))
+	      ~global_clear:false
+	      Env.Middle
+	  in
+	  let guard = mkBinOp ~loc bop2 x e2 in
+	  let tlv = Logic_const.tvar ~loc (cvar_to_lvar var_x) in
+	    (* [ty] is ok wrt the risk of overflow when computing [x+1]. See
+	       above comment. *)
+	  let incr, env = 
+	    term_to_exp (Env.push env) ty (t_plus_one tlv) 
+	  in
+	  let next_blk, env = 
+	    Env.pop_and_get
+	      env
+	      (mkStmtOneInstr ~valid_sid:true (Set(lv_x, incr, loc)))
+	      ~global_clear:false
+	      Env.Middle
+	  in
+	  let stmts_block b = [ mkStmt ~valid_sid:true (Block b) ] in
+	  let start = stmts_block init_blk in
+	  let next = stmts_block next_blk in
+	  mkFor ~start ~guard ~next ~body, env
+	| Linteger -> 
+	  (* TODO: similar translation than the case [Ctype _], but using GMP
+	     operations instead of arithmetic ones. *)
+	  assert false
+	| Ltype _ | Lvar _ | Lreal | Larrow _ -> assert false
+    in
+    let stmts, env = mk_for_loop env guards in
+    let env = 
+      Env.add_stmt env (mkStmt ~valid_sid:true (Block (mkBlock stmts))) 
+    in
+    let end_loop = mkEmptyStmt ~loc () in
+    let label = Label("e_acsl_end_loop", loc, false) in
+    end_loop.labels <- label :: end_loop.labels;
+    end_loop_ref := end_loop;
+    let env = Env.add_stmt env end_loop in
+    let env = List.fold_left Env.Logic_binding.remove env bounded_vars in
+    res, env
+  | Pforall _ -> Misc.not_yet "unguarded \\forall quantification"
+  | Pexists(bounded_vars, { content = Pand(hyps, _goal) }) -> 
+    let guards = compute_quantif_guards p bounded_vars hyps in
+    List.iter 
+      (fun (t1, _, x, _, t2) -> 
+	Options.feedback
+	  "getting %a OP %a OP %a"  
+	  d_term t1 d_logic_var x d_term t2)
+      guards;
+    assert false
+  | Pexists _ -> Misc.not_yet "unguarded \\exists quantification"
   | Pat _ -> Misc.not_yet "\\at"
   | Pvalid _ -> Misc.not_yet "\\valid"
   | Pvalid_index _ -> Misc.not_yet "\\valid_index"

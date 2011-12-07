@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  This file is part of Frama-C.                                         *)
+(*  This file is part of the E-ACSL plug-in of Frama-C.                   *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2010                                               *)
-(*    CEA (Commissariat à l'Énergie Atomique)                             *)
+(*  Copyright (C) 2011                                                    *)
+(*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
+(*         alternatives)                                                  *)
 (*                                                                        *)
 (*  you can redistribute it and/or modify it under the terms of the GNU   *)
 (*  Lesser General Public License as published by the Free Software       *)
@@ -43,10 +44,10 @@ type local_env = { block_info: block_info; mpz_tbl: mpz_tbl }
 
 type t = 
     { visitor: Visitor.frama_c_visitor; 
-      new_global_vars: varinfo list; (* generated variables at function 
-					level *)
+      new_global_vars: varinfo list; (* generated variables at function level *)
       global_mpz_tbl: mpz_tbl;
       env_stack: local_env list;
+      var_mapping: Varinfo.t Logic_var.Map.t; (* bind logic var to C var *)
       cpt: int; (* counter used when generating variables *) }
 
 let empty_block = 
@@ -66,6 +67,7 @@ let dummy =
     new_global_vars = [];
     global_mpz_tbl = empty_mpz_tbl; 
     env_stack = []; 
+    var_mapping = Logic_var.Map.empty;
     cpt = 0 }
 
 let empty v = 
@@ -73,6 +75,7 @@ let empty v =
     new_global_vars = [];
     global_mpz_tbl = empty_mpz_tbl; 
     env_stack = []; 
+    var_mapping = Logic_var.Map.empty;
     cpt = 0 }
 
 let top env = match env.env_stack with [] -> assert false | hd :: tl -> hd, tl
@@ -163,6 +166,32 @@ let new_var ?(global=false) env t ty mk_stmts =
 
 let new_var_and_mpz_init ?global env t mk_stmts = 
   new_var ?global env t Mpz.t (fun v e -> Mpz.init e :: mk_stmts v e)
+
+module Logic_binding = struct
+
+  let add env logic_v =
+  let v_ref = ref Varinfo.dummy in
+  let mk v _ = v_ref := v; [] in
+  let ty = 
+    (* TODO: yet incorrect. Waiting for the type system... *)
+    match logic_v.lv_type with
+    | Ctype ty -> ty
+    | Linteger -> Mpz.t
+    | Ltype _ | Lvar _ | Lreal | Larrow _ -> assert false
+  in
+  let _, env = new_var env None ty mk in
+  { env with var_mapping = Logic_var.Map.add logic_v !v_ref env.var_mapping }
+
+  let get env logic_v = 
+    try Logic_var.Map.find logic_v env.var_mapping
+    with Not_found -> assert false
+
+  let remove env v = 
+    let map = env.var_mapping in
+    assert (Logic_var.Map.mem v map);
+    { env with var_mapping = Logic_var.Map.remove v map }
+
+end
 
 let current_kf env = 
   let v = env.visitor in

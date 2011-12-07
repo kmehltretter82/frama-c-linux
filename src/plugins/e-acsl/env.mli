@@ -1,9 +1,10 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  This file is part of Frama-C.                                         *)
+(*  This file is part of the E-ACSL plug-in of Frama-C.                   *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2010                                               *)
-(*    CEA (Commissariat à l'Énergie Atomique)                             *)
+(*  Copyright (C) 2011                                                    *)
+(*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
+(*         alternatives)                                                  *)
 (*                                                                        *)
 (*  you can redistribute it and/or modify it under the terms of the GNU   *)
 (*  Lesser General Public License as published by the Free Software       *)
@@ -52,6 +53,12 @@ val new_var_and_mpz_init:
 (** Same as [new_var], but dedicated to mpz_t variables initialized by 
     {!Mpz.init}. *)
 
+module Logic_binding: sig
+  val add: t -> logic_var -> t
+  val get: t -> logic_var -> varinfo
+  val remove: t -> logic_var -> t
+end
+
 val add_assert: t -> stmt -> predicate named -> unit
 (** [add_assert kf s p] extends the global environment with an assertion [p]
     associated to the statement [s] in function [kf]. *)
@@ -70,14 +77,14 @@ val push: t -> t
 
 type where = Before | Middle | After
 val pop_and_get: t -> stmt -> global_clear:bool -> where -> block * t
-(* Pop the last local context and get back the corresponding new block
+(** Pop the last local context and get back the corresponding new block
    containing the given [stmt] at the given place ([Before] is before the
    code corresponding to annotations, [After] is after this code and [Middle] is
    between the stmt corresponding to annotations and the ones for freeing the
    memory. *)
 
 val pop: t -> t
-(* Pop the last local context (ignore the corresponding new block if any *)
+(** Pop the last local context (ignore the corresponding new block if any *)
 
 val get_generated_variables: t -> varinfo list
 (** All the new variables local to the visited function. *)

@@ -1,21 +1,26 @@
-à traiter avant la 1ère release:
-- quantifications sans exentension de syntaxe
+################
+# NEXT RELEASE #
+################
+
+- quantifications sur les entiers
+- mixed assumes and ensures in contracts
+- pas d'arrêt brutal en cas de feature non implémentée
+- utiliser Options.use_asserts
 
 ########
 # CODE #
 ########
 
-- mixed assumes and ensures
+- Env.new_var*: ajouter la varinfo en sortie de la fonction ?
 - function contracts for functions only declared
   ==> le noyau génère un "assigns \nothing" pour ces fonctions...
   ce assign n'est de toute façon pas gérer
 - multi ensures or multi requirements, their conjunctions and undefinedness
-- utiliser Options.use_asserts
+  	[JS 2011/12/06] c'est quoi çà ? :-(
 - gestion des initialiseurs des globals: requiert un main
 - mkcall ne devrait pas générer de nouvelles variables pour une même fonction
 - garde pour les casts quand overflows potentiels
   (même pas de warnings aujourd'hui)
-- minimiser le nombre de variables générées
 - constante entière longue: utiliser la représentation sous forme de string et 
   rechercher la base appropriée.
 - arithmetic overflows
@@ -38,11 +43,17 @@
 - utiliser Rte (get_rte_annotations dans Oxygen)
 - [Yannick] Logic functions
 - type system for generating C int/float when possible 
-  (generalisation of current Visit.principal_type)
+  (generalisation of current Visit.principal_type, 
+  nouvelle unité de compilation Typing)
+- vérifier le code de la division et du modulo 
+  (div et modulo mathématiques différents des div et modulo de l'ANSI C99)
+- customization des noms de variable générés 
+  (par ex pour indiquer le nom de la variable d'origine, ou son rôle)
 
 ##############
 # KNOWN BUGS #
 ##############
+
 - \at incorrect si StmtLabel faisant référence au stmt courant (voir test at.i)
 - incorrect d'utiliser un \old dans le post-state si pre-state == post-state
 
@@ -56,18 +67,11 @@
 - test sizeof.i devraient être plus précis quand logic_typing plus précis
 - structs
 - unions
+- quantifications entières invalides
 
 ####################
 # AVANT LA DISTRIB #
 ####################
 
-- documentation
-- e-acsl implementation manual
-
-en lien avec bts #743:
+- user manual
 - make distrib
-- headers (copyright 2011)
-- license
-- install répertoire share
-
-VOIR CPAN
