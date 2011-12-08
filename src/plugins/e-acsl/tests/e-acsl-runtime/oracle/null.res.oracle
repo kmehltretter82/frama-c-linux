@@ -2,7 +2,7 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-PROJECT_FILE.i:134:[value] Assertion got status unknown.
+PROJECT_FILE.i:198:[value] Assertion got status unknown.
 [value] Recording results for main
 [value] done for function main
 [value] ====== VALUES COMPUTED ======

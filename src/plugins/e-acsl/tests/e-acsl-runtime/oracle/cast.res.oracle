@@ -4,50 +4,50 @@ tests/e-acsl-runtime/cast.i:18:[e-acsl] warning: missing guard for ensuring that
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-PROJECT_FILE.i:138:[value] Assertion got status valid.
+PROJECT_FILE.i:202:[value] Assertion got status valid.
 [value] computing for function __gmpz_init_set_str <- main.
-        Called from PROJECT_FILE.i:142.
-PROJECT_FILE.i:37:[value] Function __gmpz_init_set_str: postcondition got status valid.
+        Called from PROJECT_FILE.i:206.
+PROJECT_FILE.i:79:[value] Function __gmpz_init_set_str: postcondition got status valid.
 [value] Done for function __gmpz_init_set_str
 [value] computing for function __gmpz_get_si <- main.
-        Called from PROJECT_FILE.i:143.
-PROJECT_FILE.i:96:[value] Function __gmpz_get_si: precondition got status valid.
+        Called from PROJECT_FILE.i:207.
+PROJECT_FILE.i:138:[value] Function __gmpz_get_si: precondition got status valid.
 [value] Done for function __gmpz_get_si
 [value] computing for function e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:144.
+        Called from PROJECT_FILE.i:208.
 [value] computing for function printf <- e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:129.
+        Called from PROJECT_FILE.i:193.
 [value] Done for function printf
 [value] computing for function exit <- e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:129.
-PROJECT_FILE.i:119:[value] Function exit: postcondition got status invalid.
+        Called from PROJECT_FILE.i:193.
+PROJECT_FILE.i:183:[value] Function exit: postcondition got status invalid.
 [value] Done for function exit
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:145.
-PROJECT_FILE.i:43:[value] Function __gmpz_clear: precondition got status valid.
+        Called from PROJECT_FILE.i:209.
+PROJECT_FILE.i:85:[value] Function __gmpz_clear: precondition got status valid.
 [value] Done for function __gmpz_clear
-PROJECT_FILE.i:149:[value] Assertion got status valid.
+PROJECT_FILE.i:213:[value] Assertion got status valid.
 [value] computing for function __gmpz_init_set_str <- main.
-        Called from PROJECT_FILE.i:153.
+        Called from PROJECT_FILE.i:217.
 [value] Done for function __gmpz_init_set_str
 [value] computing for function __gmpz_get_ui <- main.
-        Called from PROJECT_FILE.i:154.
-PROJECT_FILE.i:100:[value] Function __gmpz_get_ui: precondition got status valid.
+        Called from PROJECT_FILE.i:218.
+PROJECT_FILE.i:142:[value] Function __gmpz_get_ui: precondition got status valid.
 [value] Done for function __gmpz_get_ui
 [value] computing for function e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:156.
+        Called from PROJECT_FILE.i:220.
 [value] computing for function printf <- e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:129.
+        Called from PROJECT_FILE.i:193.
 [value] Done for function printf
 [value] computing for function exit <- e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:129.
+        Called from PROJECT_FILE.i:193.
 [value] Done for function exit
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:158.
+        Called from PROJECT_FILE.i:222.
 [value] Done for function __gmpz_clear
 [value] Recording results for main
 [value] done for function main
