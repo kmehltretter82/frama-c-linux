@@ -1,1 +1,1 @@
-STDOPT: +"-e-acsl" +"-then-on e-acsl" +"-check" +"-print" +"-val"
+OPT: -e-acsl -then-on e-acsl -check -print -val

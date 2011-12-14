@@ -20,63 +20,22 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let check () =
-  Visitor.visitFramacFileSameGlobals (Visit.do_visit false) (Ast.get ());
-  let t = Error.nb_untypable () in
-  let n = Error.nb_not_yet () in
-  let print msg n =
-    Options.result "@[%d annotation%s %s ignored,@ being %s.@]" 
-      n
-      (if n > 1 then "s" else "")
-      (if n > 1 then "were" else "was")
-      msg
-  in
-  print "untypable" t;
-  print "unsupported" n;
-  n + t = 0
+(** Handling errors. *)
 
-let check =
-  Dynamic.register
-    ~plugin:"e-acsl"
-    ~journalize:true
-    "check"
-    (Datatype.func Datatype.unit Datatype.bool)
-    check
+val untypable: string -> 'a
+(** type error built from the given argument. *)
+  
+val not_yet: string -> 'a
+(** not_yet_implemented error built from the given argument. *)
+  
+val handle: ('a -> 'a) -> 'a -> 'a
+(** run the closure with the given argument and handle potential errors. *)
 
-module Resulting_projects =
-  State_builder.Hashtbl
-    (Datatype.String.Hashtbl)
-    (Project.Datatype)
-    (struct
-      let name = "E-ACSL resulting projects"
-      let size = 7
-      let kind = `Correctness
-      let dependencies = [ Ast.self; Options.Use_assert.self ]
-     end)
+val nb_untypable: unit -> int
+(** Number of untypable annotations. *)
 
-let () = Env.global_state := Resulting_projects.self
-
-let generate_code =
-  Resulting_projects.memo
-    (fun name ->
-      let visit prj = Visit.do_visit ~prj true in
-      File.create_rebuilt_project_from_visitor ~preprocess:false name visit)
-
-let generate_code =
-  Dynamic.register
-    ~plugin:"e-acsl"
-    ~journalize:true
-    "generate_code"
-    (Datatype.func Datatype.string Project.ty)
-    generate_code
-
-let main () =
-  if Options.Run.get () then 
-    ignore (generate_code (Options.Project_name.get ()))
-  else
-    if Options.Check.get () then ignore (check ())
-
-let () = Db.Main.extend main
+val nb_not_yet: unit -> int
+(** Number of not-yet-supported annotations. *)
 
 (*
 Local Variables:

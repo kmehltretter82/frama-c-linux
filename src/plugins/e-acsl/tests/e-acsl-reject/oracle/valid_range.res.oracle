@@ -1,3 +1,3 @@
-[kernel] Plug-in e-acsl aborted because of unimplemented feature.
-         Please send a feature request at http://bts.frama-c.com with:
-         '[Plug-in e-acsl] construct `\valid_range' is not yet supported.'.
+tests/e-acsl-reject/valid_range.i:5:[e-acsl] warning: E-ACSL construct `\valid_range' is not yet supported. Ignoring annotation.
+[e-acsl] 0 annotation was ignored, being untypable.
+[e-acsl] 1 annotation was ignored, being unsupported.

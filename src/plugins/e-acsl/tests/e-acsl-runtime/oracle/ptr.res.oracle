@@ -2,7 +2,8 @@ tests/e-acsl-runtime/ptr.i:12:[e-acsl] warning: missing guard for ensuring that 
 :0:[e-acsl] warning: missing guard for ensuring that 0 is a valid array index
 tests/e-acsl-runtime/ptr.i:14:[e-acsl] warning: missing guard for ensuring that 2 is a valid array index
 tests/e-acsl-runtime/ptr.i:15:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
-:0:[e-acsl] warning: missing guard for ensuring that (2*sizeof(int))/sizeof((int)0x0) is a valid array index
+:0:[e-acsl] warning: missing guard for ensuring that
+                  (2*sizeof(int))/sizeof((int)0x0) is a valid array index
 tests/e-acsl-runtime/ptr.i:18:[e-acsl] warning: missing guard for ensuring that i is a valid array index
 tests/e-acsl-runtime/ptr.i:19:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
 :0:[e-acsl] warning: missing guard for ensuring that 2-i is a valid array index

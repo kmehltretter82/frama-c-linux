@@ -20,63 +20,52 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let check () =
-  Visitor.visitFramacFileSameGlobals (Visit.do_visit false) (Ast.get ());
-  let t = Error.nb_untypable () in
-  let n = Error.nb_not_yet () in
-  let print msg n =
-    Options.result "@[%d annotation%s %s ignored,@ being %s.@]" 
-      n
-      (if n > 1 then "s" else "")
-      (if n > 1 then "were" else "was")
-      msg
-  in
-  print "untypable" t;
-  print "unsupported" n;
-  n + t = 0
+exception Typing_error of string
+let untypable s = raise (Typing_error s)
 
-let check =
-  Dynamic.register
-    ~plugin:"e-acsl"
-    ~journalize:true
-    "check"
-    (Datatype.func Datatype.unit Datatype.bool)
-    check
+exception Not_yet of string
+let not_yet s = raise (Not_yet s)
 
-module Resulting_projects =
-  State_builder.Hashtbl
-    (Datatype.String.Hashtbl)
-    (Project.Datatype)
+module Nb_typing = 
+  State_builder.Ref
+    (Datatype.Int)
     (struct
-      let name = "E-ACSL resulting projects"
-      let size = 7
+      let name = "E_ACSL.Error.Nb_typing"
+      let default () = 0
+      let dependencies = [ Ast.self ]
       let kind = `Correctness
-      let dependencies = [ Ast.self; Options.Use_assert.self ]
      end)
 
-let () = Env.global_state := Resulting_projects.self
+let nb_untypable = Nb_typing.get
 
-let generate_code =
-  Resulting_projects.memo
-    (fun name ->
-      let visit prj = Visit.do_visit ~prj true in
-      File.create_rebuilt_project_from_visitor ~preprocess:false name visit)
+module Nb_not_yet = 
+  State_builder.Ref
+    (Datatype.Int)
+    (struct
+      let name = "E_ACSL.Error.Nb_not_yet"
+      let default () = 0
+      let dependencies = [ Ast.self ]
+      let kind = `Correctness
+     end)
 
-let generate_code =
-  Dynamic.register
-    ~plugin:"e-acsl"
-    ~journalize:true
-    "generate_code"
-    (Datatype.func Datatype.string Project.ty)
-    generate_code
+let nb_not_yet = Nb_not_yet.get
 
-let main () =
-  if Options.Run.get () then 
-    ignore (generate_code (Options.Project_name.get ()))
-  else
-    if Options.Check.get () then ignore (check ())
-
-let () = Db.Main.extend main
+let handle f x = 
+  try
+    f x
+  with
+  | Typing_error s ->
+    let msg = Format.sprintf "@[invalid E-ACSL construct@ `%s'.@]" s in
+    Options.warning ~current:true "@[%s@ Ignoring annotation.@]" msg;
+    Nb_typing.set (Nb_typing.get () + 1);
+    x
+  | Not_yet s ->
+    let msg = 
+      Format.sprintf "@[E-ACSL construct@ `%s'@ is not yet supported.@]" s
+    in 
+    Options.warning ~current:true "@[%s@ Ignoring annotation.@]" msg;
+    Nb_not_yet.set (Nb_not_yet.get () + 1);
+    x
 
 (*
 Local Variables:

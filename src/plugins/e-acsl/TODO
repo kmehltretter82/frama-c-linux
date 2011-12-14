@@ -4,7 +4,6 @@
 
 - quantifications sur les entiers
 - mixed assumes and ensures in contracts
-- pas d'arrêt brutal en cas de feature non implémentée
 - utiliser Options.use_asserts
 
 ########

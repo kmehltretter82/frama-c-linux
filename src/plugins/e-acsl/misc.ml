@@ -25,16 +25,6 @@ open Cil_datatype
 open Cil
 
 (* ************************************************************************** *)
-(** {2 Handling errors} *)
-(* ************************************************************************** *)
-
-exception Typing_error of string
-let type_error s = raise (Typing_error s)
-
-let not_yet s =
-  Options.not_yet_implemented "construct `%s' is not yet supported." s
-
-(* ************************************************************************** *)
 (** {2 Builders} *)
 (* ************************************************************************** *)
 

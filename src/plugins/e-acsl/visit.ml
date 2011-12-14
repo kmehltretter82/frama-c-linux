@@ -49,7 +49,8 @@ let context_sensitive ?loc env ctx is_mpz_string t_opt e =
       Options.warning
 	?source:(Extlib.opt_map fst loc)
 	~once:true
-	"missing guard for ensuring that the given integer is C-representable"; 
+	"@[missing guard for ensuring that the given integer is \
+C-representable@]"; 
       Env.new_var 
 	env
 	None
@@ -143,10 +144,10 @@ let compute_quantif_guards quantif bounded_vars hyps =
   let error msg pp x =
     let msg1 = Pretty_utils.sfprintf msg pp x in
     let msg2 = 
-      Pretty_utils.sfprintf " in guarded quantification %a"
+      Pretty_utils.sfprintf "@[ in quantification@ %a@]"
 	d_predicate_named quantif
     in
-    Misc.type_error (msg1 ^ msg2)
+    Error.untypable (msg1 ^ msg2)
   in
   let vars = 
     let h = Logic_var.Hashtbl.create 7 in
@@ -157,7 +158,7 @@ let compute_quantif_guards quantif bounded_vars hyps =
 	| Ctype ty when isIntegralType ty -> ()
 	| Linteger -> ()
 	| Ctype _ | Ltype _ | Lvar _ | Lreal | Larrow _ -> 
-	  error "non integer variable %a" d_logic_var v);
+	  error "@[non integer variable %a@]" d_logic_var v);
 	Logic_var.Hashtbl.add h v ()) 
       bounded_vars;
     h
@@ -174,13 +175,13 @@ let compute_quantif_guards quantif bounded_vars hyps =
 	      Logic_var.Hashtbl.replace used_vars x1 ();
 	      (t11, r1, x1, r2, t22) :: acc
 	    end else 
-	      error "unbound variable %a" d_logic_var x1
+	      error "@[unquantified variable %a@]" d_logic_var x1
 	  else  
-	    error "invalid guard %a" d_term t21
-	| TLval _, _ -> error "invalid guard %a" d_term t21
-	| _, _ -> error "invalid guard %a" d_term t12)
+	    error "@[invalid binder %a@]" d_term t21
+	| TLval _, _ -> error "@[invalid binder %a@]" d_term t21
+	| _, _ -> error "@[invalid binder %a@]" d_term t12)
       | Pand(p1, p2) -> aux (aux acc p2) p1
-      | _ -> error "invalid guard %a" d_predicate_named p
+      | _ -> error "@[invalid guard %a@]" d_predicate_named p
     in 
     aux [] p
   in
@@ -193,15 +194,15 @@ let compute_quantif_guards quantif bounded_vars hyps =
   if len > 0 then begin
     let msg = 
       Pretty_utils.sfprintf
-	"unguarded variable%s %tin quantification %a" 
+	"@[unguarded variable%s %tin quantification@ %a@]" 
 	(if len = 1 then "" else "s") 
 	(fun fmt -> 
 	  Logic_var.Hashtbl.iter
-	    (fun v () -> Format.fprintf fmt "%a " d_logic_var v)
+	    (fun v () -> Format.fprintf fmt "@[%a @]" d_logic_var v)
 	    vars)
 	d_predicate_named quantif
     in
-    Misc.type_error msg
+    Error.untypable msg
   end;
   guards
 
@@ -229,7 +230,7 @@ let rec thost_to_host env = function
   | TMem t ->
     let e, env = term_to_exp env (Ctype intType) t in
     Options.warning ~source:(fst e.eloc) ~once:true
-      "missing guard for ensuring that %a is a valid memory access"
+      "@[missing guard for ensuring that@ %a is a valid memory access@]"
       d_term t;
     Mem e, env
 
@@ -242,7 +243,7 @@ and toffset_to_offset ?loc env = function
   | TIndex(t, offset) -> 
     let e, env = term_to_exp env (Ctype intType) t in
     Options.warning ~source:(fst e.eloc) ~once:true
-      "missing guard for ensuring that %a is a valid array index"
+      "@[missing guard for ensuring that@ %a is a valid array index@]"
       d_term t;
     let offset, env = toffset_to_offset env offset in
     Index(e, offset), env
@@ -343,10 +344,10 @@ and context_insensitive_term_to_exp env t =
     e, env, false
   | TBinOp((Shiftlt | Shiftrt), _, _) ->
     (* left/right shift *)
-    Misc.not_yet "left/right shift"
+    Error.not_yet "left/right shift"
   | TBinOp((LOr | LAnd | BOr | BXor | BAnd), _, _) ->
     (* other logic/arith operators  *)
-    Misc.not_yet "missing binary operator"
+    Error.not_yet "missing binary operator"
   | TBinOp(PlusPI | IndexPI | MinusPI | MinusPP as bop, t1, t2) ->
     (* binary operation over pointers *)
     (* [TODO] untested *)
@@ -359,7 +360,7 @@ and context_insensitive_term_to_exp env t =
     let e1, env = term_to_exp env (ctx_type t1) t1 in
     let e2, env = term_to_exp env (ctx_type t2) t2 in
     Options.warning ~source:(fst loc) ~once:true
-      "missing guard for ensuring that %a is a valid pointer"
+      "@[missing guard for ensuring that@ %a is a valid pointer@]"
       d_term t;
     (* the type of the result is the same than type of the pointer [e1],
        whatever is [e2] *)
@@ -373,10 +374,10 @@ and context_insensitive_term_to_exp env t =
   | TStartOf lv -> 
     let lv, env = tlval_to_lval env lv in
     mkAddrOrStartOf ~loc lv, env, false
-  | Tapp _ -> Misc.not_yet "applying logic function"
-  | Tlambda _ -> Misc.not_yet "functional"
-  | TDataCons _ -> Misc.not_yet "constructor"
-  | Tif _ -> Misc.not_yet "conditional"
+  | Tapp _ -> Error.not_yet "applying logic function"
+  | Tlambda _ -> Error.not_yet "functional"
+  | TDataCons _ -> Error.not_yet "constructor"
+  | Tif _ -> Error.not_yet "conditional"
   | Tat(t', label) ->
     let stmt = Env.stmt_of_label env label in
     let ty = t'.term_type in
@@ -431,20 +432,20 @@ and context_insensitive_term_to_exp env t =
     let new_stmt = Visitor.visitFramacStmt o (get_stmt bhv stmt) in
     set_stmt bhv stmt new_stmt;
     res, !env_ref, false
-  | Tbase_addr _ -> Misc.not_yet "\\base_addr"
-  | Tblock_length _ -> Misc.not_yet "\\block_length"
+  | Tbase_addr _ -> Error.not_yet "\\base_addr"
+  | Tblock_length _ -> Error.not_yet "\\block_length"
   | Tnull -> mkCast (zero ~loc) (TPtr(TVoid [], [])), env, false
-  | TCoerce _ -> Misc.not_yet "coercion" (* Jessie specific *)
-  | TCoerceE _ -> Misc.not_yet "expression coercion" (* Jessie specific *)
-  | TUpdate _ -> Misc.not_yet "functional update"
-  | Ttypeof _ -> Misc.not_yet "typeof"
-  | Ttype _ -> Misc.not_yet "C type"
-  | Tempty_set -> Misc.not_yet "empty tset"
-  | Tunion _ -> Misc.not_yet "union of tsets"
-  | Tinter _ -> Misc.not_yet "intersection of tsets"
-  | Tcomprehension _ -> Misc.not_yet "tset comprehension"
-  | Trange _ -> Misc.not_yet "range"
-  | Tlet _ -> Misc.not_yet "let binding"
+  | TCoerce _ -> Error.not_yet "coercion" (* Jessie specific *)
+  | TCoerceE _ -> Error.not_yet "expression coercion" (* Jessie specific *)
+  | TUpdate _ -> Error.not_yet "functional update"
+  | Ttypeof _ -> Error.not_yet "typeof"
+  | Ttype _ -> Error.not_yet "C type"
+  | Tempty_set -> Error.not_yet "empty tset"
+  | Tunion _ -> Error.not_yet "union of tsets"
+  | Tinter _ -> Error.not_yet "intersection of tsets"
+  | Tcomprehension _ -> Error.not_yet "tset comprehension"
+  | Trange _ -> Error.not_yet "range"
+  | Tlet _ -> Error.not_yet "let binding"
 
 (* Convert an ACSL term into a corresponding C expression (if any) in the given
    environment. Also extend this environment in order to include the generating
@@ -490,8 +491,8 @@ let rec named_predicate_to_exp env p =
   match p.content with
   | Pfalse -> zero ~loc, env
   | Ptrue -> one ~loc, env
-  | Papp _ -> Misc.not_yet "logic function application"
-  | Pseparated _ -> Misc.not_yet "separated"
+  | Papp _ -> Error.not_yet "logic function application"
+  | Pseparated _ -> Error.not_yet "separated"
   | Prel(rel, t1, t2) -> 
     let e, env = 
       comparison_to_exp ~loc env (relation_to_binop rel) t1 t2 None 
@@ -535,15 +536,15 @@ let rec named_predicate_to_exp env p =
 	  Env.pop_and_get env2 s ~global_clear:false Env.Middle
 	in
 	[ mkStmt ~valid_sid:true (If(e1, then_block, else_block, loc)) ])
-  | Pxor _ -> Misc.not_yet "xor"
+  | Pxor _ -> Error.not_yet "xor"
   | Pimplies(p1, p2) -> 
     named_predicate_to_exp env (Logic_const.por ((Logic_const.pnot p1), p2))
-  | Piff _ -> Misc.not_yet "<==>"
+  | Piff _ -> Error.not_yet "<==>"
   | Pnot p ->
     let e, env = named_predicate_to_exp env p in
     new_exp ~loc (UnOp(LNot, e, TInt(IInt, []))), env
-  | Pif _ -> Misc.not_yet "_ ? _ : _"
-  | Plet _ -> Misc.not_yet "let _ = _ in _"
+  | Pif _ -> Error.not_yet "_ ? _ : _"
+  | Plet _ -> Error.not_yet "let _ = _ in _"
   | Pforall(bounded_vars, { content = Pimplies(hyps, goal) }) -> 
     (* universal quantification over integers (or a subtype of integer) *)
     let guards = compute_quantif_guards p bounded_vars hyps in
@@ -652,8 +653,8 @@ let rec named_predicate_to_exp env p =
     let env = Env.add_stmt env end_loop in
     let env = List.fold_left Env.Logic_binding.remove env bounded_vars in
     res, env
-  | Pforall _ -> Misc.not_yet "unguarded \\forall quantification"
-  | Pexists(bounded_vars, { content = Pand(hyps, _goal) }) -> 
+  | Pforall _ -> Error.not_yet "unguarded \\forall quantification"
+(*  | Pexists(bounded_vars, { content = Pand(hyps, _goal) }) -> 
     let guards = compute_quantif_guards p bounded_vars hyps in
     List.iter 
       (fun (t1, _, x, _, t2) -> 
@@ -661,15 +662,15 @@ let rec named_predicate_to_exp env p =
 	  "getting %a OP %a OP %a"  
 	  d_term t1 d_logic_var x d_term t2)
       guards;
-    assert false
-  | Pexists _ -> Misc.not_yet "unguarded \\exists quantification"
-  | Pat _ -> Misc.not_yet "\\at"
-  | Pvalid _ -> Misc.not_yet "\\valid"
-  | Pvalid_index _ -> Misc.not_yet "\\valid_index"
-  | Pvalid_range _ -> Misc.not_yet "\\valid_range"
-  | Pfresh _ -> Misc.not_yet "\\fresh"
-  | Psubtype _ -> Misc.not_yet "subtyping relation" (* Jessie specific? *)
-  | Pinitialized _ -> Misc.not_yet "\\initialized"
+    assert false*)
+  | Pexists _ -> Error.not_yet "unguarded \\exists quantification"
+  | Pat _ -> Error.not_yet "\\at"
+  | Pvalid _ -> Error.not_yet "\\valid"
+  | Pvalid_index _ -> Error.not_yet "\\valid_index"
+  | Pvalid_range _ -> Error.not_yet "\\valid_range"
+  | Pfresh _ -> Error.not_yet "\\fresh"
+  | Psubtype _ -> Error.not_yet "subtyping relation" (* Jessie specific *)
+  | Pinitialized _ -> Error.not_yet "\\initialized"
 
 (* ************************************************************************** *)
 (* [convert_*] converts a given ACSL annotation into the corresponding C
@@ -702,32 +703,38 @@ let convert_postconditions env behaviors =
     List.fold_left
       (fun env (t, p) ->
 	if b.b_assigns <> WritesAny then 
-	  Misc.not_yet "assigns clause in behavior";
+	  Error.not_yet "assigns clause in behavior";
 	if b.b_extended <> [] then 
-	  Misc.not_yet "grammar extensions in behavior";
+	  Error.not_yet "grammar extensions in behavior";
 	match t with
 	  | Normal -> 
 	    let p = p.ip_content in
 	    if p <> Ptrue && b.b_assumes <> [] then 
-	      Misc.not_yet "assumes in conjunction with ensures in behaviors";
+	      Error.not_yet "assumes in conjunction with ensures in behaviors";
 	    let p = Logic_const.unamed p in
 	    let e, env = named_predicate_to_exp env p in
 	    Env.add_stmt env (Misc.mk_e_acsl_guard ~reverse:true e p)
 	  | Exits | Breaks | Continues | Returns ->
-	    Misc.not_yet "abnormal termination case in behavior")
+	    Error.not_yet "@[abnormal termination case in behavior@]")
       env
       b.b_post_cond
   in 
   List.fold_left do_behavior env behaviors
 
 let convert_pre_spec env spec =
-  if spec.spec_variant <> None then Misc.not_yet "variant clause";
-  if spec.spec_terminates <> None then Misc.not_yet "terminates clause";
-  if spec.spec_complete_behaviors <> [] then Misc.not_yet "complete behaviors";
-  if spec.spec_disjoint_behaviors <> [] then Misc.not_yet "disjoint behaviors";
-  convert_preconditions env spec.spec_behavior
+  let convert env =
+    if spec.spec_variant <> None then Error.not_yet "variant clause";
+    if spec.spec_terminates <> None then Error.not_yet "terminates clause";
+    if spec.spec_complete_behaviors <> [] then 
+      Error.not_yet "complete behaviors";
+    if spec.spec_disjoint_behaviors <> [] then 
+      Error.not_yet "disjoint behaviors";
+    convert_preconditions env spec.spec_behavior
+  in
+  Error.handle convert env
 
-let convert_post_spec env spec = convert_postconditions env spec.spec_behavior
+let convert_post_spec env spec = 
+  Error.handle (fun env -> convert_postconditions env spec.spec_behavior) env
 
 let convert_named_predicate env p =
   let e, env = named_predicate_to_exp env p in
@@ -735,36 +742,32 @@ let convert_named_predicate env p =
   Env.add_stmt env (Misc.mk_e_acsl_guard ~reverse:true e p)
 
 let convert_pre_code_annotation env annot =
-  try
-    match annot.annot_content with
+  let convert env = match annot.annot_content with
     | AAssert(l, p) -> 
-      if l <> [] then Misc.not_yet "assertions applied only on some behaviors";
+      if l <> [] then 
+	Error.not_yet "@[assertions applied only on some behaviors@]";
       convert_named_predicate env p
     | AStmtSpec(l, spec) ->
       if l <> [] then 
-        Misc.not_yet "statement contract applied only on some behaviors";
+        Error.not_yet "@[statement contract applied only on some behaviors@]";
       convert_pre_spec env spec ;
-    | AInvariant _ -> Misc.not_yet "invariant"
-    | AVariant _ -> Misc.not_yet "variant"
-    | AAssigns _ -> Misc.not_yet "assigns"
-    | APragma _ -> Misc.not_yet "pragma"
-  with Misc.Typing_error s ->
-    let msg = Format.sprintf "invalid E-ACSL construct %s." s in
-    if Options.Check.get () then Misc.type_error msg
-    else Options.warning ~current:true "%s@\nignoring annotation." msg;
-    env
+    | AInvariant _ -> Error.not_yet "invariant"
+    | AVariant _ -> Error.not_yet "variant"
+    | AAssigns _ -> Error.not_yet "assigns"
+    | APragma _ -> Error.not_yet "pragma"
+  in
+  Error.handle convert env
 
 let convert_post_code_annotation env annot =
-  try
-    match annot.annot_content with
+  let convert env = match annot.annot_content with
     | AStmtSpec(_, spec) -> convert_post_spec env spec
     | AAssert _ 
     | AInvariant _ 
     | AVariant _
     | AAssigns _
     | APragma _ -> env
-  with Misc.Typing_error _ ->
-    env
+  in
+  Error.handle convert env
 
 (* ************************************************************************** *)
 (* Visitor *)
@@ -788,7 +791,8 @@ class e_acsl_visitor prj generate = object (self)
   method vglob_aux g =
     if !first_global then begin
       first_global := false;
-      ChangeDoChildrenPost([ g ], fun l -> Misc.e_acsl_header () :: l)
+      if Options.Check.get () then DoChildren
+      else ChangeDoChildrenPost([ g ], fun l -> Misc.e_acsl_header () :: l)
     end else
       DoChildren
 
@@ -856,7 +860,7 @@ class e_acsl_visitor prj generate = object (self)
 	(fun (User old_a | AI(_, old_a)) (env, new_annots) -> 
 	  let a =
             (* [VP] Don't use Visitor here, as it will fill the
-               queue in the middle of the computation... *)
+	       queue in the middle of the computation... *)
 	    Cil.visitCilCodeAnnotation (self :> Cil.cilVisitor) old_a
 	  in
 	  let env = Project.on prj (convert_pre_code_annotation env) a in
@@ -906,7 +910,7 @@ class e_acsl_visitor prj generate = object (self)
       in
       function_env := env;
       Options.debug ~level:3
-	"new stmt (from sid %d): %a" stmt.sid d_stmt new_stmt;
+	"@[new stmt (from sid %d):@ %a@]" stmt.sid d_stmt new_stmt;
       new_stmt
     in
     ChangeDoChildrenPost(stmt, mk_block)

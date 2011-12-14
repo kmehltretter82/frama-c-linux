@@ -1,2 +1,1 @@
-COMMENT: -e-acsl-check set by default
-STDOPT:
+OPT: -e-acsl-check

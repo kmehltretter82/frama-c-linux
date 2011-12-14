@@ -26,17 +26,6 @@ open Cil_types
 open Cil_datatype
 
 (* ************************************************************************** *)
-(** {2 Handling errors} *)
-(* ************************************************************************** *)
-
-exception Typing_error of string
-val type_error: string -> 'a
-(** @raise Typing_error with  with a message built from the given one. *)
-
-val not_yet: string -> 'a
-(** @raise Log.FeatureRequest with a message built from the given one. *)
-
-(* ************************************************************************** *)
 (** {2 Builders} *)
 (* ************************************************************************** *)
 

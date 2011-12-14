@@ -283,7 +283,7 @@ let stmt_of_label env = function
   | StmtLabel { contents = stmt } -> stmt
   | LogicLabel(_, label) when label = "Here" -> 
     (match env.visitor#current_stmt with
-    | None -> Misc.not_yet "label \"Here\" in function contract"
+    | None -> Error.not_yet "label \"Here\" in function contract"
     | Some s -> s)
   | LogicLabel(_, label) when label = "Old" || label = "Pre" -> 
     (try Kernel_function.find_first_stmt (Extlib.the env.visitor#current_kf)

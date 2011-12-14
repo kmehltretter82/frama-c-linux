@@ -33,7 +33,7 @@ PLUGIN_DIR ?=.
 PLUGIN_ENABLE:=@ENABLE_E_ACSL@
 PLUGIN_DYNAMIC:=@DYNAMIC_E_ACSL@
 PLUGIN_NAME:=E_ACSL
-PLUGIN_CMO:= local_config options read_header misc mpz env visit main
+PLUGIN_CMO:= local_config options read_header error misc mpz env visit main
 PLUGIN_HAS_MLI:=yes
 
 # Enable -warn-error, but do not distribute the plug-in with this option being
