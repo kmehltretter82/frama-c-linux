@@ -33,7 +33,7 @@ module Check =
   False
     (struct
       let option_name = "-e-acsl-check"
-      let help = "abort on E-ACSL type checking error"
+      let help = "only type check E-ACSL annotated program"
       let kind = `Correctness
      end)
 

@@ -2,7 +2,7 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-PROJECT_FILE.i:200:[value] Assertion got status valid.
+PROJECT_FILE.i:230:[value] Assertion got status valid.
 [value] Recording results for main
 [value] done for function main
 [value] ====== VALUES COMPUTED ======

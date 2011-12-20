@@ -36,12 +36,16 @@ val is_t: typ -> bool
 val init: exp -> stmt
   (** build stmt "mpz_init(v)" *)
 
-val init_set: exp -> exp -> stmt
-  (** build stmt "mpz_init_set*(v, e)" with the good function 'set' according
-      to the type of e *)
+val init_set: lval -> exp -> exp -> stmt
+(** [init_set x_as_lv x_as_exp e] builds stmt [x = e] or [mpz_init_set*(v, e)]
+    with the good function 'set' according to the type of e *)
 
 val clear: exp -> stmt
 (** build stmt "mpz_clear(v)" *)
+
+val affect: lval -> exp -> exp -> stmt
+(** [affect x_as_lv x_as_exp e] builds stmt [x = e] or [mpz_set*(e)] with the
+    good function 'set' according to the type of e *)
 
 (*
 Local Variables:

@@ -32,7 +32,7 @@
 - [Bernard] avoir une fonction
   e_acsl_trace_behavior(char *bhv_name) {}
 à appeler dès qu'un behavior est activé
-- meilleur schéma de compilation des assumes:
+- meilleur schéma de compilation des assumes (not possible in multi-bhv?):
   if (assume_bhv) {
     e_acsl_trace_behavior(bhv_name);
     requires_bhv;

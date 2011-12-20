@@ -20,17 +20,20 @@
 /*                                                                        */
 /**************************************************************************/
 
-/*****************/
-/* GMP functions */
-/*****************/
+/******************/
+/* GMP prototypes */
+/******************/
 
-// initilializers
+/****************/
+/* Initializers */
+/****************/
 
 /*@ ensures \valid(x);
   @ assigns *x; */
 extern void __gmpz_init(mpz_t x);
 
-/*@ ensures \valid(z);
+/*@ requires \valid(z_orig);
+  @ ensures \valid(z);
   @ assigns *z; */
 extern void __gmpz_init_set(mpz_t z, const mpz_t z_orig);
 
@@ -46,18 +49,43 @@ extern void __gmpz_init_set_si(mpz_t z, signed long int n);
   @ assigns *z; */
 extern int __gmpz_init_set_str(mpz_t z, const char *str, int base);
 
-// finalizer
+/***************/
+/* Assignments */
+/***************/
+
+/*@ requires \valid(z_orig);
+  @ requires \valid(z);
+  @ assigns *z; */
+extern void __gmpz_set(mpz_t z, const mpz_t z_orig);
+
+/*@ requires \valid(z);
+  @ assigns *z \from n; */
+extern void __gmpz_set_ui(mpz_t z, unsigned long int n);
+
+/*@ requires \valid(z);
+  @ assigns *z \from n; */
+extern void __gmpz_set_si(mpz_t z, signed long int n);
+
+/*************/
+/* Finalizer */
+/*************/
 
 /*@ requires \valid(x);
   @ assigns *x; */
 extern void __gmpz_clear(mpz_t x);
 
-// logical and arithmetic operators
+/********************/
+/* Logical operator */
+/********************/
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
   @ assigns \nothing; */
 extern int __gmpz_cmp(const mpz_t z1, const mpz_t z2);
+
+/***********************/
+/* Arithmetic operator */
+/***********************/
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
@@ -99,7 +127,9 @@ extern void __gmpz_tdiv_q(mpz_t z1, const mpz_t z2, const mpz_t z3);
   @ assigns *z1; */
 extern void __gmpz_tdiv_r(mpz_t z1, const mpz_t z2, const mpz_t z3);
 
-// coercions to C int
+/************************/
+/* Coercions to C types */
+/************************/
 
 /*@ requires \valid(z); 
   @ assigns \nothing; */

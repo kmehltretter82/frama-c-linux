@@ -39,23 +39,33 @@ let apply_on_var funname e = Misc.mk_call ("__gmpz_" ^ funname) [ e ]
 let init = apply_on_var "init"
 let clear = apply_on_var "clear"
 
-let init_set v e =
+let get_set_suffix_and_arg e = 
   let ty = typeOf e in
-  if is_t ty then
-    Misc.mk_call "__gmpz_init_set" [ v; e ]
+  if is_t ty then "", [ e ]
   else
-    let fname, args = match ty with
-      | TInt((IBool | IChar | IUChar | IUInt | IUShort | IULong), _) ->
-	"ui", [ e ]
-      | TInt((ISChar | IShort | IInt | ILong), _) -> "si", [ e ]
-      | TInt((ILongLong | IULongLong), _) -> assert false
-      | TPtr(TInt(IChar, _), _) ->
-	"str",
+    match unrollType ty with
+    | TInt(IChar, _) -> 
+      (if theMachine.char_is_unsigned then "_ui" else "_si"), [ e ]
+    | TInt((IBool | IUChar | IUInt | IUShort | IULong), _) ->
+      "_ui", [ e ]
+    | TInt((ISChar | IShort | IInt | ILong), _) -> "_si", [ e ]
+    | TInt((ILongLong | IULongLong), _) -> assert false
+    | TPtr(TInt(IChar, _), _) ->
+      "_str",
 	(* decimal base for the number given as string *)
-	[ e; integer ~loc:Location.unknown 10 ]
-      | _ -> assert false
-    in
-    Misc.mk_call ("__gmpz_init_set_" ^ fname) (v :: args)
+      [ e; integer ~loc:Location.unknown 10 ]
+    | _ -> assert false
+
+let generic_affect fname lv ev e =
+  let ty = typeOf ev in
+  if is_t ty then 
+    let suf, args = get_set_suffix_and_arg e in
+    Misc.mk_call (fname ^ suf) (ev :: args)
+  else
+    mkStmtOneInstr ~valid_sid:true (Set(lv, e, Location.unknown))
+
+let init_set = generic_affect "__gmpz_init_set"
+let affect = generic_affect "__gmpz_set"
 
 (*
 Local Variables:

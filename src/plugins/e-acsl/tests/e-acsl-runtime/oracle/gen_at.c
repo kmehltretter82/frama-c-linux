@@ -9,7 +9,8 @@ typedef __mpz_struct mpz_t[1];
 /*@ ensures \valid(\old(x));
     assigns *x;  */
 extern void __gmpz_init(__mpz_struct * /*[1]*/ x);
-/*@ ensures \valid(\old(z));
+/*@ requires \valid(z_orig);
+    ensures \valid(\old(z));
     assigns *z;  */
 extern void __gmpz_init_set(__mpz_struct * /*[1]*/ z,
                             __mpz_struct const * /*[1]*/ z_orig);

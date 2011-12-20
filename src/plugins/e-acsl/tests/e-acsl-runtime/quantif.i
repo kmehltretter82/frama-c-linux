@@ -1,0 +1,22 @@
+/* run.config
+   COMMENT: quantifiers
+   EXECNOW: LOG gen_quantif.c BIN gen_quantif.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/quantif.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_quantif.c > /dev/null && gcc -pedantic -o ./tests/e-acsl-runtime/result/gen_quantif.out ./tests/e-acsl-runtime/result/gen_quantif.c -lgmp && ./tests/e-acsl-runtime/result/gen_quantif.out
+*/
+
+int main(void) {
+
+  int a = -1;
+
+  // simple universal quantifications
+
+  /*@ assert \forall integer x; 0 <= x <= 1 ==> x == 0 || x == 1; */
+  /*@ assert \forall integer x; 0 < x <= 1 ==> x == 1; */
+  /*@ assert \forall integer x; 0 < x < 1 ==> \false; */
+  /*@ assert \forall integer x; 0 <= x < 1 ==> x == 0; */
+
+  // multiple universal quantifications
+  /*@ assert \forall integer x,y,z; 0 <= x < 2 && 0 <= y < 5 && 0 <= z <= y
+    ==> x+z <= y+1; */ 
+  
+  return 0;
+}

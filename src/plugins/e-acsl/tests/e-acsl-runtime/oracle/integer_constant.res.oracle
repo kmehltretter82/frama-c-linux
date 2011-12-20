@@ -2,32 +2,32 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-PROJECT_FILE.i:199:[value] Assertion got status valid.
-PROJECT_FILE.i:203:[value] Assertion got status valid.
-PROJECT_FILE.i:206:[value] Assertion got status valid.
+PROJECT_FILE.i:229:[value] Assertion got status valid.
+PROJECT_FILE.i:233:[value] Assertion got status valid.
+PROJECT_FILE.i:236:[value] Assertion got status valid.
 [value] computing for function __gmpz_init_set_str <- main.
-        Called from PROJECT_FILE.i:210.
-PROJECT_FILE.i:79:[value] Function __gmpz_init_set_str: postcondition got status valid.
+        Called from PROJECT_FILE.i:240.
+PROJECT_FILE.i:82:[value] Function __gmpz_init_set_str: postcondition got status valid.
 [value] Done for function __gmpz_init_set_str
 [value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:211.
-PROJECT_FILE.i:91:[value] Function __gmpz_cmp: precondition got status valid.
-PROJECT_FILE.i:92:[value] Function __gmpz_cmp: precondition got status valid.
+        Called from PROJECT_FILE.i:241.
+PROJECT_FILE.i:115:[value] Function __gmpz_cmp: precondition got status valid.
+PROJECT_FILE.i:116:[value] Function __gmpz_cmp: precondition got status valid.
 [value] Done for function __gmpz_cmp
 [value] computing for function e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:213.
+        Called from PROJECT_FILE.i:243.
 [value] computing for function printf <- e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:193.
+        Called from PROJECT_FILE.i:223.
 [value] Done for function printf
 [value] computing for function exit <- e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:193.
-PROJECT_FILE.i:183:[value] Function exit: postcondition got status invalid.
+        Called from PROJECT_FILE.i:223.
+PROJECT_FILE.i:213:[value] Function exit: postcondition got status invalid.
 [value] Done for function exit
 [value] Recording results for e_acsl_fail
 [value] Done for function e_acsl_fail
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:215.
-PROJECT_FILE.i:85:[value] Function __gmpz_clear: precondition got status valid.
+        Called from PROJECT_FILE.i:245.
+PROJECT_FILE.i:107:[value] Function __gmpz_clear: precondition got status valid.
 [value] Done for function __gmpz_clear
 [value] Recording results for main
 [value] done for function main

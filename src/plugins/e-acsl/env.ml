@@ -172,9 +172,7 @@ module Logic_binding = struct
   let add env logic_v =
   let v_ref = ref Varinfo.dummy in
   let mk v _ = v_ref := v; [] in
-  let ty = 
-    (* TODO: yet incorrect. Waiting for the type system... *)
-    match logic_v.lv_type with
+  let ty = match logic_v.lv_type with
     | Ctype ty -> ty
     | Linteger -> Mpz.t
     | Ltype _ | Lvar _ | Lreal | Larrow _ -> assert false
@@ -228,7 +226,7 @@ let extend_stmt_in_place env stmt ~pre block =
     env
 
 let push env = 
-  (*  Options.feedback "push";*)
+(*  Options.feedback "push (was %d)" (List.length env.env_stack);*)
   let local_env = { block_info = empty_block; mpz_tbl = empty_mpz_tbl } in
   { env with env_stack = local_env :: env.env_stack }
 
@@ -239,7 +237,7 @@ let pop env =
 
 type where = Before | Middle | After
 let pop_and_get env stmt ~global_clear where =
-(*  Options.feedback "pop_and_get";*)
+  (*  Options.feedback "pop_and_get (%d)" (List.length env.env_stack); *)
   let local_env, tl = top env in
   let clear = 
     if global_clear then 
