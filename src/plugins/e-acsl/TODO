@@ -66,7 +66,7 @@
 - test sizeof.i devraient être plus précis quand logic_typing plus précis
 - structs
 - unions
-- quantifications entières invalides
+- inclure exemple du E-ACSL Reference Manual
 
 ####################
 # AVANT LA DISTRIB #
