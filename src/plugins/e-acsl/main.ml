@@ -1,8 +1,8 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  This file is part of the E-ACSL plug-in of Frama-C.                   *)
+(*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2011                                                    *)
+(*  Copyright (C) 2012                                                    *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -51,7 +51,7 @@ module Resulting_projects =
       let name = "E-ACSL resulting projects"
       let size = 7
       let kind = `Correctness
-      let dependencies = [ Ast.self; Options.Use_assert.self ]
+      let dependencies = [ Ast.self ]
      end)
 
 let () = Env.global_state := Resulting_projects.self

@@ -25,10 +25,13 @@ extern unsigned long __gmpz_get_ui(__mpz_struct const * /*[1]*/ z);
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
-void e_acsl_fail(char *msg)
+void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
-  printf("%s\n",msg);
-  exit(1);
+  if (predicate) {
+    printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
+           line,pred_txt);
+    exit(1);
+  }
   return;
 }
 
@@ -45,9 +48,8 @@ int main(void)
     int e_acsl_2;
     __gmpz_init_set_str((__mpz_struct *)(e_acsl_1),"1152921504606846975",10);
     e_acsl_2 = (int)__gmpz_get_si((__mpz_struct const *)(e_acsl_1));
-    if (! (y != e_acsl_2)) {
-      e_acsl_fail((char *)"(y != (int)0xfffffffffffffff)");
-    }
+    e_acsl_assert(! (y != e_acsl_2),(char *)"Assertion",
+                  (char *)"(y != (int)0xfffffffffffffff)",17);
     __gmpz_clear((__mpz_struct *)(e_acsl_1));
   }
   
@@ -57,9 +59,9 @@ int main(void)
     unsigned int e_acsl_4;
     __gmpz_init_set_str((__mpz_struct *)(e_acsl_3),"1152921504606846975",10);
     e_acsl_4 = (unsigned int)__gmpz_get_ui((__mpz_struct const *)(e_acsl_3));
-    if (! ((unsigned int)y != e_acsl_4)) {
-      e_acsl_fail((char *)"((unsigned int)y != (unsigned int)0xfffffffffffffff)");
-    }
+    e_acsl_assert(! ((unsigned int)y != e_acsl_4),(char *)"Assertion",
+                  (char *)"((unsigned int)y != (unsigned int)0xfffffffffffffff)",
+                  18);
     __gmpz_clear((__mpz_struct *)(e_acsl_3));
   }
   

@@ -1,8 +1,8 @@
 /**************************************************************************/
 /*                                                                        */
-/*  This file is part of the E-ACSL plug-in of Frama-C.                   */
+/*  This file is part of the Frama-C's E-ACSL plug-in.                    */
 /*                                                                        */
-/*  Copyright (C) 2011                                                    */
+/*  Copyright (C) 2012                                                    */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -20,16 +20,6 @@
 /*                                                                        */
 /**************************************************************************/
 
-// TODO: remplacer par un e_acsl.h.in
-// faire générer par le makefile un e_acsl.h
-// avec des #include "FRAMAC_SHARE/libc/stdio.h", etc
-
-// [TODO] ne pas générer les typedef si on veut linker avec GMP derrière
-
-// [TODO] utiliser un champ modèle de type integer pour modéliser
-// l'entier exact correspondant à un mpz_t.
-// Not yet implemented in ACSL.
-
 /************************/
 /* Standard C functions */
 /************************/
@@ -46,4 +36,10 @@ extern int printf(const char *, ...);
 /* Dedicated E-ACSL function */
 /*****************************/
 
-void e_acsl_fail(char *msg) { printf("%s\n", msg); exit(1); }
+void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line) {
+  if (predicate) {
+    printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n", 
+	   kind, line, pred_txt); 
+    exit(1);
+  }
+}

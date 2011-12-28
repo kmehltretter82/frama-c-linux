@@ -29,10 +29,13 @@ extern int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
-void e_acsl_fail(char *msg)
+void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
-  printf("%s\n",msg);
-  exit(1);
+  if (predicate) {
+    printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
+           line,pred_txt);
+    exit(1);
+  }
   return;
 }
 
@@ -50,7 +53,8 @@ int main(void)
     __gmpz_init_set_si((__mpz_struct *)(e_acsl_2),(long)0);
     e_acsl_3 = __gmpz_cmp((__mpz_struct const *)(e_acsl_1),
                           (__mpz_struct const *)(e_acsl_2));
-    if (! (e_acsl_3 == 0)) { e_acsl_fail((char *)"(x == 0)"); }
+    e_acsl_assert(! (e_acsl_3 == 0),(char *)"Assertion",(char *)"(x == 0)",
+                  10);
     __gmpz_clear((__mpz_struct *)(e_acsl_1));
     __gmpz_clear((__mpz_struct *)(e_acsl_2));
   }

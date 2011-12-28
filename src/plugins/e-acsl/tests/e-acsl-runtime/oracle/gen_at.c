@@ -40,10 +40,13 @@ extern void __gmpz_add(__mpz_struct * /*[1]*/ z1,
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
-void e_acsl_fail(char *msg)
+void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
-  printf("%s\n",msg);
-  exit(1);
+  if (predicate) {
+    printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
+           line,pred_txt);
+    exit(1);
+  }
   return;
 }
 
@@ -72,7 +75,8 @@ void f(void)
     __gmpz_init_set_si((__mpz_struct *)(e_acsl_3),(long)0);
     e_acsl_4 = __gmpz_cmp((__mpz_struct const *)(e_acsl_2),
                           (__mpz_struct const *)(e_acsl_3));
-    if (! (e_acsl_4 == 0)) { e_acsl_fail((char *)"(\\at(A,Pre) == 0)"); }
+    e_acsl_assert(! (e_acsl_4 == 0),(char *)"Assertion",
+                  (char *)"(\\at(A,Pre) == 0)",12);
     __gmpz_clear((__mpz_struct *)(e_acsl_2));
     __gmpz_clear((__mpz_struct *)(e_acsl_3));
   }
@@ -86,7 +90,8 @@ void f(void)
     __gmpz_init_set_si((__mpz_struct *)(e_acsl_7),(long)1);
     e_acsl_8 = __gmpz_cmp((__mpz_struct const *)(e_acsl_6),
                           (__mpz_struct const *)(e_acsl_7));
-    if (! (e_acsl_8 == 0)) { e_acsl_fail((char *)"(\\at(A,F) == 1)"); }
+    e_acsl_assert(! (e_acsl_8 == 0),(char *)"Assertion",
+                  (char *)"(\\at(A,F) == 1)",13);
     __gmpz_clear((__mpz_struct *)(e_acsl_6));
     __gmpz_clear((__mpz_struct *)(e_acsl_7));
   }
@@ -101,7 +106,8 @@ void f(void)
     __gmpz_init_set_si((__mpz_struct *)(e_acsl_11),(long)2);
     e_acsl_12 = __gmpz_cmp((__mpz_struct const *)(e_acsl_10),
                            (__mpz_struct const *)(e_acsl_11));
-    if (! (e_acsl_12 == 0)) { e_acsl_fail((char *)"(\\at(A,Here) == 2)"); }
+    e_acsl_assert(! (e_acsl_12 == 0),(char *)"Assertion",
+                  (char *)"(\\at(A,Here) == 2)",14);
     __gmpz_clear((__mpz_struct *)(e_acsl_10));
     __gmpz_clear((__mpz_struct *)(e_acsl_11));
   }
@@ -115,9 +121,8 @@ void f(void)
     __gmpz_init_set_si((__mpz_struct *)(e_acsl_16),(long)0);
     e_acsl_17 = __gmpz_cmp((__mpz_struct const *)(e_acsl_15),
                            (__mpz_struct const *)(e_acsl_16));
-    if (! (e_acsl_17 == 0)) {
-      e_acsl_fail((char *)"(\\at(\\at(A,Pre),F) == 0)");
-    }
+    e_acsl_assert(! (e_acsl_17 == 0),(char *)"Assertion",
+                  (char *)"(\\at(\\at(A,Pre),F) == 0)",15);
     __gmpz_clear((__mpz_struct *)(e_acsl_15));
     __gmpz_clear((__mpz_struct *)(e_acsl_16));
   }
@@ -132,7 +137,8 @@ void f(void)
     __gmpz_init_set_si((__mpz_struct *)(e_acsl_20),(long)3);
     e_acsl_21 = __gmpz_cmp((__mpz_struct const *)(e_acsl_19),
                            (__mpz_struct const *)(e_acsl_20));
-    if (! (e_acsl_21 == 0)) { e_acsl_fail((char *)"(\\at(A,Post) == 3)"); }
+    e_acsl_assert(! (e_acsl_21 == 0),(char *)"Postcondition",
+                  (char *)"(\\at(A,Post) == 3)",8);
     __gmpz_clear((__mpz_struct *)(e_acsl_19));
     __gmpz_clear((__mpz_struct *)(e_acsl_20));
     return;
@@ -165,9 +171,8 @@ void g(int *p, int *q)
     __gmpz_init_set_si((__mpz_struct *)(e_acsl_4),(long)2);
     e_acsl_5 = __gmpz_cmp((__mpz_struct const *)(e_acsl_3),
                           (__mpz_struct const *)(e_acsl_4));
-    if (! (e_acsl_5 == 0)) {
-      e_acsl_fail((char *)"(\\at(*(p+\\at(*q,L1)),L2) == 2)");
-    }
+    e_acsl_assert(! (e_acsl_5 == 0),(char *)"Assertion",
+                  (char *)"(\\at(*(p+\\at(*q,L1)),L2) == 2)",31);
     __gmpz_clear((__mpz_struct *)(e_acsl_3));
     __gmpz_clear((__mpz_struct *)(e_acsl_4));
   }
@@ -183,9 +188,8 @@ void g(int *p, int *q)
     __gmpz_init_set_si((__mpz_struct *)(e_acsl_9),(long)2);
     e_acsl_10 = __gmpz_cmp((__mpz_struct const *)(e_acsl_8),
                            (__mpz_struct const *)(e_acsl_9));
-    if (! (e_acsl_10 == 0)) {
-      e_acsl_fail((char *)"(\\at(*(p+\\at(*q,L1)),Here) == 2)");
-    }
+    e_acsl_assert(! (e_acsl_10 == 0),(char *)"Assertion",
+                  (char *)"(\\at(*(p+\\at(*q,L1)),Here) == 2)",33);
     __gmpz_clear((__mpz_struct *)(e_acsl_8));
     __gmpz_clear((__mpz_struct *)(e_acsl_9));
   }
@@ -229,7 +233,8 @@ int main(void)
     __gmpz_init_set_si((__mpz_struct *)(e_acsl_2),(long)0);
     e_acsl_3 = __gmpz_cmp((__mpz_struct const *)(e_acsl_1),
                           (__mpz_struct const *)(e_acsl_2));
-    if (! (e_acsl_3 == 0)) { e_acsl_fail((char *)"(x == 0)"); }
+    e_acsl_assert(! (e_acsl_3 == 0),(char *)"Assertion",(char *)"(x == 0)",
+                  44);
     __gmpz_clear((__mpz_struct *)(e_acsl_1));
     __gmpz_clear((__mpz_struct *)(e_acsl_2));
   }
@@ -246,7 +251,8 @@ int main(void)
     __gmpz_init_set_si((__mpz_struct *)(e_acsl_6),(long)0);
     e_acsl_7 = __gmpz_cmp((__mpz_struct const *)(e_acsl_5),
                           (__mpz_struct const *)(e_acsl_6));
-    if (! (e_acsl_7 == 0)) { e_acsl_fail((char *)"(\\at(x,L) == 0)"); }
+    e_acsl_assert(! (e_acsl_7 == 0),(char *)"Assertion",
+                  (char *)"(\\at(x,L) == 0)",49);
     __gmpz_clear((__mpz_struct *)(e_acsl_5));
     __gmpz_clear((__mpz_struct *)(e_acsl_6));
   }
@@ -258,7 +264,8 @@ int main(void)
     __gmpz_init_set_si((__mpz_struct *)(e_acsl_12),(long)1);
     e_acsl_13 = __gmpz_cmp((__mpz_struct const *)(e_acsl_11),
                            (__mpz_struct const *)(e_acsl_12));
-    if (! (e_acsl_13 == 0)) { e_acsl_fail((char *)"(\\at(x+1,L) == 1)"); }
+    e_acsl_assert(! (e_acsl_13 == 0),(char *)"Assertion",
+                  (char *)"(\\at(x+1,L) == 1)",50);
     __gmpz_clear((__mpz_struct *)(e_acsl_12));
   }
   
@@ -275,7 +282,8 @@ int main(void)
                (__mpz_struct const *)(e_acsl_16));
     e_acsl_18 = __gmpz_cmp((__mpz_struct const *)(e_acsl_17),
                            (__mpz_struct const *)(e_acsl_16));
-    if (! (e_acsl_18 == 0)) { e_acsl_fail((char *)"(\\at(x,L)+1 == 1)"); }
+    e_acsl_assert(! (e_acsl_18 == 0),(char *)"Assertion",
+                  (char *)"(\\at(x,L)+1 == 1)",51);
     __gmpz_clear((__mpz_struct *)(e_acsl_15));
     __gmpz_clear((__mpz_struct *)(e_acsl_16));
     __gmpz_clear((__mpz_struct *)(e_acsl_17));

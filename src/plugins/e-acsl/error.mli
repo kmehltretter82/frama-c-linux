@@ -1,8 +1,8 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  This file is part of the E-ACSL plug-in of Frama-C.                   *)
+(*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2011                                                    *)
+(*  Copyright (C) 2012                                                    *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -23,13 +23,14 @@
 (** Handling errors. *)
 
 val untypable: string -> 'a
-(** type error built from the given argument. *)
+(** Type error built from the given argument. *)
   
 val not_yet: string -> 'a
-(** not_yet_implemented error built from the given argument. *)
+(** Not_yet_implemented error built from the given argument. *)
   
 val handle: ('a -> 'a) -> 'a -> 'a
-(** run the closure with the given argument and handle potential errors. *)
+(** Run the closure with the given argument and handle potential errors. 
+    Return the provide argument in case of errors. *)
 
 val nb_untypable: unit -> int
 (** Number of untypable annotations. *)

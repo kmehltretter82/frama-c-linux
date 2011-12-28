@@ -1,8 +1,8 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  This file is part of the E-ACSL plug-in of Frama-C.                   *)
+(*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2011                                                    *)
+(*  Copyright (C) 2012                                                    *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -40,16 +40,30 @@ let mk_call ?(loc=Location.unknown) ?result fname args =
   let f = new_lval ~loc (makeGlobalVar fname ty) in
   mkStmt ~valid_sid:true (Instr(Call(result, f, args, loc)))
 
+type annotation_kind = Assertion | Precondition | Postcondition | Invariant
+
+let kind_to_string loc k = 
+  mkString 
+    ~loc
+    (match k with
+    | Assertion -> "Assertion"
+    | Precondition -> "Precondition"
+    | Postcondition -> "Postcondition"
+    | Invariant -> "Invariant")
+
 (* Build a C conditional doing a runtime assertion check. *)
-let mk_e_acsl_guard ?(reverse=false) e p =
+let mk_e_acsl_guard ?(reverse=false) kind e p =
   let loc = p.loc in
-  let unicode = Kernel.Unicode.get () in
-  Kernel.Unicode.off ();
-  let msg = Pretty_utils.sfprintf "%a@?" Cil.d_predicate_named p in
-  Kernel.Unicode.set unicode;
-  let s = mk_call ~loc "e_acsl_fail" [ mkString loc msg ] in
+  let msg = 
+    Kernel.Unicode.without_unicode
+      (Pretty_utils.sfprintf "%a@?" Cil.d_predicate_named) p 
+  in
+  let line = (fst loc).Lexing.pos_lnum in
   let e = if reverse then new_exp ~loc:e.eloc (UnOp(LNot, e, intType)) else e in
-  mkStmt ~valid_sid:true (If(e, mkBlock [ s ], mkBlock [], loc))
+  mk_call 
+    ~loc 
+    "e_acsl_assert" 
+    [ e; kind_to_string loc kind; mkString loc msg; Cil.integer loc line ] 
 
 (*
 Local Variables:

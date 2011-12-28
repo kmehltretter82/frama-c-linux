@@ -1,8 +1,8 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  This file is part of the E-ACSL plug-in of Frama-C.                   *)
+(*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2011                                                    *)
+(*  Copyright (C) 2012                                                    *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -27,8 +27,6 @@ include S (** implementation of Log.S for E-ACSL *)
 module Check: Bool
 module Run: Bool
 module Project_name: String
-
-module Use_assert: Bool
 
 (*
 Local Variables:

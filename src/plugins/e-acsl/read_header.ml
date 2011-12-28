@@ -1,8 +1,8 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  This file is part of the E-ACSL plug-in of Frama-C.                   *)
+(*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2011                                                    *)
+(*  Copyright (C) 2012                                                    *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -21,21 +21,21 @@
 (**************************************************************************)
 
 let put_file_in_buffer fname buf =
-      try
-	let cin =
-	  open_in
-	    (Filename.concat Config.datadir (Filename.concat "e-acsl" fname))
-	in
-	try
-	  while true do
-	    let l = input_line cin in
-	    Buffer.add_string buf l;
-	    Buffer.add_char buf '\n';
-	  done
-	with End_of_file ->
-	  close_in cin
-      with Sys_error s ->
-	Options.abort "cannot read file `%s': %s" fname s
+  try
+    let cin =
+      open_in
+	(Filename.concat Config.datadir (Filename.concat "e-acsl" fname))
+    in
+    try
+      while true do
+	let l = input_line cin in
+	Buffer.add_string buf l;
+	Buffer.add_char buf '\n';
+      done
+    with End_of_file ->
+      close_in cin
+  with Sys_error s ->
+    Options.abort "cannot read file `%s': %s" fname s
 
 (* TODO: must be project-compliant. The memoized buffer should be reset when we
    have to redo the visitor in a different setting. *)

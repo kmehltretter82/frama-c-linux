@@ -5,93 +5,96 @@ tests/e-acsl-runtime/result.i:6:[e-acsl] warning: missing guard for ensuring tha
 [value] Values of globals at initialization
         Y ∈ {1}
 [value] computing for function f <- main.
-        Called from PROJECT_FILE.i:282.
+        Called from PROJECT_FILE.i:281.
 [value] computing for function __gmpz_init_set_si <- f <- main.
         Called from PROJECT_FILE.i:237.
-PROJECT_FILE.i:78:[value] Function __gmpz_init_set_si: postcondition got status valid.
+PROJECT_FILE.i:82:[value] Function __gmpz_init_set_si: postcondition got status valid.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init <- f <- main.
         Called from PROJECT_FILE.i:238.
-PROJECT_FILE.i:65:[value] Function __gmpz_init: postcondition got status valid.
+PROJECT_FILE.i:69:[value] Function __gmpz_init: postcondition got status valid.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_sub <- f <- main.
         Called from PROJECT_FILE.i:239.
-PROJECT_FILE.i:140:[value] Function __gmpz_sub: precondition got status valid.
-PROJECT_FILE.i:141:[value] Function __gmpz_sub: precondition got status valid.
-PROJECT_FILE.i:142:[value] Function __gmpz_sub: precondition got status valid.
+PROJECT_FILE.i:144:[value] Function __gmpz_sub: precondition got status valid.
+PROJECT_FILE.i:145:[value] Function __gmpz_sub: precondition got status valid.
+PROJECT_FILE.i:146:[value] Function __gmpz_sub: precondition got status valid.
 [value] Done for function __gmpz_sub
 [value] computing for function __gmpz_get_si <- f <- main.
         Called from PROJECT_FILE.i:240.
-PROJECT_FILE.i:168:[value] Function __gmpz_get_si: precondition got status valid.
+PROJECT_FILE.i:172:[value] Function __gmpz_get_si: precondition got status valid.
 [value] Done for function __gmpz_get_si
-[value] computing for function e_acsl_fail <- f <- main.
-        Called from PROJECT_FILE.i:242.
-[value] computing for function printf <- e_acsl_fail <- f <- main.
-        Called from PROJECT_FILE.i:223.
+[value] computing for function e_acsl_assert <- f <- main.
+        Called from PROJECT_FILE.i:241.
+[value] computing for function printf <- e_acsl_assert <- f <- main.
+        Called from PROJECT_FILE.i:219.
 [value] Done for function printf
-[value] computing for function exit <- e_acsl_fail <- f <- main.
-        Called from PROJECT_FILE.i:223.
-PROJECT_FILE.i:213:[value] Function exit: postcondition got status invalid.
+[value] computing for function exit <- e_acsl_assert <- f <- main.
+        Called from PROJECT_FILE.i:221.
+PROJECT_FILE.i:207:[value] Function exit: postcondition got status invalid.
 [value] Done for function exit
-[value] Recording results for e_acsl_fail
-[value] Done for function e_acsl_fail
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
 [value] computing for function __gmpz_clear <- f <- main.
-        Called from PROJECT_FILE.i:244.
-PROJECT_FILE.i:107:[value] Function __gmpz_clear: precondition got status valid.
+        Called from PROJECT_FILE.i:243.
+PROJECT_FILE.i:111:[value] Function __gmpz_clear: precondition got status valid.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- f <- main.
-        Called from PROJECT_FILE.i:245.
+        Called from PROJECT_FILE.i:244.
 [value] Done for function __gmpz_clear
 PROJECT_FILE.i:225:[value] Function f: postcondition got status valid.
 [value] Recording results for f
 [value] Done for function f
 [value] computing for function g <- main.
-        Called from PROJECT_FILE.i:283.
-PROJECT_FILE.i:252:[value] Function g: postcondition got status valid.
+        Called from PROJECT_FILE.i:282.
+[value] computing for function e_acsl_assert <- g <- main.
+        Called from PROJECT_FILE.i:254.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+PROJECT_FILE.i:251:[value] Function g: postcondition got status valid.
 [value] Recording results for g
 [value] Done for function g
 [value] computing for function h <- main.
-        Called from PROJECT_FILE.i:284.
+        Called from PROJECT_FILE.i:283.
+[value] computing for function __gmpz_init_set_si <- h <- main.
+        Called from PROJECT_FILE.i:267.
+[value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init_set_si <- h <- main.
         Called from PROJECT_FILE.i:268.
 [value] Done for function __gmpz_init_set_si
-[value] computing for function __gmpz_init_set_si <- h <- main.
-        Called from PROJECT_FILE.i:269.
-[value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_cmp <- h <- main.
-        Called from PROJECT_FILE.i:270.
-PROJECT_FILE.i:115:[value] Function __gmpz_cmp: precondition got status valid.
-PROJECT_FILE.i:116:[value] Function __gmpz_cmp: precondition got status valid.
+        Called from PROJECT_FILE.i:269.
+PROJECT_FILE.i:119:[value] Function __gmpz_cmp: precondition got status valid.
+PROJECT_FILE.i:120:[value] Function __gmpz_cmp: precondition got status valid.
 [value] Done for function __gmpz_cmp
-[value] computing for function e_acsl_fail <- h <- main.
-        Called from PROJECT_FILE.i:271.
-[value] computing for function printf <- e_acsl_fail <- h <- main.
-        Called from PROJECT_FILE.i:223.
+[value] computing for function e_acsl_assert <- h <- main.
+        Called from PROJECT_FILE.i:270.
+[value] computing for function printf <- e_acsl_assert <- h <- main.
+        Called from PROJECT_FILE.i:219.
 [value] Done for function printf
-[value] computing for function exit <- e_acsl_fail <- h <- main.
-        Called from PROJECT_FILE.i:223.
+[value] computing for function exit <- e_acsl_assert <- h <- main.
+        Called from PROJECT_FILE.i:221.
 [value] Done for function exit
-[value] Recording results for e_acsl_fail
-[value] Done for function e_acsl_fail
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_clear <- h <- main.
+        Called from PROJECT_FILE.i:271.
+[value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- h <- main.
         Called from PROJECT_FILE.i:272.
 [value] Done for function __gmpz_clear
-[value] computing for function __gmpz_clear <- h <- main.
-        Called from PROJECT_FILE.i:273.
-[value] Done for function __gmpz_clear
-PROJECT_FILE.i:259:[value] Function h: postcondition got status valid.
+PROJECT_FILE.i:258:[value] Function h: postcondition got status valid.
 [value] Recording results for h
 [value] Done for function h
 [value] Recording results for main
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
-[value] Values at end of function g:
-[value] Values at end of function e_acsl_fail:
-          NON TERMINATING FUNCTION
+[value] Values at end of function e_acsl_assert:
 [value] Values at end of function f:
           x ∈ {0}
           e_acsl_1 ∈ {1}
           e_acsl_3 ∈ {1}
+[value] Values at end of function g:
 [value] Values at end of function h:
           __retres ∈ {0}
 [value] Values at end of function main:
@@ -136,10 +139,13 @@ extern long __gmpz_get_si(__mpz_struct const * /*[1]*/ z);
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
-void e_acsl_fail(char *msg)
+void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
-  printf("%s\n",msg);
-  exit(1);
+  if (predicate) {
+    printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
+           line,pred_txt);
+    exit(1);
+  }
   return;
 }
 
@@ -160,9 +166,8 @@ int f(int x)
     __gmpz_sub((__mpz_struct *)(e_acsl_4),(__mpz_struct const *)(e_acsl_2),
                (__mpz_struct const *)(e_acsl_2));
     e_acsl_5 = (int)__gmpz_get_si((__mpz_struct const *)(e_acsl_4));
-    if (! (x == e_acsl_5)) {
-      e_acsl_fail((char *)"(\\result == (int)(\\old(x)-\\old(x)))");
-    }
+    e_acsl_assert(! (x == e_acsl_5),(char *)"Postcondition",
+                  (char *)"(\\result == (int)(\\old(x)-\\old(x)))",6);
     __gmpz_clear((__mpz_struct *)(e_acsl_2));
     __gmpz_clear((__mpz_struct *)(e_acsl_4));
     return (x);
@@ -174,7 +179,8 @@ int Y = 1;
 /*@ ensures \result ≡ Y;  */
 int g(int x)
 {
-  if (! (x == Y)) { e_acsl_fail((char *)"(\\result == Y)"); }
+  e_acsl_assert(! (x == Y),(char *)"Postcondition",(char *)"(\\result == Y)",
+                17);
   return (x);
 }
 
@@ -191,7 +197,8 @@ int h(void)
     __gmpz_init_set_si((__mpz_struct *)(e_acsl_2),(long)0);
     e_acsl_3 = __gmpz_cmp((__mpz_struct const *)(e_acsl_1),
                           (__mpz_struct const *)(e_acsl_2));
-    if (! (e_acsl_3 == 0)) { e_acsl_fail((char *)"(\\result == 0)"); }
+    e_acsl_assert(! (e_acsl_3 == 0),(char *)"Postcondition",
+                  (char *)"(\\result == 0)",22);
     __gmpz_clear((__mpz_struct *)(e_acsl_1));
     __gmpz_clear((__mpz_struct *)(e_acsl_2));
     return (__retres);

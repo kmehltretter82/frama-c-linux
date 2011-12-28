@@ -1,8 +1,8 @@
 ##########################################################################
 #                                                                        #
-#  This file is part of the E-ACSL plug-in of Frama-C.                   #
+#  This file is part of the Frama-C's E-ACSL plug-in.                    #
 #                                                                        #
-#  Copyright (C) 2011                                                    #
+#  Copyright (C) 2012                                                    #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -38,11 +38,36 @@ m4_ifndef([FRAMAC_M4_MACROS], [m4_include(FRAMAC_SHARE/configure.ac)])
 check_plugin(e_acsl,PLUGIN_RELATIVE_PATH(plugin_file),
 	     [support for E-ACSL plug-in],yes,yes)
 
+# Check Frama-C version
+#######################
+
+AC_MSG_CHECKING(for Frama-C version)
+
+FRAMAC_VERSION=`frama-c -version | sed -e 's/Version: \(.*\)/\1/' -e '2,$d' `
+AC_MSG_RESULT($FRAMAC_VERSION)
+
+DEV_VERSION_NUMBER=`echo $FRAMAC_VERSION | sed -e 's/.*-\(.*\)/\1/' `
+VERSION_NUMBER=`echo $DEV_VERSION_NUMBER | sed -e 's/\(.*\)+dev/\1/' `
+
+# at the time being, using the Frama-C development version is ok
+# DEV=`echo $DEV_VERSION_NUMBER | sed -e 's/.*\(+dev\)/\1/' `
+
+if test $VERSION_NUMBER -lt 20111001; then
+  AC_MSG_ERROR(Frama-C version must be Nitrogen-20111001.)
+else if test $VERSION_NUMBER -gt 20111001; then
+  AC_MSG_WARN(Frama-C version higher than Nitrogen-20111001 not tested: use it at your own risk.)
+fi
+fi
+
+# OCaml version
+###############
+
+OCAMLVERSION=`ocamlc -v | sed -n -e 's|.*version *\(.*\)$|\1|p' `
+
 ###############################
 # C specific stuff for E-ACSL #
 ###############################
 
-MAY_USE_ASSERT=true
 MAY_RUN_TESTS=yes
 
 # C compiler and stdio.h
@@ -62,17 +87,6 @@ if test -z $HAVE_STDIO_H; then
   AC_MSG_WARN([stdio.h missing: non-regression tests unavailable.])
 fi
 
-# assert.h
-##########
-
-AC_CHECK_HEADER(assert.h,HAVE_ASSERT_H=yes,)
-
-if test -z $HAVE_ASSERT_H; then
-  MAY_USE_ASSERT=false
-  MAY_RUN_TESTS=no
-  AC_MSG_WARN([assert.h missing: cannot use E-ACSL option -e-acsl-use-assert.])
-fi
-
 # GMP library
 #############
 
@@ -89,9 +103,7 @@ fi # testing $CC
 # Generating Makefile #
 #######################
 
-AC_SUBST(MAY_COMPILE_WITH_CC)
-AC_SUBST(MAY_USE_ASSERT)
 AC_SUBST(MAY_RUN_TESTS)
-AC_SUBST(GMPSRC_DIR)
+AC_SUBST(OCAMLVERSION)
 
 write_plugin_config(Makefile)

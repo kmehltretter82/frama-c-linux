@@ -1,0 +1,910 @@
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value] Values of globals at initialization
+PROJECT_FILE.i:233:[value] entering loop for the first time
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:242.
+PROJECT_FILE.i:82:[value] Function __gmpz_init_set_si: postcondition got status valid.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:243.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:244.
+PROJECT_FILE.i:119:[value] Function __gmpz_cmp: precondition got status valid.
+PROJECT_FILE.i:120:[value] Function __gmpz_cmp: precondition got status valid.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:249.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:250.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:257.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+PROJECT_FILE.i:207:[value] Function exit: postcondition got status invalid.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:251.
+[value] Done for function __gmpz_cmp
+PROJECT_FILE.i:252:[value] assigning non deterministic value for the first time
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:253.
+PROJECT_FILE.i:111:[value] Function __gmpz_clear: precondition got status valid.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:254.
+[value] Done for function __gmpz_clear
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:257.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:258.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:259.
+[value] Done for function __gmpz_clear
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:265.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:242.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:243.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:244.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:249.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:250.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:257.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:251.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:258.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:259.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:253.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:254.
+[value] Done for function __gmpz_clear
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:265.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:242.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:243.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:244.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:249.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:250.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:257.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:251.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:258.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:259.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:253.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:254.
+[value] Done for function __gmpz_clear
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:265.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:242.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:243.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:244.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:249.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:250.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:257.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:251.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:258.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:259.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:253.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:254.
+[value] Done for function __gmpz_clear
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:265.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:242.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:243.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:244.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:249.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:250.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:257.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:251.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:258.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:259.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:253.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:254.
+[value] Done for function __gmpz_clear
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:265.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:242.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:243.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:244.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:249.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:250.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:257.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:251.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:258.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:259.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:253.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:254.
+[value] Done for function __gmpz_clear
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:265.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:242.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:243.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:244.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:249.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:250.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:257.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:251.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:258.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:259.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:253.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:254.
+[value] Done for function __gmpz_clear
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:265.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:242.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:243.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:244.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:249.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:250.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:257.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:251.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:258.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:259.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:253.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:254.
+[value] Done for function __gmpz_clear
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:265.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:242.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:243.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:244.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:249.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:250.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:257.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:251.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:258.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:259.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:253.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:254.
+[value] Done for function __gmpz_clear
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:265.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:242.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:243.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:244.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:249.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:250.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:257.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:251.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:258.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:259.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:253.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:254.
+[value] Done for function __gmpz_clear
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:265.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:242.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:243.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:244.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:249.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:250.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:257.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:251.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:258.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:259.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:253.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:254.
+[value] Done for function __gmpz_clear
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:265.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:242.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:243.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:244.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:249.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:250.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:257.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:251.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:258.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:259.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:253.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:254.
+[value] Done for function __gmpz_clear
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:265.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:242.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:243.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:244.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:249.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:250.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:257.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:251.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:258.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:259.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:253.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:254.
+[value] Done for function __gmpz_clear
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:265.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:242.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:243.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:244.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:249.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:250.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:257.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:251.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:258.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:259.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:253.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:254.
+[value] Done for function __gmpz_clear
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:265.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:242.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:243.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:244.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:249.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:250.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:257.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:251.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:258.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:259.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:253.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:254.
+[value] Done for function __gmpz_clear
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:265.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:242.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:243.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:244.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:249.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:250.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:257.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:251.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:258.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:259.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:253.
+[value] Done for function __gmpz_clear
+PROJECT_FILE.i:263:[value] warning: 2's complement assumed for overflow
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:254.
+[value] Done for function __gmpz_clear
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:265.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] Recording results for main
+[value] done for function main
+[value] ====== VALUES COMPUTED ======
+[value] Values at end of function e_acsl_assert:
+[value] Values at end of function main:
+          __retres ∈ {0}
+          x ∈ [--..--]
+/* Generated by Frama-C */
+struct __anonstruct___mpz_struct_1 {
+   int _mp_alloc ;
+   int _mp_size ;
+   unsigned long *_mp_d ;
+};
+typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
+typedef __mpz_struct mpz_t[1];
+/*@ ensures \valid(\old(z));
+    assigns *z;
+    assigns *z \from n;  */
+extern void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z, long n);
+/*@ requires \valid(x);
+    assigns *x;  */
+extern void __gmpz_clear(__mpz_struct * /*[1]*/ x);
+/*@ requires \valid(z1);
+    requires \valid(z2);
+    assigns \nothing;  */
+extern int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
+                      __mpz_struct const * /*[1]*/ z2);
+/*@ terminates \false;
+    ensures \false;
+    assigns \nothing;  */
+extern void exit(int status);
+/*@ assigns \nothing;  */
+extern int printf(char const * , ...);
+void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
+{
+  if (predicate) {
+    printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
+           line,pred_txt);
+    exit(1);
+  }
+  return;
+}
+
+int main(void)
+{
+  int __retres;
+  int x;
+  x = 0;
+  {
+    int i;
+    i = 0;
+    while (1) {
+      if (! (i < 10)) { break; }
+      /*@ invariant 0 ≤ i ∧ i < 10; */ ;
+      {
+        mpz_t e_acsl_1;
+        mpz_t e_acsl_2;
+        int e_acsl_3;
+        int e_acsl_7;
+        __gmpz_init_set_si((__mpz_struct *)(e_acsl_1),(long)0);
+        __gmpz_init_set_si((__mpz_struct *)(e_acsl_2),(long)i);
+        e_acsl_3 = __gmpz_cmp((__mpz_struct const *)(e_acsl_1),
+                              (__mpz_struct const *)(e_acsl_2));
+        if (e_acsl_3 <= 0) {
+          mpz_t e_acsl_4;
+          mpz_t e_acsl_5;
+          int e_acsl_6;
+          __gmpz_init_set_si((__mpz_struct *)(e_acsl_4),(long)i);
+          __gmpz_init_set_si((__mpz_struct *)(e_acsl_5),(long)10);
+          e_acsl_6 = __gmpz_cmp((__mpz_struct const *)(e_acsl_4),
+                                (__mpz_struct const *)(e_acsl_5));
+          e_acsl_7 = e_acsl_6 < 0;
+          __gmpz_clear((__mpz_struct *)(e_acsl_4));
+          __gmpz_clear((__mpz_struct *)(e_acsl_5));
+        }
+        else { e_acsl_7 = 0; }
+        e_acsl_assert(! e_acsl_7,(char *)"Invariant",
+                      (char *)"(0 <= i && i < 10)",8);
+        __gmpz_clear((__mpz_struct *)(e_acsl_1));
+        __gmpz_clear((__mpz_struct *)(e_acsl_2));
+      }
+      
+      x += i;
+      /*@ invariant i ≤ x; */ ;
+      e_acsl_assert(! (i <= x),(char *)"Invariant",(char *)"(i <= x)",10);
+      i ++;
+    }
+  }
+  
+  __retres = 0;
+  return (__retres);
+}
+
+

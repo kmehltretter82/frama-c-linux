@@ -1,8 +1,8 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  This file is part of the E-ACSL plug-in of Frama-C.                   *)
+(*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2011                                                    *)
+(*  Copyright (C) 2012                                                    *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -85,7 +85,15 @@ let compute_quantif_guards quantif bounded_vars hyps =
 module Label_ids = 
   State_builder.Counter(struct let name = "E_ACSL.Label_ids" end)
 
-let convert env loc p bounded_vars hyps goal =
+let convert env loc is_forall p bounded_vars hyps goal =
+  (* part depending on the kind of quantifications 
+     (either universal or existential) *)
+  let init_val, found_val, mk_guard = 
+    let z = zero ~loc in
+    let o = one ~loc in
+    if is_forall then o, z, (fun x -> x) 
+    else z, o, (fun e -> new_exp ~loc:e.eloc (UnOp(LNot, e, intType)))
+  in
   let named_predicate_to_exp = !named_predicate_to_exp_ref in
   let term_to_exp = !term_to_exp_ref in
   (* universal quantification over integers (or a subtype of integer) *)
@@ -98,7 +106,7 @@ let convert env loc p bounded_vars hyps goal =
       (fun v _ ->
 	var_res := v;
 	let lv = var v in
-	[ mkStmtOneInstr ~valid_sid:true (Set(lv, one ~loc, loc)) ])
+	[ mkStmtOneInstr ~valid_sid:true (Set(lv, init_val, loc)) ])
   in
   let end_loop_ref = ref dummyStmt in
   let rec mk_for_loop env = function
@@ -112,13 +120,14 @@ let convert env loc p bounded_vars hyps goal =
 	   multiple binders (leading to imbricated loops) *)
 	mkBlock
 	  [ mkStmtOneInstr
-	      ~valid_sid:true (Set(var !var_res, zero ~loc, loc));
+	       ~valid_sid:true (Set(var !var_res, found_val, loc));
 	    mkStmt ~valid_sid:true (Goto(end_loop_ref, loc)) ]
       in
       let blk, env = 
 	Env.pop_and_get
 	  env
-	  (mkStmt ~valid_sid:true (If(test, then_block, else_block, loc)))
+	  (mkStmt ~valid_sid:true
+	     (If(mk_guard test, then_block, else_block, loc)))
 	  ~global_clear:false
 	  Env.After
       in
@@ -126,7 +135,6 @@ let convert env loc p bounded_vars hyps goal =
 	 stmts *)
       [ mkStmt ~valid_sid:true (Block blk) ], env
     | (t1, rel1, logic_x, rel2, t2) :: tl ->
-      let body, env = mk_for_loop env tl in
       let t_plus_one t =
 	Logic_const.term ~loc
 	  (TBinOp(PlusA, t, Logic_const.tinteger ~loc ~ikind:IChar 1))
@@ -160,6 +168,8 @@ let convert env loc p bounded_vars hyps goal =
 	  Env.add_stmt env (Mpz.init x)
 	| Ctype _ | Ltype _ | Lvar _ | Lreal | Larrow _ -> assert false
       in
+      (* build the inner loops and loop body *)
+      let body, env = mk_for_loop env tl in
       (* initialize the loop counter to [t1] *)
       let e1, env = term_to_exp (Env.push env) ty t1 in
       let init_blk, env = 
@@ -225,6 +235,17 @@ let convert env loc p bounded_vars hyps goal =
   let env = Env.add_stmt env end_loop in
   let env = List.fold_left Env.Logic_binding.remove env bounded_vars in
   res, env
+
+let quantif_to_exp env p = 
+  let loc = p.loc in
+  match p.content with
+  | Pforall(bounded_vars, { content = Pimplies(hyps, goal) }) -> 
+    convert env loc true p bounded_vars hyps goal
+  | Pforall _ -> Error.not_yet "unguarded \\forall quantification"
+  | Pexists(bounded_vars, { content = Pand(hyps, goal) }) -> 
+    convert env loc false p bounded_vars hyps goal
+  | Pexists _ -> Error.not_yet "unguarded \\exists quantification"
+  | _ -> assert false
 
 (*
 Local Variables:

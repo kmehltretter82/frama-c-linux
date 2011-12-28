@@ -5,10 +5,13 @@
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
-void e_acsl_fail(char *msg)
+void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
-  printf("%s\n",msg);
-  exit(1);
+  if (predicate) {
+    printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
+           line,pred_txt);
+    exit(1);
+  }
   return;
 }
 
@@ -18,10 +21,10 @@ int main(void)
   int x;
   x = 0;
   /*@ assert x ≡ 0; */ ;
-  if (! (x == 0)) { e_acsl_fail((char *)"(x == 0)"); }
+  e_acsl_assert(! (x == 0),(char *)"Assertion",(char *)"(x == 0)",7);
   if (x) {
     /*@ assert x ≢ 0; */ ;
-    if (! (x != 0)) { e_acsl_fail((char *)"(x != 0)"); }
+    e_acsl_assert(! (x != 0),(char *)"Assertion",(char *)"(x != 0)",8);
   }
   __retres = 0;
   return (__retres);

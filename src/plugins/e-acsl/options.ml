@@ -1,8 +1,8 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  This file is part of the E-ACSL plug-in of Frama-C.                   *)
+(*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2011                                                    *)
+(*  Copyright (C) 2012                                                    *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -58,14 +58,26 @@ module Project_name =
       let arg_name = "prj"
      end)
 
-module Use_assert =
+let () = Plugin.set_group help
+module Version =
   False
     (struct
-      let option_name = "-e-acsl-use-assert"
-      let help = "use C macro `assert' instead of `exit' in the new project \
-(by default, use it whenever possible)"
-      let kind = `Correctness
+      let option_name = "-e-acsl-version"
+      let help = "version of plug-in E-ACSL"
+      let kind = `Tuning
      end)
+
+let version () =
+  if Version.get () then begin
+    Log.print_on_output 
+      (fun fmt -> 
+	Format.fprintf 
+	  fmt
+	  "Version of plug-in E-ACSL: %s@?"
+	  Local_config.version);
+    raise Cmdline.Exit
+  end
+let () = Cmdline.run_after_configuring_stage version
 
 (*
 Local Variables:

@@ -51,6 +51,17 @@ int l() {
   return X; 
 }
 
+// mix ensures and assumes
+/*@ behavior b1:
+  @   assumes X == 7;
+  @   ensures X == 95;
+  @ behavior b2:
+  @   assumes X == 5;
+  @   assumes Y == 2;
+  @   ensures X == 7;
+  @   ensures X == \old(X) + Y; */
+void m(void) { X += Y; }
+
 int main(void) {
   f();
   g();
@@ -59,5 +70,6 @@ int main(void) {
   j();
   k();
   l();
+  m();
   return 0;
 }

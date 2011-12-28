@@ -1,8 +1,8 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  This file is part of the E-ACSL plug-in of Frama-C.                   *)
+(*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2011                                                    *)
+(*  Copyright (C) 2012                                                    *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -58,6 +58,25 @@ let constant_to_exp ?(loc=Location.unknown) = function
     else mkString ?loc (My_bigint.to_string n), true
   | CStr _ | CWStr _ | CChr _ | CReal _ | CEnum _ as c -> 
     new_exp ?loc (Const c), false
+
+let conditional_to_exp loc ctx e1 (e2, env2) (e3, env3) =
+  let env = Env.pop (Env.pop env3) in
+  Env.new_var
+    env
+    None
+    (match ctx with Linteger -> Mpz.t | Ctype ty -> ty | _ -> assert false)
+    (fun v _ -> 
+      let lv = var v in
+      let affect e = mkStmt ~valid_sid:true (Instr (Set(lv, e, loc))) in
+      let then_block, _ = 
+	let s = affect e2 in
+	Env.pop_and_get env2 s ~global_clear:false Env.Middle
+      in
+      let else_block, _ = 
+	let s = affect e3 in
+	Env.pop_and_get env3 s ~global_clear:false Env.Middle
+      in
+      [ mkStmt ~valid_sid:true (If(e1, then_block, else_block, loc)) ])
 
 let rec thost_to_host env = function
   | TVar { lv_origin = Some v } -> Var v, env
@@ -165,7 +184,10 @@ and context_insensitive_term_to_exp env t =
     let mk_stmts v e = 
       let name = name_of_mpz_arith_bop bop in
       let cond = 
-	Misc.mk_e_acsl_guard guard (Logic_const.prel (Req, t2, zero)) 
+	Misc.mk_e_acsl_guard 
+	  (Env.annotation_kind env) 
+	  guard
+	  (Logic_const.prel ~loc (Req, t2, zero)) 
       in
       Env.add_assert env cond (Logic_const.prel (Rneq, t2, zero));
       let instr = match ctx with
@@ -191,9 +213,25 @@ and context_insensitive_term_to_exp env t =
   | TBinOp((Shiftlt | Shiftrt), _, _) ->
     (* left/right shift *)
     Error.not_yet "left/right shift"
-  | TBinOp((LOr | LAnd | BOr | BXor | BAnd), _, _) ->
+  | TBinOp(LOr, t1, t2) ->
+    (* t1 || t2 <==> if t1 then true else t2 *)
+    let ty = Typing.principal_type_from_term t1 t2 in
+    let e1, env1 = term_to_exp env ty t1 in
+    let env' = Env.push env1 in
+    let res2 = term_to_exp (Env.push env') ty t2 in
+    let e, env = conditional_to_exp loc ty e1 (one loc, env') res2 in
+    e, env, false
+  | TBinOp(LAnd, t1, t2) ->
+    (* t1 && t2 <==> if t1 then t2 else false *)
+    let ty = Typing.principal_type_from_term t1 t2 in
+    let e1, env1 = term_to_exp env ty t1 in
+    let _, env2 as res2 = term_to_exp (Env.push env1) ty t2 in
+    let env3 = Env.push env2 in
+    let e, env = conditional_to_exp loc ty e1 res2 (zero loc, env3) in
+    e, env, false
+  | TBinOp((BOr | BXor | BAnd), _, _) ->
     (* other logic/arith operators  *)
-    Error.not_yet "missing binary operator"
+    Error.not_yet "missing binary bitwise operator"
   | TBinOp(PlusPI | IndexPI | MinusPI | MinusPP as bop, t1, t2) ->
     (* binary operation over pointers *)
     (* [TODO] untested *)
@@ -223,55 +261,17 @@ and context_insensitive_term_to_exp env t =
   | Tapp _ -> Error.not_yet "applying logic function"
   | Tlambda _ -> Error.not_yet "functional"
   | TDataCons _ -> Error.not_yet "constructor"
-  | Tif _ -> Error.not_yet "conditional"
+  | Tif(t1, t2, t3) -> 
+    let e1, env1 = term_to_exp env (Ctype intType) t1 in
+    let ty = Typing.principal_type_from_term t2 t3 in
+    let (_, env2 as res2) = term_to_exp (Env.push env1) ty t2 in
+    let res3 = term_to_exp (Env.push env2) ty t3 in
+    let e, env = conditional_to_exp loc ty e1 res2 res3 in
+    e, env, false
   | Tat(t', label) ->
-    let stmt = Env.stmt_of_label env label in
-    let ty = t'.term_type in
     (* convert [t'] to [e] in a separated local env *)
-    let e, env = term_to_exp (Env.push env) ty t' in
-    let new_v = ref None in
-    (* generate a new variable denoting [\at(t',label)].
-       That is this variable which is the resulting expression. 
-       ACSL typing rule ensures that the type of this variable is the same as
-       the one of [e]. *)
-    let res, new_env =
-      Env.new_var ~global:true env
-	(Some t) (typeOf e)
-	(fun lv' e' -> 
-	  (* store the corresponding left value and expression corresponding to
-	     the new variable. Will be used in the visitor in order to
-	     initialize it. *)
-	  new_v := Some (lv', e'); [])
-    in
-    let env_ref = ref new_env in
-      (* visitor modifying in place the labeled statement in order to store [e]
-	 in the resulting variable at this location which is the only correct
-	 one. *)
-    let o = object 
-      inherit Visitor.frama_c_inplace
-      method vstmt_aux stmt = 
-	let new_lv, new_e = Extlib.the !new_v in
-	  (* either a standard C affectation or an mpz one according to type of
-	     [e] *) 
-	let new_stmt = Mpz.init_set (var new_lv) new_e e in
-	assert (!env_ref == new_env);
-	  (* generate the new block of code for the labeled statement and the
-	     corresponding environment *)
-	let block, new_env = 
-	  Env.pop_and_get new_env new_stmt ~global_clear:false Env.Middle
-	in
-	let pre = match label with
-	  | LogicLabel(_, s) when s = "Here" || s = "Post" -> true
-	  | StmtLabel _ | LogicLabel _ -> false
-	in
-	env_ref := Env.extend_stmt_in_place new_env stmt ~pre block;
-	ChangeTo stmt
-    end
-    in
-    let bhv = (Env.get_visitor new_env)#behavior in
-    let new_stmt = Visitor.visitFramacStmt o (get_stmt bhv stmt) in
-    set_stmt bhv stmt new_stmt;
-    res, !env_ref, false
+    let e, env = term_to_exp (Env.push env) t'.term_type t' in
+    at_to_exp env (Some t) label e
   | Tbase_addr _ -> Error.not_yet "\\base_addr"
   | Tblock_length _ -> Error.not_yet "\\block_length"
   | Tnull -> mkCast (zero ~loc) (TPtr(TVoid [], [])), env, false
@@ -324,6 +324,54 @@ and comparison_to_exp ?(loc=Location.unknown) ?e1 env bop t1 t2 t_opt =
   | _ ->
     new_exp ?loc (BinOp(bop, e1, e2, intType)), env
 
+and at_to_exp env t_opt label e =
+  let stmt = Env.stmt_of_label env label in
+  let new_v = ref None in
+  (* generate a new variable denoting [\at(t',label)].
+     That is this variable which is the resulting expression. 
+     ACSL typing rule ensures that the type of this variable is the same as
+     the one of [e]. *)
+  let res, new_env =
+    Env.new_var ~global:true env
+      t_opt
+      (typeOf e)
+      (fun lv' e' -> 
+	(* store the corresponding left value and expression corresponding to
+	   the new variable. Will be used in the visitor in order to
+	   initialize it. *)
+	new_v := Some (lv', e'); 
+	[])
+  in
+  let env_ref = ref new_env in
+  (* visitor modifying in place the labeled statement in order to store [e]
+     in the resulting variable at this location which is the only correct
+     one. *)
+  let o = object 
+    inherit Visitor.frama_c_inplace
+    method vstmt_aux stmt = 
+      let new_lv, new_e = Extlib.the !new_v in
+      (* either a standard C affectation or an mpz one according to type of
+	 [e] *) 
+      let new_stmt = Mpz.init_set (var new_lv) new_e e in
+      assert (!env_ref == new_env);
+      (* generate the new block of code for the labeled statement and the
+	 corresponding environment *)
+      let block, new_env = 
+	Env.pop_and_get new_env new_stmt ~global_clear:false Env.Middle
+      in
+      let pre = match label with
+	| LogicLabel(_, s) when s = "Here" || s = "Post" -> true
+	| StmtLabel _ | LogicLabel _ -> false
+      in
+      env_ref := Env.extend_stmt_in_place new_env stmt ~pre block;
+      ChangeTo stmt
+  end
+  in
+  let bhv = (Env.get_visitor new_env)#behavior in
+  let new_stmt = Visitor.visitFramacStmt o (get_stmt bhv stmt) in
+  set_stmt bhv stmt new_stmt;
+  res, !env_ref, false
+
 (* Convert an ACSL named predicate into a corresponding C expression (if
    any) in the given environment. Also extend this environment which includes
    the generating constructs. *)
@@ -342,64 +390,44 @@ let rec named_predicate_to_exp env p =
   | Pand(p1, p2) ->
     (* p1 && p2 <==> if p1 then p2 else false *)
     let e1, env1 = named_predicate_to_exp env p1 in
-    let e2, env2 = named_predicate_to_exp (Env.push env1) p2 in
-    let env = Env.pop env2 in
-    Env.new_var
-      env
-      None
-      intType
-      (fun v _ -> 
-	let lv = var v in
-	let then_block, _ = 
-	  let s = mkStmtOneInstr ~valid_sid:true (Set(lv, e2, loc)) in
-	  Env.pop_and_get env2 s ~global_clear:false Env.Middle
-	in
-	let else_block = 
-	  mkBlock [ mkStmtOneInstr ~valid_sid:true (Set(lv, zero loc, loc)) ]
-	in
-	[ mkStmt ~valid_sid:true (If(e1, then_block, else_block, loc)) ])
+    let _, env2 as res2 = named_predicate_to_exp (Env.push env1) p2 in
+    let env3 = Env.push env2 in
+    conditional_to_exp loc (Ctype intType) e1 res2 (zero loc, env3)
   | Por(p1, p2) -> 
     (* p1 || p2 <==> if p1 then true else p2 *)
     let e1, env1 = named_predicate_to_exp env p1 in
-    let e2, env2 = named_predicate_to_exp (Env.push env1) p2 in
-    let env = Env.pop env2 in
-    Env.new_var
-      env
-      None
-      intType
-      (fun v _ -> 
-	let lv = var v in	
-	let then_block = 
-	  mkBlock [ mkStmt ~valid_sid:true (Instr (Set(lv, one loc, loc))) ]
-	in
-	let else_block, _ = 
-	  let s = mkStmt ~valid_sid:true (Instr (Set(lv, e2, loc))) in
-	  Env.pop_and_get env2 s ~global_clear:false Env.Middle
-	in
-	[ mkStmt ~valid_sid:true (If(e1, then_block, else_block, loc)) ])
+    let env' = Env.push env1 in
+    let res2 = named_predicate_to_exp (Env.push env') p2 in
+    conditional_to_exp loc (Ctype intType) e1 (one loc, env') res2
   | Pxor _ -> Error.not_yet "xor"
   | Pimplies(p1, p2) -> 
-    named_predicate_to_exp env (Logic_const.por ((Logic_const.pnot p1), p2))
-  | Piff _ -> Error.not_yet "<==>"
+    (* (p1 ==> p2) <==> !p1 || p2 *)
+    named_predicate_to_exp 
+      env
+      (Logic_const.por ~loc ((Logic_const.pnot ~loc p1), p2))
+  | Piff(p1, p2) -> 
+    (* (p1 <==> p2) <==> (p1 ==> p2 && p2 ==> p1) *)
+    named_predicate_to_exp 
+      env
+      (Logic_const.pand ~loc
+	 (Logic_const.pimplies ~loc (p1, p2), 
+	  Logic_const.pimplies ~loc (p2, p1)))
   | Pnot p ->
     let e, env = named_predicate_to_exp env p in
     new_exp ~loc (UnOp(LNot, e, TInt(IInt, []))), env
-  | Pif _ -> Error.not_yet "_ ? _ : _"
+  | Pif(t, p2, p3) ->
+    let e1, env1 = term_to_exp env (Ctype intType) t in
+    let (_, env2 as res2) = named_predicate_to_exp (Env.push env1) p2 in
+    let res3 = named_predicate_to_exp (Env.push env2) p3 in
+    conditional_to_exp loc (Ctype intType) e1 res2 res3
   | Plet _ -> Error.not_yet "let _ = _ in _"
-  | Pforall(bounded_vars, { content = Pimplies(hyps, goal) }) -> 
-    Quantif.convert env loc p bounded_vars hyps goal
-  | Pforall _ -> Error.not_yet "unguarded \\forall quantification"
-  (*  | Pexists(bounded_vars, { content = Pand(hyps, _goal) }) -> 
-      let guards = compute_quantif_guards p bounded_vars hyps in
-      List.iter 
-      (fun (t1, _, x, _, t2) -> 
-      Options.feedback
-      "getting %a OP %a OP %a"  
-      d_term t1 d_logic_var x d_term t2)
-      guards;
-      assert false*)
-  | Pexists _ -> Error.not_yet "unguarded \\exists quantification"
-  | Pat _ -> Error.not_yet "\\at"
+  | Pforall _ | Pexists _ -> Quantif.quantif_to_exp env p
+  | Pat(p, label) -> 
+    (* convert [t'] to [e] in a separated local env *)
+    let e, env = named_predicate_to_exp (Env.push env) p in
+    let e, env, is_string = at_to_exp env None label e in
+    assert (not is_string);
+    e, env
   | Pvalid _ -> Error.not_yet "\\valid"
   | Pvalid_index _ -> Error.not_yet "\\valid_index"
   | Pvalid_range _ -> Error.not_yet "\\valid_range"
@@ -416,29 +444,38 @@ let () =
    statement (if any) for runtime assertion checking *)
 (* ************************************************************************** *)
 
+let assumes_predicate bhv =
+  List.fold_left
+    (fun acc p -> Logic_const.pand (acc, Logic_const.unamed p.ip_content))
+    Logic_const.ptrue
+    bhv.b_assumes
+
 let convert_preconditions env behaviors =
+  let env = Env.set_annotation_kind env Misc.Precondition in
   let do_behavior env b = 
-    let assumes_pred =
-      List.fold_left
-	(fun acc p -> Logic_const.pand (acc, Logic_const.unamed p.ip_content))
-	Logic_const.ptrue
-	b.b_assumes
-    in
+    let assumes_pred = assumes_predicate b in
     List.fold_left
       (fun env p ->
+	let loc = p.ip_loc in
 	let p = 
-	  Logic_const.pimplies (assumes_pred, Logic_const.unamed p.ip_content)
+	  Logic_const.pimplies
+	    ~loc
+	    (assumes_pred, Logic_const.unamed ~loc p.ip_content)
 	in
 	let e, env = named_predicate_to_exp env p in
-	Env.add_stmt env (Misc.mk_e_acsl_guard ~reverse:true e p))
+	Env.add_stmt 
+	  env 
+	  (Misc.mk_e_acsl_guard ~reverse:true (Env.annotation_kind env) e p))
       env
       b.b_requires
   in 
   List.fold_left do_behavior env behaviors
 
 let convert_postconditions env behaviors =
+  let env = Env.set_annotation_kind env Misc.Postcondition in
   (* generate one guard by postcondition of each behavior *)
   let do_behavior env b = 
+    let assumes_pred = assumes_predicate b in
     List.fold_left
       (fun env (t, p) ->
 	if b.b_assigns <> WritesAny then 
@@ -446,15 +483,20 @@ let convert_postconditions env behaviors =
 	if b.b_extended <> [] then 
 	  Error.not_yet "grammar extensions in behavior";
 	match t with
-	  | Normal -> 
-	    let p = p.ip_content in
-	    if p <> Ptrue && b.b_assumes <> [] then 
-	      Error.not_yet "assumes in conjunction with ensures in behaviors";
-	    let p = Logic_const.unamed p in
-	    let e, env = named_predicate_to_exp env p in
-	    Env.add_stmt env (Misc.mk_e_acsl_guard ~reverse:true e p)
-	  | Exits | Breaks | Continues | Returns ->
-	    Error.not_yet "@[abnormal termination case in behavior@]")
+	| Normal -> 
+	  let loc = p.ip_loc in
+	  let p = p.ip_content in
+	  let p = 
+	    Logic_const.pimplies 
+	      ~loc
+	      (Logic_const.pold ~loc assumes_pred, Logic_const.unamed ~loc p) 
+	  in
+	  let e, env = named_predicate_to_exp env p in
+	  Env.add_stmt
+	    env
+	    (Misc.mk_e_acsl_guard ~reverse:true (Env.annotation_kind env) e p)
+	| Exits | Breaks | Continues | Returns ->
+	  Error.not_yet "@[abnormal termination case in behavior@]")
       env
       b.b_post_cond
   in 
@@ -465,9 +507,9 @@ let convert_pre_spec env spec =
     if spec.spec_variant <> None then Error.not_yet "variant clause";
     if spec.spec_terminates <> None then Error.not_yet "terminates clause";
     if spec.spec_complete_behaviors <> [] then 
-      Error.not_yet "complete behaviors";
+      Error.not_yet "complete behavior";
     if spec.spec_disjoint_behaviors <> [] then 
-      Error.not_yet "disjoint behaviors";
+      Error.not_yet "disjoint behavior";
     convert_preconditions env spec.spec_behavior
   in
   Error.handle convert env
@@ -478,11 +520,20 @@ let convert_post_spec env spec =
 let convert_named_predicate env p =
   let e, env = named_predicate_to_exp env p in
   assert (Typ.equal (typeOf e) intType);
-  Env.add_stmt env (Misc.mk_e_acsl_guard ~reverse:true e p)
+  Env.add_stmt
+    env
+    (Misc.mk_e_acsl_guard ~reverse:true (Env.annotation_kind env) e p)
 
 let convert_pre_code_annotation env annot =
   let convert env = match annot.annot_content with
-    | AAssert(l, p) -> 
+    | AAssert(l, p) | AInvariant(l, false (* invariant as assertion *), p) 
+	as a -> 
+      let kind = match a with 
+	| AAssert _ -> Misc.Assertion
+	| AInvariant _ -> Misc.Invariant
+	| _ -> assert false
+      in
+      let env = Env.set_annotation_kind env kind in
       if l <> [] then 
 	Error.not_yet "@[assertions applied only on some behaviors@]";
       convert_named_predicate env p
@@ -490,7 +541,7 @@ let convert_pre_code_annotation env annot =
       if l <> [] then 
         Error.not_yet "@[statement contract applied only on some behaviors@]";
       convert_pre_spec env spec ;
-    | AInvariant _ -> Error.not_yet "invariant"
+    | AInvariant(_, b, _) -> assert b; Error.not_yet "loop invariant"
     | AVariant _ -> Error.not_yet "variant"
     | AAssigns _ -> Error.not_yet "assigns"
     | APragma _ -> Error.not_yet "pragma"
@@ -512,7 +563,7 @@ let convert_post_code_annotation env annot =
 (* Visitor *)
 (* ************************************************************************** *)
 
-(* local reference to the below visitor and to [do_visit] *)
+(* local references to the below visitor and to [do_visit] *)
 let first_global = ref true
 let function_env = ref Env.dummy
 let funspec = ref (Cil.empty_funspec ())
@@ -540,7 +591,6 @@ class e_acsl_visitor prj generate = object (self)
   (*  method vinit v off i = assert false *)
 
   method vvdec vi = 
-    (* TODO: handle functions without code *)
     try
       let old_vi = get_original_varinfo self#behavior vi in
       let old_kf = Globals.Functions.get old_vi in
@@ -551,6 +601,7 @@ class e_acsl_visitor prj generate = object (self)
       DoChildren
     with Not_found ->
       (* function without code *)
+      (* TODO: do better *)
       DoChildren
 
   method vfunc f =

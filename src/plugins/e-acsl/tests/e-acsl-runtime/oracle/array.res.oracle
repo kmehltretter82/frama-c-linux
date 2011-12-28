@@ -12,33 +12,32 @@ PROJECT_FILE.i:232:[value] entering loop for the first time
 PROJECT_FILE.i:236:[value] assigning non deterministic value for the first time
 PROJECT_FILE.i:241:[value] entering loop for the first time
 PROJECT_FILE.i:248:[value] Assertion got status unknown.
-[value] computing for function e_acsl_fail <- main.
+[value] computing for function e_acsl_assert <- main.
         Called from PROJECT_FILE.i:249.
-[value] computing for function printf <- e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:223.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
 [value] Done for function printf
-[value] computing for function exit <- e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:223.
-PROJECT_FILE.i:213:[value] Function exit: postcondition got status invalid.
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
+PROJECT_FILE.i:207:[value] Function exit: postcondition got status invalid.
 [value] Done for function exit
-[value] Recording results for e_acsl_fail
-[value] Done for function e_acsl_fail
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
 PROJECT_FILE.i:251:[value] Assertion got status unknown.
-[value] computing for function e_acsl_fail <- main.
+[value] computing for function e_acsl_assert <- main.
         Called from PROJECT_FILE.i:252.
-[value] computing for function printf <- e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:223.
+[value] computing for function printf <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:219.
 [value] Done for function printf
-[value] computing for function exit <- e_acsl_fail <- main.
-        Called from PROJECT_FILE.i:223.
+[value] computing for function exit <- e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:221.
 [value] Done for function exit
-[value] Recording results for e_acsl_fail
-[value] Done for function e_acsl_fail
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
 [value] Recording results for main
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
-[value] Values at end of function e_acsl_fail:
-          NON TERMINATING FUNCTION
+[value] Values at end of function e_acsl_assert:
 [value] Values at end of function main:
           T1[0] ∈ {0; 2}
             [1..2] ∈ {0; 1; 2}
@@ -52,10 +51,13 @@ PROJECT_FILE.i:251:[value] Assertion got status unknown.
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
-void e_acsl_fail(char *msg)
+void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
-  printf("%s\n",msg);
-  exit(1);
+  if (predicate) {
+    printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
+           line,pred_txt);
+    exit(1);
+  }
   return;
 }
 
@@ -81,9 +83,11 @@ int main(void)
   }
   
   /*@ assert T1[0] ≡ T2[0]; */ ;
-  if (! (T1[0] == T2[0])) { e_acsl_fail((char *)"(T1[0] == T2[0])"); }
+  e_acsl_assert(! (T1[0] == T2[0]),(char *)"Assertion",
+                (char *)"(T1[0] == T2[0])",13);
   /*@ assert T1[1] ≢ T2[1]; */ ;
-  if (! (T1[1] != T2[1])) { e_acsl_fail((char *)"(T1[1] != T2[1])"); }
+  e_acsl_assert(! (T1[1] != T2[1]),(char *)"Assertion",
+                (char *)"(T1[1] != T2[1])",14);
   __retres = 0;
   return (__retres);
 }

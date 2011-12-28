@@ -38,10 +38,13 @@ extern long __gmpz_get_si(__mpz_struct const * /*[1]*/ z);
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
-void e_acsl_fail(char *msg)
+void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
-  printf("%s\n",msg);
-  exit(1);
+  if (predicate) {
+    printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
+           line,pred_txt);
+    exit(1);
+  }
   return;
 }
 
@@ -62,9 +65,8 @@ int f(int x)
     __gmpz_sub((__mpz_struct *)(e_acsl_4),(__mpz_struct const *)(e_acsl_2),
                (__mpz_struct const *)(e_acsl_2));
     e_acsl_5 = (int)__gmpz_get_si((__mpz_struct const *)(e_acsl_4));
-    if (! (x == e_acsl_5)) {
-      e_acsl_fail((char *)"(\\result == (int)(\\old(x)-\\old(x)))");
-    }
+    e_acsl_assert(! (x == e_acsl_5),(char *)"Postcondition",
+                  (char *)"(\\result == (int)(\\old(x)-\\old(x)))",6);
     __gmpz_clear((__mpz_struct *)(e_acsl_2));
     __gmpz_clear((__mpz_struct *)(e_acsl_4));
     return (x);
@@ -76,7 +78,8 @@ int Y = 1;
 /*@ ensures \result ≡ Y;  */
 int g(int x)
 {
-  if (! (x == Y)) { e_acsl_fail((char *)"(\\result == Y)"); }
+  e_acsl_assert(! (x == Y),(char *)"Postcondition",(char *)"(\\result == Y)",
+                17);
   return (x);
 }
 
@@ -93,7 +96,8 @@ int h(void)
     __gmpz_init_set_si((__mpz_struct *)(e_acsl_2),(long)0);
     e_acsl_3 = __gmpz_cmp((__mpz_struct const *)(e_acsl_1),
                           (__mpz_struct const *)(e_acsl_2));
-    if (! (e_acsl_3 == 0)) { e_acsl_fail((char *)"(\\result == 0)"); }
+    e_acsl_assert(! (e_acsl_3 == 0),(char *)"Postcondition",
+                  (char *)"(\\result == 0)",22);
     __gmpz_clear((__mpz_struct *)(e_acsl_1));
     __gmpz_clear((__mpz_struct *)(e_acsl_2));
     return (__retres);

@@ -1,0 +1,188 @@
+				------
+				README
+				------
+
+===============================================================================
+				SUMMARY
+===============================================================================
+
+0) Summary
+1) What Is
+2) Simple use
+3) Examples
+4) Advanced uses
+5) Compatibility with previous releases
+6) Have Fun with E-ACSL!
+
+===============================================================================
+				WHAT IS
+===============================================================================
+
+This package contains the Frama-C's E-ACSL plug-in. It takes as input an 
+annotated C program and returns the same program in which annotations have 
+been converted into C code dedicated to runtime assertion checking: this code 
+fails at runtime if and only if the annotation is wrong in the execution 
+context.
+
+Annotations must be written in a subset of ACSL (ANSI/ISO C Specification 
+Language), namely E-ACSL (Executable ANSI/ISO C Specification Language). E-ACSL
+is fully described in file doc/manuals/e-acsl.pdf.
+
+This plug-in is still under implementation: some parts of E-ACSL are not yet 
+implemented. What is supported is described in file 
+doc/manuals/e-acsl-implementation.pdf.
+
+Please read file INSTALL for details about the installation procedure of
+this plug-in and consult http://frama-c.com and http://frama-c.com/e-acsl 
+for information about Frama-C and ACSL.
+
+===============================================================================
+				SIMPLE USE
+===============================================================================
+
+The standard use is the following:
+
+$ frama-c -e-acsl <files> -then-on e-acsl -print -ocode generated_code.c
+
+Option -e-acsl runs the Frama-C's E-ACSL plug-in on the given <files>: it
+returns a new Frama-C project called `e-acsl'. Option -then-on switches to 
+this project while options -print and -ocode pretty prints the corresponding C 
+code into file `generated_code'.
+
+Here the only E-ACSL specific option is -e-acsl. The others (-then-on, -print
+and -ocode) are standard Frama-C options, described in the Frama-C User Manual
+as well as the concept of Frama-C Project. 
+
+The generated file is a C file which usually depends on the GMP library
+(http://???).  The following commands compile and run it:
+
+$ gcc generated_code.c -lgmp -o generated_code
+$ ./generated_code
+
+The execution behaves in the same way than the original <files>, except that 
+it fails if an annotation is violated.
+
+===============================================================================
+				EXAMPLES
+===============================================================================
+
+1) Consider the following C program:
+<true.i>
+int main(void) {
+  /*@ assert \true; */
+  return 0;
+}
+
+Since the assertion is always true, the generated code behaves in the same way 
+that just returning 0:
+$ frama-c -e-acsl true.i -then-on e-acsl -print -ocode gen_true.c
+$ gcc gen_true.c -o gen_true
+$ ./gen_true
+$ echo $?
+0
+
+As this example is trivial, the generated code does not require to be linked
+against GMP. It is usually not the case.
+
+2) Now consider the following C program:
+<false.i>
+int main(void) {
+  int x = 0;
+  /*@ assert x+1 == 0; */
+  return 0;
+}
+
+Since the assertion is always false, the generated code fails at runtime:
+$ frama-c -e-acsl false.i -then-on e-acsl -print -ocode gen_false.c
+$ gcc gen_false.c -lgmp -o gen_false
+$ ./gen_false
+Assertion failed at line 7.
+The failing predicate is:
+(x+1 == 0).
+$ echo $?
+1
+
+As this example uses arithmetic in annotations, the generated code must be
+linked against GMP (GCC's option -lgmp) to be able to produce an executable.
+
+3) More advanced examples are available in directory tests/e-acsl-runtime. Note
+   that these examples never fail at runtime: all the annotations are valid.
+
+===============================================================================
+				ADVANCED USES
+===============================================================================
+
+This E-ACSL plug-in is fully integrated within Frama-C: any standard Frama-C
+options may be used in order to custom the Frama-C execution. Read the Frama-C
+User Manual for additional information.
+
+The list of E-ACSL option is available through the option -e-acsl-help:
+$ frama-c -e-acsl-help
+
+As this example is trivial, the generated code does not require to be linked
+against GMP. It is usually not the case.
+
+2) Now consider the following C program:
+<false.i>
+int main(void) {
+  int x = 0;
+  /*@ assert x+1 == 0; */
+  return 0;
+}
+
+Since the assertion is always false, the generated code fails at runtime:
+$ frama-c -e-acsl false.i -then-on e-acsl -print -ocode gen_false.c
+$ gcc gen_false.c -lgmp -o gen_false
+$ ./gen_false
+Assertion failed at line 7.
+The failing predicate is:
+(x+1 == 0).
+$ echo $?
+1
+
+As this example uses arithmetic's in annotations, the generated code must be
+linked against GMP (GCC's option -lgmp) to be able to produce an executable.
+
+3) More advanced examples are available in directory tests/e-acsl-runtime. Note
+   that these examples never fail at runtime: all the annotations are valid.
+
+===============================================================================
+				ADVANCED USES
+===============================================================================
+
+This E-ACSL plug-in is fully integrated within Frama-C: any standard Frama-C
+options may be used in order to custom the Frama-C execution. Read the Frama-C
+User Manual for additional information.
+
+The list of E-ACSL option is available through the option -e-acsl-help:
+$ frama-c -e-acsl-help
+
+These options are the following.
+-e-acsl             generate a new project where E-ACSL annotations are
+                    translated to executable C code
+-e-acsl-check       only type check E-ACSL annotated program
+-e-acsl-project <prj>  the name of the generated project is <prj> (default to
+                    "e-acsl")
+
+-e-acsl-help        help of plug-in E-ACSL
+-e-acsl-h           alias for option -e-acsl-help
+-e-acsl-version     version of plug-in E-ACSL
+
+-e-acsl-debug <n>   level of debug for plug-in E-ACSL (defaults to 0)
+-e-acsl-verbose <n>  level of verbosity for plug-in E-ACSL (defaults to 1)
+
+The generated code contains fresh variable names prefixed by 'e_acsl'. No
+verification is done to ensure that these new names do not clash with existing
+ones. Thus be sure that your input program does not contain any variable
+prefixed by 'e_acsl'. A direct consequence is that it is not possible to give as
+input to the E-ACSL plug-in a program generated by E-ACSL itself.
+
+===============================================================================
+			COMPATIBILITY WITH PREVIOUS RELEASES
+===============================================================================
+
+Changes are documented in a textual way in file Changelog.
+
+===============================================================================
+				HAVE FUN WITH E-ACSL!
+===============================================================================

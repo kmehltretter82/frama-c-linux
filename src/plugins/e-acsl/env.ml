@@ -1,8 +1,8 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  This file is part of the E-ACSL plug-in of Frama-C.                   *)
+(*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2011                                                    *)
+(*  Copyright (C) 2012                                                    *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -44,6 +44,7 @@ type local_env = { block_info: block_info; mpz_tbl: mpz_tbl }
 
 type t = 
     { visitor: Visitor.frama_c_visitor; 
+      annotation_kind: Misc.annotation_kind;
       new_global_vars: varinfo list; (* generated variables at function level *)
       global_mpz_tbl: mpz_tbl;
       env_stack: local_env list;
@@ -64,6 +65,7 @@ let dummy =
       new Visitor.generic_frama_c_visitor 
 	Project_skeleton.dummy
 	(inplace_visit ()); 
+    annotation_kind = Misc.Assertion;
     new_global_vars = [];
     global_mpz_tbl = empty_mpz_tbl; 
     env_stack = []; 
@@ -72,6 +74,7 @@ let dummy =
 
 let empty v = 
   { visitor = v; 
+    annotation_kind = Misc.Assertion;
     new_global_vars = [];
     global_mpz_tbl = empty_mpz_tbl; 
     env_stack = []; 
@@ -290,6 +293,9 @@ let stmt_of_label env = function
     (try Kernel_function.find_return (Extlib.the env.visitor#current_kf)
      with Kernel_function.No_Statement -> assert false)
   | LogicLabel(_, _label) -> assert false
+
+let annotation_kind env = env.annotation_kind
+let set_annotation_kind env k = { env with annotation_kind = k }
 
 (*
 Local Variables:

@@ -1,8 +1,8 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  This file is part of the E-ACSL plug-in of Frama-C.                   *)
+(*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2011                                                    *)
+(*  Copyright (C) 2012                                                    *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -34,7 +34,11 @@ val new_lval: ?loc:Location.t -> varinfo -> exp
 
 val mk_call: ?loc:Location.t -> ?result:lval -> string -> exp list -> stmt
 
-val mk_e_acsl_guard: ?reverse:bool -> exp -> predicate named -> stmt
+type annotation_kind = Assertion | Precondition | Postcondition | Invariant
+
+val mk_e_acsl_guard: 
+  ?reverse:bool -> annotation_kind -> exp -> predicate named -> stmt
+
 val e_acsl_header: unit -> global
 
 (*

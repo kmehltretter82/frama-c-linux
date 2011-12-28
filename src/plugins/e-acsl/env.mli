@@ -1,8 +1,8 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  This file is part of the E-ACSL plug-in of Frama-C.                   *)
+(*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2011                                                    *)
+(*  Copyright (C) 2012                                                    *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -92,6 +92,13 @@ val get_generated_variables: t -> varinfo list
 val get_visitor: t -> Visitor.generic_frama_c_visitor
 
 val stmt_of_label: t -> logic_label -> stmt
+
+(* ************************************************************************** *)
+(** {2 Current annotation kind} *)
+(* ************************************************************************** *)
+
+val annotation_kind: t -> Misc.annotation_kind
+val set_annotation_kind: t -> Misc.annotation_kind -> t
 
 (*
 Local Variables:

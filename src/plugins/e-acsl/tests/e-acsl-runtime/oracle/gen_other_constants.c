@@ -28,10 +28,13 @@ extern int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
-void e_acsl_fail(char *msg)
+void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
-  printf("%s\n",msg);
-  exit(1);
+  if (predicate) {
+    printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
+           line,pred_txt);
+    exit(1);
+  }
   return;
 }
 
@@ -39,8 +42,8 @@ int main(void)
 {
   int __retres;
   /*@ assert "toto" ≢ "titi"; */ ;
-  if (! ("toto" != "titi")) { e_acsl_fail((char *)"(\"toto\" != \"titi\")");
-  }
+  e_acsl_assert(! ("toto" != "titi"),(char *)"Assertion",
+                (char *)"(\"toto\" != \"titi\")",9);
   /*@ assert 'c' ≡ 'c'; */ ;
   {
     mpz_t e_acsl_1;
@@ -48,12 +51,14 @@ int main(void)
     __gmpz_init_set_si((__mpz_struct *)(e_acsl_1),(long)'c');
     e_acsl_2 = __gmpz_cmp((__mpz_struct const *)(e_acsl_1),
                           (__mpz_struct const *)(e_acsl_1));
-    if (! (e_acsl_2 == 0)) { e_acsl_fail((char *)"(\'c\' == \'c\')"); }
+    e_acsl_assert(! (e_acsl_2 == 0),(char *)"Assertion",
+                  (char *)"(\'c\' == \'c\')",10);
     __gmpz_clear((__mpz_struct *)(e_acsl_1));
   }
   
   /*@ assert false ≢ true; */ ;
-  if (! (false != true)) { e_acsl_fail((char *)"(false != true)"); }
+  e_acsl_assert(! (false != true),(char *)"Assertion",
+                (char *)"(false != true)",11);
   __retres = 0;
   return (__retres);
 }

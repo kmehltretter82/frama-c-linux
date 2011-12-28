@@ -3,9 +3,14 @@
 [value] Initial state computed
 [value] Values of globals at initialization
 PROJECT_FILE.i:230:[value] Assertion got status valid.
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:231.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
 [value] Recording results for main
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
+[value] Values at end of function e_acsl_assert:
 [value] Values at end of function main:
           __retres ∈ {0}
           x ∈ {0}
@@ -16,10 +21,13 @@ PROJECT_FILE.i:230:[value] Assertion got status valid.
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
-void e_acsl_fail(char *msg)
+void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
-  printf("%s\n",msg);
-  exit(1);
+  if (predicate) {
+    printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
+           line,pred_txt);
+    exit(1);
+  }
   return;
 }
 
@@ -29,6 +37,7 @@ int main(void)
   int x;
   x = 0;
   /*@ assert \true; */ ;
+  e_acsl_assert(0,(char *)"Assertion",(char *)"(\\true)",8);
   __retres = 0;
   return (__retres);
 }

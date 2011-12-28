@@ -1,8 +1,8 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  This file is part of the E-ACSL plug-in of Frama-C.                   *)
+(*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2011                                                    *)
+(*  Copyright (C) 2012                                                    *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,16 +20,16 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Convert quantifiers. *)
+
 open Cil_types
 
-val convert: 
-  Env.t -> 
-  location ->
-  predicate named -> 
-  logic_var list -> 
-  predicate named -> 
-  predicate named -> 
-  exp * Env.t
+val quantif_to_exp: Env.t -> predicate named -> exp * Env.t
+(** The given predicate must be a quantification. *)
+
+(* ***********************************************************************)
+(** {2 Forward references} *)
+(* ***********************************************************************)
 
 val named_predicate_to_exp_ref: (Env.t -> predicate named -> exp * Env.t) ref
 val term_to_exp_ref: (Env.t -> logic_type -> term -> exp * Env.t) ref

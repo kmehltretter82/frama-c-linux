@@ -1,8 +1,8 @@
 ##########################################################################
 #                                                                        #
-#  This file is part of the E-ACSL plug-in of Frama-C.                   #
+#  This file is part of the Frama-C's E-ACSL plug-in.                    #
 #                                                                        #
-#  Copyright (C) 2011                                                    #
+#  Copyright (C) 2012                                                    #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -20,6 +20,10 @@
 #                                                                        #
 ##########################################################################
 
+#######################
+# Frama-C Environment #
+#######################
+
 # Do not use ?= to initialize both below variables
 # (fixed efficiency issue, see GNU Make manual, Section 8.11)
 ifndef FRAMAC_SHARE
@@ -28,6 +32,19 @@ endif
 ifndef FRAMAC_LIBDIR
 FRAMAC_LIBDIR :=$(shell frama-c -journal-disable -print-libpath)
 endif
+
+# OCAMLVERSION and HAS_OCAML312 are defined in Frama-C common Makefile
+# but cannot be used at this point
+OCAMLVERSION 	?=@OCAMLVERSION@
+ifeq ($(findstring 3.12,$(OCAMLVERSION)),)
+HAS_OCAML312 = no
+else
+HAS_OCAML312 = yes
+endif
+
+#########################
+# Plug-in configuration #
+#########################
 
 PLUGIN_DIR ?=.
 PLUGIN_ENABLE:=@ENABLE_E_ACSL@
@@ -46,12 +63,15 @@ PLUGIN_CMO:= local_config \
 	main
 PLUGIN_HAS_MLI:=yes
 
-# Enable -warn-error, but do not distribute the plug-in with this option being
-# activated 
+# Enable -warn-error in development mode, but not in distribution mode
+# Do not edit the line below: it is automatically set by 'make src-distrib'
+IS_DISTRIBUTED:=no
+ifneq ($(IS_DISTRIBUTED),yes)
 ifeq ($(HAS_OCAML312),yes)
 DEV_FLAGS=-warn-error +a
 else
 DEV_FLAGS=-warn-error A
+endif
 endif
 PLUGIN_BFLAGS:=$(DEV_FLAGS)
 PLUGIN_OFLAGS:=$(DEV_FLAGS)
@@ -60,13 +80,20 @@ PLUGIN_DISTRIBUTED:=no
 
 PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure
 PLUGIN_DISTRIB_BIN:=no
+
+#######################
+# Local configuration #
+#######################
+
 PLUGIN_GENERATED:= $(PLUGIN_DIR)/local_config.ml
+
+VERSION=$(shell $(SED) -e 's/\\(.*\\)/\\1/' VERSION)
 
 $(PLUGIN_DIR)/local_config.ml: $(PLUGIN_DIR)/Makefile.in
 	$(PRINT_MAKING) $@
 	$(RM) $@
 	$(ECHO) "(* This file was automatically generated from $<. Don't edit it. *)" >> $@
-	$(ECHO) "let may_use_assert = @MAY_USE_ASSERT@" >> $@
+	$(ECHO) "let version = \""$(VERSION)"\"" >> $@
 	$(CHMOD_RO) $@
 
 ###########
@@ -95,10 +122,56 @@ install::
 	$(PRINT_CP) E-ACSL share files
 	$(MKDIR) $(FRAMAC_SHARE)/e-acsl
 	$(CP) $(E_ACSL_DIR)/share/e-acsl/* $(FRAMAC_SHARE)/e-acsl
+	$(CP) $(E_ACSL_DIR)/doc/manuals/e-acsl.pdf \
+		$(E_ACSL_DIR)/doc/manuals/e-acsl-implementation.pdf \
+		$(FRAMAC_SHARE)/manuals
 
 uninstall::
 	$(PRINT_RM) E-ACSL share files
 	$(RM) -r $(FRAMAC_SHARE)/e-acsl
+	$(RM) $(FRAMAC_SHARE)/manuals/e-acsl.pdf \
+		$(FRAMAC_SHARE)/manuals/e-acsl-implementation.pdf
+
+################################
+# Building source distribution #
+################################
+
+EXPORT	=e-acsl-$(VERSION)
+
+DISTRIB_FILES= $(filter-out $(wildcard *local_config.ml), $(wildcard *.ml)) \
+	$(wildcard *.mli) \
+	configure.ac Makefile.in \
+	doc/Changelog \
+	doc/manuals/e-acsl.pdf doc/manuals/e-acsl-implementation.pdf \
+	share/e-acsl/*.h \
+	tests/test_config.in \
+	tests/e-acsl-reject/test_config tests/e-acsl-reject/*.i \
+	tests/e-acsl-runtime/test_config tests/e-acsl-runtime/*.i \
+	license/CEA_LGPL license/headache_config.txt license/LGPLv2.1 \
+	INSTALL README VERSION .depend
+
+src-distrib: .depend
+	$(PRINT_TAR) tmp-distrib
+	$(TAR) cf tmp.tar $(DISTRIB_FILES)
+	$(PRINT_MAKING) export directories
+	$(MKDIR) $(EXPORT)
+	$(PRINT_UNTAR) tmp-distrib
+	cd $(EXPORT); \
+	  $(TAR) xf ../tmp.tar; autoconf; \
+	  $(SED) -i -e 's/IS_DISTRIBUTED:=no/IS_DISTRIBUTED:=yes/' Makefile.in
+	$(PRINT_RM) tmp-distrib
+	$(RM) tmp.tar
+	$(PRINT_MAKING) test directories
+	for dir in $(EXPORT)/tests/*; do \
+	  if test -d $$dir; then \
+	    $(MKDIR) $$dir/result; \
+	    $(MKDIR) $$dir/oracle; \
+          fi \
+	done
+	$(PRINT_MAKING) archive
+	$(TAR) czf $(EXPORT).tar.gz $(EXPORT)
+	$(PRINT) Cleaning
+	$(RM) -fr $(EXPORT)
 
 ##########
 # Header #

@@ -1,8 +1,8 @@
 /**************************************************************************/
 /*                                                                        */
-/*  This file is part of the E-ACSL plug-in of Frama-C.                   */
+/*  This file is part of the Frama-C's E-ACSL plug-in.                    */
 /*                                                                        */
-/*  Copyright (C) 2011                                                    */
+/*  Copyright (C) 2012                                                    */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -23,6 +23,10 @@
 /*************/
 /* GMP types */
 /*************/
+
+// [TODO] utiliser un champ modèle de type integer pour modéliser
+// l'entier exact correspondant à un mpz_t.
+// Not yet implemented in ACSL.
 
 typedef struct {
   int _mp_alloc;
