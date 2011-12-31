@@ -45,16 +45,9 @@ let name_of_mpz_arith_bop = function
   | Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr
   | Shiftlt | Shiftrt | PlusPI | IndexPI | MinusPI | MinusPP -> assert false
 
-let is_representable _n k _s = match k with
-  | IBool | IChar | IUChar | IUInt | IUShort | IULong | ISChar | IShort | IInt
-  | ILong ->
-    true
-  | ILongLong | IULongLong ->
-    false
-
 let constant_to_exp ?(loc=Location.unknown) = function
   | CInt64(n, k, s) ->
-    if is_representable n k s then kinteger64_repr ?loc k n s, false
+    if Typing.is_representable n k s then kinteger64_repr ?loc k n s, false
     else mkString ?loc (My_bigint.to_string n), true
   | CStr _ | CWStr _ | CChr _ | CReal _ | CEnum _ as c -> 
     new_exp ?loc (Const c), false
@@ -662,7 +655,7 @@ class e_acsl_visitor prj generate = object (self)
     let mk_block stmt =
       (* be careful: as this function is called in a post action, [env] has
 	 been modified since pre actions have been executed.
-	 Use [function_env] to store it. *)
+	 Use [function_env] to get it back. *)
       let env = !function_env in
       let mk_block b = mkStmt ~valid_sid:true (Block b) in
       let mk_post_env env =
@@ -683,7 +676,39 @@ class e_acsl_visitor prj generate = object (self)
 	  (* also handle the postcondition of the function and clear the env *)
 	  let env = Project.on prj (convert_post_spec env) !funspec in
 	  let b, env = Env.pop_and_get env stmt ~global_clear:true Env.After in
-	  mk_block b, env
+	  let new_stmt = mk_block b in
+	  let labels = stmt.labels in
+	  (match labels with
+	  | [] -> ()
+	  | _ :: _ ->
+	    (* move the labels of the return to the new block in order to
+	       evaluate the postcondition when jumping to them. *)
+	    stmt.labels <- [];
+	    new_stmt.labels <- labels @ new_stmt.labels;
+	    (* update the gotos of the function jumping to one of the labels *)
+	    let o = object 
+	      inherit Visitor.frama_c_inplace
+	      method vstmt_aux s = match s.skind with
+	      | Goto(s_ref, _) -> 
+		(* [!s_ref] and [stmt] are not part of the same project, thus it
+		   is safer to compare the ids than to use Stmt.equal *)
+		if !s_ref.sid = stmt.sid then s_ref := new_stmt; 
+		SkipChildren
+	      | _ -> DoChildren
+	      (* improve efficiency: skip childrens of vstmt which cannot
+		 contain any stmt *)
+	      method vinst _ = SkipChildren
+	      method vexpr _ = SkipChildren
+	      method vcode_annot _ = SkipChildren
+	      method vlval _ = SkipChildren
+	    end in
+	    let vis = Env.get_visitor env in
+	    let f = Extlib.the vis#current_func in
+	    let mv_label s =
+	      ignore (Visitor.visitFramacStmt o (get_stmt vis#behavior s))
+	    in
+	    List.iter mv_label f.sallstmts);
+	  new_stmt, env
 	else
 	  (* must generate [pre_block] which includes [stmt] before generating
 	     [post_block] *)

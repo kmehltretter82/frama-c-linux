@@ -24,12 +24,18 @@ open Cil_types
 
 (** Typing rules. *)
 
+(* TODO: to be improved *)
+
 val principal_type: logic_type -> logic_type -> logic_type
 val principal_type_from_term: term -> term -> logic_type
 
 val context_sensitive: 
   ?loc:location -> Env.t -> logic_type -> bool -> term option -> exp -> 
   exp * Env.t
+
+val is_representable: My_bigint.t -> ikind -> string option -> bool
+(** Is the given constant representable?
+    (See [Cil_types.CInt64] for details about arguments *)
 
 (*
 Local Variables:

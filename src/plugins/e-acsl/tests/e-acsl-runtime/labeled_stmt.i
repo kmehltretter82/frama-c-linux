@@ -1,0 +1,16 @@
+/* run.config
+   COMMENT: labeled stmt and gotos
+   EXECNOW: LOG gen_labeled_stmt.c BIN gen_labeled_stmt.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/labeled_stmt.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_labeled_stmt.c > /dev/null && gcc -pedantic -o ./tests/e-acsl-runtime/result/gen_labeled_stmt.out ./tests/e-acsl-runtime/result/gen_labeled_stmt.c -lgmp && ./tests/e-acsl-runtime/result/gen_labeled_stmt.out
+*/
+
+int X = 0;
+
+/*@ ensures X == 3; */
+int main(void) {
+  goto L1;
+ L1: /*@ assert X == 0; */ X = 1;
+  goto L2;
+ L2: /*@ requires X == 1; ensures X == 2; */ X = 2;
+  if (X) { X = 3; return 0; }
+  return 0;
+}

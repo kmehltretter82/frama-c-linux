@@ -110,6 +110,13 @@ let principal_type_from_term t1 t2 =
   in
   principal_type (typ t1) (typ t2) 
 
+let is_representable _n k _s = match k with
+  | IBool | IChar | IUChar | IUInt | IUShort | IULong | ISChar | IShort | IInt
+  | ILong ->
+    true
+  | ILongLong | IULongLong ->
+    false
+
 (*
 Local Variables:
 compile-command: "make"

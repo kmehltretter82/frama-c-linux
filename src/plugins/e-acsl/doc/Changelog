@@ -1,0 +1,24 @@
+###############################################################################
+# Preliminary notes:                                                          #
+# ------------------                                                          #
+# Mark "-": change with an impact for users (and possibly developers).        #
+# Mark "o": change with an impact for developers only.                        #
+# Mark "+": change for Frama-C-commits audience (not in html version)         #
+# Mark "*": bug fixed.                                                        #
+# Mark "!": change that can break compatibility with existing development.    #
+# '#nnn'   : BTS entry #nnn                                                   #
+# '#!nnn'  : BTS private entry #nnn                                           #
+# For compatibility with old change log formats:                              #
+# '#?nnn'  : OLD-BTS entry #nnn                                               #
+###############################################################################
+# Categories:
+#   E-ACSL: the Whole E-ACSL plug-in
+###############################################################################
+
+###################################
+Plugin E-ACSL 0.1 Nitrogen_20111001
+###################################
+
+-  E-ACSL         [2012/01/06] First release for the Hi-Lite FUI9 project.
+
+###################################
