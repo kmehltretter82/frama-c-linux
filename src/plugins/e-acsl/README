@@ -8,9 +8,9 @@
 
 0) Summary
 1) What Is
-2) Simple use
+2) Simple usage
 3) Examples
-4) Advanced uses
+4) Advanced usage
 5) Compatibility with previous releases
 6) Have Fun with E-ACSL!
 
@@ -21,23 +21,22 @@
 This package contains the Frama-C's E-ACSL plug-in. It takes as input an 
 annotated C program and returns the same program in which annotations have 
 been converted into C code dedicated to runtime assertion checking: this code 
-fails at runtime if and only if the annotation is wrong in the execution 
-context.
+fails at runtime if and only if the annotation is violated at runtime.
 
 Annotations must be written in a subset of ACSL (ANSI/ISO C Specification 
 Language), namely E-ACSL (Executable ANSI/ISO C Specification Language). E-ACSL
 is fully described in file doc/manuals/e-acsl.pdf.
 
-This plug-in is still under implementation: some parts of E-ACSL are not yet 
+This plug-in is still in a preliminary state: some parts of E-ACSL are not yet 
 implemented. What is supported is described in file 
 doc/manuals/e-acsl-implementation.pdf.
 
 Please read file INSTALL for details about the installation procedure of
-this plug-in and consult http://frama-c.com and http://frama-c.com/e-acsl 
+this plug-in and consult http://frama-c.com and http://frama-c.com/acsl 
 for information about Frama-C and ACSL.
 
 ===============================================================================
-				SIMPLE USE
+				SIMPLE USAGE
 ===============================================================================
 
 The standard use is the following:
@@ -45,7 +44,7 @@ The standard use is the following:
 $ frama-c -e-acsl <files> -then-on e-acsl -print -ocode generated_code.c
 
 Option -e-acsl runs the Frama-C's E-ACSL plug-in on the given <files>: it
-returns a new Frama-C project called `e-acsl'. Option -then-on switches to 
+computes a new Frama-C project called `e-acsl'. Option -then-on switches to 
 this project while options -print and -ocode pretty prints the corresponding C 
 code into file `generated_code'.
 
@@ -54,7 +53,7 @@ and -ocode) are standard Frama-C options, described in the Frama-C User Manual
 as well as the concept of Frama-C Project. 
 
 The generated file is a C file which usually depends on the GMP library
-(http://???).  The following commands compile and run it:
+(http://gmplib.org).  The following commands compile and run it:
 
 $ gcc generated_code.c -lgmp -o generated_code
 $ ./generated_code
@@ -109,12 +108,12 @@ linked against GMP (GCC's option -lgmp) to be able to produce an executable.
    that these examples never fail at runtime: all the annotations are valid.
 
 ===============================================================================
-				ADVANCED USES
+				ADVANCED USAGE
 ===============================================================================
 
 This E-ACSL plug-in is fully integrated within Frama-C: any standard Frama-C
-options may be used in order to custom the Frama-C execution. Read the Frama-C
-User Manual for additional information.
+options may be used in order to customize the Frama-C execution. Read the
+Frama-C User Manual for additional information.
 
 The list of E-ACSL option is available through the option -e-acsl-help:
 $ frama-c -e-acsl-help
@@ -157,7 +156,7 @@ User Manual for additional information.
 The list of E-ACSL option is available through the option -e-acsl-help:
 $ frama-c -e-acsl-help
 
-These options are the following.
+The following options are available:
 -e-acsl             generate a new project where E-ACSL annotations are
                     translated to executable C code
 -e-acsl-check       only type check E-ACSL annotated program

@@ -4,7 +4,6 @@
 
 - vérifier le code de la division et du modulo 
   (div et modulo mathématiques différents des div et modulo de l'ANSI C99)
-- voir les ??? dans le INSTALL et le README
 
 ########
 # CODE #
