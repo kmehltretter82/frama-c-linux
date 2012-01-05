@@ -2,9 +2,6 @@
 # NEXT RELEASE #
 ################
 
-- vérifier le code de la division et du modulo 
-  (div et modulo mathématiques différents des div et modulo de l'ANSI C99)
-
 ########
 # CODE #
 ########
@@ -22,6 +19,8 @@
   (generalisation of current Visit.principal_type)
 - customization des noms de variable générés 
   (par ex pour indiquer le nom de la variable d'origine, ou son rôle)
+- vérifier le code de la division et du modulo 
+  (div et modulo mathématiques différents des div et modulo de l'ANSI C99)
 
 ##############
 # KNOWN BUGS #
@@ -36,6 +35,4 @@
 
 - améliorer test "integer_constant.i" quand bug fixed #745
 - test sizeof.i devraient être plus précis quand logic_typing plus précis
-- structs
-- unions
 - inclure exemple du E-ACSL Reference Manual

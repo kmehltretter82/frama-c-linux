@@ -173,6 +173,11 @@ src-distrib: .depend
 	$(PRINT) Cleaning
 	$(RM) -fr $(EXPORT)
 
+WWW	= /localhome/julien/frama-c/doc/www
+install-distrib: src-distrib
+	$(PRINT) Copying to website
+	$(CP) $(EXPORT).tar.gz $(WWW)/distrib/download
+
 ##########
 # Header #
 ##########
