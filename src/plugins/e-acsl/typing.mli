@@ -37,6 +37,17 @@ val is_representable: My_bigint.t -> ikind -> string option -> bool
 (** Is the given constant representable?
     (See [Cil_types.CInt64] for details about arguments *)
 
+(******************************************************************************)
+(* NEW TYPE SYSTEM *)
+(******************************************************************************)
+
+val type_predicate: identified_predicate -> unit
+val typ_of_term: term -> typ
+
+val compute_quantif_guards_ref
+    : (predicate named -> logic_var list -> predicate named -> 
+       (term * relation * logic_var * relation * term) list) ref
+
 (*
 Local Variables:
 compile-command: "make"

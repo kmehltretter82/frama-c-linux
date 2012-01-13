@@ -407,7 +407,7 @@ let rec named_predicate_to_exp env p =
 	  Logic_const.pimplies ~loc (p2, p1)))
   | Pnot p ->
     let e, env = named_predicate_to_exp env p in
-    new_exp ~loc (UnOp(LNot, e, TInt(IInt, []))), env
+    new_exp ~loc (UnOp(LNot, e, intType)), env
   | Pif(t, p2, p3) ->
     let e1, env1 = term_to_exp env (Ctype intType) t in
     let (_, env2 as res2) = named_predicate_to_exp (Env.push env1) p2 in

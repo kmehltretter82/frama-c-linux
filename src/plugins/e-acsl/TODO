@@ -21,6 +21,7 @@
   (par ex pour indiquer le nom de la variable d'origine, ou son rôle)
 - vérifier le code de la division et du modulo 
   (div et modulo mathématiques différents des div et modulo de l'ANSI C99)
+- NULL implemented as 0
 
 ##############
 # KNOWN BUGS #

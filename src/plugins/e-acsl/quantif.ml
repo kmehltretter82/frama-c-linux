@@ -82,6 +82,8 @@ let compute_quantif_guards quantif bounded_vars hyps =
     Error.untypable msg);
   List.rev acc
 
+let () = Typing.compute_quantif_guards_ref := compute_quantif_guards
+
 module Label_ids = 
   State_builder.Counter(struct let name = "E_ACSL.Label_ids" end)
 
