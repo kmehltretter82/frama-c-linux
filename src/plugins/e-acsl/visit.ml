@@ -443,6 +443,14 @@ let assumes_predicate bhv =
     Logic_const.ptrue
     bhv.b_assumes
 
+let convert_named_predicate env p =
+  Typing.type_named_predicate p;
+  let e, env = named_predicate_to_exp env p in
+  assert (Typ.equal (typeOf e) intType);
+  Env.add_stmt
+    env
+    (Misc.mk_e_acsl_guard ~reverse:true (Env.annotation_kind env) e p)
+
 let convert_preconditions env behaviors =
   let env = Env.set_annotation_kind env Misc.Precondition in
   let do_behavior env b = 
@@ -455,10 +463,7 @@ let convert_preconditions env behaviors =
 	    ~loc
 	    (assumes_pred, Logic_const.unamed ~loc p.ip_content)
 	in
-	let e, env = named_predicate_to_exp env p in
-	Env.add_stmt 
-	  env 
-	  (Misc.mk_e_acsl_guard ~reverse:true (Env.annotation_kind env) e p))
+	convert_named_predicate env p)
       env
       b.b_requires
   in 
@@ -484,10 +489,7 @@ let convert_postconditions env behaviors =
 	      ~loc
 	      (Logic_const.pold ~loc assumes_pred, Logic_const.unamed ~loc p) 
 	  in
-	  let e, env = named_predicate_to_exp env p in
-	  Env.add_stmt
-	    env
-	    (Misc.mk_e_acsl_guard ~reverse:true (Env.annotation_kind env) e p)
+	  convert_named_predicate env p
 	| Exits | Breaks | Continues | Returns ->
 	  Error.not_yet "@[abnormal termination case in behavior@]")
       env
@@ -509,13 +511,6 @@ let convert_pre_spec env spec =
 
 let convert_post_spec env spec = 
   Error.handle (fun env -> convert_postconditions env spec.spec_behavior) env
-
-let convert_named_predicate env p =
-  let e, env = named_predicate_to_exp env p in
-  assert (Typ.equal (typeOf e) intType);
-  Env.add_stmt
-    env
-    (Misc.mk_e_acsl_guard ~reverse:true (Env.annotation_kind env) e p)
 
 let convert_pre_code_annotation env annot =
   let convert env = match annot.annot_content with
@@ -735,10 +730,15 @@ class e_acsl_visitor prj generate = object (self)
 end
 
 let do_visit ?(prj=Project.current ()) generate =
-  let vis = new e_acsl_visitor prj generate in
+  let vis = 
+    Extlib.try_finally 
+      ~finally:Typing.clear
+      (new e_acsl_visitor prj)
+      generate
+  in
   first_global := true;
-  (* explicit type annotation in order to check that no new method is introduced
-     by error *)
+  (* explicit type annotation in order to check that no new method is
+     introduced by error *)
   (vis : Visitor.frama_c_visitor)
 
 (*

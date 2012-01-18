@@ -128,7 +128,7 @@ module BI = My_bigint
 type eacsl_typ =
   | Interv of BI.t * BI.t
   | Z
-  | No_integral(* of logic_type*)
+  | No_integral of logic_type
 
 let typ_of_eacsl_typ = function
   | Interv(l, u) -> 
@@ -141,7 +141,12 @@ let typ_of_eacsl_typ = function
      with Not_found -> 
        Mpz.t)
   | Z -> Mpz.t
-  | No_integral(* _*) -> assert false
+  | No_integral (Ctype ty) -> ty
+  | No_integral (Ltype _) -> Error.not_yet "typing of user-defined logic type"
+  | No_integral (Lvar _) -> Error.not_yet "type variable"
+  | No_integral Linteger -> assert false
+  | No_integral Lreal -> Error.not_yet "real numbers"
+  | No_integral (Larrow _) -> Error.not_yet "functional type"
 
 let eacsl_typ_of_typ = function
   | TInt(k, _) as ty -> 
@@ -151,7 +156,7 @@ let eacsl_typ_of_typ = function
       else BI.zero, max_unsigned_number n
     in
     Interv(l, u)      
-  | _ -> No_integral
+  | ty -> No_integral (Ctype ty)
 
 exception Cannot_compare
 let meet ty1 ty2 = match ty1, ty2 with
@@ -159,16 +164,18 @@ let meet ty1 ty2 = match ty1, ty2 with
   | Interv _, Z -> ty1
   | Z, Interv _ -> ty2
   | Z, Z -> Z
-  | No_integral, No_integral -> No_integral
-  | (Z | Interv _), No_integral
-  | No_integral, (Z | Interv _) -> raise Cannot_compare
+  | No_integral t1, No_integral t2 when Logic_type.equal t1 t2 -> ty1
+  | No_integral _, No_integral _
+  | (Z | Interv _), No_integral _
+  | No_integral _, (Z | Interv _) -> raise Cannot_compare
 
 let join ty1 ty2 = match ty1, ty2 with
   | Interv(l1, u1), Interv(l2, u2) -> Interv(BI.min l1 l2, BI.max u1 u2)
   | Interv _, Z | Z, Interv _ | Z, Z -> Z
-  | No_integral, No_integral -> No_integral
-  | (Z | Interv _), No_integral
-  | No_integral, (Z | Interv _) -> raise Cannot_compare
+  | No_integral t1, No_integral t2 when Logic_type.equal t1 t2 -> ty1
+  | No_integral _, No_integral _
+  | (Z | Interv _), No_integral _
+  | No_integral _, (Z | Interv _) -> raise Cannot_compare
 
 module Global_env: sig 
   val get: term -> typ
@@ -189,21 +196,26 @@ end = struct
   let get t = try H.find tbl t with Not_found -> assert false
 
   let add t typ = 
-    assert (not (H.mem tbl t));
-    H.add tbl t (typ_of_eacsl_typ typ)
+    let ty = typ_of_eacsl_typ typ in
+    try 
+      let old = H.find tbl t in
+      assert (Typ.equal old ty) 
+    with Not_found -> 
+      H.add tbl t ty
 
 end
 
 let typ_of_term = Global_env.get
+let clear = Global_env.clear
 
 let int_to_interv n = 
   let b = BI.of_int n in
   Interv (b, b)
 
-let rec type_constant = function
+let rec type_constant ty = function
   | CInt64(n, _, _) -> Interv(n, n)
-  | CChr c -> type_constant (charConstToInt c)
-  | CStr _ | CWStr _ | CReal _ | CEnum _ -> No_integral 
+  | CChr c -> type_constant ty (charConstToInt c)
+  | CStr _ | CWStr _ | CReal _ | CEnum _ -> No_integral ty
 
 let size_of ty =
   try int_to_interv (sizeOf_int ty)
@@ -212,30 +224,31 @@ let size_of ty =
 let align_of ty = int_to_interv (alignOf_int ty)
 
 let rec type_term env t = 
+  let lty = t.term_type in
+  let get_cty t = match t.term_type with Ctype ty -> ty | _ -> assert false in
   let ty = match t.term_node with
-    | TConst c -> type_constant c
-    | TLval lv -> type_term_lval env t.term_type lv
+    | TConst c -> type_constant lty c
+    | TLval lv -> type_term_lval env lty lv
     | TSizeOf ty -> size_of ty
     | TSizeOfE t -> 
       ignore (type_term env t);
-      let ty = match t.term_type with
-	| Ctype ty -> ty
-	| _ -> assert false
-      in
-      size_of ty
+      size_of (get_cty t)
     | TSizeOfStr s -> int_to_interv (String.length s + 1 (* '\0' *)) 
     | TAlignOf ty -> align_of ty
     | TAlignOfE t ->
       ignore (type_term env t);
-      let ty = match t.term_type with
-	| Ctype ty -> ty
-	| _ -> assert false
-      in
-      align_of ty
+      align_of (get_cty t)
     | TUnOp(Neg, t) -> 
       unary_arithmetic
 	(fun l u -> let opp = BI.sub BI.zero in opp u, opp l) env t
-    | TUnOp(BNot, _) -> Error.not_yet "missing unary bitwise operator"
+    | TUnOp(BNot, t) ->
+      unary_arithmetic
+	(fun l u -> 
+	  let nl = BI.lognot l in
+	  let nu = BI.lognot u in
+	  BI.min nl nu, BI.max nl nu) 
+	env 
+	t
     | TUnOp(LNot, t) ->
       ignore (type_term env t);
       Interv(BI.zero, BI.one)
@@ -245,32 +258,28 @@ let rec type_term env t =
     | TBinOp((PlusPI | IndexPI | MinusPI | MinusPP), t1, t2) -> 
       ignore (type_term env t1);
       ignore (type_term env t2);
-      No_integral
+      No_integral lty
     | TBinOp(MinusA, t1, t2) -> 
       let sub l1 u1 l2 u2 = BI.sub l1 u2, BI.sub u1 l2 in
       binary_arithmetic sub env t1 t2
-    | TBinOp(Mult, t1, t2) -> 
-      let mul l1 u1 l2 u2 = 
-	(* probably not the most efficient, but the shortest *)
-	let a = BI.mul l1 l2 in
-	let b = BI.mul l1 u2 in
-	let c = BI.mul u1 l2 in
-	let d = BI.mul u1 u2 in
-	BI.min a (BI.min b (BI.min c d)), BI.max a (BI.max b (BI.max c d))
-      in
-      binary_arithmetic mul env t1 t2
+    | TBinOp(Mult, t1, t2) -> signed_rule BI.mul env t1 t2
     | TBinOp(Div, t1, t2) -> 
-      let div l1 u1 l2 u2 = 
-	(* probably not the most efficient, but the shortest *)
-	let a = BI.div l1 l2 in
-	let b = BI.div l1 u2 in
-	let c = BI.div u1 l2 in
-	let d = BI.div u1 u2 in
-	BI.min a (BI.min b (BI.min c d)), BI.max a (BI.max b (BI.max c d))
+      let div a b = 
+	try BI.c_div a b 
+	with Division_by_zero -> 
+	    (* either the generated code will be dead (e.g. [false && 1/0])
+	       or it contains a potential RTE and thus it is actually equivalent
+	       to dead code. In any case, any type is correct at this point and
+	       we generate the less restrictive one (0 is always representable)
+	       in order to be as more precise as possible. *)
+	    BI.zero
       in
-      binary_arithmetic div env t1 t2
-    | TBinOp(Mod, _t1, _t2) -> 
-      Error.not_yet "modulo"
+      signed_rule div env t1 t2
+    | TBinOp(Mod, t1, t2) -> 
+      let modu a b =
+	try BI.c_rem a b with Division_by_zero -> BI.zero (* see Div *)
+      in
+      signed_rule modu env t1 t2
     | TBinOp(Shiftlt, _t1, _t2) | TBinOp(Shiftrt, _t1, _t2) ->
       Error.not_yet "left/right shift"
     | TBinOp((Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr), t1, t2) -> 
@@ -283,7 +292,9 @@ let rec type_term env t =
       let ty_t = type_term env t in
       let ty_c = eacsl_typ_of_typ ty in
       (try meet ty_c ty_t with Cannot_compare -> ty_c)
-    | TAddrOf _ | TStartOf _ -> No_integral
+    | TAddrOf lv | TStartOf lv -> 
+      ignore (type_term_lval env lty lv);
+      No_integral lty
     | Tapp _ -> Error.not_yet "applying logic function"
     | Tlambda _ -> Error.not_yet "functional"
     | TDataCons _ -> Error.not_yet "constructor"
@@ -316,14 +327,23 @@ and type_term_lval env ty (h, o) =
   type_term_lhost env ty h
 
 and type_term_lhost env lty = function
-  | TVar lv -> (try Logic_var.Map.find lv env with Not_found -> assert false)
+  | TVar lv -> 
+    (try Logic_var.Map.find lv env 
+     with Not_found -> 
+       (* C variable *)
+       (*       match lty with*) (* don't work yet: see bts #1064 *)
+       match lv.lv_type with
+       | Ctype ty -> eacsl_typ_of_typ ty
+       | _ -> 
+	 Options.fatal "invalid type for logic var %a: %a" 
+	   Logic_var.pretty lv Logic_type.pretty lv.lv_type)
   | TResult ty -> eacsl_typ_of_typ ty
   | TMem t -> 
     ignore (type_term env t);
     match lty with 
     | Ctype ty -> eacsl_typ_of_typ ty
     | Linteger -> Z
-    | Ltype _ | Lvar _ | Lreal | Larrow _ -> No_integral
+    | Ltype _ | Lvar _ | Lreal | Larrow _ -> No_integral lty
 
 and type_term_offset env = function
   | TNoOffset -> ()
@@ -339,7 +359,7 @@ and unary_arithmetic op env t =
     let l, u = op l u in
     Interv (l, u)
   | Z -> Z
-  | No_integral -> assert false
+  | No_integral _ -> assert false
 
 and binary_arithmetic op env t1 t2 =
   let ty1 = type_term env t1 in
@@ -348,8 +368,20 @@ and binary_arithmetic op env t1 t2 =
   | Interv(l1, u1), Interv(l2, u2) -> 
     let l, u = op l1 u1 l2 u2 in
     Interv (l, u)
-  | No_integral, _ | _, No_integral -> assert false
+  | No_integral _, _ | _, No_integral _ -> assert false
   | _, Z | Z, _ -> Z
+
+and signed_rule op env t1 t2 =
+  (* probably not the most efficient way to compute the result, but the
+     shortest *) 
+  let compute l1 u1 l2 u2 = 
+    let a = op l1 l2 in
+    let b = op l1 u2 in
+    let c = op u1 l2 in
+    let d = op u1 u2 in
+    BI.min a (BI.min b (BI.min c d)), BI.max a (BI.max b (BI.max c d))
+  in
+  binary_arithmetic compute env t1 t2
 
 let compute_quantif_guards_ref
     : (predicate named -> logic_var list -> predicate named -> 
@@ -374,11 +406,10 @@ let rec type_predicate_named env p = match p.content with
     type_predicate_named env p2
   | Plet _ -> Error.not_yet "let _ = _ in _"
   | Pforall(bounded_vars, { content = Pimplies(hyps, goal) })
-  | Pexists(bounded_vars, { content = Pimplies(hyps, goal) }) ->
-    type_predicate_named env hyps;
+  | Pexists(bounded_vars, { content = Pand(hyps, goal) }) ->
     let env =
       List.fold_left
-	(fun _env (t1, r1, x, r2, t2) -> 
+	(fun env (t1, r1, x, r2, t2) -> 
 	  let ty1 = type_term env t1 in
 	  let ty1 = match ty1, r1 with
 	    | Interv(l, u), Rlt -> Interv(BI.add l BI.one, BI.add u BI.one)
@@ -399,6 +430,7 @@ let rec type_predicate_named env p = match p.content with
 	env
 	(!compute_quantif_guards_ref p bounded_vars hyps)
     in
+    type_predicate_named env hyps;
     type_predicate_named env goal
   | Pforall _ -> Error.not_yet "unguarded \\forall quantification"
   | Pexists _ -> Error.not_yet "unguarded \\exists quantification"
@@ -410,14 +442,10 @@ let rec type_predicate_named env p = match p.content with
   | Psubtype _ -> Error.not_yet "subtyping relation" (* Jessie specific *)
   | Pinitialized _ -> Error.not_yet "\\initialized"
 
-let type_id_predicate env p = 
-  type_predicate_named
-    env
-    { name = []; loc = Location.unknown; content = p.ip_content }
-
-let type_predicate p = 
-  Global_env.clear ();
-  type_id_predicate Logic_var.Map.empty p
+let type_named_predicate p = 
+  Options.debug ~level:2 "typing predicate %a" d_predicate_named p;
+  clear ();
+  type_predicate_named Logic_var.Map.empty p
 
 (*
 Local Variables:

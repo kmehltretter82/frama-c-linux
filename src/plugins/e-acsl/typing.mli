@@ -41,8 +41,9 @@ val is_representable: My_bigint.t -> ikind -> string option -> bool
 (* NEW TYPE SYSTEM *)
 (******************************************************************************)
 
-val type_predicate: identified_predicate -> unit
+val type_named_predicate: predicate named -> unit
 val typ_of_term: term -> typ
+val clear: unit -> unit
 
 val compute_quantif_guards_ref
     : (predicate named -> logic_var list -> predicate named -> 
