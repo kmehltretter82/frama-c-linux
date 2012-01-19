@@ -22,15 +22,24 @@
 
 open Cil_types
 
-(** Typing rules. *)
+(******************************************************************************)
+(** {2 Typing} *)
+(******************************************************************************)
 
-(* TODO: to be improved *)
+val typ_of_term: term -> typ
+val type_named_predicate: predicate named -> unit
+val type_term: term -> unit
+val unsafe_set_term: term -> typ -> unit
+val clear: unit -> unit
 
-val principal_type: logic_type -> logic_type -> logic_type
-val principal_type_from_term: term -> term -> logic_type
+(******************************************************************************)
+(** {2 Subtyping} *)
+(******************************************************************************)
+
+val principal_type: term -> term -> typ
 
 val context_sensitive: 
-  ?loc:location -> Env.t -> logic_type -> bool -> term option -> exp -> 
+  ?loc:location -> Env.t -> typ -> bool -> term option -> exp -> 
   exp * Env.t
 
 val is_representable: My_bigint.t -> ikind -> string option -> bool
@@ -38,12 +47,8 @@ val is_representable: My_bigint.t -> ikind -> string option -> bool
     (See [Cil_types.CInt64] for details about arguments *)
 
 (******************************************************************************)
-(* NEW TYPE SYSTEM *)
+(** {2 Internal stuff} *)
 (******************************************************************************)
-
-val type_named_predicate: predicate named -> unit
-val typ_of_term: term -> typ
-val clear: unit -> unit
 
 val compute_quantif_guards_ref
     : (predicate named -> logic_var list -> predicate named -> 

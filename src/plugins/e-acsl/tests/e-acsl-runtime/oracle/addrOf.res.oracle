@@ -37,7 +37,7 @@ int main(void)
   int x;
   x = 0;
   /*@ assert &x ≡ &x; */ ;
-  e_acsl_assert(! (& x == & x),(char *)"Assertion",(char *)"(&x == &x)",7);
+  e_acsl_assert(! (& x == & x),(char *)"Assertion",(char *)"(&x == &x)",8);
   __retres = 0;
   return (__retres);
 }

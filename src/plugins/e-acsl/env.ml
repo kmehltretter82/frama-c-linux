@@ -162,8 +162,7 @@ let new_var ?(global=false) env t ty mk_stmts =
     try
       match t with
       | None -> raise No_term
-      | Some t -> 
-	Term.Map.find t local_env.mpz_tbl.new_exps, env
+      | Some t -> Term.Map.find t local_env.mpz_tbl.new_exps, env
     with Not_found | No_term -> 
       do_new_var ~global env t ty mk_stmts  
 
@@ -173,15 +172,22 @@ let new_var_and_mpz_init ?global env t mk_stmts =
 module Logic_binding = struct
 
   let add env logic_v =
-  let v_ref = ref Varinfo.dummy in
-  let mk v _ = v_ref := v; [] in
-  let ty = match logic_v.lv_type with
-    | Ctype ty -> ty
-    | Linteger -> Mpz.t
-    | Ltype _ | Lvar _ | Lreal | Larrow _ -> assert false
-  in
-  let _, env = new_var env None ty mk in
-  { env with var_mapping = Logic_var.Map.add logic_v !v_ref env.var_mapping }
+    let v_ref = ref Varinfo.dummy in
+    let mk v _ = v_ref := v; [] in
+    let ty = match logic_v.lv_type with
+      | Ctype ty -> ty
+      | Linteger -> Mpz.t
+      | Ltype _ | Lvar _ | Lreal | Larrow _ as lty -> 
+	let msg = 
+	  Pretty_utils.sfprintf 
+	    "logic variable of type %a" Logic_type.pretty lty
+	in
+	Error.not_yet msg
+    in
+    let e, env = new_var env None ty mk in
+    !v_ref,
+    e, 
+    { env with var_mapping = Logic_var.Map.add logic_v !v_ref env.var_mapping }
 
   let get env logic_v = 
     try Logic_var.Map.find logic_v env.var_mapping

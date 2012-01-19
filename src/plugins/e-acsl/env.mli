@@ -54,7 +54,7 @@ val new_var_and_mpz_init:
     {!Mpz.init}. *)
 
 module Logic_binding: sig
-  val add: t -> logic_var -> t
+  val add: t -> logic_var -> varinfo * exp * t
   val get: t -> logic_var -> varinfo
   val remove: t -> logic_var -> t
 end

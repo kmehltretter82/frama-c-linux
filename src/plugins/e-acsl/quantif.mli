@@ -32,7 +32,7 @@ val quantif_to_exp: Env.t -> predicate named -> exp * Env.t
 (* ***********************************************************************)
 
 val named_predicate_to_exp_ref: (Env.t -> predicate named -> exp * Env.t) ref
-val term_to_exp_ref: (Env.t -> logic_type -> term -> exp * Env.t) ref
+val term_to_exp_ref: (Env.t -> typ option -> term -> exp * Env.t) ref
 
 (*
 Local Variables:

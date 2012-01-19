@@ -15,13 +15,8 @@
 - utiliser Rte pour tous les overflows potentiels
   (get_rte_annotations dans Oxygen)
 - [Yannick] Logic functions
-- type system for generating C types whenever possible 
-  (generalisation of current Visit.principal_type)
 - customization des noms de variable générés 
   (par ex pour indiquer le nom de la variable d'origine, ou son rôle)
-- vérifier le code de la division et du modulo 
-  (div et modulo mathématiques différents des div et modulo de l'ANSI C99)
-- NULL implemented as 0
 
 ##############
 # KNOWN BUGS #

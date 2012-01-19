@@ -22,123 +22,34 @@
 
 open Cil_types
 open Cil
-
-let compatible_type ty ty' = 
-  (* compatible if the two type has the same "integrality" *)
-  isIntegralType ty = isIntegralType ty'
-
-(* convert [e] corresponding to a term of type [ty] in a way that it is
-   compatible with the given context. *)
-let context_sensitive ?loc env ctx is_mpz_string t_opt e = 
-  let ty = typeOf e in
-  let mk_mpz env e = 
-    Env.new_var env t_opt Mpz.t (fun lv v -> [ Mpz.init_set (var lv) v e ]) 
-  in
-  let do_int_ctx ty' =
-    let e, env = if is_mpz_string then mk_mpz env e else e, env in
-    if Mpz.is_t ty || is_mpz_string then
-      (* cast the mpz into a C integer *)
-      let name = 
-	if isSignedInteger ty' then "__gmpz_get_si" else "__gmpz_get_ui" 
-      in
-      Options.warning
-	?source:(Extlib.opt_map fst loc)
-	~once:true
-	"@[missing guard for ensuring that the given integer is \
-C-representable@]"; 
-      Env.new_var 
-	env
-	None
-	ty'
-	(fun v _ -> [ Misc.mk_call ?loc ~result:(var v) name [ e ] ])
-    else
-      e, env
-  in
-  match ctx with
-  | Ctype ty' -> do_int_ctx ty'
-  | Linteger ->
-    if Mpz.is_t ty then
-      e, env
-    else begin
-      (* Convert the C integer into a mpz. 
-	 Remember: very long integer constant has been temporary converted into
-	 strings *)
-      assert (Options.verify
-		(isIntegralType ty || is_mpz_string) 
-		"how to convert %a to an integer?"
-		d_type ty); 
-      mk_mpz env e
-    end
-  | ty' when Logic_const.is_boolean_type ty' -> do_int_ctx intType
-  | Ltype _ | Lvar _ | Lreal | Larrow _ -> 
-    (* not yet supported, thus cannot occur at this point *)
-    assert false
-
-let principal_type ty ty' = match ty, ty' with
-  | Ctype ty, Ctype ty' when isIntegralType ty -> 
-    assert (isIntegralType ty');
-    Ctype (arithmeticConversion ty ty')
-  | Ctype ty, Linteger | Linteger, Ctype ty when isIntegralType ty -> Linteger
-  (* not possible to unify cases below (see caml bts #5432) *)
-  | Ctype ty1, Ctype ty2 when Mpz.is_t ty1 && isIntegralType ty2 -> Linteger
-  | Ctype ty2, Ctype ty1 when Mpz.is_t ty1 && isIntegralType ty2 -> Linteger
-  | Ctype tty, Ctype tty' -> 
-    assert (compatible_type tty tty');
-    ty
-  | Ctype _, Linteger | Linteger, Ctype _ -> Linteger
-  | Linteger, Linteger -> Linteger
-  | (Ltype _ | Lvar _ | Lreal | Larrow _), _
-  | _, (Ltype _ | Lvar _ | Lreal | Larrow _) -> 
-    (* not yet supported, thus cannot occur at this point *)
-    Options.error "What is this %a here?" d_logic_type ty'; 
-    assert false
-
-let principal_type_from_term t1 t2 =
-  let typ t = 
-    let ty = t.term_type in
-    if Logic_const.is_boolean_type ty then Ctype intType
-    else match t.term_node, ty with
-    | TConst (CInt64(_, (ILongLong | IULongLong), _)), Linteger -> 
-      (* constant potentially not representable in C *)
-      Linteger
-    | TConst (CInt64(_, k, _)), _ -> 
-      (* C-representable constant *)
-      Ctype (TInt (k, []))
-    | _, _ -> 
-      (* for direct C terms, should be able to infer the corresponding C type *)
-      ty
-  in
-  principal_type (typ t1) (typ t2) 
-
-let is_representable _n k _s = match k with
-  | IBool | IChar | IUChar | IUInt | IUShort | IULong | ISChar | IShort | IInt
-  | ILong ->
-    true
-  | ILongLong | IULongLong ->
-    false
-
-(******************************************************************************)
-(* NEW TYPE SYSTEM *)
-(******************************************************************************)
-
 open Cil_datatype
 
 module BI = My_bigint
+
+let is_representable n _k _s = BI.ge n BI.min_int64 && BI.le n BI.max_int64
+
+(******************************************************************************)
+(** Type Lattice *)
+(******************************************************************************)
 
 type eacsl_typ =
   | Interv of BI.t * BI.t
   | Z
   | No_integral of logic_type
 
+exception Not_representable
 let typ_of_eacsl_typ = function
   | Interv(l, u) -> 
     let is_pos = BI.ge l BI.zero in
     (try 
-       let mk k = TInt(k, []) in
-       let ty_l = mk (intKindForValue l is_pos) in
-       let ty_u = mk (intKindForValue u is_pos) in
+       let mk n k = 
+	 if true || is_representable n k false then TInt(k, []) 
+	 else raise Not_representable
+       in
+       let ty_l = mk l (intKindForValue l is_pos) in
+       let ty_u = mk u (intKindForValue u is_pos) in
        arithmeticConversion ty_l ty_u
-     with Not_found -> 
+     with Not_found | Not_representable -> 
        Mpz.t)
   | Z -> Mpz.t
   | No_integral (Ctype ty) -> ty
@@ -148,7 +59,7 @@ let typ_of_eacsl_typ = function
   | No_integral Lreal -> Error.not_yet "real numbers"
   | No_integral (Larrow _) -> Error.not_yet "functional type"
 
-let eacsl_typ_of_typ = function
+let eacsl_typ_of_typ ty = match unrollType ty with
   | TInt(k, _) as ty -> 
     let n = bitsSizeOf ty in
     let l, u = 
@@ -160,7 +71,11 @@ let eacsl_typ_of_typ = function
 
 exception Cannot_compare
 let meet ty1 ty2 = match ty1, ty2 with
-  | Interv(l1, u1), Interv(l2, u2) -> Interv(BI.max l1 l2, BI.min u1 u2)
+  | Interv(l1, u1), Interv(l2, u2) -> 
+    let l = BI.max l1 l2 in
+    let u = BI.min u1 u2 in
+    if BI.gt l u then raise Cannot_compare;
+    Interv(l, u)
   | Interv _, Z -> ty1
   | Z, Interv _ -> ty2
   | Z, Z -> Z
@@ -177,40 +92,50 @@ let join ty1 ty2 = match ty1, ty2 with
   | (Z | Interv _), No_integral _
   | No_integral _, (Z | Interv _) -> raise Cannot_compare
 
-module Global_env: sig 
-  val get: term -> typ
-  val add: term -> eacsl_typ -> unit
-  val clear: unit -> unit
-end = struct
-
-  module H = Hashtbl.Make
-    (struct
-      type t = term
-      let equal (t1:term) t2 = t1 == t2
-      let hash = Term.hash
-     end)
-
-  let tbl = H.create 17
-
-  let clear () = H.clear tbl
-  let get t = try H.find tbl t with Not_found -> assert false
-
-  let add t typ = 
-    let ty = typ_of_eacsl_typ typ in
-    try 
-      let old = H.find tbl t in
-      assert (Typ.equal old ty) 
-    with Not_found -> 
-      H.add tbl t ty
-
-end
-
-let typ_of_term = Global_env.get
-let clear = Global_env.clear
-
 let int_to_interv n = 
   let b = BI.of_int n in
   Interv (b, b)
+
+(******************************************************************************)
+(** Environments *)
+(******************************************************************************)
+
+module Make_env(X: sig type t val hash: t -> int end): sig 
+  val add: X.t -> eacsl_typ -> unit
+  val find: X.t -> eacsl_typ
+  val mem: X.t -> bool
+  val clear: unit -> unit
+end = struct
+
+  module H = Hashtbl.Make(struct include X let equal (t1:X.t) t2 = t1 == t2 end)
+  let tbl = H.create 17
+  let add = H.replace tbl
+  let find = H.find tbl
+  let mem = H.mem tbl
+  let clear () = H.clear tbl
+
+end
+
+module Term_env = Make_env(Term)
+module Logic_var_env = Make_env(Logic_var)
+
+let typ_of_term t = 
+  try 
+    let ty = Term_env.find t in
+    typ_of_eacsl_typ ty
+  with Not_found -> Options.fatal "untyped term %a" Term.pretty t
+
+let unsafe_set_term t ty =
+  assert (not (Term_env.mem t));
+  Term_env.add t (eacsl_typ_of_typ ty)
+
+let clear () = 
+  Term_env.clear (); 
+  Logic_var_env.clear ()
+
+(******************************************************************************)
+(** Typing rules *)
+(******************************************************************************)
 
 let rec type_constant ty = function
   | CInt64(n, _, _) -> Interv(n, n)
@@ -223,46 +148,45 @@ let size_of ty =
 
 let align_of ty = int_to_interv (alignOf_int ty)
 
-let rec type_term env t = 
+let rec type_term t = 
   let lty = t.term_type in
   let get_cty t = match t.term_type with Ctype ty -> ty | _ -> assert false in
   let ty = match t.term_node with
     | TConst c -> type_constant lty c
-    | TLval lv -> type_term_lval env lty lv
+    | TLval lv -> type_term_lval lv
     | TSizeOf ty -> size_of ty
     | TSizeOfE t -> 
-      ignore (type_term env t);
+      ignore (type_term t);
       size_of (get_cty t)
     | TSizeOfStr s -> int_to_interv (String.length s + 1 (* '\0' *)) 
     | TAlignOf ty -> align_of ty
     | TAlignOfE t ->
-      ignore (type_term env t);
+      ignore (type_term t);
       align_of (get_cty t)
     | TUnOp(Neg, t) -> 
       unary_arithmetic
-	(fun l u -> let opp = BI.sub BI.zero in opp u, opp l) env t
+	(fun l u -> let opp = BI.sub BI.zero in opp u, opp l) t
     | TUnOp(BNot, t) ->
       unary_arithmetic
 	(fun l u -> 
 	  let nl = BI.lognot l in
 	  let nu = BI.lognot u in
 	  BI.min nl nu, BI.max nl nu) 
-	env 
 	t
     | TUnOp(LNot, t) ->
-      ignore (type_term env t);
+      ignore (type_term t);
       Interv(BI.zero, BI.one)
     | TBinOp(PlusA, t1, t2) -> 
       let add l1 u1 l2 u2 = BI.add l1 l2, BI.add u1 u2 in
-      binary_arithmetic add env t1 t2
+      binary_arithmetic add t1 t2
     | TBinOp((PlusPI | IndexPI | MinusPI | MinusPP), t1, t2) -> 
-      ignore (type_term env t1);
-      ignore (type_term env t2);
+      ignore (type_term t1);
+      ignore (type_term t2);
       No_integral lty
     | TBinOp(MinusA, t1, t2) -> 
       let sub l1 u1 l2 u2 = BI.sub l1 u2, BI.sub u1 l2 in
-      binary_arithmetic sub env t1 t2
-    | TBinOp(Mult, t1, t2) -> signed_rule BI.mul env t1 t2
+      binary_arithmetic sub t1 t2
+    | TBinOp(Mult, t1, t2) -> signed_rule BI.mul t1 t2
     | TBinOp(Div, t1, t2) -> 
       let div a b = 
 	try BI.c_div a b 
@@ -274,36 +198,36 @@ let rec type_term env t =
 	       in order to be as more precise as possible. *)
 	    BI.zero
       in
-      signed_rule div env t1 t2
+      signed_rule div t1 t2
     | TBinOp(Mod, t1, t2) -> 
       let modu a b =
 	try BI.c_rem a b with Division_by_zero -> BI.zero (* see Div *)
       in
-      signed_rule modu env t1 t2
+      signed_rule modu t1 t2
     | TBinOp(Shiftlt, _t1, _t2) | TBinOp(Shiftrt, _t1, _t2) ->
       Error.not_yet "left/right shift"
     | TBinOp((Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr), t1, t2) -> 
-      ignore (type_term env t1);
-      ignore (type_term env t2);
+      ignore (type_term t1);
+      ignore (type_term t2);
       Interv(BI.zero, BI.one)
     | TBinOp((BAnd | BXor | BOr), _t1, _t2) -> 
       Error.not_yet "missing binary bitwise operator"
     | TCastE(ty, t) -> 
-      let ty_t = type_term env t in
+      let ty_t = type_term t in
       let ty_c = eacsl_typ_of_typ ty in
       (try meet ty_c ty_t with Cannot_compare -> ty_c)
     | TAddrOf lv | TStartOf lv -> 
-      ignore (type_term_lval env lty lv);
+      ignore (type_term_lval lv);
       No_integral lty
     | Tapp _ -> Error.not_yet "applying logic function"
     | Tlambda _ -> Error.not_yet "functional"
     | TDataCons _ -> Error.not_yet "constructor"
     | Tif(t1, t2, t3) -> 
-      ignore (type_term env t1);
-      let ty2 = type_term env t2 in
-      let ty3 = type_term env t3 in
+      ignore (type_term t1);
+      let ty2 = type_term t2 in
+      let ty3 = type_term t3 in
       (try join ty2 ty3 with Cannot_compare -> assert false)
-    | Tat(t, _) -> type_term env t
+    | Tat(t, _) -> type_term t
     | Tbase_addr _ -> Error.not_yet "\\base_addr"
     | Tblock_length _ -> Error.not_yet "\\block_length"
     | Tnull -> int_to_interv 0
@@ -319,16 +243,16 @@ let rec type_term env t =
     | Trange _ -> Error.not_yet "range"
     | Tlet _ -> Error.not_yet "let binding"
   in
-  Global_env.add t ty;
+  Term_env.add t ty;
   ty
 
-and type_term_lval env ty (h, o) =
-  type_term_offset env o;
-  type_term_lhost env ty h
+and type_term_lval (h, o) =
+  type_term_offset o;
+  type_term_lhost h
 
-and type_term_lhost env lty = function
+and type_term_lhost = function
   | TVar lv -> 
-    (try Logic_var.Map.find lv env 
+    (try Logic_var_env.find lv 
      with Not_found -> 
        (* C variable *)
        (*       match lty with*) (* don't work yet: see bts #1064 *)
@@ -339,21 +263,22 @@ and type_term_lhost env lty = function
 	   Logic_var.pretty lv Logic_type.pretty lv.lv_type)
   | TResult ty -> eacsl_typ_of_typ ty
   | TMem t -> 
-    ignore (type_term env t);
-    match lty with 
-    | Ctype ty -> eacsl_typ_of_typ ty
-    | Linteger -> Z
-    | Ltype _ | Lvar _ | Lreal | Larrow _ -> No_integral lty
+    let ty = type_term t in
+    (* got a pointer *)
+    match ty with
+    | No_integral (Ctype (TPtr(ty, _) | TArray(ty, _, _, _))) ->
+      eacsl_typ_of_typ ty
+    | No_integral _ | Z | Interv _ -> assert false
 
-and type_term_offset env = function
+and type_term_offset = function
   | TNoOffset -> ()
-  | TField(_, o) -> type_term_offset env o
+  | TField(_, o) -> type_term_offset o
   | TIndex(t, o) ->
-    ignore (type_term env t);
-    type_term_offset env o
+    ignore (type_term t);
+    type_term_offset o
 
-and unary_arithmetic op env t = 
-  let ty = type_term env t in
+and unary_arithmetic op t = 
+  let ty = type_term t in
   match ty with
   | Interv(l, u) -> 
     let l, u = op l u in
@@ -361,9 +286,9 @@ and unary_arithmetic op env t =
   | Z -> Z
   | No_integral _ -> assert false
 
-and binary_arithmetic op env t1 t2 =
-  let ty1 = type_term env t1 in
-  let ty2 = type_term env t2 in
+and binary_arithmetic op t1 t2 =
+  let ty1 = type_term t1 in
+  let ty2 = type_term t2 in
   match ty1, ty2 with
   | Interv(l1, u1), Interv(l2, u2) -> 
     let l, u = op l1 u1 l2 u2 in
@@ -371,7 +296,7 @@ and binary_arithmetic op env t1 t2 =
   | No_integral _, _ | _, No_integral _ -> assert false
   | _, Z | Z, _ -> Z
 
-and signed_rule op env t1 t2 =
+and signed_rule op t1 t2 =
   (* probably not the most efficient way to compute the result, but the
      shortest *) 
   let compute l1 u1 l2 u2 = 
@@ -381,60 +306,58 @@ and signed_rule op env t1 t2 =
     let d = op u1 u2 in
     BI.min a (BI.min b (BI.min c d)), BI.max a (BI.max b (BI.max c d))
   in
-  binary_arithmetic compute env t1 t2
+  binary_arithmetic compute t1 t2
 
 let compute_quantif_guards_ref
     : (predicate named -> logic_var list -> predicate named -> 
        (term * relation * logic_var * relation * term) list) ref
     = Extlib.mk_fun "compute_quantif_guards_ref"
 
-let rec type_predicate_named env p = match p.content with
+let rec type_predicate_named p = match p.content with
   | Pfalse | Ptrue -> ()
   | Papp _ -> Error.not_yet "logic function application"
   | Pseparated _ -> Error.not_yet "separated"
   | Prel(_, t1, t2) -> 
-    ignore (type_term env t1);
-    ignore (type_term env t2)
+    ignore (type_term t1);
+    ignore (type_term t2)
   | Pand(p1, p2) | Por(p1, p2) | Pxor(p1, p2) | Pimplies(p1, p2) 
   | Piff(p1, p2) ->
-    type_predicate_named env p1;
-    type_predicate_named env p2
-  | Pnot p -> type_predicate_named env p
+    type_predicate_named p1;
+    type_predicate_named p2
+  | Pnot p -> type_predicate_named p
   | Pif(t, p1, p2) -> 
-    ignore (type_term env t);
-    type_predicate_named env p1;
-    type_predicate_named env p2
+    ignore (type_term t);
+    type_predicate_named p1;
+    type_predicate_named p2
   | Plet _ -> Error.not_yet "let _ = _ in _"
   | Pforall(bounded_vars, { content = Pimplies(hyps, goal) })
   | Pexists(bounded_vars, { content = Pand(hyps, goal) }) ->
-    let env =
-      List.fold_left
-	(fun env (t1, r1, x, r2, t2) -> 
-	  let ty1 = type_term env t1 in
-	  let ty1 = match ty1, r1 with
-	    | Interv(l, u), Rlt -> Interv(BI.add l BI.one, BI.add u BI.one)
-	    | Interv(l, u), Rle -> Interv(l, u)
-	    | Z, (Rlt | Rle) -> Z
-	    | _, _ -> assert false
-	  in
-	  let ty2 = type_term env t2 in
-	  (* add one here, since we increment the loop counter one more time
-	     before going out the loop. *)
-	  let ty2 = match ty2, r2 with
-	    | Interv(l, u), Rlt -> Interv(l, u)
-	    | Interv(l, u), Rle -> Interv(BI.add l BI.one, BI.add u BI.one)
-	    | Z, (Rlt | Rle) -> Z
-	    | _, _ -> assert false
-	  in
-	  Logic_var.Map.add x (join ty1 ty2) env)
-	env
-	(!compute_quantif_guards_ref p bounded_vars hyps)
-    in
-    type_predicate_named env hyps;
-    type_predicate_named env goal
+    let guards = !compute_quantif_guards_ref p bounded_vars hyps in
+    List.iter
+      (fun (t1, r1, x, r2, t2) -> 
+	let ty1 = type_term t1 in
+	let ty1 = match ty1, r1 with
+	  | Interv(l, u), Rlt -> Interv(BI.add l BI.one, BI.add u BI.one)
+	  | Interv(l, u), Rle -> Interv(l, u)
+	  | Z, (Rlt | Rle) -> Z
+	  | _, _ -> assert false
+	in
+	let ty2 = type_term t2 in
+	(* add one here, since we increment the loop counter one more time
+	   before going out the loop. *)
+	let ty2 = match ty2, r2 with
+	  | Interv(l, u), Rlt -> Interv(l, u)
+	  | Interv(l, u), Rle -> Interv(BI.add l BI.one, BI.add u BI.one)
+	  | Z, (Rlt | Rle) -> Z
+	  | _, _ -> assert false
+	in
+	Logic_var_env.add x (join ty1 ty2))
+      guards;
+    type_predicate_named hyps;
+    type_predicate_named goal
   | Pforall _ -> Error.not_yet "unguarded \\forall quantification"
   | Pexists _ -> Error.not_yet "unguarded \\exists quantification"
-  | Pat(p, _) -> type_predicate_named env p
+  | Pat(p, _) -> type_predicate_named p
   | Pvalid _ ->  Error.not_yet "\\valid"
   | Pvalid_index _ -> Error.not_yet "\\valid_index"
   | Pvalid_range _ -> Error.not_yet "\\valid_range"
@@ -442,10 +365,78 @@ let rec type_predicate_named env p = match p.content with
   | Psubtype _ -> Error.not_yet "subtyping relation" (* Jessie specific *)
   | Pinitialized _ -> Error.not_yet "\\initialized"
 
+let type_term t = ignore (type_term t)
+
 let type_named_predicate p = 
   Options.debug ~level:2 "typing predicate %a" d_predicate_named p;
   clear ();
-  type_predicate_named Logic_var.Map.empty p
+  type_predicate_named p
+
+(******************************************************************************)
+(** Subtyping *)
+(******************************************************************************)
+
+(* convert [e] in a way that it is compatible with the given typing context. *)
+let context_sensitive ?loc env ctx is_mpz_string t_opt e = 
+  let ty = typeOf e in
+  let mk_mpz e = 
+    Env.new_var env t_opt Mpz.t (fun lv v -> [ Mpz.init_set (var lv) v e ])
+  in
+  let do_int_ctx ty =
+    let e, env = if is_mpz_string then mk_mpz e else e, env in
+    if Mpz.is_t ty || is_mpz_string then
+      (* cast the mpz into a C integer *)
+      let name, new_ty = 
+	if isSignedInteger ty then 
+	  "__gmpz_get_si", longType
+	else
+	  "__gmpz_get_ui", ulongType 
+      in
+      Options.warning
+	?source:(Extlib.opt_map fst loc)
+	~once:true
+	"@[missing guard for ensuring that the given integer is \
+C-representable@]"; 
+     Env.new_var 
+       env
+       None
+       new_ty
+       (fun v _ -> [ Misc.mk_call ?loc ~result:(var v) name [ e ] ])
+    else
+      (if isIntegralType ctx && isIntegralType ty then 
+	  mkCast e (arithmeticConversion ctx ty)
+       else
+	  e),
+      env
+  in
+  if Mpz.is_t ctx then
+    if Mpz.is_t ty then
+      e, env
+    else begin
+      (* Convert the C integer into a mpz. 
+	 Remember: very long integer constants have been temporary converted
+	 into strings *)
+      assert (Options.verify
+		(isIntegralType ty || is_mpz_string) 
+		"how to convert %a to an integer?"
+		d_type ty); 
+      mk_mpz e
+    end
+  else if isIntegralType ctx then do_int_ctx ty
+  else e, env
+
+let principal_type t1 t2 = 
+  let ty1 = typ_of_term t1 in
+  let ty2 = typ_of_term t2 in
+  (* possible to get an integralType (or Mpz.t) with a non-one in the case of
+     \null *)
+  if isIntegralType ty1 then
+    if isIntegralType ty2 then arithmeticConversion ty1 ty2
+    else if Mpz.is_t ty2 then ty2 else ty1
+  else if Mpz.is_t ty1 then
+    if isIntegralType ty2 || Mpz.is_t ty2 then ty1 else ty2
+  else 
+    ty2
 
 (*
 Local Variables:

@@ -57,7 +57,7 @@ let conditional_to_exp loc ctx e1 (e2, env2) (e3, env3) =
   Env.new_var
     env
     None
-    (match ctx with Linteger -> Mpz.t | Ctype ty -> ty | _ -> assert false)
+    ctx
     (fun v _ -> 
       let lv = var v in
       let affect e = mkStmt ~valid_sid:true (Instr (Set(lv, e, loc))) in
@@ -86,7 +86,7 @@ let rec thost_to_host env = function
     | Return(Some { enode = Lval (lhost, NoOffset) }, _) -> lhost, env
     | _ -> assert false)
   | TMem t ->
-    let e, env = term_to_exp env (Ctype intType) t in
+    let e, env = term_to_exp env None t in
     Options.warning ~source:(fst e.eloc) ~once:true
       "@[missing guard for ensuring that@ %a is a valid memory access@]"
       d_term t;
@@ -99,7 +99,7 @@ and toffset_to_offset ?loc env = function
     let offset, env = toffset_to_offset ?loc env offset in
     Field(f, offset), env
   | TIndex(t, offset) -> 
-    let e, env = term_to_exp env (Ctype intType) t in
+    let e, env = term_to_exp env (Some intType) t in
     Options.warning ~source:(fst e.eloc) ~once:true
       "@[missing guard for ensuring that@ %a is a valid array index@]"
       d_term t;
@@ -123,57 +123,66 @@ and context_insensitive_term_to_exp env t =
     new_exp ~loc (Lval lv), env, false
   | TSizeOf ty -> sizeOf ~loc ty, env, false
   | TSizeOfE t ->
-    let ty = t.term_type in
-    assert (match ty with Ctype _ -> true | _ -> false);
-    let e, env = term_to_exp env ty t in
+    let ctx = match t.term_type with Ctype ty -> ty | _ -> assert false in
+    let e, env = term_to_exp env (Some ctx) t in
     sizeOf ~loc (typeOf e), env, false
   | TSizeOfStr s -> new_exp ~loc (SizeOfStr s), env, false
   | TAlignOf ty -> new_exp ~loc (AlignOf ty), env, false
   | TAlignOfE t ->
-    let ty = t.term_type in
-    assert (match ty with Ctype _ -> true | _ -> false);
-    let e, env = term_to_exp env ty t in
+    let ctx = match t.term_type with Ctype ty -> ty | _ -> assert false in
+    let e, env = term_to_exp env (Some ctx) t in
     new_exp ~loc (AlignOfE e), env, false
   | TUnOp(Neg | BNot as op, t') ->
-    let e, env = term_to_exp env Linteger t' in
-    let name = match op with
-      | Neg -> "__gmpz_neg"
-      | BNot -> "__gmpz_com"
-      | LNot -> assert false
-    in
-    let e, env = 
-      Env.new_var_and_mpz_init
-	env
-	(Some t)
-	(fun _ ev -> [ Misc.mk_call ~loc name [ ev; e ] ])
-    in
-    e, env, false
+    let ty = Typing.typ_of_term t in
+    let e, env = term_to_exp env (Some ty) t' in
+    if Mpz.is_t ty then
+      let name = match op with
+	| Neg -> "__gmpz_neg"
+	| BNot -> "__gmpz_com"
+	| LNot -> assert false
+      in
+      let e, env = 
+	Env.new_var_and_mpz_init
+	  env
+	  (Some t)
+	  (fun _ ev -> [ Misc.mk_call ~loc name [ ev; e ] ])
+      in
+      e, env, false
+    else begin
+      assert (isIntegralType ty);
+      new_exp ~loc (UnOp(op, e, ty)), env, false      
+    end
   | TUnOp(LNot, t) ->
-    let ty = t.term_type in
-    let e, env = term_to_exp env ty t in
+    let ty = Typing.typ_of_term t in
     (* TODO: preserve the old behavior. But that is incorrect if [t] is an 
        integer since we have to implement a ! over mpz values.
        Such a case is actually possible. *)
-    assert (not (Mpz.is_t (typeOf e)));
-    new_exp ~loc (UnOp(LNot, e, intType)), env, false
+    assert (not (Mpz.is_t ty));
+    let e, env = term_to_exp env (Some ty) t in
+    new_exp ~loc (UnOp(LNot, e, ty)), env, false
   | TBinOp(PlusA | MinusA | Mult as bop, t1, t2) ->
-    (* arithmetic binary operator not safely convertible into C *)
-    let e1, env = term_to_exp env Linteger t1 in
-    let e2, env = term_to_exp env Linteger t2 in
-    assert (Typ.equal (typeOf e1) (typeOf e2));
-    let name = name_of_mpz_arith_bop bop in
-    let mk_stmts _ e = [ Misc.mk_call ~loc name [ e; e1; e2 ] ] in
-    let e, env = Env.new_var_and_mpz_init env (Some t) mk_stmts in
-    e, env, false
-  | TBinOp(Div | Mod as bop, t1, t2) ->
-    (* arithmetic binary operator potentially convertible into C *)
-    let ctx = Typing.principal_type_from_term t1 t2 in
+    let ty = Typing.typ_of_term t in
+    let ctx = Some ty in
     let e1, env = term_to_exp env ctx t1 in
     let e2, env = term_to_exp env ctx t2 in
+    if Mpz.is_t ty then
+      let name = name_of_mpz_arith_bop bop in
+      let mk_stmts _ e = [ Misc.mk_call ~loc name [ e; e1; e2 ] ] in
+      let e, env = Env.new_var_and_mpz_init env (Some t) mk_stmts in
+      e, env, false
+    else
+      new_exp ~loc (BinOp(bop, e1, e2, ty)), env, false
+  | TBinOp(Div | Mod as bop, t1, t2) ->
+    let ty = Typing.typ_of_term t in
+    let ctx = Some ty in
+    let e1, env = term_to_exp env ctx t1 in
+    let e2, env = term_to_exp env ctx t2 in
+    (* [TODO] can now do better since the type system got some info about
+       possible values of [t2] *)
     (* guarding divisions and modulos *)
     let zero = Logic_const.tinteger ~ikind:IInt 0 in
     (* do not generate [e2] from [t2] twice *)
-    let guard, env = comparison_to_exp env ~e1:(e2, ctx) Eq t2 zero (Some t) in
+    let guard, env = comparison_to_exp env ~e1:(e2, ty) Eq t2 zero (Some t) in
     let mk_stmts v e = 
       let name = name_of_mpz_arith_bop bop in
       let cond = 
@@ -183,20 +192,23 @@ and context_insensitive_term_to_exp env t =
 	  (Logic_const.prel ~loc (Req, t2, zero)) 
       in
       Env.add_assert env cond (Logic_const.prel (Rneq, t2, zero));
-      let instr = match ctx with
-	| Ctype ty when isIntegralType ty -> 
+      let instr = 
+	if Mpz.is_t ty then Misc.mk_call ~loc name [ e; e1; e2 ] 
+	else begin
+	  assert (isIntegralType ty);
 	  let e = new_exp ~loc (BinOp(bop, e1, e2, ty)) in
 	  mkStmtOneInstr ~valid_sid:true (Set((Var v, NoOffset), e, loc))
-	| Linteger -> Misc.mk_call ~loc name [ e; e1; e2 ]
-	| _ -> assert false
+	end
       in
       [ cond; instr ]
     in
     let t = Some t in
-    let e, env = match ctx with
-      | Ctype ty when isIntegralType ty -> Env.new_var env t ty mk_stmts 
-      | Linteger -> Env.new_var_and_mpz_init env t mk_stmts
-      | _ -> assert false
+    let e, env = 
+      if Mpz.is_t ty then Env.new_var_and_mpz_init env t mk_stmts
+      else begin
+	assert (isIntegralType ty);
+	Env.new_var env t ty mk_stmts 
+      end
     in
     e, env, false
   | TBinOp(Lt | Gt | Le | Ge | Eq | Ne as bop, t1, t2) ->
@@ -208,17 +220,19 @@ and context_insensitive_term_to_exp env t =
     Error.not_yet "left/right shift"
   | TBinOp(LOr, t1, t2) ->
     (* t1 || t2 <==> if t1 then true else t2 *)
-    let ty = Typing.principal_type_from_term t1 t2 in
-    let e1, env1 = term_to_exp env ty t1 in
+    let ty = Typing.principal_type t1 t2 in
+    let ctx = Some ty in
+    let e1, env1 = term_to_exp env ctx t1 in
     let env' = Env.push env1 in
-    let res2 = term_to_exp (Env.push env') ty t2 in
+    let res2 = term_to_exp (Env.push env') ctx t2 in
     let e, env = conditional_to_exp loc ty e1 (one loc, env') res2 in
     e, env, false
   | TBinOp(LAnd, t1, t2) ->
     (* t1 && t2 <==> if t1 then t2 else false *)
-    let ty = Typing.principal_type_from_term t1 t2 in
-    let e1, env1 = term_to_exp env ty t1 in
-    let _, env2 as res2 = term_to_exp (Env.push env1) ty t2 in
+    let ty = Typing.principal_type t1 t2 in
+    let ctx = Some ty in
+    let e1, env1 = term_to_exp env ctx t1 in
+    let _, env2 as res2 = term_to_exp (Env.push env1) ctx t2 in
     let env3 = Env.push env2 in
     let e, env = conditional_to_exp loc ty e1 res2 (zero loc, env3) in
     e, env, false
@@ -228,22 +242,23 @@ and context_insensitive_term_to_exp env t =
   | TBinOp(PlusPI | IndexPI | MinusPI | MinusPP as bop, t1, t2) ->
     (* binary operation over pointers *)
     (* [TODO] untested *)
-    let ctx_type t = match t.term_type with
-      | Linteger -> 
-	(* convert integer to int type for pointer arith *)
-	Ctype intType 
-      | ty -> ty
+    let ctx1, ctx2, ty = 
+      (* ISO C, Section 6.5.6: either the first argument is a pointer and the
+	 second is an integer type, or the reverse *)
+      let ty1 = Typing.typ_of_term t1 in
+      let ty2 = Typing.typ_of_term t2 in
+      if Mpz.is_t ty1 then Some longType, Some ty2, ty2
+      else if Mpz.is_t ty2 then Some ty1, Some longType, ty1
+      else Some ty1, Some ty2, if isIntegralType ty1  then ty2 else ty1
     in
-    let e1, env = term_to_exp env (ctx_type t1) t1 in
-    let e2, env = term_to_exp env (ctx_type t2) t2 in
+    let e1, env = term_to_exp env ctx1 t1 in
+    let e2, env = term_to_exp env ctx2 t2 in
     Options.warning ~source:(fst loc) ~once:true
       "@[missing guard for ensuring that@ %a is a valid pointer@]"
       d_term t;
-    (* the type of the result is the same than type of the pointer [e1],
-       whatever is [e2] *)
-    new_exp ~loc (BinOp(bop, e1, e2, typeOf e1)), env, false
+    new_exp ~loc (BinOp(bop, e1, e2, ty)), env, false
   | TCastE(ty, t) ->
-    let e, env = term_to_exp env (Ctype ty) t in
+    let e, env = term_to_exp env (Some ty) t in
     mkCast e ty, env, false
   | TAddrOf lv -> 
     let lv, env = tlval_to_lval env lv in
@@ -255,15 +270,16 @@ and context_insensitive_term_to_exp env t =
   | Tlambda _ -> Error.not_yet "functional"
   | TDataCons _ -> Error.not_yet "constructor"
   | Tif(t1, t2, t3) -> 
-    let e1, env1 = term_to_exp env (Ctype intType) t1 in
-    let ty = Typing.principal_type_from_term t2 t3 in
-    let (_, env2 as res2) = term_to_exp (Env.push env1) ty t2 in
-    let res3 = term_to_exp (Env.push env2) ty t3 in
+    let e1, env1 = term_to_exp env (Some intType) t1 in
+    let ty = Typing.principal_type t2 t3 in
+    let ctx = Some ty in
+    let (_, env2 as res2) = term_to_exp (Env.push env1) ctx t2 in
+    let res3 = term_to_exp (Env.push env2) ctx t3 in
     let e, env = conditional_to_exp loc ty e1 res2 res3 in
     e, env, false
   | Tat(t', label) ->
     (* convert [t'] to [e] in a separated local env *)
-    let e, env = term_to_exp (Env.push env) t'.term_type t' in
+    let e, env = term_to_exp (Env.push env) None t' in
     at_to_exp env (Some t) label e
   | Tbase_addr _ -> Error.not_yet "\\base_addr"
   | Tblock_length _ -> Error.not_yet "\\block_length"
@@ -285,27 +301,23 @@ and context_insensitive_term_to_exp env t =
    constructs. *)
 and term_to_exp env ctx t = 
   let e, env, is_mpz_string = context_insensitive_term_to_exp env t in
-  Typing.context_sensitive ~loc:t.term_loc env ctx is_mpz_string (Some t) e
+  match ctx with
+  | None -> e, env
+  | Some ty -> 
+    Typing.context_sensitive ~loc:t.term_loc env ty is_mpz_string (Some t) e
 
 (* generate the C code equivalent to [t1 bop t2]. *)
 and comparison_to_exp ?(loc=Location.unknown) ?e1 env bop t1 t2 t_opt =
-  let ctx = match e1 with
-    | None -> Typing.principal_type_from_term t1 t2 
-    | Some(_, ctx) -> 
-      (*      Options.feedback "principality oriented by %a" d_logic_type ctx;*)
-      Typing.principal_type_from_term { t1 with term_type = ctx } t2
+  let e1, env, ctx = match e1 with
+    | None -> 
+      let ctx = Typing.principal_type t1 t2  in
+      let e1, env = term_to_exp env (Some ctx) t1 in
+      e1, env, ctx
+    | Some(e1, ctx) -> 
+      e1, env, ctx
   in
-  (*  Options.feedback "principal type of %a and %a is %a" 
-      d_term t1 d_term t2 d_logic_type ctx;*)
-  let e1, env = match e1 with
-    | None -> term_to_exp env ctx t1
-    | Some(e1, ctx1) when Cil_datatype.Logic_type.equal ctx ctx1 -> e1, env
-    | Some(e1, _) -> 
-      Typing.context_sensitive ~loc:e1.eloc env ctx false (Some t1) e1
-  in
-  let e2, env = term_to_exp env ctx t2 in
-  match ctx with
-  | Linteger ->
+  let e2, env = term_to_exp env (Some ctx) t2 in
+  if Mpz.is_t ctx then
     let e, env =
       Env.new_var
 	env
@@ -314,7 +326,7 @@ and comparison_to_exp ?(loc=Location.unknown) ?e1 env bop t1 t2 t_opt =
 	(fun v _ -> [ Misc.mk_call ~result:(var v) "__gmpz_cmp" [ e1; e2 ] ])
     in
     new_exp ?loc (BinOp(bop, e, zero ?loc, intType)), env
-  | _ ->
+  else
     new_exp ?loc (BinOp(bop, e1, e2, intType)), env
 
 and at_to_exp env t_opt label e =
@@ -379,19 +391,19 @@ let rec named_predicate_to_exp env p =
     let e, env = 
       comparison_to_exp ~loc env (relation_to_binop rel) t1 t2 None 
     in
-    Typing.context_sensitive ~loc env (Ctype intType) false None e
+    Typing.context_sensitive ~loc env intType false None e
   | Pand(p1, p2) ->
     (* p1 && p2 <==> if p1 then p2 else false *)
     let e1, env1 = named_predicate_to_exp env p1 in
     let _, env2 as res2 = named_predicate_to_exp (Env.push env1) p2 in
     let env3 = Env.push env2 in
-    conditional_to_exp loc (Ctype intType) e1 res2 (zero loc, env3)
+    conditional_to_exp loc intType e1 res2 (zero loc, env3)
   | Por(p1, p2) -> 
     (* p1 || p2 <==> if p1 then true else p2 *)
     let e1, env1 = named_predicate_to_exp env p1 in
     let env' = Env.push env1 in
     let res2 = named_predicate_to_exp (Env.push env') p2 in
-    conditional_to_exp loc (Ctype intType) e1 (one loc, env') res2
+    conditional_to_exp loc intType e1 (one loc, env') res2
   | Pxor _ -> Error.not_yet "xor"
   | Pimplies(p1, p2) -> 
     (* (p1 ==> p2) <==> !p1 || p2 *)
@@ -409,10 +421,10 @@ let rec named_predicate_to_exp env p =
     let e, env = named_predicate_to_exp env p in
     new_exp ~loc (UnOp(LNot, e, intType)), env
   | Pif(t, p2, p3) ->
-    let e1, env1 = term_to_exp env (Ctype intType) t in
+    let e1, env1 = term_to_exp env (Some intType) t in
     let (_, env2 as res2) = named_predicate_to_exp (Env.push env1) p2 in
     let res3 = named_predicate_to_exp (Env.push env2) p3 in
-    conditional_to_exp loc (Ctype intType) e1 res2 res3
+    conditional_to_exp loc intType e1 res2 res3
   | Plet _ -> Error.not_yet "let _ = _ in _"
   | Pforall _ | Pexists _ -> Quantif.quantif_to_exp env p
   | Pat(p, label) -> 
