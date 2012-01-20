@@ -26,21 +26,37 @@ open Cil_types
 (** {2 Typing} *)
 (******************************************************************************)
 
-val typ_of_term: term -> typ
 val type_named_predicate: predicate named -> unit
+(** Compute the type of each term of the given predicate. *)
+
 val type_term: term -> unit
+(** Compute the type of the given term. *)
+
+val typ_of_term: term -> typ
+(** Get the type of the given term. Must have been previously computed. *)
+
 val unsafe_set_term: term -> typ -> unit
+(** Modify the type of the given term. No verification is done to check that the
+    new type is correct. *)
+
 val clear: unit -> unit
+(** Remove all the previously computed types. *)
 
 (******************************************************************************)
 (** {2 Subtyping} *)
 (******************************************************************************)
 
 val principal_type: term -> term -> typ
+(** Get the principal type of the two given terms, that is the type which may
+    contain both of them. Their types must have been previously computed. *)
 
 val context_sensitive: 
   ?loc:location -> Env.t -> typ -> bool -> term option -> exp -> 
   exp * Env.t
+(** [context_sensitive env ty is_mpz_string t_opt e] converts [e] in [env] in
+    such a way that it becomes usable in a context of type [ty]. [t_opt], if
+    any, is a term denoting by [e]. [is_mpz_string] is [true] iff [e] is a
+    string denoting a MPZ integer. *)
 
 val is_representable: My_bigint.t -> ikind -> string option -> bool
 (** Is the given constant representable?
@@ -53,6 +69,8 @@ val is_representable: My_bigint.t -> ikind -> string option -> bool
 val compute_quantif_guards_ref
     : (predicate named -> logic_var list -> predicate named -> 
        (term * relation * logic_var * relation * term) list) ref
+(** Forward reference. *)
+
 
 (*
 Local Variables:

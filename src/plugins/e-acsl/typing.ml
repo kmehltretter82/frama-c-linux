@@ -29,7 +29,7 @@ module BI = My_bigint
 let is_representable n _k _s = BI.ge n BI.min_int64 && BI.le n BI.max_int64
 
 (******************************************************************************)
-(** Type Lattice *)
+(** Type Definitions: Intervals *)
 (******************************************************************************)
 
 type eacsl_typ =

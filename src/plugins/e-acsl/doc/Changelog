@@ -15,10 +15,13 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
+- E-ACSL	[2012/01/20] Use GMP arithmetics only when required
+	        (i.e. mostly never in practice).
+
 ###################################
 Plugin E-ACSL 0.1 Nitrogen_20111001
 ###################################
 
--  E-ACSL         [2012/01/06] First release for the Hi-Lite FUI9 project.
+- E-ACSL	[2012/01/06] First release for the Hi-Lite FUI9 project.
 
 ###################################
