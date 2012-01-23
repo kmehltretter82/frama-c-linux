@@ -2,120 +2,120 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-PROJECT_FILE.i:228:[value] Assertion got status unknown.
-PROJECT_FILE.i:234:[value] entering loop for the first time
-PROJECT_FILE.i:246:[value] assigning non deterministic value for the first time
+PROJECT_FILE.i:232:[value] Assertion got status unknown.
+PROJECT_FILE.i:238:[value] entering loop for the first time
+PROJECT_FILE.i:250:[value] assigning non deterministic value for the first time
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:249.
+        Called from PROJECT_FILE.i:253.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:255:[value] Assertion got status unknown.
-PROJECT_FILE.i:261:[value] entering loop for the first time
+PROJECT_FILE.i:259:[value] Assertion got status unknown.
+PROJECT_FILE.i:265:[value] entering loop for the first time
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:271.
+        Called from PROJECT_FILE.i:275.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:276:[value] Assertion got status unknown.
-PROJECT_FILE.i:282:[value] entering loop for the first time
+PROJECT_FILE.i:280:[value] Assertion got status unknown.
+PROJECT_FILE.i:286:[value] entering loop for the first time
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:292.
+        Called from PROJECT_FILE.i:296.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:297:[value] Assertion got status unknown.
-PROJECT_FILE.i:303:[value] entering loop for the first time
+PROJECT_FILE.i:301:[value] Assertion got status unknown.
+PROJECT_FILE.i:307:[value] entering loop for the first time
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:313.
+        Called from PROJECT_FILE.i:317.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:318:[value] Assertion got status unknown.
-PROJECT_FILE.i:329:[value] entering loop for the first time
+PROJECT_FILE.i:322:[value] Assertion got status unknown.
 PROJECT_FILE.i:333:[value] entering loop for the first time
 PROJECT_FILE.i:337:[value] entering loop for the first time
+PROJECT_FILE.i:341:[value] entering loop for the first time
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:351.
+        Called from PROJECT_FILE.i:355.
 [value] computing for function printf <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:219.
+        Called from PROJECT_FILE.i:223.
 [value] Done for function printf
 [value] computing for function exit <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:221.
-PROJECT_FILE.i:207:[value] Function exit: postcondition got status invalid.
+        Called from PROJECT_FILE.i:225.
+PROJECT_FILE.i:211:[value] Function exit: postcondition got status invalid.
 [value] Done for function exit
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:357:[value] Assertion got status unknown.
-PROJECT_FILE.i:363:[value] entering loop for the first time
+PROJECT_FILE.i:361:[value] Assertion got status unknown.
+PROJECT_FILE.i:367:[value] entering loop for the first time
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:373.
+        Called from PROJECT_FILE.i:377.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:378:[value] Assertion got status unknown.
-PROJECT_FILE.i:386:[value] entering loop for the first time
-PROJECT_FILE.i:392:[value] Assertion got status valid.
+PROJECT_FILE.i:382:[value] Assertion got status unknown.
+PROJECT_FILE.i:390:[value] entering loop for the first time
+PROJECT_FILE.i:396:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:393.
+        Called from PROJECT_FILE.i:397.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:401:[value] entering loop for the first time
-PROJECT_FILE.i:404:[value] Assertion got status valid.
+PROJECT_FILE.i:405:[value] entering loop for the first time
+PROJECT_FILE.i:408:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:405.
-[value] Recording results for e_acsl_assert
-[value] Done for function e_acsl_assert
-[value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:393.
+        Called from PROJECT_FILE.i:409.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:405.
+        Called from PROJECT_FILE.i:397.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:393.
+        Called from PROJECT_FILE.i:409.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:405.
+        Called from PROJECT_FILE.i:397.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:405.
+        Called from PROJECT_FILE.i:409.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:393.
+        Called from PROJECT_FILE.i:409.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:405.
+        Called from PROJECT_FILE.i:397.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:393.
+        Called from PROJECT_FILE.i:409.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:405.
+        Called from PROJECT_FILE.i:397.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:393.
+        Called from PROJECT_FILE.i:409.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:405.
+        Called from PROJECT_FILE.i:397.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:405.
+        Called from PROJECT_FILE.i:409.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:428.
+        Called from PROJECT_FILE.i:409.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:432.
 [value] computing for function printf <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:219.
+        Called from PROJECT_FILE.i:223.
 [value] Done for function printf
 [value] computing for function exit <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:221.
+        Called from PROJECT_FILE.i:225.
 [value] Done for function exit
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert

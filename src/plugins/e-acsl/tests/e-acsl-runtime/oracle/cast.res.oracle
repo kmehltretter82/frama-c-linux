@@ -2,24 +2,19 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-PROJECT_FILE.i:232:[value] Assertion got status valid.
+PROJECT_FILE.i:236:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:233.
+        Called from PROJECT_FILE.i:237.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:235:[value] Assertion got status valid.
+PROJECT_FILE.i:239:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:236.
+        Called from PROJECT_FILE.i:240.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:238:[value] Assertion got status valid.
+PROJECT_FILE.i:242:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:239.
-[value] Recording results for e_acsl_assert
-[value] Done for function e_acsl_assert
-PROJECT_FILE.i:241:[value] Assertion got status valid.
-[value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:242.
+        Called from PROJECT_FILE.i:243.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 PROJECT_FILE.i:245:[value] Assertion got status valid.
@@ -30,6 +25,11 @@ PROJECT_FILE.i:245:[value] Assertion got status valid.
 PROJECT_FILE.i:249:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
         Called from PROJECT_FILE.i:250.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+PROJECT_FILE.i:253:[value] Assertion got status valid.
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:254.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] Recording results for main

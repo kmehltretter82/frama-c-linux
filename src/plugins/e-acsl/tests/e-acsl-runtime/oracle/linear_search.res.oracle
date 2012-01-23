@@ -7,94 +7,94 @@ tests/e-acsl-runtime/linear_search.i:14:[e-acsl] warning: missing guard for ensu
 [value] Initial state computed
 [value] Values of globals at initialization
         A[0..9] ∈ {0}
-PROJECT_FILE.i:337:[value] entering loop for the first time
-PROJECT_FILE.i:340:[value] assigning non deterministic value for the first time
-[value] computing for function search <- main.
-        Called from PROJECT_FILE.i:343.
-PROJECT_FILE.i:226:[value] Function search: precondition got status unknown.
-PROJECT_FILE.i:248:[value] entering loop for the first time
-[value] computing for function e_acsl_assert <- search <- main.
-        Called from PROJECT_FILE.i:258.
-[value] computing for function printf <- e_acsl_assert <- search <- main.
-        Called from PROJECT_FILE.i:219.
-[value] Done for function printf
-[value] computing for function exit <- e_acsl_assert <- search <- main.
-        Called from PROJECT_FILE.i:221.
-PROJECT_FILE.i:207:[value] Function exit: postcondition got status invalid.
-[value] Done for function exit
-[value] Recording results for e_acsl_assert
-[value] Done for function e_acsl_assert
-PROJECT_FILE.i:265:[value] entering loop for the first time
-PROJECT_FILE.i:283:[value] entering loop for the first time
-PROJECT_FILE.i:299:[value] entering loop for the first time
-[value] computing for function e_acsl_assert <- search <- main.
-        Called from PROJECT_FILE.i:318.
-[value] computing for function printf <- e_acsl_assert <- search <- main.
-        Called from PROJECT_FILE.i:219.
-[value] Done for function printf
-[value] computing for function exit <- e_acsl_assert <- search <- main.
-        Called from PROJECT_FILE.i:221.
-[value] Done for function exit
-[value] Recording results for e_acsl_assert
-[value] Done for function e_acsl_assert
-[value] computing for function e_acsl_assert <- search <- main.
-        Called from PROJECT_FILE.i:323.
-[value] computing for function printf <- e_acsl_assert <- search <- main.
-        Called from PROJECT_FILE.i:219.
-[value] Done for function printf
-[value] computing for function exit <- e_acsl_assert <- search <- main.
-        Called from PROJECT_FILE.i:221.
-[value] Done for function exit
-[value] Recording results for e_acsl_assert
-[value] Done for function e_acsl_assert
-PROJECT_FILE.i:229:[value] Function search, behavior exists: postcondition got status unknown.
-PROJECT_FILE.i:229:[value] Function search, behavior exists: postcondition got status unknown, but it is unknown if the behavior is active.
-PROJECT_FILE.i:233:[value] Function search, behavior not_exists: postcondition got status unknown.
-PROJECT_FILE.i:233:[value] Function search, behavior not_exists: postcondition got status unknown, but it is unknown if the behavior is active.
-[value] Recording results for search
-[value] Done for function search
-PROJECT_FILE.i:344:[value] Assertion got status unknown.
-[value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:345.
-[value] Recording results for e_acsl_assert
-[value] Done for function e_acsl_assert
+PROJECT_FILE.i:341:[value] entering loop for the first time
+PROJECT_FILE.i:344:[value] assigning non deterministic value for the first time
 [value] computing for function search <- main.
         Called from PROJECT_FILE.i:347.
+PROJECT_FILE.i:230:[value] Function search: precondition got status unknown.
+PROJECT_FILE.i:252:[value] entering loop for the first time
 [value] computing for function e_acsl_assert <- search <- main.
-        Called from PROJECT_FILE.i:258.
+        Called from PROJECT_FILE.i:262.
 [value] computing for function printf <- e_acsl_assert <- search <- main.
-        Called from PROJECT_FILE.i:219.
+        Called from PROJECT_FILE.i:223.
 [value] Done for function printf
 [value] computing for function exit <- e_acsl_assert <- search <- main.
-        Called from PROJECT_FILE.i:221.
+        Called from PROJECT_FILE.i:225.
+PROJECT_FILE.i:211:[value] Function exit: postcondition got status invalid.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+PROJECT_FILE.i:269:[value] entering loop for the first time
+PROJECT_FILE.i:287:[value] entering loop for the first time
+PROJECT_FILE.i:303:[value] entering loop for the first time
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from PROJECT_FILE.i:322.
+[value] computing for function printf <- e_acsl_assert <- search <- main.
+        Called from PROJECT_FILE.i:223.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- search <- main.
+        Called from PROJECT_FILE.i:225.
 [value] Done for function exit
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- search <- main.
-        Called from PROJECT_FILE.i:318.
+        Called from PROJECT_FILE.i:327.
 [value] computing for function printf <- e_acsl_assert <- search <- main.
-        Called from PROJECT_FILE.i:219.
+        Called from PROJECT_FILE.i:223.
 [value] Done for function printf
 [value] computing for function exit <- e_acsl_assert <- search <- main.
-        Called from PROJECT_FILE.i:221.
+        Called from PROJECT_FILE.i:225.
 [value] Done for function exit
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-[value] computing for function e_acsl_assert <- search <- main.
-        Called from PROJECT_FILE.i:323.
-[value] computing for function printf <- e_acsl_assert <- search <- main.
-        Called from PROJECT_FILE.i:219.
-[value] Done for function printf
-[value] computing for function exit <- e_acsl_assert <- search <- main.
-        Called from PROJECT_FILE.i:221.
-[value] Done for function exit
-[value] Recording results for e_acsl_assert
-[value] Done for function e_acsl_assert
+PROJECT_FILE.i:233:[value] Function search, behavior exists: postcondition got status unknown.
+PROJECT_FILE.i:233:[value] Function search, behavior exists: postcondition got status unknown, but it is unknown if the behavior is active.
+PROJECT_FILE.i:237:[value] Function search, behavior not_exists: postcondition got status unknown.
+PROJECT_FILE.i:237:[value] Function search, behavior not_exists: postcondition got status unknown, but it is unknown if the behavior is active.
 [value] Recording results for search
 [value] Done for function search
 PROJECT_FILE.i:348:[value] Assertion got status unknown.
 [value] computing for function e_acsl_assert <- main.
         Called from PROJECT_FILE.i:349.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function search <- main.
+        Called from PROJECT_FILE.i:351.
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from PROJECT_FILE.i:262.
+[value] computing for function printf <- e_acsl_assert <- search <- main.
+        Called from PROJECT_FILE.i:223.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- search <- main.
+        Called from PROJECT_FILE.i:225.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from PROJECT_FILE.i:322.
+[value] computing for function printf <- e_acsl_assert <- search <- main.
+        Called from PROJECT_FILE.i:223.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- search <- main.
+        Called from PROJECT_FILE.i:225.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from PROJECT_FILE.i:327.
+[value] computing for function printf <- e_acsl_assert <- search <- main.
+        Called from PROJECT_FILE.i:223.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- search <- main.
+        Called from PROJECT_FILE.i:225.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] Recording results for search
+[value] Done for function search
+PROJECT_FILE.i:352:[value] Assertion got status unknown.
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:353.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] Recording results for main

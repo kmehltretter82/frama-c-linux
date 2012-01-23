@@ -3,15 +3,11 @@
 [value] Initial state computed
 [value] Values of globals at initialization
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:234.
+        Called from PROJECT_FILE.i:238.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:240.
-[value] Recording results for e_acsl_assert
-[value] Done for function e_acsl_assert
-[value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:241.
+        Called from PROJECT_FILE.i:244.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
@@ -23,19 +19,15 @@
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:250.
+        Called from PROJECT_FILE.i:253.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:263.
+        Called from PROJECT_FILE.i:254.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:264.
-[value] Recording results for e_acsl_assert
-[value] Done for function e_acsl_assert
-[value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:266.
+        Called from PROJECT_FILE.i:267.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
@@ -43,35 +35,43 @@
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:269.
+        Called from PROJECT_FILE.i:270.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:292.
+        Called from PROJECT_FILE.i:272.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:297.
+        Called from PROJECT_FILE.i:273.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:303.
+        Called from PROJECT_FILE.i:296.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:309.
+        Called from PROJECT_FILE.i:301.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:311.
+        Called from PROJECT_FILE.i:307.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:316.
+        Called from PROJECT_FILE.i:313.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:318.
+        Called from PROJECT_FILE.i:315.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:320.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:322.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] Recording results for main

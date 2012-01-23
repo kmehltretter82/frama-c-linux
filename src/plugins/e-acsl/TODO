@@ -15,8 +15,6 @@
 - utiliser Rte pour tous les overflows potentiels
   (get_rte_annotations dans Oxygen)
 - [Yannick] Logic functions
-- vérifier l'export des fonctions GMP dans share: je crois qu'il manque mpz_com
-- regarder BTS 72 (bug Jessie) et regarder le comportement d'E-ACSL
 
 ##############
 # KNOWN BUGS #
@@ -25,7 +23,8 @@
 - \at incorrect si StmtLabel faisant référence au stmt courant (voir test at.i)
 - incorrect d'utiliser un \old dans le post-state si pre-state == post-state
   (même raison que ci-dessus)
-- incorrect d'utiliser Pre, Post, Here, Old dans stmt contract
+- incorrect d'utiliser Pre, Post, Here, Old dans stmt contract 
+  (même problème que Jessie: cf. BTS #72)
 
 #########
 # TESTS #

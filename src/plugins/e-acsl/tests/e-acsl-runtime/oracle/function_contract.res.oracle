@@ -5,66 +5,58 @@
         X ∈ {0}
         Y ∈ {2}
 [value] computing for function f <- main.
-        Called from PROJECT_FILE.i:397.
+        Called from PROJECT_FILE.i:401.
 [value] computing for function e_acsl_assert <- f <- main.
-        Called from PROJECT_FILE.i:231.
+        Called from PROJECT_FILE.i:235.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:227:[value] Function f: postcondition got status valid.
+PROJECT_FILE.i:231:[value] Function f: postcondition got status valid.
 [value] Recording results for f
 [value] Done for function f
 [value] computing for function g <- main.
-        Called from PROJECT_FILE.i:398.
+        Called from PROJECT_FILE.i:402.
 [value] computing for function e_acsl_assert <- g <- main.
-        Called from PROJECT_FILE.i:240.
+        Called from PROJECT_FILE.i:244.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- g <- main.
-        Called from PROJECT_FILE.i:241.
+        Called from PROJECT_FILE.i:245.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:235:[value] Function g: postcondition got status valid.
-PROJECT_FILE.i:236:[value] Function g: postcondition got status valid.
+PROJECT_FILE.i:239:[value] Function g: postcondition got status valid.
+PROJECT_FILE.i:240:[value] Function g: postcondition got status valid.
 [value] Recording results for g
 [value] Done for function g
 [value] computing for function h <- main.
-        Called from PROJECT_FILE.i:399.
-PROJECT_FILE.i:245:[value] Function h: precondition got status valid.
+        Called from PROJECT_FILE.i:403.
+PROJECT_FILE.i:249:[value] Function h: precondition got status valid.
 [value] computing for function e_acsl_assert <- h <- main.
-        Called from PROJECT_FILE.i:248.
+        Called from PROJECT_FILE.i:252.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] Recording results for h
 [value] Done for function h
 [value] computing for function i <- main.
-        Called from PROJECT_FILE.i:400.
-PROJECT_FILE.i:253:[value] Function i: precondition got status valid.
-PROJECT_FILE.i:254:[value] Function i: precondition got status valid.
+        Called from PROJECT_FILE.i:404.
+PROJECT_FILE.i:257:[value] Function i: precondition got status valid.
+PROJECT_FILE.i:258:[value] Function i: precondition got status valid.
 [value] computing for function e_acsl_assert <- i <- main.
-        Called from PROJECT_FILE.i:257.
+        Called from PROJECT_FILE.i:261.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- i <- main.
-        Called from PROJECT_FILE.i:258.
+        Called from PROJECT_FILE.i:262.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] Recording results for i
 [value] Done for function i
 [value] computing for function j <- main.
-        Called from PROJECT_FILE.i:401.
-PROJECT_FILE.i:264:[value] Function j, behavior b1: precondition got status valid.
-PROJECT_FILE.i:268:[value] Function j, behavior b2: precondition got status valid.
-PROJECT_FILE.i:269:[value] Function j, behavior b2: precondition got status valid.
+        Called from PROJECT_FILE.i:405.
+PROJECT_FILE.i:268:[value] Function j, behavior b1: precondition got status valid.
+PROJECT_FILE.i:272:[value] Function j, behavior b2: precondition got status valid.
+PROJECT_FILE.i:273:[value] Function j, behavior b2: precondition got status valid.
 [value] computing for function e_acsl_assert <- j <- main.
-        Called from PROJECT_FILE.i:276.
-[value] Recording results for e_acsl_assert
-[value] Done for function e_acsl_assert
-[value] computing for function e_acsl_assert <- j <- main.
-        Called from PROJECT_FILE.i:277.
-[value] Recording results for e_acsl_assert
-[value] Done for function e_acsl_assert
-[value] computing for function e_acsl_assert <- j <- main.
-        Called from PROJECT_FILE.i:279.
+        Called from PROJECT_FILE.i:280.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- j <- main.
@@ -72,63 +64,71 @@ PROJECT_FILE.i:269:[value] Function j, behavior b2: precondition got status vali
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- j <- main.
-        Called from PROJECT_FILE.i:282.
+        Called from PROJECT_FILE.i:283.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:265:[value] Function j, behavior b1: postcondition got status valid.
-PROJECT_FILE.i:270:[value] Function j, behavior b2: postcondition got status valid.
+[value] computing for function e_acsl_assert <- j <- main.
+        Called from PROJECT_FILE.i:285.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- j <- main.
+        Called from PROJECT_FILE.i:286.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+PROJECT_FILE.i:269:[value] Function j, behavior b1: postcondition got status valid.
+PROJECT_FILE.i:274:[value] Function j, behavior b2: postcondition got status valid.
 [value] Recording results for j
 [value] Done for function j
 [value] computing for function k <- main.
-        Called from PROJECT_FILE.i:402.
-PROJECT_FILE.i:289:[value] Function k, behavior b1: assumption got status invalid; precondition not evaluated.
-PROJECT_FILE.i:294:[value] Function k, behavior b2: precondition got status valid.
-PROJECT_FILE.i:295:[value] Function k, behavior b2: precondition got status valid.
+        Called from PROJECT_FILE.i:406.
+PROJECT_FILE.i:293:[value] Function k, behavior b1: assumption got status invalid; precondition not evaluated.
+PROJECT_FILE.i:298:[value] Function k, behavior b2: precondition got status valid.
+PROJECT_FILE.i:299:[value] Function k, behavior b2: precondition got status valid.
 [value] computing for function e_acsl_assert <- k <- main.
-        Called from PROJECT_FILE.i:309.
+        Called from PROJECT_FILE.i:313.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- k <- main.
-        Called from PROJECT_FILE.i:314.
+        Called from PROJECT_FILE.i:318.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- k <- main.
-        Called from PROJECT_FILE.i:320.
+        Called from PROJECT_FILE.i:324.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] Recording results for k
 [value] Done for function k
 [value] computing for function l <- main.
-        Called from PROJECT_FILE.i:403.
-PROJECT_FILE.i:331:[value] Assertion got status valid.
+        Called from PROJECT_FILE.i:407.
+PROJECT_FILE.i:335:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- l <- main.
-        Called from PROJECT_FILE.i:332.
+        Called from PROJECT_FILE.i:336.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- l <- main.
-        Called from PROJECT_FILE.i:334.
+        Called from PROJECT_FILE.i:338.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:328:[value] Function l: postcondition got status valid.
+PROJECT_FILE.i:332:[value] Function l: postcondition got status valid.
 [value] Recording results for l
 [value] Done for function l
 [value] computing for function m <- main.
-        Called from PROJECT_FILE.i:404.
-[value] computing for function e_acsl_assert <- m <- main.
-        Called from PROJECT_FILE.i:377.
-[value] Recording results for e_acsl_assert
-[value] Done for function e_acsl_assert
+        Called from PROJECT_FILE.i:408.
 [value] computing for function e_acsl_assert <- m <- main.
         Called from PROJECT_FILE.i:381.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- m <- main.
-        Called from PROJECT_FILE.i:387.
+        Called from PROJECT_FILE.i:385.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:340:[value] Function m, behavior b1: assumes got status invalid; post-condition not evaluated.
-PROJECT_FILE.i:345:[value] Function m, behavior b2: postcondition got status valid.
-PROJECT_FILE.i:346:[value] Function m, behavior b2: postcondition got status valid.
+[value] computing for function e_acsl_assert <- m <- main.
+        Called from PROJECT_FILE.i:391.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+PROJECT_FILE.i:344:[value] Function m, behavior b1: assumes got status invalid; post-condition not evaluated.
+PROJECT_FILE.i:349:[value] Function m, behavior b2: postcondition got status valid.
+PROJECT_FILE.i:350:[value] Function m, behavior b2: postcondition got status valid.
 [value] Recording results for m
 [value] Done for function m
 [value] Recording results for main

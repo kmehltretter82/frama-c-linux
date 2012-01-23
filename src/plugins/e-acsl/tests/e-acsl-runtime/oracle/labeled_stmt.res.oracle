@@ -3,24 +3,24 @@
 [value] Initial state computed
 [value] Values of globals at initialization
         X ∈ {0}
-PROJECT_FILE.i:232:[value] Assertion got status valid.
+PROJECT_FILE.i:236:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:233.
+        Called from PROJECT_FILE.i:237.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:241.
+        Called from PROJECT_FILE.i:245.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:243.
+        Called from PROJECT_FILE.i:247.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:252.
+        Called from PROJECT_FILE.i:256.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:226:[value] Function main: postcondition got status valid.
+PROJECT_FILE.i:230:[value] Function main: postcondition got status valid.
 [value] Recording results for main
 [value] done for function main
 [value] ====== VALUES COMPUTED ======

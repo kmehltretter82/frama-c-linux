@@ -83,14 +83,9 @@ extern void __gmpz_clear(mpz_t x);
   @ assigns \nothing; */
 extern int __gmpz_cmp(const mpz_t z1, const mpz_t z2);
 
-/***********************/
-/* Arithmetic operator */
-/***********************/
-
-/*@ requires \valid(z1);
-  @ requires \valid(z2);
-  @ assigns *z1; */
-extern int __gmpz_comp(mpz_t z1, const mpz_t z2);
+/************************/
+/* Arithmetic operators */
+/************************/
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
@@ -126,6 +121,15 @@ extern void __gmpz_tdiv_q(mpz_t z1, const mpz_t z2, const mpz_t z3);
   @ requires \valid(z3);
   @ assigns *z1; */
 extern void __gmpz_tdiv_r(mpz_t z1, const mpz_t z2, const mpz_t z3);
+
+/*********************/
+/* Bitwise operators */
+/*********************/
+
+/*@ requires \valid(z1);
+  @ requires \valid(z2);
+  @ assigns *z1; */
+extern int __gmpz_com(mpz_t z1, const mpz_t z2);
 
 /************************/
 /* Coercions to C types */

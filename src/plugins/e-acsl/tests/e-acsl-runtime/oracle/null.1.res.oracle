@@ -2,9 +2,9 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-PROJECT_FILE.i:228:[value] Assertion got status unknown.
+PROJECT_FILE.i:232:[value] Assertion got status unknown.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:229.
+        Called from PROJECT_FILE.i:233.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] Recording results for main

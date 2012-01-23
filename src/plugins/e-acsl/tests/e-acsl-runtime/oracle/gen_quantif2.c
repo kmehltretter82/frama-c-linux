@@ -70,6 +70,11 @@ extern void __gmpz_tdiv_q(__mpz_struct * /*[1]*/ z1,
 extern void __gmpz_tdiv_r(__mpz_struct * /*[1]*/ z1,
                           __mpz_struct const * /*[1]*/ z2,
                           __mpz_struct const * /*[1]*/ z3);
+/*@ requires \valid(z1);
+    requires \valid(z2);
+    assigns *z1;  */
+extern int __gmpz_com(__mpz_struct * /*[1]*/ z1,
+                      __mpz_struct const * /*[1]*/ z2);
 /*@ terminates \false;
     ensures \false;
     assigns \nothing;  */
@@ -86,7 +91,6 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
   return;
 }
 
-extern int ( /* missing proto */ __gmpz_com)();
 int main(void)
 {
   int __retres;
@@ -141,7 +145,8 @@ int main(void)
     int __e_acsl_var_11;
     __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_9),(long)0);
     __gmpz_init((__mpz_struct *)(__e_acsl_var_10));
-    __gmpz_com(__e_acsl_var_10,__e_acsl_var_9);
+    __gmpz_com((__mpz_struct *)(__e_acsl_var_10),
+               (__mpz_struct const *)(__e_acsl_var_9));
     __e_acsl_var_11 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var_9),
                                  (__mpz_struct const *)(__e_acsl_var_10));
     e_acsl_assert(! (__e_acsl_var_11 != 0),(char *)"Assertion",
