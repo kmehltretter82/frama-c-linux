@@ -26,10 +26,10 @@ int main(void)
     while (1) {
       if (! (i < 10)) { break; }
       /*@ invariant 0 ≤ i ∧ i < 10; */ ;
-      { int e_acsl_1;
-        if (0 <= i) { e_acsl_1 = i < 10; }
-        else { e_acsl_1 = 0; }
-        e_acsl_assert(! e_acsl_1,(char *)"Invariant",
+      { int __e_acsl_var;
+        if (0 <= i) { __e_acsl_var = i < 10; }
+        else { __e_acsl_var = 0; }
+        e_acsl_assert(! __e_acsl_var,(char *)"Invariant",
                       (char *)"(0 <= i && i < 10)",9);
       }
       

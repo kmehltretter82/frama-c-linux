@@ -18,12 +18,12 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 /*@ ensures \result ≡ (int)(\old(x)-\old(x));  */
 int f(int x)
 {
-  int e_acsl_1;
-  int e_acsl_2;
-  e_acsl_2 = x;
-  e_acsl_1 = x;
+  int __e_acsl_var;
+  int __e_acsl_var_2;
+  __e_acsl_var_2 = x;
+  __e_acsl_var = x;
   x = 0;
-  e_acsl_assert(! (x == (int)((long long)e_acsl_1 - (long long)e_acsl_2)),
+  e_acsl_assert(! (x == (int)((long long)__e_acsl_var - (long long)__e_acsl_var_2)),
                 (char *)"Postcondition",
                 (char *)"(\\result == (int)(\\old(x)-\\old(x)))",7);
   return (x);

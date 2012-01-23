@@ -46,29 +46,29 @@ int main(void)
                 (char *)"(\"toto\" != \"titi\")",10);
   /*@ assert 'c' ≡ 'c'; */ ;
   {
-    mpz_t e_acsl_1;
-    int e_acsl_2;
-    __gmpz_init_set_si((__mpz_struct *)(e_acsl_1),(long)'c');
-    e_acsl_2 = __gmpz_cmp((__mpz_struct const *)(e_acsl_1),
-                          (__mpz_struct const *)(e_acsl_1));
-    e_acsl_assert(! (e_acsl_2 == 0),(char *)"Assertion",
+    mpz_t __e_acsl_var;
+    int __e_acsl_var_2;
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var),(long)'c');
+    __e_acsl_var_2 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var),
+                                (__mpz_struct const *)(__e_acsl_var));
+    e_acsl_assert(! (__e_acsl_var_2 == 0),(char *)"Assertion",
                   (char *)"(\'c\' == \'c\')",11);
-    __gmpz_clear((__mpz_struct *)(e_acsl_1));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_var));
   }
   
   /*@ assert false ≢ true; */ ;
   {
-    mpz_t e_acsl_3;
-    mpz_t e_acsl_4;
-    int e_acsl_5;
-    __gmpz_init_set_si((__mpz_struct *)(e_acsl_3),(long)false);
-    __gmpz_init_set_si((__mpz_struct *)(e_acsl_4),(long)true);
-    e_acsl_5 = __gmpz_cmp((__mpz_struct const *)(e_acsl_3),
-                          (__mpz_struct const *)(e_acsl_4));
-    e_acsl_assert(! (e_acsl_5 != 0),(char *)"Assertion",
+    mpz_t __e_acsl_var_3;
+    mpz_t __e_acsl_var_4;
+    int __e_acsl_var_5;
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_3),(long)false);
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_4),(long)true);
+    __e_acsl_var_5 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var_3),
+                                (__mpz_struct const *)(__e_acsl_var_4));
+    e_acsl_assert(! (__e_acsl_var_5 != 0),(char *)"Assertion",
                   (char *)"(false != true)",12);
-    __gmpz_clear((__mpz_struct *)(e_acsl_3));
-    __gmpz_clear((__mpz_struct *)(e_acsl_4));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_var_3));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_var_4));
   }
   
   __retres = 0;

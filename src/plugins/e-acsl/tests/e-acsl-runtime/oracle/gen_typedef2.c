@@ -46,17 +46,17 @@ int main(void)
   x = (unsigned char)0;
   /*@ assert x ≡ 0; */ ;
   {
-    mpz_t e_acsl_1;
-    mpz_t e_acsl_2;
-    int e_acsl_3;
-    __gmpz_init_set_ui((__mpz_struct *)(e_acsl_1),(unsigned long)x);
-    __gmpz_init_set_si((__mpz_struct *)(e_acsl_2),(long)0);
-    e_acsl_3 = __gmpz_cmp((__mpz_struct const *)(e_acsl_1),
-                          (__mpz_struct const *)(e_acsl_2));
-    e_acsl_assert(! (e_acsl_3 == 0),(char *)"Assertion",(char *)"(x == 0)",
-                  11);
-    __gmpz_clear((__mpz_struct *)(e_acsl_1));
-    __gmpz_clear((__mpz_struct *)(e_acsl_2));
+    mpz_t __e_acsl_var;
+    mpz_t __e_acsl_var_2;
+    int __e_acsl_var_3;
+    __gmpz_init_set_ui((__mpz_struct *)(__e_acsl_var),(unsigned long)x);
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_2),(long)0);
+    __e_acsl_var_3 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var),
+                                (__mpz_struct const *)(__e_acsl_var_2));
+    e_acsl_assert(! (__e_acsl_var_3 == 0),(char *)"Assertion",
+                  (char *)"(x == 0)",11);
+    __gmpz_clear((__mpz_struct *)(__e_acsl_var));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_var_2));
   }
   
   __retres = 0;

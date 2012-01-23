@@ -12,64 +12,64 @@ PROJECT_FILE.i:240:[value] Assertion got status valid.
         Called from PROJECT_FILE.i:251.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:255:[value] Assertion got status valid.
+PROJECT_FILE.i:256:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:259.
+        Called from PROJECT_FILE.i:260.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:263:[value] Assertion got status valid.
+PROJECT_FILE.i:264:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:274.
+        Called from PROJECT_FILE.i:275.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:278:[value] Assertion got status valid.
+PROJECT_FILE.i:279:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:282.
+        Called from PROJECT_FILE.i:283.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:286:[value] Assertion got status valid.
+PROJECT_FILE.i:287:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:297.
+        Called from PROJECT_FILE.i:298.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:301:[value] Assertion got status unknown.
+PROJECT_FILE.i:302:[value] Assertion got status unknown.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:305.
+        Called from PROJECT_FILE.i:306.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:309:[value] Assertion got status unknown.
+PROJECT_FILE.i:310:[value] Assertion got status unknown.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:313.
+        Called from PROJECT_FILE.i:314.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:317:[value] Assertion got status unknown.
+PROJECT_FILE.i:318:[value] Assertion got status unknown.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:321.
+        Called from PROJECT_FILE.i:322.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:325:[value] Assertion got status valid.
+PROJECT_FILE.i:326:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:337.
+        Called from PROJECT_FILE.i:339.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:341:[value] Assertion got status valid.
+PROJECT_FILE.i:343:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:353.
+        Called from PROJECT_FILE.i:356.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:357:[value] Assertion got status valid.
+PROJECT_FILE.i:360:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:361.
+        Called from PROJECT_FILE.i:364.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:366:[value] Assertion got status valid.
+PROJECT_FILE.i:369:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:373.
+        Called from PROJECT_FILE.i:377.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:378:[value] Assertion got status valid.
+PROJECT_FILE.i:382:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:385.
+        Called from PROJECT_FILE.i:390.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] Recording results for main
@@ -105,157 +105,161 @@ int main(void)
   x = 0;
   y = 1;
   /*@ assert x ≡ 0 ∧ y ≡ 1; */ ;
-  { int e_acsl_1;
-    if (x == 0) { e_acsl_1 = y == 1; }
-    else { e_acsl_1 = 0; }
-    e_acsl_assert(! e_acsl_1,(char *)"Assertion",
+  { int __e_acsl_var;
+    if (x == 0) { __e_acsl_var = y == 1; }
+    else { __e_acsl_var = 0; }
+    e_acsl_assert(! __e_acsl_var,(char *)"Assertion",
                   (char *)"(x == 0 && y == 1)",11);
   }
   
   /*@ assert ¬(x ≢ 0 ∧ y ≡ 1/0); */ ;
   {
-    int e_acsl_3;
+    int __e_acsl_var_3;
     if (x != 0) {
-      int e_acsl_2;
+      int __e_acsl_var_2;
       /*@ assert 0 ≢ 0; */ ;
       e_acsl_assert(0 == 0,(char *)"Assertion",(char *)"(0 == 0)",12);
-      e_acsl_2 = 1 / 0;
-      e_acsl_3 = y == e_acsl_2;
+      __e_acsl_var_2 = 1 / 0;
+      __e_acsl_var_3 = y == __e_acsl_var_2;
     }
-    else { e_acsl_3 = 0; }
-    e_acsl_assert(! (! e_acsl_3),(char *)"Assertion",
+    else { __e_acsl_var_3 = 0; }
+    e_acsl_assert(! (! __e_acsl_var_3),(char *)"Assertion",
                   (char *)"(!(x != 0 && y == 1/0))",12);
   }
   
   /*@ assert y ≡ 1 ∨ x ≡ 1; */ ;
-  { int e_acsl_4;
-    if (y == 1) { e_acsl_4 = 1; }
-    else { e_acsl_4 = x == 1; }
-    e_acsl_assert(! e_acsl_4,(char *)"Assertion",
+  { int __e_acsl_var_4;
+    if (y == 1) { __e_acsl_var_4 = 1; }
+    else { __e_acsl_var_4 = x == 1; }
+    e_acsl_assert(! __e_acsl_var_4,(char *)"Assertion",
                   (char *)"(y == 1 || x == 1)",13);
   }
   
   /*@ assert x ≡ 0 ∨ y ≡ 1/0; */ ;
   {
-    int e_acsl_6;
-    if (x == 0) { e_acsl_6 = 1; }
+    int __e_acsl_var_6;
+    if (x == 0) { __e_acsl_var_6 = 1; }
     else {
-      int e_acsl_5;
+      int __e_acsl_var_5;
       /*@ assert 0 ≢ 0; */ ;
       e_acsl_assert(0 == 0,(char *)"Assertion",(char *)"(0 == 0)",14);
-      e_acsl_5 = 1 / 0;
-      e_acsl_6 = y == e_acsl_5;
+      __e_acsl_var_5 = 1 / 0;
+      __e_acsl_var_6 = y == __e_acsl_var_5;
     }
-    e_acsl_assert(! e_acsl_6,(char *)"Assertion",
+    e_acsl_assert(! __e_acsl_var_6,(char *)"Assertion",
                   (char *)"(x == 0 || y == 1/0)",14);
   }
   
   /*@ assert x ≡ 0 ⇒ y ≡ 1; */ ;
-  { int e_acsl_7;
-    if (! (x == 0)) { e_acsl_7 = 1; }
-    else { e_acsl_7 = y == 1; }
-    e_acsl_assert(! e_acsl_7,(char *)"Assertion",
+  { int __e_acsl_var_7;
+    if (! (x == 0)) { __e_acsl_var_7 = 1; }
+    else { __e_acsl_var_7 = y == 1; }
+    e_acsl_assert(! __e_acsl_var_7,(char *)"Assertion",
                   (char *)"(x == 0 ==> y == 1)",15);
   }
   
   /*@ assert x ≡ 1 ⇒ y ≡ 1/0; */ ;
   {
-    int e_acsl_9;
-    if (! (x == 1)) { e_acsl_9 = 1; }
+    int __e_acsl_var_9;
+    if (! (x == 1)) { __e_acsl_var_9 = 1; }
     else {
-      int e_acsl_8;
+      int __e_acsl_var_8;
       /*@ assert 0 ≢ 0; */ ;
       e_acsl_assert(0 == 0,(char *)"Assertion",(char *)"(0 == 0)",16);
-      e_acsl_8 = 1 / 0;
-      e_acsl_9 = y == e_acsl_8;
+      __e_acsl_var_8 = 1 / 0;
+      __e_acsl_var_9 = y == __e_acsl_var_8;
     }
-    e_acsl_assert(! e_acsl_9,(char *)"Assertion",
+    e_acsl_assert(! __e_acsl_var_9,(char *)"Assertion",
                   (char *)"(x == 1 ==> y == 1/0)",16);
   }
   
   /*@ assert x≢0? x ≢ 0: y ≢ 0; */ ;
-  { int e_acsl_10;
-    if (x != 0) { e_acsl_10 = x != 0; }
-    else { e_acsl_10 = y != 0; }
-    e_acsl_assert(! e_acsl_10,(char *)"Assertion",
+  { int __e_acsl_var_10;
+    if (x != 0) { __e_acsl_var_10 = x != 0; }
+    else { __e_acsl_var_10 = y != 0; }
+    e_acsl_assert(! __e_acsl_var_10,(char *)"Assertion",
                   (char *)"(x!=0? x != 0: y != 0)",17);
   }
   
   /*@ assert y≢0? y ≢ 0: x ≢ 0; */ ;
-  { int e_acsl_11;
-    if (y != 0) { e_acsl_11 = y != 0; }
-    else { e_acsl_11 = x != 0; }
-    e_acsl_assert(! e_acsl_11,(char *)"Assertion",
+  { int __e_acsl_var_11;
+    if (y != 0) { __e_acsl_var_11 = y != 0; }
+    else { __e_acsl_var_11 = x != 0; }
+    e_acsl_assert(! __e_acsl_var_11,(char *)"Assertion",
                   (char *)"(y!=0? y != 0: x != 0)",18);
   }
   
   /*@ assert x≡1? x ≡ 18: x ≡ 0; */ ;
-  { int e_acsl_12;
-    if (x == 1) { e_acsl_12 = x == 18; }
-    else { e_acsl_12 = x == 0; }
-    e_acsl_assert(! e_acsl_12,(char *)"Assertion",
+  { int __e_acsl_var_12;
+    if (x == 1) { __e_acsl_var_12 = x == 18; }
+    else { __e_acsl_var_12 = x == 0; }
+    e_acsl_assert(! __e_acsl_var_12,(char *)"Assertion",
                   (char *)"(x==1? x == 18: x == 0)",19);
   }
   
   /*@ assert x ≡ 2 ⇔ y ≡ 3; */ ;
-  { int e_acsl_13;
-    int e_acsl_15;
-    if (! (x == 2)) { e_acsl_13 = 1; }
-    else { e_acsl_13 = y == 3; }
-    if (e_acsl_13) {
-      int e_acsl_14;
-      if (! (y == 3)) { e_acsl_14 = 1; }
-      else { e_acsl_14 = x == 2; }
-      e_acsl_15 = e_acsl_14;
+  {
+    int __e_acsl_var_13;
+    int __e_acsl_var_15;
+    if (! (x == 2)) { __e_acsl_var_13 = 1; }
+    else { __e_acsl_var_13 = y == 3; }
+    if (__e_acsl_var_13) {
+      int __e_acsl_var_14;
+      if (! (y == 3)) { __e_acsl_var_14 = 1; }
+      else { __e_acsl_var_14 = x == 2; }
+      __e_acsl_var_15 = __e_acsl_var_14;
     }
-    else { e_acsl_15 = 0; }
-    e_acsl_assert(! e_acsl_15,(char *)"Assertion",
+    else { __e_acsl_var_15 = 0; }
+    e_acsl_assert(! __e_acsl_var_15,(char *)"Assertion",
                   (char *)"(x == 2 <==> y == 3)",22);
   }
   
   /*@ assert x ≡ 0 ⇔ y ≡ 1; */ ;
-  { int e_acsl_16;
-    int e_acsl_18;
-    if (! (x == 0)) { e_acsl_16 = 1; }
-    else { e_acsl_16 = y == 1; }
-    if (e_acsl_16) {
-      int e_acsl_17;
-      if (! (y == 1)) { e_acsl_17 = 1; }
-      else { e_acsl_17 = x == 0; }
-      e_acsl_18 = e_acsl_17;
+  {
+    int __e_acsl_var_16;
+    int __e_acsl_var_18;
+    if (! (x == 0)) { __e_acsl_var_16 = 1; }
+    else { __e_acsl_var_16 = y == 1; }
+    if (__e_acsl_var_16) {
+      int __e_acsl_var_17;
+      if (! (y == 1)) { __e_acsl_var_17 = 1; }
+      else { __e_acsl_var_17 = x == 0; }
+      __e_acsl_var_18 = __e_acsl_var_17;
     }
-    else { e_acsl_18 = 0; }
-    e_acsl_assert(! e_acsl_18,(char *)"Assertion",
+    else { __e_acsl_var_18 = 0; }
+    e_acsl_assert(! __e_acsl_var_18,(char *)"Assertion",
                   (char *)"(x == 0 <==> y == 1)",23);
   }
   
   /*@ assert ((x≢0? x: y)≢0) ≡ (x≡0); */ ;
-  { int e_acsl_19;
-    if (x != 0) { e_acsl_19 = x; }
-    else { e_acsl_19 = y; }
-    e_acsl_assert(! ((e_acsl_19 != 0) == (x == 0)),(char *)"Assertion",
+  { int __e_acsl_var_19;
+    if (x != 0) { __e_acsl_var_19 = x; }
+    else { __e_acsl_var_19 = y; }
+    e_acsl_assert(! ((__e_acsl_var_19 != 0) == (x == 0)),(char *)"Assertion",
                   (char *)"(((x!=0? x: y)!=0) == (x==0))",26);
   }
   
   /*@ assert (x ≢ 0 ∧ y ≢ 0) ∨ y ≢ 0; */ ;
-  { int e_acsl_20;
-    int e_acsl_21;
-    if (x != 0) { e_acsl_20 = y != 0; }
-    else { e_acsl_20 = 0; }
-    if (e_acsl_20) { e_acsl_21 = 1; }
-    else { e_acsl_21 = y != 0; }
-    e_acsl_assert(! e_acsl_21,(char *)"Assertion",
+  {
+    int __e_acsl_var_20;
+    int __e_acsl_var_21;
+    if (x != 0) { __e_acsl_var_20 = y != 0; }
+    else { __e_acsl_var_20 = 0; }
+    if (__e_acsl_var_20) { __e_acsl_var_21 = 1; }
+    else { __e_acsl_var_21 = y != 0; }
+    e_acsl_assert(! __e_acsl_var_21,(char *)"Assertion",
                   (char *)"((x != 0 && y != 0) || y != 0)",27);
   }
   
   /*@ assert (x ≢ 0 ∨ y ≢ 0) ∧ y ≡ 1; */ ;
-  { int e_acsl_22;
-    int e_acsl_23;
-    if (x != 0) { e_acsl_22 = 1; }
-    else { e_acsl_22 = y != 0; }
-    if (e_acsl_22) { e_acsl_23 = y == 1; }
-    else { e_acsl_23 = 0; }
-    e_acsl_assert(! e_acsl_23,(char *)"Assertion",
+  {
+    int __e_acsl_var_22;
+    int __e_acsl_var_23;
+    if (x != 0) { __e_acsl_var_22 = 1; }
+    else { __e_acsl_var_22 = y != 0; }
+    if (__e_acsl_var_22) { __e_acsl_var_23 = y == 1; }
+    else { __e_acsl_var_23 = 0; }
+    e_acsl_assert(! __e_acsl_var_23,(char *)"Assertion",
                   (char *)"((x != 0 || y != 0) && y == 1)",28);
   }
   

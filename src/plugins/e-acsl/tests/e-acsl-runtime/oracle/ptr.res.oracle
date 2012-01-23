@@ -141,12 +141,12 @@ int main(void)
   e_acsl_assert(! (t[2] == 4),(char *)"Assertion",(char *)"(t[2] == 4)",15);
   /*@ assert t[(2*sizeof(int))/sizeof((int)0x0)] ≡ 4; */ ;
   {
-    int e_acsl_1;
+    int __e_acsl_var;
     /*@ assert sizeof((int)0x0) ≢ 0; */ ;
     e_acsl_assert(4 == 0,(char *)"Assertion",
                   (char *)"(sizeof((int)0x0) == 0)",16);
-    e_acsl_1 = (2 * 4) / 4;
-    e_acsl_assert(! (t[e_acsl_1] == 4),(char *)"Assertion",
+    __e_acsl_var = (2 * 4) / 4;
+    e_acsl_assert(! (t[__e_acsl_var] == 4),(char *)"Assertion",
                   (char *)"(t[(2*sizeof(int))/sizeof((int)0x0)] == 4)",16);
   }
   

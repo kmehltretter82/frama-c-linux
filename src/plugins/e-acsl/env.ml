@@ -51,6 +51,23 @@ type t =
       var_mapping: Varinfo.t Logic_var.Map.t; (* bind logic var to C var *)
       cpt: int; (* counter used when generating variables *) }
 
+module Varname: sig 
+  val get: string -> string 
+  val clear: unit -> unit
+end = struct
+
+  module H = Datatype.String.Hashtbl
+  let tbl = H.create 7
+
+  let get s = 
+    let _, u = Extlib.make_unique_name (H.mem tbl) ~sep:"_" s in
+    H.add tbl u ();
+    u
+
+  let clear () = H.clear tbl
+
+end
+
 let empty_block = 
   { new_block_vars = [];
     new_stmts = [];
@@ -72,7 +89,7 @@ let dummy =
     var_mapping = Logic_var.Map.empty;
     cpt = 0 }
 
-let empty v = 
+let empty v =
   { visitor = v; 
     annotation_kind = Misc.Assertion;
     new_global_vars = [];
@@ -86,7 +103,7 @@ let top env = match env.env_stack with [] -> assert false | hd :: tl -> hd, tl
 (* eta-expansion required for typing generalisation *)
 let acc_list_rev acc l = List.fold_left (fun acc x -> x :: acc) acc l
 
-let do_new_var ?(global=false) env t ty mk_stmts =
+let do_new_var ?(global=false) ?(name="var") env t ty mk_stmts =
   let local_env, tl_env = top env in
   let local_block = local_env.block_info in
   let is_t = Mpz.is_t ty in
@@ -98,7 +115,7 @@ let do_new_var ?(global=false) env t ty mk_stmts =
       ~generated:true
       false (* is a global? *)
       false (* is a formal? *)
-      ("e_acsl_" ^ string_of_int n)
+      (Varname.get ("__e_acsl_" ^ if name = "" then "var" else name))
       ty
   in
 (*  Options.feedback "new variable %a (global? %b)" Varinfo.pretty v global;*)
@@ -150,24 +167,24 @@ let do_new_var ?(global=false) env t ty mk_stmts =
 
 exception No_term
 
-let new_var ?(global=false) env t ty mk_stmts = 
+let new_var ?(global=false) ?name env t ty mk_stmts = 
   let local_env, _ = top env in
   if global then
     (* do not use memoisation here: it is incorrect for terms corresponding to
        impure expressions
        [JS 2011/11/23] actually it is correct now since globals are only use for
        \at *)
-    do_new_var ~global env t ty mk_stmts  
+    do_new_var ~global ?name env t ty mk_stmts  
   else
     try
       match t with
       | None -> raise No_term
       | Some t -> Term.Map.find t local_env.mpz_tbl.new_exps, env
     with Not_found | No_term -> 
-      do_new_var ~global env t ty mk_stmts  
+      do_new_var ~global ?name env t ty mk_stmts  
 
-let new_var_and_mpz_init ?global env t mk_stmts = 
-  new_var ?global env t Mpz.t (fun v e -> Mpz.init e :: mk_stmts v e)
+let new_var_and_mpz_init ?global ?name env t mk_stmts = 
+  new_var ?global ?name env t Mpz.t (fun v e -> Mpz.init e :: mk_stmts v e)
 
 module Logic_binding = struct
 
@@ -184,7 +201,7 @@ module Logic_binding = struct
 	in
 	Error.not_yet msg
     in
-    let e, env = new_var env None ty mk in
+    let e, env = new_var env ~name:logic_v.lv_name None ty mk in
     !v_ref,
     e, 
     { env with var_mapping = Logic_var.Map.add logic_v !v_ref env.var_mapping }
@@ -249,9 +266,10 @@ let pop_and_get env stmt ~global_clear where =
   (*  Options.feedback "pop_and_get (%d)" (List.length env.env_stack); *)
   let local_env, tl = top env in
   let clear = 
-    if global_clear then 
+    if global_clear then begin
+      Varname.clear ();
       env.global_mpz_tbl.clear_stmts @ local_env.mpz_tbl.clear_stmts
-    else
+    end else
       local_env.mpz_tbl.clear_stmts
   in
 (*  Options.feedback "clearing %d mpz (must_clear: %b)" 

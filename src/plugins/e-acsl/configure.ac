@@ -26,8 +26,15 @@
 
 m4_define([plugin_file],Makefile.in)
 
+# m4_define([FRAMA_C_ENV],
+#           [m4_normalize(m4_esyscmd([echo $FRAMA_C]))])
+
 m4_define([FRAMAC_SHARE_ENV],
           [m4_normalize(m4_esyscmd([echo $FRAMAC_SHARE]))])
+
+# m4_define([FRAMA_C],
+# 	  [m4_ifval(FRAMA_C_ENV,[FRAMA_C_ENV],
+#                                 [echo frama-c])])
 
 m4_define([FRAMAC_SHARE],
 	  [m4_ifval(FRAMAC_SHARE_ENV,[FRAMAC_SHARE_ENV],
@@ -43,14 +50,12 @@ check_plugin(e_acsl,PLUGIN_RELATIVE_PATH(plugin_file),
 
 AC_MSG_CHECKING(for Frama-C version)
 
+#FRAMAC_VERSION=`$FRAMA_C -version | sed -e 's/Version: \(.*\)/\1/' -e '2,$d' `
 FRAMAC_VERSION=`frama-c -version | sed -e 's/Version: \(.*\)/\1/' -e '2,$d' `
 AC_MSG_RESULT($FRAMAC_VERSION)
 
 DEV_VERSION_NUMBER=`echo $FRAMAC_VERSION | sed -e 's/.*-\(.*\)/\1/' `
 VERSION_NUMBER=`echo $DEV_VERSION_NUMBER | sed -e 's/\(.*\)+dev/\1/' `
-
-# at the time being, using the Frama-C development version is ok
-# DEV=`echo $DEV_VERSION_NUMBER | sed -e 's/.*\(+dev\)/\1/' `
 
 if test $VERSION_NUMBER -lt 20111001; then
   AC_MSG_ERROR(Frama-C version must be Nitrogen-20111001.)
@@ -58,6 +63,12 @@ else if test $VERSION_NUMBER -gt 20111001; then
   AC_MSG_WARN(Frama-C version higher than Nitrogen-20111001 not tested: use it at your own risk.)
 fi
 fi
+
+# at the time being, using the Frama-C development version is ok
+# DEV=`echo $DEV_VERSION_NUMBER | sed -e 's/.*\(+dev\)/\1/' `
+# if test "$DEV" != "+dev"; then
+#   AC_MSG_ERROR(Frama-C version must be the current SVN version.)
+# fi
 
 # OCaml version
 ###############

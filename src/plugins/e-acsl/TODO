@@ -15,8 +15,6 @@
 - utiliser Rte pour tous les overflows potentiels
   (get_rte_annotations dans Oxygen)
 - [Yannick] Logic functions
-- customization des noms de variable générés 
-  (par ex pour indiquer le nom de la variable d'origine, ou son rôle)
 - vérifier l'export des fonctions GMP dans share: je crois qu'il manque mpz_com
 - regarder BTS 72 (bug Jessie) et regarder le comportement d'E-ACSL
 

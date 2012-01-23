@@ -36,7 +36,7 @@ val dummy: t
 val empty: Visitor.frama_c_visitor -> t
 
 val new_var:
-  ?global:bool -> t -> term option -> typ -> 
+  ?global:bool -> ?name:string -> t -> term option -> typ -> 
   (varinfo -> exp (* the var as exp *) -> stmt list)
   -> exp * t
 (** [new_var env t ty mk_stmts] extends [env] with a fresh variable of type
@@ -47,7 +47,7 @@ val new_var:
     to [mk_stmts]. *)
 
 val new_var_and_mpz_init:
-  ?global:bool -> t -> term option -> 
+  ?global:bool -> ?name:string -> t -> term option -> 
   (varinfo -> exp (* the var as exp *) -> stmt list) 
   -> exp * t
 (** Same as [new_var], but dedicated to mpz_t variables initialized by 

@@ -147,78 +147,78 @@ int main(void)
   int __retres;
   /*@ assert ∀ int x; 0 ≤ x ∧ x ≤ 1 ⇒ x ≡ 0 ∨ x ≡ 1; */ ;
   {
-    int e_acsl_1;
-    int e_acsl_2;
-    e_acsl_1 = 1;
-    e_acsl_2 = 0;
+    int __e_acsl_var;
+    int __e_acsl_x;
+    __e_acsl_var = 1;
+    __e_acsl_x = 0;
     while (1) {
-      if (! (e_acsl_2 <= 1)) { break; }
-      { int e_acsl_3;
-        if (e_acsl_2 == 0) { e_acsl_3 = 1; }
-        else { e_acsl_3 = e_acsl_2 == 1; }
-        if (! e_acsl_3) {
-          e_acsl_1 = 0;
+      if (! (__e_acsl_x <= 1)) { break; }
+      { int __e_acsl_var_2;
+        if (__e_acsl_x == 0) { __e_acsl_var_2 = 1; }
+        else { __e_acsl_var_2 = __e_acsl_x == 1; }
+        if (! __e_acsl_var_2) {
+          __e_acsl_var = 0;
           goto e_acsl_end_loop1; }
       }
       
-      e_acsl_2 ++;
+      __e_acsl_x ++;
     }
     e_acsl_end_loop1: ;
-    e_acsl_assert(! e_acsl_1,(char *)"Assertion",
+    e_acsl_assert(! __e_acsl_var,(char *)"Assertion",
                   (char *)"(\\forall int x; 0 <= x && x <= 1 ==> x == 0 || x == 1)",
                   11);
   }
   
   /*@ assert ∀ int x; 0 < x ∧ x ≤ 1 ⇒ x ≡ 1; */ ;
   {
-    int e_acsl_4;
-    int e_acsl_5;
-    e_acsl_4 = 1;
-    e_acsl_5 = 0 + 1;
+    int __e_acsl_var_3;
+    int __e_acsl_x_2;
+    __e_acsl_var_3 = 1;
+    __e_acsl_x_2 = 0 + 1;
     while (1) {
-      if (! (e_acsl_5 <= 1)) { break; }
-      if (! (e_acsl_5 == 1)) {
-        e_acsl_4 = 0;
+      if (! (__e_acsl_x_2 <= 1)) { break; }
+      if (! (__e_acsl_x_2 == 1)) {
+        __e_acsl_var_3 = 0;
         goto e_acsl_end_loop2; }
-      e_acsl_5 ++;
+      __e_acsl_x_2 ++;
     }
     e_acsl_end_loop2: ;
-    e_acsl_assert(! e_acsl_4,(char *)"Assertion",
+    e_acsl_assert(! __e_acsl_var_3,(char *)"Assertion",
                   (char *)"(\\forall int x; 0 < x && x <= 1 ==> x == 1)",12);
   }
   
   /*@ assert ∀ int x; 0 < x ∧ x < 1 ⇒ \false; */ ;
   {
-    int e_acsl_6;
-    int e_acsl_7;
-    e_acsl_6 = 1;
-    e_acsl_7 = 0 + 1;
+    int __e_acsl_var_4;
+    int __e_acsl_x_3;
+    __e_acsl_var_4 = 1;
+    __e_acsl_x_3 = 0 + 1;
     while (1) {
-      if (! (e_acsl_7 < 1)) { break; }
-      e_acsl_6 = 0;
+      if (! (__e_acsl_x_3 < 1)) { break; }
+      __e_acsl_var_4 = 0;
       goto e_acsl_end_loop3;
-      e_acsl_7 ++;
+      __e_acsl_x_3 ++;
     }
     e_acsl_end_loop3: ;
-    e_acsl_assert(! e_acsl_6,(char *)"Assertion",
+    e_acsl_assert(! __e_acsl_var_4,(char *)"Assertion",
                   (char *)"(\\forall int x; 0 < x && x < 1 ==> \\false)",13);
   }
   
   /*@ assert ∀ int x; 0 ≤ x ∧ x < 1 ⇒ x ≡ 0; */ ;
   {
-    int e_acsl_8;
-    int e_acsl_9;
-    e_acsl_8 = 1;
-    e_acsl_9 = 0;
+    int __e_acsl_var_5;
+    int __e_acsl_x_4;
+    __e_acsl_var_5 = 1;
+    __e_acsl_x_4 = 0;
     while (1) {
-      if (! (e_acsl_9 < 1)) { break; }
-      if (! (e_acsl_9 == 0)) {
-        e_acsl_8 = 0;
+      if (! (__e_acsl_x_4 < 1)) { break; }
+      if (! (__e_acsl_x_4 == 0)) {
+        __e_acsl_var_5 = 0;
         goto e_acsl_end_loop4; }
-      e_acsl_9 ++;
+      __e_acsl_x_4 ++;
     }
     e_acsl_end_loop4: ;
-    e_acsl_assert(! e_acsl_8,(char *)"Assertion",
+    e_acsl_assert(! __e_acsl_var_5,(char *)"Assertion",
                   (char *)"(\\forall int x; 0 <= x && x < 1 ==> x == 0)",14);
   }
   
@@ -227,51 +227,52 @@ int main(void)
   ((0 ≤ x ∧ x < 2) ∧ (0 ≤ y ∧ y < 5)) ∧ (0 ≤ z ∧ z ≤ y) ⇒
   x+z ≤ y+1; */ ;
   {
-    int e_acsl_10;
-    int e_acsl_11;
-    int e_acsl_12;
-    int e_acsl_13;
-    e_acsl_10 = 1;
-    e_acsl_11 = 0;
+    int __e_acsl_var_6;
+    int __e_acsl_x_5;
+    int __e_acsl_y;
+    int __e_acsl_z;
+    __e_acsl_var_6 = 1;
+    __e_acsl_x_5 = 0;
     while (1) {
-      if (! (e_acsl_11 < 2)) { break; }
-      e_acsl_12 = 0;
+      if (! (__e_acsl_x_5 < 2)) { break; }
+      __e_acsl_y = 0;
       while (1) {
-        if (! (e_acsl_12 < 5)) { break; }
-        e_acsl_13 = 0;
+        if (! (__e_acsl_y < 5)) { break; }
+        __e_acsl_z = 0;
         while (1) {
-          if (! (e_acsl_13 <= e_acsl_12)) { break; }
-          if (! (e_acsl_11 + e_acsl_13 <= e_acsl_12 + 1)) {
-            e_acsl_10 = 0;
+          if (! (__e_acsl_z <= __e_acsl_y)) { break; }
+          if (! (__e_acsl_x_5 + __e_acsl_z <= __e_acsl_y + 1)) {
+            __e_acsl_var_6 = 0;
             goto e_acsl_end_loop5;
           }
-          e_acsl_13 ++;
+          __e_acsl_z ++;
         }
-        e_acsl_12 ++;
+        __e_acsl_y ++;
       }
-      e_acsl_11 ++;
+      __e_acsl_x_5 ++;
     }
     e_acsl_end_loop5: ;
-    e_acsl_assert(! e_acsl_10,(char *)"Assertion",
+    e_acsl_assert(! __e_acsl_var_6,(char *)"Assertion",
                   (char *)"(\\forall int x, int y, int z;\n  ((0 <= x && x < 2) && (0 <= y && y < 5)) && (0 <= z && z <= y) ==>\n  x+z <= y+1)",
                   18);
   }
   
   /*@ assert ∃ int x; (0 ≤ x ∧ x < 10) ∧ x ≡ 5; */ ;
   {
-    int e_acsl_14;
-    int e_acsl_15;
-    e_acsl_14 = 0;
-    e_acsl_15 = 0;
+    int __e_acsl_var_7;
+    int __e_acsl_x_6;
+    __e_acsl_var_7 = 0;
+    __e_acsl_x_6 = 0;
     while (1) {
-      if (! (e_acsl_15 < 10)) { break; }
-      if (! (! (e_acsl_15 == 5))) {
-        e_acsl_14 = 1;
-        goto e_acsl_end_loop6; }
-      e_acsl_15 ++;
+      if (! (__e_acsl_x_6 < 10)) { break; }
+      if (! (! (__e_acsl_x_6 == 5))) {
+        __e_acsl_var_7 = 1;
+        goto e_acsl_end_loop6;
+      }
+      __e_acsl_x_6 ++;
     }
     e_acsl_end_loop6: ;
-    e_acsl_assert(! e_acsl_14,(char *)"Assertion",
+    e_acsl_assert(! __e_acsl_var_7,(char *)"Assertion",
                   (char *)"(\\exists int x; (0 <= x && x < 10) && x == 5)",
                   23);
   }
@@ -280,51 +281,51 @@ int main(void)
   assert ∀ int x; 0 ≤ x ∧ x < 10 ⇒
   (x%2 ≡ 0 ⇒ (∃ int y; (0 ≤ y ∧ y ≤ x/2) ∧ x ≡ 2*y)); */ ;
   {
-    int e_acsl_16;
-    int e_acsl_17;
-    e_acsl_16 = 1;
-    e_acsl_17 = 0;
+    int __e_acsl_var_8;
+    int __e_acsl_x_7;
+    __e_acsl_var_8 = 1;
+    __e_acsl_x_7 = 0;
     while (1) {
-      if (! (e_acsl_17 < 10)) { break; }
+      if (! (__e_acsl_x_7 < 10)) { break; }
       {
-        int e_acsl_18;
-        int e_acsl_22;
+        int __e_acsl_var_9;
+        int __e_acsl_var_12;
         /*@ assert 2 ≢ 0; */ ;
         e_acsl_assert(2 == 0,(char *)"Assertion",(char *)"(2 == 0)",28);
-        e_acsl_18 = e_acsl_17 % 2;
-        if (! (e_acsl_18 == 0)) { e_acsl_22 = 1; }
+        __e_acsl_var_9 = __e_acsl_x_7 % 2;
+        if (! (__e_acsl_var_9 == 0)) { __e_acsl_var_12 = 1; }
         else {
-          int e_acsl_19;
-          int e_acsl_20;
-          e_acsl_19 = 0;
-          e_acsl_20 = 0;
+          int __e_acsl_var_10;
+          int __e_acsl_y_2;
+          __e_acsl_var_10 = 0;
+          __e_acsl_y_2 = 0;
           while (1) {
             {
-              int e_acsl_21;
+              int __e_acsl_var_11;
               /*@ assert 2 ≢ 0; */ ;
               e_acsl_assert(2 == 0,(char *)"Assertion",(char *)"(2 == 0)",28);
-              e_acsl_21 = e_acsl_17 / 2;
-              if (! (e_acsl_20 <= e_acsl_21)) { break; }
+              __e_acsl_var_11 = __e_acsl_x_7 / 2;
+              if (! (__e_acsl_y_2 <= __e_acsl_var_11)) { break; }
             }
             
-            if (! (! (e_acsl_17 == 2 * e_acsl_20))) {
-              e_acsl_19 = 1;
+            if (! (! (__e_acsl_x_7 == 2 * __e_acsl_y_2))) {
+              __e_acsl_var_10 = 1;
               goto e_acsl_end_loop7;
             }
-            e_acsl_20 ++;
+            __e_acsl_y_2 ++;
           }
           e_acsl_end_loop7: ;
-          e_acsl_22 = e_acsl_19;
+          __e_acsl_var_12 = __e_acsl_var_10;
         }
-        if (! e_acsl_22) {
-          e_acsl_16 = 0;
+        if (! __e_acsl_var_12) {
+          __e_acsl_var_8 = 0;
           goto e_acsl_end_loop8; }
       }
       
-      e_acsl_17 ++;
+      __e_acsl_x_7 ++;
     }
     e_acsl_end_loop8: ;
-    e_acsl_assert(! e_acsl_16,(char *)"Assertion",
+    e_acsl_assert(! __e_acsl_var_8,(char *)"Assertion",
                   (char *)"(\\forall int x; 0 <= x && x < 10 ==>\n  (x%2 == 0 ==> (\\exists int y; (0 <= y && y <= x/2) && x == 2*y)))",
                   27);
   }

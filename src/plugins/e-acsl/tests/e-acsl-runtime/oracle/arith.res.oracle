@@ -161,52 +161,52 @@ int main(void)
                 (char *)"Assertion",(char *)"(x*3 == -9)",18);
   /*@ assert x/3 ≡ -1; */ ;
   {
-    int e_acsl_1;
+    int __e_acsl_var;
     /*@ assert 3 ≢ 0; */ ;
     e_acsl_assert(3 == 0,(char *)"Assertion",(char *)"(3 == 0)",19);
-    e_acsl_1 = x / 3;
-    e_acsl_assert(! (e_acsl_1 == -1),(char *)"Assertion",
+    __e_acsl_var = x / 3;
+    e_acsl_assert(! (__e_acsl_var == -1),(char *)"Assertion",
                   (char *)"(x/3 == -1)",19);
   }
   
   /*@ assert 0xfffffffffff/0xfffffffffff ≡ 1; */ ;
   {
-    int e_acsl_2;
+    int __e_acsl_var_2;
     /*@ assert 0xfffffffffff ≢ 0; */ ;
     e_acsl_assert(0xfffffffffff == (long long)0,(char *)"Assertion",
                   (char *)"(0xfffffffffff == 0)",20);
-    e_acsl_2 = (int)(0xfffffffffff / 0xfffffffffff);
-    e_acsl_assert(! (e_acsl_2 == 1),(char *)"Assertion",
+    __e_acsl_var_2 = (int)(0xfffffffffff / 0xfffffffffff);
+    e_acsl_assert(! (__e_acsl_var_2 == 1),(char *)"Assertion",
                   (char *)"(0xfffffffffff/0xfffffffffff == 1)",20);
   }
   
   /*@ assert x%2 ≡ -1; */ ;
   {
-    int e_acsl_3;
+    int __e_acsl_var_3;
     /*@ assert 2 ≢ 0; */ ;
     e_acsl_assert(2 == 0,(char *)"Assertion",(char *)"(2 == 0)",21);
-    e_acsl_3 = x % 2;
-    e_acsl_assert(! (e_acsl_3 == -1),(char *)"Assertion",
+    __e_acsl_var_3 = x % 2;
+    e_acsl_assert(! (__e_acsl_var_3 == -1),(char *)"Assertion",
                   (char *)"(x%2 == -1)",21);
   }
   
   /*@ assert -3%-2 ≡ -1; */ ;
   {
-    int e_acsl_4;
+    int __e_acsl_var_4;
     /*@ assert -2 ≢ 0; */ ;
     e_acsl_assert(-2 == 0,(char *)"Assertion",(char *)"(-2 == 0)",22);
-    e_acsl_4 = -3 % -2;
-    e_acsl_assert(! (e_acsl_4 == -1),(char *)"Assertion",
+    __e_acsl_var_4 = -3 % -2;
+    e_acsl_assert(! (__e_acsl_var_4 == -1),(char *)"Assertion",
                   (char *)"(-3%-2 == -1)",22);
   }
   
   /*@ assert 3%-2 ≡ 1; */ ;
   {
-    int e_acsl_5;
+    int __e_acsl_var_5;
     /*@ assert -2 ≢ 0; */ ;
     e_acsl_assert(-2 == 0,(char *)"Assertion",(char *)"(-2 == 0)",23);
-    e_acsl_5 = 3 % -2;
-    e_acsl_assert(! (e_acsl_5 == 1),(char *)"Assertion",
+    __e_acsl_var_5 = 3 % -2;
+    e_acsl_assert(! (__e_acsl_var_5 == 1),(char *)"Assertion",
                   (char *)"(3%-2 == 1)",23);
   }
   

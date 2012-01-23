@@ -31,56 +31,57 @@ int search(int elt)
 {
   int __retres;
   int k;
-  int e_acsl_5;
-  int e_acsl_9;
+  int __e_acsl_var_3;
+  int __e_acsl_var_6;
   {
-    int e_acsl_1;
-    int e_acsl_2;
-    e_acsl_1 = 1;
-    e_acsl_2 = 0;
+    int __e_acsl_var;
+    int __e_acsl_i;
+    __e_acsl_var = 1;
+    __e_acsl_i = 0;
     while (1) {
-      if (! (e_acsl_2 < 9)) { break; }
-      if (! (A[e_acsl_2] <= A[e_acsl_2 + 1])) {
-        e_acsl_1 = 0;
+      if (! (__e_acsl_i < 9)) { break; }
+      if (! (A[__e_acsl_i] <= A[__e_acsl_i + 1])) {
+        __e_acsl_var = 0;
         goto e_acsl_end_loop1;
       }
-      e_acsl_2 ++;
+      __e_acsl_i ++;
     }
     e_acsl_end_loop1: ;
-    e_acsl_assert(! e_acsl_1,(char *)"Precondition",
+    e_acsl_assert(! __e_acsl_var,(char *)"Precondition",
                   (char *)"(\\forall int i; 0 <= i && i < 9 ==> A[i] <= A[i+1])",
                   9);
     {
-      int e_acsl_7;
-      int e_acsl_8;
-      e_acsl_7 = 1;
-      e_acsl_8 = 0;
+      int __e_acsl_var_5;
+      int __e_acsl_j_2;
+      __e_acsl_var_5 = 1;
+      __e_acsl_j_2 = 0;
       while (1) {
-        if (! (e_acsl_8 < 10)) { break; }
-        if (! (A[e_acsl_8] != elt)) {
-          e_acsl_7 = 0;
-          goto e_acsl_end_loop3; }
-        e_acsl_8 ++;
+        if (! (__e_acsl_j_2 < 10)) { break; }
+        if (! (A[__e_acsl_j_2] != elt)) {
+          __e_acsl_var_5 = 0;
+          goto e_acsl_end_loop3;
+        }
+        __e_acsl_j_2 ++;
       }
       e_acsl_end_loop3: ;
-      e_acsl_9 = e_acsl_7;
+      __e_acsl_var_6 = __e_acsl_var_5;
     }
     
     {
-      int e_acsl_3;
-      int e_acsl_4;
-      e_acsl_3 = 0;
-      e_acsl_4 = 0;
+      int __e_acsl_var_2;
+      int __e_acsl_j;
+      __e_acsl_var_2 = 0;
+      __e_acsl_j = 0;
       while (1) {
-        if (! (e_acsl_4 < 10)) { break; }
-        if (! (! (A[e_acsl_4] == elt))) {
-          e_acsl_3 = 1;
+        if (! (__e_acsl_j < 10)) { break; }
+        if (! (! (A[__e_acsl_j] == elt))) {
+          __e_acsl_var_2 = 1;
           goto e_acsl_end_loop2;
         }
-        e_acsl_4 ++;
+        __e_acsl_j ++;
       }
       e_acsl_end_loop2: ;
-      e_acsl_5 = e_acsl_3;
+      __e_acsl_var_3 = __e_acsl_var_2;
     }
     
     k = 0;
@@ -99,16 +100,17 @@ int search(int elt)
   }
   __retres = 0;
   return_label: 
-  { int e_acsl_6;
-    int e_acsl_10;
-    if (! e_acsl_5) { e_acsl_6 = 1; }
-    else { e_acsl_6 = __retres == 1; }
-    e_acsl_assert(! e_acsl_6,(char *)"Postcondition",
+  {
+    int __e_acsl_var_4;
+    int __e_acsl_var_7;
+    if (! __e_acsl_var_3) { __e_acsl_var_4 = 1; }
+    else { __e_acsl_var_4 = __retres == 1; }
+    e_acsl_assert(! __e_acsl_var_4,(char *)"Postcondition",
                   (char *)"(\\old(\\exists int j; (0 <= j && j < 10) && A[j] == elt) ==> \\result == 1)",
                   12);
-    if (! e_acsl_9) { e_acsl_10 = 1; }
-    else { e_acsl_10 = __retres == 0; }
-    e_acsl_assert(! e_acsl_10,(char *)"Postcondition",
+    if (! __e_acsl_var_6) { __e_acsl_var_7 = 1; }
+    else { __e_acsl_var_7 = __retres == 0; }
+    e_acsl_assert(! __e_acsl_var_7,(char *)"Postcondition",
                   (char *)"(\\old(\\forall int j; 0 <= j && j < 10 ==> A[j] != elt) ==> \\result == 0)",
                   15);
     return (__retres);
