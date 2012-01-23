@@ -27,20 +27,20 @@ int main(void)
   t[2] = 4;
   p = & x;
   /*@ assert *p ≡ 1; */ ;
-  e_acsl_assert(! (*p == 1),(char *)"Assertion",(char *)"(*p == 1)",12);
+  e_acsl_assert(! (*p == 1),(char *)"Assertion",(char *)"(*p == 1)",13);
   /*@ assert t[0] ≡ 2; */ ;
-  e_acsl_assert(! (t[0] == 2),(char *)"Assertion",(char *)"(t[0] == 2)",13);
+  e_acsl_assert(! (t[0] == 2),(char *)"Assertion",(char *)"(t[0] == 2)",14);
   /*@ assert t[2] ≡ 4; */ ;
-  e_acsl_assert(! (t[2] == 4),(char *)"Assertion",(char *)"(t[2] == 4)",14);
+  e_acsl_assert(! (t[2] == 4),(char *)"Assertion",(char *)"(t[2] == 4)",15);
   /*@ assert t[(2*sizeof(int))/sizeof((int)0x0)] ≡ 4; */ ;
   {
     int e_acsl_1;
     /*@ assert sizeof((int)0x0) ≢ 0; */ ;
     e_acsl_assert(4 == 0,(char *)"Assertion",
-                  (char *)"(sizeof((int)0x0) == 0)",15);
+                  (char *)"(sizeof((int)0x0) == 0)",16);
     e_acsl_1 = (2 * 4) / 4;
     e_acsl_assert(! (t[e_acsl_1] == 4),(char *)"Assertion",
-                  (char *)"(t[(2*sizeof(int))/sizeof((int)0x0)] == 4)",15);
+                  (char *)"(t[(2*sizeof(int))/sizeof((int)0x0)] == 4)",16);
   }
   
   {
@@ -50,13 +50,13 @@ int main(void)
       if (! (i < 2)) { break; }
       /*@ assert t[i] ≡ i+2; */ ;
       e_acsl_assert(! ((long long)t[i] == (long long)i + (long long)2),
-                    (char *)"Assertion",(char *)"(t[i] == i+2)",18);
+                    (char *)"Assertion",(char *)"(t[i] == i+2)",19);
       /*@ assert t[2-i] ≡ 4-i; */ ;
       e_acsl_assert(! ((long long)t[(long long)2 - (long long)i] == (long long)4 - (long long)i),
-                    (char *)"Assertion",(char *)"(t[2-i] == 4-i)",19);
+                    (char *)"Assertion",(char *)"(t[2-i] == 4-i)",20);
       /*@ assert *(&t[2]-i) ≡ 4-i; */ ;
       e_acsl_assert(! ((long long)*(& t[2] - i) == (long long)4 - (long long)i),
-                    (char *)"Assertion",(char *)"(*(&t[2]-i) == 4-i)",20);
+                    (char *)"Assertion",(char *)"(*(&t[2]-i) == 4-i)",21);
       i ++;
     }
   }
@@ -64,7 +64,7 @@ int main(void)
   p = & t[2];
   t[2] = 5;
   /*@ assert *p ≡ 5; */ ;
-  e_acsl_assert(! (*p == 5),(char *)"Assertion",(char *)"(*p == 5)",26);
+  e_acsl_assert(! (*p == 5),(char *)"Assertion",(char *)"(*p == 5)",27);
   __retres = 0;
   return (__retres);
 }

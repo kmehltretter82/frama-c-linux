@@ -1,6 +1,7 @@
 /* run.config
    COMMENT: labeled stmt and gotos
    EXECNOW: LOG gen_labeled_stmt.c BIN gen_labeled_stmt.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/labeled_stmt.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_labeled_stmt.c > /dev/null && gcc -pedantic -o ./tests/e-acsl-runtime/result/gen_labeled_stmt.out ./tests/e-acsl-runtime/result/gen_labeled_stmt.c -lgmp && ./tests/e-acsl-runtime/result/gen_labeled_stmt.out
+   EXECNOW: LOG gen_labeled_stmt2.c BIN gen_labeled_stmt2.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/labeled_stmt.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_labeled_stmt2.c > /dev/null && gcc -pedantic -o ./tests/e-acsl-runtime/result/gen_labeled_stmt2.out ./tests/e-acsl-runtime/result/gen_labeled_stmt2.c -lgmp && ./tests/e-acsl-runtime/result/gen_labeled_stmt2.out
 */
 
 int X = 0;

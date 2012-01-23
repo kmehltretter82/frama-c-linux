@@ -53,16 +53,16 @@ int main(void)
   goto L1;
   L1: 
   /*@ assert X ≡ 0; */ ;
-  e_acsl_assert(! (X == 0),(char *)"Assertion",(char *)"(X == 0)",11);
+  e_acsl_assert(! (X == 0),(char *)"Assertion",(char *)"(X == 0)",12);
   X = 1;
   goto L2;
   L2: 
   /*@ requires X ≡ 1;
       ensures X ≡ 2; */
   {
-    e_acsl_assert(! (X == 1),(char *)"Precondition",(char *)"(X == 1)",13);
+    e_acsl_assert(! (X == 1),(char *)"Precondition",(char *)"(X == 1)",14);
     X = 2;
-    e_acsl_assert(! (X == 2),(char *)"Postcondition",(char *)"(X == 2)",13);
+    e_acsl_assert(! (X == 2),(char *)"Postcondition",(char *)"(X == 2)",14);
   }
   
   if (X) {
@@ -71,7 +71,7 @@ int main(void)
     goto return_label; }
   __retres = 0;
   return_label: e_acsl_assert(! (X == 3),(char *)"Postcondition",
-                              (char *)"(X == 3)",8);
+                              (char *)"(X == 3)",9);
   return (__retres);
 }
 

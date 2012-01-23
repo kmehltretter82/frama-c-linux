@@ -1,7 +1,7 @@
-tests/e-acsl-runtime/array.i:13:[e-acsl] warning: missing guard for ensuring that 0 is a valid array index
-tests/e-acsl-runtime/array.i:13:[e-acsl] warning: missing guard for ensuring that 0 is a valid array index
-tests/e-acsl-runtime/array.i:14:[e-acsl] warning: missing guard for ensuring that 1 is a valid array index
-tests/e-acsl-runtime/array.i:14:[e-acsl] warning: missing guard for ensuring that 1 is a valid array index
+tests/e-acsl-runtime/array.i:14:[e-acsl] warning: missing guard for ensuring that 0 is a valid array index
+tests/e-acsl-runtime/array.i:14:[e-acsl] warning: missing guard for ensuring that 0 is a valid array index
+tests/e-acsl-runtime/array.i:15:[e-acsl] warning: missing guard for ensuring that 1 is a valid array index
+tests/e-acsl-runtime/array.i:15:[e-acsl] warning: missing guard for ensuring that 1 is a valid array index
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed
@@ -84,10 +84,10 @@ int main(void)
   
   /*@ assert T1[0] ≡ T2[0]; */ ;
   e_acsl_assert(! (T1[0] == T2[0]),(char *)"Assertion",
-                (char *)"(T1[0] == T2[0])",13);
+                (char *)"(T1[0] == T2[0])",14);
   /*@ assert T1[1] ≢ T2[1]; */ ;
   e_acsl_assert(! (T1[1] != T2[1]),(char *)"Assertion",
-                (char *)"(T1[1] != T2[1])",14);
+                (char *)"(T1[1] != T2[1])",15);
   __retres = 0;
   return (__retres);
 }

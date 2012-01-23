@@ -25,7 +25,7 @@ int f(int x)
   x = 0;
   e_acsl_assert(! (x == (int)((long long)e_acsl_1 - (long long)e_acsl_2)),
                 (char *)"Postcondition",
-                (char *)"(\\result == (int)(\\old(x)-\\old(x)))",6);
+                (char *)"(\\result == (int)(\\old(x)-\\old(x)))",7);
   return (x);
 }
 
@@ -34,7 +34,7 @@ int Y = 1;
 int g(int x)
 {
   e_acsl_assert(! (x == Y),(char *)"Postcondition",(char *)"(\\result == Y)",
-                17);
+                18);
   return (x);
 }
 
@@ -44,7 +44,7 @@ int h(void)
   int __retres;
   __retres = 0;
   e_acsl_assert(! (__retres == 0),(char *)"Postcondition",
-                (char *)"(\\result == 0)",22);
+                (char *)"(\\result == 0)",23);
   return (__retres);
 }
 

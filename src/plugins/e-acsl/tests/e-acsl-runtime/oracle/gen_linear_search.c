@@ -49,7 +49,7 @@ int search(int elt)
     e_acsl_end_loop1: ;
     e_acsl_assert(! e_acsl_1,(char *)"Precondition",
                   (char *)"(\\forall int i; 0 <= i && i < 9 ==> A[i] <= A[i+1])",
-                  8);
+                  9);
     {
       int e_acsl_7;
       int e_acsl_8;
@@ -105,12 +105,12 @@ int search(int elt)
     else { e_acsl_6 = __retres == 1; }
     e_acsl_assert(! e_acsl_6,(char *)"Postcondition",
                   (char *)"(\\old(\\exists int j; (0 <= j && j < 10) && A[j] == elt) ==> \\result == 1)",
-                  11);
+                  12);
     if (! e_acsl_9) { e_acsl_10 = 1; }
     else { e_acsl_10 = __retres == 0; }
     e_acsl_assert(! e_acsl_10,(char *)"Postcondition",
                   (char *)"(\\old(\\forall int j; 0 <= j && j < 10 ==> A[j] != elt) ==> \\result == 0)",
-                  14);
+                  15);
     return (__retres);
   }
   
@@ -129,10 +129,10 @@ int main(void)
   
   found = search(36);
   /*@ assert found ≡ 1; */ ;
-  e_acsl_assert(! (found == 1),(char *)"Assertion",(char *)"(found == 1)",30);
+  e_acsl_assert(! (found == 1),(char *)"Assertion",(char *)"(found == 1)",31);
   found = search(5);
   /*@ assert found ≡ 0; */ ;
-  e_acsl_assert(! (found == 0),(char *)"Assertion",(char *)"(found == 0)",33);
+  e_acsl_assert(! (found == 0),(char *)"Assertion",(char *)"(found == 0)",34);
   __retres = 0;
   return (__retres);
 }

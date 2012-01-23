@@ -20,14 +20,14 @@ int main(void)
   int __retres;
   int x;
   /*@ assert 0 ≡ 0; */ ;
-  e_acsl_assert(! (0 == 0),(char *)"Assertion",(char *)"(0 == 0)",8);
+  e_acsl_assert(! (0 == 0),(char *)"Assertion",(char *)"(0 == 0)",9);
   x = 0;
   /*@ assert 0 ≢ 1; */ ;
-  e_acsl_assert(! (0 != 1),(char *)"Assertion",(char *)"(0 != 1)",9);
+  e_acsl_assert(! (0 != 1),(char *)"Assertion",(char *)"(0 != 1)",10);
   /*@ assert 1152921504606846975 ≡ 0xfffffffffffffff; */ ;
   e_acsl_assert(! ((unsigned long long)1152921504606846975 == (unsigned long long)0xfffffffffffffff),
                 (char *)"Assertion",
-                (char *)"(1152921504606846975 == 0xfffffffffffffff)",10);
+                (char *)"(1152921504606846975 == 0xfffffffffffffff)",11);
   __retres = 0;
   return (__retres);
 }

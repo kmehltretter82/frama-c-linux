@@ -263,12 +263,12 @@ int main(void)
         if (0 <= i) { e_acsl_1 = i < 10; }
         else { e_acsl_1 = 0; }
         e_acsl_assert(! e_acsl_1,(char *)"Invariant",
-                      (char *)"(0 <= i && i < 10)",8);
+                      (char *)"(0 <= i && i < 10)",9);
       }
       
       x += i;
       /*@ invariant i ≤ x; */ ;
-      e_acsl_assert(! (i <= x),(char *)"Invariant",(char *)"(i <= x)",10);
+      e_acsl_assert(! (i <= x),(char *)"Invariant",(char *)"(i <= x)",11);
       i ++;
     }
   }

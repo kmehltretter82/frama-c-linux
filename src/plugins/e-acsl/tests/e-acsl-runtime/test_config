@@ -1,1 +1,2 @@
 OPT: -e-acsl -then-on e-acsl -check -print -val
+OPT: -e-acsl -e-acsl-gmp-only -then-on e-acsl -check -print -val

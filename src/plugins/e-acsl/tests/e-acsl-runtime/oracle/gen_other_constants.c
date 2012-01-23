@@ -24,13 +24,13 @@ int main(void)
   int __retres;
   /*@ assert "toto" ≢ "titi"; */ ;
   e_acsl_assert(! ("toto" != "titi"),(char *)"Assertion",
-                (char *)"(\"toto\" != \"titi\")",9);
+                (char *)"(\"toto\" != \"titi\")",10);
   /*@ assert 'c' ≡ 'c'; */ ;
   e_acsl_assert(! ('c' == 'c'),(char *)"Assertion",
-                (char *)"(\'c\' == \'c\')",10);
+                (char *)"(\'c\' == \'c\')",11);
   /*@ assert false ≢ true; */ ;
   e_acsl_assert(! (false != true),(char *)"Assertion",
-                (char *)"(false != true)",11);
+                (char *)"(false != true)",12);
   __retres = 0;
   return (__retres);
 }

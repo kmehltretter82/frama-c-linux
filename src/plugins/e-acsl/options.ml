@@ -58,6 +58,14 @@ module Project_name =
       let arg_name = "prj"
      end)
 
+module Gmp_only =
+  False
+    (struct
+      let option_name = "-e-acsl-gmp-only"
+      let help = ""
+      let kind = `Correctness
+     end)
+
 let () = Plugin.set_group help
 module Version =
   False

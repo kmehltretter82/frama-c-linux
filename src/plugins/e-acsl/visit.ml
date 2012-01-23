@@ -578,6 +578,24 @@ class e_acsl_visitor prj generate = object (self)
   method private reset_env () =
     function_env := Env.empty (self :> Visitor.frama_c_visitor)
 
+  method vfile f =
+    (* copy the options used during the visit in the new project: it is the
+       right place to do this: it is still before visiting, but after
+       that the visitor internals reset all of them :-(. *)
+    let cur = Project.current () in
+    let must_copy = not (Project.equal cur prj) in
+    let selection = 
+      State_selection.of_list [ Options.Gmp_only.self; Options.Check.self ] 
+    in
+    if must_copy then Project.copy ~selection ~src:cur prj;
+    ChangeDoChildrenPost
+      (f, 
+       fun f ->
+	 (* reset them at the end to be observationally equivalent to a standard
+	    visitor. *) 
+	 if must_copy then Project.clear ~selection ~project:prj ();
+	 f)
+
   method vglob_aux g =
     if !first_global then begin
       first_global := false;
@@ -742,11 +760,8 @@ class e_acsl_visitor prj generate = object (self)
 end
 
 let do_visit ?(prj=Project.current ()) generate =
-  let vis = 
-    Extlib.try_finally 
-      ~finally:Typing.clear
-      (new e_acsl_visitor prj)
-      generate
+  let vis =
+    Extlib.try_finally ~finally:Typing.clear (new e_acsl_visitor prj) generate
   in
   first_global := true;
   (* explicit type annotation in order to check that no new method is

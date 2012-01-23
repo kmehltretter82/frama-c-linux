@@ -64,24 +64,24 @@ int main(void)
   x = 0;
   y = 1;
   /*@ assert x < y; */ ;
-  e_acsl_assert(! (x < y),(char *)"Assertion",(char *)"(x < y)",8);
+  e_acsl_assert(! (x < y),(char *)"Assertion",(char *)"(x < y)",9);
   /*@ requires x ≡ 0;
       ensures x ≥ 1; */
   {
-    e_acsl_assert(! (x == 0),(char *)"Precondition",(char *)"(x == 0)",9);
+    e_acsl_assert(! (x == 0),(char *)"Precondition",(char *)"(x == 0)",10);
     if (x) {
       /*@ assert \false; */ ;
-      e_acsl_assert(1,(char *)"Assertion",(char *)"(\\false)",12);
+      e_acsl_assert(1,(char *)"Assertion",(char *)"(\\false)",13);
     }
     else {
       /*@ requires x ≡ 0;
           ensures x ≡ 1; */
       {
         e_acsl_assert(! (x == 0),(char *)"Precondition",(char *)"(x == 0)",
-                      14);
+                      15);
         x ++;
         e_acsl_assert(! (x == 1),(char *)"Postcondition",(char *)"(x == 1)",
-                      15);
+                      16);
       }
       
       if (x) {
@@ -89,19 +89,19 @@ int main(void)
             ensures x ≡ 2; */
         {
           e_acsl_assert(! (x == 1),(char *)"Precondition",(char *)"(x == 1)",
-                        18);
+                        19);
           x ++;
           e_acsl_assert(! (x == 2),(char *)"Postcondition",
-                        (char *)"(x == 2)",19);
+                        (char *)"(x == 2)",20);
         }
         
       }
       else {
         /*@ assert \false; */ ;
-        e_acsl_assert(1,(char *)"Assertion",(char *)"(\\false)",22);
+        e_acsl_assert(1,(char *)"Assertion",(char *)"(\\false)",23);
       }
     }
-    e_acsl_assert(! (x >= 1),(char *)"Postcondition",(char *)"(x >= 1)",10);
+    e_acsl_assert(! (x >= 1),(char *)"Postcondition",(char *)"(x >= 1)",11);
   }
   
   __retres = 0;

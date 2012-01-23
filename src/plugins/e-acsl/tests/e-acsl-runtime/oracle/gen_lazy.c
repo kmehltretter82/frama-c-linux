@@ -27,7 +27,7 @@ int main(void)
     if (x == 0) { e_acsl_1 = y == 1; }
     else { e_acsl_1 = 0; }
     e_acsl_assert(! e_acsl_1,(char *)"Assertion",
-                  (char *)"(x == 0 && y == 1)",10);
+                  (char *)"(x == 0 && y == 1)",11);
   }
   
   /*@ assert ¬(x ≢ 0 ∧ y ≡ 1/0); */ ;
@@ -36,13 +36,13 @@ int main(void)
     if (x != 0) {
       int e_acsl_2;
       /*@ assert 0 ≢ 0; */ ;
-      e_acsl_assert(0 == 0,(char *)"Assertion",(char *)"(0 == 0)",11);
+      e_acsl_assert(0 == 0,(char *)"Assertion",(char *)"(0 == 0)",12);
       e_acsl_2 = 1 / 0;
       e_acsl_3 = y == e_acsl_2;
     }
     else { e_acsl_3 = 0; }
     e_acsl_assert(! (! e_acsl_3),(char *)"Assertion",
-                  (char *)"(!(x != 0 && y == 1/0))",11);
+                  (char *)"(!(x != 0 && y == 1/0))",12);
   }
   
   /*@ assert y ≡ 1 ∨ x ≡ 1; */ ;
@@ -50,7 +50,7 @@ int main(void)
     if (y == 1) { e_acsl_4 = 1; }
     else { e_acsl_4 = x == 1; }
     e_acsl_assert(! e_acsl_4,(char *)"Assertion",
-                  (char *)"(y == 1 || x == 1)",12);
+                  (char *)"(y == 1 || x == 1)",13);
   }
   
   /*@ assert x ≡ 0 ∨ y ≡ 1/0; */ ;
@@ -60,12 +60,12 @@ int main(void)
     else {
       int e_acsl_5;
       /*@ assert 0 ≢ 0; */ ;
-      e_acsl_assert(0 == 0,(char *)"Assertion",(char *)"(0 == 0)",13);
+      e_acsl_assert(0 == 0,(char *)"Assertion",(char *)"(0 == 0)",14);
       e_acsl_5 = 1 / 0;
       e_acsl_6 = y == e_acsl_5;
     }
     e_acsl_assert(! e_acsl_6,(char *)"Assertion",
-                  (char *)"(x == 0 || y == 1/0)",13);
+                  (char *)"(x == 0 || y == 1/0)",14);
   }
   
   /*@ assert x ≡ 0 ⇒ y ≡ 1; */ ;
@@ -73,7 +73,7 @@ int main(void)
     if (! (x == 0)) { e_acsl_7 = 1; }
     else { e_acsl_7 = y == 1; }
     e_acsl_assert(! e_acsl_7,(char *)"Assertion",
-                  (char *)"(x == 0 ==> y == 1)",14);
+                  (char *)"(x == 0 ==> y == 1)",15);
   }
   
   /*@ assert x ≡ 1 ⇒ y ≡ 1/0; */ ;
@@ -83,12 +83,12 @@ int main(void)
     else {
       int e_acsl_8;
       /*@ assert 0 ≢ 0; */ ;
-      e_acsl_assert(0 == 0,(char *)"Assertion",(char *)"(0 == 0)",15);
+      e_acsl_assert(0 == 0,(char *)"Assertion",(char *)"(0 == 0)",16);
       e_acsl_8 = 1 / 0;
       e_acsl_9 = y == e_acsl_8;
     }
     e_acsl_assert(! e_acsl_9,(char *)"Assertion",
-                  (char *)"(x == 1 ==> y == 1/0)",15);
+                  (char *)"(x == 1 ==> y == 1/0)",16);
   }
   
   /*@ assert x≢0? x ≢ 0: y ≢ 0; */ ;
@@ -96,7 +96,7 @@ int main(void)
     if (x != 0) { e_acsl_10 = x != 0; }
     else { e_acsl_10 = y != 0; }
     e_acsl_assert(! e_acsl_10,(char *)"Assertion",
-                  (char *)"(x!=0? x != 0: y != 0)",16);
+                  (char *)"(x!=0? x != 0: y != 0)",17);
   }
   
   /*@ assert y≢0? y ≢ 0: x ≢ 0; */ ;
@@ -104,7 +104,7 @@ int main(void)
     if (y != 0) { e_acsl_11 = y != 0; }
     else { e_acsl_11 = x != 0; }
     e_acsl_assert(! e_acsl_11,(char *)"Assertion",
-                  (char *)"(y!=0? y != 0: x != 0)",17);
+                  (char *)"(y!=0? y != 0: x != 0)",18);
   }
   
   /*@ assert x≡1? x ≡ 18: x ≡ 0; */ ;
@@ -112,7 +112,7 @@ int main(void)
     if (x == 1) { e_acsl_12 = x == 18; }
     else { e_acsl_12 = x == 0; }
     e_acsl_assert(! e_acsl_12,(char *)"Assertion",
-                  (char *)"(x==1? x == 18: x == 0)",18);
+                  (char *)"(x==1? x == 18: x == 0)",19);
   }
   
   /*@ assert x ≡ 2 ⇔ y ≡ 3; */ ;
@@ -128,7 +128,7 @@ int main(void)
     }
     else { e_acsl_15 = 0; }
     e_acsl_assert(! e_acsl_15,(char *)"Assertion",
-                  (char *)"(x == 2 <==> y == 3)",21);
+                  (char *)"(x == 2 <==> y == 3)",22);
   }
   
   /*@ assert x ≡ 0 ⇔ y ≡ 1; */ ;
@@ -144,7 +144,7 @@ int main(void)
     }
     else { e_acsl_18 = 0; }
     e_acsl_assert(! e_acsl_18,(char *)"Assertion",
-                  (char *)"(x == 0 <==> y == 1)",22);
+                  (char *)"(x == 0 <==> y == 1)",23);
   }
   
   /*@ assert ((x≢0? x: y)≢0) ≡ (x≡0); */ ;
@@ -152,7 +152,7 @@ int main(void)
     if (x != 0) { e_acsl_19 = x; }
     else { e_acsl_19 = y; }
     e_acsl_assert(! ((e_acsl_19 != 0) == (x == 0)),(char *)"Assertion",
-                  (char *)"(((x!=0? x: y)!=0) == (x==0))",25);
+                  (char *)"(((x!=0? x: y)!=0) == (x==0))",26);
   }
   
   /*@ assert (x ≢ 0 ∧ y ≢ 0) ∨ y ≢ 0; */ ;
@@ -163,7 +163,7 @@ int main(void)
     if (e_acsl_20) { e_acsl_21 = 1; }
     else { e_acsl_21 = y != 0; }
     e_acsl_assert(! e_acsl_21,(char *)"Assertion",
-                  (char *)"((x != 0 && y != 0) || y != 0)",26);
+                  (char *)"((x != 0 && y != 0) || y != 0)",27);
   }
   
   /*@ assert (x ≢ 0 ∨ y ≢ 0) ∧ y ≡ 1; */ ;
@@ -174,7 +174,7 @@ int main(void)
     if (e_acsl_22) { e_acsl_23 = y == 1; }
     else { e_acsl_23 = 0; }
     e_acsl_assert(! e_acsl_23,(char *)"Assertion",
-                  (char *)"((x != 0 || y != 0) && y == 1)",27);
+                  (char *)"((x != 0 || y != 0) && y == 1)",28);
   }
   
   __retres = 0;

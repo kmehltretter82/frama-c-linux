@@ -1,9 +1,9 @@
-tests/e-acsl-runtime/at.i:31:[e-acsl] warning: missing guard for ensuring that q is a valid memory access
-tests/e-acsl-runtime/at.i:31:[e-acsl] warning: missing guard for ensuring that p+\at(*q,L1) is a valid pointer
-tests/e-acsl-runtime/at.i:31:[e-acsl] warning: missing guard for ensuring that p+\at(*q,L1) is a valid memory access
-tests/e-acsl-runtime/at.i:33:[e-acsl] warning: missing guard for ensuring that q is a valid memory access
-tests/e-acsl-runtime/at.i:33:[e-acsl] warning: missing guard for ensuring that p+\at(*q,L1) is a valid pointer
-tests/e-acsl-runtime/at.i:33:[e-acsl] warning: missing guard for ensuring that p+\at(*q,L1) is a valid memory access
+tests/e-acsl-runtime/at.i:32:[e-acsl] warning: missing guard for ensuring that q is a valid memory access
+tests/e-acsl-runtime/at.i:32:[e-acsl] warning: missing guard for ensuring that p+\at(*q,L1) is a valid pointer
+tests/e-acsl-runtime/at.i:32:[e-acsl] warning: missing guard for ensuring that p+\at(*q,L1) is a valid memory access
+tests/e-acsl-runtime/at.i:34:[e-acsl] warning: missing guard for ensuring that q is a valid memory access
+tests/e-acsl-runtime/at.i:34:[e-acsl] warning: missing guard for ensuring that p+\at(*q,L1) is a valid pointer
+tests/e-acsl-runtime/at.i:34:[e-acsl] warning: missing guard for ensuring that p+\at(*q,L1) is a valid memory access
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed
@@ -137,21 +137,21 @@ void f(void)
   A = 2;
   /*@ assert \at(A,Pre) ≡ 0; */ ;
   e_acsl_assert(! (e_acsl_1 == 0),(char *)"Assertion",
-                (char *)"(\\at(A,Pre) == 0)",12);
+                (char *)"(\\at(A,Pre) == 0)",13);
   /*@ assert \at(A,F) ≡ 1; */ ;
   e_acsl_assert(! (e_acsl_2 == 1),(char *)"Assertion",
-                (char *)"(\\at(A,F) == 1)",13);
+                (char *)"(\\at(A,F) == 1)",14);
   /*@ assert \at(A,Here) ≡ 2; */ ;
   e_acsl_3 = A;
   e_acsl_assert(! (e_acsl_3 == 2),(char *)"Assertion",
-                (char *)"(\\at(A,Here) == 2)",14);
+                (char *)"(\\at(A,Here) == 2)",15);
   /*@ assert \at(\at(A,Pre),F) ≡ 0; */ ;
   e_acsl_assert(! (e_acsl_5 == 0),(char *)"Assertion",
-                (char *)"(\\at(\\at(A,Pre),F) == 0)",15);
+                (char *)"(\\at(\\at(A,Pre),F) == 0)",16);
   A = 3;
   e_acsl_6 = A;
   e_acsl_assert(! (e_acsl_6 == 3),(char *)"Postcondition",
-                (char *)"(\\at(A,Post) == 3)",8);
+                (char *)"(\\at(A,Post) == 3)",9);
   return;
 }
 
@@ -173,12 +173,12 @@ void g(int *p, int *q)
   A = 4;
   /*@ assert \at(*(p+\at(*q,L1)),L2) ≡ 2; */ ;
   e_acsl_assert(! (e_acsl_2 == 2),(char *)"Assertion",
-                (char *)"(\\at(*(p+\\at(*q,L1)),L2) == 2)",31);
+                (char *)"(\\at(*(p+\\at(*q,L1)),L2) == 2)",32);
   L3: 
   /*@ assert \at(*(p+\at(*q,L1)),Here) ≡ 2; */ ;
   e_acsl_4 = *(p + e_acsl_3);
   e_acsl_assert(! (e_acsl_4 == 2),(char *)"Assertion",
-                (char *)"(\\at(*(p+\\at(*q,L1)),Here) == 2)",33);
+                (char *)"(\\at(*(p+\\at(*q,L1)),Here) == 2)",34);
   return;
 }
 
@@ -195,19 +195,19 @@ int main(void)
   e_acsl_2 = (long long)x + (long long)1;
   e_acsl_1 = x;
   /*@ assert x ≡ 0; */ ;
-  e_acsl_assert(! (x == 0),(char *)"Assertion",(char *)"(x == 0)",44);
+  e_acsl_assert(! (x == 0),(char *)"Assertion",(char *)"(x == 0)",45);
   x = 1;
   x = 2;
   f();
   /*@ assert \at(x,L) ≡ 0; */ ;
   e_acsl_assert(! (e_acsl_1 == 0),(char *)"Assertion",
-                (char *)"(\\at(x,L) == 0)",49);
+                (char *)"(\\at(x,L) == 0)",50);
   /*@ assert \at(x+1,L) ≡ 1; */ ;
   e_acsl_assert(! (e_acsl_2 == (long long)1),(char *)"Assertion",
-                (char *)"(\\at(x+1,L) == 1)",50);
+                (char *)"(\\at(x+1,L) == 1)",51);
   /*@ assert \at(x,L)+1 ≡ 1; */ ;
   e_acsl_assert(! ((long long)e_acsl_3 + (long long)1 == (long long)1),
-                (char *)"Assertion",(char *)"(\\at(x,L)+1 == 1)",51);
+                (char *)"Assertion",(char *)"(\\at(x,L)+1 == 1)",52);
   g(t,& x);
   __retres = 0;
   return (__retres);

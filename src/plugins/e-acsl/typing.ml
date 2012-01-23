@@ -26,7 +26,17 @@ open Cil_datatype
 
 module BI = My_bigint
 
-let is_representable n _k _s = BI.ge n BI.min_int64 && BI.le n BI.max_int64
+let is_representable n k _s = 
+  (* [TODO] these two different behaviors seem to be quite strange here... *)
+  if Options.Gmp_only.get () then
+    match k with
+    | IBool | IChar | ISChar | IUChar | IInt | IUInt | IShort | IUShort 
+    | ILong | IULong ->
+      true
+    | ILongLong | IULongLong ->
+      false
+  else
+    BI.ge n BI.min_int64 && BI.le n BI.max_int64
 
 (******************************************************************************)
 (** Type Definitions: Intervals *)
@@ -120,14 +130,27 @@ module Term_env = Make_env(Term)
 module Logic_var_env = Make_env(Logic_var)
 
 let typ_of_term t = 
-  try 
-    let ty = Term_env.find t in
-    typ_of_eacsl_typ ty
-  with Not_found -> Options.fatal "untyped term %a" Term.pretty t
+  if Options.Gmp_only.get () then 
+    match t.term_type with
+    | Linteger -> Mpz.t
+    | Ctype ty when isIntegralType ty -> Mpz.t
+    | Ctype ty -> ty
+    | Ltype _ -> Error.not_yet "typing of user-defined logic type"
+    | Lvar _ -> Error.not_yet "type variable"
+    | Lreal -> Error.not_yet "real numbers"
+    | Larrow _ -> Error.not_yet "functional type"
+  else
+    try 
+      let ty = Term_env.find t in
+      typ_of_eacsl_typ ty
+    with Not_found -> 
+      Options.fatal "untyped term %a" Term.pretty t
 
 let unsafe_set_term t ty =
-  assert (not (Term_env.mem t));
-  Term_env.add t (eacsl_typ_of_typ ty)
+  if not (Options.Gmp_only.get ()) then begin
+    assert (not (Term_env.mem t));
+    Term_env.add t (eacsl_typ_of_typ ty)
+  end
 
 let clear () = 
   Term_env.clear (); 
@@ -365,12 +388,14 @@ let rec type_predicate_named p = match p.content with
   | Psubtype _ -> Error.not_yet "subtyping relation" (* Jessie specific *)
   | Pinitialized _ -> Error.not_yet "\\initialized"
 
-let type_term t = ignore (type_term t)
+let type_term t = if not (Options.Gmp_only.get ()) then ignore (type_term t)
 
 let type_named_predicate p = 
-  Options.debug ~level:2 "typing predicate %a" d_predicate_named p;
-  clear ();
-  type_predicate_named p
+  if not (Options.Gmp_only.get ()) then begin
+    Options.debug ~level:2 "typing predicate %a" d_predicate_named p;
+    clear ();
+    type_predicate_named p
+  end
 
 (******************************************************************************)
 (** Subtyping *)
@@ -416,10 +441,12 @@ C-representable@]";
       (* Convert the C integer into a mpz. 
 	 Remember: very long integer constants have been temporary converted
 	 into strings *)
-      assert (Options.verify
-		(isIntegralType ty || is_mpz_string) 
-		"how to convert %a to an integer?"
-		d_type ty); 
+      (* possible to get a non integralType (or Mpz.t) with a non-one in the
+	 case of \null *)
+      let e = 
+	if isIntegralType ty || is_mpz_string then e
+	else mkCast e longType (* \null *)
+      in
       mk_mpz e
     end
   else if isIntegralType ctx then do_int_ctx ty

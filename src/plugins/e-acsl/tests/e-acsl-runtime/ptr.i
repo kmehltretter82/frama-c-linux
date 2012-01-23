@@ -1,6 +1,7 @@
 /* run.config
    COMMENT: pointers and pointer arithmetic
    EXECNOW: LOG gen_ptr.c BIN gen_ptr.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/ptr.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_ptr.c > /dev/null && gcc -pedantic -Wno-long-long -o ./tests/e-acsl-runtime/result/gen_ptr.out ./tests/e-acsl-runtime/result/gen_ptr.c -lgmp && ./tests/e-acsl-runtime/result/gen_ptr.out
+   EXECNOW: LOG gen_ptr2.c BIN gen_ptr2.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/ptr.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_ptr2.c > /dev/null && gcc -pedantic -Wno-long-long -o ./tests/e-acsl-runtime/result/gen_ptr2.out ./tests/e-acsl-runtime/result/gen_ptr2.c -lgmp && ./tests/e-acsl-runtime/result/gen_ptr2.out
 */
 
 int main(void) {

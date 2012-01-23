@@ -1,6 +1,7 @@
 /* run.config
    COMMENT: terms and predicates using lazy operators
    EXECNOW: LOG gen_lazy.c BIN gen_lazy.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/lazy.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_lazy.c > /dev/null &&  gcc -pedantic -o ./tests/e-acsl-runtime/result/gen_lazy.out ./tests/e-acsl-runtime/result/gen_lazy.c -lgmp 2> /dev/null && ./tests/e-acsl-runtime/result/gen_lazy.out
+   EXECNOW: LOG gen_lazy2.c BIN gen_lazy2.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/lazy.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_lazy2.c > /dev/null &&  gcc -pedantic -o ./tests/e-acsl-runtime/result/gen_lazy2.out ./tests/e-acsl-runtime/result/gen_lazy2.c -lgmp 2> /dev/null && ./tests/e-acsl-runtime/result/gen_lazy2.out
 */
 
 int main(void) {
