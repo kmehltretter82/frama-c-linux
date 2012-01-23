@@ -29,13 +29,13 @@ int main(void)
   /*@ assert 0 ≢ ~0; */ ;
   e_acsl_assert(! (0 != ~ 0),(char *)"Assertion",(char *)"(0 != ~0)",14);
   /*@ assert x+1 ≡ -2; */ ;
-  e_acsl_assert(! ((long long)x + (long long)1 == (long long)-2),
+  e_acsl_assert(! ((long long)x + (long long)1 == (long long)(-2)),
                 (char *)"Assertion",(char *)"(x+1 == -2)",16);
   /*@ assert x-1 ≡ -4; */ ;
-  e_acsl_assert(! ((long long)x - (long long)1 == (long long)-4),
+  e_acsl_assert(! ((long long)x - (long long)1 == (long long)(-4)),
                 (char *)"Assertion",(char *)"(x-1 == -4)",17);
   /*@ assert x*3 ≡ -9; */ ;
-  e_acsl_assert(! ((long long)x * (long long)3 == (long long)-9),
+  e_acsl_assert(! ((long long)x * (long long)3 == (long long)(-9)),
                 (char *)"Assertion",(char *)"(x*3 == -9)",18);
   /*@ assert x/3 ≡ -1; */ ;
   {
@@ -90,7 +90,7 @@ int main(void)
   
   /*@ assert ((x*2+(3+y))-4)+(x-y) ≡ -10; */ ;
   e_acsl_assert(! ((((long long)x * (long long)2 + ((long long)3 + (long long)y)) - (long long)4) + (
-                   (long long)x - (long long)y) == (long long)-10),
+                   (long long)x - (long long)y) == (long long)(-10)),
                 (char *)"Assertion",(char *)"(((x*2+(3+y))-4)+(x-y) == -10)",
                 25);
   /*@ assert (0≡1) ≡ !(0≡0); */ ;

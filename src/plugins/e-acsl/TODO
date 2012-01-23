@@ -26,6 +26,8 @@
 
 - \at incorrect si StmtLabel faisant référence au stmt courant (voir test at.i)
 - incorrect d'utiliser un \old dans le post-state si pre-state == post-state
+  (même raison que ci-dessus)
+- incorrect d'utiliser Pre, Post, Here, Old dans stmt contract
 
 #########
 # TESTS #
