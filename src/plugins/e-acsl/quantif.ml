@@ -53,6 +53,7 @@ let compute_quantif_guards quantif bounded_vars hyps =
 	    match v.lv_type with
 	    | Ctype ty when isIntegralType ty -> v, tl
 	    | Linteger -> v, tl
+	    | Ltype _ as ty when Logic_const.is_boolean_type ty -> v, tl
 	    | Ctype _ | Ltype _ | Lvar _ | Lreal | Larrow _ -> 
 	      error "@[non integer variable %a@]" d_logic_var v
 	in
@@ -100,10 +101,14 @@ let convert env loc is_forall p bounded_vars hyps goal =
   let term_to_exp = !term_to_exp_ref in
   (* universal quantification over integers (or a subtype of integer) *)
   let guards = compute_quantif_guards p bounded_vars hyps in
-(*  let env = List.fold_left Env.Logic_binding.add env bounded_vars in*)
   let var_res, res, env =
-    (* variable storing the result of the \forall *)
-    Env.new_var env None intType
+    (* variable storing the result of the quantifier *)
+    let name = if is_forall then "forall" else "exists" in
+    Env.new_var
+      ~name
+      env
+      None
+      intType
       (fun v _ ->
 	let lv = var v in
 	[ mkStmtOneInstr ~valid_sid:true (Set(lv, init_val, loc)) ])

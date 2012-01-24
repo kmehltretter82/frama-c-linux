@@ -171,10 +171,10 @@ int main(void)
     while (1) {
       if (! (i < 10)) { break; }
       /*@ invariant 0 ≤ i ∧ i < 10; */ ;
-      { int __e_acsl;
-        if (0 <= i) { __e_acsl = i < 10; }
-        else { __e_acsl = 0; }
-        e_acsl_assert(__e_acsl,(char *)"Invariant",
+      { int __e_acsl_and;
+        if (0 <= i) { __e_acsl_and = i < 10; }
+        else { __e_acsl_and = 0; }
+        e_acsl_assert(__e_acsl_and,(char *)"Invariant",
                       (char *)"(0 <= i && i < 10)",9);
       }
       

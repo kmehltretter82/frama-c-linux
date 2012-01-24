@@ -104,7 +104,7 @@ let top env = match env.env_stack with [] -> assert false | hd :: tl -> hd, tl
 (* eta-expansion required for typing generalisation *)
 let acc_list_rev acc l = List.fold_left (fun acc x -> x :: acc) acc l
 
-let do_new_var ?(global=false) ?(name="var") env t ty mk_stmts =
+let do_new_var ?(global=false) ?(name="") env t ty mk_stmts =
   let local_env, tl_env = top env in
   let local_block = local_env.block_info in
   let is_t = Mpz.is_t ty in
@@ -116,7 +116,7 @@ let do_new_var ?(global=false) ?(name="var") env t ty mk_stmts =
       ~generated:true
       false (* is a global? *)
       false (* is a formal? *)
-      (Varname.get ("__e_acsl_" ^ if name = "" then "var" else name))
+      (Varname.get ("__e_acsl" ^ if name = "" then "" else "_" ^ name))
       ty
   in
 (*  Options.feedback "new variable %a (global? %b)" Varinfo.pretty v global;*)
@@ -183,7 +183,7 @@ let new_var ?(global=false) ?name env t ty mk_stmts =
       | None -> raise No_term
       | Some t -> 
 	let v, e = Term.Map.find t local_env.mpz_tbl.new_exps in
-	v, e, env
+	if Typ.equal ty v.vtype then v, e, env else raise No_term
     with Not_found | No_term -> 
       do_new_var ~global ?name env t ty mk_stmts  
 
@@ -196,6 +196,7 @@ module Logic_binding = struct
     let ty = match logic_v.lv_type with
       | Ctype ty -> ty
       | Linteger -> Mpz.t
+      | Ltype _ as ty when Logic_const.is_boolean_type ty -> charType
       | Ltype _ | Lvar _ | Lreal | Larrow _ as lty -> 
 	let msg = 
 	  Pretty_utils.sfprintf 

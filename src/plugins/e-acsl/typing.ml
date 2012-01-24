@@ -63,6 +63,7 @@ let typ_of_eacsl_typ = function
        Mpz.t)
   | Z -> Mpz.t
   | No_integral (Ctype ty) -> ty
+  | No_integral ty when Logic_const.is_boolean_type ty -> assert false
   | No_integral (Ltype _) -> Error.not_yet "typing of user-defined logic type"
   | No_integral (Lvar _) -> Error.not_yet "type variable"
   | No_integral Linteger -> assert false
@@ -135,6 +136,7 @@ let typ_of_term t =
     | Linteger -> Mpz.t
     | Ctype ty when isIntegralType ty -> Mpz.t
     | Ctype ty -> ty
+    | Ltype _ as ty when Logic_const.is_boolean_type ty -> Mpz.t
     | Ltype _ -> Error.not_yet "typing of user-defined logic type"
     | Lvar _ -> Error.not_yet "type variable"
     | Lreal -> Error.not_yet "real numbers"
@@ -402,11 +404,16 @@ let type_named_predicate p =
 (******************************************************************************)
 
 (* convert [e] in a way that it is compatible with the given typing context. *)
-let context_sensitive ?loc env ctx is_mpz_string t_opt e = 
+let context_sensitive ?loc ?name env ctx is_mpz_string t_opt e = 
   let ty = typeOf e in
   let mk_mpz e = 
     let _, e, env = 
-      Env.new_var env t_opt Mpz.t (fun lv v -> [ Mpz.init_set (var lv) v e ])
+      Env.new_var 
+	?name
+	env
+	t_opt
+	Mpz.t
+	(fun lv v -> [ Mpz.init_set (var lv) v e ])
     in
     e, env
   in
@@ -414,7 +421,7 @@ let context_sensitive ?loc env ctx is_mpz_string t_opt e =
     let e, env = if is_mpz_string then mk_mpz e else e, env in
     if Mpz.is_t ty || is_mpz_string then
       (* cast the mpz into a C integer *)
-      let name, new_ty = 
+      let fname, new_ty = 
 	if isSignedInteger ty then 
 	  "__gmpz_get_si", longType
 	else
@@ -427,10 +434,11 @@ let context_sensitive ?loc env ctx is_mpz_string t_opt e =
 C-representable@]"; 
       let _, e, env = 
 	Env.new_var 
+	  ?name
 	  env
 	  None
 	  new_ty
-	  (fun v _ -> [ Misc.mk_call ?loc ~result:(var v) name [ e ] ])
+	  (fun v _ -> [ Misc.mk_call ?loc ~result:(var v) fname [ e ] ])
       in
       e, env
     else

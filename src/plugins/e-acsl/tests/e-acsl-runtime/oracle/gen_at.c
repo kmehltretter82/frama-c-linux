@@ -20,61 +20,61 @@ int A = 0;
 /*@ ensures \at(A,Post) ≡ 3;  */
 void f(void)
 {
-  int __e_acsl;
-  int __e_acsl_2;
-  int __e_acsl_3;
-  int __e_acsl_4;
-  int __e_acsl_5;
-  int __e_acsl_6;
-  __e_acsl_4 = A;
-  __e_acsl = A;
+  int __e_acsl_at;
+  int __e_acsl_at_2;
+  int __e_acsl_at_3;
+  int __e_acsl_at_4;
+  int __e_acsl_at_5;
+  int __e_acsl_at_6;
+  __e_acsl_at_4 = A;
+  __e_acsl_at = A;
   A = 1;
-  F: __e_acsl_5 = __e_acsl_4;
-  __e_acsl_2 = A;
+  F: __e_acsl_at_5 = __e_acsl_at_4;
+  __e_acsl_at_2 = A;
   A = 2;
   /*@ assert \at(A,Pre) ≡ 0; */ ;
-  e_acsl_assert(__e_acsl == 0,(char *)"Assertion",
+  e_acsl_assert(__e_acsl_at == 0,(char *)"Assertion",
                 (char *)"(\\at(A,Pre) == 0)",13);
   /*@ assert \at(A,F) ≡ 1; */ ;
-  e_acsl_assert(__e_acsl_2 == 1,(char *)"Assertion",
+  e_acsl_assert(__e_acsl_at_2 == 1,(char *)"Assertion",
                 (char *)"(\\at(A,F) == 1)",14);
   /*@ assert \at(A,Here) ≡ 2; */ ;
-  __e_acsl_3 = A;
-  e_acsl_assert(__e_acsl_3 == 2,(char *)"Assertion",
+  __e_acsl_at_3 = A;
+  e_acsl_assert(__e_acsl_at_3 == 2,(char *)"Assertion",
                 (char *)"(\\at(A,Here) == 2)",15);
   /*@ assert \at(\at(A,Pre),F) ≡ 0; */ ;
-  e_acsl_assert(__e_acsl_5 == 0,(char *)"Assertion",
+  e_acsl_assert(__e_acsl_at_5 == 0,(char *)"Assertion",
                 (char *)"(\\at(\\at(A,Pre),F) == 0)",16);
   A = 3;
-  __e_acsl_6 = A;
-  e_acsl_assert(__e_acsl_6 == 3,(char *)"Postcondition",
+  __e_acsl_at_6 = A;
+  e_acsl_assert(__e_acsl_at_6 == 3,(char *)"Postcondition",
                 (char *)"(\\at(A,Post) == 3)",9);
   return;
 }
 
 void g(int *p, int *q)
 {
-  int __e_acsl;
-  int __e_acsl_2;
-  int __e_acsl_3;
-  int __e_acsl_4;
+  int __e_acsl_at;
+  int __e_acsl_at_2;
+  int __e_acsl_at_3;
+  int __e_acsl_at_4;
   *p = 0;
   *(p + 1) = 1;
   *q = 0;
-  L1: __e_acsl_3 = *q;
-  __e_acsl = *q;
+  L1: __e_acsl_at_3 = *q;
+  __e_acsl_at = *q;
   *p = 2;
   *(p + 1) = 3;
   *q = 1;
-  L2: __e_acsl_2 = *(p + __e_acsl);
+  L2: __e_acsl_at_2 = *(p + __e_acsl_at);
   A = 4;
   /*@ assert \at(*(p+\at(*q,L1)),L2) ≡ 2; */ ;
-  e_acsl_assert(__e_acsl_2 == 2,(char *)"Assertion",
+  e_acsl_assert(__e_acsl_at_2 == 2,(char *)"Assertion",
                 (char *)"(\\at(*(p+\\at(*q,L1)),L2) == 2)",32);
   L3: 
   /*@ assert \at(*(p+\at(*q,L1)),Here) ≡ 2; */ ;
-  __e_acsl_4 = *(p + __e_acsl_3);
-  e_acsl_assert(__e_acsl_4 == 2,(char *)"Assertion",
+  __e_acsl_at_4 = *(p + __e_acsl_at_3);
+  e_acsl_assert(__e_acsl_at_4 == 2,(char *)"Assertion",
                 (char *)"(\\at(*(p+\\at(*q,L1)),Here) == 2)",34);
   return;
 }
@@ -84,26 +84,26 @@ int main(void)
   int __retres;
   int x;
   int t[2];
-  int __e_acsl;
-  long long __e_acsl_2;
-  int __e_acsl_3;
+  int __e_acsl_at;
+  long long __e_acsl_at_2;
+  int __e_acsl_at_3;
   x = 0;
-  L: __e_acsl_3 = x;
-  __e_acsl_2 = (long long)x + (long long)1;
-  __e_acsl = x;
+  L: __e_acsl_at_3 = x;
+  __e_acsl_at_2 = (long long)x + (long long)1;
+  __e_acsl_at = x;
   /*@ assert x ≡ 0; */ ;
   e_acsl_assert(x == 0,(char *)"Assertion",(char *)"(x == 0)",45);
   x = 1;
   x = 2;
   f();
   /*@ assert \at(x,L) ≡ 0; */ ;
-  e_acsl_assert(__e_acsl == 0,(char *)"Assertion",(char *)"(\\at(x,L) == 0)",
-                50);
+  e_acsl_assert(__e_acsl_at == 0,(char *)"Assertion",
+                (char *)"(\\at(x,L) == 0)",50);
   /*@ assert \at(x+1,L) ≡ 1; */ ;
-  e_acsl_assert(__e_acsl_2 == (long long)1,(char *)"Assertion",
+  e_acsl_assert(__e_acsl_at_2 == (long long)1,(char *)"Assertion",
                 (char *)"(\\at(x+1,L) == 1)",51);
   /*@ assert \at(x,L)+1 ≡ 1; */ ;
-  e_acsl_assert((long long)__e_acsl_3 + (long long)1 == (long long)1,
+  e_acsl_assert((long long)__e_acsl_at_3 + (long long)1 == (long long)1,
                 (char *)"Assertion",(char *)"(\\at(x,L)+1 == 1)",52);
   g(t,& x);
   __retres = 0;

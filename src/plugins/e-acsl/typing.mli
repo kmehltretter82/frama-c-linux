@@ -51,8 +51,8 @@ val principal_type: term -> term -> typ
     contain both of them. Their types must have been previously computed. *)
 
 val context_sensitive: 
-  ?loc:location -> Env.t -> typ -> bool -> term option -> exp -> 
-  exp * Env.t
+  ?loc:location -> ?name:string -> 
+  Env.t -> typ -> bool -> term option -> exp -> exp * Env.t
 (** [context_sensitive env ty is_mpz_string t_opt e] converts [e] in [env] in
     such a way that it becomes usable in a context of type [ty]. [t_opt], if
     any, is a term denoting by [e]. [is_mpz_string] is [true] iff [e] is a

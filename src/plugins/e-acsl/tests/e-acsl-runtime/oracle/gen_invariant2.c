@@ -48,46 +48,46 @@ int main(void)
       /*@ invariant 0 ≤ i ∧ i < 10; */ ;
       {
         mpz_t __e_acsl;
-        mpz_t __e_acsl_2;
-        int __e_acsl_3;
-        int __e_acsl_7;
+        mpz_t __e_acsl_i;
+        int __e_acsl_le;
+        int __e_acsl_and;
         __gmpz_init_set_si((__mpz_struct *)(__e_acsl),(long)0);
-        __gmpz_init_set_si((__mpz_struct *)(__e_acsl_2),(long)i);
-        __e_acsl_3 = __gmpz_cmp((__mpz_struct const *)(__e_acsl),
-                                (__mpz_struct const *)(__e_acsl_2));
-        if (__e_acsl_3 <= 0) {
-          mpz_t __e_acsl_4;
-          mpz_t __e_acsl_5;
-          int __e_acsl_6;
-          __gmpz_init_set_si((__mpz_struct *)(__e_acsl_4),(long)i);
-          __gmpz_init_set_si((__mpz_struct *)(__e_acsl_5),(long)10);
-          __e_acsl_6 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_4),
-                                  (__mpz_struct const *)(__e_acsl_5));
-          __e_acsl_7 = __e_acsl_6 < 0;
-          __gmpz_clear((__mpz_struct *)(__e_acsl_4));
-          __gmpz_clear((__mpz_struct *)(__e_acsl_5));
+        __gmpz_init_set_si((__mpz_struct *)(__e_acsl_i),(long)i);
+        __e_acsl_le = __gmpz_cmp((__mpz_struct const *)(__e_acsl),
+                                 (__mpz_struct const *)(__e_acsl_i));
+        if (__e_acsl_le <= 0) {
+          mpz_t __e_acsl_i_2;
+          mpz_t __e_acsl_2;
+          int __e_acsl_lt;
+          __gmpz_init_set_si((__mpz_struct *)(__e_acsl_i_2),(long)i);
+          __gmpz_init_set_si((__mpz_struct *)(__e_acsl_2),(long)10);
+          __e_acsl_lt = __gmpz_cmp((__mpz_struct const *)(__e_acsl_i_2),
+                                   (__mpz_struct const *)(__e_acsl_2));
+          __e_acsl_and = __e_acsl_lt < 0;
+          __gmpz_clear((__mpz_struct *)(__e_acsl_i_2));
+          __gmpz_clear((__mpz_struct *)(__e_acsl_2));
         }
-        else { __e_acsl_7 = 0; }
-        e_acsl_assert(__e_acsl_7,(char *)"Invariant",
+        else { __e_acsl_and = 0; }
+        e_acsl_assert(__e_acsl_and,(char *)"Invariant",
                       (char *)"(0 <= i && i < 10)",9);
         __gmpz_clear((__mpz_struct *)(__e_acsl));
-        __gmpz_clear((__mpz_struct *)(__e_acsl_2));
+        __gmpz_clear((__mpz_struct *)(__e_acsl_i));
       }
       
       x += i;
       /*@ invariant i ≤ x; */ ;
       {
-        mpz_t __e_acsl_8;
-        mpz_t __e_acsl_9;
-        int __e_acsl_10;
-        __gmpz_init_set_si((__mpz_struct *)(__e_acsl_8),(long)i);
-        __gmpz_init_set_si((__mpz_struct *)(__e_acsl_9),(long)x);
-        __e_acsl_10 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_8),
-                                 (__mpz_struct const *)(__e_acsl_9));
-        e_acsl_assert(__e_acsl_10 <= 0,(char *)"Invariant",
+        mpz_t __e_acsl_i_3;
+        mpz_t __e_acsl_x;
+        int __e_acsl_le_2;
+        __gmpz_init_set_si((__mpz_struct *)(__e_acsl_i_3),(long)i);
+        __gmpz_init_set_si((__mpz_struct *)(__e_acsl_x),(long)x);
+        __e_acsl_le_2 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_i_3),
+                                   (__mpz_struct const *)(__e_acsl_x));
+        e_acsl_assert(__e_acsl_le_2 <= 0,(char *)"Invariant",
                       (char *)"(i <= x)",11);
-        __gmpz_clear((__mpz_struct *)(__e_acsl_8));
-        __gmpz_clear((__mpz_struct *)(__e_acsl_9));
+        __gmpz_clear((__mpz_struct *)(__e_acsl_i_3));
+        __gmpz_clear((__mpz_struct *)(__e_acsl_x));
       }
       
       i ++;
