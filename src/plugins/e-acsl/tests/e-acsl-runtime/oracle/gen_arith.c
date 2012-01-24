@@ -5,9 +5,10 @@
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
+/*@ requires predicate ≢ 0;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
-  if (predicate) {
+  if (! predicate) {
     printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
            line,pred_txt);
     exit(1);
@@ -23,27 +24,27 @@ int main(void)
   x = -3;
   y = 2;
   /*@ assert -3 ≡ x; */ ;
-  e_acsl_assert(! (-3 == x),(char *)"Assertion",(char *)"(-3 == x)",12);
+  e_acsl_assert(-3 == x,(char *)"Assertion",(char *)"(-3 == x)",12);
   /*@ assert x ≡ -3; */ ;
-  e_acsl_assert(! (x == -3),(char *)"Assertion",(char *)"(x == -3)",13);
+  e_acsl_assert(x == -3,(char *)"Assertion",(char *)"(x == -3)",13);
   /*@ assert 0 ≢ ~0; */ ;
-  e_acsl_assert(! (0 != ~ 0),(char *)"Assertion",(char *)"(0 != ~0)",14);
+  e_acsl_assert(0 != ~ 0,(char *)"Assertion",(char *)"(0 != ~0)",14);
   /*@ assert x+1 ≡ -2; */ ;
-  e_acsl_assert(! ((long long)x + (long long)1 == (long long)(-2)),
+  e_acsl_assert((long long)x + (long long)1 == (long long)(-2),
                 (char *)"Assertion",(char *)"(x+1 == -2)",16);
   /*@ assert x-1 ≡ -4; */ ;
-  e_acsl_assert(! ((long long)x - (long long)1 == (long long)(-4)),
+  e_acsl_assert((long long)x - (long long)1 == (long long)(-4),
                 (char *)"Assertion",(char *)"(x-1 == -4)",17);
   /*@ assert x*3 ≡ -9; */ ;
-  e_acsl_assert(! ((long long)x * (long long)3 == (long long)(-9)),
+  e_acsl_assert((long long)x * (long long)3 == (long long)(-9),
                 (char *)"Assertion",(char *)"(x*3 == -9)",18);
   /*@ assert x/3 ≡ -1; */ ;
   {
     int __e_acsl_var;
     /*@ assert 3 ≢ 0; */ ;
-    e_acsl_assert(3 == 0,(char *)"Assertion",(char *)"(3 == 0)",19);
+    e_acsl_assert(! (3 == 0),(char *)"Assertion",(char *)"(3 == 0)",19);
     __e_acsl_var = x / 3;
-    e_acsl_assert(! (__e_acsl_var == -1),(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var == -1,(char *)"Assertion",
                   (char *)"(x/3 == -1)",19);
   }
   
@@ -51,10 +52,10 @@ int main(void)
   {
     int __e_acsl_var_2;
     /*@ assert 0xfffffffffff ≢ 0; */ ;
-    e_acsl_assert(0xfffffffffff == (long long)0,(char *)"Assertion",
+    e_acsl_assert(! (0xfffffffffff == (long long)0),(char *)"Assertion",
                   (char *)"(0xfffffffffff == 0)",20);
     __e_acsl_var_2 = (int)(0xfffffffffff / 0xfffffffffff);
-    e_acsl_assert(! (__e_acsl_var_2 == 1),(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_2 == 1,(char *)"Assertion",
                   (char *)"(0xfffffffffff/0xfffffffffff == 1)",20);
   }
   
@@ -62,9 +63,9 @@ int main(void)
   {
     int __e_acsl_var_3;
     /*@ assert 2 ≢ 0; */ ;
-    e_acsl_assert(2 == 0,(char *)"Assertion",(char *)"(2 == 0)",21);
+    e_acsl_assert(! (2 == 0),(char *)"Assertion",(char *)"(2 == 0)",21);
     __e_acsl_var_3 = x % 2;
-    e_acsl_assert(! (__e_acsl_var_3 == -1),(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_3 == -1,(char *)"Assertion",
                   (char *)"(x%2 == -1)",21);
   }
   
@@ -72,9 +73,9 @@ int main(void)
   {
     int __e_acsl_var_4;
     /*@ assert -2 ≢ 0; */ ;
-    e_acsl_assert(-2 == 0,(char *)"Assertion",(char *)"(-2 == 0)",22);
+    e_acsl_assert(! (-2 == 0),(char *)"Assertion",(char *)"(-2 == 0)",22);
     __e_acsl_var_4 = -3 % -2;
-    e_acsl_assert(! (__e_acsl_var_4 == -1),(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_4 == -1,(char *)"Assertion",
                   (char *)"(-3%-2 == -1)",22);
   }
   
@@ -82,31 +83,31 @@ int main(void)
   {
     int __e_acsl_var_5;
     /*@ assert -2 ≢ 0; */ ;
-    e_acsl_assert(-2 == 0,(char *)"Assertion",(char *)"(-2 == 0)",23);
+    e_acsl_assert(! (-2 == 0),(char *)"Assertion",(char *)"(-2 == 0)",23);
     __e_acsl_var_5 = 3 % -2;
-    e_acsl_assert(! (__e_acsl_var_5 == 1),(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_5 == 1,(char *)"Assertion",
                   (char *)"(3%-2 == 1)",23);
   }
   
   /*@ assert ((x*2+(3+y))-4)+(x-y) ≡ -10; */ ;
-  e_acsl_assert(! ((((long long)x * (long long)2 + ((long long)3 + (long long)y)) - (long long)4) + (
-                   (long long)x - (long long)y) == (long long)(-10)),
+  e_acsl_assert((((long long)x * (long long)2 + ((long long)3 + (long long)y)) - (long long)4) + (
+                (long long)x - (long long)y) == (long long)(-10),
                 (char *)"Assertion",(char *)"(((x*2+(3+y))-4)+(x-y) == -10)",
                 25);
   /*@ assert (0≡1) ≡ !(0≡0); */ ;
-  e_acsl_assert(! ((0 == 1) == ! (0 == 0)),(char *)"Assertion",
+  e_acsl_assert((0 == 1) == ! (0 == 0),(char *)"Assertion",
                 (char *)"((0==1) == !(0==0))",27);
   /*@ assert (0≤-1) ≡ (0>0); */ ;
-  e_acsl_assert(! ((0 <= -1) == (0 > 0)),(char *)"Assertion",
+  e_acsl_assert((0 <= -1) == (0 > 0),(char *)"Assertion",
                 (char *)"((0<=-1) == (0>0))",28);
   /*@ assert (0≥-1) ≡ (0≤0); */ ;
-  e_acsl_assert(! ((0 >= -1) == (0 <= 0)),(char *)"Assertion",
+  e_acsl_assert((0 >= -1) == (0 <= 0),(char *)"Assertion",
                 (char *)"((0>=-1) == (0<=0))",29);
   /*@ assert (0≢1) ≡ !(0≢0); */ ;
-  e_acsl_assert(! ((0 != 1) == ! (0 != 0)),(char *)"Assertion",
+  e_acsl_assert((0 != 1) == ! (0 != 0),(char *)"Assertion",
                 (char *)"((0!=1) == !(0!=0))",30);
   /*@ assert (0≢0) ≡ !(1≢0); */ ;
-  e_acsl_assert(! ((0 != 0) == ! (1 != 0)),(char *)"Assertion",
+  e_acsl_assert((0 != 0) == ! (1 != 0),(char *)"Assertion",
                 (char *)"((0!=0) == !(1!=0))",32);
   __retres = 0;
   return (__retres);

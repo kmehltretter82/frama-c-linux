@@ -59,7 +59,7 @@ let mk_e_acsl_guard ?(reverse=false) kind e p =
       (Pretty_utils.sfprintf "%a@?" Cil.d_predicate_named) p 
   in
   let line = (fst loc).Lexing.pos_lnum in
-  let e = if reverse then new_exp ~loc:e.eloc (UnOp(LNot, e, intType)) else e in
+  let e = if reverse then e else new_exp ~loc:e.eloc (UnOp(LNot, e, intType)) in
   mk_call 
     ~loc 
     "e_acsl_assert" 

@@ -5,9 +5,10 @@
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
+/*@ requires predicate ≢ 0;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
-  if (predicate) {
+  if (! predicate) {
     printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
            line,pred_txt);
     exit(1);
@@ -21,7 +22,7 @@ int Y = 2;
 void f(void)
 {
   X = 1;
-  e_acsl_assert(! (X == 1),(char *)"Postcondition",(char *)"(X == 1)",10);
+  e_acsl_assert(X == 1,(char *)"Postcondition",(char *)"(X == 1)",10);
   return;
 }
 
@@ -30,15 +31,15 @@ void f(void)
 void g(void)
 {
   X = 2;
-  e_acsl_assert(! (X == 2),(char *)"Postcondition",(char *)"(X == 2)",14);
-  e_acsl_assert(! (Y == 2),(char *)"Postcondition",(char *)"(Y == 2)",15);
+  e_acsl_assert(X == 2,(char *)"Postcondition",(char *)"(X == 2)",14);
+  e_acsl_assert(Y == 2,(char *)"Postcondition",(char *)"(Y == 2)",15);
   return;
 }
 
 /*@ requires X ≡ 2;  */
 void h(void)
 {
-  e_acsl_assert(! (X == 2),(char *)"Precondition",(char *)"(X == 2)",19);
+  e_acsl_assert(X == 2,(char *)"Precondition",(char *)"(X == 2)",19);
   X ++;
   return;
 }
@@ -47,8 +48,8 @@ void h(void)
     requires Y ≡ 2;  */
 void i(void)
 {
-  e_acsl_assert(! (X == 3),(char *)"Precondition",(char *)"(X == 3)",23);
-  e_acsl_assert(! (Y == 2),(char *)"Precondition",(char *)"(Y == 2)",24);
+  e_acsl_assert(X == 3,(char *)"Precondition",(char *)"(X == 3)",23);
+  e_acsl_assert(Y == 2,(char *)"Precondition",(char *)"(Y == 2)",24);
   X += Y;
   return;
 }
@@ -66,13 +67,13 @@ void i(void)
 */
 void j(void)
 {
-  e_acsl_assert(! (X == 5),(char *)"Precondition",(char *)"(X == 5)",29);
-  e_acsl_assert(! ((long long)X == (long long)3 + (long long)Y),
+  e_acsl_assert(X == 5,(char *)"Precondition",(char *)"(X == 5)",29);
+  e_acsl_assert((long long)X == (long long)3 + (long long)Y,
                 (char *)"Precondition",(char *)"(X == 3+Y)",32);
-  e_acsl_assert(! (Y == 2),(char *)"Precondition",(char *)"(Y == 2)",33);
+  e_acsl_assert(Y == 2,(char *)"Precondition",(char *)"(Y == 2)",33);
   X = 3;
-  e_acsl_assert(! (X == 3),(char *)"Postcondition",(char *)"(X == 3)",30);
-  e_acsl_assert(! ((long long)X == (long long)Y + (long long)1),
+  e_acsl_assert(X == 3,(char *)"Postcondition",(char *)"(X == 3)",30);
+  e_acsl_assert((long long)X == (long long)Y + (long long)1,
                 (char *)"Postcondition",(char *)"(X == Y+1)",34);
   return;
 }
@@ -99,19 +100,19 @@ void k(void)
     int __e_acsl_var_5;
     if (! (X == 1)) { __e_acsl_var = 1; }
     else { __e_acsl_var = X == 0; }
-    e_acsl_assert(! __e_acsl_var,(char *)"Precondition",
+    e_acsl_assert(__e_acsl_var,(char *)"Precondition",
                   (char *)"(X == 1 ==> X == 0)",40);
     if (X == 3) { __e_acsl_var_2 = Y == 2; }
     else { __e_acsl_var_2 = 0; }
     if (! __e_acsl_var_2) { __e_acsl_var_3 = 1; }
     else { __e_acsl_var_3 = X == 3; }
-    e_acsl_assert(! __e_acsl_var_3,(char *)"Precondition",
+    e_acsl_assert(__e_acsl_var_3,(char *)"Precondition",
                   (char *)"(X == 3 && Y == 2 ==> X == 3)",44);
     if (X == 3) { __e_acsl_var_4 = Y == 2; }
     else { __e_acsl_var_4 = 0; }
     if (! __e_acsl_var_4) { __e_acsl_var_5 = 1; }
     else { __e_acsl_var_5 = (long long)X + (long long)Y == (long long)5; }
-    e_acsl_assert(! __e_acsl_var_5,(char *)"Precondition",
+    e_acsl_assert(__e_acsl_var_5,(char *)"Precondition",
                   (char *)"(X == 3 && Y == 2 ==> X+Y == 5)",45);
     X += Y;
   }
@@ -123,8 +124,8 @@ void k(void)
 int l(void)
 {
   /*@ assert Y ≡ 2; */ ;
-  e_acsl_assert(! (Y == 2),(char *)"Assertion",(char *)"(Y == 2)",51);
-  e_acsl_assert(! (X == 5),(char *)"Postcondition",(char *)"(X == 5)",49);
+  e_acsl_assert(Y == 2,(char *)"Assertion",(char *)"(Y == 2)",51);
+  e_acsl_assert(X == 5,(char *)"Postcondition",(char *)"(X == 5)",49);
   return (X);
 }
 
@@ -167,17 +168,17 @@ void m(void)
     int __e_acsl_var_9;
     if (! __e_acsl_var) { __e_acsl_var_2 = 1; }
     else { __e_acsl_var_2 = X == 95; }
-    e_acsl_assert(! __e_acsl_var_2,(char *)"Postcondition",
+    e_acsl_assert(__e_acsl_var_2,(char *)"Postcondition",
                   (char *)"(\\old(X == 7) ==> X == 95)",58);
     if (! __e_acsl_var_4) { __e_acsl_var_5 = 1; }
     else { __e_acsl_var_5 = X == 7; }
-    e_acsl_assert(! __e_acsl_var_5,(char *)"Postcondition",
+    e_acsl_assert(__e_acsl_var_5,(char *)"Postcondition",
                   (char *)"(\\old(X == 5 && Y == 2) ==> X == 7)",62);
     if (! __e_acsl_var_7) { __e_acsl_var_9 = 1; }
     else {
       __e_acsl_var_9 = (long long)X == (long long)__e_acsl_var_8 + (long long)Y;
     }
-    e_acsl_assert(! __e_acsl_var_9,(char *)"Postcondition",
+    e_acsl_assert(__e_acsl_var_9,(char *)"Postcondition",
                   (char *)"(\\old(X == 5 && Y == 2) ==> X == \\old(X)+Y)",63);
     return;
   }

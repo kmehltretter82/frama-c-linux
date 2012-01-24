@@ -5,9 +5,10 @@
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
+/*@ requires predicate ≢ 0;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
-  if (predicate) {
+  if (! predicate) {
     printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
            line,pred_txt);
     exit(1);
@@ -23,7 +24,7 @@ int f(int x)
   __e_acsl_var_2 = x;
   __e_acsl_var = x;
   x = 0;
-  e_acsl_assert(! (x == (int)((long long)__e_acsl_var - (long long)__e_acsl_var_2)),
+  e_acsl_assert(x == (int)((long long)__e_acsl_var - (long long)__e_acsl_var_2),
                 (char *)"Postcondition",
                 (char *)"(\\result == (int)(\\old(x)-\\old(x)))",7);
   return (x);
@@ -33,8 +34,7 @@ int Y = 1;
 /*@ ensures \result ≡ Y;  */
 int g(int x)
 {
-  e_acsl_assert(! (x == Y),(char *)"Postcondition",(char *)"(\\result == Y)",
-                18);
+  e_acsl_assert(x == Y,(char *)"Postcondition",(char *)"(\\result == Y)",18);
   return (x);
 }
 
@@ -43,7 +43,7 @@ int h(void)
 {
   int __retres;
   __retres = 0;
-  e_acsl_assert(! (__retres == 0),(char *)"Postcondition",
+  e_acsl_assert(__retres == 0,(char *)"Postcondition",
                 (char *)"(\\result == 0)",23);
   return (__retres);
 }

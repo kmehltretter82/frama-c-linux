@@ -2,9 +2,10 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-PROJECT_FILE.i:235:[value] Assertion got status valid.
+PROJECT_FILE.i:236:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:236.
+        Called from PROJECT_FILE.i:237.
+PROJECT_FILE.i:221:[value] Function e_acsl_assert: precondition got status valid.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] Recording results for main
@@ -22,9 +23,10 @@ typedef unsigned char uint8;
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
+/*@ requires predicate ≢ 0;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
-  if (predicate) {
+  if (! predicate) {
     printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
            line,pred_txt);
     exit(1);
@@ -38,7 +40,7 @@ int main(void)
   uint8 x;
   x = (unsigned char)0;
   /*@ assert x ≡ 0; */ ;
-  e_acsl_assert(! ((int)x == 0),(char *)"Assertion",(char *)"(x == 0)",11);
+  e_acsl_assert((int)x == 0,(char *)"Assertion",(char *)"(x == 0)",11);
   __retres = 0;
   return (__retres);
 }

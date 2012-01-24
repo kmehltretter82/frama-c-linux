@@ -24,9 +24,10 @@ extern int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
+/*@ requires predicate ≢ 0;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
-  if (predicate) {
+  if (! predicate) {
     printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
            line,pred_txt);
     exit(1);
@@ -67,7 +68,7 @@ int main(void)
           __gmpz_clear((__mpz_struct *)(__e_acsl_var_5));
         }
         else { __e_acsl_var_7 = 0; }
-        e_acsl_assert(! __e_acsl_var_7,(char *)"Invariant",
+        e_acsl_assert(__e_acsl_var_7,(char *)"Invariant",
                       (char *)"(0 <= i && i < 10)",9);
         __gmpz_clear((__mpz_struct *)(__e_acsl_var));
         __gmpz_clear((__mpz_struct *)(__e_acsl_var_2));
@@ -83,7 +84,7 @@ int main(void)
         __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_9),(long)x);
         __e_acsl_var_10 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var_8),
                                      (__mpz_struct const *)(__e_acsl_var_9));
-        e_acsl_assert(! (__e_acsl_var_10 <= 0),(char *)"Invariant",
+        e_acsl_assert(__e_acsl_var_10 <= 0,(char *)"Invariant",
                       (char *)"(i <= x)",11);
         __gmpz_clear((__mpz_struct *)(__e_acsl_var_8));
         __gmpz_clear((__mpz_struct *)(__e_acsl_var_9));

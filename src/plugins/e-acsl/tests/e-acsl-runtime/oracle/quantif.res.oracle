@@ -2,121 +2,110 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-PROJECT_FILE.i:232:[value] Assertion got status unknown.
-PROJECT_FILE.i:238:[value] entering loop for the first time
-PROJECT_FILE.i:250:[value] assigning non deterministic value for the first time
+PROJECT_FILE.i:233:[value] Assertion got status unknown.
+PROJECT_FILE.i:239:[value] entering loop for the first time
+PROJECT_FILE.i:251:[value] assigning non deterministic value for the first time
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:253.
+        Called from PROJECT_FILE.i:254.
+PROJECT_FILE.i:221:[value] Function e_acsl_assert: precondition got status valid.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:259:[value] Assertion got status unknown.
-PROJECT_FILE.i:265:[value] entering loop for the first time
+PROJECT_FILE.i:260:[value] Assertion got status unknown.
+PROJECT_FILE.i:266:[value] entering loop for the first time
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:275.
+        Called from PROJECT_FILE.i:276.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:280:[value] Assertion got status unknown.
-PROJECT_FILE.i:286:[value] entering loop for the first time
+PROJECT_FILE.i:281:[value] Assertion got status unknown.
+PROJECT_FILE.i:287:[value] entering loop for the first time
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:296.
+        Called from PROJECT_FILE.i:297.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:301:[value] Assertion got status unknown.
-PROJECT_FILE.i:307:[value] entering loop for the first time
+PROJECT_FILE.i:302:[value] Assertion got status unknown.
+PROJECT_FILE.i:308:[value] entering loop for the first time
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:317.
+        Called from PROJECT_FILE.i:318.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:322:[value] Assertion got status unknown.
-PROJECT_FILE.i:333:[value] entering loop for the first time
-PROJECT_FILE.i:337:[value] entering loop for the first time
-PROJECT_FILE.i:341:[value] entering loop for the first time
+PROJECT_FILE.i:323:[value] Assertion got status unknown.
+PROJECT_FILE.i:334:[value] entering loop for the first time
+PROJECT_FILE.i:338:[value] entering loop for the first time
+PROJECT_FILE.i:342:[value] entering loop for the first time
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:355.
-[value] computing for function printf <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:223.
-[value] Done for function printf
-[value] computing for function exit <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:225.
-PROJECT_FILE.i:211:[value] Function exit: postcondition got status invalid.
-[value] Done for function exit
+        Called from PROJECT_FILE.i:356.
+PROJECT_FILE.i:221:[value] Function e_acsl_assert: precondition got status unknown.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:361:[value] Assertion got status unknown.
-PROJECT_FILE.i:367:[value] entering loop for the first time
+PROJECT_FILE.i:362:[value] Assertion got status unknown.
+PROJECT_FILE.i:368:[value] entering loop for the first time
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:377.
+        Called from PROJECT_FILE.i:378.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:382:[value] Assertion got status unknown.
-PROJECT_FILE.i:390:[value] entering loop for the first time
-PROJECT_FILE.i:396:[value] Assertion got status valid.
+PROJECT_FILE.i:383:[value] Assertion got status unknown.
+PROJECT_FILE.i:391:[value] entering loop for the first time
+PROJECT_FILE.i:397:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:397.
+        Called from PROJECT_FILE.i:398.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:405:[value] entering loop for the first time
-PROJECT_FILE.i:408:[value] Assertion got status valid.
+PROJECT_FILE.i:406:[value] entering loop for the first time
+PROJECT_FILE.i:409:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:409.
+        Called from PROJECT_FILE.i:410.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:397.
+        Called from PROJECT_FILE.i:398.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:409.
+        Called from PROJECT_FILE.i:410.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:397.
+        Called from PROJECT_FILE.i:398.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:409.
+        Called from PROJECT_FILE.i:410.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:409.
+        Called from PROJECT_FILE.i:410.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:397.
+        Called from PROJECT_FILE.i:398.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:409.
+        Called from PROJECT_FILE.i:410.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:397.
+        Called from PROJECT_FILE.i:398.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:409.
+        Called from PROJECT_FILE.i:410.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:397.
+        Called from PROJECT_FILE.i:398.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:409.
+        Called from PROJECT_FILE.i:410.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:409.
+        Called from PROJECT_FILE.i:410.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:432.
-[value] computing for function printf <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:223.
-[value] Done for function printf
-[value] computing for function exit <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:225.
-[value] Done for function exit
+        Called from PROJECT_FILE.i:433.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] Recording results for main
@@ -132,9 +121,10 @@ PROJECT_FILE.i:408:[value] Assertion got status valid.
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
+/*@ requires predicate ≢ 0;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
-  if (predicate) {
+  if (! predicate) {
     printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
            line,pred_txt);
     exit(1);
@@ -164,7 +154,7 @@ int main(void)
       __e_acsl_x ++;
     }
     e_acsl_end_loop1: ;
-    e_acsl_assert(! __e_acsl_var,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var,(char *)"Assertion",
                   (char *)"(\\forall int x; 0 <= x && x <= 1 ==> x == 0 || x == 1)",
                   11);
   }
@@ -183,7 +173,7 @@ int main(void)
       __e_acsl_x_2 ++;
     }
     e_acsl_end_loop2: ;
-    e_acsl_assert(! __e_acsl_var_3,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_3,(char *)"Assertion",
                   (char *)"(\\forall int x; 0 < x && x <= 1 ==> x == 1)",12);
   }
   
@@ -200,7 +190,7 @@ int main(void)
       __e_acsl_x_3 ++;
     }
     e_acsl_end_loop3: ;
-    e_acsl_assert(! __e_acsl_var_4,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_4,(char *)"Assertion",
                   (char *)"(\\forall int x; 0 < x && x < 1 ==> \\false)",13);
   }
   
@@ -218,7 +208,7 @@ int main(void)
       __e_acsl_x_4 ++;
     }
     e_acsl_end_loop4: ;
-    e_acsl_assert(! __e_acsl_var_5,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_5,(char *)"Assertion",
                   (char *)"(\\forall int x; 0 <= x && x < 1 ==> x == 0)",14);
   }
   
@@ -252,7 +242,7 @@ int main(void)
       __e_acsl_x_5 ++;
     }
     e_acsl_end_loop5: ;
-    e_acsl_assert(! __e_acsl_var_6,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_6,(char *)"Assertion",
                   (char *)"(\\forall int x, int y, int z;\n  ((0 <= x && x < 2) && (0 <= y && y < 5)) && (0 <= z && z <= y) ==>\n  x+z <= y+1)",
                   18);
   }
@@ -272,7 +262,7 @@ int main(void)
       __e_acsl_x_6 ++;
     }
     e_acsl_end_loop6: ;
-    e_acsl_assert(! __e_acsl_var_7,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_7,(char *)"Assertion",
                   (char *)"(\\exists int x; (0 <= x && x < 10) && x == 5)",
                   23);
   }
@@ -291,7 +281,7 @@ int main(void)
         int __e_acsl_var_9;
         int __e_acsl_var_12;
         /*@ assert 2 ≢ 0; */ ;
-        e_acsl_assert(2 == 0,(char *)"Assertion",(char *)"(2 == 0)",28);
+        e_acsl_assert(! (2 == 0),(char *)"Assertion",(char *)"(2 == 0)",28);
         __e_acsl_var_9 = __e_acsl_x_7 % 2;
         if (! (__e_acsl_var_9 == 0)) { __e_acsl_var_12 = 1; }
         else {
@@ -303,7 +293,8 @@ int main(void)
             {
               int __e_acsl_var_11;
               /*@ assert 2 ≢ 0; */ ;
-              e_acsl_assert(2 == 0,(char *)"Assertion",(char *)"(2 == 0)",28);
+              e_acsl_assert(! (2 == 0),(char *)"Assertion",
+                            (char *)"(2 == 0)",28);
               __e_acsl_var_11 = __e_acsl_x_7 / 2;
               if (! (__e_acsl_y_2 <= __e_acsl_var_11)) { break; }
             }
@@ -325,7 +316,7 @@ int main(void)
       __e_acsl_x_7 ++;
     }
     e_acsl_end_loop8: ;
-    e_acsl_assert(! __e_acsl_var_8,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_8,(char *)"Assertion",
                   (char *)"(\\forall int x; 0 <= x && x < 10 ==>\n  (x%2 == 0 ==> (\\exists int y; (0 <= y && y <= x/2) && x == 2*y)))",
                   27);
   }

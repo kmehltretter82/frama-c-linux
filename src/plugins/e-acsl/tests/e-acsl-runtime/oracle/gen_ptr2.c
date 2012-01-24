@@ -62,9 +62,10 @@ extern unsigned long __gmpz_get_ui(__mpz_struct const * /*[1]*/ z);
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
+/*@ requires predicate ≢ 0;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
-  if (predicate) {
+  if (! predicate) {
     printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
            line,pred_txt);
     exit(1);
@@ -92,7 +93,7 @@ int main(void)
     __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_2),(long)1);
     __e_acsl_var_3 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var),
                                 (__mpz_struct const *)(__e_acsl_var_2));
-    e_acsl_assert(! (__e_acsl_var_3 == 0),(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_3 == 0,(char *)"Assertion",
                   (char *)"(*p == 1)",13);
     __gmpz_clear((__mpz_struct *)(__e_acsl_var));
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_2));
@@ -107,7 +108,7 @@ int main(void)
     __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_5),(long)2);
     __e_acsl_var_6 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var_4),
                                 (__mpz_struct const *)(__e_acsl_var_5));
-    e_acsl_assert(! (__e_acsl_var_6 == 0),(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_6 == 0,(char *)"Assertion",
                   (char *)"(t[0] == 2)",14);
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_4));
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_5));
@@ -122,7 +123,7 @@ int main(void)
     __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_8),(long)4);
     __e_acsl_var_9 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var_7),
                                 (__mpz_struct const *)(__e_acsl_var_8));
-    e_acsl_assert(! (__e_acsl_var_9 == 0),(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_9 == 0,(char *)"Assertion",
                   (char *)"(t[2] == 4)",15);
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_7));
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_8));
@@ -153,7 +154,7 @@ int main(void)
                                  (__mpz_struct const *)(__e_acsl_var_14));
     __gmpz_init((__mpz_struct *)(__e_acsl_var_16));
     /*@ assert sizeof((int)0x0) ≢ 0; */ ;
-    e_acsl_assert(__e_acsl_var_15 == 0,(char *)"Assertion",
+    e_acsl_assert(! (__e_acsl_var_15 == 0),(char *)"Assertion",
                   (char *)"(sizeof((int)0x0) == 0)",16);
     __gmpz_tdiv_q((__mpz_struct *)(__e_acsl_var_16),
                   (__mpz_struct const *)(__e_acsl_var_12),
@@ -164,7 +165,7 @@ int main(void)
     __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_19),(long)4);
     __e_acsl_var_20 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var_18),
                                  (__mpz_struct const *)(__e_acsl_var_19));
-    e_acsl_assert(! (__e_acsl_var_20 == 0),(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_20 == 0,(char *)"Assertion",
                   (char *)"(t[(2*sizeof(int))/sizeof((int)0x0)] == 4)",16);
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_10));
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_11));
@@ -197,7 +198,7 @@ int main(void)
                    (__mpz_struct const *)(__e_acsl_var_23));
         __e_acsl_var_25 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var_21),
                                      (__mpz_struct const *)(__e_acsl_var_24));
-        e_acsl_assert(! (__e_acsl_var_25 == 0),(char *)"Assertion",
+        e_acsl_assert(__e_acsl_var_25 == 0,(char *)"Assertion",
                       (char *)"(t[i] == i+2)",19);
         __gmpz_clear((__mpz_struct *)(__e_acsl_var_21));
         __gmpz_clear((__mpz_struct *)(__e_acsl_var_22));
@@ -231,7 +232,7 @@ int main(void)
                    (__mpz_struct const *)(__e_acsl_var_27));
         __e_acsl_var_33 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var_30),
                                      (__mpz_struct const *)(__e_acsl_var_32));
-        e_acsl_assert(! (__e_acsl_var_33 == 0),(char *)"Assertion",
+        e_acsl_assert(__e_acsl_var_33 == 0,(char *)"Assertion",
                       (char *)"(t[2-i] == 4-i)",20);
         __gmpz_clear((__mpz_struct *)(__e_acsl_var_26));
         __gmpz_clear((__mpz_struct *)(__e_acsl_var_27));
@@ -258,7 +259,7 @@ int main(void)
                    (__mpz_struct const *)(__e_acsl_var_36));
         __e_acsl_var_38 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var_34),
                                      (__mpz_struct const *)(__e_acsl_var_37));
-        e_acsl_assert(! (__e_acsl_var_38 == 0),(char *)"Assertion",
+        e_acsl_assert(__e_acsl_var_38 == 0,(char *)"Assertion",
                       (char *)"(*(&t[2]-i) == 4-i)",21);
         __gmpz_clear((__mpz_struct *)(__e_acsl_var_34));
         __gmpz_clear((__mpz_struct *)(__e_acsl_var_35));
@@ -281,7 +282,7 @@ int main(void)
     __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_40),(long)5);
     __e_acsl_var_41 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var_39),
                                  (__mpz_struct const *)(__e_acsl_var_40));
-    e_acsl_assert(! (__e_acsl_var_41 == 0),(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_41 == 0,(char *)"Assertion",
                   (char *)"(*p == 5)",27);
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_39));
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_40));

@@ -2,14 +2,15 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-PROJECT_FILE.i:234:[value] Assertion got status valid.
+PROJECT_FILE.i:235:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:235.
+        Called from PROJECT_FILE.i:236.
+PROJECT_FILE.i:221:[value] Function e_acsl_assert: precondition got status valid.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:237:[value] Assertion got status valid.
+PROJECT_FILE.i:238:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:238.
+        Called from PROJECT_FILE.i:239.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] Recording results for main
@@ -26,9 +27,10 @@ PROJECT_FILE.i:237:[value] Assertion got status valid.
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
+/*@ requires predicate ≢ 0;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
-  if (predicate) {
+  if (! predicate) {
     printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
            line,pred_txt);
     exit(1);
@@ -42,10 +44,10 @@ int main(void)
   int x;
   x = 0;
   /*@ assert sizeof(int) ≡ sizeof(x); */ ;
-  e_acsl_assert(! (4 == 4),(char *)"Assertion",
+  e_acsl_assert(4 == 4,(char *)"Assertion",
                 (char *)"(sizeof(int) == sizeof(x))",9);
   /*@ assert sizeof("totototototo") ≡ sizeof(char *); */ ;
-  e_acsl_assert(! (4 == 4),(char *)"Assertion",
+  e_acsl_assert(4 == 4,(char *)"Assertion",
                 (char *)"(sizeof(\"totototototo\") == sizeof(char *))",10);
   __retres = 0;
   return (__retres);

@@ -5,9 +5,10 @@
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
+/*@ requires predicate ≢ 0;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
-  if (predicate) {
+  if (! predicate) {
     printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
            line,pred_txt);
     exit(1);
@@ -32,21 +33,21 @@ void f(void)
   __e_acsl_var_2 = A;
   A = 2;
   /*@ assert \at(A,Pre) ≡ 0; */ ;
-  e_acsl_assert(! (__e_acsl_var == 0),(char *)"Assertion",
+  e_acsl_assert(__e_acsl_var == 0,(char *)"Assertion",
                 (char *)"(\\at(A,Pre) == 0)",13);
   /*@ assert \at(A,F) ≡ 1; */ ;
-  e_acsl_assert(! (__e_acsl_var_2 == 1),(char *)"Assertion",
+  e_acsl_assert(__e_acsl_var_2 == 1,(char *)"Assertion",
                 (char *)"(\\at(A,F) == 1)",14);
   /*@ assert \at(A,Here) ≡ 2; */ ;
   __e_acsl_var_3 = A;
-  e_acsl_assert(! (__e_acsl_var_3 == 2),(char *)"Assertion",
+  e_acsl_assert(__e_acsl_var_3 == 2,(char *)"Assertion",
                 (char *)"(\\at(A,Here) == 2)",15);
   /*@ assert \at(\at(A,Pre),F) ≡ 0; */ ;
-  e_acsl_assert(! (__e_acsl_var_5 == 0),(char *)"Assertion",
+  e_acsl_assert(__e_acsl_var_5 == 0,(char *)"Assertion",
                 (char *)"(\\at(\\at(A,Pre),F) == 0)",16);
   A = 3;
   __e_acsl_var_6 = A;
-  e_acsl_assert(! (__e_acsl_var_6 == 3),(char *)"Postcondition",
+  e_acsl_assert(__e_acsl_var_6 == 3,(char *)"Postcondition",
                 (char *)"(\\at(A,Post) == 3)",9);
   return;
 }
@@ -68,12 +69,12 @@ void g(int *p, int *q)
   L2: __e_acsl_var_2 = *(p + __e_acsl_var);
   A = 4;
   /*@ assert \at(*(p+\at(*q,L1)),L2) ≡ 2; */ ;
-  e_acsl_assert(! (__e_acsl_var_2 == 2),(char *)"Assertion",
+  e_acsl_assert(__e_acsl_var_2 == 2,(char *)"Assertion",
                 (char *)"(\\at(*(p+\\at(*q,L1)),L2) == 2)",32);
   L3: 
   /*@ assert \at(*(p+\at(*q,L1)),Here) ≡ 2; */ ;
   __e_acsl_var_4 = *(p + __e_acsl_var_3);
-  e_acsl_assert(! (__e_acsl_var_4 == 2),(char *)"Assertion",
+  e_acsl_assert(__e_acsl_var_4 == 2,(char *)"Assertion",
                 (char *)"(\\at(*(p+\\at(*q,L1)),Here) == 2)",34);
   return;
 }
@@ -91,18 +92,18 @@ int main(void)
   __e_acsl_var_2 = (long long)x + (long long)1;
   __e_acsl_var = x;
   /*@ assert x ≡ 0; */ ;
-  e_acsl_assert(! (x == 0),(char *)"Assertion",(char *)"(x == 0)",45);
+  e_acsl_assert(x == 0,(char *)"Assertion",(char *)"(x == 0)",45);
   x = 1;
   x = 2;
   f();
   /*@ assert \at(x,L) ≡ 0; */ ;
-  e_acsl_assert(! (__e_acsl_var == 0),(char *)"Assertion",
+  e_acsl_assert(__e_acsl_var == 0,(char *)"Assertion",
                 (char *)"(\\at(x,L) == 0)",50);
   /*@ assert \at(x+1,L) ≡ 1; */ ;
-  e_acsl_assert(! (__e_acsl_var_2 == (long long)1),(char *)"Assertion",
+  e_acsl_assert(__e_acsl_var_2 == (long long)1,(char *)"Assertion",
                 (char *)"(\\at(x+1,L) == 1)",51);
   /*@ assert \at(x,L)+1 ≡ 1; */ ;
-  e_acsl_assert(! ((long long)__e_acsl_var_3 + (long long)1 == (long long)1),
+  e_acsl_assert((long long)__e_acsl_var_3 + (long long)1 == (long long)1,
                 (char *)"Assertion",(char *)"(\\at(x,L)+1 == 1)",52);
   g(t,& x);
   __retres = 0;

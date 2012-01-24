@@ -35,9 +35,10 @@ extern void __gmpz_tdiv_q(__mpz_struct * /*[1]*/ z1,
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
+/*@ requires predicate ≢ 0;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
-  if (predicate) {
+  if (! predicate) {
     printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
            line,pred_txt);
     exit(1);
@@ -75,7 +76,7 @@ int main(void)
       __gmpz_clear((__mpz_struct *)(__e_acsl_var_5));
     }
     else { __e_acsl_var_7 = 0; }
-    e_acsl_assert(! __e_acsl_var_7,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_7,(char *)"Assertion",
                   (char *)"(x == 0 && y == 1)",11);
     __gmpz_clear((__mpz_struct *)(__e_acsl_var));
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_2));
@@ -105,7 +106,7 @@ int main(void)
                                    (__mpz_struct const *)(__e_acsl_var_13));
       __gmpz_init((__mpz_struct *)(__e_acsl_var_15));
       /*@ assert 0 ≢ 0; */ ;
-      e_acsl_assert(__e_acsl_var_14 == 0,(char *)"Assertion",
+      e_acsl_assert(! (__e_acsl_var_14 == 0),(char *)"Assertion",
                     (char *)"(0 == 0)",12);
       __gmpz_tdiv_q((__mpz_struct *)(__e_acsl_var_15),
                     (__mpz_struct const *)(__e_acsl_var_12),
@@ -119,7 +120,7 @@ int main(void)
       __gmpz_clear((__mpz_struct *)(__e_acsl_var_15));
     }
     else { __e_acsl_var_17 = 0; }
-    e_acsl_assert(! (! __e_acsl_var_17),(char *)"Assertion",
+    e_acsl_assert(! __e_acsl_var_17,(char *)"Assertion",
                   (char *)"(!(x != 0 && y == 1/0))",12);
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_8));
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_9));
@@ -148,7 +149,7 @@ int main(void)
       __gmpz_clear((__mpz_struct *)(__e_acsl_var_21));
       __gmpz_clear((__mpz_struct *)(__e_acsl_var_22));
     }
-    e_acsl_assert(! __e_acsl_var_24,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_24,(char *)"Assertion",
                   (char *)"(y == 1 || x == 1)",13);
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_18));
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_19));
@@ -179,7 +180,7 @@ int main(void)
                                    (__mpz_struct const *)(__e_acsl_var_30));
       __gmpz_init((__mpz_struct *)(__e_acsl_var_32));
       /*@ assert 0 ≢ 0; */ ;
-      e_acsl_assert(__e_acsl_var_31 == 0,(char *)"Assertion",
+      e_acsl_assert(! (__e_acsl_var_31 == 0),(char *)"Assertion",
                     (char *)"(0 == 0)",14);
       __gmpz_tdiv_q((__mpz_struct *)(__e_acsl_var_32),
                     (__mpz_struct const *)(__e_acsl_var_29),
@@ -192,7 +193,7 @@ int main(void)
       __gmpz_clear((__mpz_struct *)(__e_acsl_var_30));
       __gmpz_clear((__mpz_struct *)(__e_acsl_var_32));
     }
-    e_acsl_assert(! __e_acsl_var_34,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_34,(char *)"Assertion",
                   (char *)"(x == 0 || y == 1/0)",14);
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_25));
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_26));
@@ -221,7 +222,7 @@ int main(void)
       __gmpz_clear((__mpz_struct *)(__e_acsl_var_38));
       __gmpz_clear((__mpz_struct *)(__e_acsl_var_39));
     }
-    e_acsl_assert(! __e_acsl_var_41,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_41,(char *)"Assertion",
                   (char *)"(x == 0 ==> y == 1)",15);
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_35));
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_36));
@@ -252,7 +253,7 @@ int main(void)
                                    (__mpz_struct const *)(__e_acsl_var_47));
       __gmpz_init((__mpz_struct *)(__e_acsl_var_49));
       /*@ assert 0 ≢ 0; */ ;
-      e_acsl_assert(__e_acsl_var_48 == 0,(char *)"Assertion",
+      e_acsl_assert(! (__e_acsl_var_48 == 0),(char *)"Assertion",
                     (char *)"(0 == 0)",16);
       __gmpz_tdiv_q((__mpz_struct *)(__e_acsl_var_49),
                     (__mpz_struct const *)(__e_acsl_var_46),
@@ -265,7 +266,7 @@ int main(void)
       __gmpz_clear((__mpz_struct *)(__e_acsl_var_47));
       __gmpz_clear((__mpz_struct *)(__e_acsl_var_49));
     }
-    e_acsl_assert(! __e_acsl_var_51,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_51,(char *)"Assertion",
                   (char *)"(x == 1 ==> y == 1/0)",16);
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_42));
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_43));
@@ -305,7 +306,7 @@ int main(void)
       __gmpz_clear((__mpz_struct *)(__e_acsl_var_58));
       __gmpz_clear((__mpz_struct *)(__e_acsl_var_59));
     }
-    e_acsl_assert(! __e_acsl_var_61,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_61,(char *)"Assertion",
                   (char *)"(x!=0? x != 0: y != 0)",17);
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_52));
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_53));
@@ -345,7 +346,7 @@ int main(void)
       __gmpz_clear((__mpz_struct *)(__e_acsl_var_68));
       __gmpz_clear((__mpz_struct *)(__e_acsl_var_69));
     }
-    e_acsl_assert(! __e_acsl_var_71,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_71,(char *)"Assertion",
                   (char *)"(y!=0? y != 0: x != 0)",18);
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_62));
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_63));
@@ -385,7 +386,7 @@ int main(void)
       __gmpz_clear((__mpz_struct *)(__e_acsl_var_78));
       __gmpz_clear((__mpz_struct *)(__e_acsl_var_79));
     }
-    e_acsl_assert(! __e_acsl_var_81,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_81,(char *)"Assertion",
                   (char *)"(x==1? x == 18: x == 0)",19);
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_72));
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_73));
@@ -442,7 +443,7 @@ int main(void)
       __gmpz_clear((__mpz_struct *)(__e_acsl_var_90));
     }
     else { __e_acsl_var_96 = 0; }
-    e_acsl_assert(! __e_acsl_var_96,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_96,(char *)"Assertion",
                   (char *)"(x == 2 <==> y == 3)",22);
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_82));
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_83));
@@ -499,7 +500,7 @@ int main(void)
       __gmpz_clear((__mpz_struct *)(__e_acsl_var_105));
     }
     else { __e_acsl_var_111 = 0; }
-    e_acsl_assert(! __e_acsl_var_111,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_111,(char *)"Assertion",
                   (char *)"(x == 0 <==> y == 1)",23);
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_97));
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_98));
@@ -543,7 +544,7 @@ int main(void)
       __gmpz_clear((__mpz_struct *)(__e_acsl_var_119));
       __gmpz_clear((__mpz_struct *)(__e_acsl_var_120));
     }
-    e_acsl_assert(! __e_acsl_var_122,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_122,(char *)"Assertion",
                   (char *)"((x != 0 && y != 0) || y != 0)",27);
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_112));
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_113));
@@ -586,7 +587,7 @@ int main(void)
       __gmpz_clear((__mpz_struct *)(__e_acsl_var_131));
     }
     else { __e_acsl_var_133 = 0; }
-    e_acsl_assert(! __e_acsl_var_133,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_133,(char *)"Assertion",
                   (char *)"((x != 0 || y != 0) && y == 1)",28);
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_123));
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_124));

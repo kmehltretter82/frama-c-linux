@@ -3,24 +3,25 @@
 [value] Initial state computed
 [value] Values of globals at initialization
         X ∈ {0}
-PROJECT_FILE.i:236:[value] Assertion got status valid.
+PROJECT_FILE.i:237:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:237.
+        Called from PROJECT_FILE.i:238.
+PROJECT_FILE.i:221:[value] Function e_acsl_assert: precondition got status valid.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:245.
+        Called from PROJECT_FILE.i:246.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:247.
+        Called from PROJECT_FILE.i:248.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:256.
+        Called from PROJECT_FILE.i:257.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:230:[value] Function main: postcondition got status valid.
+PROJECT_FILE.i:231:[value] Function main: postcondition got status valid.
 [value] Recording results for main
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
@@ -35,9 +36,10 @@ PROJECT_FILE.i:230:[value] Function main: postcondition got status valid.
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
+/*@ requires predicate ≢ 0;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
-  if (predicate) {
+  if (! predicate) {
     printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
            line,pred_txt);
     exit(1);
@@ -53,16 +55,16 @@ int main(void)
   goto L1;
   L1: 
   /*@ assert X ≡ 0; */ ;
-  e_acsl_assert(! (X == 0),(char *)"Assertion",(char *)"(X == 0)",12);
+  e_acsl_assert(X == 0,(char *)"Assertion",(char *)"(X == 0)",12);
   X = 1;
   goto L2;
   L2: 
   /*@ requires X ≡ 1;
       ensures X ≡ 2; */
   {
-    e_acsl_assert(! (X == 1),(char *)"Precondition",(char *)"(X == 1)",14);
+    e_acsl_assert(X == 1,(char *)"Precondition",(char *)"(X == 1)",14);
     X = 2;
-    e_acsl_assert(! (X == 2),(char *)"Postcondition",(char *)"(X == 2)",14);
+    e_acsl_assert(X == 2,(char *)"Postcondition",(char *)"(X == 2)",14);
   }
   
   if (X) {
@@ -70,7 +72,7 @@ int main(void)
     __retres = 0;
     goto return_label; }
   __retres = 0;
-  return_label: e_acsl_assert(! (X == 3),(char *)"Postcondition",
+  return_label: e_acsl_assert(X == 3,(char *)"Postcondition",
                               (char *)"(X == 3)",9);
   return (__retres);
 }

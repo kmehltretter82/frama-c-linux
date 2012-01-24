@@ -28,9 +28,10 @@ extern int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
+/*@ requires predicate ≢ 0;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
-  if (predicate) {
+  if (! predicate) {
     printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
            line,pred_txt);
     exit(1);
@@ -42,7 +43,7 @@ int main(void)
 {
   int __retres;
   /*@ assert "toto" ≢ "titi"; */ ;
-  e_acsl_assert(! ("toto" != "titi"),(char *)"Assertion",
+  e_acsl_assert("toto" != "titi",(char *)"Assertion",
                 (char *)"(\"toto\" != \"titi\")",10);
   /*@ assert 'c' ≡ 'c'; */ ;
   {
@@ -51,7 +52,7 @@ int main(void)
     __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var),(long)'c');
     __e_acsl_var_2 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var),
                                 (__mpz_struct const *)(__e_acsl_var));
-    e_acsl_assert(! (__e_acsl_var_2 == 0),(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_2 == 0,(char *)"Assertion",
                   (char *)"(\'c\' == \'c\')",11);
     __gmpz_clear((__mpz_struct *)(__e_acsl_var));
   }
@@ -65,7 +66,7 @@ int main(void)
     __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_4),(long)true);
     __e_acsl_var_5 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var_3),
                                 (__mpz_struct const *)(__e_acsl_var_4));
-    e_acsl_assert(! (__e_acsl_var_5 != 0),(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_5 != 0,(char *)"Assertion",
                   (char *)"(false != true)",12);
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_3));
     __gmpz_clear((__mpz_struct *)(__e_acsl_var_4));

@@ -2,34 +2,35 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-PROJECT_FILE.i:236:[value] Assertion got status valid.
+PROJECT_FILE.i:237:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:237.
+        Called from PROJECT_FILE.i:238.
+PROJECT_FILE.i:221:[value] Function e_acsl_assert: precondition got status valid.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:239:[value] Assertion got status valid.
+PROJECT_FILE.i:240:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:240.
+        Called from PROJECT_FILE.i:241.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:242:[value] Assertion got status valid.
+PROJECT_FILE.i:243:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:243.
+        Called from PROJECT_FILE.i:244.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:245:[value] Assertion got status valid.
+PROJECT_FILE.i:246:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:246.
+        Called from PROJECT_FILE.i:247.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:249:[value] Assertion got status valid.
+PROJECT_FILE.i:250:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:250.
+        Called from PROJECT_FILE.i:251.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:253:[value] Assertion got status valid.
+PROJECT_FILE.i:254:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:254.
+        Called from PROJECT_FILE.i:255.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] Recording results for main
@@ -47,9 +48,10 @@ PROJECT_FILE.i:253:[value] Assertion got status valid.
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
+/*@ requires predicate ≢ 0;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
-  if (predicate) {
+  if (! predicate) {
     printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
            line,pred_txt);
     exit(1);
@@ -65,21 +67,19 @@ int main(void)
   x = (long)0;
   y = 0;
   /*@ assert (int)x ≡ y; */ ;
-  e_acsl_assert(! ((int)x == y),(char *)"Assertion",(char *)"((int)x == y)",
-                11);
+  e_acsl_assert((int)x == y,(char *)"Assertion",(char *)"((int)x == y)",11);
   /*@ assert x ≡ (long)y; */ ;
-  e_acsl_assert(! (x == (long)y),(char *)"Assertion",
-                (char *)"(x == (long)y)",12);
+  e_acsl_assert(x == (long)y,(char *)"Assertion",(char *)"(x == (long)y)",12);
   /*@ assert y ≡ (int)0; */ ;
-  e_acsl_assert(! (y == 0),(char *)"Assertion",(char *)"(y == (int)0)",14);
+  e_acsl_assert(y == 0,(char *)"Assertion",(char *)"(y == (int)0)",14);
   /*@ assert (unsigned int)y ≡ (unsigned int)0; */ ;
-  e_acsl_assert(! ((unsigned int)y == (unsigned int)0),(char *)"Assertion",
+  e_acsl_assert((unsigned int)y == (unsigned int)0,(char *)"Assertion",
                 (char *)"((unsigned int)y == (unsigned int)0)",15);
   /*@ assert y ≢ (int)0xfffffffffffffff; */ ;
-  e_acsl_assert(! (y != (int)0xfffffffffffffff),(char *)"Assertion",
+  e_acsl_assert(y != (int)0xfffffffffffffff,(char *)"Assertion",
                 (char *)"(y != (int)0xfffffffffffffff)",18);
   /*@ assert (unsigned int)y ≢ (unsigned int)0xfffffffffffffff; */ ;
-  e_acsl_assert(! ((unsigned int)y != (unsigned int)0xfffffffffffffff),
+  e_acsl_assert((unsigned int)y != (unsigned int)0xfffffffffffffff,
                 (char *)"Assertion",
                 (char *)"((unsigned int)y != (unsigned int)0xfffffffffffffff)",
                 19);

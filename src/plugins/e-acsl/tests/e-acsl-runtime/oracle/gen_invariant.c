@@ -5,9 +5,10 @@
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
+/*@ requires predicate ≢ 0;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
-  if (predicate) {
+  if (! predicate) {
     printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
            line,pred_txt);
     exit(1);
@@ -29,13 +30,13 @@ int main(void)
       { int __e_acsl_var;
         if (0 <= i) { __e_acsl_var = i < 10; }
         else { __e_acsl_var = 0; }
-        e_acsl_assert(! __e_acsl_var,(char *)"Invariant",
+        e_acsl_assert(__e_acsl_var,(char *)"Invariant",
                       (char *)"(0 <= i && i < 10)",9);
       }
       
       x += i;
       /*@ invariant i ≤ x; */ ;
-      e_acsl_assert(! (i <= x),(char *)"Invariant",(char *)"(i <= x)",11);
+      e_acsl_assert(i <= x,(char *)"Invariant",(char *)"(i <= x)",11);
       i ++;
     }
   }

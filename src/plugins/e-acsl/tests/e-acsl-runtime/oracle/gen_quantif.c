@@ -5,9 +5,10 @@
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
+/*@ requires predicate ≢ 0;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
-  if (predicate) {
+  if (! predicate) {
     printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
            line,pred_txt);
     exit(1);
@@ -37,7 +38,7 @@ int main(void)
       __e_acsl_x ++;
     }
     e_acsl_end_loop1: ;
-    e_acsl_assert(! __e_acsl_var,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var,(char *)"Assertion",
                   (char *)"(\\forall int x; 0 <= x && x <= 1 ==> x == 0 || x == 1)",
                   11);
   }
@@ -56,7 +57,7 @@ int main(void)
       __e_acsl_x_2 ++;
     }
     e_acsl_end_loop2: ;
-    e_acsl_assert(! __e_acsl_var_3,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_3,(char *)"Assertion",
                   (char *)"(\\forall int x; 0 < x && x <= 1 ==> x == 1)",12);
   }
   
@@ -73,7 +74,7 @@ int main(void)
       __e_acsl_x_3 ++;
     }
     e_acsl_end_loop3: ;
-    e_acsl_assert(! __e_acsl_var_4,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_4,(char *)"Assertion",
                   (char *)"(\\forall int x; 0 < x && x < 1 ==> \\false)",13);
   }
   
@@ -91,7 +92,7 @@ int main(void)
       __e_acsl_x_4 ++;
     }
     e_acsl_end_loop4: ;
-    e_acsl_assert(! __e_acsl_var_5,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_5,(char *)"Assertion",
                   (char *)"(\\forall int x; 0 <= x && x < 1 ==> x == 0)",14);
   }
   
@@ -125,7 +126,7 @@ int main(void)
       __e_acsl_x_5 ++;
     }
     e_acsl_end_loop5: ;
-    e_acsl_assert(! __e_acsl_var_6,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_6,(char *)"Assertion",
                   (char *)"(\\forall int x, int y, int z;\n  ((0 <= x && x < 2) && (0 <= y && y < 5)) && (0 <= z && z <= y) ==>\n  x+z <= y+1)",
                   18);
   }
@@ -145,7 +146,7 @@ int main(void)
       __e_acsl_x_6 ++;
     }
     e_acsl_end_loop6: ;
-    e_acsl_assert(! __e_acsl_var_7,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_7,(char *)"Assertion",
                   (char *)"(\\exists int x; (0 <= x && x < 10) && x == 5)",
                   23);
   }
@@ -164,7 +165,7 @@ int main(void)
         int __e_acsl_var_9;
         int __e_acsl_var_12;
         /*@ assert 2 ≢ 0; */ ;
-        e_acsl_assert(2 == 0,(char *)"Assertion",(char *)"(2 == 0)",28);
+        e_acsl_assert(! (2 == 0),(char *)"Assertion",(char *)"(2 == 0)",28);
         __e_acsl_var_9 = __e_acsl_x_7 % 2;
         if (! (__e_acsl_var_9 == 0)) { __e_acsl_var_12 = 1; }
         else {
@@ -176,7 +177,8 @@ int main(void)
             {
               int __e_acsl_var_11;
               /*@ assert 2 ≢ 0; */ ;
-              e_acsl_assert(2 == 0,(char *)"Assertion",(char *)"(2 == 0)",28);
+              e_acsl_assert(! (2 == 0),(char *)"Assertion",
+                            (char *)"(2 == 0)",28);
               __e_acsl_var_11 = __e_acsl_x_7 / 2;
               if (! (__e_acsl_y_2 <= __e_acsl_var_11)) { break; }
             }
@@ -198,7 +200,7 @@ int main(void)
       __e_acsl_x_7 ++;
     }
     e_acsl_end_loop8: ;
-    e_acsl_assert(! __e_acsl_var_8,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_var_8,(char *)"Assertion",
                   (char *)"(\\forall int x; 0 <= x && x < 10 ==>\n  (x%2 == 0 ==> (\\exists int y; (0 <= y && y <= x/2) && x == 2*y)))",
                   27);
   }

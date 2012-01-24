@@ -2,226 +2,137 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-PROJECT_FILE.i:237:[value] entering loop for the first time
+PROJECT_FILE.i:238:[value] entering loop for the first time
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:244.
+        Called from PROJECT_FILE.i:245.
+PROJECT_FILE.i:221:[value] Function e_acsl_assert: precondition got status valid.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:250.
+        Called from PROJECT_FILE.i:251.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:244.
+        Called from PROJECT_FILE.i:245.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:248:[value] assigning non deterministic value for the first time
+PROJECT_FILE.i:249:[value] assigning non deterministic value for the first time
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:250.
-[value] computing for function printf <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:223.
-[value] Done for function printf
-[value] computing for function exit <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:225.
-PROJECT_FILE.i:211:[value] Function exit: postcondition got status invalid.
-[value] Done for function exit
+        Called from PROJECT_FILE.i:251.
+PROJECT_FILE.i:221:[value] Function e_acsl_assert: precondition got status unknown.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:244.
+        Called from PROJECT_FILE.i:245.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:250.
-[value] computing for function printf <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:223.
-[value] Done for function printf
-[value] computing for function exit <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:225.
-[value] Done for function exit
+        Called from PROJECT_FILE.i:251.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:244.
+        Called from PROJECT_FILE.i:245.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:250.
-[value] computing for function printf <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:223.
-[value] Done for function printf
-[value] computing for function exit <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:225.
-[value] Done for function exit
+        Called from PROJECT_FILE.i:251.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:244.
+        Called from PROJECT_FILE.i:245.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:250.
-[value] computing for function printf <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:223.
-[value] Done for function printf
-[value] computing for function exit <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:225.
-[value] Done for function exit
+        Called from PROJECT_FILE.i:251.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:244.
+        Called from PROJECT_FILE.i:245.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:250.
-[value] computing for function printf <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:223.
-[value] Done for function printf
-[value] computing for function exit <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:225.
-[value] Done for function exit
+        Called from PROJECT_FILE.i:251.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:244.
+        Called from PROJECT_FILE.i:245.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:250.
-[value] computing for function printf <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:223.
-[value] Done for function printf
-[value] computing for function exit <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:225.
-[value] Done for function exit
+        Called from PROJECT_FILE.i:251.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:244.
+        Called from PROJECT_FILE.i:245.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:250.
-[value] computing for function printf <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:223.
-[value] Done for function printf
-[value] computing for function exit <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:225.
-[value] Done for function exit
+        Called from PROJECT_FILE.i:251.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:244.
+        Called from PROJECT_FILE.i:245.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:250.
-[value] computing for function printf <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:223.
-[value] Done for function printf
-[value] computing for function exit <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:225.
-[value] Done for function exit
+        Called from PROJECT_FILE.i:251.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:244.
+        Called from PROJECT_FILE.i:245.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:250.
-[value] computing for function printf <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:223.
-[value] Done for function printf
-[value] computing for function exit <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:225.
-[value] Done for function exit
+        Called from PROJECT_FILE.i:251.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:244.
+        Called from PROJECT_FILE.i:245.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:250.
-[value] computing for function printf <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:223.
-[value] Done for function printf
-[value] computing for function exit <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:225.
-[value] Done for function exit
+        Called from PROJECT_FILE.i:251.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:244.
+        Called from PROJECT_FILE.i:245.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:250.
-[value] computing for function printf <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:223.
-[value] Done for function printf
-[value] computing for function exit <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:225.
-[value] Done for function exit
+        Called from PROJECT_FILE.i:251.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:244.
+        Called from PROJECT_FILE.i:245.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:250.
-[value] computing for function printf <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:223.
-[value] Done for function printf
-[value] computing for function exit <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:225.
-[value] Done for function exit
+        Called from PROJECT_FILE.i:251.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:244.
+        Called from PROJECT_FILE.i:245.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:250.
-[value] computing for function printf <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:223.
-[value] Done for function printf
-[value] computing for function exit <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:225.
-[value] Done for function exit
+        Called from PROJECT_FILE.i:251.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:244.
+        Called from PROJECT_FILE.i:245.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:250.
-[value] computing for function printf <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:223.
-[value] Done for function printf
-[value] computing for function exit <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:225.
-[value] Done for function exit
+        Called from PROJECT_FILE.i:251.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:244.
+        Called from PROJECT_FILE.i:245.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:248:[value] warning: 2's complement assumed for overflow
+PROJECT_FILE.i:249:[value] warning: 2's complement assumed for overflow
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:250.
-[value] computing for function printf <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:223.
-[value] Done for function printf
-[value] computing for function exit <- e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:225.
-[value] Done for function exit
+        Called from PROJECT_FILE.i:251.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] Recording results for main
@@ -238,9 +149,10 @@ PROJECT_FILE.i:248:[value] warning: 2's complement assumed for overflow
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
+/*@ requires predicate ≢ 0;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
-  if (predicate) {
+  if (! predicate) {
     printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
            line,pred_txt);
     exit(1);
@@ -262,13 +174,13 @@ int main(void)
       { int __e_acsl_var;
         if (0 <= i) { __e_acsl_var = i < 10; }
         else { __e_acsl_var = 0; }
-        e_acsl_assert(! __e_acsl_var,(char *)"Invariant",
+        e_acsl_assert(__e_acsl_var,(char *)"Invariant",
                       (char *)"(0 <= i && i < 10)",9);
       }
       
       x += i;
       /*@ invariant i ≤ x; */ ;
-      e_acsl_assert(! (i <= x),(char *)"Invariant",(char *)"(i <= x)",11);
+      e_acsl_assert(i <= x,(char *)"Invariant",(char *)"(i <= x)",11);
       i ++;
     }
   }

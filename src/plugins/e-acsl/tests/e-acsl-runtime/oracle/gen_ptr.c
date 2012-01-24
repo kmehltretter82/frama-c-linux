@@ -5,9 +5,10 @@
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
+/*@ requires predicate ≢ 0;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
-  if (predicate) {
+  if (! predicate) {
     printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
            line,pred_txt);
     exit(1);
@@ -27,19 +28,19 @@ int main(void)
   t[2] = 4;
   p = & x;
   /*@ assert *p ≡ 1; */ ;
-  e_acsl_assert(! (*p == 1),(char *)"Assertion",(char *)"(*p == 1)",13);
+  e_acsl_assert(*p == 1,(char *)"Assertion",(char *)"(*p == 1)",13);
   /*@ assert t[0] ≡ 2; */ ;
-  e_acsl_assert(! (t[0] == 2),(char *)"Assertion",(char *)"(t[0] == 2)",14);
+  e_acsl_assert(t[0] == 2,(char *)"Assertion",(char *)"(t[0] == 2)",14);
   /*@ assert t[2] ≡ 4; */ ;
-  e_acsl_assert(! (t[2] == 4),(char *)"Assertion",(char *)"(t[2] == 4)",15);
+  e_acsl_assert(t[2] == 4,(char *)"Assertion",(char *)"(t[2] == 4)",15);
   /*@ assert t[(2*sizeof(int))/sizeof((int)0x0)] ≡ 4; */ ;
   {
     int __e_acsl_var;
     /*@ assert sizeof((int)0x0) ≢ 0; */ ;
-    e_acsl_assert(4 == 0,(char *)"Assertion",
+    e_acsl_assert(! (4 == 0),(char *)"Assertion",
                   (char *)"(sizeof((int)0x0) == 0)",16);
     __e_acsl_var = (2 * 4) / 4;
-    e_acsl_assert(! (t[__e_acsl_var] == 4),(char *)"Assertion",
+    e_acsl_assert(t[__e_acsl_var] == 4,(char *)"Assertion",
                   (char *)"(t[(2*sizeof(int))/sizeof((int)0x0)] == 4)",16);
   }
   
@@ -49,13 +50,13 @@ int main(void)
     while (1) {
       if (! (i < 2)) { break; }
       /*@ assert t[i] ≡ i+2; */ ;
-      e_acsl_assert(! ((long long)t[i] == (long long)i + (long long)2),
+      e_acsl_assert((long long)t[i] == (long long)i + (long long)2,
                     (char *)"Assertion",(char *)"(t[i] == i+2)",19);
       /*@ assert t[2-i] ≡ 4-i; */ ;
-      e_acsl_assert(! ((long long)t[(long long)2 - (long long)i] == (long long)4 - (long long)i),
+      e_acsl_assert((long long)t[(long long)2 - (long long)i] == (long long)4 - (long long)i,
                     (char *)"Assertion",(char *)"(t[2-i] == 4-i)",20);
       /*@ assert *(&t[2]-i) ≡ 4-i; */ ;
-      e_acsl_assert(! ((long long)*(& t[2] - i) == (long long)4 - (long long)i),
+      e_acsl_assert((long long)*(& t[2] - i) == (long long)4 - (long long)i,
                     (char *)"Assertion",(char *)"(*(&t[2]-i) == 4-i)",21);
       i ++;
     }
@@ -64,7 +65,7 @@ int main(void)
   p = & t[2];
   t[2] = 5;
   /*@ assert *p ≡ 5; */ ;
-  e_acsl_assert(! (*p == 5),(char *)"Assertion",(char *)"(*p == 5)",27);
+  e_acsl_assert(*p == 5,(char *)"Assertion",(char *)"(*p == 5)",27);
   __retres = 0;
   return (__retres);
 }

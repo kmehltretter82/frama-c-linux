@@ -5,9 +5,10 @@
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
+/*@ requires predicate ≢ 0;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
-  if (predicate) {
+  if (! predicate) {
     printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
            line,pred_txt);
     exit(1);
@@ -47,7 +48,7 @@ int search(int elt)
       __e_acsl_i ++;
     }
     e_acsl_end_loop1: ;
-    e_acsl_assert(! __e_acsl_var,(char *)"Precondition",
+    e_acsl_assert(__e_acsl_var,(char *)"Precondition",
                   (char *)"(\\forall int i; 0 <= i && i < 9 ==> A[i] <= A[i+1])",
                   9);
     {
@@ -105,12 +106,12 @@ int search(int elt)
     int __e_acsl_var_7;
     if (! __e_acsl_var_3) { __e_acsl_var_4 = 1; }
     else { __e_acsl_var_4 = __retres == 1; }
-    e_acsl_assert(! __e_acsl_var_4,(char *)"Postcondition",
+    e_acsl_assert(__e_acsl_var_4,(char *)"Postcondition",
                   (char *)"(\\old(\\exists int j; (0 <= j && j < 10) && A[j] == elt) ==> \\result == 1)",
                   12);
     if (! __e_acsl_var_6) { __e_acsl_var_7 = 1; }
     else { __e_acsl_var_7 = __retres == 0; }
-    e_acsl_assert(! __e_acsl_var_7,(char *)"Postcondition",
+    e_acsl_assert(__e_acsl_var_7,(char *)"Postcondition",
                   (char *)"(\\old(\\forall int j; 0 <= j && j < 10 ==> A[j] != elt) ==> \\result == 0)",
                   15);
     return (__retres);
@@ -131,10 +132,10 @@ int main(void)
   
   found = search(36);
   /*@ assert found ≡ 1; */ ;
-  e_acsl_assert(! (found == 1),(char *)"Assertion",(char *)"(found == 1)",31);
+  e_acsl_assert(found == 1,(char *)"Assertion",(char *)"(found == 1)",31);
   found = search(5);
   /*@ assert found ≡ 0; */ ;
-  e_acsl_assert(! (found == 0),(char *)"Assertion",(char *)"(found == 0)",34);
+  e_acsl_assert(found == 0,(char *)"Assertion",(char *)"(found == 0)",34);
   __retres = 0;
   return (__retres);
 }

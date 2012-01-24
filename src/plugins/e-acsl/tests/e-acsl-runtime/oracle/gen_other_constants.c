@@ -9,9 +9,10 @@ enum bool {
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
+/*@ requires predicate ≢ 0;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
-  if (predicate) {
+  if (! predicate) {
     printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
            line,pred_txt);
     exit(1);
@@ -23,14 +24,13 @@ int main(void)
 {
   int __retres;
   /*@ assert "toto" ≢ "titi"; */ ;
-  e_acsl_assert(! ("toto" != "titi"),(char *)"Assertion",
+  e_acsl_assert("toto" != "titi",(char *)"Assertion",
                 (char *)"(\"toto\" != \"titi\")",10);
   /*@ assert 'c' ≡ 'c'; */ ;
-  e_acsl_assert(! ('c' == 'c'),(char *)"Assertion",
-                (char *)"(\'c\' == \'c\')",11);
+  e_acsl_assert('c' == 'c',(char *)"Assertion",(char *)"(\'c\' == \'c\')",11);
   /*@ assert false ≢ true; */ ;
-  e_acsl_assert(! (false != true),(char *)"Assertion",
-                (char *)"(false != true)",12);
+  e_acsl_assert(false != true,(char *)"Assertion",(char *)"(false != true)",
+                12);
   __retres = 0;
   return (__retres);
 }

@@ -5,9 +5,10 @@
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
+/*@ requires predicate ≢ 0;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
-  if (predicate) {
+  if (! predicate) {
     printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
            line,pred_txt);
     exit(1);
@@ -22,7 +23,7 @@ int main(void)
   x = 0;
   if (x) {
     /*@ assert \false; */ ;
-    e_acsl_assert(1,(char *)"Assertion",(char *)"(\\false)",8);
+    e_acsl_assert(0,(char *)"Assertion",(char *)"(\\false)",8);
   }
   __retres = 0;
   return (__retres);

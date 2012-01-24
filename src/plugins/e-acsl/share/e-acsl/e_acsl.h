@@ -36,8 +36,9 @@ extern int printf(const char *, ...);
 /* Dedicated E-ACSL function */
 /*****************************/
 
+/*@ requires predicate != 0; */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line) {
-  if (predicate) {
+  if (! predicate) {
     printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n", 
 	   kind, line, pred_txt); 
     exit(1);
