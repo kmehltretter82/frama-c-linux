@@ -42,32 +42,32 @@ int main(void)
   x = 0;
   /*@ assert sizeof(int) ≡ sizeof(x); */ ;
   {
-    mpz_t __e_acsl_var;
-    mpz_t __e_acsl_var_2;
-    int __e_acsl_var_3;
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var),(long)4);
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_2),(long)4);
-    __e_acsl_var_3 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var),
-                                (__mpz_struct const *)(__e_acsl_var_2));
-    e_acsl_assert(__e_acsl_var_3 == 0,(char *)"Assertion",
+    mpz_t __e_acsl;
+    mpz_t __e_acsl_2;
+    int __e_acsl_3;
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl),(long)4);
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_2),(long)4);
+    __e_acsl_3 = __gmpz_cmp((__mpz_struct const *)(__e_acsl),
+                            (__mpz_struct const *)(__e_acsl_2));
+    e_acsl_assert(__e_acsl_3 == 0,(char *)"Assertion",
                   (char *)"(sizeof(int) == sizeof(x))",9);
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_2));
+    __gmpz_clear((__mpz_struct *)(__e_acsl));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_2));
   }
   
   /*@ assert sizeof("totototototo") ≡ sizeof(char *); */ ;
   {
-    mpz_t __e_acsl_var_4;
-    mpz_t __e_acsl_var_5;
-    int __e_acsl_var_6;
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_4),(long)4);
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_5),(long)4);
-    __e_acsl_var_6 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var_4),
-                                (__mpz_struct const *)(__e_acsl_var_5));
-    e_acsl_assert(__e_acsl_var_6 == 0,(char *)"Assertion",
+    mpz_t __e_acsl_4;
+    mpz_t __e_acsl_5;
+    int __e_acsl_6;
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_4),(long)4);
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_5),(long)4);
+    __e_acsl_6 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_4),
+                            (__mpz_struct const *)(__e_acsl_5));
+    e_acsl_assert(__e_acsl_6 == 0,(char *)"Assertion",
                   (char *)"(sizeof(\"totototototo\") == sizeof(char *))",10);
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_4));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_5));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_4));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_5));
   }
   
   __retres = 0;

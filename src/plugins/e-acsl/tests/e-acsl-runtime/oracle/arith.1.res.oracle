@@ -1,13 +1,3 @@
-:0:[e-acsl] warning: E-ACSL construct `typing of user-defined logic type' is not yet supported.
-                  Ignoring annotation.
-:0:[e-acsl] warning: E-ACSL construct `typing of user-defined logic type' is not yet supported.
-                  Ignoring annotation.
-:0:[e-acsl] warning: E-ACSL construct `typing of user-defined logic type' is not yet supported.
-                  Ignoring annotation.
-:0:[e-acsl] warning: E-ACSL construct `typing of user-defined logic type' is not yet supported.
-                  Ignoring annotation.
-:0:[e-acsl] warning: E-ACSL construct `typing of user-defined logic type' is not yet supported.
-                  Ignoring annotation.
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed
@@ -325,18 +315,21 @@ PROJECT_FILE.i:407:[value] Assertion got status valid.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function __gmpz_tdiv_q <- main.
-        Called from PROJECT_FILE.i:410.
+        Called from PROJECT_FILE.i:409.
 [value] Done for function __gmpz_tdiv_q
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:411.
+        Called from PROJECT_FILE.i:410.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:412.
+        Called from PROJECT_FILE.i:411.
 [value] Done for function __gmpz_cmp
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:413.
+        Called from PROJECT_FILE.i:412.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:414.
+[value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- main.
         Called from PROJECT_FILE.i:415.
 [value] Done for function __gmpz_clear
@@ -346,52 +339,52 @@ PROJECT_FILE.i:407:[value] Assertion got status valid.
 [value] computing for function __gmpz_clear <- main.
         Called from PROJECT_FILE.i:417.
 [value] Done for function __gmpz_clear
-[value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:418.
-[value] Done for function __gmpz_clear
-PROJECT_FILE.i:422:[value] Assertion got status valid.
+PROJECT_FILE.i:421:[value] Assertion got status valid.
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:431.
+[value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init_set_si <- main.
         Called from PROJECT_FILE.i:432.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init_set_si <- main.
         Called from PROJECT_FILE.i:433.
 [value] Done for function __gmpz_init_set_si
-[value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:434.
-[value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:435.
+        Called from PROJECT_FILE.i:434.
 [value] Done for function __gmpz_cmp
 [value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:436.
+        Called from PROJECT_FILE.i:435.
 [value] Done for function __gmpz_init
-PROJECT_FILE.i:437:[value] Assertion got status valid.
+PROJECT_FILE.i:436:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:438.
+        Called from PROJECT_FILE.i:437.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function __gmpz_tdiv_r <- main.
-        Called from PROJECT_FILE.i:439.
+        Called from PROJECT_FILE.i:438.
 PROJECT_FILE.i:157:[value] Function __gmpz_tdiv_r: precondition got status valid.
 PROJECT_FILE.i:158:[value] Function __gmpz_tdiv_r: precondition got status valid.
 PROJECT_FILE.i:159:[value] Function __gmpz_tdiv_r: precondition got status valid.
 [value] Done for function __gmpz_tdiv_r
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:440.
+        Called from PROJECT_FILE.i:439.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:441.
+        Called from PROJECT_FILE.i:440.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_neg <- main.
-        Called from PROJECT_FILE.i:442.
+        Called from PROJECT_FILE.i:441.
 [value] Done for function __gmpz_neg
 [value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:443.
+        Called from PROJECT_FILE.i:442.
 [value] Done for function __gmpz_cmp
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:444.
+        Called from PROJECT_FILE.i:443.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:444.
+[value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- main.
         Called from PROJECT_FILE.i:445.
 [value] Done for function __gmpz_clear
@@ -407,61 +400,61 @@ PROJECT_FILE.i:159:[value] Function __gmpz_tdiv_r: precondition got status valid
 [value] computing for function __gmpz_clear <- main.
         Called from PROJECT_FILE.i:449.
 [value] Done for function __gmpz_clear
-[value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:450.
-[value] Done for function __gmpz_clear
-PROJECT_FILE.i:454:[value] Assertion got status valid.
+PROJECT_FILE.i:453:[value] Assertion got status valid.
 [value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:465.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init <- main.
         Called from PROJECT_FILE.i:466.
-[value] Done for function __gmpz_init_set_si
-[value] computing for function __gmpz_init <- main.
+[value] Done for function __gmpz_init
+[value] computing for function __gmpz_neg <- main.
         Called from PROJECT_FILE.i:467.
-[value] Done for function __gmpz_init
-[value] computing for function __gmpz_neg <- main.
-        Called from PROJECT_FILE.i:468.
 [value] Done for function __gmpz_neg
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:469.
+        Called from PROJECT_FILE.i:468.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:470.
+        Called from PROJECT_FILE.i:469.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_neg <- main.
-        Called from PROJECT_FILE.i:471.
+        Called from PROJECT_FILE.i:470.
 [value] Done for function __gmpz_neg
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:472.
+        Called from PROJECT_FILE.i:471.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:473.
+        Called from PROJECT_FILE.i:472.
 [value] Done for function __gmpz_cmp
 [value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:474.
+        Called from PROJECT_FILE.i:473.
 [value] Done for function __gmpz_init
-PROJECT_FILE.i:475:[value] Assertion got status valid.
+PROJECT_FILE.i:474:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:476.
+        Called from PROJECT_FILE.i:475.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function __gmpz_tdiv_r <- main.
-        Called from PROJECT_FILE.i:477.
+        Called from PROJECT_FILE.i:476.
 [value] Done for function __gmpz_tdiv_r
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:478.
+        Called from PROJECT_FILE.i:477.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:479.
+        Called from PROJECT_FILE.i:478.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_neg <- main.
-        Called from PROJECT_FILE.i:480.
+        Called from PROJECT_FILE.i:479.
 [value] Done for function __gmpz_neg
 [value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:481.
+        Called from PROJECT_FILE.i:480.
 [value] Done for function __gmpz_cmp
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:482.
+        Called from PROJECT_FILE.i:481.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:482.
+[value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- main.
         Called from PROJECT_FILE.i:483.
 [value] Done for function __gmpz_clear
@@ -483,49 +476,49 @@ PROJECT_FILE.i:475:[value] Assertion got status valid.
 [value] computing for function __gmpz_clear <- main.
         Called from PROJECT_FILE.i:489.
 [value] Done for function __gmpz_clear
-[value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:490.
-[value] Done for function __gmpz_clear
-PROJECT_FILE.i:494:[value] Assertion got status valid.
+PROJECT_FILE.i:493:[value] Assertion got status valid.
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:503.
+[value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init_set_si <- main.
         Called from PROJECT_FILE.i:504.
 [value] Done for function __gmpz_init_set_si
-[value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:505.
-[value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:506.
+        Called from PROJECT_FILE.i:505.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_neg <- main.
-        Called from PROJECT_FILE.i:507.
+        Called from PROJECT_FILE.i:506.
 [value] Done for function __gmpz_neg
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:508.
+        Called from PROJECT_FILE.i:507.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:509.
+        Called from PROJECT_FILE.i:508.
 [value] Done for function __gmpz_cmp
 [value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:510.
+        Called from PROJECT_FILE.i:509.
 [value] Done for function __gmpz_init
-PROJECT_FILE.i:511:[value] Assertion got status valid.
+PROJECT_FILE.i:510:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:512.
+        Called from PROJECT_FILE.i:511.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function __gmpz_tdiv_r <- main.
-        Called from PROJECT_FILE.i:513.
+        Called from PROJECT_FILE.i:512.
 [value] Done for function __gmpz_tdiv_r
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:514.
+        Called from PROJECT_FILE.i:513.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:515.
+        Called from PROJECT_FILE.i:514.
 [value] Done for function __gmpz_cmp
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:516.
+        Called from PROJECT_FILE.i:515.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:516.
+[value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- main.
         Called from PROJECT_FILE.i:517.
 [value] Done for function __gmpz_clear
@@ -541,77 +534,77 @@ PROJECT_FILE.i:511:[value] Assertion got status valid.
 [value] computing for function __gmpz_clear <- main.
         Called from PROJECT_FILE.i:521.
 [value] Done for function __gmpz_clear
-[value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:522.
-[value] Done for function __gmpz_clear
-PROJECT_FILE.i:526:[value] Assertion got status valid.
+PROJECT_FILE.i:525:[value] Assertion got status valid.
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:541.
+[value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init_set_si <- main.
         Called from PROJECT_FILE.i:542.
 [value] Done for function __gmpz_init_set_si
-[value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:543.
-[value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:544.
+        Called from PROJECT_FILE.i:543.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_mul <- main.
-        Called from PROJECT_FILE.i:545.
+        Called from PROJECT_FILE.i:544.
 [value] Done for function __gmpz_mul
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:545.
+[value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init_set_si <- main.
         Called from PROJECT_FILE.i:546.
 [value] Done for function __gmpz_init_set_si
-[value] computing for function __gmpz_init_set_si <- main.
+[value] computing for function __gmpz_init <- main.
         Called from PROJECT_FILE.i:547.
-[value] Done for function __gmpz_init_set_si
-[value] computing for function __gmpz_init <- main.
+[value] Done for function __gmpz_init
+[value] computing for function __gmpz_add <- main.
         Called from PROJECT_FILE.i:548.
-[value] Done for function __gmpz_init
-[value] computing for function __gmpz_add <- main.
+[value] Done for function __gmpz_add
+[value] computing for function __gmpz_init <- main.
         Called from PROJECT_FILE.i:549.
-[value] Done for function __gmpz_add
-[value] computing for function __gmpz_init <- main.
+[value] Done for function __gmpz_init
+[value] computing for function __gmpz_add <- main.
         Called from PROJECT_FILE.i:550.
-[value] Done for function __gmpz_init
-[value] computing for function __gmpz_add <- main.
+[value] Done for function __gmpz_add
+[value] computing for function __gmpz_init_set_si <- main.
         Called from PROJECT_FILE.i:551.
-[value] Done for function __gmpz_add
-[value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:552.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init <- main.
+        Called from PROJECT_FILE.i:552.
+[value] Done for function __gmpz_init
+[value] computing for function __gmpz_sub <- main.
         Called from PROJECT_FILE.i:553.
-[value] Done for function __gmpz_init
-[value] computing for function __gmpz_sub <- main.
+[value] Done for function __gmpz_sub
+[value] computing for function __gmpz_init <- main.
         Called from PROJECT_FILE.i:554.
-[value] Done for function __gmpz_sub
-[value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:555.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_sub <- main.
-        Called from PROJECT_FILE.i:556.
+        Called from PROJECT_FILE.i:555.
 [value] Done for function __gmpz_sub
 [value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:557.
+        Called from PROJECT_FILE.i:556.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_add <- main.
-        Called from PROJECT_FILE.i:558.
+        Called from PROJECT_FILE.i:557.
 [value] Done for function __gmpz_add
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:559.
+        Called from PROJECT_FILE.i:558.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:560.
+        Called from PROJECT_FILE.i:559.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_neg <- main.
-        Called from PROJECT_FILE.i:561.
+        Called from PROJECT_FILE.i:560.
 [value] Done for function __gmpz_neg
 [value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:562.
+        Called from PROJECT_FILE.i:561.
 [value] Done for function __gmpz_cmp
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:563.
+        Called from PROJECT_FILE.i:562.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:564.
+[value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- main.
         Called from PROJECT_FILE.i:565.
 [value] Done for function __gmpz_clear
@@ -648,14 +641,241 @@ PROJECT_FILE.i:526:[value] Assertion got status valid.
 [value] computing for function __gmpz_clear <- main.
         Called from PROJECT_FILE.i:576.
 [value] Done for function __gmpz_clear
+PROJECT_FILE.i:580:[value] Assertion got status valid.
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:591.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:592.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:593.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:594.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:595.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:596.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:597.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:598.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:599.
+[value] Done for function __gmpz_cmp
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:600.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:577.
+        Called from PROJECT_FILE.i:601.
 [value] Done for function __gmpz_clear
-PROJECT_FILE.i:581:[value] Assertion got status valid.
-PROJECT_FILE.i:583:[value] Assertion got status valid.
-PROJECT_FILE.i:585:[value] Assertion got status valid.
-PROJECT_FILE.i:587:[value] Assertion got status valid.
-PROJECT_FILE.i:589:[value] Assertion got status valid.
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:602.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:603.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:604.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:605.
+[value] Done for function __gmpz_clear
+PROJECT_FILE.i:609:[value] Assertion got status valid.
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:619.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:620.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init <- main.
+        Called from PROJECT_FILE.i:621.
+[value] Done for function __gmpz_init
+[value] computing for function __gmpz_neg <- main.
+        Called from PROJECT_FILE.i:622.
+[value] Done for function __gmpz_neg
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:623.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:624.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:625.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:626.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:627.
+[value] Done for function __gmpz_cmp
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:628.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:629.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:630.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:631.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:632.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:633.
+[value] Done for function __gmpz_clear
+PROJECT_FILE.i:637:[value] Assertion got status valid.
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:647.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:648.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init <- main.
+        Called from PROJECT_FILE.i:649.
+[value] Done for function __gmpz_init
+[value] computing for function __gmpz_neg <- main.
+        Called from PROJECT_FILE.i:650.
+[value] Done for function __gmpz_neg
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:651.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:652.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:653.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:654.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:655.
+[value] Done for function __gmpz_cmp
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:656.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:657.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:658.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:659.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:660.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:661.
+[value] Done for function __gmpz_clear
+PROJECT_FILE.i:665:[value] Assertion got status valid.
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:676.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:677.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:678.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:679.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:680.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:681.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:682.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:683.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:684.
+[value] Done for function __gmpz_cmp
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:685.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:686.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:687.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:688.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:689.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:690.
+[value] Done for function __gmpz_clear
+PROJECT_FILE.i:694:[value] Assertion got status valid.
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:705.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:706.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:707.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:708.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:709.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:710.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:711.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:712.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:713.
+[value] Done for function __gmpz_cmp
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:714.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:715.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:716.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:717.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:718.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:719.
+[value] Done for function __gmpz_clear
 [value] Recording results for main
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
@@ -767,414 +987,580 @@ int main(void)
   y = 2;
   /*@ assert -3 ≡ x; */ ;
   {
-    mpz_t __e_acsl_var;
-    mpz_t __e_acsl_var_2;
-    mpz_t __e_acsl_var_3;
-    int __e_acsl_var_4;
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var),(long)3);
-    __gmpz_init((__mpz_struct *)(__e_acsl_var_2));
-    __gmpz_neg((__mpz_struct *)(__e_acsl_var_2),
-               (__mpz_struct const *)(__e_acsl_var));
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_3),(long)x);
-    __e_acsl_var_4 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var_2),
-                                (__mpz_struct const *)(__e_acsl_var_3));
-    e_acsl_assert(__e_acsl_var_4 == 0,(char *)"Assertion",
-                  (char *)"(-3 == x)",12);
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_2));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_3));
+    mpz_t __e_acsl;
+    mpz_t __e_acsl_2;
+    mpz_t __e_acsl_3;
+    int __e_acsl_4;
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl),(long)3);
+    __gmpz_init((__mpz_struct *)(__e_acsl_2));
+    __gmpz_neg((__mpz_struct *)(__e_acsl_2),(__mpz_struct const *)(__e_acsl));
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_3),(long)x);
+    __e_acsl_4 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_2),
+                            (__mpz_struct const *)(__e_acsl_3));
+    e_acsl_assert(__e_acsl_4 == 0,(char *)"Assertion",(char *)"(-3 == x)",12);
+    __gmpz_clear((__mpz_struct *)(__e_acsl));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_2));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_3));
   }
   
   /*@ assert x ≡ -3; */ ;
   {
-    mpz_t __e_acsl_var_5;
-    mpz_t __e_acsl_var_6;
-    mpz_t __e_acsl_var_7;
-    int __e_acsl_var_8;
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_5),(long)x);
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_6),(long)3);
-    __gmpz_init((__mpz_struct *)(__e_acsl_var_7));
-    __gmpz_neg((__mpz_struct *)(__e_acsl_var_7),
-               (__mpz_struct const *)(__e_acsl_var_6));
-    __e_acsl_var_8 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var_5),
-                                (__mpz_struct const *)(__e_acsl_var_7));
-    e_acsl_assert(__e_acsl_var_8 == 0,(char *)"Assertion",
-                  (char *)"(x == -3)",13);
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_5));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_6));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_7));
+    mpz_t __e_acsl_5;
+    mpz_t __e_acsl_6;
+    mpz_t __e_acsl_7;
+    int __e_acsl_8;
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_5),(long)x);
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_6),(long)3);
+    __gmpz_init((__mpz_struct *)(__e_acsl_7));
+    __gmpz_neg((__mpz_struct *)(__e_acsl_7),
+               (__mpz_struct const *)(__e_acsl_6));
+    __e_acsl_8 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_5),
+                            (__mpz_struct const *)(__e_acsl_7));
+    e_acsl_assert(__e_acsl_8 == 0,(char *)"Assertion",(char *)"(x == -3)",13);
+    __gmpz_clear((__mpz_struct *)(__e_acsl_5));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_6));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_7));
   }
   
   /*@ assert 0 ≢ ~0; */ ;
   {
-    mpz_t __e_acsl_var_9;
-    mpz_t __e_acsl_var_10;
-    int __e_acsl_var_11;
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_9),(long)0);
-    __gmpz_init((__mpz_struct *)(__e_acsl_var_10));
-    __gmpz_com((__mpz_struct *)(__e_acsl_var_10),
-               (__mpz_struct const *)(__e_acsl_var_9));
-    __e_acsl_var_11 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var_9),
-                                 (__mpz_struct const *)(__e_acsl_var_10));
-    e_acsl_assert(__e_acsl_var_11 != 0,(char *)"Assertion",
-                  (char *)"(0 != ~0)",14);
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_9));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_10));
+    mpz_t __e_acsl_9;
+    mpz_t __e_acsl_10;
+    int __e_acsl_11;
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_9),(long)0);
+    __gmpz_init((__mpz_struct *)(__e_acsl_10));
+    __gmpz_com((__mpz_struct *)(__e_acsl_10),
+               (__mpz_struct const *)(__e_acsl_9));
+    __e_acsl_11 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_9),
+                             (__mpz_struct const *)(__e_acsl_10));
+    e_acsl_assert(__e_acsl_11 != 0,(char *)"Assertion",(char *)"(0 != ~0)",
+                  14);
+    __gmpz_clear((__mpz_struct *)(__e_acsl_9));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_10));
   }
   
   /*@ assert x+1 ≡ -2; */ ;
   {
-    mpz_t __e_acsl_var_12;
-    mpz_t __e_acsl_var_13;
-    mpz_t __e_acsl_var_14;
-    mpz_t __e_acsl_var_15;
-    mpz_t __e_acsl_var_16;
-    int __e_acsl_var_17;
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_12),(long)x);
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_13),(long)1);
-    __gmpz_init((__mpz_struct *)(__e_acsl_var_14));
-    __gmpz_add((__mpz_struct *)(__e_acsl_var_14),
-               (__mpz_struct const *)(__e_acsl_var_12),
-               (__mpz_struct const *)(__e_acsl_var_13));
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_15),(long)2);
-    __gmpz_init((__mpz_struct *)(__e_acsl_var_16));
-    __gmpz_neg((__mpz_struct *)(__e_acsl_var_16),
-               (__mpz_struct const *)(__e_acsl_var_15));
-    __e_acsl_var_17 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var_14),
-                                 (__mpz_struct const *)(__e_acsl_var_16));
-    e_acsl_assert(__e_acsl_var_17 == 0,(char *)"Assertion",
-                  (char *)"(x+1 == -2)",16);
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_12));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_13));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_14));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_15));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_16));
+    mpz_t __e_acsl_12;
+    mpz_t __e_acsl_13;
+    mpz_t __e_acsl_14;
+    mpz_t __e_acsl_15;
+    mpz_t __e_acsl_16;
+    int __e_acsl_17;
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_12),(long)x);
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_13),(long)1);
+    __gmpz_init((__mpz_struct *)(__e_acsl_14));
+    __gmpz_add((__mpz_struct *)(__e_acsl_14),
+               (__mpz_struct const *)(__e_acsl_12),
+               (__mpz_struct const *)(__e_acsl_13));
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_15),(long)2);
+    __gmpz_init((__mpz_struct *)(__e_acsl_16));
+    __gmpz_neg((__mpz_struct *)(__e_acsl_16),
+               (__mpz_struct const *)(__e_acsl_15));
+    __e_acsl_17 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_14),
+                             (__mpz_struct const *)(__e_acsl_16));
+    e_acsl_assert(__e_acsl_17 == 0,(char *)"Assertion",(char *)"(x+1 == -2)",
+                  16);
+    __gmpz_clear((__mpz_struct *)(__e_acsl_12));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_13));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_14));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_15));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_16));
   }
   
   /*@ assert x-1 ≡ -4; */ ;
   {
-    mpz_t __e_acsl_var_18;
-    mpz_t __e_acsl_var_19;
-    mpz_t __e_acsl_var_20;
-    mpz_t __e_acsl_var_21;
-    mpz_t __e_acsl_var_22;
-    int __e_acsl_var_23;
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_18),(long)x);
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_19),(long)1);
-    __gmpz_init((__mpz_struct *)(__e_acsl_var_20));
-    __gmpz_sub((__mpz_struct *)(__e_acsl_var_20),
-               (__mpz_struct const *)(__e_acsl_var_18),
-               (__mpz_struct const *)(__e_acsl_var_19));
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_21),(long)4);
-    __gmpz_init((__mpz_struct *)(__e_acsl_var_22));
-    __gmpz_neg((__mpz_struct *)(__e_acsl_var_22),
-               (__mpz_struct const *)(__e_acsl_var_21));
-    __e_acsl_var_23 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var_20),
-                                 (__mpz_struct const *)(__e_acsl_var_22));
-    e_acsl_assert(__e_acsl_var_23 == 0,(char *)"Assertion",
-                  (char *)"(x-1 == -4)",17);
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_18));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_19));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_20));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_21));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_22));
+    mpz_t __e_acsl_18;
+    mpz_t __e_acsl_19;
+    mpz_t __e_acsl_20;
+    mpz_t __e_acsl_21;
+    mpz_t __e_acsl_22;
+    int __e_acsl_23;
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_18),(long)x);
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_19),(long)1);
+    __gmpz_init((__mpz_struct *)(__e_acsl_20));
+    __gmpz_sub((__mpz_struct *)(__e_acsl_20),
+               (__mpz_struct const *)(__e_acsl_18),
+               (__mpz_struct const *)(__e_acsl_19));
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_21),(long)4);
+    __gmpz_init((__mpz_struct *)(__e_acsl_22));
+    __gmpz_neg((__mpz_struct *)(__e_acsl_22),
+               (__mpz_struct const *)(__e_acsl_21));
+    __e_acsl_23 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_20),
+                             (__mpz_struct const *)(__e_acsl_22));
+    e_acsl_assert(__e_acsl_23 == 0,(char *)"Assertion",(char *)"(x-1 == -4)",
+                  17);
+    __gmpz_clear((__mpz_struct *)(__e_acsl_18));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_19));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_20));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_21));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_22));
   }
   
   /*@ assert x*3 ≡ -9; */ ;
   {
-    mpz_t __e_acsl_var_24;
-    mpz_t __e_acsl_var_25;
-    mpz_t __e_acsl_var_26;
-    mpz_t __e_acsl_var_27;
-    mpz_t __e_acsl_var_28;
-    int __e_acsl_var_29;
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_24),(long)x);
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_25),(long)3);
-    __gmpz_init((__mpz_struct *)(__e_acsl_var_26));
-    __gmpz_mul((__mpz_struct *)(__e_acsl_var_26),
-               (__mpz_struct const *)(__e_acsl_var_24),
-               (__mpz_struct const *)(__e_acsl_var_25));
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_27),(long)9);
-    __gmpz_init((__mpz_struct *)(__e_acsl_var_28));
-    __gmpz_neg((__mpz_struct *)(__e_acsl_var_28),
-               (__mpz_struct const *)(__e_acsl_var_27));
-    __e_acsl_var_29 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var_26),
-                                 (__mpz_struct const *)(__e_acsl_var_28));
-    e_acsl_assert(__e_acsl_var_29 == 0,(char *)"Assertion",
-                  (char *)"(x*3 == -9)",18);
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_24));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_25));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_26));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_27));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_28));
+    mpz_t __e_acsl_24;
+    mpz_t __e_acsl_25;
+    mpz_t __e_acsl_26;
+    mpz_t __e_acsl_27;
+    mpz_t __e_acsl_28;
+    int __e_acsl_29;
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_24),(long)x);
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_25),(long)3);
+    __gmpz_init((__mpz_struct *)(__e_acsl_26));
+    __gmpz_mul((__mpz_struct *)(__e_acsl_26),
+               (__mpz_struct const *)(__e_acsl_24),
+               (__mpz_struct const *)(__e_acsl_25));
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_27),(long)9);
+    __gmpz_init((__mpz_struct *)(__e_acsl_28));
+    __gmpz_neg((__mpz_struct *)(__e_acsl_28),
+               (__mpz_struct const *)(__e_acsl_27));
+    __e_acsl_29 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_26),
+                             (__mpz_struct const *)(__e_acsl_28));
+    e_acsl_assert(__e_acsl_29 == 0,(char *)"Assertion",(char *)"(x*3 == -9)",
+                  18);
+    __gmpz_clear((__mpz_struct *)(__e_acsl_24));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_25));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_26));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_27));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_28));
   }
   
   /*@ assert x/3 ≡ -1; */ ;
   {
-    mpz_t __e_acsl_var_30;
-    mpz_t __e_acsl_var_31;
-    mpz_t __e_acsl_var_32;
-    int __e_acsl_var_33;
-    mpz_t __e_acsl_var_34;
-    mpz_t __e_acsl_var_35;
-    mpz_t __e_acsl_var_36;
-    int __e_acsl_var_37;
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_30),(long)x);
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_31),(long)3);
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_32),(long)0);
-    __e_acsl_var_33 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var_31),
-                                 (__mpz_struct const *)(__e_acsl_var_32));
-    __gmpz_init((__mpz_struct *)(__e_acsl_var_34));
+    mpz_t __e_acsl_30;
+    mpz_t __e_acsl_31;
+    mpz_t __e_acsl_32;
+    int __e_acsl_33;
+    mpz_t __e_acsl_34;
+    mpz_t __e_acsl_35;
+    mpz_t __e_acsl_36;
+    int __e_acsl_37;
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_30),(long)x);
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_31),(long)3);
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_32),(long)0);
+    __e_acsl_33 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_31),
+                             (__mpz_struct const *)(__e_acsl_32));
+    __gmpz_init((__mpz_struct *)(__e_acsl_34));
     /*@ assert 3 ≢ 0; */ ;
-    e_acsl_assert(! (__e_acsl_var_33 == 0),(char *)"Assertion",
+    e_acsl_assert(! (__e_acsl_33 == 0),(char *)"Assertion",
                   (char *)"(3 == 0)",19);
-    __gmpz_tdiv_q((__mpz_struct *)(__e_acsl_var_34),
-                  (__mpz_struct const *)(__e_acsl_var_30),
-                  (__mpz_struct const *)(__e_acsl_var_31));
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_35),(long)1);
-    __gmpz_init((__mpz_struct *)(__e_acsl_var_36));
-    __gmpz_neg((__mpz_struct *)(__e_acsl_var_36),
-               (__mpz_struct const *)(__e_acsl_var_35));
-    __e_acsl_var_37 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var_34),
-                                 (__mpz_struct const *)(__e_acsl_var_36));
-    e_acsl_assert(__e_acsl_var_37 == 0,(char *)"Assertion",
-                  (char *)"(x/3 == -1)",19);
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_30));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_31));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_32));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_34));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_35));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_36));
+    __gmpz_tdiv_q((__mpz_struct *)(__e_acsl_34),
+                  (__mpz_struct const *)(__e_acsl_30),
+                  (__mpz_struct const *)(__e_acsl_31));
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_35),(long)1);
+    __gmpz_init((__mpz_struct *)(__e_acsl_36));
+    __gmpz_neg((__mpz_struct *)(__e_acsl_36),
+               (__mpz_struct const *)(__e_acsl_35));
+    __e_acsl_37 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_34),
+                             (__mpz_struct const *)(__e_acsl_36));
+    e_acsl_assert(__e_acsl_37 == 0,(char *)"Assertion",(char *)"(x/3 == -1)",
+                  19);
+    __gmpz_clear((__mpz_struct *)(__e_acsl_30));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_31));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_32));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_34));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_35));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_36));
   }
   
   /*@ assert 0xfffffffffff/0xfffffffffff ≡ 1; */ ;
   {
-    mpz_t __e_acsl_var_38;
-    mpz_t __e_acsl_var_39;
-    int __e_acsl_var_40;
-    mpz_t __e_acsl_var_41;
-    mpz_t __e_acsl_var_42;
-    int __e_acsl_var_43;
-    __gmpz_init_set_str((__mpz_struct *)(__e_acsl_var_38),"17592186044415",
-                        10);
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_39),(long)0);
-    __e_acsl_var_40 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var_38),
-                                 (__mpz_struct const *)(__e_acsl_var_39));
-    __gmpz_init((__mpz_struct *)(__e_acsl_var_41));
+    mpz_t __e_acsl_38;
+    mpz_t __e_acsl_39;
+    int __e_acsl_40;
+    mpz_t __e_acsl_41;
+    mpz_t __e_acsl_42;
+    int __e_acsl_43;
+    __gmpz_init_set_str((__mpz_struct *)(__e_acsl_38),"17592186044415",10);
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_39),(long)0);
+    __e_acsl_40 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_38),
+                             (__mpz_struct const *)(__e_acsl_39));
+    __gmpz_init((__mpz_struct *)(__e_acsl_41));
     /*@ assert 0xfffffffffff ≢ 0; */ ;
-    e_acsl_assert(! (__e_acsl_var_40 == 0),(char *)"Assertion",
+    e_acsl_assert(! (__e_acsl_40 == 0),(char *)"Assertion",
                   (char *)"(0xfffffffffff == 0)",20);
-    __gmpz_tdiv_q((__mpz_struct *)(__e_acsl_var_41),
-                  (__mpz_struct const *)(__e_acsl_var_38),
-                  (__mpz_struct const *)(__e_acsl_var_38));
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_42),(long)1);
-    __e_acsl_var_43 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var_41),
-                                 (__mpz_struct const *)(__e_acsl_var_42));
-    e_acsl_assert(__e_acsl_var_43 == 0,(char *)"Assertion",
+    __gmpz_tdiv_q((__mpz_struct *)(__e_acsl_41),
+                  (__mpz_struct const *)(__e_acsl_38),
+                  (__mpz_struct const *)(__e_acsl_38));
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_42),(long)1);
+    __e_acsl_43 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_41),
+                             (__mpz_struct const *)(__e_acsl_42));
+    e_acsl_assert(__e_acsl_43 == 0,(char *)"Assertion",
                   (char *)"(0xfffffffffff/0xfffffffffff == 1)",20);
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_38));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_39));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_41));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_42));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_38));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_39));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_41));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_42));
   }
   
   /*@ assert x%2 ≡ -1; */ ;
   {
-    mpz_t __e_acsl_var_44;
-    mpz_t __e_acsl_var_45;
-    mpz_t __e_acsl_var_46;
-    int __e_acsl_var_47;
-    mpz_t __e_acsl_var_48;
-    mpz_t __e_acsl_var_49;
-    mpz_t __e_acsl_var_50;
-    int __e_acsl_var_51;
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_44),(long)x);
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_45),(long)2);
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_46),(long)0);
-    __e_acsl_var_47 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var_45),
-                                 (__mpz_struct const *)(__e_acsl_var_46));
-    __gmpz_init((__mpz_struct *)(__e_acsl_var_48));
+    mpz_t __e_acsl_44;
+    mpz_t __e_acsl_45;
+    mpz_t __e_acsl_46;
+    int __e_acsl_47;
+    mpz_t __e_acsl_48;
+    mpz_t __e_acsl_49;
+    mpz_t __e_acsl_50;
+    int __e_acsl_51;
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_44),(long)x);
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_45),(long)2);
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_46),(long)0);
+    __e_acsl_47 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_45),
+                             (__mpz_struct const *)(__e_acsl_46));
+    __gmpz_init((__mpz_struct *)(__e_acsl_48));
     /*@ assert 2 ≢ 0; */ ;
-    e_acsl_assert(! (__e_acsl_var_47 == 0),(char *)"Assertion",
+    e_acsl_assert(! (__e_acsl_47 == 0),(char *)"Assertion",
                   (char *)"(2 == 0)",21);
-    __gmpz_tdiv_r((__mpz_struct *)(__e_acsl_var_48),
-                  (__mpz_struct const *)(__e_acsl_var_44),
-                  (__mpz_struct const *)(__e_acsl_var_45));
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_49),(long)1);
-    __gmpz_init((__mpz_struct *)(__e_acsl_var_50));
-    __gmpz_neg((__mpz_struct *)(__e_acsl_var_50),
-               (__mpz_struct const *)(__e_acsl_var_49));
-    __e_acsl_var_51 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var_48),
-                                 (__mpz_struct const *)(__e_acsl_var_50));
-    e_acsl_assert(__e_acsl_var_51 == 0,(char *)"Assertion",
-                  (char *)"(x%2 == -1)",21);
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_44));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_45));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_46));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_48));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_49));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_50));
+    __gmpz_tdiv_r((__mpz_struct *)(__e_acsl_48),
+                  (__mpz_struct const *)(__e_acsl_44),
+                  (__mpz_struct const *)(__e_acsl_45));
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_49),(long)1);
+    __gmpz_init((__mpz_struct *)(__e_acsl_50));
+    __gmpz_neg((__mpz_struct *)(__e_acsl_50),
+               (__mpz_struct const *)(__e_acsl_49));
+    __e_acsl_51 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_48),
+                             (__mpz_struct const *)(__e_acsl_50));
+    e_acsl_assert(__e_acsl_51 == 0,(char *)"Assertion",(char *)"(x%2 == -1)",
+                  21);
+    __gmpz_clear((__mpz_struct *)(__e_acsl_44));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_45));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_46));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_48));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_49));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_50));
   }
   
   /*@ assert -3%-2 ≡ -1; */ ;
   {
-    mpz_t __e_acsl_var_52;
-    mpz_t __e_acsl_var_53;
-    mpz_t __e_acsl_var_54;
-    mpz_t __e_acsl_var_55;
-    mpz_t __e_acsl_var_56;
-    int __e_acsl_var_57;
-    mpz_t __e_acsl_var_58;
-    mpz_t __e_acsl_var_59;
-    mpz_t __e_acsl_var_60;
-    int __e_acsl_var_61;
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_52),(long)3);
-    __gmpz_init((__mpz_struct *)(__e_acsl_var_53));
-    __gmpz_neg((__mpz_struct *)(__e_acsl_var_53),
-               (__mpz_struct const *)(__e_acsl_var_52));
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_54),(long)2);
-    __gmpz_init((__mpz_struct *)(__e_acsl_var_55));
-    __gmpz_neg((__mpz_struct *)(__e_acsl_var_55),
-               (__mpz_struct const *)(__e_acsl_var_54));
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_56),(long)0);
-    __e_acsl_var_57 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var_55),
-                                 (__mpz_struct const *)(__e_acsl_var_56));
-    __gmpz_init((__mpz_struct *)(__e_acsl_var_58));
+    mpz_t __e_acsl_52;
+    mpz_t __e_acsl_53;
+    mpz_t __e_acsl_54;
+    mpz_t __e_acsl_55;
+    mpz_t __e_acsl_56;
+    int __e_acsl_57;
+    mpz_t __e_acsl_58;
+    mpz_t __e_acsl_59;
+    mpz_t __e_acsl_60;
+    int __e_acsl_61;
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_52),(long)3);
+    __gmpz_init((__mpz_struct *)(__e_acsl_53));
+    __gmpz_neg((__mpz_struct *)(__e_acsl_53),
+               (__mpz_struct const *)(__e_acsl_52));
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_54),(long)2);
+    __gmpz_init((__mpz_struct *)(__e_acsl_55));
+    __gmpz_neg((__mpz_struct *)(__e_acsl_55),
+               (__mpz_struct const *)(__e_acsl_54));
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_56),(long)0);
+    __e_acsl_57 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_55),
+                             (__mpz_struct const *)(__e_acsl_56));
+    __gmpz_init((__mpz_struct *)(__e_acsl_58));
     /*@ assert -2 ≢ 0; */ ;
-    e_acsl_assert(! (__e_acsl_var_57 == 0),(char *)"Assertion",
+    e_acsl_assert(! (__e_acsl_57 == 0),(char *)"Assertion",
                   (char *)"(-2 == 0)",22);
-    __gmpz_tdiv_r((__mpz_struct *)(__e_acsl_var_58),
-                  (__mpz_struct const *)(__e_acsl_var_53),
-                  (__mpz_struct const *)(__e_acsl_var_55));
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_59),(long)1);
-    __gmpz_init((__mpz_struct *)(__e_acsl_var_60));
-    __gmpz_neg((__mpz_struct *)(__e_acsl_var_60),
-               (__mpz_struct const *)(__e_acsl_var_59));
-    __e_acsl_var_61 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var_58),
-                                 (__mpz_struct const *)(__e_acsl_var_60));
-    e_acsl_assert(__e_acsl_var_61 == 0,(char *)"Assertion",
+    __gmpz_tdiv_r((__mpz_struct *)(__e_acsl_58),
+                  (__mpz_struct const *)(__e_acsl_53),
+                  (__mpz_struct const *)(__e_acsl_55));
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_59),(long)1);
+    __gmpz_init((__mpz_struct *)(__e_acsl_60));
+    __gmpz_neg((__mpz_struct *)(__e_acsl_60),
+               (__mpz_struct const *)(__e_acsl_59));
+    __e_acsl_61 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_58),
+                             (__mpz_struct const *)(__e_acsl_60));
+    e_acsl_assert(__e_acsl_61 == 0,(char *)"Assertion",
                   (char *)"(-3%-2 == -1)",22);
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_52));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_53));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_54));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_55));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_56));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_58));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_59));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_60));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_52));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_53));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_54));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_55));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_56));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_58));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_59));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_60));
   }
   
   /*@ assert 3%-2 ≡ 1; */ ;
   {
-    mpz_t __e_acsl_var_62;
-    mpz_t __e_acsl_var_63;
-    mpz_t __e_acsl_var_64;
-    mpz_t __e_acsl_var_65;
-    int __e_acsl_var_66;
-    mpz_t __e_acsl_var_67;
-    mpz_t __e_acsl_var_68;
-    int __e_acsl_var_69;
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_62),(long)3);
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_63),(long)2);
-    __gmpz_init((__mpz_struct *)(__e_acsl_var_64));
-    __gmpz_neg((__mpz_struct *)(__e_acsl_var_64),
-               (__mpz_struct const *)(__e_acsl_var_63));
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_65),(long)0);
-    __e_acsl_var_66 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var_64),
-                                 (__mpz_struct const *)(__e_acsl_var_65));
-    __gmpz_init((__mpz_struct *)(__e_acsl_var_67));
+    mpz_t __e_acsl_62;
+    mpz_t __e_acsl_63;
+    mpz_t __e_acsl_64;
+    mpz_t __e_acsl_65;
+    int __e_acsl_66;
+    mpz_t __e_acsl_67;
+    mpz_t __e_acsl_68;
+    int __e_acsl_69;
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_62),(long)3);
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_63),(long)2);
+    __gmpz_init((__mpz_struct *)(__e_acsl_64));
+    __gmpz_neg((__mpz_struct *)(__e_acsl_64),
+               (__mpz_struct const *)(__e_acsl_63));
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_65),(long)0);
+    __e_acsl_66 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_64),
+                             (__mpz_struct const *)(__e_acsl_65));
+    __gmpz_init((__mpz_struct *)(__e_acsl_67));
     /*@ assert -2 ≢ 0; */ ;
-    e_acsl_assert(! (__e_acsl_var_66 == 0),(char *)"Assertion",
+    e_acsl_assert(! (__e_acsl_66 == 0),(char *)"Assertion",
                   (char *)"(-2 == 0)",23);
-    __gmpz_tdiv_r((__mpz_struct *)(__e_acsl_var_67),
-                  (__mpz_struct const *)(__e_acsl_var_62),
-                  (__mpz_struct const *)(__e_acsl_var_64));
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_68),(long)1);
-    __e_acsl_var_69 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var_67),
-                                 (__mpz_struct const *)(__e_acsl_var_68));
-    e_acsl_assert(__e_acsl_var_69 == 0,(char *)"Assertion",
-                  (char *)"(3%-2 == 1)",23);
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_62));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_63));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_64));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_65));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_67));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_68));
+    __gmpz_tdiv_r((__mpz_struct *)(__e_acsl_67),
+                  (__mpz_struct const *)(__e_acsl_62),
+                  (__mpz_struct const *)(__e_acsl_64));
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_68),(long)1);
+    __e_acsl_69 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_67),
+                             (__mpz_struct const *)(__e_acsl_68));
+    e_acsl_assert(__e_acsl_69 == 0,(char *)"Assertion",(char *)"(3%-2 == 1)",
+                  23);
+    __gmpz_clear((__mpz_struct *)(__e_acsl_62));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_63));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_64));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_65));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_67));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_68));
   }
   
   /*@ assert ((x*2+(3+y))-4)+(x-y) ≡ -10; */ ;
   {
-    mpz_t __e_acsl_var_70;
-    mpz_t __e_acsl_var_71;
-    mpz_t __e_acsl_var_72;
-    mpz_t __e_acsl_var_73;
-    mpz_t __e_acsl_var_74;
-    mpz_t __e_acsl_var_75;
-    mpz_t __e_acsl_var_76;
-    mpz_t __e_acsl_var_77;
-    mpz_t __e_acsl_var_78;
-    mpz_t __e_acsl_var_79;
-    mpz_t __e_acsl_var_80;
-    mpz_t __e_acsl_var_81;
-    mpz_t __e_acsl_var_82;
-    int __e_acsl_var_83;
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_70),(long)x);
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_71),(long)2);
-    __gmpz_init((__mpz_struct *)(__e_acsl_var_72));
-    __gmpz_mul((__mpz_struct *)(__e_acsl_var_72),
-               (__mpz_struct const *)(__e_acsl_var_70),
-               (__mpz_struct const *)(__e_acsl_var_71));
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_73),(long)3);
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_74),(long)y);
-    __gmpz_init((__mpz_struct *)(__e_acsl_var_75));
-    __gmpz_add((__mpz_struct *)(__e_acsl_var_75),
-               (__mpz_struct const *)(__e_acsl_var_73),
-               (__mpz_struct const *)(__e_acsl_var_74));
-    __gmpz_init((__mpz_struct *)(__e_acsl_var_76));
-    __gmpz_add((__mpz_struct *)(__e_acsl_var_76),
-               (__mpz_struct const *)(__e_acsl_var_72),
-               (__mpz_struct const *)(__e_acsl_var_75));
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_77),(long)4);
-    __gmpz_init((__mpz_struct *)(__e_acsl_var_78));
-    __gmpz_sub((__mpz_struct *)(__e_acsl_var_78),
-               (__mpz_struct const *)(__e_acsl_var_76),
-               (__mpz_struct const *)(__e_acsl_var_77));
-    __gmpz_init((__mpz_struct *)(__e_acsl_var_79));
-    __gmpz_sub((__mpz_struct *)(__e_acsl_var_79),
-               (__mpz_struct const *)(__e_acsl_var_70),
-               (__mpz_struct const *)(__e_acsl_var_74));
-    __gmpz_init((__mpz_struct *)(__e_acsl_var_80));
-    __gmpz_add((__mpz_struct *)(__e_acsl_var_80),
-               (__mpz_struct const *)(__e_acsl_var_78),
-               (__mpz_struct const *)(__e_acsl_var_79));
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_var_81),(long)10);
-    __gmpz_init((__mpz_struct *)(__e_acsl_var_82));
-    __gmpz_neg((__mpz_struct *)(__e_acsl_var_82),
-               (__mpz_struct const *)(__e_acsl_var_81));
-    __e_acsl_var_83 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_var_80),
-                                 (__mpz_struct const *)(__e_acsl_var_82));
-    e_acsl_assert(__e_acsl_var_83 == 0,(char *)"Assertion",
+    mpz_t __e_acsl_70;
+    mpz_t __e_acsl_71;
+    mpz_t __e_acsl_72;
+    mpz_t __e_acsl_73;
+    mpz_t __e_acsl_74;
+    mpz_t __e_acsl_75;
+    mpz_t __e_acsl_76;
+    mpz_t __e_acsl_77;
+    mpz_t __e_acsl_78;
+    mpz_t __e_acsl_79;
+    mpz_t __e_acsl_80;
+    mpz_t __e_acsl_81;
+    mpz_t __e_acsl_82;
+    int __e_acsl_83;
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_70),(long)x);
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_71),(long)2);
+    __gmpz_init((__mpz_struct *)(__e_acsl_72));
+    __gmpz_mul((__mpz_struct *)(__e_acsl_72),
+               (__mpz_struct const *)(__e_acsl_70),
+               (__mpz_struct const *)(__e_acsl_71));
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_73),(long)3);
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_74),(long)y);
+    __gmpz_init((__mpz_struct *)(__e_acsl_75));
+    __gmpz_add((__mpz_struct *)(__e_acsl_75),
+               (__mpz_struct const *)(__e_acsl_73),
+               (__mpz_struct const *)(__e_acsl_74));
+    __gmpz_init((__mpz_struct *)(__e_acsl_76));
+    __gmpz_add((__mpz_struct *)(__e_acsl_76),
+               (__mpz_struct const *)(__e_acsl_72),
+               (__mpz_struct const *)(__e_acsl_75));
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_77),(long)4);
+    __gmpz_init((__mpz_struct *)(__e_acsl_78));
+    __gmpz_sub((__mpz_struct *)(__e_acsl_78),
+               (__mpz_struct const *)(__e_acsl_76),
+               (__mpz_struct const *)(__e_acsl_77));
+    __gmpz_init((__mpz_struct *)(__e_acsl_79));
+    __gmpz_sub((__mpz_struct *)(__e_acsl_79),
+               (__mpz_struct const *)(__e_acsl_70),
+               (__mpz_struct const *)(__e_acsl_74));
+    __gmpz_init((__mpz_struct *)(__e_acsl_80));
+    __gmpz_add((__mpz_struct *)(__e_acsl_80),
+               (__mpz_struct const *)(__e_acsl_78),
+               (__mpz_struct const *)(__e_acsl_79));
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_81),(long)10);
+    __gmpz_init((__mpz_struct *)(__e_acsl_82));
+    __gmpz_neg((__mpz_struct *)(__e_acsl_82),
+               (__mpz_struct const *)(__e_acsl_81));
+    __e_acsl_83 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_80),
+                             (__mpz_struct const *)(__e_acsl_82));
+    e_acsl_assert(__e_acsl_83 == 0,(char *)"Assertion",
                   (char *)"(((x*2+(3+y))-4)+(x-y) == -10)",25);
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_70));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_71));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_72));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_73));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_74));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_75));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_76));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_77));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_78));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_79));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_80));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_81));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_var_82));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_70));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_71));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_72));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_73));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_74));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_75));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_76));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_77));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_78));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_79));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_80));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_81));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_82));
   }
   
   /*@ assert (0≡1) ≡ !(0≡0); */ ;
+  {
+    mpz_t __e_acsl_84;
+    mpz_t __e_acsl_85;
+    int __e_acsl_86;
+    mpz_t __e_acsl_87;
+    int __e_acsl_88;
+    mpz_t __e_acsl_89;
+    int __e_acsl_90;
+    mpz_t __e_acsl_91;
+    int __e_acsl_92;
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_84),(long)0);
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_85),(long)1);
+    __e_acsl_86 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_84),
+                             (__mpz_struct const *)(__e_acsl_85));
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_87),
+                       (long)(__e_acsl_86 == 0));
+    __e_acsl_88 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_84),
+                             (__mpz_struct const *)(__e_acsl_84));
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_89),
+                       (long)(__e_acsl_88 == 0));
+    __e_acsl_90 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_89),
+                             (__mpz_struct const *)(__e_acsl_84));
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_91),
+                       (long)(__e_acsl_90 == 0));
+    __e_acsl_92 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_87),
+                             (__mpz_struct const *)(__e_acsl_91));
+    e_acsl_assert(__e_acsl_92 == 0,(char *)"Assertion",
+                  (char *)"((0==1) == !(0==0))",27);
+    __gmpz_clear((__mpz_struct *)(__e_acsl_84));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_85));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_87));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_89));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_91));
+  }
+  
   /*@ assert (0≤-1) ≡ (0>0); */ ;
+  {
+    mpz_t __e_acsl_93;
+    mpz_t __e_acsl_94;
+    mpz_t __e_acsl_95;
+    int __e_acsl_96;
+    mpz_t __e_acsl_97;
+    int __e_acsl_98;
+    mpz_t __e_acsl_99;
+    int __e_acsl_100;
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_93),(long)0);
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_94),(long)1);
+    __gmpz_init((__mpz_struct *)(__e_acsl_95));
+    __gmpz_neg((__mpz_struct *)(__e_acsl_95),
+               (__mpz_struct const *)(__e_acsl_94));
+    __e_acsl_96 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_93),
+                             (__mpz_struct const *)(__e_acsl_95));
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_97),
+                       (long)(__e_acsl_96 <= 0));
+    __e_acsl_98 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_93),
+                             (__mpz_struct const *)(__e_acsl_93));
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_99),(long)(__e_acsl_98 > 0));
+    __e_acsl_100 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_97),
+                              (__mpz_struct const *)(__e_acsl_99));
+    e_acsl_assert(__e_acsl_100 == 0,(char *)"Assertion",
+                  (char *)"((0<=-1) == (0>0))",28);
+    __gmpz_clear((__mpz_struct *)(__e_acsl_93));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_94));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_95));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_97));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_99));
+  }
+  
   /*@ assert (0≥-1) ≡ (0≤0); */ ;
+  {
+    mpz_t __e_acsl_101;
+    mpz_t __e_acsl_102;
+    mpz_t __e_acsl_103;
+    int __e_acsl_104;
+    mpz_t __e_acsl_105;
+    int __e_acsl_106;
+    mpz_t __e_acsl_107;
+    int __e_acsl_108;
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_101),(long)0);
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_102),(long)1);
+    __gmpz_init((__mpz_struct *)(__e_acsl_103));
+    __gmpz_neg((__mpz_struct *)(__e_acsl_103),
+               (__mpz_struct const *)(__e_acsl_102));
+    __e_acsl_104 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_101),
+                              (__mpz_struct const *)(__e_acsl_103));
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_105),
+                       (long)(__e_acsl_104 >= 0));
+    __e_acsl_106 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_101),
+                              (__mpz_struct const *)(__e_acsl_101));
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_107),
+                       (long)(__e_acsl_106 <= 0));
+    __e_acsl_108 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_105),
+                              (__mpz_struct const *)(__e_acsl_107));
+    e_acsl_assert(__e_acsl_108 == 0,(char *)"Assertion",
+                  (char *)"((0>=-1) == (0<=0))",29);
+    __gmpz_clear((__mpz_struct *)(__e_acsl_101));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_102));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_103));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_105));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_107));
+  }
+  
   /*@ assert (0≢1) ≡ !(0≢0); */ ;
+  {
+    mpz_t __e_acsl_109;
+    mpz_t __e_acsl_110;
+    int __e_acsl_111;
+    mpz_t __e_acsl_112;
+    int __e_acsl_113;
+    mpz_t __e_acsl_114;
+    int __e_acsl_115;
+    mpz_t __e_acsl_116;
+    int __e_acsl_117;
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_109),(long)0);
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_110),(long)1);
+    __e_acsl_111 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_109),
+                              (__mpz_struct const *)(__e_acsl_110));
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_112),
+                       (long)(__e_acsl_111 != 0));
+    __e_acsl_113 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_109),
+                              (__mpz_struct const *)(__e_acsl_109));
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_114),
+                       (long)(__e_acsl_113 != 0));
+    __e_acsl_115 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_114),
+                              (__mpz_struct const *)(__e_acsl_109));
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_116),
+                       (long)(__e_acsl_115 == 0));
+    __e_acsl_117 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_112),
+                              (__mpz_struct const *)(__e_acsl_116));
+    e_acsl_assert(__e_acsl_117 == 0,(char *)"Assertion",
+                  (char *)"((0!=1) == !(0!=0))",30);
+    __gmpz_clear((__mpz_struct *)(__e_acsl_109));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_110));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_112));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_114));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_116));
+  }
+  
   /*@ assert (0≢0) ≡ !(1≢0); */ ;
+  {
+    mpz_t __e_acsl_118;
+    int __e_acsl_119;
+    mpz_t __e_acsl_120;
+    mpz_t __e_acsl_121;
+    int __e_acsl_122;
+    mpz_t __e_acsl_123;
+    int __e_acsl_124;
+    mpz_t __e_acsl_125;
+    int __e_acsl_126;
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_118),(long)0);
+    __e_acsl_119 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_118),
+                              (__mpz_struct const *)(__e_acsl_118));
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_120),
+                       (long)(__e_acsl_119 != 0));
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_121),(long)1);
+    __e_acsl_122 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_121),
+                              (__mpz_struct const *)(__e_acsl_118));
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_123),
+                       (long)(__e_acsl_122 != 0));
+    __e_acsl_124 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_123),
+                              (__mpz_struct const *)(__e_acsl_118));
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_125),
+                       (long)(__e_acsl_124 == 0));
+    __e_acsl_126 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_120),
+                              (__mpz_struct const *)(__e_acsl_125));
+    e_acsl_assert(__e_acsl_126 == 0,(char *)"Assertion",
+                  (char *)"((0!=0) == !(1!=0))",32);
+    __gmpz_clear((__mpz_struct *)(__e_acsl_118));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_120));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_121));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_123));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_125));
+  }
+  
   __retres = 0;
   return (__retres);
 }

@@ -32,57 +32,57 @@ int search(int elt)
 {
   int __retres;
   int k;
-  int __e_acsl_var_3;
-  int __e_acsl_var_6;
+  int __e_acsl_3;
+  int __e_acsl_6;
   {
-    int __e_acsl_var;
+    int __e_acsl;
     int __e_acsl_i;
-    __e_acsl_var = 1;
+    __e_acsl = 1;
     __e_acsl_i = 0;
     while (1) {
       if (! (__e_acsl_i < 9)) { break; }
       if (! (A[__e_acsl_i] <= A[__e_acsl_i + 1])) {
-        __e_acsl_var = 0;
+        __e_acsl = 0;
         goto e_acsl_end_loop1;
       }
       __e_acsl_i ++;
     }
     e_acsl_end_loop1: ;
-    e_acsl_assert(__e_acsl_var,(char *)"Precondition",
+    e_acsl_assert(__e_acsl,(char *)"Precondition",
                   (char *)"(\\forall int i; 0 <= i && i < 9 ==> A[i] <= A[i+1])",
                   9);
     {
-      int __e_acsl_var_5;
+      int __e_acsl_5;
       int __e_acsl_j_2;
-      __e_acsl_var_5 = 1;
+      __e_acsl_5 = 1;
       __e_acsl_j_2 = 0;
       while (1) {
         if (! (__e_acsl_j_2 < 10)) { break; }
         if (! (A[__e_acsl_j_2] != elt)) {
-          __e_acsl_var_5 = 0;
+          __e_acsl_5 = 0;
           goto e_acsl_end_loop3;
         }
         __e_acsl_j_2 ++;
       }
       e_acsl_end_loop3: ;
-      __e_acsl_var_6 = __e_acsl_var_5;
+      __e_acsl_6 = __e_acsl_5;
     }
     
     {
-      int __e_acsl_var_2;
+      int __e_acsl_2;
       int __e_acsl_j;
-      __e_acsl_var_2 = 0;
+      __e_acsl_2 = 0;
       __e_acsl_j = 0;
       while (1) {
         if (! (__e_acsl_j < 10)) { break; }
         if (! (! (A[__e_acsl_j] == elt))) {
-          __e_acsl_var_2 = 1;
+          __e_acsl_2 = 1;
           goto e_acsl_end_loop2;
         }
         __e_acsl_j ++;
       }
       e_acsl_end_loop2: ;
-      __e_acsl_var_3 = __e_acsl_var_2;
+      __e_acsl_3 = __e_acsl_2;
     }
     
     k = 0;
@@ -101,17 +101,16 @@ int search(int elt)
   }
   __retres = 0;
   return_label: 
-  {
-    int __e_acsl_var_4;
-    int __e_acsl_var_7;
-    if (! __e_acsl_var_3) { __e_acsl_var_4 = 1; }
-    else { __e_acsl_var_4 = __retres == 1; }
-    e_acsl_assert(__e_acsl_var_4,(char *)"Postcondition",
+  { int __e_acsl_4;
+    int __e_acsl_7;
+    if (! __e_acsl_3) { __e_acsl_4 = 1; }
+    else { __e_acsl_4 = __retres == 1; }
+    e_acsl_assert(__e_acsl_4,(char *)"Postcondition",
                   (char *)"(\\old(\\exists int j; (0 <= j && j < 10) && A[j] == elt) ==> \\result == 1)",
                   12);
-    if (! __e_acsl_var_6) { __e_acsl_var_7 = 1; }
-    else { __e_acsl_var_7 = __retres == 0; }
-    e_acsl_assert(__e_acsl_var_7,(char *)"Postcondition",
+    if (! __e_acsl_6) { __e_acsl_7 = 1; }
+    else { __e_acsl_7 = __retres == 0; }
+    e_acsl_assert(__e_acsl_7,(char *)"Postcondition",
                   (char *)"(\\old(\\forall int j; 0 <= j && j < 10 ==> A[j] != elt) ==> \\result == 0)",
                   15);
     return (__retres);

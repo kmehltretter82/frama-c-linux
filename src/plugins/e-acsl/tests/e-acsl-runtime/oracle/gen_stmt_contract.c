@@ -77,26 +77,26 @@ int main(void)
         
   */
   {
-    int __e_acsl_var;
-    int __e_acsl_var_2;
-    int __e_acsl_var_3;
-    int __e_acsl_var_4;
-    int __e_acsl_var_5;
-    if (! (x == 1)) { __e_acsl_var = 1; }
-    else { __e_acsl_var = x == 0; }
-    e_acsl_assert(__e_acsl_var,(char *)"Precondition",
+    int __e_acsl;
+    int __e_acsl_2;
+    int __e_acsl_3;
+    int __e_acsl_4;
+    int __e_acsl_5;
+    if (! (x == 1)) { __e_acsl = 1; }
+    else { __e_acsl = x == 0; }
+    e_acsl_assert(__e_acsl,(char *)"Precondition",
                   (char *)"(x == 1 ==> x == 0)",34);
-    if (x == 3) { __e_acsl_var_2 = y == 2; }
-    else { __e_acsl_var_2 = 0; }
-    if (! __e_acsl_var_2) { __e_acsl_var_3 = 1; }
-    else { __e_acsl_var_3 = x == 3; }
-    e_acsl_assert(__e_acsl_var_3,(char *)"Precondition",
+    if (x == 3) { __e_acsl_2 = y == 2; }
+    else { __e_acsl_2 = 0; }
+    if (! __e_acsl_2) { __e_acsl_3 = 1; }
+    else { __e_acsl_3 = x == 3; }
+    e_acsl_assert(__e_acsl_3,(char *)"Precondition",
                   (char *)"(x == 3 && y == 2 ==> x == 3)",38);
-    if (x == 3) { __e_acsl_var_4 = y == 2; }
-    else { __e_acsl_var_4 = 0; }
-    if (! __e_acsl_var_4) { __e_acsl_var_5 = 1; }
-    else { __e_acsl_var_5 = (long long)x + (long long)y == (long long)5; }
-    e_acsl_assert(__e_acsl_var_5,(char *)"Precondition",
+    if (x == 3) { __e_acsl_4 = y == 2; }
+    else { __e_acsl_4 = 0; }
+    if (! __e_acsl_4) { __e_acsl_5 = 1; }
+    else { __e_acsl_5 = (long long)x + (long long)y == (long long)5; }
+    e_acsl_assert(__e_acsl_5,(char *)"Precondition",
                   (char *)"(x == 3 && y == 2 ==> x+y == 5)",39);
     x += y;
   }
