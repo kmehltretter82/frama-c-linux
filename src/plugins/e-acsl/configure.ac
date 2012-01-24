@@ -57,18 +57,21 @@ AC_MSG_RESULT($FRAMAC_VERSION)
 DEV_VERSION_NUMBER=`echo $FRAMAC_VERSION | sed -e 's/.*-\(.*\)/\1/' `
 VERSION_NUMBER=`echo $DEV_VERSION_NUMBER | sed -e 's/\(.*\)+dev/\1/' `
 
-if test $VERSION_NUMBER -lt 20111001; then
-  AC_MSG_ERROR(Frama-C version must be Nitrogen-20111001.)
-else if test $VERSION_NUMBER -gt 20111001; then
-  AC_MSG_WARN(Frama-C version higher than Nitrogen-20111001 not tested: use it at your own risk.)
-fi
-fi
+# does not check the version number in order to keep the build farm happy
+# (see bts #1070)
 
-# at the time being, using the Frama-C development version is ok
-# DEV=`echo $DEV_VERSION_NUMBER | sed -e 's/.*\(+dev\)/\1/' `
-# if test "$DEV" != "+dev"; then
-#   AC_MSG_ERROR(Frama-C version must be the current SVN version.)
+# if test $VERSION_NUMBER -lt 20111001; then
+#   AC_MSG_ERROR(Frama-C version must be Nitrogen-20111001.)
+# else if test $VERSION_NUMBER -gt 20111001; then
+#   AC_MSG_WARN(Frama-C version higher than Nitrogen-20111001 not tested: use it at your own risk.)
 # fi
+# fi
+
+# at the time being, must use the Frama-C development version
+DEV=`echo $DEV_VERSION_NUMBER | sed -e 's/.*\(+dev\)/\1/' `
+if test "$DEV" != "+dev"; then
+  AC_MSG_ERROR(Frama-C version must be the current SVN version.)
+fi
 
 # OCaml version
 ###############
