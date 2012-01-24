@@ -27,7 +27,8 @@ open Cil
 let global_state = ref State.dummy
 
 type mpz_tbl = {   
-  new_exps: exp Term.Map.t; (* generated mpz variables as exp from terms *)
+  new_exps: (varinfo * exp) Term.Map.t; (* generated mpz variables as exp from
+					   terms *)
   clear_stmts: stmt list; (* stmts freeing the memory before exiting the 
 			     block *) 
 }
@@ -131,6 +132,7 @@ let do_new_var ?(global=false) ?(name="var") env t ty mk_stmts =
       new_stmts = new_stmts;
       pre_stmts = local_block.pre_stmts } 
   in
+  v,
   e, 
   if is_t then 
     let extend_tbl tbl = 
@@ -140,7 +142,7 @@ let do_new_var ?(global=false) ?(name="var") env t ty mk_stmts =
       { clear_stmts = Mpz.clear e :: tbl.clear_stmts;
 	new_exps = match t with
 	| None -> tbl.new_exps
-	| Some t -> Term.Map.add t e tbl.new_exps }
+	| Some t -> Term.Map.add t (v, e) tbl.new_exps }
     in
     if global then
       let local_env = { local_env with block_info = new_block } in
@@ -179,7 +181,9 @@ let new_var ?(global=false) ?name env t ty mk_stmts =
     try
       match t with
       | None -> raise No_term
-      | Some t -> Term.Map.find t local_env.mpz_tbl.new_exps, env
+      | Some t -> 
+	let v, e = Term.Map.find t local_env.mpz_tbl.new_exps in
+	v, e, env
     with Not_found | No_term -> 
       do_new_var ~global ?name env t ty mk_stmts  
 
@@ -189,8 +193,6 @@ let new_var_and_mpz_init ?global ?name env t mk_stmts =
 module Logic_binding = struct
 
   let add env logic_v =
-    let v_ref = ref Varinfo.dummy in
-    let mk v _ = v_ref := v; [] in
     let ty = match logic_v.lv_type with
       | Ctype ty -> ty
       | Linteger -> Mpz.t
@@ -201,10 +203,10 @@ module Logic_binding = struct
 	in
 	Error.not_yet msg
     in
-    let e, env = new_var env ~name:logic_v.lv_name None ty mk in
-    !v_ref,
+    let v, e, env = new_var env ~name:logic_v.lv_name None ty (fun _ _ -> []) in
+    v,
     e, 
-    { env with var_mapping = Logic_var.Map.add logic_v !v_ref env.var_mapping }
+    { env with var_mapping = Logic_var.Map.add logic_v v env.var_mapping }
 
   let get env logic_v = 
     try Logic_var.Map.find logic_v env.var_mapping

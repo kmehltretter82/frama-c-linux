@@ -101,12 +101,10 @@ let convert env loc is_forall p bounded_vars hyps goal =
   (* universal quantification over integers (or a subtype of integer) *)
   let guards = compute_quantif_guards p bounded_vars hyps in
 (*  let env = List.fold_left Env.Logic_binding.add env bounded_vars in*)
-  let var_res = ref Varinfo.dummy in
-  let res, env =
+  let var_res, res, env =
     (* variable storing the result of the \forall *)
     Env.new_var env None intType
       (fun v _ ->
-	var_res := v;
 	let lv = var v in
 	[ mkStmtOneInstr ~valid_sid:true (Set(lv, init_val, loc)) ])
   in
@@ -122,7 +120,7 @@ let convert env loc is_forall p bounded_vars hyps goal =
 	   multiple binders (leading to imbricated loops) *)
 	mkBlock
 	  [ mkStmtOneInstr
-	       ~valid_sid:true (Set(var !var_res, found_val, loc));
+	       ~valid_sid:true (Set(var var_res, found_val, loc));
 	    mkStmt ~valid_sid:true (Goto(end_loop_ref, loc)) ]
       in
       let blk, env = 

@@ -405,7 +405,10 @@ let type_named_predicate p =
 let context_sensitive ?loc env ctx is_mpz_string t_opt e = 
   let ty = typeOf e in
   let mk_mpz e = 
-    Env.new_var env t_opt Mpz.t (fun lv v -> [ Mpz.init_set (var lv) v e ])
+    let _, e, env = 
+      Env.new_var env t_opt Mpz.t (fun lv v -> [ Mpz.init_set (var lv) v e ])
+    in
+    e, env
   in
   let do_int_ctx ty =
     let e, env = if is_mpz_string then mk_mpz e else e, env in
@@ -422,11 +425,14 @@ let context_sensitive ?loc env ctx is_mpz_string t_opt e =
 	~once:true
 	"@[missing guard for ensuring that the given integer is \
 C-representable@]"; 
-     Env.new_var 
-       env
-       None
-       new_ty
-       (fun v _ -> [ Misc.mk_call ?loc ~result:(var v) name [ e ] ])
+      let _, e, env = 
+	Env.new_var 
+	  env
+	  None
+	  new_ty
+	  (fun v _ -> [ Misc.mk_call ?loc ~result:(var v) name [ e ] ])
+      in
+      e, env
     else
       (if isIntegralType ctx && isIntegralType ty then 
 	  mkCast e (arithmeticConversion ctx ty)

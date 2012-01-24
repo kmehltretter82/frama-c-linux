@@ -54,22 +54,25 @@ let constant_to_exp ?(loc=Location.unknown) = function
 
 let conditional_to_exp loc ctx e1 (e2, env2) (e3, env3) =
   let env = Env.pop (Env.pop env3) in
-  Env.new_var
-    env
-    None
-    ctx
-    (fun v _ -> 
-      let lv = var v in
-      let affect e = mkStmt ~valid_sid:true (Instr (Set(lv, e, loc))) in
-      let then_block, _ = 
-	let s = affect e2 in
-	Env.pop_and_get env2 s ~global_clear:false Env.Middle
-      in
-      let else_block, _ = 
-	let s = affect e3 in
-	Env.pop_and_get env3 s ~global_clear:false Env.Middle
-      in
-      [ mkStmt ~valid_sid:true (If(e1, then_block, else_block, loc)) ])
+  let _, e, env =
+    Env.new_var
+      env
+      None
+      ctx
+      (fun v _ -> 
+	let lv = var v in
+	let affect e = mkStmt ~valid_sid:true (Instr (Set(lv, e, loc))) in
+	let then_block, _ = 
+	  let s = affect e2 in
+	  Env.pop_and_get env2 s ~global_clear:false Env.Middle
+	in
+	let else_block, _ = 
+	  let s = affect e3 in
+	  Env.pop_and_get env3 s ~global_clear:false Env.Middle
+	in
+	[ mkStmt ~valid_sid:true (If(e1, then_block, else_block, loc)) ])
+  in
+  e, env
 
 let rec thost_to_host env = function
   | TVar { lv_origin = Some v } -> Var v, env
@@ -141,7 +144,7 @@ and context_insensitive_term_to_exp env t =
 	| BNot -> "__gmpz_com"
 	| LNot -> assert false
       in
-      let e, env = 
+      let _, e, env = 
 	Env.new_var_and_mpz_init
 	  env
 	  (Some t)
@@ -168,7 +171,7 @@ and context_insensitive_term_to_exp env t =
     if Mpz.is_t ty then
       let name = name_of_mpz_arith_bop bop in
       let mk_stmts _ e = [ Misc.mk_call ~loc name [ e; e1; e2 ] ] in
-      let e, env = Env.new_var_and_mpz_init env (Some t) mk_stmts in
+      let _, e, env = Env.new_var_and_mpz_init env (Some t) mk_stmts in
       e, env, false
     else
       new_exp ~loc (BinOp(bop, e1, e2, ty)), env, false
@@ -203,7 +206,7 @@ and context_insensitive_term_to_exp env t =
       [ cond; instr ]
     in
     let t = Some t in
-    let e, env = 
+    let _, e, env = 
       if Mpz.is_t ty then Env.new_var_and_mpz_init env t mk_stmts
       else begin
 	assert (isIntegralType ty);
@@ -318,7 +321,7 @@ and comparison_to_exp ?(loc=Location.unknown) ?e1 env bop t1 t2 t_opt =
   in
   let e2, env = term_to_exp env (Some ctx) t2 in
   if Mpz.is_t ctx then
-    let e, env =
+    let _, e, env =
       Env.new_var
 	env
 	t_opt
@@ -331,21 +334,12 @@ and comparison_to_exp ?(loc=Location.unknown) ?e1 env bop t1 t2 t_opt =
 
 and at_to_exp env t_opt label e =
   let stmt = Env.stmt_of_label env label in
-  let new_v = ref None in
   (* generate a new variable denoting [\at(t',label)].
      That is this variable which is the resulting expression. 
      ACSL typing rule ensures that the type of this variable is the same as
      the one of [e]. *)
-  let res, new_env =
-    Env.new_var ~global:true env
-      t_opt
-      (typeOf e)
-      (fun lv' e' -> 
-	(* store the corresponding left value and expression corresponding to
-	   the new variable. Will be used in the visitor in order to
-	   initialize it. *)
-	new_v := Some (lv', e'); 
-	[])
+  let res_v, res, new_env =
+    Env.new_var ~global:true env t_opt (typeOf e) (fun _ _ -> [])
   in
   let env_ref = ref new_env in
   (* visitor modifying in place the labeled statement in order to store [e]
@@ -354,10 +348,9 @@ and at_to_exp env t_opt label e =
   let o = object 
     inherit Visitor.frama_c_inplace
     method vstmt_aux stmt = 
-      let new_lv, new_e = Extlib.the !new_v in
       (* either a standard C affectation or an mpz one according to type of
 	 [e] *) 
-      let new_stmt = Mpz.init_set (var new_lv) new_e e in
+      let new_stmt = Mpz.init_set (var res_v) res e in
       assert (!env_ref == new_env);
       (* generate the new block of code for the labeled statement and the
 	 corresponding environment *)

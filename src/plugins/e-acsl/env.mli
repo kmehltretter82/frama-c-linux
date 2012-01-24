@@ -38,18 +38,18 @@ val empty: Visitor.frama_c_visitor -> t
 val new_var:
   ?global:bool -> ?name:string -> t -> term option -> typ -> 
   (varinfo -> exp (* the var as exp *) -> stmt list)
-  -> exp * t
+  -> varinfo * exp * t
 (** [new_var env t ty mk_stmts] extends [env] with a fresh variable of type
     [ty] corresponding to [t]. [global] indicates whether the new variable is
     global to the current function or local to the local block (default is
     [false], i.e. local).
-    @return this variable as a C expression already initialized by applying it
-    to [mk_stmts]. *)
+    @return this variable as both a C variable and a C expression already
+    initialized by applying it to [mk_stmts]. *)
 
 val new_var_and_mpz_init:
   ?global:bool -> ?name:string -> t -> term option -> 
   (varinfo -> exp (* the var as exp *) -> stmt list) 
-  -> exp * t
+  -> varinfo * exp * t
 (** Same as [new_var], but dedicated to mpz_t variables initialized by 
     {!Mpz.init}. *)
 

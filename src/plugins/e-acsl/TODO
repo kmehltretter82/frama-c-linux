@@ -13,7 +13,6 @@
 ########
 
 - grep TODO *.ml*
-- Env.new_var*: ajouter la varinfo en sortie de la fonction ?
 - gestion des initialiseurs des globals: requiert un main
 - mkcall ne devrait pas générer de nouvelles variables pour une même fonction
 
