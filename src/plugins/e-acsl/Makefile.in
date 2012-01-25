@@ -150,7 +150,7 @@ DISTRIB_FILES= $(filter-out $(wildcard *local_config.ml), $(wildcard *.ml)) \
 	license/CEA_LGPL license/headache_config.txt license/LGPLv2.1 \
 	INSTALL README VERSION .depend
 
-src-distrib: .depend
+e-acsl-distrib: .depend
 	$(PRINT_TAR) tmp-distrib
 	$(TAR) cf tmp.tar $(DISTRIB_FILES)
 	$(PRINT_MAKING) export directories
@@ -174,7 +174,7 @@ src-distrib: .depend
 	$(RM) -fr $(EXPORT)
 
 WWW	= /localhome/julien/frama-c/doc/www
-install-distrib: src-distrib
+install-distrib: e-acsl-distrib
 	$(PRINT) Copying to website
 	$(CP) $(EXPORT).tar.gz $(WWW)/distrib/download/e-acsl
 
