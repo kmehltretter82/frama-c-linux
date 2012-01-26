@@ -31,7 +31,6 @@
 #########
 
 - améliorer test "integer_constant.i" quand bug fixed #745
-- test sizeof.i devraient être plus précis quand logic_typing plus précis
 - inclure exemple du E-ACSL Reference Manual
 - test arith.i: mettre les exemples du ACSL manual about div and modulo
 - test lazy.i: en attente d'un fix dans l'analyse de valeurs

@@ -122,6 +122,7 @@ install::
 	$(PRINT_CP) E-ACSL share files
 	$(MKDIR) $(FRAMAC_SHARE)/e-acsl
 	$(CP) $(E_ACSL_DIR)/share/e-acsl/* $(FRAMAC_SHARE)/e-acsl
+	$(MKDIR) $(FRAMAC_SHARE)/manuals
 	$(CP) $(E_ACSL_DIR)/doc/manuals/e-acsl.pdf \
 		$(E_ACSL_DIR)/doc/manuals/e-acsl-implementation.pdf \
 		$(FRAMAC_SHARE)/manuals
