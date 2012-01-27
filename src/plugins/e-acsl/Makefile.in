@@ -33,13 +33,15 @@ ifndef FRAMAC_LIBDIR
 FRAMAC_LIBDIR :=$(shell frama-c -journal-disable -print-libpath)
 endif
 
-# OCAMLVERSION and HAS_OCAML312 are defined in Frama-C common Makefile
-# but cannot be used at this point
-OCAMLVERSION 	?=@OCAMLVERSION@
-ifeq ($(findstring 3.12,$(OCAMLVERSION)),)
-HAS_OCAML312 = no
+# OCAMLVERSION and HAS_OCAML312 are defined in Frama-C common Makefile but
+# cannot be used at this point. Unfortunatly cannot reuse the same variable name
+# here without introducing unexpected interaction with Frama-C compilation when
+# compiling it with --enable-external=e-acsl.
+EACSL_OCAMLVERSION 	?=@OCAMLVERSION@
+ifeq ($(findstring 3.12,$(EACSL_OCAMLVERSION)),)
+EACSL_HAS_OCAML312 = no
 else
-HAS_OCAML312 = yes
+EACSL_HAS_OCAML312 = yes
 endif
 
 #########################
@@ -62,12 +64,20 @@ PLUGIN_CMO:= local_config \
 	visit \
 	main
 PLUGIN_HAS_MLI:=yes
+PLUGIN_DISTRIBUTED:=no
+
+PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure
+PLUGIN_DISTRIB_BIN:=no
+
+###############
+# Local Flags #
+###############
 
 # Enable -warn-error in development mode, but not in distribution mode
 # Do not edit the line below: it is automatically set by 'make src-distrib'
 IS_DISTRIBUTED:=no
 ifneq ($(IS_DISTRIBUTED),yes)
-ifeq ($(HAS_OCAML312),yes)
+ifeq ($(EACSL_HAS_OCAML312),yes)
 DEV_FLAGS=-warn-error +a
 else
 DEV_FLAGS=-warn-error A
@@ -75,11 +85,6 @@ endif
 endif
 PLUGIN_BFLAGS:=$(DEV_FLAGS)
 PLUGIN_OFLAGS:=$(DEV_FLAGS)
-
-PLUGIN_DISTRIBUTED:=no
-
-PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure
-PLUGIN_DISTRIB_BIN:=no
 
 #######################
 # Local configuration #
