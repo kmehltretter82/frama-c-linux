@@ -26,9 +26,8 @@ int main(void) {
   /*@ assert (x ? x : y) == (x == 0); */
   /*@ assert (x && y) || y; */      // converted into predicate by the kernel
   /*@ assert (x || y) && y == 1; */ // converted into predicate by the kernel
-  // Waiting for bug fixes in value analysis
-  //  /*@ assert (x || y) == y; */
-  //  /*@ assert (x && y) == x; */
+  /*@ assert (x || y) == y; */
+  /*@ assert (x && y) == x; */
 
   return 0;
 }

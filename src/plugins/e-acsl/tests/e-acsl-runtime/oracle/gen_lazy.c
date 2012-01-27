@@ -181,6 +181,22 @@ int main(void)
                   (char *)"((x != 0 || y != 0) && y == 1)",28);
   }
   
+  /*@ assert (x≢0∨y≢0) ≡ (y≢0); */ ;
+  { int __e_acsl_or_5;
+    if (x != 0) { __e_acsl_or_5 = 1; }
+    else { __e_acsl_or_5 = y != 0; }
+    e_acsl_assert(__e_acsl_or_5 == (y != 0),(char *)"Assertion",
+                  (char *)"((x!=0||y!=0) == (y!=0))",29);
+  }
+  
+  /*@ assert (x≢0∧y≢0) ≡ (x≢0); */ ;
+  { int __e_acsl_and_5;
+    if (x != 0) { __e_acsl_and_5 = y != 0; }
+    else { __e_acsl_and_5 = 0; }
+    e_acsl_assert(__e_acsl_and_5 == (x != 0),(char *)"Assertion",
+                  (char *)"((x!=0&&y!=0) == (x!=0))",30);
+  }
+  
   __retres = 0;
   return (__retres);
 }
