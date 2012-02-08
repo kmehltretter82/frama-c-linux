@@ -384,8 +384,6 @@ let rec type_predicate_named p = match p.content with
   | Pexists _ -> Error.not_yet "unguarded \\exists quantification"
   | Pat(p, _) -> type_predicate_named p
   | Pvalid _ ->  Error.not_yet "\\valid"
-  | Pvalid_index _ -> Error.not_yet "\\valid_index"
-  | Pvalid_range _ -> Error.not_yet "\\valid_range"
   | Pfresh _ -> Error.not_yet "\\fresh"
   | Psubtype _ -> Error.not_yet "subtyping relation" (* Jessie specific *)
   | Pinitialized _ -> Error.not_yet "\\initialized"

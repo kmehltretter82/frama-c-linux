@@ -477,8 +477,6 @@ let rec named_predicate_to_exp ?name env p =
     assert (not is_string);
     e, env
   | Pvalid _ -> Error.not_yet "\\valid"
-  | Pvalid_index _ -> Error.not_yet "\\valid_index"
-  | Pvalid_range _ -> Error.not_yet "\\valid_range"
   | Pfresh _ -> Error.not_yet "\\fresh"
   | Psubtype _ -> Error.not_yet "subtyping relation" (* Jessie specific *)
   | Pinitialized _ -> Error.not_yet "\\initialized"
@@ -587,6 +585,7 @@ let convert_pre_code_annotation env annot =
     | AInvariant(_, b, _) -> assert b; Error.not_yet "loop invariant"
     | AVariant _ -> Error.not_yet "variant"
     | AAssigns _ -> Error.not_yet "assigns"
+    | AAllocation _ -> Error.not_yet "allocation"
     | APragma _ -> Error.not_yet "pragma"
   in
   Error.handle convert env
@@ -598,6 +597,7 @@ let convert_post_code_annotation env annot =
     | AInvariant _ 
     | AVariant _
     | AAssigns _
+    | AAllocation _
     | APragma _ -> env
   in
   Error.handle convert env
