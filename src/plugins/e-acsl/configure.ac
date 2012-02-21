@@ -50,15 +50,8 @@ check_plugin(e_acsl,PLUGIN_RELATIVE_PATH(plugin_file),
 
 AC_MSG_CHECKING(for Frama-C version)
 
-#FRAMAC_VERSION=`$FRAMA_C -version | sed -e 's/Version: \(.*\)/\1/' -e '2,$d' `
-FRAMAC_VERSION=`frama-c -version | sed -e 's/Version: \(.*\)/\1/' -e '2,$d' `
-AC_MSG_RESULT($FRAMAC_VERSION)
-
 DEV_VERSION_NUMBER=`echo $FRAMAC_VERSION | sed -e 's/.*-\(.*\)/\1/' `
 VERSION_NUMBER=`echo $DEV_VERSION_NUMBER | sed -e 's/\(.*\)+dev/\1/' `
-
-# does not check the version number in order to keep the build farm happy
-# (see bts #1070)
 
 # if test $VERSION_NUMBER -lt 20111001; then
 #   AC_MSG_ERROR(Frama-C version must be Nitrogen-20111001.)
@@ -70,7 +63,9 @@ VERSION_NUMBER=`echo $DEV_VERSION_NUMBER | sed -e 's/\(.*\)+dev/\1/' `
 # at the time being, must use the Frama-C development version
 DEV=`echo $DEV_VERSION_NUMBER | sed -e 's/.*\(+dev\)/\1/' `
 if test "$DEV" != "+dev"; then
-  AC_MSG_ERROR(Frama-C version must be the current SVN version.)
+  AC_MSG_ERROR(Frama-C version must be the current SVN version.);
+else
+  AC_MSG_RESULT($FRAMAC_VERSION)
 fi
 
 # OCaml version
