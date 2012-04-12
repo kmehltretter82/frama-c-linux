@@ -5,14 +5,17 @@
 PROJECT_FILE.i:237:[value] Assertion got status valid.
 [value] computing for function __gmpz_init_set_si <- main.
         Called from PROJECT_FILE.i:243.
+[value] using specification for function __gmpz_init_set_si
 PROJECT_FILE.i:82:[value] Function __gmpz_init_set_si: postcondition got status valid.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init <- main.
         Called from PROJECT_FILE.i:244.
+[value] using specification for function __gmpz_init
 PROJECT_FILE.i:69:[value] Function __gmpz_init: postcondition got status valid.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_neg <- main.
         Called from PROJECT_FILE.i:245.
+[value] using specification for function __gmpz_neg
 PROJECT_FILE.i:128:[value] Function __gmpz_neg: precondition got status valid.
 PROJECT_FILE.i:129:[value] Function __gmpz_neg: precondition got status valid.
 [value] Done for function __gmpz_neg
@@ -21,6 +24,7 @@ PROJECT_FILE.i:129:[value] Function __gmpz_neg: precondition got status valid.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_cmp <- main.
         Called from PROJECT_FILE.i:247.
+[value] using specification for function __gmpz_cmp
 PROJECT_FILE.i:119:[value] Function __gmpz_cmp: precondition got status valid.
 PROJECT_FILE.i:120:[value] Function __gmpz_cmp: precondition got status valid.
 [value] Done for function __gmpz_cmp
@@ -31,6 +35,7 @@ PROJECT_FILE.i:221:[value] Function e_acsl_assert: precondition got status unkno
 [value] Done for function e_acsl_assert
 [value] computing for function __gmpz_clear <- main.
         Called from PROJECT_FILE.i:249.
+[value] using specification for function __gmpz_clear
 PROJECT_FILE.i:111:[value] Function __gmpz_clear: precondition got status valid.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- main.
@@ -77,6 +82,7 @@ PROJECT_FILE.i:273:[value] Assertion got status valid.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_com <- main.
         Called from PROJECT_FILE.i:280.
+[value] using specification for function __gmpz_com
 PROJECT_FILE.i:167:[value] Function __gmpz_com: precondition got status valid.
 PROJECT_FILE.i:168:[value] Function __gmpz_com: precondition got status valid.
 [value] Done for function __gmpz_com
@@ -105,6 +111,7 @@ PROJECT_FILE.i:288:[value] Assertion got status valid.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_add <- main.
         Called from PROJECT_FILE.i:299.
+[value] using specification for function __gmpz_add
 PROJECT_FILE.i:133:[value] Function __gmpz_add: precondition got status valid.
 PROJECT_FILE.i:134:[value] Function __gmpz_add: precondition got status valid.
 PROJECT_FILE.i:135:[value] Function __gmpz_add: precondition got status valid.
@@ -152,6 +159,7 @@ PROJECT_FILE.i:313:[value] Assertion got status valid.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_sub <- main.
         Called from PROJECT_FILE.i:324.
+[value] using specification for function __gmpz_sub
 PROJECT_FILE.i:139:[value] Function __gmpz_sub: precondition got status valid.
 PROJECT_FILE.i:140:[value] Function __gmpz_sub: precondition got status valid.
 PROJECT_FILE.i:141:[value] Function __gmpz_sub: precondition got status valid.
@@ -199,6 +207,7 @@ PROJECT_FILE.i:338:[value] Assertion got status valid.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_mul <- main.
         Called from PROJECT_FILE.i:349.
+[value] using specification for function __gmpz_mul
 PROJECT_FILE.i:145:[value] Function __gmpz_mul: precondition got status valid.
 PROJECT_FILE.i:146:[value] Function __gmpz_mul: precondition got status valid.
 PROJECT_FILE.i:147:[value] Function __gmpz_mul: precondition got status valid.
@@ -257,6 +266,7 @@ PROJECT_FILE.i:378:[value] Assertion got status valid.
 [value] Done for function e_acsl_assert
 [value] computing for function __gmpz_tdiv_q <- main.
         Called from PROJECT_FILE.i:380.
+[value] using specification for function __gmpz_tdiv_q
 PROJECT_FILE.i:151:[value] Function __gmpz_tdiv_q: precondition got status valid.
 PROJECT_FILE.i:152:[value] Function __gmpz_tdiv_q: precondition got status valid.
 PROJECT_FILE.i:153:[value] Function __gmpz_tdiv_q: precondition got status valid.
@@ -298,6 +308,7 @@ PROJECT_FILE.i:153:[value] Function __gmpz_tdiv_q: precondition got status valid
 PROJECT_FILE.i:395:[value] Assertion got status valid.
 [value] computing for function __gmpz_init_set_str <- main.
         Called from PROJECT_FILE.i:403.
+[value] using specification for function __gmpz_init_set_str
 PROJECT_FILE.i:86:[value] Function __gmpz_init_set_str: postcondition got status valid.
 [value] Done for function __gmpz_init_set_str
 [value] computing for function __gmpz_init_set_si <- main.
@@ -362,6 +373,7 @@ PROJECT_FILE.i:437:[value] Assertion got status valid.
 [value] Done for function e_acsl_assert
 [value] computing for function __gmpz_tdiv_r <- main.
         Called from PROJECT_FILE.i:439.
+[value] using specification for function __gmpz_tdiv_r
 PROJECT_FILE.i:157:[value] Function __gmpz_tdiv_r: precondition got status valid.
 PROJECT_FILE.i:158:[value] Function __gmpz_tdiv_r: precondition got status valid.
 PROJECT_FILE.i:159:[value] Function __gmpz_tdiv_r: precondition got status valid.
@@ -893,33 +905,67 @@ struct __anonstruct___mpz_struct_1 {
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct mpz_t[1];
 /*@ ensures \valid(\old(x));
+    allocates \nothing;
     assigns *x;  */
 extern void __gmpz_init(__mpz_struct * /*[1]*/ x);
+/*@ requires \valid(z_orig);
+    ensures \valid(\old(z));
+    assigns *z;  */
+extern void __gmpz_init_set(__mpz_struct * /*[1]*/ z,
+                            __mpz_struct const * /*[1]*/ z_orig);
 /*@ ensures \valid(\old(z));
     assigns *z;
     assigns *z \from n;  */
+extern void __gmpz_init_set_ui(__mpz_struct * /*[1]*/ z, unsigned long n);
+/*@ ensures \valid(\old(z));
+    allocates \nothing;
+    assigns *z;
+    assigns *z \from n; 
+*/
 extern void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z, long n);
 /*@ ensures \valid(\old(z));
+    allocates \nothing;
     assigns *z;  */
 extern int __gmpz_init_set_str(__mpz_struct * /*[1]*/ z, char const *str,
                                int base);
+/*@ requires \valid(z_orig);
+    requires \valid(z);
+    assigns *z;  */
+extern void __gmpz_set(__mpz_struct * /*[1]*/ z,
+                       __mpz_struct const * /*[1]*/ z_orig);
+/*@ requires \valid(z);
+    assigns *z;
+    assigns *z \from n;  */
+extern void __gmpz_set_ui(__mpz_struct * /*[1]*/ z, unsigned long n);
+/*@ requires \valid(z);
+    assigns *z;
+    assigns *z \from n;  */
+extern void __gmpz_set_si(__mpz_struct * /*[1]*/ z, long n);
 /*@ requires \valid(x);
+    allocates \nothing;
     assigns *x;  */
 extern void __gmpz_clear(__mpz_struct * /*[1]*/ x);
 /*@ requires \valid(z1);
     requires \valid(z2);
-    assigns \nothing;  */
+    allocates \nothing;
+    assigns \nothing;
+  
+*/
 extern int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
                       __mpz_struct const * /*[1]*/ z2);
 /*@ requires \valid(z1);
     requires \valid(z2);
-    assigns *z1;  */
+    allocates \nothing;
+    assigns *z1; 
+*/
 extern void __gmpz_neg(__mpz_struct * /*[1]*/ z1,
                        __mpz_struct const * /*[1]*/ z2);
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
-    assigns *z1; 
+    allocates \nothing;
+    assigns *z1;
+  
 */
 extern void __gmpz_add(__mpz_struct * /*[1]*/ z1,
                        __mpz_struct const * /*[1]*/ z2,
@@ -927,7 +973,9 @@ extern void __gmpz_add(__mpz_struct * /*[1]*/ z1,
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
-    assigns *z1; 
+    allocates \nothing;
+    assigns *z1;
+  
 */
 extern void __gmpz_sub(__mpz_struct * /*[1]*/ z1,
                        __mpz_struct const * /*[1]*/ z2,
@@ -935,7 +983,9 @@ extern void __gmpz_sub(__mpz_struct * /*[1]*/ z1,
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
-    assigns *z1; 
+    allocates \nothing;
+    assigns *z1;
+  
 */
 extern void __gmpz_mul(__mpz_struct * /*[1]*/ z1,
                        __mpz_struct const * /*[1]*/ z2,
@@ -943,7 +993,9 @@ extern void __gmpz_mul(__mpz_struct * /*[1]*/ z1,
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
-    assigns *z1; 
+    allocates \nothing;
+    assigns *z1;
+  
 */
 extern void __gmpz_tdiv_q(__mpz_struct * /*[1]*/ z1,
                           __mpz_struct const * /*[1]*/ z2,
@@ -951,16 +1003,26 @@ extern void __gmpz_tdiv_q(__mpz_struct * /*[1]*/ z1,
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
-    assigns *z1; 
+    allocates \nothing;
+    assigns *z1;
+  
 */
 extern void __gmpz_tdiv_r(__mpz_struct * /*[1]*/ z1,
                           __mpz_struct const * /*[1]*/ z2,
                           __mpz_struct const * /*[1]*/ z3);
 /*@ requires \valid(z1);
     requires \valid(z2);
-    assigns *z1;  */
+    allocates \nothing;
+    assigns *z1; 
+*/
 extern int __gmpz_com(__mpz_struct * /*[1]*/ z1,
                       __mpz_struct const * /*[1]*/ z2);
+/*@ requires \valid(z);
+    assigns \nothing;  */
+extern long __gmpz_get_si(__mpz_struct const * /*[1]*/ z);
+/*@ requires \valid(z);
+    assigns \nothing;  */
+extern unsigned long __gmpz_get_ui(__mpz_struct const * /*[1]*/ z);
 /*@ terminates \false;
     ensures \false;
     assigns \nothing;  */

@@ -254,6 +254,7 @@ let rec type_term t =
       (try join ty2 ty3 with Cannot_compare -> assert false)
     | Tat(t, _) -> type_term t
     | Tbase_addr _ -> Error.not_yet "\\base_addr"
+    | Toffset _ -> Error.not_yet "\\offset"
     | Tblock_length _ -> Error.not_yet "\\block_length"
     | Tnull -> int_to_interv 0
     | TCoerce _ -> Error.not_yet "coercion" (* Jessie specific *)
@@ -301,6 +302,7 @@ and type_term_offset = function
   | TIndex(t, o) ->
     ignore (type_term t);
     type_term_offset o
+  | TModel _ -> Error.not_yet "model"
 
 and unary_arithmetic op t = 
   let ty = type_term t in
@@ -384,6 +386,9 @@ let rec type_predicate_named p = match p.content with
   | Pexists _ -> Error.not_yet "unguarded \\exists quantification"
   | Pat(p, _) -> type_predicate_named p
   | Pvalid _ ->  Error.not_yet "\\valid"
+  | Pvalid_read _ ->  Error.not_yet "\\valid_read"
+  | Pallocable _ -> Error.not_yet "\\allocate"
+  | Pfreeable _ -> Error.not_yet "\\free"
   | Pfresh _ -> Error.not_yet "\\fresh"
   | Psubtype _ -> Error.not_yet "subtyping relation" (* Jessie specific *)
   | Pinitialized _ -> Error.not_yet "\\initialized"

@@ -6,6 +6,14 @@ struct __anonstruct___mpz_struct_1 {
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct mpz_t[1];
+/*@ ensures \valid(\old(x));
+    assigns *x;  */
+extern void __gmpz_init(__mpz_struct * /*[1]*/ x);
+/*@ requires \valid(z_orig);
+    ensures \valid(\old(z));
+    assigns *z;  */
+extern void __gmpz_init_set(__mpz_struct * /*[1]*/ z,
+                            __mpz_struct const * /*[1]*/ z_orig);
 /*@ ensures \valid(\old(z));
     assigns *z;
     assigns *z \from n;  */
@@ -18,6 +26,19 @@ extern void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z, long n);
     assigns *z;  */
 extern int __gmpz_init_set_str(__mpz_struct * /*[1]*/ z, char const *str,
                                int base);
+/*@ requires \valid(z_orig);
+    requires \valid(z);
+    assigns *z;  */
+extern void __gmpz_set(__mpz_struct * /*[1]*/ z,
+                       __mpz_struct const * /*[1]*/ z_orig);
+/*@ requires \valid(z);
+    assigns *z;
+    assigns *z \from n;  */
+extern void __gmpz_set_ui(__mpz_struct * /*[1]*/ z, unsigned long n);
+/*@ requires \valid(z);
+    assigns *z;
+    assigns *z \from n;  */
+extern void __gmpz_set_si(__mpz_struct * /*[1]*/ z, long n);
 /*@ requires \valid(x);
     assigns *x;  */
 extern void __gmpz_clear(__mpz_struct * /*[1]*/ x);
@@ -26,6 +47,59 @@ extern void __gmpz_clear(__mpz_struct * /*[1]*/ x);
     assigns \nothing;  */
 extern int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
                       __mpz_struct const * /*[1]*/ z2);
+/*@ requires \valid(z1);
+    requires \valid(z2);
+    assigns *z1;  */
+extern void __gmpz_neg(__mpz_struct * /*[1]*/ z1,
+                       __mpz_struct const * /*[1]*/ z2);
+/*@ requires \valid(z1);
+    requires \valid(z2);
+    requires \valid(z3);
+    assigns *z1; 
+*/
+extern void __gmpz_add(__mpz_struct * /*[1]*/ z1,
+                       __mpz_struct const * /*[1]*/ z2,
+                       __mpz_struct const * /*[1]*/ z3);
+/*@ requires \valid(z1);
+    requires \valid(z2);
+    requires \valid(z3);
+    assigns *z1; 
+*/
+extern void __gmpz_sub(__mpz_struct * /*[1]*/ z1,
+                       __mpz_struct const * /*[1]*/ z2,
+                       __mpz_struct const * /*[1]*/ z3);
+/*@ requires \valid(z1);
+    requires \valid(z2);
+    requires \valid(z3);
+    assigns *z1; 
+*/
+extern void __gmpz_mul(__mpz_struct * /*[1]*/ z1,
+                       __mpz_struct const * /*[1]*/ z2,
+                       __mpz_struct const * /*[1]*/ z3);
+/*@ requires \valid(z1);
+    requires \valid(z2);
+    requires \valid(z3);
+    assigns *z1; 
+*/
+extern void __gmpz_tdiv_q(__mpz_struct * /*[1]*/ z1,
+                          __mpz_struct const * /*[1]*/ z2,
+                          __mpz_struct const * /*[1]*/ z3);
+/*@ requires \valid(z1);
+    requires \valid(z2);
+    requires \valid(z3);
+    assigns *z1; 
+*/
+extern void __gmpz_tdiv_r(__mpz_struct * /*[1]*/ z1,
+                          __mpz_struct const * /*[1]*/ z2,
+                          __mpz_struct const * /*[1]*/ z3);
+/*@ requires \valid(z1);
+    requires \valid(z2);
+    assigns *z1;  */
+extern int __gmpz_com(__mpz_struct * /*[1]*/ z1,
+                      __mpz_struct const * /*[1]*/ z2);
+/*@ requires \valid(z);
+    assigns \nothing;  */
+extern long __gmpz_get_si(__mpz_struct const * /*[1]*/ z);
 /*@ requires \valid(z);
     assigns \nothing;  */
 extern unsigned long __gmpz_get_ui(__mpz_struct const * /*[1]*/ z);

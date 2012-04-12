@@ -130,6 +130,7 @@ and toffset_to_offset ?loc env = function
       d_term t;
     let offset, env = toffset_to_offset env offset in
     Index(e, offset), env
+  | TModel _ -> Error.not_yet "model"
 
 and tlval_to_lval env (host, offset) = 
   let host, env, name = thost_to_host env host in
@@ -321,6 +322,7 @@ and context_insensitive_term_to_exp env t =
     let e, env, is_mpz_string = at_to_exp env (Some t) label e in
     e, env, is_mpz_string, ""
   | Tbase_addr _ -> Error.not_yet "\\base_addr"
+  | Toffset _ -> Error.not_yet "\\offset"
   | Tblock_length _ -> Error.not_yet "\\block_length"
   | Tnull -> mkCast (zero ~loc) (TPtr(TVoid [], [])), env, false, "null"
   | TCoerce _ -> Error.not_yet "coercion" (* Jessie specific *)
@@ -477,6 +479,9 @@ let rec named_predicate_to_exp ?name env p =
     assert (not is_string);
     e, env
   | Pvalid _ -> Error.not_yet "\\valid"
+  | Pvalid_read _ ->  Error.not_yet "\\valid_read"
+  | Pallocable _ -> Error.not_yet "\\allocate"
+  | Pfreeable _ -> Error.not_yet "\\free"
   | Pfresh _ -> Error.not_yet "\\fresh"
   | Psubtype _ -> Error.not_yet "subtyping relation" (* Jessie specific *)
   | Pinitialized _ -> Error.not_yet "\\initialized"

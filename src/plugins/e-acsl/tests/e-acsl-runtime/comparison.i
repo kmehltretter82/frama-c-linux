@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: comparison operators
-   EXECNOW: LOG gen_comparison.c BIN gen_comparison.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/comparison.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_comparison.c > /dev/null &&  gcc -pedantic -o ./tests/e-acsl-runtime/result/gen_comparison.out ./tests/e-acsl-runtime/result/gen_comparison.c -lgmp && ./tests/e-acsl-runtime/result/gen_comparison.out
-   EXECNOW: LOG gen_comparison2.c BIN gen_comparison2.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/comparison.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_comparison2.c > /dev/null &&  gcc -pedantic -o ./tests/e-acsl-runtime/result/gen_comparison2.out ./tests/e-acsl-runtime/result/gen_comparison2.c -lgmp && ./tests/e-acsl-runtime/result/gen_comparison2.out
+   EXECNOW: LOG gen_comparison.c BIN gen_comparison.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/comparison.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_comparison.c > /dev/null &&  gcc -pedantic -o ./tests/e-acsl-runtime/result/gen_comparison.out ./tests/e-acsl-runtime/result/gen_comparison.c -lgmp && ./tests/e-acsl-runtime/result/gen_comparison.out
+   EXECNOW: LOG gen_comparison2.c BIN gen_comparison2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/comparison.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_comparison2.c > /dev/null &&  gcc -pedantic -o ./tests/e-acsl-runtime/result/gen_comparison2.out ./tests/e-acsl-runtime/result/gen_comparison2.c -lgmp && ./tests/e-acsl-runtime/result/gen_comparison2.out
 */
 
 int main(void) {

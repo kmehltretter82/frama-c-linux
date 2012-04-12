@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: arrays
-   EXECNOW: LOG gen_array.c BIN gen_array.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/array.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_array.c > /dev/null && gcc -pedantic -o ./tests/e-acsl-runtime/result/gen_array.out ./tests/e-acsl-runtime/result/gen_array.c -lgmp && ./tests/e-acsl-runtime/result/gen_array.out
-   EXECNOW: LOG gen_array2.c BIN gen_array2.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/array.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_array2.c > /dev/null && gcc -pedantic -o ./tests/e-acsl-runtime/result/gen_array2.out ./tests/e-acsl-runtime/result/gen_array2.c -lgmp && ./tests/e-acsl-runtime/result/gen_array2.out
+   EXECNOW: LOG gen_array.c BIN gen_array.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/array.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_array.c > /dev/null && gcc -pedantic -o ./tests/e-acsl-runtime/result/gen_array.out ./tests/e-acsl-runtime/result/gen_array.c -lgmp && ./tests/e-acsl-runtime/result/gen_array.out
+   EXECNOW: LOG gen_array2.c BIN gen_array2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/array.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_array2.c > /dev/null && gcc -pedantic -o ./tests/e-acsl-runtime/result/gen_array2.out ./tests/e-acsl-runtime/result/gen_array2.c -lgmp && ./tests/e-acsl-runtime/result/gen_array2.out
 */
 
 int T1[3],T2[4];

@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: linear search (example of the TAP'12 article)
-   EXECNOW: LOG gen_linear_search.c BIN gen_linear_search.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/linear_search.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_linear_search.c > /dev/null && gcc -pedantic -o ./tests/e-acsl-runtime/result/gen_linear_search.out ./tests/e-acsl-runtime/result/gen_linear_search.c -lgmp && ./tests/e-acsl-runtime/result/gen_linear_search.out
-   EXECNOW: LOG gen_linear_search2.c BIN gen_linear_search2.out FRAMAC_SHARE=./share @frama-c@ ./tests/e-acsl-runtime/linear_search.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_linear_search2.c > /dev/null && gcc -pedantic -Wno-long-long -o ./tests/e-acsl-runtime/result/gen_linear_search2.out ./tests/e-acsl-runtime/result/gen_linear_search2.c -lgmp && ./tests/e-acsl-runtime/result/gen_linear_search2.out
+   EXECNOW: LOG gen_linear_search.c BIN gen_linear_search.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/linear_search.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_linear_search.c > /dev/null && gcc -pedantic -o ./tests/e-acsl-runtime/result/gen_linear_search.out ./tests/e-acsl-runtime/result/gen_linear_search.c -lgmp && ./tests/e-acsl-runtime/result/gen_linear_search.out
+   EXECNOW: LOG gen_linear_search2.c BIN gen_linear_search2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/linear_search.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_linear_search2.c > /dev/null && gcc -pedantic -Wno-long-long -o ./tests/e-acsl-runtime/result/gen_linear_search2.out ./tests/e-acsl-runtime/result/gen_linear_search2.c -lgmp && ./tests/e-acsl-runtime/result/gen_linear_search2.out
 */
 
 int A[10];

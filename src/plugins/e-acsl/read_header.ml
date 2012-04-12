@@ -39,10 +39,10 @@ let put_file_in_buffer fname buf =
 
 (* TODO: must be project-compliant. The memoized buffer should be reset when we
    have to redo the visitor in a different setting. *)
-
+(*
 let add_include buf hfile =
   Buffer.add_string buf (Format.sprintf "#include %S\n" hfile)
-
+ *)
 let text =
   let buf = Buffer.create 97 in
   fun () ->
