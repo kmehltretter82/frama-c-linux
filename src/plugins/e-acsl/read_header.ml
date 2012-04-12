@@ -22,10 +22,7 @@
 
 let put_file_in_buffer fname buf =
   try
-    let cin =
-      open_in
-	(Filename.concat Config.datadir (Filename.concat "e-acsl" fname))
-    in
+    let cin = open_in (Options.Share.file fname) in
     try
       while true do
 	let l = input_line cin in

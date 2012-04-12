@@ -108,14 +108,7 @@ $(PLUGIN_DIR)/local_config.ml: $(PLUGIN_DIR)/Makefile.in
 ifeq (@MAY_RUN_TESTS@,yes)
 
 PLUGIN_TESTS_DIRS:=e-acsl-reject e-acsl-runtime
-PLUGIN_NO_DEFAULT_TEST:=yes
-
-tests/test_config: tests/test_config.in Makefile
-	$(PRINT_MAKING) $@
-	$(SED) -e "s|${FRAMAC_SHARE}|$(FRAMAC_SHARE)|g" \
-	       -e "s|@SEDCMD@|`which sed `|g" $< > $@
-
-tests:: tests/test_config
+tests:: $(PLUGIN_DIR)/tests/test_config
 
 endif
 
@@ -201,16 +194,36 @@ headers::
 
 include $(FRAMAC_SHARE)/Makefile.dynamic
 
+####################
+# Testing (part 2) #
+####################
+
+ifeq (@MAY_RUN_TESTS@,yes)
+
+ifeq ($(FRAMAC_INTERNAL),yes)
+SHARE:=-e-acsl-share ./share/e-acsl
+else
+SHARE:=
+endif
+$(E_ACSL_DIR)/tests/test_config: $(E_ACSL_DIR)/tests/test_config.in \
+				$(E_ACSL_DIR)/Makefile
+	$(PRINT_MAKING) $@
+	$(SED) -e "s|@SHARE@|$(SHARE)|g" \
+	       -e "s|@SEDCMD@|`which sed `|g" $< > $@
+
+endif
+
 #####################################
 # Regenerating the Makefile on need #
 #####################################
 
 ifeq ("$(FRAMAC_INTERNAL)","yes")
-CONFIG_STATUS_DIR=$(FRAMAC_SRC)
+CONFIG_STATUS_DIR:=$(FRAMAC_SRC)
+CONFIG_STATUS_DIR_DEP:=
 else
-CONFIG_STATUS_DIR=$(E_ACSL_DIR)
+CONFIG_STATUS_DIR:=$(E_ACSL_DIR)
+CONFIG_STATUS_DIR_DEP:=$(CONFIG_STATUS_DIR)/config.status
 endif
 
-$(E_ACSL_DIR)/Makefile: $(E_ACSL_DIR)/Makefile.in \
-			$(CONFIG_STATUS_DIR)/config.status
+$(E_ACSL_DIR)/Makefile: $(E_ACSL_DIR)/Makefile.in $(CONFIG_STATUS_DIR_DEP)
 	cd $(CONFIG_STATUS_DIR) && ./config.status
