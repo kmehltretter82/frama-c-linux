@@ -22,6 +22,8 @@ PROJECT_FILE.i:247:[value] Assertion got status valid.
         Called from PROJECT_FILE.i:248.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
+PROJECT_FILE.i:250:[value] cannot evaluate ACSL term,
+        unsupported ACSL construct: \at() on a C label
 PROJECT_FILE.i:250:[value] Assertion got status unknown.
 [value] computing for function e_acsl_assert <- f <- main.
         Called from PROJECT_FILE.i:251.
@@ -32,6 +34,8 @@ PROJECT_FILE.i:253:[value] Assertion got status valid.
         Called from PROJECT_FILE.i:255.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
+PROJECT_FILE.i:257:[value] cannot evaluate ACSL term,
+        unsupported ACSL construct: \at() on a C label
 PROJECT_FILE.i:257:[value] Assertion got status unknown.
 [value] computing for function e_acsl_assert <- f <- main.
         Called from PROJECT_FILE.i:258.
@@ -44,16 +48,22 @@ PROJECT_FILE.i:257:[value] Assertion got status unknown.
 PROJECT_FILE.i:231:[value] Function f: postcondition got status valid.
 [value] Recording results for f
 [value] Done for function f
+PROJECT_FILE.i:317:[value] cannot evaluate ACSL term,
+        unsupported ACSL construct: \at() on a C label
 PROJECT_FILE.i:317:[value] Assertion got status unknown.
 [value] computing for function e_acsl_assert <- main.
         Called from PROJECT_FILE.i:318.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
+PROJECT_FILE.i:320:[value] cannot evaluate ACSL term,
+        unsupported ACSL construct: \at() on a C label
 PROJECT_FILE.i:320:[value] Assertion got status unknown.
 [value] computing for function e_acsl_assert <- main.
         Called from PROJECT_FILE.i:321.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
+PROJECT_FILE.i:324:[value] cannot evaluate ACSL term,
+        unsupported ACSL construct: \at() on a C label
 PROJECT_FILE.i:324:[value] Assertion got status unknown.
 [value] computing for function e_acsl_assert <- main.
         Called from PROJECT_FILE.i:325.
@@ -61,11 +71,15 @@ PROJECT_FILE.i:324:[value] Assertion got status unknown.
 [value] Done for function e_acsl_assert
 [value] computing for function g <- main.
         Called from PROJECT_FILE.i:328.
+PROJECT_FILE.i:285:[value] cannot evaluate ACSL term,
+        unsupported ACSL construct: \at() on a C label
 PROJECT_FILE.i:285:[value] Assertion got status unknown.
 [value] computing for function e_acsl_assert <- g <- main.
         Called from PROJECT_FILE.i:286.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
+PROJECT_FILE.i:290:[value] cannot evaluate ACSL term,
+        unsupported ACSL construct: \at() on a C label
 PROJECT_FILE.i:290:[value] Assertion got status unknown.
 [value] computing for function e_acsl_assert <- g <- main.
         Called from PROJECT_FILE.i:292.

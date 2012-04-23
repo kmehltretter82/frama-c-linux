@@ -28,6 +28,8 @@ PROJECT_FILE.i:251:[value] Assertion got status valid.
         Called from PROJECT_FILE.i:252.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
+PROJECT_FILE.i:254:[value] cannot evaluate ACSL term,
+        unsupported ACSL construct: unsupported ACSL construct "toto"
 PROJECT_FILE.i:254:[value] Assertion got status unknown.
 [value] computing for function e_acsl_assert <- main.
         Called from PROJECT_FILE.i:255.

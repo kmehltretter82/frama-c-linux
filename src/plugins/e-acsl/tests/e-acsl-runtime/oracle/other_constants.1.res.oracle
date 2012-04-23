@@ -2,6 +2,8 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
+PROJECT_FILE.i:237:[value] cannot evaluate ACSL term,
+        unsupported ACSL construct: unsupported ACSL construct "toto"
 PROJECT_FILE.i:237:[value] Assertion got status unknown.
 [value] computing for function e_acsl_assert <- main.
         Called from PROJECT_FILE.i:238.
