@@ -7,29 +7,53 @@ struct __anonstruct___mpz_struct_1 {
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct mpz_t[1];
 typedef unsigned char uint8;
-/*@ ensures \valid(\old(x));
-    assigns *x;  */
-extern void __gmpz_init(__mpz_struct * /*[1]*/ x);
+/*@
+model __mpz_struct { ℤ n };
+*/
+/*@ ensures \valid(\old(z));
+    allocates \old(z);
+    
+    assigns *z;  */
+extern void __gmpz_init(__mpz_struct * /*[1]*/ z);
 /*@ requires \valid(z_orig);
     ensures \valid(\old(z));
-    assigns *z;  */
+    allocates \old(z);
+    
+    assigns *z;
+    assigns *z \from *z_orig;
+  
+*/
 extern void __gmpz_init_set(__mpz_struct * /*[1]*/ z,
                             __mpz_struct const * /*[1]*/ z_orig);
 /*@ ensures \valid(\old(z));
+    allocates \old(z);
+    
     assigns *z;
-    assigns *z \from n;  */
+    assigns *z \from n; 
+*/
 extern void __gmpz_init_set_ui(__mpz_struct * /*[1]*/ z, unsigned long n);
 /*@ ensures \valid(\old(z));
+    allocates \old(z);
+    
     assigns *z;
-    assigns *z \from n;  */
+    assigns *z \from n; 
+*/
 extern void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z, long n);
 /*@ ensures \valid(\old(z));
-    assigns *z;  */
+    allocates \old(z);
+    
+    assigns *z;
+    assigns *z \from str, base;
+  
+*/
 extern int __gmpz_init_set_str(__mpz_struct * /*[1]*/ z, char const *str,
                                int base);
 /*@ requires \valid(z_orig);
     requires \valid(z);
-    assigns *z;  */
+    assigns *z;
+    assigns *z \from *z_orig;
+  
+*/
 extern void __gmpz_set(__mpz_struct * /*[1]*/ z,
                        __mpz_struct const * /*[1]*/ z_orig);
 /*@ requires \valid(z);
@@ -41,6 +65,8 @@ extern void __gmpz_set_ui(__mpz_struct * /*[1]*/ z, unsigned long n);
     assigns *z \from n;  */
 extern void __gmpz_set_si(__mpz_struct * /*[1]*/ z, long n);
 /*@ requires \valid(x);
+    frees x;
+    
     assigns *x;  */
 extern void __gmpz_clear(__mpz_struct * /*[1]*/ x);
 /*@ requires \valid(z1);
@@ -50,13 +76,18 @@ extern int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
                       __mpz_struct const * /*[1]*/ z2);
 /*@ requires \valid(z1);
     requires \valid(z2);
-    assigns *z1;  */
+    assigns *z1;
+    assigns *z1 \from *z2;
+  
+*/
 extern void __gmpz_neg(__mpz_struct * /*[1]*/ z1,
                        __mpz_struct const * /*[1]*/ z2);
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
-    assigns *z1; 
+    assigns *z1;
+    assigns *z1 \from *z2, *z3;
+  
 */
 extern void __gmpz_add(__mpz_struct * /*[1]*/ z1,
                        __mpz_struct const * /*[1]*/ z2,
@@ -64,7 +95,9 @@ extern void __gmpz_add(__mpz_struct * /*[1]*/ z1,
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
-    assigns *z1; 
+    assigns *z1;
+    assigns *z1 \from *z2, *z3;
+  
 */
 extern void __gmpz_sub(__mpz_struct * /*[1]*/ z1,
                        __mpz_struct const * /*[1]*/ z2,
@@ -72,7 +105,9 @@ extern void __gmpz_sub(__mpz_struct * /*[1]*/ z1,
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
-    assigns *z1; 
+    assigns *z1;
+    assigns *z1 \from *z2, *z3;
+  
 */
 extern void __gmpz_mul(__mpz_struct * /*[1]*/ z1,
                        __mpz_struct const * /*[1]*/ z2,
@@ -80,7 +115,9 @@ extern void __gmpz_mul(__mpz_struct * /*[1]*/ z1,
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
-    assigns *z1; 
+    assigns *z1;
+    assigns *z1 \from *z2, *z3;
+  
 */
 extern void __gmpz_tdiv_q(__mpz_struct * /*[1]*/ z1,
                           __mpz_struct const * /*[1]*/ z2,
@@ -88,14 +125,19 @@ extern void __gmpz_tdiv_q(__mpz_struct * /*[1]*/ z1,
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
-    assigns *z1; 
+    assigns *z1;
+    assigns *z1 \from *z2, *z3;
+  
 */
 extern void __gmpz_tdiv_r(__mpz_struct * /*[1]*/ z1,
                           __mpz_struct const * /*[1]*/ z2,
                           __mpz_struct const * /*[1]*/ z3);
 /*@ requires \valid(z1);
     requires \valid(z2);
-    assigns *z1;  */
+    assigns *z1;
+    assigns *z1 \from *z2;
+  
+*/
 extern int __gmpz_com(__mpz_struct * /*[1]*/ z1,
                       __mpz_struct const * /*[1]*/ z2);
 /*@ requires \valid(z);
@@ -110,7 +152,8 @@ extern unsigned long __gmpz_get_ui(__mpz_struct const * /*[1]*/ z);
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
-/*@ requires predicate ≢ 0;  */
+/*@ requires predicate ≢ 0;
+    assigns \nothing;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
   if (! predicate) {

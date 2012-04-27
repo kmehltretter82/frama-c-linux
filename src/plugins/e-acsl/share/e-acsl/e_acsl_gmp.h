@@ -28,25 +28,33 @@
 /* Initializers */
 /****************/
 
-/*@ ensures \valid(x);
-  @ assigns *x; */
-extern void __gmpz_init(mpz_t x);
+/*@ ensures \valid(z);
+  @ allocates z;
+  @ assigns *z; */
+extern void __gmpz_init(mpz_t z);
 
 /*@ requires \valid(z_orig);
+  @ allocates z;
   @ ensures \valid(z);
-  @ assigns *z; */
+//  @ ensures z->n == z_orig->n;
+  @ assigns *z \from *z_orig; */
 extern void __gmpz_init_set(mpz_t z, const mpz_t z_orig);
 
-/*@ ensures \valid(z);
+/*@ allocates z;
+  @ ensures \valid(z);
+//  @ ensures z->n == n;
   @ assigns *z \from n; */
 extern void __gmpz_init_set_ui(mpz_t z, unsigned long int n);
 
-/*@ ensures \valid(z);
+/*@ allocates z;
+  @ ensures \valid(z);
+//  @ ensures z->n == n;
   @ assigns *z \from n; */
 extern void __gmpz_init_set_si(mpz_t z, signed long int n);
 
-/*@ ensures \valid(z);
-  @ assigns *z; */
+/*@ allocates z;
+  @ ensures \valid(z);
+  @ assigns *z \from str,base; */
 extern int __gmpz_init_set_str(mpz_t z, const char *str, int base);
 
 /***************/
@@ -55,14 +63,17 @@ extern int __gmpz_init_set_str(mpz_t z, const char *str, int base);
 
 /*@ requires \valid(z_orig);
   @ requires \valid(z);
-  @ assigns *z; */
+//  @ ensures z->n == z_orig->n;
+  @ assigns *z \from *z_orig; */
 extern void __gmpz_set(mpz_t z, const mpz_t z_orig);
 
 /*@ requires \valid(z);
+//  @ ensures z->n == n;
   @ assigns *z \from n; */
 extern void __gmpz_set_ui(mpz_t z, unsigned long int n);
 
 /*@ requires \valid(z);
+//  @ ensures z->n == n;
   @ assigns *z \from n; */
 extern void __gmpz_set_si(mpz_t z, signed long int n);
 
@@ -71,6 +82,7 @@ extern void __gmpz_set_si(mpz_t z, signed long int n);
 /*************/
 
 /*@ requires \valid(x);
+  @ frees x; 
   @ assigns *x; */
 extern void __gmpz_clear(mpz_t x);
 
@@ -89,37 +101,37 @@ extern int __gmpz_cmp(const mpz_t z1, const mpz_t z2);
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
-  @ assigns *z1; */
+  @ assigns *z1 \from *z2; */
 extern void __gmpz_neg(mpz_t z1, const mpz_t z2);
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
   @ requires \valid(z3);
-  @ assigns *z1; */
+  @ assigns *z1 \from *z2, *z3; */
 extern void __gmpz_add(mpz_t z1, const mpz_t z2, const mpz_t z3);
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
   @ requires \valid(z3);
-  @ assigns *z1; */
+  @ assigns *z1 \from *z2, *z3; */
 extern void __gmpz_sub(mpz_t z1, const mpz_t z2, const mpz_t z3);
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
   @ requires \valid(z3);
-  @ assigns *z1; */
+  @ assigns *z1 \from *z2, *z3; */
 extern void __gmpz_mul(mpz_t z1, const mpz_t z2, const mpz_t z3);
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
   @ requires \valid(z3);
-  @ assigns *z1; */
+  @ assigns *z1 \from *z2, *z3; */
 extern void __gmpz_tdiv_q(mpz_t z1, const mpz_t z2, const mpz_t z3);
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
   @ requires \valid(z3);
-  @ assigns *z1; */
+  @ assigns *z1 \from *z2, *z3; */
 extern void __gmpz_tdiv_r(mpz_t z1, const mpz_t z2, const mpz_t z3);
 
 /*********************/
@@ -128,7 +140,7 @@ extern void __gmpz_tdiv_r(mpz_t z1, const mpz_t z2, const mpz_t z3);
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
-  @ assigns *z1; */
+  @ assigns *z1 \from *z2; */
 extern int __gmpz_com(mpz_t z1, const mpz_t z2);
 
 /************************/

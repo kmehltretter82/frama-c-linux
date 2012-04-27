@@ -3,76 +3,76 @@
 [value] Initial state computed
 [value] Values of globals at initialization
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:239.
-PROJECT_FILE.i:221:[value] Function e_acsl_assert: precondition got status valid.
-[value] Recording results for e_acsl_assert
-[value] Done for function e_acsl_assert
-[value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:245.
-[value] Recording results for e_acsl_assert
-[value] Done for function e_acsl_assert
-[value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:246.
-[value] Recording results for e_acsl_assert
-[value] Done for function e_acsl_assert
-[value] computing for function e_acsl_assert <- main.
         Called from PROJECT_FILE.i:250.
+PROJECT_FILE.i:231:[value] Function e_acsl_assert: precondition got status valid.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:254.
+        Called from PROJECT_FILE.i:256.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:255.
+        Called from PROJECT_FILE.i:257.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:268.
+        Called from PROJECT_FILE.i:261.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:269.
+        Called from PROJECT_FILE.i:265.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:271.
+        Called from PROJECT_FILE.i:266.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:273.
+        Called from PROJECT_FILE.i:279.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:274.
+        Called from PROJECT_FILE.i:280.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:297.
+        Called from PROJECT_FILE.i:282.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:302.
+        Called from PROJECT_FILE.i:284.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:309.
+        Called from PROJECT_FILE.i:285.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:315.
+        Called from PROJECT_FILE.i:308.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:317.
+        Called from PROJECT_FILE.i:313.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:322.
+        Called from PROJECT_FILE.i:320.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:324.
+        Called from PROJECT_FILE.i:326.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:328.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:333.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- main.
+        Called from PROJECT_FILE.i:335.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] Recording results for main
@@ -90,29 +90,53 @@ struct __anonstruct___mpz_struct_1 {
    unsigned long *_mp_d ;
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
-/*@ ensures \valid(\old(x));
-    assigns *x;  */
-extern void __gmpz_init(__mpz_struct * /*[1]*/ x);
+/*@
+model __mpz_struct { ℤ n };
+*/
+/*@ ensures \valid(\old(z));
+    allocates \old(z);
+    
+    assigns *z;  */
+extern void __gmpz_init(__mpz_struct * /*[1]*/ z);
 /*@ requires \valid(z_orig);
     ensures \valid(\old(z));
-    assigns *z;  */
+    allocates \old(z);
+    
+    assigns *z;
+    assigns *z \from *z_orig;
+  
+*/
 extern void __gmpz_init_set(__mpz_struct * /*[1]*/ z,
                             __mpz_struct const * /*[1]*/ z_orig);
 /*@ ensures \valid(\old(z));
+    allocates \old(z);
+    
     assigns *z;
-    assigns *z \from n;  */
+    assigns *z \from n; 
+*/
 extern void __gmpz_init_set_ui(__mpz_struct * /*[1]*/ z, unsigned long n);
 /*@ ensures \valid(\old(z));
+    allocates \old(z);
+    
     assigns *z;
-    assigns *z \from n;  */
+    assigns *z \from n; 
+*/
 extern void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z, long n);
 /*@ ensures \valid(\old(z));
-    assigns *z;  */
+    allocates \old(z);
+    
+    assigns *z;
+    assigns *z \from str, base;
+  
+*/
 extern int __gmpz_init_set_str(__mpz_struct * /*[1]*/ z, char const *str,
                                int base);
 /*@ requires \valid(z_orig);
     requires \valid(z);
-    assigns *z;  */
+    assigns *z;
+    assigns *z \from *z_orig;
+  
+*/
 extern void __gmpz_set(__mpz_struct * /*[1]*/ z,
                        __mpz_struct const * /*[1]*/ z_orig);
 /*@ requires \valid(z);
@@ -124,6 +148,8 @@ extern void __gmpz_set_ui(__mpz_struct * /*[1]*/ z, unsigned long n);
     assigns *z \from n;  */
 extern void __gmpz_set_si(__mpz_struct * /*[1]*/ z, long n);
 /*@ requires \valid(x);
+    frees x;
+    
     assigns *x;  */
 extern void __gmpz_clear(__mpz_struct * /*[1]*/ x);
 /*@ requires \valid(z1);
@@ -133,13 +159,18 @@ extern int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
                       __mpz_struct const * /*[1]*/ z2);
 /*@ requires \valid(z1);
     requires \valid(z2);
-    assigns *z1;  */
+    assigns *z1;
+    assigns *z1 \from *z2;
+  
+*/
 extern void __gmpz_neg(__mpz_struct * /*[1]*/ z1,
                        __mpz_struct const * /*[1]*/ z2);
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
-    assigns *z1; 
+    assigns *z1;
+    assigns *z1 \from *z2, *z3;
+  
 */
 extern void __gmpz_add(__mpz_struct * /*[1]*/ z1,
                        __mpz_struct const * /*[1]*/ z2,
@@ -147,7 +178,9 @@ extern void __gmpz_add(__mpz_struct * /*[1]*/ z1,
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
-    assigns *z1; 
+    assigns *z1;
+    assigns *z1 \from *z2, *z3;
+  
 */
 extern void __gmpz_sub(__mpz_struct * /*[1]*/ z1,
                        __mpz_struct const * /*[1]*/ z2,
@@ -155,7 +188,9 @@ extern void __gmpz_sub(__mpz_struct * /*[1]*/ z1,
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
-    assigns *z1; 
+    assigns *z1;
+    assigns *z1 \from *z2, *z3;
+  
 */
 extern void __gmpz_mul(__mpz_struct * /*[1]*/ z1,
                        __mpz_struct const * /*[1]*/ z2,
@@ -163,7 +198,9 @@ extern void __gmpz_mul(__mpz_struct * /*[1]*/ z1,
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
-    assigns *z1; 
+    assigns *z1;
+    assigns *z1 \from *z2, *z3;
+  
 */
 extern void __gmpz_tdiv_q(__mpz_struct * /*[1]*/ z1,
                           __mpz_struct const * /*[1]*/ z2,
@@ -171,14 +208,19 @@ extern void __gmpz_tdiv_q(__mpz_struct * /*[1]*/ z1,
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
-    assigns *z1; 
+    assigns *z1;
+    assigns *z1 \from *z2, *z3;
+  
 */
 extern void __gmpz_tdiv_r(__mpz_struct * /*[1]*/ z1,
                           __mpz_struct const * /*[1]*/ z2,
                           __mpz_struct const * /*[1]*/ z3);
 /*@ requires \valid(z1);
     requires \valid(z2);
-    assigns *z1;  */
+    assigns *z1;
+    assigns *z1 \from *z2;
+  
+*/
 extern int __gmpz_com(__mpz_struct * /*[1]*/ z1,
                       __mpz_struct const * /*[1]*/ z2);
 /*@ requires \valid(z);
@@ -193,7 +235,8 @@ extern unsigned long __gmpz_get_ui(__mpz_struct const * /*[1]*/ z);
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
-/*@ requires predicate ≢ 0;  */
+/*@ requires predicate ≢ 0;
+    assigns \nothing;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
   if (! predicate) {

@@ -5,131 +5,131 @@
         X ∈ {0}
         Y ∈ {2}
 [value] computing for function f <- main.
-        Called from PROJECT_FILE.i:403.
+        Called from PROJECT_FILE.i:414.
 [value] computing for function e_acsl_assert <- f <- main.
-        Called from PROJECT_FILE.i:236.
-PROJECT_FILE.i:221:[value] Function e_acsl_assert: precondition got status valid.
+        Called from PROJECT_FILE.i:247.
+PROJECT_FILE.i:231:[value] Function e_acsl_assert: precondition got status valid.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:232:[value] Function f: postcondition got status valid.
+PROJECT_FILE.i:243:[value] Function f: postcondition got status valid.
 [value] Recording results for f
 [value] Done for function f
 [value] computing for function g <- main.
-        Called from PROJECT_FILE.i:404.
+        Called from PROJECT_FILE.i:415.
 [value] computing for function e_acsl_assert <- g <- main.
-        Called from PROJECT_FILE.i:245.
+        Called from PROJECT_FILE.i:256.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- g <- main.
-        Called from PROJECT_FILE.i:246.
+        Called from PROJECT_FILE.i:257.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:240:[value] Function g: postcondition got status valid.
-PROJECT_FILE.i:241:[value] Function g: postcondition got status valid.
+PROJECT_FILE.i:251:[value] Function g: postcondition got status valid.
+PROJECT_FILE.i:252:[value] Function g: postcondition got status valid.
 [value] Recording results for g
 [value] Done for function g
 [value] computing for function h <- main.
-        Called from PROJECT_FILE.i:405.
-PROJECT_FILE.i:250:[value] Function h: precondition got status valid.
+        Called from PROJECT_FILE.i:416.
+PROJECT_FILE.i:261:[value] Function h: precondition got status valid.
 [value] computing for function e_acsl_assert <- h <- main.
-        Called from PROJECT_FILE.i:253.
+        Called from PROJECT_FILE.i:264.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] Recording results for h
 [value] Done for function h
 [value] computing for function i <- main.
-        Called from PROJECT_FILE.i:406.
-PROJECT_FILE.i:258:[value] Function i: precondition got status valid.
-PROJECT_FILE.i:259:[value] Function i: precondition got status valid.
+        Called from PROJECT_FILE.i:417.
+PROJECT_FILE.i:269:[value] Function i: precondition got status valid.
+PROJECT_FILE.i:270:[value] Function i: precondition got status valid.
 [value] computing for function e_acsl_assert <- i <- main.
-        Called from PROJECT_FILE.i:262.
+        Called from PROJECT_FILE.i:273.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- i <- main.
-        Called from PROJECT_FILE.i:263.
+        Called from PROJECT_FILE.i:274.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] Recording results for i
 [value] Done for function i
 [value] computing for function j <- main.
-        Called from PROJECT_FILE.i:407.
-PROJECT_FILE.i:269:[value] Function j, behavior b1: precondition got status valid.
-PROJECT_FILE.i:273:[value] Function j, behavior b2: precondition got status valid.
-PROJECT_FILE.i:274:[value] Function j, behavior b2: precondition got status valid.
+        Called from PROJECT_FILE.i:418.
+PROJECT_FILE.i:280:[value] Function j, behavior b1: precondition got status valid.
+PROJECT_FILE.i:284:[value] Function j, behavior b2: precondition got status valid.
+PROJECT_FILE.i:285:[value] Function j, behavior b2: precondition got status valid.
 [value] computing for function e_acsl_assert <- j <- main.
-        Called from PROJECT_FILE.i:281.
+        Called from PROJECT_FILE.i:292.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- j <- main.
-        Called from PROJECT_FILE.i:282.
+        Called from PROJECT_FILE.i:293.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- j <- main.
-        Called from PROJECT_FILE.i:284.
+        Called from PROJECT_FILE.i:295.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- j <- main.
-        Called from PROJECT_FILE.i:286.
+        Called from PROJECT_FILE.i:297.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- j <- main.
-        Called from PROJECT_FILE.i:287.
+        Called from PROJECT_FILE.i:298.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:270:[value] Function j, behavior b1: postcondition got status valid.
-PROJECT_FILE.i:275:[value] Function j, behavior b2: postcondition got status valid.
+PROJECT_FILE.i:281:[value] Function j, behavior b1: postcondition got status valid.
+PROJECT_FILE.i:286:[value] Function j, behavior b2: postcondition got status valid.
 [value] Recording results for j
 [value] Done for function j
 [value] computing for function k <- main.
-        Called from PROJECT_FILE.i:408.
-PROJECT_FILE.i:294:[value] Function k, behavior b1: assumption got status invalid; precondition not evaluated.
-PROJECT_FILE.i:299:[value] Function k, behavior b2: precondition got status valid.
-PROJECT_FILE.i:300:[value] Function k, behavior b2: precondition got status valid.
+        Called from PROJECT_FILE.i:419.
+PROJECT_FILE.i:305:[value] Function k, behavior b1: assumption got status invalid; precondition not evaluated.
+PROJECT_FILE.i:310:[value] Function k, behavior b2: precondition got status valid.
+PROJECT_FILE.i:311:[value] Function k, behavior b2: precondition got status valid.
 [value] computing for function e_acsl_assert <- k <- main.
-        Called from PROJECT_FILE.i:314.
+        Called from PROJECT_FILE.i:325.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- k <- main.
-        Called from PROJECT_FILE.i:319.
+        Called from PROJECT_FILE.i:330.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- k <- main.
-        Called from PROJECT_FILE.i:326.
+        Called from PROJECT_FILE.i:337.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] Recording results for k
 [value] Done for function k
 [value] computing for function l <- main.
-        Called from PROJECT_FILE.i:409.
-PROJECT_FILE.i:337:[value] Assertion got status valid.
+        Called from PROJECT_FILE.i:420.
+PROJECT_FILE.i:348:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- l <- main.
-        Called from PROJECT_FILE.i:338.
+        Called from PROJECT_FILE.i:349.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- l <- main.
-        Called from PROJECT_FILE.i:340.
+        Called from PROJECT_FILE.i:351.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:334:[value] Function l: postcondition got status valid.
+PROJECT_FILE.i:345:[value] Function l: postcondition got status valid.
 [value] Recording results for l
 [value] Done for function l
 [value] computing for function m <- main.
-        Called from PROJECT_FILE.i:410.
+        Called from PROJECT_FILE.i:421.
 [value] computing for function e_acsl_assert <- m <- main.
-        Called from PROJECT_FILE.i:383.
+        Called from PROJECT_FILE.i:394.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- m <- main.
-        Called from PROJECT_FILE.i:387.
+        Called from PROJECT_FILE.i:398.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- m <- main.
-        Called from PROJECT_FILE.i:393.
+        Called from PROJECT_FILE.i:404.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:346:[value] Function m, behavior b1: assumes got status invalid; post-condition not evaluated.
-PROJECT_FILE.i:351:[value] Function m, behavior b2: postcondition got status valid.
-PROJECT_FILE.i:352:[value] Function m, behavior b2: postcondition got status valid.
+PROJECT_FILE.i:357:[value] Function m, behavior b1: assumes got status invalid; post-condition not evaluated.
+PROJECT_FILE.i:362:[value] Function m, behavior b2: postcondition got status valid.
+PROJECT_FILE.i:363:[value] Function m, behavior b2: postcondition got status valid.
 [value] Recording results for m
 [value] Done for function m
 [value] Recording results for main
@@ -165,29 +165,53 @@ struct __anonstruct___mpz_struct_1 {
    unsigned long *_mp_d ;
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
-/*@ ensures \valid(\old(x));
-    assigns *x;  */
-extern void __gmpz_init(__mpz_struct * /*[1]*/ x);
+/*@
+model __mpz_struct { ℤ n };
+*/
+/*@ ensures \valid(\old(z));
+    allocates \old(z);
+    
+    assigns *z;  */
+extern void __gmpz_init(__mpz_struct * /*[1]*/ z);
 /*@ requires \valid(z_orig);
     ensures \valid(\old(z));
-    assigns *z;  */
+    allocates \old(z);
+    
+    assigns *z;
+    assigns *z \from *z_orig;
+  
+*/
 extern void __gmpz_init_set(__mpz_struct * /*[1]*/ z,
                             __mpz_struct const * /*[1]*/ z_orig);
 /*@ ensures \valid(\old(z));
+    allocates \old(z);
+    
     assigns *z;
-    assigns *z \from n;  */
+    assigns *z \from n; 
+*/
 extern void __gmpz_init_set_ui(__mpz_struct * /*[1]*/ z, unsigned long n);
 /*@ ensures \valid(\old(z));
+    allocates \old(z);
+    
     assigns *z;
-    assigns *z \from n;  */
+    assigns *z \from n; 
+*/
 extern void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z, long n);
 /*@ ensures \valid(\old(z));
-    assigns *z;  */
+    allocates \old(z);
+    
+    assigns *z;
+    assigns *z \from str, base;
+  
+*/
 extern int __gmpz_init_set_str(__mpz_struct * /*[1]*/ z, char const *str,
                                int base);
 /*@ requires \valid(z_orig);
     requires \valid(z);
-    assigns *z;  */
+    assigns *z;
+    assigns *z \from *z_orig;
+  
+*/
 extern void __gmpz_set(__mpz_struct * /*[1]*/ z,
                        __mpz_struct const * /*[1]*/ z_orig);
 /*@ requires \valid(z);
@@ -199,6 +223,8 @@ extern void __gmpz_set_ui(__mpz_struct * /*[1]*/ z, unsigned long n);
     assigns *z \from n;  */
 extern void __gmpz_set_si(__mpz_struct * /*[1]*/ z, long n);
 /*@ requires \valid(x);
+    frees x;
+    
     assigns *x;  */
 extern void __gmpz_clear(__mpz_struct * /*[1]*/ x);
 /*@ requires \valid(z1);
@@ -208,13 +234,18 @@ extern int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
                       __mpz_struct const * /*[1]*/ z2);
 /*@ requires \valid(z1);
     requires \valid(z2);
-    assigns *z1;  */
+    assigns *z1;
+    assigns *z1 \from *z2;
+  
+*/
 extern void __gmpz_neg(__mpz_struct * /*[1]*/ z1,
                        __mpz_struct const * /*[1]*/ z2);
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
-    assigns *z1; 
+    assigns *z1;
+    assigns *z1 \from *z2, *z3;
+  
 */
 extern void __gmpz_add(__mpz_struct * /*[1]*/ z1,
                        __mpz_struct const * /*[1]*/ z2,
@@ -222,7 +253,9 @@ extern void __gmpz_add(__mpz_struct * /*[1]*/ z1,
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
-    assigns *z1; 
+    assigns *z1;
+    assigns *z1 \from *z2, *z3;
+  
 */
 extern void __gmpz_sub(__mpz_struct * /*[1]*/ z1,
                        __mpz_struct const * /*[1]*/ z2,
@@ -230,7 +263,9 @@ extern void __gmpz_sub(__mpz_struct * /*[1]*/ z1,
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
-    assigns *z1; 
+    assigns *z1;
+    assigns *z1 \from *z2, *z3;
+  
 */
 extern void __gmpz_mul(__mpz_struct * /*[1]*/ z1,
                        __mpz_struct const * /*[1]*/ z2,
@@ -238,7 +273,9 @@ extern void __gmpz_mul(__mpz_struct * /*[1]*/ z1,
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
-    assigns *z1; 
+    assigns *z1;
+    assigns *z1 \from *z2, *z3;
+  
 */
 extern void __gmpz_tdiv_q(__mpz_struct * /*[1]*/ z1,
                           __mpz_struct const * /*[1]*/ z2,
@@ -246,14 +283,19 @@ extern void __gmpz_tdiv_q(__mpz_struct * /*[1]*/ z1,
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
-    assigns *z1; 
+    assigns *z1;
+    assigns *z1 \from *z2, *z3;
+  
 */
 extern void __gmpz_tdiv_r(__mpz_struct * /*[1]*/ z1,
                           __mpz_struct const * /*[1]*/ z2,
                           __mpz_struct const * /*[1]*/ z3);
 /*@ requires \valid(z1);
     requires \valid(z2);
-    assigns *z1;  */
+    assigns *z1;
+    assigns *z1 \from *z2;
+  
+*/
 extern int __gmpz_com(__mpz_struct * /*[1]*/ z1,
                       __mpz_struct const * /*[1]*/ z2);
 /*@ requires \valid(z);
@@ -268,7 +310,8 @@ extern unsigned long __gmpz_get_ui(__mpz_struct const * /*[1]*/ z);
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
-/*@ requires predicate ≢ 0;  */
+/*@ requires predicate ≢ 0;
+    assigns \nothing;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
   if (! predicate) {

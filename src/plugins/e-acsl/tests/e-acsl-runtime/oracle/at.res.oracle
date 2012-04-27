@@ -9,80 +9,80 @@ tests/e-acsl-runtime/at.i:34:[e-acsl] warning: missing guard for ensuring that p
 [value] Initial state computed
 [value] Values of globals at initialization
         A ∈ {0}
-PROJECT_FILE.i:311:[value] Assertion got status valid.
+PROJECT_FILE.i:322:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:312.
-PROJECT_FILE.i:221:[value] Function e_acsl_assert: precondition got status valid.
+        Called from PROJECT_FILE.i:323.
+PROJECT_FILE.i:231:[value] Function e_acsl_assert: precondition got status valid.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function f <- main.
-        Called from PROJECT_FILE.i:316.
-PROJECT_FILE.i:247:[value] Assertion got status valid.
+        Called from PROJECT_FILE.i:327.
+PROJECT_FILE.i:258:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- f <- main.
-        Called from PROJECT_FILE.i:248.
+        Called from PROJECT_FILE.i:259.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:250:[value] cannot evaluate ACSL term,
+PROJECT_FILE.i:261:[value] cannot evaluate ACSL term,
         unsupported ACSL construct: \at() on a C label
-PROJECT_FILE.i:250:[value] Assertion got status unknown.
+PROJECT_FILE.i:261:[value] Assertion got status unknown.
 [value] computing for function e_acsl_assert <- f <- main.
-        Called from PROJECT_FILE.i:251.
+        Called from PROJECT_FILE.i:262.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:253:[value] Assertion got status valid.
+PROJECT_FILE.i:264:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- f <- main.
-        Called from PROJECT_FILE.i:255.
+        Called from PROJECT_FILE.i:266.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:257:[value] cannot evaluate ACSL term,
+PROJECT_FILE.i:268:[value] cannot evaluate ACSL term,
         unsupported ACSL construct: \at() on a C label
-PROJECT_FILE.i:257:[value] Assertion got status unknown.
+PROJECT_FILE.i:268:[value] Assertion got status unknown.
 [value] computing for function e_acsl_assert <- f <- main.
-        Called from PROJECT_FILE.i:258.
+        Called from PROJECT_FILE.i:269.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- f <- main.
-        Called from PROJECT_FILE.i:263.
+        Called from PROJECT_FILE.i:274.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:231:[value] Function f: postcondition got status valid.
+PROJECT_FILE.i:242:[value] Function f: postcondition got status valid.
 [value] Recording results for f
 [value] Done for function f
-PROJECT_FILE.i:317:[value] cannot evaluate ACSL term,
+PROJECT_FILE.i:328:[value] cannot evaluate ACSL term,
         unsupported ACSL construct: \at() on a C label
-PROJECT_FILE.i:317:[value] Assertion got status unknown.
+PROJECT_FILE.i:328:[value] Assertion got status unknown.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:318.
+        Called from PROJECT_FILE.i:329.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:320:[value] cannot evaluate ACSL term,
+PROJECT_FILE.i:331:[value] cannot evaluate ACSL term,
         unsupported ACSL construct: \at() on a C label
-PROJECT_FILE.i:320:[value] Assertion got status unknown.
+PROJECT_FILE.i:331:[value] Assertion got status unknown.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:321.
+        Called from PROJECT_FILE.i:332.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:324:[value] cannot evaluate ACSL term,
+PROJECT_FILE.i:335:[value] cannot evaluate ACSL term,
         unsupported ACSL construct: \at() on a C label
-PROJECT_FILE.i:324:[value] Assertion got status unknown.
+PROJECT_FILE.i:335:[value] Assertion got status unknown.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:325.
+        Called from PROJECT_FILE.i:336.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function g <- main.
-        Called from PROJECT_FILE.i:328.
-PROJECT_FILE.i:285:[value] cannot evaluate ACSL term,
+        Called from PROJECT_FILE.i:339.
+PROJECT_FILE.i:296:[value] cannot evaluate ACSL term,
         unsupported ACSL construct: \at() on a C label
-PROJECT_FILE.i:285:[value] Assertion got status unknown.
+PROJECT_FILE.i:296:[value] Assertion got status unknown.
 [value] computing for function e_acsl_assert <- g <- main.
-        Called from PROJECT_FILE.i:286.
+        Called from PROJECT_FILE.i:297.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:290:[value] cannot evaluate ACSL term,
+PROJECT_FILE.i:301:[value] cannot evaluate ACSL term,
         unsupported ACSL construct: \at() on a C label
-PROJECT_FILE.i:290:[value] Assertion got status unknown.
+PROJECT_FILE.i:301:[value] Assertion got status unknown.
 [value] computing for function e_acsl_assert <- g <- main.
-        Called from PROJECT_FILE.i:292.
+        Called from PROJECT_FILE.i:303.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] Recording results for g
@@ -124,29 +124,53 @@ struct __anonstruct___mpz_struct_1 {
    unsigned long *_mp_d ;
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
-/*@ ensures \valid(\old(x));
-    assigns *x;  */
-extern void __gmpz_init(__mpz_struct * /*[1]*/ x);
+/*@
+model __mpz_struct { ℤ n };
+*/
+/*@ ensures \valid(\old(z));
+    allocates \old(z);
+    
+    assigns *z;  */
+extern void __gmpz_init(__mpz_struct * /*[1]*/ z);
 /*@ requires \valid(z_orig);
     ensures \valid(\old(z));
-    assigns *z;  */
+    allocates \old(z);
+    
+    assigns *z;
+    assigns *z \from *z_orig;
+  
+*/
 extern void __gmpz_init_set(__mpz_struct * /*[1]*/ z,
                             __mpz_struct const * /*[1]*/ z_orig);
 /*@ ensures \valid(\old(z));
+    allocates \old(z);
+    
     assigns *z;
-    assigns *z \from n;  */
+    assigns *z \from n; 
+*/
 extern void __gmpz_init_set_ui(__mpz_struct * /*[1]*/ z, unsigned long n);
 /*@ ensures \valid(\old(z));
+    allocates \old(z);
+    
     assigns *z;
-    assigns *z \from n;  */
+    assigns *z \from n; 
+*/
 extern void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z, long n);
 /*@ ensures \valid(\old(z));
-    assigns *z;  */
+    allocates \old(z);
+    
+    assigns *z;
+    assigns *z \from str, base;
+  
+*/
 extern int __gmpz_init_set_str(__mpz_struct * /*[1]*/ z, char const *str,
                                int base);
 /*@ requires \valid(z_orig);
     requires \valid(z);
-    assigns *z;  */
+    assigns *z;
+    assigns *z \from *z_orig;
+  
+*/
 extern void __gmpz_set(__mpz_struct * /*[1]*/ z,
                        __mpz_struct const * /*[1]*/ z_orig);
 /*@ requires \valid(z);
@@ -158,6 +182,8 @@ extern void __gmpz_set_ui(__mpz_struct * /*[1]*/ z, unsigned long n);
     assigns *z \from n;  */
 extern void __gmpz_set_si(__mpz_struct * /*[1]*/ z, long n);
 /*@ requires \valid(x);
+    frees x;
+    
     assigns *x;  */
 extern void __gmpz_clear(__mpz_struct * /*[1]*/ x);
 /*@ requires \valid(z1);
@@ -167,13 +193,18 @@ extern int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
                       __mpz_struct const * /*[1]*/ z2);
 /*@ requires \valid(z1);
     requires \valid(z2);
-    assigns *z1;  */
+    assigns *z1;
+    assigns *z1 \from *z2;
+  
+*/
 extern void __gmpz_neg(__mpz_struct * /*[1]*/ z1,
                        __mpz_struct const * /*[1]*/ z2);
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
-    assigns *z1; 
+    assigns *z1;
+    assigns *z1 \from *z2, *z3;
+  
 */
 extern void __gmpz_add(__mpz_struct * /*[1]*/ z1,
                        __mpz_struct const * /*[1]*/ z2,
@@ -181,7 +212,9 @@ extern void __gmpz_add(__mpz_struct * /*[1]*/ z1,
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
-    assigns *z1; 
+    assigns *z1;
+    assigns *z1 \from *z2, *z3;
+  
 */
 extern void __gmpz_sub(__mpz_struct * /*[1]*/ z1,
                        __mpz_struct const * /*[1]*/ z2,
@@ -189,7 +222,9 @@ extern void __gmpz_sub(__mpz_struct * /*[1]*/ z1,
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
-    assigns *z1; 
+    assigns *z1;
+    assigns *z1 \from *z2, *z3;
+  
 */
 extern void __gmpz_mul(__mpz_struct * /*[1]*/ z1,
                        __mpz_struct const * /*[1]*/ z2,
@@ -197,7 +232,9 @@ extern void __gmpz_mul(__mpz_struct * /*[1]*/ z1,
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
-    assigns *z1; 
+    assigns *z1;
+    assigns *z1 \from *z2, *z3;
+  
 */
 extern void __gmpz_tdiv_q(__mpz_struct * /*[1]*/ z1,
                           __mpz_struct const * /*[1]*/ z2,
@@ -205,14 +242,19 @@ extern void __gmpz_tdiv_q(__mpz_struct * /*[1]*/ z1,
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
-    assigns *z1; 
+    assigns *z1;
+    assigns *z1 \from *z2, *z3;
+  
 */
 extern void __gmpz_tdiv_r(__mpz_struct * /*[1]*/ z1,
                           __mpz_struct const * /*[1]*/ z2,
                           __mpz_struct const * /*[1]*/ z3);
 /*@ requires \valid(z1);
     requires \valid(z2);
-    assigns *z1;  */
+    assigns *z1;
+    assigns *z1 \from *z2;
+  
+*/
 extern int __gmpz_com(__mpz_struct * /*[1]*/ z1,
                       __mpz_struct const * /*[1]*/ z2);
 /*@ requires \valid(z);
@@ -227,7 +269,8 @@ extern unsigned long __gmpz_get_ui(__mpz_struct const * /*[1]*/ z);
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
-/*@ requires predicate ≢ 0;  */
+/*@ requires predicate ≢ 0;
+    assigns \nothing;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
   if (! predicate) {

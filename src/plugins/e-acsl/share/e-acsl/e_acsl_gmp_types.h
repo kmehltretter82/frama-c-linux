@@ -24,14 +24,12 @@
 /* GMP types */
 /*************/
 
-// [TODO] utiliser un champ modèle de type integer pour modéliser
-// l'entier exact correspondant à un mpz_t.
-// Not yet implemented in ACSL.
-
 typedef struct {
   int _mp_alloc;
   int _mp_size;
   unsigned long int *_mp_d;
 } __mpz_struct;
+
+/*@ model __mpz_struct { integer n; }; */
 
 typedef __mpz_struct mpz_t[1];

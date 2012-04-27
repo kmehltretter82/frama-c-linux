@@ -2,666 +2,666 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-PROJECT_FILE.i:233:[value] Assertion got status unknown.
+PROJECT_FILE.i:244:[value] Assertion got status unknown.
 [value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:238.
+        Called from PROJECT_FILE.i:249.
 [value] using specification for function __gmpz_init
-PROJECT_FILE.i:69:[value] Function __gmpz_init: postcondition got status valid.
+PROJECT_FILE.i:67:[value] Function __gmpz_init: postcondition got status valid.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:241.
+        Called from PROJECT_FILE.i:252.
 [value] using specification for function __gmpz_init_set_si
-PROJECT_FILE.i:82:[value] Function __gmpz_init_set_si: postcondition got status valid.
+PROJECT_FILE.i:86:[value] Function __gmpz_init_set_si: postcondition got status valid.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_set <- main.
-        Called from PROJECT_FILE.i:242.
+        Called from PROJECT_FILE.i:253.
 [value] using specification for function __gmpz_set
-PROJECT_FILE.i:94:[value] Function __gmpz_set: precondition got status valid.
-PROJECT_FILE.i:95:[value] Function __gmpz_set: precondition got status valid.
+PROJECT_FILE.i:100:[value] Function __gmpz_set: precondition got status valid.
+PROJECT_FILE.i:101:[value] Function __gmpz_set: precondition got status valid.
 [value] Done for function __gmpz_set
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:243.
+        Called from PROJECT_FILE.i:254.
 [value] using specification for function __gmpz_clear
-PROJECT_FILE.i:111:[value] Function __gmpz_clear: precondition got status valid.
+PROJECT_FILE.i:120:[value] Function __gmpz_clear: precondition got status valid.
 [value] Done for function __gmpz_clear
-PROJECT_FILE.i:246:[value] entering loop for the first time
+PROJECT_FILE.i:257:[value] entering loop for the first time
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:250.
-[value] Done for function __gmpz_init_set_si
-[value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:251.
-[value] using specification for function __gmpz_cmp
-PROJECT_FILE.i:119:[value] Function __gmpz_cmp: precondition got status valid.
-PROJECT_FILE.i:120:[value] Function __gmpz_cmp: precondition got status valid.
-[value] Done for function __gmpz_cmp
-[value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:253.
-[value] Done for function __gmpz_clear
-[value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:260.
-[value] Done for function __gmpz_init_set_si
-[value] computing for function __gmpz_cmp <- main.
         Called from PROJECT_FILE.i:261.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:262.
+[value] using specification for function __gmpz_cmp
+PROJECT_FILE.i:129:[value] Function __gmpz_cmp: precondition got status valid.
+PROJECT_FILE.i:130:[value] Function __gmpz_cmp: precondition got status valid.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:264.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:271.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:272.
 [value] Done for function __gmpz_cmp
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:266.
+        Called from PROJECT_FILE.i:277.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:271.
+        Called from PROJECT_FILE.i:282.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:267.
+        Called from PROJECT_FILE.i:278.
 [value] Done for function __gmpz_cmp
-PROJECT_FILE.i:268:[value] assigning non deterministic value for the first time
+PROJECT_FILE.i:279:[value] assigning non deterministic value for the first time
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:269.
+        Called from PROJECT_FILE.i:280.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:281.
+        Called from PROJECT_FILE.i:292.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:271.
+        Called from PROJECT_FILE.i:282.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:282.
+        Called from PROJECT_FILE.i:293.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_add <- main.
-        Called from PROJECT_FILE.i:283.
+        Called from PROJECT_FILE.i:294.
 [value] using specification for function __gmpz_add
-PROJECT_FILE.i:133:[value] Function __gmpz_add: precondition got status valid.
-PROJECT_FILE.i:134:[value] Function __gmpz_add: precondition got status valid.
-PROJECT_FILE.i:135:[value] Function __gmpz_add: precondition got status valid.
+PROJECT_FILE.i:143:[value] Function __gmpz_add: precondition got status valid.
+PROJECT_FILE.i:144:[value] Function __gmpz_add: precondition got status valid.
+PROJECT_FILE.i:145:[value] Function __gmpz_add: precondition got status valid.
 [value] Done for function __gmpz_add
 [value] computing for function __gmpz_set <- main.
-        Called from PROJECT_FILE.i:284.
+        Called from PROJECT_FILE.i:295.
 [value] Done for function __gmpz_set
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:285.
+        Called from PROJECT_FILE.i:296.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:286.
+        Called from PROJECT_FILE.i:297.
 [value] Done for function __gmpz_clear
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:291.
-PROJECT_FILE.i:221:[value] Function e_acsl_assert: precondition got status unknown.
+        Called from PROJECT_FILE.i:302.
+PROJECT_FILE.i:231:[value] Function e_acsl_assert: precondition got status unknown.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:294.
+        Called from PROJECT_FILE.i:305.
 [value] Done for function __gmpz_clear
-PROJECT_FILE.i:298:[value] Assertion got status unknown.
+PROJECT_FILE.i:309:[value] Assertion got status unknown.
 [value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:303.
+        Called from PROJECT_FILE.i:314.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:308.
+        Called from PROJECT_FILE.i:319.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:309.
+        Called from PROJECT_FILE.i:320.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:310.
+        Called from PROJECT_FILE.i:321.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_add <- main.
-        Called from PROJECT_FILE.i:311.
+        Called from PROJECT_FILE.i:322.
 [value] Done for function __gmpz_add
 [value] computing for function __gmpz_set <- main.
-        Called from PROJECT_FILE.i:312.
+        Called from PROJECT_FILE.i:323.
 [value] Done for function __gmpz_set
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:313.
+        Called from PROJECT_FILE.i:324.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:314.
+        Called from PROJECT_FILE.i:325.
 [value] Done for function __gmpz_clear
-[value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:315.
-[value] Done for function __gmpz_clear
-PROJECT_FILE.i:318:[value] entering loop for the first time
-[value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:322.
-[value] Done for function __gmpz_init_set_si
-[value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:323.
-[value] Done for function __gmpz_cmp
 [value] computing for function __gmpz_clear <- main.
         Called from PROJECT_FILE.i:326.
 [value] Done for function __gmpz_clear
+PROJECT_FILE.i:329:[value] entering loop for the first time
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:332.
+        Called from PROJECT_FILE.i:333.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:333.
+        Called from PROJECT_FILE.i:334.
 [value] Done for function __gmpz_cmp
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:334.
+        Called from PROJECT_FILE.i:337.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:343.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
         Called from PROJECT_FILE.i:344.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:345.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:355.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:345.
+        Called from PROJECT_FILE.i:356.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_add <- main.
-        Called from PROJECT_FILE.i:346.
+        Called from PROJECT_FILE.i:357.
 [value] Done for function __gmpz_add
 [value] computing for function __gmpz_set <- main.
-        Called from PROJECT_FILE.i:347.
+        Called from PROJECT_FILE.i:358.
 [value] Done for function __gmpz_set
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:348.
+        Called from PROJECT_FILE.i:359.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:349.
+        Called from PROJECT_FILE.i:360.
 [value] Done for function __gmpz_clear
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:354.
+        Called from PROJECT_FILE.i:365.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:356.
+        Called from PROJECT_FILE.i:367.
 [value] Done for function __gmpz_clear
-PROJECT_FILE.i:360:[value] Assertion got status unknown.
+PROJECT_FILE.i:371:[value] Assertion got status unknown.
 [value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:365.
+        Called from PROJECT_FILE.i:376.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:370.
+        Called from PROJECT_FILE.i:381.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:371.
+        Called from PROJECT_FILE.i:382.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:372.
+        Called from PROJECT_FILE.i:383.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_add <- main.
-        Called from PROJECT_FILE.i:373.
+        Called from PROJECT_FILE.i:384.
 [value] Done for function __gmpz_add
 [value] computing for function __gmpz_set <- main.
-        Called from PROJECT_FILE.i:374.
+        Called from PROJECT_FILE.i:385.
 [value] Done for function __gmpz_set
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:375.
+        Called from PROJECT_FILE.i:386.
 [value] Done for function __gmpz_clear
-[value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:376.
-[value] Done for function __gmpz_clear
-[value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:377.
-[value] Done for function __gmpz_clear
-PROJECT_FILE.i:380:[value] entering loop for the first time
-[value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:384.
-[value] Done for function __gmpz_init_set_si
-[value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:385.
-[value] Done for function __gmpz_cmp
 [value] computing for function __gmpz_clear <- main.
         Called from PROJECT_FILE.i:387.
 [value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:388.
+[value] Done for function __gmpz_clear
+PROJECT_FILE.i:391:[value] entering loop for the first time
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:395.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:396.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:398.
+[value] Done for function __gmpz_clear
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:407.
+        Called from PROJECT_FILE.i:418.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:409.
+        Called from PROJECT_FILE.i:420.
 [value] Done for function __gmpz_clear
-PROJECT_FILE.i:413:[value] Assertion got status unknown.
+PROJECT_FILE.i:424:[value] Assertion got status unknown.
 [value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:418.
+        Called from PROJECT_FILE.i:429.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:421.
+        Called from PROJECT_FILE.i:432.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_set <- main.
-        Called from PROJECT_FILE.i:422.
+        Called from PROJECT_FILE.i:433.
 [value] Done for function __gmpz_set
-[value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:423.
-[value] Done for function __gmpz_clear
-PROJECT_FILE.i:426:[value] entering loop for the first time
-[value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:430.
-[value] Done for function __gmpz_init_set_si
-[value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:431.
-[value] Done for function __gmpz_cmp
 [value] computing for function __gmpz_clear <- main.
         Called from PROJECT_FILE.i:434.
 [value] Done for function __gmpz_clear
+PROJECT_FILE.i:437:[value] entering loop for the first time
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:440.
+        Called from PROJECT_FILE.i:441.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:441.
+        Called from PROJECT_FILE.i:442.
 [value] Done for function __gmpz_cmp
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:442.
+        Called from PROJECT_FILE.i:445.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:451.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
         Called from PROJECT_FILE.i:452.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:453.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:463.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:453.
+        Called from PROJECT_FILE.i:464.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_add <- main.
-        Called from PROJECT_FILE.i:454.
+        Called from PROJECT_FILE.i:465.
 [value] Done for function __gmpz_add
 [value] computing for function __gmpz_set <- main.
-        Called from PROJECT_FILE.i:455.
+        Called from PROJECT_FILE.i:466.
 [value] Done for function __gmpz_set
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:456.
+        Called from PROJECT_FILE.i:467.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:457.
+        Called from PROJECT_FILE.i:468.
 [value] Done for function __gmpz_clear
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:462.
+        Called from PROJECT_FILE.i:473.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:464.
+        Called from PROJECT_FILE.i:475.
 [value] Done for function __gmpz_clear
-PROJECT_FILE.i:468:[value] Assertion got status unknown.
+PROJECT_FILE.i:479:[value] Assertion got status unknown.
 [value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:478.
+        Called from PROJECT_FILE.i:489.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:479.
+        Called from PROJECT_FILE.i:490.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:480.
+        Called from PROJECT_FILE.i:491.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:483.
+        Called from PROJECT_FILE.i:494.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_set <- main.
-        Called from PROJECT_FILE.i:484.
+        Called from PROJECT_FILE.i:495.
 [value] Done for function __gmpz_set
-[value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:485.
-[value] Done for function __gmpz_clear
-PROJECT_FILE.i:488:[value] entering loop for the first time
-[value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:492.
-[value] Done for function __gmpz_init_set_si
-[value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:493.
-[value] Done for function __gmpz_cmp
 [value] computing for function __gmpz_clear <- main.
         Called from PROJECT_FILE.i:496.
 [value] Done for function __gmpz_clear
+PROJECT_FILE.i:499:[value] entering loop for the first time
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:501.
-[value] Done for function __gmpz_init_set_si
-[value] computing for function __gmpz_set <- main.
-        Called from PROJECT_FILE.i:502.
-[value] Done for function __gmpz_set
-[value] computing for function __gmpz_clear <- main.
         Called from PROJECT_FILE.i:503.
-[value] Done for function __gmpz_clear
-PROJECT_FILE.i:506:[value] entering loop for the first time
-[value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:510.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:511.
+        Called from PROJECT_FILE.i:504.
 [value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:507.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:512.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_set <- main.
+        Called from PROJECT_FILE.i:513.
+[value] Done for function __gmpz_set
 [value] computing for function __gmpz_clear <- main.
         Called from PROJECT_FILE.i:514.
 [value] Done for function __gmpz_clear
+PROJECT_FILE.i:517:[value] entering loop for the first time
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:519.
+        Called from PROJECT_FILE.i:521.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:522.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:525.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:530.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:578.
+        Called from PROJECT_FILE.i:589.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_set <- main.
-        Called from PROJECT_FILE.i:520.
+        Called from PROJECT_FILE.i:531.
 [value] Done for function __gmpz_set
 [value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:579.
+        Called from PROJECT_FILE.i:590.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:521.
+        Called from PROJECT_FILE.i:532.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_add <- main.
-        Called from PROJECT_FILE.i:580.
+        Called from PROJECT_FILE.i:591.
 [value] Done for function __gmpz_add
-PROJECT_FILE.i:524:[value] entering loop for the first time
+PROJECT_FILE.i:535:[value] entering loop for the first time
 [value] computing for function __gmpz_set <- main.
-        Called from PROJECT_FILE.i:581.
+        Called from PROJECT_FILE.i:592.
 [value] Done for function __gmpz_set
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:593.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:594.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:538.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init <- main.
+        Called from PROJECT_FILE.i:547.
+[value] Done for function __gmpz_init
+[value] computing for function __gmpz_add <- main.
+        Called from PROJECT_FILE.i:548.
+[value] Done for function __gmpz_add
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:577.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:549.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init <- main.
+        Called from PROJECT_FILE.i:578.
+[value] Done for function __gmpz_init
+[value] computing for function __gmpz_init <- main.
+        Called from PROJECT_FILE.i:550.
+[value] Done for function __gmpz_init
+[value] computing for function __gmpz_add <- main.
+        Called from PROJECT_FILE.i:579.
+[value] Done for function __gmpz_add
+[value] computing for function __gmpz_add <- main.
+        Called from PROJECT_FILE.i:551.
+[value] Done for function __gmpz_add
+[value] computing for function __gmpz_set <- main.
+        Called from PROJECT_FILE.i:580.
+[value] Done for function __gmpz_set
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:552.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:581.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:553.
+[value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- main.
         Called from PROJECT_FILE.i:582.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:583.
+        Called from PROJECT_FILE.i:554.
 [value] Done for function __gmpz_clear
-[value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:527.
-[value] Done for function __gmpz_cmp
-[value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:536.
-[value] Done for function __gmpz_init
-[value] computing for function __gmpz_add <- main.
-        Called from PROJECT_FILE.i:537.
-[value] Done for function __gmpz_add
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:555.
+[value] Done for function __gmpz_clear
 [value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:565.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init <- main.
         Called from PROJECT_FILE.i:566.
-[value] Done for function __gmpz_init_set_si
-[value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:538.
-[value] Done for function __gmpz_init_set_si
-[value] computing for function __gmpz_init <- main.
+[value] Done for function __gmpz_init
+[value] computing for function __gmpz_add <- main.
         Called from PROJECT_FILE.i:567.
-[value] Done for function __gmpz_init
-[value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:539.
-[value] Done for function __gmpz_init
-[value] computing for function __gmpz_add <- main.
-        Called from PROJECT_FILE.i:568.
-[value] Done for function __gmpz_add
-[value] computing for function __gmpz_add <- main.
-        Called from PROJECT_FILE.i:540.
 [value] Done for function __gmpz_add
 [value] computing for function __gmpz_set <- main.
-        Called from PROJECT_FILE.i:569.
+        Called from PROJECT_FILE.i:568.
 [value] Done for function __gmpz_set
-[value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:541.
-[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:569.
+[value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- main.
         Called from PROJECT_FILE.i:570.
 [value] Done for function __gmpz_clear
-[value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:542.
-[value] Done for function __gmpz_clear
-[value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:571.
-[value] Done for function __gmpz_clear
-[value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:543.
-[value] Done for function __gmpz_clear
-[value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:544.
-[value] Done for function __gmpz_clear
-[value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:554.
-[value] Done for function __gmpz_init_set_si
-[value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:555.
-[value] Done for function __gmpz_init
-[value] computing for function __gmpz_add <- main.
-        Called from PROJECT_FILE.i:556.
-[value] Done for function __gmpz_add
-[value] computing for function __gmpz_set <- main.
-        Called from PROJECT_FILE.i:557.
-[value] Done for function __gmpz_set
-[value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:558.
-[value] Done for function __gmpz_clear
-[value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:559.
-[value] Done for function __gmpz_clear
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:588.
+        Called from PROJECT_FILE.i:599.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:591.
-[value] Done for function __gmpz_clear
-[value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:592.
-[value] Done for function __gmpz_clear
-[value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:593.
-[value] Done for function __gmpz_clear
-PROJECT_FILE.i:597:[value] Assertion got status unknown.
-[value] computing for function __gmpz_init <- main.
         Called from PROJECT_FILE.i:602.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:603.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:604.
+[value] Done for function __gmpz_clear
+PROJECT_FILE.i:608:[value] Assertion got status unknown.
+[value] computing for function __gmpz_init <- main.
+        Called from PROJECT_FILE.i:613.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:605.
+        Called from PROJECT_FILE.i:616.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_set <- main.
-        Called from PROJECT_FILE.i:606.
+        Called from PROJECT_FILE.i:617.
 [value] Done for function __gmpz_set
-[value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:607.
-[value] Done for function __gmpz_clear
-PROJECT_FILE.i:610:[value] entering loop for the first time
-[value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:614.
-[value] Done for function __gmpz_init_set_si
-[value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:615.
-[value] Done for function __gmpz_cmp
 [value] computing for function __gmpz_clear <- main.
         Called from PROJECT_FILE.i:618.
 [value] Done for function __gmpz_clear
+PROJECT_FILE.i:621:[value] entering loop for the first time
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:624.
+        Called from PROJECT_FILE.i:625.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:625.
+        Called from PROJECT_FILE.i:626.
 [value] Done for function __gmpz_cmp
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:626.
+        Called from PROJECT_FILE.i:629.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:635.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
         Called from PROJECT_FILE.i:636.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:637.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:647.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:637.
+        Called from PROJECT_FILE.i:648.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_add <- main.
-        Called from PROJECT_FILE.i:638.
+        Called from PROJECT_FILE.i:649.
 [value] Done for function __gmpz_add
 [value] computing for function __gmpz_set <- main.
-        Called from PROJECT_FILE.i:639.
+        Called from PROJECT_FILE.i:650.
 [value] Done for function __gmpz_set
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:640.
+        Called from PROJECT_FILE.i:651.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:641.
+        Called from PROJECT_FILE.i:652.
 [value] Done for function __gmpz_clear
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:646.
+        Called from PROJECT_FILE.i:657.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:648.
-[value] Done for function __gmpz_clear
-PROJECT_FILE.i:652:[value] Assertion got status unknown.
-[value] computing for function __gmpz_init <- main.
         Called from PROJECT_FILE.i:659.
+[value] Done for function __gmpz_clear
+PROJECT_FILE.i:663:[value] Assertion got status unknown.
+[value] computing for function __gmpz_init <- main.
+        Called from PROJECT_FILE.i:670.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:662.
+        Called from PROJECT_FILE.i:673.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_set <- main.
-        Called from PROJECT_FILE.i:663.
+        Called from PROJECT_FILE.i:674.
 [value] Done for function __gmpz_set
-[value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:664.
-[value] Done for function __gmpz_clear
-PROJECT_FILE.i:667:[value] entering loop for the first time
-[value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:671.
-[value] Done for function __gmpz_init_set_si
-[value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:672.
-[value] Done for function __gmpz_cmp
 [value] computing for function __gmpz_clear <- main.
         Called from PROJECT_FILE.i:675.
 [value] Done for function __gmpz_clear
+PROJECT_FILE.i:678:[value] entering loop for the first time
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:685.
-[value] Done for function __gmpz_init_set_si
-[value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:686.
+        Called from PROJECT_FILE.i:682.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:687.
+        Called from PROJECT_FILE.i:683.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:686.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:696.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:697.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:698.
 [value] Done for function __gmpz_cmp
 [value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:688.
+        Called from PROJECT_FILE.i:699.
 [value] Done for function __gmpz_init
-PROJECT_FILE.i:689:[value] Assertion got status valid.
+PROJECT_FILE.i:700:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:690.
+        Called from PROJECT_FILE.i:701.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function __gmpz_tdiv_r <- main.
-        Called from PROJECT_FILE.i:691.
+        Called from PROJECT_FILE.i:702.
 [value] using specification for function __gmpz_tdiv_r
-PROJECT_FILE.i:157:[value] Function __gmpz_tdiv_r: precondition got status valid.
-PROJECT_FILE.i:158:[value] Function __gmpz_tdiv_r: precondition got status valid.
-PROJECT_FILE.i:159:[value] Function __gmpz_tdiv_r: precondition got status valid.
+PROJECT_FILE.i:167:[value] Function __gmpz_tdiv_r: precondition got status valid.
+PROJECT_FILE.i:168:[value] Function __gmpz_tdiv_r: precondition got status valid.
+PROJECT_FILE.i:169:[value] Function __gmpz_tdiv_r: precondition got status valid.
 [value] Done for function __gmpz_tdiv_r
 [value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:692.
+        Called from PROJECT_FILE.i:703.
 [value] Done for function __gmpz_cmp
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:761.
+        Called from PROJECT_FILE.i:772.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:698.
+        Called from PROJECT_FILE.i:709.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:762.
+        Called from PROJECT_FILE.i:773.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:763.
+        Called from PROJECT_FILE.i:774.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:701.
+        Called from PROJECT_FILE.i:712.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_set <- main.
-        Called from PROJECT_FILE.i:702.
+        Called from PROJECT_FILE.i:713.
 [value] Done for function __gmpz_set
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:703.
+        Called from PROJECT_FILE.i:714.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:773.
+        Called from PROJECT_FILE.i:784.
 [value] Done for function __gmpz_init_set_si
-PROJECT_FILE.i:706:[value] entering loop for the first time
+PROJECT_FILE.i:717:[value] entering loop for the first time
 [value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:774.
+        Called from PROJECT_FILE.i:785.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_add <- main.
-        Called from PROJECT_FILE.i:775.
+        Called from PROJECT_FILE.i:786.
 [value] Done for function __gmpz_add
 [value] computing for function __gmpz_set <- main.
-        Called from PROJECT_FILE.i:776.
+        Called from PROJECT_FILE.i:787.
 [value] Done for function __gmpz_set
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:713.
+        Called from PROJECT_FILE.i:724.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:777.
+        Called from PROJECT_FILE.i:788.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:714.
+        Called from PROJECT_FILE.i:725.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:778.
+        Called from PROJECT_FILE.i:789.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:715.
+        Called from PROJECT_FILE.i:726.
 [value] Done for function __gmpz_cmp
 [value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:716.
+        Called from PROJECT_FILE.i:727.
 [value] Done for function __gmpz_init
-PROJECT_FILE.i:717:[value] Assertion got status valid.
+PROJECT_FILE.i:728:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:718.
+        Called from PROJECT_FILE.i:729.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function __gmpz_tdiv_q <- main.
-        Called from PROJECT_FILE.i:720.
+        Called from PROJECT_FILE.i:731.
 [value] using specification for function __gmpz_tdiv_q
-PROJECT_FILE.i:151:[value] Function __gmpz_tdiv_q: precondition got status valid.
-PROJECT_FILE.i:152:[value] Function __gmpz_tdiv_q: precondition got status valid.
-PROJECT_FILE.i:153:[value] Function __gmpz_tdiv_q: precondition got status valid.
+PROJECT_FILE.i:161:[value] Function __gmpz_tdiv_q: precondition got status valid.
+PROJECT_FILE.i:162:[value] Function __gmpz_tdiv_q: precondition got status valid.
+PROJECT_FILE.i:163:[value] Function __gmpz_tdiv_q: precondition got status valid.
 [value] Done for function __gmpz_tdiv_q
 [value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:721.
+        Called from PROJECT_FILE.i:732.
 [value] Done for function __gmpz_cmp
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:724.
-[value] Done for function __gmpz_clear
-[value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:725.
-[value] Done for function __gmpz_clear
-[value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:726.
-[value] Done for function __gmpz_clear
-[value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:759.
-[value] Done for function __gmpz_clear
-[value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:733.
-[value] Done for function __gmpz_init_set_si
-[value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:761.
-[value] Done for function __gmpz_clear
-[value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:734.
-[value] Done for function __gmpz_init
-[value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:762.
-[value] Done for function __gmpz_clear
-[value] computing for function __gmpz_mul <- main.
         Called from PROJECT_FILE.i:735.
-[value] using specification for function __gmpz_mul
-PROJECT_FILE.i:145:[value] Function __gmpz_mul: precondition got status valid.
-PROJECT_FILE.i:146:[value] Function __gmpz_mul: precondition got status valid.
-PROJECT_FILE.i:147:[value] Function __gmpz_mul: precondition got status valid.
-[value] Done for function __gmpz_mul
-[value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:763.
 [value] Done for function __gmpz_clear
-[value] computing for function __gmpz_cmp <- main.
+[value] computing for function __gmpz_clear <- main.
         Called from PROJECT_FILE.i:736.
-[value] Done for function __gmpz_cmp
+[value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- main.
         Called from PROJECT_FILE.i:737.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:738.
+        Called from PROJECT_FILE.i:770.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:744.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:772.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_init <- main.
+        Called from PROJECT_FILE.i:745.
+[value] Done for function __gmpz_init
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:773.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_mul <- main.
+        Called from PROJECT_FILE.i:746.
+[value] using specification for function __gmpz_mul
+PROJECT_FILE.i:155:[value] Function __gmpz_mul: precondition got status valid.
+PROJECT_FILE.i:156:[value] Function __gmpz_mul: precondition got status valid.
+PROJECT_FILE.i:157:[value] Function __gmpz_mul: precondition got status valid.
+[value] Done for function __gmpz_mul
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:774.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_cmp <- main.
+        Called from PROJECT_FILE.i:747.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_clear <- main.
         Called from PROJECT_FILE.i:748.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from PROJECT_FILE.i:749.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from PROJECT_FILE.i:759.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:749.
+        Called from PROJECT_FILE.i:760.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_add <- main.
-        Called from PROJECT_FILE.i:750.
+        Called from PROJECT_FILE.i:761.
 [value] Done for function __gmpz_add
 [value] computing for function __gmpz_set <- main.
-        Called from PROJECT_FILE.i:751.
+        Called from PROJECT_FILE.i:762.
 [value] Done for function __gmpz_set
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:759.
+        Called from PROJECT_FILE.i:770.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:752.
+        Called from PROJECT_FILE.i:763.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:753.
+        Called from PROJECT_FILE.i:764.
 [value] Done for function __gmpz_clear
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:783.
+        Called from PROJECT_FILE.i:794.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:786.
+        Called from PROJECT_FILE.i:797.
 [value] Done for function __gmpz_clear
 [value] Recording results for main
 [value] done for function main
@@ -677,33 +677,53 @@ struct __anonstruct___mpz_struct_1 {
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct mpz_t[1];
-/*@ ensures \valid(\old(x));
-    allocates \nothing;
-    assigns *x;  */
-extern void __gmpz_init(__mpz_struct * /*[1]*/ x);
+/*@
+model __mpz_struct { ℤ n };
+*/
+/*@ ensures \valid(\old(z));
+    allocates \old(z);
+    
+    assigns *z;  */
+extern void __gmpz_init(__mpz_struct * /*[1]*/ z);
 /*@ requires \valid(z_orig);
     ensures \valid(\old(z));
-    assigns *z;  */
+    allocates \old(z);
+    
+    assigns *z;
+    assigns *z \from *z_orig;
+  
+*/
 extern void __gmpz_init_set(__mpz_struct * /*[1]*/ z,
                             __mpz_struct const * /*[1]*/ z_orig);
 /*@ ensures \valid(\old(z));
+    allocates \old(z);
+    
     assigns *z;
-    assigns *z \from n;  */
+    assigns *z \from n; 
+*/
 extern void __gmpz_init_set_ui(__mpz_struct * /*[1]*/ z, unsigned long n);
 /*@ ensures \valid(\old(z));
-    allocates \nothing;
+    allocates \old(z);
+    
     assigns *z;
     assigns *z \from n; 
 */
 extern void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z, long n);
 /*@ ensures \valid(\old(z));
-    assigns *z;  */
+    allocates \old(z);
+    
+    assigns *z;
+    assigns *z \from str, base;
+  
+*/
 extern int __gmpz_init_set_str(__mpz_struct * /*[1]*/ z, char const *str,
                                int base);
 /*@ requires \valid(z_orig);
     requires \valid(z);
     allocates \nothing;
-    assigns *z; 
+    assigns *z;
+    assigns *z \from *z_orig;
+  
 */
 extern void __gmpz_set(__mpz_struct * /*[1]*/ z,
                        __mpz_struct const * /*[1]*/ z_orig);
@@ -716,7 +736,8 @@ extern void __gmpz_set_ui(__mpz_struct * /*[1]*/ z, unsigned long n);
     assigns *z \from n;  */
 extern void __gmpz_set_si(__mpz_struct * /*[1]*/ z, long n);
 /*@ requires \valid(x);
-    allocates \nothing;
+    frees x;
+    
     assigns *x;  */
 extern void __gmpz_clear(__mpz_struct * /*[1]*/ x);
 /*@ requires \valid(z1);
@@ -729,7 +750,10 @@ extern int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
                       __mpz_struct const * /*[1]*/ z2);
 /*@ requires \valid(z1);
     requires \valid(z2);
-    assigns *z1;  */
+    assigns *z1;
+    assigns *z1 \from *z2;
+  
+*/
 extern void __gmpz_neg(__mpz_struct * /*[1]*/ z1,
                        __mpz_struct const * /*[1]*/ z2);
 /*@ requires \valid(z1);
@@ -737,6 +761,7 @@ extern void __gmpz_neg(__mpz_struct * /*[1]*/ z1,
     requires \valid(z3);
     allocates \nothing;
     assigns *z1;
+    assigns *z1 \from *z2, *z3;
   
 */
 extern void __gmpz_add(__mpz_struct * /*[1]*/ z1,
@@ -745,7 +770,9 @@ extern void __gmpz_add(__mpz_struct * /*[1]*/ z1,
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
-    assigns *z1; 
+    assigns *z1;
+    assigns *z1 \from *z2, *z3;
+  
 */
 extern void __gmpz_sub(__mpz_struct * /*[1]*/ z1,
                        __mpz_struct const * /*[1]*/ z2,
@@ -755,6 +782,7 @@ extern void __gmpz_sub(__mpz_struct * /*[1]*/ z1,
     requires \valid(z3);
     allocates \nothing;
     assigns *z1;
+    assigns *z1 \from *z2, *z3;
   
 */
 extern void __gmpz_mul(__mpz_struct * /*[1]*/ z1,
@@ -765,6 +793,7 @@ extern void __gmpz_mul(__mpz_struct * /*[1]*/ z1,
     requires \valid(z3);
     allocates \nothing;
     assigns *z1;
+    assigns *z1 \from *z2, *z3;
   
 */
 extern void __gmpz_tdiv_q(__mpz_struct * /*[1]*/ z1,
@@ -775,6 +804,7 @@ extern void __gmpz_tdiv_q(__mpz_struct * /*[1]*/ z1,
     requires \valid(z3);
     allocates \nothing;
     assigns *z1;
+    assigns *z1 \from *z2, *z3;
   
 */
 extern void __gmpz_tdiv_r(__mpz_struct * /*[1]*/ z1,
@@ -782,7 +812,10 @@ extern void __gmpz_tdiv_r(__mpz_struct * /*[1]*/ z1,
                           __mpz_struct const * /*[1]*/ z3);
 /*@ requires \valid(z1);
     requires \valid(z2);
-    assigns *z1;  */
+    assigns *z1;
+    assigns *z1 \from *z2;
+  
+*/
 extern int __gmpz_com(__mpz_struct * /*[1]*/ z1,
                       __mpz_struct const * /*[1]*/ z2);
 /*@ requires \valid(z);
@@ -797,7 +830,8 @@ extern unsigned long __gmpz_get_ui(__mpz_struct const * /*[1]*/ z);
 extern void exit(int status);
 /*@ assigns \nothing;  */
 extern int printf(char const * , ...);
-/*@ requires predicate ≢ 0;  */
+/*@ requires predicate ≢ 0;
+    assigns \nothing;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
   if (! predicate) {
