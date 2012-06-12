@@ -96,8 +96,7 @@ PROJECT_FILE.i:306:[value] Assertion got status valid.
 PROJECT_FILE.i:231:[value] Function e_acsl_assert: precondition got status valid.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:309:[value] cannot evaluate ACSL term,
-        unsupported ACSL construct: unsupported ACSL construct "toto"
+PROJECT_FILE.i:309:[value] cannot evaluate ACSL term, unsupported ACSL construct: constant strings
 PROJECT_FILE.i:309:[value] Assertion got status unknown.
 [value] computing for function e_acsl_assert <- main.
         Called from PROJECT_FILE.i:310.

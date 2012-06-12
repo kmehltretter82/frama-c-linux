@@ -20,6 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+let () = Plugin.is_share_visible ()
 module P = Plugin.Register
   (struct
      let name = "E-ACSL"

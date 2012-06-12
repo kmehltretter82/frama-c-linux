@@ -228,12 +228,19 @@ let current_kf env =
 
 let get_visitor env = env.visitor
 
+let emitter = 
+  Emitter.create
+    "E-ACSL" 
+    [ Emitter.Code_annot ] 
+    ~correctness:[ Options.Gmp_only.parameter ]
+    ~tuning:[]
+
 let add_assert env stmt annot = 
   match current_kf env with
   | None -> assert false (* TODO: ??? *)
   | Some kf ->
     Queue.add
-      (fun () -> Annotations.add_assert kf stmt [ !global_state ] annot) 
+      (fun () -> Annotations.add_assert emitter ~kf stmt annot) 
       env.visitor#get_filling_actions
 
 let add_stmt env stmt =

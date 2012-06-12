@@ -663,7 +663,7 @@ class e_acsl_visitor prj generate = object (self)
       funspec :=
 	Cil.visitCilFunspec
 	(self :> Cil.cilVisitor)
-	(Kernel_function.get_spec old_kf);
+	(Annotations.funspec old_kf);
       DoChildren
     with Not_found ->
       (* function without code *)
@@ -712,8 +712,8 @@ class e_acsl_visitor prj generate = object (self)
     (* [TODO] potential BUG HERE since the annotations tbl is the one of the old
        project. *)
     let env, new_annots =
-      Annotations.single_fold_stmt
-	(fun (User old_a | AI(_, old_a)) (env, new_annots) -> 
+      Annotations.fold_code_annot
+	(fun _ (User old_a | AI(_, old_a)) (env, new_annots) -> 
 	  let a =
             (* [VP] Don't use Visitor here, as it will fill the
 	       queue in the middle of the computation... *)
