@@ -59,7 +59,10 @@ let () = Env.global_state := Resulting_projects.self
 let generate_code =
   Resulting_projects.memo
     (fun name ->
-      let visit prj = Visit.do_visit ~prj true in
+      let visit prj = 
+	Project.on prj Kernel.Keep_unused_specified_functions.off ();
+	Visit.do_visit ~prj true;
+      in
       File.create_rebuilt_project_from_visitor ~preprocess:false name visit)
 
 let generate_code =

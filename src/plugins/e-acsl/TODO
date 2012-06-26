@@ -20,6 +20,7 @@
 # KNOWN BUGS #
 ##############
 
+- Bernard's bug avec un requires global et un ensures dans un behavior
 - \at incorrect si StmtLabel faisant référence au stmt courant (voir test at.i)
 - incorrect d'utiliser un \old dans le post-state si pre-state == post-state
   (même raison que ci-dessus)
