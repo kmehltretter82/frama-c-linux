@@ -196,6 +196,43 @@ void m(void)
   
 }
 
+/*@ requires X > 0;
+    requires X < 10;
+    behavior b1:
+      assumes X ≡ 7;
+      ensures X ≡ 8;
+      
+    behavior b2:
+      assumes X ≡ 5;
+      ensures X ≡ 98;
+      
+  
+*/
+void n(void)
+{
+  int __e_acsl_at;
+  int __e_acsl_at_2;
+  e_acsl_assert(X > 0,(char *)"Precondition",(char *)"(X > 0)",67);
+  e_acsl_assert(X < 10,(char *)"Precondition",(char *)"(X < 10)",68);
+  __e_acsl_at_2 = X == 5;
+  __e_acsl_at = X == 7;
+  X ++;
+  {
+    int __e_acsl_implies;
+    int __e_acsl_implies_2;
+    if (! __e_acsl_at) { __e_acsl_implies = 1; }
+    else { __e_acsl_implies = X == 8; }
+    e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",
+                  (char *)"(\\old(X == 7) ==> X == 8)",71);
+    if (! __e_acsl_at_2) { __e_acsl_implies_2 = 1; }
+    else { __e_acsl_implies_2 = X == 98; }
+    e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",
+                  (char *)"(\\old(X == 5) ==> X == 98)",74);
+    return;
+  }
+  
+}
+
 int main(void)
 {
   int __retres;
@@ -207,6 +244,7 @@ int main(void)
   k();
   l();
   m();
+  n();
   __retres = 0;
   return (__retres);
 }

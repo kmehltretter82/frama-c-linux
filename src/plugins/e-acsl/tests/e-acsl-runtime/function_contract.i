@@ -63,6 +63,17 @@ int l() {
   @   ensures X == \old(X) + Y; */
 void m(void) { X += Y; }
 
+// mix requires, ensures and assumes
+/*@ requires X > 0;
+  @ requires X < 10;
+  @ behavior b1:
+  @   assumes X == 7;
+  @   ensures X == 8;
+  @ behavior b2:
+  @   assumes X == 5;
+  @   ensures X == 98; */
+void n(void) { X ++; }
+
 int main(void) {
   f();
   g();
@@ -72,5 +83,6 @@ int main(void) {
   k();
   l();
   m();
+  n();
   return 0;
 }

@@ -515,13 +515,16 @@ let convert_preconditions env behaviors =
     let assumes_pred = assumes_predicate b in
     List.fold_left
       (fun env p ->
-	let loc = p.ip_loc in
-	let p = 
-	  Logic_const.pimplies
-	    ~loc
-	    (assumes_pred, Logic_const.unamed ~loc p.ip_content)
+	let do_it env =
+	  let loc = p.ip_loc in
+	  let p = 
+	    Logic_const.pimplies
+	      ~loc
+	      (assumes_pred, Logic_const.unamed ~loc p.ip_content)
+	  in
+	  convert_named_predicate env p
 	in
-	convert_named_predicate env p)
+	Error.handle do_it env)
       env
       b.b_requires
   in 
@@ -534,22 +537,25 @@ let convert_postconditions env behaviors =
     let assumes_pred = assumes_predicate b in
     List.fold_left
       (fun env (t, p) ->
-	if b.b_assigns <> WritesAny then 
-	  Error.not_yet "assigns clause in behavior";
-	if b.b_extended <> [] then 
-	  Error.not_yet "grammar extensions in behavior";
-	match t with
-	| Normal -> 
-	  let loc = p.ip_loc in
-	  let p = p.ip_content in
-	  let p = 
-	    Logic_const.pimplies 
-	      ~loc
-	      (Logic_const.pold ~loc assumes_pred, Logic_const.unamed ~loc p) 
-	  in
-	  convert_named_predicate env p
-	| Exits | Breaks | Continues | Returns ->
-	  Error.not_yet "@[abnormal termination case in behavior@]")
+	let do_it env =
+	  if b.b_assigns <> WritesAny then 
+	    Error.not_yet "assigns clause in behavior";
+	  if b.b_extended <> [] then 
+	    Error.not_yet "grammar extensions in behavior";
+	  match t with
+	  | Normal -> 
+	    let loc = p.ip_loc in
+	    let p = p.ip_content in
+	    let p = 
+	      Logic_const.pimplies 
+		~loc
+		(Logic_const.pold ~loc assumes_pred, Logic_const.unamed ~loc p) 
+	    in
+	    convert_named_predicate env p
+	  | Exits | Breaks | Continues | Returns ->
+	    Error.not_yet "@[abnormal termination case in behavior@]"
+	in
+	Error.handle do_it env)
       env
       b.b_post_cond
   in 

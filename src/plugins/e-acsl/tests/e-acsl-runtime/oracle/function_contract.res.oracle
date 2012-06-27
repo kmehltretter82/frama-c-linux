@@ -5,7 +5,7 @@
         X ∈ {0}
         Y ∈ {2}
 [value] computing for function f <- main.
-        Called from PROJECT_FILE.i:414.
+        Called from PROJECT_FILE.i:451.
 [value] computing for function e_acsl_assert <- f <- main.
         Called from PROJECT_FILE.i:247.
 PROJECT_FILE.i:231:[value] Function e_acsl_assert: precondition got status valid.
@@ -15,7 +15,7 @@ PROJECT_FILE.i:243:[value] Function f: postcondition got status valid.
 [value] Recording results for f
 [value] Done for function f
 [value] computing for function g <- main.
-        Called from PROJECT_FILE.i:415.
+        Called from PROJECT_FILE.i:452.
 [value] computing for function e_acsl_assert <- g <- main.
         Called from PROJECT_FILE.i:256.
 [value] Recording results for e_acsl_assert
@@ -29,7 +29,7 @@ PROJECT_FILE.i:252:[value] Function g: postcondition got status valid.
 [value] Recording results for g
 [value] Done for function g
 [value] computing for function h <- main.
-        Called from PROJECT_FILE.i:416.
+        Called from PROJECT_FILE.i:453.
 PROJECT_FILE.i:261:[value] Function h: precondition got status valid.
 [value] computing for function e_acsl_assert <- h <- main.
         Called from PROJECT_FILE.i:264.
@@ -38,7 +38,7 @@ PROJECT_FILE.i:261:[value] Function h: precondition got status valid.
 [value] Recording results for h
 [value] Done for function h
 [value] computing for function i <- main.
-        Called from PROJECT_FILE.i:417.
+        Called from PROJECT_FILE.i:454.
 PROJECT_FILE.i:269:[value] Function i: precondition got status valid.
 PROJECT_FILE.i:270:[value] Function i: precondition got status valid.
 [value] computing for function e_acsl_assert <- i <- main.
@@ -52,7 +52,7 @@ PROJECT_FILE.i:270:[value] Function i: precondition got status valid.
 [value] Recording results for i
 [value] Done for function i
 [value] computing for function j <- main.
-        Called from PROJECT_FILE.i:418.
+        Called from PROJECT_FILE.i:455.
 PROJECT_FILE.i:280:[value] Function j, behavior b1: precondition got status valid.
 PROJECT_FILE.i:284:[value] Function j, behavior b2: precondition got status valid.
 PROJECT_FILE.i:285:[value] Function j, behavior b2: precondition got status valid.
@@ -81,7 +81,7 @@ PROJECT_FILE.i:286:[value] Function j, behavior b2: postcondition got status val
 [value] Recording results for j
 [value] Done for function j
 [value] computing for function k <- main.
-        Called from PROJECT_FILE.i:419.
+        Called from PROJECT_FILE.i:456.
 PROJECT_FILE.i:305:[value] Function k, behavior b1: assumption got status invalid; precondition not evaluated.
 PROJECT_FILE.i:310:[value] Function k, behavior b2: precondition got status valid.
 PROJECT_FILE.i:311:[value] Function k, behavior b2: precondition got status valid.
@@ -100,7 +100,7 @@ PROJECT_FILE.i:311:[value] Function k, behavior b2: precondition got status vali
 [value] Recording results for k
 [value] Done for function k
 [value] computing for function l <- main.
-        Called from PROJECT_FILE.i:420.
+        Called from PROJECT_FILE.i:457.
 PROJECT_FILE.i:348:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- l <- main.
         Called from PROJECT_FILE.i:349.
@@ -114,7 +114,7 @@ PROJECT_FILE.i:345:[value] Function l: postcondition got status valid.
 [value] Recording results for l
 [value] Done for function l
 [value] computing for function m <- main.
-        Called from PROJECT_FILE.i:421.
+        Called from PROJECT_FILE.i:458.
 [value] computing for function e_acsl_assert <- m <- main.
         Called from PROJECT_FILE.i:394.
 [value] Recording results for e_acsl_assert
@@ -132,6 +132,30 @@ PROJECT_FILE.i:362:[value] Function m, behavior b2: postcondition got status val
 PROJECT_FILE.i:363:[value] Function m, behavior b2: postcondition got status valid.
 [value] Recording results for m
 [value] Done for function m
+[value] computing for function n <- main.
+        Called from PROJECT_FILE.i:459.
+PROJECT_FILE.i:411:[value] Function n: precondition got status valid.
+PROJECT_FILE.i:412:[value] Function n: precondition got status valid.
+[value] computing for function e_acsl_assert <- n <- main.
+        Called from PROJECT_FILE.i:427.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- n <- main.
+        Called from PROJECT_FILE.i:428.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- n <- main.
+        Called from PROJECT_FILE.i:437.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- n <- main.
+        Called from PROJECT_FILE.i:441.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+PROJECT_FILE.i:415:[value] Function n, behavior b1: postcondition got status valid.
+PROJECT_FILE.i:419:[value] Function n, behavior b2: assumes got status invalid; post-condition not evaluated.
+[value] Recording results for n
+[value] Done for function n
 [value] Recording results for main
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
@@ -155,8 +179,12 @@ PROJECT_FILE.i:363:[value] Function m, behavior b2: postcondition got status val
           __e_acsl_at_2 ∈ {1}
           __e_acsl_at_3 ∈ {1}
           __e_acsl_at_4 ∈ {5}
+[value] Values at end of function n:
+          X ∈ {8}
+          __e_acsl_at ∈ {1}
+          __e_acsl_at_2 ∈ {0}
 [value] Values at end of function main:
-          X ∈ {7}
+          X ∈ {8}
           __retres ∈ {0}
 /* Generated by Frama-C */
 struct __anonstruct___mpz_struct_1 {
@@ -356,6 +384,43 @@ void m(void)
   
 }
 
+/*@ requires X > 0;
+    requires X < 10;
+    behavior b1:
+      assumes X ≡ 7;
+      ensures X ≡ 8;
+      
+    behavior b2:
+      assumes X ≡ 5;
+      ensures X ≡ 98;
+      
+  
+*/
+void n(void)
+{
+  int __e_acsl_at;
+  int __e_acsl_at_2;
+  e_acsl_assert(X > 0,(char *)"Precondition",(char *)"(X > 0)",67);
+  e_acsl_assert(X < 10,(char *)"Precondition",(char *)"(X < 10)",68);
+  __e_acsl_at_2 = X == 5;
+  __e_acsl_at = X == 7;
+  X ++;
+  {
+    int __e_acsl_implies;
+    int __e_acsl_implies_2;
+    if (! __e_acsl_at) { __e_acsl_implies = 1; }
+    else { __e_acsl_implies = X == 8; }
+    e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",
+                  (char *)"(\\old(X == 7) ==> X == 8)",71);
+    if (! __e_acsl_at_2) { __e_acsl_implies_2 = 1; }
+    else { __e_acsl_implies_2 = X == 98; }
+    e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",
+                  (char *)"(\\old(X == 5) ==> X == 98)",74);
+    return;
+  }
+  
+}
+
 int main(void)
 {
   int __retres;
@@ -367,6 +432,7 @@ int main(void)
   k();
   l();
   m();
+  n();
   __retres = 0;
   return (__retres);
 }

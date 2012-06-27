@@ -5,7 +5,7 @@
         X ∈ {0}
         Y ∈ {2}
 [value] computing for function f <- main.
-        Called from PROJECT_FILE.i:697.
+        Called from PROJECT_FILE.i:792.
 [value] computing for function __gmpz_init_set_si <- f <- main.
         Called from PROJECT_FILE.i:251.
 [value] using specification for function __gmpz_init_set_si
@@ -37,7 +37,7 @@ PROJECT_FILE.i:243:[value] Function f: postcondition got status valid.
 [value] Recording results for f
 [value] Done for function f
 [value] computing for function g <- main.
-        Called from PROJECT_FILE.i:698.
+        Called from PROJECT_FILE.i:793.
 [value] computing for function __gmpz_init_set_si <- g <- main.
         Called from PROJECT_FILE.i:273.
 [value] Done for function __gmpz_init_set_si
@@ -75,7 +75,7 @@ PROJECT_FILE.i:263:[value] Function g: postcondition got status valid.
 [value] Recording results for g
 [value] Done for function g
 [value] computing for function h <- main.
-        Called from PROJECT_FILE.i:699.
+        Called from PROJECT_FILE.i:794.
 PROJECT_FILE.i:288:[value] Function h: precondition got status valid.
 [value] computing for function __gmpz_init_set_si <- h <- main.
         Called from PROJECT_FILE.i:295.
@@ -99,7 +99,7 @@ PROJECT_FILE.i:288:[value] Function h: precondition got status valid.
 [value] Recording results for h
 [value] Done for function h
 [value] computing for function i <- main.
-        Called from PROJECT_FILE.i:700.
+        Called from PROJECT_FILE.i:795.
 PROJECT_FILE.i:307:[value] Function i: precondition got status valid.
 PROJECT_FILE.i:308:[value] Function i: precondition got status valid.
 [value] computing for function __gmpz_init_set_si <- i <- main.
@@ -143,7 +143,7 @@ PROJECT_FILE.i:308:[value] Function i: precondition got status valid.
 [value] Recording results for i
 [value] Done for function i
 [value] computing for function j <- main.
-        Called from PROJECT_FILE.i:701.
+        Called from PROJECT_FILE.i:796.
 PROJECT_FILE.i:337:[value] Function j, behavior b1: precondition got status valid.
 PROJECT_FILE.i:341:[value] Function j, behavior b2: precondition got status valid.
 PROJECT_FILE.i:342:[value] Function j, behavior b2: precondition got status valid.
@@ -265,7 +265,7 @@ PROJECT_FILE.i:343:[value] Function j, behavior b2: postcondition got status val
 [value] Recording results for j
 [value] Done for function j
 [value] computing for function k <- main.
-        Called from PROJECT_FILE.i:702.
+        Called from PROJECT_FILE.i:797.
 PROJECT_FILE.i:411:[value] Function k, behavior b1: assumption got status invalid; precondition not evaluated.
 PROJECT_FILE.i:416:[value] Function k, behavior b2: precondition got status valid.
 PROJECT_FILE.i:417:[value] Function k, behavior b2: precondition got status valid.
@@ -402,7 +402,7 @@ PROJECT_FILE.i:446:[value] assigning non deterministic value for the first time
 [value] Recording results for k
 [value] Done for function k
 [value] computing for function l <- main.
-        Called from PROJECT_FILE.i:703.
+        Called from PROJECT_FILE.i:798.
 PROJECT_FILE.i:525:[value] Assertion got status valid.
 [value] computing for function __gmpz_init_set_si <- l <- main.
         Called from PROJECT_FILE.i:530.
@@ -446,7 +446,7 @@ PROJECT_FILE.i:522:[value] Function l: postcondition got status valid.
 [value] Recording results for l
 [value] Done for function l
 [value] computing for function m <- main.
-        Called from PROJECT_FILE.i:704.
+        Called from PROJECT_FILE.i:799.
 [value] computing for function __gmpz_init_set_si <- m <- main.
         Called from PROJECT_FILE.i:578.
 [value] Done for function __gmpz_init_set_si
@@ -599,6 +599,114 @@ PROJECT_FILE.i:561:[value] Function m, behavior b2: postcondition got status val
 PROJECT_FILE.i:562:[value] Function m, behavior b2: postcondition got status valid.
 [value] Recording results for m
 [value] Done for function m
+[value] computing for function n <- main.
+        Called from PROJECT_FILE.i:800.
+PROJECT_FILE.i:694:[value] Function n: precondition got status valid.
+PROJECT_FILE.i:695:[value] Function n: precondition got status valid.
+[value] computing for function __gmpz_init_set_si <- n <- main.
+        Called from PROJECT_FILE.i:716.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- n <- main.
+        Called from PROJECT_FILE.i:717.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- n <- main.
+        Called from PROJECT_FILE.i:718.
+[value] Done for function __gmpz_cmp
+[value] computing for function e_acsl_assert <- n <- main.
+        Called from PROJECT_FILE.i:719.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_init_set_si <- n <- main.
+        Called from PROJECT_FILE.i:720.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- n <- main.
+        Called from PROJECT_FILE.i:721.
+[value] Done for function __gmpz_cmp
+[value] computing for function e_acsl_assert <- n <- main.
+        Called from PROJECT_FILE.i:722.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_clear <- n <- main.
+        Called from PROJECT_FILE.i:723.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- n <- main.
+        Called from PROJECT_FILE.i:724.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- n <- main.
+        Called from PROJECT_FILE.i:725.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_init_set_si <- n <- main.
+        Called from PROJECT_FILE.i:730.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- n <- main.
+        Called from PROJECT_FILE.i:731.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- n <- main.
+        Called from PROJECT_FILE.i:732.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_clear <- n <- main.
+        Called from PROJECT_FILE.i:734.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- n <- main.
+        Called from PROJECT_FILE.i:735.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_init_set_si <- n <- main.
+        Called from PROJECT_FILE.i:742.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- n <- main.
+        Called from PROJECT_FILE.i:743.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- n <- main.
+        Called from PROJECT_FILE.i:744.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_clear <- n <- main.
+        Called from PROJECT_FILE.i:746.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- n <- main.
+        Called from PROJECT_FILE.i:747.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_init_set_si <- n <- main.
+        Called from PROJECT_FILE.i:761.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- n <- main.
+        Called from PROJECT_FILE.i:762.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- n <- main.
+        Called from PROJECT_FILE.i:763.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_clear <- n <- main.
+        Called from PROJECT_FILE.i:765.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- n <- main.
+        Called from PROJECT_FILE.i:766.
+[value] Done for function __gmpz_clear
+[value] computing for function e_acsl_assert <- n <- main.
+        Called from PROJECT_FILE.i:768.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_init_set_si <- n <- main.
+        Called from PROJECT_FILE.i:775.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- n <- main.
+        Called from PROJECT_FILE.i:776.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- n <- main.
+        Called from PROJECT_FILE.i:777.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_clear <- n <- main.
+        Called from PROJECT_FILE.i:779.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- n <- main.
+        Called from PROJECT_FILE.i:780.
+[value] Done for function __gmpz_clear
+[value] computing for function e_acsl_assert <- n <- main.
+        Called from PROJECT_FILE.i:782.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+PROJECT_FILE.i:698:[value] Function n, behavior b1: postcondition got status valid.
+PROJECT_FILE.i:702:[value] Function n, behavior b2: assumes got status invalid; post-condition not evaluated.
+[value] Recording results for n
+[value] Done for function n
 [value] Recording results for main
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
@@ -622,8 +730,12 @@ PROJECT_FILE.i:562:[value] Function m, behavior b2: postcondition got status val
           __e_acsl_at_2 ∈ {0; 1}
           __e_acsl_at_3 ∈ {0; 1}
           __e_acsl_at_4 ∈ {5}
+[value] Values at end of function n:
+          X ∈ {8}
+          __e_acsl_at ∈ {0; 1}
+          __e_acsl_at_2 ∈ {0; 1}
 [value] Values at end of function main:
-          X ∈ {7}
+          X ∈ {8}
           __retres ∈ {0}
 /* Generated by Frama-C */
 struct __anonstruct___mpz_struct_1 {
@@ -1192,6 +1304,109 @@ void m(void)
   
 }
 
+/*@ requires X > 0;
+    requires X < 10;
+    behavior b1:
+      assumes X ≡ 7;
+      ensures X ≡ 8;
+      
+    behavior b2:
+      assumes X ≡ 5;
+      ensures X ≡ 98;
+      
+  
+*/
+void n(void)
+{
+  int __e_acsl_at;
+  int __e_acsl_at_2;
+  {
+    mpz_t __e_acsl_X;
+    mpz_t __e_acsl;
+    int __e_acsl_gt;
+    mpz_t __e_acsl_2;
+    int __e_acsl_lt;
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_X),(long)X);
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl),(long)0);
+    __e_acsl_gt = __gmpz_cmp((__mpz_struct const *)(__e_acsl_X),
+                             (__mpz_struct const *)(__e_acsl));
+    e_acsl_assert(__e_acsl_gt > 0,(char *)"Precondition",(char *)"(X > 0)",
+                  67);
+    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_2),(long)10);
+    __e_acsl_lt = __gmpz_cmp((__mpz_struct const *)(__e_acsl_X),
+                             (__mpz_struct const *)(__e_acsl_2));
+    e_acsl_assert(__e_acsl_lt < 0,(char *)"Precondition",(char *)"(X < 10)",
+                  68);
+    __gmpz_clear((__mpz_struct *)(__e_acsl_X));
+    __gmpz_clear((__mpz_struct *)(__e_acsl));
+    __gmpz_clear((__mpz_struct *)(__e_acsl_2));
+    {
+      mpz_t __e_acsl_X_4;
+      mpz_t __e_acsl_5;
+      int __e_acsl_eq_3;
+      __gmpz_init_set_si((__mpz_struct *)(__e_acsl_X_4),(long)X);
+      __gmpz_init_set_si((__mpz_struct *)(__e_acsl_5),(long)5);
+      __e_acsl_eq_3 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_X_4),
+                                 (__mpz_struct const *)(__e_acsl_5));
+      __e_acsl_at_2 = __e_acsl_eq_3 == 0;
+      __gmpz_clear((__mpz_struct *)(__e_acsl_X_4));
+      __gmpz_clear((__mpz_struct *)(__e_acsl_5));
+    }
+    
+    {
+      mpz_t __e_acsl_X_2;
+      mpz_t __e_acsl_3;
+      int __e_acsl_eq;
+      __gmpz_init_set_si((__mpz_struct *)(__e_acsl_X_2),(long)X);
+      __gmpz_init_set_si((__mpz_struct *)(__e_acsl_3),(long)7);
+      __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl_X_2),
+                               (__mpz_struct const *)(__e_acsl_3));
+      __e_acsl_at = __e_acsl_eq == 0;
+      __gmpz_clear((__mpz_struct *)(__e_acsl_X_2));
+      __gmpz_clear((__mpz_struct *)(__e_acsl_3));
+    }
+    
+    X ++;
+  }
+  
+  {
+    int __e_acsl_implies;
+    int __e_acsl_implies_2;
+    if (! __e_acsl_at) { __e_acsl_implies = 1; }
+    else {
+      mpz_t __e_acsl_X_3;
+      mpz_t __e_acsl_4;
+      int __e_acsl_eq_2;
+      __gmpz_init_set_si((__mpz_struct *)(__e_acsl_X_3),(long)X);
+      __gmpz_init_set_si((__mpz_struct *)(__e_acsl_4),(long)8);
+      __e_acsl_eq_2 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_X_3),
+                                 (__mpz_struct const *)(__e_acsl_4));
+      __e_acsl_implies = __e_acsl_eq_2 == 0;
+      __gmpz_clear((__mpz_struct *)(__e_acsl_X_3));
+      __gmpz_clear((__mpz_struct *)(__e_acsl_4));
+    }
+    e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",
+                  (char *)"(\\old(X == 7) ==> X == 8)",71);
+    if (! __e_acsl_at_2) { __e_acsl_implies_2 = 1; }
+    else {
+      mpz_t __e_acsl_X_5;
+      mpz_t __e_acsl_6;
+      int __e_acsl_eq_4;
+      __gmpz_init_set_si((__mpz_struct *)(__e_acsl_X_5),(long)X);
+      __gmpz_init_set_si((__mpz_struct *)(__e_acsl_6),(long)98);
+      __e_acsl_eq_4 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_X_5),
+                                 (__mpz_struct const *)(__e_acsl_6));
+      __e_acsl_implies_2 = __e_acsl_eq_4 == 0;
+      __gmpz_clear((__mpz_struct *)(__e_acsl_X_5));
+      __gmpz_clear((__mpz_struct *)(__e_acsl_6));
+    }
+    e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",
+                  (char *)"(\\old(X == 5) ==> X == 98)",74);
+    return;
+  }
+  
+}
+
 int main(void)
 {
   int __retres;
@@ -1203,6 +1418,7 @@ int main(void)
   k();
   l();
   m();
+  n();
   __retres = 0;
   return (__retres);
 }
