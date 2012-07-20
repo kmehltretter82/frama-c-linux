@@ -34,9 +34,6 @@ int main(void)
   /*@ assert sizeof(int) ≡ sizeof(x); */ ;
   e_acsl_assert(4 == 4,(char *)"Assertion",
                 (char *)"(sizeof(int) == sizeof(x))",9);
-  /*@ assert sizeof("totototototo") ≡ sizeof(char *); */ ;
-  e_acsl_assert(4 == 4,(char *)"Assertion",
-                (char *)"(sizeof(\"totototototo\") == sizeof(char *))",10);
   __retres = 0;
   return (__retres);
 }

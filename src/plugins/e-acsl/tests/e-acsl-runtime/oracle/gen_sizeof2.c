@@ -64,21 +64,6 @@ int main(void)
     __gmpz_clear((__mpz_struct *)(__e_acsl_sizeof_2));
   }
   
-  /*@ assert sizeof("totototototo") ≡ sizeof(char *); */ ;
-  {
-    mpz_t __e_acsl_sizeof_3;
-    mpz_t __e_acsl_sizeof_4;
-    int __e_acsl_eq_2;
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_sizeof_3),(long)4);
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_sizeof_4),(long)4);
-    __e_acsl_eq_2 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_sizeof_3),
-                               (__mpz_struct const *)(__e_acsl_sizeof_4));
-    e_acsl_assert(__e_acsl_eq_2 == 0,(char *)"Assertion",
-                  (char *)"(sizeof(\"totototototo\") == sizeof(char *))",10);
-    __gmpz_clear((__mpz_struct *)(__e_acsl_sizeof_3));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_sizeof_4));
-  }
-  
   __retres = 0;
   return (__retres);
 }

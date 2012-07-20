@@ -30,26 +30,6 @@ PROJECT_FILE.i:120:[value] Function __gmpz_clear: precondition got status valid.
 [value] computing for function __gmpz_clear <- main.
         Called from PROJECT_FILE.i:257.
 [value] Done for function __gmpz_clear
-PROJECT_FILE.i:261:[value] Assertion got status valid.
-[value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:266.
-[value] Done for function __gmpz_init_set_si
-[value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:267.
-[value] Done for function __gmpz_init_set_si
-[value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:268.
-[value] Done for function __gmpz_cmp
-[value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:269.
-[value] Recording results for e_acsl_assert
-[value] Done for function e_acsl_assert
-[value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:271.
-[value] Done for function __gmpz_clear
-[value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:272.
-[value] Done for function __gmpz_clear
 [value] Recording results for main
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
@@ -124,21 +104,6 @@ int main(void)
                   (char *)"(sizeof(int) == sizeof(x))",9);
     __gmpz_clear((__mpz_struct *)(__e_acsl_sizeof));
     __gmpz_clear((__mpz_struct *)(__e_acsl_sizeof_2));
-  }
-  
-  /*@ assert sizeof("totototototo") ≡ sizeof(char *); */ ;
-  {
-    mpz_t __e_acsl_sizeof_3;
-    mpz_t __e_acsl_sizeof_4;
-    int __e_acsl_eq_2;
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_sizeof_3),(long)4);
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_sizeof_4),(long)4);
-    __e_acsl_eq_2 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_sizeof_3),
-                               (__mpz_struct const *)(__e_acsl_sizeof_4));
-    e_acsl_assert(__e_acsl_eq_2 == 0,(char *)"Assertion",
-                  (char *)"(sizeof(\"totototototo\") == sizeof(char *))",10);
-    __gmpz_clear((__mpz_struct *)(__e_acsl_sizeof_3));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_sizeof_4));
   }
   
   __retres = 0;

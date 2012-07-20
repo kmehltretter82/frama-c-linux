@@ -7,6 +7,6 @@
 int main(void) {
   int x = 0;
   /*@ assert sizeof(int) == sizeof(x); */ ;
-  /*@ assert sizeof("totototototo") == sizeof(char *); */ ;
+  //  /*@ assert sizeof("totototototo") == sizeof(char *); */ ;
   return 0;
 }
