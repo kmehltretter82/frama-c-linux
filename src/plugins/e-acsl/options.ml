@@ -35,7 +35,6 @@ module Check =
     (struct
       let option_name = "-e-acsl-check"
       let help = "only type check E-ACSL annotated program"
-      let kind = `Correctness
      end)
 
 module Run =
@@ -44,8 +43,6 @@ module Run =
       let option_name = "-e-acsl"
       let help = "generate a new project where E-ACSL annotations are \
 translated to executable C code"
-      let kind = `Correctness
-      let arg_name = "prj"
      end)
 
 module Project_name =
@@ -54,7 +51,6 @@ module Project_name =
       let option_name = "-e-acsl-project"
       let help = "the name of the generated project is <prj> \
 (default to \"e-acsl\")"
-      let kind = `Correctness
       let default = "e-acsl"
       let arg_name = "prj"
      end)
@@ -64,7 +60,6 @@ module Gmp_only =
     (struct
       let option_name = "-e-acsl-gmp-only"
       let help = ""
-      let kind = `Correctness
      end)
 
 let () = Plugin.set_group help
@@ -73,7 +68,6 @@ module Version =
     (struct
       let option_name = "-e-acsl-version"
       let help = "version of plug-in E-ACSL"
-      let kind = `Tuning
      end)
 
 let version () =

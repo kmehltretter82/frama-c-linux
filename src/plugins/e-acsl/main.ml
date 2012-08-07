@@ -50,7 +50,6 @@ module Resulting_projects =
     (struct
       let name = "E-ACSL resulting projects"
       let size = 7
-      let kind = `Correctness
       let dependencies = [ Ast.self ]
      end)
 

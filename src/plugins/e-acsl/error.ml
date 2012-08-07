@@ -33,7 +33,6 @@ module Nb_typing =
       let name = "E_ACSL.Error.Nb_typing"
       let default () = 0
       let dependencies = [ Ast.self ]
-      let kind = `Correctness
      end)
 
 let nb_untypable = Nb_typing.get
@@ -45,7 +44,6 @@ module Nb_not_yet =
       let name = "E_ACSL.Error.Nb_not_yet"
       let default () = 0
       let dependencies = [ Ast.self ]
-      let kind = `Correctness
      end)
 
 let nb_not_yet = Nb_not_yet.get
