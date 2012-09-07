@@ -694,7 +694,6 @@ extern void __gmpz_init(__mpz_struct * /*[1]*/ z);
 extern void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z, long n);
 /*@ requires \valid(z_orig);
     requires \valid(z);
-    allocates \nothing;
     assigns *z;
     assigns *z \from *z_orig;
   
@@ -708,16 +707,12 @@ extern void __gmpz_set(__mpz_struct * /*[1]*/ z,
 extern void __gmpz_clear(__mpz_struct * /*[1]*/ x);
 /*@ requires \valid(z1);
     requires \valid(z2);
-    allocates \nothing;
-    assigns \nothing;
-  
-*/
+    assigns \nothing;  */
 extern int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
                       __mpz_struct const * /*[1]*/ z2);
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
-    allocates \nothing;
     assigns *z1;
     assigns *z1 \from *z2, *z3;
   
@@ -728,7 +723,6 @@ extern void __gmpz_add(__mpz_struct * /*[1]*/ z1,
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
-    allocates \nothing;
     assigns *z1;
     assigns *z1 \from *z2, *z3;
   
@@ -739,7 +733,6 @@ extern void __gmpz_mul(__mpz_struct * /*[1]*/ z1,
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
-    allocates \nothing;
     assigns *z1;
     assigns *z1 \from *z2, *z3;
   
@@ -750,7 +743,6 @@ extern void __gmpz_tdiv_q(__mpz_struct * /*[1]*/ z1,
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
-    allocates \nothing;
     assigns *z1;
     assigns *z1 \from *z2, *z3;
   

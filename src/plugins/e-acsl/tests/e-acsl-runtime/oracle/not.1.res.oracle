@@ -62,10 +62,7 @@ extern void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z, long n);
 extern void __gmpz_clear(__mpz_struct * /*[1]*/ x);
 /*@ requires \valid(z1);
     requires \valid(z2);
-    allocates \nothing;
-    assigns \nothing;
-  
-*/
+    assigns \nothing;  */
 extern int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
                       __mpz_struct const * /*[1]*/ z2);
 /*@ terminates \false;
