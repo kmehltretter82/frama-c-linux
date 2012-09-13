@@ -60,27 +60,27 @@ int main(void)
         mpz_t __e_acsl_i;
         int __e_acsl_le;
         int __e_acsl_and;
-        __gmpz_init_set_si((__mpz_struct *)(__e_acsl),(long)0);
-        __gmpz_init_set_si((__mpz_struct *)(__e_acsl_i),(long)i);
+        __gmpz_init_set_si(__e_acsl,(long)0);
+        __gmpz_init_set_si(__e_acsl_i,(long)i);
         __e_acsl_le = __gmpz_cmp((__mpz_struct const *)(__e_acsl),
                                  (__mpz_struct const *)(__e_acsl_i));
         if (__e_acsl_le <= 0) {
           mpz_t __e_acsl_i_2;
           mpz_t __e_acsl_2;
           int __e_acsl_lt;
-          __gmpz_init_set_si((__mpz_struct *)(__e_acsl_i_2),(long)i);
-          __gmpz_init_set_si((__mpz_struct *)(__e_acsl_2),(long)10);
+          __gmpz_init_set_si(__e_acsl_i_2,(long)i);
+          __gmpz_init_set_si(__e_acsl_2,(long)10);
           __e_acsl_lt = __gmpz_cmp((__mpz_struct const *)(__e_acsl_i_2),
                                    (__mpz_struct const *)(__e_acsl_2));
           __e_acsl_and = __e_acsl_lt < 0;
-          __gmpz_clear((__mpz_struct *)(__e_acsl_i_2));
-          __gmpz_clear((__mpz_struct *)(__e_acsl_2));
+          __gmpz_clear(__e_acsl_i_2);
+          __gmpz_clear(__e_acsl_2);
         }
         else { __e_acsl_and = 0; }
         e_acsl_assert(__e_acsl_and,(char *)"Invariant",
                       (char *)"(0 <= i && i < 10)",9);
-        __gmpz_clear((__mpz_struct *)(__e_acsl));
-        __gmpz_clear((__mpz_struct *)(__e_acsl_i));
+        __gmpz_clear(__e_acsl);
+        __gmpz_clear(__e_acsl_i);
       }
       
       x += i;
@@ -89,14 +89,14 @@ int main(void)
         mpz_t __e_acsl_i_3;
         mpz_t __e_acsl_x;
         int __e_acsl_le_2;
-        __gmpz_init_set_si((__mpz_struct *)(__e_acsl_i_3),(long)i);
-        __gmpz_init_set_si((__mpz_struct *)(__e_acsl_x),(long)x);
+        __gmpz_init_set_si(__e_acsl_i_3,(long)i);
+        __gmpz_init_set_si(__e_acsl_x,(long)x);
         __e_acsl_le_2 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_i_3),
                                    (__mpz_struct const *)(__e_acsl_x));
         e_acsl_assert(__e_acsl_le_2 <= 0,(char *)"Invariant",
                       (char *)"(i <= x)",11);
-        __gmpz_clear((__mpz_struct *)(__e_acsl_i_3));
-        __gmpz_clear((__mpz_struct *)(__e_acsl_x));
+        __gmpz_clear(__e_acsl_i_3);
+        __gmpz_clear(__e_acsl_x);
       }
       
       i ++;

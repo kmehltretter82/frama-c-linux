@@ -58,12 +58,12 @@ int main(void)
   {
     mpz_t __e_acsl;
     int __e_acsl_eq;
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl),(long)'c');
+    __gmpz_init_set_si(__e_acsl,(long)'c');
     __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl),
                              (__mpz_struct const *)(__e_acsl));
     e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",
                   (char *)"(\'c\' == \'c\')",11);
-    __gmpz_clear((__mpz_struct *)(__e_acsl));
+    __gmpz_clear(__e_acsl);
   }
   
   /*@ assert false ≢ true; */ ;
@@ -71,14 +71,14 @@ int main(void)
     mpz_t __e_acsl_2;
     mpz_t __e_acsl_3;
     int __e_acsl_ne;
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_2),(long)false);
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_3),(long)true);
+    __gmpz_init_set_si(__e_acsl_2,(long)false);
+    __gmpz_init_set_si(__e_acsl_3,(long)true);
     __e_acsl_ne = __gmpz_cmp((__mpz_struct const *)(__e_acsl_2),
                              (__mpz_struct const *)(__e_acsl_3));
     e_acsl_assert(__e_acsl_ne != 0,(char *)"Assertion",
                   (char *)"(false != true)",12);
-    __gmpz_clear((__mpz_struct *)(__e_acsl_2));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_3));
+    __gmpz_clear(__e_acsl_2);
+    __gmpz_clear(__e_acsl_3);
   }
   
   __retres = 0;

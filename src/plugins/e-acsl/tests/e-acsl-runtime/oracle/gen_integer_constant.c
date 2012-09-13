@@ -36,8 +36,7 @@ int main(void)
   /*@ assert 0 ≢ 1; */ ;
   e_acsl_assert(0 != 1,(char *)"Assertion",(char *)"(0 != 1)",10);
   /*@ assert 1152921504606846975 ≡ 0xfffffffffffffff; */ ;
-  e_acsl_assert((unsigned long long)1152921504606846975 == (unsigned long long)0xfffffffffffffff,
-                (char *)"Assertion",
+  e_acsl_assert(1152921504606846975 == 0xfffffffffffffff,(char *)"Assertion",
                 (char *)"(1152921504606846975 == 0xfffffffffffffff)",11);
   __retres = 0;
   return (__retres);

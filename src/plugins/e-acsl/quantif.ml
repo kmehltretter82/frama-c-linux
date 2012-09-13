@@ -142,7 +142,7 @@ let convert env loc is_forall p bounded_vars hyps goal =
     | (t1, rel1, logic_x, rel2, t2) :: tl ->
       let t_plus_one t =
 	Logic_const.term ~loc
-	  (TBinOp(PlusA, t, Logic_const.tinteger ~loc ~ikind:IChar 1))
+	  (TBinOp(PlusA, t, Logic_const.tinteger ~loc 1))
 	  Linteger
       in
       let t1 = match rel1 with

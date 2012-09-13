@@ -54,14 +54,14 @@ int main(void)
     mpz_t __e_acsl_sizeof;
     mpz_t __e_acsl_sizeof_2;
     int __e_acsl_eq;
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_sizeof),(long)4);
-    __gmpz_init_set_si((__mpz_struct *)(__e_acsl_sizeof_2),(long)4);
+    __gmpz_init_set_si(__e_acsl_sizeof,(long)4);
+    __gmpz_init_set_si(__e_acsl_sizeof_2,(long)4);
     __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl_sizeof),
                              (__mpz_struct const *)(__e_acsl_sizeof_2));
     e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",
                   (char *)"(sizeof(int) == sizeof(x))",9);
-    __gmpz_clear((__mpz_struct *)(__e_acsl_sizeof));
-    __gmpz_clear((__mpz_struct *)(__e_acsl_sizeof_2));
+    __gmpz_clear(__e_acsl_sizeof);
+    __gmpz_clear(__e_acsl_sizeof_2);
   }
   
   __retres = 0;

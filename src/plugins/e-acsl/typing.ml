@@ -26,14 +26,14 @@ open Cil_datatype
 
 module BI = My_bigint
 
-let is_representable n k _s = 
-  (* [TODO] these two different behaviors seem to be quite strange here... *)
+let is_representable n k = 
   if Options.Gmp_only.get () then
     match k with
     | IBool | IChar | ISChar | IUChar | IInt | IUInt | IShort | IUShort 
     | ILong | IULong ->
       true
     | ILongLong | IULongLong ->
+      (* no GMP initializer from a long long *)
       false
   else
     BI.ge n BI.min_int64 && BI.le n BI.max_int64
@@ -48,16 +48,31 @@ type eacsl_typ =
   | No_integral of logic_type
 
 exception Not_representable
+
+let typ_of_integer i unsigned = 
+  (* int whenever possible *)
+  if fitsInInt IInt i then IInt
+  else
+    if unsigned then begin
+      if fitsInInt IUInt i then IUInt
+      else if fitsInInt IULong i then IULong
+      else if fitsInInt IULongLong i then IULongLong
+      else raise Not_representable
+    end else
+      if fitsInInt ILong i then ILong
+      else if fitsInInt ILongLong i then ILongLong
+      else raise Not_representable
+
 let typ_of_eacsl_typ = function
   | Interv(l, u) -> 
     let is_pos = BI.ge l BI.zero in
     (try 
        let mk n k = 
-	 if true || is_representable n k false then TInt(k, []) 
+	 if is_representable n k then TInt(k, []) 
 	 else raise Not_representable
        in
-       let ty_l = mk l (intKindForValue l is_pos) in
-       let ty_u = mk u (intKindForValue u is_pos) in
+       let ty_l = mk l (typ_of_integer l is_pos) in
+       let ty_u = mk u (typ_of_integer u is_pos) in
        arithmeticConversion ty_l ty_u
      with Not_found | Not_representable -> 
        Mpz.t)
@@ -162,10 +177,13 @@ let clear () =
 (** Typing rules *)
 (******************************************************************************)
 
-let rec type_constant ty = function
-  | CInt64(n, _, _) -> Interv(n, n)
-  | CChr c -> type_constant ty (charConstToInt c)
-  | CStr _ | CWStr _ | CReal _ | CEnum _ -> No_integral ty
+let type_constant ty = function
+  | Integer(n, _) -> Interv(n, n)
+  | LChr c -> 
+    (match charConstToInt c with
+    | CInt64(n, _, _) -> Interv(n, n)
+    | _ -> assert false)
+  | LStr _ | LWStr _ | LReal _ | LEnum _ -> No_integral ty
 
 let size_of ty =
   try int_to_interv (sizeOf_int ty)

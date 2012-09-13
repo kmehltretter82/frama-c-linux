@@ -26,6 +26,12 @@ open Cil_types
 (** {2 Typing} *)
 (******************************************************************************)
 
+exception Not_representable
+val typ_of_integer: My_bigint.t -> bool -> ikind
+(** Compute the best type of a bigint. The boolean must be [true] for unsigned
+    and [false] for signed.
+    @raise Not_representable if the integer does not fit in any C type. *)
+
 val type_named_predicate: predicate named -> unit
 (** Compute the type of each term of the given predicate. *)
 
@@ -58,9 +64,8 @@ val context_sensitive:
     any, is a term denoting by [e]. [is_mpz_string] is [true] iff [e] is a
     string denoting a MPZ integer. *)
 
-val is_representable: My_bigint.t -> ikind -> string option -> bool
-(** Is the given constant representable?
-    (See [Cil_types.CInt64] for details about arguments *)
+val is_representable: My_bigint.t -> ikind -> bool
+(** Is the given constant representable? *)
 
 (******************************************************************************)
 (** {2 Internal stuff} *)

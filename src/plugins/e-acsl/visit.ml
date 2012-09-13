@@ -67,11 +67,18 @@ let name_of_mpz_arith_bop = function
   | Shiftlt | Shiftrt | PlusPI | IndexPI | MinusPI | MinusPP -> assert false
 
 let constant_to_exp ?(loc=Location.unknown) = function
-  | CInt64(n, k, s) ->
-    if Typing.is_representable n k s then kinteger64_repr ?loc k n s, false
-    else mkString ?loc (My_bigint.to_string n), true
-  | CStr _ | CWStr _ | CChr _ | CReal _ | CEnum _ as c -> 
-    new_exp ?loc (Const c), false
+  | Integer(n, s) ->
+    (try
+       let k = Typing.typ_of_integer n (My_bigint.ge n My_bigint.zero) in
+       if Typing.is_representable n k then kinteger64_repr ?loc k n s, false
+       else raise Typing.Not_representable
+     with Typing.Not_representable ->
+       mkString ?loc (My_bigint.to_string n), true)
+  | LStr s -> new_exp ?loc (Const (CStr s)), false
+  | LWStr s -> new_exp ?loc (Const (CWStr s)), false
+  | LChr c -> new_exp ?loc (Const (CChr c)), false
+  | LReal _ -> Error.not_yet "real"
+  | LEnum e -> new_exp ?loc (Const (CEnum e)), false
 
 let conditional_to_exp ?(name="if") loc ctx e1 (e2, env2) (e3, env3) =
   let env = Env.pop (Env.pop env3) in
@@ -186,7 +193,7 @@ and context_insensitive_term_to_exp env t =
     let ty = Typing.typ_of_term t in
     if Mpz.is_t ty then
       (* [!t] is converted into [t == 0] *)
-      let zero = Logic_const.tinteger ~ikind:IInt 0 in
+      let zero = Logic_const.tinteger 0 in
       let e, env = comparison_to_exp ~loc ~name:"not" env Eq t zero (Some t) in
       e, env, false, ""
     else begin
@@ -215,7 +222,7 @@ and context_insensitive_term_to_exp env t =
     (* [TODO] can now do better since the type system got some info about
        possible values of [t2] *)
     (* guarding divisions and modulos *)
-    let zero = Logic_const.tinteger ~ikind:IInt 0 in
+    let zero = Logic_const.tinteger 0 in
     (* do not generate [e2] from [t2] twice *)
     let guard, env = 
       let name = name_of_binop bop ^ "_guard" in

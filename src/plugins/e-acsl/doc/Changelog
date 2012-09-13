@@ -15,7 +15,8 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
-- E-ACSL	[2012/01/25] nicer generated variable names.
+* E-ACSL        [2012/09/13] Fix bug with very long ACSL integer constants.
+- E-ACSL	[2012/01/25] Nicer generated variable names.
 * E-ACSL	[2012/01/23] Function __gmp_com was wrongly named in
 	        E_ACSL C header.
 - E-ACSL	[2012/01/20] Use GMP arithmetics only when required
