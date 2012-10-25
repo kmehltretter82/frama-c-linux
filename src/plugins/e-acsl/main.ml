@@ -58,11 +58,9 @@ let () = Env.global_state := Resulting_projects.self
 let generate_code =
   Resulting_projects.memo
     (fun name ->
-      let visit prj = 
-	Project.on prj Kernel.Keep_unused_specified_functions.off ();
-	Visit.do_visit ~prj true;
-      in
-      File.create_rebuilt_project_from_visitor ~preprocess:false name visit)
+      Pre_analysis.reset ();
+      let visit prj = Visit.do_visit ~prj true in
+      File.create_project_from_visitor(* ~preprocess:false*) name visit)
 
 let generate_code =
   Dynamic.register
@@ -72,8 +70,25 @@ let generate_code =
     (Datatype.func Datatype.string Project.ty)
     generate_code
 
+let add_e_acsl_library () =
+  if Options.must_visit () then begin
+    Kernel.CppExtraArgs.add (Pretty_utils.sfprintf " -I%s/libc" Config.datadir);
+    Kernel.Keep_unused_specified_functions.off ();
+    let register s =
+      File.pre_register
+	(File.NeedCPP 
+	   (s, 
+	    File.get_preprocessor_command () 
+	    ^ Pretty_utils.sfprintf " -I%s" (Options.Share.dir ~error:true ())))
+    in
+    List.iter register (Misc.library_files ())
+  end
+ 
+let () = Cmdline.run_after_configuring_stage add_e_acsl_library
+
 let main () =
-  if Options.Run.get () then 
+  if Options.must_visit () then Pre_analysis.init_mpz ();
+  if Options.Run.get () then
     ignore (generate_code (Options.Project_name.get ()))
   else
     if Options.Check.get () then ignore (check ())

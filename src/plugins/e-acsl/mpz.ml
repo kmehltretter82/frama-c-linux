@@ -24,20 +24,23 @@ open Cil_types
 open Cil_datatype
 open Cil
 
-let t_torig =
-  { torig_name = "mpz_t";
-    tname = "mpz_t";
-    ttype = TVoid [] (* incorrect but does not matter *);
-    treferenced = false }
+let t_torig_ref =
+  ref 
+    { torig_name = "";
+      tname = "";
+      ttype = TVoid [];
+      treferenced = false }
 
-let is_now_referenced () = t_torig.treferenced <- true
+let set_t ty = t_torig_ref := ty
 
-let t = TNamed(t_torig, [])
-let is_t ty = Cil_datatype.Typ.equal ty t
+let is_now_referenced () = !t_torig_ref.treferenced <- true
 
-let apply_on_var funname e = Misc.mk_call ("__gmpz_" ^ funname) [ e ]
-let init = apply_on_var "init"
-let clear = apply_on_var "clear"
+let t () = TNamed(!t_torig_ref, [])
+let is_t ty = Cil_datatype.Typ.equal ty (t ())
+
+let apply_on_var ?loc funname e = Misc.mk_call ?loc ("__gmpz_" ^ funname) [ e ]
+let init ?loc e = apply_on_var "init" ?loc e
+let clear ?loc e = apply_on_var "clear" ? loc e
 
 let get_set_suffix_and_arg e = 
   let ty = typeOf e in
@@ -56,16 +59,16 @@ let get_set_suffix_and_arg e =
       [ e; integer ~loc:Location.unknown 10 ]
     | _ -> assert false
 
-let generic_affect fname lv ev e =
+let generic_affect ?loc fname lv ev e =
   let ty = typeOf ev in
   if is_t ty then 
     let suf, args = get_set_suffix_and_arg e in
-    Misc.mk_call (fname ^ suf) (ev :: args)
+    Misc.mk_call ?loc (fname ^ suf) (ev :: args)
   else
     mkStmtOneInstr ~valid_sid:true (Set(lv, e, Location.unknown))
 
-let init_set = generic_affect "__gmpz_init_set"
-let affect = generic_affect "__gmpz_set"
+let init_set ?loc lv ev e = generic_affect ?loc "__gmpz_init_set" lv ev e
+let affect ?loc lv ev e = generic_affect ?loc "__gmpz_set" lv ev e
 
 (*
 Local Variables:

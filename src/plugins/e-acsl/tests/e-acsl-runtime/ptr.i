@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: pointers and pointer arithmetic
-   EXECNOW: LOG gen_ptr.c BIN gen_ptr.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/ptr.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_ptr.c > /dev/null && gcc -pedantic -Wno-long-long -o ./tests/e-acsl-runtime/result/gen_ptr.out ./tests/e-acsl-runtime/result/gen_ptr.c -lgmp && ./tests/e-acsl-runtime/result/gen_ptr.out
-   EXECNOW: LOG gen_ptr2.c BIN gen_ptr2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/ptr.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_ptr2.c > /dev/null && gcc -pedantic -Wno-long-long -o ./tests/e-acsl-runtime/result/gen_ptr2.out ./tests/e-acsl-runtime/result/gen_ptr2.c -lgmp && ./tests/e-acsl-runtime/result/gen_ptr2.out
+   EXECNOW: LOG gen_ptr.c BIN gen_ptr.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/ptr.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_ptr.c > /dev/null && ./gcc_test.sh ptr
+   EXECNOW: LOG gen_ptr2.c BIN gen_ptr2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/ptr.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_ptr2.c > /dev/null && ./gcc_test.sh ptr2
 */
 
 int main(void) {
@@ -16,9 +16,9 @@ int main(void) {
   /*@ assert *(t+2*sizeof(int)/sizeof((int)0x0)) == 4; */
 
   for(int i = 0; i < 2; i++) {
-       /*@ assert (*(t+i) == i+2); */ ;
-       /*@ assert (*(t+(2-i)) == 4-i); */ ;
-       /*@ assert (*(t+2-i) == 4-i); */ ;
+    /*@ assert (*(t+i) == i+2); */ ;
+    /*@ assert (*(t+(2-i)) == 4-i); */ ;
+    /*@ assert (*(t+2-i) == 4-i); */ ;
     ;
   }
 

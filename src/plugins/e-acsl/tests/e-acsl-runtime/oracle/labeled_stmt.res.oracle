@@ -1,27 +1,55 @@
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -I/usr/local/share/frama-c/libc ./share/e-acsl/e_acsl_gmp_types.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -I/usr/local/share/frama-c/libc ./share/e-acsl/e_acsl_gmp.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -I/usr/local/share/frama-c/libc ./share/e-acsl/e_acsl.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -I/usr/local/share/frama-c/libc ./share/e-acsl/memory_model/e_acsl_mmodel_api.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -I/usr/local/share/frama-c/libc ./share/e-acsl/memory_model/e_acsl_bittree.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -I/usr/local/share/frama-c/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
+        __fc_random_counter ∈ {0}
+        __fc_rand_max ∈ {2147483647}
+        __fc_heap_status ∈ [--..--]
+        __fc_stdout ∈ {{ NULL ; &S___fc_stdout }}
         X ∈ {0}
-PROJECT_FILE.i:248:[value] Assertion got status valid.
+        S___fc_stdout[0].__fc_stdio_fpos ∈ [--..--]
+                     [0].__fc_stdio_buffer ∈
+                     {{ NULL ; &S___fc_stdio_buffer_0_S___fc_stdout }}
+                     [0]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
+                     [0].[bits 80 to 95] ∈ UNINITIALIZED
+                     {[0].__fc_stdio_id; [1].__fc_stdio_fpos; } ∈ [--..--]
+                     [1].__fc_stdio_buffer ∈
+                     {{ NULL ; &S___fc_stdio_buffer_1_S___fc_stdout }}
+                     [1]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
+                     [1].[bits 80 to 95] ∈ UNINITIALIZED
+                     [1].__fc_stdio_id ∈ [--..--]
+        S___fc_stdio_buffer_0_S___fc_stdout[0..1] ∈ [--..--]
+        S___fc_stdio_buffer_1_S___fc_stdout[0..1] ∈ [--..--]
+tests/e-acsl-runtime/labeled_stmt.i:12:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:249.
-PROJECT_FILE.i:231:[value] Function e_acsl_assert: precondition got status valid.
+        Called from tests/e-acsl-runtime/labeled_stmt.i:12.
+./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status valid.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:257.
+        Called from tests/e-acsl-runtime/labeled_stmt.i:14.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:259.
+        Called from tests/e-acsl-runtime/labeled_stmt.i:14.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:268.
+        Called from tests/e-acsl-runtime/labeled_stmt.i:9.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:242:[value] Function main: postcondition got status valid.
+[value] computing for function __clean <- main.
+        Called from tests/e-acsl-runtime/labeled_stmt.i:16.
+[value] using specification for function __clean
+[kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
+[value] Done for function __clean
+tests/e-acsl-runtime/labeled_stmt.i:9:[value] Function main: postcondition got status valid.
 [value] Recording results for main
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
@@ -36,15 +64,41 @@ struct __anonstruct___mpz_struct_1 {
    unsigned long *_mp_d ;
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
+typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
+typedef unsigned int size_t;
+struct __fc_pos_t {
+   unsigned long __fc_stdio_position ;
+};
+typedef struct __fc_pos_t fpos_t;
+struct __fc_FILE {
+   fpos_t __fc_stdio_fpos ;
+   char *__fc_stdio_buffer ;
+   char __fc_stdio_error ;
+   char __fc_stdio_eof ;
+   long __fc_stdio_id ;
+};
+typedef struct __fc_FILE FILE;
 /*@
 model __mpz_struct { ℤ n };
 */
-/*@ terminates \false;
-    ensures \false;
+int __fc_random_counter __attribute__((__unused__));
+unsigned long const __fc_rand_max = (unsigned long)2147483647;
+extern int __fc_heap_status;
+/*@
+axiomatic
+  dynamic_allocation {
+  predicate is_allocable{L}(size_t n) 
+    reads __fc_heap_status;
+  
+  }
+ */
+/*@ ensures \false;
     assigns \nothing;  */
 extern void exit(int status);
-/*@ assigns \nothing;  */
-extern int printf(char const * , ...);
+extern FILE *__fc_stdout;
+/*@ assigns *__fc_stdout;
+    assigns *__fc_stdout \from *(format+(..));  */
+extern int printf(char const *format , ...);
 /*@ requires predicate ≢ 0;
     assigns \nothing;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
@@ -57,6 +111,8 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
   return;
 }
 
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 int X = 0;
 /*@ ensures X ≡ 3;  */
 int main(void)
@@ -64,17 +120,17 @@ int main(void)
   int __retres;
   goto L1;
   L1: 
-  /*@ assert X ≡ 0; */ ;
-  e_acsl_assert(X == 0,(char *)"Assertion",(char *)"(X == 0)",12);
+  /*@ assert X ≡ 0; */
+  e_acsl_assert(X == 0,(char *)"Assertion",(char *)"X == 0",12);
   X = 1;
   goto L2;
   L2: 
   /*@ requires X ≡ 1;
       ensures X ≡ 2; */
   {
-    e_acsl_assert(X == 1,(char *)"Precondition",(char *)"(X == 1)",14);
+    e_acsl_assert(X == 1,(char *)"Precondition",(char *)"X == 1",14);
     X = 2;
-    e_acsl_assert(X == 2,(char *)"Postcondition",(char *)"(X == 2)",14);
+    e_acsl_assert(X == 2,(char *)"Postcondition",(char *)"X == 2",14);
   }
   
   if (X) {
@@ -82,8 +138,9 @@ int main(void)
     __retres = 0;
     goto return_label; }
   __retres = 0;
-  return_label: e_acsl_assert(X == 3,(char *)"Postcondition",
-                              (char *)"(X == 3)",9);
+  return_label: /* internal */ 
+  e_acsl_assert(X == 3,(char *)"Postcondition",(char *)"X == 3",9);
+  __clean();
   return (__retres);
 }
 

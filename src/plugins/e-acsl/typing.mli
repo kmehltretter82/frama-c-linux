@@ -65,7 +65,8 @@ val context_sensitive:
     string denoting a MPZ integer. *)
 
 val is_representable: My_bigint.t -> ikind -> bool
-(** Is the given constant representable? *)
+(** Is the given constant representable?
+    (See [Cil_types.CInt64] for details about arguments *)
 
 (******************************************************************************)
 (** {2 Internal stuff} *)

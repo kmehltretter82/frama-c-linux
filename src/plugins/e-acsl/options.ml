@@ -82,6 +82,8 @@ let version () =
   end
 let () = Cmdline.run_after_configuring_stage version
 
+let must_visit () = Run.get () || Check.get ()
+
 (*
 Local Variables:
 compile-command: "make"

@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: labeled stmt and gotos
-   EXECNOW: LOG gen_labeled_stmt.c BIN gen_labeled_stmt.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/labeled_stmt.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_labeled_stmt.c > /dev/null && gcc -pedantic -o ./tests/e-acsl-runtime/result/gen_labeled_stmt.out ./tests/e-acsl-runtime/result/gen_labeled_stmt.c -lgmp && ./tests/e-acsl-runtime/result/gen_labeled_stmt.out
-   EXECNOW: LOG gen_labeled_stmt2.c BIN gen_labeled_stmt2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/labeled_stmt.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_labeled_stmt2.c > /dev/null && gcc -pedantic -o ./tests/e-acsl-runtime/result/gen_labeled_stmt2.out ./tests/e-acsl-runtime/result/gen_labeled_stmt2.c -lgmp && ./tests/e-acsl-runtime/result/gen_labeled_stmt2.out
+   EXECNOW: LOG gen_labeled_stmt.c BIN gen_labeled_stmt.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/labeled_stmt.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_labeled_stmt.c > /dev/null && ./gcc_test.sh labeled_stmt
+   EXECNOW: LOG gen_labeled_stmt2.c BIN gen_labeled_stmt2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/labeled_stmt.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_labeled_stmt2.c > /dev/null && ./gcc_test.sh labeled_stmt2
 */
 
 int X = 0;

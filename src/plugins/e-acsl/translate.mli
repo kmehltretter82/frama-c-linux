@@ -17,38 +17,19 @@
 (*                                                                        *)
 (*  See the GNU Lesser General Public License version 2.1                 *)
 (*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
-(*                                                                        *)
+(*            *                                                            *)
 (**************************************************************************)
 
-let put_file_in_buffer fname buf =
-  try
-    let cin = open_in (Options.Share.file fname) in
-    try
-      while true do
-	let l = input_line cin in
-	Buffer.add_string buf l;
-	Buffer.add_char buf '\n';
-      done
-    with End_of_file ->
-      close_in cin
-  with Sys_error s ->
-    Options.abort "cannot read file `%s': %s" fname s
+open Cil_types
 
-(* TODO: must be project-compliant. The memoized buffer should be reset when we
-   have to redo the visitor in a different setting. *)
-(*
-let add_include buf hfile =
-  Buffer.add_string buf (Format.sprintf "#include %S\n" hfile)
- *)
-let text =
-  let buf = Buffer.create 97 in
-  fun () ->
-    if Buffer.length buf = 0 then begin
-      put_file_in_buffer "e_acsl_gmp_types.h" buf;
-      put_file_in_buffer "e_acsl_gmp.h" buf;
-      put_file_in_buffer "e_acsl.h" buf
-    end;
-    Buffer.contents buf
+(** [translate_*] translates a given ACSL annotation into the corresponding C
+    statement (if any) for runtime assertion checking. This C statements are
+    part of the resulting environment. *)
+
+val translate_pre_spec: Env.t -> funspec -> Env.t
+val translate_post_spec: Env.t -> funspec -> Env.t
+val translate_pre_code_annotation: Env.t -> code_annotation -> Env.t
+val translate_post_code_annotation: Env.t -> code_annotation -> Env.t
 
 (*
 Local Variables:

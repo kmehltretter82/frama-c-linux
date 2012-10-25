@@ -24,21 +24,55 @@ open Cil_types
 open Cil_datatype
 open Cil
 
+let library_files () =       
+  List.map
+    (Options.Share.file ~error:true)
+    [ "e_acsl_gmp_types.h";
+      "e_acsl_gmp.h";
+      "e_acsl.h";
+      "memory_model/e_acsl_mmodel_api.h";
+      "memory_model/e_acsl_bittree.h";
+      "memory_model/e_acsl_mmodel.h" ]
+
 (* ************************************************************************** *)
 (** {2 Builders} *)
 (* ************************************************************************** *)
 
-let e_acsl_header () = GText (Read_header.text ())
+let library_functions = Datatype.String.Hashtbl.create 17
+let register_library_function vi = 
+  Datatype.String.Hashtbl.add library_functions vi.vname vi
 
-let new_lval ?(loc=Location.unknown) v = new_exp ~loc (Lval (var v))
+let reset () = Datatype.String.Hashtbl.clear library_functions
 
 let mk_call ?(loc=Location.unknown) ?result fname args =
-  (* the type is incorrect, but it doesn't matter *)
-  (* [JS 2011/04/12] should not generate a new variable by function name *) 
-  (* [TODO] require a projectified table to associate an lval to each name *)
-  let ty = TFun(voidType, None, false, []) in
-  let f = new_lval ~loc (makeGlobalVar fname ty) in
-  mkStmt ~valid_sid:true (Instr(Call(result, f, args, loc)))
+  let vi =  
+    try Datatype.String.Hashtbl.find library_functions fname 
+    with Not_found -> Options.fatal "unregistered library function `%s'" fname
+  in
+  let f = Cil.evar ~loc vi in
+  vi.vreferenced <- true;
+  let ty_params = match vi.vtype with
+    | TFun(_, Some l, _, _) -> l
+    | _ -> assert false
+  in
+  let args =
+    List.map2
+      (fun (_, ty, _) arg -> 
+	match ty, unrollType (typeOf arg), arg.enode with
+	| TPtr _, TArray _, Lval lv -> Cil.new_exp ~loc (StartOf lv)
+	| TPtr _, TArray _, _ -> assert false
+	| _, ty_arg, _ -> Cil.mkCastT ~force:false ~e:arg ~newt:ty ~oldt:ty_arg)
+      ty_params
+      args
+  in
+  mkStmtOneInstr ~valid_sid:true (Call(result, f, args, loc))
+
+let mk_debug_mmodel_stmt stmt =
+  if Options.debug_atleast 2 then
+    let debug = mk_call "__debug" [] in
+    Cil.mkStmt ~valid_sid:true (Block (Cil.mkBlock [ stmt; debug]))
+  else 
+    stmt
 
 type annotation_kind = Assertion | Precondition | Postcondition | Invariant
 
@@ -64,6 +98,19 @@ let mk_e_acsl_guard ?(reverse=false) kind e p =
     ~loc 
     "e_acsl_assert" 
     [ e; kind_to_string loc kind; mkString loc msg; Cil.integer loc line ] 
+
+let result_lhost kf =
+  let stmt = 
+    try Kernel_function.find_return kf 
+    with Kernel_function.No_Statement -> assert false
+  in
+  match stmt.skind with
+  | Return(Some { enode = Lval (lhost, NoOffset) }, _) -> lhost
+  | _ -> assert false
+
+let result_vi kf = match result_lhost kf with
+  | Var vi -> vi
+  | Mem _ -> assert false
 
 (*
 Local Variables:

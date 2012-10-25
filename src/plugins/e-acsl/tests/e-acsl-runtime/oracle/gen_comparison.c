@@ -5,15 +5,41 @@ struct __anonstruct___mpz_struct_1 {
    unsigned long *_mp_d ;
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
+typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
+typedef unsigned int size_t;
+struct __fc_pos_t {
+   unsigned long __fc_stdio_position ;
+};
+typedef struct __fc_pos_t fpos_t;
+struct __fc_FILE {
+   fpos_t __fc_stdio_fpos ;
+   char *__fc_stdio_buffer ;
+   char __fc_stdio_error ;
+   char __fc_stdio_eof ;
+   long __fc_stdio_id ;
+};
+typedef struct __fc_FILE FILE;
 /*@
 model __mpz_struct { ℤ n };
 */
-/*@ terminates \false;
-    ensures \false;
+int __fc_random_counter __attribute__((__unused__));
+unsigned long const __fc_rand_max = (unsigned long)2147483647;
+extern int __fc_heap_status;
+/*@
+axiomatic
+  dynamic_allocation {
+  predicate is_allocable{L}(size_t n) 
+    reads __fc_heap_status;
+  
+  }
+ */
+/*@ ensures \false;
     assigns \nothing;  */
 extern void exit(int status);
-/*@ assigns \nothing;  */
-extern int printf(char const * , ...);
+extern FILE *__fc_stdout;
+/*@ assigns *__fc_stdout;
+    assigns *__fc_stdout \from *(format+(..));  */
+extern int printf(char const *format , ...);
 /*@ requires predicate ≢ 0;
     assigns \nothing;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
@@ -26,54 +52,62 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
   return;
 }
 
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void *_store_block(void *ptr,
+                                                           size_t size);
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void _full_init(void *ptr);
+extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 int main(void)
 {
+  char *__e_acsl_literal_string;
   int __retres;
   int x;
   int y;
   char *s;
   x = 0;
   y = 1;
-  /*@ assert x < y; */ ;
-  e_acsl_assert(x < y,(char *)"Assertion",(char *)"(x < y)",9);
-  /*@ assert y > x; */ ;
-  e_acsl_assert(y > x,(char *)"Assertion",(char *)"(y > x)",10);
-  /*@ assert x ≤ 0; */ ;
-  e_acsl_assert(x <= 0,(char *)"Assertion",(char *)"(x <= 0)",11);
-  /*@ assert y ≥ 1; */ ;
-  e_acsl_assert(y >= 1,(char *)"Assertion",(char *)"(y >= 1)",12);
-  s = (char *)"toto";
-  /*@ assert s ≡ s; */ ;
-  e_acsl_assert(s == s,(char *)"Assertion",(char *)"(s == s)",14);
-  /*@ assert "toto" ≢ "titi"; */ ;
-  e_acsl_assert("toto" != "titi",(char *)"Assertion",
-                (char *)"(\"toto\" != \"titi\")",15);
-  /*@ assert 5 < 18; */ ;
-  e_acsl_assert(5 < 18,(char *)"Assertion",(char *)"(5 < 18)",16);
-  /*@ assert 32 > 3; */ ;
-  e_acsl_assert(32 > 3,(char *)"Assertion",(char *)"(32 > 3)",17);
-  /*@ assert 12 ≤ 13; */ ;
-  e_acsl_assert(12 <= 13,(char *)"Assertion",(char *)"(12 <= 13)",18);
-  /*@ assert 123 ≥ 12; */ ;
-  e_acsl_assert(123 >= 12,(char *)"Assertion",(char *)"(123 >= 12)",19);
-  /*@ assert 0xff ≡ 0xff; */ ;
-  e_acsl_assert(0xff == 0xff,(char *)"Assertion",(char *)"(0xff == 0xff)",20);
-  /*@ assert 1 ≢ 2; */ ;
-  e_acsl_assert(1 != 2,(char *)"Assertion",(char *)"(1 != 2)",21);
-  /*@ assert -5 < 18; */ ;
-  e_acsl_assert(-5 < 18,(char *)"Assertion",(char *)"(-5 < 18)",23);
-  /*@ assert 32 > -3; */ ;
-  e_acsl_assert(32 > -3,(char *)"Assertion",(char *)"(32 > -3)",24);
-  /*@ assert -12 ≤ 13; */ ;
-  e_acsl_assert(-12 <= 13,(char *)"Assertion",(char *)"(-12 <= 13)",25);
-  /*@ assert 123 ≥ -12; */ ;
-  e_acsl_assert(123 >= -12,(char *)"Assertion",(char *)"(123 >= -12)",26);
-  /*@ assert -0xff ≡ -0xff; */ ;
-  e_acsl_assert(-0xff == -0xff,(char *)"Assertion",
-                (char *)"(-0xff == -0xff)",27);
-  /*@ assert 1 ≢ -2; */ ;
-  e_acsl_assert(1 != -2,(char *)"Assertion",(char *)"(1 != -2)",28);
+  /*@ assert x < y; */
+  e_acsl_assert(x < y,(char *)"Assertion",(char *)"x < y",9);
+  /*@ assert y > x; */
+  e_acsl_assert(y > x,(char *)"Assertion",(char *)"y > x",10);
+  /*@ assert x ≤ 0; */
+  e_acsl_assert(x <= 0,(char *)"Assertion",(char *)"x <= 0",11);
+  /*@ assert y ≥ 1; */
+  e_acsl_assert(y >= 1,(char *)"Assertion",(char *)"y >= 1",12);
+  __e_acsl_literal_string = "toto";
+  _store_block((void *)__e_acsl_literal_string,sizeof("toto"));
+  _full_init((void *)__e_acsl_literal_string);
+  s = (char *)__e_acsl_literal_string;
+  /*@ assert s ≡ s; */
+  e_acsl_assert(s == s,(char *)"Assertion",(char *)"s == s",14);
+  /*@ assert 5 < 18; */
+  e_acsl_assert(5 < 18,(char *)"Assertion",(char *)"5 < 18",17);
+  /*@ assert 32 > 3; */
+  e_acsl_assert(32 > 3,(char *)"Assertion",(char *)"32 > 3",18);
+  /*@ assert 12 ≤ 13; */
+  e_acsl_assert(12 <= 13,(char *)"Assertion",(char *)"12 <= 13",19);
+  /*@ assert 123 ≥ 12; */
+  e_acsl_assert(123 >= 12,(char *)"Assertion",(char *)"123 >= 12",20);
+  /*@ assert 0xff ≡ 0xff; */
+  e_acsl_assert(0xff == 0xff,(char *)"Assertion",(char *)"0xff == 0xff",21);
+  /*@ assert 1 ≢ 2; */
+  e_acsl_assert(1 != 2,(char *)"Assertion",(char *)"1 != 2",22);
+  /*@ assert -5 < 18; */
+  e_acsl_assert(-5 < 18,(char *)"Assertion",(char *)"-5 < 18",24);
+  /*@ assert 32 > -3; */
+  e_acsl_assert(32 > -3,(char *)"Assertion",(char *)"32 > -3",25);
+  /*@ assert -12 ≤ 13; */
+  e_acsl_assert(-12 <= 13,(char *)"Assertion",(char *)"-12 <= 13",26);
+  /*@ assert 123 ≥ -12; */
+  e_acsl_assert(123 >= -12,(char *)"Assertion",(char *)"123 >= -12",27);
+  /*@ assert -0xff ≡ -0xff; */
+  e_acsl_assert(-0xff == -0xff,(char *)"Assertion",(char *)"-0xff == -0xff",
+                28);
+  /*@ assert 1 ≢ -2; */
+  e_acsl_assert(1 != -2,(char *)"Assertion",(char *)"1 != -2",29);
   __retres = 0;
+  __clean();
   return (__retres);
 }
 

@@ -24,13 +24,11 @@
 /* Standard C functions */
 /************************/
 
-/*@ terminates \false;
-  @ assigns \nothing;
-  @ ensures \false; */
-extern void exit(int status);
+#ifndef E_ACSL
+#define E_ACSL
 
-/*@ assigns \nothing; */
-extern int printf(const char *, ...);
+#include "stdlib.h"
+#include "stdio.h"
 
 /*****************************/
 /* Dedicated E-ACSL function */
@@ -45,3 +43,5 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line) {
     exit(1);
   }
 }
+
+#endif

@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: comparison operators
-   EXECNOW: LOG gen_comparison.c BIN gen_comparison.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/comparison.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_comparison.c > /dev/null &&  gcc -pedantic -o ./tests/e-acsl-runtime/result/gen_comparison.out ./tests/e-acsl-runtime/result/gen_comparison.c -lgmp && ./tests/e-acsl-runtime/result/gen_comparison.out
-   EXECNOW: LOG gen_comparison2.c BIN gen_comparison2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/comparison.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_comparison2.c > /dev/null &&  gcc -pedantic -o ./tests/e-acsl-runtime/result/gen_comparison2.out ./tests/e-acsl-runtime/result/gen_comparison2.c -lgmp && ./tests/e-acsl-runtime/result/gen_comparison2.out
+   EXECNOW: LOG gen_comparison.c BIN gen_comparison.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/comparison.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_comparison.c > /dev/null && ./gcc_test.sh comparison
+   EXECNOW: LOG gen_comparison2.c BIN gen_comparison2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/comparison.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_comparison2.c > /dev/null && ./gcc_test.sh comparison2
 */
 
 int main(void) {
@@ -12,7 +12,8 @@ int main(void) {
   /*@ assert y >= 1; */
   char *s = "toto";
   /*@ assert s == s; */
-  /*@ assert "toto" != "titi"; */
+  // waiting for clarification of semantics of ACSL's literal strings
+  //  /*@ assert "toto" != "titi"; */
   /*@ assert 5 < 18; */
   /*@ assert 32 > 3; */
   /*@ assert 12 <= 13; */

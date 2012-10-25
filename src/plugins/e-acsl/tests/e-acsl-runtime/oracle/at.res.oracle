@@ -1,3 +1,9 @@
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -I/usr/local/share/frama-c/libc ./share/e-acsl/e_acsl_gmp_types.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -I/usr/local/share/frama-c/libc ./share/e-acsl/e_acsl_gmp.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -I/usr/local/share/frama-c/libc ./share/e-acsl/e_acsl.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -I/usr/local/share/frama-c/libc ./share/e-acsl/memory_model/e_acsl_mmodel_api.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -I/usr/local/share/frama-c/libc ./share/e-acsl/memory_model/e_acsl_bittree.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -I/usr/local/share/frama-c/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
 tests/e-acsl-runtime/at.i:32:[e-acsl] warning: missing guard for ensuring that q is a valid memory access
 tests/e-acsl-runtime/at.i:32:[e-acsl] warning: missing guard for ensuring that p+\at(*q,L1) is a valid pointer
 tests/e-acsl-runtime/at.i:32:[e-acsl] warning: missing guard for ensuring that p+\at(*q,L1) is a valid memory access
@@ -8,108 +14,117 @@ tests/e-acsl-runtime/at.i:34:[e-acsl] warning: missing guard for ensuring that p
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
+        __fc_random_counter ∈ {0}
+        __fc_rand_max ∈ {2147483647}
+        __fc_heap_status ∈ [--..--]
+        __fc_stdout ∈ {{ NULL ; &S___fc_stdout }}
         A ∈ {0}
-PROJECT_FILE.i:322:[value] Assertion got status valid.
+        S___fc_stdout[0].__fc_stdio_fpos ∈ [--..--]
+                     [0].__fc_stdio_buffer ∈
+                     {{ NULL ; &S___fc_stdio_buffer_0_S___fc_stdout }}
+                     [0]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
+                     [0].[bits 80 to 95] ∈ UNINITIALIZED
+                     {[0].__fc_stdio_id; [1].__fc_stdio_fpos; } ∈ [--..--]
+                     [1].__fc_stdio_buffer ∈
+                     {{ NULL ; &S___fc_stdio_buffer_1_S___fc_stdout }}
+                     [1]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
+                     [1].[bits 80 to 95] ∈ UNINITIALIZED
+                     [1].__fc_stdio_id ∈ [--..--]
+        S___fc_stdio_buffer_0_S___fc_stdout[0..1] ∈ [--..--]
+        S___fc_stdio_buffer_1_S___fc_stdout[0..1] ∈ [--..--]
+tests/e-acsl-runtime/at.i:45:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:323.
-PROJECT_FILE.i:231:[value] Function e_acsl_assert: precondition got status valid.
+        Called from tests/e-acsl-runtime/at.i:45.
+./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status valid.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function f <- main.
-        Called from PROJECT_FILE.i:327.
-PROJECT_FILE.i:258:[value] Assertion got status valid.
+        Called from tests/e-acsl-runtime/at.i:48.
+tests/e-acsl-runtime/at.i:13:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- f <- main.
-        Called from PROJECT_FILE.i:259.
+        Called from tests/e-acsl-runtime/at.i:13.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:261:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
-PROJECT_FILE.i:261:[value] Assertion got status unknown.
+tests/e-acsl-runtime/at.i:14:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
+tests/e-acsl-runtime/at.i:14:[value] Assertion got status unknown.
 [value] computing for function e_acsl_assert <- f <- main.
-        Called from PROJECT_FILE.i:262.
+        Called from tests/e-acsl-runtime/at.i:14.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:264:[value] Assertion got status valid.
+:0:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- f <- main.
-        Called from PROJECT_FILE.i:266.
+        Called from tests/e-acsl-runtime/at.i:15.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:268:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
-PROJECT_FILE.i:268:[value] Assertion got status unknown.
+tests/e-acsl-runtime/at.i:16:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
+tests/e-acsl-runtime/at.i:16:[value] Assertion got status unknown.
 [value] computing for function e_acsl_assert <- f <- main.
-        Called from PROJECT_FILE.i:269.
+        Called from tests/e-acsl-runtime/at.i:16.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- f <- main.
-        Called from PROJECT_FILE.i:274.
+        Called from tests/e-acsl-runtime/at.i:9.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:242:[value] Function f: postcondition got status valid.
+tests/e-acsl-runtime/at.i:9:[value] Function f: postcondition got status valid.
 [value] Recording results for f
 [value] Done for function f
-PROJECT_FILE.i:328:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
-PROJECT_FILE.i:328:[value] Assertion got status unknown.
+tests/e-acsl-runtime/at.i:50:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
+tests/e-acsl-runtime/at.i:50:[value] Assertion got status unknown.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:329.
+        Called from tests/e-acsl-runtime/at.i:50.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:331:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
-PROJECT_FILE.i:331:[value] Assertion got status unknown.
+tests/e-acsl-runtime/at.i:51:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
+tests/e-acsl-runtime/at.i:51:[value] Assertion got status unknown.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:332.
+        Called from tests/e-acsl-runtime/at.i:51.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:335:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
-PROJECT_FILE.i:335:[value] Assertion got status unknown.
+tests/e-acsl-runtime/at.i:52:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
+tests/e-acsl-runtime/at.i:52:[value] Assertion got status unknown.
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:336.
+        Called from tests/e-acsl-runtime/at.i:52.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function g <- main.
-        Called from PROJECT_FILE.i:339.
-PROJECT_FILE.i:296:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
-PROJECT_FILE.i:296:[value] Assertion got status unknown.
+        Called from tests/e-acsl-runtime/at.i:55.
+tests/e-acsl-runtime/at.i:32:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
+tests/e-acsl-runtime/at.i:32:[value] Assertion got status unknown.
 [value] computing for function e_acsl_assert <- g <- main.
-        Called from PROJECT_FILE.i:297.
+        Called from tests/e-acsl-runtime/at.i:32.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-PROJECT_FILE.i:301:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
-PROJECT_FILE.i:301:[value] Assertion got status unknown.
+:0:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
+:0:[value] Assertion got status unknown.
 [value] computing for function e_acsl_assert <- g <- main.
-        Called from PROJECT_FILE.i:303.
+        Called from tests/e-acsl-runtime/at.i:34.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] Recording results for g
 [value] Done for function g
+[value] computing for function __clean <- main.
+        Called from tests/e-acsl-runtime/at.i:57.
+[value] using specification for function __clean
+[kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
+[value] Done for function __clean
 [value] Recording results for main
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function e_acsl_assert:
 [value] Values at end of function f:
           A ∈ {3}
-          __e_acsl_at ∈ {0}
-          __e_acsl_at_2 ∈ {1}
-          __e_acsl_at_3 ∈ {2}
-          __e_acsl_at_4 ∈ {0}
-          __e_acsl_at_5 ∈ {0}
-          __e_acsl_at_6 ∈ {3}
 [value] Values at end of function g:
           A ∈ {4}
-          __e_acsl_at ∈ {0}
-          __e_acsl_at_2 ∈ {2}
-          __e_acsl_at_3 ∈ {0}
-          __e_acsl_at_4 ∈ {2}
           x ∈ {1}
           t[0] ∈ {2}
            [1] ∈ {3}
 [value] Values at end of function main:
           A ∈ {4}
-          __retres ∈ {0}
           x ∈ {1}
           t[0] ∈ {2}
            [1] ∈ {3}
-          __e_acsl_at ∈ {0}
-          __e_acsl_at_2 ∈ {1}
-          __e_acsl_at_3 ∈ {0}
+          __retres ∈ {0}
 /* Generated by Frama-C */
 struct __anonstruct___mpz_struct_1 {
    int _mp_alloc ;
@@ -117,15 +132,41 @@ struct __anonstruct___mpz_struct_1 {
    unsigned long *_mp_d ;
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
+typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
+typedef unsigned int size_t;
+struct __fc_pos_t {
+   unsigned long __fc_stdio_position ;
+};
+typedef struct __fc_pos_t fpos_t;
+struct __fc_FILE {
+   fpos_t __fc_stdio_fpos ;
+   char *__fc_stdio_buffer ;
+   char __fc_stdio_error ;
+   char __fc_stdio_eof ;
+   long __fc_stdio_id ;
+};
+typedef struct __fc_FILE FILE;
 /*@
 model __mpz_struct { ℤ n };
 */
-/*@ terminates \false;
-    ensures \false;
+int __fc_random_counter __attribute__((__unused__));
+unsigned long const __fc_rand_max = (unsigned long)2147483647;
+extern int __fc_heap_status;
+/*@
+axiomatic
+  dynamic_allocation {
+  predicate is_allocable{L}(size_t n) 
+    reads __fc_heap_status;
+  
+  }
+ */
+/*@ ensures \false;
     assigns \nothing;  */
 extern void exit(int status);
-/*@ assigns \nothing;  */
-extern int printf(char const * , ...);
+extern FILE *__fc_stdout;
+/*@ assigns *__fc_stdout;
+    assigns *__fc_stdout \from *(format+(..));  */
+extern int printf(char const *format , ...);
 /*@ requires predicate ≢ 0;
     assigns \nothing;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
@@ -138,97 +179,104 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
   return;
 }
 
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 int A = 0;
 /*@ ensures \at(A,Post) ≡ 3;  */
 void f(void)
 {
-  int __e_acsl_at;
-  int __e_acsl_at_2;
-  int __e_acsl_at_3;
-  int __e_acsl_at_4;
-  int __e_acsl_at_5;
   int __e_acsl_at_6;
+  int __e_acsl_at_5;
+  int __e_acsl_at_4;
+  int __e_acsl_at_3;
+  int __e_acsl_at_2;
+  int __e_acsl_at;
   __e_acsl_at_4 = A;
   __e_acsl_at = A;
   A = 1;
-  F: __e_acsl_at_5 = __e_acsl_at_4;
+  F: 
+  __e_acsl_at_5 = __e_acsl_at_4;
   __e_acsl_at_2 = A;
   A = 2;
-  /*@ assert \at(A,Pre) ≡ 0; */ ;
+  /*@ assert \at(A,Pre) ≡ 0; */
   e_acsl_assert(__e_acsl_at == 0,(char *)"Assertion",
-                (char *)"(\\at(A,Pre) == 0)",13);
-  /*@ assert \at(A,F) ≡ 1; */ ;
+                (char *)"\\at(A,Pre) == 0",13);
+  /*@ assert \at(A,F) ≡ 1; */
   e_acsl_assert(__e_acsl_at_2 == 1,(char *)"Assertion",
-                (char *)"(\\at(A,F) == 1)",14);
-  /*@ assert \at(A,Here) ≡ 2; */ ;
+                (char *)"\\at(A,F) == 1",14);
+  /*@ assert \at(A,Here) ≡ 2; */
   __e_acsl_at_3 = A;
   e_acsl_assert(__e_acsl_at_3 == 2,(char *)"Assertion",
-                (char *)"(\\at(A,Here) == 2)",15);
-  /*@ assert \at(\at(A,Pre),F) ≡ 0; */ ;
+                (char *)"\\at(A,Here) == 2",15);
+  /*@ assert \at(\at(A,Pre),F) ≡ 0; */
   e_acsl_assert(__e_acsl_at_5 == 0,(char *)"Assertion",
-                (char *)"(\\at(\\at(A,Pre),F) == 0)",16);
+                (char *)"\\at(\\at(A,Pre),F) == 0",16);
   A = 3;
   __e_acsl_at_6 = A;
   e_acsl_assert(__e_acsl_at_6 == 3,(char *)"Postcondition",
-                (char *)"(\\at(A,Post) == 3)",9);
+                (char *)"\\at(A,Post) == 3",9);
   return;
 }
 
 void g(int *p, int *q)
 {
-  int __e_acsl_at;
-  int __e_acsl_at_2;
-  int __e_acsl_at_3;
   int __e_acsl_at_4;
+  int __e_acsl_at_3;
+  int __e_acsl_at_2;
+  int __e_acsl_at;
   *p = 0;
   *(p + 1) = 1;
   *q = 0;
-  L1: __e_acsl_at_3 = *q;
+  L1: 
+  __e_acsl_at_3 = *q;
   __e_acsl_at = *q;
   *p = 2;
   *(p + 1) = 3;
   *q = 1;
-  L2: __e_acsl_at_2 = *(p + __e_acsl_at);
+  L2: 
+  __e_acsl_at_2 = *(p + __e_acsl_at);
   A = 4;
-  /*@ assert \at(*(p+\at(*q,L1)),L2) ≡ 2; */ ;
+  /*@ assert \at(*(p+\at(*q,L1)),L2) ≡ 2; */
   e_acsl_assert(__e_acsl_at_2 == 2,(char *)"Assertion",
-                (char *)"(\\at(*(p+\\at(*q,L1)),L2) == 2)",32);
+                (char *)"\\at(*(p+\\at(*q,L1)),L2) == 2",32);
   L3: 
-  /*@ assert \at(*(p+\at(*q,L1)),Here) ≡ 2; */ ;
+  /*@ assert \at(*(p+\at(*q,L1)),Here) ≡ 2; */
   __e_acsl_at_4 = *(p + __e_acsl_at_3);
   e_acsl_assert(__e_acsl_at_4 == 2,(char *)"Assertion",
-                (char *)"(\\at(*(p+\\at(*q,L1)),Here) == 2)",34);
+                (char *)"\\at(*(p+\\at(*q,L1)),Here) == 2",34);
   return;
 }
 
 int main(void)
 {
+  int __e_acsl_at_3;
+  long long __e_acsl_at_2;
+  int __e_acsl_at;
   int __retres;
   int x;
   int t[2];
-  int __e_acsl_at;
-  long long __e_acsl_at_2;
-  int __e_acsl_at_3;
   x = 0;
-  L: __e_acsl_at_3 = x;
+  L: 
+  __e_acsl_at_3 = x;
   __e_acsl_at_2 = (long long)x + (long long)1;
   __e_acsl_at = x;
-  /*@ assert x ≡ 0; */ ;
-  e_acsl_assert(x == 0,(char *)"Assertion",(char *)"(x == 0)",45);
+  /*@ assert x ≡ 0; */
+  e_acsl_assert(x == 0,(char *)"Assertion",(char *)"x == 0",45);
   x = 1;
   x = 2;
   f();
-  /*@ assert \at(x,L) ≡ 0; */ ;
+  /*@ assert \at(x,L) ≡ 0; */
   e_acsl_assert(__e_acsl_at == 0,(char *)"Assertion",
-                (char *)"(\\at(x,L) == 0)",50);
-  /*@ assert \at(x+1,L) ≡ 1; */ ;
+                (char *)"\\at(x,L) == 0",50);
+  /*@ assert \at(x+1,L) ≡ 1; */
   e_acsl_assert(__e_acsl_at_2 == (long long)1,(char *)"Assertion",
-                (char *)"(\\at(x+1,L) == 1)",51);
-  /*@ assert \at(x,L)+1 ≡ 1; */ ;
+                (char *)"\\at(x+1,L) == 1",51);
+  /*@ assert \at(x,L)+1 ≡ 1; */
   e_acsl_assert((long long)__e_acsl_at_3 + (long long)1 == (long long)1,
-                (char *)"Assertion",(char *)"(\\at(x,L)+1 == 1)",52);
+                (char *)"Assertion",(char *)"\\at(x,L)+1 == 1",52);
   g(t,& x);
   __retres = 0;
+  __clean();
   return (__retres);
 }
 

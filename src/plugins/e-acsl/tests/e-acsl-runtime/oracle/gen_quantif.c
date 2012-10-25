@@ -5,15 +5,41 @@ struct __anonstruct___mpz_struct_1 {
    unsigned long *_mp_d ;
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
+typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
+typedef unsigned int size_t;
+struct __fc_pos_t {
+   unsigned long __fc_stdio_position ;
+};
+typedef struct __fc_pos_t fpos_t;
+struct __fc_FILE {
+   fpos_t __fc_stdio_fpos ;
+   char *__fc_stdio_buffer ;
+   char __fc_stdio_error ;
+   char __fc_stdio_eof ;
+   long __fc_stdio_id ;
+};
+typedef struct __fc_FILE FILE;
 /*@
 model __mpz_struct { ℤ n };
 */
-/*@ terminates \false;
-    ensures \false;
+int __fc_random_counter __attribute__((__unused__));
+unsigned long const __fc_rand_max = (unsigned long)2147483647;
+extern int __fc_heap_status;
+/*@
+axiomatic
+  dynamic_allocation {
+  predicate is_allocable{L}(size_t n) 
+    reads __fc_heap_status;
+  
+  }
+ */
+/*@ ensures \false;
     assigns \nothing;  */
 extern void exit(int status);
-/*@ assigns \nothing;  */
-extern int printf(char const * , ...);
+extern FILE *__fc_stdout;
+/*@ assigns *__fc_stdout;
+    assigns *__fc_stdout \from *(format+(..));  */
+extern int printf(char const *format , ...);
 /*@ requires predicate ≢ 0;
     assigns \nothing;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
@@ -26,92 +52,100 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
   return;
 }
 
+extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 int main(void)
 {
   int __retres;
-  /*@ assert ∀ int x; 0 ≤ x ∧ x ≤ 1 ⇒ x ≡ 0 ∨ x ≡ 1; */ ;
+  /*@ assert ∀ int x; 0 ≤ x ∧ x ≤ 1 ⇒ x ≡ 0 ∨ x ≡ 1; */
   {
     int __e_acsl_forall;
     int __e_acsl_x;
     __e_acsl_forall = 1;
     __e_acsl_x = 0;
     while (1) {
-      if (! (__e_acsl_x <= 1)) { break; }
+      if (__e_acsl_x <= 1) { ; }
+      else { break; }
       { int __e_acsl_or;
         if (__e_acsl_x == 0) { __e_acsl_or = 1; }
         else { __e_acsl_or = __e_acsl_x == 1; }
-        if (! __e_acsl_or) {
+        if (__e_acsl_or) { ; }
+        else {
           __e_acsl_forall = 0;
           goto e_acsl_end_loop1; }
       }
       
       __e_acsl_x ++;
     }
-    e_acsl_end_loop1: ;
+    e_acsl_end_loop1: /* internal */ ;
     e_acsl_assert(__e_acsl_forall,(char *)"Assertion",
-                  (char *)"(\\forall int x; 0 <= x && x <= 1 ==> x == 0 || x == 1)",
+                  (char *)"\\forall int x; 0 <= x && x <= 1 ==>\nx == 0 || x == 1",
                   11);
   }
   
-  /*@ assert ∀ int x; 0 < x ∧ x ≤ 1 ⇒ x ≡ 1; */ ;
+  /*@ assert ∀ int x; 0 < x ∧ x ≤ 1 ⇒ x ≡ 1; */
   {
     int __e_acsl_forall_2;
     int __e_acsl_x_2;
     __e_acsl_forall_2 = 1;
     __e_acsl_x_2 = 0 + 1;
     while (1) {
-      if (! (__e_acsl_x_2 <= 1)) { break; }
-      if (! (__e_acsl_x_2 == 1)) {
+      if (__e_acsl_x_2 <= 1) { ; }
+      else { break; }
+      if (__e_acsl_x_2 == 1) { ; }
+      else {
         __e_acsl_forall_2 = 0;
-        goto e_acsl_end_loop2;
-      }
+        goto e_acsl_end_loop2; }
       __e_acsl_x_2 ++;
     }
-    e_acsl_end_loop2: ;
+    e_acsl_end_loop2: /* internal */ ;
     e_acsl_assert(__e_acsl_forall_2,(char *)"Assertion",
-                  (char *)"(\\forall int x; 0 < x && x <= 1 ==> x == 1)",12);
+                  (char *)"\\forall int x; 0 < x && x <= 1 ==>\nx == 1",12);
   }
   
-  /*@ assert ∀ int x; 0 < x ∧ x < 1 ⇒ \false; */ ;
+  /*@ assert ∀ int x; 0 < x ∧ x < 1 ⇒ \false; */
   {
     int __e_acsl_forall_3;
     int __e_acsl_x_3;
     __e_acsl_forall_3 = 1;
     __e_acsl_x_3 = 0 + 1;
     while (1) {
-      if (! (__e_acsl_x_3 < 1)) { break; }
-      __e_acsl_forall_3 = 0;
-      goto e_acsl_end_loop3;
+      if (__e_acsl_x_3 < 1) { ; }
+      else { break; }
+      if (0) { ; }
+      else {
+        __e_acsl_forall_3 = 0;
+        goto e_acsl_end_loop3; }
       __e_acsl_x_3 ++;
     }
-    e_acsl_end_loop3: ;
+    e_acsl_end_loop3: /* internal */ ;
     e_acsl_assert(__e_acsl_forall_3,(char *)"Assertion",
-                  (char *)"(\\forall int x; 0 < x && x < 1 ==> \\false)",13);
+                  (char *)"\\forall int x; 0 < x && x < 1 ==>\n\\false",13);
   }
   
-  /*@ assert ∀ int x; 0 ≤ x ∧ x < 1 ⇒ x ≡ 0; */ ;
+  /*@ assert ∀ int x; 0 ≤ x ∧ x < 1 ⇒ x ≡ 0; */
   {
     int __e_acsl_forall_4;
     int __e_acsl_x_4;
     __e_acsl_forall_4 = 1;
     __e_acsl_x_4 = 0;
     while (1) {
-      if (! (__e_acsl_x_4 < 1)) { break; }
-      if (! (__e_acsl_x_4 == 0)) {
+      if (__e_acsl_x_4 < 1) { ; }
+      else { break; }
+      if (__e_acsl_x_4 == 0) { ; }
+      else {
         __e_acsl_forall_4 = 0;
-        goto e_acsl_end_loop4;
-      }
+        goto e_acsl_end_loop4; }
       __e_acsl_x_4 ++;
     }
-    e_acsl_end_loop4: ;
+    e_acsl_end_loop4: /* internal */ ;
     e_acsl_assert(__e_acsl_forall_4,(char *)"Assertion",
-                  (char *)"(\\forall int x; 0 <= x && x < 1 ==> x == 0)",14);
+                  (char *)"\\forall int x; 0 <= x && x < 1 ==>\nx == 0",14);
   }
   
-  /*@
-  assert ∀ int x, int y, int z;
-  ((0 ≤ x ∧ x < 2) ∧ (0 ≤ y ∧ y < 5)) ∧ (0 ≤ z ∧ z ≤ y) ⇒
-  x+z ≤ y+1; */ ;
+  /*@ assert ∀ int x, int y, int z;
+      ((0 ≤ x ∧ x < 2) ∧ (0 ≤ y ∧ y < 5)) ∧ (0 ≤ z ∧ z ≤ y)
+      ⇒ x+z ≤ y+1;
+  */
   {
     int __e_acsl_forall_5;
     int __e_acsl_x_5;
@@ -120,64 +154,68 @@ int main(void)
     __e_acsl_forall_5 = 1;
     __e_acsl_x_5 = 0;
     while (1) {
-      if (! (__e_acsl_x_5 < 2)) { break; }
+      if (__e_acsl_x_5 < 2) { ; }
+      else { break; }
       __e_acsl_y = 0;
       while (1) {
-        if (! (__e_acsl_y < 5)) { break; }
+        if (__e_acsl_y < 5) { ; }
+        else { break; }
         __e_acsl_z = 0;
         while (1) {
-          if (! (__e_acsl_z <= __e_acsl_y)) { break; }
-          if (! (__e_acsl_x_5 + __e_acsl_z <= __e_acsl_y + 1)) {
+          if (__e_acsl_z <= __e_acsl_y) { ; }
+          else { break; }
+          if (__e_acsl_x_5 + __e_acsl_z <= __e_acsl_y + 1) { ; }
+          else {
             __e_acsl_forall_5 = 0;
-            goto e_acsl_end_loop5;
-          }
+            goto e_acsl_end_loop5; }
           __e_acsl_z ++;
         }
         __e_acsl_y ++;
       }
       __e_acsl_x_5 ++;
     }
-    e_acsl_end_loop5: ;
+    e_acsl_end_loop5: /* internal */ ;
     e_acsl_assert(__e_acsl_forall_5,(char *)"Assertion",
-                  (char *)"(\\forall int x, int y, int z;\n  ((0 <= x && x < 2) && (0 <= y && y < 5)) && (0 <= z && z <= y) ==>\n  x+z <= y+1)",
+                  (char *)"\\forall int x, int y, int z;\n((0 <= x && x < 2) && (0 <= y && y < 5)) && (0 <= z && z <= y) ==>\nx+z <= y+1",
                   18);
   }
   
-  /*@ assert ∃ int x; (0 ≤ x ∧ x < 10) ∧ x ≡ 5; */ ;
+  /*@ assert ∃ int x; (0 ≤ x ∧ x < 10) ∧ x ≡ 5; */
   {
     int __e_acsl_exists;
     int __e_acsl_x_6;
     __e_acsl_exists = 0;
     __e_acsl_x_6 = 0;
     while (1) {
-      if (! (__e_acsl_x_6 < 10)) { break; }
-      if (! (! (__e_acsl_x_6 == 5))) {
+      if (__e_acsl_x_6 < 10) { ; }
+      else { break; }
+      if (! (__e_acsl_x_6 == 5)) { ; }
+      else {
         __e_acsl_exists = 1;
-        goto e_acsl_end_loop6;
-      }
+        goto e_acsl_end_loop6; }
       __e_acsl_x_6 ++;
     }
-    e_acsl_end_loop6: ;
+    e_acsl_end_loop6: /* internal */ ;
     e_acsl_assert(__e_acsl_exists,(char *)"Assertion",
-                  (char *)"(\\exists int x; (0 <= x && x < 10) && x == 5)",
-                  23);
+                  (char *)"\\exists int x; (0 <= x && x < 10) &&\nx == 5",23);
   }
   
-  /*@
-  assert ∀ int x; 0 ≤ x ∧ x < 10 ⇒
-  (x%2 ≡ 0 ⇒ (∃ int y; (0 ≤ y ∧ y ≤ x/2) ∧ x ≡ 2*y)); */ ;
+  /*@ assert ∀ int x; 0 ≤ x ∧ x < 10 ⇒
+      (x%2 ≡ 0 ⇒ (∃ int y; (0 ≤ y ∧ y ≤ x/2) ∧ x ≡ 2*y));
+  */
   {
     int __e_acsl_forall_6;
     int __e_acsl_x_7;
     __e_acsl_forall_6 = 1;
     __e_acsl_x_7 = 0;
     while (1) {
-      if (! (__e_acsl_x_7 < 10)) { break; }
+      if (__e_acsl_x_7 < 10) { ; }
+      else { break; }
       {
         int __e_acsl_mod;
         int __e_acsl_implies;
-        /*@ assert 2 ≢ 0; */ ;
-        e_acsl_assert(! (2 == 0),(char *)"Assertion",(char *)"(2 == 0)",28);
+        /*@ assert E_ACSL: 2 ≢ 0; */
+        e_acsl_assert(! (2 == 0),(char *)"Assertion",(char *)"2 == 0",28);
         __e_acsl_mod = __e_acsl_x_7 % 2;
         if (! (__e_acsl_mod == 0)) { __e_acsl_implies = 1; }
         else {
@@ -188,37 +226,38 @@ int main(void)
           while (1) {
             {
               int __e_acsl_div;
-              /*@ assert 2 ≢ 0; */ ;
-              e_acsl_assert(! (2 == 0),(char *)"Assertion",
-                            (char *)"(2 == 0)",28);
+              /*@ assert E_ACSL: 2 ≢ 0; */
+              e_acsl_assert(! (2 == 0),(char *)"Assertion",(char *)"2 == 0",
+                            28);
               __e_acsl_div = __e_acsl_x_7 / 2;
-              if (! (__e_acsl_y_2 <= __e_acsl_div)) { break; }
+              if (__e_acsl_y_2 <= __e_acsl_div) { ; } else { break; }
             }
             
-            if (! (! (__e_acsl_x_7 == 2 * __e_acsl_y_2))) {
+            if (! (__e_acsl_x_7 == 2 * __e_acsl_y_2)) { ; }
+            else {
               __e_acsl_exists_2 = 1;
-              goto e_acsl_end_loop7;
-            }
+              goto e_acsl_end_loop7; }
             __e_acsl_y_2 ++;
           }
-          e_acsl_end_loop7: ;
+          e_acsl_end_loop7: /* internal */ ;
           __e_acsl_implies = __e_acsl_exists_2;
         }
-        if (! __e_acsl_implies) {
+        if (__e_acsl_implies) { ; }
+        else {
           __e_acsl_forall_6 = 0;
-          goto e_acsl_end_loop8;
-        }
+          goto e_acsl_end_loop8; }
       }
       
       __e_acsl_x_7 ++;
     }
-    e_acsl_end_loop8: ;
+    e_acsl_end_loop8: /* internal */ ;
     e_acsl_assert(__e_acsl_forall_6,(char *)"Assertion",
-                  (char *)"(\\forall int x; 0 <= x && x < 10 ==>\n  (x%2 == 0 ==> (\\exists int y; (0 <= y && y <= x/2) && x == 2*y)))",
+                  (char *)"\\forall int x; 0 <= x && x < 10 ==>\n(x%2 == 0 ==> (\\exists int y; (0 <= y && y <= x/2) && x == 2*y))",
                   27);
   }
   
   __retres = 0;
+  __clean();
   return (__retres);
 }
 

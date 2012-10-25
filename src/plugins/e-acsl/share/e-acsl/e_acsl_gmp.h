@@ -24,38 +24,56 @@
 /* GMP prototypes */
 /******************/
 
+#ifndef E_ACSL_GMP
+#define E_ACSL_GMP
+
+#include "e_acsl_gmp_types.h"
+
 /****************/
 /* Initializers */
 /****************/
 
-/*@ ensures \valid(z);
+/*@ requires ! \initialized(z);
+  @ ensures \valid(z);
   @ allocates z;
   @ assigns *z; */
-extern void __gmpz_init(mpz_t z);
+extern void __gmpz_init(mpz_t z)
+  __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(z_orig);
+  @ requires ! \initialized(z);
   @ allocates z;
   @ ensures \valid(z);
 //  @ ensures z->n == z_orig->n;
   @ assigns *z \from *z_orig; */
-extern void __gmpz_init_set(mpz_t z, const mpz_t z_orig);
+extern void __gmpz_init_set(mpz_t z, const mpz_t z_orig)
+  __attribute__((FC_BUILTIN));
 
-/*@ allocates z;
+/*@ requires ! \initialized(z);
+  @ allocates z;
   @ ensures \valid(z);
+  @ ensures \initialized(z);
 //  @ ensures z->n == n;
   @ assigns *z \from n; */
-extern void __gmpz_init_set_ui(mpz_t z, unsigned long int n);
+extern void __gmpz_init_set_ui(mpz_t z, unsigned long int n)
+  __attribute__((FC_BUILTIN));
 
-/*@ allocates z;
+/*@ requires ! \initialized(z);
+  @ allocates z;
   @ ensures \valid(z);
+  @ ensures \initialized(z);
 //  @ ensures z->n == n;
   @ assigns *z \from n; */
-extern void __gmpz_init_set_si(mpz_t z, signed long int n);
+extern void __gmpz_init_set_si(mpz_t z, signed long int n)
+  __attribute__((FC_BUILTIN));
 
-/*@ allocates z;
+/*@ requires ! \initialized(z);
+  @ allocates z;
   @ ensures \valid(z);
+  @ ensures \initialized(z);
   @ assigns *z \from str,base; */
-extern int __gmpz_init_set_str(mpz_t z, const char *str, int base);
+extern int __gmpz_init_set_str(mpz_t z, const char *str, int base)
+  __attribute__((FC_BUILTIN));
 
 /***************/
 /* Assignments */
@@ -65,26 +83,30 @@ extern int __gmpz_init_set_str(mpz_t z, const char *str, int base);
   @ requires \valid(z);
 //  @ ensures z->n == z_orig->n;
   @ assigns *z \from *z_orig; */
-extern void __gmpz_set(mpz_t z, const mpz_t z_orig);
+extern void __gmpz_set(mpz_t z, const mpz_t z_orig)
+  __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(z);
 //  @ ensures z->n == n;
   @ assigns *z \from n; */
-extern void __gmpz_set_ui(mpz_t z, unsigned long int n);
+extern void __gmpz_set_ui(mpz_t z, unsigned long int n)
+  __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(z);
 //  @ ensures z->n == n;
   @ assigns *z \from n; */
-extern void __gmpz_set_si(mpz_t z, signed long int n);
+extern void __gmpz_set_si(mpz_t z, signed long int n)
+  __attribute__((FC_BUILTIN));
 
 /*************/
 /* Finalizer */
 /*************/
 
 /*@ requires \valid(x);
-  @ frees x; 
+//  @ frees x;
   @ assigns *x; */
-extern void __gmpz_clear(mpz_t x);
+extern void __gmpz_clear(mpz_t x)
+  __attribute__((FC_BUILTIN));
 
 /********************/
 /* Logical operator */
@@ -93,7 +115,8 @@ extern void __gmpz_clear(mpz_t x);
 /*@ requires \valid(z1);
   @ requires \valid(z2);
   @ assigns \nothing; */
-extern int __gmpz_cmp(const mpz_t z1, const mpz_t z2);
+extern int __gmpz_cmp(const mpz_t z1, const mpz_t z2)
+  __attribute__((FC_BUILTIN));
 
 /************************/
 /* Arithmetic operators */
@@ -102,37 +125,43 @@ extern int __gmpz_cmp(const mpz_t z1, const mpz_t z2);
 /*@ requires \valid(z1);
   @ requires \valid(z2);
   @ assigns *z1 \from *z2; */
-extern void __gmpz_neg(mpz_t z1, const mpz_t z2);
+extern void __gmpz_neg(mpz_t z1, const mpz_t z2)
+  __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
   @ requires \valid(z3);
   @ assigns *z1 \from *z2, *z3; */
-extern void __gmpz_add(mpz_t z1, const mpz_t z2, const mpz_t z3);
+extern void __gmpz_add(mpz_t z1, const mpz_t z2, const mpz_t z3)
+  __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
   @ requires \valid(z3);
   @ assigns *z1 \from *z2, *z3; */
-extern void __gmpz_sub(mpz_t z1, const mpz_t z2, const mpz_t z3);
+extern void __gmpz_sub(mpz_t z1, const mpz_t z2, const mpz_t z3)
+  __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
   @ requires \valid(z3);
   @ assigns *z1 \from *z2, *z3; */
-extern void __gmpz_mul(mpz_t z1, const mpz_t z2, const mpz_t z3);
+extern void __gmpz_mul(mpz_t z1, const mpz_t z2, const mpz_t z3)
+  __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
   @ requires \valid(z3);
   @ assigns *z1 \from *z2, *z3; */
-extern void __gmpz_tdiv_q(mpz_t z1, const mpz_t z2, const mpz_t z3);
+extern void __gmpz_tdiv_q(mpz_t z1, const mpz_t z2, const mpz_t z3)
+  __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
   @ requires \valid(z3);
   @ assigns *z1 \from *z2, *z3; */
-extern void __gmpz_tdiv_r(mpz_t z1, const mpz_t z2, const mpz_t z3);
+extern void __gmpz_tdiv_r(mpz_t z1, const mpz_t z2, const mpz_t z3)
+  __attribute__((FC_BUILTIN));
 
 /*********************/
 /* Bitwise operators */
@@ -141,7 +170,8 @@ extern void __gmpz_tdiv_r(mpz_t z1, const mpz_t z2, const mpz_t z3);
 /*@ requires \valid(z1);
   @ requires \valid(z2);
   @ assigns *z1 \from *z2; */
-extern int __gmpz_com(mpz_t z1, const mpz_t z2);
+extern int __gmpz_com(mpz_t z1, const mpz_t z2)
+  __attribute__((FC_BUILTIN));
 
 /************************/
 /* Coercions to C types */
@@ -149,8 +179,12 @@ extern int __gmpz_com(mpz_t z1, const mpz_t z2);
 
 /*@ requires \valid(z); 
   @ assigns \nothing; */
-extern long __gmpz_get_si(const mpz_t z);
+extern long __gmpz_get_si(const mpz_t z)
+  __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(z); 
   @ assigns \nothing; */
-extern unsigned long __gmpz_get_ui(const mpz_t z);
+extern unsigned long __gmpz_get_ui(const mpz_t z)
+  __attribute__((FC_BUILTIN));
+
+#endif

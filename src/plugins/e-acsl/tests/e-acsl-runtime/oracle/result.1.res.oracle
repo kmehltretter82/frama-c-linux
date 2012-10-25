@@ -1,127 +1,153 @@
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -I/usr/local/share/frama-c/libc ./share/e-acsl/e_acsl_gmp_types.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -I/usr/local/share/frama-c/libc ./share/e-acsl/e_acsl_gmp.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -I/usr/local/share/frama-c/libc ./share/e-acsl/e_acsl.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -I/usr/local/share/frama-c/libc ./share/e-acsl/memory_model/e_acsl_mmodel_api.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -I/usr/local/share/frama-c/libc ./share/e-acsl/memory_model/e_acsl_bittree.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -I/usr/local/share/frama-c/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
 tests/e-acsl-runtime/result.i:7:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
+        __fc_random_counter ∈ {0}
+        __fc_rand_max ∈ {2147483647}
+        __fc_heap_status ∈ [--..--]
+        __fc_stdout ∈ {{ NULL ; &S___fc_stdout }}
         Y ∈ {1}
+        S___fc_stdout[0].__fc_stdio_fpos ∈ [--..--]
+                     [0].__fc_stdio_buffer ∈
+                     {{ NULL ; &S___fc_stdio_buffer_0_S___fc_stdout }}
+                     [0]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
+                     [0].[bits 80 to 95] ∈ UNINITIALIZED
+                     {[0].__fc_stdio_id; [1].__fc_stdio_fpos; } ∈ [--..--]
+                     [1].__fc_stdio_buffer ∈
+                     {{ NULL ; &S___fc_stdio_buffer_1_S___fc_stdout }}
+                     [1]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
+                     [1].[bits 80 to 95] ∈ UNINITIALIZED
+                     [1].__fc_stdio_id ∈ [--..--]
+        S___fc_stdio_buffer_0_S___fc_stdout[0..1] ∈ [--..--]
+        S___fc_stdio_buffer_1_S___fc_stdout[0..1] ∈ [--..--]
 [value] computing for function f <- main.
-        Called from PROJECT_FILE.i:316.
+        Called from tests/e-acsl-runtime/result.i:27.
 [value] computing for function __gmpz_init_set_si <- f <- main.
-        Called from PROJECT_FILE.i:256.
+        Called from tests/e-acsl-runtime/result.i:7.
 [value] using specification for function __gmpz_init_set_si
-PROJECT_FILE.i:86:[value] Function __gmpz_init_set_si: postcondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:61:[value] Function __gmpz_init_set_si: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:63:[value] Function __gmpz_init_set_si: postcondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: postcondition got status unknown.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init_set_si <- f <- main.
-        Called from PROJECT_FILE.i:257.
+        Called from tests/e-acsl-runtime/result.i:7.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init <- f <- main.
-        Called from PROJECT_FILE.i:258.
+        Called from tests/e-acsl-runtime/result.i:7.
 [value] using specification for function __gmpz_init
-PROJECT_FILE.i:67:[value] Function __gmpz_init: postcondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:36:[value] Function __gmpz_init: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:37:[value] Function __gmpz_init: postcondition got status valid.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_sub <- f <- main.
-        Called from PROJECT_FILE.i:259.
+        Called from tests/e-acsl-runtime/result.i:7.
 [value] using specification for function __gmpz_sub
-PROJECT_FILE.i:149:[value] Function __gmpz_sub: precondition got status valid.
-PROJECT_FILE.i:150:[value] Function __gmpz_sub: precondition got status valid.
-PROJECT_FILE.i:151:[value] Function __gmpz_sub: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:138:[value] Function __gmpz_sub: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:139:[value] Function __gmpz_sub: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:140:[value] Function __gmpz_sub: precondition got status valid.
 [value] Done for function __gmpz_sub
 [value] computing for function __gmpz_get_ui <- f <- main.
-        Called from PROJECT_FILE.i:260.
+        Called from :0.
 [value] using specification for function __gmpz_get_ui
-PROJECT_FILE.i:190:[value] Function __gmpz_get_ui: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:185:[value] Function __gmpz_get_ui: precondition got status valid.
 [value] Done for function __gmpz_get_ui
 [value] computing for function __gmpz_init_set_si <- f <- main.
-        Called from PROJECT_FILE.i:261.
+        Called from tests/e-acsl-runtime/result.i:7.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_cmp <- f <- main.
-        Called from PROJECT_FILE.i:262.
+        Called from tests/e-acsl-runtime/result.i:7.
 [value] using specification for function __gmpz_cmp
-PROJECT_FILE.i:129:[value] Function __gmpz_cmp: precondition got status valid.
-PROJECT_FILE.i:130:[value] Function __gmpz_cmp: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:115:[value] Function __gmpz_cmp: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:116:[value] Function __gmpz_cmp: precondition got status valid.
 [value] Done for function __gmpz_cmp
 [value] computing for function e_acsl_assert <- f <- main.
-        Called from PROJECT_FILE.i:263.
-PROJECT_FILE.i:231:[value] Function e_acsl_assert: precondition got status unknown.
+        Called from tests/e-acsl-runtime/result.i:7.
+./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status unknown.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function __gmpz_clear <- f <- main.
-        Called from PROJECT_FILE.i:265.
+        Called from tests/e-acsl-runtime/result.i:7.
 [value] using specification for function __gmpz_clear
-PROJECT_FILE.i:120:[value] Function __gmpz_clear: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:105:[value] Function __gmpz_clear: precondition got status valid.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- f <- main.
-        Called from PROJECT_FILE.i:266.
+        Called from tests/e-acsl-runtime/result.i:7.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- f <- main.
-        Called from PROJECT_FILE.i:267.
+        Called from tests/e-acsl-runtime/result.i:7.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- f <- main.
-        Called from PROJECT_FILE.i:268.
+        Called from tests/e-acsl-runtime/result.i:7.
 [value] Done for function __gmpz_clear
-PROJECT_FILE.i:241:[value] Function f: postcondition got status valid.
+tests/e-acsl-runtime/result.i:7:[value] Function f: postcondition got status valid.
 [value] Recording results for f
 [value] Done for function f
 [value] computing for function g <- main.
-        Called from PROJECT_FILE.i:317.
+        Called from tests/e-acsl-runtime/result.i:28.
 [value] computing for function __gmpz_init_set_si <- g <- main.
-        Called from PROJECT_FILE.i:282.
+        Called from tests/e-acsl-runtime/result.i:18.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init_set_si <- g <- main.
-        Called from PROJECT_FILE.i:283.
+        Called from tests/e-acsl-runtime/result.i:18.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_cmp <- g <- main.
-        Called from PROJECT_FILE.i:284.
+        Called from tests/e-acsl-runtime/result.i:18.
 [value] Done for function __gmpz_cmp
 [value] computing for function e_acsl_assert <- g <- main.
-        Called from PROJECT_FILE.i:285.
+        Called from tests/e-acsl-runtime/result.i:18.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function __gmpz_clear <- g <- main.
-        Called from PROJECT_FILE.i:286.
+        Called from tests/e-acsl-runtime/result.i:18.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- g <- main.
-        Called from PROJECT_FILE.i:287.
+        Called from tests/e-acsl-runtime/result.i:18.
 [value] Done for function __gmpz_clear
-PROJECT_FILE.i:275:[value] Function g: postcondition got status valid.
+tests/e-acsl-runtime/result.i:18:[value] Function g: postcondition got status valid.
 [value] Recording results for g
 [value] Done for function g
 [value] computing for function h <- main.
-        Called from PROJECT_FILE.i:318.
+        Called from tests/e-acsl-runtime/result.i:29.
 [value] computing for function __gmpz_init_set_si <- h <- main.
-        Called from PROJECT_FILE.i:302.
+        Called from tests/e-acsl-runtime/result.i:23.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init_set_si <- h <- main.
-        Called from PROJECT_FILE.i:303.
+        Called from tests/e-acsl-runtime/result.i:23.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_cmp <- h <- main.
-        Called from PROJECT_FILE.i:304.
+        Called from tests/e-acsl-runtime/result.i:23.
 [value] Done for function __gmpz_cmp
 [value] computing for function e_acsl_assert <- h <- main.
-        Called from PROJECT_FILE.i:305.
+        Called from tests/e-acsl-runtime/result.i:23.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function __gmpz_clear <- h <- main.
-        Called from PROJECT_FILE.i:306.
+        Called from tests/e-acsl-runtime/result.i:23.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- h <- main.
-        Called from PROJECT_FILE.i:307.
+        Called from tests/e-acsl-runtime/result.i:23.
 [value] Done for function __gmpz_clear
-PROJECT_FILE.i:293:[value] Function h: postcondition got status valid.
+tests/e-acsl-runtime/result.i:23:[value] Function h: postcondition got status valid.
 [value] Recording results for h
 [value] Done for function h
+[value] computing for function __clean <- main.
+        Called from tests/e-acsl-runtime/result.i:30.
+[value] using specification for function __clean
+[kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
+[value] Done for function __clean
 [value] Recording results for main
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function e_acsl_assert:
 [value] Values at end of function f:
           x ∈ {0}
-          __e_acsl_at ∈ {1}
-          __e_acsl_at_2 ∈ {1}
 [value] Values at end of function g:
-          __e_acsl_result[0] ∈ [--..--] or UNINITIALIZED
-          __e_acsl_Y[0] ∈ [--..--] or UNINITIALIZED
-          __e_acsl_eq ∈ [--..--]
 [value] Values at end of function h:
           __retres ∈ {0}
 [value] Values at end of function main:
@@ -133,32 +159,51 @@ struct __anonstruct___mpz_struct_1 {
    unsigned long *_mp_d ;
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
-typedef __mpz_struct mpz_t[1];
+typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
+typedef unsigned int size_t;
+struct __fc_pos_t {
+   unsigned long __fc_stdio_position ;
+};
+typedef struct __fc_pos_t fpos_t;
+struct __fc_FILE {
+   fpos_t __fc_stdio_fpos ;
+   char *__fc_stdio_buffer ;
+   char __fc_stdio_error ;
+   char __fc_stdio_eof ;
+   long __fc_stdio_id ;
+};
+typedef struct __fc_FILE FILE;
 /*@
 model __mpz_struct { ℤ n };
 */
-/*@ ensures \valid(\old(z));
-    allocates \old(z);
-    
-    assigns *z;  */
-extern void __gmpz_init(__mpz_struct * /*[1]*/ z);
-/*@ ensures \valid(\old(z));
+/*@ requires ¬\initialized(z);
+    ensures \valid(\old(z));
     allocates \old(z);
     
     assigns *z;
-    assigns *z \from n; 
+  
 */
-extern void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z, long n);
-/*@ requires \valid(x);
-    frees x;
+extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init(__mpz_struct * /*[1]*/ z);
+/*@ requires ¬\initialized(z);
+    ensures \valid(\old(z));
     
+    ensures \initialized(\old(z));
+    allocates \old(z);
+    
+    assigns *z;
+    assigns *z \from n;
+  
+*/
+extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z,
+                                                                long n);
+/*@ requires \valid(x);
     assigns *x;  */
-extern void __gmpz_clear(__mpz_struct * /*[1]*/ x);
+extern  __attribute__((__FC_BUILTIN__)) void __gmpz_clear(__mpz_struct * /*[1]*/ x);
 /*@ requires \valid(z1);
     requires \valid(z2);
     assigns \nothing;  */
-extern int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
-                      __mpz_struct const * /*[1]*/ z2);
+extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
+                                                       __mpz_struct const * /*[1]*/ z2);
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
@@ -166,18 +211,30 @@ extern int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
     assigns *z1 \from *z2, *z3;
   
 */
-extern void __gmpz_sub(__mpz_struct * /*[1]*/ z1,
-                       __mpz_struct const * /*[1]*/ z2,
-                       __mpz_struct const * /*[1]*/ z3);
+extern  __attribute__((__FC_BUILTIN__)) void __gmpz_sub(__mpz_struct * /*[1]*/ z1,
+                                                        __mpz_struct const * /*[1]*/ z2,
+                                                        __mpz_struct const * /*[1]*/ z3);
 /*@ requires \valid(z);
     assigns \nothing;  */
-extern unsigned long __gmpz_get_ui(__mpz_struct const * /*[1]*/ z);
-/*@ terminates \false;
-    ensures \false;
+extern  __attribute__((__FC_BUILTIN__)) unsigned long __gmpz_get_ui(__mpz_struct const * /*[1]*/ z);
+int __fc_random_counter __attribute__((__unused__));
+unsigned long const __fc_rand_max = (unsigned long)2147483647;
+extern int __fc_heap_status;
+/*@
+axiomatic
+  dynamic_allocation {
+  predicate is_allocable{L}(size_t n) 
+    reads __fc_heap_status;
+  
+  }
+ */
+/*@ ensures \false;
     assigns \nothing;  */
 extern void exit(int status);
-/*@ assigns \nothing;  */
-extern int printf(char const * , ...);
+extern FILE *__fc_stdout;
+/*@ assigns *__fc_stdout;
+    assigns *__fc_stdout \from *(format+(..));  */
+extern int printf(char const *format , ...);
 /*@ requires predicate ≢ 0;
     assigns \nothing;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
@@ -190,11 +247,13 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
   return;
 }
 
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 /*@ ensures \result ≡ (int)(\old(x)-\old(x));  */
 int f(int x)
 {
-  int __e_acsl_at;
   int __e_acsl_at_2;
+  int __e_acsl_at;
   __e_acsl_at_2 = x;
   __e_acsl_at = x;
   x = 0;
@@ -208,14 +267,12 @@ int f(int x)
     __gmpz_init_set_si(__e_acsl_result,(long)x);
     __gmpz_init_set_si(__e_acsl,(long)__e_acsl_at);
     __gmpz_init(__e_acsl_sub);
-    __gmpz_sub(__e_acsl_sub,(__mpz_struct const *)(__e_acsl),
-               (__mpz_struct const *)(__e_acsl));
-    __e_acsl_2 = __gmpz_get_ui((__mpz_struct const *)(__e_acsl_sub));
+    __gmpz_sub(__e_acsl_sub,__e_acsl,__e_acsl);
+    __e_acsl_2 = __gmpz_get_ui(__e_acsl_sub);
     __gmpz_init_set_si(__e_acsl_cast,(long)((int)__e_acsl_2));
-    __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl_result),
-                             (__mpz_struct const *)(__e_acsl_cast));
+    __e_acsl_eq = __gmpz_cmp(__e_acsl_result,__e_acsl_cast);
     e_acsl_assert(__e_acsl_eq == 0,(char *)"Postcondition",
-                  (char *)"(\\result == (int)(\\old(x)-\\old(x)))",7);
+                  (char *)"\\result == (int)(\\old(x)-\\old(x))",7);
     __gmpz_clear(__e_acsl_result);
     __gmpz_clear(__e_acsl);
     __gmpz_clear(__e_acsl_sub);
@@ -229,18 +286,20 @@ int Y = 1;
 /*@ ensures \result ≡ Y;  */
 int g(int x)
 {
-  mpz_t __e_acsl_result;
-  mpz_t __e_acsl_Y;
-  int __e_acsl_eq;
-  __gmpz_init_set_si(__e_acsl_result,(long)x);
-  __gmpz_init_set_si(__e_acsl_Y,(long)Y);
-  __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl_result),
-                           (__mpz_struct const *)(__e_acsl_Y));
-  e_acsl_assert(__e_acsl_eq == 0,(char *)"Postcondition",
-                (char *)"(\\result == Y)",18);
-  __gmpz_clear(__e_acsl_result);
-  __gmpz_clear(__e_acsl_Y);
-  return (x);
+  {
+    mpz_t __e_acsl_result;
+    mpz_t __e_acsl_Y;
+    int __e_acsl_eq;
+    __gmpz_init_set_si(__e_acsl_result,(long)x);
+    __gmpz_init_set_si(__e_acsl_Y,(long)Y);
+    __e_acsl_eq = __gmpz_cmp(__e_acsl_result,__e_acsl_Y);
+    e_acsl_assert(__e_acsl_eq == 0,(char *)"Postcondition",
+                  (char *)"\\result == Y",18);
+    __gmpz_clear(__e_acsl_result);
+    __gmpz_clear(__e_acsl_Y);
+    return (x);
+  }
+  
 }
 
 /*@ ensures \result ≡ 0;  */
@@ -254,10 +313,9 @@ int h(void)
     int __e_acsl_eq;
     __gmpz_init_set_si(__e_acsl_result,(long)__retres);
     __gmpz_init_set_si(__e_acsl,(long)0);
-    __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl_result),
-                             (__mpz_struct const *)(__e_acsl));
+    __e_acsl_eq = __gmpz_cmp(__e_acsl_result,__e_acsl);
     e_acsl_assert(__e_acsl_eq == 0,(char *)"Postcondition",
-                  (char *)"(\\result == 0)",23);
+                  (char *)"\\result == 0",23);
     __gmpz_clear(__e_acsl_result);
     __gmpz_clear(__e_acsl);
     return (__retres);
@@ -272,6 +330,7 @@ int main(void)
   g(Y);
   h();
   __retres = 0;
+  __clean();
   return (__retres);
 }
 

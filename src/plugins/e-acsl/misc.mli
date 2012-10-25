@@ -29,17 +29,23 @@ open Cil_datatype
 (** {2 Builders} *)
 (* ************************************************************************** *)
 
-val new_lval: ?loc:Location.t -> varinfo -> exp
-(* [TODO] put it in the Frama-C kernel? *)
-
 val mk_call: ?loc:Location.t -> ?result:lval -> string -> exp list -> stmt
+val mk_debug_mmodel_stmt: stmt -> stmt
 
 type annotation_kind = Assertion | Precondition | Postcondition | Invariant
 
 val mk_e_acsl_guard: 
   ?reverse:bool -> annotation_kind -> exp -> predicate named -> stmt
 
-val e_acsl_header: unit -> global
+val library_files: unit -> string list
+val register_library_function: varinfo -> unit
+val reset: unit -> unit
+
+val result_lhost: kernel_function -> lhost
+(** @return the lhost corresponding to \result in the given function *)
+
+val result_vi: kernel_function -> varinfo
+(** @return the varinfo corresponding to \result in the given function *)
 
 (*
 Local Variables:

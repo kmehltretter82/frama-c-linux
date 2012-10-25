@@ -5,33 +5,61 @@ struct __anonstruct___mpz_struct_1 {
    unsigned long *_mp_d ;
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
-typedef __mpz_struct mpz_t[1];
+typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
+typedef unsigned int size_t;
+struct __fc_pos_t {
+   unsigned long __fc_stdio_position ;
+};
+typedef struct __fc_pos_t fpos_t;
+struct __fc_FILE {
+   fpos_t __fc_stdio_fpos ;
+   char *__fc_stdio_buffer ;
+   char __fc_stdio_error ;
+   char __fc_stdio_eof ;
+   long __fc_stdio_id ;
+};
+typedef struct __fc_FILE FILE;
 /*@
 model __mpz_struct { ℤ n };
 */
-/*@ ensures \valid(\old(z));
+/*@ requires ¬\initialized(z);
+    ensures \valid(\old(z));
+    
+    ensures \initialized(\old(z));
     allocates \old(z);
     
     assigns *z;
-    assigns *z \from n; 
+    assigns *z \from n;
+  
 */
-extern void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z, long n);
+extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z,
+                                                                long n);
 /*@ requires \valid(x);
-    frees x;
-    
     assigns *x;  */
-extern void __gmpz_clear(__mpz_struct * /*[1]*/ x);
+extern  __attribute__((__FC_BUILTIN__)) void __gmpz_clear(__mpz_struct * /*[1]*/ x);
 /*@ requires \valid(z1);
     requires \valid(z2);
     assigns \nothing;  */
-extern int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
-                      __mpz_struct const * /*[1]*/ z2);
-/*@ terminates \false;
-    ensures \false;
+extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
+                                                       __mpz_struct const * /*[1]*/ z2);
+int __fc_random_counter __attribute__((__unused__));
+unsigned long const __fc_rand_max = (unsigned long)2147483647;
+extern int __fc_heap_status;
+/*@
+axiomatic
+  dynamic_allocation {
+  predicate is_allocable{L}(size_t n) 
+    reads __fc_heap_status;
+  
+  }
+ */
+/*@ ensures \false;
     assigns \nothing;  */
 extern void exit(int status);
-/*@ assigns \nothing;  */
-extern int printf(char const * , ...);
+extern FILE *__fc_stdout;
+/*@ assigns *__fc_stdout;
+    assigns *__fc_stdout \from *(format+(..));  */
+extern int printf(char const *format , ...);
 /*@ requires predicate ≢ 0;
     assigns \nothing;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
@@ -44,6 +72,7 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
   return;
 }
 
+extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 int main(void)
 {
   int __retres;
@@ -52,9 +81,8 @@ int main(void)
   {
     int i;
     i = 0;
-    while (1) {
-      if (! (i < 10)) { break; }
-      /*@ invariant 0 ≤ i ∧ i < 10; */ ;
+    while (i < 10) {
+      /*@ invariant 0 ≤ i ∧ i < 10; */
       {
         mpz_t __e_acsl;
         mpz_t __e_acsl_i;
@@ -62,39 +90,36 @@ int main(void)
         int __e_acsl_and;
         __gmpz_init_set_si(__e_acsl,(long)0);
         __gmpz_init_set_si(__e_acsl_i,(long)i);
-        __e_acsl_le = __gmpz_cmp((__mpz_struct const *)(__e_acsl),
-                                 (__mpz_struct const *)(__e_acsl_i));
+        __e_acsl_le = __gmpz_cmp(__e_acsl,__e_acsl_i);
         if (__e_acsl_le <= 0) {
           mpz_t __e_acsl_i_2;
           mpz_t __e_acsl_2;
           int __e_acsl_lt;
           __gmpz_init_set_si(__e_acsl_i_2,(long)i);
           __gmpz_init_set_si(__e_acsl_2,(long)10);
-          __e_acsl_lt = __gmpz_cmp((__mpz_struct const *)(__e_acsl_i_2),
-                                   (__mpz_struct const *)(__e_acsl_2));
+          __e_acsl_lt = __gmpz_cmp(__e_acsl_i_2,__e_acsl_2);
           __e_acsl_and = __e_acsl_lt < 0;
           __gmpz_clear(__e_acsl_i_2);
           __gmpz_clear(__e_acsl_2);
         }
         else { __e_acsl_and = 0; }
         e_acsl_assert(__e_acsl_and,(char *)"Invariant",
-                      (char *)"(0 <= i && i < 10)",9);
+                      (char *)"0 <= i &&\ni < 10",9);
         __gmpz_clear(__e_acsl);
         __gmpz_clear(__e_acsl_i);
       }
       
       x += i;
-      /*@ invariant i ≤ x; */ ;
+      /*@ invariant i ≤ x; */
       {
         mpz_t __e_acsl_i_3;
         mpz_t __e_acsl_x;
         int __e_acsl_le_2;
         __gmpz_init_set_si(__e_acsl_i_3,(long)i);
         __gmpz_init_set_si(__e_acsl_x,(long)x);
-        __e_acsl_le_2 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_i_3),
-                                   (__mpz_struct const *)(__e_acsl_x));
+        __e_acsl_le_2 = __gmpz_cmp(__e_acsl_i_3,__e_acsl_x);
         e_acsl_assert(__e_acsl_le_2 <= 0,(char *)"Invariant",
-                      (char *)"(i <= x)",11);
+                      (char *)"i <= x",11);
         __gmpz_clear(__e_acsl_i_3);
         __gmpz_clear(__e_acsl_x);
       }
@@ -104,6 +129,7 @@ int main(void)
   }
   
   __retres = 0;
+  __clean();
   return (__retres);
 }
 

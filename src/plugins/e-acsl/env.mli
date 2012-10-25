@@ -36,20 +36,22 @@ val dummy: t
 val empty: Visitor.frama_c_visitor -> t
 
 val new_var:
-  ?global:bool -> ?name:string -> t -> term option -> typ -> 
-  (varinfo -> exp (* the var as exp *) -> stmt list)
-  -> varinfo * exp * t
+  ?loc:location -> ?init:bool -> ?global:bool -> ?name:string -> 
+  t -> term option -> typ -> 
+  (varinfo -> exp (* the var as exp *) -> stmt list) -> 
+  varinfo * exp * t
 (** [new_var env t ty mk_stmts] extends [env] with a fresh variable of type
     [ty] corresponding to [t]. [global] indicates whether the new variable is
     global to the current function or local to the local block (default is
-    [false], i.e. local).
+    [false], i.e. local). [init] indicates if the initial env must be used.
     @return this variable as both a C variable and a C expression already
     initialized by applying it to [mk_stmts]. *)
 
 val new_var_and_mpz_init:
-  ?global:bool -> ?name:string -> t -> term option -> 
-  (varinfo -> exp (* the var as exp *) -> stmt list) 
-  -> varinfo * exp * t
+  ?loc:location -> ?init:bool -> ?global:bool -> ?name:string -> 
+  t -> term option -> 
+  (varinfo -> exp (* the var as exp *) -> stmt list) -> 
+  varinfo * exp * t
 (** Same as [new_var], but dedicated to mpz_t variables initialized by 
     {!Mpz.init}. *)
 
@@ -63,7 +65,7 @@ val add_assert: t -> stmt -> predicate named -> unit
 (** [add_assert kf s p] extends the global environment with an assertion [p]
     associated to the statement [s] in function [kf]. *)
 
-val add_stmt: t -> stmt -> t
+val add_stmt: ?init:bool -> t -> stmt -> t
   (** [add_stmt env s] extends [env] with the new statement [s] *)
 
 val extend_stmt_in_place: t -> stmt -> pre:bool -> block -> t
@@ -86,10 +88,13 @@ val pop_and_get: t -> stmt -> global_clear:bool -> where -> block * t
 val pop: t -> t
 (** Pop the last local context (ignore the corresponding new block if any *)
 
-val get_generated_variables: t -> varinfo list
-(** All the new variables local to the visited function. *)
+val get_generated_variables: t -> (varinfo * bool) list
+(** All the new variables local to the visited function. 
+    The boolean indicates whether the varinfo must be added to the outermost
+    function block. *)
 
 val get_visitor: t -> Visitor.generic_frama_c_visitor
+val get_behavior: t -> Cil.visitor_behavior
 
 val stmt_of_label: t -> logic_label -> stmt
 

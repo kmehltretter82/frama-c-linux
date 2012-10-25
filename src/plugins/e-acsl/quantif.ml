@@ -104,12 +104,15 @@ let convert env loc is_forall p bounded_vars hyps goal =
   let var_res, res, env =
     (* variable storing the result of the quantifier *)
     let name = if is_forall then "forall" else "exists" in
+    let init_loc = loc in
     Env.new_var
+      ~loc
       ~name
       env
       None
       intType
-      (fun v _ ->
+      (fun ?loc v _ ->
+	let loc = match loc with None -> init_loc | Some l -> l in
 	let lv = var v in
 	[ mkStmtOneInstr ~valid_sid:true (Set(lv, init_val, loc)) ])
   in
@@ -168,7 +171,9 @@ let convert env loc is_forall p bounded_vars hyps goal =
       logic_x.lv_type <- if Mpz.is_t ty then Linteger else Ctype ty;
       let var_x, x, env = Env.Logic_binding.add env logic_x in
       let lv_x = var var_x in
-      let env = if Mpz.is_t ty then Env.add_stmt env (Mpz.init x) else env in
+      let env = 
+	if Mpz.is_t ty then Env.add_stmt env (Mpz.init ~loc x) else env 
+      in
       (* build the inner loops and loop body *)
       let body, env = mk_for_loop env tl in
       (* initialize the loop counter to [t1] *)

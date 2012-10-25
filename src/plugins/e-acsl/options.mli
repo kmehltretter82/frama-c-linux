@@ -29,6 +29,8 @@ module Run: Bool
 module Gmp_only: Bool
 module Project_name: String
 
+val must_visit: unit -> bool
+
 (*
 Local Variables:
 compile-command: "make"

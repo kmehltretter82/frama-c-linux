@@ -1,7 +1,19 @@
+- enlever les skip inutiles
+- valid global literal string
+
+################
+# MEMORY MODEL #
+################
+
+- appel de full_init et consort sur des variables générées par e_acsl (at.i)
+- ne générer les instructions que si nécessaire
+- traduction constructions logiques modèle mémoire \valid, \init ...
+
 ################
 # NEXT RELEASE #
 ################
 
+- updater doc/Changelog
 - [Bernard] avoir une fonction e_acsl_trace_behavior(char *bhv_name) {}
   à appeler dès qu'un behavior est activé
 - utiliser Rte pour tous les overflows potentiels
@@ -15,18 +27,28 @@
 - grep TODO *.ml*
 - gestion des initialiseurs des globals: requiert un main
 - mkcall ne devrait pas générer de nouvelles variables pour une même fonction
+- variable GMP potentiellement initialisé mais non utilisé en présence de \at
+  (voir test result.i, cas -e-acsl-gmp-only)
 
 ##############
 # KNOWN BUGS #
 ##############
 
-- sizeof("literal_string") (voir sizeof.i)
-- Bernard's bug avec un requires global et un ensures dans un behavior
+- sizeof("literal_string") (voir test sizeof.i)
+- comparaisons qui aboutissent à du C incorrect
+  ==> comparaison de chaînes litérales
+   (voir tests other_constants.i et comparison.i)
+    --> dépend de la sémantique d'ACSL non fixée
+    --> veut-on le transformer en égalité des caractères avec un ordre lexico 
+    ou veut-on générer une erreur (comportement non **spécifié** du C). 
+  ==> comparaison de pointeurs --> générer une erreur (merci RTE?)
 - \at incorrect si StmtLabel faisant référence au stmt courant (voir test at.i)
 - incorrect d'utiliser un \old dans le post-state si pre-state == post-state
   (même raison que ci-dessus)
 - incorrect d'utiliser Pre, Post, Here, Old dans stmt contract 
   (même problème que Jessie: cf. BTS #72)
+  (voir aussi result.i et ./at_stmt_contract.i)
+- interprétation des tableaux
 
 #########
 # TESTS #
@@ -35,3 +57,5 @@
 - améliorer test "integer_constant.i" quand bug fixed #745
 - inclure exemple du E-ACSL Reference Manual
 - test arith.i: mettre les exemples du ACSL manual about div and modulo
+- -val-verbose 0 dans les tests...
+- test intensif modèle mémoire

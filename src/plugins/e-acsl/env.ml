@@ -22,7 +22,6 @@
 
 open Cil_types
 open Cil_datatype
-open Cil
 
 let global_state = ref State.dummy
 
@@ -46,9 +45,12 @@ type local_env = { block_info: block_info; mpz_tbl: mpz_tbl }
 type t = 
     { visitor: Visitor.frama_c_visitor; 
       annotation_kind: Misc.annotation_kind;
-      new_global_vars: varinfo list; (* generated variables at function level *)
+      new_global_vars: (varinfo * bool) list; 
+      (* generated variables at function level. The boolean indicates whether
+	 the varinfo must be added to the outermost function block. *)
       global_mpz_tbl: mpz_tbl;
       env_stack: local_env list;
+      init_env: local_env;
       var_mapping: Varinfo.t Logic_var.Map.t; (* bind logic var to C var *)
       cpt: int; (* counter used when generating variables *) }
 
@@ -78,15 +80,20 @@ let empty_mpz_tbl =
   { new_exps = Term.Map.empty;
     clear_stmts = [] }
 
+let empty_local_env =
+  { block_info = { new_block_vars = []; new_stmts = []; pre_stmts = [] };
+    mpz_tbl = empty_mpz_tbl }
+
 let dummy = 
   { visitor = 
       new Visitor.generic_frama_c_visitor 
 	Project_skeleton.dummy
-	(inplace_visit ()); 
+	(Cil.inplace_visit ()); 
     annotation_kind = Misc.Assertion;
     new_global_vars = [];
     global_mpz_tbl = empty_mpz_tbl; 
     env_stack = []; 
+    init_env = empty_local_env;
     var_mapping = Logic_var.Map.empty;
     cpt = 0 }
 
@@ -96,22 +103,25 @@ let empty v =
     new_global_vars = [];
     global_mpz_tbl = empty_mpz_tbl; 
     env_stack = []; 
+    init_env = empty_local_env;
     var_mapping = Logic_var.Map.empty;
     cpt = 0 }
 
-let top env = match env.env_stack with [] -> assert false | hd :: tl -> hd, tl
+let top init env = 
+  if init then env.init_env, []
+  else match env.env_stack with [] -> assert false | hd :: tl -> hd, tl
 
 (* eta-expansion required for typing generalisation *)
 let acc_list_rev acc l = List.fold_left (fun acc x -> x :: acc) acc l
 
-let do_new_var ?(global=false) ?(name="") env t ty mk_stmts =
-  let local_env, tl_env = top env in
+let do_new_var ?loc init ?(global=false) ?(name="") env t ty mk_stmts =
+  let local_env, tl_env = top init env in
   let local_block = local_env.block_info in
   let is_t = Mpz.is_t ty in
   if is_t then Mpz.is_now_referenced ();
   let n = succ env.cpt in
   let v =
-    makeVarinfo
+    Cil.makeVarinfo
       ~logic:false
       ~generated:true
       false (* is a global? *)
@@ -119,8 +129,9 @@ let do_new_var ?(global=false) ?(name="") env t ty mk_stmts =
       (Varname.get ("__e_acsl" ^ if name = "" then "" else "_" ^ name))
       ty
   in
+  v.vreferenced <- true;
 (*  Options.feedback "new variable %a (global? %b)" Varinfo.pretty v global;*)
-  let e = Misc.new_lval v in
+  let e = Cil.evar v in
   let stmts = mk_stmts v e in
   let new_stmts = acc_list_rev local_block.new_stmts stmts in
   let new_block_vars = 
@@ -134,12 +145,13 @@ let do_new_var ?(global=false) ?(name="") env t ty mk_stmts =
   in
   v,
   e, 
-  if is_t then 
+  if is_t then begin
+    assert (not init); (* only char* in initializers *)
     let extend_tbl tbl = 
 (*      Options.feedback "memoizing %a for term %a" 
 	Varinfo.pretty v (fun fmt t -> match t with None -> Format.fprintf fmt
 	  "NONE" | Some t -> Term.pretty fmt t) t;*)
-      { clear_stmts = Mpz.clear e :: tbl.clear_stmts;
+      { clear_stmts = Mpz.clear ?loc e :: tbl.clear_stmts;
 	new_exps = match t with
 	| None -> tbl.new_exps
 	| Some t -> Term.Map.add t (v, e) tbl.new_exps }
@@ -149,35 +161,41 @@ let do_new_var ?(global=false) ?(name="") env t ty mk_stmts =
       (* also memoise the new variable, but must never be used *)
       { env with
 	cpt = n;
-	new_global_vars = v :: env.new_global_vars;
+	new_global_vars = (v, true) :: env.new_global_vars;
 	global_mpz_tbl = extend_tbl env.global_mpz_tbl;
 	env_stack = local_env :: tl_env }
     else
       let local_env = 
 	{ block_info = new_block; mpz_tbl = extend_tbl local_env.mpz_tbl } 
       in
-      { env with cpt = n; env_stack = local_env :: tl_env }
-  else
+      { env with 
+	cpt = n; 
+	env_stack = local_env :: tl_env;
+	new_global_vars = (v, false) :: env.new_global_vars }
+  end else
     let new_global_vars = 
-      if global then v :: env.new_global_vars
-      else env.new_global_vars
+      if global then (v, true) :: env.new_global_vars 
+      else (v, false) :: env.new_global_vars
     in
+    let local_env = { local_env with block_info = new_block } in
     { env with
       new_global_vars = new_global_vars;
       cpt = n;
-      env_stack = { local_env with block_info = new_block } :: tl_env }
+      init_env = if init then local_env else env.init_env;
+      env_stack = if init then env.env_stack else local_env :: tl_env }
 
 exception No_term
 
-let new_var ?(global=false) ?name env t ty mk_stmts = 
-  let local_env, _ = top env in
-  if global then
+let new_var ?loc ?(init=false) ?(global=false) ?name env t ty mk_stmts = 
+  let local_env, _ = top init env in
+  if global then begin
+    assert (not init);
     (* do not use memoisation here: it is incorrect for terms corresponding to
        impure expressions
        [JS 2011/11/23] actually it is correct now since globals are only use for
        \at *)
-    do_new_var ~global ?name env t ty mk_stmts  
-  else
+    do_new_var ?loc false ~global ?name env t ty mk_stmts  
+  end else
     try
       match t with
       | None -> raise No_term
@@ -185,18 +203,20 @@ let new_var ?(global=false) ?name env t ty mk_stmts =
 	let v, e = Term.Map.find t local_env.mpz_tbl.new_exps in
 	if Typ.equal ty v.vtype then v, e, env else raise No_term
     with Not_found | No_term -> 
-      do_new_var ~global ?name env t ty mk_stmts  
+      do_new_var ?loc ~global init ?name env t ty mk_stmts  
 
-let new_var_and_mpz_init ?global ?name env t mk_stmts = 
-  new_var ?global ?name env t Mpz.t (fun v e -> Mpz.init e :: mk_stmts v e)
+let new_var_and_mpz_init ?loc ?init ?global ?name env t mk_stmts = 
+  new_var 
+    ?loc ?init ?global ?name env t (Mpz.t ()) 
+    (fun v e -> Mpz.init ?loc e :: mk_stmts v e)
 
 module Logic_binding = struct
 
   let add env logic_v =
     let ty = match logic_v.lv_type with
       | Ctype ty -> ty
-      | Linteger -> Mpz.t
-      | Ltype _ as ty when Logic_const.is_boolean_type ty -> charType
+      | Linteger -> Mpz.t ()
+      | Ltype _ as ty when Logic_const.is_boolean_type ty -> Cil.charType
       | Ltype _ | Lvar _ | Lreal | Larrow _ as lty -> 
 	let msg = 
 	  Pretty_utils.sfprintf 
@@ -204,7 +224,9 @@ module Logic_binding = struct
 	in
 	Error.not_yet msg
     in
-    let v, e, env = new_var env ~name:logic_v.lv_name None ty (fun _ _ -> []) in
+    let v, e, env = 
+      new_var env ~name:logic_v.lv_name None ty (fun ?loc:_ _ _ -> []) 
+    in
     v,
     e, 
     { env with var_mapping = Logic_var.Map.add logic_v v env.var_mapping }
@@ -227,10 +249,11 @@ let current_kf env =
   | Some kf -> Some (Cil.get_kernel_function v#behavior kf)
 
 let get_visitor env = env.visitor
+let get_behavior env = env.visitor#behavior
 
 let emitter = 
   Emitter.create
-    "E-ACSL" 
+    "E_ACSL" 
     [ Emitter.Code_annot ] 
     ~correctness:[ Options.Gmp_only.parameter ]
     ~tuning:[]
@@ -243,18 +266,21 @@ let add_assert env stmt annot =
       (fun () -> Annotations.add_assert emitter ~kf stmt annot) 
       env.visitor#get_filling_actions
 
-let add_stmt env stmt =
-  let local_env, tl = top env in
+let add_stmt ?(init=false) env stmt =
+  let local_env, tl = top init env in
   let block = local_env.block_info in
   let block = { block with new_stmts = stmt :: block.new_stmts } in
-  { env with env_stack = { local_env with block_info = block } :: tl }
+  let local_env = { local_env with block_info = block } in
+  { env with 
+    init_env = if init then local_env else env.init_env;
+    env_stack = if init then env.env_stack else local_env :: tl }
 
 let extend_stmt_in_place env stmt ~pre block =
-  let new_stmt = mkStmt ~valid_sid:true (Block block) in
+  let new_stmt = Cil.mkStmt ~valid_sid:true (Block block) in
   let sk = stmt.skind in
-  stmt.skind <- Block (mkBlock [ new_stmt; mkStmt ~valid_sid:true sk ]);
+  stmt.skind <- Block (Cil.mkBlock [ new_stmt; Cil.mkStmt ~valid_sid:true sk ]);
   if pre then 
-    let local_env, tl_env = top env in
+    let local_env, tl_env = top false env in
     let b_info = local_env.block_info in
     let b_info = { b_info with pre_stmts = new_stmt :: b_info.pre_stmts } in
     { env with env_stack = { local_env with block_info = b_info } :: tl_env }
@@ -268,13 +294,13 @@ let push env =
 
 let pop env =
 (*  Options.feedback "pop";*)
-  let _, tl = top env in
+  let _, tl = top false env in
   { env with env_stack = tl }
 
 type where = Before | Middle | After
 let pop_and_get env stmt ~global_clear where =
   (*  Options.feedback "pop_and_get (%d)" (List.length env.env_stack); *)
-  let local_env, tl = top env in
+  let local_env, tl = top false env in
   let clear = 
     if global_clear then begin
       Varname.clear ();
@@ -291,23 +317,22 @@ let pop_and_get env stmt ~global_clear where =
 	| [] -> acc, stmt
 	| _ :: tl ->
 	  match stmt.skind with
-	  | Block { bstmts = [ fst; snd ] } ->
-	    (* [JS 2011/11/23] stmts look the same as expected; but sid are
-	       different and I don't know why ==> thus the assertion does not
-	       hold :-( *)
-(*	    assert (Stmt.equal stmt' fst);*)
-	    extract snd (fst :: acc) tl
+	  | Block { bstmts = [ fst; snd ] } -> extract snd (fst :: acc) tl
 	  | _ -> assert false
       in
       extract stmt [] block.pre_stmts
     in
     let new_s = block.new_stmts in
-    let stmts = match where with
-      | Before -> stmt :: acc_list_rev (List.rev clear) new_s
-      | Middle -> acc_list_rev (stmt :: List.rev clear) new_s
-      | After -> acc_list_rev (acc_list_rev [ stmt ] clear) new_s
+    let cat stmt l = match stmt.skind with
+      | Instr(Skip _) -> l
+      | _ -> stmt :: l
     in
-    mkBlock (acc_list_rev stmts pre_stmts)
+    let stmts = match where with
+      | Before -> cat stmt (acc_list_rev (List.rev clear) new_s)
+      | Middle -> acc_list_rev (cat stmt (List.rev clear)) new_s
+      | After -> acc_list_rev (acc_list_rev (cat stmt []) clear) new_s
+    in
+    Cil.mkBlock (acc_list_rev stmts pre_stmts)
   in
   b.blocals <- acc_list_rev b.blocals block.new_block_vars;
   b, { env with env_stack = tl }

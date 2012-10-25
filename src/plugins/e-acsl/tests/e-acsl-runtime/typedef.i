@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: typedef (from a Bernard's bug report)
-   EXECNOW: LOG gen_typedef.c BIN gen_typedef.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/typedef.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_typedef.c > /dev/null && gcc -pedantic -o ./tests/e-acsl-runtime/result/gen_typedef.out ./tests/e-acsl-runtime/result/gen_typedef.c -lgmp && ./tests/e-acsl-runtime/result/gen_typedef.out
-   EXECNOW: LOG gen_typedef2.c BIN gen_typedef2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/typedef.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_typedef2.c > /dev/null && gcc -pedantic -o ./tests/e-acsl-runtime/result/gen_typedef2.out ./tests/e-acsl-runtime/result/gen_typedef2.c -lgmp && ./tests/e-acsl-runtime/result/gen_typedef2.out
+   EXECNOW: LOG gen_typedef.c BIN gen_typedef.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/typedef.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_typedef.c > /dev/null && ./gcc_test.sh typedef
+   EXECNOW: LOG gen_typedef2.c BIN gen_typedef2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/typedef.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_typedef2.c > /dev/null && ./gcc_test.sh typedef2
 */
 
 typedef unsigned char uint8;

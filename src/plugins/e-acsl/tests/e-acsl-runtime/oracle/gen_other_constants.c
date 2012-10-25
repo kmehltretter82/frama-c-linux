@@ -5,6 +5,20 @@ struct __anonstruct___mpz_struct_1 {
    unsigned long *_mp_d ;
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
+typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
+typedef unsigned int size_t;
+struct __fc_pos_t {
+   unsigned long __fc_stdio_position ;
+};
+typedef struct __fc_pos_t fpos_t;
+struct __fc_FILE {
+   fpos_t __fc_stdio_fpos ;
+   char *__fc_stdio_buffer ;
+   char __fc_stdio_error ;
+   char __fc_stdio_eof ;
+   long __fc_stdio_id ;
+};
+typedef struct __fc_FILE FILE;
 enum bool {
     false = 0,
     true = 1
@@ -12,12 +26,24 @@ enum bool {
 /*@
 model __mpz_struct { ℤ n };
 */
-/*@ terminates \false;
-    ensures \false;
+int __fc_random_counter __attribute__((__unused__));
+unsigned long const __fc_rand_max = (unsigned long)2147483647;
+extern int __fc_heap_status;
+/*@
+axiomatic
+  dynamic_allocation {
+  predicate is_allocable{L}(size_t n) 
+    reads __fc_heap_status;
+  
+  }
+ */
+/*@ ensures \false;
     assigns \nothing;  */
 extern void exit(int status);
-/*@ assigns \nothing;  */
-extern int printf(char const * , ...);
+extern FILE *__fc_stdout;
+/*@ assigns *__fc_stdout;
+    assigns *__fc_stdout \from *(format+(..));  */
+extern int printf(char const *format , ...);
 /*@ requires predicate ≢ 0;
     assigns \nothing;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
@@ -30,18 +56,16 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
   return;
 }
 
+extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 int main(void)
 {
   int __retres;
-  /*@ assert "toto" ≢ "titi"; */ ;
-  e_acsl_assert("toto" != "titi",(char *)"Assertion",
-                (char *)"(\"toto\" != \"titi\")",10);
-  /*@ assert 'c' ≡ 'c'; */ ;
-  e_acsl_assert('c' == 'c',(char *)"Assertion",(char *)"(\'c\' == \'c\')",11);
-  /*@ assert false ≢ true; */ ;
-  e_acsl_assert(false != true,(char *)"Assertion",(char *)"(false != true)",
-                12);
+  /*@ assert 'c' ≡ 'c'; */
+  e_acsl_assert('c' == 'c',(char *)"Assertion",(char *)"\'c\' == \'c\'",12);
+  /*@ assert false ≢ true; */
+  e_acsl_assert(false != true,(char *)"Assertion",(char *)"false != true",13);
   __retres = 0;
+  __clean();
   return (__retres);
 }
 

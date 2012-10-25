@@ -1,3 +1,9 @@
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -I/usr/local/share/frama-c/libc ./share/e-acsl/e_acsl_gmp_types.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -I/usr/local/share/frama-c/libc ./share/e-acsl/e_acsl_gmp.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -I/usr/local/share/frama-c/libc ./share/e-acsl/e_acsl.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -I/usr/local/share/frama-c/libc ./share/e-acsl/memory_model/e_acsl_mmodel_api.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -I/usr/local/share/frama-c/libc ./share/e-acsl/memory_model/e_acsl_bittree.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -I/usr/local/share/frama-c/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
 tests/e-acsl-runtime/at.i:32:[e-acsl] warning: missing guard for ensuring that q is a valid memory access
 tests/e-acsl-runtime/at.i:32:[e-acsl] warning: missing guard for ensuring that p+\at(*q,L1) is a valid pointer
 tests/e-acsl-runtime/at.i:32:[e-acsl] warning: missing guard for ensuring that p+\at(*q,L1) is a valid memory access
@@ -8,319 +14,332 @@ tests/e-acsl-runtime/at.i:34:[e-acsl] warning: missing guard for ensuring that p
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
+        __fc_random_counter ∈ {0}
+        __fc_rand_max ∈ {2147483647}
+        __fc_heap_status ∈ [--..--]
+        __fc_stdout ∈ {{ NULL ; &S___fc_stdout }}
         A ∈ {0}
+        S___fc_stdout[0].__fc_stdio_fpos ∈ [--..--]
+                     [0].__fc_stdio_buffer ∈
+                     {{ NULL ; &S___fc_stdio_buffer_0_S___fc_stdout }}
+                     [0]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
+                     [0].[bits 80 to 95] ∈ UNINITIALIZED
+                     {[0].__fc_stdio_id; [1].__fc_stdio_fpos; } ∈ [--..--]
+                     [1].__fc_stdio_buffer ∈
+                     {{ NULL ; &S___fc_stdio_buffer_1_S___fc_stdout }}
+                     [1]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
+                     [1].[bits 80 to 95] ∈ UNINITIALIZED
+                     [1].__fc_stdio_id ∈ [--..--]
+        S___fc_stdio_buffer_0_S___fc_stdout[0..1] ∈ [--..--]
+        S___fc_stdio_buffer_1_S___fc_stdout[0..1] ∈ [--..--]
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:401.
+        Called from tests/e-acsl-runtime/at.i:51.
 [value] using specification for function __gmpz_init_set_si
-PROJECT_FILE.i:86:[value] Function __gmpz_init_set_si: postcondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:61:[value] Function __gmpz_init_set_si: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:63:[value] Function __gmpz_init_set_si: postcondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: postcondition got status unknown.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:402.
+        Called from tests/e-acsl-runtime/at.i:51.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:403.
+        Called from tests/e-acsl-runtime/at.i:51.
 [value] using specification for function __gmpz_init
-PROJECT_FILE.i:67:[value] Function __gmpz_init: postcondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:36:[value] Function __gmpz_init: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:37:[value] Function __gmpz_init: postcondition got status valid.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_add <- main.
-        Called from PROJECT_FILE.i:404.
+        Called from tests/e-acsl-runtime/at.i:51.
 [value] using specification for function __gmpz_add
-PROJECT_FILE.i:143:[value] Function __gmpz_add: precondition got status valid.
-PROJECT_FILE.i:144:[value] Function __gmpz_add: precondition got status valid.
-PROJECT_FILE.i:145:[value] Function __gmpz_add: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:131:[value] Function __gmpz_add: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:132:[value] Function __gmpz_add: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:133:[value] Function __gmpz_add: precondition got status valid.
 [value] Done for function __gmpz_add
 [value] computing for function __gmpz_init_set <- main.
-        Called from PROJECT_FILE.i:405.
+        Called from :0.
 [value] using specification for function __gmpz_init_set
-PROJECT_FILE.i:72:[value] Function __gmpz_init_set: precondition got status valid.
-PROJECT_FILE.i:74:[value] Function __gmpz_init_set: postcondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:43:[value] Function __gmpz_init_set: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:44:[value] Function __gmpz_init_set: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:46:[value] Function __gmpz_init_set: postcondition got status valid.
 [value] Done for function __gmpz_init_set
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:406.
+        Called from tests/e-acsl-runtime/at.i:51.
 [value] using specification for function __gmpz_clear
-PROJECT_FILE.i:120:[value] Function __gmpz_clear: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:105:[value] Function __gmpz_clear: precondition got status valid.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:407.
+        Called from tests/e-acsl-runtime/at.i:51.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:408.
+        Called from tests/e-acsl-runtime/at.i:51.
 [value] Done for function __gmpz_clear
-PROJECT_FILE.i:412:[value] Assertion got status valid.
+tests/e-acsl-runtime/at.i:45:[value] Assertion got status valid.
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:417.
+        Called from tests/e-acsl-runtime/at.i:45.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:418.
+        Called from tests/e-acsl-runtime/at.i:45.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:419.
+        Called from tests/e-acsl-runtime/at.i:45.
 [value] using specification for function __gmpz_cmp
-PROJECT_FILE.i:129:[value] Function __gmpz_cmp: precondition got status valid.
-PROJECT_FILE.i:130:[value] Function __gmpz_cmp: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:115:[value] Function __gmpz_cmp: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:116:[value] Function __gmpz_cmp: precondition got status valid.
 [value] Done for function __gmpz_cmp
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:420.
-PROJECT_FILE.i:231:[value] Function e_acsl_assert: precondition got status unknown.
+        Called from tests/e-acsl-runtime/at.i:45.
+./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status unknown.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:421.
+        Called from tests/e-acsl-runtime/at.i:45.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:422.
+        Called from tests/e-acsl-runtime/at.i:45.
 [value] Done for function __gmpz_clear
 [value] computing for function f <- main.
-        Called from PROJECT_FILE.i:428.
-PROJECT_FILE.i:258:[value] Assertion got status valid.
+        Called from tests/e-acsl-runtime/at.i:48.
+tests/e-acsl-runtime/at.i:13:[value] Assertion got status valid.
 [value] computing for function __gmpz_init_set_si <- f <- main.
-        Called from PROJECT_FILE.i:263.
+        Called from tests/e-acsl-runtime/at.i:13.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init_set_si <- f <- main.
-        Called from PROJECT_FILE.i:264.
+        Called from tests/e-acsl-runtime/at.i:13.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_cmp <- f <- main.
-        Called from PROJECT_FILE.i:265.
+        Called from tests/e-acsl-runtime/at.i:13.
 [value] Done for function __gmpz_cmp
 [value] computing for function e_acsl_assert <- f <- main.
-        Called from PROJECT_FILE.i:266.
+        Called from tests/e-acsl-runtime/at.i:13.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function __gmpz_clear <- f <- main.
-        Called from PROJECT_FILE.i:267.
+        Called from tests/e-acsl-runtime/at.i:13.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- f <- main.
-        Called from PROJECT_FILE.i:268.
+        Called from tests/e-acsl-runtime/at.i:13.
 [value] Done for function __gmpz_clear
-PROJECT_FILE.i:272:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
-PROJECT_FILE.i:272:[value] Assertion got status unknown.
+tests/e-acsl-runtime/at.i:14:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
+tests/e-acsl-runtime/at.i:14:[value] Assertion got status unknown.
 [value] computing for function __gmpz_init_set_si <- f <- main.
-        Called from PROJECT_FILE.i:277.
+        Called from tests/e-acsl-runtime/at.i:14.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init_set_si <- f <- main.
-        Called from PROJECT_FILE.i:278.
+        Called from tests/e-acsl-runtime/at.i:14.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_cmp <- f <- main.
-        Called from PROJECT_FILE.i:279.
+        Called from tests/e-acsl-runtime/at.i:14.
 [value] Done for function __gmpz_cmp
 [value] computing for function e_acsl_assert <- f <- main.
-        Called from PROJECT_FILE.i:280.
+        Called from tests/e-acsl-runtime/at.i:14.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function __gmpz_clear <- f <- main.
-        Called from PROJECT_FILE.i:281.
+        Called from tests/e-acsl-runtime/at.i:14.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- f <- main.
-        Called from PROJECT_FILE.i:282.
+        Called from tests/e-acsl-runtime/at.i:14.
 [value] Done for function __gmpz_clear
-PROJECT_FILE.i:286:[value] Assertion got status valid.
+:0:[value] Assertion got status valid.
 [value] computing for function __gmpz_init_set_si <- f <- main.
-        Called from PROJECT_FILE.i:292.
+        Called from tests/e-acsl-runtime/at.i:15.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init_set_si <- f <- main.
-        Called from PROJECT_FILE.i:293.
+        Called from tests/e-acsl-runtime/at.i:15.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_cmp <- f <- main.
-        Called from PROJECT_FILE.i:294.
+        Called from tests/e-acsl-runtime/at.i:15.
 [value] Done for function __gmpz_cmp
 [value] computing for function e_acsl_assert <- f <- main.
-        Called from PROJECT_FILE.i:295.
+        Called from tests/e-acsl-runtime/at.i:15.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function __gmpz_clear <- f <- main.
-        Called from PROJECT_FILE.i:296.
+        Called from tests/e-acsl-runtime/at.i:15.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- f <- main.
-        Called from PROJECT_FILE.i:297.
+        Called from tests/e-acsl-runtime/at.i:15.
 [value] Done for function __gmpz_clear
-PROJECT_FILE.i:301:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
-PROJECT_FILE.i:301:[value] Assertion got status unknown.
+tests/e-acsl-runtime/at.i:16:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
+tests/e-acsl-runtime/at.i:16:[value] Assertion got status unknown.
 [value] computing for function __gmpz_init_set_si <- f <- main.
-        Called from PROJECT_FILE.i:306.
+        Called from tests/e-acsl-runtime/at.i:16.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init_set_si <- f <- main.
-        Called from PROJECT_FILE.i:307.
+        Called from tests/e-acsl-runtime/at.i:16.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_cmp <- f <- main.
-        Called from PROJECT_FILE.i:308.
+        Called from tests/e-acsl-runtime/at.i:16.
 [value] Done for function __gmpz_cmp
 [value] computing for function e_acsl_assert <- f <- main.
-        Called from PROJECT_FILE.i:309.
+        Called from tests/e-acsl-runtime/at.i:16.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function __gmpz_clear <- f <- main.
-        Called from PROJECT_FILE.i:311.
+        Called from tests/e-acsl-runtime/at.i:16.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- f <- main.
-        Called from PROJECT_FILE.i:312.
+        Called from tests/e-acsl-runtime/at.i:16.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_init_set_si <- f <- main.
-        Called from PROJECT_FILE.i:322.
+        Called from tests/e-acsl-runtime/at.i:9.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init_set_si <- f <- main.
-        Called from PROJECT_FILE.i:323.
+        Called from tests/e-acsl-runtime/at.i:9.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_cmp <- f <- main.
-        Called from PROJECT_FILE.i:324.
+        Called from tests/e-acsl-runtime/at.i:9.
 [value] Done for function __gmpz_cmp
 [value] computing for function e_acsl_assert <- f <- main.
-        Called from PROJECT_FILE.i:325.
+        Called from tests/e-acsl-runtime/at.i:9.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function __gmpz_clear <- f <- main.
-        Called from PROJECT_FILE.i:326.
+        Called from tests/e-acsl-runtime/at.i:9.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- f <- main.
-        Called from PROJECT_FILE.i:327.
+        Called from tests/e-acsl-runtime/at.i:9.
 [value] Done for function __gmpz_clear
-PROJECT_FILE.i:242:[value] Function f: postcondition got status valid.
+tests/e-acsl-runtime/at.i:9:[value] Function f: postcondition got status valid.
 [value] Recording results for f
 [value] Done for function f
-PROJECT_FILE.i:429:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
-PROJECT_FILE.i:429:[value] Assertion got status unknown.
+tests/e-acsl-runtime/at.i:50:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
+tests/e-acsl-runtime/at.i:50:[value] Assertion got status unknown.
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:434.
+        Called from tests/e-acsl-runtime/at.i:50.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:435.
+        Called from tests/e-acsl-runtime/at.i:50.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:436.
+        Called from tests/e-acsl-runtime/at.i:50.
 [value] Done for function __gmpz_cmp
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:437.
+        Called from tests/e-acsl-runtime/at.i:50.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:438.
+        Called from tests/e-acsl-runtime/at.i:50.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:439.
+        Called from tests/e-acsl-runtime/at.i:50.
 [value] Done for function __gmpz_clear
-PROJECT_FILE.i:443:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
-PROJECT_FILE.i:443:[value] Assertion got status unknown.
+tests/e-acsl-runtime/at.i:51:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
+tests/e-acsl-runtime/at.i:51:[value] Assertion got status unknown.
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:447.
+        Called from tests/e-acsl-runtime/at.i:51.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:448.
+        Called from tests/e-acsl-runtime/at.i:51.
 [value] Done for function __gmpz_cmp
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:449.
+        Called from tests/e-acsl-runtime/at.i:51.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:450.
+        Called from tests/e-acsl-runtime/at.i:51.
 [value] Done for function __gmpz_clear
-PROJECT_FILE.i:454:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
-PROJECT_FILE.i:454:[value] Assertion got status unknown.
+tests/e-acsl-runtime/at.i:52:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
+tests/e-acsl-runtime/at.i:52:[value] Assertion got status unknown.
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:460.
+        Called from tests/e-acsl-runtime/at.i:52.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init_set_si <- main.
-        Called from PROJECT_FILE.i:461.
+        Called from tests/e-acsl-runtime/at.i:52.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init <- main.
-        Called from PROJECT_FILE.i:462.
+        Called from tests/e-acsl-runtime/at.i:52.
 [value] Done for function __gmpz_init
 [value] computing for function __gmpz_add <- main.
-        Called from PROJECT_FILE.i:463.
+        Called from tests/e-acsl-runtime/at.i:52.
 [value] Done for function __gmpz_add
 [value] computing for function __gmpz_cmp <- main.
-        Called from PROJECT_FILE.i:464.
+        Called from tests/e-acsl-runtime/at.i:52.
 [value] Done for function __gmpz_cmp
 [value] computing for function e_acsl_assert <- main.
-        Called from PROJECT_FILE.i:465.
+        Called from tests/e-acsl-runtime/at.i:52.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:466.
+        Called from tests/e-acsl-runtime/at.i:52.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:467.
+        Called from tests/e-acsl-runtime/at.i:52.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:468.
+        Called from tests/e-acsl-runtime/at.i:52.
 [value] Done for function __gmpz_clear
 [value] computing for function g <- main.
-        Called from PROJECT_FILE.i:472.
-PROJECT_FILE.i:351:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
-PROJECT_FILE.i:351:[value] Assertion got status unknown.
+        Called from tests/e-acsl-runtime/at.i:55.
+tests/e-acsl-runtime/at.i:32:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
+tests/e-acsl-runtime/at.i:32:[value] Assertion got status unknown.
 [value] computing for function __gmpz_init_set_si <- g <- main.
-        Called from PROJECT_FILE.i:356.
+        Called from tests/e-acsl-runtime/at.i:32.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init_set_si <- g <- main.
-        Called from PROJECT_FILE.i:357.
+        Called from tests/e-acsl-runtime/at.i:32.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_cmp <- g <- main.
-        Called from PROJECT_FILE.i:358.
+        Called from tests/e-acsl-runtime/at.i:32.
 [value] Done for function __gmpz_cmp
 [value] computing for function e_acsl_assert <- g <- main.
-        Called from PROJECT_FILE.i:359.
+        Called from tests/e-acsl-runtime/at.i:32.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function __gmpz_clear <- g <- main.
-        Called from PROJECT_FILE.i:361.
+        Called from tests/e-acsl-runtime/at.i:32.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- g <- main.
-        Called from PROJECT_FILE.i:362.
+        Called from tests/e-acsl-runtime/at.i:32.
 [value] Done for function __gmpz_clear
-PROJECT_FILE.i:367:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
-PROJECT_FILE.i:367:[value] Assertion got status unknown.
+:0:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
+:0:[value] Assertion got status unknown.
 [value] computing for function __gmpz_init_set_si <- g <- main.
-        Called from PROJECT_FILE.i:373.
+        Called from tests/e-acsl-runtime/at.i:34.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_init_set_si <- g <- main.
-        Called from PROJECT_FILE.i:374.
+        Called from tests/e-acsl-runtime/at.i:34.
 [value] Done for function __gmpz_init_set_si
 [value] computing for function __gmpz_cmp <- g <- main.
-        Called from PROJECT_FILE.i:375.
+        Called from tests/e-acsl-runtime/at.i:34.
 [value] Done for function __gmpz_cmp
 [value] computing for function e_acsl_assert <- g <- main.
-        Called from PROJECT_FILE.i:376.
+        Called from tests/e-acsl-runtime/at.i:34.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function __gmpz_clear <- g <- main.
-        Called from PROJECT_FILE.i:378.
+        Called from tests/e-acsl-runtime/at.i:34.
 [value] Done for function __gmpz_clear
 [value] computing for function __gmpz_clear <- g <- main.
-        Called from PROJECT_FILE.i:379.
+        Called from tests/e-acsl-runtime/at.i:34.
 [value] Done for function __gmpz_clear
 [value] Recording results for g
 [value] Done for function g
 [value] computing for function __gmpz_clear <- main.
-        Called from PROJECT_FILE.i:474.
+        Called from :0.
 [value] Done for function __gmpz_clear
+[value] computing for function __clean <- main.
+        Called from tests/e-acsl-runtime/at.i:57.
+[value] using specification for function __clean
+[kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
+[value] Done for function __clean
 [value] Recording results for main
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function e_acsl_assert:
 [value] Values at end of function f:
           A ∈ {3}
-          __e_acsl_at ∈ {0}
-          __e_acsl_at_2 ∈ {1}
-          __e_acsl_at_3 ∈ {2}
-          __e_acsl_at_4 ∈ {0}
-          __e_acsl_at_5 ∈ {0}
-          __e_acsl_at_6 ∈ {3}
 [value] Values at end of function g:
           A ∈ {4}
-          __e_acsl_at ∈ {0}
-          __e_acsl_at_2 ∈ {2}
-          __e_acsl_at_3 ∈ {0}
-          __e_acsl_at_4 ∈ {2}
           x ∈ {1}
           t[0] ∈ {2}
            [1] ∈ {3}
 [value] Values at end of function main:
           A ∈ {4}
-          __retres ∈ {0}
           x ∈ {1}
           t[0] ∈ {2}
            [1] ∈ {3}
-          __e_acsl_at ∈ {0}
-          __e_acsl_at_2[0] ∈ [--..--] or UNINITIALIZED
-          __e_acsl_at_3 ∈ {0}
+          __retres ∈ {0}
 /* Generated by Frama-C */
 struct __anonstruct___mpz_struct_1 {
    int _mp_alloc ;
@@ -328,16 +347,33 @@ struct __anonstruct___mpz_struct_1 {
    unsigned long *_mp_d ;
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
-typedef __mpz_struct mpz_t[1];
+typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
+typedef unsigned int size_t;
+struct __fc_pos_t {
+   unsigned long __fc_stdio_position ;
+};
+typedef struct __fc_pos_t fpos_t;
+struct __fc_FILE {
+   fpos_t __fc_stdio_fpos ;
+   char *__fc_stdio_buffer ;
+   char __fc_stdio_error ;
+   char __fc_stdio_eof ;
+   long __fc_stdio_id ;
+};
+typedef struct __fc_FILE FILE;
 /*@
 model __mpz_struct { ℤ n };
 */
-/*@ ensures \valid(\old(z));
+/*@ requires ¬\initialized(z);
+    ensures \valid(\old(z));
     allocates \old(z);
     
-    assigns *z;  */
-extern void __gmpz_init(__mpz_struct * /*[1]*/ z);
+    assigns *z;
+  
+*/
+extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init(__mpz_struct * /*[1]*/ z);
 /*@ requires \valid(z_orig);
+    requires ¬\initialized(z);
     ensures \valid(\old(z));
     allocates \old(z);
     
@@ -345,25 +381,28 @@ extern void __gmpz_init(__mpz_struct * /*[1]*/ z);
     assigns *z \from *z_orig;
   
 */
-extern void __gmpz_init_set(__mpz_struct * /*[1]*/ z,
-                            __mpz_struct const * /*[1]*/ z_orig);
-/*@ ensures \valid(\old(z));
+extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init_set(__mpz_struct * /*[1]*/ z,
+                                                             __mpz_struct const * /*[1]*/ z_orig);
+/*@ requires ¬\initialized(z);
+    ensures \valid(\old(z));
+    
+    ensures \initialized(\old(z));
     allocates \old(z);
     
     assigns *z;
-    assigns *z \from n; 
+    assigns *z \from n;
+  
 */
-extern void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z, long n);
+extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z,
+                                                                long n);
 /*@ requires \valid(x);
-    frees x;
-    
     assigns *x;  */
-extern void __gmpz_clear(__mpz_struct * /*[1]*/ x);
+extern  __attribute__((__FC_BUILTIN__)) void __gmpz_clear(__mpz_struct * /*[1]*/ x);
 /*@ requires \valid(z1);
     requires \valid(z2);
     assigns \nothing;  */
-extern int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
-                      __mpz_struct const * /*[1]*/ z2);
+extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
+                                                       __mpz_struct const * /*[1]*/ z2);
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
@@ -371,15 +410,27 @@ extern int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
     assigns *z1 \from *z2, *z3;
   
 */
-extern void __gmpz_add(__mpz_struct * /*[1]*/ z1,
-                       __mpz_struct const * /*[1]*/ z2,
-                       __mpz_struct const * /*[1]*/ z3);
-/*@ terminates \false;
-    ensures \false;
+extern  __attribute__((__FC_BUILTIN__)) void __gmpz_add(__mpz_struct * /*[1]*/ z1,
+                                                        __mpz_struct const * /*[1]*/ z2,
+                                                        __mpz_struct const * /*[1]*/ z3);
+int __fc_random_counter __attribute__((__unused__));
+unsigned long const __fc_rand_max = (unsigned long)2147483647;
+extern int __fc_heap_status;
+/*@
+axiomatic
+  dynamic_allocation {
+  predicate is_allocable{L}(size_t n) 
+    reads __fc_heap_status;
+  
+  }
+ */
+/*@ ensures \false;
     assigns \nothing;  */
 extern void exit(int status);
-/*@ assigns \nothing;  */
-extern int printf(char const * , ...);
+extern FILE *__fc_stdout;
+/*@ assigns *__fc_stdout;
+    assigns *__fc_stdout \from *(format+(..));  */
+extern int printf(char const *format , ...);
 /*@ requires predicate ≢ 0;
     assigns \nothing;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
@@ -392,53 +443,54 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
   return;
 }
 
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 int A = 0;
 /*@ ensures \at(A,Post) ≡ 3;  */
 void f(void)
 {
-  int __e_acsl_at;
-  int __e_acsl_at_2;
-  int __e_acsl_at_3;
-  int __e_acsl_at_4;
-  int __e_acsl_at_5;
   int __e_acsl_at_6;
+  int __e_acsl_at_5;
+  int __e_acsl_at_4;
+  int __e_acsl_at_3;
+  int __e_acsl_at_2;
+  int __e_acsl_at;
   __e_acsl_at_4 = A;
   __e_acsl_at = A;
   A = 1;
-  F: __e_acsl_at_5 = __e_acsl_at_4;
+  F: 
+  __e_acsl_at_5 = __e_acsl_at_4;
   __e_acsl_at_2 = A;
   A = 2;
-  /*@ assert \at(A,Pre) ≡ 0; */ ;
+  /*@ assert \at(A,Pre) ≡ 0; */
   {
     mpz_t __e_acsl;
     mpz_t __e_acsl_2;
     int __e_acsl_eq;
     __gmpz_init_set_si(__e_acsl,(long)__e_acsl_at);
     __gmpz_init_set_si(__e_acsl_2,(long)0);
-    __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl),
-                             (__mpz_struct const *)(__e_acsl_2));
+    __e_acsl_eq = __gmpz_cmp(__e_acsl,__e_acsl_2);
     e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",
-                  (char *)"(\\at(A,Pre) == 0)",13);
+                  (char *)"\\at(A,Pre) == 0",13);
     __gmpz_clear(__e_acsl);
     __gmpz_clear(__e_acsl_2);
   }
   
-  /*@ assert \at(A,F) ≡ 1; */ ;
+  /*@ assert \at(A,F) ≡ 1; */
   {
     mpz_t __e_acsl_3;
     mpz_t __e_acsl_4;
     int __e_acsl_eq_2;
     __gmpz_init_set_si(__e_acsl_3,(long)__e_acsl_at_2);
     __gmpz_init_set_si(__e_acsl_4,(long)1);
-    __e_acsl_eq_2 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_3),
-                               (__mpz_struct const *)(__e_acsl_4));
+    __e_acsl_eq_2 = __gmpz_cmp(__e_acsl_3,__e_acsl_4);
     e_acsl_assert(__e_acsl_eq_2 == 0,(char *)"Assertion",
-                  (char *)"(\\at(A,F) == 1)",14);
+                  (char *)"\\at(A,F) == 1",14);
     __gmpz_clear(__e_acsl_3);
     __gmpz_clear(__e_acsl_4);
   }
   
-  /*@ assert \at(A,Here) ≡ 2; */ ;
+  /*@ assert \at(A,Here) ≡ 2; */
   {
     mpz_t __e_acsl_5;
     mpz_t __e_acsl_6;
@@ -446,25 +498,23 @@ void f(void)
     __e_acsl_at_3 = A;
     __gmpz_init_set_si(__e_acsl_5,(long)__e_acsl_at_3);
     __gmpz_init_set_si(__e_acsl_6,(long)2);
-    __e_acsl_eq_3 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_5),
-                               (__mpz_struct const *)(__e_acsl_6));
+    __e_acsl_eq_3 = __gmpz_cmp(__e_acsl_5,__e_acsl_6);
     e_acsl_assert(__e_acsl_eq_3 == 0,(char *)"Assertion",
-                  (char *)"(\\at(A,Here) == 2)",15);
+                  (char *)"\\at(A,Here) == 2",15);
     __gmpz_clear(__e_acsl_5);
     __gmpz_clear(__e_acsl_6);
   }
   
-  /*@ assert \at(\at(A,Pre),F) ≡ 0; */ ;
+  /*@ assert \at(\at(A,Pre),F) ≡ 0; */
   {
     mpz_t __e_acsl_7;
     mpz_t __e_acsl_8;
     int __e_acsl_eq_4;
     __gmpz_init_set_si(__e_acsl_7,(long)__e_acsl_at_5);
     __gmpz_init_set_si(__e_acsl_8,(long)0);
-    __e_acsl_eq_4 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_7),
-                               (__mpz_struct const *)(__e_acsl_8));
+    __e_acsl_eq_4 = __gmpz_cmp(__e_acsl_7,__e_acsl_8);
     e_acsl_assert(__e_acsl_eq_4 == 0,(char *)"Assertion",
-                  (char *)"(\\at(\\at(A,Pre),F) == 0)",16);
+                  (char *)"\\at(\\at(A,Pre),F) == 0",16);
     __gmpz_clear(__e_acsl_7);
     __gmpz_clear(__e_acsl_8);
   }
@@ -477,10 +527,9 @@ void f(void)
     __e_acsl_at_6 = A;
     __gmpz_init_set_si(__e_acsl_9,(long)__e_acsl_at_6);
     __gmpz_init_set_si(__e_acsl_10,(long)3);
-    __e_acsl_eq_5 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_9),
-                               (__mpz_struct const *)(__e_acsl_10));
+    __e_acsl_eq_5 = __gmpz_cmp(__e_acsl_9,__e_acsl_10);
     e_acsl_assert(__e_acsl_eq_5 == 0,(char *)"Postcondition",
-                  (char *)"(\\at(A,Post) == 3)",9);
+                  (char *)"\\at(A,Post) == 3",9);
     __gmpz_clear(__e_acsl_9);
     __gmpz_clear(__e_acsl_10);
     return;
@@ -490,37 +539,38 @@ void f(void)
 
 void g(int *p, int *q)
 {
-  int __e_acsl_at;
-  int __e_acsl_at_2;
-  int __e_acsl_at_3;
   int __e_acsl_at_4;
+  int __e_acsl_at_3;
+  int __e_acsl_at_2;
+  int __e_acsl_at;
   *p = 0;
   *(p + 1) = 1;
   *q = 0;
-  L1: __e_acsl_at_3 = *q;
+  L1: 
+  __e_acsl_at_3 = *q;
   __e_acsl_at = *q;
   *p = 2;
   *(p + 1) = 3;
   *q = 1;
-  L2: __e_acsl_at_2 = *(p + (long)__e_acsl_at);
+  L2: 
+  __e_acsl_at_2 = *(p + (long)__e_acsl_at);
   A = 4;
-  /*@ assert \at(*(p+\at(*q,L1)),L2) ≡ 2; */ ;
+  /*@ assert \at(*(p+\at(*q,L1)),L2) ≡ 2; */
   {
     mpz_t __e_acsl;
     mpz_t __e_acsl_2;
     int __e_acsl_eq;
     __gmpz_init_set_si(__e_acsl,(long)__e_acsl_at_2);
     __gmpz_init_set_si(__e_acsl_2,(long)2);
-    __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl),
-                             (__mpz_struct const *)(__e_acsl_2));
+    __e_acsl_eq = __gmpz_cmp(__e_acsl,__e_acsl_2);
     e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",
-                  (char *)"(\\at(*(p+\\at(*q,L1)),L2) == 2)",32);
+                  (char *)"\\at(*(p+\\at(*q,L1)),L2) == 2",32);
     __gmpz_clear(__e_acsl);
     __gmpz_clear(__e_acsl_2);
   }
   
   L3: 
-  /*@ assert \at(*(p+\at(*q,L1)),Here) ≡ 2; */ ;
+  /*@ assert \at(*(p+\at(*q,L1)),Here) ≡ 2; */
   {
     mpz_t __e_acsl_3;
     mpz_t __e_acsl_4;
@@ -528,10 +578,9 @@ void g(int *p, int *q)
     __e_acsl_at_4 = *(p + (long)__e_acsl_at_3);
     __gmpz_init_set_si(__e_acsl_3,(long)__e_acsl_at_4);
     __gmpz_init_set_si(__e_acsl_4,(long)2);
-    __e_acsl_eq_2 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_3),
-                               (__mpz_struct const *)(__e_acsl_4));
+    __e_acsl_eq_2 = __gmpz_cmp(__e_acsl_3,__e_acsl_4);
     e_acsl_assert(__e_acsl_eq_2 == 0,(char *)"Assertion",
-                  (char *)"(\\at(*(p+\\at(*q,L1)),Here) == 2)",34);
+                  (char *)"\\at(*(p+\\at(*q,L1)),Here) == 2",34);
     __gmpz_clear(__e_acsl_3);
     __gmpz_clear(__e_acsl_4);
   }
@@ -541,14 +590,15 @@ void g(int *p, int *q)
 
 int main(void)
 {
+  int __e_acsl_at_3;
+  mpz_t __e_acsl_at_2;
+  int __e_acsl_at;
   int __retres;
   int x;
   int t[2];
-  int __e_acsl_at;
-  mpz_t __e_acsl_at_2;
-  int __e_acsl_at_3;
   x = 0;
-  L: __e_acsl_at_3 = x;
+  L: 
+  __e_acsl_at_3 = x;
   {
     mpz_t __e_acsl_x_2;
     mpz_t __e_acsl_4;
@@ -556,25 +606,23 @@ int main(void)
     __gmpz_init_set_si(__e_acsl_x_2,(long)x);
     __gmpz_init_set_si(__e_acsl_4,(long)1);
     __gmpz_init(__e_acsl_add);
-    __gmpz_add(__e_acsl_add,(__mpz_struct const *)(__e_acsl_x_2),
-               (__mpz_struct const *)(__e_acsl_4));
-    __gmpz_init_set(__e_acsl_at_2,(__mpz_struct const *)(__e_acsl_add));
+    __gmpz_add(__e_acsl_add,__e_acsl_x_2,__e_acsl_4);
+    __gmpz_init_set(__e_acsl_at_2,__e_acsl_add);
     __gmpz_clear(__e_acsl_x_2);
     __gmpz_clear(__e_acsl_4);
     __gmpz_clear(__e_acsl_add);
   }
   
   __e_acsl_at = x;
-  /*@ assert x ≡ 0; */ ;
+  /*@ assert x ≡ 0; */
   {
     mpz_t __e_acsl_x;
     mpz_t __e_acsl;
     int __e_acsl_eq;
     __gmpz_init_set_si(__e_acsl_x,(long)x);
     __gmpz_init_set_si(__e_acsl,(long)0);
-    __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl_x),
-                             (__mpz_struct const *)(__e_acsl));
-    e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"(x == 0)",45);
+    __e_acsl_eq = __gmpz_cmp(__e_acsl_x,__e_acsl);
+    e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"x == 0",45);
     __gmpz_clear(__e_acsl_x);
     __gmpz_clear(__e_acsl);
   }
@@ -582,34 +630,32 @@ int main(void)
   x = 1;
   x = 2;
   f();
-  /*@ assert \at(x,L) ≡ 0; */ ;
+  /*@ assert \at(x,L) ≡ 0; */
   {
     mpz_t __e_acsl_2;
     mpz_t __e_acsl_3;
     int __e_acsl_eq_2;
     __gmpz_init_set_si(__e_acsl_2,(long)__e_acsl_at);
     __gmpz_init_set_si(__e_acsl_3,(long)0);
-    __e_acsl_eq_2 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_2),
-                               (__mpz_struct const *)(__e_acsl_3));
+    __e_acsl_eq_2 = __gmpz_cmp(__e_acsl_2,__e_acsl_3);
     e_acsl_assert(__e_acsl_eq_2 == 0,(char *)"Assertion",
-                  (char *)"(\\at(x,L) == 0)",50);
+                  (char *)"\\at(x,L) == 0",50);
     __gmpz_clear(__e_acsl_2);
     __gmpz_clear(__e_acsl_3);
   }
   
-  /*@ assert \at(x+1,L) ≡ 1; */ ;
+  /*@ assert \at(x+1,L) ≡ 1; */
   {
     mpz_t __e_acsl_5;
     int __e_acsl_eq_3;
     __gmpz_init_set_si(__e_acsl_5,(long)1);
-    __e_acsl_eq_3 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_at_2),
-                               (__mpz_struct const *)(__e_acsl_5));
+    __e_acsl_eq_3 = __gmpz_cmp(__e_acsl_at_2,__e_acsl_5);
     e_acsl_assert(__e_acsl_eq_3 == 0,(char *)"Assertion",
-                  (char *)"(\\at(x+1,L) == 1)",51);
+                  (char *)"\\at(x+1,L) == 1",51);
     __gmpz_clear(__e_acsl_5);
   }
   
-  /*@ assert \at(x,L)+1 ≡ 1; */ ;
+  /*@ assert \at(x,L)+1 ≡ 1; */
   {
     mpz_t __e_acsl_6;
     mpz_t __e_acsl_7;
@@ -618,12 +664,10 @@ int main(void)
     __gmpz_init_set_si(__e_acsl_6,(long)__e_acsl_at_3);
     __gmpz_init_set_si(__e_acsl_7,(long)1);
     __gmpz_init(__e_acsl_add_2);
-    __gmpz_add(__e_acsl_add_2,(__mpz_struct const *)(__e_acsl_6),
-               (__mpz_struct const *)(__e_acsl_7));
-    __e_acsl_eq_4 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_add_2),
-                               (__mpz_struct const *)(__e_acsl_7));
+    __gmpz_add(__e_acsl_add_2,__e_acsl_6,__e_acsl_7);
+    __e_acsl_eq_4 = __gmpz_cmp(__e_acsl_add_2,__e_acsl_7);
     e_acsl_assert(__e_acsl_eq_4 == 0,(char *)"Assertion",
-                  (char *)"(\\at(x,L)+1 == 1)",52);
+                  (char *)"\\at(x,L)+1 == 1",52);
     __gmpz_clear(__e_acsl_6);
     __gmpz_clear(__e_acsl_7);
     __gmpz_clear(__e_acsl_add_2);
@@ -632,6 +676,7 @@ int main(void)
   g(t,& x);
   __retres = 0;
   __gmpz_clear(__e_acsl_at_2);
+  __clean();
   return (__retres);
 }
 

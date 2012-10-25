@@ -5,15 +5,41 @@ struct __anonstruct___mpz_struct_1 {
    unsigned long *_mp_d ;
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
+typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
+typedef unsigned int size_t;
+struct __fc_pos_t {
+   unsigned long __fc_stdio_position ;
+};
+typedef struct __fc_pos_t fpos_t;
+struct __fc_FILE {
+   fpos_t __fc_stdio_fpos ;
+   char *__fc_stdio_buffer ;
+   char __fc_stdio_error ;
+   char __fc_stdio_eof ;
+   long __fc_stdio_id ;
+};
+typedef struct __fc_FILE FILE;
 /*@
 model __mpz_struct { ℤ n };
 */
-/*@ terminates \false;
-    ensures \false;
+int __fc_random_counter __attribute__((__unused__));
+unsigned long const __fc_rand_max = (unsigned long)2147483647;
+extern int __fc_heap_status;
+/*@
+axiomatic
+  dynamic_allocation {
+  predicate is_allocable{L}(size_t n) 
+    reads __fc_heap_status;
+  
+  }
+ */
+/*@ ensures \false;
     assigns \nothing;  */
 extern void exit(int status);
-/*@ assigns \nothing;  */
-extern int printf(char const * , ...);
+extern FILE *__fc_stdout;
+/*@ assigns *__fc_stdout;
+    assigns *__fc_stdout \from *(format+(..));  */
+extern int printf(char const *format , ...);
 /*@ requires predicate ≢ 0;
     assigns \nothing;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
@@ -26,6 +52,7 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
   return;
 }
 
+extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 int main(void)
 {
   int __retres;
@@ -33,100 +60,100 @@ int main(void)
   int y;
   x = 0;
   y = 1;
-  /*@ assert x ≡ 0 ∧ y ≡ 1; */ ;
+  /*@ assert x ≡ 0 ∧ y ≡ 1; */
   { int __e_acsl_and;
     if (x == 0) { __e_acsl_and = y == 1; }
     else { __e_acsl_and = 0; }
     e_acsl_assert(__e_acsl_and,(char *)"Assertion",
-                  (char *)"(x == 0 && y == 1)",11);
+                  (char *)"x == 0 &&\ny == 1",11);
   }
   
-  /*@ assert ¬(x ≢ 0 ∧ y ≡ 1/0); */ ;
+  /*@ assert ¬(x ≢ 0 ∧ y ≡ 1/0); */
   {
     int __e_acsl_and_2;
     if (x != 0) {
       int __e_acsl_div;
-      /*@ assert 0 ≢ 0; */ ;
-      e_acsl_assert(! (0 == 0),(char *)"Assertion",(char *)"(0 == 0)",12);
+      /*@ assert E_ACSL: 0 ≢ 0; */
+      e_acsl_assert(! (0 == 0),(char *)"Assertion",(char *)"0 == 0",12);
       __e_acsl_div = 1 / 0;
       __e_acsl_and_2 = y == __e_acsl_div;
     }
     else { __e_acsl_and_2 = 0; }
     e_acsl_assert(! __e_acsl_and_2,(char *)"Assertion",
-                  (char *)"(!(x != 0 && y == 1/0))",12);
+                  (char *)"!(x != 0 && y == 1/0)",12);
   }
   
-  /*@ assert y ≡ 1 ∨ x ≡ 1; */ ;
+  /*@ assert y ≡ 1 ∨ x ≡ 1; */
   { int __e_acsl_or;
     if (y == 1) { __e_acsl_or = 1; }
     else { __e_acsl_or = x == 1; }
     e_acsl_assert(__e_acsl_or,(char *)"Assertion",
-                  (char *)"(y == 1 || x == 1)",13);
+                  (char *)"y == 1 ||\nx == 1",13);
   }
   
-  /*@ assert x ≡ 0 ∨ y ≡ 1/0; */ ;
+  /*@ assert x ≡ 0 ∨ y ≡ 1/0; */
   {
     int __e_acsl_or_2;
     if (x == 0) { __e_acsl_or_2 = 1; }
     else {
       int __e_acsl_div_2;
-      /*@ assert 0 ≢ 0; */ ;
-      e_acsl_assert(! (0 == 0),(char *)"Assertion",(char *)"(0 == 0)",14);
+      /*@ assert E_ACSL: 0 ≢ 0; */
+      e_acsl_assert(! (0 == 0),(char *)"Assertion",(char *)"0 == 0",14);
       __e_acsl_div_2 = 1 / 0;
       __e_acsl_or_2 = y == __e_acsl_div_2;
     }
     e_acsl_assert(__e_acsl_or_2,(char *)"Assertion",
-                  (char *)"(x == 0 || y == 1/0)",14);
+                  (char *)"x == 0 ||\ny == 1/0",14);
   }
   
-  /*@ assert x ≡ 0 ⇒ y ≡ 1; */ ;
+  /*@ assert x ≡ 0 ⇒ y ≡ 1; */
   { int __e_acsl_implies;
     if (! (x == 0)) { __e_acsl_implies = 1; }
     else { __e_acsl_implies = y == 1; }
     e_acsl_assert(__e_acsl_implies,(char *)"Assertion",
-                  (char *)"(x == 0 ==> y == 1)",15);
+                  (char *)"x == 0 ==>\ny == 1",15);
   }
   
-  /*@ assert x ≡ 1 ⇒ y ≡ 1/0; */ ;
+  /*@ assert x ≡ 1 ⇒ y ≡ 1/0; */
   {
     int __e_acsl_implies_2;
     if (! (x == 1)) { __e_acsl_implies_2 = 1; }
     else {
       int __e_acsl_div_3;
-      /*@ assert 0 ≢ 0; */ ;
-      e_acsl_assert(! (0 == 0),(char *)"Assertion",(char *)"(0 == 0)",16);
+      /*@ assert E_ACSL: 0 ≢ 0; */
+      e_acsl_assert(! (0 == 0),(char *)"Assertion",(char *)"0 == 0",16);
       __e_acsl_div_3 = 1 / 0;
       __e_acsl_implies_2 = y == __e_acsl_div_3;
     }
     e_acsl_assert(__e_acsl_implies_2,(char *)"Assertion",
-                  (char *)"(x == 1 ==> y == 1/0)",16);
+                  (char *)"x == 1 ==>\ny == 1/0",16);
   }
   
-  /*@ assert x≢0? x ≢ 0: y ≢ 0; */ ;
+  /*@ assert x≢0? x ≢ 0: y ≢ 0; */
   { int __e_acsl_if;
     if (x != 0) { __e_acsl_if = x != 0; }
     else { __e_acsl_if = y != 0; }
     e_acsl_assert(__e_acsl_if,(char *)"Assertion",
-                  (char *)"(x!=0? x != 0: y != 0)",17);
+                  (char *)"x!=0? x != 0: y != 0",17);
   }
   
-  /*@ assert y≢0? y ≢ 0: x ≢ 0; */ ;
+  /*@ assert y≢0? y ≢ 0: x ≢ 0; */
   { int __e_acsl_if_2;
     if (y != 0) { __e_acsl_if_2 = y != 0; }
     else { __e_acsl_if_2 = x != 0; }
     e_acsl_assert(__e_acsl_if_2,(char *)"Assertion",
-                  (char *)"(y!=0? y != 0: x != 0)",18);
+                  (char *)"y!=0? y != 0: x != 0",18);
   }
   
-  /*@ assert x≡1? x ≡ 18: x ≡ 0; */ ;
+  /*@ assert x≡1? x ≡ 18: x ≡ 0; */
   { int __e_acsl_if_3;
     if (x == 1) { __e_acsl_if_3 = x == 18; }
     else { __e_acsl_if_3 = x == 0; }
     e_acsl_assert(__e_acsl_if_3,(char *)"Assertion",
-                  (char *)"(x==1? x == 18: x == 0)",19);
+                  (char *)"x==1? x == 18: x == 0",19);
   }
   
-  /*@ assert x ≡ 2 ⇔ y ≡ 3; */ ;
+  /*@ assert x ≡ 2 ⇔ y ≡ 3; */
   {
     int __e_acsl_implies_3;
     int __e_acsl_equiv;
@@ -140,10 +167,10 @@ int main(void)
     }
     else { __e_acsl_equiv = 0; }
     e_acsl_assert(__e_acsl_equiv,(char *)"Assertion",
-                  (char *)"(x == 2 <==> y == 3)",22);
+                  (char *)"x == 2 <==>\ny == 3",22);
   }
   
-  /*@ assert x ≡ 0 ⇔ y ≡ 1; */ ;
+  /*@ assert x ≡ 0 ⇔ y ≡ 1; */
   {
     int __e_acsl_implies_5;
     int __e_acsl_equiv_2;
@@ -157,18 +184,18 @@ int main(void)
     }
     else { __e_acsl_equiv_2 = 0; }
     e_acsl_assert(__e_acsl_equiv_2,(char *)"Assertion",
-                  (char *)"(x == 0 <==> y == 1)",23);
+                  (char *)"x == 0 <==>\ny == 1",23);
   }
   
-  /*@ assert ((x≢0? x: y)≢0) ≡ (x≡0); */ ;
+  /*@ assert ((x≢0? x: y)≢0) ≡ (x≡0); */
   { int __e_acsl_if_4;
     if (x != 0) { __e_acsl_if_4 = x; }
     else { __e_acsl_if_4 = y; }
     e_acsl_assert((__e_acsl_if_4 != 0) == (x == 0),(char *)"Assertion",
-                  (char *)"(((x!=0? x: y)!=0) == (x==0))",26);
+                  (char *)"((x!=0? x: y)!=0) == (x==0)",26);
   }
   
-  /*@ assert (x ≢ 0 ∧ y ≢ 0) ∨ y ≢ 0; */ ;
+  /*@ assert (x ≢ 0 ∧ y ≢ 0) ∨ y ≢ 0; */
   {
     int __e_acsl_and_3;
     int __e_acsl_or_3;
@@ -177,10 +204,10 @@ int main(void)
     if (__e_acsl_and_3) { __e_acsl_or_3 = 1; }
     else { __e_acsl_or_3 = y != 0; }
     e_acsl_assert(__e_acsl_or_3,(char *)"Assertion",
-                  (char *)"((x != 0 && y != 0) || y != 0)",27);
+                  (char *)"(x != 0 && y != 0) ||\ny != 0",27);
   }
   
-  /*@ assert (x ≢ 0 ∨ y ≢ 0) ∧ y ≡ 1; */ ;
+  /*@ assert (x ≢ 0 ∨ y ≢ 0) ∧ y ≡ 1; */
   { int __e_acsl_or_4;
     int __e_acsl_and_4;
     if (x != 0) { __e_acsl_or_4 = 1; }
@@ -188,26 +215,27 @@ int main(void)
     if (__e_acsl_or_4) { __e_acsl_and_4 = y == 1; }
     else { __e_acsl_and_4 = 0; }
     e_acsl_assert(__e_acsl_and_4,(char *)"Assertion",
-                  (char *)"((x != 0 || y != 0) && y == 1)",28);
+                  (char *)"(x != 0 || y != 0) &&\ny == 1",28);
   }
   
-  /*@ assert (x≢0∨y≢0) ≡ (y≢0); */ ;
+  /*@ assert (x≢0∨y≢0) ≡ (y≢0); */
   { int __e_acsl_or_5;
     if (x != 0) { __e_acsl_or_5 = 1; }
     else { __e_acsl_or_5 = y != 0; }
     e_acsl_assert(__e_acsl_or_5 == (y != 0),(char *)"Assertion",
-                  (char *)"((x!=0||y!=0) == (y!=0))",29);
+                  (char *)"(x!=0||y!=0) == (y!=0)",29);
   }
   
-  /*@ assert (x≢0∧y≢0) ≡ (x≢0); */ ;
+  /*@ assert (x≢0∧y≢0) ≡ (x≢0); */
   { int __e_acsl_and_5;
     if (x != 0) { __e_acsl_and_5 = y != 0; }
     else { __e_acsl_and_5 = 0; }
     e_acsl_assert(__e_acsl_and_5 == (x != 0),(char *)"Assertion",
-                  (char *)"((x!=0&&y!=0) == (x!=0))",30);
+                  (char *)"(x!=0&&y!=0) == (x!=0)",30);
   }
   
   __retres = 0;
+  __clean();
   return (__retres);
 }
 

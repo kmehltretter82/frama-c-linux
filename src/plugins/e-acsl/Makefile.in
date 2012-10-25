@@ -54,13 +54,14 @@ PLUGIN_DYNAMIC:=@DYNAMIC_E_ACSL@
 PLUGIN_NAME:=E_ACSL
 PLUGIN_CMO:= local_config \
 	options \
-	read_header \
 	error \
 	misc \
 	mpz \
+	pre_analysis \
 	env \
 	typing \
 	quantif \
+	translate \
 	visit \
 	main
 PLUGIN_HAS_MLI:=yes
@@ -119,7 +120,10 @@ endif
 install::
 	$(PRINT_CP) E-ACSL share files
 	$(MKDIR) $(FRAMAC_SHARE)/e-acsl
-	$(CP) $(E_ACSL_DIR)/share/e-acsl/* $(FRAMAC_SHARE)/e-acsl
+	$(CP) $(E_ACSL_DIR)/share/e-acsl/*.h $(FRAMAC_SHARE)/e-acsl
+	$(MKDIR) $(FRAMAC_SHARE)/e-acsl/memory_model
+	$(CP) $(E_ACSL_DIR)/share/e-acsl/memory_model/* \
+		$(FRAMAC_SHARE)/e-acsl/memory_model
 	$(MKDIR) $(FRAMAC_SHARE)/manuals
 	$(CP) $(E_ACSL_DIR)/doc/manuals/e-acsl.pdf \
 		$(E_ACSL_DIR)/doc/manuals/e-acsl-implementation.pdf \

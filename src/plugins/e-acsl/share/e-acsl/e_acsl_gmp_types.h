@@ -20,6 +20,9 @@
 /*                                                                        */
 /**************************************************************************/
 
+#ifndef E_ACSL_GMP_TYPES
+#define E_ACSL_GMP_TYPES
+
 /*************/
 /* GMP types */
 /*************/
@@ -32,4 +35,6 @@ typedef struct {
 
 /*@ model __mpz_struct { integer n; }; */
 
-typedef __mpz_struct mpz_t[1];
+typedef __mpz_struct mpz_t[1] __attribute__((FC_BUILTIN));
+
+#endif

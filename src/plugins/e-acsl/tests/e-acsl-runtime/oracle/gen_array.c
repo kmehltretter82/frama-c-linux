@@ -5,15 +5,41 @@ struct __anonstruct___mpz_struct_1 {
    unsigned long *_mp_d ;
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
+typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
+typedef unsigned int size_t;
+struct __fc_pos_t {
+   unsigned long __fc_stdio_position ;
+};
+typedef struct __fc_pos_t fpos_t;
+struct __fc_FILE {
+   fpos_t __fc_stdio_fpos ;
+   char *__fc_stdio_buffer ;
+   char __fc_stdio_error ;
+   char __fc_stdio_eof ;
+   long __fc_stdio_id ;
+};
+typedef struct __fc_FILE FILE;
 /*@
 model __mpz_struct { ℤ n };
 */
-/*@ terminates \false;
-    ensures \false;
+int __fc_random_counter __attribute__((__unused__));
+unsigned long const __fc_rand_max = (unsigned long)2147483647;
+extern int __fc_heap_status;
+/*@
+axiomatic
+  dynamic_allocation {
+  predicate is_allocable{L}(size_t n) 
+    reads __fc_heap_status;
+  
+  }
+ */
+/*@ ensures \false;
     assigns \nothing;  */
 extern void exit(int status);
-/*@ assigns \nothing;  */
-extern int printf(char const * , ...);
+extern FILE *__fc_stdout;
+/*@ assigns *__fc_stdout;
+    assigns *__fc_stdout \from *(format+(..));  */
+extern int printf(char const *format , ...);
 /*@ requires predicate ≢ 0;
     assigns \nothing;  */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
@@ -26,6 +52,7 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
   return;
 }
 
+extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 int T1[3];
 int T2[4];
 int main(void)
@@ -33,27 +60,24 @@ int main(void)
   int __retres;
   { int i;
     i = 0;
-    while (1) {
-      if (! (i < 3)) { break; }
+    while (i < 3) {
       T1[i] = i;
       i ++; } }
   
-  {
-    int i_0;
+  { int i_0;
     i_0 = 0;
-    while (1) {
-      if (! (i_0 < 4)) { break; }
+    while (i_0 < 4) {
       T2[i_0] = 2 * i_0;
-      i_0 ++; }
-  }
+      i_0 ++; } }
   
-  /*@ assert T1[0] ≡ T2[0]; */ ;
-  e_acsl_assert(T1[0] == T2[0],(char *)"Assertion",
-                (char *)"(T1[0] == T2[0])",14);
-  /*@ assert T1[1] ≢ T2[1]; */ ;
-  e_acsl_assert(T1[1] != T2[1],(char *)"Assertion",
-                (char *)"(T1[1] != T2[1])",15);
+  /*@ assert T1[0] ≡ T2[0]; */
+  e_acsl_assert(T1[0] == T2[0],(char *)"Assertion",(char *)"T1[0] == T2[0]",
+                15);
+  /*@ assert T1[1] ≢ T2[1]; */
+  e_acsl_assert(T1[1] != T2[1],(char *)"Assertion",(char *)"T1[1] != T2[1]",
+                16);
   __retres = 0;
+  __clean();
   return (__retres);
 }
 

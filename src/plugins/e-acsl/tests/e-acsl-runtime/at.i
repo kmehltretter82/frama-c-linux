@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: \at
-   EXECNOW: LOG gen_at.c BIN gen_at.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/at.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_at.c > /dev/null && gcc -pedantic -Wno-long-long -o ./tests/e-acsl-runtime/result/gen_at.out ./tests/e-acsl-runtime/result/gen_at.c -lgmp && ./tests/e-acsl-runtime/result/gen_at.out
-   EXECNOW: LOG gen_at2.c BIN gen_at2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/at.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_at2.c > /dev/null && gcc -pedantic -Wno-long-long -o ./tests/e-acsl-runtime/result/gen_at2.out ./tests/e-acsl-runtime/result/gen_at2.c -lgmp && ./tests/e-acsl-runtime/result/gen_at2.out
+   EXECNOW: LOG gen_at.c BIN gen_at.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/at.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_at.c > /dev/null && ./gcc_test.sh at -Wno-unused-label
+   EXECNOW: LOG gen_at2.c BIN gen_at2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/at.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_at2.c > /dev/null && ./gcc_test.sh at2 -Wno-unused-label
 */
 
 int A = 0;
