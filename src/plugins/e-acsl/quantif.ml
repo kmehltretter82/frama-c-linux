@@ -104,15 +104,13 @@ let convert env loc is_forall p bounded_vars hyps goal =
   let var_res, res, env =
     (* variable storing the result of the quantifier *)
     let name = if is_forall then "forall" else "exists" in
-    let init_loc = loc in
     Env.new_var
       ~loc
       ~name
       env
       None
       intType
-      (fun ?loc v _ ->
-	let loc = match loc with None -> init_loc | Some l -> l in
+      (fun v _ ->
 	let lv = var v in
 	[ mkStmtOneInstr ~valid_sid:true (Set(lv, init_val, loc)) ])
   in

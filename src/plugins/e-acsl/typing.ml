@@ -469,7 +469,7 @@ C-representable@]";
 	  env
 	  None
 	  new_ty
-	  (fun ?loc v _ -> 
+	  (fun v _ ->
 	    [ Misc.mk_call ?loc ~result:(Cil.var v) fname [ e ] ])
       in
       e, env

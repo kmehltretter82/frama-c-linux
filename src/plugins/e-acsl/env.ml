@@ -225,7 +225,7 @@ module Logic_binding = struct
 	Error.not_yet msg
     in
     let v, e, env = 
-      new_var env ~name:logic_v.lv_name None ty (fun ?loc:_ _ _ -> []) 
+      new_var env ~name:logic_v.lv_name None ty (fun _ _ -> []) 
     in
     v,
     e, 
