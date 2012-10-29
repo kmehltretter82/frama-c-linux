@@ -1,10 +1,10 @@
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -I/localhome/virgile/softs/share/frama-c/libc -I/localhome/virgile/softs/share/frama-c/libc ./share/e-acsl/e_acsl_gmp_types.h"
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -I/localhome/virgile/softs/share/frama-c/libc -I/localhome/virgile/softs/share/frama-c/libc ./share/e-acsl/e_acsl_gmp.h"
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -I/localhome/virgile/softs/share/frama-c/libc -I/localhome/virgile/softs/share/frama-c/libc ./share/e-acsl/e_acsl.h"
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -I/localhome/virgile/softs/share/frama-c/libc -I/localhome/virgile/softs/share/frama-c/libc ./share/e-acsl/memory_model/e_acsl_mmodel_api.h"
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -I/localhome/virgile/softs/share/frama-c/libc -I/localhome/virgile/softs/share/frama-c/libc ./share/e-acsl/memory_model/e_acsl_bittree.h"
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -I/localhome/virgile/softs/share/frama-c/libc -I/localhome/virgile/softs/share/frama-c/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
-[kernel] preprocessing with "gcc -C -E -I.  -I/localhome/virgile/softs/share/frama-c/libc -I/localhome/virgile/softs/share/frama-c/libc tests/e-acsl-runtime/valid_alias.c"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/e_acsl_gmp_types.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/e_acsl_gmp.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/e_acsl.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel_api.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_bittree.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
+[kernel] preprocessing with "gcc -C -E -I.  -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc tests/e-acsl-runtime/valid_alias.c"
 tests/e-acsl-runtime/valid_alias.c:17:[e-acsl] warning: missing guard for ensuring that b is a valid memory access
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
@@ -98,7 +98,7 @@ tests/e-acsl-runtime/valid_alias.c:16:[value] Assertion got status valid.
 [value] computing for function exit <- e_acsl_assert <- main.
         Called from ./share/e-acsl/e_acsl.h:43.
 [value] using specification for function exit
-/localhome/virgile/softs/share/frama-c/libc/stdlib.h:180:[value] Function exit: postcondition got status invalid.
+FRAMAC_SHARE/libc/stdlib.h:180:[value] Function exit: postcondition got status invalid.
 [value] Done for function exit
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
