@@ -333,7 +333,7 @@ class e_acsl_visitor prj generate = object (self)
     in
     let env, new_annots =
       Annotations.fold_code_annot
-	(fun _ (User old_a | AI(_, old_a)) (env, new_annots) -> 
+	(fun _ old_a (env, new_annots) -> 
 	  let a =
             (* [VP] Don't use Visitor here, as it will fill the
 	       queue in the middle of the computation... *)

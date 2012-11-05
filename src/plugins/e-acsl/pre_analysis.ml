@@ -220,8 +220,7 @@ module rec Transfer
       ignore (Visitor.visitFramacIdPredicate (register state_ref) pred);
       !state_ref
     in
-    let register_code_annot annot state = 
-      let a = Annotations.code_annotation_of_rooted annot in
+    let register_code_annot a state = 
       let state_ref = ref state in
       ignore (Visitor.visitFramacCodeAnnotation (register state_ref) a);
       !state_ref
