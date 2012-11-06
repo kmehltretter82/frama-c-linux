@@ -331,17 +331,16 @@ and context_insensitive_term_to_exp env t =
     let e, env = term_to_exp (Env.push env) None t' in
     let e, env, is_mpz_string = at_to_exp env (Some t) label e in
     e, env, is_mpz_string, ""
-  (* GP: ****************)
-  | Tbase_addr (_,t') ->
-    trivial_annotation_to_exp ~loc "base_addr" Cil.voidPtrType env t'
-  | Toffset (_,t') ->
-    let e, env = 
-      less_trivial_annotation_to_exp ~loc "offset" Cil.intType env t'
-    in 
+  | Tbase_addr(LogicLabel(_, label), t) when label = "Here" ->
+    mmodel_call ~loc "base_addr" Cil.voidPtrType env t
+  | Tbase_addr _ -> Error.not_yet "labeled \\base_addr"
+  | Toffset(LogicLabel(_, label), t) when label = "Here" ->
+    let e, env = mmodel_call_with_size ~loc "offset" Cil.intType env t in 
     e, env, false, "offset"
-  | Tblock_length (_,t') ->
-    trivial_annotation_to_exp ~loc "block_length" Cil.ulongType env t'
-  (**********************)
+  | Toffset _ -> Error.not_yet "labeled \\offset"
+  | Tblock_length(LogicLabel(_, label), t) when label = "Here" ->
+    mmodel_call ~loc "block_length" Cil.ulongType env t
+  | Tblock_length _ -> Error.not_yet "labeled \\block_length"
   | Tnull -> Cil.mkCast (Cil.zero ~loc) (TPtr(TVoid [], [])), env, false, "null"
   | TCoerce _ -> Error.untypable "coercion" (* Jessie specific *)
   | TCoerceE _ -> Error.untypable "expression coercion" (* Jessie specific *)
@@ -400,40 +399,39 @@ and comparison_to_exp
   else
     Cil.new_exp  ~loc (BinOp(bop, e1, e2, Cil.intType)), env
 
-(****************************************************)
-(* GP: for \base_addr and \block_length annotations *)
-(****************************************************)
-and trivial_annotation_to_exp ~loc name ctx env t =
-  let e, env = term_to_exp env (Some ctx) t in
-  let v, _, env = Env.new_var ~loc ~name env None ctx (fun _ _ -> []) in
-  let stmt = Misc.mk_call ~loc ~result:(Cil.var v) ("_" ^ name) [ e ] in
-  let env = Env.add_stmt env stmt in
-  e, env, false, name
+(* \base_addr and \block_length annotations *)
+and mmodel_call ~loc name ctx env t =
+  let e, env = term_to_exp env None t in
+  let _, res, env = 
+    Env.new_var
+      ~loc
+      ~name
+      env
+      None
+      ctx 
+      (fun v _ -> [ Misc.mk_call ~loc ~result:(Cil.var v) ("_" ^ name) [ e ] ]) 
+  in
+  res, env, false, name
 
-(********************************************************)
-(* GP: for \valid, \offset and \initialized annotations *)
-(********************************************************)
-and less_trivial_annotation_to_exp ~loc name ctx env t =
-  let e, env = term_to_exp env (Some ctx) t in
+(* \valid, \offset and \initialized annotations *)
+and mmodel_call_with_size ~loc name ctx env t =
+  let e, env = term_to_exp env None t in
   let typ = Typing.typ_of_term t in
-  let _, e, env =
-    Env.new_var ~loc ~name env None ctx
+  let _, res, env =
+    Env.new_var
+      ~loc
+      ~name
+      env
+      None
+      ctx
       (fun v _ ->
-	let sizeof = match typ with
-	  | TPtr (t', _) -> SizeOf t'
+	let sizeof = match typ with 
+	  | TPtr (t', _) -> Cil.new_exp ~loc (SizeOf t')
 	  | _ -> assert false
 	in
-	let stmt = 
-	  Misc.mk_call
-	    ~loc
-	    ~result:(Var v, NoOffset)
-	    ("_" ^ name)
-	    [ e; Cil.new_exp ~loc sizeof ]
-	in
-	[ stmt ])
+	[ Misc.mk_call ~loc ~result:(Cil.var v) ("_" ^ name) [ e; sizeof ] ])
   in
-  e, env
-(*****************************************************)
+  res, env
 
 and at_to_exp env t_opt label e =
   let stmt = Env.stmt_of_label env label in
@@ -482,8 +480,8 @@ and at_to_exp env t_opt label e =
 
 (* internal to [named_predicate_to_exp] but put it outside in order to not add
    extra tedious parameter. 
-   It is [true] iff we are currently visiting \valid or \initialized. *)
-let in_mem_predicate = ref false
+   It is [true] iff we are currently visiting \valid. *)
+let is_visiting_valid = ref false
 
 (* Convert an ACSL named predicate into a corresponding C expression (if
    any) in the given environment. Also extend this environment which includes
@@ -545,30 +543,31 @@ let rec named_predicate_to_exp ?name env p =
     let e, env, is_string = at_to_exp env None label e in
     assert (not is_string);
     e, env
-  (** GP **)
-  | Pvalid(label, t) -> 
-    (* [TODO] should handle [label] *)
-    if !in_mem_predicate then begin
-      in_mem_predicate := false;
-      less_trivial_annotation_to_exp ~loc "valid" Cil.intType env t
+  | Pvalid(LogicLabel(_, label) as llabel, t) when label = "Here" -> 
+    if !is_visiting_valid then begin
+      (* we already transformed \valid(t) into \initialized(t) && \valid(t):
+	 now convert this right-most valid. *)
+      is_visiting_valid := false;
+      mmodel_call_with_size ~loc "valid" Cil.intType env t
     end else begin
       (* [JS 2012/07/20] could probably be simplified whenever RTE will be used
 	 to prevent RTE in the generated code *)
-      in_mem_predicate := true;
+      is_visiting_valid := true;
       match t.term_node, t.term_type with
       | TLval tlv, Ctype ty ->
-	let p =
-	  Logic_const.pand ~loc
-	    (Logic_const.pinitialized ~loc
-	       (label, Logic_const.taddrof ~loc tlv (Ctype (TPtr(ty, [])))),
-	     p)
+	let init = 
+	  Logic_const.pinitialized ~loc
+	    (llabel, Logic_const.taddrof ~loc tlv (Ctype (TPtr(ty, []))))
 	in
-	Typing.type_named_predicate ~must_clear:false p;
+	Typing.type_named_predicate ~must_clear:false init;
+	let p = Logic_const.pand ~loc (init, p) in
 	named_predicate_to_exp env p
       | _ -> assert false
     end
-  | Pinitialized (_,t) ->
-    less_trivial_annotation_to_exp ~loc "initialized" Cil.intType env t
+  | Pvalid _ -> Error.not_yet "labeled \\valid"
+  | Pinitialized(LogicLabel(_, label), t) when label = "Here" ->
+    mmodel_call_with_size ~loc "initialized" Cil.intType env t
+  | Pinitialized _ -> Error.not_yet "labeled \\initialized"
   (********)
   | Pvalid_read _ ->  Error.not_yet "\\valid_read"
   | Pallocable _ -> Error.not_yet "\\allocate"
