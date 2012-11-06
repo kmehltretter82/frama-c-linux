@@ -563,7 +563,7 @@ let rec named_predicate_to_exp ?name env p =
 	       (label, Logic_const.taddrof ~loc tlv (Ctype (TPtr(ty, [])))),
 	     p)
 	in
-	Typing.type_named_predicate p;
+	Typing.type_named_predicate ~must_clear:false p;
 	named_predicate_to_exp env p
       | _ -> assert false
     end

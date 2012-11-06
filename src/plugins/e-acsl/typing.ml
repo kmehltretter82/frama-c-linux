@@ -233,12 +233,12 @@ let rec type_term t =
       let div a b = 
 	try BI.c_div a b 
 	with Division_by_zero -> 
-	    (* either the generated code will be dead (e.g. [false && 1/0])
-	       or it contains a potential RTE and thus it is actually equivalent
-	       to dead code. In any case, any type is correct at this point and
-	       we generate the less restrictive one (0 is always representable)
-	       in order to be as more precise as possible. *)
-	    BI.zero
+	  (* either the generated code will be dead (e.g. [false && 1/0]) or
+	     it contains a potential RTE and thus it is actually equivalent to
+	     dead code. In any case, any type is correct at this point and we
+	     generate the less restrictive one (0 is always representable) in
+	     order to be as more precise as possible. *)
+	  BI.zero
       in
       signed_rule div t1 t2
     | TBinOp(Mod, t1, t2) -> 
@@ -421,10 +421,10 @@ let rec type_predicate_named p = match p.content with
 
 let type_term t = if not (Options.Gmp_only.get ()) then ignore (type_term t)
 
-let type_named_predicate p = 
+let type_named_predicate ?(must_clear=true) p = 
   if not (Options.Gmp_only.get ()) then begin
     Options.debug ~level:2 "typing predicate %a" Cil.d_predicate_named p;
-    clear ();
+    if must_clear then clear ();
     type_predicate_named p
   end
 

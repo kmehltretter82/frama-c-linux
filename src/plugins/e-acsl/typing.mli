@@ -32,7 +32,7 @@ val typ_of_integer: My_bigint.t -> bool -> ikind
     and [false] for signed.
     @raise Not_representable if the integer does not fit in any C type. *)
 
-val type_named_predicate: predicate named -> unit
+val type_named_predicate: ?must_clear:bool -> predicate named -> unit
 (** Compute the type of each term of the given predicate. *)
 
 val type_term: term -> unit
