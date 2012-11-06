@@ -73,12 +73,17 @@ in \lstinline|\\at|}
 \ifthenelse%
     {\boolean{PrintImplementationRq}}%
     {
-\section{Changes in \eacsl implementation}
+\section{Changes in \eacsl Implementation}
 
 \subsection{Version \eacslversion}
 
 \begin{itemize}
-\item Implement bitwise complementation.
+\item \changeinsection{expressions}{support of bitwise complementation}
+\item \changeinsection{memory}{support of \lstinline|\\valid|}
+\item \changeinsection{memory}{support of \lstinline|\\block_length|}
+\item \changeinsection{memory}{support of \lstinline|\\base_addr|}
+\item \changeinsection{memory}{support of \lstinline|\\offset|}
+\item \changeinsection{dangling}{support of \lstinline|\\initialized|}
 \end{itemize}
 
 \subsection{Version 0.1}

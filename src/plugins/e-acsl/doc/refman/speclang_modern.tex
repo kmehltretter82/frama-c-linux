@@ -650,12 +650,12 @@ axiomatics.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Memory blocks and pointer dereferencing}
-\label{subsec:memory}
+\label{subsec:memory}\label{sec:memory}
 \nodiff
 
-\difficultswhy{\notimplemented{\lstinline|\\base\_addr|,
+\difficultswhy{\lstinline|\\base\_addr|,
     \lstinline|\\block\_length|, \lstinline|\\valid| and
-    \lstinline|\\offset|}}{the implementation of a memory model}
+    \lstinline|\\offset|}{the implementation of a memory model}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -762,7 +762,9 @@ same than the one of \acsl.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Undefined values, dangling pointers}
+\label{sec:dangling}
 \nodiff
 
-\difficultswhy{\notimplemented{\lstinline|\\initialized| and
-    \lstinline|\\specified|}}{the implementation of a memory model}
+\difficultswhy{\lstinline|\\initialized| and
+  \notimplemented{\lstinline|\\specified|}}{the implementation of a memory
+  model}
