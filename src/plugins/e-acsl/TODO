@@ -1,19 +1,7 @@
-- enlever les skip inutiles
-- valid global literal string
-
-################
-# MEMORY MODEL #
-################
-
-- appel de full_init et consort sur des variables générées par e_acsl (at.i)
-- ne générer les instructions que si nécessaire
-- traduction constructions logiques modèle mémoire \valid, \init ...
-
 ################
 # NEXT RELEASE #
 ################
 
-- updater doc/Changelog
 - [Bernard] avoir une fonction e_acsl_trace_behavior(char *bhv_name) {}
   à appeler dès qu'un behavior est activé
 - utiliser Rte pour tous les overflows potentiels
@@ -54,8 +42,6 @@
 # TESTS #
 #########
 
-- améliorer test "integer_constant.i" quand bug fixed #745
 - inclure exemple du E-ACSL Reference Manual
 - test arith.i: mettre les exemples du ACSL manual about div and modulo
-- -val-verbose 0 dans les tests...
-- test intensif modèle mémoire
+- tests intensifs modèle mémoire

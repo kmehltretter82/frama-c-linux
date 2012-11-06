@@ -96,7 +96,7 @@ int main(void)
     int __e_acsl_eq;
     __gmpz_init_set_si(__e_acsl,(long)0);
     __e_acsl_eq = __gmpz_cmp(__e_acsl,__e_acsl);
-    e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"0 == 0",9);
+    e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"0 == 0",8);
     __gmpz_clear(__e_acsl);
   }
   
@@ -110,7 +110,7 @@ int main(void)
     __gmpz_init_set_si(__e_acsl_2,(long)0);
     __gmpz_init_set_si(__e_acsl_3,(long)1);
     __e_acsl_ne = __gmpz_cmp(__e_acsl_2,__e_acsl_3);
-    e_acsl_assert(__e_acsl_ne != 0,(char *)"Assertion",(char *)"0 != 1",11);
+    e_acsl_assert(__e_acsl_ne != 0,(char *)"Assertion",(char *)"0 != 1",10);
     __gmpz_clear(__e_acsl_2);
     __gmpz_clear(__e_acsl_3);
   }
@@ -122,8 +122,24 @@ int main(void)
     __gmpz_init_set_str(__e_acsl_4,"1152921504606846975",10);
     __e_acsl_eq_2 = __gmpz_cmp(__e_acsl_4,__e_acsl_4);
     e_acsl_assert(__e_acsl_eq_2 == 0,(char *)"Assertion",
-                  (char *)"1152921504606846975 == 0xfffffffffffffff",12);
+                  (char *)"1152921504606846975 == 0xfffffffffffffff",11);
     __gmpz_clear(__e_acsl_4);
+  }
+  
+  /*@ assert
+      0xffffffffffffffffffffffffffffffff ≡
+      0xffffffffffffffffffffffffffffffff;
+  */
+  {
+    mpz_t __e_acsl_5;
+    int __e_acsl_eq_3;
+    __gmpz_init_set_str(__e_acsl_5,"340282366920938463463374607431768211455",
+                        10);
+    __e_acsl_eq_3 = __gmpz_cmp(__e_acsl_5,__e_acsl_5);
+    e_acsl_assert(__e_acsl_eq_3 == 0,(char *)"Assertion",
+                  (char *)"0xffffffffffffffffffffffffffffffff == 0xffffffffffffffffffffffffffffffff",
+                  13);
+    __gmpz_clear(__e_acsl_5);
   }
   
   __retres = 0;

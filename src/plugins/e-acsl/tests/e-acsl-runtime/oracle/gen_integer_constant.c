@@ -22,6 +22,27 @@ typedef struct __fc_FILE FILE;
 /*@
 model __mpz_struct { ℤ n };
 */
+/*@ requires ¬\initialized(z);
+    ensures \valid(\old(z));
+    
+    ensures \initialized(\old(z));
+    allocates \old(z);
+    
+    assigns *z;
+    assigns *z \from str, base;
+  
+*/
+extern  __attribute__((__FC_BUILTIN__)) int __gmpz_init_set_str(__mpz_struct * /*[1]*/ z,
+                                                                char const *str,
+                                                                int base);
+/*@ requires \valid(x);
+    assigns *x;  */
+extern  __attribute__((__FC_BUILTIN__)) void __gmpz_clear(__mpz_struct * /*[1]*/ x);
+/*@ requires \valid(z1);
+    requires \valid(z2);
+    assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
+                                                       __mpz_struct const * /*[1]*/ z2);
 int __fc_random_counter __attribute__((__unused__));
 unsigned long const __fc_rand_max = (unsigned long)2147483647;
 extern int __fc_heap_status;
@@ -58,14 +79,30 @@ int main(void)
   int __retres;
   int x;
   /*@ assert 0 ≡ 0; */
-  e_acsl_assert(0 == 0,(char *)"Assertion",(char *)"0 == 0",9);
+  e_acsl_assert(0 == 0,(char *)"Assertion",(char *)"0 == 0",8);
   x = 0;
   x ++;
   /*@ assert 0 ≢ 1; */
-  e_acsl_assert(0 != 1,(char *)"Assertion",(char *)"0 != 1",11);
+  e_acsl_assert(0 != 1,(char *)"Assertion",(char *)"0 != 1",10);
   /*@ assert 1152921504606846975 ≡ 0xfffffffffffffff; */
   e_acsl_assert(1152921504606846975 == 0xfffffffffffffff,(char *)"Assertion",
-                (char *)"1152921504606846975 == 0xfffffffffffffff",12);
+                (char *)"1152921504606846975 == 0xfffffffffffffff",11);
+  /*@ assert
+      0xffffffffffffffffffffffffffffffff ≡
+      0xffffffffffffffffffffffffffffffff;
+  */
+  {
+    mpz_t __e_acsl;
+    int __e_acsl_eq;
+    __gmpz_init_set_str(__e_acsl,"340282366920938463463374607431768211455",
+                        10);
+    __e_acsl_eq = __gmpz_cmp(__e_acsl,__e_acsl);
+    e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",
+                  (char *)"0xffffffffffffffffffffffffffffffff == 0xffffffffffffffffffffffffffffffff",
+                  13);
+    __gmpz_clear(__e_acsl);
+  }
+  
   __retres = 0;
   __clean();
   return (__retres);
