@@ -25,8 +25,8 @@ open Cil_types
 val init_mpz: unit -> unit
 val reset: unit -> unit
 
-val must_model_vi: ?kf:kernel_function -> varinfo -> bool
-val must_model_lval: kernel_function -> lval -> bool
+val must_model_vi: ?kf:kernel_function -> ?stmt:stmt -> varinfo -> bool
+val must_model_lval: ?kf:kernel_function -> ?stmt:stmt -> lval -> bool
 
 (*
 Local Variables:

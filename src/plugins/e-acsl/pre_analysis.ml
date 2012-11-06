@@ -89,7 +89,6 @@ end = struct
 
   let consolidated_mem v = 
     is_consolidated_ref := true;
-    Kernel_function.Hashtbl.clear tbl; (* will not be used anymore *)
     Varinfo.Set.mem v !consolidated_set
 
   let is_consolidated () = !is_consolidated_ref
@@ -397,33 +396,53 @@ and Compute: sig val get: kernel_function -> Varinfo.Set.t end = struct
 
 end
 
-let must_model_vi ?kf vi =
+let consolidated_must_model_vi ?kf vi =
   if Env.is_consolidated () then
     Env.consolidated_mem vi
   else
-    match kf with
+    (match kf with
     | None -> 
       Globals.Functions.iter 
 	(fun kf -> 
 	  let set = Compute.get kf in
 	  Env.consolidate set);
-    (*    Options.feedback "MUST MODEL %s? %b (consolidated)" 
-	  vi.vname (Env.consolidated_mem vi);*)
+      (*    Options.feedback "MUST MODEL %s? %b (consolidated)" 
+	    vi.vname (Env.consolidated_mem vi);*)
       Env.consolidated_mem vi
     | Some kf -> 
       let set = Compute.get kf in
-    (*    Options.feedback "MUST MODEL %s? %b" vi.vname (Varinfo.Set.mem vi set);*)
-      Varinfo.Set.mem vi set
+      (*    Options.feedback "MUST MODEL %s? %b" vi.vname (Varinfo.Set.mem vi set);*)
+      Varinfo.Set.mem vi set)
 
-let rec must_model_lval kf = function
-  | Var vi, _ -> must_model_vi ~kf vi
-  | Mem e, _ -> must_model_exp kf e
+let must_model_vi ?kf ?stmt vi =
+  let kf = match kf, stmt with
+    | None, None | Some _, _ -> kf
+    | None, Some stmt -> Some (Kernel_function.find_englobing_kf stmt)
+  in
+  match stmt, kf with
+  | None, _ -> consolidated_must_model_vi ?kf vi
+  | Some _, None ->
+    assert false
+  | Some stmt, Some kf  ->
+    assert (Env.is_consolidated ());
+    let tbl = try Env.find kf with Not_found -> assert false in
+    try
+      let set = Stmt.Hashtbl.find tbl stmt in
+      Varinfo.Set.mem vi (Env.default_varinfos set)
+    with Not_found -> 
+      (* new statement *)
+      consolidated_must_model_vi ~kf vi
 
-and must_model_exp kf e = match e.enode with
-  | Lval lv | AddrOf lv | StartOf lv -> must_model_lval kf lv
-  | BinOp((PlusPI | IndexPI | MinusPI), e1, _, _) -> must_model_exp kf e1
-  | BinOp(MinusPP, e1, e2, _) -> must_model_exp kf e1 || must_model_exp kf e2
-  | Info(e, _) | CastE(_, e) -> must_model_exp kf e
+let rec must_model_lval ?kf ?stmt = function
+  | Var vi, _ -> must_model_vi ?kf ?stmt vi
+  | Mem e, _ -> must_model_exp ?kf ?stmt e
+
+and must_model_exp ?kf ?stmt e = match e.enode with
+  | Lval lv | AddrOf lv | StartOf lv -> must_model_lval ?kf ?stmt lv
+  | BinOp((PlusPI | IndexPI | MinusPI), e1, _, _) -> must_model_exp ?kf ?stmt e1
+  | BinOp(MinusPP, e1, e2, _) -> 
+    must_model_exp ?kf ?stmt e1 || must_model_exp ?kf ?stmt e2
+  | Info(e, _) | CastE(_, e) -> must_model_exp ?kf ?stmt e
   | BinOp((PlusA | MinusA | Mult | Div | Mod |Shiftlt | Shiftrt 
 	      | Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr),
 	  _, _, _)

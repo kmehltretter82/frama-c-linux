@@ -61,13 +61,6 @@ FRAMAC_SHARE/libc/stdlib.h:180:[value] Function exit: postcondition got status i
 [value] Done for function exit
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-[value] computing for function _initialize <- add <- main.
-        Called from tests/e-acsl-runtime/localvar.c:21.
-[value] using specification for function _initialize
-[value] Done for function _initialize
-[value] computing for function _initialize <- add <- main.
-        Called from tests/e-acsl-runtime/localvar.c:22.
-[value] Done for function _initialize
 [value] computing for function _delete_block <- add <- main.
         Called from tests/e-acsl-runtime/localvar.c:18.
 [value] using specification for function _delete_block
@@ -98,12 +91,6 @@ FRAMAC_SHARE/libc/stdlib.h:180:[value] Function exit: postcondition got status i
 [value] Done for function exit
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-[value] computing for function _initialize <- add <- main.
-        Called from tests/e-acsl-runtime/localvar.c:21.
-[value] Done for function _initialize
-[value] computing for function _initialize <- add <- main.
-        Called from tests/e-acsl-runtime/localvar.c:22.
-[value] Done for function _initialize
 [value] computing for function _delete_block <- add <- main.
         Called from tests/e-acsl-runtime/localvar.c:18.
 [value] Done for function _delete_block
@@ -251,9 +238,6 @@ extern  __attribute__((__FC_BUILTIN__)) void *_store_block(void *ptr,
 /*@ assigns \nothing;  */
 extern  __attribute__((__FC_BUILTIN__)) void _delete_block(void *ptr);
 /*@ assigns \nothing;  */
-extern  __attribute__((__FC_BUILTIN__)) void _initialize(void *ptr,
-                                                         size_t size);
-/*@ assigns \nothing;  */
 extern  __attribute__((__FC_BUILTIN__)) void _full_init(void *ptr);
 /*@ assigns \nothing;  */
 extern  __attribute__((__FC_BUILTIN__)) int _valid(void *ptr, size_t size);
@@ -288,9 +272,7 @@ struct list *add(struct list *l, int i)
     e_acsl_assert(__e_acsl_and,(char *)"Assertion",(char *)"\\valid(new)",20);
   }
   
-  _initialize((void *)(& new->element),sizeof(int));
   new->element = i;
-  _initialize((void *)(& new->next),sizeof(struct list *));
   new->next = l;
   _delete_block((void *)(& new));
   return (new);

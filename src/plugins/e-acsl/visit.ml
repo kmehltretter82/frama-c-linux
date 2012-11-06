@@ -443,7 +443,8 @@ class e_acsl_visitor prj generate = object (self)
     let add_initializer = function
       | Set(new_lv, _, loc) | Call(Some new_lv, _, _, loc) ->
 	let kf = Extlib.the self#current_kf in
-	if Pre_analysis.must_model_lval kf old_lv then begin
+	let stmt = Extlib.the self#current_stmt in
+	if Pre_analysis.must_model_lval ~kf ~stmt old_lv then begin
 	  let stmt = Misc.mk_debug_mmodel_stmt (mk_initialize loc new_lv) in
 	  function_env := Env.add_stmt !function_env stmt
 	end
