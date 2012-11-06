@@ -485,9 +485,9 @@ class e_acsl_visitor prj generate = object (self)
 	      List.fold_left (fun acc v -> v :: acc) (add_locals init) tl
 	  | { skind = Block b } :: _ -> 
 	    insert_in_innermost_last_block b (List.rev b.bstmts)
-	  | l -> blk.bstmts <- add_locals l
+	  | l -> blk.bstmts <- add_locals (List.rev l)
 	in
-	insert_in_innermost_last_block blk (List.rev new_blk.bstmts);
+	insert_in_innermost_last_block new_blk (List.rev new_blk.bstmts);
 	new_blk.bstmts <-
 	  List.fold_left
 	  (fun acc v -> 

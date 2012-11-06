@@ -1,0 +1,311 @@
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/e_acsl_gmp_types.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/e_acsl_gmp.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/e_acsl.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel_api.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_bittree.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
+[kernel] preprocessing with "gcc -C -E -I.  -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc tests/e-acsl-runtime/localvar.c"
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value] Values of globals at initialization
+        __fc_random_counter ∈ {0}
+        __fc_rand_max ∈ {2147483647}
+        __fc_heap_status ∈ [--..--]
+        __fc_stdout ∈ {{ NULL ; &S___fc_stdout }}
+        S___fc_stdout[0].__fc_stdio_fpos ∈ [--..--]
+                     [0].__fc_stdio_buffer ∈
+                     {{ NULL ; &S___fc_stdio_buffer_0_S___fc_stdout }}
+                     [0]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
+                     [0].[bits 80 to 95] ∈ UNINITIALIZED
+                     {[0].__fc_stdio_id; [1].__fc_stdio_fpos; } ∈ [--..--]
+                     [1].__fc_stdio_buffer ∈
+                     {{ NULL ; &S___fc_stdio_buffer_1_S___fc_stdout }}
+                     [1]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
+                     [1].[bits 80 to 95] ∈ UNINITIALIZED
+                     [1].__fc_stdio_id ∈ [--..--]
+        S___fc_stdio_buffer_0_S___fc_stdout[0..1] ∈ [--..--]
+        S___fc_stdio_buffer_1_S___fc_stdout[0..1] ∈ [--..--]
+[value] computing for function add <- main.
+        Called from tests/e-acsl-runtime/localvar.c:28.
+[value] computing for function _store_block <- add <- main.
+        Called from tests/e-acsl-runtime/localvar.c:18.
+[value] using specification for function _store_block
+[value] Done for function _store_block
+[value] computing for function _full_init <- add <- main.
+        Called from tests/e-acsl-runtime/localvar.c:19.
+[value] using specification for function _full_init
+[value] Done for function _full_init
+tests/e-acsl-runtime/localvar.c:20:[value] Assertion got status valid.
+[value] computing for function _initialized <- add <- main.
+        Called from tests/e-acsl-runtime/localvar.c:20.
+[value] using specification for function _initialized
+./share/e-acsl/memory_model/e_acsl_mmodel.h:57:[value] Function _initialized: postcondition got status unknown.
+./share/e-acsl/memory_model/e_acsl_mmodel.h:58:[value] Function _initialized: postcondition got status valid.
+[value] Done for function _initialized
+[value] computing for function _valid <- add <- main.
+        Called from tests/e-acsl-runtime/localvar.c:20.
+[value] using specification for function _valid
+[value] Done for function _valid
+[value] computing for function e_acsl_assert <- add <- main.
+        Called from tests/e-acsl-runtime/localvar.c:20.
+./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status unknown.
+[value] computing for function printf <- e_acsl_assert <- add <- main.
+        Called from ./share/e-acsl/e_acsl.h:41.
+[value] using specification for function printf
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- add <- main.
+        Called from ./share/e-acsl/e_acsl.h:43.
+[value] using specification for function exit
+FRAMAC_SHARE/libc/stdlib.h:180:[value] Function exit: postcondition got status invalid.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function _initialize <- add <- main.
+        Called from tests/e-acsl-runtime/localvar.c:21.
+[value] using specification for function _initialize
+[value] Done for function _initialize
+[value] computing for function _initialize <- add <- main.
+        Called from tests/e-acsl-runtime/localvar.c:22.
+[value] Done for function _initialize
+[value] computing for function _delete_block <- add <- main.
+        Called from tests/e-acsl-runtime/localvar.c:18.
+[value] using specification for function _delete_block
+[value] Done for function _delete_block
+[value] Recording results for add
+[value] Done for function add
+[value] computing for function add <- main.
+        Called from tests/e-acsl-runtime/localvar.c:29.
+[value] computing for function _store_block <- add <- main.
+        Called from tests/e-acsl-runtime/localvar.c:18.
+[value] Done for function _store_block
+[value] computing for function _full_init <- add <- main.
+        Called from tests/e-acsl-runtime/localvar.c:19.
+[value] Done for function _full_init
+[value] computing for function _initialized <- add <- main.
+        Called from tests/e-acsl-runtime/localvar.c:20.
+[value] Done for function _initialized
+[value] computing for function _valid <- add <- main.
+        Called from tests/e-acsl-runtime/localvar.c:20.
+[value] Done for function _valid
+[value] computing for function e_acsl_assert <- add <- main.
+        Called from tests/e-acsl-runtime/localvar.c:20.
+[value] computing for function printf <- e_acsl_assert <- add <- main.
+        Called from ./share/e-acsl/e_acsl.h:41.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- add <- main.
+        Called from ./share/e-acsl/e_acsl.h:43.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function _initialize <- add <- main.
+        Called from tests/e-acsl-runtime/localvar.c:21.
+[value] Done for function _initialize
+[value] computing for function _initialize <- add <- main.
+        Called from tests/e-acsl-runtime/localvar.c:22.
+[value] Done for function _initialize
+[value] computing for function _delete_block <- add <- main.
+        Called from tests/e-acsl-runtime/localvar.c:18.
+[value] Done for function _delete_block
+[value] Recording results for add
+[value] Done for function add
+[value] computing for function __clean <- main.
+        Called from tests/e-acsl-runtime/localvar.c:30.
+[value] using specification for function __clean
+[kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
+[value] Done for function __clean
+[value] Recording results for main
+[value] done for function main
+[value] ====== VALUES COMPUTED ======
+[value] Values at end of function e_acsl_assert:
+          S___fc_stdout[0].__fc_stdio_fpos ∈ [--..--]
+                       [0].__fc_stdio_buffer ∈
+                       {{ NULL ; &S___fc_stdio_buffer_0_S___fc_stdout }}
+                       [0]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
+                       [0].[bits 80 to 95] ∈ UNINITIALIZED
+                       {[0].__fc_stdio_id; [1].__fc_stdio_fpos; } ∈ [--..--]
+                       [1].__fc_stdio_buffer ∈
+                       {{ NULL ; &S___fc_stdio_buffer_1_S___fc_stdout }}
+                       [1]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
+                       [1].[bits 80 to 95] ∈ UNINITIALIZED
+                       [1].__fc_stdio_id ∈ [--..--]
+[value] Values at end of function add:
+          __fc_heap_status ∈ [--..--]
+          new ∈ {{ &Frama_C_alloc ; &Frama_C_alloc_0 }}
+          S___fc_stdout[0].__fc_stdio_fpos ∈ [--..--]
+                       [0].__fc_stdio_buffer ∈
+                       {{ NULL ; &S___fc_stdio_buffer_0_S___fc_stdout }}
+                       [0]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
+                       [0].[bits 80 to 95] ∈ UNINITIALIZED
+                       {[0].__fc_stdio_id; [1].__fc_stdio_fpos; } ∈ [--..--]
+                       [1].__fc_stdio_buffer ∈
+                       {{ NULL ; &S___fc_stdio_buffer_1_S___fc_stdout }}
+                       [1]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
+                       [1].[bits 80 to 95] ∈ UNINITIALIZED
+                       [1].__fc_stdio_id ∈ [--..--]
+          Frama_C_alloc[bits 0 to 31] ∈ {4}
+                       [4..7] ∈ {0}
+          Frama_C_alloc_0[bits 0 to 31] ∈ {7} or UNINITIALIZED
+                         [bits 32 to 63] ∈ {{ &Frama_C_alloc }} or UNINITIALIZED
+[value] Values at end of function main:
+          __fc_heap_status ∈ [--..--]
+          l ∈ {{ &Frama_C_alloc_0 }}
+          __retres ∈ {0}
+          S___fc_stdout[0].__fc_stdio_fpos ∈ [--..--]
+                       [0].__fc_stdio_buffer ∈
+                       {{ NULL ; &S___fc_stdio_buffer_0_S___fc_stdout }}
+                       [0]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
+                       [0].[bits 80 to 95] ∈ UNINITIALIZED
+                       {[0].__fc_stdio_id; [1].__fc_stdio_fpos; } ∈ [--..--]
+                       [1].__fc_stdio_buffer ∈
+                       {{ NULL ; &S___fc_stdio_buffer_1_S___fc_stdout }}
+                       [1]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
+                       [1].[bits 80 to 95] ∈ UNINITIALIZED
+                       [1].__fc_stdio_id ∈ [--..--]
+          Frama_C_alloc[bits 0 to 31] ∈ {4}
+                       [4..7] ∈ {0}
+          Frama_C_alloc_0[bits 0 to 31] ∈ {7}
+                         [bits 32 to 63] ∈ {{ &Frama_C_alloc }}
+/* Generated by Frama-C */
+struct __anonstruct___mpz_struct_1 {
+   int _mp_alloc ;
+   int _mp_size ;
+   unsigned long *_mp_d ;
+};
+typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
+typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
+typedef unsigned int size_t;
+struct __fc_pos_t {
+   unsigned long __fc_stdio_position ;
+};
+typedef struct __fc_pos_t fpos_t;
+struct __fc_FILE {
+   fpos_t __fc_stdio_fpos ;
+   char *__fc_stdio_buffer ;
+   char __fc_stdio_error ;
+   char __fc_stdio_eof ;
+   long __fc_stdio_id ;
+};
+typedef struct __fc_FILE FILE;
+struct list {
+   int element ;
+   struct list *next ;
+};
+/*@
+model __mpz_struct { ℤ n };
+*/
+int __fc_random_counter __attribute__((__unused__));
+unsigned long const __fc_rand_max = (unsigned long)2147483647;
+extern int __fc_heap_status;
+/*@
+axiomatic
+  dynamic_allocation {
+  predicate is_allocable{L}(size_t n) 
+    reads __fc_heap_status;
+  
+  }
+ */
+/*@ allocates \result;
+    
+    assigns __fc_heap_status;
+    assigns __fc_heap_status \from size, __fc_heap_status;
+    assigns \result
+    \from size, __fc_heap_status;
+    behavior allocation:
+      assumes is_allocable(size);
+      ensures \fresh{Old, Here}(\result,\old(size));
+      assigns __fc_heap_status;
+      assigns __fc_heap_status \from size, __fc_heap_status;
+      assigns \result \from size, __fc_heap_status;
+    behavior no_allocation:
+      assumes ¬is_allocable(size);
+      ensures \result ≡ \null;
+      allocates \nothing;assigns \result \from \nothing;
+    complete behaviors no_allocation, allocation;
+    disjoint behaviors no_allocation, allocation;
+  
+*/
+extern void *_malloc(size_t size);
+/*@ ensures \false;
+    assigns \nothing;  */
+extern void exit(int status);
+extern FILE *__fc_stdout;
+/*@ assigns *__fc_stdout;
+    assigns *__fc_stdout \from *(format+(..));  */
+extern int printf(char const *format , ...);
+/*@ requires predicate ≢ 0;
+    assigns \nothing;  */
+void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
+{
+  if (! predicate) {
+    printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
+           line,pred_txt);
+    exit(1);
+  }
+  return;
+}
+
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void *_store_block(void *ptr,
+                                                           size_t size);
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void _delete_block(void *ptr);
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void _initialize(void *ptr,
+                                                         size_t size);
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void _full_init(void *ptr);
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) int _valid(void *ptr, size_t size);
+/*@ ensures \result ≡ 0 ∨ \result ≡ 1;
+    ensures \result ≡ 1 ⇒
+            \initialized((char *)\old(ptr)+(0..\old(size)-1));
+    assigns \nothing;
+  
+*/
+extern  __attribute__((__FC_BUILTIN__)) int _initialized(void *ptr,
+                                                         size_t size);
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
+struct list *add(struct list *l, int i)
+{
+  struct list *new;
+  _store_block((void *)(& new),4U);
+  _full_init((void *)(& new));
+  new = (struct list *)_malloc(sizeof(struct list));
+  /*@ assert \valid(new); */
+  {
+    int __e_acsl_initialized;
+    int __e_acsl_and;
+    __e_acsl_initialized = _initialized((void *)(& new),
+                                        sizeof(struct list *));
+    if (__e_acsl_initialized) {
+      int __e_acsl_valid;
+      __e_acsl_valid = _valid((void *)new,sizeof(struct list));
+      __e_acsl_and = __e_acsl_valid;
+    }
+    else { __e_acsl_and = 0; }
+    e_acsl_assert(__e_acsl_and,(char *)"Assertion",(char *)"\\valid(new)",20);
+  }
+  
+  _initialize((void *)(& new->element),sizeof(int));
+  new->element = i;
+  _initialize((void *)(& new->next),sizeof(struct list *));
+  new->next = l;
+  _delete_block((void *)(& new));
+  return (new);
+}
+
+int main(void)
+{
+  int __retres;
+  struct list *l;
+  l = (struct list *)((void *)0);
+  l = add(l,4);
+  l = add(l,7);
+  __retres = 0;
+  __clean();
+  return (__retres);
+}
+
+
