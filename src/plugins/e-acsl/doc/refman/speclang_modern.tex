@@ -654,13 +654,17 @@ axiomatics.
 \nodiff
 
 \difficultswhy{\lstinline|\\base\_addr|,
-    \lstinline|\\block\_length|, \lstinline|\\valid| and
+    \lstinline|\\block\_length|, \lstinline|\\valid|, 
+    \notimplemented{\lstinline|\\valid_read|} and
     \lstinline|\\offset|}{the implementation of a memory model}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Separation}
-\absentexperimental
+\subsection{Separation}\label{sec:separation}
+\nodiff
+
+\difficultswhy{\notimplemented{\lstinline|\\separated|}}{the implementation of a
+  memory model}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -718,6 +722,7 @@ invariants.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{\notimplemented{Model variables and model fields}}
+\label{sec:model}
 \index{model}
 
 \nodiff

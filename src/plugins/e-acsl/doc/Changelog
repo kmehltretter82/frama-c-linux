@@ -31,10 +31,9 @@
 -* E-ACSL       [2012/01/24] Fix bug with boolean.
 -* E-ACSL       [2012/01/24] Fix bug with negation and GMP integers.
 -* E-ACSL       [2012/01/24] Fix bug with conditional and GMP integers.
--  E-ACSL       [2012/01/24] function e_acsl_assert now consistent with
+-  E-ACSL       [2012/01/24] Function e_acsl_assert now consistent with
 	        standard assert.
--* E-ACSL	[2012/01/23] Function __gmp_com was wrongly named in
-	        E_ACSL C header.
+-  E-ACSL	[2012/01/23] Support of bitwise complementation.
 -  E-ACSL	[2012/01/20] Use GMP arithmetics only when required
 	        (i.e. mostly never in practice).
 
@@ -42,6 +41,6 @@
 Plugin E-ACSL 0.1 Nitrogen_20111001
 ###################################
 
--  E-ACSL	[2012/01/06] First release for the Hi-Lite FUI9 project.
+-  E-ACSL	[2012/01/06] First public release.
 
 ###################################

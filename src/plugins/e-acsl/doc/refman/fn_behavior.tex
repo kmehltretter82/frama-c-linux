@@ -13,6 +13,8 @@
   \
   { locations } ::= { location ("," location) * | "\nothing" }
   \
+  { location } ::= { tset }
+  \
   ensures-clause ::= "ensures" predicate ";"
   \
   named-behavior ::= "behavior" id ":" behavior-body
