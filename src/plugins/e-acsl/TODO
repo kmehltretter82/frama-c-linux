@@ -22,7 +22,6 @@
 # KNOWN BUGS #
 ##############
 
-- sizeof("literal_string") (voir test sizeof.i)
 - comparaisons qui aboutissent à du C incorrect
   ==> comparaison de chaînes litérales
    (voir tests other_constants.i et comparison.i)

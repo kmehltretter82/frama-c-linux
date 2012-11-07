@@ -299,8 +299,11 @@ let rec type_term t =
   ty
 
 and type_term_lval (h, o) =
-  type_term_offset o;
-  type_term_lhost h
+  let ty_off = type_term_offset o in
+  let ty_host = type_term_lhost h in
+  match ty_off with
+  | Some ty -> ty (* access to a field of a struct *)
+  | None -> ty_host
 
 and type_term_lhost = function
   | TVar lv -> 
@@ -323,8 +326,10 @@ and type_term_lhost = function
     | No_integral _ | Z | Interv _ -> assert false
 
 and type_term_offset = function
-  | TNoOffset -> ()
-  | TField(_, o) -> type_term_offset o
+  | TNoOffset -> None
+  | TField(f, o) -> 
+    ignore (type_term_offset o);
+    Some (eacsl_typ_of_typ f.ftype)
   | TIndex(t, o) ->
     ignore (type_term t);
     type_term_offset o

@@ -72,8 +72,8 @@ extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
       ensures \result ≡ \old(l);
       
     behavior B2:
-      assumes \valid(l);
-      assumes l->next ≡ \null;
+      assumes ¬\valid(l);
+      assumes ¬\valid(l->next);
       ensures \result ≡ \old(l);
       
   
@@ -87,18 +87,22 @@ struct list *f(struct list *l)
   struct list *__retres;
   __e_acsl_at_4 = l;
   {
-    int __e_acsl_initialized;
-    int __e_acsl_and;
+    int __e_acsl_valid;
     int __e_acsl_and_2;
-    __e_acsl_initialized = _initialized((void *)(& l),sizeof(struct list *));
-    if (__e_acsl_initialized) {
-      int __e_acsl_valid;
-      __e_acsl_valid = _valid((void *)l,sizeof(struct list));
-      __e_acsl_and = __e_acsl_valid;
-    }
-    else { __e_acsl_and = 0; }
-    if (__e_acsl_and) { __e_acsl_and_2 = l->next == (void *)0; }
-    else { __e_acsl_and_2 = 0; }
+    __e_acsl_valid = _valid((void *)l,sizeof(struct list));
+    if (! __e_acsl_valid) {
+      int __e_acsl_initialized;
+      int __e_acsl_and;
+      __e_acsl_initialized = _initialized((void *)(& l->next),
+                                          sizeof(struct list *));
+      if (__e_acsl_initialized) {
+        int __e_acsl_valid_2;
+        __e_acsl_valid_2 = _valid((void *)l->next,sizeof(struct list));
+        __e_acsl_and = __e_acsl_valid_2;
+      }
+      else { __e_acsl_and = 0; }
+      __e_acsl_and_2 = ! __e_acsl_and;
+    } else { __e_acsl_and_2 = 0; }
     __e_acsl_at_3 = __e_acsl_and_2;
   }
   
@@ -122,7 +126,7 @@ struct list *f(struct list *l)
     if (! __e_acsl_at_3) { __e_acsl_implies_2 = 1; }
     else { __e_acsl_implies_2 = __retres == __e_acsl_at_4; }
     e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",
-                  (char *)"\\old(\\valid(l) && l->next == \\null) ==>\n\\result == \\old(l)",
+                  (char *)"\\old(!\\valid(l) && !\\valid(l->next)) ==>\n\\result == \\old(l)",
                   22);
     return (__retres);
   }

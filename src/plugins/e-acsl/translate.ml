@@ -544,16 +544,20 @@ let rec named_predicate_to_exp ?name env p =
     assert (not is_string);
     e, env
   | Pvalid(LogicLabel(_, label) as llabel, t) when label = "Here" -> 
+    let call_valid t = mmodel_call_with_size ~loc "valid" Cil.intType env t in
     if !is_visiting_valid then begin
       (* we already transformed \valid(t) into \initialized(t) && \valid(t):
 	 now convert this right-most valid. *)
       is_visiting_valid := false;
-      mmodel_call_with_size ~loc "valid" Cil.intType env t
+      call_valid t
     end else begin
       (* [JS 2012/07/20] could probably be simplified whenever RTE will be used
 	 to prevent RTE in the generated code *)
-      is_visiting_valid := true;
       match t.term_node, t.term_type with
+      | TLval (TResult _, TNoOffset), _ -> call_valid t
+      | TLval (TVar { lv_origin = Some vi }, TNoOffset), _ 
+	when vi.vformal || vi.vglob ->
+	call_valid t
       | TLval tlv, Ctype ty ->
 	let init = 
 	  Logic_const.pinitialized ~loc
@@ -561,6 +565,7 @@ let rec named_predicate_to_exp ?name env p =
 	in
 	Typing.type_named_predicate ~must_clear:false init;
 	let p = Logic_const.pand ~loc (init, p) in
+	is_visiting_valid := true;
 	named_predicate_to_exp env p
       | _ -> assert false
     end
