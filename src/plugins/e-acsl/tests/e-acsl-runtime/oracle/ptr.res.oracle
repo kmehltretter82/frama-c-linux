@@ -53,6 +53,7 @@ tests/e-acsl-runtime/ptr.i:15:[value] Assertion got status valid.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 tests/e-acsl-runtime/ptr.i:16:[value] Assertion got status valid.
+tests/e-acsl-runtime/ptr.i:16:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
         Called from tests/e-acsl-runtime/ptr.i:16.
 [value] Recording results for e_acsl_assert

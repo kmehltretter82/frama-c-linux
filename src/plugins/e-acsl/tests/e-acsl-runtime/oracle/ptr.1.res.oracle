@@ -140,6 +140,7 @@ tests/e-acsl-runtime/ptr.i:16:[value] Assertion got status valid.
 [value] computing for function __gmpz_init <- main.
         Called from tests/e-acsl-runtime/ptr.i:16.
 [value] Done for function __gmpz_init
+tests/e-acsl-runtime/ptr.i:16:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
         Called from tests/e-acsl-runtime/ptr.i:16.
 [value] Recording results for e_acsl_assert
@@ -378,7 +379,6 @@ tests/e-acsl-runtime/ptr.i:20:[value] Assertion got status unknown.
 [value] computing for function __gmpz_get_ui <- main.
         Called from tests/e-acsl-runtime/ptr.i:20.
 [value] Done for function __gmpz_get_ui
-tests/e-acsl-runtime/ptr.i:20:[value] Assertion got status unknown.
 [value] computing for function __gmpz_init_set_si <- main.
         Called from tests/e-acsl-runtime/ptr.i:20.
 [value] Done for function __gmpz_init_set_si

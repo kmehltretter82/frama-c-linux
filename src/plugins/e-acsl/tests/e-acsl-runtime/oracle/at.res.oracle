@@ -51,7 +51,7 @@ tests/e-acsl-runtime/at.i:14:[value] Assertion got status unknown.
         Called from tests/e-acsl-runtime/at.i:14.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
-:0:[value] Assertion got status valid.
+tests/e-acsl-runtime/at.i:15:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- f <- main.
         Called from tests/e-acsl-runtime/at.i:15.
 [value] Recording results for e_acsl_assert
@@ -96,7 +96,7 @@ tests/e-acsl-runtime/at.i:32:[value] Assertion got status unknown.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 :0:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
-:0:[value] Assertion got status unknown.
+tests/e-acsl-runtime/at.i:34:[value] Assertion got status unknown.
 [value] computing for function e_acsl_assert <- g <- main.
         Called from tests/e-acsl-runtime/at.i:34.
 [value] Recording results for e_acsl_assert

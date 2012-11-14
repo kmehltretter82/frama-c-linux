@@ -140,7 +140,7 @@ tests/e-acsl-runtime/at.i:14:[value] Assertion got status unknown.
 [value] computing for function __gmpz_clear <- f <- main.
         Called from tests/e-acsl-runtime/at.i:14.
 [value] Done for function __gmpz_clear
-:0:[value] Assertion got status valid.
+tests/e-acsl-runtime/at.i:15:[value] Assertion got status valid.
 [value] computing for function __gmpz_init_set_si <- f <- main.
         Called from tests/e-acsl-runtime/at.i:15.
 [value] Done for function __gmpz_init_set_si
@@ -293,7 +293,7 @@ tests/e-acsl-runtime/at.i:32:[value] Assertion got status unknown.
         Called from tests/e-acsl-runtime/at.i:32.
 [value] Done for function __gmpz_clear
 :0:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
-:0:[value] Assertion got status unknown.
+tests/e-acsl-runtime/at.i:34:[value] Assertion got status unknown.
 [value] computing for function __gmpz_init_set_si <- g <- main.
         Called from tests/e-acsl-runtime/at.i:34.
 [value] Done for function __gmpz_init_set_si

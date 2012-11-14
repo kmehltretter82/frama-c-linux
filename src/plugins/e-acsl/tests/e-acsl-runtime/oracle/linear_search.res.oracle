@@ -44,8 +44,8 @@ tests/e-acsl-runtime/linear_search.i:9:[value] entering loop for the first time
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 :0:[value] entering loop for the first time
-tests/e-acsl-runtime/linear_search.i:21:[value] Loop invariant got status valid.
-tests/e-acsl-runtime/linear_search.i:21:[value] Loop invariant got status unknown.
+tests/e-acsl-runtime/linear_search.i:19:[value] Loop invariant got status valid.
+tests/e-acsl-runtime/linear_search.i:20:[value] Loop invariant got status unknown.
 tests/e-acsl-runtime/linear_search.i:21:[value] entering loop for the first time
 [value] computing for function e_acsl_assert <- search <- main.
         Called from tests/e-acsl-runtime/linear_search.i:12.

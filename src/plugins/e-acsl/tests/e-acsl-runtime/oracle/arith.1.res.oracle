@@ -465,7 +465,6 @@ tests/e-acsl-runtime/arith.i:22:[value] Assertion got status valid.
 [value] computing for function __gmpz_init <- main.
         Called from tests/e-acsl-runtime/arith.i:22.
 [value] Done for function __gmpz_init
-tests/e-acsl-runtime/arith.i:22:[value] Assertion got status valid.
 [value] computing for function e_acsl_assert <- main.
         Called from tests/e-acsl-runtime/arith.i:22.
 [value] Recording results for e_acsl_assert
