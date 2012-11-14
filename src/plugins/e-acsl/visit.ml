@@ -79,8 +79,8 @@ let mk_full_init_stmt ?(addr=true) vi =
   in
   Misc.mk_debug_mmodel_stmt stmt
 
-let mk_initialize ~loc (_, offset as lv) = match offset with
-  | NoOffset -> Misc.mk_call ~loc "_full_init" [ Cil.mkAddrOf ~loc lv ]
+let mk_initialize ~loc (host, offset as lv) = match host, offset with
+  | Var _, NoOffset -> Misc.mk_call ~loc "_full_init" [ Cil.mkAddrOf ~loc lv ]
   | _ -> 
     let typ = Cil.typeOfLval lv in
     Misc.mk_call ~loc 
