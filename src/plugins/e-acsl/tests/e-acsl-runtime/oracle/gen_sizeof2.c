@@ -86,7 +86,8 @@ int main(void)
     int __e_acsl_eq;
     __gmpz_init_set_si(__e_acsl_sizeof,4L);
     __gmpz_init_set_si(__e_acsl_sizeof_2,4L);
-    __e_acsl_eq = __gmpz_cmp(__e_acsl_sizeof,__e_acsl_sizeof_2);
+    __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl_sizeof),
+                             (__mpz_struct const *)(__e_acsl_sizeof_2));
     e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",
                   (char *)"sizeof(int) == sizeof(x)",10);
     __gmpz_clear(__e_acsl_sizeof);

@@ -98,6 +98,9 @@ extern  __attribute__((__FC_BUILTIN__)) void *_store_block(void *ptr,
 /*@ assigns \nothing;  */
 extern  __attribute__((__FC_BUILTIN__)) void _delete_block(void *ptr);
 /*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void _initialize(void *ptr,
+                                                         size_t size);
+/*@ assigns \nothing;  */
 extern  __attribute__((__FC_BUILTIN__)) void _full_init(void *ptr);
 /*@ assigns \nothing;  */
 extern  __attribute__((__FC_BUILTIN__)) int _valid(void *ptr, size_t size);
@@ -152,7 +155,7 @@ int main(void)
   
   _full_init((void *)(& a));
   a = (int *)_malloc(sizeof(int));
-  _full_init((void *)a);
+  _initialize((void *)a,sizeof(int));
   *a = n;
   _full_init((void *)(& b));
   b = a;

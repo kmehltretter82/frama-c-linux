@@ -126,12 +126,15 @@ module rec Transfer
       the one we have just computed. Return None if the combination is the same
       as the old data, otherwise return the combination. In the latter case, the
       predecessors of the statement are put on the working list. *)
-  let combineStmtStartData _stmt ~old state = match old, state with
+  let combineStmtStartData stmt ~old state = match old, state with
     | _, None -> assert false
     | None, Some _ -> Some state (* [old] already included in [state] *)
     | Some old, Some new_ -> 
-      assert (Varinfo.Set.equal old new_);
-      None
+      match stmt.skind with
+      | Return _ -> Some (Some (Varinfo.Set.union old new_))
+      | _ ->
+	assert (Varinfo.Set.equal old new_);
+	None
 
   (** Take the data from two successors and combine it *)
   let combineSuccessors s1 s2 = 
@@ -278,7 +281,7 @@ module rec Transfer
 		| Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr),
 	    _, _, _)
     | UnOp _ | Const _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ 
-    | AlignOfE _ -> assert false
+    | AlignOfE _ -> acc
     in
     aux [] e
 
@@ -306,11 +309,25 @@ module rec Transfer
       (match f_exp.enode with
       | Lval(Var vi, NoOffset) ->
 	let kf = Globals.Functions.get vi in
+	let params = Globals.Functions.get_params kf in
 	let state =
 	  if Kernel_function.is_definition kf then
-	    let state_kf = Compute.get kf in
-	    (* keep arguments whenever the corresponding formals must be kept *)
 	    try
+	      let init =
+		List.fold_left2
+		  (fun acc p a -> 
+		    let bases = base_addr a in
+		    if List.exists 
+		      (fun vi -> Varinfo.Set.mem vi state) bases 
+		    then Varinfo.Set.add p acc
+		    else acc)
+		  Varinfo.Set.empty
+		  params
+		  l
+	      in
+	      let state_kf = Compute.get ~init kf in
+	      (* keep arguments whenever the corresponding formals must be 
+		 kept *)
 	      List.fold_left2
 		(fun acc p a -> 
 		  if Varinfo.Set.mem p state_kf then 
@@ -318,17 +335,21 @@ module rec Transfer
 		  else
 		    acc)
 		state
-		(Globals.Functions.get_params kf)
+		params
 		l
 	    with Invalid_argument _ -> 
-	      Error.not_yet "variadic function call"
+	      Options.warning
+		"ignoring effect of variadic function %a" 
+		Kernel_function.pretty
+		kf;
+	      state
 	  else
 	    state
 	in
 	let state = match result with
 	  | None -> state
 	  | Some (lhost, _) ->
-		(* result of this call must be kept; so keep each argument *)
+	    (* result of this call must be kept; so keep each argument *)
 	    List.fold_left (fun acc e -> extend_to_expr acc lhost e) state l
 	in
 	Dataflow.Done (Some state)
@@ -355,11 +376,13 @@ module rec Transfer
 
 end
 
-and Compute: sig val get: kernel_function -> Varinfo.Set.t end = struct
+and Compute: sig 
+  val get: ?init:Varinfo.Set.t -> kernel_function -> Varinfo.Set.t 
+end = struct
 
   module D = Dataflow.Backwards(Transfer)
 
-  let compute kf = 
+  let compute init_set kf = 
 (*    Options.feedback "ANALYSING %a" Kernel_function.pretty kf;*)
     let tbl = Stmt.Hashtbl.create 17 in
     Env.add kf tbl;
@@ -376,16 +399,17 @@ and Compute: sig val get: kernel_function -> Varinfo.Set.t end = struct
       let fundec = Kernel_function.get_definition kf in
       let stmt = Kernel_function.find_return kf in
       ignore (Visitor.visitFramacFunction init fundec);
+      Extlib.may (fun set -> Stmt.Hashtbl.replace tbl stmt (Some set)) init_set;
       D.compute [ stmt ];
       tbl
     with Kernel_function.No_Definition | Kernel_function.No_Statement -> 
       tbl
 
-  let get kf =
+  let get ?init kf =
     try
       let stmt = Kernel_function.find_first_stmt kf in
 (*      Options.feedback "GETTING %a" Kernel_function.pretty kf;*)
-      let tbl = try Env.find kf	with Not_found -> Env.apply compute kf in
+      let tbl = try Env.find kf	with Not_found -> Env.apply (compute init) kf in
       try
 	let set = Stmt.Hashtbl.find tbl stmt in
 	Env.default_varinfos set
@@ -402,6 +426,7 @@ let consolidated_must_model_vi ?kf vi =
   else
     (match kf with
     | None -> 
+      (* TODO: should iterate in callgraph order *)
       Globals.Functions.iter 
 	(fun kf -> 
 	  let set = Compute.get kf in

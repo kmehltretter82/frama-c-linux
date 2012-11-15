@@ -58,10 +58,13 @@ let mk_call ?(loc=Location.unknown) ?result fname args =
   let args =
     List.map2
       (fun (_, ty, _) arg -> 
-	match ty, unrollType (typeOf arg), arg.enode with
-	| TPtr _, TArray _, Lval lv -> Cil.new_exp ~loc (StartOf lv)
-	| TPtr _, TArray _, _ -> assert false
-	| _, ty_arg, _ -> Cil.mkCastT ~force:false ~e:arg ~newt:ty ~oldt:ty_arg)
+	let e =
+	  match ty, unrollType (typeOf arg), arg.enode with
+	  | TPtr _, TArray _, Lval lv -> Cil.new_exp ~loc (StartOf lv)
+	  | TPtr _, TArray _, _ -> assert false
+	  | _, _, _ -> arg
+	in
+	Cil.mkCast ~force:false ~newt:ty ~e)
       ty_params
       args
   in

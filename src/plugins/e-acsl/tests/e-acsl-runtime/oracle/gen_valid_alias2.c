@@ -118,6 +118,9 @@ extern  __attribute__((__FC_BUILTIN__)) void *_store_block(void *ptr,
 /*@ assigns \nothing;  */
 extern  __attribute__((__FC_BUILTIN__)) void _delete_block(void *ptr);
 /*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void _initialize(void *ptr,
+                                                         size_t size);
+/*@ assigns \nothing;  */
 extern  __attribute__((__FC_BUILTIN__)) void _full_init(void *ptr);
 /*@ assigns \nothing;  */
 extern  __attribute__((__FC_BUILTIN__)) int _valid(void *ptr, size_t size);
@@ -172,7 +175,7 @@ int main(void)
   
   _full_init((void *)(& a));
   a = (int *)_malloc(sizeof(int));
-  _full_init((void *)a);
+  _initialize((void *)a,sizeof(int));
   *a = n;
   _full_init((void *)(& b));
   b = a;
@@ -212,7 +215,8 @@ int main(void)
     int __e_acsl_eq;
     __gmpz_init_set_si(__e_acsl,(long)*b);
     __gmpz_init_set_si(__e_acsl_n,(long)n);
-    __e_acsl_eq = __gmpz_cmp(__e_acsl,__e_acsl_n);
+    __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl),
+                             (__mpz_struct const *)(__e_acsl_n));
     e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"*b == n",17);
     __gmpz_clear(__e_acsl);
     __gmpz_clear(__e_acsl_n);

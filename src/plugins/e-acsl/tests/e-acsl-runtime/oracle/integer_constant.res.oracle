@@ -176,7 +176,8 @@ int main(void)
     int __e_acsl_eq;
     __gmpz_init_set_str(__e_acsl,"340282366920938463463374607431768211455",
                         10);
-    __e_acsl_eq = __gmpz_cmp(__e_acsl,__e_acsl);
+    __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl),
+                             (__mpz_struct const *)(__e_acsl));
     e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",
                   (char *)"0xffffffffffffffffffffffffffffffff == 0xffffffffffffffffffffffffffffffff",
                   13);

@@ -85,7 +85,8 @@ int main(void)
     int __e_acsl_eq;
     __gmpz_init_set_si(__e_acsl_x,(long)x);
     __gmpz_init_set_si(__e_acsl,0L);
-    __e_acsl_eq = __gmpz_cmp(__e_acsl_x,__e_acsl);
+    __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl_x),
+                             (__mpz_struct const *)(__e_acsl));
     e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"x == 0",8);
     __gmpz_clear(__e_acsl_x);
     __gmpz_clear(__e_acsl);
@@ -99,7 +100,8 @@ int main(void)
       int __e_acsl_ne;
       __gmpz_init_set_si(__e_acsl_x_2,(long)x);
       __gmpz_init_set_si(__e_acsl_2,0L);
-      __e_acsl_ne = __gmpz_cmp(__e_acsl_x_2,__e_acsl_2);
+      __e_acsl_ne = __gmpz_cmp((__mpz_struct const *)(__e_acsl_x_2),
+                               (__mpz_struct const *)(__e_acsl_2));
       e_acsl_assert(__e_acsl_ne != 0,(char *)"Assertion",(char *)"x != 0",9);
       __gmpz_clear(__e_acsl_x_2);
       __gmpz_clear(__e_acsl_2);

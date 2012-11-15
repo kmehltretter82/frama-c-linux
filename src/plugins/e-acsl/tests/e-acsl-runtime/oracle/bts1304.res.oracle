@@ -1,0 +1,257 @@
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/e_acsl_gmp_types.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/e_acsl_gmp.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/e_acsl.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel_api.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_bittree.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value] Values of globals at initialization
+        __fc_random_counter ∈ {0}
+        __fc_rand_max ∈ {2147483647}
+        __fc_heap_status ∈ [--..--]
+        __fc_stdout ∈ {{ NULL ; &S___fc_stdout }}
+        S___fc_stdout[0].__fc_stdio_fpos ∈ [--..--]
+                     [0].__fc_stdio_buffer ∈
+                     {{ NULL ; &S___fc_stdio_buffer_0_S___fc_stdout }}
+                     [0]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
+                     [0].[bits 80 to 95] ∈ UNINITIALIZED
+                     {[0].__fc_stdio_id; [1].__fc_stdio_fpos; } ∈ [--..--]
+                     [1].__fc_stdio_buffer ∈
+                     {{ NULL ; &S___fc_stdio_buffer_1_S___fc_stdout }}
+                     [1]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
+                     [1].[bits 80 to 95] ∈ UNINITIALIZED
+                     [1].__fc_stdio_id ∈ [--..--]
+        S___fc_stdio_buffer_0_S___fc_stdout[0..1] ∈ [--..--]
+        S___fc_stdio_buffer_1_S___fc_stdout[0..1] ∈ [--..--]
+[value] computing for function _store_block <- main.
+        Called from tests/e-acsl-runtime/bts1304.i:21.
+[value] using specification for function _store_block
+[value] Done for function _store_block
+tests/e-acsl-runtime/bts1304.i:23:[value] entering loop for the first time
+[value] computing for function read_sensor_4 <- main.
+        Called from tests/e-acsl-runtime/bts1304.i:24.
+[value] computing for function _store_block <- read_sensor_4 <- main.
+        Called from tests/e-acsl-runtime/bts1304.i:15.
+[value] Done for function _store_block
+[value] computing for function _full_init <- read_sensor_4 <- main.
+        Called from tests/e-acsl-runtime/bts1304.i:15.
+[value] using specification for function _full_init
+[value] Done for function _full_init
+[value] computing for function _initialize <- read_sensor_4 <- main.
+        Called from tests/e-acsl-runtime/bts1304.i:17.
+[value] using specification for function _initialize
+[value] Done for function _initialize
+[value] computing for function _delete_block <- read_sensor_4 <- main.
+        Called from tests/e-acsl-runtime/bts1304.i:15.
+[value] using specification for function _delete_block
+[value] Done for function _delete_block
+[value] Recording results for read_sensor_4
+[value] Done for function read_sensor_4
+[value] computing for function read_sensor_4 <- main.
+        Called from tests/e-acsl-runtime/bts1304.i:24.
+[value] computing for function _store_block <- read_sensor_4 <- main.
+        Called from tests/e-acsl-runtime/bts1304.i:15.
+[value] Done for function _store_block
+[value] computing for function _full_init <- read_sensor_4 <- main.
+        Called from tests/e-acsl-runtime/bts1304.i:15.
+[value] Done for function _full_init
+[value] computing for function _initialize <- read_sensor_4 <- main.
+        Called from tests/e-acsl-runtime/bts1304.i:17.
+[value] Done for function _initialize
+[value] computing for function _delete_block <- read_sensor_4 <- main.
+        Called from tests/e-acsl-runtime/bts1304.i:15.
+[value] Done for function _delete_block
+[value] Recording results for read_sensor_4
+[value] Done for function read_sensor_4
+tests/e-acsl-runtime/bts1304.i:23:[value] assigning non deterministic value for the first time
+[value] computing for function read_sensor_4 <- main.
+        Called from tests/e-acsl-runtime/bts1304.i:24.
+[value] computing for function _store_block <- read_sensor_4 <- main.
+        Called from tests/e-acsl-runtime/bts1304.i:15.
+[value] Done for function _store_block
+[value] computing for function _full_init <- read_sensor_4 <- main.
+        Called from tests/e-acsl-runtime/bts1304.i:15.
+[value] Done for function _full_init
+[value] computing for function _initialize <- read_sensor_4 <- main.
+        Called from tests/e-acsl-runtime/bts1304.i:17.
+[value] Done for function _initialize
+[value] computing for function _delete_block <- read_sensor_4 <- main.
+        Called from tests/e-acsl-runtime/bts1304.i:15.
+[value] Done for function _delete_block
+[value] Recording results for read_sensor_4
+[value] Done for function read_sensor_4
+[value] computing for function read_sensor_4 <- main.
+        Called from tests/e-acsl-runtime/bts1304.i:24.
+[value] computing for function _store_block <- read_sensor_4 <- main.
+        Called from tests/e-acsl-runtime/bts1304.i:15.
+[value] Done for function _store_block
+[value] computing for function _full_init <- read_sensor_4 <- main.
+        Called from tests/e-acsl-runtime/bts1304.i:15.
+[value] Done for function _full_init
+[value] computing for function _initialize <- read_sensor_4 <- main.
+        Called from tests/e-acsl-runtime/bts1304.i:17.
+[value] Done for function _initialize
+[value] computing for function _delete_block <- read_sensor_4 <- main.
+        Called from tests/e-acsl-runtime/bts1304.i:15.
+[value] Done for function _delete_block
+[value] Recording results for read_sensor_4
+[value] Done for function read_sensor_4
+tests/e-acsl-runtime/bts1304.i:25:[value] Assertion got status unknown.
+[value] computing for function _initialized <- main.
+        Called from tests/e-acsl-runtime/bts1304.i:25.
+[value] using specification for function _initialized
+./share/e-acsl/memory_model/e_acsl_mmodel.h:57:[value] Function _initialized: postcondition got status unknown.
+./share/e-acsl/memory_model/e_acsl_mmodel.h:58:[value] Function _initialized: postcondition got status unknown.
+[value] Done for function _initialized
+[value] computing for function e_acsl_assert <- main.
+        Called from tests/e-acsl-runtime/bts1304.i:25.
+./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status unknown.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function _delete_block <- main.
+        Called from tests/e-acsl-runtime/bts1304.i:21.
+[value] Done for function _delete_block
+[value] computing for function __clean <- main.
+        Called from tests/e-acsl-runtime/bts1304.i:26.
+[value] using specification for function __clean
+[kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
+[value] Done for function __clean
+[value] Recording results for main
+[value] done for function main
+[value] ====== VALUES COMPUTED ======
+[value] Values at end of function e_acsl_assert:
+[value] Values at end of function read_sensor_4:
+          buf[0..11] ∈ {0} or UNINITIALIZED
+[value] Values at end of function main:
+          buf[0] ∈ {0}
+             [1..11] ∈ {0} or UNINITIALIZED
+          i ∈ {3}
+          __retres ∈ {0}
+/* Generated by Frama-C */
+struct __anonstruct___mpz_struct_1 {
+   int _mp_alloc ;
+   int _mp_size ;
+   unsigned long *_mp_d ;
+};
+typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
+typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
+typedef unsigned int size_t;
+struct __fc_pos_t {
+   unsigned long __fc_stdio_position ;
+};
+typedef struct __fc_pos_t fpos_t;
+struct __fc_FILE {
+   fpos_t __fc_stdio_fpos ;
+   char *__fc_stdio_buffer ;
+   char __fc_stdio_error ;
+   char __fc_stdio_eof ;
+   long __fc_stdio_id ;
+};
+typedef struct __fc_FILE FILE;
+struct msgA {
+   int type ;
+   int a[2] ;
+};
+struct msgB {
+   int type ;
+   double x ;
+};
+struct __anonstruct_T_1 {
+   int type ;
+};
+union msg {
+   struct __anonstruct_T_1 T ;
+   struct msgA A ;
+   struct msgB B ;
+};
+/*@
+model __mpz_struct { ℤ n };
+*/
+int __fc_random_counter __attribute__((__unused__));
+unsigned long const __fc_rand_max = (unsigned long)2147483647;
+extern int __fc_heap_status;
+/*@
+axiomatic
+  dynamic_allocation {
+  predicate is_allocable{L}(size_t n) 
+    reads __fc_heap_status;
+  
+  }
+ */
+/*@ ensures \false;
+    assigns \nothing;  */
+extern void exit(int status);
+extern FILE *__fc_stdout;
+/*@ assigns *__fc_stdout;
+    assigns *__fc_stdout \from *(format+(..));  */
+extern int printf(char const *format , ...);
+/*@ requires predicate ≢ 0;
+    assigns \nothing;  */
+void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
+{
+  if (! predicate) {
+    printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
+           line,pred_txt);
+    exit(1);
+  }
+  return;
+}
+
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void *_store_block(void *ptr,
+                                                           size_t size);
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void _delete_block(void *ptr);
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void _initialize(void *ptr,
+                                                         size_t size);
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void _full_init(void *ptr);
+/*@ ensures \result ≡ 0 ∨ \result ≡ 1;
+    ensures \result ≡ 1 ⇒
+            \initialized((char *)\old(ptr)+(0..\old(size)-1));
+    assigns \nothing;
+  
+*/
+extern  __attribute__((__FC_BUILTIN__)) int _initialized(void *ptr,
+                                                         size_t size);
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
+void read_sensor_4(unsigned int *m)
+{
+  _store_block((void *)(& m),4U);
+  _full_init((void *)(& m));
+  _initialize((void *)m,sizeof(unsigned int));
+  *m = (unsigned int)0;
+  _delete_block((void *)(& m));
+  return;
+}
+
+int main(void)
+{
+  int __retres;
+  unsigned char buf[sizeof(union msg)];
+  int i;
+  _store_block((void *)(buf),12U);
+  i = 0;
+  while ((unsigned int)i < sizeof(buf) / (unsigned int)4) {
+    read_sensor_4((unsigned int *)(buf) + i);
+    i ++;
+  }
+  /*@ assert \initialized((union msg *)buf); */
+  {
+    int __e_acsl_initialized;
+    __e_acsl_initialized = _initialized((void *)(buf),sizeof(union msg));
+    e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",
+                  (char *)"\\initialized((union msg *)buf)",25);
+  }
+  
+  __retres = 0;
+  _delete_block((void *)(buf));
+  __clean();
+  return (__retres);
+}
+
+
