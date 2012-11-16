@@ -313,8 +313,14 @@ class e_acsl_visitor prj generate = object (self)
       assert false
 
   method private is_main old_kf =
-    let main, _ = Globals.entry_point () in
-    Kernel_function.equal old_kf main
+    try
+      let main, _ = Globals.entry_point () in
+      Kernel_function.equal old_kf main
+    with Globals.No_such_entry_point s ->
+      Options.warning ~once:true "%s@ \
+@[The generated program may be incomplete.@]" 
+	s;
+      false
 
   method vstmt_aux stmt =
     Options.debug ~level:2 "proceeding stmt (sid %d) %a@." 
