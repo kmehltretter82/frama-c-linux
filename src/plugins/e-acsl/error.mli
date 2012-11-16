@@ -32,6 +32,10 @@ val handle: ('a -> 'a) -> 'a -> 'a
 (** Run the closure with the given argument and handle potential errors. 
     Return the provide argument in case of errors. *)
 
+val generic_handle: ('a -> 'b) -> 'b -> 'a -> 'b
+(** Run the closure with the given argument and handle potential errors. 
+    Return the additional argument in case of errors. *)
+
 val nb_untypable: unit -> int
 (** Number of untypable annotations. *)
 

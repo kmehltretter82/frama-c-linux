@@ -374,7 +374,7 @@ let compute_quantif_guards_ref
 let rec type_predicate_named p = match p.content with
   | Pfalse | Ptrue -> ()
   | Papp _ -> Error.not_yet "logic function application"
-  | Pseparated _ -> Error.not_yet "separated"
+  | Pseparated _ -> Error.not_yet "\\separated"
   | Prel(_, t1, t2) -> 
     ignore (type_term t1);
     ignore (type_term t2)

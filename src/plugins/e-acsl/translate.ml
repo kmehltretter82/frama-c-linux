@@ -492,7 +492,7 @@ let rec named_predicate_to_exp ?name env p =
   | Pfalse -> Cil.zero ~loc, env
   | Ptrue -> Cil.one ~loc, env
   | Papp _ -> Error.not_yet "logic function application"
-  | Pseparated _ -> Error.not_yet "separated"
+  | Pseparated _ -> Error.not_yet "\\separated"
   | Prel(rel, t1, t2) -> 
     let e, env = 
       comparison_to_exp ~loc env (relation_to_binop rel) t1 t2 None 

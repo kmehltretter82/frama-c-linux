@@ -48,7 +48,7 @@ module Nb_not_yet =
 
 let nb_not_yet = Nb_not_yet.get
 
-let handle f x = 
+let generic_handle f res x =
   try
     f x
   with
@@ -56,14 +56,16 @@ let handle f x =
     let msg = Format.sprintf "@[invalid E-ACSL construct@ `%s'.@]" s in
     Options.warning ~current:true "@[%s@ Ignoring annotation.@]" msg;
     Nb_typing.set (Nb_typing.get () + 1);
-    x
+    res
   | Not_yet s ->
     let msg = 
       Format.sprintf "@[E-ACSL construct@ `%s'@ is not yet supported.@]" s
     in 
     Options.warning ~current:true "@[%s@ Ignoring annotation.@]" msg;
     Nb_not_yet.set (Nb_not_yet.get () + 1);
-    x
+    res
+
+let handle f x = generic_handle f x x
 
 (*
 Local Variables:
