@@ -1,0 +1,23 @@
+/* run.config
+   COMMENT: spec with floats and reals
+   EXECNOW: LOG gen_bts1307.c BIN gen_bts1307.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/bts1307.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_bts1307.c > /dev/null && ./gcc_test.sh bts1307
+   EXECNOW: LOG gen_bts13072.c BIN gen_bts13072.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/bts1307.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_bts13072.c > /dev/null && ./gcc_test.sh bts13072
+*/
+
+/*@ requires \valid(Mtmax_in);
+  @ requires \valid(Mwmax);
+  @ requires \valid(Mtmax_out);
+
+  @ behavior OverEstimate_Motoring:
+  @ assumes \true;
+  @ ensures *Mtmax_out == *Mtmax_in + (5 - (((5 / 80) * *Mwmax) * 0.4));
+  @*/
+void foo(float* Mtmax_in, float* Mwmax, float* Mtmax_out) {
+  *Mtmax_out = *Mtmax_in + (5 - (((5 / 80) * *Mwmax) * 0.4));
+}
+
+int main(void) {
+  float f = 1.0, g = 1.0, h;
+  foo(&f, &g, &h);
+  return 0;
+}
