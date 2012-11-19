@@ -76,7 +76,10 @@ let constant_to_exp ?(loc=Location.unknown) = function
   | LStr s -> Cil.new_exp ?loc (Const (CStr s)), false
   | LWStr s -> Cil.new_exp ?loc (Const (CWStr s)), false
   | LChr c -> Cil.new_exp ?loc (Const (CChr c)), false
-  | LReal _ -> Error.not_yet "real"
+  | LReal(f, s) -> 
+    Options.feedback ~current:true ~once:true
+      "approximating a real number by a float";
+    Cil.new_exp ?loc (Const (CReal (f, FLongDouble, Some s))), false
   | LEnum e -> Cil.new_exp ?loc (Const (CEnum e)), false
 
 let conditional_to_exp ?(name="if") loc ctx e1 (e2, env2) (e3, env3) =

@@ -5,7 +5,6 @@
 - [Bernard] avoir une fonction e_acsl_trace_behavior(char *bhv_name) {}
   à appeler dès qu'un behavior est activé
 - utiliser Rte pour tous les overflows potentiels
-  (get_rte_annotations dans Oxygen)
 - [Yannick] Logic functions
 
 ########
@@ -13,7 +12,9 @@
 ########
 
 - grep TODO *.ml*
-- gestion des initialiseurs des globals: requiert un main
+- Gestion du mode -lib-entry
+- init du main dans une fonction séparée
+- l'init du main doit être généré même quand il n'y a pas de main
 - mkcall ne devrait pas générer de nouvelles variables pour une même fonction
 - variable GMP potentiellement initialisé mais non utilisé en présence de \at
   (voir test result.i, cas -e-acsl-gmp-only)
@@ -43,4 +44,3 @@
 
 - inclure exemple du E-ACSL Reference Manual
 - test arith.i: mettre les exemples du ACSL manual about div and modulo
-- tests intensifs modèle mémoire

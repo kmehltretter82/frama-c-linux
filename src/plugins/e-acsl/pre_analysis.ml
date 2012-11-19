@@ -259,7 +259,9 @@ module rec Transfer
       (match lv with
       | Var vi, _ -> Varinfo.Set.add vi varinfos
       | Mem e, _ -> register_exp varinfos e)
-    | UnOp(_, e, _) | CastE(_, e) | Info(e, _) -> register_exp varinfos e
+    | UnOp(_, e, _) | CastE(_, e) | Info(e, _)
+    | BinOp((MinusPI | PlusPI | IndexPI), e, _, _) -> 
+      register_exp varinfos e
     | BinOp(_, e1, e2, _) -> 
       let s = register_exp varinfos e1 in
       register_exp s e2
@@ -330,10 +332,8 @@ module rec Transfer
 		 kept *)
 	      List.fold_left2
 		(fun acc p a -> 
-		  if Varinfo.Set.mem p state_kf then 
-		    extend_to_expr acc (Var p) a 
-		  else
-		    acc)
+		  if Varinfo.Set.mem p state_kf then register_exp acc a 
+		  else acc)
 		state
 		params
 		l

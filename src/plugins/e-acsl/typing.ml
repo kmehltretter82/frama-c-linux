@@ -67,7 +67,7 @@ let typ_of_eacsl_typ = function
     let is_pos = BI.ge l BI.zero in
     (try 
        let mk n k = 
-	 if  is_representable n k then TInt(k, []) 
+	 if is_representable n k then TInt(k, []) 
 	 else raise Not_representable
        in
        let ty_l = mk l (Cil.intKindForValue l is_pos) in
@@ -81,7 +81,10 @@ let typ_of_eacsl_typ = function
   | No_integral (Ltype _) -> Error.not_yet "typing of user-defined logic type"
   | No_integral (Lvar _) -> Error.not_yet "type variable"
   | No_integral Linteger -> assert false
-  | No_integral Lreal -> Error.not_yet "real numbers"
+  | No_integral Lreal -> 
+    Options.warning ~current:true ~once:true
+      "approximating type `real' by `long double'"; 
+    TFloat(FLongDouble, [])
   | No_integral (Larrow _) -> Error.not_yet "functional type"
 
 let eacsl_typ_of_typ ty = match Cil.unrollType ty with
@@ -153,7 +156,10 @@ let typ_of_term t =
     | Ltype _ as ty when Logic_const.is_boolean_type ty -> Mpz.t ()
     | Ltype _ -> Error.not_yet "typing of user-defined logic type"
     | Lvar _ -> Error.not_yet "type variable"
-    | Lreal -> Error.not_yet "real numbers"
+    | Lreal -> 
+      Options.warning ~current:true ~once:true
+	"approximating type `real' by `long double'"; 
+      TFloat(FLongDouble, [])
     | Larrow _ -> Error.not_yet "functional type"
   else
     try 
@@ -220,15 +226,15 @@ let rec type_term t =
       Interv(BI.zero, BI.one)
     | TBinOp(PlusA, t1, t2) -> 
       let add l1 u1 l2 u2 = BI.add l1 l2, BI.add u1 u2 in
-      binary_arithmetic add t1 t2
+      binary_arithmetic t.term_type add t1 t2
     | TBinOp((PlusPI | IndexPI | MinusPI | MinusPP), t1, t2) -> 
       ignore (type_term t1);
       ignore (type_term t2);
       No_integral lty
     | TBinOp(MinusA, t1, t2) -> 
       let sub l1 u1 l2 u2 = BI.sub l1 u2, BI.sub u1 l2 in
-      binary_arithmetic sub t1 t2
-    | TBinOp(Mult, t1, t2) -> signed_rule BI.mul t1 t2
+      binary_arithmetic t.term_type sub t1 t2
+    | TBinOp(Mult, t1, t2) -> signed_rule t.term_type BI.mul t1 t2
     | TBinOp(Div, t1, t2) -> 
       let div a b = 
 	try BI.c_div a b 
@@ -240,12 +246,12 @@ let rec type_term t =
 	     order to be as more precise as possible. *)
 	  BI.zero
       in
-      signed_rule div t1 t2
+      signed_rule t.term_type div t1 t2
     | TBinOp(Mod, t1, t2) -> 
       let modu a b =
 	try BI.c_rem a b with Division_by_zero -> BI.zero (* see Div *)
       in
-      signed_rule modu t1 t2
+      signed_rule t.term_type modu t1 t2
     | TBinOp(Shiftlt, _t1, _t2) | TBinOp(Shiftrt, _t1, _t2) ->
       Error.not_yet "left/right shift"
     | TBinOp((Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr), t1, t2) -> 
@@ -344,17 +350,17 @@ and unary_arithmetic op t =
   | Z -> Z
   | No_integral _ -> assert false
 
-and binary_arithmetic op t1 t2 =
+and binary_arithmetic ty op t1 t2 =
   let ty1 = type_term t1 in
   let ty2 = type_term t2 in
   match ty1, ty2 with
   | Interv(l1, u1), Interv(l2, u2) -> 
     let l, u = op l1 u1 l2 u2 in
     Interv (l, u)
-  | No_integral _, _ | _, No_integral _ -> assert false
+  | No_integral _, _ | _, No_integral _ -> No_integral ty
   | _, Z | Z, _ -> Z
 
-and signed_rule op t1 t2 =
+and signed_rule ty op t1 t2 =
   (* probably not the most efficient way to compute the result, but the
      shortest *) 
   let compute l1 u1 l2 u2 = 
@@ -364,7 +370,7 @@ and signed_rule op t1 t2 =
     let d = op u1 u2 in
     BI.min a (BI.min b (BI.min c d)), BI.max a (BI.max b (BI.max c d))
   in
-  binary_arithmetic compute t1 t2
+  binary_arithmetic ty compute t1 t2
 
 let compute_quantif_guards_ref
     : (predicate named -> logic_var list -> predicate named -> 
@@ -500,8 +506,8 @@ C-representable@]";
       in
       mk_mpz e
     end
-  else if Cil.isIntegralType ctx then do_int_ctx ty
-  else e, env
+  else
+    do_int_ctx ty
 
 let principal_type t1 t2 = 
   let ty1 = typ_of_term t1 in
