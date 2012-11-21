@@ -1,0 +1,464 @@
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/e_acsl_gmp_types.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/e_acsl_gmp.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/e_acsl.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel_api.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_bittree.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
+tests/e-acsl-runtime/bts1307.i:16:[kernel] warning: Floating-point constant 0.4 is not represented exactly. Will use 0x1.999999999999ap-2. See documentation for option -warn-decimal-float
+tests/e-acsl-runtime/bts1307.i:19:[e-acsl] warning: approximating type `real' by `long double'
+:0:[e-acsl] warning: missing guard for ensuring that \old(Mtmax_out) is a valid memory access
+:0:[e-acsl] warning: missing guard for ensuring that \old(Mtmax_in) is a valid memory access
+tests/e-acsl-runtime/bts1307.i:13:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
+:0:[e-acsl] warning: missing guard for ensuring that \old(Mwmax) is a valid memory access
+tests/e-acsl-runtime/bts1307.i:19:[e-acsl] approximating a real number by a float
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value] Values of globals at initialization
+        __fc_random_counter ∈ {0}
+        __fc_rand_max ∈ {2147483647}
+        __fc_heap_status ∈ [--..--]
+        __fc_stdout ∈ {{ NULL ; &S___fc_stdout }}
+        S___fc_stdout[0].__fc_stdio_fpos ∈ [--..--]
+                     [0].__fc_stdio_buffer ∈
+                     {{ NULL ; &S___fc_stdio_buffer_0_S___fc_stdout }}
+                     [0]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
+                     [0].[bits 80 to 95] ∈ UNINITIALIZED
+                     {[0].__fc_stdio_id; [1].__fc_stdio_fpos; } ∈ [--..--]
+                     [1].__fc_stdio_buffer ∈
+                     {{ NULL ; &S___fc_stdio_buffer_1_S___fc_stdout }}
+                     [1]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
+                     [1].[bits 80 to 95] ∈ UNINITIALIZED
+                     [1].__fc_stdio_id ∈ [--..--]
+        S___fc_stdio_buffer_0_S___fc_stdout[0..1] ∈ [--..--]
+        S___fc_stdio_buffer_1_S___fc_stdout[0..1] ∈ [--..--]
+[value] computing for function _store_block <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:20.
+[value] using specification for function _store_block
+[value] Done for function _store_block
+[value] computing for function _store_block <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:20.
+[value] Done for function _store_block
+[value] computing for function _store_block <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:20.
+[value] Done for function _store_block
+[value] computing for function _full_init <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:20.
+[value] using specification for function _full_init
+[value] Done for function _full_init
+[value] computing for function _full_init <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:20.
+[value] Done for function _full_init
+[value] computing for function foo <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:21.
+tests/e-acsl-runtime/bts1307.i:7:[value] Function foo: precondition got status valid.
+tests/e-acsl-runtime/bts1307.i:8:[value] Function foo: precondition got status valid.
+tests/e-acsl-runtime/bts1307.i:9:[value] Function foo: precondition got status valid.
+[value] computing for function _store_block <- foo <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:15.
+[value] Done for function _store_block
+[value] computing for function _full_init <- foo <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:15.
+[value] Done for function _full_init
+[value] computing for function _store_block <- foo <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:15.
+[value] Done for function _store_block
+[value] computing for function _full_init <- foo <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:15.
+[value] Done for function _full_init
+[value] computing for function _store_block <- foo <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:15.
+[value] Done for function _store_block
+[value] computing for function _full_init <- foo <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:15.
+[value] Done for function _full_init
+[value] computing for function _valid <- foo <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:7.
+[value] using specification for function _valid
+[value] Done for function _valid
+[value] computing for function e_acsl_assert <- foo <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:7.
+./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status unknown.
+[value] computing for function printf <- e_acsl_assert <- foo <- main.
+        Called from ./share/e-acsl/e_acsl.h:41.
+[value] using specification for function printf
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- foo <- main.
+        Called from ./share/e-acsl/e_acsl.h:43.
+[value] using specification for function exit
+FRAMAC_SHARE/libc/stdlib.h:180:[value] Function exit: postcondition got status invalid.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function _valid <- foo <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:8.
+[value] Done for function _valid
+[value] computing for function e_acsl_assert <- foo <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:8.
+[value] computing for function printf <- e_acsl_assert <- foo <- main.
+        Called from ./share/e-acsl/e_acsl.h:41.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- foo <- main.
+        Called from ./share/e-acsl/e_acsl.h:43.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function _valid <- foo <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:9.
+[value] Done for function _valid
+[value] computing for function e_acsl_assert <- foo <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:9.
+[value] computing for function printf <- e_acsl_assert <- foo <- main.
+        Called from ./share/e-acsl/e_acsl.h:41.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- foo <- main.
+        Called from ./share/e-acsl/e_acsl.h:43.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function _initialize <- foo <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:16.
+[value] using specification for function _initialize
+[value] Done for function _initialize
+[value] computing for function __gmpz_init_set_si <- foo <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:13.
+[value] using specification for function __gmpz_init_set_si
+./share/e-acsl/e_acsl_gmp.h:61:[value] Function __gmpz_init_set_si: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:63:[value] Function __gmpz_init_set_si: postcondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: postcondition got status unknown.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- foo <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:13.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- foo <- main.
+        Called from :0.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- foo <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:13.
+[value] using specification for function __gmpz_cmp
+./share/e-acsl/e_acsl_gmp.h:115:[value] Function __gmpz_cmp: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:116:[value] Function __gmpz_cmp: precondition got status valid.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init <- foo <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:13.
+[value] using specification for function __gmpz_init
+./share/e-acsl/e_acsl_gmp.h:36:[value] Function __gmpz_init: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:37:[value] Function __gmpz_init: postcondition got status valid.
+[value] Done for function __gmpz_init
+tests/e-acsl-runtime/bts1307.i:13:[value] Assertion got status valid.
+[value] computing for function e_acsl_assert <- foo <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:13.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_tdiv_q <- foo <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:13.
+[value] using specification for function __gmpz_tdiv_q
+./share/e-acsl/e_acsl_gmp.h:152:[value] Function __gmpz_tdiv_q: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:153:[value] Function __gmpz_tdiv_q: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:154:[value] Function __gmpz_tdiv_q: precondition got status valid.
+[value] Done for function __gmpz_tdiv_q
+[value] computing for function __gmpz_get_ui <- foo <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:13.
+[value] using specification for function __gmpz_get_ui
+./share/e-acsl/e_acsl_gmp.h:185:[value] Function __gmpz_get_ui: precondition got status valid.
+[value] Done for function __gmpz_get_ui
+tests/e-acsl-runtime/bts1307.i:13:[value] warning: converting value to float: assert(Ook)
+[value] computing for function e_acsl_assert <- foo <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:13.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function _delete_block <- foo <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:15.
+[value] using specification for function _delete_block
+[value] Done for function _delete_block
+[value] computing for function _delete_block <- foo <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:15.
+[value] Done for function _delete_block
+[value] computing for function _delete_block <- foo <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:15.
+[value] Done for function _delete_block
+[value] computing for function __gmpz_clear <- foo <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:13.
+[value] using specification for function __gmpz_clear
+./share/e-acsl/e_acsl_gmp.h:105:[value] Function __gmpz_clear: precondition got status valid.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- foo <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:13.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- foo <- main.
+        Called from :0.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- foo <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:13.
+[value] Done for function __gmpz_clear
+tests/e-acsl-runtime/bts1307.i:17:[value] warning: converting value to float: assert(Ook)
+tests/e-acsl-runtime/bts1307.i:13:[value] Function foo, behavior OverEstimate_Motoring: postcondition got status unknown.
+[value] Recording results for foo
+[value] Done for function foo
+[value] computing for function _delete_block <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:20.
+[value] Done for function _delete_block
+[value] computing for function _delete_block <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:20.
+[value] Done for function _delete_block
+[value] computing for function _delete_block <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:20.
+[value] Done for function _delete_block
+[value] computing for function __clean <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:22.
+[value] using specification for function __clean
+[kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
+[value] Done for function __clean
+[value] Recording results for main
+[value] done for function main
+[value] ====== VALUES COMPUTED ======
+[value] Values at end of function e_acsl_assert:
+          S___fc_stdout[0].__fc_stdio_fpos ∈ [--..--]
+                       [0].__fc_stdio_buffer ∈
+                       {{ NULL ; &S___fc_stdio_buffer_0_S___fc_stdout }}
+                       [0]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
+                       [0].[bits 80 to 95] ∈ UNINITIALIZED
+                       {[0].__fc_stdio_id; [1].__fc_stdio_fpos; } ∈ [--..--]
+                       [1].__fc_stdio_buffer ∈
+                       {{ NULL ; &S___fc_stdio_buffer_1_S___fc_stdout }}
+                       [1]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
+                       [1].[bits 80 to 95] ∈ UNINITIALIZED
+                       [1].__fc_stdio_id ∈ [--..--]
+[value] Values at end of function foo:
+          h ∈ 6.
+          S___fc_stdout[0].__fc_stdio_fpos ∈ [--..--]
+                       [0].__fc_stdio_buffer ∈
+                       {{ NULL ; &S___fc_stdio_buffer_0_S___fc_stdout }}
+                       [0]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
+                       [0].[bits 80 to 95] ∈ UNINITIALIZED
+                       {[0].__fc_stdio_id; [1].__fc_stdio_fpos; } ∈ [--..--]
+                       [1].__fc_stdio_buffer ∈
+                       {{ NULL ; &S___fc_stdio_buffer_1_S___fc_stdout }}
+                       [1]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
+                       [1].[bits 80 to 95] ∈ UNINITIALIZED
+                       [1].__fc_stdio_id ∈ [--..--]
+[value] Values at end of function main:
+          f ∈ 1.
+          g ∈ 1.
+          h ∈ 6.
+          __retres ∈ {0}
+          S___fc_stdout[0].__fc_stdio_fpos ∈ [--..--]
+                       [0].__fc_stdio_buffer ∈
+                       {{ NULL ; &S___fc_stdio_buffer_0_S___fc_stdout }}
+                       [0]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
+                       [0].[bits 80 to 95] ∈ UNINITIALIZED
+                       {[0].__fc_stdio_id; [1].__fc_stdio_fpos; } ∈ [--..--]
+                       [1].__fc_stdio_buffer ∈
+                       {{ NULL ; &S___fc_stdio_buffer_1_S___fc_stdout }}
+                       [1]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
+                       [1].[bits 80 to 95] ∈ UNINITIALIZED
+                       [1].__fc_stdio_id ∈ [--..--]
+/* Generated by Frama-C */
+struct __anonstruct___mpz_struct_1 {
+   int _mp_alloc ;
+   int _mp_size ;
+   unsigned long *_mp_d ;
+};
+typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
+typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
+typedef unsigned int size_t;
+struct __fc_pos_t {
+   unsigned long __fc_stdio_position ;
+};
+typedef struct __fc_pos_t fpos_t;
+struct __fc_FILE {
+   fpos_t __fc_stdio_fpos ;
+   char *__fc_stdio_buffer ;
+   char __fc_stdio_error ;
+   char __fc_stdio_eof ;
+   long __fc_stdio_id ;
+};
+typedef struct __fc_FILE FILE;
+/*@
+model __mpz_struct { ℤ n };
+*/
+/*@ requires ¬\initialized(z);
+    ensures \valid(\old(z));
+    allocates \old(z);
+    
+    assigns *z;
+  
+*/
+extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init(__mpz_struct * /*[1]*/ z);
+/*@ requires ¬\initialized(z);
+    ensures \valid(\old(z));
+    
+    ensures \initialized(\old(z));
+    allocates \old(z);
+    
+    assigns *z;
+    assigns *z \from n;
+  
+*/
+extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z,
+                                                                long n);
+/*@ requires \valid(x);
+    assigns *x;  */
+extern  __attribute__((__FC_BUILTIN__)) void __gmpz_clear(__mpz_struct * /*[1]*/ x);
+/*@ requires \valid(z1);
+    requires \valid(z2);
+    assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
+                                                       __mpz_struct const * /*[1]*/ z2);
+/*@ requires \valid(z1);
+    requires \valid(z2);
+    requires \valid(z3);
+    assigns *z1;
+    assigns *z1 \from *z2, *z3;
+  
+*/
+extern  __attribute__((__FC_BUILTIN__)) void __gmpz_tdiv_q(__mpz_struct * /*[1]*/ z1,
+                                                           __mpz_struct const * /*[1]*/ z2,
+                                                           __mpz_struct const * /*[1]*/ z3);
+/*@ requires \valid(z);
+    assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) unsigned long __gmpz_get_ui(__mpz_struct const * /*[1]*/ z);
+int __fc_random_counter __attribute__((__unused__));
+unsigned long const __fc_rand_max = (unsigned long)2147483647;
+extern int __fc_heap_status;
+/*@
+axiomatic
+  dynamic_allocation {
+  predicate is_allocable{L}(size_t n) 
+    reads __fc_heap_status;
+  
+  }
+ */
+/*@ ensures \false;
+    assigns \nothing;  */
+extern void exit(int status);
+extern FILE *__fc_stdout;
+/*@ assigns *__fc_stdout;
+    assigns *__fc_stdout \from *(format+(..));  */
+extern int printf(char const *format , ...);
+/*@ requires predicate ≢ 0;
+    assigns \nothing;  */
+void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
+{
+  if (! predicate) {
+    printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
+           line,pred_txt);
+    exit(1);
+  }
+  return;
+}
+
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void *_store_block(void *ptr,
+                                                           size_t size);
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void _delete_block(void *ptr);
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void _initialize(void *ptr,
+                                                         size_t size);
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void _full_init(void *ptr);
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) int _valid(void *ptr, size_t size);
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
+/*@ requires \valid(Mtmax_in);
+    requires \valid(Mwmax);
+    requires \valid(Mtmax_out);
+    behavior OverEstimate_Motoring:
+      assumes \true;
+      ensures *\old(Mtmax_out) ≡
+              *\old(Mtmax_in)+(5-((5/80)**\old(Mwmax))*0.4);
+      
+  
+*/
+void foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
+{
+  float *__e_acsl_at_3;
+  float *__e_acsl_at_2;
+  float *__e_acsl_at;
+  {
+    int __e_acsl_valid;
+    int __e_acsl_valid_2;
+    int __e_acsl_valid_3;
+    _store_block((void *)(& Mtmax_in),4U);
+    _full_init((void *)(& Mtmax_in));
+    _store_block((void *)(& Mwmax),4U);
+    _full_init((void *)(& Mwmax));
+    _store_block((void *)(& Mtmax_out),4U);
+    _full_init((void *)(& Mtmax_out));
+    __e_acsl_valid = _valid((void *)Mtmax_in,sizeof(float));
+    e_acsl_assert(__e_acsl_valid,(char *)"Precondition",
+                  (char *)"\\valid(Mtmax_in)",7);
+    __e_acsl_valid_2 = _valid((void *)Mwmax,sizeof(float));
+    e_acsl_assert(__e_acsl_valid_2,(char *)"Precondition",
+                  (char *)"\\valid(Mwmax)",8);
+    __e_acsl_valid_3 = _valid((void *)Mtmax_out,sizeof(float));
+    e_acsl_assert(__e_acsl_valid_3,(char *)"Precondition",
+                  (char *)"\\valid(Mtmax_out)",9);
+    _initialize((void *)Mtmax_out,sizeof(float));
+    __e_acsl_at_3 = Mwmax;
+    __e_acsl_at_2 = Mtmax_in;
+    __e_acsl_at = Mtmax_out;
+    *Mtmax_out = (float)((double)*Mtmax_in + ((double)5 - (double)((float)(
+                                                                   5 / 80) * *Mwmax) * 0.4));
+  }
+  
+  {
+    mpz_t __e_acsl;
+    mpz_t __e_acsl_2;
+    mpz_t __e_acsl_3;
+    int __e_acsl_div_guard;
+    mpz_t __e_acsl_div;
+    unsigned long __e_acsl_4;
+    __gmpz_init_set_si(__e_acsl,(long)5);
+    __gmpz_init_set_si(__e_acsl_2,(long)80);
+    __gmpz_init_set_si(__e_acsl_3,0L);
+    __e_acsl_div_guard = __gmpz_cmp((__mpz_struct const *)(__e_acsl_2),
+                                    (__mpz_struct const *)(__e_acsl_3));
+    __gmpz_init(__e_acsl_div);
+    /*@ assert E_ACSL: 80 ≢ 0; */
+    e_acsl_assert(! (__e_acsl_div_guard == 0),(char *)"Postcondition",
+                  (char *)"80 == 0",13);
+    __gmpz_tdiv_q(__e_acsl_div,(__mpz_struct const *)(__e_acsl),
+                  (__mpz_struct const *)(__e_acsl_2));
+    __e_acsl_4 = __gmpz_get_ui((__mpz_struct const *)(__e_acsl_div));
+    e_acsl_assert(*__e_acsl_at == *__e_acsl_at_2 + (5 - (__e_acsl_4 * *__e_acsl_at_3) * 0.4),
+                  (char *)"Postcondition",
+                  (char *)"*\\old(Mtmax_out) == *\\old(Mtmax_in)+(5-((5/80)**\\old(Mwmax))*0.4)",
+                  13);
+    _delete_block((void *)(& Mtmax_in));
+    _delete_block((void *)(& Mwmax));
+    _delete_block((void *)(& Mtmax_out));
+    __gmpz_clear(__e_acsl);
+    __gmpz_clear(__e_acsl_2);
+    __gmpz_clear(__e_acsl_3);
+    __gmpz_clear(__e_acsl_div);
+    return;
+  }
+  
+}
+
+int main(void)
+{
+  int __retres;
+  float f;
+  float g;
+  float h;
+  _store_block((void *)(& h),4U);
+  _store_block((void *)(& g),4U);
+  _store_block((void *)(& f),4U);
+  _full_init((void *)(& f));
+  f = (float)1.0;
+  _full_init((void *)(& g));
+  g = (float)1.0;
+  foo(& f,& g,& h);
+  __retres = 0;
+  _delete_block((void *)(& h));
+  _delete_block((void *)(& g));
+  _delete_block((void *)(& f));
+  __clean();
+  return (__retres);
+}
+
+
