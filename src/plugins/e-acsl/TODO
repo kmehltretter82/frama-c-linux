@@ -13,11 +13,9 @@
 
 - grep TODO *.ml*
 - Gestion du mode -lib-entry
-- init du main dans une fonction séparée
-- l'init du main doit être généré même quand il n'y a pas de main
-- mkcall ne devrait pas générer de nouvelles variables pour une même fonction
 - variable GMP potentiellement initialisé mais non utilisé en présence de \at
   (voir test result.i, cas -e-acsl-gmp-only)
+- générer les delete des globals dans une fonction séparée, comme pour les init.
 
 ##############
 # KNOWN BUGS #
@@ -37,6 +35,7 @@
   (même problème que Jessie: cf. BTS #72)
   (voir aussi result.i et ./at_stmt_contract.i)
 - interprétation des tableaux
+- \initialized sur des chaînes littérales (voir global_literal_string.i)
 
 #########
 # TESTS #

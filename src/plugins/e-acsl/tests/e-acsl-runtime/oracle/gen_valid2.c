@@ -160,14 +160,20 @@ int *f(int *x)
   
 }
 
+void e_acsl_global_init(void)
+{
+  _store_block((void *)(& X),4U);
+  _full_init((void *)(& X));
+  return;
+}
+
 int main(void)
 {
   int __retres;
   int *a;
   int *b;
   int n;
-  _store_block((void *)(& X),4U);
-  _full_init((void *)(& X));
+  e_acsl_global_init();
   _store_block((void *)(& n),4U);
   _store_block((void *)(& b),4U);
   _store_block((void *)(& a),4U);

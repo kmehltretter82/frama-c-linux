@@ -175,45 +175,99 @@ class e_acsl_visitor prj generate = object (self)
 	   visitor. *)
 	if generate then Project.clear ~selection ~project:prj ();
 	(* extend the main with forward initialization and put it at end *)
-	(match main_fct with
-	| Some main ->
-	  if not (Options.Check.get ()) then
-	    let stmts = 
-	      Varinfo.Hashtbl.fold
-		(fun old_vi i acc -> 
-		  let new_vi = Cil.get_varinfo self#behavior old_vi in
-		  let model blk =
-		    if Pre_analysis.must_model_vi old_vi then
-		      mk_store_stmt new_vi :: mk_full_init_stmt new_vi :: blk
-		    else
-		      acc
-		  in
-		  match i with
-		  | None ->  model acc
-		  | Some i ->
-		    let b = 
-		      Cabs2cil.blockInit (Var new_vi, NoOffset) i new_vi.vtype 
+	if not (Options.Check.get ()) then begin
+	  let must_init =
+	    try
+	      Varinfo.Hashtbl.iter
+		(fun old_vi i -> match i with None | Some _ -> 
+		  if Pre_analysis.must_model_vi old_vi then raise Exit)
+		global_vars;
+	      false
+	    with Exit ->
+	      true
+	  in
+	  if must_init then
+	    let build_initializer () =
+	      let return = 
+		Cil.mkStmt ~valid_sid:true (Return(None, Location.unknown))
+	      in
+	      let stmts = 
+		Varinfo.Hashtbl.fold
+		  (fun old_vi i acc -> 
+		    let new_vi = Cil.get_varinfo self#behavior old_vi in
+		    let model blk =
+		      if Pre_analysis.must_model_vi old_vi then
+			mk_store_stmt new_vi :: mk_full_init_stmt new_vi :: blk
+		      else
+			acc
 		    in
-		    model (Cil.mkStmt ~valid_sid:true (Block b) :: acc))
-		global_vars
-		main.sbody.bstmts
+		    match i with
+		    | None ->  model acc
+		    | Some i -> 
+		      let b = 
+			Cabs2cil.blockInit
+			  (Var new_vi, NoOffset) 
+			  i 
+			  new_vi.vtype 
+		      in
+		      model (Cil.mkStmt ~valid_sid:true (Block b) :: acc))
+		  global_vars
+		  [ return ]
+	      in
+	      let blk = Cil.mkBlock stmts in
+	      let fname = "e_acsl_global_init" in
+	      let vi = 
+		Cil.makeGlobalVar ~logic:false ~generated:true 
+		  fname
+		  (TFun(Cil.voidType, Some [], false, []))
+	      in
+	      vi.vdefined <- true;
+	      let spec = Cil.empty_funspec () in
+	      let fundec =
+		{ svar = vi;
+		  sformals = [];
+		  slocals = [];
+		  smaxid = 0;
+		  sbody = blk;
+		  smaxstmtid = None;
+		  sallstmts = [];
+		  sspec = spec }
+	      in
+	      let fct = Definition(fundec, Location.unknown) in
+	      let kf =
+		{ fundec = fct; return_stmt = Some return; spec = spec } 
+	      in
+	      Globals.Functions.register kf;
+	      Globals.Functions.replace_by_definition
+		spec fundec Location.unknown;
+	      let cil_fct = GFun(fundec, Location.unknown) in
+	      match main_fct with
+	      | Some main ->
+		let exp = Cil.evar ~loc:Location.unknown vi in
+		let stmt = 
+		  Cil.mkStmtOneInstr ~valid_sid:true 
+		    (Call(None, exp, [], Location.unknown))
+		in
+		vi.vreferenced <- true;
+		main.sbody.bstmts <- stmt :: main.sbody.bstmts;
+		let new_globals =
+		  List.fold_right
+		    (fun g acc -> match g with
+		    | GFun({ svar = vi }, _) when Varinfo.equal vi main.svar -> 
+		      acc
+		    | _ -> g :: acc)
+		    f.globals
+		    [ cil_fct; GFun(main, Location.unknown) ]
+		in
+		f.globals <- new_globals
+	      | None -> 
+		Kernel.warning "no entry point specified:@ \
+you must call function `%s' by yourself" 
+		  fname;
+		f.globals <- f.globals @ [ cil_fct ]
 	    in
-	    main.sbody.bstmts <- stmts;
-	    let new_globals =
-	      List.fold_right
-		(fun g acc -> match g with
-		| GFun({ svar = vi }, _) when Varinfo.equal vi main.svar -> acc
-		| _ -> g :: acc)
-		f.globals
-		[ GFun(main, Location.unknown) ]
-	    in
-	    f.globals <- new_globals
- 	| None -> 
-	  Varinfo.Hashtbl.iter
-	    (fun _ i -> match i with 
-	    | None -> () 
-	    | Some _ -> Kernel.abort "entry point required")
-	    global_vars);
+	    Project.on prj build_initializer ()
+	end;
 	f)
 
   method vglob_aux g =

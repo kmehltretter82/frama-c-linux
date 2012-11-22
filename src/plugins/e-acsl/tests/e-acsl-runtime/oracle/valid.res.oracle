@@ -27,14 +27,18 @@
                      [1].__fc_stdio_id ∈ [--..--]
         S___fc_stdio_buffer_0_S___fc_stdout[0..1] ∈ [--..--]
         S___fc_stdio_buffer_1_S___fc_stdout[0..1] ∈ [--..--]
-[value] computing for function _store_block <- main.
+[value] computing for function e_acsl_global_init <- main.
+        Called from :0.
+[value] computing for function _store_block <- e_acsl_global_init <- main.
         Called from tests/e-acsl-runtime/valid.c:13.
 [value] using specification for function _store_block
 [value] Done for function _store_block
-[value] computing for function _full_init <- main.
+[value] computing for function _full_init <- e_acsl_global_init <- main.
         Called from tests/e-acsl-runtime/valid.c:13.
 [value] using specification for function _full_init
 [value] Done for function _full_init
+[value] Recording results for e_acsl_global_init
+[value] Done for function e_acsl_global_init
 [value] computing for function _store_block <- main.
         Called from tests/e-acsl-runtime/valid.c:26.
 [value] Done for function _store_block
@@ -316,6 +320,7 @@ tests/e-acsl-runtime/valid.c:37:[value] Non-termination in evaluation of functio
 [value] Recording results for main
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
+[value] Values at end of function e_acsl_global_init:
 [value] Values at end of function e_acsl_assert:
           S___fc_stdout[0].__fc_stdio_fpos ∈ [--..--]
                        [0].__fc_stdio_buffer ∈
@@ -535,14 +540,20 @@ int *f(int *x)
   
 }
 
+void e_acsl_global_init(void)
+{
+  _store_block((void *)(& X),4U);
+  _full_init((void *)(& X));
+  return;
+}
+
 int main(void)
 {
   int __retres;
   int *a;
   int *b;
   int n;
-  _store_block((void *)(& X),4U);
-  _full_init((void *)(& X));
+  e_acsl_global_init();
   _store_block((void *)(& n),4U);
   _store_block((void *)(& b),4U);
   _store_block((void *)(& a),4U);

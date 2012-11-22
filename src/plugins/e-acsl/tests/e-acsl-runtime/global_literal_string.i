@@ -23,6 +23,7 @@ int G2 = 2;
 
 int main(void) {
   /*@ assert S[G2] == 'o'; */
+  // /*@ assert \initialized(S); */
   return 0;
 }
 

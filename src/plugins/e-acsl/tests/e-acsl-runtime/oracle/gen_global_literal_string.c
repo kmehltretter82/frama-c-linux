@@ -68,7 +68,6 @@ void f(void)
 char *S = (char *)"foo";
 int IDX = 1;
 int G2 = 2;
-char *U = (char *)"baz";
 int main(void)
 {
   int __retres;
@@ -80,4 +79,5 @@ int main(void)
   return (__retres);
 }
 
+char *U = (char *)"baz";
 

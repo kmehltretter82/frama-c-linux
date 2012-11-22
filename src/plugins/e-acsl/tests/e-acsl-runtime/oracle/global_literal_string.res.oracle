@@ -42,7 +42,7 @@ tests/e-acsl-runtime/global_literal_string.i:25:[value] Assertion got status val
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function __clean <- main.
-        Called from tests/e-acsl-runtime/global_literal_string.i:26.
+        Called from tests/e-acsl-runtime/global_literal_string.i:27.
 [value] using specification for function __clean
 [kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
 [value] Done for function __clean
@@ -123,7 +123,6 @@ void f(void)
 char *S = (char *)"foo";
 int IDX = 1;
 int G2 = 2;
-char *U = (char *)"baz";
 int main(void)
 {
   int __retres;
@@ -135,4 +134,5 @@ int main(void)
   return (__retres);
 }
 
+char *U = (char *)"baz";
 
