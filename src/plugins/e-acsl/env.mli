@@ -80,10 +80,10 @@ val push: t -> t
 type where = Before | Middle | After
 val pop_and_get: t -> stmt -> global_clear:bool -> where -> block * t
 (** Pop the last local context and get back the corresponding new block
-   containing the given [stmt] at the given place ([Before] is before the
-   code corresponding to annotations, [After] is after this code and [Middle] is
-   between the stmt corresponding to annotations and the ones for freeing the
-   memory. *)
+    containing the given [stmt] at the given place ([Before] is before the code
+    corresponding to annotations, [After] is after this code and [Middle] is
+    between the stmt corresponding to annotations and the ones for freeing the
+    memory. *)
 
 val pop: t -> t
 (** Pop the last local context (ignore the corresponding new block if any *)

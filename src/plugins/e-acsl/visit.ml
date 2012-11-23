@@ -191,29 +191,37 @@ class e_acsl_visitor prj generate = object (self)
 	      let return = 
 		Cil.mkStmt ~valid_sid:true (Return(None, Location.unknown))
 	      in
-	      let stmts = 
+	      let env = Env.push !function_env in
+	      let stmts, env = 
 		Varinfo.Hashtbl.fold
-		  (fun old_vi i acc -> 
+		  (fun old_vi i (stmts, env) -> 
 		    let new_vi = Cil.get_varinfo self#behavior old_vi in
 		    let model blk =
 		      if Pre_analysis.must_model_vi old_vi then
 			mk_store_stmt new_vi :: mk_full_init_stmt new_vi :: blk
 		      else
-			acc
+			stmts
 		    in
 		    match i with
-		    | None ->  model acc
-		    | Some i -> 
-		      let b = 
-			Cabs2cil.blockInit
-			  (Var new_vi, NoOffset) 
-			  i 
-			  new_vi.vtype 
+		    | None -> model stmts, env
+		    | Some (CompoundInit _) -> assert false
+		    | Some (SingleInit e) -> 
+		      let e, env = self#literal_string env e in
+		      let stmt = 
+			Cil.mkStmtOneInstr ~valid_sid:true
+			  (Set(Cil.var new_vi, e, Location.unknown))
 		      in
-		      model (Cil.mkStmt ~valid_sid:true (Block b) :: acc))
+		      model (stmt :: stmts), env)
 		  global_vars
-		  [ return ]
+		  ([ return ], env)
 	      in
+	      let (b, env), stmts = match stmts with
+		| [] -> assert false
+		| stmt :: stmts ->
+		  Env.pop_and_get env stmt ~global_clear:true Env.Before, stmts
+	      in
+	      function_env := env;
+	      let stmts = Cil.mkStmt ~valid_sid:true (Block b) :: stmts in
 	      let blk = Cil.mkBlock stmts in
 	      let fname = "e_acsl_global_init" in
 	      let vi = 
@@ -233,12 +241,13 @@ class e_acsl_visitor prj generate = object (self)
 		  sallstmts = [];
 		  sspec = spec }
 	      in
+	      self#add_generated_variables_in_function fundec;
 	      let fct = Definition(fundec, Location.unknown) in
 	      let kf =
 		{ fundec = fct; return_stmt = Some return; spec = spec } 
 	      in
 	      Globals.Functions.register kf;
-	      Globals.Functions.replace_by_definition
+	      Globals.Functions.replace_by_definition 
 		spec fundec Location.unknown;
 	      let cil_fct = GFun(fundec, Location.unknown) in
 	      match main_fct with
@@ -313,14 +322,20 @@ you must call function `%s' by yourself"
       Cil.DoChildrenPost(fun g -> List.iter do_it g; g)
 
   method vinit vi _off _i = 
-    keep_initializer <- Some true;
-    Cil.DoChildrenPost
-      (fun i -> 
-	(match keep_initializer with
-	| Some false -> Varinfo.Hashtbl.replace global_vars vi (Some i)
-	| Some true | None -> ());
-	keep_initializer <- None; 
-	i)
+    if generate then
+      if Pre_analysis.must_model_vi vi then begin
+	keep_initializer <- Some true;
+	Cil.DoChildrenPost
+	  (fun i -> 
+	    (match keep_initializer with
+	    | Some false -> Varinfo.Hashtbl.replace global_vars vi (Some i)
+	    | Some true | None -> ());
+	    keep_initializer <- None; 
+	    i)
+      end else
+	Cil.JustCopy
+    else
+      Cil.SkipChildren
 
   method vvdec vi = 
     try
@@ -336,20 +351,19 @@ you must call function `%s' by yourself"
       (* TODO: do better *)
       Cil.DoChildren
 
+  method private add_generated_variables_in_function f =
+    let vars = Env.get_generated_variables !function_env in
+    self#reset_env ();
+    f.slocals <- f.slocals @ List.map fst vars;
+    let body = f.sbody in
+    body.blocals <- 
+      List.fold_left
+      (fun acc (v, b) -> if b then v :: acc else acc) 
+      body.blocals
+      vars
+
   method vfunc _f =
-    let add_gen_vars f = 
-      let vars = Env.get_generated_variables !function_env in
-      self#reset_env ();
-      f.slocals <- f.slocals @ List.map fst vars;
-      let body = f.sbody in
-      body.blocals <- 
-	List.fold_left
-	(fun acc (v, b) -> if b then v :: acc else acc) 
-	body.blocals
-	vars;
-      f
-    in
-    Cil.DoChildrenPost add_gen_vars
+    Cil.DoChildrenPost (fun f -> self#add_generated_variables_in_function f; f)
 
   method private is_return old_kf stmt = 
     let old_ret = 
@@ -375,6 +389,38 @@ you must call function `%s' by yourself"
 @[The generated program may be incomplete.@]" 
 	s;
       false
+
+  (* [JS 2012/10/25] Not required for each literal string.  
+     TODO: find a way to generate extra-variables only when required *)
+  method private literal_string env e = 
+    let env_ref = ref env in
+    let o = object
+      inherit Cil.genericCilVisitor 
+	~prj:(Project.current ()) (Cil.copy_visit ())
+      method vexpr e = match e.enode with
+      | Const(CStr s) ->
+	let _, exp, env = 
+	  Env.new_var
+	    ~global:true
+	    ~name:"literal_string"
+	    env
+	    None
+	    Cil.charPtrType
+	    (fun vi _ -> 
+	      let loc = e.eloc in
+	      let str_size = Cil.new_exp loc (SizeOfStr s) in
+	      [ Cil.mkStmtOneInstr 
+		  ~valid_sid:true (Set(Cil.var vi, e, loc));
+		mk_store_stmt ~str_size vi;
+		mk_full_init_stmt ~addr:false vi ])
+	in
+	env_ref := env;
+	Cil.ChangeTo exp
+      | _ -> 
+	Cil.DoChildren
+    end in
+    let e = Cil.visitCilExpr o e in
+    e, !env_ref
 
   method vstmt_aux stmt =
     Options.debug ~level:2 "proceeding stmt (sid %d) %a@." 
@@ -569,31 +615,12 @@ you must call function `%s' by yourself"
 	let keep = match exp.enode with Const(CStr _) -> false | _ -> true  in
 	keep_initializer <- Some keep;
 	if keep then Cil.DoChildren else Cil.JustCopy
-      | None ->
-	(* [JS 2012/10/25] Not required for each literal string.
-	   TODO: find a way to generate extra-variables only when required *)
-	let literate_string e = match e.enode with
-	  | Const(CStr s) ->
-	    let _, exp, env = 
-	      Env.new_var
-		~global:true
-		~name:"literal_string"
-		!function_env
-		None
-		Cil.charPtrType
-		(fun vi _ -> 
-		  let loc = e.eloc in
-		  let str_size = Cil.new_exp loc (SizeOfStr s) in
-		  [ Cil.mkStmtOneInstr 
-		      ~valid_sid:true (Set(Cil.var vi, e, loc));
-		    mk_store_stmt ~str_size vi;
-		    mk_full_init_stmt ~addr:false vi ])
-	    in
+      | None -> 
+	Cil.DoChildrenPost
+	  (fun e -> 
+	    let e, env = self#literal_string !function_env e in
 	    function_env := env;
-	    exp
-	  | _ -> e
-	in
-	Cil.DoChildrenPost literate_string
+	    e)
     else
       Cil.SkipChildren
 

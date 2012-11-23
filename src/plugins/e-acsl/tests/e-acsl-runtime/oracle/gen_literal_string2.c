@@ -72,6 +72,21 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
   return;
 }
 
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void *_store_block(void *ptr,
+                                                           size_t size);
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void _delete_block(void *ptr);
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void _full_init(void *ptr);
+/*@ ensures \result ≡ 0 ∨ \result ≡ 1;
+    ensures \result ≡ 1 ⇒
+            \initialized((char *)\old(ptr)+(0..\old(size)-1));
+    assigns \nothing;
+  
+*/
+extern  __attribute__((__FC_BUILTIN__)) int _initialized(void *ptr,
+                                                         size_t size);
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 int main(void);
 char *T = (char *)"bar";
@@ -88,7 +103,7 @@ void f(void)
     __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl),
                              (__mpz_struct const *)(__e_acsl_2));
     e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",
-                  (char *)"*(T+G) == \'b\'",15);
+                  (char *)"*(T+G) == \'b\'",13);
     __gmpz_clear(__e_acsl);
     __gmpz_clear(__e_acsl_2);
   }
@@ -97,12 +112,42 @@ void f(void)
   return;
 }
 
-char *S = (char *)"foo";
+char *S;
+char *S2;
 int IDX = 1;
 int G2 = 2;
+char *U = (char *)"baz";
+void e_acsl_global_init(void)
+{
+  char *__e_acsl_literal_string_2;
+  char *__e_acsl_literal_string;
+  _store_block((void *)(& S2),4U);
+  __e_acsl_literal_string = "foo";
+  _store_block((void *)__e_acsl_literal_string,sizeof("foo"));
+  _full_init((void *)__e_acsl_literal_string);
+  __e_acsl_literal_string_2 = "foo2";
+  _store_block((void *)__e_acsl_literal_string_2,sizeof("foo2"));
+  _full_init((void *)__e_acsl_literal_string_2);
+  _full_init((void *)(& S2));
+  S2 = (char *)__e_acsl_literal_string_2;
+  _store_block((void *)(& S),4U);
+  _full_init((void *)(& S));
+  S = (char *)__e_acsl_literal_string;
+  return;
+}
+
 int main(void)
 {
+  char *__e_acsl_literal_string;
   int __retres;
+  char *SS;
+  e_acsl_global_init();
+  _store_block((void *)(& SS),4U);
+  __e_acsl_literal_string = "ss";
+  _store_block((void *)__e_acsl_literal_string,sizeof("ss"));
+  _full_init((void *)__e_acsl_literal_string);
+  _full_init((void *)(& SS));
+  SS = (char *)__e_acsl_literal_string;
   /*@ assert *(S+G2) ≡ 'o'; */
   {
     mpz_t __e_acsl;
@@ -113,15 +158,40 @@ int main(void)
     __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl),
                              (__mpz_struct const *)(__e_acsl_2));
     e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",
-                  (char *)"*(S+G2) == \'o\'",25);
+                  (char *)"*(S+G2) == \'o\'",24);
     __gmpz_clear(__e_acsl);
     __gmpz_clear(__e_acsl_2);
   }
   
+  /*@ assert (\initialized(S) ∧ \initialized(S2)) ∧ \initialized(SS); */
+  {
+    int __e_acsl_initialized;
+    int __e_acsl_and;
+    int __e_acsl_and_2;
+    __e_acsl_initialized = _initialized((void *)S,sizeof(char));
+    if (__e_acsl_initialized) {
+      int __e_acsl_initialized_2;
+      __e_acsl_initialized_2 = _initialized((void *)S2,sizeof(char));
+      __e_acsl_and = __e_acsl_initialized_2;
+    }
+    else { __e_acsl_and = 0; }
+    if (__e_acsl_and) {
+      int __e_acsl_initialized_3;
+      __e_acsl_initialized_3 = _initialized((void *)SS,sizeof(char));
+      __e_acsl_and_2 = __e_acsl_initialized_3;
+    }
+    else { __e_acsl_and_2 = 0; }
+    e_acsl_assert(__e_acsl_and_2,(char *)"Assertion",
+                  (char *)"(\\initialized(S) && \\initialized(S2)) &&\n\\initialized(SS)",
+                  25);
+  }
+  
   __retres = 0;
+  _delete_block((void *)(& S2));
+  _delete_block((void *)(& S));
+  _delete_block((void *)(& SS));
   __clean();
   return (__retres);
 }
 
-char *U = (char *)"baz";
 
