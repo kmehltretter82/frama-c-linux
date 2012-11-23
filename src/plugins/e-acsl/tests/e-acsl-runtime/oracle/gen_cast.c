@@ -61,22 +61,22 @@ int main(void)
   x = (long)0;
   y = 0;
   /*@ assert (int)x ≡ y; */
-  e_acsl_assert((int)x == y,(char *)"Assertion",(char *)"(int)x == y",11);
+  e_acsl_assert((int)x == y,(char *)"Assertion",(char *)"(int)x == y",12);
   /*@ assert x ≡ (long)y; */
-  e_acsl_assert(x == (long)y,(char *)"Assertion",(char *)"x == (long)y",12);
+  e_acsl_assert(x == (long)y,(char *)"Assertion",(char *)"x == (long)y",13);
   /*@ assert y ≡ (int)0; */
-  e_acsl_assert(y == 0,(char *)"Assertion",(char *)"y == (int)0",14);
+  e_acsl_assert(y == 0,(char *)"Assertion",(char *)"y == (int)0",15);
   /*@ assert (unsigned int)y ≡ (unsigned int)0; */
   e_acsl_assert((unsigned int)y == (unsigned int)0,(char *)"Assertion",
-                (char *)"(unsigned int)y == (unsigned int)0",15);
+                (char *)"(unsigned int)y == (unsigned int)0",16);
   /*@ assert y ≢ (int)0xfffffffffffffff; */
   e_acsl_assert(y != (int)0xfffffffffffffff,(char *)"Assertion",
-                (char *)"y != (int)0xfffffffffffffff",18);
+                (char *)"y != (int)0xfffffffffffffff",19);
   /*@ assert (unsigned int)y ≢ (unsigned int)0xfffffffffffffff; */
   e_acsl_assert((unsigned int)y != (unsigned int)0xfffffffffffffff,
                 (char *)"Assertion",
                 (char *)"(unsigned int)y != (unsigned int)0xfffffffffffffff",
-                19);
+                20);
   __retres = 0;
   __clean();
   return (__retres);

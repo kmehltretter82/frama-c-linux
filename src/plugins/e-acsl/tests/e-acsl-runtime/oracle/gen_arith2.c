@@ -703,6 +703,38 @@ int main(void)
     __gmpz_clear(__e_acsl_53);
   }
   
+  /*@ assert 4/y ≡ 2; */
+  {
+    mpz_t __e_acsl_54;
+    mpz_t __e_acsl_y_2;
+    mpz_t __e_acsl_55;
+    int __e_acsl_div_guard_3;
+    mpz_t __e_acsl_div_3;
+    mpz_t __e_acsl_56;
+    int __e_acsl_eq_19;
+    __gmpz_init_set_si(__e_acsl_54,(long)4);
+    __gmpz_init_set_si(__e_acsl_y_2,(long)y);
+    __gmpz_init_set_si(__e_acsl_55,0L);
+    __e_acsl_div_guard_3 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_y_2),
+                                      (__mpz_struct const *)(__e_acsl_55));
+    __gmpz_init(__e_acsl_div_3);
+    /*@ assert E_ACSL: y ≢ 0; */
+    e_acsl_assert(! (__e_acsl_div_guard_3 == 0),(char *)"Assertion",
+                  (char *)"y == 0",33);
+    __gmpz_tdiv_q(__e_acsl_div_3,(__mpz_struct const *)(__e_acsl_54),
+                  (__mpz_struct const *)(__e_acsl_y_2));
+    __gmpz_init_set_si(__e_acsl_56,(long)2);
+    __e_acsl_eq_19 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_div_3),
+                                (__mpz_struct const *)(__e_acsl_56));
+    e_acsl_assert(__e_acsl_eq_19 == 0,(char *)"Assertion",(char *)"4/y == 2",
+                  33);
+    __gmpz_clear(__e_acsl_54);
+    __gmpz_clear(__e_acsl_y_2);
+    __gmpz_clear(__e_acsl_55);
+    __gmpz_clear(__e_acsl_div_3);
+    __gmpz_clear(__e_acsl_56);
+  }
+  
   __retres = 0;
   __clean();
   return (__retres);

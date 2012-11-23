@@ -5,15 +5,8 @@
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_bittree.h"
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
 tests/e-acsl-runtime/ptr.i:13:[e-acsl] warning: missing guard for ensuring that p is a valid memory access
-:0:[e-acsl] warning: missing guard for ensuring that 0 is a valid array index
-tests/e-acsl-runtime/ptr.i:15:[e-acsl] warning: missing guard for ensuring that 2 is a valid array index
 tests/e-acsl-runtime/ptr.i:16:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
-:0:[e-acsl] warning: missing guard for ensuring that
-                  (2*sizeof(int))/sizeof((int)0x0) is a valid array index
-tests/e-acsl-runtime/ptr.i:19:[e-acsl] warning: missing guard for ensuring that i is a valid array index
 tests/e-acsl-runtime/ptr.i:20:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
-:0:[e-acsl] warning: missing guard for ensuring that 2-i is a valid array index
-tests/e-acsl-runtime/ptr.i:21:[e-acsl] warning: missing guard for ensuring that 2 is a valid array index
 tests/e-acsl-runtime/ptr.i:21:[e-acsl] warning: missing guard for ensuring that &t[2]-i is a valid pointer
 tests/e-acsl-runtime/ptr.i:21:[e-acsl] warning: missing guard for ensuring that &t[2]-i is a valid memory access
 tests/e-acsl-runtime/ptr.i:27:[e-acsl] warning: missing guard for ensuring that p is a valid memory access

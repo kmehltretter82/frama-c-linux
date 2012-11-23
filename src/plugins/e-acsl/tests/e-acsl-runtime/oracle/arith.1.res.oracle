@@ -911,8 +911,56 @@ tests/e-acsl-runtime/arith.i:32:[value] Assertion got status valid.
 [value] computing for function __gmpz_clear <- main.
         Called from tests/e-acsl-runtime/arith.i:32.
 [value] Done for function __gmpz_clear
+tests/e-acsl-runtime/arith.i:33:[value] Assertion got status valid.
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from tests/e-acsl-runtime/arith.i:33.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from tests/e-acsl-runtime/arith.i:33.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from :0.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from tests/e-acsl-runtime/arith.i:33.
+[value] Done for function __gmpz_cmp
+[value] computing for function __gmpz_init <- main.
+        Called from tests/e-acsl-runtime/arith.i:33.
+[value] Done for function __gmpz_init
+[value] computing for function e_acsl_assert <- main.
+        Called from tests/e-acsl-runtime/arith.i:33.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_tdiv_q <- main.
+        Called from tests/e-acsl-runtime/arith.i:33.
+[value] Done for function __gmpz_tdiv_q
+[value] computing for function __gmpz_init_set_si <- main.
+        Called from tests/e-acsl-runtime/arith.i:33.
+[value] Done for function __gmpz_init_set_si
+[value] computing for function __gmpz_cmp <- main.
+        Called from tests/e-acsl-runtime/arith.i:33.
+[value] Done for function __gmpz_cmp
+[value] computing for function e_acsl_assert <- main.
+        Called from tests/e-acsl-runtime/arith.i:33.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function __gmpz_clear <- main.
+        Called from tests/e-acsl-runtime/arith.i:33.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from tests/e-acsl-runtime/arith.i:33.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from :0.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from tests/e-acsl-runtime/arith.i:33.
+[value] Done for function __gmpz_clear
+[value] computing for function __gmpz_clear <- main.
+        Called from tests/e-acsl-runtime/arith.i:33.
+[value] Done for function __gmpz_clear
 [value] computing for function __clean <- main.
-        Called from tests/e-acsl-runtime/arith.i:34.
+        Called from tests/e-acsl-runtime/arith.i:35.
 [value] using specification for function __clean
 [kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
 [value] Done for function __clean
@@ -1628,6 +1676,38 @@ int main(void)
     __gmpz_clear(__e_acsl_51);
     __gmpz_clear(__e_acsl_52);
     __gmpz_clear(__e_acsl_53);
+  }
+  
+  /*@ assert 4/y ≡ 2; */
+  {
+    mpz_t __e_acsl_54;
+    mpz_t __e_acsl_y_2;
+    mpz_t __e_acsl_55;
+    int __e_acsl_div_guard_3;
+    mpz_t __e_acsl_div_3;
+    mpz_t __e_acsl_56;
+    int __e_acsl_eq_19;
+    __gmpz_init_set_si(__e_acsl_54,(long)4);
+    __gmpz_init_set_si(__e_acsl_y_2,(long)y);
+    __gmpz_init_set_si(__e_acsl_55,0L);
+    __e_acsl_div_guard_3 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_y_2),
+                                      (__mpz_struct const *)(__e_acsl_55));
+    __gmpz_init(__e_acsl_div_3);
+    /*@ assert E_ACSL: y ≢ 0; */
+    e_acsl_assert(! (__e_acsl_div_guard_3 == 0),(char *)"Assertion",
+                  (char *)"y == 0",33);
+    __gmpz_tdiv_q(__e_acsl_div_3,(__mpz_struct const *)(__e_acsl_54),
+                  (__mpz_struct const *)(__e_acsl_y_2));
+    __gmpz_init_set_si(__e_acsl_56,(long)2);
+    __e_acsl_eq_19 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_div_3),
+                                (__mpz_struct const *)(__e_acsl_56));
+    e_acsl_assert(__e_acsl_eq_19 == 0,(char *)"Assertion",(char *)"4/y == 2",
+                  33);
+    __gmpz_clear(__e_acsl_54);
+    __gmpz_clear(__e_acsl_y_2);
+    __gmpz_clear(__e_acsl_55);
+    __gmpz_clear(__e_acsl_div_3);
+    __gmpz_clear(__e_acsl_56);
   }
   
   __retres = 0;

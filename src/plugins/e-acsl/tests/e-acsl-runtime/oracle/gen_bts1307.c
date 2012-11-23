@@ -107,21 +107,14 @@ void foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
                                                                    5 / 80) * *Mwmax) * 0.4));
   }
   
-  {
-    int __e_acsl_div;
-    /*@ assert E_ACSL: 80 ≢ 0; */
-    e_acsl_assert(! (80 == 0),(char *)"Postcondition",(char *)"80 == 0",13);
-    __e_acsl_div = 5 / 80;
-    e_acsl_assert(*__e_acsl_at == *__e_acsl_at_2 + (5 - (__e_acsl_div * *__e_acsl_at_3) * 0.4),
-                  (char *)"Postcondition",
-                  (char *)"*\\old(Mtmax_out) == *\\old(Mtmax_in)+(5-((5/80)**\\old(Mwmax))*0.4)",
-                  13);
-    _delete_block((void *)(& Mtmax_in));
-    _delete_block((void *)(& Mwmax));
-    _delete_block((void *)(& Mtmax_out));
-    return;
-  }
-  
+  e_acsl_assert(*__e_acsl_at == *__e_acsl_at_2 + (5 - ((5 / 80) * *__e_acsl_at_3) * 0.4),
+                (char *)"Postcondition",
+                (char *)"*\\old(Mtmax_out) == *\\old(Mtmax_in)+(5-((5/80)**\\old(Mwmax))*0.4)",
+                13);
+  _delete_block((void *)(& Mtmax_in));
+  _delete_block((void *)(& Mwmax));
+  _delete_block((void *)(& Mtmax_out));
+  return;
 }
 
 int main(void)

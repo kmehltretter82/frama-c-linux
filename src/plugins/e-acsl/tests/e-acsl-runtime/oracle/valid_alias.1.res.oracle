@@ -6,6 +6,7 @@
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
 [kernel] preprocessing with "gcc -C -E -I.  -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc tests/e-acsl-runtime/valid_alias.c"
 tests/e-acsl-runtime/valid_alias.c:17:[e-acsl] warning: missing guard for ensuring that b is a valid memory access
+tests/e-acsl-runtime/valid_alias.c:10:[e-acsl] warning: E-ACSL construct `\valid_read' is not yet supported. Ignoring annotation.
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed

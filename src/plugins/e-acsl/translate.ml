@@ -134,9 +134,10 @@ and toffset_to_offset ?loc env = function
     Field(f, offset), env
   | TIndex(t, offset) -> 
     let e, env = term_to_exp env (Some Cil.intType) t in
-    Options.warning ~source:(fst e.eloc) ~once:true
-      "@[missing guard for ensuring that@ %a is a valid array index@]"
-      Cil.d_term t;
+    if Mpz.is_t (Cil.typeOf e) then
+      Options.warning ~source:(fst e.eloc) ~once:true
+	"@[missing guard for ensuring that@ %a is a valid array index@]"
+	Cil.d_term t;
     let offset, env = toffset_to_offset env offset in
     Index(e, offset), env
   | TModel _ -> Error.not_yet "model"
@@ -224,44 +225,38 @@ and context_insensitive_term_to_exp env t =
     let ctx = Some ty in
     let e1, env = term_to_exp env ctx t1 in
     let e2, env = term_to_exp env ctx t2 in
-    (* [TODO] can now do better since the type system got some info about
-       possible values of [t2] *)
-    (* guarding divisions and modulos *)
-    let zero = Logic_const.tinteger 0 in
-    (* do not generate [e2] from [t2] twice *)
-    let guard, env = 
-      let name = name_of_binop bop ^ "_guard" in
-      comparison_to_exp ~loc env ~e1:(e2, ty) ~name Eq t2 zero (Some t) 
-    in
-    let mk_stmts v e = 
+    if Mpz.is_t ty then 
+      let t = Some t in
       let name = name_of_mpz_arith_bop bop in
-      let cond = 
-	Misc.mk_e_acsl_guard 
-	  (Env.annotation_kind env) 
-	  guard
-	  (Logic_const.prel ~loc (Req, t2, zero)) 
+      (* [TODO] can now do better since the type system got some info about
+	 possible values of [t2] *)
+      (* guarding divisions and modulos *)
+      let zero = Logic_const.tinteger 0 in
+      (* do not generate [e2] from [t2] twice *)
+      let guard, env = 
+	let name = name_of_binop bop ^ "_guard" in
+	comparison_to_exp ~loc env ~e1:(e2, ty) ~name Eq t2 zero t 
       in
-      Env.add_assert env cond (Logic_const.prel (Rneq, t2, zero));
-      let instr = 
-	if Mpz.is_t ty then Misc.mk_call ~loc name [ e; e1; e2 ]
-	else begin
-	  assert (Cil.isIntegralType ty);
-	  let e = Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)) in
-	  Cil.mkStmtOneInstr ~valid_sid:true (Set((Var v, NoOffset), e, loc))
-	end
+      let mk_stmts _v e = 
+	assert (Mpz.is_t ty);
+	let cond = 
+	  Misc.mk_e_acsl_guard 
+	    (Env.annotation_kind env) 
+	    guard
+	    (Logic_const.prel ~loc (Req, t2, zero)) 
+	in
+	Env.add_assert env cond (Logic_const.prel (Rneq, t2, zero));
+	let instr = Misc.mk_call ~loc name [ e; e1; e2 ] in
+	[ cond; instr ]
       in
-      [ cond; instr ]
-    in
-    let t = Some t in
-    let _, e, env = 
       let name = name_of_binop bop in
-      if Mpz.is_t ty then Env.new_var_and_mpz_init ~loc ~name env t mk_stmts
-      else begin
-	assert (Cil.isIntegralType ty);
-	Env.new_var ~loc ~name env t ty mk_stmts 
-      end
-    in
-    e, env, false, ""
+      let _, e, env = Env.new_var_and_mpz_init ~loc ~name env t mk_stmts in
+      e, env, false, ""
+    else begin
+      assert (Cil.isIntegralType ty);
+      (* no guard required since RTE are generated separately *)
+      Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)), env, false, ""
+    end
   | TBinOp(Lt | Gt | Le | Ge | Eq | Ne as bop, t1, t2) ->
     (* comparison operators *)
     let e, env = comparison_to_exp ~loc env bop t1 t2 (Some t) in
@@ -490,7 +485,7 @@ let is_visiting_valid = ref false
 (* Convert an ACSL named predicate into a corresponding C expression (if
    any) in the given environment. Also extend this environment which includes
    the generating constructs. *)
-let rec named_predicate_to_exp ?name env p = 
+let rec named_predicate_to_exp ?name kf env p = 
   let loc = p.loc in
   match p.content with
   | Pfalse -> Cil.zero ~loc, env
@@ -504,16 +499,16 @@ let rec named_predicate_to_exp ?name env p =
     Typing.context_sensitive ~loc env Cil.intType false None e
   | Pand(p1, p2) ->
     (* p1 && p2 <==> if p1 then p2 else false *)
-    let e1, env1 = named_predicate_to_exp env p1 in
-    let _, env2 as res2 = named_predicate_to_exp (Env.push env1) p2 in
+    let e1, env1 = named_predicate_to_exp kf env p1 in
+    let _, env2 as res2 = named_predicate_to_exp kf (Env.push env1) p2 in
     let env3 = Env.push env2 in
     let name = match name with None -> "and" | Some n -> n in
     conditional_to_exp ~name loc Cil.intType e1 res2 (Cil.zero loc, env3)
   | Por(p1, p2) -> 
     (* p1 || p2 <==> if p1 then true else p2 *)
-    let e1, env1 = named_predicate_to_exp env p1 in
+    let e1, env1 = named_predicate_to_exp kf env p1 in
     let env' = Env.push env1 in
-    let res2 = named_predicate_to_exp (Env.push env') p2 in
+    let res2 = named_predicate_to_exp kf (Env.push env') p2 in
     let name = match name with None -> "or" | Some n -> n in
     conditional_to_exp ~name loc Cil.intType e1 (Cil.one loc, env') res2
   | Pxor _ -> Error.not_yet "xor"
@@ -521,29 +516,31 @@ let rec named_predicate_to_exp ?name env p =
     (* (p1 ==> p2) <==> !p1 || p2 *)
     named_predicate_to_exp 
       ~name:"implies"
+      kf
       env
       (Logic_const.por ~loc ((Logic_const.pnot ~loc p1), p2))
   | Piff(p1, p2) -> 
     (* (p1 <==> p2) <==> (p1 ==> p2 && p2 ==> p1) *)
     named_predicate_to_exp 
       ~name:"equiv"
+      kf
       env
       (Logic_const.pand ~loc
 	 (Logic_const.pimplies ~loc (p1, p2), 
 	  Logic_const.pimplies ~loc (p2, p1)))
   | Pnot p ->
-    let e, env = named_predicate_to_exp env p in
+    let e, env = named_predicate_to_exp kf env p in
     Cil.new_exp ~loc (UnOp(LNot, e, Cil.intType)), env
   | Pif(t, p2, p3) ->
     let e1, env1 = term_to_exp env (Some Cil.intType) t in
-    let (_, env2 as res2) = named_predicate_to_exp (Env.push env1) p2 in
-    let res3 = named_predicate_to_exp (Env.push env2) p3 in
+    let (_, env2 as res2) = named_predicate_to_exp kf (Env.push env1) p2 in
+    let res3 = named_predicate_to_exp kf (Env.push env2) p3 in
     conditional_to_exp loc Cil.intType e1 res2 res3
   | Plet _ -> Error.not_yet "let _ = _ in _"
-  | Pforall _ | Pexists _ -> Quantif.quantif_to_exp env p
+  | Pforall _ | Pexists _ -> Quantif.quantif_to_exp kf env p
   | Pat(p, label) -> 
     (* convert [t'] to [e] in a separated local env *)
-    let e, env = named_predicate_to_exp (Env.push env) p in
+    let e, env = named_predicate_to_exp kf (Env.push env) p in
     let e, env, is_string = at_to_exp env None label e in
     assert (not is_string);
     e, env
@@ -570,7 +567,7 @@ let rec named_predicate_to_exp ?name env p =
 	Typing.type_named_predicate ~must_clear:false init;
 	let p = Logic_const.pand ~loc (init, p) in
 	is_visiting_valid := true;
-	named_predicate_to_exp env p
+	named_predicate_to_exp kf env p
       | _ -> assert false
     end
   | Pvalid _ -> Error.not_yet "labeled \\valid"
@@ -599,15 +596,38 @@ let assumes_predicate bhv =
     Logic_const.ptrue
     bhv.b_assumes
 
-let translate_named_predicate env p =
-  Typing.type_named_predicate p;
-  let e, env = named_predicate_to_exp env p in
+let get_rte =
+  Dynamic.get
+    ~plugin:"RteGen"
+    "exp_annotations"
+    (Datatype.func3 Kernel_function.ty Stmt.ty Exp.ty 
+       (let module L = Datatype.List(Code_annotation) in L.ty))
+
+let rec translate_named_predicate kf ?(rte=true) env p =
+  Typing.type_named_predicate ~must_clear:rte p;
+  let e, env = named_predicate_to_exp kf env p in
   assert (Typ.equal (Cil.typeOf e) Cil.intType);
+  let env = if rte then rte_to_exp kf env e else env in
   Env.add_stmt
     env 
     (Misc.mk_e_acsl_guard ~reverse:true (Env.annotation_kind env) e p)
 
-let translate_preconditions env behaviors =
+and rte_to_exp kf env e =
+  let stmt = Cil.mkStmtOneInstr ~valid_sid:true (Skip Location.unknown) in
+  let l = get_rte kf stmt e in
+  List.fold_left
+    (fun env a -> match a.annot_content with
+    | AAssert(_, p) -> 
+      Error.handle
+	(fun env -> translate_named_predicate kf ~rte:false env p)
+	env
+    | _ -> assert false)
+    env
+    l
+
+let () = Quantif.rte_to_exp_ref := rte_to_exp
+
+let translate_preconditions kf env behaviors =
   let env = Env.set_annotation_kind env Misc.Precondition in
   let do_behavior env b = 
     let assumes_pred = assumes_predicate b in
@@ -620,7 +640,7 @@ let translate_preconditions env behaviors =
 	      ~loc
 	      (assumes_pred, Logic_const.unamed ~loc p.ip_content)
 	  in
-	  translate_named_predicate env p
+	  translate_named_predicate kf env p
 	in
 	Error.handle do_it env)
       env
@@ -628,7 +648,7 @@ let translate_preconditions env behaviors =
   in 
   List.fold_left do_behavior env behaviors
 
-let translate_postconditions env behaviors =
+let translate_postconditions kf env behaviors =
   let env = Env.set_annotation_kind env Misc.Postcondition in
   (* generate one guard by postcondition of each behavior *)
   let do_behavior env b = 
@@ -649,7 +669,7 @@ let translate_postconditions env behaviors =
 		~loc
 		(Logic_const.pold ~loc assumes_pred, Logic_const.unamed ~loc p) 
 	    in
-	    translate_named_predicate env p
+	    translate_named_predicate kf env p
 	  | Exits | Breaks | Continues | Returns ->
 	    Error.not_yet "@[abnormal termination case in behavior@]"
 	in
@@ -659,7 +679,7 @@ let translate_postconditions env behaviors =
   in 
   List.fold_left do_behavior env behaviors
 
-let translate_pre_spec env spec =
+let translate_pre_spec kf env spec =
   let convert env =
     if spec.spec_variant <> None then Error.not_yet "variant clause";
     if spec.spec_terminates <> None then Error.not_yet "terminates clause";
@@ -667,14 +687,15 @@ let translate_pre_spec env spec =
       Error.not_yet "complete behavior";
     if spec.spec_disjoint_behaviors <> [] then 
       Error.not_yet "disjoint behavior";
-    translate_preconditions env spec.spec_behavior
+    translate_preconditions kf env spec.spec_behavior
   in
   Error.handle convert env
 
-let translate_post_spec env spec = 
-  Error.handle (fun env -> translate_postconditions env spec.spec_behavior) env
+let translate_post_spec kf env spec = 
+  Error.handle
+    (fun env -> translate_postconditions kf env spec.spec_behavior) env
 
-let translate_pre_code_annotation env annot =
+let translate_pre_code_annotation kf env annot =
   let convert env = match annot.annot_content with
     | AAssert(l, p) | AInvariant(l, false (* invariant as assertion *), p) 
 	as a -> 
@@ -686,11 +707,11 @@ let translate_pre_code_annotation env annot =
       let env = Env.set_annotation_kind env kind in
       if l <> [] then 
 	Error.not_yet "@[assertions applied only on some behaviors@]";
-      translate_named_predicate env p
+      translate_named_predicate kf env p
     | AStmtSpec(l, spec) ->
       if l <> [] then 
         Error.not_yet "@[statement contract applied only on some behaviors@]";
-      translate_pre_spec env spec ;
+      translate_pre_spec kf env spec ;
     | AInvariant(_, b, _) -> assert b; Error.not_yet "loop invariant"
     | AVariant _ -> Error.not_yet "variant"
     | AAssigns _ -> Error.not_yet "assigns"
@@ -699,9 +720,9 @@ let translate_pre_code_annotation env annot =
   in
   Error.handle convert env
 
-let translate_post_code_annotation env annot =
+let translate_post_code_annotation kf env annot =
   let convert env = match annot.annot_content with
-    | AStmtSpec(_, spec) -> translate_post_spec env spec
+    | AStmtSpec(_, spec) -> translate_post_spec kf env spec
     | AAssert _ 
     | AInvariant _ 
     | AVariant _

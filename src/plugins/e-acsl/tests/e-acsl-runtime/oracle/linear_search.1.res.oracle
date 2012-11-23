@@ -5,13 +5,10 @@
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_bittree.h"
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
 tests/e-acsl-runtime/linear_search.i:9:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
-:0:[e-acsl] warning: missing guard for ensuring that i is a valid array index
 tests/e-acsl-runtime/linear_search.i:9:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
-:0:[e-acsl] warning: missing guard for ensuring that i+1 is a valid array index
 tests/e-acsl-runtime/linear_search.i:27:[e-acsl] warning: E-ACSL construct `loop invariant' is not yet supported. Ignoring annotation.
 tests/e-acsl-runtime/linear_search.i:27:[e-acsl] warning: E-ACSL construct `loop invariant' is not yet supported. Ignoring annotation.
 tests/e-acsl-runtime/linear_search.i:11:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
-:0:[e-acsl] warning: missing guard for ensuring that j is a valid array index
 tests/e-acsl-runtime/linear_search.i:14:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
 [value] Analyzing a complete application starting at main
 [value] Computing initial state

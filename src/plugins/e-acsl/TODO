@@ -5,6 +5,7 @@
 - [Bernard] avoir une fonction e_acsl_trace_behavior(char *bhv_name) {}
   à appeler dès qu'un behavior est activé
 - utiliser Rte pour tous les overflows potentiels
+  - reste les acces mémoires et le code GMP
 - [Yannick] Logic functions
 
 ########
@@ -36,6 +37,7 @@
   (voir aussi result.i et ./at_stmt_contract.i)
 - interprétation des tableaux
 - \initialized sur des chaînes littérales (voir global_literal_string.i)
+- \valid(strings) (bts #1317)
 
 #########
 # TESTS #

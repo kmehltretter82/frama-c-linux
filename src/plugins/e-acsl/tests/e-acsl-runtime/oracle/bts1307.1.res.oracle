@@ -11,6 +11,9 @@ tests/e-acsl-runtime/bts1307.i:19:[e-acsl] warning: approximating type `real' by
 tests/e-acsl-runtime/bts1307.i:13:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
 :0:[e-acsl] warning: missing guard for ensuring that \old(Mwmax) is a valid memory access
 tests/e-acsl-runtime/bts1307.i:19:[e-acsl] approximating a real number by a float
+tests/e-acsl-runtime/bts1307.i:19:[e-acsl] warning: E-ACSL construct `\valid_read' is not yet supported. Ignoring annotation.
+tests/e-acsl-runtime/bts1307.i:19:[e-acsl] warning: E-ACSL construct `\valid_read' is not yet supported. Ignoring annotation.
+tests/e-acsl-runtime/bts1307.i:19:[e-acsl] warning: E-ACSL construct `\valid_read' is not yet supported. Ignoring annotation.
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed

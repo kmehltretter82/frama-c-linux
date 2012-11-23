@@ -212,27 +212,16 @@ int main(void)
       if (__e_acsl_x_7 < 10) { ; }
       else { break; }
       {
-        int __e_acsl_mod;
         int __e_acsl_implies;
-        /*@ assert E_ACSL: 2 ≢ 0; */
-        e_acsl_assert(! (2 == 0),(char *)"Assertion",(char *)"2 == 0",28);
-        __e_acsl_mod = __e_acsl_x_7 % 2;
-        if (! (__e_acsl_mod == 0)) { __e_acsl_implies = 1; }
+        if (! (__e_acsl_x_7 % 2 == 0)) { __e_acsl_implies = 1; }
         else {
           int __e_acsl_exists_2;
           int __e_acsl_y_2;
           __e_acsl_exists_2 = 0;
           __e_acsl_y_2 = 0;
           while (1) {
-            {
-              int __e_acsl_div;
-              /*@ assert E_ACSL: 2 ≢ 0; */
-              e_acsl_assert(! (2 == 0),(char *)"Assertion",(char *)"2 == 0",
-                            28);
-              __e_acsl_div = __e_acsl_x_7 / 2;
-              if (__e_acsl_y_2 <= __e_acsl_div) { ; } else { break; }
-            }
-            
+            if (__e_acsl_y_2 <= __e_acsl_x_7 / 2) { ; }
+            else { break; }
             if (! (__e_acsl_x_7 == 2 * __e_acsl_y_2)) { ; }
             else {
               __e_acsl_exists_2 = 1;

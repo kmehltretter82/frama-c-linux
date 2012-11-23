@@ -33,6 +33,14 @@
 ./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status valid.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- f <- main.
+        Called from tests/e-acsl-runtime/result.i:7.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- f <- main.
+        Called from tests/e-acsl-runtime/result.i:7.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
 tests/e-acsl-runtime/result.i:7:[value] Function f: postcondition got status valid.
 [value] Recording results for f
 [value] Done for function f
@@ -134,6 +142,14 @@ int f(int x)
   __e_acsl_at_2 = x;
   __e_acsl_at = x;
   x = 0;
+  e_acsl_assert(-2147483648LL <= (long long)__e_acsl_at - (long long)__e_acsl_at_2,
+                (char *)"Postcondition",
+                (char *)"downcast: -2147483648 <= (long long)__e_acsl_at-(long long)__e_acsl_at_2",
+                7);
+  e_acsl_assert((long long)__e_acsl_at - (long long)__e_acsl_at_2 <= 2147483647LL,
+                (char *)"Postcondition",
+                (char *)"downcast: (long long)__e_acsl_at-(long long)__e_acsl_at_2 <= 2147483647",
+                7);
   e_acsl_assert(x == (int)((long long)__e_acsl_at - (long long)__e_acsl_at_2),
                 (char *)"Postcondition",
                 (char *)"\\result == (int)(\\old(x)-\\old(x))",7);

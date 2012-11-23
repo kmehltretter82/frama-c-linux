@@ -10,6 +10,9 @@ tests/e-acsl-runtime/bts1307.i:19:[e-acsl] warning: approximating type `real' by
 :0:[e-acsl] warning: missing guard for ensuring that \old(Mtmax_in) is a valid memory access
 :0:[e-acsl] warning: missing guard for ensuring that \old(Mwmax) is a valid memory access
 tests/e-acsl-runtime/bts1307.i:19:[e-acsl] approximating a real number by a float
+tests/e-acsl-runtime/bts1307.i:19:[e-acsl] warning: E-ACSL construct `\valid_read' is not yet supported. Ignoring annotation.
+tests/e-acsl-runtime/bts1307.i:19:[e-acsl] warning: E-ACSL construct `\valid_read' is not yet supported. Ignoring annotation.
+tests/e-acsl-runtime/bts1307.i:19:[e-acsl] warning: E-ACSL construct `\valid_read' is not yet supported. Ignoring annotation.
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed
@@ -119,12 +122,6 @@ FRAMAC_SHARE/libc/stdlib.h:180:[value] Function exit: postcondition got status i
         Called from tests/e-acsl-runtime/bts1307.i:16.
 [value] using specification for function _initialize
 [value] Done for function _initialize
-tests/e-acsl-runtime/bts1307.i:13:[value] Assertion got status valid.
-[value] computing for function e_acsl_assert <- foo <- main.
-        Called from tests/e-acsl-runtime/bts1307.i:13.
-./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status valid.
-[value] Recording results for e_acsl_assert
-[value] Done for function e_acsl_assert
 tests/e-acsl-runtime/bts1307.i:13:[value] warning: converting value to float: assert(Ook)
 [value] computing for function e_acsl_assert <- foo <- main.
         Called from tests/e-acsl-runtime/bts1307.i:13.
@@ -312,21 +309,14 @@ void foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
                                                                    5 / 80) * *Mwmax) * 0.4));
   }
   
-  {
-    int __e_acsl_div;
-    /*@ assert E_ACSL: 80 ≢ 0; */
-    e_acsl_assert(! (80 == 0),(char *)"Postcondition",(char *)"80 == 0",13);
-    __e_acsl_div = 5 / 80;
-    e_acsl_assert(*__e_acsl_at == *__e_acsl_at_2 + (5 - (__e_acsl_div * *__e_acsl_at_3) * 0.4),
-                  (char *)"Postcondition",
-                  (char *)"*\\old(Mtmax_out) == *\\old(Mtmax_in)+(5-((5/80)**\\old(Mwmax))*0.4)",
-                  13);
-    _delete_block((void *)(& Mtmax_in));
-    _delete_block((void *)(& Mwmax));
-    _delete_block((void *)(& Mtmax_out));
-    return;
-  }
-  
+  e_acsl_assert(*__e_acsl_at == *__e_acsl_at_2 + (5 - ((5 / 80) * *__e_acsl_at_3) * 0.4),
+                (char *)"Postcondition",
+                (char *)"*\\old(Mtmax_out) == *\\old(Mtmax_in)+(5-((5/80)**\\old(Mwmax))*0.4)",
+                13);
+  _delete_block((void *)(& Mtmax_in));
+  _delete_block((void *)(& Mwmax));
+  _delete_block((void *)(& Mtmax_out));
+  return;
 }
 
 int main(void)

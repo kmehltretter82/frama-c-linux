@@ -76,56 +76,16 @@ int main(void)
   e_acsl_assert((long long)x * (long long)3 == (long long)(-9),
                 (char *)"Assertion",(char *)"x*3 == -9",18);
   /*@ assert x/3 ≡ -1; */
-  {
-    int __e_acsl_div;
-    /*@ assert E_ACSL: 3 ≢ 0; */
-    e_acsl_assert(! (3 == 0),(char *)"Assertion",(char *)"3 == 0",19);
-    __e_acsl_div = x / 3;
-    e_acsl_assert(__e_acsl_div == -1,(char *)"Assertion",(char *)"x/3 == -1",
-                  19);
-  }
-  
+  e_acsl_assert(x / 3 == -1,(char *)"Assertion",(char *)"x/3 == -1",19);
   /*@ assert 0xfffffffffff/0xfffffffffff ≡ 1; */
-  {
-    int __e_acsl_div_2;
-    /*@ assert E_ACSL: 0xfffffffffff ≢ 0; */
-    e_acsl_assert(! (0xfffffffffff == 0),(char *)"Assertion",
-                  (char *)"0xfffffffffff == 0",20);
-    __e_acsl_div_2 = 0xfffffffffff / 0xfffffffffff;
-    e_acsl_assert(__e_acsl_div_2 == 1,(char *)"Assertion",
-                  (char *)"0xfffffffffff/0xfffffffffff == 1",20);
-  }
-  
+  e_acsl_assert(0xfffffffffff / 0xfffffffffff == 1,(char *)"Assertion",
+                (char *)"0xfffffffffff/0xfffffffffff == 1",20);
   /*@ assert x%2 ≡ -1; */
-  {
-    int __e_acsl_mod;
-    /*@ assert E_ACSL: 2 ≢ 0; */
-    e_acsl_assert(! (2 == 0),(char *)"Assertion",(char *)"2 == 0",21);
-    __e_acsl_mod = x % 2;
-    e_acsl_assert(__e_acsl_mod == -1,(char *)"Assertion",(char *)"x%2 == -1",
-                  21);
-  }
-  
+  e_acsl_assert(x % 2 == -1,(char *)"Assertion",(char *)"x%2 == -1",21);
   /*@ assert -3%-2 ≡ -1; */
-  {
-    int __e_acsl_mod_2;
-    /*@ assert E_ACSL: -2 ≢ 0; */
-    e_acsl_assert(! (-2 == 0),(char *)"Assertion",(char *)"-2 == 0",22);
-    __e_acsl_mod_2 = -3 % -2;
-    e_acsl_assert(__e_acsl_mod_2 == -1,(char *)"Assertion",
-                  (char *)"-3%-2 == -1",22);
-  }
-  
+  e_acsl_assert(-3 % -2 == -1,(char *)"Assertion",(char *)"-3%-2 == -1",22);
   /*@ assert 3%-2 ≡ 1; */
-  {
-    int __e_acsl_mod_3;
-    /*@ assert E_ACSL: -2 ≢ 0; */
-    e_acsl_assert(! (-2 == 0),(char *)"Assertion",(char *)"-2 == 0",23);
-    __e_acsl_mod_3 = 3 % -2;
-    e_acsl_assert(__e_acsl_mod_3 == 1,(char *)"Assertion",
-                  (char *)"3%-2 == 1",23);
-  }
-  
+  e_acsl_assert(3 % -2 == 1,(char *)"Assertion",(char *)"3%-2 == 1",23);
   /*@ assert ((x*2+(3+y))-4)+(x-y) ≡ -10; */
   e_acsl_assert((((long long)x * (long long)2 + ((long long)3 + (long long)y)) - (long long)4) + (
                 (long long)x - (long long)y) == (long long)(-10),
@@ -146,6 +106,10 @@ int main(void)
   /*@ assert (0≢0) ≡ !(1≢0); */
   e_acsl_assert((0 != 0) == ! (1 != 0),(char *)"Assertion",
                 (char *)"(0!=0) == !(1!=0)",32);
+  /*@ assert 4/y ≡ 2; */
+  e_acsl_assert(y != 0,(char *)"Assertion",
+                (char *)"division_by_zero: y != 0",33);
+  e_acsl_assert(4 / y == 2,(char *)"Assertion",(char *)"4/y == 2",33);
   __retres = 0;
   __clean();
   return (__retres);

@@ -61,6 +61,14 @@ int f(int x)
   __e_acsl_at_2 = x;
   __e_acsl_at = x;
   x = 0;
+  e_acsl_assert(-2147483648LL <= (long long)__e_acsl_at - (long long)__e_acsl_at_2,
+                (char *)"Postcondition",
+                (char *)"downcast: -2147483648 <= (long long)__e_acsl_at-(long long)__e_acsl_at_2",
+                7);
+  e_acsl_assert((long long)__e_acsl_at - (long long)__e_acsl_at_2 <= 2147483647LL,
+                (char *)"Postcondition",
+                (char *)"downcast: (long long)__e_acsl_at-(long long)__e_acsl_at_2 <= 2147483647",
+                7);
   e_acsl_assert(x == (int)((long long)__e_acsl_at - (long long)__e_acsl_at_2),
                 (char *)"Postcondition",
                 (char *)"\\result == (int)(\\old(x)-\\old(x))",7);

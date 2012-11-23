@@ -79,6 +79,16 @@ int search(int elt)
     while (1) {
       if (__e_acsl_i < 9) { ; }
       else { break; }
+      e_acsl_assert((int)((long long)__e_acsl_i + (long long)1) < 10,
+                    (char *)"Precondition",
+                    (char *)"index_bound: (int)(__e_acsl_i+1) < 10",9);
+      e_acsl_assert(0 <= (int)((long long)__e_acsl_i + (long long)1),
+                    (char *)"Precondition",
+                    (char *)"index_bound: 0 <= (int)(__e_acsl_i+1)",9);
+      e_acsl_assert(__e_acsl_i < 10,(char *)"Precondition",
+                    (char *)"index_bound: __e_acsl_i < 10",9);
+      e_acsl_assert(0 <= __e_acsl_i,(char *)"Precondition",
+                    (char *)"index_bound: 0 <= __e_acsl_i",9);
       if (A[__e_acsl_i] <= A[__e_acsl_i + 1]) { ; }
       else {
         __e_acsl_forall = 0;
@@ -97,6 +107,10 @@ int search(int elt)
       while (1) {
         if (__e_acsl_j_2 < 10) { ; }
         else { break; }
+        e_acsl_assert(__e_acsl_j_2 < 10,(char *)"Postcondition",
+                      (char *)"index_bound: __e_acsl_j_2 < 10",14);
+        e_acsl_assert(0 <= __e_acsl_j_2,(char *)"Postcondition",
+                      (char *)"index_bound: 0 <= __e_acsl_j_2",14);
         if (A[__e_acsl_j_2] != elt) { ; }
         else {
           __e_acsl_forall_2 = 0;
@@ -115,6 +129,10 @@ int search(int elt)
       while (1) {
         if (__e_acsl_j < 10) { ; }
         else { break; }
+        e_acsl_assert(__e_acsl_j < 10,(char *)"Postcondition",
+                      (char *)"index_bound: __e_acsl_j < 10",11);
+        e_acsl_assert(0 <= __e_acsl_j,(char *)"Postcondition",
+                      (char *)"index_bound: 0 <= __e_acsl_j",11);
         if (! (A[__e_acsl_j] == elt)) { ; }
         else {
           __e_acsl_exists = 1;

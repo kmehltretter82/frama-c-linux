@@ -6,8 +6,10 @@
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
 tests/e-acsl-runtime/literal_string.i:13:[e-acsl] warning: missing guard for ensuring that T+G is a valid pointer
 tests/e-acsl-runtime/literal_string.i:13:[e-acsl] warning: missing guard for ensuring that T+G is a valid memory access
+tests/e-acsl-runtime/literal_string.i:29:[e-acsl] warning: E-ACSL construct `\valid_read' is not yet supported. Ignoring annotation.
 tests/e-acsl-runtime/literal_string.i:24:[e-acsl] warning: missing guard for ensuring that S+G2 is a valid pointer
 tests/e-acsl-runtime/literal_string.i:24:[e-acsl] warning: missing guard for ensuring that S+G2 is a valid memory access
+tests/e-acsl-runtime/literal_string.i:29:[e-acsl] warning: E-ACSL construct `\valid_read' is not yet supported. Ignoring annotation.
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed

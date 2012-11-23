@@ -71,24 +71,27 @@ int main(void)
   /*@ assert t[2] ≡ 4; */
   e_acsl_assert(t[2] == 4,(char *)"Assertion",(char *)"t[2] == 4",15);
   /*@ assert t[(2*sizeof(int))/sizeof((int)0x0)] ≡ 4; */
-  {
-    int __e_acsl_div;
-    /*@ assert E_ACSL: sizeof((int)0x0) ≢ 0; */
-    e_acsl_assert(! (4 == 0),(char *)"Assertion",
-                  (char *)"sizeof((int)0x0) == 0",16);
-    __e_acsl_div = (2 * 4) / 4;
-    e_acsl_assert(t[__e_acsl_div] == 4,(char *)"Assertion",
-                  (char *)"t[(2*sizeof(int))/sizeof((int)0x0)] == 4",16);
-  }
-  
+  e_acsl_assert(t[(2 * 4) / 4] == 4,(char *)"Assertion",
+                (char *)"t[(2*sizeof(int))/sizeof((int)0x0)] == 4",16);
   {
     int i;
     i = 0;
     while (i < 2) {
       /*@ assert t[i] ≡ i+2; */
+      e_acsl_assert(i < 3,(char *)"Assertion",(char *)"index_bound: i < 3",
+                    19);
+      e_acsl_assert(0 <= i,(char *)"Assertion",(char *)"index_bound: 0 <= i",
+                    19);
       e_acsl_assert((long long)t[i] == (long long)i + (long long)2,
                     (char *)"Assertion",(char *)"t[i] == i+2",19);
       /*@ assert t[2-i] ≡ 4-i; */
+      e_acsl_assert((long long)2 - (long long)i < (long long)3,
+                    (char *)"Assertion",
+                    (char *)"index_bound: (long long)((long long)2-(long long)i) < 3",
+                    20);
+      e_acsl_assert(0LL <= (long long)2 - (long long)i,(char *)"Assertion",
+                    (char *)"index_bound: 0 <= (long long)((long long)2-(long long)i)",
+                    20);
       e_acsl_assert((long long)t[(long long)2 - (long long)i] == (long long)4 - (long long)i,
                     (char *)"Assertion",(char *)"t[2-i] == 4-i",20);
       /*@ assert *(&t[2]-i) ≡ 4-i; */

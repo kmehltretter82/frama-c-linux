@@ -30,6 +30,7 @@ int main(void) {
   /*@ assert (0 != 1) == !(0 != 0); */ ;
 
   /*@ assert 0 == !1; */ ;
+  /*@ assert 4 / y == 2; */ /* non trivial division */
 
   return 0;
 }

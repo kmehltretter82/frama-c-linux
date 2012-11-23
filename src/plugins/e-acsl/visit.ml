@@ -165,7 +165,11 @@ class e_acsl_visitor prj generate = object (self)
        that the visitor internals reset all of them :-(. *)
     let cur = Project.current () in
     let selection = 
-      State_selection.of_list [ Options.Gmp_only.self; Options.Check.self ] 
+      State_selection.of_list 
+	[ Options.Gmp_only.self; Options.Check.self;
+	  Kernel.SignedOverflow.self; Kernel.UnsignedOverflow.self;
+	  Kernel.SignedDowncast.self; Kernel.UnsignedDowncast.self;
+	  Kernel.Machdep.self ] 
     in
     if generate then Project.copy ~selection ~src:cur prj;
     Cil.DoChildrenPost
@@ -389,8 +393,6 @@ you must call function `%s' by yourself"
 	s;
       false
 
-  (* [JS 2012/10/25] Not required for each literal string.  
-     TODO: find a way to generate extra-variables only when required *)
   method private literal_string env e = 
     let env_ref = ref env in
     let o = object
@@ -431,7 +433,7 @@ you must call function `%s' by yourself"
 	(* JS: should be done in the new project? *)
 	let env = allocate_function env kf in
 	(* translate the precondition of the function *)
-	Project.on prj (Translate.translate_pre_spec env) !funspec
+	Project.on prj (Translate.translate_pre_spec kf env) !funspec
       else
 	env
     in
@@ -444,7 +446,7 @@ you must call function `%s' by yourself"
 	    Cil.visitCilCodeAnnotation (self :> Cil.cilVisitor) old_a
 	  in
 	  let env = 
-	    Project.on prj (Translate.translate_pre_code_annotation env) a 
+	    Project.on prj (Translate.translate_pre_code_annotation kf env) a 
 	  in
 	  env, a :: new_annots)
 	(Cil.get_original_stmt self#behavior stmt)
@@ -479,7 +481,7 @@ you must call function `%s' by yourself"
 	Project.on
 	  prj
 	  (List.fold_right
-	     (fun a env -> Translate.translate_post_code_annotation env a)
+	     (fun a env -> Translate.translate_post_code_annotation kf env a)
 	     new_annots)
 	  env
       in
@@ -491,7 +493,7 @@ you must call function `%s' by yourself"
 	  let env = mk_post_env env in
 	  (* also handle the postcondition of the function and clear the env *)
 	  let env = 
-	    Project.on prj (Translate.translate_post_spec env) !funspec 
+	    Project.on prj (Translate.translate_post_spec kf env) !funspec 
 	  in
 	  (* de-allocating memory previously allocating by the kf *)
 	  (* JS: should be done in the new project? *)

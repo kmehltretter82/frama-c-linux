@@ -4,12 +4,8 @@
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel_api.h"
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_bittree.h"
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
-tests/e-acsl-runtime/linear_search.i:9:[e-acsl] warning: missing guard for ensuring that i is a valid array index
-tests/e-acsl-runtime/linear_search.i:9:[e-acsl] warning: missing guard for ensuring that i+1 is a valid array index
 tests/e-acsl-runtime/linear_search.i:27:[e-acsl] warning: E-ACSL construct `loop invariant' is not yet supported. Ignoring annotation.
 tests/e-acsl-runtime/linear_search.i:27:[e-acsl] warning: E-ACSL construct `loop invariant' is not yet supported. Ignoring annotation.
-tests/e-acsl-runtime/linear_search.i:11:[e-acsl] warning: missing guard for ensuring that j is a valid array index
-tests/e-acsl-runtime/linear_search.i:14:[e-acsl] warning: missing guard for ensuring that j is a valid array index
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed
@@ -40,10 +36,203 @@ tests/e-acsl-runtime/linear_search.i:9:[value] Function search: precondition got
 tests/e-acsl-runtime/linear_search.i:9:[value] entering loop for the first time
 [value] computing for function e_acsl_assert <- search <- main.
         Called from tests/e-acsl-runtime/linear_search.i:9.
+./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status valid.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
 ./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status unknown.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 :0:[value] entering loop for the first time
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:14.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:14.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:14.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:14.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:14.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:14.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:14.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:14.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:14.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:14.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:14.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:14.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:11.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:11.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:11.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:11.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:11.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:11.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:11.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:11.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:11.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:11.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:11.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:11.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
 tests/e-acsl-runtime/linear_search.i:19:[value] Loop invariant got status valid.
 tests/e-acsl-runtime/linear_search.i:20:[value] Loop invariant got status unknown.
 tests/e-acsl-runtime/linear_search.i:21:[value] entering loop for the first time
@@ -64,13 +253,204 @@ tests/e-acsl-runtime/linear_search.i:15:[value] Function search, behavior not_ex
 tests/e-acsl-runtime/linear_search.i:33:[value] Assertion got status unknown.
 [value] computing for function e_acsl_assert <- main.
         Called from tests/e-acsl-runtime/linear_search.i:33.
-./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status valid.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function search <- main.
         Called from tests/e-acsl-runtime/linear_search.i:35.
 [value] computing for function e_acsl_assert <- search <- main.
         Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:9.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:14.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:14.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:14.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:14.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:14.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:14.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:14.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:14.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:14.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:14.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:14.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:14.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:11.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:11.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:11.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:11.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:11.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:11.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:11.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:11.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:11.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:11.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:11.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function e_acsl_assert <- search <- main.
+        Called from tests/e-acsl-runtime/linear_search.i:11.
 [value] Recording results for e_acsl_assert
 [value] Done for function e_acsl_assert
 [value] computing for function e_acsl_assert <- search <- main.
@@ -186,6 +566,16 @@ int search(int elt)
     while (1) {
       if (__e_acsl_i < 9) { ; }
       else { break; }
+      e_acsl_assert((int)((long long)__e_acsl_i + (long long)1) < 10,
+                    (char *)"Precondition",
+                    (char *)"index_bound: (int)(__e_acsl_i+1) < 10",9);
+      e_acsl_assert(0 <= (int)((long long)__e_acsl_i + (long long)1),
+                    (char *)"Precondition",
+                    (char *)"index_bound: 0 <= (int)(__e_acsl_i+1)",9);
+      e_acsl_assert(__e_acsl_i < 10,(char *)"Precondition",
+                    (char *)"index_bound: __e_acsl_i < 10",9);
+      e_acsl_assert(0 <= __e_acsl_i,(char *)"Precondition",
+                    (char *)"index_bound: 0 <= __e_acsl_i",9);
       if (A[__e_acsl_i] <= A[__e_acsl_i + 1]) { ; }
       else {
         __e_acsl_forall = 0;
@@ -204,6 +594,10 @@ int search(int elt)
       while (1) {
         if (__e_acsl_j_2 < 10) { ; }
         else { break; }
+        e_acsl_assert(__e_acsl_j_2 < 10,(char *)"Postcondition",
+                      (char *)"index_bound: __e_acsl_j_2 < 10",14);
+        e_acsl_assert(0 <= __e_acsl_j_2,(char *)"Postcondition",
+                      (char *)"index_bound: 0 <= __e_acsl_j_2",14);
         if (A[__e_acsl_j_2] != elt) { ; }
         else {
           __e_acsl_forall_2 = 0;
@@ -222,6 +616,10 @@ int search(int elt)
       while (1) {
         if (__e_acsl_j < 10) { ; }
         else { break; }
+        e_acsl_assert(__e_acsl_j < 10,(char *)"Postcondition",
+                      (char *)"index_bound: __e_acsl_j < 10",11);
+        e_acsl_assert(0 <= __e_acsl_j,(char *)"Postcondition",
+                      (char *)"index_bound: 0 <= __e_acsl_j",11);
         if (! (A[__e_acsl_j] == elt)) { ; }
         else {
           __e_acsl_exists = 1;

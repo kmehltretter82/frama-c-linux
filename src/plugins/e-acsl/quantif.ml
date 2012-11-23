@@ -25,12 +25,16 @@ open Cil
 open Cil_datatype
 
 let named_predicate_to_exp_ref
-    : (Env.t -> predicate named -> exp * Env.t) ref
+    : (kernel_function -> Env.t -> predicate named -> exp * Env.t) ref
     = Extlib.mk_fun "named_predicate_to_exp_ref"
 
 let term_to_exp_ref
     : (Env.t -> typ option -> term -> exp * Env.t) ref
     = Extlib.mk_fun "term_to_exp_ref"
+
+let rte_to_exp_ref
+    : (kernel_function -> Env.t -> exp -> Env.t) ref
+    = Extlib.mk_fun "rte_to_exp_ref"
 
 let compute_quantif_guards quantif bounded_vars hyps = 
   let error msg pp x =
@@ -88,7 +92,7 @@ let () = Typing.compute_quantif_guards_ref := compute_quantif_guards
 module Label_ids = 
   State_builder.Counter(struct let name = "E_ACSL.Label_ids" end)
 
-let convert env loc is_forall p bounded_vars hyps goal =
+let convert kf env loc is_forall p bounded_vars hyps goal =
   (* part depending on the kind of quantifications 
      (either universal or existential) *)
   let init_val, found_val, mk_guard = 
@@ -119,7 +123,8 @@ let convert env loc is_forall p bounded_vars hyps goal =
     | [] -> 
       (* innermost loop body: store the result in [res] and go out according
 	 to evaluation of the goal *)
-      let test, env = named_predicate_to_exp (Env.push env) goal in
+      let test, env = named_predicate_to_exp kf (Env.push env) goal in
+      let env = !rte_to_exp_ref kf env test in
       let then_block = mkBlock [ mkEmptyStmt ~loc () ] in
       let else_block = 
 	(* use a 'goto', not a simple 'break' in order to handle 'forall' with
@@ -240,14 +245,14 @@ let convert env loc is_forall p bounded_vars hyps goal =
   let env = List.fold_left Env.Logic_binding.remove env bounded_vars in
   res, env
 
-let quantif_to_exp env p = 
+let quantif_to_exp kf env p = 
   let loc = p.loc in
   match p.content with
   | Pforall(bounded_vars, { content = Pimplies(hyps, goal) }) -> 
-    convert env loc true p bounded_vars hyps goal
+    convert kf env loc true p bounded_vars hyps goal
   | Pforall _ -> Error.not_yet "unguarded \\forall quantification"
   | Pexists(bounded_vars, { content = Pand(hyps, goal) }) -> 
-    convert env loc false p bounded_vars hyps goal
+    convert kf env loc false p bounded_vars hyps goal
   | Pexists _ -> Error.not_yet "unguarded \\exists quantification"
   | _ -> assert false
 
