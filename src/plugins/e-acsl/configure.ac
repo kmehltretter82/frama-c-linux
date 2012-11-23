@@ -45,6 +45,9 @@ m4_ifndef([FRAMAC_M4_MACROS], [m4_include(FRAMAC_SHARE/configure.ac)])
 check_plugin(e_acsl,PLUGIN_RELATIVE_PATH(plugin_file),
 	     [support for E-ACSL plug-in],yes,yes)
 
+plugin_require(e_acsl,rte_annotation)
+check_plugin_dependencies
+
 # Check Frama-C version
 #######################
 

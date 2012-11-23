@@ -112,8 +112,7 @@ let meet ty1 ty2 = match ty1, ty2 with
   | (Z | Interv _), No_integral _
   | No_integral _, (Z | Interv _) -> raise Cannot_compare
 
-let join ty1 ty2 = 
-  match ty1, ty2 with
+let join ty1 ty2 = match ty1, ty2 with
   | Interv(l1, u1), Interv(l2, u2) -> Interv(BI.min l1 l2, BI.max u1 u2)
   | Interv _, Z | Z, Interv _ | Z, Z -> Z
   | No_integral t1, No_integral t2 when Logic_type.equal t1 t2 -> ty1
