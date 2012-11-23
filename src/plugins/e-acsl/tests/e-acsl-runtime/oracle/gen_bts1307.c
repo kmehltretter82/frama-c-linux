@@ -117,6 +117,73 @@ void foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
   return;
 }
 
+/*@ requires \valid(Mtmin_in);
+    requires \valid(Mwmin);
+    requires \valid(Mtmin_out);
+    behavior UnderEstimate_Motoring:
+      assumes \true;
+      ensures *\old(Mtmin_out)≡*\old(Mtmin_in)∧*\old(Mtmin_in)<0.85**
+                \old(Mwmin)? *\old(Mtmin_in) ≢ 0.: 0.85**\old(Mwmin) ≢ 0.;
+      
+  
+*/
+void bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
+{
+  float *__e_acsl_at_6;
+  float *__e_acsl_at_5;
+  float *__e_acsl_at_4;
+  float *__e_acsl_at_3;
+  float *__e_acsl_at_2;
+  float *__e_acsl_at;
+  {
+    int __e_acsl_valid;
+    int __e_acsl_valid_2;
+    int __e_acsl_valid_3;
+    _store_block((void *)(& Mtmin_in),4U);
+    _full_init((void *)(& Mtmin_in));
+    _store_block((void *)(& Mwmin),4U);
+    _full_init((void *)(& Mwmin));
+    _store_block((void *)(& Mtmin_out),4U);
+    _full_init((void *)(& Mtmin_out));
+    __e_acsl_valid = _valid((void *)Mtmin_in,sizeof(float));
+    e_acsl_assert(__e_acsl_valid,(char *)"Precondition",
+                  (char *)"\\valid(Mtmin_in)",19);
+    __e_acsl_valid_2 = _valid((void *)Mwmin,sizeof(float));
+    e_acsl_assert(__e_acsl_valid_2,(char *)"Precondition",
+                  (char *)"\\valid(Mwmin)",20);
+    __e_acsl_valid_3 = _valid((void *)Mtmin_out,sizeof(float));
+    e_acsl_assert(__e_acsl_valid_3,(char *)"Precondition",
+                  (char *)"\\valid(Mtmin_out)",21);
+    _initialize((void *)Mtmin_out,sizeof(float));
+    __e_acsl_at_6 = Mwmin;
+    __e_acsl_at_5 = Mtmin_in;
+    __e_acsl_at_4 = Mwmin;
+    __e_acsl_at_3 = Mtmin_in;
+    __e_acsl_at_2 = Mtmin_in;
+    __e_acsl_at = Mtmin_out;
+    *Mtmin_out = (float)(0.85 * (double)*Mwmin);
+  }
+  
+  {
+    int __e_acsl_and;
+    int __e_acsl_if;
+    if (*__e_acsl_at == *__e_acsl_at_2) {
+      __e_acsl_and = *__e_acsl_at_3 < 0.85 * *__e_acsl_at_4;
+    }
+    else { __e_acsl_and = 0; }
+    if (__e_acsl_and) { __e_acsl_if = *__e_acsl_at_5 != 0.; }
+    else { __e_acsl_if = 0.85 * *__e_acsl_at_6 != 0.; }
+    e_acsl_assert(__e_acsl_if,(char *)"Postcondition",
+                  (char *)"*\\old(Mtmin_out)==*\\old(Mtmin_in)&&*\\old(Mtmin_in)<0.85**\\old(Mwmin)?\n  *\\old(Mtmin_in) != 0.: 0.85**\\old(Mwmin) != 0.",
+                  25);
+    _delete_block((void *)(& Mtmin_in));
+    _delete_block((void *)(& Mwmin));
+    _delete_block((void *)(& Mtmin_out));
+    return;
+  }
+  
+}
+
 int main(void)
 {
   int __retres;
@@ -131,6 +198,7 @@ int main(void)
   _full_init((void *)(& g));
   g = (float)1.0;
   foo(& f,& g,& h);
+  bar(& f,& g,& h);
   __retres = 0;
   _delete_block((void *)(& h));
   _delete_block((void *)(& g));

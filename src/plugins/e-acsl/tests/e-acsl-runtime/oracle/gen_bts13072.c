@@ -30,6 +30,17 @@ model __mpz_struct { ℤ n };
   
 */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init(__mpz_struct * /*[1]*/ z);
+/*@ requires \valid(z_orig);
+    requires ¬\initialized(z);
+    ensures \valid(\old(z));
+    allocates \old(z);
+    
+    assigns *z;
+    assigns *z \from *z_orig;
+  
+*/
+extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init_set(__mpz_struct * /*[1]*/ z,
+                                                             __mpz_struct const * /*[1]*/ z_orig);
 /*@ requires ¬\initialized(z);
     ensures \valid(\old(z));
     
@@ -183,6 +194,80 @@ void foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
   
 }
 
+/*@ requires \valid(Mtmin_in);
+    requires \valid(Mwmin);
+    requires \valid(Mtmin_out);
+    behavior UnderEstimate_Motoring:
+      assumes \true;
+      ensures *\old(Mtmin_out)≡*\old(Mtmin_in)∧*\old(Mtmin_in)<0.85**
+                \old(Mwmin)? *\old(Mtmin_in) ≢ 0.: 0.85**\old(Mwmin) ≢ 0.;
+      
+  
+*/
+void bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
+{
+  float *__e_acsl_at_6;
+  float *__e_acsl_at_5;
+  float *__e_acsl_at_4;
+  float *__e_acsl_at_3;
+  float *__e_acsl_at_2;
+  float *__e_acsl_at;
+  {
+    int __e_acsl_valid;
+    int __e_acsl_valid_2;
+    int __e_acsl_valid_3;
+    _store_block((void *)(& Mtmin_in),4U);
+    _full_init((void *)(& Mtmin_in));
+    _store_block((void *)(& Mwmin),4U);
+    _full_init((void *)(& Mwmin));
+    _store_block((void *)(& Mtmin_out),4U);
+    _full_init((void *)(& Mtmin_out));
+    __e_acsl_valid = _valid((void *)Mtmin_in,sizeof(float));
+    e_acsl_assert(__e_acsl_valid,(char *)"Precondition",
+                  (char *)"\\valid(Mtmin_in)",19);
+    __e_acsl_valid_2 = _valid((void *)Mwmin,sizeof(float));
+    e_acsl_assert(__e_acsl_valid_2,(char *)"Precondition",
+                  (char *)"\\valid(Mwmin)",20);
+    __e_acsl_valid_3 = _valid((void *)Mtmin_out,sizeof(float));
+    e_acsl_assert(__e_acsl_valid_3,(char *)"Precondition",
+                  (char *)"\\valid(Mtmin_out)",21);
+    _initialize((void *)Mtmin_out,sizeof(float));
+    __e_acsl_at_6 = Mwmin;
+    __e_acsl_at_5 = Mtmin_in;
+    __e_acsl_at_4 = Mwmin;
+    __e_acsl_at_3 = Mtmin_in;
+    __e_acsl_at_2 = Mtmin_in;
+    __e_acsl_at = Mtmin_out;
+    *Mtmin_out = (float)(0.85 * (double)*Mwmin);
+  }
+  
+  {
+    mpz_t __e_acsl_and;
+    unsigned long __e_acsl_2;
+    int __e_acsl_if;
+    if (*__e_acsl_at == *__e_acsl_at_2) {
+      mpz_t __e_acsl;
+      __gmpz_init_set_si(__e_acsl,
+                         (long)(*__e_acsl_at_3 < 0.85 * *__e_acsl_at_4));
+      __gmpz_init_set(__e_acsl_and,(__mpz_struct const *)(__e_acsl));
+      __gmpz_clear(__e_acsl);
+    }
+    else { __gmpz_init_set_si(__e_acsl_and,0L); }
+    __e_acsl_2 = __gmpz_get_ui((__mpz_struct const *)(__e_acsl_and));
+    if (__e_acsl_2) { __e_acsl_if = *__e_acsl_at_5 != 0.; }
+    else { __e_acsl_if = 0.85 * *__e_acsl_at_6 != 0.; }
+    e_acsl_assert(__e_acsl_if,(char *)"Postcondition",
+                  (char *)"*\\old(Mtmin_out)==*\\old(Mtmin_in)&&*\\old(Mtmin_in)<0.85**\\old(Mwmin)?\n  *\\old(Mtmin_in) != 0.: 0.85**\\old(Mwmin) != 0.",
+                  25);
+    _delete_block((void *)(& Mtmin_in));
+    _delete_block((void *)(& Mwmin));
+    _delete_block((void *)(& Mtmin_out));
+    __gmpz_clear(__e_acsl_and);
+    return;
+  }
+  
+}
+
 int main(void)
 {
   int __retres;
@@ -197,6 +282,7 @@ int main(void)
   _full_init((void *)(& g));
   g = (float)1.0;
   foo(& f,& g,& h);
+  bar(& f,& g,& h);
   __retres = 0;
   _delete_block((void *)(& h));
   _delete_block((void *)(& g));

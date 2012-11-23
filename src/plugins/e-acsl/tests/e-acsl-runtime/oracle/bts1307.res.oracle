@@ -5,14 +5,17 @@
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_bittree.h"
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
 tests/e-acsl-runtime/bts1307.i:16:[kernel] warning: Floating-point constant 0.4 is not represented exactly. Will use 0x1.999999999999ap-2. See documentation for option -warn-decimal-float
-tests/e-acsl-runtime/bts1307.i:19:[e-acsl] warning: approximating type `real' by `long double'
+tests/e-acsl-runtime/bts1307.i:31:[e-acsl] warning: approximating type `real' by `long double'
 :0:[e-acsl] warning: missing guard for ensuring that \old(Mtmax_out) is a valid memory access
 :0:[e-acsl] warning: missing guard for ensuring that \old(Mtmax_in) is a valid memory access
 :0:[e-acsl] warning: missing guard for ensuring that \old(Mwmax) is a valid memory access
-tests/e-acsl-runtime/bts1307.i:19:[e-acsl] approximating a real number by a float
-tests/e-acsl-runtime/bts1307.i:19:[e-acsl] warning: E-ACSL construct `\valid_read' is not yet supported. Ignoring annotation.
-tests/e-acsl-runtime/bts1307.i:19:[e-acsl] warning: E-ACSL construct `\valid_read' is not yet supported. Ignoring annotation.
-tests/e-acsl-runtime/bts1307.i:19:[e-acsl] warning: E-ACSL construct `\valid_read' is not yet supported. Ignoring annotation.
+tests/e-acsl-runtime/bts1307.i:31:[e-acsl] approximating a real number by a float
+tests/e-acsl-runtime/bts1307.i:31:[e-acsl] warning: E-ACSL construct `\valid_read' is not yet supported. Ignoring annotation.
+tests/e-acsl-runtime/bts1307.i:31:[e-acsl] warning: E-ACSL construct `\valid_read' is not yet supported. Ignoring annotation.
+tests/e-acsl-runtime/bts1307.i:31:[e-acsl] warning: E-ACSL construct `\valid_read' is not yet supported. Ignoring annotation.
+:0:[e-acsl] warning: missing guard for ensuring that \old(Mtmin_out) is a valid memory access
+:0:[e-acsl] warning: missing guard for ensuring that \old(Mtmin_in) is a valid memory access
+:0:[e-acsl] warning: missing guard for ensuring that \old(Mwmin) is a valid memory access
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed
@@ -35,24 +38,24 @@ tests/e-acsl-runtime/bts1307.i:19:[e-acsl] warning: E-ACSL construct `\valid_rea
         S___fc_stdio_buffer_0_S___fc_stdout[0..1] ∈ [--..--]
         S___fc_stdio_buffer_1_S___fc_stdout[0..1] ∈ [--..--]
 [value] computing for function _store_block <- main.
-        Called from tests/e-acsl-runtime/bts1307.i:20.
+        Called from tests/e-acsl-runtime/bts1307.i:32.
 [value] using specification for function _store_block
 [value] Done for function _store_block
 [value] computing for function _store_block <- main.
-        Called from tests/e-acsl-runtime/bts1307.i:20.
+        Called from tests/e-acsl-runtime/bts1307.i:32.
 [value] Done for function _store_block
 [value] computing for function _store_block <- main.
-        Called from tests/e-acsl-runtime/bts1307.i:20.
+        Called from tests/e-acsl-runtime/bts1307.i:32.
 [value] Done for function _store_block
 [value] computing for function _full_init <- main.
-        Called from tests/e-acsl-runtime/bts1307.i:20.
+        Called from tests/e-acsl-runtime/bts1307.i:32.
 [value] using specification for function _full_init
 [value] Done for function _full_init
 [value] computing for function _full_init <- main.
-        Called from tests/e-acsl-runtime/bts1307.i:20.
+        Called from tests/e-acsl-runtime/bts1307.i:32.
 [value] Done for function _full_init
 [value] computing for function foo <- main.
-        Called from tests/e-acsl-runtime/bts1307.i:21.
+        Called from tests/e-acsl-runtime/bts1307.i:33.
 tests/e-acsl-runtime/bts1307.i:7:[value] Function foo: precondition got status valid.
 tests/e-acsl-runtime/bts1307.i:8:[value] Function foo: precondition got status valid.
 tests/e-acsl-runtime/bts1307.i:9:[value] Function foo: precondition got status valid.
@@ -141,17 +144,99 @@ tests/e-acsl-runtime/bts1307.i:17:[value] warning: converting value to float: as
 tests/e-acsl-runtime/bts1307.i:13:[value] Function foo, behavior OverEstimate_Motoring: postcondition got status unknown.
 [value] Recording results for foo
 [value] Done for function foo
-[value] computing for function _delete_block <- main.
+[value] computing for function bar <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:34.
+tests/e-acsl-runtime/bts1307.i:19:[value] Function bar: precondition got status valid.
+tests/e-acsl-runtime/bts1307.i:20:[value] Function bar: precondition got status valid.
+tests/e-acsl-runtime/bts1307.i:21:[value] Function bar: precondition got status valid.
+[value] computing for function _store_block <- bar <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:27.
+[value] Done for function _store_block
+[value] computing for function _full_init <- bar <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:27.
+[value] Done for function _full_init
+[value] computing for function _store_block <- bar <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:27.
+[value] Done for function _store_block
+[value] computing for function _full_init <- bar <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:27.
+[value] Done for function _full_init
+[value] computing for function _store_block <- bar <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:27.
+[value] Done for function _store_block
+[value] computing for function _full_init <- bar <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:27.
+[value] Done for function _full_init
+[value] computing for function _valid <- bar <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:19.
+[value] Done for function _valid
+[value] computing for function e_acsl_assert <- bar <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:19.
+[value] computing for function printf <- e_acsl_assert <- bar <- main.
+        Called from ./share/e-acsl/e_acsl.h:41.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- bar <- main.
+        Called from ./share/e-acsl/e_acsl.h:43.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function _valid <- bar <- main.
         Called from tests/e-acsl-runtime/bts1307.i:20.
+[value] Done for function _valid
+[value] computing for function e_acsl_assert <- bar <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:20.
+[value] computing for function printf <- e_acsl_assert <- bar <- main.
+        Called from ./share/e-acsl/e_acsl.h:41.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- bar <- main.
+        Called from ./share/e-acsl/e_acsl.h:43.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function _valid <- bar <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:21.
+[value] Done for function _valid
+[value] computing for function e_acsl_assert <- bar <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:21.
+[value] computing for function printf <- e_acsl_assert <- bar <- main.
+        Called from ./share/e-acsl/e_acsl.h:41.
+[value] Done for function printf
+[value] computing for function exit <- e_acsl_assert <- bar <- main.
+        Called from ./share/e-acsl/e_acsl.h:43.
+[value] Done for function exit
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function _initialize <- bar <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:28.
+[value] Done for function _initialize
+[value] computing for function e_acsl_assert <- bar <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:25.
+./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status valid.
+[value] Recording results for e_acsl_assert
+[value] Done for function e_acsl_assert
+[value] computing for function _delete_block <- bar <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:27.
+[value] Done for function _delete_block
+[value] computing for function _delete_block <- bar <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:27.
+[value] Done for function _delete_block
+[value] computing for function _delete_block <- bar <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:27.
+[value] Done for function _delete_block
+tests/e-acsl-runtime/bts1307.i:25:[value] Function bar, behavior UnderEstimate_Motoring: postcondition got status unknown.
+[value] Recording results for bar
+[value] Done for function bar
+[value] computing for function _delete_block <- main.
+        Called from tests/e-acsl-runtime/bts1307.i:32.
 [value] Done for function _delete_block
 [value] computing for function _delete_block <- main.
-        Called from tests/e-acsl-runtime/bts1307.i:20.
+        Called from tests/e-acsl-runtime/bts1307.i:32.
 [value] Done for function _delete_block
 [value] computing for function _delete_block <- main.
-        Called from tests/e-acsl-runtime/bts1307.i:20.
+        Called from tests/e-acsl-runtime/bts1307.i:32.
 [value] Done for function _delete_block
 [value] computing for function __clean <- main.
-        Called from tests/e-acsl-runtime/bts1307.i:22.
+        Called from tests/e-acsl-runtime/bts1307.i:35.
 [value] using specification for function __clean
 [kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
 [value] Done for function __clean
@@ -159,6 +244,19 @@ tests/e-acsl-runtime/bts1307.i:13:[value] Function foo, behavior OverEstimate_Mo
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function e_acsl_assert:
+          S___fc_stdout[0].__fc_stdio_fpos ∈ [--..--]
+                       [0].__fc_stdio_buffer ∈
+                       {{ NULL ; &S___fc_stdio_buffer_0_S___fc_stdout }}
+                       [0]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
+                       [0].[bits 80 to 95] ∈ UNINITIALIZED
+                       {[0].__fc_stdio_id; [1].__fc_stdio_fpos; } ∈ [--..--]
+                       [1].__fc_stdio_buffer ∈
+                       {{ NULL ; &S___fc_stdio_buffer_1_S___fc_stdout }}
+                       [1]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
+                       [1].[bits 80 to 95] ∈ UNINITIALIZED
+                       [1].__fc_stdio_id ∈ [--..--]
+[value] Values at end of function bar:
+          h ∈ 0.850000023842
           S___fc_stdout[0].__fc_stdio_fpos ∈ [--..--]
                        [0].__fc_stdio_buffer ∈
                        {{ NULL ; &S___fc_stdio_buffer_0_S___fc_stdout }}
@@ -186,7 +284,7 @@ tests/e-acsl-runtime/bts1307.i:13:[value] Function foo, behavior OverEstimate_Mo
 [value] Values at end of function main:
           f ∈ 1.
           g ∈ 1.
-          h ∈ 6.
+          h ∈ 0.850000023842
           __retres ∈ {0}
           S___fc_stdout[0].__fc_stdio_fpos ∈ [--..--]
                        [0].__fc_stdio_buffer ∈
@@ -319,6 +417,73 @@ void foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
   return;
 }
 
+/*@ requires \valid(Mtmin_in);
+    requires \valid(Mwmin);
+    requires \valid(Mtmin_out);
+    behavior UnderEstimate_Motoring:
+      assumes \true;
+      ensures *\old(Mtmin_out)≡*\old(Mtmin_in)∧*\old(Mtmin_in)<0.85**
+                \old(Mwmin)? *\old(Mtmin_in) ≢ 0.: 0.85**\old(Mwmin) ≢ 0.;
+      
+  
+*/
+void bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
+{
+  float *__e_acsl_at_6;
+  float *__e_acsl_at_5;
+  float *__e_acsl_at_4;
+  float *__e_acsl_at_3;
+  float *__e_acsl_at_2;
+  float *__e_acsl_at;
+  {
+    int __e_acsl_valid;
+    int __e_acsl_valid_2;
+    int __e_acsl_valid_3;
+    _store_block((void *)(& Mtmin_in),4U);
+    _full_init((void *)(& Mtmin_in));
+    _store_block((void *)(& Mwmin),4U);
+    _full_init((void *)(& Mwmin));
+    _store_block((void *)(& Mtmin_out),4U);
+    _full_init((void *)(& Mtmin_out));
+    __e_acsl_valid = _valid((void *)Mtmin_in,sizeof(float));
+    e_acsl_assert(__e_acsl_valid,(char *)"Precondition",
+                  (char *)"\\valid(Mtmin_in)",19);
+    __e_acsl_valid_2 = _valid((void *)Mwmin,sizeof(float));
+    e_acsl_assert(__e_acsl_valid_2,(char *)"Precondition",
+                  (char *)"\\valid(Mwmin)",20);
+    __e_acsl_valid_3 = _valid((void *)Mtmin_out,sizeof(float));
+    e_acsl_assert(__e_acsl_valid_3,(char *)"Precondition",
+                  (char *)"\\valid(Mtmin_out)",21);
+    _initialize((void *)Mtmin_out,sizeof(float));
+    __e_acsl_at_6 = Mwmin;
+    __e_acsl_at_5 = Mtmin_in;
+    __e_acsl_at_4 = Mwmin;
+    __e_acsl_at_3 = Mtmin_in;
+    __e_acsl_at_2 = Mtmin_in;
+    __e_acsl_at = Mtmin_out;
+    *Mtmin_out = (float)(0.85 * (double)*Mwmin);
+  }
+  
+  {
+    int __e_acsl_and;
+    int __e_acsl_if;
+    if (*__e_acsl_at == *__e_acsl_at_2) {
+      __e_acsl_and = *__e_acsl_at_3 < 0.85 * *__e_acsl_at_4;
+    }
+    else { __e_acsl_and = 0; }
+    if (__e_acsl_and) { __e_acsl_if = *__e_acsl_at_5 != 0.; }
+    else { __e_acsl_if = 0.85 * *__e_acsl_at_6 != 0.; }
+    e_acsl_assert(__e_acsl_if,(char *)"Postcondition",
+                  (char *)"*\\old(Mtmin_out)==*\\old(Mtmin_in)&&*\\old(Mtmin_in)<0.85**\\old(Mwmin)?\n  *\\old(Mtmin_in) != 0.: 0.85**\\old(Mwmin) != 0.",
+                  25);
+    _delete_block((void *)(& Mtmin_in));
+    _delete_block((void *)(& Mwmin));
+    _delete_block((void *)(& Mtmin_out));
+    return;
+  }
+  
+}
+
 int main(void)
 {
   int __retres;
@@ -333,6 +498,7 @@ int main(void)
   _full_init((void *)(& g));
   g = (float)1.0;
   foo(& f,& g,& h);
+  bar(& f,& g,& h);
   __retres = 0;
   _delete_block((void *)(& h));
   _delete_block((void *)(& g));

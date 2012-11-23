@@ -308,6 +308,7 @@ and context_insensitive_term_to_exp env t =
   | TCastE(ty, t) ->
     let e, env = term_to_exp env (Some ty) t in
     Cil.mkCast e ty, env, false, "cast"
+  | TLogic_coerce _ -> assert false (* handle in [term_to_exp] *)
   | TAddrOf lv -> 
     let lv, env, _ = tlval_to_lval env lv in
     Cil.mkAddrOf ~loc lv, env, false, "addrof"
@@ -357,6 +358,7 @@ and context_insensitive_term_to_exp env t =
    environment. Also extend this environment in order to include the generating
    constructs. *)
 and term_to_exp env ctx t = 
+  let t = match t.term_node with TLogic_coerce(_, t) -> t | _ -> t in
   let e, env, is_mpz_string, name = context_insensitive_term_to_exp env t in
   match ctx with
   | None -> e, env

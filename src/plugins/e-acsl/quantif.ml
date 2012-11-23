@@ -49,24 +49,28 @@ let compute_quantif_guards quantif bounded_vars hyps =
     match p.content with
     | Pand({ content = Prel((Rlt | Rle) as r1, t11, t12) },
 	   { content = Prel((Rlt | Rle) as r2, t21, t22) }) ->
-      (match t12.term_node, t21.term_node with
-      | TLval(TVar x1, TNoOffset), TLval(TVar x2, TNoOffset) -> 
-	let v, vars = match vars with
-	  | [] -> error "@[too much constraint(s)%a@]" (fun _ () -> ()) ()
-	  | v :: tl -> 
-	    match v.lv_type with
-	    | Ctype ty when isIntegralType ty -> v, tl
-	    | Linteger -> v, tl
-	    | Ltype _ as ty when Logic_const.is_boolean_type ty -> v, tl
-	    | Ctype _ | Ltype _ | Lvar _ | Lreal | Larrow _ -> 
-	      error "@[non integer variable %a@]" d_logic_var v
-	in
-	if Logic_var.equal x1 x2 && Logic_var.equal x1 v then
-	  (t11, r1, x1, r2, t22) :: acc, vars
-	else
-	  error "@[invalid binder %a@]" d_term t21
-      | TLval _, _ -> error "@[invalid binder %a@]" d_term t21
-      | _, _ -> error "@[invalid binder %a@]" d_term t12)
+      let rec terms t12 t21 = match t12.term_node, t21.term_node with
+	| TLval(TVar x1, TNoOffset), TLval(TVar x2, TNoOffset) -> 
+	  let v, vars = match vars with
+	    | [] -> error "@[too much constraint(s)%a@]" (fun _ () -> ()) ()
+	    | v :: tl -> 
+	      match v.lv_type with
+	      | Ctype ty when isIntegralType ty -> v, tl
+	      | Linteger -> v, tl
+	      | Ltype _ as ty when Logic_const.is_boolean_type ty -> v, tl
+	      | Ctype _ | Ltype _ | Lvar _ | Lreal | Larrow _ -> 
+		error "@[non integer variable %a@]" d_logic_var v
+	  in
+	  if Logic_var.equal x1 x2 && Logic_var.equal x1 v then
+	    (t11, r1, x1, r2, t22) :: acc, vars
+	  else
+	    error "@[invalid binder %a@]" d_term t21
+	| TLogic_coerce(_, t12), _ -> terms t12 t21 
+	| _, TLogic_coerce(_, t21) -> terms t12 t21
+	| TLval _, _ -> error "@[invalid binder %a@]" d_term t21
+	| _, _ -> error "@[invalid binder %a@]" d_term t12
+      in
+      terms t12 t21
     | Pand(p1, p2) -> 
       let acc, vars = aux acc vars p1 in
       aux acc vars p2

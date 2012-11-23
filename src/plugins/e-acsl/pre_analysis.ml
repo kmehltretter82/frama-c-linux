@@ -163,6 +163,7 @@ module rec Transfer
     | Tbase_addr _ -> Error.not_yet "\\base_addr"
     | Toffset _ -> Error.not_yet "\\offset"
     | Tblock_length _ -> Error.not_yet "\\block_length"
+    | TLogic_coerce(_, t) -> register_term kf varinfos t
     | TCoerce _ -> Error.not_yet "coerce"
     | TCoerceE _ -> Error.not_yet "coerce expression"
     | TUpdate _ -> Error.not_yet "functional update"
@@ -212,7 +213,7 @@ module rec Transfer
       | TSizeOfE _ | TAlignOfE _ | TUnOp _ | TBinOp _ | TCastE _ | TAddrOf _
       | TStartOf _ | Tapp _ | Tlambda _ | TDataCons _ | Tif _ | Tat _
       | TCoerce _ | TCoerceE _ | TUpdate _ | Ttypeof _ | Tunion _ | Tinter _
-      | Tcomprehension _ | Trange _ | Tlet _ -> 
+      | Tcomprehension _ | Trange _ | Tlet _ | TLogic_coerce _ -> 
 	(* potential sub-term inside *)
 	Cil.DoChildren
       method vlogic_label _ = Cil.SkipChildren

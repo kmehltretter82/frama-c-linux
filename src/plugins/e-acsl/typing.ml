@@ -112,10 +112,13 @@ let meet ty1 ty2 = match ty1, ty2 with
   | (Z | Interv _), No_integral _
   | No_integral _, (Z | Interv _) -> raise Cannot_compare
 
-let join ty1 ty2 = match ty1, ty2 with
+let join ty1 ty2 = 
+  match ty1, ty2 with
   | Interv(l1, u1), Interv(l2, u2) -> Interv(BI.min l1 l2, BI.max u1 u2)
   | Interv _, Z | Z, Interv _ | Z, Z -> Z
   | No_integral t1, No_integral t2 when Logic_type.equal t1 t2 -> ty1
+  | No_integral t, ty | ty, No_integral t when Cil.isLogicRealType t -> ty
+  | No_integral t, _ when Cil.isLogicFloatType t -> ty1
   | No_integral _, No_integral _
   | (Z | Interv _), No_integral _
   | No_integral _, (Z | Interv _) -> raise Cannot_compare
@@ -282,6 +285,7 @@ let rec type_term t =
       ignore (type_term t);
       eacsl_typ_of_typ Cil.theMachine.Cil.typeOfSizeOf
     | Tnull -> int_to_interv 0
+    | TLogic_coerce(_, t) -> type_term t
     | TCoerce(t, ty) -> 
       (* Jessie specific *)
       ignore (type_term t);
