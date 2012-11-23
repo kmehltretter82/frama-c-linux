@@ -149,8 +149,7 @@ let funspec = ref dft_funspec
 class e_acsl_visitor prj generate = object (self)
 
   inherit Visitor.generic_frama_c_visitor 
-    prj 
-    ((if generate then Cil.copy_visit else Cil.inplace_visit) ())
+    (if generate then Cil.copy_visit prj else Cil.inplace_visit ())
 
   val mutable main_fct = None
   val mutable keep_initializer = None
@@ -395,8 +394,7 @@ you must call function `%s' by yourself"
   method private literal_string env e = 
     let env_ref = ref env in
     let o = object
-      inherit Cil.genericCilVisitor 
-	~prj:(Project.current ()) (Cil.copy_visit ())
+      inherit Cil.genericCilVisitor (Cil.copy_visit (Project.current ()))
       method vexpr e = match e.enode with
       | Const(CStr s) ->
 	let _, exp, env = 

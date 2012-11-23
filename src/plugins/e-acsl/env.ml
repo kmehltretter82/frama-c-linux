@@ -85,10 +85,7 @@ let empty_local_env =
     mpz_tbl = empty_mpz_tbl }
 
 let dummy = 
-  { visitor = 
-      new Visitor.generic_frama_c_visitor 
-	Project_skeleton.dummy
-	(Cil.inplace_visit ()); 
+  { visitor = new Visitor.generic_frama_c_visitor (Cil.inplace_visit ()); 
     annotation_kind = Misc.Assertion;
     new_global_vars = [];
     global_mpz_tbl = empty_mpz_tbl; 
