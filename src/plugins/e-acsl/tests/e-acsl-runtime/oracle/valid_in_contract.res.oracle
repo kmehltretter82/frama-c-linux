@@ -36,8 +36,8 @@ tests/e-acsl-runtime/valid_in_contract.c:21:[e-acsl] warning: missing guard for 
 [value] computing for function _initialized <- f <- main.
         Called from tests/e-acsl-runtime/valid_in_contract.c:21.
 [value] using specification for function _initialized
-./share/e-acsl/memory_model/e_acsl_mmodel.h:57:[value] Function _initialized: postcondition got status unknown.
-./share/e-acsl/memory_model/e_acsl_mmodel.h:58:[value] Function _initialized: postcondition got status unknown.
+./share/e-acsl/memory_model/e_acsl_mmodel.h:84:[value] Function _initialized: postcondition got status unknown.
+./share/e-acsl/memory_model/e_acsl_mmodel.h:85:[value] Function _initialized: postcondition got status unknown.
 [value] Done for function _initialized
 tests/e-acsl-runtime/valid_in_contract.c:21:[kernel] warning: out of bounds read. assert \valid_read(&l->next);
 tests/e-acsl-runtime/valid_in_contract.c:21:[value] Non-termination in evaluation of function call expression argument

@@ -39,7 +39,7 @@ union msg {
 model __mpz_struct { ℤ n };
 */
 int __fc_random_counter __attribute__((__unused__));
-unsigned long const __fc_rand_max = (unsigned long)2147483647;
+unsigned long const __fc_rand_max = 2147483647UL;
 extern int __fc_heap_status;
 /*@
 axiomatic
@@ -92,7 +92,7 @@ void read_sensor_4(unsigned int *m)
   _store_block((void *)(& m),4U);
   _full_init((void *)(& m));
   _initialize((void *)m,sizeof(unsigned int));
-  *m = (unsigned int)0;
+  *m = 0U;
   _delete_block((void *)(& m));
   return;
 }
@@ -100,11 +100,11 @@ void read_sensor_4(unsigned int *m)
 int main(void)
 {
   int __retres;
-  unsigned char buf[sizeof(union msg)];
+  unsigned char buf[12U];
   int i;
   _store_block((void *)(buf),12U);
   i = 0;
-  while ((unsigned int)i < sizeof(buf) / (unsigned int)4) {
+  while ((unsigned int)i < 3U) {
     read_sensor_4((unsigned int *)(buf) + i);
     i ++;
   }

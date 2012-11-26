@@ -209,7 +209,8 @@ int _initialized (void * ptr, size_t size) {
   assert(ptr != NULL);
   assert(size > 0);
   tmp = _get_cont(ptr);
-  assert(tmp != NULL);
+  if(tmp == NULL)
+    return false;
   
   /* fully uninitialized */
   if(tmp->init_cpt == 0) return false;
@@ -240,7 +241,8 @@ size_t _block_length(void* ptr) {
 /* return whether the size bytes of ptr are readable/writable */
 int _valid(void* ptr, size_t size) {
   struct _block * tmp;
-  assert(ptr != NULL);
+  if(ptr == NULL)
+    return false;
   assert(size > 0);
   tmp = _get_cont(ptr);
   return (tmp == NULL) ?
@@ -252,7 +254,8 @@ int _valid(void* ptr, size_t size) {
 /* return whether the size bytes of ptr are readable */
 int _valid_read(void* ptr, size_t size) {
   struct _block * tmp;
-  assert(ptr != NULL);
+  if(ptr == NULL)
+    return false;
   assert(size > 0);
   tmp = _get_cont(ptr);
   return (tmp == NULL) ?
