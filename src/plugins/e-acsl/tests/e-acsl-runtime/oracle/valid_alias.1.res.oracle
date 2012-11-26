@@ -46,8 +46,8 @@ tests/e-acsl-runtime/valid_alias.c:12:[value] Assertion got status valid.
 [value] computing for function _initialized <- main.
         Called from tests/e-acsl-runtime/valid_alias.c:12.
 [value] using specification for function _initialized
-./share/e-acsl/memory_model/e_acsl_mmodel.h:57:[value] Function _initialized: postcondition got status unknown.
-./share/e-acsl/memory_model/e_acsl_mmodel.h:58:[value] Function _initialized: postcondition got status unknown.
+./share/e-acsl/memory_model/e_acsl_mmodel.h:84:[value] Function _initialized: postcondition got status unknown.
+./share/e-acsl/memory_model/e_acsl_mmodel.h:85:[value] Function _initialized: postcondition got status unknown.
 [value] Done for function _initialized
 tests/e-acsl-runtime/valid_alias.c:12:[kernel] warning: accessing uninitialized left-value: assert \initialized(&a);
 tests/e-acsl-runtime/valid_alias.c:12:[kernel] warning: completely indeterminate value in a.
@@ -78,7 +78,7 @@ tests/e-acsl-runtime/valid_alias.c:12:[value] Non-termination in evaluation of f
 tests/e-acsl-runtime/valid_alias.c:16:[value] Assertion got status valid.
 [value] computing for function _initialized <- main.
         Called from tests/e-acsl-runtime/valid_alias.c:16.
-./share/e-acsl/memory_model/e_acsl_mmodel.h:58:[value] Function _initialized: postcondition got status valid.
+./share/e-acsl/memory_model/e_acsl_mmodel.h:85:[value] Function _initialized: postcondition got status valid.
 [value] Done for function _initialized
 [value] computing for function _valid <- main.
         Called from tests/e-acsl-runtime/valid_alias.c:16.

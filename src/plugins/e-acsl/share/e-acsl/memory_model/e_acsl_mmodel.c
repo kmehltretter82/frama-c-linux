@@ -77,7 +77,7 @@ void _free(void* ptr) {
 /* resize the block starting at ptr to fit its new size,
  * for further information, see realloc */
 void* _realloc(void* ptr, size_t size) {
-  struct _block * tmp, * next;
+  struct _block * tmp;
   void * new_ptr;
   if(ptr == NULL) return _malloc(size);
   if(size <= 0) {
@@ -99,7 +99,7 @@ void* _realloc(void* ptr, size_t size) {
       tmp->init_cpt = size;
     /* realloc bigger larger block */
     else {
-      int i, nb = needed_bytes(size);
+      int nb = needed_bytes(size);
       tmp->init_ptr = malloc(nb);
       memset(tmp->init_ptr, 0xFF, nb);
       if(size%8 != 0)

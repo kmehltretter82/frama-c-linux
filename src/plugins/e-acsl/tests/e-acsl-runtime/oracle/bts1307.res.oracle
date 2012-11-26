@@ -140,8 +140,7 @@ tests/e-acsl-runtime/bts1307.i:13:[value] warning: converting value to float: as
 [value] computing for function _delete_block <- foo <- main.
         Called from tests/e-acsl-runtime/bts1307.i:15.
 [value] Done for function _delete_block
-tests/e-acsl-runtime/bts1307.i:17:[value] warning: converting value to float: assert(Ook)
-tests/e-acsl-runtime/bts1307.i:13:[value] Function foo, behavior OverEstimate_Motoring: postcondition got status unknown.
+tests/e-acsl-runtime/bts1307.i:13:[value] Function foo, behavior OverEstimate_Motoring: postcondition got status valid.
 [value] Recording results for foo
 [value] Done for function foo
 [value] computing for function bar <- main.

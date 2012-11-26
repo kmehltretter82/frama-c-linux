@@ -41,8 +41,7 @@ module Env: sig
   val clear: unit -> unit
   val add: kernel_function -> Varinfo.Set.t option Stmt.Hashtbl.t -> unit
   val find: kernel_function -> Varinfo.Set.t option Stmt.Hashtbl.t 
-  module StartData: Dataflow.StmtStartData with type key = stmt
-					   and type data = Varinfo.Set.t option
+  module StartData: Dataflow.StmtStartData with type data = Varinfo.Set.t option
   val is_consolidated: unit -> bool
   val consolidate: Varinfo.Set.t -> unit
   val consolidated_mem: varinfo -> bool
@@ -104,7 +103,6 @@ let reset = Env.clear
 
 module rec Transfer
   : Dataflow.BackwardsTransfer with type t = Varinfo.Set.t option
-			       and type StmtStartData.key = stmt
   = struct
 
   let name = "E_ACSL.Pre_analysis"

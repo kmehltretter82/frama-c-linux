@@ -40,8 +40,8 @@ tests/e-acsl-runtime/localvar.c:20:[value] Assertion got status valid.
 [value] computing for function _initialized <- add <- main.
         Called from tests/e-acsl-runtime/localvar.c:20.
 [value] using specification for function _initialized
-./share/e-acsl/memory_model/e_acsl_mmodel.h:57:[value] Function _initialized: postcondition got status unknown.
-./share/e-acsl/memory_model/e_acsl_mmodel.h:58:[value] Function _initialized: postcondition got status valid.
+./share/e-acsl/memory_model/e_acsl_mmodel.h:84:[value] Function _initialized: postcondition got status unknown.
+./share/e-acsl/memory_model/e_acsl_mmodel.h:85:[value] Function _initialized: postcondition got status valid.
 [value] Done for function _initialized
 [value] computing for function _valid <- add <- main.
         Called from tests/e-acsl-runtime/localvar.c:20.
