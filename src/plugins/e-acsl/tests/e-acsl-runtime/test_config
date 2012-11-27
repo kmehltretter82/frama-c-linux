@@ -1,2 +1,2 @@
-OPT: -check -e-acsl -then-on e-acsl -print -val
-OPT: -check -e-acsl -e-acsl-gmp-only -then-on e-acsl -print -val
+OPT: -check -e-acsl -then-on e-acsl -val -no-val-show-progress
+OPT: -check -e-acsl -e-acsl-gmp-only -then-on e-acsl -val -no-val-show-progress

@@ -27,146 +27,51 @@ tests/e-acsl-runtime/valid_alias.c:17:[e-acsl] warning: missing guard for ensuri
                      [1].__fc_stdio_id ∈ [--..--]
         S___fc_stdio_buffer_0_S___fc_stdout[0..1] ∈ [--..--]
         S___fc_stdio_buffer_1_S___fc_stdout[0..1] ∈ [--..--]
-[value] computing for function _store_block <- main.
-        Called from tests/e-acsl-runtime/valid_alias.c:11.
 [value] using specification for function _store_block
-[value] Done for function _store_block
-[value] computing for function _store_block <- main.
-        Called from tests/e-acsl-runtime/valid_alias.c:11.
-[value] Done for function _store_block
-[value] computing for function _store_block <- main.
-        Called from tests/e-acsl-runtime/valid_alias.c:11.
-[value] Done for function _store_block
-[value] computing for function _full_init <- main.
-        Called from tests/e-acsl-runtime/valid_alias.c:11.
 [value] using specification for function _full_init
-[value] Done for function _full_init
 tests/e-acsl-runtime/valid_alias.c:12:[value] Assertion got status valid.
-[value] computing for function _initialized <- main.
-        Called from tests/e-acsl-runtime/valid_alias.c:12.
 [value] using specification for function _initialized
 ./share/e-acsl/memory_model/e_acsl_mmodel.h:84:[value] Function _initialized: postcondition got status unknown.
 ./share/e-acsl/memory_model/e_acsl_mmodel.h:85:[value] Function _initialized: postcondition got status unknown.
-[value] Done for function _initialized
 tests/e-acsl-runtime/valid_alias.c:12:[kernel] warning: accessing uninitialized left-value: assert \initialized(&a);
 tests/e-acsl-runtime/valid_alias.c:12:[kernel] warning: completely indeterminate value in a.
 tests/e-acsl-runtime/valid_alias.c:12:[value] Non-termination in evaluation of function call expression argument
         (void *)a
-[value] computing for function _initialized <- main.
-        Called from tests/e-acsl-runtime/valid_alias.c:12.
-[value] Done for function _initialized
 tests/e-acsl-runtime/valid_alias.c:12:[kernel] warning: accessing uninitialized left-value: assert \initialized(&b);
 tests/e-acsl-runtime/valid_alias.c:12:[kernel] warning: completely indeterminate value in b.
 tests/e-acsl-runtime/valid_alias.c:12:[value] Non-termination in evaluation of function call expression argument
         (void *)b
-[value] computing for function e_acsl_assert <- main.
-        Called from tests/e-acsl-runtime/valid_alias.c:12.
 ./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status valid.
-[value] Recording results for e_acsl_assert
-[value] Done for function e_acsl_assert
-[value] computing for function _full_init <- main.
-        Called from tests/e-acsl-runtime/valid_alias.c:13.
-[value] Done for function _full_init
-[value] computing for function _initialize <- main.
-        Called from tests/e-acsl-runtime/valid_alias.c:14.
 [value] using specification for function _initialize
-[value] Done for function _initialize
-[value] computing for function _full_init <- main.
-        Called from tests/e-acsl-runtime/valid_alias.c:15.
-[value] Done for function _full_init
 tests/e-acsl-runtime/valid_alias.c:16:[value] Assertion got status valid.
-[value] computing for function _initialized <- main.
-        Called from tests/e-acsl-runtime/valid_alias.c:16.
 ./share/e-acsl/memory_model/e_acsl_mmodel.h:85:[value] Function _initialized: postcondition got status valid.
-[value] Done for function _initialized
-[value] computing for function _valid <- main.
-        Called from tests/e-acsl-runtime/valid_alias.c:16.
 [value] using specification for function _valid
-[value] Done for function _valid
-[value] computing for function _initialized <- main.
-        Called from tests/e-acsl-runtime/valid_alias.c:16.
-[value] Done for function _initialized
-[value] computing for function _valid <- main.
-        Called from tests/e-acsl-runtime/valid_alias.c:16.
-[value] Done for function _valid
-[value] computing for function e_acsl_assert <- main.
-        Called from tests/e-acsl-runtime/valid_alias.c:16.
 ./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status unknown.
-[value] computing for function printf <- e_acsl_assert <- main.
-        Called from ./share/e-acsl/e_acsl.h:41.
 [value] using specification for function printf
-[value] Done for function printf
-[value] computing for function exit <- e_acsl_assert <- main.
-        Called from ./share/e-acsl/e_acsl.h:43.
 [value] using specification for function exit
 FRAMAC_SHARE/libc/stdlib.h:180:[value] Function exit: postcondition got status invalid.
-[value] Done for function exit
-[value] Recording results for e_acsl_assert
-[value] Done for function e_acsl_assert
 tests/e-acsl-runtime/valid_alias.c:17:[value] Assertion got status valid.
-[value] computing for function __gmpz_init_set_si <- main.
-        Called from tests/e-acsl-runtime/valid_alias.c:17.
 [value] using specification for function __gmpz_init_set_si
 ./share/e-acsl/e_acsl_gmp.h:61:[value] Function __gmpz_init_set_si: precondition got status valid.
 ./share/e-acsl/e_acsl_gmp.h:63:[value] Function __gmpz_init_set_si: postcondition got status valid.
 ./share/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: postcondition got status unknown.
-[value] Done for function __gmpz_init_set_si
-[value] computing for function __gmpz_init_set_si <- main.
-        Called from tests/e-acsl-runtime/valid_alias.c:17.
-[value] Done for function __gmpz_init_set_si
-[value] computing for function __gmpz_cmp <- main.
-        Called from tests/e-acsl-runtime/valid_alias.c:17.
 [value] using specification for function __gmpz_cmp
 ./share/e-acsl/e_acsl_gmp.h:115:[value] Function __gmpz_cmp: precondition got status valid.
 ./share/e-acsl/e_acsl_gmp.h:116:[value] Function __gmpz_cmp: precondition got status valid.
-[value] Done for function __gmpz_cmp
-[value] computing for function e_acsl_assert <- main.
-        Called from tests/e-acsl-runtime/valid_alias.c:17.
-[value] Recording results for e_acsl_assert
-[value] Done for function e_acsl_assert
-[value] computing for function __gmpz_clear <- main.
-        Called from tests/e-acsl-runtime/valid_alias.c:17.
 [value] using specification for function __gmpz_clear
 ./share/e-acsl/e_acsl_gmp.h:105:[value] Function __gmpz_clear: precondition got status valid.
-[value] Done for function __gmpz_clear
-[value] computing for function __gmpz_clear <- main.
-        Called from tests/e-acsl-runtime/valid_alias.c:17.
-[value] Done for function __gmpz_clear
 tests/e-acsl-runtime/valid_alias.c:19:[value] Assertion got status valid.
-[value] computing for function _initialized <- main.
-        Called from tests/e-acsl-runtime/valid_alias.c:19.
-[value] Done for function _initialized
 tests/e-acsl-runtime/valid_alias.c:19:[kernel] warning: accessing left-value a that contains escaping addresses; assert(Ook)
 tests/e-acsl-runtime/valid_alias.c:19:[kernel] warning: completely indeterminate value in a.
 tests/e-acsl-runtime/valid_alias.c:19:[value] Non-termination in evaluation of function call expression argument
         (void *)a
-[value] computing for function _initialized <- main.
-        Called from tests/e-acsl-runtime/valid_alias.c:19.
-[value] Done for function _initialized
 tests/e-acsl-runtime/valid_alias.c:19:[kernel] warning: accessing left-value b that contains escaping addresses; assert(Ook)
 tests/e-acsl-runtime/valid_alias.c:19:[kernel] warning: completely indeterminate value in b.
 tests/e-acsl-runtime/valid_alias.c:19:[value] Non-termination in evaluation of function call expression argument
         (void *)b
-[value] computing for function e_acsl_assert <- main.
-        Called from tests/e-acsl-runtime/valid_alias.c:19.
-[value] Recording results for e_acsl_assert
-[value] Done for function e_acsl_assert
-[value] computing for function _delete_block <- main.
-        Called from tests/e-acsl-runtime/valid_alias.c:11.
 [value] using specification for function _delete_block
-[value] Done for function _delete_block
-[value] computing for function _delete_block <- main.
-        Called from tests/e-acsl-runtime/valid_alias.c:11.
-[value] Done for function _delete_block
-[value] computing for function _delete_block <- main.
-        Called from tests/e-acsl-runtime/valid_alias.c:11.
-[value] Done for function _delete_block
-[value] computing for function __clean <- main.
-        Called from tests/e-acsl-runtime/valid_alias.c:20.
 [value] using specification for function __clean
 [kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
-[value] Done for function __clean
-[value] Recording results for main
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function e_acsl_assert:
@@ -207,269 +112,3 @@ tests/e-acsl-runtime/valid_alias.c:19:[value] Non-termination in evaluation of f
                        [1].[bits 80 to 95] ∈ UNINITIALIZED
                        [1].__fc_stdio_id ∈ [--..--]
           Frama_C_alloc[0..3] ∈ UNINITIALIZED
-/* Generated by Frama-C */
-struct __anonstruct___mpz_struct_1 {
-   int _mp_alloc ;
-   int _mp_size ;
-   unsigned long *_mp_d ;
-};
-typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
-typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
-typedef unsigned int size_t;
-struct __fc_pos_t {
-   unsigned long __fc_stdio_position ;
-};
-typedef struct __fc_pos_t fpos_t;
-struct __fc_FILE {
-   fpos_t __fc_stdio_fpos ;
-   char *__fc_stdio_buffer ;
-   char __fc_stdio_error ;
-   char __fc_stdio_eof ;
-   long __fc_stdio_id ;
-};
-typedef struct __fc_FILE FILE;
-/*@
-model __mpz_struct { ℤ n };
-*/
-/*@ requires ¬\initialized(z);
-    ensures \valid(\old(z));
-    
-    ensures \initialized(\old(z));
-    allocates \old(z);
-    
-    assigns *z;
-    assigns *z \from n;
-  
-*/
-extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z,
-                                                                long n);
-/*@ requires \valid(x);
-    assigns *x;  */
-extern  __attribute__((__FC_BUILTIN__)) void __gmpz_clear(__mpz_struct * /*[1]*/ x);
-/*@ requires \valid(z1);
-    requires \valid(z2);
-    assigns \nothing;  */
-extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
-                                                       __mpz_struct const * /*[1]*/ z2);
-int __fc_random_counter __attribute__((__unused__));
-unsigned long const __fc_rand_max = (unsigned long)2147483647;
-extern int __fc_heap_status;
-/*@
-axiomatic
-  dynamic_allocation {
-  predicate is_allocable{L}(size_t n) 
-    reads __fc_heap_status;
-  
-  }
- */
-/*@ allocates \result;
-    
-    assigns __fc_heap_status;
-    assigns __fc_heap_status \from size, __fc_heap_status;
-    assigns \result
-    \from size, __fc_heap_status;
-    behavior allocation:
-      assumes is_allocable(size);
-      ensures \fresh{Old, Here}(\result,\old(size));
-      assigns __fc_heap_status;
-      assigns __fc_heap_status \from size, __fc_heap_status;
-      assigns \result \from size, __fc_heap_status;
-    behavior no_allocation:
-      assumes ¬is_allocable(size);
-      ensures \result ≡ \null;
-      allocates \nothing;assigns \result \from \nothing;
-    complete behaviors no_allocation, allocation;
-    disjoint behaviors no_allocation, allocation;
-  
-*/
-extern void *_malloc(size_t size);
-/*@ frees p;
-    
-    assigns __fc_heap_status;
-    assigns __fc_heap_status
-    \from __fc_heap_status;
-    behavior deallocation:
-      assumes p ≢ \null;
-      requires \freeable(p);
-      ensures \allocable(\old(p));
-      assigns __fc_heap_status;
-      assigns __fc_heap_status \from __fc_heap_status;
-    behavior no_deallocation:
-      assumes p ≡ \null;
-      allocates \nothing;assigns \nothing;
-    complete behaviors no_deallocation, deallocation;
-    disjoint behaviors no_deallocation, deallocation;
-  
-*/
-extern void _free(void *p);
-/*@ ensures \false;
-    assigns \nothing;  */
-extern void exit(int status);
-extern FILE *__fc_stdout;
-/*@ assigns *__fc_stdout;
-    assigns *__fc_stdout \from *(format+(..));  */
-extern int printf(char const *format , ...);
-/*@ requires predicate ≢ 0;
-    assigns \nothing;  */
-void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
-{
-  if (! predicate) {
-    printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
-           line,pred_txt);
-    exit(1);
-  }
-  return;
-}
-
-/*@ assigns \nothing;  */
-extern  __attribute__((__FC_BUILTIN__)) void *_store_block(void *ptr,
-                                                           size_t size);
-/*@ assigns \nothing;  */
-extern  __attribute__((__FC_BUILTIN__)) void _delete_block(void *ptr);
-/*@ assigns \nothing;  */
-extern  __attribute__((__FC_BUILTIN__)) void _initialize(void *ptr,
-                                                         size_t size);
-/*@ assigns \nothing;  */
-extern  __attribute__((__FC_BUILTIN__)) void _full_init(void *ptr);
-/*@ assigns \nothing;  */
-extern  __attribute__((__FC_BUILTIN__)) int _valid(void *ptr, size_t size);
-/*@ ensures \result ≡ 0 ∨ \result ≡ 1;
-    ensures \result ≡ 1 ⇒
-            \initialized((char *)\old(ptr)+(0..\old(size)-1));
-    assigns \nothing;
-  
-*/
-extern  __attribute__((__FC_BUILTIN__)) int _initialized(void *ptr,
-                                                         size_t size);
-/*@ assigns \nothing;  */
-extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
-int main(void)
-{
-  int __retres;
-  int *a;
-  int *b;
-  int n;
-  _store_block((void *)(& n),4U);
-  _store_block((void *)(& b),4U);
-  _store_block((void *)(& a),4U);
-  _full_init((void *)(& n));
-  n = 0;
-  /*@ assert ¬\valid(a) ∧ ¬\valid(b); */
-  {
-    int __e_acsl_initialized;
-    int __e_acsl_and;
-    int __e_acsl_and_3;
-    __e_acsl_initialized = _initialized((void *)(& a),sizeof(int *));
-    if (__e_acsl_initialized) {
-      int __e_acsl_valid;
-      /*@ assert Value: initialisation: \initialized(&a); */
-      __e_acsl_valid = _valid((void *)a,sizeof(int));
-      __e_acsl_and = __e_acsl_valid;
-    }
-    else { __e_acsl_and = 0; }
-    if (! __e_acsl_and) {
-      int __e_acsl_initialized_2;
-      int __e_acsl_and_2;
-      __e_acsl_initialized_2 = _initialized((void *)(& b),sizeof(int *));
-      if (__e_acsl_initialized_2) {
-        int __e_acsl_valid_2;
-        /*@ assert Value: initialisation: \initialized(&b); */
-        __e_acsl_valid_2 = _valid((void *)b,sizeof(int));
-        __e_acsl_and_2 = __e_acsl_valid_2;
-      }
-      else { __e_acsl_and_2 = 0; }
-      __e_acsl_and_3 = ! __e_acsl_and_2;
-    }
-    else { __e_acsl_and_3 = 0; }
-    e_acsl_assert(__e_acsl_and_3,(char *)"Assertion",
-                  (char *)"!\\valid(a) &&\n!\\valid(b)",12);
-  }
-  
-  _full_init((void *)(& a));
-  a = (int *)_malloc(sizeof(int));
-  _initialize((void *)a,sizeof(int));
-  *a = n;
-  _full_init((void *)(& b));
-  b = a;
-  /*@ assert \valid(a) ∧ \valid(b); */
-  {
-    int __e_acsl_initialized_3;
-    int __e_acsl_and_4;
-    int __e_acsl_and_6;
-    __e_acsl_initialized_3 = _initialized((void *)(& a),sizeof(int *));
-    if (__e_acsl_initialized_3) {
-      int __e_acsl_valid_3;
-      __e_acsl_valid_3 = _valid((void *)a,sizeof(int));
-      __e_acsl_and_4 = __e_acsl_valid_3;
-    }
-    else { __e_acsl_and_4 = 0; }
-    if (__e_acsl_and_4) {
-      int __e_acsl_initialized_4;
-      int __e_acsl_and_5;
-      __e_acsl_initialized_4 = _initialized((void *)(& b),sizeof(int *));
-      if (__e_acsl_initialized_4) {
-        int __e_acsl_valid_4;
-        __e_acsl_valid_4 = _valid((void *)b,sizeof(int));
-        __e_acsl_and_5 = __e_acsl_valid_4;
-      }
-      else { __e_acsl_and_5 = 0; }
-      __e_acsl_and_6 = __e_acsl_and_5;
-    }
-    else { __e_acsl_and_6 = 0; }
-    e_acsl_assert(__e_acsl_and_6,(char *)"Assertion",
-                  (char *)"\\valid(a) &&\n\\valid(b)",16);
-  }
-  
-  /*@ assert *b ≡ n; */
-  {
-    mpz_t __e_acsl;
-    mpz_t __e_acsl_n;
-    int __e_acsl_eq;
-    __gmpz_init_set_si(__e_acsl,(long)*b);
-    __gmpz_init_set_si(__e_acsl_n,(long)n);
-    __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl),
-                             (__mpz_struct const *)(__e_acsl_n));
-    e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"*b == n",17);
-    __gmpz_clear(__e_acsl);
-    __gmpz_clear(__e_acsl_n);
-  }
-  
-  _free((void *)b);
-  /*@ assert ¬\valid(a) ∧ ¬\valid(b); */
-  {
-    int __e_acsl_initialized_5;
-    int __e_acsl_and_7;
-    int __e_acsl_and_9;
-    __e_acsl_initialized_5 = _initialized((void *)(& a),sizeof(int *));
-    if (__e_acsl_initialized_5) {
-      int __e_acsl_valid_5;
-      __e_acsl_valid_5 = _valid((void *)a,sizeof(int));
-      __e_acsl_and_7 = __e_acsl_valid_5;
-    }
-    else { __e_acsl_and_7 = 0; }
-    if (! __e_acsl_and_7) {
-      int __e_acsl_initialized_6;
-      int __e_acsl_and_8;
-      __e_acsl_initialized_6 = _initialized((void *)(& b),sizeof(int *));
-      if (__e_acsl_initialized_6) {
-        int __e_acsl_valid_6;
-        __e_acsl_valid_6 = _valid((void *)b,sizeof(int));
-        __e_acsl_and_8 = __e_acsl_valid_6;
-      }
-      else { __e_acsl_and_8 = 0; }
-      __e_acsl_and_9 = ! __e_acsl_and_8;
-    }
-    else { __e_acsl_and_9 = 0; }
-    e_acsl_assert(__e_acsl_and_9,(char *)"Assertion",
-                  (char *)"!\\valid(a) &&\n!\\valid(b)",19);
-  }
-  
-  __retres = 0;
-  _delete_block((void *)(& n));
-  _delete_block((void *)(& b));
-  _delete_block((void *)(& a));
-  __clean();
-  return (__retres);
-}
-
-

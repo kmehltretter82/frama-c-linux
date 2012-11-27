@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: function contract
-   EXECNOW: LOG gen_function_contract.c BIN gen_function_contract.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/function_contract.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_function_contract.c > /dev/null && ./gcc_test.sh function_contract
-   EXECNOW: LOG gen_function_contract2.c BIN gen_function_contract2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/function_contract.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_function_contract2.c > /dev/null && ./gcc_test.sh function_contract2
+   EXECNOW: LOG gen_function_contract.c @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/function_contract.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_function_contract.c > /dev/null && ./gcc_test.sh function_contract
+   EXECNOW: LOG gen_function_contract2.c @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/function_contract.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_function_contract2.c > /dev/null && ./gcc_test.sh function_contract2
 */
 
 int X = 0, Y = 2;
