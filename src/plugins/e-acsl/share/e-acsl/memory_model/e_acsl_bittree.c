@@ -264,6 +264,28 @@ struct _block * _get_exact (void * ptr) {
 }
 
 
+/* return the block B containing ptr, starting from b and only exploring
+   left children, or NULL if such block does not exist
+   THIS METHOD IS INVOKED FROM _get_cont ONLY
+   DO NOT CALL IT FROM ANYWHERE ELSE */
+struct _block * _get_cont_by_left_child (void * ptr, struct bittree * b) {
+  struct bittree * tmp = b;
+  assert(((unsigned long)b->addr & b->mask) == ((unsigned long)ptr & b->mask));
+
+  while(!tmp->is_leaf) {
+    assert(tmp->left != NULL && tmp->right != NULL);
+    if(((unsigned long)tmp->left->addr & tmp->mask) == (unsigned long)ptr)
+      tmp = tmp->left;
+    else
+      return NULL;
+  }
+
+  assert(tmp->is_leaf);
+
+  return (tmp->addr == ptr) ? tmp->leaf : NULL;
+}
+
+
 /* return the block B containing ptr, such as :
    begin addr of B <= ptr < (begin addr + size) of B
    or NULL if such a block does not exist */
@@ -284,8 +306,17 @@ struct _block * _get_cont (void * ptr) {
     
     assert(tmp->left != NULL && tmp->right != NULL);
 
-    /* the right child has the highest address, so we test it first */
     if(((unsigned long)tmp->right->addr & tmp->right->mask)
+       == (unsigned long)ptr) {
+      struct _block * r = _get_cont_by_left_child(ptr, tmp->right);
+      if(r == NULL)
+	tmp = tmp->left;
+      else
+	return r;
+    }
+
+    /* the right child has the highest address, so we test it first */
+    else if(((unsigned long)tmp->right->addr & tmp->right->mask)
        <= ((unsigned long)ptr & tmp->right->mask))
       tmp = tmp->right;
     else if(((unsigned long)tmp->left->addr & tmp->left->mask)
