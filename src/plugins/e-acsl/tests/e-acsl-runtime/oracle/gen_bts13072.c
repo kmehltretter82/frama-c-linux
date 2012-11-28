@@ -116,6 +116,17 @@ extern  __attribute__((__FC_BUILTIN__)) void _initialize(void *ptr,
 extern  __attribute__((__FC_BUILTIN__)) void _full_init(void *ptr);
 /*@ assigns \nothing;  */
 extern  __attribute__((__FC_BUILTIN__)) int _valid(void *ptr, size_t size);
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) int _valid_read(void *ptr,
+                                                        size_t size);
+/*@ ensures \result ≡ 0 ∨ \result ≡ 1;
+    ensures \result ≡ 1 ⇒
+            \initialized((char *)\old(ptr)+(0..\old(size)-1));
+    assigns \nothing;
+  
+*/
+extern  __attribute__((__FC_BUILTIN__)) int _initialized(void *ptr,
+                                                         size_t size);
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 /*@ requires \valid(Mtmax_in);
     requires \valid(Mwmax);
@@ -152,8 +163,14 @@ void foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     e_acsl_assert(__e_acsl_valid_3,(char *)"Precondition",
                   (char *)"\\valid(Mtmax_out)",9);
     _initialize((void *)Mtmax_out,sizeof(float));
+    _store_block((void *)(& __e_acsl_at_3),4U);
+    _full_init((void *)(& __e_acsl_at_3));
     __e_acsl_at_3 = Mwmax;
+    _store_block((void *)(& __e_acsl_at_2),4U);
+    _full_init((void *)(& __e_acsl_at_2));
     __e_acsl_at_2 = Mtmax_in;
+    _store_block((void *)(& __e_acsl_at),4U);
+    _full_init((void *)(& __e_acsl_at));
     __e_acsl_at = Mtmax_out;
     *Mtmax_out = (float)((double)*Mtmax_in + ((double)5 - (double)((float)(
                                                                    5 / 80) * *Mwmax) * 0.4));
@@ -166,6 +183,12 @@ void foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     int __e_acsl_div_guard;
     mpz_t __e_acsl_div;
     unsigned long __e_acsl_4;
+    int __e_acsl_initialized;
+    int __e_acsl_and;
+    int __e_acsl_initialized_2;
+    int __e_acsl_and_2;
+    int __e_acsl_initialized_3;
+    int __e_acsl_and_3;
     __gmpz_init_set_si(__e_acsl,(long)5);
     __gmpz_init_set_si(__e_acsl_2,(long)80);
     __gmpz_init_set_si(__e_acsl_3,0L);
@@ -178,6 +201,37 @@ void foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     __gmpz_tdiv_q(__e_acsl_div,(__mpz_struct const *)(__e_acsl),
                   (__mpz_struct const *)(__e_acsl_2));
     __e_acsl_4 = __gmpz_get_ui((__mpz_struct const *)(__e_acsl_div));
+    __e_acsl_initialized = _initialized((void *)(& __e_acsl_at_3),
+                                        sizeof(float *));
+    if (__e_acsl_initialized) {
+      int __e_acsl_valid_read;
+      __e_acsl_valid_read = _valid_read((void *)__e_acsl_at_3,sizeof(float));
+      __e_acsl_and = __e_acsl_valid_read;
+    }
+    else { __e_acsl_and = 0; }
+    e_acsl_assert(__e_acsl_and,(char *)"Postcondition",
+                  (char *)"mem_access: \\valid_read(__e_acsl_at_3)",0);
+    __e_acsl_initialized_2 = _initialized((void *)(& __e_acsl_at_2),
+                                          sizeof(float *));
+    if (__e_acsl_initialized_2) {
+      int __e_acsl_valid_read_2;
+      __e_acsl_valid_read_2 = _valid_read((void *)__e_acsl_at_2,
+                                          sizeof(float));
+      __e_acsl_and_2 = __e_acsl_valid_read_2;
+    }
+    else { __e_acsl_and_2 = 0; }
+    e_acsl_assert(__e_acsl_and_2,(char *)"Postcondition",
+                  (char *)"mem_access: \\valid_read(__e_acsl_at_2)",0);
+    __e_acsl_initialized_3 = _initialized((void *)(& __e_acsl_at),
+                                          sizeof(float *));
+    if (__e_acsl_initialized_3) {
+      int __e_acsl_valid_read_3;
+      __e_acsl_valid_read_3 = _valid_read((void *)__e_acsl_at,sizeof(float));
+      __e_acsl_and_3 = __e_acsl_valid_read_3;
+    }
+    else { __e_acsl_and_3 = 0; }
+    e_acsl_assert(__e_acsl_and_3,(char *)"Postcondition",
+                  (char *)"mem_access: \\valid_read(__e_acsl_at)",0);
     e_acsl_assert(*__e_acsl_at == *__e_acsl_at_2 + (5 - (__e_acsl_4 * *__e_acsl_at_3) * 0.4),
                   (char *)"Postcondition",
                   (char *)"*\\old(Mtmax_out) == *\\old(Mtmax_in)+(5-((5/80)**\\old(Mwmax))*0.4)",
@@ -232,11 +286,23 @@ void bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     e_acsl_assert(__e_acsl_valid_3,(char *)"Precondition",
                   (char *)"\\valid(Mtmin_out)",21);
     _initialize((void *)Mtmin_out,sizeof(float));
+    _store_block((void *)(& __e_acsl_at_6),4U);
+    _full_init((void *)(& __e_acsl_at_6));
     __e_acsl_at_6 = Mwmin;
+    _store_block((void *)(& __e_acsl_at_5),4U);
+    _full_init((void *)(& __e_acsl_at_5));
     __e_acsl_at_5 = Mtmin_in;
+    _store_block((void *)(& __e_acsl_at_4),4U);
+    _full_init((void *)(& __e_acsl_at_4));
     __e_acsl_at_4 = Mwmin;
+    _store_block((void *)(& __e_acsl_at_3),4U);
+    _full_init((void *)(& __e_acsl_at_3));
     __e_acsl_at_3 = Mtmin_in;
+    _store_block((void *)(& __e_acsl_at_2),4U);
+    _full_init((void *)(& __e_acsl_at_2));
     __e_acsl_at_2 = Mtmin_in;
+    _store_block((void *)(& __e_acsl_at),4U);
+    _full_init((void *)(& __e_acsl_at));
     __e_acsl_at = Mtmin_out;
     *Mtmin_out = (float)(0.85 * (double)*Mwmin);
   }

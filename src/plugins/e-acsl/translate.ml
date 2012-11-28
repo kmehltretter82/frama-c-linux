@@ -121,9 +121,6 @@ let rec thost_to_host env = function
     | _ -> assert false)
   | TMem t ->
     let e, env = term_to_exp env None t in
-    Options.warning ~source:(fst e.eloc) ~once:true
-      "@[missing guard for ensuring that@ %a is a valid memory access@]"
-      Cil.d_term t;
     Mem e, env, ""
 
 and toffset_to_offset ?loc env = function
@@ -301,9 +298,6 @@ and context_insensitive_term_to_exp env t =
     in
     let e1, env = term_to_exp env ctx1 t1 in
     let e2, env = term_to_exp env ctx2 t2 in
-    Options.warning ~source:(fst loc) ~once:true
-      "@[missing guard for ensuring that@ %a is a valid pointer@]"
-      Cil.d_term t;
     Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)), env, false, ""
   | TCastE(ty, t) ->
     let e, env = term_to_exp env (Some ty) t in
@@ -440,15 +434,35 @@ and at_to_exp env t_opt label e =
      That is this variable which is the resulting expression. 
      ACSL typing rule ensures that the type of this variable is the same as
      the one of [e]. *)
+  let must_model_new_var e =
+    let res = ref false in
+    let o = object
+      inherit Cil.nopCilVisitor
+      method vlval (host, _) = match host with
+      | Var v -> 
+	if Pre_analysis.old_must_model_vi (Env.get_behavior env) v then 
+	  res := true;
+	Cil.SkipChildren
+      | Mem _ ->
+	Cil.DoChildren
+    end in
+    ignore (Cil.visitCilExpr o e);
+    !res
+  in
+  let loc = Stmt.loc stmt in
   let res_v, res, new_env =
     Env.new_var
-      ~loc:(Stmt.loc stmt)
+      ~loc
       ~name:"at" 
       ~global:true
       env
       t_opt
       (Cil.typeOf e) 
-      (fun _ _ -> [])
+      (fun v _ -> 
+	if must_model_new_var e then 
+	  [ Misc.mk_store_stmt v;
+	    Misc.mk_initialize ~loc (Var v, NoOffset) ]
+	else [])
   in
   let env_ref = ref new_env in
   (* visitor modifying in place the labeled statement in order to store [e]
@@ -459,7 +473,7 @@ and at_to_exp env t_opt label e =
     method vstmt_aux stmt = 
       (* either a standard C affectation or an mpz one according to type of
 	 [e] *) 
-      let new_stmt = Mpz.init_set ~loc:(Stmt.loc stmt) (Cil.var res_v) res e in
+      let new_stmt = Mpz.init_set ~loc (Cil.var res_v) res e in
       assert (!env_ref == new_env);
       (* generate the new block of code for the labeled statement and the
 	 corresponding environment *)
@@ -546,16 +560,22 @@ let rec named_predicate_to_exp ?name kf env p =
     let e, env, is_string = at_to_exp env None label e in
     assert (not is_string);
     e, env
-  | Pvalid(LogicLabel(_, label) as llabel, t) when label = "Here" -> 
-    let call_valid t = mmodel_call_with_size ~loc "valid" Cil.intType env t in
+  | Pvalid_read(LogicLabel(_, label) as llabel, t) as pc
+  | (Pvalid(LogicLabel(_, label) as llabel, t) as pc) when label = "Here" ->
+    let call_valid t = 
+      let name = match pc with
+	| Pvalid _ -> "valid"
+	| Pvalid_read _ -> "valid_read"
+	| _ -> assert false
+      in
+      mmodel_call_with_size ~loc name Cil.intType env t 
+    in
     if !is_visiting_valid then begin
       (* we already transformed \valid(t) into \initialized(t) && \valid(t):
 	 now convert this right-most valid. *)
       is_visiting_valid := false;
       call_valid t
     end else begin
-      (* [JS 2012/07/20] could probably be simplified whenever RTE will be used
-	 to prevent RTE in the generated code *)
       match t.term_node, t.term_type with
       | TLval (TResult _, TNoOffset), _ -> call_valid t
       | TLval (TVar { lv_origin = Some vi }, TNoOffset), _ 
@@ -570,14 +590,13 @@ let rec named_predicate_to_exp ?name kf env p =
 	let p = Logic_const.pand ~loc (init, p) in
 	is_visiting_valid := true;
 	named_predicate_to_exp kf env p
-      | _ -> assert false
+      | _ -> call_valid t
     end
   | Pvalid _ -> Error.not_yet "labeled \\valid"
+  | Pvalid_read _ -> Error.not_yet "labeled \\valid_read"
   | Pinitialized(LogicLabel(_, label), t) when label = "Here" ->
     mmodel_call_with_size ~loc "initialized" Cil.intType env t
   | Pinitialized _ -> Error.not_yet "labeled \\initialized"
-  (********)
-  | Pvalid_read _ ->  Error.not_yet "\\valid_read"
   | Pallocable _ -> Error.not_yet "\\allocate"
   | Pfreeable _ -> Error.not_yet "\\free"
   | Pfresh _ -> Error.not_yet "\\fresh"

@@ -57,6 +57,8 @@ extern  __attribute__((__FC_BUILTIN__)) void *_store_block(void *ptr,
                                                            size_t size);
 /*@ assigns \nothing;  */
 extern  __attribute__((__FC_BUILTIN__)) void _full_init(void *ptr);
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void _literal_string(void *ptr);
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 int main(void)
 {
@@ -78,6 +80,7 @@ int main(void)
   __e_acsl_literal_string = "toto";
   _store_block((void *)__e_acsl_literal_string,sizeof("toto"));
   _full_init((void *)__e_acsl_literal_string);
+  _literal_string((void *)__e_acsl_literal_string);
   s = (char *)__e_acsl_literal_string;
   /*@ assert s ≡ s; */
   e_acsl_assert(s == s,(char *)"Assertion",(char *)"s == s",14);

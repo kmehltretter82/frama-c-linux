@@ -4,12 +4,8 @@
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel_api.h"
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_bittree.h"
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
-tests/e-acsl-runtime/ptr.i:13:[e-acsl] warning: missing guard for ensuring that p is a valid memory access
 tests/e-acsl-runtime/ptr.i:16:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
 tests/e-acsl-runtime/ptr.i:20:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
-tests/e-acsl-runtime/ptr.i:21:[e-acsl] warning: missing guard for ensuring that &t[2]-i is a valid pointer
-tests/e-acsl-runtime/ptr.i:21:[e-acsl] warning: missing guard for ensuring that &t[2]-i is a valid memory access
-tests/e-acsl-runtime/ptr.i:27:[e-acsl] warning: missing guard for ensuring that p is a valid memory access
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed
@@ -31,6 +27,9 @@ tests/e-acsl-runtime/ptr.i:27:[e-acsl] warning: missing guard for ensuring that 
                      [1].__fc_stdio_id ∈ [--..--]
         S___fc_stdio_buffer_0_S___fc_stdout[0..1] ∈ [--..--]
         S___fc_stdio_buffer_1_S___fc_stdout[0..1] ∈ [--..--]
+[value] using specification for function _store_block
+[value] using specification for function _full_init
+[value] using specification for function _initialize
 tests/e-acsl-runtime/ptr.i:13:[value] Assertion got status valid.
 [value] using specification for function __gmpz_init_set_si
 ./share/e-acsl/e_acsl_gmp.h:61:[value] Function __gmpz_init_set_si: precondition got status valid.
@@ -76,6 +75,7 @@ tests/e-acsl-runtime/ptr.i:21:[value] Assertion got status valid.
 tests/e-acsl-runtime/ptr.i:19:[value] Assertion got status unknown.
 tests/e-acsl-runtime/ptr.i:20:[value] Assertion got status unknown.
 tests/e-acsl-runtime/ptr.i:21:[value] Assertion got status unknown.
+[value] using specification for function _delete_block
 tests/e-acsl-runtime/ptr.i:27:[value] Assertion got status valid.
 [value] using specification for function __clean
 [kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype

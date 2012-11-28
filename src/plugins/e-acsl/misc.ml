@@ -115,6 +115,54 @@ let result_vi kf = match result_lhost kf with
   | Var vi -> vi
   | Mem _ -> assert false
 
+let mk_full_init_stmt ?(addr=true) vi =
+  let loc = vi.vdecl in
+  let stmt = match addr, Cil.unrollType vi.vtype with
+    | _, TArray(_,Some _, _, _) | false, _ ->
+      mk_call ~loc "_full_init" [ Cil.evar ~loc vi ]
+    | _ -> mk_call ~loc "_full_init" [ Cil.mkAddrOfVi vi ]
+  in
+  mk_debug_mmodel_stmt stmt
+
+let mk_initialize ~loc (host, offset as lv) = match host, offset with
+  | Var _, NoOffset -> mk_call ~loc "_full_init" [ Cil.mkAddrOf ~loc lv ]
+  | _ -> 
+    let typ = Cil.typeOfLval lv in
+    mk_call ~loc 
+      "_initialize" 
+      [ Cil.mkAddrOf ~loc lv; Cil.new_exp loc (SizeOf typ) ]
+
+let mk_store_stmt ?str_size vi =
+  let ty = Cil.unrollType vi.vtype in
+  let loc = vi.vdecl in
+  let stmt = match ty, str_size with
+    | TArray(_, Some _,_,_), None ->
+      mk_call ~loc "_store_block" [ Cil.evar ~loc vi ; Cil.sizeOf ~loc ty ]
+    | TPtr(TInt(IChar, _), _), Some size ->
+      mk_call ~loc "_store_block" [ Cil.evar ~loc vi ; size ]
+    | _, None -> 
+      mk_call ~loc "_store_block" 
+	[ Cil.mkAddrOfVi vi ; Cil.sizeOf ~loc ty ]
+    | _, Some _ ->
+      assert false
+  in
+  mk_debug_mmodel_stmt stmt
+
+let mk_delete_stmt vi =
+  let loc = vi.vdecl in
+  let stmt = match Cil.unrollType vi.vtype with
+    | TArray(_, Some _, _, _) ->
+      mk_call ~loc "_delete_block" [ Cil.evar ~loc vi ]
+      (*      | Tarray(_, None, _, _)*)
+    | _ -> mk_call ~loc "_delete_block" [ Cil.mkAddrOfVi vi ] 
+  in
+  mk_debug_mmodel_stmt stmt
+
+let mk_literal_string vi =
+  let loc = vi.vdecl in
+  let stmt = mk_call ~loc "_literal_string" [ Cil.evar ~loc vi ] in
+  mk_debug_mmodel_stmt stmt
+
 (*
 Local Variables:
 compile-command: "make"

@@ -49,7 +49,8 @@ void _full_init(void * ptr)
 
 /* marks a block as litteral string */
 /*@ assigns \nothing; */
-void _litteral_string(void * ptr);
+void _literal_string(void * ptr)
+  __attribute__((FC_BUILTIN));
 
 /* ****************** */
 /* E-ACSL annotations */

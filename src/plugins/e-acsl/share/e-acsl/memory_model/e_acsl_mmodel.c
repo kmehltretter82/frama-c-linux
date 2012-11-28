@@ -193,7 +193,7 @@ void _full_init (void * ptr) {
 
 
 /* mark a block as litteral string */
-void _litteral_string (void * ptr) {
+void _literal_string (void * ptr) {
   struct _block * tmp;
   assert(ptr != NULL);
   tmp = _get_exact(ptr);

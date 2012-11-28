@@ -52,6 +52,16 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
   return;
 }
 
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void *_store_block(void *ptr,
+                                                           size_t size);
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void _delete_block(void *ptr);
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void _initialize(void *ptr,
+                                                         size_t size);
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void _full_init(void *ptr);
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 int A = 0;
 /*@ ensures \at(A,Post) ≡ 3;  */
@@ -96,16 +106,32 @@ void g(int *p, int *q)
   int __e_acsl_at_3;
   int __e_acsl_at_2;
   int __e_acsl_at;
+  _store_block((void *)(& p),4U);
+  _full_init((void *)(& p));
+  _store_block((void *)(& q),4U);
+  _full_init((void *)(& q));
+  _initialize((void *)p,sizeof(int));
   *p = 0;
+  _initialize((void *)(p + 1),sizeof(int));
   *(p + 1) = 1;
+  _initialize((void *)q,sizeof(int));
   *q = 0;
+  _initialize((void *)p,sizeof(int));
   L1: 
+  _store_block((void *)(& __e_acsl_at_3),4U);
+  _full_init((void *)(& __e_acsl_at_3));
   __e_acsl_at_3 = *q;
+  _store_block((void *)(& __e_acsl_at),4U);
+  _full_init((void *)(& __e_acsl_at));
   __e_acsl_at = *q;
   *p = 2;
+  _initialize((void *)(p + 1),sizeof(int));
   *(p + 1) = 3;
+  _initialize((void *)q,sizeof(int));
   *q = 1;
   L2: 
+  _store_block((void *)(& __e_acsl_at_2),4U);
+  _full_init((void *)(& __e_acsl_at_2));
   __e_acsl_at_2 = *(p + __e_acsl_at);
   A = 4;
   /*@ assert \at(*(p+\at(*q,L1)),L2) ≡ 2; */
@@ -113,9 +139,13 @@ void g(int *p, int *q)
                 (char *)"\\at(*(p+\\at(*q,L1)),L2) == 2",32);
   L3: 
   /*@ assert \at(*(p+\at(*q,L1)),Here) ≡ 2; */
+  _store_block((void *)(& __e_acsl_at_4),4U);
+  _full_init((void *)(& __e_acsl_at_4));
   __e_acsl_at_4 = *(p + __e_acsl_at_3);
   e_acsl_assert(__e_acsl_at_4 == 2,(char *)"Assertion",
                 (char *)"\\at(*(p+\\at(*q,L1)),Here) == 2",34);
+  _delete_block((void *)(& p));
+  _delete_block((void *)(& q));
   return;
 }
 
@@ -127,14 +157,25 @@ int main(void)
   int __retres;
   int x;
   int t[2];
+  _store_block((void *)(t),8U);
+  _store_block((void *)(& x),4U);
+  _full_init((void *)(& x));
   x = 0;
   L: 
+  _store_block((void *)(& __e_acsl_at_3),4U);
+  _full_init((void *)(& __e_acsl_at_3));
   __e_acsl_at_3 = x;
+  _store_block((void *)(& __e_acsl_at_2),8U);
+  _full_init((void *)(& __e_acsl_at_2));
   __e_acsl_at_2 = (long long)x + (long long)1;
+  _store_block((void *)(& __e_acsl_at),4U);
+  _full_init((void *)(& __e_acsl_at));
   __e_acsl_at = x;
   /*@ assert x ≡ 0; */
   e_acsl_assert(x == 0,(char *)"Assertion",(char *)"x == 0",45);
+  _full_init((void *)(& x));
   x = 1;
+  _full_init((void *)(& x));
   x = 2;
   f();
   /*@ assert \at(x,L) ≡ 0; */
@@ -148,6 +189,8 @@ int main(void)
                 (char *)"Assertion",(char *)"\\at(x,L)+1 == 1",52);
   g(t,& x);
   __retres = 0;
+  _delete_block((void *)(t));
+  _delete_block((void *)(& x));
   __clean();
   return (__retres);
 }

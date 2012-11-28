@@ -32,8 +32,8 @@ tests/e-acsl-runtime/bts1304.i:23:[value] entering loop for the first time
 [value] using specification for function _delete_block
 tests/e-acsl-runtime/bts1304.i:25:[value] Assertion got status unknown.
 [value] using specification for function _initialized
-./share/e-acsl/memory_model/e_acsl_mmodel.h:84:[value] Function _initialized: postcondition got status unknown.
 ./share/e-acsl/memory_model/e_acsl_mmodel.h:85:[value] Function _initialized: postcondition got status unknown.
+./share/e-acsl/memory_model/e_acsl_mmodel.h:86:[value] Function _initialized: postcondition got status unknown.
 ./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status unknown.
 [value] using specification for function __clean
 [kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype

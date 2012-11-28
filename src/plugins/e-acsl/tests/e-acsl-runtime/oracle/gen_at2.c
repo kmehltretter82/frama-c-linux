@@ -101,6 +101,16 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
   return;
 }
 
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void *_store_block(void *ptr,
+                                                           size_t size);
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void _delete_block(void *ptr);
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void _initialize(void *ptr,
+                                                         size_t size);
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void _full_init(void *ptr);
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 int A = 0;
 /*@ ensures \at(A,Post) ≡ 3;  */
@@ -205,16 +215,32 @@ void g(int *p, int *q)
   int __e_acsl_at_3;
   int __e_acsl_at_2;
   int __e_acsl_at;
+  _store_block((void *)(& p),4U);
+  _full_init((void *)(& p));
+  _store_block((void *)(& q),4U);
+  _full_init((void *)(& q));
+  _initialize((void *)p,sizeof(int));
   *p = 0;
+  _initialize((void *)(p + 1),sizeof(int));
   *(p + 1) = 1;
+  _initialize((void *)q,sizeof(int));
   *q = 0;
+  _initialize((void *)p,sizeof(int));
   L1: 
+  _store_block((void *)(& __e_acsl_at_3),4U);
+  _full_init((void *)(& __e_acsl_at_3));
   __e_acsl_at_3 = *q;
+  _store_block((void *)(& __e_acsl_at),4U);
+  _full_init((void *)(& __e_acsl_at));
   __e_acsl_at = *q;
   *p = 2;
+  _initialize((void *)(p + 1),sizeof(int));
   *(p + 1) = 3;
+  _initialize((void *)q,sizeof(int));
   *q = 1;
   L2: 
+  _store_block((void *)(& __e_acsl_at_2),4U);
+  _full_init((void *)(& __e_acsl_at_2));
   __e_acsl_at_2 = *(p + (long)__e_acsl_at);
   A = 4;
   /*@ assert \at(*(p+\at(*q,L1)),L2) ≡ 2; */
@@ -238,6 +264,8 @@ void g(int *p, int *q)
     mpz_t __e_acsl_3;
     mpz_t __e_acsl_4;
     int __e_acsl_eq_2;
+    _store_block((void *)(& __e_acsl_at_4),4U);
+    _full_init((void *)(& __e_acsl_at_4));
     __e_acsl_at_4 = *(p + (long)__e_acsl_at_3);
     __gmpz_init_set_si(__e_acsl_3,(long)__e_acsl_at_4);
     __gmpz_init_set_si(__e_acsl_4,(long)2);
@@ -249,6 +277,8 @@ void g(int *p, int *q)
     __gmpz_clear(__e_acsl_4);
   }
   
+  _delete_block((void *)(& p));
+  _delete_block((void *)(& q));
   return;
 }
 
@@ -260,8 +290,13 @@ int main(void)
   int __retres;
   int x;
   int t[2];
+  _store_block((void *)(t),8U);
+  _store_block((void *)(& x),4U);
+  _full_init((void *)(& x));
   x = 0;
   L: 
+  _store_block((void *)(& __e_acsl_at_3),4U);
+  _full_init((void *)(& __e_acsl_at_3));
   __e_acsl_at_3 = x;
   {
     mpz_t __e_acsl_x_2;
@@ -278,6 +313,8 @@ int main(void)
     __gmpz_clear(__e_acsl_add);
   }
   
+  _store_block((void *)(& __e_acsl_at),4U);
+  _full_init((void *)(& __e_acsl_at));
   __e_acsl_at = x;
   /*@ assert x ≡ 0; */
   {
@@ -293,7 +330,9 @@ int main(void)
     __gmpz_clear(__e_acsl);
   }
   
+  _full_init((void *)(& x));
   x = 1;
+  _full_init((void *)(& x));
   x = 2;
   f();
   /*@ assert \at(x,L) ≡ 0; */
@@ -346,6 +385,8 @@ int main(void)
   g(t,& x);
   __retres = 0;
   __gmpz_clear(__e_acsl_at_2);
+  _delete_block((void *)(t));
+  _delete_block((void *)(& x));
   __clean();
   return (__retres);
 }

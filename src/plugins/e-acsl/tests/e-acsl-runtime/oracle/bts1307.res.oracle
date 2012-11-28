@@ -6,16 +6,7 @@
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
 tests/e-acsl-runtime/bts1307.i:16:[kernel] warning: Floating-point constant 0.4 is not represented exactly. Will use 0x1.999999999999ap-2. See documentation for option -warn-decimal-float
 tests/e-acsl-runtime/bts1307.i:31:[e-acsl] warning: approximating type `real' by `long double'
-:0:[e-acsl] warning: missing guard for ensuring that \old(Mtmax_out) is a valid memory access
-:0:[e-acsl] warning: missing guard for ensuring that \old(Mtmax_in) is a valid memory access
-:0:[e-acsl] warning: missing guard for ensuring that \old(Mwmax) is a valid memory access
 tests/e-acsl-runtime/bts1307.i:31:[e-acsl] approximating a real number by a float
-tests/e-acsl-runtime/bts1307.i:31:[e-acsl] warning: E-ACSL construct `\valid_read' is not yet supported. Ignoring annotation.
-tests/e-acsl-runtime/bts1307.i:31:[e-acsl] warning: E-ACSL construct `\valid_read' is not yet supported. Ignoring annotation.
-tests/e-acsl-runtime/bts1307.i:31:[e-acsl] warning: E-ACSL construct `\valid_read' is not yet supported. Ignoring annotation.
-:0:[e-acsl] warning: missing guard for ensuring that \old(Mtmin_out) is a valid memory access
-:0:[e-acsl] warning: missing guard for ensuring that \old(Mtmin_in) is a valid memory access
-:0:[e-acsl] warning: missing guard for ensuring that \old(Mwmin) is a valid memory access
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed
@@ -48,6 +39,10 @@ tests/e-acsl-runtime/bts1307.i:9:[value] Function foo: precondition got status v
 [value] using specification for function exit
 FRAMAC_SHARE/libc/stdlib.h:180:[value] Function exit: postcondition got status invalid.
 [value] using specification for function _initialize
+[value] using specification for function _initialized
+./share/e-acsl/memory_model/e_acsl_mmodel.h:85:[value] Function _initialized: postcondition got status unknown.
+./share/e-acsl/memory_model/e_acsl_mmodel.h:86:[value] Function _initialized: postcondition got status valid.
+[value] using specification for function _valid_read
 tests/e-acsl-runtime/bts1307.i:13:[value] warning: converting value to float: assert(Ook)
 [value] using specification for function _delete_block
 tests/e-acsl-runtime/bts1307.i:13:[value] Function foo, behavior OverEstimate_Motoring: postcondition got status valid.

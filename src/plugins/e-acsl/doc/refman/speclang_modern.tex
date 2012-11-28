@@ -223,11 +223,10 @@ Below, the first term is well-defined, while the second one is undefined.
 
 \paragraph{Handling undefinedness in tools}
 
-\notimplemented{It is the responsibility of the tools which interprets \eacsl
-  to ensure that an undefined term is never evaluated. For instance, they may
-  exit with a proper error message or, if they generate \C code, they may guard
-  each generated undefined \C expression in order to be sure that they are
-  always safely used.}
+It is the responsibility of the tools which interprets \eacsl to ensure that an
+undefined term is never evaluated. For instance, they may exit with a proper
+error message or, if they generate \C code, they may guard each generated
+undefined \C expression in order to be sure that they are always safely used.
 
 This behavior is consistent with both \acsl~\cite{acsl} and mainstream
 specification languages for runtime assertion checking like
@@ -265,8 +264,8 @@ It is not possible to define logic types introduced by the specification writer
 \subsection{C arrays and pointers}
 \nodiff
 
-\difficultwhy{\notimplemented{Ensuring validity of memory accesses}}{the
-  implementation of a memory model}
+\difficultwhy{Ensuring validity of memory accesses}{the implementation of a
+  memory model}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -655,7 +654,7 @@ axiomatics.
 
 \difficultswhy{\lstinline|\\base\_addr|,
     \lstinline|\\block\_length|, \lstinline|\\valid|, 
-    \notimplemented{\lstinline|\\valid_read|} and
+    \lstinline|\\valid_read| and
     \lstinline|\\offset|}{the implementation of a memory model}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

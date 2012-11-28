@@ -47,6 +47,12 @@ val result_lhost: kernel_function -> lhost
 val result_vi: kernel_function -> varinfo
 (** @return the varinfo corresponding to \result in the given function *)
 
+val mk_store_stmt: ?str_size:exp -> varinfo -> stmt
+val mk_delete_stmt: varinfo -> stmt
+val mk_full_init_stmt: ?addr:bool -> varinfo -> stmt
+val mk_initialize: loc:location -> lval -> stmt
+val mk_literal_string: varinfo -> stmt
+
 (*
 Local Variables:
 compile-command: "make"

@@ -9,7 +9,7 @@ int main(void);
 char *T = "bar";
 int G = 0;
 
-void f(void) { 
+void f(void) {
   /*@ assert T[G] == 'b'; */ ;
   G++;
 }
@@ -22,7 +22,9 @@ int G2 = 2;
 int main(void) {
   char *SS = "ss";
   /*@ assert S[G2] == 'o'; */
-  /*@ assert \initialized(S) && \initialized(S2) && \initialized(SS); */
+  /*@ assert \initialized(S); */
+  /*@ assert \valid_read(S2); */
+  /*@ assert ! \valid(SS); */
   return 0;
 }
 

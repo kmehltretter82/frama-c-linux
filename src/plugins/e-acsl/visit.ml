@@ -23,9 +23,6 @@
 open Cil_types
 open Cil_datatype
 
-let must_model_vi bhv ?kf vi =
-  Pre_analysis.must_model_vi ?kf (Cil.get_original_varinfo bhv vi)
-
 (* move all labels of [stmt] onto [new_stmt] *)
 let move_labels env stmt new_stmt =
   let labels = stmt.labels in
@@ -70,56 +67,13 @@ let rename_alloc_function stmt =
   |_ -> 
     stmt
 
-let mk_full_init_stmt ?(addr=true) vi =
-  let loc = vi.vdecl in
-  let stmt = match addr, Cil.unrollType vi.vtype with
-    | _, TArray(_,Some _, _, _) | false, _ ->
-      Misc.mk_call ~loc "_full_init" [ Cil.evar ~loc vi ]
-    | _ -> Misc.mk_call ~loc "_full_init" [ Cil.mkAddrOfVi vi ]
-  in
-  Misc.mk_debug_mmodel_stmt stmt
-
-let mk_initialize ~loc (host, offset as lv) = match host, offset with
-  | Var _, NoOffset -> Misc.mk_call ~loc "_full_init" [ Cil.mkAddrOf ~loc lv ]
-  | _ -> 
-    let typ = Cil.typeOfLval lv in
-    Misc.mk_call ~loc 
-      "_initialize" 
-      [ Cil.mkAddrOf ~loc lv; Cil.new_exp loc (SizeOf typ) ]
-
-let mk_store_stmt ?str_size vi =
-  let ty = Cil.unrollType vi.vtype in
-  let loc = vi.vdecl in
-  let stmt = match ty, str_size with
-    | TArray(_, Some _,_,_), None ->
-      Misc.mk_call ~loc "_store_block" [ Cil.evar ~loc vi ; Cil.sizeOf ~loc ty ]
-    | TPtr(TInt(IChar, _), _), Some size ->
-      Misc.mk_call ~loc "_store_block" [ Cil.evar ~loc vi ; size ]
-    | _, None -> 
-      Misc.mk_call ~loc "_store_block" 
-	[ Cil.mkAddrOfVi vi ; Cil.sizeOf ~loc ty ]
-    | _, Some _ ->
-      assert false
-  in
-  Misc.mk_debug_mmodel_stmt stmt
-
-let mk_delete_stmt vi =
-  let loc = vi.vdecl in
-  let stmt = match Cil.unrollType vi.vtype with
-    | TArray(_, Some _, _, _) ->
-      Misc.mk_call ~loc "_delete_block" [ Cil.evar ~loc vi ]
-      (*      | Tarray(_, None, _, _)*)
-    | _ -> Misc.mk_call ~loc "_delete_block" [ Cil.mkAddrOfVi vi ] 
-  in
-  Misc.mk_debug_mmodel_stmt stmt
-
 let allocate_function env kf =
   List.fold_left
     (fun env vi -> 
       if Pre_analysis.must_model_vi ~kf vi then
 	let vi = Cil.get_varinfo (Env.get_behavior env) vi in
-	let env = Env.add_stmt env (mk_store_stmt vi) in
-	Env.add_stmt env (mk_full_init_stmt vi)
+	let env = Env.add_stmt env (Misc.mk_store_stmt vi) in
+	Env.add_stmt env (Misc.mk_full_init_stmt vi)
       else
 	env)
     env
@@ -130,7 +84,7 @@ let deallocate_function env kf  =
     (fun env vi -> 
       if Pre_analysis.must_model_vi ~kf vi then 
 	let vi = Cil.get_varinfo (Env.get_behavior env) vi in
-	Env.add_stmt env (mk_delete_stmt vi)
+	Env.add_stmt env (Misc.mk_delete_stmt vi)
       else
 	env)
     env
@@ -201,7 +155,9 @@ class e_acsl_visitor prj generate = object (self)
 		    let new_vi = Cil.get_varinfo self#behavior old_vi in
 		    let model blk =
 		      if Pre_analysis.must_model_vi old_vi then
-			mk_store_stmt new_vi :: mk_full_init_stmt new_vi :: blk
+			Misc.mk_store_stmt new_vi
+			:: Misc.mk_full_init_stmt new_vi 
+			:: blk
 		      else
 			stmts
 		    in
@@ -302,7 +258,7 @@ you must call function `%s' by yourself"
       let do_it = function
 	| GVar(vi, i, _) ->
 	  (* remove initializers on need *)
-	  if must_model_vi self#behavior vi then
+	  if Pre_analysis.old_must_model_vi self#behavior vi then
 	    (try
 	       let old_vi = Cil.get_original_varinfo self#behavior vi in
 	       match Varinfo.Hashtbl.find global_vars old_vi with
@@ -411,8 +367,9 @@ you must call function `%s' by yourself"
 	      let str_size = Cil.new_exp loc (SizeOfStr s) in
 	      [ Cil.mkStmtOneInstr 
 		  ~valid_sid:true (Set(Cil.var vi, e, loc));
-		mk_store_stmt ~str_size vi;
-		mk_full_init_stmt ~addr:false vi ])
+		Misc.mk_store_stmt ~str_size vi;
+		Misc.mk_full_init_stmt ~addr:false vi;
+		Misc.mk_literal_string vi ])
 	in
 	env_ref := env;
 	Cil.ChangeTo exp
@@ -510,7 +467,7 @@ you must call function `%s' by yourself"
 		  (fun vi _ acc -> 
 		    if Pre_analysis.must_model_vi vi then 
 		      let vi = Cil.get_varinfo self#behavior vi in
-		      mk_delete_stmt vi :: acc
+		      Misc.mk_delete_stmt vi :: acc
 		    else
 		      acc)
 		  [ Misc.mk_call ~loc:(Stmt.loc stmt) "__clean" []; ret ]
@@ -551,7 +508,9 @@ you must call function `%s' by yourself"
 	let kf = Extlib.the self#current_kf in
 	let stmt = Extlib.the self#current_stmt in
 	if Pre_analysis.must_model_lval ~kf ~stmt old_lv then begin
-	  let stmt = Misc.mk_debug_mmodel_stmt (mk_initialize loc new_lv) in
+	  let stmt = 
+	    Misc.mk_debug_mmodel_stmt (Misc.mk_initialize loc new_lv) 
+	  in
 	  function_env := Env.add_stmt !function_env stmt
 	end
       | _ -> assert false
@@ -573,8 +532,8 @@ you must call function `%s' by yourself"
 	let add_locals stmts =
 	  List.fold_left
 	    (fun acc vi ->
-	      if must_model_vi self#behavior ~kf vi then
-		mk_delete_stmt vi :: acc
+	      if Pre_analysis.old_must_model_vi self#behavior ~kf vi then
+		Misc.mk_delete_stmt vi :: acc
 	      else
 		acc)
 	    stmts
@@ -592,14 +551,15 @@ you must call function `%s' by yourself"
 	      List.fold_left (fun acc v -> v :: acc) (add_locals init) tl
 	  | { skind = Block b } :: _ -> 
 	    insert_in_innermost_last_block b (List.rev b.bstmts)
-	  | l -> blk.bstmts <- add_locals (List.rev l)
+	  | l -> blk.bstmts <- 
+	    List.fold_left (fun acc v -> v :: acc) (add_locals []) l
 	in
 	insert_in_innermost_last_block new_blk (List.rev new_blk.bstmts);
 	new_blk.bstmts <-
 	  List.fold_left
 	  (fun acc v -> 
 	    if Pre_analysis.must_model_vi v 
-	    then mk_store_stmt (Cil.get_varinfo self#behavior v) :: acc
+	    then Misc.mk_store_stmt (Cil.get_varinfo self#behavior v) :: acc
 	    else acc)
 	  new_blk.bstmts
 	  blk.blocals;

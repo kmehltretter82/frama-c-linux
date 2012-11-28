@@ -31,8 +31,8 @@
 [value] using specification for function _full_init
 tests/e-acsl-runtime/valid.c:27:[value] Assertion got status valid.
 [value] using specification for function _initialized
-./share/e-acsl/memory_model/e_acsl_mmodel.h:84:[value] Function _initialized: postcondition got status unknown.
 ./share/e-acsl/memory_model/e_acsl_mmodel.h:85:[value] Function _initialized: postcondition got status unknown.
+./share/e-acsl/memory_model/e_acsl_mmodel.h:86:[value] Function _initialized: postcondition got status unknown.
 tests/e-acsl-runtime/valid.c:27:[kernel] warning: accessing uninitialized left-value: assert \initialized(&a);
 tests/e-acsl-runtime/valid.c:27:[kernel] warning: completely indeterminate value in a.
 tests/e-acsl-runtime/valid.c:27:[value] Non-termination in evaluation of function call expression argument
@@ -44,7 +44,7 @@ tests/e-acsl-runtime/valid.c:27:[value] Non-termination in evaluation of functio
 [value] using specification for function _valid
 ./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status unknown.
 tests/e-acsl-runtime/valid.c:29:[value] Assertion got status valid.
-./share/e-acsl/memory_model/e_acsl_mmodel.h:85:[value] Function _initialized: postcondition got status valid.
+./share/e-acsl/memory_model/e_acsl_mmodel.h:86:[value] Function _initialized: postcondition got status valid.
 tests/e-acsl-runtime/valid.c:29:[kernel] warning: accessing uninitialized left-value: assert \initialized(&b);
 tests/e-acsl-runtime/valid.c:29:[kernel] warning: completely indeterminate value in b.
 tests/e-acsl-runtime/valid.c:29:[value] Non-termination in evaluation of function call expression argument

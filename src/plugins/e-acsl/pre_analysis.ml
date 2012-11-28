@@ -63,7 +63,6 @@ end = struct
 
   module StartData = struct
     type data = Varinfo.Set.t option
-    type key = stmt
     let apply f = 
       try
 	let h =  Kernel_function.Hashtbl.find tbl !current_kf in
@@ -124,15 +123,14 @@ module rec Transfer
       the one we have just computed. Return None if the combination is the same
       as the old data, otherwise return the combination. In the latter case, the
       predecessors of the statement are put on the working list. *)
-  let combineStmtStartData stmt ~old state = match old, state with
+  let combineStmtStartData _stmt ~old state = match old, state with
     | _, None -> assert false
     | None, Some _ -> Some state (* [old] already included in [state] *)
     | Some old, Some new_ -> 
-      match stmt.skind with
-      | Return _ -> Some (Some (Varinfo.Set.union old new_))
-      | _ ->
-	assert (Varinfo.Set.equal old new_);
+      if Varinfo.Set.equal old new_ then
 	None
+      else
+	Some (Some (Varinfo.Set.union old new_))
 
   (** Take the data from two successors and combine it *)
   let combineSuccessors s1 s2 = 
@@ -204,17 +202,24 @@ module rec Transfer
       | Tbase_addr(_, t) | Toffset(_, t) | Tblock_length(_, t) ->
 	state_ref := register_term kf !state_ref t;
 	Cil.SkipChildren
-      | TConst _ | TSizeOf _ | TSizeOfStr _ | TAlignOf _  | TLval _ | Tnull
+      | TConst _ | TSizeOf _ | TSizeOfStr _ | TAlignOf _  | Tnull
       | Ttype _ | Tempty_set -> 
 	(* no sub-term inside: skip for efficiency *)
 	Cil.SkipChildren
-      | TSizeOfE _ | TAlignOfE _ | TUnOp _ | TBinOp _ | TCastE _ | TAddrOf _
+      | TLval _ | TSizeOfE _ | TAlignOfE _ | TUnOp _ | TBinOp _ | TCastE _ 
+      | TAddrOf _
       | TStartOf _ | Tapp _ | Tlambda _ | TDataCons _ | Tif _ | Tat _
       | TCoerce _ | TCoerceE _ | TUpdate _ | Ttypeof _ | Tunion _ | Tinter _
       | Tcomprehension _ | Trange _ | Tlet _ | TLogic_coerce _ -> 
 	(* potential sub-term inside *)
 	Cil.DoChildren
       method vlogic_label _ = Cil.SkipChildren
+      method vterm_lhost = function
+      | TMem t ->
+	state_ref := register_term kf !state_ref t;
+	Cil.SkipChildren
+      | TVar _ | TResult _ -> 
+	Cil.SkipChildren
     end in
     let register_predicate pred state = 
       let state_ref = ref state in
@@ -227,7 +232,7 @@ module rec Transfer
       !state_ref
     in
     Dataflow.Post 
-      (fun state -> 
+      (fun state ->
 	let state = Env.default_varinfos state in
 	let state = 
 	  if is_first || is_last then 
@@ -478,6 +483,9 @@ let must_model_vi ?kf ?stmt vi =
 
 let must_model_lval ?kf ?stmt lv = 
   Error.generic_handle (must_model_lval ?kf ?stmt) false lv
+
+let old_must_model_vi bhv ?kf vi =
+  must_model_vi ?kf (Cil.get_original_varinfo bhv vi)
 
 (*
 Local Variables:
