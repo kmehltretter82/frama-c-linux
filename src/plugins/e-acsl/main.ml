@@ -70,6 +70,15 @@ let generate_code =
     (Datatype.func Datatype.string Project.ty)
     generate_code
 
+let predicate_to_exp =
+  Dynamic.register
+    ~plugin:"e-acsl"
+    ~journalize:false
+    "predicate_to_exp"
+    (Datatype.func2
+       Kernel_function.ty Cil_datatype.Predicate_named.ty Cil_datatype.Exp.ty)
+    Translate.predicate_to_exp
+
 let add_e_acsl_library () =
   if Options.must_visit () then begin
     Kernel.CppExtraArgs.add (Pretty_utils.sfprintf " -I%s/libc" Config.datadir);

@@ -33,6 +33,8 @@ val translate_pre_code_annotation:
 val translate_post_code_annotation: 
   kernel_function -> Env.t -> code_annotation -> Env.t
 
+val predicate_to_exp: kernel_function -> predicate named -> exp
+
 (*
 Local Variables:
 compile-command: "make"

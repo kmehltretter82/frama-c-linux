@@ -606,6 +606,13 @@ let () =
   Quantif.term_to_exp_ref := term_to_exp;
   Quantif.named_predicate_to_exp_ref := named_predicate_to_exp
 
+let predicate_to_exp kf p =
+  Typing.type_named_predicate ~must_clear:true p;
+  let empty_env = Env.empty (new Visitor.frama_c_copy Project_skeleton.dummy) in
+  let e, _ = named_predicate_to_exp kf empty_env p in
+  assert (Typ.equal (Cil.typeOf e) Cil.intType);
+  e  
+
 (* ************************************************************************** *)
 (* [translate_*] translates a given ACSL annotation into the corresponding C
    statement (if any) for runtime assertion checking *)
