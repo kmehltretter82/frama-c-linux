@@ -32,24 +32,24 @@
                      [1].__fc_stdio_id ∈ [--..--]
         S___fc_stdio_buffer_0_S___fc_stdout[0..1] ∈ [--..--]
         S___fc_stdio_buffer_1_S___fc_stdout[0..1] ∈ [--..--]
-[value] using specification for function _store_block
-[value] using specification for function _full_init
-[value] using specification for function _literal_string
+[value] using specification for function __store_block
+[value] using specification for function __full_init
+[value] using specification for function __literal_string
 tests/e-acsl-runtime/literal_string.i:24:[value] Assertion got status valid.
-[value] using specification for function _valid_read
+[value] using specification for function __valid_read
 ./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status unknown.
 [value] using specification for function printf
 [value] using specification for function exit
 FRAMAC_SHARE/libc/stdlib.h:180:[value] Function exit: postcondition got status invalid.
 ./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status valid.
 tests/e-acsl-runtime/literal_string.i:25:[value] Assertion got status valid.
-[value] using specification for function _initialized
-./share/e-acsl/memory_model/e_acsl_mmodel.h:85:[value] Function _initialized: postcondition got status unknown.
-./share/e-acsl/memory_model/e_acsl_mmodel.h:86:[value] Function _initialized: postcondition got status valid.
+[value] using specification for function __initialized
+./share/e-acsl/memory_model/e_acsl_mmodel.h:85:[value] Function __initialized: postcondition got status unknown.
+./share/e-acsl/memory_model/e_acsl_mmodel.h:86:[value] Function __initialized: postcondition got status valid.
 tests/e-acsl-runtime/literal_string.i:26:[value] Assertion got status valid.
 tests/e-acsl-runtime/literal_string.i:27:[value] Assertion got status valid.
-[value] using specification for function _valid
-[value] using specification for function _delete_block
+[value] using specification for function __valid
+[value] using specification for function __delete_block
 [value] using specification for function __clean
 [kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
 [value] done for function main

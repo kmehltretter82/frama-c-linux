@@ -89,12 +89,12 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 }
 
 /*@ assigns \nothing;  */
-extern  __attribute__((__FC_BUILTIN__)) void *_store_block(void *ptr,
-                                                           size_t size);
+extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
+                                                            size_t size);
 /*@ assigns \nothing;  */
-extern  __attribute__((__FC_BUILTIN__)) void _full_init(void *ptr);
+extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
 /*@ assigns \nothing;  */
-extern  __attribute__((__FC_BUILTIN__)) void _literal_string(void *ptr);
+extern  __attribute__((__FC_BUILTIN__)) void __literal_string(void *ptr);
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 int main(void)
 {
@@ -162,9 +162,9 @@ int main(void)
   }
   
   __e_acsl_literal_string = "toto";
-  _store_block((void *)__e_acsl_literal_string,sizeof("toto"));
-  _full_init((void *)__e_acsl_literal_string);
-  _literal_string((void *)__e_acsl_literal_string);
+  __store_block((void *)__e_acsl_literal_string,sizeof("toto"));
+  __full_init((void *)__e_acsl_literal_string);
+  __literal_string((void *)__e_acsl_literal_string);
   s = (char *)__e_acsl_literal_string;
   /*@ assert s ≡ s; */
   e_acsl_assert(s == s,(char *)"Assertion",(char *)"s == s",14);

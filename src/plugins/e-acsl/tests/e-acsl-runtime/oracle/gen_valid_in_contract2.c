@@ -57,15 +57,15 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 }
 
 /*@ assigns \nothing;  */
-extern  __attribute__((__FC_BUILTIN__)) int _valid(void *ptr, size_t size);
+extern  __attribute__((__FC_BUILTIN__)) int __valid(void *ptr, size_t size);
 /*@ ensures \result ≡ 0 ∨ \result ≡ 1;
     ensures \result ≡ 1 ⇒
             \initialized((char *)\old(ptr)+(0..\old(size)-1));
     assigns \nothing;
   
 */
-extern  __attribute__((__FC_BUILTIN__)) int _initialized(void *ptr,
-                                                         size_t size);
+extern  __attribute__((__FC_BUILTIN__)) int __initialized(void *ptr,
+                                                          size_t size);
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 /*@ behavior B1:
       assumes l ≡ \null;
@@ -89,15 +89,15 @@ struct list *f(struct list *l)
   {
     int __e_acsl_valid;
     int __e_acsl_and_2;
-    __e_acsl_valid = _valid((void *)l,sizeof(struct list));
+    __e_acsl_valid = __valid((void *)l,sizeof(struct list));
     if (! __e_acsl_valid) {
       int __e_acsl_initialized;
       int __e_acsl_and;
-      __e_acsl_initialized = _initialized((void *)(& l->next),
-                                          sizeof(struct list *));
+      __e_acsl_initialized = __initialized((void *)(& l->next),
+                                           sizeof(struct list *));
       if (__e_acsl_initialized) {
         int __e_acsl_valid_2;
-        __e_acsl_valid_2 = _valid((void *)l->next,sizeof(struct list));
+        __e_acsl_valid_2 = __valid((void *)l->next,sizeof(struct list));
         __e_acsl_and = __e_acsl_valid_2;
       }
       else { __e_acsl_and = 0; }

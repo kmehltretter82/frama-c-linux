@@ -69,31 +69,31 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 }
 
 /*@ assigns \nothing;  */
-extern  __attribute__((__FC_BUILTIN__)) void *_store_block(void *ptr,
-                                                           size_t size);
+extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
+                                                            size_t size);
 /*@ assigns \nothing;  */
-extern  __attribute__((__FC_BUILTIN__)) void _delete_block(void *ptr);
+extern  __attribute__((__FC_BUILTIN__)) void __delete_block(void *ptr);
 /*@ assigns \nothing;  */
-extern  __attribute__((__FC_BUILTIN__)) void _initialize(void *ptr,
-                                                         size_t size);
+extern  __attribute__((__FC_BUILTIN__)) void __initialize(void *ptr,
+                                                          size_t size);
 /*@ assigns \nothing;  */
-extern  __attribute__((__FC_BUILTIN__)) void _full_init(void *ptr);
+extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
 /*@ ensures \result ≡ 0 ∨ \result ≡ 1;
     ensures \result ≡ 1 ⇒
             \initialized((char *)\old(ptr)+(0..\old(size)-1));
     assigns \nothing;
   
 */
-extern  __attribute__((__FC_BUILTIN__)) int _initialized(void *ptr,
-                                                         size_t size);
+extern  __attribute__((__FC_BUILTIN__)) int __initialized(void *ptr,
+                                                          size_t size);
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 void read_sensor_4(unsigned int *m)
 {
-  _store_block((void *)(& m),4U);
-  _full_init((void *)(& m));
-  _initialize((void *)m,sizeof(unsigned int));
+  __store_block((void *)(& m),4U);
+  __full_init((void *)(& m));
+  __initialize((void *)m,sizeof(unsigned int));
   *m = 0U;
-  _delete_block((void *)(& m));
+  __delete_block((void *)(& m));
   return;
 }
 
@@ -102,7 +102,7 @@ int main(void)
   int __retres;
   unsigned char buf[12U];
   int i;
-  _store_block((void *)(buf),12U);
+  __store_block((void *)(buf),12U);
   i = 0;
   while ((unsigned int)i < 3U) {
     read_sensor_4((unsigned int *)(buf) + i);
@@ -111,13 +111,13 @@ int main(void)
   /*@ assert \initialized((union msg *)buf); */
   {
     int __e_acsl_initialized;
-    __e_acsl_initialized = _initialized((void *)(buf),sizeof(union msg));
+    __e_acsl_initialized = __initialized((void *)(buf),sizeof(union msg));
     e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",
                   (char *)"\\initialized((union msg *)buf)",25);
   }
   
   __retres = 0;
-  _delete_block((void *)(buf));
+  __delete_block((void *)(buf));
   __clean();
   return (__retres);
 }

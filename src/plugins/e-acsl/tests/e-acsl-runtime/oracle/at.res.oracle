@@ -26,8 +26,8 @@
                      [1].__fc_stdio_id ∈ [--..--]
         S___fc_stdio_buffer_0_S___fc_stdout[0..1] ∈ [--..--]
         S___fc_stdio_buffer_1_S___fc_stdout[0..1] ∈ [--..--]
-[value] using specification for function _store_block
-[value] using specification for function _full_init
+[value] using specification for function __store_block
+[value] using specification for function __full_init
 tests/e-acsl-runtime/at.i:45:[value] Assertion got status valid.
 ./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status valid.
 tests/e-acsl-runtime/at.i:13:[value] Assertion got status valid.
@@ -43,12 +43,12 @@ tests/e-acsl-runtime/at.i:51:[value] cannot evaluate ACSL term, unsupported ACSL
 tests/e-acsl-runtime/at.i:51:[value] Assertion got status unknown.
 tests/e-acsl-runtime/at.i:52:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
 tests/e-acsl-runtime/at.i:52:[value] Assertion got status unknown.
-[value] using specification for function _initialize
+[value] using specification for function __initialize
 tests/e-acsl-runtime/at.i:32:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
 tests/e-acsl-runtime/at.i:32:[value] Assertion got status unknown.
 :0:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
 tests/e-acsl-runtime/at.i:34:[value] Assertion got status unknown.
-[value] using specification for function _delete_block
+[value] using specification for function __delete_block
 [value] using specification for function __clean
 [kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
 [value] done for function main

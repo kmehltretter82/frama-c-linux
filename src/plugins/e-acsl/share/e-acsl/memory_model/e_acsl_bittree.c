@@ -105,7 +105,6 @@ unsigned long mask(void * a, void * b) {
   return Tmasks[-i];
 }
 
-
 /* logical AND of a bittree and a new node */
 void* and(struct bittree * a, struct _block * b) {
   return (void*) ((unsigned long)a->addr & (unsigned long)b->ptr);
@@ -116,9 +115,8 @@ int matches_mask(struct bittree * a, void * b) {
   return ((unsigned long)a->addr & a->mask) == ((unsigned long)b & a->mask);
 }
 
-
 /* remove the block from the structure */
-void _remove_element (struct _block * ptr) {
+void __remove_element (struct _block * ptr) {
   struct bittree * curr = __root;
   assert(__root != NULL);
   assert(ptr != NULL);
@@ -169,9 +167,8 @@ void _remove_element (struct _block * ptr) {
   }
 }
 
-
 /* add a block in the structure */
-void _add_element (struct _block * ptr) {
+void __add_element (struct _block * ptr) {
   struct bittree * new_leaf;
   assert(ptr != NULL);
   
@@ -241,10 +238,9 @@ void _add_element (struct _block * ptr) {
   }
 }
 
-
 /* return the block B such as : begin addr of B == ptr
    we suppose that such a block exists, but we could return NULL if not */
-struct _block * _get_exact (void * ptr) {
+struct _block * __get_exact (void * ptr) {
   struct bittree * tmp = __root;
   if(__root == NULL || ptr == NULL) return NULL;
 
@@ -263,12 +259,11 @@ struct _block * _get_exact (void * ptr) {
   }
 }
 
-
 /* return the block B containing ptr, starting from b and only exploring
    left children, or NULL if such block does not exist
-   THIS METHOD IS INVOKED FROM _get_cont ONLY
+   THIS METHOD IS INVOKED FROM __get_cont ONLY
    DO NOT CALL IT FROM ANYWHERE ELSE */
-struct _block * _get_cont_by_left_child (void * ptr, struct bittree * b) {
+struct _block * __get_cont_by_left_child (void * ptr, struct bittree * b) {
   struct bittree * tmp = b;
   assert(((unsigned long)b->addr & b->mask) == ((unsigned long)ptr & b->mask));
 
@@ -285,11 +280,10 @@ struct _block * _get_cont_by_left_child (void * ptr, struct bittree * b) {
   return (tmp->addr == ptr) ? tmp->leaf : NULL;
 }
 
-
 /* return the block B containing ptr, such as :
    begin addr of B <= ptr < (begin addr + size) of B
    or NULL if such a block does not exist */
-struct _block * _get_cont (void * ptr) {
+struct _block * __get_cont (void * ptr) {
   struct bittree * tmp = __root;
   if(__root == NULL || ptr == NULL) return NULL;
   
@@ -308,7 +302,7 @@ struct _block * _get_cont (void * ptr) {
 
     if(((unsigned long)tmp->right->addr & tmp->right->mask)
        == (unsigned long)ptr) {
-      struct _block * r = _get_cont_by_left_child(ptr, tmp->right);
+      struct _block * r = __get_cont_by_left_child(ptr, tmp->right);
       if(r == NULL)
 	tmp = tmp->left;
       else
@@ -326,18 +320,16 @@ struct _block * _get_cont (void * ptr) {
   }
 }
 
-
 /*******************/
 /* CLEAN           */
 /*******************/
-
 
 /* recursively erase the content of the structure,
    do not call directly */
 void __clean_rec (struct bittree * ptr) {
   if(ptr == NULL) return;
   else if(ptr->is_leaf) {
-    _clean_block(ptr->leaf);
+    __clean_block(ptr->leaf);
     ptr->leaf = NULL;
   }
   else {
@@ -354,11 +346,9 @@ void __clean_struct () {
   __root = NULL;
 }
 
-
 /*********************/
 /* DEBUG             */
 /*********************/
-
 
 /* recursively print the content of the structure
    do not call directly */
@@ -366,7 +356,7 @@ void __debug_rec (struct bittree * ptr) {
   if(ptr == NULL) return;
   else if(ptr->is_leaf) {
     printf("\t\t\t");
-    _print_block(ptr->leaf);
+    __print_block(ptr->leaf);
   }
   else {
     __debug_rec(ptr->left);

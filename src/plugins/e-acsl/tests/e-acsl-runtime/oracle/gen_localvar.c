@@ -57,7 +57,7 @@ axiomatic
     disjoint behaviors no_allocation, allocation;
   
 */
-extern void *_malloc(size_t size);
+extern void *__malloc(size_t size);
 /*@ ensures \false;
     assigns \nothing;  */
 extern void exit(int status);
@@ -78,38 +78,38 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 }
 
 /*@ assigns \nothing;  */
-extern  __attribute__((__FC_BUILTIN__)) void *_store_block(void *ptr,
-                                                           size_t size);
+extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
+                                                            size_t size);
 /*@ assigns \nothing;  */
-extern  __attribute__((__FC_BUILTIN__)) void _delete_block(void *ptr);
+extern  __attribute__((__FC_BUILTIN__)) void __delete_block(void *ptr);
 /*@ assigns \nothing;  */
-extern  __attribute__((__FC_BUILTIN__)) void _full_init(void *ptr);
+extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
 /*@ assigns \nothing;  */
-extern  __attribute__((__FC_BUILTIN__)) int _valid(void *ptr, size_t size);
+extern  __attribute__((__FC_BUILTIN__)) int __valid(void *ptr, size_t size);
 /*@ ensures \result ≡ 0 ∨ \result ≡ 1;
     ensures \result ≡ 1 ⇒
             \initialized((char *)\old(ptr)+(0..\old(size)-1));
     assigns \nothing;
   
 */
-extern  __attribute__((__FC_BUILTIN__)) int _initialized(void *ptr,
-                                                         size_t size);
+extern  __attribute__((__FC_BUILTIN__)) int __initialized(void *ptr,
+                                                          size_t size);
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 struct list *add(struct list *l, int i)
 {
   struct list *new;
-  _store_block((void *)(& new),4U);
-  _full_init((void *)(& new));
-  new = (struct list *)_malloc(sizeof(struct list));
+  __store_block((void *)(& new),4U);
+  __full_init((void *)(& new));
+  new = (struct list *)__malloc(sizeof(struct list));
   /*@ assert \valid(new); */
   {
     int __e_acsl_initialized;
     int __e_acsl_and;
-    __e_acsl_initialized = _initialized((void *)(& new),
-                                        sizeof(struct list *));
+    __e_acsl_initialized = __initialized((void *)(& new),
+                                         sizeof(struct list *));
     if (__e_acsl_initialized) {
       int __e_acsl_valid;
-      __e_acsl_valid = _valid((void *)new,sizeof(struct list));
+      __e_acsl_valid = __valid((void *)new,sizeof(struct list));
       __e_acsl_and = __e_acsl_valid;
     }
     else { __e_acsl_and = 0; }
@@ -118,7 +118,7 @@ struct list *add(struct list *l, int i)
   
   new->element = i;
   new->next = l;
-  _delete_block((void *)(& new));
+  __delete_block((void *)(& new));
   return (new);
 }
 

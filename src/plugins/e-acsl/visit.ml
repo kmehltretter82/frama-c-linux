@@ -62,7 +62,7 @@ let rename_alloc_function stmt =
   match stmt.skind with 
   | Instr(Call(_, { enode = Lval(Var vi, _) }, _, _))
       when is_alloc_name vi.vname ->
-    vi.vname <- "_" ^ vi.vname;
+    vi.vname <- "__" ^ vi.vname;
     Misc.mk_debug_mmodel_stmt stmt
   |_ -> 
     stmt

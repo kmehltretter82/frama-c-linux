@@ -70,13 +70,6 @@ let mk_call ?(loc=Location.unknown) ?result fname args =
   in
   mkStmtOneInstr ~valid_sid:true (Call(result, f, args, loc))
 
-let mk_debug_mmodel_stmt stmt =
-  if Options.debug_atleast 2 then
-    let debug = mk_call "__debug" [] in
-    Cil.mkStmt ~valid_sid:true (Block (Cil.mkBlock [ stmt; debug]))
-  else 
-    stmt
-
 type annotation_kind = Assertion | Precondition | Postcondition | Invariant
 
 let kind_to_string loc k = 
@@ -115,36 +108,41 @@ let result_vi kf = match result_lhost kf with
   | Var vi -> vi
   | Mem _ -> assert false
 
+(* TODO: convert -debug 2 into a new debugging category *)
+let mk_debug_mmodel_stmt stmt =
+  if Options.debug_atleast 2 then
+    let debug = mk_call "__debug" [] in
+    Cil.mkStmt ~valid_sid:true (Block (Cil.mkBlock [ stmt; debug]))
+  else 
+    stmt
+
 let mk_full_init_stmt ?(addr=true) vi =
   let loc = vi.vdecl in
   let stmt = match addr, Cil.unrollType vi.vtype with
     | _, TArray(_,Some _, _, _) | false, _ ->
-      mk_call ~loc "_full_init" [ Cil.evar ~loc vi ]
-    | _ -> mk_call ~loc "_full_init" [ Cil.mkAddrOfVi vi ]
+      mk_call ~loc "__full_init" [ Cil.evar ~loc vi ]
+    | _ -> mk_call ~loc "__full_init" [ Cil.mkAddrOfVi vi ]
   in
   mk_debug_mmodel_stmt stmt
 
 let mk_initialize ~loc (host, offset as lv) = match host, offset with
-  | Var _, NoOffset -> mk_call ~loc "_full_init" [ Cil.mkAddrOf ~loc lv ]
+  | Var _, NoOffset -> mk_call ~loc "__full_init" [ Cil.mkAddrOf ~loc lv ]
   | _ -> 
     let typ = Cil.typeOfLval lv in
     mk_call ~loc 
-      "_initialize" 
+      "__initialize" 
       [ Cil.mkAddrOf ~loc lv; Cil.new_exp loc (SizeOf typ) ]
 
 let mk_store_stmt ?str_size vi =
   let ty = Cil.unrollType vi.vtype in
   let loc = vi.vdecl in
+  let store = mk_call ~loc "__store_block" in
   let stmt = match ty, str_size with
-    | TArray(_, Some _,_,_), None ->
-      mk_call ~loc "_store_block" [ Cil.evar ~loc vi ; Cil.sizeOf ~loc ty ]
-    | TPtr(TInt(IChar, _), _), Some size ->
-      mk_call ~loc "_store_block" [ Cil.evar ~loc vi ; size ]
-    | _, None -> 
-      mk_call ~loc "_store_block" 
-	[ Cil.mkAddrOfVi vi ; Cil.sizeOf ~loc ty ]
-    | _, Some _ ->
-      assert false
+    | TArray(_, Some _,_,_), None -> 
+      store [ Cil.evar ~loc vi ; Cil.sizeOf ~loc ty ]
+    | TPtr(TInt(IChar, _), _), Some size -> store [ Cil.evar ~loc vi ; size ]
+    | _, None -> store [ Cil.mkAddrOfVi vi ; Cil.sizeOf ~loc ty ]
+    | _, Some _ -> assert false
   in
   mk_debug_mmodel_stmt stmt
 
@@ -152,15 +150,15 @@ let mk_delete_stmt vi =
   let loc = vi.vdecl in
   let stmt = match Cil.unrollType vi.vtype with
     | TArray(_, Some _, _, _) ->
-      mk_call ~loc "_delete_block" [ Cil.evar ~loc vi ]
+      mk_call ~loc "__delete_block" [ Cil.evar ~loc vi ]
       (*      | Tarray(_, None, _, _)*)
-    | _ -> mk_call ~loc "_delete_block" [ Cil.mkAddrOfVi vi ] 
+    | _ -> mk_call ~loc "__delete_block" [ Cil.mkAddrOfVi vi ] 
   in
   mk_debug_mmodel_stmt stmt
 
 let mk_literal_string vi =
   let loc = vi.vdecl in
-  let stmt = mk_call ~loc "_literal_string" [ Cil.evar ~loc vi ] in
+  let stmt = mk_call ~loc "__literal_string" [ Cil.evar ~loc vi ] in
   mk_debug_mmodel_stmt stmt
 
 (*

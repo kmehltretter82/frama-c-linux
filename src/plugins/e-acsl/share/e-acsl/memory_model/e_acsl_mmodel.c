@@ -11,16 +11,12 @@ const int nbr_bits_to_1[256] = {
   0,1,1,2,1,2,2,3,1,2,2,3,2,3,3,4,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,4,5,5,6,5,6,6,7,5,6,6,7,6,7,7,8
 };
 
-
-
 size_t needed_bytes (size_t size) {
   return (size % 8) == 0 ? (size/8) : (size/8 + 1);
 }
 
-
-
 /* store the block of size bytes starting at ptr */
-void* _store_block(void* ptr, size_t size) {
+void* __store_block(void* ptr, size_t size) {
   struct _block * tmp;
   assert(ptr != NULL);
   tmp = malloc(sizeof(struct _block));
@@ -30,61 +26,57 @@ void* _store_block(void* ptr, size_t size) {
   tmp->init_ptr = NULL;
   tmp->init_cpt = 0;
   tmp->is_litteral_string = false;
-  _add_element(tmp);
+  __add_element(tmp);
   return ptr;
 }
 
-
 /* remove the block starting at ptr */
-void _delete_block(void* ptr) {
+void __delete_block(void* ptr) {
   struct _block * tmp;
   assert(ptr != NULL);
-  tmp = _get_exact(ptr);
+  tmp = __get_exact(ptr);
   assert(tmp != NULL);
-  _clean_init(tmp);
-  _remove_element(tmp);
+  __clean_init(tmp);
+  __remove_element(tmp);
   free(tmp);
 }
 
-
 /* allocate size bytes and store the returned block
  * for further information, see malloc */
-void* _malloc(size_t size) {
+void* __malloc(size_t size) {
   void * tmp, * tmp2;
   if(size <= 0) return NULL;
   tmp = malloc(size);
   if(tmp == NULL) return NULL;
-  tmp2 = _store_block(tmp, size);
+  tmp2 = __store_block(tmp, size);
   assert(tmp2 != NULL);
   return tmp2;
 }
 
-
 /* free the block starting at ptr,
  * for further information, see free */
-void _free(void* ptr) {
+void __free(void* ptr) {
   struct _block * tmp;
   if(ptr == NULL) return;
-  tmp = _get_exact(ptr);
+  tmp = __get_exact(ptr);
   assert(tmp != NULL);
   free(ptr);
-  _clean_init(tmp);
-  _remove_element(tmp);
+  __clean_init(tmp);
+  __remove_element(tmp);
   free(tmp);
 }
 
-
 /* resize the block starting at ptr to fit its new size,
  * for further information, see realloc */
-void* _realloc(void* ptr, size_t size) {
+void* __realloc(void* ptr, size_t size) {
   struct _block * tmp;
   void * new_ptr;
-  if(ptr == NULL) return _malloc(size);
+  if(ptr == NULL) return __malloc(size);
   if(size <= 0) {
-    _free(ptr);
+    __free(ptr);
     return NULL;
   }
-  tmp = _get_exact(ptr);
+  tmp = __get_exact(ptr);
   assert(tmp != NULL);
   new_ptr = realloc(tmp->ptr, size);
   if(new_ptr == NULL) return NULL;
@@ -126,28 +118,26 @@ void* _realloc(void* ptr, size_t size) {
   return tmp->ptr;
 }
 
-
 /* allocate memory for an array of nbr_block elements of size_block size,
  * this memory is set to zero, the returned block is stored,
  * for further information, see calloc */
-void* _calloc(size_t nbr_block, size_t size_block) {
+void* __calloc(size_t nbr_block, size_t size_block) {
   void * tmp, * tmp2;
   if(nbr_block * size_block <= 0) return NULL;
   tmp = calloc(nbr_block, size_block);
   if(tmp == NULL) return NULL;
-  tmp2 = _store_block(tmp, nbr_block * size_block);
+  tmp2 = __store_block(tmp, nbr_block * size_block);
   assert(tmp2 != NULL);
   return tmp2;
 }
 
-
 /* mark the size bytes of ptr as initialized */
-void _initialize (void * ptr, size_t size) {
+void __initialize (void * ptr, size_t size) {
   struct _block * tmp;
   unsigned i;
   assert(ptr != NULL);
   assert(size > 0);
-  tmp = _get_cont(ptr);
+  tmp = __get_cont(ptr);
   assert(tmp != NULL);
   
   /* already fully initialized, do nothing */
@@ -175,12 +165,11 @@ void _initialize (void * ptr, size_t size) {
   }
 }
 
-
 /* mark all bytes of ptr as initialized */
-void _full_init (void * ptr) {
+void __full_init (void * ptr) {
   struct _block * tmp;
   assert(ptr != NULL);
-  tmp = _get_exact(ptr);
+  tmp = __get_exact(ptr);
   assert(tmp != NULL);
 
   if (tmp->init_ptr != NULL) {
@@ -191,24 +180,22 @@ void _full_init (void * ptr) {
   tmp->init_cpt = tmp->size;
 }
 
-
 /* mark a block as litteral string */
-void _literal_string (void * ptr) {
+void __literal_string (void * ptr) {
   struct _block * tmp;
   assert(ptr != NULL);
-  tmp = _get_exact(ptr);
+  tmp = __get_exact(ptr);
   assert(tmp != NULL);
   tmp->is_litteral_string = true;
 }
 
-
 /* return whether the size bytes of ptr are initialized */
-int _initialized (void * ptr, size_t size) {
+int __initialized (void * ptr, size_t size) {
   struct _block * tmp;
   unsigned i;
   assert(ptr != NULL);
   assert(size > 0);
-  tmp = _get_cont(ptr);
+  tmp = __get_cont(ptr);
   if(tmp == NULL)
     return false;
   
@@ -227,70 +214,62 @@ int _initialized (void * ptr, size_t size) {
   return true;
 }
 
-
 /* return the length (in bytes) of the block containing ptr */
-size_t _block_length(void* ptr) {
+size_t __block_length(void* ptr) {
   struct _block * tmp;
   assert(ptr != NULL);
-  tmp = _get_cont(ptr);
+  tmp = __get_cont(ptr);
   assert(tmp != NULL);
   return tmp->size;
 }
 
-
 /* return whether the size bytes of ptr are readable/writable */
-int _valid(void* ptr, size_t size) {
+int __valid(void* ptr, size_t size) {
   struct _block * tmp;
   if(ptr == NULL)
     return false;
   assert(size > 0);
-  tmp = _get_cont(ptr);
+  tmp = __get_cont(ptr);
   return (tmp == NULL) ?
     false : ( tmp->size - ( (char*)ptr - tmp->ptr ) >= size
 	      && !tmp->is_litteral_string);
 }
 
-
 /* return whether the size bytes of ptr are readable */
-int _valid_read(void* ptr, size_t size) {
+int __valid_read(void* ptr, size_t size) {
   struct _block * tmp;
   if(ptr == NULL)
     return false;
   assert(size > 0);
-  tmp = _get_cont(ptr);
+  tmp = __get_cont(ptr);
   return (tmp == NULL) ?
     false : ( tmp->size - ( (char*)ptr - tmp->ptr ) >= size );
 }
 
-
 /* return the base address of the block containing ptr */
-void* _base_addr(void* ptr) {
+void* __base_addr(void* ptr) {
   struct _block * tmp;
   assert(ptr != NULL);
-  tmp = _get_cont(ptr);
+  tmp = __get_cont(ptr);
   assert(tmp != NULL);
   return tmp->ptr;
 }
 
-
 /* return the offset of ptr within its block */
-/* TODO: remove `size` parameter */
-int _offset(void* ptr, size_t size) {
+int _offset(void* ptr) {
   struct _block * tmp;
   assert(ptr != NULL);
-  tmp = _get_cont(ptr);
+  tmp = __get_cont(ptr);
   assert(tmp != NULL);
   return ((char*)ptr - tmp->ptr);
 }
-
 
 /*******************/
 /* PRINT           */
 /*******************/
 
-
 /* print the information about a block */
-void _print_block (struct _block * ptr) {
+void __print_block (struct _block * ptr) {
   if (ptr != NULL) {
     printf("%p %zu (litt:%i); [init] : %li ",
 	   ptr->ptr, ptr->size, ptr->is_litteral_string, ptr->init_cpt);
@@ -306,14 +285,12 @@ void _print_block (struct _block * ptr) {
   }
 }
 
-
 /********************/
 /* CLEAN            */
 /********************/
 
-
 /* erase information about initialization of a block */
-void _clean_init (struct _block * ptr) {
+void __clean_init (struct _block * ptr) {
   if(ptr->init_ptr != NULL) {
     free(ptr->init_ptr);
     ptr->init_ptr = NULL;
@@ -321,25 +298,21 @@ void _clean_init (struct _block * ptr) {
   ptr->init_cpt = 0;
 }
 
-
 /* erase all information about a block */
-void _clean_block (struct _block * ptr) {
+void __clean_block (struct _block * ptr) {
   if(ptr == NULL) return;
-  _clean_init(ptr);
+  __clean_init(ptr);
   free(ptr);
 }
-
 
 /* erase the content of the abstract structure */
 void __clean() {
   __clean_struct();
 }
 
-
 /**********************/
 /* DEBUG              */
 /**********************/
-
 
 /* print the content of the abstract structure */
 void __debug() {

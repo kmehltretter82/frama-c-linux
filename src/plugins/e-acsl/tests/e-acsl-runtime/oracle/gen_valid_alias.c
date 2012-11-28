@@ -53,7 +53,7 @@ axiomatic
     disjoint behaviors no_allocation, allocation;
   
 */
-extern void *_malloc(size_t size);
+extern void *__malloc(size_t size);
 /*@ frees p;
     
     assigns __fc_heap_status;
@@ -72,7 +72,7 @@ extern void *_malloc(size_t size);
     disjoint behaviors no_deallocation, deallocation;
   
 */
-extern void _free(void *p);
+extern void __free(void *p);
 /*@ ensures \false;
     assigns \nothing;  */
 extern void exit(int status);
@@ -93,28 +93,28 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 }
 
 /*@ assigns \nothing;  */
-extern  __attribute__((__FC_BUILTIN__)) void *_store_block(void *ptr,
-                                                           size_t size);
+extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
+                                                            size_t size);
 /*@ assigns \nothing;  */
-extern  __attribute__((__FC_BUILTIN__)) void _delete_block(void *ptr);
+extern  __attribute__((__FC_BUILTIN__)) void __delete_block(void *ptr);
 /*@ assigns \nothing;  */
-extern  __attribute__((__FC_BUILTIN__)) void _initialize(void *ptr,
+extern  __attribute__((__FC_BUILTIN__)) void __initialize(void *ptr,
+                                                          size_t size);
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) int __valid(void *ptr, size_t size);
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) int __valid_read(void *ptr,
                                                          size_t size);
-/*@ assigns \nothing;  */
-extern  __attribute__((__FC_BUILTIN__)) void _full_init(void *ptr);
-/*@ assigns \nothing;  */
-extern  __attribute__((__FC_BUILTIN__)) int _valid(void *ptr, size_t size);
-/*@ assigns \nothing;  */
-extern  __attribute__((__FC_BUILTIN__)) int _valid_read(void *ptr,
-                                                        size_t size);
 /*@ ensures \result ≡ 0 ∨ \result ≡ 1;
     ensures \result ≡ 1 ⇒
             \initialized((char *)\old(ptr)+(0..\old(size)-1));
     assigns \nothing;
   
 */
-extern  __attribute__((__FC_BUILTIN__)) int _initialized(void *ptr,
-                                                         size_t size);
+extern  __attribute__((__FC_BUILTIN__)) int __initialized(void *ptr,
+                                                          size_t size);
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 int main(void)
 {
@@ -122,30 +122,30 @@ int main(void)
   int *a;
   int *b;
   int n;
-  _store_block((void *)(& n),4U);
-  _store_block((void *)(& b),4U);
-  _store_block((void *)(& a),4U);
-  _full_init((void *)(& n));
+  __store_block((void *)(& n),4U);
+  __store_block((void *)(& b),4U);
+  __store_block((void *)(& a),4U);
+  __full_init((void *)(& n));
   n = 0;
   /*@ assert ¬\valid(a) ∧ ¬\valid(b); */
   {
     int __e_acsl_initialized;
     int __e_acsl_and;
     int __e_acsl_and_3;
-    __e_acsl_initialized = _initialized((void *)(& a),sizeof(int *));
+    __e_acsl_initialized = __initialized((void *)(& a),sizeof(int *));
     if (__e_acsl_initialized) {
       int __e_acsl_valid;
-      __e_acsl_valid = _valid((void *)a,sizeof(int));
+      __e_acsl_valid = __valid((void *)a,sizeof(int));
       __e_acsl_and = __e_acsl_valid;
     }
     else { __e_acsl_and = 0; }
     if (! __e_acsl_and) {
       int __e_acsl_initialized_2;
       int __e_acsl_and_2;
-      __e_acsl_initialized_2 = _initialized((void *)(& b),sizeof(int *));
+      __e_acsl_initialized_2 = __initialized((void *)(& b),sizeof(int *));
       if (__e_acsl_initialized_2) {
         int __e_acsl_valid_2;
-        __e_acsl_valid_2 = _valid((void *)b,sizeof(int));
+        __e_acsl_valid_2 = __valid((void *)b,sizeof(int));
         __e_acsl_and_2 = __e_acsl_valid_2;
       }
       else { __e_acsl_and_2 = 0; }
@@ -156,31 +156,31 @@ int main(void)
                   (char *)"!\\valid(a) &&\n!\\valid(b)",12);
   }
   
-  _full_init((void *)(& a));
-  a = (int *)_malloc(sizeof(int));
-  _initialize((void *)a,sizeof(int));
+  __full_init((void *)(& a));
+  a = (int *)__malloc(sizeof(int));
+  __initialize((void *)a,sizeof(int));
   *a = n;
-  _full_init((void *)(& b));
+  __full_init((void *)(& b));
   b = a;
   /*@ assert \valid(a) ∧ \valid(b); */
   {
     int __e_acsl_initialized_3;
     int __e_acsl_and_4;
     int __e_acsl_and_6;
-    __e_acsl_initialized_3 = _initialized((void *)(& a),sizeof(int *));
+    __e_acsl_initialized_3 = __initialized((void *)(& a),sizeof(int *));
     if (__e_acsl_initialized_3) {
       int __e_acsl_valid_3;
-      __e_acsl_valid_3 = _valid((void *)a,sizeof(int));
+      __e_acsl_valid_3 = __valid((void *)a,sizeof(int));
       __e_acsl_and_4 = __e_acsl_valid_3;
     }
     else { __e_acsl_and_4 = 0; }
     if (__e_acsl_and_4) {
       int __e_acsl_initialized_4;
       int __e_acsl_and_5;
-      __e_acsl_initialized_4 = _initialized((void *)(& b),sizeof(int *));
+      __e_acsl_initialized_4 = __initialized((void *)(& b),sizeof(int *));
       if (__e_acsl_initialized_4) {
         int __e_acsl_valid_4;
-        __e_acsl_valid_4 = _valid((void *)b,sizeof(int));
+        __e_acsl_valid_4 = __valid((void *)b,sizeof(int));
         __e_acsl_and_5 = __e_acsl_valid_4;
       }
       else { __e_acsl_and_5 = 0; }
@@ -195,10 +195,10 @@ int main(void)
   {
     int __e_acsl_initialized_5;
     int __e_acsl_and_7;
-    __e_acsl_initialized_5 = _initialized((void *)(& b),sizeof(int *));
+    __e_acsl_initialized_5 = __initialized((void *)(& b),sizeof(int *));
     if (__e_acsl_initialized_5) {
       int __e_acsl_valid_read;
-      __e_acsl_valid_read = _valid_read((void *)b,sizeof(int));
+      __e_acsl_valid_read = __valid_read((void *)b,sizeof(int));
       __e_acsl_and_7 = __e_acsl_valid_read;
     }
     else { __e_acsl_and_7 = 0; }
@@ -207,26 +207,26 @@ int main(void)
     e_acsl_assert(*b == n,(char *)"Assertion",(char *)"*b == n",17);
   }
   
-  _free((void *)b);
+  __free((void *)b);
   /*@ assert ¬\valid(a) ∧ ¬\valid(b); */
   {
     int __e_acsl_initialized_6;
     int __e_acsl_and_8;
     int __e_acsl_and_10;
-    __e_acsl_initialized_6 = _initialized((void *)(& a),sizeof(int *));
+    __e_acsl_initialized_6 = __initialized((void *)(& a),sizeof(int *));
     if (__e_acsl_initialized_6) {
       int __e_acsl_valid_5;
-      __e_acsl_valid_5 = _valid((void *)a,sizeof(int));
+      __e_acsl_valid_5 = __valid((void *)a,sizeof(int));
       __e_acsl_and_8 = __e_acsl_valid_5;
     }
     else { __e_acsl_and_8 = 0; }
     if (! __e_acsl_and_8) {
       int __e_acsl_initialized_7;
       int __e_acsl_and_9;
-      __e_acsl_initialized_7 = _initialized((void *)(& b),sizeof(int *));
+      __e_acsl_initialized_7 = __initialized((void *)(& b),sizeof(int *));
       if (__e_acsl_initialized_7) {
         int __e_acsl_valid_6;
-        __e_acsl_valid_6 = _valid((void *)b,sizeof(int));
+        __e_acsl_valid_6 = __valid((void *)b,sizeof(int));
         __e_acsl_and_9 = __e_acsl_valid_6;
       }
       else { __e_acsl_and_9 = 0; }
@@ -238,9 +238,9 @@ int main(void)
   }
   
   __retres = 0;
-  _delete_block((void *)(& n));
-  _delete_block((void *)(& b));
-  _delete_block((void *)(& a));
+  __delete_block((void *)(& n));
+  __delete_block((void *)(& b));
+  __delete_block((void *)(& a));
   __clean();
   return (__retres);
 }

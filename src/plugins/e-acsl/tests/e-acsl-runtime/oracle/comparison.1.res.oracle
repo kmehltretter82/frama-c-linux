@@ -39,9 +39,9 @@ tests/e-acsl-runtime/comparison.i:9:[value] Assertion got status valid.
 tests/e-acsl-runtime/comparison.i:10:[value] Assertion got status valid.
 tests/e-acsl-runtime/comparison.i:11:[value] Assertion got status valid.
 tests/e-acsl-runtime/comparison.i:12:[value] Assertion got status valid.
-[value] using specification for function _store_block
-[value] using specification for function _full_init
-[value] using specification for function _literal_string
+[value] using specification for function __store_block
+[value] using specification for function __full_init
+[value] using specification for function __literal_string
 tests/e-acsl-runtime/comparison.i:14:[value] Assertion got status valid.
 ./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status valid.
 tests/e-acsl-runtime/comparison.i:17:[value] Assertion got status valid.

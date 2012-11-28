@@ -329,8 +329,7 @@ and context_insensitive_term_to_exp env t =
     mmodel_call ~loc "base_addr" Cil.voidPtrType env t
   | Tbase_addr _ -> Error.not_yet "labeled \\base_addr"
   | Toffset(LogicLabel(_, label), t) when label = "Here" ->
-    let e, env = mmodel_call_with_size ~loc "offset" Cil.intType env t in 
-    e, env, false, "offset"
+    mmodel_call ~loc "offset" Cil.intType env t 
   | Toffset _ -> Error.not_yet "labeled \\offset"
   | Tblock_length(LogicLabel(_, label), t) when label = "Here" ->
     mmodel_call ~loc "block_length" Cil.ulongType env t
@@ -404,7 +403,8 @@ and mmodel_call ~loc name ctx env t =
       env
       None
       ctx 
-      (fun v _ -> [ Misc.mk_call ~loc ~result:(Cil.var v) ("_" ^ name) [ e ] ]) 
+      (fun v _ -> 
+	[ Misc.mk_call ~loc ~result:(Cil.var v) ("__" ^ name) [ e ] ]) 
   in
   res, env, false, name
 
@@ -424,7 +424,7 @@ and mmodel_call_with_size ~loc name ctx env t =
 	  | TPtr (t', _) -> Cil.new_exp ~loc (SizeOf t')
 	  | _ -> assert false
 	in
-	[ Misc.mk_call ~loc ~result:(Cil.var v) ("_" ^ name) [ e; sizeof ] ])
+	[ Misc.mk_call ~loc ~result:(Cil.var v) ("__" ^ name) [ e; sizeof ] ])
   in
   res, env
 
