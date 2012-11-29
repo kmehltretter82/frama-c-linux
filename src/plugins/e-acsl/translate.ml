@@ -68,11 +68,11 @@ let name_of_mpz_arith_bop = function
 let constant_to_exp ?(loc=Location.unknown) = function
   | Integer(n, s) ->
     (try
-       let k = Typing.typ_of_integer n (My_bigint.ge n My_bigint.zero) in
+       let k = Typing.typ_of_integer n (Integer.ge n Integer.zero) in
        if Typing.is_representable n k then Cil.kinteger64_repr ?loc k n s, false
        else raise Typing.Not_representable
      with Typing.Not_representable ->
-       Cil.mkString ?loc (My_bigint.to_string n), true)
+       Cil.mkString ?loc (Integer.to_string n), true)
   | LStr s -> Cil.new_exp ?loc (Const (CStr s)), false
   | LWStr s -> Cil.new_exp ?loc (Const (CWStr s)), false
   | LChr c -> Cil.new_exp ?loc (Const (CChr c)), false

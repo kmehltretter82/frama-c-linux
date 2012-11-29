@@ -23,7 +23,7 @@
 open Cil_types
 open Cil_datatype
 
-module BI = My_bigint
+module Z = Integer
 
 let is_representable n k = 
   if Options.Gmp_only.get () then
@@ -35,14 +35,14 @@ let is_representable n k =
       (* no GMP initializer from a long long *)
       false
   else
-    BI.ge n BI.min_int64 && BI.le n BI.max_int64
+    Z.ge n Z.min_int64 && Z.le n Z.max_int64
 
 (******************************************************************************)
 (** Type Definitions: Intervals *)
 (******************************************************************************)
 
 type eacsl_typ =
-  | Interv of BI.t * BI.t
+  | Interv of Z.t * Z.t
   | Z
   | No_integral of logic_type
 
@@ -64,7 +64,7 @@ let typ_of_integer i unsigned =
 
 let typ_of_eacsl_typ = function
   | Interv(l, u) -> 
-    let is_pos = BI.ge l BI.zero in
+    let is_pos = Z.ge l Z.zero in
     (try 
        let mk n k = 
 	 if is_representable n k then TInt(k, []) 
@@ -92,7 +92,7 @@ let eacsl_typ_of_typ ty = match Cil.unrollType ty with
     let n = Cil.bitsSizeOf ty in
     let l, u = 
       if Cil.isSigned k then Cil.min_signed_number n, Cil.max_signed_number n
-      else BI.zero, Cil.max_unsigned_number n
+      else Z.zero, Cil.max_unsigned_number n
     in
     Interv(l, u)      
   | ty -> No_integral (Ctype ty)
@@ -100,9 +100,9 @@ let eacsl_typ_of_typ ty = match Cil.unrollType ty with
 exception Cannot_compare
 let meet ty1 ty2 = match ty1, ty2 with
   | Interv(l1, u1), Interv(l2, u2) -> 
-    let l = BI.max l1 l2 in
-    let u = BI.min u1 u2 in
-    if BI.gt l u then raise Cannot_compare;
+    let l = Z.max l1 l2 in
+    let u = Z.min u1 u2 in
+    if Z.gt l u then raise Cannot_compare;
     Interv(l, u)
   | Interv _, Z -> ty1
   | Z, Interv _ -> ty2
@@ -113,7 +113,7 @@ let meet ty1 ty2 = match ty1, ty2 with
   | No_integral _, (Z | Interv _) -> raise Cannot_compare
 
 let join ty1 ty2 = match ty1, ty2 with
-  | Interv(l1, u1), Interv(l2, u2) -> Interv(BI.min l1 l2, BI.max u1 u2)
+  | Interv(l1, u1), Interv(l2, u2) -> Interv(Z.min l1 l2, Z.max u1 u2)
   | Interv _, Z | Z, Interv _ | Z, Z -> Z
   | No_integral t1, No_integral t2 when Logic_type.equal t1 t2 -> ty1
   | No_integral t, ty | ty, No_integral t when Cil.isLogicRealType t -> ty
@@ -123,7 +123,7 @@ let join ty1 ty2 = match ty1, ty2 with
   | No_integral _, (Z | Interv _) -> raise Cannot_compare
 
 let int_to_interv n = 
-  let b = BI.of_int n in
+  let b = Z.of_int n in
   Interv (b, b)
 
 (******************************************************************************)
@@ -215,43 +215,43 @@ let rec type_term t =
       align_of (get_cty t)
     | TUnOp(Neg, t) -> 
       unary_arithmetic
-	(fun l u -> let opp = BI.sub BI.zero in opp u, opp l) t
+	(fun l u -> let opp = Z.sub Z.zero in opp u, opp l) t
     | TUnOp(BNot, t) ->
       unary_arithmetic
 	(fun l u -> 
-	  let nl = BI.lognot l in
-	  let nu = BI.lognot u in
-	  BI.min nl nu, BI.max nl nu) 
+	  let nl = Z.lognot l in
+	  let nu = Z.lognot u in
+	  Z.min nl nu, Z.max nl nu) 
 	t
     | TUnOp(LNot, t) ->
       ignore (type_term t);
-      Interv(BI.zero, BI.one)
+      Interv(Z.zero, Z.one)
     | TBinOp(PlusA, t1, t2) -> 
-      let add l1 u1 l2 u2 = BI.add l1 l2, BI.add u1 u2 in
+      let add l1 u1 l2 u2 = Z.add l1 l2, Z.add u1 u2 in
       binary_arithmetic t.term_type add t1 t2
     | TBinOp((PlusPI | IndexPI | MinusPI | MinusPP), t1, t2) -> 
       ignore (type_term t1);
       ignore (type_term t2);
       No_integral lty
     | TBinOp(MinusA, t1, t2) -> 
-      let sub l1 u1 l2 u2 = BI.sub l1 u2, BI.sub u1 l2 in
+      let sub l1 u1 l2 u2 = Z.sub l1 u2, Z.sub u1 l2 in
       binary_arithmetic t.term_type sub t1 t2
-    | TBinOp(Mult, t1, t2) -> signed_rule t.term_type BI.mul t1 t2
+    | TBinOp(Mult, t1, t2) -> signed_rule t.term_type Z.mul t1 t2
     | TBinOp(Div, t1, t2) -> 
       let div a b = 
-	try BI.c_div a b 
+	try Z.c_div a b 
 	with Division_by_zero -> 
 	  (* either the generated code will be dead (e.g. [false && 1/0]) or
 	     it contains a potential RTE and thus it is actually equivalent to
 	     dead code. In any case, any type is correct at this point and we
 	     generate the less restrictive one (0 is always representable) in
 	     order to be as more precise as possible. *)
-	  BI.zero
+	  Z.zero
       in
       signed_rule t.term_type div t1 t2
     | TBinOp(Mod, t1, t2) -> 
       let modu a b =
-	try BI.c_rem a b with Division_by_zero -> BI.zero (* see Div *)
+	try Z.c_rem a b with Division_by_zero -> Z.zero (* see Div *)
       in
       signed_rule t.term_type modu t1 t2
     | TBinOp(Shiftlt, _t1, _t2) | TBinOp(Shiftrt, _t1, _t2) ->
@@ -259,7 +259,7 @@ let rec type_term t =
     | TBinOp((Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr), t1, t2) -> 
       ignore (type_term t1);
       ignore (type_term t2);
-      Interv(BI.zero, BI.one)
+      Interv(Z.zero, Z.one)
     | TBinOp((BAnd | BXor | BOr), _t1, _t2) -> 
       Error.not_yet "missing binary bitwise operator"
     | TCastE(ty, t) -> 
@@ -371,7 +371,7 @@ and signed_rule ty op t1 t2 =
     let b = op l1 u2 in
     let c = op u1 l2 in
     let d = op u1 u2 in
-    BI.min a (BI.min b (BI.min c d)), BI.max a (BI.max b (BI.max c d))
+    Z.min a (Z.min b (Z.min c d)), Z.max a (Z.max b (Z.max c d))
   in
   binary_arithmetic ty compute t1 t2
 
@@ -404,7 +404,7 @@ let rec type_predicate_named p = match p.content with
       (fun (t1, r1, x, r2, t2) -> 
 	let ty1 = type_term t1 in
 	let ty1 = match ty1, r1 with
-	  | Interv(l, u), Rlt -> Interv(BI.add l BI.one, BI.add u BI.one)
+	  | Interv(l, u), Rlt -> Interv(Z.add l Z.one, Z.add u Z.one)
 	  | Interv(l, u), Rle -> Interv(l, u)
 	  | Z, (Rlt | Rle) -> Z
 	  | _, _ -> assert false
@@ -414,7 +414,7 @@ let rec type_predicate_named p = match p.content with
 	   before going out the loop. *)
 	let ty2 = match ty2, r2 with
 	  | Interv(l, u), Rlt -> Interv(l, u)
-	  | Interv(l, u), Rle -> Interv(BI.add l BI.one, BI.add u BI.one)
+	  | Interv(l, u), Rle -> Interv(Z.add l Z.one, Z.add u Z.one)
 	  | Z, (Rlt | Rle) -> Z
 	  | _, _ -> assert false
 	in

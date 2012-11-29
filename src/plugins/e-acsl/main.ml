@@ -60,7 +60,9 @@ let generate_code =
     (fun name ->
       Pre_analysis.reset ();
       let visit prj = Visit.do_visit ~prj true in
-      File.create_project_from_visitor(* ~preprocess:false*) name visit)
+      let prj = File.create_project_from_visitor name visit in
+      Resulting_projects.mark_as_computed ();
+      prj)
 
 let generate_code =
   Dynamic.register
@@ -80,7 +82,7 @@ let predicate_to_exp =
     Translate.predicate_to_exp
 
 let add_e_acsl_library () =
-  if Options.must_visit () then begin
+  if Options.must_visit () && not (Resulting_projects.is_computed ()) then begin
     Kernel.CppExtraArgs.add (Pretty_utils.sfprintf " -I%s/libc" Config.datadir);
     Kernel.Keep_unused_specified_functions.off ();
     let register s =
