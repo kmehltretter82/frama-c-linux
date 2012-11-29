@@ -81,28 +81,68 @@ let predicate_to_exp =
        Kernel_function.ty Cil_datatype.Predicate_named.ty Cil_datatype.Exp.ty)
     Translate.predicate_to_exp
 
-let add_e_acsl_library () =
+let analyzed_project = ref None
+
+let add_e_acsl_library _files =
+  analyzed_project := None;
   if Options.must_visit () && not (Resulting_projects.is_computed ()) then begin
-    Kernel.CppExtraArgs.add (Pretty_utils.sfprintf " -I%s/libc" Config.datadir);
-    Kernel.Keep_unused_specified_functions.off ();
-    let register s =
-      File.pre_register
-	(File.NeedCPP 
-	   (s, 
-	    File.get_preprocessor_command () 
-	    ^ Pretty_utils.sfprintf " -I%s" (Options.Share.dir ~error:true ())))
+    let extend () =
+      Kernel.CppExtraArgs.add
+	(Pretty_utils.sfprintf " -I%s/libc" Config.datadir);
+      Kernel.Keep_unused_specified_functions.off ();
+      let register s =
+	File.pre_register
+	  (File.NeedCPP 
+	     (s, 
+	      File.get_preprocessor_command () 
+	      ^ Pretty_utils.sfprintf " -I%s" 
+		(Options.Share.dir ~error:true ())))
+      in
+      List.iter register (Misc.library_files ())
     in
-    List.iter register (Misc.library_files ())
+    if Ast.is_computed () then begin
+      (* do not modify the existing project: work on a copy.
+	 Must also extend the current AST with the E-ACSL's library files. *)
+      let name = Project.get_name (Project.current ()) in
+      let tmpfile = 
+	Extlib.temp_file_cleanup_at_exit ("e_acsl_" ^ name) ".i" in
+      let cout = open_out tmpfile in
+      let fmt = Format.formatter_of_out_channel cout in
+      File.pretty_ast ~fmt ();
+      let selection = 
+	State_selection.diff
+	  State_selection.full
+	  (State_selection.with_dependencies Ast.self)
+      in
+      let prj =
+	Project.create_by_copy
+	  ~selection
+	  (Pretty_utils.sfprintf "%s for E-ACSL" name)
+      in
+      Project.on prj
+	(fun () ->
+	  Kernel.Files.set [ tmpfile ];
+	  extend ())
+	();
+      analyzed_project := Some prj
+    end else
+      extend ()
   end
  
 let () = Cmdline.run_after_configuring_stage add_e_acsl_library
 
-let main () =
+let analyze () =
   if Options.must_visit () then Pre_analysis.init_mpz ();
   if Options.Run.get () then
     ignore (generate_code (Options.Project_name.get ()))
   else
     if Options.Check.get () then ignore (check ())
+
+let main () = match !analyzed_project with
+  | None -> analyze ()
+  | Some project -> 
+    Project.on project analyze ();
+    Project.remove ~project ()
 
 let () = Db.Main.extend main
 
