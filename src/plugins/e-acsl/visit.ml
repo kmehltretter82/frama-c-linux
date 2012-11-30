@@ -150,7 +150,7 @@ class e_acsl_visitor prj generate = object (self)
 	      in
 	      let env = Env.push !function_env in
 	      let stmts, env = 
-		Varinfo.Hashtbl.fold
+		Varinfo.Hashtbl.fold_sorted
 		  (fun old_vi i (stmts, env) -> 
 		    let new_vi = Cil.get_varinfo self#behavior old_vi in
 		    let model blk =
