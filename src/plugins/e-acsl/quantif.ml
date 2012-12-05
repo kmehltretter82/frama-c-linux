@@ -181,6 +181,8 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
       let env = 
 	if Mpz.is_t ty then Env.add_stmt env (Mpz.init ~loc x) else env 
       in
+      let llv = cvar_to_lvar var_x in
+      if not (Mpz.is_t ty) then Typing.unsafe_unify ~from:logic_x llv;
       (* build the inner loops and loop body *)
       let body, env = mk_for_loop env tl in
       (* initialize the loop counter to [t1] *)
@@ -194,7 +196,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
       in
       (* generate the guard [x bop t2] *)
       let stmts_block b = [ mkStmt ~valid_sid:true (Block b) ] in
-      let tlv = Logic_const.tvar ~loc (cvar_to_lvar var_x) in
+      let tlv = Logic_const.tvar ~loc llv in
       let guard = Logic_const.term (TBinOp(bop2, tlv, t2)) Linteger in
       Typing.type_term guard;
       let guard_exp, env = term_to_exp (Env.push env) (Some intType) guard in

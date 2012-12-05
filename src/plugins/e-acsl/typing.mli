@@ -45,6 +45,10 @@ val unsafe_set_term: term -> typ -> unit
 (** Modify the type of the given term. No verification is done to check that the
     new type is correct. *)
 
+val unsafe_unify: from:logic_var -> logic_var -> unit
+(** Set the type of the second logic var to the type of the first one, named
+    [from]. *) 
+
 val clear: unit -> unit
 (** Remove all the previously computed types. *)
 

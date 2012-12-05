@@ -79,11 +79,9 @@ int search(int elt)
     while (1) {
       if (__e_acsl_i < 9) { ; }
       else { break; }
-      e_acsl_assert((int)((long long)__e_acsl_i + (long long)1) < 10,
-                    (char *)"Precondition",
+      e_acsl_assert(__e_acsl_i + 1 < 10,(char *)"Precondition",
                     (char *)"index_bound: (int)(__e_acsl_i+1) < 10",9);
-      e_acsl_assert(0 <= (int)((long long)__e_acsl_i + (long long)1),
-                    (char *)"Precondition",
+      e_acsl_assert(0 <= __e_acsl_i + 1,(char *)"Precondition",
                     (char *)"index_bound: 0 <= (int)(__e_acsl_i+1)",9);
       e_acsl_assert(__e_acsl_i < 10,(char *)"Precondition",
                     (char *)"index_bound: __e_acsl_i < 10",9);

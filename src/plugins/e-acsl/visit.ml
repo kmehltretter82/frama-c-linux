@@ -239,21 +239,25 @@ you must call function `%s' by yourself"
 	f)
 
   method vglob_aux g =
-    let is_library_var vi =
-      List.mem (fst (vi.vdecl)).Lexing.pos_fname (Misc.library_files ())
+    (* TODO optimize: do not do the standard operation on library globals
+       without varinfo *)
+    let is_library_loc (loc, _) =
+      List.mem loc.Lexing.pos_fname (Misc.library_files ())
     in
     match g with
     | GVarDecl(_, vi, _) | GVar(vi, _, _) | GFun({ svar = vi }, _) 
-	when is_library_var vi -> 
+	when is_library_loc vi.vdecl -> 
       if generate then
 	Cil.JustCopyPost
 	  (fun l -> 
-	    Misc.register_library_function (Cil.get_varinfo self#behavior vi); 
+	    Misc.register_library_function (Cil.get_varinfo self#behavior vi);
 	    l)
       else begin
 	Misc.register_library_function vi; 
 	Cil.SkipChildren
       end
+    | g when is_library_loc (Global.loc g) ->
+      if generate then Cil.JustCopy else Cil.SkipChildren
     | _ ->
       let do_it = function
 	| GVar(vi, i, _) ->

@@ -46,6 +46,15 @@ type eacsl_typ =
   | Z
   | No_integral of logic_type
 
+(* debugging purpose only *)
+let _pretty_eacsl_typ fmt = function
+  | Interv(l, u) -> 
+    Format.fprintf fmt "[ %a; %a ]" 
+      (fun z -> Z.pretty z) l 
+      (fun z -> Z.pretty z) u
+  | Z -> Format.fprintf fmt "Z"
+  | No_integral lty -> Format.fprintf fmt "%a" Cil.d_logic_type lty
+
 exception Not_representable
 
 let typ_of_integer i unsigned = 
@@ -175,6 +184,14 @@ let unsafe_set_term t ty =
     assert (not (Term_env.mem t));
     Term_env.add t (eacsl_typ_of_typ ty)
   end
+
+let unsafe_unify ~from logic_v =
+  try
+    let ty = Logic_var_env.find from in
+    assert (not (Logic_var_env.mem logic_v));
+    Logic_var_env.add logic_v ty
+  with Not_found ->
+    Options.fatal "unknown logic variable %a" Cil.d_logic_var logic_v
 
 let clear () = 
   Term_env.clear (); 
@@ -437,7 +454,8 @@ let type_term t = if not (Options.Gmp_only.get ()) then ignore (type_term t)
 
 let type_named_predicate ?(must_clear=true) p = 
   if not (Options.Gmp_only.get ()) then begin
-    Options.debug ~level:2 "typing predicate %a" Cil.d_predicate_named p;
+    Options.debug ~level:2 "typing predicate %a (clear? %b)" 
+      Cil.d_predicate_named p must_clear;
     if must_clear then clear ();
     type_predicate_named p
   end
@@ -515,7 +533,7 @@ C-representable@]";
 let principal_type t1 t2 = 
   let ty1 = typ_of_term t1 in
   let ty2 = typ_of_term t2 in
-  (* possible to get an integralType (or Mpz.t) with a non-one in the case of
+  (* possible to get an integralType (or Mpz.t) from a non-one in the case of
      \null *)
   if Cil.isIntegralType ty1 then
     if Cil.isIntegralType ty2 then Cil.arithmeticConversion ty1 ty2
