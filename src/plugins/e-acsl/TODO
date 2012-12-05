@@ -17,6 +17,7 @@
 - variable GMP potentiellement initialisé mais non utilisé en présence de \at
   (voir test result.i, cas -e-acsl-gmp-only)
 - générer les delete des globals dans une fonction séparée, comme pour les init.
+- do not analyse library function in pre-analysis
 
 ##############
 # KNOWN BUGS #

@@ -57,6 +57,13 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 }
 
 /*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
+                                                            size_t size);
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void __delete_block(void *ptr);
+/*@ assigns \nothing;  */
+extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
+/*@ assigns \nothing;  */
 extern  __attribute__((__FC_BUILTIN__)) int __valid(void *ptr, size_t size);
 /*@ ensures \result ≡ 0 ∨ \result ≡ 1;
     ensures \result ≡ 1 ⇒
@@ -85,6 +92,10 @@ struct list *f(struct list *l)
   struct list *__e_acsl_at_2;
   int __e_acsl_at;
   struct list *__retres;
+  __store_block((void *)(& l),4U);
+  __full_init((void *)(& l));
+  __store_block((void *)(& __e_acsl_at_4),4U);
+  __full_init((void *)(& __e_acsl_at_4));
   __e_acsl_at_4 = l;
   {
     int __e_acsl_valid;
@@ -106,7 +117,11 @@ struct list *f(struct list *l)
     __e_acsl_at_3 = __e_acsl_and_2;
   }
   
+  __store_block((void *)(& __e_acsl_at_2),4U);
+  __full_init((void *)(& __e_acsl_at_2));
   __e_acsl_at_2 = l;
+  __store_block((void *)(& __e_acsl_at),4U);
+  __full_init((void *)(& __e_acsl_at));
   __e_acsl_at = l == (void *)0;
   if (l == (void *)0) {
     __retres = l;
@@ -128,6 +143,7 @@ struct list *f(struct list *l)
     e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",
                   (char *)"\\old(!\\valid(l) && !\\valid(l->next)) ==>\n\\result == \\old(l)",
                   22);
+    __delete_block((void *)(& l));
     return (__retres);
   }
   

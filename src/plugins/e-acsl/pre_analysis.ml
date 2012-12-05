@@ -112,7 +112,9 @@ module rec Transfer
 
   module StmtStartData = Env.StartData
 
-  let pretty _fmt _state = assert false
+  let pretty fmt state = match state with
+    | None -> Format.fprintf fmt "None"
+    | Some s -> Format.fprintf fmt "%a" Varinfo.Set.pretty s
 
   (** The data at function exit. Used for statements with no successors.
       This is usually bottom, since we'll also use doStmt on Return
@@ -123,10 +125,11 @@ module rec Transfer
       the one we have just computed. Return None if the combination is the same
       as the old data, otherwise return the combination. In the latter case, the
       predecessors of the statement are put on the working list. *)
-  let combineStmtStartData _stmt ~old state = match old, state with
-    | _, None -> assert false
-    | None, Some _ -> Some state (* [old] already included in [state] *)
-    | Some old, Some new_ -> 
+  let combineStmtStartData stmt ~old state = match stmt.skind, old, state with
+    | _, _, None -> assert false
+    | _, None, Some _ -> Some state (* [old] already included in [state] *)
+    | Return _, Some old, Some new_ -> Some (Some (Varinfo.Set.union old new_))
+    | _, Some old, Some new_ -> 
       if Varinfo.Set.equal old new_ then
 	None
       else
@@ -137,7 +140,7 @@ module rec Transfer
     Some (Varinfo.Set.union (Env.default_varinfos s1) (Env.default_varinfos s2))
 
   let rec register_term_lval kf varinfos (thost, _) = match thost with
-    | TVar { lv_origin = None } -> Error.not_yet "logic variable"
+    | TVar { lv_origin = None } -> varinfos
     | TVar { lv_origin = Some vi } -> 
       Varinfo.Set.add vi varinfos
     | TResult _ -> Varinfo.Set.add (Misc.result_vi kf) varinfos
@@ -154,7 +157,7 @@ module rec Transfer
     | TBinOp(_, t1, t2) | Tif(_, t1, t2) ->
       let s = register_term kf varinfos t1 in
       register_term kf s t2
-    | Tapp(_, _, l) -> List.fold_left (register_term kf) varinfos l
+    | Tapp(_, _, _) -> Error.not_yet "function application"
     | TDataCons _ -> Error.not_yet "data constructor"
     | Tbase_addr _ -> Error.not_yet "\\base_addr"
     | Toffset _ -> Error.not_yet "\\offset"
@@ -170,12 +173,62 @@ module rec Transfer
     | Tcomprehension _ -> Error.not_yet "set comprehension"
     | Trange _ -> Error.not_yet "\\range"
 
+  let register_object kf state_ref = object
+    inherit Visitor.frama_c_inplace
+    method vpredicate = function
+    | Pvalid(_, t) | Pvalid_read(_, t) | Pinitialized(_, t)
+    | Pallocable(_, t) | Pfreeable(_, t) | Pfresh(_, _, t, _) ->
+	(*	Options.feedback "REGISTER %a" Cil.d_term t;*)
+      state_ref := register_term kf !state_ref t;
+      Cil.SkipChildren
+    | Pseparated _ -> Error.not_yet "\\separated"
+    | Ptrue | Pfalse | Papp _ | Prel _
+    | Pand _ | Por _ | Pxor _ | Pimplies _ | Piff _ | Pnot _ | Pif _ 
+    | Plet _ | Pforall _ | Pexists _ | Pat _ | Psubtype _ ->
+      Cil.DoChildren
+    method vterm term = match term.term_node with
+    | Tbase_addr(_, t) | Toffset(_, t) | Tblock_length(_, t) 
+    | TBinOp((PlusPI | IndexPI | MinusPI), t, _) ->
+      state_ref := register_term kf !state_ref t;
+      Cil.SkipChildren
+    | TBinOp(MinusPP, t1, t2) ->
+      let state = register_term kf !state_ref t1 in
+      state_ref := register_term kf state t2;
+      Cil.SkipChildren
+    | TConst _ | TSizeOf _ | TSizeOfStr _ | TAlignOf _  | Tnull
+    | Ttype _ | Tempty_set | TSizeOfE _ | TUnOp _ | TBinOp _ | Ttypeof _ -> 
+      (* no left-value inside inside: skip for efficiency *)
+      Cil.SkipChildren
+    | TLval _ | TAlignOfE _ | TCastE _ | TAddrOf _
+    | TStartOf _ | Tapp _ | Tlambda _ | TDataCons _ | Tif _ | Tat _
+    | TCoerce _ | TCoerceE _ | TUpdate _ | Tunion _ | Tinter _
+    | Tcomprehension _ | Trange _ | Tlet _ | TLogic_coerce _ -> 
+      (* potential sub-term inside *)
+      Cil.DoChildren
+    method vlogic_label _ = Cil.SkipChildren
+    method vterm_lhost = function
+    | TMem t ->
+      state_ref := register_term kf !state_ref t;
+      Cil.SkipChildren
+    | TVar _ | TResult _ -> 
+      Cil.SkipChildren
+  end
+
+  let register_predicate kf pred state = 
+    let state_ref = ref state in
+    ignore (Visitor.visitFramacIdPredicate (register_object kf state_ref) pred);
+    !state_ref
+
+  let register_code_annot kf a state = 
+    let state_ref = ref state in
+    ignore (Visitor.visitFramacCodeAnnotation (register_object kf state_ref) a);
+    !state_ref
+
   (** The (backwards) transfer function for a branch. The [(Cil.CurrentLoc.get
       ())] is set before calling this. If it returns None, then we have some
       default handling. Otherwise, the returned data is the data before the
       branch (not considering the exception handlers) *)
   let doStmt stmt =
-(*    Options.feedback "ANALYSING %a" Cil.d_stmt stmt;*)
     let _, kf = Kernel_function.find_from_sid stmt.sid in
     let is_first =
       try Stmt.equal stmt (Kernel_function.find_first_stmt kf) 
@@ -184,52 +237,6 @@ module rec Transfer
     let is_last =
       try Stmt.equal stmt (Kernel_function.find_return kf) 
       with Kernel_function.No_Statement -> assert false
-    in
-    let register state_ref = object
-      inherit Visitor.frama_c_inplace
-      method vpredicate = function
-      | Pvalid(_, t) | Pvalid_read(_, t) | Pinitialized(_, t)
-      | Pallocable(_, t) | Pfreeable(_, t) | Pfresh(_, _, t, _) ->
-(*	Options.feedback "REGISTER %a" Cil.d_term t;*)
-	state_ref := register_term kf !state_ref t;
-	Cil.SkipChildren
-      | Pseparated _ -> Error.not_yet "\\separated"
-      | Ptrue | Pfalse | Papp _ | Prel _
-      | Pand _ | Por _ | Pxor _ | Pimplies _ | Piff _ | Pnot _ | Pif _ 
-      | Plet _ | Pforall _ | Pexists _ | Pat _ | Psubtype _ ->
-	Cil.DoChildren
-      method vterm term = match term.term_node with
-      | Tbase_addr(_, t) | Toffset(_, t) | Tblock_length(_, t) ->
-	state_ref := register_term kf !state_ref t;
-	Cil.SkipChildren
-      | TConst _ | TSizeOf _ | TSizeOfStr _ | TAlignOf _  | Tnull
-      | Ttype _ | Tempty_set -> 
-	(* no sub-term inside: skip for efficiency *)
-	Cil.SkipChildren
-      | TLval _ | TSizeOfE _ | TAlignOfE _ | TUnOp _ | TBinOp _ | TCastE _ 
-      | TAddrOf _
-      | TStartOf _ | Tapp _ | Tlambda _ | TDataCons _ | Tif _ | Tat _
-      | TCoerce _ | TCoerceE _ | TUpdate _ | Ttypeof _ | Tunion _ | Tinter _
-      | Tcomprehension _ | Trange _ | Tlet _ | TLogic_coerce _ -> 
-	(* potential sub-term inside *)
-	Cil.DoChildren
-      method vlogic_label _ = Cil.SkipChildren
-      method vterm_lhost = function
-      | TMem t ->
-	state_ref := register_term kf !state_ref t;
-	Cil.SkipChildren
-      | TVar _ | TResult _ -> 
-	Cil.SkipChildren
-    end in
-    let register_predicate pred state = 
-      let state_ref = ref state in
-      ignore (Visitor.visitFramacIdPredicate (register state_ref) pred);
-      !state_ref
-    in
-    let register_code_annot a state = 
-      let state_ref = ref state in
-      ignore (Visitor.visitFramacCodeAnnotation (register state_ref) a);
-      !state_ref
     in
     Dataflow.Post 
       (fun state ->
@@ -240,11 +247,12 @@ module rec Transfer
 	      (fun _ bhv s -> 
 		let handle_annot test f s =
 		  if test then 
-		    f (fun _ p s -> register_predicate p s) kf bhv.b_name s
+		    f (fun _ p s -> register_predicate kf p s) kf bhv.b_name s
 		  else
 		    s
 		in
 		let s = handle_annot is_first Annotations.fold_requires s in
+		let s = handle_annot is_first Annotations.fold_assumes s in
 		handle_annot 
 		  is_last 
 		  (fun f -> Annotations.fold_ensures (fun e (_, p) -> f e p)) s)
@@ -254,7 +262,8 @@ module rec Transfer
 	    state
 	in
 	let state = 
-	  Annotations.fold_code_annot (fun _ -> register_code_annot) stmt state
+	  Annotations.fold_code_annot
+	    (fun _ -> register_code_annot kf) stmt state
 	in
 	Some state)
 
@@ -484,8 +493,8 @@ let must_model_vi ?kf ?stmt vi =
 let must_model_lval ?kf ?stmt lv = 
   Error.generic_handle (must_model_lval ?kf ?stmt) false lv
 
-let old_must_model_vi bhv ?kf vi =
-  must_model_vi ?kf (Cil.get_original_varinfo bhv vi)
+let old_must_model_vi bhv ?kf ?stmt vi =
+  must_model_vi ?kf ?stmt (Cil.get_original_varinfo bhv vi)
 
 (*
 Local Variables:

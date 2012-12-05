@@ -1,0 +1,81 @@
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/e_acsl_gmp_types.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/e_acsl_gmp.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/e_acsl.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel_api.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_bittree.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
+tests/e-acsl-runtime/bts1324.i:8:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
+tests/e-acsl-runtime/bts1324.i:8:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value] Values of globals at initialization
+        __fc_random_counter ∈ {0}
+        __fc_rand_max ∈ {2147483647}
+        __fc_heap_status ∈ [--..--]
+        __fc_stdout ∈ {{ NULL ; &S___fc_stdout }}
+        S___fc_stdout[0].__fc_stdio_fpos ∈ [--..--]
+                     [0].__fc_stdio_buffer ∈
+                     {{ NULL ; &S___fc_stdio_buffer_0_S___fc_stdout }}
+                     [0]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
+                     [0].[bits 80 to 95] ∈ UNINITIALIZED
+                     {[0].__fc_stdio_id; [1].__fc_stdio_fpos; } ∈ [--..--]
+                     [1].__fc_stdio_buffer ∈
+                     {{ NULL ; &S___fc_stdio_buffer_1_S___fc_stdout }}
+                     [1]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
+                     [1].[bits 80 to 95] ∈ UNINITIALIZED
+                     [1].__fc_stdio_id ∈ [--..--]
+        S___fc_stdio_buffer_0_S___fc_stdout[0..1] ∈ [--..--]
+        S___fc_stdio_buffer_1_S___fc_stdout[0..1] ∈ [--..--]
+[value] using specification for function __store_block
+[value] using specification for function __initialize
+[value] using specification for function __full_init
+[value] using specification for function __gmpz_init
+./share/e-acsl/e_acsl_gmp.h:36:[value] Function __gmpz_init: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:37:[value] Function __gmpz_init: postcondition got status valid.
+[value] using specification for function __gmpz_init_set_si
+./share/e-acsl/e_acsl_gmp.h:61:[value] Function __gmpz_init_set_si: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:63:[value] Function __gmpz_init_set_si: postcondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: postcondition got status unknown.
+[value] using specification for function __gmpz_add
+./share/e-acsl/e_acsl_gmp.h:131:[value] Function __gmpz_add: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:132:[value] Function __gmpz_add: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:133:[value] Function __gmpz_add: precondition got status valid.
+[value] using specification for function __gmpz_set
+./share/e-acsl/e_acsl_gmp.h:82:[value] Function __gmpz_set: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:83:[value] Function __gmpz_set: precondition got status valid.
+[value] using specification for function __gmpz_clear
+./share/e-acsl/e_acsl_gmp.h:105:[value] Function __gmpz_clear: precondition got status valid.
+:0:[value] entering loop for the first time
+[value] using specification for function __gmpz_cmp
+./share/e-acsl/e_acsl_gmp.h:115:[value] Function __gmpz_cmp: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:116:[value] Function __gmpz_cmp: precondition got status valid.
+[value] using specification for function __gmpz_sub
+./share/e-acsl/e_acsl_gmp.h:138:[value] Function __gmpz_sub: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:139:[value] Function __gmpz_sub: precondition got status valid.
+./share/e-acsl/e_acsl_gmp.h:140:[value] Function __gmpz_sub: precondition got status valid.
+[value] using specification for function __gmpz_get_ui
+./share/e-acsl/e_acsl_gmp.h:185:[value] Function __gmpz_get_ui: precondition got status valid.
+tests/e-acsl-runtime/bts1324.i:8:[kernel] warning: out of bounds read. assert \valid_read(t+__e_acsl_2);
+tests/e-acsl-runtime/bts1324.i:8:[kernel] warning: out of bounds read. assert \valid_read(t+__e_acsl_i_2);
+tests/e-acsl-runtime/bts1324.i:15:[value] entering loop for the first time
+./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status unknown.
+[value] using specification for function __delete_block
+tests/e-acsl-runtime/bts1324.i:9:[value] Function sorted, behavior yes: postcondition got status valid.
+tests/e-acsl-runtime/bts1324.i:9:[value] Function sorted, behavior yes: postcondition got status valid, but it is unknown if the behavior is active.
+tests/e-acsl-runtime/bts1324.i:25:[value] Assertion got status valid.
+[value] using specification for function __clean
+[kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
+[value] done for function main
+[value] ====== VALUES COMPUTED ======
+[value] Values at end of function e_acsl_assert:
+[value] Values at end of function sorted:
+          b ∈ [7..15]
+          __retres ∈ {1}
+[value] Values at end of function main:
+          t[0] ∈ {1}
+           [1..2] ∈ {4}
+           [3..5] ∈ {5}
+           [6] ∈ {7}
+          n ∈ {1}
+          __retres ∈ {0}

@@ -29,7 +29,7 @@ val must_model_vi: ?kf:kernel_function -> ?stmt:stmt -> varinfo -> bool
 val must_model_lval: ?kf:kernel_function -> ?stmt:stmt -> lval -> bool
 
 val old_must_model_vi: 
-  Cil.visitor_behavior -> ?kf:kernel_function -> varinfo -> bool
+  Cil.visitor_behavior -> ?kf:kernel_function -> ?stmt:stmt -> varinfo -> bool
 
 (*
 Local Variables:

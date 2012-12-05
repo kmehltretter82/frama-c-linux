@@ -26,6 +26,8 @@
                      [1].__fc_stdio_id ∈ [--..--]
         S___fc_stdio_buffer_0_S___fc_stdout[0..1] ∈ [--..--]
         S___fc_stdio_buffer_1_S___fc_stdout[0..1] ∈ [--..--]
+[value] using specification for function __store_block
+[value] using specification for function __full_init
 [value] using specification for function __valid
 [value] using specification for function __initialized
 ./share/e-acsl/memory_model/e_acsl_mmodel.h:85:[value] Function __initialized: postcondition got status unknown.
@@ -34,6 +36,7 @@ tests/e-acsl-runtime/valid_in_contract.c:21:[kernel] warning: out of bounds read
 tests/e-acsl-runtime/valid_in_contract.c:21:[value] Non-termination in evaluation of function call expression argument
         (void *)l->next
 ./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status valid.
+[value] using specification for function __delete_block
 tests/e-acsl-runtime/valid_in_contract.c:18:[value] Function f, behavior B1: postcondition got status valid.
 tests/e-acsl-runtime/valid_in_contract.c:22:[value] Function f, behavior B2: postcondition got status valid.
 tests/e-acsl-runtime/valid_in_contract.c:22:[value] Function f, behavior B2: postcondition got status valid, but it is unknown if the behavior is active.
