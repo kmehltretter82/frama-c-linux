@@ -38,6 +38,7 @@ val mk_e_acsl_guard:
   ?reverse:bool -> annotation_kind -> exp -> predicate named -> stmt
 
 val library_files: unit -> string list
+val is_library_loc: location -> bool
 val register_library_function: varinfo -> unit
 val reset: unit -> unit
 

@@ -238,51 +238,45 @@ you must call function `%s' by yourself"
 	end;
 	f)
 
-  method vglob_aux g =
-    (* TODO optimize: do not do the standard operation on library globals
-       without varinfo *)
-    let is_library_loc (loc, _) =
-      List.mem loc.Lexing.pos_fname (Misc.library_files ())
-    in
-    match g with
-    | GVarDecl(_, vi, _) | GVar(vi, _, _) | GFun({ svar = vi }, _) 
-	when is_library_loc vi.vdecl -> 
-      if generate then
-	Cil.JustCopyPost
-	  (fun l -> 
-	    Misc.register_library_function (Cil.get_varinfo self#behavior vi);
-	    l)
-      else begin
-	Misc.register_library_function vi; 
-	Cil.SkipChildren
-      end
-    | g when is_library_loc (Global.loc g) ->
-      if generate then Cil.JustCopy else Cil.SkipChildren
-    | _ ->
-      let do_it = function
-	| GVar(vi, i, _) ->
+  method vglob_aux = function
+  | GVarDecl(_, vi, _) | GVar(vi, _, _) | GFun({ svar = vi }, _) 
+      when Misc.is_library_loc vi.vdecl -> 
+    if generate then
+      Cil.JustCopyPost
+	(fun l -> 
+	  Misc.register_library_function (Cil.get_varinfo self#behavior vi);
+	  l)
+    else begin
+      Misc.register_library_function vi; 
+      Cil.SkipChildren
+    end
+  | g when Misc.is_library_loc (Global.loc g) ->
+    if generate then Cil.JustCopy else Cil.SkipChildren
+  | g ->
+    let do_it = function
+      | GVar(vi, i, _) ->
 	  (* remove initializers on need *)
-	  if Pre_analysis.old_must_model_vi self#behavior vi then
-	    (try
-	       let old_vi = Cil.get_original_varinfo self#behavior vi in
-	       match Varinfo.Hashtbl.find global_vars old_vi with
-	       | None -> ()
-	       | Some _ -> i.init <- None;
-	     with Not_found ->
-	       assert false)
-	| GFun({ svar = vi } as fundec, _) ->
+	if Pre_analysis.old_must_model_vi self#behavior vi then
+	  (try
+	     let old_vi = Cil.get_original_varinfo self#behavior vi in
+	     match Varinfo.Hashtbl.find global_vars old_vi with
+	     | None -> ()
+	     | Some _ -> i.init <- None;
+	   with Not_found ->
+	     assert false)
+      | GFun({ svar = vi } as fundec, _) ->
 	  (* remember that we have to remove the main later 
 	     (see method [vfile]) *)
-	  if vi.vorig_name = Kernel.MainFunction.get () 
-	  && not (Options.Check.get ()) 
-	  then main_fct <- Some fundec
-	| _ -> 
-	  ()
-      in
-      (match g with
-      | GVar(vi, _, _) -> Varinfo.Hashtbl.replace global_vars vi None
-      | _ -> ());
-      Cil.DoChildrenPost(fun g -> List.iter do_it g; g)
+	if vi.vorig_name = Kernel.MainFunction.get () 
+	&& not (Options.Check.get ()) 
+	then main_fct <- Some fundec
+      | _ -> 
+	()
+    in
+    (match g with
+    | GVar(vi, _, _) -> Varinfo.Hashtbl.replace global_vars vi None
+    | _ -> ());
+    Cil.DoChildrenPost(fun g -> List.iter do_it g; g)
 
   method vinit vi _off _i = 
     if generate then

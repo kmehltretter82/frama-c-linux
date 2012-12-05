@@ -34,6 +34,8 @@ let library_files () =
       "memory_model/e_acsl_bittree.h";
       "memory_model/e_acsl_mmodel.h" ]
 
+let is_library_loc (loc, _) = List.mem loc.Lexing.pos_fname (library_files ())
+
 (* ************************************************************************** *)
 (** {2 Builders} *)
 (* ************************************************************************** *)

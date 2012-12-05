@@ -396,8 +396,9 @@ end = struct
   module D = Dataflow.Backwards(Transfer)
 
   let compute init_set kf = 
-(*    Options.feedback "ANALYSING %a" Kernel_function.pretty kf;*)
+    assert (not (Misc.is_library_loc (Kernel_function.get_location kf)));
     let tbl = Stmt.Hashtbl.create 17 in
+      (*	Options.feedback "ANALYSING %a" Kernel_function.pretty kf;*)
     Env.add kf tbl;
     try 
       let init = object
@@ -419,17 +420,23 @@ end = struct
       tbl
 
   let get ?init kf =
-    try
-      let stmt = Kernel_function.find_first_stmt kf in
-(*      Options.feedback "GETTING %a" Kernel_function.pretty kf;*)
-      let tbl = try Env.find kf	with Not_found -> Env.apply (compute init) kf in
-      try
-	let set = Stmt.Hashtbl.find tbl stmt in
-	Env.default_varinfos set
-      with Not_found ->
-	Options.fatal "stmt never analyzed: %a" Cil.d_stmt stmt
-    with Kernel_function.No_Statement -> 
+    if Misc.is_library_loc (Kernel_function.get_location kf) then
       Varinfo.Set.empty
+    else
+      try
+	let stmt = Kernel_function.find_first_stmt kf in
+	(*      Options.feedback "GETTING %a" Kernel_function.pretty kf;*)
+	let tbl = 
+	  try Env.find kf
+	  with Not_found -> Env.apply (compute init) kf 
+	in
+	try
+	  let set = Stmt.Hashtbl.find tbl stmt in
+	  Env.default_varinfos set
+	with Not_found ->
+	  Options.fatal "stmt never analyzed: %a" Cil.d_stmt stmt
+      with Kernel_function.No_Statement -> 
+	Varinfo.Set.empty
 
 end
 
