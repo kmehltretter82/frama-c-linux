@@ -34,14 +34,14 @@ axiomatic
   }
  */
 /*@ ensures \false;
-    assigns \nothing;  */
+    assigns \nothing; */
 extern void exit(int status);
 extern FILE *__fc_stdout;
 /*@ assigns *__fc_stdout;
-    assigns *__fc_stdout \from *(format+(..));  */
+    assigns *__fc_stdout \from *(format+(..)); */
 extern int printf(char const *format , ...);
 /*@ requires predicate ≢ 0;
-    assigns \nothing;  */
+    assigns \nothing; */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
   if (! predicate) {
@@ -83,12 +83,11 @@ int main(void)
   /*@ behavior b1:
         requires x ≡ 5;
         ensures x ≡ 3;
-        
+      
       behavior b2:
         requires x ≡ 3+y;
         requires y ≡ 2;
         ensures x ≡ y+1;
-        
   */
   {
     e_acsl_assert(x == 5,(char *)"Precondition",(char *)"x == 5",24);
@@ -104,13 +103,12 @@ int main(void)
   /*@ behavior b1:
         assumes x ≡ 1;
         requires x ≡ 0;
-        
+      
       behavior b2:
         assumes x ≡ 3;
         assumes y ≡ 2;
         requires x ≡ 3;
         requires x+y ≡ 5;
-        
   */
   {
     int __e_acsl_implies;
@@ -121,20 +119,18 @@ int main(void)
     if (! (x == 1)) { __e_acsl_implies = 1; }
     else { __e_acsl_implies = x == 0; }
     e_acsl_assert(__e_acsl_implies,(char *)"Precondition",
-                  (char *)"x == 1 ==>\nx == 0",34);
-    if (x == 3) { __e_acsl_and = y == 2; }
-    else { __e_acsl_and = 0; }
+                  (char *)"x == 1 ==> x == 0",34);
+    if (x == 3) { __e_acsl_and = y == 2; } else { __e_acsl_and = 0; }
     if (! __e_acsl_and) { __e_acsl_implies_2 = 1; }
     else { __e_acsl_implies_2 = x == 3; }
     e_acsl_assert(__e_acsl_implies_2,(char *)"Precondition",
-                  (char *)"x == 3 && y == 2 ==>\nx == 3",38);
-    if (x == 3) { __e_acsl_and_2 = y == 2; }
-    else { __e_acsl_and_2 = 0; }
+                  (char *)"x == 3 && y == 2 ==> x == 3",38);
+    if (x == 3) { __e_acsl_and_2 = y == 2; } else { __e_acsl_and_2 = 0; }
     if (! __e_acsl_and_2) { __e_acsl_implies_3 = 1; }
     else { __e_acsl_implies_3 = (long long)x + (long long)y == (long long)5;
     }
     e_acsl_assert(__e_acsl_implies_3,(char *)"Precondition",
-                  (char *)"x == 3 && y == 2 ==>\nx+y == 5",39);
+                  (char *)"x == 3 && y == 2 ==> x+y == 5",39);
     x += y;
   }
   

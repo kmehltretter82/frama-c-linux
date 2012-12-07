@@ -34,14 +34,14 @@ axiomatic
   }
  */
 /*@ ensures \false;
-    assigns \nothing;  */
+    assigns \nothing; */
 extern void exit(int status);
 extern FILE *__fc_stdout;
 /*@ assigns *__fc_stdout;
-    assigns *__fc_stdout \from *(format+(..));  */
+    assigns *__fc_stdout \from *(format+(..)); */
 extern int printf(char const *format , ...);
 /*@ requires predicate ≢ 0;
-    assigns \nothing;  */
+    assigns \nothing; */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
   if (! predicate) {
@@ -52,12 +52,12 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
   return;
 }
 
-/*@ assigns \nothing;  */
+/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
                                                             size_t size);
-/*@ assigns \nothing;  */
+/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
-/*@ assigns \nothing;  */
+/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __literal_string(void *ptr);
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 int main(void)

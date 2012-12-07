@@ -34,14 +34,14 @@ axiomatic
   }
  */
 /*@ ensures \false;
-    assigns \nothing;  */
+    assigns \nothing; */
 extern void exit(int status);
 extern FILE *__fc_stdout;
 /*@ assigns *__fc_stdout;
-    assigns *__fc_stdout \from *(format+(..));  */
+    assigns *__fc_stdout \from *(format+(..)); */
 extern int printf(char const *format , ...);
 /*@ requires predicate ≢ 0;
-    assigns \nothing;  */
+    assigns \nothing; */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
   if (! predicate) {
@@ -55,7 +55,7 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 int X = 0;
 int Y = 2;
-/*@ ensures X ≡ 1;  */
+/*@ ensures X ≡ 1; */
 void f(void)
 {
   X = 1;
@@ -64,7 +64,7 @@ void f(void)
 }
 
 /*@ ensures X ≡ 2;
-    ensures Y ≡ 2;  */
+    ensures Y ≡ 2; */
 void g(void)
 {
   X = 2;
@@ -73,7 +73,7 @@ void g(void)
   return;
 }
 
-/*@ requires X ≡ 2;  */
+/*@ requires X ≡ 2; */
 void h(void)
 {
   e_acsl_assert(X == 2,(char *)"Precondition",(char *)"X == 2",19);
@@ -82,7 +82,7 @@ void h(void)
 }
 
 /*@ requires X ≡ 3;
-    requires Y ≡ 2;  */
+    requires Y ≡ 2; */
 void i(void)
 {
   e_acsl_assert(X == 3,(char *)"Precondition",(char *)"X == 3",23);
@@ -94,14 +94,12 @@ void i(void)
 /*@ behavior b1:
       requires X ≡ 5;
       ensures X ≡ 3;
-      
+    
     behavior b2:
       requires X ≡ 3+Y;
       requires Y ≡ 2;
       ensures X ≡ Y+1;
-      
-  
-*/
+ */
 void j(void)
 {
   e_acsl_assert(X == 5,(char *)"Precondition",(char *)"X == 5",29);
@@ -118,15 +116,13 @@ void j(void)
 /*@ behavior b1:
       assumes X ≡ 1;
       requires X ≡ 0;
-      
+    
     behavior b2:
       assumes X ≡ 3;
       assumes Y ≡ 2;
       requires X ≡ 3;
       requires X+Y ≡ 5;
-      
-  
-*/
+ */
 void k(void)
 {
   {
@@ -138,27 +134,25 @@ void k(void)
     if (! (X == 1)) { __e_acsl_implies = 1; }
     else { __e_acsl_implies = X == 0; }
     e_acsl_assert(__e_acsl_implies,(char *)"Precondition",
-                  (char *)"X == 1 ==>\nX == 0",40);
-    if (X == 3) { __e_acsl_and = Y == 2; }
-    else { __e_acsl_and = 0; }
+                  (char *)"X == 1 ==> X == 0",40);
+    if (X == 3) { __e_acsl_and = Y == 2; } else { __e_acsl_and = 0; }
     if (! __e_acsl_and) { __e_acsl_implies_2 = 1; }
     else { __e_acsl_implies_2 = X == 3; }
     e_acsl_assert(__e_acsl_implies_2,(char *)"Precondition",
-                  (char *)"X == 3 && Y == 2 ==>\nX == 3",44);
-    if (X == 3) { __e_acsl_and_2 = Y == 2; }
-    else { __e_acsl_and_2 = 0; }
+                  (char *)"X == 3 && Y == 2 ==> X == 3",44);
+    if (X == 3) { __e_acsl_and_2 = Y == 2; } else { __e_acsl_and_2 = 0; }
     if (! __e_acsl_and_2) { __e_acsl_implies_3 = 1; }
     else { __e_acsl_implies_3 = (long long)X + (long long)Y == (long long)5;
     }
     e_acsl_assert(__e_acsl_implies_3,(char *)"Precondition",
-                  (char *)"X == 3 && Y == 2 ==>\nX+Y == 5",45);
+                  (char *)"X == 3 && Y == 2 ==> X+Y == 5",45);
     X += Y;
   }
   
   return;
 }
 
-/*@ ensures X ≡ 5;  */
+/*@ ensures X ≡ 5; */
 int l(void)
 {
   /*@ assert Y ≡ 2; */
@@ -170,15 +164,13 @@ int l(void)
 /*@ behavior b1:
       assumes X ≡ 7;
       ensures X ≡ 95;
-      
+    
     behavior b2:
       assumes X ≡ 5;
       assumes Y ≡ 2;
       ensures X ≡ 7;
       ensures X ≡ \old(X)+Y;
-      
-  
-*/
+ */
 void m(void)
 {
   int __e_acsl_at_4;
@@ -186,15 +178,15 @@ void m(void)
   int __e_acsl_at_2;
   int __e_acsl_at;
   __e_acsl_at_4 = X;
-  { int __e_acsl_and_2;
-    if (X == 5) { __e_acsl_and_2 = Y == 2; }
-    else { __e_acsl_and_2 = 0; }
+  {
+    int __e_acsl_and_2;
+    if (X == 5) { __e_acsl_and_2 = Y == 2; } else { __e_acsl_and_2 = 0; }
     __e_acsl_at_3 = __e_acsl_and_2;
   }
   
-  { int __e_acsl_and;
-    if (X == 5) { __e_acsl_and = Y == 2; }
-    else { __e_acsl_and = 0; }
+  {
+    int __e_acsl_and;
+    if (X == 5) { __e_acsl_and = Y == 2; } else { __e_acsl_and = 0; }
     __e_acsl_at_2 = __e_acsl_and;
   }
   
@@ -207,17 +199,17 @@ void m(void)
     if (! __e_acsl_at) { __e_acsl_implies = 1; }
     else { __e_acsl_implies = X == 95; }
     e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",
-                  (char *)"\\old(X == 7) ==>\nX == 95",58);
+                  (char *)"\\old(X == 7) ==> X == 95",58);
     if (! __e_acsl_at_2) { __e_acsl_implies_2 = 1; }
     else { __e_acsl_implies_2 = X == 7; }
     e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",
-                  (char *)"\\old(X == 5 && Y == 2) ==>\nX == 7",62);
+                  (char *)"\\old(X == 5 && Y == 2) ==> X == 7",62);
     if (! __e_acsl_at_3) { __e_acsl_implies_3 = 1; }
     else {
       __e_acsl_implies_3 = (long long)X == (long long)__e_acsl_at_4 + (long long)Y;
     }
     e_acsl_assert(__e_acsl_implies_3,(char *)"Postcondition",
-                  (char *)"\\old(X == 5 && Y == 2) ==>\nX == \\old(X)+Y",63);
+                  (char *)"\\old(X == 5 && Y == 2) ==> X == \\old(X)+Y",63);
     return;
   }
   
@@ -225,16 +217,15 @@ void m(void)
 
 /*@ requires X > 0;
     requires X < 10;
+    
     behavior b1:
       assumes X ≡ 7;
       ensures X ≡ 8;
-      
+    
     behavior b2:
       assumes X ≡ 5;
       ensures X ≡ 98;
-      
-  
-*/
+ */
 void n(void)
 {
   int __e_acsl_at_2;
@@ -250,11 +241,11 @@ void n(void)
     if (! __e_acsl_at) { __e_acsl_implies = 1; }
     else { __e_acsl_implies = X == 8; }
     e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",
-                  (char *)"\\old(X == 7) ==>\nX == 8",71);
+                  (char *)"\\old(X == 7) ==> X == 8",71);
     if (! __e_acsl_at_2) { __e_acsl_implies_2 = 1; }
     else { __e_acsl_implies_2 = X == 98; }
     e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",
-                  (char *)"\\old(X == 5) ==>\nX == 98",74);
+                  (char *)"\\old(X == 5) ==> X == 98",74);
     return;
   }
   

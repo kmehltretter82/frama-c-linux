@@ -34,14 +34,14 @@ axiomatic
   }
  */
 /*@ ensures \false;
-    assigns \nothing;  */
+    assigns \nothing; */
 extern void exit(int status);
 extern FILE *__fc_stdout;
 /*@ assigns *__fc_stdout;
-    assigns *__fc_stdout \from *(format+(..));  */
+    assigns *__fc_stdout \from *(format+(..)); */
 extern int printf(char const *format , ...);
 /*@ requires predicate ≢ 0;
-    assigns \nothing;  */
+    assigns \nothing; */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
   if (! predicate) {
@@ -52,40 +52,38 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
   return;
 }
 
-/*@ assigns \nothing;  */
+/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
                                                             size_t size);
-/*@ assigns \nothing;  */
+/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __delete_block(void *ptr);
-/*@ assigns \nothing;  */
+/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __initialize(void *ptr,
                                                           size_t size);
-/*@ assigns \nothing;  */
+/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
-/*@ assigns \nothing;  */
+/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) int __valid(void *ptr, size_t size);
-/*@ assigns \nothing;  */
+/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) int __valid_read(void *ptr,
                                                          size_t size);
 /*@ ensures \result ≡ 0 ∨ \result ≡ 1;
-    ensures \result ≡ 1 ⇒
-            \initialized((char *)\old(ptr)+(0..\old(size)-1));
+    ensures
+      \result ≡ 1 ⇒ \initialized((char *)\old(ptr)+(0..\old(size)-1));
     assigns \nothing;
-  
-*/
+ */
 extern  __attribute__((__FC_BUILTIN__)) int __initialized(void *ptr,
                                                           size_t size);
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 /*@ requires \valid(Mtmax_in);
     requires \valid(Mwmax);
     requires \valid(Mtmax_out);
+    
     behavior OverEstimate_Motoring:
       assumes \true;
-      ensures *\old(Mtmax_out) ≡
-              *\old(Mtmax_in)+(5-((5/80)**\old(Mwmax))*0.4);
-      
-  
-*/
+      ensures
+        *\old(Mtmax_out) ≡ *\old(Mtmax_in)+(5-((5/80)**\old(Mwmax))*0.4);
+ */
 void foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
 {
   float *__e_acsl_at_3;
@@ -177,13 +175,15 @@ void foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
 /*@ requires \valid(Mtmin_in);
     requires \valid(Mwmin);
     requires \valid(Mtmin_out);
+    
     behavior UnderEstimate_Motoring:
       assumes \true;
-      ensures *\old(Mtmin_out)≡*\old(Mtmin_in)∧*\old(Mtmin_in)<0.85**
-                \old(Mwmin)? *\old(Mtmin_in) ≢ 0.: 0.85**\old(Mwmin) ≢ 0.;
-      
-  
-*/
+      ensures
+        *\old(Mtmin_out)≡*\old(Mtmin_in)∧*\old(Mtmin_in)<0.85**\old(
+                                                                   Mwmin)?
+          *\old(Mtmin_in) ≢ 0.:
+          0.85**\old(Mwmin) ≢ 0.;
+ */
 void bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
 {
   float *__e_acsl_at_6;
@@ -243,7 +243,7 @@ void bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     if (__e_acsl_and) { __e_acsl_if = *__e_acsl_at_5 != 0.; }
     else { __e_acsl_if = 0.85 * *__e_acsl_at_6 != 0.; }
     e_acsl_assert(__e_acsl_if,(char *)"Postcondition",
-                  (char *)"*\\old(Mtmin_out)==*\\old(Mtmin_in)&&*\\old(Mtmin_in)<0.85**\\old(Mwmin)?\n  *\\old(Mtmin_in) != 0.: 0.85**\\old(Mwmin) != 0.",
+                  (char *)"*\\old(Mtmin_out)==*\\old(Mtmin_in)&&*\\old(Mtmin_in)<0.85**\\old(Mwmin)?\n  *\\old(Mtmin_in) != 0.:\n  0.85**\\old(Mwmin) != 0.",
                   25);
     __delete_block((void *)(& Mtmin_in));
     __delete_block((void *)(& Mwmin));

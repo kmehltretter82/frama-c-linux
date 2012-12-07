@@ -24,41 +24,34 @@ model __mpz_struct { ℤ n };
 */
 /*@ requires ¬\initialized(z);
     ensures \valid(\old(z));
-    allocates \old(z);
-    
     assigns *z;
-  
-*/
+    allocates \old(z);
+ */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init(__mpz_struct * /*[1]*/ z);
 /*@ requires \valid(z_orig);
     requires ¬\initialized(z);
     ensures \valid(\old(z));
-    allocates \old(z);
-    
     assigns *z;
     assigns *z \from *z_orig;
-  
-*/
+    allocates \old(z);
+ */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init_set(__mpz_struct * /*[1]*/ z,
                                                              __mpz_struct const * /*[1]*/ z_orig);
 /*@ requires ¬\initialized(z);
     ensures \valid(\old(z));
-    
     ensures \initialized(\old(z));
-    allocates \old(z);
-    
     assigns *z;
     assigns *z \from n;
-  
-*/
+    allocates \old(z);
+ */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z,
                                                                 long n);
 /*@ requires \valid(x);
-    assigns *x;  */
+    assigns *x; */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_clear(__mpz_struct * /*[1]*/ x);
 /*@ requires \valid(z1);
     requires \valid(z2);
-    assigns \nothing;  */
+    assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
                                                        __mpz_struct const * /*[1]*/ z2);
 /*@ requires \valid(z1);
@@ -66,8 +59,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1
     requires \valid(z3);
     assigns *z1;
     assigns *z1 \from *z2, *z3;
-  
-*/
+ */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_tdiv_q(__mpz_struct * /*[1]*/ z1,
                                                            __mpz_struct const * /*[1]*/ z2,
                                                            __mpz_struct const * /*[1]*/ z3);
@@ -83,14 +75,14 @@ axiomatic
   }
  */
 /*@ ensures \false;
-    assigns \nothing;  */
+    assigns \nothing; */
 extern void exit(int status);
 extern FILE *__fc_stdout;
 /*@ assigns *__fc_stdout;
-    assigns *__fc_stdout \from *(format+(..));  */
+    assigns *__fc_stdout \from *(format+(..)); */
 extern int printf(char const *format , ...);
 /*@ requires predicate ≢ 0;
-    assigns \nothing;  */
+    assigns \nothing; */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
   if (! predicate) {
@@ -133,7 +125,7 @@ int main(void)
     }
     else { __e_acsl_and = 0; }
     e_acsl_assert(__e_acsl_and,(char *)"Assertion",
-                  (char *)"x == 0 &&\ny == 1",11);
+                  (char *)"x == 0 && y == 1",11);
     __gmpz_clear(__e_acsl_x);
     __gmpz_clear(__e_acsl);
   }
@@ -204,8 +196,8 @@ int main(void)
       __gmpz_clear(__e_acsl_x_3);
       __gmpz_clear(__e_acsl_7);
     }
-    e_acsl_assert(__e_acsl_or,(char *)"Assertion",
-                  (char *)"y == 1 ||\nx == 1",13);
+    e_acsl_assert(__e_acsl_or,(char *)"Assertion",(char *)"y == 1 || x == 1",
+                  13);
     __gmpz_clear(__e_acsl_y_3);
     __gmpz_clear(__e_acsl_6);
   }
@@ -248,7 +240,7 @@ int main(void)
       __gmpz_clear(__e_acsl_div_2);
     }
     e_acsl_assert(__e_acsl_or_2,(char *)"Assertion",
-                  (char *)"x == 0 ||\ny == 1/0",14);
+                  (char *)"x == 0 || y == 1/0",14);
     __gmpz_clear(__e_acsl_x_4);
     __gmpz_clear(__e_acsl_8);
   }
@@ -277,7 +269,7 @@ int main(void)
       __gmpz_clear(__e_acsl_12);
     }
     e_acsl_assert(__e_acsl_implies,(char *)"Assertion",
-                  (char *)"x == 0 ==>\ny == 1",15);
+                  (char *)"x == 0 ==> y == 1",15);
     __gmpz_clear(__e_acsl_x_5);
     __gmpz_clear(__e_acsl_11);
   }
@@ -320,7 +312,7 @@ int main(void)
       __gmpz_clear(__e_acsl_div_3);
     }
     e_acsl_assert(__e_acsl_implies_2,(char *)"Assertion",
-                  (char *)"x == 1 ==>\ny == 1/0",16);
+                  (char *)"x == 1 ==> y == 1/0",16);
     __gmpz_clear(__e_acsl_x_6);
     __gmpz_clear(__e_acsl_13);
   }
@@ -497,7 +489,7 @@ int main(void)
     }
     else { __e_acsl_equiv = 0; }
     e_acsl_assert(__e_acsl_equiv,(char *)"Assertion",
-                  (char *)"x == 2 <==>\ny == 3",22);
+                  (char *)"x == 2 <==> y == 3",22);
     __gmpz_clear(__e_acsl_x_13);
     __gmpz_clear(__e_acsl_25);
   }
@@ -554,7 +546,7 @@ int main(void)
     }
     else { __e_acsl_equiv_2 = 0; }
     e_acsl_assert(__e_acsl_equiv_2,(char *)"Assertion",
-                  (char *)"x == 0 <==>\ny == 1",23);
+                  (char *)"x == 0 <==> y == 1",23);
     __gmpz_clear(__e_acsl_x_15);
     __gmpz_clear(__e_acsl_29);
   }
@@ -641,7 +633,7 @@ int main(void)
       __gmpz_clear(__e_acsl_38);
     }
     e_acsl_assert(__e_acsl_or_3,(char *)"Assertion",
-                  (char *)"(x != 0 && y != 0) ||\ny != 0",27);
+                  (char *)"(x != 0 && y != 0) || y != 0",27);
     __gmpz_clear(__e_acsl_x_19);
     __gmpz_clear(__e_acsl_36);
   }
@@ -684,7 +676,7 @@ int main(void)
     }
     else { __e_acsl_and_4 = 0; }
     e_acsl_assert(__e_acsl_and_4,(char *)"Assertion",
-                  (char *)"(x != 0 || y != 0) &&\ny == 1",28);
+                  (char *)"(x != 0 || y != 0) && y == 1",28);
     __gmpz_clear(__e_acsl_x_20);
     __gmpz_clear(__e_acsl_39);
   }

@@ -34,14 +34,14 @@ axiomatic
   }
  */
 /*@ ensures \false;
-    assigns \nothing;  */
+    assigns \nothing; */
 extern void exit(int status);
 extern FILE *__fc_stdout;
 /*@ assigns *__fc_stdout;
-    assigns *__fc_stdout \from *(format+(..));  */
+    assigns *__fc_stdout \from *(format+(..)); */
 extern int printf(char const *format , ...);
 /*@ requires predicate ≢ 0;
-    assigns \nothing;  */
+    assigns \nothing; */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
   if (! predicate) {
@@ -53,7 +53,7 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 }
 
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
-/*@ ensures \result ≡ (int)(\old(x)-\old(x));  */
+/*@ ensures \result ≡ (int)(\old(x)-\old(x)); */
 int f(int x)
 {
   int __e_acsl_at_2;
@@ -76,14 +76,14 @@ int f(int x)
 }
 
 int Y = 1;
-/*@ ensures \result ≡ Y;  */
+/*@ ensures \result ≡ Y; */
 int g(int x)
 {
   e_acsl_assert(x == Y,(char *)"Postcondition",(char *)"\\result == Y",18);
   return (x);
 }
 
-/*@ ensures \result ≡ 0;  */
+/*@ ensures \result ≡ 0; */
 int h(void)
 {
   int __retres;

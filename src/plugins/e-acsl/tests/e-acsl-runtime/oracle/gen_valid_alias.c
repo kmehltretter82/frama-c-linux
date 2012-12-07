@@ -33,55 +33,57 @@ axiomatic
   
   }
  */
-/*@ allocates \result;
-    
-    assigns __fc_heap_status;
+/*@ assigns __fc_heap_status;
     assigns __fc_heap_status \from size, __fc_heap_status;
-    assigns \result
-    \from size, __fc_heap_status;
+    assigns \result \from size, __fc_heap_status;
+    allocates \result;
+    
     behavior allocation:
       assumes is_allocable(size);
       ensures \fresh{Old, Here}(\result,\old(size));
       assigns __fc_heap_status;
       assigns __fc_heap_status \from size, __fc_heap_status;
       assigns \result \from size, __fc_heap_status;
+    
     behavior no_allocation:
       assumes ¬is_allocable(size);
       ensures \result ≡ \null;
-      allocates \nothing;assigns \result \from \nothing;
+      assigns \result \from \nothing;
+      allocates \nothing;
+    
     complete behaviors no_allocation, allocation;
     disjoint behaviors no_allocation, allocation;
-  
-*/
+ */
 extern void *__malloc(size_t size);
-/*@ frees p;
+/*@ assigns __fc_heap_status;
+    assigns __fc_heap_status \from __fc_heap_status;
+    frees p;
     
-    assigns __fc_heap_status;
-    assigns __fc_heap_status
-    \from __fc_heap_status;
     behavior deallocation:
       assumes p ≢ \null;
       requires \freeable(p);
       ensures \allocable(\old(p));
       assigns __fc_heap_status;
       assigns __fc_heap_status \from __fc_heap_status;
+    
     behavior no_deallocation:
       assumes p ≡ \null;
-      allocates \nothing;assigns \nothing;
+      assigns \nothing;
+      allocates \nothing;
+    
     complete behaviors no_deallocation, deallocation;
     disjoint behaviors no_deallocation, deallocation;
-  
-*/
+ */
 extern void __free(void *p);
 /*@ ensures \false;
-    assigns \nothing;  */
+    assigns \nothing; */
 extern void exit(int status);
 extern FILE *__fc_stdout;
 /*@ assigns *__fc_stdout;
-    assigns *__fc_stdout \from *(format+(..));  */
+    assigns *__fc_stdout \from *(format+(..)); */
 extern int printf(char const *format , ...);
 /*@ requires predicate ≢ 0;
-    assigns \nothing;  */
+    assigns \nothing; */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
   if (! predicate) {
@@ -92,27 +94,26 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
   return;
 }
 
-/*@ assigns \nothing;  */
+/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
                                                             size_t size);
-/*@ assigns \nothing;  */
+/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __delete_block(void *ptr);
-/*@ assigns \nothing;  */
+/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __initialize(void *ptr,
                                                           size_t size);
-/*@ assigns \nothing;  */
+/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
-/*@ assigns \nothing;  */
+/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) int __valid(void *ptr, size_t size);
-/*@ assigns \nothing;  */
+/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) int __valid_read(void *ptr,
                                                          size_t size);
 /*@ ensures \result ≡ 0 ∨ \result ≡ 1;
-    ensures \result ≡ 1 ⇒
-            \initialized((char *)\old(ptr)+(0..\old(size)-1));
+    ensures
+      \result ≡ 1 ⇒ \initialized((char *)\old(ptr)+(0..\old(size)-1));
     assigns \nothing;
-  
-*/
+ */
 extern  __attribute__((__FC_BUILTIN__)) int __initialized(void *ptr,
                                                           size_t size);
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
@@ -153,7 +154,7 @@ int main(void)
     }
     else { __e_acsl_and_3 = 0; }
     e_acsl_assert(__e_acsl_and_3,(char *)"Assertion",
-                  (char *)"!\\valid(a) &&\n!\\valid(b)",12);
+                  (char *)"!\\valid(a) && !\\valid(b)",12);
   }
   
   __full_init((void *)(& a));
@@ -188,7 +189,7 @@ int main(void)
     }
     else { __e_acsl_and_6 = 0; }
     e_acsl_assert(__e_acsl_and_6,(char *)"Assertion",
-                  (char *)"\\valid(a) &&\n\\valid(b)",16);
+                  (char *)"\\valid(a) && \\valid(b)",16);
   }
   
   /*@ assert *b ≡ n; */
@@ -234,7 +235,7 @@ int main(void)
     }
     else { __e_acsl_and_10 = 0; }
     e_acsl_assert(__e_acsl_and_10,(char *)"Assertion",
-                  (char *)"!\\valid(a) &&\n!\\valid(b)",19);
+                  (char *)"!\\valid(a) && !\\valid(b)",19);
   }
   
   __retres = 0;

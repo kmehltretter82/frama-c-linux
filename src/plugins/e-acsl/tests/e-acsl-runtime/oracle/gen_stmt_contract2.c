@@ -24,30 +24,25 @@ model __mpz_struct { ℤ n };
 */
 /*@ requires ¬\initialized(z);
     ensures \valid(\old(z));
-    allocates \old(z);
-    
     assigns *z;
-  
-*/
+    allocates \old(z);
+ */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init(__mpz_struct * /*[1]*/ z);
 /*@ requires ¬\initialized(z);
     ensures \valid(\old(z));
-    
     ensures \initialized(\old(z));
-    allocates \old(z);
-    
     assigns *z;
     assigns *z \from n;
-  
-*/
+    allocates \old(z);
+ */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z,
                                                                 long n);
 /*@ requires \valid(x);
-    assigns *x;  */
+    assigns *x; */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_clear(__mpz_struct * /*[1]*/ x);
 /*@ requires \valid(z1);
     requires \valid(z2);
-    assigns \nothing;  */
+    assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
                                                        __mpz_struct const * /*[1]*/ z2);
 /*@ requires \valid(z1);
@@ -55,8 +50,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1
     requires \valid(z3);
     assigns *z1;
     assigns *z1 \from *z2, *z3;
-  
-*/
+ */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_add(__mpz_struct * /*[1]*/ z1,
                                                         __mpz_struct const * /*[1]*/ z2,
                                                         __mpz_struct const * /*[1]*/ z3);
@@ -72,14 +66,14 @@ axiomatic
   }
  */
 /*@ ensures \false;
-    assigns \nothing;  */
+    assigns \nothing; */
 extern void exit(int status);
 extern FILE *__fc_stdout;
 /*@ assigns *__fc_stdout;
-    assigns *__fc_stdout \from *(format+(..));  */
+    assigns *__fc_stdout \from *(format+(..)); */
 extern int printf(char const *format , ...);
 /*@ requires predicate ≢ 0;
-    assigns \nothing;  */
+    assigns \nothing; */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
   if (! predicate) {
@@ -186,12 +180,11 @@ int main(void)
   /*@ behavior b1:
         requires x ≡ 5;
         ensures x ≡ 3;
-        
+      
       behavior b2:
         requires x ≡ 3+y;
         requires y ≡ 2;
         ensures x ≡ y+1;
-        
   */
   {
     mpz_t __e_acsl_x_6;
@@ -265,13 +258,12 @@ int main(void)
   /*@ behavior b1:
         assumes x ≡ 1;
         requires x ≡ 0;
-        
+      
       behavior b2:
         assumes x ≡ 3;
         assumes y ≡ 2;
         requires x ≡ 3;
         requires x+y ≡ 5;
-        
   */
   {
     mpz_t __e_acsl_x_7;
@@ -303,7 +295,7 @@ int main(void)
       __gmpz_clear(__e_acsl_12);
     }
     e_acsl_assert(__e_acsl_implies,(char *)"Precondition",
-                  (char *)"x == 1 ==>\nx == 0",34);
+                  (char *)"x == 1 ==> x == 0",34);
     __gmpz_init_set_si(__e_acsl_13,(long)3);
     __e_acsl_eq_14 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_x_7),
                                 (__mpz_struct const *)(__e_acsl_13));
@@ -334,7 +326,7 @@ int main(void)
       __gmpz_clear(__e_acsl_15);
     }
     e_acsl_assert(__e_acsl_implies_2,(char *)"Precondition",
-                  (char *)"x == 3 && y == 2 ==>\nx == 3",38);
+                  (char *)"x == 3 && y == 2 ==> x == 3",38);
     __e_acsl_eq_17 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_x_7),
                                 (__mpz_struct const *)(__e_acsl_13));
     if (__e_acsl_eq_17 == 0) {
@@ -372,7 +364,7 @@ int main(void)
       __gmpz_clear(__e_acsl_17);
     }
     e_acsl_assert(__e_acsl_implies_3,(char *)"Precondition",
-                  (char *)"x == 3 && y == 2 ==>\nx+y == 5",39);
+                  (char *)"x == 3 && y == 2 ==> x+y == 5",39);
     __gmpz_clear(__e_acsl_x_7);
     __gmpz_clear(__e_acsl_11);
     __gmpz_clear(__e_acsl_13);

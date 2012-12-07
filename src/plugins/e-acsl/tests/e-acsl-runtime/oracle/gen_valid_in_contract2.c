@@ -38,14 +38,14 @@ axiomatic
   }
  */
 /*@ ensures \false;
-    assigns \nothing;  */
+    assigns \nothing; */
 extern void exit(int status);
 extern FILE *__fc_stdout;
 /*@ assigns *__fc_stdout;
-    assigns *__fc_stdout \from *(format+(..));  */
+    assigns *__fc_stdout \from *(format+(..)); */
 extern int printf(char const *format , ...);
 /*@ requires predicate ≢ 0;
-    assigns \nothing;  */
+    assigns \nothing; */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
   if (! predicate) {
@@ -56,35 +56,32 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
   return;
 }
 
-/*@ assigns \nothing;  */
+/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
                                                             size_t size);
-/*@ assigns \nothing;  */
+/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __delete_block(void *ptr);
-/*@ assigns \nothing;  */
+/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
-/*@ assigns \nothing;  */
+/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) int __valid(void *ptr, size_t size);
 /*@ ensures \result ≡ 0 ∨ \result ≡ 1;
-    ensures \result ≡ 1 ⇒
-            \initialized((char *)\old(ptr)+(0..\old(size)-1));
+    ensures
+      \result ≡ 1 ⇒ \initialized((char *)\old(ptr)+(0..\old(size)-1));
     assigns \nothing;
-  
-*/
+ */
 extern  __attribute__((__FC_BUILTIN__)) int __initialized(void *ptr,
                                                           size_t size);
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 /*@ behavior B1:
       assumes l ≡ \null;
       ensures \result ≡ \old(l);
-      
+    
     behavior B2:
       assumes ¬\valid(l);
       assumes ¬\valid(l->next);
       ensures \result ≡ \old(l);
-      
-  
-*/
+ */
 struct list *f(struct list *l)
 {
   struct list *__e_acsl_at_4;
@@ -113,7 +110,8 @@ struct list *f(struct list *l)
       }
       else { __e_acsl_and = 0; }
       __e_acsl_and_2 = ! __e_acsl_and;
-    } else { __e_acsl_and_2 = 0; }
+    }
+    else { __e_acsl_and_2 = 0; }
     __e_acsl_at_3 = __e_acsl_and_2;
   }
   
@@ -137,11 +135,11 @@ struct list *f(struct list *l)
     if (! __e_acsl_at) { __e_acsl_implies = 1; }
     else { __e_acsl_implies = __retres == __e_acsl_at_2; }
     e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",
-                  (char *)"\\old(l == \\null) ==>\n\\result == \\old(l)",18);
+                  (char *)"\\old(l == \\null) ==> \\result == \\old(l)",18);
     if (! __e_acsl_at_3) { __e_acsl_implies_2 = 1; }
     else { __e_acsl_implies_2 = __retres == __e_acsl_at_4; }
     e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",
-                  (char *)"\\old(!\\valid(l) && !\\valid(l->next)) ==>\n\\result == \\old(l)",
+                  (char *)"\\old(!\\valid(l) && !\\valid(l->next)) ==> \\result == \\old(l)",
                   22);
     __delete_block((void *)(& l));
     return (__retres);

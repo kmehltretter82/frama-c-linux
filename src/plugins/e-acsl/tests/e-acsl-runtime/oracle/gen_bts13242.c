@@ -24,38 +24,32 @@ model __mpz_struct { ℤ n };
 */
 /*@ requires ¬\initialized(z);
     ensures \valid(\old(z));
-    allocates \old(z);
-    
     assigns *z;
-  
-*/
+    allocates \old(z);
+ */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init(__mpz_struct * /*[1]*/ z);
 /*@ requires ¬\initialized(z);
     ensures \valid(\old(z));
-    
     ensures \initialized(\old(z));
-    allocates \old(z);
-    
     assigns *z;
     assigns *z \from n;
-  
-*/
+    allocates \old(z);
+ */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z,
                                                                 long n);
 /*@ requires \valid(z_orig);
     requires \valid(z);
     assigns *z;
     assigns *z \from *z_orig;
-  
-*/
+ */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_set(__mpz_struct * /*[1]*/ z,
                                                         __mpz_struct const * /*[1]*/ z_orig);
 /*@ requires \valid(x);
-    assigns *x;  */
+    assigns *x; */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_clear(__mpz_struct * /*[1]*/ x);
 /*@ requires \valid(z1);
     requires \valid(z2);
-    assigns \nothing;  */
+    assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
                                                        __mpz_struct const * /*[1]*/ z2);
 /*@ requires \valid(z1);
@@ -63,8 +57,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1
     requires \valid(z3);
     assigns *z1;
     assigns *z1 \from *z2, *z3;
-  
-*/
+ */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_add(__mpz_struct * /*[1]*/ z1,
                                                         __mpz_struct const * /*[1]*/ z2,
                                                         __mpz_struct const * /*[1]*/ z3);
@@ -73,13 +66,12 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_add(__mpz_struct * /*[1]*/ z
     requires \valid(z3);
     assigns *z1;
     assigns *z1 \from *z2, *z3;
-  
-*/
+ */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_sub(__mpz_struct * /*[1]*/ z1,
                                                         __mpz_struct const * /*[1]*/ z2,
                                                         __mpz_struct const * /*[1]*/ z3);
 /*@ requires \valid(z);
-    assigns \nothing;  */
+    assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) unsigned long __gmpz_get_ui(__mpz_struct const * /*[1]*/ z);
 int __fc_random_counter __attribute__((__unused__));
 unsigned long const __fc_rand_max = (unsigned long)2147483647;
@@ -93,14 +85,14 @@ axiomatic
   }
  */
 /*@ ensures \false;
-    assigns \nothing;  */
+    assigns \nothing; */
 extern void exit(int status);
 extern FILE *__fc_stdout;
 /*@ assigns *__fc_stdout;
-    assigns *__fc_stdout \from *(format+(..));  */
+    assigns *__fc_stdout \from *(format+(..)); */
 extern int printf(char const *format , ...);
 /*@ requires predicate ≢ 0;
-    assigns \nothing;  */
+    assigns \nothing; */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
   if (! predicate) {
@@ -111,23 +103,21 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
   return;
 }
 
-/*@ assigns \nothing;  */
+/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
                                                             size_t size);
-/*@ assigns \nothing;  */
+/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __delete_block(void *ptr);
-/*@ assigns \nothing;  */
+/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __initialize(void *ptr,
                                                           size_t size);
-/*@ assigns \nothing;  */
+/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 /*@ behavior yes:
       assumes ∀ ℤ i; 0 < i ∧ i < n ⇒ *(t+(i-1)) ≤ *(t+i);
       ensures \result ≡ 1;
-      
-  
-*/
+ */
 int sorted(int *t, int n)
 {
   int __e_acsl_at;

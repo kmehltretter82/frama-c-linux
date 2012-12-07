@@ -24,22 +24,19 @@ model __mpz_struct { ℤ n };
 */
 /*@ requires ¬\initialized(z);
     ensures \valid(\old(z));
-    
     ensures \initialized(\old(z));
-    allocates \old(z);
-    
     assigns *z;
     assigns *z \from n;
-  
-*/
+    allocates \old(z);
+ */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z,
                                                                 long n);
 /*@ requires \valid(x);
-    assigns *x;  */
+    assigns *x; */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_clear(__mpz_struct * /*[1]*/ x);
 /*@ requires \valid(z1);
     requires \valid(z2);
-    assigns \nothing;  */
+    assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
                                                        __mpz_struct const * /*[1]*/ z2);
 int __fc_random_counter __attribute__((__unused__));
@@ -54,14 +51,14 @@ axiomatic
   }
  */
 /*@ ensures \false;
-    assigns \nothing;  */
+    assigns \nothing; */
 extern void exit(int status);
 extern FILE *__fc_stdout;
 /*@ assigns *__fc_stdout;
-    assigns *__fc_stdout \from *(format+(..));  */
+    assigns *__fc_stdout \from *(format+(..)); */
 extern int printf(char const *format , ...);
 /*@ requires predicate ≢ 0;
-    assigns \nothing;  */
+    assigns \nothing; */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
   if (! predicate) {
@@ -106,7 +103,7 @@ int main(void)
         }
         else { __e_acsl_and = 0; }
         e_acsl_assert(__e_acsl_and,(char *)"Invariant",
-                      (char *)"0 <= i &&\ni < 10",9);
+                      (char *)"0 <= i && i < 10",9);
         __gmpz_clear(__e_acsl);
         __gmpz_clear(__e_acsl_i);
       }

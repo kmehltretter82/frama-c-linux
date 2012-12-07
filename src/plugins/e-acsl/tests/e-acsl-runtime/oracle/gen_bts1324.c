@@ -34,14 +34,14 @@ axiomatic
   }
  */
 /*@ ensures \false;
-    assigns \nothing;  */
+    assigns \nothing; */
 extern void exit(int status);
 extern FILE *__fc_stdout;
 /*@ assigns *__fc_stdout;
-    assigns *__fc_stdout \from *(format+(..));  */
+    assigns *__fc_stdout \from *(format+(..)); */
 extern int printf(char const *format , ...);
 /*@ requires predicate ≢ 0;
-    assigns \nothing;  */
+    assigns \nothing; */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
   if (! predicate) {
@@ -52,26 +52,24 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
   return;
 }
 
-/*@ assigns \nothing;  */
+/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
                                                             size_t size);
-/*@ assigns \nothing;  */
+/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __delete_block(void *ptr);
-/*@ assigns \nothing;  */
+/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __initialize(void *ptr,
                                                           size_t size);
-/*@ assigns \nothing;  */
+/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
-/*@ assigns \nothing;  */
+/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) int __valid_read(void *ptr,
                                                          size_t size);
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 /*@ behavior yes:
       assumes ∀ long long i; 0 < i ∧ i < n ⇒ *(t+(i-1)) ≤ *(t+i);
       ensures \result ≡ 1;
-      
-  
-*/
+ */
 int sorted(int *t, int n)
 {
   int __e_acsl_at;
@@ -85,8 +83,7 @@ int sorted(int *t, int n)
     __e_acsl_forall = 1;
     __e_acsl_i = (long long)(0 + 1);
     while (1) {
-      if (__e_acsl_i < n) { ; }
-      else { break; }
+      if (__e_acsl_i < n) { ; } else { break; }
       {
         int __e_acsl_valid_read;
         int __e_acsl_valid_read_2;
@@ -124,7 +121,8 @@ int sorted(int *t, int n)
   }
   __retres = 1;
   return_label: /* internal */ 
-  { int __e_acsl_implies;
+  {
+    int __e_acsl_implies;
     if (! __e_acsl_at) { __e_acsl_implies = 1; }
     else { __e_acsl_implies = __retres == 1; }
     e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",

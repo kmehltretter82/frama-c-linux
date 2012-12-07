@@ -24,38 +24,32 @@ model __mpz_struct { ℤ n };
 */
 /*@ requires ¬\initialized(z);
     ensures \valid(\old(z));
-    allocates \old(z);
-    
     assigns *z;
-  
-*/
+    allocates \old(z);
+ */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init(__mpz_struct * /*[1]*/ z);
 /*@ requires ¬\initialized(z);
     ensures \valid(\old(z));
-    
     ensures \initialized(\old(z));
-    allocates \old(z);
-    
     assigns *z;
     assigns *z \from n;
-  
-*/
+    allocates \old(z);
+ */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z,
                                                                 long n);
 /*@ requires \valid(z_orig);
     requires \valid(z);
     assigns *z;
     assigns *z \from *z_orig;
-  
-*/
+ */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_set(__mpz_struct * /*[1]*/ z,
                                                         __mpz_struct const * /*[1]*/ z_orig);
 /*@ requires \valid(x);
-    assigns *x;  */
+    assigns *x; */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_clear(__mpz_struct * /*[1]*/ x);
 /*@ requires \valid(z1);
     requires \valid(z2);
-    assigns \nothing;  */
+    assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
                                                        __mpz_struct const * /*[1]*/ z2);
 /*@ requires \valid(z1);
@@ -63,13 +57,12 @@ extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1
     requires \valid(z3);
     assigns *z1;
     assigns *z1 \from *z2, *z3;
-  
-*/
+ */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_add(__mpz_struct * /*[1]*/ z1,
                                                         __mpz_struct const * /*[1]*/ z2,
                                                         __mpz_struct const * /*[1]*/ z3);
 /*@ requires \valid(z);
-    assigns \nothing;  */
+    assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) unsigned long __gmpz_get_ui(__mpz_struct const * /*[1]*/ z);
 int __fc_random_counter __attribute__((__unused__));
 unsigned long const __fc_rand_max = (unsigned long)2147483647;
@@ -83,14 +76,14 @@ axiomatic
   }
  */
 /*@ ensures \false;
-    assigns \nothing;  */
+    assigns \nothing; */
 extern void exit(int status);
 extern FILE *__fc_stdout;
 /*@ assigns *__fc_stdout;
-    assigns *__fc_stdout \from *(format+(..));  */
+    assigns *__fc_stdout \from *(format+(..)); */
 extern int printf(char const *format , ...);
 /*@ requires predicate ≢ 0;
-    assigns \nothing;  */
+    assigns \nothing; */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
   if (! predicate) {
@@ -104,16 +97,15 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 int A[10];
 /*@ requires ∀ ℤ i; 0 ≤ i ∧ i < 9 ⇒ A[i] ≤ A[i+1];
+    
     behavior exists:
       assumes ∃ ℤ j; (0 ≤ j ∧ j < 10) ∧ A[j] ≡ elt;
       ensures \result ≡ 1;
-      
+    
     behavior not_exists:
       assumes ∀ ℤ j; 0 ≤ j ∧ j < 10 ⇒ A[j] ≢ elt;
       ensures \result ≡ 0;
-      
-  
-*/
+ */
 int search(int elt)
 {
   int __e_acsl_at_2;
@@ -186,7 +178,7 @@ int search(int elt)
     }
     e_acsl_end_loop1: /* internal */ ;
     e_acsl_assert(__e_acsl_forall,(char *)"Precondition",
-                  (char *)"\\forall integer i; 0 <= i && i < 9 ==>\nA[i] <= A[i+1]",
+                  (char *)"\\forall integer i; 0 <= i && i < 9 ==> A[i] <= A[i+1]",
                   9);
     __gmpz_clear(__e_acsl_i);
     {
@@ -208,8 +200,7 @@ int search(int elt)
           __gmpz_init_set_si(__e_acsl_15,(long)10);
           __e_acsl_lt_3 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_j_3),
                                      (__mpz_struct const *)(__e_acsl_15));
-          if (__e_acsl_lt_3 < 0) { ; }
-          else { break; }
+          if (__e_acsl_lt_3 < 0) { ; } else { break; }
           __gmpz_clear(__e_acsl_15);
         }
         
@@ -268,8 +259,7 @@ int search(int elt)
           __gmpz_init_set_si(__e_acsl_10,(long)10);
           __e_acsl_lt_2 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_j),
                                      (__mpz_struct const *)(__e_acsl_10));
-          if (__e_acsl_lt_2 < 0) { ; }
-          else { break; }
+          if (__e_acsl_lt_2 < 0) { ; } else { break; }
           __gmpz_clear(__e_acsl_10);
         }
         
@@ -344,7 +334,7 @@ int search(int elt)
       __gmpz_clear(__e_acsl_12);
     }
     e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",
-                  (char *)"\\old(\\exists integer j; (0 <= j && j < 10) && A[j] == elt) ==>\n\\result == 1",
+                  (char *)"\\old(\\exists integer j; (0 <= j && j < 10) && A[j] == elt) ==> \\result == 1",
                   12);
     if (! __e_acsl_at_2) { __e_acsl_implies_2 = 1; }
     else {
@@ -360,7 +350,7 @@ int search(int elt)
       __gmpz_clear(__e_acsl_17);
     }
     e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",
-                  (char *)"\\old(\\forall integer j; 0 <= j && j < 10 ==> A[j] != elt) ==>\n\\result == 0",
+                  (char *)"\\old(\\forall integer j; 0 <= j && j < 10 ==> A[j] != elt) ==> \\result == 0",
                   15);
     return (__retres);
   }

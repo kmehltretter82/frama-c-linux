@@ -34,14 +34,14 @@ axiomatic
   }
  */
 /*@ ensures \false;
-    assigns \nothing;  */
+    assigns \nothing; */
 extern void exit(int status);
 extern FILE *__fc_stdout;
 /*@ assigns *__fc_stdout;
-    assigns *__fc_stdout \from *(format+(..));  */
+    assigns *__fc_stdout \from *(format+(..)); */
 extern int printf(char const *format , ...);
 /*@ requires predicate ≢ 0;
-    assigns \nothing;  */
+    assigns \nothing; */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 {
   if (! predicate) {
@@ -63,11 +63,11 @@ int main(void)
     i = 0;
     while (i < 10) {
       /*@ invariant 0 ≤ i ∧ i < 10; */
-      { int __e_acsl_and;
-        if (0 <= i) { __e_acsl_and = i < 10; }
-        else { __e_acsl_and = 0; }
+      {
+        int __e_acsl_and;
+        if (0 <= i) { __e_acsl_and = i < 10; } else { __e_acsl_and = 0; }
         e_acsl_assert(__e_acsl_and,(char *)"Invariant",
-                      (char *)"0 <= i &&\ni < 10",9);
+                      (char *)"0 <= i && i < 10",9);
       }
       
       x += i;
