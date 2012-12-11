@@ -186,10 +186,8 @@ and context_insensitive_term_to_exp env t =
 	  (fun _ ev -> [ Misc.mk_call ~loc name [ ev; e ] ])
       in
       e, env, false, ""
-    else begin
-      assert (Cil.isIntegralType ty);
+    else
       Cil.new_exp ~loc (UnOp(op, e, ty)), env, false, ""
-    end
   | TUnOp(LNot, t) ->
     let ty = Typing.typ_of_term t in
     if Mpz.is_t ty then

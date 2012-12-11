@@ -368,7 +368,7 @@ and unary_arithmetic op t =
     let l, u = op l u in
     Interv (l, u)
   | Z -> Z
-  | No_integral _ -> assert false
+  | No_integral _ -> ty
 
 and binary_arithmetic ty op t1 t2 =
   let ty1 = type_term t1 in
