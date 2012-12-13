@@ -706,20 +706,24 @@ let translate_postconditions kf env behaviors =
   List.fold_left do_behavior env behaviors
 
 let translate_pre_spec kf env spec =
-  let convert env =
+  let convert_unsupported_clauses env =
     if spec.spec_variant <> None then Error.not_yet "variant clause";
     if spec.spec_terminates <> None then Error.not_yet "terminates clause";
     if spec.spec_complete_behaviors <> [] then 
       Error.not_yet "complete behavior";
     if spec.spec_disjoint_behaviors <> [] then 
       Error.not_yet "disjoint behavior";
-    translate_preconditions kf env spec.spec_behavior
+    env
   in
-  Error.handle convert env
+  let env = Error.handle convert_unsupported_clauses env in
+  Error.handle
+    (fun env -> translate_preconditions kf env spec.spec_behavior) 
+    env
 
 let translate_post_spec kf env spec = 
   Error.handle
-    (fun env -> translate_postconditions kf env spec.spec_behavior) env
+    (fun env -> translate_postconditions kf env spec.spec_behavior) 
+    env
 
 let translate_pre_code_annotation kf env annot =
   let convert env = match annot.annot_content with

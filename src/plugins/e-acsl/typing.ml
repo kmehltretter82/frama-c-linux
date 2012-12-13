@@ -89,7 +89,7 @@ let typ_of_eacsl_typ = function
   | No_integral ty when Logic_const.is_boolean_type ty -> assert false
   | No_integral (Ltype _) -> Error.not_yet "typing of user-defined logic type"
   | No_integral (Lvar _) -> Error.not_yet "type variable"
-  | No_integral Linteger -> assert false
+  | No_integral Linteger -> Mpz.t ()
   | No_integral Lreal -> 
     Options.warning ~current:true ~once:true
       "approximating type `real' by `long double'"; 
@@ -215,6 +215,8 @@ let size_of ty =
 
 let align_of ty = int_to_interv (Cil.alignOf_int ty)
 
+type offset_ty = Ty_no_offset | Ty_field of eacsl_typ | Ty_index of eacsl_typ
+
 let rec type_term t = 
   let lty = t.term_type in
   let get_cty t = match t.term_type with Ctype ty -> ty | _ -> assert false in
@@ -328,8 +330,16 @@ and type_term_lval (h, o) =
   let ty_off = type_term_offset o in
   let ty_host = type_term_lhost h in
   match ty_off with
-  | Some ty -> ty (* access to a field of a struct *)
-  | None -> ty_host
+  | Ty_no_offset -> ty_host
+  | Ty_field ty -> ty
+  | Ty_index _ ->
+    match ty_host with
+    | No_integral (Ctype ty) -> 
+      (match Cil.unrollType ty with
+      |	TArray(ty, _, _, _) -> eacsl_typ_of_typ ty
+      | TPtr _ -> ty_host
+      | _ -> assert false)
+    | _ -> assert false
 
 and type_term_lhost = function
   | TVar lv -> 
@@ -345,20 +355,25 @@ and type_term_lhost = function
   | TResult ty -> eacsl_typ_of_typ ty
   | TMem t -> 
     let ty = type_term t in
-    (* got a pointer *)
+    (* got a pointer or an array *)
     match ty with
-    | No_integral (Ctype (TPtr(ty, _) | TArray(ty, _, _, _))) ->
-      eacsl_typ_of_typ ty
+    | No_integral (Ctype ty) ->
+      (match Cil.unrollType ty with
+      | TPtr(ty, _) | TArray(ty, _, _, _) -> eacsl_typ_of_typ ty
+      | _ -> assert false)
     | No_integral _ | Z | Interv _ -> assert false
 
 and type_term_offset = function
-  | TNoOffset -> None
+  | TNoOffset -> Ty_no_offset
   | TField(f, o) -> 
-    ignore (type_term_offset o);
-    Some (eacsl_typ_of_typ f.ftype)
+    (match type_term_offset o with
+    | Ty_no_offset -> Ty_field (eacsl_typ_of_typ f.ftype)
+    | (Ty_field _ | Ty_index _) as ty -> ty)  
   | TIndex(t, o) ->
-    ignore (type_term t);
-    type_term_offset o
+    let ty = type_term t in
+    (match type_term_offset o with
+    | Ty_no_offset -> Ty_index ty
+    | (Ty_field _ | Ty_index _) as ty_off -> ty_off)  
   | TModel _ -> Error.not_yet "model"
 
 and unary_arithmetic op t = 
