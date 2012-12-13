@@ -144,7 +144,6 @@ int sorted(int *t, int n)
       __gmpz_clear(__e_acsl_6);
       __gmpz_clear(__e_acsl_add);
     }
-    
     while (1) {
       {
         mpz_t __e_acsl_n;
@@ -152,10 +151,9 @@ int sorted(int *t, int n)
         __gmpz_init_set_si(__e_acsl_n,(long)n);
         __e_acsl_lt = __gmpz_cmp((__mpz_struct const *)(__e_acsl_i),
                                  (__mpz_struct const *)(__e_acsl_n));
-        if (__e_acsl_lt < 0) { ; } else { break; }
+        if (__e_acsl_lt < 0) ; else break;
         __gmpz_clear(__e_acsl_n);
       }
-      
       {
         mpz_t __e_acsl;
         mpz_t __e_acsl_sub;
@@ -178,12 +176,12 @@ int sorted(int *t, int n)
         __gmpz_clear(__e_acsl_sub);
         __gmpz_clear(__e_acsl_3);
         __gmpz_clear(__e_acsl_4);
-        if (__e_acsl_le <= 0) { ; }
+        if (__e_acsl_le <= 0) ;
         else {
           __e_acsl_forall = 0;
-          goto e_acsl_end_loop1; }
+          goto e_acsl_end_loop1;
+        }
       }
-      
       {
         mpz_t __e_acsl_7;
         mpz_t __e_acsl_add_2;
@@ -195,48 +193,47 @@ int sorted(int *t, int n)
         __gmpz_clear(__e_acsl_7);
         __gmpz_clear(__e_acsl_add_2);
       }
-      
     }
     e_acsl_end_loop1: /* internal */ ;
     __e_acsl_at = __e_acsl_forall;
     __gmpz_clear(__e_acsl_i);
   }
-  
   b = 1;
   if (n <= 1) {
     __retres = 1;
-    goto return_label; }
+    goto return_label;
+  }
   b = 1;
   while (b < n) {
     if (*(t + (b - 1)) > *(t + b)) {
       __retres = 0;
-      goto return_label; }
+      goto return_label;
+    }
     b ++;
   }
   __retres = 1;
-  return_label: /* internal */ 
-  {
-    int __e_acsl_implies;
-    if (! __e_acsl_at) { __e_acsl_implies = 1; }
-    else {
-      mpz_t __e_acsl_result;
-      mpz_t __e_acsl_8;
-      int __e_acsl_eq;
-      __gmpz_init_set_si(__e_acsl_result,(long)__retres);
-      __gmpz_init_set_si(__e_acsl_8,(long)1);
-      __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl_result),
-                               (__mpz_struct const *)(__e_acsl_8));
-      __e_acsl_implies = __e_acsl_eq == 0;
-      __gmpz_clear(__e_acsl_result);
-      __gmpz_clear(__e_acsl_8);
+  return_label: /* internal */
+    {
+      int __e_acsl_implies;
+      if (! __e_acsl_at) __e_acsl_implies = 1;
+      else {
+        mpz_t __e_acsl_result;
+        mpz_t __e_acsl_8;
+        int __e_acsl_eq;
+        __gmpz_init_set_si(__e_acsl_result,(long)__retres);
+        __gmpz_init_set_si(__e_acsl_8,(long)1);
+        __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl_result),
+                                 (__mpz_struct const *)(__e_acsl_8));
+        __e_acsl_implies = __e_acsl_eq == 0;
+        __gmpz_clear(__e_acsl_result);
+        __gmpz_clear(__e_acsl_8);
+      }
+      e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",
+                    (char *)"\\old(\\forall integer i; 0 < i && i < n ==> *(t+(i-1)) <= *(t+i)) ==>\n\\result == 1",
+                    9);
+      __delete_block((void *)(& t));
+      return __retres;
     }
-    e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",
-                  (char *)"\\old(\\forall integer i; 0 < i && i < n ==> *(t+(i-1)) <= *(t+i)) ==>\n\\result == 1",
-                  9);
-    __delete_block((void *)(& t));
-    return (__retres);
-  }
-  
 }
 
 int main(void)
@@ -273,11 +270,10 @@ int main(void)
     __gmpz_clear(__e_acsl_n);
     __gmpz_clear(__e_acsl);
   }
-  
   __retres = 0;
   __delete_block((void *)(t));
   __clean();
-  return (__retres);
+  return __retres;
 }
 
 

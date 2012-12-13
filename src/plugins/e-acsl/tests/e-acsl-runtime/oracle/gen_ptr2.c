@@ -157,7 +157,6 @@ int main(void)
     __gmpz_clear(__e_acsl);
     __gmpz_clear(__e_acsl_2);
   }
-  
   /*@ assert t[0] ≡ 2; */
   {
     mpz_t __e_acsl_3;
@@ -172,7 +171,6 @@ int main(void)
     __gmpz_clear(__e_acsl_3);
     __gmpz_clear(__e_acsl_4);
   }
-  
   /*@ assert t[2] ≡ 4; */
   {
     mpz_t __e_acsl_5;
@@ -187,7 +185,6 @@ int main(void)
     __gmpz_clear(__e_acsl_5);
     __gmpz_clear(__e_acsl_6);
   }
-  
   /*@ assert t[(2*sizeof(int))/sizeof((int)0x0)] ≡ 4; */
   {
     mpz_t __e_acsl_7;
@@ -232,7 +229,6 @@ int main(void)
     __gmpz_clear(__e_acsl_10);
     __gmpz_clear(__e_acsl_11);
   }
-  
   {
     int i;
     __store_block((void *)(& i),4U);
@@ -261,7 +257,6 @@ int main(void)
         __gmpz_clear(__e_acsl_13);
         __gmpz_clear(__e_acsl_add);
       }
-      
       /*@ assert t[2-i] ≡ 4-i; */
       {
         mpz_t __e_acsl_14;
@@ -294,7 +289,6 @@ int main(void)
         __gmpz_clear(__e_acsl_17);
         __gmpz_clear(__e_acsl_sub_2);
       }
-      
       /*@ assert *(&t[2]-i) ≡ 4-i; */
       {
         mpz_t __e_acsl_18;
@@ -317,13 +311,11 @@ int main(void)
         __gmpz_clear(__e_acsl_i_3);
         __gmpz_clear(__e_acsl_sub_3);
       }
-      
       __full_init((void *)(& i));
       i ++;
     }
     __delete_block((void *)(& i));
   }
-  
   __full_init((void *)(& p));
   p = & t[2];
   t[2] = 5;
@@ -341,13 +333,12 @@ int main(void)
     __gmpz_clear(__e_acsl_20);
     __gmpz_clear(__e_acsl_21);
   }
-  
   __retres = 0;
   __delete_block((void *)(& p));
   __delete_block((void *)(t));
   __delete_block((void *)(& x));
   __clean();
-  return (__retres);
+  return __retres;
 }
 
 

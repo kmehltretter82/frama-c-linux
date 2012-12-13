@@ -111,7 +111,7 @@ int main(void)
   e_acsl_assert(1 != -2,(char *)"Assertion",(char *)"1 != -2",29);
   __retres = 0;
   __clean();
-  return (__retres);
+  return __retres;
 }
 
 

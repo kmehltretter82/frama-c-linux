@@ -58,18 +58,22 @@ int T2[4];
 int main(void)
 {
   int __retres;
-  { int i;
+  {
+    int i;
     i = 0;
     while (i < 3) {
       T1[i] = i;
-      i ++; } }
-  
-  { int i_0;
+      i ++;
+    }
+  }
+  {
+    int i_0;
     i_0 = 0;
     while (i_0 < 4) {
       T2[i_0] = 2 * i_0;
-      i_0 ++; } }
-  
+      i_0 ++;
+    }
+  }
   /*@ assert T1[0] ≡ T2[0]; */
   e_acsl_assert(T1[0] == T2[0],(char *)"Assertion",(char *)"T1[0] == T2[0]",
                 15);
@@ -78,7 +82,7 @@ int main(void)
                 16);
   __retres = 0;
   __clean();
-  return (__retres);
+  return __retres;
 }
 
 

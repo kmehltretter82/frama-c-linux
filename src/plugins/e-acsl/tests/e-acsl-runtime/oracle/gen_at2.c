@@ -117,10 +117,9 @@ void f(void)
   __e_acsl_at_4 = A;
   __e_acsl_at = A;
   A = 1;
-  F: 
-  __e_acsl_at_5 = __e_acsl_at_4;
-  __e_acsl_at_2 = A;
-  A = 2;
+  F: __e_acsl_at_5 = __e_acsl_at_4;
+     __e_acsl_at_2 = A;
+     A = 2;
   /*@ assert \at(A,Pre) ≡ 0; */
   {
     mpz_t __e_acsl;
@@ -135,7 +134,6 @@ void f(void)
     __gmpz_clear(__e_acsl);
     __gmpz_clear(__e_acsl_2);
   }
-  
   /*@ assert \at(A,F) ≡ 1; */
   {
     mpz_t __e_acsl_3;
@@ -150,7 +148,6 @@ void f(void)
     __gmpz_clear(__e_acsl_3);
     __gmpz_clear(__e_acsl_4);
   }
-  
   /*@ assert \at(A,Here) ≡ 2; */
   {
     mpz_t __e_acsl_5;
@@ -166,7 +163,6 @@ void f(void)
     __gmpz_clear(__e_acsl_5);
     __gmpz_clear(__e_acsl_6);
   }
-  
   /*@ assert \at(\at(A,Pre),F) ≡ 0; */
   {
     mpz_t __e_acsl_7;
@@ -181,7 +177,6 @@ void f(void)
     __gmpz_clear(__e_acsl_7);
     __gmpz_clear(__e_acsl_8);
   }
-  
   A = 3;
   {
     mpz_t __e_acsl_9;
@@ -198,7 +193,6 @@ void f(void)
     __gmpz_clear(__e_acsl_10);
     return;
   }
-  
 }
 
 void g(int *p, int *q)
@@ -218,23 +212,23 @@ void g(int *p, int *q)
   __initialize((void *)q,sizeof(int));
   *q = 0;
   __initialize((void *)p,sizeof(int));
-  L1: 
-  __store_block((void *)(& __e_acsl_at_3),4U);
-  __full_init((void *)(& __e_acsl_at_3));
-  __e_acsl_at_3 = *q;
-  __store_block((void *)(& __e_acsl_at),4U);
-  __full_init((void *)(& __e_acsl_at));
-  __e_acsl_at = *q;
-  *p = 2;
+  L1:
+    __store_block((void *)(& __e_acsl_at_3),4U);
+    __full_init((void *)(& __e_acsl_at_3));
+    __e_acsl_at_3 = *q;
+    __store_block((void *)(& __e_acsl_at),4U);
+    __full_init((void *)(& __e_acsl_at));
+    __e_acsl_at = *q;
+    *p = 2;
   __initialize((void *)(p + 1),sizeof(int));
   *(p + 1) = 3;
   __initialize((void *)q,sizeof(int));
   *q = 1;
-  L2: 
-  __store_block((void *)(& __e_acsl_at_2),4U);
-  __full_init((void *)(& __e_acsl_at_2));
-  __e_acsl_at_2 = *(p + (long)__e_acsl_at);
-  A = 4;
+  L2:
+    __store_block((void *)(& __e_acsl_at_2),4U);
+    __full_init((void *)(& __e_acsl_at_2));
+    __e_acsl_at_2 = *(p + (long)__e_acsl_at);
+    A = 4;
   /*@ assert \at(*(p+\at(*q,L1)),L2) ≡ 2; */
   {
     mpz_t __e_acsl;
@@ -249,29 +243,27 @@ void g(int *p, int *q)
     __gmpz_clear(__e_acsl);
     __gmpz_clear(__e_acsl_2);
   }
-  
-  L3: 
-  /*@ assert \at(*(p+\at(*q,L1)),Here) ≡ 2; */
-  {
-    mpz_t __e_acsl_3;
-    mpz_t __e_acsl_4;
-    int __e_acsl_eq_2;
-    __store_block((void *)(& __e_acsl_at_4),4U);
-    __full_init((void *)(& __e_acsl_at_4));
-    __e_acsl_at_4 = *(p + (long)__e_acsl_at_3);
-    __gmpz_init_set_si(__e_acsl_3,(long)__e_acsl_at_4);
-    __gmpz_init_set_si(__e_acsl_4,(long)2);
-    __e_acsl_eq_2 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_3),
-                               (__mpz_struct const *)(__e_acsl_4));
-    e_acsl_assert(__e_acsl_eq_2 == 0,(char *)"Assertion",
-                  (char *)"\\at(*(p+\\at(*q,L1)),Here) == 2",34);
-    __gmpz_clear(__e_acsl_3);
-    __gmpz_clear(__e_acsl_4);
-  }
-  
-  __delete_block((void *)(& p));
-  __delete_block((void *)(& q));
-  return;
+  L3:
+    /*@ assert \at(*(p+\at(*q,L1)),Here) ≡ 2; */
+    {
+      mpz_t __e_acsl_3;
+      mpz_t __e_acsl_4;
+      int __e_acsl_eq_2;
+      __store_block((void *)(& __e_acsl_at_4),4U);
+      __full_init((void *)(& __e_acsl_at_4));
+      __e_acsl_at_4 = *(p + (long)__e_acsl_at_3);
+      __gmpz_init_set_si(__e_acsl_3,(long)__e_acsl_at_4);
+      __gmpz_init_set_si(__e_acsl_4,(long)2);
+      __e_acsl_eq_2 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_3),
+                                 (__mpz_struct const *)(__e_acsl_4));
+      e_acsl_assert(__e_acsl_eq_2 == 0,(char *)"Assertion",
+                    (char *)"\\at(*(p+\\at(*q,L1)),Here) == 2",34);
+      __gmpz_clear(__e_acsl_3);
+      __gmpz_clear(__e_acsl_4);
+    }
+    __delete_block((void *)(& p));
+    __delete_block((void *)(& q));
+    return;
 }
 
 int main(void)
@@ -286,44 +278,42 @@ int main(void)
   __store_block((void *)(& x),4U);
   __full_init((void *)(& x));
   x = 0;
-  L: 
-  __store_block((void *)(& __e_acsl_at_3),4U);
-  __full_init((void *)(& __e_acsl_at_3));
-  __e_acsl_at_3 = x;
-  {
-    mpz_t __e_acsl_x_2;
-    mpz_t __e_acsl_4;
-    mpz_t __e_acsl_add;
-    __gmpz_init_set_si(__e_acsl_x_2,(long)x);
-    __gmpz_init_set_si(__e_acsl_4,(long)1);
-    __gmpz_init(__e_acsl_add);
-    __gmpz_add(__e_acsl_add,(__mpz_struct const *)(__e_acsl_x_2),
-               (__mpz_struct const *)(__e_acsl_4));
-    __gmpz_init_set(__e_acsl_at_2,(__mpz_struct const *)(__e_acsl_add));
-    __gmpz_clear(__e_acsl_x_2);
-    __gmpz_clear(__e_acsl_4);
-    __gmpz_clear(__e_acsl_add);
-  }
-  
-  __store_block((void *)(& __e_acsl_at),4U);
-  __full_init((void *)(& __e_acsl_at));
-  __e_acsl_at = x;
-  /*@ assert x ≡ 0; */
-  {
-    mpz_t __e_acsl_x;
-    mpz_t __e_acsl;
-    int __e_acsl_eq;
-    __gmpz_init_set_si(__e_acsl_x,(long)x);
-    __gmpz_init_set_si(__e_acsl,(long)0);
-    __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl_x),
-                             (__mpz_struct const *)(__e_acsl));
-    e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"x == 0",45);
-    __gmpz_clear(__e_acsl_x);
-    __gmpz_clear(__e_acsl);
-  }
-  
-  __full_init((void *)(& x));
-  x = 1;
+  L:
+    __store_block((void *)(& __e_acsl_at_3),4U);
+    __full_init((void *)(& __e_acsl_at_3));
+    __e_acsl_at_3 = x;
+    {
+      mpz_t __e_acsl_x_2;
+      mpz_t __e_acsl_4;
+      mpz_t __e_acsl_add;
+      __gmpz_init_set_si(__e_acsl_x_2,(long)x);
+      __gmpz_init_set_si(__e_acsl_4,(long)1);
+      __gmpz_init(__e_acsl_add);
+      __gmpz_add(__e_acsl_add,(__mpz_struct const *)(__e_acsl_x_2),
+                 (__mpz_struct const *)(__e_acsl_4));
+      __gmpz_init_set(__e_acsl_at_2,(__mpz_struct const *)(__e_acsl_add));
+      __gmpz_clear(__e_acsl_x_2);
+      __gmpz_clear(__e_acsl_4);
+      __gmpz_clear(__e_acsl_add);
+    }
+    __store_block((void *)(& __e_acsl_at),4U);
+    __full_init((void *)(& __e_acsl_at));
+    __e_acsl_at = x;
+    /*@ assert x ≡ 0; */
+    {
+      mpz_t __e_acsl_x;
+      mpz_t __e_acsl;
+      int __e_acsl_eq;
+      __gmpz_init_set_si(__e_acsl_x,(long)x);
+      __gmpz_init_set_si(__e_acsl,(long)0);
+      __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl_x),
+                               (__mpz_struct const *)(__e_acsl));
+      e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"x == 0",45);
+      __gmpz_clear(__e_acsl_x);
+      __gmpz_clear(__e_acsl);
+    }
+    __full_init((void *)(& x));
+    x = 1;
   __full_init((void *)(& x));
   x = 2;
   f();
@@ -341,7 +331,6 @@ int main(void)
     __gmpz_clear(__e_acsl_2);
     __gmpz_clear(__e_acsl_3);
   }
-  
   /*@ assert \at(x+1,L) ≡ 1; */
   {
     mpz_t __e_acsl_5;
@@ -353,7 +342,6 @@ int main(void)
                   (char *)"\\at(x+1,L) == 1",51);
     __gmpz_clear(__e_acsl_5);
   }
-  
   /*@ assert \at(x,L)+1 ≡ 1; */
   {
     mpz_t __e_acsl_6;
@@ -373,14 +361,13 @@ int main(void)
     __gmpz_clear(__e_acsl_7);
     __gmpz_clear(__e_acsl_add_2);
   }
-  
   g(t,& x);
   __retres = 0;
   __gmpz_clear(__e_acsl_at_2);
   __delete_block((void *)(t));
   __delete_block((void *)(& x));
   __clean();
-  return (__retres);
+  return __retres;
 }
 
 

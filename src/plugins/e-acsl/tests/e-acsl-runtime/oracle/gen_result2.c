@@ -118,9 +118,8 @@ int f(int x)
     __gmpz_clear(__e_acsl);
     __gmpz_clear(__e_acsl_sub);
     __gmpz_clear(__e_acsl_cast);
-    return (x);
+    return x;
   }
-  
 }
 
 int Y = 1;
@@ -139,9 +138,8 @@ int g(int x)
                   (char *)"\\result == Y",18);
     __gmpz_clear(__e_acsl_result);
     __gmpz_clear(__e_acsl_Y);
-    return (x);
+    return x;
   }
-  
 }
 
 /*@ ensures \result ≡ 0; */
@@ -161,9 +159,8 @@ int h(void)
                   (char *)"\\result == 0",23);
     __gmpz_clear(__e_acsl_result);
     __gmpz_clear(__e_acsl);
-    return (__retres);
+    return __retres;
   }
-  
 }
 
 int main(void)
@@ -174,7 +171,7 @@ int main(void)
   h();
   __retres = 0;
   __clean();
-  return (__retres);
+  return __retres;
 }
 
 

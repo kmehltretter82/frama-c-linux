@@ -60,13 +60,12 @@ int main(void)
   x = 0;
   /*@ assert x ≡ 0; */
   e_acsl_assert(x == 0,(char *)"Assertion",(char *)"x == 0",8);
-  if (x) {
+  if (x) 
     /*@ assert x ≢ 0; */
     e_acsl_assert(x != 0,(char *)"Assertion",(char *)"x != 0",9);
-  }
   __retres = 0;
   __clean();
-  return (__retres);
+  return __retres;
 }
 
 

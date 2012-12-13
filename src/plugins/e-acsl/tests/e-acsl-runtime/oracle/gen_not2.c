@@ -88,7 +88,6 @@ int main(void)
     __gmpz_clear(__e_acsl_x);
     __gmpz_clear(__e_acsl);
   }
-  
   if (x) {
     /*@ assert x ≢ 0; */
     {
@@ -103,11 +102,10 @@ int main(void)
       __gmpz_clear(__e_acsl_x_2);
       __gmpz_clear(__e_acsl_2);
     }
-    
   }
   __retres = 0;
   __clean();
-  return (__retres);
+  return __retres;
 }
 
 

@@ -88,7 +88,6 @@ int main(void)
                   (char *)"\'c\' == \'c\'",12);
     __gmpz_clear(__e_acsl);
   }
-  
   /*@ assert false ≢ true; */
   {
     mpz_t __e_acsl_2;
@@ -103,10 +102,9 @@ int main(void)
     __gmpz_clear(__e_acsl_2);
     __gmpz_clear(__e_acsl_3);
   }
-  
   __retres = 0;
   __clean();
-  return (__retres);
+  return __retres;
 }
 
 

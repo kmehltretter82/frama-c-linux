@@ -88,7 +88,6 @@ void f(void)
     e_acsl_assert((int)*(T + G) == 'b',(char *)"Assertion",
                   (char *)"*(T+G) == \'b\'",13);
   }
-  
   G ++;
   return;
 }
@@ -153,7 +152,6 @@ int main(void)
     e_acsl_assert((int)*(S + G2) == 'o',(char *)"Assertion",
                   (char *)"*(S+G2) == \'o\'",24);
   }
-  
   /*@ assert \initialized(S); */
   {
     int __e_acsl_initialized;
@@ -161,7 +159,6 @@ int main(void)
     e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",
                   (char *)"\\initialized(S)",25);
   }
-  
   /*@ assert \valid_read(S2); */
   {
     int __e_acsl_valid_read_2;
@@ -169,7 +166,6 @@ int main(void)
     e_acsl_assert(__e_acsl_valid_read_2,(char *)"Assertion",
                   (char *)"\\valid_read(S2)",26);
   }
-  
   /*@ assert ¬\valid(SS); */
   {
     int __e_acsl_initialized_2;
@@ -180,11 +176,10 @@ int main(void)
       __e_acsl_valid = __valid((void *)SS,sizeof(char));
       __e_acsl_and = __e_acsl_valid;
     }
-    else { __e_acsl_and = 0; }
+    else __e_acsl_and = 0;
     e_acsl_assert(! __e_acsl_and,(char *)"Assertion",(char *)"!\\valid(SS)",
                   27);
   }
-  
   __retres = 0;
   __delete_block((void *)(& G2));
   __delete_block((void *)(& S2));
@@ -193,7 +188,7 @@ int main(void)
   __delete_block((void *)(& T));
   __delete_block((void *)(& SS));
   __clean();
-  return (__retres);
+  return __retres;
 }
 
 

@@ -100,10 +100,9 @@ int main(void)
                   13);
     __gmpz_clear(__e_acsl);
   }
-  
   __retres = 0;
   __clean();
-  return (__retres);
+  return __retres;
 }
 
 

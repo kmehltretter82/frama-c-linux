@@ -65,21 +65,19 @@ int main(void)
       /*@ invariant 0 ≤ i ∧ i < 10; */
       {
         int __e_acsl_and;
-        if (0 <= i) { __e_acsl_and = i < 10; } else { __e_acsl_and = 0; }
+        if (0 <= i) __e_acsl_and = i < 10; else __e_acsl_and = 0;
         e_acsl_assert(__e_acsl_and,(char *)"Invariant",
                       (char *)"0 <= i && i < 10",9);
       }
-      
       x += i;
       /*@ invariant i ≤ x; */
       e_acsl_assert(i <= x,(char *)"Invariant",(char *)"i <= x",11);
       i ++;
     }
   }
-  
   __retres = 0;
   __clean();
-  return (__retres);
+  return __retres;
 }
 
 

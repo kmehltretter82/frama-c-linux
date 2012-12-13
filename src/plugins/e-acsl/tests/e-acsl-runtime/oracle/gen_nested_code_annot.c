@@ -66,10 +66,9 @@ int main(void)
       ensures x ≥ 1; */
   {
     e_acsl_assert(x == 0,(char *)"Precondition",(char *)"x == 0",10);
-    if (x) {
+    if (x) 
       /*@ assert \false; */
       e_acsl_assert(0,(char *)"Assertion",(char *)"\\false",13);
-    }
     else {
       /*@ requires x ≡ 0;
           ensures x ≡ 1; */
@@ -78,7 +77,6 @@ int main(void)
         x ++;
         e_acsl_assert(x == 1,(char *)"Postcondition",(char *)"x == 1",16);
       }
-      
       if (x) {
         /*@ requires x ≡ 1;
             ensures x ≡ 2; */
@@ -87,19 +85,16 @@ int main(void)
           x ++;
           e_acsl_assert(x == 2,(char *)"Postcondition",(char *)"x == 2",20);
         }
-        
       }
-      else {
+      else 
         /*@ assert \false; */
         e_acsl_assert(0,(char *)"Assertion",(char *)"\\false",23);
-      }
     }
     e_acsl_assert(x >= 1,(char *)"Postcondition",(char *)"x >= 1",11);
   }
-  
   __retres = 0;
   __clean();
-  return (__retres);
+  return __retres;
 }
 
 

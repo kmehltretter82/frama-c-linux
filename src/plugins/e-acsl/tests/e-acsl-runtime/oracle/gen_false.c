@@ -58,13 +58,12 @@ int main(void)
   int __retres;
   int x;
   x = 0;
-  if (x) {
+  if (x) 
     /*@ assert \false; */
     e_acsl_assert(0,(char *)"Assertion",(char *)"\\false",8);
-  }
   __retres = 0;
   __clean();
-  return (__retres);
+  return __retres;
 }
 
 

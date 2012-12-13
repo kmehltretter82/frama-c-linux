@@ -169,7 +169,6 @@ int main(void)
     __gmpz_clear(__e_acsl_neg);
     __gmpz_clear(__e_acsl_x);
   }
-  
   /*@ assert x ≡ -3; */
   {
     mpz_t __e_acsl_x_2;
@@ -188,7 +187,6 @@ int main(void)
     __gmpz_clear(__e_acsl_2);
     __gmpz_clear(__e_acsl_neg_2);
   }
-  
   /*@ assert 0 ≢ ~0; */
   {
     mpz_t __e_acsl_3;
@@ -203,7 +201,6 @@ int main(void)
     __gmpz_clear(__e_acsl_3);
     __gmpz_clear(__e_acsl_bnot);
   }
-  
   /*@ assert x+1 ≡ -2; */
   {
     mpz_t __e_acsl_x_3;
@@ -230,7 +227,6 @@ int main(void)
     __gmpz_clear(__e_acsl_5);
     __gmpz_clear(__e_acsl_neg_3);
   }
-  
   /*@ assert x-1 ≡ -4; */
   {
     mpz_t __e_acsl_x_4;
@@ -257,7 +253,6 @@ int main(void)
     __gmpz_clear(__e_acsl_7);
     __gmpz_clear(__e_acsl_neg_4);
   }
-  
   /*@ assert x*3 ≡ -9; */
   {
     mpz_t __e_acsl_x_5;
@@ -284,7 +279,6 @@ int main(void)
     __gmpz_clear(__e_acsl_9);
     __gmpz_clear(__e_acsl_neg_5);
   }
-  
   /*@ assert x/3 ≡ -1; */
   {
     mpz_t __e_acsl_x_6;
@@ -320,7 +314,6 @@ int main(void)
     __gmpz_clear(__e_acsl_12);
     __gmpz_clear(__e_acsl_neg_6);
   }
-  
   /*@ assert 0xfffffffffff/0xfffffffffff ≡ 1; */
   {
     mpz_t __e_acsl_13;
@@ -349,7 +342,6 @@ int main(void)
     __gmpz_clear(__e_acsl_div_2);
     __gmpz_clear(__e_acsl_15);
   }
-  
   /*@ assert x%2 ≡ -1; */
   {
     mpz_t __e_acsl_x_7;
@@ -385,7 +377,6 @@ int main(void)
     __gmpz_clear(__e_acsl_18);
     __gmpz_clear(__e_acsl_neg_7);
   }
-  
   /*@ assert -3%-2 ≡ -1; */
   {
     mpz_t __e_acsl_19;
@@ -429,7 +420,6 @@ int main(void)
     __gmpz_clear(__e_acsl_22);
     __gmpz_clear(__e_acsl_neg_10);
   }
-  
   /*@ assert 3%-2 ≡ 1; */
   {
     mpz_t __e_acsl_23;
@@ -465,7 +455,6 @@ int main(void)
     __gmpz_clear(__e_acsl_mod_3);
     __gmpz_clear(__e_acsl_26);
   }
-  
   /*@ assert ((x*2+(3+y))-4)+(x-y) ≡ -10; */
   {
     mpz_t __e_acsl_x_8;
@@ -526,7 +515,6 @@ int main(void)
     __gmpz_clear(__e_acsl_30);
     __gmpz_clear(__e_acsl_neg_12);
   }
-  
   /*@ assert (0≡1) ≡ !(0≡0); */
   {
     mpz_t __e_acsl_31;
@@ -559,7 +547,6 @@ int main(void)
     __gmpz_clear(__e_acsl_34);
     __gmpz_clear(__e_acsl_35);
   }
-  
   /*@ assert (0≤-1) ≡ (0>0); */
   {
     mpz_t __e_acsl_36;
@@ -590,7 +577,6 @@ int main(void)
     __gmpz_clear(__e_acsl_38);
     __gmpz_clear(__e_acsl_39);
   }
-  
   /*@ assert (0≥-1) ≡ (0≤0); */
   {
     mpz_t __e_acsl_40;
@@ -621,7 +607,6 @@ int main(void)
     __gmpz_clear(__e_acsl_42);
     __gmpz_clear(__e_acsl_43);
   }
-  
   /*@ assert (0≢1) ≡ !(0≢0); */
   {
     mpz_t __e_acsl_44;
@@ -654,7 +639,6 @@ int main(void)
     __gmpz_clear(__e_acsl_47);
     __gmpz_clear(__e_acsl_48);
   }
-  
   /*@ assert (0≢0) ≡ !(1≢0); */
   {
     mpz_t __e_acsl_49;
@@ -687,7 +671,6 @@ int main(void)
     __gmpz_clear(__e_acsl_52);
     __gmpz_clear(__e_acsl_53);
   }
-  
   /*@ assert 4/y ≡ 2; */
   {
     mpz_t __e_acsl_54;
@@ -719,10 +702,9 @@ int main(void)
     __gmpz_clear(__e_acsl_div_3);
     __gmpz_clear(__e_acsl_56);
   }
-  
   __retres = 0;
   __clean();
-  return (__retres);
+  return __retres;
 }
 
 

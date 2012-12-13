@@ -63,7 +63,7 @@ int main(void)
   e_acsl_assert(1,(char *)"Assertion",(char *)"\\true",10);
   __retres = 0;
   __clean();
-  return (__retres);
+  return __retres;
 }
 
 

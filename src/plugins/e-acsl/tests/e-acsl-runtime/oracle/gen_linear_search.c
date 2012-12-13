@@ -76,7 +76,7 @@ int search(int elt)
     __e_acsl_forall = 1;
     __e_acsl_i = 0;
     while (1) {
-      if (__e_acsl_i < 9) { ; } else { break; }
+      if (__e_acsl_i < 9) ; else break;
       e_acsl_assert(__e_acsl_i + 1 < 10,(char *)"Precondition",
                     (char *)"index_bound: (int)(__e_acsl_i+1) < 10",9);
       e_acsl_assert(0 <= __e_acsl_i + 1,(char *)"Precondition",
@@ -85,10 +85,11 @@ int search(int elt)
                     (char *)"index_bound: __e_acsl_i < 10",9);
       e_acsl_assert(0 <= __e_acsl_i,(char *)"Precondition",
                     (char *)"index_bound: 0 <= __e_acsl_i",9);
-      if (A[__e_acsl_i] <= A[__e_acsl_i + 1]) { ; }
+      if (A[__e_acsl_i] <= A[__e_acsl_i + 1]) ;
       else {
         __e_acsl_forall = 0;
-        goto e_acsl_end_loop1; }
+        goto e_acsl_end_loop1;
+      }
       __e_acsl_i ++;
     }
     e_acsl_end_loop1: /* internal */ ;
@@ -101,88 +102,90 @@ int search(int elt)
       __e_acsl_forall_2 = 1;
       __e_acsl_j_2 = 0;
       while (1) {
-        if (__e_acsl_j_2 < 10) { ; } else { break; }
+        if (__e_acsl_j_2 < 10) ; else break;
         e_acsl_assert(__e_acsl_j_2 < 10,(char *)"Postcondition",
                       (char *)"index_bound: __e_acsl_j_2 < 10",14);
         e_acsl_assert(0 <= __e_acsl_j_2,(char *)"Postcondition",
                       (char *)"index_bound: 0 <= __e_acsl_j_2",14);
-        if (A[__e_acsl_j_2] != elt) { ; }
+        if (A[__e_acsl_j_2] != elt) ;
         else {
           __e_acsl_forall_2 = 0;
-          goto e_acsl_end_loop3; }
+          goto e_acsl_end_loop3;
+        }
         __e_acsl_j_2 ++;
       }
       e_acsl_end_loop3: /* internal */ ;
       __e_acsl_at_2 = __e_acsl_forall_2;
     }
-    
     {
       int __e_acsl_exists;
       int __e_acsl_j;
       __e_acsl_exists = 0;
       __e_acsl_j = 0;
       while (1) {
-        if (__e_acsl_j < 10) { ; } else { break; }
+        if (__e_acsl_j < 10) ; else break;
         e_acsl_assert(__e_acsl_j < 10,(char *)"Postcondition",
                       (char *)"index_bound: __e_acsl_j < 10",11);
         e_acsl_assert(0 <= __e_acsl_j,(char *)"Postcondition",
                       (char *)"index_bound: 0 <= __e_acsl_j",11);
-        if (! (A[__e_acsl_j] == elt)) { ; }
+        if (! (A[__e_acsl_j] == elt)) ;
         else {
           __e_acsl_exists = 1;
-          goto e_acsl_end_loop2; }
+          goto e_acsl_end_loop2;
+        }
         __e_acsl_j ++;
       }
       e_acsl_end_loop2: /* internal */ ;
       __e_acsl_at = __e_acsl_exists;
     }
-    
     k = 0;
   }
-  
   /*@ loop invariant 0 ≤ k ∧ k ≤ 10;
       loop invariant ∀ ℤ i; 0 ≤ i ∧ i < k ⇒ A[i] < elt;
   */
   while (k < 10) {
     if (A[k] == elt) {
       __retres = 1;
-      goto return_label; }
-    else {
+      goto return_label;
+    }
+    else 
       if (A[k] > elt) {
         __retres = 0;
-        goto return_label; } }
+        goto return_label;
+      }
     k ++;
   }
   __retres = 0;
-  return_label: /* internal */ 
-  {
-    int __e_acsl_implies;
-    int __e_acsl_implies_2;
-    if (! __e_acsl_at) { __e_acsl_implies = 1; }
-    else { __e_acsl_implies = __retres == 1; }
-    e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",
-                  (char *)"\\old(\\exists int j; (0 <= j && j < 10) && A[j] == elt) ==> \\result == 1",
-                  12);
-    if (! __e_acsl_at_2) { __e_acsl_implies_2 = 1; }
-    else { __e_acsl_implies_2 = __retres == 0; }
-    e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",
-                  (char *)"\\old(\\forall int j; 0 <= j && j < 10 ==> A[j] != elt) ==> \\result == 0",
-                  15);
-    return (__retres);
-  }
-  
+  return_label: /* internal */
+    {
+      int __e_acsl_implies;
+      int __e_acsl_implies_2;
+      if (! __e_acsl_at) __e_acsl_implies = 1;
+      else __e_acsl_implies = __retres == 1;
+      e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",
+                    (char *)"\\old(\\exists int j; (0 <= j && j < 10) && A[j] == elt) ==> \\result == 1",
+                    12);
+      if (! __e_acsl_at_2) __e_acsl_implies_2 = 1;
+      else __e_acsl_implies_2 = __retres == 0;
+      e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",
+                    (char *)"\\old(\\forall int j; 0 <= j && j < 10 ==> A[j] != elt) ==> \\result == 0",
+                    15);
+      return __retres;
+    }
 }
 
 int main(void)
 {
   int __retres;
   int found;
-  { int i;
+  {
+    int i;
     i = 0;
     while (i < 10) {
       A[i] = i * i;
-      i ++; } }
-  
+      i ++;
+    }
+  }
   found = search(36);
   /*@ assert found ≡ 1; */
   e_acsl_assert(found == 1,(char *)"Assertion",(char *)"found == 1",33);
@@ -191,7 +194,7 @@ int main(void)
   e_acsl_assert(found == 0,(char *)"Assertion",(char *)"found == 0",36);
   __retres = 0;
   __clean();
-  return (__retres);
+  return __retres;
 }
 
 

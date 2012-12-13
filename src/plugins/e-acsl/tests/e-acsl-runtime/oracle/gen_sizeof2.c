@@ -90,10 +90,9 @@ int main(void)
     __gmpz_clear(__e_acsl_sizeof);
     __gmpz_clear(__e_acsl_sizeof_2);
   }
-  
   __retres = 0;
   __clean();
-  return (__retres);
+  return __retres;
 }
 
 

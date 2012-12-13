@@ -112,7 +112,7 @@ int main(void)
   e_acsl_assert(4 / y == 2,(char *)"Assertion",(char *)"4/y == 2",33);
   __retres = 0;
   __clean();
-  return (__retres);
+  return __retres;
 }
 
 

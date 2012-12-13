@@ -114,11 +114,10 @@ int main(void)
     e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",
                   (char *)"\\initialized((union msg *)buf)",25);
   }
-  
   __retres = 0;
   __delete_block((void *)(buf));
   __clean();
-  return (__retres);
+  return __retres;
 }
 
 

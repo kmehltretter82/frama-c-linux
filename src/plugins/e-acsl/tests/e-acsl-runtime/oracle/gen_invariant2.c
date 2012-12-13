@@ -101,13 +101,12 @@ int main(void)
           __gmpz_clear(__e_acsl_i_2);
           __gmpz_clear(__e_acsl_2);
         }
-        else { __e_acsl_and = 0; }
+        else __e_acsl_and = 0;
         e_acsl_assert(__e_acsl_and,(char *)"Invariant",
                       (char *)"0 <= i && i < 10",9);
         __gmpz_clear(__e_acsl);
         __gmpz_clear(__e_acsl_i);
       }
-      
       x += i;
       /*@ invariant i ≤ x; */
       {
@@ -123,14 +122,12 @@ int main(void)
         __gmpz_clear(__e_acsl_i_3);
         __gmpz_clear(__e_acsl_x);
       }
-      
       i ++;
     }
   }
-  
   __retres = 0;
   __clean();
-  return (__retres);
+  return __retres;
 }
 
 

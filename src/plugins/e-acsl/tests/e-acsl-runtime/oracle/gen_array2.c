@@ -75,18 +75,22 @@ int T2[4];
 int main(void)
 {
   int __retres;
-  { int i;
+  {
+    int i;
     i = 0;
     while (i < 3) {
       T1[i] = i;
-      i ++; } }
-  
-  { int i_0;
+      i ++;
+    }
+  }
+  {
+    int i_0;
     i_0 = 0;
     while (i_0 < 4) {
       T2[i_0] = 2 * i_0;
-      i_0 ++; } }
-  
+      i_0 ++;
+    }
+  }
   /*@ assert T1[0] ≡ T2[0]; */
   {
     mpz_t __e_acsl;
@@ -101,7 +105,6 @@ int main(void)
     __gmpz_clear(__e_acsl);
     __gmpz_clear(__e_acsl_2);
   }
-  
   /*@ assert T1[1] ≢ T2[1]; */
   {
     mpz_t __e_acsl_3;
@@ -116,10 +119,9 @@ int main(void)
     __gmpz_clear(__e_acsl_3);
     __gmpz_clear(__e_acsl_4);
   }
-  
   __retres = 0;
   __clean();
-  return (__retres);
+  return __retres;
 }
 
 

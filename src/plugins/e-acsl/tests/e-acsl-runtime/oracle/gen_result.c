@@ -72,7 +72,7 @@ int f(int x)
   e_acsl_assert(x == (int)((long long)__e_acsl_at - (long long)__e_acsl_at_2),
                 (char *)"Postcondition",
                 (char *)"\\result == (int)(\\old(x)-\\old(x))",7);
-  return (x);
+  return x;
 }
 
 int Y = 1;
@@ -80,7 +80,7 @@ int Y = 1;
 int g(int x)
 {
   e_acsl_assert(x == Y,(char *)"Postcondition",(char *)"\\result == Y",18);
-  return (x);
+  return x;
 }
 
 /*@ ensures \result ≡ 0; */
@@ -90,7 +90,7 @@ int h(void)
   __retres = 0;
   e_acsl_assert(__retres == 0,(char *)"Postcondition",
                 (char *)"\\result == 0",23);
-  return (__retres);
+  return __retres;
 }
 
 int main(void)
@@ -101,7 +101,7 @@ int main(void)
   h();
   __retres = 0;
   __clean();
-  return (__retres);
+  return __retres;
 }
 
 

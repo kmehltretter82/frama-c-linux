@@ -61,7 +61,7 @@ int main(void)
                 (char *)"\\null == (void *)0",8);
   __retres = 0;
   __clean();
-  return (__retres);
+  return __retres;
 }
 
 

@@ -112,14 +112,13 @@ struct list *add(struct list *l, int i)
       __e_acsl_valid = __valid((void *)new,sizeof(struct list));
       __e_acsl_and = __e_acsl_valid;
     }
-    else { __e_acsl_and = 0; }
+    else __e_acsl_and = 0;
     e_acsl_assert(__e_acsl_and,(char *)"Assertion",(char *)"\\valid(new)",20);
   }
-  
   new->element = i;
   new->next = l;
   __delete_block((void *)(& new));
-  return (new);
+  return new;
 }
 
 int main(void)
@@ -131,7 +130,7 @@ int main(void)
   l = add(l,7);
   __retres = 0;
   __clean();
-  return (__retres);
+  return __retres;
 }
 
 

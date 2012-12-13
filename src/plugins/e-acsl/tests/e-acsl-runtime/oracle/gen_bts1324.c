@@ -83,7 +83,7 @@ int sorted(int *t, int n)
     __e_acsl_forall = 1;
     __e_acsl_i = (long long)(0 + 1);
     while (1) {
-      if (__e_acsl_i < n) { ; } else { break; }
+      if (__e_acsl_i < n) ; else break;
       {
         int __e_acsl_valid_read;
         int __e_acsl_valid_read_2;
@@ -96,42 +96,43 @@ int sorted(int *t, int n)
         e_acsl_assert(__e_acsl_valid_read_2,(char *)"Postcondition",
                       (char *)"mem_access: \\valid_read(t+(long long)(__e_acsl_i-(long long)1))",
                       0);
-        if (*(t + (__e_acsl_i - (long long)1)) <= *(t + __e_acsl_i)) { ; }
+        if (*(t + (__e_acsl_i - (long long)1)) <= *(t + __e_acsl_i)) 
+          ;
         else {
           __e_acsl_forall = 0;
-          goto e_acsl_end_loop1; }
+          goto e_acsl_end_loop1;
+        }
       }
-      
       __e_acsl_i ++;
     }
     e_acsl_end_loop1: /* internal */ ;
     __e_acsl_at = __e_acsl_forall;
   }
-  
   b = 1;
   if (n <= 1) {
     __retres = 1;
-    goto return_label; }
+    goto return_label;
+  }
   b = 1;
   while (b < n) {
     if (*(t + (b - 1)) > *(t + b)) {
       __retres = 0;
-      goto return_label; }
+      goto return_label;
+    }
     b ++;
   }
   __retres = 1;
-  return_label: /* internal */ 
-  {
-    int __e_acsl_implies;
-    if (! __e_acsl_at) { __e_acsl_implies = 1; }
-    else { __e_acsl_implies = __retres == 1; }
-    e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",
-                  (char *)"\\old(\\forall long long i; 0 < i && i < n ==> *(t+(i-1)) <= *(t+i)) ==>\n\\result == 1",
-                  9);
-    __delete_block((void *)(& t));
-    return (__retres);
-  }
-  
+  return_label: /* internal */
+    {
+      int __e_acsl_implies;
+      if (! __e_acsl_at) __e_acsl_implies = 1;
+      else __e_acsl_implies = __retres == 1;
+      e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",
+                    (char *)"\\old(\\forall long long i; 0 < i && i < n ==> *(t+(i-1)) <= *(t+i)) ==>\n\\result == 1",
+                    9);
+      __delete_block((void *)(& t));
+      return __retres;
+    }
 }
 
 int main(void)
@@ -160,7 +161,7 @@ int main(void)
   __retres = 0;
   __delete_block((void *)(t));
   __clean();
-  return (__retres);
+  return __retres;
 }
 
 

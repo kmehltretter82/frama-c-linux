@@ -108,13 +108,12 @@ struct list *f(struct list *l)
         __e_acsl_valid_2 = __valid((void *)l->next,sizeof(struct list));
         __e_acsl_and = __e_acsl_valid_2;
       }
-      else { __e_acsl_and = 0; }
+      else __e_acsl_and = 0;
       __e_acsl_and_2 = ! __e_acsl_and;
     }
-    else { __e_acsl_and_2 = 0; }
+    else __e_acsl_and_2 = 0;
     __e_acsl_at_3 = __e_acsl_and_2;
   }
-  
   __store_block((void *)(& __e_acsl_at_2),4U);
   __full_init((void *)(& __e_acsl_at_2));
   __e_acsl_at_2 = l;
@@ -123,28 +122,29 @@ struct list *f(struct list *l)
   __e_acsl_at = l == (void *)0;
   if (l == (void *)0) {
     __retres = l;
-    goto return_label; }
+    goto return_label;
+  }
   if (l->next == (void *)0) {
     __retres = l;
-    goto return_label; }
-  __retres = (struct list *)((void *)0);
-  return_label: /* internal */ 
-  {
-    int __e_acsl_implies;
-    int __e_acsl_implies_2;
-    if (! __e_acsl_at) { __e_acsl_implies = 1; }
-    else { __e_acsl_implies = __retres == __e_acsl_at_2; }
-    e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",
-                  (char *)"\\old(l == \\null) ==> \\result == \\old(l)",18);
-    if (! __e_acsl_at_3) { __e_acsl_implies_2 = 1; }
-    else { __e_acsl_implies_2 = __retres == __e_acsl_at_4; }
-    e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",
-                  (char *)"\\old(!\\valid(l) && !\\valid(l->next)) ==> \\result == \\old(l)",
-                  22);
-    __delete_block((void *)(& l));
-    return (__retres);
+    goto return_label;
   }
-  
+  __retres = (struct list *)((void *)0);
+  return_label: /* internal */
+    {
+      int __e_acsl_implies;
+      int __e_acsl_implies_2;
+      if (! __e_acsl_at) __e_acsl_implies = 1;
+      else __e_acsl_implies = __retres == __e_acsl_at_2;
+      e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",
+                    (char *)"\\old(l == \\null) ==> \\result == \\old(l)",18);
+      if (! __e_acsl_at_3) __e_acsl_implies_2 = 1;
+      else __e_acsl_implies_2 = __retres == __e_acsl_at_4;
+      e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",
+                    (char *)"\\old(!\\valid(l) && !\\valid(l->next)) ==> \\result == \\old(l)",
+                    22);
+      __delete_block((void *)(& l));
+      return __retres;
+    }
 }
 
 int main(void)
@@ -153,7 +153,7 @@ int main(void)
   f((struct list *)((void *)0));
   __retres = 0;
   __clean();
-  return (__retres);
+  return __retres;
 }
 
 
