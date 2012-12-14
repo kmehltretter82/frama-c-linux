@@ -1,0 +1,573 @@
+
+\documentclass[a4paper,11pt,twocolumn]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[dvips]{graphicx}
+%\usepackage{framed}
+\usepackage{latexsym}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{courier}
+\usepackage{caption}
+\usepackage[normalem]{ulem}
+\usepackage{pgfplots}
+\usepackage{booktabs,colortbl}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{etex}
+\usepackage{pstricks-add}
+\usepackage{paralist}
+\usepackage[nounderscore]{syntax}
+\usepackage{tikz}
+\usetikzlibrary{matrix,shapes,shapes.multipart,backgrounds,calc,fit}
+
+%\definecolor{shadecolor}{gray}{0.9}
+ 
+\setlength{\fboxsep}{1.5pt}
+\newcommand{\highl}{\colorbox{gray!30}}
+
+\lstloadlanguages{C}
+
+\def\lstsmallmath{\leavevmode\ifmmode \scriptstyle \else  \fi}
+\def\lstsmallmathend{\leavevmode\ifmmode  \else  \fi}
+\lstset {
+  escapechar=§,
+  %frame=shadowbox,
+  %rulesepcolor=\color{black},
+  showspaces=false,showtabs=false,tabsize=2,
+  numberstyle=\tiny,numbers=left,
+  stringstyle=\color{sh_string},
+  keywordstyle = \color{sh_keyword}\bfseries,
+  commentstyle=\color{sh_comment}\itshape,
+  captionpos=b,
+  xleftmargin=0.7cm,
+  aboveskip=0.7cm,
+  belowskip=0.5cm,
+  escapebegin={\lstsmallmath}, escapeend={\lstsmallmathend},
+  emph={let,and,match,function,with,in,assert,true,false,None,Some,fun,
+    int,char,void,return,size\_t,unsigned,long,struct,if,then,else,raise,type,
+    method,module,end,rec,ref,val,list,for,while,break,const,short},
+  emphstyle=\textbf
+}
+
+
+\captionsetup[lstlisting]{
+  singlelinecheck=false,
+  margin=40pt,
+  font={bf,footnotesize}
+}
+
+
+
+\begin{document}
+ 
+\title{Code generation for memory monitoring}
+\author{...}
+\date{\today}
+ 
+\maketitle
+
+
+
+
+\section{Introduction}
+
+
+Memory accesses from a pointer or an array are not safe in C, thus trying to
+access an element of an array out of valid range or an invalid pointer may cause
+a segmentation fault during execution.
+
+C compilers such as \textsc{Gcc} do not provide detection mechanisms for this
+kind of errors. We propose an automatic code instrumentation, so that the
+generated code will perform memory monitoring and will be able to check
+memory properties during execution (runtime checking).
+We consider as readable and writable memory: global variables, dynamically
+allocated memory, and formal parameters and local variables of each function. We
+decided to use the term ``block'' to nominate these four cases.
+
+\textsc{E-Acsl} is an executable subset of \textsc{Acsl} \cite{ACSL}, a formal
+specification language for C using source code annotations to express
+properties. \textsc{Acsl}-annotated C programs can be dealt with
+\textsc{Frama-C} \cite{Frama-C}, a framework for modular analysis of C.
+\textsc{Frama-C} provides a plug-in generating executable C code from
+\textsc{E-Acsl} annotations, used by the implementation discussed in this paper.
+Memory blocks (as defined above) held properties such as their base address and
+their size. \textsc{E-Acsl} provides five annotations to retrieve useful
+information about blocks:
+
+\begin{description}
+\item[$\backslash$base\_addr(p)] \hfill \\
+  returns the base address of the block containing the pointer $p$
+\item[$\backslash$block\_length(p)] \hfill \\
+  returns the size (in bytes) of the block containing the pointer $p$
+\item[$\backslash$offset(p)] \hfill \\
+  returns the offset between $p$ and $\backslash$base\_addr($p$)
+\item[$\backslash$valid(s)] \hfill \\
+  whether reading and writing $*s$ is safe
+\item[$\backslash$initialized(s)] \hfill \\
+  whether the variable stored at the address $s$ has been initialized
+\end{description}
+
+Our contribution allowed the \textsc{E-Acsl} plug-in to generate executable C
+code from these five annotations, thus checking these five memory properties
+during execution.
+
+
+
+\section{Stored information}
+
+For each block, we need to store the following information: the base address
+(address of the first element within the block), the size (in bytes), the
+validity status (whether reading and writing the block is safe) and the
+initialization status for each byte of the block.
+Figure~\ref{fig:block_descr} illustrates the data structure (we call it
+{\em block descriptor}) chosen to store this information.
+
+
+\begin{figure}[h]
+  \begin{lstlisting}
+  struct _block {
+    char * ptr;
+    size_t size;
+    int valid;
+    unsigned char * init_ptr;
+    unsigned long init_cpt;
+  };
+  \end{lstlisting}
+  \caption{Block descriptor}
+  \label{fig:block_descr}
+\end{figure}
+
+
+$init\_ptr$ is an array of booleans that is dynamically allocated only if
+needed. If it has been allocated, it contains a boolean for each byte of the
+block: the $n^{th}$ boolean indicates whether the $n^{th}$ byte has been
+initialized.
+
+$init\_cpt$ counts the number of initialized bytes within the block. If
+$init\_cpt = 0$ (none) or $init\_cpt = size$ (all) then $init\_ptr$ is freed.
+So, when none or all of the bytes have been initialized (the most common cases),
+the memory space needed for the block descriptor itself is reduced. This
+consistency is maintained when adding/removing an element.
+
+
+\section{Global architecture}
+
+\newcommand{\colB}{0}
+\newcommand{\rowA}{7}
+\newcommand{\rowB}{5}
+\newcommand{\rowC}{3}
+\newcommand{\rowD}{1}
+\begin{figure}[h]
+  \begin{center}
+    \tikzstyle{service}=[rounded corners,rectangle,inner sep=2mm,fill=gray!40]
+    \scalebox{0.85}{
+      \begin{tikzpicture}
+        \node[service,rectangle,inner sep=4mm] (eacsl) at (\colB{},\rowA{}) {
+          E-ACSL plug-in};
+        \node [inner sep=4mm,draw](lib) at (\colB{},\rowB{})
+              {Monitoring functions};
+        \node[inner sep=4mm,draw](sdda) at (\colB{},\rowC{}){Common interface};
+        \node [matrix of nodes,rectangle,draw,column sep=4mm,inner sep=2.5mm]
+        (sddc) at (\colB{},\rowD{}) {
+          \node[service](p) at (0,0) {{\em Bittree}}; \pgfmatrixnextcell
+          \node at (0,0) {or}; \pgfmatrixnextcell
+          \node[service] at (0,0) { Linked list }; \pgfmatrixnextcell
+          \node at (0,0) {\dots};\\
+        };
+        \path [<->,thick] (eacsl) edge (lib);
+        \path [<->,thick] (lib) edge (sdda);
+        \path [<->,thick] (sdda) edge (sddc);
+      \end{tikzpicture}
+    }
+  \end{center}
+  \caption{Global architecture}
+  \label{fig:lib}
+\end{figure}
+
+
+Interactions between the components of our solution are displayed by
+Figure~\ref{fig:lib}. A data structure (see
+Section~\ref{section:bittree}) stores the block descriptors. The library
+functions (see Section~\ref{section:lib}) add, remove or modify the block
+descriptors. The \textsc{E-Acsl} plug-in then perform an instrumentation (see
+Section~\ref{section:instru}) to generate executable C code. The generated code
+uses the monitoring functions of this library.
+
+
+\section{Concrete data structure used: {\em bittree}}
+\label{section:bittree}
+
+In this section we discuss the choice of the concrete data structure used to
+store the block descriptors.
+
+
+\subsection{{\em Patricia tries}}
+
+
+We need a data structure with a good time and space complexity, indeed we may
+have to often add or remove a block descriptor in the structure. The structure
+has to be sorted: we want to access to a block descriptor by its base address,
+and also to its predecessor and successor. Thus, hash-tables will not fit.
+We also unconsidered the linked lists, due to the linear worst-case complexity.
+The (unbalanced) binary search trees provide a linear worst-case complexity too
+when the base address of inserted elements are monotonically increasing, and
+this may be quite common. Self-balanced binary search trees are dismissed
+because of the numerous add/remove operations implying numerous costly balancing
+operations.
+
+We choose to use the {\em Patricia tries} \cite{Patricia-tries} structure, which
+is efficient even if the tree is unbalanced. The prefix used by a node (not a
+leaf) is the greatest common prefix (on 32 or 64 bits) of its two children.
+The block descriptors are held on leaves. Other nodes just do the routing from
+the root to a block descriptor. Patricia tries are usually used on
+strings and characters, so we named ``bittree'' the structure used in this
+article. For example on 8-bit addresses, Figure~\ref{fig:bittree} shows
+a bittree  storing three block descriptors (identified by their addresses:
+${\tt 0010\,0111}$, ${\tt 0010\,1001}$ and ${\tt 0010\,1101})$. The greatest
+common prefix of ${\tt 0010\,1001}$ and ${\tt 0010\,1101}$ is ${\tt 0010\,1***}$
+and the greatest common prefix of ${\tt 0010\,0111}$ and ${\tt 0010\,1***}$ is
+${\tt 0010\,****}$. The $*$ means that this bit is meaningless.
+Figure~\ref{fig:insertion} shows that a new node (with a new prefix) is added
+when a block descriptor is inserted.
+
+Figure~\ref{fig:deletion} shows an example of deletion of a 8-bit block
+descriptor. Patricia tries being compact prefix trees, a node having an
+only child is deleted. So ${\tt 0010\,1***}$ becomes useless and is replaced by
+its child ${\tt 0010\,1001}$. Deleting useless nodes, or only storing useful
+ones for routing, keeps the tree exploration efficient. A 32-bit (respectively
+64-bit) bittree has a worst-case depth of 33 (respectively 65) nodes.
+
+
+\begin{figure}[h]
+  \begin{center}
+    \tikz[grow=right,level 2/.style={sibling distance=1em},level distance=3cm]
+    \node {0010 ****}
+    child { node {0010 0111} }
+    child { node {0010 1***}
+      child { node {0010 1001} }
+      child { node {0010 1101} }
+    };
+    \caption{Example of bittree}
+    \label{fig:bittree}
+  \end{center}
+\end{figure}
+
+\begin{figure}[h]
+  \begin{center}
+    \tikz[grow=right,level 2/.style={sibling distance=1em},level distance=3cm]
+    \node {0010 ****}
+    child { node {0010 011*}
+      child { node {0010 0110} }
+      child { node {0010 0111} }
+    }
+    child { node {0010 1***}
+      child { node {0010 1001} }
+      child { node {0010 1101} }
+    };
+    \caption{Bittree after adding ${\tt 0010\,0110}$ into the bittree of
+      Fig.~\ref{fig:bittree}}
+    \label{fig:insertion}
+  \end{center}
+\end{figure}
+
+\begin{figure}[h]
+  \begin{center}
+    \tikz[grow=right,level 2/.style={sibling distance=1em},level distance=3cm]
+    \node {0010 ****}
+    child { node {0010 0111} }
+    child { node {0010 1001} };
+    \caption{Bittree after deleting ${\tt 0010\,1101}$ from the bittree of
+      Fig.~\ref{fig:bittree}}
+    \label{fig:deletion}
+  \end{center}
+\end{figure}
+
+
+\subsection{Greatest common prefix computation}
+\label{section:gcpc}
+
+The greatest common prefix of $A$ and $B$ can be naively computed by:
+$X = \lnot (A \oplus B)$ (where $\oplus$ is the XOR operator) to keep bits in
+common, then each bit of $X$ on the right side of a 0 is set to 0. The obtained
+mask is then applied to $A$ or $B$. For example, considering
+$A = {\tt 0110\,0111}$ and $B = {\tt 0111\,1111}$,
+$X = \lnot (A \oplus B) = {\tt 1110\,0111}$, setting each bit on the right side
+of a 0 to 0 we get ${\tt 1110\,0000}$. We apply this mask to $A$ and get the
+greatest common prefix of $A$ and $B$: ${\tt 011*\,****}$. This algorithm is
+used by the first version of out implementation and is named {\em Bittree-naive}
+in the experiments.
+
+We optimized this algorithm by firstly computing all of the 65 or 33 different
+masks (from {\tt 0x0} to {\tt0xf$\dots$f}) and storing them in an array. Then we
+use a dichotomic search to find the mask corresponding to the greatest common
+prefix: if $A$ and $B$ have a 32-bit common prefix, do they have a 48-bit common
+prefix ? Otherwise, do they have a 16-bit common prefix ? And so on. This search
+takes at most 6 (respectively 5) steps on 64-bit (respectively 32-bit) bittrees.
+This algorithm is used by the final version of our implementation and is named
+{\em Bittree-opti} in the experiments.
+
+
+\subsection{Experiments}
+
+These experiments justify the choice of bittrees over linked lists and binary
+search trees. We implemented the classic {\em merge sort} algorithm, and added
+extra allocations/deallocations to put each data structure to the test.
+The program has been instrumented (see Section~\ref{section:instru}) to call our
+monitoring functions (see Section~\ref{section:lib}). The execution time of the
+instrumented program using each data structure has been measured (in
+micro-seconds) and is plotted against the number of calls to a function $store$
+(adding an element to the data structure). Figure~\ref{fig:experiments}
+displays the results of the experiments.
+The reference time is the execution time of the program without any
+instrumentation. Bittree-naive and Bittree-opti are using two different versions
+of the greatest common prefix computation (see Sub-section~\ref{section:gcpc}).
+
+
+
+\begin{figure}[h]
+  \hspace{-0.5in}
+  \begin{tikzpicture}
+    \begin{axis}[xlabel={Number of calls to $store$}, ylabel={Time ($\mu$s)},
+	legend entries={List, Tree, Bittree-naive, Bittree-opti, Reference time}
+      ]
+      \addplot table {timeList.dat};
+      \addplot table {timeTree.dat};
+      \addplot table {timeBTn.dat};
+      \addplot table {timeBTo.dat};
+      \addplot table {timeNone.dat};
+    \end{axis}
+  \end{tikzpicture}
+  \caption{Execution time plotted against the number of calls to $store$}
+  \label{fig:experiments}
+\end{figure}
+
+
+
+The last but one measurement, the merge sort applied to 50,000 elements
+(4,889,819 calls to $store$), has a reference time of 0.07s. It runs 32s with
+the optimized bittree, 118s with the naive bittree, 7 hours 15 minutes with the
+binary search trees and 19 hours 15 minutes with linked lists.
+Our last measurement, the merge sort applied to 100,000 elements
+(10,279,851 calls to $store$)  has a reference time of 0.19s. It runs 72s with
+the optimized bittree, 252s with the naive bittree, but binary search trees and
+linked lists exceed our 24-hour timeout.
+
+
+
+\section{Monitoring functions}
+\label{section:lib}
+
+
+This section presents the functions used for adding/removing/retrieving
+in formations about block descriptors into our data structure (bittree). These
+functions will be automatically inserted in the source code by the
+instrumentation step (see Section~\ref{section:instru}).
+
+
+\subsection{Automatic allocation}
+
+Automatic allocation functions keep track of all non-dynamically allocated
+variables (but occupying memory space nevertheless), such as formal parameters,
+local variables or global variables.
+
+\begin{lstlisting}[caption=Automatic allocation functions]
+void * _store_block
+  (void * ptr, size_t size);
+void _delete_block(void * ptr);
+\end{lstlisting}
+
+
+\subsection{Dynamic allocation}
+
+These functions have to be used instead of those of the standard library 
+({\em stdlib.h}).
+
+\begin{lstlisting}[caption=Dynamic allocation functions]
+void * _malloc(size_t size);
+void * _realloc
+  (void * ptr, size_t size);
+void * _calloc
+  (size_t nbr, size_t size);
+void _free(void * ptr);
+\end{lstlisting}
+
+
+\subsection{Initialization}
+
+These functions have to be used for each assignment, to update the
+initialization status of a block descriptor. ${\tt \_initialize(ptr, size)}$
+marks the $size$ first bytes starting from $ptr$ as initialized.
+${\tt \_full\_init(ptr)}$ marks all the bytes of $ptr$ as initialized at once.
+It is designed to avoid multiple calls to ${\tt \_initialize}$ whenever it is
+possible and improves efficiency of the instrumented program.
+
+
+\begin{lstlisting}[caption=Initialization functions]
+void _initialize
+  (void * ptr, size_t size);
+void _full_init(void * ptr);
+\end{lstlisting}
+
+
+\subsection{Interrogation}
+
+These functions are used to retrieve information about the block descriptors
+and match the \textsc{E-Acsl} annotations we are trying to support:
+${\tt \backslash valid}$, ${\tt \backslash base\_addr}$,
+${\tt \backslash block\_length}$, ${\tt \backslash offset}$ and
+${\tt \backslash initialized}$.
+
+\begin{lstlisting}[caption=Interrogation functions]
+int _valid
+  (void * ptr, size_t size);
+void * _base_addr(void * ptr);
+size_t _block_length(void * ptr);
+int _offset
+  (void * ptr, size_t size);
+int _initialized
+  (void * ptr, size_t size);
+\end{lstlisting}
+
+${\tt \_valid(ptr, size)}$ returns 1 if it is safe to read/write $size$ bytes
+starting from $ptr$, 0 otherwise. ${\tt \_base\_addr(ptr)}$ returns the base
+address of the block containing $ptr$ if such a block exists, NULL otherwise.
+${\tt \_block\_length(ptr)}$ returns the size (in bytes) of the block containing
+$ptr$ if such a block exists, 0 otherwise. ${\tt \_offset(ptr)}$ returns the
+offset between $ptr$ and the base address of the block containing $ptr$ if such
+a block exists, -1 otherwise. ${\tt \_initialized(ptr, size)}$ returns 1 if the
+$size$ first bytes starting from $ptr$ are initialized, 0 otherwise.
+
+
+\section{Instrumentation}
+\label{section:instru}
+
+This section presents the instrumentation performed by the \textsc{E-Acsl}
+plug-in to monitor the memory used by a program. The generated instrumented code
+uses the previously defined functions (see previous section).
+
+For each global variable, calls to ${\tt \_store\_block}$ and
+${\tt \_full\_init}$ are inserted at the beginning of the $main$ function, and a
+call to ${\tt \_delete\_block}$ at the end (see Figure~\ref{fig:globals}). For
+each formal parameter and local variable, a call to ${\tt \_store\_block}$ is
+inserted at the beginning of their scope block and a call to
+${\tt \_delete\_block}$ at the end of their scope block (see
+Figure~\ref{fig:formals} and Figure~\ref{fig:locals}). Calls to
+${\tt \_full\_init}$ and ${\tt \_initialize}$ are inserted on assignments (see
+Figure~\ref{fig:init}), and \textsc{E-Acsl} annotations are translated to the
+corresponding functions which result is tested by an assertion (see
+Figure~\ref{fig:annot}).
+
+
+
+\begin{figure}[h]
+    \begin{lstlisting}
+int * p;
+p = §\highl{\_malloc}§(32);
+§\highl{\_free}§(p);
+    \end{lstlisting}
+  \caption{Dynamic allocation instrumentation}
+  \label{fig:alloc-dyn}
+\end{figure}
+
+
+\begin{figure}[h]
+    \begin{lstlisting}
+{
+  int* p;
+  §\highl{\_store\_block(\&p, sizeof(int*));}§
+  ...
+  §\highl{\_delete\_block(\&p);}§
+}
+    \end{lstlisting}
+  \caption{Local variable instrumentation}
+  \label{fig:locals}
+\end{figure}
+
+
+\begin{figure}[h]
+    \begin{lstlisting}
+int g;
+
+int main() {
+  §\highl{\_store\_block(\&g, sizeof(int));}§
+  §\highl{\_full\_init(\&g);}§
+  ...
+  §\highl{\_delete\_block(\&g);}§
+  ...
+  return 0;
+}
+    \end{lstlisting}
+  \caption{Global variable instrumentation}
+  \label{fig:globals}
+\end{figure}
+
+
+\begin{figure}[h]
+    \begin{lstlisting}
+void f (int i) {
+  §\highl{\_store\_block(\&i);}§
+  §\highl{\_full\_init(\&i);}§
+  ...
+  §\highl{\_delete\_block(\&i);}§
+}
+    \end{lstlisting}
+  \caption{Formal parameter instrumentation}
+  \label{fig:formals}
+\end{figure}
+
+
+\begin{figure}[h]
+    \begin{lstlisting}
+int i;
+i = 4;
+§\highl{\_full\_init(\&i);}§
+
+int t [10];
+t[2] = 4;
+§\highl{\_initialize((t+2), sizeof(int));}§
+    \end{lstlisting}
+  \caption{Assignment instrumentation}
+  \label{fig:init}
+\end{figure}
+
+
+\begin{figure}[h]
+    \begin{lstlisting}
+int p[12];
+//@ assert \valid (p+2);
+§\highl{assert(\_valid((p+2), sizeof(int)));}§
+    \end{lstlisting}
+  \caption{Annotation instrumentation}
+  \label{fig:annot}
+\end{figure}
+
+
+\section{Conclusion}
+
+
+We implemented an efficient data structure (bittree) (see
+Section~\ref{section:bittree}) to store the block descriptors and functions (see
+Section~\ref{section:lib}) relying on this structure to perform memory
+monitoring.
+We also defined and implemented into the \textsc{E-Acsl} plug-in the
+instrumentation (see Section~\ref{section:instru}) to perform on a C source code
+to monitor the memory. This allows the runtime checking of the following
+\textsc{E-Acsl} annotations: ${\tt \backslash base\_addr}$,
+${\tt \backslash block\_length}$, ${\tt \backslash offset}$,
+${\tt \backslash valid}$ and ${\tt \backslash initialized}$.
+
+
+\begin{scriptsize}
+\bibliographystyle{abbrv}
+\bibliography{biblio}
+\end{scriptsize}
+
+
+
+
+
+\end{document}
+
