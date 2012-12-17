@@ -247,11 +247,9 @@ and context_insensitive_term_to_exp env t =
       let name = name_of_binop bop in
       let _, e, env = Env.new_var_and_mpz_init ~loc ~name env t mk_stmts in
       e, env, false, ""
-    else begin
-      assert (Cil.isIntegralType ty);
+    else
       (* no guard required since RTE are generated separately *)
       Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)), env, false, ""
-    end
   | TBinOp(Lt | Gt | Le | Ge | Eq | Ne as bop, t1, t2) ->
     (* comparison operators *)
     let e, env = comparison_to_exp ~loc env bop t1 t2 (Some t) in
