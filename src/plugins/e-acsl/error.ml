@@ -54,14 +54,14 @@ let generic_handle f res x =
   with
   | Typing_error s ->
     let msg = Format.sprintf "@[invalid E-ACSL construct@ `%s'.@]" s in
-    Options.warning ~current:true "@[%s@ Ignoring annotation.@]" msg;
+    Options.warning ~once:true ~current:true "@[%s@ Ignoring annotation.@]" msg;
     Nb_typing.set (Nb_typing.get () + 1);
     res
   | Not_yet s ->
     let msg = 
       Format.sprintf "@[E-ACSL construct@ `%s'@ is not yet supported.@]" s
     in 
-    Options.warning ~current:true "@[%s@ Ignoring annotation.@]" msg;
+    Options.warning ~once:true ~current:true "@[%s@ Ignoring annotation.@]" msg;
     Nb_not_yet.set (Nb_not_yet.get () + 1);
     res
 

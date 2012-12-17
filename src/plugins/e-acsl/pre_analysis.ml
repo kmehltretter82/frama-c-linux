@@ -178,7 +178,7 @@ module rec Transfer
     method vpredicate = function
     | Pvalid(_, t) | Pvalid_read(_, t) | Pinitialized(_, t)
     | Pallocable(_, t) | Pfreeable(_, t) | Pfresh(_, _, t, _) ->
-	(*	Options.feedback "REGISTER %a" Cil.d_term t;*)
+	   (*	Options.feedback "REGISTER %a" Cil.d_term t;*)
       state_ref := register_term kf !state_ref t;
       Cil.SkipChildren
     | Pseparated _ -> Error.not_yet "\\separated"
@@ -195,15 +195,15 @@ module rec Transfer
       let state = register_term kf !state_ref t1 in
       state_ref := register_term kf state t2;
       Cil.SkipChildren
-    | TConst _ | TSizeOf _ | TSizeOfStr _ | TAlignOf _  | Tnull
-    | Ttype _ | Tempty_set | TSizeOfE _ | TUnOp _ | TBinOp _ | Ttypeof _ -> 
-      (* no left-value inside inside: skip for efficiency *)
+    | TConst _ | TSizeOf _ | TSizeOfStr _ | TAlignOf _  | Tnull | Ttype _ 
+    | Tempty_set | TSizeOfE _ | TUnOp _ | TBinOp _ | Ttypeof _ -> 
+	   (* no left-value inside inside: skip for efficiency *)
       Cil.SkipChildren
     | TLval _ | TAlignOfE _ | TCastE _ | TAddrOf _
     | TStartOf _ | Tapp _ | Tlambda _ | TDataCons _ | Tif _ | Tat _
     | TCoerce _ | TCoerceE _ | TUpdate _ | Tunion _ | Tinter _
     | Tcomprehension _ | Trange _ | Tlet _ | TLogic_coerce _ -> 
-      (* potential sub-term inside *)
+	   (* potential sub-term inside *)
       Cil.DoChildren
     method vlogic_label _ = Cil.SkipChildren
     method vterm_lhost = function
@@ -216,12 +216,20 @@ module rec Transfer
 
   let register_predicate kf pred state = 
     let state_ref = ref state in
-    ignore (Visitor.visitFramacIdPredicate (register_object kf state_ref) pred);
+    Error.handle
+      (fun () ->
+	ignore
+	  (Visitor.visitFramacIdPredicate (register_object kf state_ref) pred))
+      ();
     !state_ref
 
   let register_code_annot kf a state = 
     let state_ref = ref state in
-    ignore (Visitor.visitFramacCodeAnnotation (register_object kf state_ref) a);
+    Error.handle
+      (fun () ->
+	ignore 
+	  (Visitor.visitFramacCodeAnnotation (register_object kf state_ref) a))
+      ();
     !state_ref
 
   (** The (backwards) transfer function for a branch. The [(Cil.CurrentLoc.get
@@ -398,7 +406,7 @@ end = struct
   let compute init_set kf = 
     assert (not (Misc.is_library_loc (Kernel_function.get_location kf)));
     let tbl = Stmt.Hashtbl.create 17 in
-      (*	Options.feedback "ANALYSING %a" Kernel_function.pretty kf;*)
+(*    Options.feedback "ANALYSING %a" Kernel_function.pretty kf;*)
     Env.add kf tbl;
     try 
       let init = object
@@ -449,8 +457,13 @@ let consolidated_must_model_vi ?kf vi =
       (* TODO: should iterate in callgraph order *)
       Globals.Functions.iter 
 	(fun kf -> 
-	  let set = Compute.get kf in
-	  Env.consolidate set);
+	  try 
+	    let set = Compute.get kf in
+	    Env.consolidate set
+	  with exn ->
+	    Kernel.fatal "Pre-analysis failed for function %a:@\n%s"
+	      Kernel_function.pretty kf 
+	      (Printexc.to_string exn));
       (*    Options.feedback "MUST MODEL %s? %b (consolidated)" 
 	    vi.vname (Env.consolidated_mem vi);*)
       Env.consolidated_mem vi
@@ -470,7 +483,12 @@ let must_model_vi ?kf ?stmt vi =
     assert false
   | Some stmt, Some kf  ->
     assert (Env.is_consolidated ());
-    let tbl = try Env.find kf with Not_found -> assert false in
+    let tbl = 
+      try Env.find kf 
+      with Not_found -> 
+	Options.fatal "[Pre-analysis] unknown function %a" 
+	  Kernel_function.pretty kf
+    in
     try
       let set = Stmt.Hashtbl.find tbl stmt in
       Varinfo.Set.mem vi (Env.default_varinfos set)
