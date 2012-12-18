@@ -7,7 +7,6 @@
 tests/e-acsl-runtime/linear_search.i:9:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
 tests/e-acsl-runtime/linear_search.i:9:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
 tests/e-acsl-runtime/linear_search.i:27:[e-acsl] warning: E-ACSL construct `loop invariant' is not yet supported. Ignoring annotation.
-tests/e-acsl-runtime/linear_search.i:27:[e-acsl] warning: E-ACSL construct `loop invariant' is not yet supported. Ignoring annotation.
 tests/e-acsl-runtime/linear_search.i:11:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
 tests/e-acsl-runtime/linear_search.i:14:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
 [value] Analyzing a complete application starting at main
