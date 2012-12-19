@@ -7,16 +7,41 @@ struct __anonstruct___mpz_struct_1 {
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
 typedef unsigned int size_t;
-struct __fc_pos_t {
-   unsigned long __fc_stdio_position ;
+typedef unsigned int ino_t;
+typedef unsigned int gid_t;
+typedef unsigned int uid_t;
+typedef long time_t;
+typedef unsigned int blkcnt_t;
+typedef unsigned int blksize_t;
+typedef unsigned int dev_t;
+typedef unsigned int mode_t;
+typedef unsigned int nlink_t;
+typedef unsigned int off_t;
+struct stat {
+   dev_t st_dev ;
+   ino_t st_ino ;
+   mode_t st_mode ;
+   nlink_t st_nlink ;
+   uid_t st_uid ;
+   gid_t st_gid ;
+   dev_t st_rdev ;
+   off_t st_size ;
+   time_t st_atime ;
+   time_t st_mtime ;
+   time_t st_ctime ;
+   blksize_t st_blksize ;
+   blkcnt_t st_blocks ;
+   char *__fc_real_data ;
+   int __fc_real_data_max_size ;
 };
-typedef struct __fc_pos_t fpos_t;
 struct __fc_FILE {
-   fpos_t __fc_stdio_fpos ;
-   char *__fc_stdio_buffer ;
-   char __fc_stdio_error ;
-   char __fc_stdio_eof ;
-   long __fc_stdio_id ;
+   unsigned int __fc_stdio_id ;
+   unsigned int __fc_maxsz ;
+   unsigned int __fc_writepos ;
+   unsigned int __fc_readpos ;
+   int __fc_is_a_socket ;
+   int __fc_mode ;
+   struct stat *__fc_inode ;
 };
 typedef struct __fc_FILE FILE;
 typedef int ArrayInt[5];
@@ -24,7 +49,7 @@ typedef int ArrayInt[5];
 model __mpz_struct { ℤ n };
 */
 int __fc_random_counter __attribute__((__unused__));
-unsigned long const __fc_rand_max = (unsigned long)2147483647;
+unsigned long const __fc_rand_max = (unsigned long)32767;
 extern int __fc_heap_status;
 /*@
 axiomatic

@@ -240,7 +240,8 @@ you must call function `%s' by yourself"
 
   method vglob_aux = function
   | GVarDecl(_, vi, _) | GVar(vi, _, _) | GFun({ svar = vi }, _) 
-      when Misc.is_library_loc vi.vdecl -> 
+      when Misc.is_library_loc vi.vdecl ->
+    assert (not vi.vghost);
     if generate then
       Cil.JustCopyPost
 	(fun l -> 
@@ -253,9 +254,10 @@ you must call function `%s' by yourself"
   | g when Misc.is_library_loc (Global.loc g) ->
     if generate then Cil.JustCopy else Cil.SkipChildren
   | g ->
+    (* TODO: handle ghost declaration. Waiting for fixing bug #1328 *)
     let do_it = function
       | GVar(vi, i, _) ->
-	  (* remove initializers on need *)
+	(* remove initializers on need *)
 	if Pre_analysis.old_must_model_vi self#behavior vi then
 	  (try
 	     let old_vi = Cil.get_original_varinfo self#behavior vi in
@@ -265,8 +267,8 @@ you must call function `%s' by yourself"
 	   with Not_found ->
 	     assert false)
       | GFun({ svar = vi } as fundec, _) ->
-	  (* remember that we have to remove the main later 
-	     (see method [vfile]) *)
+	(* remember that we have to remove the main later (see method
+	   [vfile]) *)
 	if vi.vorig_name = Kernel.MainFunction.get () 
 	&& not (Options.Check.get ()) 
 	then main_fct <- Some fundec
@@ -492,6 +494,7 @@ you must call function `%s' by yourself"
 	  (* TODO: must clear the local block anytime (?) *)
 	  mk_block post_block, env
       in
+      (*      if TODO HERE *)
       function_env := env;
       Options.debug ~level:3
 	"@[new stmt (from sid %d):@ %a@]" stmt.sid Cil.d_stmt new_stmt;

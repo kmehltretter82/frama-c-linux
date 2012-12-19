@@ -10,22 +10,41 @@
 [value] Initial state computed
 [value] Values of globals at initialization
         __fc_random_counter ∈ {0}
-        __fc_rand_max ∈ {2147483647}
+        __fc_rand_max ∈ {32767}
         __fc_heap_status ∈ [--..--]
         __fc_stdout ∈ {{ NULL ; &S___fc_stdout }}
-        S___fc_stdout[0].__fc_stdio_fpos ∈ [--..--]
-                     [0].__fc_stdio_buffer ∈
-                     {{ NULL ; &S___fc_stdio_buffer_0_S___fc_stdout }}
-                     [0]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
-                     [0].[bits 80 to 95] ∈ UNINITIALIZED
-                     {[0].__fc_stdio_id; [1].__fc_stdio_fpos; } ∈ [--..--]
-                     [1].__fc_stdio_buffer ∈
-                     {{ NULL ; &S___fc_stdio_buffer_1_S___fc_stdout }}
-                     [1]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
-                     [1].[bits 80 to 95] ∈ UNINITIALIZED
-                     [1].__fc_stdio_id ∈ [--..--]
-        S___fc_stdio_buffer_0_S___fc_stdout[0..1] ∈ [--..--]
-        S___fc_stdio_buffer_1_S___fc_stdout[0..1] ∈ [--..--]
+        S___fc_stdout[0]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
+                     [--..--]
+                     [0].__fc_inode ∈ {{ NULL ; &S___fc_inode_0_S___fc_stdout }}
+                     [1]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
+                     [--..--]
+                     [1].__fc_inode ∈ {{ NULL ; &S___fc_inode_1_S___fc_stdout }}
+        S___fc_inode_0_S___fc_stdout[0]{.st_dev; .st_ino; .st_mode; .st_nlink; .st_uid; .st_gid; .st_rdev; .st_size; .st_atime; .st_mtime; .st_ctime; .st_blksize; .st_blocks; } ∈
+                                    [--..--]
+                                    [0].__fc_real_data ∈
+                                    {{ NULL ;
+                                       &S___fc_real_data_0_S___fc_inode_0_S___fc_stdout }}
+                                    {[0].__fc_real_data_max_size; [1]{.st_dev; .st_ino; .st_mode; .st_nlink; .st_uid; .st_gid; .st_rdev; .st_size; .st_atime; .st_mtime; .st_ctime; .st_blksize; .st_blocks; }; } ∈
+                                    [--..--]
+                                    [1].__fc_real_data ∈
+                                    {{ NULL ;
+                                       &S___fc_real_data_1_S___fc_inode_0_S___fc_stdout }}
+                                    [1].__fc_real_data_max_size ∈ [--..--]
+        S___fc_real_data_0_S___fc_inode_0_S___fc_stdout[0..1] ∈ [--..--]
+        S___fc_real_data_1_S___fc_inode_0_S___fc_stdout[0..1] ∈ [--..--]
+        S___fc_inode_1_S___fc_stdout[0]{.st_dev; .st_ino; .st_mode; .st_nlink; .st_uid; .st_gid; .st_rdev; .st_size; .st_atime; .st_mtime; .st_ctime; .st_blksize; .st_blocks; } ∈
+                                    [--..--]
+                                    [0].__fc_real_data ∈
+                                    {{ NULL ;
+                                       &S___fc_real_data_0_S___fc_inode_1_S___fc_stdout }}
+                                    {[0].__fc_real_data_max_size; [1]{.st_dev; .st_ino; .st_mode; .st_nlink; .st_uid; .st_gid; .st_rdev; .st_size; .st_atime; .st_mtime; .st_ctime; .st_blksize; .st_blocks; }; } ∈
+                                    [--..--]
+                                    [1].__fc_real_data ∈
+                                    {{ NULL ;
+                                       &S___fc_real_data_1_S___fc_inode_1_S___fc_stdout }}
+                                    [1].__fc_real_data_max_size ∈ [--..--]
+        S___fc_real_data_0_S___fc_inode_1_S___fc_stdout[0..1] ∈ [--..--]
+        S___fc_real_data_1_S___fc_inode_1_S___fc_stdout[0..1] ∈ [--..--]
 [value] using specification for function __store_block
 [value] using specification for function __full_init
 tests/e-acsl-runtime/localvar.c:20:[value] Assertion got status valid.
@@ -43,31 +62,21 @@ FRAMAC_SHARE/libc/stdlib.h:180:[value] Function exit: postcondition got status i
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function e_acsl_assert:
-          S___fc_stdout[0].__fc_stdio_fpos ∈ [--..--]
-                       [0].__fc_stdio_buffer ∈
-                       {{ NULL ; &S___fc_stdio_buffer_0_S___fc_stdout }}
-                       [0]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
-                       [0].[bits 80 to 95] ∈ UNINITIALIZED
-                       {[0].__fc_stdio_id; [1].__fc_stdio_fpos; } ∈ [--..--]
-                       [1].__fc_stdio_buffer ∈
-                       {{ NULL ; &S___fc_stdio_buffer_1_S___fc_stdout }}
-                       [1]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
-                       [1].[bits 80 to 95] ∈ UNINITIALIZED
-                       [1].__fc_stdio_id ∈ [--..--]
+          S___fc_stdout[0]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
+                       [--..--]
+                       [0].__fc_inode ∈ {{ NULL ; &S___fc_inode_0_S___fc_stdout }}
+                       [1]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
+                       [--..--]
+                       [1].__fc_inode ∈ {{ NULL ; &S___fc_inode_1_S___fc_stdout }}
 [value] Values at end of function add:
           __fc_heap_status ∈ [--..--]
           new ∈ {{ &Frama_C_alloc ; &Frama_C_alloc_0 }}
-          S___fc_stdout[0].__fc_stdio_fpos ∈ [--..--]
-                       [0].__fc_stdio_buffer ∈
-                       {{ NULL ; &S___fc_stdio_buffer_0_S___fc_stdout }}
-                       [0]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
-                       [0].[bits 80 to 95] ∈ UNINITIALIZED
-                       {[0].__fc_stdio_id; [1].__fc_stdio_fpos; } ∈ [--..--]
-                       [1].__fc_stdio_buffer ∈
-                       {{ NULL ; &S___fc_stdio_buffer_1_S___fc_stdout }}
-                       [1]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
-                       [1].[bits 80 to 95] ∈ UNINITIALIZED
-                       [1].__fc_stdio_id ∈ [--..--]
+          S___fc_stdout[0]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
+                       [--..--]
+                       [0].__fc_inode ∈ {{ NULL ; &S___fc_inode_0_S___fc_stdout }}
+                       [1]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
+                       [--..--]
+                       [1].__fc_inode ∈ {{ NULL ; &S___fc_inode_1_S___fc_stdout }}
           Frama_C_alloc[bits 0 to 31] ∈ {4}
                        [4..7] ∈ {0}
           Frama_C_alloc_0[bits 0 to 31] ∈ {7} or UNINITIALIZED
@@ -76,17 +85,12 @@ FRAMAC_SHARE/libc/stdlib.h:180:[value] Function exit: postcondition got status i
           __fc_heap_status ∈ [--..--]
           l ∈ {{ &Frama_C_alloc_0 }}
           __retres ∈ {0}
-          S___fc_stdout[0].__fc_stdio_fpos ∈ [--..--]
-                       [0].__fc_stdio_buffer ∈
-                       {{ NULL ; &S___fc_stdio_buffer_0_S___fc_stdout }}
-                       [0]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
-                       [0].[bits 80 to 95] ∈ UNINITIALIZED
-                       {[0].__fc_stdio_id; [1].__fc_stdio_fpos; } ∈ [--..--]
-                       [1].__fc_stdio_buffer ∈
-                       {{ NULL ; &S___fc_stdio_buffer_1_S___fc_stdout }}
-                       [1]{.__fc_stdio_error; .__fc_stdio_eof; } ∈ [--..--]
-                       [1].[bits 80 to 95] ∈ UNINITIALIZED
-                       [1].__fc_stdio_id ∈ [--..--]
+          S___fc_stdout[0]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
+                       [--..--]
+                       [0].__fc_inode ∈ {{ NULL ; &S___fc_inode_0_S___fc_stdout }}
+                       [1]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
+                       [--..--]
+                       [1].__fc_inode ∈ {{ NULL ; &S___fc_inode_1_S___fc_stdout }}
           Frama_C_alloc[bits 0 to 31] ∈ {4}
                        [4..7] ∈ {0}
           Frama_C_alloc_0[bits 0 to 31] ∈ {7}
