@@ -23,6 +23,13 @@
 open Cil_types
 open Cil_datatype
 
+let get_rte_by_stmt =
+  Dynamic.get
+    ~plugin:"RteGen"
+    "stmt_annotations"
+    (Datatype.func2 Kernel_function.ty Stmt.ty 
+       (let module L = Datatype.List(Code_annotation) in L.ty))
+
 (* move all labels of [stmt] onto [new_stmt] *)
 let move_labels env stmt new_stmt =
   let labels = stmt.labels in
@@ -242,31 +249,34 @@ you must call function `%s' by yourself"
   | GVarDecl(_, vi, _) | GVar(vi, _, _) | GFun({ svar = vi }, _) 
       when Misc.is_library_loc vi.vdecl ->
     assert (not vi.vghost);
-    if generate then
-      Cil.JustCopyPost
-	(fun l -> 
-	  Misc.register_library_function (Cil.get_varinfo self#behavior vi);
-	  l)
-    else begin
-      Misc.register_library_function vi; 
-      Cil.SkipChildren
-    end
+	if generate then
+	  Cil.JustCopyPost
+	    (fun l -> 
+	      Misc.register_library_function (Cil.get_varinfo self#behavior vi);
+	      l)
+	else begin
+	  Misc.register_library_function vi; 
+	  Cil.SkipChildren
+	end
   | g when Misc.is_library_loc (Global.loc g) ->
     if generate then Cil.JustCopy else Cil.SkipChildren
   | g ->
-    (* TODO: handle ghost declaration. Waiting for fixing bug #1328 *)
-    let do_it = function
+    let do_it g =
+      match g with
       | GVar(vi, i, _) ->
+	vi.vghost <- false;
 	(* remove initializers on need *)
-	if Pre_analysis.old_must_model_vi self#behavior vi then
-	  (try
-	     let old_vi = Cil.get_original_varinfo self#behavior vi in
-	     match Varinfo.Hashtbl.find global_vars old_vi with
-	     | None -> ()
-	     | Some _ -> i.init <- None;
-	   with Not_found ->
-	     assert false)
+	if Pre_analysis.old_must_model_vi self#behavior vi then begin
+	  try
+	    let old_vi = Cil.get_original_varinfo self#behavior vi in
+	    match Varinfo.Hashtbl.find global_vars old_vi with
+	    | None -> ()
+	    | Some _ -> i.init <- None
+	  with Not_found ->
+	    assert false
+	end	
       | GFun({ svar = vi } as fundec, _) ->
+	vi.vghost <- false;
 	(* remember that we have to remove the main later (see method
 	   [vfile]) *)
 	if vi.vorig_name = Kernel.MainFunction.get () 
@@ -321,8 +331,10 @@ you must call function `%s' by yourself"
       body.blocals
       vars
 
-  method vfunc _f =
-    Cil.DoChildrenPost (fun f -> self#add_generated_variables_in_function f; f)
+  method vfunc f =
+    List.iter (fun vi -> vi.vghost <- false) f.slocals;
+    Cil.DoChildrenPost 
+      (fun f -> self#add_generated_variables_in_function f; f)
 
   method private is_return old_kf stmt = 
     let old_ret = 
@@ -415,6 +427,21 @@ you must call function `%s' by yourself"
 	 been modified from the time where pre actions have been executed.
 	 Use [function_env] to get it back. *)
       let env = !function_env in
+      let env =
+	if stmt.ghost then begin
+	  stmt.ghost <- false;
+	  (* translate potential RTEs of ghost code *)
+	  let rtes = get_rte_by_stmt kf stmt in
+	  List.fold_left
+	    (fun env a -> match a.annot_content with
+	    | AAssert(_, p) ->
+	      Translate.translate_named_predicate kf ~rte:false env p
+	    | _ -> assert false)
+	    env
+	    rtes
+	end else
+	  env
+      in
       let mk_block b = 
 	let mk b = match b.bstmts with
 	  | [] -> 
@@ -494,7 +521,6 @@ you must call function `%s' by yourself"
 	  (* TODO: must clear the local block anytime (?) *)
 	  mk_block post_block, env
       in
-      (*      if TODO HERE *)
       function_env := env;
       Options.debug ~level:3
 	"@[new stmt (from sid %d):@ %a@]" stmt.sid Cil.d_stmt new_stmt;
@@ -528,7 +554,6 @@ you must call function `%s' by yourself"
       match new_blk.blocals with
       | [] -> new_blk
       | _ :: _ ->
-	(* bstmts <- [store_locals] @ bstmts @ [delete_locals] *)
 	let kf = Extlib.the self#current_kf in
 	let add_locals stmts =
 	  List.fold_left
@@ -558,9 +583,11 @@ you must call function `%s' by yourself"
 	insert_in_innermost_last_block new_blk (List.rev new_blk.bstmts);
 	new_blk.bstmts <-
 	  List.fold_left
-	  (fun acc v -> 
-	    if Pre_analysis.must_model_vi v 
-	    then Misc.mk_store_stmt (Cil.get_varinfo self#behavior v) :: acc
+	  (fun acc vi -> 
+	    if Pre_analysis.must_model_vi vi
+	    then 
+	      let vi = Cil.get_varinfo self#behavior vi in
+	      Misc.mk_store_stmt vi :: acc
 	    else acc)
 	  new_blk.bstmts
 	  blk.blocals;

@@ -32,6 +32,8 @@ val translate_pre_code_annotation:
   kernel_function -> Env.t -> code_annotation -> Env.t
 val translate_post_code_annotation: 
   kernel_function -> Env.t -> code_annotation -> Env.t
+val translate_named_predicate: 
+  kernel_function -> ?rte:bool -> Env.t -> predicate named -> Env.t
 
 val predicate_to_exp: kernel_function -> predicate named -> exp
 

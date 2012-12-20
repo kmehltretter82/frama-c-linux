@@ -35,6 +35,13 @@ let init_mpz () =
   end in
   Cil.visitCilFileSameGlobals set_mpzt (Ast.get ())
 
+let get_rte_by_stmt =
+  Dynamic.get
+    ~plugin:"RteGen"
+    "stmt_annotations"
+    (Datatype.func2 Kernel_function.ty Stmt.ty 
+       (let module L = Datatype.List(Code_annotation) in L.ty))
+
 module Env: sig
   val default_varinfos: Varinfo.Set.t option -> Varinfo.Set.t
   val apply: (kernel_function -> 'a) -> kernel_function -> 'a
@@ -272,6 +279,14 @@ module rec Transfer
 	let state = 
 	  Annotations.fold_code_annot
 	    (fun _ -> register_code_annot kf) stmt state
+	in
+	let state =
+	  if stmt.ghost then
+	    let rtes = get_rte_by_stmt kf stmt in
+	    List.fold_left
+	      (fun state a -> register_code_annot kf a state) state rtes
+	  else 
+	    state
 	in
 	Some state)
 

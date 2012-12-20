@@ -15,8 +15,9 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
--* E-ACSL       [2012/12/13] Fix bug with complex term left-values
--  E-ACSL       [2012/11/27] Support of \valid_read
+-  E-ACSL       [2012/12/20] Support of ghost variables and statements.
+-* E-ACSL       [2012/12/13] Fix bug with complex term left-values.
+-  E-ACSL       [2012/11/27] Support of \valid_read.
 -  E-ACSL       [2012/11/27] Prevent runtime errors in annotations.
 -  E-ACSL       [2012/11/19] Support of floats in annotations. Approximate
 	        reals by floats.
