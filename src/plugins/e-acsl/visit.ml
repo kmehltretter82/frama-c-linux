@@ -316,8 +316,6 @@ you must call function `%s' by yourself"
 	(Annotations.funspec old_kf);
       Cil.DoChildren
     with Not_found ->
-      (* function without code *)
-      (* TODO: do better *)
       Cil.DoChildren
 
   method private add_generated_variables_in_function f =

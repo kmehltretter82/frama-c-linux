@@ -35,6 +35,11 @@ let init_mpz () =
   end in
   Cil.visitCilFileSameGlobals set_mpzt (Ast.get ())
 
+(* ********************************************************************** *)
+(* Backward dataflow analysis to compute a sound over-approximation of what
+   left-values must be tracked by the memory model library *)
+(* ********************************************************************** *)
+
 let get_rte_by_stmt =
   Dynamic.get
     ~plugin:"RteGen"
