@@ -502,7 +502,8 @@ let must_model_vi ?kf ?stmt vi =
   | Some _, None ->
     assert false
   | Some stmt, Some kf  ->
-    assert (Env.is_consolidated ());
+    if not (Env.is_consolidated ()) then 
+      ignore (consolidated_must_model_vi ~kf vi);
     let tbl = 
       try Env.find kf 
       with Not_found -> 

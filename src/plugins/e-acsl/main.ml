@@ -43,6 +43,67 @@ let check =
     (Datatype.func Datatype.unit Datatype.bool)
     check
 
+module Extended_ast =
+  State_builder.Option_ref
+    (Project.Datatype)
+    (struct
+      let name = "E-ACSL AST is extended"
+      let dependencies = []
+     end)
+
+let unmemoized_extend_ast () =
+  let extend () =
+    Kernel.CppExtraArgs.add
+      (Pretty_utils.sfprintf " -I%s/libc" Config.datadir);
+    Kernel.Keep_unused_specified_functions.off ();
+    let register s =
+      File.pre_register
+	(File.NeedCPP 
+	   (s, 
+	    File.get_preprocessor_command () 
+	    ^ Pretty_utils.sfprintf " -I%s" 
+	      (Options.Share.dir ~error:true ())))
+    in
+    List.iter register (Misc.library_files ())
+  in
+  if Ast.is_computed () then begin
+    (* do not modify the existing project: work on a copy.
+       Must also extend the current AST with the E-ACSL's library files. *)
+    let name = Project.get_name (Project.current ()) in
+    let tmpfile = 
+      Extlib.temp_file_cleanup_at_exit ("e_acsl_" ^ name) ".i" in
+    let cout = open_out tmpfile in
+    let fmt = Format.formatter_of_out_channel cout in
+    File.pretty_ast ~fmt ();
+    let selection = 
+      State_selection.diff
+	State_selection.full
+	(State_selection.with_dependencies Ast.self)
+    in
+    let prj =
+      Project.create_by_copy
+	~selection
+	(Pretty_utils.sfprintf "%s for E-ACSL" name)
+    in
+    Project.on prj
+      (fun () ->
+	Kernel.Files.set [ tmpfile ];
+	extend ())
+      ();
+    prj
+  end else begin
+    extend ();
+    Project.current ()
+  end
+
+let extend_ast () = Extended_ast.memo unmemoized_extend_ast
+
+let apply_on_e_acsl_ast f x =
+  let tmp_prj = extend_ast () in
+  let res = Project.on tmp_prj f x in
+  if tmp_prj != Project.current () then Project.remove ~project:tmp_prj ();
+  res
+
 module Resulting_projects =
   State_builder.Hashtbl
     (Datatype.String.Hashtbl)
@@ -58,15 +119,19 @@ let () = Env.global_state := Resulting_projects.self
 let generate_code =
   Resulting_projects.memo
     (fun name ->
-      Pre_analysis.reset ();
-      let visit prj = Visit.do_visit ~prj true in
-      let prj = File.create_project_from_visitor name visit in
-      Resulting_projects.mark_as_computed ();
-      prj)
+      apply_on_e_acsl_ast
+	(fun () ->
+	  Pre_analysis.init_mpz ();
+	  Pre_analysis.reset ();
+	  let visit prj = Visit.do_visit ~prj true in
+	  let prj = File.create_project_from_visitor name visit in
+	  Resulting_projects.mark_as_computed ();
+	  prj)
+	())
 
 let generate_code =
   Dynamic.register
-    ~plugin:"e-acsl"
+    ~plugin:"E_ACSL"
     ~journalize:true
     "generate_code"
     (Datatype.func Datatype.string Project.ty)
@@ -74,75 +139,28 @@ let generate_code =
 
 let predicate_to_exp =
   Dynamic.register
-    ~plugin:"e-acsl"
+    ~plugin:"E_ACSL"
     ~journalize:false
     "predicate_to_exp"
     (Datatype.func2
        Kernel_function.ty Cil_datatype.Predicate_named.ty Cil_datatype.Exp.ty)
     Translate.predicate_to_exp
 
-let analyzed_project = ref None
+let add_e_acsl_library _files = 
+  if Options.must_visit () then ignore (extend_ast ())
 
-let add_e_acsl_library _files =
-  analyzed_project := None;
-  if Options.must_visit () && not (Resulting_projects.is_computed ()) then begin
-    let extend () =
-      Kernel.CppExtraArgs.add
-	(Pretty_utils.sfprintf " -I%s/libc" Config.datadir);
-      Kernel.Keep_unused_specified_functions.off ();
-      let register s =
-	File.pre_register
-	  (File.NeedCPP 
-	     (s, 
-	      File.get_preprocessor_command () 
-	      ^ Pretty_utils.sfprintf " -I%s" 
-		(Options.Share.dir ~error:true ())))
-      in
-      List.iter register (Misc.library_files ())
-    in
-    if Ast.is_computed () then begin
-      (* do not modify the existing project: work on a copy.
-	 Must also extend the current AST with the E-ACSL's library files. *)
-      let name = Project.get_name (Project.current ()) in
-      let tmpfile = 
-	Extlib.temp_file_cleanup_at_exit ("e_acsl_" ^ name) ".i" in
-      let cout = open_out tmpfile in
-      let fmt = Format.formatter_of_out_channel cout in
-      File.pretty_ast ~fmt ();
-      let selection = 
-	State_selection.diff
-	  State_selection.full
-	  (State_selection.with_dependencies Ast.self)
-      in
-      let prj =
-	Project.create_by_copy
-	  ~selection
-	  (Pretty_utils.sfprintf "%s for E-ACSL" name)
-      in
-      Project.on prj
-	(fun () ->
-	  Kernel.Files.set [ tmpfile ];
-	  extend ())
-	();
-      analyzed_project := Some prj
-    end else
-      extend ()
-  end
- 
 let () = Cmdline.run_after_configuring_stage add_e_acsl_library
 
-let analyze () =
-  if Options.must_visit () then Pre_analysis.init_mpz ();
+let main () =
   if Options.Run.get () then
     ignore (generate_code (Options.Project_name.get ()))
   else
-    if Options.Check.get () then ignore (check ())
-
-let main () = match !analyzed_project with
-  | None -> analyze ()
-  | Some project -> 
-    Project.on project analyze ();
-    Project.remove ~project ()
+    if Options.Check.get () then
+      apply_on_e_acsl_ast
+	(fun () -> 
+	  Pre_analysis.init_mpz ();
+	  ignore (check ()))
+	()
 
 let () = Db.Main.extend main
 
