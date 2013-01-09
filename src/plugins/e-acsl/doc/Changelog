@@ -15,6 +15,10 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
+-* E-ACSL       [2013/01/09] Fix bug when translating a postcondition of a
+	        function where the init state is the same than the final
+	        state (bts #!1300).
+-  E-ACSL       [2013/01/09] Support of specified function without code.
 -  E-ACSL       [2012/12/20] Support of ghost variables and statements.
 -* E-ACSL       [2012/12/13] Fix bug with complex term left-values.
 -  E-ACSL       [2012/11/27] Support of \valid_read.

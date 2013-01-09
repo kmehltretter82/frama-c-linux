@@ -51,6 +51,7 @@ struct list {
 /*@
 model __mpz_struct { ℤ n };
 */
+void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line);
 int __fc_random_counter __attribute__((__unused__));
 unsigned long const __fc_rand_max = (unsigned long)32767;
 extern int __fc_heap_status;
@@ -65,10 +66,28 @@ axiomatic
 /*@ ensures \false;
     assigns \nothing; */
 extern void exit(int status);
+/*@ ensures \false;
+    assigns \nothing; */
+void __e_acsl_exit(int status)
+{
+  exit(status);
+  e_acsl_assert(0,(char *)"Postcondition",(char *)"\\false",180);
+  return;
+}
+
 extern FILE *__fc_stdout;
 /*@ assigns *__fc_stdout;
     assigns *__fc_stdout \from *(format+(..)); */
 extern int printf(char const *format , ...);
+/*@ assigns *__fc_stdout;
+    assigns *__fc_stdout \from *(format+(..)); */
+int __e_acsl_printf(char const *format , ...)
+{
+  int __retres;
+  __retres = printf(format);
+  return __retres;
+}
+
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
@@ -109,6 +128,34 @@ extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
  */
 struct list *f(struct list *l)
 {
+  struct list *__retres;
+  __store_block((void *)(& l),4U);
+  __full_init((void *)(& l));
+  if (l == (void *)0) {
+    __retres = l;
+    goto return_label;
+  }
+  if (l->next == (void *)0) {
+    __retres = l;
+    goto return_label;
+  }
+  __retres = (struct list *)((void *)0);
+  return_label: /* internal */
+    __delete_block((void *)(& l));
+    return __retres;
+}
+
+/*@ behavior B1:
+      assumes l ≡ \null;
+      ensures \result ≡ \old(l);
+    
+    behavior B2:
+      assumes ¬\valid(l);
+      assumes ¬\valid(l->next);
+      ensures \result ≡ \old(l);
+ */
+struct list *__e_acsl_f(struct list *l)
+{
   struct list *__e_acsl_at_4;
   int __e_acsl_at_3;
   struct list *__e_acsl_at_2;
@@ -145,37 +192,28 @@ struct list *f(struct list *l)
   __store_block((void *)(& __e_acsl_at),4U);
   __full_init((void *)(& __e_acsl_at));
   __e_acsl_at = l == (void *)0;
-  if (l == (void *)0) {
-    __retres = l;
-    goto return_label;
+  __retres = f(l);
+  {
+    int __e_acsl_implies;
+    int __e_acsl_implies_2;
+    if (! __e_acsl_at) __e_acsl_implies = 1;
+    else __e_acsl_implies = __retres == __e_acsl_at_2;
+    e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",
+                  (char *)"\\old(l == \\null) ==> \\result == \\old(l)",18);
+    if (! __e_acsl_at_3) __e_acsl_implies_2 = 1;
+    else __e_acsl_implies_2 = __retres == __e_acsl_at_4;
+    e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",
+                  (char *)"\\old(!\\valid(l) && !\\valid(l->next)) ==> \\result == \\old(l)",
+                  22);
+    __delete_block((void *)(& l));
+    return __retres;
   }
-  if (l->next == (void *)0) {
-    __retres = l;
-    goto return_label;
-  }
-  __retres = (struct list *)((void *)0);
-  return_label: /* internal */
-    {
-      int __e_acsl_implies;
-      int __e_acsl_implies_2;
-      if (! __e_acsl_at) __e_acsl_implies = 1;
-      else __e_acsl_implies = __retres == __e_acsl_at_2;
-      e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",
-                    (char *)"\\old(l == \\null) ==> \\result == \\old(l)",18);
-      if (! __e_acsl_at_3) __e_acsl_implies_2 = 1;
-      else __e_acsl_implies_2 = __retres == __e_acsl_at_4;
-      e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",
-                    (char *)"\\old(!\\valid(l) && !\\valid(l->next)) ==> \\result == \\old(l)",
-                    22);
-      __delete_block((void *)(& l));
-      return __retres;
-    }
 }
 
 int main(void)
 {
   int __retres;
-  f((struct list *)((void *)0));
+  __e_acsl_f((struct list *)((void *)0));
   __retres = 0;
   __clean();
   return __retres;

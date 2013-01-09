@@ -105,6 +105,15 @@ val stmt_of_label: t -> logic_label -> stmt
 val annotation_kind: t -> Misc.annotation_kind
 val set_annotation_kind: t -> Misc.annotation_kind -> t
 
+(* ************************************************************************** *)
+(** {2 Context for error handling} *)
+(* ************************************************************************** *)
+
+module Context: sig
+  val save: t -> unit
+  val restore: t -> t
+end
+
 (*
 Local Variables:
 compile-command: "make"

@@ -82,6 +82,7 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_sub(__mpz_struct * /*[1]*/ z
 /*@ requires \valid(z);
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) unsigned long __gmpz_get_ui(__mpz_struct const * /*[1]*/ z);
+void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line);
 int __fc_random_counter __attribute__((__unused__));
 unsigned long const __fc_rand_max = (unsigned long)32767;
 extern int __fc_heap_status;
@@ -96,10 +97,28 @@ axiomatic
 /*@ ensures \false;
     assigns \nothing; */
 extern void exit(int status);
+/*@ ensures \false;
+    assigns \nothing; */
+void __e_acsl_exit(int status)
+{
+  exit(status);
+  e_acsl_assert(0,(char *)"Postcondition",(char *)"\\false",180);
+  return;
+}
+
 extern FILE *__fc_stdout;
 /*@ assigns *__fc_stdout;
     assigns *__fc_stdout \from *(format+(..)); */
 extern int printf(char const *format , ...);
+/*@ assigns *__fc_stdout;
+    assigns *__fc_stdout \from *(format+(..)); */
+int __e_acsl_printf(char const *format , ...)
+{
+  int __retres;
+  __retres = printf(format);
+  return __retres;
+}
+
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
@@ -116,11 +135,19 @@ extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 /*@ ensures \result ≡ (int)(\old(x)-\old(x)); */
 int f(int x)
 {
+  x = 0;
+  return x;
+}
+
+/*@ ensures \result ≡ (int)(\old(x)-\old(x)); */
+int __e_acsl_f(int x)
+{
   int __e_acsl_at_2;
   int __e_acsl_at;
+  int __retres;
   __e_acsl_at_2 = x;
   __e_acsl_at = x;
-  x = 0;
+  __retres = f(x);
   {
     mpz_t __e_acsl_result;
     mpz_t __e_acsl;
@@ -128,7 +155,7 @@ int f(int x)
     unsigned long __e_acsl_2;
     mpz_t __e_acsl_cast;
     int __e_acsl_eq;
-    __gmpz_init_set_si(__e_acsl_result,(long)x);
+    __gmpz_init_set_si(__e_acsl_result,(long)__retres);
     __gmpz_init_set_si(__e_acsl,(long)__e_acsl_at);
     __gmpz_init(__e_acsl_sub);
     __gmpz_sub(__e_acsl_sub,(__mpz_struct const *)(__e_acsl),
@@ -143,7 +170,7 @@ int f(int x)
     __gmpz_clear(__e_acsl);
     __gmpz_clear(__e_acsl_sub);
     __gmpz_clear(__e_acsl_cast);
-    return x;
+    return __retres;
   }
 }
 
@@ -151,11 +178,19 @@ int Y = 1;
 /*@ ensures \result ≡ Y; */
 int g(int x)
 {
+  return x;
+}
+
+/*@ ensures \result ≡ Y; */
+int __e_acsl_g(int x)
+{
+  int __retres;
+  __retres = g(x);
   {
     mpz_t __e_acsl_result;
     mpz_t __e_acsl_Y;
     int __e_acsl_eq;
-    __gmpz_init_set_si(__e_acsl_result,(long)x);
+    __gmpz_init_set_si(__e_acsl_result,(long)__retres);
     __gmpz_init_set_si(__e_acsl_Y,(long)Y);
     __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl_result),
                              (__mpz_struct const *)(__e_acsl_Y));
@@ -163,7 +198,7 @@ int g(int x)
                   (char *)"\\result == Y",18);
     __gmpz_clear(__e_acsl_result);
     __gmpz_clear(__e_acsl_Y);
-    return x;
+    return __retres;
   }
 }
 
@@ -172,6 +207,14 @@ int h(void)
 {
   int __retres;
   __retres = 0;
+  return __retres;
+}
+
+/*@ ensures \result ≡ 0; */
+int __e_acsl_h(void)
+{
+  int __retres;
+  __retres = h();
   {
     mpz_t __e_acsl_result;
     mpz_t __e_acsl;
@@ -191,9 +234,9 @@ int h(void)
 int main(void)
 {
   int __retres;
-  f(1);
-  g(Y);
-  h();
+  __e_acsl_f(1);
+  __e_acsl_g(Y);
+  __e_acsl_h();
   __retres = 0;
   __clean();
   return __retres;

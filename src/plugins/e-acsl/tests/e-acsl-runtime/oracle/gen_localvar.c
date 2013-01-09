@@ -51,6 +51,7 @@ struct list {
 /*@
 model __mpz_struct { ℤ n };
 */
+void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line);
 int __fc_random_counter __attribute__((__unused__));
 unsigned long const __fc_rand_max = (unsigned long)32767;
 extern int __fc_heap_status;
@@ -84,13 +85,59 @@ axiomatic
     disjoint behaviors no_allocation, allocation;
  */
 extern void *__malloc(size_t size);
+/*@ assigns __fc_heap_status;
+    assigns __fc_heap_status \from size, __fc_heap_status;
+    assigns \result \from size, __fc_heap_status;
+    allocates \result;
+    
+    behavior allocation:
+      assumes is_allocable(size);
+      ensures \fresh{Old, Here}(\result,\old(size));
+      assigns __fc_heap_status;
+      assigns __fc_heap_status \from size, __fc_heap_status;
+      assigns \result \from size, __fc_heap_status;
+    
+    behavior no_allocation:
+      assumes ¬is_allocable(size);
+      ensures \result ≡ \null;
+      assigns \result \from \nothing;
+      allocates \nothing;
+    
+    complete behaviors no_allocation, allocation;
+    disjoint behaviors no_allocation, allocation;
+ */
+void *__e_acsl_malloc(size_t size)
+{
+  void *__retres;
+  __retres = __malloc(size);
+  return __retres;
+}
+
 /*@ ensures \false;
     assigns \nothing; */
 extern void exit(int status);
+/*@ ensures \false;
+    assigns \nothing; */
+void __e_acsl_exit(int status)
+{
+  exit(status);
+  e_acsl_assert(0,(char *)"Postcondition",(char *)"\\false",180);
+  return;
+}
+
 extern FILE *__fc_stdout;
 /*@ assigns *__fc_stdout;
     assigns *__fc_stdout \from *(format+(..)); */
 extern int printf(char const *format , ...);
+/*@ assigns *__fc_stdout;
+    assigns *__fc_stdout \from *(format+(..)); */
+int __e_acsl_printf(char const *format , ...)
+{
+  int __retres;
+  __retres = printf(format);
+  return __retres;
+}
+
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
@@ -125,7 +172,7 @@ struct list *add(struct list *l, int i)
   struct list *new;
   __store_block((void *)(& new),4U);
   __full_init((void *)(& new));
-  new = (struct list *)__malloc(sizeof(struct list));
+  new = (struct list *)__e_acsl_malloc(sizeof(struct list));
   /*@ assert \valid(new); */
   {
     int __e_acsl_initialized;

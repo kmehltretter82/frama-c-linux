@@ -47,6 +47,7 @@ typedef struct __fc_FILE FILE;
 /*@
 model __mpz_struct { ℤ n };
 */
+void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line);
 int __fc_random_counter __attribute__((__unused__));
 unsigned long const __fc_rand_max = (unsigned long)32767;
 extern int __fc_heap_status;
@@ -61,10 +62,28 @@ axiomatic
 /*@ ensures \false;
     assigns \nothing; */
 extern void exit(int status);
+/*@ ensures \false;
+    assigns \nothing; */
+void __e_acsl_exit(int status)
+{
+  exit(status);
+  e_acsl_assert(0,(char *)"Postcondition",(char *)"\\false",180);
+  return;
+}
+
 extern FILE *__fc_stdout;
 /*@ assigns *__fc_stdout;
     assigns *__fc_stdout \from *(format+(..)); */
 extern int printf(char const *format , ...);
+/*@ assigns *__fc_stdout;
+    assigns *__fc_stdout \from *(format+(..)); */
+int __e_acsl_printf(char const *format , ...)
+{
+  int __retres;
+  __retres = printf(format);
+  return __retres;
+}
+
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
@@ -91,10 +110,43 @@ int A[10];
  */
 int search(int elt)
 {
+  int __retres;
+  int k;
+  k = 0;
+  /*@ loop invariant 0 ≤ k ∧ k ≤ 10;
+      loop invariant ∀ ℤ i; 0 ≤ i ∧ i < k ⇒ A[i] < elt;
+  */
+  while (k < 10) {
+    if (A[k] == elt) {
+      __retres = 1;
+      goto return_label;
+    }
+    else 
+      if (A[k] > elt) {
+        __retres = 0;
+        goto return_label;
+      }
+    k ++;
+  }
+  __retres = 0;
+  return_label: /* internal */ return __retres;
+}
+
+/*@ requires ∀ int i; 0 ≤ i ∧ i < 9 ⇒ A[i] ≤ A[i+1];
+    
+    behavior exists:
+      assumes ∃ int j; (0 ≤ j ∧ j < 10) ∧ A[j] ≡ elt;
+      ensures \result ≡ 1;
+    
+    behavior not_exists:
+      assumes ∀ int j; 0 ≤ j ∧ j < 10 ⇒ A[j] ≢ elt;
+      ensures \result ≡ 0;
+ */
+int __e_acsl_search(int elt)
+{
   int __e_acsl_at_2;
   int __e_acsl_at;
   int __retres;
-  int k;
   {
     int __e_acsl_forall;
     int __e_acsl_i;
@@ -163,40 +215,23 @@ int search(int elt)
       e_acsl_end_loop2: /* internal */ ;
       __e_acsl_at = __e_acsl_exists;
     }
-    k = 0;
+    __retres = search(elt);
   }
-  /*@ loop invariant 0 ≤ k ∧ k ≤ 10;
-      loop invariant ∀ ℤ i; 0 ≤ i ∧ i < k ⇒ A[i] < elt;
-  */
-  while (k < 10) {
-    if (A[k] == elt) {
-      __retres = 1;
-      goto return_label;
-    }
-    else 
-      if (A[k] > elt) {
-        __retres = 0;
-        goto return_label;
-      }
-    k ++;
+  {
+    int __e_acsl_implies;
+    int __e_acsl_implies_2;
+    if (! __e_acsl_at) __e_acsl_implies = 1;
+    else __e_acsl_implies = __retres == 1;
+    e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",
+                  (char *)"\\old(\\exists int j; (0 <= j && j < 10) && A[j] == elt) ==> \\result == 1",
+                  12);
+    if (! __e_acsl_at_2) __e_acsl_implies_2 = 1;
+    else __e_acsl_implies_2 = __retres == 0;
+    e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",
+                  (char *)"\\old(\\forall int j; 0 <= j && j < 10 ==> A[j] != elt) ==> \\result == 0",
+                  15);
+    return __retres;
   }
-  __retres = 0;
-  return_label: /* internal */
-    {
-      int __e_acsl_implies;
-      int __e_acsl_implies_2;
-      if (! __e_acsl_at) __e_acsl_implies = 1;
-      else __e_acsl_implies = __retres == 1;
-      e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",
-                    (char *)"\\old(\\exists int j; (0 <= j && j < 10) && A[j] == elt) ==> \\result == 1",
-                    12);
-      if (! __e_acsl_at_2) __e_acsl_implies_2 = 1;
-      else __e_acsl_implies_2 = __retres == 0;
-      e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",
-                    (char *)"\\old(\\forall int j; 0 <= j && j < 10 ==> A[j] != elt) ==> \\result == 0",
-                    15);
-      return __retres;
-    }
 }
 
 int main(void)
@@ -211,10 +246,10 @@ int main(void)
       i ++;
     }
   }
-  found = search(36);
+  found = __e_acsl_search(36);
   /*@ assert found ≡ 1; */
   e_acsl_assert(found == 1,(char *)"Assertion",(char *)"found == 1",33);
-  found = search(5);
+  found = __e_acsl_search(5);
   /*@ assert found ≡ 0; */
   e_acsl_assert(found == 0,(char *)"Assertion",(char *)"found == 0",36);
   __retres = 0;

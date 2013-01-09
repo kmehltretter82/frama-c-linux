@@ -64,6 +64,7 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_clear(__mpz_struct * /*[1]*/
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
                                                        __mpz_struct const * /*[1]*/ z2);
+void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line);
 int __fc_random_counter __attribute__((__unused__));
 unsigned long const __fc_rand_max = (unsigned long)32767;
 extern int __fc_heap_status;
@@ -78,10 +79,28 @@ axiomatic
 /*@ ensures \false;
     assigns \nothing; */
 extern void exit(int status);
+/*@ ensures \false;
+    assigns \nothing; */
+void __e_acsl_exit(int status)
+{
+  exit(status);
+  e_acsl_assert(0,(char *)"Postcondition",(char *)"\\false",180);
+  return;
+}
+
 extern FILE *__fc_stdout;
 /*@ assigns *__fc_stdout;
     assigns *__fc_stdout \from *(format+(..)); */
 extern int printf(char const *format , ...);
+/*@ assigns *__fc_stdout;
+    assigns *__fc_stdout \from *(format+(..)); */
+int __e_acsl_printf(char const *format , ...)
+{
+  int __retres;
+  __retres = printf(format);
+  return __retres;
+}
+
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
@@ -97,7 +116,7 @@ void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 int X = 0;
 /*@ ensures X ≡ 3; */
-int main(void)
+int __e_acsl_main(void)
 {
   int __retres;
   goto L1;
@@ -153,22 +172,29 @@ int main(void)
     goto return_label;
   }
   __retres = 0;
-  return_label: /* internal */
-    {
-      mpz_t __e_acsl_X_4;
-      mpz_t __e_acsl_4;
-      int __e_acsl_eq_4;
-      __gmpz_init_set_si(__e_acsl_X_4,(long)X);
-      __gmpz_init_set_si(__e_acsl_4,(long)3);
-      __e_acsl_eq_4 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_X_4),
-                                 (__mpz_struct const *)(__e_acsl_4));
-      e_acsl_assert(__e_acsl_eq_4 == 0,(char *)"Postcondition",
-                    (char *)"X == 3",9);
-      __gmpz_clear(__e_acsl_X_4);
-      __gmpz_clear(__e_acsl_4);
-      __clean();
-      return __retres;
-    }
+  return_label: /* internal */ return __retres;
+}
+
+/*@ ensures X ≡ 3; */
+int main(void)
+{
+  int __retres;
+  __retres = __e_acsl_main();
+  {
+    mpz_t __e_acsl_X;
+    mpz_t __e_acsl;
+    int __e_acsl_eq;
+    __gmpz_init_set_si(__e_acsl_X,(long)X);
+    __gmpz_init_set_si(__e_acsl,(long)3);
+    __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl_X),
+                             (__mpz_struct const *)(__e_acsl));
+    e_acsl_assert(__e_acsl_eq == 0,(char *)"Postcondition",(char *)"X == 3",
+                  9);
+    __gmpz_clear(__e_acsl_X);
+    __gmpz_clear(__e_acsl);
+    __clean();
+    return __retres;
+  }
 }
 
 

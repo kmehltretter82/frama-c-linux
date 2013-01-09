@@ -4,6 +4,8 @@
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel_api.h"
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_bittree.h"
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
+tests/e-acsl-runtime/ghost.i:13:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+                  Ignoring annotation.
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed
@@ -50,7 +52,7 @@
 [value] using specification for function __full_init
 [value] using specification for function __initialize
 [value] using specification for function __valid_read
-./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status unknown.
+./share/e-acsl/e_acsl.h:39:[value] Function e_acsl_assert: precondition got status unknown.
 [value] using specification for function printf
 [value] using specification for function exit
 FRAMAC_SHARE/libc/stdlib.h:180:[value] Function exit: postcondition got status invalid.
@@ -59,7 +61,7 @@ tests/e-acsl-runtime/ghost.i:17:[value] Assertion got status valid.
 [value] using specification for function __initialized
 ./share/e-acsl/memory_model/e_acsl_mmodel.h:85:[value] Function __initialized: postcondition got status unknown.
 ./share/e-acsl/memory_model/e_acsl_mmodel.h:86:[value] Function __initialized: postcondition got status valid.
-./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status valid.
+./share/e-acsl/e_acsl.h:39:[value] Function e_acsl_assert: precondition got status valid.
 [value] using specification for function __delete_block
 [value] using specification for function __clean
 [kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype

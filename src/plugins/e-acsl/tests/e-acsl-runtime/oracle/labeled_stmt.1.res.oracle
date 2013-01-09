@@ -4,6 +4,8 @@
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel_api.h"
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_bittree.h"
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
+tests/e-acsl-runtime/labeled_stmt.i:10:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+                  Ignoring annotation.
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed
@@ -53,15 +55,19 @@ tests/e-acsl-runtime/labeled_stmt.i:12:[value] Assertion got status valid.
 [value] using specification for function __gmpz_cmp
 ./share/e-acsl/e_acsl_gmp.h:115:[value] Function __gmpz_cmp: precondition got status valid.
 ./share/e-acsl/e_acsl_gmp.h:116:[value] Function __gmpz_cmp: precondition got status valid.
-./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status unknown.
+./share/e-acsl/e_acsl.h:39:[value] Function e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_clear
 ./share/e-acsl/e_acsl_gmp.h:105:[value] Function __gmpz_clear: precondition got status valid.
+tests/e-acsl-runtime/labeled_stmt.i:9:[value] Function __e_acsl_main: postcondition got status valid.
 [value] using specification for function __clean
 [kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
 tests/e-acsl-runtime/labeled_stmt.i:9:[value] Function main: postcondition got status valid.
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function e_acsl_assert:
+[value] Values at end of function __e_acsl_main:
+          X ∈ {3}
+          __retres ∈ {0}
 [value] Values at end of function main:
           X ∈ {3}
           __retres ∈ {0}

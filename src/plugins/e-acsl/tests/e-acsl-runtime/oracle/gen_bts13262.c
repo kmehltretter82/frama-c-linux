@@ -89,6 +89,7 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_add(__mpz_struct * /*[1]*/ z
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_tdiv_q(__mpz_struct * /*[1]*/ z1,
                                                            __mpz_struct const * /*[1]*/ z2,
                                                            __mpz_struct const * /*[1]*/ z3);
+void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line);
 int __fc_random_counter __attribute__((__unused__));
 unsigned long const __fc_rand_max = (unsigned long)32767;
 extern int __fc_heap_status;
@@ -103,10 +104,28 @@ axiomatic
 /*@ ensures \false;
     assigns \nothing; */
 extern void exit(int status);
+/*@ ensures \false;
+    assigns \nothing; */
+void __e_acsl_exit(int status)
+{
+  exit(status);
+  e_acsl_assert(0,(char *)"Postcondition",(char *)"\\false",180);
+  return;
+}
+
 extern FILE *__fc_stdout;
 /*@ assigns *__fc_stdout;
     assigns *__fc_stdout \from *(format+(..)); */
 extern int printf(char const *format , ...);
+/*@ assigns *__fc_stdout;
+    assigns *__fc_stdout \from *(format+(..)); */
+int __e_acsl_printf(char const *format , ...)
+{
+  int __retres;
+  __retres = printf(format);
+  return __retres;
+}
+
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
@@ -138,6 +157,26 @@ extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
  */
 void atp_NORMAL_computeAverageAccel(ArrayInt *Accel, int *AverageAccel)
 {
+  __store_block((void *)(& Accel),4U);
+  __full_init((void *)(& Accel));
+  __store_block((void *)(& AverageAccel),4U);
+  __full_init((void *)(& AverageAccel));
+  __initialize((void *)AverageAccel,sizeof(int));
+  *AverageAccel = (((((*Accel)[4] + (*Accel)[3]) + (*Accel)[2]) + (*Accel)[1]) + (*Accel)[0]) / 5;
+  __delete_block((void *)(& Accel));
+  __delete_block((void *)(& AverageAccel));
+  return;
+}
+
+/*@ ensures
+      *\old(AverageAccel) ≡
+      (((((*\old(Accel))[4]+(*\old(Accel))[3])+(*\old(Accel))[2])+(*\old(
+                                                                    Accel))[1])+(*
+        \old(Accel))[0])/5;
+ */
+void __e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
+                                             int *AverageAccel)
+{
   ArrayInt *__e_acsl_at_6;
   ArrayInt *__e_acsl_at_5;
   ArrayInt *__e_acsl_at_4;
@@ -148,7 +187,6 @@ void atp_NORMAL_computeAverageAccel(ArrayInt *Accel, int *AverageAccel)
   __full_init((void *)(& Accel));
   __store_block((void *)(& AverageAccel),4U);
   __full_init((void *)(& AverageAccel));
-  __initialize((void *)AverageAccel,sizeof(int));
   __store_block((void *)(& __e_acsl_at_6),4U);
   __full_init((void *)(& __e_acsl_at_6));
   __e_acsl_at_6 = Accel;
@@ -167,7 +205,7 @@ void atp_NORMAL_computeAverageAccel(ArrayInt *Accel, int *AverageAccel)
   __store_block((void *)(& __e_acsl_at),4U);
   __full_init((void *)(& __e_acsl_at));
   __e_acsl_at = AverageAccel;
-  *AverageAccel = (((((*Accel)[4] + (*Accel)[3]) + (*Accel)[2]) + (*Accel)[1]) + (*Accel)[0]) / 5;
+  atp_NORMAL_computeAverageAccel(Accel,AverageAccel);
   {
     mpz_t __e_acsl;
     mpz_t __e_acsl_2;
@@ -253,7 +291,7 @@ int main(void)
   Accel[3] = 4;
   __initialize((void *)(& Accel[4]),sizeof(int));
   Accel[4] = 5;
-  atp_NORMAL_computeAverageAccel(& Accel,& av);
+  __e_acsl_atp_NORMAL_computeAverageAccel(& Accel,& av);
   __retres = 0;
   __delete_block((void *)(& av));
   __delete_block((void *)(Accel));

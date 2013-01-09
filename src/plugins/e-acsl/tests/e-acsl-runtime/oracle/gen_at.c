@@ -47,6 +47,7 @@ typedef struct __fc_FILE FILE;
 /*@
 model __mpz_struct { ℤ n };
 */
+void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line);
 int __fc_random_counter __attribute__((__unused__));
 unsigned long const __fc_rand_max = (unsigned long)32767;
 extern int __fc_heap_status;
@@ -61,10 +62,28 @@ axiomatic
 /*@ ensures \false;
     assigns \nothing; */
 extern void exit(int status);
+/*@ ensures \false;
+    assigns \nothing; */
+void __e_acsl_exit(int status)
+{
+  exit(status);
+  e_acsl_assert(0,(char *)"Postcondition",(char *)"\\false",180);
+  return;
+}
+
 extern FILE *__fc_stdout;
 /*@ assigns *__fc_stdout;
     assigns *__fc_stdout \from *(format+(..)); */
 extern int printf(char const *format , ...);
+/*@ assigns *__fc_stdout;
+    assigns *__fc_stdout \from *(format+(..)); */
+int __e_acsl_printf(char const *format , ...)
+{
+  int __retres;
+  __retres = printf(format);
+  return __retres;
+}
+
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
@@ -92,7 +111,6 @@ int A = 0;
 /*@ ensures \at(A,Post) ≡ 3; */
 void f(void)
 {
-  int __e_acsl_at_6;
   int __e_acsl_at_5;
   int __e_acsl_at_4;
   int __e_acsl_at_3;
@@ -118,8 +136,16 @@ void f(void)
   e_acsl_assert(__e_acsl_at_5 == 0,(char *)"Assertion",
                 (char *)"\\at(\\at(A,Pre),F) == 0",16);
   A = 3;
-  __e_acsl_at_6 = A;
-  e_acsl_assert(__e_acsl_at_6 == 3,(char *)"Postcondition",
+  return;
+}
+
+/*@ ensures \at(A,Post) ≡ 3; */
+void __e_acsl_f(void)
+{
+  int __e_acsl_at;
+  f();
+  __e_acsl_at = A;
+  e_acsl_assert(__e_acsl_at == 3,(char *)"Postcondition",
                 (char *)"\\at(A,Post) == 3",9);
   return;
 }
@@ -173,6 +199,24 @@ void g(int *p, int *q)
     return;
 }
 
+/*@ ensures \result ≡ \old(x); */
+int h(int x)
+{
+  return x;
+}
+
+/*@ ensures \result ≡ \old(x); */
+int __e_acsl_h(int x)
+{
+  int __e_acsl_at;
+  int __retres;
+  __e_acsl_at = x;
+  __retres = h(x);
+  e_acsl_assert(__retres == __e_acsl_at,(char *)"Postcondition",
+                (char *)"\\result == \\old(x)",40);
+  return __retres;
+}
+
 int main(void)
 {
   int __e_acsl_at_3;
@@ -184,7 +228,7 @@ int main(void)
   __store_block((void *)(t),8U);
   __store_block((void *)(& x),4U);
   __full_init((void *)(& x));
-  x = 0;
+  x = __e_acsl_h(0);
   L:
     __store_block((void *)(& __e_acsl_at_3),4U);
     __full_init((void *)(& __e_acsl_at_3));
@@ -196,21 +240,21 @@ int main(void)
     __full_init((void *)(& __e_acsl_at));
     __e_acsl_at = x;
     /*@ assert x ≡ 0; */
-    e_acsl_assert(x == 0,(char *)"Assertion",(char *)"x == 0",45);
+    e_acsl_assert(x == 0,(char *)"Assertion",(char *)"x == 0",48);
     __full_init((void *)(& x));
     x = 1;
   __full_init((void *)(& x));
   x = 2;
-  f();
+  __e_acsl_f();
   /*@ assert \at(x,L) ≡ 0; */
   e_acsl_assert(__e_acsl_at == 0,(char *)"Assertion",
-                (char *)"\\at(x,L) == 0",50);
+                (char *)"\\at(x,L) == 0",53);
   /*@ assert \at(x+1,L) ≡ 1; */
   e_acsl_assert(__e_acsl_at_2 == (long long)1,(char *)"Assertion",
-                (char *)"\\at(x+1,L) == 1",51);
+                (char *)"\\at(x+1,L) == 1",54);
   /*@ assert \at(x,L)+1 ≡ 1; */
   e_acsl_assert((long long)__e_acsl_at_3 + (long long)1 == (long long)1,
-                (char *)"Assertion",(char *)"\\at(x,L)+1 == 1",52);
+                (char *)"Assertion",(char *)"\\at(x,L)+1 == 1",55);
   g(t,& x);
   __retres = 0;
   __delete_block((void *)(t));

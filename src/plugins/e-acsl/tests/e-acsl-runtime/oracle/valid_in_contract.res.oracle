@@ -5,6 +5,8 @@
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_bittree.h"
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
 [kernel] preprocessing with "gcc -C -E -I.  -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc tests/e-acsl-runtime/valid_in_contract.c"
+tests/e-acsl-runtime/valid_in_contract.c:33:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+                  Ignoring annotation.
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed
@@ -54,19 +56,24 @@
 tests/e-acsl-runtime/valid_in_contract.c:21:[kernel] warning: out of bounds read. assert \valid_read(&l->next);
 tests/e-acsl-runtime/valid_in_contract.c:21:[value] Non-termination in evaluation of function call expression argument
         (void *)l->next
-./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status valid.
 [value] using specification for function __delete_block
 tests/e-acsl-runtime/valid_in_contract.c:18:[value] Function f, behavior B1: postcondition got status valid.
 tests/e-acsl-runtime/valid_in_contract.c:22:[value] Function f, behavior B2: postcondition got status valid.
 tests/e-acsl-runtime/valid_in_contract.c:22:[value] Function f, behavior B2: postcondition got status valid, but it is unknown if the behavior is active.
+./share/e-acsl/e_acsl.h:39:[value] Function e_acsl_assert: precondition got status valid.
+tests/e-acsl-runtime/valid_in_contract.c:18:[value] Function __e_acsl_f, behavior B1: postcondition got status valid.
+tests/e-acsl-runtime/valid_in_contract.c:22:[value] Function __e_acsl_f, behavior B2: postcondition got status valid.
+tests/e-acsl-runtime/valid_in_contract.c:22:[value] Function __e_acsl_f, behavior B2: postcondition got status valid, but it is unknown if the behavior is active.
 [value] using specification for function __clean
 [kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function e_acsl_assert:
+[value] Values at end of function f:
+          __retres ∈ {0}
 tests/e-acsl-runtime/valid_in_contract.c:21:[value] Non-termination in evaluation of function call expression argument
         (void *)l->next
-[value] Values at end of function f:
+[value] Values at end of function __e_acsl_f:
           __retres ∈ {0}
 [value] Values at end of function main:
           __retres ∈ {0}

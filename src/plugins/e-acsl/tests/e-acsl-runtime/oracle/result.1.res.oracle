@@ -4,6 +4,8 @@
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel_api.h"
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_bittree.h"
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
+tests/e-acsl-runtime/result.i:26:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+                  Ignoring annotation.
 tests/e-acsl-runtime/result.i:7:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
@@ -46,6 +48,7 @@ tests/e-acsl-runtime/result.i:7:[e-acsl] warning: missing guard for ensuring tha
                                     [1].__fc_real_data_max_size ∈ [--..--]
         S___fc_real_data_0_S___fc_inode_1_S___fc_stdout[0..1] ∈ [--..--]
         S___fc_real_data_1_S___fc_inode_1_S___fc_stdout[0..1] ∈ [--..--]
+tests/e-acsl-runtime/result.i:7:[value] Function f: postcondition got status valid.
 [value] using specification for function __gmpz_init_set_si
 ./share/e-acsl/e_acsl_gmp.h:61:[value] Function __gmpz_init_set_si: precondition got status valid.
 ./share/e-acsl/e_acsl_gmp.h:63:[value] Function __gmpz_init_set_si: postcondition got status valid.
@@ -62,12 +65,14 @@ tests/e-acsl-runtime/result.i:7:[e-acsl] warning: missing guard for ensuring tha
 [value] using specification for function __gmpz_cmp
 ./share/e-acsl/e_acsl_gmp.h:115:[value] Function __gmpz_cmp: precondition got status valid.
 ./share/e-acsl/e_acsl_gmp.h:116:[value] Function __gmpz_cmp: precondition got status valid.
-./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status unknown.
+./share/e-acsl/e_acsl.h:39:[value] Function e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_clear
 ./share/e-acsl/e_acsl_gmp.h:105:[value] Function __gmpz_clear: precondition got status valid.
-tests/e-acsl-runtime/result.i:7:[value] Function f: postcondition got status valid.
+tests/e-acsl-runtime/result.i:7:[value] Function __e_acsl_f: postcondition got status valid.
 tests/e-acsl-runtime/result.i:18:[value] Function g: postcondition got status valid.
+tests/e-acsl-runtime/result.i:18:[value] Function __e_acsl_g: postcondition got status valid.
 tests/e-acsl-runtime/result.i:23:[value] Function h: postcondition got status valid.
+tests/e-acsl-runtime/result.i:23:[value] Function __e_acsl_h: postcondition got status valid.
 [value] using specification for function __clean
 [kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
 [value] done for function main
@@ -75,8 +80,14 @@ tests/e-acsl-runtime/result.i:23:[value] Function h: postcondition got status va
 [value] Values at end of function e_acsl_assert:
 [value] Values at end of function f:
           x ∈ {0}
+[value] Values at end of function __e_acsl_f:
+          __retres ∈ {0}
 [value] Values at end of function g:
+[value] Values at end of function __e_acsl_g:
+          __retres ∈ {1}
 [value] Values at end of function h:
+          __retres ∈ {0}
+[value] Values at end of function __e_acsl_h:
           __retres ∈ {0}
 [value] Values at end of function main:
           __retres ∈ {0}

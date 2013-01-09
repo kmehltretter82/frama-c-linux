@@ -4,6 +4,8 @@
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel_api.h"
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_bittree.h"
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
+tests/e-acsl-runtime/nested_code_annot.i:7:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+                  Ignoring annotation.
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed
@@ -52,7 +54,7 @@ tests/e-acsl-runtime/nested_code_annot.i:9:[value] Assertion got status valid.
 [value] using specification for function __gmpz_cmp
 ./share/e-acsl/e_acsl_gmp.h:115:[value] Function __gmpz_cmp: precondition got status valid.
 ./share/e-acsl/e_acsl_gmp.h:116:[value] Function __gmpz_cmp: precondition got status valid.
-./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status unknown.
+./share/e-acsl/e_acsl.h:39:[value] Function e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_clear
 ./share/e-acsl/e_acsl_gmp.h:105:[value] Function __gmpz_clear: precondition got status valid.
 [value] using specification for function __clean

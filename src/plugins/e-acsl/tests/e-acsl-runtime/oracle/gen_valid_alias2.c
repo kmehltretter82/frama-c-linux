@@ -64,6 +64,7 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_clear(__mpz_struct * /*[1]*/
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
                                                        __mpz_struct const * /*[1]*/ z2);
+void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line);
 int __fc_random_counter __attribute__((__unused__));
 unsigned long const __fc_rand_max = (unsigned long)32767;
 extern int __fc_heap_status;
@@ -98,6 +99,34 @@ axiomatic
  */
 extern void *__malloc(size_t size);
 /*@ assigns __fc_heap_status;
+    assigns __fc_heap_status \from size, __fc_heap_status;
+    assigns \result \from size, __fc_heap_status;
+    allocates \result;
+    
+    behavior allocation:
+      assumes is_allocable(size);
+      ensures \fresh{Old, Here}(\result,\old(size));
+      assigns __fc_heap_status;
+      assigns __fc_heap_status \from size, __fc_heap_status;
+      assigns \result \from size, __fc_heap_status;
+    
+    behavior no_allocation:
+      assumes ¬is_allocable(size);
+      ensures \result ≡ \null;
+      assigns \result \from \nothing;
+      allocates \nothing;
+    
+    complete behaviors no_allocation, allocation;
+    disjoint behaviors no_allocation, allocation;
+ */
+void *__e_acsl_malloc(size_t size)
+{
+  void *__retres;
+  __retres = __malloc(size);
+  return __retres;
+}
+
+/*@ assigns __fc_heap_status;
     assigns __fc_heap_status \from __fc_heap_status;
     frees p;
     
@@ -117,13 +146,58 @@ extern void *__malloc(size_t size);
     disjoint behaviors no_deallocation, deallocation;
  */
 extern void __free(void *p);
+/*@ assigns __fc_heap_status;
+    assigns __fc_heap_status \from __fc_heap_status;
+    frees p;
+    
+    behavior deallocation:
+      assumes p ≢ \null;
+      requires \freeable(p);
+      ensures \allocable(\old(p));
+      assigns __fc_heap_status;
+      assigns __fc_heap_status \from __fc_heap_status;
+    
+    behavior no_deallocation:
+      assumes p ≡ \null;
+      assigns \nothing;
+      allocates \nothing;
+    
+    complete behaviors no_deallocation, deallocation;
+    disjoint behaviors no_deallocation, deallocation;
+ */
+void __e_acsl_free(void *p)
+{
+  int __e_acsl_at;
+  __e_acsl_at = p != (void *)0;
+  __free(p);
+  return;
+}
+
 /*@ ensures \false;
     assigns \nothing; */
 extern void exit(int status);
+/*@ ensures \false;
+    assigns \nothing; */
+void __e_acsl_exit(int status)
+{
+  exit(status);
+  e_acsl_assert(0,(char *)"Postcondition",(char *)"\\false",180);
+  return;
+}
+
 extern FILE *__fc_stdout;
 /*@ assigns *__fc_stdout;
     assigns *__fc_stdout \from *(format+(..)); */
 extern int printf(char const *format , ...);
+/*@ assigns *__fc_stdout;
+    assigns *__fc_stdout \from *(format+(..)); */
+int __e_acsl_printf(char const *format , ...)
+{
+  int __retres;
+  __retres = printf(format);
+  return __retres;
+}
+
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
@@ -196,7 +270,7 @@ int main(void)
                   (char *)"!\\valid(a) && !\\valid(b)",12);
   }
   __full_init((void *)(& a));
-  a = (int *)__malloc(sizeof(int));
+  a = (int *)__e_acsl_malloc(sizeof(int));
   __initialize((void *)a,sizeof(int));
   *a = n;
   __full_init((void *)(& b));
@@ -242,7 +316,7 @@ int main(void)
     __gmpz_clear(__e_acsl);
     __gmpz_clear(__e_acsl_n);
   }
-  __free((void *)b);
+  __e_acsl_free((void *)b);
   /*@ assert ¬\valid(a) ∧ ¬\valid(b); */
   {
     int __e_acsl_initialized_5;

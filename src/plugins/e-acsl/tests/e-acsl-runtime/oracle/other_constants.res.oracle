@@ -4,6 +4,8 @@
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel_api.h"
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_bittree.h"
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
+tests/e-acsl-runtime/other_constants.i:9:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+                  Ignoring annotation.
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed
@@ -45,7 +47,7 @@
         S___fc_real_data_0_S___fc_inode_1_S___fc_stdout[0..1] ∈ [--..--]
         S___fc_real_data_1_S___fc_inode_1_S___fc_stdout[0..1] ∈ [--..--]
 tests/e-acsl-runtime/other_constants.i:12:[value] Assertion got status valid.
-./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status valid.
+./share/e-acsl/e_acsl.h:39:[value] Function e_acsl_assert: precondition got status valid.
 tests/e-acsl-runtime/other_constants.i:13:[value] Assertion got status valid.
 [value] using specification for function __clean
 [kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype

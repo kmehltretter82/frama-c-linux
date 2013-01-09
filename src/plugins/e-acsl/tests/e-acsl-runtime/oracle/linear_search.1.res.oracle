@@ -4,9 +4,11 @@
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel_api.h"
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_bittree.h"
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
-tests/e-acsl-runtime/linear_search.i:9:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
-tests/e-acsl-runtime/linear_search.i:9:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
+tests/e-acsl-runtime/linear_search.i:27:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+                  Ignoring annotation.
 tests/e-acsl-runtime/linear_search.i:27:[e-acsl] warning: E-ACSL construct `loop invariant' is not yet supported. Ignoring annotation.
+tests/e-acsl-runtime/linear_search.i:9:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
+tests/e-acsl-runtime/linear_search.i:9:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
 tests/e-acsl-runtime/linear_search.i:11:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
 tests/e-acsl-runtime/linear_search.i:14:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
 [value] Analyzing a complete application starting at main
@@ -51,7 +53,7 @@ tests/e-acsl-runtime/linear_search.i:14:[e-acsl] warning: missing guard for ensu
         S___fc_real_data_0_S___fc_inode_1_S___fc_stdout[0..1] ∈ [--..--]
         S___fc_real_data_1_S___fc_inode_1_S___fc_stdout[0..1] ∈ [--..--]
 tests/e-acsl-runtime/linear_search.i:30:[value] entering loop for the first time
-tests/e-acsl-runtime/linear_search.i:9:[value] Function search: precondition got status unknown.
+tests/e-acsl-runtime/linear_search.i:9:[value] Function __e_acsl_search: precondition got status unknown.
 [value] using specification for function __gmpz_init
 ./share/e-acsl/e_acsl_gmp.h:36:[value] Function __gmpz_init: precondition got status valid.
 ./share/e-acsl/e_acsl_gmp.h:37:[value] Function __gmpz_init: postcondition got status valid.
@@ -76,10 +78,11 @@ tests/e-acsl-runtime/linear_search.i:9:[kernel] warning: accessing out of bounds
 ./share/e-acsl/e_acsl_gmp.h:132:[value] Function __gmpz_add: precondition got status valid.
 ./share/e-acsl/e_acsl_gmp.h:133:[value] Function __gmpz_add: precondition got status valid.
 tests/e-acsl-runtime/linear_search.i:9:[kernel] warning: accessing out of bounds index [0..4294967295]. assert __e_acsl_3 < 10;
-./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status unknown.
+./share/e-acsl/e_acsl.h:39:[value] Function e_acsl_assert: precondition got status unknown.
 :0:[value] entering loop for the first time
 tests/e-acsl-runtime/linear_search.i:14:[kernel] warning: accessing out of bounds index [0..4294967295]. assert __e_acsl_j_4 < 10;
 tests/e-acsl-runtime/linear_search.i:11:[kernel] warning: accessing out of bounds index [0..4294967295]. assert __e_acsl_j_2 < 10;
+tests/e-acsl-runtime/linear_search.i:9:[value] Function search: precondition got status unknown.
 tests/e-acsl-runtime/linear_search.i:19:[value] Loop invariant got status valid.
 tests/e-acsl-runtime/linear_search.i:20:[value] Loop invariant got status unknown.
 tests/e-acsl-runtime/linear_search.i:21:[value] entering loop for the first time
@@ -87,6 +90,10 @@ tests/e-acsl-runtime/linear_search.i:12:[value] Function search, behavior exists
 tests/e-acsl-runtime/linear_search.i:12:[value] Function search, behavior exists: postcondition got status unknown, but it is unknown if the behavior is active.
 tests/e-acsl-runtime/linear_search.i:15:[value] Function search, behavior not_exists: postcondition got status unknown.
 tests/e-acsl-runtime/linear_search.i:15:[value] Function search, behavior not_exists: postcondition got status unknown, but it is unknown if the behavior is active.
+tests/e-acsl-runtime/linear_search.i:12:[value] Function __e_acsl_search, behavior exists: postcondition got status unknown.
+tests/e-acsl-runtime/linear_search.i:12:[value] Function __e_acsl_search, behavior exists: postcondition got status unknown, but it is unknown if the behavior is active.
+tests/e-acsl-runtime/linear_search.i:15:[value] Function __e_acsl_search, behavior not_exists: postcondition got status unknown.
+tests/e-acsl-runtime/linear_search.i:15:[value] Function __e_acsl_search, behavior not_exists: postcondition got status unknown, but it is unknown if the behavior is active.
 tests/e-acsl-runtime/linear_search.i:33:[value] Assertion got status unknown.
 tests/e-acsl-runtime/linear_search.i:9:[value] Assertion got status unknown.
 tests/e-acsl-runtime/linear_search.i:9:[value] Assertion got status unknown.
@@ -100,6 +107,8 @@ tests/e-acsl-runtime/linear_search.i:36:[value] Assertion got status unknown.
 [value] Values at end of function e_acsl_assert:
 [value] Values at end of function search:
           k ∈ [0..10]
+          __retres ∈ {0; 1}
+[value] Values at end of function __e_acsl_search:
           __retres ∈ {0; 1}
 [value] Values at end of function main:
           A[0..9] ∈ [0..81]

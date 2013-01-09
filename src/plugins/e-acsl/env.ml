@@ -80,9 +80,7 @@ let empty_mpz_tbl =
   { new_exps = Term.Map.empty;
     clear_stmts = [] }
 
-let empty_local_env =
-  { block_info = { new_block_vars = []; new_stmts = []; pre_stmts = [] };
-    mpz_tbl = empty_mpz_tbl }
+let empty_local_env = { block_info = empty_block; mpz_tbl = empty_mpz_tbl }
 
 let dummy = 
   { visitor = new Visitor.generic_frama_c_visitor (Cil.inplace_visit ()); 
@@ -163,7 +161,8 @@ let do_new_var ?loc init ?(global=false) ?(name="") env t ty mk_stmts =
 	env_stack = local_env :: tl_env }
     else
       let local_env = 
-	{ block_info = new_block; mpz_tbl = extend_tbl local_env.mpz_tbl } 
+	{ block_info = new_block; 
+	  mpz_tbl = extend_tbl local_env.mpz_tbl } 
       in
       { env with 
 	cpt = n; 
@@ -275,7 +274,8 @@ let add_stmt ?(init=false) env stmt =
 let extend_stmt_in_place env stmt ~pre block =
   let new_stmt = Cil.mkStmt ~valid_sid:true (Block block) in
   let sk = stmt.skind in
-  stmt.skind <- Block (Cil.mkBlock [ new_stmt; Cil.mkStmt ~valid_sid:true sk ]);
+  stmt.skind <- 
+    Block (Cil.mkBlock [ new_stmt; Cil.mkStmt ~valid_sid:true sk ]);
   if pre then 
     let local_env, tl_env = top false env in
     let b_info = local_env.block_info in
@@ -286,8 +286,7 @@ let extend_stmt_in_place env stmt ~pre block =
 
 let push env = 
 (*  Options.feedback "push (was %d)" (List.length env.env_stack);*)
-  let local_env = { block_info = empty_block; mpz_tbl = empty_mpz_tbl } in
-  { env with env_stack = local_env :: env.env_stack }
+  { env with env_stack = empty_local_env :: env.env_stack }
 
 let pop env =
 (*  Options.feedback "pop";*)
@@ -352,6 +351,27 @@ let stmt_of_label env = function
 
 let annotation_kind env = env.annotation_kind
 let set_annotation_kind env k = { env with annotation_kind = k }
+
+module Context = struct
+
+  let ctx = ref []
+  let save env = ctx := env.new_global_vars
+  let restore env = 
+    if !ctx <> [] then begin
+      let vars = env.new_global_vars in
+      let env =
+	{ env with new_global_vars = 
+	    List.filter
+	      (fun (v, b) -> b && List.for_all (fun (v', _) -> v != v') vars) 
+	      !ctx 
+	      @ vars }
+      in
+      ctx := [];
+      env
+    end else     
+      env
+
+end
 
 (*
 Local Variables:

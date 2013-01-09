@@ -98,6 +98,7 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_sub(__mpz_struct * /*[1]*/ z
 /*@ requires \valid(z);
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) unsigned long __gmpz_get_ui(__mpz_struct const * /*[1]*/ z);
+void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line);
 int __fc_random_counter __attribute__((__unused__));
 unsigned long const __fc_rand_max = (unsigned long)32767;
 extern int __fc_heap_status;
@@ -112,10 +113,28 @@ axiomatic
 /*@ ensures \false;
     assigns \nothing; */
 extern void exit(int status);
+/*@ ensures \false;
+    assigns \nothing; */
+void __e_acsl_exit(int status)
+{
+  exit(status);
+  e_acsl_assert(0,(char *)"Postcondition",(char *)"\\false",180);
+  return;
+}
+
 extern FILE *__fc_stdout;
 /*@ assigns *__fc_stdout;
     assigns *__fc_stdout \from *(format+(..)); */
 extern int printf(char const *format , ...);
+/*@ assigns *__fc_stdout;
+    assigns *__fc_stdout \from *(format+(..)); */
+int __e_acsl_printf(char const *format , ...)
+{
+  int __retres;
+  __retres = printf(format);
+  return __retres;
+}
+
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
@@ -145,9 +164,37 @@ extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
  */
 int sorted(int *t, int n)
 {
-  int __e_acsl_at;
   int __retres;
   int b;
+  __store_block((void *)(& t),4U);
+  __full_init((void *)(& t));
+  b = 1;
+  if (n <= 1) {
+    __retres = 1;
+    goto return_label;
+  }
+  b = 1;
+  while (b < n) {
+    if (*(t + (b - 1)) > *(t + b)) {
+      __retres = 0;
+      goto return_label;
+    }
+    b ++;
+  }
+  __retres = 1;
+  return_label: /* internal */
+    __delete_block((void *)(& t));
+    return __retres;
+}
+
+/*@ behavior yes:
+      assumes ∀ ℤ i; 0 < i ∧ i < n ⇒ *(t+(i-1)) ≤ *(t+i);
+      ensures \result ≡ 1;
+ */
+int __e_acsl_sorted(int *t, int n)
+{
+  int __e_acsl_at;
+  int __retres;
   __store_block((void *)(& t),4U);
   __full_init((void *)(& t));
   {
@@ -223,42 +270,28 @@ int sorted(int *t, int n)
     __e_acsl_at = __e_acsl_forall;
     __gmpz_clear(__e_acsl_i);
   }
-  b = 1;
-  if (n <= 1) {
-    __retres = 1;
-    goto return_label;
-  }
-  b = 1;
-  while (b < n) {
-    if (*(t + (b - 1)) > *(t + b)) {
-      __retres = 0;
-      goto return_label;
+  __retres = sorted(t,n);
+  {
+    int __e_acsl_implies;
+    if (! __e_acsl_at) __e_acsl_implies = 1;
+    else {
+      mpz_t __e_acsl_result;
+      mpz_t __e_acsl_8;
+      int __e_acsl_eq;
+      __gmpz_init_set_si(__e_acsl_result,(long)__retres);
+      __gmpz_init_set_si(__e_acsl_8,(long)1);
+      __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl_result),
+                               (__mpz_struct const *)(__e_acsl_8));
+      __e_acsl_implies = __e_acsl_eq == 0;
+      __gmpz_clear(__e_acsl_result);
+      __gmpz_clear(__e_acsl_8);
     }
-    b ++;
+    e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",
+                  (char *)"\\old(\\forall integer i; 0 < i && i < n ==> *(t+(i-1)) <= *(t+i)) ==>\n\\result == 1",
+                  9);
+    __delete_block((void *)(& t));
+    return __retres;
   }
-  __retres = 1;
-  return_label: /* internal */
-    {
-      int __e_acsl_implies;
-      if (! __e_acsl_at) __e_acsl_implies = 1;
-      else {
-        mpz_t __e_acsl_result;
-        mpz_t __e_acsl_8;
-        int __e_acsl_eq;
-        __gmpz_init_set_si(__e_acsl_result,(long)__retres);
-        __gmpz_init_set_si(__e_acsl_8,(long)1);
-        __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl_result),
-                                 (__mpz_struct const *)(__e_acsl_8));
-        __e_acsl_implies = __e_acsl_eq == 0;
-        __gmpz_clear(__e_acsl_result);
-        __gmpz_clear(__e_acsl_8);
-      }
-      e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",
-                    (char *)"\\old(\\forall integer i; 0 < i && i < n ==> *(t+(i-1)) <= *(t+i)) ==>\n\\result == 1",
-                    9);
-      __delete_block((void *)(& t));
-      return __retres;
-    }
 }
 
 int main(void)
@@ -281,7 +314,7 @@ int main(void)
   t[5] = 5;
   __initialize((void *)(& t[6]),sizeof(int));
   t[6] = 7;
-  n = sorted(t,7);
+  n = __e_acsl_sorted(t,7);
   /*@ assert n ≡ 1; */
   {
     mpz_t __e_acsl_n;

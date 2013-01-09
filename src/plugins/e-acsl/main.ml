@@ -121,12 +121,21 @@ let generate_code =
     (fun name ->
       apply_on_e_acsl_ast
 	(fun () ->
-	  Pre_analysis.init_mpz ();
-	  Pre_analysis.reset ();
-	  let visit prj = Visit.do_visit ~prj true in
-	  let prj = File.create_project_from_visitor name visit in
-	  Resulting_projects.mark_as_computed ();
-	  prj)
+	  let dup_prj = Pre_visit.dup_functions () in
+	  let res =
+	    Project.on
+	      dup_prj
+	      (fun () ->
+		Pre_analysis.init_mpz ();
+		Pre_analysis.reset ();
+		let visit prj = Visit.do_visit ~prj true in
+		let prj = File.create_project_from_visitor name visit in
+		Resulting_projects.mark_as_computed ();
+		prj)
+	      ()
+	  in
+	  Project.remove ~project:dup_prj ();
+	  res)
 	())
 
 let generate_code =

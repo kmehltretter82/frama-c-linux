@@ -47,6 +47,7 @@ typedef struct __fc_FILE FILE;
 /*@
 model __mpz_struct { ℤ n };
 */
+void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line);
 int __fc_random_counter __attribute__((__unused__));
 unsigned long const __fc_rand_max = (unsigned long)32767;
 extern int __fc_heap_status;
@@ -81,6 +82,34 @@ axiomatic
  */
 extern void *__malloc(size_t size);
 /*@ assigns __fc_heap_status;
+    assigns __fc_heap_status \from size, __fc_heap_status;
+    assigns \result \from size, __fc_heap_status;
+    allocates \result;
+    
+    behavior allocation:
+      assumes is_allocable(size);
+      ensures \fresh{Old, Here}(\result,\old(size));
+      assigns __fc_heap_status;
+      assigns __fc_heap_status \from size, __fc_heap_status;
+      assigns \result \from size, __fc_heap_status;
+    
+    behavior no_allocation:
+      assumes ¬is_allocable(size);
+      ensures \result ≡ \null;
+      assigns \result \from \nothing;
+      allocates \nothing;
+    
+    complete behaviors no_allocation, allocation;
+    disjoint behaviors no_allocation, allocation;
+ */
+void *__e_acsl_malloc(size_t size)
+{
+  void *__retres;
+  __retres = __malloc(size);
+  return __retres;
+}
+
+/*@ assigns __fc_heap_status;
     assigns __fc_heap_status \from __fc_heap_status;
     frees p;
     
@@ -100,13 +129,58 @@ extern void *__malloc(size_t size);
     disjoint behaviors no_deallocation, deallocation;
  */
 extern void __free(void *p);
+/*@ assigns __fc_heap_status;
+    assigns __fc_heap_status \from __fc_heap_status;
+    frees p;
+    
+    behavior deallocation:
+      assumes p ≢ \null;
+      requires \freeable(p);
+      ensures \allocable(\old(p));
+      assigns __fc_heap_status;
+      assigns __fc_heap_status \from __fc_heap_status;
+    
+    behavior no_deallocation:
+      assumes p ≡ \null;
+      assigns \nothing;
+      allocates \nothing;
+    
+    complete behaviors no_deallocation, deallocation;
+    disjoint behaviors no_deallocation, deallocation;
+ */
+void __e_acsl_free(void *p)
+{
+  int __e_acsl_at;
+  __e_acsl_at = p != (void *)0;
+  __free(p);
+  return;
+}
+
 /*@ ensures \false;
     assigns \nothing; */
 extern void exit(int status);
+/*@ ensures \false;
+    assigns \nothing; */
+void __e_acsl_exit(int status)
+{
+  exit(status);
+  e_acsl_assert(0,(char *)"Postcondition",(char *)"\\false",180);
+  return;
+}
+
 extern FILE *__fc_stdout;
 /*@ assigns *__fc_stdout;
     assigns *__fc_stdout \from *(format+(..)); */
 extern int printf(char const *format , ...);
+/*@ assigns *__fc_stdout;
+    assigns *__fc_stdout \from *(format+(..)); */
+int __e_acsl_printf(char const *format , ...)
+{
+  int __retres;
+  __retres = printf(format);
+  return __retres;
+}
+
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
@@ -145,19 +219,15 @@ int *f(int *x)
   __store_block((void *)(& y),4U);
   /*@ assert ¬\valid(y); */
   {
-    int __e_acsl_valid;
     int __e_acsl_initialized;
     int __e_acsl_and;
     __store_block((void *)(& x),4U);
     __full_init((void *)(& x));
-    __e_acsl_valid = __valid((void *)x,sizeof(int));
-    e_acsl_assert(__e_acsl_valid,(char *)"Precondition",(char *)"\\valid(x)",
-                  15);
     __e_acsl_initialized = __initialized((void *)(& y),sizeof(int *));
     if (__e_acsl_initialized) {
-      int __e_acsl_valid_2;
-      __e_acsl_valid_2 = __valid((void *)y,sizeof(int));
-      __e_acsl_and = __e_acsl_valid_2;
+      int __e_acsl_valid;
+      __e_acsl_valid = __valid((void *)y,sizeof(int));
+      __e_acsl_and = __e_acsl_valid;
     }
     else __e_acsl_and = 0;
     e_acsl_assert(! __e_acsl_and,(char *)"Assertion",(char *)"!\\valid(y)",
@@ -167,19 +237,37 @@ int *f(int *x)
   y = x;
   /*@ assert \valid(x); */
   {
-    int __e_acsl_valid_3;
-    __e_acsl_valid_3 = __valid((void *)x,sizeof(int));
-    e_acsl_assert(__e_acsl_valid_3,(char *)"Assertion",(char *)"\\valid(x)",
+    int __e_acsl_valid_2;
+    __e_acsl_valid_2 = __valid((void *)x,sizeof(int));
+    e_acsl_assert(__e_acsl_valid_2,(char *)"Assertion",(char *)"\\valid(x)",
                   21);
   }
+  __delete_block((void *)(& x));
+  __delete_block((void *)(& y));
+  return y;
+}
+
+/*@ requires \valid(x);
+    ensures \valid(\result); */
+int *__e_acsl_f(int *x)
+{
+  int *__retres;
   {
-    int __e_acsl_valid_4;
-    __e_acsl_valid_4 = __valid((void *)y,sizeof(int));
-    e_acsl_assert(__e_acsl_valid_4,(char *)"Postcondition",
+    int __e_acsl_valid;
+    __store_block((void *)(& x),4U);
+    __full_init((void *)(& x));
+    __e_acsl_valid = __valid((void *)x,sizeof(int));
+    e_acsl_assert(__e_acsl_valid,(char *)"Precondition",(char *)"\\valid(x)",
+                  15);
+    __retres = f(x);
+  }
+  {
+    int __e_acsl_valid_2;
+    __e_acsl_valid_2 = __valid((void *)__retres,sizeof(int));
+    e_acsl_assert(__e_acsl_valid_2,(char *)"Postcondition",
                   (char *)"\\valid(\\result)",16);
     __delete_block((void *)(& x));
-    __delete_block((void *)(& y));
-    return y;
+    return __retres;
   }
 }
 
@@ -238,7 +326,7 @@ int main(void)
                   (char *)"(!\\valid(a) && !\\valid(b)) && !\\valid(X)",27);
   }
   __full_init((void *)(& a));
-  a = (int *)__malloc(sizeof(int));
+  a = (int *)__e_acsl_malloc(sizeof(int));
   /*@ assert (\valid(a) ∧ ¬\valid(b)) ∧ ¬\valid(X); */
   {
     int __e_acsl_initialized_3;
@@ -312,7 +400,7 @@ int main(void)
                   (char *)"(\\valid(a) && !\\valid(b)) && \\valid(X)",31);
   }
   __full_init((void *)(& b));
-  b = f(& n);
+  b = __e_acsl_f(& n);
   /*@ assert (\valid(a) ∧ \valid(b)) ∧ \valid(X); */
   {
     int __e_acsl_initialized_7;
@@ -385,7 +473,7 @@ int main(void)
     e_acsl_assert(__e_acsl_and_20,(char *)"Assertion",
                   (char *)"(\\valid(a) && \\valid(b)) && \\valid(X)",35);
   }
-  __free((void *)a);
+  __e_acsl_free((void *)a);
   /*@ assert (¬\valid(a) ∧ \valid(b)) ∧ \valid(X); */
   {
     int __e_acsl_initialized_11;

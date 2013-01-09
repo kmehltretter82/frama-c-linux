@@ -27,6 +27,8 @@
 #ifndef E_ACSL
 #define E_ACSL
 
+void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line);
+
 #include "stdlib.h"
 #include "stdio.h"
 

@@ -4,6 +4,8 @@
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel_api.h"
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_bittree.h"
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
+tests/e-acsl-runtime/at.i:43:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+                  Ignoring annotation.
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed
@@ -47,8 +49,10 @@
         S___fc_real_data_1_S___fc_inode_1_S___fc_stdout[0..1] ∈ [--..--]
 [value] using specification for function __store_block
 [value] using specification for function __full_init
-tests/e-acsl-runtime/at.i:45:[value] Assertion got status valid.
-./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status valid.
+tests/e-acsl-runtime/at.i:40:[value] Function h: postcondition got status valid.
+./share/e-acsl/e_acsl.h:39:[value] Function e_acsl_assert: precondition got status valid.
+tests/e-acsl-runtime/at.i:40:[value] Function __e_acsl_h: postcondition got status valid.
+tests/e-acsl-runtime/at.i:48:[value] Assertion got status valid.
 tests/e-acsl-runtime/at.i:13:[value] Assertion got status valid.
 tests/e-acsl-runtime/at.i:14:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
 tests/e-acsl-runtime/at.i:14:[value] Assertion got status unknown.
@@ -56,12 +60,13 @@ tests/e-acsl-runtime/at.i:15:[value] Assertion got status valid.
 tests/e-acsl-runtime/at.i:16:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
 tests/e-acsl-runtime/at.i:16:[value] Assertion got status unknown.
 tests/e-acsl-runtime/at.i:9:[value] Function f: postcondition got status valid.
-tests/e-acsl-runtime/at.i:50:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
-tests/e-acsl-runtime/at.i:50:[value] Assertion got status unknown.
-tests/e-acsl-runtime/at.i:51:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
-tests/e-acsl-runtime/at.i:51:[value] Assertion got status unknown.
-tests/e-acsl-runtime/at.i:52:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
-tests/e-acsl-runtime/at.i:52:[value] Assertion got status unknown.
+tests/e-acsl-runtime/at.i:9:[value] Function __e_acsl_f: postcondition got status valid.
+tests/e-acsl-runtime/at.i:53:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
+tests/e-acsl-runtime/at.i:53:[value] Assertion got status unknown.
+tests/e-acsl-runtime/at.i:54:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
+tests/e-acsl-runtime/at.i:54:[value] Assertion got status unknown.
+tests/e-acsl-runtime/at.i:55:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
+tests/e-acsl-runtime/at.i:55:[value] Assertion got status unknown.
 [value] using specification for function __initialize
 tests/e-acsl-runtime/at.i:32:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
 tests/e-acsl-runtime/at.i:32:[value] Assertion got status unknown.
@@ -75,11 +80,16 @@ tests/e-acsl-runtime/at.i:34:[value] Assertion got status unknown.
 [value] Values at end of function e_acsl_assert:
 [value] Values at end of function f:
           A ∈ {3}
+[value] Values at end of function __e_acsl_f:
+          A ∈ {3}
 [value] Values at end of function g:
           A ∈ {4}
           x ∈ {1}
           t[0] ∈ {2}
            [1] ∈ {3}
+[value] Values at end of function h:
+[value] Values at end of function __e_acsl_h:
+          __retres ∈ {0}
 [value] Values at end of function main:
           A ∈ {4}
           x ∈ {1}

@@ -47,6 +47,7 @@ typedef struct __fc_FILE FILE;
 /*@
 model __mpz_struct { ℤ n };
 */
+void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line);
 int __fc_random_counter __attribute__((__unused__));
 unsigned long const __fc_rand_max = (unsigned long)32767;
 extern int __fc_heap_status;
@@ -61,10 +62,28 @@ axiomatic
 /*@ ensures \false;
     assigns \nothing; */
 extern void exit(int status);
+/*@ ensures \false;
+    assigns \nothing; */
+void __e_acsl_exit(int status)
+{
+  exit(status);
+  e_acsl_assert(0,(char *)"Postcondition",(char *)"\\false",180);
+  return;
+}
+
 extern FILE *__fc_stdout;
 /*@ assigns *__fc_stdout;
     assigns *__fc_stdout \from *(format+(..)); */
 extern int printf(char const *format , ...);
+/*@ assigns *__fc_stdout;
+    assigns *__fc_stdout \from *(format+(..)); */
+int __e_acsl_printf(char const *format , ...)
+{
+  int __retres;
+  __retres = printf(format);
+  return __retres;
+}
+
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
@@ -81,11 +100,19 @@ extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 /*@ ensures \result ≡ (int)(\old(x)-\old(x)); */
 int f(int x)
 {
+  x = 0;
+  return x;
+}
+
+/*@ ensures \result ≡ (int)(\old(x)-\old(x)); */
+int __e_acsl_f(int x)
+{
   int __e_acsl_at_2;
   int __e_acsl_at;
+  int __retres;
   __e_acsl_at_2 = x;
   __e_acsl_at = x;
-  x = 0;
+  __retres = f(x);
   e_acsl_assert(-2147483648LL <= (long long)__e_acsl_at - (long long)__e_acsl_at_2,
                 (char *)"Postcondition",
                 (char *)"downcast: -2147483648 <= (long long)__e_acsl_at-(long long)__e_acsl_at_2",
@@ -94,18 +121,27 @@ int f(int x)
                 (char *)"Postcondition",
                 (char *)"downcast: (long long)__e_acsl_at-(long long)__e_acsl_at_2 <= 2147483647",
                 7);
-  e_acsl_assert(x == (int)((long long)__e_acsl_at - (long long)__e_acsl_at_2),
+  e_acsl_assert(__retres == (int)((long long)__e_acsl_at - (long long)__e_acsl_at_2),
                 (char *)"Postcondition",
                 (char *)"\\result == (int)(\\old(x)-\\old(x))",7);
-  return x;
+  return __retres;
 }
 
 int Y = 1;
 /*@ ensures \result ≡ Y; */
 int g(int x)
 {
-  e_acsl_assert(x == Y,(char *)"Postcondition",(char *)"\\result == Y",18);
   return x;
+}
+
+/*@ ensures \result ≡ Y; */
+int __e_acsl_g(int x)
+{
+  int __retres;
+  __retres = g(x);
+  e_acsl_assert(__retres == Y,(char *)"Postcondition",
+                (char *)"\\result == Y",18);
+  return __retres;
 }
 
 /*@ ensures \result ≡ 0; */
@@ -113,6 +149,14 @@ int h(void)
 {
   int __retres;
   __retres = 0;
+  return __retres;
+}
+
+/*@ ensures \result ≡ 0; */
+int __e_acsl_h(void)
+{
+  int __retres;
+  __retres = h();
   e_acsl_assert(__retres == 0,(char *)"Postcondition",
                 (char *)"\\result == 0",23);
   return __retres;
@@ -121,9 +165,9 @@ int h(void)
 int main(void)
 {
   int __retres;
-  f(1);
-  g(Y);
-  h();
+  __e_acsl_f(1);
+  __e_acsl_g(Y);
+  __e_acsl_h();
   __retres = 0;
   __clean();
   return __retres;

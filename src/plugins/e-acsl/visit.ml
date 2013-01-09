@@ -258,6 +258,9 @@ you must call function `%s' by yourself"
 	  Misc.register_library_function vi; 
 	  Cil.SkipChildren
 	end
+  | GVarDecl(_, vi, _) | GVar(vi, _, _) | GFun({ svar = vi }, _) 
+      when Cil.is_builtin vi ->
+    if generate then Cil.JustCopy else Cil.SkipChildren
   | g when Misc.is_library_loc (Global.loc g) ->
     if generate then Cil.JustCopy else Cil.SkipChildren
   | g ->
@@ -400,7 +403,10 @@ you must call function `%s' by yourself"
 	(* JS: should be done in the new project? *)
 	let env = allocate_function env kf in
 	(* translate the precondition of the function *)
-	Project.on prj (Translate.translate_pre_spec kf env) !funspec
+	if Pre_visit.is_generated_function (Extlib.the self#current_kf) then
+	  Project.on prj (Translate.translate_pre_spec kf env) !funspec
+	else
+	  env
       else
 	env
     in
@@ -475,7 +481,10 @@ you must call function `%s' by yourself"
 	  let env = mk_post_env env in
 	  (* also handle the postcondition of the function and clear the env *)
 	  let env = 
-	    Project.on prj (Translate.translate_post_spec kf env) !funspec 
+	    if Pre_visit.is_generated_function (Extlib.the self#current_kf) then
+	      Project.on prj (Translate.translate_post_spec kf env) !funspec 
+	    else
+	      env
 	  in
 	  (* de-allocating memory previously allocating by the kf *)
 	  (* JS: should be done in the new project? *)

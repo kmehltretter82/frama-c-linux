@@ -47,6 +47,7 @@ typedef struct __fc_FILE FILE;
 /*@
 model __mpz_struct { ℤ n };
 */
+void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line);
 int __fc_random_counter __attribute__((__unused__));
 unsigned long const __fc_rand_max = (unsigned long)32767;
 extern int __fc_heap_status;
@@ -61,10 +62,28 @@ axiomatic
 /*@ ensures \false;
     assigns \nothing; */
 extern void exit(int status);
+/*@ ensures \false;
+    assigns \nothing; */
+void __e_acsl_exit(int status)
+{
+  exit(status);
+  e_acsl_assert(0,(char *)"Postcondition",(char *)"\\false",180);
+  return;
+}
+
 extern FILE *__fc_stdout;
 /*@ assigns *__fc_stdout;
     assigns *__fc_stdout \from *(format+(..)); */
 extern int printf(char const *format , ...);
+/*@ assigns *__fc_stdout;
+    assigns *__fc_stdout \from *(format+(..)); */
+int __e_acsl_printf(char const *format , ...)
+{
+  int __retres;
+  __retres = printf(format);
+  return __retres;
+}
+
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
@@ -111,6 +130,32 @@ extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
  */
 void foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
 {
+  __store_block((void *)(& Mtmax_in),4U);
+  __full_init((void *)(& Mtmax_in));
+  __store_block((void *)(& Mwmax),4U);
+  __full_init((void *)(& Mwmax));
+  __store_block((void *)(& Mtmax_out),4U);
+  __full_init((void *)(& Mtmax_out));
+  __initialize((void *)Mtmax_out,sizeof(float));
+  *Mtmax_out = (float)((double)*Mtmax_in + ((double)5 - (double)((float)(
+                                                                 5 / 80) * *Mwmax) * 0.4));
+  __delete_block((void *)(& Mtmax_in));
+  __delete_block((void *)(& Mwmax));
+  __delete_block((void *)(& Mtmax_out));
+  return;
+}
+
+/*@ requires \valid(Mtmax_in);
+    requires \valid(Mwmax);
+    requires \valid(Mtmax_out);
+    
+    behavior OverEstimate_Motoring:
+      assumes \true;
+      ensures
+        *\old(Mtmax_out) ≡ *\old(Mtmax_in)+(5-((5/80)**\old(Mwmax))*0.4);
+ */
+void __e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
+{
   float *__e_acsl_at_3;
   float *__e_acsl_at_2;
   float *__e_acsl_at;
@@ -133,7 +178,6 @@ void foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     __e_acsl_valid_3 = __valid((void *)Mtmax_out,sizeof(float));
     e_acsl_assert(__e_acsl_valid_3,(char *)"Precondition",
                   (char *)"\\valid(Mtmax_out)",9);
-    __initialize((void *)Mtmax_out,sizeof(float));
     __store_block((void *)(& __e_acsl_at_3),4U);
     __full_init((void *)(& __e_acsl_at_3));
     __e_acsl_at_3 = Mwmax;
@@ -143,8 +187,7 @@ void foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     __store_block((void *)(& __e_acsl_at),4U);
     __full_init((void *)(& __e_acsl_at));
     __e_acsl_at = Mtmax_out;
-    *Mtmax_out = (float)((double)*Mtmax_in + ((double)5 - (double)((float)(
-                                                                   5 / 80) * *Mwmax) * 0.4));
+    foo(Mtmax_in,Mwmax,Mtmax_out);
   }
   {
     int __e_acsl_initialized;
@@ -209,6 +252,34 @@ void foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
  */
 void bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
 {
+  __store_block((void *)(& Mtmin_in),4U);
+  __full_init((void *)(& Mtmin_in));
+  __store_block((void *)(& Mwmin),4U);
+  __full_init((void *)(& Mwmin));
+  __store_block((void *)(& Mtmin_out),4U);
+  __full_init((void *)(& Mtmin_out));
+  __initialize((void *)Mtmin_out,sizeof(float));
+  *Mtmin_out = (float)(0.85 * (double)*Mwmin);
+  __delete_block((void *)(& Mtmin_in));
+  __delete_block((void *)(& Mwmin));
+  __delete_block((void *)(& Mtmin_out));
+  return;
+}
+
+/*@ requires \valid(Mtmin_in);
+    requires \valid(Mwmin);
+    requires \valid(Mtmin_out);
+    
+    behavior UnderEstimate_Motoring:
+      assumes \true;
+      ensures
+        *\old(Mtmin_out)≡*\old(Mtmin_in)∧*\old(Mtmin_in)<0.85**\old(
+                                                                   Mwmin)?
+          *\old(Mtmin_in) ≢ 0.:
+          0.85**\old(Mwmin) ≢ 0.;
+ */
+void __e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
+{
   float *__e_acsl_at_6;
   float *__e_acsl_at_5;
   float *__e_acsl_at_4;
@@ -234,7 +305,6 @@ void bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     __e_acsl_valid_3 = __valid((void *)Mtmin_out,sizeof(float));
     e_acsl_assert(__e_acsl_valid_3,(char *)"Precondition",
                   (char *)"\\valid(Mtmin_out)",21);
-    __initialize((void *)Mtmin_out,sizeof(float));
     __store_block((void *)(& __e_acsl_at_6),4U);
     __full_init((void *)(& __e_acsl_at_6));
     __e_acsl_at_6 = Mwmin;
@@ -253,7 +323,7 @@ void bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     __store_block((void *)(& __e_acsl_at),4U);
     __full_init((void *)(& __e_acsl_at));
     __e_acsl_at = Mtmin_out;
-    *Mtmin_out = (float)(0.85 * (double)*Mwmin);
+    bar(Mtmin_in,Mwmin,Mtmin_out);
   }
   {
     int __e_acsl_and;
@@ -286,8 +356,8 @@ int main(void)
   f = (float)1.0;
   __full_init((void *)(& g));
   g = (float)1.0;
-  foo(& f,& g,& h);
-  bar(& f,& g,& h);
+  __e_acsl_foo(& f,& g,& h);
+  __e_acsl_bar(& f,& g,& h);
   __retres = 0;
   __delete_block((void *)(& h));
   __delete_block((void *)(& g));

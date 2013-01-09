@@ -23,6 +23,14 @@
 open Cil_types
 open Cil_datatype
 
+let not_yet env s =
+  Env.Context.save env;
+  Error.not_yet s
+
+let handle_error f env =
+  let env = Error.handle f env in
+  Env.Context.restore env
+
 (* ************************************************************************** *)
 (* Transforming terms and predicates into C expressions (if any) *)
 (* ************************************************************************** *)
@@ -137,7 +145,7 @@ and toffset_to_offset ?loc env = function
 	Cil.d_term t;
     let offset, env = toffset_to_offset env offset in
     Index(e, offset), env
-  | TModel _ -> Error.not_yet "model"
+  | TModel _ -> not_yet env "model"
 
 and tlval_to_lval env (host, offset) = 
   let host, env, name = thost_to_host env host in
@@ -256,7 +264,7 @@ and context_insensitive_term_to_exp env t =
     e, env, false, ""
   | TBinOp((Shiftlt | Shiftrt), _, _) ->
     (* left/right shift *)
-    Error.not_yet "left/right shift"
+    not_yet env "left/right shift"
   | TBinOp(LOr, t1, t2) ->
     (* t1 || t2 <==> if t1 then true else t2 *)
     let ty = Typing.principal_type t1 t2 in
@@ -279,7 +287,7 @@ and context_insensitive_term_to_exp env t =
     e, env, false, ""
   | TBinOp((BOr | BXor | BAnd), _, _) ->
     (* other logic/arith operators  *)
-    Error.not_yet "missing binary bitwise operator"
+    not_yet env "missing binary bitwise operator"
   | TBinOp(PlusPI | IndexPI | MinusPI | MinusPP as bop, t1, t2) ->
     (* binary operation over pointers *)
     (* [TODO] untested *)
@@ -305,9 +313,9 @@ and context_insensitive_term_to_exp env t =
   | TStartOf lv -> 
     let lv, env, _ = tlval_to_lval env lv in
     Cil.mkAddrOrStartOf ~loc lv, env, false, "startof"
-  | Tapp _ -> Error.not_yet "applying logic function"
-  | Tlambda _ -> Error.not_yet "functional"
-  | TDataCons _ -> Error.not_yet "constructor"
+  | Tapp _ -> not_yet env "applying logic function"
+  | Tlambda _ -> not_yet env "functional"
+  | TDataCons _ -> not_yet env "constructor"
   | Tif(t1, t2, t3) -> 
     let e1, env1 = term_to_exp env (Some Cil.intType) t1 in
     let ty = Typing.principal_type t2 t3 in
@@ -323,25 +331,25 @@ and context_insensitive_term_to_exp env t =
     e, env, is_mpz_string, ""
   | Tbase_addr(LogicLabel(_, label), t) when label = "Here" ->
     mmodel_call ~loc "base_addr" Cil.voidPtrType env t
-  | Tbase_addr _ -> Error.not_yet "labeled \\base_addr"
+  | Tbase_addr _ -> not_yet env "labeled \\base_addr"
   | Toffset(LogicLabel(_, label), t) when label = "Here" ->
     mmodel_call ~loc "offset" Cil.intType env t 
-  | Toffset _ -> Error.not_yet "labeled \\offset"
+  | Toffset _ -> not_yet env "labeled \\offset"
   | Tblock_length(LogicLabel(_, label), t) when label = "Here" ->
     mmodel_call ~loc "block_length" Cil.ulongType env t
-  | Tblock_length _ -> Error.not_yet "labeled \\block_length"
+  | Tblock_length _ -> not_yet env "labeled \\block_length"
   | Tnull -> Cil.mkCast (Cil.zero ~loc) (TPtr(TVoid [], [])), env, false, "null"
   | TCoerce _ -> Error.untypable "coercion" (* Jessie specific *)
   | TCoerceE _ -> Error.untypable "expression coercion" (* Jessie specific *)
-  | TUpdate _ -> Error.not_yet "functional update"
-  | Ttypeof _ -> Error.not_yet "typeof"
-  | Ttype _ -> Error.not_yet "C type"
-  | Tempty_set -> Error.not_yet "empty tset"
-  | Tunion _ -> Error.not_yet "union of tsets"
-  | Tinter _ -> Error.not_yet "intersection of tsets"
-  | Tcomprehension _ -> Error.not_yet "tset comprehension"
-  | Trange _ -> Error.not_yet "range"
-  | Tlet _ -> Error.not_yet "let binding"
+  | TUpdate _ -> not_yet env "functional update"
+  | Ttypeof _ -> not_yet env "typeof"
+  | Ttype _ -> not_yet env "C type"
+  | Tempty_set -> not_yet env "empty tset"
+  | Tunion _ -> not_yet env "union of tsets"
+  | Tinter _ -> not_yet env "intersection of tsets"
+  | Tcomprehension _ -> not_yet env "tset comprehension"
+  | Trange _ -> not_yet env "range"
+  | Tlet _ -> not_yet env "let binding"
 
 (* Convert an ACSL term into a corresponding C expression (if any) in the given
    environment. Also extend this environment in order to include the generating
@@ -462,8 +470,8 @@ and at_to_exp env t_opt label e =
   in
   let env_ref = ref new_env in
   (* visitor modifying in place the labeled statement in order to store [e]
-     in the resulting variable at this location which is the only correct
-     one. *)
+     in the resulting variable at this location (which is the only correct
+     one). *)
   let o = object 
     inherit Visitor.frama_c_inplace
     method vstmt_aux stmt = 
@@ -502,8 +510,8 @@ let rec named_predicate_to_exp ?name kf env p =
   match p.content with
   | Pfalse -> Cil.zero ~loc, env
   | Ptrue -> Cil.one ~loc, env
-  | Papp _ -> Error.not_yet "logic function application"
-  | Pseparated _ -> Error.not_yet "\\separated"
+  | Papp _ -> not_yet env "logic function application"
+  | Pseparated _ -> not_yet env "\\separated"
   | Prel(rel, t1, t2) -> 
     let e, env = 
       comparison_to_exp ~loc env (relation_to_binop rel) t1 t2 None 
@@ -523,7 +531,7 @@ let rec named_predicate_to_exp ?name kf env p =
     let res2 = named_predicate_to_exp kf (Env.push env') p2 in
     let name = match name with None -> "or" | Some n -> n in
     conditional_to_exp ~name loc Cil.intType e1 (Cil.one loc, env') res2
-  | Pxor _ -> Error.not_yet "xor"
+  | Pxor _ -> not_yet env "xor"
   | Pimplies(p1, p2) -> 
     (* (p1 ==> p2) <==> !p1 || p2 *)
     named_predicate_to_exp 
@@ -548,7 +556,7 @@ let rec named_predicate_to_exp ?name kf env p =
     let (_, env2 as res2) = named_predicate_to_exp kf (Env.push env1) p2 in
     let res3 = named_predicate_to_exp kf (Env.push env2) p3 in
     conditional_to_exp loc Cil.intType e1 res2 res3
-  | Plet _ -> Error.not_yet "let _ = _ in _"
+  | Plet _ -> not_yet env "let _ = _ in _"
   | Pforall _ | Pexists _ -> Quantif.quantif_to_exp kf env p
   | Pat(p, label) -> 
     (* convert [t'] to [e] in a separated local env *)
@@ -588,14 +596,14 @@ let rec named_predicate_to_exp ?name kf env p =
 	named_predicate_to_exp kf env p
       | _ -> call_valid t
     end
-  | Pvalid _ -> Error.not_yet "labeled \\valid"
-  | Pvalid_read _ -> Error.not_yet "labeled \\valid_read"
+  | Pvalid _ -> not_yet env "labeled \\valid"
+  | Pvalid_read _ -> not_yet env "labeled \\valid_read"
   | Pinitialized(LogicLabel(_, label), t) when label = "Here" ->
     mmodel_call_with_size ~loc "initialized" Cil.intType env t
-  | Pinitialized _ -> Error.not_yet "labeled \\initialized"
-  | Pallocable _ -> Error.not_yet "\\allocate"
-  | Pfreeable _ -> Error.not_yet "\\free"
-  | Pfresh _ -> Error.not_yet "\\fresh"
+  | Pinitialized _ -> not_yet env "labeled \\initialized"
+  | Pallocable _ -> not_yet env "\\allocate"
+  | Pfreeable _ -> not_yet env "\\free"
+  | Pfresh _ -> not_yet env "\\fresh"
   | Psubtype _ -> Error.untypable "subtyping relation" (* Jessie specific *)
 
 let () = 
@@ -642,7 +650,7 @@ and rte_to_exp kf env e =
   List.fold_left
     (fun env a -> match a.annot_content with
     | AAssert(_, p) -> 
-      Error.handle
+      handle_error
 	(fun env -> translate_named_predicate kf ~rte:false env p)
 	env
     | _ -> assert false)
@@ -666,7 +674,7 @@ let translate_preconditions kf env behaviors =
 	  in
 	  translate_named_predicate kf env p
 	in
-	Error.handle do_it env)
+	handle_error do_it env)
       env
       b.b_requires
   in 
@@ -679,11 +687,17 @@ let translate_postconditions kf env behaviors =
     let assumes_pred = assumes_predicate b in
     List.fold_left
       (fun env (t, p) ->
+	let env =
+	  handle_error
+	    (fun env ->
+	      if b.b_assigns <> WritesAny then 
+		not_yet env "assigns clause in behavior";
+	      if b.b_extended <> [] then 
+		not_yet env "grammar extensions in behavior";
+	      env)
+	    env
+	in
 	let do_it env =
-	  if b.b_assigns <> WritesAny then 
-	    Error.not_yet "assigns clause in behavior";
-	  if b.b_extended <> [] then 
-	    Error.not_yet "grammar extensions in behavior";
 	  match t with
 	  | Normal -> 
 	    let loc = p.ip_loc in
@@ -695,9 +709,9 @@ let translate_postconditions kf env behaviors =
 	    in
 	    translate_named_predicate kf env p
 	  | Exits | Breaks | Continues | Returns ->
-	    Error.not_yet "@[abnormal termination case in behavior@]"
+	    not_yet env "@[abnormal termination case in behavior@]"
 	in
-	Error.handle do_it env)
+	handle_error do_it env)
       env
       b.b_post_cond
   in 
@@ -705,21 +719,21 @@ let translate_postconditions kf env behaviors =
 
 let translate_pre_spec kf env spec =
   let convert_unsupported_clauses env =
-    if spec.spec_variant <> None then Error.not_yet "variant clause";
-    if spec.spec_terminates <> None then Error.not_yet "terminates clause";
+    if spec.spec_variant <> None then not_yet env "variant clause";
+    if spec.spec_terminates <> None then not_yet env "terminates clause";
     if spec.spec_complete_behaviors <> [] then 
-      Error.not_yet "complete behavior";
+      not_yet env "complete behavior";
     if spec.spec_disjoint_behaviors <> [] then 
-      Error.not_yet "disjoint behavior";
+      not_yet env "disjoint behavior";
     env
   in
-  let env = Error.handle convert_unsupported_clauses env in
-  Error.handle
+  let env = handle_error convert_unsupported_clauses env in
+  handle_error
     (fun env -> translate_preconditions kf env spec.spec_behavior) 
     env
 
 let translate_post_spec kf env spec = 
-  Error.handle
+  handle_error
     (fun env -> translate_postconditions kf env spec.spec_behavior) 
     env
 
@@ -734,19 +748,19 @@ let translate_pre_code_annotation kf env annot =
       in
       let env = Env.set_annotation_kind env kind in
       if l <> [] then 
-	Error.not_yet "@[assertions applied only on some behaviors@]";
+	not_yet env "@[assertions applied only on some behaviors@]";
       translate_named_predicate kf env p
     | AStmtSpec(l, spec) ->
       if l <> [] then 
-        Error.not_yet "@[statement contract applied only on some behaviors@]";
+        not_yet env "@[statement contract applied only on some behaviors@]";
       translate_pre_spec kf env spec ;
-    | AInvariant(_, b, _) -> assert b; Error.not_yet "loop invariant"
-    | AVariant _ -> Error.not_yet "variant"
-    | AAssigns _ -> Error.not_yet "assigns"
-    | AAllocation _ -> Error.not_yet "allocation"
-    | APragma _ -> Error.not_yet "pragma"
+    | AInvariant(_, b, _) -> assert b; not_yet env "loop invariant"
+    | AVariant _ -> not_yet env "variant"
+    | AAssigns _ -> not_yet env "assigns"
+    | AAllocation _ -> not_yet env "allocation"
+    | APragma _ -> not_yet env "pragma"
   in
-  Error.handle convert env
+  handle_error convert env
 
 let translate_post_code_annotation kf env annot =
   let convert env = match annot.annot_content with
@@ -758,7 +772,7 @@ let translate_post_code_annotation kf env annot =
     | AAllocation _
     | APragma _ -> env
   in
-  Error.handle convert env
+  handle_error convert env
 
 (*
 Local Variables:

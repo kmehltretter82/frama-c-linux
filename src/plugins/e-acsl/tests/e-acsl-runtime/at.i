@@ -37,11 +37,14 @@ void g(int *p, int *q) {
   return ;
 }
 
+/*@ ensures \result == x; */
+int h(int x) { return x; }
+
 int main(void) {
 
   int x;
 
-  x = 0;
+  x = h(0);
  L: /*@ assert x == 0; */ x = 1;
   x = 2;
 
