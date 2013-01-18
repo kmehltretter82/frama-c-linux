@@ -7,47 +7,15 @@ struct __anonstruct___mpz_struct_1 {
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
 typedef unsigned int size_t;
-typedef unsigned int ino_t;
-typedef unsigned int gid_t;
-typedef unsigned int uid_t;
-typedef long time_t;
-typedef unsigned int blkcnt_t;
-typedef unsigned int blksize_t;
-typedef unsigned int dev_t;
-typedef unsigned int mode_t;
-typedef unsigned int nlink_t;
-typedef unsigned int off_t;
-struct stat {
-   dev_t st_dev ;
-   ino_t st_ino ;
-   mode_t st_mode ;
-   nlink_t st_nlink ;
-   uid_t st_uid ;
-   gid_t st_gid ;
-   dev_t st_rdev ;
-   off_t st_size ;
-   time_t st_atime ;
-   time_t st_mtime ;
-   time_t st_ctime ;
-   blksize_t st_blksize ;
-   blkcnt_t st_blocks ;
-   char *__fc_real_data ;
-   int __fc_real_data_max_size ;
-};
-struct __fc_FILE {
-   unsigned int __fc_stdio_id ;
-   unsigned int __fc_maxsz ;
-   unsigned int __fc_writepos ;
-   unsigned int __fc_readpos ;
-   int __fc_is_a_socket ;
-   int __fc_mode ;
-   struct stat *__fc_inode ;
-};
-typedef struct __fc_FILE FILE;
 /*@
 model __mpz_struct { ℤ n };
 */
-void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line);
+/*@ requires predicate ≢ 0;
+    assigns \nothing; */
+extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
+                                                           char *kind,
+                                                           char *pred_txt,
+                                                           int line);
 int __fc_random_counter __attribute__((__unused__));
 unsigned long const __fc_rand_max = (unsigned long)32767;
 extern int __fc_heap_status;
@@ -82,6 +50,43 @@ axiomatic
  */
 extern void *__malloc(size_t size);
 /*@ assigns __fc_heap_status;
+    assigns __fc_heap_status \from __fc_heap_status;
+    frees p;
+    
+    behavior deallocation:
+      assumes p ≢ \null;
+      requires \freeable(p);
+      ensures \allocable(\old(p));
+      assigns __fc_heap_status;
+      assigns __fc_heap_status \from __fc_heap_status;
+    
+    behavior no_deallocation:
+      assumes p ≡ \null;
+      assigns \nothing;
+      allocates \nothing;
+    
+    complete behaviors no_deallocation, deallocation;
+    disjoint behaviors no_deallocation, deallocation;
+ */
+extern void __free(void *p);
+/*@ assigns \nothing; */
+extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
+                                                            size_t size);
+/*@ assigns \nothing; */
+extern  __attribute__((__FC_BUILTIN__)) void __delete_block(void *ptr);
+/*@ assigns \nothing; */
+extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
+/*@ assigns \nothing; */
+extern  __attribute__((__FC_BUILTIN__)) int __valid(void *ptr, size_t size);
+/*@ ensures \result ≡ 0 ∨ \result ≡ 1;
+    ensures
+      \result ≡ 1 ⇒ \initialized((char *)\old(ptr)+(0..\old(size)-1));
+    assigns \nothing;
+ */
+extern  __attribute__((__FC_BUILTIN__)) int __initialized(void *ptr,
+                                                          size_t size);
+extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
+/*@ assigns __fc_heap_status;
     assigns __fc_heap_status \from size, __fc_heap_status;
     assigns \result \from size, __fc_heap_status;
     allocates \result;
@@ -105,30 +110,16 @@ extern void *__malloc(size_t size);
 void *__e_acsl_malloc(size_t size)
 {
   void *__retres;
+  __store_block((void *)(& __retres),4U);
+  __store_block((void *)(& size),4U);
+  __full_init((void *)(& size));
+  __full_init((void *)(& __retres));
   __retres = __malloc(size);
+  __delete_block((void *)(& size));
+  __delete_block((void *)(& __retres));
   return __retres;
 }
 
-/*@ assigns __fc_heap_status;
-    assigns __fc_heap_status \from __fc_heap_status;
-    frees p;
-    
-    behavior deallocation:
-      assumes p ≢ \null;
-      requires \freeable(p);
-      ensures \allocable(\old(p));
-      assigns __fc_heap_status;
-      assigns __fc_heap_status \from __fc_heap_status;
-    
-    behavior no_deallocation:
-      assumes p ≡ \null;
-      assigns \nothing;
-      allocates \nothing;
-    
-    complete behaviors no_deallocation, deallocation;
-    disjoint behaviors no_deallocation, deallocation;
- */
-extern void __free(void *p);
 /*@ assigns __fc_heap_status;
     assigns __fc_heap_status \from __fc_heap_status;
     frees p;
@@ -151,65 +142,16 @@ extern void __free(void *p);
 void __e_acsl_free(void *p)
 {
   int __e_acsl_at;
+  __store_block((void *)(& p),4U);
+  __full_init((void *)(& p));
+  __store_block((void *)(& __e_acsl_at),4U);
+  __full_init((void *)(& __e_acsl_at));
   __e_acsl_at = p != (void *)0;
   __free(p);
+  __delete_block((void *)(& p));
   return;
 }
 
-/*@ ensures \false;
-    assigns \nothing; */
-extern void exit(int status);
-/*@ ensures \false;
-    assigns \nothing; */
-void __e_acsl_exit(int status)
-{
-  exit(status);
-  e_acsl_assert(0,(char *)"Postcondition",(char *)"\\false",180);
-  return;
-}
-
-extern FILE *__fc_stdout;
-/*@ assigns *__fc_stdout;
-    assigns *__fc_stdout \from *(format+(..)); */
-extern int printf(char const *format , ...);
-/*@ assigns *__fc_stdout;
-    assigns *__fc_stdout \from *(format+(..)); */
-int __e_acsl_printf(char const *format , ...)
-{
-  int __retres;
-  __retres = printf(format);
-  return __retres;
-}
-
-/*@ requires predicate ≢ 0;
-    assigns \nothing; */
-void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
-{
-  if (! predicate) {
-    printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
-           line,pred_txt);
-    exit(1);
-  }
-  return;
-}
-
-/*@ assigns \nothing; */
-extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
-                                                            size_t size);
-/*@ assigns \nothing; */
-extern  __attribute__((__FC_BUILTIN__)) void __delete_block(void *ptr);
-/*@ assigns \nothing; */
-extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
-/*@ assigns \nothing; */
-extern  __attribute__((__FC_BUILTIN__)) int __valid(void *ptr, size_t size);
-/*@ ensures \result ≡ 0 ∨ \result ≡ 1;
-    ensures
-      \result ≡ 1 ⇒ \initialized((char *)\old(ptr)+(0..\old(size)-1));
-    assigns \nothing;
- */
-extern  __attribute__((__FC_BUILTIN__)) int __initialized(void *ptr,
-                                                          size_t size);
-extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 int *X;
 /*@ requires \valid(x);
     ensures \valid(\result); */
@@ -252,6 +194,7 @@ int *f(int *x)
 int *__e_acsl_f(int *x)
 {
   int *__retres;
+  __store_block((void *)(& __retres),4U);
   {
     int __e_acsl_valid;
     __store_block((void *)(& x),4U);
@@ -259,6 +202,7 @@ int *__e_acsl_f(int *x)
     __e_acsl_valid = __valid((void *)x,sizeof(int));
     e_acsl_assert(__e_acsl_valid,(char *)"Precondition",(char *)"\\valid(x)",
                   15);
+    __full_init((void *)(& __retres));
     __retres = f(x);
   }
   {
@@ -267,6 +211,7 @@ int *__e_acsl_f(int *x)
     e_acsl_assert(__e_acsl_valid_2,(char *)"Postcondition",
                   (char *)"\\valid(\\result)",16);
     __delete_block((void *)(& x));
+    __delete_block((void *)(& __retres));
     return __retres;
   }
 }

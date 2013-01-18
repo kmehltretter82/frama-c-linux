@@ -20,29 +20,14 @@
 /*                                                                        */
 /**************************************************************************/
 
-/************************/
-/* Standard C functions */
-/************************/
+#include "e_acsl.h"
+#include "stdlib.h"
+#include "stdio.h"
 
-#ifndef E_ACSL
-#define E_ACSL
-
-/* #include "stdlib.h" */
-/* #include "stdio.h" */
-
-/*****************************/
-/* Dedicated E-ACSL function */
-/*****************************/
-
-/*@ requires predicate != 0; 
-  @ assigns \nothing; */
-void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
-  __attribute__((FC_BUILTIN));/*  { */
-/*   if (! predicate) { */
-/*     printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",  */
-/* 	   kind, line, pred_txt);  */
-/*     exit(1); */
-/*   } */
-/* } */
-
-#endif
+void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line) {
+  if (! predicate) {
+    printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",
+	   kind, line, pred_txt);
+    exit(1);
+  }
+}

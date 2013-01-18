@@ -4,8 +4,6 @@
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel_api.h"
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_bittree.h"
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
-tests/e-acsl-runtime/bts1326.i:18:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-                  Ignoring annotation.
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed
@@ -13,53 +11,18 @@ tests/e-acsl-runtime/bts1326.i:18:[e-acsl] warning: E-ACSL construct `assigns cl
         __fc_random_counter ∈ {0}
         __fc_rand_max ∈ {32767}
         __fc_heap_status ∈ [--..--]
-        __fc_stdout ∈ {{ NULL ; &S___fc_stdout }}
-        S___fc_stdout[0]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
-                     [--..--]
-                     [0].__fc_inode ∈ {{ NULL ; &S___fc_inode_0_S___fc_stdout }}
-                     [1]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
-                     [--..--]
-                     [1].__fc_inode ∈ {{ NULL ; &S___fc_inode_1_S___fc_stdout }}
-        S___fc_inode_0_S___fc_stdout[0]{.st_dev; .st_ino; .st_mode; .st_nlink; .st_uid; .st_gid; .st_rdev; .st_size; .st_atime; .st_mtime; .st_ctime; .st_blksize; .st_blocks; } ∈
-                                    [--..--]
-                                    [0].__fc_real_data ∈
-                                    {{ NULL ;
-                                       &S___fc_real_data_0_S___fc_inode_0_S___fc_stdout }}
-                                    {[0].__fc_real_data_max_size; [1]{.st_dev; .st_ino; .st_mode; .st_nlink; .st_uid; .st_gid; .st_rdev; .st_size; .st_atime; .st_mtime; .st_ctime; .st_blksize; .st_blocks; }; } ∈
-                                    [--..--]
-                                    [1].__fc_real_data ∈
-                                    {{ NULL ;
-                                       &S___fc_real_data_1_S___fc_inode_0_S___fc_stdout }}
-                                    [1].__fc_real_data_max_size ∈ [--..--]
-        S___fc_real_data_0_S___fc_inode_0_S___fc_stdout[0..1] ∈ [--..--]
-        S___fc_real_data_1_S___fc_inode_0_S___fc_stdout[0..1] ∈ [--..--]
-        S___fc_inode_1_S___fc_stdout[0]{.st_dev; .st_ino; .st_mode; .st_nlink; .st_uid; .st_gid; .st_rdev; .st_size; .st_atime; .st_mtime; .st_ctime; .st_blksize; .st_blocks; } ∈
-                                    [--..--]
-                                    [0].__fc_real_data ∈
-                                    {{ NULL ;
-                                       &S___fc_real_data_0_S___fc_inode_1_S___fc_stdout }}
-                                    {[0].__fc_real_data_max_size; [1]{.st_dev; .st_ino; .st_mode; .st_nlink; .st_uid; .st_gid; .st_rdev; .st_size; .st_atime; .st_mtime; .st_ctime; .st_blksize; .st_blocks; }; } ∈
-                                    [--..--]
-                                    [1].__fc_real_data ∈
-                                    {{ NULL ;
-                                       &S___fc_real_data_1_S___fc_inode_1_S___fc_stdout }}
-                                    [1].__fc_real_data_max_size ∈ [--..--]
-        S___fc_real_data_0_S___fc_inode_1_S___fc_stdout[0..1] ∈ [--..--]
-        S___fc_real_data_1_S___fc_inode_1_S___fc_stdout[0..1] ∈ [--..--]
 [value] using specification for function __store_block
 [value] using specification for function __initialize
 [value] using specification for function __full_init
 [value] using specification for function __delete_block
 tests/e-acsl-runtime/bts1326.i:10:[value] Function atp_NORMAL_computeAverageAccel: postcondition got status valid.
 [value] using specification for function __valid_read
-./share/e-acsl/e_acsl.h:39:[value] Function e_acsl_assert: precondition got status unknown.
-[value] using specification for function printf
-[value] using specification for function exit
-FRAMAC_SHARE/libc/stdlib.h:180:[value] Function exit: postcondition got status invalid.
+[value] using specification for function e_acsl_assert
+./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status unknown.
 [value] using specification for function __initialized
 ./share/e-acsl/memory_model/e_acsl_mmodel.h:85:[value] Function __initialized: postcondition got status unknown.
 ./share/e-acsl/memory_model/e_acsl_mmodel.h:86:[value] Function __initialized: postcondition got status valid.
-./share/e-acsl/e_acsl.h:39:[value] Function e_acsl_assert: precondition got status valid.
+./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status valid.
 tests/e-acsl-runtime/bts1326.i:10:[value] Function __e_acsl_atp_NORMAL_computeAverageAccel: postcondition got status valid.
 [value] using specification for function __clean
 [kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
@@ -67,21 +30,8 @@ tests/e-acsl-runtime/bts1326.i:10:[value] Function __e_acsl_atp_NORMAL_computeAv
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function atp_NORMAL_computeAverageAccel:
           av ∈ {3}
-[value] Values at end of function e_acsl_assert:
-          S___fc_stdout[0]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
-                       [--..--]
-                       [0].__fc_inode ∈ {{ NULL ; &S___fc_inode_0_S___fc_stdout }}
-                       [1]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
-                       [--..--]
-                       [1].__fc_inode ∈ {{ NULL ; &S___fc_inode_1_S___fc_stdout }}
 [value] Values at end of function __e_acsl_atp_NORMAL_computeAverageAccel:
           av ∈ {3}
-          S___fc_stdout[0]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
-                       [--..--]
-                       [0].__fc_inode ∈ {{ NULL ; &S___fc_inode_0_S___fc_stdout }}
-                       [1]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
-                       [--..--]
-                       [1].__fc_inode ∈ {{ NULL ; &S___fc_inode_1_S___fc_stdout }}
 [value] Values at end of function main:
           Accel[0] ∈ {1}
                [1] ∈ {2}
@@ -90,9 +40,3 @@ tests/e-acsl-runtime/bts1326.i:10:[value] Function __e_acsl_atp_NORMAL_computeAv
                [4] ∈ {5}
           av ∈ {3}
           __retres ∈ {0}
-          S___fc_stdout[0]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
-                       [--..--]
-                       [0].__fc_inode ∈ {{ NULL ; &S___fc_inode_0_S___fc_stdout }}
-                       [1]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
-                       [--..--]
-                       [1].__fc_inode ∈ {{ NULL ; &S___fc_inode_1_S___fc_stdout }}

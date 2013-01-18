@@ -404,7 +404,7 @@ you must call function `%s' by yourself"
 	let env = allocate_function env kf in
 	(* translate the precondition of the function *)
 	if Pre_visit.is_generated_function (Extlib.the self#current_kf) then
-	  Project.on prj (Translate.translate_pre_spec kf env) !funspec
+	  Project.on prj (Translate.translate_pre_spec kf Kglobal env) !funspec
 	else
 	  env
       else
@@ -419,7 +419,10 @@ you must call function `%s' by yourself"
 	    Cil.visitCilCodeAnnotation (self :> Cil.cilVisitor) old_a
 	  in
 	  let env = 
-	    Project.on prj (Translate.translate_pre_code_annotation kf env) a 
+	    Project.on
+	      prj
+	      (Translate.translate_pre_code_annotation kf stmt env)
+	      a 
 	  in
 	  env, a :: new_annots)
 	(Cil.get_original_stmt self#behavior stmt)
@@ -439,7 +442,8 @@ you must call function `%s' by yourself"
 	  List.fold_left
 	    (fun env a -> match a.annot_content with
 	    | AAssert(_, p) ->
-	      Translate.translate_named_predicate kf ~rte:false env p
+	      Translate.translate_named_predicate
+		kf (Kstmt stmt) ~rte:false env p
 	    | _ -> assert false)
 	    env
 	    rtes
@@ -469,7 +473,8 @@ you must call function `%s' by yourself"
 	Project.on
 	  prj
 	  (List.fold_right
-	     (fun a env -> Translate.translate_post_code_annotation kf env a)
+	     (fun a env -> 
+	       Translate.translate_post_code_annotation kf stmt env a)
 	     new_annots)
 	  env
       in
@@ -482,7 +487,10 @@ you must call function `%s' by yourself"
 	  (* also handle the postcondition of the function and clear the env *)
 	  let env = 
 	    if Pre_visit.is_generated_function (Extlib.the self#current_kf) then
-	      Project.on prj (Translate.translate_post_spec kf env) !funspec 
+	      Project.on
+		prj
+		(Translate.translate_post_spec kf Kglobal env) 
+		!funspec 
 	    else
 	      env
 	  in
@@ -497,7 +505,7 @@ you must call function `%s' by yourself"
 	    | [] -> assert false (* return is here *)
 	    | ret :: l ->
 	      let delete_stmts =
-		Globals.Vars.fold
+		Globals.Vars.fold_in_file_order
 		  (fun vi _ acc -> 
 		    if Pre_analysis.must_model_vi vi then 
 		      let vi = Cil.get_varinfo self#behavior vi in
@@ -621,7 +629,8 @@ you must call function `%s' by yourself"
 
   initializer 
     Misc.reset ();
-    self#reset_env ()
+    self#reset_env ();
+    Translate.set_original_project (Project.current ())
 
 end
 

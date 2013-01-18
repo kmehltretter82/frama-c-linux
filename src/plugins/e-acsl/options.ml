@@ -55,6 +55,20 @@ module Project_name =
       let arg_name = "prj"
      end)
 
+module Valid =
+  False
+    (struct
+      let option_name = "-e-acsl-valid"
+      let help = "translate annotation which have been proven valid"
+     end)
+
+module Prepare =
+  False
+    (struct
+      let option_name = "-e-acsl-prepare"
+      let help = "prepare the AST to be directly usable by E-ACSL"
+     end)
+
 module Gmp_only =
   False
     (struct

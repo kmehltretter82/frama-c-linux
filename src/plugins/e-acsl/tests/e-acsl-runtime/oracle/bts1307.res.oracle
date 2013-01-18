@@ -5,8 +5,6 @@
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_bittree.h"
 [kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
 tests/e-acsl-runtime/bts1307.i:16:[kernel] warning: Floating-point constant 0.4 is not represented exactly. Will use 0x1.999999999999ap-2. See documentation for option -warn-decimal-float
-tests/e-acsl-runtime/bts1307.i:31:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-                  Ignoring annotation.
 tests/e-acsl-runtime/bts1307.i:31:[e-acsl] warning: approximating type `real' by `long double'
 tests/e-acsl-runtime/bts1307.i:31:[e-acsl] approximating a real number by a float
 [value] Analyzing a complete application starting at main
@@ -16,49 +14,14 @@ tests/e-acsl-runtime/bts1307.i:31:[e-acsl] approximating a real number by a floa
         __fc_random_counter ∈ {0}
         __fc_rand_max ∈ {32767}
         __fc_heap_status ∈ [--..--]
-        __fc_stdout ∈ {{ NULL ; &S___fc_stdout }}
-        S___fc_stdout[0]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
-                     [--..--]
-                     [0].__fc_inode ∈ {{ NULL ; &S___fc_inode_0_S___fc_stdout }}
-                     [1]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
-                     [--..--]
-                     [1].__fc_inode ∈ {{ NULL ; &S___fc_inode_1_S___fc_stdout }}
-        S___fc_inode_0_S___fc_stdout[0]{.st_dev; .st_ino; .st_mode; .st_nlink; .st_uid; .st_gid; .st_rdev; .st_size; .st_atime; .st_mtime; .st_ctime; .st_blksize; .st_blocks; } ∈
-                                    [--..--]
-                                    [0].__fc_real_data ∈
-                                    {{ NULL ;
-                                       &S___fc_real_data_0_S___fc_inode_0_S___fc_stdout }}
-                                    {[0].__fc_real_data_max_size; [1]{.st_dev; .st_ino; .st_mode; .st_nlink; .st_uid; .st_gid; .st_rdev; .st_size; .st_atime; .st_mtime; .st_ctime; .st_blksize; .st_blocks; }; } ∈
-                                    [--..--]
-                                    [1].__fc_real_data ∈
-                                    {{ NULL ;
-                                       &S___fc_real_data_1_S___fc_inode_0_S___fc_stdout }}
-                                    [1].__fc_real_data_max_size ∈ [--..--]
-        S___fc_real_data_0_S___fc_inode_0_S___fc_stdout[0..1] ∈ [--..--]
-        S___fc_real_data_1_S___fc_inode_0_S___fc_stdout[0..1] ∈ [--..--]
-        S___fc_inode_1_S___fc_stdout[0]{.st_dev; .st_ino; .st_mode; .st_nlink; .st_uid; .st_gid; .st_rdev; .st_size; .st_atime; .st_mtime; .st_ctime; .st_blksize; .st_blocks; } ∈
-                                    [--..--]
-                                    [0].__fc_real_data ∈
-                                    {{ NULL ;
-                                       &S___fc_real_data_0_S___fc_inode_1_S___fc_stdout }}
-                                    {[0].__fc_real_data_max_size; [1]{.st_dev; .st_ino; .st_mode; .st_nlink; .st_uid; .st_gid; .st_rdev; .st_size; .st_atime; .st_mtime; .st_ctime; .st_blksize; .st_blocks; }; } ∈
-                                    [--..--]
-                                    [1].__fc_real_data ∈
-                                    {{ NULL ;
-                                       &S___fc_real_data_1_S___fc_inode_1_S___fc_stdout }}
-                                    [1].__fc_real_data_max_size ∈ [--..--]
-        S___fc_real_data_0_S___fc_inode_1_S___fc_stdout[0..1] ∈ [--..--]
-        S___fc_real_data_1_S___fc_inode_1_S___fc_stdout[0..1] ∈ [--..--]
 [value] using specification for function __store_block
 [value] using specification for function __full_init
 tests/e-acsl-runtime/bts1307.i:7:[value] Function __e_acsl_foo: precondition got status valid.
 tests/e-acsl-runtime/bts1307.i:8:[value] Function __e_acsl_foo: precondition got status valid.
 tests/e-acsl-runtime/bts1307.i:9:[value] Function __e_acsl_foo: precondition got status valid.
 [value] using specification for function __valid
-./share/e-acsl/e_acsl.h:39:[value] Function e_acsl_assert: precondition got status unknown.
-[value] using specification for function printf
-[value] using specification for function exit
-FRAMAC_SHARE/libc/stdlib.h:180:[value] Function exit: postcondition got status invalid.
+[value] using specification for function e_acsl_assert
+./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status unknown.
 tests/e-acsl-runtime/bts1307.i:7:[value] Function foo: precondition got status valid.
 tests/e-acsl-runtime/bts1307.i:8:[value] Function foo: precondition got status valid.
 tests/e-acsl-runtime/bts1307.i:9:[value] Function foo: precondition got status valid.
@@ -78,7 +41,7 @@ tests/e-acsl-runtime/bts1307.i:19:[value] Function bar: precondition got status 
 tests/e-acsl-runtime/bts1307.i:20:[value] Function bar: precondition got status valid.
 tests/e-acsl-runtime/bts1307.i:21:[value] Function bar: precondition got status valid.
 tests/e-acsl-runtime/bts1307.i:25:[value] Function bar, behavior UnderEstimate_Motoring: postcondition got status unknown.
-./share/e-acsl/e_acsl.h:39:[value] Function e_acsl_assert: precondition got status valid.
+./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status valid.
 tests/e-acsl-runtime/bts1307.i:25:[value] Function __e_acsl_bar, behavior UnderEstimate_Motoring: postcondition got status unknown.
 [value] using specification for function __clean
 [kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
@@ -86,39 +49,14 @@ tests/e-acsl-runtime/bts1307.i:25:[value] Function __e_acsl_bar, behavior UnderE
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function bar:
           h ∈ 0.850000023842
-[value] Values at end of function foo:
-          h ∈ 6.
-[value] Values at end of function e_acsl_assert:
-          S___fc_stdout[0]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
-                       [--..--]
-                       [0].__fc_inode ∈ {{ NULL ; &S___fc_inode_0_S___fc_stdout }}
-                       [1]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
-                       [--..--]
-                       [1].__fc_inode ∈ {{ NULL ; &S___fc_inode_1_S___fc_stdout }}
 [value] Values at end of function __e_acsl_bar:
           h ∈ 0.850000023842
-          S___fc_stdout[0]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
-                       [--..--]
-                       [0].__fc_inode ∈ {{ NULL ; &S___fc_inode_0_S___fc_stdout }}
-                       [1]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
-                       [--..--]
-                       [1].__fc_inode ∈ {{ NULL ; &S___fc_inode_1_S___fc_stdout }}
+[value] Values at end of function foo:
+          h ∈ 6.
 [value] Values at end of function __e_acsl_foo:
           h ∈ 6.
-          S___fc_stdout[0]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
-                       [--..--]
-                       [0].__fc_inode ∈ {{ NULL ; &S___fc_inode_0_S___fc_stdout }}
-                       [1]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
-                       [--..--]
-                       [1].__fc_inode ∈ {{ NULL ; &S___fc_inode_1_S___fc_stdout }}
 [value] Values at end of function main:
           f ∈ 1.
           g ∈ 1.
           h ∈ 0.850000023842
           __retres ∈ {0}
-          S___fc_stdout[0]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
-                       [--..--]
-                       [0].__fc_inode ∈ {{ NULL ; &S___fc_inode_0_S___fc_stdout }}
-                       [1]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
-                       [--..--]
-                       [1].__fc_inode ∈ {{ NULL ; &S___fc_inode_1_S___fc_stdout }}

@@ -7,43 +7,6 @@ struct __anonstruct___mpz_struct_1 {
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
 typedef unsigned int size_t;
-typedef unsigned int ino_t;
-typedef unsigned int gid_t;
-typedef unsigned int uid_t;
-typedef long time_t;
-typedef unsigned int blkcnt_t;
-typedef unsigned int blksize_t;
-typedef unsigned int dev_t;
-typedef unsigned int mode_t;
-typedef unsigned int nlink_t;
-typedef unsigned int off_t;
-struct stat {
-   dev_t st_dev ;
-   ino_t st_ino ;
-   mode_t st_mode ;
-   nlink_t st_nlink ;
-   uid_t st_uid ;
-   gid_t st_gid ;
-   dev_t st_rdev ;
-   off_t st_size ;
-   time_t st_atime ;
-   time_t st_mtime ;
-   time_t st_ctime ;
-   blksize_t st_blksize ;
-   blkcnt_t st_blocks ;
-   char *__fc_real_data ;
-   int __fc_real_data_max_size ;
-};
-struct __fc_FILE {
-   unsigned int __fc_stdio_id ;
-   unsigned int __fc_maxsz ;
-   unsigned int __fc_writepos ;
-   unsigned int __fc_readpos ;
-   int __fc_is_a_socket ;
-   int __fc_mode ;
-   struct stat *__fc_inode ;
-};
-typedef struct __fc_FILE FILE;
 struct msgA {
    int type ;
    int a[2] ;
@@ -63,7 +26,12 @@ union msg {
 /*@
 model __mpz_struct { ℤ n };
 */
-void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line);
+/*@ requires predicate ≢ 0;
+    assigns \nothing; */
+extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
+                                                           char *kind,
+                                                           char *pred_txt,
+                                                           int line);
 int __fc_random_counter __attribute__((__unused__));
 unsigned long const __fc_rand_max = 32767UL;
 extern int __fc_heap_status;
@@ -75,43 +43,6 @@ axiomatic
   
   }
  */
-/*@ ensures \false;
-    assigns \nothing; */
-extern void exit(int status);
-/*@ ensures \false;
-    assigns \nothing; */
-void __e_acsl_exit(int status)
-{
-  exit(status);
-  e_acsl_assert(0,(char *)"Postcondition",(char *)"\\false",180);
-  return;
-}
-
-extern FILE *__fc_stdout;
-/*@ assigns *__fc_stdout;
-    assigns *__fc_stdout \from *(format+(..)); */
-extern int printf(char const *format , ...);
-/*@ assigns *__fc_stdout;
-    assigns *__fc_stdout \from *(format+(..)); */
-int __e_acsl_printf(char const *format , ...)
-{
-  int __retres;
-  __retres = printf(format);
-  return __retres;
-}
-
-/*@ requires predicate ≢ 0;
-    assigns \nothing; */
-void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line)
-{
-  if (! predicate) {
-    printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",kind,
-           line,pred_txt);
-    exit(1);
-  }
-  return;
-}
-
 /*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
                                                             size_t size);

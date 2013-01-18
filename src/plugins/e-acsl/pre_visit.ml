@@ -29,6 +29,8 @@ open Cil_types
 let fct_tbl: unit Kernel_function.Hashtbl.t = Kernel_function.Hashtbl.create 7
 let is_generated_function kf = Kernel_function.Hashtbl.mem fct_tbl kf
 
+let actions = Queue.create ()
+
 module Global: sig
   val add_logic_info: logic_info -> unit
   val mem_logic_info: logic_info -> bool
@@ -44,11 +46,47 @@ end
 
 let reset () = 
   Kernel_function.Hashtbl.clear fct_tbl;
-  Global.reset ()
+  Global.reset ();
+  Queue.clear actions
+
+(* ********************************************************************** *)
+(* Duplicating property statuses *)
+(* ********************************************************************** *)
+
+let copy_ppt old_prj new_prj old_ppt new_ppt =
+  let module P = Property_status in
+  let selection = State_selection.of_list [ P.self; Emitter.self ] in
+  let emit s l =
+    Project.on ~selection new_prj 
+      (fun s ->
+	let e = match l with [] -> assert false | e :: _ -> e in
+(*	Options.feedback "HERE %a --> %a  (%a)" Property.pretty new_ppt
+	  P.Emitted_status.pretty s Project.pretty new_prj;*)
+	if not e.P.logical_consequence then
+	  let emitter = Emitter.Usable_emitter.get e.P.emitter in
+(*	  Options.feedback "EMIT %a --> %a  (%a)" Property.pretty new_ppt
+	    P.Emitted_status.pretty s Project.pretty new_prj;*)
+	  P.emit emitter ~hyps:e.P.properties new_ppt s)
+      s
+  in
+  let copy () =
+    match Project.on ~selection old_prj P.get old_ppt with
+    | P.Never_tried -> ()
+    | P.Best(s, l) -> emit s l
+    | P.Inconsistent i ->
+      emit P.True i.P.valid;
+      emit P.False_and_reachable i.P.invalid
+  in
+  if not (Options.Valid.get ()) then Queue.add copy actions
 
 (* ********************************************************************** *)
 (* Duplicating functions *)
 (* ********************************************************************** *)
+
+let dup_spec_status old_prj kf new_kf old_spec new_spec =
+  let old_ppts = Property.ip_of_spec kf Kglobal old_spec in
+  let new_ppts = Property.ip_of_spec new_kf Kglobal new_spec in
+  List.iter2 (copy_ppt old_prj (Project.current ())) old_ppts new_ppts
 
 let dup_funspec tbl bhv spec =
   (*  Options.feedback "DUP SPEC %a" Cil.d_funspec spec;*)
@@ -148,25 +186,73 @@ let dup_fundec loc spec bhv kf vi new_vi =
     sspec = new_spec }, 
   return
 
-let dup_global loc spec bhv kf vi new_vi = 
+let dup_global loc old_prj spec bhv kf vi new_vi = 
   (*  Options.feedback "DUP GLOBAL %s" vi.vname;*)
   let fundec, return = dup_fundec loc spec bhv kf vi new_vi  in
   let fct = Definition(fundec, loc) in
-  let spec = fundec.sspec in
-  let kf = { fundec = fct; return_stmt = Some return; spec = spec } in
-  Kernel_function.Hashtbl.add fct_tbl kf ();
-  Globals.Functions.register kf;
-  Globals.Functions.replace_by_definition spec fundec loc;
+  let new_spec = fundec.sspec in
+  let new_kf = { fundec = fct; return_stmt = Some return; spec = new_spec } in
+  Kernel_function.Hashtbl.add fct_tbl new_kf ();
+  Globals.Functions.register new_kf;
+  Globals.Functions.replace_by_definition new_spec fundec loc;
+  Annotations.register_funspec new_kf;
+  dup_spec_status old_prj kf new_kf spec new_spec;
   GFun(fundec, loc)
 
 (* ********************************************************************** *)
 (* Visitor *)
 (* ********************************************************************** *)
 
+type position = Before_gmp | Gmp | After_gmp | Memory_model | Code
+
 class dup_functions_visitor prj = object (self)
   inherit Visitor.frama_c_copy prj
 
   val fct_tbl = Cil_datatype.Varinfo.Hashtbl.create 7
+  val mutable before_memory_model = Before_gmp
+  val mutable libc_decls = []
+
+  method private before_memory_model = match before_memory_model with
+  | Before_gmp | Gmp | After_gmp -> true
+  | Memory_model | Code -> false
+
+  method private insert_libc l =
+    match libc_decls with
+    | [] -> l
+    | _ :: _ ->
+      let res = List.fold_left (fun acc g -> g :: acc) l libc_decls in
+      libc_decls <- [];
+      res
+
+  method private dup_libc g new_g =
+    if self#before_memory_model then begin
+      libc_decls <- new_g :: libc_decls;
+      [ g ]
+    end else
+      self#insert_libc [ g; new_g ]
+
+  method private next () =
+    match before_memory_model with
+    | Before_gmp -> ()
+    | Gmp -> before_memory_model <- After_gmp
+    | After_gmp -> ()
+    | Memory_model -> before_memory_model <- Code
+    | Code -> ()
+
+  method vcode_annot a =
+    Cil.JustCopyPost
+      (fun a' ->
+	let get_ppt kf stmt a = Property.ip_of_code_annot kf stmt a in
+	let kf = Extlib.the self#current_kf in
+	let stmt = Extlib.the self#current_stmt in
+	List.iter2
+	  (fun p p' -> copy_ppt (Project.current ()) prj p p')
+	  (get_ppt kf stmt a)
+	  (get_ppt
+	     (Cil.get_kernel_function self#behavior kf) 
+	     (Cil.get_stmt self#behavior stmt)
+	     a');
+	a')
 
   method vlogic_info_decl li = 
     Global.add_logic_info li;
@@ -180,7 +266,7 @@ class dup_functions_visitor prj = object (self)
       Cil.JustCopy
 
   method vglob_aux = function
-  | GVarDecl(_, vi, loc) | GFun({ svar = vi }, loc) 
+  | GVarDecl(_, vi, loc) | GFun({ svar = vi }, loc)
       when Cil.isFunctionType vi.vtype
 	&& not (Misc.is_library_loc loc) 
 	&& not (Cil.is_builtin vi)
@@ -189,6 +275,7 @@ class dup_functions_visitor prj = object (self)
 		  (Annotations.funspec ~populate:false
 		     (Extlib.the self#current_kf)))
 	-> 
+    self#next ();
     let name = "__e_acsl_" ^ vi.vname in
     let new_vi = Project.on prj (Cil.makeGlobalVar name) vi.vtype in
     Cil_datatype.Varinfo.Hashtbl.add fct_tbl vi new_vi;
@@ -213,17 +300,36 @@ class dup_functions_visitor prj = object (self)
 	let spec = Annotations.funspec ~populate:false kf in
 	let vi_bhv = Cil.get_varinfo self#behavior vi in
 	let new_g = 
-	  Project.on prj (dup_global loc spec self#behavior kf vi_bhv) 
+	  Project.on prj
+	    (dup_global loc (Project.current ()) spec self#behavior kf vi_bhv) 
 	    new_vi 
 	in
-	[ g; new_g ]
+	self#dup_libc g new_g
       | _ -> assert false)
-  | GVarDecl(_, vi, loc) | GFun({ svar = vi }, loc) 
-      when Misc.is_library_loc loc || Cil.is_builtin vi
-	->
+  | GVarDecl(_, _, loc) | GFun(_, loc) when Misc.is_library_loc loc ->
+    (match before_memory_model with
+    | Before_gmp -> before_memory_model <- Gmp
+    | Gmp | Memory_model -> ()
+    | After_gmp -> before_memory_model <- Memory_model
+    | Code -> assert false);
+    Cil.JustCopy
+  | GVarDecl(_, vi, _) | GFun({ svar = vi }, _) when Cil.is_builtin vi ->
+    self#next ();
     Cil.JustCopy
   | _ -> 
-    Cil.DoChildren
+    self#next ();
+    Cil.DoChildrenPost self#insert_libc
+
+  method vfile _ =
+    Cil.DoChildrenPost
+      (fun f ->
+	match libc_decls with
+	| [] -> f
+	| _ :: _ -> 
+	  (* in the rare case where there is no global tagged as [Code] in the
+	     file *)
+	  f.globals <- self#insert_libc f.globals; 
+	  f)
 
   initializer reset ()
 
@@ -236,6 +342,7 @@ let dup_functions () =
       (new dup_functions_visitor)
   in
   Project.copy ~selection:(Plugin.get_selection ()) prj;
+  Queue.iter (fun f -> f ()) actions;
   prj
 
 (*

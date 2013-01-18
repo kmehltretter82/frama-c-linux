@@ -15,6 +15,8 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
+-  E-ACSL       [2013/01/09] New option -e-acsl-valid. By default, valid
+	        annotation are not translated anymore.
 -* E-ACSL       [2013/01/09] Fix bug when translating a postcondition of a
 	        function where the init state is the same than the final
 	        state (bts #!1300).

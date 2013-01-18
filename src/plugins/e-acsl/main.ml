@@ -156,7 +156,7 @@ let predicate_to_exp =
     Translate.predicate_to_exp
 
 let add_e_acsl_library _files = 
-  if Options.must_visit () then ignore (extend_ast ())
+  if Options.must_visit () || Options.Prepare.get () then ignore (extend_ast ())
 
 let () = Cmdline.run_after_configuring_stage add_e_acsl_library
 

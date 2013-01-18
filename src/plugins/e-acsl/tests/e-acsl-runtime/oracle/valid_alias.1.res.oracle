@@ -20,39 +20,6 @@ tests/e-acsl-runtime/valid_alias.c:10:[e-acsl] warning: E-ACSL construct `\alloc
         __fc_random_counter ∈ {0}
         __fc_rand_max ∈ {32767}
         __fc_heap_status ∈ [--..--]
-        __fc_stdout ∈ {{ NULL ; &S___fc_stdout }}
-        S___fc_stdout[0]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
-                     [--..--]
-                     [0].__fc_inode ∈ {{ NULL ; &S___fc_inode_0_S___fc_stdout }}
-                     [1]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
-                     [--..--]
-                     [1].__fc_inode ∈ {{ NULL ; &S___fc_inode_1_S___fc_stdout }}
-        S___fc_inode_0_S___fc_stdout[0]{.st_dev; .st_ino; .st_mode; .st_nlink; .st_uid; .st_gid; .st_rdev; .st_size; .st_atime; .st_mtime; .st_ctime; .st_blksize; .st_blocks; } ∈
-                                    [--..--]
-                                    [0].__fc_real_data ∈
-                                    {{ NULL ;
-                                       &S___fc_real_data_0_S___fc_inode_0_S___fc_stdout }}
-                                    {[0].__fc_real_data_max_size; [1]{.st_dev; .st_ino; .st_mode; .st_nlink; .st_uid; .st_gid; .st_rdev; .st_size; .st_atime; .st_mtime; .st_ctime; .st_blksize; .st_blocks; }; } ∈
-                                    [--..--]
-                                    [1].__fc_real_data ∈
-                                    {{ NULL ;
-                                       &S___fc_real_data_1_S___fc_inode_0_S___fc_stdout }}
-                                    [1].__fc_real_data_max_size ∈ [--..--]
-        S___fc_real_data_0_S___fc_inode_0_S___fc_stdout[0..1] ∈ [--..--]
-        S___fc_real_data_1_S___fc_inode_0_S___fc_stdout[0..1] ∈ [--..--]
-        S___fc_inode_1_S___fc_stdout[0]{.st_dev; .st_ino; .st_mode; .st_nlink; .st_uid; .st_gid; .st_rdev; .st_size; .st_atime; .st_mtime; .st_ctime; .st_blksize; .st_blocks; } ∈
-                                    [--..--]
-                                    [0].__fc_real_data ∈
-                                    {{ NULL ;
-                                       &S___fc_real_data_0_S___fc_inode_1_S___fc_stdout }}
-                                    {[0].__fc_real_data_max_size; [1]{.st_dev; .st_ino; .st_mode; .st_nlink; .st_uid; .st_gid; .st_rdev; .st_size; .st_atime; .st_mtime; .st_ctime; .st_blksize; .st_blocks; }; } ∈
-                                    [--..--]
-                                    [1].__fc_real_data ∈
-                                    {{ NULL ;
-                                       &S___fc_real_data_1_S___fc_inode_1_S___fc_stdout }}
-                                    [1].__fc_real_data_max_size ∈ [--..--]
-        S___fc_real_data_0_S___fc_inode_1_S___fc_stdout[0..1] ∈ [--..--]
-        S___fc_real_data_1_S___fc_inode_1_S___fc_stdout[0..1] ∈ [--..--]
 [value] using specification for function __store_block
 [value] using specification for function __full_init
 tests/e-acsl-runtime/valid_alias.c:12:[value] Assertion got status valid.
@@ -67,7 +34,9 @@ tests/e-acsl-runtime/valid_alias.c:12:[kernel] warning: accessing uninitialized 
 tests/e-acsl-runtime/valid_alias.c:12:[kernel] warning: completely indeterminate value in b.
 tests/e-acsl-runtime/valid_alias.c:12:[value] Non-termination in evaluation of function call expression argument
         (void *)b
-./share/e-acsl/e_acsl.h:39:[value] Function e_acsl_assert: precondition got status valid.
+[value] using specification for function e_acsl_assert
+./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status valid.
+[value] using specification for function __delete_block
 FRAMAC_SHARE/libc/stdlib.h:127:[value] Function __e_acsl_malloc, behavior allocation: postcondition got status unknown.
 FRAMAC_SHARE/libc/stdlib.h:127:[value] Function __e_acsl_malloc, behavior allocation: postcondition got status unknown, but it is unknown if the behavior is active.
 FRAMAC_SHARE/libc/stdlib.h:132:[value] Function __e_acsl_malloc, behavior no_allocation: postcondition got status invalid.
@@ -76,10 +45,7 @@ FRAMAC_SHARE/libc/stdlib.h:132:[value] Function __e_acsl_malloc, behavior no_all
 tests/e-acsl-runtime/valid_alias.c:16:[value] Assertion got status valid.
 ./share/e-acsl/memory_model/e_acsl_mmodel.h:86:[value] Function __initialized: postcondition got status valid.
 [value] using specification for function __valid
-./share/e-acsl/e_acsl.h:39:[value] Function e_acsl_assert: precondition got status unknown.
-[value] using specification for function printf
-[value] using specification for function exit
-FRAMAC_SHARE/libc/stdlib.h:180:[value] Function exit: postcondition got status invalid.
+./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status unknown.
 tests/e-acsl-runtime/valid_alias.c:17:[value] Assertion got status valid.
 [value] using specification for function __valid_read
 FRAMAC_SHARE/libc/stdlib.h:142:[value] Function __e_acsl_free, behavior deallocation: precondition got status unknown.
@@ -93,7 +59,6 @@ tests/e-acsl-runtime/valid_alias.c:19:[kernel] warning: accessing left-value b t
 tests/e-acsl-runtime/valid_alias.c:19:[kernel] warning: completely indeterminate value in b.
 tests/e-acsl-runtime/valid_alias.c:19:[value] Non-termination in evaluation of function call expression argument
         (void *)b
-[value] using specification for function __delete_block
 [value] using specification for function __clean
 [kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
 [value] done for function main
@@ -103,13 +68,6 @@ tests/e-acsl-runtime/valid_alias.c:19:[value] Non-termination in evaluation of f
 [value] Values at end of function __e_acsl_malloc:
           __fc_heap_status ∈ [--..--]
           __retres ∈ {{ &Frama_C_alloc }}
-[value] Values at end of function e_acsl_assert:
-          S___fc_stdout[0]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
-                       [--..--]
-                       [0].__fc_inode ∈ {{ NULL ; &S___fc_inode_0_S___fc_stdout }}
-                       [1]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
-                       [--..--]
-                       [1].__fc_inode ∈ {{ NULL ; &S___fc_inode_1_S___fc_stdout }}
 tests/e-acsl-runtime/valid_alias.c:12:[value] Non-termination in evaluation of function call expression argument
         (void *)a
 tests/e-acsl-runtime/valid_alias.c:12:[value] Non-termination in evaluation of function call expression argument
@@ -124,10 +82,4 @@ tests/e-acsl-runtime/valid_alias.c:19:[value] Non-termination in evaluation of f
           b ∈ ESCAPINGADDR
           n ∈ {0}
           __retres ∈ {0}
-          S___fc_stdout[0]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
-                       [--..--]
-                       [0].__fc_inode ∈ {{ NULL ; &S___fc_inode_0_S___fc_stdout }}
-                       [1]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .__fc_mode; } ∈
-                       [--..--]
-                       [1].__fc_inode ∈ {{ NULL ; &S___fc_inode_1_S___fc_stdout }}
           Frama_C_alloc[0..3] ∈ UNINITIALIZED
