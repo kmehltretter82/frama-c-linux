@@ -53,6 +53,11 @@ let reset () =
 (* Duplicating property statuses *)
 (* ********************************************************************** *)
 
+let reemit = function
+  | Property.IPBehavior _ | Property.IPAxiom _ | Property.IPAxiomatic _
+  | Property.IPPredicate (Property.PKAssumes _, _, _, _) -> false
+  | _ -> true
+
 let copy_ppt old_prj new_prj old_ppt new_ppt =
   let module P = Property_status in
   let selection = State_selection.of_list [ P.self; Emitter.self ] in
@@ -60,13 +65,8 @@ let copy_ppt old_prj new_prj old_ppt new_ppt =
     Project.on ~selection new_prj 
       (fun s ->
 	let e = match l with [] -> assert false | e :: _ -> e in
-(*	Options.feedback "HERE %a --> %a  (%a)" Property.pretty new_ppt
-	  P.Emitted_status.pretty s Project.pretty new_prj;*)
-	if not e.P.logical_consequence then
-	  let emitter = Emitter.Usable_emitter.get e.P.emitter in
-(*	  Options.feedback "EMIT %a --> %a  (%a)" Property.pretty new_ppt
-	    P.Emitted_status.pretty s Project.pretty new_prj;*)
-	  P.emit emitter ~hyps:e.P.properties new_ppt s)
+	let emitter = Emitter.Usable_emitter.get e.P.emitter in
+	P.emit emitter ~hyps:e.P.properties new_ppt s)
       s
   in
   let copy () =
@@ -77,7 +77,7 @@ let copy_ppt old_prj new_prj old_ppt new_ppt =
       emit P.True i.P.valid;
       emit P.False_and_reachable i.P.invalid
   in
-  if not (Options.Valid.get ()) then Queue.add copy actions
+  if reemit old_ppt && not (Options.Valid.get ()) then Queue.add copy actions
 
 (* ********************************************************************** *)
 (* Duplicating functions *)
