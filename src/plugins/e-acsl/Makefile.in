@@ -57,7 +57,6 @@ PLUGIN_CMO:= local_config \
 	error \
 	misc \
 	mpz \
-	init \
 	pre_analysis \
 	pre_visit \
 	env \

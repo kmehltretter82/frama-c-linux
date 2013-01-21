@@ -669,9 +669,6 @@ let must_translate ppt =
   Project.on ~selection 
     !original_project_ref
     (fun ppt ->
-      Options.feedback "%a --> %a (%a)" Property.pretty ppt 
-	Property_status.pretty (Property_status.get ppt) Project.pretty
-	(Project.current ());
       match Property_status.get ppt with
       | Property_status.Best(Property_status.True, _) -> Options.Valid.get ()
       | _ -> true)
