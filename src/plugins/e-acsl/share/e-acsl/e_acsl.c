@@ -24,10 +24,16 @@
 #include "stdlib.h"
 #include "stdio.h"
 
-void e_acsl_assert(int predicate, char *kind, char *pred_txt, int line) {
+void e_acsl_assert(int predicate, 
+		   char *kind, 
+		   char *fct, 
+		   char *pred_txt, 
+		   int line) 
+{
   if (! predicate) {
-    printf("%s failed at line %d.\nThe failing predicate is:\n%s.\n",
-	   kind, line, pred_txt);
+    printf("%s failed at line %d of function %s.\n\
+The failing predicate is:\n%s.\n",
+	   kind, line, fct, pred_txt);
     exit(1);
   }
 }

@@ -14,6 +14,7 @@ model __mpz_struct { ℤ n };
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *kind,
+                                                           char *fct,
                                                            char *pred_txt,
                                                            int line);
 int __fc_random_counter __attribute__((__unused__));
@@ -76,10 +77,10 @@ int main(void)
     int __e_acsl_valid;
     __initialize((void *)P,sizeof(int));
     __e_acsl_valid_read = __valid_read((void *)P,sizeof(int));
-    e_acsl_assert(__e_acsl_valid_read,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_valid_read,(char *)"Assertion",(char *)"main",
                   (char *)"mem_access: \\valid_read(P)",16);
     __e_acsl_valid = __valid((void *)P,sizeof(int));
-    e_acsl_assert(__e_acsl_valid,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_valid,(char *)"Assertion",(char *)"main",
                   (char *)"mem_access: \\valid(P)",16);
     (*P) ++;
   }
@@ -94,9 +95,10 @@ int main(void)
       __e_acsl_and = __e_acsl_valid_read_2;
     }
     else __e_acsl_and = 0;
-    e_acsl_assert(__e_acsl_and,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_and,(char *)"Assertion",(char *)"main",
                   (char *)"mem_access: \\valid_read(Q)",0);
-    e_acsl_assert(*Q == G,(char *)"Assertion",(char *)"*Q == G",17);
+    e_acsl_assert(*Q == G,(char *)"Assertion",(char *)"main",
+                  (char *)"*Q == G",17);
   }
   __retres = 0;
   __delete_block((void *)(& P));

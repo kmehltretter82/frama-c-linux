@@ -44,7 +44,7 @@ tests/e-acsl-runtime/linear_search.i:9:[kernel] warning: accessing out of bounds
 ./share/e-acsl/e_acsl_gmp.h:133:[value] Function __gmpz_add: precondition got status valid.
 tests/e-acsl-runtime/linear_search.i:9:[kernel] warning: accessing out of bounds index [0..4294967295]. assert __e_acsl_3 < 10;
 [value] using specification for function e_acsl_assert
-./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status unknown.
+./share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
 :0:[value] entering loop for the first time
 tests/e-acsl-runtime/linear_search.i:14:[kernel] warning: accessing out of bounds index [0..4294967295]. assert __e_acsl_j_4 < 10;
 tests/e-acsl-runtime/linear_search.i:11:[kernel] warning: accessing out of bounds index [0..4294967295]. assert __e_acsl_j_2 < 10;

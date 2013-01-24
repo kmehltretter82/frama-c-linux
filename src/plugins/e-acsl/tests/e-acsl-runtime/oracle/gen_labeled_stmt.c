@@ -14,6 +14,7 @@ model __mpz_struct { ℤ n };
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *kind,
+                                                           char *fct,
                                                            char *pred_txt,
                                                            int line);
 int __fc_random_counter __attribute__((__unused__));
@@ -36,16 +37,19 @@ int __e_acsl_main(void)
   goto L1;
   L1:
     /*@ assert X ≡ 0; */
-    e_acsl_assert(X == 0,(char *)"Assertion",(char *)"X == 0",12);
+    e_acsl_assert(X == 0,(char *)"Assertion",(char *)"main",(char *)"X == 0",
+                  12);
     X = 1;
   goto L2;
   L2:
     /*@ requires X ≡ 1;
         ensures X ≡ 2; */
     {
-      e_acsl_assert(X == 1,(char *)"Precondition",(char *)"X == 1",14);
+      e_acsl_assert(X == 1,(char *)"Precondition",(char *)"main",
+                    (char *)"X == 1",14);
       X = 2;
-      e_acsl_assert(X == 2,(char *)"Postcondition",(char *)"X == 2",14);
+      e_acsl_assert(X == 2,(char *)"Postcondition",(char *)"main",
+                    (char *)"X == 2",14);
     }
   if (X) {
     X = 3;
@@ -61,7 +65,8 @@ int main(void)
 {
   int __retres;
   __retres = __e_acsl_main();
-  e_acsl_assert(X == 3,(char *)"Postcondition",(char *)"X == 3",9);
+  e_acsl_assert(X == 3,(char *)"Postcondition",(char *)"main",
+                (char *)"X == 3",9);
   __clean();
   return __retres;
 }

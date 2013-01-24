@@ -14,6 +14,7 @@ model __mpz_struct { ℤ n };
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *kind,
+                                                           char *fct,
                                                            char *pred_txt,
                                                            int line);
 int __fc_random_counter __attribute__((__unused__));
@@ -45,15 +46,15 @@ int __e_acsl_f(int x)
   __e_acsl_at = x;
   __retres = f(x);
   e_acsl_assert(-2147483648LL <= (long long)__e_acsl_at - (long long)__e_acsl_at_2,
-                (char *)"Postcondition",
+                (char *)"Postcondition",(char *)"f",
                 (char *)"downcast: -2147483648 <= (long long)__e_acsl_at-(long long)__e_acsl_at_2",
                 7);
   e_acsl_assert((long long)__e_acsl_at - (long long)__e_acsl_at_2 <= 2147483647LL,
-                (char *)"Postcondition",
+                (char *)"Postcondition",(char *)"f",
                 (char *)"downcast: (long long)__e_acsl_at-(long long)__e_acsl_at_2 <= 2147483647",
                 7);
   e_acsl_assert(__retres == (int)((long long)__e_acsl_at - (long long)__e_acsl_at_2),
-                (char *)"Postcondition",
+                (char *)"Postcondition",(char *)"f",
                 (char *)"\\result == (int)(\\old(x)-\\old(x))",7);
   return __retres;
 }
@@ -70,7 +71,7 @@ int __e_acsl_g(int x)
 {
   int __retres;
   __retres = g(x);
-  e_acsl_assert(__retres == Y,(char *)"Postcondition",
+  e_acsl_assert(__retres == Y,(char *)"Postcondition",(char *)"g",
                 (char *)"\\result == Y",18);
   return __retres;
 }
@@ -88,7 +89,7 @@ int __e_acsl_h(void)
 {
   int __retres;
   __retres = h();
-  e_acsl_assert(__retres == 0,(char *)"Postcondition",
+  e_acsl_assert(__retres == 0,(char *)"Postcondition",(char *)"h",
                 (char *)"\\result == 0",23);
   return __retres;
 }

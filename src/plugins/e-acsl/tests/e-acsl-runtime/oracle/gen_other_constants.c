@@ -18,6 +18,7 @@ model __mpz_struct { ℤ n };
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *kind,
+                                                           char *fct,
                                                            char *pred_txt,
                                                            int line);
 int __fc_random_counter __attribute__((__unused__));
@@ -36,9 +37,11 @@ int main(void)
 {
   int __retres;
   /*@ assert 'c' ≡ 'c'; */
-  e_acsl_assert('c' == 'c',(char *)"Assertion",(char *)"\'c\' == \'c\'",12);
+  e_acsl_assert('c' == 'c',(char *)"Assertion",(char *)"main",
+                (char *)"\'c\' == \'c\'",12);
   /*@ assert false ≢ true; */
-  e_acsl_assert(false != true,(char *)"Assertion",(char *)"false != true",13);
+  e_acsl_assert(false != true,(char *)"Assertion",(char *)"main",
+                (char *)"false != true",13);
   __retres = 0;
   __clean();
   return __retres;

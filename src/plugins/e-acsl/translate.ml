@@ -242,9 +242,12 @@ and context_insensitive_term_to_exp env t =
       in
       let mk_stmts _v e = 
 	assert (Mpz.is_t ty);
+	let vis = Env.get_visitor env in
+	let kf = Extlib.the vis#current_kf in
 	let cond = 
 	  Misc.mk_e_acsl_guard 
 	    (Env.annotation_kind env) 
+	    kf
 	    guard
 	    (Logic_const.prel ~loc (Req, t2, zero)) 
 	in
@@ -642,7 +645,7 @@ let rec translate_named_predicate kf _kinstr ?(rte=true) env p =
   let env = if rte then rte_to_exp kf env e else env in
   Env.add_stmt
     env 
-    (Misc.mk_e_acsl_guard ~reverse:true (Env.annotation_kind env) e p)
+    (Misc.mk_e_acsl_guard ~reverse:true (Env.annotation_kind env) kf e p)
 
 and rte_to_exp kf env e =
   let stmt = Cil.mkStmtOneInstr ~valid_sid:true (Skip Location.unknown) in

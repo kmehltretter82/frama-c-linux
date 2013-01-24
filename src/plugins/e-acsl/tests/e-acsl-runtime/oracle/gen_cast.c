@@ -14,6 +14,7 @@ model __mpz_struct { ℤ n };
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *kind,
+                                                           char *fct,
                                                            char *pred_txt,
                                                            int line);
 int __fc_random_counter __attribute__((__unused__));
@@ -36,20 +37,24 @@ int main(void)
   x = (long)0;
   y = 0;
   /*@ assert (int)x ≡ y; */
-  e_acsl_assert((int)x == y,(char *)"Assertion",(char *)"(int)x == y",12);
+  e_acsl_assert((int)x == y,(char *)"Assertion",(char *)"main",
+                (char *)"(int)x == y",12);
   /*@ assert x ≡ (long)y; */
-  e_acsl_assert(x == (long)y,(char *)"Assertion",(char *)"x == (long)y",13);
+  e_acsl_assert(x == (long)y,(char *)"Assertion",(char *)"main",
+                (char *)"x == (long)y",13);
   /*@ assert y ≡ (int)0; */
-  e_acsl_assert(y == 0,(char *)"Assertion",(char *)"y == (int)0",15);
+  e_acsl_assert(y == 0,(char *)"Assertion",(char *)"main",
+                (char *)"y == (int)0",15);
   /*@ assert (unsigned int)y ≡ (unsigned int)0; */
   e_acsl_assert((unsigned int)y == (unsigned int)0,(char *)"Assertion",
-                (char *)"(unsigned int)y == (unsigned int)0",16);
+                (char *)"main",(char *)"(unsigned int)y == (unsigned int)0",
+                16);
   /*@ assert y ≢ (int)0xfffffffffffffff; */
   e_acsl_assert(y != (int)0xfffffffffffffff,(char *)"Assertion",
-                (char *)"y != (int)0xfffffffffffffff",19);
+                (char *)"main",(char *)"y != (int)0xfffffffffffffff",19);
   /*@ assert (unsigned int)y ≢ (unsigned int)0xfffffffffffffff; */
   e_acsl_assert((unsigned int)y != (unsigned int)0xfffffffffffffff,
-                (char *)"Assertion",
+                (char *)"Assertion",(char *)"main",
                 (char *)"(unsigned int)y != (unsigned int)0xfffffffffffffff",
                 20);
   __retres = 0;

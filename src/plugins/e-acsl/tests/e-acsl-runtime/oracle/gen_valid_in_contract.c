@@ -18,6 +18,7 @@ model __mpz_struct { ℤ n };
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *kind,
+                                                           char *fct,
                                                            char *pred_txt,
                                                            int line);
 int __fc_random_counter __attribute__((__unused__));
@@ -129,11 +130,11 @@ struct list *__e_acsl_f(struct list *l)
     int __e_acsl_implies_2;
     if (! __e_acsl_at) __e_acsl_implies = 1;
     else __e_acsl_implies = __retres == __e_acsl_at_2;
-    e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",
+    e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",(char *)"f",
                   (char *)"\\old(l == \\null) ==> \\result == \\old(l)",18);
     if (! __e_acsl_at_3) __e_acsl_implies_2 = 1;
     else __e_acsl_implies_2 = __retres == __e_acsl_at_4;
-    e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",
+    e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",(char *)"f",
                   (char *)"\\old(!\\valid(l) && !\\valid(l->next)) ==> \\result == \\old(l)",
                   22);
     __delete_block((void *)(& l));

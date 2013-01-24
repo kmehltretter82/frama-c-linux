@@ -14,6 +14,7 @@ model __mpz_struct { ℤ n };
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *kind,
+                                                           char *fct,
                                                            char *pred_txt,
                                                            int line);
 int __fc_random_counter __attribute__((__unused__));
@@ -50,11 +51,11 @@ int main(void)
     }
   }
   /*@ assert T1[0] ≡ T2[0]; */
-  e_acsl_assert(T1[0] == T2[0],(char *)"Assertion",(char *)"T1[0] == T2[0]",
-                15);
+  e_acsl_assert(T1[0] == T2[0],(char *)"Assertion",(char *)"main",
+                (char *)"T1[0] == T2[0]",15);
   /*@ assert T1[1] ≢ T2[1]; */
-  e_acsl_assert(T1[1] != T2[1],(char *)"Assertion",(char *)"T1[1] != T2[1]",
-                16);
+  e_acsl_assert(T1[1] != T2[1],(char *)"Assertion",(char *)"main",
+                (char *)"T1[1] != T2[1]",16);
   __retres = 0;
   __clean();
   return __retres;

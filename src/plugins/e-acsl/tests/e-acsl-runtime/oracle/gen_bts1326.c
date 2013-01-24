@@ -15,6 +15,7 @@ model __mpz_struct { ℤ n };
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *kind,
+                                                           char *fct,
                                                            char *pred_txt,
                                                            int line);
 int __fc_random_counter __attribute__((__unused__));
@@ -116,23 +117,28 @@ void __e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
     int __e_acsl_and;
     __e_acsl_valid_read = __valid_read((void *)(*__e_acsl_at_6),sizeof(int));
     e_acsl_assert(__e_acsl_valid_read,(char *)"Postcondition",
+                  (char *)"atp_NORMAL_computeAverageAccel",
                   (char *)"mem_access: \\valid_read((int *)*__e_acsl_at_6)",
                   0);
     __e_acsl_valid_read_2 = __valid_read((void *)(& (*__e_acsl_at_5)[1]),
                                          sizeof(int));
     e_acsl_assert(__e_acsl_valid_read_2,(char *)"Postcondition",
+                  (char *)"atp_NORMAL_computeAverageAccel",
                   (char *)"mem_access: \\valid_read(&(*__e_acsl_at_5)[1])",0);
     __e_acsl_valid_read_3 = __valid_read((void *)(& (*__e_acsl_at_4)[2]),
                                          sizeof(int));
     e_acsl_assert(__e_acsl_valid_read_3,(char *)"Postcondition",
+                  (char *)"atp_NORMAL_computeAverageAccel",
                   (char *)"mem_access: \\valid_read(&(*__e_acsl_at_4)[2])",0);
     __e_acsl_valid_read_4 = __valid_read((void *)(& (*__e_acsl_at_3)[3]),
                                          sizeof(int));
     e_acsl_assert(__e_acsl_valid_read_4,(char *)"Postcondition",
+                  (char *)"atp_NORMAL_computeAverageAccel",
                   (char *)"mem_access: \\valid_read(&(*__e_acsl_at_3)[3])",0);
     __e_acsl_valid_read_5 = __valid_read((void *)(& (*__e_acsl_at_2)[4]),
                                          sizeof(int));
     e_acsl_assert(__e_acsl_valid_read_5,(char *)"Postcondition",
+                  (char *)"atp_NORMAL_computeAverageAccel",
                   (char *)"mem_access: \\valid_read(&(*__e_acsl_at_2)[4])",0);
     __e_acsl_initialized = __initialized((void *)(& __e_acsl_at),
                                          sizeof(int *));
@@ -143,9 +149,11 @@ void __e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
     }
     else __e_acsl_and = 0;
     e_acsl_assert(__e_acsl_and,(char *)"Postcondition",
+                  (char *)"atp_NORMAL_computeAverageAccel",
                   (char *)"mem_access: \\valid_read(__e_acsl_at)",0);
     e_acsl_assert(*__e_acsl_at == (((((long long)(*__e_acsl_at_2)[4] + (long long)(*__e_acsl_at_3)[3]) + (long long)(*__e_acsl_at_4)[2]) + (long long)(*__e_acsl_at_5)[1]) + (long long)(*__e_acsl_at_6)[0]) / 5,
                   (char *)"Postcondition",
+                  (char *)"atp_NORMAL_computeAverageAccel",
                   (char *)"*\\old(AverageAccel) ==\n(((((*\\old(Accel))[4]+(*\\old(Accel))[3])+(*\\old(Accel))[2])+(*\\old(Accel))[1])+(*\n  \\old(Accel))[0])/5",
                   10);
     __delete_block((void *)(& Accel));

@@ -18,7 +18,7 @@
 [value] using specification for function __initialize
 [value] using specification for function __valid_read
 [value] using specification for function e_acsl_assert
-./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status unknown.
+./share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
 [value] using specification for function __valid
 tests/e-acsl-runtime/ghost.i:17:[value] Assertion got status valid.
 [value] using specification for function __gmpz_init_set_si

@@ -14,6 +14,7 @@ model __mpz_struct { ℤ n };
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *kind,
+                                                           char *fct,
                                                            char *pred_txt,
                                                            int line);
 int __fc_random_counter __attribute__((__unused__));
@@ -93,10 +94,12 @@ int __e_acsl_sorted(int *t, int n)
         __e_acsl_valid_read = __valid_read((void *)(t + __e_acsl_i),
                                            sizeof(int));
         e_acsl_assert(__e_acsl_valid_read,(char *)"Postcondition",
+                      (char *)"sorted",
                       (char *)"mem_access: \\valid_read(t+__e_acsl_i)",0);
         __e_acsl_valid_read_2 = __valid_read((void *)(t + (__e_acsl_i - (long long)1)),
                                              sizeof(int));
         e_acsl_assert(__e_acsl_valid_read_2,(char *)"Postcondition",
+                      (char *)"sorted",
                       (char *)"mem_access: \\valid_read(t+(long long)(__e_acsl_i-(long long)1))",
                       0);
         if (*(t + (__e_acsl_i - (long long)1)) <= *(t + __e_acsl_i)) 
@@ -116,7 +119,7 @@ int __e_acsl_sorted(int *t, int n)
     int __e_acsl_implies;
     if (! __e_acsl_at) __e_acsl_implies = 1;
     else __e_acsl_implies = __retres == 1;
-    e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",
+    e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",(char *)"sorted",
                   (char *)"\\old(\\forall long long i; 0 < i && i < n ==> *(t+(i-1)) <= *(t+i)) ==>\n\\result == 1",
                   9);
     __delete_block((void *)(& t));
@@ -146,7 +149,8 @@ int main(void)
   t[6] = 7;
   n = __e_acsl_sorted(t,7);
   /*@ assert n ≡ 1; */
-  e_acsl_assert(n == 1,(char *)"Assertion",(char *)"n == 1",25);
+  e_acsl_assert(n == 1,(char *)"Assertion",(char *)"main",(char *)"n == 1",
+                25);
   __retres = 0;
   __delete_block((void *)(t));
   __clean();

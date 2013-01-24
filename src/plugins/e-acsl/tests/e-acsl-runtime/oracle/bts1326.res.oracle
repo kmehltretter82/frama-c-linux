@@ -18,11 +18,11 @@
 tests/e-acsl-runtime/bts1326.i:10:[value] Function atp_NORMAL_computeAverageAccel: postcondition got status valid.
 [value] using specification for function __valid_read
 [value] using specification for function e_acsl_assert
-./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status unknown.
+./share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
 [value] using specification for function __initialized
 ./share/e-acsl/memory_model/e_acsl_mmodel.h:85:[value] Function __initialized: postcondition got status unknown.
 ./share/e-acsl/memory_model/e_acsl_mmodel.h:86:[value] Function __initialized: postcondition got status valid.
-./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status valid.
+./share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
 tests/e-acsl-runtime/bts1326.i:10:[value] Function __e_acsl_atp_NORMAL_computeAverageAccel: postcondition got status valid.
 [value] using specification for function __clean
 [kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype

@@ -56,6 +56,7 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_tdiv_q(__mpz_struct * /*[1]*
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *kind,
+                                                           char *fct,
                                                            char *pred_txt,
                                                            int line);
 int __fc_random_counter __attribute__((__unused__));
@@ -178,12 +179,14 @@ void __e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
     __gmpz_init(__e_acsl_div);
     /*@ assert E_ACSL: 5 ≢ 0; */
     e_acsl_assert(! (__e_acsl_div_guard == 0),(char *)"Postcondition",
-                  (char *)"5 == 0",11);
+                  (char *)"atp_NORMAL_computeAverageAccel",(char *)"5 == 0",
+                  11);
     __gmpz_tdiv_q(__e_acsl_div,(__mpz_struct const *)(__e_acsl_add_4),
                   (__mpz_struct const *)(__e_acsl_7));
     __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl),
                              (__mpz_struct const *)(__e_acsl_div));
     e_acsl_assert(__e_acsl_eq == 0,(char *)"Postcondition",
+                  (char *)"atp_NORMAL_computeAverageAccel",
                   (char *)"*\\old(AverageAccel) ==\n(((((*\\old(Accel))[4]+(*\\old(Accel))[3])+(*\\old(Accel))[2])+(*\\old(Accel))[1])+(*\n  \\old(Accel))[0])/5",
                   10);
     __delete_block((void *)(& Accel));

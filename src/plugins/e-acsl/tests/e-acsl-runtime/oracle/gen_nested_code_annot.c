@@ -14,6 +14,7 @@ model __mpz_struct { ℤ n };
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *kind,
+                                                           char *fct,
                                                            char *pred_txt,
                                                            int line);
 int __fc_random_counter __attribute__((__unused__));
@@ -36,36 +37,44 @@ int main(void)
   x = 0;
   y = 1;
   /*@ assert x < y; */
-  e_acsl_assert(x < y,(char *)"Assertion",(char *)"x < y",9);
+  e_acsl_assert(x < y,(char *)"Assertion",(char *)"main",(char *)"x < y",9);
   /*@ requires x ≡ 0;
       ensures x ≥ 1; */
   {
-    e_acsl_assert(x == 0,(char *)"Precondition",(char *)"x == 0",10);
+    e_acsl_assert(x == 0,(char *)"Precondition",(char *)"main",
+                  (char *)"x == 0",10);
     if (x) 
       /*@ assert \false; */
-      e_acsl_assert(0,(char *)"Assertion",(char *)"\\false",13);
+      e_acsl_assert(0,(char *)"Assertion",(char *)"main",(char *)"\\false",
+                    13);
     else {
       /*@ requires x ≡ 0;
           ensures x ≡ 1; */
       {
-        e_acsl_assert(x == 0,(char *)"Precondition",(char *)"x == 0",15);
+        e_acsl_assert(x == 0,(char *)"Precondition",(char *)"main",
+                      (char *)"x == 0",15);
         x ++;
-        e_acsl_assert(x == 1,(char *)"Postcondition",(char *)"x == 1",16);
+        e_acsl_assert(x == 1,(char *)"Postcondition",(char *)"main",
+                      (char *)"x == 1",16);
       }
       if (x) {
         /*@ requires x ≡ 1;
             ensures x ≡ 2; */
         {
-          e_acsl_assert(x == 1,(char *)"Precondition",(char *)"x == 1",19);
+          e_acsl_assert(x == 1,(char *)"Precondition",(char *)"main",
+                        (char *)"x == 1",19);
           x ++;
-          e_acsl_assert(x == 2,(char *)"Postcondition",(char *)"x == 2",20);
+          e_acsl_assert(x == 2,(char *)"Postcondition",(char *)"main",
+                        (char *)"x == 2",20);
         }
       }
       else 
         /*@ assert \false; */
-        e_acsl_assert(0,(char *)"Assertion",(char *)"\\false",23);
+        e_acsl_assert(0,(char *)"Assertion",(char *)"main",(char *)"\\false",
+                      23);
     }
-    e_acsl_assert(x >= 1,(char *)"Postcondition",(char *)"x >= 1",11);
+    e_acsl_assert(x >= 1,(char *)"Postcondition",(char *)"main",
+                  (char *)"x >= 1",11);
   }
   __retres = 0;
   __clean();

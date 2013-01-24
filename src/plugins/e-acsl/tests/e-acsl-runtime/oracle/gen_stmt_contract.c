@@ -14,6 +14,7 @@ model __mpz_struct { ℤ n };
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *kind,
+                                                           char *fct,
                                                            char *pred_txt,
                                                            int line);
 int __fc_random_counter __attribute__((__unused__));
@@ -38,22 +39,28 @@ int main(void)
   /*@ ensures x ≡ 1; */
   {
     x = 1;
-    e_acsl_assert(x == 1,(char *)"Postcondition",(char *)"x == 1",9);
+    e_acsl_assert(x == 1,(char *)"Postcondition",(char *)"main",
+                  (char *)"x == 1",9);
   }
   /*@ ensures x ≡ 2;
       ensures y ≡ 2; */
   {
     x = 2;
-    e_acsl_assert(x == 2,(char *)"Postcondition",(char *)"x == 2",12);
-    e_acsl_assert(y == 2,(char *)"Postcondition",(char *)"y == 2",13);
+    e_acsl_assert(x == 2,(char *)"Postcondition",(char *)"main",
+                  (char *)"x == 2",12);
+    e_acsl_assert(y == 2,(char *)"Postcondition",(char *)"main",
+                  (char *)"y == 2",13);
   }
   /*@ requires x ≡ 2; */
-  e_acsl_assert(x == 2,(char *)"Precondition",(char *)"x == 2",16);
+  e_acsl_assert(x == 2,(char *)"Precondition",(char *)"main",
+                (char *)"x == 2",16);
   x ++;
   /*@ requires x ≡ 3;
       requires y ≡ 2; */
-  e_acsl_assert(x == 3,(char *)"Precondition",(char *)"x == 3",19);
-  e_acsl_assert(y == 2,(char *)"Precondition",(char *)"y == 2",20);
+  e_acsl_assert(x == 3,(char *)"Precondition",(char *)"main",
+                (char *)"x == 3",19);
+  e_acsl_assert(y == 2,(char *)"Precondition",(char *)"main",
+                (char *)"y == 2",20);
   x += y;
   /*@ behavior b1:
         requires x ≡ 5;
@@ -65,14 +72,19 @@ int main(void)
         ensures x ≡ y+1;
   */
   {
-    e_acsl_assert(x == 5,(char *)"Precondition",(char *)"x == 5",24);
+    e_acsl_assert(x == 5,(char *)"Precondition",(char *)"main",
+                  (char *)"x == 5",24);
     e_acsl_assert((long long)x == (long long)3 + (long long)y,
-                  (char *)"Precondition",(char *)"x == 3+y",27);
-    e_acsl_assert(y == 2,(char *)"Precondition",(char *)"y == 2",28);
+                  (char *)"Precondition",(char *)"main",(char *)"x == 3+y",
+                  27);
+    e_acsl_assert(y == 2,(char *)"Precondition",(char *)"main",
+                  (char *)"y == 2",28);
     x = 3;
-    e_acsl_assert(x == 3,(char *)"Postcondition",(char *)"x == 3",25);
+    e_acsl_assert(x == 3,(char *)"Postcondition",(char *)"main",
+                  (char *)"x == 3",25);
     e_acsl_assert((long long)x == (long long)y + (long long)1,
-                  (char *)"Postcondition",(char *)"x == y+1",29);
+                  (char *)"Postcondition",(char *)"main",(char *)"x == y+1",
+                  29);
   }
   /*@ behavior b1:
         assumes x ≡ 1;
@@ -91,31 +103,35 @@ int main(void)
     int __e_acsl_and_2;
     int __e_acsl_implies_3;
     if (! (x == 1)) __e_acsl_implies = 1; else __e_acsl_implies = x == 0;
-    e_acsl_assert(__e_acsl_implies,(char *)"Precondition",
+    e_acsl_assert(__e_acsl_implies,(char *)"Precondition",(char *)"main",
                   (char *)"x == 1 ==> x == 0",34);
     if (x == 3) __e_acsl_and = y == 2; else __e_acsl_and = 0;
     if (! __e_acsl_and) __e_acsl_implies_2 = 1;
     else __e_acsl_implies_2 = x == 3;
-    e_acsl_assert(__e_acsl_implies_2,(char *)"Precondition",
+    e_acsl_assert(__e_acsl_implies_2,(char *)"Precondition",(char *)"main",
                   (char *)"x == 3 && y == 2 ==> x == 3",38);
     if (x == 3) __e_acsl_and_2 = y == 2; else __e_acsl_and_2 = 0;
     if (! __e_acsl_and_2) __e_acsl_implies_3 = 1;
     else __e_acsl_implies_3 = (long long)x + (long long)y == (long long)5;
-    e_acsl_assert(__e_acsl_implies_3,(char *)"Precondition",
+    e_acsl_assert(__e_acsl_implies_3,(char *)"Precondition",(char *)"main",
                   (char *)"x == 3 && y == 2 ==> x+y == 5",39);
     x += y;
   }
   /*@ requires x ≡ 5; */
-  e_acsl_assert(x == 5,(char *)"Precondition",(char *)"x == 5",42);
+  e_acsl_assert(x == 5,(char *)"Precondition",(char *)"main",
+                (char *)"x == 5",42);
   /*@ requires y ≡ 2; */
-  e_acsl_assert(y == 2,(char *)"Precondition",(char *)"y == 2",43);
+  e_acsl_assert(y == 2,(char *)"Precondition",(char *)"main",
+                (char *)"y == 2",43);
   x += y;
   /*@ requires x ≡ 7;
       ensures x ≡ 7; */
   {
-    e_acsl_assert(x == 7,(char *)"Precondition",(char *)"x == 7",46);
+    e_acsl_assert(x == 7,(char *)"Precondition",(char *)"main",
+                  (char *)"x == 7",46);
     __retres = 0;
-    e_acsl_assert(x == 7,(char *)"Postcondition",(char *)"x == 7",47);
+    e_acsl_assert(x == 7,(char *)"Postcondition",(char *)"main",
+                  (char *)"x == 7",47);
   }
   __clean();
   return __retres;

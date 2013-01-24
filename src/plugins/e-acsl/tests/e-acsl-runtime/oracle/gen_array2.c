@@ -31,6 +31,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *kind,
+                                                           char *fct,
                                                            char *pred_txt,
                                                            int line);
 int __fc_random_counter __attribute__((__unused__));
@@ -75,7 +76,7 @@ int main(void)
     __gmpz_init_set_si(__e_acsl_2,(long)T2[0]);
     __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl),
                              (__mpz_struct const *)(__e_acsl_2));
-    e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"main",
                   (char *)"T1[0] == T2[0]",15);
     __gmpz_clear(__e_acsl);
     __gmpz_clear(__e_acsl_2);
@@ -89,7 +90,7 @@ int main(void)
     __gmpz_init_set_si(__e_acsl_4,(long)T2[1]);
     __e_acsl_ne = __gmpz_cmp((__mpz_struct const *)(__e_acsl_3),
                              (__mpz_struct const *)(__e_acsl_4));
-    e_acsl_assert(__e_acsl_ne != 0,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_ne != 0,(char *)"Assertion",(char *)"main",
                   (char *)"T1[1] != T2[1]",16);
     __gmpz_clear(__e_acsl_3);
     __gmpz_clear(__e_acsl_4);

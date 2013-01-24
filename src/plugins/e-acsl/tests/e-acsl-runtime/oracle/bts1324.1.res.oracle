@@ -49,7 +49,7 @@ tests/e-acsl-runtime/bts1324.i:15:[value] entering loop for the first time
 tests/e-acsl-runtime/bts1324.i:9:[value] Function sorted, behavior yes: postcondition got status valid.
 tests/e-acsl-runtime/bts1324.i:9:[value] Function sorted, behavior yes: postcondition got status valid, but it is unknown if the behavior is active.
 [value] using specification for function e_acsl_assert
-./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status unknown.
+./share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
 tests/e-acsl-runtime/bts1324.i:9:[value] Function __e_acsl_sorted, behavior yes: postcondition got status valid.
 tests/e-acsl-runtime/bts1324.i:9:[value] Function __e_acsl_sorted, behavior yes: postcondition got status valid, but it is unknown if the behavior is active.
 tests/e-acsl-runtime/bts1324.i:25:[value] Assertion got status valid.

@@ -55,6 +55,7 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_add(__mpz_struct * /*[1]*/ z
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *kind,
+                                                           char *fct,
                                                            char *pred_txt,
                                                            int line);
 int __fc_random_counter __attribute__((__unused__));
@@ -103,7 +104,7 @@ void f(void)
     __gmpz_init_set_si(__e_acsl_2,(long)0);
     __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl),
                              (__mpz_struct const *)(__e_acsl_2));
-    e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"f",
                   (char *)"\\at(A,Pre) == 0",13);
     __gmpz_clear(__e_acsl);
     __gmpz_clear(__e_acsl_2);
@@ -117,7 +118,7 @@ void f(void)
     __gmpz_init_set_si(__e_acsl_4,(long)1);
     __e_acsl_eq_2 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_3),
                                (__mpz_struct const *)(__e_acsl_4));
-    e_acsl_assert(__e_acsl_eq_2 == 0,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_eq_2 == 0,(char *)"Assertion",(char *)"f",
                   (char *)"\\at(A,F) == 1",14);
     __gmpz_clear(__e_acsl_3);
     __gmpz_clear(__e_acsl_4);
@@ -132,7 +133,7 @@ void f(void)
     __gmpz_init_set_si(__e_acsl_6,(long)2);
     __e_acsl_eq_3 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_5),
                                (__mpz_struct const *)(__e_acsl_6));
-    e_acsl_assert(__e_acsl_eq_3 == 0,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_eq_3 == 0,(char *)"Assertion",(char *)"f",
                   (char *)"\\at(A,Here) == 2",15);
     __gmpz_clear(__e_acsl_5);
     __gmpz_clear(__e_acsl_6);
@@ -146,7 +147,7 @@ void f(void)
     __gmpz_init_set_si(__e_acsl_8,(long)0);
     __e_acsl_eq_4 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_7),
                                (__mpz_struct const *)(__e_acsl_8));
-    e_acsl_assert(__e_acsl_eq_4 == 0,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_eq_4 == 0,(char *)"Assertion",(char *)"f",
                   (char *)"\\at(\\at(A,Pre),F) == 0",16);
     __gmpz_clear(__e_acsl_7);
     __gmpz_clear(__e_acsl_8);
@@ -169,7 +170,7 @@ void __e_acsl_f(void)
     __gmpz_init_set_si(__e_acsl_2,(long)3);
     __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl),
                              (__mpz_struct const *)(__e_acsl_2));
-    e_acsl_assert(__e_acsl_eq == 0,(char *)"Postcondition",
+    e_acsl_assert(__e_acsl_eq == 0,(char *)"Postcondition",(char *)"f",
                   (char *)"\\at(A,Post) == 3",9);
     __gmpz_clear(__e_acsl);
     __gmpz_clear(__e_acsl_2);
@@ -220,7 +221,7 @@ void g(int *p, int *q)
     __gmpz_init_set_si(__e_acsl_2,(long)2);
     __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl),
                              (__mpz_struct const *)(__e_acsl_2));
-    e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"g",
                   (char *)"\\at(*(p+\\at(*q,L1)),L2) == 2",32);
     __gmpz_clear(__e_acsl);
     __gmpz_clear(__e_acsl_2);
@@ -238,7 +239,7 @@ void g(int *p, int *q)
       __gmpz_init_set_si(__e_acsl_4,(long)2);
       __e_acsl_eq_2 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_3),
                                  (__mpz_struct const *)(__e_acsl_4));
-      e_acsl_assert(__e_acsl_eq_2 == 0,(char *)"Assertion",
+      e_acsl_assert(__e_acsl_eq_2 == 0,(char *)"Assertion",(char *)"g",
                     (char *)"\\at(*(p+\\at(*q,L1)),Here) == 2",34);
       __gmpz_clear(__e_acsl_3);
       __gmpz_clear(__e_acsl_4);
@@ -269,7 +270,7 @@ int __e_acsl_h(int x)
     __gmpz_init_set_si(__e_acsl,(long)__e_acsl_at);
     __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl_result),
                              (__mpz_struct const *)(__e_acsl));
-    e_acsl_assert(__e_acsl_eq == 0,(char *)"Postcondition",
+    e_acsl_assert(__e_acsl_eq == 0,(char *)"Postcondition",(char *)"h",
                   (char *)"\\result == \\old(x)",40);
     __gmpz_clear(__e_acsl_result);
     __gmpz_clear(__e_acsl);
@@ -319,7 +320,8 @@ int main(void)
       __gmpz_init_set_si(__e_acsl,(long)0);
       __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl_x),
                                (__mpz_struct const *)(__e_acsl));
-      e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"x == 0",48);
+      e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"main",
+                    (char *)"x == 0",48);
       __gmpz_clear(__e_acsl_x);
       __gmpz_clear(__e_acsl);
     }
@@ -337,7 +339,7 @@ int main(void)
     __gmpz_init_set_si(__e_acsl_3,(long)0);
     __e_acsl_eq_2 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_2),
                                (__mpz_struct const *)(__e_acsl_3));
-    e_acsl_assert(__e_acsl_eq_2 == 0,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_eq_2 == 0,(char *)"Assertion",(char *)"main",
                   (char *)"\\at(x,L) == 0",53);
     __gmpz_clear(__e_acsl_2);
     __gmpz_clear(__e_acsl_3);
@@ -349,7 +351,7 @@ int main(void)
     __gmpz_init_set_si(__e_acsl_5,(long)1);
     __e_acsl_eq_3 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_at_2),
                                (__mpz_struct const *)(__e_acsl_5));
-    e_acsl_assert(__e_acsl_eq_3 == 0,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_eq_3 == 0,(char *)"Assertion",(char *)"main",
                   (char *)"\\at(x+1,L) == 1",54);
     __gmpz_clear(__e_acsl_5);
   }
@@ -366,7 +368,7 @@ int main(void)
                (__mpz_struct const *)(__e_acsl_7));
     __e_acsl_eq_4 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_add_2),
                                (__mpz_struct const *)(__e_acsl_7));
-    e_acsl_assert(__e_acsl_eq_4 == 0,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_eq_4 == 0,(char *)"Assertion",(char *)"main",
                   (char *)"\\at(x,L)+1 == 1",55);
     __gmpz_clear(__e_acsl_6);
     __gmpz_clear(__e_acsl_7);

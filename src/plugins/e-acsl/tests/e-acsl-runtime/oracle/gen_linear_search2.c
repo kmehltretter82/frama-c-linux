@@ -56,6 +56,7 @@ extern  __attribute__((__FC_BUILTIN__)) unsigned long __gmpz_get_ui(__mpz_struct
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *kind,
+                                                           char *fct,
                                                            char *pred_txt,
                                                            int line);
 int __fc_random_counter __attribute__((__unused__));
@@ -182,7 +183,7 @@ int __e_acsl_search(int elt)
       }
     }
     e_acsl_end_loop1: /* internal */ ;
-    e_acsl_assert(__e_acsl_forall,(char *)"Precondition",
+    e_acsl_assert(__e_acsl_forall,(char *)"Precondition",(char *)"search",
                   (char *)"\\forall integer i; 0 <= i && i < 9 ==> A[i] <= A[i+1]",
                   9);
     __gmpz_clear(__e_acsl_i);
@@ -314,7 +315,7 @@ int __e_acsl_search(int elt)
       __gmpz_clear(__e_acsl_result);
       __gmpz_clear(__e_acsl_12);
     }
-    e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",
+    e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",(char *)"search",
                   (char *)"\\old(\\exists integer j; (0 <= j && j < 10) && A[j] == elt) ==> \\result == 1",
                   12);
     if (! __e_acsl_at_2) __e_acsl_implies_2 = 1;
@@ -331,6 +332,7 @@ int __e_acsl_search(int elt)
       __gmpz_clear(__e_acsl_17);
     }
     e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",
+                  (char *)"search",
                   (char *)"\\old(\\forall integer j; 0 <= j && j < 10 ==> A[j] != elt) ==> \\result == 0",
                   15);
     return __retres;
@@ -359,8 +361,8 @@ int main(void)
     __gmpz_init_set_si(__e_acsl,(long)1);
     __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl_found),
                              (__mpz_struct const *)(__e_acsl));
-    e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"found == 1",
-                  33);
+    e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"main",
+                  (char *)"found == 1",33);
     __gmpz_clear(__e_acsl_found);
     __gmpz_clear(__e_acsl);
   }
@@ -374,7 +376,7 @@ int main(void)
     __gmpz_init_set_si(__e_acsl_2,(long)0);
     __e_acsl_eq_2 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_found_2),
                                (__mpz_struct const *)(__e_acsl_2));
-    e_acsl_assert(__e_acsl_eq_2 == 0,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_eq_2 == 0,(char *)"Assertion",(char *)"main",
                   (char *)"found == 0",36);
     __gmpz_clear(__e_acsl_found_2);
     __gmpz_clear(__e_acsl_2);

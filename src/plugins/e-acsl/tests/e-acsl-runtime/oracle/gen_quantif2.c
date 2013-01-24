@@ -80,6 +80,7 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_tdiv_r(__mpz_struct * /*[1]*
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *kind,
+                                                           char *fct,
                                                            char *pred_txt,
                                                            int line);
 int __fc_random_counter __attribute__((__unused__));
@@ -156,7 +157,7 @@ int main(void)
       }
     }
     e_acsl_end_loop1: /* internal */ ;
-    e_acsl_assert(__e_acsl_forall,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_forall,(char *)"Assertion",(char *)"main",
                   (char *)"\\forall integer x; 0 <= x && x <= 1 ==> x == 0 || x == 1",
                   11);
     __gmpz_clear(__e_acsl_x);
@@ -217,7 +218,7 @@ int main(void)
       }
     }
     e_acsl_end_loop2: /* internal */ ;
-    e_acsl_assert(__e_acsl_forall_2,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_forall_2,(char *)"Assertion",(char *)"main",
                   (char *)"\\forall integer x; 0 < x && x <= 1 ==> x == 1",
                   12);
     __gmpz_clear(__e_acsl_x_2);
@@ -270,7 +271,7 @@ int main(void)
       }
     }
     e_acsl_end_loop3: /* internal */ ;
-    e_acsl_assert(__e_acsl_forall_3,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_forall_3,(char *)"Assertion",(char *)"main",
                   (char *)"\\forall integer x; 0 < x && x < 1 ==> \\false",
                   13);
     __gmpz_clear(__e_acsl_x_3);
@@ -323,7 +324,7 @@ int main(void)
       }
     }
     e_acsl_end_loop4: /* internal */ ;
-    e_acsl_assert(__e_acsl_forall_4,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_forall_4,(char *)"Assertion",(char *)"main",
                   (char *)"\\forall integer x; 0 <= x && x < 1 ==> x == 0",
                   14);
     __gmpz_clear(__e_acsl_x_4);
@@ -447,7 +448,7 @@ int main(void)
       }
     }
     e_acsl_end_loop5: /* internal */ ;
-    e_acsl_assert(__e_acsl_forall_5,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_forall_5,(char *)"Assertion",(char *)"main",
                   (char *)"\\forall integer x, integer y, integer z;\n  ((0 <= x && x < 2) && (0 <= y && y < 5)) && (0 <= z && z <= y) ==>\n  x+z <= y+1",
                   18);
     __gmpz_clear(__e_acsl_x_5);
@@ -502,7 +503,7 @@ int main(void)
       }
     }
     e_acsl_end_loop6: /* internal */ ;
-    e_acsl_assert(__e_acsl_exists,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_exists,(char *)"Assertion",(char *)"main",
                   (char *)"\\exists integer x; (0 <= x && x < 10) && x == 5",
                   23);
     __gmpz_clear(__e_acsl_x_6);
@@ -547,7 +548,7 @@ int main(void)
         __gmpz_init(__e_acsl_mod);
         /*@ assert E_ACSL: 2 ≢ 0; */
         e_acsl_assert(! (__e_acsl_mod_guard == 0),(char *)"Assertion",
-                      (char *)"2 == 0",28);
+                      (char *)"main",(char *)"2 == 0",28);
         __gmpz_tdiv_r(__e_acsl_mod,(__mpz_struct const *)(__e_acsl_x_7),
                       (__mpz_struct const *)(__e_acsl_32));
         __e_acsl_eq_6 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_mod),
@@ -578,7 +579,7 @@ int main(void)
               __gmpz_init(__e_acsl_div);
               /*@ assert E_ACSL: 2 ≢ 0; */
               e_acsl_assert(! (__e_acsl_div_guard == 0),(char *)"Assertion",
-                            (char *)"2 == 0",28);
+                            (char *)"main",(char *)"2 == 0",28);
               __gmpz_tdiv_q(__e_acsl_div,
                             (__mpz_struct const *)(__e_acsl_x_7),
                             (__mpz_struct const *)(__e_acsl_36));
@@ -647,7 +648,7 @@ int main(void)
       }
     }
     e_acsl_end_loop8: /* internal */ ;
-    e_acsl_assert(__e_acsl_forall_6,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_forall_6,(char *)"Assertion",(char *)"main",
                   (char *)"\\forall integer x;\n  0 <= x && x < 10 ==>\n  (x%2 == 0 ==> (\\exists integer y; (0 <= y && y <= x/2) && x == 2*y))",
                   27);
     __gmpz_clear(__e_acsl_x_7);

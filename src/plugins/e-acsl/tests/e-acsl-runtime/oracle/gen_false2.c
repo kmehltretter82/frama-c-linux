@@ -14,6 +14,7 @@ model __mpz_struct { ℤ n };
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *kind,
+                                                           char *fct,
                                                            char *pred_txt,
                                                            int line);
 int __fc_random_counter __attribute__((__unused__));
@@ -35,7 +36,7 @@ int main(void)
   x = 0;
   if (x) 
     /*@ assert \false; */
-    e_acsl_assert(0,(char *)"Assertion",(char *)"\\false",8);
+    e_acsl_assert(0,(char *)"Assertion",(char *)"main",(char *)"\\false",8);
   __retres = 0;
   __clean();
   return __retres;

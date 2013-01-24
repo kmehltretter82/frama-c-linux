@@ -14,6 +14,7 @@ model __mpz_struct { ℤ n };
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *kind,
+                                                           char *fct,
                                                            char *pred_txt,
                                                            int line);
 int __fc_random_counter __attribute__((__unused__));
@@ -172,8 +173,8 @@ int *f(int *x)
       __e_acsl_and = __e_acsl_valid;
     }
     else __e_acsl_and = 0;
-    e_acsl_assert(! __e_acsl_and,(char *)"Assertion",(char *)"!\\valid(y)",
-                  19);
+    e_acsl_assert(! __e_acsl_and,(char *)"Assertion",(char *)"f",
+                  (char *)"!\\valid(y)",19);
   }
   __full_init((void *)(& y));
   y = x;
@@ -181,8 +182,8 @@ int *f(int *x)
   {
     int __e_acsl_valid_2;
     __e_acsl_valid_2 = __valid((void *)x,sizeof(int));
-    e_acsl_assert(__e_acsl_valid_2,(char *)"Assertion",(char *)"\\valid(x)",
-                  21);
+    e_acsl_assert(__e_acsl_valid_2,(char *)"Assertion",(char *)"f",
+                  (char *)"\\valid(x)",21);
   }
   __delete_block((void *)(& x));
   __delete_block((void *)(& y));
@@ -200,15 +201,15 @@ int *__e_acsl_f(int *x)
     __store_block((void *)(& x),4U);
     __full_init((void *)(& x));
     __e_acsl_valid = __valid((void *)x,sizeof(int));
-    e_acsl_assert(__e_acsl_valid,(char *)"Precondition",(char *)"\\valid(x)",
-                  15);
+    e_acsl_assert(__e_acsl_valid,(char *)"Precondition",(char *)"f",
+                  (char *)"\\valid(x)",15);
     __full_init((void *)(& __retres));
     __retres = f(x);
   }
   {
     int __e_acsl_valid_2;
     __e_acsl_valid_2 = __valid((void *)__retres,sizeof(int));
-    e_acsl_assert(__e_acsl_valid_2,(char *)"Postcondition",
+    e_acsl_assert(__e_acsl_valid_2,(char *)"Postcondition",(char *)"f",
                   (char *)"\\valid(\\result)",16);
     __delete_block((void *)(& x));
     __delete_block((void *)(& __retres));
@@ -267,7 +268,7 @@ int main(void)
       __e_acsl_and_4 = ! __e_acsl_valid_3;
     }
     else __e_acsl_and_4 = 0;
-    e_acsl_assert(__e_acsl_and_4,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_and_4,(char *)"Assertion",(char *)"main",
                   (char *)"(!\\valid(a) && !\\valid(b)) && !\\valid(X)",27);
   }
   __full_init((void *)(& a));
@@ -304,7 +305,7 @@ int main(void)
       __e_acsl_and_8 = ! __e_acsl_valid_6;
     }
     else __e_acsl_and_8 = 0;
-    e_acsl_assert(__e_acsl_and_8,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_and_8,(char *)"Assertion",(char *)"main",
                   (char *)"(\\valid(a) && !\\valid(b)) && !\\valid(X)",29);
   }
   __full_init((void *)(& X));
@@ -341,7 +342,7 @@ int main(void)
       __e_acsl_and_12 = __e_acsl_valid_9;
     }
     else __e_acsl_and_12 = 0;
-    e_acsl_assert(__e_acsl_and_12,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_and_12,(char *)"Assertion",(char *)"main",
                   (char *)"(\\valid(a) && !\\valid(b)) && \\valid(X)",31);
   }
   __full_init((void *)(& b));
@@ -378,7 +379,7 @@ int main(void)
       __e_acsl_and_16 = __e_acsl_valid_12;
     }
     else __e_acsl_and_16 = 0;
-    e_acsl_assert(__e_acsl_and_16,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_and_16,(char *)"Assertion",(char *)"main",
                   (char *)"(\\valid(a) && \\valid(b)) && \\valid(X)",33);
   }
   __full_init((void *)(& X));
@@ -415,7 +416,7 @@ int main(void)
       __e_acsl_and_20 = __e_acsl_valid_15;
     }
     else __e_acsl_and_20 = 0;
-    e_acsl_assert(__e_acsl_and_20,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_and_20,(char *)"Assertion",(char *)"main",
                   (char *)"(\\valid(a) && \\valid(b)) && \\valid(X)",35);
   }
   __e_acsl_free((void *)a);
@@ -451,7 +452,7 @@ int main(void)
       __e_acsl_and_24 = __e_acsl_valid_18;
     }
     else __e_acsl_and_24 = 0;
-    e_acsl_assert(__e_acsl_and_24,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_and_24,(char *)"Assertion",(char *)"main",
                   (char *)"(!\\valid(a) && \\valid(b)) && \\valid(X)",37);
   }
   __retres = 0;

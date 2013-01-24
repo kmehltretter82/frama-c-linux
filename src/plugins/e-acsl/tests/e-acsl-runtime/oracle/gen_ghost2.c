@@ -31,6 +31,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *kind,
+                                                           char *fct,
                                                            char *pred_txt,
                                                            int line);
 int __fc_random_counter __attribute__((__unused__));
@@ -86,10 +87,10 @@ int main(void)
     int __e_acsl_valid;
     __initialize((void *)P,sizeof(int));
     __e_acsl_valid_read = __valid_read((void *)P,sizeof(int));
-    e_acsl_assert(__e_acsl_valid_read,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_valid_read,(char *)"Assertion",(char *)"main",
                   (char *)"mem_access: \\valid_read(P)",16);
     __e_acsl_valid = __valid((void *)P,sizeof(int));
-    e_acsl_assert(__e_acsl_valid,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_valid,(char *)"Assertion",(char *)"main",
                   (char *)"mem_access: \\valid(P)",16);
     (*P) ++;
   }
@@ -102,7 +103,8 @@ int main(void)
     __gmpz_init_set_si(__e_acsl_G,(long)G);
     __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl),
                              (__mpz_struct const *)(__e_acsl_G));
-    e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"*Q == G",17);
+    e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"main",
+                  (char *)"*Q == G",17);
     __gmpz_clear(__e_acsl);
     __gmpz_clear(__e_acsl_G);
   }

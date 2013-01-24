@@ -35,7 +35,7 @@ tests/e-acsl-runtime/valid_alias.c:12:[kernel] warning: completely indeterminate
 tests/e-acsl-runtime/valid_alias.c:12:[value] Non-termination in evaluation of function call expression argument
         (void *)b
 [value] using specification for function e_acsl_assert
-./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status valid.
+./share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
 [value] using specification for function __delete_block
 FRAMAC_SHARE/libc/stdlib.h:127:[value] Function __e_acsl_malloc, behavior allocation: postcondition got status unknown.
 FRAMAC_SHARE/libc/stdlib.h:127:[value] Function __e_acsl_malloc, behavior allocation: postcondition got status unknown, but it is unknown if the behavior is active.
@@ -45,7 +45,7 @@ FRAMAC_SHARE/libc/stdlib.h:132:[value] Function __e_acsl_malloc, behavior no_all
 tests/e-acsl-runtime/valid_alias.c:16:[value] Assertion got status valid.
 ./share/e-acsl/memory_model/e_acsl_mmodel.h:86:[value] Function __initialized: postcondition got status valid.
 [value] using specification for function __valid
-./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status unknown.
+./share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
 tests/e-acsl-runtime/valid_alias.c:17:[value] Assertion got status valid.
 [value] using specification for function __gmpz_init_set_si
 ./share/e-acsl/e_acsl_gmp.h:61:[value] Function __gmpz_init_set_si: precondition got status valid.

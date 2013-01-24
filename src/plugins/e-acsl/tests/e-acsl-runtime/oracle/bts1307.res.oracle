@@ -21,7 +21,7 @@ tests/e-acsl-runtime/bts1307.i:8:[value] Function __e_acsl_foo: precondition got
 tests/e-acsl-runtime/bts1307.i:9:[value] Function __e_acsl_foo: precondition got status valid.
 [value] using specification for function __valid
 [value] using specification for function e_acsl_assert
-./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status unknown.
+./share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
 tests/e-acsl-runtime/bts1307.i:7:[value] Function foo: precondition got status valid.
 tests/e-acsl-runtime/bts1307.i:8:[value] Function foo: precondition got status valid.
 tests/e-acsl-runtime/bts1307.i:9:[value] Function foo: precondition got status valid.
@@ -41,7 +41,7 @@ tests/e-acsl-runtime/bts1307.i:19:[value] Function bar: precondition got status 
 tests/e-acsl-runtime/bts1307.i:20:[value] Function bar: precondition got status valid.
 tests/e-acsl-runtime/bts1307.i:21:[value] Function bar: precondition got status valid.
 tests/e-acsl-runtime/bts1307.i:25:[value] Function bar, behavior UnderEstimate_Motoring: postcondition got status unknown.
-./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status valid.
+./share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
 tests/e-acsl-runtime/bts1307.i:25:[value] Function __e_acsl_bar, behavior UnderEstimate_Motoring: postcondition got status unknown.
 [value] using specification for function __clean
 [kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype

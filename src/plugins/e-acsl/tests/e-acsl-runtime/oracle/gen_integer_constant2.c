@@ -41,6 +41,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *kind,
+                                                           char *fct,
                                                            char *pred_txt,
                                                            int line);
 int __fc_random_counter __attribute__((__unused__));
@@ -66,7 +67,8 @@ int main(void)
     __gmpz_init_set_si(__e_acsl,(long)0);
     __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl),
                              (__mpz_struct const *)(__e_acsl));
-    e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"0 == 0",8);
+    e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"main",
+                  (char *)"0 == 0",8);
     __gmpz_clear(__e_acsl);
   }
   x = 0;
@@ -80,7 +82,8 @@ int main(void)
     __gmpz_init_set_si(__e_acsl_3,(long)1);
     __e_acsl_ne = __gmpz_cmp((__mpz_struct const *)(__e_acsl_2),
                              (__mpz_struct const *)(__e_acsl_3));
-    e_acsl_assert(__e_acsl_ne != 0,(char *)"Assertion",(char *)"0 != 1",10);
+    e_acsl_assert(__e_acsl_ne != 0,(char *)"Assertion",(char *)"main",
+                  (char *)"0 != 1",10);
     __gmpz_clear(__e_acsl_2);
     __gmpz_clear(__e_acsl_3);
   }
@@ -91,7 +94,7 @@ int main(void)
     __gmpz_init_set_str(__e_acsl_4,"1152921504606846975",10);
     __e_acsl_eq_2 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_4),
                                (__mpz_struct const *)(__e_acsl_4));
-    e_acsl_assert(__e_acsl_eq_2 == 0,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_eq_2 == 0,(char *)"Assertion",(char *)"main",
                   (char *)"1152921504606846975 == 0xfffffffffffffff",11);
     __gmpz_clear(__e_acsl_4);
   }
@@ -106,7 +109,7 @@ int main(void)
                         10);
     __e_acsl_eq_3 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_5),
                                (__mpz_struct const *)(__e_acsl_5));
-    e_acsl_assert(__e_acsl_eq_3 == 0,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_eq_3 == 0,(char *)"Assertion",(char *)"main",
                   (char *)"0xffffffffffffffffffffffffffffffff == 0xffffffffffffffffffffffffffffffff",
                   13);
     __gmpz_clear(__e_acsl_5);

@@ -31,6 +31,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *kind,
+                                                           char *fct,
                                                            char *pred_txt,
                                                            int line);
 int __fc_random_counter __attribute__((__unused__));
@@ -77,7 +78,7 @@ int main(void)
           __gmpz_clear(__e_acsl_2);
         }
         else __e_acsl_and = 0;
-        e_acsl_assert(__e_acsl_and,(char *)"Invariant",
+        e_acsl_assert(__e_acsl_and,(char *)"Invariant",(char *)"main",
                       (char *)"0 <= i && i < 10",9);
         __gmpz_clear(__e_acsl);
         __gmpz_clear(__e_acsl_i);
@@ -92,7 +93,7 @@ int main(void)
         __gmpz_init_set_si(__e_acsl_x,(long)x);
         __e_acsl_le_2 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_i_3),
                                    (__mpz_struct const *)(__e_acsl_x));
-        e_acsl_assert(__e_acsl_le_2 <= 0,(char *)"Invariant",
+        e_acsl_assert(__e_acsl_le_2 <= 0,(char *)"Invariant",(char *)"main",
                       (char *)"i <= x",11);
         __gmpz_clear(__e_acsl_i_3);
         __gmpz_clear(__e_acsl_x);

@@ -49,6 +49,7 @@ extern  __attribute__((__FC_BUILTIN__)) unsigned long __gmpz_get_ui(__mpz_struct
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *kind,
+                                                           char *fct,
                                                            char *pred_txt,
                                                            int line);
 int __fc_random_counter __attribute__((__unused__));
@@ -95,7 +96,7 @@ int __e_acsl_f(int x)
     __gmpz_init_set_si(__e_acsl_cast,(long)((int)__e_acsl_2));
     __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl_result),
                              (__mpz_struct const *)(__e_acsl_cast));
-    e_acsl_assert(__e_acsl_eq == 0,(char *)"Postcondition",
+    e_acsl_assert(__e_acsl_eq == 0,(char *)"Postcondition",(char *)"f",
                   (char *)"\\result == (int)(\\old(x)-\\old(x))",7);
     __gmpz_clear(__e_acsl_result);
     __gmpz_clear(__e_acsl);
@@ -125,7 +126,7 @@ int __e_acsl_g(int x)
     __gmpz_init_set_si(__e_acsl_Y,(long)Y);
     __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl_result),
                              (__mpz_struct const *)(__e_acsl_Y));
-    e_acsl_assert(__e_acsl_eq == 0,(char *)"Postcondition",
+    e_acsl_assert(__e_acsl_eq == 0,(char *)"Postcondition",(char *)"g",
                   (char *)"\\result == Y",18);
     __gmpz_clear(__e_acsl_result);
     __gmpz_clear(__e_acsl_Y);
@@ -154,7 +155,7 @@ int __e_acsl_h(void)
     __gmpz_init_set_si(__e_acsl,(long)0);
     __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl_result),
                              (__mpz_struct const *)(__e_acsl));
-    e_acsl_assert(__e_acsl_eq == 0,(char *)"Postcondition",
+    e_acsl_assert(__e_acsl_eq == 0,(char *)"Postcondition",(char *)"h",
                   (char *)"\\result == 0",23);
     __gmpz_clear(__e_acsl_result);
     __gmpz_clear(__e_acsl);

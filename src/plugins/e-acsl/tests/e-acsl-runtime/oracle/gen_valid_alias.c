@@ -14,6 +14,7 @@ model __mpz_struct { ℤ n };
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *kind,
+                                                           char *fct,
                                                            char *pred_txt,
                                                            int line);
 int __fc_random_counter __attribute__((__unused__));
@@ -194,7 +195,7 @@ int main(void)
       __e_acsl_and_3 = ! __e_acsl_and_2;
     }
     else __e_acsl_and_3 = 0;
-    e_acsl_assert(__e_acsl_and_3,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_and_3,(char *)"Assertion",(char *)"main",
                   (char *)"!\\valid(a) && !\\valid(b)",12);
   }
   __full_init((void *)(& a));
@@ -228,7 +229,7 @@ int main(void)
       __e_acsl_and_6 = __e_acsl_and_5;
     }
     else __e_acsl_and_6 = 0;
-    e_acsl_assert(__e_acsl_and_6,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_and_6,(char *)"Assertion",(char *)"main",
                   (char *)"\\valid(a) && \\valid(b)",16);
   }
   /*@ assert *b ≡ n; */
@@ -242,9 +243,10 @@ int main(void)
       __e_acsl_and_7 = __e_acsl_valid_read;
     }
     else __e_acsl_and_7 = 0;
-    e_acsl_assert(__e_acsl_and_7,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_and_7,(char *)"Assertion",(char *)"main",
                   (char *)"mem_access: \\valid_read(b)",0);
-    e_acsl_assert(*b == n,(char *)"Assertion",(char *)"*b == n",17);
+    e_acsl_assert(*b == n,(char *)"Assertion",(char *)"main",
+                  (char *)"*b == n",17);
   }
   __e_acsl_free((void *)b);
   /*@ assert ¬\valid(a) ∧ ¬\valid(b); */
@@ -272,7 +274,7 @@ int main(void)
       __e_acsl_and_10 = ! __e_acsl_and_9;
     }
     else __e_acsl_and_10 = 0;
-    e_acsl_assert(__e_acsl_and_10,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_and_10,(char *)"Assertion",(char *)"main",
                   (char *)"!\\valid(a) && !\\valid(b)",19);
   }
   __retres = 0;

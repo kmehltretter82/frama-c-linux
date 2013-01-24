@@ -31,6 +31,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *kind,
+                                                           char *fct,
                                                            char *pred_txt,
                                                            int line);
 int __fc_random_counter __attribute__((__unused__));
@@ -208,7 +209,7 @@ int main(void)
       __e_acsl_and_3 = ! __e_acsl_and_2;
     }
     else __e_acsl_and_3 = 0;
-    e_acsl_assert(__e_acsl_and_3,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_and_3,(char *)"Assertion",(char *)"main",
                   (char *)"!\\valid(a) && !\\valid(b)",12);
   }
   __full_init((void *)(& a));
@@ -242,7 +243,7 @@ int main(void)
       __e_acsl_and_6 = __e_acsl_and_5;
     }
     else __e_acsl_and_6 = 0;
-    e_acsl_assert(__e_acsl_and_6,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_and_6,(char *)"Assertion",(char *)"main",
                   (char *)"\\valid(a) && \\valid(b)",16);
   }
   /*@ assert *b ≡ n; */
@@ -254,7 +255,8 @@ int main(void)
     __gmpz_init_set_si(__e_acsl_n,(long)n);
     __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl),
                              (__mpz_struct const *)(__e_acsl_n));
-    e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"*b == n",17);
+    e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"main",
+                  (char *)"*b == n",17);
     __gmpz_clear(__e_acsl);
     __gmpz_clear(__e_acsl_n);
   }
@@ -284,7 +286,7 @@ int main(void)
       __e_acsl_and_9 = ! __e_acsl_and_8;
     }
     else __e_acsl_and_9 = 0;
-    e_acsl_assert(__e_acsl_and_9,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_and_9,(char *)"Assertion",(char *)"main",
                   (char *)"!\\valid(a) && !\\valid(b)",19);
   }
   __retres = 0;

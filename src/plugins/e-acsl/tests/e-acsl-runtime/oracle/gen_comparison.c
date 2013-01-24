@@ -14,6 +14,7 @@ model __mpz_struct { ℤ n };
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *kind,
+                                                           char *fct,
                                                            char *pred_txt,
                                                            int line);
 int __fc_random_counter __attribute__((__unused__));
@@ -45,45 +46,59 @@ int main(void)
   x = 0;
   y = 1;
   /*@ assert x < y; */
-  e_acsl_assert(x < y,(char *)"Assertion",(char *)"x < y",9);
+  e_acsl_assert(x < y,(char *)"Assertion",(char *)"main",(char *)"x < y",9);
   /*@ assert y > x; */
-  e_acsl_assert(y > x,(char *)"Assertion",(char *)"y > x",10);
+  e_acsl_assert(y > x,(char *)"Assertion",(char *)"main",(char *)"y > x",10);
   /*@ assert x ≤ 0; */
-  e_acsl_assert(x <= 0,(char *)"Assertion",(char *)"x <= 0",11);
+  e_acsl_assert(x <= 0,(char *)"Assertion",(char *)"main",(char *)"x <= 0",
+                11);
   /*@ assert y ≥ 1; */
-  e_acsl_assert(y >= 1,(char *)"Assertion",(char *)"y >= 1",12);
+  e_acsl_assert(y >= 1,(char *)"Assertion",(char *)"main",(char *)"y >= 1",
+                12);
   __e_acsl_literal_string = "toto";
   __store_block((void *)__e_acsl_literal_string,sizeof("toto"));
   __full_init((void *)__e_acsl_literal_string);
   __literal_string((void *)__e_acsl_literal_string);
   s = (char *)__e_acsl_literal_string;
   /*@ assert s ≡ s; */
-  e_acsl_assert(s == s,(char *)"Assertion",(char *)"s == s",14);
+  e_acsl_assert(s == s,(char *)"Assertion",(char *)"main",(char *)"s == s",
+                14);
   /*@ assert 5 < 18; */
-  e_acsl_assert(5 < 18,(char *)"Assertion",(char *)"5 < 18",17);
+  e_acsl_assert(5 < 18,(char *)"Assertion",(char *)"main",(char *)"5 < 18",
+                17);
   /*@ assert 32 > 3; */
-  e_acsl_assert(32 > 3,(char *)"Assertion",(char *)"32 > 3",18);
+  e_acsl_assert(32 > 3,(char *)"Assertion",(char *)"main",(char *)"32 > 3",
+                18);
   /*@ assert 12 ≤ 13; */
-  e_acsl_assert(12 <= 13,(char *)"Assertion",(char *)"12 <= 13",19);
+  e_acsl_assert(12 <= 13,(char *)"Assertion",(char *)"main",
+                (char *)"12 <= 13",19);
   /*@ assert 123 ≥ 12; */
-  e_acsl_assert(123 >= 12,(char *)"Assertion",(char *)"123 >= 12",20);
+  e_acsl_assert(123 >= 12,(char *)"Assertion",(char *)"main",
+                (char *)"123 >= 12",20);
   /*@ assert 0xff ≡ 0xff; */
-  e_acsl_assert(0xff == 0xff,(char *)"Assertion",(char *)"0xff == 0xff",21);
+  e_acsl_assert(0xff == 0xff,(char *)"Assertion",(char *)"main",
+                (char *)"0xff == 0xff",21);
   /*@ assert 1 ≢ 2; */
-  e_acsl_assert(1 != 2,(char *)"Assertion",(char *)"1 != 2",22);
+  e_acsl_assert(1 != 2,(char *)"Assertion",(char *)"main",(char *)"1 != 2",
+                22);
   /*@ assert -5 < 18; */
-  e_acsl_assert(-5 < 18,(char *)"Assertion",(char *)"-5 < 18",24);
+  e_acsl_assert(-5 < 18,(char *)"Assertion",(char *)"main",(char *)"-5 < 18",
+                24);
   /*@ assert 32 > -3; */
-  e_acsl_assert(32 > -3,(char *)"Assertion",(char *)"32 > -3",25);
+  e_acsl_assert(32 > -3,(char *)"Assertion",(char *)"main",(char *)"32 > -3",
+                25);
   /*@ assert -12 ≤ 13; */
-  e_acsl_assert(-12 <= 13,(char *)"Assertion",(char *)"-12 <= 13",26);
+  e_acsl_assert(-12 <= 13,(char *)"Assertion",(char *)"main",
+                (char *)"-12 <= 13",26);
   /*@ assert 123 ≥ -12; */
-  e_acsl_assert(123 >= -12,(char *)"Assertion",(char *)"123 >= -12",27);
+  e_acsl_assert(123 >= -12,(char *)"Assertion",(char *)"main",
+                (char *)"123 >= -12",27);
   /*@ assert -0xff ≡ -0xff; */
-  e_acsl_assert(-0xff == -0xff,(char *)"Assertion",(char *)"-0xff == -0xff",
-                28);
+  e_acsl_assert(-0xff == -0xff,(char *)"Assertion",(char *)"main",
+                (char *)"-0xff == -0xff",28);
   /*@ assert 1 ≢ -2; */
-  e_acsl_assert(1 != -2,(char *)"Assertion",(char *)"1 != -2",29);
+  e_acsl_assert(1 != -2,(char *)"Assertion",(char *)"main",(char *)"1 != -2",
+                29);
   __retres = 0;
   __clean();
   return __retres;

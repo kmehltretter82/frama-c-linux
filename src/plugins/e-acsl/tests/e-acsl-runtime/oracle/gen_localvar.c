@@ -18,6 +18,7 @@ model __mpz_struct { ℤ n };
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *kind,
+                                                           char *fct,
                                                            char *pred_txt,
                                                            int line);
 int __fc_random_counter __attribute__((__unused__));
@@ -122,7 +123,8 @@ struct list *add(struct list *l, int i)
       __e_acsl_and = __e_acsl_valid;
     }
     else __e_acsl_and = 0;
-    e_acsl_assert(__e_acsl_and,(char *)"Assertion",(char *)"\\valid(new)",20);
+    e_acsl_assert(__e_acsl_and,(char *)"Assertion",(char *)"add",
+                  (char *)"\\valid(new)",20);
   }
   new->element = i;
   new->next = l;

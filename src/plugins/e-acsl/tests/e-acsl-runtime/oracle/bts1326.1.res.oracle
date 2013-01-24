@@ -32,7 +32,7 @@ tests/e-acsl-runtime/bts1326.i:10:[value] Function atp_NORMAL_computeAverageAcce
 ./share/e-acsl/e_acsl_gmp.h:116:[value] Function __gmpz_cmp: precondition got status valid.
 tests/e-acsl-runtime/bts1326.i:11:[value] Assertion got status valid.
 [value] using specification for function e_acsl_assert
-./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status unknown.
+./share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_tdiv_q
 ./share/e-acsl/e_acsl_gmp.h:152:[value] Function __gmpz_tdiv_q: precondition got status valid.
 ./share/e-acsl/e_acsl_gmp.h:153:[value] Function __gmpz_tdiv_q: precondition got status valid.

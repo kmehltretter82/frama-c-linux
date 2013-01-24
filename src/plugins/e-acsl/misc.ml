@@ -22,7 +22,6 @@
 
 open Cil_types
 open Cil_datatype
-open Cil
 
 let library_files () =       
   List.map
@@ -61,7 +60,7 @@ let mk_call ?(loc=Location.unknown) ?result fname args =
     List.map2
       (fun (_, ty, _) arg -> 
 	let e =
-	  match ty, unrollType (typeOf arg), arg.enode with
+	  match ty, Cil.unrollType (Cil.typeOf arg), arg.enode with
 	  | TPtr _, TArray _, Lval lv -> Cil.new_exp ~loc (StartOf lv)
 	  | TPtr _, TArray _, _ -> assert false
 	  | _, _, _ -> arg
@@ -70,12 +69,12 @@ let mk_call ?(loc=Location.unknown) ?result fname args =
       ty_params
       args
   in
-  mkStmtOneInstr ~valid_sid:true (Call(result, f, args, loc))
+  Cil.mkStmtOneInstr ~valid_sid:true (Call(result, f, args, loc))
 
 type annotation_kind = Assertion | Precondition | Postcondition | Invariant
 
 let kind_to_string loc k = 
-  mkString 
+  Cil.mkString 
     ~loc
     (match k with
     | Assertion -> "Assertion"
@@ -83,19 +82,33 @@ let kind_to_string loc k =
     | Postcondition -> "Postcondition"
     | Invariant -> "Invariant")
 
+let get_orig_name kf =
+  let name = Kernel_function.get_name kf in
+  let str = Str.regexp "__e_acsl_\\(.*\\)" in
+  if Str.string_match str name 0 then
+    try Str.matched_group 1 name with Not_found -> assert false
+  else
+    name
+
 (* Build a C conditional doing a runtime assertion check. *)
-let mk_e_acsl_guard ?(reverse=false) kind e p =
+let mk_e_acsl_guard ?(reverse=false) kind kf e p =
   let loc = p.loc in
   let msg = 
     Kernel.Unicode.without_unicode
       (Pretty_utils.sfprintf "%a@?" Cil.d_predicate_named) p 
   in
   let line = (fst loc).Lexing.pos_lnum in
-  let e = if reverse then e else new_exp ~loc:e.eloc (UnOp(LNot, e, intType)) in
+  let e = 
+    if reverse then e else Cil.new_exp ~loc:e.eloc (UnOp(LNot, e, Cil.intType)) 
+  in
   mk_call 
     ~loc 
     "e_acsl_assert" 
-    [ e; kind_to_string loc kind; mkString loc msg; Cil.integer loc line ] 
+    [ e; 
+      kind_to_string loc kind; 
+      Cil.mkString ~loc (get_orig_name kf); 
+      Cil.mkString ~loc msg; 
+      Cil.integer loc line ] 
 
 let result_lhost kf =
   let stmt = 

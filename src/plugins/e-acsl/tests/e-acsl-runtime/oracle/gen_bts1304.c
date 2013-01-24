@@ -30,6 +30,7 @@ model __mpz_struct { ℤ n };
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *kind,
+                                                           char *fct,
                                                            char *pred_txt,
                                                            int line);
 int __fc_random_counter __attribute__((__unused__));
@@ -86,7 +87,7 @@ int main(void)
   {
     int __e_acsl_initialized;
     __e_acsl_initialized = __initialized((void *)(buf),sizeof(union msg));
-    e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"main",
                   (char *)"\\initialized((union msg *)buf)",25);
   }
   __retres = 0;

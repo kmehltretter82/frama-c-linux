@@ -35,7 +35,8 @@ val mk_debug_mmodel_stmt: stmt -> stmt
 type annotation_kind = Assertion | Precondition | Postcondition | Invariant
 
 val mk_e_acsl_guard: 
-  ?reverse:bool -> annotation_kind -> exp -> predicate named -> stmt
+  ?reverse:bool -> annotation_kind -> kernel_function -> exp -> predicate named 
+  -> stmt
 
 val library_files: unit -> string list
 val is_library_loc: location -> bool

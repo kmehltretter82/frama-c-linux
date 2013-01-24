@@ -14,6 +14,7 @@ model __mpz_struct { ℤ n };
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *kind,
+                                                           char *fct,
                                                            char *pred_txt,
                                                            int line);
 int __fc_random_counter __attribute__((__unused__));
@@ -41,12 +42,13 @@ int main(void)
       {
         int __e_acsl_and;
         if (0 <= i) __e_acsl_and = i < 10; else __e_acsl_and = 0;
-        e_acsl_assert(__e_acsl_and,(char *)"Invariant",
+        e_acsl_assert(__e_acsl_and,(char *)"Invariant",(char *)"main",
                       (char *)"0 <= i && i < 10",9);
       }
       x += i;
       /*@ invariant i ≤ x; */
-      e_acsl_assert(i <= x,(char *)"Invariant",(char *)"i <= x",11);
+      e_acsl_assert(i <= x,(char *)"Invariant",(char *)"main",
+                    (char *)"i <= x",11);
       i ++;
     }
   }

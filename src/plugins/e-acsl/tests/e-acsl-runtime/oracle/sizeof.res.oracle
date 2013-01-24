@@ -13,7 +13,7 @@
         __fc_heap_status ∈ [--..--]
 tests/e-acsl-runtime/sizeof.i:10:[value] Assertion got status valid.
 [value] using specification for function e_acsl_assert
-./share/e-acsl/e_acsl.h:37:[value] Function e_acsl_assert: precondition got status valid.
+./share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
 [value] using specification for function __clean
 [kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
 [value] done for function main

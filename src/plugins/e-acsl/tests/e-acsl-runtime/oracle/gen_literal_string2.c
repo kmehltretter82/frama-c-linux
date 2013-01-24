@@ -31,6 +31,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *kind,
+                                                           char *fct,
                                                            char *pred_txt,
                                                            int line);
 int __fc_random_counter __attribute__((__unused__));
@@ -80,7 +81,7 @@ void f(void)
     __gmpz_init_set_si(__e_acsl_2,(long)'b');
     __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl),
                              (__mpz_struct const *)(__e_acsl_2));
-    e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"f",
                   (char *)"*(T+G) == \'b\'",13);
     __gmpz_clear(__e_acsl);
     __gmpz_clear(__e_acsl_2);
@@ -149,7 +150,7 @@ int main(void)
     __gmpz_init_set_si(__e_acsl_2,(long)'o');
     __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl),
                              (__mpz_struct const *)(__e_acsl_2));
-    e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"main",
                   (char *)"*(S+G2) == \'o\'",24);
     __gmpz_clear(__e_acsl);
     __gmpz_clear(__e_acsl_2);
@@ -158,14 +159,14 @@ int main(void)
   {
     int __e_acsl_initialized;
     __e_acsl_initialized = __initialized((void *)S,sizeof(char));
-    e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"main",
                   (char *)"\\initialized(S)",25);
   }
   /*@ assert \valid_read(S2); */
   {
     int __e_acsl_valid_read;
     __e_acsl_valid_read = __valid_read((void *)S2,sizeof(char));
-    e_acsl_assert(__e_acsl_valid_read,(char *)"Assertion",
+    e_acsl_assert(__e_acsl_valid_read,(char *)"Assertion",(char *)"main",
                   (char *)"\\valid_read(S2)",26);
   }
   /*@ assert ¬\valid(SS); */
@@ -179,8 +180,8 @@ int main(void)
       __e_acsl_and = __e_acsl_valid;
     }
     else __e_acsl_and = 0;
-    e_acsl_assert(! __e_acsl_and,(char *)"Assertion",(char *)"!\\valid(SS)",
-                  27);
+    e_acsl_assert(! __e_acsl_and,(char *)"Assertion",(char *)"main",
+                  (char *)"!\\valid(SS)",27);
   }
   __retres = 0;
   __delete_block((void *)(& G2));
