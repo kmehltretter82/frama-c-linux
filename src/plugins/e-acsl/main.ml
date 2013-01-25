@@ -54,7 +54,9 @@ module Extended_ast =
 let unmemoized_extend_ast () =
   let extend () =
     Kernel.CppExtraArgs.add
-      (Pretty_utils.sfprintf " -I%s/libc" Config.datadir);
+      (Pretty_utils.sfprintf " -DE_ACSL_MACHDEP=%s -I%s/libc" 
+	 (Kernel.Machdep.get ())
+	 Config.datadir);
     Kernel.Keep_unused_specified_functions.off ();
     let register s =
       File.pre_register

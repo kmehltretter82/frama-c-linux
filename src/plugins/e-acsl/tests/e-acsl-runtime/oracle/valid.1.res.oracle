@@ -1,10 +1,10 @@
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/e_acsl_gmp_types.h"
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/e_acsl_gmp.h"
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/e_acsl.h"
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel_api.h"
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_bittree.h"
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
-[kernel] preprocessing with "gcc -C -E -I.  -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc tests/e-acsl-runtime/valid.c"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/e_acsl_gmp_types.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/e_acsl_gmp.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/e_acsl.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel_api.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_bittree.h"
+[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
+[kernel] preprocessing with "gcc -C -E -I.  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc tests/e-acsl-runtime/valid.c"
 tests/e-acsl-runtime/valid.c:25:[e-acsl] warning: E-ACSL construct `complete behavior' is not yet supported.
                   Ignoring annotation.
 tests/e-acsl-runtime/valid.c:25:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
