@@ -7,17 +7,73 @@
 #include "e_acsl_bittree.h"
 #include "e_acsl_mmodel.h"
 
-#define WORDBITS 64
 
-struct bittree {
-  int is_leaf;
-  char* addr;
-  unsigned long mask;
-  struct bittree * left;
-  struct bittree * right;
-  struct bittree * father;
-  struct _block * leaf;
-} * __root = NULL;
+#if WORDBITS == 16
+
+unsigned long Tmasks[] =
+0x0,
+0x8000,
+0xc000,
+0xe000,
+0xf000,
+0xf800,
+0xfc00,
+0xfe00,
+0xff00,
+0xff80,
+0xffc0,
+0xffe0,
+0xfff0,
+0xfff8,
+0xfffc,
+0xfffe,
+0xffff};
+
+int Teq[] = {0,-1,3,-3,6,-5,7,-7,12,-9,11,-11,14,-13,15,16,-16};
+int Tneq[] = {0,0,1,-2,2,-4,5,-6,4,-8,9,-10,10,-12,13,-14,-15};
+
+#elif WORDBITS == 32
+
+unsigned long Tmasks[] = {
+0x0,
+0x80000000,
+0xc0000000,
+0xe0000000,
+0xf0000000,
+0xf8000000,
+0xfc000000,
+0xfe000000,
+0xff000000,
+0xff800000,
+0xffc00000,
+0xffe00000,
+0xfff00000,
+0xfff80000,
+0xfffc0000,
+0xfffe0000,
+0xffff0000,
+0xffff8000,
+0xffffc000,
+0xffffe000,
+0xfffff000,
+0xfffff800,
+0xfffffc00,
+0xfffffe00,
+0xffffff00,
+0xffffff80,
+0xffffffc0,
+0xffffffe0,
+0xfffffff0,
+0xfffffff8,
+0xfffffffc,
+0xfffffffe,
+0xffffffff};
+
+int Teq[] = {0,-1,3,-3,6,-5,7,-7,12,-9,11,-11,14,-13,15,-15,24,-17,19,-19,22,-21,23,-23,28,-25,27,-27,30,-29,31,32,-32};
+int Tneq[] = {0,0,1,-2,2,-4,5,-6,4,-8,9,-10,10,-12,13,-14,8,-16,17,-18,18,-20,21,-22,20,-24,25,-26,26,-28,29,-30,-31};
+
+
+#else /* WORDBITS == 64 */
 
 unsigned long Tmasks[] = {
 0x0,
@@ -86,11 +142,26 @@ unsigned long Tmasks[] = {
 0xfffffffffffffffe,
 0xffffffffffffffff};
 
-int __cpt_mask = 0;
 
 int Teq[] = {0,-1,3,-3,6,-5,7,-7,12,-9,11,-11,14,-13,15,-15,24,-17,19,-19,22,-21,23,-23,28,-25,27,-27,30,-29,31,-31,48,-33,35,-35,38,-37,39,-39,44,-41,43,-43,46,-45,47,-47,56,-49,51,-51,54,-53,55,-55,60,-57,59,-59,62,-61,63,64,-64};
 
 int Tneq[] = {0,0,1,-2,2,-4,5,-6,4,-8,9,-10,10,-12,13,-14,8,-16,17,-18,18,-20,21,-22,20,-24,25,-26,26,-28,29,-30,16,-32,33,-34,34,-36,37,-38,36,-40,41,-42,42,-44,45,-46,40,-48,49,-50,50,-52,53,-54,52,-56,57,-58,58,-60,61,-62,-63};
+
+#endif
+
+
+
+
+struct bittree {
+  int is_leaf;
+  char* addr;
+  unsigned long mask;
+  struct bittree * left;
+  struct bittree * right;
+  struct bittree * father;
+  struct _block * leaf;
+} * __root = NULL;
+
 
 /* common bits of two addresses */
 unsigned long mask(void * a, void * b) {
