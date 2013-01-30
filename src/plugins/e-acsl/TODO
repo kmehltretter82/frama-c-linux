@@ -33,6 +33,7 @@
   (même problème que Jessie: cf. BTS #72)
   (voir aussi result.i et ./at_stmt_contract.i)
 - interprétation des tableaux
+- \valid (or other memory-model constructs) in ensures of functions without code
 
 #########
 # TESTS #
