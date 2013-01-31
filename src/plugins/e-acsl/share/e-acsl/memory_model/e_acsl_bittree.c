@@ -296,7 +296,7 @@ void __add_element (struct _block * ptr) {
 	
 	curr->is_leaf = 0;
 	curr->mask = mask(new_node->addr, ptr->ptr);
-	curr->addr = (void*)((unsigned long)and(new_node, ptr) & curr->mask);
+	/*curr->addr = (void*)((unsigned long)and(new_node, ptr) & curr->mask);*/
 
 	/* smaller at left, higher at right */
 	if(new_node->addr < ptr->ptr) {
@@ -330,9 +330,14 @@ struct _block * __get_exact (void * ptr) {
     assert(tmp->left != NULL && tmp->right != NULL);
     
     /* visit child with greatest common prefix */
-    tmp = /*((tmp->mask >> 1) & ( ~ tmp->mask ) & (unsigned long)ptr)*/
-      ((unsigned long)ptr >= (unsigned long)tmp->right->addr) ?
-      tmp->right : tmp->left;
+    if(((unsigned long)tmp->right->addr & (unsigned long)tmp->right->mask)
+       == ((unsigned long)ptr & (unsigned long)tmp->right->mask))
+      tmp = tmp->right;
+    else if(((unsigned long)tmp->left->addr & (unsigned long)tmp->left->mask)
+	    == ((unsigned long)ptr & (unsigned long)tmp->left->mask))
+      tmp = tmp->left;
+    else
+      return NULL;
   }
 }
 
