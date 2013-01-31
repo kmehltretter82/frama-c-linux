@@ -271,8 +271,9 @@ int _offset(void* ptr) {
 /* print the information about a block */
 void __print_block (struct _block * ptr) {
   if (ptr != NULL) {
-    printf("%p %zu (litt:%i); [init] : %li ",
-	   ptr->ptr, ptr->size, ptr->is_litteral_string, ptr->init_cpt);
+    printf("%p; %zu Bytes; %slitteral; [init] : %li ",
+	   (char*)ptr->ptr, ptr->size,
+	   ptr->is_litteral_string ? "" : "not ", ptr->init_cpt);
     if(ptr->init_ptr != NULL) {
       unsigned i;
       for(i = 0; i < ptr->size; i++) {

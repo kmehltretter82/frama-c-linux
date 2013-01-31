@@ -8,7 +8,7 @@
 
 #if WORDBITS == 16
 
-unsigned long Tmasks[] =
+unsigned long Tmasks[] = {
 0x0,
 0x8000,
 0xc000,
@@ -330,7 +330,8 @@ struct _block * __get_exact (void * ptr) {
     assert(tmp->left != NULL && tmp->right != NULL);
     
     /* visit child with greatest common prefix */
-    tmp = ((tmp->mask >> 1) & ( ~ tmp->mask ) & (unsigned long)ptr) ?
+    tmp = /*((tmp->mask >> 1) & ( ~ tmp->mask ) & (unsigned long)ptr)*/
+      ((unsigned long)ptr >= (unsigned long)tmp->right->addr) ?
       tmp->right : tmp->left;
   }
 }
@@ -428,21 +429,24 @@ void __clean_struct () {
 
 /* recursively print the content of the structure
    do not call directly */
-void __debug_rec (struct bittree * ptr) {
-  if(ptr == NULL) return;
-  else if(ptr->is_leaf) {
-    printf("\t\t\t");
+void __debug_rec (struct bittree * ptr, int depth) {
+  int i;
+  if(ptr == NULL)
+    return;
+  for(i = 0; i < depth; i++)
+    printf("\t");
+  if(ptr->is_leaf)
     __print_block(ptr->leaf);
-  }
   else {
-    __debug_rec(ptr->left);
-    __debug_rec(ptr->right);
+    printf("%p -- %p\n", (char*)ptr->mask, ptr->addr);
+    __debug_rec(ptr->left, depth+1);
+    __debug_rec(ptr->right, depth+1);
   }
 }
 
 /* print the content of the structure */
 void __debug_struct () {
   printf("\t\t\t------------DEBUG\n");
-  __debug_rec(__root);
+  __debug_rec(__root, 0);
   printf("\t\t\t-----------------\n");
 }
