@@ -37,10 +37,10 @@ tests/e-acsl-runtime/function_contract.i:30:[value] Function j, behavior b1: pos
 tests/e-acsl-runtime/function_contract.i:34:[value] Function j, behavior b2: postcondition got status valid.
 tests/e-acsl-runtime/function_contract.i:30:[value] Function __e_acsl_j, behavior b1: postcondition got status valid.
 tests/e-acsl-runtime/function_contract.i:34:[value] Function __e_acsl_j, behavior b2: postcondition got status valid.
-tests/e-acsl-runtime/function_contract.i:40:[value] Function __e_acsl_k, behavior b1: assumption got status invalid; precondition not evaluated.
+tests/e-acsl-runtime/function_contract.i:40:[value] Function __e_acsl_k, behavior b1: behavior 'assumes' got status invalid; precondition not evaluated.
 tests/e-acsl-runtime/function_contract.i:44:[value] Function __e_acsl_k, behavior b2: precondition got status valid.
 tests/e-acsl-runtime/function_contract.i:45:[value] Function __e_acsl_k, behavior b2: precondition got status valid.
-tests/e-acsl-runtime/function_contract.i:40:[value] Function k, behavior b1: assumption got status invalid; precondition not evaluated.
+tests/e-acsl-runtime/function_contract.i:40:[value] Function k, behavior b1: behavior 'assumes' got status invalid; precondition not evaluated.
 tests/e-acsl-runtime/function_contract.i:44:[value] Function k, behavior b2: precondition got status valid.
 tests/e-acsl-runtime/function_contract.i:45:[value] Function k, behavior b2: precondition got status valid.
 tests/e-acsl-runtime/function_contract.i:51:[value] Assertion got status valid.

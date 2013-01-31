@@ -22,9 +22,7 @@ tests/e-acsl-runtime/localvar.c:26:[e-acsl] warning: E-ACSL construct `logic fun
 [value] using specification for function __full_init
 [value] using specification for function __delete_block
 FRAMAC_SHARE/libc/stdlib.h:127:[value] Function __e_acsl_malloc, behavior allocation: postcondition got status unknown.
-FRAMAC_SHARE/libc/stdlib.h:127:[value] Function __e_acsl_malloc, behavior allocation: postcondition got status unknown, but it is unknown if the behavior is active.
 FRAMAC_SHARE/libc/stdlib.h:132:[value] Function __e_acsl_malloc, behavior no_allocation: postcondition got status invalid.
-FRAMAC_SHARE/libc/stdlib.h:132:[value] Function __e_acsl_malloc, behavior no_allocation: postcondition got status invalid, but it is unknown if the behavior is active.
 tests/e-acsl-runtime/localvar.c:20:[value] Assertion got status valid.
 [value] using specification for function __initialized
 ./share/e-acsl/memory_model/e_acsl_mmodel.h:85:[value] Function __initialized: postcondition got status unknown.
