@@ -2,6 +2,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include "stdio.h"
+#include "stdlib.h"
 #include "e_acsl_mmodel_api.h"
 #include "e_acsl_bittree.h"
 #include "e_acsl_mmodel.h"
@@ -32,7 +33,7 @@ int Tneq[] = {0,0,1,-2,2,-4,5,-6,4,-8,9,-10,10,-12,13,-14,-15};
 
 #elif WORDBITS == 32
 
-unsigned long Tmasks[] = {
+size_t Tmasks[] = {
 0x0,
 0x80000000,
 0xc0000000,
@@ -77,7 +78,7 @@ int Tneq[] =
 
 #else /* WORDBITS == 64 */
 
-unsigned long Tmasks[] = {
+size_t Tmasks[] = {
 0x0,
 0x8000000000000000,
 0xc000000000000000,
@@ -160,7 +161,7 @@ int Tneq[] =
 struct bittree {
   int is_leaf;
   char* addr;
-  unsigned long mask;
+  size_t mask;
   struct bittree * left;
   struct bittree * right;
   struct bittree * father;
@@ -169,13 +170,15 @@ struct bittree {
 
 
 /* common bits of two addresses */
-unsigned long mask(void * a, void * b) {
-  unsigned long nxor = ~((unsigned long)a ^ (unsigned long)b);
+size_t mask(void * a, void * b) {
+  size_t nxor = ~((size_t)a ^ (size_t)b);
   int i = WORDBITS/2; /* dichotomic search, starting in the middle */
   
   /* if the current mask matches we use transition from Teq, else from Tneq
      we stop as soon as i is negative, meaning that we found the mask */
   while(i > 0) i = (nxor >= Tmasks[i]) ? Teq[i] : Tneq[i];
+
+  assert(((size_t)a & Tmasks[-i]) == ((size_t)b & Tmasks[-i]));
 
   /* a negative element i from Teq or Tneq means stop and return Tmasks[-i] */
   return Tmasks[-i];
@@ -183,12 +186,12 @@ unsigned long mask(void * a, void * b) {
 
 /* logical AND of a bittree and a new node */
 void* and(struct bittree * a, struct _block * b) {
-  return (void*) ((unsigned long)a->addr & (unsigned long)b->ptr);
+  return (void*) ((size_t)a->addr & (size_t)b->ptr);
 }
 
 /* does an address matches the mask of a bittree ? */
 int matches_mask(struct bittree * a, void * b) {
-  return ((unsigned long)a->addr & a->mask) == ((unsigned long)b & a->mask);
+  return ((size_t)a->addr & a->mask) == ((size_t)b & a->mask);
 }
 
 /* remove the block from the structure */
@@ -238,7 +241,7 @@ void __remove_element (struct _block * ptr) {
     /* visit child with greatest common prefix,
        if the bit next to the mask is set to 1, go to right child,
        because its address is higher than the other */
-    curr = ((curr->mask >> 1) & ( ~ curr->mask ) & (unsigned long)ptr->ptr) ?
+    curr = ((curr->mask >> 1) & ( ~ curr->mask ) & (size_t)ptr->ptr) ?
       curr->right : curr->left;
   }
 }
@@ -272,7 +275,7 @@ void __add_element (struct _block * ptr) {
 
 	/* visit child with greatest common prefix */
 	curr =
-	  ((curr->mask >> 1) & ( ~ curr->mask ) & (unsigned long)ptr->ptr) ?
+	  ((curr->mask >> 1) & ( ~ curr->mask ) & (size_t)ptr->ptr) ?
 	  curr->right : curr->left;
       }
       
@@ -296,7 +299,7 @@ void __add_element (struct _block * ptr) {
 	
 	curr->is_leaf = 0;
 	curr->mask = mask(new_node->addr, ptr->ptr);
-	/*curr->addr = (void*)((unsigned long)and(new_node, ptr) & curr->mask);*/
+	/*curr->addr = (void*)((size_t)and(new_node, ptr) & curr->mask);*/
 
 	/* smaller at left, higher at right */
 	if(new_node->addr < ptr->ptr) {
@@ -330,11 +333,11 @@ struct _block * __get_exact (void * ptr) {
     assert(tmp->left != NULL && tmp->right != NULL);
     
     /* visit child with greatest common prefix */
-    if(((unsigned long)tmp->right->addr & (unsigned long)tmp->right->mask)
-       == ((unsigned long)ptr & (unsigned long)tmp->right->mask))
+    if(((size_t)tmp->right->addr & (size_t)tmp->right->mask)
+       == ((size_t)ptr & (size_t)tmp->right->mask))
       tmp = tmp->right;
-    else if(((unsigned long)tmp->left->addr & (unsigned long)tmp->left->mask)
-	    == ((unsigned long)ptr & (unsigned long)tmp->left->mask))
+    else if(((size_t)tmp->left->addr & (size_t)tmp->left->mask)
+	    == ((size_t)ptr & (size_t)tmp->left->mask))
       tmp = tmp->left;
     else
       return NULL;
@@ -347,11 +350,11 @@ struct _block * __get_exact (void * ptr) {
    DO NOT CALL IT FROM ANYWHERE ELSE */
 struct _block * __get_cont_by_left_child (void * ptr, struct bittree * b) {
   struct bittree * tmp = b;
-  assert(((unsigned long)b->addr & b->mask) == ((unsigned long)ptr & b->mask));
+  assert(((size_t)b->addr & b->mask) == ((size_t)ptr & b->mask));
 
   while(!tmp->is_leaf) {
     assert(tmp->left != NULL && tmp->right != NULL);
-    if(((unsigned long)tmp->left->addr & tmp->mask) == (unsigned long)ptr)
+    if(((size_t)tmp->left->addr & tmp->mask) == (size_t)ptr)
       tmp = tmp->left;
     else
       return NULL;
@@ -382,8 +385,8 @@ struct _block * __get_cont (void * ptr) {
     
     assert(tmp->left != NULL && tmp->right != NULL);
 
-    if(((unsigned long)tmp->right->addr & tmp->right->mask)
-       == (unsigned long)ptr) {
+    if(((size_t)tmp->right->addr & tmp->right->mask)
+       == (size_t)ptr) {
       struct _block * r = __get_cont_by_left_child(ptr, tmp->right);
       if(r == NULL)
 	tmp = tmp->left;
@@ -392,11 +395,11 @@ struct _block * __get_cont (void * ptr) {
     }
 
     /* the right child has the highest address, so we test it first */
-    else if(((unsigned long)tmp->right->addr & tmp->right->mask)
-       <= ((unsigned long)ptr & tmp->right->mask))
+    else if(((size_t)tmp->right->addr & tmp->right->mask)
+       <= ((size_t)ptr & tmp->right->mask))
       tmp = tmp->right;
-    else if(((unsigned long)tmp->left->addr & tmp->left->mask)
-	    <= ((unsigned long)ptr & tmp->left->mask))
+    else if(((size_t)tmp->left->addr & tmp->left->mask)
+	    <= ((size_t)ptr & tmp->left->mask))
       tmp = tmp->left;
     else return NULL;
   }

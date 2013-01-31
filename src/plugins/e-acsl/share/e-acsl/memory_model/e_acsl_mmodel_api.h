@@ -22,7 +22,7 @@ struct _block {
   size_t size;	/* size in bytes */
 /* Keep trace of initialized sub-blocks within a memory block */
   unsigned char * init_ptr; /* dynamic array of booleans */
-  unsigned long init_cpt;
+  size_t init_cpt;
   _Bool is_litteral_string;
 };
 
