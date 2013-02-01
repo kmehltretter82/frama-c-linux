@@ -24,14 +24,10 @@ tests/e-acsl-runtime/linear_search.i:9:[value] Function search: precondition got
 tests/e-acsl-runtime/linear_search.i:19:[value] Loop invariant got status valid.
 tests/e-acsl-runtime/linear_search.i:20:[value] Loop invariant got status unknown.
 tests/e-acsl-runtime/linear_search.i:21:[value] entering loop for the first time
-tests/e-acsl-runtime/linear_search.i:12:[value] Function search, behavior exists: postcondition got status unknown.
-tests/e-acsl-runtime/linear_search.i:12:[value] Function search, behavior exists: postcondition got status unknown, but it is unknown if the behavior is active.
-tests/e-acsl-runtime/linear_search.i:15:[value] Function search, behavior not_exists: postcondition got status unknown.
-tests/e-acsl-runtime/linear_search.i:15:[value] Function search, behavior not_exists: postcondition got status unknown, but it is unknown if the behavior is active.
-tests/e-acsl-runtime/linear_search.i:12:[value] Function __e_acsl_search, behavior exists: postcondition got status unknown.
-tests/e-acsl-runtime/linear_search.i:12:[value] Function __e_acsl_search, behavior exists: postcondition got status unknown, but it is unknown if the behavior is active.
-tests/e-acsl-runtime/linear_search.i:15:[value] Function __e_acsl_search, behavior not_exists: postcondition got status unknown.
-tests/e-acsl-runtime/linear_search.i:15:[value] Function __e_acsl_search, behavior not_exists: postcondition got status unknown, but it is unknown if the behavior is active.
+tests/e-acsl-runtime/linear_search.i:12:[value] Function search, behavior exists: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
+tests/e-acsl-runtime/linear_search.i:15:[value] Function search, behavior not_exists: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
+tests/e-acsl-runtime/linear_search.i:12:[value] Function __e_acsl_search, behavior exists: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
+tests/e-acsl-runtime/linear_search.i:15:[value] Function __e_acsl_search, behavior not_exists: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
 tests/e-acsl-runtime/linear_search.i:33:[value] Assertion got status unknown.
 tests/e-acsl-runtime/linear_search.i:36:[value] Assertion got status unknown.
 [value] using specification for function __clean

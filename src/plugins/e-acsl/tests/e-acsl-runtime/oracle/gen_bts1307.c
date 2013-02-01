@@ -17,9 +17,11 @@ extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *fct,
                                                            char *pred_txt,
                                                            int line);
+
 int __fc_random_counter __attribute__((__unused__));
 unsigned long const __fc_rand_max = (unsigned long)32767;
-extern int __fc_heap_status;
+/*@ ghost extern int __fc_heap_status; */
+
 /*@
 axiomatic
   dynamic_allocation {
@@ -31,18 +33,24 @@ axiomatic
 /*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
                                                             size_t size);
+
 /*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __delete_block(void *ptr);
+
 /*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __initialize(void *ptr,
                                                           size_t size);
+
 /*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
+
 /*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) int __valid(void *ptr, size_t size);
+
 /*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) int __valid_read(void *ptr,
                                                          size_t size);
+
 /*@ ensures \result ≡ 0 ∨ \result ≡ 1;
     ensures
       \result ≡ 1 ⇒ \initialized((char *)\old(ptr)+(0..\old(size)-1));
@@ -50,7 +58,9 @@ extern  __attribute__((__FC_BUILTIN__)) int __valid_read(void *ptr,
  */
 extern  __attribute__((__FC_BUILTIN__)) int __initialized(void *ptr,
                                                           size_t size);
+
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
+
 /*@ requires \valid(Mtmax_in);
     requires \valid(Mwmax);
     requires \valid(Mtmax_out);

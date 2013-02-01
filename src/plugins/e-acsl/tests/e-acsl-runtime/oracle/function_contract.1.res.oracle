@@ -53,19 +53,19 @@ tests/e-acsl-runtime/function_contract.i:30:[value] Function j, behavior b1: pos
 tests/e-acsl-runtime/function_contract.i:34:[value] Function j, behavior b2: postcondition got status valid.
 tests/e-acsl-runtime/function_contract.i:30:[value] Function __e_acsl_j, behavior b1: postcondition got status valid.
 tests/e-acsl-runtime/function_contract.i:34:[value] Function __e_acsl_j, behavior b2: postcondition got status valid.
-tests/e-acsl-runtime/function_contract.i:40:[value] Function __e_acsl_k, behavior b1: assumption got status invalid; precondition not evaluated.
+tests/e-acsl-runtime/function_contract.i:40:[value] Function __e_acsl_k, behavior b1: assumes got status invalid; precondition not evaluated.
 tests/e-acsl-runtime/function_contract.i:44:[value] Function __e_acsl_k, behavior b2: precondition got status valid.
 tests/e-acsl-runtime/function_contract.i:45:[value] Function __e_acsl_k, behavior b2: precondition got status valid.
-tests/e-acsl-runtime/function_contract.i:40:[value] Function k, behavior b1: assumption got status invalid; precondition not evaluated.
+tests/e-acsl-runtime/function_contract.i:40:[value] Function k, behavior b1: assumes got status invalid; precondition not evaluated.
 tests/e-acsl-runtime/function_contract.i:44:[value] Function k, behavior b2: precondition got status valid.
 tests/e-acsl-runtime/function_contract.i:45:[value] Function k, behavior b2: precondition got status valid.
 tests/e-acsl-runtime/function_contract.i:51:[value] Assertion got status valid.
 tests/e-acsl-runtime/function_contract.i:49:[value] Function l: postcondition got status valid.
 tests/e-acsl-runtime/function_contract.i:49:[value] Function __e_acsl_l: postcondition got status valid.
-tests/e-acsl-runtime/function_contract.i:58:[value] Function m, behavior b1: assumes got status invalid; post-condition not evaluated.
+tests/e-acsl-runtime/function_contract.i:58:[value] Function m, behavior b1: assumes got status invalid; postcondition not evaluated.
 tests/e-acsl-runtime/function_contract.i:62:[value] Function m, behavior b2: postcondition got status valid.
 tests/e-acsl-runtime/function_contract.i:63:[value] Function m, behavior b2: postcondition got status valid.
-tests/e-acsl-runtime/function_contract.i:58:[value] Function __e_acsl_m, behavior b1: assumes got status invalid; post-condition not evaluated.
+tests/e-acsl-runtime/function_contract.i:58:[value] Function __e_acsl_m, behavior b1: assumes got status invalid; postcondition not evaluated.
 tests/e-acsl-runtime/function_contract.i:62:[value] Function __e_acsl_m, behavior b2: postcondition got status valid.
 tests/e-acsl-runtime/function_contract.i:63:[value] Function __e_acsl_m, behavior b2: postcondition got status valid.
 tests/e-acsl-runtime/function_contract.i:67:[value] Function __e_acsl_n: precondition got status valid.
@@ -73,9 +73,9 @@ tests/e-acsl-runtime/function_contract.i:68:[value] Function __e_acsl_n: precond
 tests/e-acsl-runtime/function_contract.i:67:[value] Function n: precondition got status valid.
 tests/e-acsl-runtime/function_contract.i:68:[value] Function n: precondition got status valid.
 tests/e-acsl-runtime/function_contract.i:71:[value] Function n, behavior b1: postcondition got status valid.
-tests/e-acsl-runtime/function_contract.i:74:[value] Function n, behavior b2: assumes got status invalid; post-condition not evaluated.
+tests/e-acsl-runtime/function_contract.i:74:[value] Function n, behavior b2: assumes got status invalid; postcondition not evaluated.
 tests/e-acsl-runtime/function_contract.i:71:[value] Function __e_acsl_n, behavior b1: postcondition got status valid.
-tests/e-acsl-runtime/function_contract.i:74:[value] Function __e_acsl_n, behavior b2: assumes got status invalid; post-condition not evaluated.
+tests/e-acsl-runtime/function_contract.i:74:[value] Function __e_acsl_n, behavior b2: assumes got status invalid; postcondition not evaluated.
 [value] using specification for function __clean
 [kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
 [value] done for function main

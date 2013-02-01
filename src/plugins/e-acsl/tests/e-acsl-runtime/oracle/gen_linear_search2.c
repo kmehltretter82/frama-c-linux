@@ -16,6 +16,7 @@ model __mpz_struct { ℤ n };
     allocates \old(z);
  */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init(__mpz_struct * /*[1]*/ z);
+
 /*@ requires ¬\initialized(z);
     ensures \valid(\old(z));
     ensures \initialized(\old(z));
@@ -25,6 +26,7 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init(__mpz_struct * /*[1]*/ 
  */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z,
                                                                 long n);
+
 /*@ requires \valid(z_orig);
     requires \valid(z);
     assigns *z;
@@ -32,14 +34,17 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init_set_si(__mpz_struct * /
  */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_set(__mpz_struct * /*[1]*/ z,
                                                         __mpz_struct const * /*[1]*/ z_orig);
+
 /*@ requires \valid(x);
     assigns *x; */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_clear(__mpz_struct * /*[1]*/ x);
+
 /*@ requires \valid(z1);
     requires \valid(z2);
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
                                                        __mpz_struct const * /*[1]*/ z2);
+
 /*@ requires \valid(z1);
     requires \valid(z2);
     requires \valid(z3);
@@ -49,9 +54,11 @@ extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_add(__mpz_struct * /*[1]*/ z1,
                                                         __mpz_struct const * /*[1]*/ z2,
                                                         __mpz_struct const * /*[1]*/ z3);
+
 /*@ requires \valid(z);
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) unsigned long __gmpz_get_ui(__mpz_struct const * /*[1]*/ z);
+
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
@@ -59,9 +66,11 @@ extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *fct,
                                                            char *pred_txt,
                                                            int line);
+
 int __fc_random_counter __attribute__((__unused__));
 unsigned long const __fc_rand_max = (unsigned long)32767;
-extern int __fc_heap_status;
+/*@ ghost extern int __fc_heap_status; */
+
 /*@
 axiomatic
   dynamic_allocation {
@@ -71,6 +80,7 @@ axiomatic
   }
  */
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
+
 int A[10];
 /*@ requires ∀ ℤ i; 0 ≤ i ∧ i < 9 ⇒ A[i] ≤ A[i+1];
     

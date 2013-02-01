@@ -17,9 +17,11 @@ extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *fct,
                                                            char *pred_txt,
                                                            int line);
+
 int __fc_random_counter __attribute__((__unused__));
 unsigned long const __fc_rand_max = (unsigned long)32767;
-extern int __fc_heap_status;
+/*@ ghost extern int __fc_heap_status; */
+
 /*@
 axiomatic
   dynamic_allocation {
@@ -31,14 +33,19 @@ axiomatic
 /*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
                                                             size_t size);
+
 /*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __delete_block(void *ptr);
+
 /*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __initialize(void *ptr,
                                                           size_t size);
+
 /*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
+
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
+
 int A = 0;
 /*@ ensures \at(A,Post) ≡ 3; */
 void f(void)

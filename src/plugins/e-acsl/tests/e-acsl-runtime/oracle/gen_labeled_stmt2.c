@@ -19,14 +19,17 @@ model __mpz_struct { ℤ n };
  */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z,
                                                                 long n);
+
 /*@ requires \valid(x);
     assigns *x; */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_clear(__mpz_struct * /*[1]*/ x);
+
 /*@ requires \valid(z1);
     requires \valid(z2);
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
                                                        __mpz_struct const * /*[1]*/ z2);
+
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
@@ -34,9 +37,11 @@ extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *fct,
                                                            char *pred_txt,
                                                            int line);
+
 int __fc_random_counter __attribute__((__unused__));
 unsigned long const __fc_rand_max = (unsigned long)32767;
-extern int __fc_heap_status;
+/*@ ghost extern int __fc_heap_status; */
+
 /*@
 axiomatic
   dynamic_allocation {
@@ -46,6 +51,7 @@ axiomatic
   }
  */
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
+
 int X = 0;
 /*@ ensures X ≡ 3; */
 int __e_acsl_main(void)
