@@ -3,6 +3,6 @@
 
 #include "stdlib.h"
 
-size_t mask(void*, void*);
+size_t mask(size_t, size_t);
 
 #endif

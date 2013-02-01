@@ -3,9 +3,12 @@
 #include <unistd.h>
 #include "stdio.h"
 #include "stdlib.h"
+#include "stdbool.h"
 #include "e_acsl_mmodel_api.h"
 #include "e_acsl_bittree.h"
 #include "e_acsl_mmodel.h"
+
+#define WORDBITS 64
 
 #if WORDBITS == 16
 
@@ -159,193 +162,291 @@ int Tneq[] =
 #endif
 
 struct bittree {
-  int is_leaf;
-  char* addr;
-  size_t mask;
-  struct bittree * left;
-  struct bittree * right;
-  struct bittree * father;
+  _Bool is_leaf;
+  size_t addr,  mask;
+  struct bittree * left, * right, * father;
   struct _block * leaf;
 } * __root = NULL;
 
 
-/* common bits of two addresses */
-size_t mask(void * a, void * b) {
-  size_t nxor = ~((size_t)a ^ (size_t)b);
+
+/* common prefix of two addresses */
+/*@ assigns \nothing;
+  @ ensures \forall int i;
+     0 <= i <= WORDBITS
+     ==> (Tmasks[i] & a) == (Tmasks[i] & b)
+     ==> \result >= Tmasks[i];
+  @ ensures (a & \result) == (b & \result);
+  @ ensures \exists int i; 0 <= i <= WORDBITS && \result == Tmasks[i];
+  @*/
+size_t mask(size_t a, size_t b) {
+  size_t nxor = ~(a ^ b), ret;
   int i = WORDBITS/2; /* dichotomic search, starting in the middle */
   
   /* if the current mask matches we use transition from Teq, else from Tneq
-     we stop as soon as i is negative, meaning that we found the mask */
-  while(i > 0)
-    i = (nxor >= Tmasks[i]) ? Teq[i] : Tneq[i];
+     we stop as soon as i is negative, meaning that we found the mask
+     a negative element i from Teq or Tneq means stop and return Tmasks[-i] */
+  /*@ loop invariant -WORDBITS <= i <= WORDBITS;
+    @ loop assigns i;
+    @*/
+  while(i > 0) {
+    //@ assert 0 < i <= WORDBITS;
+    //@ assert \valid(Tmasks+i);
+    if (nxor >= Tmasks[i])
+      //@ assert \valid(Teq+i);
+      i = Teq[i];
+    else
+      //@ assert \valid(Tneq+i);
+      i = Tneq[i];
+  }
 
-  assert(((size_t)a & Tmasks[-i]) == ((size_t)b & Tmasks[-i]));
-
-  /* a negative element i from Teq or Tneq means stop and return Tmasks[-i] */
-  return Tmasks[-i];
+  //@ assert -WORDBITS <= i <= 0;
+  ret = Tmasks[-i];
+  assert ((a & ret) == (b & ret));
+  return ret;
 }
 
 
-/* remove the block from the structure */
-void __remove_element (struct _block * ptr) {
+/* called from __remove_element */
+/* the block we are looking for has to be in the tree */
+/*@ requires \valid(ptr);
+  @ requires \valid(__root);
+  @ assings \nothing;
+  @ ensures \valid(\result);
+  @ ensures \result->leaf == ptr;
+  @*/
+struct bittree * __get_leaf_from_block (struct _block * ptr) {
   struct bittree * curr = __root;
   assert(__root != NULL);
   assert(ptr != NULL);
 
-  if(__root->is_leaf) { 
-    assert(__root->addr == ptr->ptr);
-    free(__root);
-    __root = NULL;
-    return;
-  }
-  
-  while(1) {
-    /* does not match the mask */
-    assert(((size_t)curr->addr & curr->mask)
-	   == ((size_t)ptr->ptr & curr->mask));
-    
-    /* element to delete */
-    if(curr->is_leaf) {
-      struct bittree * brother, * cf;
-      cf = curr->father;
-      assert(cf != NULL);
-      brother = (curr == cf->left) ? cf->right : cf->left;
-      assert(brother != NULL);
-      
-      cf->is_leaf = brother->is_leaf;
-      cf->addr = brother->addr;
-      cf->mask = brother->mask;
-      cf->left = brother->left;
-      cf->right = brother->right;
-      cf->leaf = brother->leaf;
-
-      if(!brother->is_leaf) {
-	brother->left->father = cf;
-	brother->right->father = cf;
-      }
-
-      free(brother);
-      free(curr);
-      break;
-    }
-    
+  /*@ loop assigns curr;
+    @*/
+  while(!curr->is_leaf) {
+    // the prefix is consistent
+    assert((curr->addr & curr->mask) == (ptr->ptr & curr->mask));
+    // two sons
     assert(curr->left != NULL && curr->right != NULL);
-    
-    /* visit child with greatest common prefix,
-       if the bit next to the mask is set to 1, go to right child,
-       because its address is higher than the other */
-    curr = ((curr->mask >> 1) & ( ~ curr->mask ) & (size_t)ptr->ptr) ?
-      curr->right : curr->left;
+    // the prefix of one son is consistent
+    if((curr->right->addr & curr->right->mask)
+       == (ptr->ptr & curr->right->mask))
+      curr = curr->right;
+    else if((curr->left->addr & curr->left->mask)
+	    == (ptr->ptr & curr->left->mask))
+      curr = curr->left;
+    else
+      assert(0);
+  }
+  assert(curr->is_leaf);
+  assert(curr->leaf == ptr);
+  return curr;
+}
+
+
+/* remove the block from the structure */
+/* the block we are looking for has to be in the tree */
+/*@ requires \valid(ptr);
+  @*/
+void __remove_element (struct _block * ptr) {
+  struct bittree * leaf_to_delete = __get_leaf_from_block (ptr);
+  assert(leaf_to_delete->leaf == ptr);
+  
+  if(leaf_to_delete->father == NULL)
+    // the leaf is the root
+    __root = NULL;
+  else {
+    struct bittree * brother, * father;
+    father = leaf_to_delete->father;
+    brother = (leaf_to_delete == father->left) ? father->right : father->left;
+    assert(brother != NULL);
+    // copying all brother's fields into the father's
+    father->is_leaf = brother->is_leaf;
+    father->addr = brother->addr;
+    father->mask = brother->mask;
+    father->left = brother->left;
+    father->right = brother->right;
+    father->leaf = brother->leaf;
+    if(!brother->is_leaf) {
+      brother->left->father = father;
+      brother->right->father = father;
+    }
+    free(brother);
+  }
+  free(leaf_to_delete);
+}
+
+
+/* called from __add_element */
+/* the returned node will be the brother of the soon to be added node */
+/*@ requires \valid(ptr);
+  @ requires \valid(__root);
+  @ assigns \nothing;
+  @ ensures \valid(\result);
+  @*/
+struct bittree * __most_similar_node (struct _block * ptr) {
+  struct bittree * curr = __root;
+  size_t common_prefix, left_prefix, right_prefix;
+  assert(ptr != NULL);
+  assert(__root != NULL);
+
+  common_prefix = mask(curr->addr & curr->mask, ptr->ptr);
+  // no bits in common
+  if(common_prefix == Tmasks[0])
+    return curr;
+
+  while(1) {
+    if(curr->is_leaf)
+      return curr;
+    assert(curr->left != NULL && curr->right != NULL);
+    /*printf("common_prefix = %p\n", common_prefix);*/
+    left_prefix = mask(curr->left->addr & curr->left->mask, ptr->ptr);
+    /*printf("left mask(%p, %p) = %p\n",
+      curr->left->addr & curr->left->mask, ptr->ptr, left_prefix);*/
+    if(left_prefix > curr->mask) {
+      curr = curr->left;
+      common_prefix = left_prefix;
+    }
+    else {
+      right_prefix = mask(curr->right->addr & curr->right->mask, ptr->ptr);
+      /*printf("right mask(%p, %p) = %p\n",
+	curr->right->addr & curr->right->mask, ptr->ptr, right_prefix);*/
+      if(right_prefix > curr->mask) {
+	curr = curr->right;
+	common_prefix = right_prefix;
+      }
+      else
+	return curr;
+    }
   }
 }
 
+
+
 /* add a block in the structure */
+/*@ requires \valid(ptr);
+  @*/
 void __add_element (struct _block * ptr) {
   struct bittree * new_leaf;
   assert(ptr != NULL);
   
   new_leaf = malloc(sizeof(struct bittree));
   assert(new_leaf != NULL);
-  new_leaf->is_leaf = 1;
+  new_leaf->is_leaf = true;
   new_leaf->addr = ptr->ptr;
-  new_leaf->mask = ~0ul;
-  new_leaf->left = new_leaf->right = new_leaf->father = NULL;
+  new_leaf->mask = Tmasks[WORDBITS]; /* ~0ul */
+  new_leaf->left = NULL;
+  new_leaf->right = NULL;
+  new_leaf->father = NULL;
   new_leaf->leaf = ptr;
-  
-  if(__root == NULL) __root = new_leaf;
+
+  if(__root == NULL)
+    __root = new_leaf;
   else {
-    struct bittree * curr = __root;
+    struct bittree * brother = __most_similar_node (ptr), * father, * aux;
     
-    while(1) {
-      /* matches the mask */
-      if(((size_t)curr->addr & curr->mask)
-	 == ((size_t)ptr->ptr & curr->mask)) {
-	/* is a leaf => already stored */
-	if(curr->is_leaf)
-	  return;
+    assert(brother != NULL);
+    father = malloc(sizeof(struct bittree));
+    assert(father != NULL);
+    father->is_leaf = false;
+    father->addr = brother->addr & new_leaf->addr;
+    /*father->mask = mask(brother->addr & brother->mask, ptr->ptr);*/
+    father->leaf = NULL;
+    if(new_leaf->addr <= brother->addr) {
+      father->left = new_leaf;
+      father->right = brother;
+    } else {
+      father->left = brother;
+      father->right = new_leaf;
+    }
+    new_leaf->father = father;
+    
+    if(brother == __root) {
+      father->father = NULL;
+      father->mask = mask(brother->addr & brother->mask, ptr->ptr);
+      __root = father;
+    }
+    else {
+      if (brother->father->left == brother)
+	brother->father->left = father;
+      else
+	brother->father->right = father;
+      father->father = brother->father;
 
-	assert(!curr->is_leaf);
-	assert(curr->left != NULL && curr->right != NULL);
-
-	/* visit child with greatest common prefix */
-	curr =
-	  ((curr->mask >> 1) & ( ~ curr->mask ) & (size_t)ptr->ptr) ?
-	  curr->right : curr->left;
-      }
-      
-      /* does not match the mask : creating a new node */
-      else {
-	struct bittree * new_node;
-	new_node = malloc(sizeof(struct bittree));
-	assert(new_node != NULL);
-	  
-	new_node->is_leaf = curr->is_leaf;
-	new_node->addr = curr->addr;
-	new_node->mask = curr->mask;
-	new_node->left = curr->left;
-	new_node->right = curr->right;
-	new_node->father = curr;
-	new_leaf->father = curr;
-	new_node->leaf = curr->leaf;
-
-	if(!new_node->is_leaf)
-	  new_node->left->father = new_node->right->father = new_node;
-	
-	curr->is_leaf = 0;
-	curr->mask = mask(new_node->addr, ptr->ptr);
-
-	/* smaller at left, higher at right */
-	if(new_node->addr < ptr->ptr) {
-	  curr->left = new_node;
-	  curr->right = new_leaf;
-	}
-	else {
-	  curr->left = new_leaf;
-	  curr->right = new_node;
-	}
-	curr->leaf = NULL;
-	break;
+      aux = father;
+      while(1) {
+	aux->mask = mask(aux->left->addr & aux->left->mask,
+			    aux->right->addr & aux->right->mask);
+	if(aux == __root) break;
+	aux = aux->father;
       }
     }
+    brother->father = father;
+    if(!brother->is_leaf)
+      brother->mask = mask(brother->left->addr & brother->left->mask,
+			   brother->right->addr & brother->right->mask);
+
+    assert((father->left == brother && father->right == new_leaf)
+	   || (father->left == new_leaf && father->right == brother));
   }
+  /*printf("%p added\n", (void*)ptr->ptr);
+    __debug();*/
 }
+
 
 /* return the block B such as : begin addr of B == ptr
    we suppose that such a block exists, but we could return NULL if not */
+/*@ assigns \nothing;
+  @ ensures \valid(\result);
+  @ ensures \result->ptr == (size_t)ptr;
+  @*/
 struct _block * __get_exact (void * ptr) {
   struct bittree * tmp = __root;
-  if(__root == NULL || ptr == NULL) return NULL;
+  assert(__root != NULL);
+  assert(ptr != NULL);
 
-  while(1) {
-    /* does not match the mask */
-    if(((size_t)tmp->addr & tmp->mask)
-       != ((size_t)ptr & tmp->mask))
-      return NULL;
+  /*@ loop assigns tmp;
+    @*/
+  while(!tmp->is_leaf) {
+    /*if(!((tmp->addr & tmp->mask) == ((size_t)ptr & tmp->mask))) {
+      printf("get_exact(%p)\n", ptr, (void*)tmp->addr);
+      printf("(tmp->addr & tmp->mask) = %p\n", (tmp->addr & tmp->mask));
+      printf("((size_t)ptr & tmp->mask) = %p\n", ((size_t)ptr & tmp->mask));
+      }*/
 
-    /* the leaf we are looking for */
-    if(tmp->is_leaf) {
-      assert(tmp->leaf->ptr == ptr);
-      return tmp->leaf;
-    }
-
+    // prefix is consistent
+    assert((tmp->addr & tmp->mask) == ((size_t)ptr & tmp->mask));
+    // two sons
     assert(tmp->left != NULL && tmp->right != NULL);
-    
-    /* visit child with greatest common prefix */
-    if(((size_t)tmp->right->addr & (size_t)tmp->right->mask)
-       == ((size_t)ptr & (size_t)tmp->right->mask))
+    // the prefix of one son is consistent
+    if((tmp->right->addr & tmp->right->mask)
+       == ((size_t)ptr & tmp->right->mask))
       tmp = tmp->right;
-    else if(((size_t)tmp->left->addr & (size_t)tmp->left->mask)
-	    == ((size_t)ptr & (size_t)tmp->left->mask))
+    else if((tmp->left->addr & tmp->left->mask)
+	    == ((size_t)ptr & tmp->left->mask))
       tmp = tmp->left;
-    else
-      return NULL;
+    else {
+      /*printf("get_exact(%p)\n", ptr);
+	__debug();*/
+      assert(0);
+      /*printf("get_exact(%p) at %p\n", ptr, (void*)tmp->addr);
+      printf("%p -- %p\n", tmp->left->mask, tmp->right->mask);
+      printf("%p\n", (tmp->right->addr & tmp->right->mask));
+      printf("%p\n", ((size_t)ptr & tmp->right->mask));
+      printf("%p\n", (tmp->left->addr & tmp->left->mask));
+      printf("%p\n", ((size_t)ptr & tmp->left->mask));
+      return NULL;*/
+    }
   }
+
+  assert(tmp->is_leaf);
+  assert(tmp->leaf->ptr == (size_t)ptr);
+  return tmp->leaf;
 }
 
+
+/* called from __get_cont */
 /* return the block B containing ptr, starting from b and only exploring
-   left children, or NULL if such block does not exist
-   THIS METHOD IS INVOKED FROM __get_cont ONLY
-   DO NOT CALL IT FROM ANYWHERE ELSE */
+   left children, or NULL if such block does not exist */
 struct _block * __get_cont_by_left_child (void * ptr, struct bittree * b) {
   struct bittree * tmp = b;
   assert(((size_t)b->addr & b->mask) == ((size_t)ptr & b->mask));
@@ -360,7 +461,7 @@ struct _block * __get_cont_by_left_child (void * ptr, struct bittree * b) {
 
   assert(tmp->is_leaf);
 
-  return (tmp->addr == ptr) ? tmp->leaf : NULL;
+  return (tmp->addr == (size_t)ptr) ? tmp->leaf : NULL;
 }
 
 /* return the block B containing ptr, such as :
@@ -373,10 +474,10 @@ struct _block * __get_cont (void * ptr) {
   while(1) {
     if(tmp->is_leaf) {
       /* tmp cannot contain ptr because its begin addr is higher */
-      if(tmp->addr > (char*)ptr) return NULL;
+      if(tmp->addr > (size_t)ptr) return NULL;
       /* tmp->addr <= ptr, tmp may contain ptr
 	 ptr is contained if tmp is large enough (begin addr + size) */
-      else if((char*)ptr < tmp->leaf->size + tmp->addr) return tmp->leaf;
+      else if((size_t)ptr < tmp->leaf->size + tmp->addr) return tmp->leaf;
       /* tmp->addr <= ptr, but tmp->addr is not large enough */
       return NULL;
     }
@@ -407,8 +508,8 @@ struct _block * __get_cont (void * ptr) {
 /* CLEAN           */
 /*******************/
 
-/* recursively erase the content of the structure,
-   do not call directly */
+/* called from __clean_struct */
+/* recursively erase the content of the structure */
 void __clean_rec (struct bittree * ptr) {
   if(ptr == NULL) return;
   else if(ptr->is_leaf) {
@@ -433,8 +534,10 @@ void __clean_struct () {
 /* DEBUG             */
 /*********************/
 
-/* recursively print the content of the structure
-   do not call directly */
+/* called from __debug_struct */
+/* recursively print the content of the structure */
+/*@ assigns \nothing;
+  @*/
 void __debug_rec (struct bittree * ptr, int depth) {
   int i;
   if(ptr == NULL)
@@ -444,13 +547,15 @@ void __debug_rec (struct bittree * ptr, int depth) {
   if(ptr->is_leaf)
     __print_block(ptr->leaf);
   else {
-    printf("%p -- %p\n", (char*)ptr->mask, ptr->addr);
+    printf("%p -- %p\n", (void*)ptr->mask, (void*)ptr->addr);
     __debug_rec(ptr->left, depth+1);
     __debug_rec(ptr->right, depth+1);
   }
 }
 
 /* print the content of the structure */
+/*@ assigns \nothing;
+  @*/
 void __debug_struct () {
   printf("\t\t\t------------DEBUG\n");
   __debug_rec(__root, 0);

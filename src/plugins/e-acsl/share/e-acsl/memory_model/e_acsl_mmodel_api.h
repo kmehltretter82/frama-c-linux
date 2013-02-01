@@ -18,7 +18,7 @@
 
 /* Memory block allocated and may be deallocated */
 struct _block {
-  char * ptr;	/* begin address */
+  size_t ptr;	/* begin address */
   size_t size;	/* size in bytes */
 /* Keep trace of initialized sub-blocks within a memory block */
   unsigned char * init_ptr; /* dynamic array of booleans */

@@ -6,6 +6,7 @@
 #include <assert.h>
 #include "e_acsl_bittree.h"
 #include "e_acsl_mmodel_api.h"
+#include "e_acsl_mmodel.h"
 
 const int nbr_bits_to_1[256] = {
   0,1,1,2,1,2,2,3,1,2,2,3,2,3,3,4,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,4,5,5,6,5,6,6,7,5,6,6,7,6,7,7,8
@@ -21,7 +22,7 @@ void* __store_block(void* ptr, size_t size) {
   assert(ptr != NULL);
   tmp = malloc(sizeof(struct _block));
   assert(tmp != NULL);
-  tmp->ptr = ptr;
+  tmp->ptr = (size_t)ptr;
   tmp->size = size;
   tmp->init_ptr = NULL;
   tmp->init_cpt = 0;
@@ -78,9 +79,9 @@ void* __realloc(void* ptr, size_t size) {
   }
   tmp = __get_exact(ptr);
   assert(tmp != NULL);
-  new_ptr = realloc(tmp->ptr, size);
+  new_ptr = realloc((void*)tmp->ptr, size);
   if(new_ptr == NULL) return NULL;
-  tmp->ptr = new_ptr;
+  tmp->ptr = (size_t)new_ptr;
   /* uninitialized, do nothing */
   if(tmp->init_cpt == 0) ;
   /* already fully initialized block */
@@ -115,7 +116,7 @@ void* __realloc(void* ptr, size_t size) {
     }
   }
   tmp->size = size;
-  return tmp->ptr;
+  return (void*)tmp->ptr;
 }
 
 /* allocate memory for an array of nbr_block elements of size_block size,
@@ -151,7 +152,7 @@ void __initialize (void * ptr, size_t size) {
   }
 
   for(i = 0; i < size; i++) {
-    int byte_offset =(char*)ptr - tmp->ptr + i; 
+    int byte_offset = (size_t)ptr - tmp->ptr + i; 
     int ind = byte_offset / 8;
     unsigned char mask_bit = 1U << (7 - (byte_offset % 8));
     if((tmp->init_ptr[ind] & mask_bit) == 0) tmp->init_cpt++;
@@ -170,6 +171,10 @@ void __full_init (void * ptr) {
   struct _block * tmp;
   assert(ptr != NULL);
   tmp = __get_exact(ptr);
+  if(!tmp) {
+    printf("full_init(%p)\n", ptr);
+    __debug();
+  }
   assert(tmp != NULL);
 
   if (tmp->init_ptr != NULL) {
@@ -206,7 +211,7 @@ int __initialized (void * ptr, size_t size) {
   
   for(i = 0; i < size; i++) {
     /* if one byte is uninitialized */
-    int byte_offset =(char*)ptr - tmp->ptr + i; 
+    int byte_offset = (size_t)ptr - tmp->ptr + i; 
     int ind = byte_offset / 8;
     unsigned char mask_bit = 1U << (7 - (byte_offset % 8));
     if((tmp->init_ptr[ind] & mask_bit) == 0) return false;
@@ -231,7 +236,7 @@ int __valid(void* ptr, size_t size) {
   assert(size > 0);
   tmp = __get_cont(ptr);
   return (tmp == NULL) ?
-    false : ( tmp->size - ( (char*)ptr - tmp->ptr ) >= size
+    false : ( tmp->size - ( (size_t)ptr - tmp->ptr ) >= size
 	      && !tmp->is_litteral_string);
 }
 
@@ -243,7 +248,7 @@ int __valid_read(void* ptr, size_t size) {
   assert(size > 0);
   tmp = __get_cont(ptr);
   return (tmp == NULL) ?
-    false : ( tmp->size - ( (char*)ptr - tmp->ptr ) >= size );
+    false : ( tmp->size - ( (size_t)ptr - tmp->ptr ) >= size );
 }
 
 /* return the base address of the block containing ptr */
@@ -252,7 +257,7 @@ void* __base_addr(void* ptr) {
   assert(ptr != NULL);
   tmp = __get_cont(ptr);
   assert(tmp != NULL);
-  return tmp->ptr;
+  return (void*)tmp->ptr;
 }
 
 /* return the offset of ptr within its block */
@@ -261,7 +266,7 @@ int _offset(void* ptr) {
   assert(ptr != NULL);
   tmp = __get_cont(ptr);
   assert(tmp != NULL);
-  return ((char*)ptr - tmp->ptr);
+  return ((size_t)ptr - tmp->ptr);
 }
 
 /*******************/
