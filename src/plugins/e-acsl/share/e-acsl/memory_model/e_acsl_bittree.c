@@ -9,7 +9,7 @@
 
 #if WORDBITS == 16
 
-unsigned long Tmasks[] = {
+size_t Tmasks[] = {
 0x0,
 0x8000,
 0xc000,
@@ -176,7 +176,8 @@ size_t mask(void * a, void * b) {
   
   /* if the current mask matches we use transition from Teq, else from Tneq
      we stop as soon as i is negative, meaning that we found the mask */
-  while(i > 0) i = (nxor >= Tmasks[i]) ? Teq[i] : Tneq[i];
+  while(i > 0)
+    i = (nxor >= Tmasks[i]) ? Teq[i] : Tneq[i];
 
   assert(((size_t)a & Tmasks[-i]) == ((size_t)b & Tmasks[-i]));
 
@@ -184,15 +185,6 @@ size_t mask(void * a, void * b) {
   return Tmasks[-i];
 }
 
-/* logical AND of a bittree and a new node */
-void* and(struct bittree * a, struct _block * b) {
-  return (void*) ((size_t)a->addr & (size_t)b->ptr);
-}
-
-/* does an address matches the mask of a bittree ? */
-int matches_mask(struct bittree * a, void * b) {
-  return ((size_t)a->addr & a->mask) == ((size_t)b & a->mask);
-}
 
 /* remove the block from the structure */
 void __remove_element (struct _block * ptr) {
@@ -209,7 +201,8 @@ void __remove_element (struct _block * ptr) {
   
   while(1) {
     /* does not match the mask */
-    assert(matches_mask(curr, ptr->ptr));
+    assert(((size_t)curr->addr & curr->mask)
+	   == ((size_t)ptr->ptr & curr->mask));
     
     /* element to delete */
     if(curr->is_leaf) {
@@ -265,7 +258,8 @@ void __add_element (struct _block * ptr) {
     
     while(1) {
       /* matches the mask */
-      if(matches_mask(curr, ptr->ptr)) {
+      if(((size_t)curr->addr & curr->mask)
+	 == ((size_t)ptr->ptr & curr->mask)) {
 	/* is a leaf => already stored */
 	if(curr->is_leaf)
 	  return;
@@ -299,7 +293,6 @@ void __add_element (struct _block * ptr) {
 	
 	curr->is_leaf = 0;
 	curr->mask = mask(new_node->addr, ptr->ptr);
-	/*curr->addr = (void*)((size_t)and(new_node, ptr) & curr->mask);*/
 
 	/* smaller at left, higher at right */
 	if(new_node->addr < ptr->ptr) {
@@ -325,10 +318,15 @@ struct _block * __get_exact (void * ptr) {
 
   while(1) {
     /* does not match the mask */
-    if(!matches_mask(tmp, ptr)) return NULL;
+    if(((size_t)tmp->addr & tmp->mask)
+       != ((size_t)ptr & tmp->mask))
+      return NULL;
 
     /* the leaf we are looking for */
-    if(tmp->is_leaf) return tmp->leaf;
+    if(tmp->is_leaf) {
+      assert(tmp->leaf->ptr == ptr);
+      return tmp->leaf;
+    }
 
     assert(tmp->left != NULL && tmp->right != NULL);
     
