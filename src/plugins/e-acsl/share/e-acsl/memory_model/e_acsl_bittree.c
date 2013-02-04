@@ -292,20 +292,14 @@ void __remove_element (struct _block * ptr) {
   @*/
 struct bittree * __most_similar_node (struct _block * ptr) {
   struct bittree * curr = __root;
-  size_t common_prefix, left_prefix, right_prefix;
+  size_t left_prefix, right_prefix;
   assert(ptr != NULL);
   assert(__root != NULL);
-
-  common_prefix = mask(curr->addr & curr->mask, ptr->ptr);
-  // no bits in common
-  if(common_prefix == Tmasks[0])
-    return curr;
 
   while(1) {
     if(curr->is_leaf)
       return curr;
     assert(curr->left != NULL && curr->right != NULL);
-    /*printf("common_prefix = %p\n", common_prefix);*/
     left_prefix = mask(curr->left->addr & curr->left->mask, ptr->ptr);
     right_prefix = mask(curr->right->addr & curr->right->mask, ptr->ptr);
     if(left_prefix > right_prefix)
@@ -314,23 +308,6 @@ struct bittree * __most_similar_node (struct _block * ptr) {
       curr = curr->right;
     else
       return curr;
-    /*printf("left mask(%p, %p) = %p\n",
-      curr->left->addr & curr->left->mask, ptr->ptr, left_prefix);*/
-    /*if(left_prefix > curr->mask) {
-      curr = curr->left;
-      common_prefix = left_prefix;
-    }
-    else {
-    right_prefix = mask(curr->right->addr & curr->right->mask, ptr->ptr);*/
-      /*printf("right mask(%p, %p) = %p\n",
-	curr->right->addr & curr->right->mask, ptr->ptr, right_prefix);*/
-    /*      if(right_prefix > curr->mask) {
-	curr = curr->right;
-	common_prefix = right_prefix;
-      }
-      else
-	return curr;
-	}*/
   }
 }
 
@@ -423,12 +400,6 @@ struct _block * __get_exact (void * ptr) {
   /*@ loop assigns tmp;
     @*/
   while(!tmp->is_leaf) {
-    /*if(!((tmp->addr & tmp->mask) == ((size_t)ptr & tmp->mask))) {
-      printf("get_exact(%p)\n", ptr, (void*)tmp->addr);
-      printf("(tmp->addr & tmp->mask) = %p\n", (tmp->addr & tmp->mask));
-      printf("((size_t)ptr & tmp->mask) = %p\n", ((size_t)ptr & tmp->mask));
-      }*/
-
     // prefix is consistent
     assert((tmp->addr & tmp->mask) == ((size_t)ptr & tmp->mask));
     // two sons
@@ -442,14 +413,7 @@ struct _block * __get_exact (void * ptr) {
       tmp = tmp->left;
     else {
       printf("get_exact(%p)\n", ptr);
-	__debug();
-	/*assert(0);*/
-      printf("get_exact(%p) at %p\n", ptr, (void*)tmp->addr);
-      printf("%p -- %p\n", tmp->left->mask, tmp->right->mask);
-      printf("%p (%p)\n", tmp->right->addr, (tmp->right->addr & tmp->right->mask));
-      printf("%p\n", ((size_t)ptr & tmp->right->mask));
-      printf("%p (%p)\n", tmp->left->addr, (tmp->left->addr & tmp->left->mask));
-      printf("%p\n", ((size_t)ptr & tmp->left->mask));
+      __debug();
       assert(0);
     }
   }

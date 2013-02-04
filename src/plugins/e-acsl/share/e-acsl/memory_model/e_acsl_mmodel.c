@@ -171,10 +171,6 @@ void __full_init (void * ptr) {
   struct _block * tmp;
   assert(ptr != NULL);
   tmp = __get_exact(ptr);
-  if(!tmp) {
-    printf("full_init(%p)\n", ptr);
-    __debug();
-  }
   assert(tmp != NULL);
 
   if (tmp->init_ptr != NULL) {
