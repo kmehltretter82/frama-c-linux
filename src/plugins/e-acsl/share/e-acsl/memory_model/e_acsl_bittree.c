@@ -8,7 +8,6 @@
 #include "e_acsl_bittree.h"
 #include "e_acsl_mmodel.h"
 
-#define WORDBITS 64
 
 #if WORDBITS == 16
 

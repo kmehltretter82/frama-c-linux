@@ -13,7 +13,7 @@
 #elif E_ACSL_MACHDEP == x86_16
 #define WORDBITS 16
 #else
-#define WORDBITS 64
+#define WORDBITS 32
 #endif
 
 /* Memory block allocated and may be deallocated */

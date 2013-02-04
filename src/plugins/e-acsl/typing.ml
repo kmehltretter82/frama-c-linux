@@ -213,7 +213,7 @@ let size_of ty =
   try int_to_interv (Cil.sizeOf_int ty)
   with Cil.SizeOfError _ -> eacsl_typ_of_typ Cil.ulongLongType
 
-let align_of ty = int_to_interv (Cil.alignOf_int ty)
+let align_of ty = int_to_interv (Cil.bytesAlignOf ty)
 
 type offset_ty = Ty_no_offset | Ty_field of eacsl_typ | Ty_index of eacsl_typ
 
