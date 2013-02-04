@@ -270,6 +270,14 @@ void __remove_element (struct _block * ptr) {
       brother->right->father = father;
     }
     free(brother);
+    /* necessary ? -- begin */
+    if(father->father != NULL) {
+      father->father->mask = mask(father->father->left->addr
+				  & father->father->left->mask,
+				  father->father->right->addr
+				  & father->father->right->mask);
+    }
+    /* necessary ? -- end */
   }
   free(leaf_to_delete);
 }
@@ -371,6 +379,7 @@ void __add_element (struct _block * ptr) {
 	brother->father->right = father;
       father->father = brother->father;
 
+      /* necessary ? -- begin */
       aux = father;
       while(1) {
 	aux->mask = mask(aux->left->addr & aux->left->mask,
@@ -378,6 +387,7 @@ void __add_element (struct _block * ptr) {
 	if(aux == __root) break;
 	aux = aux->father;
       }
+      /* necessary ? -- end */
     }
     brother->father = father;
     if(!brother->is_leaf)
