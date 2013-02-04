@@ -307,23 +307,30 @@ struct bittree * __most_similar_node (struct _block * ptr) {
     assert(curr->left != NULL && curr->right != NULL);
     /*printf("common_prefix = %p\n", common_prefix);*/
     left_prefix = mask(curr->left->addr & curr->left->mask, ptr->ptr);
+    right_prefix = mask(curr->right->addr & curr->right->mask, ptr->ptr);
+    if(left_prefix > right_prefix)
+      curr = curr->left;
+    else if(right_prefix > left_prefix)
+      curr = curr->right;
+    else
+      return curr;
     /*printf("left mask(%p, %p) = %p\n",
       curr->left->addr & curr->left->mask, ptr->ptr, left_prefix);*/
-    if(left_prefix > curr->mask) {
+    /*if(left_prefix > curr->mask) {
       curr = curr->left;
       common_prefix = left_prefix;
     }
     else {
-      right_prefix = mask(curr->right->addr & curr->right->mask, ptr->ptr);
+    right_prefix = mask(curr->right->addr & curr->right->mask, ptr->ptr);*/
       /*printf("right mask(%p, %p) = %p\n",
 	curr->right->addr & curr->right->mask, ptr->ptr, right_prefix);*/
-      if(right_prefix > curr->mask) {
+    /*      if(right_prefix > curr->mask) {
 	curr = curr->right;
 	common_prefix = right_prefix;
       }
       else
 	return curr;
-    }
+	}*/
   }
 }
 
@@ -381,12 +388,12 @@ void __add_element (struct _block * ptr) {
 
       /* necessary ? -- begin */
       aux = father;
-      while(1) {
+      /*while(1) {*/
 	aux->mask = mask(aux->left->addr & aux->left->mask,
 			    aux->right->addr & aux->right->mask);
-	if(aux == __root) break;
+	/*if(aux == __root) break;
 	aux = aux->father;
-      }
+	}*/
       /* necessary ? -- end */
     }
     brother->father = father;
@@ -434,16 +441,16 @@ struct _block * __get_exact (void * ptr) {
 	    == ((size_t)ptr & tmp->left->mask))
       tmp = tmp->left;
     else {
-      /*printf("get_exact(%p)\n", ptr);
-	__debug();*/
-      assert(0);
-      /*printf("get_exact(%p) at %p\n", ptr, (void*)tmp->addr);
+      printf("get_exact(%p)\n", ptr);
+	__debug();
+	/*assert(0);*/
+      printf("get_exact(%p) at %p\n", ptr, (void*)tmp->addr);
       printf("%p -- %p\n", tmp->left->mask, tmp->right->mask);
-      printf("%p\n", (tmp->right->addr & tmp->right->mask));
+      printf("%p (%p)\n", tmp->right->addr, (tmp->right->addr & tmp->right->mask));
       printf("%p\n", ((size_t)ptr & tmp->right->mask));
-      printf("%p\n", (tmp->left->addr & tmp->left->mask));
+      printf("%p (%p)\n", tmp->left->addr, (tmp->left->addr & tmp->left->mask));
       printf("%p\n", ((size_t)ptr & tmp->left->mask));
-      return NULL;*/
+      assert(0);
     }
   }
 
