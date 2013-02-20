@@ -70,6 +70,13 @@
 
 
 
+\begin{abstract}
+We present:\\
+* framework for memory monitoring\\
+* instrumentation of {C} programs\\
+* ...
+\end{abstract}
+
 
 \section{Introduction}
 
@@ -96,6 +103,7 @@ properties. \textsc{Acsl}-annotated C programs can be dealt with
 
 \section{Related work}
 
+* ask Pascal ? *
 
 \section{Stored information}
 
@@ -180,10 +188,10 @@ is used instead.
              {Instrumented {C} code};
         \node[inner sep=4mm,draw](lib)at(\colB{},\rowB{}){Monitoring functions};
         \node[inner sep=4mm,draw](sdda) at (\colB{},\rowC{}){Common interface};
-        \node[inner sep=4mm,draw](bt) at (-1.5,\rowD{}){{\em Bittree}};
+        \node[inner sep=4mm,draw](bt) at (-1.5,\rowD{}){{\em Patricia trie}};
         \node[inner sep=4mm,draw](ll) at (1.5,\rowD{}){Linked list};
 
-        \node[service] at (8,\rowA{})
+        \node[service] (eacsl2) at (8,\rowA{})
              {translated from \textsc{Acsl} specification};
         
         \node [matrix of nodes,column sep=2mm,inner sep=2mm,draw] (mf) at
@@ -216,10 +224,13 @@ is used instead.
         %  \node at (0,0) { Linked list }; \pgfmatrixnextcell
         %  \node at (0,0) {\dots};\\
         %};
-        \path [<->,thick] (eacsl) edge (lib);
-        \path [<->,thick] (lib) edge (sdda);
-        \path [<-,thick] (sdda) edge (bt);
-        \path [loosely dashed,thick] (sdda) edge (ll);
+        \path [->,thick] (eacsl) edge (lib);
+        \path [->,thick] (lib) edge (sdda);
+        \path [->,thick] (sdda) edge (bt);
+        \path [->,loosely dashed,thick] (sdda) edge (ll);
+        \path [<->] (eacsl) edge (eacsl2);
+        \path [<->] (lib) edge (mf);
+        \path [<->] (sdda) edge (ci);
       \end{tikzpicture}
     }
   \end{center}
@@ -230,21 +241,17 @@ is used instead.
 
 Interactions between the components of our solution are displayed by
 Figure~\ref{fig:lib}. Informations about block descriptors are stored in an
-arbitrary data structure $S$ (see Section~\ref{section:bittree}). The
+arbitrary data structure $S$ (see Section~\ref{section:patricia-trie}). The
 \textsc{E-Acsl} plug-in performs an instrumentation to generate executable C
 code invoking monitoring functions (see Section~\ref{section:lib}) relying on
 the data structure $S$.
 
 
-\section{Concrete data structure used: {\em bittree}}
-\label{section:bittree}
+\section{Concrete data structure used: {\em Patricia trie}}
+\label{section:patricia-trie}
 
 In this section we discuss the choice of the concrete data structure used to
 store the block descriptors.
-
-
-\subsection{{\em Patricia tries}}
-
 
 We need a data structure with a good time and space complexity, indeed we may
 have to often add or remove a block descriptor in the structure. The structure
@@ -266,19 +273,22 @@ operations.
       child { node {0010 1001} }
       child { node {0010 1101} }
     };
-    \caption{Example of bittree}
+    \caption{Example of Patricia trie}
     \label{fig:bittree}
   \end{center}
 \end{figure}
 
-We choose to use the {\em Patricia tries} \cite{Patricia-tries} structure, which
+We choose to use the {\em Patricia trie} \cite{Patricia-tries} structure, which
 is efficient even if the tree is unbalanced. The prefix used by a node (not a
 leaf) is the greatest common prefix (on 32 or 64 bits) of its two children.
 The block descriptors are held on leaves. Other nodes just do the routing from
-the root to a block descriptor. Patricia tries are usually used on
-strings and characters, so we named ``bittree'' the structure used in this
-article. For example on 8-bit addresses, Figure~\ref{fig:bittree} shows
-a bittree  storing three block descriptors (identified by their addresses:
+the root to a block descriptor.
+
+%Patricia tries are usually used on strings and characters, so we named
+%``bittree'' the structure used in this article.
+
+For example on 8-bit addresses, Figure~\ref{fig:bittree} shows
+a Patricia trie storing three block descriptors (identified by their addresses:
 ${\tt 0010\,0111}$, ${\tt 0010\,1001}$ and ${\tt 0010\,1101})$. The greatest
 common prefix of ${\tt 0010\,1001}$ and ${\tt 0010\,1101}$ is ${\tt 0010\,1***}$
 and the greatest common prefix of ${\tt 0010\,0111}$ and ${\tt 0010\,1***}$ is
@@ -298,7 +308,7 @@ when a block descriptor is inserted.
       child { node {0010 1001} }
       child { node {0010 1101} }
     };
-    \caption{Bittree after adding ${\tt 0010\,0110}$ into the bittree of
+    \caption{Patricia trie after adding ${\tt 0010\,0110}$ into the trie of
       Fig.~\ref{fig:bittree}}
     \label{fig:insertion}
   \end{center}
@@ -309,7 +319,7 @@ descriptor. Patricia tries being compact prefix trees, a node having an
 only child is deleted. So ${\tt 0010\,1***}$ becomes useless and is replaced by
 its child ${\tt 0010\,1001}$. Deleting useless nodes, or only storing useful
 ones for routing, keeps the tree exploration efficient. A 32-bit (respectively
-64-bit) bittree has a worst-case depth of 33 (respectively 65) nodes.
+64-bit) trie has a worst-case depth of 33 (respectively 65) nodes.
 
 \begin{figure}[h]
   \begin{center}
@@ -317,7 +327,7 @@ ones for routing, keeps the tree exploration efficient. A 32-bit (respectively
     \node {0010 ****}
     child { node {0010 0111} }
     child { node {0010 1001} };
-    \caption{Bittree after deleting ${\tt 0010\,1101}$ from the bittree of
+    \caption{Patricia trie after deleting ${\tt 0010\,1101}$ from the trie of
       Fig.~\ref{fig:bittree}}
     \label{fig:deletion}
   \end{center}
@@ -334,66 +344,69 @@ mask is then applied to $A$ or $B$. For example, considering
 $A = {\tt 0110\,0111}$ and $B = {\tt 0111\,1111}$,
 $X = \lnot (A \oplus B) = {\tt 1110\,0111}$, setting each bit on the right side
 of a 0 to 0 we get ${\tt 1110\,0000}$. We apply this mask to $A$ and get the
-greatest common prefix of $A$ and $B$: ${\tt 011*\,****}$. This algorithm is
-used by the first version of out implementation and is named {\em Bittree-naive}
-in the experiments.
+greatest common prefix of $A$ and $B$: ${\tt 011*\,****}$.
+
+%This algorithm is
+%used by the first version of out implementation and is named {\em Bittree-naive}
+%in the experiments.
 
 We optimized this algorithm by firstly computing all of the 65 or 33 different
 masks (from {\tt 0x0} to {\tt0xf$\dots$f}) and storing them in an array. Then we
 use a dichotomic search to find the mask corresponding to the greatest common
 prefix: if $A$ and $B$ have a 32-bit common prefix, do they have a 48-bit common
 prefix ? Otherwise, do they have a 16-bit common prefix ? And so on. This search
-takes at most 6 (respectively 5) steps on 64-bit (respectively 32-bit) bittrees.
-This algorithm is used by the final version of our implementation and is named
-{\em Bittree-opti} in the experiments.
+takes at most 6 (respectively 5) steps on 64-bit (respectively 32-bit) tries.
+
+%This algorithm is used by the final version of our implementation and is named
+%{\em Bittree-opti} in the experiments.
 
 
-\subsection{Experiments}
+%\subsection{Experiments}
 
-These experiments justify the choice of bittrees over linked lists and binary
-search trees. We implemented the classic {\em merge sort} algorithm, and added
-extra allocations/deallocations to put each data structure to the test.
-The program has been instrumented to call our
-monitoring functions (see Section~\ref{section:lib}). The execution time of the
-instrumented program using each data structure has been measured (in
-micro-seconds) and is plotted against the number of calls to a function $store$
-(adding an element to the data structure). Figure~\ref{fig:experiments}
-displays the results of the experiments.
-The reference time is the execution time of the program without any
-instrumentation. Bittree-naive and Bittree-opti are using two different versions
-of the greatest common prefix computation (see Sub-section~\ref{section:gcpc}).
-
-
-
-\begin{figure}[h]
-\begin{center}
-  \hspace{-0.5in}
-  \begin{tikzpicture}
-    \begin{axis}[xlabel={Number of calls to $store$}, ylabel={Time ($\mu$s)},
-	legend entries={List, Tree, Bittree-naive, Bittree-opti, Reference time}
-      ]
-      \addplot table {timeList.dat};
-      \addplot table {timeTree.dat};
-      \addplot table {timeBTn.dat};
-      \addplot table {timeBTo.dat};
-      \addplot table {timeNone.dat};
-    \end{axis}
-  \end{tikzpicture}
-  \caption{Execution time plotted against the number of calls to $store$}
-  \label{fig:experiments}
-\end{center}
-\end{figure}
+%These experiments justify the choice of bittrees over linked lists and binary
+%search trees. We implemented the classic {\em merge sort} algorithm, and added
+%extra allocations/deallocations to put each data structure to the test.
+%The program has been instrumented to call our
+%monitoring functions (see Section~\ref{section:lib}). The execution time of the
+%instrumented program using each data structure has been measured (in
+%micro-seconds) and is plotted against the number of calls to a function $store$
+%(adding an element to the data structure). Figure~\ref{fig:experiments}
+%displays the results of the experiments.
+%The reference time is the execution time of the program without any
+%instrumentation. Bittree-naive and Bittree-opti are using two different versions
+%of the greatest common prefix computation (see Sub-section~\ref{section:gcpc}).
 
 
 
-The last but one measurement, the merge sort applied to 50,000 elements
-(4,889,819 calls to $store$), has a reference time of 0.07s. It runs 32s with
-the optimized bittree, 118s with the naive bittree, 7 hours 15 minutes with the
-binary search trees and 19 hours 15 minutes with linked lists.
-Our last measurement, the merge sort applied to 100,000 elements
-(10,279,851 calls to $store$)  has a reference time of 0.19s. It runs 72s with
-the optimized bittree, 252s with the naive bittree, but binary search trees and
-linked lists exceed our 24-hour timeout.
+%\begin{figure}[h]
+%\begin{center}
+%  \hspace{-0.5in}
+%  \begin{tikzpicture}
+%    \begin{axis}[xlabel={Number of calls to $store$}, ylabel={Time ($\mu$s)},
+%	legend entries={List, Tree, Bittree-naive, Bittree-opti, Reference time}
+%      ]
+%      \addplot table {timeList.dat};
+%      \addplot table {timeTree.dat};
+%      \addplot table {timeBTn.dat};
+%      \addplot table {timeBTo.dat};
+%      \addplot table {timeNone.dat};
+%    \end{axis}
+%  \end{tikzpicture}
+%  \caption{Execution time plotted against the number of calls to $store$}
+%  \label{fig:experiments}
+%\end{center}
+%\end{figure}
+
+
+
+%The last but one measurement, the merge sort applied to 50,000 elements
+%(4,889,819 calls to $store$), has a reference time of 0.07s. It runs 32s with
+%the optimized bittree, 118s with the naive bittree, 7 hours 15 minutes with the
+%binary search trees and 19 hours 15 minutes with linked lists.
+%Our last measurement, the merge sort applied to 100,000 elements
+%(10,279,851 calls to $store$)  has a reference time of 0.19s. It runs 72s with
+%the optimized bittree, 252s with the naive bittree, but binary search trees and
+%linked lists exceed our 24-hour timeout.
 
 
 
@@ -401,9 +414,9 @@ linked lists exceed our 24-hour timeout.
 \label{section:lib}
 
 
-This section presents the functions used for adding/removing/retrieving
-in formations about block descriptors into our data structure (bittree). These
-functions will be automatically inserted in the source code by the
+This section presents the functions used for adding/removing/retrieving in
+formations about block descriptors into our data structure (Patricia trie).
+These functions will be automatically inserted in the source code by the
 instrumentation performed by the \textsc{E-Acsl} plug-in.
 
 
@@ -428,12 +441,12 @@ local variables or global variables.
 } // end of scope of v
 \end{lstlisting}};
 
-      \path[draw, fill=gray!20] (1,-1.5)--(2,1.5)--(3,-1.5)--cycle;
-      \node at (2,-0.5) {{\em bittree}};
-      \node at (0.4,0.3) {$add$};
-      \draw[->] (0,0) -- (1, 0);
-      \node at (0.4,-.7) {$remove$};
-      \draw[->] (0,-1) -- (1, -1);
+      \path[draw, fill=gray!20] (1,-1)--(2,.5)--(3,-1)--cycle;
+      \node at (2,-0.5) {{\em trie}};
+      \node at (0,0.3) {$add(v)$};
+      \draw[->] (-.4,0) -- (.6, 0);
+      \node at (0,-.7) {$remove(v)$};
+      \draw[->] (-.4,-1) -- (.6, -1);
     \end{tikzpicture}
   \end{center}
   \caption{$storeBlock$ and $deleteblock$}
@@ -465,11 +478,11 @@ $free$ from the standard library.
   §\highl{$free (v);$}§
 \end{lstlisting}};
 
-      \path[draw, fill=gray!20] (3,-1.5)--(4,1.5)--(5,-1.5)--cycle;
-      \node at (4,-0.5) {{\em bittree}};
-      \node at (1.9,0.3) {$add$};
+      \path[draw, fill=gray!20] (3,-1)--(4,.5)--(5,-1)--cycle;
+      \node at (4,-0.5) {{\em trie}};
+      \node at (1.9,0.3) {$add(v)$};
       \draw[->] (1.5,0) -- (2.5, 0);
-      \node at (1.9,-.7) {$remove$};
+      \node at (1.9,-.7) {$remove(v)$};
       \draw[->] (1.5,-1) -- (2.5, -1);
     \end{tikzpicture}
   \end{center}
@@ -504,10 +517,12 @@ possible and improves efficiency of the instrumented program.
   §\highl{$initialize (v, sizeof (T));$}§
 \end{lstlisting}};
 
-      \path[draw, fill=gray!20] (3,-1.5)--(4,1.5)--(5,-1.5)--cycle;
-      \node at (4,-0.5) {{\em bittree}};
-      \node at (1.9,0) {$find$};
-      \draw[->] (1.5,-0.3) -- (2.5,-0.3);
+      \path[draw, fill=gray!20] (2.5,-1)--(3.5,.5)--(4.5,-1)--cycle;
+      \node at (3.5,-0.5) {{\em trie}};
+      \node at (1.4,0) {$find(v)$};
+      \draw[->] (1,-0.3) -- (2,-0.3);
+      \draw[->] (4.5,0) .. controls(4.7,-.2) .. (4.5,-.4);
+      \node at (5.8,-.2) {$update(v)$};
     \end{tikzpicture}
   \end{center}
   \caption{$initialize$}
@@ -555,9 +570,9 @@ $ptr$ are initialized, 0 otherwise.
   §\highl{$assert (valid (p+i));$}§
 \end{lstlisting}};
 
-      \path[draw, fill=gray!20] (3,-1.5)--(4,1.5)--(5,-1.5)--cycle;
-      \node at (4,-0.5) {{\em bittree}};
-      \node at (1.9,0) {$find$};
+      \path[draw, fill=gray!20] (3,-1)--(4,.5)--(5,-1)--cycle;
+      \node at (4,-0.5) {{\em trie}};
+      \node at (1.9,0) {$find(v)$};
       \draw[<->] (1.5,-0.3) -- (2.5,-0.3);
     \end{tikzpicture}
   \end{center}
@@ -677,12 +692,16 @@ $ptr$ are initialized, 0 otherwise.
   \begin{tabular}{|c|c|c|c|c|c|c|}
     \hline
     & alarms & time & test cases & mutants & mutants killed \\
+    %\hline
+    %$p_1$ & 5 & 22s & 27 & 2 & 2 \\ % sorted
+    %\hline
+    %$p_2$ & 19 & 34s & 31 & 6 & 6 \\ % f
     \hline
-    $p_1$ & 5 & 22s & 27 & 2 & 2 \\ % sorted
+    $Bsearch$ & 25 & 65s & 20 & 43 & 43 \\
     \hline
-    $p_2$ & 19 & 34s & 31 & 6 & 6 \\ % f
+    $Bsort$ & 32 & 200s & 153 & 50 & 50 \\
     \hline
-    $p_3$ & 25 & 32s & 20 & 11 & 11 \\ % BsearchPrecond
+    $Merge$ & 52 & 106s & 19 & 63 & 63 \\
     \hline
   \end{tabular}
   \caption{Experimental results}
@@ -692,7 +711,7 @@ $ptr$ are initialized, 0 otherwise.
 \section{Conclusion}
 
 
-We implemented an efficient data structure (bittree) to store the block
+We implemented an efficient data structure to store the block
 descriptors and functions relying on this structure to perform memory
 monitoring.
 We also defined and implemented into the \textsc{E-Acsl} plug-in the
