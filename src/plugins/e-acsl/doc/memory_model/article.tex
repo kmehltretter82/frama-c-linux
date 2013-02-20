@@ -417,20 +417,14 @@ local variables or global variables.
 
 \begin{figure}[h]
   \begin{center}
-
-
-    %\tikz[grow=right,level 2/.style={sibling distance=1em},level distance=3cm]
-    %\node {0010 ****}
-    %child { node {0010 0111} }
-    %child { node {0010 1001} };
     \begin{tikzpicture}
       \node at (-3,0) {
 \begin{lstlisting}
 { // begin of scope of v
   T v;
-  §\highl{$storeBlock (v, sizeof (T))$}§
+  §\highl{$storeBlock (v, sizeof (T));$}§
   ...
-  §\highl{$deleteBlock (v)$}§
+  §\highl{$deleteBlock (v);$}§
 } // end of scope of v
 \end{lstlisting}};
 
@@ -442,7 +436,7 @@ local variables or global variables.
       \draw[->] (0,-1) -- (1, -1);
     \end{tikzpicture}
   \end{center}
-  \caption{store and delete block}
+  \caption{$storeBlock$ and $deleteblock$}
 \end{figure}
 
 
@@ -457,6 +451,31 @@ local variables or global variables.
 
 These functions have to be used instead of $malloc$, $realloc$, $calloc$ and
 $free$ from the standard library.
+
+
+
+\begin{figure}[h]
+  \begin{center}
+    \begin{tikzpicture}
+      \node at (-3,0) {
+\begin{lstlisting}
+  T* v;
+  v = §\highl{$malloc (sizeof (N));$}§
+  ...
+  §\highl{$free (v);$}§
+\end{lstlisting}};
+
+      \path[draw, fill=gray!20] (3,-1.5)--(4,1.5)--(5,-1.5)--cycle;
+      \node at (4,-0.5) {{\em bittree}};
+      \node at (1.9,0.3) {$add$};
+      \draw[->] (1.5,0) -- (2.5, 0);
+      \node at (1.9,-.7) {$remove$};
+      \draw[->] (1.5,-1) -- (2.5, -1);
+    \end{tikzpicture}
+  \end{center}
+  \caption{$malloc$ and $free$}
+\end{figure}
+
 
 %\begin{lstlisting}[caption=Dynamic allocation functions]
 %void * _malloc(size_t size);
@@ -474,6 +493,25 @@ marks the $size$ bytes starting from $ptr$ as initialized.
 $fullInit(ptr)$ marks all the bytes of $ptr$ as initialized at once.
 It is designed to avoid multiple calls to $initialize$ whenever it is
 possible and improves efficiency of the instrumented program.
+
+
+\begin{figure}[h]
+  \begin{center}
+    \begin{tikzpicture}
+      \node at (-3,0) {
+\begin{lstlisting}
+  v = (T)x;
+  §\highl{$initialize (v, sizeof (T));$}§
+\end{lstlisting}};
+
+      \path[draw, fill=gray!20] (3,-1.5)--(4,1.5)--(5,-1.5)--cycle;
+      \node at (4,-0.5) {{\em bittree}};
+      \node at (1.9,0) {$find$};
+      \draw[->] (1.5,-0.3) -- (2.5,-0.3);
+    \end{tikzpicture}
+  \end{center}
+  \caption{$initialize$}
+\end{figure}
 
 
 %\begin{lstlisting}[caption=Initialization functions]
@@ -506,6 +544,25 @@ exists, 0 otherwise. $offset(ptr)$ returns the offset between $ptr$ and the base
 address of the block containing $ptr$ if such a block exists, -1 otherwise.
 $initialized(ptr, size)$ returns 1 if the $size$ first bytes starting from
 $ptr$ are initialized, 0 otherwise.
+
+
+\begin{figure}[h]
+  \begin{center}
+    \begin{tikzpicture}
+      \node at (-3,0) {
+\begin{lstlisting}
+  //@ assert §${\tt \backslash valid(p+i)}$§;
+  §\highl{$assert (valid (p+i));$}§
+\end{lstlisting}};
+
+      \path[draw, fill=gray!20] (3,-1.5)--(4,1.5)--(5,-1.5)--cycle;
+      \node at (4,-0.5) {{\em bittree}};
+      \node at (1.9,0) {$find$};
+      \draw[<->] (1.5,-0.3) -- (2.5,-0.3);
+    \end{tikzpicture}
+  \end{center}
+  \caption{$valid$ assertion checking}
+\end{figure}
 
 
 %\section{Instrumentation}
@@ -619,12 +676,13 @@ $ptr$ are initialized, 0 otherwise.
   \centering
   \begin{tabular}{|c|c|c|c|c|c|c|}
     \hline
-    & alarms & $\tau_{exec}$ & mutants & mutation & test cases
-    & assert violations \\
+    & alarms & time & test cases & mutants & mutants killed \\
     \hline
-    $p_1$ & 19 & 63s & 6 & pointer arith. & 57 & 156/186 (83.8 \%) \\
+    $p_1$ & 5 & 22s & 27 & 2 & 2 \\ % sorted
     \hline
-    $p_2$ & 8  & 28s & 2 & pointer arith. & 27 & 52/54 (96.3 \%) \\
+    $p_2$ & 19 & 34s & 31 & 6 & 6 \\ % f
+    \hline
+    $p_3$ & 25 & 32s & 20 & 11 & 11 \\ % BsearchPrecond
     \hline
   \end{tabular}
   \caption{Experimental results}
