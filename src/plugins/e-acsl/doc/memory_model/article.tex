@@ -188,8 +188,8 @@ is used instead.
              {Instrumented {C} code};
         \node[inner sep=4mm,draw](lib)at(\colB{},\rowB{}){Monitoring functions};
         \node[inner sep=4mm,draw](sdda) at (\colB{},\rowC{}){Common interface};
-        \node[inner sep=4mm,draw](bt) at (-1.5,\rowD{}){{\em Patricia trie}};
-        \node[inner sep=4mm,draw](ll) at (1.5,\rowD{}){Linked list};
+        \node[inner sep=4mm,draw](bt) at (-2,\rowD{}){{\em Patricia trie}};
+        \node[inner sep=4mm,draw](ll) at (2,\rowD{}){Linked list};
 
         \node[service] (eacsl2) at (8,\rowA{})
              {translated from \textsc{Acsl} specification};
@@ -449,7 +449,7 @@ local variables or global variables.
       \draw[->] (-.4,-1) -- (.6, -1);
     \end{tikzpicture}
   \end{center}
-  \caption{$storeBlock$ and $deleteblock$}
+  \caption{$storeBlock$ and $deleteBlock$}
 \end{figure}
 
 
@@ -697,11 +697,15 @@ $ptr$ are initialized, 0 otherwise.
     %\hline
     %$p_2$ & 19 & 34s & 31 & 6 & 6 \\ % f
     \hline
+    $fibonacci$ & 31 & 54s & 38 & 20 & 20 \\
+    \hline
     $Bsearch$ & 25 & 65s & 20 & 43 & 43 \\
     \hline
     $Bsort$ & 32 & 200s & 153 & 50 & 50 \\
     \hline
     $Merge$ & 52 & 106s & 19 & 63 & 63 \\
+    \hline
+    $BubbleSort$ & 31 & 963s & 873 & 44 & 44 \\
     \hline
   \end{tabular}
   \caption{Experimental results}
