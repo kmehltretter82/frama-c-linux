@@ -13,10 +13,9 @@
  * Thomas Lundqvist at Chalmers.
  *----------------------------------------------------------------------*/
 
-#define UPPERLIMIT 10
 
 void 
-Multiply(int ** A, int ** B, int ** Res)
+Multiply(int ** A, int ** B, int ** Res, int n)
 /*
  * Multiplies arrays A and B and stores the result in ResultArray.
  */
@@ -24,29 +23,29 @@ Multiply(int ** A, int ** B, int ** Res)
   register int    Outer, Inner, Index;
 
   //@ ghost int old_Outer = -1; 
-  for (Outer = 0; Outer < UPPERLIMIT; Outer++) {
+  for (Outer = 0; Outer < n; Outer++) {
     //@ assert old_Outer != Outer;
     //@ ghost old_Outer = Outer;
-    //@ assert 0 <= Outer < 10;
+    //@ assert 0 <= Outer < n;
     //@ ghost int old_Inner = -1;
-    for (Inner = 0; Inner < UPPERLIMIT; Inner++) {
+    for (Inner = 0; Inner < n; Inner++) {
       //@ assert old_Inner != Inner;
       //@ ghost old_Inner = Inner;
-      //@ assert 0 <= Inner < 10;
+      //@ assert 0 <= Inner < n;
       Res[Outer][Inner] = 0;
       //@ assert Res[Outer][Inner] == 0;
       //@ ghost int old_Index = -1;
-      for (Index = 0; Index < UPPERLIMIT; Index++) {
+      for (Index = 0; Index < n; Index++) {
 	//@ assert old_Index != Index;
 	//@ ghost old_Index = Index;
-	//@ assert 0 <= Index < 10;
+	//@ assert 0 <= Index < n;
 	//@ ghost int res = Res[Outer][Inner];
 	Res[Outer][Inner] += A[Outer][Index] * B[Index][Inner];
 	//@ assert Res[Outer][Inner] == res + A[Outer][Index] * B[Index][Inner];
       }
-      //@ assert Index == 10;
+      //@ assert Index == n;
     }
-    //@ assert Inner == 10;
+    //@ assert Inner == n;
   }
-  //@ assert Outer == 10;
+  //@ assert Outer == n;
 }
