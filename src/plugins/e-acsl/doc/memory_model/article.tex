@@ -51,6 +51,8 @@
   emphstyle=\textbf
 }
 
+\tikzstyle{leaf}=[rounded corners,rectangle,inner sep=1mm,fill=gray!40]
+
 
 \captionsetup[lstlisting]{
   singlelinecheck=false,
@@ -63,7 +65,7 @@
 \begin{document}
  
 \title{Code generation for memory monitoring}
-\author{Guillaume Petiot}
+\author{Nikolaï Kosmatov \and Guillaume Petiot \and Julien Signoles}
 \date{\today}
  
 \maketitle
@@ -181,7 +183,7 @@ is used instead.
 \newcommand{\rowD}{1}
 \begin{figure}[h]
   \begin{center}
-    \tikzstyle{service}=[rounded corners,rectangle,inner sep=2mm,fill=gray!40]
+    \tikzstyle{service}=[rounded corners,rectangle,inner sep=1mm,fill=gray!40]
     \scalebox{0.85}{
       \begin{tikzpicture}
         \node[inner sep=4mm,draw] (eacsl) at (\colB{},\rowA{})
@@ -266,12 +268,12 @@ operations.
 
 \begin{figure}[h]
   \begin{center}
-    \tikz[grow=right,level 2/.style={sibling distance=1em},level distance=3cm]
+    \tikz[grow=right,sibling distance=1.4em,level distance=3cm]
     \node {0010 ****}
-    child { node {0010 0111} }
+    child { node[leaf] {0010 0111} }
     child { node {0010 1***}
-      child { node {0010 1001} }
-      child { node {0010 1101} }
+      child { node[leaf] {0010 1001} }
+      child { node[leaf] {0010 1101} }
     };
     \caption{Example of Patricia trie}
     \label{fig:bittree}
@@ -298,15 +300,15 @@ when a block descriptor is inserted.
 
 \begin{figure}[h]
   \begin{center}
-    \tikz[grow=right,level 2/.style={sibling distance=1em},level distance=3cm]
+    \tikz[grow=right,level 2/.style={sibling distance=1.4em},level distance=3cm]
     \node {0010 ****}
     child { node {0010 011*}
-      child { node {0010 0110} }
-      child { node {0010 0111} }
+      child { node[leaf] {0010 0110} }
+      child { node[leaf] {0010 0111} }
     }
     child { node {0010 1***}
-      child { node {0010 1001} }
-      child { node {0010 1101} }
+      child { node[leaf] {0010 1001} }
+      child { node[leaf] {0010 1101} }
     };
     \caption{Patricia trie after adding ${\tt 0010\,0110}$ into the trie of
       Fig.~\ref{fig:bittree}}
@@ -323,10 +325,10 @@ ones for routing, keeps the tree exploration efficient. A 32-bit (respectively
 
 \begin{figure}[h]
   \begin{center}
-    \tikz[grow=right,level 2/.style={sibling distance=1em},level distance=3cm]
+    \tikz[grow=right,sibling distance=1.4em,level distance=3cm]
     \node {0010 ****}
-    child { node {0010 0111} }
-    child { node {0010 1001} };
+    child { node[leaf] {0010 0111} }
+    child { node[leaf] {0010 1001} };
     \caption{Patricia trie after deleting ${\tt 0010\,1101}$ from the trie of
       Fig.~\ref{fig:bittree}}
     \label{fig:deletion}
@@ -686,6 +688,27 @@ $ptr$ are initialized, 0 otherwise.
 
 \section{Experimental results}
 
+We used mutational testing to stress our library. The program under test is
+previously annotated (its specification is expressed in \textsc{Acsl}
+\cite{ACSL}. The program under test is supposed correct, we want to show that
+\textsc{E-Acsl} is able to spot the specification violations of
+ ``mutated programs'' (that do not match the specification anymore).\\
+
+We used a test generator granting path coverage \cite{PathCrawler}
+to generate test cases. We then use \textsc{E-Acsl} to instrument the program
+under test and the test cases, to generate calls to our monitoring framework.
+We the check that the instrumented original program (supposed correct)
+successfully pass each of those tests. We then generate mutated programs,
+obtained by modifying an element in the syntactic tree. The mutations used for
+these experiments are: numerical-arithmetic operator modification,
+pointer-arithmetic operator modification, comparison operator modification
+and logic ($land$ and $lor$) operator modification. Then each mutant program is
+instrumented by \textsc{E-Acsl}.\\
+
+Finally, each pair ($test case$, $mutant$) is executed. The results are
+displayed in Fig.~\ref{fig:exp}. We consider a mutant ``killed'' if there is at
+least one test case provoking a runtime error and this error has been found by
+\textsc{E-Acsl}.
 
 \begin{figure}[h]
   \centering
@@ -707,6 +730,7 @@ $ptr$ are initialized, 0 otherwise.
     \hline
   \end{tabular}
   \caption{Experimental results}
+  \label{fig:exp}
 \end{figure}~\\
 
 
