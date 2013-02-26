@@ -4,6 +4,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "stdbool.h"
+#include "math.h"
 #include "e_acsl_mmodel_api.h"
 #include "e_acsl_bittree.h"
 #include "e_acsl_mmodel.h"
@@ -11,7 +12,7 @@
 
 #if WORDBITS == 16
 
-size_t Tmasks[] = {
+const size_t Tmasks[] = {
 0x0,
 0x8000,
 0xc000,
@@ -30,12 +31,12 @@ size_t Tmasks[] = {
 0xfffe,
 0xffff};
 
-int Teq[] = {0,-1,3,-3,6,-5,7,-7,12,-9,11,-11,14,-13,15,16,-16};
-int Tneq[] = {0,0,1,-2,2,-4,5,-6,4,-8,9,-10,10,-12,13,-14,-15};
+const int Teq[] = {0,-1,3,-3,6,-5,7,-7,12,-9,11,-11,14,-13,15,16,-16};
+const int Tneq[] = {0,0,1,-2,2,-4,5,-6,4,-8,9,-10,10,-12,13,-14,-15};
 
 #elif WORDBITS == 32
 
-size_t Tmasks[] = {
+const size_t Tmasks[] = {
 0x0,
 0x80000000,
 0xc0000000,
@@ -70,17 +71,17 @@ size_t Tmasks[] = {
 0xfffffffe,
 0xffffffff};
 
-int Teq[] = 
+const int Teq[] = 
   { 0,-1,3,-3,6,-5,7,-7,12,-9,11,-11,14,-13,15,-15,24,-17,19,-19,22,
     -21,23,-23,28,-25,27,-27,30,-29,31,32,-32 };
 
-int Tneq[] = 
+const int Tneq[] = 
   { 0,0,1,-2,2,-4,5,-6,4,-8,9,-10,10,-12,13,-14,8,-16,17,-18,18,-20,21,-22,20,
     -24,25,-26,26,-28,29,-30,-31 };
 
 #else /* WORDBITS == 64 */
 
-size_t Tmasks[] = {
+const size_t Tmasks[] = {
 0x0,
 0x8000000000000000,
 0xc000000000000000,
@@ -148,12 +149,12 @@ size_t Tmasks[] = {
 0xffffffffffffffff};
 
 
-int Teq[] = 
+const int Teq[] = 
   { 0,-1,3,-3,6,-5,7,-7,12,-9,11,-11,14,-13,15,-15,24,-17,19,-19,22,-21,23,-23,
     28,-25,27,-27,30,-29,31,-31,48,-33,35,-35,38,-37,39,-39,44,-41,43,-43,46,
     -45,47,-47,56,-49,51,-51,54,-53,55,-55,60,-57,59,-59,62,-61,63,64,-64 };
 
-int Tneq[] = 
+const int Tneq[] = 
   { 0,0,1,-2,2,-4,5,-6,4,-8,9,-10,10,-12,13,-14,8,-16,17,-18,18,-20,21,-22,20,
     -24,25,-26,26,-28,29,-30,16,-32,33,-34,34,-36,37,-38,36,-40,41,-42,42,-44,
     45,-46,40,-48,49,-50,50,-52,53,-54,52,-56,57,-58,58,-60,61,-62,-63 };
@@ -181,6 +182,12 @@ struct bittree {
 size_t mask(size_t a, size_t b) {
   size_t nxor = ~(a ^ b), ret;
   int i = WORDBITS/2; /* dichotomic search, starting in the middle */
+  int k;
+
+  for(k = 0; k <= WORDBITS; k++)
+    //@ assert Tmasks[k] == Tmasks[WORDBITS] << (WORDBITS-k);
+    ;
+  
   
   /* if the current mask matches we use transition from Teq, else from Tneq
      we stop as soon as i is negative, meaning that we found the mask
@@ -210,7 +217,7 @@ size_t mask(size_t a, size_t b) {
 /* the block we are looking for has to be in the tree */
 /*@ requires \valid(ptr);
   @ requires \valid(__root);
-  @ assings \nothing;
+  @ assigns \nothing;
   @ ensures \valid(\result);
   @ ensures \result->leaf == ptr;
   @*/
@@ -424,63 +431,62 @@ struct _block * __get_exact (void * ptr) {
 }
 
 
-/* called from __get_cont */
-/* return the block B containing ptr, starting from b and only exploring
-   left children, or NULL if such block does not exist */
-struct _block * __get_cont_by_left_child (void * ptr, struct bittree * b) {
-  struct bittree * tmp = b;
-  assert(((size_t)b->addr & b->mask) == ((size_t)ptr & b->mask));
-
-  while(!tmp->is_leaf) {
-    assert(tmp->left != NULL && tmp->right != NULL);
-    if(((size_t)tmp->left->addr & tmp->mask) == (size_t)ptr)
-      tmp = tmp->left;
-    else
-      return NULL;
-  }
-
-  assert(tmp->is_leaf);
-
-  return (tmp->addr == (size_t)ptr) ? tmp->leaf : NULL;
-}
-
 /* return the block B containing ptr, such as :
    begin addr of B <= ptr < (begin addr + size) of B
    or NULL if such a block does not exist */
 struct _block * __get_cont (void * ptr) {
   struct bittree * tmp = __root;
   if(__root == NULL || ptr == NULL) return NULL;
+
+  struct bittree * t [WORDBITS];
+  short ind = -1;
   
   while(1) {
     if(tmp->is_leaf) {
       /* tmp cannot contain ptr because its begin addr is higher */
-      if(tmp->addr > (size_t)ptr) return NULL;
+      if(tmp->addr > (size_t)ptr) {
+	if(ind == -1)
+	  return NULL;
+	else {
+	  tmp = t[ind];
+	  ind--;
+	  continue;
+	}
+      }
       /* tmp->addr <= ptr, tmp may contain ptr
 	 ptr is contained if tmp is large enough (begin addr + size) */
-      else if((size_t)ptr < tmp->leaf->size + tmp->addr) return tmp->leaf;
+      else if((size_t)ptr < tmp->leaf->size + tmp->addr)
+	return tmp->leaf;
       /* tmp->addr <= ptr, but tmp->addr is not large enough */
-      return NULL;
+      else if (ind == -1)
+	return NULL;
+      else {
+	tmp = t[ind];
+	ind--;
+	continue;
+      }
     }
     
     assert(tmp->left != NULL && tmp->right != NULL);
 
-    if(((size_t)tmp->right->addr & tmp->right->mask)
-       == (size_t)ptr) {
-      struct _block * r = __get_cont_by_left_child(ptr, tmp->right);
-      if(r == NULL)
-	tmp = tmp->left;
-      else
-	return r;
-    }
-
     /* the right child has the highest address, so we test it first */
-    else if(((size_t)tmp->right->addr & tmp->right->mask)
-       <= ((size_t)ptr & tmp->right->mask))
+    if(((size_t)tmp->right->addr & tmp->right->mask)
+       <= ((size_t)ptr & tmp->right->mask)) {
+      ind++;
+      t[ind] = tmp->left;
       tmp = tmp->right;
+    }
     else if(((size_t)tmp->left->addr & tmp->left->mask)
 	    <= ((size_t)ptr & tmp->left->mask))
       tmp = tmp->left;
-    else return NULL;
+    else {
+      if(ind == -1)
+	return NULL;
+      else {
+	tmp = t[ind];
+	ind--;
+      }
+    }
   }
 }
 
@@ -523,7 +529,7 @@ void __debug_rec (struct bittree * ptr, int depth) {
   if(ptr == NULL)
     return;
   for(i = 0; i < depth; i++)
-    printf("\t");
+    printf("  ");
   if(ptr->is_leaf)
     __print_block(ptr->leaf);
   else {
@@ -537,7 +543,7 @@ void __debug_rec (struct bittree * ptr, int depth) {
 /*@ assigns \nothing;
   @*/
 void __debug_struct () {
-  printf("\t\t\t------------DEBUG\n");
+  printf("------------DEBUG\n");
   __debug_rec(__root, 0);
-  printf("\t\t\t-----------------\n");
+  printf("-----------------\n");
 }
