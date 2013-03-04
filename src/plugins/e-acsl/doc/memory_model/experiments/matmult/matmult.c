@@ -13,7 +13,13 @@
  * Thomas Lundqvist at Chalmers.
  *----------------------------------------------------------------------*/
 
-
+/*@ requires \valid(A+(0..n-1));
+  @ requires \valid(B+(0..n-1));
+  @ requires \valid(Res+(0..n-1));
+  @ requires \forall int i; 0 <= i < n ==> \valid(A[i]+(0..n-1));
+  @ requires \forall int i; 0 <= i < n ==> \valid(B[i]+(0..n-1));
+  @ requires \forall int i; 0 <= i < n ==> \valid(Res[i]+(0..n-1));
+  @*/
 void 
 Multiply(int ** A, int ** B, int ** Res, int n)
 /*
