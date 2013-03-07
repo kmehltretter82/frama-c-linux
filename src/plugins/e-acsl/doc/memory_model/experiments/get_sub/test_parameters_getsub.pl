@@ -17,15 +17,15 @@ dom('getsub',cont('sub__getsub',_),[],int([-128..127])).
 %  dom('yourFunName',cont('yourArray',_),[],int([min..max])).
 
 create_input_vals('getsub',Ins):-
-  create_input_val(dim('sub__getsub'),int([5..5]),Ins),
-  create_input_val(dim('arg__getsub'),int([7..7]),Ins),
+  create_input_val(dim('sub__getsub'),int([6..6]),Ins),
+  create_input_val(dim('arg__getsub'),int([6..6]),Ins),
   true.
 % add new variable domain e.g.:
 %  create_input_val(yourVarName,int([min..max]),Ins), 
 
 
-unquantif_preconds('getsub',[cond(egal,cont('sub__getsub',4),0,pre),
-                             cond(egal,cont('arg__getsub',6),0,pre)]).
+unquantif_preconds('getsub',[cond(egal,cont('sub__getsub',5),0,pre),
+                             cond(egal,cont('arg__getsub',5),0,pre)]).
 
 quantif_preconds('getsub',[]).
 

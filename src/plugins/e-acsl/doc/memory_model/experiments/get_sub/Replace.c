@@ -2,14 +2,16 @@
 
 
 
-# include <stdio.h>
-#include <stdlib.h>
+#include "stdio.h"
+#include "stdlib.h"
+
+/*
 #include <ctype.h>
 
 typedef char	bool;
 # define false 0
 # define true  1
-/*# define NULL 0*/
+# define NULL 0
 
 # define MAXSTR 100
 # define MAXPAT MAXSTR
@@ -35,7 +37,7 @@ typedef char	bool;
 
 typedef char	character;
 typedef char string[MAXSTR];
-
+*/
 
 
 
@@ -43,30 +45,34 @@ typedef char string[MAXSTR];
   @ behavior b1:
   @  assumes *j >= maxset;
   @  assigns \nothing;
-  @  ensures \result == false;
+  @  ensures \result == 0;
   @ behavior b2:
   @  assumes *j < maxset;
-  @  requires \valid(outset+(0..maxset-1));
   @  requires \valid(j);
+  @  requires \valid(outset+(*j));
   @  assigns *j, outset[*j];
-  @  ensures j == \old(j)+1;
-  @  ensures outset[*j] == c;
-  @  ensures \result == true;
+  @  ensures *j == \old(*j)+1;
+  @  ensures outset[*j-1] == c;
+  @  ensures \result == 1;
   @ complete behaviors;
   @ disjoint behaviors;
   @*/
 int addstr(char c, char *outset, int *j, int maxset){
-  bool	result;
+  char	result;
   
   /* b1 */
   if (*j >= maxset){
-    result = false;
+    //@ assert *j >= maxset;
+    result = 0;
   }
   /* b2 */
   else {
-    outset[*j] = c;  
+    //@ assert *j < maxset;
+    outset[*j] = c;
+    //@ ghost int tmp = *j;
     *j = *j + 1;
-    result = true;
+    //@ assert *j == tmp + 1;
+    result = 1;
   }
   return result;
 }
@@ -75,35 +81,38 @@ int addstr(char c, char *outset, int *j, int maxset){
 /*@ requires \valid_read(i);
   @ requires \valid_read(s+(*i));
   @ behavior b1:
-  @  assumes s[*i] != ESCAPE;
+  @  assumes s[*i] != '@';
   @  assigns \nothing;
   @  ensures \result == s[*i];
   @ behavior b2:
-  @  assumes s[*i] == ESCAPE;
-  @  assumes s[*i+1] == ENDSTR;
+  @  assumes s[*i] == '@';
+  @  assumes s[*i+1] == '\0';
   @  requires \valid_read(s+(*i+1));
   @  assigns \nothing;
-  @  ensures \result == ESCAPE;
+  @  ensures \result == '@';
   @ behavior b3:
-  @  assumes s[*i] == ESCAPE;
+  @  assumes s[*i] == '@';
   @  assumes s[*i+1] == 'n';
   @  requires \valid_read(s+(*i+1));
   @  assigns *i;
-  @  ensures \result == NEWLINE;
+  @  ensures *i == \old(*i)+1;
+  @  ensures \result == 10;
   @ behavior b4:
-  @  assumes s[*i] == ESCAPE;
+  @  assumes s[*i] == '@';
   @  assumes s[*i+1] == 't';
   @  requires \valid_read(s+(*i+1));
   @  assigns *i;
-  @  ensures \result == TAB;
+  @  ensures *i == \old(*i)+1;
+  @  ensures \result == 9;
   @ behavior b5:
-  @  assumes s[*i] == ESCAPE;
-  @  assumes s[*i+1] != ENDSTR;
+  @  assumes s[*i] == '@';
+  @  assumes s[*i+1] != '\0';
   @  assumes s[*i+1] != 'n';
   @  assumes s[*i+1] != 't';
   @  requires \valid_read(s+(*i+1));
   @  assigns *i;
-  @  ensures \result == s[*i+1];
+  @  ensures *i == \old(*i)+1;
+  @  ensures \result == s[*i];
   @ complete behaviors;
   @ disjoint behaviors;
   @*/
@@ -111,27 +120,37 @@ char esc(char *s, int *i){
   char	result;
   
   /* b1 */
-  if (s[*i] != ESCAPE){  
+  if (s[*i] != '@'){
+    //@ assert s[*i] != '@';
     result = s[*i];
   }
   else{
+    //@ assert s[*i] == '@';
     /* b2 */
-    if(s[*i + 1] == ENDSTR){
-      result = ESCAPE;
+    if(s[*i + 1] == '\0'){
+      //@ assert s[*i+1] == '\0';
+      result = '@';
     }
     else{
+      //@ assert s[*i+1] != '\0';
+      //@ ghost int tmp = *i;
       *i = *i + 1;
+      //@ assert *i == tmp + 1;
       /* b3 */
       if(s[*i] == 'n'){
-	result = NEWLINE;
+	//@ assert s[*i] == 'n';
+	result = 10;
       }
       else{
+	//@ assert s[*i] != 'n';
 	/* b4 */
 	if(s[*i] == 't'){
-	  result = TAB;
+	  //@ assert s[*i] == 't';
+	  result = 9;
 	}
 	/* b5 */
 	else{
+	  //@ assert s[*i] != 't';
 	  result = s[*i];
 	}
       }
@@ -141,57 +160,49 @@ char esc(char *s, int *i){
 }
 
 
-/*@ requires \exists int i;
-  0 < i && arg[i] == ENDSTR && \valid_read(arg+(0..i-1));
-  @ requires \exists int i;
-  0 < i && sub[i] == ENDSTR && \valid(sub+(0..i-1));
-  @ behavior b2:
-  @  assumes \exists int i;
-  0 < i && sub[i] == ENDSTR && \valid(sub+(0..i-1)) && i >= MAXPAT;
-  @  ensures \result == 0;
-  @ behavior b3:
-  @  assumes \exists int i;
-  0 < i && sub[i] == ENDSTR && \valid(sub+(0..i-1)) && i < MAXPAT;
-  @  ensures \result >= 0;
-  @ complete behaviors;
-  @ disjoint behaviors;
-  @*/
-int makesub(char* arg, int from, character delim, char* sub){
+int makesub(char* arg, int from, char delim, char* sub){
   int  result;
   int	i, j;
-  bool	junk;
-  character	escjunk;
+  char	junk;
+  char	escjunk;
   
   j = 0;
   i = from;
 
-  while ((arg[i] != delim) && (arg[i] != ENDSTR)) {
+  while ((arg[i] != delim) && (arg[i] != '\0')) {
     //@ assert arg[i] != delim;
-    //@ assert arg[i] != ENDSTR;
+    //@ assert arg[i] != '\0';
     if ((arg[i] == (unsigned)('&'))){
-      junk = addstr(DITTO, sub, &j, MAXPAT);
+      //@ assert arg[i] == '&';
+      junk = addstr(-1, sub, &j, 100);
     }
     else {
+      //@ assert arg[i] != '&';
       escjunk = esc(arg, &i);
-      junk = addstr(escjunk, sub, &j, MAXPAT);
+      junk = addstr(escjunk, sub, &j, 100);
     }
     
+    //@ ghost int tmp = i;
     i = i + 1;
+    //@ assert i == tmp + 1;
   }
-  //@ assert arg[i] == delim || arg[i] == ENDSTR;
+  //@ assert arg[i] == delim || arg[i] == '\0';
   /* b1 */
   if (arg[i] != delim){
+    //@ assert arg[i] != delim;
     // unreachable
     result = 0;
   }else {
     //@ assert arg[i] == delim;
-    junk = addstr(ENDSTR, &(*sub), &j, MAXPAT);
+    junk = addstr('\0', &(*sub), &j, 100);
     /* b2 */
     if (!junk){
+      //@ assert !junk;
       result = 0;
     }
     /* b3 */
     else{
+      //@ assert junk;
       result = i;
     }
   }
@@ -199,17 +210,46 @@ int makesub(char* arg, int from, character delim, char* sub){
 }
 
 
-/*@ requires \exists int i; 0 < i && arg[i] == ENDSTR && \valid(arg+(0..i-1));
-  @ requires \exists int i; 0 < i && sub[i] == ENDSTR && \valid(sub+(0..i-1));
-  @*/
-bool getsub(char* arg, char* sub){
+char getsub(char* arg, char* sub){
   int	makeres;
-  makeres = makesub(arg, 0, ENDSTR, sub);
+  makeres = makesub(arg, 0, '\0', sub);
+  //@ ghost char* tmp_arg = arg;
+  //@ ghost char* tmp_sub = sub;
+  //@ ghost int verdict = 1;
+  /*@ ghost while (*tmp_arg != 0) {
+      if(*tmp_arg == '&') {
+        if(*tmp_sub != -1){verdict=0;break;}
+	tmp_arg++; tmp_sub++;
+      }
+      else if(*tmp_arg == '@' && *(tmp_arg+1) == '\0') {
+        if(*tmp_sub != '@') {verdict=0;break;}
+	tmp_arg++; tmp_sub++;
+      }
+      else if(*tmp_arg == '@' && *(tmp_arg+1) == 'n') {
+        if(*tmp_sub != 10) {verdict=0;break;}
+        tmp_arg += 2; tmp_sub++;
+      }
+      else if(*tmp_arg == '@' && *(tmp_arg+1) == 't') {
+        if(*tmp_sub != 9) {verdict=0;break;}
+        tmp_arg += 2; tmp_sub++;
+      }
+      else if(*tmp_arg == '@') {
+        if(*tmp_sub != *(tmp_arg+1)) {verdict=0;break;}
+        tmp_arg += 2; tmp_sub++;
+      }
+      else {
+        if(*tmp_sub != *tmp_arg) {verdict=0;break;}
+        tmp_arg++; tmp_sub++;
+      }
+    } */
+
+  //@ assert verdict == 1;
   if(makeres > 0){
+    //@ assert makeres > 0;
     return(1);
   }
   else{
+    //@ assert makeres <= 0;
     return(0);
   }
 }
-
