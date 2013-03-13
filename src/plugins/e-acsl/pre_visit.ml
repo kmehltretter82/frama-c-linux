@@ -66,7 +66,18 @@ let copy_ppt old_prj new_prj old_ppt new_ppt =
       (fun s ->
 	let e = match l with [] -> assert false | e :: _ -> e in
 	let emitter = Emitter.Usable_emitter.get e.P.emitter in
-	P.emit emitter ~hyps:e.P.properties new_ppt s)
+	Options.feedback "%a: %a --> %a (%d)"
+	  Emitter.pretty emitter
+	  Property.pretty new_ppt
+	  Property_status.Emitted_status.pretty s
+	  (List.length e.P.properties);
+	match s with 
+	| P.True | P.False_and_reachable | P.Dont_know ->
+	  P.emit emitter ~hyps:e.P.properties new_ppt s
+	| P.False_if_reachable -> 
+	  (* in that case, the only hypothesis is "Reachable new_ppt" which must
+	     be automatically added by the kernel *)
+	  P.emit emitter ~hyps:[] new_ppt P.False_if_reachable)
       s
   in
   let copy () =
