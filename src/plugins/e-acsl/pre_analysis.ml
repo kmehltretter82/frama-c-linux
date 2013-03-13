@@ -41,11 +41,18 @@ let init_mpz () =
 (* ********************************************************************** *)
 
 let get_rte_by_stmt =
-  Dynamic.get
-    ~plugin:"RteGen"
-    "stmt_annotations"
-    (Datatype.func2 Kernel_function.ty Stmt.ty 
-       (let module L = Datatype.List(Code_annotation) in L.ty))
+  try
+    Dynamic.get
+      ~plugin:"RteGen"
+      "stmt_annotations"
+      (Datatype.func2 Kernel_function.ty Stmt.ty 
+	 (let module L = Datatype.List(Code_annotation) in L.ty))
+  with Failure _ | Dynamic.Unbound_value _ | Dynamic.Incompatible_type _ as exn
+    ->
+    Options.warning "@[@[cannot run RTE:@ %s.@]@ \
+Ignoring potential runtime errors in annotations." 
+      (Printexc.to_string exn);
+    fun _ _ -> []
 
 module Env: sig
   val default_varinfos: Varinfo.Set.t option -> Varinfo.Set.t

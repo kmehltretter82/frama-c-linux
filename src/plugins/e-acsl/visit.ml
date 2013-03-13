@@ -24,11 +24,14 @@ open Cil_types
 open Cil_datatype
 
 let get_rte_by_stmt =
-  Dynamic.get
-    ~plugin:"RteGen"
-    "stmt_annotations"
-    (Datatype.func2 Kernel_function.ty Stmt.ty 
-       (let module L = Datatype.List(Code_annotation) in L.ty))
+  try
+    Dynamic.get
+      ~plugin:"RteGen"
+      "stmt_annotations"
+      (Datatype.func2 Kernel_function.ty Stmt.ty 
+	 (let module L = Datatype.List(Code_annotation) in L.ty))
+  with _ ->
+    fun _ _ -> []
 
 (* move all labels of [stmt] onto [new_stmt] *)
 let move_labels env stmt new_stmt =

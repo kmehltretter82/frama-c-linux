@@ -47,7 +47,9 @@ let get_set_suffix_and_arg e =
   else
     match Cil.unrollType ty with
     | TInt(IChar, _) -> 
-      (if Cil.theMachine.Cil.char_is_unsigned then "_ui" else "_si"), [ e ]
+      (if Cil.theMachine.Cil.theMachine.char_is_unsigned then "_ui" 
+       else "_si"), 
+      [ e ]
     | TInt((IBool | IUChar | IUInt | IUShort | IULong), _) ->
       "_ui", [ e ]
     | TInt((ISChar | IShort | IInt | ILong), _) -> "_si", [ e ]
