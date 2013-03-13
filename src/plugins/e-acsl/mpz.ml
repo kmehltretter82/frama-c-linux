@@ -22,7 +22,6 @@
 
 open Cil_types
 open Cil_datatype
-open Cil
 
 let t_torig_ref =
   ref 
@@ -43,12 +42,12 @@ let init ?loc e = apply_on_var "init" ?loc e
 let clear ?loc e = apply_on_var "clear" ? loc e
 
 let get_set_suffix_and_arg e = 
-  let ty = typeOf e in
+  let ty = Cil.typeOf e in
   if is_t ty then "", [ e ]
   else
-    match unrollType ty with
+    match Cil.unrollType ty with
     | TInt(IChar, _) -> 
-      (if theMachine.theMachine.char_is_unsigned then "_ui" else "_si"), [ e ]
+      (if Cil.theMachine.Cil.char_is_unsigned then "_ui" else "_si"), [ e ]
     | TInt((IBool | IUChar | IUInt | IUShort | IULong), _) ->
       "_ui", [ e ]
     | TInt((ISChar | IShort | IInt | ILong), _) -> "_si", [ e ]
@@ -56,16 +55,16 @@ let get_set_suffix_and_arg e =
     | TPtr(TInt(IChar, _), _) ->
       "_str",
 	(* decimal base for the number given as string *)
-      [ e; integer ~loc:Location.unknown 10 ]
+      [ e; Cil.integer ~loc:Location.unknown 10 ]
     | _ -> assert false
 
 let generic_affect ?loc fname lv ev e =
-  let ty = typeOf ev in
+  let ty = Cil.typeOf ev in
   if is_t ty then 
     let suf, args = get_set_suffix_and_arg e in
     Misc.mk_call ?loc (fname ^ suf) (ev :: args)
   else
-    mkStmtOneInstr ~valid_sid:true (Set(lv, e, Location.unknown))
+    Cil.mkStmtOneInstr ~valid_sid:true (Set(lv, e, Location.unknown))
 
 let init_set ?loc lv ev e = generic_affect ?loc "__gmpz_init_set" lv ev e
 let affect ?loc lv ev e = generic_affect ?loc "__gmpz_set" lv ev e

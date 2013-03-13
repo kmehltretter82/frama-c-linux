@@ -95,7 +95,10 @@ int __e_acsl_sorted(int *t, int n)
     __e_acsl_forall = 1;
     __e_acsl_i = (long long)(0 + 1);
     while (1) {
-      if (__e_acsl_i < n) ; else break;
+      if (__e_acsl_i < n) 
+        ;
+      else 
+        break;
       {
         int __e_acsl_valid_read;
         int __e_acsl_valid_read_2;
@@ -125,8 +128,10 @@ int __e_acsl_sorted(int *t, int n)
   __retres = sorted(t,n);
   {
     int __e_acsl_implies;
-    if (! __e_acsl_at) __e_acsl_implies = 1;
-    else __e_acsl_implies = __retres == 1;
+    if (! __e_acsl_at) 
+      __e_acsl_implies = 1;
+    else 
+      __e_acsl_implies = __retres == 1;
     e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",(char *)"sorted",
                   (char *)"\\old(\\forall long long i; 0 < i && i < n ==> *(t+(i-1)) <= *(t+i)) ==>\n\\result == 1",
                   9);

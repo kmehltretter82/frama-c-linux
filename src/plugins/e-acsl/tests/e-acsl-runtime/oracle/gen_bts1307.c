@@ -145,7 +145,8 @@ void __e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
       __e_acsl_valid_read = __valid_read((void *)__e_acsl_at_3,sizeof(float));
       __e_acsl_and = __e_acsl_valid_read;
     }
-    else __e_acsl_and = 0;
+    else 
+      __e_acsl_and = 0;
     e_acsl_assert(__e_acsl_and,(char *)"Postcondition",(char *)"foo",
                   (char *)"mem_access: \\valid_read(__e_acsl_at_3)",0);
     __e_acsl_initialized_2 = __initialized((void *)(& __e_acsl_at_2),
@@ -156,7 +157,8 @@ void __e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
                                            sizeof(float));
       __e_acsl_and_2 = __e_acsl_valid_read_2;
     }
-    else __e_acsl_and_2 = 0;
+    else 
+      __e_acsl_and_2 = 0;
     e_acsl_assert(__e_acsl_and_2,(char *)"Postcondition",(char *)"foo",
                   (char *)"mem_access: \\valid_read(__e_acsl_at_2)",0);
     __e_acsl_initialized_3 = __initialized((void *)(& __e_acsl_at),
@@ -166,7 +168,8 @@ void __e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
       __e_acsl_valid_read_3 = __valid_read((void *)__e_acsl_at,sizeof(float));
       __e_acsl_and_3 = __e_acsl_valid_read_3;
     }
-    else __e_acsl_and_3 = 0;
+    else 
+      __e_acsl_and_3 = 0;
     e_acsl_assert(__e_acsl_and_3,(char *)"Postcondition",(char *)"foo",
                   (char *)"mem_access: \\valid_read(__e_acsl_at)",0);
     e_acsl_assert(*__e_acsl_at == *__e_acsl_at_2 + (5 - ((5 / 80) * *__e_acsl_at_3) * 0.4),
@@ -270,11 +273,14 @@ void __e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
   {
     int __e_acsl_and;
     int __e_acsl_if;
-    if (*__e_acsl_at == *__e_acsl_at_2) __e_acsl_and = *__e_acsl_at_3 < 
-                                                       0.85 * *__e_acsl_at_4;
-    else __e_acsl_and = 0;
-    if (__e_acsl_and) __e_acsl_if = *__e_acsl_at_5 != 0.;
-    else __e_acsl_if = 0.85 * *__e_acsl_at_6 != 0.;
+    if (*__e_acsl_at == *__e_acsl_at_2) 
+      __e_acsl_and = *__e_acsl_at_3 < 0.85 * *__e_acsl_at_4;
+    else 
+      __e_acsl_and = 0;
+    if (__e_acsl_and) 
+      __e_acsl_if = *__e_acsl_at_5 != 0.;
+    else 
+      __e_acsl_if = 0.85 * *__e_acsl_at_6 != 0.;
     e_acsl_assert(__e_acsl_if,(char *)"Postcondition",(char *)"bar",
                   (char *)"*\\old(Mtmin_out)==*\\old(Mtmin_in)&&*\\old(Mtmin_in)<0.85**\\old(Mwmin)?\n  *\\old(Mtmin_in) != 0.:\n  0.85**\\old(Mwmin) != 0.",
                   25);

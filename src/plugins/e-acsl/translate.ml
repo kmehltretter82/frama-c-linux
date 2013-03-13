@@ -142,7 +142,7 @@ and toffset_to_offset ?loc env = function
     if Mpz.is_t (Cil.typeOf e) then
       Options.warning ~source:(fst e.eloc) ~once:true
 	"@[missing guard for ensuring that@ %a is a valid array index@]"
-	Cil.d_term t;
+	Printer.pp_term t;
     let offset, env = toffset_to_offset env offset in
     Index(e, offset), env
   | TModel _ -> not_yet env "model"

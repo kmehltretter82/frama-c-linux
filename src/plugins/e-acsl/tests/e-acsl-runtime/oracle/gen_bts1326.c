@@ -156,7 +156,8 @@ void __e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
       __e_acsl_valid_read_6 = __valid_read((void *)__e_acsl_at,sizeof(int));
       __e_acsl_and = __e_acsl_valid_read_6;
     }
-    else __e_acsl_and = 0;
+    else 
+      __e_acsl_and = 0;
     e_acsl_assert(__e_acsl_and,(char *)"Postcondition",
                   (char *)"atp_NORMAL_computeAverageAccel",
                   (char *)"mem_access: \\valid_read(__e_acsl_at)",0);

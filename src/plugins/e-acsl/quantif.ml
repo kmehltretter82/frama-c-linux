@@ -41,7 +41,7 @@ let compute_quantif_guards quantif bounded_vars hyps =
     let msg1 = Pretty_utils.sfprintf msg pp x in
     let msg2 = 
       Pretty_utils.sfprintf "@[ in quantification@ %a@]"
-	d_predicate_named quantif
+	Printer.pp_predicate_named quantif
     in
     Error.untypable (msg1 ^ msg2)
   in
@@ -59,22 +59,22 @@ let compute_quantif_guards quantif bounded_vars hyps =
 	      | Linteger -> v, tl
 	      | Ltype _ as ty when Logic_const.is_boolean_type ty -> v, tl
 	      | Ctype _ | Ltype _ | Lvar _ | Lreal | Larrow _ -> 
-		error "@[non integer variable %a@]" d_logic_var v
+		error "@[non integer variable %a@]" Printer.pp_logic_var v
 	  in
 	  if Logic_var.equal x1 x2 && Logic_var.equal x1 v then
 	    (t11, r1, x1, r2, t22) :: acc, vars
 	  else
-	    error "@[invalid binder %a@]" d_term t21
+	    error "@[invalid binder %a@]" Printer.pp_term t21
 	| TLogic_coerce(_, t12), _ -> terms t12 t21 
 	| _, TLogic_coerce(_, t21) -> terms t12 t21
-	| TLval _, _ -> error "@[invalid binder %a@]" d_term t21
-	| _, _ -> error "@[invalid binder %a@]" d_term t12
+	| TLval _, _ -> error "@[invalid binder %a@]" Printer.pp_term t21
+	| _, _ -> error "@[invalid binder %a@]" Printer.pp_term t12
       in
       terms t12 t21
     | Pand(p1, p2) -> 
       let acc, vars = aux acc vars p1 in
       aux acc vars p2
-    | _ -> error "@[invalid guard %a@]" d_predicate_named p
+    | _ -> error "@[invalid guard %a@]" Printer.pp_predicate_named p
   in 
   let acc, vars = aux [] bounded_vars hyps in
   (match vars with
@@ -85,8 +85,10 @@ let compute_quantif_guards quantif bounded_vars hyps =
 	"@[unguarded variable%s %tin quantification@ %a@]" 
 	(if List.length vars = 1 then "" else "s") 
 	(fun fmt -> 
-	  List.iter (fun v -> Format.fprintf fmt "@[%a @]" d_logic_var v) vars)
-	d_predicate_named quantif
+	  List.iter
+	    (fun v -> Format.fprintf fmt "@[%a @]" Printer.pp_logic_var v) 
+	    vars)
+	Printer.pp_predicate_named quantif
     in
     Error.untypable msg);
   List.rev acc

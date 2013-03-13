@@ -538,7 +538,7 @@ you must call function `%s' by yourself"
       in
       function_env := env;
       Options.debug ~level:3
-	"@[new stmt (from sid %d):@ %a@]" stmt.sid Cil.d_stmt new_stmt;
+	"@[new stmt (from sid %d):@ %a@]" stmt.sid Printer.pp_stmt new_stmt;
       new_stmt
     in
     Cil.ChangeDoChildrenPost(stmt, mk_block)

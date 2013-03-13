@@ -53,7 +53,7 @@ let _pretty_eacsl_typ fmt = function
       (fun z -> Z.pretty z) l 
       (fun z -> Z.pretty z) u
   | Z -> Format.fprintf fmt "Z"
-  | No_integral lty -> Format.fprintf fmt "%a" Cil.d_logic_type lty
+  | No_integral lty -> Format.fprintf fmt "%a" Printer.pp_logic_type lty
 
 exception Not_representable
 
@@ -191,7 +191,7 @@ let unsafe_unify ~from logic_v =
     assert (not (Logic_var_env.mem logic_v));
     Logic_var_env.add logic_v ty
   with Not_found ->
-    Options.fatal "unknown logic variable %a" Cil.d_logic_var logic_v
+    Options.fatal "unknown logic variable %a" Printer.pp_logic_var logic_v
 
 let clear () = 
   Term_env.clear (); 
@@ -213,7 +213,7 @@ let size_of ty =
   try int_to_interv (Cil.sizeOf_int ty)
   with Cil.SizeOfError _ -> eacsl_typ_of_typ Cil.ulongLongType
 
-let align_of ty = int_to_interv (Cil.bytesAlignOf ty)
+let align_of ty = int_to_interv (Cil.alignOf_int ty)
 
 type offset_ty = Ty_no_offset | Ty_field of eacsl_typ | Ty_index of eacsl_typ
 
@@ -470,7 +470,7 @@ let type_term t = if not (Options.Gmp_only.get ()) then ignore (type_term t)
 let type_named_predicate ?(must_clear=true) p = 
   if not (Options.Gmp_only.get ()) then begin
     Options.debug ~level:2 "typing predicate %a (clear? %b)" 
-      Cil.d_predicate_named p must_clear;
+      Printer.pp_predicate_named p must_clear;
     if must_clear then clear ();
     type_predicate_named p
   end

@@ -342,7 +342,8 @@ void __e_acsl_k(void)
     __gmpz_init_set_si(__e_acsl,(long)1);
     __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl_X),
                              (__mpz_struct const *)(__e_acsl));
-    if (! (__e_acsl_eq == 0)) __e_acsl_implies = 1;
+    if (! (__e_acsl_eq == 0)) 
+      __e_acsl_implies = 1;
     else {
       mpz_t __e_acsl_X_2;
       mpz_t __e_acsl_2;
@@ -372,8 +373,10 @@ void __e_acsl_k(void)
       __gmpz_clear(__e_acsl_Y);
       __gmpz_clear(__e_acsl_4);
     }
-    else __e_acsl_and = 0;
-    if (! __e_acsl_and) __e_acsl_implies_2 = 1;
+    else 
+      __e_acsl_and = 0;
+    if (! __e_acsl_and) 
+      __e_acsl_implies_2 = 1;
     else {
       mpz_t __e_acsl_X_3;
       mpz_t __e_acsl_5;
@@ -402,8 +405,10 @@ void __e_acsl_k(void)
       __gmpz_clear(__e_acsl_Y_2);
       __gmpz_clear(__e_acsl_6);
     }
-    else __e_acsl_and_2 = 0;
-    if (! __e_acsl_and_2) __e_acsl_implies_3 = 1;
+    else 
+      __e_acsl_and_2 = 0;
+    if (! __e_acsl_and_2) 
+      __e_acsl_implies_3 = 1;
     else {
       mpz_t __e_acsl_X_4;
       mpz_t __e_acsl_Y_3;
@@ -529,7 +534,8 @@ void __e_acsl_m(void)
       __gmpz_clear(__e_acsl_Y_2);
       __gmpz_clear(__e_acsl_7);
     }
-    else __e_acsl_and_2 = 0;
+    else 
+      __e_acsl_and_2 = 0;
     __e_acsl_at_3 = __e_acsl_and_2;
     __gmpz_clear(__e_acsl_X_5);
     __gmpz_clear(__e_acsl_6);
@@ -555,7 +561,8 @@ void __e_acsl_m(void)
       __gmpz_clear(__e_acsl_Y);
       __gmpz_clear(__e_acsl_4);
     }
-    else __e_acsl_and = 0;
+    else 
+      __e_acsl_and = 0;
     __e_acsl_at_2 = __e_acsl_and;
     __gmpz_clear(__e_acsl_X_3);
     __gmpz_clear(__e_acsl_3);
@@ -577,7 +584,8 @@ void __e_acsl_m(void)
     int __e_acsl_implies;
     int __e_acsl_implies_2;
     int __e_acsl_implies_3;
-    if (! __e_acsl_at) __e_acsl_implies = 1;
+    if (! __e_acsl_at) 
+      __e_acsl_implies = 1;
     else {
       mpz_t __e_acsl_X_2;
       mpz_t __e_acsl_2;
@@ -592,7 +600,8 @@ void __e_acsl_m(void)
     }
     e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",(char *)"m",
                   (char *)"\\old(X == 7) ==> X == 95",58);
-    if (! __e_acsl_at_2) __e_acsl_implies_2 = 1;
+    if (! __e_acsl_at_2) 
+      __e_acsl_implies_2 = 1;
     else {
       mpz_t __e_acsl_X_4;
       mpz_t __e_acsl_5;
@@ -607,7 +616,8 @@ void __e_acsl_m(void)
     }
     e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",(char *)"m",
                   (char *)"\\old(X == 5 && Y == 2) ==> X == 7",62);
-    if (! __e_acsl_at_3) __e_acsl_implies_3 = 1;
+    if (! __e_acsl_at_3) 
+      __e_acsl_implies_3 = 1;
     else {
       mpz_t __e_acsl_X_6;
       mpz_t __e_acsl_8;
@@ -715,7 +725,8 @@ void __e_acsl_n(void)
   {
     int __e_acsl_implies;
     int __e_acsl_implies_2;
-    if (! __e_acsl_at) __e_acsl_implies = 1;
+    if (! __e_acsl_at) 
+      __e_acsl_implies = 1;
     else {
       mpz_t __e_acsl_X_3;
       mpz_t __e_acsl_4;
@@ -730,7 +741,8 @@ void __e_acsl_n(void)
     }
     e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",(char *)"n",
                   (char *)"\\old(X == 7) ==> X == 8",71);
-    if (! __e_acsl_at_2) __e_acsl_implies_2 = 1;
+    if (! __e_acsl_at_2) 
+      __e_acsl_implies_2 = 1;
     else {
       mpz_t __e_acsl_X_5;
       mpz_t __e_acsl_6;

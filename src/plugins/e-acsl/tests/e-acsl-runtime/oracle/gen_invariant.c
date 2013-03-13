@@ -44,7 +44,10 @@ int main(void)
       /*@ invariant 0 ≤ i ∧ i < 10; */
       {
         int __e_acsl_and;
-        if (0 <= i) __e_acsl_and = i < 10; else __e_acsl_and = 0;
+        if (0 <= i) 
+          __e_acsl_and = i < 10;
+        else 
+          __e_acsl_and = 0;
         e_acsl_assert(__e_acsl_and,(char *)"Invariant",(char *)"main",
                       (char *)"0 <= i && i < 10",9);
       }

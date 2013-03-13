@@ -163,7 +163,8 @@ int main(void)
       __e_acsl_valid = __valid((void *)SS,sizeof(char));
       __e_acsl_and = __e_acsl_valid;
     }
-    else __e_acsl_and = 0;
+    else 
+      __e_acsl_and = 0;
     e_acsl_assert(! __e_acsl_and,(char *)"Assertion",(char *)"main",
                   (char *)"!\\valid(SS)",27);
   }

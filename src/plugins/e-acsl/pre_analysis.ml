@@ -462,7 +462,7 @@ end = struct
 	  let set = Stmt.Hashtbl.find tbl stmt in
 	  Env.default_varinfos set
 	with Not_found ->
-	  Options.fatal "stmt never analyzed: %a" Cil.d_stmt stmt
+	  Options.fatal "stmt never analyzed: %a" Printer.pp_stmt stmt
       with Kernel_function.No_Statement -> 
 	Varinfo.Set.empty
 
