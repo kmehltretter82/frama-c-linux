@@ -27,6 +27,7 @@ void* __store_block(void* ptr, size_t size) {
   tmp->init_ptr = NULL;
   tmp->init_cpt = 0;
   tmp->is_litteral_string = false;
+  tmp->is_out_of_bound = false;
   __add_element(tmp);
   return ptr;
 }
@@ -233,7 +234,7 @@ int __valid(void* ptr, size_t size) {
   tmp = __get_cont(ptr);
   return (tmp == NULL) ?
     false : ( tmp->size - ( (size_t)ptr - tmp->ptr ) >= size
-	      && !tmp->is_litteral_string);
+	      && !tmp->is_litteral_string && !tmp->is_out_of_bound);
 }
 
 /* return whether the size bytes of ptr are readable */
@@ -244,7 +245,8 @@ int __valid_read(void* ptr, size_t size) {
   assert(size > 0);
   tmp = __get_cont(ptr);
   return (tmp == NULL) ?
-    false : ( tmp->size - ( (size_t)ptr - tmp->ptr ) >= size );
+    false : ( tmp->size - ( (size_t)ptr - tmp->ptr ) >= size
+	      && !tmp->is_out_of_bound);
 }
 
 /* return the base address of the block containing ptr */
@@ -257,12 +259,20 @@ void* __base_addr(void* ptr) {
 }
 
 /* return the offset of ptr within its block */
-int _offset(void* ptr) {
+int __offset(void* ptr) {
   struct _block * tmp;
   assert(ptr != NULL);
   tmp = __get_cont(ptr);
   assert(tmp != NULL);
   return ((size_t)ptr - tmp->ptr);
+}
+
+void __out_of_bound(void* ptr, _Bool flag) {
+  struct _block * tmp;
+  assert(ptr != NULL);
+  tmp = __get_cont(ptr);
+  assert(tmp != NULL);
+  tmp->is_out_of_bound = flag;
 }
 
 /*******************/

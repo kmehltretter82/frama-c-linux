@@ -24,6 +24,7 @@ struct _block {
   unsigned char * init_ptr; /* dynamic array of booleans */
   size_t init_cpt;
   _Bool is_litteral_string;
+  _Bool is_out_of_bound;
 };
 
 /* print the information about a block */

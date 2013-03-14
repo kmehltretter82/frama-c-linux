@@ -388,8 +388,6 @@ void __add_element (struct _block * ptr) {
     assert((father->left == brother && father->right == new_leaf)
 	   || (father->left == new_leaf && father->right == brother));
   }
-  /*printf("%p added\n", (void*)ptr->ptr);
-    __debug();*/
 }
 
 
@@ -418,11 +416,8 @@ struct _block * __get_exact (void * ptr) {
     else if((tmp->left->addr & tmp->left->mask)
 	    == ((size_t)ptr & tmp->left->mask))
       tmp = tmp->left;
-    else {
-      printf("get_exact(%p)\n", ptr);
-      __debug();
+    else
       assert(0);
-    }
   }
 
   assert(tmp->is_leaf);

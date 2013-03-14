@@ -3,6 +3,7 @@
 #define E_ACSL_MMODEL
 
 #include "stdlib.h"
+#include "stdbool.h"
 
 /* allocate size bytes and store the returned block
  * for further information, see malloc */
@@ -86,6 +87,9 @@ int __offset(void * ptr)
   @ ensures \result == 1 ==> \initialized(((char *)ptr)+(0..size-1));
   @ assigns \nothing; */
 int __initialized(void * ptr, size_t size)
+  __attribute__((FC_BUILTIN));
+
+void __out_of_bound(void * ptr, _Bool flag)
   __attribute__((FC_BUILTIN));
 
 /* print the content of the abstract structure */
