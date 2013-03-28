@@ -84,7 +84,7 @@ let constant_to_exp ?(loc=Location.unknown) = function
   | LStr s -> Cil.new_exp ?loc (Const (CStr s)), false
   | LWStr s -> Cil.new_exp ?loc (Const (CWStr s)), false
   | LChr c -> Cil.new_exp ?loc (Const (CChr c)), false
-  | LReal((f, l, u), s) -> 
+  | LReal {r_literal=s; r_nearest=f; r_lower=l; r_upper=u} -> 
     if l <> u then 
       Options.feedback ~current:true ~once:true
 	"approximating a real number by a float";
