@@ -101,4 +101,15 @@ void __debug(void)
 void __clean(void)
   __attribute__((FC_BUILTIN));
 
+/* return the number of bytes dynamically allocated */
+size_t __get_memory_size(void)
+  __attribute__((FC_BUILTIN));
+
+/* for predicates */
+extern size_t __memory_size;
+
+/*@ predicate diffSize{L1,L2}(integer i) =
+  \at(__memory_size, L1) - \at(__memory_size, L2) == i;
+*/
+
 #endif

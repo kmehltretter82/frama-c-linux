@@ -8,9 +8,15 @@
 #include "e_acsl_mmodel_api.h"
 #include "e_acsl_mmodel.h"
 
+size_t __memory_size = 0;
+
 const int nbr_bits_to_1[256] = {
   0,1,1,2,1,2,2,3,1,2,2,3,2,3,3,4,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,4,5,5,6,5,6,6,7,5,6,6,7,6,7,7,8
 };
+
+size_t __get_memory_size(void) {
+  return __memory_size;
+}
 
 size_t needed_bytes (size_t size) {
   return (size % 8) == 0 ? (size/8) : (size/8 + 1);
@@ -51,6 +57,7 @@ void* __malloc(size_t size) {
   tmp = malloc(size);
   if(tmp == NULL) return NULL;
   tmp2 = __store_block(tmp, size);
+  __memory_size += size;
   assert(tmp2 != NULL);
   return tmp2;
 }
@@ -64,6 +71,7 @@ void __free(void* ptr) {
   assert(tmp != NULL);
   free(ptr);
   __clean_init(tmp);
+  __memory_size -= tmp->size;
   __remove_element(tmp);
   free(tmp);
 }
@@ -75,10 +83,12 @@ void* __realloc(void* ptr, size_t size) {
   void * new_ptr;
   if(ptr == NULL) return __malloc(size);
   if(size <= 0) {
+    __memory_size -= __get_exact(ptr)->size;
     __free(ptr);
     return NULL;
   }
   tmp = __get_exact(ptr);
+  __memory_size -= tmp->size;
   assert(tmp != NULL);
   new_ptr = realloc((void*)tmp->ptr, size);
   if(new_ptr == NULL) return NULL;
@@ -117,6 +127,7 @@ void* __realloc(void* ptr, size_t size) {
     }
   }
   tmp->size = size;
+  __memory_size += size;
   return (void*)tmp->ptr;
 }
 
@@ -129,6 +140,7 @@ void* __calloc(size_t nbr_block, size_t size_block) {
   tmp = calloc(nbr_block, size_block);
   if(tmp == NULL) return NULL;
   tmp2 = __store_block(tmp, nbr_block * size_block);
+  __memory_size += nbr_block * size_block;
   assert(tmp2 != NULL);
   return tmp2;
 }
