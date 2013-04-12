@@ -1,9 +1,9 @@
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc ./share/e-acsl/e_acsl_gmp_types.h"
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc ./share/e-acsl/e_acsl_gmp.h"
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc ./share/e-acsl/e_acsl.h"
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel_api.h"
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_bittree.h"
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
+[kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/e_acsl_gmp_types.h"
+[kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/e_acsl_gmp.h"
+[kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/e_acsl.h"
+[kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_mmodel_api.h"
+[kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_bittree.h"
+[kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_mmodel.h"
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed
@@ -11,36 +11,36 @@
         __fc_random_counter ∈ {0}
         __fc_rand_max ∈ {32767}
         __fc_heap_status ∈ [--..--]
+        __memory_size ∈ [--..--]
         A ∈ {0}
 [value] using specification for function __store_block
 [value] using specification for function __full_init
 tests/e-acsl-runtime/at.i:40:[value] Function h: postcondition got status valid.
 [value] using specification for function e_acsl_assert
-./share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
+share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
 tests/e-acsl-runtime/at.i:40:[value] Function __e_acsl_h: postcondition got status valid.
 tests/e-acsl-runtime/at.i:48:[value] Assertion got status valid.
 tests/e-acsl-runtime/at.i:13:[value] Assertion got status valid.
-tests/e-acsl-runtime/at.i:14:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
+tests/e-acsl-runtime/at.i:14:[value] cannot evaluate ACSL term, \at() on a C label is unsupported
 tests/e-acsl-runtime/at.i:14:[value] Assertion got status unknown.
 tests/e-acsl-runtime/at.i:15:[value] Assertion got status valid.
-tests/e-acsl-runtime/at.i:16:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
-tests/e-acsl-runtime/at.i:16:[value] Assertion got status unknown.
+tests/e-acsl-runtime/at.i:16:[value] Assertion got status valid.
 tests/e-acsl-runtime/at.i:9:[value] Function f: postcondition got status valid.
 tests/e-acsl-runtime/at.i:9:[value] Function __e_acsl_f: postcondition got status valid.
-tests/e-acsl-runtime/at.i:53:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
+tests/e-acsl-runtime/at.i:53:[value] cannot evaluate ACSL term, \at() on a C label is unsupported
 tests/e-acsl-runtime/at.i:53:[value] Assertion got status unknown.
-tests/e-acsl-runtime/at.i:54:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
+tests/e-acsl-runtime/at.i:54:[value] cannot evaluate ACSL term, \at() on a C label is unsupported
 tests/e-acsl-runtime/at.i:54:[value] Assertion got status unknown.
-tests/e-acsl-runtime/at.i:55:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
+tests/e-acsl-runtime/at.i:55:[value] cannot evaluate ACSL term, \at() on a C label is unsupported
 tests/e-acsl-runtime/at.i:55:[value] Assertion got status unknown.
 [value] using specification for function __initialize
-tests/e-acsl-runtime/at.i:32:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
+tests/e-acsl-runtime/at.i:32:[value] cannot evaluate ACSL term, \at() on a C label is unsupported
 tests/e-acsl-runtime/at.i:32:[value] Assertion got status unknown.
-:0:[value] cannot evaluate ACSL term, unsupported ACSL construct: \at() on a C label
+:0:[value] cannot evaluate ACSL term, \at() on a C label is unsupported
 tests/e-acsl-runtime/at.i:34:[value] Assertion got status unknown.
 [value] using specification for function __delete_block
-[value] using specification for function __clean
 [kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
+[value] using specification for function __clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function f:

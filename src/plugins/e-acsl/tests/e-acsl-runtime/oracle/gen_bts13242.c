@@ -105,6 +105,12 @@ extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
 
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 
+extern size_t __memory_size;
+
+/*@
+predicate diffSize{L1, L2}(ℤ i) =
+  \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
+ */
 /*@ behavior yes:
       assumes ∀ ℤ i; 0 < i ∧ i < n ⇒ *(t+(i-1)) ≤ *(t+i);
       ensures \result ≡ 1;
@@ -170,10 +176,7 @@ int __e_acsl_sorted(int *t, int n)
         __gmpz_init_set_si(__e_acsl_n,(long)n);
         __e_acsl_lt = __gmpz_cmp((__mpz_struct const *)(__e_acsl_i),
                                  (__mpz_struct const *)(__e_acsl_n));
-        if (__e_acsl_lt < 0) 
-          ;
-        else 
-          break;
+        if (__e_acsl_lt < 0) ; else break;
         __gmpz_clear(__e_acsl_n);
       }
       {
@@ -198,8 +201,7 @@ int __e_acsl_sorted(int *t, int n)
         __gmpz_clear(__e_acsl_sub);
         __gmpz_clear(__e_acsl_3);
         __gmpz_clear(__e_acsl_4);
-        if (__e_acsl_le <= 0) 
-          ;
+        if (__e_acsl_le <= 0) ;
         else {
           __e_acsl_forall = 0;
           goto e_acsl_end_loop1;
@@ -224,8 +226,7 @@ int __e_acsl_sorted(int *t, int n)
   __retres = sorted(t,n);
   {
     int __e_acsl_implies;
-    if (! __e_acsl_at) 
-      __e_acsl_implies = 1;
+    if (! __e_acsl_at) __e_acsl_implies = 1;
     else {
       mpz_t __e_acsl_result;
       mpz_t __e_acsl_8;

@@ -105,6 +105,8 @@ extern  __attribute__((__FC_BUILTIN__)) int __initialized(void *ptr,
 
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 
+extern size_t __memory_size;
+
 /*@ assigns __fc_heap_status;
     assigns __fc_heap_status \from size, __fc_heap_status;
     assigns \result \from size, __fc_heap_status;
@@ -171,6 +173,11 @@ void __e_acsl_free(void *p)
   return;
 }
 
+/*@
+predicate diffSize{L1, L2}(ℤ i) =
+  \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
+
+*/
 int main(void)
 {
   int __retres;
@@ -193,8 +200,7 @@ int main(void)
       __e_acsl_valid = __valid((void *)a,sizeof(int));
       __e_acsl_and = __e_acsl_valid;
     }
-    else 
-      __e_acsl_and = 0;
+    else __e_acsl_and = 0;
     if (! __e_acsl_and) {
       int __e_acsl_initialized_2;
       int __e_acsl_and_2;
@@ -204,12 +210,10 @@ int main(void)
         __e_acsl_valid_2 = __valid((void *)b,sizeof(int));
         __e_acsl_and_2 = __e_acsl_valid_2;
       }
-      else 
-        __e_acsl_and_2 = 0;
+      else __e_acsl_and_2 = 0;
       __e_acsl_and_3 = ! __e_acsl_and_2;
     }
-    else 
-      __e_acsl_and_3 = 0;
+    else __e_acsl_and_3 = 0;
     e_acsl_assert(__e_acsl_and_3,(char *)"Assertion",(char *)"main",
                   (char *)"!\\valid(a) && !\\valid(b)",12);
   }
@@ -230,8 +234,7 @@ int main(void)
       __e_acsl_valid_3 = __valid((void *)a,sizeof(int));
       __e_acsl_and_4 = __e_acsl_valid_3;
     }
-    else 
-      __e_acsl_and_4 = 0;
+    else __e_acsl_and_4 = 0;
     if (__e_acsl_and_4) {
       int __e_acsl_initialized_4;
       int __e_acsl_and_5;
@@ -241,12 +244,10 @@ int main(void)
         __e_acsl_valid_4 = __valid((void *)b,sizeof(int));
         __e_acsl_and_5 = __e_acsl_valid_4;
       }
-      else 
-        __e_acsl_and_5 = 0;
+      else __e_acsl_and_5 = 0;
       __e_acsl_and_6 = __e_acsl_and_5;
     }
-    else 
-      __e_acsl_and_6 = 0;
+    else __e_acsl_and_6 = 0;
     e_acsl_assert(__e_acsl_and_6,(char *)"Assertion",(char *)"main",
                   (char *)"\\valid(a) && \\valid(b)",16);
   }
@@ -260,8 +261,7 @@ int main(void)
       __e_acsl_valid_read = __valid_read((void *)b,sizeof(int));
       __e_acsl_and_7 = __e_acsl_valid_read;
     }
-    else 
-      __e_acsl_and_7 = 0;
+    else __e_acsl_and_7 = 0;
     e_acsl_assert(__e_acsl_and_7,(char *)"Assertion",(char *)"main",
                   (char *)"mem_access: \\valid_read(b)",0);
     e_acsl_assert(*b == n,(char *)"Assertion",(char *)"main",
@@ -279,8 +279,7 @@ int main(void)
       __e_acsl_valid_5 = __valid((void *)a,sizeof(int));
       __e_acsl_and_8 = __e_acsl_valid_5;
     }
-    else 
-      __e_acsl_and_8 = 0;
+    else __e_acsl_and_8 = 0;
     if (! __e_acsl_and_8) {
       int __e_acsl_initialized_7;
       int __e_acsl_and_9;
@@ -290,12 +289,10 @@ int main(void)
         __e_acsl_valid_6 = __valid((void *)b,sizeof(int));
         __e_acsl_and_9 = __e_acsl_valid_6;
       }
-      else 
-        __e_acsl_and_9 = 0;
+      else __e_acsl_and_9 = 0;
       __e_acsl_and_10 = ! __e_acsl_and_9;
     }
-    else 
-      __e_acsl_and_10 = 0;
+    else __e_acsl_and_10 = 0;
     e_acsl_assert(__e_acsl_and_10,(char *)"Assertion",(char *)"main",
                   (char *)"!\\valid(a) && !\\valid(b)",19);
   }

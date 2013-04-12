@@ -52,6 +52,12 @@ axiomatic
  */
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 
+extern size_t __memory_size;
+
+/*@
+predicate diffSize{L1, L2}(ℤ i) =
+  \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
+ */
 int main(void)
 {
   int __retres;
@@ -83,8 +89,7 @@ int main(void)
           __gmpz_clear(__e_acsl_i_2);
           __gmpz_clear(__e_acsl_2);
         }
-        else 
-          __e_acsl_and = 0;
+        else __e_acsl_and = 0;
         e_acsl_assert(__e_acsl_and,(char *)"Invariant",(char *)"main",
                       (char *)"0 <= i && i < 10",9);
         __gmpz_clear(__e_acsl);

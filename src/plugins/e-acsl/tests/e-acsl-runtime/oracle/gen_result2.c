@@ -73,6 +73,12 @@ axiomatic
  */
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 
+extern size_t __memory_size;
+
+/*@
+predicate diffSize{L1, L2}(ℤ i) =
+  \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
+ */
 /*@ ensures \result ≡ (int)(\old(x)-\old(x)); */
 int f(int x)
 {

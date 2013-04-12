@@ -32,6 +32,12 @@ axiomatic
  */
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 
+extern size_t __memory_size;
+
+/*@
+predicate diffSize{L1, L2}(ℤ i) =
+  \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
+ */
 /*@ ensures \result ≡ (int)(\old(x)-\old(x)); */
 int f(int x)
 {
@@ -48,14 +54,6 @@ int __e_acsl_f(int x)
   __e_acsl_at_2 = x;
   __e_acsl_at = x;
   __retres = f(x);
-  e_acsl_assert(-2147483648LL <= (long long)__e_acsl_at - (long long)__e_acsl_at_2,
-                (char *)"Postcondition",(char *)"f",
-                (char *)"downcast: -2147483648 <= (long long)__e_acsl_at-(long long)__e_acsl_at_2",
-                7);
-  e_acsl_assert((long long)__e_acsl_at - (long long)__e_acsl_at_2 <= 2147483647LL,
-                (char *)"Postcondition",(char *)"f",
-                (char *)"downcast: (long long)__e_acsl_at-(long long)__e_acsl_at_2 <= 2147483647",
-                7);
   e_acsl_assert(__retres == (int)((long long)__e_acsl_at - (long long)__e_acsl_at_2),
                 (char *)"Postcondition",(char *)"f",
                 (char *)"\\result == (int)(\\old(x)-\\old(x))",7);

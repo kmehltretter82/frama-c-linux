@@ -59,6 +59,12 @@ extern  __attribute__((__FC_BUILTIN__)) int __initialized(void *ptr,
 
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 
+extern size_t __memory_size;
+
+/*@
+predicate diffSize{L1, L2}(ℤ i) =
+  \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
+ */
 /*@ ensures
       *\old(AverageAccel) ≡
       (((((*\old(Accel))[4]+(*\old(Accel))[3])+(*\old(Accel))[2])+(*\old(
@@ -156,8 +162,7 @@ void __e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
       __e_acsl_valid_read_6 = __valid_read((void *)__e_acsl_at,sizeof(int));
       __e_acsl_and = __e_acsl_valid_read_6;
     }
-    else 
-      __e_acsl_and = 0;
+    else __e_acsl_and = 0;
     e_acsl_assert(__e_acsl_and,(char *)"Postcondition",
                   (char *)"atp_NORMAL_computeAverageAccel",
                   (char *)"mem_access: \\valid_read(__e_acsl_at)",0);

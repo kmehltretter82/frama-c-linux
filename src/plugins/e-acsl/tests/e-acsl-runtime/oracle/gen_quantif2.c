@@ -107,6 +107,12 @@ axiomatic
  */
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 
+extern size_t __memory_size;
+
+/*@
+predicate diffSize{L1, L2}(ℤ i) =
+  \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
+ */
 int main(void)
 {
   int __retres;
@@ -129,10 +135,7 @@ int main(void)
         __gmpz_init_set_si(__e_acsl_4,(long)1);
         __e_acsl_le = __gmpz_cmp((__mpz_struct const *)(__e_acsl_x),
                                  (__mpz_struct const *)(__e_acsl_4));
-        if (__e_acsl_le <= 0) 
-          ;
-        else 
-          break;
+        if (__e_acsl_le <= 0) ; else break;
         __gmpz_clear(__e_acsl_4);
       }
       {
@@ -142,8 +145,7 @@ int main(void)
         __gmpz_init_set_si(__e_acsl,(long)0);
         __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl_x),
                                  (__mpz_struct const *)(__e_acsl));
-        if (__e_acsl_eq == 0) 
-          __e_acsl_or = 1;
+        if (__e_acsl_eq == 0) __e_acsl_or = 1;
         else {
           mpz_t __e_acsl_2;
           int __e_acsl_eq_2;
@@ -154,8 +156,7 @@ int main(void)
           __gmpz_clear(__e_acsl_2);
         }
         __gmpz_clear(__e_acsl);
-        if (__e_acsl_or) 
-          ;
+        if (__e_acsl_or) ;
         else {
           __e_acsl_forall = 0;
           goto e_acsl_end_loop1;
@@ -206,10 +207,7 @@ int main(void)
         __gmpz_init_set_si(__e_acsl_9,(long)1);
         __e_acsl_le_2 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_x_2),
                                    (__mpz_struct const *)(__e_acsl_9));
-        if (__e_acsl_le_2 <= 0) 
-          ;
-        else 
-          break;
+        if (__e_acsl_le_2 <= 0) ; else break;
         __gmpz_clear(__e_acsl_9);
       }
       {
@@ -219,8 +217,7 @@ int main(void)
         __e_acsl_eq_3 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_x_2),
                                    (__mpz_struct const *)(__e_acsl_6));
         __gmpz_clear(__e_acsl_6);
-        if (__e_acsl_eq_3 == 0) 
-          ;
+        if (__e_acsl_eq_3 == 0) ;
         else {
           __e_acsl_forall_2 = 0;
           goto e_acsl_end_loop2;
@@ -271,14 +268,10 @@ int main(void)
         __gmpz_init_set_si(__e_acsl_13,(long)1);
         __e_acsl_lt = __gmpz_cmp((__mpz_struct const *)(__e_acsl_x_3),
                                  (__mpz_struct const *)(__e_acsl_13));
-        if (__e_acsl_lt < 0) 
-          ;
-        else 
-          break;
+        if (__e_acsl_lt < 0) ; else break;
         __gmpz_clear(__e_acsl_13);
       }
-      if (0) 
-        ;
+      if (0) ;
       else {
         __e_acsl_forall_3 = 0;
         goto e_acsl_end_loop3;
@@ -320,10 +313,7 @@ int main(void)
         __gmpz_init_set_si(__e_acsl_17,(long)1);
         __e_acsl_lt_2 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_x_4),
                                    (__mpz_struct const *)(__e_acsl_17));
-        if (__e_acsl_lt_2 < 0) 
-          ;
-        else 
-          break;
+        if (__e_acsl_lt_2 < 0) ; else break;
         __gmpz_clear(__e_acsl_17);
       }
       {
@@ -333,8 +323,7 @@ int main(void)
         __e_acsl_eq_4 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_x_4),
                                    (__mpz_struct const *)(__e_acsl_15));
         __gmpz_clear(__e_acsl_15);
-        if (__e_acsl_eq_4 == 0) 
-          ;
+        if (__e_acsl_eq_4 == 0) ;
         else {
           __e_acsl_forall_4 = 0;
           goto e_acsl_end_loop4;
@@ -385,10 +374,7 @@ int main(void)
         __gmpz_init_set_si(__e_acsl_26,(long)2);
         __e_acsl_lt_4 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_x_5),
                                    (__mpz_struct const *)(__e_acsl_26));
-        if (__e_acsl_lt_4 < 0) 
-          ;
-        else 
-          break;
+        if (__e_acsl_lt_4 < 0) ; else break;
         __gmpz_clear(__e_acsl_26);
       }
       {
@@ -404,10 +390,7 @@ int main(void)
           __gmpz_init_set_si(__e_acsl_23,(long)5);
           __e_acsl_lt_3 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_y),
                                      (__mpz_struct const *)(__e_acsl_23));
-          if (__e_acsl_lt_3 < 0) 
-            ;
-          else 
-            break;
+          if (__e_acsl_lt_3 < 0) ; else break;
           __gmpz_clear(__e_acsl_23);
         }
         {
@@ -421,10 +404,7 @@ int main(void)
             int __e_acsl_le_4;
             __e_acsl_le_4 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_z),
                                        (__mpz_struct const *)(__e_acsl_y));
-            if (__e_acsl_le_4 <= 0) 
-              ;
-            else 
-              break;
+            if (__e_acsl_le_4 <= 0) ; else break;
           }
           {
             mpz_t __e_acsl_add_7;
@@ -443,8 +423,7 @@ int main(void)
             __gmpz_clear(__e_acsl_add_7);
             __gmpz_clear(__e_acsl_19);
             __gmpz_clear(__e_acsl_add_8);
-            if (__e_acsl_le_3 <= 0) 
-              ;
+            if (__e_acsl_le_3 <= 0) ;
             else {
               __e_acsl_forall_5 = 0;
               goto e_acsl_end_loop5;
@@ -513,10 +492,7 @@ int main(void)
         __gmpz_init_set_si(__e_acsl_30,(long)10);
         __e_acsl_lt_5 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_x_6),
                                    (__mpz_struct const *)(__e_acsl_30));
-        if (__e_acsl_lt_5 < 0) 
-          ;
-        else 
-          break;
+        if (__e_acsl_lt_5 < 0) ; else break;
         __gmpz_clear(__e_acsl_30);
       }
       {
@@ -526,8 +502,7 @@ int main(void)
         __e_acsl_eq_5 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_x_6),
                                    (__mpz_struct const *)(__e_acsl_28));
         __gmpz_clear(__e_acsl_28);
-        if (! (__e_acsl_eq_5 == 0)) 
-          ;
+        if (! (__e_acsl_eq_5 == 0)) ;
         else {
           __e_acsl_exists = 1;
           goto e_acsl_end_loop6;
@@ -574,10 +549,7 @@ int main(void)
         __gmpz_init_set_si(__e_acsl_40,(long)10);
         __e_acsl_lt_6 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_x_7),
                                    (__mpz_struct const *)(__e_acsl_40));
-        if (__e_acsl_lt_6 < 0) 
-          ;
-        else 
-          break;
+        if (__e_acsl_lt_6 < 0) ; else break;
         __gmpz_clear(__e_acsl_40);
       }
       {
@@ -599,8 +571,7 @@ int main(void)
                       (__mpz_struct const *)(__e_acsl_32));
         __e_acsl_eq_6 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_mod),
                                    (__mpz_struct const *)(__e_acsl_33));
-        if (! (__e_acsl_eq_6 == 0)) 
-          __e_acsl_implies = 1;
+        if (! (__e_acsl_eq_6 == 0)) __e_acsl_implies = 1;
         else {
           int __e_acsl_exists_2;
           mpz_t __e_acsl_y_2;
@@ -632,10 +603,7 @@ int main(void)
                             (__mpz_struct const *)(__e_acsl_36));
               __e_acsl_le_5 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_y_2),
                                          (__mpz_struct const *)(__e_acsl_div));
-              if (__e_acsl_le_5 <= 0) 
-                ;
-              else 
-                break;
+              if (__e_acsl_le_5 <= 0) ; else break;
               __gmpz_clear(__e_acsl_36);
               __gmpz_clear(__e_acsl_37);
               __gmpz_clear(__e_acsl_div);
@@ -652,8 +620,7 @@ int main(void)
                                          (__mpz_struct const *)(__e_acsl_mul));
               __gmpz_clear(__e_acsl_34);
               __gmpz_clear(__e_acsl_mul);
-              if (! (__e_acsl_eq_7 == 0)) 
-                ;
+              if (! (__e_acsl_eq_7 == 0)) ;
               else {
                 __e_acsl_exists_2 = 1;
                 goto e_acsl_end_loop7;
@@ -680,8 +647,7 @@ int main(void)
         __gmpz_clear(__e_acsl_32);
         __gmpz_clear(__e_acsl_33);
         __gmpz_clear(__e_acsl_mod);
-        if (__e_acsl_implies) 
-          ;
+        if (__e_acsl_implies) ;
         else {
           __e_acsl_forall_6 = 0;
           goto e_acsl_end_loop8;

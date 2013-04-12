@@ -632,19 +632,10 @@ let assumes_predicate bhv =
     bhv.b_assumes
 
 let get_rte =
-  try
-    Dynamic.get
-      ~plugin:"RteGen"
-      "exp_annotations"
-      (Datatype.func3 Kernel_function.ty Stmt.ty Exp.ty 
-	 (let module L = Datatype.List(Code_annotation) in L.ty))
-  with Failure _ | Dynamic.Unbound_value _ | Dynamic.Incompatible_type _ as exn
-    ->
-      Options.warning "@[@[cannot run RTE:@ %s.@]@ \
-Ignoring potential runtime errors in annotations." 
-	(Printexc.to_string exn);
-      fun _ _ _ -> []
-  
+  Misc.rte3
+    "exp_annotations"
+    (Datatype.func3 Kernel_function.ty Stmt.ty Exp.ty 
+       (let module L = Datatype.List(Code_annotation) in L.ty))
 
 let rec translate_named_predicate kf _kinstr ?(rte=true) env p =
   Typing.type_named_predicate ~must_clear:rte p;

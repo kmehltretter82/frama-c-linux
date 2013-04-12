@@ -1,9 +1,9 @@
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/e_acsl_gmp_types.h"
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/e_acsl_gmp.h"
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/e_acsl.h"
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel_api.h"
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_bittree.h"
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc ./share/e-acsl/memory_model/e_acsl_mmodel.h"
+[kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc share/e-acsl/e_acsl_gmp_types.h"
+[kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc share/e-acsl/e_acsl_gmp.h"
+[kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc share/e-acsl/e_acsl.h"
+[kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_mmodel_api.h"
+[kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_bittree.h"
+[kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_mmodel.h"
 [kernel] preprocessing with "gcc -C -E -I.  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc tests/e-acsl-runtime/valid_alias.c"
 tests/e-acsl-runtime/valid_alias.c:10:[e-acsl] warning: E-ACSL construct `complete behavior' is not yet supported.
                   Ignoring annotation.
@@ -20,53 +20,54 @@ tests/e-acsl-runtime/valid_alias.c:10:[e-acsl] warning: E-ACSL construct `\alloc
         __fc_random_counter ∈ {0}
         __fc_rand_max ∈ {32767}
         __fc_heap_status ∈ [--..--]
+        __memory_size ∈ [--..--]
 [value] using specification for function __store_block
 [value] using specification for function __full_init
 tests/e-acsl-runtime/valid_alias.c:12:[value] Assertion got status valid.
 [value] using specification for function __initialized
-./share/e-acsl/memory_model/e_acsl_mmodel.h:85:[value] Function __initialized: postcondition got status unknown.
-./share/e-acsl/memory_model/e_acsl_mmodel.h:86:[value] Function __initialized: postcondition got status unknown.
+share/e-acsl/memory_model/e_acsl_mmodel.h:86:[value] Function __initialized: postcondition got status unknown.
+share/e-acsl/memory_model/e_acsl_mmodel.h:87:[value] Function __initialized: postcondition got status unknown.
 tests/e-acsl-runtime/valid_alias.c:12:[kernel] warning: accessing uninitialized left-value: assert \initialized(&a);
 tests/e-acsl-runtime/valid_alias.c:12:[kernel] warning: completely indeterminate value in a.
-tests/e-acsl-runtime/valid_alias.c:12:[value] Non-termination in evaluation of function call expression argument
+tests/e-acsl-runtime/valid_alias.c:12:[value] all evaluations are invalid for function call argument
         (void *)a
 tests/e-acsl-runtime/valid_alias.c:12:[kernel] warning: accessing uninitialized left-value: assert \initialized(&b);
 tests/e-acsl-runtime/valid_alias.c:12:[kernel] warning: completely indeterminate value in b.
-tests/e-acsl-runtime/valid_alias.c:12:[value] Non-termination in evaluation of function call expression argument
+tests/e-acsl-runtime/valid_alias.c:12:[value] all evaluations are invalid for function call argument
         (void *)b
 [value] using specification for function e_acsl_assert
-./share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
+share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
 [value] using specification for function __delete_block
 FRAMAC_SHARE/libc/stdlib.h:127:[value] Function __e_acsl_malloc, behavior allocation: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
 FRAMAC_SHARE/libc/stdlib.h:132:[value] Function __e_acsl_malloc, behavior no_allocation: postcondition got status invalid. (Behavior may be inactive, no reduction performed.)
 [value] using specification for function __initialize
 tests/e-acsl-runtime/valid_alias.c:16:[value] Assertion got status valid.
-./share/e-acsl/memory_model/e_acsl_mmodel.h:86:[value] Function __initialized: postcondition got status valid.
+share/e-acsl/memory_model/e_acsl_mmodel.h:87:[value] Function __initialized: postcondition got status valid.
 [value] using specification for function __valid
-./share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
+share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
 tests/e-acsl-runtime/valid_alias.c:17:[value] Assertion got status valid.
 [value] using specification for function __gmpz_init_set_si
-./share/e-acsl/e_acsl_gmp.h:61:[value] Function __gmpz_init_set_si: precondition got status valid.
-./share/e-acsl/e_acsl_gmp.h:63:[value] Function __gmpz_init_set_si: postcondition got status valid.
-./share/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: postcondition got status unknown.
+share/e-acsl/e_acsl_gmp.h:61:[value] Function __gmpz_init_set_si: precondition got status valid.
+share/e-acsl/e_acsl_gmp.h:63:[value] Function __gmpz_init_set_si: postcondition got status valid.
+share/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: postcondition got status unknown.
 [value] using specification for function __gmpz_cmp
-./share/e-acsl/e_acsl_gmp.h:115:[value] Function __gmpz_cmp: precondition got status valid.
-./share/e-acsl/e_acsl_gmp.h:116:[value] Function __gmpz_cmp: precondition got status valid.
+share/e-acsl/e_acsl_gmp.h:115:[value] Function __gmpz_cmp: precondition got status valid.
+share/e-acsl/e_acsl_gmp.h:116:[value] Function __gmpz_cmp: precondition got status valid.
 [value] using specification for function __gmpz_clear
-./share/e-acsl/e_acsl_gmp.h:105:[value] Function __gmpz_clear: precondition got status valid.
+share/e-acsl/e_acsl_gmp.h:105:[value] Function __gmpz_clear: precondition got status valid.
 FRAMAC_SHARE/libc/stdlib.h:142:[value] Function __e_acsl_free, behavior deallocation: precondition got status unknown.
 FRAMAC_SHARE/libc/stdlib.h:144:[value] Function __e_acsl_free, behavior deallocation: postcondition got status unknown.
 tests/e-acsl-runtime/valid_alias.c:19:[value] Assertion got status valid.
-tests/e-acsl-runtime/valid_alias.c:19:[kernel] warning: accessing left-value a that contains escaping addresses; assert(Ook)
+tests/e-acsl-runtime/valid_alias.c:19:[kernel] warning: accessing left-value that contains escaping addresses; assert(\defined(&a))
 tests/e-acsl-runtime/valid_alias.c:19:[kernel] warning: completely indeterminate value in a.
-tests/e-acsl-runtime/valid_alias.c:19:[value] Non-termination in evaluation of function call expression argument
+tests/e-acsl-runtime/valid_alias.c:19:[value] all evaluations are invalid for function call argument
         (void *)a
-tests/e-acsl-runtime/valid_alias.c:19:[kernel] warning: accessing left-value b that contains escaping addresses; assert(Ook)
+tests/e-acsl-runtime/valid_alias.c:19:[kernel] warning: accessing left-value that contains escaping addresses; assert(\defined(&b))
 tests/e-acsl-runtime/valid_alias.c:19:[kernel] warning: completely indeterminate value in b.
-tests/e-acsl-runtime/valid_alias.c:19:[value] Non-termination in evaluation of function call expression argument
+tests/e-acsl-runtime/valid_alias.c:19:[value] all evaluations are invalid for function call argument
         (void *)b
-[value] using specification for function __clean
 [kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
+[value] using specification for function __clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function __e_acsl_free:
@@ -74,14 +75,6 @@ tests/e-acsl-runtime/valid_alias.c:19:[value] Non-termination in evaluation of f
 [value] Values at end of function __e_acsl_malloc:
           __fc_heap_status ∈ [--..--]
           __retres ∈ {{ &Frama_C_alloc }}
-tests/e-acsl-runtime/valid_alias.c:12:[value] Non-termination in evaluation of function call expression argument
-        (void *)a
-tests/e-acsl-runtime/valid_alias.c:12:[value] Non-termination in evaluation of function call expression argument
-        (void *)b
-tests/e-acsl-runtime/valid_alias.c:19:[value] Non-termination in evaluation of function call expression argument
-        (void *)a
-tests/e-acsl-runtime/valid_alias.c:19:[value] Non-termination in evaluation of function call expression argument
-        (void *)b
 [value] Values at end of function main:
           __fc_heap_status ∈ [--..--]
           a ∈ ESCAPINGADDR

@@ -32,6 +32,12 @@ axiomatic
  */
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 
+extern size_t __memory_size;
+
+/*@
+predicate diffSize{L1, L2}(ℤ i) =
+  \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
+ */
 int main(void)
 {
   int __retres;
@@ -42,18 +48,12 @@ int main(void)
     __e_acsl_forall = 1;
     __e_acsl_x = 0;
     while (1) {
-      if (__e_acsl_x <= 1) 
-        ;
-      else 
-        break;
+      if (__e_acsl_x <= 1) ; else break;
       {
         int __e_acsl_or;
-        if (__e_acsl_x == 0) 
-          __e_acsl_or = 1;
-        else 
-          __e_acsl_or = __e_acsl_x == 1;
-        if (__e_acsl_or) 
-          ;
+        if (__e_acsl_x == 0) __e_acsl_or = 1;
+        else __e_acsl_or = __e_acsl_x == 1;
+        if (__e_acsl_or) ;
         else {
           __e_acsl_forall = 0;
           goto e_acsl_end_loop1;
@@ -73,12 +73,8 @@ int main(void)
     __e_acsl_forall_2 = 1;
     __e_acsl_x_2 = 0 + 1;
     while (1) {
-      if (__e_acsl_x_2 <= 1) 
-        ;
-      else 
-        break;
-      if (__e_acsl_x_2 == 1) 
-        ;
+      if (__e_acsl_x_2 <= 1) ; else break;
+      if (__e_acsl_x_2 == 1) ;
       else {
         __e_acsl_forall_2 = 0;
         goto e_acsl_end_loop2;
@@ -96,12 +92,8 @@ int main(void)
     __e_acsl_forall_3 = 1;
     __e_acsl_x_3 = 0 + 1;
     while (1) {
-      if (__e_acsl_x_3 < 1) 
-        ;
-      else 
-        break;
-      if (0) 
-        ;
+      if (__e_acsl_x_3 < 1) ; else break;
+      if (0) ;
       else {
         __e_acsl_forall_3 = 0;
         goto e_acsl_end_loop3;
@@ -119,12 +111,8 @@ int main(void)
     __e_acsl_forall_4 = 1;
     __e_acsl_x_4 = 0;
     while (1) {
-      if (__e_acsl_x_4 < 1) 
-        ;
-      else 
-        break;
-      if (__e_acsl_x_4 == 0) 
-        ;
+      if (__e_acsl_x_4 < 1) ; else break;
+      if (__e_acsl_x_4 == 0) ;
       else {
         __e_acsl_forall_4 = 0;
         goto e_acsl_end_loop4;
@@ -148,24 +136,14 @@ int main(void)
     __e_acsl_forall_5 = 1;
     __e_acsl_x_5 = 0;
     while (1) {
-      if (__e_acsl_x_5 < 2) 
-        ;
-      else 
-        break;
+      if (__e_acsl_x_5 < 2) ; else break;
       __e_acsl_y = 0;
       while (1) {
-        if (__e_acsl_y < 5) 
-          ;
-        else 
-          break;
+        if (__e_acsl_y < 5) ; else break;
         __e_acsl_z = 0;
         while (1) {
-          if (__e_acsl_z <= __e_acsl_y) 
-            ;
-          else 
-            break;
-          if (__e_acsl_x_5 + __e_acsl_z <= __e_acsl_y + 1) 
-            ;
+          if (__e_acsl_z <= __e_acsl_y) ; else break;
+          if (__e_acsl_x_5 + __e_acsl_z <= __e_acsl_y + 1) ;
           else {
             __e_acsl_forall_5 = 0;
             goto e_acsl_end_loop5;
@@ -188,12 +166,8 @@ int main(void)
     __e_acsl_exists = 0;
     __e_acsl_x_6 = 0;
     while (1) {
-      if (__e_acsl_x_6 < 10) 
-        ;
-      else 
-        break;
-      if (! (__e_acsl_x_6 == 5)) 
-        ;
+      if (__e_acsl_x_6 < 10) ; else break;
+      if (! (__e_acsl_x_6 == 5)) ;
       else {
         __e_acsl_exists = 1;
         goto e_acsl_end_loop6;
@@ -215,26 +189,18 @@ int main(void)
     __e_acsl_forall_6 = 1;
     __e_acsl_x_7 = 0;
     while (1) {
-      if (__e_acsl_x_7 < 10) 
-        ;
-      else 
-        break;
+      if (__e_acsl_x_7 < 10) ; else break;
       {
         int __e_acsl_implies;
-        if (! (__e_acsl_x_7 % 2 == 0)) 
-          __e_acsl_implies = 1;
+        if (! (__e_acsl_x_7 % 2 == 0)) __e_acsl_implies = 1;
         else {
           int __e_acsl_exists_2;
           int __e_acsl_y_2;
           __e_acsl_exists_2 = 0;
           __e_acsl_y_2 = 0;
           while (1) {
-            if (__e_acsl_y_2 <= __e_acsl_x_7 / 2) 
-              ;
-            else 
-              break;
-            if (! (__e_acsl_x_7 == 2 * __e_acsl_y_2)) 
-              ;
+            if (__e_acsl_y_2 <= __e_acsl_x_7 / 2) ; else break;
+            if (! (__e_acsl_x_7 == 2 * __e_acsl_y_2)) ;
             else {
               __e_acsl_exists_2 = 1;
               goto e_acsl_end_loop7;
@@ -244,8 +210,7 @@ int main(void)
           e_acsl_end_loop7: /* internal */ ;
           __e_acsl_implies = __e_acsl_exists_2;
         }
-        if (__e_acsl_implies) 
-          ;
+        if (__e_acsl_implies) ;
         else {
           __e_acsl_forall_6 = 0;
           goto e_acsl_end_loop8;

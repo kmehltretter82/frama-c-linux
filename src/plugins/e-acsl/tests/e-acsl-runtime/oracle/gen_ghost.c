@@ -61,6 +61,12 @@ extern  __attribute__((__FC_BUILTIN__)) int __initialized(void *ptr,
 
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 
+extern size_t __memory_size;
+
+/*@
+predicate diffSize{L1, L2}(ℤ i) =
+  \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
+ */
 int G = 0;
 int *P;
 void e_acsl_global_init(void)
@@ -104,8 +110,7 @@ int main(void)
       __e_acsl_valid_read_2 = __valid_read((void *)Q,sizeof(int));
       __e_acsl_and = __e_acsl_valid_read_2;
     }
-    else 
-      __e_acsl_and = 0;
+    else __e_acsl_and = 0;
     e_acsl_assert(__e_acsl_and,(char *)"Assertion",(char *)"main",
                   (char *)"mem_access: \\valid_read(Q)",0);
     e_acsl_assert(*Q == G,(char *)"Assertion",(char *)"main",

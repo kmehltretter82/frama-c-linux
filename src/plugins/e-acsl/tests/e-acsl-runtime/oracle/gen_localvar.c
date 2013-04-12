@@ -80,6 +80,8 @@ extern  __attribute__((__FC_BUILTIN__)) int __initialized(void *ptr,
 
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 
+extern size_t __memory_size;
+
 /*@ assigns __fc_heap_status;
     assigns __fc_heap_status \from size, __fc_heap_status;
     assigns \result \from size, __fc_heap_status;
@@ -114,6 +116,11 @@ void *__e_acsl_malloc(size_t size)
   return __retres;
 }
 
+/*@
+predicate diffSize{L1, L2}(ℤ i) =
+  \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
+
+*/
 struct list *add(struct list *l, int i)
 {
   struct list *new;
@@ -131,8 +138,7 @@ struct list *add(struct list *l, int i)
       __e_acsl_valid = __valid((void *)new,sizeof(struct list));
       __e_acsl_and = __e_acsl_valid;
     }
-    else 
-      __e_acsl_and = 0;
+    else __e_acsl_and = 0;
     e_acsl_assert(__e_acsl_and,(char *)"Assertion",(char *)"add",
                   (char *)"\\valid(new)",20);
   }

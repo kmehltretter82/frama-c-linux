@@ -60,6 +60,12 @@ extern  __attribute__((__FC_BUILTIN__)) int __initialized(void *ptr,
 
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 
+extern size_t __memory_size;
+
+/*@
+predicate diffSize{L1, L2}(ℤ i) =
+  \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
+ */
 int main(void);
 
 char *T;
@@ -163,8 +169,7 @@ int main(void)
       __e_acsl_valid = __valid((void *)SS,sizeof(char));
       __e_acsl_and = __e_acsl_valid;
     }
-    else 
-      __e_acsl_and = 0;
+    else __e_acsl_and = 0;
     e_acsl_assert(! __e_acsl_and,(char *)"Assertion",(char *)"main",
                   (char *)"!\\valid(SS)",27);
   }

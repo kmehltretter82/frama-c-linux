@@ -23,6 +23,10 @@
 open Cil_types
 open Cil_datatype
 
+(* ************************************************************************** *)
+(** {2 Handling the E-ACSL's C-libraries, part I} *)
+(* ************************************************************************** *)
+
 let library_files () =       
   List.map
     (Options.Share.file ~error:true)
@@ -35,15 +39,15 @@ let library_files () =
 
 let is_library_loc (loc, _) = List.mem loc.Lexing.pos_fname (library_files ())
 
-(* ************************************************************************** *)
-(** {2 Builders} *)
-(* ************************************************************************** *)
-
 let library_functions = Datatype.String.Hashtbl.create 17
 let register_library_function vi = 
   Datatype.String.Hashtbl.add library_functions vi.vname vi
 
 let reset () = Datatype.String.Hashtbl.clear library_functions
+
+(* ************************************************************************** *)
+(** {2 Builders} *)
+(* ************************************************************************** *)
 
 let mk_call ?(loc=Location.unknown) ?result fname args =
   let vi =  
@@ -110,6 +114,10 @@ let mk_e_acsl_guard ?(reverse=false) kind kf e p =
       Cil.mkString ~loc msg; 
       Cil.integer loc line ] 
 
+(* ************************************************************************** *)
+(** {2 Handling \result} *)
+(* ************************************************************************** *)
+
 let result_lhost kf =
   let stmt = 
     try Kernel_function.find_return kf 
@@ -122,6 +130,10 @@ let result_lhost kf =
 let result_vi kf = match result_lhost kf with
   | Var vi -> vi
   | Mem _ -> assert false
+
+(* ************************************************************************** *)
+(** {2 Handling the E-ACSL's C-libraries, part II} *)
+(* ************************************************************************** *)
 
 (* TODO: convert -debug 2 into a new debugging category *)
 let mk_debug_mmodel_stmt stmt =
@@ -175,6 +187,45 @@ let mk_literal_string vi =
   let loc = vi.vdecl in
   let stmt = mk_call ~loc "__literal_string" [ Cil.evar ~loc vi ] in
   mk_debug_mmodel_stmt stmt
+
+(* ************************************************************************** *)
+(** {2 Rte} *)
+(* ************************************************************************** *)
+
+let apply_rte f x =
+  let signed = Kernel.SignedOverflow.get () in
+  let unsigned = Kernel.UnsignedOverflow.get () in
+  Kernel.SignedOverflow.off ();
+  Kernel.UnsignedOverflow.off ();
+  let finally () =
+    Kernel.SignedOverflow.set signed;
+    Kernel.UnsignedOverflow.set unsigned
+  in
+  Extlib.try_finally ~finally f x
+
+let warn_rte w exn =
+  if w then
+    Options.warning "@[@[cannot run RTE:@ %s.@]@ \
+Ignoring potential runtime errors in annotations." 
+      (Printexc.to_string exn)
+
+let rte2 ?(warn=true) fname ty =
+  try 
+    let f = Dynamic.get ~plugin:"RteGen" fname ty in
+    (fun x y -> apply_rte (f x) y)
+  with Failure _ | Dynamic.Unbound_value _ | Dynamic.Incompatible_type _ as exn
+    ->
+      warn_rte warn exn;
+      fun _ _ -> []
+
+let rte3 ?(warn=true) fname ty =
+  try 
+    let f = Dynamic.get ~plugin:"RteGen" fname ty in
+    (fun x y z -> apply_rte (f x y) z)
+  with Failure _ | Dynamic.Unbound_value _ | Dynamic.Incompatible_type _ as exn
+    ->
+      warn_rte warn exn;
+      fun _ _ _ -> []
 
 (*
 Local Variables:

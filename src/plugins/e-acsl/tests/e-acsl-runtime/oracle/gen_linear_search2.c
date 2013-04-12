@@ -81,6 +81,12 @@ axiomatic
  */
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 
+extern size_t __memory_size;
+
+/*@
+predicate diffSize{L1, L2}(ℤ i) =
+  \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
+ */
 int A[10];
 /*@ requires ∀ ℤ i; 0 ≤ i ∧ i < 9 ⇒ A[i] ≤ A[i+1];
     
@@ -149,10 +155,7 @@ int __e_acsl_search(int elt)
         __gmpz_init_set_si(__e_acsl_6,(long)9);
         __e_acsl_lt = __gmpz_cmp((__mpz_struct const *)(__e_acsl_i),
                                  (__mpz_struct const *)(__e_acsl_6));
-        if (__e_acsl_lt < 0) 
-          ;
-        else 
-          break;
+        if (__e_acsl_lt < 0) ; else break;
         __gmpz_clear(__e_acsl_6);
       }
       {
@@ -177,8 +180,7 @@ int __e_acsl_search(int elt)
         __gmpz_clear(__e_acsl_2);
         __gmpz_clear(__e_acsl_add);
         __gmpz_clear(__e_acsl_4);
-        if (__e_acsl_le <= 0) 
-          ;
+        if (__e_acsl_le <= 0) ;
         else {
           __e_acsl_forall = 0;
           goto e_acsl_end_loop1;
@@ -219,10 +221,7 @@ int __e_acsl_search(int elt)
           __gmpz_init_set_si(__e_acsl_15,(long)10);
           __e_acsl_lt_3 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_j_3),
                                      (__mpz_struct const *)(__e_acsl_15));
-          if (__e_acsl_lt_3 < 0) 
-            ;
-          else 
-            break;
+          if (__e_acsl_lt_3 < 0) ; else break;
           __gmpz_clear(__e_acsl_15);
         }
         {
@@ -237,8 +236,7 @@ int __e_acsl_search(int elt)
                                    (__mpz_struct const *)(__e_acsl_elt_2));
           __gmpz_clear(__e_acsl_13);
           __gmpz_clear(__e_acsl_elt_2);
-          if (__e_acsl_ne != 0) 
-            ;
+          if (__e_acsl_ne != 0) ;
           else {
             __e_acsl_forall_2 = 0;
             goto e_acsl_end_loop3;
@@ -278,10 +276,7 @@ int __e_acsl_search(int elt)
           __gmpz_init_set_si(__e_acsl_10,(long)10);
           __e_acsl_lt_2 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_j),
                                      (__mpz_struct const *)(__e_acsl_10));
-          if (__e_acsl_lt_2 < 0) 
-            ;
-          else 
-            break;
+          if (__e_acsl_lt_2 < 0) ; else break;
           __gmpz_clear(__e_acsl_10);
         }
         {
@@ -296,8 +291,7 @@ int __e_acsl_search(int elt)
                                    (__mpz_struct const *)(__e_acsl_elt));
           __gmpz_clear(__e_acsl_8);
           __gmpz_clear(__e_acsl_elt);
-          if (! (__e_acsl_eq == 0)) 
-            ;
+          if (! (__e_acsl_eq == 0)) ;
           else {
             __e_acsl_exists = 1;
             goto e_acsl_end_loop2;
@@ -324,8 +318,7 @@ int __e_acsl_search(int elt)
   {
     int __e_acsl_implies;
     int __e_acsl_implies_2;
-    if (! __e_acsl_at) 
-      __e_acsl_implies = 1;
+    if (! __e_acsl_at) __e_acsl_implies = 1;
     else {
       mpz_t __e_acsl_result;
       mpz_t __e_acsl_12;
@@ -341,8 +334,7 @@ int __e_acsl_search(int elt)
     e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",(char *)"search",
                   (char *)"\\old(\\exists integer j; (0 <= j && j < 10) && A[j] == elt) ==> \\result == 1",
                   12);
-    if (! __e_acsl_at_2) 
-      __e_acsl_implies_2 = 1;
+    if (! __e_acsl_at_2) __e_acsl_implies_2 = 1;
     else {
       mpz_t __e_acsl_result_2;
       mpz_t __e_acsl_17;

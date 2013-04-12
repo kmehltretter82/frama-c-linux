@@ -69,6 +69,12 @@ axiomatic
  */
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 
+extern size_t __memory_size;
+
+/*@
+predicate diffSize{L1, L2}(ℤ i) =
+  \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
+ */
 int main(void)
 {
   int __retres;
@@ -259,8 +265,7 @@ int main(void)
     __gmpz_init_set_si(__e_acsl_11,(long)1);
     __e_acsl_eq_12 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_x_7),
                                 (__mpz_struct const *)(__e_acsl_11));
-    if (! (__e_acsl_eq_12 == 0)) 
-      __e_acsl_implies = 1;
+    if (! (__e_acsl_eq_12 == 0)) __e_acsl_implies = 1;
     else {
       mpz_t __e_acsl_x_8;
       mpz_t __e_acsl_12;
@@ -290,10 +295,8 @@ int main(void)
       __gmpz_clear(__e_acsl_y_5);
       __gmpz_clear(__e_acsl_14);
     }
-    else 
-      __e_acsl_and = 0;
-    if (! __e_acsl_and) 
-      __e_acsl_implies_2 = 1;
+    else __e_acsl_and = 0;
+    if (! __e_acsl_and) __e_acsl_implies_2 = 1;
     else {
       mpz_t __e_acsl_x_9;
       mpz_t __e_acsl_15;
@@ -322,10 +325,8 @@ int main(void)
       __gmpz_clear(__e_acsl_y_6);
       __gmpz_clear(__e_acsl_16);
     }
-    else 
-      __e_acsl_and_2 = 0;
-    if (! __e_acsl_and_2) 
-      __e_acsl_implies_3 = 1;
+    else __e_acsl_and_2 = 0;
+    if (! __e_acsl_and_2) __e_acsl_implies_3 = 1;
     else {
       mpz_t __e_acsl_x_10;
       mpz_t __e_acsl_y_7;

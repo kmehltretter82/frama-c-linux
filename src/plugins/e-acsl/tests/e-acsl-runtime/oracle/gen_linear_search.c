@@ -32,6 +32,12 @@ axiomatic
  */
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 
+extern size_t __memory_size;
+
+/*@
+predicate diffSize{L1, L2}(ℤ i) =
+  \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
+ */
 int A[10];
 /*@ requires ∀ int i; 0 ≤ i ∧ i < 9 ⇒ A[i] ≤ A[i+1];
     
@@ -88,10 +94,7 @@ int __e_acsl_search(int elt)
     __e_acsl_forall = 1;
     __e_acsl_i = 0;
     while (1) {
-      if (__e_acsl_i < 9) 
-        ;
-      else 
-        break;
+      if (__e_acsl_i < 9) ; else break;
       e_acsl_assert(__e_acsl_i + 1 < 10,(char *)"Precondition",
                     (char *)"search",
                     (char *)"index_bound: (int)(__e_acsl_i+1) < 10",9);
@@ -102,8 +105,7 @@ int __e_acsl_search(int elt)
                     (char *)"index_bound: __e_acsl_i < 10",9);
       e_acsl_assert(0 <= __e_acsl_i,(char *)"Precondition",(char *)"search",
                     (char *)"index_bound: 0 <= __e_acsl_i",9);
-      if (A[__e_acsl_i] <= A[__e_acsl_i + 1]) 
-        ;
+      if (A[__e_acsl_i] <= A[__e_acsl_i + 1]) ;
       else {
         __e_acsl_forall = 0;
         goto e_acsl_end_loop1;
@@ -120,18 +122,14 @@ int __e_acsl_search(int elt)
       __e_acsl_forall_2 = 1;
       __e_acsl_j_2 = 0;
       while (1) {
-        if (__e_acsl_j_2 < 10) 
-          ;
-        else 
-          break;
+        if (__e_acsl_j_2 < 10) ; else break;
         e_acsl_assert(__e_acsl_j_2 < 10,(char *)"Postcondition",
                       (char *)"search",
                       (char *)"index_bound: __e_acsl_j_2 < 10",14);
         e_acsl_assert(0 <= __e_acsl_j_2,(char *)"Postcondition",
                       (char *)"search",
                       (char *)"index_bound: 0 <= __e_acsl_j_2",14);
-        if (A[__e_acsl_j_2] != elt) 
-          ;
+        if (A[__e_acsl_j_2] != elt) ;
         else {
           __e_acsl_forall_2 = 0;
           goto e_acsl_end_loop3;
@@ -147,18 +145,14 @@ int __e_acsl_search(int elt)
       __e_acsl_exists = 0;
       __e_acsl_j = 0;
       while (1) {
-        if (__e_acsl_j < 10) 
-          ;
-        else 
-          break;
+        if (__e_acsl_j < 10) ; else break;
         e_acsl_assert(__e_acsl_j < 10,(char *)"Postcondition",
                       (char *)"search",
                       (char *)"index_bound: __e_acsl_j < 10",11);
         e_acsl_assert(0 <= __e_acsl_j,(char *)"Postcondition",
                       (char *)"search",
                       (char *)"index_bound: 0 <= __e_acsl_j",11);
-        if (! (A[__e_acsl_j] == elt)) 
-          ;
+        if (! (A[__e_acsl_j] == elt)) ;
         else {
           __e_acsl_exists = 1;
           goto e_acsl_end_loop2;
@@ -173,17 +167,13 @@ int __e_acsl_search(int elt)
   {
     int __e_acsl_implies;
     int __e_acsl_implies_2;
-    if (! __e_acsl_at) 
-      __e_acsl_implies = 1;
-    else 
-      __e_acsl_implies = __retres == 1;
+    if (! __e_acsl_at) __e_acsl_implies = 1;
+    else __e_acsl_implies = __retres == 1;
     e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",(char *)"search",
                   (char *)"\\old(\\exists int j; (0 <= j && j < 10) && A[j] == elt) ==> \\result == 1",
                   12);
-    if (! __e_acsl_at_2) 
-      __e_acsl_implies_2 = 1;
-    else 
-      __e_acsl_implies_2 = __retres == 0;
+    if (! __e_acsl_at_2) __e_acsl_implies_2 = 1;
+    else __e_acsl_implies_2 = __retres == 0;
     e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",
                   (char *)"search",
                   (char *)"\\old(\\forall int j; 0 <= j && j < 10 ==> A[j] != elt) ==> \\result == 0",

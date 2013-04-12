@@ -32,6 +32,12 @@ axiomatic
  */
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 
+extern size_t __memory_size;
+
+/*@
+predicate diffSize{L1, L2}(ℤ i) =
+  \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
+ */
 int main(void)
 {
   int __retres;
@@ -105,30 +111,17 @@ int main(void)
     int __e_acsl_implies_2;
     int __e_acsl_and_2;
     int __e_acsl_implies_3;
-    if (! (x == 1)) 
-      __e_acsl_implies = 1;
-    else 
-      __e_acsl_implies = x == 0;
+    if (! (x == 1)) __e_acsl_implies = 1; else __e_acsl_implies = x == 0;
     e_acsl_assert(__e_acsl_implies,(char *)"Precondition",(char *)"main",
                   (char *)"x == 1 ==> x == 0",34);
-    if (x == 3) 
-      __e_acsl_and = y == 2;
-    else 
-      __e_acsl_and = 0;
-    if (! __e_acsl_and) 
-      __e_acsl_implies_2 = 1;
-    else 
-      __e_acsl_implies_2 = x == 3;
+    if (x == 3) __e_acsl_and = y == 2; else __e_acsl_and = 0;
+    if (! __e_acsl_and) __e_acsl_implies_2 = 1;
+    else __e_acsl_implies_2 = x == 3;
     e_acsl_assert(__e_acsl_implies_2,(char *)"Precondition",(char *)"main",
                   (char *)"x == 3 && y == 2 ==> x == 3",38);
-    if (x == 3) 
-      __e_acsl_and_2 = y == 2;
-    else 
-      __e_acsl_and_2 = 0;
-    if (! __e_acsl_and_2) 
-      __e_acsl_implies_3 = 1;
-    else 
-      __e_acsl_implies_3 = (long long)x + (long long)y == (long long)5;
+    if (x == 3) __e_acsl_and_2 = y == 2; else __e_acsl_and_2 = 0;
+    if (! __e_acsl_and_2) __e_acsl_implies_3 = 1;
+    else __e_acsl_implies_3 = (long long)x + (long long)y == (long long)5;
     e_acsl_assert(__e_acsl_implies_3,(char *)"Precondition",(char *)"main",
                   (char *)"x == 3 && y == 2 ==> x+y == 5",39);
     x += y;
