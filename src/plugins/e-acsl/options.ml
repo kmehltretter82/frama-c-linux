@@ -76,6 +76,13 @@ module Gmp_only =
       let help = ""
      end)
 
+module Full_mmodel =
+  False
+    (struct
+      let option_name = "-e-acsl-full-mmodel"
+      let help = ""
+     end)
+
 let () = Plugin.set_group help
 module Version =
   False

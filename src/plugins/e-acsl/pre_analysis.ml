@@ -532,14 +532,17 @@ and must_model_exp ?kf ?stmt e = match e.enode with
   | UnOp _ | Const _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ 
   | AlignOfE _ -> assert false
 
-let must_model_vi ?kf ?stmt vi = 
-  Error.generic_handle (must_model_vi ?kf ?stmt) false vi
+let must_model_vi ?kf ?stmt vi =
+  Options.Full_mmodel.get ()
+  || Error.generic_handle (must_model_vi ?kf ?stmt) false vi
 
 let must_model_lval ?kf ?stmt lv = 
-  Error.generic_handle (must_model_lval ?kf ?stmt) false lv
+  Options.Full_mmodel.get ()
+  || Error.generic_handle (must_model_lval ?kf ?stmt) false lv
 
 let old_must_model_vi bhv ?kf ?stmt vi =
-  must_model_vi ?kf ?stmt (Cil.get_original_varinfo bhv vi)
+  Options.Full_mmodel.get ()
+  || must_model_vi ?kf ?stmt (Cil.get_original_varinfo bhv vi)
 
 (*
 Local Variables:

@@ -127,7 +127,7 @@ class e_acsl_visitor prj generate = object (self)
     let cur = Project.current () in
     let selection = 
       State_selection.of_list 
-	[ Options.Gmp_only.self; Options.Check.self;
+	[ Options.Gmp_only.self; Options.Check.self; Options.Full_mmodel.self;
 	  Kernel.SignedOverflow.self; Kernel.UnsignedOverflow.self;
 	  Kernel.SignedDowncast.self; Kernel.UnsignedDowncast.self;
 	  Kernel.Machdep.self ] 
@@ -135,9 +135,6 @@ class e_acsl_visitor prj generate = object (self)
     if generate then Project.copy ~selection ~src:cur prj;
     Cil.DoChildrenPost
       (fun f ->
-	(* reset them at the end to be observationally equivalent to a standard
-	   visitor. *)
-	if generate then Project.clear ~selection ~project:prj ();
 	(* extend the main with forward initialization and put it at end *)
 	if not (Options.Check.get ()) then begin
 	  let must_init =
@@ -243,6 +240,9 @@ you must call function `%s' by yourself"
 	    in
 	    Project.on prj build_initializer ()
 	end;
+	(* reset copied states at the end to be observationally equivalent to a
+	   standard visitor. *)
+	if generate then Project.clear ~selection ~project:prj ();
 	f)
 
   method vglob_aux = function

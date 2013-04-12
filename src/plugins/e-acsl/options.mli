@@ -29,6 +29,7 @@ module Run: Bool
 module Valid: Bool
 module Prepare: Bool
 module Gmp_only: Bool
+module Full_mmodel: Bool
 module Project_name: String
 
 val must_visit: unit -> bool
