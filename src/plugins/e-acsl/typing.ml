@@ -301,6 +301,8 @@ let rec type_term t =
     | Toffset(_, t)
     | Tblock_length(_, t) -> 
       ignore (type_term t);
+      (* TODO: to be improved by computing the length of the type of the
+	 pointer *)
       eacsl_typ_of_typ Cil.theMachine.Cil.typeOfSizeOf
     | Tnull -> int_to_interv 0
     | TLogic_coerce(_, t) -> type_term t

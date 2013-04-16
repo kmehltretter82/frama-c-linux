@@ -293,7 +293,6 @@ and context_insensitive_term_to_exp env t =
     not_yet env "missing binary bitwise operator"
   | TBinOp(PlusPI | IndexPI | MinusPI | MinusPP as bop, t1, t2) ->
     (* binary operation over pointers *)
-    (* [TODO] untested *)
     let ctx1, ctx2, ty = 
       (* ISO C, Section 6.5.6: either the first argument is a pointer and the
 	 second is an integer type, or the reverse *)
@@ -301,7 +300,7 @@ and context_insensitive_term_to_exp env t =
       let ty2 = Typing.typ_of_term t2 in
       if Mpz.is_t ty1 then Some Cil.longType, Some ty2, ty2
       else if Mpz.is_t ty2 then Some ty1, Some Cil.longType, ty1
-      else Some ty1, Some ty2, if Cil.isIntegralType ty1  then ty2 else ty1
+      else Some ty1, Some ty2, if Cil.isIntegralType ty1 then ty2 else ty1
     in
     let e1, env = term_to_exp env ctx1 t1 in
     let e2, env = term_to_exp env ctx2 t2 in

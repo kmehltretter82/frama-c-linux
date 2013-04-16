@@ -39,14 +39,14 @@ predicate diffSize{L1, L2}(ℤ i) =
   \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
  */
 int A[10];
-/*@ requires ∀ int i; 0 ≤ i ∧ i < 9 ⇒ A[i] ≤ A[i+1];
+/*@ requires ∀ ℤ i; 0 ≤ i ∧ i < 9 ⇒ A[i] ≤ A[i+1];
     
     behavior exists:
-      assumes ∃ int j; (0 ≤ j ∧ j < 10) ∧ A[j] ≡ elt;
+      assumes ∃ ℤ j; (0 ≤ j ∧ j < 10) ∧ A[j] ≡ elt;
       ensures \result ≡ 1;
     
     behavior not_exists:
-      assumes ∀ int j; 0 ≤ j ∧ j < 10 ⇒ A[j] ≢ elt;
+      assumes ∀ ℤ j; 0 ≤ j ∧ j < 10 ⇒ A[j] ≢ elt;
       ensures \result ≡ 0;
  */
 int search(int elt)
@@ -73,14 +73,14 @@ int search(int elt)
   return_label: /* internal */ return __retres;
 }
 
-/*@ requires ∀ int i; 0 ≤ i ∧ i < 9 ⇒ A[i] ≤ A[i+1];
+/*@ requires ∀ ℤ i; 0 ≤ i ∧ i < 9 ⇒ A[i] ≤ A[i+1];
     
     behavior exists:
-      assumes ∃ int j; (0 ≤ j ∧ j < 10) ∧ A[j] ≡ elt;
+      assumes ∃ ℤ j; (0 ≤ j ∧ j < 10) ∧ A[j] ≡ elt;
       ensures \result ≡ 1;
     
     behavior not_exists:
-      assumes ∀ int j; 0 ≤ j ∧ j < 10 ⇒ A[j] ≢ elt;
+      assumes ∀ ℤ j; 0 ≤ j ∧ j < 10 ⇒ A[j] ≢ elt;
       ensures \result ≡ 0;
  */
 int __e_acsl_search(int elt)
@@ -114,7 +114,7 @@ int __e_acsl_search(int elt)
     }
     e_acsl_end_loop1: /* internal */ ;
     e_acsl_assert(__e_acsl_forall,(char *)"Precondition",(char *)"search",
-                  (char *)"\\forall int i; 0 <= i && i < 9 ==> A[i] <= A[i+1]",
+                  (char *)"\\forall integer i; 0 <= i && i < 9 ==> A[i] <= A[i+1]",
                   9);
     {
       int __e_acsl_forall_2;
@@ -170,13 +170,13 @@ int __e_acsl_search(int elt)
     if (! __e_acsl_at) __e_acsl_implies = 1;
     else __e_acsl_implies = __retres == 1;
     e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",(char *)"search",
-                  (char *)"\\old(\\exists int j; (0 <= j && j < 10) && A[j] == elt) ==> \\result == 1",
+                  (char *)"\\old(\\exists integer j; (0 <= j && j < 10) && A[j] == elt) ==> \\result == 1",
                   12);
     if (! __e_acsl_at_2) __e_acsl_implies_2 = 1;
     else __e_acsl_implies_2 = __retres == 0;
     e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",
                   (char *)"search",
-                  (char *)"\\old(\\forall int j; 0 <= j && j < 10 ==> A[j] != elt) ==> \\result == 0",
+                  (char *)"\\old(\\forall integer j; 0 <= j && j < 10 ==> A[j] != elt) ==> \\result == 0",
                   15);
     return __retres;
   }

@@ -208,17 +208,19 @@ let new_var_and_mpz_init ?loc ?init ?global ?name env t mk_stmts =
 
 module Logic_binding = struct
 
-  let add env logic_v =
-    let ty = match logic_v.lv_type with
-      | Ctype ty -> ty
-      | Linteger -> Mpz.t ()
-      | Ltype _ as ty when Logic_const.is_boolean_type ty -> Cil.charType
-      | Ltype _ | Lvar _ | Lreal | Larrow _ as lty -> 
-	let msg = 
-	  Pretty_utils.sfprintf 
-	    "logic variable of type %a" Logic_type.pretty lty
-	in
-	Error.not_yet msg
+  let add ?ty env logic_v =
+    let ty = match ty with
+      | Some ty -> ty
+      | None -> match logic_v.lv_type with
+	| Ctype ty -> ty
+	| Linteger -> Mpz.t ()
+	| Ltype _ as ty when Logic_const.is_boolean_type ty -> Cil.charType
+	| Ltype _ | Lvar _ | Lreal | Larrow _ as lty -> 
+	  let msg = 
+	    Pretty_utils.sfprintf 
+	      "logic variable of type %a" Logic_type.pretty lty
+	  in
+	  Error.not_yet msg
     in
     let v, e, env = 
       new_var env ~name:logic_v.lv_name None ty (fun _ _ -> []) 

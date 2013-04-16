@@ -112,7 +112,7 @@ predicate diffSize{L1, L2}(ℤ i) =
   \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
  */
 /*@ behavior yes:
-      assumes ∀ ℤ i; 0 < i ∧ i < n ⇒ *(t+(i-1)) ≤ *(t+i);
+      assumes ∀ int i; 0 < i ∧ i < n ⇒ *(t+(i-1)) ≤ *(t+i);
       ensures \result ≡ 1;
  */
 int sorted(int *t, int n)
@@ -141,7 +141,7 @@ int sorted(int *t, int n)
 }
 
 /*@ behavior yes:
-      assumes ∀ ℤ i; 0 < i ∧ i < n ⇒ *(t+(i-1)) ≤ *(t+i);
+      assumes ∀ int i; 0 < i ∧ i < n ⇒ *(t+(i-1)) ≤ *(t+i);
       ensures \result ≡ 1;
  */
 int __e_acsl_sorted(int *t, int n)
@@ -240,7 +240,7 @@ int __e_acsl_sorted(int *t, int n)
       __gmpz_clear(__e_acsl_8);
     }
     e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",(char *)"sorted",
-                  (char *)"\\old(\\forall integer i; 0 < i && i < n ==> *(t+(i-1)) <= *(t+i)) ==>\n\\result == 1",
+                  (char *)"\\old(\\forall int i; 0 < i && i < n ==> *(t+(i-1)) <= *(t+i)) ==> \\result == 1",
                   9);
     __delete_block((void *)(& t));
     return __retres;

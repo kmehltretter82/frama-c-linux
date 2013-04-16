@@ -57,7 +57,7 @@ predicate diffSize{L1, L2}(ℤ i) =
   \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
  */
 /*@ behavior yes:
-      assumes ∀ long long i; 0 < i ∧ i < n ⇒ *(t+(i-1)) ≤ *(t+i);
+      assumes ∀ int i; 0 < i ∧ i < n ⇒ *(t+(i-1)) ≤ *(t+i);
       ensures \result ≡ 1;
  */
 int sorted(int *t, int n)
@@ -86,7 +86,7 @@ int sorted(int *t, int n)
 }
 
 /*@ behavior yes:
-      assumes ∀ long long i; 0 < i ∧ i < n ⇒ *(t+(i-1)) ≤ *(t+i);
+      assumes ∀ int i; 0 < i ∧ i < n ⇒ *(t+(i-1)) ≤ *(t+i);
       ensures \result ≡ 1;
  */
 int __e_acsl_sorted(int *t, int n)
@@ -97,9 +97,9 @@ int __e_acsl_sorted(int *t, int n)
   __full_init((void *)(& t));
   {
     int __e_acsl_forall;
-    long long __e_acsl_i;
+    int __e_acsl_i;
     __e_acsl_forall = 1;
-    __e_acsl_i = (long long)(0 + 1);
+    __e_acsl_i = 0 + 1;
     while (1) {
       if (__e_acsl_i < n) ; else break;
       {
@@ -110,13 +110,13 @@ int __e_acsl_sorted(int *t, int n)
         e_acsl_assert(__e_acsl_valid_read,(char *)"Postcondition",
                       (char *)"sorted",
                       (char *)"mem_access: \\valid_read(t+__e_acsl_i)",0);
-        __e_acsl_valid_read_2 = __valid_read((void *)(t + (__e_acsl_i - (long long)1)),
+        __e_acsl_valid_read_2 = __valid_read((void *)(t + ((long long)__e_acsl_i - (long long)1)),
                                              sizeof(int));
         e_acsl_assert(__e_acsl_valid_read_2,(char *)"Postcondition",
                       (char *)"sorted",
-                      (char *)"mem_access: \\valid_read(t+(long long)(__e_acsl_i-(long long)1))",
+                      (char *)"mem_access: \\valid_read(t+(long long)((long long)__e_acsl_i-(long long)1))",
                       0);
-        if (*(t + (__e_acsl_i - (long long)1)) <= *(t + __e_acsl_i)) 
+        if (*(t + ((long long)__e_acsl_i - (long long)1)) <= *(t + __e_acsl_i)) 
           ;
         else {
           __e_acsl_forall = 0;
@@ -134,7 +134,7 @@ int __e_acsl_sorted(int *t, int n)
     if (! __e_acsl_at) __e_acsl_implies = 1;
     else __e_acsl_implies = __retres == 1;
     e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",(char *)"sorted",
-                  (char *)"\\old(\\forall long long i; 0 < i && i < n ==> *(t+(i-1)) <= *(t+i)) ==>\n\\result == 1",
+                  (char *)"\\old(\\forall int i; 0 < i && i < n ==> *(t+(i-1)) <= *(t+i)) ==> \\result == 1",
                   9);
     __delete_block((void *)(& t));
     return __retres;

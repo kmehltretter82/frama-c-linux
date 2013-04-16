@@ -473,7 +473,7 @@ int main(void)
     __gmpz_clear(__e_acsl_y);
     __gmpz_clear(__e_acsl_z);
   }
-  /*@ assert ∃ ℤ x; (0 ≤ x ∧ x < 10) ∧ x ≡ 5; */
+  /*@ assert ∃ int x; (0 ≤ x ∧ x < 10) ∧ x ≡ 5; */
   {
     int __e_acsl_exists;
     mpz_t __e_acsl_x_6;
@@ -522,12 +522,11 @@ int main(void)
     }
     e_acsl_end_loop6: /* internal */ ;
     e_acsl_assert(__e_acsl_exists,(char *)"Assertion",(char *)"main",
-                  (char *)"\\exists integer x; (0 <= x && x < 10) && x == 5",
-                  23);
+                  (char *)"\\exists int x; (0 <= x && x < 10) && x == 5",23);
     __gmpz_clear(__e_acsl_x_6);
   }
   /*@ assert
-      ∀ ℤ x;
+      ∀ int x;
         0 ≤ x ∧ x < 10 ⇒
         (x%2 ≡ 0 ⇒ (∃ ℤ y; (0 ≤ y ∧ y ≤ x/2) ∧ x ≡ 2*y));
   */
@@ -667,7 +666,7 @@ int main(void)
     }
     e_acsl_end_loop8: /* internal */ ;
     e_acsl_assert(__e_acsl_forall_6,(char *)"Assertion",(char *)"main",
-                  (char *)"\\forall integer x;\n  0 <= x && x < 10 ==>\n  (x%2 == 0 ==> (\\exists integer y; (0 <= y && y <= x/2) && x == 2*y))",
+                  (char *)"\\forall int x;\n  0 <= x && x < 10 ==>\n  (x%2 == 0 ==> (\\exists integer y; (0 <= y && y <= x/2) && x == 2*y))",
                   27);
     __gmpz_clear(__e_acsl_x_7);
   }

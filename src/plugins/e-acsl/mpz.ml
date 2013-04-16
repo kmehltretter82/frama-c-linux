@@ -53,7 +53,7 @@ let get_set_suffix_and_arg e =
     | TInt((IBool | IUChar | IUInt | IUShort | IULong), _) ->
       "_ui", [ e ]
     | TInt((ISChar | IShort | IInt | ILong), _) -> "_si", [ e ]
-    | TInt((ILongLong | IULongLong), _) -> assert false
+    | TInt((ILongLong | IULongLong), _)
     | TPtr(TInt(IChar, _), _) ->
       "_str",
 	(* decimal base for the number given as string *)

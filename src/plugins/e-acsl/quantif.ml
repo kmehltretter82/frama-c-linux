@@ -165,20 +165,19 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
 	| Rle -> t1
 	| Rgt | Rge | Req | Rneq -> assert false
       in
-      let bop2 = match rel2 with
-	| Rlt -> Lt
-	| Rle -> Le
+      let t2_one, bop2 = match rel2 with
+	| Rlt -> t2, Lt
+	| Rle -> 
+	  (* we increment the loop counter one more time (at the end of the
+	     loop). Thus to prevent  overflow, check the type of [t2 + 1]
+	     instead of [t2]. *) 
+	  t_plus_one t2, Le
 	| Rgt | Rge | Req | Rneq -> assert false
       in
-      (* we increment the loop counter one more time (at the end of the
-	 loop). Thus to prevent  overflow, check the type of [t2 + 1] instead
-	 of [t2]. *) 
-      let t2_one = t_plus_one t2 in
       Typing.type_term t2_one;
       let ty = Typing.principal_type t1 t2_one in
       (* loop counter corresponding to the quantified variable *)
-      logic_x.lv_type <- if Mpz.is_t ty then Linteger else Ctype ty;
-      let var_x, x, env = Env.Logic_binding.add env logic_x in
+      let var_x, x, env = Env.Logic_binding.add ~ty env logic_x in
       let lv_x = var var_x in
       let env = 
 	if Mpz.is_t ty then Env.add_stmt env (Mpz.init ~loc x) else env 
