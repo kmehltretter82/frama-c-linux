@@ -95,7 +95,7 @@ void e_acsl_global_init(void)
   char *__e_acsl_literal_string_3;
   char *__e_acsl_literal_string_2;
   char *__e_acsl_literal_string;
-  __store_block((void *)(& G2),4U);
+  __store_block((void *)(& S2),4U);
   __e_acsl_literal_string = "bar";
   __store_block((void *)__e_acsl_literal_string,sizeof("bar"));
   __full_init((void *)__e_acsl_literal_string);
@@ -108,15 +108,11 @@ void e_acsl_global_init(void)
   __store_block((void *)__e_acsl_literal_string_3,sizeof("foo2"));
   __full_init((void *)__e_acsl_literal_string_3);
   __literal_string((void *)__e_acsl_literal_string_3);
-  __full_init((void *)(& G2));
-  __store_block((void *)(& S2),4U);
   __full_init((void *)(& S2));
   S2 = (char *)__e_acsl_literal_string_3;
   __store_block((void *)(& S),4U);
   __full_init((void *)(& S));
   S = (char *)__e_acsl_literal_string_2;
-  __store_block((void *)(& G),4U);
-  __full_init((void *)(& G));
   __store_block((void *)(& T),4U);
   __full_init((void *)(& T));
   T = (char *)__e_acsl_literal_string;
@@ -174,10 +170,8 @@ int main(void)
                   (char *)"!\\valid(SS)",27);
   }
   __retres = 0;
-  __delete_block((void *)(& G2));
   __delete_block((void *)(& S2));
   __delete_block((void *)(& S));
-  __delete_block((void *)(& G));
   __delete_block((void *)(& T));
   __delete_block((void *)(& SS));
   __clean();

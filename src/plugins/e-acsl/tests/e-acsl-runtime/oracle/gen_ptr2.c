@@ -230,8 +230,6 @@ int main(void)
   }
   {
     int i;
-    __store_block((void *)(& i),4U);
-    __full_init((void *)(& i));
     i = 0;
     while (i < 2) {
       /*@ assert t[i] ≡ i+2; */
@@ -310,10 +308,8 @@ int main(void)
         __gmpz_clear(__e_acsl_i_3);
         __gmpz_clear(__e_acsl_sub_3);
       }
-      __full_init((void *)(& i));
       i ++;
     }
-    __delete_block((void *)(& i));
   }
   __full_init((void *)(& p));
   p = & t[2];

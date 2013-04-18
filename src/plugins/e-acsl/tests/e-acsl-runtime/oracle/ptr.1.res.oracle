@@ -63,8 +63,8 @@ tests/e-acsl-runtime/ptr.i:21:[value] Assertion got status valid.
 tests/e-acsl-runtime/ptr.i:19:[value] Assertion got status unknown.
 tests/e-acsl-runtime/ptr.i:20:[value] Assertion got status unknown.
 tests/e-acsl-runtime/ptr.i:21:[value] Assertion got status unknown.
-[value] using specification for function __delete_block
 tests/e-acsl-runtime/ptr.i:27:[value] Assertion got status valid.
+[value] using specification for function __delete_block
 [kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
 [value] using specification for function __clean
 [value] done for function main

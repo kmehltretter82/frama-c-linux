@@ -110,8 +110,6 @@ int main(void)
                 (char *)"t[(2*sizeof(int))/sizeof((int)0x0)] == 4",16);
   {
     int i;
-    __store_block((void *)(& i),4U);
-    __full_init((void *)(& i));
     i = 0;
     while (i < 2) {
       /*@ assert t[i] ≡ i+2; */
@@ -146,10 +144,8 @@ int main(void)
                       (char *)"Assertion",(char *)"main",
                       (char *)"*(&t[2]-i) == 4-i",21);
       }
-      __full_init((void *)(& i));
       i ++;
     }
-    __delete_block((void *)(& i));
   }
   __full_init((void *)(& p));
   p = & t[2];

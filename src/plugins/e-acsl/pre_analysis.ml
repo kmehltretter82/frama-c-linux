@@ -150,11 +150,21 @@ module rec Transfer
   let combineSuccessors s1 s2 = 
     Some (Varinfo.Set.union (Env.default_varinfos s1) (Env.default_varinfos s2))
 
-  let rec register_term_lval kf varinfos (thost, _) = match thost with
+  let is_ptr_or_array ty = Cil.isPtrType ty || Cil.isArrayType ty
+
+  let is_ptr_or_array_exp e =
+    let ty = Cil.typeOf e in
+    is_ptr_or_array ty
+
+  let rec register_term_lval kf varinfos (thost, _) = 
+    let add vi = 
+      if is_ptr_or_array vi.vtype then Varinfo.Set.add vi varinfos 
+      else varinfos
+    in
+    match thost with
     | TVar { lv_origin = None } -> varinfos
-    | TVar { lv_origin = Some vi } -> 
-      Varinfo.Set.add vi varinfos
-    | TResult _ -> Varinfo.Set.add (Misc.result_vi kf) varinfos
+    | TVar { lv_origin = Some vi } -> add vi
+    | TResult _ -> add (Misc.result_vi kf)
     | TMem t -> register_term kf varinfos t
 
   and register_term kf varinfos term = match term.term_node with
@@ -189,7 +199,7 @@ module rec Transfer
     method vpredicate = function
     | Pvalid(_, t) | Pvalid_read(_, t) | Pinitialized(_, t)
     | Pallocable(_, t) | Pfreeable(_, t) | Pfresh(_, _, t, _) ->
-	   (*	Options.feedback "REGISTER %a" Cil.d_term t;*)
+      (*	Options.feedback "REGISTER %a" Cil.d_term t;*)
       state_ref := register_term kf !state_ref t;
       Cil.SkipChildren
     | Pseparated _ -> Error.not_yet "\\separated"
@@ -198,23 +208,29 @@ module rec Transfer
     | Plet _ | Pforall _ | Pexists _ | Pat _ | Psubtype _ ->
       Cil.DoChildren
     method vterm term = match term.term_node with
-    | Tbase_addr(_, t) | Toffset(_, t) | Tblock_length(_, t) 
-    | TBinOp((PlusPI | IndexPI | MinusPI), t, _) ->
+    | Tbase_addr(_, t) | Toffset(_, t) | Tblock_length(_, t) ->
       state_ref := register_term kf !state_ref t;
       Cil.SkipChildren
-    | TBinOp(MinusPP, t1, t2) ->
-      let state = register_term kf !state_ref t1 in
-      state_ref := register_term kf state t2;
+    | TBinOp((PlusPI | IndexPI | MinusPI), t1, t2) ->
+      (match t1.term_type with
+      | Ctype ty when is_ptr_or_array ty ->
+	state_ref := register_term kf !state_ref t1
+      | _ -> 
+	match t2.term_type with
+	| Ctype ty when is_ptr_or_array ty ->
+	  state_ref := register_term kf !state_ref t2
+	| _ -> assert false);
       Cil.SkipChildren
     | TConst _ | TSizeOf _ | TSizeOfStr _ | TAlignOf _  | Tnull | Ttype _ 
-    | Tempty_set | TSizeOfE _ | TUnOp _ | TBinOp _ | Ttypeof _ -> 
-	   (* no left-value inside inside: skip for efficiency *)
+    | Tempty_set -> 
+      (* no left-value inside inside: skip for efficiency *)
       Cil.SkipChildren
+    | TUnOp _ | TBinOp _ | Ttypeof _ | TSizeOfE _
     | TLval _ | TAlignOfE _ | TCastE _ | TAddrOf _
     | TStartOf _ | Tapp _ | Tlambda _ | TDataCons _ | Tif _ | Tat _
     | TCoerce _ | TCoerceE _ | TUpdate _ | Tunion _ | Tinter _
     | Tcomprehension _ | Trange _ | Tlet _ | TLogic_coerce _ -> 
-	   (* potential sub-term inside *)
+      (* potential sub-term inside *)
       Cil.DoChildren
     method vlogic_label _ = Cil.SkipChildren
     method vterm_lhost = function
@@ -294,38 +310,24 @@ module rec Transfer
 	in
 	Some state)
 
-  let rec register_exp varinfos e = match e.enode with
+  let rec base_addr e = match e.enode with
     | Lval lv | AddrOf lv | StartOf lv -> 
       (match lv with
-      | Var vi, _ -> Varinfo.Set.add vi varinfos
-      | Mem e, _ -> register_exp varinfos e)
-    | UnOp(_, e, _) | CastE(_, e) | Info(e, _)
-    | BinOp((MinusPI | PlusPI | IndexPI), e, _, _) -> 
-      register_exp varinfos e
-    | BinOp(_, e1, e2, _) -> 
-      let s = register_exp varinfos e1 in
-      register_exp s e2
-    | Const _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ -> 
-      varinfos
-
-  let base_addr e = 
-    let rec aux acc e = match e.enode with
-    | Lval lv | AddrOf lv | StartOf lv -> 
-      (match lv with
-      | Var vi, _ -> [ vi ]
-      | Mem e, _ -> aux acc e)
-    | BinOp((PlusPI | IndexPI | MinusPI), e1, _, _) -> aux acc e1
-    | BinOp(MinusPP, e1, e2, _) -> 
-      let acc = aux acc e1  in
-      aux acc e2
-    | Info(e, _) | CastE(_, e) -> aux acc e
-    | BinOp((PlusA | MinusA | Mult | Div | Mod |Shiftlt | Shiftrt 
+      | Var vi, _ -> Some vi
+      | Mem e, _ -> base_addr e)
+    | BinOp((PlusPI | IndexPI | MinusPI), e1, e2, _) -> 
+      if is_ptr_or_array_exp e1 then base_addr e1
+      else begin
+	assert (is_ptr_or_array_exp e2);
+	base_addr e2
+      end
+    | Info(e, _) | CastE(_, e) -> base_addr e
+    | BinOp((MinusPP | PlusA | MinusA | Mult | Div | Mod |Shiftlt | Shiftrt 
 		| Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr),
 	    _, _, _)
     | UnOp _ | Const _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ 
-    | AlignOfE _ -> acc
-    in
-    aux [] e
+    | AlignOfE _ -> 
+      None
 
   (** The (backwards) transfer function for an instruction. The
       [(Cil.CurrentLoc.get ())] is set before calling this. If it returns
@@ -335,14 +337,19 @@ module rec Transfer
     let state = Env.default_varinfos state in
     let extend_to_expr state lhost e =
       let add_vi state vi =
-	if Varinfo.Set.mem vi state then register_exp state e
-	else state
+	if Varinfo.Set.mem vi state then 
+	  match base_addr e with
+	  | None -> state
+	  | Some vi -> Varinfo.Set.add vi state
+	else 
+	  state
       in
       match lhost with
       | Var vi -> add_vi state vi
       | Mem e -> 
-	let l = base_addr e in
-	List.fold_left add_vi state l
+	match base_addr e with
+	| None -> Kernel.fatal "no base address for %a" Printer.pp_exp e
+	| Some vi -> add_vi state vi
     in
     match instr with
     | Set((lhost, _), e, _) -> 
@@ -357,12 +364,12 @@ module rec Transfer
 	    try
 	      let init =
 		List.fold_left2
-		  (fun acc p a -> 
-		    let bases = base_addr a in
-		    if List.exists 
-		      (fun vi -> Varinfo.Set.mem vi state) bases 
-		    then Varinfo.Set.add p acc
-		    else acc)
+		  (fun acc p a -> match base_addr a with
+		    | None -> acc
+		    | Some vi -> 
+		      if Varinfo.Set.mem vi state
+		      then Varinfo.Set.add p acc
+		      else acc)
 		  Varinfo.Set.empty
 		  params
 		  l
@@ -371,9 +378,12 @@ module rec Transfer
 	      (* keep arguments whenever the corresponding formals must be 
 		 kept *)
 	      List.fold_left2
-		(fun acc p a -> 
-		  if Varinfo.Set.mem p state_kf then register_exp acc a 
-		  else acc)
+		(fun acc p a -> match base_addr a with
+		  | None -> acc
+		  | Some vi ->
+		    if  Varinfo.Set.mem p state_kf 
+		    then Varinfo.Set.add vi acc 
+		    else acc)
 		state
 		params
 		l
@@ -396,7 +406,13 @@ module rec Transfer
       | _ ->
 	(* imprecise function call: keep each argument *)
 	Dataflow.Done 
-	  (Some (List.fold_left (fun acc e -> register_exp acc e) state l)))
+	  (Some
+	     (List.fold_left
+		(fun acc e -> match base_addr e with
+		| None -> acc
+		| Some vi -> Varinfo.Set.add vi acc)
+		state 
+		l)))
     | Asm _ -> Error.not_yet "asm"
     | Skip _ | Code_annot _ -> Dataflow.Default
 
@@ -476,13 +492,8 @@ let consolidated_must_model_vi ?kf vi =
       (* TODO: should iterate in callgraph order *)
       Globals.Functions.iter 
 	(fun kf -> 
-	  try 
-	    let set = Compute.get kf in
-	    Env.consolidate set
-	  with exn ->
-	    Kernel.fatal "Pre-analysis failed for function %a:@\n%s"
-	      Kernel_function.pretty kf 
-	      (Printexc.to_string exn));
+	  let set = Compute.get kf in
+	  Env.consolidate set);
       (*    Options.feedback "MUST MODEL %s? %b (consolidated)" 
 	    vi.vname (Env.consolidated_mem vi);*)
       Env.consolidated_mem vi
