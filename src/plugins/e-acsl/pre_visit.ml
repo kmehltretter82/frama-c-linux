@@ -276,9 +276,14 @@ class dup_functions_visitor prj = object (self)
     with Not_found ->
       Cil.JustCopy
 
+  method private is_unvariadic_function vi =
+    match Cil.unrollType vi.vtype with
+    | TFun(_, _, variadic, _) -> not variadic
+    | _ -> false
+
   method vglob_aux = function
   | GVarDecl(_, vi, loc) | GFun({ svar = vi }, loc)
-      when Cil.isFunctionType vi.vtype
+      when self#is_unvariadic_function vi
 	&& not (Misc.is_library_loc loc) 
 	&& not (Cil.is_builtin vi)
 	&& not (Cil_datatype.Varinfo.Hashtbl.mem fct_tbl vi)

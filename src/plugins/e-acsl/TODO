@@ -16,6 +16,7 @@
   (voir test result.i, cas -e-acsl-gmp-only)
 - générer les delete des globals dans une fonction séparée, comme pour les init.
 - do not analyse library function in pre-analysis
+- variadic functions are not yet duplicated
 
 ##############
 # KNOWN BUGS #

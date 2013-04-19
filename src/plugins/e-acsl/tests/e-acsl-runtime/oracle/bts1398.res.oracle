@@ -1,0 +1,69 @@
+[kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc share/e-acsl/e_acsl_gmp_types.h"
+[kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc share/e-acsl/e_acsl_gmp.h"
+[kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc share/e-acsl/e_acsl.h"
+[kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_mmodel_api.h"
+[kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_bittree.h"
+[kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_mmodel.h"
+[kernel] preprocessing with "gcc -C -E -I.  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc tests/e-acsl-runtime/bts1398.c"
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value] Values of globals at initialization
+        __fc_random_counter ∈ {0}
+        __fc_rand_max ∈ {32767}
+        __fc_heap_status ∈ [--..--]
+        __memory_size ∈ [--..--]
+        __fc_stdout ∈ {{ NULL ; &S___fc_stdout }}
+        S___fc_stdout[0]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .mode} ∈
+                     [--..--]
+                     [0].__fc_inode ∈ {{ NULL ; &S___fc_inode_0_S___fc_stdout }}
+                     [1]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .mode} ∈
+                     [--..--]
+                     [1].__fc_inode ∈ {{ NULL ; &S___fc_inode_1_S___fc_stdout }}
+        S___fc_inode_0_S___fc_stdout[0]{.st_dev; .st_ino; .st_mode; .st_nlink; .st_uid; .st_gid; .st_rdev; .st_size; .st_atime; .st_mtime; .st_ctime; .st_blksize; .st_blocks} ∈
+                                    [--..--]
+                                    [0].__fc_real_data ∈
+                                    {{ NULL ;
+                                       &S___fc_real_data_0_S___fc_inode_0_S___fc_stdout }}
+                                    {[0].__fc_real_data_max_size; [1]{.st_dev; .st_ino; .st_mode; .st_nlink; .st_uid; .st_gid; .st_rdev; .st_size; .st_atime; .st_mtime; .st_ctime; .st_blksize; .st_blocks}} ∈
+                                    [--..--]
+                                    [1].__fc_real_data ∈
+                                    {{ NULL ;
+                                       &S___fc_real_data_1_S___fc_inode_0_S___fc_stdout }}
+                                    [1].__fc_real_data_max_size ∈ [--..--]
+        S___fc_real_data_0_S___fc_inode_0_S___fc_stdout[0..1] ∈ [--..--]
+        S___fc_real_data_1_S___fc_inode_0_S___fc_stdout[0..1] ∈ [--..--]
+        S___fc_inode_1_S___fc_stdout[0]{.st_dev; .st_ino; .st_mode; .st_nlink; .st_uid; .st_gid; .st_rdev; .st_size; .st_atime; .st_mtime; .st_ctime; .st_blksize; .st_blocks} ∈
+                                    [--..--]
+                                    [0].__fc_real_data ∈
+                                    {{ NULL ;
+                                       &S___fc_real_data_0_S___fc_inode_1_S___fc_stdout }}
+                                    {[0].__fc_real_data_max_size; [1]{.st_dev; .st_ino; .st_mode; .st_nlink; .st_uid; .st_gid; .st_rdev; .st_size; .st_atime; .st_mtime; .st_ctime; .st_blksize; .st_blocks}} ∈
+                                    [--..--]
+                                    [1].__fc_real_data ∈
+                                    {{ NULL ;
+                                       &S___fc_real_data_1_S___fc_inode_1_S___fc_stdout }}
+                                    [1].__fc_real_data_max_size ∈ [--..--]
+        S___fc_real_data_0_S___fc_inode_1_S___fc_stdout[0..1] ∈ [--..--]
+        S___fc_real_data_1_S___fc_inode_1_S___fc_stdout[0..1] ∈ [--..--]
+[value] using specification for function __store_block
+[value] using specification for function __full_init
+[value] using specification for function __literal_string
+[value] using specification for function printf
+[kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
+[value] using specification for function __clean
+[value] done for function main
+[value] ====== VALUES COMPUTED ======
+[value] Values at end of function main:
+          x ∈ {0}
+          t[0] ∈ {1}
+           [1] ∈ {2}
+          i ∈ {1}
+          __retres ∈ {0}
+          S___fc_stdout[0]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .mode} ∈
+                       [--..--]
+                       [0].__fc_inode ∈
+                       {{ NULL + [--..--] ; &S___fc_inode_0_S___fc_stdout }}
+                       [1]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .mode} ∈
+                       [--..--]
+                       [1].__fc_inode ∈ {{ NULL ; &S___fc_inode_1_S___fc_stdout }}
