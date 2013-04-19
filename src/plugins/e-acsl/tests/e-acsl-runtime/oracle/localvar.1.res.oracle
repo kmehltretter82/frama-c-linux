@@ -5,6 +5,7 @@
 [kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_bittree.h"
 [kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_mmodel.h"
 [kernel] preprocessing with "gcc -C -E -I.  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc tests/e-acsl-runtime/localvar.c"
+FRAMAC_SHARE/libc/stdlib.h:136:[e-acsl] warning: E-ACSL construct `\separated' is not yet supported. Ignoring annotation.
 tests/e-acsl-runtime/localvar.c:26:[e-acsl] warning: E-ACSL construct `complete behavior' is not yet supported.
                   Ignoring annotation.
 tests/e-acsl-runtime/localvar.c:26:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
@@ -21,7 +22,6 @@ tests/e-acsl-runtime/localvar.c:26:[e-acsl] warning: E-ACSL construct `logic fun
         __memory_size ∈ [--..--]
 [value] using specification for function __store_block
 [value] using specification for function __full_init
-[value] using specification for function __delete_block
 FRAMAC_SHARE/libc/stdlib.h:127:[value] Function __e_acsl_malloc, behavior allocation: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
 FRAMAC_SHARE/libc/stdlib.h:132:[value] Function __e_acsl_malloc, behavior no_allocation: postcondition got status invalid. (Behavior may be inactive, no reduction performed.)
 tests/e-acsl-runtime/localvar.c:20:[value] Assertion got status valid.
@@ -31,6 +31,7 @@ share/e-acsl/memory_model/e_acsl_mmodel.h:87:[value] Function __initialized: pos
 [value] using specification for function __valid
 [value] using specification for function e_acsl_assert
 share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
+[value] using specification for function __delete_block
 [kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
 [value] using specification for function __clean
 [value] done for function main

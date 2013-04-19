@@ -197,12 +197,12 @@ module rec Transfer
   let register_object kf state_ref = object
     inherit Visitor.frama_c_inplace
     method vpredicate = function
-    | Pvalid(_, t) | Pvalid_read(_, t) | Pinitialized(_, t)
-    | Pallocable(_, t) | Pfreeable(_, t) | Pfresh(_, _, t, _) ->
+    | Pvalid(_, t) | Pvalid_read(_, t) | Pinitialized(_, t) ->
       (*	Options.feedback "REGISTER %a" Cil.d_term t;*)
       state_ref := register_term kf !state_ref t;
       Cil.SkipChildren
-    | Pseparated _ -> Error.not_yet "\\separated"
+    | Pallocable _ | Pfreeable _ | Pfresh _ | Pseparated _ -> 
+      Error.not_yet "\\separated"
     | Ptrue | Pfalse | Papp _ | Prel _
     | Pand _ | Por _ | Pxor _ | Pimplies _ | Piff _ | Pnot _ | Pif _ 
     | Plet _ | Pforall _ | Pexists _ | Pat _ | Psubtype _ ->
