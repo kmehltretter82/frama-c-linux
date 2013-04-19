@@ -215,7 +215,15 @@ let size_of ty =
 
 let align_of ty = int_to_interv (Cil.bytesAlignOf ty)
 
-type offset_ty = Ty_no_offset | Ty_field of eacsl_typ | Ty_index of eacsl_typ
+type offset_ty = Ty_no_offset | Ty_field of eacsl_typ | Ty_index
+
+let type_of_indexed_host = function
+  | No_integral (Ctype ty) as ty_host -> 
+    (match Cil.unrollType ty with
+    | TArray(ty, _, _, _) -> eacsl_typ_of_typ ty
+    | TPtr _ -> ty_host
+    | _ -> assert  false)
+  | _ -> assert false
 
 let rec type_term t = 
   let lty = t.term_type in
@@ -334,14 +342,7 @@ and type_term_lval (h, o) =
   match ty_off with
   | Ty_no_offset -> ty_host
   | Ty_field ty -> ty
-  | Ty_index _ ->
-    match ty_host with
-    | No_integral (Ctype ty) -> 
-      (match Cil.unrollType ty with
-      |	TArray(ty, _, _, _) -> eacsl_typ_of_typ ty
-      | TPtr _ -> ty_host
-      | _ -> assert false)
-    | _ -> assert false
+  | Ty_index -> type_of_indexed_host ty_host
 
 and type_term_lhost = function
   | TVar lv -> 
@@ -370,12 +371,12 @@ and type_term_offset = function
   | TField(f, o) -> 
     (match type_term_offset o with
     | Ty_no_offset -> Ty_field (eacsl_typ_of_typ f.ftype)
-    | (Ty_field _ | Ty_index _) as ty -> ty)  
+    | Ty_index -> Ty_field (type_of_indexed_host (eacsl_typ_of_typ f.ftype))
+    | Ty_field _ as ty -> ty)
   | TIndex(t, o) ->
-    let ty = type_term t in
-    (match type_term_offset o with
-    | Ty_no_offset -> Ty_index ty
-    | (Ty_field _ | Ty_index _) as ty_off -> ty_off)  
+    ignore (type_term t);
+    ignore (type_term_offset o);
+    Ty_index
   | TModel _ -> Error.not_yet "model"
 
 and unary_arithmetic op t = 

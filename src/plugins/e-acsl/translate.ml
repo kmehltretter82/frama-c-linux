@@ -115,7 +115,7 @@ let conditional_to_exp ?(name="if") loc ctx e1 (e2, env2) (e3, env3) =
   in
   e, env
 
-let rec thost_to_host env = function
+let rec thost_to_host kf env = function
   | TVar { lv_origin = Some v } -> 
     Var (Cil.get_varinfo (Env.get_behavior env) v), env, v.vname
   | TVar ({ lv_origin = None } as logic_v) -> 
@@ -128,57 +128,57 @@ let rec thost_to_host env = function
     | Var v -> Var (Cil.get_varinfo (Env.get_behavior env) v), env, "result"
     | _ -> assert false)
   | TMem t ->
-    let e, env = term_to_exp env None t in
+    let e, env = term_to_exp kf env None t in
     Mem e, env, ""
 
-and toffset_to_offset ?loc env = function
+and toffset_to_offset ?loc kf env = function
   | TNoOffset -> NoOffset, env
   | TField(f, offset) -> 
     (* TODO: still untested *)
-    let offset, env = toffset_to_offset ?loc env offset in
+    let offset, env = toffset_to_offset ?loc kf env offset in
     Field(f, offset), env
   | TIndex(t, offset) -> 
-    let e, env = term_to_exp env (Some Cil.intType) t in
+    let e, env = term_to_exp kf env (Some Cil.intType) t in
     if Mpz.is_t (Cil.typeOf e) then
       Options.warning ~source:(fst e.eloc) ~once:true
 	"@[missing guard for ensuring that@ %a is a valid array index@]"
 	Printer.pp_term t;
-    let offset, env = toffset_to_offset env offset in
+    let offset, env = toffset_to_offset kf env offset in
     Index(e, offset), env
   | TModel _ -> not_yet env "model"
 
-and tlval_to_lval env (host, offset) = 
-  let host, env, name = thost_to_host env host in
-  let offset, env = toffset_to_offset env offset in
+and tlval_to_lval kf env (host, offset) = 
+  let host, env, name = thost_to_host kf env host in
+  let offset, env = toffset_to_offset kf env offset in
   let name = match offset with NoOffset -> name | Field _ | Index _ -> "" in
   (host, offset), env, name
 
 (* the returned boolean says that the expression is an mpz_string;
    the returned string is the name of the generated variable corresponding to
    the term. *)
-and context_insensitive_term_to_exp env t = 
+and context_insensitive_term_to_exp kf env t = 
   let loc = t.term_loc in
   match t.term_node with
   | TConst c -> 
     let c, is_mpz_string = constant_to_exp ~loc c in
     c, env, is_mpz_string, ""
   | TLval lv -> 
-    let lv, env, name = tlval_to_lval env lv in
+    let lv, env, name = tlval_to_lval kf env lv in
     Cil.new_exp ~loc (Lval lv), env, false, name
   | TSizeOf ty -> Cil.sizeOf ~loc ty, env, false, "sizeof"
   | TSizeOfE t ->
     let ctx = match t.term_type with Ctype ty -> ty | _ -> assert false in
-    let e, env = term_to_exp env (Some ctx) t in
+    let e, env = term_to_exp kf env (Some ctx) t in
     Cil.sizeOf ~loc (Cil.typeOf e), env, false, "sizeof"
   | TSizeOfStr s -> Cil.new_exp ~loc (SizeOfStr s), env, false, "sizeofstr"
   | TAlignOf ty -> Cil.new_exp ~loc (AlignOf ty), env, false, "alignof"
   | TAlignOfE t ->
     let ctx = match t.term_type with Ctype ty -> ty | _ -> assert false in
-    let e, env = term_to_exp env (Some ctx) t in
+    let e, env = term_to_exp kf env (Some ctx) t in
     Cil.new_exp ~loc (AlignOfE e), env, false, "alignof"
   | TUnOp(Neg | BNot as op, t') ->
     let ty = Typing.typ_of_term t in
-    let e, env = term_to_exp env (Some ty) t' in
+    let e, env = term_to_exp kf env (Some ty) t' in
     if Mpz.is_t ty then
       let name, vname = match op with
 	| Neg -> "__gmpz_neg", "neg"
@@ -201,18 +201,20 @@ and context_insensitive_term_to_exp env t =
     if Mpz.is_t ty then
       (* [!t] is converted into [t == 0] *)
       let zero = Logic_const.tinteger 0 in
-      let e, env = comparison_to_exp ~loc ~name:"not" env Eq t zero (Some t) in
+      let e, env = 
+	comparison_to_exp kf ~loc ~name:"not" env Eq t zero (Some t) 
+      in
       e, env, false, ""
     else begin
       assert (Cil.isIntegralType ty);
-      let e, env = term_to_exp env None t in
+      let e, env = term_to_exp kf env None t in
       Cil.new_exp ~loc (UnOp(LNot, e, Cil.intType)), env, false, ""
     end
   | TBinOp(PlusA | MinusA | Mult as bop, t1, t2) ->
     let ty = Typing.typ_of_term t in
     let ctx = Some ty in
-    let e1, env = term_to_exp env ctx t1 in
-    let e2, env = term_to_exp env ctx t2 in
+    let e1, env = term_to_exp kf env ctx t1 in
+    let e2, env = term_to_exp kf env ctx t2 in
     if Mpz.is_t ty then
       let name = name_of_mpz_arith_bop bop in
       let mk_stmts _ e = [ Misc.mk_call ~loc name [ e; e1; e2 ] ] in
@@ -226,8 +228,8 @@ and context_insensitive_term_to_exp env t =
   | TBinOp(Div | Mod as bop, t1, t2) ->
     let ty = Typing.typ_of_term t in
     let ctx = Some ty in
-    let e1, env = term_to_exp env ctx t1 in
-    let e2, env = term_to_exp env ctx t2 in
+    let e1, env = term_to_exp kf env ctx t1 in
+    let e2, env = term_to_exp kf env ctx t2 in
     if Mpz.is_t ty then 
       let t = Some t in
       let name = name_of_mpz_arith_bop bop in
@@ -238,7 +240,7 @@ and context_insensitive_term_to_exp env t =
       (* do not generate [e2] from [t2] twice *)
       let guard, env = 
 	let name = name_of_binop bop ^ "_guard" in
-	comparison_to_exp ~loc env ~e1:(e2, ty) ~name Eq t2 zero t 
+	comparison_to_exp ~loc kf env ~e1:(e2, ty) ~name Eq t2 zero t 
       in
       let mk_stmts _v e = 
 	assert (Mpz.is_t ty);
@@ -263,7 +265,7 @@ and context_insensitive_term_to_exp env t =
       Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)), env, false, ""
   | TBinOp(Lt | Gt | Le | Ge | Eq | Ne as bop, t1, t2) ->
     (* comparison operators *)
-    let e, env = comparison_to_exp ~loc env bop t1 t2 (Some t) in
+    let e, env = comparison_to_exp ~loc kf env bop t1 t2 (Some t) in
     e, env, false, ""
   | TBinOp((Shiftlt | Shiftrt), _, _) ->
     (* left/right shift *)
@@ -271,9 +273,9 @@ and context_insensitive_term_to_exp env t =
   | TBinOp(LOr, t1, t2) ->
     (* t1 || t2 <==> if t1 then true else t2 *)
     let ty = Typing.principal_type t1 t2 in
-    let e1, env1 = term_to_exp env (Some Cil.intType) t1 in
+    let e1, env1 = term_to_exp kf env (Some Cil.intType) t1 in
     let env' = Env.push env1 in
-    let res2 = term_to_exp (Env.push env') (Some ty) t2 in
+    let res2 = term_to_exp kf (Env.push env') (Some ty) t2 in
     let e, env = 
       conditional_to_exp ~name:"or" loc ty e1 (Cil.one loc, env') res2 
     in
@@ -281,8 +283,8 @@ and context_insensitive_term_to_exp env t =
   | TBinOp(LAnd, t1, t2) ->
     (* t1 && t2 <==> if t1 then t2 else false *)
     let ty = Typing.principal_type t1 t2 in
-    let e1, env1 = term_to_exp env (Some Cil.intType) t1 in
-    let _, env2 as res2 = term_to_exp (Env.push env1) (Some ty) t2 in
+    let e1, env1 = term_to_exp kf env (Some Cil.intType) t1 in
+    let _, env2 as res2 = term_to_exp kf (Env.push env1) (Some ty) t2 in
     let env3 = Env.push env2 in
     let e, env = 
       conditional_to_exp ~name:"and" loc ty e1 res2 (Cil.zero loc, env3) 
@@ -302,43 +304,43 @@ and context_insensitive_term_to_exp env t =
       else if Mpz.is_t ty2 then Some ty1, Some Cil.longType, ty1
       else Some ty1, Some ty2, if Cil.isIntegralType ty1 then ty2 else ty1
     in
-    let e1, env = term_to_exp env ctx1 t1 in
-    let e2, env = term_to_exp env ctx2 t2 in
+    let e1, env = term_to_exp kf env ctx1 t1 in
+    let e2, env = term_to_exp kf env ctx2 t2 in
     Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)), env, false, ""
   | TCastE(ty, t) ->
-    let e, env = term_to_exp env (Some ty) t in
+    let e, env = term_to_exp kf env (Some ty) t in
     Cil.mkCast e ty, env, false, "cast"
   | TLogic_coerce _ -> assert false (* handle in [term_to_exp] *)
   | TAddrOf lv -> 
-    let lv, env, _ = tlval_to_lval env lv in
+    let lv, env, _ = tlval_to_lval kf env lv in
     Cil.mkAddrOf ~loc lv, env, false, "addrof"
   | TStartOf lv -> 
-    let lv, env, _ = tlval_to_lval env lv in
+    let lv, env, _ = tlval_to_lval kf env lv in
     Cil.mkAddrOrStartOf ~loc lv, env, false, "startof"
   | Tapp _ -> not_yet env "applying logic function"
   | Tlambda _ -> not_yet env "functional"
   | TDataCons _ -> not_yet env "constructor"
   | Tif(t1, t2, t3) -> 
-    let e1, env1 = term_to_exp env (Some Cil.intType) t1 in
+    let e1, env1 = term_to_exp kf env (Some Cil.intType) t1 in
     let ty = Typing.principal_type t2 t3 in
     let ctx = Some ty in
-    let (_, env2 as res2) = term_to_exp (Env.push env1) ctx t2 in
-    let res3 = term_to_exp (Env.push env2) ctx t3 in
+    let (_, env2 as res2) = term_to_exp kf (Env.push env1) ctx t2 in
+    let res3 = term_to_exp kf (Env.push env2) ctx t3 in
     let e, env = conditional_to_exp loc ty e1 res2 res3 in
     e, env, false, ""
   | Tat(t', label) ->
     (* convert [t'] to [e] in a separated local env *)
-    let e, env = term_to_exp (Env.push env) None t' in
+    let e, env = term_to_exp kf (Env.push env) None t' in
     let e, env, is_mpz_string = at_to_exp env (Some t) label e in
     e, env, is_mpz_string, ""
   | Tbase_addr(LogicLabel(_, label), t) when label = "Here" ->
-    mmodel_call ~loc "base_addr" Cil.voidPtrType env t
+    mmodel_call ~loc kf "base_addr" Cil.voidPtrType env t
   | Tbase_addr _ -> not_yet env "labeled \\base_addr"
   | Toffset(LogicLabel(_, label), t) when label = "Here" ->
-    mmodel_call ~loc "offset" Cil.intType env t 
+    mmodel_call ~loc kf "offset" Cil.intType env t 
   | Toffset _ -> not_yet env "labeled \\offset"
   | Tblock_length(LogicLabel(_, label), t) when label = "Here" ->
-    mmodel_call ~loc "block_length" Cil.ulongType env t
+    mmodel_call ~loc kf "block_length" Cil.ulongType env t
   | Tblock_length _ -> not_yet env "labeled \\block_length"
   | Tnull -> Cil.mkCast (Cil.zero ~loc) (TPtr(TVoid [], [])), env, false, "null"
   | TCoerce _ -> Error.untypable "coercion" (* Jessie specific *)
@@ -356,9 +358,9 @@ and context_insensitive_term_to_exp env t =
 (* Convert an ACSL term into a corresponding C expression (if any) in the given
    environment. Also extend this environment in order to include the generating
    constructs. *)
-and term_to_exp env ctx t = 
+and term_to_exp kf env ctx t = 
   let t = match t.term_node with TLogic_coerce(_, t) -> t | _ -> t in
-  let e, env, is_mpz_string, name = context_insensitive_term_to_exp env t in
+  let e, env, is_mpz_string, name = context_insensitive_term_to_exp kf env t in
   match ctx with
   | None -> e, env
   | Some ty -> 
@@ -374,16 +376,17 @@ and term_to_exp env ctx t =
 
 (* generate the C code equivalent to [t1 bop t2]. *)
 and comparison_to_exp
-    ?(loc=Location.unknown) ?e1 env bop ?(name=name_of_binop bop) t1 t2 t_opt =
+    ?(loc=Location.unknown) ?e1 kf env bop ?(name=name_of_binop bop) 
+    t1 t2 t_opt =
   let e1, env, ctx = match e1 with
     | None -> 
       let ctx = Typing.principal_type t1 t2  in
-      let e1, env = term_to_exp env (Some ctx) t1 in
+      let e1, env = term_to_exp kf env (Some ctx) t1 in
       e1, env, ctx
     | Some(e1, ctx) -> 
       e1, env, ctx
   in
-  let e2, env = term_to_exp env (Some ctx) t2 in
+  let e2, env = term_to_exp kf env (Some ctx) t2 in
   if Mpz.is_t ctx then
     let _, e, env =
       Env.new_var
@@ -400,8 +403,9 @@ and comparison_to_exp
     Cil.new_exp  ~loc (BinOp(bop, e1, e2, Cil.intType)), env
 
 (* \base_addr and \block_length annotations *)
-and mmodel_call ~loc name ctx env t =
-  let e, env = term_to_exp env None t in
+and mmodel_call ~loc kf name ctx env t =
+  let e, env = term_to_exp kf env None t in
+  let env = !Quantif.rte_to_exp_ref kf env e in
   let _, res, env = 
     Env.new_var
       ~loc
@@ -415,9 +419,10 @@ and mmodel_call ~loc name ctx env t =
   res, env, false, name
 
 (* \valid, \offset and \initialized annotations *)
-and mmodel_call_with_size ~loc name ctx env t =
-  let e, env = term_to_exp env None t in
+and mmodel_call_with_size ~loc kf name ctx env t =
+  let e, env = term_to_exp kf env None t in
   let typ = Typing.typ_of_term t in
+  let env = !Quantif.rte_to_exp_ref kf env e in
   let _, res, env =
     Env.new_var
       ~loc
@@ -516,7 +521,7 @@ let rec named_predicate_to_exp ?name kf env p =
   | Pseparated _ -> not_yet env "\\separated"
   | Prel(rel, t1, t2) -> 
     let e, env = 
-      comparison_to_exp ~loc env (relation_to_binop rel) t1 t2 None 
+      comparison_to_exp ~loc kf env (relation_to_binop rel) t1 t2 None 
     in
     Typing.context_sensitive ~loc env Cil.intType false None e
   | Pand(p1, p2) ->
@@ -554,7 +559,7 @@ let rec named_predicate_to_exp ?name kf env p =
     let e, env = named_predicate_to_exp kf env p in
     Cil.new_exp ~loc (UnOp(LNot, e, Cil.intType)), env
   | Pif(t, p2, p3) ->
-    let e1, env1 = term_to_exp env (Some Cil.intType) t in
+    let e1, env1 = term_to_exp kf env (Some Cil.intType) t in
     let (_, env2 as res2) = named_predicate_to_exp kf (Env.push env1) p2 in
     let res3 = named_predicate_to_exp kf (Env.push env2) p3 in
     conditional_to_exp loc Cil.intType e1 res2 res3
@@ -574,7 +579,7 @@ let rec named_predicate_to_exp ?name kf env p =
 	| Pvalid_read _ -> "valid_read"
 	| _ -> assert false
       in
-      mmodel_call_with_size ~loc name Cil.intType env t 
+      mmodel_call_with_size ~loc kf name Cil.intType env t 
     in
     if !is_visiting_valid then begin
       (* we already transformed \valid(t) into \initialized(t) && \valid(t):
@@ -601,7 +606,7 @@ let rec named_predicate_to_exp ?name kf env p =
   | Pvalid _ -> not_yet env "labeled \\valid"
   | Pvalid_read _ -> not_yet env "labeled \\valid_read"
   | Pinitialized(LogicLabel(_, label), t) when label = "Here" ->
-    mmodel_call_with_size ~loc "initialized" Cil.intType env t
+    mmodel_call_with_size ~loc kf "initialized" Cil.intType env t
   | Pinitialized _ -> not_yet env "labeled \\initialized"
   | Pallocable _ -> not_yet env "\\allocate"
   | Pfreeable _ -> not_yet env "\\free"

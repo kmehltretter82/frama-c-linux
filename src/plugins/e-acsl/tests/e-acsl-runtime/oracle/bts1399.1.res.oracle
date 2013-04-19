@@ -1,0 +1,56 @@
+[kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc share/e-acsl/e_acsl_gmp_types.h"
+[kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc share/e-acsl/e_acsl_gmp.h"
+[kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc share/e-acsl/e_acsl.h"
+[kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_mmodel_api.h"
+[kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_bittree.h"
+[kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_mmodel.h"
+[kernel] preprocessing with "gcc -C -E -I.  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc tests/e-acsl-runtime/bts1399.c"
+FRAMAC_SHARE/libc/stdlib.h:152:[e-acsl] warning: E-ACSL construct `\allocable' is not yet supported. Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:152:[e-acsl] warning: E-ACSL construct `\freeable' is not yet supported. Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:136:[e-acsl] warning: E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
+tests/e-acsl-runtime/bts1399.c:19:[e-acsl] warning: E-ACSL construct `complete behavior' is not yet supported.
+                  Ignoring annotation.
+tests/e-acsl-runtime/bts1399.c:19:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+                  Ignoring annotation.
+tests/e-acsl-runtime/bts1399.c:19:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+                  Ignoring annotation.
+tests/e-acsl-runtime/bts1399.c:19:[e-acsl] warning: E-ACSL construct `\free' is not yet supported. Ignoring annotation.
+tests/e-acsl-runtime/bts1399.c:19:[e-acsl] warning: E-ACSL construct `\allocate' is not yet supported. Ignoring annotation.
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value] Values of globals at initialization
+        __fc_random_counter ∈ {0}
+        __fc_rand_max ∈ {32767}
+        __fc_heap_status ∈ [--..--]
+        __memory_size ∈ [--..--]
+[value] using specification for function __store_block
+[value] using specification for function __full_init
+FRAMAC_SHARE/libc/stdlib.h:127:[value] Function __e_acsl_malloc, behavior allocation: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
+FRAMAC_SHARE/libc/stdlib.h:132:[value] Function __e_acsl_malloc, behavior no_allocation: postcondition got status invalid. (Behavior may be inactive, no reduction performed.)
+[value] using specification for function __initialize
+tests/e-acsl-runtime/bts1399.c:24:[value] Assertion got status valid.
+[value] using specification for function __valid_read
+[value] using specification for function e_acsl_assert
+share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
+[value] using specification for function __initialized
+share/e-acsl/memory_model/e_acsl_mmodel.h:86:[value] Function __initialized: postcondition got status unknown.
+share/e-acsl/memory_model/e_acsl_mmodel.h:87:[value] Function __initialized: postcondition got status unknown.
+share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
+FRAMAC_SHARE/libc/stdlib.h:142:[value] Function __e_acsl_free, behavior deallocation: precondition got status unknown.
+FRAMAC_SHARE/libc/stdlib.h:144:[value] Function __e_acsl_free, behavior deallocation: postcondition got status unknown.
+[value] using specification for function __delete_block
+[kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
+[value] using specification for function __clean
+[value] done for function main
+[value] ====== VALUES COMPUTED ======
+[value] Values at end of function __e_acsl_free:
+          __fc_heap_status ∈ [--..--]
+[value] Values at end of function __e_acsl_malloc:
+          __fc_heap_status ∈ [--..--]
+          __retres ∈ {{ &Frama_C_alloc }}
+[value] Values at end of function main:
+          __fc_heap_status ∈ [--..--]
+          state ∈ ESCAPINGADDR
+          __retres ∈ {0}
+          Frama_C_alloc[0..447] ∈ UNINITIALIZED

@@ -47,6 +47,10 @@ extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
 /*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) int __valid(void *ptr, size_t size);
 
+/*@ assigns \nothing; */
+extern  __attribute__((__FC_BUILTIN__)) int __valid_read(void *ptr,
+                                                         size_t size);
+
 /*@ ensures \result ≡ 0 ∨ \result ≡ 1;
     ensures
       \result ≡ 1 ⇒ \initialized((char *)\old(ptr)+(0..\old(size)-1));
@@ -122,7 +126,13 @@ struct list *__e_acsl_f(struct list *l)
       __e_acsl_initialized = __initialized((void *)(& l->next),
                                            sizeof(struct list *));
       if (__e_acsl_initialized) {
+        int __e_acsl_valid_read;
         int __e_acsl_valid_2;
+        __e_acsl_valid_read = __valid_read((void *)(& l->next),
+                                           sizeof(struct list *));
+        e_acsl_assert(__e_acsl_valid_read,(char *)"Postcondition",
+                      (char *)"f",
+                      (char *)"mem_access: \\valid_read(&l->next)",0);
         __e_acsl_valid_2 = __valid((void *)l->next,sizeof(struct list));
         __e_acsl_and = __e_acsl_valid_2;
       }

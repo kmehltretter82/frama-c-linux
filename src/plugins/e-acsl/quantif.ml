@@ -29,7 +29,7 @@ let named_predicate_to_exp_ref
     = Extlib.mk_fun "named_predicate_to_exp_ref"
 
 let term_to_exp_ref
-    : (Env.t -> typ option -> term -> exp * Env.t) ref
+    : (kernel_function -> Env.t -> typ option -> term -> exp * Env.t) ref
     = Extlib.mk_fun "term_to_exp_ref"
 
 let rte_to_exp_ref
@@ -187,7 +187,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
       (* build the inner loops and loop body *)
       let body, env = mk_for_loop env tl in
       (* initialize the loop counter to [t1] *)
-      let e1, env = term_to_exp (Env.push env) (Some ty) t1 in
+      let e1, env = term_to_exp kf (Env.push env) (Some ty) t1 in
       let init_blk, env = 
 	Env.pop_and_get 
 	  env
@@ -200,7 +200,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
       let tlv = Logic_const.tvar ~loc llv in
       let guard = Logic_const.term (TBinOp(bop2, tlv, t2)) Linteger in
       Typing.type_term guard;
-      let guard_exp, env = term_to_exp (Env.push env) (Some intType) guard in
+      let guard_exp, env = term_to_exp kf (Env.push env) (Some intType) guard in
       let break_stmt = mkStmt ~valid_sid:true (Break guard_exp.eloc) in
       let guard_blk, env =
 	Env.pop_and_get
@@ -218,7 +218,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
       let tlv_one = t_plus_one tlv in
       (* previous typing ensures that [x++] fits type [ty] *)
       Typing.unsafe_set_term tlv_one ty;
-      let incr, env = term_to_exp (Env.push env) (Some ty) tlv_one in
+      let incr, env = term_to_exp kf (Env.push env) (Some ty) tlv_one in
       let next_blk, env = 
 	Env.pop_and_get
 	  env
