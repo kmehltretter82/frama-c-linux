@@ -201,8 +201,10 @@ module rec Transfer
       (*	Options.feedback "REGISTER %a" Cil.d_term t;*)
       state_ref := register_term kf !state_ref t;
       Cil.SkipChildren
-    | Pallocable _ | Pfreeable _ | Pfresh _ | Pseparated _ -> 
-      Error.not_yet "\\separated"
+    | Pallocable _ -> Error.not_yet "\\allocable"
+    | Pfreeable _ -> Error.not_yet "\\freeable"
+    | Pfresh _ -> Error.not_yet "\\fresh"
+    | Pseparated _ -> Error.not_yet "\\separated"
     | Ptrue | Pfalse | Papp _ | Prel _
     | Pand _ | Por _ | Pxor _ | Pimplies _ | Piff _ | Pnot _ | Pif _ 
     | Plet _ | Pforall _ | Pexists _ | Pat _ | Psubtype _ ->
