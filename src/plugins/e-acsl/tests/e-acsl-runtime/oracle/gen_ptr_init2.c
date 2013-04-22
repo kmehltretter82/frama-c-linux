@@ -119,14 +119,16 @@ void f(void)
 
 void g(int *C, int *D)
 {
-  __store_block((void *)(& C),4U);
-  __full_init((void *)(& C));
-  __store_block((void *)(& D),4U);
-  __full_init((void *)(& D));
-  __full_init((void *)(& C));
-  C = D;
+  /*@ assert \initialized(&C); */
+  {
+    int __e_acsl_initialized;
+    __store_block((void *)(& C),4U);
+    __full_init((void *)(& C));
+    __e_acsl_initialized = __initialized((void *)(& C),sizeof(int *));
+    e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"g",
+                  (char *)"\\initialized(&C)",19);
+  }
   __delete_block((void *)(& C));
-  __delete_block((void *)(& D));
   return;
 }
 
@@ -144,51 +146,34 @@ int main(void)
   int __retres;
   int *x;
   int *y;
-  int *z;
-  int *t;
   e_acsl_global_init();
-  __store_block((void *)(& t),4U);
-  __store_block((void *)(& z),4U);
   __store_block((void *)(& y),4U);
   __store_block((void *)(& x),4U);
   __full_init((void *)(& B));
   B = (int *)__e_acsl_malloc(sizeof(int));
   __full_init((void *)(& y));
   y = (int *)__e_acsl_malloc(sizeof(int));
-  __full_init((void *)(& t));
-  t = (int *)__e_acsl_malloc(sizeof(int));
   __full_init((void *)(& x));
   x = y;
   f();
-  __full_init((void *)(& z));
-  __full_init((void *)(& t));
-  g(z,t);
   /*@ assert \initialized(&A); */
   {
     int __e_acsl_initialized;
     __e_acsl_initialized = __initialized((void *)(& A),sizeof(int *));
     e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"main",
-                  (char *)"\\initialized(&A)",30);
+                  (char *)"\\initialized(&A)",28);
   }
   /*@ assert \initialized(&x); */
   {
     int __e_acsl_initialized_2;
     __e_acsl_initialized_2 = __initialized((void *)(& x),sizeof(int *));
     e_acsl_assert(__e_acsl_initialized_2,(char *)"Assertion",(char *)"main",
-                  (char *)"\\initialized(&x)",31);
+                  (char *)"\\initialized(&x)",29);
   }
-  /*@ assert \initialized(&z); */
-  {
-    int __e_acsl_initialized_3;
-    __e_acsl_initialized_3 = __initialized((void *)(& z),sizeof(int *));
-    e_acsl_assert(__e_acsl_initialized_3,(char *)"Assertion",(char *)"main",
-                  (char *)"\\initialized(&z)",32);
-  }
+  g(x,y);
   __retres = 0;
   __delete_block((void *)(& B));
   __delete_block((void *)(& A));
-  __delete_block((void *)(& t));
-  __delete_block((void *)(& z));
   __delete_block((void *)(& y));
   __delete_block((void *)(& x));
   __clean();

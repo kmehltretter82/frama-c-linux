@@ -27,6 +27,6 @@ int main(void) {
   f();
   /*@ assert \initialized(&A); */
   /*@ assert \initialized(&x); */
-  g(y, x);
+  g(x, y);
   return 0;
 }
