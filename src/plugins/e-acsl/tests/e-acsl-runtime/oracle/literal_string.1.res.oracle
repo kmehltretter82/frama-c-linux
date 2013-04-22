@@ -42,6 +42,7 @@ tests/e-acsl-runtime/literal_string.i:26:[value] Assertion got status valid.
 [value] using specification for function __valid_read
 tests/e-acsl-runtime/literal_string.i:27:[value] Assertion got status valid.
 [value] using specification for function __valid
+tests/e-acsl-runtime/literal_string.i:13:[value] Assertion got status valid.
 [value] using specification for function __delete_block
 [kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
 [value] using specification for function __clean
@@ -51,8 +52,11 @@ tests/e-acsl-runtime/literal_string.i:27:[value] Assertion got status valid.
           T ∈ {{ "bar" }}
           S ∈ {{ "foo" }}
           S2 ∈ {{ "foo2" }}
+[value] Values at end of function f:
+          G ∈ {1}
 [value] Values at end of function main:
           T ∈ {{ "bar" }}
+          G ∈ {1}
           S ∈ {{ "foo" }}
           S2 ∈ {{ "foo2" }}
           SS ∈ {{ "ss" }}

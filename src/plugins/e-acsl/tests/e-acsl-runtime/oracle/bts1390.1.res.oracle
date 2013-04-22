@@ -5,7 +5,6 @@
 [kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_bittree.h"
 [kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_mmodel.h"
 [kernel] preprocessing with "gcc -C -E -I.  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc tests/e-acsl-runtime/bts1390.c"
-tests/e-acsl-runtime/bts1390.c:18:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed
@@ -14,9 +13,34 @@ tests/e-acsl-runtime/bts1390.c:18:[e-acsl] warning: missing guard for ensuring t
         __fc_rand_max ∈ {32767}
         __fc_heap_status ∈ [--..--]
         __memory_size ∈ [--..--]
+[value] using specification for function __store_block
+[value] using specification for function __full_init
+[value] using specification for function __literal_string
+:0:[value] entering loop for the first time
+[value] using specification for function __valid_read
+[value] using specification for function e_acsl_assert
+share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
+tests/e-acsl-runtime/bts1390.c:20:[value] entering loop for the first time
+[value] using specification for function __delete_block
+tests/e-acsl-runtime/bts1390.c:13:[value] Function memchr, behavior exists: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
+tests/e-acsl-runtime/bts1390.c:16:[value] Function memchr, behavior not_exists: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
+tests/e-acsl-runtime/bts1390.c:13:[value] entering loop for the first time
+[value] using specification for function __offset
+share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
+tests/e-acsl-runtime/bts1390.c:13:[value] Function __e_acsl_memchr, behavior exists: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
+tests/e-acsl-runtime/bts1390.c:16:[value] Function __e_acsl_memchr, behavior not_exists: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
+tests/e-acsl-runtime/bts1390.c:21:[kernel] warning: out of bounds read. assert \valid_read(s);
+tests/e-acsl-runtime/bts1390.c:16:[value] Function memchr, behavior not_exists: postcondition got status valid. (Behavior may be inactive, no reduction performed.)
+tests/e-acsl-runtime/bts1390.c:16:[value] Function __e_acsl_memchr, behavior not_exists: postcondition got status valid. (Behavior may be inactive, no reduction performed.)
 [kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
 [value] using specification for function __clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
+[value] Values at end of function memchr:
+          i ∈ {0; 1; 2; 3; 4}
+          s ∈ {{ "toto" + {0; 1} ; "toto" + [0..15] }}
+          __retres ∈ {{ NULL ; "toto" + {1} }}
+[value] Values at end of function __e_acsl_memchr:
+          __retres ∈ {{ NULL ; "toto" + {1} }}
 [value] Values at end of function main:
           __retres ∈ {0}

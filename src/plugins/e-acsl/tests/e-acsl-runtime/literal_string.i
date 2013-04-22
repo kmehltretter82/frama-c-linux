@@ -25,6 +25,7 @@ int main(void) {
   /*@ assert \initialized(S); */
   /*@ assert \valid_read(S2); */
   /*@ assert ! \valid(SS); */
+  f();
   return 0;
 }
 

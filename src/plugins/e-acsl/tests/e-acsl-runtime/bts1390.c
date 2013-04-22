@@ -7,21 +7,25 @@
 
 #include "stdlib.h"
 
-/*@ ensures 
-  \forall int i; 0 <= i < \offset((char*)\result) ==> ((char*)s)[i] != c;
-  @*/
-void *memchr(const void *s, int c, size_t n) {
-  return 0;
-}
-
-/*@ ensures 
-  \forall int i; 
-  0 <= i <= \offset((char*)\result) ==> ((char*)s)[i] != c;
-  @*/
-void *memchr3(const void *s, int c, size_t n) {
-  return 0;
+/*@ behavior exists:
+  assumes \exists integer i; 0 <= i < n && ((char*)buf)[i] == c;
+  ensures
+  \forall int i; 0 <= i < \offset((char*)\result) ==> ((char*)buf)[i] != c; 
+  behavior not_exists:
+  assumes \forall integer i; 0 <= i < n ==> ((char*)buf)[i] != c;
+  ensures \result == (void*) 0; */
+void *memchr(const void *buf, int c, size_t n) {
+  int i;
+  char *s = buf;
+  for(i = 0; i < n; i++) {
+    if(*s == c) return s;
+    s++;
+  }
+  return (void*)0;
 }
 
 int main(void) {
+  memchr("toto", 'o', 4);
+  memchr("toto", 'a', 4);
   return 0;
 }

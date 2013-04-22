@@ -227,6 +227,13 @@ let rte3 ?(warn=true) fname ty =
       warn_rte warn exn;
       fun _ _ _ -> []
 
+(* ************************************************************************** *)
+(** {2 Other stuff} *)
+(* ************************************************************************** *)
+
+let term_addr_of ~loc tlv ty =
+  Logic_const.taddrof ~loc tlv (Ctype (TPtr(ty, [])))
+
 (*
 Local Variables:
 compile-command: "make"

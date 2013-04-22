@@ -10,52 +10,6 @@ typedef unsigned int size_t;
 /*@
 model __mpz_struct { ℤ n };
 */
-/*@ requires ¬\initialized(z);
-    ensures \valid(\old(z));
-    assigns *z;
-    allocates \old(z);
- */
-extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init(__mpz_struct * /*[1]*/ z);
-
-/*@ requires ¬\initialized(z);
-    ensures \valid(\old(z));
-    ensures \initialized(\old(z));
-    assigns *z;
-    assigns *z \from n;
-    allocates \old(z);
- */
-extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z,
-                                                                long n);
-
-/*@ requires ¬\initialized(z);
-    ensures \valid(\old(z));
-    ensures \initialized(\old(z));
-    assigns *z;
-    assigns *z \from str, base;
-    allocates \old(z);
- */
-extern  __attribute__((__FC_BUILTIN__)) int __gmpz_init_set_str(__mpz_struct * /*[1]*/ z,
-                                                                char const *str,
-                                                                int base);
-
-/*@ requires \valid(x);
-    assigns *x; */
-extern  __attribute__((__FC_BUILTIN__)) void __gmpz_clear(__mpz_struct * /*[1]*/ x);
-
-/*@ requires \valid(z1);
-    requires \valid(z2);
-    requires \valid(z3);
-    assigns *z1;
-    assigns *z1 \from *z2, *z3;
- */
-extern  __attribute__((__FC_BUILTIN__)) void __gmpz_add(__mpz_struct * /*[1]*/ z1,
-                                                        __mpz_struct const * /*[1]*/ z2,
-                                                        __mpz_struct const * /*[1]*/ z3);
-
-/*@ requires \valid(z);
-    assigns \nothing; */
-extern  __attribute__((__FC_BUILTIN__)) unsigned long __gmpz_get_ui(__mpz_struct const * /*[1]*/ z);
-
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
@@ -87,6 +41,9 @@ extern  __attribute__((__FC_BUILTIN__)) void __delete_block(void *ptr);
 extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
 
 /*@ assigns \nothing; */
+extern  __attribute__((__FC_BUILTIN__)) void __literal_string(void *ptr);
+
+/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) int __valid_read(void *ptr,
                                                          size_t size);
 
@@ -101,181 +58,178 @@ extern size_t __memory_size;
 predicate diffSize{L1, L2}(ℤ i) =
   \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
  */
-/*@ ensures
-      ∀ int i;
-        0 ≤ i ∧ i < \offset((char *)\result) ⇒
-        (int)*((char *)\old(s)+i) ≢ \old(c);
+/*@ behavior exists:
+      assumes ∃ ℤ i; (0 ≤ i ∧ i < n) ∧ (int)*((char *)buf+i) ≡ c;
+      ensures
+        ∀ int i;
+          0 ≤ i ∧ i < \offset((char *)\result) ⇒
+          (int)*((char *)\old(buf)+i) ≢ \old(c);
+    
+    behavior not_exists:
+      assumes ∀ ℤ i; 0 ≤ i ∧ i < n ⇒ (int)*((char *)buf+i) ≢ c;
+      ensures \result ≡ (void *)0;
  */
-void *memchr(void const *s, int c, size_t n)
+void *memchr(void const *buf, int c, size_t n)
 {
   void *__retres;
-  __store_block((void *)(& __retres),4U);
+  int i;
+  char *s;
   __store_block((void *)(& s),4U);
+  __store_block((void *)(& __retres),4U);
+  __store_block((void *)(& buf),4U);
+  __full_init((void *)(& buf));
   __full_init((void *)(& s));
+  s = (char *)buf;
+  i = 0;
+  while ((size_t)i < n) {
+    if ((int)*s == c) {
+      __full_init((void *)(& __retres));
+      __retres = (void *)s;
+      goto return_label;
+    }
+    __full_init((void *)(& s));
+    s ++;
+    i ++;
+  }
   __full_init((void *)(& __retres));
   __retres = (void *)0;
-  __delete_block((void *)(& s));
-  __delete_block((void *)(& __retres));
-  return __retres;
+  return_label: /* internal */
+    __delete_block((void *)(& buf));
+    __delete_block((void *)(& s));
+    __delete_block((void *)(& __retres));
+    return __retres;
 }
 
-/*@ ensures
-      ∀ int i;
-        0 ≤ i ∧ i < \offset((char *)\result) ⇒
-        (int)*((char *)\old(s)+i) ≢ \old(c);
+/*@ behavior exists:
+      assumes ∃ ℤ i; (0 ≤ i ∧ i < n) ∧ (int)*((char *)buf+i) ≡ c;
+      ensures
+        ∀ int i;
+          0 ≤ i ∧ i < \offset((char *)\result) ⇒
+          (int)*((char *)\old(buf)+i) ≢ \old(c);
+    
+    behavior not_exists:
+      assumes ∀ ℤ i; 0 ≤ i ∧ i < n ⇒ (int)*((char *)buf+i) ≢ c;
+      ensures \result ≡ (void *)0;
  */
-void *__e_acsl_memchr(void const *s, int c, size_t n)
+void *__e_acsl_memchr(void const *buf, int c, size_t n)
 {
-  int __e_acsl_at_2;
-  void const *__e_acsl_at;
+  int __e_acsl_at_4;
+  int __e_acsl_at_3;
+  void const *__e_acsl_at_2;
+  int __e_acsl_at;
   void *__retres;
   __store_block((void *)(& __retres),4U);
-  __store_block((void *)(& s),4U);
-  __full_init((void *)(& s));
+  __store_block((void *)(& buf),4U);
+  __full_init((void *)(& buf));
   __store_block((void *)(& c),4U);
   __full_init((void *)(& c));
   __store_block((void *)(& n),4U);
   __full_init((void *)(& n));
   __full_init((void *)(& __retres));
+  {
+    int __e_acsl_forall_2;
+    unsigned int __e_acsl_i_3;
+    __e_acsl_forall_2 = 1;
+    __e_acsl_i_3 = (unsigned int)0;
+    while (1) {
+      if (__e_acsl_i_3 < n) ; else break;
+      {
+        int __e_acsl_valid_read_3;
+        __e_acsl_valid_read_3 = __valid_read((void *)((char *)buf + __e_acsl_i_3),
+                                             sizeof(char));
+        e_acsl_assert(__e_acsl_valid_read_3,(char *)"Postcondition",
+                      (char *)"memchr",
+                      (char *)"mem_access: \\valid_read((char *)buf+__e_acsl_i_3)",
+                      0);
+        if ((int)*((char *)buf + __e_acsl_i_3) != c) ;
+        else {
+          __e_acsl_forall_2 = 0;
+          goto e_acsl_end_loop3;
+        }
+      }
+      __e_acsl_i_3 ++;
+    }
+    e_acsl_end_loop3: /* internal */ ;
+    __e_acsl_at_4 = __e_acsl_forall_2;
+  }
+  __store_block((void *)(& __e_acsl_at_3),4U);
+  __full_init((void *)(& __e_acsl_at_3));
+  __e_acsl_at_3 = c;
   __store_block((void *)(& __e_acsl_at_2),4U);
   __full_init((void *)(& __e_acsl_at_2));
-  __e_acsl_at_2 = c;
-  __store_block((void *)(& __e_acsl_at),4U);
-  __full_init((void *)(& __e_acsl_at));
-  __e_acsl_at = s;
-  __retres = memchr(s,c,n);
+  __e_acsl_at_2 = buf;
   {
-    int __e_acsl_forall;
+    int __e_acsl_exists;
     unsigned int __e_acsl_i;
-    __e_acsl_forall = 1;
+    __e_acsl_exists = 0;
     __e_acsl_i = (unsigned int)0;
     while (1) {
-      {
-        int __e_acsl_offset;
-        __e_acsl_offset = __offset(__retres);
-        if (__e_acsl_i < (unsigned int)__e_acsl_offset) ; else break;
-      }
+      if (__e_acsl_i < n) ; else break;
       {
         int __e_acsl_valid_read;
-        __e_acsl_valid_read = __valid_read((void *)((char *)__e_acsl_at + __e_acsl_i),
+        __e_acsl_valid_read = __valid_read((void *)((char *)buf + __e_acsl_i),
                                            sizeof(char));
         e_acsl_assert(__e_acsl_valid_read,(char *)"Postcondition",
                       (char *)"memchr",
-                      (char *)"mem_access: \\valid_read((char *)__e_acsl_at+__e_acsl_i)",
+                      (char *)"mem_access: \\valid_read((char *)buf+__e_acsl_i)",
                       0);
-        if ((int)*((char *)__e_acsl_at + __e_acsl_i) != __e_acsl_at_2) 
-          ;
+        if (! ((int)*((char *)buf + __e_acsl_i) == c)) ;
         else {
-          __e_acsl_forall = 0;
+          __e_acsl_exists = 1;
           goto e_acsl_end_loop1;
         }
       }
       __e_acsl_i ++;
     }
     e_acsl_end_loop1: /* internal */ ;
-    e_acsl_assert(__e_acsl_forall,(char *)"Postcondition",(char *)"memchr",
-                  (char *)"\\forall int i;\n  0 <= i && i < \\offset((char *)\\result) ==>\n  (int)*((char *)\\old(s)+i) != \\old(c)",
-                  11);
-    __delete_block((void *)(& s));
-    __delete_block((void *)(& c));
-    __delete_block((void *)(& n));
-    __delete_block((void *)(& __retres));
-    return __retres;
+    __e_acsl_at = __e_acsl_exists;
   }
-}
-
-/*@ ensures
-      ∀ int i;
-        0 ≤ i ∧ i ≤ \offset((char *)\result) ⇒
-        (int)*((char *)\old(s)+i) ≢ \old(c);
- */
-void *memchr3(void const *s, int c, size_t n)
-{
-  void *__retres;
-  __store_block((void *)(& __retres),4U);
-  __store_block((void *)(& s),4U);
-  __full_init((void *)(& s));
-  __full_init((void *)(& __retres));
-  __retres = (void *)0;
-  __delete_block((void *)(& s));
-  __delete_block((void *)(& __retres));
-  return __retres;
-}
-
-/*@ ensures
-      ∀ int i;
-        0 ≤ i ∧ i ≤ \offset((char *)\result) ⇒
-        (int)*((char *)\old(s)+i) ≢ \old(c);
- */
-void *__e_acsl_memchr3(void const *s, int c, size_t n)
-{
-  int __e_acsl_at_2;
-  void const *__e_acsl_at;
-  void *__retres;
-  __store_block((void *)(& __retres),4U);
-  __store_block((void *)(& s),4U);
-  __full_init((void *)(& s));
-  __store_block((void *)(& c),4U);
-  __full_init((void *)(& c));
-  __store_block((void *)(& n),4U);
-  __full_init((void *)(& n));
-  __full_init((void *)(& __retres));
-  __store_block((void *)(& __e_acsl_at_2),4U);
-  __full_init((void *)(& __e_acsl_at_2));
-  __e_acsl_at_2 = c;
-  __store_block((void *)(& __e_acsl_at),4U);
-  __full_init((void *)(& __e_acsl_at));
-  __e_acsl_at = s;
-  __retres = memchr3(s,c,n);
+  __retres = memchr(buf,c,n);
   {
-    int __e_acsl_forall;
-    unsigned long long __e_acsl_i;
-    __e_acsl_forall = 1;
-    __e_acsl_i = (unsigned long long)0;
-    while (1) {
-      {
-        int __e_acsl_offset;
-        __e_acsl_offset = __offset(__retres);
-        if (__e_acsl_i <= (unsigned long long)__e_acsl_offset) ; else 
-                                                                   break;
-      }
-      {
-        int __e_acsl_valid_read;
-        __e_acsl_valid_read = __valid_read((void *)((char *)__e_acsl_at + __e_acsl_i),
-                                           sizeof(char));
-        e_acsl_assert(__e_acsl_valid_read,(char *)"Postcondition",
-                      (char *)"memchr3",
-                      (char *)"mem_access: \\valid_read((char *)__e_acsl_at+__e_acsl_i)",
-                      0);
-        if ((int)*((char *)__e_acsl_at + __e_acsl_i) != __e_acsl_at_2) 
-          ;
-        else {
-          __e_acsl_forall = 0;
-          goto e_acsl_end_loop2;
+    int __e_acsl_implies;
+    int __e_acsl_implies_2;
+    if (! __e_acsl_at) __e_acsl_implies = 1;
+    else {
+      int __e_acsl_forall;
+      unsigned int __e_acsl_i_2;
+      __e_acsl_forall = 1;
+      __e_acsl_i_2 = (unsigned int)0;
+      while (1) {
+        {
+          int __e_acsl_offset;
+          __e_acsl_offset = __offset(__retres);
+          if (__e_acsl_i_2 < (unsigned int)__e_acsl_offset) ; else break;
         }
+        {
+          int __e_acsl_valid_read_2;
+          __e_acsl_valid_read_2 = __valid_read((void *)((char *)__e_acsl_at_2 + __e_acsl_i_2),
+                                               sizeof(char));
+          e_acsl_assert(__e_acsl_valid_read_2,(char *)"Postcondition",
+                        (char *)"memchr",
+                        (char *)"mem_access: \\valid_read((char *)__e_acsl_at_2+__e_acsl_i_2)",
+                        0);
+          if ((int)*((char *)__e_acsl_at_2 + __e_acsl_i_2) != __e_acsl_at_3) 
+            ;
+          else {
+            __e_acsl_forall = 0;
+            goto e_acsl_end_loop2;
+          }
+        }
+        __e_acsl_i_2 ++;
       }
-      {
-        mpz_t __e_acsl___e_acsl_i;
-        mpz_t __e_acsl;
-        mpz_t __e_acsl_add;
-        unsigned long __e_acsl_2;
-        __gmpz_init_set_str(__e_acsl___e_acsl_i,(char const *)__e_acsl_i,10);
-        __gmpz_init_set_si(__e_acsl,1L);
-        __gmpz_init(__e_acsl_add);
-        __gmpz_add(__e_acsl_add,(__mpz_struct const *)(__e_acsl___e_acsl_i),
-                   (__mpz_struct const *)(__e_acsl));
-        __e_acsl_2 = __gmpz_get_ui((__mpz_struct const *)(__e_acsl_add));
-        __e_acsl_i = __e_acsl_2;
-        __gmpz_clear(__e_acsl___e_acsl_i);
-        __gmpz_clear(__e_acsl);
-        __gmpz_clear(__e_acsl_add);
-      }
+      e_acsl_end_loop2: /* internal */ ;
+      __e_acsl_implies = __e_acsl_forall;
     }
-    e_acsl_end_loop2: /* internal */ ;
-    e_acsl_assert(__e_acsl_forall,(char *)"Postcondition",(char *)"memchr3",
-                  (char *)"\\forall int i;\n  0 <= i && i <= \\offset((char *)\\result) ==>\n  (int)*((char *)\\old(s)+i) != \\old(c)",
-                  18);
-    __delete_block((void *)(& s));
+    e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",(char *)"memchr",
+                  (char *)"\\old(\\exists integer i; (0 <= i && i < n) && (int)*((char *)buf+i) == c) ==>\n(\\forall int i;\n   0 <= i && i < \\offset((char *)\\result) ==>\n   (int)*((char *)\\old(buf)+i) != \\old(c))",
+                  13);
+    if (! __e_acsl_at_4) __e_acsl_implies_2 = 1;
+    else __e_acsl_implies_2 = __retres == (void *)0;
+    e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",
+                  (char *)"memchr",
+                  (char *)"\\old(\\forall integer i; 0 <= i && i < n ==> (int)*((char *)buf+i) != c) ==>\n\\result == (void *)0",
+                  16);
+    __delete_block((void *)(& buf));
     __delete_block((void *)(& c));
     __delete_block((void *)(& n));
     __delete_block((void *)(& __retres));
@@ -285,7 +239,20 @@ void *__e_acsl_memchr3(void const *s, int c, size_t n)
 
 int main(void)
 {
+  char *__e_acsl_literal_string_2;
+  char *__e_acsl_literal_string;
   int __retres;
+  __e_acsl_literal_string = "toto";
+  __store_block((void *)__e_acsl_literal_string,sizeof("toto"));
+  __full_init((void *)__e_acsl_literal_string);
+  __literal_string((void *)__e_acsl_literal_string);
+  __e_acsl_memchr((void const *)__e_acsl_literal_string,'o',(unsigned int)4);
+  __e_acsl_literal_string_2 = "toto";
+  __store_block((void *)__e_acsl_literal_string_2,sizeof("toto"));
+  __full_init((void *)__e_acsl_literal_string_2);
+  __literal_string((void *)__e_acsl_literal_string_2);
+  __e_acsl_memchr((void const *)__e_acsl_literal_string_2,'a',
+                  (unsigned int)4);
   __retres = 0;
   __clean();
   return __retres;

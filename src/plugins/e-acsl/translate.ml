@@ -337,7 +337,7 @@ and context_insensitive_term_to_exp kf env t =
     mmodel_call ~loc kf "base_addr" Cil.voidPtrType env t
   | Tbase_addr _ -> not_yet env "labeled \\base_addr"
   | Toffset(LogicLabel(_, label), t) when label = "Here" ->
-    mmodel_call ~loc kf "offset" Cil.intType env t 
+    mmodel_call ~loc kf "offset" Cil.intType env t
   | Toffset _ -> not_yet env "labeled \\offset"
   | Tblock_length(LogicLabel(_, label), t) when label = "Here" ->
     mmodel_call ~loc kf "block_length" Cil.ulongType env t
@@ -594,8 +594,7 @@ let rec named_predicate_to_exp ?name kf env p =
 	call_valid t
       | TLval tlv, Ctype ty ->
 	let init = 
-	  Logic_const.pinitialized ~loc
-	    (llabel, Logic_const.taddrof ~loc tlv (Ctype (TPtr(ty, []))))
+	  Logic_const.pinitialized ~loc (llabel, Misc.term_addr_of ~loc tlv ty)
 	in
 	Typing.type_named_predicate ~must_clear:false init;
 	let p = Logic_const.pand ~loc (init, p) in

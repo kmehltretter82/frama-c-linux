@@ -543,24 +543,41 @@ you must call function `%s' by yourself"
     in
     Cil.ChangeDoChildrenPost(stmt, mk_block)
 
+  method private add_initializer loc checked_lv assigned_lv =
+    let kf = Extlib.the self#current_kf in
+    let stmt = Extlib.the self#current_stmt in
+    if Pre_analysis.must_model_lval ~kf ~stmt checked_lv then begin
+      let stmt = 
+	Misc.mk_debug_mmodel_stmt (Misc.mk_initialize loc assigned_lv) 
+      in
+      function_env := Env.add_stmt !function_env stmt
+    end
+
   method vinst = function
-  | Set(old_lv, _, _) | Call(Some old_lv, _, _, _) ->
-    let add_initializer = function
-      | Set(new_lv, _, loc) | Call(Some new_lv, _, _, loc) ->
-	let kf = Extlib.the self#current_kf in
-	let stmt = Extlib.the self#current_stmt in
-	if Pre_analysis.must_model_lval ~kf ~stmt old_lv then begin
-	  let stmt = 
-	    Misc.mk_debug_mmodel_stmt (Misc.mk_initialize loc new_lv) 
-	  in
-	  function_env := Env.add_stmt !function_env stmt
-	end
-      | _ -> assert false
-    in
+  | Set(old_lv, _, _) ->
     Cil.DoChildrenPost 
       (function 
-      | [ inst ] as l -> add_initializer inst; l
-      | [] | _ :: _ :: _ -> assert false)
+      | [ Set(new_lv, _, loc) ] as l -> 
+	self#add_initializer loc old_lv new_lv; 
+	l
+      | _ -> assert false)
+  | Call(old_ret, _, old_args, _) ->
+    Cil.DoChildrenPost 
+      (function 
+      | [ Call(new_ret, _, new_args, loc) ] as l -> 
+	(match old_ret, new_ret with
+	| None, None -> ()
+	| Some old_lv, Some new_lv -> self#add_initializer loc old_lv new_lv
+	| None, Some _ | Some _, None -> assert false);
+	List.iter2
+	  (fun old_e new_e -> 
+	    match old_e.enode, new_e.enode with
+	  | Lval old_lv, Lval new_lv -> self#add_initializer loc old_lv new_lv
+	  | _, _ ->  ())
+	  old_args
+	  new_args;
+	l
+      | _ -> assert false)
   | _ ->
     Cil.DoChildren
 

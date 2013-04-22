@@ -173,8 +173,13 @@ void *__e_acsl_malloc(size_t size)
 void __e_acsl_free(void *p)
 {
   int __e_acsl_at;
+  __store_block((void *)(& p),4U);
+  __full_init((void *)(& p));
+  __store_block((void *)(& __e_acsl_at),4U);
+  __full_init((void *)(& __e_acsl_at));
   __e_acsl_at = p != (void *)0;
   __free(p);
+  __delete_block((void *)(& p));
   return;
 }
 

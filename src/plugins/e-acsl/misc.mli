@@ -75,6 +75,12 @@ val rte3:
   string -> ('a -> 'b -> 'c -> 'd list) Type.t -> 
   ('a -> 'b -> 'c -> 'd list)
 
+(* ************************************************************************** *)
+(** {2 Other stuff} *)
+(* ************************************************************************** *)
+
+val term_addr_of: loc:location -> term_lval -> typ -> term
+
 (*
 Local Variables:
 compile-command: "make"

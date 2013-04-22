@@ -50,6 +50,7 @@ share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status
 tests/e-acsl-runtime/valid_alias.c:17:[value] Assertion got status valid.
 [value] using specification for function __valid_read
 FRAMAC_SHARE/libc/stdlib.h:142:[value] Function __e_acsl_free, behavior deallocation: precondition got status unknown.
+[value] using specification for function __delete_block
 FRAMAC_SHARE/libc/stdlib.h:144:[value] Function __e_acsl_free, behavior deallocation: postcondition got status unknown.
 tests/e-acsl-runtime/valid_alias.c:19:[value] Assertion got status valid.
 tests/e-acsl-runtime/valid_alias.c:19:[kernel] warning: accessing left-value that contains escaping addresses; assert(\defined(&a))
@@ -60,16 +61,15 @@ tests/e-acsl-runtime/valid_alias.c:19:[kernel] warning: accessing left-value tha
 tests/e-acsl-runtime/valid_alias.c:19:[kernel] warning: completely indeterminate value in b.
 tests/e-acsl-runtime/valid_alias.c:19:[value] all evaluations are invalid for function call argument
         (void *)b
-[value] using specification for function __delete_block
 [kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
 [value] using specification for function __clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
-[value] Values at end of function __e_acsl_free:
-          __fc_heap_status ∈ [--..--]
 [value] Values at end of function __e_acsl_malloc:
           __fc_heap_status ∈ [--..--]
           __retres ∈ {{ &Frama_C_alloc }}
+[value] Values at end of function __e_acsl_free:
+          __fc_heap_status ∈ [--..--]
 [value] Values at end of function main:
           __fc_heap_status ∈ [--..--]
           a ∈ ESCAPINGADDR

@@ -372,19 +372,18 @@ module rec Transfer
 		      if Varinfo.Set.mem vi state
 		      then Varinfo.Set.add p acc
 		      else acc)
-		  Varinfo.Set.empty
+		  state
 		  params
 		  l
 	      in
-	      let state_kf = Compute.get ~init kf in
+	      let state = Compute.get ~init kf in
 	      (* keep arguments whenever the corresponding formals must be 
 		 kept *)
 	      List.fold_left2
 		(fun acc p a -> match base_addr a with
 		  | None -> acc
 		  | Some vi ->
-		    if  Varinfo.Set.mem p state_kf 
-		    then Varinfo.Set.add vi acc 
+		    if  Varinfo.Set.mem p state then Varinfo.Set.add vi acc
 		    else acc)
 		state
 		params
@@ -485,24 +484,20 @@ end = struct
 
 end
 
-let consolidated_must_model_vi ?kf vi =
+let consolidated_must_model_vi vi =
   if Env.is_consolidated () then
     Env.consolidated_mem vi
-  else
-    (match kf with
-    | None -> 
-      (* TODO: should iterate in callgraph order *)
-      Globals.Functions.iter 
-	(fun kf -> 
-	  let set = Compute.get kf in
-	  Env.consolidate set);
-      (*    Options.feedback "MUST MODEL %s? %b (consolidated)" 
-	    vi.vname (Env.consolidated_mem vi);*)
-      Env.consolidated_mem vi
-    | Some kf -> 
-      let set = Compute.get kf in
-      (*    Options.feedback "MUST MODEL %s? %b" vi.vname (Varinfo.Set.mem vi set);*)
-      Varinfo.Set.mem vi set)
+  else begin
+    (try
+       let main, _ = Globals.entry_point () in
+       let set = Compute.get main in
+       Env.consolidate set
+     with Globals.No_such_entry_point s ->
+       Options.warning ~once:true "%s@ \
+@[The generated program may be incomplete.@]"
+	 s);
+    Env.consolidated_mem vi
+  end
 
 let must_model_vi ?kf ?stmt vi =
   let kf = match kf, stmt with
@@ -510,24 +505,23 @@ let must_model_vi ?kf ?stmt vi =
     | None, Some stmt -> Some (Kernel_function.find_englobing_kf stmt)
   in
   match stmt, kf with
-  | None, _ -> consolidated_must_model_vi ?kf vi
+  | None, _ -> consolidated_must_model_vi vi
   | Some _, None ->
     assert false
   | Some stmt, Some kf  ->
     if not (Env.is_consolidated ()) then 
-      ignore (consolidated_must_model_vi ~kf vi);
-    let tbl = 
-      try Env.find kf 
-      with Not_found -> 
-	Options.fatal "[Pre-analysis] unknown function %a" 
-	  Kernel_function.pretty kf
-    in
+      ignore (consolidated_must_model_vi vi);
     try
-      let set = Stmt.Hashtbl.find tbl stmt in
-      Varinfo.Set.mem vi (Env.default_varinfos set)
+      let tbl = Env.find kf in
+      try
+	let set = Stmt.Hashtbl.find tbl stmt in
+	Varinfo.Set.mem vi (Env.default_varinfos set)
+      with Not_found -> 
+	(* new statement *)
+	consolidated_must_model_vi vi
     with Not_found -> 
-      (* new statement *)
-      consolidated_must_model_vi ~kf vi
+      (* [kf] is dead code *)
+      false
 
 let rec must_model_lval ?kf ?stmt = function
   | Var vi, _ -> must_model_vi ?kf ?stmt vi

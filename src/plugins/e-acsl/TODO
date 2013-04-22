@@ -17,6 +17,7 @@
 - générer les delete des globals dans une fonction séparée, comme pour les init.
 - do not analyse library function in pre-analysis
 - variadic functions are not yet duplicated
+- generate guard for \offset & co (\offset(p) must ensures that p is valid)
 
 ##############
 # KNOWN BUGS #

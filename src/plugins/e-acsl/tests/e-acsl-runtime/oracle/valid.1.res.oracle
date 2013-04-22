@@ -80,11 +80,11 @@ tests/e-acsl-runtime/valid.c:37:[value] all evaluations are invalid for function
 [value] using specification for function __clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
-[value] Values at end of function __e_acsl_free:
-          __fc_heap_status ∈ [--..--]
 [value] Values at end of function __e_acsl_malloc:
           __fc_heap_status ∈ [--..--]
           __retres ∈ {{ &Frama_C_alloc }}
+[value] Values at end of function __e_acsl_free:
+          __fc_heap_status ∈ [--..--]
 [value] Values at end of function e_acsl_global_init:
 [value] Values at end of function f:
           y ∈ {{ &n }}

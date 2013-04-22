@@ -199,6 +199,7 @@ int main(void)
     e_acsl_assert(! __e_acsl_and,(char *)"Assertion",(char *)"main",
                   (char *)"!\\valid(SS)",27);
   }
+  f();
   __retres = 0;
   __delete_block((void *)(& S2));
   __delete_block((void *)(& S));
