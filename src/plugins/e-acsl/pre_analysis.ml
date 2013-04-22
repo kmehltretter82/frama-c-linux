@@ -237,6 +237,7 @@ module rec Transfer
     method vlogic_label _ = Cil.SkipChildren
     method vterm_lhost = function
     | TMem t ->
+      (* potential RTE *)
       state_ref := register_term kf !state_ref t;
       Cil.SkipChildren
     | TVar _ | TResult _ -> 
@@ -364,6 +365,7 @@ module rec Transfer
 	let state =
 	  if Kernel_function.is_definition kf then
 	    try
+	      (* compute the initial state of the called function *)
 	      let init =
 		List.fold_left2
 		  (fun acc p a -> match base_addr a with
@@ -377,14 +379,14 @@ module rec Transfer
 		  l
 	      in
 	      let state = Compute.get ~init kf in
-	      (* keep arguments whenever the corresponding formals must be 
-		 kept *)
+	      (* compute the resulting state by keeping arguments whenever the
+		 corresponding formals must be kept *)
 	      List.fold_left2
 		(fun acc p a -> match base_addr a with
-		  | None -> acc
-		  | Some vi ->
-		    if  Varinfo.Set.mem p state then Varinfo.Set.add vi acc
-		    else acc)
+		| None -> acc
+		| Some vi ->
+		  if  Varinfo.Set.mem p state then Varinfo.Set.add vi acc
+		  else acc)
 		state
 		params
 		l

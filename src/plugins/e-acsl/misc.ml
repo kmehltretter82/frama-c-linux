@@ -86,6 +86,11 @@ let kind_to_string loc k =
     | Postcondition -> "Postcondition"
     | Invariant -> "Invariant")
 
+let is_generated_kf kf =
+  let name = Kernel_function.get_name kf in
+  let str = Str.regexp "__e_acsl_\\(.*\\)" in
+  Str.string_match str name 0
+
 let get_orig_name kf =
   let name = Kernel_function.get_name kf in
   let str = Str.regexp "__e_acsl_\\(.*\\)" in

@@ -125,7 +125,6 @@ void *__e_acsl_memchr(void const *buf, int c, size_t n)
   __full_init((void *)(& c));
   __store_block((void *)(& n),4U);
   __full_init((void *)(& n));
-  __full_init((void *)(& __retres));
   {
     int __e_acsl_forall_2;
     unsigned int __e_acsl_i_3;

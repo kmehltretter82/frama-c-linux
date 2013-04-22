@@ -80,6 +80,7 @@ val rte3:
 (* ************************************************************************** *)
 
 val term_addr_of: loc:location -> term_lval -> typ -> term
+val is_generated_kf: kernel_function -> bool
 
 (*
 Local Variables:

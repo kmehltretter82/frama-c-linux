@@ -214,7 +214,6 @@ int *__e_acsl_f(int *x)
     __e_acsl_valid = __valid((void *)x,sizeof(int));
     e_acsl_assert(__e_acsl_valid,(char *)"Precondition",(char *)"f",
                   (char *)"\\valid(x)",15);
-    __full_init((void *)(& __retres));
     __retres = f(x);
   }
   {

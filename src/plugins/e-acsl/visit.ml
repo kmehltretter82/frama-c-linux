@@ -561,23 +561,16 @@ you must call function `%s' by yourself"
 	self#add_initializer loc old_lv new_lv; 
 	l
       | _ -> assert false)
-  | Call(old_ret, _, old_args, _) ->
-    Cil.DoChildrenPost 
-      (function 
-      | [ Call(new_ret, _, new_args, loc) ] as l -> 
-	(match old_ret, new_ret with
-	| None, None -> ()
-	| Some old_lv, Some new_lv -> self#add_initializer loc old_lv new_lv
-	| None, Some _ | Some _, None -> assert false);
-	List.iter2
-	  (fun old_e new_e -> 
-	    match old_e.enode, new_e.enode with
-	  | Lval old_lv, Lval new_lv -> self#add_initializer loc old_lv new_lv
-	  | _, _ ->  ())
-	  old_args
-	  new_args;
-	l
-      | _ -> assert false)
+  | Call(Some old_ret, _, _, _) ->
+    if Misc.is_generated_kf (Extlib.the self#current_kf) then
+      Cil.DoChildren
+    else
+      Cil.DoChildrenPost 
+	(function 
+	| [ Call(Some new_ret, _, _, loc) ] as l -> 
+	  self#add_initializer loc old_ret new_ret;
+	  l
+	| _ -> assert false)
   | _ ->
     Cil.DoChildren
 

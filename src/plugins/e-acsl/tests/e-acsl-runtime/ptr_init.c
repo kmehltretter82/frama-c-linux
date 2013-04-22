@@ -16,19 +16,17 @@ void f() {
 }
 
 void g(int *C, int* D) {
-  C = D;
+  /*@ assert \initialized(&C); */
 }
 
 int main(void) {
-  int *x, *y, *z, *t;
+  int *x, *y;
   B = (int*) malloc(sizeof(int));
   y = (int*) malloc(sizeof(int));
-  t = (int*) malloc(sizeof(int));
   x = y; 
   f();
-  g(z, t);
   /*@ assert \initialized(&A); */
   /*@ assert \initialized(&x); */
-  /*@ assert \initialized(&z); */
+  g(y, x);
   return 0;
 }
