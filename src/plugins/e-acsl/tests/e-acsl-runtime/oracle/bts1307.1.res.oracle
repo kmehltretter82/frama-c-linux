@@ -5,10 +5,12 @@
 [kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_bittree.h"
 [kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_mmodel.h"
 tests/e-acsl-runtime/bts1307.i:16:[kernel] warning: Floating-point constant 0.4 is not represented exactly. Will use 0x1.999999999999ap-2. See documentation for option -warn-decimal-float
+[e-acsl] beginning translation.
 tests/e-acsl-runtime/bts1307.i:31:[e-acsl] warning: approximating type `real' by `long double'
 tests/e-acsl-runtime/bts1307.i:13:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
-tests/e-acsl-runtime/bts1307.i:31:[e-acsl] approximating a real number by a float
+tests/e-acsl-runtime/bts1307.i:31:[e-acsl] warning: approximating a real number by a float
 tests/e-acsl-runtime/bts1307.i:25:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
+[e-acsl] translation done in project "e-acsl".
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed

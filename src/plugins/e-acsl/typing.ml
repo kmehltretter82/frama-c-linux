@@ -23,6 +23,8 @@
 open Cil_types
 open Cil_datatype
 
+let dkey = Options.dkey_typing
+
 module Z = Integer
 
 let is_representable n k = 
@@ -194,6 +196,7 @@ let unsafe_unify ~from logic_v =
     Options.fatal "unknown logic variable %a" Printer.pp_logic_var logic_v
 
 let clear () = 
+  Options.feedback ~dkey ~level:2 "clearing environment.";
   Term_env.clear (); 
   Logic_var_env.clear ()
 
@@ -468,12 +471,16 @@ let rec type_predicate_named p = match p.content with
   | Pvalid(_, x)
   | Pvalid_read(_, x) -> ignore (type_term x)
 
-let type_term t = if not (Options.Gmp_only.get ()) then ignore (type_term t)
+let type_term t = 
+  if not (Options.Gmp_only.get ()) then begin
+    Options.feedback ~dkey ~level:4 "typing term %a." Printer.pp_term t;
+    ignore (type_term t)
+  end
 
 let type_named_predicate ?(must_clear=true) p = 
   if not (Options.Gmp_only.get ()) then begin
-    Options.debug ~level:2 "typing predicate %a (clear? %b)" 
-      Printer.pp_predicate_named p must_clear;
+    Options.feedback ~dkey ~level:3 "typing predicate %a." 
+      Printer.pp_predicate_named p;
     if must_clear then clear ();
     type_predicate_named p
   end

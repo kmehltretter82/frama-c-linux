@@ -34,6 +34,11 @@ module Project_name: String
 
 val must_visit: unit -> bool
 
+val dkey_analysis: category
+val dkey_dup: category
+val dkey_translation: category
+val dkey_typing: category
+
 (*
 Local Variables:
 compile-command: "make"

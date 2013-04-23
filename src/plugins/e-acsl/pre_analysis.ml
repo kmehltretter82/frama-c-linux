@@ -24,6 +24,7 @@ open Cil_types
 open Cil_datatype
 
 let init_mpz () =
+  Options.feedback ~level:2 "initializing GMP type.";
   let set_mpzt = object
     inherit Cil.nopCilVisitor
     method vglob = function
@@ -39,6 +40,8 @@ let init_mpz () =
 (* Backward dataflow analysis to compute a sound over-approximation of what
    left-values must be tracked by the memory model library *)
 (* ********************************************************************** *)
+
+let dkey = Options.dkey_analysis
 
 let get_rte_by_stmt =
   Misc.rte2
@@ -109,7 +112,9 @@ end = struct
 
 end
 
-let reset = Env.clear
+let reset () = 
+  Options.feedback ~dkey ~level:2 "clearing environment.";
+  Env.clear ()
 
 module rec Transfer
   : Dataflow.BackwardsTransfer with type t = Varinfo.Set.t option
@@ -442,28 +447,26 @@ end = struct
   module D = Dataflow.Backwards(Transfer)
 
   let compute init_set kf = 
+    Options.feedback ~dkey ~level:2 "entering in function %a." 
+      Kernel_function.pretty kf;
     assert (not (Misc.is_library_loc (Kernel_function.get_location kf)));
     let tbl = Stmt.Hashtbl.create 17 in
 (*    Options.feedback "ANALYSING %a" Kernel_function.pretty kf;*)
     Env.add kf tbl;
-    try 
-      let init = object
-	inherit Visitor.frama_c_inplace
-	method vstmt_aux stmt = 
-	  Stmt.Hashtbl.add tbl stmt None;
-	  Cil.DoChildren
-	method vinst _ = Cil.SkipChildren
-	method vexpr _ = Cil.SkipChildren
-      end
-      in
+    (try
       let fundec = Kernel_function.get_definition kf in
-      let stmt = Kernel_function.find_return kf in
-      ignore (Visitor.visitFramacFunction init fundec);
-      Extlib.may (fun set -> Stmt.Hashtbl.replace tbl stmt (Some set)) init_set;
-      D.compute [ stmt ];
-      tbl
+      let stmts, returns = Dataflow.find_stmts fundec in
+      List.iter (fun s -> Stmt.Hashtbl.add tbl s None) stmts;
+      Extlib.may
+	(fun set -> 
+	  List.iter (fun s -> Stmt.Hashtbl.replace tbl s (Some set)) returns)
+	init_set;
+      D.compute returns
     with Kernel_function.No_Definition | Kernel_function.No_Statement -> 
-      tbl
+      ());
+    Options.feedback ~dkey ~level:2 "function %a done." 
+      Kernel_function.pretty kf;
+    tbl
 
   let get ?init kf =
     if Misc.is_library_loc (Kernel_function.get_location kf) then
@@ -490,14 +493,17 @@ let consolidated_must_model_vi vi =
   if Env.is_consolidated () then
     Env.consolidated_mem vi
   else begin
+    Options.feedback ~level:2 "performing pre-analysis for minimal memory \
+instrumentation.";
     (try
        let main, _ = Globals.entry_point () in
        let set = Compute.get main in
        Env.consolidate set
      with Globals.No_such_entry_point s ->
        Options.warning ~once:true "%s@ \
-@[The generated program may be incomplete.@]"
+@[The generated program may miss memory instrumentation.@]"
 	 s);
+    Options.feedback ~level:2 "pre-analysis done.";
     Env.consolidated_mem vi
   end
 

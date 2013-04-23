@@ -22,6 +22,8 @@
 
 open Cil_types
 
+let dkey = Options.dkey_dup
+
 (* ********************************************************************** *)
 (* Environment *)
 (* ********************************************************************** *)
@@ -66,11 +68,6 @@ let copy_ppt old_prj new_prj old_ppt new_ppt =
       (fun s ->
 	let e = match l with [] -> assert false | e :: _ -> e in
 	let emitter = Emitter.Usable_emitter.get e.P.emitter in
-	Options.feedback "%a: %a --> %a (%d)"
-	  Emitter.pretty emitter
-	  Property.pretty new_ppt
-	  Property_status.Emitted_status.pretty s
-	  (List.length e.P.properties);
 	match s with 
 	| P.True | P.False_and_reachable | P.Dont_know ->
 	  P.emit emitter ~hyps:e.P.properties new_ppt s
@@ -198,7 +195,8 @@ let dup_fundec loc spec bhv kf vi new_vi =
   return
 
 let dup_global loc old_prj spec bhv kf vi new_vi = 
-  (*  Options.feedback "DUP GLOBAL %s" vi.vname;*)
+  let name = vi.vname in
+  Options.feedback ~dkey ~level:2 "entering in function %s" name;
   let fundec, return = dup_fundec loc spec bhv kf vi new_vi  in
   let fct = Definition(fundec, loc) in
   let new_spec = fundec.sspec in
@@ -208,6 +206,7 @@ let dup_global loc old_prj spec bhv kf vi new_vi =
   Globals.Functions.replace_by_definition new_spec fundec loc;
   Annotations.register_funspec new_kf;
   dup_spec_status old_prj kf new_kf spec new_spec;
+  Options.feedback ~dkey ~level:2 "function %s" name;
   GFun(fundec, loc)
 
 (* ********************************************************************** *)
@@ -352,6 +351,7 @@ class dup_functions_visitor prj = object (self)
 end
 
 let dup_functions () =
+  Options.feedback ~level:2 "duplicating annotated functions";
   let prj =
     File.create_project_from_visitor
       "e_acsl_dup_functions" 

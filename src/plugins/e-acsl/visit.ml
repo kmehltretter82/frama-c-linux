@@ -23,6 +23,8 @@
 open Cil_types
 open Cil_datatype
 
+let dkey = Options.dkey_translation
+
 let get_rte_by_stmt =
   Misc.rte2
     ~warn:false
@@ -149,6 +151,7 @@ class e_acsl_visitor prj generate = object (self)
 	  in
 	  if must_init then
 	    let build_initializer () =
+	      Options.feedback ~dkey ~level:2 "building global initializer.";
 	      let return = 
 		Cil.mkStmt ~valid_sid:true (Return(None, Location.unknown))
 	      in
@@ -264,8 +267,7 @@ you must call function `%s' by yourself"
   | g when Misc.is_library_loc (Global.loc g) ->
     if generate then Cil.JustCopy else Cil.SkipChildren
   | g ->
-    let do_it g =
-      match g with
+    let do_it = function
       | GVar(vi, i, _) ->
 	vi.vghost <- false;
 	(* remove initializers on need *)
@@ -277,7 +279,7 @@ you must call function `%s' by yourself"
 	    | Some _ -> i.init <- None
 	  with Not_found ->
 	    assert false
-	end	
+	end
       | GFun({ svar = vi } as fundec, _) ->
 	vi.vghost <- false;
 	(* remember that we have to remove the main later (see method
@@ -285,11 +287,13 @@ you must call function `%s' by yourself"
 	if vi.vorig_name = Kernel.MainFunction.get () 
 	&& not (Options.Check.get ()) 
 	then main_fct <- Some fundec
+      | GVarDecl(_, vi, _) -> vi.vghost <- false
       | _ -> 
 	()
     in
     (match g with
-    | GVar(vi, _, _) -> Varinfo.Hashtbl.replace global_vars vi None
+    | GVar(vi, _, _) | GVarDecl(_, vi, _) -> 
+      Varinfo.Hashtbl.replace global_vars vi None
     | _ -> ());
     Cil.DoChildrenPost(fun g -> List.iter do_it g; g)
 
@@ -333,9 +337,16 @@ you must call function `%s' by yourself"
       vars
 
   method vfunc f =
+    let kf = Extlib.the self#current_kf in
+    Options.feedback ~dkey ~level:2 "entering in function %a." 
+      Kernel_function.pretty kf;
     List.iter (fun vi -> vi.vghost <- false) f.slocals;
     Cil.DoChildrenPost 
-      (fun f -> self#add_generated_variables_in_function f; f)
+      (fun f -> 
+	self#add_generated_variables_in_function f; 
+	Options.feedback ~dkey ~level:2 "function %a done."
+	  Kernel_function.pretty kf;
+	f)
 
   method private is_return old_kf stmt = 
     let old_ret = 
@@ -393,7 +404,7 @@ you must call function `%s' by yourself"
     e, !env_ref
 
   method vstmt_aux stmt =
-    Options.debug ~level:2 "proceeding stmt (sid %d) %a@." 
+    Options.debug ~level:3 "proceeding stmt (sid %d) %a@." 
       stmt.sid Stmt.pretty stmt;
     let kf = Extlib.the self#current_kf in
     let is_main = self#is_main kf in
@@ -645,6 +656,9 @@ you must call function `%s' by yourself"
 end
 
 let do_visit ?(prj=Project.current ()) generate =
+  Options.feedback ~level:2 "%s annotations in %a." 
+    (if generate then "translating" else "checking")
+    Project.pretty prj;
   let vis =
     Extlib.try_finally ~finally:Typing.clear (new e_acsl_visitor prj) generate
   in

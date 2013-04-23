@@ -5,6 +5,7 @@
 [kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_bittree.h"
 [kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_mmodel.h"
 [kernel] preprocessing with "gcc -C -E -I.  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc tests/e-acsl-runtime/valid.c"
+[e-acsl] beginning translation.
 FRAMAC_SHARE/libc/stdlib.h:152:[e-acsl] warning: E-ACSL construct `\allocable' is not yet supported. Ignoring annotation.
 FRAMAC_SHARE/libc/stdlib.h:152:[e-acsl] warning: E-ACSL construct `\freeable' is not yet supported. Ignoring annotation.
 FRAMAC_SHARE/libc/stdlib.h:136:[e-acsl] warning: E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
@@ -16,6 +17,7 @@ tests/e-acsl-runtime/valid.c:25:[e-acsl] warning: E-ACSL construct `logic functi
                   Ignoring annotation.
 tests/e-acsl-runtime/valid.c:25:[e-acsl] warning: E-ACSL construct `\free' is not yet supported. Ignoring annotation.
 tests/e-acsl-runtime/valid.c:25:[e-acsl] warning: E-ACSL construct `\allocate' is not yet supported. Ignoring annotation.
+[e-acsl] translation done in project "e-acsl".
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed

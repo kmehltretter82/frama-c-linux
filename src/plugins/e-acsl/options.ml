@@ -105,6 +105,11 @@ let () = Cmdline.run_after_configuring_stage version
 
 let must_visit () = Run.get () || Check.get ()
 
+let dkey_analysis = register_category "analysis"
+let dkey_dup = register_category "duplication"
+let dkey_translation = register_category "translation"
+let dkey_typing = register_category "typing"
+
 (*
 Local Variables:
 compile-command: "make"

@@ -81,7 +81,6 @@ val compute_quantif_guards_ref
        (term * relation * logic_var * relation * term) list) ref
 (** Forward reference. *)
 
-
 (*
 Local Variables:
 compile-command: "make"

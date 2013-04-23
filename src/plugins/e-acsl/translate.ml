@@ -23,6 +23,8 @@
 open Cil_types
 open Cil_datatype
 
+let dkey = Options.dkey_translation
+
 let not_yet env s =
   Env.Context.save env;
   Error.not_yet s
@@ -86,7 +88,7 @@ let constant_to_exp ?(loc=Location.unknown) = function
   | LChr c -> Cil.new_exp ?loc (Const (CChr c)), false
   | LReal {r_literal=s; r_nearest=f; r_lower=l; r_upper=u} -> 
     if l <> u then 
-      Options.feedback ~current:true ~once:true
+      Options.warning ~current:true ~once:true
 	"approximating a real number by a float";
     Cil.new_exp ?loc (Const (CReal (f, FLongDouble, Some s))), false
   | LEnum e -> Cil.new_exp ?loc (Const (CEnum e)), false
@@ -641,6 +643,8 @@ let get_rte =
        (let module L = Datatype.List(Code_annotation) in L.ty))
 
 let rec translate_named_predicate kf _kinstr ?(rte=true) env p =
+  Options.feedback ~dkey ~level:3 "translating predicate %a" 
+    Printer.pp_predicate_named p;
   Typing.type_named_predicate ~must_clear:rte p;
   let e, env = named_predicate_to_exp kf env p in
   assert (Typ.equal (Cil.typeOf e) Cil.intType);

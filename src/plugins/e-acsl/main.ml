@@ -53,6 +53,7 @@ module Extended_ast =
 
 let unmemoized_extend_ast () =
   let extend () =
+    Options.feedback ~level:3 "setting kernel options for E-ACSL.";
     Kernel.CppExtraArgs.add
       (Pretty_utils.sfprintf " -DE_ACSL_MACHDEP=%s -I%s/libc" 
 	 (Kernel.Machdep.get ())
@@ -71,6 +72,8 @@ let unmemoized_extend_ast () =
   if Ast.is_computed () then begin
     (* do not modify the existing project: work on a copy.
        Must also extend the current AST with the E-ACSL's library files. *)
+    Options.feedback ~level:2 "AST already computed: \
+E-ACSL is going to work on a copy.";
     let name = Project.get_name (Project.current ()) in
     let tmpfile = 
       Extlib.temp_file_cleanup_at_exit ("e_acsl_" ^ name) ".i" in
@@ -123,6 +126,7 @@ let generate_code =
     (fun name ->
       apply_on_e_acsl_ast
 	(fun () ->
+	  Options.feedback "beginning translation.";
 	  let dup_prj = Pre_visit.dup_functions () in
 	  let res =
 	    Project.on
@@ -137,6 +141,8 @@ let generate_code =
 	      ()
 	  in
 	  Project.remove ~project:dup_prj ();
+	  Options.feedback "translation done in project \"%s\"." 
+	    (Options.Project_name.get ());
 	  res)
 	())
 
