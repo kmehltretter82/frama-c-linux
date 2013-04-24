@@ -10,9 +10,9 @@
 /*@ behavior exists:
   assumes \exists integer i; 0 <= i < n && ((char*)buf)[i] == c;
   ensures
-  \forall int i; 0 <= i < \offset((char*)\result) ==> ((char*)buf)[i] != c; 
+  \forall int j; 0 <= j < \offset((char*)\result) ==> ((char*)buf)[j] != c; 
   behavior not_exists:
-  assumes \forall integer i; 0 <= i < n ==> ((char*)buf)[i] != c;
+  assumes \forall integer k; 0 <= k < n ==> ((char*)buf)[k] != c;
   ensures \result == (void*) 0; */
 void *memchr(const void *buf, int c, size_t n) {
   int i;

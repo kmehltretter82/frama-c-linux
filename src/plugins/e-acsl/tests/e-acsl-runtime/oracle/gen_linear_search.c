@@ -95,15 +95,13 @@ int __e_acsl_search(int elt)
     __e_acsl_i = 0;
     while (1) {
       if (__e_acsl_i < 9) ; else break;
-      e_acsl_assert(__e_acsl_i + 1 < 10,(char *)"Precondition",
-                    (char *)"search",
+      e_acsl_assert(__e_acsl_i + 1 < 10,(char *)"RTE",(char *)"search",
                     (char *)"index_bound: (int)(__e_acsl_i+1) < 10",9);
-      e_acsl_assert(0 <= __e_acsl_i + 1,(char *)"Precondition",
-                    (char *)"search",
+      e_acsl_assert(0 <= __e_acsl_i + 1,(char *)"RTE",(char *)"search",
                     (char *)"index_bound: 0 <= (int)(__e_acsl_i+1)",9);
-      e_acsl_assert(__e_acsl_i < 10,(char *)"Precondition",(char *)"search",
+      e_acsl_assert(__e_acsl_i < 10,(char *)"RTE",(char *)"search",
                     (char *)"index_bound: __e_acsl_i < 10",9);
-      e_acsl_assert(0 <= __e_acsl_i,(char *)"Precondition",(char *)"search",
+      e_acsl_assert(0 <= __e_acsl_i,(char *)"RTE",(char *)"search",
                     (char *)"index_bound: 0 <= __e_acsl_i",9);
       if (A[__e_acsl_i] <= A[__e_acsl_i + 1]) ;
       else {
@@ -123,11 +121,9 @@ int __e_acsl_search(int elt)
       __e_acsl_j_2 = 0;
       while (1) {
         if (__e_acsl_j_2 < 10) ; else break;
-        e_acsl_assert(__e_acsl_j_2 < 10,(char *)"Postcondition",
-                      (char *)"search",
+        e_acsl_assert(__e_acsl_j_2 < 10,(char *)"RTE",(char *)"search",
                       (char *)"index_bound: __e_acsl_j_2 < 10",14);
-        e_acsl_assert(0 <= __e_acsl_j_2,(char *)"Postcondition",
-                      (char *)"search",
+        e_acsl_assert(0 <= __e_acsl_j_2,(char *)"RTE",(char *)"search",
                       (char *)"index_bound: 0 <= __e_acsl_j_2",14);
         if (A[__e_acsl_j_2] != elt) ;
         else {
@@ -146,11 +142,9 @@ int __e_acsl_search(int elt)
       __e_acsl_j = 0;
       while (1) {
         if (__e_acsl_j < 10) ; else break;
-        e_acsl_assert(__e_acsl_j < 10,(char *)"Postcondition",
-                      (char *)"search",
+        e_acsl_assert(__e_acsl_j < 10,(char *)"RTE",(char *)"search",
                       (char *)"index_bound: __e_acsl_j < 10",11);
-        e_acsl_assert(0 <= __e_acsl_j,(char *)"Postcondition",
-                      (char *)"search",
+        e_acsl_assert(0 <= __e_acsl_j,(char *)"RTE",(char *)"search",
                       (char *)"index_bound: 0 <= __e_acsl_j",11);
         if (! (A[__e_acsl_j] == elt)) ;
         else {

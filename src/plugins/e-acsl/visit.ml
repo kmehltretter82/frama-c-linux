@@ -452,9 +452,8 @@ you must call function `%s' by yourself"
 	  let rtes = get_rte_by_stmt kf stmt in
 	  List.fold_left
 	    (fun env a -> match a.annot_content with
-	    | AAssert(_, p) ->
-	      Translate.translate_named_predicate
-		kf (Kstmt stmt) ~rte:false env p
+	    | AAssert(_, p) -> 
+	      Translate.translate_named_predicate kf (Env.rte env false) p
 	    | _ -> assert false)
 	    env
 	    rtes

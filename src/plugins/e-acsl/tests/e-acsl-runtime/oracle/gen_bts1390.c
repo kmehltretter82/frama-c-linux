@@ -61,12 +61,12 @@ predicate diffSize{L1, L2}(ℤ i) =
 /*@ behavior exists:
       assumes ∃ ℤ i; (0 ≤ i ∧ i < n) ∧ (int)*((char *)buf+i) ≡ c;
       ensures
-        ∀ int i;
-          0 ≤ i ∧ i < \offset((char *)\result) ⇒
-          (int)*((char *)\old(buf)+i) ≢ \old(c);
+        ∀ int j;
+          0 ≤ j ∧ j < \offset((char *)\result) ⇒
+          (int)*((char *)\old(buf)+j) ≢ \old(c);
     
     behavior not_exists:
-      assumes ∀ ℤ i; 0 ≤ i ∧ i < n ⇒ (int)*((char *)buf+i) ≢ c;
+      assumes ∀ ℤ k; 0 ≤ k ∧ k < n ⇒ (int)*((char *)buf+k) ≢ c;
       ensures \result ≡ (void *)0;
  */
 void *memchr(void const *buf, int c, size_t n)
@@ -103,12 +103,12 @@ void *memchr(void const *buf, int c, size_t n)
 /*@ behavior exists:
       assumes ∃ ℤ i; (0 ≤ i ∧ i < n) ∧ (int)*((char *)buf+i) ≡ c;
       ensures
-        ∀ int i;
-          0 ≤ i ∧ i < \offset((char *)\result) ⇒
-          (int)*((char *)\old(buf)+i) ≢ \old(c);
+        ∀ int j;
+          0 ≤ j ∧ j < \offset((char *)\result) ⇒
+          (int)*((char *)\old(buf)+j) ≢ \old(c);
     
     behavior not_exists:
-      assumes ∀ ℤ i; 0 ≤ i ∧ i < n ⇒ (int)*((char *)buf+i) ≢ c;
+      assumes ∀ ℤ k; 0 ≤ k ∧ k < n ⇒ (int)*((char *)buf+k) ≢ c;
       ensures \result ≡ (void *)0;
  */
 void *__e_acsl_memchr(void const *buf, int c, size_t n)
@@ -127,26 +127,25 @@ void *__e_acsl_memchr(void const *buf, int c, size_t n)
   __full_init((void *)(& n));
   {
     int __e_acsl_forall_2;
-    unsigned int __e_acsl_i_3;
+    unsigned int __e_acsl_k;
     __e_acsl_forall_2 = 1;
-    __e_acsl_i_3 = (unsigned int)0;
+    __e_acsl_k = (unsigned int)0;
     while (1) {
-      if (__e_acsl_i_3 < n) ; else break;
+      if (__e_acsl_k < n) ; else break;
       {
         int __e_acsl_valid_read_3;
-        __e_acsl_valid_read_3 = __valid_read((void *)((char *)buf + __e_acsl_i_3),
+        __e_acsl_valid_read_3 = __valid_read((void *)((char *)buf + __e_acsl_k),
                                              sizeof(char));
-        e_acsl_assert(__e_acsl_valid_read_3,(char *)"Postcondition",
-                      (char *)"memchr",
-                      (char *)"mem_access: \\valid_read((char *)buf+__e_acsl_i_3)",
+        e_acsl_assert(__e_acsl_valid_read_3,(char *)"RTE",(char *)"memchr",
+                      (char *)"mem_access: \\valid_read((char *)buf+__e_acsl_k)",
                       0);
-        if ((int)*((char *)buf + __e_acsl_i_3) != c) ;
+        if ((int)*((char *)buf + __e_acsl_k) != c) ;
         else {
           __e_acsl_forall_2 = 0;
           goto e_acsl_end_loop3;
         }
       }
-      __e_acsl_i_3 ++;
+      __e_acsl_k ++;
     }
     e_acsl_end_loop3: /* internal */ ;
     __e_acsl_at_4 = __e_acsl_forall_2;
@@ -168,8 +167,7 @@ void *__e_acsl_memchr(void const *buf, int c, size_t n)
         int __e_acsl_valid_read;
         __e_acsl_valid_read = __valid_read((void *)((char *)buf + __e_acsl_i),
                                            sizeof(char));
-        e_acsl_assert(__e_acsl_valid_read,(char *)"Postcondition",
-                      (char *)"memchr",
+        e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"memchr",
                       (char *)"mem_access: \\valid_read((char *)buf+__e_acsl_i)",
                       0);
         if (! ((int)*((char *)buf + __e_acsl_i) == c)) ;
@@ -190,43 +188,42 @@ void *__e_acsl_memchr(void const *buf, int c, size_t n)
     if (! __e_acsl_at) __e_acsl_implies = 1;
     else {
       int __e_acsl_forall;
-      unsigned int __e_acsl_i_2;
+      unsigned int __e_acsl_j;
       __e_acsl_forall = 1;
-      __e_acsl_i_2 = (unsigned int)0;
+      __e_acsl_j = (unsigned int)0;
       while (1) {
         {
           int __e_acsl_offset;
           __e_acsl_offset = __offset(__retres);
-          if (__e_acsl_i_2 < (unsigned int)__e_acsl_offset) ; else break;
+          if (__e_acsl_j < (unsigned int)__e_acsl_offset) ; else break;
         }
         {
           int __e_acsl_valid_read_2;
-          __e_acsl_valid_read_2 = __valid_read((void *)((char *)__e_acsl_at_2 + __e_acsl_i_2),
+          __e_acsl_valid_read_2 = __valid_read((void *)((char *)__e_acsl_at_2 + __e_acsl_j),
                                                sizeof(char));
-          e_acsl_assert(__e_acsl_valid_read_2,(char *)"Postcondition",
-                        (char *)"memchr",
-                        (char *)"mem_access: \\valid_read((char *)__e_acsl_at_2+__e_acsl_i_2)",
+          e_acsl_assert(__e_acsl_valid_read_2,(char *)"RTE",(char *)"memchr",
+                        (char *)"mem_access: \\valid_read((char *)__e_acsl_at_2+__e_acsl_j)",
                         0);
-          if ((int)*((char *)__e_acsl_at_2 + __e_acsl_i_2) != __e_acsl_at_3) 
+          if ((int)*((char *)__e_acsl_at_2 + __e_acsl_j) != __e_acsl_at_3) 
             ;
           else {
             __e_acsl_forall = 0;
             goto e_acsl_end_loop2;
           }
         }
-        __e_acsl_i_2 ++;
+        __e_acsl_j ++;
       }
       e_acsl_end_loop2: /* internal */ ;
       __e_acsl_implies = __e_acsl_forall;
     }
     e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",(char *)"memchr",
-                  (char *)"\\old(\\exists integer i; (0 <= i && i < n) && (int)*((char *)buf+i) == c) ==>\n(\\forall int i;\n   0 <= i && i < \\offset((char *)\\result) ==>\n   (int)*((char *)\\old(buf)+i) != \\old(c))",
+                  (char *)"\\old(\\exists integer i; (0 <= i && i < n) && (int)*((char *)buf+i) == c) ==>\n(\\forall int j;\n   0 <= j && j < \\offset((char *)\\result) ==>\n   (int)*((char *)\\old(buf)+j) != \\old(c))",
                   13);
     if (! __e_acsl_at_4) __e_acsl_implies_2 = 1;
     else __e_acsl_implies_2 = __retres == (void *)0;
     e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",
                   (char *)"memchr",
-                  (char *)"\\old(\\forall integer i; 0 <= i && i < n ==> (int)*((char *)buf+i) != c) ==>\n\\result == (void *)0",
+                  (char *)"\\old(\\forall integer k; 0 <= k && k < n ==> (int)*((char *)buf+k) != c) ==>\n\\result == (void *)0",
                   16);
     __delete_block((void *)(& buf));
     __delete_block((void *)(& c));

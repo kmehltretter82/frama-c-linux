@@ -107,13 +107,11 @@ int __e_acsl_sorted(int *t, int n)
         int __e_acsl_valid_read_2;
         __e_acsl_valid_read = __valid_read((void *)(t + __e_acsl_i),
                                            sizeof(int));
-        e_acsl_assert(__e_acsl_valid_read,(char *)"Postcondition",
-                      (char *)"sorted",
+        e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"sorted",
                       (char *)"mem_access: \\valid_read(t+__e_acsl_i)",0);
         __e_acsl_valid_read_2 = __valid_read((void *)(t + ((long long)__e_acsl_i - (long long)1)),
                                              sizeof(int));
-        e_acsl_assert(__e_acsl_valid_read_2,(char *)"Postcondition",
-                      (char *)"sorted",
+        e_acsl_assert(__e_acsl_valid_read_2,(char *)"RTE",(char *)"sorted",
                       (char *)"mem_access: \\valid_read(t+(long long)((long long)__e_acsl_i-(long long)1))",
                       0);
         if (*(t + ((long long)__e_acsl_i - (long long)1)) <= *(t + __e_acsl_i)) 

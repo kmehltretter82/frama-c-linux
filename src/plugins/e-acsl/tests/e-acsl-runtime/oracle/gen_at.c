@@ -44,6 +44,13 @@ extern  __attribute__((__FC_BUILTIN__)) void __initialize(void *ptr,
 /*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
 
+/*@ assigns \nothing; */
+extern  __attribute__((__FC_BUILTIN__)) void __literal_string(void *ptr);
+
+/*@ assigns \nothing; */
+extern  __attribute__((__FC_BUILTIN__)) int __valid_read(void *ptr,
+                                                         size_t size);
+
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 
 extern size_t __memory_size;
@@ -97,6 +104,9 @@ void __e_acsl_f(void)
 
 void g(int *p, int *q)
 {
+  char *__e_acsl_literal_string_3;
+  char *__e_acsl_literal_string_2;
+  char *__e_acsl_literal_string;
   int __e_acsl_at_4;
   int __e_acsl_at_3;
   int __e_acsl_at_2;
@@ -113,30 +123,70 @@ void g(int *p, int *q)
   *q = 0;
   __initialize((void *)p,sizeof(int));
   L1:
-    __store_block((void *)(& __e_acsl_at_3),4U);
-    __full_init((void *)(& __e_acsl_at_3));
-    __e_acsl_at_3 = *q;
-    __store_block((void *)(& __e_acsl_at),4U);
-    __full_init((void *)(& __e_acsl_at));
-    __e_acsl_at = *q;
+    {
+      int __e_acsl_valid_read_3;
+      __e_acsl_valid_read_3 = __valid_read((void *)q,sizeof(int));
+      e_acsl_assert(__e_acsl_valid_read_3,(char *)"RTE",(char *)"g",
+                    (char *)"mem_access: \\valid_read(q)",0);
+      __store_block((void *)(& __e_acsl_at_3),4U);
+      __full_init((void *)(& __e_acsl_at_3));
+      __e_acsl_at_3 = *q;
+    }
+    {
+      int __e_acsl_valid_read;
+      __e_acsl_valid_read = __valid_read((void *)q,sizeof(int));
+      e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"g",
+                    (char *)"mem_access: \\valid_read(q)",0);
+      __store_block((void *)(& __e_acsl_at),4U);
+      __full_init((void *)(& __e_acsl_at));
+      __e_acsl_at = *q;
+    }
     *p = 2;
   __initialize((void *)(p + 1),sizeof(int));
   *(p + 1) = 3;
   __initialize((void *)q,sizeof(int));
   *q = 1;
   L2:
-    __store_block((void *)(& __e_acsl_at_2),4U);
-    __full_init((void *)(& __e_acsl_at_2));
-    __e_acsl_at_2 = *(p + __e_acsl_at);
+    {
+      int __e_acsl_valid_read_2;
+      __e_acsl_valid_read_2 = __valid_read((void *)(p + __e_acsl_at),
+                                           sizeof(int));
+      e_acsl_assert(__e_acsl_valid_read_2,(char *)"RTE",(char *)"g",
+                    (char *)"mem_access: \\valid_read(p+__e_acsl_at)",0);
+      __store_block((void *)(& __e_acsl_at_2),4U);
+      __full_init((void *)(& __e_acsl_at_2));
+      __e_acsl_at_2 = *(p + __e_acsl_at);
+    }
     A = 4;
   /*@ assert \at(*(p+\at(*q,L1)),L2) ≡ 2; */
   e_acsl_assert(__e_acsl_at_2 == 2,(char *)"Assertion",(char *)"g",
                 (char *)"\\at(*(p+\\at(*q,L1)),L2) == 2",32);
   L3:
     /*@ assert \at(*(p+\at(*q,L1)),Here) ≡ 2; */
-    __store_block((void *)(& __e_acsl_at_4),4U);
-    __full_init((void *)(& __e_acsl_at_4));
-    __e_acsl_at_4 = *(p + __e_acsl_at_3);
+    {
+      int __e_acsl_valid_read_4;
+      __e_acsl_valid_read_4 = __valid_read((void *)(p + __e_acsl_at_3),
+                                           sizeof(int));
+      __e_acsl_literal_string = "RTE";
+      __store_block((void *)__e_acsl_literal_string,sizeof("RTE"));
+      __full_init((void *)__e_acsl_literal_string);
+      __literal_string((void *)__e_acsl_literal_string);
+      __e_acsl_literal_string_2 = "g";
+      __store_block((void *)__e_acsl_literal_string_2,sizeof("g"));
+      __full_init((void *)__e_acsl_literal_string_2);
+      __literal_string((void *)__e_acsl_literal_string_2);
+      __e_acsl_literal_string_3 = "mem_access: \\valid_read(p+__e_acsl_at_3)";
+      __store_block((void *)__e_acsl_literal_string_3,
+                    sizeof("mem_access: \\valid_read(p+__e_acsl_at_3)"));
+      __full_init((void *)__e_acsl_literal_string_3);
+      __literal_string((void *)__e_acsl_literal_string_3);
+      e_acsl_assert(__e_acsl_valid_read_4,(char *)__e_acsl_literal_string,
+                    (char *)__e_acsl_literal_string_2,
+                    (char *)__e_acsl_literal_string_3,0);
+      __store_block((void *)(& __e_acsl_at_4),4U);
+      __full_init((void *)(& __e_acsl_at_4));
+      __e_acsl_at_4 = *(p + __e_acsl_at_3);
+    }
     e_acsl_assert(__e_acsl_at_4 == 2,(char *)"Assertion",(char *)"g",
                   (char *)"\\at(*(p+\\at(*q,L1)),Here) == 2",34);
     __delete_block((void *)(& p));

@@ -187,7 +187,7 @@ int main(void)
     int __e_acsl_initialized;
     __e_acsl_valid_read = __valid_read((void *)(& state->bitsInQueue),
                                        sizeof(unsigned int));
-    e_acsl_assert(__e_acsl_valid_read,(char *)"Assertion",(char *)"main",
+    e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"main",
                   (char *)"mem_access: \\valid_read(&state->bitsInQueue)",0);
     __e_acsl_initialized = __initialized((void *)(& state->dataQueue[
                                          state->bitsInQueue / (unsigned int)8]),

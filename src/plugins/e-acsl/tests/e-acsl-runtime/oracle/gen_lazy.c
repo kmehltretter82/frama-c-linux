@@ -55,7 +55,12 @@ int main(void)
   /*@ assert ¬(x ≢ 0 ∧ y ≡ 1/0); */
   {
     int __e_acsl_and_2;
-    if (x != 0) __e_acsl_and_2 = y == 1 / 0; else __e_acsl_and_2 = 0;
+    if (x != 0) {
+      e_acsl_assert(0 != 0,(char *)"RTE",(char *)"main",
+                    (char *)"division_by_zero: 0 != 0",12);
+      __e_acsl_and_2 = y == 1 / 0;
+    }
+    else __e_acsl_and_2 = 0;
     e_acsl_assert(! __e_acsl_and_2,(char *)"Assertion",(char *)"main",
                   (char *)"!(x != 0 && y == 1/0)",12);
   }
@@ -69,7 +74,12 @@ int main(void)
   /*@ assert x ≡ 0 ∨ y ≡ 1/0; */
   {
     int __e_acsl_or_2;
-    if (x == 0) __e_acsl_or_2 = 1; else __e_acsl_or_2 = y == 1 / 0;
+    if (x == 0) __e_acsl_or_2 = 1;
+    else {
+      e_acsl_assert(0 != 0,(char *)"RTE",(char *)"main",
+                    (char *)"division_by_zero: 0 != 0",14);
+      __e_acsl_or_2 = y == 1 / 0;
+    }
     e_acsl_assert(__e_acsl_or_2,(char *)"Assertion",(char *)"main",
                   (char *)"x == 0 || y == 1/0",14);
   }
@@ -84,7 +94,11 @@ int main(void)
   {
     int __e_acsl_implies_2;
     if (! (x == 1)) __e_acsl_implies_2 = 1;
-    else __e_acsl_implies_2 = y == 1 / 0;
+    else {
+      e_acsl_assert(0 != 0,(char *)"RTE",(char *)"main",
+                    (char *)"division_by_zero: 0 != 0",16);
+      __e_acsl_implies_2 = y == 1 / 0;
+    }
     e_acsl_assert(__e_acsl_implies_2,(char *)"Assertion",(char *)"main",
                   (char *)"x == 1 ==> y == 1/0",16);
   }

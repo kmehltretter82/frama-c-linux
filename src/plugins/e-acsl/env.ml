@@ -40,7 +40,10 @@ type block_info = {
 			   which should be before [new_stmts]. *)
 }
 
-type local_env = { block_info: block_info; mpz_tbl: mpz_tbl }
+type local_env = 
+    { block_info: block_info; 
+      mpz_tbl: mpz_tbl;
+      rte: bool }
 
 type t = 
     { visitor: Visitor.frama_c_visitor; 
@@ -80,7 +83,10 @@ let empty_mpz_tbl =
   { new_exps = Term.Map.empty;
     clear_stmts = [] }
 
-let empty_local_env = { block_info = empty_block; mpz_tbl = empty_mpz_tbl }
+let empty_local_env = 
+  { block_info = empty_block; 
+    mpz_tbl = empty_mpz_tbl;
+    rte = true }
 
 let dummy = 
   { visitor = new Visitor.generic_frama_c_visitor (Cil.inplace_visit ()); 
@@ -105,6 +111,14 @@ let empty v =
 let top init env = 
   if init then env.init_env, []
   else match env.env_stack with [] -> assert false | hd :: tl -> hd, tl
+
+let rte env b =
+  let local_env, tl_env = top false env in
+  { env with env_stack = { local_env with rte = b } :: tl_env }
+
+let generate_rte env =
+  let local_env, _ = top false env in
+  local_env.rte
 
 (* eta-expansion required for typing generalisation *)
 let acc_list_rev acc l = List.fold_left (fun acc x -> x :: acc) acc l
@@ -162,7 +176,8 @@ let do_new_var ?loc init ?(global=false) ?(name="") env t ty mk_stmts =
     else
       let local_env = 
 	{ block_info = new_block; 
-	  mpz_tbl = extend_tbl local_env.mpz_tbl } 
+	  mpz_tbl = extend_tbl local_env.mpz_tbl;
+	  rte = false (* must be already checked by mk_stmts *) }
       in
       { env with 
 	cpt = n; 
@@ -173,7 +188,11 @@ let do_new_var ?loc init ?(global=false) ?(name="") env t ty mk_stmts =
       if global then (v, true) :: env.new_global_vars 
       else (v, false) :: env.new_global_vars
     in
-    let local_env = { local_env with block_info = new_block } in
+    let local_env = 
+      { local_env with 
+	block_info = new_block; 
+	rte = false (* must be already checked by mk_stmts *) } 
+    in
     { env with
       new_global_vars = new_global_vars;
       cpt = n;

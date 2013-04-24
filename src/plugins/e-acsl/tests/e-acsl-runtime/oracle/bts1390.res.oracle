@@ -43,7 +43,7 @@ share/e-acsl/e_acsl_gmp.h:115:[value] Function __gmpz_cmp: precondition got stat
 share/e-acsl/e_acsl_gmp.h:116:[value] Function __gmpz_cmp: precondition got status valid.
 [value] using specification for function __gmpz_get_ui
 share/e-acsl/e_acsl_gmp.h:185:[value] Function __gmpz_get_ui: precondition got status valid.
-tests/e-acsl-runtime/bts1390.c:15:[kernel] warning: out of bounds read. assert \valid_read((char *)buf+__e_acsl_i_6);
+tests/e-acsl-runtime/bts1390.c:15:[kernel] warning: out of bounds read. assert \valid_read((char *)buf+__e_acsl_k_2);
 [value] using specification for function __gmpz_add
 share/e-acsl/e_acsl_gmp.h:131:[value] Function __gmpz_add: precondition got status valid.
 share/e-acsl/e_acsl_gmp.h:132:[value] Function __gmpz_add: precondition got status valid.
@@ -55,7 +55,7 @@ tests/e-acsl-runtime/bts1390.c:13:[value] Function memchr, behavior exists: post
 tests/e-acsl-runtime/bts1390.c:16:[value] Function memchr, behavior not_exists: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
 tests/e-acsl-runtime/bts1390.c:13:[value] entering loop for the first time
 [value] using specification for function __offset
-tests/e-acsl-runtime/bts1390.c:13:[kernel] warning: out of bounds read. assert \valid_read((char *)__e_acsl_at_2+__e_acsl_i_4);
+tests/e-acsl-runtime/bts1390.c:13:[kernel] warning: out of bounds read. assert \valid_read((char *)__e_acsl_at_2+__e_acsl_j_2);
 [value] using specification for function e_acsl_assert
 share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
 tests/e-acsl-runtime/bts1390.c:13:[value] Function __e_acsl_memchr, behavior exists: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)

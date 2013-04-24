@@ -99,7 +99,7 @@ int main(void)
   e_acsl_assert((0 != 0) == ! (1 != 0),(char *)"Assertion",(char *)"main",
                 (char *)"(0!=0) == !(1!=0)",32);
   /*@ assert 4/y ≡ 2; */
-  e_acsl_assert(y != 0,(char *)"Assertion",(char *)"main",
+  e_acsl_assert(y != 0,(char *)"RTE",(char *)"main",
                 (char *)"division_by_zero: y != 0",33);
   e_acsl_assert(4 / y == 2,(char *)"Assertion",(char *)"main",
                 (char *)"4/y == 2",33);

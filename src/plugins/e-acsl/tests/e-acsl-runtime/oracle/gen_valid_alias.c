@@ -256,7 +256,7 @@ int main(void)
       __e_acsl_and_7 = __e_acsl_valid_read;
     }
     else __e_acsl_and_7 = 0;
-    e_acsl_assert(__e_acsl_and_7,(char *)"Assertion",(char *)"main",
+    e_acsl_assert(__e_acsl_and_7,(char *)"RTE",(char *)"main",
                   (char *)"mem_access: \\valid_read(b)",0);
     e_acsl_assert(*b == n,(char *)"Assertion",(char *)"main",
                   (char *)"*b == n",17);

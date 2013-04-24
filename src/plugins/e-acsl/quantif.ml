@@ -32,10 +32,6 @@ let term_to_exp_ref
     : (kernel_function -> Env.t -> typ option -> term -> exp * Env.t) ref
     = Extlib.mk_fun "term_to_exp_ref"
 
-let rte_to_exp_ref
-    : (kernel_function -> Env.t -> exp -> Env.t) ref
-    = Extlib.mk_fun "rte_to_exp_ref"
-
 let compute_quantif_guards quantif bounded_vars hyps = 
   let error msg pp x =
     let msg1 = Pretty_utils.sfprintf msg pp x in
@@ -130,7 +126,6 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
       (* innermost loop body: store the result in [res] and go out according
 	 to evaluation of the goal *)
       let test, env = named_predicate_to_exp kf (Env.push env) goal in
-      let env = !rte_to_exp_ref kf env test in
       let then_block = mkBlock [ mkEmptyStmt ~loc () ] in
       let else_block = 
 	(* use a 'goto', not a simple 'break' in order to handle 'forall' with

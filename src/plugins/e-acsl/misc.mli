@@ -32,7 +32,14 @@ open Cil_datatype
 val mk_call: ?loc:Location.t -> ?result:lval -> string -> exp list -> stmt
 val mk_debug_mmodel_stmt: stmt -> stmt
 
-type annotation_kind = Assertion | Precondition | Postcondition | Invariant
+type annotation_kind = 
+  | Assertion
+  | Precondition
+  | Postcondition
+  | Invariant
+  | RTE
+
+val e_acsl_guard_name: string
 
 val mk_e_acsl_guard: 
   ?reverse:bool -> annotation_kind -> kernel_function -> exp -> predicate named 

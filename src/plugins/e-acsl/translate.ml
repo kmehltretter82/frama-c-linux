@@ -25,6 +25,12 @@ open Cil_datatype
 
 let dkey = Options.dkey_translation
 
+let get_rte =
+  Misc.rte3
+    "exp_annotations"
+    (Datatype.func3 Kernel_function.ty Stmt.ty Exp.ty 
+       (let module L = Datatype.List(Code_annotation) in L.ty))
+
 let not_yet env s =
   Env.Context.save env;
   Error.not_yet s
@@ -32,6 +38,11 @@ let not_yet env s =
 let handle_error f env =
   let env = Error.handle f env in
   Env.Context.restore env
+
+(* internal to [named_predicate_to_exp] but put it outside in order to not add
+   extra tedious parameter. 
+   It is [true] iff we are currently visiting \valid. *)
+let is_visiting_valid = ref false
 
 (* ************************************************************************** *)
 (* Transforming terms and predicates into C expressions (if any) *)
@@ -136,15 +147,10 @@ let rec thost_to_host kf env = function
 and toffset_to_offset ?loc kf env = function
   | TNoOffset -> NoOffset, env
   | TField(f, offset) -> 
-    (* TODO: still untested *)
     let offset, env = toffset_to_offset ?loc kf env offset in
     Field(f, offset), env
   | TIndex(t, offset) -> 
     let e, env = term_to_exp kf env (Some Cil.intType) t in
-    if Mpz.is_t (Cil.typeOf e) then
-      Options.warning ~source:(fst e.eloc) ~once:true
-	"@[missing guard for ensuring that@ %a is a valid array index@]"
-	Printer.pp_term t;
     let offset, env = toffset_to_offset kf env offset in
     Index(e, offset), env
   | TModel _ -> not_yet env "model"
@@ -233,6 +239,8 @@ and context_insensitive_term_to_exp kf env t =
     let e1, env = term_to_exp kf env ctx t1 in
     let e2, env = term_to_exp kf env ctx t2 in
     if Mpz.is_t ty then 
+      (* TODO: preventing division by zero should not be required anymore.
+	 RTE should do this automatically. *)
       let t = Some t in
       let name = name_of_mpz_arith_bop bop in
       (* [TODO] can now do better since the type system got some info about
@@ -275,7 +283,7 @@ and context_insensitive_term_to_exp kf env t =
   | TBinOp(LOr, t1, t2) ->
     (* t1 || t2 <==> if t1 then true else t2 *)
     let ty = Typing.principal_type t1 t2 in
-    let e1, env1 = term_to_exp kf env (Some Cil.intType) t1 in
+    let e1, env1 = term_to_exp kf (Env.rte env true) (Some Cil.intType) t1 in
     let env' = Env.push env1 in
     let res2 = term_to_exp kf (Env.push env') (Some ty) t2 in
     let e, env = 
@@ -285,7 +293,7 @@ and context_insensitive_term_to_exp kf env t =
   | TBinOp(LAnd, t1, t2) ->
     (* t1 && t2 <==> if t1 then t2 else false *)
     let ty = Typing.principal_type t1 t2 in
-    let e1, env1 = term_to_exp kf env (Some Cil.intType) t1 in
+    let e1, env1 = term_to_exp kf (Env.rte env true) (Some Cil.intType) t1 in
     let _, env2 as res2 = term_to_exp kf (Env.push env1) (Some ty) t2 in
     let env3 = Env.push env2 in
     let e, env = 
@@ -323,7 +331,7 @@ and context_insensitive_term_to_exp kf env t =
   | Tlambda _ -> not_yet env "functional"
   | TDataCons _ -> not_yet env "constructor"
   | Tif(t1, t2, t3) -> 
-    let e1, env1 = term_to_exp kf env (Some Cil.intType) t1 in
+    let e1, env1 = term_to_exp kf (Env.rte env true) (Some Cil.intType) t1 in
     let ty = Typing.principal_type t2 t3 in
     let ctx = Some ty in
     let (_, env2 as res2) = term_to_exp kf (Env.push env1) ctx t2 in
@@ -361,8 +369,13 @@ and context_insensitive_term_to_exp kf env t =
    environment. Also extend this environment in order to include the generating
    constructs. *)
 and term_to_exp kf env ctx t = 
+  let generate_rte = Env.generate_rte env in
+  Options.feedback ~dkey ~level:4 "translating term %a (rte? %b)" 
+    Printer.pp_term t generate_rte;
+  let env = Env.rte env false in
   let t = match t.term_node with TLogic_coerce(_, t) -> t | _ -> t in
   let e, env, is_mpz_string, name = context_insensitive_term_to_exp kf env t in
+  let env = if generate_rte then translate_rte kf env e else env in
   match ctx with
   | None -> e, env
   | Some ty -> 
@@ -406,8 +419,7 @@ and comparison_to_exp
 
 (* \base_addr and \block_length annotations *)
 and mmodel_call ~loc kf name ctx env t =
-  let e, env = term_to_exp kf env None t in
-  let env = !Quantif.rte_to_exp_ref kf env e in
+  let e, env = term_to_exp kf (Env.rte env true) None t in
   let _, res, env = 
     Env.new_var
       ~loc
@@ -422,9 +434,8 @@ and mmodel_call ~loc kf name ctx env t =
 
 (* \valid, \offset and \initialized annotations *)
 and mmodel_call_with_size ~loc kf name ctx env t =
-  let e, env = term_to_exp kf env None t in
+  let e, env = term_to_exp kf (Env.rte env true) None t in
   let typ = Typing.typ_of_term t in
-  let env = !Quantif.rte_to_exp_ref kf env e in
   let _, res, env =
     Env.new_var
       ~loc
@@ -475,7 +486,8 @@ and at_to_exp env t_opt label e =
 	if must_model_new_var e then 
 	  [ Misc.mk_store_stmt v;
 	    Misc.mk_initialize ~loc (Var v, NoOffset) ]
-	else [])
+	else
+	  [])
   in
   let env_ref = ref new_env in
   (* visitor modifying in place the labeled statement in order to store [e]
@@ -506,15 +518,10 @@ and at_to_exp env t_opt label e =
   Cil.set_stmt bhv stmt new_stmt;
   res, !env_ref, false
 
-(* internal to [named_predicate_to_exp] but put it outside in order to not add
-   extra tedious parameter. 
-   It is [true] iff we are currently visiting \valid. *)
-let is_visiting_valid = ref false
-
 (* Convert an ACSL named predicate into a corresponding C expression (if
    any) in the given environment. Also extend this environment which includes
    the generating constructs. *)
-let rec named_predicate_to_exp ?name kf env p = 
+and named_predicate_content_to_exp ?name kf env p =
   let loc = p.loc in
   match p.content with
   | Pfalse -> Cil.zero ~loc, env
@@ -528,14 +535,14 @@ let rec named_predicate_to_exp ?name kf env p =
     Typing.context_sensitive ~loc env Cil.intType false None e
   | Pand(p1, p2) ->
     (* p1 && p2 <==> if p1 then p2 else false *)
-    let e1, env1 = named_predicate_to_exp kf env p1 in
+    let e1, env1 = named_predicate_to_exp kf (Env.rte env true) p1 in
     let _, env2 as res2 = named_predicate_to_exp kf (Env.push env1) p2 in
     let env3 = Env.push env2 in
     let name = match name with None -> "and" | Some n -> n in
     conditional_to_exp ~name loc Cil.intType e1 res2 (Cil.zero loc, env3)
   | Por(p1, p2) -> 
     (* p1 || p2 <==> if p1 then true else p2 *)
-    let e1, env1 = named_predicate_to_exp kf env p1 in
+    let e1, env1 = named_predicate_to_exp kf (Env.rte env true) p1 in
     let env' = Env.push env1 in
     let res2 = named_predicate_to_exp kf (Env.push env') p2 in
     let name = match name with None -> "or" | Some n -> n in
@@ -561,7 +568,7 @@ let rec named_predicate_to_exp ?name kf env p =
     let e, env = named_predicate_to_exp kf env p in
     Cil.new_exp ~loc (UnOp(LNot, e, Cil.intType)), env
   | Pif(t, p2, p3) ->
-    let e1, env1 = term_to_exp kf env (Some Cil.intType) t in
+    let e1, env1 = term_to_exp kf (Env.rte env true) (Some Cil.intType) t in
     let (_, env2 as res2) = named_predicate_to_exp kf (Env.push env1) p2 in
     let res3 = named_predicate_to_exp kf (Env.push env2) p3 in
     conditional_to_exp loc Cil.intType e1 res2 res3
@@ -614,10 +621,53 @@ let rec named_predicate_to_exp ?name kf env p =
   | Pfresh _ -> not_yet env "\\fresh"
   | Psubtype _ -> Error.untypable "subtyping relation" (* Jessie specific *)
 
+and named_predicate_to_exp ?name kf ?rte env p =
+  let rte = match rte with None -> Env.generate_rte env | Some b -> b in
+  let env = Env.rte env false in
+  let e, env = named_predicate_content_to_exp ?name kf env p in
+  let env = if rte then translate_rte kf env e else env in
+  e, env
+
+and translate_rte kf env e =
+  let stmt = Cil.mkStmtOneInstr ~valid_sid:true (Skip Location.unknown) in
+  let l = get_rte kf stmt e in
+  let old_kind = Env.annotation_kind env in
+  let env = Env.set_annotation_kind env Misc.RTE in
+  let env =
+    List.fold_left
+      (fun env a -> match a.annot_content with
+      | AAssert(_, p) -> 
+	handle_error
+	  (fun env -> 
+	    Options.feedback ~dkey ~level:4 "prevent RTE from %a" 
+	      Printer.pp_exp e;
+	    translate_named_predicate kf (Env.rte env false) p)
+	  env
+      | _ -> assert false)
+      env
+      l
+  in
+  Env.set_annotation_kind env old_kind
+
+and translate_named_predicate kf env p =
+  Options.feedback ~dkey ~level:3 "translating predicate %a" 
+    Printer.pp_predicate_named p;
+  let rte = Env.generate_rte env in
+  Typing.type_named_predicate ~must_clear:rte p;
+  let e, env = named_predicate_to_exp kf ~rte env p in
+  assert (Typ.equal (Cil.typeOf e) Cil.intType);
+  Env.add_stmt
+    env 
+    (Misc.mk_e_acsl_guard ~reverse:true (Env.annotation_kind env) kf e p)
+
+let named_predicate_to_exp ?name kf env p = 
+  named_predicate_to_exp ?name kf env p (* forget optional argument ?rte *)
+
 let () = 
   Quantif.term_to_exp_ref := term_to_exp;
   Quantif.named_predicate_to_exp_ref := named_predicate_to_exp
 
+(* for Guillaume: incorrect in general *)
 let predicate_to_exp kf p =
   Typing.type_named_predicate ~must_clear:true p;
   let empty_env = Env.empty (new Visitor.frama_c_copy Project_skeleton.dummy) in
@@ -635,38 +685,6 @@ let assumes_predicate bhv =
     (fun acc p -> Logic_const.pand (acc, Logic_const.unamed p.ip_content))
     Logic_const.ptrue
     bhv.b_assumes
-
-let get_rte =
-  Misc.rte3
-    "exp_annotations"
-    (Datatype.func3 Kernel_function.ty Stmt.ty Exp.ty 
-       (let module L = Datatype.List(Code_annotation) in L.ty))
-
-let rec translate_named_predicate kf _kinstr ?(rte=true) env p =
-  Options.feedback ~dkey ~level:3 "translating predicate %a" 
-    Printer.pp_predicate_named p;
-  Typing.type_named_predicate ~must_clear:rte p;
-  let e, env = named_predicate_to_exp kf env p in
-  assert (Typ.equal (Cil.typeOf e) Cil.intType);
-  let env = if rte then rte_to_exp kf env e else env in
-  Env.add_stmt
-    env 
-    (Misc.mk_e_acsl_guard ~reverse:true (Env.annotation_kind env) kf e p)
-
-and rte_to_exp kf env e =
-  let stmt = Cil.mkStmtOneInstr ~valid_sid:true (Skip Location.unknown) in
-  let l = get_rte kf stmt e in
-  List.fold_left
-    (fun env a -> match a.annot_content with
-    | AAssert(_, p) -> 
-      handle_error
-	(fun env -> translate_named_predicate kf (Kstmt stmt) ~rte:false env p)
-	env
-    | _ -> assert false)
-    env
-    l
-
-let () = Quantif.rte_to_exp_ref := rte_to_exp
 
 let original_project_ref = ref Project_skeleton.dummy
 let set_original_project p = original_project_ref := p
@@ -697,7 +715,7 @@ let translate_preconditions kf kinstr env behaviors =
 		~loc
 		(assumes_pred, Logic_const.unamed ~loc p.ip_content)
 	    in
-	    translate_named_predicate kf kinstr env p
+	    translate_named_predicate kf env p
 	  else
 	    env
 	in
@@ -736,7 +754,7 @@ let translate_postconditions kf kinstr env behaviors =
 		  (Logic_const.pold ~loc assumes_pred, 
 		   Logic_const.unamed ~loc p) 
 	      in
-	      translate_named_predicate kf kinstr env p
+	      translate_named_predicate kf env p
 	    | Exits | Breaks | Continues | Returns ->
 	      not_yet env "@[abnormal termination case in behavior@]"
 	  in
@@ -801,7 +819,7 @@ let translate_pre_code_annotation kf stmt env annot =
 	let env = Env.set_annotation_kind env kind in
 	if l <> [] then 
 	  not_yet env "@[assertions applied only on some behaviors@]";
-	translate_named_predicate kf (Kstmt stmt) env p
+	translate_named_predicate kf env p
       else
 	env
     | AStmtSpec(l, spec) ->

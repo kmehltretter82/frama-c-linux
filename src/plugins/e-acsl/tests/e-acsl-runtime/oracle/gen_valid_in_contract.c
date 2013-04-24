@@ -130,8 +130,7 @@ struct list *__e_acsl_f(struct list *l)
         int __e_acsl_valid_2;
         __e_acsl_valid_read = __valid_read((void *)(& l->next),
                                            sizeof(struct list *));
-        e_acsl_assert(__e_acsl_valid_read,(char *)"Postcondition",
-                      (char *)"f",
+        e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"f",
                       (char *)"mem_access: \\valid_read(&l->next)",0);
         __e_acsl_valid_2 = __valid((void *)l->next,sizeof(struct list));
         __e_acsl_and = __e_acsl_valid_2;

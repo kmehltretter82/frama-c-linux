@@ -76,7 +76,7 @@ void f(void)
   {
     int __e_acsl_valid_read;
     __e_acsl_valid_read = __valid_read((void *)(T + G),sizeof(char));
-    e_acsl_assert(__e_acsl_valid_read,(char *)"Assertion",(char *)"f",
+    e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"f",
                   (char *)"mem_access: \\valid_read(T+G)",0);
     e_acsl_assert((int)*(T + G) == 'b',(char *)"Assertion",(char *)"f",
                   (char *)"*(T+G) == \'b\'",13);
@@ -136,7 +136,7 @@ int main(void)
   {
     int __e_acsl_valid_read;
     __e_acsl_valid_read = __valid_read((void *)(S + G2),sizeof(char));
-    e_acsl_assert(__e_acsl_valid_read,(char *)"Assertion",(char *)"main",
+    e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"main",
                   (char *)"mem_access: \\valid_read(S+G2)",0);
     e_acsl_assert((int)*(S + G2) == 'o',(char *)"Assertion",(char *)"main",
                   (char *)"*(S+G2) == \'o\'",24);

@@ -21,7 +21,7 @@
 
 - grep TODO *.ml*
 - Gestion du mode -lib-entry et/ou pas de main
-- variable GMP potentiellement initialisé mais non utilisé en présence de \at
+- variable GMP potentiellement initialisée mais non utilisée en présence de \at
   (voir test result.i, cas -e-acsl-gmp-only)
 - générer les delete des globals dans une fonction séparée, comme pour les init.
 - variadic functions are not yet duplicated
@@ -31,8 +31,14 @@
   that the hyp will be generated
 - use value analysis whenever possible instead of our own imprecise analysis
 - use checked assigns whenever possible in the analysis
-
-checked property = valid property or property for which code will be generated
+  checked property = valid property or property for which code will be generated
+- fix \offset, \block_length and \base_addr
+- rte dans un at(, Here) génère plein de code supplémentaire lié aux strings
+  en argument de __e_acsl_assert (cf. tests/e-acsl-runtime/at.i)
+- sur des variables générées par E-ACSL (e.g. __e_acsl_at), 
+  pas nécessaire de tester __initialized(&) quand on teste __valid_read 
+  (cf. tests/e-acsl-runtime/bts1307.i)
+- RTE avec du code GMP
 
 ##############
 # KNOWN BUGS #

@@ -111,7 +111,7 @@ int main(void)
       __e_acsl_and = __e_acsl_valid_read_2;
     }
     else __e_acsl_and = 0;
-    e_acsl_assert(__e_acsl_and,(char *)"Assertion",(char *)"main",
+    e_acsl_assert(__e_acsl_and,(char *)"RTE",(char *)"main",
                   (char *)"mem_access: \\valid_read(Q)",0);
     e_acsl_assert(*Q == G,(char *)"Assertion",(char *)"main",
                   (char *)"*Q == G",17);

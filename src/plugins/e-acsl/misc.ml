@@ -75,7 +75,12 @@ let mk_call ?(loc=Location.unknown) ?result fname args =
   in
   Cil.mkStmtOneInstr ~valid_sid:true (Call(result, f, args, loc))
 
-type annotation_kind = Assertion | Precondition | Postcondition | Invariant
+type annotation_kind = 
+  | Assertion
+  | Precondition
+  | Postcondition
+  | Invariant
+  | RTE
 
 let kind_to_string loc k = 
   Cil.mkString 
@@ -84,7 +89,8 @@ let kind_to_string loc k =
     | Assertion -> "Assertion"
     | Precondition -> "Precondition"
     | Postcondition -> "Postcondition"
-    | Invariant -> "Invariant")
+    | Invariant -> "Invariant"
+    | RTE -> "RTE")
 
 let is_generated_kf kf =
   let name = Kernel_function.get_name kf in
@@ -99,6 +105,8 @@ let get_orig_name kf =
   else
     name
 
+let e_acsl_guard_name = "e_acsl_assert"
+
 (* Build a C conditional doing a runtime assertion check. *)
 let mk_e_acsl_guard ?(reverse=false) kind kf e p =
   let loc = p.loc in
@@ -112,7 +120,7 @@ let mk_e_acsl_guard ?(reverse=false) kind kf e p =
   in
   mk_call 
     ~loc 
-    "e_acsl_assert" 
+    e_acsl_guard_name
     [ e; 
       kind_to_string loc kind; 
       Cil.mkString ~loc (get_orig_name kf); 
