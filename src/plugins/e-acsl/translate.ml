@@ -338,6 +338,10 @@ and context_insensitive_term_to_exp kf env t =
     let res3 = term_to_exp kf (Env.push env2) ctx t3 in
     let e, env = conditional_to_exp loc ty e1 res2 res3 in
     e, env, false, ""
+  | Tat(t, LogicLabel(_, label)) when label = "Here" -> 
+    let ctx = match t.term_type with Ctype ty -> ty | _ -> assert false in
+    let e, env = term_to_exp kf env (Some ctx) t in
+    e, env, false, ""
   | Tat(t', label) ->
     (* convert [t'] to [e] in a separated local env *)
     let e, env = term_to_exp kf (Env.push env) None t' in
@@ -574,6 +578,8 @@ and named_predicate_content_to_exp ?name kf env p =
     conditional_to_exp loc Cil.intType e1 res2 res3
   | Plet _ -> not_yet env "let _ = _ in _"
   | Pforall _ | Pexists _ -> Quantif.quantif_to_exp kf env p
+  | Pat(p, LogicLabel(_, label)) when label = "Here" -> 
+    named_predicate_to_exp kf env p
   | Pat(p, label) -> 
     (* convert [t'] to [e] in a separated local env *)
     let e, env = named_predicate_to_exp kf (Env.push env) p in

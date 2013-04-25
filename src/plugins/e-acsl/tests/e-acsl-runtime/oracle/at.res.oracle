@@ -42,7 +42,6 @@ tests/e-acsl-runtime/at.i:32:[value] cannot evaluate ACSL term, \at() on a C lab
 tests/e-acsl-runtime/at.i:32:[value] Assertion got status unknown.
 :0:[value] cannot evaluate ACSL term, \at() on a C label is unsupported
 tests/e-acsl-runtime/at.i:34:[value] Assertion got status unknown.
-[value] using specification for function __literal_string
 [value] using specification for function __delete_block
 [kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
 [value] using specification for function __clean
