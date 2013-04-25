@@ -106,27 +106,33 @@ let constant_to_exp ?(loc=Location.unknown) = function
 
 let conditional_to_exp ?(name="if") loc ctx e1 (e2, env2) (e3, env3) =
   let env = Env.pop (Env.pop env3) in
-  let _, e, env =
-    Env.new_var
-      ~loc
-      ~name
-      env
-      None
-      ctx
-      (fun v ev ->
-	let lv = Cil.var v in
-	let affect e = Mpz.init_set ~loc lv ev e in
-	let then_block, _ = 
-	  let s = affect e2 in
-	  Env.pop_and_get env2 s ~global_clear:false Env.Middle
-	in
-	let else_block, _ = 
-	  let s = affect e3 in
-	  Env.pop_and_get env3 s ~global_clear:false Env.Middle
-	in
-	[ Cil.mkStmt ~valid_sid:true (If(e1, then_block, else_block, loc)) ])
-  in
-  e, env
+  match e1.enode with
+  | Const(CInt64(n, _, _)) when Integer.is_zero n ->
+    e3, Env.transfer ~from:env3 env
+  | Const(CInt64(n, _, _)) when Integer.is_one n ->
+    e2, Env.transfer ~from:env2 env
+  | _ ->
+    let _, e, env =
+      Env.new_var
+	~loc
+	~name
+	env
+	None
+	ctx
+	(fun v ev ->
+	  let lv = Cil.var v in
+	  let affect e = Mpz.init_set ~loc lv ev e in
+	  let then_block, _ = 
+	    let s = affect e2 in
+	    Env.pop_and_get env2 s ~global_clear:false Env.Middle
+	  in
+	  let else_block, _ = 
+	    let s = affect e3 in
+	    Env.pop_and_get env3 s ~global_clear:false Env.Middle
+	  in
+	  [ Cil.mkStmt ~valid_sid:true (If(e1, then_block, else_block, loc)) ])
+    in
+    e, env
 
 let rec thost_to_host kf env = function
   | TVar { lv_origin = Some v } -> 
@@ -593,16 +599,12 @@ and named_predicate_content_to_exp ?name kf env p =
       mmodel_call_with_size ~loc kf name Cil.intType env t 
     in
     if !is_visiting_valid then begin
-      (* we already transformed \valid(t) into \initialized(t) && \valid(t):
+      (* we already transformed \valid(t) into \initialized(&t) && \valid(t):
 	 now convert this right-most valid. *)
       is_visiting_valid := false;
       call_valid t
     end else begin
       match t.term_node, t.term_type with
-      | TLval (TResult _, TNoOffset), _ -> call_valid t
-      | TLval (TVar { lv_origin = Some vi }, TNoOffset), _ 
-	when vi.vformal || vi.vglob ->
-	call_valid t
       | TLval tlv, Ctype ty ->
 	let init = 
 	  Logic_const.pinitialized ~loc (llabel, Misc.term_addr_of ~loc tlv ty)
@@ -617,8 +619,10 @@ and named_predicate_content_to_exp ?name kf env p =
   | Pvalid_read _ -> not_yet env "labeled \\valid_read"
   | Pinitialized(LogicLabel(_, label), t) when label = "Here" ->
     (match t.term_node with
-    | TAddrOf (TVar { lv_origin = Some vi }, _) 
-	when Misc.is_generated_varinfo vi ->
+    (* optimisation when we know that the initialisation is ok *)
+    | TAddrOf (TResult _, TNoOffset) -> Cil.one ~loc, env
+    | TAddrOf (TVar { lv_origin = Some vi }, TNoOffset) 
+      when vi.vformal || vi.vglob || Misc.is_generated_varinfo vi ->
       Cil.one ~loc, env
     | _ -> mmodel_call_with_size ~loc kf "initialized" Cil.intType env t)
   | Pinitialized _ -> not_yet env "labeled \\initialized"

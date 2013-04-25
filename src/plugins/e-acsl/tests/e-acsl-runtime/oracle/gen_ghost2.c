@@ -84,22 +84,19 @@ int *P;
 void e_acsl_global_init(void)
 {
   __store_block((void *)(& P),4U);
-  __full_init((void *)(& P));
   __store_block((void *)(& G),4U);
-  __full_init((void *)(& G));
   return;
 }
 
 int main(void)
 {
   int __retres;
-  int *Q;
+  int *q;
   e_acsl_global_init();
-  __store_block((void *)(& Q),4U);
-  __full_init((void *)(& P));
+  __store_block((void *)(& q),4U);
   P = & G;
-  __full_init((void *)(& Q));
-  Q = P;
+  __full_init((void *)(& q));
+  q = P;
   {
     int __e_acsl_valid_read;
     int __e_acsl_valid;
@@ -112,24 +109,24 @@ int main(void)
                   (char *)"mem_access: \\valid(P)",16);
     (*P) ++;
   }
-  /*@ assert *Q ≡ G; */
+  /*@ assert *q ≡ G; */
   {
     mpz_t __e_acsl;
     mpz_t __e_acsl_G;
     int __e_acsl_eq;
-    __gmpz_init_set_si(__e_acsl,(long)*Q);
+    __gmpz_init_set_si(__e_acsl,(long)*q);
     __gmpz_init_set_si(__e_acsl_G,(long)G);
     __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl),
                              (__mpz_struct const *)(__e_acsl_G));
     e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"main",
-                  (char *)"*Q == G",17);
+                  (char *)"*q == G",17);
     __gmpz_clear(__e_acsl);
     __gmpz_clear(__e_acsl_G);
   }
   __retres = 0;
   __delete_block((void *)(& P));
   __delete_block((void *)(& G));
-  __delete_block((void *)(& Q));
+  __delete_block((void *)(& q));
   __clean();
   return __retres;
 }

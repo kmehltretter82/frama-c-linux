@@ -112,7 +112,6 @@ int *A;
 int *B;
 void f(void)
 {
-  __full_init((void *)(& A));
   A = B;
   return;
 }
@@ -120,14 +119,9 @@ void f(void)
 void g(int *C, int *D)
 {
   /*@ assert \initialized(&C); */
-  {
-    int __e_acsl_initialized;
-    __store_block((void *)(& C),4U);
-    __full_init((void *)(& C));
-    __e_acsl_initialized = __initialized((void *)(& C),sizeof(int *));
-    e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"g",
-                  (char *)"\\initialized(&C)",19);
-  }
+  __store_block((void *)(& C),4U);
+  e_acsl_assert(1,(char *)"Assertion",(char *)"g",
+                (char *)"\\initialized(&C)",19);
   __delete_block((void *)(& C));
   return;
 }
@@ -135,9 +129,7 @@ void g(int *C, int *D)
 void e_acsl_global_init(void)
 {
   __store_block((void *)(& B),4U);
-  __full_init((void *)(& B));
   __store_block((void *)(& A),4U);
-  __full_init((void *)(& A));
   return;
 }
 
@@ -149,7 +141,6 @@ int main(void)
   e_acsl_global_init();
   __store_block((void *)(& y),4U);
   __store_block((void *)(& x),4U);
-  __full_init((void *)(& B));
   B = (int *)__e_acsl_malloc(sizeof(int));
   __full_init((void *)(& y));
   y = (int *)__e_acsl_malloc(sizeof(int));
@@ -157,17 +148,13 @@ int main(void)
   x = y;
   f();
   /*@ assert \initialized(&A); */
-  {
-    int __e_acsl_initialized;
-    __e_acsl_initialized = __initialized((void *)(& A),sizeof(int *));
-    e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"main",
-                  (char *)"\\initialized(&A)",28);
-  }
+  e_acsl_assert(1,(char *)"Assertion",(char *)"main",
+                (char *)"\\initialized(&A)",28);
   /*@ assert \initialized(&x); */
   {
-    int __e_acsl_initialized_2;
-    __e_acsl_initialized_2 = __initialized((void *)(& x),sizeof(int *));
-    e_acsl_assert(__e_acsl_initialized_2,(char *)"Assertion",(char *)"main",
+    int __e_acsl_initialized;
+    __e_acsl_initialized = __initialized((void *)(& x),sizeof(int *));
+    e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"main",
                   (char *)"\\initialized(&x)",29);
   }
   g(x,y);

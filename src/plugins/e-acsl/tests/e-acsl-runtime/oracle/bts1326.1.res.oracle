@@ -16,7 +16,6 @@
         __memory_size ∈ [--..--]
 [value] using specification for function __store_block
 [value] using specification for function __initialize
-[value] using specification for function __full_init
 [value] using specification for function __delete_block
 tests/e-acsl-runtime/bts1326.i:10:[value] Function atp_NORMAL_computeAverageAccel: postcondition got status valid.
 [value] using specification for function __gmpz_init_set_si

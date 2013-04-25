@@ -81,8 +81,7 @@ let allocate_function env kf =
     (fun env vi -> 
       if Pre_analysis.must_model_vi ~kf vi then
 	let vi = Cil.get_varinfo (Env.get_behavior env) vi in
-	let env = Env.add_stmt env (Misc.mk_store_stmt vi) in
-	Env.add_stmt env (Misc.mk_full_init_stmt vi)
+	Env.add_stmt env (Misc.mk_store_stmt vi)
       else
 	env)
     env
@@ -162,9 +161,7 @@ class e_acsl_visitor prj generate = object (self)
 		    let new_vi = Cil.get_varinfo self#behavior old_vi in
 		    let model blk =
 		      if Pre_analysis.must_model_vi old_vi then
-			Misc.mk_store_stmt new_vi
-			:: Misc.mk_full_init_stmt new_vi 
-			:: blk
+			Misc.mk_store_stmt new_vi :: blk
 		      else
 			stmts
 		    in
@@ -556,7 +553,13 @@ you must call function `%s' by yourself"
   method private add_initializer loc checked_lv assigned_lv =
     let kf = Extlib.the self#current_kf in
     let stmt = Extlib.the self#current_stmt in
-    if Pre_analysis.must_model_lval ~kf ~stmt checked_lv then begin
+    let may_safely_ignore = function
+      | Var vi, NoOffset -> vi.vglob || vi.vformal
+      | _ -> false
+    in
+    if not (may_safely_ignore assigned_lv) && 
+      Pre_analysis.must_model_lval ~kf ~stmt checked_lv 
+    then begin
       let stmt = 
 	Misc.mk_debug_mmodel_stmt (Misc.mk_initialize loc assigned_lv) 
       in

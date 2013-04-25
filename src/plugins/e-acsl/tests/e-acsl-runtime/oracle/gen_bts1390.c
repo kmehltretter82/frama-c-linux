@@ -75,7 +75,6 @@ void *memchr(void const *buf, int c, size_t n)
   int i;
   char *s;
   __store_block((void *)(& buf),4U);
-  __full_init((void *)(& buf));
   s = (char *)buf;
   i = 0;
   while ((size_t)i < n) {
@@ -112,11 +111,8 @@ void *__e_acsl_memchr(void const *buf, int c, size_t n)
   void *__retres;
   __store_block((void *)(& __retres),4U);
   __store_block((void *)(& buf),4U);
-  __full_init((void *)(& buf));
   __store_block((void *)(& c),4U);
-  __full_init((void *)(& c));
   __store_block((void *)(& n),4U);
-  __full_init((void *)(& n));
   {
     int __e_acsl_forall_2;
     unsigned int __e_acsl_k;

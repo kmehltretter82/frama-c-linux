@@ -37,5 +37,5 @@ share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status
 [value] Values at end of function main:
           G ∈ {1}
           P ∈ {{ &G }}
-          Q ∈ {{ &G }}
+          q ∈ {{ &G }}
           __retres ∈ {0}

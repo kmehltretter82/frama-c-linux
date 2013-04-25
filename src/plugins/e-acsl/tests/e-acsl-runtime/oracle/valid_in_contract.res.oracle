@@ -16,7 +16,6 @@
         __fc_heap_status ∈ [--..--]
         __memory_size ∈ [--..--]
 [value] using specification for function __store_block
-[value] using specification for function __full_init
 [value] using specification for function __valid
 [value] using specification for function __initialized
 share/e-acsl/memory_model/e_acsl_mmodel.h:86:[value] Function __initialized: postcondition got status unknown.

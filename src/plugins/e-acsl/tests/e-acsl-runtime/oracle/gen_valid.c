@@ -150,7 +150,6 @@ void __e_acsl_free(void *p)
 {
   int __e_acsl_at;
   __store_block((void *)(& p),4U);
-  __full_init((void *)(& p));
   __store_block((void *)(& __e_acsl_at),4U);
   __e_acsl_at = p != (void *)0;
   __free(p);
@@ -175,7 +174,6 @@ int *f(int *x)
     int __e_acsl_initialized;
     int __e_acsl_and;
     __store_block((void *)(& x),4U);
-    __full_init((void *)(& x));
     __e_acsl_initialized = __initialized((void *)(& y),sizeof(int *));
     if (__e_acsl_initialized) {
       int __e_acsl_valid;
@@ -208,7 +206,6 @@ int *__e_acsl_f(int *x)
   {
     int __e_acsl_valid;
     __store_block((void *)(& x),4U);
-    __full_init((void *)(& x));
     __e_acsl_valid = __valid((void *)x,sizeof(int));
     e_acsl_assert(__e_acsl_valid,(char *)"Precondition",(char *)"f",
                   (char *)"\\valid(x)",15);
@@ -228,7 +225,6 @@ int *__e_acsl_f(int *x)
 void e_acsl_global_init(void)
 {
   __store_block((void *)(& X),4U);
-  __full_init((void *)(& X));
   return;
 }
 
@@ -316,7 +312,6 @@ int main(void)
     e_acsl_assert(__e_acsl_and_8,(char *)"Assertion",(char *)"main",
                   (char *)"(\\valid(a) && !\\valid(b)) && !\\valid(X)",29);
   }
-  __full_init((void *)(& X));
   X = a;
   /*@ assert (\valid(a) ∧ ¬\valid(b)) ∧ \valid(X); */
   {
@@ -390,7 +385,6 @@ int main(void)
     e_acsl_assert(__e_acsl_and_16,(char *)"Assertion",(char *)"main",
                   (char *)"(\\valid(a) && \\valid(b)) && \\valid(X)",33);
   }
-  __full_init((void *)(& X));
   X = b;
   /*@ assert (\valid(a) ∧ \valid(b)) ∧ \valid(X); */
   {

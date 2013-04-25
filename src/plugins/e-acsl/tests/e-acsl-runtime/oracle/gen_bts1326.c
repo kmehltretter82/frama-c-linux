@@ -43,9 +43,6 @@ extern  __attribute__((__FC_BUILTIN__)) void __initialize(void *ptr,
                                                           size_t size);
 
 /*@ assigns \nothing; */
-extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
-
-/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) int __valid_read(void *ptr,
                                                          size_t size);
 
@@ -66,9 +63,7 @@ predicate diffSize{L1, L2}(ℤ i) =
 void atp_NORMAL_computeAverageAccel(ArrayInt *Accel, int *AverageAccel)
 {
   __store_block((void *)(& Accel),4U);
-  __full_init((void *)(& Accel));
   __store_block((void *)(& AverageAccel),4U);
-  __full_init((void *)(& AverageAccel));
   __initialize((void *)AverageAccel,sizeof(int));
   *AverageAccel = (((((*Accel)[4] + (*Accel)[3]) + (*Accel)[2]) + (*Accel)[1]) + (*Accel)[0]) / 5;
   __delete_block((void *)(& Accel));
@@ -92,9 +87,7 @@ void __e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
   ArrayInt *__e_acsl_at_2;
   int *__e_acsl_at;
   __store_block((void *)(& Accel),4U);
-  __full_init((void *)(& Accel));
   __store_block((void *)(& AverageAccel),4U);
-  __full_init((void *)(& AverageAccel));
   __store_block((void *)(& __e_acsl_at_6),4U);
   __e_acsl_at_6 = Accel;
   __store_block((void *)(& __e_acsl_at_5),4U);
@@ -114,7 +107,7 @@ void __e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
     int __e_acsl_valid_read_3;
     int __e_acsl_valid_read_4;
     int __e_acsl_valid_read_5;
-    int __e_acsl_and;
+    int __e_acsl_valid_read_6;
     __e_acsl_valid_read = __valid_read((void *)(*__e_acsl_at_6),sizeof(int));
     e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",
                   (char *)"atp_NORMAL_computeAverageAccel",
@@ -140,13 +133,8 @@ void __e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
     e_acsl_assert(__e_acsl_valid_read_5,(char *)"RTE",
                   (char *)"atp_NORMAL_computeAverageAccel",
                   (char *)"mem_access: \\valid_read(&(*__e_acsl_at_2)[4])",0);
-    if (1) {
-      int __e_acsl_valid_read_6;
-      __e_acsl_valid_read_6 = __valid_read((void *)__e_acsl_at,sizeof(int));
-      __e_acsl_and = __e_acsl_valid_read_6;
-    }
-    else __e_acsl_and = 0;
-    e_acsl_assert(__e_acsl_and,(char *)"RTE",
+    __e_acsl_valid_read_6 = __valid_read((void *)__e_acsl_at,sizeof(int));
+    e_acsl_assert(__e_acsl_valid_read_6,(char *)"RTE",
                   (char *)"atp_NORMAL_computeAverageAccel",
                   (char *)"mem_access: \\valid_read(__e_acsl_at)",0);
     e_acsl_assert(*__e_acsl_at == (((((long long)(*__e_acsl_at_2)[4] + (long long)(*__e_acsl_at_3)[3]) + (long long)(*__e_acsl_at_4)[2]) + (long long)(*__e_acsl_at_5)[1]) + (long long)(*__e_acsl_at_6)[0]) / 5,

@@ -205,9 +205,7 @@ void g(int *p, int *q)
   int __e_acsl_at_2;
   int __e_acsl_at;
   __store_block((void *)(& p),4U);
-  __full_init((void *)(& p));
   __store_block((void *)(& q),4U);
-  __full_init((void *)(& q));
   __initialize((void *)p,sizeof(int));
   *p = 0;
   __initialize((void *)(p + 1),sizeof(int));

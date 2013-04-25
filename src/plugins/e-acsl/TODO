@@ -14,6 +14,7 @@
 - logic functions
 - disjoint and complete behaviors (cf. Bernard's feature wish)
 - loop invariant
+- loop variant
 
 ########
 # CODE #
@@ -59,7 +60,7 @@
 # DOC #
 #######
 
-- writing user manual
+- write user manual
 
 #########
 # TESTS #

@@ -12,9 +12,9 @@
 
 int main(void) {
   /*@ ghost P = &G; */ ;
-  /*@ ghost int *Q = P; */
+  /*@ ghost int *q = P; */
   /*@ ghost (*P)++; */
-  /*@ assert *Q == G; */
+  /*@ assert *q == G; */
   //  /*@ ghost G = foo(&G); */
   //  /*@ assert G == 2; */
 }

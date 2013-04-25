@@ -16,7 +16,6 @@
         __memory_size ∈ [--..--]
 [value] using specification for function __store_block
 tests/e-acsl-runtime/bts1304.i:23:[value] entering loop for the first time
-[value] using specification for function __full_init
 [value] using specification for function __initialize
 [value] using specification for function __delete_block
 tests/e-acsl-runtime/bts1304.i:25:[value] Assertion got status unknown.

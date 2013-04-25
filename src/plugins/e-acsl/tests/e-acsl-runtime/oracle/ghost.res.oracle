@@ -42,5 +42,5 @@ share/e-acsl/e_acsl_gmp.h:105:[value] Function __gmpz_clear: precondition got st
 [value] Values at end of function main:
           G ∈ {1}
           P ∈ {{ &G }}
-          Q ∈ {{ &G }}
+          q ∈ {{ &G }}
           __retres ∈ {0}

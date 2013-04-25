@@ -16,7 +16,6 @@
         __memory_size ∈ [--..--]
 [value] using specification for function __store_block
 [value] using specification for function __initialize
-[value] using specification for function __full_init
 :0:[value] entering loop for the first time
 [value] using specification for function __valid_read
 [value] using specification for function e_acsl_assert

@@ -122,11 +122,8 @@ predicate diffSize{L1, L2}(ℤ i) =
 void foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
 {
   __store_block((void *)(& Mtmax_in),4U);
-  __full_init((void *)(& Mtmax_in));
   __store_block((void *)(& Mwmax),4U);
-  __full_init((void *)(& Mwmax));
   __store_block((void *)(& Mtmax_out),4U);
-  __full_init((void *)(& Mtmax_out));
   __initialize((void *)Mtmax_out,sizeof(float));
   *Mtmax_out = (float)((double)*Mtmax_in + ((double)5 - (double)((float)(
                                                                  5 / 80) * *Mwmax) * 0.4));
@@ -155,11 +152,8 @@ void __e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     int __e_acsl_valid_2;
     int __e_acsl_valid_3;
     __store_block((void *)(& Mtmax_in),4U);
-    __full_init((void *)(& Mtmax_in));
     __store_block((void *)(& Mwmax),4U);
-    __full_init((void *)(& Mwmax));
     __store_block((void *)(& Mtmax_out),4U);
-    __full_init((void *)(& Mtmax_out));
     __e_acsl_valid = __valid((void *)Mtmax_in,sizeof(float));
     e_acsl_assert(__e_acsl_valid,(char *)"Precondition",(char *)"foo",
                   (char *)"\\valid(Mtmax_in)",7);
@@ -184,9 +178,9 @@ void __e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     int __e_acsl_div_guard;
     mpz_t __e_acsl_div;
     unsigned long __e_acsl_4;
-    int __e_acsl_and;
-    int __e_acsl_and_2;
-    int __e_acsl_and_3;
+    int __e_acsl_valid_read;
+    int __e_acsl_valid_read_2;
+    int __e_acsl_valid_read_3;
     __gmpz_init_set_si(__e_acsl,(long)5);
     __gmpz_init_set_si(__e_acsl_2,(long)80);
     __gmpz_init_set_si(__e_acsl_3,0L);
@@ -199,30 +193,14 @@ void __e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     __gmpz_tdiv_q(__e_acsl_div,(__mpz_struct const *)(__e_acsl),
                   (__mpz_struct const *)(__e_acsl_2));
     __e_acsl_4 = __gmpz_get_ui((__mpz_struct const *)(__e_acsl_div));
-    if (1) {
-      int __e_acsl_valid_read;
-      __e_acsl_valid_read = __valid_read((void *)__e_acsl_at_3,sizeof(float));
-      __e_acsl_and = __e_acsl_valid_read;
-    }
-    else __e_acsl_and = 0;
-    e_acsl_assert(__e_acsl_and,(char *)"RTE",(char *)"foo",
+    __e_acsl_valid_read = __valid_read((void *)__e_acsl_at_3,sizeof(float));
+    e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"foo",
                   (char *)"mem_access: \\valid_read(__e_acsl_at_3)",0);
-    if (1) {
-      int __e_acsl_valid_read_2;
-      __e_acsl_valid_read_2 = __valid_read((void *)__e_acsl_at_2,
-                                           sizeof(float));
-      __e_acsl_and_2 = __e_acsl_valid_read_2;
-    }
-    else __e_acsl_and_2 = 0;
-    e_acsl_assert(__e_acsl_and_2,(char *)"RTE",(char *)"foo",
+    __e_acsl_valid_read_2 = __valid_read((void *)__e_acsl_at_2,sizeof(float));
+    e_acsl_assert(__e_acsl_valid_read_2,(char *)"RTE",(char *)"foo",
                   (char *)"mem_access: \\valid_read(__e_acsl_at_2)",0);
-    if (1) {
-      int __e_acsl_valid_read_3;
-      __e_acsl_valid_read_3 = __valid_read((void *)__e_acsl_at,sizeof(float));
-      __e_acsl_and_3 = __e_acsl_valid_read_3;
-    }
-    else __e_acsl_and_3 = 0;
-    e_acsl_assert(__e_acsl_and_3,(char *)"RTE",(char *)"foo",
+    __e_acsl_valid_read_3 = __valid_read((void *)__e_acsl_at,sizeof(float));
+    e_acsl_assert(__e_acsl_valid_read_3,(char *)"RTE",(char *)"foo",
                   (char *)"mem_access: \\valid_read(__e_acsl_at)",0);
     e_acsl_assert(*__e_acsl_at == *__e_acsl_at_2 + (5 - (__e_acsl_4 * *__e_acsl_at_3) * 0.4),
                   (char *)"Postcondition",(char *)"foo",
@@ -254,11 +232,8 @@ void __e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
 void bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
 {
   __store_block((void *)(& Mtmin_in),4U);
-  __full_init((void *)(& Mtmin_in));
   __store_block((void *)(& Mwmin),4U);
-  __full_init((void *)(& Mwmin));
   __store_block((void *)(& Mtmin_out),4U);
-  __full_init((void *)(& Mtmin_out));
   __initialize((void *)Mtmin_out,sizeof(float));
   *Mtmin_out = (float)(0.85 * (double)*Mwmin);
   __delete_block((void *)(& Mtmin_in));
@@ -292,11 +267,8 @@ void __e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     int __e_acsl_valid_2;
     int __e_acsl_valid_3;
     __store_block((void *)(& Mtmin_in),4U);
-    __full_init((void *)(& Mtmin_in));
     __store_block((void *)(& Mwmin),4U);
-    __full_init((void *)(& Mwmin));
     __store_block((void *)(& Mtmin_out),4U);
-    __full_init((void *)(& Mtmin_out));
     __e_acsl_valid = __valid((void *)Mtmin_in,sizeof(float));
     e_acsl_assert(__e_acsl_valid,(char *)"Precondition",(char *)"bar",
                   (char *)"\\valid(Mtmin_in)",19);
@@ -321,79 +293,49 @@ void __e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     bar(Mtmin_in,Mwmin,Mtmin_out);
   }
   {
-    int __e_acsl_and;
-    int __e_acsl_and_2;
-    mpz_t __e_acsl_and_5;
+    int __e_acsl_valid_read;
+    int __e_acsl_valid_read_2;
+    mpz_t __e_acsl_and;
     unsigned long __e_acsl_2;
     int __e_acsl_if;
-    if (1) {
-      int __e_acsl_valid_read;
-      __e_acsl_valid_read = __valid_read((void *)__e_acsl_at_2,sizeof(float));
-      __e_acsl_and = __e_acsl_valid_read;
-    }
-    else __e_acsl_and = 0;
-    e_acsl_assert(__e_acsl_and,(char *)"RTE",(char *)"bar",
+    __e_acsl_valid_read = __valid_read((void *)__e_acsl_at_2,sizeof(float));
+    e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"bar",
                   (char *)"mem_access: \\valid_read(__e_acsl_at_2)",0);
-    if (1) {
-      int __e_acsl_valid_read_2;
-      __e_acsl_valid_read_2 = __valid_read((void *)__e_acsl_at,sizeof(float));
-      __e_acsl_and_2 = __e_acsl_valid_read_2;
-    }
-    else __e_acsl_and_2 = 0;
-    e_acsl_assert(__e_acsl_and_2,(char *)"RTE",(char *)"bar",
+    __e_acsl_valid_read_2 = __valid_read((void *)__e_acsl_at,sizeof(float));
+    e_acsl_assert(__e_acsl_valid_read_2,(char *)"RTE",(char *)"bar",
                   (char *)"mem_access: \\valid_read(__e_acsl_at)",0);
     if (*__e_acsl_at == *__e_acsl_at_2) {
-      int __e_acsl_and_3;
-      int __e_acsl_and_4;
+      int __e_acsl_valid_read_3;
+      int __e_acsl_valid_read_4;
       mpz_t __e_acsl;
-      if (1) {
-        int __e_acsl_valid_read_3;
-        __e_acsl_valid_read_3 = __valid_read((void *)__e_acsl_at_4,
-                                             sizeof(float));
-        __e_acsl_and_3 = __e_acsl_valid_read_3;
-      }
-      else __e_acsl_and_3 = 0;
-      e_acsl_assert(__e_acsl_and_3,(char *)"RTE",(char *)"bar",
+      __e_acsl_valid_read_3 = __valid_read((void *)__e_acsl_at_4,
+                                           sizeof(float));
+      e_acsl_assert(__e_acsl_valid_read_3,(char *)"RTE",(char *)"bar",
                     (char *)"mem_access: \\valid_read(__e_acsl_at_4)",0);
-      if (1) {
-        int __e_acsl_valid_read_4;
-        __e_acsl_valid_read_4 = __valid_read((void *)__e_acsl_at_3,
-                                             sizeof(float));
-        __e_acsl_and_4 = __e_acsl_valid_read_4;
-      }
-      else __e_acsl_and_4 = 0;
-      e_acsl_assert(__e_acsl_and_4,(char *)"RTE",(char *)"bar",
+      __e_acsl_valid_read_4 = __valid_read((void *)__e_acsl_at_3,
+                                           sizeof(float));
+      e_acsl_assert(__e_acsl_valid_read_4,(char *)"RTE",(char *)"bar",
                     (char *)"mem_access: \\valid_read(__e_acsl_at_3)",0);
       __gmpz_init_set_si(__e_acsl,
                          (long)(*__e_acsl_at_3 < 0.85 * *__e_acsl_at_4));
-      __gmpz_init_set(__e_acsl_and_5,(__mpz_struct const *)(__e_acsl));
+      __gmpz_init_set(__e_acsl_and,(__mpz_struct const *)(__e_acsl));
       __gmpz_clear(__e_acsl);
     }
-    else __gmpz_init_set_si(__e_acsl_and_5,0L);
-    __e_acsl_2 = __gmpz_get_ui((__mpz_struct const *)(__e_acsl_and_5));
+    else __gmpz_init_set_si(__e_acsl_and,0L);
+    __e_acsl_2 = __gmpz_get_ui((__mpz_struct const *)(__e_acsl_and));
     if (__e_acsl_2) {
-      int __e_acsl_and_6;
-      if (1) {
-        int __e_acsl_valid_read_5;
-        __e_acsl_valid_read_5 = __valid_read((void *)__e_acsl_at_5,
-                                             sizeof(float));
-        __e_acsl_and_6 = __e_acsl_valid_read_5;
-      }
-      else __e_acsl_and_6 = 0;
-      e_acsl_assert(__e_acsl_and_6,(char *)"RTE",(char *)"bar",
+      int __e_acsl_valid_read_5;
+      __e_acsl_valid_read_5 = __valid_read((void *)__e_acsl_at_5,
+                                           sizeof(float));
+      e_acsl_assert(__e_acsl_valid_read_5,(char *)"RTE",(char *)"bar",
                     (char *)"mem_access: \\valid_read(__e_acsl_at_5)",0);
       __e_acsl_if = *__e_acsl_at_5 != 0.;
     }
     else {
-      int __e_acsl_and_7;
-      if (1) {
-        int __e_acsl_valid_read_6;
-        __e_acsl_valid_read_6 = __valid_read((void *)__e_acsl_at_6,
-                                             sizeof(float));
-        __e_acsl_and_7 = __e_acsl_valid_read_6;
-      }
-      else __e_acsl_and_7 = 0;
-      e_acsl_assert(__e_acsl_and_7,(char *)"RTE",(char *)"bar",
+      int __e_acsl_valid_read_6;
+      __e_acsl_valid_read_6 = __valid_read((void *)__e_acsl_at_6,
+                                           sizeof(float));
+      e_acsl_assert(__e_acsl_valid_read_6,(char *)"RTE",(char *)"bar",
                     (char *)"mem_access: \\valid_read(__e_acsl_at_6)",0);
       __e_acsl_if = 0.85 * *__e_acsl_at_6 != 0.;
     }
@@ -403,7 +345,7 @@ void __e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     __delete_block((void *)(& Mtmin_in));
     __delete_block((void *)(& Mwmin));
     __delete_block((void *)(& Mtmin_out));
-    __gmpz_clear(__e_acsl_and_5);
+    __gmpz_clear(__e_acsl_and);
     return;
   }
 }

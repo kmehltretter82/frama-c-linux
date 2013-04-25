@@ -203,22 +203,21 @@ exception No_term
 
 let new_var ?loc ?(init=false) ?(global=false) ?name env t ty mk_stmts = 
   let local_env, _ = top init env in
-  if global then begin
-    assert (not init);
-    (* do not use memoisation here: it is incorrect for terms corresponding to
-       impure expressions
-       [JS 2011/11/23] actually it is correct now since globals are only use for
-       \at *)
-    do_new_var ?loc false ~global ?name env t ty mk_stmts  
-  end else
+  let memo tbl =
     try
       match t with
       | None -> raise No_term
       | Some t -> 
-	let v, e = Term.Map.find t local_env.mpz_tbl.new_exps in
+	let v, e = Term.Map.find t tbl.new_exps in
 	if Typ.equal ty v.vtype then v, e, env else raise No_term
     with Not_found | No_term -> 
       do_new_var ?loc ~global init ?name env t ty mk_stmts  
+  in
+  if global then begin
+    assert (not init);
+    memo env.global_mpz_tbl
+  end else
+    memo local_env.mpz_tbl
 
 let new_var_and_mpz_init ?loc ?init ?global ?name env t mk_stmts = 
   new_var 
@@ -314,6 +313,18 @@ let pop env =
   let _, tl = top false env in
   { env with env_stack = tl }
 
+let transfer ~from env = match from.env_stack, env.env_stack with
+  | { block_info = from_blk } :: _, ({ block_info = env_blk } as local) :: tl
+    ->
+    let new_blk = 
+      { new_block_vars = from_blk.new_block_vars @ env_blk.new_block_vars;
+	new_stmts = from_blk.new_stmts @ env_blk.new_stmts;
+	pre_stmts = from_blk.pre_stmts @ env_blk.pre_stmts }
+    in
+    { env with env_stack = { local with block_info = new_blk } :: tl }
+  | _, _ ->
+    assert false
+      
 type where = Before | Middle | After
 let pop_and_get env stmt ~global_clear where =
   (*  Options.feedback "pop_and_get (%d)" (List.length env.env_stack); *)

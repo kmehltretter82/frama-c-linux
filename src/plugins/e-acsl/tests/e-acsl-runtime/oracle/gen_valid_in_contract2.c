@@ -42,9 +42,6 @@ extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
 extern  __attribute__((__FC_BUILTIN__)) void __delete_block(void *ptr);
 
 /*@ assigns \nothing; */
-extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
-
-/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) int __valid(void *ptr, size_t size);
 
 /*@ assigns \nothing; */
@@ -108,7 +105,6 @@ struct list *__e_acsl_f(struct list *l)
   int __e_acsl_at;
   struct list *__retres;
   __store_block((void *)(& l),4U);
-  __full_init((void *)(& l));
   __store_block((void *)(& __e_acsl_at_4),4U);
   __e_acsl_at_4 = l;
   {

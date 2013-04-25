@@ -100,9 +100,6 @@ extern  __attribute__((__FC_BUILTIN__)) void __delete_block(void *ptr);
 extern  __attribute__((__FC_BUILTIN__)) void __initialize(void *ptr,
                                                           size_t size);
 
-/*@ assigns \nothing; */
-extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
-
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 
 extern size_t __memory_size;
@@ -145,7 +142,6 @@ int __e_acsl_sorted(int *t, int n)
   int __e_acsl_at;
   int __retres;
   __store_block((void *)(& t),4U);
-  __full_init((void *)(& t));
   {
     int __e_acsl_forall;
     mpz_t __e_acsl_i;

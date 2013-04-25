@@ -18,7 +18,6 @@ tests/e-acsl-runtime/bts1324.i:8:[e-acsl] warning: missing guard for ensuring th
         __memory_size ∈ [--..--]
 [value] using specification for function __store_block
 [value] using specification for function __initialize
-[value] using specification for function __full_init
 [value] using specification for function __gmpz_init
 share/e-acsl/e_acsl_gmp.h:36:[value] Function __gmpz_init: precondition got status valid.
 share/e-acsl/e_acsl_gmp.h:37:[value] Function __gmpz_init: postcondition got status valid.

@@ -89,9 +89,6 @@ extern  __attribute__((__FC_BUILTIN__)) void __delete_block(void *ptr);
 extern  __attribute__((__FC_BUILTIN__)) void __initialize(void *ptr,
                                                           size_t size);
 
-/*@ assigns \nothing; */
-extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
-
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 
 extern size_t __memory_size;
@@ -109,9 +106,7 @@ predicate diffSize{L1, L2}(ℤ i) =
 void atp_NORMAL_computeAverageAccel(ArrayInt *Accel, int *AverageAccel)
 {
   __store_block((void *)(& Accel),4U);
-  __full_init((void *)(& Accel));
   __store_block((void *)(& AverageAccel),4U);
-  __full_init((void *)(& AverageAccel));
   __initialize((void *)AverageAccel,sizeof(int));
   *AverageAccel = (((((*Accel)[4] + (*Accel)[3]) + (*Accel)[2]) + (*Accel)[1]) + (*Accel)[0]) / 5;
   __delete_block((void *)(& Accel));
@@ -135,9 +130,7 @@ void __e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
   ArrayInt *__e_acsl_at_2;
   int *__e_acsl_at;
   __store_block((void *)(& Accel),4U);
-  __full_init((void *)(& Accel));
   __store_block((void *)(& AverageAccel),4U);
-  __full_init((void *)(& AverageAccel));
   __store_block((void *)(& __e_acsl_at_6),4U);
   __e_acsl_at_6 = Accel;
   __store_block((void *)(& __e_acsl_at_5),4U);

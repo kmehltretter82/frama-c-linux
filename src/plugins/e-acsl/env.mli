@@ -88,6 +88,9 @@ val pop_and_get: t -> stmt -> global_clear:bool -> where -> block * t
 val pop: t -> t
 (** Pop the last local context (ignore the corresponding new block if any *)
 
+val transfer: from:t -> t -> t
+(** Pop the last local context of [from] and push it into the other env. *)
+
 val get_generated_variables: t -> (varinfo * bool) list
 (** All the new variables local to the visited function. 
     The boolean indicates whether the varinfo must be added to the outermost

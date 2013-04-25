@@ -57,9 +57,6 @@ extern  __attribute__((__FC_BUILTIN__)) void __delete_block(void *ptr);
 extern  __attribute__((__FC_BUILTIN__)) void __initialize(void *ptr,
                                                           size_t size);
 
-/*@ assigns \nothing; */
-extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
-
 /*@ ensures \result ≡ 0 ∨ \result ≡ 1;
     ensures
       \result ≡ 1 ⇒ \initialized((char *)\old(ptr)+(0..\old(size)-1));
@@ -79,7 +76,6 @@ predicate diffSize{L1, L2}(ℤ i) =
 void read_sensor_4(unsigned int *m)
 {
   __store_block((void *)(& m),4U);
-  __full_init((void *)(& m));
   __initialize((void *)m,sizeof(unsigned int));
   *m = 0U;
   __delete_block((void *)(& m));
