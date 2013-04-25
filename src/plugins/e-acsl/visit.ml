@@ -401,7 +401,7 @@ you must call function `%s' by yourself"
     e, !env_ref
 
   method vstmt_aux stmt =
-    Options.debug ~level:3 "proceeding stmt (sid %d) %a@." 
+    Options.debug ~level:4 "proceeding stmt (sid %d) %a@." 
       stmt.sid Stmt.pretty stmt;
     let kf = Extlib.the self#current_kf in
     let is_main = self#is_main kf in
@@ -544,7 +544,7 @@ you must call function `%s' by yourself"
 	  mk_block post_block, env
       in
       function_env := env;
-      Options.debug ~level:3
+      Options.debug ~level:4
 	"@[new stmt (from sid %d):@ %a@]" stmt.sid Printer.pp_stmt new_stmt;
       new_stmt
     in

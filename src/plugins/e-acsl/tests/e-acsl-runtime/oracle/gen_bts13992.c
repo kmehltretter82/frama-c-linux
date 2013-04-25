@@ -181,7 +181,11 @@ extern size_t __memory_size;
 void *__e_acsl_malloc(size_t size)
 {
   void *__retres;
+  __store_block((void *)(& __retres),4U);
+  __store_block((void *)(& size),4U);
   __retres = __malloc(size);
+  __delete_block((void *)(& size));
+  __delete_block((void *)(& __retres));
   return __retres;
 }
 

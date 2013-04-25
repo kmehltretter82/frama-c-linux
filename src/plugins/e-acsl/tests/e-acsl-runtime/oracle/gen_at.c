@@ -167,6 +167,8 @@ void g(int *p, int *q)
 /*@ ensures \result ≡ \old(x); */
 int h(int x)
 {
+  __store_block((void *)(& x),4U);
+  __delete_block((void *)(& x));
   return x;
 }
 
@@ -175,10 +177,15 @@ int __e_acsl_h(int x)
 {
   int __e_acsl_at;
   int __retres;
+  __store_block((void *)(& __retres),4U);
+  __store_block((void *)(& x),4U);
+  __store_block((void *)(& __e_acsl_at),4U);
   __e_acsl_at = x;
   __retres = h(x);
   e_acsl_assert(__retres == __e_acsl_at,(char *)"Postcondition",(char *)"h",
                 (char *)"\\result == \\old(x)",40);
+  __delete_block((void *)(& x));
+  __delete_block((void *)(& __retres));
   return __retres;
 }
 

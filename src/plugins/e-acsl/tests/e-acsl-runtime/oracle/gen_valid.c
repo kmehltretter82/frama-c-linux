@@ -123,7 +123,11 @@ extern size_t __memory_size;
 void *__e_acsl_malloc(size_t size)
 {
   void *__retres;
+  __store_block((void *)(& __retres),4U);
+  __store_block((void *)(& size),4U);
   __retres = __malloc(size);
+  __delete_block((void *)(& size));
+  __delete_block((void *)(& __retres));
   return __retres;
 }
 
@@ -184,6 +188,7 @@ int *f(int *x)
     e_acsl_assert(! __e_acsl_and,(char *)"Assertion",(char *)"f",
                   (char *)"!\\valid(y)",19);
   }
+  __full_init((void *)(& y));
   y = x;
   /*@ assert \valid(x); */
   {

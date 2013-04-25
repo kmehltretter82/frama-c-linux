@@ -318,7 +318,7 @@ module rec Transfer
 	in
 	Some state)
 
-  let rec base_addr e = match e.enode with
+  let rec base_addr_node = function
     | Lval lv | AddrOf lv | StartOf lv -> 
       (match lv with
       | Var vi, _ -> Some vi
@@ -336,6 +336,8 @@ module rec Transfer
     | UnOp _ | Const _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ 
     | AlignOfE _ -> 
       None
+
+  and base_addr e = base_addr_node e.enode
 
   (** The (backwards) transfer function for an instruction. The
       [(Cil.CurrentLoc.get ())] is set before calling this. If it returns
@@ -376,12 +378,21 @@ module rec Transfer
 		  (fun acc p a -> match base_addr a with
 		    | None -> acc
 		    | Some vi -> 
-		      if Varinfo.Set.mem vi state
-		      then Varinfo.Set.add p acc
+		      if Varinfo.Set.mem vi state then Varinfo.Set.add p acc
 		      else acc)
 		  state
 		  params
 		  l
+	      in
+	      let init = match result with
+		| None -> init
+		| Some lv ->
+		  match base_addr_node (Lval lv) with
+		  | None -> init
+		  | Some vi ->
+		    if Varinfo.Set.mem vi state 
+		    then Varinfo.Set.add (Misc.result_vi kf) init
+		    else init
 	      in
 	      let state = Compute.get ~init kf in
 	      (* compute the resulting state by keeping arguments whenever the

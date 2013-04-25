@@ -55,12 +55,15 @@
 - \valid (or other memory-model constructs) in ensures of functions without code
 - function pointers 
   (in case of the pointing function has a behavior like in test ptr_init.c)
+- ne pas remplacer tous les appels à malloc/free par des 
+  __e_acsl_malloc/__eacsl_free. Ne le faire uniquement pour ceux monitorer.
 
 #######
 # DOC #
 #######
 
 - write user manual
+- update according to the latest version of ACSL
 
 #########
 # TESTS #
