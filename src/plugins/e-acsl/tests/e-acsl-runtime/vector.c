@@ -19,7 +19,8 @@ int* new_inversed(int len, int *v) {
 }
 
 int main(void) {
-  int v1[3]= { 1, 2, 3}, *v2;
+  int x = 3;
+  int v1[3]= { 1, 2, x }, *v2;
   // @ assert \valid(&v1[2]);
   LAST = v1[2]; 
   //@ assert \initialized(v1+2);

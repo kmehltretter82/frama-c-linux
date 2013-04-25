@@ -174,8 +174,6 @@ void *__e_acsl_memchr(void const *buf, int c, size_t n)
   void *__retres;
   __store_block((void *)(& __retres),4U);
   __store_block((void *)(& buf),4U);
-  __store_block((void *)(& c),4U);
-  __store_block((void *)(& n),4U);
   {
     int __e_acsl_forall_2;
     mpz_t __e_acsl_k;
@@ -232,7 +230,6 @@ void *__e_acsl_memchr(void const *buf, int c, size_t n)
     __e_acsl_at_4 = __e_acsl_forall_2;
     __gmpz_clear(__e_acsl_k);
   }
-  __store_block((void *)(& __e_acsl_at_3),4U);
   __e_acsl_at_3 = c;
   __store_block((void *)(& __e_acsl_at_2),4U);
   __e_acsl_at_2 = buf;
@@ -365,8 +362,6 @@ void *__e_acsl_memchr(void const *buf, int c, size_t n)
                   (char *)"\\old(\\forall integer k; 0 <= k && k < n ==> (int)*((char *)buf+k) != c) ==>\n\\result == (void *)0",
                   16);
     __delete_block((void *)(& buf));
-    __delete_block((void *)(& c));
-    __delete_block((void *)(& n));
     __delete_block((void *)(& __retres));
     return __retres;
   }

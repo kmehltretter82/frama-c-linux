@@ -148,9 +148,7 @@ void *__e_acsl_malloc(size_t size)
 {
   void *__retres;
   __store_block((void *)(& __retres),4U);
-  __store_block((void *)(& size),4U);
   __retres = __malloc(size);
-  __delete_block((void *)(& size));
   __delete_block((void *)(& __retres));
   return __retres;
 }
@@ -196,10 +194,8 @@ int main(void)
   int *a;
   int *b;
   int n;
-  __store_block((void *)(& n),4U);
   __store_block((void *)(& b),4U);
   __store_block((void *)(& a),4U);
-  __full_init((void *)(& n));
   n = 0;
   /*@ assert ¬\valid(a) ∧ ¬\valid(b); */
   {
@@ -307,7 +303,6 @@ int main(void)
                   (char *)"!\\valid(a) && !\\valid(b)",19);
   }
   __retres = 0;
-  __delete_block((void *)(& n));
   __delete_block((void *)(& b));
   __delete_block((void *)(& a));
   __clean();

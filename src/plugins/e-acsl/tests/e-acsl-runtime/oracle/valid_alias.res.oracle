@@ -27,7 +27,6 @@ tests/e-acsl-runtime/valid_alias.c:10:[e-acsl] warning: E-ACSL construct `\alloc
         __fc_heap_status ∈ [--..--]
         __memory_size ∈ [--..--]
 [value] using specification for function __store_block
-[value] using specification for function __full_init
 tests/e-acsl-runtime/valid_alias.c:12:[value] Assertion got status valid.
 [value] using specification for function __initialized
 share/e-acsl/memory_model/e_acsl_mmodel.h:86:[value] Function __initialized: postcondition got status unknown.
@@ -42,6 +41,7 @@ tests/e-acsl-runtime/valid_alias.c:12:[value] all evaluations are invalid for fu
         (void *)b
 [value] using specification for function e_acsl_assert
 share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
+[value] using specification for function __full_init
 [value] using specification for function __delete_block
 FRAMAC_SHARE/libc/stdlib.h:127:[value] Function __e_acsl_malloc, behavior allocation: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
 FRAMAC_SHARE/libc/stdlib.h:132:[value] Function __e_acsl_malloc, behavior no_allocation: postcondition got status invalid. (Behavior may be inactive, no reduction performed.)

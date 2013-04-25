@@ -347,10 +347,10 @@ module rec Transfer
     let state = Env.default_varinfos state in
     let extend_to_expr state lhost e =
       let add_vi state vi =
-	if Varinfo.Set.mem vi state then 
+	if is_ptr_or_array_exp e && Varinfo.Set.mem vi state then 
 	  match base_addr e with
 	  | None -> state
-	  | Some vi -> Varinfo.Set.add vi state
+	  | Some vi_e -> Varinfo.Set.add vi_e state
 	else 
 	  state
       in
@@ -423,6 +423,8 @@ module rec Transfer
 	in
 	Dataflow.Done (Some state)
       | _ ->
+	Options.warning "function pointers may introduce too limited \
+instrumentation.";
 	(* imprecise function call: keep each argument *)
 	Dataflow.Done 
 	  (Some

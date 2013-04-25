@@ -145,9 +145,7 @@ void *__e_acsl_malloc(size_t size)
 {
   void *__retres;
   __store_block((void *)(& __retres),4U);
-  __store_block((void *)(& size),4U);
   __retres = __malloc(size);
-  __delete_block((void *)(& size));
   __delete_block((void *)(& __retres));
   return __retres;
 }
@@ -190,7 +188,6 @@ int *new_inversed(int len, int *v)
   int i;
   int *p;
   __store_block((void *)(& p),4U);
-  __store_block((void *)(& v),4U);
   __full_init((void *)(& p));
   p = (int *)__e_acsl_malloc(sizeof(int) * (unsigned int)len);
   i = 0;
@@ -199,7 +196,6 @@ int *new_inversed(int len, int *v)
     *(p + i) = *(v + ((len - i) - 1));
     i ++;
   }
-  __delete_block((void *)(& v));
   __delete_block((void *)(& p));
   return p;
 }
@@ -207,23 +203,25 @@ int *new_inversed(int len, int *v)
 int main(void)
 {
   int __retres;
+  int x;
   int v1[3];
   int *v2;
   __store_block((void *)(& v2),4U);
   __store_block((void *)(v1),12U);
+  x = 3;
   __initialize((void *)(v1),sizeof(int));
   v1[0] = 1;
   __initialize((void *)(& v1[1]),sizeof(int));
   v1[1] = 2;
   __initialize((void *)(& v1[2]),sizeof(int));
-  v1[2] = 3;
+  v1[2] = x;
   LAST = v1[2];
   /*@ assert \initialized(&v1[2]); */
   {
     int __e_acsl_initialized;
     __e_acsl_initialized = __initialized((void *)(& v1[2]),sizeof(int));
     e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"main",
-                  (char *)"\\initialized(&v1[2])",25);
+                  (char *)"\\initialized(&v1[2])",26);
   }
   __full_init((void *)(& v2));
   v2 = new_inversed(3,v1);
@@ -234,7 +232,7 @@ int main(void)
     __e_acsl_initialized_2 = __initialized((void *)(v2 + (long)2),
                                            sizeof(int));
     e_acsl_assert(__e_acsl_initialized_2,(char *)"Assertion",(char *)"main",
-                  (char *)"\\initialized(v2+2)",28);
+                  (char *)"\\initialized(v2+2)",29);
   }
   /*@ assert LAST ≡ 1; */
   {
@@ -246,7 +244,7 @@ int main(void)
     __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl_LAST),
                              (__mpz_struct const *)(__e_acsl));
     e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"main",
-                  (char *)"LAST == 1",29);
+                  (char *)"LAST == 1",30);
     __gmpz_clear(__e_acsl_LAST);
     __gmpz_clear(__e_acsl);
   }
