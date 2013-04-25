@@ -74,29 +74,21 @@ void *memchr(void const *buf, int c, size_t n)
   void *__retres;
   int i;
   char *s;
-  __store_block((void *)(& s),4U);
-  __store_block((void *)(& __retres),4U);
   __store_block((void *)(& buf),4U);
   __full_init((void *)(& buf));
-  __full_init((void *)(& s));
   s = (char *)buf;
   i = 0;
   while ((size_t)i < n) {
     if ((int)*s == c) {
-      __full_init((void *)(& __retres));
       __retres = (void *)s;
       goto return_label;
     }
-    __full_init((void *)(& s));
     s ++;
     i ++;
   }
-  __full_init((void *)(& __retres));
   __retres = (void *)0;
   return_label: /* internal */
     __delete_block((void *)(& buf));
-    __delete_block((void *)(& s));
-    __delete_block((void *)(& __retres));
     return __retres;
 }
 

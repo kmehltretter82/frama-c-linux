@@ -64,8 +64,6 @@ int sorted(int *t, int n)
 {
   int __retres;
   int b;
-  __store_block((void *)(& t),4U);
-  __full_init((void *)(& t));
   b = 1;
   if (n <= 1) {
     __retres = 1;
@@ -80,9 +78,7 @@ int sorted(int *t, int n)
     b ++;
   }
   __retres = 1;
-  return_label: /* internal */
-    __delete_block((void *)(& t));
-    return __retres;
+  return_label: /* internal */ return __retres;
 }
 
 /*@ behavior yes:

@@ -79,8 +79,6 @@ predicate diffSize{L1, L2}(ℤ i) =
 struct list *f(struct list *l)
 {
   struct list *__retres;
-  __store_block((void *)(& l),4U);
-  __full_init((void *)(& l));
   if (l == (void *)0) {
     __retres = l;
     goto return_label;
@@ -90,9 +88,7 @@ struct list *f(struct list *l)
     goto return_label;
   }
   __retres = (struct list *)((void *)0);
-  return_label: /* internal */
-    __delete_block((void *)(& l));
-    return __retres;
+  return_label: /* internal */ return __retres;
 }
 
 /*@ behavior B1:

@@ -186,7 +186,6 @@ int *f(int *x)
     e_acsl_assert(! __e_acsl_and,(char *)"Assertion",(char *)"f",
                   (char *)"!\\valid(y)",19);
   }
-  __full_init((void *)(& y));
   y = x;
   /*@ assert \valid(x); */
   {

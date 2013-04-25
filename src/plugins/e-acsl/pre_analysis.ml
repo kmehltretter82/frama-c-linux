@@ -285,7 +285,7 @@ module rec Transfer
       (fun state ->
 	let state = Env.default_varinfos state in
 	let state = 
-	  if is_first || is_last then 
+	  if (is_first || is_last) && Misc.is_generated_kf kf then 
 	    Annotations.fold_behaviors
 	      (fun _ bhv s -> 
 		let handle_annot test f s =
