@@ -114,7 +114,6 @@ struct list *__e_acsl_f(struct list *l)
   __store_block((void *)(& l),4U);
   __full_init((void *)(& l));
   __store_block((void *)(& __e_acsl_at_4),4U);
-  __full_init((void *)(& __e_acsl_at_4));
   __e_acsl_at_4 = l;
   {
     int __e_acsl_valid;
@@ -142,10 +141,8 @@ struct list *__e_acsl_f(struct list *l)
     __e_acsl_at_3 = __e_acsl_and_2;
   }
   __store_block((void *)(& __e_acsl_at_2),4U);
-  __full_init((void *)(& __e_acsl_at_2));
   __e_acsl_at_2 = l;
   __store_block((void *)(& __e_acsl_at),4U);
-  __full_init((void *)(& __e_acsl_at));
   __e_acsl_at = l == (void *)0;
   __retres = f(l);
   {

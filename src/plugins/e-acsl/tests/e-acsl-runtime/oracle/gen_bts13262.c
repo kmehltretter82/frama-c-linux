@@ -139,22 +139,16 @@ void __e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
   __store_block((void *)(& AverageAccel),4U);
   __full_init((void *)(& AverageAccel));
   __store_block((void *)(& __e_acsl_at_6),4U);
-  __full_init((void *)(& __e_acsl_at_6));
   __e_acsl_at_6 = Accel;
   __store_block((void *)(& __e_acsl_at_5),4U);
-  __full_init((void *)(& __e_acsl_at_5));
   __e_acsl_at_5 = Accel;
   __store_block((void *)(& __e_acsl_at_4),4U);
-  __full_init((void *)(& __e_acsl_at_4));
   __e_acsl_at_4 = Accel;
   __store_block((void *)(& __e_acsl_at_3),4U);
-  __full_init((void *)(& __e_acsl_at_3));
   __e_acsl_at_3 = Accel;
   __store_block((void *)(& __e_acsl_at_2),4U);
-  __full_init((void *)(& __e_acsl_at_2));
   __e_acsl_at_2 = Accel;
   __store_block((void *)(& __e_acsl_at),4U);
-  __full_init((void *)(& __e_acsl_at));
   __e_acsl_at = AverageAccel;
   atp_NORMAL_computeAverageAccel(Accel,AverageAccel);
   {

@@ -92,10 +92,22 @@ let kind_to_string loc k =
     | Invariant -> "Invariant"
     | RTE -> "RTE")
 
+let is_generated_varinfo vi =
+  vi.vgenerated
+  && let name = vi.vname in
+     name.[0] = '_'
+     && name.[1] = '_'
+     && name.[2] = 'e'
+     && name.[3] = '_'
+     && name.[4] = 'a'
+     && name.[5] = 'c'
+     && name.[6] = 's'
+     && name.[7] = 'l'
+     && name.[8] = '_'
+
 let is_generated_kf kf =
-  let name = Kernel_function.get_name kf in
-  let str = Str.regexp "__e_acsl_\\(.*\\)" in
-  Str.string_match str name 0
+  let name = Kernel_function.get_vi kf in
+  is_generated_varinfo name
 
 let get_orig_name kf =
   let name = Kernel_function.get_name kf in

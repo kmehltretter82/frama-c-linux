@@ -222,7 +222,6 @@ void g(int *p, int *q)
       e_acsl_assert(__e_acsl_valid_read_3,(char *)"RTE",(char *)"g",
                     (char *)"mem_access: \\valid_read(q)",0);
       __store_block((void *)(& __e_acsl_at_3),4U);
-      __full_init((void *)(& __e_acsl_at_3));
       __e_acsl_at_3 = *q;
     }
     {
@@ -231,7 +230,6 @@ void g(int *p, int *q)
       e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"g",
                     (char *)"mem_access: \\valid_read(q)",0);
       __store_block((void *)(& __e_acsl_at),4U);
-      __full_init((void *)(& __e_acsl_at));
       __e_acsl_at = *q;
     }
     *p = 2;
@@ -248,7 +246,6 @@ void g(int *p, int *q)
                     (char *)"mem_access: \\valid_read(p+(long)__e_acsl_at)",
                     0);
       __store_block((void *)(& __e_acsl_at_2),4U);
-      __full_init((void *)(& __e_acsl_at_2));
       __e_acsl_at_2 = *(p + (long)__e_acsl_at);
     }
     A = 4;
@@ -329,7 +326,6 @@ int main(void)
   x = __e_acsl_h(0);
   L:
     __store_block((void *)(& __e_acsl_at_3),4U);
-    __full_init((void *)(& __e_acsl_at_3));
     __e_acsl_at_3 = x;
     {
       mpz_t __e_acsl_x_2;
@@ -346,7 +342,6 @@ int main(void)
       __gmpz_clear(__e_acsl_add);
     }
     __store_block((void *)(& __e_acsl_at),4U);
-    __full_init((void *)(& __e_acsl_at));
     __e_acsl_at = x;
     /*@ assert x ≡ 0; */
     {

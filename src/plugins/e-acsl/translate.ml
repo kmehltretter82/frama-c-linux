@@ -487,11 +487,7 @@ and at_to_exp env t_opt label e =
       t_opt
       (Cil.typeOf e) 
       (fun v _ -> 
-	if must_model_new_var e then 
-	  [ Misc.mk_store_stmt v;
-	    Misc.mk_initialize ~loc (Var v, NoOffset) ]
-	else
-	  [])
+	if must_model_new_var e then [ Misc.mk_store_stmt v ] else [])
   in
   let env_ref = ref new_env in
   (* visitor modifying in place the labeled statement in order to store [e]
@@ -620,7 +616,11 @@ and named_predicate_content_to_exp ?name kf env p =
   | Pvalid _ -> not_yet env "labeled \\valid"
   | Pvalid_read _ -> not_yet env "labeled \\valid_read"
   | Pinitialized(LogicLabel(_, label), t) when label = "Here" ->
-    mmodel_call_with_size ~loc kf "initialized" Cil.intType env t
+    (match t.term_node with
+    | TAddrOf (TVar { lv_origin = Some vi }, _) 
+	when Misc.is_generated_varinfo vi ->
+      Cil.one ~loc, env
+    | _ -> mmodel_call_with_size ~loc kf "initialized" Cil.intType env t)
   | Pinitialized _ -> not_yet env "labeled \\initialized"
   | Pallocable _ -> not_yet env "\\allocate"
   | Pfreeable _ -> not_yet env "\\free"

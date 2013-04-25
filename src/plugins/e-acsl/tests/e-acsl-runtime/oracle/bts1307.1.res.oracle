@@ -50,9 +50,6 @@ share/e-acsl/e_acsl_gmp.h:153:[value] Function __gmpz_tdiv_q: precondition got s
 share/e-acsl/e_acsl_gmp.h:154:[value] Function __gmpz_tdiv_q: precondition got status valid.
 [value] using specification for function __gmpz_get_ui
 share/e-acsl/e_acsl_gmp.h:185:[value] Function __gmpz_get_ui: precondition got status valid.
-[value] using specification for function __initialized
-share/e-acsl/memory_model/e_acsl_mmodel.h:86:[value] Function __initialized: postcondition got status unknown.
-share/e-acsl/memory_model/e_acsl_mmodel.h:87:[value] Function __initialized: postcondition got status valid.
 [value] using specification for function __valid_read
 [value] user error: type long double not implemented. Using double instead
 tests/e-acsl-runtime/bts1307.i:13:[kernel] warning: non-finite long double value ([--..--]):

@@ -33,9 +33,6 @@
 - use checked assigns whenever possible in the analysis
   checked property = valid property or property for which code will be generated
 - fix \offset, \block_length and \base_addr
-- sur des variables générées par E-ACSL (e.g. __e_acsl_at), 
-  pas nécessaire de tester __initialized(&) quand on teste __valid_read 
-  (cf. tests/e-acsl-runtime/bts1307.i)
 - RTE avec du code GMP
 
 ##############

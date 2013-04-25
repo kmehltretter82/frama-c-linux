@@ -49,14 +49,6 @@ extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
 extern  __attribute__((__FC_BUILTIN__)) int __valid_read(void *ptr,
                                                          size_t size);
 
-/*@ ensures \result ≡ 0 ∨ \result ≡ 1;
-    ensures
-      \result ≡ 1 ⇒ \initialized((char *)\old(ptr)+(0..\old(size)-1));
-    assigns \nothing;
- */
-extern  __attribute__((__FC_BUILTIN__)) int __initialized(void *ptr,
-                                                          size_t size);
-
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 
 extern size_t __memory_size;
@@ -104,22 +96,16 @@ void __e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
   __store_block((void *)(& AverageAccel),4U);
   __full_init((void *)(& AverageAccel));
   __store_block((void *)(& __e_acsl_at_6),4U);
-  __full_init((void *)(& __e_acsl_at_6));
   __e_acsl_at_6 = Accel;
   __store_block((void *)(& __e_acsl_at_5),4U);
-  __full_init((void *)(& __e_acsl_at_5));
   __e_acsl_at_5 = Accel;
   __store_block((void *)(& __e_acsl_at_4),4U);
-  __full_init((void *)(& __e_acsl_at_4));
   __e_acsl_at_4 = Accel;
   __store_block((void *)(& __e_acsl_at_3),4U);
-  __full_init((void *)(& __e_acsl_at_3));
   __e_acsl_at_3 = Accel;
   __store_block((void *)(& __e_acsl_at_2),4U);
-  __full_init((void *)(& __e_acsl_at_2));
   __e_acsl_at_2 = Accel;
   __store_block((void *)(& __e_acsl_at),4U);
-  __full_init((void *)(& __e_acsl_at));
   __e_acsl_at = AverageAccel;
   atp_NORMAL_computeAverageAccel(Accel,AverageAccel);
   {
@@ -128,7 +114,6 @@ void __e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
     int __e_acsl_valid_read_3;
     int __e_acsl_valid_read_4;
     int __e_acsl_valid_read_5;
-    int __e_acsl_initialized;
     int __e_acsl_and;
     __e_acsl_valid_read = __valid_read((void *)(*__e_acsl_at_6),sizeof(int));
     e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",
@@ -155,9 +140,7 @@ void __e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
     e_acsl_assert(__e_acsl_valid_read_5,(char *)"RTE",
                   (char *)"atp_NORMAL_computeAverageAccel",
                   (char *)"mem_access: \\valid_read(&(*__e_acsl_at_2)[4])",0);
-    __e_acsl_initialized = __initialized((void *)(& __e_acsl_at),
-                                         sizeof(int *));
-    if (__e_acsl_initialized) {
+    if (1) {
       int __e_acsl_valid_read_6;
       __e_acsl_valid_read_6 = __valid_read((void *)__e_acsl_at,sizeof(int));
       __e_acsl_and = __e_acsl_valid_read_6;

@@ -151,10 +151,8 @@ void *__e_acsl_memchr(void const *buf, int c, size_t n)
     __e_acsl_at_4 = __e_acsl_forall_2;
   }
   __store_block((void *)(& __e_acsl_at_3),4U);
-  __full_init((void *)(& __e_acsl_at_3));
   __e_acsl_at_3 = c;
   __store_block((void *)(& __e_acsl_at_2),4U);
-  __full_init((void *)(& __e_acsl_at_2));
   __e_acsl_at_2 = buf;
   {
     int __e_acsl_exists;
