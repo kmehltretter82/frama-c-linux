@@ -10,7 +10,7 @@
 extern void *malloc(size_t p);
 extern void free(void* p);
 
-int *X;
+int *X, Z;
 
 /*@ requires \valid(x); 
   @ ensures \valid(\result); */
@@ -35,5 +35,6 @@ int main(void) {
   /*@ assert \valid(a) && \valid(b) && \valid(X); */
   free(a);
   /*@ assert ! \valid(a) && \valid(b) && \valid(X); */
+  /*@ assert \valid(&Z); */
   return 0;
 }

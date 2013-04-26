@@ -34,6 +34,9 @@
 - use checked assigns whenever possible in the analysis
   checked property = valid property or property for which code will be generated
 - RTE avec du code GMP
+- ne pas appeler __malloc et __free quand pas nécessaire. Nécessite d'avoir
+  malloc, __malloc, __e_acsl_malloc, __e_acsl__malloc (idem pour free)
+- analysis: optimize it by performing no join over sets anymore
 
 ##############
 # KNOWN BUGS #
@@ -55,8 +58,6 @@
 - \valid (or other memory-model constructs) in ensures of functions without code
 - function pointers 
   (in case of the pointing function has a behavior like in test ptr_init.c)
-- ne pas remplacer tous les appels à malloc/free par des 
-  __e_acsl_malloc/__eacsl_free. Ne le faire uniquement pour ceux monitorer.
 
 #######
 # DOC #

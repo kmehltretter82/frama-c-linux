@@ -165,6 +165,7 @@ predicate diffSize{L1, L2}(ℤ i) =
 
 */
 int *X;
+int Z;
 /*@ requires \valid(x);
     ensures \valid(\result); */
 int *f(int *x)
@@ -227,6 +228,7 @@ int *__e_acsl_f(int *x)
 
 void e_acsl_global_init(void)
 {
+  __store_block((void *)(& Z),4U);
   __store_block((void *)(& X),4U);
   return;
 }
@@ -460,7 +462,15 @@ int main(void)
     e_acsl_assert(__e_acsl_and_24,(char *)"Assertion",(char *)"main",
                   (char *)"(!\\valid(a) && \\valid(b)) && \\valid(X)",37);
   }
+  /*@ assert \valid(&Z); */
+  {
+    int __e_acsl_valid_19;
+    __e_acsl_valid_19 = __valid((void *)(& Z),sizeof(int));
+    e_acsl_assert(__e_acsl_valid_19,(char *)"Assertion",(char *)"main",
+                  (char *)"\\valid(&Z)",38);
+  }
   __retres = 0;
+  __delete_block((void *)(& Z));
   __delete_block((void *)(& X));
   __delete_block((void *)(& n));
   __delete_block((void *)(& b));

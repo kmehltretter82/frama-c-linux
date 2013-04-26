@@ -161,28 +161,31 @@ module rec Transfer
     let ty = Cil.typeOf e in
     is_ptr_or_array ty
 
-  let rec register_term_lval kf varinfos (thost, _) = 
-    let add vi = 
-      if is_ptr_or_array vi.vtype then Varinfo.Set.add vi varinfos 
-      else varinfos
-    in
-    match thost with
+  let rec register_term_lval kf varinfos (thost, _) = match thost with
     | TVar { lv_origin = None } -> varinfos
-    | TVar { lv_origin = Some vi } -> add vi
-    | TResult _ -> add (Misc.result_vi kf)
+    | TVar { lv_origin = Some vi } -> Varinfo.Set.add vi varinfos
+    | TResult _ -> Varinfo.Set.add (Misc.result_vi kf) varinfos
     | TMem t -> register_term kf varinfos t
 
   and register_term kf varinfos term = match term.term_node with
-    | TConst _ | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ | TAlignOf _
-    | TAlignOfE _ | Tnull | Ttype _ ->
-      varinfos
     | TLval tlv | TAddrOf tlv | TStartOf tlv -> 
       register_term_lval kf varinfos tlv
-    | TUnOp(_, t) | TCastE(_, t) | Tlambda(_, t) | Tat(t, _) | Tlet(_, t) ->
+    | TCastE(_, t) | Tat(t, _) | Tlet(_, t) ->
       register_term kf varinfos t
-    | TBinOp(_, t1, t2) | Tif(_, t1, t2) ->
-      let s = register_term kf varinfos t1 in
-      register_term kf s t2
+    | Tif(_, t1, t2) ->
+      let varinfos = register_term kf varinfos t1 in
+      register_term kf varinfos t2
+    | TBinOp((PlusPI | IndexPI | MinusPI), t1, t2) ->
+      (match t1.term_type with
+      | Ctype ty when is_ptr_or_array ty -> register_term kf varinfos t1
+      | _ -> 
+	match t2.term_type with
+	| Ctype ty when is_ptr_or_array ty -> register_term kf varinfos t2
+	| _ -> assert false)
+    | TConst _ | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ | TAlignOf _
+    | TAlignOfE _ | Tnull | Ttype _ | TUnOp _ | TBinOp _ ->
+      varinfos
+    | Tlambda(_, _) -> Error.not_yet "lambda function"
     | Tapp(_, _, _) -> Error.not_yet "function application"
     | TDataCons _ -> Error.not_yet "data constructor"
     | Tbase_addr _ -> Error.not_yet "\\base_addr"
@@ -205,7 +208,7 @@ module rec Transfer
     | Pvalid(_, t) | Pvalid_read(_, t) | Pinitialized(_, t) ->
       (*	Options.feedback "REGISTER %a" Cil.d_term t;*)
       state_ref := register_term kf !state_ref t;
-      Cil.SkipChildren
+      Cil.DoChildren
     | Pallocable _ -> Error.not_yet "\\allocable"
     | Pfreeable _ -> Error.not_yet "\\freeable"
     | Pfresh _ -> Error.not_yet "\\fresh"
@@ -217,17 +220,7 @@ module rec Transfer
     method vterm term = match term.term_node with
     | Tbase_addr(_, t) | Toffset(_, t) | Tblock_length(_, t) ->
       state_ref := register_term kf !state_ref t;
-      Cil.SkipChildren
-    | TBinOp((PlusPI | IndexPI | MinusPI), t1, t2) ->
-      (match t1.term_type with
-      | Ctype ty when is_ptr_or_array ty ->
-	state_ref := register_term kf !state_ref t1
-      | _ -> 
-	match t2.term_type with
-	| Ctype ty when is_ptr_or_array ty ->
-	  state_ref := register_term kf !state_ref t2
-	| _ -> assert false);
-      Cil.SkipChildren
+      Cil.DoChildren
     | TConst _ | TSizeOf _ | TSizeOfStr _ | TAlignOf _  | Tnull | Ttype _ 
     | Tempty_set -> 
       (* no left-value inside inside: skip for efficiency *)
@@ -244,7 +237,7 @@ module rec Transfer
     | TMem t ->
       (* potential RTE *)
       state_ref := register_term kf !state_ref t;
-      Cil.SkipChildren
+      Cil.DoChildren
     | TVar _ | TResult _ -> 
       Cil.SkipChildren
   end

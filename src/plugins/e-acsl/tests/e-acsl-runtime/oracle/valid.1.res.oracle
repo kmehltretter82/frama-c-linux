@@ -27,6 +27,7 @@ tests/e-acsl-runtime/valid.c:25:[e-acsl] warning: E-ACSL construct `\allocate' i
         __fc_heap_status ∈ [--..--]
         __memory_size ∈ [--..--]
         X ∈ {0}
+        Z ∈ {0}
 [value] using specification for function __store_block
 [value] using specification for function __full_init
 tests/e-acsl-runtime/valid.c:27:[value] Assertion got status valid.
@@ -78,6 +79,7 @@ tests/e-acsl-runtime/valid.c:37:[kernel] warning: accessing left-value that cont
 tests/e-acsl-runtime/valid.c:37:[kernel] warning: completely indeterminate value in a.
 tests/e-acsl-runtime/valid.c:37:[value] all evaluations are invalid for function call argument
         (void *)a
+tests/e-acsl-runtime/valid.c:38:[value] Assertion got status valid.
 [kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
 [value] using specification for function __clean
 [value] done for function main
