@@ -13,23 +13,8 @@
 #if WORDBITS == 16
 
 const size_t Tmasks[] = {
-0x0,
-0x8000,
-0xc000,
-0xe000,
-0xf000,
-0xf800,
-0xfc00,
-0xfe00,
-0xff00,
-0xff80,
-0xffc0,
-0xffe0,
-0xfff0,
-0xfff8,
-0xfffc,
-0xfffe,
-0xffff};
+0x0,0x8000,0xc000,0xe000,0xf000,0xf800,0xfc00,0xfe00,0xff00,0xff80,0xffc0,
+0xffe0,0xfff0,0xfff8,0xfffc,0xfffe,0xffff};
 
 const int Teq[] = {0,-1,3,-3,6,-5,7,-7,12,-9,11,-11,14,-13,15,16,-16};
 const int Tneq[] = {0,0,1,-2,2,-4,5,-6,4,-8,9,-10,10,-12,13,-14,-15};
@@ -37,39 +22,11 @@ const int Tneq[] = {0,0,1,-2,2,-4,5,-6,4,-8,9,-10,10,-12,13,-14,-15};
 #elif WORDBITS == 32
 
 const size_t Tmasks[] = {
-0x0,
-0x80000000,
-0xc0000000,
-0xe0000000,
-0xf0000000,
-0xf8000000,
-0xfc000000,
-0xfe000000,
-0xff000000,
-0xff800000,
-0xffc00000,
-0xffe00000,
-0xfff00000,
-0xfff80000,
-0xfffc0000,
-0xfffe0000,
-0xffff0000,
-0xffff8000,
-0xffffc000,
-0xffffe000,
-0xfffff000,
-0xfffff800,
-0xfffffc00,
-0xfffffe00,
-0xffffff00,
-0xffffff80,
-0xffffffc0,
-0xffffffe0,
-0xfffffff0,
-0xfffffff8,
-0xfffffffc,
-0xfffffffe,
-0xffffffff};
+0x0,0x80000000,0xc0000000,0xe0000000,0xf0000000,0xf8000000,0xfc000000,
+0xfe000000,0xff000000,0xff800000,0xffc00000,0xffe00000,0xfff00000,0xfff80000,
+0xfffc0000,0xfffe0000,0xffff0000,0xffff8000,0xffffc000,0xffffe000,0xfffff000,
+0xfffff800,0xfffffc00,0xfffffe00,0xffffff00,0xffffff80,0xffffffc0,0xffffffe0,
+0xfffffff0,0xfffffff8,0xfffffffc,0xfffffffe,0xffffffff};
 
 const int Teq[] = 
   { 0,-1,3,-3,6,-5,7,-7,12,-9,11,-11,14,-13,15,-15,24,-17,19,-19,22,
@@ -82,71 +39,22 @@ const int Tneq[] =
 #else /* WORDBITS == 64 */
 
 const size_t Tmasks[] = {
-0x0,
-0x8000000000000000,
-0xc000000000000000,
-0xe000000000000000,
-0xf000000000000000,
-0xf800000000000000,
-0xfc00000000000000,
-0xfe00000000000000,
-0xff00000000000000,
-0xff80000000000000,
-0xffc0000000000000,
-0xffe0000000000000,
-0xfff0000000000000,
-0xfff8000000000000,
-0xfffc000000000000,
-0xfffe000000000000,
-0xffff000000000000,
-0xffff800000000000,
-0xffffc00000000000,
-0xffffe00000000000,
-0xfffff00000000000,
-0xfffff80000000000,
-0xfffffc0000000000,
-0xfffffe0000000000,
-0xffffff0000000000,
-0xffffff8000000000,
-0xffffffc000000000,
-0xffffffe000000000,
-0xfffffff000000000,
-0xfffffff800000000,
-0xfffffffc00000000,
-0xfffffffe00000000,
-0xffffffff00000000,
-0xffffffff80000000,
-0xffffffffc0000000,
-0xffffffffe0000000,
-0xfffffffff0000000,
-0xfffffffff8000000,
-0xfffffffffc000000,
-0xfffffffffe000000,
-0xffffffffff000000,
-0xffffffffff800000,
-0xffffffffffc00000,
-0xffffffffffe00000,
-0xfffffffffff00000,
-0xfffffffffff80000,
-0xfffffffffffc0000,
-0xfffffffffffe0000,
-0xffffffffffff0000,
-0xffffffffffff8000,
-0xffffffffffffc000,
-0xffffffffffffe000,
-0xfffffffffffff000,
-0xfffffffffffff800,
-0xfffffffffffffc00,
-0xfffffffffffffe00,
-0xffffffffffffff00,
-0xffffffffffffff80,
-0xffffffffffffffc0,
-0xffffffffffffffe0,
-0xfffffffffffffff0,
-0xfffffffffffffff8,
-0xfffffffffffffffc,
-0xfffffffffffffffe,
-0xffffffffffffffff};
+0x0,0x8000000000000000,0xc000000000000000,0xe000000000000000,0xf000000000000000,
+0xf800000000000000,0xfc00000000000000,0xfe00000000000000,0xff00000000000000,
+0xff80000000000000,0xffc0000000000000,0xffe0000000000000,0xfff0000000000000,
+0xfff8000000000000,0xfffc000000000000,0xfffe000000000000,0xffff000000000000,
+0xffff800000000000,0xffffc00000000000,0xffffe00000000000,0xfffff00000000000,
+0xfffff80000000000,0xfffffc0000000000,0xfffffe0000000000,0xffffff0000000000,
+0xffffff8000000000,0xffffffc000000000,0xffffffe000000000,0xfffffff000000000,
+0xfffffff800000000,0xfffffffc00000000,0xfffffffe00000000,0xffffffff00000000,
+0xffffffff80000000,0xffffffffc0000000,0xffffffffe0000000,0xfffffffff0000000,
+0xfffffffff8000000,0xfffffffffc000000,0xfffffffffe000000,0xffffffffff000000,
+0xffffffffff800000,0xffffffffffc00000,0xffffffffffe00000,0xfffffffffff00000,
+0xfffffffffff80000,0xfffffffffffc0000,0xfffffffffffe0000,0xffffffffffff0000,
+0xffffffffffff8000,0xffffffffffffc000,0xffffffffffffe000,0xfffffffffffff000,
+0xfffffffffffff800,0xfffffffffffffc00,0xfffffffffffffe00,0xffffffffffffff00,
+0xffffffffffffff80,0xffffffffffffffc0,0xffffffffffffffe0,0xfffffffffffffff0,
+0xfffffffffffffff8,0xfffffffffffffffc,0xfffffffffffffffe,0xffffffffffffffff};
 
 
 const int Teq[] = 
@@ -168,7 +76,7 @@ struct bittree {
   struct _block * leaf;
 } * __root = NULL;
 
-
+/*unsigned cpt_mask = 0;*/
 
 /* common prefix of two addresses */
 /*@ assigns \nothing;
@@ -182,12 +90,7 @@ struct bittree {
 size_t mask(size_t a, size_t b) {
   size_t nxor = ~(a ^ b), ret;
   int i = WORDBITS/2; /* dichotomic search, starting in the middle */
-  int k;
-
-  for(k = 0; k <= WORDBITS; k++)
-    //@ assert Tmasks[k] == Tmasks[WORDBITS] << (WORDBITS-k);
-    ;
-  
+  /*cpt_mask++;*/
   
   /* if the current mask matches we use transition from Teq, else from Tneq
      we stop as soon as i is negative, meaning that we found the mask
@@ -372,12 +275,8 @@ void __add_element (struct _block * ptr) {
 
       /* necessary ? -- begin */
       aux = father;
-      /*while(1) {*/
-	aux->mask = mask(aux->left->addr & aux->left->mask,
-			    aux->right->addr & aux->right->mask);
-	/*if(aux == __root) break;
-	aux = aux->father;
-	}*/
+      aux->mask = mask(aux->left->addr & aux->left->mask,
+		       aux->right->addr & aux->right->mask);
       /* necessary ? -- end */
     }
     brother->father = father;
@@ -509,6 +408,7 @@ void __clean_rec (struct bittree * ptr) {
 void __clean_struct () {
   __clean_rec(__root);
   __root = NULL;
+  /*printf("%i &\n", cpt_mask);*/
 }
 
 /*********************/

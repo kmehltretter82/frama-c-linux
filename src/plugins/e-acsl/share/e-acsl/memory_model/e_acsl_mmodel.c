@@ -4,20 +4,28 @@
 #include <string.h>
 #include <stdbool.h>
 #include <assert.h>
-#include "e_acsl_bittree.h"
 #include "e_acsl_mmodel_api.h"
 #include "e_acsl_mmodel.h"
 
 size_t __memory_size = 0;
+/*unsigned cpt_store_block = 0;*/
+
 
 const int nbr_bits_to_1[256] = {
   0,1,1,2,1,2,2,3,1,2,2,3,2,3,3,4,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,4,5,5,6,5,6,6,7,5,6,6,7,6,7,7,8
 };
 
+/*@ assigns \nothing;
+  @ ensures \resul == __memory_size;
+  @*/
 size_t __get_memory_size(void) {
   return __memory_size;
 }
 
+/*@ assigns \nothing;
+  @ ensures size%8 == 0 ==> \result == size/8;
+  @ ensures size%8 != 0 ==> \result == size/8+1;
+  @*/
 size_t needed_bytes (size_t size) {
   return (size % 8) == 0 ? (size/8) : (size/8 + 1);
 }
@@ -35,6 +43,7 @@ void* __store_block(void* ptr, size_t size) {
   tmp->is_litteral_string = false;
   tmp->is_out_of_bound = false;
   __add_element(tmp);
+  /*cpt_store_block++;*/
   return ptr;
 }
 
@@ -240,10 +249,14 @@ size_t __block_length(void* ptr) {
 /* return whether the size bytes of ptr are readable/writable */
 int __valid(void* ptr, size_t size) {
   struct _block * tmp;
+  /*printf("ptr = %p\n", ptr);
+    printf("size = %i\n", size);*/
   if(ptr == NULL)
     return false;
   assert(size > 0);
   tmp = __get_cont(ptr);
+  /*printf("tmp->ptr = %p\n", tmp->ptr);
+    printf("tmp->size = %i\n", tmp->size);*/
   return (tmp == NULL) ?
     false : ( tmp->size - ( (size_t)ptr - tmp->ptr ) >= size
 	      && !tmp->is_litteral_string && !tmp->is_out_of_bound);
@@ -332,6 +345,7 @@ void __clean_block (struct _block * ptr) {
 /* erase the content of the abstract structure */
 void __clean() {
   __clean_struct();
+  /*printf("%i &\n", cpt_store_block);*/
 }
 
 /**********************/
