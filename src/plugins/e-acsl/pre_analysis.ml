@@ -161,10 +161,17 @@ module rec Transfer
     let ty = Cil.typeOf e in
     is_ptr_or_array ty
 
-  let rec register_term_lval kf varinfos (thost, _) = match thost with
+  let rec register_term_lval kf varinfos (thost, _) = 
+    let add_vi kf vi =
+      Options.feedback ~level:4 ~dkey "monitoring %a from annotation of %a." 
+	Printer.pp_varinfo vi 
+	Kernel_function.pretty kf;
+      Varinfo.Set.add vi varinfos
+    in
+    match thost with
     | TVar { lv_origin = None } -> varinfos
-    | TVar { lv_origin = Some vi } -> Varinfo.Set.add vi varinfos
-    | TResult _ -> Varinfo.Set.add (Misc.result_vi kf) varinfos
+    | TVar { lv_origin = Some vi } -> add_vi kf vi
+    | TResult _ -> add_vi kf (Misc.result_vi kf)
     | TMem t -> register_term kf varinfos t
 
   and register_term kf varinfos term = match term.term_node with
@@ -343,7 +350,12 @@ module rec Transfer
 	if is_ptr_or_array_exp e && Varinfo.Set.mem vi state then 
 	  match base_addr e with
 	  | None -> state
-	  | Some vi_e -> Varinfo.Set.add vi_e state
+	  | Some vi_e -> 
+	    Options.feedback ~level:4 ~dkey
+	      "monitoring %a from %a."
+	      Printer.pp_varinfo vi_e
+	      Printer.pp_lval (lhost, NoOffset);
+	    Varinfo.Set.add vi_e state
 	else 
 	  state
       in

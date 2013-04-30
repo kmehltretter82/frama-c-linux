@@ -622,7 +622,7 @@ and named_predicate_content_to_exp ?name kf env p =
     (* optimisation when we know that the initialisation is ok *)
     | TAddrOf (TResult _, TNoOffset) -> Cil.one ~loc, env
     | TAddrOf (TVar { lv_origin = Some vi }, TNoOffset) 
-      when vi.vformal || vi.vglob || Misc.is_generated_varinfo vi ->
+	when vi.vformal || vi.vglob || Misc.is_generated_varinfo vi ->
       Cil.one ~loc, env
     | _ -> mmodel_call_with_size ~loc kf "initialized" Cil.intType env t)
   | Pinitialized _ -> not_yet env "labeled \\initialized"
@@ -641,6 +641,7 @@ and named_predicate_to_exp ?name kf ?rte env p =
 and translate_rte kf env e =
   let stmt = Cil.mkStmtOneInstr ~valid_sid:true (Skip Location.unknown) in
   let l = get_rte kf stmt e in
+  let old_valid = !is_visiting_valid in
   let old_kind = Env.annotation_kind env in
   let env = Env.set_annotation_kind env Misc.RTE in
   let env =
@@ -657,6 +658,7 @@ and translate_rte kf env e =
       env
       l
   in
+  is_visiting_valid := old_valid;
   Env.set_annotation_kind env old_kind
 
 and translate_named_predicate kf env p =

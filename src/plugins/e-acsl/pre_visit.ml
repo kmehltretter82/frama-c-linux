@@ -346,7 +346,9 @@ class dup_functions_visitor prj = object (self)
 	  f.globals <- self#insert_libc f.globals; 
 	  f)
 
-  initializer reset ()
+  initializer
+    Project.copy ~selection:(Plugin.get_selection ()) prj;
+    reset ()
 
 end
 
@@ -357,7 +359,6 @@ let dup_functions () =
       "e_acsl_dup_functions" 
       (new dup_functions_visitor)
   in
-  Project.copy ~selection:(Plugin.get_selection ()) prj;
   Queue.iter (fun f -> f ()) actions;
   prj
 

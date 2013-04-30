@@ -1,8 +1,8 @@
 /* run.config
    COMMENT: \valid
    STDOPT: #"-cpp-extra-args=\"-I`@frama-c@ -print-share-path`/libc\"" +"-val-builtin __malloc:Frama_C_alloc_size -val-builtin __free:Frama_C_free"
-   EXECNOW: LOG gen_valid.c BIN gen_valid.out @frama-c@ -cpp-extra-args="-I`@frama-c@ -print-share-path`/libc" -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/valid.c -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_valid.c > /dev/null && ./gcc_test.sh valid
-   EXECNOW: LOG gen_valid2.c BIN gen_valid2.out @frama-c@ -cpp-extra-args="-I`@frama-c@ -print-share-path`/libc" -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/valid.c -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_valid2.c > /dev/null && ./gcc_test.sh valid2
+   EXECNOW: LOG gen_valid.c BIN gen_valid.out @frama-c@ -machdep x86_64 -cpp-extra-args="-I`@frama-c@ -print-share-path`/libc" -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/valid.c -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_valid.c > /dev/null && ./gcc_test.sh valid
+   EXECNOW: LOG gen_valid2.c BIN gen_valid2.out @frama-c@ -machdep x86_64 -cpp-extra-args="-I`@frama-c@ -print-share-path`/libc" -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/valid.c -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_valid2.c > /dev/null && ./gcc_test.sh valid2
 */
 
 #include "stdlib.h"
@@ -23,7 +23,7 @@ int *f(int *x) {
 }
 
 int main(void) {
-  int *a, *b, n = 0;
+  int *a, *b, **c, ***d, n = 0;
   /*@ assert ! \valid(a) && ! \valid(b) && ! \valid(X); */
   a = malloc(sizeof(int));
   /*@ assert \valid(a) && ! \valid(b) && ! \valid(X); */
@@ -33,6 +33,10 @@ int main(void) {
   /*@ assert \valid(a) && \valid(b) && \valid(X); */
   X = b;
   /*@ assert \valid(a) && \valid(b) && \valid(X); */
+  c = &a;
+  d = &c;
+  /*@ assert \valid(*c); */
+  /*@ assert \valid(**d); */
   free(a);
   /*@ assert ! \valid(a) && \valid(b) && \valid(X); */
   /*@ assert \valid(&Z); */

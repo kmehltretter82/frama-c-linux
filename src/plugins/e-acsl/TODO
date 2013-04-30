@@ -37,6 +37,8 @@
 - ne pas appeler __malloc et __free quand pas nécessaire. Nécessite d'avoir
   malloc, __malloc, __e_acsl_malloc, __e_acsl__malloc (idem pour free)
 - analysis: optimize it by performing no join over sets anymore
+- analysis: fixed incorrectness in presence of recursive functions
+- RTE: potential duplication (e.g. with **p)
 
 ##############
 # KNOWN BUGS #

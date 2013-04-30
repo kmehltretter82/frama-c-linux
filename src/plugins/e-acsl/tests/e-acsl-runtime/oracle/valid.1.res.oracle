@@ -72,14 +72,17 @@ tests/e-acsl-runtime/valid.c:16:[value] Function f: postcondition got status val
 tests/e-acsl-runtime/valid.c:16:[value] Function __e_acsl_f: postcondition got status valid.
 tests/e-acsl-runtime/valid.c:33:[value] Assertion got status valid.
 tests/e-acsl-runtime/valid.c:35:[value] Assertion got status valid.
+tests/e-acsl-runtime/valid.c:38:[value] Assertion got status valid.
+[value] using specification for function __valid_read
+tests/e-acsl-runtime/valid.c:39:[value] Assertion got status valid.
 FRAMAC_SHARE/libc/stdlib.h:142:[value] Function __e_acsl_free, behavior deallocation: precondition got status unknown.
 FRAMAC_SHARE/libc/stdlib.h:144:[value] Function __e_acsl_free, behavior deallocation: postcondition got status unknown.
-tests/e-acsl-runtime/valid.c:37:[value] Assertion got status valid.
-tests/e-acsl-runtime/valid.c:37:[kernel] warning: accessing left-value that contains escaping addresses; assert(\defined(&a))
-tests/e-acsl-runtime/valid.c:37:[kernel] warning: completely indeterminate value in a.
-tests/e-acsl-runtime/valid.c:37:[value] all evaluations are invalid for function call argument
+tests/e-acsl-runtime/valid.c:41:[value] Assertion got status valid.
+tests/e-acsl-runtime/valid.c:41:[kernel] warning: accessing left-value that contains escaping addresses; assert(\defined(&a))
+tests/e-acsl-runtime/valid.c:41:[kernel] warning: completely indeterminate value in a.
+tests/e-acsl-runtime/valid.c:41:[value] all evaluations are invalid for function call argument
         (void *)a
-tests/e-acsl-runtime/valid.c:38:[value] Assertion got status valid.
+tests/e-acsl-runtime/valid.c:42:[value] Assertion got status valid.
 [kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
 [value] using specification for function __clean
 [value] done for function main
@@ -99,5 +102,7 @@ tests/e-acsl-runtime/valid.c:38:[value] Assertion got status valid.
           X ∈ {{ &n }}
           a ∈ ESCAPINGADDR
           b ∈ {{ &n }}
+          c ∈ {{ &a }}
+          d ∈ {{ &c }}
           n ∈ {0}
           __retres ∈ {0}

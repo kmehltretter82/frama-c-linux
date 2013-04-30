@@ -161,7 +161,10 @@ class e_acsl_visitor prj generate = object (self)
 		    let new_vi = Cil.get_varinfo self#behavior old_vi in
 		    let model blk =
 		      if Pre_analysis.must_model_vi old_vi then
-			Misc.mk_store_stmt new_vi :: blk
+			Misc.mk_store_stmt new_vi 
+			(*			:: Misc.mk_full_init_stmt new_vi
+			 *) (*TODO TODO*)
+			:: blk
 		      else
 			stmts
 		    in
@@ -557,6 +560,11 @@ you must call function `%s' by yourself"
       | Var vi, NoOffset -> vi.vglob || vi.vformal
       | _ -> false
     in
+(*    Options.feedback "%a? %a (%b && %b)" 
+      Printer.pp_lval assigned_lv 
+      Printer.pp_lval checked_lv
+      (not (may_safely_ignore assigned_lv))
+      (Pre_analysis.must_model_lval ~kf ~stmt checked_lv);*)
     if not (may_safely_ignore assigned_lv) && 
       Pre_analysis.must_model_lval ~kf ~stmt checked_lv 
     then begin
