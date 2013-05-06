@@ -30,7 +30,7 @@ install: e-acsl-implementation.pdf e-acsl.pdf
 	cp -f e-acsl-implementation.pdf \
 	  $(DISTRIB_DIR)/download/e-acsl/e-acsl-implementation-$(EACSL_VERSION).pdf
 
-include support/MakeLaTeXModern
+include $(EACSL_DIR)/doc/support/MakeLaTeXModern
 
 eacslversion.tex: Makefile
 	rm -f $@
