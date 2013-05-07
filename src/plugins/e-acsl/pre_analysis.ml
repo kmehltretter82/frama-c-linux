@@ -50,19 +50,21 @@ let get_rte_by_stmt =
        (let module L = Datatype.List(Code_annotation) in L.ty))
 
 module Env: sig
-  val default_varinfos: Varinfo.Set.t option -> Varinfo.Set.t
+  val default_varinfos: Varinfo.Hptset.t option -> Varinfo.Hptset.t
   val apply: (kernel_function -> 'a) -> kernel_function -> 'a
   val clear: unit -> unit
-  val add: kernel_function -> Varinfo.Set.t option Stmt.Hashtbl.t -> unit
-  val find: kernel_function -> Varinfo.Set.t option Stmt.Hashtbl.t 
-  module StartData: Dataflow.StmtStartData with type data = Varinfo.Set.t option
+  val add: kernel_function -> Varinfo.Hptset.t option Stmt.Hashtbl.t -> unit
+  val add_init: kernel_function -> Varinfo.Hptset.t option -> unit
+  val mem_init: kernel_function -> Varinfo.Hptset.t option -> bool
+  val find: kernel_function -> Varinfo.Hptset.t option Stmt.Hashtbl.t 
+  module StartData: Dataflow.StmtStartData with type data = Varinfo.Hptset.t option
   val is_consolidated: unit -> bool
-  val consolidate: Varinfo.Set.t -> unit
+  val consolidate: Varinfo.Hptset.t -> unit
   val consolidated_mem: varinfo -> bool
 end = struct
 
   let current_kf = ref (Kernel_function.dummy ())
-  let default_varinfos = function None -> Varinfo.Set.empty | Some s -> s 
+  let default_varinfos = function None -> Varinfo.Hptset.empty | Some s -> s 
 
   let apply f kf =
     let old = !current_kf in
@@ -75,8 +77,26 @@ end = struct
   let add = Kernel_function.Hashtbl.add tbl
   let find = Kernel_function.Hashtbl.find tbl
 
+  module S = Set.Make(Datatype.Option(Varinfo.Hptset))
+
+  let tbl_init = Kernel_function.Hashtbl.create 7
+  let add_init kf init = 
+    let set =
+      try Kernel_function.Hashtbl.find tbl_init kf
+      with Not_found -> S.empty
+    in
+    let set = S.add init set in
+    Kernel_function.Hashtbl.replace tbl_init kf set
+
+  let mem_init kf init = 
+    try 
+      let set = Kernel_function.Hashtbl.find tbl_init kf in
+      S.mem init set
+    with Not_found -> 
+      false
+
   module StartData = struct
-    type data = Varinfo.Set.t option
+    type data = Varinfo.Hptset.t option
     let apply f = 
       try
 	let h =  Kernel_function.Hashtbl.find tbl !current_kf in
@@ -92,22 +112,25 @@ end = struct
     let length () = apply Stmt.Hashtbl.length
   end
 
-  let consolidated_set = ref Varinfo.Set.empty
+  (* TODO: instead of this costly consolidation, why do not take the state of
+     the entry point of the function? *)
+
+  let consolidated_set = ref Varinfo.Hptset.empty
   let is_consolidated_ref = ref false
 
   let consolidate set = 
-    let set = Varinfo.Set.fold Varinfo.Set.add set !consolidated_set in
+    let set = Varinfo.Hptset.union set !consolidated_set in
     consolidated_set := set
 
   let consolidated_mem v = 
     is_consolidated_ref := true;
-    Varinfo.Set.mem v !consolidated_set
+    Varinfo.Hptset.mem v !consolidated_set
 
   let is_consolidated () = !is_consolidated_ref
 
   let clear () = 
     Kernel_function.Hashtbl.clear tbl;
-    consolidated_set := Varinfo.Set.empty;
+    consolidated_set := Varinfo.Hptset.empty;
     is_consolidated_ref := false
 
 end
@@ -117,20 +140,20 @@ let reset () =
   Env.clear ()
 
 module rec Transfer
-  : Dataflow.BackwardsTransfer with type t = Varinfo.Set.t option
+  : Dataflow.BackwardsTransfer with type t = Varinfo.Hptset.t option
   = struct
 
   let name = "E_ACSL.Pre_analysis"
 
   let debug = ref false
 
-  type t = Varinfo.Set.t option
+  type t = Varinfo.Hptset.t option
 
   module StmtStartData = Env.StartData
 
   let pretty fmt state = match state with
     | None -> Format.fprintf fmt "None"
-    | Some s -> Format.fprintf fmt "%a" Varinfo.Set.pretty s
+    | Some s -> Format.fprintf fmt "%a" Varinfo.Hptset.pretty s
 
   (** The data at function exit. Used for statements with no successors.
       This is usually bottom, since we'll also use doStmt on Return
@@ -144,16 +167,18 @@ module rec Transfer
   let combineStmtStartData stmt ~old state = match stmt.skind, old, state with
     | _, _, None -> assert false
     | _, None, Some _ -> Some state (* [old] already included in [state] *)
-    | Return _, Some old, Some new_ -> Some (Some (Varinfo.Set.union old new_))
+    | Return _, Some old, Some new_ -> 
+      Some (Some (Varinfo.Hptset.union old new_))
     | _, Some old, Some new_ -> 
-      if Varinfo.Set.equal old new_ then
+      if Varinfo.Hptset.equal old new_ then
 	None
       else
-	Some (Some (Varinfo.Set.union old new_))
+	Some (Some (Varinfo.Hptset.union old new_))
 
   (** Take the data from two successors and combine it *)
   let combineSuccessors s1 s2 = 
-    Some (Varinfo.Set.union (Env.default_varinfos s1) (Env.default_varinfos s2))
+    Some 
+      (Varinfo.Hptset.union (Env.default_varinfos s1) (Env.default_varinfos s2))
 
   let is_ptr_or_array ty = Cil.isPtrType ty || Cil.isArrayType ty
 
@@ -166,7 +191,7 @@ module rec Transfer
       Options.feedback ~level:4 ~dkey "monitoring %a from annotation of %a." 
 	Printer.pp_varinfo vi 
 	Kernel_function.pretty kf;
-      Varinfo.Set.add vi varinfos
+      Varinfo.Hptset.add vi varinfos
     in
     match thost with
     | TVar { lv_origin = None } -> varinfos
@@ -347,7 +372,7 @@ module rec Transfer
     let state = Env.default_varinfos state in
     let extend_to_expr state lhost e =
       let add_vi state vi =
-	if is_ptr_or_array_exp e && Varinfo.Set.mem vi state then 
+	if is_ptr_or_array_exp e && Varinfo.Hptset.mem vi state then 
 	  match base_addr e with
 	  | None -> state
 	  | Some vi_e -> 
@@ -355,7 +380,7 @@ module rec Transfer
 	      "monitoring %a from %a."
 	      Printer.pp_varinfo vi_e
 	      Printer.pp_lval (lhost, NoOffset);
-	    Varinfo.Set.add vi_e state
+	    Varinfo.Hptset.add vi_e state
 	else 
 	  state
       in
@@ -398,7 +423,8 @@ module rec Transfer
 		  (fun acc p a -> match base_addr a with
 		    | None -> acc
 		    | Some vi -> 
-		      if Varinfo.Set.mem vi state then Varinfo.Set.add p acc
+		      if Varinfo.Hptset.mem vi state 
+		      then Varinfo.Hptset.add p acc
 		      else acc)
 		  state
 		  params
@@ -410,8 +436,8 @@ module rec Transfer
 		  match base_addr_node (Lval lv) with
 		  | None -> init
 		  | Some vi ->
-		    if Varinfo.Set.mem vi state 
-		    then Varinfo.Set.add (Misc.result_vi kf) init
+		    if Varinfo.Hptset.mem vi state 
+		    then Varinfo.Hptset.add (Misc.result_vi kf) init
 		    else init
 	      in
 	      let state = Compute.get ~init kf in
@@ -421,7 +447,7 @@ module rec Transfer
 		(fun acc p a -> match base_addr a with
 		| None -> acc
 		| Some vi ->
-		  if  Varinfo.Set.mem p state then Varinfo.Set.add vi acc
+		  if  Varinfo.Hptset.mem p state then Varinfo.Hptset.add vi acc
 		  else acc)
 		state
 		params
@@ -435,11 +461,20 @@ module rec Transfer
 	  else
 	    state
 	in
-	let state = match result with
-	  | None -> state
-	  | Some (lhost, _) ->
-	    (* result of this call must be kept; so keep each argument *)
-	    List.fold_left (fun acc e -> extend_to_expr acc lhost e) state l
+	let state = match result, Kernel_function.is_definition kf with
+	  | None, _ | _, false -> state
+	  | Some (lhost, _), true ->
+	    (* add the result if \result must be kept after calling the kf *)
+	    let vi = Misc.result_vi kf in
+	    if  Varinfo.Hptset.mem vi state then 
+	      match lhost with
+	      | Var vi -> Varinfo.Hptset.add vi state
+	      | Mem e -> 
+		match base_addr e with
+		| None -> Kernel.fatal "no base address for %a" Printer.pp_exp e
+		| Some vi -> Varinfo.Hptset.add vi state
+	    else
+	      state
 	in
 	Dataflow.Done (Some state)
       | _ ->
@@ -451,7 +486,7 @@ instrumentation.";
 	     (List.fold_left
 		(fun acc e -> match base_addr e with
 		| None -> acc
-		| Some vi -> Varinfo.Set.add vi acc)
+		| Some vi -> Varinfo.Hptset.add vi acc)
 		state 
 		l)))
     | Asm _ -> Error.not_yet "asm"
@@ -474,7 +509,7 @@ instrumentation.";
 end
 
 and Compute: sig 
-  val get: ?init:Varinfo.Set.t -> kernel_function -> Varinfo.Set.t 
+  val get: ?init:Varinfo.Hptset.t -> kernel_function -> Varinfo.Hptset.t 
 end = struct
 
   module D = Dataflow.Backwards(Transfer)
@@ -483,17 +518,37 @@ end = struct
     Options.feedback ~dkey ~level:2 "entering in function %a." 
       Kernel_function.pretty kf;
     assert (not (Misc.is_library_loc (Kernel_function.get_location kf)));
-    let tbl = Stmt.Hashtbl.create 17 in
+    let tbl, is_init =
+      try Env.find kf, true
+      with Not_found -> Stmt.Hashtbl.create 17, false
+    in
 (*    Options.feedback "ANALYSING %a" Kernel_function.pretty kf;*)
-    Env.add kf tbl;
+    if not is_init then Env.add kf tbl;
     (try
       let fundec = Kernel_function.get_definition kf in
       let stmts, returns = Dataflow.find_stmts fundec in
-      List.iter (fun s -> Stmt.Hashtbl.add tbl s None) stmts;
-      Extlib.may
-	(fun set -> 
-	  List.iter (fun s -> Stmt.Hashtbl.replace tbl s (Some set)) returns)
-	init_set;
+      if is_init then 
+	Extlib.may
+	  (fun set -> 
+	    List.iter 
+	      (fun s -> 
+		let old = 
+		  try Extlib.the (Stmt.Hashtbl.find tbl s) 
+		  with Not_found -> assert false
+		in
+		Stmt.Hashtbl.replace 
+		  tbl
+		  s
+		  (Some (Varinfo.Hptset.union set old)))
+		  returns)
+	  init_set
+      else begin
+	List.iter (fun s -> Stmt.Hashtbl.add tbl s None) stmts;
+	Extlib.may
+	  (fun set -> 
+	    List.iter (fun s -> Stmt.Hashtbl.replace tbl s (Some set)) returns)
+	  init_set
+      end;
       D.compute returns
     with Kernel_function.No_Definition | Kernel_function.No_Statement -> 
       ());
@@ -503,14 +558,19 @@ end = struct
 
   let get ?init kf =
     if Misc.is_library_loc (Kernel_function.get_location kf) then
-      Varinfo.Set.empty
+      Varinfo.Hptset.empty
     else
       try
 	let stmt = Kernel_function.find_first_stmt kf in
 	(*      Options.feedback "GETTING %a" Kernel_function.pretty kf;*)
 	let tbl = 
-	  try Env.find kf
-	  with Not_found -> Env.apply (compute init) kf 
+	  if Env.mem_init kf init then
+	    try Env.find kf with Not_found -> assert false
+	  else begin
+	    (* WARN: potentially incorrect in case of recursive call *)
+	    Env.add_init kf init;
+	    Env.apply (compute init) kf 
+	  end
 	in
 	try
 	  let set = Stmt.Hashtbl.find tbl stmt in
@@ -518,7 +578,7 @@ end = struct
 	with Not_found ->
 	  Options.fatal "stmt never analyzed: %a" Printer.pp_stmt stmt
       with Kernel_function.No_Statement -> 
-	Varinfo.Set.empty
+	Varinfo.Hptset.empty
 
 end
 
@@ -548,7 +608,8 @@ let must_model_vi ?kf ?stmt vi =
   (* [JS 2013/05/07] that is unsound to take the env from the given stmt in
      presence of aliasing with an address (see tests address.i).
      TODO: could be optimized though *)
-  consolidated_must_model_vi vi
+  let res =  consolidated_must_model_vi vi in
+  res
 (*  match stmt, kf with
   | None, _ -> consolidated_must_model_vi vi
   | Some _, None ->
@@ -560,7 +621,7 @@ let must_model_vi ?kf ?stmt vi =
       let tbl = Env.find kf in
       try
 	let set = Stmt.Hashtbl.find tbl stmt in
-	Varinfo.Set.mem vi (Env.default_varinfos set)
+	Varinfo.Hptset.mem vi (Env.default_varinfos set)
       with Not_found -> 
 	(* new statement *)
 	consolidated_must_model_vi vi

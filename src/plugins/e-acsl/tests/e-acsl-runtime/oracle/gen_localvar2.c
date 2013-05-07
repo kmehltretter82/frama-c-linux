@@ -125,6 +125,7 @@ struct list *add(struct list *l, int i)
 {
   struct list *new;
   __store_block((void *)(& new),4U);
+  __store_block((void *)(& l),4U);
   __full_init((void *)(& new));
   new = (struct list *)__e_acsl_malloc(sizeof(struct list));
   /*@ assert \valid(new); */
@@ -146,6 +147,7 @@ struct list *add(struct list *l, int i)
   new->element = i;
   __initialize((void *)(& new->next),sizeof(struct list *));
   new->next = l;
+  __delete_block((void *)(& l));
   __delete_block((void *)(& new));
   return new;
 }
@@ -154,10 +156,15 @@ int main(void)
 {
   int __retres;
   struct list *l;
+  __store_block((void *)(& l),4U);
+  __full_init((void *)(& l));
   l = (struct list *)((void *)0);
+  __full_init((void *)(& l));
   l = add(l,4);
+  __full_init((void *)(& l));
   l = add(l,7);
   __retres = 0;
+  __delete_block((void *)(& l));
   __clean();
   return __retres;
 }

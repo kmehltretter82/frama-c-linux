@@ -7,10 +7,6 @@ struct __anonstruct___mpz_struct_1 {
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
 typedef unsigned int size_t;
-struct list {
-   int element ;
-   struct list *next ;
-};
 /*@
 model __mpz_struct { ℤ n };
 */
@@ -74,14 +70,6 @@ extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
 /*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) int __valid(void *ptr, size_t size);
 
-/*@ ensures \result ≡ 0 ∨ \result ≡ 1;
-    ensures
-      \result ≡ 1 ⇒ \initialized((char *)\old(ptr)+(0..\old(size)-1));
-    assigns \nothing;
- */
-extern  __attribute__((__FC_BUILTIN__)) int __initialized(void *ptr,
-                                                          size_t size);
-
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 
 extern size_t __memory_size;
@@ -121,50 +109,61 @@ predicate diffSize{L1, L2}(ℤ i) =
   \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
 
 */
-struct list *add(struct list *l, int i)
+/*@ ensures \valid(\result); */
+int *f(int *x, int *y)
 {
-  struct list *new;
-  __store_block((void *)(& new),4U);
-  __store_block((void *)(& l),4U);
-  __full_init((void *)(& new));
-  new = (struct list *)__e_acsl_malloc(sizeof(struct list));
-  /*@ assert \valid(new); */
+  __store_block((void *)(& x),4U);
+  __store_block((void *)(& y),4U);
+  __initialize((void *)y,sizeof(int));
+  *y = 1;
+  __delete_block((void *)(& x));
+  __delete_block((void *)(& y));
+  return x;
+}
+
+/*@ ensures \valid(\result); */
+int *__e_acsl_f(int *x, int *y)
+{
+  int *__retres;
+  __store_block((void *)(& __retres),4U);
+  __store_block((void *)(& x),4U);
+  __store_block((void *)(& y),4U);
+  __retres = f(x,y);
   {
-    int __e_acsl_initialized;
-    int __e_acsl_and;
-    __e_acsl_initialized = __initialized((void *)(& new),
-                                         sizeof(struct list *));
-    if (__e_acsl_initialized) {
-      int __e_acsl_valid;
-      __e_acsl_valid = __valid((void *)new,sizeof(struct list));
-      __e_acsl_and = __e_acsl_valid;
-    }
-    else __e_acsl_and = 0;
-    e_acsl_assert(__e_acsl_and,(char *)"Assertion",(char *)"add",
-                  (char *)"\\valid(new)",20);
+    int __e_acsl_valid;
+    __e_acsl_valid = __valid((void *)__retres,sizeof(int));
+    e_acsl_assert(__e_acsl_valid,(char *)"Postcondition",(char *)"f",
+                  (char *)"\\valid(\\result)",12);
+    __delete_block((void *)(& x));
+    __delete_block((void *)(& y));
+    __delete_block((void *)(& __retres));
+    return __retres;
   }
-  __initialize((void *)(& new->element),sizeof(int));
-  new->element = i;
-  __initialize((void *)(& new->next),sizeof(struct list *));
-  new->next = l;
-  __delete_block((void *)(& l));
-  __delete_block((void *)(& new));
-  return new;
 }
 
 int main(void)
 {
   int __retres;
-  struct list *l;
-  __store_block((void *)(& l),4U);
-  __full_init((void *)(& l));
-  l = (struct list *)((void *)0);
-  __full_init((void *)(& l));
-  l = add(l,4);
-  __full_init((void *)(& l));
-  l = add(l,7);
+  int x;
+  int *p;
+  int *q;
+  int *r;
+  __store_block((void *)(& q),4U);
+  __store_block((void *)(& p),4U);
+  __store_block((void *)(& x),4U);
+  __full_init((void *)(& x));
+  x = 0;
+  __full_init((void *)(& q));
+  q = (int *)__e_acsl_malloc(sizeof(int));
+  r = (int *)__e_acsl_malloc(sizeof(int));
+  __full_init((void *)(& p));
+  p = __e_acsl_f(& x,q);
+  __full_init((void *)(& q));
+  q = __e_acsl_f(& x,r);
   __retres = 0;
-  __delete_block((void *)(& l));
+  __delete_block((void *)(& q));
+  __delete_block((void *)(& p));
+  __delete_block((void *)(& x));
   __clean();
   return __retres;
 }
