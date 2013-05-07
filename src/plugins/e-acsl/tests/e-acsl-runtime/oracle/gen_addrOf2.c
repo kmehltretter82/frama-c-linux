@@ -30,6 +30,24 @@ axiomatic
   
   }
  */
+/*@ assigns \nothing; */
+extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
+                                                            size_t size);
+
+/*@ assigns \nothing; */
+extern  __attribute__((__FC_BUILTIN__)) void __delete_block(void *ptr);
+
+/*@ assigns \nothing; */
+extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
+
+/*@ ensures \result ≡ 0 ∨ \result ≡ 1;
+    ensures
+      \result ≡ 1 ⇒ \initialized((char *)\old(ptr)+(0..\old(size)-1));
+    assigns \nothing;
+ */
+extern  __attribute__((__FC_BUILTIN__)) int __initialized(void *ptr,
+                                                          size_t size);
+
 extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
 
 extern size_t __memory_size;
@@ -38,14 +56,42 @@ extern size_t __memory_size;
 predicate diffSize{L1, L2}(ℤ i) =
   \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
  */
+void f(void)
+{
+  int m;
+  int *u;
+  int *p;
+  __store_block((void *)(& p),4U);
+  __store_block((void *)(& u),4U);
+  __store_block((void *)(& m),4U);
+  __full_init((void *)(& u));
+  u = & m;
+  __full_init((void *)(& p));
+  p = u;
+  __full_init((void *)(& m));
+  m = 123;
+  /*@ assert \initialized(p); */
+  {
+    int __e_acsl_initialized;
+    __e_acsl_initialized = __initialized((void *)p,sizeof(int));
+    e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"f",
+                  (char *)"\\initialized(p)",12);
+  }
+  __delete_block((void *)(& p));
+  __delete_block((void *)(& u));
+  __delete_block((void *)(& m));
+  return;
+}
+
 int main(void)
 {
   int __retres;
   int x;
   x = 0;
+  f();
   /*@ assert &x ≡ &x; */
   e_acsl_assert(& x == & x,(char *)"Assertion",(char *)"main",
-                (char *)"&x == &x",9);
+                (char *)"&x == &x",18);
   __retres = 0;
   __clean();
   return __retres;

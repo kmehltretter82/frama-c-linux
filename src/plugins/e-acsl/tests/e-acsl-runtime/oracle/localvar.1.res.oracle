@@ -34,6 +34,7 @@ share/e-acsl/memory_model/e_acsl_mmodel.h:87:[value] Function __initialized: pos
 [value] using specification for function __valid
 [value] using specification for function e_acsl_assert
 share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
+[value] using specification for function __initialize
 [kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
 [value] using specification for function __clean
 [value] done for function main

@@ -65,6 +65,10 @@ extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
 extern  __attribute__((__FC_BUILTIN__)) void __delete_block(void *ptr);
 
 /*@ assigns \nothing; */
+extern  __attribute__((__FC_BUILTIN__)) void __initialize(void *ptr,
+                                                          size_t size);
+
+/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
 
 /*@ assigns \nothing; */
@@ -138,7 +142,9 @@ struct list *add(struct list *l, int i)
     e_acsl_assert(__e_acsl_and,(char *)"Assertion",(char *)"add",
                   (char *)"\\valid(new)",20);
   }
+  __initialize((void *)(& new->element),sizeof(int));
   new->element = i;
+  __initialize((void *)(& new->next),sizeof(struct list *));
   new->next = l;
   __delete_block((void *)(& new));
   return new;

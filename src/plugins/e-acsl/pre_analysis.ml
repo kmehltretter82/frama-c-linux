@@ -367,7 +367,22 @@ module rec Transfer
 	| Some vi -> add_vi state vi
     in
     match instr with
-    | Set((lhost, _), e, _) -> 
+    | Set((lhost, _) as lv, e, _) -> 
+      (* if [e]  contains an address from a base to be monitored, then also
+	 monitor the host *)
+      let rec extend_from_addr state e = match e.enode with
+	| AddrOf(lhost, _) -> 
+	  extend_to_expr state lhost (Cil.new_exp ~loc:e.eloc (Lval lv))
+	| BinOp((PlusPI | IndexPI | MinusPI), e1, e2, _) -> 
+	  if is_ptr_or_array_exp e1 then extend_from_addr state e1
+	  else begin
+	    assert (is_ptr_or_array_exp e2);
+	    extend_from_addr state e2
+	  end
+	| CastE(_, e) | Info(e, _) -> extend_from_addr state e
+	| _ -> state
+      in
+      let state = extend_from_addr state e in
       Dataflow.Done (Some (extend_to_expr state lhost e))
     | Call(result, f_exp, l, _) -> 
       (match f_exp.enode with
@@ -526,11 +541,15 @@ instrumentation.";
   end
 
 let must_model_vi ?kf ?stmt vi =
-  let kf = match kf, stmt with
+  let _kf = match kf, stmt with
     | None, None | Some _, _ -> kf
     | None, Some stmt -> Some (Kernel_function.find_englobing_kf stmt)
   in
-  match stmt, kf with
+  (* [JS 2013/05/07] that is unsound to take the env from the given stmt in
+     presence of aliasing with an address (see tests address.i).
+     TODO: could be optimized though *)
+  consolidated_must_model_vi vi
+(*  match stmt, kf with
   | None, _ -> consolidated_must_model_vi vi
   | Some _, None ->
     assert false
@@ -548,7 +567,7 @@ let must_model_vi ?kf ?stmt vi =
     with Not_found -> 
       (* [kf] is dead code *)
       false
-
+ *)
 let rec must_model_lval ?kf ?stmt = function
   | Var vi, _ -> must_model_vi ?kf ?stmt vi
   | Mem e, _ -> must_model_exp ?kf ?stmt e

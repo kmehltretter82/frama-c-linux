@@ -313,6 +313,7 @@ int main(void)
   }
   __full_init((void *)(& p));
   p = & t[2];
+  __initialize((void *)(& t[2]),sizeof(int));
   t[2] = 5;
   /*@ assert *p ≡ 5; */
   {
