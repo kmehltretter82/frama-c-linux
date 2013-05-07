@@ -161,10 +161,7 @@ class e_acsl_visitor prj generate = object (self)
 		    let new_vi = Cil.get_varinfo self#behavior old_vi in
 		    let model blk =
 		      if Pre_analysis.must_model_vi old_vi then
-			Misc.mk_store_stmt new_vi 
-			(*			:: Misc.mk_full_init_stmt new_vi
-			 *) (*TODO TODO*)
-			:: blk
+			Misc.mk_store_stmt new_vi :: blk
 		      else
 			stmts
 		    in

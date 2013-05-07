@@ -10,10 +10,10 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-        __fc_random_counter ∈ {0}
-        __fc_rand_max ∈ {32767}
-        __fc_heap_status ∈ [--..--]
-        __memory_size ∈ [--..--]
+  __fc_random_counter ∈ {0}
+  __fc_rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __memory_size ∈ [--..--]
 tests/e-acsl-runtime/not.i:8:[value] Assertion got status valid.
 [value] using specification for function e_acsl_assert
 share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
@@ -22,5 +22,5 @@ share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function main:
-          x ∈ {0}
-          __retres ∈ {0}
+  x ∈ {0}
+  __retres ∈ {0}

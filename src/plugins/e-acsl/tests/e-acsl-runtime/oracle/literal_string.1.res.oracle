@@ -10,17 +10,17 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-        __fc_random_counter ∈ {0}
-        __fc_rand_max ∈ {32767}
-        __fc_heap_status ∈ [--..--]
-        __memory_size ∈ [--..--]
-        T ∈ {0}
-        G ∈ {0}
-        S ∈ {0}
-        S2 ∈ {0}
-        IDX ∈ {1}
-        G2 ∈ {2}
-        U ∈ {{ "baz" }}
+  __fc_random_counter ∈ {0}
+  __fc_rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __memory_size ∈ [--..--]
+  T ∈ {0}
+  G ∈ {0}
+  S ∈ {0}
+  S2 ∈ {0}
+  IDX ∈ {1}
+  G2 ∈ {2}
+  U ∈ {{ "baz" }}
 [value] using specification for function __store_block
 [value] using specification for function __full_init
 [value] using specification for function __literal_string
@@ -51,15 +51,15 @@ tests/e-acsl-runtime/literal_string.i:13:[value] Assertion got status valid.
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function e_acsl_global_init:
-          T ∈ {{ "bar" }}
-          S ∈ {{ "foo" }}
-          S2 ∈ {{ "foo2" }}
+  T ∈ {{ "bar" }}
+  S ∈ {{ "foo" }}
+  S2 ∈ {{ "foo2" }}
 [value] Values at end of function f:
-          G ∈ {1}
+  G ∈ {1}
 [value] Values at end of function main:
-          T ∈ {{ "bar" }}
-          G ∈ {1}
-          S ∈ {{ "foo" }}
-          S2 ∈ {{ "foo2" }}
-          SS ∈ {{ "ss" }}
-          __retres ∈ {0}
+  T ∈ {{ "bar" }}
+  G ∈ {1}
+  S ∈ {{ "foo" }}
+  S2 ∈ {{ "foo2" }}
+  SS ∈ {{ "ss" }}
+  __retres ∈ {0}

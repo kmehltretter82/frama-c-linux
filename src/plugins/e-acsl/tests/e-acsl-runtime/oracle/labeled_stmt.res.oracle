@@ -10,11 +10,11 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-        __fc_random_counter ∈ {0}
-        __fc_rand_max ∈ {32767}
-        __fc_heap_status ∈ [--..--]
-        __memory_size ∈ [--..--]
-        X ∈ {0}
+  __fc_random_counter ∈ {0}
+  __fc_rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __memory_size ∈ [--..--]
+  X ∈ {0}
 tests/e-acsl-runtime/labeled_stmt.i:12:[value] Assertion got status valid.
 [value] using specification for function e_acsl_assert
 share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
@@ -25,8 +25,8 @@ tests/e-acsl-runtime/labeled_stmt.i:9:[value] Function main: postcondition got s
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function __e_acsl_main:
-          X ∈ {3}
-          __retres ∈ {0}
+  X ∈ {3}
+  __retres ∈ {0}
 [value] Values at end of function main:
-          X ∈ {3}
-          __retres ∈ {0}
+  X ∈ {3}
+  __retres ∈ {0}

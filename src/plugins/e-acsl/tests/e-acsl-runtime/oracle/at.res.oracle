@@ -10,11 +10,11 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-        __fc_random_counter ∈ {0}
-        __fc_rand_max ∈ {32767}
-        __fc_heap_status ∈ [--..--]
-        __memory_size ∈ [--..--]
-        A ∈ {0}
+  __fc_random_counter ∈ {0}
+  __fc_rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __memory_size ∈ [--..--]
+  A ∈ {0}
 [value] using specification for function __store_block
 [value] using specification for function __full_init
 [value] using specification for function __delete_block
@@ -48,20 +48,21 @@ tests/e-acsl-runtime/at.i:34:[value] Assertion got status unknown.
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function f:
-          A ∈ {3}
+  A ∈ {3}
 [value] Values at end of function __e_acsl_f:
-          A ∈ {3}
+  A ∈ {3}
 [value] Values at end of function g:
-          A ∈ {4}
-          x ∈ {1}
-          t[0] ∈ {2}
-           [1] ∈ {3}
+  A ∈ {4}
+  x ∈ {1}
+  t[0] ∈ {2}
+   [1] ∈ {3}
 [value] Values at end of function h:
+  
 [value] Values at end of function __e_acsl_h:
-          __retres ∈ {0}
+  __retres ∈ {0}
 [value] Values at end of function main:
-          A ∈ {4}
-          x ∈ {1}
-          t[0] ∈ {2}
-           [1] ∈ {3}
-          __retres ∈ {0}
+  A ∈ {4}
+  x ∈ {1}
+  t[0] ∈ {2}
+   [1] ∈ {3}
+  __retres ∈ {0}

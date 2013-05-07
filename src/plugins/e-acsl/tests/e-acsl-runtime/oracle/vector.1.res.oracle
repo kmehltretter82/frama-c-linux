@@ -22,11 +22,11 @@ tests/e-acsl-runtime/vector.c:21:[e-acsl] warning: E-ACSL construct `\allocate' 
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-        __fc_random_counter ∈ {0}
-        __fc_rand_max ∈ {32767}
-        __fc_heap_status ∈ [--..--]
-        __memory_size ∈ [--..--]
-        LAST ∈ {0}
+  __fc_random_counter ∈ {0}
+  __fc_rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __memory_size ∈ [--..--]
+  LAST ∈ {0}
 [value] using specification for function __store_block
 [value] using specification for function __initialize
 tests/e-acsl-runtime/vector.c:26:[value] Assertion got status valid.
@@ -50,22 +50,22 @@ FRAMAC_SHARE/libc/stdlib.h:144:[value] Function __e_acsl_free, behavior dealloca
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function __e_acsl_free:
-          __fc_heap_status ∈ [--..--]
+  __fc_heap_status ∈ [--..--]
 [value] Values at end of function __e_acsl_malloc:
-          __fc_heap_status ∈ [--..--]
-          __retres ∈ {{ &Frama_C_alloc }}
+  __fc_heap_status ∈ [--..--]
+  __retres ∈ {{ &Frama_C_alloc }}
 [value] Values at end of function new_inversed:
-          __fc_heap_status ∈ [--..--]
-          i ∈ {3}
-          p ∈ {{ &Frama_C_alloc }}
-          Frama_C_alloc[bits 0 to 95]# ∈ {1; 2; 3} or UNINITIALIZED repeated %32
+  __fc_heap_status ∈ [--..--]
+  i ∈ {3}
+  p ∈ {{ &Frama_C_alloc }}
+  Frama_C_alloc[bits 0 to 95]# ∈ {1; 2; 3} or UNINITIALIZED repeated %32 
 [value] Values at end of function main:
-          __fc_heap_status ∈ [--..--]
-          LAST ∈ {1; 2; 3} or UNINITIALIZED
-          x ∈ {3}
-          v1[0] ∈ {1}
-            [1] ∈ {2}
-            [2] ∈ {3}
-          v2 ∈ ESCAPINGADDR
-          __retres ∈ {0}
-          Frama_C_alloc[0..11] ∈ UNINITIALIZED
+  __fc_heap_status ∈ [--..--]
+  LAST ∈ {1; 2; 3} or UNINITIALIZED
+  x ∈ {3}
+  v1[0] ∈ {1}
+    [1] ∈ {2}
+    [2] ∈ {3}
+  v2 ∈ ESCAPINGADDR
+  __retres ∈ {0}
+  Frama_C_alloc[0..11] ∈ UNINITIALIZED

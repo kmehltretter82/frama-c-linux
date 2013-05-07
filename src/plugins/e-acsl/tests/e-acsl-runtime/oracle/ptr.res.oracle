@@ -10,10 +10,10 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-        __fc_random_counter ∈ {0}
-        __fc_rand_max ∈ {32767}
-        __fc_heap_status ∈ [--..--]
-        __memory_size ∈ [--..--]
+  __fc_random_counter ∈ {0}
+  __fc_rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __memory_size ∈ [--..--]
 [value] using specification for function __store_block
 [value] using specification for function __full_init
 [value] using specification for function __initialize
@@ -42,9 +42,9 @@ tests/e-acsl-runtime/ptr.i:27:[value] Assertion got status valid.
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function main:
-          x ∈ {1}
-          t[0] ∈ {2}
-           [1] ∈ {3}
-           [2] ∈ {5}
-          p ∈ {{ &t + {8} }}
-          __retres ∈ {0}
+  x ∈ {1}
+  t[0] ∈ {2}
+   [1] ∈ {3}
+   [2] ∈ {5}
+  p ∈ {{ &t + {8} }}
+  __retres ∈ {0}

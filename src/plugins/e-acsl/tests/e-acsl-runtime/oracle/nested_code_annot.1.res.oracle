@@ -10,10 +10,10 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-        __fc_random_counter ∈ {0}
-        __fc_rand_max ∈ {32767}
-        __fc_heap_status ∈ [--..--]
-        __memory_size ∈ [--..--]
+  __fc_random_counter ∈ {0}
+  __fc_rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __memory_size ∈ [--..--]
 tests/e-acsl-runtime/nested_code_annot.i:9:[value] Assertion got status valid.
 [value] using specification for function __gmpz_init_set_si
 share/e-acsl/e_acsl_gmp.h:61:[value] Function __gmpz_init_set_si: precondition got status valid.
@@ -31,6 +31,6 @@ share/e-acsl/e_acsl_gmp.h:105:[value] Function __gmpz_clear: precondition got st
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function main:
-          x ∈ {2}
-          y ∈ {1}
-          __retres ∈ {0}
+  x ∈ {2}
+  y ∈ {1}
+  __retres ∈ {0}

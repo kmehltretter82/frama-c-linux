@@ -10,10 +10,10 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-        __fc_random_counter ∈ {0}
-        __fc_rand_max ∈ {32767}
-        __fc_heap_status ∈ [--..--]
-        __memory_size ∈ [--..--]
+  __fc_random_counter ∈ {0}
+  __fc_rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __memory_size ∈ [--..--]
 [value] using specification for function __store_block
 tests/e-acsl-runtime/bts1304.i:23:[value] entering loop for the first time
 [value] using specification for function __initialize
@@ -29,9 +29,9 @@ share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function read_sensor_4:
-          buf[0..11] ∈ {0} or UNINITIALIZED
+  buf[0..11] ∈ {0} or UNINITIALIZED
 [value] Values at end of function main:
-          buf[0] ∈ {0}
-             [1..11] ∈ {0} or UNINITIALIZED
-          i ∈ {3}
-          __retres ∈ {0}
+  buf[0] ∈ {0}
+     [1..11] ∈ {0} or UNINITIALIZED
+  i ∈ {3}
+  __retres ∈ {0}

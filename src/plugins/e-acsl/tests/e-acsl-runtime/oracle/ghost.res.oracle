@@ -10,12 +10,12 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-        __fc_random_counter ∈ {0}
-        __fc_rand_max ∈ {32767}
-        __fc_heap_status ∈ [--..--]
-        __memory_size ∈ [--..--]
-        G ∈ {0}
-        P ∈ {0}
+  __fc_random_counter ∈ {0}
+  __fc_rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __memory_size ∈ [--..--]
+  G ∈ {0}
+  P ∈ {0}
 [value] using specification for function __store_block
 [value] using specification for function __full_init
 [value] using specification for function __initialize
@@ -39,8 +39,9 @@ share/e-acsl/e_acsl_gmp.h:105:[value] Function __gmpz_clear: precondition got st
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function e_acsl_global_init:
+  
 [value] Values at end of function main:
-          G ∈ {1}
-          P ∈ {{ &G }}
-          q ∈ {{ &G }}
-          __retres ∈ {0}
+  G ∈ {1}
+  P ∈ {{ &G }}
+  q ∈ {{ &G }}
+  __retres ∈ {0}

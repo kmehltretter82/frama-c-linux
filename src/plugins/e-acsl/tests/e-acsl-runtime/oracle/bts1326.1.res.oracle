@@ -10,10 +10,10 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-        __fc_random_counter ∈ {0}
-        __fc_rand_max ∈ {32767}
-        __fc_heap_status ∈ [--..--]
-        __memory_size ∈ [--..--]
+  __fc_random_counter ∈ {0}
+  __fc_rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __memory_size ∈ [--..--]
 [value] using specification for function __store_block
 [value] using specification for function __initialize
 [value] using specification for function __delete_block
@@ -47,14 +47,14 @@ tests/e-acsl-runtime/bts1326.i:10:[value] Function __e_acsl_atp_NORMAL_computeAv
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function atp_NORMAL_computeAverageAccel:
-          av ∈ {3}
+  av ∈ {3}
 [value] Values at end of function __e_acsl_atp_NORMAL_computeAverageAccel:
-          av ∈ {3}
+  av ∈ {3}
 [value] Values at end of function main:
-          Accel[0] ∈ {1}
-               [1] ∈ {2}
-               [2] ∈ {3}
-               [3] ∈ {4}
-               [4] ∈ {5}
-          av ∈ {3}
-          __retres ∈ {0}
+  Accel[0] ∈ {1}
+       [1] ∈ {2}
+       [2] ∈ {3}
+       [3] ∈ {4}
+       [4] ∈ {5}
+  av ∈ {3}
+  __retres ∈ {0}

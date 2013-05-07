@@ -11,10 +11,10 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-        __fc_random_counter ∈ {0}
-        __fc_rand_max ∈ {32767}
-        __fc_heap_status ∈ [--..--]
-        __memory_size ∈ [--..--]
+  __fc_random_counter ∈ {0}
+  __fc_rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __memory_size ∈ [--..--]
 [value] using specification for function __store_block
 [value] using specification for function __valid
 [value] using specification for function __initialized
@@ -37,8 +37,8 @@ tests/e-acsl-runtime/valid_in_contract.c:22:[value] Function __e_acsl_f, behavio
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function f:
-          __retres ∈ {0}
+  __retres ∈ {0}
 [value] Values at end of function __e_acsl_f:
-          __retres ∈ {0}
+  __retres ∈ {0}
 [value] Values at end of function main:
-          __retres ∈ {0}
+  __retres ∈ {0}

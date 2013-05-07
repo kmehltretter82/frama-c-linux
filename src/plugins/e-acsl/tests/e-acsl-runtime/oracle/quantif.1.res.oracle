@@ -10,10 +10,10 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-        __fc_random_counter ∈ {0}
-        __fc_rand_max ∈ {32767}
-        __fc_heap_status ∈ [--..--]
-        __memory_size ∈ [--..--]
+  __fc_random_counter ∈ {0}
+  __fc_rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __memory_size ∈ [--..--]
 tests/e-acsl-runtime/quantif.i:11:[value] Assertion got status unknown.
 [value] using specification for function __gmpz_init
 share/e-acsl/e_acsl_gmp.h:36:[value] Function __gmpz_init: precondition got status valid.
@@ -69,4 +69,4 @@ share/e-acsl/e_acsl_gmp.h:147:[value] Function __gmpz_mul: precondition got stat
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function main:
-          __retres ∈ {0}
+  __retres ∈ {0}

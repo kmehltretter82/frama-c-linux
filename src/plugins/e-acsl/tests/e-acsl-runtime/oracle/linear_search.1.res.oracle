@@ -15,11 +15,11 @@ tests/e-acsl-runtime/linear_search.i:14:[e-acsl] warning: missing guard for ensu
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-        __fc_random_counter ∈ {0}
-        __fc_rand_max ∈ {32767}
-        __fc_heap_status ∈ [--..--]
-        __memory_size ∈ [--..--]
-        A[0..9] ∈ {0}
+  __fc_random_counter ∈ {0}
+  __fc_rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __memory_size ∈ [--..--]
+  A[0..9] ∈ {0}
 tests/e-acsl-runtime/linear_search.i:30:[value] entering loop for the first time
 tests/e-acsl-runtime/linear_search.i:9:[value] Function __e_acsl_search: precondition got status unknown.
 [value] using specification for function __gmpz_init
@@ -66,11 +66,11 @@ tests/e-acsl-runtime/linear_search.i:36:[value] Assertion got status unknown.
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function search:
-          k ∈ [0..10]
-          __retres ∈ {0; 1}
+  k ∈ [0..10]
+  __retres ∈ {0; 1}
 [value] Values at end of function __e_acsl_search:
-          __retres ∈ {0; 1}
+  __retres ∈ {0; 1}
 [value] Values at end of function main:
-          A[0..9] ∈ [0..81]
-          found ∈ {0}
-          __retres ∈ {0}
+  A[0..9] ∈ [0..81]
+  found ∈ {0}
+  __retres ∈ {0}

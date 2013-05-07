@@ -10,10 +10,10 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-        __fc_random_counter ∈ {0}
-        __fc_rand_max ∈ {32767}
-        __fc_heap_status ∈ [--..--]
-        __memory_size ∈ [--..--]
+  __fc_random_counter ∈ {0}
+  __fc_rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __memory_size ∈ [--..--]
 tests/e-acsl-runtime/comparison.i:9:[value] Assertion got status valid.
 [value] using specification for function __gmpz_init_set_si
 share/e-acsl/e_acsl_gmp.h:61:[value] Function __gmpz_init_set_si: precondition got status valid.
@@ -57,7 +57,7 @@ tests/e-acsl-runtime/comparison.i:29:[value] Assertion got status valid.
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function main:
-          x ∈ {0}
-          y ∈ {1}
-          s ∈ {{ "toto" }}
-          __retres ∈ {0}
+  x ∈ {0}
+  y ∈ {1}
+  s ∈ {{ "toto" }}
+  __retres ∈ {0}

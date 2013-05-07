@@ -15,10 +15,10 @@ tests/e-acsl-runtime/bts1307.i:25:[e-acsl] warning: missing guard for ensuring t
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-        __fc_random_counter ∈ {0}
-        __fc_rand_max ∈ {32767}
-        __fc_heap_status ∈ [--..--]
-        __memory_size ∈ [--..--]
+  __fc_random_counter ∈ {0}
+  __fc_rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __memory_size ∈ [--..--]
 [value] using specification for function __store_block
 [value] using specification for function __full_init
 tests/e-acsl-runtime/bts1307.i:7:[value] Function __e_acsl_foo: precondition got status valid.
@@ -74,15 +74,15 @@ tests/e-acsl-runtime/bts1307.i:25:[value] Function __e_acsl_bar, behavior UnderE
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function bar:
-          h ∈ 0.850000023842
+  h ∈ 0.850000023842
 [value] Values at end of function __e_acsl_bar:
-          h ∈ 0.850000023842
+  h ∈ 0.850000023842
 [value] Values at end of function foo:
-          h ∈ 6.
+  h ∈ 6.
 [value] Values at end of function __e_acsl_foo:
-          h ∈ 6.
+  h ∈ 6.
 [value] Values at end of function main:
-          f ∈ 1.
-          g ∈ 1.
-          h ∈ 0.850000023842
-          __retres ∈ {0}
+  f ∈ 1.
+  g ∈ 1.
+  h ∈ 0.850000023842
+  __retres ∈ {0}

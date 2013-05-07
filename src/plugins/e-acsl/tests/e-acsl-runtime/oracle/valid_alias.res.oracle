@@ -22,10 +22,10 @@ tests/e-acsl-runtime/valid_alias.c:10:[e-acsl] warning: E-ACSL construct `\alloc
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-        __fc_random_counter ∈ {0}
-        __fc_rand_max ∈ {32767}
-        __fc_heap_status ∈ [--..--]
-        __memory_size ∈ [--..--]
+  __fc_random_counter ∈ {0}
+  __fc_rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __memory_size ∈ [--..--]
 [value] using specification for function __store_block
 tests/e-acsl-runtime/valid_alias.c:12:[value] Assertion got status valid.
 [value] using specification for function __initialized
@@ -76,14 +76,14 @@ tests/e-acsl-runtime/valid_alias.c:19:[value] all evaluations are invalid for fu
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function __e_acsl_free:
-          __fc_heap_status ∈ [--..--]
+  __fc_heap_status ∈ [--..--]
 [value] Values at end of function __e_acsl_malloc:
-          __fc_heap_status ∈ [--..--]
-          __retres ∈ {{ &Frama_C_alloc }}
+  __fc_heap_status ∈ [--..--]
+  __retres ∈ {{ &Frama_C_alloc }}
 [value] Values at end of function main:
-          __fc_heap_status ∈ [--..--]
-          a ∈ ESCAPINGADDR
-          b ∈ ESCAPINGADDR
-          n ∈ {0}
-          __retres ∈ {0}
-          Frama_C_alloc[0..3] ∈ UNINITIALIZED
+  __fc_heap_status ∈ [--..--]
+  a ∈ ESCAPINGADDR
+  b ∈ ESCAPINGADDR
+  n ∈ {0}
+  __retres ∈ {0}
+  Frama_C_alloc[0..3] ∈ UNINITIALIZED

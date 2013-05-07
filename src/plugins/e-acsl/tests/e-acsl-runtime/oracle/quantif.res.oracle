@@ -10,10 +10,10 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-        __fc_random_counter ∈ {0}
-        __fc_rand_max ∈ {32767}
-        __fc_heap_status ∈ [--..--]
-        __memory_size ∈ [--..--]
+  __fc_random_counter ∈ {0}
+  __fc_rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __memory_size ∈ [--..--]
 tests/e-acsl-runtime/quantif.i:11:[value] Assertion got status unknown.
 tests/e-acsl-runtime/quantif.i:11:[value] entering loop for the first time
 [value] using specification for function e_acsl_assert
@@ -37,4 +37,4 @@ tests/e-acsl-runtime/quantif.i:28:[value] entering loop for the first time
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function main:
-          __retres ∈ {0}
+  __retres ∈ {0}
