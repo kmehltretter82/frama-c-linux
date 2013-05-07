@@ -284,7 +284,10 @@ you must call function `%s' by yourself"
 	if vi.vorig_name = Kernel.MainFunction.get () 
 	&& not (Options.Check.get ()) 
 	then main_fct <- Some fundec
-      | GVarDecl(_, vi, _) -> vi.vghost <- false
+      | GVarDecl(_, vi, _) -> 
+	(* do not convert extern ghost variables, because they can't be linked,
+	   see bts #1392 *)
+	if vi.vstorage <> Extern then vi.vghost <- false
       | _ -> 
 	()
     in

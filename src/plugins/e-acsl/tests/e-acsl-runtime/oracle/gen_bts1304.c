@@ -36,7 +36,7 @@ extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
 
 int __fc_random_counter __attribute__((__unused__));
 unsigned long const __fc_rand_max = 32767UL;
-extern int __fc_heap_status;
+/*@ ghost extern int __fc_heap_status; */
 
 /*@
 axiomatic
