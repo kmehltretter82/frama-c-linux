@@ -9,6 +9,8 @@
 \newcommand{\eacsl}{\textsc{E-ACSL}\xspace}
 \newcommand{\C}{\textsc{C}\xspace}
 \newcommand{\jml}{\textsc{JML}\xspace}
+\newcommand{\valueplugin}{\textsc{Value}\xspace}
+\newcommand{\wpplugin}{\textsc{Wp}\xspace}
 
 \newcommand{\nodiff}{\emph{No difference with \acsl.}}
 \newcommand{\except}[1]{\emph{No difference with \acsl, but #1.}}
@@ -248,3 +250,24 @@
 % for texttt
 
 \newcommand{\bs}{\ensuremath{\backslash}}
+
+% Index
+
+\newcommand{\optionidx}[2]{\index{#2@\texttt{#1#2}}}
+\newcommand{\codeidx}[1]{\index{#1@\texttt{#1}}}
+\newcommand{\scodeidx}[2]{\index{#1@\texttt{#1}!#2@\texttt{#2}}}
+\newcommand{\sscodeidx}[3]{%
+  \index{#1@\texttt{#1}!#2@\texttt{#2}!#3@\texttt{#3}}}
+\newcommand{\bfit}[1]{\textbf{\textit{\hyperpage{#1}}}}
+\newcommand{\optionidxdef}[2]{\index{#2@\texttt{#1#2}|bfit}}
+\newcommand{\codeidxdef}[1]{\index{#1@\texttt{#1}|bfit}}
+\newcommand{\scodeidxdef}[2]{\index{#1@\texttt{#1}!#2@\texttt{#2}|bfit}}
+\newcommand{\sscodeidxdef}[3]{%
+  \index{#1@\texttt{#1}!#2@\texttt{#2}!#3@\texttt{#3}|bfit}}
+
+\newcommand{\pragmadef}[1]{\texttt{#1}\index{Pragma!#1@\texttt{#1}}}
+\newcommand{\optiondef}[2]{\texttt{#1#2}\optionidxdef{#1}{#2}}
+\newcommand{\textttdef}[1]{\texttt{#1}\codeidxdef{#1}}
+
+\newcommand{\optionuse}[2]{\texttt{#1#2}\optionidx{#1}{#2}}
+\newcommand{\textttuse}[1]{\texttt{#1}\codeidx{#1}}

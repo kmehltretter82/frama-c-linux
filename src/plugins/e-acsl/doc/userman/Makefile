@@ -1,8 +1,13 @@
 MAIN=main
+
+C_CODE=first.i
+
 DEPS_MODERN=eacslversion.tex biblio.bib macros.tex \
 	introduction.tex \
 	provides.tex \
-	limitations.tex
+	limitations.tex \
+	$(addprefix examples/, $(C_CODE))
+
 
 default: main.pdf
 
