@@ -1,0 +1,14 @@
+\chapter{Introduction}
+
+\framac~\cite{userman,sefm12} is a modular analysis framework for the C language
+which supports the ACSL specification language~\cite{acsl}. This manual
+documents the \eacsl plug-in of \framac. This plug-in automatically translates
+an annotated C code into a \C code which fails at runtime if an annotation is
+violated. If no annotation is violated, the behavior of the new program is
+exactly the same than the one of the original program.
+
+Annotations must be written in the \eacsl specification
+language~\cite{eacsl,sac13} which is a subset of \acsl. This plug-in is still in
+a preliminary state: some parts of E-ACSL are not yet supported. Which \eacsl
+annotations are currently handled by the \eacsl plug-in is documented in a
+separated document~\cite{eacsl-implem}.

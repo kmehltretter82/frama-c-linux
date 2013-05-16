@@ -1,5 +1,8 @@
 MAIN=main
-DEPS_MODERN=eacslversion.tex biblio.bib macros.tex
+DEPS_MODERN=eacslversion.tex biblio.bib macros.tex \
+	introduction.tex \
+	provides.tex \
+	limitations.tex
 
 default: main.pdf
 
