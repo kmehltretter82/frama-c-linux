@@ -32,8 +32,6 @@ tests/e-acsl-runtime/quantif.i:23:[value] entering loop for the first time
 tests/e-acsl-runtime/quantif.i:27:[value] Assertion got status unknown.
 tests/e-acsl-runtime/quantif.i:27:[value] entering loop for the first time
 tests/e-acsl-runtime/quantif.i:28:[value] entering loop for the first time
-[kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
-[value] using specification for function __clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function main:

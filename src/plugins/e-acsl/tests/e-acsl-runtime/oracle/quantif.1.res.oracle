@@ -64,8 +64,6 @@ share/e-acsl/e_acsl_gmp.h:154:[value] Function __gmpz_tdiv_q: precondition got s
 share/e-acsl/e_acsl_gmp.h:145:[value] Function __gmpz_mul: precondition got status valid.
 share/e-acsl/e_acsl_gmp.h:146:[value] Function __gmpz_mul: precondition got status valid.
 share/e-acsl/e_acsl_gmp.h:147:[value] Function __gmpz_mul: precondition got status valid.
-[kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
-[value] using specification for function __clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function main:

@@ -40,8 +40,6 @@ extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
 /*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __literal_string(void *ptr);
 
-extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
-
 extern size_t __memory_size;
 
 /*@
@@ -112,7 +110,6 @@ int main(void)
   e_acsl_assert(1 != -2,(char *)"Assertion",(char *)"main",(char *)"1 != -2",
                 29);
   __retres = 0;
-  __clean();
   return __retres;
 }
 

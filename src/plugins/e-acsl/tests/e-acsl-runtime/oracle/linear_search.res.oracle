@@ -33,8 +33,6 @@ tests/e-acsl-runtime/linear_search.i:12:[value] Function __e_acsl_search, behavi
 tests/e-acsl-runtime/linear_search.i:15:[value] Function __e_acsl_search, behavior not_exists: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
 tests/e-acsl-runtime/linear_search.i:33:[value] Assertion got status unknown.
 tests/e-acsl-runtime/linear_search.i:36:[value] Assertion got status unknown.
-[kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
-[value] using specification for function __clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function search:

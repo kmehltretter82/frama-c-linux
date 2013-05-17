@@ -52,8 +52,6 @@ tests/e-acsl-runtime/lazy.i:27:[value] Assertion got status valid.
 tests/e-acsl-runtime/lazy.i:28:[value] Assertion got status valid.
 tests/e-acsl-runtime/lazy.i:29:[value] Assertion got status valid.
 tests/e-acsl-runtime/lazy.i:30:[value] Assertion got status valid.
-[kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
-[value] using specification for function __clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function main:

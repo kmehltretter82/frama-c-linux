@@ -43,8 +43,6 @@ share/e-acsl/e_acsl_gmp.h:73:[value] Function __gmpz_init_set_str: postcondition
 [value] using specification for function __gmpz_get_ui
 share/e-acsl/e_acsl_gmp.h:185:[value] Function __gmpz_get_ui: precondition got status valid.
 tests/e-acsl-runtime/cast.i:20:[value] Assertion got status valid.
-[kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
-[value] using specification for function __clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function main:

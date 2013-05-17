@@ -50,8 +50,6 @@ axiomatic
   
   }
  */
-extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
-
 extern size_t __memory_size;
 
 /*@
@@ -114,7 +112,6 @@ int main(void)
     }
   }
   __retres = 0;
-  __clean();
   return __retres;
 }
 

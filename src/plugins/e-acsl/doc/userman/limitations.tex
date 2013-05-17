@@ -1,10 +1,38 @@
-\chapter{Known limitations}
+\chapter{Known Limitations}
+
+The development of the \eacsl plug-in is still ongoing. First, the whole \eacsl
+reference manual~\cite{eacsl} is not yet supported. Which annotations are
+already translated into \C code and which are not is defined in a separated
+document~\cite{eacsl-implem}. Second, even if we do our best, bugs may exist. If
+you find a new one, please report it on the bug tracking system (see Chapter 10
+of the \framac User Manual~\cite{userman}). Third, there are some additional
+known limitations, which could be annoying for the user in some cases, but are
+hard to lift. Thus they could be there for a while. Lifting them could be part
+of commercial supports\footnote{Contact us or read
+  \url{http://frama-c.com/support.html} for additional details.}.
+
+\section{Undefined Value}
+\index{Undefined value}
 
 \begin{itemize}
-\item of course, annotations that are not yet translated~\cite{eacsl-implem}
-\item function without code
-\item recursive functions
-\item function pointers
-\item complex control flow graph
-\item read KNOWN\_BUGS
+\item use of undefined values are not tracked in annotations
+\item missing guards for \lstinline+\offset+, \lstinline+\block_length+ and
+  \lstinline+texbase_addr+ (\lstinline+offset(p)+ must ensures that $p$ is
+  valid)
 \end{itemize}
+
+\section{Function without Code}
+\index{Function!Without code}
+
+\section{Recursive Function}
+\index{Function!Recursive}
+
+\section{Variadic Function}
+\index{Function!Variadic}
+
+\begin{itemize}
+\item Not yet duplicated
+\end{itemize}
+
+\section{Function Pointer}
+\index{Function!Pointer}

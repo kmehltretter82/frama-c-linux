@@ -52,8 +52,6 @@
 [value] using specification for function __full_init
 [value] using specification for function __literal_string
 [value] using specification for function printf
-[kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
-[value] using specification for function __clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function main:

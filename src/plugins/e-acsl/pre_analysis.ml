@@ -57,10 +57,12 @@ module Env: sig
   val add_init: kernel_function -> Varinfo.Hptset.t option -> unit
   val mem_init: kernel_function -> Varinfo.Hptset.t option -> bool
   val find: kernel_function -> Varinfo.Hptset.t option Stmt.Hashtbl.t 
-  module StartData: Dataflow.StmtStartData with type data = Varinfo.Hptset.t option
+  module StartData: 
+    Dataflow.StmtStartData with type data = Varinfo.Hptset.t option
   val is_consolidated: unit -> bool
   val consolidate: Varinfo.Hptset.t -> unit
   val consolidated_mem: varinfo -> bool
+  val is_empty: unit -> bool
 end = struct
 
   let current_kf = ref (Kernel_function.dummy ())
@@ -127,6 +129,20 @@ end = struct
     Varinfo.Hptset.mem v !consolidated_set
 
   let is_consolidated () = !is_consolidated_ref
+
+  let is_empty () =
+    try
+      Kernel_function.Hashtbl.iter
+	(fun _ h -> 
+	  Stmt.Hashtbl.iter
+	    (fun _ set -> match set with
+	    | None -> ()
+	    | Some s -> if not (Varinfo.Hptset.is_empty s) then raise Exit)
+	    h)
+	tbl;
+      true
+    with Exit ->
+      false
 
   let clear () = 
     Kernel_function.Hashtbl.clear tbl;
@@ -656,6 +672,8 @@ let must_model_lval ?kf ?stmt lv =
 let old_must_model_vi bhv ?kf ?stmt vi =
   Options.Full_mmodel.get ()
   || must_model_vi ?kf ?stmt (Cil.get_original_varinfo bhv vi)
+
+let use_model () = not (Env.is_empty ())
 
 (*
 Local Variables:

@@ -32,8 +32,6 @@ share/e-acsl/e_acsl_gmp.h:37:[value] Function __gmpz_init: postcondition got sta
 share/e-acsl/e_acsl_gmp.h:131:[value] Function __gmpz_add: precondition got status valid.
 share/e-acsl/e_acsl_gmp.h:132:[value] Function __gmpz_add: precondition got status valid.
 share/e-acsl/e_acsl_gmp.h:133:[value] Function __gmpz_add: precondition got status valid.
-[kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
-[value] using specification for function __clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function main:

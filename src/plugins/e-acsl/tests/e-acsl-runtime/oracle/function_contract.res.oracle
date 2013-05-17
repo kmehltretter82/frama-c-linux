@@ -63,8 +63,6 @@ tests/e-acsl-runtime/function_contract.i:71:[value] Function n, behavior b1: pos
 tests/e-acsl-runtime/function_contract.i:74:[value] Function n, behavior b2: assumes got status invalid; postcondition not evaluated.
 tests/e-acsl-runtime/function_contract.i:71:[value] Function __e_acsl_n, behavior b1: postcondition got status valid.
 tests/e-acsl-runtime/function_contract.i:74:[value] Function __e_acsl_n, behavior b2: assumes got status invalid; postcondition not evaluated.
-[kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
-[value] using specification for function __clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function f:

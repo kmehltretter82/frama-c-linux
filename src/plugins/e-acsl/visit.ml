@@ -213,30 +213,31 @@ class e_acsl_visitor prj generate = object (self)
 	      Globals.Functions.replace_by_definition 
 		spec fundec Location.unknown;
 	      let cil_fct = GFun(fundec, Location.unknown) in
-	      match main_fct with
-	      | Some main ->
-		let exp = Cil.evar ~loc:Location.unknown vi in
-		let stmt = 
-		  Cil.mkStmtOneInstr ~valid_sid:true 
-		    (Call(None, exp, [], Location.unknown))
-		in
-		vi.vreferenced <- true;
-		main.sbody.bstmts <- stmt :: main.sbody.bstmts;
-		let new_globals =
-		  List.fold_right
-		    (fun g acc -> match g with
-		    | GFun({ svar = vi }, _) when Varinfo.equal vi main.svar -> 
-		      acc
-		    | _ -> g :: acc)
-		    f.globals
-		    [ cil_fct; GFun(main, Location.unknown) ]
-		in
-		f.globals <- new_globals
-	      | None -> 
-		Kernel.warning "no entry point specified:@ \
+	      if Pre_analysis.use_model () then
+		match main_fct with
+		| Some main ->
+		  let exp = Cil.evar ~loc:Location.unknown vi in
+		  let stmt = 
+		    Cil.mkStmtOneInstr ~valid_sid:true 
+		      (Call(None, exp, [], Location.unknown))
+		  in
+		  vi.vreferenced <- true;
+		  main.sbody.bstmts <- stmt :: main.sbody.bstmts;
+		  let new_globals =
+		    List.fold_right
+		      (fun g acc -> match g with
+		      | GFun({ svar = vi }, _) when Varinfo.equal vi main.svar -> 
+			acc
+		      | _ -> g :: acc)
+		      f.globals
+		      [ cil_fct; GFun(main, Location.unknown) ]
+		  in
+		  f.globals <- new_globals
+		| None -> 
+		  Kernel.warning "no entry point specified:@ \
 you must call function `%s' by yourself" 
-		  fname;
-		f.globals <- f.globals @ [ cil_fct ]
+		    fname;
+		  f.globals <- f.globals @ [ cil_fct ]
 	    in
 	    Project.on prj build_initializer ()
 	end;
@@ -508,7 +509,7 @@ you must call function `%s' by yourself"
 	  (* JS: should be done in the new project? *)
 	  let env = deallocate_function env kf in
 	  let b, env = Env.pop_and_get env stmt ~global_clear:true Env.After in
-	  if is_main then begin
+	  if is_main && Pre_analysis.use_model () then begin
 	    let stmts = b.bstmts in
 	    let l = List.rev stmts in
 	    match l with
@@ -616,8 +617,10 @@ you must call function `%s' by yourself"
 	    (* keep the return (enclosed in a generated block) at the end;
 	       preceded by clean if any *)
 	    let init, tl = 
-	      if self#is_main kf then [ potential_clean; ret ], tl
-	      else [ ret ], l
+	      if self#is_main kf && Pre_analysis.use_model () then
+		[ potential_clean; ret ], tl
+	      else
+		[ ret ], l
 	    in
 	    blk.bstmts <-
 	      List.fold_left (fun acc v -> v :: acc) (add_locals init) tl

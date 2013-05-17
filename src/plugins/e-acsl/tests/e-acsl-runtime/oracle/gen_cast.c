@@ -30,8 +30,6 @@ axiomatic
   
   }
  */
-extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
-
 extern size_t __memory_size;
 
 /*@
@@ -67,7 +65,6 @@ int main(void)
                 (char *)"(unsigned int)y != (unsigned int)0xfffffffffffffff",
                 20);
   __retres = 0;
-  __clean();
   return __retres;
 }
 

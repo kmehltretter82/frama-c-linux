@@ -3,25 +3,32 @@
 This chapter is the core of this manual and describes how to use the
 plug-in. First, Section~\ref{sec:run} shows how to run the plug-in on a trivial
 example and how to execute the generated code with a standard \C compiler to
-detect invalid annotations at runtime. Then, Section~\ref{sec:custom} introduces
-how to customize the plug-in. Next, Section~\ref{sec:exec} provides additional
-details on the execution of the generated code. Section~\ref{sec:rte} explains
-how the plug-in handles potential runtime errors in the generated code, while
-Section~\ref{sec:incomplete} focus on how to deal with incomplete programs,
-\emph{i.e.} in which some functions have no body or in which there are no main
-function. After, Section~\ref{sec:combine} explains how to combine the plug-in
-with other plug-ins of \framac. Finally, Section~\ref{sec:verbose} details the
-verbosing policy of the plug-in.
+detect invalid annotations at runtime. Then, Section~\ref{sec:exec} provides
+additional details on the execution of the generated code. Section~\ref{sec:rte}
+explains how the plug-in handles potential runtime errors in the generated
+code. Next, Section~\ref{sec:incomplete} focus on how to deal with incomplete
+programs, \emph{i.e.} in which some functions have no body or in which there are
+no main function. After, Section~\ref{sec:combine} explains how to combine the
+plug-in with other plug-ins of \framac. Finally, Section~\ref{sec:custom}
+introduces how to customize the plug-in, while Section~\ref{sec:verbose} details
+the verbosing policy of the plug-in.
 
 \section{Simple Example}
 \label{sec:run}
 
-The main option of the plug-in is \optiondef{-}{e-acsl}. Consider the following
-program.
+This Section is a mini-tutorial which explains from scratch how to detect at
+runtime that an \eacsl annotation is violated thanks to the use of the plug-in.
+
+\subsection{Running \eacsl}
+
+Consider the following simple program in which the first assertion is valid
+while the second one is not.
 
 \listingname{first.i}
 \cinput{examples/first.i}
-Running \eacsl on this file is then pretty simple:
+
+Running \eacsl on this file just consists in adding the option
+\optiondef{-}{e-acsl} to the \framac command line:
 \begin{shell}
 \$ frama-c -e-acsl first.i
 [kernel] preprocessing with <...> share/frama-c/e-acsl/e_acsl_gmp_types.h
@@ -42,7 +49,7 @@ Section~\ref{sec:exec}.
 Then \eacsl takes the annotated \C code as input and
 translates it into a new \framac project named \texttt{e-acsl}\footnote{The
   notion of \emph{project} is explained in Section 8.1 of the \framac user
-  manual~\cite{userman}.}. By default, the option \optionuse{-}{eacsl} does
+  manual~\cite{userman}.}. By default, the option \optionuse{-}{e-acsl} does
 nothing more. It is however possible to have a look at the generated code on the
 \framac GUI. It is also possible through the command line thanks to the kernel
 options \optionuse{-}{then-on} and \optionuse{-}{print}:
@@ -107,7 +114,6 @@ int main(void)
   /*@ assert x == 1; */
   e_acsl_assert(x == 1,(char *)"Assertion",(char *)"main",(char *)"x == 1",4);
   __retres = 0;
-  __clean();
   return __retres;
 }
 \end{shell}
@@ -117,27 +123,28 @@ constant declarations and global \acsl annotations that are not in the initial
 file \texttt{first.i}. That is a part of the included \eacsl library. You can
 safely ignore it right now. The translated \texttt{main} function of
 \texttt{first.i} is displayed at the end. Two lines have been added. The first
-one is just after the unique \eacsl annotation.
+one is just after the first \eacsl annotation, while the second one is just
+after the second one.
 
 \begin{ccode}
   /*@ assert x == 0; */
   e_acsl_assert(x == 0,(char *)"Assertion",(char *)"main",(char *)"x == 0",3);
+  /*@ assert x == 1; */
+  e_acsl_assert(x == 1,(char *)"Assertion",(char *)"main",(char *)"x == 1",4);
 \end{ccode}
 
-It is a function call to \texttt{e\_acsl\_assert}\codeidx{e\_acsl\_assert} from
-the \eacsl library. This call performs the dynamic verification that the
-corresponding assertion is valid. More precisely, it checks that its first
-argument (here \texttt{x == 0} corresponding to the annotation) is not equal to
-0 and fails otherwise. The extra arguments are only used to display nice user
-feedback as shown later in Section~\ref{sec:exec}.
+They are function calls to \texttt{e\_acsl\_assert}\codeidx{e\_acsl\_assert}
+which is defined in the \eacsl library. Each call performs the dynamic
+verification that the corresponding assertion is valid. More precisely, it
+checks that its first argument (here \texttt{x == 0} or \texttt{x == 1}
+corresponding to the annotations) is not equal to 0 and fails otherwise. The
+extra arguments are only used to display nice user feedback as shown later in
+Section~\ref{sec:exec}.
 
-The second additional line is the call to \texttt{\_\_clean}\codeidx{\_\_clean}
-(once again from the \eacsl library) just before the \texttt{return}
-statement. This call is required to clean potential extra allocations done by
-the \eacsl library (actually none in this example).
+\subsection{Executing the generated code}
 
 By using the option \optionuse{-}{ocode} of \framac, we can redirect the
-generate code into a \C file as follows.
+generated code into a \C file as follows.
 
 \begin{shell}
 \$ frama-c -e-acsl first.i -then-on e-acsl -print -ocode monitored_first.i
@@ -152,21 +159,12 @@ The failing predicate is:
 x == 1.
 \end{shell}
 
-\section{Customizing the Plug-in}
-\label{sec:custom}
-
-\begin{itemize}
-\item -e-acsl-project
-\item -e-acsl-check
-\item -eacsl-share
-\end{itemize}
-
 \section{Execution Environment of the Generated Code}
 \label{sec:exec}
 
 \begin{itemize}
 \item takes care of architecture (32, 64 bits)
-\item memory model (linking issue)
+\item memory model (linking issue)~\cite{rv13}
 \item GMP (linking issue)
 \item customizing e\_acsl\_assert
 \end{itemize}
@@ -192,6 +190,15 @@ x == 1.
 \begin{itemize}
 \item -e-acsl-valid
 \item -e-acsl-prepare
+\end{itemize}
+
+\section{Customizing the Plug-in}
+\label{sec:custom}
+
+\begin{itemize}
+\item -e-acsl-project
+\item -e-acsl-check
+\item -eacsl-share
 \end{itemize}
 
 \section{Verbosing Policy}

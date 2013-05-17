@@ -22,8 +22,6 @@ tests/e-acsl-runtime/cast.i:15:[value] Assertion got status valid.
 tests/e-acsl-runtime/cast.i:16:[value] Assertion got status valid.
 tests/e-acsl-runtime/cast.i:19:[value] Assertion got status valid.
 tests/e-acsl-runtime/cast.i:20:[value] Assertion got status valid.
-[kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
-[value] using specification for function __clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function main:

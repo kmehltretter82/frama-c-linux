@@ -28,8 +28,6 @@ share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status
 share/e-acsl/e_acsl_gmp.h:105:[value] Function __gmpz_clear: precondition got status valid.
 share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
 tests/e-acsl-runtime/invariant.i:10:[kernel] warning: signed overflow. assert x+i ≤ 2147483647;
-[kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
-[value] using specification for function __clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function main:

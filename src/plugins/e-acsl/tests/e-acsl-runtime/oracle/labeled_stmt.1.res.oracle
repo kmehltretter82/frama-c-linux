@@ -28,8 +28,6 @@ share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status
 [value] using specification for function __gmpz_clear
 share/e-acsl/e_acsl_gmp.h:105:[value] Function __gmpz_clear: precondition got status valid.
 tests/e-acsl-runtime/labeled_stmt.i:9:[value] Function __e_acsl_main: postcondition got status valid.
-[kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
-[value] using specification for function __clean
 tests/e-acsl-runtime/labeled_stmt.i:9:[value] Function main: postcondition got status valid.
 [value] done for function main
 [value] ====== VALUES COMPUTED ======

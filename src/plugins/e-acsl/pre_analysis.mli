@@ -31,6 +31,9 @@ val init_mpz: unit -> unit
 val reset: unit -> unit
 (** Must be called to redo the analysis *)
 
+val use_model: unit -> bool
+(** Is one variable monitored (at least)? *)
+
 val must_model_vi: ?kf:kernel_function -> ?stmt:stmt -> varinfo -> bool
 (** [must_model_vi ?kf ?stmt vi] returns [true] if the varinfo [vi] at the given
     [stmt] in the given function [kf] must be tracked by the memory model

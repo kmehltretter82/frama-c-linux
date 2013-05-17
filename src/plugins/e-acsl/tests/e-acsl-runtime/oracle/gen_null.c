@@ -30,8 +30,6 @@ axiomatic
   
   }
  */
-extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
-
 extern size_t __memory_size;
 
 /*@
@@ -45,7 +43,6 @@ int main(void)
   e_acsl_assert((void *)0 == (void *)0,(char *)"Assertion",(char *)"main",
                 (char *)"\\null == (void *)0",8);
   __retres = 0;
-  __clean();
   return __retres;
 }
 

@@ -42,8 +42,6 @@ tests/e-acsl-runtime/result.i:18:[value] Function g: postcondition got status va
 tests/e-acsl-runtime/result.i:18:[value] Function __e_acsl_g: postcondition got status valid.
 tests/e-acsl-runtime/result.i:23:[value] Function h: postcondition got status valid.
 tests/e-acsl-runtime/result.i:23:[value] Function __e_acsl_h: postcondition got status valid.
-[kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
-[value] using specification for function __clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function f:

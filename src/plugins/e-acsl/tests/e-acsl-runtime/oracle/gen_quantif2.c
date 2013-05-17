@@ -105,8 +105,6 @@ axiomatic
   
   }
  */
-extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
-
 extern size_t __memory_size;
 
 /*@
@@ -671,7 +669,6 @@ int main(void)
     __gmpz_clear(__e_acsl_x_7);
   }
   __retres = 0;
-  __clean();
   return __retres;
 }
 
