@@ -31,7 +31,7 @@ void e_acsl_assert(int predicate,
 		   int line) 
 {
   if (! predicate) {
-    printf("%s failed at line %d of function %s.\n\
+    printf("%s failed at line %d in function %s.\n\
 The failing predicate is:\n%s.\n",
 	   kind, line, fct, pred_txt);
     exit(1);

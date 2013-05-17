@@ -4,14 +4,13 @@ This chapter is the core of this manual and describes how to use the
 plug-in. First, Section~\ref{sec:run} shows how to run the plug-in on a trivial
 example and how to execute the generated code with a standard \C compiler to
 detect invalid annotations at runtime. Then, Section~\ref{sec:exec} provides
-additional details on the execution of the generated code. Section~\ref{sec:rte}
-explains how the plug-in handles potential runtime errors in the generated
-code. Next, Section~\ref{sec:incomplete} focus on how to deal with incomplete
-programs, \emph{i.e.} in which some functions have no body or in which there are
-no main function. After, Section~\ref{sec:combine} explains how to combine the
-plug-in with other plug-ins of \framac. Finally, Section~\ref{sec:custom}
-introduces how to customize the plug-in, while Section~\ref{sec:verbose} details
-the verbosing policy of the plug-in.
+additional details on the execution of the generated code. Next,
+Section~\ref{sec:incomplete} focus on how to deal with incomplete programs,
+\emph{i.e.} in which some functions have no body or in which there are no main
+function. After, Section~\ref{sec:combine} explains how to combine the plug-in
+with other plug-ins of \framac. Finally, Section~\ref{sec:custom} introduces how
+to customize the plug-in, while Section~\ref{sec:verbose} details the verbosing
+policy of the plug-in.
 
 \section{Simple Example}
 \label{sec:run}
@@ -96,8 +95,6 @@ axiomatic
   
   }
  */
-extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
-
 extern size_t __memory_size;
 
 /*@
@@ -150,31 +147,154 @@ generated code into a \C file as follows.
 \$ frama-c -e-acsl first.i -then-on e-acsl -print -ocode monitored_first.i
 \end{shell}
 
+Then it may be executed by a standard \C compiler like \gcc in the following
+way.
+\lstset{escapechar=£}
 \begin{shell}
-\$ gcc -o monitored_first `frama-c -print-share-path`/e-acsl/e_acsl.c
-monitored_first.i
+\$ gcc -o monitored_first `frama-c -print-share-path`/e-acsl/e_acsl.c monitored_first.i
+<file_path>/e_acsl.h:41:3: warning: `FC_BUILTIN' attribute directive ignored [-Wattributes]
+monitored_first.i:8:1: warning: `__FC_BUILTIN__' attribute directive ignored [-Wattributes]
+monitored_first.i:19:60: warning: `__FC_BUILTIN__' attribute directive ignored [-Wattributes]
+\end{shell}
+You may notice that the generated file \texttt{monitored\_first.i} is linked
+with the file \texttt{`frama-c -print-share-path`/e-acsl/e\_acsl.c}. This last
+file is part of the \eacsl library installed with the plug-in. It especially
+contains an implementation of the function
+\texttt{e\_acsl\_assert}\codeidx{e\_acsl\_assert}. It is usually required to
+generate an executable from an \eacsl-generated code.
+
+The warnings can be safely ignored. They refer to an attribute
+\texttt{FC\_BUILTIN} internally used by \framac. You can also add the option
+\texttt{-Wno-attributes} to \gcc if you do not want to be polluted by these
+warnings.
+
+Finally you can execute the generated binary.
+\begin{shell}
 \$ ./monitored_first
-Assertion failed at line 4 of function main.
+Assertion failed at line 4 in function main.
 The failing predicate is:
 x == 1.
+\$ echo \$?
+1
 \end{shell}
+This execution stops with an exit code of 1 and an error message indicated that
+the invalid \eacsl annotation has been violated. There is no output for the
+valid \eacsl annotation. So, thanks to the plug-in, we detect that one of the
+assertion in the initial program was wrong.
 
 \section{Execution Environment of the Generated Code}
 \label{sec:exec}
 
-\begin{itemize}
-\item takes care of architecture (32, 64 bits)
-\item memory model (linking issue)~\cite{rv13}
-\item GMP (linking issue)
-\item customizing e\_acsl\_assert
-\end{itemize}
+The environment in which the code is executed is not necesseraly the same as the
+one supposed to be by \framac. You must take care of that when running the
+plug-in and when compiling the generated code with \gcc. Also, the plug-in
+offers you few possibilities of customization.
 
-\section{Potential Runtime Errors in the Generated Code}
-\label{sec:rte}
+\subsection{Runtime Errors in Annotations}
+\index{Runtime Error}
 
-\begin{itemize}
-\item runtime error in annotations
-\end{itemize}
+The major difference between \acsl~\cite{acsl} and \eacsl~\cite{eacsl}
+specification languages is that the logic is total in the former language while
+it is partial in the latter one: the semantics of a term denoting a \C
+expression $e$ is undefined if $e$ leads to a runtime error and, consequently,
+the semantics of any term $t$ (resp. predicate $p$) containing such an
+expression $e$ is undefined if $e$ has to be evaluated in order to evaluate $t$
+(resp. $p$). The \eacsl Reference Manual also states that \emph{``it is the
+  responsability of the tools which interprets \eacsl to ensure that an
+undefined term is never evaluated''}~\cite{eacsl}.
+
+Accordingly, the plug-in prevents undefined term to be evaluated. If it should
+be because an annotation contains such a term, it will report a proper error at
+runtime instead.
+
+Consider for instance the following program.
+
+\listingname{rte.i}
+\cinput{examples/rte.i}
+
+The terms and predicates containing the modulo `\%' in the clause
+\texttt{assumes} are undefined in the context of the \texttt{main}'s function
+call since \texttt{y} is equal to 0.
+
+However we can generate an instrumented code and compile it through the
+following command lines:
+
+\begin{shell}
+\$ frama-c -e-acsl rte.i -then-on e-acsl -print -ocode monitored_rte.i
+\$ gcc -o rte `frama-c -print-share-path`/e-acsl/e_acsl.c monitored_rte.i
+\end{shell}
+
+Now, when you execute it, you get the following output explaining that your
+contract is invalid because it contains a division by zero.
+
+\begin{shell}
+\$ ./rte
+RTE failed at line 5 in function divide.
+The failing predicate is:
+division_by_zero: y != 0.
+\end{shell}
+
+\subsection{Architecture}
+
+In many cases, the execution of a \C program depends on the underlying machine
+architecture on which it is executed, and it must be compiled in the very same
+architecture (or cross-compiled) for the compiler being able to generate the
+correct code.
+
+\framac mades assumptions about this machine when analyzed such a file. By
+default, it assumes a x86 32 bits platform, but it may be changed thanks to the
+option \optionuse{-}{machdep}~\cite{userman}. This option is of primary
+importance when using the \eacsl plug-in: it must be set to the value
+corresponding to the machine which the generated code will be executed on if the
+code \emph{or the annotation} is machine dependent.
+
+Consider for instance the following program.
+
+\listingname{archi.c}
+\cinput{examples/archi.c}
+
+We can generate an instrumented code and compile it through the
+following command lines (the option \optionuse{-}{pp-annot} must be used to
+preprocess the annotations~\cite{userman}):
+
+\begin{shell}
+\$ frama-c -pp-annot -e-acsl archi.c -then-on e-acsl -print -ocode monitored_archi.i
+\$ gcc -o archi `frama-c -print-share-path`/e-acsl/e_acsl.c monitored_archi.i
+\end{shell}
+
+However, the generated code crashes at runtime on a x86 64 bits computer because
+a 32 bits architecture was assumed at generation time.
+
+\begin{shell}
+\$ ./archi
+Assertion failed at line 10 in function main.
+The failing predicate is:
+sizeof(long) == 8.
+\end{shell}
+
+There is no assertion failure if you add the option \texttt{-machdep x86\_64}
+when calling \framac.
+
+\subsection{\gmp}
+\index{GMP}
+
+\eacsl has got an integer type which exactly corresponds to mathematical
+integers. Of course such integers do not fit in any integral \C type. To
+circumvent this issue, \eacsl uses the \gmp
+library\footnote{\url{http://gmplib.org}}. Thus, even if \eacsl does its best to
+use standard \C integral type instead of \gmp~\cite{sac13}, it may generate
+such integers from time to time. In such cases, the generated code must be
+linked against \gmp to be executed.
+
+Consider for instance the following program.
+
+\listingname{gmp}
+\cinput{examples/gmp.i}
+
+\subsection{Memory Model}
+\cite{rv13}
+
+\subsection{Customizing the Behavior of the Executed Code}
 
 \section{Handling Incomplete Program}
 \label{sec:incomplete}

@@ -1,6 +1,6 @@
 [kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/e_acsl_gmp_types.h"
-[kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/e_acsl_gmp.h"
 [kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/e_acsl.h"
+[kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/e_acsl_gmp.h"
 [kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_mmodel_api.h"
 [kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_bittree.h"
 [kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_mmodel.h"
@@ -34,22 +34,22 @@ tests/e-acsl-runtime/bts1307.i:9:[value] Function foo: precondition got status v
 [value] using specification for function __delete_block
 tests/e-acsl-runtime/bts1307.i:13:[value] Function foo, behavior OverEstimate_Motoring: postcondition got status valid.
 [value] using specification for function __gmpz_init_set_si
-share/e-acsl/e_acsl_gmp.h:61:[value] Function __gmpz_init_set_si: precondition got status valid.
-share/e-acsl/e_acsl_gmp.h:63:[value] Function __gmpz_init_set_si: postcondition got status valid.
-share/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: postcondition got status unknown.
+share/e-acsl/e_acsl_gmp.h:62:[value] Function __gmpz_init_set_si: precondition got status valid.
+share/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: postcondition got status valid.
+share/e-acsl/e_acsl_gmp.h:65:[value] Function __gmpz_init_set_si: postcondition got status unknown.
 [value] using specification for function __gmpz_cmp
-share/e-acsl/e_acsl_gmp.h:115:[value] Function __gmpz_cmp: precondition got status valid.
-share/e-acsl/e_acsl_gmp.h:116:[value] Function __gmpz_cmp: precondition got status valid.
+share/e-acsl/e_acsl_gmp.h:124:[value] Function __gmpz_cmp: precondition got status valid.
+share/e-acsl/e_acsl_gmp.h:125:[value] Function __gmpz_cmp: precondition got status valid.
 [value] using specification for function __gmpz_init
-share/e-acsl/e_acsl_gmp.h:36:[value] Function __gmpz_init: precondition got status valid.
-share/e-acsl/e_acsl_gmp.h:37:[value] Function __gmpz_init: postcondition got status valid.
+share/e-acsl/e_acsl_gmp.h:37:[value] Function __gmpz_init: precondition got status valid.
+share/e-acsl/e_acsl_gmp.h:38:[value] Function __gmpz_init: postcondition got status valid.
 tests/e-acsl-runtime/bts1307.i:13:[value] Assertion got status valid.
 [value] using specification for function __gmpz_tdiv_q
-share/e-acsl/e_acsl_gmp.h:152:[value] Function __gmpz_tdiv_q: precondition got status valid.
-share/e-acsl/e_acsl_gmp.h:153:[value] Function __gmpz_tdiv_q: precondition got status valid.
-share/e-acsl/e_acsl_gmp.h:154:[value] Function __gmpz_tdiv_q: precondition got status valid.
+share/e-acsl/e_acsl_gmp.h:161:[value] Function __gmpz_tdiv_q: precondition got status valid.
+share/e-acsl/e_acsl_gmp.h:162:[value] Function __gmpz_tdiv_q: precondition got status valid.
+share/e-acsl/e_acsl_gmp.h:163:[value] Function __gmpz_tdiv_q: precondition got status valid.
 [value] using specification for function __gmpz_get_ui
-share/e-acsl/e_acsl_gmp.h:185:[value] Function __gmpz_get_ui: precondition got status valid.
+share/e-acsl/e_acsl_gmp.h:194:[value] Function __gmpz_get_ui: precondition got status valid.
 [value] using specification for function __valid_read
 [value] user error: type long double not implemented. Using double instead
 tests/e-acsl-runtime/bts1307.i:13:[kernel] warning: non-finite long double value ([--..--]):
@@ -58,7 +58,7 @@ tests/e-acsl-runtime/bts1307.i:13:[kernel] warning: non-finite long double value
                   assert
                   \is_finite((long double)(5-(long double)((long double)(__e_acsl_4**__e_acsl_at_3)*0.4)));
 [value] using specification for function __gmpz_clear
-share/e-acsl/e_acsl_gmp.h:105:[value] Function __gmpz_clear: precondition got status valid.
+share/e-acsl/e_acsl_gmp.h:114:[value] Function __gmpz_clear: precondition got status valid.
 tests/e-acsl-runtime/bts1307.i:13:[value] Function __e_acsl_foo, behavior OverEstimate_Motoring: postcondition got status valid.
 tests/e-acsl-runtime/bts1307.i:19:[value] Function __e_acsl_bar: precondition got status valid.
 tests/e-acsl-runtime/bts1307.i:20:[value] Function __e_acsl_bar: precondition got status valid.

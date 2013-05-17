@@ -27,6 +27,7 @@
 #ifndef E_ACSL_GMP
 #define E_ACSL_GMP
 
+#include "stdlib.h"
 #include "e_acsl_gmp_types.h"
 
 /****************/
@@ -73,6 +74,14 @@ extern void __gmpz_init_set_si(mpz_t z, signed long int n)
   @ ensures \initialized(z);
   @ assigns *z \from str,base; */
 extern int __gmpz_init_set_str(mpz_t z, const char *str, int base)
+  __attribute__((FC_BUILTIN));
+
+/*@ requires ! \initialized(z);
+  @ allocates z;
+  @ ensures \valid(z);
+  @ ensures \initialized(z);
+  @ assigns *z \from base; */
+extern void __gmpz_import (mpz_t z, size_t, int, size_t, int, size_t, const void *base)
   __attribute__((FC_BUILTIN));
 
 /***************/

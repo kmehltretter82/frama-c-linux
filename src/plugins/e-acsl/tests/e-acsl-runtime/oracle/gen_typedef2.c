@@ -11,6 +11,26 @@ typedef unsigned char uint8;
 /*@
 model __mpz_struct { ℤ n };
 */
+/*@ requires predicate ≢ 0;
+    assigns \nothing; */
+extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
+                                                           char *kind,
+                                                           char *fct,
+                                                           char *pred_txt,
+                                                           int line);
+
+int __fc_random_counter __attribute__((__unused__));
+unsigned long const __fc_rand_max = (unsigned long)32767;
+/*@ ghost extern int __fc_heap_status; */
+
+/*@
+axiomatic
+  dynamic_allocation {
+  predicate is_allocable{L}(size_t n) 
+    reads __fc_heap_status;
+  
+  }
+ */
 /*@ requires ¬\initialized(z);
     ensures \valid(\old(z));
     ensures \initialized(\old(z));
@@ -41,26 +61,6 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_clear(__mpz_struct * /*[1]*/
 extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
                                                        __mpz_struct const * /*[1]*/ z2);
 
-/*@ requires predicate ≢ 0;
-    assigns \nothing; */
-extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
-                                                           char *kind,
-                                                           char *fct,
-                                                           char *pred_txt,
-                                                           int line);
-
-int __fc_random_counter __attribute__((__unused__));
-unsigned long const __fc_rand_max = (unsigned long)32767;
-/*@ ghost extern int __fc_heap_status; */
-
-/*@
-axiomatic
-  dynamic_allocation {
-  predicate is_allocable{L}(size_t n) 
-    reads __fc_heap_status;
-  
-  }
- */
 extern size_t __memory_size;
 
 /*@

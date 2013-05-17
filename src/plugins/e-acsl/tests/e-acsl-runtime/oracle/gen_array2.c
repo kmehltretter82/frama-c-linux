@@ -10,26 +10,6 @@ typedef unsigned int size_t;
 /*@
 model __mpz_struct { ℤ n };
 */
-/*@ requires ¬\initialized(z);
-    ensures \valid(\old(z));
-    ensures \initialized(\old(z));
-    assigns *z;
-    assigns *z \from n;
-    allocates \old(z);
- */
-extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z,
-                                                                long n);
-
-/*@ requires \valid(x);
-    assigns *x; */
-extern  __attribute__((__FC_BUILTIN__)) void __gmpz_clear(__mpz_struct * /*[1]*/ x);
-
-/*@ requires \valid(z1);
-    requires \valid(z2);
-    assigns \nothing; */
-extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
-                                                       __mpz_struct const * /*[1]*/ z2);
-
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
@@ -50,6 +30,26 @@ axiomatic
   
   }
  */
+/*@ requires ¬\initialized(z);
+    ensures \valid(\old(z));
+    ensures \initialized(\old(z));
+    assigns *z;
+    assigns *z \from n;
+    allocates \old(z);
+ */
+extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z,
+                                                                long n);
+
+/*@ requires \valid(x);
+    assigns *x; */
+extern  __attribute__((__FC_BUILTIN__)) void __gmpz_clear(__mpz_struct * /*[1]*/ x);
+
+/*@ requires \valid(z1);
+    requires \valid(z2);
+    assigns \nothing; */
+extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
+                                                       __mpz_struct const * /*[1]*/ z2);
+
 extern size_t __memory_size;
 
 /*@

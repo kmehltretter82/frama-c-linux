@@ -57,6 +57,17 @@ let _pretty_eacsl_typ fmt = function
   | Z -> Format.fprintf fmt "Z"
   | No_integral lty -> Format.fprintf fmt "%a" Printer.pp_logic_type lty
 
+let convert_typ = function
+  | Interv(l, u) as int -> 
+    (* convert the interval to Z if it does not fit in any C type *)
+    let is_pos = Z.ge l Z.zero in
+    if is_representable l (Cil.intKindForValue l is_pos)
+      && is_representable u (Cil.intKindForValue u is_pos)
+    then int
+    else Z
+  | Z -> Z
+  | No_integral _ as ty -> ty
+
 exception Not_representable
 
 let typ_of_integer i unsigned = 
@@ -84,8 +95,10 @@ let typ_of_eacsl_typ = function
        let ty_l = mk l (Cil.intKindForValue l is_pos) in
        let ty_u = mk u (Cil.intKindForValue u is_pos) in
        Cil.arithmeticConversion ty_l ty_u
-     with Not_found | Not_representable -> 
-       Mpz.t ())
+     with
+     | Not_found -> Mpz.t ()
+     | Not_representable -> 
+       Options.fatal "typing error: unrepresentable interval")
   | Z -> Mpz.t ()
   | No_integral (Ctype ty) -> ty
   | No_integral ty when Logic_const.is_boolean_type ty -> assert false
@@ -336,6 +349,7 @@ let rec type_term t =
     | Trange _ -> Error.not_yet "range"
     | Tlet _ -> Error.not_yet "let binding"
   in
+  let ty = convert_typ ty in
   Term_env.add t ty;
   ty
 

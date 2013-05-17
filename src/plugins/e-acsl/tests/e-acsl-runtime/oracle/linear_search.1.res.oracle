@@ -1,6 +1,6 @@
 [kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/e_acsl_gmp_types.h"
-[kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/e_acsl_gmp.h"
 [kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/e_acsl.h"
+[kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/e_acsl_gmp.h"
 [kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_mmodel_api.h"
 [kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_bittree.h"
 [kernel] preprocessing with "gcc -C -E -I. -Ishare/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_mmodel.h"
@@ -23,28 +23,28 @@ tests/e-acsl-runtime/linear_search.i:14:[e-acsl] warning: missing guard for ensu
 tests/e-acsl-runtime/linear_search.i:30:[value] entering loop for the first time
 tests/e-acsl-runtime/linear_search.i:9:[value] Function __e_acsl_search: precondition got status unknown.
 [value] using specification for function __gmpz_init
-share/e-acsl/e_acsl_gmp.h:36:[value] Function __gmpz_init: precondition got status valid.
-share/e-acsl/e_acsl_gmp.h:37:[value] Function __gmpz_init: postcondition got status valid.
+share/e-acsl/e_acsl_gmp.h:37:[value] Function __gmpz_init: precondition got status valid.
+share/e-acsl/e_acsl_gmp.h:38:[value] Function __gmpz_init: postcondition got status valid.
 [value] using specification for function __gmpz_init_set_si
-share/e-acsl/e_acsl_gmp.h:61:[value] Function __gmpz_init_set_si: precondition got status valid.
-share/e-acsl/e_acsl_gmp.h:63:[value] Function __gmpz_init_set_si: postcondition got status valid.
-share/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: postcondition got status unknown.
+share/e-acsl/e_acsl_gmp.h:62:[value] Function __gmpz_init_set_si: precondition got status valid.
+share/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: postcondition got status valid.
+share/e-acsl/e_acsl_gmp.h:65:[value] Function __gmpz_init_set_si: postcondition got status unknown.
 [value] using specification for function __gmpz_set
-share/e-acsl/e_acsl_gmp.h:82:[value] Function __gmpz_set: precondition got status valid.
-share/e-acsl/e_acsl_gmp.h:83:[value] Function __gmpz_set: precondition got status valid.
+share/e-acsl/e_acsl_gmp.h:91:[value] Function __gmpz_set: precondition got status valid.
+share/e-acsl/e_acsl_gmp.h:92:[value] Function __gmpz_set: precondition got status valid.
 [value] using specification for function __gmpz_clear
-share/e-acsl/e_acsl_gmp.h:105:[value] Function __gmpz_clear: precondition got status valid.
+share/e-acsl/e_acsl_gmp.h:114:[value] Function __gmpz_clear: precondition got status valid.
 tests/e-acsl-runtime/linear_search.i:9:[value] entering loop for the first time
 [value] using specification for function __gmpz_cmp
-share/e-acsl/e_acsl_gmp.h:115:[value] Function __gmpz_cmp: precondition got status valid.
-share/e-acsl/e_acsl_gmp.h:116:[value] Function __gmpz_cmp: precondition got status valid.
+share/e-acsl/e_acsl_gmp.h:124:[value] Function __gmpz_cmp: precondition got status valid.
+share/e-acsl/e_acsl_gmp.h:125:[value] Function __gmpz_cmp: precondition got status valid.
 [value] using specification for function __gmpz_get_ui
-share/e-acsl/e_acsl_gmp.h:185:[value] Function __gmpz_get_ui: precondition got status valid.
+share/e-acsl/e_acsl_gmp.h:194:[value] Function __gmpz_get_ui: precondition got status valid.
 tests/e-acsl-runtime/linear_search.i:9:[kernel] warning: accessing out of bounds index [0..4294967295]. assert __e_acsl_i_2 < 10;
 [value] using specification for function __gmpz_add
-share/e-acsl/e_acsl_gmp.h:131:[value] Function __gmpz_add: precondition got status valid.
-share/e-acsl/e_acsl_gmp.h:132:[value] Function __gmpz_add: precondition got status valid.
-share/e-acsl/e_acsl_gmp.h:133:[value] Function __gmpz_add: precondition got status valid.
+share/e-acsl/e_acsl_gmp.h:140:[value] Function __gmpz_add: precondition got status valid.
+share/e-acsl/e_acsl_gmp.h:141:[value] Function __gmpz_add: precondition got status valid.
+share/e-acsl/e_acsl_gmp.h:142:[value] Function __gmpz_add: precondition got status valid.
 tests/e-acsl-runtime/linear_search.i:9:[kernel] warning: accessing out of bounds index [0..4294967295]. assert __e_acsl_3 < 10;
 [value] using specification for function e_acsl_assert
 share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.

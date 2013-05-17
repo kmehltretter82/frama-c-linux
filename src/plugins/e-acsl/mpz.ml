@@ -41,6 +41,8 @@ let apply_on_var ?loc funname e = Misc.mk_call ?loc ("__gmpz_" ^ funname) [ e ]
 let init ?loc e = apply_on_var "init" ?loc e
 let clear ?loc e = apply_on_var "clear" ? loc e
 
+exception Longlong of ikind
+
 let get_set_suffix_and_arg e = 
   let ty = Cil.typeOf e in
   if is_t ty then "", [ e ]
@@ -53,10 +55,10 @@ let get_set_suffix_and_arg e =
     | TInt((IBool | IUChar | IUInt | IUShort | IULong), _) ->
       "_ui", [ e ]
     | TInt((ISChar | IShort | IInt | ILong), _) -> "_si", [ e ]
-    | TInt((ILongLong | IULongLong), _)
+    | TInt((ILongLong | IULongLong as ikind), _) -> raise (Longlong ikind)
     | TPtr(TInt(IChar, _), _) ->
       "_str",
-	(* decimal base for the number given as string *)
+      (* decimal base for the number given as string *)
       [ e; Cil.integer ~loc:Location.unknown 10 ]
     | _ -> assert false
 
@@ -68,8 +70,35 @@ let generic_affect ?loc fname lv ev e =
   else
     Cil.mkStmtOneInstr ~valid_sid:true (Set(lv, e, Location.unknown))
 
-let init_set ?loc lv ev e = generic_affect ?loc "__gmpz_init_set" lv ev e
-let affect ?loc lv ev e = generic_affect ?loc "__gmpz_set" lv ev e
+let init_set ?loc lv ev e = 
+  try generic_affect ?loc "__gmpz_init_set" lv ev e
+  with 
+  | Longlong IULongLong ->
+    (match e.enode with
+    | Lval elv ->
+      let call =
+	Misc.mk_call ?loc
+	  "__gmpz_import"
+	  (let loc = match loc with None -> Location.unknown | Some l -> l in
+	   [ ev; 
+	     Cil.one ~loc; 
+	     Cil.one ~loc; 
+	     Cil.sizeOf ~loc (TInt(IULongLong, []));
+	     Cil.zero ~loc;
+	     Cil.zero ~loc;
+	     Cil.mkAddrOf ~loc elv ])
+      in
+      Cil.mkStmt
+	~valid_sid:true
+	(Block (Cil.mkBlock [ init ?loc ev; call ]))
+    | _ ->  Error.not_yet "unsigned long long expression requiring GMP")
+  | Longlong ILongLong ->
+    Error.not_yet "long long requiring GMP"
+
+let affect ?loc lv ev e = 
+  try generic_affect ?loc "__gmpz_set" lv ev e
+  with Longlong _ ->
+    Error.not_yet "quantification over long long and requiring GMP"
 
 (*
 Local Variables:
