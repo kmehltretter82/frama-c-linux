@@ -7,9 +7,6 @@ struct __anonstruct___mpz_struct_1 {
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
 typedef unsigned int size_t;
-/*@
-model __mpz_struct { ℤ n };
-*/
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
@@ -18,6 +15,9 @@ extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *pred_txt,
                                                            int line);
 
+/*@
+model __mpz_struct { ℤ n };
+*/
 int __fc_random_counter __attribute__((__unused__));
 unsigned long const __fc_rand_max = (unsigned long)32767;
 /*@ ghost extern int __fc_heap_status; */
@@ -100,12 +100,12 @@ int __e_acsl_sorted(int *t, int n)
         __e_acsl_valid_read = __valid_read((void *)(t + __e_acsl_i),
                                            sizeof(int));
         e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"sorted",
-                      (char *)"mem_access: \\valid_read(t+__e_acsl_i)",0);
+                      (char *)"mem_access: \\valid_read(t+__e_acsl_i)",8);
         __e_acsl_valid_read_2 = __valid_read((void *)(t + ((long long)__e_acsl_i - (long long)1)),
                                              sizeof(int));
         e_acsl_assert(__e_acsl_valid_read_2,(char *)"RTE",(char *)"sorted",
                       (char *)"mem_access: \\valid_read(t+(long long)((long long)__e_acsl_i-(long long)1))",
-                      0);
+                      8);
         if (*(t + ((long long)__e_acsl_i - (long long)1)) <= *(t + __e_acsl_i)) 
           ;
         else {

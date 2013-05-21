@@ -639,7 +639,7 @@ and named_predicate_to_exp ?name kf ?rte env p =
   e, env
 
 and translate_rte kf env e =
-  let stmt = Cil.mkStmtOneInstr ~valid_sid:true (Skip Location.unknown) in
+  let stmt = Cil.mkStmtOneInstr ~valid_sid:true (Skip e.eloc) in
   let l = get_rte kf stmt e in
   let old_valid = !is_visiting_valid in
   let old_kind = Env.annotation_kind env in

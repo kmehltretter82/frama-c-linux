@@ -7,9 +7,6 @@ struct __anonstruct___mpz_struct_1 {
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
 typedef unsigned int size_t;
-/*@
-model __mpz_struct { ℤ n };
-*/
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
@@ -18,6 +15,9 @@ extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *pred_txt,
                                                            int line);
 
+/*@
+model __mpz_struct { ℤ n };
+*/
 int __fc_random_counter __attribute__((__unused__));
 unsigned long const __fc_rand_max = (unsigned long)32767;
 /*@ ghost extern int __fc_heap_status; */
@@ -465,7 +465,7 @@ int main(void)
       }
       else __e_acsl_and_21 = 0;
       e_acsl_assert(__e_acsl_and_21,(char *)"RTE",(char *)"main",
-                    (char *)"mem_access: \\valid_read(c)",0);
+                    (char *)"mem_access: \\valid_read(c)",38);
       __e_acsl_valid_16 = __valid((void *)*c,(size_t)sizeof(int));
       __e_acsl_and_22 = __e_acsl_valid_16;
     }
@@ -480,7 +480,7 @@ int main(void)
     int __e_acsl_and_26;
     __e_acsl_valid_read_2 = __valid_read((void *)d,(size_t)sizeof(int **));
     e_acsl_assert(__e_acsl_valid_read_2,(char *)"RTE",(char *)"main",
-                  (char *)"mem_access: \\valid_read(d)",0);
+                  (char *)"mem_access: \\valid_read(d)",39);
     __e_acsl_initialized_13 = __initialized((void *)*d,(size_t)sizeof(int *));
     if (__e_acsl_initialized_13) {
       int __e_acsl_initialized_14;
@@ -504,14 +504,14 @@ int main(void)
         }
         else __e_acsl_and_23 = 0;
         e_acsl_assert(__e_acsl_and_23,(char *)"RTE",(char *)"main",
-                      (char *)"mem_access: \\valid_read(d)",0);
+                      (char *)"mem_access: \\valid_read(d)",39);
         __e_acsl_valid_read_4 = __valid_read((void *)*d,
                                              (size_t)sizeof(int *));
         __e_acsl_and_24 = __e_acsl_valid_read_4;
       }
       else __e_acsl_and_24 = 0;
       e_acsl_assert(__e_acsl_and_24,(char *)"RTE",(char *)"main",
-                    (char *)"mem_access: \\valid_read(*d)",0);
+                    (char *)"mem_access: \\valid_read(*d)",39);
       __e_acsl_initialized_16 = __initialized((void *)(& d),
                                               (size_t)sizeof(int ***));
       if (__e_acsl_initialized_16) {
@@ -522,7 +522,7 @@ int main(void)
       }
       else __e_acsl_and_25 = 0;
       e_acsl_assert(__e_acsl_and_25,(char *)"RTE",(char *)"main",
-                    (char *)"mem_access: \\valid_read(d)",0);
+                    (char *)"mem_access: \\valid_read(d)",39);
       __e_acsl_valid_17 = __valid((void *)*(*d),(size_t)sizeof(int));
       __e_acsl_and_26 = __e_acsl_valid_17;
     }

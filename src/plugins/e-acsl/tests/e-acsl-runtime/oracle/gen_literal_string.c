@@ -7,9 +7,6 @@ struct __anonstruct___mpz_struct_1 {
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
 typedef unsigned int size_t;
-/*@
-model __mpz_struct { ℤ n };
-*/
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
@@ -18,6 +15,9 @@ extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *pred_txt,
                                                            int line);
 
+/*@
+model __mpz_struct { ℤ n };
+*/
 int __fc_random_counter __attribute__((__unused__));
 unsigned long const __fc_rand_max = (unsigned long)32767;
 /*@ ghost extern int __fc_heap_status; */
@@ -77,7 +77,7 @@ void f(void)
     int __e_acsl_valid_read;
     __e_acsl_valid_read = __valid_read((void *)(T + G),sizeof(char));
     e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"f",
-                  (char *)"mem_access: \\valid_read(T+G)",0);
+                  (char *)"mem_access: \\valid_read(T+G)",13);
     e_acsl_assert((int)*(T + G) == 'b',(char *)"Assertion",(char *)"f",
                   (char *)"*(T+G) == \'b\'",13);
   }
@@ -134,7 +134,7 @@ int main(void)
     int __e_acsl_valid_read;
     __e_acsl_valid_read = __valid_read((void *)(S + G2),sizeof(char));
     e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"main",
-                  (char *)"mem_access: \\valid_read(S+G2)",0);
+                  (char *)"mem_access: \\valid_read(S+G2)",24);
     e_acsl_assert((int)*(S + G2) == 'o',(char *)"Assertion",(char *)"main",
                   (char *)"*(S+G2) == \'o\'",24);
   }

@@ -7,9 +7,6 @@ struct __anonstruct___mpz_struct_1 {
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
 typedef unsigned int size_t;
-/*@
-model __mpz_struct { ℤ n };
-*/
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
@@ -18,6 +15,9 @@ extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
                                                            char *pred_txt,
                                                            int line);
 
+/*@
+model __mpz_struct { ℤ n };
+*/
 int __fc_random_counter __attribute__((__unused__));
 unsigned long const __fc_rand_max = (unsigned long)32767;
 /*@ ghost extern int __fc_heap_status; */
@@ -218,7 +218,7 @@ void g(int *p, int *q)
       int __e_acsl_valid_read_3;
       __e_acsl_valid_read_3 = __valid_read((void *)q,sizeof(int));
       e_acsl_assert(__e_acsl_valid_read_3,(char *)"RTE",(char *)"g",
-                    (char *)"mem_access: \\valid_read(q)",0);
+                    (char *)"mem_access: \\valid_read(q)",34);
       __store_block((void *)(& __e_acsl_at_3),4U);
       __e_acsl_at_3 = *q;
     }
@@ -226,7 +226,7 @@ void g(int *p, int *q)
       int __e_acsl_valid_read;
       __e_acsl_valid_read = __valid_read((void *)q,sizeof(int));
       e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"g",
-                    (char *)"mem_access: \\valid_read(q)",0);
+                    (char *)"mem_access: \\valid_read(q)",32);
       __store_block((void *)(& __e_acsl_at),4U);
       __e_acsl_at = *q;
     }
@@ -242,7 +242,7 @@ void g(int *p, int *q)
                                            sizeof(int));
       e_acsl_assert(__e_acsl_valid_read_2,(char *)"RTE",(char *)"g",
                     (char *)"mem_access: \\valid_read(p+(long)__e_acsl_at)",
-                    0);
+                    32);
       __store_block((void *)(& __e_acsl_at_2),4U);
       __e_acsl_at_2 = *(p + (long)__e_acsl_at);
     }

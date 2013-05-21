@@ -226,7 +226,8 @@ class e_acsl_visitor prj generate = object (self)
 		  let new_globals =
 		    List.fold_right
 		      (fun g acc -> match g with
-		      | GFun({ svar = vi }, _) when Varinfo.equal vi main.svar -> 
+		      | GFun({ svar = vi }, _) 
+			  when Varinfo.equal vi main.svar -> 
 			acc
 		      | _ -> g :: acc)
 		      f.globals
