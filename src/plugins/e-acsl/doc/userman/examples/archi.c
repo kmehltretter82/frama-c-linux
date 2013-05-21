@@ -1,4 +1,4 @@
-#define ARCH_BITS 64 /* consider a 64 bits architecture */
+#define ARCH_BITS 64 /* assume a 64 bits architecture */
 
 #if ARCH_BITS == 32
 #define SIZEOF_LONG 4
