@@ -590,11 +590,31 @@ combination with value and wp
 \section{Customization}
 \label{sec:custom}
 
-\begin{itemize}
-\item -e-acsl-project
-\item -e-acsl-check
-\item -eacsl-share
-\end{itemize}
+There are few ways to customize the \eacsl plug-in. 
+
+First, the name of the generated project ---which is \texttt{e-acsl} by
+default--- may be changed by setting the option \optiondef{-}{e-acsl-project}.
+
+Second, the directory which the \eacsl library files are searched in ---which is
+\texttt{`frama-c -print-share-path`/e-acsl} by default--- may be changed by
+setting the option \optiondef{-}{e-acsl-share}.
+
+Third, the option \optiondef{-}{e-acsl-check} does not generate any new project
+but it only verifies that each annotation is translatable. Then it produces a
+summary as shown in the following example (left shift in annotation is not
+yet supported by the \eacsl plug-in).
+
+\listingname{check.i}
+\cinput{examples/check.i}
+
+\begin{shell}
+\$ frama-c -e-acsl-check check.i
+<skip preprocessing commands>
+check.i:4:[e-acsl] warning: E-ACSL construct `left/right shift' is not yet supported.
+                  Ignoring annotation.
+[e-acsl] 0 annotation was ignored, being untypable.
+[e-acsl] 1 annotation was ignored, being unsupported.
+\end{shell}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

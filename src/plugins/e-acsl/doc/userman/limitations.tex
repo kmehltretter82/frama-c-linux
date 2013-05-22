@@ -11,15 +11,39 @@ hard to lift. Thus they could be there for a while. Lifting them could be part
 of commercial supports\footnote{Contact us or read
   \url{http://frama-c.com/support.html} for additional details.}.
 
-\section{Undefined Value}
-\index{Undefined value}
+\section{Uninitialized Value}
+\index{Uninitialized value}
 
-\begin{itemize}
-\item use of undefined values are not tracked in annotations
-\item missing guards for \lstinline+\offset+, \lstinline+\block_length+ and
-  \lstinline+texbase_addr+ (\lstinline+offset(p)+ must ensures that $p$ is
-  valid)
-\end{itemize}
+As explained in Section~\ref{sec:runtime-error}, the \eacsl plug-in should never
+translate an annotation into a \C code which can lead to a runtime error. That
+is the case, except for unitialized values which are values read before having
+been written like in the following example.
+
+\listingname{uninitialized.i}
+\cinput{examples/uninitialized.i}
+
+If you generate the instrumented code, compile it, and finally execute it, you
+may get no runtime error depending on your \C compiler, but the behavior is
+actually uninitialized and should be trap by the \eacsl plug-in. That is not the
+case yet.
+\begin{shell}
+\$ frama-c -e-acsl uninitialized.i -then-on e-acsl -print \
+          -ocode monitored_uninitialized.i
+\$ gcc -Wuninitialized -o pointer `frama-c -print-share-path`/e-acsl/e_acsl.c` \
+      monitored_uninitialized.i
+monitored_uninitialized.i: In function 'main':
+monitored_uninitialized.i:44:16: warning: 'x' is used uninitialized in this function\
+[-Wuninitialized]
+\$ ./monitored_uninitialized
+\end{shell}
+
+Actually that is more a design choice that a limitation: if the \eacsl plug-in
+would generate additional instrumentation to prevent such values to be executed,
+the generated code would be much more verbose and much slower.
+
+If you really want to track such unitializations in your annotation, you have to
+manually add calls to the \eacsl predicate
+\lstinline|\initialized|~\cite{eacsl}.
 
 \section{Incomplete Programs}
 
@@ -36,7 +60,7 @@ plug-in is running (see examples of Sections~\ref{sec:no-main} and
 \index{Program!Without main}
 \label{sec:limits:no-main}
 
-The generation is incorrect for every program without main containing a
+The generated program is incorrect for every program without main containing a
 memory-related annotations, except if the option
 \optionuse{-}{e-acsl-full-mmodel} is provided.
 
@@ -85,6 +109,18 @@ freed: \valid(x).
 \subsection{Function without Code}
 \label{sec:limits:no-code}
 \index{Function!Without code}
+
+The generated program is incorrect for every program which contains a
+memory-related annotation $a$ and a function $f$ without code if and only if:
+\begin{itemize}
+\item either $f$ has an (even indirect) effect on a left-value occuring in $a$;
+\item or $a$ is one of the post-condition of $f$.
+\end{itemize}
+
+There is no workaround yet.
+
+Also, the option \optionuse{-}{e-acsl-check} does not verify the annotations of
+function without code. There is also no workaround yet. 
 
 \section{Recursive Function}
 \index{Function!Recursive}

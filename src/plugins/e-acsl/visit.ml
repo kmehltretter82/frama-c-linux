@@ -137,7 +137,7 @@ class e_acsl_visitor prj generate = object (self)
     Cil.DoChildrenPost
       (fun f ->
 	(* extend the main with forward initialization and put it at end *)
-	if not (Options.Check.get ()) then begin
+	if generate then begin
 	  let must_init =
 	    try
 	      Varinfo.Hashtbl.iter
@@ -283,13 +283,13 @@ you must call function `%s' and `__clean' by yourself.@]"
 	vi.vghost <- false;
 	(* remember that we have to remove the main later (see method
 	   [vfile]) *)
-	if vi.vorig_name = Kernel.MainFunction.get () 
-	&& not (Options.Check.get ()) 
-	then main_fct <- Some fundec
+	if vi.vorig_name = Kernel.MainFunction.get () then
+	  main_fct <- Some fundec
       | GVarDecl(_, vi, _) -> 
 	(* do not convert extern ghost variables, because they can't be linked,
 	   see bts #1392 *)
-	if vi.vstorage <> Extern then vi.vghost <- false
+	if vi.vstorage <> Extern then
+	  vi.vghost <- false
       | _ -> 
 	()
     in
@@ -297,7 +297,8 @@ you must call function `%s' and `__clean' by yourself.@]"
     | GVar(vi, _, _) | GVarDecl(_, vi, _) -> 
       Varinfo.Hashtbl.replace global_vars vi None
     | _ -> ());
-    Cil.DoChildrenPost(fun g -> List.iter do_it g; g)
+    if generate then Cil.DoChildrenPost(fun g -> List.iter do_it g; g)
+    else Cil.DoChildren
 
   method vinit vi _off _i = 
     if generate then
@@ -328,6 +329,7 @@ you must call function `%s' and `__clean' by yourself.@]"
       Cil.DoChildren
 
   method private add_generated_variables_in_function f =
+    assert generate;
     let vars = Env.get_generated_variables !function_env in
     self#reset_env ();
     f.slocals <- f.slocals @ List.map fst vars;
@@ -339,16 +341,19 @@ you must call function `%s' and `__clean' by yourself.@]"
       vars
 
   method vfunc f =
-    let kf = Extlib.the self#current_kf in
-    Options.feedback ~dkey ~level:2 "entering in function %a." 
-      Kernel_function.pretty kf;
-    List.iter (fun vi -> vi.vghost <- false) f.slocals;
-    Cil.DoChildrenPost 
-      (fun f -> 
-	self#add_generated_variables_in_function f; 
-	Options.feedback ~dkey ~level:2 "function %a done."
-	  Kernel_function.pretty kf;
-	f)
+    if generate then
+      let kf = Extlib.the self#current_kf in
+      Options.feedback ~dkey ~level:2 "entering in function %a." 
+	Kernel_function.pretty kf;
+      List.iter (fun vi -> vi.vghost <- false) f.slocals;
+      Cil.DoChildrenPost 
+	(fun f -> 
+	  self#add_generated_variables_in_function f; 
+	  Options.feedback ~dkey ~level:2 "function %a done."
+	    Kernel_function.pretty kf;
+	  f)
+    else
+      Cil.DoChildren
 
   method private is_return old_kf stmt = 
     let old_ret = 
@@ -373,10 +378,11 @@ you must call function `%s' and `__clean' by yourself.@]"
       (* [JS 2013/05/21] already a warning in pre-analysis *)
       (*      Options.warning ~once:true "%s@ \
 	      @[The generated program may be incomplete.@]" 
-	s;*)
+	      s;*)
       false
 
-  method private literal_string env e = 
+  method private literal_string env e =
+    assert generate;
     let env_ref = ref env in
     let o = object
       inherit Cil.genericCilVisitor (Cil.copy_visit (Project.current ()))
@@ -415,7 +421,7 @@ you must call function `%s' and `__clean' by yourself.@]"
     let env = 
       if self#is_first_stmt kf stmt then
 	(* JS: should be done in the new project? *)
-	let env = allocate_function env kf in
+	let env = if generate then allocate_function env kf else env in
 	(* translate the precondition of the function *)
 	if Pre_visit.is_generated_function (Extlib.the self#current_kf) then
 	  Project.on prj (Translate.translate_pre_spec kf Kglobal env) !funspec
@@ -449,7 +455,7 @@ you must call function `%s' and `__clean' by yourself.@]"
 	 Use [function_env] to get it back. *)
       let env = !function_env in
       let env =
-	if stmt.ghost then begin
+	if stmt.ghost && generate then begin
 	  stmt.ghost <- false;
 	  (* translate potential RTEs of ghost code *)
 	  let rtes = get_rte_by_stmt kf stmt in
@@ -464,6 +470,7 @@ you must call function `%s' and `__clean' by yourself.@]"
 	  env
       in
       let mk_block b = 
+	assert generate;
 	let mk b = match b.bstmts with
 	  | [] -> 
 	    (match stmt.skind with
@@ -509,54 +516,63 @@ you must call function `%s' and `__clean' by yourself.@]"
 	  in
 	  (* de-allocating memory previously allocating by the kf *)
 	  (* JS: should be done in the new project? *)
-	  let env = deallocate_function env kf in
-	  let b, env = Env.pop_and_get env stmt ~global_clear:true Env.After in
-	  if is_main && Pre_analysis.use_model () then begin
-	    let stmts = b.bstmts in
-	    let l = List.rev stmts in
-	    match l with
-	    | [] -> assert false (* return is here *)
-	    | ret :: l ->
-	      let delete_stmts =
-		Globals.Vars.fold_in_file_order
-		  (fun vi _ acc -> 
-		    if Pre_analysis.must_model_vi vi then 
-		      let vi = Cil.get_varinfo self#behavior vi in
-		      Misc.mk_delete_stmt vi :: acc
-		    else
-		      acc)
-		  [ Misc.mk_call ~loc:(Stmt.loc stmt) "__clean" []; ret ]
-	      in
-	      b.bstmts <- List.rev l @ delete_stmts
-	  end;
-	  let new_stmt = mk_block b in
-	  (* move the labels of the return to the new block in order to
-	     evaluate the postcondition when jumping to them. *)
-	  move_labels env stmt new_stmt;
-	  new_stmt, env
+	  if generate then
+	    let env = deallocate_function env kf in
+	    let b, env = 
+	      Env.pop_and_get env stmt ~global_clear:true Env.After 
+	    in
+	    if is_main && Pre_analysis.use_model () && generate then begin
+	      let stmts = b.bstmts in
+	      let l = List.rev stmts in
+	      match l with
+	      | [] -> assert false (* return is here *)
+	      | ret :: l ->
+		let delete_stmts =
+		  Globals.Vars.fold_in_file_order
+		    (fun vi _ acc -> 
+		      if Pre_analysis.must_model_vi vi then 
+			let vi = Cil.get_varinfo self#behavior vi in
+			Misc.mk_delete_stmt vi :: acc
+		      else
+			acc)
+		    [ Misc.mk_call ~loc:(Stmt.loc stmt) "__clean" []; ret ]
+		in
+		b.bstmts <- List.rev l @ delete_stmts
+	    end;
+	    let new_stmt = mk_block b in
+	    (* move the labels of the return to the new block in order to
+	       evaluate the postcondition when jumping to them. *)
+	    move_labels env stmt new_stmt;
+	    new_stmt, env
+	  else
+	    stmt, env
 	else
-	  let stmt = rename_alloc_function stmt in
-	  (* must generate [pre_block] which includes [stmt] before generating
-	     [post_block] *)
-	  let pre_block, env = 
-	    Env.pop_and_get env stmt ~global_clear:false Env.After
-	  in
-	  let env = mk_post_env (Env.push env) in
-	  let post_block, env = 
-	    Env.pop_and_get 
-	      env (mk_block pre_block) ~global_clear:false Env.Before 
-	  in
-	  (* TODO: must clear the local block anytime (?) *)
-	  mk_block post_block, env
+	  if generate then
+	    let stmt = rename_alloc_function stmt in
+	    (* must generate [pre_block] which includes [stmt] before generating
+	       [post_block] *)
+	    let pre_block, env = 
+	      Env.pop_and_get env stmt ~global_clear:false Env.After
+	    in
+	    let env = mk_post_env (Env.push env) in
+	    let post_block, env = 
+	      Env.pop_and_get 
+		env (mk_block pre_block) ~global_clear:false Env.Before 
+	    in
+	    (* TODO: must clear the local block anytime (?) *)
+	    mk_block post_block, env
+	  else
+	    stmt, env
       in
       function_env := env;
       Options.debug ~level:4
 	"@[new stmt (from sid %d):@ %a@]" stmt.sid Printer.pp_stmt new_stmt;
-      new_stmt
+      if generate then new_stmt else stmt
     in
     Cil.ChangeDoChildrenPost(stmt, mk_block)
 
   method private add_initializer loc checked_lv assigned_lv =
+    assert generate;
     let kf = Extlib.the self#current_kf in
     let stmt = Extlib.the self#current_stmt in
     let may_safely_ignore = function
@@ -579,14 +595,17 @@ you must call function `%s' and `__clean' by yourself.@]"
 
   method vinst = function
   | Set(old_lv, _, _) ->
-    Cil.DoChildrenPost 
-      (function 
-      | [ Set(new_lv, _, loc) ] as l -> 
-	self#add_initializer loc old_lv new_lv; 
-	l
-      | _ -> assert false)
+    if generate then
+      Cil.DoChildrenPost 
+	(function 
+	| [ Set(new_lv, _, loc) ] as l -> 
+	  self#add_initializer loc old_lv new_lv; 
+	  l
+	| _ -> assert false)
+    else
+      Cil.DoChildren
   | Call(Some old_ret, _, _, _) ->
-    if Misc.is_generated_kf (Extlib.the self#current_kf) then
+    if not generate || Misc.is_generated_kf (Extlib.the self#current_kf) then
       Cil.DoChildren
     else
       Cil.DoChildrenPost 
@@ -644,7 +663,7 @@ you must call function `%s' and `__clean' by yourself.@]"
 	  blk.blocals;
 	new_blk
     in
-    Cil.DoChildrenPost handle_memory
+    if generate then Cil.DoChildrenPost handle_memory else Cil.DoChildren
 
   method vexpr exp = 
     if generate then
