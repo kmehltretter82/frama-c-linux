@@ -226,7 +226,7 @@ class e_acsl_visitor prj generate = object (self)
 		  let new_globals =
 		    List.fold_right
 		      (fun g acc -> match g with
-		      | GFun({ svar = vi }, _) 
+		      | GFun({ svar = vi }, _)
 			  when Varinfo.equal vi main.svar -> 
 			acc
 		      | _ -> g :: acc)
@@ -235,8 +235,8 @@ class e_acsl_visitor prj generate = object (self)
 		  in
 		  f.globals <- new_globals
 		| None -> 
-		  Kernel.warning "no entry point specified:@ \
-you must call function `%s' by yourself" 
+		  Kernel.warning "@[no entry point specified:@ \
+you must call function `%s' and `__clean' by yourself.@]" 
 		    fname;
 		  f.globals <- f.globals @ [ cil_fct ]
 	    in

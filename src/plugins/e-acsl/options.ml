@@ -73,14 +73,14 @@ module Gmp_only =
   False
     (struct
       let option_name = "-e-acsl-gmp-only"
-      let help = ""
+      let help = "always use GMP integers instead of C integral types"
      end)
 
 module Full_mmodel =
   False
     (struct
       let option_name = "-e-acsl-full-mmodel"
-      let help = ""
+      let help = "maximal memory-related instrumentation"
      end)
 
 let () = Plugin.set_group help

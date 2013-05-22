@@ -663,8 +663,10 @@ and must_model_exp ?kf ?stmt e = match e.enode with
   | AlignOfE _ -> assert false
 
 let must_model_vi ?kf ?stmt vi =
-  Options.Full_mmodel.get ()
-  || Error.generic_handle (must_model_vi ?kf ?stmt) false vi
+  not (Cil.isFunctionType vi.vtype || (vi.vghost && vi.vstorage = Extern))
+  &&
+    (Options.Full_mmodel.get ()
+     || Error.generic_handle (must_model_vi ?kf ?stmt) false vi)
 
 let must_model_lval ?kf ?stmt lv = 
   Options.Full_mmodel.get ()
@@ -674,7 +676,7 @@ let old_must_model_vi bhv ?kf ?stmt vi =
   Options.Full_mmodel.get ()
   || must_model_vi ?kf ?stmt (Cil.get_original_varinfo bhv vi)
 
-let use_model () = not (Env.is_empty ())
+let use_model () = not (Env.is_empty ()) || Options.Full_mmodel.get ()
 
 (*
 Local Variables:

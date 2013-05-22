@@ -343,6 +343,11 @@ We can now execute it as usual.
 
 Since the assertion is valid, there is no output in this case.
 
+The option \optiondef{-}{e-acsl-gmp-only} (unset by default) may be set to
+always generate \gmp integers, even when it is not required. If it is set, the
+generated program must be linked against \gmp as soon as there is an integer or
+any integral \C type in an annotation.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Memory-related Annotations}
@@ -378,7 +383,8 @@ must be generated from \texttt{monitored\_valid.i} as follows:
 \begin{shell}
 \$ DIR=`frama-c -print-share-path`/e-acsl
 \$ MDIR=\$DIR/memory_model
-\$ gcc -o valid \$DIR/e_acsl.c \$MDIR/e_acsl_bittree.c \$MDIR/e_acsl_mmodel.c monitored_valid.i
+\$ gcc -o valid \$DIR/e_acsl.c \$MDIR/e_acsl_bittree.c \$MDIR/e_acsl_mmodel.c \
+       monitored_valid.i
 \end{shell}
 
 Now we can execute the generate binary which fails at runtime since the second
@@ -416,6 +422,11 @@ RTE failed at line 12 in function main.
 The failing predicate is:
 mem_access: \valid_read(x).
 \end{shell}
+
+The option \optiondef{-}{e-acsl-full-mmodel} (unset by default) may be set to
+always instrumente the code for handline potential memory-related annotations,
+even when it is not required. If it is set, the generated program must be always
+linked against the memory library.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -463,6 +474,7 @@ instrumented code.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Program without Main}
+\label{sec:no-main}
 \index{Program!Without main}
 
 The \eacsl plug-in may work even if there is no \texttt{main} function.
@@ -487,7 +499,7 @@ warning.
 
 This warning indicates that the instrumentation would be incorrect if the
 program contains memory-related annotations (see
-Section~\ref{sec:limits:incomplete}). That is not the case here, so you can
+Section~\ref{sec:limits:no-main}). That is not the case here, so you can
 safely ignore it. Now, it is possible to compile the generated code with a \C
 compiler in a standard way, and even to link it against additional files like
 the following one. In this particular case, we also need to link against \gmp as
@@ -530,7 +542,7 @@ generating default assigns from the prototype
 
 Like in the previous Section, this warning indicates that the instrumentation
 would be incorrect if the program contains memory-related annotations (see
-Section~\ref{sec:limits:incomplete}). That is still not the case here, so you
+Section~\ref{sec:limits:no-code}). That is still not the case here, so you
 can safely ignore it. Now, it is possible to compile the generated code with a
 \C compiler in a standard way, and even to link it against additional files that
 provided an implementation for the missing functions like the following one. In

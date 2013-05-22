@@ -22,9 +22,69 @@ of commercial supports\footnote{Contact us or read
 \end{itemize}
 
 \section{Incomplete Programs}
+
+Section~\ref{sec:incomplete} explains how the \eacsl plug-in is able to handle
+incomplete programs, which are either programs without main, or programs
+containing functions without bodies.
+
+However, if such programs contain memory-related annotations, the generated code
+may be incorrect. That is made explicit by a warning displayed when the \eacsl
+plug-in is running (see examples of Sections~\ref{sec:no-main} and
+\ref{sec:no-code}).
+
+\subsection{Program without Main}
 \index{Program!Without main}
+\label{sec:limits:no-main}
+
+The generation is incorrect for every program without main containing a
+memory-related annotations, except if the option
+\optionuse{-}{e-acsl-full-mmodel} is provided.
+
+Consider the following example.
+
+\listingname{valid\_no\_main.c}
+\cinput{examples/valid_no_main.c}
+
+You can generate the instrumented program as follows.
+\begin{shell}
+\$ frama-c -e-acsl-full-mmodel -machdep x86_64 -e-acsl valid_no_main.c \
+          -then-on e-acsl -print -ocode monitored_valid_no_main.i
+<skip preprocessing commands>
+[e-acsl] beginning translation.
+<skip warnings about annotations from the Frama-C libc 
+      which cannot be translated>
+[kernel] warning: no entry point specified:
+                  you must call function `e_acsl_global_init' and `__clean' by yourself.
+[e-acsl] translation done in project "e-acsl".
+\end{shell}
+
+The last warning states an important point: if this program is linked against
+another file containing a \texttt{main} function, then this main function must
+be modified to insert a call to the function
+\texttt{e\_acsl\_global\_init}\codeidx{e\_acsl\_global\_init} at 
+the very beginning and a call to the function
+\texttt{\_\_clean}\codeidx{\_\_clean} at the very end like in the following
+example.
+
+\listingname{modified\_main.c}
+\cinput{examples/modified_main.c}
+
+Then just compile and run it as explained in Section~\ref{sec:memory}.
+
+\begin{shell}
+\$ DIR=`frama-c -print-share-path`/e-acsl
+\$ MDIR=\$DIR/memory_model
+\$ gcc -o valid_no_main \$DIR/e_acsl.c \$MDIR/e_acsl_bittree.c \
+      \$MDIR/e_acsl_mmodel.c monitored_valid_no_main.i modified_main.c
+\$ ./valid_no_main
+Assertion failed at line 11 in function f.
+The failing predicate is:
+freed: \valid(x).
+\end{shell}
+
+\subsection{Function without Code}
+\label{sec:limits:no-code}
 \index{Function!Without code}
-\label{sec:limits:incomplete}
 
 \section{Recursive Function}
 \index{Function!Recursive}
