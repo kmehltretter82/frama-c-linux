@@ -463,13 +463,49 @@ instrumented code.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Program without Main}
+\index{Program!Without main}
 
+The \eacsl plug-in may work even if there is no \texttt{main} function.
+Consider for instance the following annotated program without such a
+\texttt{main}.  
 
+\listingname{no\_main.i} 
+\cinput{examples/no_main.i}
+
+The instrumented code is generated as usual, even if you get an additional
+warning.
+\begin{shell}
+\$ frama-c -e-acsl no_main.i -then-on e-acsl -print -ocode monitored_no_main.i
+<skip preprocessing command line>
+[e-acsl] beginning translation.
+[e-acsl] warning: cannot find entry point `main'.
+                  Please use option `-main' for specifying a valid entry point.
+                  The generated program may miss memory instrumentation.
+[e-acsl] translation done in project "e-acsl".
+\end{shell}
+
+This warning indicates that the instrumentation would be incorrect if the
+program contains memory-related annotations (see
+Section~\ref{sec:limits:no-main}). That is not the case here, so you can safely
+ignore it. Now, it is possible to compile the generated code with a \C compiler
+in a standard way, and even to link it against additional files like the
+following one. In this particular case, we also need to link against \gmp as
+explained in Section~\ref{sec:integers}.
+
+\listingname{main.c}
+\cinput{examples/main.c}
+
+\begin{shell}
+\$ gcc -o no_main `frama-c -print-share-path`/e-acsl/e_acsl.c main.c -lgmp
+\$ ./no_main
+x = 65536
+\end{shell}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Function without Code}
 \label{sec:no-code}
+\index{Function!Without code}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
