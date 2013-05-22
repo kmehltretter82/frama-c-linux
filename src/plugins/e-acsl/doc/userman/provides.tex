@@ -481,22 +481,24 @@ warning.
 [e-acsl] warning: cannot find entry point `main'.
                   Please use option `-main' for specifying a valid entry point.
                   The generated program may miss memory instrumentation.
+                  if there are memory-related annotations.
 [e-acsl] translation done in project "e-acsl".
 \end{shell}
 
 This warning indicates that the instrumentation would be incorrect if the
 program contains memory-related annotations (see
-Section~\ref{sec:limits:no-main}). That is not the case here, so you can safely
-ignore it. Now, it is possible to compile the generated code with a \C compiler
-in a standard way, and even to link it against additional files like the
-following one. In this particular case, we also need to link against \gmp as
+Section~\ref{sec:limits:incomplete}). That is not the case here, so you can
+safely ignore it. Now, it is possible to compile the generated code with a \C
+compiler in a standard way, and even to link it against additional files like
+the following one. In this particular case, we also need to link against \gmp as
 explained in Section~\ref{sec:integers}.
 
 \listingname{main.c}
 \cinput{examples/main.c}
 
 \begin{shell}
-\$ gcc -o no_main `frama-c -print-share-path`/e-acsl/e_acsl.c main.c -lgmp
+\$ gcc -o no_main `frama-c -print-share-path`/e-acsl/e_acsl.c \
+      monitored_no_main.i main.c -lgmp
 \$ ./no_main
 x = 65536
 \end{shell}
@@ -506,6 +508,50 @@ x = 65536
 \subsection{Function without Code}
 \label{sec:no-code}
 \index{Function!Without code}
+
+The \eacsl plug-in may also work if some functions have no implementation.
+Consider for instance the following annotated program for which the
+implementation of the function \texttt{my\_pow} is not provided.
+
+\listingname{no\_code.c} 
+\cinput{examples/no_code.c}
+
+The instrumented code is generated as usual, even if you get an additional
+warning.
+\begin{shell}
+[e-acsl] beginning translation.
+[e-acsl] warning: annotated function `my_pow' without code:
+                  the generated program may miss memory instrumentation
+                  if there are memory-related annotations.
+[kernel] warning: No code nor implicit assigns clause for function my_pow, 
+generating default assigns from the prototype
+[e-acsl] translation done in project "e-acsl".
+\end{shell}
+
+Like in the previous Section, this warning indicates that the instrumentation
+would be incorrect if the program contains memory-related annotations (see
+Section~\ref{sec:limits:incomplete}). That is still not the case here, so you
+can safely ignore it. Now, it is possible to compile the generated code with a
+\C compiler in a standard way, and even to link it against additional files that
+provided an implementation for the missing functions like the following one. In
+this particular case, we also need to link against \gmp as explained in
+Section~\ref{sec:integers}.
+
+\listingname{pow.i}
+\cinput{examples/pow.i}
+
+\begin{shell}
+\$ gcc -o no_code `frama-c -print-share-path`/e-acsl/e_acsl.c \
+      pow.i monitored_no_code.i -lgmp
+\$ ./no_code
+Postcondition failed at line 8 in function my_pow.
+The failing predicate is:
+\old(n%2 != 0) ==> \result >= 1.
+\end{shell}
+
+The execution of the corresponding binary fails at runtime: actually, our
+implementation of the function \texttt{my\_pow} that we use several times since
+the beginning of this manual may overflow in case of big exponentiations.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

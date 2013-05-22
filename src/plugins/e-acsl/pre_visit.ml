@@ -297,6 +297,15 @@ class dup_functions_visitor prj = object (self)
     Cil.DoChildrenPost
       (fun l -> match l with
       | [ GVarDecl(_, vi, _) | GFun({ svar = vi }, _) as g ] -> 
+	(match g with
+	| GVarDecl _ ->
+	  if vi.vname <> "malloc" && vi.vname <> "free" then
+	    Options.warning "@[annotated function `%a' without code:@ \
+the generated program may miss memory instrumentation@ \
+if there are memory-related annotations.@]"
+	    Printer.pp_varinfo vi
+	| GFun _ -> ()
+	| _ -> assert false);
 	let tmp = vi.vname in
 	if tmp = Kernel.MainFunction.get () then begin
 	  (* the new function becomes the new main: simply swap the name of both

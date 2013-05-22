@@ -369,10 +369,11 @@ you must call function `%s' by yourself"
     try
       let main, _ = Globals.entry_point () in
       Kernel_function.equal old_kf main
-    with Globals.No_such_entry_point s ->
-      Options.warning ~once:true "%s@ \
-@[The generated program may be incomplete.@]" 
-	s;
+    with Globals.No_such_entry_point _s ->
+      (* [JS 2013/05/21] already a warning in pre-analysis *)
+      (*      Options.warning ~once:true "%s@ \
+	      @[The generated program may be incomplete.@]" 
+	s;*)
       false
 
   method private literal_string env e = 

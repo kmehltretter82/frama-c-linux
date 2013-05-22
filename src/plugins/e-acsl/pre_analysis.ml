@@ -610,7 +610,8 @@ instrumentation.";
        Env.consolidate set
      with Globals.No_such_entry_point s ->
        Options.warning ~once:true "%s@ \
-@[The generated program may miss memory instrumentation.@]"
+@[The generated program may miss memory instrumentation@ \
+if there are memory-related annotations.@]"
 	 s);
     Options.feedback ~level:2 "pre-analysis done.";
     Env.consolidated_mem vi
