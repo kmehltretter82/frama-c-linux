@@ -125,12 +125,23 @@ function without code. There is also no workaround yet.
 \section{Recursive Function}
 \index{Function!Recursive}
 
+Programs containing recursive functions have the same limitations than the ones
+containing function without code (Section~\ref{sec:limits:no-code}) and
+memory-related annotations.
+
+Also, even if there is no such annotations, the generated code may call a
+function before it is declared. This behavior appears in a non-specified
+way. The generated code is however easy to fix by hand.
+
 \section{Variadic Function}
 \index{Function!Variadic}
 
-\begin{itemize}
-\item Not yet duplicated
-\end{itemize}
+Programs containing variadic functions without code but with a function contract
+are not yet supported. There is no workaround.
 
 \section{Function Pointer}
 \index{Function!Pointer}
+
+Programs containing function pointers have the same limitations as about
+memory-related annotations than the ones containing function without code or
+recursive functions.
