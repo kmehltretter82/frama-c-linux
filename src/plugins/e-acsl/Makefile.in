@@ -125,16 +125,20 @@ install::
 	$(MKDIR) $(FRAMAC_SHARE)/e-acsl/memory_model
 	$(CP) $(E_ACSL_DIR)/share/e-acsl/memory_model/* \
 		$(FRAMAC_SHARE)/e-acsl/memory_model
+	$(PRINT_CP) E-ACSL manuals
 	$(MKDIR) $(FRAMAC_SHARE)/manuals
 	$(CP) $(E_ACSL_DIR)/doc/manuals/e-acsl.pdf \
-		$(E_ACSL_DIR)/doc/manuals/e-acsl-implementation.pdf \
+	      $(E_ACSL_DIR)/doc/manuals/e-acsl-implementation.pdf \
+	      $(E_ACSL_DIR)/doc/manuals/e-acsl-manual.pdf \
 		$(FRAMAC_SHARE)/manuals
 
 uninstall::
 	$(PRINT_RM) E-ACSL share files
 	$(RM) -r $(FRAMAC_SHARE)/e-acsl
+	$(PRINT_RM) E-ACSL manuals
 	$(RM) $(FRAMAC_SHARE)/manuals/e-acsl.pdf \
-		$(FRAMAC_SHARE)/manuals/e-acsl-implementation.pdf
+	      $(FRAMAC_SHARE)/manuals/e-acsl-implementation.pdf \
+	      $(FRAMAC_SHARE)/manuals/e-acsl-manual.pdf
 
 ################################
 # Building source distribution #
