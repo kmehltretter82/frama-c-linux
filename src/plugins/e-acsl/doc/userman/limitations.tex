@@ -16,7 +16,7 @@ of commercial supports\footnote{Contact us or read
 
 As explained in Section~\ref{sec:runtime-error}, the \eacsl plug-in should never
 translate an annotation into a \C code which can lead to a runtime error. That
-is the case, except for unitialized values which are values read before having
+is the case, except for uninitialized values which are values read before having
 been written like in the following example.
 
 \listingname{uninitialized.i}
@@ -41,8 +41,8 @@ Actually that is more a design choice that a limitation: if the \eacsl plug-in
 would generate additional instrumentation to prevent such values to be executed,
 the generated code would be much more verbose and much slower.
 
-If you really want to track such unitializations in your annotation, you have to
-manually add calls to the \eacsl predicate
+If you really want to track such uninitializations in your annotation, you have
+to manually add calls to the \eacsl predicate
 \lstinline|\initialized|~\cite{eacsl}.
 
 \section{Incomplete Programs}
@@ -113,7 +113,7 @@ freed: \valid(x).
 The generated program is incorrect for every program which contains a
 memory-related annotation $a$ and a function $f$ without code if and only if:
 \begin{itemize}
-\item either $f$ has an (even indirect) effect on a left-value occuring in $a$;
+\item either $f$ has an (even indirect) effect on a left-value occurring in $a$;
 \item or $a$ is one of the post-condition of $f$.
 \end{itemize}
 

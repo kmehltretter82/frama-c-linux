@@ -202,7 +202,7 @@ this execution.
 \section{Execution Environment of the Generated Code}
 \label{sec:exec-env}
 
-The environment in which the code is executed is not necesseraly the same than
+The environment in which the code is executed is not necessarily the same than
 the one assumed by \framac. You must take care of that when running the \eacsl
 plug-in and when compiling the generated code with \gcc. Also, the plug-in
 offers you few possibilities of customization.
@@ -220,7 +220,7 @@ expression $e$ is undefined if $e$ leads to a runtime error and, consequently,
 the semantics of any term $t$ (resp. predicate $p$) containing such an
 expression $e$ is undefined as soon as $e$ has to be evaluated in order to
 evaluate $t$ (resp. $p$). The \eacsl Reference Manual also states that
-\emph{``it is the responsability of the tools which interprets \eacsl to ensure
+\emph{``it is the responsibility of the tools which interprets \eacsl to ensure
   that an undefined term is never evaluated''}~\cite{eacsl}.
 
 Accordingly, the \eacsl plug-in prevents undefined term to be evaluated. If it
@@ -427,7 +427,7 @@ mem_access: \valid_read(x).
 \end{shell}
 
 The option \optiondef{-}{e-acsl-full-mmodel} (unset by default) may be set to
-always instrumente the code for handline potential memory-related annotations,
+always instrument the code for handling potential memory-related annotations,
 even when it is not required. If it is set, the generated program must be always
 linked against the memory library.
 
@@ -578,12 +578,12 @@ the beginning of this manual may overflow in case of big exponentiations.
 As the \eacsl plug-in generates a new \framac project, it is easy to run any
 plug-in on the generated program, either in the same \framac session (thanks to
 the option \optionuse{-}{then} or through the GUI), or in another one. The only
-issue might be that, depending on the plug-in, the analysis may be unperfect if
+issue might be that, depending on the plug-in, the analysis may be imperfect if
 the generated program uses \gmp or the dedicated memory library: both
 intensively use dynamic structures which are usually difficult to handle by
 analysis tools.
 
-Another way to combine \eacsl with others plug-ins is to run \eacsl afterwards.
+Another way to combine \eacsl with others plug-ins is to run \eacsl afterward.
 For instance, the \rte plug-in~\cite{rte} may be used to generate annotations
 corresponding to runtime errors. Then the \eacsl plug-in may generate an
 instrumented program to verify that there is no such runtime errors during the
@@ -603,7 +603,7 @@ are potential overflows in this case), just do:
 \end{shell}
 
 Nevertheless if you run the \eacsl plug-in after another one, it first generates
-a new temporary project in which it links the analysed program against its own
+a new temporary project in which it links the analyzed program against its own
 library in order to generate the \framac internal representation of the \C
 program (\emph{aka} AST), as explained in Section~\ref{sec:run}. Consequently,
 even if the \eacsl plug-in keeps the maximum amount of information, results of
@@ -612,10 +612,10 @@ known in this new project. If you want to keep them, you have to set the option
 \optiondef{-}{e-acsl-prepare} when the first analysis is asked for.
  
 In this context, the \eacsl plug-in does not generate code for annotations
-proven valid by another plug-in, except if you explicitely set the option
+proven valid by another plug-in, except if you explicitly set the option
 \optiondef{-}{e-acsl-valid}. For instance, \valueplugin~\cite{value} is able to
 prove that there is no potential overflow in the previous program, so the \eacsl
-plugin does not generate additional code for checking them if you run the
+plug-in does not generate additional code for checking them if you run the
 following command.
 \begin{shell}
 \$ frama-c -e-acsl-prepare -rte combine.i -then -val -then -e-acsl \
@@ -628,7 +628,7 @@ The additional code will be generated with one of the two following commands.
 \$ frama-c -rte combine.i -then -val -then -e-acsl \
           -then-on e-acsl -print -ocode monitored_combine.i
 \end{shell}
-In the first case, that is because it is explicitely required by the option
+In the first case, that is because it is explicitly required by the option
 \texttt{-e-acsl-valid} while, in the second case, that is because the option
 \texttt{-e-acsl-prepare} is not provided on the command line which results in
 the fact that the result of the value analysis are unknown when the \eacsl
