@@ -2,10 +2,12 @@
 
 \framac~\cite{userman,sefm12} is a modular analysis framework for the C language
 which supports the ACSL specification language~\cite{acsl}. This manual
-documents the \eacsl plug-in of \framac. This plug-in automatically translates
-an annotated C code into another one which fails at runtime if an annotation is
-violated. If no annotation is violated, the behavior of the new program is
-exactly the same than the one of the original program.
+documents the \eacsl plug-in of \framac, version \eacslversion. Which \eacsl
+version you are using is indicated by running \texttt{frama-c
+  -e-acsl-version}\optionidx{-}{e-acsl-version}. This plug-in automatically
+translates an annotated C code into another one which fails at runtime if an
+annotation is violated. If no annotation is violated, the behavior of the new
+program is exactly the same than the one of the original program.
 
 Such a translation brings several benefits. First it allows the user to monitor
 a \C code, in particular to perform what is usually called ``runtime assertion

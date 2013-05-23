@@ -43,13 +43,7 @@ let check =
     (Datatype.func Datatype.unit Datatype.bool)
     check
 
-module Extended_ast =
-  State_builder.Option_ref
-    (Project.Datatype)
-    (struct
-      let name = "E-ACSL AST is extended"
-      let dependencies = []
-     end)
+let extended_ast_project: Project.t option ref = ref None
 
 let unmemoized_extend_ast () =
   let extend () =
@@ -101,12 +95,21 @@ E-ACSL is going to work on a copy.";
     Project.current ()
   end
 
-let extend_ast () = Extended_ast.memo unmemoized_extend_ast
+let extend_ast () = match !extended_ast_project with
+  | None -> 
+    let prj = unmemoized_extend_ast () in
+    extended_ast_project := Some prj;
+    prj
+  | Some prj ->
+    prj
 
 let apply_on_e_acsl_ast f x =
   let tmp_prj = extend_ast () in
   let res = Project.on tmp_prj f x in
-  if tmp_prj != Project.current () then Project.remove ~project:tmp_prj ();
+  if not (Project.equal tmp_prj (Project.current ())) then begin
+    extended_ast_project := None;
+    Project.remove ~project:tmp_prj ()
+  end;
   res
 
 module Resulting_projects =
@@ -166,6 +169,10 @@ let predicate_to_exp =
 let add_e_acsl_library _files = 
   if Options.must_visit () || Options.Prepare.get () then ignore (extend_ast ())
 
+(* extending the AST as soon as possible reduce the amount of time the AST is
+   duplicated:
+   - that is faster
+   - locations are better (indicate an existing file, and not a temp file) *)
 let () = Cmdline.run_after_configuring_stage add_e_acsl_library
 
 let main () =
