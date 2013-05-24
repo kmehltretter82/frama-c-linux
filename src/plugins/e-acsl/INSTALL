@@ -40,9 +40,9 @@ See below for more detailed and specific instructions.
 ===============================================================================
 
 - GNU make version >= 3.81
-- Objective Caml >= 3.10.2;
-- Frama-C = Nitrogen-20111001 
-  (no warranty that this plug-in works with more recent version of Frama-C)
+- Objective Caml >= 3.12.1;
+- Frama-C = Fluorine-20130401 or Fluorine-20130501 
+  (no warranty that this plug-in works with a more recent version of Frama-C)
 
 - The native version of the plug-in is only available if native dynamic linking
   feature of OCaml is available on your system (see Frama-C User Manual, 
@@ -94,14 +94,18 @@ Object files: (usually in `frama-c -print-plugin-path`)
 
 Shared files: (usually in `frama-c -print-share-path`/e-acsl)
 -------------
-- e_acsl.h
+- e_acsl.[ch]
 - e_acsl_gmp.h
 - e_acsl_gmp_types.h
+- memory_model/e_acsl_bittree.[ch]
+- memory_model/e_acsl_mmodel.[ch]
+- memory_model/e_acsl_mmodel_api.[h]
 
 Manuals: (usually in `frama-c -print-share-path`/manuals)
 --------
 - e-acsl.pdf
 - e-acsl-implementation.pdf
+- e-acsl-manual.pdf
 
 ===============================================================================
 			      CUSTOM INSTALLATION
