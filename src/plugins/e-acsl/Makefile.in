@@ -144,17 +144,18 @@ uninstall::
 # Building source distribution #
 ################################
 
-EXPORT	=e-acsl-$(VERSION)
+EXPORT	=e-acsl-$(EACSL_VERSION)
 
 DISTRIB_FILES= $(filter-out $(wildcard *local_config.ml), $(wildcard *.ml)) \
 	$(wildcard *.mli) \
 	configure.ac Makefile.in \
 	doc/Changelog \
+	doc/manuals/e-acsl-manual.pdf  \
 	doc/manuals/e-acsl.pdf doc/manuals/e-acsl-implementation.pdf \
-	share/e-acsl/*.h \
+	share/e-acsl/*.[ch] share/e-acsl/memory_model/*.[ch] \
 	tests/test_config.in \
 	tests/e-acsl-reject/test_config tests/e-acsl-reject/*.i \
-	tests/e-acsl-runtime/test_config tests/e-acsl-runtime/*.i \
+	tests/e-acsl-runtime/test_config tests/e-acsl-runtime/*.[ci] \
 	license/CEA_LGPL license/headache_config.txt license/LGPLv2.1 \
 	INSTALL README VERSION .depend
 
