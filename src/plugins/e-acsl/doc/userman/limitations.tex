@@ -3,29 +3,29 @@
 The development of the \eacsl plug-in is still ongoing. First, the whole \eacsl
 reference manual~\cite{eacsl} is not yet supported. Which annotations are
 already translated into \C code and which are not is defined in a separated
-document~\cite{eacsl-implem}. Second, even if we do our best, bugs may exist. If
-you find a new one, please report it on the bug tracking system (see Chapter 10
-of the \framac User Manual~\cite{userman}). Third, there are some additional
-known limitations, which could be annoying for the user in some cases, but are
-hard to lift. Thus they could be there for a while. Lifting them could be part
-of commercial supports\footnote{Contact us or read
-  \url{http://frama-c.com/support.html} for additional details.}.
+document~\cite{eacsl-implem}. Second, even though we do our best, bugs may
+exist. If you find a new one, please report it on the bug tracking system (see
+Chapter 10 of the \framac User Manual~\cite{userman}). Third, there are some
+additional known limitations, which could be annoying for the user in some
+cases, but are hard to lift. Please contact us if you are interested in lifting
+these limitations\footnote{Read \url{http://frama-c.com/support.html} for
+  additional details.}.
 
-\section{Uninitialized Value}
+\section{Uninitialized Values}
 \index{Uninitialized value}
 
 As explained in Section~\ref{sec:runtime-error}, the \eacsl plug-in should never
-translate an annotation into a \C code which can lead to a runtime error. That
-is the case, except for uninitialized values which are values read before having
-been written like in the following example.
+translate an annotation into \C code which can lead to a runtime error. This is
+enforced, except for uninitialized values which are values read before having
+been written.
 
 \listingname{uninitialized.i}
 \cinput{examples/uninitialized.i}
 
 If you generate the instrumented code, compile it, and finally execute it, you
 may get no runtime error depending on your \C compiler, but the behavior is
-actually uninitialized and should be trap by the \eacsl plug-in. That is not the
-case yet.
+actually uninitialized and should be caught by the \eacsl plug-in. That is not
+the case yet.
 \begin{shell}
 \$ frama-c -e-acsl uninitialized.i -then-on e-acsl -print \
           -ocode monitored_uninitialized.i
@@ -37,9 +37,9 @@ monitored_uninitialized.i:44:16: warning: 'x' is used uninitialized in this func
 \$ ./monitored_uninitialized
 \end{shell}
 
-Actually that is more a design choice that a limitation: if the \eacsl plug-in
-would generate additional instrumentation to prevent such values to be executed,
-the generated code would be much more verbose and much slower.
+This is more a design choice that a limitation: should the \eacsl plug-in
+generate additional instrumentation to prevent such values to be executed, the
+generated code would be much more verbose and much slower.
 
 If you really want to track such uninitializations in your annotation, you have
 to manually add calls to the \eacsl predicate
@@ -56,7 +56,7 @@ may be incorrect. That is made explicit by a warning displayed when the \eacsl
 plug-in is running (see examples of Sections~\ref{sec:no-main} and
 \ref{sec:no-code}).
 
-\subsection{Program without Main}
+\subsection{Programs without Main}
 \index{Program!Without main}
 \label{sec:limits:no-main}
 
@@ -106,7 +106,7 @@ The failing predicate is:
 freed: \valid(x).
 \end{shell}
 
-\subsection{Function without Code}
+\subsection{Functions without Code}
 \label{sec:limits:no-code}
 \index{Function!Without code}
 
@@ -120,7 +120,7 @@ memory-related annotation $a$ and a function $f$ without code if and only if:
 There is no workaround yet.
 
 Also, the option \optionuse{-}{e-acsl-check} does not verify the annotations of
-function without code. There is also no workaround yet. 
+functions without code. There is also no workaround yet. 
 
 \section{Recursive Function}
 \index{Function!Recursive}
@@ -129,17 +129,17 @@ Programs containing recursive functions have the same limitations than the ones
 containing function without code (Section~\ref{sec:limits:no-code}) and
 memory-related annotations.
 
-Also, even if there is no such annotations, the generated code may call a
+Also, even though there is no such annotations, the generated code may call a
 function before it is declared. This behavior appears in a non-specified
 way. The generated code is however easy to fix by hand.
 
-\section{Variadic Function}
+\section{Variadic Functions}
 \index{Function!Variadic}
 
 Programs containing variadic functions without code but with a function contract
-are not yet supported. There is no workaround.
+are not yet supported. There is no workaround yet.
 
-\section{Function Pointer}
+\section{Function Pointers}
 \index{Function!Pointer}
 
 Programs containing function pointers have the same limitations as about
