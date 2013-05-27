@@ -386,9 +386,10 @@ module rec Transfer
       the data before the branch (not considering the exception handlers) *)
   let doInstr _stmt instr state = 
     let state = Env.default_varinfos state in
-    let extend_to_expr state lhost e =
+    let extend_to_expr always state lhost e =
       let add_vi state vi =
-	if is_ptr_or_array_exp e && Varinfo.Hptset.mem vi state then 
+	if is_ptr_or_array_exp e && (always || Varinfo.Hptset.mem vi state)
+	then 
 	  match base_addr e with
 	  | None -> state
 	  | Some vi_e -> 
@@ -409,11 +410,11 @@ module rec Transfer
     in
     match instr with
     | Set((lhost, _) as lv, e, _) -> 
-      (* if [e]  contains an address from a base to be monitored, then also
-	 monitor the host *)
+      (* if [e] contains an address from a base, then also monitor the host *)
       let rec extend_from_addr state e = match e.enode with
 	| AddrOf(lhost, _) -> 
-	  extend_to_expr state lhost (Cil.new_exp ~loc:e.eloc (Lval lv))
+	  extend_to_expr true state lhost (Cil.new_exp ~loc:e.eloc (Lval lv)),
+	  true
 	| BinOp((PlusPI | IndexPI | MinusPI), e1, e2, _) -> 
 	  if is_ptr_or_array_exp e1 then extend_from_addr state e1
 	  else begin
@@ -421,10 +422,10 @@ module rec Transfer
 	    extend_from_addr state e2
 	  end
 	| CastE(_, e) | Info(e, _) -> extend_from_addr state e
-	| _ -> state
+	| _ -> state, false
       in
-      let state = extend_from_addr state e in
-      Dataflow.Done (Some (extend_to_expr state lhost e))
+      let state, always = extend_from_addr state e in
+      Dataflow.Done (Some (extend_to_expr always state lhost e))
     | Call(result, f_exp, l, _) -> 
       (match f_exp.enode with
       | Lval(Var vi, NoOffset) ->

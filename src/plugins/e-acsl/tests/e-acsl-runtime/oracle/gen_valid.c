@@ -230,6 +230,52 @@ int *__e_acsl_f(int *x)
   }
 }
 
+void g(void)
+{
+  int m;
+  int *u;
+  int **p;
+  __store_block((void *)(& p),8U);
+  __store_block((void *)(& u),8U);
+  __store_block((void *)(& m),4U);
+  __full_init((void *)(& p));
+  p = & u;
+  __full_init((void *)(& u));
+  u = & m;
+  __full_init((void *)(& m));
+  m = 123;
+  /*@ assert \valid(*p); */
+  {
+    int __e_acsl_initialized;
+    int __e_acsl_and_2;
+    __e_acsl_initialized = __initialized((void *)p,(size_t)sizeof(int *));
+    if (__e_acsl_initialized) {
+      int __e_acsl_initialized_2;
+      int __e_acsl_and;
+      int __e_acsl_valid;
+      __e_acsl_initialized_2 = __initialized((void *)(& p),
+                                             (size_t)sizeof(int **));
+      if (__e_acsl_initialized_2) {
+        int __e_acsl_valid_read;
+        __e_acsl_valid_read = __valid_read((void *)p,(size_t)sizeof(int *));
+        __e_acsl_and = __e_acsl_valid_read;
+      }
+      else __e_acsl_and = 0;
+      e_acsl_assert(__e_acsl_and,(char *)"RTE",(char *)"g",
+                    (char *)"mem_access: \\valid_read(p)",30);
+      __e_acsl_valid = __valid((void *)*p,(size_t)sizeof(int));
+      __e_acsl_and_2 = __e_acsl_valid;
+    }
+    else __e_acsl_and_2 = 0;
+    e_acsl_assert(__e_acsl_and_2,(char *)"Assertion",(char *)"g",
+                  (char *)"\\valid(*p)",30);
+  }
+  __delete_block((void *)(& p));
+  __delete_block((void *)(& u));
+  __delete_block((void *)(& m));
+  return;
+}
+
 void e_acsl_global_init(void)
 {
   __store_block((void *)(& Z),4U);
@@ -287,7 +333,7 @@ int main(void)
     }
     else __e_acsl_and_4 = 0;
     e_acsl_assert(__e_acsl_and_4,(char *)"Assertion",(char *)"main",
-                  (char *)"(!\\valid(a) && !\\valid(b)) && !\\valid(X)",27);
+                  (char *)"(!\\valid(a) && !\\valid(b)) && !\\valid(X)",35);
   }
   __full_init((void *)(& a));
   a = (int *)__e_acsl_malloc((unsigned int)sizeof(int));
@@ -326,7 +372,7 @@ int main(void)
     }
     else __e_acsl_and_8 = 0;
     e_acsl_assert(__e_acsl_and_8,(char *)"Assertion",(char *)"main",
-                  (char *)"(\\valid(a) && !\\valid(b)) && !\\valid(X)",29);
+                  (char *)"(\\valid(a) && !\\valid(b)) && !\\valid(X)",37);
   }
   X = a;
   /*@ assert (\valid(a) ∧ ¬\valid(b)) ∧ \valid(X); */
@@ -364,7 +410,7 @@ int main(void)
     }
     else __e_acsl_and_12 = 0;
     e_acsl_assert(__e_acsl_and_12,(char *)"Assertion",(char *)"main",
-                  (char *)"(\\valid(a) && !\\valid(b)) && \\valid(X)",31);
+                  (char *)"(\\valid(a) && !\\valid(b)) && \\valid(X)",39);
   }
   __full_init((void *)(& b));
   b = __e_acsl_f(& n);
@@ -403,7 +449,7 @@ int main(void)
     }
     else __e_acsl_and_16 = 0;
     e_acsl_assert(__e_acsl_and_16,(char *)"Assertion",(char *)"main",
-                  (char *)"(\\valid(a) && \\valid(b)) && \\valid(X)",33);
+                  (char *)"(\\valid(a) && \\valid(b)) && \\valid(X)",41);
   }
   X = b;
   /*@ assert (\valid(a) ∧ \valid(b)) ∧ \valid(X); */
@@ -441,7 +487,7 @@ int main(void)
     }
     else __e_acsl_and_20 = 0;
     e_acsl_assert(__e_acsl_and_20,(char *)"Assertion",(char *)"main",
-                  (char *)"(\\valid(a) && \\valid(b)) && \\valid(X)",35);
+                  (char *)"(\\valid(a) && \\valid(b)) && \\valid(X)",43);
   }
   __full_init((void *)(& c));
   c = & a;
@@ -465,13 +511,13 @@ int main(void)
       }
       else __e_acsl_and_21 = 0;
       e_acsl_assert(__e_acsl_and_21,(char *)"RTE",(char *)"main",
-                    (char *)"mem_access: \\valid_read(c)",38);
+                    (char *)"mem_access: \\valid_read(c)",46);
       __e_acsl_valid_16 = __valid((void *)*c,(size_t)sizeof(int));
       __e_acsl_and_22 = __e_acsl_valid_16;
     }
     else __e_acsl_and_22 = 0;
     e_acsl_assert(__e_acsl_and_22,(char *)"Assertion",(char *)"main",
-                  (char *)"\\valid(*c)",38);
+                  (char *)"\\valid(*c)",46);
   }
   /*@ assert \valid(*(*d)); */
   {
@@ -480,7 +526,7 @@ int main(void)
     int __e_acsl_and_26;
     __e_acsl_valid_read_2 = __valid_read((void *)d,(size_t)sizeof(int **));
     e_acsl_assert(__e_acsl_valid_read_2,(char *)"RTE",(char *)"main",
-                  (char *)"mem_access: \\valid_read(d)",39);
+                  (char *)"mem_access: \\valid_read(d)",47);
     __e_acsl_initialized_13 = __initialized((void *)*d,(size_t)sizeof(int *));
     if (__e_acsl_initialized_13) {
       int __e_acsl_initialized_14;
@@ -504,14 +550,14 @@ int main(void)
         }
         else __e_acsl_and_23 = 0;
         e_acsl_assert(__e_acsl_and_23,(char *)"RTE",(char *)"main",
-                      (char *)"mem_access: \\valid_read(d)",39);
+                      (char *)"mem_access: \\valid_read(d)",47);
         __e_acsl_valid_read_4 = __valid_read((void *)*d,
                                              (size_t)sizeof(int *));
         __e_acsl_and_24 = __e_acsl_valid_read_4;
       }
       else __e_acsl_and_24 = 0;
       e_acsl_assert(__e_acsl_and_24,(char *)"RTE",(char *)"main",
-                    (char *)"mem_access: \\valid_read(*d)",39);
+                    (char *)"mem_access: \\valid_read(*d)",47);
       __e_acsl_initialized_16 = __initialized((void *)(& d),
                                               (size_t)sizeof(int ***));
       if (__e_acsl_initialized_16) {
@@ -522,13 +568,13 @@ int main(void)
       }
       else __e_acsl_and_25 = 0;
       e_acsl_assert(__e_acsl_and_25,(char *)"RTE",(char *)"main",
-                    (char *)"mem_access: \\valid_read(d)",39);
+                    (char *)"mem_access: \\valid_read(d)",47);
       __e_acsl_valid_17 = __valid((void *)*(*d),(size_t)sizeof(int));
       __e_acsl_and_26 = __e_acsl_valid_17;
     }
     else __e_acsl_and_26 = 0;
     e_acsl_assert(__e_acsl_and_26,(char *)"Assertion",(char *)"main",
-                  (char *)"\\valid(*(*d))",39);
+                  (char *)"\\valid(*(*d))",47);
   }
   __e_acsl_free((void *)a);
   /*@ assert (¬\valid(a) ∧ \valid(b)) ∧ \valid(X); */
@@ -566,15 +612,16 @@ int main(void)
     }
     else __e_acsl_and_30 = 0;
     e_acsl_assert(__e_acsl_and_30,(char *)"Assertion",(char *)"main",
-                  (char *)"(!\\valid(a) && \\valid(b)) && \\valid(X)",41);
+                  (char *)"(!\\valid(a) && \\valid(b)) && \\valid(X)",49);
   }
   /*@ assert \valid(&Z); */
   {
     int __e_acsl_valid_21;
     __e_acsl_valid_21 = __valid((void *)(& Z),(size_t)sizeof(int));
     e_acsl_assert(__e_acsl_valid_21,(char *)"Assertion",(char *)"main",
-                  (char *)"\\valid(&Z)",42);
+                  (char *)"\\valid(&Z)",50);
   }
+  g();
   __retres = 0;
   __delete_block((void *)(& Z));
   __delete_block((void *)(& X));

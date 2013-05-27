@@ -22,6 +22,14 @@ int *f(int *x) {
   return y; 
 }
 
+void g(void) {
+  int m, *u, **p;
+  p=&u;
+  u=&m;
+  m=123;
+  //@ assert \valid(*p);
+}
+
 int main(void) {
   int *a, *b, **c, ***d, n = 0;
   /*@ assert ! \valid(a) && ! \valid(b) && ! \valid(X); */
@@ -40,5 +48,6 @@ int main(void) {
   free(a);
   /*@ assert ! \valid(a) && \valid(b) && \valid(X); */
   /*@ assert \valid(&Z); */
+  g();
   return 0;
 }
