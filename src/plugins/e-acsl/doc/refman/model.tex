@@ -1,6 +1,5 @@
 \begin{syntax}
   declaration ::= C-declaration ;
   | {"/*@" "model" parameter ";" "*/"} ; model variable
-  | "/*@" "model" C-type "{" parameter ";"? "}" ";" "*/" ; model field
-  | { "/*@" "model" C-declaration "*/" } ; model variable
+  | { "/*@" "model" C-type "{" parameter ";"? "}" ";" "*/" } ; model field
 \end{syntax}

@@ -18,8 +18,8 @@ e-acsl: e-acsl-implementation.pdf e-acsl.pdf main.pdf
 
 all: e-acsl
 
-LANGUAGE_VERSION=1.6+dev
-EACSL_VERSION= 0.1+dev
+LANGUAGE_VERSION=1.7
+EACSL_VERSION= 0.2
 
 EACSL_DIR=$(HOME)/plugins/e-acsl
 DISTRIB_DIR=$(HOME)/frama-c/doc/www/distrib

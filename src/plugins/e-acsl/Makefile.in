@@ -96,7 +96,7 @@ PLUGIN_GENERATED:= $(PLUGIN_DIR)/local_config.ml
 
 EACSL_VERSION=$(shell $(SED) -e 's/\\(.*\\)/\\1/' VERSION)
 
-$(PLUGIN_DIR)/local_config.ml: $(PLUGIN_DIR)/Makefile.in
+$(PLUGIN_DIR)/local_config.ml: $(PLUGIN_DIR)/Makefile.in VERSION
 	$(PRINT_MAKING) $@
 	$(RM) $@
 	$(ECHO) "(* This file was automatically generated from $<. Don't edit it. *)" >> $@
@@ -146,12 +146,14 @@ uninstall::
 
 EXPORT	=e-acsl-$(EACSL_VERSION)
 
+DOC_FILES= doc/manuals/e-acsl-manual.pdf  \
+	doc/manuals/e-acsl.pdf doc/manuals/e-acsl-implementation.pdf
+
 DISTRIB_FILES= $(filter-out $(wildcard *local_config.ml), $(wildcard *.ml)) \
 	$(wildcard *.mli) \
 	configure.ac Makefile.in \
 	doc/Changelog \
-	doc/manuals/e-acsl-manual.pdf  \
-	doc/manuals/e-acsl.pdf doc/manuals/e-acsl-implementation.pdf \
+	$(DOC_FILES) \
 	share/e-acsl/*.[ch] share/e-acsl/memory_model/*.[ch] \
 	tests/test_config.in \
 	tests/e-acsl-reject/test_config tests/e-acsl-reject/*.i \
@@ -186,6 +188,13 @@ WWW	= /localhome/julien/frama-c/doc/www
 e-acsl-install-distrib: e-acsl-distrib
 	$(PRINT) Copying to website
 	$(CP) $(EXPORT).tar.gz $(WWW)/distrib/download/e-acsl
+	$(CP) $(DOC_FILES) $(WWW)/distrib/download/e-acsl
+	$(CP) doc/manuals/e-acsl-manual.pdf \
+	      $(WWW)/distrib/download/e-acsl/e-acsl-manual-$(EACSL_VERSION).pdf
+	$(CP) doc/manuals/e-acsl.pdf \
+	      $(WWW)/distrib/download/e-acsl/e-acsl-1.7.pdf
+	$(CP) doc/manuals/e-acsl-implementation.pdf \
+	      $(WWW)/distrib/download/e-acsl/e-acsl-implementation-$(EACSL_VERSION).pdf
 
 ##########
 # Header #
