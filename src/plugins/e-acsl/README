@@ -107,44 +107,6 @@ $ echo $?
    tests/e-acsl-runtime.
 
 ===============================================================================
-				ADVANCED USAGE
-===============================================================================
-
-This E-ACSL plug-in is fully integrated within Frama-C: any standard Frama-C
-options may be used in order to customize the Frama-C execution. Read the
-Frama-C User Manual for additional information.
-
-The list of E-ACSL option is available through the option -e-acsl-help:
-$ frama-c -e-acsl-help
-
-As this example is trivial, the generated code does not require to be linked
-against GMP. It is usually not the case.
-
-2) Now consider the following C program:
-<false.i>
-int main(void) {
-  int x = 0;
-  /*@ assert x+1 == 0; */
-  return 0;
-}
-
-Since the assertion is always false, the generated code fails at runtime:
-$ frama-c -e-acsl false.i -then-on e-acsl -print -ocode gen_false.c
-$ gcc gen_false.c -lgmp -o gen_false
-$ ./gen_false
-Assertion failed at line 7.
-The failing predicate is:
-(x+1 == 0).
-$ echo $?
-1
-
-As this example uses arithmetic's in annotations, the generated code must be
-linked against GMP (GCC's option -lgmp) to be able to produce an executable.
-
-3) More advanced examples are available in directory tests/e-acsl-runtime. Note
-   that these examples never fail at runtime: all the annotations are valid.
-
-===============================================================================
 			COMPATIBILITY WITH PREVIOUS RELEASES
 ===============================================================================
 
