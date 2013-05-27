@@ -1,15 +1,15 @@
 \chapter{Known Limitations}
 
-The development of the \eacsl plug-in is still ongoing. First, the whole \eacsl
-reference manual~\cite{eacsl} is not yet supported. Which annotations are
+The development of the \eacsl plug-in is still ongoing. First, the \eacsl
+reference manual~\cite{eacsl} is not yet fully supported. Which annotations are
 already translated into \C code and which are not is defined in a separated
-document~\cite{eacsl-implem}. Second, even though we do our best, bugs may
-exist. If you find a new one, please report it on the bug tracking system (see
-Chapter 10 of the \framac User Manual~\cite{userman}). Third, there are some
-additional known limitations, which could be annoying for the user in some
-cases, but are hard to lift. Please contact us if you are interested in lifting
-these limitations\footnote{Read \url{http://frama-c.com/support.html} for
-  additional details.}.
+document~\cite{eacsl-implem}. Second, even though we do our best to avoid them,
+bugs may exist. If you find a new one, please report it on the bug tracking
+system (see Chapter 10 of the \framac User Manual~\cite{userman}). Third, there
+are some additional known limitations, which could be annoying for the user in
+some cases, but are tedious to lift. Please contact us if you are interested in
+lifting these limitations\footnote{Read \url{http://frama-c.com/support.html}
+  for additional details.}.
 
 \section{Uninitialized Values}
 \index{Uninitialized value}
@@ -37,9 +37,9 @@ monitored_uninitialized.i:44:16: warning: 'x' is used uninitialized in this func
 \$ ./monitored_uninitialized
 \end{shell}
 
-This is more a design choice that a limitation: should the \eacsl plug-in
-generate additional instrumentation to prevent such values to be executed, the
-generated code would be much more verbose and much slower.
+This is more a design choice than a limitation: should the \eacsl plug-in
+generate additional instrumentation to prevent such values from being evaluated,
+the generated code would be much more verbose and slower.
 
 If you really want to track such uninitializations in your annotation, you have
 to manually add calls to the \eacsl predicate
@@ -49,7 +49,7 @@ to manually add calls to the \eacsl predicate
 
 Section~\ref{sec:incomplete} explains how the \eacsl plug-in is able to handle
 incomplete programs, which are either programs without main, or programs
-containing functions without bodies.
+containing undefined functions (\emph{i.e.} functions without body).
 
 However, if such programs contain memory-related annotations, the generated code
 may be incorrect. That is made explicit by a warning displayed when the \eacsl
@@ -60,9 +60,10 @@ plug-in is running (see examples of Sections~\ref{sec:no-main} and
 \index{Program!Without main}
 \label{sec:limits:no-main}
 
-The generated program is incorrect for every program without main containing a
-memory-related annotations, except if the option
-\optionuse{-}{e-acsl-full-mmodel} is provided.
+The instrumentation in the generated program is partial for every program
+without main containing a memory-related annotations, except if the option
+\optionuse{-}{e-acsl-full-mmodel} is provided. In that case, violations of such
+annotations are undetected.
 
 Consider the following example.
 
@@ -106,42 +107,42 @@ The failing predicate is:
 freed: \valid(x).
 \end{shell}
 
-\subsection{Functions without Code}
+\subsection{Undefined Functions}
 \label{sec:limits:no-code}
-\index{Function!Without code}
+\index{Function!Undefined}
 
-The generated program is incorrect for every program which contains a
-memory-related annotation $a$ and a function $f$ without code if and only if:
+The instrumentation in the generated program is partial for a program $p$ if and
+only if $p$ contains a memory-related annotation $a$ and an undefined function
+$f$ such that:
 \begin{itemize}
 \item either $f$ has an (even indirect) effect on a left-value occurring in $a$;
-\item or $a$ is one of the post-condition of $f$.
+\item or $a$ is one of the post-conditions of $f$.
 \end{itemize}
-
-There is no workaround yet.
+A Violation of such an annotation $a$ is undetected. There is no workaround yet.
 
 Also, the option \optionuse{-}{e-acsl-check} does not verify the annotations of
-functions without code. There is also no workaround yet. 
+undefined functions. There is also no workaround yet.
 
 \section{Recursive Function}
 \index{Function!Recursive}
 
-Programs containing recursive functions have the same limitations than the ones
-containing function without code (Section~\ref{sec:limits:no-code}) and
+Programs containing recursive functions have the same limitations as the ones
+containing undefined functions (Section~\ref{sec:limits:no-code}) and
 memory-related annotations.
 
 Also, even though there is no such annotations, the generated code may call a
-function before it is declared. This behavior appears in a non-specified
-way. The generated code is however easy to fix by hand.
+function before it is declared. When this behavior appears remains
+unspecifed. The generated code is however easy to fix by hand.
 
 \section{Variadic Functions}
 \index{Function!Variadic}
 
-Programs containing variadic functions without code but with a function contract
+Programs containing variadic undefined functions but with a function contract
 are not yet supported. There is no workaround yet.
 
 \section{Function Pointers}
 \index{Function!Pointer}
 
-Programs containing function pointers have the same limitations as about
-memory-related annotations than the ones containing function without code or
+Programs containing function pointers have the same limitations on
+memory-related annotations as the ones containing undefined function or
 recursive functions.

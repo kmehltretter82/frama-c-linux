@@ -300,7 +300,7 @@ class dup_functions_visitor prj = object (self)
 	(match g with
 	| GVarDecl _ ->
 	  if vi.vname <> "malloc" && vi.vname <> "free" then
-	    Options.warning "@[annotated function `%a' without code:@ \
+	    Options.warning "@[annotating undefined function `%a':@ \
 the generated program may miss memory instrumentation@ \
 if there are memory-related annotations.@]"
 	    Printer.pp_varinfo vi

@@ -4,15 +4,15 @@ This chapter is the core of this manual and describes how to use the
 plug-in. You can still call the option \optiondef{-}{e-acsl-help} to get the
 list of available options with few lines of documentation. First,
 Section~\ref{sec:simple} shows how to run the plug-in on a toy example and how
-to execute the generated code with a standard \C compiler to detect invalid
+to compile the generated code with a standard \C compiler and to detect invalid
 annotations at runtime. Then, Section~\ref{sec:exec-env} provides additional
 details on the execution of the generated code. Next,
 Section~\ref{sec:incomplete} focuses on how to deal with incomplete programs,
-\emph{i.e.} in which some functions have no body or in which there are no main
-function. Section~\ref{sec:combine} explains how to combine the \eacsl plug-in
-with others \framac plug-ins. Finally, Section~\ref{sec:custom} introduces how
-to customize the plug-in, and Section~\ref{sec:verbose} details the verbosing
-policy of the plug-in.
+\emph{i.e.} in which some functions are not defined or in which there are no
+main function. Section~\ref{sec:combine} explains how to combine the \eacsl
+plug-in with other \framac plug-ins. Finally, Section~\ref{sec:custom}
+introduces how to customize the plug-in, and Section~\ref{sec:verbose} details
+the verbosing policy of the plug-in.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -51,7 +51,7 @@ Running \eacsl on this file just consists in adding the option
 
 Even if \texttt{first.i} is already preprocessed, \eacsl first asks the \framac
 kernel to preprocess and to link against \texttt{first.i} several files which
-forms the \eacsl library. Its usefulness will be explain later, mainly in
+form the \eacsl library. Their usage will be explain later, mainly in
 Section~\ref{sec:exec-env}.
 
 Then \eacsl takes the annotated \C code as input and
@@ -61,7 +61,7 @@ translates it into a new \framac project named \texttt{e-acsl}\footnote{The
 nothing more. It is however possible to have a look at the generated code in the
 \framac GUI. This is also possible through the command line thanks to the kernel
 options \optionuse{-}{then-on} and \optionuse{-}{print} which respectively
-switches to another project and pretty prints the \C code~\cite{userman}:
+switch to another project and pretty prints the \C code~\cite{userman}:
 
 \begin{shell}
 \$ frama-c -e-acsl first.i -then-on e-acsl -print
@@ -127,11 +127,10 @@ int main(void)
 
 As you can see, the generated code contains additional type declarations,
 constant declarations and global \acsl annotations that are not in the initial
-file \texttt{first.i}. That is a part of the included \eacsl library. You can
-safely ignore it right now. The translated \texttt{main} function of
-\texttt{first.i} is displayed at the end. Two lines have been added. The first
-one is just after the first \eacsl annotation, while the second one is just
-after the second one.
+file \texttt{first.i}. They are part of the included \eacsl monitoring
+library. You can safely ignore it right now. The translated \texttt{main}
+function of \texttt{first.i} is displayed at the end. After each \eacsl
+annotation, a line has been added. 
 
 \begin{ccode}
   /*@ assert x == 0; */
@@ -145,7 +144,7 @@ which is defined in the \eacsl library. Each call performs the dynamic
 verification that the corresponding assertion is valid. More precisely, it
 checks that its first argument (here \texttt{x == 0} or \texttt{x == 1}) is not
 equal to 0 and fails otherwise. The extra arguments are only used to display
-nice user feedback as shown later in Section~\ref{sec:exec}.
+precise error reports as shown in Section~\ref{sec:exec}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -189,9 +188,9 @@ x == 1.
 \$ echo \$?
 1
 \end{shell}
-This execution stops with an exit code of 1 and an error message indicated that
-the invalid \eacsl annotation has been violated. There is no output for the
-valid \eacsl annotation. So, thanks to the plug-in, we detect that the second
+This execution stops with exit code 1 and an error message indicating which
+invalid \eacsl annotation has been violated. There is no output for the valid
+\eacsl annotation. So, thanks to the plug-in, we detect that the second
 assertion in the initial program is wrong, while the first one is correct for
 this execution.
 
@@ -202,8 +201,8 @@ this execution.
 \section{Execution Environment of the Generated Code}
 \label{sec:exec-env}
 
-The environment in which the code is executed is not necessarily the same than
-the one assumed by \framac. You must take care of that when running the \eacsl
+The environment in which the code is executed is not necessarily the same as
+the one assumed by \framac. You should take care of that when running the \eacsl
 plug-in and when compiling the generated code with \gcc. In this aspect, the
 plug-in offers a few possibilities of customization.
 
@@ -214,16 +213,16 @@ plug-in offers a few possibilities of customization.
 \index{Runtime Error}
 
 The major difference between \acsl~\cite{acsl} and \eacsl~\cite{eacsl}
-specification languages is that the logic is total in the former language while
-it is partial in the latter one: the semantics of a term denoting a \C
-expression $e$ is undefined if $e$ leads to a runtime error and, consequently,
-the semantics of any term $t$ (resp. predicate $p$) containing such an
-expression $e$ is undefined as soon as $e$ has to be evaluated in order to
-evaluate $t$ (resp. $p$). The \eacsl Reference Manual also states that
-\emph{``it is the responsibility of the tools which interprets \eacsl to ensure
-  that an undefined term is never evaluated''}~\cite{eacsl}.
+specification languages is that the logic is total in the former while it is
+partial in the latter one: the semantics of a term denoting a \C expression $e$
+is undefined if $e$ leads to a runtime error and, consequently, the semantics of
+any term $t$ (resp. predicate $p$) containing such an expression $e$ is
+undefined as soon as $e$ has to be evaluated in order to evaluate $t$
+(resp. $p$). The \eacsl Reference Manual also states that \emph{``it is the
+  responsibility of each tool which interprets \eacsl to ensure that an
+  undefined term is never evaluated''}~\cite{eacsl}.
 
-Accordingly, the \eacsl plug-in prevents undefined terms from being
+Accordingly, the \eacsl plug-in prevents an undefined term from being
 evaluated. Should it be because an annotation contains such a term, it will
 report a proper error at runtime instead.
 
@@ -232,9 +231,9 @@ Consider for instance the following annotated program.
 \listingname{rte.i}
 \cinput{examples/rte.i}
 
-The terms and predicates containing the modulo `\%' in the clause
-\texttt{assumes} are undefined in the context of the \texttt{main}'s function
-call since the second argument is equal to 0.
+The terms and predicates containing the modulo `\%' in the \texttt{assumes}
+clause are undefined in the context of the \texttt{main} function call since
+the second argument is equal to 0.
 
 However we can generate an instrumented code and compile it through the
 following command lines:
@@ -244,8 +243,8 @@ following command lines:
 \$ gcc -o rte `frama-c -print-share-path`/e-acsl/e_acsl.c monitored_rte.i
 \end{shell}
 
-Now, when you execute it, you get the following output which explains that your
-function contract is invalid because it contains a division by zero.
+Now, when \texttt{rte} is executed, you get the following output indicating that
+your function contract is invalid because it contains a division by zero.
 
 \begin{shell}
 \$ ./rte
@@ -259,16 +258,16 @@ division_by_zero: y != 0.
 \subsection{Architecture Dependent Annotations}
 
 In many cases, the execution of a \C program depends on the underlying machine
-architecture which it is executed on. The program must be compiled in the very
-same architecture (or cross-compiled) for the compiler being able to generate a
-correct binary.
+architecture it is executed on. The program must be compiled on the very same
+architecture (or cross-compiled for it) for the compiler being able to generate
+a correct binary.
 
 \framac makes assumptions about the machine architecture when analyzing such a
-file. By default, it assumes a x86 32 bits platform, but it may be changed
+file. By default, it assumes an X86 32-bit platform, but it may be customized
 thanks to the option \optionuse{-}{machdep}~\cite{userman}. This option is of
 primary importance when using the \eacsl plug-in: it must be set to the value
-corresponding to the machine which the generated code will be executed on if the
-code \emph{or the annotation} is machine dependent.
+corresponding to the machine architecture which the generated code will be
+executed on if the code \emph{or the annotation} is machine dependent.
 
 Consider for instance the following program.
 
@@ -284,8 +283,8 @@ preprocess the annotations~\cite{userman}):
 \$ gcc -o archi `frama-c -print-share-path`/e-acsl/e_acsl.c monitored_archi.i
 \end{shell}
 
-However, the generated code crashes at runtime on a x86 64 bits computer because
-a 32 bits architecture was assumed at generation time.
+However, the generated code fails at runtime on an X86 64-bit computer because
+a 32-bit architecture was assumed at generation time.
 
 \begin{shell}
 \$ ./archi
@@ -295,7 +294,7 @@ sizeof(long) == 8.
 \end{shell}
 
 There is no assertion failure if you add the option \texttt{-machdep x86\_64}
-when calling \framac.
+when running the \eacsl plug-in.
 
 \begin{shell}
 \$ frama-c -machdep x86_64 -pp-annot -e-acsl archi.c \
@@ -313,7 +312,7 @@ when calling \framac.
 corresponds to mathematical integers. Such a type does not fit in any integral
 \C type. To circumvent this issue, \eacsl uses the \gmp
 library\footnote{\url{http://gmplib.org}}. Thus, even if \eacsl does its best to
-use standard \C integral type instead of \gmp~\cite{sac13}, it may generate such
+use standard integral types instead of \gmp~\cite{sac13}, it may generate such
 integers from time to time. In such cases, the generated code must be linked
 against \gmp to be executed.
 
@@ -322,7 +321,7 @@ Consider for instance the following program.
 \listingname{gmp.i}
 \cinput{examples/gmp.i}
 
-Even on a 64 bits machine, it is not possible to compute the assertion with a
+Even on a 64-bit machine, it is not possible to compute the assertion with a
 standard \C type. In this case, the \eacsl plug-in generates \gmp code.
 
 We can generate an instrumented code as usual through the following command
@@ -358,11 +357,11 @@ any integral \C type in an \eacsl annotation.
 
 The \eacsl plug-in handles memory-related annotations such as
 \lstinline|\valid|. When using such an annotation, the generated code must be
-linked against a specific library installed with the plug-in to be
-executed. This library includes two \C files which are installed in the \eacsl'
-share directory:
+linked against a specific memory library installed with the plug-in. This
+library includes two \C files which are installed in the \eacsl' share
+directory:
 \begin{itemize}
-\item \texttt{memory\_model/e\_acsl\_bittree.c}; and
+\item \texttt{memory\_model/e\_acsl\_bittree.c}, and
 \item \texttt{memory\_model/e\_acsl\_mmodel.c}.
 \end{itemize}
 
@@ -371,16 +370,16 @@ Consider for instance the following program.
 \listingname{valid.c}
 \cinput{examples/valid.c}
 
-Assuming that we want to execute the generated code on a x86 64 bits machine,
+Assuming that we want to execute the generated code on an X86 64-bit machine,
 the generation of the instrumented code requires the use of the option
 \optionuse{-}{machdep} since the code uses \texttt{sizeof}. However, nothing
-more is required here.
+is required here.
 
 \begin{shell}
 \$ frama-c -machdep x86_64 -e-acsl valid.c -then-on e-acsl -print -ocode monitored_valid.i
 \end{shell}
 
-However, since the original code uses \lstinline|\valid|, the executable binary
+Since the original code uses \lstinline|\valid|, the executable binary
 must be generated from \texttt{monitored\_valid.i} as follows:
 
 \begin{shell}
@@ -390,7 +389,7 @@ must be generated from \texttt{monitored\_valid.i} as follows:
        monitored_valid.i
 \end{shell}
 
-Now we can execute the generate binary which fails at runtime since the second
+Now we can execute the generated binary which fails at runtime since the second
 assertion is violated.
 \begin{shell}
 \$ ./valid
@@ -399,17 +398,18 @@ The failing predicate is:
 freed: \valid(x).
 \end{shell}
 
-Like for integers, the \eacsl plug-in does its best to use the dedicated library
-only when required~\cite{rv13}. So, if your program does not contain
+Like for integers, the \eacsl plug-in does its best to use the dedicated memory
+library only when required~\cite{rv13}. So, if your program does not contain
 memory-related annotations, the generated one does not require to be linked
 against the dedicated memory library, like the examples of the previous
 sections.
 
-However, if your program has annotations with pointer dereferencing (for
-instance), then the generated code \emph{does} require to be linked against the
-dedicated library at compile time. Why? Because pointer dereferencing may lead
-to runtime errors, so the \eacsl plug-in inserts runtime checks to prevent them
-according to Section~\ref{sec:runtime-error}, witness the following example.
+However, if your program contains some annotations with pointer dereferencing
+(for instance), then the generated code \emph{does} require to be linked against
+the dedicated library at compile time. Why? Because pointer dereferencing may
+lead to runtime errors, so the \eacsl plug-in inserts runtime checks to prevent
+them according to Section~\ref{sec:runtime-error}, witness the following
+example.
 
 \listingname{pointer.c}
 \cinput{examples/pointer.c}
@@ -428,9 +428,9 @@ mem_access: \valid_read(x).
 \end{shell}
 
 The option \optiondef{-}{e-acsl-full-mmodel} (unset by default) may be set to
-always instrument the code for handling potential memory-related annotations,
-even when it is not required. If it is set, the generated program must be always
-linked against the memory library.
+systematically instrument the code for handling potential memory-related
+annotations, even when it is not required. If it is set, the generated program
+must be always linked against the memory library.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -438,7 +438,7 @@ linked against the memory library.
 
 When a predicate is checked at runtime, the function
 \texttt{e\_acsl\_assert}\codeidxdef{e\_acsl\_assert} is called. Its body is
-defined in the file \texttt{e\_acsl.c} from the \eacsl library. By default, it
+defined in the file \texttt{e\_acsl.c} of the \eacsl library. By default, it
 does nothing if the predicate is valid, while it prints an error message and
 exits (with status 1) if the predicate is invalid.
 
@@ -472,8 +472,10 @@ The verified predicate was: `x == 1'.
 \label{sec:incomplete}
 
 Executing a \C program requires to have a complete application. However, the
-\eacsl plug-in does not necessarily require to get it to generate the
-instrumented code.
+\eacsl plug-in does not necessarily require to have it to generate the
+instrumented code. It is still possible to instrument a partial program with no
+entry point or in which some functions remain undefined, even though a few
+restrictions.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -521,9 +523,9 @@ x = 65536
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Functions without Code}
+\subsection{Undefined Functions}
 \label{sec:no-code}
-\index{Function!Without code}
+\index{Function!Undefined}
 
 The \eacsl plug-in may also work if some functions have no implementation.
 Consider for instance the following annotated program for which the
@@ -536,7 +538,7 @@ The instrumented code is generated as usual, even though you get an additional
 warning.
 \begin{shell}
 [e-acsl] beginning translation.
-[e-acsl] warning: annotated function `my_pow' without code:
+[e-acsl] warning: annotating undefined function `my_pow':
                   the generated program may miss memory instrumentation
                   if there are memory-related annotations.
 [kernel] warning: No code nor implicit assigns clause for function my_pow, 
@@ -573,7 +575,7 @@ the beginning of this manual may overflow in case of large exponentiations.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Combining E-ACSL with Others Plug-ins}
+\section{Combining E-ACSL with Other Plug-ins}
 \label{sec:combine}
 
 As the \eacsl plug-in generates a new \framac project, it is easy to run any
@@ -584,17 +586,17 @@ the generated program uses \gmp or the dedicated memory library: both make
 intensive use of dynamic structures which are usually difficult to handle by
 analysis tools.
 
-Another way to combine \eacsl with others plug-ins is to run \eacsl last.  For
+Another way to combine \eacsl with other plug-ins is to run \eacsl last.  For
 instance, the \rte plug-in~\cite{rte} may be used to generate annotations
 corresponding to runtime errors. Then the \eacsl plug-in may generate an
-instrumented program to verify that there is no such runtime errors during the
+instrumented program to verify that there are no such runtime errors during the
 execution of the program.
 
 Consider the following program.
 
 \listingname{combine.i}
 \cinput{examples/combine.i}
-To check at runtime that this programs does not perform any runtime error (which
+To check at runtime that this program does not perform any runtime error (which
 are potential overflows in this case), just do:
 \begin{shell}
 \$ frama-c -rte combine.i -then -e-acsl -then-on e-acsl -print \
@@ -607,10 +609,10 @@ Nevertheless if you run the \eacsl plug-in after another one, it first generates
 a new temporary project in which it links the analyzed program against its own
 library in order to generate the \framac internal representation of the \C
 program (\emph{aka} AST), as explained in Section~\ref{sec:run}. Consequently,
-even if the \eacsl plug-in keeps the maximum amount of information, results of
-already executed analyzers (such as the validity status of the annotations) are
-not known in this new project. If you want to keep them, you have to set the
-option \optiondef{-}{e-acsl-prepare} when the first analysis is asked for.
+even if the \eacsl plug-in keeps the maximum amount of information, the results
+of already executed analyzers (such as validity status of annotations) are not
+known in this new project. If you want to keep them, you have to set the option
+\optiondef{-}{e-acsl-prepare} when the first analysis is asked for.
  
 In this context, the \eacsl plug-in does not generate code for annotations
 proven valid by another plug-in, except if you explicitly set the option
@@ -642,12 +644,12 @@ plug-in is running.
 \section{Customization}
 \label{sec:custom}
 
-There are few ways to customize the \eacsl plug-in. 
+There are several ways to customize the \eacsl plug-in. 
 
 First, the name of the generated project -- which is \texttt{e-acsl} by
 default -- may be changed by setting the option \optiondef{-}{e-acsl-project}.
 
-Second, the directory which the \eacsl library files are searched in -- which is
+Second, the directory where the \eacsl library files are searched in -- which is
 \texttt{`frama-c -print-share-path`/e-acsl} by default -- may be changed by
 setting the option \optiondef{-}{e-acsl-share}.
 
@@ -676,14 +678,14 @@ check.i:4:[e-acsl] warning: E-ACSL construct `left/right shift' is not yet suppo
 \label{sec:verbose}
 
 By default, \eacsl does not provide much information when it is running. Mainly,
-it prints a message when it begins the translation, and one other when the
+it prints a message when it begins the translation, and another one when the
 translation is done. It may also display warnings when something requires the
 attention of the user, for instance if it is not able to translate an
 annotation. Such information is usually enough but, in some cases, you might
-want to get additional controls on what is displayed. As quite usual with
+want to get additional control on what is displayed. As quite usual with
 \framac plug-ins, \eacsl offers two different ways to do this: the verbosity
 level which indicates the \emph{amount} of information to display, and the
-message categories which indicates the \emph{kind} of information to display.
+message categories which indicate the \emph{kind} of information to display.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -692,7 +694,7 @@ message categories which indicates the \emph{kind} of information to display.
 The amount of information displayed by the \eacsl plug-in is settable by the
 option \optiondef{-}{e-acsl-verbose}. It is 1 by default. Below is indicated
 which information is displayed according to the verbosing level. The level $n$
-also displays the information of the level $n-1$.
+also displays the information of all the lower levels.
 
 \begin{center}
 \begin{tabular}{|l|l|}
