@@ -79,17 +79,17 @@ You can generate the instrumented program as follows.
 <skip warnings about annotations from the Frama-C libc 
       which cannot be translated>
 [kernel] warning: no entry point specified:
-                  you must call function `e_acsl_global_init' and `__clean' by yourself.
+                  you must call function `__e_acsl_memory_init' and `__e_acsl_memeory_clean' by yourself.
 [e-acsl] translation done in project "e-acsl".
 \end{shell}
 
 The last warning states an important point: if this program is linked against
 another file containing a \texttt{main} function, then this main function must
-be modified to insert a call to the function
-\texttt{e\_acsl\_global\_init}\codeidx{e\_acsl\_global\_init} at 
-the very beginning and a call to the function
-\texttt{\_\_clean}\codeidx{\_\_clean} at the very end like in the following
-example.
+be modified to insert a call to the function \texttt{\_\_e\_acsl\_memory\_init}
+\index{e\_acsl\_memory\_init@\texttt{\_\_e\_acsl\_memory\_init}} at the very
+beginning and a call to the function \texttt{\_\_e\_acsl\_memory\_clean}
+\index{e\_acsl\_memory\_clean@\texttt{\_\_e\_acsl\_memory\_clean}} at the very
+end like in the following example.
 
 \listingname{modified\_main.c}
 \cinput{examples/modified_main.c}

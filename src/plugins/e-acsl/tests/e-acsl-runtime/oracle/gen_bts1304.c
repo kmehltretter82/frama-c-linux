@@ -65,7 +65,7 @@ extern  __attribute__((__FC_BUILTIN__)) void __initialize(void *ptr,
 extern  __attribute__((__FC_BUILTIN__)) int __initialized(void *ptr,
                                                           size_t size);
 
-extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
+extern  __attribute__((__FC_BUILTIN__)) void __e_acsl_memory_clean(void);
 
 extern size_t __memory_size;
 
@@ -102,7 +102,7 @@ int main(void)
   }
   __retres = 0;
   __delete_block((void *)(buf));
-  __clean();
+  __e_acsl_memory_clean();
   return __retres;
 }
 

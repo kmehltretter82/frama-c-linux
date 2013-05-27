@@ -54,8 +54,8 @@ share/e-acsl/e_acsl_gmp.h:125:[value] Function __gmpz_cmp: precondition got stat
 share/e-acsl/e_acsl_gmp.h:114:[value] Function __gmpz_clear: precondition got status valid.
 FRAMAC_SHARE/libc/stdlib.h:142:[value] Function __e_acsl_free, behavior deallocation: precondition got status unknown.
 FRAMAC_SHARE/libc/stdlib.h:144:[value] Function __e_acsl_free, behavior deallocation: postcondition got status unknown.
-[kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
-[value] using specification for function __clean
+[kernel] warning: Neither code nor specification for function __e_acsl_memory_clean, generating default assigns from the prototype
+[value] using specification for function __e_acsl_memory_clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function __e_acsl_free:

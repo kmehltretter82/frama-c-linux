@@ -99,7 +99,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __valid_read(void *ptr,
 extern  __attribute__((__FC_BUILTIN__)) int __initialized(void *ptr,
                                                           size_t size);
 
-extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
+extern  __attribute__((__FC_BUILTIN__)) void __e_acsl_memory_clean(void);
 
 extern size_t __memory_size;
 
@@ -276,7 +276,7 @@ void g(void)
   return;
 }
 
-void e_acsl_global_init(void)
+void __e_acsl_memory_init(void)
 {
   __store_block((void *)(& Z),4U);
   __store_block((void *)(& X),8U);
@@ -291,7 +291,7 @@ int main(void)
   int **c;
   int ***d;
   int n;
-  e_acsl_global_init();
+  __e_acsl_memory_init();
   __store_block((void *)(& n),4U);
   __store_block((void *)(& d),8U);
   __store_block((void *)(& c),8U);
@@ -630,7 +630,7 @@ int main(void)
   __delete_block((void *)(& c));
   __delete_block((void *)(& b));
   __delete_block((void *)(& a));
-  __clean();
+  __e_acsl_memory_clean();
   return __retres;
 }
 

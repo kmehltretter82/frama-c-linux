@@ -343,7 +343,7 @@ void __clean_block (struct _block * ptr) {
 }
 
 /* erase the content of the abstract structure */
-void __clean() {
+void __e_acsl_memory_clean() {
   __clean_struct();
   /*printf("%i &\n", cpt_store_block);*/
 }

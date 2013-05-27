@@ -93,12 +93,12 @@ void __out_of_bound(void * ptr, _Bool flag)
   __attribute__((FC_BUILTIN));
 
 /* print the content of the abstract structure */
-void __debug(void)
+void __e_acsl_memory_debug(void)
   __attribute__((FC_BUILTIN));
 
 /* erase the content of the abstract structure
  * have to be called at the end of the `main` */
-void __clean(void)
+void __e_acsl_memory_clean(void)
   __attribute__((FC_BUILTIN));
 
 /* return the number of bytes dynamically allocated */

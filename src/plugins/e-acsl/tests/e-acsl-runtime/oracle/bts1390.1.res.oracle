@@ -34,8 +34,8 @@ tests/e-acsl-runtime/bts1390.c:16:[value] Function __e_acsl_memchr, behavior not
 tests/e-acsl-runtime/bts1390.c:21:[kernel] warning: out of bounds read. assert \valid_read(s);
 tests/e-acsl-runtime/bts1390.c:16:[value] Function memchr, behavior not_exists: postcondition got status valid. (Behavior may be inactive, no reduction performed.)
 tests/e-acsl-runtime/bts1390.c:16:[value] Function __e_acsl_memchr, behavior not_exists: postcondition got status valid. (Behavior may be inactive, no reduction performed.)
-[kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
-[value] using specification for function __clean
+[kernel] warning: Neither code nor specification for function __e_acsl_memory_clean, generating default assigns from the prototype
+[value] using specification for function __e_acsl_memory_clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function memchr:

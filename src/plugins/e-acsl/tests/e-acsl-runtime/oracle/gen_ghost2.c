@@ -71,7 +71,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __valid(void *ptr, size_t size);
 extern  __attribute__((__FC_BUILTIN__)) int __valid_read(void *ptr,
                                                          size_t size);
 
-extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
+extern  __attribute__((__FC_BUILTIN__)) void __e_acsl_memory_clean(void);
 
 extern size_t __memory_size;
 
@@ -81,7 +81,7 @@ predicate diffSize{L1, L2}(ℤ i) =
  */
 int G = 0;
 int *P;
-void e_acsl_global_init(void)
+void __e_acsl_memory_init(void)
 {
   __store_block((void *)(& P),4U);
   __store_block((void *)(& G),4U);
@@ -92,7 +92,7 @@ int main(void)
 {
   int __retres;
   int *q;
-  e_acsl_global_init();
+  __e_acsl_memory_init();
   __store_block((void *)(& q),4U);
   P = & G;
   __full_init((void *)(& q));
@@ -127,7 +127,7 @@ int main(void)
   __delete_block((void *)(& P));
   __delete_block((void *)(& G));
   __delete_block((void *)(& q));
-  __clean();
+  __e_acsl_memory_clean();
   return __retres;
 }
 

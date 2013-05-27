@@ -71,7 +71,7 @@ extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
 extern  __attribute__((__FC_BUILTIN__)) int __initialized(void *ptr,
                                                           size_t size);
 
-extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
+extern  __attribute__((__FC_BUILTIN__)) void __e_acsl_memory_clean(void);
 
 extern size_t __memory_size;
 
@@ -128,7 +128,7 @@ void g(int *C, int *D)
   return;
 }
 
-void e_acsl_global_init(void)
+void __e_acsl_memory_init(void)
 {
   __store_block((void *)(& B),4U);
   __store_block((void *)(& A),4U);
@@ -140,7 +140,7 @@ int main(void)
   int __retres;
   int *x;
   int *y;
-  e_acsl_global_init();
+  __e_acsl_memory_init();
   __store_block((void *)(& y),4U);
   __store_block((void *)(& x),4U);
   B = (int *)__e_acsl_malloc(sizeof(int));
@@ -165,7 +165,7 @@ int main(void)
   __delete_block((void *)(& A));
   __delete_block((void *)(& y));
   __delete_block((void *)(& x));
-  __clean();
+  __e_acsl_memory_clean();
   return __retres;
 }
 

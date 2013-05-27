@@ -78,7 +78,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __valid_read(void *ptr,
 extern  __attribute__((__FC_BUILTIN__)) int __initialized(void *ptr,
                                                           size_t size);
 
-extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
+extern  __attribute__((__FC_BUILTIN__)) void __e_acsl_memory_clean(void);
 
 extern size_t __memory_size;
 
@@ -115,7 +115,7 @@ char *S2;
 int IDX = 1;
 int G2 = 2;
 char *U = (char *)"baz";
-void e_acsl_global_init(void)
+void __e_acsl_memory_init(void)
 {
   char *__e_acsl_literal_string_3;
   char *__e_acsl_literal_string_2;
@@ -146,7 +146,7 @@ int main(void)
   char *__e_acsl_literal_string;
   int __retres;
   char *SS;
-  e_acsl_global_init();
+  __e_acsl_memory_init();
   __store_block((void *)(& SS),4U);
   __e_acsl_literal_string = "ss";
   __store_block((void *)__e_acsl_literal_string,sizeof("ss"));
@@ -202,7 +202,7 @@ int main(void)
   __delete_block((void *)(& S));
   __delete_block((void *)(& T));
   __delete_block((void *)(& SS));
-  __clean();
+  __e_acsl_memory_clean();
   return __retres;
 }
 

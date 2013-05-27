@@ -186,7 +186,7 @@ class e_acsl_visitor prj generate = object (self)
 	      function_env := env;
 	      let stmts = Cil.mkStmt ~valid_sid:true (Block b) :: stmts in
 	      let blk = Cil.mkBlock stmts in
-	      let fname = "e_acsl_global_init" in
+	      let fname = "__e_acsl_memory_init" in
 	      let vi = 
 		Cil.makeGlobalVar ~logic:false ~generated:true 
 		  fname
@@ -236,7 +236,7 @@ class e_acsl_visitor prj generate = object (self)
 		  f.globals <- new_globals
 		| None -> 
 		  Kernel.warning "@[no entry point specified:@ \
-you must call function `%s' and `__clean' by yourself.@]" 
+you must call function `%s' and `__e_acsl_memory_clean by yourself.@]" 
 		    fname;
 		  f.globals <- f.globals @ [ cil_fct ]
 	    in
@@ -527,6 +527,7 @@ you must call function `%s' and `__clean' by yourself.@]"
 	      match l with
 	      | [] -> assert false (* return is here *)
 	      | ret :: l ->
+		let loc = Stmt.loc stmt in
 		let delete_stmts =
 		  Globals.Vars.fold_in_file_order
 		    (fun vi _ acc -> 
@@ -535,7 +536,7 @@ you must call function `%s' and `__clean' by yourself.@]"
 			Misc.mk_delete_stmt vi :: acc
 		      else
 			acc)
-		    [ Misc.mk_call ~loc:(Stmt.loc stmt) "__clean" []; ret ]
+		    [ Misc.mk_call ~loc "__e_acsl_memory_clean" []; ret ]
 		in
 		b.bstmts <- List.rev l @ delete_stmts
 	    end;

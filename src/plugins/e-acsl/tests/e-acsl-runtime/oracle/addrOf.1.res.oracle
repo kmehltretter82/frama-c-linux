@@ -25,8 +25,8 @@ share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status
 [value] using specification for function __delete_block
 tests/e-acsl-runtime/addrOf.i:18:[value] Assertion got status valid.
 share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
-[kernel] warning: Neither code nor specification for function __clean, generating default assigns from the prototype
-[value] using specification for function __clean
+[kernel] warning: Neither code nor specification for function __e_acsl_memory_clean, generating default assigns from the prototype
+[value] using specification for function __e_acsl_memory_clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function f:

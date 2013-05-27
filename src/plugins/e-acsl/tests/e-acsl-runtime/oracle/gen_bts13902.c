@@ -105,7 +105,7 @@ extern  __attribute__((__FC_BUILTIN__)) void __literal_string(void *ptr);
 /*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) int __offset(void *ptr);
 
-extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
+extern  __attribute__((__FC_BUILTIN__)) void __e_acsl_memory_clean(void);
 
 extern size_t __memory_size;
 
@@ -384,7 +384,7 @@ int main(void)
   __e_acsl_memchr((void const *)__e_acsl_literal_string_2,'a',
                   (unsigned int)4);
   __retres = 0;
-  __clean();
+  __e_acsl_memory_clean();
   return __retres;
 }
 

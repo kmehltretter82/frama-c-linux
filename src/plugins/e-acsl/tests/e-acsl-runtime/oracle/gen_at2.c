@@ -95,7 +95,7 @@ extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
 extern  __attribute__((__FC_BUILTIN__)) int __valid_read(void *ptr,
                                                          size_t size);
 
-extern  __attribute__((__FC_BUILTIN__)) void __clean(void);
+extern  __attribute__((__FC_BUILTIN__)) void __e_acsl_memory_clean(void);
 
 extern size_t __memory_size;
 
@@ -416,7 +416,7 @@ int main(void)
   __gmpz_clear(__e_acsl_at_2);
   __delete_block((void *)(t));
   __delete_block((void *)(& x));
-  __clean();
+  __e_acsl_memory_clean();
   return __retres;
 }
 
