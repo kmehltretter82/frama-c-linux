@@ -226,7 +226,7 @@ let type_constant ty = function
   | LStr _ | LWStr _ | LReal _ | LEnum _ -> No_integral ty
 
 let size_of ty =
-  try int_to_interv (Cil.sizeOf_int ty)
+  try int_to_interv (Cil.bytesSizeOf ty)
   with Cil.SizeOfError _ -> eacsl_typ_of_typ Cil.ulongLongType
 
 let align_of ty = int_to_interv (Cil.bytesAlignOf ty)
