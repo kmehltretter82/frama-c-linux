@@ -58,8 +58,8 @@ share/e-acsl/e_acsl_gmp.h:163:[value] Function __gmpz_tdiv_q: precondition got s
 [value] using specification for function __gmpz_get_ui
 share/e-acsl/e_acsl_gmp.h:194:[value] Function __gmpz_get_ui: precondition got status valid.
 [value] using specification for function __initialized
-share/e-acsl/memory_model/e_acsl_mmodel.h:86:[value] Function __initialized: postcondition got status unknown.
-share/e-acsl/memory_model/e_acsl_mmodel.h:87:[value] Function __initialized: postcondition got status unknown.
+share/e-acsl/memory_model/e_acsl_mmodel.h:107:[value] Function __initialized: postcondition got status unknown.
+share/e-acsl/memory_model/e_acsl_mmodel.h:108:[value] Function __initialized: postcondition got status unknown.
 [value] using specification for function __gmpz_clear
 share/e-acsl/e_acsl_gmp.h:114:[value] Function __gmpz_clear: precondition got status valid.
 FRAMAC_SHARE/libc/stdlib.h:142:[value] Function __e_acsl_free, behavior deallocation: precondition got status unknown.

@@ -160,10 +160,11 @@ let result_vi kf = match result_lhost kf with
 (** {2 Handling the E-ACSL's C-libraries, part II} *)
 (* ************************************************************************** *)
 
-(* TODO: convert -debug 2 into a new debugging category *)
 let mk_debug_mmodel_stmt stmt =
-  if Options.debug_atleast 2 then
-    let debug = mk_call "__debug" [] in
+  if Options.debug_atleast 1
+    && Options.is_debug_key_enabled Options.dkey_analysis 
+  then
+    let debug = mk_call "__e_acsl_memory_debug" [] in
     Cil.mkStmt ~valid_sid:true (Block (Cil.mkBlock [ stmt; debug]))
   else 
     stmt

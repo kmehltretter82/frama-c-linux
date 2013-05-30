@@ -15,6 +15,12 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
+-* E-ACSL       [2013/05/30] Fixed -e-acsl-debug n, with n >= 2.
+
+###################################
+Plugin E-ACSL 0.2 Fluorine_20130401
+###################################
+
 -  E-ACSL       [2013/01/09] New option -e-acsl-valid. By default, valid
 	        annotation are not translated anymore.
 -* E-ACSL       [2013/01/09] Fix bug when translating a postcondition of a

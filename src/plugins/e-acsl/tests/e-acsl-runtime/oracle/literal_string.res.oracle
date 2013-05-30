@@ -31,8 +31,8 @@ share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status
 share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
 tests/e-acsl-runtime/literal_string.i:25:[value] Assertion got status valid.
 [value] using specification for function __initialized
-share/e-acsl/memory_model/e_acsl_mmodel.h:86:[value] Function __initialized: postcondition got status unknown.
-share/e-acsl/memory_model/e_acsl_mmodel.h:87:[value] Function __initialized: postcondition got status valid.
+share/e-acsl/memory_model/e_acsl_mmodel.h:107:[value] Function __initialized: postcondition got status unknown.
+share/e-acsl/memory_model/e_acsl_mmodel.h:108:[value] Function __initialized: postcondition got status valid.
 tests/e-acsl-runtime/literal_string.i:26:[value] Assertion got status valid.
 tests/e-acsl-runtime/literal_string.i:27:[value] Assertion got status valid.
 [value] using specification for function __valid

@@ -5,27 +5,28 @@
 - [Bernard] avoir une fonction e_acsl_trace_behavior(char *bhv_name) {}
   à appeler dès qu'un behavior est activé
 - [Yannick] Logic functions
+- [Nikolaï] temporal memory properties
+- memory profiling
 
 #####################
 # E-ACSL CONSTRUCTS #
 #####################
 
+- assigns, loop assigns
 - predicates
 - logic functions
 - disjoint and complete behaviors (cf. Bernard's feature wish)
 - loop invariant
 - loop variant
+- grep "not_yet" *.ml
 
 ########
 # CODE #
 ########
 
 - grep TODO *.ml*
-- Gestion du mode -lib-entry et/ou pas de main
-- variable GMP potentiellement initialisée mais non utilisée en présence de \at
-  (voir test result.i, cas -e-acsl-gmp-only)
+- Gestion du mode -lib-entry
 - générer les delete des globals dans une fonction séparée, comme pour les init.
-- variadic functions are not yet duplicated
 - generate guard for \offset, \block_length and \base_addr
   (\offset(p) must ensures that p is valid)
 - don't generate code for properties with status valid_under_hyp when we know
@@ -40,12 +41,16 @@
 - analysis: fixed incorrectness in presence of recursive functions
 - RTE: potential duplication (e.g. with **p)
 - default output of e_acsl_assert in the format of standart error messages
+- some calls to __eacsl_memory_debug are missing in debug mode
 
 ##############
 # KNOWN BUGS #
 ##############
 
 - see BTS
+- see Chapter "Known Limitations" of the User Manual
+- variable GMP potentiellement initialisée mais non utilisée en présence de \at
+  (voir test result.i, cas -e-acsl-gmp-only)
 - comparaisons qui aboutissent à du C incorrect
   ==> comparaison de chaînes litérales
    (voir tests other_constants.i et comparison.i)
@@ -57,21 +62,17 @@
 - incorrect d'utiliser Pre, Post, Here, Old dans stmt contract 
   (même problème que Jessie: cf. BTS #72)
   (voir aussi result.i et ./at_stmt_contract.i)
-- interprétation des tableaux
-- \valid (or other memory-model constructs) in ensures of functions without code
-- function pointers 
-  (in case of the pointing function has a behavior like in test ptr_init.c)
+- interprétation des tableaux logiques
+[Dillon] Windows
 
 #######
 # DOC #
 #######
-
-- write user manual
-- update according to the latest version of ACSL
 
 #########
 # TESTS #
 #########
 
 - inclure exemple du E-ACSL Reference Manual
+- inclure exemple du E-ACSL User Manual
 - test arith.i: mettre les exemples du ACSL manual about div and modulo
