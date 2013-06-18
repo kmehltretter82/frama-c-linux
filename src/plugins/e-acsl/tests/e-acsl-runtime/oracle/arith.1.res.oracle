@@ -53,6 +53,7 @@ share/e-acsl/e_acsl_gmp.h:154:[value] Function __gmpz_mul: precondition got stat
 share/e-acsl/e_acsl_gmp.h:155:[value] Function __gmpz_mul: precondition got status valid.
 share/e-acsl/e_acsl_gmp.h:156:[value] Function __gmpz_mul: precondition got status valid.
 tests/e-acsl-runtime/arith.i:19:[value] Assertion got status valid.
+tests/e-acsl-runtime/arith.i:19:[value] Assertion 'E_ACSL' got status valid.
 [value] using specification for function __gmpz_tdiv_q
 share/e-acsl/e_acsl_gmp.h:161:[value] Function __gmpz_tdiv_q: precondition got status valid.
 share/e-acsl/e_acsl_gmp.h:162:[value] Function __gmpz_tdiv_q: precondition got status valid.
@@ -62,13 +63,17 @@ tests/e-acsl-runtime/arith.i:20:[value] Assertion got status valid.
 share/e-acsl/e_acsl_gmp.h:71:[value] Function __gmpz_init_set_str: precondition got status valid.
 share/e-acsl/e_acsl_gmp.h:73:[value] Function __gmpz_init_set_str: postcondition got status valid.
 share/e-acsl/e_acsl_gmp.h:74:[value] Function __gmpz_init_set_str: postcondition got status unknown.
+tests/e-acsl-runtime/arith.i:20:[value] Assertion 'E_ACSL' got status valid.
 tests/e-acsl-runtime/arith.i:21:[value] Assertion got status valid.
+tests/e-acsl-runtime/arith.i:21:[value] Assertion 'E_ACSL' got status valid.
 [value] using specification for function __gmpz_tdiv_r
 share/e-acsl/e_acsl_gmp.h:168:[value] Function __gmpz_tdiv_r: precondition got status valid.
 share/e-acsl/e_acsl_gmp.h:169:[value] Function __gmpz_tdiv_r: precondition got status valid.
 share/e-acsl/e_acsl_gmp.h:170:[value] Function __gmpz_tdiv_r: precondition got status valid.
 tests/e-acsl-runtime/arith.i:22:[value] Assertion got status valid.
+tests/e-acsl-runtime/arith.i:22:[value] Assertion 'E_ACSL' got status valid.
 tests/e-acsl-runtime/arith.i:23:[value] Assertion got status valid.
+tests/e-acsl-runtime/arith.i:23:[value] Assertion 'E_ACSL' got status valid.
 tests/e-acsl-runtime/arith.i:25:[value] Assertion got status valid.
 tests/e-acsl-runtime/arith.i:27:[value] Assertion got status valid.
 tests/e-acsl-runtime/arith.i:28:[value] Assertion got status valid.
@@ -76,6 +81,7 @@ tests/e-acsl-runtime/arith.i:29:[value] Assertion got status valid.
 tests/e-acsl-runtime/arith.i:30:[value] Assertion got status valid.
 tests/e-acsl-runtime/arith.i:32:[value] Assertion got status valid.
 tests/e-acsl-runtime/arith.i:33:[value] Assertion got status valid.
+tests/e-acsl-runtime/arith.i:33:[value] Assertion 'E_ACSL' got status valid.
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function main:

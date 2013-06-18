@@ -30,14 +30,14 @@ tests/e-acsl-runtime/lazy.i:12:[value] Assertion got status valid.
 [value] using specification for function __gmpz_init
 share/e-acsl/e_acsl_gmp.h:37:[value] Function __gmpz_init: precondition got status valid.
 share/e-acsl/e_acsl_gmp.h:38:[value] Function __gmpz_init: postcondition got status valid.
-tests/e-acsl-runtime/lazy.i:12:[value] Assertion got status invalid (stopping propagation).
+tests/e-acsl-runtime/lazy.i:12:[value] Assertion 'E_ACSL' got status invalid (stopping propagation).
 share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
 tests/e-acsl-runtime/lazy.i:13:[value] Assertion got status valid.
 tests/e-acsl-runtime/lazy.i:14:[value] Assertion got status valid.
-tests/e-acsl-runtime/lazy.i:14:[value] Assertion got status invalid (stopping propagation).
+tests/e-acsl-runtime/lazy.i:14:[value] Assertion 'E_ACSL' got status invalid (stopping propagation).
 tests/e-acsl-runtime/lazy.i:15:[value] Assertion got status valid.
 tests/e-acsl-runtime/lazy.i:16:[value] Assertion got status valid.
-tests/e-acsl-runtime/lazy.i:16:[value] Assertion got status invalid (stopping propagation).
+tests/e-acsl-runtime/lazy.i:16:[value] Assertion 'E_ACSL' got status invalid (stopping propagation).
 tests/e-acsl-runtime/lazy.i:17:[value] Assertion got status unknown.
 tests/e-acsl-runtime/lazy.i:18:[value] Assertion got status unknown.
 tests/e-acsl-runtime/lazy.i:19:[value] Assertion got status unknown.

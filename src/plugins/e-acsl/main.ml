@@ -139,6 +139,13 @@ let generate_code =
 		Pre_analysis.reset ();
 		let visit prj = Visit.do_visit ~prj true in
 		let prj = File.create_project_from_visitor name visit in
+		(* remove the RTE's results computed from E-ACSL: their are
+		   partial and associated with the wrong kernel function (the
+		   one of the old project). *)
+		Project.clear
+		  ~selection:(State_selection.with_dependencies !Db.RteGen.self)
+		  ~project:prj
+		  ();
 		Resulting_projects.mark_as_computed ();
 		prj)
 	      ()

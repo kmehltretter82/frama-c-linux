@@ -16,7 +16,7 @@ typedef unsigned int blksize_t;
 typedef unsigned int dev_t;
 typedef unsigned int mode_t;
 typedef unsigned int nlink_t;
-typedef unsigned int off_t;
+typedef long off_t;
 struct stat {
    dev_t st_dev ;
    ino_t st_ino ;

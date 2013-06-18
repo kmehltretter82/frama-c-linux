@@ -41,7 +41,7 @@ share/e-acsl/e_acsl_gmp.h:38:[value] Function __gmpz_init: postcondition got sta
 share/e-acsl/e_acsl_gmp.h:154:[value] Function __gmpz_mul: precondition got status valid.
 share/e-acsl/e_acsl_gmp.h:155:[value] Function __gmpz_mul: precondition got status valid.
 share/e-acsl/e_acsl_gmp.h:156:[value] Function __gmpz_mul: precondition got status valid.
-tests/e-acsl-runtime/ptr.i:16:[value] Assertion got status valid.
+tests/e-acsl-runtime/ptr.i:16:[value] Assertion 'E_ACSL' got status valid.
 [value] using specification for function __gmpz_tdiv_q
 share/e-acsl/e_acsl_gmp.h:161:[value] Function __gmpz_tdiv_q: precondition got status valid.
 share/e-acsl/e_acsl_gmp.h:162:[value] Function __gmpz_tdiv_q: precondition got status valid.

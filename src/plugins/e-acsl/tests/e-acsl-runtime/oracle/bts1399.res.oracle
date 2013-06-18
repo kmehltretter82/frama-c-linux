@@ -48,7 +48,7 @@ share/e-acsl/e_acsl_gmp.h:125:[value] Function __gmpz_cmp: precondition got stat
 [value] using specification for function __gmpz_init
 share/e-acsl/e_acsl_gmp.h:37:[value] Function __gmpz_init: precondition got status valid.
 share/e-acsl/e_acsl_gmp.h:38:[value] Function __gmpz_init: postcondition got status valid.
-tests/e-acsl-runtime/bts1399.c:24:[value] Assertion got status valid.
+tests/e-acsl-runtime/bts1399.c:24:[value] Assertion 'E_ACSL' got status valid.
 [value] using specification for function e_acsl_assert
 share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_tdiv_q

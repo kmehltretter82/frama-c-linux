@@ -42,6 +42,8 @@
 - RTE: potential duplication (e.g. with **p)
 - default output of e_acsl_assert in the format of standart error messages
 - some calls to __eacsl_memory_debug are missing in debug mode
+- translate only once the assumes clause in presence of a pre- and a 
+  post-condition
 
 ##############
 # KNOWN BUGS #
