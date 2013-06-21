@@ -68,7 +68,7 @@ int search(int elt)
     k ++;
   }
   __retres = 0;
-  return_label: /* internal */ return __retres;
+  return_label: return __retres;
 }
 
 /*@ requires ∀ ℤ i; 0 ≤ i ∧ i < 9 ⇒ A[i] ≤ A[i+1];
@@ -108,7 +108,7 @@ int __e_acsl_search(int elt)
       }
       __e_acsl_i ++;
     }
-    e_acsl_end_loop1: /* internal */ ;
+    e_acsl_end_loop1: ;
     e_acsl_assert(__e_acsl_forall,(char *)"Precondition",(char *)"search",
                   (char *)"\\forall integer i; 0 <= i && i < 9 ==> A[i] <= A[i+1]",
                   9);
@@ -130,7 +130,7 @@ int __e_acsl_search(int elt)
         }
         __e_acsl_j_2 ++;
       }
-      e_acsl_end_loop3: /* internal */ ;
+      e_acsl_end_loop3: ;
       __e_acsl_at_2 = __e_acsl_forall_2;
     }
     {
@@ -151,7 +151,7 @@ int __e_acsl_search(int elt)
         }
         __e_acsl_j ++;
       }
-      e_acsl_end_loop2: /* internal */ ;
+      e_acsl_end_loop2: ;
       __e_acsl_at = __e_acsl_exists;
     }
     __retres = search(elt);

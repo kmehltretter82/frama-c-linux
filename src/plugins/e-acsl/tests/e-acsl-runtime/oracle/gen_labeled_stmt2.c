@@ -115,7 +115,7 @@ int __e_acsl_main(void)
     goto return_label;
   }
   __retres = 0;
-  return_label: /* internal */ return __retres;
+  return_label: return __retres;
 }
 
 /*@ ensures X ≡ 3; */

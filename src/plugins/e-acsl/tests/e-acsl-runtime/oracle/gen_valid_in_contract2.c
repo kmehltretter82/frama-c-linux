@@ -85,7 +85,7 @@ struct list *f(struct list *l)
     goto return_label;
   }
   __retres = (struct list *)((void *)0);
-  return_label: /* internal */ return __retres;
+  return_label: return __retres;
 }
 
 /*@ behavior B1:

@@ -172,7 +172,7 @@ int main(void)
         __gmpz_clear(__e_acsl_add);
       }
     }
-    e_acsl_end_loop1: /* internal */ ;
+    e_acsl_end_loop1: ;
     e_acsl_assert(__e_acsl_forall,(char *)"Assertion",(char *)"main",
                   (char *)"\\forall integer x; 0 <= x && x <= 1 ==> x == 0 || x == 1",
                   11);
@@ -233,7 +233,7 @@ int main(void)
         __gmpz_clear(__e_acsl_add_3);
       }
     }
-    e_acsl_end_loop2: /* internal */ ;
+    e_acsl_end_loop2: ;
     e_acsl_assert(__e_acsl_forall_2,(char *)"Assertion",(char *)"main",
                   (char *)"\\forall integer x; 0 < x && x <= 1 ==> x == 1",
                   12);
@@ -286,7 +286,7 @@ int main(void)
         __gmpz_clear(__e_acsl_add_5);
       }
     }
-    e_acsl_end_loop3: /* internal */ ;
+    e_acsl_end_loop3: ;
     e_acsl_assert(__e_acsl_forall_3,(char *)"Assertion",(char *)"main",
                   (char *)"\\forall integer x; 0 < x && x < 1 ==> \\false",
                   13);
@@ -339,7 +339,7 @@ int main(void)
         __gmpz_clear(__e_acsl_add_6);
       }
     }
-    e_acsl_end_loop4: /* internal */ ;
+    e_acsl_end_loop4: ;
     e_acsl_assert(__e_acsl_forall_4,(char *)"Assertion",(char *)"main",
                   (char *)"\\forall integer x; 0 <= x && x < 1 ==> x == 0",
                   14);
@@ -463,7 +463,7 @@ int main(void)
         __gmpz_clear(__e_acsl_add_11);
       }
     }
-    e_acsl_end_loop5: /* internal */ ;
+    e_acsl_end_loop5: ;
     e_acsl_assert(__e_acsl_forall_5,(char *)"Assertion",(char *)"main",
                   (char *)"\\forall integer x, integer y, integer z;\n  ((0 <= x && x < 2) && (0 <= y && y < 5)) && (0 <= z && z <= y) ==>\n  x+z <= y+1",
                   18);
@@ -518,7 +518,7 @@ int main(void)
         __gmpz_clear(__e_acsl_add_12);
       }
     }
-    e_acsl_end_loop6: /* internal */ ;
+    e_acsl_end_loop6: ;
     e_acsl_assert(__e_acsl_exists,(char *)"Assertion",(char *)"main",
                   (char *)"\\exists int x; (0 <= x && x < 10) && x == 5",23);
     __gmpz_clear(__e_acsl_x_6);
@@ -637,7 +637,7 @@ int main(void)
               __gmpz_clear(__e_acsl_add_13);
             }
           }
-          e_acsl_end_loop7: /* internal */ ;
+          e_acsl_end_loop7: ;
           __e_acsl_implies = __e_acsl_exists_2;
           __gmpz_clear(__e_acsl_y_2);
         }
@@ -662,7 +662,7 @@ int main(void)
         __gmpz_clear(__e_acsl_add_14);
       }
     }
-    e_acsl_end_loop8: /* internal */ ;
+    e_acsl_end_loop8: ;
     e_acsl_assert(__e_acsl_forall_6,(char *)"Assertion",(char *)"main",
                   (char *)"\\forall int x;\n  0 <= x && x < 10 ==>\n  (x%2 == 0 ==> (\\exists integer y; (0 <= y && y <= x/2) && x == 2*y))",
                   27);

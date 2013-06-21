@@ -75,7 +75,7 @@ int sorted(int *t, int n)
     b ++;
   }
   __retres = 1;
-  return_label: /* internal */ return __retres;
+  return_label: return __retres;
 }
 
 /*@ behavior yes:
@@ -115,7 +115,7 @@ int __e_acsl_sorted(int *t, int n)
       }
       __e_acsl_i ++;
     }
-    e_acsl_end_loop1: /* internal */ ;
+    e_acsl_end_loop1: ;
     __e_acsl_at = __e_acsl_forall;
   }
   __retres = sorted(t,n);
