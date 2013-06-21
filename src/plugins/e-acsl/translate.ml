@@ -86,7 +86,7 @@ let name_of_mpz_arith_bop = function
   | Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr
   | Shiftlt | Shiftrt | PlusPI | IndexPI | MinusPI | MinusPP -> assert false
 
-let constant_to_exp ?(loc=Location.unknown) = function
+let constant_to_exp ~loc = function
   | Integer(n, s) ->
     (try
        let k = Typing.typ_of_integer n (Integer.ge n Integer.zero) in
@@ -401,8 +401,7 @@ and term_to_exp kf env ctx t =
 
 (* generate the C code equivalent to [t1 bop t2]. *)
 and comparison_to_exp
-    ?(loc=Location.unknown) ?e1 kf env bop ?(name=name_of_binop bop) 
-    t1 t2 t_opt =
+    ~loc ?e1 kf env bop ?(name=name_of_binop bop) t1 t2 t_opt =
   let e1, env, ctx = match e1 with
     | None -> 
       let ctx = Typing.principal_type t1 t2  in

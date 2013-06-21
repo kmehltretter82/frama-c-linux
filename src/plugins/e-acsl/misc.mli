@@ -29,7 +29,7 @@ open Cil_datatype
 (** {2 Builders} *)
 (* ************************************************************************** *)
 
-val mk_call: ?loc:Location.t -> ?result:lval -> string -> exp list -> stmt
+val mk_call: loc:Location.t -> ?result:lval -> string -> exp list -> stmt
 val mk_debug_mmodel_stmt: stmt -> stmt
 
 type annotation_kind = 

@@ -504,17 +504,17 @@ let type_named_predicate ?(must_clear=true) p =
 (******************************************************************************)
 
 (* convert [e] in a way that it is compatible with the given typing context. *)
-let context_sensitive ?loc ?name env ctx is_mpz_string t_opt e = 
+let context_sensitive ~loc ?name env ctx is_mpz_string t_opt e = 
   let ty = Cil.typeOf e in
   let mk_mpz e = 
     let _, e, env = 
       Env.new_var 
-	?loc
+	~loc
 	?name
 	env
 	t_opt
 	(Mpz.t ())
-	(fun lv v -> [ Mpz.init_set ?loc (Cil.var lv) v e ])
+	(fun lv v -> [ Mpz.init_set ~loc (Cil.var lv) v e ])
     in
     e, env
   in
@@ -529,7 +529,7 @@ let context_sensitive ?loc ?name env ctx is_mpz_string t_opt e =
 	  "__gmpz_get_ui", Cil.ulongType 
       in
       Options.warning
-	?source:(Extlib.opt_map fst loc)
+	~source:(fst loc)
 	~once:true
 	"@[missing guard for ensuring that the given integer is \
 C-representable@]"; 

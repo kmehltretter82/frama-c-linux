@@ -186,7 +186,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
       let init_blk, env = 
 	Env.pop_and_get 
 	  env
-	  (Mpz.affect lv_x x e1)
+	  (Mpz.affect ~loc:e1.eloc lv_x x e1)
 	  ~global_clear:false
 	  Env.Middle
       in
@@ -217,7 +217,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
       let next_blk, env = 
 	Env.pop_and_get
 	  env
-	  (Mpz.affect lv_x x incr)
+	  (Mpz.affect ~loc:incr.eloc lv_x x incr)
 	  ~global_clear:false
 	  Env.Middle
       in

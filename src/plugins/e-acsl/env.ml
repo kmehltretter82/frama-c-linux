@@ -123,7 +123,7 @@ let generate_rte env =
 (* eta-expansion required for typing generalisation *)
 let acc_list_rev acc l = List.fold_left (fun acc x -> x :: acc) acc l
 
-let do_new_var ?loc init ?(global=false) ?(name="") env t ty mk_stmts =
+let do_new_var ~loc init ?(global=false) ?(name="") env t ty mk_stmts =
   let local_env, tl_env = top init env in
   let local_block = local_env.block_info in
   let is_t = Mpz.is_t ty in
@@ -160,7 +160,7 @@ let do_new_var ?loc init ?(global=false) ?(name="") env t ty mk_stmts =
 (*      Options.feedback "memoizing %a for term %a" 
 	Varinfo.pretty v (fun fmt t -> match t with None -> Format.fprintf fmt
 	  "NONE" | Some t -> Term.pretty fmt t) t;*)
-      { clear_stmts = Mpz.clear ?loc e :: tbl.clear_stmts;
+      { clear_stmts = Mpz.clear ~loc e :: tbl.clear_stmts;
 	new_exps = match t with
 	| None -> tbl.new_exps
 	| Some t -> Term.Map.add t (v, e) tbl.new_exps }
@@ -201,7 +201,7 @@ let do_new_var ?loc init ?(global=false) ?(name="") env t ty mk_stmts =
 
 exception No_term
 
-let new_var ?loc ?(init=false) ?(global=false) ?name env t ty mk_stmts = 
+let new_var ~loc ?(init=false) ?(global=false) ?name env t ty mk_stmts = 
   let local_env, _ = top init env in
   let memo tbl =
     try
@@ -211,7 +211,7 @@ let new_var ?loc ?(init=false) ?(global=false) ?name env t ty mk_stmts =
 	let v, e = Term.Map.find t tbl.new_exps in
 	if Typ.equal ty v.vtype then v, e, env else raise No_term
     with Not_found | No_term -> 
-      do_new_var ?loc ~global init ?name env t ty mk_stmts  
+      do_new_var ~loc ~global init ?name env t ty mk_stmts  
   in
   if global then begin
     assert (not init);
@@ -219,10 +219,10 @@ let new_var ?loc ?(init=false) ?(global=false) ?name env t ty mk_stmts =
   end else
     memo local_env.mpz_tbl
 
-let new_var_and_mpz_init ?loc ?init ?global ?name env t mk_stmts = 
+let new_var_and_mpz_init ~loc ?init ?global ?name env t mk_stmts = 
   new_var 
-    ?loc ?init ?global ?name env t (Mpz.t ()) 
-    (fun v e -> Mpz.init ?loc e :: mk_stmts v e)
+    ~loc ?init ?global ?name env t (Mpz.t ()) 
+    (fun v e -> Mpz.init ~loc e :: mk_stmts v e)
 
 module Logic_binding = struct
 
@@ -241,7 +241,8 @@ module Logic_binding = struct
 	  Error.not_yet msg
     in
     let v, e, env = 
-      new_var env ~name:logic_v.lv_name None ty (fun _ _ -> []) 
+      new_var
+	~loc:Location.unknown env ~name:logic_v.lv_name None ty (fun _ _ -> []) 
     in
     v,
     e, 

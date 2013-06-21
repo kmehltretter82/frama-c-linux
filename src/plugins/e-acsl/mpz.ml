@@ -37,9 +37,9 @@ let is_now_referenced () = !t_torig_ref.treferenced <- true
 let t () = TNamed(!t_torig_ref, [])
 let is_t ty = Cil_datatype.Typ.equal ty (t ())
 
-let apply_on_var ?loc funname e = Misc.mk_call ?loc ("__gmpz_" ^ funname) [ e ]
-let init ?loc e = apply_on_var "init" ?loc e
-let clear ?loc e = apply_on_var "clear" ? loc e
+let apply_on_var ~loc funname e = Misc.mk_call ~loc ("__gmpz_" ^ funname) [ e ]
+let init ~loc e = apply_on_var "init" ~loc e
+let clear ~loc e = apply_on_var "clear" ~loc e
 
 exception Longlong of ikind
 
@@ -62,16 +62,16 @@ let get_set_suffix_and_arg e =
       [ e; Cil.integer ~loc:Location.unknown 10 ]
     | _ -> assert false
 
-let generic_affect ?loc fname lv ev e =
+let generic_affect ~loc fname lv ev e =
   let ty = Cil.typeOf ev in
   if is_t ty then 
     let suf, args = get_set_suffix_and_arg e in
-    Misc.mk_call ?loc (fname ^ suf) (ev :: args)
+    Misc.mk_call ~loc (fname ^ suf) (ev :: args)
   else
-    Cil.mkStmtOneInstr ~valid_sid:true (Set(lv, e, Location.unknown))
+    Cil.mkStmtOneInstr ~valid_sid:true (Set(lv, e, e.eloc))
 
-let init_set ?loc lv ev e = 
-  try generic_affect ?loc "__gmpz_init_set" lv ev e
+let init_set ~loc lv ev e = 
+  try generic_affect ~loc "__gmpz_init_set" lv ev e
   with 
   | Longlong IULongLong ->
     (match e.enode with
@@ -79,14 +79,13 @@ let init_set ?loc lv ev e =
       let call =
 	Misc.mk_call ?loc
 	  "__gmpz_import"
-	  (let loc = match loc with None -> Location.unknown | Some l -> l in
-	   [ ev; 
-	     Cil.one ~loc; 
-	     Cil.one ~loc; 
-	     Cil.sizeOf ~loc (TInt(IULongLong, []));
-	     Cil.zero ~loc;
-	     Cil.zero ~loc;
-	     Cil.mkAddrOf ~loc elv ])
+	  [ ev; 
+	    Cil.one ~loc; 
+	    Cil.one ~loc; 
+	    Cil.sizeOf ~loc (TInt(IULongLong, []));
+	    Cil.zero ~loc;
+	    Cil.zero ~loc;
+	    Cil.mkAddrOf ~loc elv ]
       in
       Cil.mkStmt
 	~valid_sid:true
@@ -95,8 +94,8 @@ let init_set ?loc lv ev e =
   | Longlong ILongLong ->
     Error.not_yet "long long requiring GMP"
 
-let affect ?loc lv ev e = 
-  try generic_affect ?loc "__gmpz_set" lv ev e
+let affect ~loc lv ev e = 
+  try generic_affect ~loc "__gmpz_set" lv ev e
   with Longlong _ ->
     Error.not_yet "quantification over long long and requiring GMP"
 

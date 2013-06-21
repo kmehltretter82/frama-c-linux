@@ -172,7 +172,7 @@ class e_acsl_visitor prj generate = object (self)
 		      let e, env = self#literal_string env e in
 		      let stmt = 
 			Cil.mkStmtOneInstr ~valid_sid:true
-			  (Set(Cil.var new_vi, e, Location.unknown))
+			  (Set(Cil.var new_vi, e, e.eloc))
 		      in
 		      model (stmt :: stmts), env)
 		  global_vars
@@ -388,15 +388,16 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       inherit Cil.genericCilVisitor (Cil.copy_visit (Project.current ()))
       method vexpr e = match e.enode with
       | Const(CStr s) ->
+	let loc = e.eloc in
 	let _, exp, env = 
 	  Env.new_var
+	    ~loc
 	    ~global:true
 	    ~name:"literal_string"
 	    env
 	    None
 	    Cil.charPtrType
 	    (fun vi _ -> 
-	      let loc = e.eloc in
 	      let str_size = Cil.new_exp loc (SizeOfStr s) in
 	      [ Cil.mkStmtOneInstr 
 		  ~valid_sid:true (Set(Cil.var vi, e, loc));

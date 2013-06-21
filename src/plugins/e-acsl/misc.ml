@@ -49,7 +49,7 @@ let reset () = Datatype.String.Hashtbl.clear library_functions
 (** {2 Builders} *)
 (* ************************************************************************** *)
 
-let mk_call ?(loc=Location.unknown) ?result fname args =
+let mk_call ~loc ?result fname args =
   let vi =  
     try Datatype.String.Hashtbl.find library_functions fname 
     with Not_found -> Options.fatal "unregistered library function `%s'" fname
@@ -164,7 +164,7 @@ let mk_debug_mmodel_stmt stmt =
   if Options.debug_atleast 1
     && Options.is_debug_key_enabled Options.dkey_analysis 
   then
-    let debug = mk_call "__e_acsl_memory_debug" [] in
+    let debug = mk_call ~loc:(Stmt.loc stmt) "__e_acsl_memory_debug" [] in
     Cil.mkStmt ~valid_sid:true (Block (Cil.mkBlock [ stmt; debug]))
   else 
     stmt

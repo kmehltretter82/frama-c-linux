@@ -36,7 +36,7 @@ val dummy: t
 val empty: Visitor.frama_c_visitor -> t
 
 val new_var:
-  ?loc:location -> ?init:bool -> ?global:bool -> ?name:string -> 
+  loc:location -> ?init:bool -> ?global:bool -> ?name:string -> 
   t -> term option -> typ -> 
   (varinfo -> exp (* the var as exp *) -> stmt list) -> 
   varinfo * exp * t
@@ -48,7 +48,7 @@ val new_var:
     initialized by applying it to [mk_stmts]. *)
 
 val new_var_and_mpz_init:
-  ?loc:location -> ?init:bool -> ?global:bool -> ?name:string -> 
+  loc:location -> ?init:bool -> ?global:bool -> ?name:string -> 
   t -> term option -> 
   (varinfo -> exp (* the var as exp *) -> stmt list) -> 
   varinfo * exp * t

@@ -35,17 +35,17 @@ val is_now_referenced: unit -> unit
 val is_t: typ -> bool 
   (** is the type equal to "mpz_t"? *)
 
-val init: ?loc:location -> exp -> stmt
+val init: loc:location -> exp -> stmt
   (** build stmt "mpz_init(v)" *)
 
-val init_set: ?loc:location -> lval -> exp -> exp -> stmt
+val init_set: loc:location -> lval -> exp -> exp -> stmt
 (** [init_set x_as_lv x_as_exp e] builds stmt [x = e] or [mpz_init_set*(v, e)]
     with the good function 'set' according to the type of e *)
 
-val clear: ?loc:location -> exp -> stmt
+val clear: loc:location -> exp -> stmt
 (** build stmt "mpz_clear(v)" *)
 
-val affect: ?loc:location -> lval -> exp -> exp -> stmt
+val affect: loc:location -> lval -> exp -> exp -> stmt
 (** [affect x_as_lv x_as_exp e] builds stmt [x = e] or [mpz_set*(e)] with the
     good function 'set' according to the type of e *)
 
