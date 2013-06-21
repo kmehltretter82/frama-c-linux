@@ -34,7 +34,7 @@ share/e-acsl/e_acsl_gmp.h:91:[value] Function __gmpz_set: precondition got statu
 share/e-acsl/e_acsl_gmp.h:92:[value] Function __gmpz_set: precondition got status valid.
 [value] using specification for function __gmpz_clear
 share/e-acsl/e_acsl_gmp.h:114:[value] Function __gmpz_clear: precondition got status valid.
-:0:[value] entering loop for the first time
+tests/e-acsl-runtime/bts1324.i:8:[value] entering loop for the first time
 [value] using specification for function __gmpz_cmp
 share/e-acsl/e_acsl_gmp.h:124:[value] Function __gmpz_cmp: precondition got status valid.
 share/e-acsl/e_acsl_gmp.h:125:[value] Function __gmpz_cmp: precondition got status valid.

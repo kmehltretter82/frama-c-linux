@@ -18,10 +18,11 @@
 [value] using specification for function __store_block
 [value] using specification for function __full_init
 [value] using specification for function __literal_string
-:0:[value] entering loop for the first time
+tests/e-acsl-runtime/bts1390.c:15:[value] entering loop for the first time
 [value] using specification for function __valid_read
 [value] using specification for function e_acsl_assert
 share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
+tests/e-acsl-runtime/bts1390.c:11:[value] entering loop for the first time
 tests/e-acsl-runtime/bts1390.c:20:[value] entering loop for the first time
 [value] using specification for function __delete_block
 tests/e-acsl-runtime/bts1390.c:13:[value] Function memchr, behavior exists: postcondition got status valid. (Behavior may be inactive, no reduction performed.)

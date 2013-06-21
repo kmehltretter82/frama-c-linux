@@ -581,9 +581,9 @@ and named_predicate_content_to_exp ?name kf env p =
   | Pforall _ | Pexists _ -> Quantif.quantif_to_exp kf env p
   | Pat(p, LogicLabel(_, label)) when label = "Here" -> 
     named_predicate_to_exp kf env p
-  | Pat(p, label) -> 
+  | Pat(p', label) -> 
     (* convert [t'] to [e] in a separated local env *)
-    let e, env = named_predicate_to_exp kf (Env.push env) p in
+    let e, env = named_predicate_to_exp kf (Env.push env) p' in
     let e, env, is_string = at_to_exp env None label e in
     assert (not is_string);
     e, env
@@ -693,7 +693,10 @@ let predicate_to_exp kf p =
 
 let assumes_predicate bhv =
   List.fold_left
-    (fun acc p -> Logic_const.pand (acc, Logic_const.unamed p.ip_content))
+    (fun acc p -> 
+      Logic_const.pand
+	~loc:p.ip_loc
+	(acc, Logic_const.unamed ~loc:p.ip_loc p.ip_content))
     Logic_const.ptrue
     bhv.b_assumes
 

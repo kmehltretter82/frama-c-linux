@@ -22,7 +22,8 @@ tests/e-acsl-runtime/linear_search.i:9:[value] entering loop for the first time
 [value] using specification for function e_acsl_assert
 share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
 share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
-:0:[value] entering loop for the first time
+tests/e-acsl-runtime/linear_search.i:14:[value] entering loop for the first time
+tests/e-acsl-runtime/linear_search.i:11:[value] entering loop for the first time
 tests/e-acsl-runtime/linear_search.i:9:[value] Function search: precondition got status unknown.
 tests/e-acsl-runtime/linear_search.i:19:[value] Loop invariant got status valid.
 tests/e-acsl-runtime/linear_search.i:20:[value] Loop invariant got status unknown.

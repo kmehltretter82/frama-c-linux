@@ -21,7 +21,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Cil_datatype
 
 let t_torig_ref =
   ref 
@@ -59,7 +58,7 @@ let get_set_suffix_and_arg e =
     | TPtr(TInt(IChar, _), _) ->
       "_str",
       (* decimal base for the number given as string *)
-      [ e; Cil.integer ~loc:Location.unknown 10 ]
+      [ e; Cil.integer ~loc:e.eloc 10 ]
     | _ -> assert false
 
 let generic_affect ~loc fname lv ev e =
