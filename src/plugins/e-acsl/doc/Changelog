@@ -15,6 +15,7 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
+-* E-ACSL       [2013/06/26] Fix crash with typedef on pointer types.
 -  E-ACSL       [2013/06/21] Fewer unknown locations.
 -* E-ACSL       [2013/06/18] Fixed bug when generating RTEs on the E-ACSL
 	        generated project.

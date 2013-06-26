@@ -453,7 +453,7 @@ and mmodel_call_with_size ~loc kf name ctx env t =
       None
       ctx
       (fun v _ ->
-	let sizeof = match typ with 
+	let sizeof = match Cil.unrollType typ with 
 	  | TPtr (t', _) -> Cil.new_exp ~loc (SizeOf t')
 	  | _ -> assert false
 	in
