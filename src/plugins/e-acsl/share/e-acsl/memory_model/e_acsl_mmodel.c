@@ -28,6 +28,26 @@
 #include "e_acsl_mmodel_api.h"
 #include "e_acsl_mmodel.h"
 
+
+#define WARNING 0
+#define ERROR 1
+#define IGNORE 2
+
+
+#ifdef E_ACSL_WARNING
+int __warning_level = E_ACSL_WARNING;
+#else
+int __warning_level = WARNING;
+#endif
+
+
+void __warning(const char* fct_name) {
+  fprintf(stderr,
+	  "warning: E_ACSL function '%s' called with null pointer\n", fct_name);
+}
+
+
+
 size_t __memory_size = 0;
 /*unsigned cpt_store_block = 0;*/
 
@@ -178,10 +198,21 @@ void* __calloc(size_t nbr_block, size_t size_block) {
 void __initialize (void * ptr, size_t size) {
   struct _block * tmp;
   unsigned i;
-  assert(ptr != NULL);
+
+  if(ptr == NULL) {
+    if(__warning_level == ERROR) assert(0);
+    else if(__warning_level == IGNORE) return;
+    else { __warning("initialize"); return; }
+  }
+  
   assert(size > 0);
   tmp = __get_cont(ptr);
-  assert(tmp != NULL);
+
+  if(tmp == NULL) {
+    if(__warning_level == ERROR) assert(0);
+    else if(__warning_level == IGNORE) return;
+    else { __warning("initialize"); return; }
+  }
   
   /* already fully initialized, do nothing */
   if(tmp->init_cpt == tmp->size) return;
@@ -211,9 +242,20 @@ void __initialize (void * ptr, size_t size) {
 /* mark all bytes of ptr as initialized */
 void __full_init (void * ptr) {
   struct _block * tmp;
-  assert(ptr != NULL);
+
+  if(ptr == NULL) {
+    if(__warning_level == ERROR) assert(0);
+    else if(__warning_level == IGNORE) return;
+    else { __warning("full_init"); return; }
+  }
+
   tmp = __get_exact(ptr);
-  assert(tmp != NULL);
+  
+  if(tmp == NULL) {
+    if(__warning_level == ERROR) assert(0);
+    else if(__warning_level == IGNORE) return;
+    else { __warning("full_init"); return; }
+  }
 
   if (tmp->init_ptr != NULL) {
     free(tmp->init_ptr);
@@ -226,9 +268,21 @@ void __full_init (void * ptr) {
 /* mark a block as litteral string */
 void __literal_string (void * ptr) {
   struct _block * tmp;
-  assert(ptr != NULL);
+
+  if(ptr == NULL) {
+    if(__warning_level == ERROR) assert(0);
+    else if(__warning_level == IGNORE) return;
+    else { __warning("literal_string"); return; }
+  }
+
   tmp = __get_exact(ptr);
-  assert(tmp != NULL);
+  
+  if(tmp == NULL) {
+    if(__warning_level == ERROR) assert(0);
+    else if(__warning_level == IGNORE) return;
+    else { __warning("literal_string"); return; }
+  }
+
   tmp->is_litteral_string = true;
 }
 
@@ -269,14 +323,10 @@ size_t __block_length(void* ptr) {
 /* return whether the size bytes of ptr are readable/writable */
 int __valid(void* ptr, size_t size) {
   struct _block * tmp;
-  /*printf("ptr = %p\n", ptr);
-    printf("size = %i\n", size);*/
   if(ptr == NULL)
     return false;
   assert(size > 0);
   tmp = __get_cont(ptr);
-  /*printf("tmp->ptr = %p\n", tmp->ptr);
-    printf("tmp->size = %i\n", tmp->size);*/
   return (tmp == NULL) ?
     false : ( tmp->size - ( (size_t)ptr - tmp->ptr ) >= size
 	      && !tmp->is_litteral_string && !tmp->is_out_of_bound);
@@ -365,7 +415,6 @@ void __clean_block (struct _block * ptr) {
 /* erase the content of the abstract structure */
 void __e_acsl_memory_clean() {
   __clean_struct();
-  /*printf("%i &\n", cpt_store_block);*/
 }
 
 /**********************/
