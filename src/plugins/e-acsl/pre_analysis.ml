@@ -65,12 +65,12 @@ module Env: sig
   val is_empty: unit -> bool
 end = struct
 
-  let current_kf = ref (Kernel_function.dummy ())
+  let current_kf = ref None
   let default_varinfos = function None -> Varinfo.Hptset.empty | Some s -> s 
 
   let apply f kf =
     let old = !current_kf in
-    current_kf := kf;
+    current_kf := Some kf;
     let res = f kf in
     current_kf := old;
     res
@@ -101,7 +101,8 @@ end = struct
     type data = Varinfo.Hptset.t option
     let apply f = 
       try
-	let h =  Kernel_function.Hashtbl.find tbl !current_kf in
+        let kf = Extlib.opt_conv (Kernel_function.dummy()) !current_kf in
+	let h = Kernel_function.Hashtbl.find tbl kf in
 	f h
       with Not_found -> 
 	assert false

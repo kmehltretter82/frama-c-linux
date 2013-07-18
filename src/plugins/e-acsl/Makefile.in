@@ -219,10 +219,16 @@ include $(FRAMAC_SHARE)/Makefile.dynamic
 
 ifeq (@MAY_RUN_TESTS@,yes)
 
+ifeq ($(FRAMAC_INTERNAL),yes)
+E_ACSL_SHARE=-e-acsl-share ./share/e-acsl
+else
+E_ACSL_SHARE=
+endif
+
 $(E_ACSL_DIR)/tests/test_config: $(E_ACSL_DIR)/tests/test_config.in \
 				$(E_ACSL_DIR)/Makefile
 	$(PRINT_MAKING) $@
-	$(SED) -e "s|@SHARE@|-e-acsl-share $(E_ACSL_DIR)/share/e-acsl|g" \
+	$(SED) -e "s|@SHARE@|$(E_ACSL_SHARE)|g" \
 	       -e "s|@SEDCMD@|`which sed `|g" $< > $@
 
 endif

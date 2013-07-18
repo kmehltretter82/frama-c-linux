@@ -85,15 +85,10 @@ MAY_RUN_TESTS=yes
 # C compiler and stdio.h
 #########################
 
-AC_CHECK_HEADER(stdio.h,HAVE_STDIO_H=yes,)
+AC_CHECK_HEADERS([stdio.h],[HAVE_STDIO_H=yes],)
 
 # not sure it can actually happens:
 # look like the configure stops on error if no C compiler detected
-if test -z $CC; then
-  MAY_RUN_TESTS=no
-  AC_MSG_WARN([no C compiler: non-regression tests unavailable.])
-else
-
 if test -z $HAVE_STDIO_H; then
   MAY_RUN_TESTS=no
   AC_MSG_WARN([stdio.h missing: non-regression tests unavailable.])
@@ -108,8 +103,6 @@ if test -z $HAVE_GMP; then
   MAY_RUN_TESTS=no
   AC_MSG_WARN([GMP library missing: non-regression tests unavailable.])
 fi
-
-fi # testing $CC
 
 #######################
 # Generating Makefile #
