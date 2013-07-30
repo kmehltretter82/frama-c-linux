@@ -41,7 +41,7 @@ tests/e-acsl-runtime/bts1390.c:16:[value] Function __e_acsl_memchr, behavior not
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function memchr:
   i ∈ {0; 1; 2; 3; 4}
-  s ∈ {{ "toto" + {0; 1} ; "toto" + [0..15] }}
+  s ∈ {{ "toto" + {0; 1} ; "toto" + [0..--] }}
   __retres ∈ {{ NULL ; "toto" + {1} }}
 [value] Values at end of function __e_acsl_memchr:
   __retres ∈ {{ NULL ; "toto" + {1} }}

@@ -62,7 +62,7 @@ share/e-acsl/memory_model/e_acsl_mmodel.h:107:[value] Function __initialized: po
 share/e-acsl/memory_model/e_acsl_mmodel.h:108:[value] Function __initialized: postcondition got status unknown.
 [value] using specification for function __gmpz_clear
 share/e-acsl/e_acsl_gmp.h:114:[value] Function __gmpz_clear: precondition got status valid.
-FRAMAC_SHARE/libc/stdlib.h:142:[value] Function __e_acsl_free, behavior deallocation: precondition got status unknown.
+FRAMAC_SHARE/libc/stdlib.h:142:[value] Function __e_acsl_free, behavior deallocation: precondition 'freeable' got status unknown.
 FRAMAC_SHARE/libc/stdlib.h:144:[value] Function __e_acsl_free, behavior deallocation: postcondition got status unknown.
 [kernel] warning: Neither code nor specification for function __e_acsl_memory_clean, generating default assigns from the prototype
 [value] using specification for function __e_acsl_memory_clean

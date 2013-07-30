@@ -65,7 +65,7 @@ extern void *__malloc(size_t size);
     
     behavior deallocation:
       assumes p ≢ \null;
-      requires \freeable(p);
+      requires freeable: \freeable(p);
       ensures \allocable(\old(p));
       assigns __fc_heap_status;
       assigns __fc_heap_status \from __fc_heap_status;
@@ -146,7 +146,7 @@ void *__e_acsl_malloc(size_t size)
     
     behavior deallocation:
       assumes p ≢ \null;
-      requires \freeable(p);
+      requires freeable: \freeable(p);
       ensures \allocable(\old(p));
       assigns __fc_heap_status;
       assigns __fc_heap_status \from __fc_heap_status;

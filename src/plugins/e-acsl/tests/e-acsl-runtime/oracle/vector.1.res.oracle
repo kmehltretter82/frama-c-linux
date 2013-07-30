@@ -43,7 +43,7 @@ tests/e-acsl-runtime/vector.c:16:[value] entering loop for the first time
 tests/e-acsl-runtime/vector.c:29:[value] Assertion got status unknown.
 tests/e-acsl-runtime/vector.c:30:[value] Assertion got status unknown.
 tests/e-acsl-runtime/vector.c:30:[kernel] warning: accessing uninitialized left-value: assert \initialized(&LAST);
-FRAMAC_SHARE/libc/stdlib.h:142:[value] Function __e_acsl_free, behavior deallocation: precondition got status unknown.
+FRAMAC_SHARE/libc/stdlib.h:142:[value] Function __e_acsl_free, behavior deallocation: precondition 'freeable' got status unknown.
 FRAMAC_SHARE/libc/stdlib.h:144:[value] Function __e_acsl_free, behavior deallocation: postcondition got status unknown.
 [kernel] warning: Neither code nor specification for function __e_acsl_memory_clean, generating default assigns from the prototype
 [value] using specification for function __e_acsl_memory_clean

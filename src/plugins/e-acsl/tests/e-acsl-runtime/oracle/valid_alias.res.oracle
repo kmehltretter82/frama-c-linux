@@ -60,7 +60,7 @@ share/e-acsl/e_acsl_gmp.h:124:[value] Function __gmpz_cmp: precondition got stat
 share/e-acsl/e_acsl_gmp.h:125:[value] Function __gmpz_cmp: precondition got status valid.
 [value] using specification for function __gmpz_clear
 share/e-acsl/e_acsl_gmp.h:114:[value] Function __gmpz_clear: precondition got status valid.
-FRAMAC_SHARE/libc/stdlib.h:142:[value] Function __e_acsl_free, behavior deallocation: precondition got status unknown.
+FRAMAC_SHARE/libc/stdlib.h:142:[value] Function __e_acsl_free, behavior deallocation: precondition 'freeable' got status unknown.
 FRAMAC_SHARE/libc/stdlib.h:144:[value] Function __e_acsl_free, behavior deallocation: postcondition got status unknown.
 tests/e-acsl-runtime/valid_alias.c:19:[value] Assertion got status valid.
 tests/e-acsl-runtime/valid_alias.c:19:[kernel] warning: accessing left-value that contains escaping addresses; assert(\defined(&a))

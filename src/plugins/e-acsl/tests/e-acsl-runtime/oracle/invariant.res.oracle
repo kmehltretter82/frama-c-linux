@@ -22,5 +22,5 @@ tests/e-acsl-runtime/invariant.i:10:[kernel] warning: signed overflow. assert x+
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function main:
-  x ∈ [--..--]
+  x ∈ [0..2147483647]
   __retres ∈ {0}
