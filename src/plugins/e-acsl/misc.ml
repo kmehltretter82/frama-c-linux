@@ -51,8 +51,10 @@ let reset () = Datatype.String.Hashtbl.clear library_functions
 
 let mk_call ~loc ?result fname args =
   let vi =  
-    try Datatype.String.Hashtbl.find library_functions fname 
-    with Not_found -> Options.fatal "unregistered library function `%s'" fname
+    try 
+      Datatype.String.Hashtbl.find library_functions (Filepath.normalize fname)
+    with Not_found -> 
+      Options.fatal "unregistered library function `%s'" fname
   in
   let f = Cil.evar ~loc vi in
   vi.vreferenced <- true;

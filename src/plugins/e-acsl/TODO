@@ -67,9 +67,15 @@
 - interprétation des tableaux logiques
 [Dillon] Windows
 
+[to be check]: no call to full_init or initialize for the assigned result of a 
+function call
+
 #######
 # DOC #
 #######
+
+- E_ACSL_MACHDEP with gcc -D
+- check of runtime error in combination with RTE
 
 #########
 # TESTS #
