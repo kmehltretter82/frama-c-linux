@@ -27,9 +27,9 @@ open Cil_datatype
 (** {2 Handling the E-ACSL's C-libraries, part I} *)
 (* ************************************************************************** *)
 
-let library_files () =       
+let library_files () =
   List.map
-    (fun d -> Filepath.normalize (Options.Share.file ~error:true d))
+    (fun d -> (*Filepath.normalize*) (Options.Share.file ~error:true d))
     [ "e_acsl.h";
       "e_acsl_gmp_types.h";
       "e_acsl_gmp.h";
@@ -37,7 +37,11 @@ let library_files () =
       "memory_model/e_acsl_bittree.h";
       "memory_model/e_acsl_mmodel.h" ]
 
-let is_library_loc (loc, _) = List.mem loc.Lexing.pos_fname (library_files ())
+let normalized_library_files = 
+  lazy (List.map Filepath.normalize (library_files ()))
+
+let is_library_loc (loc, _) = 
+  List.mem loc.Lexing.pos_fname (Lazy.force normalized_library_files)
 
 let library_functions = Datatype.String.Hashtbl.create 17
 let register_library_function vi = 
@@ -51,10 +55,8 @@ let reset () = Datatype.String.Hashtbl.clear library_functions
 
 let mk_call ~loc ?result fname args =
   let vi =  
-    try 
-      Datatype.String.Hashtbl.find library_functions (Filepath.normalize fname)
-    with Not_found -> 
-      Options.fatal "unregistered library function `%s'" fname
+    try Datatype.String.Hashtbl.find library_functions fname
+    with Not_found -> Options.fatal "unregistered library function `%s'" fname
   in
   let f = Cil.evar ~loc vi in
   vi.vreferenced <- true;
