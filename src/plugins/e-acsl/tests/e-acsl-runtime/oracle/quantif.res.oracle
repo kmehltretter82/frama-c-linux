@@ -1,9 +1,9 @@
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/e_acsl.h"
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/e_acsl_gmp_types.h"
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/e_acsl_gmp.h"
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_mmodel_api.h"
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_bittree.h"
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_mmodel.h"
+[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/e_acsl.h"
+[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/e_acsl_gmp_types.h"
+[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/e_acsl_gmp.h"
+[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel_api.h"
+[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/memory_model/e_acsl_bittree.h"
+[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h"
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
 [value] Analyzing a complete application starting at main
@@ -17,7 +17,7 @@
 tests/e-acsl-runtime/quantif.i:11:[value] Assertion got status unknown.
 tests/e-acsl-runtime/quantif.i:11:[value] entering loop for the first time
 [value] using specification for function e_acsl_assert
-share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
 tests/e-acsl-runtime/quantif.i:12:[value] Assertion got status unknown.
 tests/e-acsl-runtime/quantif.i:12:[value] entering loop for the first time
 tests/e-acsl-runtime/quantif.i:13:[value] Assertion got status unknown.
@@ -26,7 +26,7 @@ tests/e-acsl-runtime/quantif.i:14:[value] Assertion got status unknown.
 tests/e-acsl-runtime/quantif.i:14:[value] entering loop for the first time
 tests/e-acsl-runtime/quantif.i:18:[value] Assertion got status unknown.
 tests/e-acsl-runtime/quantif.i:18:[value] entering loop for the first time
-share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
 tests/e-acsl-runtime/quantif.i:23:[value] Assertion got status unknown.
 tests/e-acsl-runtime/quantif.i:23:[value] entering loop for the first time
 tests/e-acsl-runtime/quantif.i:27:[value] Assertion got status unknown.

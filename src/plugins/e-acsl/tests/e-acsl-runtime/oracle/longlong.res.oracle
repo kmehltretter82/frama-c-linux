@@ -1,9 +1,9 @@
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/e_acsl.h"
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/e_acsl_gmp_types.h"
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/e_acsl_gmp.h"
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_mmodel_api.h"
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_bittree.h"
-[kernel] preprocessing with "gcc -C -E -I. -I./share/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc share/e-acsl/memory_model/e_acsl_mmodel.h"
+[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/e_acsl.h"
+[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/e_acsl_gmp_types.h"
+[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/e_acsl_gmp.h"
+[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel_api.h"
+[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/memory_model/e_acsl_bittree.h"
+[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h"
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
 [value] Analyzing a complete application starting at main
@@ -23,36 +23,36 @@ tests/e-acsl-runtime/longlong.i:11:[value] warning: recursive call during value 
 tests/e-acsl-runtime/longlong.i:12:[kernel] warning: signed overflow. assert -2147483648 ≤ tmp*tmp ≤ 2147483647;
 tests/e-acsl-runtime/longlong.i:19:[value] Assertion got status valid.
 [value] using specification for function __gmpz_init_set_si
-share/e-acsl/e_acsl_gmp.h:62:[value] Function __gmpz_init_set_si: precondition got status valid.
-share/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: postcondition got status valid.
-share/e-acsl/e_acsl_gmp.h:65:[value] Function __gmpz_init_set_si: postcondition got status unknown.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:62:[value] Function __gmpz_init_set_si: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: postcondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:65:[value] Function __gmpz_init_set_si: postcondition got status unknown.
 [value] using specification for function __gmpz_init
-share/e-acsl/e_acsl_gmp.h:37:[value] Function __gmpz_init: precondition got status valid.
-share/e-acsl/e_acsl_gmp.h:38:[value] Function __gmpz_init: postcondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:37:[value] Function __gmpz_init: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:38:[value] Function __gmpz_init: postcondition got status valid.
 [value] using specification for function __gmpz_import
-share/e-acsl/e_acsl_gmp.h:79:[value] Function __gmpz_import: precondition got status unknown.
-share/e-acsl/e_acsl_gmp.h:81:[value] Function __gmpz_import: postcondition got status valid.
-share/e-acsl/e_acsl_gmp.h:82:[value] Function __gmpz_import: postcondition got status unknown.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:79:[value] Function __gmpz_import: precondition got status unknown.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:81:[value] Function __gmpz_import: postcondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:82:[value] Function __gmpz_import: postcondition got status unknown.
 [value] using specification for function __gmpz_mul
-share/e-acsl/e_acsl_gmp.h:154:[value] Function __gmpz_mul: precondition got status valid.
-share/e-acsl/e_acsl_gmp.h:155:[value] Function __gmpz_mul: precondition got status valid.
-share/e-acsl/e_acsl_gmp.h:156:[value] Function __gmpz_mul: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:154:[value] Function __gmpz_mul: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:155:[value] Function __gmpz_mul: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:156:[value] Function __gmpz_mul: precondition got status valid.
 [value] using specification for function __gmpz_add
-share/e-acsl/e_acsl_gmp.h:140:[value] Function __gmpz_add: precondition got status valid.
-share/e-acsl/e_acsl_gmp.h:141:[value] Function __gmpz_add: precondition got status valid.
-share/e-acsl/e_acsl_gmp.h:142:[value] Function __gmpz_add: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:140:[value] Function __gmpz_add: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:141:[value] Function __gmpz_add: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:142:[value] Function __gmpz_add: precondition got status valid.
 [value] using specification for function __gmpz_cmp
-share/e-acsl/e_acsl_gmp.h:124:[value] Function __gmpz_cmp: precondition got status valid.
-share/e-acsl/e_acsl_gmp.h:125:[value] Function __gmpz_cmp: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:124:[value] Function __gmpz_cmp: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:125:[value] Function __gmpz_cmp: precondition got status valid.
 tests/e-acsl-runtime/longlong.i:19:[value] Assertion 'E_ACSL' got status valid.
 [value] using specification for function e_acsl_assert
-share/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_tdiv_r
-share/e-acsl/e_acsl_gmp.h:168:[value] Function __gmpz_tdiv_r: precondition got status valid.
-share/e-acsl/e_acsl_gmp.h:169:[value] Function __gmpz_tdiv_r: precondition got status valid.
-share/e-acsl/e_acsl_gmp.h:170:[value] Function __gmpz_tdiv_r: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:168:[value] Function __gmpz_tdiv_r: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:169:[value] Function __gmpz_tdiv_r: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:170:[value] Function __gmpz_tdiv_r: precondition got status valid.
 [value] using specification for function __gmpz_clear
-share/e-acsl/e_acsl_gmp.h:114:[value] Function __gmpz_clear: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:114:[value] Function __gmpz_clear: precondition got status valid.
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 tests/e-acsl-runtime/longlong.i:11:[inout] warning: During inout context analysis of my_pow:
