@@ -93,12 +93,13 @@ int main(void)
     read_sensor_4((unsigned int *)(buf) + i);
     i ++;
   }
-  /*@ assert \initialized((union msg *)buf); */
+  /*@ assert \initialized((union msg *)((unsigned char *)buf)); */
   {
     int __e_acsl_initialized;
     __e_acsl_initialized = __initialized((void *)(buf),sizeof(union msg));
     e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"main",
-                  (char *)"\\initialized((union msg *)buf)",25);
+                  (char *)"\\initialized((union msg *)((unsigned char *)buf))",
+                  25);
   }
   __retres = 0;
   __delete_block((void *)(buf));

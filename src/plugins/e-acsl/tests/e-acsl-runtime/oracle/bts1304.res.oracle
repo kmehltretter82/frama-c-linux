@@ -21,7 +21,7 @@ tests/e-acsl-runtime/bts1304.i:23:[value] entering loop for the first time
 tests/e-acsl-runtime/bts1304.i:25:[value] Assertion got status unknown.
 [value] using specification for function __initialized
 FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:107:[value] Function __initialized: postcondition got status unknown.
-FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:108:[value] Function __initialized: postcondition got status unknown.
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:108:[value] Function __initialized: postcondition got status valid.
 [value] using specification for function e_acsl_assert
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
 [kernel] warning: Neither code nor specification for function __e_acsl_memory_clean, generating default assigns from the prototype
@@ -31,7 +31,6 @@ FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got
 [value] Values at end of function read_sensor_4:
   buf[0..11] ∈ {0} or UNINITIALIZED
 [value] Values at end of function main:
-  buf[0] ∈ {0}
-     [1..11] ∈ {0} or UNINITIALIZED
+  buf[0..11] ∈ {0}
   i ∈ {3}
   __retres ∈ {0}
