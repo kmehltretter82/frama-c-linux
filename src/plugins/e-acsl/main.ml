@@ -43,7 +43,11 @@ let check =
     (Datatype.func Datatype.unit Datatype.bool)
     check
 
-let extended_ast_project: Project.t option ref = ref None
+type extended_project =
+  | To_be_extended
+  | Already_extended of Project.t option (* None = keep the current project *)
+
+let extended_ast_project: extended_project ref = ref To_be_extended
 
 let unmemoized_extend_ast () =
   let extend () =
@@ -89,27 +93,34 @@ E-ACSL is going to work on a copy.";
 	Kernel.Files.set [ tmpfile ];
 	extend ())
       ();
-    prj
+    Some prj
   end else begin
     extend ();
-    Project.current ()
+    None
   end
 
 let extend_ast () = match !extended_ast_project with
-  | None -> 
+  | To_be_extended -> 
     let prj = unmemoized_extend_ast () in
-    extended_ast_project := Some prj;
-    prj
-  | Some prj ->
+    extended_ast_project := Already_extended prj;
+    (match prj with
+    | None -> Project.current ()
+    | Some prj -> prj)
+  | Already_extended None ->
+    Project.current ()
+  | Already_extended(Some prj) ->
     prj
 
 let apply_on_e_acsl_ast f x =
   let tmp_prj = extend_ast () in
   let res = Project.on tmp_prj f x in
-  if not (Project.equal tmp_prj (Project.current ())) then begin
-    extended_ast_project := None;
-    Project.remove ~project:tmp_prj ()
-  end;
+  (match !extended_ast_project with
+  | To_be_extended -> assert false
+  | Already_extended None -> ()
+  | Already_extended (Some prj) ->
+    assert (Project.equal prj tmp_prj);
+    extended_ast_project := To_be_extended;
+    Project.remove ~project:tmp_prj ());
   res
 
 module Resulting_projects =

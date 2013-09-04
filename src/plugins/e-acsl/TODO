@@ -19,6 +19,7 @@
 - loop invariant
 - loop variant
 - grep "not_yet" *.ml
+- logical shift (at least in non GMP mode)
 
 ########
 # CODE #
@@ -84,3 +85,4 @@ function call
 - inclure exemple du E-ACSL Reference Manual
 - inclure exemple du E-ACSL User Manual
 - test arith.i: mettre les exemples du ACSL manual about div and modulo
+- currently, tests require a non-free version of Frama-C
