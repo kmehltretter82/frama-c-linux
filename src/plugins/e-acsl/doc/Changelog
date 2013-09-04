@@ -15,6 +15,8 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
+-* E-ACSL       [2013/09/04] Fix bug when monitored global variables have
+	        initializers (bts #1478).
 -* E-ACSL       [2013/09/04] Fix bug when mixing -e-acsl-prepare and
 	        running E-ACSL in another project (bts #!1473).
 -* E-ACSL       [2013/06/26] Fix crash with typedef on pointer types.

@@ -203,6 +203,67 @@ module rec Transfer
     let ty = Cil.typeOf e in
     is_ptr_or_array ty
 
+  let rec base_addr_node = function
+    | Lval lv | AddrOf lv | StartOf lv -> 
+      (match lv with
+      | Var vi, _ -> Some vi
+      | Mem e, _ -> base_addr e)
+    | BinOp((PlusPI | IndexPI | MinusPI), e1, e2, _) -> 
+      if is_ptr_or_array_exp e1 then base_addr e1
+      else begin
+	assert (is_ptr_or_array_exp e2);
+	base_addr e2
+      end
+    | Info(e, _) | CastE(_, e) -> base_addr e
+    | BinOp((MinusPP | PlusA | MinusA | Mult | Div | Mod |Shiftlt | Shiftrt 
+		| Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr),
+	    _, _, _)
+    | UnOp _ | Const _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ 
+    | AlignOfE _ -> 
+      None
+
+  and base_addr e = base_addr_node e.enode
+
+  let extend_to_expr always state lhost e =
+    let add_vi state vi =
+      if is_ptr_or_array_exp e && (always || Varinfo.Hptset.mem vi state) then 
+	match base_addr e with
+	| None -> state
+	| Some vi_e -> 
+	  Options.feedback ~level:4 ~dkey
+	    "monitoring %a from %a."
+	    Printer.pp_varinfo vi_e
+	    Printer.pp_lval (lhost, NoOffset);
+	  Varinfo.Hptset.add vi_e state
+      else 
+	state
+    in
+    match lhost with
+    | Var vi -> add_vi state vi
+    | Mem e -> 
+      match base_addr e with
+      | None -> Kernel.fatal "no base address for %a" Printer.pp_exp e
+      | Some vi -> add_vi state vi
+
+  (* if [e] contains an address from a base, then also monitor the host *)
+  let rec extend_from_addr state lv e = match e.enode with
+    | AddrOf(lhost, _) -> 
+      extend_to_expr true state lhost (Cil.new_exp ~loc:e.eloc (Lval lv)),
+      true
+    | BinOp((PlusPI | IndexPI | MinusPI), e1, e2, _) -> 
+      if is_ptr_or_array_exp e1 then extend_from_addr state lv e1
+      else begin
+	assert (is_ptr_or_array_exp e2);
+	extend_from_addr state lv e2
+      end
+    | CastE(_, e) | Info(e, _) -> extend_from_addr state lv e
+    | _ -> state, false
+
+  let handle_assignment state (lhost, _ as lv) e =
+      (* if [e] contains an address from a base, then also monitor the host *)
+    let state, always = extend_from_addr state lv e in
+    extend_to_expr always state lhost e
+
   let rec register_term_lval kf varinfos (thost, _) = 
     let add_vi kf vi =
       Options.feedback ~level:4 ~dkey "monitoring %a from annotation of %a." 
@@ -309,6 +370,18 @@ module rec Transfer
       ();
     !state_ref
 
+  let register_initializers state =
+    let rec do_init vi init state = match init with
+      | SingleInit e -> handle_assignment state (Var vi, NoOffset) e
+      | CompoundInit(_, l) -> 
+	List.fold_left (fun state (_, init) -> do_init vi init state) state l
+    in
+    let do_one vi init state = match init.init with 
+      | None -> state
+      | Some init -> do_init vi init state
+    in
+    Globals.Vars.fold_in_file_order do_one state
+
   (** The (backwards) transfer function for a branch. The [(Cil.CurrentLoc.get
       ())] is set before calling this. If it returns None, then we have some
       default handling. Otherwise, the returned data is the data before the
@@ -358,28 +431,18 @@ module rec Transfer
 	  else 
 	    state
 	in
+	let state =
+	  (* take initializers into account *)
+	  if is_first then
+	    let main, lib = Globals.entry_point () in
+	    if Kernel_function.equal kf main && not lib then 
+	      register_initializers state
+	    else
+	      state
+	  else
+	    state
+	in
 	Some state)
-
-  let rec base_addr_node = function
-    | Lval lv | AddrOf lv | StartOf lv -> 
-      (match lv with
-      | Var vi, _ -> Some vi
-      | Mem e, _ -> base_addr e)
-    | BinOp((PlusPI | IndexPI | MinusPI), e1, e2, _) -> 
-      if is_ptr_or_array_exp e1 then base_addr e1
-      else begin
-	assert (is_ptr_or_array_exp e2);
-	base_addr e2
-      end
-    | Info(e, _) | CastE(_, e) -> base_addr e
-    | BinOp((MinusPP | PlusA | MinusA | Mult | Div | Mod |Shiftlt | Shiftrt 
-		| Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr),
-	    _, _, _)
-    | UnOp _ | Const _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ 
-    | AlignOfE _ -> 
-      None
-
-  and base_addr e = base_addr_node e.enode
 
   (** The (backwards) transfer function for an instruction. The
       [(Cil.CurrentLoc.get ())] is set before calling this. If it returns
@@ -387,46 +450,10 @@ module rec Transfer
       the data before the branch (not considering the exception handlers) *)
   let doInstr _stmt instr state = 
     let state = Env.default_varinfos state in
-    let extend_to_expr always state lhost e =
-      let add_vi state vi =
-	if is_ptr_or_array_exp e && (always || Varinfo.Hptset.mem vi state)
-	then 
-	  match base_addr e with
-	  | None -> state
-	  | Some vi_e -> 
-	    Options.feedback ~level:4 ~dkey
-	      "monitoring %a from %a."
-	      Printer.pp_varinfo vi_e
-	      Printer.pp_lval (lhost, NoOffset);
-	    Varinfo.Hptset.add vi_e state
-	else 
-	  state
-      in
-      match lhost with
-      | Var vi -> add_vi state vi
-      | Mem e -> 
-	match base_addr e with
-	| None -> Kernel.fatal "no base address for %a" Printer.pp_exp e
-	| Some vi -> add_vi state vi
-    in
     match instr with
-    | Set((lhost, _) as lv, e, _) -> 
-      (* if [e] contains an address from a base, then also monitor the host *)
-      let rec extend_from_addr state e = match e.enode with
-	| AddrOf(lhost, _) -> 
-	  extend_to_expr true state lhost (Cil.new_exp ~loc:e.eloc (Lval lv)),
-	  true
-	| BinOp((PlusPI | IndexPI | MinusPI), e1, e2, _) -> 
-	  if is_ptr_or_array_exp e1 then extend_from_addr state e1
-	  else begin
-	    assert (is_ptr_or_array_exp e2);
-	    extend_from_addr state e2
-	  end
-	| CastE(_, e) | Info(e, _) -> extend_from_addr state e
-	| _ -> state, false
-      in
-      let state, always = extend_from_addr state e in
-      Dataflow.Done (Some (extend_to_expr always state lhost e))
+    | Set(lv, e, _) -> 
+      let state = handle_assignment state lv e in
+      Dataflow.Done (Some state)
     | Call(result, f_exp, l, _) -> 
       (match f_exp.enode with
       | Lval(Var vi, NoOffset) ->

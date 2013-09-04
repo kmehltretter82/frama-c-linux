@@ -1,0 +1,43 @@
+[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/e_acsl.h"
+[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/e_acsl_gmp_types.h"
+[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/e_acsl_gmp.h"
+[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel_api.h"
+[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/memory_model/e_acsl_bittree.h"
+[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h"
+[kernel] preprocessing with "gcc -C -E -I.  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc tests/e-acsl-runtime/bts1478.c"
+[e-acsl] beginning translation.
+[e-acsl] translation done in project "e-acsl".
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value] Values of globals at initialization
+  __fc_random_counter ∈ {0}
+  __fc_rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __memory_size ∈ [--..--]
+  global_i ∈ {0}
+  global_i_ptr ∈ {{ &global_i }}
+[value] using specification for function __store_block
+tests/e-acsl-runtime/bts1478.c:10:[value] Function __e_acsl_loop: precondition got status valid.
+tests/e-acsl-runtime/bts1478.c:11:[value] Function __e_acsl_loop: precondition got status valid.
+tests/e-acsl-runtime/bts1478.c:12:[value] Function __e_acsl_loop: precondition got status valid.
+[value] using specification for function e_acsl_assert
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
+[value] using specification for function __valid
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
+tests/e-acsl-runtime/bts1478.c:10:[value] Function loop: precondition got status valid.
+tests/e-acsl-runtime/bts1478.c:11:[value] Function loop: precondition got status valid.
+tests/e-acsl-runtime/bts1478.c:12:[value] Function loop: precondition got status valid.
+[value] using specification for function __delete_block
+[kernel] warning: Neither code nor specification for function __e_acsl_memory_clean, generating default assigns from the prototype
+[value] using specification for function __e_acsl_memory_clean
+[value] done for function main
+[value] ====== VALUES COMPUTED ======
+[value] Values at end of function __e_acsl_memory_init:
+  
+[value] Values at end of function loop:
+  
+[value] Values at end of function __e_acsl_loop:
+  
+[value] Values at end of function main:
+  __retres ∈ {0}
