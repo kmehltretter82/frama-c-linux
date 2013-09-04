@@ -380,7 +380,7 @@ module rec Transfer
       | None -> state
       | Some init -> do_init vi init state
     in
-    Globals.Vars.fold_in_file_order do_one state
+    Globals.Vars.fold_in_file_rev_order do_one state
 
   (** The (backwards) transfer function for a branch. The [(Cil.CurrentLoc.get
       ())] is set before calling this. If it returns None, then we have some
