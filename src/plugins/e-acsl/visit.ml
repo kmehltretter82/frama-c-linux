@@ -460,13 +460,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
 	  stmt.ghost <- false;
 	  (* translate potential RTEs of ghost code *)
 	  let rtes = get_rte_by_stmt kf stmt in
-	  List.fold_left
-	    (fun env a -> match a.annot_content with
-	    | AAssert(_, p) -> 
-	      Translate.translate_named_predicate kf (Env.rte env false) p
-	    | _ -> assert false)
-	    env
-	    rtes
+	  Translate.translate_rte_annots Printer.pp_stmt stmt kf env rtes
 	end else
 	  env
       in
@@ -522,11 +516,11 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
 	    let b, env = 
 	      Env.pop_and_get env stmt ~global_clear:true Env.After 
 	    in
-	    if is_main && Pre_analysis.use_model () && generate then begin
+	    if is_main && Pre_analysis.use_model () then begin
 	      let stmts = b.bstmts in
 	      let l = List.rev stmts in
 	      match l with
-	      | [] -> assert false (* return is here *)
+	      | [] -> assert false (* at least the 'return' stmt *)
 	      | ret :: l ->
 		let loc = Stmt.loc stmt in
 		let delete_stmts =
@@ -548,7 +542,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
 	    new_stmt, env
 	  else
 	    stmt, env
-	else
+	else (* i.e. not (is_return stmt) *)
 	  if generate then
 	    let stmt = rename_alloc_function stmt in
 	    (* must generate [pre_block] which includes [stmt] before generating

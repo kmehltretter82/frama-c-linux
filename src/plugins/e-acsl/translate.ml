@@ -637,9 +637,10 @@ and named_predicate_to_exp ?name kf ?rte env p =
   let env = if rte then translate_rte kf env e else env in
   e, env
 
-and translate_rte kf env e =
-  let stmt = Cil.mkStmtOneInstr ~valid_sid:true (Skip e.eloc) in
-  let l = get_rte kf stmt e in
+and translate_rte_annots: 
+    'a. (Format.formatter -> 'a -> unit) -> 'a ->
+    kernel_function -> Env.t -> code_annotation list -> Env.t =
+  fun pp elt kf env l ->
   let old_valid = !is_visiting_valid in
   let old_kind = Env.annotation_kind env in
   let env = Env.set_annotation_kind env Misc.RTE in
@@ -649,8 +650,7 @@ and translate_rte kf env e =
       | AAssert(_, p) -> 
 	handle_error
 	  (fun env -> 
-	    Options.feedback ~dkey ~level:4 "prevent RTE from %a" 
-	      Printer.pp_exp e;
+	    Options.feedback ~dkey ~level:4 "prevent RTE from %a" pp elt;
 	    translate_named_predicate kf (Env.rte env false) p)
 	  env
       | _ -> assert false)
@@ -659,6 +659,11 @@ and translate_rte kf env e =
   in
   is_visiting_valid := old_valid;
   Env.set_annotation_kind env old_kind
+
+and translate_rte kf env e =
+  let stmt = Cil.mkStmtOneInstr ~valid_sid:true (Skip e.eloc) in
+  let l = get_rte kf stmt e in
+  translate_rte_annots Printer.pp_exp e kf env l
 
 and translate_named_predicate kf env p =
   Options.feedback ~dkey ~level:3 "translating predicate %a" 

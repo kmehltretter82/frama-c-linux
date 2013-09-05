@@ -7,6 +7,8 @@
 - [Yannick] Logic functions
 - [Nikolaï] temporal memory properties
 - memory profiling
+- [Guillaume] ajouter les annotations de RTE dans la table des annotations
+  	      (avec une option)
 
 #####################
 # E-ACSL CONSTRUCTS #

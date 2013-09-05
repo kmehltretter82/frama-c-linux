@@ -35,6 +35,14 @@ val translate_post_code_annotation:
 val translate_named_predicate: 
   kernel_function -> Env.t -> predicate named -> Env.t
 
+val translate_rte_annots:
+  (Format.formatter -> 'a -> unit) -> 
+  'a ->
+  kernel_function -> 
+  Env.t -> 
+  code_annotation list ->
+  Env.t
+
 val predicate_to_exp: kernel_function -> predicate named -> exp
 
 val set_original_project: Project.t -> unit
