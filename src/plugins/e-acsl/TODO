@@ -18,7 +18,6 @@
 - predicates
 - logic functions
 - disjoint and complete behaviors (cf. Bernard's feature wish)
-- loop invariant
 - loop variant
 - grep "not_yet" *.ml
 - logical shift (at least in non GMP mode)

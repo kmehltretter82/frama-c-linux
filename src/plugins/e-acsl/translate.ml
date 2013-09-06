@@ -826,18 +826,11 @@ let translate_post_spec kf kinstr env spec =
 
 let translate_pre_code_annotation kf stmt env annot =
   let convert env = match annot.annot_content with
-    | AAssert(l, p) | AInvariant(l, false (* invariant as assertion *), p) 
-	as a -> 
-      if must_translate (Property.ip_of_code_annot_single kf stmt annot)
-      then
-	let kind = match a with 
-	  | AAssert _ -> Misc.Assertion
-	  | AInvariant _ -> Misc.Invariant
-	  | _ -> assert false
-	in
-	let env = Env.set_annotation_kind env kind in
+    | AAssert(l, p) -> 
+      if must_translate (Property.ip_of_code_annot_single kf stmt annot) then
+	let env = Env.set_annotation_kind env Misc.Assertion in
 	if l <> [] then 
-	  not_yet env "@[assertions applied only on some behaviors@]";
+	  not_yet env "@[assertion applied only on some behaviors@]";
 	translate_named_predicate kf env p
       else
 	env
@@ -845,11 +838,15 @@ let translate_pre_code_annotation kf stmt env annot =
       if l <> [] then 
         not_yet env "@[statement contract applied only on some behaviors@]";
       translate_pre_spec kf (Kstmt stmt) env spec ;
-    | AInvariant(_, b, _) -> 
-      assert b;
-      if must_translate (Property.ip_of_code_annot_single kf stmt annot)
-      then not_yet env "loop invariant"
-      else env
+    | AInvariant(l, loop_invariant, p) ->
+      if must_translate (Property.ip_of_code_annot_single kf stmt annot) then
+	let env = Env.set_annotation_kind env Misc.Invariant in
+	if l <> [] then 
+	  not_yet env "@[invariant applied only on some behaviors@]";
+	let env = translate_named_predicate kf env p in
+	if loop_invariant then Env.add_loop_invariant env p else env
+      else
+	env
     | AVariant _ ->
       if must_translate (Property.ip_of_code_annot_single kf stmt annot)
       then not_yet env "variant"

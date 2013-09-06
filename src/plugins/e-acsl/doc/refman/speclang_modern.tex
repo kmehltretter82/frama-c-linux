@@ -407,7 +407,7 @@ Figure~\ref{fig:gram:assertions} summarizes grammar for assertions.
 \subsection{Loop annotations}
 \label{sec:loop_annot}
 
-\except{\notimplemented{loop invariants} lose their inductive nature}
+\except{loop invariants lose their inductive nature}
 
 Figure~\ref{fig:gram:loops} shows grammar for loop annotations. There is no
 syntactic difference with \acsl. 
@@ -422,13 +422,13 @@ syntactic difference with \acsl.
 \difficultwhy{\notimplemented{\lstinline|loop assigns|}}{the implementation of a
   memory model}
 
-\subsubsection{\notimplemented{Loop invariants}}
+\subsubsection{Loop invariants}
 
-\index{invariant} The semantics of \notimplemented{loop invariants} is the same
-than the one defined in \acsl, except that they are not inductive. More
-precisely, if one does not take care of side effects (semantics of
-specifications about side effects in loop is the same in \eacsl than the one in
-\acsl), a loop invariant $I$ is valid in \acsl if and only if:
+\index{invariant} The semantics of loop invariants is the same than the one
+defined in \acsl, except that they are not inductive. More precisely, if one
+does not take care of side effects (semantics of specifications about side
+effects in loop is the same in \eacsl than the one in \acsl), a loop invariant
+$I$ is valid in \acsl if and only if:
 \begin{itemize}
 \item $I$ holds before entering the loop; and
 \item if $I$ is assumed true in some state where the loop condition $c$ is also

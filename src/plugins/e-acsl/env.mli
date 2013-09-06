@@ -62,8 +62,8 @@ module Logic_binding: sig
 end
 
 val add_assert: t -> stmt -> predicate named -> unit
-(** [add_assert kf s p] extends the global environment with an assertion [p]
-    associated to the statement [s] in function [kf]. *)
+(** [add_assert env s p] associates the assertion [p] to the statement [s] in
+    the environment [env]. *)
 
 val add_stmt: ?init:bool -> t -> stmt -> t
   (** [add_stmt env s] extends [env] with the new statement [s] *)
@@ -98,6 +98,8 @@ val get_generated_variables: t -> (varinfo * bool) list
 
 val get_visitor: t -> Visitor.generic_frama_c_visitor
 val get_behavior: t -> Cil.visitor_behavior
+val current_kf: t -> kernel_function option
+(** Kernel function currently visited in the new project. *)
 
 val stmt_of_label: t -> logic_label -> stmt
 
@@ -109,7 +111,15 @@ val annotation_kind: t -> Misc.annotation_kind
 val set_annotation_kind: t -> Misc.annotation_kind -> t
 
 (* ************************************************************************** *)
-(** {2 Handling RTEs} *)
+(** {2 Loop invariants} *)
+(* ************************************************************************** *)
+
+val push_loop: t -> t
+val add_loop_invariant: t -> predicate named -> t
+val pop_loop: t -> predicate named list * t
+
+(* ************************************************************************** *)
+(** {2 RTEs} *)
 (* ************************************************************************** *)
 
 val rte: t -> bool -> t

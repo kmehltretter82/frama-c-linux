@@ -419,6 +419,10 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     let kf = Extlib.the self#current_kf in
     let is_main = self#is_main kf in
     let env = Env.push !function_env in
+    let env = match stmt.skind with
+      | Loop _ -> Env.push_loop env
+      | _ -> env
+    in
     let env = 
       if self#is_first_stmt kf stmt then
 	(* JS: should be done in the new project? *)
@@ -464,25 +468,6 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
 	end else
 	  env
       in
-      let mk_block b = 
-	assert generate;
-	let mk b = match b.bstmts with
-	  | [] -> 
-	    (match stmt.skind with
-	    | Instr(Skip _) -> stmt
-	    | _ -> assert false)
-	  | [ s ] -> 
-	    if Stmt.equal stmt s then s 
-	    else 
-	      (* [JS 2012/10/19] this case exactly corresponds to
-		 e_acsl_assert(...) when the annotation is associated to a
-		 statement <skip>. Creating a block prevents the printer to add
-		 a stupid unintuitive block *)
-	      Cil.mkStmt ~valid_sid:true (Block b)
-	  |  _ :: _ -> Cil.mkStmt ~valid_sid:true (Block b)
-	in	    
-	Project.on prj mk b
-      in
       let mk_post_env env =
 	(* [fold_right] to preserve order of generation of pre_conditions *) 
 	Project.on
@@ -493,6 +478,8 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
 	     new_annots)
 	  env
       in
+      (* handle loop invariants *)
+      let new_stmt, env, must_mv = Loops.preserve_invariant prj env kf stmt in
       let new_stmt, env = 
 	if self#is_return kf stmt then 
 	  (* must generate the post_block before including [stmt] (the 'return')
@@ -514,7 +501,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
 	  if generate then
 	    let env = deallocate_function env kf in
 	    let b, env = 
-	      Env.pop_and_get env stmt ~global_clear:true Env.After 
+	      Env.pop_and_get env new_stmt ~global_clear:true Env.After 
 	    in
 	    if is_main && Pre_analysis.use_model () then begin
 	      let stmts = b.bstmts in
@@ -535,7 +522,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
 		in
 		b.bstmts <- List.rev l @ delete_stmts
 	    end;
-	    let new_stmt = mk_block b in
+	    let new_stmt = Misc.mk_block prj stmt b in
 	    (* move the labels of the return to the new block in order to
 	       evaluate the postcondition when jumping to them. *)
 	    move_labels env stmt new_stmt;
@@ -544,7 +531,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
 	    stmt, env
 	else (* i.e. not (is_return stmt) *)
 	  if generate then
-	    let stmt = rename_alloc_function stmt in
+	    let stmt = rename_alloc_function new_stmt in
 	    (* must generate [pre_block] which includes [stmt] before generating
 	       [post_block] *)
 	    let pre_block, env = 
@@ -553,13 +540,17 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
 	    let env = mk_post_env (Env.push env) in
 	    let post_block, env = 
 	      Env.pop_and_get 
-		env (mk_block pre_block) ~global_clear:false Env.Before 
+		env
+		(Misc.mk_block prj stmt pre_block) 
+		~global_clear:false 
+		Env.Before 
 	    in
 	    (* TODO: must clear the local block anytime (?) *)
-	    mk_block post_block, env
+	    Misc.mk_block prj stmt post_block, env
 	  else
 	    stmt, env
       in
+      if must_mv then Loops.mv_invariants env ~old:new_stmt stmt;
       function_env := env;
       Options.debug ~level:4
 	"@[new stmt (from sid %d):@ %a@]" stmt.sid Printer.pp_stmt new_stmt;

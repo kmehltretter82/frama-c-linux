@@ -55,6 +55,8 @@ type t =
       env_stack: local_env list;
       init_env: local_env;
       var_mapping: Varinfo.t Logic_var.Map.t; (* bind logic var to C var *)
+      loop_invariants: predicate named list list;
+      (* list of loop invariants for each currently visited loops *) 
       cpt: int; (* counter used when generating variables *) }
 
 module Varname: sig 
@@ -96,7 +98,8 @@ let dummy =
     env_stack = []; 
     init_env = empty_local_env;
     var_mapping = Logic_var.Map.empty;
-    cpt = 0 }
+    loop_invariants = [];
+    cpt = 0; }
 
 let empty v =
   { visitor = v; 
@@ -106,11 +109,31 @@ let empty v =
     env_stack = []; 
     init_env = empty_local_env;
     var_mapping = Logic_var.Map.empty;
+    loop_invariants = [];
     cpt = 0 }
 
 let top init env = 
   if init then env.init_env, []
   else match env.env_stack with [] -> assert false | hd :: tl -> hd, tl
+
+(* ************************************************************************** *)
+(** {2 Loop invariants} *)
+(* ************************************************************************** *)
+
+let push_loop env = 
+  { env with loop_invariants = [] :: env.loop_invariants }
+
+let add_loop_invariant env inv = match env.loop_invariants with
+  | [] -> assert false
+  | invs :: tl -> { env with loop_invariants = (inv :: invs) :: tl }
+
+let pop_loop env = match env.loop_invariants with
+  | [] -> assert false
+  | invs :: tl -> invs, { env with loop_invariants = tl }
+
+(* ************************************************************************** *)
+(** {2 RTEs} *)
+(* ************************************************************************** *)
 
 let rte env b =
   let local_env, tl_env = top false env in
@@ -119,6 +142,8 @@ let rte env b =
 let generate_rte env =
   let local_env, _ = top false env in
   local_env.rte
+
+(* ************************************************************************** *)
 
 (* eta-expansion required for typing generalisation *)
 let acc_list_rev acc l = List.fold_left (fun acc x -> x :: acc) acc l
@@ -275,9 +300,8 @@ let emitter =
     ~correctness:[ Options.Gmp_only.parameter ]
     ~tuning:[]
 
-let add_assert env stmt annot = 
-  match current_kf env with
-  | None -> assert false (* TODO: ??? *)
+let add_assert env stmt annot = match current_kf env with
+  | None -> assert false
   | Some kf ->
     Queue.add
       (fun () -> Annotations.add_assert emitter ~kf stmt annot) 

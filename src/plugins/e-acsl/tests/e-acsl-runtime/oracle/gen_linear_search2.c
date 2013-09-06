@@ -101,20 +101,184 @@ int search(int elt)
   int __retres;
   int k;
   k = 0;
-  /*@ loop invariant 0 ≤ k ∧ k ≤ 10;
-      loop invariant ∀ ℤ i; 0 ≤ i ∧ i < k ⇒ A[i] < elt;
-  */
-  while (k < 10) {
-    if (A[k] == elt) {
-      __retres = 1;
-      goto return_label;
+  {
+    int __e_acsl_forall;
+    mpz_t __e_acsl_i;
+    mpz_t __e_acsl_4;
+    mpz_t __e_acsl_k_2;
+    int __e_acsl_le;
+    int __e_acsl_and;
+    __e_acsl_forall = 1;
+    __gmpz_init(__e_acsl_i);
+    {
+      mpz_t __e_acsl_2;
+      __gmpz_init_set_si(__e_acsl_2,(long)0);
+      __gmpz_set(__e_acsl_i,(__mpz_struct const *)(__e_acsl_2));
+      __gmpz_clear(__e_acsl_2);
     }
-    else 
-      if (A[k] > elt) {
-        __retres = 0;
+    while (1) {
+      {
+        mpz_t __e_acsl_k;
+        int __e_acsl_lt_2;
+        __gmpz_init_set_si(__e_acsl_k,(long)k);
+        __e_acsl_lt_2 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_i),
+                                   (__mpz_struct const *)(__e_acsl_k));
+        if (__e_acsl_lt_2 < 0) ; else break;
+        __gmpz_clear(__e_acsl_k);
+      }
+      {
+        unsigned long __e_acsl_i_2;
+        mpz_t __e_acsl;
+        mpz_t __e_acsl_elt;
+        int __e_acsl_lt;
+        __e_acsl_i_2 = __gmpz_get_ui((__mpz_struct const *)(__e_acsl_i));
+        __gmpz_init_set_si(__e_acsl,(long)A[__e_acsl_i_2]);
+        __gmpz_init_set_si(__e_acsl_elt,(long)elt);
+        __e_acsl_lt = __gmpz_cmp((__mpz_struct const *)(__e_acsl),
+                                 (__mpz_struct const *)(__e_acsl_elt));
+        __gmpz_clear(__e_acsl);
+        __gmpz_clear(__e_acsl_elt);
+        if (__e_acsl_lt < 0) ;
+        else {
+          __e_acsl_forall = 0;
+          goto e_acsl_end_loop1;
+        }
+      }
+      {
+        mpz_t __e_acsl_3;
+        mpz_t __e_acsl_add;
+        __gmpz_init_set_si(__e_acsl_3,1L);
+        __gmpz_init(__e_acsl_add);
+        __gmpz_add(__e_acsl_add,(__mpz_struct const *)(__e_acsl_i),
+                   (__mpz_struct const *)(__e_acsl_3));
+        __gmpz_set(__e_acsl_i,(__mpz_struct const *)(__e_acsl_add));
+        __gmpz_clear(__e_acsl_3);
+        __gmpz_clear(__e_acsl_add);
+      }
+    }
+    e_acsl_end_loop1: ;
+    e_acsl_assert(__e_acsl_forall,(char *)"Invariant",(char *)"search",
+                  (char *)"\\forall integer i; 0 <= i && i < k ==> A[i] < elt",
+                  20);
+    __gmpz_init_set_si(__e_acsl_4,(long)0);
+    __gmpz_init_set_si(__e_acsl_k_2,(long)k);
+    __e_acsl_le = __gmpz_cmp((__mpz_struct const *)(__e_acsl_4),
+                             (__mpz_struct const *)(__e_acsl_k_2));
+    if (__e_acsl_le <= 0) {
+      mpz_t __e_acsl_k_3;
+      mpz_t __e_acsl_5;
+      int __e_acsl_le_2;
+      __gmpz_init_set_si(__e_acsl_k_3,(long)k);
+      __gmpz_init_set_si(__e_acsl_5,(long)10);
+      __e_acsl_le_2 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_k_3),
+                                 (__mpz_struct const *)(__e_acsl_5));
+      __e_acsl_and = __e_acsl_le_2 <= 0;
+      __gmpz_clear(__e_acsl_k_3);
+      __gmpz_clear(__e_acsl_5);
+    }
+    else __e_acsl_and = 0;
+    e_acsl_assert(__e_acsl_and,(char *)"Invariant",(char *)"search",
+                  (char *)"0 <= k && k <= 10",19);
+    __gmpz_clear(__e_acsl_i);
+    __gmpz_clear(__e_acsl_4);
+    __gmpz_clear(__e_acsl_k_2);
+    /*@ loop invariant 0 ≤ k ∧ k ≤ 10;
+        loop invariant ∀ ℤ i; 0 ≤ i ∧ i < k ⇒ A[i] < elt;
+    */
+    while (k < 10) {
+      if (A[k] == elt) {
+        __retres = 1;
         goto return_label;
       }
-    k ++;
+      else 
+        if (A[k] > elt) {
+          __retres = 0;
+          goto return_label;
+        }
+      {
+        mpz_t __e_acsl_6;
+        mpz_t __e_acsl_k_4;
+        int __e_acsl_le_3;
+        int __e_acsl_and_2;
+        int __e_acsl_forall_2;
+        mpz_t __e_acsl_i_3;
+        k ++;
+        __gmpz_init_set_si(__e_acsl_6,(long)0);
+        __gmpz_init_set_si(__e_acsl_k_4,(long)k);
+        __e_acsl_le_3 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_6),
+                                   (__mpz_struct const *)(__e_acsl_k_4));
+        if (__e_acsl_le_3 <= 0) {
+          mpz_t __e_acsl_k_5;
+          mpz_t __e_acsl_7;
+          int __e_acsl_le_4;
+          __gmpz_init_set_si(__e_acsl_k_5,(long)k);
+          __gmpz_init_set_si(__e_acsl_7,(long)10);
+          __e_acsl_le_4 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_k_5),
+                                     (__mpz_struct const *)(__e_acsl_7));
+          __e_acsl_and_2 = __e_acsl_le_4 <= 0;
+          __gmpz_clear(__e_acsl_k_5);
+          __gmpz_clear(__e_acsl_7);
+        }
+        else __e_acsl_and_2 = 0;
+        e_acsl_assert(__e_acsl_and_2,(char *)"Invariant",(char *)"search",
+                      (char *)"0 <= k && k <= 10",19);
+        __e_acsl_forall_2 = 1;
+        __gmpz_init(__e_acsl_i_3);
+        {
+          mpz_t __e_acsl_9;
+          __gmpz_init_set_si(__e_acsl_9,(long)0);
+          __gmpz_set(__e_acsl_i_3,(__mpz_struct const *)(__e_acsl_9));
+          __gmpz_clear(__e_acsl_9);
+        }
+        while (1) {
+          {
+            mpz_t __e_acsl_k_6;
+            int __e_acsl_lt_4;
+            __gmpz_init_set_si(__e_acsl_k_6,(long)k);
+            __e_acsl_lt_4 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_i_3),
+                                       (__mpz_struct const *)(__e_acsl_k_6));
+            if (__e_acsl_lt_4 < 0) ; else break;
+            __gmpz_clear(__e_acsl_k_6);
+          }
+          {
+            unsigned long __e_acsl_i_4;
+            mpz_t __e_acsl_8;
+            mpz_t __e_acsl_elt_2;
+            int __e_acsl_lt_3;
+            __e_acsl_i_4 = __gmpz_get_ui((__mpz_struct const *)(__e_acsl_i_3));
+            __gmpz_init_set_si(__e_acsl_8,(long)A[__e_acsl_i_4]);
+            __gmpz_init_set_si(__e_acsl_elt_2,(long)elt);
+            __e_acsl_lt_3 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_8),
+                                       (__mpz_struct const *)(__e_acsl_elt_2));
+            __gmpz_clear(__e_acsl_8);
+            __gmpz_clear(__e_acsl_elt_2);
+            if (__e_acsl_lt_3 < 0) ;
+            else {
+              __e_acsl_forall_2 = 0;
+              goto e_acsl_end_loop2;
+            }
+          }
+          {
+            mpz_t __e_acsl_10;
+            mpz_t __e_acsl_add_2;
+            __gmpz_init_set_si(__e_acsl_10,1L);
+            __gmpz_init(__e_acsl_add_2);
+            __gmpz_add(__e_acsl_add_2,(__mpz_struct const *)(__e_acsl_i_3),
+                       (__mpz_struct const *)(__e_acsl_10));
+            __gmpz_set(__e_acsl_i_3,(__mpz_struct const *)(__e_acsl_add_2));
+            __gmpz_clear(__e_acsl_10);
+            __gmpz_clear(__e_acsl_add_2);
+          }
+        }
+        e_acsl_end_loop2: ;
+        e_acsl_assert(__e_acsl_forall_2,(char *)"Invariant",(char *)"search",
+                      (char *)"\\forall integer i; 0 <= i && i < k ==> A[i] < elt",
+                      20);
+        __gmpz_clear(__e_acsl_6);
+        __gmpz_clear(__e_acsl_k_4);
+        __gmpz_clear(__e_acsl_i_3);
+      }
+    }
   }
   __retres = 0;
   return_label: return __retres;
@@ -181,7 +345,7 @@ int __e_acsl_search(int elt)
         if (__e_acsl_le <= 0) ;
         else {
           __e_acsl_forall = 0;
-          goto e_acsl_end_loop1;
+          goto e_acsl_end_loop3;
         }
       }
       {
@@ -196,7 +360,7 @@ int __e_acsl_search(int elt)
         __gmpz_clear(__e_acsl_add_2);
       }
     }
-    e_acsl_end_loop1: ;
+    e_acsl_end_loop3: ;
     e_acsl_assert(__e_acsl_forall,(char *)"Precondition",(char *)"search",
                   (char *)"\\forall integer i; 0 <= i && i < 9 ==> A[i] <= A[i+1]",
                   9);
@@ -237,7 +401,7 @@ int __e_acsl_search(int elt)
           if (__e_acsl_ne != 0) ;
           else {
             __e_acsl_forall_2 = 0;
-            goto e_acsl_end_loop3;
+            goto e_acsl_end_loop5;
           }
         }
         {
@@ -252,7 +416,7 @@ int __e_acsl_search(int elt)
           __gmpz_clear(__e_acsl_add_4);
         }
       }
-      e_acsl_end_loop3: ;
+      e_acsl_end_loop5: ;
       __e_acsl_at_2 = __e_acsl_forall_2;
       __gmpz_clear(__e_acsl_j_3);
     }
@@ -292,7 +456,7 @@ int __e_acsl_search(int elt)
           if (! (__e_acsl_eq == 0)) ;
           else {
             __e_acsl_exists = 1;
-            goto e_acsl_end_loop2;
+            goto e_acsl_end_loop4;
           }
         }
         {
@@ -307,7 +471,7 @@ int __e_acsl_search(int elt)
           __gmpz_clear(__e_acsl_add_3);
         }
       }
-      e_acsl_end_loop2: ;
+      e_acsl_end_loop4: ;
       __e_acsl_at = __e_acsl_exists;
       __gmpz_clear(__e_acsl_j);
     }

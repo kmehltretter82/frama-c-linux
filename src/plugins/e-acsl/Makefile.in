@@ -63,6 +63,7 @@ PLUGIN_CMO:= local_config \
 	typing \
 	quantif \
 	translate \
+	loops \
 	visit \
 	main
 PLUGIN_HAS_MLI:=yes

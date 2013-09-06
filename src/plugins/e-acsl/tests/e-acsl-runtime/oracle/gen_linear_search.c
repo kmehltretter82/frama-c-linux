@@ -52,20 +52,74 @@ int search(int elt)
   int __retres;
   int k;
   k = 0;
-  /*@ loop invariant 0 ≤ k ∧ k ≤ 10;
-      loop invariant ∀ ℤ i; 0 ≤ i ∧ i < k ⇒ A[i] < elt;
-  */
-  while (k < 10) {
-    if (A[k] == elt) {
-      __retres = 1;
-      goto return_label;
+  {
+    int __e_acsl_forall;
+    int __e_acsl_i;
+    int __e_acsl_and;
+    __e_acsl_forall = 1;
+    __e_acsl_i = 0;
+    while (1) {
+      if (__e_acsl_i < k) ; else break;
+      e_acsl_assert(__e_acsl_i < 10,(char *)"RTE",(char *)"search",
+                    (char *)"index_bound: __e_acsl_i < 10",20);
+      e_acsl_assert(0 <= __e_acsl_i,(char *)"RTE",(char *)"search",
+                    (char *)"index_bound: 0 <= __e_acsl_i",20);
+      if (A[__e_acsl_i] < elt) ;
+      else {
+        __e_acsl_forall = 0;
+        goto e_acsl_end_loop1;
+      }
+      __e_acsl_i ++;
     }
-    else 
-      if (A[k] > elt) {
-        __retres = 0;
+    e_acsl_end_loop1: ;
+    e_acsl_assert(__e_acsl_forall,(char *)"Invariant",(char *)"search",
+                  (char *)"\\forall integer i; 0 <= i && i < k ==> A[i] < elt",
+                  20);
+    if (0 <= k) __e_acsl_and = k <= 10; else __e_acsl_and = 0;
+    e_acsl_assert(__e_acsl_and,(char *)"Invariant",(char *)"search",
+                  (char *)"0 <= k && k <= 10",19);
+    /*@ loop invariant 0 ≤ k ∧ k ≤ 10;
+        loop invariant ∀ ℤ i; 0 ≤ i ∧ i < k ⇒ A[i] < elt;
+    */
+    while (k < 10) {
+      if (A[k] == elt) {
+        __retres = 1;
         goto return_label;
       }
-    k ++;
+      else 
+        if (A[k] > elt) {
+          __retres = 0;
+          goto return_label;
+        }
+      {
+        int __e_acsl_and_2;
+        int __e_acsl_forall_2;
+        int __e_acsl_i_2;
+        k ++;
+        if (0 <= k) __e_acsl_and_2 = k <= 10; else __e_acsl_and_2 = 0;
+        e_acsl_assert(__e_acsl_and_2,(char *)"Invariant",(char *)"search",
+                      (char *)"0 <= k && k <= 10",19);
+        __e_acsl_forall_2 = 1;
+        __e_acsl_i_2 = 0;
+        while (1) {
+          if (__e_acsl_i_2 < k) ; else break;
+          e_acsl_assert(__e_acsl_i_2 < 10,(char *)"RTE",(char *)"search",
+                        (char *)"index_bound: __e_acsl_i_2 < 10",20);
+          e_acsl_assert(0 <= __e_acsl_i_2,(char *)"RTE",(char *)"search",
+                        (char *)"index_bound: 0 <= __e_acsl_i_2",20);
+          if (A[__e_acsl_i_2] < elt) ;
+          else {
+            __e_acsl_forall_2 = 0;
+            goto e_acsl_end_loop2;
+          }
+          __e_acsl_i_2 ++;
+        }
+        e_acsl_end_loop2: ;
+        e_acsl_assert(__e_acsl_forall_2,(char *)"Invariant",(char *)"search",
+                      (char *)"\\forall integer i; 0 <= i && i < k ==> A[i] < elt",
+                      20);
+      }
+    }
   }
   __retres = 0;
   return_label: return __retres;
@@ -104,11 +158,11 @@ int __e_acsl_search(int elt)
       if (A[__e_acsl_i] <= A[__e_acsl_i + 1]) ;
       else {
         __e_acsl_forall = 0;
-        goto e_acsl_end_loop1;
+        goto e_acsl_end_loop3;
       }
       __e_acsl_i ++;
     }
-    e_acsl_end_loop1: ;
+    e_acsl_end_loop3: ;
     e_acsl_assert(__e_acsl_forall,(char *)"Precondition",(char *)"search",
                   (char *)"\\forall integer i; 0 <= i && i < 9 ==> A[i] <= A[i+1]",
                   9);
@@ -126,11 +180,11 @@ int __e_acsl_search(int elt)
         if (A[__e_acsl_j_2] != elt) ;
         else {
           __e_acsl_forall_2 = 0;
-          goto e_acsl_end_loop3;
+          goto e_acsl_end_loop5;
         }
         __e_acsl_j_2 ++;
       }
-      e_acsl_end_loop3: ;
+      e_acsl_end_loop5: ;
       __e_acsl_at_2 = __e_acsl_forall_2;
     }
     {
@@ -147,11 +201,11 @@ int __e_acsl_search(int elt)
         if (! (A[__e_acsl_j] == elt)) ;
         else {
           __e_acsl_exists = 1;
-          goto e_acsl_end_loop2;
+          goto e_acsl_end_loop4;
         }
         __e_acsl_j ++;
       }
-      e_acsl_end_loop2: ;
+      e_acsl_end_loop4: ;
       __e_acsl_at = __e_acsl_exists;
     }
     __retres = search(elt);
