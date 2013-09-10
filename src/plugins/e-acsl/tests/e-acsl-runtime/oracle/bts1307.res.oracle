@@ -16,6 +16,8 @@ tests/e-acsl-runtime/bts1307.i:31:[e-acsl] warning: approximating a real number 
   __fc_random_counter ∈ {0}
   __fc_rand_max ∈ {32767}
   __fc_heap_status ∈ [--..--]
+  __e_acsl_init ∈ [--..--]
+  __e_acsl_internal_heap ∈ [--..--]
   __memory_size ∈ [--..--]
 [value] using specification for function __store_block
 [value] using specification for function __full_init
@@ -23,6 +25,8 @@ tests/e-acsl-runtime/bts1307.i:7:[value] Function __e_acsl_foo: precondition got
 tests/e-acsl-runtime/bts1307.i:8:[value] Function __e_acsl_foo: precondition got status valid.
 tests/e-acsl-runtime/bts1307.i:9:[value] Function __e_acsl_foo: precondition got status valid.
 [value] using specification for function __valid
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:86:[value] Function __valid: postcondition got status unknown.
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:87:[value] Function __valid: postcondition got status valid.
 [value] using specification for function e_acsl_assert
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
 tests/e-acsl-runtime/bts1307.i:7:[value] Function foo: precondition got status valid.
@@ -32,6 +36,8 @@ tests/e-acsl-runtime/bts1307.i:9:[value] Function foo: precondition got status v
 [value] using specification for function __delete_block
 tests/e-acsl-runtime/bts1307.i:13:[value] Function foo, behavior OverEstimate_Motoring: postcondition got status valid.
 [value] using specification for function __valid_read
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:93:[value] Function __valid_read: postcondition got status unknown.
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:94:[value] Function __valid_read: postcondition got status valid.
 [value] user error: type long double not implemented. Using double instead
 tests/e-acsl-runtime/bts1307.i:13:[kernel] warning: non-finite long double value ({5}):
                   assert
@@ -46,7 +52,6 @@ tests/e-acsl-runtime/bts1307.i:21:[value] Function bar: precondition got status 
 tests/e-acsl-runtime/bts1307.i:25:[value] Function bar, behavior UnderEstimate_Motoring: postcondition got status unknown.
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
 tests/e-acsl-runtime/bts1307.i:25:[value] Function __e_acsl_bar, behavior UnderEstimate_Motoring: postcondition got status unknown.
-[kernel] warning: Neither code nor specification for function __e_acsl_memory_clean, generating default assigns from the prototype
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
@@ -59,6 +64,7 @@ tests/e-acsl-runtime/bts1307.i:25:[value] Function __e_acsl_bar, behavior UnderE
 [value] Values at end of function __e_acsl_foo:
   h ∈ 6.
 [value] Values at end of function main:
+  __e_acsl_internal_heap ∈ [--..--]
   f ∈ 1.
   g ∈ 1.
   h ∈ 0.850000023842

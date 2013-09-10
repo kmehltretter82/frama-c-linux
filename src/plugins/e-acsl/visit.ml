@@ -250,16 +250,15 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
   method vglob_aux = function
   | GVarDecl(_, vi, _) | GVar(vi, _, _) | GFun({ svar = vi }, _) 
       when Misc.is_library_loc vi.vdecl ->
-    assert (not vi.vghost);
-	if generate then
-	  Cil.JustCopyPost
-	    (fun l -> 
-	      Misc.register_library_function (Cil.get_varinfo self#behavior vi);
-	      l)
-	else begin
-	  Misc.register_library_function vi; 
-	  Cil.SkipChildren
-	end
+    if generate then
+      Cil.JustCopyPost
+	(fun l -> 
+	  Misc.register_library_function (Cil.get_varinfo self#behavior vi);
+	  l)
+    else begin
+      Misc.register_library_function vi; 
+      Cil.SkipChildren
+    end
   | GVarDecl(_, vi, _) | GVar(vi, _, _) | GFun({ svar = vi }, _) 
       when Cil.is_builtin vi ->
     if generate then Cil.JustCopy else Cil.SkipChildren

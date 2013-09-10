@@ -25,6 +25,8 @@ tests/e-acsl-runtime/bts1399.c:19:[e-acsl] warning: E-ACSL construct `\allocate'
   __fc_random_counter ∈ {0}
   __fc_rand_max ∈ {32767}
   __fc_heap_status ∈ [--..--]
+  __e_acsl_init ∈ [--..--]
+  __e_acsl_internal_heap ∈ [--..--]
   __memory_size ∈ [--..--]
 [value] using specification for function __store_block
 [value] using specification for function __full_init
@@ -34,15 +36,16 @@ FRAMAC_SHARE/libc/stdlib.h:132:[value] Function __e_acsl_malloc, behavior no_all
 [value] using specification for function __initialize
 tests/e-acsl-runtime/bts1399.c:24:[value] Assertion got status valid.
 [value] using specification for function __valid_read
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:93:[value] Function __valid_read: postcondition got status unknown.
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:94:[value] Function __valid_read: postcondition got status valid.
 [value] using specification for function e_acsl_assert
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
 [value] using specification for function __initialized
-FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:107:[value] Function __initialized: postcondition got status unknown.
-FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:108:[value] Function __initialized: postcondition got status unknown.
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:118:[value] Function __initialized: postcondition got status unknown.
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:119:[value] Function __initialized: postcondition got status unknown.
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
 FRAMAC_SHARE/libc/stdlib.h:142:[value] Function __e_acsl_free, behavior deallocation: precondition 'freeable' got status unknown.
 FRAMAC_SHARE/libc/stdlib.h:144:[value] Function __e_acsl_free, behavior deallocation: postcondition got status unknown.
-[kernel] warning: Neither code nor specification for function __e_acsl_memory_clean, generating default assigns from the prototype
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
@@ -53,6 +56,7 @@ FRAMAC_SHARE/libc/stdlib.h:144:[value] Function __e_acsl_free, behavior dealloca
   __retres ∈ {{ &Frama_C_alloc }}
 [value] Values at end of function main:
   __fc_heap_status ∈ [--..--]
+  __e_acsl_internal_heap ∈ [--..--]
   state ∈ ESCAPINGADDR
   __retres ∈ {0}
   Frama_C_alloc[0..447] ∈ UNINITIALIZED

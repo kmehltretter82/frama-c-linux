@@ -34,6 +34,8 @@ axiomatic
   
   }
  */
+/*@ ghost extern int __e_acsl_init; */
+
 /*@ requires ¬\initialized(z);
     ensures \valid(\old(z));
     ensures \initialized(\old(z));
@@ -45,16 +47,20 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init_set_si(__mpz_struct * /
                                                                 long n);
 
 /*@ requires \valid(x);
-    assigns *x; */
+    assigns *x;
+    assigns *x \from *x; */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_clear(__mpz_struct * /*[1]*/ x);
 
 /*@ requires \valid(z1);
     requires \valid(z2);
-    assigns \nothing; */
+    assigns \result \from *z1, *z2;
+ */
 extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
                                                        __mpz_struct const * /*[1]*/ z2);
 
-extern size_t __memory_size;
+/*@ ghost extern int __e_acsl_internal_heap; */
+
+/*@ ghost extern size_t __memory_size; */
 
 /*@
 predicate diffSize{L1, L2}(ℤ i) =

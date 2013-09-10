@@ -13,6 +13,8 @@
   __fc_random_counter ∈ {0}
   __fc_rand_max ∈ {32767}
   __fc_heap_status ∈ [--..--]
+  __e_acsl_init ∈ [--..--]
+  __e_acsl_internal_heap ∈ [--..--]
   __memory_size ∈ [--..--]
   T ∈ {0}
   G ∈ {0}
@@ -26,27 +28,30 @@
 [value] using specification for function __literal_string
 tests/e-acsl-runtime/literal_string.i:24:[value] Assertion got status valid.
 [value] using specification for function __gmpz_init_set_si
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:62:[value] Function __gmpz_init_set_si: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: postcondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:65:[value] Function __gmpz_init_set_si: postcondition got status unknown.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:66:[value] Function __gmpz_init_set_si: postcondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:67:[value] Function __gmpz_init_set_si: postcondition got status unknown.
 [value] using specification for function __gmpz_cmp
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:124:[value] Function __gmpz_cmp: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:125:[value] Function __gmpz_cmp: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:127:[value] Function __gmpz_cmp: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:128:[value] Function __gmpz_cmp: precondition got status valid.
 [value] using specification for function e_acsl_assert
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_clear
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:114:[value] Function __gmpz_clear: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:117:[value] Function __gmpz_clear: precondition got status valid.
 tests/e-acsl-runtime/literal_string.i:25:[value] Assertion got status valid.
 [value] using specification for function __initialized
-FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:107:[value] Function __initialized: postcondition got status unknown.
-FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:108:[value] Function __initialized: postcondition got status valid.
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:118:[value] Function __initialized: postcondition got status unknown.
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:119:[value] Function __initialized: postcondition got status valid.
 tests/e-acsl-runtime/literal_string.i:26:[value] Assertion got status valid.
 [value] using specification for function __valid_read
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:93:[value] Function __valid_read: postcondition got status unknown.
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:94:[value] Function __valid_read: postcondition got status valid.
 tests/e-acsl-runtime/literal_string.i:27:[value] Assertion got status valid.
 [value] using specification for function __valid
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:86:[value] Function __valid: postcondition got status unknown.
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:87:[value] Function __valid: postcondition got status unknown.
 tests/e-acsl-runtime/literal_string.i:13:[value] Assertion got status valid.
 [value] using specification for function __delete_block
-[kernel] warning: Neither code nor specification for function __e_acsl_memory_clean, generating default assigns from the prototype
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
@@ -57,6 +62,7 @@ tests/e-acsl-runtime/literal_string.i:13:[value] Assertion got status valid.
 [value] Values at end of function f:
   G ∈ {1}
 [value] Values at end of function main:
+  __e_acsl_internal_heap ∈ [--..--]
   T ∈ {{ "bar" }}
   G ∈ {1}
   S ∈ {{ "foo" }}

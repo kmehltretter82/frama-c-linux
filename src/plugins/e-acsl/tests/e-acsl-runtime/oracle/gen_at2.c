@@ -30,9 +30,12 @@ axiomatic
   
   }
  */
+/*@ ghost extern int __e_acsl_init; */
+
 /*@ requires ¬\initialized(z);
     ensures \valid(\old(z));
     assigns *z;
+    assigns *z \from __e_acsl_init;
     allocates \old(z);
  */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init(__mpz_struct * /*[1]*/ z);
@@ -58,12 +61,14 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init_set_si(__mpz_struct * /
                                                                 long n);
 
 /*@ requires \valid(x);
-    assigns *x; */
+    assigns *x;
+    assigns *x \from *x; */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_clear(__mpz_struct * /*[1]*/ x);
 
 /*@ requires \valid(z1);
     requires \valid(z2);
-    assigns \nothing; */
+    assigns \result \from *z1, *z2;
+ */
 extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
                                                        __mpz_struct const * /*[1]*/ z2);
 
@@ -77,7 +82,7 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_add(__mpz_struct * /*[1]*/ z
                                                         __mpz_struct const * /*[1]*/ z2,
                                                         __mpz_struct const * /*[1]*/ z3);
 
-/*@ assigns \nothing; */
+/*@ assigns \result \from *((char *)ptr+(0..size-1)); */
 extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
                                                             size_t size);
 
@@ -91,13 +96,22 @@ extern  __attribute__((__FC_BUILTIN__)) void __initialize(void *ptr,
 /*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
 
-/*@ assigns \nothing; */
+/*@ ensures \result ≡ 0 ∨ \result ≡ 1;
+    ensures
+      \result ≡ 1 ⇒ \valid_read((char *)\old(ptr)+(0..\old(size)-1));
+    assigns \result \from *((char *)ptr+(0..size-1));
+ */
 extern  __attribute__((__FC_BUILTIN__)) int __valid_read(void *ptr,
                                                          size_t size);
 
+/*@ ghost extern int __e_acsl_internal_heap; */
+
+/*@ assigns __e_acsl_internal_heap;
+    assigns __e_acsl_internal_heap \from __e_acsl_internal_heap;
+ */
 extern  __attribute__((__FC_BUILTIN__)) void __e_acsl_memory_clean(void);
 
-extern size_t __memory_size;
+/*@ ghost extern size_t __memory_size; */
 
 /*@
 predicate diffSize{L1, L2}(ℤ i) =

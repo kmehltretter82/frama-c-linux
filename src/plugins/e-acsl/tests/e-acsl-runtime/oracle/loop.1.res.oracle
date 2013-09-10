@@ -13,6 +13,8 @@
   __fc_random_counter ∈ {0}
   __fc_rand_max ∈ {32767}
   __fc_heap_status ∈ [--..--]
+  __e_acsl_init ∈ [--..--]
+  __e_acsl_internal_heap ∈ [--..--]
   __memory_size ∈ [--..--]
 [value] using specification for function e_acsl_assert
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
@@ -28,7 +30,7 @@ tests/e-acsl-runtime/loop.i:21:[kernel] warning: accessing uninitialized left-va
 tests/e-acsl-runtime/loop.i:28:[value] Loop invariant got status valid.
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
-[value] Values at end of function nested_loop:
+[value] Values at end of function nested_loops:
   t{[0][0..14]; [1][0]} ∈ {0}
    [1][1] ∈ {1}
    [1][2] ∈ {2}

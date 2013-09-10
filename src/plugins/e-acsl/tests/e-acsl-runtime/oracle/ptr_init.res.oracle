@@ -21,6 +21,8 @@ tests/e-acsl-runtime/ptr_init.c:22:[e-acsl] warning: E-ACSL construct `logic fun
   __fc_random_counter ∈ {0}
   __fc_rand_max ∈ {32767}
   __fc_heap_status ∈ [--..--]
+  __e_acsl_init ∈ [--..--]
+  __e_acsl_internal_heap ∈ [--..--]
   __memory_size ∈ [--..--]
   A ∈ {0}
   B ∈ {0}
@@ -37,11 +39,10 @@ tests/e-acsl-runtime/ptr_init.c:28:[value] Assertion got status valid.
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
 tests/e-acsl-runtime/ptr_init.c:29:[value] Assertion got status valid.
 [value] using specification for function __initialized
-FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:107:[value] Function __initialized: postcondition got status unknown.
-FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:108:[value] Function __initialized: postcondition got status valid.
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:118:[value] Function __initialized: postcondition got status unknown.
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:119:[value] Function __initialized: postcondition got status valid.
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
 tests/e-acsl-runtime/ptr_init.c:19:[value] Assertion got status valid.
-[kernel] warning: Neither code nor specification for function __e_acsl_memory_clean, generating default assigns from the prototype
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
@@ -57,6 +58,7 @@ tests/e-acsl-runtime/ptr_init.c:19:[value] Assertion got status valid.
   
 [value] Values at end of function main:
   __fc_heap_status ∈ [--..--]
+  __e_acsl_internal_heap ∈ [--..--]
   A ∈ {{ NULL + [--..--] ; &alloced_return___malloc + [0..2147483647] }}
   B ∈ {{ NULL + [--..--] ; &alloced_return___malloc + [0..2147483647] }}
   x ∈ {{ NULL + [--..--] ; &alloced_return___malloc + [0..2147483647] }}

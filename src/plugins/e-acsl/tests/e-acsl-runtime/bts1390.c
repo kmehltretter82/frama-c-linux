@@ -26,6 +26,6 @@ void *memchr(const void *buf, int c, size_t n) {
 
 int main(void) {
   memchr("toto", 'o', 4);
-  memchr("toto", 'a', 4);
+  memchr("tata", 'o', 4);
   return 0;
 }

@@ -422,7 +422,7 @@ and comparison_to_exp
 	(fun v _ -> 
 	  [ Misc.mk_call ~loc ~result:(Cil.var v) "__gmpz_cmp" [ e1; e2 ] ])
     in
-    Cil.new_exp ~loc (BinOp(bop, e, Cil.zero ?loc, Cil.intType)), env
+    Cil.new_exp ~loc (BinOp(bop, e, Cil.zero ~loc, Cil.intType)), env
   else
     Cil.new_exp  ~loc (BinOp(bop, e1, e2, Cil.intType)), env
 

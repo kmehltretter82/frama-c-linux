@@ -30,7 +30,11 @@ axiomatic
   
   }
  */
-extern size_t __memory_size;
+/*@ ghost extern int __e_acsl_init; */
+
+/*@ ghost extern int __e_acsl_internal_heap; */
+
+/*@ ghost extern size_t __memory_size; */
 
 /*@
 predicate diffSize{L1, L2}(ℤ i) =

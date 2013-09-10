@@ -30,9 +30,12 @@ axiomatic
   
   }
  */
+/*@ ghost extern int __e_acsl_init; */
+
 /*@ requires ¬\initialized(z);
     ensures \valid(\old(z));
     assigns *z;
+    assigns *z \from __e_acsl_init;
     allocates \old(z);
  */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init(__mpz_struct * /*[1]*/ z);
@@ -51,7 +54,8 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init_set_si(__mpz_struct * /
     ensures \valid(\old(z));
     ensures \initialized(\old(z));
     assigns *z;
-    assigns *z \from str, base;
+    assigns *z \from *(str+(0..)), base;
+    assigns \result \from *(str+(0..)), base;
     allocates \old(z);
  */
 extern  __attribute__((__FC_BUILTIN__)) int __gmpz_init_set_str(__mpz_struct * /*[1]*/ z,
@@ -59,12 +63,14 @@ extern  __attribute__((__FC_BUILTIN__)) int __gmpz_init_set_str(__mpz_struct * /
                                                                 int base);
 
 /*@ requires \valid(x);
-    assigns *x; */
+    assigns *x;
+    assigns *x \from *x; */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_clear(__mpz_struct * /*[1]*/ x);
 
 /*@ requires \valid(z1);
     requires \valid(z2);
-    assigns \nothing; */
+    assigns \result \from *z1, *z2;
+ */
 extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
                                                        __mpz_struct const * /*[1]*/ z2);
 
@@ -130,11 +136,14 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_tdiv_r(__mpz_struct * /*[1]*
     requires \valid(z2);
     assigns *z1;
     assigns *z1 \from *z2;
+    assigns \result \from *z1, *z2;
  */
 extern  __attribute__((__FC_BUILTIN__)) int __gmpz_com(__mpz_struct * /*[1]*/ z1,
                                                        __mpz_struct const * /*[1]*/ z2);
 
-extern size_t __memory_size;
+/*@ ghost extern int __e_acsl_internal_heap; */
+
+/*@ ghost extern size_t __memory_size; */
 
 /*@
 predicate diffSize{L1, L2}(ℤ i) =

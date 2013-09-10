@@ -13,36 +13,37 @@
   __fc_random_counter ∈ {0}
   __fc_rand_max ∈ {32767}
   __fc_heap_status ∈ [--..--]
+  __e_acsl_init ∈ [--..--]
+  __e_acsl_internal_heap ∈ [--..--]
   __memory_size ∈ [--..--]
 [value] using specification for function __store_block
 [value] using specification for function __initialize
 [value] using specification for function __delete_block
 tests/e-acsl-runtime/bts1326.i:10:[value] Function atp_NORMAL_computeAverageAccel: postcondition got status valid.
 [value] using specification for function __gmpz_init_set_si
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:62:[value] Function __gmpz_init_set_si: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: postcondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:65:[value] Function __gmpz_init_set_si: postcondition got status unknown.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:66:[value] Function __gmpz_init_set_si: postcondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:67:[value] Function __gmpz_init_set_si: postcondition got status unknown.
 [value] using specification for function __gmpz_init
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:37:[value] Function __gmpz_init: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:38:[value] Function __gmpz_init: postcondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:39:[value] Function __gmpz_init: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:40:[value] Function __gmpz_init: postcondition got status valid.
 [value] using specification for function __gmpz_add
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:140:[value] Function __gmpz_add: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:141:[value] Function __gmpz_add: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:142:[value] Function __gmpz_add: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:143:[value] Function __gmpz_add: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:144:[value] Function __gmpz_add: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:145:[value] Function __gmpz_add: precondition got status valid.
 [value] using specification for function __gmpz_cmp
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:124:[value] Function __gmpz_cmp: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:125:[value] Function __gmpz_cmp: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:127:[value] Function __gmpz_cmp: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:128:[value] Function __gmpz_cmp: precondition got status valid.
 tests/e-acsl-runtime/bts1326.i:11:[value] Assertion 'E_ACSL' got status valid.
 [value] using specification for function e_acsl_assert
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_tdiv_q
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:161:[value] Function __gmpz_tdiv_q: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:162:[value] Function __gmpz_tdiv_q: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:163:[value] Function __gmpz_tdiv_q: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:164:[value] Function __gmpz_tdiv_q: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:165:[value] Function __gmpz_tdiv_q: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:166:[value] Function __gmpz_tdiv_q: precondition got status valid.
 [value] using specification for function __gmpz_clear
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:114:[value] Function __gmpz_clear: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:117:[value] Function __gmpz_clear: precondition got status valid.
 tests/e-acsl-runtime/bts1326.i:10:[value] Function __e_acsl_atp_NORMAL_computeAverageAccel: postcondition got status valid.
-[kernel] warning: Neither code nor specification for function __e_acsl_memory_clean, generating default assigns from the prototype
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
@@ -51,6 +52,7 @@ tests/e-acsl-runtime/bts1326.i:10:[value] Function __e_acsl_atp_NORMAL_computeAv
 [value] Values at end of function __e_acsl_atp_NORMAL_computeAverageAccel:
   av ∈ {3}
 [value] Values at end of function main:
+  __e_acsl_internal_heap ∈ [--..--]
   Accel[0] ∈ {1}
        [1] ∈ {2}
        [2] ∈ {3}

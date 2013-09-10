@@ -21,6 +21,8 @@ tests/e-acsl-runtime/localvar.c:26:[e-acsl] warning: E-ACSL construct `logic fun
   __fc_random_counter ∈ {0}
   __fc_rand_max ∈ {32767}
   __fc_heap_status ∈ [--..--]
+  __e_acsl_init ∈ [--..--]
+  __e_acsl_internal_heap ∈ [--..--]
   __memory_size ∈ [--..--]
 [value] using specification for function __store_block
 [value] using specification for function __full_init
@@ -29,13 +31,14 @@ FRAMAC_SHARE/libc/stdlib.h:127:[value] Function __e_acsl_malloc, behavior alloca
 FRAMAC_SHARE/libc/stdlib.h:132:[value] Function __e_acsl_malloc, behavior no_allocation: postcondition got status invalid. (Behavior may be inactive, no reduction performed.)
 tests/e-acsl-runtime/localvar.c:20:[value] Assertion got status valid.
 [value] using specification for function __initialized
-FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:107:[value] Function __initialized: postcondition got status unknown.
-FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:108:[value] Function __initialized: postcondition got status valid.
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:118:[value] Function __initialized: postcondition got status unknown.
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:119:[value] Function __initialized: postcondition got status valid.
 [value] using specification for function __valid
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:86:[value] Function __valid: postcondition got status unknown.
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:87:[value] Function __valid: postcondition got status valid.
 [value] using specification for function e_acsl_assert
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
 [value] using specification for function __initialize
-[kernel] warning: Neither code nor specification for function __e_acsl_memory_clean, generating default assigns from the prototype
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
@@ -51,6 +54,7 @@ FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got
                  [bits 32 to 63] ∈ {{ &Frama_C_alloc }}
 [value] Values at end of function main:
   __fc_heap_status ∈ [--..--]
+  __e_acsl_internal_heap ∈ [--..--]
   l ∈ {{ &Frama_C_alloc_0 }}
   __retres ∈ {0}
   Frama_C_alloc[bits 0 to 31] ∈ {4}

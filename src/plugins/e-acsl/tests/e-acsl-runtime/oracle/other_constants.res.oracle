@@ -13,6 +13,8 @@
   __fc_random_counter ∈ {0}
   __fc_rand_max ∈ {32767}
   __fc_heap_status ∈ [--..--]
+  __e_acsl_init ∈ [--..--]
+  __e_acsl_internal_heap ∈ [--..--]
   __memory_size ∈ [--..--]
 tests/e-acsl-runtime/other_constants.i:12:[value] Assertion got status valid.
 [value] using specification for function e_acsl_assert

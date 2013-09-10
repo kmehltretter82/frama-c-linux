@@ -18,33 +18,35 @@ tests/e-acsl-runtime/linear_search.i:14:[e-acsl] warning: missing guard for ensu
   __fc_random_counter ∈ {0}
   __fc_rand_max ∈ {32767}
   __fc_heap_status ∈ [--..--]
+  __e_acsl_init ∈ [--..--]
+  __e_acsl_internal_heap ∈ [--..--]
   __memory_size ∈ [--..--]
   A[0..9] ∈ {0}
 tests/e-acsl-runtime/linear_search.i:30:[value] entering loop for the first time
 tests/e-acsl-runtime/linear_search.i:9:[value] Function __e_acsl_search: precondition got status unknown.
 [value] using specification for function __gmpz_init
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:37:[value] Function __gmpz_init: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:38:[value] Function __gmpz_init: postcondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:39:[value] Function __gmpz_init: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:40:[value] Function __gmpz_init: postcondition got status valid.
 [value] using specification for function __gmpz_init_set_si
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:62:[value] Function __gmpz_init_set_si: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: postcondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:65:[value] Function __gmpz_init_set_si: postcondition got status unknown.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:66:[value] Function __gmpz_init_set_si: postcondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:67:[value] Function __gmpz_init_set_si: postcondition got status unknown.
 [value] using specification for function __gmpz_set
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:91:[value] Function __gmpz_set: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:92:[value] Function __gmpz_set: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:94:[value] Function __gmpz_set: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:95:[value] Function __gmpz_set: precondition got status valid.
 [value] using specification for function __gmpz_clear
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:114:[value] Function __gmpz_clear: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:117:[value] Function __gmpz_clear: precondition got status valid.
 tests/e-acsl-runtime/linear_search.i:9:[value] entering loop for the first time
 [value] using specification for function __gmpz_cmp
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:124:[value] Function __gmpz_cmp: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:125:[value] Function __gmpz_cmp: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:127:[value] Function __gmpz_cmp: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:128:[value] Function __gmpz_cmp: precondition got status valid.
 [value] using specification for function __gmpz_get_ui
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:194:[value] Function __gmpz_get_ui: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:198:[value] Function __gmpz_get_ui: precondition got status valid.
 tests/e-acsl-runtime/linear_search.i:9:[kernel] warning: accessing out of bounds index [0..4294967295]. assert __e_acsl_i_2 < 10;
 [value] using specification for function __gmpz_add
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:140:[value] Function __gmpz_add: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:141:[value] Function __gmpz_add: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:142:[value] Function __gmpz_add: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:143:[value] Function __gmpz_add: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:144:[value] Function __gmpz_add: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:145:[value] Function __gmpz_add: precondition got status valid.
 tests/e-acsl-runtime/linear_search.i:9:[kernel] warning: accessing out of bounds index [0..4294967295]. assert __e_acsl_3 < 10;
 [value] using specification for function e_acsl_assert
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.

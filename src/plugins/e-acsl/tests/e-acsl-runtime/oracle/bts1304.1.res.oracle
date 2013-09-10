@@ -13,6 +13,8 @@
   __fc_random_counter ∈ {0}
   __fc_rand_max ∈ {32767}
   __fc_heap_status ∈ [--..--]
+  __e_acsl_init ∈ [--..--]
+  __e_acsl_internal_heap ∈ [--..--]
   __memory_size ∈ [--..--]
 [value] using specification for function __store_block
 tests/e-acsl-runtime/bts1304.i:23:[value] entering loop for the first time
@@ -20,17 +22,17 @@ tests/e-acsl-runtime/bts1304.i:23:[value] entering loop for the first time
 [value] using specification for function __delete_block
 tests/e-acsl-runtime/bts1304.i:25:[value] Assertion got status unknown.
 [value] using specification for function __initialized
-FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:107:[value] Function __initialized: postcondition got status unknown.
-FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:108:[value] Function __initialized: postcondition got status valid.
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:118:[value] Function __initialized: postcondition got status unknown.
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:119:[value] Function __initialized: postcondition got status valid.
 [value] using specification for function e_acsl_assert
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
-[kernel] warning: Neither code nor specification for function __e_acsl_memory_clean, generating default assigns from the prototype
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function read_sensor_4:
   buf[0..11] ∈ {0} or UNINITIALIZED
 [value] Values at end of function main:
+  __e_acsl_internal_heap ∈ [--..--]
   buf[0..11] ∈ {0}
   i ∈ {3}
   __retres ∈ {0}

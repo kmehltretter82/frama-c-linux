@@ -59,7 +59,9 @@ axiomatic
   
   }
  */
-/*@ assigns \nothing; */
+/*@ ghost extern int __e_acsl_init; */
+
+/*@ assigns \result \from *((char *)ptr+(0..size-1)); */
 extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
                                                             size_t size);
 
@@ -69,7 +71,9 @@ extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
 /*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __literal_string(void *ptr);
 
-extern size_t __memory_size;
+/*@ ghost extern int __e_acsl_internal_heap; */
+
+/*@ ghost extern size_t __memory_size; */
 
 /*@
 predicate diffSize{L1, L2}(ℤ i) =

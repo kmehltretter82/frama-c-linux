@@ -13,23 +13,25 @@
   __fc_random_counter ∈ {0}
   __fc_rand_max ∈ {32767}
   __fc_heap_status ∈ [--..--]
+  __e_acsl_init ∈ [--..--]
+  __e_acsl_internal_heap ∈ [--..--]
   __memory_size ∈ [--..--]
 tests/e-acsl-runtime/typedef.i:11:[value] Assertion got status valid.
 [value] using specification for function __gmpz_init_set_ui
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:53:[value] Function __gmpz_init_set_ui: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:55:[value] Function __gmpz_init_set_ui: postcondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:56:[value] Function __gmpz_init_set_ui: postcondition got status unknown.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:55:[value] Function __gmpz_init_set_ui: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:57:[value] Function __gmpz_init_set_ui: postcondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:58:[value] Function __gmpz_init_set_ui: postcondition got status unknown.
 [value] using specification for function __gmpz_init_set_si
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:62:[value] Function __gmpz_init_set_si: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: postcondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:65:[value] Function __gmpz_init_set_si: postcondition got status unknown.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:66:[value] Function __gmpz_init_set_si: postcondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:67:[value] Function __gmpz_init_set_si: postcondition got status unknown.
 [value] using specification for function __gmpz_cmp
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:124:[value] Function __gmpz_cmp: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:125:[value] Function __gmpz_cmp: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:127:[value] Function __gmpz_cmp: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:128:[value] Function __gmpz_cmp: precondition got status valid.
 [value] using specification for function e_acsl_assert
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_clear
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:114:[value] Function __gmpz_clear: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:117:[value] Function __gmpz_clear: precondition got status valid.
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value] Values at end of function main:

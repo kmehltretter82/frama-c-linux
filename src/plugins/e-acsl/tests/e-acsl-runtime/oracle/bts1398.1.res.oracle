@@ -14,6 +14,8 @@
   __fc_random_counter ∈ {0}
   __fc_rand_max ∈ {32767}
   __fc_heap_status ∈ [--..--]
+  __e_acsl_init ∈ [--..--]
+  __e_acsl_internal_heap ∈ [--..--]
   __memory_size ∈ [--..--]
   __fc_stdout ∈ {{ NULL ; &S___fc_stdout }}
   S___fc_stdout[0]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .mode} ∈

@@ -30,7 +30,9 @@ axiomatic
   
   }
  */
-/*@ assigns \nothing; */
+/*@ ghost extern int __e_acsl_init; */
+
+/*@ assigns \result \from *((char *)ptr+(0..size-1)); */
 extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
                                                             size_t size);
 
@@ -43,16 +45,26 @@ extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
 /*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __literal_string(void *ptr);
 
-/*@ assigns \nothing; */
+/*@ ensures \result ≡ 0 ∨ \result ≡ 1;
+    ensures
+      \result ≡ 1 ⇒ \valid_read((char *)\old(ptr)+(0..\old(size)-1));
+    assigns \result \from *((char *)ptr+(0..size-1));
+ */
 extern  __attribute__((__FC_BUILTIN__)) int __valid_read(void *ptr,
                                                          size_t size);
 
-/*@ assigns \nothing; */
+/*@ ensures \result ≡ \offset(\old(ptr));
+    assigns \result \from ptr; */
 extern  __attribute__((__FC_BUILTIN__)) int __offset(void *ptr);
 
+/*@ ghost extern int __e_acsl_internal_heap; */
+
+/*@ assigns __e_acsl_internal_heap;
+    assigns __e_acsl_internal_heap \from __e_acsl_internal_heap;
+ */
 extern  __attribute__((__FC_BUILTIN__)) void __e_acsl_memory_clean(void);
 
-extern size_t __memory_size;
+/*@ ghost extern size_t __memory_size; */
 
 /*@
 predicate diffSize{L1, L2}(ℤ i) =
@@ -232,11 +244,11 @@ int main(void)
   __full_init((void *)__e_acsl_literal_string);
   __literal_string((void *)__e_acsl_literal_string);
   __e_acsl_memchr((void const *)__e_acsl_literal_string,'o',(unsigned int)4);
-  __e_acsl_literal_string_2 = "toto";
-  __store_block((void *)__e_acsl_literal_string_2,sizeof("toto"));
+  __e_acsl_literal_string_2 = "tata";
+  __store_block((void *)__e_acsl_literal_string_2,sizeof("tata"));
   __full_init((void *)__e_acsl_literal_string_2);
   __literal_string((void *)__e_acsl_literal_string_2);
-  __e_acsl_memchr((void const *)__e_acsl_literal_string_2,'a',
+  __e_acsl_memchr((void const *)__e_acsl_literal_string_2,'o',
                   (unsigned int)4);
   __retres = 0;
   __e_acsl_memory_clean();

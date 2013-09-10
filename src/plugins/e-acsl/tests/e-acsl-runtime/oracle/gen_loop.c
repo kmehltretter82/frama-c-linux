@@ -30,7 +30,11 @@ axiomatic
   
   }
  */
-extern size_t __memory_size;
+/*@ ghost extern int __e_acsl_init; */
+
+/*@ ghost extern int __e_acsl_internal_heap; */
+
+/*@ ghost extern size_t __memory_size; */
 
 /*@
 predicate diffSize{L1, L2}(ℤ i) =
@@ -64,7 +68,7 @@ void simple_loop(void)
   return;
 }
 
-void nested_loop(void)
+void nested_loops(void)
 {
   int t[10][15];
   int i;
@@ -72,7 +76,7 @@ void nested_loop(void)
   {
     int __e_acsl_and;
     if (0 <= i) __e_acsl_and = i <= 10; else __e_acsl_and = 0;
-    e_acsl_assert(__e_acsl_and,(char *)"Invariant",(char *)"nested_loop",
+    e_acsl_assert(__e_acsl_and,(char *)"Invariant",(char *)"nested_loops",
                   (char *)"0 <= i && i <= 10",17);
     /*@ loop invariant 0 ≤ i ∧ i ≤ 10; */
     while (i < 10) {
@@ -92,16 +96,16 @@ void nested_loop(void)
             while (1) {
               if (__e_acsl_l < j) ; else break;
               e_acsl_assert(__e_acsl_l < 15,(char *)"RTE",
-                            (char *)"nested_loop",
+                            (char *)"nested_loops",
                             (char *)"index_bound: __e_acsl_l < 15",21);
               e_acsl_assert(0 <= __e_acsl_l,(char *)"RTE",
-                            (char *)"nested_loop",
+                            (char *)"nested_loops",
                             (char *)"index_bound: 0 <= __e_acsl_l",21);
               e_acsl_assert(__e_acsl_k < 10,(char *)"RTE",
-                            (char *)"nested_loop",
+                            (char *)"nested_loops",
                             (char *)"index_bound: __e_acsl_k < 10",21);
               e_acsl_assert(0 <= __e_acsl_k,(char *)"RTE",
-                            (char *)"nested_loop",
+                            (char *)"nested_loops",
                             (char *)"index_bound: 0 <= __e_acsl_k",21);
               if ((long long)t[__e_acsl_k][__e_acsl_l] == (long long)__e_acsl_k * (long long)__e_acsl_l) 
                 ;
@@ -115,12 +119,13 @@ void nested_loop(void)
           }
           e_acsl_end_loop1: ;
           e_acsl_assert(__e_acsl_forall,(char *)"Invariant",
-                        (char *)"nested_loop",
+                        (char *)"nested_loops",
                         (char *)"\\forall integer k, integer l;\n  (0 <= k && k < i) && (0 <= l && l < j) ==> t[k][l] == k*l",
                         21);
           if (0 <= j) __e_acsl_and_2 = j <= 15; else __e_acsl_and_2 = 0;
           e_acsl_assert(__e_acsl_and_2,(char *)"Invariant",
-                        (char *)"nested_loop",(char *)"0 <= j && j <= 15",19);
+                        (char *)"nested_loops",(char *)"0 <= j && j <= 15",
+                        19);
           /*@ loop invariant 0 ≤ j ∧ j ≤ 15;
               loop invariant
                 ∀ ℤ k, ℤ l;
@@ -137,7 +142,7 @@ void nested_loop(void)
               j ++;
               if (0 <= j) __e_acsl_and_3 = j <= 15; else __e_acsl_and_3 = 0;
               e_acsl_assert(__e_acsl_and_3,(char *)"Invariant",
-                            (char *)"nested_loop",
+                            (char *)"nested_loops",
                             (char *)"0 <= j && j <= 15",19);
               __e_acsl_forall_2 = 1;
               __e_acsl_k_2 = 0;
@@ -147,16 +152,16 @@ void nested_loop(void)
                 while (1) {
                   if (__e_acsl_l_2 < j) ; else break;
                   e_acsl_assert(__e_acsl_l_2 < 15,(char *)"RTE",
-                                (char *)"nested_loop",
+                                (char *)"nested_loops",
                                 (char *)"index_bound: __e_acsl_l_2 < 15",21);
                   e_acsl_assert(0 <= __e_acsl_l_2,(char *)"RTE",
-                                (char *)"nested_loop",
+                                (char *)"nested_loops",
                                 (char *)"index_bound: 0 <= __e_acsl_l_2",21);
                   e_acsl_assert(__e_acsl_k_2 < 10,(char *)"RTE",
-                                (char *)"nested_loop",
+                                (char *)"nested_loops",
                                 (char *)"index_bound: __e_acsl_k_2 < 10",21);
                   e_acsl_assert(0 <= __e_acsl_k_2,(char *)"RTE",
-                                (char *)"nested_loop",
+                                (char *)"nested_loops",
                                 (char *)"index_bound: 0 <= __e_acsl_k_2",21);
                   if ((long long)t[__e_acsl_k_2][__e_acsl_l_2] == (long long)__e_acsl_k_2 * (long long)__e_acsl_l_2) 
                     ;
@@ -170,7 +175,7 @@ void nested_loop(void)
               }
               e_acsl_end_loop2: ;
               e_acsl_assert(__e_acsl_forall_2,(char *)"Invariant",
-                            (char *)"nested_loop",
+                            (char *)"nested_loops",
                             (char *)"\\forall integer k, integer l;\n  (0 <= k && k < i) && (0 <= l && l < j) ==> t[k][l] == k*l",
                             21);
             }
@@ -182,7 +187,7 @@ void nested_loop(void)
         i ++;
         if (0 <= i) __e_acsl_and_4 = i <= 10; else __e_acsl_and_4 = 0;
         e_acsl_assert(__e_acsl_and_4,(char *)"Invariant",
-                      (char *)"nested_loop",(char *)"0 <= i && i <= 10",17);
+                      (char *)"nested_loops",(char *)"0 <= i && i <= 10",17);
       }
     }
   }
@@ -223,7 +228,7 @@ int main(void)
 {
   int __retres;
   simple_loop();
-  nested_loop();
+  nested_loops();
   unnatural_loop();
   __retres = 0;
   return __retres;

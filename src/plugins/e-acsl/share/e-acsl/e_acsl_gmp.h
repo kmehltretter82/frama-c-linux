@@ -34,10 +34,12 @@
 /* Initializers */
 /****************/
 
+/*@ ghost extern int __e_acsl_init; */
+
 /*@ requires ! \initialized(z);
   @ ensures \valid(z);
   @ allocates z;
-  @ assigns *z; */
+  @ assigns *z \from __e_acsl_init; */
 extern void __gmpz_init(mpz_t z)
   __attribute__((FC_BUILTIN));
 
@@ -72,7 +74,8 @@ extern void __gmpz_init_set_si(mpz_t z, signed long int n)
   @ allocates z;
   @ ensures \valid(z);
   @ ensures \initialized(z);
-  @ assigns *z \from str,base; */
+  @ assigns *z \from str[0..],base; 
+  @ assigns \result \from str[0..],base; */
 extern int __gmpz_init_set_str(mpz_t z, const char *str, int base)
   __attribute__((FC_BUILTIN));
 
@@ -113,7 +116,7 @@ extern void __gmpz_set_si(mpz_t z, signed long int n)
 
 /*@ requires \valid(x);
 //  @ frees x;
-  @ assigns *x; */
+  @ assigns *x \from *x; */
 extern void __gmpz_clear(mpz_t x)
   __attribute__((FC_BUILTIN));
 
@@ -123,7 +126,7 @@ extern void __gmpz_clear(mpz_t x)
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
-  @ assigns \nothing; */
+  @ assigns \result \from *z1, *z2; */
 extern int __gmpz_cmp(const mpz_t z1, const mpz_t z2)
   __attribute__((FC_BUILTIN));
 
@@ -178,7 +181,8 @@ extern void __gmpz_tdiv_r(mpz_t z1, const mpz_t z2, const mpz_t z3)
 
 /*@ requires \valid(z1);
   @ requires \valid(z2);
-  @ assigns *z1 \from *z2; */
+  @ assigns *z1 \from *z2; 
+  @ assigns \result \from *z1,*z2; */
 extern int __gmpz_com(mpz_t z1, const mpz_t z2)
   __attribute__((FC_BUILTIN));
 
@@ -187,12 +191,12 @@ extern int __gmpz_com(mpz_t z1, const mpz_t z2)
 /************************/
 
 /*@ requires \valid(z); 
-  @ assigns \nothing; */
+  @ assigns \result \from *z; */
 extern long __gmpz_get_si(const mpz_t z)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(z); 
-  @ assigns \nothing; */
+  @ assigns \result \from *z; */
 extern unsigned long __gmpz_get_ui(const mpz_t z)
   __attribute__((FC_BUILTIN));
 

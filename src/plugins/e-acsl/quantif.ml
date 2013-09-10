@@ -193,7 +193,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
       (* generate the guard [x bop t2] *)
       let stmts_block b = [ mkStmt ~valid_sid:true (Block b) ] in
       let tlv = Logic_const.tvar ~loc llv in
-      let guard = Logic_const.term (TBinOp(bop2, tlv, t2)) Linteger in
+      let guard = Logic_const.term ~loc (TBinOp(bop2, tlv, t2)) Linteger in
       Typing.type_term guard;
       let guard_exp, env = term_to_exp kf (Env.push env) (Some intType) guard in
       let break_stmt = mkStmt ~valid_sid:true (Break guard_exp.eloc) in
@@ -202,7 +202,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
 	  env
 	  (mkStmt ~valid_sid:true
 	     (If(guard_exp,
-		 mkBlock [ mkEmptyStmt () ],
+		 mkBlock [ mkEmptyStmt ~loc () ],
 		 mkBlock [ break_stmt ], 
 		 guard_exp.eloc)))
 	  ~global_clear:false
