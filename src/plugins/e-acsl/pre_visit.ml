@@ -292,7 +292,9 @@ class dup_functions_visitor prj = object (self)
 	-> 
     self#next ();
     let name = "__e_acsl_" ^ vi.vname in
-    let new_vi = Project.on prj (Cil.makeGlobalVar name) vi.vtype in
+    let new_vi = 
+      Project.on prj (Cil.makeGlobalVar ~generated:true name) vi.vtype 
+    in
     Cil_datatype.Varinfo.Hashtbl.add fct_tbl vi new_vi;
     Cil.DoChildrenPost
       (fun l -> match l with
