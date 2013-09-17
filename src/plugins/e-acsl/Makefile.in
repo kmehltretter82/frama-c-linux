@@ -150,7 +150,9 @@ EXPORT	=e-acsl-$(EACSL_VERSION)
 DOC_FILES= doc/manuals/e-acsl-manual.pdf  \
 	doc/manuals/e-acsl.pdf doc/manuals/e-acsl-implementation.pdf
 
-DISTRIB_FILES= $(filter-out $(wildcard *local_config.ml), $(wildcard *.ml)) \
+EACSL_DISTRIB_FILES=\
+  $(filter-out \
+	$(wildcard *local_config.ml), $(wildcard *.ml)) \
 	$(wildcard *.mli) \
 	configure.ac Makefile.in \
 	doc/Changelog \
@@ -164,7 +166,7 @@ DISTRIB_FILES= $(filter-out $(wildcard *local_config.ml), $(wildcard *.ml)) \
 
 e-acsl-distrib: .depend
 	$(PRINT_TAR) tmp-distrib
-	$(TAR) cf tmp.tar $(DISTRIB_FILES)
+	$(TAR) cf tmp.tar $(EACSL_DISTRIB_FILES)
 	$(PRINT_MAKING) export directories
 	$(MKDIR) $(EXPORT)
 	$(PRINT_UNTAR) tmp-distrib
