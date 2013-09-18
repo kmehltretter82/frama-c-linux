@@ -68,6 +68,7 @@
   (voir aussi result.i et ./at_stmt_contract.i)
 - interprétation des tableaux logiques
 [Dillon] Windows
+[Guillaume] look like some loop invariants are tagged as "assertion"
 
 [to be check]: no call to full_init or initialize for the assigned result of a 
 function call

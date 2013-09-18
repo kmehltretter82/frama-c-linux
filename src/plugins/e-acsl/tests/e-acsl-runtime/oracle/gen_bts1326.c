@@ -152,7 +152,7 @@ void __e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
     e_acsl_assert(__e_acsl_valid_read_6,(char *)"RTE",
                   (char *)"atp_NORMAL_computeAverageAccel",
                   (char *)"mem_access: \\valid_read(__e_acsl_at)",10);
-    e_acsl_assert(*__e_acsl_at == (((((long long)(*__e_acsl_at_2)[4] + (long long)(*__e_acsl_at_3)[3]) + (long long)(*__e_acsl_at_4)[2]) + (long long)(*__e_acsl_at_5)[1]) + (long long)(*__e_acsl_at_6)[0]) / 5,
+    e_acsl_assert(*__e_acsl_at == (((((long long)(*__e_acsl_at_2)[4] + (long long)(*__e_acsl_at_3)[3]) + (long long)(*__e_acsl_at_4)[2]) + (long long)(*__e_acsl_at_5)[1]) + (long long)(*__e_acsl_at_6)[0]) / (long long)5,
                   (char *)"Postcondition",
                   (char *)"atp_NORMAL_computeAverageAccel",
                   (char *)"*\\old(AverageAccel) ==\n(((((*\\old(Accel))[4]+(*\\old(Accel))[3])+(*\\old(Accel))[2])+(*\\old(Accel))[1])+(*\n  \\old(Accel))[0])/5",

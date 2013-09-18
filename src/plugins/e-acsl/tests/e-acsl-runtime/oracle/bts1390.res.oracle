@@ -6,9 +6,6 @@
 [kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h"
 [kernel] preprocessing with "gcc -C -E -I.  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc tests/e-acsl-runtime/bts1390.c"
 [e-acsl] beginning translation.
-tests/e-acsl-runtime/bts1390.c:11:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
-tests/e-acsl-runtime/bts1390.c:13:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
-tests/e-acsl-runtime/bts1390.c:15:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
 [e-acsl] translation done in project "e-acsl".
 [value] Analyzing a complete application starting at main
 [value] Computing initial state

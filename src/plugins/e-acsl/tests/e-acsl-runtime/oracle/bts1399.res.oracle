@@ -17,7 +17,6 @@ tests/e-acsl-runtime/bts1399.c:19:[e-acsl] warning: E-ACSL construct `logic func
                   Ignoring annotation.
 tests/e-acsl-runtime/bts1399.c:19:[e-acsl] warning: E-ACSL construct `\free' is not yet supported. Ignoring annotation.
 tests/e-acsl-runtime/bts1399.c:19:[e-acsl] warning: E-ACSL construct `\allocate' is not yet supported. Ignoring annotation.
-tests/e-acsl-runtime/bts1399.c:24:[e-acsl] warning: missing guard for ensuring that the given integer is C-representable
 [e-acsl] translation done in project "e-acsl".
 [value] Analyzing a complete application starting at main
 [value] Computing initial state

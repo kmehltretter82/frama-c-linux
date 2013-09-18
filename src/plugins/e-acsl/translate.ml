@@ -191,7 +191,7 @@ and context_insensitive_term_to_exp kf env t =
     let e, env = term_to_exp kf env (Some ctx) t in
     Cil.new_exp ~loc (AlignOfE e), env, false, "alignof"
   | TUnOp(Neg | BNot as op, t') ->
-    let ty = Typing.typ_of_term t in
+    let ty = Typing.typ_of_term_operation t in
     let e, env = term_to_exp kf env (Some ty) t' in
     if Mpz.is_t ty then
       let name, vname = match op with
@@ -211,7 +211,7 @@ and context_insensitive_term_to_exp kf env t =
     else
       Cil.new_exp ~loc (UnOp(op, e, ty)), env, false, ""
   | TUnOp(LNot, t) ->
-    let ty = Typing.typ_of_term t in
+    let ty = Typing.typ_of_term_operation t in
     if Mpz.is_t ty then
       (* [!t] is converted into [t == 0] *)
       let zero = Logic_const.tinteger 0 in
@@ -225,7 +225,7 @@ and context_insensitive_term_to_exp kf env t =
       Cil.new_exp ~loc (UnOp(LNot, e, Cil.intType)), env, false, ""
     end
   | TBinOp(PlusA | MinusA | Mult as bop, t1, t2) ->
-    let ty = Typing.typ_of_term t in
+    let ty = Typing.typ_of_term_operation t in
     let ctx = Some ty in
     let e1, env = term_to_exp kf env ctx t1 in
     let e2, env = term_to_exp kf env ctx t2 in
@@ -240,7 +240,7 @@ and context_insensitive_term_to_exp kf env t =
     else
       Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)), env, false, ""
   | TBinOp(Div | Mod as bop, t1, t2) ->
-    let ty = Typing.typ_of_term t in
+    let ty = Typing.typ_of_term_operation t in
     let ctx = Some ty in
     let e1, env = term_to_exp kf env ctx t1 in
     let e2, env = term_to_exp kf env ctx t2 in
@@ -253,6 +253,7 @@ and context_insensitive_term_to_exp kf env t =
 	 possible values of [t2] *)
       (* guarding divisions and modulos *)
       let zero = Logic_const.tinteger 0 in
+      Typing.type_term zero;
       (* do not generate [e2] from [t2] twice *)
       let guard, env = 
 	let name = name_of_binop bop ^ "_guard" in
@@ -277,7 +278,7 @@ and context_insensitive_term_to_exp kf env t =
       let _, e, env = Env.new_var_and_mpz_init ~loc ~name env t mk_stmts in
       e, env, false, ""
     else
-      (* no guard required since RTE are generated separately *)
+      (* no guard required since RTEs are generated separately *)
       Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)), env, false, ""
   | TBinOp(Lt | Gt | Le | Ge | Eq | Ne as bop, t1, t2) ->
     (* comparison operators *)
@@ -388,7 +389,7 @@ and term_to_exp kf env ctx t =
   let env = if generate_rte then translate_rte kf env e else env in
   match ctx with
   | None -> e, env
-  | Some ty -> 
+  | Some ty ->
     let name = if name = "" then None else Some name in
     Typing.context_sensitive
       ~loc:t.term_loc

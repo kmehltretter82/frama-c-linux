@@ -105,6 +105,10 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_tdiv_r(__mpz_struct * /*[1]*
                                                            __mpz_struct const * /*[1]*/ z2,
                                                            __mpz_struct const * /*[1]*/ z3);
 
+/*@ requires \valid(z);
+    assigns \result \from *z; */
+extern  __attribute__((__FC_BUILTIN__)) unsigned long __gmpz_get_ui(__mpz_struct const * /*[1]*/ z);
+
 /*@ ghost extern int __e_acsl_internal_heap; */
 
 /*@ ghost extern size_t __memory_size; */
@@ -151,7 +155,7 @@ int main(void)
     mpz_t __e_acsl_3;
     int __e_acsl_mod_guard;
     mpz_t __e_acsl_mod;
-    int __e_acsl_eq;
+    unsigned long __e_acsl_4;
     __gmpz_init_set_si(__e_acsl,(long)2);
     __gmpz_init(__e_acsl_x);
     __gmpz_import(__e_acsl_x,1U,1,8U,0,0U,(void const *)(& x));
@@ -171,9 +175,8 @@ int main(void)
                   (char *)"main",(char *)"2 == 0",19);
     __gmpz_tdiv_r(__e_acsl_mod,(__mpz_struct const *)(__e_acsl_add),
                   (__mpz_struct const *)(__e_acsl));
-    __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl_mod),
-                             (__mpz_struct const *)(__e_acsl_2));
-    e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"main",
+    __e_acsl_4 = __gmpz_get_ui((__mpz_struct const *)(__e_acsl_mod));
+    e_acsl_assert(__e_acsl_4 == 1,(char *)"Assertion",(char *)"main",
                   (char *)"(2*x+1)%2 == 1",19);
     __gmpz_clear(__e_acsl);
     __gmpz_clear(__e_acsl_x);

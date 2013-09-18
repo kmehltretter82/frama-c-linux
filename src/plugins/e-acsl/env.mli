@@ -134,6 +134,8 @@ module Context: sig
   val restore: t -> t
 end
 
+val pretty: Format.formatter -> t -> unit
+
 (*
 Local Variables:
 compile-command: "make"

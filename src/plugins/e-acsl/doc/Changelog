@@ -15,6 +15,8 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
+-  E-ACSL       [2013/09/18] Use Gmp still less often.
+-* E-ACSL       [2013/09/18] Fix bug which may occur with divisions and modulos.
 -  E-ACSL       [2013/09/10] Improve ACSL contracts of the E-ACSL C library.
 -  E-ACSL       [2013/09/06] Support of loop invariants.
 -* E-ACSL       [2013/09/04] Fix bug when monitored global variables have

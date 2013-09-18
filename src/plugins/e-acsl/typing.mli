@@ -41,6 +41,10 @@ val type_term: term -> unit
 val typ_of_term: term -> typ
 (** Get the type of the given term. Must have been previously computed. *)
 
+val typ_of_term_operation: term -> typ
+(** Get the type in which the operation corresponding to the term must be
+    performed. Typing of the given term must have been previously computed. *)
+
 val unsafe_set_term: term -> typ -> unit
 (** Modify the type of the given term. No verification is done to check that the
     new type is correct. *)

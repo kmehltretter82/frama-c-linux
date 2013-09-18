@@ -352,7 +352,7 @@ let transfer ~from env = match from.env_stack, env.env_stack with
       
 type where = Before | Middle | After
 let pop_and_get env stmt ~global_clear where =
-  (*  Options.feedback "pop_and_get (%d)" (List.length env.env_stack); *)
+(*  Options.feedback "pop_and_get (%d)" (List.length env.env_stack);*)
   let local_env, tl = top false env in
   let clear = 
     if global_clear then begin
@@ -361,8 +361,8 @@ let pop_and_get env stmt ~global_clear where =
     end else
       local_env.mpz_tbl.clear_stmts
   in
-(*  Options.feedback "clearing %d mpz (must_clear: %b)" 
-    (List.length clear) must_clear;*)
+(*  Options.feedback "clearing %d mpz (global_clear: %b)" 
+    (List.length clear) global_clear;*)
   let block = local_env.block_info in
   let b = 
     let pre_stmts, stmt = 
@@ -429,6 +429,15 @@ module Context = struct
       env
 
 end
+
+(* debugging purpose *)
+let pretty fmt env =
+  let local_env, _ = top false env in
+  Format.fprintf fmt "local new_stmts %t"
+    (fun fmt -> 
+      List.iter
+	(fun s -> Printer.pp_stmt fmt s) 
+	local_env.block_info.new_stmts)
 
 (*
 Local Variables:

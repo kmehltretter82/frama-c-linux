@@ -49,24 +49,13 @@ type eacsl_typ =
   | No_integral of logic_type
 
 (* debugging purpose only *)
-let _pretty_eacsl_typ fmt = function
+let pretty_eacsl_typ fmt = function
   | Interv(l, u) -> 
     Format.fprintf fmt "[ %a; %a ]" 
       (fun z -> Z.pretty z) l 
       (fun z -> Z.pretty z) u
   | Z -> Format.fprintf fmt "Z"
   | No_integral lty -> Format.fprintf fmt "%a" Printer.pp_logic_type lty
-
-let convert_typ = function
-  | Interv(l, u) as int -> 
-    (* convert the interval to Z if it does not fit in any C type *)
-    let is_pos = Z.ge l Z.zero in
-    if is_representable l (Cil.intKindForValue l is_pos)
-      && is_representable u (Cil.intKindForValue u is_pos)
-    then int
-    else Z
-  | Z -> Z
-  | No_integral _ as ty -> ty
 
 exception Not_representable
 
@@ -96,9 +85,8 @@ let typ_of_eacsl_typ = function
        let ty_u = mk u (Cil.intKindForValue u is_pos) in
        Cil.arithmeticConversion ty_l ty_u
      with
-     | Not_found -> Mpz.t ()
-     | Not_representable -> 
-       Options.fatal "typing error: unrepresentable interval")
+     | Not_found | Not_representable -> 
+       Mpz.t ())
   | Z -> Mpz.t ()
   | No_integral (Ctype ty) -> ty
   | No_integral ty when Logic_const.is_boolean_type ty -> assert false
@@ -118,7 +106,8 @@ let eacsl_typ_of_typ ty = match Cil.unrollType ty with
       if Cil.isSigned k then Cil.min_signed_number n, Cil.max_signed_number n
       else Z.zero, Cil.max_unsigned_number n
     in
-    Interv(l, u)      
+    Interv(l, u)
+  | ty when Mpz.is_t ty -> Z
   | ty -> No_integral (Ctype ty)
 
 exception Cannot_compare
@@ -144,7 +133,10 @@ let join ty1 ty2 = match ty1, ty2 with
   | No_integral t, _ when Cil.isLogicFloatType t -> ty1
   | No_integral _, No_integral _
   | (Z | Interv _), No_integral _
-  | No_integral _, (Z | Interv _) -> raise Cannot_compare
+  | No_integral _, (Interv _ | Z) -> 
+    Options.fatal "cannot join %a and %a" 
+      pretty_eacsl_typ ty1 
+      pretty_eacsl_typ ty2
 
 let int_to_interv n = 
   let b = Z.of_int n in
@@ -154,14 +146,27 @@ let int_to_interv n =
 (** Environments *)
 (******************************************************************************)
 
-module Make_env(X: sig type t val hash: t -> int end): sig 
-  val add: X.t -> eacsl_typ -> unit
-  val find: X.t -> eacsl_typ
-  val mem: X.t -> bool
+module type Typing_env = sig
+  type key
+  type data
+  val add: key -> data -> unit
+  val find: key -> data
+  val mem: key -> bool
   val clear: unit -> unit
-end = struct
+end
 
-  module H = Hashtbl.Make(struct include X let equal (t1:X.t) t2 = t1 == t2 end)
+module Make_env
+  (Key: sig type t val hash: t -> int end) 
+  (Data: sig type t end):
+  Typing_env with type key = Key.t and type data = Data.t = 
+struct
+
+  type key = Key.t
+  type data = Data.t
+
+  module H = 
+    Hashtbl.Make(struct include Key let equal (t1:key) t2 = t1 == t2 end)
+
   let tbl = H.create 17
   let add = H.replace tbl
   let find = H.find tbl
@@ -170,34 +175,41 @@ end = struct
 
 end
 
-module Term_env = Make_env(Term)
-module Logic_var_env = Make_env(Logic_var)
+module Term_env = Make_env(Term)(struct type t = eacsl_typ * eacsl_typ end)
+module Logic_var_env = Make_env(Logic_var)(struct type t = eacsl_typ end)
 
-let typ_of_term t = 
-  if Options.Gmp_only.get () then 
-    match t.term_type with
-    | Linteger -> Mpz.t ()
-    | Ctype ty when Cil.isIntegralType ty -> Mpz.t ()
-    | Ctype ty -> ty
-    | Ltype _ as ty when Logic_const.is_boolean_type ty -> Mpz.t ()
-    | Ltype _ -> Error.not_yet "typing of user-defined logic type"
-    | Lvar _ -> Error.not_yet "type variable"
-    | Lreal -> 
-      Options.warning ~current:true ~once:true
-	"approximating type `real' by `long double'"; 
-      TFloat(FLongDouble, [])
-    | Larrow _ -> Error.not_yet "functional type"
-  else
-    try 
-      let ty = Term_env.find t in
-      typ_of_eacsl_typ ty
-    with Not_found -> 
-      Options.fatal "untyped term %a" Term.pretty t
+let generic_typ (which: < f: 'a. 'a * 'a -> 'a >) t =
+    if Options.Gmp_only.get () then 
+      let ty = match t.term_type with
+	| Linteger -> Mpz.t ()
+	| Ctype ty when Cil.isIntegralType ty -> Mpz.t ()
+	| Ctype ty -> ty
+	| Ltype _ as ty when Logic_const.is_boolean_type ty -> Mpz.t ()
+	| Ltype _ -> Error.not_yet "typing of user-defined logic type"
+	| Lvar _ -> Error.not_yet "type variable"
+	| Lreal -> 
+	  Options.warning ~current:true ~once:true
+	    "approximating type `real' by `long double'"; 
+	  TFloat(FLongDouble, [])
+	| Larrow _ -> Error.not_yet "functional type"
+      in
+      which#f (ty, ty)
+    else
+      try 
+	let typs = Term_env.find t in
+	typ_of_eacsl_typ (which#f typs)
+      with Not_found -> 
+	Options.fatal "untyped term %a" Term.pretty t
+
+let typ_of_term = generic_typ (object method f: 'a. 'a * 'a -> 'a = fst end)
+let typ_of_term_operation = 
+  generic_typ (object method f: 'a. 'a * 'a -> 'a = snd end)
 
 let unsafe_set_term t ty =
   if not (Options.Gmp_only.get ()) then begin
     assert (not (Term_env.mem t));
-    Term_env.add t (eacsl_typ_of_typ ty)
+    let ty = eacsl_typ_of_typ ty in
+    Term_env.add t (ty, ty)
   end
 
 let unsafe_unify ~from logic_v =
@@ -244,18 +256,19 @@ let type_of_indexed_host = function
 let rec type_term t = 
   let lty = t.term_type in
   let get_cty t = match t.term_type with Ctype ty -> ty | _ -> assert false in
-  let ty = match t.term_node with
-    | TConst c -> type_constant lty c
-    | TLval lv -> type_term_lval lv
-    | TSizeOf ty -> size_of ty
+  let dup f x = let y = f x in y, y in
+  let ty, _ as res = match t.term_node with
+    | TConst c -> dup (type_constant lty) c
+    | TLval lv -> dup type_term_lval lv
+    | TSizeOf ty -> dup size_of ty
     | TSizeOfE t -> 
       ignore (type_term t);
-      size_of (get_cty t)
-    | TSizeOfStr s -> int_to_interv (String.length s + 1 (* '\0' *)) 
-    | TAlignOf ty -> align_of ty
+      dup size_of (get_cty t)
+    | TSizeOfStr s -> dup int_to_interv (String.length s + 1 (* '\0' *)) 
+    | TAlignOf ty -> dup align_of ty
     | TAlignOfE t ->
       ignore (type_term t);
-      align_of (get_cty t)
+      dup align_of (get_cty t)
     | TUnOp(Neg, t) -> 
       unary_arithmetic
 	(fun l u -> let opp = Z.sub Z.zero in opp u, opp l) t
@@ -267,19 +280,21 @@ let rec type_term t =
 	  Z.min nl nu, Z.max nl nu) 
 	t
     | TUnOp(LNot, t) ->
-      ignore (type_term t);
-      Interv(Z.zero, Z.one)
+      let ty_t = type_term t in
+      let ty = Interv(Z.zero, Z.one) in
+      ty, join ty ty_t
     | TBinOp(PlusA, t1, t2) -> 
       let add l1 u1 l2 u2 = Z.add l1 l2, Z.add u1 u2 in
-      binary_arithmetic t.term_type add t1 t2
+      binary_arithmetic t.term_type add t1 t2 t
     | TBinOp((PlusPI | IndexPI | MinusPI | MinusPP), t1, t2) -> 
       ignore (type_term t1);
       ignore (type_term t2);
-      No_integral lty
+      let ty = No_integral lty in
+      ty, ty
     | TBinOp(MinusA, t1, t2) -> 
       let sub l1 u1 l2 u2 = Z.sub l1 u2, Z.sub u1 l2 in
-      binary_arithmetic t.term_type sub t1 t2
-    | TBinOp(Mult, t1, t2) -> signed_rule t.term_type Z.mul t1 t2
+      binary_arithmetic t.term_type sub t1 t2 t
+    | TBinOp(Mult, t1, t2) -> signed_rule t.term_type Z.mul t1 t2 t
     | TBinOp(Div, t1, t2) -> 
       let div a b = 
 	try Z.c_div a b 
@@ -291,27 +306,30 @@ let rec type_term t =
 	     order to be as more precise as possible. *)
 	  Z.zero
       in
-      signed_rule t.term_type div t1 t2
+      signed_rule t.term_type div t1 t2 t
     | TBinOp(Mod, t1, t2) -> 
       let modu a b =
 	try Z.c_rem a b with Division_by_zero -> Z.zero (* see Div *)
       in
-      signed_rule t.term_type modu t1 t2
+      signed_rule t.term_type modu t1 t2 t
     | TBinOp(Shiftlt, _t1, _t2) | TBinOp(Shiftrt, _t1, _t2) ->
       Error.not_yet "left/right shift"
     | TBinOp((Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr), t1, t2) -> 
-      ignore (type_term t1);
-      ignore (type_term t2);
-      Interv(Z.zero, Z.one)
+      let ty1 = type_term t1 in
+      let ty2 = type_term t2 in
+      let ty = Interv(Z.zero, Z.one) in
+      ty, join ty (join ty1 ty2)
     | TBinOp((BAnd | BXor | BOr), _t1, _t2) -> 
       Error.not_yet "missing binary bitwise operator"
     | TCastE(ty, t) -> 
       let ty_t = type_term t in
       let ty_c = eacsl_typ_of_typ ty in
-      (try meet ty_c ty_t with Cannot_compare -> ty_c)
+      let ty = try meet ty_c ty_t with Cannot_compare -> ty_c in
+      ty, ty (* an alarm is emitted by RTE anyway *)
     | TAddrOf lv | TStartOf lv -> 
       ignore (type_term_lval lv);
-      No_integral lty
+      let ty = No_integral lty in
+      ty, ty
     | Tapp _ -> Error.not_yet "applying logic function"
     | Tlambda _ -> Error.not_yet "functional"
     | TDataCons _ -> Error.not_yet "constructor"
@@ -319,26 +337,26 @@ let rec type_term t =
       ignore (type_term t1);
       let ty2 = type_term t2 in
       let ty3 = type_term t3 in
-      (try join ty2 ty3 with Cannot_compare -> assert false)
+      dup (join ty2) ty3
     | Tat(t, _)
-    | Tbase_addr(_, t) -> type_term t
+    | Tbase_addr(_, t) -> dup type_term t
     | Toffset(_, t)
     | Tblock_length(_, t) -> 
       ignore (type_term t);
       (* TODO: to be improved by computing the length of the type of the
 	 pointer *)
-      eacsl_typ_of_typ Cil.theMachine.Cil.typeOfSizeOf
-    | Tnull -> int_to_interv 0
-    | TLogic_coerce(_, t) -> type_term t
+      dup eacsl_typ_of_typ Cil.theMachine.Cil.typeOfSizeOf
+    | Tnull -> dup int_to_interv 0
+    | TLogic_coerce(_, t) -> dup type_term t
     | TCoerce(t, ty) -> 
       (* Jessie specific *)
       ignore (type_term t);
-      size_of ty
+      dup size_of ty
     | TCoerceE(t1, t2) -> 
       (* Jessie specific *)
       ignore (type_term t1);
       ignore (type_term t2);
-      size_of (get_cty t2)
+      dup size_of (get_cty t2)
     | TUpdate _ -> Error.not_yet "functional update"
     | Ttypeof _ -> Error.not_yet "typeof"
     | Ttype _ -> Error.not_yet "C type"
@@ -349,8 +367,8 @@ let rec type_term t =
     | Trange _ -> Error.not_yet "range"
     | Tlet _ -> Error.not_yet "let binding"
   in
-  let ty = convert_typ ty in
-  Term_env.add t ty;
+(*  Options.feedback "ADD %a --> %a" Printer.pp_term t pretty_eacsl_typ ty;*)
+  Term_env.add t res;
   ty
 
 and type_term_lval (h, o) =
@@ -381,7 +399,7 @@ and type_term_lhost = function
       (match Cil.unrollType ty with
       | TPtr(ty, _) | TArray(ty, _, _, _) -> eacsl_typ_of_typ ty
       | _ -> assert false)
-    | No_integral _ | Z | Interv _ -> assert false
+    | No_integral _ | Interv _ | Z -> assert false
 
 and type_term_offset = function
   | TNoOffset -> Ty_no_offset
@@ -397,25 +415,29 @@ and type_term_offset = function
   | TModel _ -> Error.not_yet "model"
 
 and unary_arithmetic op t = 
-  let ty = type_term t in
-  match ty with
-  | Interv(l, u) -> 
-    let l, u = op l u in
-    Interv (l, u)
-  | Z -> Z
-  | No_integral _ -> ty
-
-and binary_arithmetic ty op t1 t2 =
+  let ty_t = type_term t in
+  let ty = match ty_t with
+    | Interv(l, u) -> 
+      let l, u = op l u in
+      Interv (l, u)
+    | Z -> Z
+    | No_integral _ -> ty_t
+  in
+  ty, join ty ty_t
+      
+and binary_arithmetic ty op t1 t2 _t =
   let ty1 = type_term t1 in
   let ty2 = type_term t2 in
-  match ty1, ty2 with
-  | Interv(l1, u1), Interv(l2, u2) -> 
-    let l, u = op l1 u1 l2 u2 in
-    Interv (l, u)
-  | No_integral _, _ | _, No_integral _ -> No_integral ty
-  | _, Z | Z, _ -> Z
+  let ty = match ty1, ty2 with
+    | Interv(l1, u1), Interv(l2, u2) -> 
+      let l, u = op l1 u1 l2 u2 in
+      Interv (l, u)
+    | No_integral _, _ | _, No_integral _ -> No_integral ty
+    | _, Z | Z, _ -> Z
+  in
+  ty, join ty (join ty1 ty2)
 
-and signed_rule ty op t1 t2 =
+and signed_rule ty op t1 t2 t =
   (* probably not the most efficient way to compute the result, but the
      shortest *) 
   let compute l1 u1 l2 u2 = 
@@ -425,7 +447,7 @@ and signed_rule ty op t1 t2 =
     let d = op u1 u2 in
     Z.min a (Z.min b (Z.min c d)), Z.max a (Z.max b (Z.max c d))
   in
-  binary_arithmetic ty compute t1 t2
+  binary_arithmetic ty compute t1 t2 t
 
 let compute_quantif_guards_ref
     : (predicate named -> logic_var list -> predicate named -> 
@@ -488,7 +510,8 @@ let rec type_predicate_named p = match p.content with
 let type_term t = 
   if not (Options.Gmp_only.get ()) then begin
     Options.feedback ~dkey ~level:4 "typing term %a." Printer.pp_term t;
-    ignore (type_term t)
+    let ty = type_term t in
+    Options.debug ~dkey ~level:4 "got %a." pretty_eacsl_typ ty;
   end
 
 let type_named_predicate ?(must_clear=true) p = 
@@ -506,6 +529,8 @@ let type_named_predicate ?(must_clear=true) p =
 (* convert [e] in a way that it is compatible with the given typing context. *)
 let context_sensitive ~loc ?name env ctx is_mpz_string t_opt e = 
   let ty = Cil.typeOf e in
+(*  Options.feedback "exp %a in context %a" 
+    Printer.pp_exp e Printer.pp_typ ctx;*)
   let mk_mpz e = 
     let _, e, env = 
       Env.new_var 
@@ -519,20 +544,16 @@ let context_sensitive ~loc ?name env ctx is_mpz_string t_opt e =
     e, env
   in
   let do_int_ctx ty =
+    (* handle a C-integer context *)
     let e, env = if is_mpz_string then mk_mpz e else e, env in
-    if Mpz.is_t ty || is_mpz_string then
-      (* cast the mpz into a C integer *)
+    if (Mpz.is_t ty || is_mpz_string) then
+      (* we get an mpz, but it fits into a C integer: convert it *)
       let fname, new_ty = 
 	if Cil.isSignedInteger ty then 
 	  "__gmpz_get_si", Cil.longType
 	else
 	  "__gmpz_get_ui", Cil.ulongType 
       in
-      Options.warning
-	~source:(fst loc)
-	~once:true
-	"@[missing guard for ensuring that the given integer is \
-C-representable@]"; 
       let _, e, env = 
 	Env.new_var
 	  ?loc
@@ -554,18 +575,17 @@ C-representable@]";
   if Mpz.is_t ctx then
     if Mpz.is_t ty then
       e, env
-    else begin
+    else
       (* Convert the C integer into a mpz. 
 	 Remember: very long integer constants have been temporary converted
-	 into strings *)
-      (* possible to get a non integralType (or Mpz.t) with a non-one in the
-	 case of \null *)
+	 into strings;
+	 also possible to get a non integralType (or Mpz.t) with a non-one in
+	 the case of \null *)
       let e = 
 	if Cil.isIntegralType ty || is_mpz_string then e
 	else Cil.mkCast e Cil.longType (* \null *)
       in
       mk_mpz e
-    end
   else
     do_int_ctx ty
 
