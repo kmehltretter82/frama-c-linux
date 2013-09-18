@@ -37,6 +37,3 @@ FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:76:[value] Function __gmpz_init_set_str: postco
 tests/e-acsl-runtime/integer_constant.i:13:[value] Assertion got status valid.
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
-[value] Values at end of function main:
-  x ∈ {1}
-  __retres ∈ {0}

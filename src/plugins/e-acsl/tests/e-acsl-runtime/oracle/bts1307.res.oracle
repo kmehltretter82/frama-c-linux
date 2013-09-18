@@ -39,9 +39,10 @@ tests/e-acsl-runtime/bts1307.i:13:[value] Function foo, behavior OverEstimate_Mo
 FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:93:[value] Function __valid_read: postcondition got status unknown.
 FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:94:[value] Function __valid_read: postcondition got status valid.
 [value] user error: type long double not implemented. Using double instead
-tests/e-acsl-runtime/bts1307.i:13:[kernel] warning: non-finite long double value ({5}):
+tests/e-acsl-runtime/bts1307.i:13:[kernel] warning: non-finite float value ([-1.79769313486e+308 .. 1.79769313486e+308]):
                   assert
-                  \is_finite((long double)(5-(long double)((long double)((int)(5/80)**__e_acsl_at_3)*0.4)));
+                  \is_finite((float)(*__e_acsl_at_2+(int)(5-(long double)((float)((int)
+                                                                                   (5/80)**__e_acsl_at_3)*0.4))));
 tests/e-acsl-runtime/bts1307.i:13:[value] Function __e_acsl_foo, behavior OverEstimate_Motoring: postcondition got status valid.
 tests/e-acsl-runtime/bts1307.i:19:[value] Function __e_acsl_bar: precondition got status valid.
 tests/e-acsl-runtime/bts1307.i:20:[value] Function __e_acsl_bar: precondition got status valid.
@@ -55,17 +56,3 @@ tests/e-acsl-runtime/bts1307.i:25:[value] Function __e_acsl_bar, behavior UnderE
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
-[value] Values at end of function bar:
-  h ∈ 0.850000023842
-[value] Values at end of function __e_acsl_bar:
-  h ∈ 0.850000023842
-[value] Values at end of function foo:
-  h ∈ 6.
-[value] Values at end of function __e_acsl_foo:
-  h ∈ 6.
-[value] Values at end of function main:
-  __e_acsl_internal_heap ∈ [--..--]
-  f ∈ 1.
-  g ∈ 1.
-  h ∈ 0.850000023842
-  __retres ∈ {0}

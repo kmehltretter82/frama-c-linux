@@ -26,7 +26,3 @@ tests/e-acsl-runtime/cast.i:19:[value] Assertion got status valid.
 tests/e-acsl-runtime/cast.i:20:[value] Assertion got status valid.
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
-[value] Values at end of function main:
-  x ∈ {0}
-  y ∈ {0}
-  __retres ∈ {0}

@@ -38,7 +38,3 @@ tests/e-acsl-runtime/arith.i:32:[value] Assertion got status valid.
 tests/e-acsl-runtime/arith.i:33:[value] Assertion got status valid.
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
-[value] Values at end of function main:
-  x ∈ {-3}
-  y ∈ {2}
-  __retres ∈ {0}

@@ -40,8 +40,3 @@ tests/e-acsl-runtime/comparison.i:28:[value] Assertion got status valid.
 tests/e-acsl-runtime/comparison.i:29:[value] Assertion got status valid.
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
-[value] Values at end of function main:
-  x ∈ {0}
-  y ∈ {1}
-  s ∈ {{ "toto" }}
-  __retres ∈ {0}

@@ -55,17 +55,3 @@ tests/e-acsl-runtime/literal_string.i:13:[value] Assertion got status valid.
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
-[value] Values at end of function __e_acsl_memory_init:
-  T ∈ {{ "bar" }}
-  S ∈ {{ "foo" }}
-  S2 ∈ {{ "foo2" }}
-[value] Values at end of function f:
-  G ∈ {1}
-[value] Values at end of function main:
-  __e_acsl_internal_heap ∈ [--..--]
-  T ∈ {{ "bar" }}
-  G ∈ {1}
-  S ∈ {{ "foo" }}
-  S2 ∈ {{ "foo2" }}
-  SS ∈ {{ "ss" }}
-  __retres ∈ {0}

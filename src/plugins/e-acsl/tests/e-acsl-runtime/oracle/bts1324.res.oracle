@@ -33,16 +33,3 @@ tests/e-acsl-runtime/bts1324.i:25:[value] Assertion got status valid.
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
-[value] Values at end of function sorted:
-  b ∈ [7..15]
-  __retres ∈ {1}
-[value] Values at end of function __e_acsl_sorted:
-  __retres ∈ {1}
-[value] Values at end of function main:
-  __e_acsl_internal_heap ∈ [--..--]
-  t[0] ∈ {1}
-   [1..2] ∈ {4}
-   [3..5] ∈ {5}
-   [6] ∈ {7}
-  n ∈ {1}
-  __retres ∈ {0}

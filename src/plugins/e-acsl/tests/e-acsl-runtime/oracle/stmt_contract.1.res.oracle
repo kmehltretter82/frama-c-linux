@@ -36,7 +36,3 @@ FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:144:[value] Function __gmpz_add: precondition g
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:145:[value] Function __gmpz_add: precondition got status valid.
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
-[value] Values at end of function main:
-  x ∈ {7}
-  y ∈ {2}
-  __retres ∈ {0}

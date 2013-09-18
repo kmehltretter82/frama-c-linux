@@ -45,7 +45,3 @@ FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:198:[value] Function __gmpz_get_ui: preconditio
 tests/e-acsl-runtime/cast.i:20:[value] Assertion got status valid.
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
-[value] Values at end of function main:
-  x ∈ {0}
-  y ∈ {0}
-  __retres ∈ {0}

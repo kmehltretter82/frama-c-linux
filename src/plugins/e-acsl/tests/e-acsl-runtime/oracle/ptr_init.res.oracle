@@ -46,21 +46,3 @@ tests/e-acsl-runtime/ptr_init.c:19:[value] Assertion got status valid.
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
-[value] Values at end of function __e_acsl_malloc:
-  __fc_heap_status ∈ [--..--]
-  __retres ∈
-          {{ NULL + [--..--] ; &alloced_return___malloc + [0..2147483647] }}
-[value] Values at end of function __e_acsl_memory_init:
-  
-[value] Values at end of function f:
-  A ∈ {{ NULL + [--..--] ; &alloced_return___malloc + [0..2147483647] }}
-[value] Values at end of function g:
-  
-[value] Values at end of function main:
-  __fc_heap_status ∈ [--..--]
-  __e_acsl_internal_heap ∈ [--..--]
-  A ∈ {{ NULL + [--..--] ; &alloced_return___malloc + [0..2147483647] }}
-  B ∈ {{ NULL + [--..--] ; &alloced_return___malloc + [0..2147483647] }}
-  x ∈ {{ NULL + [--..--] ; &alloced_return___malloc + [0..2147483647] }}
-  y ∈ {{ NULL + [--..--] ; &alloced_return___malloc + [0..2147483647] }}
-  __retres ∈ {0}

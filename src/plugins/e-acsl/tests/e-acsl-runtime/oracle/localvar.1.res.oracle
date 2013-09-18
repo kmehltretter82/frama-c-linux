@@ -42,22 +42,3 @@ FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
-[value] Values at end of function __e_acsl_malloc:
-  __fc_heap_status ∈ [--..--]
-  __retres ∈ {{ &Frama_C_alloc ; &Frama_C_alloc_0 }}
-[value] Values at end of function add:
-  __fc_heap_status ∈ [--..--]
-  new ∈ {{ &Frama_C_alloc ; &Frama_C_alloc_0 }}
-  Frama_C_alloc[bits 0 to 31] ∈ {4}
-               [4..7] ∈ {0}
-  Frama_C_alloc_0[bits 0 to 31] ∈ {7}
-                 [bits 32 to 63] ∈ {{ &Frama_C_alloc }}
-[value] Values at end of function main:
-  __fc_heap_status ∈ [--..--]
-  __e_acsl_internal_heap ∈ [--..--]
-  l ∈ {{ &Frama_C_alloc_0 }}
-  __retres ∈ {0}
-  Frama_C_alloc[bits 0 to 31] ∈ {4}
-               [4..7] ∈ {0}
-  Frama_C_alloc_0[bits 0 to 31] ∈ {7}
-                 [bits 32 to 63] ∈ {{ &Frama_C_alloc }}

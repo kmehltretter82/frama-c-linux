@@ -131,9 +131,10 @@ let join ty1 ty2 = match ty1, ty2 with
   | No_integral t1, No_integral t2 when Logic_type.equal t1 t2 -> ty1
   | No_integral t, ty | ty, No_integral t when Cil.isLogicRealType t -> ty
   | No_integral t, _ when Cil.isLogicFloatType t -> ty1
-  | No_integral _, No_integral _
-  | (Z | Interv _), No_integral _
-  | No_integral _, (Interv _ | Z) -> 
+  | (Z | Interv _), (No_integral _ as ty)
+  | (No_integral _ as ty), (Interv _ | Z) -> 
+    ty
+  | No_integral _, No_integral _ ->
     Options.fatal "cannot join %a and %a" 
       pretty_eacsl_typ ty1 
       pretty_eacsl_typ ty2

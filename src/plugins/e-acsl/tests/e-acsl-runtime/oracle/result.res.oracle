@@ -27,17 +27,3 @@ tests/e-acsl-runtime/result.i:23:[value] Function h: postcondition got status va
 tests/e-acsl-runtime/result.i:23:[value] Function __e_acsl_h: postcondition got status valid.
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
-[value] Values at end of function f:
-  x ∈ {0}
-[value] Values at end of function __e_acsl_f:
-  __retres ∈ {0}
-[value] Values at end of function g:
-  
-[value] Values at end of function __e_acsl_g:
-  __retres ∈ {1}
-[value] Values at end of function h:
-  __retres ∈ {0}
-[value] Values at end of function __e_acsl_h:
-  __retres ∈ {0}
-[value] Values at end of function main:
-  __retres ∈ {0}

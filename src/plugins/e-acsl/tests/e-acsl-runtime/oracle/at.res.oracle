@@ -50,23 +50,3 @@ tests/e-acsl-runtime/at.i:34:[value] Assertion got status unknown.
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
-[value] Values at end of function f:
-  A ∈ {3}
-[value] Values at end of function __e_acsl_f:
-  A ∈ {3}
-[value] Values at end of function g:
-  A ∈ {4}
-  x ∈ {1}
-  t[0] ∈ {2}
-   [1] ∈ {3}
-[value] Values at end of function h:
-  
-[value] Values at end of function __e_acsl_h:
-  __retres ∈ {0}
-[value] Values at end of function main:
-  __e_acsl_internal_heap ∈ [--..--]
-  A ∈ {4}
-  x ∈ {1}
-  t[0] ∈ {2}
-   [1] ∈ {3}
-  __retres ∈ {0}

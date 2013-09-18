@@ -18,6 +18,3 @@
   __memory_size ∈ [--..--]
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
-[value] Values at end of function main:
-  x ∈ {0}
-  __retres ∈ {0}

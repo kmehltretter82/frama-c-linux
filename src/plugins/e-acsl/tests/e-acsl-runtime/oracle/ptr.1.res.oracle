@@ -70,11 +70,3 @@ tests/e-acsl-runtime/ptr.i:27:[value] Assertion got status valid.
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
-[value] Values at end of function main:
-  __e_acsl_internal_heap ∈ [--..--]
-  x ∈ {1}
-  t[0] ∈ {2}
-   [1] ∈ {3}
-   [2] ∈ {5}
-  p ∈ {{ &t + {8} }}
-  __retres ∈ {0}

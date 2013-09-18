@@ -68,5 +68,3 @@ FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:158:[value] Function __gmpz_mul: precondition g
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:159:[value] Function __gmpz_mul: precondition got status valid.
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
-[value] Values at end of function main:
-  __retres ∈ {0}

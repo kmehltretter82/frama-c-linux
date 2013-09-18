@@ -65,11 +65,3 @@ tests/e-acsl-runtime/longlong.i:19:[kernel] warning: pointer comparison:
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:117:[value] Function __gmpz_clear: precondition got status valid.
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
-tests/e-acsl-runtime/longlong.i:11:[inout] warning: During inout context analysis of my_pow:
-                 ignoring probable recursive call.
-[value] Values at end of function my_pow:
-  tmp ∈ [--..--]
-  __retres ∈ [0..4294967294],0%2
-[value] Values at end of function main:
-  x ∈ [0..4294967294],0%2
-  __retres ∈ {0}

@@ -39,12 +39,3 @@ tests/e-acsl-runtime/linear_search.i:33:[value] Assertion got status unknown.
 tests/e-acsl-runtime/linear_search.i:36:[value] Assertion got status unknown.
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
-[value] Values at end of function search:
-  k ∈ [0..10]
-  __retres ∈ {0; 1}
-[value] Values at end of function __e_acsl_search:
-  __retres ∈ {0; 1}
-[value] Values at end of function main:
-  A[0..9] ∈ [0..81]
-  found ∈ {0}
-  __retres ∈ {0}

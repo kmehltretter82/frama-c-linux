@@ -21,7 +21,3 @@ tests/e-acsl-runtime/nested_code_annot.i:9:[value] Assertion got status valid.
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
-[value] Values at end of function main:
-  x ∈ {2}
-  y ∈ {1}
-  __retres ∈ {0}

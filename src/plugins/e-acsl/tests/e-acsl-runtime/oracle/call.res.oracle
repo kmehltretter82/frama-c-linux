@@ -40,23 +40,3 @@ tests/e-acsl-runtime/call.c:12:[value] Function __e_acsl_f: postcondition got st
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
-[value] Values at end of function __e_acsl_malloc:
-  __fc_heap_status ∈ [--..--]
-  __retres ∈ {{ &Frama_C_alloc ; &Frama_C_alloc_0 }}
-[value] Values at end of function f:
-  Frama_C_alloc[bits 0 to 31] ∈ {1}
-  Frama_C_alloc_0[bits 0 to 31] ∈ {1} or UNINITIALIZED
-[value] Values at end of function __e_acsl_f:
-  __retres ∈ {{ &x }}
-  Frama_C_alloc[bits 0 to 31] ∈ {1}
-  Frama_C_alloc_0[bits 0 to 31] ∈ {1} or UNINITIALIZED
-[value] Values at end of function main:
-  __fc_heap_status ∈ [--..--]
-  __e_acsl_internal_heap ∈ [--..--]
-  x ∈ {0}
-  p ∈ {{ &x }}
-  q ∈ {{ &x }}
-  r ∈ {{ &Frama_C_alloc_0 }}
-  __retres ∈ {0}
-  Frama_C_alloc[bits 0 to 31] ∈ {1}
-  Frama_C_alloc_0[bits 0 to 31] ∈ {1}

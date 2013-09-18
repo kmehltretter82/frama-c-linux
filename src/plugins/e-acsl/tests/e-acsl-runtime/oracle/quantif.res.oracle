@@ -36,5 +36,3 @@ tests/e-acsl-runtime/quantif.i:27:[value] entering loop for the first time
 tests/e-acsl-runtime/quantif.i:28:[value] entering loop for the first time
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
-[value] Values at end of function main:
-  __retres ∈ {0}
