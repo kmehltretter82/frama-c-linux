@@ -115,7 +115,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __initialized(void *ptr,
  */
 extern  __attribute__((__FC_BUILTIN__)) void __e_acsl_memory_clean(void);
 
-/*@ ghost extern size_t __memory_size; */
+extern size_t __memory_size;
 
 /*@ assigns __fc_heap_status;
     assigns __fc_heap_status \from size, __fc_heap_status;

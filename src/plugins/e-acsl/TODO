@@ -19,8 +19,9 @@
 - logic functions
 - disjoint and complete behaviors (cf. Bernard's feature wish)
 - loop variant
-- grep "not_yet" *.ml
 - logical shift (at least in non GMP mode)
+- let-in
+- grep "not_yet" *.ml
 
 ########
 # CODE #
