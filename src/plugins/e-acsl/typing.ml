@@ -59,6 +59,8 @@ let pretty_eacsl_typ fmt = function
 
 exception Not_representable
 
+(* TODO: replace it by Cil.intKindForValue as soon as Frama-C Fluorine is not
+   required anymore. *)
 let typ_of_integer i unsigned = 
   (* int whenever possible *)
   if Cil.fitsInInt IInt i then IInt
@@ -77,15 +79,10 @@ let typ_of_eacsl_typ = function
   | Interv(l, u) -> 
     let is_pos = Z.ge l Z.zero in
     (try 
-       let mk n k = 
-	 if is_representable n k then TInt(k, []) 
-	 else raise Not_representable
-       in
-       let ty_l = mk l (Cil.intKindForValue l is_pos) in
-       let ty_u = mk u (Cil.intKindForValue u is_pos) in
+       let ty_l = TInt(typ_of_integer l is_pos, []) in
+       let ty_u = TInt(typ_of_integer u is_pos, []) in
        Cil.arithmeticConversion ty_l ty_u
-     with
-     | Not_found | Not_representable -> 
+     with Not_representable -> 
        Mpz.t ())
   | Z -> Mpz.t ()
   | No_integral (Ctype ty) -> ty
@@ -99,7 +96,8 @@ let typ_of_eacsl_typ = function
     TFloat(FLongDouble, [])
   | No_integral (Larrow _) -> Error.not_yet "functional type"
 
-let eacsl_typ_of_typ ty = match Cil.unrollType ty with
+let eacsl_typ_of_typ ty = 
+  match Cil.unrollType ty with
   | TInt(k, _) as ty -> 
     let n = Cil.bitsSizeOf ty in
     let l, u = 
@@ -231,7 +229,9 @@ let clear () =
 (******************************************************************************)
 
 let type_constant ty = function
-  | Integer(n, _) -> Interv(n, n)
+  | Integer(n, _) -> 
+    if Cil.fitsInInt ILongLong n || Cil.fitsInInt IULongLong n then Interv(n, n)
+    else Z
   | LChr c -> 
     (match Cil.charConstToInt c with
     | CInt64(n, _, _) -> Interv(n, n)
