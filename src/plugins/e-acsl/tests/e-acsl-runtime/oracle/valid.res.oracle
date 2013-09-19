@@ -9,7 +9,9 @@
 FRAMAC_SHARE/libc/stdlib.h:152:[e-acsl] warning: E-ACSL construct `\allocable' is not yet supported. Ignoring annotation.
 FRAMAC_SHARE/libc/stdlib.h:152:[e-acsl] warning: E-ACSL construct `\freeable' is not yet supported. Ignoring annotation.
 FRAMAC_SHARE/libc/stdlib.h:136:[e-acsl] warning: E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
-tests/e-acsl-runtime/valid.c:33:[e-acsl] warning: E-ACSL construct `complete behavior' is not yet supported.
+tests/e-acsl-runtime/valid.c:33:[e-acsl] warning: E-ACSL construct `complete behaviors' is not yet supported.
+                  Ignoring annotation.
+tests/e-acsl-runtime/valid.c:33:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
                   Ignoring annotation.
 tests/e-acsl-runtime/valid.c:33:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
                   Ignoring annotation.

@@ -7,7 +7,9 @@
 [kernel] preprocessing with "gcc -C -E -I.  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc tests/e-acsl-runtime/ptr_init.c"
 [e-acsl] beginning translation.
 FRAMAC_SHARE/libc/stdlib.h:136:[e-acsl] warning: E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
-tests/e-acsl-runtime/ptr_init.c:22:[e-acsl] warning: E-ACSL construct `complete behavior' is not yet supported.
+tests/e-acsl-runtime/ptr_init.c:22:[e-acsl] warning: E-ACSL construct `complete behaviors' is not yet supported.
+                  Ignoring annotation.
+tests/e-acsl-runtime/ptr_init.c:22:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
                   Ignoring annotation.
 tests/e-acsl-runtime/ptr_init.c:22:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
                   Ignoring annotation.

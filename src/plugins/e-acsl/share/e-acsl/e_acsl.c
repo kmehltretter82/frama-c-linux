@@ -21,8 +21,8 @@
 /**************************************************************************/
 
 #include "e_acsl.h"
-#include "stdlib.h"
-#include "stdio.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 void e_acsl_assert(int predicate, 
 		   char *kind, 

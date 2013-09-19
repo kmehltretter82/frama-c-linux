@@ -786,36 +786,41 @@ let translate_postconditions kf kinstr env behaviors =
   List.fold_left do_behavior env behaviors
 
 let translate_pre_spec kf kinstr env spec =
+  let unsupported f x = ignore (handle_error (fun env -> f x; env) env) in
   let convert_unsupported_clauses env =
-    Extlib.may
-      (fun v ->
-	if must_translate (Property.ip_of_decreases kf kinstr v) then
-	  not_yet env "variant clause")
+    unsupported
+      (Extlib.may
+	 (fun v ->
+	   if must_translate (Property.ip_of_decreases kf kinstr v) then
+	     not_yet env "variant clause"))
       spec.spec_variant;
-    Extlib.may
-      (fun t ->
-	if must_translate (Property.ip_of_terminates kf kinstr t) then
-	  not_yet env "terminates clause")
+    unsupported
+      (Extlib.may
+	 (fun t ->
+	   if must_translate (Property.ip_of_terminates kf kinstr t) then
+	     not_yet env "terminates clause"))
       spec.spec_terminates;
     (match spec.spec_complete_behaviors with
     | [] -> ()
     | l ->
-      List.iter
-	(fun l ->
-	  if must_translate (Property.ip_of_complete kf kinstr l) then
-	    not_yet env "complete behavior")
+      unsupported
+	(List.iter
+	   (fun l ->
+	     if must_translate (Property.ip_of_complete kf kinstr l) then
+	       not_yet env "complete behaviors"))
 	l);
     (match spec.spec_disjoint_behaviors with
     | [] -> ()
     | l ->
-      List.iter
-	(fun l ->
-	  if must_translate (Property.ip_of_disjoint kf kinstr l) then
-	    not_yet env "disjoint behavior")
+      unsupported
+	(List.iter
+	   (fun l ->
+	     if must_translate (Property.ip_of_disjoint kf kinstr l) then
+	       not_yet env "disjoint behaviors"))
 	l);
     env
   in
-  let env = handle_error convert_unsupported_clauses env in
+  let env = convert_unsupported_clauses env in
   handle_error
     (fun env -> translate_preconditions kf kinstr env spec.spec_behavior) 
     env

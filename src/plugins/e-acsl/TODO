@@ -77,7 +77,6 @@ function call
 # DOC #
 #######
 
-- E_ACSL_MACHDEP with gcc -D
 - check of runtime error in combination with RTE
 
 #########
@@ -86,5 +85,6 @@ function call
 
 - inclure exemple du E-ACSL Reference Manual
 - inclure exemple du E-ACSL User Manual
+- inclure exemple du E-ACSL Tutorial
 - test arith.i: mettre les exemples du ACSL manual about div and modulo
 - currently, tests require a non-free version of Frama-C

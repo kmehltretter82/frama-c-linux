@@ -6,6 +6,7 @@ DEPS_MODERN=eacslversion.tex biblio.bib macros.tex \
 	introduction.tex \
 	provides.tex \
 	limitations.tex \
+	changes.tex \
 	$(addprefix examples/, $(C_CODE))
 
 
@@ -13,7 +14,7 @@ default: main.pdf
 
 main.pdf: $(DEPS_MODERN)
 
-EACSL_VERSION= 0.2
+EACSL_VERSION= 0.3
 FC_VERSION= Fluorine-20130501
 
 EACSL_DIR=$(HOME)/plugins/e-acsl
