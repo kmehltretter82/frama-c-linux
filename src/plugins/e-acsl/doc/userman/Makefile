@@ -1,13 +1,13 @@
 MAIN=main
 
-C_CODE=first.i
+C_CODE=$(wildcard examples/*.[ci])
 
 DEPS_MODERN=eacslversion.tex biblio.bib macros.tex \
 	introduction.tex \
 	provides.tex \
 	limitations.tex \
 	changes.tex \
-	$(addprefix examples/, $(C_CODE))
+	$(C_CODE)
 
 
 default: main.pdf
