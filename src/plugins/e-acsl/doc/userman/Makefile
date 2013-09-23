@@ -15,7 +15,7 @@ default: main.pdf
 main.pdf: $(DEPS_MODERN)
 
 EACSL_VERSION= 0.3
-FC_VERSION= Fluorine-20130501
+FC_VERSION= Fluorine-20130601
 
 EACSL_DIR=$(HOME)/plugins/e-acsl
 DISTRIB_DIR=$(HOME)/frama-c/doc/www/distrib

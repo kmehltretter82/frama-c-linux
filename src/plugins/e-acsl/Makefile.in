@@ -164,6 +164,7 @@ EACSL_DISTRIB_FILES=\
 	license/CEA_LGPL license/headache_config.txt license/LGPLv2.1 \
 	INSTALL README VERSION .depend
 
+# BE CAREFUL: manually remove all *.ml* files which should not be released!
 e-acsl-distrib: .depend
 	$(PRINT_TAR) tmp-distrib
 	$(TAR) cf tmp.tar $(EACSL_DISTRIB_FILES)
@@ -172,7 +173,8 @@ e-acsl-distrib: .depend
 	$(PRINT_UNTAR) tmp-distrib
 	cd $(EXPORT); \
 	  $(TAR) xf ../tmp.tar; autoconf; \
-	  $(SED) -i -e 's/IS_DISTRIBUTED:=no/IS_DISTRIBUTED:=yes/' Makefile.in
+	  $(SED) -i -e 's/IS_DISTRIBUTED:=no/IS_DISTRIBUTED:=yes/' Makefile.in; \
+	  $(RM) -rf autom4te.cache
 	$(PRINT_RM) tmp-distrib
 	$(RM) tmp.tar
 	$(PRINT_MAKING) test directories
