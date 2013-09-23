@@ -46,8 +46,6 @@ axiomatic
   
   }
  */
-/*@ ghost extern int __e_acsl_init; */
-
 /*@ assigns \result \from *((char *)ptr+(0..size-1)); */
 extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
                                                             size_t size);
@@ -66,8 +64,6 @@ extern  __attribute__((__FC_BUILTIN__)) void __initialize(void *ptr,
  */
 extern  __attribute__((__FC_BUILTIN__)) int __initialized(void *ptr,
                                                           size_t size);
-
-/*@ ghost extern int __e_acsl_internal_heap; */
 
 /*@ assigns __e_acsl_internal_heap;
     assigns __e_acsl_internal_heap \from __e_acsl_internal_heap;
@@ -100,13 +96,12 @@ int main(void)
     read_sensor_4((unsigned int *)(buf) + i);
     i ++;
   }
-  /*@ assert \initialized((union msg *)((unsigned char *)buf)); */
+  /*@ assert \initialized((union msg *)buf); */
   {
     int __e_acsl_initialized;
     __e_acsl_initialized = __initialized((void *)(buf),sizeof(union msg));
     e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"main",
-                  (char *)"\\initialized((union msg *)((unsigned char *)buf))",
-                  25);
+                  (char *)"\\initialized((union msg *)buf)",25);
   }
   __retres = 0;
   __delete_block((void *)(buf));

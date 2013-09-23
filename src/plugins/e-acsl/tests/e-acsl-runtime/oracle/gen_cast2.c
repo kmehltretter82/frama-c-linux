@@ -30,8 +30,6 @@ axiomatic
   
   }
  */
-/*@ ghost extern int __e_acsl_init; */
-
 /*@ requires ¬\initialized(z);
     ensures \valid(\old(z));
     ensures \initialized(\old(z));
@@ -79,8 +77,6 @@ extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1
 /*@ requires \valid(z);
     assigns \result \from *z; */
 extern  __attribute__((__FC_BUILTIN__)) unsigned long __gmpz_get_ui(__mpz_struct const * /*[1]*/ z);
-
-/*@ ghost extern int __e_acsl_internal_heap; */
 
 extern size_t __memory_size;
 

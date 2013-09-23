@@ -30,8 +30,6 @@ axiomatic
   
   }
  */
-/*@ ghost extern int __e_acsl_init; */
-
 /*@ assigns \result \from *((char *)ptr+(0..size-1)); */
 extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
                                                             size_t size);
@@ -56,8 +54,6 @@ extern  __attribute__((__FC_BUILTIN__)) int __valid_read(void *ptr,
 /*@ ensures \result ≡ \offset(\old(ptr));
     assigns \result \from ptr; */
 extern  __attribute__((__FC_BUILTIN__)) int __offset(void *ptr);
-
-/*@ ghost extern int __e_acsl_internal_heap; */
 
 /*@ assigns __e_acsl_internal_heap;
     assigns __e_acsl_internal_heap \from __e_acsl_internal_heap;
@@ -104,7 +100,7 @@ void *memchr(void const *buf, int c, size_t n)
   }
   __full_init((void *)(& __retres));
   __retres = (void *)0;
-  return_label:
+  return_label: /* internal */
     __delete_block((void *)(& buf));
     __delete_block((void *)(& s));
     __delete_block((void *)(& __retres));
@@ -153,7 +149,7 @@ void *__e_acsl_memchr(void const *buf, int c, size_t n)
       }
       __e_acsl_k ++;
     }
-    e_acsl_end_loop3: ;
+    e_acsl_end_loop3: /* internal */ ;
     __e_acsl_at_4 = __e_acsl_forall_2;
   }
   __e_acsl_at_3 = c;
@@ -181,7 +177,7 @@ void *__e_acsl_memchr(void const *buf, int c, size_t n)
       }
       __e_acsl_i ++;
     }
-    e_acsl_end_loop1: ;
+    e_acsl_end_loop1: /* internal */ ;
     __e_acsl_at = __e_acsl_exists;
   }
   __retres = memchr(buf,c,n);
@@ -216,7 +212,7 @@ void *__e_acsl_memchr(void const *buf, int c, size_t n)
         }
         __e_acsl_j ++;
       }
-      e_acsl_end_loop2: ;
+      e_acsl_end_loop2: /* internal */ ;
       __e_acsl_implies = __e_acsl_forall;
     }
     e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",(char *)"memchr",

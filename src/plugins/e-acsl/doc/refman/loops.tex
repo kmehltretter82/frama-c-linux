@@ -1,19 +1,19 @@
 \begin{syntax}
-  statement ::= { "/*@" loop-annot "*/" } ;
+  statement ::= "/*@" loop-annot "*/" ;
   "while" "(" expr ")" statement ;
-  | { "/*@" loop-annot "*/" } ;
+  | "/*@" loop-annot "*/" ;
     "for";
   "(" expr ";" expr ";" expr ")";
   statement ;
-  | { "/*@" loop-annot "*/" } ;
+  | "/*@" loop-annot "*/" ;
   "do" statement ;
   "while" "(" expr ")" ";"
   \
-  { loop-annot } ::= { loop-clause* } ;
+  loop-annot ::= loop-clause* ;
   { loop-behavior* } ;
   { loop-variant? }
   \
-  { loop-clause } ::= { loop-invariant } ;
+  loop-clause ::= loop-invariant ;
                 | { loop-assigns }
   \
   [ loop-invariant ] ::= [ "loop" "invariant" pred ";" ] ;

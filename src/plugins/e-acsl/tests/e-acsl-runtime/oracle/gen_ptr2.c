@@ -30,8 +30,6 @@ axiomatic
   
   }
  */
-/*@ ghost extern int __e_acsl_init; */
-
 /*@ requires ¬\initialized(z);
     ensures \valid(\old(z));
     assigns *z;
@@ -119,8 +117,6 @@ extern  __attribute__((__FC_BUILTIN__)) void __initialize(void *ptr,
 
 /*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
-
-/*@ ghost extern int __e_acsl_internal_heap; */
 
 /*@ assigns __e_acsl_internal_heap;
     assigns __e_acsl_internal_heap \from __e_acsl_internal_heap;

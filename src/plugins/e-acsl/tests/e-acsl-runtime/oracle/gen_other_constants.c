@@ -34,10 +34,6 @@ axiomatic
   
   }
  */
-/*@ ghost extern int __e_acsl_init; */
-
-/*@ ghost extern int __e_acsl_internal_heap; */
-
 extern size_t __memory_size;
 
 /*@

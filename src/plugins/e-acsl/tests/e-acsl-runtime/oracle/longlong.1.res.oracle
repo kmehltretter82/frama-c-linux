@@ -10,12 +10,10 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-  __fc_random_counter ∈ {0}
-  __fc_rand_max ∈ {32767}
-  __fc_heap_status ∈ [--..--]
-  __e_acsl_init ∈ [--..--]
-  __e_acsl_internal_heap ∈ [--..--]
-  __memory_size ∈ [--..--]
+        __fc_random_counter ∈ {0}
+        __fc_rand_max ∈ {32767}
+        __fc_heap_status ∈ [--..--]
+        __memory_size ∈ [--..--]
 tests/e-acsl-runtime/longlong.i:11:[value] warning: recursive call during value analysis
                  of my_pow (my_pow <- my_pow :: tests/e-acsl-runtime/longlong.i:18 <- main).
                  Using specification of my_pow.
@@ -46,7 +44,6 @@ FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:145:[value] Function __gmpz_add: precondition g
 [value] using specification for function __gmpz_cmp
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:127:[value] Function __gmpz_cmp: precondition got status valid.
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:128:[value] Function __gmpz_cmp: precondition got status valid.
-tests/e-acsl-runtime/longlong.i:19:[value] Assertion 'E_ACSL' got status valid.
 [value] using specification for function e_acsl_assert
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_tdiv_r

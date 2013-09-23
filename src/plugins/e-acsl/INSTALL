@@ -41,7 +41,7 @@ See below for more detailed and specific instructions.
 
 - GNU make version >= 3.81
 - Objective Caml >= 3.12.1;
-- Frama-C = Fluorine-20130401 or Fluorine-20130501 
+- Frama-C = Fluorine-20130601
   (no warranty that this plug-in works with a more recent version of Frama-C)
 
 - The native version of the plug-in is only available if native dynamic linking

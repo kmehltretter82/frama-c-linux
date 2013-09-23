@@ -15,6 +15,10 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
+###################################
+Plugin E-ACSL 0.3 Fluorine_20130601
+###################################
+
 -  E-ACSL       [2013/09/18] More precise message for unsupported contract
 	        clauses.
 -  E-ACSL       [2013/09/18] Use Gmp still less often.

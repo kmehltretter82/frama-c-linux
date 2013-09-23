@@ -30,8 +30,6 @@ axiomatic
   
   }
  */
-/*@ ghost extern int __e_acsl_init; */
-
 /*@ requires ¬\initialized(z);
     ensures \valid(\old(z));
     ensures \initialized(\old(z));
@@ -53,8 +51,6 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_clear(__mpz_struct * /*[1]*/
  */
 extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
                                                        __mpz_struct const * /*[1]*/ z2);
-
-/*@ ghost extern int __e_acsl_internal_heap; */
 
 extern size_t __memory_size;
 
@@ -121,7 +117,7 @@ int __e_acsl_main(void)
     goto return_label;
   }
   __retres = 0;
-  return_label: return __retres;
+  return_label: /* internal */ return __retres;
 }
 
 /*@ ensures X ≡ 3; */

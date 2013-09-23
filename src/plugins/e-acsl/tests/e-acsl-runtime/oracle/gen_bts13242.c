@@ -30,8 +30,6 @@ axiomatic
   
   }
  */
-/*@ ghost extern int __e_acsl_init; */
-
 /*@ requires ¬\initialized(z);
     ensures \valid(\old(z));
     assigns *z;
@@ -105,8 +103,6 @@ extern  __attribute__((__FC_BUILTIN__)) void __delete_block(void *ptr);
 extern  __attribute__((__FC_BUILTIN__)) void __initialize(void *ptr,
                                                           size_t size);
 
-/*@ ghost extern int __e_acsl_internal_heap; */
-
 /*@ assigns __e_acsl_internal_heap;
     assigns __e_acsl_internal_heap \from __e_acsl_internal_heap;
  */
@@ -140,7 +136,7 @@ int sorted(int *t, int n)
     b ++;
   }
   __retres = 1;
-  return_label: return __retres;
+  return_label: /* internal */ return __retres;
 }
 
 /*@ behavior yes:
@@ -221,7 +217,7 @@ int __e_acsl_sorted(int *t, int n)
         __gmpz_clear(__e_acsl_add_2);
       }
     }
-    e_acsl_end_loop1: ;
+    e_acsl_end_loop1: /* internal */ ;
     __e_acsl_at = __e_acsl_forall;
     __gmpz_clear(__e_acsl_i);
   }

@@ -30,10 +30,6 @@ axiomatic
   
   }
  */
-/*@ ghost extern int __e_acsl_init; */
-
-/*@ ghost extern int __e_acsl_internal_heap; */
-
 extern size_t __memory_size;
 
 /*@
@@ -68,7 +64,7 @@ int __e_acsl_main(void)
     goto return_label;
   }
   __retres = 0;
-  return_label: return __retres;
+  return_label: /* internal */ return __retres;
 }
 
 /*@ ensures X ≡ 3; */

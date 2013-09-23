@@ -11,14 +11,12 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-  __fc_random_counter ∈ {0}
-  __fc_rand_max ∈ {32767}
-  __fc_heap_status ∈ [--..--]
-  __e_acsl_init ∈ [--..--]
-  __e_acsl_internal_heap ∈ [--..--]
-  __memory_size ∈ [--..--]
-  global_i ∈ {0}
-  global_i_ptr ∈ {{ &global_i }}
+        __fc_random_counter ∈ {0}
+        __fc_rand_max ∈ {32767}
+        __fc_heap_status ∈ [--..--]
+        __memory_size ∈ [--..--]
+        global_i ∈ {0}
+        global_i_ptr ∈ {{ &global_i }}
 [value] using specification for function __store_block
 tests/e-acsl-runtime/bts1478.c:10:[value] Function __e_acsl_loop: precondition got status valid.
 tests/e-acsl-runtime/bts1478.c:11:[value] Function __e_acsl_loop: precondition got status valid.

@@ -61,12 +61,12 @@ if test $VERSION_NUMBER -lt 20130601; then
 fi
 
 # at the time being, must use the Frama-C development version
-DEV=`echo $DEV_VERSION_NUMBER | sed -e 's/.*\(+dev\)/\1/' `
-if test "$DEV" != "+dev"; then
-  AC_MSG_ERROR(Frama-C version must be the current SVN version.);
-else
-   AC_MSG_RESULT($FRAMAC_VERSION)
-fi
+# DEV=`echo $DEV_VERSION_NUMBER | sed -e 's/.*\(+dev\)/\1/' `
+# if test "$DEV" != "+dev"; then
+#   AC_MSG_ERROR(Frama-C version must be the current SVN version.);
+# else
+#    AC_MSG_RESULT($FRAMAC_VERSION)
+# fi
 
 # OCaml version
 ###############
