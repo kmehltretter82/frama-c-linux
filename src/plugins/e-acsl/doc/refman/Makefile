@@ -18,7 +18,7 @@ e-acsl: e-acsl-implementation.pdf e-acsl.pdf main.pdf
 
 all: e-acsl
 
-LANGUAGE_VERSION=1.7
+LANGUAGE_VERSION=1.7-1
 EACSL_VERSION= 0.3
 
 EACSL_DIR=$(HOME)/plugins/e-acsl
