@@ -35,10 +35,11 @@ let apply_rte f x =
   in
   Extlib.try_finally ~finally f x
 
-let warn_rte exn =
-  Options.warning "@[@[cannot run RTE:@ %s.@]@ \
+let warn_rte warn exn =
+  if warn then
+    Options.warning "@[@[cannot run RTE:@ %s.@]@ \
 Ignoring potential runtime errors in annotations." 
-    (Printexc.to_string exn)
+      (Printexc.to_string exn)
 
 (* ************************************************************************** *)
 (** {2 Exported code} *)
@@ -46,7 +47,7 @@ Ignoring potential runtime errors in annotations."
 
 open Cil_datatype
 
-let stmt =
+let stmt ?(warn=true) =
   try 
     let f = 
       Dynamic.get
@@ -58,10 +59,10 @@ let stmt =
     (fun x y -> apply_rte (f x) y)
   with Failure _ | Dynamic.Unbound_value _ | Dynamic.Incompatible_type _ as exn
     ->
-      warn_rte exn;
+      warn_rte warn exn;
       fun _ _ -> []
 
-let exp =
+let exp ?(warn=true) =
   try 
     let f = 
       Dynamic.get
@@ -73,7 +74,7 @@ let exp =
     (fun x y z -> apply_rte (f x y) z)
   with Failure _ | Dynamic.Unbound_value _ | Dynamic.Incompatible_type _ as exn
     ->
-      warn_rte exn;
+      warn_rte warn exn;
       fun _ _ _ -> []
 
 (*

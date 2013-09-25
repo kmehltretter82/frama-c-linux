@@ -455,7 +455,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
 	if stmt.ghost && generate then begin
 	  stmt.ghost <- false;
 	  (* translate potential RTEs of ghost code *)
-	  let rtes = Rte.stmt kf stmt in
+	  let rtes = Rte.stmt ~warn:false kf stmt in
 	  Translate.translate_rte_annots Printer.pp_stmt stmt kf env rtes
 	end else
 	  env

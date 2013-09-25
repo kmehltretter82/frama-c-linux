@@ -24,10 +24,10 @@
 
 open Cil_types
 
-val stmt: kernel_function -> stmt -> code_annotation list
+val stmt: ?warn:bool -> kernel_function -> stmt -> code_annotation list
 (** RTEs of a given stmt, as a list of code annotations. *)
 
-val exp: kernel_function -> stmt -> exp -> code_annotation list
+val exp: ?warn:bool -> kernel_function -> stmt -> exp -> code_annotation list
 (** RTEs of a given exp, as a list of code annotations. *)
 
 (*
