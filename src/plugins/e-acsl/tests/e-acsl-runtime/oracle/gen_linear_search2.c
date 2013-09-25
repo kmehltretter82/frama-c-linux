@@ -30,6 +30,8 @@ axiomatic
   
   }
  */
+/*@ ghost extern int __e_acsl_init; */
+
 /*@ requires ¬\initialized(z);
     ensures \valid(\old(z));
     assigns *z;
@@ -81,6 +83,8 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_add(__mpz_struct * /*[1]*/ z
 /*@ requires \valid(z);
     assigns \result \from *z; */
 extern  __attribute__((__FC_BUILTIN__)) unsigned long __gmpz_get_ui(__mpz_struct const * /*[1]*/ z);
+
+/*@ ghost extern int __e_acsl_internal_heap; */
 
 extern size_t __memory_size;
 
@@ -159,7 +163,7 @@ int search(int elt)
         __gmpz_clear(__e_acsl_add);
       }
     }
-    e_acsl_end_loop1: /* internal */ ;
+    e_acsl_end_loop1: ;
     e_acsl_assert(__e_acsl_forall,(char *)"Invariant",(char *)"search",
                   (char *)"\\forall integer i; 0 <= i && i < k ==> A[i] < elt",
                   20);
@@ -273,7 +277,7 @@ int search(int elt)
             __gmpz_clear(__e_acsl_add_2);
           }
         }
-        e_acsl_end_loop2: /* internal */ ;
+        e_acsl_end_loop2: ;
         e_acsl_assert(__e_acsl_forall_2,(char *)"Invariant",(char *)"search",
                       (char *)"\\forall integer i; 0 <= i && i < k ==> A[i] < elt",
                       20);
@@ -284,7 +288,7 @@ int search(int elt)
     }
   }
   __retres = 0;
-  return_label: /* internal */ return __retres;
+  return_label: return __retres;
 }
 
 /*@ requires ∀ ℤ i; 0 ≤ i ∧ i < 9 ⇒ A[i] ≤ A[i+1];
@@ -363,7 +367,7 @@ int __e_acsl_search(int elt)
         __gmpz_clear(__e_acsl_add_2);
       }
     }
-    e_acsl_end_loop3: /* internal */ ;
+    e_acsl_end_loop3: ;
     e_acsl_assert(__e_acsl_forall,(char *)"Precondition",(char *)"search",
                   (char *)"\\forall integer i; 0 <= i && i < 9 ==> A[i] <= A[i+1]",
                   9);
@@ -419,7 +423,7 @@ int __e_acsl_search(int elt)
           __gmpz_clear(__e_acsl_add_4);
         }
       }
-      e_acsl_end_loop5: /* internal */ ;
+      e_acsl_end_loop5: ;
       __e_acsl_at_2 = __e_acsl_forall_2;
       __gmpz_clear(__e_acsl_j_3);
     }
@@ -474,7 +478,7 @@ int __e_acsl_search(int elt)
           __gmpz_clear(__e_acsl_add_3);
         }
       }
-      e_acsl_end_loop4: /* internal */ ;
+      e_acsl_end_loop4: ;
       __e_acsl_at = __e_acsl_exists;
       __gmpz_clear(__e_acsl_j);
     }

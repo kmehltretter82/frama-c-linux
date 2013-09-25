@@ -239,7 +239,8 @@ let type_constant ty = function
   | LStr _ | LWStr _ | LReal _ | LEnum _ -> No_integral ty
 
 let size_of ty =
-  try int_to_interv (*(Cil.bytesSizeOf ty)*) (Cil.sizeOf_int ty)
+  try int_to_interv (Cil.bytesSizeOf ty) (* Fluorine version:
+					    (Cil.sizeOf_int ty) *)
   with Cil.SizeOfError _ -> eacsl_typ_of_typ Cil.ulongLongType
 
 let align_of ty = int_to_interv (Cil.bytesAlignOf ty)
@@ -385,7 +386,6 @@ and type_term_lhost = function
     (try Logic_var_env.find lv 
      with Not_found -> 
        (* C variable *)
-       (*       match lty with*) (* don't work yet: see bts #1064 *)
        match lv.lv_type with
        | Ctype ty -> eacsl_typ_of_typ ty
        | _ -> 

@@ -30,6 +30,8 @@ axiomatic
   
   }
  */
+/*@ ghost extern int __e_acsl_init; */
+
 /*@ requires ¬\initialized(z);
     ensures \valid(\old(z));
     assigns *z;
@@ -91,6 +93,8 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_mul(__mpz_struct * /*[1]*/ z
 /*@ requires \valid(z);
     assigns \result \from *z; */
 extern  __attribute__((__FC_BUILTIN__)) unsigned long __gmpz_get_ui(__mpz_struct const * /*[1]*/ z);
+
+/*@ ghost extern int __e_acsl_internal_heap; */
 
 extern size_t __memory_size;
 
@@ -294,7 +298,7 @@ void nested_loops(void)
               __gmpz_clear(__e_acsl_add_2);
             }
           }
-          e_acsl_end_loop1: /* internal */ ;
+          e_acsl_end_loop1: ;
           e_acsl_assert(__e_acsl_forall,(char *)"Invariant",
                         (char *)"nested_loops",
                         (char *)"\\forall integer k, integer l;\n  (0 <= k && k < i) && (0 <= l && l < j) ==> t[k][l] == k*l",
@@ -448,7 +452,7 @@ void nested_loops(void)
                   __gmpz_clear(__e_acsl_add_4);
                 }
               }
-              e_acsl_end_loop2: /* internal */ ;
+              e_acsl_end_loop2: ;
               e_acsl_assert(__e_acsl_forall_2,(char *)"Invariant",
                             (char *)"nested_loops",
                             (char *)"\\forall integer k, integer l;\n  (0 <= k && k < i) && (0 <= l && l < j) ==> t[k][l] == k*l",

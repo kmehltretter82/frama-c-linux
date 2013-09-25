@@ -20,5 +20,53 @@ tests/e-acsl-runtime/bts1399.c:19:[e-acsl] warning: E-ACSL construct `logic func
 tests/e-acsl-runtime/bts1399.c:19:[e-acsl] warning: E-ACSL construct `\free' is not yet supported. Ignoring annotation.
 tests/e-acsl-runtime/bts1399.c:19:[e-acsl] warning: E-ACSL construct `\allocate' is not yet supported. Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[value] user error: option '-val-builtin __free:Frama_C_free': undeclared builtin 'Frama_C_free'
-[kernel] Plug-in value aborted: invalid user input.
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value] Values of globals at initialization
+  __fc_random_counter ∈ {0}
+  __fc_rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __e_acsl_init ∈ [--..--]
+  __e_acsl_internal_heap ∈ [--..--]
+  __memory_size ∈ [--..--]
+[value] using specification for function __store_block
+[value] using specification for function __full_init
+[value] using specification for function __delete_block
+FRAMAC_SHARE/libc/stdlib.h:127:[value] Function __e_acsl_malloc, behavior allocation: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
+FRAMAC_SHARE/libc/stdlib.h:132:[value] Function __e_acsl_malloc, behavior no_allocation: postcondition got status invalid. (Behavior may be inactive, no reduction performed.)
+[value] using specification for function __initialize
+tests/e-acsl-runtime/bts1399.c:24:[value] Assertion got status valid.
+[value] using specification for function __gmpz_init_set_ui
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:55:[value] Function __gmpz_init_set_ui: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:57:[value] Function __gmpz_init_set_ui: postcondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:58:[value] Function __gmpz_init_set_ui: postcondition got status unknown.
+[value] using specification for function __gmpz_init_set_si
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:66:[value] Function __gmpz_init_set_si: postcondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:67:[value] Function __gmpz_init_set_si: postcondition got status unknown.
+[value] using specification for function __gmpz_cmp
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:127:[value] Function __gmpz_cmp: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:128:[value] Function __gmpz_cmp: precondition got status valid.
+[value] using specification for function __gmpz_init
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:39:[value] Function __gmpz_init: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:40:[value] Function __gmpz_init: postcondition got status valid.
+tests/e-acsl-runtime/bts1399.c:24:[value] Assertion 'E_ACSL' got status valid.
+[value] using specification for function e_acsl_assert
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
+[value] using specification for function __gmpz_tdiv_q
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:164:[value] Function __gmpz_tdiv_q: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:165:[value] Function __gmpz_tdiv_q: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:166:[value] Function __gmpz_tdiv_q: precondition got status valid.
+[value] using specification for function __gmpz_get_ui
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:198:[value] Function __gmpz_get_ui: precondition got status valid.
+[value] using specification for function __initialized
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:118:[value] Function __initialized: postcondition got status unknown.
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:119:[value] Function __initialized: postcondition got status unknown.
+[value] using specification for function __gmpz_clear
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:117:[value] Function __gmpz_clear: precondition got status valid.
+FRAMAC_SHARE/libc/stdlib.h:142:[value] Function __e_acsl_free, behavior deallocation: precondition 'freeable' got status unknown.
+FRAMAC_SHARE/libc/stdlib.h:144:[value] Function __e_acsl_free, behavior deallocation: postcondition got status unknown.
+[value] using specification for function __e_acsl_memory_clean
+[value] done for function main
+[value] ====== VALUES COMPUTED ======

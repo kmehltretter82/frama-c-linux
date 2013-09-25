@@ -30,6 +30,8 @@ axiomatic
   
   }
  */
+/*@ ghost extern int __e_acsl_init; */
+
 /*@ requires ¬\initialized(z);
     ensures \valid(\old(z));
     assigns *z;
@@ -109,6 +111,8 @@ extern  __attribute__((__FC_BUILTIN__)) void __literal_string(void *ptr);
     assigns \result \from ptr; */
 extern  __attribute__((__FC_BUILTIN__)) int __offset(void *ptr);
 
+/*@ ghost extern int __e_acsl_internal_heap; */
+
 /*@ assigns __e_acsl_internal_heap;
     assigns __e_acsl_internal_heap \from __e_acsl_internal_heap;
  */
@@ -154,7 +158,7 @@ void *memchr(void const *buf, int c, size_t n)
   }
   __full_init((void *)(& __retres));
   __retres = (void *)0;
-  return_label: /* internal */
+  return_label:
     __delete_block((void *)(& buf));
     __delete_block((void *)(& s));
     __delete_block((void *)(& __retres));
@@ -233,7 +237,7 @@ void *__e_acsl_memchr(void const *buf, int c, size_t n)
         __gmpz_clear(__e_acsl_add_3);
       }
     }
-    e_acsl_end_loop3: /* internal */ ;
+    e_acsl_end_loop3: ;
     __e_acsl_at_4 = __e_acsl_forall_2;
     __gmpz_clear(__e_acsl_k);
   }
@@ -292,7 +296,7 @@ void *__e_acsl_memchr(void const *buf, int c, size_t n)
         __gmpz_clear(__e_acsl_add);
       }
     }
-    e_acsl_end_loop1: /* internal */ ;
+    e_acsl_end_loop1: ;
     __e_acsl_at = __e_acsl_exists;
     __gmpz_clear(__e_acsl_i);
   }
@@ -355,7 +359,7 @@ void *__e_acsl_memchr(void const *buf, int c, size_t n)
           __gmpz_clear(__e_acsl_add_2);
         }
       }
-      e_acsl_end_loop2: /* internal */ ;
+      e_acsl_end_loop2: ;
       __e_acsl_implies = __e_acsl_forall;
       __gmpz_clear(__e_acsl_j);
     }

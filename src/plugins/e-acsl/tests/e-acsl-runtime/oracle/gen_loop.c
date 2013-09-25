@@ -30,6 +30,10 @@ axiomatic
   
   }
  */
+/*@ ghost extern int __e_acsl_init; */
+
+/*@ ghost extern int __e_acsl_internal_heap; */
+
 extern size_t __memory_size;
 
 /*@
@@ -113,7 +117,7 @@ void nested_loops(void)
             }
             __e_acsl_k ++;
           }
-          e_acsl_end_loop1: /* internal */ ;
+          e_acsl_end_loop1: ;
           e_acsl_assert(__e_acsl_forall,(char *)"Invariant",
                         (char *)"nested_loops",
                         (char *)"\\forall integer k, integer l;\n  (0 <= k && k < i) && (0 <= l && l < j) ==> t[k][l] == k*l",
@@ -169,7 +173,7 @@ void nested_loops(void)
                 }
                 __e_acsl_k_2 ++;
               }
-              e_acsl_end_loop2: /* internal */ ;
+              e_acsl_end_loop2: ;
               e_acsl_assert(__e_acsl_forall_2,(char *)"Invariant",
                             (char *)"nested_loops",
                             (char *)"\\forall integer k, integer l;\n  (0 <= k && k < i) && (0 <= l && l < j) ==> t[k][l] == k*l",

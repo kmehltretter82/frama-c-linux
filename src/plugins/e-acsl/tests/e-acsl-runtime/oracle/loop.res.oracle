@@ -10,10 +10,12 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-        __fc_random_counter ∈ {0}
-        __fc_rand_max ∈ {32767}
-        __fc_heap_status ∈ [--..--]
-        __memory_size ∈ [--..--]
+  __fc_random_counter ∈ {0}
+  __fc_rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __e_acsl_init ∈ [--..--]
+  __e_acsl_internal_heap ∈ [--..--]
+  __memory_size ∈ [--..--]
 [value] using specification for function __gmpz_init_set_si
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: precondition got status valid.
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:66:[value] Function __gmpz_init_set_si: postcondition got status valid.
@@ -34,13 +36,8 @@ FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:40:[value] Function __gmpz_init: postcondition 
 [value] using specification for function __gmpz_set
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:94:[value] Function __gmpz_set: precondition got status valid.
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:95:[value] Function __gmpz_set: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
 [value] using specification for function __gmpz_get_ui
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:198:[value] Function __gmpz_get_ui: precondition got status valid.
-[value] using specification for function __gmpz_add
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:143:[value] Function __gmpz_add: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:144:[value] Function __gmpz_add: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:145:[value] Function __gmpz_add: precondition got status valid.
 tests/e-acsl-runtime/loop.i:21:[kernel] warning: accessing out of bounds index [0..4294967295]. assert __e_acsl_k_2 < 10;
 tests/e-acsl-runtime/loop.i:21:[kernel] warning: accessing out of bounds index [0..4294967295]. assert __e_acsl_l_2 < 15;
 tests/e-acsl-runtime/loop.i:21:[kernel] warning: accessing uninitialized left-value:
@@ -48,6 +45,11 @@ tests/e-acsl-runtime/loop.i:21:[kernel] warning: accessing uninitialized left-va
 tests/e-acsl-runtime/loop.i:21:[kernel] warning: completely indeterminate value in t with offsets [0..4768],0%32.
 tests/e-acsl-runtime/loop.i:21:[value] all evaluations are invalid for function call argument
         (long)t[__e_acsl_k_2][__e_acsl_l_2]
+[value] using specification for function __gmpz_add
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:143:[value] Function __gmpz_add: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:144:[value] Function __gmpz_add: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:145:[value] Function __gmpz_add: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
 tests/e-acsl-runtime/loop.i:19:[value] Loop invariant got status valid.
 tests/e-acsl-runtime/loop.i:21:[value] Loop invariant got status unknown.
 tests/e-acsl-runtime/loop.i:21:[kernel] warning: accessing out of bounds index [0..4294967295]. assert __e_acsl_k_4 < 10;

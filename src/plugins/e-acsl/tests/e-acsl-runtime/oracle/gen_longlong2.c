@@ -30,6 +30,8 @@ axiomatic
   
   }
  */
+/*@ ghost extern int __e_acsl_init; */
+
 /*@ requires ¬\initialized(z);
     ensures \valid(\old(z));
     assigns *z;
@@ -103,6 +105,8 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_tdiv_r(__mpz_struct * /*[1]*
                                                            __mpz_struct const * /*[1]*/ z2,
                                                            __mpz_struct const * /*[1]*/ z3);
 
+/*@ ghost extern int __e_acsl_internal_heap; */
+
 extern size_t __memory_size;
 
 /*@
@@ -129,7 +133,7 @@ unsigned long long my_pow(unsigned int x, unsigned int n)
     goto return_label;
   }
   __retres = (unsigned long long)(x * (unsigned int)tmp);
-  return_label: /* internal */ return __retres;
+  return_label: return __retres;
 }
 
 int main(void)

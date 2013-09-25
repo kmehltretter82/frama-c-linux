@@ -65,7 +65,7 @@ extern void *__malloc(size_t size);
     
     behavior deallocation:
       assumes p ≢ \null;
-      requires \freeable(p);
+      requires freeable: \freeable(p);
       ensures \allocable(\old(p));
       assigns __fc_heap_status;
       assigns __fc_heap_status \from __fc_heap_status;
@@ -79,6 +79,8 @@ extern void *__malloc(size_t size);
     disjoint behaviors no_deallocation, deallocation;
  */
 extern void __free(void *p);
+
+/*@ ghost extern int __e_acsl_init; */
 
 /*@ assigns \result \from *((char *)ptr+(0..size-1)); */
 extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
@@ -109,6 +111,8 @@ extern  __attribute__((__FC_BUILTIN__)) int __valid_read(void *ptr,
  */
 extern  __attribute__((__FC_BUILTIN__)) int __initialized(void *ptr,
                                                           size_t size);
+
+/*@ ghost extern int __e_acsl_internal_heap; */
 
 /*@ assigns __e_acsl_internal_heap;
     assigns __e_acsl_internal_heap \from __e_acsl_internal_heap;
@@ -153,7 +157,7 @@ void *__e_acsl_malloc(size_t size)
     
     behavior deallocation:
       assumes p ≢ \null;
-      requires \freeable(p);
+      requires freeable: \freeable(p);
       ensures \allocable(\old(p));
       assigns __fc_heap_status;
       assigns __fc_heap_status \from __fc_heap_status;

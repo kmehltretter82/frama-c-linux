@@ -57,6 +57,8 @@ axiomatic
  */
 extern void *__malloc(size_t size);
 
+/*@ ghost extern int __e_acsl_init; */
+
 /*@ assigns \result \from *((char *)ptr+(0..size-1)); */
 extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
                                                             size_t size);
@@ -84,6 +86,8 @@ extern  __attribute__((__FC_BUILTIN__)) int __valid(void *ptr, size_t size);
  */
 extern  __attribute__((__FC_BUILTIN__)) int __initialized(void *ptr,
                                                           size_t size);
+
+/*@ ghost extern int __e_acsl_internal_heap; */
 
 /*@ assigns __e_acsl_internal_heap;
     assigns __e_acsl_internal_heap \from __e_acsl_internal_heap;

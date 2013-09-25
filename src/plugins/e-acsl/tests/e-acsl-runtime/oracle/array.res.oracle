@@ -10,12 +10,14 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-        __fc_random_counter ∈ {0}
-        __fc_rand_max ∈ {32767}
-        __fc_heap_status ∈ [--..--]
-        __memory_size ∈ [--..--]
-        T1[0..2] ∈ {0}
-        T2[0..3] ∈ {0}
+  __fc_random_counter ∈ {0}
+  __fc_rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __e_acsl_init ∈ [--..--]
+  __e_acsl_internal_heap ∈ [--..--]
+  __memory_size ∈ [--..--]
+  T1[0..2] ∈ {0}
+  T2[0..3] ∈ {0}
 tests/e-acsl-runtime/array.i:12:[value] entering loop for the first time
 tests/e-acsl-runtime/array.i:13:[value] entering loop for the first time
 tests/e-acsl-runtime/array.i:15:[value] Assertion got status unknown.

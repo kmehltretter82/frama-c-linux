@@ -20,5 +20,79 @@ tests/e-acsl-runtime/valid.c:33:[e-acsl] warning: E-ACSL construct `logic functi
 tests/e-acsl-runtime/valid.c:33:[e-acsl] warning: E-ACSL construct `\free' is not yet supported. Ignoring annotation.
 tests/e-acsl-runtime/valid.c:33:[e-acsl] warning: E-ACSL construct `\allocate' is not yet supported. Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[value] user error: option '-val-builtin __free:Frama_C_free': undeclared builtin 'Frama_C_free'
-[kernel] Plug-in value aborted: invalid user input.
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value] Values of globals at initialization
+  __fc_random_counter ∈ {0}
+  __fc_rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __e_acsl_init ∈ [--..--]
+  __e_acsl_internal_heap ∈ [--..--]
+  __memory_size ∈ [--..--]
+  X ∈ {0}
+  Z ∈ {0}
+[value] using specification for function __store_block
+[value] using specification for function __full_init
+tests/e-acsl-runtime/valid.c:35:[value] Assertion got status valid.
+[value] using specification for function __initialized
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:118:[value] Function __initialized: postcondition got status unknown.
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:119:[value] Function __initialized: postcondition got status unknown.
+tests/e-acsl-runtime/valid.c:35:[kernel] warning: accessing uninitialized left-value: assert \initialized(&a);
+tests/e-acsl-runtime/valid.c:35:[kernel] warning: completely indeterminate value in a.
+tests/e-acsl-runtime/valid.c:35:[value] all evaluations are invalid for function call argument
+        (void *)a
+tests/e-acsl-runtime/valid.c:35:[kernel] warning: accessing uninitialized left-value: assert \initialized(&b);
+tests/e-acsl-runtime/valid.c:35:[kernel] warning: completely indeterminate value in b.
+tests/e-acsl-runtime/valid.c:35:[value] all evaluations are invalid for function call argument
+        (void *)b
+[value] using specification for function __valid
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:86:[value] Function __valid: postcondition got status unknown.
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:87:[value] Function __valid: postcondition got status unknown.
+[value] using specification for function e_acsl_assert
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
+[value] using specification for function __delete_block
+FRAMAC_SHARE/libc/stdlib.h:127:[value] Function __e_acsl_malloc, behavior allocation: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
+FRAMAC_SHARE/libc/stdlib.h:132:[value] Function __e_acsl_malloc, behavior no_allocation: postcondition got status invalid. (Behavior may be inactive, no reduction performed.)
+tests/e-acsl-runtime/valid.c:37:[value] Assertion got status valid.
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:119:[value] Function __initialized: postcondition got status valid.
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:87:[value] Function __valid: postcondition got status valid.
+tests/e-acsl-runtime/valid.c:37:[kernel] warning: accessing uninitialized left-value: assert \initialized(&b);
+tests/e-acsl-runtime/valid.c:37:[kernel] warning: completely indeterminate value in b.
+tests/e-acsl-runtime/valid.c:37:[value] all evaluations are invalid for function call argument
+        (void *)b
+tests/e-acsl-runtime/valid.c:39:[value] Assertion got status valid.
+tests/e-acsl-runtime/valid.c:39:[kernel] warning: accessing uninitialized left-value: assert \initialized(&b);
+tests/e-acsl-runtime/valid.c:39:[kernel] warning: completely indeterminate value in b.
+tests/e-acsl-runtime/valid.c:39:[value] all evaluations are invalid for function call argument
+        (void *)b
+tests/e-acsl-runtime/valid.c:15:[value] Function __e_acsl_f: precondition got status valid.
+tests/e-acsl-runtime/valid.c:15:[value] Function f: precondition got status valid.
+tests/e-acsl-runtime/valid.c:19:[value] Assertion got status valid.
+tests/e-acsl-runtime/valid.c:19:[kernel] warning: accessing uninitialized left-value: assert \initialized(&y);
+tests/e-acsl-runtime/valid.c:19:[kernel] warning: completely indeterminate value in y.
+tests/e-acsl-runtime/valid.c:19:[value] all evaluations are invalid for function call argument
+        (void *)y
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
+tests/e-acsl-runtime/valid.c:21:[value] Assertion got status valid.
+tests/e-acsl-runtime/valid.c:16:[value] Function f: postcondition got status valid.
+tests/e-acsl-runtime/valid.c:16:[value] Function __e_acsl_f: postcondition got status valid.
+tests/e-acsl-runtime/valid.c:41:[value] Assertion got status valid.
+tests/e-acsl-runtime/valid.c:43:[value] Assertion got status valid.
+tests/e-acsl-runtime/valid.c:46:[value] Assertion got status valid.
+[value] using specification for function __valid_read
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:93:[value] Function __valid_read: postcondition got status unknown.
+FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:94:[value] Function __valid_read: postcondition got status valid.
+tests/e-acsl-runtime/valid.c:47:[value] Assertion got status valid.
+FRAMAC_SHARE/libc/stdlib.h:142:[value] Function __e_acsl_free, behavior deallocation: precondition 'freeable' got status unknown.
+FRAMAC_SHARE/libc/stdlib.h:144:[value] Function __e_acsl_free, behavior deallocation: postcondition got status unknown.
+tests/e-acsl-runtime/valid.c:49:[value] Assertion got status valid.
+tests/e-acsl-runtime/valid.c:49:[kernel] warning: accessing left-value that contains escaping addresses; assert(\defined(&a))
+tests/e-acsl-runtime/valid.c:49:[kernel] warning: completely indeterminate value in a.
+tests/e-acsl-runtime/valid.c:49:[value] all evaluations are invalid for function call argument
+        (void *)a
+tests/e-acsl-runtime/valid.c:50:[value] Assertion got status valid.
+tests/e-acsl-runtime/valid.c:30:[value] Assertion got status valid.
+[value] using specification for function __e_acsl_memory_clean
+[value] done for function main
+[value] ====== VALUES COMPUTED ======

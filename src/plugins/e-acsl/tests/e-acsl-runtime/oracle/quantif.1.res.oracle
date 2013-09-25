@@ -10,10 +10,12 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-        __fc_random_counter ∈ {0}
-        __fc_rand_max ∈ {32767}
-        __fc_heap_status ∈ [--..--]
-        __memory_size ∈ [--..--]
+  __fc_random_counter ∈ {0}
+  __fc_rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __e_acsl_init ∈ [--..--]
+  __e_acsl_internal_heap ∈ [--..--]
+  __memory_size ∈ [--..--]
 tests/e-acsl-runtime/quantif.i:11:[value] Assertion got status unknown.
 [value] using specification for function __gmpz_init
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:39:[value] Function __gmpz_init: precondition got status valid.
@@ -49,13 +51,13 @@ tests/e-acsl-runtime/quantif.i:23:[value] Assertion got status unknown.
 tests/e-acsl-runtime/quantif.i:23:[value] entering loop for the first time
 tests/e-acsl-runtime/quantif.i:27:[value] Assertion got status unknown.
 tests/e-acsl-runtime/quantif.i:27:[value] entering loop for the first time
-tests/e-acsl-runtime/quantif.i:28:[value] Assertion got status valid.
+tests/e-acsl-runtime/quantif.i:28:[value] Assertion 'E_ACSL' got status valid.
 [value] using specification for function __gmpz_tdiv_r
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:171:[value] Function __gmpz_tdiv_r: precondition got status valid.
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:172:[value] Function __gmpz_tdiv_r: precondition got status valid.
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:173:[value] Function __gmpz_tdiv_r: precondition got status valid.
 tests/e-acsl-runtime/quantif.i:28:[value] entering loop for the first time
-tests/e-acsl-runtime/quantif.i:28:[value] Assertion got status valid.
+tests/e-acsl-runtime/quantif.i:28:[value] Assertion 'E_ACSL' got status valid.
 [value] using specification for function __gmpz_tdiv_q
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:164:[value] Function __gmpz_tdiv_q: precondition got status valid.
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:165:[value] Function __gmpz_tdiv_q: precondition got status valid.

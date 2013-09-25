@@ -16,7 +16,7 @@ typedef unsigned int blksize_t;
 typedef unsigned int dev_t;
 typedef unsigned int mode_t;
 typedef unsigned int nlink_t;
-typedef unsigned int off_t;
+typedef long off_t;
 struct stat {
    dev_t st_dev ;
    ino_t st_ino ;
@@ -59,6 +59,8 @@ axiomatic
   
   }
  */
+/*@ ghost extern int __e_acsl_init; */
+
 /*@ assigns \result \from *((char *)ptr+(0..size-1)); */
 extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
                                                             size_t size);
@@ -68,6 +70,8 @@ extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
 
 /*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __literal_string(void *ptr);
+
+/*@ ghost extern int __e_acsl_internal_heap; */
 
 extern size_t __memory_size;
 

@@ -34,10 +34,10 @@ module Project_name: String
 
 val must_visit: unit -> bool
 
-val dkey_analysis: (*Log.*)category
-val dkey_dup: (*Log.*)category
-val dkey_translation: (*Log.*)category
-val dkey_typing: (*Log.*)category
+val dkey_analysis: Log.category
+val dkey_dup: Log.category
+val dkey_translation: Log.category
+val dkey_typing: Log.category
 
 (*
 Local Variables:

@@ -10,10 +10,12 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-        __fc_random_counter ∈ {0}
-        __fc_rand_max ∈ {32767}
-        __fc_heap_status ∈ [--..--]
-        __memory_size ∈ [--..--]
+  __fc_random_counter ∈ {0}
+  __fc_rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __e_acsl_init ∈ [--..--]
+  __e_acsl_internal_heap ∈ [--..--]
+  __memory_size ∈ [--..--]
 tests/e-acsl-runtime/arith.i:12:[value] Assertion got status valid.
 [value] using specification for function __gmpz_init_set_si
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: precondition got status valid.
@@ -53,6 +55,7 @@ FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:157:[value] Function __gmpz_mul: precondition g
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:158:[value] Function __gmpz_mul: precondition got status valid.
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:159:[value] Function __gmpz_mul: precondition got status valid.
 tests/e-acsl-runtime/arith.i:19:[value] Assertion got status valid.
+tests/e-acsl-runtime/arith.i:19:[value] Assertion 'E_ACSL' got status valid.
 [value] using specification for function __gmpz_tdiv_q
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:164:[value] Function __gmpz_tdiv_q: precondition got status valid.
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:165:[value] Function __gmpz_tdiv_q: precondition got status valid.
@@ -62,13 +65,17 @@ tests/e-acsl-runtime/arith.i:20:[value] Assertion got status valid.
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:73:[value] Function __gmpz_init_set_str: precondition got status valid.
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:75:[value] Function __gmpz_init_set_str: postcondition got status valid.
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:76:[value] Function __gmpz_init_set_str: postcondition got status unknown.
+tests/e-acsl-runtime/arith.i:20:[value] Assertion 'E_ACSL' got status valid.
 tests/e-acsl-runtime/arith.i:21:[value] Assertion got status valid.
+tests/e-acsl-runtime/arith.i:21:[value] Assertion 'E_ACSL' got status valid.
 [value] using specification for function __gmpz_tdiv_r
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:171:[value] Function __gmpz_tdiv_r: precondition got status valid.
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:172:[value] Function __gmpz_tdiv_r: precondition got status valid.
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:173:[value] Function __gmpz_tdiv_r: precondition got status valid.
 tests/e-acsl-runtime/arith.i:22:[value] Assertion got status valid.
+tests/e-acsl-runtime/arith.i:22:[value] Assertion 'E_ACSL' got status valid.
 tests/e-acsl-runtime/arith.i:23:[value] Assertion got status valid.
+tests/e-acsl-runtime/arith.i:23:[value] Assertion 'E_ACSL' got status valid.
 tests/e-acsl-runtime/arith.i:25:[value] Assertion got status valid.
 tests/e-acsl-runtime/arith.i:27:[value] Assertion got status valid.
 tests/e-acsl-runtime/arith.i:28:[value] Assertion got status valid.
@@ -76,5 +83,6 @@ tests/e-acsl-runtime/arith.i:29:[value] Assertion got status valid.
 tests/e-acsl-runtime/arith.i:30:[value] Assertion got status valid.
 tests/e-acsl-runtime/arith.i:32:[value] Assertion got status valid.
 tests/e-acsl-runtime/arith.i:33:[value] Assertion got status valid.
+tests/e-acsl-runtime/arith.i:33:[value] Assertion 'E_ACSL' got status valid.
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
