@@ -68,6 +68,7 @@ let preserve_invariant prj env kf stmt = match stmt.skind with
 	Misc.mk_block prj last blk :: stmts, env, invariants != []
       | s :: tl -> handle_invariants (s :: stmts, env, false) tl
     in
+    let env = Env.set_annotation_kind env Misc.Invariant in
     let stmts, env, has_loop = handle_invariants ([], env, false) stmts in
     let new_blk = { blk with bstmts = List.rev stmts } in
     { stmt with skind = Loop([], new_blk, loc, cont, break) }, 

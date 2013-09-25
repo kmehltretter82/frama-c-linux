@@ -9,6 +9,7 @@
 - memory profiling
 - [Guillaume] ajouter les annotations de RTE dans la table des annotations
   	      (avec une option)
+- [David Mentré] tset
 
 #####################
 # E-ACSL CONSTRUCTS #
@@ -21,6 +22,7 @@
 - loop variant
 - logical shift (at least in non GMP mode)
 - let-in
+- tset
 - grep "not_yet" *.ml
 
 ########
@@ -69,7 +71,6 @@
   (voir aussi result.i et ./at_stmt_contract.i)
 - interprétation des tableaux logiques
 [Dillon] Windows
-[Guillaume] look like some loop invariants are tagged as "assertion"
 
 [to be check]: no call to full_init or initialize for the assigned result of a 
 function call
@@ -87,5 +88,4 @@ function call
 - inclure exemple du E-ACSL Reference Manual
 - inclure exemple du E-ACSL User Manual
 - inclure exemple du E-ACSL Tutorial
-- test arith.i: mettre les exemples du ACSL manual about div and modulo
-- currently, tests require a non-free version of Frama-C
+- currently, tests require a non-free version of Frama-C (built-ins Value)
