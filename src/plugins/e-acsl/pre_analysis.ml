@@ -43,12 +43,6 @@ let init_mpz () =
 
 let dkey = Options.dkey_analysis
 
-let get_rte_by_stmt =
-  Misc.rte2
-    "stmt_annotations"
-    (Datatype.func2 Kernel_function.ty Stmt.ty 
-       (let module L = Datatype.List(Code_annotation) in L.ty))
-
 module Env: sig
   val default_varinfos: Varinfo.Hptset.t option -> Varinfo.Hptset.t
   val apply: (kernel_function -> 'a) -> kernel_function -> 'a
@@ -428,7 +422,7 @@ module rec Transfer
 	in
 	let state =
 	  if stmt.ghost then
-	    let rtes = get_rte_by_stmt kf stmt in
+	    let rtes = Rte.stmt kf stmt in
 	    List.fold_left
 	      (fun state a -> register_code_annot kf a state) state rtes
 	  else 

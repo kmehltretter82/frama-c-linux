@@ -237,45 +237,6 @@ let mk_literal_string vi =
   mk_debug_mmodel_stmt stmt
 
 (* ************************************************************************** *)
-(** {2 Rte} *)
-(* ************************************************************************** *)
-
-let apply_rte f x =
-  let signed = Kernel.SignedOverflow.get () in
-  let unsigned = Kernel.UnsignedOverflow.get () in
-  Kernel.SignedOverflow.off ();
-  Kernel.UnsignedOverflow.off ();
-  let finally () =
-    Kernel.SignedOverflow.set signed;
-    Kernel.UnsignedOverflow.set unsigned
-  in
-  Extlib.try_finally ~finally f x
-
-let warn_rte w exn =
-  if w then
-    Options.warning "@[@[cannot run RTE:@ %s.@]@ \
-Ignoring potential runtime errors in annotations." 
-      (Printexc.to_string exn)
-
-let rte2 ?(warn=true) fname ty =
-  try 
-    let f = Dynamic.get ~plugin:"RteGen" fname ty in
-    (fun x y -> apply_rte (f x) y)
-  with Failure _ | Dynamic.Unbound_value _ | Dynamic.Incompatible_type _ as exn
-    ->
-      warn_rte warn exn;
-      fun _ _ -> []
-
-let rte3 ?(warn=true) fname ty =
-  try 
-    let f = Dynamic.get ~plugin:"RteGen" fname ty in
-    (fun x y z -> apply_rte (f x y) z)
-  with Failure _ | Dynamic.Unbound_value _ | Dynamic.Incompatible_type _ as exn
-    ->
-      warn_rte warn exn;
-      fun _ _ _ -> []
-
-(* ************************************************************************** *)
 (** {2 Other stuff} *)
 (* ************************************************************************** *)
 

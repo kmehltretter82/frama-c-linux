@@ -25,13 +25,6 @@ open Cil_datatype
 
 let dkey = Options.dkey_translation
 
-let get_rte_by_stmt =
-  Misc.rte2
-    ~warn:false
-    "stmt_annotations"
-    (Datatype.func2 Kernel_function.ty Stmt.ty 
-       (let module L = Datatype.List(Code_annotation) in L.ty))
-
 (* move all labels of [stmt] onto [new_stmt] *)
 let move_labels env stmt new_stmt =
   let labels = stmt.labels in
@@ -462,7 +455,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
 	if stmt.ghost && generate then begin
 	  stmt.ghost <- false;
 	  (* translate potential RTEs of ghost code *)
-	  let rtes = get_rte_by_stmt kf stmt in
+	  let rtes = Rte.stmt kf stmt in
 	  Translate.translate_rte_annots Printer.pp_stmt stmt kf env rtes
 	end else
 	  env

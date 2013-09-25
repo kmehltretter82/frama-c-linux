@@ -54,6 +54,7 @@ PLUGIN_DYNAMIC:=@DYNAMIC_E_ACSL@
 PLUGIN_NAME:=E_ACSL
 PLUGIN_CMO:= local_config \
 	options \
+	rte \
 	error \
 	misc \
 	mpz \

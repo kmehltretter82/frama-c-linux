@@ -3,7 +3,7 @@
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
 (*  Copyright (C) 2012-2013                                               *)
-(*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
+(*    CEA (Commissariat Ã  l'Ã©nergie atomique et aux Ã©nergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
 (*  you can redistribute it and/or modify it under the terms of the GNU   *)
@@ -20,65 +20,61 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Utilities for E-ACSL. *)
+(* ************************************************************************** *)
+(** {2 Generic code} *)
+(* ************************************************************************** *)
 
-open Cil_types
+let apply_rte f x =
+  let signed = Kernel.SignedOverflow.get () in
+  let unsigned = Kernel.UnsignedOverflow.get () in
+  Kernel.SignedOverflow.off ();
+  Kernel.UnsignedOverflow.off ();
+  let finally () =
+    Kernel.SignedOverflow.set signed;
+    Kernel.UnsignedOverflow.set unsigned
+  in
+  Extlib.try_finally ~finally f x
+
+let warn_rte exn =
+  Options.warning "@[@[cannot run RTE:@ %s.@]@ \
+Ignoring potential runtime errors in annotations." 
+    (Printexc.to_string exn)
+
+(* ************************************************************************** *)
+(** {2 Exported code} *)
+(* ************************************************************************** *)
+
 open Cil_datatype
 
-(* ************************************************************************** *)
-(** {2 Builders} *)
-(* ************************************************************************** *)
+let stmt =
+  try 
+    let f = 
+      Dynamic.get
+	~plugin:"RteGen" 
+	"stmt_annotations" 
+	(Datatype.func2 Kernel_function.ty Stmt.ty 
+	   (let module L = Datatype.List(Code_annotation) in L.ty))
+    in
+    (fun x y -> apply_rte (f x) y)
+  with Failure _ | Dynamic.Unbound_value _ | Dynamic.Incompatible_type _ as exn
+    ->
+      warn_rte exn;
+      fun _ _ -> []
 
-val mk_call: loc:Location.t -> ?result:lval -> string -> exp list -> stmt
-val mk_debug_mmodel_stmt: stmt -> stmt
-
-type annotation_kind = 
-  | Assertion
-  | Precondition
-  | Postcondition
-  | Invariant
-  | RTE
-
-val e_acsl_guard_name: string
-
-val mk_e_acsl_guard: 
-  ?reverse:bool -> annotation_kind -> kernel_function -> exp -> predicate named 
-  -> stmt
-
-val mk_block: Project.t -> stmt -> block -> stmt
-
-(* ************************************************************************** *)
-(** {2 Handling \result} *)
-(* ************************************************************************** *)
-
-val result_lhost: kernel_function -> lhost
-(** @return the lhost corresponding to \result in the given function *)
-
-val result_vi: kernel_function -> varinfo
-(** @return the varinfo corresponding to \result in the given function *)
-
-(* ************************************************************************** *)
-(** {2 Handling the E-ACSL's C-libraries} *)
-(* ************************************************************************** *)
-
-val library_files: unit -> string list
-val is_library_loc: location -> bool
-val register_library_function: varinfo -> unit
-val reset: unit -> unit
-
-val mk_store_stmt: ?str_size:exp -> varinfo -> stmt
-val mk_delete_stmt: varinfo -> stmt
-val mk_full_init_stmt: ?addr:bool -> varinfo -> stmt
-val mk_initialize: loc:location -> lval -> stmt
-val mk_literal_string: varinfo -> stmt
-
-(* ************************************************************************** *)
-(** {2 Other stuff} *)
-(* ************************************************************************** *)
-
-val term_addr_of: loc:location -> term_lval -> typ -> term
-val is_generated_varinfo: varinfo -> bool
-val is_generated_kf: kernel_function -> bool
+let exp =
+  try 
+    let f = 
+      Dynamic.get
+	~plugin:"RteGen" 
+	"exp_annotations" 
+	(Datatype.func3 Kernel_function.ty Stmt.ty Exp.ty 
+	   (let module L = Datatype.List(Code_annotation) in L.ty))
+    in
+    (fun x y z -> apply_rte (f x y) z)
+  with Failure _ | Dynamic.Unbound_value _ | Dynamic.Incompatible_type _ as exn
+    ->
+      warn_rte exn;
+      fun _ _ _ -> []
 
 (*
 Local Variables:

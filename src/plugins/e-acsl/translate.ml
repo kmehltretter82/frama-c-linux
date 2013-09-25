@@ -25,12 +25,6 @@ open Cil_datatype
 
 let dkey = Options.dkey_translation
 
-let get_rte =
-  Misc.rte3
-    "exp_annotations"
-    (Datatype.func3 Kernel_function.ty Stmt.ty Exp.ty 
-       (let module L = Datatype.List(Code_annotation) in L.ty))
-
 let not_yet env s =
   Env.Context.save env;
   Error.not_yet s
@@ -663,7 +657,7 @@ and translate_rte_annots:
 
 and translate_rte kf env e =
   let stmt = Cil.mkStmtOneInstr ~valid_sid:true (Skip e.eloc) in
-  let l = get_rte kf stmt e in
+  let l = Rte.exp kf stmt e in
   translate_rte_annots Printer.pp_exp e kf env l
 
 and translate_named_predicate kf env p =
