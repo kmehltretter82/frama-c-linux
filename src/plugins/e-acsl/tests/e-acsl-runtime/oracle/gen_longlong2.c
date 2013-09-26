@@ -123,7 +123,7 @@ unsigned long long my_pow(unsigned int x, unsigned int n)
     goto return_label;
   }
   {
-    /*undefined sequence*/
+    /*sequence*/
     tmp_0 = my_pow(x,n / (unsigned int)2);
     tmp = (int)tmp_0;
   }

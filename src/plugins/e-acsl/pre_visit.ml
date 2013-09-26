@@ -352,8 +352,8 @@ if there are memory-related annotations.@]"
 	match libc_decls with
 	| [] -> f
 	| _ :: _ -> 
-	  (* in the rare case where there is no global tagged as [Code] in the
-	     file *)
+	  (* required by the few cases where there is no global tagged as
+	     [Code] in the file. *)
 	  f.globals <- self#insert_libc f.globals; 
 	  f)
 

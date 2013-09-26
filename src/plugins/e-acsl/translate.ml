@@ -678,7 +678,8 @@ let () =
   Quantif.term_to_exp_ref := term_to_exp;
   Quantif.named_predicate_to_exp_ref := named_predicate_to_exp
 
-(* for Guillaume: incorrect in general *)
+(* This function is used by Guillaume.
+   However, it is a correct to use it only in specific contexts. *)
 let predicate_to_exp kf p =
   Typing.type_named_predicate ~must_clear:true p;
   let empty_env = Env.empty (new Visitor.frama_c_copy Project_skeleton.dummy) in
