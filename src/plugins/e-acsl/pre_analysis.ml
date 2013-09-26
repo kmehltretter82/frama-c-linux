@@ -239,8 +239,14 @@ module rec Transfer
       | None -> Kernel.fatal "no base address for %a" Printer.pp_exp e
       | Some vi -> add_vi state vi
 
-  (* if [e] contains an address from a base, then also monitor the host *)
+  (* if [e] contains a pointer left-value, then also monitor the host *)
   let rec extend_from_addr state lv e = match e.enode with
+    | Lval(lhost, _) ->
+      if is_ptr_or_array_exp e then
+	extend_to_expr true state lhost (Cil.new_exp ~loc:e.eloc (Lval lv)),
+	true
+      else
+	state, false
     | AddrOf(lhost, _) -> 
       extend_to_expr true state lhost (Cil.new_exp ~loc:e.eloc (Lval lv)),
       true
@@ -254,7 +260,7 @@ module rec Transfer
     | _ -> state, false
 
   let handle_assignment state (lhost, _ as lv) e =
-      (* if [e] contains an address from a base, then also monitor the host *)
+    (* if [e] is a pointer left-value, then also monitor the host *)
     let state, always = extend_from_addr state lv e in
     extend_to_expr always state lhost e
 

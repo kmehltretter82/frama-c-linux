@@ -15,7 +15,9 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
--* E-ACSL       [2013/09/25] Some loop invariants were tagged as "assertions".	
+-* E-ACSL       [2013/09/26] Fix incorrectness which may occur in presence
+	        of aliasing.
+-* E-ACSL       [2013/09/25] Some loop invariants were tagged as "assertions".
 
 ###################################
 Plugin E-ACSL 0.3 Fluorine_20130601

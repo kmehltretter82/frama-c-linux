@@ -43,6 +43,9 @@ extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
 /*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __delete_block(void *ptr);
 
+/*@ assigns \nothing; */
+extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
+
 /*@ ensures \result ≡ 0 ∨ \result ≡ 1;
     ensures \result ≡ 1 ⇒ \valid((char *)\old(ptr)+(0..\old(size)-1));
     assigns \result \from *((char *)ptr+(0..size-1));
@@ -90,16 +93,24 @@ predicate diffSize{L1, L2}(ℤ i) =
 struct list *f(struct list *l)
 {
   struct list *__retres;
+  __store_block((void *)(& __retres),4U);
+  __store_block((void *)(& l),4U);
   if (l == (void *)0) {
+    __full_init((void *)(& __retres));
     __retres = l;
     goto return_label;
   }
   if (l->next == (void *)0) {
+    __full_init((void *)(& __retres));
     __retres = l;
     goto return_label;
   }
+  __full_init((void *)(& __retres));
   __retres = (struct list *)((void *)0);
-  return_label: return __retres;
+  return_label:
+    __delete_block((void *)(& l));
+    __delete_block((void *)(& __retres));
+    return __retres;
 }
 
 /*@ behavior B1:
@@ -118,6 +129,7 @@ struct list *__e_acsl_f(struct list *l)
   struct list *__e_acsl_at_2;
   int __e_acsl_at;
   struct list *__retres;
+  __store_block((void *)(& __retres),4U);
   __store_block((void *)(& l),4U);
   __store_block((void *)(& __e_acsl_at_4),4U);
   __e_acsl_at_4 = l;
@@ -164,6 +176,7 @@ struct list *__e_acsl_f(struct list *l)
                   (char *)"\\old(!\\valid(l) && !\\valid(l->next)) ==> \\result == \\old(l)",
                   22);
     __delete_block((void *)(& l));
+    __delete_block((void *)(& __retres));
     return __retres;
   }
 }
