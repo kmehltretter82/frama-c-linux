@@ -42,7 +42,6 @@ let init_mpz () =
 (* ********************************************************************** *)
 
 let dkey = Options.dkey_analysis
-
 module Env: sig
   val default_varinfos: Varinfo.Hptset.t option -> Varinfo.Hptset.t
   val apply: (kernel_function -> 'a) -> kernel_function -> 'a
@@ -191,7 +190,7 @@ module rec Transfer
     Some 
       (Varinfo.Hptset.union (Env.default_varinfos s1) (Env.default_varinfos s2))
 
-  let is_ptr_or_array ty = Cil.isPtrType ty || Cil.isArrayType ty
+  let is_ptr_or_array ty = Cil.isPointerType ty || Cil.isArrayType ty
 
   let is_ptr_or_array_exp e =
     let ty = Cil.typeOf e in
