@@ -27,6 +27,11 @@ tests/e-acsl-runtime/loop.i:21:[value] entering loop for the first time
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status invalid.
 tests/e-acsl-runtime/loop.i:21:[kernel] warning: accessing uninitialized left-value:
                   assert \initialized(&t[__e_acsl_k_2][__e_acsl_l_2]);
+tests/e-acsl-runtime/loop.i:21:[kernel] warning: completely indeterminate value in t with offsets [2400..2848],0%32.
+tests/e-acsl-runtime/loop.i:21:[kernel] warning: completely indeterminate value in t with offsets [2880..3328],0%32.
+tests/e-acsl-runtime/loop.i:21:[kernel] warning: completely indeterminate value in t with offsets [3360..3808],0%32.
+tests/e-acsl-runtime/loop.i:21:[kernel] warning: completely indeterminate value in t with offsets [3840..4288],0%32.
+tests/e-acsl-runtime/loop.i:21:[kernel] warning: completely indeterminate value in t with offsets [4320..4768],0%32.
 tests/e-acsl-runtime/loop.i:28:[value] Loop invariant got status valid.
 [value] done for function main
 [value] ====== VALUES COMPUTED ======

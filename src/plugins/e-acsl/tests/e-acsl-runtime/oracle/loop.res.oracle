@@ -42,7 +42,16 @@ tests/e-acsl-runtime/loop.i:21:[kernel] warning: accessing out of bounds index [
 tests/e-acsl-runtime/loop.i:21:[kernel] warning: accessing out of bounds index [0..4294967295]. assert __e_acsl_l_2 < 15;
 tests/e-acsl-runtime/loop.i:21:[kernel] warning: accessing uninitialized left-value:
                   assert \initialized(&t[__e_acsl_k_2][__e_acsl_l_2]);
-tests/e-acsl-runtime/loop.i:21:[kernel] warning: completely indeterminate value in t with offsets [0..4768],0%32.
+tests/e-acsl-runtime/loop.i:21:[kernel] warning: completely indeterminate value in t with offsets [0..448],0%32.
+tests/e-acsl-runtime/loop.i:21:[kernel] warning: completely indeterminate value in t with offsets [480..928],0%32.
+tests/e-acsl-runtime/loop.i:21:[kernel] warning: completely indeterminate value in t with offsets [960..1408],0%32.
+tests/e-acsl-runtime/loop.i:21:[kernel] warning: completely indeterminate value in t with offsets [1440..1888],0%32.
+tests/e-acsl-runtime/loop.i:21:[kernel] warning: completely indeterminate value in t with offsets [1920..2368],0%32.
+tests/e-acsl-runtime/loop.i:21:[kernel] warning: completely indeterminate value in t with offsets [2400..2848],0%32.
+tests/e-acsl-runtime/loop.i:21:[kernel] warning: completely indeterminate value in t with offsets [2880..3328],0%32.
+tests/e-acsl-runtime/loop.i:21:[kernel] warning: completely indeterminate value in t with offsets [3360..3808],0%32.
+tests/e-acsl-runtime/loop.i:21:[kernel] warning: completely indeterminate value in t with offsets [3840..4288],0%32.
+tests/e-acsl-runtime/loop.i:21:[kernel] warning: completely indeterminate value in t with offsets [4320..4768],0%32.
 tests/e-acsl-runtime/loop.i:21:[value] all evaluations are invalid for function call argument
         (long)t[__e_acsl_k_2][__e_acsl_l_2]
 [value] using specification for function __gmpz_add

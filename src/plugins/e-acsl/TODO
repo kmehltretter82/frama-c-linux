@@ -10,6 +10,8 @@
 - [Guillaume] ajouter les annotations de RTE dans la table des annotations
   	      (avec une option)
 - [David Mentré] tset
+- [Guillaume] voir les valeurs quand la spec échoue, voir Boogaloo@RV'13 à ce 
+  sujet
 
 #####################
 # E-ACSL CONSTRUCTS #
