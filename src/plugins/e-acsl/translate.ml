@@ -466,7 +466,7 @@ and at_to_exp env t_opt label e =
     let res = ref false in
     let o = object
       inherit Cil.nopCilVisitor
-      method vlval (host, _) = match host with
+      method !vlval (host, _) = match host with
       | Var v -> 
 	if Pre_analysis.old_must_model_vi (Env.get_behavior env) v then 
 	  res := true;
@@ -495,7 +495,7 @@ and at_to_exp env t_opt label e =
      one). *)
   let o = object 
     inherit Visitor.frama_c_inplace
-    method vstmt_aux stmt = 
+    method !vstmt_aux stmt = 
       (* either a standard C affectation or an mpz one according to type of
 	 [e] *) 
       let new_stmt = Mpz.init_set ~loc (Cil.var res_v) res e in

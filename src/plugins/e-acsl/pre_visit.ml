@@ -103,7 +103,7 @@ let dup_funspec tbl bhv spec =
 
     val already_visited = Cil_datatype.Logic_var.Hashtbl.create 7
 
-    method vlogic_info_use li =
+    method !vlogic_info_use li =
       if Global.mem_logic_info li then
 	Cil.ChangeDoChildrenPost
 	  ({ li with l_var_info = li.l_var_info } (* force a copy *),
@@ -111,7 +111,7 @@ let dup_funspec tbl bhv spec =
       else
 	Cil.JustCopy
 
-    method vterm_offset _ =
+    method !vterm_offset _ =
       Cil.DoChildrenPost
 	(function
 	(* no way to directly visit fieldinfo and model_info uses *)	
@@ -119,7 +119,7 @@ let dup_funspec tbl bhv spec =
 	| TModel(mi, off) -> TModel(Cil.get_model_info bhv mi, off)
 	| off -> off)
 
-    method vlogic_var_use orig_lvi =
+    method !vlogic_var_use orig_lvi =
       match orig_lvi.lv_origin with
       | None -> 
 	Cil.JustCopy
@@ -149,10 +149,10 @@ let dup_funspec tbl bhv spec =
 		 assert vi.vglob;
 		 Cil.get_logic_var bhv lvi)
 
-    method videntified_term _ = 
+    method !videntified_term _ = 
       Cil.DoChildrenPost Logic_const.refresh_identified_term
 
-    method videntified_predicate _ = 
+    method !videntified_predicate _ = 
       Cil.DoChildrenPost Logic_const.refresh_predicate
   end in
   Cil.visitCilFunspec o spec
@@ -249,7 +249,7 @@ class dup_functions_visitor prj = object (self)
     | Memory_model -> before_memory_model <- Code
     | Code -> ()
 
-  method vcode_annot a =
+  method !vcode_annot a =
     Cil.JustCopyPost
       (fun a' ->
 	let get_ppt kf stmt a = Property.ip_of_code_annot kf stmt a in
@@ -264,11 +264,11 @@ class dup_functions_visitor prj = object (self)
 	     a');
 	a')
 
-  method vlogic_info_decl li = 
+  method !vlogic_info_decl li = 
     Global.add_logic_info li;
     Cil.JustCopy
 
-  method vvrbl vi =
+  method !vvrbl vi =
     try
       let new_vi = Cil_datatype.Varinfo.Hashtbl.find fct_tbl vi in
       Cil.ChangeTo new_vi
@@ -280,7 +280,7 @@ class dup_functions_visitor prj = object (self)
     | TFun(_, _, variadic, _) -> not variadic
     | _ -> false
 
-  method vglob_aux = function
+  method !vglob_aux = function
   | GVarDecl(_, vi, loc) | GFun({ svar = vi }, loc)
       when self#is_unvariadic_function vi
 	&& not (Misc.is_library_loc loc) 
@@ -346,7 +346,7 @@ if there are memory-related annotations.@]"
     self#next ();
     Cil.DoChildrenPost self#insert_libc
 
-  method vfile _ =
+  method !vfile _ =
     Cil.DoChildrenPost
       (fun f ->
 	match libc_decls with

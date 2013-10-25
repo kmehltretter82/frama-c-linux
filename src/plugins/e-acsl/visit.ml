@@ -36,7 +36,7 @@ let move_labels env stmt new_stmt =
     (* update the gotos of the function jumping to one of the labels *)
     let o = object 
       inherit Visitor.frama_c_inplace
-      method vstmt_aux s = match s.skind with
+      method !vstmt_aux s = match s.skind with
       | Goto(s_ref, _) -> 
 	(* [!s_ref] and [stmt] are not part of the same project, thus it
 	   is safer to compare the ids than to use Stmt.equal *)
@@ -45,10 +45,10 @@ let move_labels env stmt new_stmt =
       | _ -> Cil.DoChildren
       (* improve efficiency: skip childrens of vstmt which cannot
 	 contain any stmt *)
-      method vinst _ = Cil.SkipChildren
-      method vexpr _ = Cil.SkipChildren
-      method vcode_annot _ = Cil.SkipChildren
-      method vlval _ = Cil.SkipChildren
+      method !vinst _ = Cil.SkipChildren
+      method !vexpr _ = Cil.SkipChildren
+      method !vcode_annot _ = Cil.SkipChildren
+      method !vlval _ = Cil.SkipChildren
     end in
     let vis = Env.get_visitor env in
     let f = Extlib.the vis#current_func in
@@ -114,7 +114,7 @@ class e_acsl_visitor prj generate = object (self)
   method private reset_env () =
     function_env := Env.empty (self :> Visitor.frama_c_visitor)
 
-  method vfile _f =
+  method !vfile _f =
     (* copy the options used during the visit in the new project: it is the
        right place to do this: it is still before visiting, but after
        that the visitor internals reset all of them :-(. *)
@@ -240,7 +240,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
 	if generate then Project.clear ~selection ~project:prj ();
 	f)
 
-  method vglob_aux = function
+  method !vglob_aux = function
   | GVarDecl(_, vi, _) | GVar(vi, _, _) | GFun({ svar = vi }, _) 
       when Misc.is_library_loc vi.vdecl ->
     if generate then
@@ -292,7 +292,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     if generate then Cil.DoChildrenPost(fun g -> List.iter do_it g; g)
     else Cil.DoChildren
 
-  method vinit vi _off _i = 
+  method !vinit vi _off _i = 
     if generate then
       if Pre_analysis.must_model_vi vi then begin
 	keep_initializer <- Some true;
@@ -308,7 +308,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     else
       Cil.SkipChildren
 
-  method vvdec vi = 
+  method !vvdec vi = 
     try
       let old_vi = Cil.get_original_varinfo self#behavior vi in
       let old_kf = Globals.Functions.get old_vi in
@@ -332,7 +332,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       body.blocals
       vars
 
-  method vfunc f =
+  method !vfunc f =
     if generate then
       let kf = Extlib.the self#current_kf in
       Options.feedback ~dkey ~level:2 "entering in function %a." 
@@ -378,7 +378,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     let env_ref = ref env in
     let o = object
       inherit Cil.genericCilVisitor (Cil.copy_visit (Project.current ()))
-      method vexpr e = match e.enode with
+      method !vexpr e = match e.enode with
       | Const(CStr s) ->
 	let loc = e.eloc in
 	let _, exp, env = 
@@ -405,7 +405,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     let e = Cil.visitCilExpr o e in
     e, !env_ref
 
-  method vstmt_aux stmt =
+  method !vstmt_aux stmt =
     Options.debug ~level:4 "proceeding stmt (sid %d) %a@." 
       stmt.sid Stmt.pretty stmt;
     let kf = Extlib.the self#current_kf in
@@ -572,7 +572,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       function_env := Env.add_stmt !function_env stmt
     end
 
-  method vinst = function
+  method !vinst = function
   | Set(old_lv, _, _) ->
     if generate then
       Cil.DoChildrenPost 
@@ -596,7 +596,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
   | _ ->
     Cil.DoChildren
 
-  method vblock blk =
+  method !vblock blk =
     let handle_memory new_blk = 
       match new_blk.blocals with
       | [] -> new_blk
@@ -644,7 +644,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     in
     if generate then Cil.DoChildrenPost handle_memory else Cil.DoChildren
 
-  method vexpr exp = 
+  method !vexpr exp = 
     if generate then
       match keep_initializer with
       | Some false -> Cil.JustCopy

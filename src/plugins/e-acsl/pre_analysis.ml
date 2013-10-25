@@ -27,7 +27,7 @@ let init_mpz () =
   Options.feedback ~level:2 "initializing GMP type.";
   let set_mpzt = object
     inherit Cil.nopCilVisitor
-    method vglob = function
+    method !vglob = function
     | GType({ torig_name = s } as info, _) when s = "mpz_t" ->
       Mpz.set_t info;
       Cil.SkipChildren
@@ -313,7 +313,7 @@ module rec Transfer
 
   let register_object kf state_ref = object
     inherit Visitor.frama_c_inplace
-    method vpredicate = function
+    method !vpredicate = function
     | Pvalid(_, t) | Pvalid_read(_, t) | Pinitialized(_, t) ->
       (*	Options.feedback "REGISTER %a" Cil.d_term t;*)
       state_ref := register_term kf !state_ref t;
@@ -326,7 +326,7 @@ module rec Transfer
     | Pand _ | Por _ | Pxor _ | Pimplies _ | Piff _ | Pnot _ | Pif _ 
     | Plet _ | Pforall _ | Pexists _ | Pat _ | Psubtype _ ->
       Cil.DoChildren
-    method vterm term = match term.term_node with
+    method !vterm term = match term.term_node with
     | Tbase_addr(_, t) | Toffset(_, t) | Tblock_length(_, t) ->
       state_ref := register_term kf !state_ref t;
       Cil.DoChildren
@@ -341,8 +341,8 @@ module rec Transfer
     | Tcomprehension _ | Trange _ | Tlet _ | TLogic_coerce _ -> 
       (* potential sub-term inside *)
       Cil.DoChildren
-    method vlogic_label _ = Cil.SkipChildren
-    method vterm_lhost = function
+    method !vlogic_label _ = Cil.SkipChildren
+    method !vterm_lhost = function
     | TMem t ->
       (* potential RTE *)
       state_ref := register_term kf !state_ref t;
