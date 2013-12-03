@@ -67,6 +67,7 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_clear(__mpz_struct * /*[1]*/
 
 /*@ requires \valid(z1);
     requires \valid(z2);
+    assigns \result;
     assigns \result \from *z1, *z2;
  */
 extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
@@ -82,7 +83,8 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_add(__mpz_struct * /*[1]*/ z
                                                         __mpz_struct const * /*[1]*/ z2,
                                                         __mpz_struct const * /*[1]*/ z3);
 
-/*@ assigns \result \from *((char *)ptr+(0..size-1)); */
+/*@ assigns \result;
+    assigns \result \from *((char *)ptr+(0 .. size-1)); */
 extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
                                                             size_t size);
 
@@ -98,8 +100,9 @@ extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
 
 /*@ ensures \result ≡ 0 ∨ \result ≡ 1;
     ensures
-      \result ≡ 1 ⇒ \valid_read((char *)\old(ptr)+(0..\old(size)-1));
-    assigns \result \from *((char *)ptr+(0..size-1));
+      \result ≡ 1 ⇒ \valid_read((char *)\old(ptr)+(0 .. \old(size)-1));
+    assigns \result;
+    assigns \result \from *((char *)ptr+(0 .. size-1));
  */
 extern  __attribute__((__FC_BUILTIN__)) int __valid_read(void *ptr,
                                                          size_t size);

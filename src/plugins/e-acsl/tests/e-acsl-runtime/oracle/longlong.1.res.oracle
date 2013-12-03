@@ -20,7 +20,7 @@ tests/e-acsl-runtime/longlong.i:11:[value] warning: recursive call during value 
                  of my_pow (my_pow <- my_pow :: tests/e-acsl-runtime/longlong.i:18 <- main).
                  Using specification of my_pow.
 [value] user error: Recursive call on an unspecified function. Using potentially invalid
-                    inferred assigns 'assigns \at(\result,Post) \from x, n;'
+                    inferred assigns 'assigns \result \from x, n;'
 [value] using specification for function my_pow
 tests/e-acsl-runtime/longlong.i:12:[kernel] warning: signed overflow. assert -2147483648 ≤ tmp*tmp ≤ 2147483647;
 tests/e-acsl-runtime/longlong.i:19:[value] Assertion got status valid.

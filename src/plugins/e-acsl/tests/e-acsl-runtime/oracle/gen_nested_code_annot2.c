@@ -49,6 +49,7 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_clear(__mpz_struct * /*[1]*/
 
 /*@ requires \valid(z1);
     requires \valid(z2);
+    assigns \result;
     assigns \result \from *z1, *z2;
  */
 extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,

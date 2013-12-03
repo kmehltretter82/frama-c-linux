@@ -61,7 +61,8 @@ axiomatic
  */
 /*@ ghost extern int __e_acsl_init; */
 
-/*@ assigns \result \from *((char *)ptr+(0..size-1)); */
+/*@ assigns \result;
+    assigns \result \from *((char *)ptr+(0 .. size-1)); */
 extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
                                                             size_t size);
 
@@ -81,8 +82,10 @@ predicate diffSize{L1, L2}(ℤ i) =
  */
 extern FILE *__fc_stdout;
 
+FILE __fc_fopen[2];
+FILE const *_p__fc_fopen = (FILE const *)(__fc_fopen);
 /*@ assigns *__fc_stdout;
-    assigns *__fc_stdout \from *(format+(..)); */
+    assigns *__fc_stdout \from *(format+( .. )); */
 extern int printf(char const *format , ...);
 
 int main(void)

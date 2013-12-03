@@ -65,6 +65,7 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_clear(__mpz_struct * /*[1]*/
 
 /*@ requires \valid(z1);
     requires \valid(z2);
+    assigns \result;
     assigns \result \from *z1, *z2;
  */
 extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
@@ -91,10 +92,12 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_sub(__mpz_struct * /*[1]*/ z
                                                         __mpz_struct const * /*[1]*/ z3);
 
 /*@ requires \valid(z);
+    assigns \result;
     assigns \result \from *z; */
 extern  __attribute__((__FC_BUILTIN__)) unsigned long __gmpz_get_ui(__mpz_struct const * /*[1]*/ z);
 
-/*@ assigns \result \from *((char *)ptr+(0..size-1)); */
+/*@ assigns \result;
+    assigns \result \from *((char *)ptr+(0 .. size-1)); */
 extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
                                                             size_t size);
 

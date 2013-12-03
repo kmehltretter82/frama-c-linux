@@ -53,9 +53,9 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init_set_si(__mpz_struct * /
 /*@ requires ¬\initialized(z);
     ensures \valid(\old(z));
     ensures \initialized(\old(z));
-    assigns *z;
-    assigns *z \from *(str+(0..)), base;
-    assigns \result \from *(str+(0..)), base;
+    assigns *z, \result;
+    assigns *z \from *(str+(0 .. )), base;
+    assigns \result \from *(str+(0 .. )), base;
     allocates \old(z);
  */
 extern  __attribute__((__FC_BUILTIN__)) int __gmpz_init_set_str(__mpz_struct * /*[1]*/ z,
@@ -69,6 +69,7 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_clear(__mpz_struct * /*[1]*/
 
 /*@ requires \valid(z1);
     requires \valid(z2);
+    assigns \result;
     assigns \result \from *z1, *z2;
  */
 extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
@@ -134,7 +135,7 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_tdiv_r(__mpz_struct * /*[1]*
 
 /*@ requires \valid(z1);
     requires \valid(z2);
-    assigns *z1;
+    assigns *z1, \result;
     assigns *z1 \from *z2;
     assigns \result \from *z1, *z2;
  */
