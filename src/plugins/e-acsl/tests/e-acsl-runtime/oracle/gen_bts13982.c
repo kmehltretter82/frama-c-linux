@@ -85,7 +85,7 @@ extern FILE *__fc_stdout;
 FILE __fc_fopen[2];
 FILE const *_p__fc_fopen = (FILE const *)(__fc_fopen);
 /*@ assigns *__fc_stdout;
-    assigns *__fc_stdout \from *(format+( .. )); */
+    assigns *__fc_stdout \from *(format+(..)); */
 extern int printf(char const *format , ...);
 
 int main(void)

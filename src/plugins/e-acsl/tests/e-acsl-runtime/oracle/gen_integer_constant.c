@@ -36,8 +36,8 @@ axiomatic
     ensures \valid(\old(z));
     ensures \initialized(\old(z));
     assigns *z, \result;
-    assigns *z \from *(str+(0 .. )), base;
-    assigns \result \from *(str+(0 .. )), base;
+    assigns *z \from *(str+(0 ..)), base;
+    assigns \result \from *(str+(0 ..)), base;
     allocates \old(z);
  */
 extern  __attribute__((__FC_BUILTIN__)) int __gmpz_init_set_str(__mpz_struct * /*[1]*/ z,
