@@ -3,7 +3,7 @@
 /*  This file is part of the Frama-C's E-ACSL plug-in.                    */
 /*                                                                        */
 /*  Copyright (C) 2012-2013                                               */
-/*    CEA (Commissariat Ã  l'Ã©nergie atomique et aux Ã©nergies              */
+/*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
 /*  you can redistribute it and/or modify it under the terms of the GNU   */

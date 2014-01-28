@@ -13,6 +13,13 @@
 - [Guillaume] voir les valeurs quand la spec échoue, voir Boogaloo@RV'13 à ce 
   sujet
 
+=====
+- Voir avec Guillaume et Nikolaï ce dont ils ont besoin comme API pour faire
+  leur génération de code pour les entrées de PathCrawler...
+  ==> problème de la connaissance de la taille des tableaux 
+  (Pathcrawler_dimension)
+=====
+
 #####################
 # E-ACSL CONSTRUCTS #
 #####################

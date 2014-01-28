@@ -235,7 +235,8 @@ module rec Transfer
     | Var vi -> add_vi state vi
     | Mem e -> 
       match base_addr e with
-      | None -> Kernel.fatal "no base address for %a" Printer.pp_exp e
+      | None -> 
+	Kernel.fatal "[pre_analysis] no base address for %a" Printer.pp_exp e
       | Some vi -> add_vi state vi
 
   (* if [e] contains a pointer left-value, then also monitor the host *)
@@ -518,7 +519,9 @@ module rec Transfer
 	      | Var vi -> Varinfo.Hptset.add vi state
 	      | Mem e -> 
 		match base_addr e with
-		| None -> Kernel.fatal "no base address for %a" Printer.pp_exp e
+		| None -> 
+		  Kernel.fatal "[pre_analysis] no base address for %a" 
+		    Printer.pp_exp e
 		| Some vi -> Varinfo.Hptset.add vi state
 	    else
 	      state
@@ -623,7 +626,8 @@ end = struct
 	  let set = Stmt.Hashtbl.find tbl stmt in
 	  Env.default_varinfos set
 	with Not_found ->
-	  Options.fatal "stmt never analyzed: %a" Printer.pp_stmt stmt
+	  Options.fatal "[pre_analysis] stmt never analyzed: %a" 
+	    Printer.pp_stmt stmt
       with Kernel_function.No_Statement -> 
 	Varinfo.Hptset.empty
 
@@ -690,8 +694,10 @@ and must_model_exp ?kf ?stmt e = match e.enode with
   | BinOp((PlusA | MinusA | Mult | Div | Mod |Shiftlt | Shiftrt 
 	      | Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr),
 	  _, _, _)
-  | UnOp _ | Const _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ 
-  | AlignOfE _ -> assert false
+  | Const _ -> (* possible in case of static address *) false
+  | UnOp _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ 
+  | AlignOfE _ -> 
+    Options.fatal "[pre_analysis] unexpected expression %a" Exp.pretty e
 
 let must_model_vi ?kf ?stmt vi =
   not (Cil.isFunctionType vi.vtype || (vi.vghost && vi.vstorage = Extern))
