@@ -20,17 +20,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Plugin
+include Plugin.S (** implementation of Log.S for E-ACSL *)
 
-include S (** implementation of Log.S for E-ACSL *)
-
-module Check: Bool
-module Run: Bool
-module Valid: Bool
-module Prepare: Bool
-module Gmp_only: Bool
-module Full_mmodel: Bool
-module Project_name: String
+module Check: Parameter_sig.Bool
+module Run: Parameter_sig.Bool
+module Valid: Parameter_sig.Bool
+module Prepare: Parameter_sig.Bool
+module Gmp_only: Parameter_sig.Bool
+module Full_mmodel: Parameter_sig.Bool
+module Project_name: Parameter_sig.String
 
 val must_visit: unit -> bool
 

@@ -358,7 +358,7 @@ if there are memory-related annotations.@]"
 	  f)
 
   initializer
-    Project.copy ~selection:(Plugin.get_selection ()) prj;
+    Project.copy ~selection:(Parameter_state.get_selection ()) prj;
     reset ()
 
 end

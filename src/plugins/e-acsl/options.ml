@@ -83,7 +83,7 @@ module Full_mmodel =
       let help = "maximal memory-related instrumentation"
      end)
 
-let () = Plugin.set_group help
+let () = Parameter_customize.set_group help
 module Version =
   False
     (struct
