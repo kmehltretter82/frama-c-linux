@@ -35,8 +35,6 @@ tests/e-acsl-runtime/vector.c:21:[e-acsl] warning: E-ACSL construct `\allocate' 
 [value] using specification for function __initialize
 tests/e-acsl-runtime/vector.c:26:[value] Assertion got status valid.
 [value] using specification for function __initialized
-FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:118:[value] Function __initialized: postcondition got status unknown.
-FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:119:[value] Function __initialized: postcondition got status valid.
 [value] using specification for function e_acsl_assert
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
 [value] using specification for function __full_init

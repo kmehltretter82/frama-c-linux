@@ -40,8 +40,6 @@ tests/e-acsl-runtime/at.i:55:[value] cannot evaluate ACSL term, \at() on a C lab
 tests/e-acsl-runtime/at.i:55:[value] Assertion got status unknown.
 [value] using specification for function __initialize
 [value] using specification for function __valid_read
-FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:93:[value] Function __valid_read: postcondition got status unknown.
-FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:94:[value] Function __valid_read: postcondition got status valid.
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
 tests/e-acsl-runtime/at.i:32:[value] cannot evaluate ACSL term, \at() on a C label is unsupported
 tests/e-acsl-runtime/at.i:32:[value] Assertion got status unknown.

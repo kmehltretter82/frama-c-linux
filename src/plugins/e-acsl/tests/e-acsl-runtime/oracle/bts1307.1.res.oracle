@@ -25,8 +25,6 @@ tests/e-acsl-runtime/bts1307.i:7:[value] Function __e_acsl_foo: precondition got
 tests/e-acsl-runtime/bts1307.i:8:[value] Function __e_acsl_foo: precondition got status valid.
 tests/e-acsl-runtime/bts1307.i:9:[value] Function __e_acsl_foo: precondition got status valid.
 [value] using specification for function __valid
-FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:86:[value] Function __valid: postcondition got status unknown.
-FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:87:[value] Function __valid: postcondition got status valid.
 [value] using specification for function e_acsl_assert
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
 tests/e-acsl-runtime/bts1307.i:7:[value] Function foo: precondition got status valid.
@@ -37,14 +35,11 @@ tests/e-acsl-runtime/bts1307.i:9:[value] Function foo: precondition got status v
 tests/e-acsl-runtime/bts1307.i:13:[value] Function foo, behavior OverEstimate_Motoring: postcondition got status valid.
 [value] using specification for function __gmpz_init_set_si
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:66:[value] Function __gmpz_init_set_si: postcondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:67:[value] Function __gmpz_init_set_si: postcondition got status unknown.
 [value] using specification for function __gmpz_cmp
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:127:[value] Function __gmpz_cmp: precondition got status valid.
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:128:[value] Function __gmpz_cmp: precondition got status valid.
 [value] using specification for function __gmpz_init
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:39:[value] Function __gmpz_init: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:40:[value] Function __gmpz_init: postcondition got status valid.
 tests/e-acsl-runtime/bts1307.i:13:[value] Assertion 'E_ACSL' got status valid.
 [value] using specification for function __gmpz_tdiv_q
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:164:[value] Function __gmpz_tdiv_q: precondition got status valid.
@@ -53,8 +48,6 @@ FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:166:[value] Function __gmpz_tdiv_q: preconditio
 [value] using specification for function __gmpz_get_ui
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:198:[value] Function __gmpz_get_ui: precondition got status valid.
 [value] using specification for function __valid_read
-FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:93:[value] Function __valid_read: postcondition got status unknown.
-FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:94:[value] Function __valid_read: postcondition got status valid.
 [value] user error: type long double not implemented. Using double instead
 tests/e-acsl-runtime/bts1307.i:13:[kernel] warning: non-finite long double value ([--..--]):
                   assert \is_finite((long double)(__e_acsl_4**__e_acsl_at_3));

@@ -25,8 +25,6 @@ tests/e-acsl-runtime/bts1307.i:7:[value] Function __e_acsl_foo: precondition got
 tests/e-acsl-runtime/bts1307.i:8:[value] Function __e_acsl_foo: precondition got status valid.
 tests/e-acsl-runtime/bts1307.i:9:[value] Function __e_acsl_foo: precondition got status valid.
 [value] using specification for function __valid
-FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:86:[value] Function __valid: postcondition got status unknown.
-FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:87:[value] Function __valid: postcondition got status valid.
 [value] using specification for function e_acsl_assert
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
 tests/e-acsl-runtime/bts1307.i:7:[value] Function foo: precondition got status valid.
@@ -36,8 +34,6 @@ tests/e-acsl-runtime/bts1307.i:9:[value] Function foo: precondition got status v
 [value] using specification for function __delete_block
 tests/e-acsl-runtime/bts1307.i:13:[value] Function foo, behavior OverEstimate_Motoring: postcondition got status valid.
 [value] using specification for function __valid_read
-FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:93:[value] Function __valid_read: postcondition got status unknown.
-FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h:94:[value] Function __valid_read: postcondition got status valid.
 [value] user error: type long double not implemented. Using double instead
 tests/e-acsl-runtime/bts1307.i:13:[kernel] warning: non-finite float value ([-1.79769313486e+308 .. 1.79769313486e+308]):
                   assert

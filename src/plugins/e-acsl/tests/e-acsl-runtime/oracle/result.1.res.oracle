@@ -20,11 +20,8 @@
 tests/e-acsl-runtime/result.i:7:[value] Function f: postcondition got status valid.
 [value] using specification for function __gmpz_init_set_si
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:66:[value] Function __gmpz_init_set_si: postcondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:67:[value] Function __gmpz_init_set_si: postcondition got status unknown.
 [value] using specification for function __gmpz_init
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:39:[value] Function __gmpz_init: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:40:[value] Function __gmpz_init: postcondition got status valid.
 [value] using specification for function __gmpz_sub
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:150:[value] Function __gmpz_sub: precondition got status valid.
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:151:[value] Function __gmpz_sub: precondition got status valid.
