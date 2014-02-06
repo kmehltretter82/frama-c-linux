@@ -57,23 +57,9 @@ let pretty_eacsl_typ fmt = function
   | Z -> Format.fprintf fmt "Z"
   | No_integral lty -> Format.fprintf fmt "%a" Printer.pp_logic_type lty
 
-exception Not_representable
-
-(* TODO: replace it by Cil.intKindForValue as soon as Frama-C Fluorine is not
-   required anymore. *)
 let typ_of_integer i unsigned = 
-  (* int whenever possible *)
-  if Cil.fitsInInt IInt i then IInt
-  else
-    if unsigned then begin
-      if Cil.fitsInInt IUInt i then IUInt
-      else if Cil.fitsInInt IULong i then IULong
-      else if Cil.fitsInInt IULongLong i then IULongLong
-      else raise Not_representable
-    end else
-      if Cil.fitsInInt ILong i then ILong
-      else if Cil.fitsInInt ILongLong i then ILongLong
-      else raise Not_representable
+  (* int whenever possible to prevent superfluous casts in the generated code *)
+  if Cil.fitsInInt IInt i then IInt else Cil.intKindForValue i unsigned
 
 let typ_of_eacsl_typ = function
   | Interv(l, u) -> 
@@ -82,7 +68,7 @@ let typ_of_eacsl_typ = function
        let ty_l = TInt(typ_of_integer l is_pos, []) in
        let ty_u = TInt(typ_of_integer u is_pos, []) in
        Cil.arithmeticConversion ty_l ty_u
-     with Not_representable -> 
+     with Cil.Not_representable -> 
        Mpz.t ())
   | Z -> Mpz.t ()
   | No_integral (Ctype ty) -> ty

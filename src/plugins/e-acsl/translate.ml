@@ -85,8 +85,8 @@ let constant_to_exp ~loc = function
     (try
        let k = Typing.typ_of_integer n (Integer.ge n Integer.zero) in
        if Typing.is_representable n k then Cil.kinteger64_repr ?loc k n s, false
-       else raise Typing.Not_representable
-     with Typing.Not_representable ->
+       else raise Cil.Not_representable
+     with Cil.Not_representable ->
        Cil.mkString ?loc (Integer.to_string n), true)
   | LStr s -> Cil.new_exp ?loc (Const (CStr s)), false
   | LWStr s -> Cil.new_exp ?loc (Const (CWStr s)), false

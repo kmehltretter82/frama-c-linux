@@ -26,11 +26,10 @@ open Cil_types
 (** {2 Typing} *)
 (******************************************************************************)
 
-exception Not_representable
 val typ_of_integer: Integer.t -> bool -> ikind
 (** Compute the best type of a bigint. The boolean must be [true] for unsigned
     and [false] for signed.
-    @raise Not_representable if the integer does not fit in any C type. *)
+    @raise Cil.Not_representable if the integer does not fit in any C type. *)
 
 val type_named_predicate: ?must_clear:bool -> predicate named -> unit
 (** Compute the type of each term of the given predicate. *)
