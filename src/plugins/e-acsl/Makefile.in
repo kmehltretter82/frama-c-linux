@@ -78,7 +78,7 @@ PLUGIN_DISTRIB_BIN:=no
 ###############
 
 # Enable -warn-error in development mode, but not in distribution mode
-# Do not edit the line below: it is automatically set by 'make src-distrib'
+# Do not edit the line below: it is automatically set by 'make e-acsl-distrib'
 IS_DISTRIBUTED:=no
 ifneq ($(IS_DISTRIBUTED),yes)
 ifeq ($(EACSL_HAS_OCAML312),yes)

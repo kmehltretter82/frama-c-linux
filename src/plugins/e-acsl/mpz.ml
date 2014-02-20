@@ -76,7 +76,7 @@ let init_set ~loc lv ev e =
     (match e.enode with
     | Lval elv ->
       let call =
-	Misc.mk_call ?loc
+	Misc.mk_call ~loc
 	  "__gmpz_import"
 	  [ ev; 
 	    Cil.one ~loc; 
@@ -88,7 +88,7 @@ let init_set ~loc lv ev e =
       in
       Cil.mkStmt
 	~valid_sid:true
-	(Block (Cil.mkBlock [ init ?loc ev; call ]))
+	(Block (Cil.mkBlock [ init ~loc ev; call ]))
     | _ ->  Error.not_yet "unsigned long long expression requiring GMP")
   | Longlong ILongLong ->
     Error.not_yet "long long requiring GMP"
