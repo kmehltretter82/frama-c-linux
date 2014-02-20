@@ -21,7 +21,7 @@ all: e-acsl
 LANGUAGE_VERSION=1.7-1
 EACSL_VERSION= 0.3
 
-EACSL_DIR=$(HOME)/plugins/e-acsl
+EACSL_DIR=../..
 DISTRIB_DIR=$(HOME)/frama-c/doc/www/distrib
 install: e-acsl-implementation.pdf e-acsl.pdf
 	cp -f $^ $(EACSL_DIR)/doc/manuals

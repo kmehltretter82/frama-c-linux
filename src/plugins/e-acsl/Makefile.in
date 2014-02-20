@@ -190,7 +190,7 @@ e-acsl-distrib: .depend
 	$(PRINT) Cleaning
 	$(RM) -fr $(EXPORT)
 
-WWW	= /localhome/julien/frama-c/doc/www
+WWW	?= /localhome/julien/frama-c/doc/www
 e-acsl-install-distrib: e-acsl-distrib
 	$(PRINT) Copying to website
 	$(CP) $(EXPORT).tar.gz $(WWW)/distrib/download/e-acsl
