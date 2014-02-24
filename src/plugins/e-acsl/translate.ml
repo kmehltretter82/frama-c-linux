@@ -84,19 +84,19 @@ let constant_to_exp ~loc = function
   | Integer(n, s) ->
     (try
        let k = Typing.typ_of_integer n (Integer.ge n Integer.zero) in
-       if Typing.is_representable n k then Cil.kinteger64_repr ?loc k n s, false
+       if Typing.is_representable n k then Cil.kinteger64_repr ~loc k n s, false
        else raise Cil.Not_representable
      with Cil.Not_representable ->
-       Cil.mkString ?loc (Integer.to_string n), true)
-  | LStr s -> Cil.new_exp ?loc (Const (CStr s)), false
-  | LWStr s -> Cil.new_exp ?loc (Const (CWStr s)), false
-  | LChr c -> Cil.new_exp ?loc (Const (CChr c)), false
+       Cil.mkString ~loc (Integer.to_string n), true)
+  | LStr s -> Cil.new_exp ~loc (Const (CStr s)), false
+  | LWStr s -> Cil.new_exp ~loc (Const (CWStr s)), false
+  | LChr c -> Cil.new_exp ~loc (Const (CChr c)), false
   | LReal {r_literal=s; r_nearest=f; r_lower=l; r_upper=u} -> 
     if l <> u then 
       Options.warning ~current:true ~once:true
 	"approximating a real number by a float";
-    Cil.new_exp ?loc (Const (CReal (f, FLongDouble, Some s))), false
-  | LEnum e -> Cil.new_exp ?loc (Const (CEnum e)), false
+    Cil.new_exp ~loc (Const (CReal (f, FLongDouble, Some s))), false
+  | LEnum e -> Cil.new_exp ~loc (Const (CEnum e)), false
 
 let conditional_to_exp ?(name="if") loc ctx e1 (e2, env2) (e3, env3) =
   let env = Env.pop (Env.pop env3) in

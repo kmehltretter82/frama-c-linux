@@ -542,13 +542,12 @@ let context_sensitive ~loc ?name env ctx is_mpz_string t_opt e =
       in
       let _, e, env = 
 	Env.new_var
-	  ?loc
+	  ~loc
 	  ?name
 	  env
 	  None
 	  new_ty
-	  (fun v _ ->
-	    [ Misc.mk_call ?loc ~result:(Cil.var v) fname [ e ] ])
+	  (fun v _ -> [ Misc.mk_call ~loc ~result:(Cil.var v) fname [ e ] ])
       in
       e, env
     else
