@@ -15,6 +15,10 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
+###############################
+Plugin E-ACSL 0.4 Neon_20140301
+###############################
+
 -* E-ACSL       [2014/01/28] Fix bug #1634 occuring in presence of static
 	        addresses.
 -* E-ACSL       [2013/09/26] Fix incorrectness which may occur in presence
