@@ -25,10 +25,10 @@ EACSL_DIR=../..
 DISTRIB_DIR=$(HOME)/frama-c/doc/www/distrib
 install: e-acsl-implementation.pdf e-acsl.pdf
 	cp -f $^ $(EACSL_DIR)/doc/manuals
-	cp -f e-acsl.pdf \
-	  $(DISTRIB_DIR)/download/e-acsl/e-acsl-$(LANGUAGE_VERSION).pdf
-	cp -f e-acsl-implementation.pdf \
-	  $(DISTRIB_DIR)/download/e-acsl/e-acsl-implementation-$(EACSL_VERSION).pdf
+	# cp -f e-acsl.pdf \
+	#   $(DISTRIB_DIR)/download/e-acsl/e-acsl-$(LANGUAGE_VERSION).pdf
+	# cp -f e-acsl-implementation.pdf \
+	#   $(DISTRIB_DIR)/download/e-acsl/e-acsl-implementation-$(EACSL_VERSION).pdf
 
 include $(EACSL_DIR)/doc/support/MakeLaTeXModern
 
