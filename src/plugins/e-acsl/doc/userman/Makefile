@@ -14,14 +14,14 @@ default: main.pdf
 
 main.pdf: $(DEPS_MODERN)
 
-EACSL_VERSION= 0.3
-FC_VERSION= Fluorine-20130601
+EACSL_VERSION= 0.4
+FC_VERSION= Neon-20140301
 
-EACSL_DIR=$(HOME)/plugins/e-acsl
+EACSL_DIR=../..
 DISTRIB_DIR=$(HOME)/frama-c/doc/www/distrib
 install: 
 	cp -f main.pdf $(EACSL_DIR)/doc/manuals/e-acsl-manual.pdf
-	cp -f main.pdf \
+#	cp -f main.pdf \
 	  $(DISTRIB_DIR)/download/e-acsl/e-acsl-manual-$(EACSL_VERSION).pdf
 
 include $(EACSL_DIR)/doc/support/MakeLaTeXModern
