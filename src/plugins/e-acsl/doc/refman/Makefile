@@ -4,7 +4,7 @@ DEPS_MODERN=macros_modern.tex eacslversion.tex biblio.bib \
 	libraries_modern.tex concl_modern.tex changes_modern.tex \
 	term_modern.bnf binders_modern.bnf predicate_modern.bnf \
 	fn_behavior_modern.bnf oldandresult_modern.bnf \
-	loc_modern.bnf \
+	loc_modern.bnf memory_modern.bnf \
 	assertions_modern.bnf loops_modern.bnf st_contracts_modern.bnf \
 	logic_modern.bnf data_invariants_modern.bnf model_modern.bnf \
 	ghost_modern.bnf generalinvariants_modern.bnf iterator_modern.bnf \
@@ -18,17 +18,17 @@ e-acsl: e-acsl-implementation.pdf e-acsl.pdf main.pdf
 
 all: e-acsl
 
-LANGUAGE_VERSION=1.7-1
-EACSL_VERSION= 0.3
+LANGUAGE_VERSION=1.8
+EACSL_VERSION= 0.4
 
 EACSL_DIR=../..
 DISTRIB_DIR=$(HOME)/frama-c/doc/www/distrib
 install: e-acsl-implementation.pdf e-acsl.pdf
 	cp -f $^ $(EACSL_DIR)/doc/manuals
-	cp -f e-acsl.pdf \
-	  $(DISTRIB_DIR)/download/e-acsl/e-acsl-$(LANGUAGE_VERSION).pdf
-	cp -f e-acsl-implementation.pdf \
-	  $(DISTRIB_DIR)/download/e-acsl/e-acsl-implementation-$(EACSL_VERSION).pdf
+	# cp -f e-acsl.pdf \
+	#   $(DISTRIB_DIR)/download/e-acsl/e-acsl-$(LANGUAGE_VERSION).pdf
+	# cp -f e-acsl-implementation.pdf \
+	#   $(DISTRIB_DIR)/download/e-acsl/e-acsl-implementation-$(EACSL_VERSION).pdf
 
 include $(EACSL_DIR)/doc/support/MakeLaTeXModern
 
@@ -106,7 +106,9 @@ e-acsl.pdf: $(DEPS_MODERN)
 
 e-acsl.tex: e-acsl-implementation.tex Makefile
 	rm -f $@
-	sed -e '/PrintImplementationRq/s/%--//' $^ > $@
+	sed -e '/PrintImplementationRq/s/%--//' \
+	    -e '/ColorImplementationRq/s/%--//' \
+	    $^ > $@
 	chmod a-w $@
 
 # version pour le goupe de travail E-ACSL

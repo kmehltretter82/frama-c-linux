@@ -77,8 +77,8 @@ this form of quantifier is limited to \texttt{integer} and its subtype. Thus
 there is no guarded quantification over \texttt{float}, \texttt{real}, \C
 pointers or logic types.
 
-\item[\notimplemented{Iterator quantification}] In order to iterate over
-  non-integer types, \eacsl introduces a notion of $iterators$ over types:
+\item[{\highlightnotimplemented{Iterator quantification}}] In order to iterate
+  over non-integer types, \eacsl introduces a notion of $iterators$ over types:
   standard \acsl unguarded quantifications are only allowed over a type which an
   iterator is attached to.
 
@@ -111,8 +111,8 @@ pointers or logic types.
     \cinput{link.c}
   \end{example}
 
-\item[\notimplemented{Unguarded quantification}] They are only allowed over
-  boolean and char. 
+\item[{\highlightnotimplemented{Unguarded quantification}}] They are only
+  allowed over boolean and char.
 \end{description}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -651,6 +651,16 @@ axiomatics.
 \label{sec:pointers}
 
 \except{separation, allocation and deallocation is unsupported}
+
+Figure~\ref{fig:gram:memory} shows the additional constructs for terms and
+predicates which are related to memory location.
+\begin{figure}[htbp]
+  \fbox{\begin{minipage}{0.97\linewidth}
+      \input{memory_modern.bnf}
+    \end{minipage}}
+  \caption{Grammar extension of terms and predicates about memory}
+\label{fig:gram:memory}
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
