@@ -6,7 +6,7 @@
 [kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h"
 [kernel] preprocessing with "gcc -C -E -I.  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc tests/e-acsl-runtime/call.c"
 [e-acsl] beginning translation.
-FRAMAC_SHARE/libc/stdlib.h:136:[e-acsl] warning: E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:156:[e-acsl] warning: E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
 tests/e-acsl-runtime/call.c:18:[e-acsl] warning: E-ACSL construct `complete behaviors' is not yet supported.
                   Ignoring annotation.
 tests/e-acsl-runtime/call.c:18:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
@@ -29,8 +29,8 @@ tests/e-acsl-runtime/call.c:18:[e-acsl] warning: E-ACSL construct `logic functio
 [value] using specification for function __store_block
 [value] using specification for function __full_init
 [value] using specification for function __delete_block
-FRAMAC_SHARE/libc/stdlib.h:127:[value] Function __e_acsl_malloc, behavior allocation: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
-FRAMAC_SHARE/libc/stdlib.h:132:[value] Function __e_acsl_malloc, behavior no_allocation: postcondition got status invalid. (Behavior may be inactive, no reduction performed.)
+FRAMAC_SHARE/libc/stdlib.h:147:[value] Function __e_acsl_malloc, behavior allocation: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
+FRAMAC_SHARE/libc/stdlib.h:152:[value] Function __e_acsl_malloc, behavior no_allocation: postcondition got status invalid. (Behavior may be inactive, no reduction performed.)
 [value] using specification for function __initialize
 tests/e-acsl-runtime/call.c:12:[value] Function f: postcondition got status valid.
 [value] using specification for function __valid
