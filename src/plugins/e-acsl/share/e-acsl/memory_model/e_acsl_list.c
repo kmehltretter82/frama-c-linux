@@ -99,11 +99,12 @@ struct _block* __get_exact(void* ptr) {
 struct _block* __get_cont(void* ptr) {
   struct _node * tmp = __list;
   for(; tmp != NULL; tmp = tmp->next) {
-    if(tmp->value->ptr <= (size_t)ptr
-       && (size_t)ptr < tmp->value->ptr + tmp->value->size)
-      return tmp->value;
-    else if(tmp->value->ptr > (size_t)ptr)
+    if(tmp->value->ptr > (size_t)ptr)
       break;
+    if(tmp->value->size == 0 && (size_t)ptr == tmp->value->ptr)
+      return tmp->value;
+    if((size_t)ptr < tmp->value->ptr + tmp->value->size)
+      return tmp->value;
   }
   return NULL;
 }
