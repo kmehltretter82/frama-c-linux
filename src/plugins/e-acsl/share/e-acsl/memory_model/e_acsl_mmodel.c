@@ -332,7 +332,7 @@ int __valid(void* ptr, size_t size) {
   struct _block * tmp;
   if(ptr == NULL)
     return false;
-  assert(size > 0);
+  //assert(size > 0);
   tmp = __get_cont(ptr);
   return (tmp == NULL) ?
     false : ( tmp->size - ( (size_t)ptr - tmp->ptr ) >= size
@@ -344,7 +344,7 @@ int __valid_read(void* ptr, size_t size) {
   struct _block * tmp;
   if(ptr == NULL)
     return false;
-  assert(size > 0);
+  //assert(size > 0);
   tmp = __get_cont(ptr);
   return (tmp == NULL) ?
     false : ( tmp->size - ( (size_t)ptr - tmp->ptr ) >= size

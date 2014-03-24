@@ -156,6 +156,8 @@ struct _block* __get_exact(void* ptr) {
 struct _block* _get_cont_rec(struct _node * node, void* ptr) {
   if(node == NULL) return NULL;
   else if(node->value->ptr > (size_t)ptr) return _get_cont_rec(node->left, ptr);
+  else if(node->value->size == 0 && node->value->ptr == (size_t)ptr)
+    return node->value;
   else if(node->value->ptr+node->value->size > (size_t)ptr) return node->value;
   else return _get_cont_rec(node->right, ptr);
 }
