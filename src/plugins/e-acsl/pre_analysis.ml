@@ -95,10 +95,10 @@ end = struct
     let apply f = 
       try
         let kf = Extlib.opt_conv (Kernel_function.dummy()) !current_kf in
-	let h = Kernel_function.Hashtbl.find tbl kf in
-	f h
+        let h = Kernel_function.Hashtbl.find tbl kf in
+        f h
       with Not_found -> 
-	assert false
+        assert false
     let clear () = apply Stmt.Hashtbl.clear
     let mem k = apply Stmt.Hashtbl.mem k
     let find k = apply Stmt.Hashtbl.find k
@@ -127,13 +127,13 @@ end = struct
   let is_empty () =
     try
       Kernel_function.Hashtbl.iter
-	(fun _ h -> 
-	  Stmt.Hashtbl.iter
-	    (fun _ set -> match set with
-	    | None -> ()
-	    | Some s -> if not (Varinfo.Hptset.is_empty s) then raise Exit)
-	    h)
-	tbl;
+        (fun _ h -> 
+          Stmt.Hashtbl.iter
+            (fun _ set -> match set with
+            | None -> ()
+            | Some s -> if not (Varinfo.Hptset.is_empty s) then raise Exit)
+            h)
+        tbl;
       true
     with Exit ->
       false
@@ -181,9 +181,9 @@ module rec Transfer
       Some (Some (Varinfo.Hptset.union old new_))
     | _, Some old, Some new_ -> 
       if Varinfo.Hptset.equal old new_ then
-	None
+        None
       else
-	Some (Some (Varinfo.Hptset.union old new_))
+        Some (Some (Varinfo.Hptset.union old new_))
 
   (** Take the data from two successors and combine it *)
   let combineSuccessors s1 s2 = 
@@ -204,13 +204,13 @@ module rec Transfer
     | BinOp((PlusPI | IndexPI | MinusPI), e1, e2, _) -> 
       if is_ptr_or_array_exp e1 then base_addr e1
       else begin
-	assert (is_ptr_or_array_exp e2);
-	base_addr e2
+        assert (is_ptr_or_array_exp e2);
+        base_addr e2
       end
     | Info(e, _) | CastE(_, e) -> base_addr e
     | BinOp((MinusPP | PlusA | MinusA | Mult | Div | Mod |Shiftlt | Shiftrt 
-		| Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr),
-	    _, _, _)
+                | Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr),
+            _, _, _)
     | UnOp _ | Const _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ 
     | AlignOfE _ -> 
       None
@@ -220,41 +220,41 @@ module rec Transfer
   let extend_to_expr always state lhost e =
     let add_vi state vi =
       if is_ptr_or_array_exp e && (always || Varinfo.Hptset.mem vi state) then 
-	match base_addr e with
-	| None -> state
-	| Some vi_e -> 
-	  Options.feedback ~level:4 ~dkey
-	    "monitoring %a from %a."
-	    Printer.pp_varinfo vi_e
-	    Printer.pp_lval (lhost, NoOffset);
-	  Varinfo.Hptset.add vi_e state
+        match base_addr e with
+        | None -> state
+        | Some vi_e -> 
+          Options.feedback ~level:4 ~dkey
+            "monitoring %a from %a."
+            Printer.pp_varinfo vi_e
+            Printer.pp_lval (lhost, NoOffset);
+          Varinfo.Hptset.add vi_e state
       else 
-	state
+        state
     in
     match lhost with
     | Var vi -> add_vi state vi
     | Mem e -> 
       match base_addr e with
       | None -> 
-	Kernel.fatal "[pre_analysis] no base address for %a" Printer.pp_exp e
+        Kernel.fatal "[pre_analysis] no base address for %a" Printer.pp_exp e
       | Some vi -> add_vi state vi
 
   (* if [e] contains a pointer left-value, then also monitor the host *)
   let rec extend_from_addr state lv e = match e.enode with
     | Lval(lhost, _) ->
       if is_ptr_or_array_exp e then
-	extend_to_expr true state lhost (Cil.new_exp ~loc:e.eloc (Lval lv)),
-	true
+        extend_to_expr true state lhost (Cil.new_exp ~loc:e.eloc (Lval lv)),
+        true
       else
-	state, false
+        state, false
     | AddrOf(lhost, _) -> 
       extend_to_expr true state lhost (Cil.new_exp ~loc:e.eloc (Lval lv)),
       true
     | BinOp((PlusPI | IndexPI | MinusPI), e1, e2, _) -> 
       if is_ptr_or_array_exp e1 then extend_from_addr state lv e1
       else begin
-	assert (is_ptr_or_array_exp e2);
-	extend_from_addr state lv e2
+        assert (is_ptr_or_array_exp e2);
+        extend_from_addr state lv e2
       end
     | CastE(_, e) | Info(e, _) -> extend_from_addr state lv e
     | _ -> state, false
@@ -267,8 +267,8 @@ module rec Transfer
   let rec register_term_lval kf varinfos (thost, _) = 
     let add_vi kf vi =
       Options.feedback ~level:4 ~dkey "monitoring %a from annotation of %a." 
-	Printer.pp_varinfo vi 
-	Kernel_function.pretty kf;
+        Printer.pp_varinfo vi 
+        Kernel_function.pretty kf;
       Varinfo.Hptset.add vi varinfos
     in
     match thost with
@@ -289,9 +289,9 @@ module rec Transfer
       (match t1.term_type with
       | Ctype ty when is_ptr_or_array ty -> register_term kf varinfos t1
       | _ -> 
-	match t2.term_type with
-	| Ctype ty when is_ptr_or_array ty -> register_term kf varinfos t2
-	| _ -> assert false)
+        match t2.term_type with
+        | Ctype ty when is_ptr_or_array ty -> register_term kf varinfos t2
+        | _ -> assert false)
     | TConst _ | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ | TAlignOf _
     | TAlignOfE _ | Tnull | Ttype _ | TUnOp _ | TBinOp _ ->
       varinfos
@@ -352,21 +352,21 @@ module rec Transfer
       Cil.SkipChildren
   end
 
-  let register_predicate kf pred state = 
-    let state_ref = ref state in
-    Error.handle
-      (fun () ->
-	ignore
-	  (Visitor.visitFramacIdPredicate (register_object kf state_ref) pred))
-      ();
-    !state_ref
+let register_predicate kf pred state = 
+  let state_ref = ref state in
+  Error.handle
+    (fun () ->
+      ignore
+        (Visitor.visitFramacIdPredicate (register_object kf state_ref) pred))
+    ();
+  !state_ref
 
   let register_code_annot kf a state = 
     let state_ref = ref state in
     Error.handle
       (fun () ->
-	ignore 
-	  (Visitor.visitFramacCodeAnnotation (register_object kf state_ref) a))
+        ignore 
+          (Visitor.visitFramacCodeAnnotation (register_object kf state_ref) a))
       ();
     !state_ref
 
@@ -374,7 +374,7 @@ module rec Transfer
     let rec do_init vi init state = match init with
       | SingleInit e -> handle_assignment state (Var vi, NoOffset) e
       | CompoundInit(_, l) -> 
-	List.fold_left (fun state (_, init) -> do_init vi init state) state l
+        List.fold_left (fun state (_, init) -> do_init vi init state) state l
     in
     let do_one vi init state = match init.init with 
       | None -> state
@@ -404,48 +404,48 @@ module rec Transfer
         let state = Env.default_varinfos state in
         let state = 
           if (is_first || is_last) && Misc.is_generated_kf kf then 
-	          Annotations.fold_behaviors
-	            (fun _ bhv s -> 
-		            let handle_annot test f s =
-		              if test then 
-		                f (fun _ p s -> register_predicate kf p s) kf bhv.b_name s
-		              else
-		                s
-		            in
-		            let s = handle_annot is_first Annotations.fold_requires s in
-		            let s = handle_annot is_first Annotations.fold_assumes s in
-		            handle_annot 
-		              is_last 
-		              (fun f -> Annotations.fold_ensures (fun e (_, p) -> f e p)) s)
-	            kf
-	            state
-	        else
-	          state
-	      in
-	      let state = 
-	        Annotations.fold_code_annot
-	          (fun _ -> register_code_annot kf) stmt state
-	      in
-	      let state =
-	        if stmt.ghost then
-	          let rtes = Rte.stmt kf stmt in
-	          List.fold_left
-	            (fun state a -> register_code_annot kf a state) state rtes
-	        else 
-	          state
-	      in
-	      let state =
-	        (* take initializers into account *)
-	        if is_first then
-	          let main, lib = Globals.entry_point () in
-	          if Kernel_function.equal kf main && not lib then 
-	            register_initializers state
-	          else
-	            state
-	        else
-	          state
-	      in
-	      Some state)
+            Annotations.fold_behaviors
+              (fun _ bhv s -> 
+                let handle_annot test f s =
+                  if test then 
+                    f (fun _ p s -> register_predicate kf p s) kf bhv.b_name s
+                  else
+                    s
+                in
+                let s = handle_annot is_first Annotations.fold_requires s in
+                let s = handle_annot is_first Annotations.fold_assumes s in
+                handle_annot 
+                  is_last 
+                  (fun f -> Annotations.fold_ensures (fun e (_, p) -> f e p)) s)
+              kf
+              state
+          else
+            state
+        in
+        let state = 
+          Annotations.fold_code_annot
+            (fun _ -> register_code_annot kf) stmt state
+        in
+        let state =
+          if stmt.ghost then
+            let rtes = Rte.stmt kf stmt in
+            List.fold_left
+              (fun state a -> register_code_annot kf a state) state rtes
+          else 
+            state
+        in
+        let state =
+        (* take initializers into account *)
+          if is_first then
+            let main, lib = Globals.entry_point () in
+            if Kernel_function.equal kf main && not lib then 
+              register_initializers state
+            else
+              state
+          else
+            state
+        in
+        Some state)
 
   (** The (backwards) transfer function for an instruction. The
       [(Cil.CurrentLoc.get ())] is set before calling this. If it returns
@@ -460,85 +460,85 @@ module rec Transfer
     | Call(result, f_exp, l, _) -> 
       (match f_exp.enode with
       | Lval(Var vi, NoOffset) ->
-	let kf = Globals.Functions.get vi in
-	let params = Globals.Functions.get_params kf in
-	let state =
-	  if Kernel_function.is_definition kf then
-	    try
-	      (* compute the initial state of the called function *)
-	      let init =
-		List.fold_left2
-		  (fun acc p a -> match base_addr a with
-		    | None -> acc
-		    | Some vi -> 
-		      if Varinfo.Hptset.mem vi state 
-		      then Varinfo.Hptset.add p acc
-		      else acc)
-		  state
-		  params
-		  l
-	      in
-	      let init = match result with
-		| None -> init
-		| Some lv ->
-		  match base_addr_node (Lval lv) with
-		  | None -> init
-		  | Some vi ->
-		    if Varinfo.Hptset.mem vi state 
-		    then Varinfo.Hptset.add (Misc.result_vi kf) init
-		    else init
-	      in
-	      let state = Compute.get ~init kf in
-	      (* compute the resulting state by keeping arguments whenever the
-		 corresponding formals must be kept *)
-	      List.fold_left2
-		(fun acc p a -> match base_addr a with
-		| None -> acc
-		| Some vi ->
-		  if  Varinfo.Hptset.mem p state then Varinfo.Hptset.add vi acc
-		  else acc)
-		state
-		params
-		l
-	    with Invalid_argument _ -> 
-	      Options.warning
-		"ignoring effect of variadic function %a" 
-		Kernel_function.pretty
-		kf;
-	      state
-	  else
-	    state
-	in
-	let state = match result, Kernel_function.is_definition kf with
-	  | None, _ | _, false -> state
-	  | Some (lhost, _), true ->
-	    (* add the result if \result must be kept after calling the kf *)
-	    let vi = Misc.result_vi kf in
-	    if  Varinfo.Hptset.mem vi state then 
-	      match lhost with
-	      | Var vi -> Varinfo.Hptset.add vi state
-	      | Mem e -> 
-		match base_addr e with
-		| None -> 
-		  Kernel.fatal "[pre_analysis] no base address for %a" 
-		    Printer.pp_exp e
-		| Some vi -> Varinfo.Hptset.add vi state
-	    else
-	      state
-	in
-	Dataflow.Done (Some state)
+        let kf = Globals.Functions.get vi in
+        let params = Globals.Functions.get_params kf in
+        let state =
+          if Kernel_function.is_definition kf then
+            try
+      (* compute the initial state of the called function *)
+              let init =
+                List.fold_left2
+                  (fun acc p a -> match base_addr a with
+                  | None -> acc
+                  | Some vi -> 
+                    if Varinfo.Hptset.mem vi state 
+                    then Varinfo.Hptset.add p acc
+                    else acc)
+                  state
+                  params
+                  l
+              in
+              let init = match result with
+                | None -> init
+                | Some lv ->
+                  match base_addr_node (Lval lv) with
+                  | None -> init
+                  | Some vi ->
+                    if Varinfo.Hptset.mem vi state 
+                    then Varinfo.Hptset.add (Misc.result_vi kf) init
+                    else init
+              in
+              let state = Compute.get ~init kf in
+      (* compute the resulting state by keeping arguments whenever the
+         corresponding formals must be kept *)
+              List.fold_left2
+                (fun acc p a -> match base_addr a with
+                | None -> acc
+                | Some vi ->
+                  if  Varinfo.Hptset.mem p state then Varinfo.Hptset.add vi acc
+                  else acc)
+                state
+                params
+                l
+            with Invalid_argument _ -> 
+              Options.warning
+                "ignoring effect of variadic function %a" 
+                Kernel_function.pretty
+                kf;
+              state
+          else
+            state
+        in
+        let state = match result, Kernel_function.is_definition kf with
+          | None, _ | _, false -> state
+          | Some (lhost, _), true ->
+    (* add the result if \result must be kept after calling the kf *)
+            let vi = Misc.result_vi kf in
+            if  Varinfo.Hptset.mem vi state then 
+              match lhost with
+              | Var vi -> Varinfo.Hptset.add vi state
+              | Mem e -> 
+                match base_addr e with
+                | None -> 
+                  Kernel.fatal "[pre_analysis] no base address for %a" 
+                    Printer.pp_exp e
+                | Some vi -> Varinfo.Hptset.add vi state
+            else
+              state
+        in
+        Dataflow.Done (Some state)
       | _ ->
-	Options.warning "function pointers may introduce too limited \
+        Options.warning "function pointers may introduce too limited \
 instrumentation.";
-	(* imprecise function call: keep each argument *)
-	Dataflow.Done 
-	  (Some
-	     (List.fold_left
-		(fun acc e -> match base_addr e with
-		| None -> acc
-		| Some vi -> Varinfo.Hptset.add vi acc)
-		state 
-		l)))
+(* imprecise function call: keep each argument *)
+        Dataflow.Done 
+          (Some
+             (List.fold_left
+                (fun acc e -> match base_addr e with
+                | None -> acc
+                | Some vi -> Varinfo.Hptset.add vi acc)
+                state 
+                l)))
     | Asm _ -> Error.not_yet "asm"
     | Skip _ | Code_annot _ -> Dataflow.Default
 
@@ -572,36 +572,36 @@ end = struct
       try Env.find kf, true
       with Not_found -> Stmt.Hashtbl.create 17, false
     in
-(*    Options.feedback "ANALYSING %a" Kernel_function.pretty kf;*)
+    (*    Options.feedback "ANALYSING %a" Kernel_function.pretty kf;*)
     if not is_init then Env.add kf tbl;
     (try
-      let fundec = Kernel_function.get_definition kf in
-      let stmts, returns = Dataflow.find_stmts fundec in
-      if is_init then 
-	Extlib.may
-	  (fun set -> 
-	    List.iter 
-	      (fun s -> 
-		let old = 
-		  try Extlib.the (Stmt.Hashtbl.find tbl s) 
-		  with Not_found -> assert false
-		in
-		Stmt.Hashtbl.replace 
-		  tbl
-		  s
-		  (Some (Varinfo.Hptset.union set old)))
-		  returns)
-	  init_set
-      else begin
-	List.iter (fun s -> Stmt.Hashtbl.add tbl s None) stmts;
-	Extlib.may
-	  (fun set -> 
-	    List.iter (fun s -> Stmt.Hashtbl.replace tbl s (Some set)) returns)
-	  init_set
-      end;
-      D.compute stmts
-    with Kernel_function.No_Definition | Kernel_function.No_Statement -> 
-      ());
+       let fundec = Kernel_function.get_definition kf in
+       let stmts, returns = Dataflow.find_stmts fundec in
+       if is_init then 
+         Extlib.may
+           (fun set -> 
+             List.iter 
+               (fun s -> 
+                 let old = 
+                   try Extlib.the (Stmt.Hashtbl.find tbl s) 
+                   with Not_found -> assert false
+                 in
+                 Stmt.Hashtbl.replace 
+                   tbl
+                   s
+                   (Some (Varinfo.Hptset.union set old)))
+               returns)
+           init_set
+       else begin
+         List.iter (fun s -> Stmt.Hashtbl.add tbl s None) stmts;
+         Extlib.may
+           (fun set -> 
+             List.iter (fun s -> Stmt.Hashtbl.replace tbl s (Some set)) returns)
+           init_set
+       end;
+       D.compute stmts
+     with Kernel_function.No_Definition | Kernel_function.No_Statement -> 
+       ());
     Options.feedback ~dkey ~level:2 "function %a done." 
       Kernel_function.pretty kf;
     tbl
@@ -611,25 +611,25 @@ end = struct
       Varinfo.Hptset.empty
     else
       try
-	let stmt = Kernel_function.find_first_stmt kf in
-	(*      Options.feedback "GETTING %a" Kernel_function.pretty kf;*)
-	let tbl = 
-	  if Env.mem_init kf init then
-	    try Env.find kf with Not_found -> assert false
-	  else begin
-	    (* WARN: potentially incorrect in case of recursive call *)
-	    Env.add_init kf init;
-	    Env.apply (compute init) kf 
-	  end
-	in
-	try
-	  let set = Stmt.Hashtbl.find tbl stmt in
-	  Env.default_varinfos set
-	with Not_found ->
-	  Options.fatal "[pre_analysis] stmt never analyzed: %a" 
-	    Printer.pp_stmt stmt
+        let stmt = Kernel_function.find_first_stmt kf in
+(*      Options.feedback "GETTING %a" Kernel_function.pretty kf;*)
+        let tbl = 
+          if Env.mem_init kf init then
+            try Env.find kf with Not_found -> assert false
+          else begin
+    (* WARN: potentially incorrect in case of recursive call *)
+            Env.add_init kf init;
+            Env.apply (compute init) kf 
+          end
+        in
+        try
+          let set = Stmt.Hashtbl.find tbl stmt in
+          Env.default_varinfos set
+        with Not_found ->
+          Options.fatal "[pre_analysis] stmt never analyzed: %a" 
+            Printer.pp_stmt stmt
       with Kernel_function.No_Statement -> 
-	Varinfo.Hptset.empty
+        Varinfo.Hptset.empty
 
 end
 
@@ -647,7 +647,7 @@ instrumentation.";
        Options.warning ~once:true "%s@ \
 @[The generated program may miss memory instrumentation@ \
 if there are memory-related annotations.@]"
-	 s);
+ s);
     Options.feedback ~level:2 "pre-analysis done.";
     Env.consolidated_mem vi
   end
@@ -672,11 +672,11 @@ let must_model_vi ?kf ?stmt vi =
     try
       let tbl = Env.find kf in
       try
-	let set = Stmt.Hashtbl.find tbl stmt in
-	Varinfo.Hptset.mem vi (Env.default_varinfos set)
+let set = Stmt.Hashtbl.find tbl stmt in
+Varinfo.Hptset.mem vi (Env.default_varinfos set)
       with Not_found -> 
-	(* new statement *)
-	consolidated_must_model_vi vi
+(* new statement *)
+consolidated_must_model_vi vi
     with Not_found -> 
       (* [kf] is dead code *)
       false
@@ -692,8 +692,8 @@ and must_model_exp ?kf ?stmt e = match e.enode with
     must_model_exp ?kf ?stmt e1 || must_model_exp ?kf ?stmt e2
   | Info(e, _) | CastE(_, e) -> must_model_exp ?kf ?stmt e
   | BinOp((PlusA | MinusA | Mult | Div | Mod |Shiftlt | Shiftrt 
-	      | Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr),
-	  _, _, _)
+              | Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr),
+          _, _, _)
   | Const _ -> (* possible in case of static address *) false
   | UnOp _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ 
   | AlignOfE _ -> 
