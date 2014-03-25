@@ -57,7 +57,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1
 
 /*@ ghost extern int __e_acsl_internal_heap; */
 
-extern size_t __memory_size;
+/*@ ghost extern size_t __memory_size; */
 
 /*@
 predicate diffSize{L1, L2}(ℤ i) =

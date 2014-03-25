@@ -85,7 +85,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __valid(void *ptr, size_t size);
  */
 extern  __attribute__((__FC_BUILTIN__)) void __e_acsl_memory_clean(void);
 
-extern size_t __memory_size;
+/*@ ghost extern size_t __memory_size; */
 
 /*@ assigns __fc_heap_status, \result;
     assigns __fc_heap_status \from size, __fc_heap_status;
