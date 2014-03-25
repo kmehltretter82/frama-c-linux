@@ -81,11 +81,13 @@ let name_of_mpz_arith_bop = function
   | Shiftlt | Shiftrt | PlusPI | IndexPI | MinusPI | MinusPP -> assert false
 
 let constant_to_exp ~loc = function
-  | Integer(n, s) ->
+  | Integer(n, repr) ->
     (try
-       let k = Typing.typ_of_integer n (Integer.ge n Integer.zero) in
-       if Typing.is_representable n k then Cil.kinteger64_repr ~loc k n s, false
-       else raise Cil.Not_representable
+       let kind = Typing.typ_of_integer n (Integer.ge n Integer.zero) in
+       if Typing.is_representable n kind then 
+         Cil.kinteger64 ~loc ~kind ?repr n, false
+       else 
+         raise Cil.Not_representable
      with Cil.Not_representable ->
        Cil.mkString ~loc (Integer.to_string n), true)
   | LStr s -> Cil.new_exp ~loc (Const (CStr s)), false
