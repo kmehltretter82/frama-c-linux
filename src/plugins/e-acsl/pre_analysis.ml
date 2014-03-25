@@ -599,7 +599,7 @@ end = struct
 	    List.iter (fun s -> Stmt.Hashtbl.replace tbl s (Some set)) returns)
 	  init_set
       end;
-      D.compute returns
+      D.compute stmts
     with Kernel_function.No_Definition | Kernel_function.No_Statement -> 
       ());
     Options.feedback ~dkey ~level:2 "function %a done." 

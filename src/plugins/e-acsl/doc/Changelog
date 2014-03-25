@@ -15,7 +15,8 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
--* E-ACSL       [2014/03/17] Fix bug #1715 about -e-acsl-full-mmodel which
+-* E-ACSL       [2014/03/25] Fix bug #1716 with annotations in while(1).
+-* E-ACSL       [2014/03/25] Fix bug #1715 about -e-acsl-full-mmodel which
 	        generates incorrect code.
 -* E-ACSL       [2014/03/17] Fix bug #1700 about non-ISO empty struct.
 
