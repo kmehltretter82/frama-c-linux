@@ -103,7 +103,7 @@ extern  __attribute__((__FC_BUILTIN__)) void __initialize(void *ptr,
  */
 extern  __attribute__((__FC_BUILTIN__)) void __e_acsl_memory_clean(void);
 
-extern size_t __memory_size;
+/*@ ghost extern size_t __memory_size; */
 
 /*@
 predicate diffSize{L1, L2}(ℤ i) =
