@@ -164,6 +164,7 @@ module Term_env = Make_env(Term)(struct type t = eacsl_typ * eacsl_typ end)
 module Logic_var_env = Make_env(Logic_var)(struct type t = eacsl_typ end)
 
 let generic_typ (which: < f: 'a. 'a * 'a -> 'a >) t =
+  Cil.CurrentLoc.set t.term_loc;
     if Options.Gmp_only.get () then 
       let ty = match t.term_type with
 	| Linteger -> Mpz.t ()
@@ -241,6 +242,7 @@ let type_of_indexed_host = function
   | _ -> assert false
 
 let rec type_term t = 
+  Cil.CurrentLoc.set t.term_loc;
   let lty = t.term_type in
   let get_cty t = match t.term_type with Ctype ty -> ty | _ -> assert false in
   let dup f x = let y = f x in y, y in
@@ -440,7 +442,9 @@ let compute_quantif_guards_ref
        (term * relation * logic_var * relation * term) list) ref
     = Extlib.mk_fun "compute_quantif_guards_ref"
 
-let rec type_predicate_named p = match p.content with
+let rec type_predicate_named p = 
+  Cil.CurrentLoc.set p.loc;
+  match p.content with
   | Pfalse | Ptrue -> ()
   | Papp _ -> Error.not_yet "logic function application"
   | Pseparated _ -> Error.not_yet "\\separated"
