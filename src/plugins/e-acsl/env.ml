@@ -371,7 +371,10 @@ let pop_and_get env stmt ~global_clear where =
 	| _ :: tl ->
 	  match stmt.skind with
 	  | Block { bstmts = [ fst; snd ] } -> extract snd (fst :: acc) tl
-	  | _ -> assert false
+	  | _ ->
+            Kernel.fatal
+              "experting a block containing 2 statements instead of %a"
+              Printer.pp_stmt stmt
       in
       extract stmt [] block.pre_stmts
     in
