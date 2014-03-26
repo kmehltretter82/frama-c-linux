@@ -636,9 +636,21 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       (fun t ->
         (match t.term_node with
         | Tat(_, StmtLabel s_ref) ->
+          (* the label may have been moved,
+             so move the corresponding reference *)
           s_ref := E_acsl_label.new_labeled_stmt !s_ref
         | _ -> ());
         t)
+
+  method !vpredicate _ =
+    Cil.DoChildrenPost
+      (function
+      | Pat(_, StmtLabel s_ref) as p ->
+          (* the label may have been moved,
+             so move the corresponding reference *)
+        s_ref := E_acsl_label.new_labeled_stmt !s_ref;
+        p
+      | p -> p);
 
   initializer
     Misc.reset ();
