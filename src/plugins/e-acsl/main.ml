@@ -133,6 +133,11 @@ module Resulting_projects =
       let dependencies = [ Ast.self ]
      end)
 
+let () =
+  State_dependency_graph.add_dependencies
+    ~from:Resulting_projects.self
+    [ Label.self ]
+
 let generate_code =
   Resulting_projects.memo
     (fun name ->

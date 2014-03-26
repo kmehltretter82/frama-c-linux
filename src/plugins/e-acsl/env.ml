@@ -20,6 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module E_acsl_label = Label
 open Cil_types
 open Cil_datatype
 
@@ -305,12 +306,13 @@ let add_assert env stmt annot = match current_kf env with
       (fun () -> Annotations.add_assert emitter ~kf stmt annot) 
       env.visitor#get_filling_actions
 
-let add_stmt ?(init=false) env stmt =
+let add_stmt ?(init=false) ?before env stmt =
+  Extlib.may (fun old -> E_acsl_label.move env.visitor ~old stmt) before;
   let local_env, tl = top init env in
   let block = local_env.block_info in
   let block = { block with new_stmts = stmt :: block.new_stmts } in
   let local_env = { local_env with block_info = block } in
-  { env with 
+  { env with
     init_env = if init then local_env else env.init_env;
     env_stack = if init then env.env_stack else local_env :: tl }
 

@@ -29,6 +29,13 @@ val move: Visitor.generic_frama_c_visitor -> old:stmt -> stmt -> unit
 val get_stmt: Visitor.generic_frama_c_visitor -> logic_label -> stmt
 (** @return the statement where the logic label points to. *)
 
+val new_labeled_stmt: stmt -> stmt
+(** @return the labeled stmt to use instead of the given one (which
+    previously contained a label *)
+
+val self: State.t
+(** Internal state *)
+
 (*
 Local Variables:
 compile-command: "make"

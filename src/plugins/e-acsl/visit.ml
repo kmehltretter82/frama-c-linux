@@ -535,12 +535,12 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       (Pre_analysis.must_model_lval ~kf ~stmt checked_lv);*)
     if not (may_safely_ignore assigned_lv) && 
       Pre_analysis.must_model_lval ~kf ~stmt checked_lv 
-    then begin
-      let stmt = 
+    then
+      let new_stmt =
         Misc.mk_debug_mmodel_stmt (Misc.mk_initialize loc assigned_lv) 
       in
-      function_env := Env.add_stmt !function_env stmt
-    end
+      let before = Cil.memo_stmt self#behavior stmt in
+      function_env := Env.add_stmt ~before !function_env new_stmt
 
   method !vinst = function
   | Set(old_lv, _, _) ->
@@ -631,7 +631,16 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     else
       Cil.SkipChildren
 
-  initializer 
+  method !vterm _ =
+    Cil.DoChildrenPost
+      (fun t ->
+        (match t.term_node with
+        | Tat(_, StmtLabel s_ref) ->
+          s_ref := E_acsl_label.new_labeled_stmt !s_ref
+        | _ -> ());
+        t)
+
+  initializer
     Misc.reset ();
     self#reset_env ();
     Translate.set_original_project (Project.current ())
