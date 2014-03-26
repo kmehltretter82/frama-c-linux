@@ -133,8 +133,6 @@ module Resulting_projects =
       let dependencies = [ Ast.self ]
      end)
 
-let () = Env.global_state := Resulting_projects.self
-
 let generate_code =
   Resulting_projects.memo
     (fun name ->

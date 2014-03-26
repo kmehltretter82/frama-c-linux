@@ -27,9 +27,6 @@ open Cil_types
     Environments handle all the new C constructs (variables, statements and
     annotations. *) 
 
-val global_state: State.t ref
-(** reference to the E-ACSL global state. Not defined here, yet required *) 
-
 type t
 
 val dummy: t
