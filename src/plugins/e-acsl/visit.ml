@@ -20,42 +20,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module E_acsl_label = Label
 open Cil_types
 open Cil_datatype
 
 let dkey = Options.dkey_translation
-
-(* move all labels of [stmt] onto [new_stmt] *)
-let move_labels env stmt new_stmt =
-  let labels = stmt.labels in
-  match labels with
-  | [] -> ()
-  | _ :: _ ->
-    stmt.labels <- [];
-    new_stmt.labels <- labels @ new_stmt.labels;
-    (* update the gotos of the function jumping to one of the labels *)
-    let o = object 
-      inherit Visitor.frama_c_inplace
-      method !vstmt_aux s = match s.skind with
-      | Goto(s_ref, _) -> 
-	(* [!s_ref] and [stmt] are not part of the same project, thus it
-	   is safer to compare the ids than to use Stmt.equal *)
-	if !s_ref.sid = stmt.sid then s_ref := new_stmt; 
-	Cil.SkipChildren
-      | _ -> Cil.DoChildren
-      (* improve efficiency: skip childrens of vstmt which cannot
-	 contain any stmt *)
-      method !vinst _ = Cil.SkipChildren
-      method !vexpr _ = Cil.SkipChildren
-      method !vcode_annot _ = Cil.SkipChildren
-      method !vlval _ = Cil.SkipChildren
-    end in
-    let vis = Env.get_visitor env in
-    let f = Extlib.the vis#current_func in
-    let mv_labels s =
-      ignore (Visitor.visitFramacStmt o (Cil.get_stmt vis#behavior s))
-    in
-    List.iter mv_labels f.sallstmts
 
 let rename_alloc_function stmt = 
   let is_alloc_name s = 
@@ -473,74 +442,75 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       (* handle loop invariants *)
       let new_stmt, env, must_mv = Loops.preserve_invariant prj env kf stmt in
       let new_stmt, env = 
-	if self#is_return kf stmt then 
-	  (* must generate the post_block before including [stmt] (the 'return')
-	     since no code is executed after it. However, since this statement
-	     is pure (Cil invariant), that is semantically correct. *)
-	  let env = mk_post_env env in
-	  (* also handle the postcondition of the function and clear the env *)
-	  let env = 
-	    if Pre_visit.is_generated_function (Extlib.the self#current_kf) then
-	      Project.on
-		prj
-		(Translate.translate_post_spec kf Kglobal env) 
-		!funspec 
-	    else
-	      env
-	  in
-	  (* de-allocating memory previously allocating by the kf *)
-	  (* JS: should be done in the new project? *)
-	  if generate then
-	    let env = deallocate_function env kf in
-	    let b, env = 
-	      Env.pop_and_get env new_stmt ~global_clear:true Env.After 
-	    in
-	    if is_main && Pre_analysis.use_model () then begin
-	      let stmts = b.bstmts in
-	      let l = List.rev stmts in
-	      match l with
-	      | [] -> assert false (* at least the 'return' stmt *)
-	      | ret :: l ->
-		let loc = Stmt.loc stmt in
-		let delete_stmts =
-		  Globals.Vars.fold_in_file_order
-		    (fun vi _ acc -> 
-		      if Pre_analysis.must_model_vi vi then 
-			let vi = Cil.get_varinfo self#behavior vi in
-			Misc.mk_delete_stmt vi :: acc
-		      else
-			acc)
-		    [ Misc.mk_call ~loc "__e_acsl_memory_clean" []; ret ]
-		in
-		b.bstmts <- List.rev l @ delete_stmts
-	    end;
-	    let new_stmt = Misc.mk_block prj stmt b in
-	    (* move the labels of the return to the new block in order to
-	       evaluate the postcondition when jumping to them. *)
-	    move_labels env stmt new_stmt;
-	    new_stmt, env
-	  else
-	    stmt, env
-	else (* i.e. not (is_return stmt) *)
-	  if generate then
-	    let stmt = rename_alloc_function new_stmt in
-	    (* must generate [pre_block] which includes [stmt] before generating
-	       [post_block] *)
-	    let pre_block, env = 
-	      Env.pop_and_get env stmt ~global_clear:false Env.After
-	    in
-	    let env = mk_post_env (Env.push env) in
-	    let post_block, env = 
-	      Env.pop_and_get 
-		env
-		(Misc.mk_block prj stmt pre_block) 
-		~global_clear:false 
-		Env.Before 
-	    in
-	    (* TODO: must clear the local block anytime (?) *)
-	    Misc.mk_block prj stmt post_block, env
-	  else
-	    stmt, env
+        if self#is_return kf stmt then 
+          (* must generate the post_block before including [stmt] (the 'return')
+             since no code is executed after it. However, since this statement
+             is pure (Cil invariant), that is semantically correct. *)
+          let env = mk_post_env env in
+          (* also handle the postcondition of the function and clear the env *)
+          let env = 
+            if Pre_visit.is_generated_function (Extlib.the self#current_kf) then
+              Project.on
+                prj
+                (Translate.translate_post_spec kf Kglobal env) 
+                !funspec 
+            else
+              env
+          in
+          (* de-allocating memory previously allocating by the kf *)
+          (* JS: should be done in the new project? *)
+          if generate then
+            let env = deallocate_function env kf in
+            let b, env = 
+              Env.pop_and_get env new_stmt ~global_clear:true Env.After 
+            in
+            if is_main && Pre_analysis.use_model () then begin
+              let stmts = b.bstmts in
+              let l = List.rev stmts in
+              match l with
+              | [] -> assert false (* at least the 'return' stmt *)
+              | ret :: l ->
+                let loc = Stmt.loc stmt in
+                let delete_stmts =
+                  Globals.Vars.fold_in_file_order
+                    (fun vi _ acc -> 
+                      if Pre_analysis.must_model_vi vi then 
+                        let vi = Cil.get_varinfo self#behavior vi in
+                        Misc.mk_delete_stmt vi :: acc
+                      else
+                        acc)
+                    [ Misc.mk_call ~loc "__e_acsl_memory_clean" []; ret ]
+                in
+                b.bstmts <- List.rev l @ delete_stmts
+            end;
+            let new_stmt = Misc.mk_block prj stmt b in
+            (* move the labels of the return to the new block in order to
+               evaluate the postcondition when jumping to them. *)
+            E_acsl_label.move
+              (self :> Visitor.generic_frama_c_visitor) stmt new_stmt;
+            new_stmt, env
+          else
+            stmt, env
+        else (* i.e. not (is_return stmt) *)
+          if generate then
+            let stmt = rename_alloc_function new_stmt in
+            (* must generate [pre_block] which includes [stmt] before generating
+               [post_block] *)
+            let pre_block, env = 
+              Env.pop_and_get env stmt ~global_clear:false Env.After
+            in
+            let env = mk_post_env (Env.push env) in
+            let post_block, env = 
+              Env.pop_and_get 
+                env
+                (Misc.mk_block prj stmt pre_block) 
+                ~global_clear:false 
+                Env.Before 
+            in
+            (* TODO: must clear the local block anytime (?) *)
+            Misc.mk_block prj stmt post_block, env
+          else
+            stmt, env
       in
       if must_mv then Loops.mv_invariants env ~old:new_stmt stmt;
       function_env := env;

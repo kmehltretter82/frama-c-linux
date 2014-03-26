@@ -60,6 +60,7 @@ PLUGIN_CMO:= local_config \
 	mpz \
 	pre_analysis \
 	pre_visit \
+	label \
 	env \
 	typing \
 	quantif \

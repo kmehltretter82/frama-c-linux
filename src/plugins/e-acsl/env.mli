@@ -101,8 +101,6 @@ val get_behavior: t -> Cil.visitor_behavior
 val current_kf: t -> kernel_function option
 (** Kernel function currently visited in the new project. *)
 
-val stmt_of_label: t -> logic_label -> stmt
-
 (* ************************************************************************** *)
 (** {2 Current annotation kind} *)
 (* ************************************************************************** *)
