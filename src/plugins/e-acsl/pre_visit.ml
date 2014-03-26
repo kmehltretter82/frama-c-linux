@@ -301,7 +301,9 @@ class dup_functions_visitor prj = object (self)
       | [ GVarDecl(_, vi, _) | GFun({ svar = vi }, _) as g ] -> 
 	(match g with
 	| GVarDecl _ ->
-	  if vi.vname <> "malloc" && vi.vname <> "free" then
+	  if not (Kernel_function.is_definition (Extlib.the self#current_kf))
+            && vi.vname <> "malloc" && vi.vname <> "free" 
+          then
 	    Options.warning "@[annotating undefined function `%a':@ \
 the generated program may miss memory instrumentation@ \
 if there are memory-related annotations.@]"
