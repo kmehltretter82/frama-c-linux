@@ -23,8 +23,6 @@
 open Cil_types
 open Cil_datatype
 
-let global_state = ref State.dummy
-
 type mpz_tbl = {   
   new_exps: (varinfo * exp) Term.Map.t; (* generated mpz variables as exp from
 					   terms *)
