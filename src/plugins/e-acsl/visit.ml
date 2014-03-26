@@ -20,42 +20,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module E_acsl_label = Label
 open Cil_types
 open Cil_datatype
 
 let dkey = Options.dkey_translation
-
-(* move all labels of [stmt] onto [new_stmt] *)
-let move_labels env stmt new_stmt =
-  let labels = stmt.labels in
-  match labels with
-  | [] -> ()
-  | _ :: _ ->
-    stmt.labels <- [];
-    new_stmt.labels <- labels @ new_stmt.labels;
-    (* update the gotos of the function jumping to one of the labels *)
-    let o = object 
-      inherit Visitor.frama_c_inplace
-      method !vstmt_aux s = match s.skind with
-      | Goto(s_ref, _) -> 
-        (* [!s_ref] and [stmt] are not part of the same project, thus it is
-           safer to compare the ids than to use Stmt.equal *)
-        if !s_ref.sid = stmt.sid then s_ref := new_stmt; 
-        Cil.SkipChildren
-      | _ -> Cil.DoChildren
-      (* improve efficiency: skip childrens of vstmt which cannot contain any
-         stmt *)
-      method !vinst _ = Cil.SkipChildren
-      method !vexpr _ = Cil.SkipChildren
-      method !vcode_annot _ = Cil.SkipChildren
-      method !vlval _ = Cil.SkipChildren
-    end in
-    let vis = Env.get_visitor env in
-    let f = Extlib.the vis#current_func in
-    let mv_labels s =
-      ignore (Visitor.visitFramacStmt o (Cil.get_stmt vis#behavior s))
-    in
-    List.iter mv_labels f.sallstmts
 
 let rename_alloc_function stmt = 
   let is_alloc_name s = 
@@ -517,7 +486,8 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
             let new_stmt = Misc.mk_block prj stmt b in
             (* move the labels of the return to the new block in order to
                evaluate the postcondition when jumping to them. *)
-            move_labels env stmt new_stmt;
+            E_acsl_label.move
+              (self :> Visitor.generic_frama_c_visitor) stmt new_stmt;
             new_stmt, env
           else
             stmt, env

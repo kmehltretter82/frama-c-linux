@@ -395,20 +395,6 @@ let pop_and_get env stmt ~global_clear where =
 
 let get_generated_variables env = List.rev env.new_global_vars
 
-let stmt_of_label env = function
-  | StmtLabel { contents = stmt } -> stmt
-  | LogicLabel(_, label) when label = "Here" -> 
-    (match env.visitor#current_stmt with
-    | None -> Error.not_yet "label \"Here\" in function contract"
-    | Some s -> s)
-  | LogicLabel(_, label) when label = "Old" || label = "Pre" -> 
-    (try Kernel_function.find_first_stmt (Extlib.the env.visitor#current_kf)
-     with Kernel_function.No_Statement -> assert false)
-  | LogicLabel(_, label) when label = "Post" -> 
-    (try Kernel_function.find_return (Extlib.the env.visitor#current_kf)
-     with Kernel_function.No_Statement -> assert false)
-  | LogicLabel(_, _label) -> assert false
-
 let annotation_kind env = env.annotation_kind
 let set_annotation_kind env k = { env with annotation_kind = k }
 

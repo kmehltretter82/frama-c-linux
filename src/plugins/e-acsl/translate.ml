@@ -20,6 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module E_acsl_label = Label
 open Cil_types
 open Cil_datatype
 
@@ -459,7 +460,7 @@ and mmodel_call_with_size ~loc kf name ctx env t =
   res, env
 
 and at_to_exp env t_opt label e =
-  let stmt = Env.stmt_of_label env label in
+  let stmt = E_acsl_label.get_stmt (Env.get_visitor env) label in
   (* generate a new variable denoting [\at(t',label)].
      That is this variable which is the resulting expression. 
      ACSL typing rule ensures that the type of this variable is the same as
