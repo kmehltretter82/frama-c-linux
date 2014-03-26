@@ -30,16 +30,11 @@ let move (vis:Visitor.generic_frama_c_visitor) ~old new_stmt =
     old.labels <- [];
     new_stmt.labels <- labels @ new_stmt.labels;
     (* update the gotos of the function jumping to one of the labels *)
-    let update_label sref =
-      (* [!s_ref] and [old] are not part of the same project, thus it is
-         safer to compare the ids than to use Stmt.equal *)
-      if !sref.sid = old.sid then sref := new_stmt
-    in
     let o = object
       inherit Visitor.frama_c_inplace
       method !vstmt_aux s = match s.skind with
       | Goto(s_ref, _) ->
-        update_label s_ref;
+        if Cil_datatype.Stmt.equal !s_ref old then s_ref := new_stmt;
         Cil.SkipChildren
       | _ -> Cil.DoChildren
       (* improve efficiency: skip childrens which cannot contain any label *)
@@ -49,7 +44,7 @@ let move (vis:Visitor.generic_frama_c_visitor) ~old new_stmt =
     end in
     let f = Extlib.the vis#current_func in
     let mv_labels s =
-      ignore (Visitor.visitFramacStmt o (Cil.get_stmt vis#behavior s))
+      ignore (Visitor.visitFramacStmt o (Cil.memo_stmt vis#behavior s))
     in
     List.iter mv_labels f.sallstmts
 
