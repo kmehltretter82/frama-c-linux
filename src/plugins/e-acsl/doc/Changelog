@@ -20,6 +20,8 @@
 	        some messages.
 -  E-ACSL       [2014/03/26] Remove a spurious warning when an annotated
 	        function is first declared, then defined.
+-* E-ACSL       [2014/03/26] Fix bug #1717 about instrumentation of
+	        labeled statements.
 -* E-ACSL       [2014/03/25] Fix bug #1716 with annotations in while(1).
 -* E-ACSL       [2014/03/25] Fix bug #1715 about -e-acsl-full-mmodel which
 	        generates incorrect code.

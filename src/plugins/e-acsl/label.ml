@@ -22,6 +22,21 @@
 
 open Cil_types
 
+(* The keys are the stmts which were previously labeled, whereas the associated
+   values are the new stmts containing the same labels. *)
+module Labeled_stmts =
+  Cil_state_builder.Stmt_hashtbl
+    (Cil_datatype.Stmt)
+    (struct
+      let size = 7
+      let dependencies = [] (* delayed *)
+      let name = "E-ACSL.Labels"
+     end)
+
+let self = Labeled_stmts.self
+
+let new_labeled_stmt stmt = try Labeled_stmts.find stmt with Not_found -> stmt
+
 let move (vis:Visitor.generic_frama_c_visitor) ~old new_stmt =
   let labels = old.labels in
   match labels with
@@ -29,6 +44,7 @@ let move (vis:Visitor.generic_frama_c_visitor) ~old new_stmt =
   | _ :: _ ->
     old.labels <- [];
     new_stmt.labels <- labels @ new_stmt.labels;
+    Labeled_stmts.add old new_stmt;
     (* update the gotos of the function jumping to one of the labels *)
     let update_label sref =
       (* [!s_ref] and [old] are not part of the same project, thus it is

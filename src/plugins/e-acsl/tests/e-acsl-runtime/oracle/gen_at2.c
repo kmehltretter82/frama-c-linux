@@ -229,7 +229,6 @@ void g(int *p, int *q)
   *(p + 1) = 1;
   __initialize((void *)q,sizeof(int));
   *q = 0;
-  __initialize((void *)p,sizeof(int));
   L1:
     {
       int __e_acsl_valid_read_3;
@@ -247,7 +246,8 @@ void g(int *p, int *q)
       __store_block((void *)(& __e_acsl_at),4U);
       __e_acsl_at = *q;
     }
-    *p = 2;
+    __initialize((void *)p,sizeof(int));
+  *p = 2;
   __initialize((void *)(p + 1),sizeof(int));
   *(p + 1) = 3;
   __initialize((void *)q,sizeof(int));
