@@ -76,10 +76,7 @@ let typ_of_eacsl_typ = function
   | No_integral (Ltype _) -> Error.not_yet "typing of user-defined logic type"
   | No_integral (Lvar _) -> Error.not_yet "type variable"
   | No_integral Linteger -> Mpz.t ()
-  | No_integral Lreal -> 
-    Options.warning ~current:true ~once:true
-      "approximating type `real' by `long double'"; 
-    TFloat(FLongDouble, [])
+  | No_integral Lreal -> TFloat(FLongDouble, [])
   | No_integral (Larrow _) -> Error.not_yet "functional type"
 
 let eacsl_typ_of_typ ty = 
@@ -173,10 +170,7 @@ let generic_typ (which: < f: 'a. 'a * 'a -> 'a >) t =
 	| Ltype _ as ty when Logic_const.is_boolean_type ty -> Mpz.t ()
 	| Ltype _ -> Error.not_yet "typing of user-defined logic type"
 	| Lvar _ -> Error.not_yet "type variable"
-	| Lreal -> 
-	  Options.warning ~current:true ~once:true
-	    "approximating type `real' by `long double'"; 
-	  TFloat(FLongDouble, [])
+	| Lreal -> TFloat(FLongDouble, [])
 	| Larrow _ -> Error.not_yet "functional type"
       in
       which#f (ty, ty)
