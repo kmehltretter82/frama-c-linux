@@ -15,6 +15,7 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
+-  E-ACSL       [2014/03/27] Remove spurious warnings when using type `real`.
 -* E-ACSL       [2014/03/26] Fix bug #1692 about wrong localisation of
 	        some messages.
 -  E-ACSL       [2014/03/26] Remove a spurious warning when an annotated
