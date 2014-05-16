@@ -28,7 +28,7 @@
 */
 int binary_search(int* a, int length, int key) {
   int low = 0, high = length - 1;
-  while (low<=high) {
+  while (low <= high) {
     int mid = low + (high - low) / 2;
     if (a[mid] == key) return mid;
     if (a[mid] < key) { low = mid + 1; }
