@@ -13,7 +13,7 @@ void swap(int* array, int i, int j) {
   array[j] = tmp;
 }
 
-/*@ requires \valid(array+(left..right));
+/*@ requires \forall integer j; left <= j <= right ==> \valid(array+j);
   @ assigns array[left..right];
   @*/
 int partition (int* array, int left, int right, int pivotIndex) {
@@ -33,7 +33,7 @@ int partition (int* array, int left, int right, int pivotIndex) {
   return storeIndex;
 }
 
-/*@ requires \valid(array+(left..right));
+/*@ requires \forall integer j; left <= j <= right ==> \valid(array+j);
   @ assigns array[left..right];
   @ ensures \forall int i; left <= i < right ==> array[i] <= array[i+1];
   @*/
@@ -48,20 +48,16 @@ void quicksort(int* array, int left, int right) {
 
 int main(void) {
   int i;
-  int arr_min[LEN]; // array of minimal elements
   int arr[LEN];     // array to be sorted
   int arr_max[LEN]; // array of maximal elements
 
   arr[0] = 0; 
-  arr_min[0] = 0;
   arr_max[0] = 9;
   for(i = 1; i < LEN; i++){
     arr[i] = (13 * arr[i-1] + i) % 10; 
-    arr_min[i] = 0;
     arr_max[i] = 9;
   }
-
-  
+    
   printf("\n Array before quicksort:\n");
   for (i=0; i < LEN; i++) 
     printf("%d, ",arr[i]);
