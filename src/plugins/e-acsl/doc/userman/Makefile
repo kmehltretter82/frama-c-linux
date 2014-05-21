@@ -14,7 +14,7 @@ default: main.pdf
 
 main.pdf: $(DEPS_MODERN)
 
-EACSL_VERSION= 0.4
+EACSL_VERSION= 0.4+dev
 FC_VERSION= Neon-20140301
 
 EACSL_DIR=../..
