@@ -44,12 +44,12 @@ module Ppt_line =
 
 exception Found of Property.t * int
 
-let search_assert kf =
+let search_assert_or_invariant kf =
   try
     Annotations.iter_all_code_annot
       (fun stmt _ a ->
 	match a.annot_content with
-	| AAssert(_, p) ->
+        | AAssert(_, p) | AInvariant(_, _, p) ->
 	  let line = Ppt_line.get () in
 	  if (fst (p.loc)).Lexing.pos_lnum = line then 
 	    raise (Found(Property.ip_of_code_annot_single kf stmt a, line))
@@ -88,10 +88,10 @@ let search_requires kf =
     kf
 
 let search kf = match Ppt_name.get () with
-  | "" | "Assertion" -> search_assert kf
+  | "" | "Assertion" | "Invariant" -> search_assert_or_invariant kf
   | "Precondition" -> search_requires kf
   | "Postcondition" -> search_ensures kf
-  | _ -> assert false
+  | s -> abort "unknown property %s" s
 
 (* ************************************************************************** *)
 (* Emitting status "invalid" for the property   *)
