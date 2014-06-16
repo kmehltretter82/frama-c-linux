@@ -68,8 +68,8 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_import(__mpz_struct * /*[1]*
     assigns *x \from *x; */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_clear(__mpz_struct * /*[1]*/ x);
 
-/*@ requires \valid(z1);
-    requires \valid(z2);
+/*@ requires \valid_read(z1);
+    requires \valid_read(z2);
     assigns \result;
     assigns \result \from *z1, *z2;
  */
@@ -77,8 +77,8 @@ extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1
                                                        __mpz_struct const * /*[1]*/ z2);
 
 /*@ requires \valid(z1);
-    requires \valid(z2);
-    requires \valid(z3);
+    requires \valid_read(z2);
+    requires \valid_read(z3);
     assigns *z1;
     assigns *z1 \from *z2, *z3;
  */
@@ -87,8 +87,8 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_add(__mpz_struct * /*[1]*/ z
                                                         __mpz_struct const * /*[1]*/ z3);
 
 /*@ requires \valid(z1);
-    requires \valid(z2);
-    requires \valid(z3);
+    requires \valid_read(z2);
+    requires \valid_read(z3);
     assigns *z1;
     assigns *z1 \from *z2, *z3;
  */
@@ -97,8 +97,8 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_mul(__mpz_struct * /*[1]*/ z
                                                         __mpz_struct const * /*[1]*/ z3);
 
 /*@ requires \valid(z1);
-    requires \valid(z2);
-    requires \valid(z3);
+    requires \valid_read(z2);
+    requires \valid_read(z3);
     assigns *z1;
     assigns *z1 \from *z2, *z3;
  */
@@ -106,7 +106,7 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_tdiv_r(__mpz_struct * /*[1]*
                                                            __mpz_struct const * /*[1]*/ z2,
                                                            __mpz_struct const * /*[1]*/ z3);
 
-/*@ requires \valid(z);
+/*@ requires \valid_read(z);
     assigns \result;
     assigns \result \from *z; */
 extern  __attribute__((__FC_BUILTIN__)) unsigned long __gmpz_get_ui(__mpz_struct const * /*[1]*/ z);

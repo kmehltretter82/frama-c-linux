@@ -214,9 +214,8 @@ let type_constant ty = function
     if Cil.fitsInInt ILongLong n || Cil.fitsInInt IULongLong n then Interv(n, n)
     else Z
   | LChr c -> 
-    (match Cil.charConstToInt c with
-    | CInt64(n, _, _) -> Interv(n, n)
-    | _ -> assert false)
+    let n = Cil.charConstToInt c in
+    Interv(n, n)
   | LStr _ | LWStr _ | LReal _ | LEnum _ -> No_integral ty
 
 let size_of ty =

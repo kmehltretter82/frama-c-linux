@@ -43,7 +43,7 @@
 extern void __gmpz_init(mpz_t z)
   __attribute__((FC_BUILTIN));
 
-/*@ requires \valid(z_orig);
+/*@ requires \valid_read(z_orig);
   @ requires ! \initialized(z);
   @ allocates z;
   @ ensures \valid(z);
@@ -91,7 +91,7 @@ extern void __gmpz_import (mpz_t z, size_t, int, size_t, int, size_t, const void
 /* Assignments */
 /***************/
 
-/*@ requires \valid(z_orig);
+/*@ requires \valid_read(z_orig);
   @ requires \valid(z);
 //  @ ensures z->n == z_orig->n;
   @ assigns *z \from *z_orig; */
@@ -124,8 +124,8 @@ extern void __gmpz_clear(mpz_t x)
 /* Logical operator */
 /********************/
 
-/*@ requires \valid(z1);
-  @ requires \valid(z2);
+/*@ requires \valid_read(z1);
+  @ requires \valid_read(z2);
   @ assigns \result \from *z1, *z2; */
 extern int __gmpz_cmp(const mpz_t z1, const mpz_t z2)
   __attribute__((FC_BUILTIN));
@@ -135,42 +135,42 @@ extern int __gmpz_cmp(const mpz_t z1, const mpz_t z2)
 /************************/
 
 /*@ requires \valid(z1);
-  @ requires \valid(z2);
+  @ requires \valid_read(z2);
   @ assigns *z1 \from *z2; */
 extern void __gmpz_neg(mpz_t z1, const mpz_t z2)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(z1);
-  @ requires \valid(z2);
-  @ requires \valid(z3);
+  @ requires \valid_read(z2);
+  @ requires \valid_read(z3);
   @ assigns *z1 \from *z2, *z3; */
 extern void __gmpz_add(mpz_t z1, const mpz_t z2, const mpz_t z3)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(z1);
-  @ requires \valid(z2);
-  @ requires \valid(z3);
+  @ requires \valid_read(z2);
+  @ requires \valid_read(z3);
   @ assigns *z1 \from *z2, *z3; */
 extern void __gmpz_sub(mpz_t z1, const mpz_t z2, const mpz_t z3)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(z1);
-  @ requires \valid(z2);
-  @ requires \valid(z3);
+  @ requires \valid_read(z2);
+  @ requires \valid_read(z3);
   @ assigns *z1 \from *z2, *z3; */
 extern void __gmpz_mul(mpz_t z1, const mpz_t z2, const mpz_t z3)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(z1);
-  @ requires \valid(z2);
-  @ requires \valid(z3);
+  @ requires \valid_read(z2);
+  @ requires \valid_read(z3);
   @ assigns *z1 \from *z2, *z3; */
 extern void __gmpz_tdiv_q(mpz_t z1, const mpz_t z2, const mpz_t z3)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(z1);
-  @ requires \valid(z2);
-  @ requires \valid(z3);
+  @ requires \valid_read(z2);
+  @ requires \valid_read(z3);
   @ assigns *z1 \from *z2, *z3; */
 extern void __gmpz_tdiv_r(mpz_t z1, const mpz_t z2, const mpz_t z3)
   __attribute__((FC_BUILTIN));
@@ -180,7 +180,7 @@ extern void __gmpz_tdiv_r(mpz_t z1, const mpz_t z2, const mpz_t z3)
 /*********************/
 
 /*@ requires \valid(z1);
-  @ requires \valid(z2);
+  @ requires \valid_read(z2);
   @ assigns *z1 \from *z2; 
   @ assigns \result \from *z1,*z2; */
 extern int __gmpz_com(mpz_t z1, const mpz_t z2)
@@ -190,12 +190,12 @@ extern int __gmpz_com(mpz_t z1, const mpz_t z2)
 /* Coercions to C types */
 /************************/
 
-/*@ requires \valid(z); 
+/*@ requires \valid_read(z); 
   @ assigns \result \from *z; */
 extern long __gmpz_get_si(const mpz_t z)
   __attribute__((FC_BUILTIN));
 
-/*@ requires \valid(z); 
+/*@ requires \valid_read(z); 
   @ assigns \result \from *z; */
 extern unsigned long __gmpz_get_ui(const mpz_t z)
   __attribute__((FC_BUILTIN));
