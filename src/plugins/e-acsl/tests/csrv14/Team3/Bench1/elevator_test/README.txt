@@ -1,0 +1,3 @@
+librairie:
+
+mingw32

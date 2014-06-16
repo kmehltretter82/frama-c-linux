@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<io_pair>
+  <description xsi:nil="true"/>
+  <id>542</id>
+  <io_pair_category>good</io_pair_category>
+  <name>TC_C_121_registry_d</name>
+  <platform>BOTH</platform>
+  <technical_impact>NONE</technical_impact>
+  <timeout_execute>10</timeout_execute>
+  <io_groups>
+    <io_group>
+      <co_process xsi:nil="true"/>
+      <io_parameters>
+        <io_parameter>
+          <feature>registry_contents</feature>
+          <order>1</order>
+          <io_values>
+            <io_value>
+              <order>1</order>
+              <val>HKEY_CURRENT_USER\Software\STONESOUP\RegistryInput</val>
+              <val_type>USE_TEXT_DIRECTLY</val_type>
+            </io_value>
+            <io_value>
+              <order>2</order>
+              <val>InputData</val>
+              <val_type>USE_TEXT_DIRECTLY</val_type>
+            </io_value>
+            <io_value>
+              <order>3</order>
+              <val>ydb945bkix40kxvz30kxzaui</val>
+              <val_type>USE_TEXT_DIRECTLY</val_type>
+            </io_value>
+          </io_values>
+        </io_parameter>
+        <io_parameter>
+          <feature>stdin</feature>
+          <order>2</order>
+          <io_values>
+            <io_value>
+              <order>1</order>
+              <val>encrypted\n/quit\n</val>
+              <val_type>USE_TEXT_DIRECTLY</val_type>
+            </io_value>
+          </io_values>
+        </io_parameter>
+      </io_parameters>
+    </io_group>
+    <io_group>
+      <co_process xsi:nil="true"/>
+      <io_parameters>
+        <io_parameter>
+          <feature>stdout_terminal_o</feature>
+          <order>1</order>
+          <io_values>
+            <io_value>
+              <order>1</order>
+              <val>24 14 8 38 46 26 13 54 21 42 40 6 50 29 9 25 32 53 18 37 36 17 49 19 15 44 22 43 39 52 16 23 3 30 11 33 5 7 47 35 28 2 48 51 45 27 12 1 4 31 34 10 41 20 
+Enter message to be encrypted (type '/help' for help):
+Unencrypted: encrypted
+35
+12
+52
+51
+26
+50
+41
+44
+45
+Encrypted: NZCQYNIWW
+24 14 8 38 46 26 13 54 21 42 40 6 50 29 9 25 32 53 18 37 36 17 49 19 15 44 22 43 39 52 16 23 3 30 11 33 5 7 47 35 28 2 48 51 45 27 12 1 4 31 34 10 41 20 
+Enter message to be encrypted (type '/help' for help):
+</val>
+              <val_type>USE_TEXT_DIRECTLY</val_type>
+            </io_value>
+          </io_values>
+        </io_parameter>
+      </io_parameters>
+    </io_group>
+  </io_groups>
+</io_pair>

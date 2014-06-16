@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<io_pair>
+  <description>The output varys by run because of memory variances</description>
+  <id>1602</id>
+  <io_pair_category>bad</io_pair_category>
+  <name>TC_C_170_Bad1_Linux</name>
+  <platform>LINUX</platform>
+  <technical_impact>READ_APPLICATION_DATA</technical_impact>
+  <timeout_execute>10</timeout_execute>
+  <io_groups>
+    <io_group>
+      <co_process xsi:nil="true"/>
+      <io_parameters>
+        <io_parameter>
+          <feature>command_line</feature>
+          <order>1</order>
+          <io_values>
+            <io_value>
+              <order>1</order>
+              <val>key</val>
+              <val_type>USE_TEXT_DIRECTLY</val_type>
+            </io_value>
+          </io_values>
+        </io_parameter>
+        <io_parameter>
+          <feature>stdin</feature>
+          <order>2</order>
+          <io_values>
+            <io_value>
+              <order>1</order>
+              <val>I'm sorry, Dave, I'm afraid I can't do that.\n/quit\n</val>
+              <val_type>USE_TEXT_DIRECTLY</val_type>
+            </io_value>
+          </io_values>
+        </io_parameter>
+      </io_parameters>
+    </io_group>
+    <io_group>
+      <co_process xsi:nil="true"/>
+      <io_parameters>
+        <io_parameter>
+          <feature>stdout_terminal_o</feature>
+          <order>1</order>
+          <io_values>
+            <io_value>
+              <order>1</order>
+              <val>Enter message to be encrypted (type '/help' for help):
+Unencrypted: 49 27 6D 20 73 6F 72 72 79 2C 20 44 61 76 65 2C 20 49 27 6D 
+Encrypted: LVCBTJOUISJMC
+Enter message to be encrypted (type '/help' for help):
+Unencrypted: 61 66 72 61 69 64 20 49 20 63 61 6E 27 74 20 64 6F 20 74 68 
+Encrypted: DOBNKVYTIKYHEME
+Enter message to be encrypted (type '/help' for help):
+Unencrypted: 74 2E 
+Encrypted: W
+Enter message to be encrypted (type '/help' for help):</val>
+              <val_type>USE_TEXT_DIRECTLY</val_type>
+            </io_value>
+          </io_values>
+        </io_parameter>
+      </io_parameters>
+    </io_group>
+  </io_groups>
+</io_pair>

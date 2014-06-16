@@ -1,0 +1,6 @@
+The program simulates a trace of summary report of youtube connections bandwidth real dataset -  http://skuld.cs.umass.edu/traces/network/youtube_traces.tgz
+
+Property 1 - For all Connections, [] ((Connection.bandwidth > 10000) -> <>(Connection.bandwidth <= 10000))
+
+./CaseStudy3 -f flows.0607.dat -o -l 65536 -r 1 //OPENMP
+./CaseStudy3 -f flows.0607.dat -c -l 65536 -r 1 //CPU

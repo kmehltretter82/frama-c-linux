@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<io_pair>
+  <description xsi:nil="true"/>
+  <id>546</id>
+  <io_pair_category>good</io_pair_category>
+  <name>TC_C_121_command_line_c</name>
+  <platform>BOTH</platform>
+  <technical_impact>NONE</technical_impact>
+  <timeout_execute>10</timeout_execute>
+  <io_groups>
+    <io_group>
+      <co_process xsi:nil="true"/>
+      <io_parameters>
+        <io_parameter>
+          <feature>command_line</feature>
+          <order>1</order>
+          <io_values>
+            <io_value>
+              <order>1</order>
+              <val>aex9340ktvox9sazuj0k03se</val>
+              <val_type>USE_TEXT_DIRECTLY</val_type>
+            </io_value>
+          </io_values>
+        </io_parameter>
+        <io_parameter>
+          <feature>stdin</feature>
+          <order>2</order>
+          <io_values>
+            <io_value>
+              <order>1</order>
+              <val>This message is hidden\n/quit\n</val>
+              <val_type>USE_TEXT_DIRECTLY</val_type>
+            </io_value>
+          </io_values>
+        </io_parameter>
+      </io_parameters>
+    </io_group>
+    <io_group>
+      <co_process xsi:nil="true"/>
+      <io_parameters>
+        <io_parameter>
+          <feature>stdout_terminal_o</feature>
+          <order>1</order>
+          <io_values>
+            <io_value>
+              <order>1</order>
+              <val>31 40 43 22 9 15 54 38 34 23 1 11 29 25 53 47 41 39 46 21 50 8 49 3 12 13 51 6 30 42 35 17 7 2 48 20 27 45 28 36 18 24 52 5 10 14 37 32 4 33 26 16 44 19 
+Enter message to be encrypted (type '/help' for help):
+Unencrypted: This message is hidden
+49
+25
+2
+5
+5
+51
+8
+19
+41
+45
+32
+6
+36
+19
+51
+1
+32
+33
+46
+Encrypted: QGKXRDALPZKOCAHEJLH
+31 40 43 22 9 15 54 38 34 23 1 11 29 25 53 47 41 39 46 21 50 8 49 3 12 13 51 6 30 42 35 17 7 2 48 20 27 45 28 36 18 24 52 5 10 14 37 32 4 33 26 16 44 19 
+Enter message to be encrypted (type '/help' for help):</val>
+              <val_type>USE_TEXT_DIRECTLY</val_type>
+            </io_value>
+          </io_values>
+        </io_parameter>
+      </io_parameters>
+    </io_group>
+  </io_groups>
+</io_pair>

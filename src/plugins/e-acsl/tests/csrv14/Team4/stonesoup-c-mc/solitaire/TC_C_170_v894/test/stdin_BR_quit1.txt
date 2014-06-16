@@ -1,0 +1,4 @@
+Barney Rubble
+/quit
+abcdefghijklmnopqrstuvwxyz
+# End of file

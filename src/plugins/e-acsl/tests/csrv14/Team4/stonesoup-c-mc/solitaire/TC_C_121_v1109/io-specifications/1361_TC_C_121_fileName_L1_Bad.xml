@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<io_pair>
+  <description xsi:nil="true"/>
+  <id>1361</id>
+  <io_pair_category>bad</io_pair_category>
+  <name>TC_C_121_fileName_L1_Bad</name>
+  <platform>LINUX</platform>
+  <technical_impact>DOS_UNCONTROLLED_EXIT</technical_impact>
+  <timeout_execute>10</timeout_execute>
+  <io_groups>
+    <io_group>
+      <co_process xsi:nil="true"/>
+      <io_parameters>
+        <io_parameter>
+          <feature>file_name</feature>
+          <order>1</order>
+          <io_values>
+            <io_value>
+              <order>1</order>
+              <val>key1_bad_linux</val>
+              <val_type>USE_TEXT_DIRECTLY</val_type>
+            </io_value>
+          </io_values>
+        </io_parameter>
+        <io_parameter>
+          <feature>stdin</feature>
+          <order>2</order>
+          <io_values>
+            <io_value>
+              <order>1</order>
+              <val>hello\n/quit\n</val>
+              <val_type>USE_TEXT_DIRECTLY</val_type>
+            </io_value>
+          </io_values>
+        </io_parameter>
+      </io_parameters>
+    </io_group>
+    <io_group>
+      <co_process xsi:nil="true"/>
+      <io_parameters>
+        <io_parameter>
+          <feature>return_status_o</feature>
+          <order>1</order>
+          <io_values>
+            <io_value>
+              <order>1</order>
+              <val>139</val>
+              <val_type>USE_TEXT_DIRECTLY</val_type>
+            </io_value>
+          </io_values>
+        </io_parameter>
+      </io_parameters>
+    </io_group>
+  </io_groups>
+</io_pair>

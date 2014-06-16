@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<io_pair>
+  <description>Fill me in</description>
+  <id>2184</id>
+  <io_pair_category>bad</io_pair_category>
+  <name>TC_C_121_v1117_bad2</name>
+  <platform>LINUX</platform>
+  <technical_impact>DOS_UNCONTROLLED_EXIT</technical_impact>
+  <timeout_execute>10</timeout_execute>
+  <io_groups>
+    <io_group>
+      <co_process xsi:nil="true"/>
+      <io_parameters>
+        <io_parameter>
+          <feature>registry_contents</feature>
+          <order>1</order>
+          <io_values>
+            <io_value>
+              <order>1</order>
+              <val>HKEY_CURRENT_USER\Software\STONESOUP\RegistryInput</val>
+              <val_type>USE_CONTENTS_OF_FILE</val_type>
+            </io_value>
+            <io_value>
+              <order>2</order>
+              <val>InputData</val>
+              <val_type>USE_TEXT_DIRECTLY</val_type>
+            </io_value>
+            <io_value>
+              <order>3</order>
+              <val>olxbeulckxseouzqeoul3456AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</val>
+              <val_type>USE_TEXT_DIRECTLY</val_type>
+            </io_value>
+          </io_values>
+        </io_parameter>
+      </io_parameters>
+    </io_group>
+    <io_group>
+      <co_process xsi:nil="true"/>
+      <io_parameters>
+        <io_parameter>
+          <feature>return_status_o</feature>
+          <order>1</order>
+          <io_values>
+            <io_value>
+              <order>1</order>
+              <val>139</val>
+              <val_type>USE_TEXT_DIRECTLY</val_type>
+            </io_value>
+          </io_values>
+        </io_parameter>
+      </io_parameters>
+    </io_group>
+  </io_groups>
+</io_pair>

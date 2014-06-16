@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<io_pair>
+  <description xsi:nil="true"/>
+  <id>540</id>
+  <io_pair_category>good</io_pair_category>
+  <name>TC_C_121_registry_b</name>
+  <platform>BOTH</platform>
+  <technical_impact>NONE</technical_impact>
+  <timeout_execute>10</timeout_execute>
+  <io_groups>
+    <io_group>
+      <co_process xsi:nil="true"/>
+      <io_parameters>
+        <io_parameter>
+          <feature>registry_contents</feature>
+          <order>1</order>
+          <io_values>
+            <io_value>
+              <order>1</order>
+              <val>HKEY_CURRENT_USER\Software\STONESOUP\RegistryInput</val>
+              <val_type>USE_TEXT_DIRECTLY</val_type>
+            </io_value>
+            <io_value>
+              <order>2</order>
+              <val>InputData</val>
+              <val_type>USE_TEXT_DIRECTLY</val_type>
+            </io_value>
+            <io_value>
+              <order>3</order>
+              <val>adafafsacasdw41rfq24y3ew</val>
+              <val_type>USE_TEXT_DIRECTLY</val_type>
+            </io_value>
+          </io_values>
+        </io_parameter>
+        <io_parameter>
+          <feature>stdin</feature>
+          <order>2</order>
+          <io_values>
+            <io_value>
+              <order>1</order>
+              <val>hello\n/quit\n</val>
+              <val_type>USE_TEXT_DIRECTLY</val_type>
+            </io_value>
+          </io_values>
+        </io_parameter>
+      </io_parameters>
+    </io_group>
+    <io_group>
+      <co_process xsi:nil="true"/>
+      <io_parameters>
+        <io_parameter>
+          <feature>stdout_terminal_o</feature>
+          <order>1</order>
+          <io_values>
+            <io_value>
+              <order>1</order>
+              <val>6 8 43 46 18 40 14 19 36 27 31 15 30 22 48 13 20 23 28 11 9 17 44 33 52 5 29 3 1 16 49 47 34 51 7 54 45 4 25 21 39 2 50 10 38 42 37 35 32 41 12 53 24 26 
+Enter message to be encrypted (type '/help' for help):
+Unencrypted: hello
+29
+9
+36
+39
+2
+Encrypted: KNVYQ
+6 8 43 46 18 40 14 19 36 27 31 15 30 22 48 13 20 23 28 11 9 17 44 33 52 5 29 3 1 16 49 47 34 51 7 54 45 4 25 21 39 2 50 10 38 42 37 35 32 41 12 53 24 26 
+Enter message to be encrypted (type '/help' for help):
+</val>
+              <val_type>USE_TEXT_DIRECTLY</val_type>
+            </io_value>
+          </io_values>
+        </io_parameter>
+      </io_parameters>
+    </io_group>
+  </io_groups>
+</io_pair>

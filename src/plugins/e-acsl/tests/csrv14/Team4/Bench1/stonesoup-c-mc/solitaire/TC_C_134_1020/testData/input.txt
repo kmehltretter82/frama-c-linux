@@ -1,0 +1,1 @@
+Microsoft plans to continue issuing patches to remove additional fraudulent certificates. These patches may occur outside of our monthly software release schedule. Employees are required to install these updates within three business days once their availability has been announced through distribution channels.

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<io_pair>
+  <description xsi:nil="true"/>
+  <id>561</id>
+  <io_pair_category>good</io_pair_category>
+  <name>TC_C_122_env_d</name>
+  <platform>BOTH</platform>
+  <technical_impact xsi:nil="true"/>
+  <timeout_execute xsi:nil="true"/>
+  <io_groups>
+    <io_group>
+      <co_process xsi:nil="true"/>
+      <io_parameters>
+        <io_parameter>
+          <feature>environment_variable</feature>
+          <order>1</order>
+          <io_values>
+            <io_value>
+              <order>1</order>
+              <val>PALINDROME</val>
+              <val_type>USE_TEXT_DIRECTLY</val_type>
+            </io_value>
+            <io_value>
+              <order>2</order>
+              <val>65469034573234502345043657023534503425340571002410247506456406104714072304875462359365469034573234502345043657023534503425340571002410247506456406104714072304875462359451460569345610543654690345732345023450436570235</val>
+              <val_type>USE_TEXT_DIRECTLY</val_type>
+            </io_value>
+          </io_values>
+        </io_parameter>
+      </io_parameters>
+    </io_group>
+    <io_group>
+      <co_process xsi:nil="true"/>
+      <io_parameters>
+        <io_parameter>
+          <feature>stdout_terminal_o</feature>
+          <order>1</order>
+          <io_values>
+            <io_value>
+              <order>1</order>
+              <val>65469034573234502345043657023534503425340571002410247506456406104714072304875462359365469034573234502345043734054320543237543096456395326457840327041740160465460574201420017504352430543532075634054320543237543096456</val>
+              <val_type>USE_TEXT_DIRECTLY</val_type>
+            </io_value>
+          </io_values>
+        </io_parameter>
+      </io_parameters>
+    </io_group>
+  </io_groups>
+</io_pair>

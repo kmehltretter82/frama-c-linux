@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<io_pair>
+  <description>Fill me in</description>
+  <id>2171</id>
+  <io_pair_category>bad</io_pair_category>
+  <name>TC_C_170_v905_B1</name>
+  <platform>LINUX</platform>
+  <technical_impact>ALTER_EXECUTION_LOGIC</technical_impact>
+  <timeout_execute>10</timeout_execute>
+  <io_groups>
+    <io_group>
+      <co_process xsi:nil="true"/>
+      <io_parameters>
+        <io_parameter>
+          <feature>keyboard</feature>
+          <order>1</order>
+          <io_values>
+            <io_value>
+              <order>1</order>
+              <val>Anything longer than 20 characters causes the program to run its algorithm multiple times</val>
+              <val_type>USE_TEXT_DIRECTLY</val_type>
+            </io_value>
+          </io_values>
+        </io_parameter>
+      </io_parameters>
+    </io_group>
+    <io_group>
+      <co_process xsi:nil="true"/>
+      <io_parameters>
+        <io_parameter>
+          <feature>does_not_return_o</feature>
+          <order>1</order>
+          <io_values/>
+        </io_parameter>
+      </io_parameters>
+    </io_group>
+  </io_groups>
+</io_pair>

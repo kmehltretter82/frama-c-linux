@@ -1,0 +1,3 @@
+Fred Flintstone
+/quit
+# End of file
