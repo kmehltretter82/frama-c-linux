@@ -23,8 +23,7 @@ unsigned long const __fc_rand_max = (unsigned long)32767;
 /*@ ghost extern int __fc_heap_status; */
 
 /*@
-axiomatic
-  dynamic_allocation {
+axiomatic dynamic_allocation {
   predicate is_allocable{L}(size_t n) 
     reads __fc_heap_status;
   
@@ -134,10 +133,10 @@ void simple_loop(void)
       }
       else __e_acsl_and = 0;
       e_acsl_assert(__e_acsl_and,(char *)"Invariant",(char *)"simple_loop",
-                    (char *)"0 <= i && i <= 10",10);
+                    (char *)"0 <= i <= 10",10);
       __gmpz_clear(__e_acsl);
       __gmpz_clear(__e_acsl_i);
-      /*@ loop invariant 0 ≤ i ∧ i ≤ 10; */
+      /*@ loop invariant 0 ≤ i ≤ 10; */
       while (i < 10) {
         sum += i;
         {
@@ -164,7 +163,7 @@ void simple_loop(void)
           }
           else __e_acsl_and_2 = 0;
           e_acsl_assert(__e_acsl_and_2,(char *)"Invariant",
-                        (char *)"simple_loop",(char *)"0 <= i && i <= 10",10);
+                        (char *)"simple_loop",(char *)"0 <= i <= 10",10);
           __gmpz_clear(__e_acsl_3);
           __gmpz_clear(__e_acsl_i_3);
         }
@@ -202,10 +201,10 @@ void nested_loops(void)
     }
     else __e_acsl_and = 0;
     e_acsl_assert(__e_acsl_and,(char *)"Invariant",(char *)"nested_loops",
-                  (char *)"0 <= i && i <= 10",17);
+                  (char *)"0 <= i <= 10",17);
     __gmpz_clear(__e_acsl);
     __gmpz_clear(__e_acsl_i);
-    /*@ loop invariant 0 ≤ i ∧ i ≤ 10; */
+    /*@ loop invariant 0 ≤ i ≤ 10; */
     while (i < 10) {
       {
         int j;
@@ -303,7 +302,7 @@ void nested_loops(void)
           e_acsl_end_loop1: ;
           e_acsl_assert(__e_acsl_forall,(char *)"Invariant",
                         (char *)"nested_loops",
-                        (char *)"\\forall integer k, integer l;\n  (0 <= k && k < i) && (0 <= l && l < j) ==> t[k][l] == k*l",
+                        (char *)"\\forall integer k, integer l; 0 <= k < i && 0 <= l < j ==> t[k][l] == k*l",
                         21);
           __gmpz_init_set_si(__e_acsl_8,(long)0);
           __gmpz_init_set_si(__e_acsl_j_2,(long)j);
@@ -323,17 +322,15 @@ void nested_loops(void)
           }
           else __e_acsl_and_2 = 0;
           e_acsl_assert(__e_acsl_and_2,(char *)"Invariant",
-                        (char *)"nested_loops",(char *)"0 <= j && j <= 15",
-                        19);
+                        (char *)"nested_loops",(char *)"0 <= j <= 15",19);
           __gmpz_clear(__e_acsl_k);
           __gmpz_clear(__e_acsl_l);
           __gmpz_clear(__e_acsl_8);
           __gmpz_clear(__e_acsl_j_2);
-          /*@ loop invariant 0 ≤ j ∧ j ≤ 15;
+          /*@ loop invariant 0 ≤ j ≤ 15;
               loop invariant
                 ∀ ℤ k, ℤ l;
-                  (0 ≤ k ∧ k < i) ∧ (0 ≤ l ∧ l < j) ⇒
-                  t[k][l] ≡ k*l;
+                  0 ≤ k < i ∧ 0 ≤ l < j ⇒ t[k][l] ≡ k*l;
           */
           while (j < 15) {
             t[i][j] = i * j;
@@ -364,8 +361,7 @@ void nested_loops(void)
               }
               else __e_acsl_and_3 = 0;
               e_acsl_assert(__e_acsl_and_3,(char *)"Invariant",
-                            (char *)"nested_loops",
-                            (char *)"0 <= j && j <= 15",19);
+                            (char *)"nested_loops",(char *)"0 <= j <= 15",19);
               __e_acsl_forall_2 = 1;
               __gmpz_init(__e_acsl_k_3);
               __gmpz_init(__e_acsl_l_3);
@@ -457,7 +453,7 @@ void nested_loops(void)
               e_acsl_end_loop2: ;
               e_acsl_assert(__e_acsl_forall_2,(char *)"Invariant",
                             (char *)"nested_loops",
-                            (char *)"\\forall integer k, integer l;\n  (0 <= k && k < i) && (0 <= l && l < j) ==> t[k][l] == k*l",
+                            (char *)"\\forall integer k, integer l; 0 <= k < i && 0 <= l < j ==> t[k][l] == k*l",
                             21);
               __gmpz_clear(__e_acsl_10);
               __gmpz_clear(__e_acsl_j_4);
@@ -491,7 +487,7 @@ void nested_loops(void)
         }
         else __e_acsl_and_4 = 0;
         e_acsl_assert(__e_acsl_and_4,(char *)"Invariant",
-                      (char *)"nested_loops",(char *)"0 <= i && i <= 10",17);
+                      (char *)"nested_loops",(char *)"0 <= i <= 10",17);
         __gmpz_clear(__e_acsl_17);
         __gmpz_clear(__e_acsl_i_5);
       }
@@ -530,10 +526,10 @@ void unnatural_loop(void)
       }
       else __e_acsl_and = 0;
       e_acsl_assert(__e_acsl_and,(char *)"Invariant",
-                    (char *)"unnatural_loop",(char *)"0 <= i && i <= 6",28);
+                    (char *)"unnatural_loop",(char *)"0 <= i <= 6",28);
       __gmpz_clear(__e_acsl);
       __gmpz_clear(__e_acsl_i);
-      /*@ loop invariant 0 ≤ i ∧ i ≤ 6; */
+      /*@ loop invariant 0 ≤ i ≤ 6; */
       while (i < 10) {
         if (x == 5) break;
         x = i;
@@ -561,8 +557,7 @@ void unnatural_loop(void)
           }
           else __e_acsl_and_2 = 0;
           e_acsl_assert(__e_acsl_and_2,(char *)"Invariant",
-                        (char *)"unnatural_loop",(char *)"0 <= i && i <= 6",
-                        28);
+                        (char *)"unnatural_loop",(char *)"0 <= i <= 6",28);
           __gmpz_clear(__e_acsl_3);
           __gmpz_clear(__e_acsl_i_3);
         }

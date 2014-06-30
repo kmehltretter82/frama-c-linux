@@ -32,47 +32,63 @@ let term_to_exp_ref
     : (kernel_function -> Env.t -> typ option -> term -> exp * Env.t) ref
     = Extlib.mk_fun "term_to_exp_ref"
 
-let compute_quantif_guards quantif bounded_vars hyps = 
+let compute_quantif_guards quantif bounded_vars hyps =
   let error msg pp x =
     let msg1 = Pretty_utils.sfprintf msg pp x in
-    let msg2 = 
+    let msg2 =
       Pretty_utils.sfprintf "@[ in quantification@ %a@]"
-	Printer.pp_predicate_named quantif
+        Printer.pp_predicate_named quantif
     in
     Error.untypable (msg1 ^ msg2)
   in
-  let rec aux acc vars p = 
-    match p.content with
-    | Pand({ content = Prel((Rlt | Rle) as r1, t11, t12) },
-	   { content = Prel((Rlt | Rle) as r2, t21, t22) }) ->
-      let rec terms t12 t21 = match t12.term_node, t21.term_node with
-	| TLval(TVar x1, TNoOffset), TLval(TVar x2, TNoOffset) -> 
-	  let v, vars = match vars with
-	    | [] -> error "@[too much constraint(s)%a@]" (fun _ () -> ()) ()
-	    | v :: tl -> 
-	      match v.lv_type with
-	      | Ctype ty when isIntegralType ty -> v, tl
-	      | Linteger -> v, tl
-	      | Ltype _ as ty when Logic_const.is_boolean_type ty -> v, tl
-	      | Ctype _ | Ltype _ | Lvar _ | Lreal | Larrow _ -> 
-		error "@[non integer variable %a@]" Printer.pp_logic_var v
-	  in
-	  if Logic_var.equal x1 x2 && Logic_var.equal x1 v then
-	    (t11, r1, x1, r2, t22) :: acc, vars
-	  else
-	    error "@[invalid binder %a@]" Printer.pp_term t21
-	| TLogic_coerce(_, t12), _ -> terms t12 t21 
-	| _, TLogic_coerce(_, t21) -> terms t12 t21
-	| TLval _, _ -> error "@[invalid binder %a@]" Printer.pp_term t21
-	| _, _ -> error "@[invalid binder %a@]" Printer.pp_term t12
+  let rec left_term acc vars left_bound t = match t.term_node with
+    | TLogic_coerce(_, t) -> left_term acc vars left_bound t
+    | TLval(TVar x, TNoOffset) ->
+      (* check if [x] is the correct variable *)
+      let v, vars = match vars with
+        | [] -> error "@[too much constraint(s)%a@]" (fun _ () -> ()) ()
+        | v :: tl -> match v.lv_type with
+          | Ctype ty when isIntegralType ty -> v, tl
+          | Linteger -> v, tl
+          | Ltype _ as ty when Logic_const.is_boolean_type ty -> v, tl
+          | Ctype _ | Ltype _ | Lvar _ | Lreal | Larrow _ ->
+            error "@[non integer variable %a@]" Printer.pp_logic_var v
       in
-      terms t12 t21
-    | Pand(p1, p2) -> 
-      let acc, vars = aux acc vars p1 in
-      aux acc vars p2
+      if Logic_var.equal x v then acc, Some (left_bound, x), vars
+      else error "@[invalid binder %a@]" Printer.pp_term t
+    | _ -> error "@[invalid binder %a@]" Printer.pp_term t
+  in
+  let rec parse acc vars p = match p.content with
+    | Pand(p, { content = Prel((Rlt | Rle) as r, t1, t2) }) ->
+      (* && is left-associative in the AST *)
+      let acc, partial, vars = parse acc vars p in
+      (match partial with
+      | None ->
+        (* left part of a new constraint: the searched variable is [t2] *)
+        left_term acc vars (t1, r) t2
+      | Some ((t_left, r_left), v)  ->
+        (* right part of an existing constraint: the variable is [t1] *)
+        let rec right_term t = match t.term_node with
+          | TLogic_coerce(_, t) -> right_term t
+          | TLval(TVar x, TNoOffset) ->
+            if Logic_var.equal x v then
+              (* new full constraint found *)
+              (t_left, r_left, x, r, t2) :: acc, None, vars
+            else
+              error "@[invalid binder %a@]" Printer.pp_term t
+          | _ -> error "@[invalid binder %a@]" Printer.pp_term t
+        in
+        right_term t1)
+    | Prel((Rlt | Rle) as r, t1, t2) ->
+      (* left-most predicate: the searched variable is [t2] *)
+      left_term acc vars (t1, r) t2
     | _ -> error "@[invalid guard %a@]" Printer.pp_predicate_named p
-  in 
-  let acc, vars = aux [] bounded_vars hyps in
+  in
+  let acc, partial, vars = parse [] bounded_vars hyps in
+  (match partial with
+  | None -> ()
+  | Some(_, x) ->
+    error "@[missing upper-bound for variable %a@]" Printer.pp_logic_var x);
   (match vars with
   | [] -> ()
   | _ :: _ ->

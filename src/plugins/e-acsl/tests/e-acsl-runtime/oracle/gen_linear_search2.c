@@ -23,8 +23,7 @@ unsigned long const __fc_rand_max = (unsigned long)32767;
 /*@ ghost extern int __fc_heap_status; */
 
 /*@
-axiomatic
-  dynamic_allocation {
+axiomatic dynamic_allocation {
   predicate is_allocable{L}(size_t n) 
     reads __fc_heap_status;
   
@@ -95,14 +94,14 @@ predicate diffSize{L1, L2}(ℤ i) =
   \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
  */
 int A[10];
-/*@ requires ∀ ℤ i; 0 ≤ i ∧ i < 9 ⇒ A[i] ≤ A[i+1];
+/*@ requires ∀ ℤ i; 0 ≤ i < 9 ⇒ A[i] ≤ A[i+1];
     
     behavior exists:
-      assumes ∃ ℤ j; (0 ≤ j ∧ j < 10) ∧ A[j] ≡ elt;
+      assumes ∃ ℤ j; 0 ≤ j < 10 ∧ A[j] ≡ elt;
       ensures \result ≡ 1;
     
     behavior not_exists:
-      assumes ∀ ℤ j; 0 ≤ j ∧ j < 10 ⇒ A[j] ≢ elt;
+      assumes ∀ ℤ j; 0 ≤ j < 10 ⇒ A[j] ≢ elt;
       ensures \result ≡ 0;
  */
 int search(int elt)
@@ -167,8 +166,7 @@ int search(int elt)
     }
     e_acsl_end_loop1: ;
     e_acsl_assert(__e_acsl_forall,(char *)"Invariant",(char *)"search",
-                  (char *)"\\forall integer i; 0 <= i && i < k ==> A[i] < elt",
-                  20);
+                  (char *)"\\forall integer i; 0 <= i < k ==> A[i] < elt",20);
     __gmpz_init_set_si(__e_acsl_4,(long)0);
     __gmpz_init_set_si(__e_acsl_k_2,(long)k);
     __e_acsl_le = __gmpz_cmp((__mpz_struct const *)(__e_acsl_4),
@@ -187,12 +185,12 @@ int search(int elt)
     }
     else __e_acsl_and = 0;
     e_acsl_assert(__e_acsl_and,(char *)"Invariant",(char *)"search",
-                  (char *)"0 <= k && k <= 10",19);
+                  (char *)"0 <= k <= 10",19);
     __gmpz_clear(__e_acsl_i);
     __gmpz_clear(__e_acsl_4);
     __gmpz_clear(__e_acsl_k_2);
-    /*@ loop invariant 0 ≤ k ∧ k ≤ 10;
-        loop invariant ∀ ℤ i; 0 ≤ i ∧ i < k ⇒ A[i] < elt;
+    /*@ loop invariant 0 ≤ k ≤ 10;
+        loop invariant ∀ ℤ i; 0 ≤ i < k ⇒ A[i] < elt;
     */
     while (k < 10) {
       if (A[k] == elt) {
@@ -230,7 +228,7 @@ int search(int elt)
         }
         else __e_acsl_and_2 = 0;
         e_acsl_assert(__e_acsl_and_2,(char *)"Invariant",(char *)"search",
-                      (char *)"0 <= k && k <= 10",19);
+                      (char *)"0 <= k <= 10",19);
         __e_acsl_forall_2 = 1;
         __gmpz_init(__e_acsl_i_3);
         {
@@ -281,7 +279,7 @@ int search(int elt)
         }
         e_acsl_end_loop2: ;
         e_acsl_assert(__e_acsl_forall_2,(char *)"Invariant",(char *)"search",
-                      (char *)"\\forall integer i; 0 <= i && i < k ==> A[i] < elt",
+                      (char *)"\\forall integer i; 0 <= i < k ==> A[i] < elt",
                       20);
         __gmpz_clear(__e_acsl_6);
         __gmpz_clear(__e_acsl_k_4);
@@ -293,14 +291,14 @@ int search(int elt)
   return_label: return __retres;
 }
 
-/*@ requires ∀ ℤ i; 0 ≤ i ∧ i < 9 ⇒ A[i] ≤ A[i+1];
+/*@ requires ∀ ℤ i; 0 ≤ i < 9 ⇒ A[i] ≤ A[i+1];
     
     behavior exists:
-      assumes ∃ ℤ j; (0 ≤ j ∧ j < 10) ∧ A[j] ≡ elt;
+      assumes ∃ ℤ j; 0 ≤ j < 10 ∧ A[j] ≡ elt;
       ensures \result ≡ 1;
     
     behavior not_exists:
-      assumes ∀ ℤ j; 0 ≤ j ∧ j < 10 ⇒ A[j] ≢ elt;
+      assumes ∀ ℤ j; 0 ≤ j < 10 ⇒ A[j] ≢ elt;
       ensures \result ≡ 0;
  */
 int __e_acsl_search(int elt)
@@ -371,7 +369,7 @@ int __e_acsl_search(int elt)
     }
     e_acsl_end_loop3: ;
     e_acsl_assert(__e_acsl_forall,(char *)"Precondition",(char *)"search",
-                  (char *)"\\forall integer i; 0 <= i && i < 9 ==> A[i] <= A[i+1]",
+                  (char *)"\\forall integer i; 0 <= i < 9 ==> A[i] <= A[i+1]",
                   9);
     __gmpz_clear(__e_acsl_i);
     {
@@ -503,7 +501,7 @@ int __e_acsl_search(int elt)
       __gmpz_clear(__e_acsl_12);
     }
     e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",(char *)"search",
-                  (char *)"\\old(\\exists integer j; (0 <= j && j < 10) && A[j] == elt) ==> \\result == 1",
+                  (char *)"\\old(\\exists integer j; 0 <= j < 10 && A[j] == elt) ==> \\result == 1",
                   12);
     if (! __e_acsl_at_2) __e_acsl_implies_2 = 1;
     else {
@@ -520,7 +518,7 @@ int __e_acsl_search(int elt)
     }
     e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",
                   (char *)"search",
-                  (char *)"\\old(\\forall integer j; 0 <= j && j < 10 ==> A[j] != elt) ==> \\result == 0",
+                  (char *)"\\old(\\forall integer j; 0 <= j < 10 ==> A[j] != elt) ==> \\result == 0",
                   15);
     return __retres;
   }

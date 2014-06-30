@@ -23,8 +23,7 @@ unsigned long const __fc_rand_max = (unsigned long)32767;
 /*@ ghost extern int __fc_heap_status; */
 
 /*@
-axiomatic
-  dynamic_allocation {
+axiomatic dynamic_allocation {
   predicate is_allocable{L}(size_t n) 
     reads __fc_heap_status;
   
@@ -122,7 +121,7 @@ predicate diffSize{L1, L2}(ℤ i) =
   \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
  */
 /*@ behavior yes:
-      assumes ∀ int i; 0 < i ∧ i < n ⇒ *(t+(i-1)) ≤ *(t+i);
+      assumes ∀ int i; 0 < i < n ⇒ *(t+(i-1)) ≤ *(t+i);
       ensures \result ≡ 1;
  */
 int sorted(int *t, int n)
@@ -147,7 +146,7 @@ int sorted(int *t, int n)
 }
 
 /*@ behavior yes:
-      assumes ∀ int i; 0 < i ∧ i < n ⇒ *(t+(i-1)) ≤ *(t+i);
+      assumes ∀ int i; 0 < i < n ⇒ *(t+(i-1)) ≤ *(t+i);
       ensures \result ≡ 1;
  */
 int __e_acsl_sorted(int *t, int n)
@@ -245,7 +244,7 @@ int __e_acsl_sorted(int *t, int n)
       __gmpz_clear(__e_acsl_8);
     }
     e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",(char *)"sorted",
-                  (char *)"\\old(\\forall int i; 0 < i && i < n ==> *(t+(i-1)) <= *(t+i)) ==> \\result == 1",
+                  (char *)"\\old(\\forall int i; 0 < i < n ==> *(t+(i-1)) <= *(t+i)) ==> \\result == 1",
                   9);
     __delete_block((void *)(& t));
     return __retres;

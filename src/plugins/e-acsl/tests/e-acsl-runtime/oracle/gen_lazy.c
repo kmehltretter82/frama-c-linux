@@ -23,8 +23,7 @@ unsigned long const __fc_rand_max = (unsigned long)32767;
 /*@ ghost extern int __fc_heap_status; */
 
 /*@
-axiomatic
-  dynamic_allocation {
+axiomatic dynamic_allocation {
   predicate is_allocable{L}(size_t n) 
     reads __fc_heap_status;
   
@@ -187,12 +186,12 @@ int main(void)
     e_acsl_assert(__e_acsl_or_5 == (y != 0),(char *)"Assertion",
                   (char *)"main",(char *)"(x!=0||y!=0) == (y!=0)",29);
   }
-  /*@ assert (x≢0∧y≢0) ≡ (x≢0); */
+  /*@ assert (x≢0 ∧ y≢0) ≡ (x≢0); */
   {
     int __e_acsl_and_5;
     if (x != 0) __e_acsl_and_5 = y != 0; else __e_acsl_and_5 = 0;
     e_acsl_assert(__e_acsl_and_5 == (x != 0),(char *)"Assertion",
-                  (char *)"main",(char *)"(x!=0&&y!=0) == (x!=0)",30);
+                  (char *)"main",(char *)"(x!=0 && y!=0) == (x!=0)",30);
   }
   __retres = 0;
   return __retres;

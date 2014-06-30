@@ -39,8 +39,7 @@ unsigned long const __fc_rand_max = 32767UL;
 /*@ ghost extern int __fc_heap_status; */
 
 /*@
-axiomatic
-  dynamic_allocation {
+axiomatic dynamic_allocation {
   predicate is_allocable{L}(size_t n) 
     reads __fc_heap_status;
   

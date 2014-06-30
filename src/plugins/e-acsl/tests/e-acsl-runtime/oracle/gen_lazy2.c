@@ -23,8 +23,7 @@ unsigned long const __fc_rand_max = (unsigned long)32767;
 /*@ ghost extern int __fc_heap_status; */
 
 /*@
-axiomatic
-  dynamic_allocation {
+axiomatic dynamic_allocation {
   predicate is_allocable{L}(size_t n) 
     reads __fc_heap_status;
   
@@ -708,7 +707,7 @@ int main(void)
     __gmpz_clear(__e_acsl_y_20);
     __gmpz_clear(__e_acsl_45);
   }
-  /*@ assert (x≢0∧y≢0) ≡ (x≢0); */
+  /*@ assert (x≢0 ∧ y≢0) ≡ (x≢0); */
   {
     mpz_t __e_acsl_x_22;
     mpz_t __e_acsl_46;
@@ -743,7 +742,7 @@ int main(void)
     __e_acsl_eq_27 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_and_5),
                                 (__mpz_struct const *)(__e_acsl_49));
     e_acsl_assert(__e_acsl_eq_27 == 0,(char *)"Assertion",(char *)"main",
-                  (char *)"(x!=0&&y!=0) == (x!=0)",30);
+                  (char *)"(x!=0 && y!=0) == (x!=0)",30);
     __gmpz_clear(__e_acsl_x_22);
     __gmpz_clear(__e_acsl_46);
     __gmpz_clear(__e_acsl_and_5);

@@ -23,8 +23,7 @@ unsigned long const __fc_rand_max = (unsigned long)32767;
 /*@ ghost extern int __fc_heap_status; */
 
 /*@
-axiomatic
-  dynamic_allocation {
+axiomatic dynamic_allocation {
   predicate is_allocable{L}(size_t n) 
     reads __fc_heap_status;
   
@@ -72,7 +71,7 @@ int main(void)
     int i;
     i = 0;
     while (i < 10) {
-      /*@ invariant 0 ≤ i ∧ i < 10; */
+      /*@ invariant 0 ≤ i < 10; */
       {
         mpz_t __e_acsl;
         mpz_t __e_acsl_i;
@@ -96,7 +95,7 @@ int main(void)
         }
         else __e_acsl_and = 0;
         e_acsl_assert(__e_acsl_and,(char *)"Invariant",(char *)"main",
-                      (char *)"0 <= i && i < 10",9);
+                      (char *)"0 <= i < 10",9);
         __gmpz_clear(__e_acsl);
         __gmpz_clear(__e_acsl_i);
       }

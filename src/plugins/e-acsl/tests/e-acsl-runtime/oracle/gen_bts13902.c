@@ -23,8 +23,7 @@ unsigned long const __fc_rand_max = (unsigned long)32767;
 /*@ ghost extern int __fc_heap_status; */
 
 /*@
-axiomatic
-  dynamic_allocation {
+axiomatic dynamic_allocation {
   predicate is_allocable{L}(size_t n) 
     reads __fc_heap_status;
   
@@ -130,14 +129,14 @@ predicate diffSize{L1, L2}(ℤ i) =
   \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
  */
 /*@ behavior exists:
-      assumes ∃ ℤ i; (0 ≤ i ∧ i < n) ∧ (int)*((char *)buf+i) ≡ c;
+      assumes ∃ ℤ i; 0 ≤ i < n ∧ (int)*((char *)buf+i) ≡ c;
       ensures
         ∀ int j;
-          0 ≤ j ∧ j < \offset((char *)\result) ⇒
+          0 ≤ j < \offset((char *)\result) ⇒
           (int)*((char *)\old(buf)+j) ≢ \old(c);
     
     behavior not_exists:
-      assumes ∀ ℤ k; 0 ≤ k ∧ k < n ⇒ (int)*((char *)buf+k) ≢ c;
+      assumes ∀ ℤ k; 0 ≤ k < n ⇒ (int)*((char *)buf+k) ≢ c;
       ensures \result ≡ (void *)0;
  */
 void *memchr(void const *buf, int c, size_t n)
@@ -171,14 +170,14 @@ void *memchr(void const *buf, int c, size_t n)
 }
 
 /*@ behavior exists:
-      assumes ∃ ℤ i; (0 ≤ i ∧ i < n) ∧ (int)*((char *)buf+i) ≡ c;
+      assumes ∃ ℤ i; 0 ≤ i < n ∧ (int)*((char *)buf+i) ≡ c;
       ensures
         ∀ int j;
-          0 ≤ j ∧ j < \offset((char *)\result) ⇒
+          0 ≤ j < \offset((char *)\result) ⇒
           (int)*((char *)\old(buf)+j) ≢ \old(c);
     
     behavior not_exists:
-      assumes ∀ ℤ k; 0 ≤ k ∧ k < n ⇒ (int)*((char *)buf+k) ≢ c;
+      assumes ∀ ℤ k; 0 ≤ k < n ⇒ (int)*((char *)buf+k) ≢ c;
       ensures \result ≡ (void *)0;
  */
 void *__e_acsl_memchr(void const *buf, int c, size_t n)
@@ -369,13 +368,13 @@ void *__e_acsl_memchr(void const *buf, int c, size_t n)
       __gmpz_clear(__e_acsl_j);
     }
     e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",(char *)"memchr",
-                  (char *)"\\old(\\exists integer i; (0 <= i && i < n) && (int)*((char *)buf+i) == c) ==>\n(\\forall int j;\n   0 <= j && j < \\offset((char *)\\result) ==>\n   (int)*((char *)\\old(buf)+j) != \\old(c))",
+                  (char *)"\\old(\\exists integer i; 0 <= i < n && (int)*((char *)buf+i) == c) ==>\n(\\forall int j;\n   0 <= j < \\offset((char *)\\result) ==>\n   (int)*((char *)\\old(buf)+j) != \\old(c))",
                   13);
     if (! __e_acsl_at_4) __e_acsl_implies_2 = 1;
     else __e_acsl_implies_2 = __retres == (void *)0;
     e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",
                   (char *)"memchr",
-                  (char *)"\\old(\\forall integer k; 0 <= k && k < n ==> (int)*((char *)buf+k) != c) ==>\n\\result == (void *)0",
+                  (char *)"\\old(\\forall integer k; 0 <= k < n ==> (int)*((char *)buf+k) != c) ==>\n\\result == (void *)0",
                   16);
     __delete_block((void *)(& buf));
     __delete_block((void *)(& __retres));

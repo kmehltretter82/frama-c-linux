@@ -23,8 +23,7 @@ unsigned long const __fc_rand_max = (unsigned long)32767;
 /*@ ghost extern int __fc_heap_status; */
 
 /*@
-axiomatic
-  dynamic_allocation {
+axiomatic dynamic_allocation {
   predicate is_allocable{L}(size_t n) 
     reads __fc_heap_status;
   
@@ -168,8 +167,7 @@ void __e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     behavior UnderEstimate_Motoring:
       assumes \true;
       ensures
-        *\old(Mtmin_out)≡*\old(Mtmin_in)∧*\old(Mtmin_in)<0.85**\old(
-                                                                   Mwmin)?
+        *\old(Mtmin_out) ≡ *\old(Mtmin_in) < 0.85**\old(Mwmin)?
           *\old(Mtmin_in) ≢ 0.:
           0.85**\old(Mwmin) ≢ 0.;
  */
@@ -193,8 +191,7 @@ void bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     behavior UnderEstimate_Motoring:
       assumes \true;
       ensures
-        *\old(Mtmin_out)≡*\old(Mtmin_in)∧*\old(Mtmin_in)<0.85**\old(
-                                                                   Mwmin)?
+        *\old(Mtmin_out) ≡ *\old(Mtmin_in) < 0.85**\old(Mwmin)?
           *\old(Mtmin_in) ≢ 0.:
           0.85**\old(Mwmin) ≢ 0.;
  */
@@ -278,7 +275,7 @@ void __e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
       __e_acsl_if = 0.85 * *__e_acsl_at_6 != 0.;
     }
     e_acsl_assert(__e_acsl_if,(char *)"Postcondition",(char *)"bar",
-                  (char *)"*\\old(Mtmin_out)==*\\old(Mtmin_in)&&*\\old(Mtmin_in)<0.85**\\old(Mwmin)?\n  *\\old(Mtmin_in) != 0.:\n  0.85**\\old(Mwmin) != 0.",
+                  (char *)"*\\old(Mtmin_out) == *\\old(Mtmin_in) < 0.85**\\old(Mwmin)?\n  *\\old(Mtmin_in) != 0.:\n  0.85**\\old(Mwmin) != 0.",
                   25);
     __delete_block((void *)(& Mtmin_in));
     __delete_block((void *)(& Mwmin));

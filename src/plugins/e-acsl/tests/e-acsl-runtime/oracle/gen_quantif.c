@@ -23,8 +23,7 @@ unsigned long const __fc_rand_max = (unsigned long)32767;
 /*@ ghost extern int __fc_heap_status; */
 
 /*@
-axiomatic
-  dynamic_allocation {
+axiomatic dynamic_allocation {
   predicate is_allocable{L}(size_t n) 
     reads __fc_heap_status;
   
@@ -43,7 +42,7 @@ predicate diffSize{L1, L2}(ℤ i) =
 int main(void)
 {
   int __retres;
-  /*@ assert ∀ ℤ x; 0 ≤ x ∧ x ≤ 1 ⇒ x ≡ 0 ∨ x ≡ 1; */
+  /*@ assert ∀ ℤ x; 0 ≤ x ≤ 1 ⇒ x ≡ 0 ∨ x ≡ 1; */
   {
     int __e_acsl_forall;
     int __e_acsl_x;
@@ -65,10 +64,10 @@ int main(void)
     }
     e_acsl_end_loop1: ;
     e_acsl_assert(__e_acsl_forall,(char *)"Assertion",(char *)"main",
-                  (char *)"\\forall integer x; 0 <= x && x <= 1 ==> x == 0 || x == 1",
+                  (char *)"\\forall integer x; 0 <= x <= 1 ==> x == 0 || x == 1",
                   11);
   }
-  /*@ assert ∀ ℤ x; 0 < x ∧ x ≤ 1 ⇒ x ≡ 1; */
+  /*@ assert ∀ ℤ x; 0 < x ≤ 1 ⇒ x ≡ 1; */
   {
     int __e_acsl_forall_2;
     int __e_acsl_x_2;
@@ -85,10 +84,9 @@ int main(void)
     }
     e_acsl_end_loop2: ;
     e_acsl_assert(__e_acsl_forall_2,(char *)"Assertion",(char *)"main",
-                  (char *)"\\forall integer x; 0 < x && x <= 1 ==> x == 1",
-                  12);
+                  (char *)"\\forall integer x; 0 < x <= 1 ==> x == 1",12);
   }
-  /*@ assert ∀ ℤ x; 0 < x ∧ x < 1 ⇒ \false; */
+  /*@ assert ∀ ℤ x; 0 < x < 1 ⇒ \false; */
   {
     int __e_acsl_forall_3;
     int __e_acsl_x_3;
@@ -105,10 +103,9 @@ int main(void)
     }
     e_acsl_end_loop3: ;
     e_acsl_assert(__e_acsl_forall_3,(char *)"Assertion",(char *)"main",
-                  (char *)"\\forall integer x; 0 < x && x < 1 ==> \\false",
-                  13);
+                  (char *)"\\forall integer x; 0 < x < 1 ==> \\false",13);
   }
-  /*@ assert ∀ ℤ x; 0 ≤ x ∧ x < 1 ⇒ x ≡ 0; */
+  /*@ assert ∀ ℤ x; 0 ≤ x < 1 ⇒ x ≡ 0; */
   {
     int __e_acsl_forall_4;
     int __e_acsl_x_4;
@@ -125,13 +122,11 @@ int main(void)
     }
     e_acsl_end_loop4: ;
     e_acsl_assert(__e_acsl_forall_4,(char *)"Assertion",(char *)"main",
-                  (char *)"\\forall integer x; 0 <= x && x < 1 ==> x == 0",
-                  14);
+                  (char *)"\\forall integer x; 0 <= x < 1 ==> x == 0",14);
   }
   /*@ assert
       ∀ ℤ x, ℤ y, ℤ z;
-        ((0 ≤ x ∧ x < 2) ∧ (0 ≤ y ∧ y < 5)) ∧
-        (0 ≤ z ∧ z ≤ y) ⇒ x+z ≤ y+1;
+        0 ≤ x < 2 ∧ 0 ≤ y < 5 ∧ 0 ≤ z ≤ y ⇒ x+z ≤ y+1;
   */
   {
     int __e_acsl_forall_5;
@@ -161,10 +156,10 @@ int main(void)
     }
     e_acsl_end_loop5: ;
     e_acsl_assert(__e_acsl_forall_5,(char *)"Assertion",(char *)"main",
-                  (char *)"\\forall integer x, integer y, integer z;\n  ((0 <= x && x < 2) && (0 <= y && y < 5)) && (0 <= z && z <= y) ==>\n  x+z <= y+1",
+                  (char *)"\\forall integer x, integer y, integer z;\n  0 <= x < 2 && 0 <= y < 5 && 0 <= z <= y ==> x+z <= y+1",
                   18);
   }
-  /*@ assert ∃ int x; (0 ≤ x ∧ x < 10) ∧ x ≡ 5; */
+  /*@ assert ∃ int x; 0 ≤ x < 10 ∧ x ≡ 5; */
   {
     int __e_acsl_exists;
     int __e_acsl_x_6;
@@ -181,12 +176,12 @@ int main(void)
     }
     e_acsl_end_loop6: ;
     e_acsl_assert(__e_acsl_exists,(char *)"Assertion",(char *)"main",
-                  (char *)"\\exists int x; (0 <= x && x < 10) && x == 5",23);
+                  (char *)"\\exists int x; 0 <= x < 10 && x == 5",23);
   }
   /*@ assert
       ∀ int x;
-        0 ≤ x ∧ x < 10 ⇒
-        (x%2 ≡ 0 ⇒ (∃ ℤ y; (0 ≤ y ∧ y ≤ x/2) ∧ x ≡ 2*y));
+        0 ≤ x < 10 ⇒
+        x%2 ≡ 0 ⇒ (∃ ℤ y; 0 ≤ y ≤ x/2 ∧ x ≡ 2*y);
   */
   {
     int __e_acsl_forall_6;
@@ -225,7 +220,7 @@ int main(void)
     }
     e_acsl_end_loop8: ;
     e_acsl_assert(__e_acsl_forall_6,(char *)"Assertion",(char *)"main",
-                  (char *)"\\forall int x;\n  0 <= x && x < 10 ==>\n  (x%2 == 0 ==> (\\exists integer y; (0 <= y && y <= x/2) && x == 2*y))",
+                  (char *)"\\forall int x;\n  0 <= x < 10 ==> x%2 == 0 ==> (\\exists integer y; 0 <= y <= x/2 && x == 2*y)",
                   27);
   }
   __retres = 0;
