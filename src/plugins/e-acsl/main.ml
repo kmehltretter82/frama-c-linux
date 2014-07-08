@@ -197,10 +197,39 @@ let add_e_acsl_library _files =
    - locations are better (indicate an existing file, and not a temp file) *)
 let () = Cmdline.run_after_configuring_stage add_e_acsl_library
 
+(* The Frama-C standard library contains specific built-in variables prefixed by
+   "__fc_" and declared as extern: they prevent the generated code to be
+   linked. This modification of the default printer replaces them by their
+   original version from the stdlib. For instance, [__fc_stdout] is replaced by
+   [stdout]. That is very hackish since it modifies the default Frama-C
+   printer.
+
+   TODO: should be done by the Frama-C default printer at some points. *)
+let change_printer =
+  (* not projectified on purpose: this printer change is common to each
+     project. *)
+  let first = ref true in
+  fun () ->
+    if !first then begin
+      first := false;
+      let r = Str.regexp "^__fc_" in
+      let pp () = object
+        inherit (Printer.extensible_printer ()) as super
+        method !varinfo fmt vi =
+          if not vi.Cil_types.vghost then
+            let s = Str.replace_first r "" vi.Cil_types.vname in
+            Format.fprintf fmt "%s" s
+          else
+            super#varinfo fmt vi
+      end in
+      Printer.change_printer pp
+    end
+
 let main () =
-  if Options.Run.get () then
+  if Options.Run.get () then begin
+    change_printer ();
     ignore (generate_code (Options.Project_name.get ()))
-  else
+  end else
     if Options.Check.get () then
       apply_on_e_acsl_ast
 	(fun () -> 

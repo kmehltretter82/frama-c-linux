@@ -1,0 +1,63 @@
+[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -dD FRAMAC_SHARE/e-acsl/e_acsl.h"
+[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -dD FRAMAC_SHARE/e-acsl/e_acsl_gmp_types.h"
+[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -dD FRAMAC_SHARE/e-acsl/e_acsl_gmp.h"
+[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -dD FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel_api.h"
+[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -dD FRAMAC_SHARE/e-acsl/memory_model/e_acsl_bittree.h"
+[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -dD FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h"
+[kernel] preprocessing with "gcc -C -E -I.  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -dD tests/e-acsl-runtime/stdout.c"
+[e-acsl] beginning translation.
+[e-acsl] translation done in project "e-acsl".
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value] Values of globals at initialization
+  random_counter ∈ {0}
+  rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __e_acsl_init ∈ [--..--]
+  __e_acsl_internal_heap ∈ [--..--]
+  __memory_size ∈ [--..--]
+  stdout ∈ {{ NULL ; &S___fc_stdout }}
+  fopen[0..1] ∈ {0}
+  _p__fc_fopen ∈ {{ &fopen }}
+  S___fc_stdout[0]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .mode} ∈
+               [--..--]
+               [0].__fc_inode ∈ {{ NULL ; &S___fc_inode_0_S___fc_stdout }}
+               [1]{.__fc_stdio_id; .__fc_maxsz; .__fc_writepos; .__fc_readpos; .__fc_is_a_socket; .mode} ∈
+               [--..--]
+               [1].__fc_inode ∈ {{ NULL ; &S___fc_inode_1_S___fc_stdout }}
+  S___fc_inode_0_S___fc_stdout[0]{.st_dev; .st_ino; .st_mode; .st_nlink; .st_uid; .st_gid; .st_rdev; .st_size; .st_atime; .st_mtime; .st_ctime; .st_blksize; .st_blocks} ∈
+                              [--..--]
+                              [0].__fc_real_data ∈
+                              {{ NULL ;
+                                 &S___fc_real_data_0_S___fc_inode_0_S___fc_stdout }}
+                              {[0].__fc_real_data_max_size; [1]{.st_dev; .st_ino; .st_mode; .st_nlink; .st_uid; .st_gid; .st_rdev; .st_size; .st_atime; .st_mtime; .st_ctime; .st_blksize; .st_blocks}} ∈
+                              [--..--]
+                              [1].__fc_real_data ∈
+                              {{ NULL ;
+                                 &S___fc_real_data_1_S___fc_inode_0_S___fc_stdout }}
+                              [1].__fc_real_data_max_size ∈ [--..--]
+  S___fc_real_data_0_S___fc_inode_0_S___fc_stdout[0..1] ∈ [--..--]
+  S___fc_real_data_1_S___fc_inode_0_S___fc_stdout[0..1] ∈ [--..--]
+  S___fc_inode_1_S___fc_stdout[0]{.st_dev; .st_ino; .st_mode; .st_nlink; .st_uid; .st_gid; .st_rdev; .st_size; .st_atime; .st_mtime; .st_ctime; .st_blksize; .st_blocks} ∈
+                              [--..--]
+                              [0].__fc_real_data ∈
+                              {{ NULL ;
+                                 &S___fc_real_data_0_S___fc_inode_1_S___fc_stdout }}
+                              {[0].__fc_real_data_max_size; [1]{.st_dev; .st_ino; .st_mode; .st_nlink; .st_uid; .st_gid; .st_rdev; .st_size; .st_atime; .st_mtime; .st_ctime; .st_blksize; .st_blocks}} ∈
+                              [--..--]
+                              [1].__fc_real_data ∈
+                              {{ NULL ;
+                                 &S___fc_real_data_1_S___fc_inode_1_S___fc_stdout }}
+                              [1].__fc_real_data_max_size ∈ [--..--]
+  S___fc_real_data_0_S___fc_inode_1_S___fc_stdout[0..1] ∈ [--..--]
+  S___fc_real_data_1_S___fc_inode_1_S___fc_stdout[0..1] ∈ [--..--]
+[value] using specification for function __store_block
+[value] using specification for function __full_init
+tests/e-acsl-runtime/stdout.c:12:[value] Assertion got status unknown.
+[value] using specification for function e_acsl_assert
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
+[value] using specification for function __delete_block
+[value] using specification for function __e_acsl_memory_clean
+[value] done for function main
+[value] ====== VALUES COMPUTED ======
