@@ -47,8 +47,8 @@ typedef struct __fc_FILE FILE;
 /*@
 model __mpz_struct { ℤ n };
 */
-int __fc_random_counter __attribute__((__unused__));
-unsigned long const __fc_rand_max = (unsigned long)32767;
+int random_counter __attribute__((__unused__));
+unsigned long const rand_max = (unsigned long)32767;
 /*@ ghost extern int __fc_heap_status; */
 
 /*@
@@ -79,10 +79,10 @@ extern  __attribute__((__FC_BUILTIN__)) void __literal_string(void *ptr);
 predicate diffSize{L1, L2}(ℤ i) =
   \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
  */
-extern FILE *__fc_stdout;
+extern FILE *stdout;
 
-FILE __fc_fopen[512];
-FILE const *_p__fc_fopen = (FILE const *)(__fc_fopen);
+FILE fopen[512];
+FILE const *_p__fc_fopen = (FILE const *)(fopen);
 /*@ assigns *__fc_stdout;
     assigns *__fc_stdout \from *(format+(..)); */
 extern int printf(char const *format , ...);

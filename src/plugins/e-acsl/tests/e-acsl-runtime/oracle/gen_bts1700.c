@@ -21,8 +21,8 @@ extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
 /*@
 model __mpz_struct { ℤ n };
 */
-int __fc_random_counter __attribute__((__unused__));
-unsigned long const __fc_rand_max = (unsigned long)32767;
+int random_counter __attribute__((__unused__));
+unsigned long const rand_max = (unsigned long)32767;
 /*@ ghost extern int __fc_heap_status; */
 
 /*@
