@@ -196,18 +196,40 @@ class e_acsl_visitor prj generate = object (self)
 		      [ cil_fct; GFun(main, Location.unknown) ]
 		  in
 		  f.globals <- new_globals
-		| None -> 
+		| None ->
 		  Kernel.warning "@[no entry point specified:@ \
 you must call function `%s' and `__e_acsl_memory_clean by yourself.@]" 
-		    fname;
-		  f.globals <- f.globals @ [ cil_fct ]
-	    in
-	    Project.on prj build_initializer ()
-	end;
-	(* reset copied states at the end to be observationally equivalent to a
-	   standard visitor. *)
-	if generate then Project.clear ~selection ~project:prj ();
-	f)
+      fname;
+    f.globals <- f.globals @ [ cil_fct ]
+     in
+     Project.on prj build_initializer ()
+ end;
+
+ (* init memory store, and then add program arguments if there
+    are any. must be called before global variables are
+    initialized. *)
+ if Pre_analysis.use_model () then begin
+   match main_fct with
+   | Some main ->
+     let charPtrPtrType = TPtr(Cil.charPtrType,[]) in
+     let loc = Location.unknown in
+     (* this might not be valid in an embedded environment,
+        where int/char**  arguments is not necessarily valid *)
+     let stmts_pre = match main.sformals with
+       | { vtype = t1 }::{ vtype = t2 }::_ when
+           t1 = Cil.intType && t2 = charPtrPtrType ->
+         let args = (List.map Cil.evar main.sformals) in
+         [(Misc.mk_call loc "__init_args" args)]
+       | _ -> []
+     in
+     main.sbody.bstmts <- stmts_pre @ main.sbody.bstmts;
+   | None -> ()
+ end;
+
+ (* reset copied states at the end to be observationally equivalent to a
+    standard visitor. *)
+ if generate then Project.clear ~selection ~project:prj ();
+ f)
 
   method !vglob_aux = function
   | GVarDecl(_, vi, _) | GVar(vi, _, _) | GFun({ svar = vi }, _) 

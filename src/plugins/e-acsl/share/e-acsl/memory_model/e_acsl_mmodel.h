@@ -53,6 +53,11 @@ void * __calloc(size_t nbr_elt, size_t size_elt)
 
 /* From outside the library, the following functions have no side effect */
 
+/* put argc/argv in memory model */
+/*@ assigns \nothing; */
+void __init_args(int argc_ref, char **argv_ref)
+	__attribute__((FC_BUILTIN));
+
 /* store the block of size bytes starting at ptr */
 /*@ assigns \result \from *(((char*)ptr)+(0..size-1)); */
 void * __store_block(void * ptr, size_t size)
