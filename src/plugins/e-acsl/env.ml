@@ -155,8 +155,7 @@ let do_new_var ~loc init ?(global=false) ?(name="") env t ty mk_stmts =
   let n = succ env.cpt in
   let v =
     Cil.makeVarinfo
-      ~logic:false
-      ~generated:true
+      ~source:true
       false (* is a global? *)
       false (* is a formal? *)
       (Varname.get ("__e_acsl" ^ if name = "" then "" else "_" ^ name))

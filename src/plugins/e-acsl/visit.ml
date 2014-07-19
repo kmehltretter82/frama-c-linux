@@ -150,7 +150,7 @@ class e_acsl_visitor prj generate = object (self)
               let blk = Cil.mkBlock stmts in
               let fname = "__e_acsl_memory_init" in
               let vi = 
-                Cil.makeGlobalVar ~logic:false ~generated:true 
+                Cil.makeGlobalVar ~source:true
                   fname
                   (TFun(Cil.voidType, Some [], false, []))
               in

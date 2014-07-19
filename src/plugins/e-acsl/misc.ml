@@ -97,8 +97,7 @@ let kind_to_string loc k =
     | RTE -> "RTE")
 
 let is_generated_varinfo vi =
-  vi.vgenerated
-  && let name = vi.vname in
+  let name = vi.vname in
      name.[0] = '_'
      && name.[1] = '_'
      && name.[2] = 'e'
