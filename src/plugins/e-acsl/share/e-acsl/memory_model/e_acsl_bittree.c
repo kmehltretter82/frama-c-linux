@@ -371,7 +371,8 @@ struct _block * __get_cont (void * ptr) {
       }
       /* tmp->addr <= ptr, tmp may contain ptr
 	 ptr is contained if tmp is large enough (begin addr + size) */
-      else if((size_t)ptr <= tmp->leaf->size + tmp->addr)
+      else if((size_t)ptr < tmp->leaf->size + tmp->addr
+              || (tmp->leaf->size == 0 && (size_t)ptr == tmp->leaf->ptr))
 	return tmp->leaf;
       /* tmp->addr <= ptr, but tmp->addr is not large enough */
       else if (ind == -1)
