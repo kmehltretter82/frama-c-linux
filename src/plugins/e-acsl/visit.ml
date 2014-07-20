@@ -472,13 +472,14 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
               | ret :: l ->
                 let loc = Stmt.loc stmt in
                 let delete_stmts =
-                  Globals.Vars.fold_in_file_order
-                    (fun vi _ acc -> 
-                      if Pre_analysis.must_model_vi vi then 
-                        let vi = Cil.get_varinfo self#behavior vi in
-                        Misc.mk_delete_stmt vi :: acc
+                  Varinfo.Hashtbl.fold_sorted
+                    (fun old_vi _ acc ->
+                      if Pre_analysis.must_model_vi old_vi then
+                        let new_vi = Cil.get_varinfo self#behavior old_vi in
+                        Misc.mk_delete_stmt new_vi :: acc
                       else
                         acc)
+                    global_vars
                     [ Misc.mk_call ~loc "__e_acsl_memory_clean" []; ret ]
                 in
                 b.bstmts <- List.rev l @ delete_stmts
