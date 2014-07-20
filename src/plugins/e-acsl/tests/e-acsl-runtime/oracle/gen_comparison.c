@@ -45,7 +45,7 @@ extern  __attribute__((__FC_BUILTIN__)) void __literal_string(void *ptr);
 
 /*@ ghost extern int __e_acsl_internal_heap; */
 
-/*@ ghost extern size_t __memory_size; */
+extern size_t __memory_size;
 
 /*@
 predicate diffSize{L1, L2}(ℤ i) =
