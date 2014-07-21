@@ -7,6 +7,7 @@ struct __anonstruct___mpz_struct_1 {
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
 typedef unsigned int size_t;
+typedef int wchar_t;
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
@@ -162,11 +163,354 @@ extern  __attribute__((__FC_BUILTIN__)) void __e_acsl_memory_clean(void);
 predicate diffSize{L1, L2}(ℤ i) =
   \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
  */
-/*@ assigns \result, *(x_0+(0 ..));
-    assigns \result \from *(x_0+(0 ..));
-    assigns *(x_0+(0 ..)) \from *(x_0+(0 ..));
+/*@
+axiomatic
+  MemCmp {
+  logic ℤ memcmp{L}(char *s1, char *s2, ℤ n)
+    
+    reads *(s1+(0 .. n-1)), *(s2+(0 .. n-1));
+  
+  axiom
+  memcmp_zero{L}:
+                 ∀ char *s1, char *s2;
+                   (∀ ℤ n;
+                      memcmp{L}(s1, s2, n) ≡ 0 ⇔
+                      (∀ ℤ i; 0 ≤ i ∧ i < n ⇒ *(s1+i) ≡ *(s2+i)));
+  
+  }
  */
-extern int ( /* missing proto */ strlen)(char *x_0);
+/*@
+axiomatic
+  MemChr {
+  logic 𝔹 memchr{L}(char *s, ℤ c, ℤ n) ;
+  
+  axiom
+  memchr_def{L}:
+                ∀ char *s;
+                  (∀ ℤ c;
+                     (∀ ℤ n;
+                        memchr{L}(s, c, n) ≡ \true ⇔
+                        (∃ int i; (0 ≤ i ∧ i < n) ∧ *(s+i) ≡ c)));
+  
+  }
+ */
+/*@
+axiomatic
+  MemSet {
+  logic 𝔹 memset{L}(char *s, ℤ c, ℤ n) ;
+  
+  axiom
+  memset_def{L}:
+                ∀ char *s;
+                  (∀ ℤ c;
+                     (∀ ℤ n;
+                        memset{L}(s, c, n) ≡ \true ⇔
+                        (∀ ℤ i; 0 ≤ i ∧ i < n ⇒ *(s+i) ≡ c)));
+  
+  }
+ */
+/*@
+axiomatic
+  StrLen {
+  logic ℤ strlen{L}(char *s) ;
+  
+  axiom
+  strlen_pos_or_null{L}:
+                        ∀ char *s;
+                          (∀ ℤ i;
+                             (0 ≤ i ∧
+                              (∀ ℤ j;
+                                 0 ≤ j ∧ j < i ⇒ *(s+j) ≢ '\000'))
+                             ∧ *(s+i) ≡ '\000' ⇒ strlen{L}(s) ≡ i);
+  
+  axiom
+  strlen_neg{L}:
+                ∀ char *s;
+                  (∀ ℤ i; 0 ≤ i ⇒ *(s+i) ≢ '\000') ⇒
+                  strlen{L}(s) < 0;
+  
+  axiom
+  strlen_before_null{L}:
+                        ∀ char *s;
+                          (∀ ℤ i;
+                             0 ≤ i ∧ i < strlen{L}(s) ⇒
+                             *(s+i) ≢ '\000');
+  
+  axiom
+  strlen_at_null{L}:
+                    ∀ char *s;
+                      0 ≤ strlen{L}(s) ⇒ *(s+strlen{L}(s)) ≡ '\000';
+  
+  axiom
+  strlen_not_zero{L}:
+                     ∀ char *s;
+                       (∀ ℤ i;
+                          (0 ≤ i ∧ i ≤ strlen{L}(s)) ∧
+                          *(s+i) ≢ '\000' ⇒ i < strlen{L}(s));
+  
+  axiom
+  strlen_zero{L}:
+                 ∀ char *s;
+                   (∀ ℤ i;
+                      (0 ≤ i ∧ i ≤ strlen{L}(s)) ∧ *(s+i) ≡ '\000'
+                      ⇒ i ≡ strlen{L}(s));
+  
+  axiom
+  strlen_sup{L}:
+                ∀ char *s;
+                  (∀ ℤ i;
+                     0 ≤ i ∧ *(s+i) ≡ '\000' ⇒
+                     0 ≤ strlen{L}(s) ∧ strlen{L}(s) ≤ i);
+  
+  axiom
+  strlen_shift{L}:
+                  ∀ char *s;
+                    (∀ ℤ i;
+                       0 ≤ i ∧ i ≤ strlen{L}(s) ⇒
+                       strlen{L}(s+i) ≡ strlen{L}(s)-i);
+  
+  axiom
+  strlen_create{L}:
+                   ∀ char *s;
+                     (∀ ℤ i;
+                        0 ≤ i ∧ *(s+i) ≡ '\000' ⇒
+                        0 ≤ strlen{L}(s) ∧ strlen{L}(s) ≤ i);
+  
+  axiom
+  strlen_create_shift{L}:
+                         ∀ char *s;
+                           (∀ ℤ i;
+                              (∀ ℤ k;
+                                 (0 ≤ k ∧ k ≤ i) ∧ *(s+i) ≡ '\000'
+                                 ⇒
+                                 0 ≤ strlen{L}(s+k) ∧
+                                 strlen{L}(s+k) ≤ i-k));
+  
+  axiom
+  memcmp_strlen_left{L}:
+                        ∀ char *s1, char *s2;
+                          (∀ ℤ n;
+                             memcmp{L}(s1, s2, n) ≡ 0 ∧ strlen{L}(s1) < n
+                             ⇒ strlen{L}(s1) ≡ strlen{L}(s2));
+  
+  axiom
+  memcmp_strlen_right{L}:
+                         ∀ char *s1, char *s2;
+                           (∀ ℤ n;
+                              memcmp{L}(s1, s2, n) ≡ 0 ∧
+                              strlen{L}(s2) < n ⇒
+                              strlen{L}(s1) ≡ strlen{L}(s2));
+  
+  axiom
+  memcmp_strlen_shift_left{L}:
+                              ∀ char *s1, char *s2;
+                                (∀ ℤ k, ℤ n;
+                                   (memcmp{L}(s1, s2+k, n) ≡ 0 ∧ 0 ≤ k)
+                                   ∧ strlen{L}(s1) < n ⇒
+                                   0 ≤ strlen{L}(s2) ∧
+                                   strlen{L}(s2) ≤ k+strlen{L}(s1));
+  
+  axiom
+  memcmp_strlen_shift_right{L}:
+                               ∀ char *s1, char *s2;
+                                 (∀ ℤ k, ℤ n;
+                                    (memcmp{L}(s1+k, s2, n) ≡ 0 ∧ 0 ≤ k)
+                                    ∧ strlen{L}(s2) < n ⇒
+                                    0 ≤ strlen{L}(s1) ∧
+                                    strlen{L}(s1) ≤ k+strlen{L}(s2));
+  
+  }
+ */
+/*@
+axiomatic
+  StrCmp {
+  logic ℤ strcmp{L}(char *s1, char *s2) ;
+  
+  axiom
+  strcmp_zero{L}:
+                 ∀ char *s1, char *s2;
+                   strcmp{L}(s1, s2) ≡ 0 ⇔
+                   strlen{L}(s1) ≡ strlen{L}(s2) ∧
+                   (∀ ℤ i;
+                      0 ≤ i ∧ i ≤ strlen{L}(s1) ⇒ *(s1+i) ≡ *(s2+i));
+  
+  }
+ */
+/*@
+axiomatic
+  StrNCmp {
+  logic ℤ strncmp{L}(char *s1, char *s2, ℤ n) ;
+  
+  axiom
+  strncmp_zero{L}:
+                  ∀ char *s1, char *s2;
+                    (∀ ℤ n;
+                       strncmp{L}(s1, s2, n) ≡ 0 ⇔
+                       (strlen{L}(s1) < n ∧ strcmp{L}(s1, s2) ≡ 0) ∨
+                       (∀ ℤ i; 0 ≤ i ∧ i < n ⇒ *(s1+i) ≡ *(s2+i)));
+  
+  }
+ */
+/*@
+axiomatic
+  StrChr {
+  logic 𝔹 strchr{L}(char *s, ℤ c) ;
+  
+  axiom
+  strchr_def{L}:
+                ∀ char *s;
+                  (∀ ℤ c;
+                     strchr{L}(s, c) ≡ \true ⇔
+                     (∃ ℤ i;
+                        (0 ≤ i ∧ i ≤ strlen{L}(s)) ∧ *(s+i) ≡ c));
+  
+  }
+ */
+/*@
+axiomatic
+  WcsLen {
+  logic ℤ wcslen{L}(wchar_t *s) ;
+  
+  axiom
+  wcslen_pos_or_null{L}:
+                        ∀ wchar_t *s;
+                          (∀ ℤ i;
+                             (0 ≤ i ∧
+                              (∀ ℤ j; 0 ≤ j ∧ j < i ⇒ *(s+j) ≢ 0))
+                             ∧ *(s+i) ≡ 0 ⇒ wcslen{L}(s) ≡ i);
+  
+  axiom
+  wcslen_neg{L}:
+                ∀ wchar_t *s;
+                  (∀ ℤ i; 0 ≤ i ⇒ *(s+i) ≢ 0) ⇒ wcslen{L}(s) < 0;
+  
+  axiom
+  wcslen_before_null{L}:
+                        ∀ wchar_t *s;
+                          (∀ int i;
+                             0 ≤ i ∧ i < wcslen{L}(s) ⇒ *(s+i) ≢ 0);
+  
+  axiom
+  wcslen_at_null{L}:
+                    ∀ wchar_t *s;
+                      0 ≤ wcslen{L}(s) ⇒ *(s+wcslen{L}(s)) ≡ 0;
+  
+  axiom
+  wcslen_not_zero{L}:
+                     ∀ wchar_t *s;
+                       (∀ int i;
+                          (0 ≤ i ∧ i ≤ wcslen{L}(s)) ∧ *(s+i) ≢ 0
+                          ⇒ i < wcslen{L}(s));
+  
+  axiom
+  wcslen_zero{L}:
+                 ∀ wchar_t *s;
+                   (∀ int i;
+                      (0 ≤ i ∧ i ≤ wcslen{L}(s)) ∧ *(s+i) ≡ 0 ⇒
+                      i ≡ wcslen{L}(s));
+  
+  axiom
+  wcslen_sup{L}:
+                ∀ wchar_t *s;
+                  (∀ int i;
+                     0 ≤ i ∧ *(s+i) ≡ 0 ⇒
+                     0 ≤ wcslen{L}(s) ∧ wcslen{L}(s) ≤ i);
+  
+  axiom
+  wcslen_shift{L}:
+                  ∀ wchar_t *s;
+                    (∀ int i;
+                       0 ≤ i ∧ i ≤ wcslen{L}(s) ⇒
+                       wcslen{L}(s+i) ≡ wcslen{L}(s)-i);
+  
+  axiom
+  wcslen_create{L}:
+                   ∀ wchar_t *s;
+                     (∀ int i;
+                        0 ≤ i ∧ *(s+i) ≡ 0 ⇒
+                        0 ≤ wcslen{L}(s) ∧ wcslen{L}(s) ≤ i);
+  
+  axiom
+  wcslen_create_shift{L}:
+                         ∀ wchar_t *s;
+                           (∀ int i;
+                              (∀ int k;
+                                 (0 ≤ k ∧ k ≤ i) ∧ *(s+i) ≡ 0 ⇒
+                                 0 ≤ wcslen{L}(s+k) ∧
+                                 wcslen{L}(s+k) ≤ i-k));
+  
+  }
+ */
+/*@
+axiomatic
+  WcsCmp {
+  logic ℤ wcscmp{L}(wchar_t *s1, wchar_t *s2) ;
+  
+  axiom
+  wcscmp_zero{L}:
+                 ∀ wchar_t *s1, wchar_t *s2;
+                   wcscmp{L}(s1, s2) ≡ 0 ⇔
+                   wcslen{L}(s1) ≡ wcslen{L}(s2) ∧
+                   (∀ ℤ i;
+                      0 ≤ i ∧ i ≤ wcslen{L}(s1) ⇒ *(s1+i) ≡ *(s2+i));
+  
+  }
+ */
+/*@
+axiomatic
+  WcsNCmp {
+  logic ℤ wcsncmp{L}(wchar_t *s1, wchar_t *s2, ℤ n) ;
+  
+  axiom
+  wcsncmp_zero{L}:
+                  ∀ wchar_t *s1, wchar_t *s2;
+                    (∀ ℤ n;
+                       wcsncmp{L}(s1, s2, n) ≡ 0 ⇔
+                       (wcslen{L}(s1) < n ∧ wcscmp{L}(s1, s2) ≡ 0) ∨
+                       (∀ ℤ i; 0 ≤ i ∧ i < n ⇒ *(s1+i) ≡ *(s2+i)));
+  
+  }
+ */
+/*@ logic ℤ minimum(ℤ i, ℤ j) = i<j? i: j;
+ */
+/*@ logic ℤ maximum(ℤ i, ℤ j) = i<j? j: i;
+ */
+/*@
+predicate valid_string{L}(char *s) =
+  0 ≤ strlen{L}(s) ∧ \valid{L}(s+(0 .. strlen{L}(s)));
+ */
+/*@
+predicate valid_string_or_null{L}(char *s) =
+  s ≡ \null ∨ valid_string{L}(s);
+ */
+/*@
+predicate valid_wstring{L}(wchar_t *s) =
+  0 ≤ wcslen{L}(s) ∧ \valid{L}(s+(0 .. wcslen{L}(s)));
+ */
+/*@
+predicate valid_wstring_or_null{L}(wchar_t *s) =
+  s ≡ \null ∨ valid_wstring{L}(s);
+ */
+/*@ requires valid_string_src: valid_string(s);
+    ensures \result ≡ strlen(\old(s));
+    assigns \result;
+    assigns \result \from *(s+(0 ..));
+ */
+extern size_t strlen(char const *s);
+
+/*@ requires valid_string_src: valid_string(s);
+    ensures \result ≡ strlen(\old(s));
+    assigns \result;
+    assigns \result \from *(s+(0 ..));
+ */
+size_t __e_acsl_strlen(char const *s)
+{
+  size_t __retres;
+  __store_block((void *)(& s),8U);
+  __retres = strlen(s);
+  __delete_block((void *)(& s));
+  return __retres;
+}
 
 int main(int argc, char **argv)
 {
@@ -309,7 +653,9 @@ int main(int argc, char **argv)
   while (i < argc) {
     {
       int len;
-      len = strlen(*(argv + i));
+      size_t tmp;
+      tmp = __e_acsl_strlen((char const *)*(argv + i));
+      len = (int)tmp;
       /*@ assert \valid(*(argv+i)); */
       {
         int __e_acsl_initialized_2;
