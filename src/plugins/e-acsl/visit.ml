@@ -76,7 +76,12 @@ class e_acsl_visitor prj generate = object (self)
     (if generate then Cil.copy_visit prj else Cil.inplace_visit ())
 
   val mutable main_fct = None
+  (* fundec of the main entry point, in the new project [prj].
+     [None] while the global corresponding to this fundec has not been
+     visited *)
+
   val mutable keep_initializer = None
+
   val global_vars: init option Varinfo.Hashtbl.t = Varinfo.Hashtbl.create 7
   (* keys belong to the original project while values belong to the new one *)
 
@@ -224,10 +229,11 @@ class e_acsl_visitor prj generate = object (self)
 	    let build_args_initializer () =
 	      let main = Extlib.the main_fct in
 	      let loc = Location.unknown in
-	      let args = (List.map Cil.evar main.sformals) in
+              let args = List.map Cil.evar main.sformals in
 	      let call = Misc.mk_call loc "__init_args" args in
 	      main.sbody.bstmts <- call :: main.sbody.bstmts;
-	    in Project.on prj build_args_initializer ();
+            in
+            Project.on prj build_args_initializer ()
 	  end;
 	  (* reset copied states at the end to be observationally
 	     equivalent to a standard visitor. *)
