@@ -17,11 +17,9 @@
 
 -* E-ACSL       [2014/08/04] Fix bug #1696 by clarifying the manual.
 -* E-ACSL       [2014/08/04] Fix bug #1831 about argc and argv.
--* E-ACSL       [2014/07/08] Fix bug about using some part of the
-	        (Frama-C) libc which prevents linking of the generated C code.
 -* E-ACSL       [2014/07/19] Fix bug #1836 about one-off error when
 	        computing the block which a pointer points to.
--* E-ACSL       [2014/07/08] Fix bug about using some part of the
+-* E-ACSL       [2014/07/08] Fix bug #1695 about using some part of the
 	        (Frama-C) libc which prevents linking of the generated C code.
 -* E-ACSL       [2014/05/21] Fix bug #1782 about incorrect URL in the
 	        documentation.
