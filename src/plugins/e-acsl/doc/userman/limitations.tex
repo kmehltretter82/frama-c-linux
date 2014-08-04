@@ -107,6 +107,11 @@ The failing predicate is:
 freed: \valid(x).
 \end{shell}
 
+Also, if the unprovided main initializes some variables, running the
+instrumented code (linked against this main) could print some warnings from the
+\eacsl memory library\footnote{see
+  \url{https://bts.frama-c.com/view.php?id=1696} for an example}.
+
 \subsection{Undefined Functions}
 \label{sec:limits:no-code}
 \index{Function!Undefined}
