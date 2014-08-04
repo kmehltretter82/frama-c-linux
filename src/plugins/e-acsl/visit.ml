@@ -110,7 +110,7 @@ class e_acsl_visitor prj generate = object (self)
             with Exit ->
               true
           in
-          if must_init then
+          if must_init then begin
             let build_initializer () =
               Options.feedback ~dkey ~level:2 "building global initializer.";
               let return = 
@@ -203,11 +203,37 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
                   f.globals <- f.globals @ [ cil_fct ]
             in
             Project.on prj build_initializer ()
-        end;
-        (* reset copied states at the end to be observationally equivalent to a
-           standard visitor. *)
-        if generate then Project.clear ~selection ~project:prj ();
-        f)
+	  end; (* must_init *)
+	  let must_init_args = match main_fct with
+	    | Some main ->
+	       let charPtrPtrType = TPtr(Cil.charPtrType,[]) in
+	       (* this might not be valid in an embedded environment,
+		  where int/char** arguments is not necessarily
+		  valid *)
+	       (match main.sformals with
+		| vi1::vi2::_ when
+		       vi1.vtype = Cil.intType && vi2.vtype = charPtrPtrType
+		       && Pre_analysis.must_model_vi vi2 -> true
+		| _ -> false)
+	    | None -> false
+	  in
+	  if must_init_args then begin
+	    (* init memory store, and then add program arguments if
+	       there are any. must be called before global variables
+	       are initialized. *)
+	    let build_args_initializer () =
+	      let main = Extlib.the main_fct in
+	      let loc = Location.unknown in
+	      let args = (List.map Cil.evar main.sformals) in
+	      let call = Misc.mk_call loc "__init_args" args in
+	      main.sbody.bstmts <- call :: main.sbody.bstmts;
+	    in Project.on prj build_args_initializer ();
+	  end;
+	  (* reset copied states at the end to be observationally
+	     equivalent to a standard visitor. *)
+	  Project.clear ~selection ~project:prj ();
+	 end; (* generate *)
+	 f)
 
   method !vglob_aux = function
   | GVarDecl(_, vi, _) | GVar(vi, _, _) | GFun({ svar = vi }, _) 

@@ -52,23 +52,28 @@ check_plugin_dependencies
 #######################
 
 AC_MSG_CHECKING(for Frama-C version)
+AC_MSG_RESULT($FRAMAC_VERSION)
 
 DEV_VERSION_NUMBER=`echo $FRAMAC_VERSION | sed -e 's/.*-\(.*\)/\1/' `
 VERSION_NUMBER=`echo $DEV_VERSION_NUMBER | sed -e 's/\(.*\)+dev/\1/' `
 REQUIRED_NUMBER=20140301
 
-if test $VERSION_NUMBER -lt $REQUIRED_NUMBER; then
-  AC_MSG_ERROR(Frama-C version must be at least Neon-$REQUIRED_NUMBER.)
-else
-
-# # at the time being, must use the Frama-C development version
-# DEV=`echo $DEV_VERSION_NUMBER | sed -e 's/.*\(+dev\)/\1/' `
-# if test "$DEV" != "+dev"; then
-#   AC_MSG_ERROR(Frama-C version must be the current GIT version.);
-# else
-    AC_MSG_RESULT($FRAMAC_VERSION)
-# fi
-fi
+case $FRAMAC_VERSION in
+  Neon*)
+    # # at the time being, must use the Frama-C development version
+    # DEV=`echo $DEV_VERSION_NUMBER | sed -e 's/.*\(+dev\)/\1/' `
+    # if test "$DEV" != "+dev"; then
+    #   AC_MSG_ERROR(Frama-C version must be the current GIT version.);
+    # fi
+    ;;
+  *)
+    if test $VERSION_NUMBER -lt $REQUIRED_NUMBER; then
+      AC_MSG_ERROR(Frama-C version must be at least Neon-$REQUIRED_NUMBER.)
+    else
+      AC_MSG_WARN(Frama-C version is more recent than Neon: \
+use it at your own risk)
+    fi;;
+esac
 
 # OCaml version
 ###############

@@ -1,0 +1,86 @@
+[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/e_acsl.h"
+[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/e_acsl_gmp_types.h"
+[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/e_acsl_gmp.h"
+[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel_api.h"
+[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/memory_model/e_acsl_bittree.h"
+[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h"
+[kernel] preprocessing with "gcc -C -E -I.  -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc tests/e-acsl-runtime/mainargs.c"
+[e-acsl] beginning translation.
+[e-acsl] warning: annotating undefined function `strlen':
+                  the generated program may miss memory instrumentation
+                  if there are memory-related annotations.
+tests/e-acsl-runtime/mainargs.c:9:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+                  Ignoring annotation.
+tests/e-acsl-runtime/mainargs.c:9:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:88:[e-acsl] warning: E-ACSL construct `applying logic function' is not yet supported.
+                  Ignoring annotation.
+[e-acsl] translation done in project "e-acsl".
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value] Values of globals at initialization
+  random_counter ∈ {0}
+  rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __e_acsl_init ∈ [--..--]
+  __e_acsl_internal_heap ∈ [--..--]
+  __memory_size ∈ [--..--]
+[value] using specification for function __init_args
+tests/e-acsl-runtime/mainargs.c:12:[value] Assertion got status valid.
+[value] using specification for function __store_block
+[value] using specification for function __valid
+[value] using specification for function e_acsl_assert
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
+tests/e-acsl-runtime/mainargs.c:13:[value] Assertion got status valid.
+tests/e-acsl-runtime/mainargs.c:14:[value] Assertion got status unknown.
+[value] using specification for function __gmpz_init
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:39:[value] Function __gmpz_init: precondition got status valid.
+[value] using specification for function __gmpz_init_set_si
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: precondition got status valid.
+[value] using specification for function __gmpz_set
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:94:[value] Function __gmpz_set: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:95:[value] Function __gmpz_set: precondition got status valid.
+[value] using specification for function __gmpz_clear
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:117:[value] Function __gmpz_clear: precondition got status valid.
+tests/e-acsl-runtime/mainargs.c:14:[value] entering loop for the first time
+[value] using specification for function __gmpz_cmp
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:127:[value] Function __gmpz_cmp: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:128:[value] Function __gmpz_cmp: precondition got status valid.
+[value] using specification for function __gmpz_get_ui
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:198:[value] Function __gmpz_get_ui: precondition got status valid.
+[value] using specification for function __gmpz_add
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:143:[value] Function __gmpz_add: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:144:[value] Function __gmpz_add: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:145:[value] Function __gmpz_add: precondition got status valid.
+tests/e-acsl-runtime/mainargs.c:15:[value] Assertion got status unknown.
+[value] using specification for function __block_length
+[value] using specification for function __gmpz_init_set_ui
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:55:[value] Function __gmpz_init_set_ui: precondition got status valid.
+[value] using specification for function __gmpz_mul
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:157:[value] Function __gmpz_mul: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:158:[value] Function __gmpz_mul: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:159:[value] Function __gmpz_mul: precondition got status valid.
+tests/e-acsl-runtime/mainargs.c:17:[value] Assertion got status unknown.
+[value] using specification for function __valid_read
+tests/e-acsl-runtime/mainargs.c:17:[kernel] warning: out of bounds read. assert \valid_read(argv+(long)argc);
+tests/e-acsl-runtime/mainargs.c:18:[value] Assertion got status unknown.
+[value] using specification for function __initialized
+tests/e-acsl-runtime/mainargs.c:18:[kernel] warning: out of bounds read. assert \valid_read(argv+(long)argc);
+tests/e-acsl-runtime/mainargs.c:19:[value] entering loop for the first time
+tests/e-acsl-runtime/mainargs.c:20:[kernel] warning: out of bounds read. assert \valid_read(argv+i);
+FRAMAC_SHARE/libc/string.h:86:[value] Function __e_acsl_strlen: precondition 'valid_string_src' got status unknown.
+[value] using specification for function strlen
+FRAMAC_SHARE/libc/string.h:86:[value] Function strlen: precondition 'valid_string_src' got status unknown.
+FRAMAC_SHARE/libc/string.h:90:[value] cannot evaluate ACSL term, unsupported ACSL construct: logic functions or predicates
+[value] using specification for function __delete_block
+FRAMAC_SHARE/libc/string.h:88:[value] Function __e_acsl_strlen: postcondition got status unknown.
+tests/e-acsl-runtime/mainargs.c:21:[value] Assertion got status unknown.
+tests/e-acsl-runtime/mainargs.c:21:[kernel] warning: out of bounds read. assert \valid_read(argv+(long)i);
+tests/e-acsl-runtime/mainargs.c:22:[value] Assertion got status unknown.
+tests/e-acsl-runtime/mainargs.c:22:[value] entering loop for the first time
+tests/e-acsl-runtime/mainargs.c:22:[kernel] warning: out of bounds read. assert \valid_read(argv+(long)i);
+tests/e-acsl-runtime/mainargs.c:19:[kernel] warning: signed overflow. assert i+1 ≤ 2147483647;
+[value] using specification for function __e_acsl_memory_clean
+[value] done for function main
+[value] ====== VALUES COMPUTED ======

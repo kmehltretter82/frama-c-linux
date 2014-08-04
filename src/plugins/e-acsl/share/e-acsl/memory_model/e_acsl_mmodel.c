@@ -77,6 +77,20 @@ size_t needed_bytes (size_t size) {
   return (size % 8) == 0 ? (size/8) : (size/8 + 1);
 }
 
+
+/* adds argc / argv to the memory model */
+void __init_args(int argc, char **argv) {
+  int i;
+
+  __store_block(argv, (argc+1)*sizeof(char*));
+  __full_init(argv);
+
+  for (i = 0; i < argc; i++) {
+    __store_block(argv[i], strlen(argv[i])+1);
+    __full_init(argv[i]);
+  }
+}
+
 /* store the block of size bytes starting at ptr */
 void* __store_block(void* ptr, size_t size) {
   struct _block * tmp;
