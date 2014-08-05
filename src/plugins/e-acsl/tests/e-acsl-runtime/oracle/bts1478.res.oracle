@@ -20,6 +20,7 @@
   global_i ∈ {0}
   global_i_ptr ∈ {{ &global_i }}
 [value] using specification for function __store_block
+[value] using specification for function __full_init
 tests/e-acsl-runtime/bts1478.c:10:[value] Function __e_acsl_loop: precondition got status valid.
 tests/e-acsl-runtime/bts1478.c:11:[value] Function __e_acsl_loop: precondition got status valid.
 tests/e-acsl-runtime/bts1478.c:12:[value] Function __e_acsl_loop: precondition got status valid.

@@ -128,6 +128,13 @@ class e_acsl_visitor prj generate = object (self)
                     let new_vi = Cil.get_varinfo self#behavior old_vi in
                     let model blk =
                       if Pre_analysis.must_model_vi old_vi then
+                        let blk =
+                          if Kernel.LibEntry.get () then blk
+                          else
+                            Misc.mk_initialize ~loc:Location.unknown
+                              (Cil.var new_vi)
+                            :: blk
+                        in
                         Misc.mk_store_stmt new_vi :: blk
                       else
                         stmts
@@ -208,7 +215,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
                   f.globals <- f.globals @ [ cil_fct ]
             in
             Project.on prj build_initializer ()
-	  end; (* must_init *)
+          end; (* must_init *)
 	  let must_init_args = match main_fct with
 	    | Some main ->
 	       let charPtrPtrType = TPtr(Cil.charPtrType,[]) in
@@ -216,10 +223,11 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
 		  where int/char** arguments is not necessarily
 		  valid *)
 	       (match main.sformals with
-		| vi1::vi2::_ when
-		       vi1.vtype = Cil.intType && vi2.vtype = charPtrPtrType
-		       && Pre_analysis.must_model_vi vi2 -> true
-		| _ -> false)
+               | vi1 :: vi2 :: _ when
+                    vi1.vtype = Cil.intType
+                    && vi2.vtype = charPtrPtrType
+                      && Pre_analysis.must_model_vi vi2 -> true
+               | _ -> false)
 	    | None -> false
 	  in
 	  if must_init_args then begin

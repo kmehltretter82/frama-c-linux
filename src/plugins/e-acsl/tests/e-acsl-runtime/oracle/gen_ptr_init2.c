@@ -141,7 +141,9 @@ void g(int *C, int *D)
 void __e_acsl_memory_init(void)
 {
   __store_block((void *)(& B),4U);
+  __full_init((void *)(& B));
   __store_block((void *)(& A),4U);
+  __full_init((void *)(& A));
   return;
 }
 

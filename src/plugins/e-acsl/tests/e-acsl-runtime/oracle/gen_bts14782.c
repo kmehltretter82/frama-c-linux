@@ -62,6 +62,9 @@ extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
 /*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __delete_block(void *ptr);
 
+/*@ assigns \nothing; */
+extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
+
 /*@ ensures \result ≡ 0 ∨ \result ≡ 1;
     ensures \result ≡ 1 ⇒ \valid((char *)\old(ptr)+(0 .. \old(size)-1));
     assigns \result;
@@ -125,7 +128,9 @@ void __e_acsl_loop(void)
 void __e_acsl_memory_init(void)
 {
   __store_block((void *)(& global_i_ptr),4U);
+  __full_init((void *)(& global_i_ptr));
   __store_block((void *)(& global_i),4U);
+  __full_init((void *)(& global_i));
   return;
 }
 

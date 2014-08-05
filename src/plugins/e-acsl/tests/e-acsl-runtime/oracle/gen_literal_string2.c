@@ -153,10 +153,13 @@ void __e_acsl_memory_init(void)
   __store_block((void *)__e_acsl_literal_string_3,sizeof("foo2"));
   __full_init((void *)__e_acsl_literal_string_3);
   __literal_string((void *)__e_acsl_literal_string_3);
+  __full_init((void *)(& S2));
   S2 = (char *)__e_acsl_literal_string_3;
   __store_block((void *)(& S),4U);
+  __full_init((void *)(& S));
   S = (char *)__e_acsl_literal_string_2;
   __store_block((void *)(& T),4U);
+  __full_init((void *)(& T));
   T = (char *)__e_acsl_literal_string;
   return;
 }
