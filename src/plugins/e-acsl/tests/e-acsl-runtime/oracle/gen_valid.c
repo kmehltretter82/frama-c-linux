@@ -299,7 +299,9 @@ void g(void)
 void __e_acsl_memory_init(void)
 {
   __store_block((void *)(& Z),4U);
+  __full_init((void *)(& Z));
   __store_block((void *)(& X),8U);
+  __full_init((void *)(& X));
   return;
 }
 

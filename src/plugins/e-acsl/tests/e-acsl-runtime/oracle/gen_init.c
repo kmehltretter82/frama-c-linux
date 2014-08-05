@@ -44,11 +44,13 @@ extern  __attribute__((__FC_BUILTIN__)) void __delete_block(void *ptr);
 extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
 
 /*@ ensures \result ≡ 0 ∨ \result ≡ 1;
-    ensures \result ≡ 1 ⇒ \valid((char *)\old(ptr)+(0 .. \old(size)-1));
+    ensures
+      \result ≡ 1 ⇒ \initialized((char *)\old(ptr)+(0 .. \old(size)-1));
     assigns \result;
     assigns \result \from *((char *)ptr+(0 .. size-1));
  */
-extern  __attribute__((__FC_BUILTIN__)) int __valid(void *ptr, size_t size);
+extern  __attribute__((__FC_BUILTIN__)) int __initialized(void *ptr,
+                                                          size_t size);
 
 /*@ ghost extern int __e_acsl_internal_heap; */
 
@@ -63,54 +65,51 @@ extern size_t __memory_size;
 predicate diffSize{L1, L2}(ℤ i) =
   \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
  */
-int global_i = 0;
-int *global_i_ptr = & global_i;
-/*@ requires global_i ≡ 0;
-    requires \valid(global_i_ptr);
-    requires global_i_ptr ≡ &global_i;
- */
-void loop(void)
-{
-  return;
-}
-
-/*@ requires global_i ≡ 0;
-    requires \valid(global_i_ptr);
-    requires global_i_ptr ≡ &global_i;
- */
-void __e_acsl_loop(void)
-{
-  {
-    int __e_acsl_valid;
-    e_acsl_assert(global_i == 0,(char *)"Precondition",(char *)"loop",
-                  (char *)"global_i == 0",10);
-    __e_acsl_valid = __valid((void *)global_i_ptr,sizeof(int));
-    e_acsl_assert(__e_acsl_valid,(char *)"Precondition",(char *)"loop",
-                  (char *)"\\valid(global_i_ptr)",11);
-    e_acsl_assert(global_i_ptr == & global_i,(char *)"Precondition",
-                  (char *)"loop",(char *)"global_i_ptr == &global_i",12);
-    loop();
-  }
-  return;
-}
-
+int a = 0;
+int b;
 void __e_acsl_memory_init(void)
 {
-  __store_block((void *)(& global_i_ptr),4U);
-  __full_init((void *)(& global_i_ptr));
-  __store_block((void *)(& global_i),4U);
-  __full_init((void *)(& global_i));
+  __store_block((void *)(& b),4U);
+  __full_init((void *)(& b));
+  __store_block((void *)(& a),4U);
+  __full_init((void *)(& a));
   return;
 }
 
 int main(void)
 {
   int __retres;
+  int *p;
+  int *q;
   __e_acsl_memory_init();
-  __e_acsl_loop();
+  __store_block((void *)(& q),8U);
+  __store_block((void *)(& p),8U);
+  __full_init((void *)(& p));
+  p = & a;
+  __full_init((void *)(& q));
+  q = & b;
+  /*@ assert \initialized(&b); */
+  e_acsl_assert(1,(char *)"Assertion",(char *)"main",
+                (char *)"\\initialized(&b)",11);
+  /*@ assert \initialized(q); */
+  {
+    int __e_acsl_initialized;
+    __e_acsl_initialized = __initialized((void *)q,(size_t)sizeof(int));
+    e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"main",
+                  (char *)"\\initialized(q)",12);
+  }
+  /*@ assert \initialized(p); */
+  {
+    int __e_acsl_initialized_2;
+    __e_acsl_initialized_2 = __initialized((void *)p,(size_t)sizeof(int));
+    e_acsl_assert(__e_acsl_initialized_2,(char *)"Assertion",(char *)"main",
+                  (char *)"\\initialized(p)",13);
+  }
   __retres = 0;
-  __delete_block((void *)(& global_i_ptr));
-  __delete_block((void *)(& global_i));
+  __delete_block((void *)(& b));
+  __delete_block((void *)(& a));
+  __delete_block((void *)(& q));
+  __delete_block((void *)(& p));
   __e_acsl_memory_clean();
   return __retres;
 }

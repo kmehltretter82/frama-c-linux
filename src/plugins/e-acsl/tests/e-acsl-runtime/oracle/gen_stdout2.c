@@ -100,6 +100,7 @@ FILE const *_p__fc_fopen = (FILE const *)(fopen);
 void __e_acsl_memory_init(void)
 {
   __store_block((void *)(& stdout),8U);
+  __full_init((void *)(& stdout));
   return;
 }
 

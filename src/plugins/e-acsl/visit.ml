@@ -128,7 +128,14 @@ class e_acsl_visitor prj generate = object (self)
 		    let new_vi = Cil.get_varinfo self#behavior old_vi in
 		    let model blk =
 		      if Pre_analysis.must_model_vi old_vi then
-			Misc.mk_store_stmt new_vi :: blk
+                        let blk =
+                          if Kernel.LibEntry.get () then blk
+                          else
+                            Misc.mk_initialize ~loc:Location.unknown
+                              (Cil.var new_vi)
+                            :: blk
+                        in
+                        Misc.mk_store_stmt new_vi :: blk
 		      else
 			stmts
 		    in
@@ -203,7 +210,7 @@ class e_acsl_visitor prj generate = object (self)
 		  f.globals <- new_globals
 		| None ->
 		  Kernel.warning "@[no entry point specified:@ \
-				  you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
+you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
 				 fname;
 		  f.globals <- f.globals @ [ cil_fct ]
 	    in

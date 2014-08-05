@@ -104,7 +104,9 @@ int *P;
 void __e_acsl_memory_init(void)
 {
   __store_block((void *)(& P),4U);
+  __full_init((void *)(& P));
   __store_block((void *)(& G),4U);
+  __full_init((void *)(& G));
   return;
 }
 

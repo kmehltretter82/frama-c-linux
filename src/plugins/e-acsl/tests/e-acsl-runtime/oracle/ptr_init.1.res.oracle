@@ -33,11 +33,11 @@ FRAMAC_SHARE/libc/stdlib.h:129:[e-acsl] warning: E-ACSL construct `logic functio
   A ∈ {0}
   B ∈ {0}
 [value] using specification for function __store_block
+[value] using specification for function __full_init
 [value] using specification for function __malloc
 [value] using specification for function __delete_block
 FRAMAC_SHARE/libc/stdlib.h:127:[value] Function __e_acsl_malloc, behavior allocation: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
 FRAMAC_SHARE/libc/stdlib.h:132:[value] Function __e_acsl_malloc, behavior no_allocation: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
-[value] using specification for function __full_init
 tests/e-acsl-runtime/ptr_init.c:28:[value] Assertion got status valid.
 [value] using specification for function e_acsl_assert
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
