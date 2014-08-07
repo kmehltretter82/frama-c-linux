@@ -59,12 +59,8 @@ VERSION_NUMBER=`echo $DEV_VERSION_NUMBER | sed -e 's/\(.*\)+dev/\1/' `
 REQUIRED_NUMBER=20140301
 
 case $FRAMAC_VERSION in
-  Neon*)
+  Neon-20140301+dev*)
     # # at the time being, must use the Frama-C development version
-    # DEV=`echo $DEV_VERSION_NUMBER | sed -e 's/.*\(+dev\)/\1/' `
-    # if test "$DEV" != "+dev"; then
-    #   AC_MSG_ERROR(Frama-C version must be the current GIT version.);
-    # fi
     ;;
   *)
     if test $VERSION_NUMBER -lt $REQUIRED_NUMBER; then
