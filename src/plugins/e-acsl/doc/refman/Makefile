@@ -1,3 +1,5 @@
+VERSION_FILE=../../VERSION
+
 MAIN=main
 DEPS_MODERN=macros_modern.tex eacslversion.tex biblio.bib \
 	intro_modern.tex speclang_modern.tex \
@@ -19,7 +21,7 @@ e-acsl: e-acsl-implementation.pdf e-acsl.pdf main.pdf
 all: e-acsl
 
 LANGUAGE_VERSION=1.8
-EACSL_VERSION= 0.4
+EACSL_VERSION=$(shell cat $(VERSION_FILE))
 
 EACSL_DIR=../..
 DISTRIB_DIR=$(HOME)/frama-c/doc/www/distrib
@@ -32,7 +34,7 @@ install: e-acsl-implementation.pdf e-acsl.pdf
 
 include $(EACSL_DIR)/doc/support/MakeLaTeXModern
 
-eacslversion.tex: Makefile
+eacslversion.tex: Makefile $(VERSION_FILE)
 	rm -f $@
 	echo '\\newcommand{\\eacslversion}{$(EACSL_VERSION)}' > $@
 	chmod a-w $@

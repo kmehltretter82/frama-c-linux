@@ -1,21 +1,22 @@
 MAIN=main
 
 C_CODE=$(wildcard examples/*.[ci])
+VERSION_FILE=../../VERSION
 
 DEPS_MODERN=eacslversion.tex biblio.bib macros.tex \
 	introduction.tex \
 	provides.tex \
 	limitations.tex \
 	changes.tex \
-	$(C_CODE)
-
+	$(C_CODE) \
+	$(VERSION_FILE)
 
 default: main.pdf
 
 main.pdf: $(DEPS_MODERN)
 
-EACSL_VERSION= 0.4+dev
-FC_VERSION= Neon-20140301
+EACSL_VERSION= $(shell cat $(VERSION_FILE))
+FC_VERSION= Neon
 
 EACSL_DIR=../..
 DISTRIB_DIR=$(HOME)/frama-c/doc/www/distrib
