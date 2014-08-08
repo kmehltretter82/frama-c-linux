@@ -26,17 +26,20 @@ open Cil_datatype
 
 let dkey = Options.dkey_translation
 
-let rename_alloc_function stmt = 
-  let is_alloc_name s = 
+let rename_alloc_function ~create bhv vi =
+  let is_alloc_name s =
     s = "malloc" || s = "free" || s = "realloc" || s = "calloc"
   in
-  match stmt.skind with 
-  | Instr(Call(_, { enode = Lval(Var vi, _) }, _, _))
-      when is_alloc_name vi.vname ->
-    vi.vname <- "__" ^ vi.vname;
-        Misc.mk_debug_mmodel_stmt stmt
-  |_ -> 
-    stmt
+  if is_alloc_name vi.vname then
+    let new_name =  "__" ^ vi.vname in
+    let kf =
+      try Globals.Functions.find_by_name new_name
+      with Not_found -> assert false
+    in
+    if create then Cil.makeGlobalVar new_name vi.vtype
+    else Cil.get_varinfo bhv (Globals.Functions.get_vi kf)
+  else
+    vi
 
 let allocate_function env kf =
   List.fold_left
@@ -317,17 +320,20 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     else
       Cil.SkipChildren
 
-  method !vvdec vi = 
-    try
-      let old_vi = Cil.get_original_varinfo self#behavior vi in
-      let old_kf = Globals.Functions.get old_vi in
-      funspec :=
-        Cil.visitCilFunspec
-        (self :> Cil.cilVisitor)
-        (Annotations.funspec old_kf);
-      Cil.DoChildren
-    with Not_found ->
-      Cil.DoChildren
+  method !vvdec vi =
+    (try
+       let old_vi = Cil.get_original_varinfo self#behavior vi in
+       let old_kf = Globals.Functions.get old_vi in
+       funspec :=
+         Cil.visitCilFunspec
+         (self :> Cil.cilVisitor)
+         (Annotations.funspec old_kf)
+     with Not_found ->
+       ());
+    Cil.DoChildrenPost(rename_alloc_function ~create:true self#behavior)
+
+  method !vvrbl _vi =
+    Cil.DoChildrenPost(rename_alloc_function ~create:false self#behavior)
 
   method private add_generated_variables_in_function f =
     assert generate;
@@ -534,22 +540,21 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
             stmt, env
         else (* i.e. not (is_return stmt) *)
           if generate then
-            let stmt = rename_alloc_function new_stmt in
             (* must generate [pre_block] which includes [stmt] before generating
                [post_block] *)
-            let pre_block, env = 
-              Env.pop_and_get env stmt ~global_clear:false Env.After
+            let pre_block, env =
+              Env.pop_and_get env new_stmt ~global_clear:false Env.After
             in
             let env = mk_post_env (Env.push env) in
-            let post_block, env = 
-              Env.pop_and_get 
+            let post_block, env =
+              Env.pop_and_get
                 env
-                (Misc.mk_block prj stmt pre_block) 
-                ~global_clear:false 
-                Env.Before 
+                (Misc.mk_block prj new_stmt pre_block)
+                ~global_clear:false
+                Env.Before
             in
             (* TODO: must clear the local block anytime (?) *)
-            Misc.mk_block prj stmt post_block, env
+            Misc.mk_block prj new_stmt post_block, env
           else
             stmt, env
       in

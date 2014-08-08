@@ -29,29 +29,7 @@ axiomatic dynamic_allocation {
   
   }
  */
-/*@ assigns __fc_heap_status, \result;
-    assigns __fc_heap_status \from size, __fc_heap_status;
-    assigns \result \from size, __fc_heap_status;
-    allocates \result;
-    
-    behavior allocation:
-      assumes is_allocable(size);
-      ensures \fresh{Old, Here}(\result,\old(size));
-      assigns __fc_heap_status, \result;
-      assigns __fc_heap_status \from size, __fc_heap_status;
-      assigns \result \from size, __fc_heap_status;
-    
-    behavior no_allocation:
-      assumes ¬is_allocable(size);
-      ensures \result ≡ \null;
-      assigns \result;
-      assigns \result \from \nothing;
-      allocates \nothing;
-    
-    complete behaviors no_allocation, allocation;
-    disjoint behaviors no_allocation, allocation;
- */
-extern void *__malloc(size_t size);
+void *__malloc(size_t size);
 
 /*@ ghost extern int __e_acsl_init; */
 

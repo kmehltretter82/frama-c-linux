@@ -29,50 +29,9 @@ axiomatic dynamic_allocation {
   
   }
  */
-/*@ assigns __fc_heap_status, \result;
-    assigns __fc_heap_status \from size, __fc_heap_status;
-    assigns \result \from size, __fc_heap_status;
-    allocates \result;
-    
-    behavior allocation:
-      assumes is_allocable(size);
-      ensures \fresh{Old, Here}(\result,\old(size));
-      assigns __fc_heap_status, \result;
-      assigns __fc_heap_status \from size, __fc_heap_status;
-      assigns \result \from size, __fc_heap_status;
-    
-    behavior no_allocation:
-      assumes ¬is_allocable(size);
-      ensures \result ≡ \null;
-      assigns \result;
-      assigns \result \from \nothing;
-      allocates \nothing;
-    
-    complete behaviors no_allocation, allocation;
-    disjoint behaviors no_allocation, allocation;
- */
-extern void *__malloc(size_t size);
+void *__malloc(size_t size);
 
-/*@ assigns __fc_heap_status;
-    assigns __fc_heap_status \from __fc_heap_status;
-    frees p;
-    
-    behavior deallocation:
-      assumes p ≢ \null;
-      requires freeable: \freeable(p);
-      ensures \allocable(\old(p));
-      assigns __fc_heap_status;
-      assigns __fc_heap_status \from __fc_heap_status;
-    
-    behavior no_deallocation:
-      assumes p ≡ \null;
-      assigns \nothing;
-      allocates \nothing;
-    
-    complete behaviors no_deallocation, deallocation;
-    disjoint behaviors no_deallocation, deallocation;
- */
-extern void __free(void *p);
+void __free(void *p);
 
 /*@ ghost extern int __e_acsl_init; */
 
@@ -296,9 +255,9 @@ void g(void)
 
 void __e_acsl_memory_init(void)
 {
-  __store_block((void *)(& Z),4U);
+  __store_block((void *)(& Z),4UL);
   __full_init((void *)(& Z));
-  __store_block((void *)(& X),8U);
+  __store_block((void *)(& X),8UL);
   __full_init((void *)(& X));
   return;
 }

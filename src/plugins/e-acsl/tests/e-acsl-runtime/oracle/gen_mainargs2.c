@@ -6,7 +6,7 @@ struct __anonstruct___mpz_struct_1 {
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
-typedef unsigned int size_t;
+typedef unsigned long size_t;
 typedef int wchar_t;
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
@@ -24,8 +24,7 @@ unsigned long const rand_max = (unsigned long)32767;
 /*@ ghost extern int __fc_heap_status; */
 
 /*@
-axiomatic
-  dynamic_allocation {
+axiomatic dynamic_allocation {
   predicate is_allocable{L}(size_t n) 
     reads __fc_heap_status;
   
@@ -61,7 +60,7 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init_set_ui(__mpz_struct * /
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z,
                                                                 long n);
 
-/*@ requires \valid(z_orig);
+/*@ requires \valid_read(z_orig);
     requires \valid(z);
     assigns *z;
     assigns *z \from *z_orig;
@@ -74,8 +73,8 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_set(__mpz_struct * /*[1]*/ z
     assigns *x \from *x; */
 extern  __attribute__((__FC_BUILTIN__)) void __gmpz_clear(__mpz_struct * /*[1]*/ x);
 
-/*@ requires \valid(z1);
-    requires \valid(z2);
+/*@ requires \valid_read(z1);
+    requires \valid_read(z2);
     assigns \result;
     assigns \result \from *z1, *z2;
  */
@@ -83,8 +82,8 @@ extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1
                                                        __mpz_struct const * /*[1]*/ z2);
 
 /*@ requires \valid(z1);
-    requires \valid(z2);
-    requires \valid(z3);
+    requires \valid_read(z2);
+    requires \valid_read(z3);
     assigns *z1;
     assigns *z1 \from *z2, *z3;
  */
@@ -93,8 +92,8 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_add(__mpz_struct * /*[1]*/ z
                                                         __mpz_struct const * /*[1]*/ z3);
 
 /*@ requires \valid(z1);
-    requires \valid(z2);
-    requires \valid(z3);
+    requires \valid_read(z2);
+    requires \valid_read(z3);
     assigns *z1;
     assigns *z1 \from *z2, *z3;
  */
@@ -102,7 +101,7 @@ extern  __attribute__((__FC_BUILTIN__)) void __gmpz_mul(__mpz_struct * /*[1]*/ z
                                                         __mpz_struct const * /*[1]*/ z2,
                                                         __mpz_struct const * /*[1]*/ z3);
 
-/*@ requires \valid(z);
+/*@ requires \valid_read(z);
     assigns \result;
     assigns \result \from *z; */
 extern  __attribute__((__FC_BUILTIN__)) unsigned long __gmpz_get_ui(__mpz_struct const * /*[1]*/ z);
@@ -164,310 +163,228 @@ predicate diffSize{L1, L2}(ℤ i) =
   \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
  */
 /*@
-axiomatic
-  MemCmp {
-  logic ℤ memcmp{L}(char *s1, char *s2, ℤ n)
-    
+axiomatic MemCmp {
+  logic ℤ memcmp{L}(char *s1, char *s2, ℤ n) 
     reads *(s1+(0 .. n-1)), *(s2+(0 .. n-1));
   
-  axiom
-  memcmp_zero{L}:
-                 ∀ char *s1, char *s2;
-                   (∀ ℤ n;
-                      memcmp{L}(s1, s2, n) ≡ 0 ⇔
-                      (∀ ℤ i; 0 ≤ i ∧ i < n ⇒ *(s1+i) ≡ *(s2+i)));
+  axiom memcmp_zero{L}:
+    ∀ char *s1, char *s2;
+    ∀ ℤ n;
+      memcmp{L}(s1, s2, n) ≡ 0 ⇔
+      (∀ ℤ i; 0 ≤ i < n ⇒ *(s1+i) ≡ *(s2+i));
   
   }
  */
 /*@
-axiomatic
-  MemChr {
+axiomatic MemChr {
   logic 𝔹 memchr{L}(char *s, ℤ c, ℤ n) ;
   
-  axiom
-  memchr_def{L}:
-                ∀ char *s;
-                  (∀ ℤ c;
-                     (∀ ℤ n;
-                        memchr{L}(s, c, n) ≡ \true ⇔
-                        (∃ int i; (0 ≤ i ∧ i < n) ∧ *(s+i) ≡ c)));
+  axiom memchr_def{L}:
+    ∀ char *s;
+    ∀ ℤ c;
+    ∀ ℤ n;
+      memchr{L}(s, c, n) ≡ \true ⇔
+      (∃ int i; 0 ≤ i < n ∧ *(s+i) ≡ c);
   
   }
  */
 /*@
-axiomatic
-  MemSet {
+axiomatic MemSet {
   logic 𝔹 memset{L}(char *s, ℤ c, ℤ n) ;
   
-  axiom
-  memset_def{L}:
-                ∀ char *s;
-                  (∀ ℤ c;
-                     (∀ ℤ n;
-                        memset{L}(s, c, n) ≡ \true ⇔
-                        (∀ ℤ i; 0 ≤ i ∧ i < n ⇒ *(s+i) ≡ c)));
+  axiom memset_def{L}:
+    ∀ char *s;
+    ∀ ℤ c;
+    ∀ ℤ n;
+      memset{L}(s, c, n) ≡ \true ⇔
+      (∀ ℤ i; 0 ≤ i < n ⇒ *(s+i) ≡ c);
   
   }
  */
 /*@
-axiomatic
-  StrLen {
+axiomatic StrLen {
   logic ℤ strlen{L}(char *s) ;
   
-  axiom
-  strlen_pos_or_null{L}:
-                        ∀ char *s;
-                          (∀ ℤ i;
-                             (0 ≤ i ∧
-                              (∀ ℤ j;
-                                 0 ≤ j ∧ j < i ⇒ *(s+j) ≢ '\000'))
-                             ∧ *(s+i) ≡ '\000' ⇒ strlen{L}(s) ≡ i);
+  axiom strlen_pos_or_null{L}:
+    ∀ char *s;
+    ∀ ℤ i;
+      0 ≤ i ∧ (∀ ℤ j; 0 ≤ j < i ⇒ *(s+j) ≢ '\000') ∧
+      *(s+i) ≡ '\000' ⇒ strlen{L}(s) ≡ i;
   
-  axiom
-  strlen_neg{L}:
-                ∀ char *s;
-                  (∀ ℤ i; 0 ≤ i ⇒ *(s+i) ≢ '\000') ⇒
-                  strlen{L}(s) < 0;
+  axiom strlen_neg{L}:
+    ∀ char *s;
+      (∀ ℤ i; 0 ≤ i ⇒ *(s+i) ≢ '\000') ⇒ strlen{L}(s) < 0;
   
-  axiom
-  strlen_before_null{L}:
-                        ∀ char *s;
-                          (∀ ℤ i;
-                             0 ≤ i ∧ i < strlen{L}(s) ⇒
-                             *(s+i) ≢ '\000');
+  axiom strlen_before_null{L}:
+    ∀ char *s;
+    ∀ ℤ i; 0 ≤ i < strlen{L}(s) ⇒ *(s+i) ≢ '\000';
   
-  axiom
-  strlen_at_null{L}:
-                    ∀ char *s;
-                      0 ≤ strlen{L}(s) ⇒ *(s+strlen{L}(s)) ≡ '\000';
+  axiom strlen_at_null{L}:
+    ∀ char *s; 0 ≤ strlen{L}(s) ⇒ *(s+strlen{L}(s)) ≡ '\000';
   
-  axiom
-  strlen_not_zero{L}:
-                     ∀ char *s;
-                       (∀ ℤ i;
-                          (0 ≤ i ∧ i ≤ strlen{L}(s)) ∧
-                          *(s+i) ≢ '\000' ⇒ i < strlen{L}(s));
+  axiom strlen_not_zero{L}:
+    ∀ char *s;
+    ∀ ℤ i;
+      0 ≤ i ≤ strlen{L}(s) ∧ *(s+i) ≢ '\000' ⇒ i < strlen{L}(s);
   
-  axiom
-  strlen_zero{L}:
-                 ∀ char *s;
-                   (∀ ℤ i;
-                      (0 ≤ i ∧ i ≤ strlen{L}(s)) ∧ *(s+i) ≡ '\000'
-                      ⇒ i ≡ strlen{L}(s));
+  axiom strlen_zero{L}:
+    ∀ char *s;
+    ∀ ℤ i;
+      0 ≤ i ≤ strlen{L}(s) ∧ *(s+i) ≡ '\000' ⇒ i ≡ strlen{L}(s);
   
-  axiom
-  strlen_sup{L}:
-                ∀ char *s;
-                  (∀ ℤ i;
-                     0 ≤ i ∧ *(s+i) ≡ '\000' ⇒
-                     0 ≤ strlen{L}(s) ∧ strlen{L}(s) ≤ i);
+  axiom strlen_sup{L}:
+    ∀ char *s;
+    ∀ ℤ i; 0 ≤ i ∧ *(s+i) ≡ '\000' ⇒ 0 ≤ strlen{L}(s) ≤ i;
   
-  axiom
-  strlen_shift{L}:
-                  ∀ char *s;
-                    (∀ ℤ i;
-                       0 ≤ i ∧ i ≤ strlen{L}(s) ⇒
-                       strlen{L}(s+i) ≡ strlen{L}(s)-i);
+  axiom strlen_shift{L}:
+    ∀ char *s;
+    ∀ ℤ i; 0 ≤ i ≤ strlen{L}(s) ⇒ strlen{L}(s+i) ≡ strlen{L}(s)-i;
   
-  axiom
-  strlen_create{L}:
-                   ∀ char *s;
-                     (∀ ℤ i;
-                        0 ≤ i ∧ *(s+i) ≡ '\000' ⇒
-                        0 ≤ strlen{L}(s) ∧ strlen{L}(s) ≤ i);
+  axiom strlen_create{L}:
+    ∀ char *s;
+    ∀ ℤ i; 0 ≤ i ∧ *(s+i) ≡ '\000' ⇒ 0 ≤ strlen{L}(s) ≤ i;
   
-  axiom
-  strlen_create_shift{L}:
-                         ∀ char *s;
-                           (∀ ℤ i;
-                              (∀ ℤ k;
-                                 (0 ≤ k ∧ k ≤ i) ∧ *(s+i) ≡ '\000'
-                                 ⇒
-                                 0 ≤ strlen{L}(s+k) ∧
-                                 strlen{L}(s+k) ≤ i-k));
+  axiom strlen_create_shift{L}:
+    ∀ char *s;
+    ∀ ℤ i;
+    ∀ ℤ k;
+      0 ≤ k ≤ i ∧ *(s+i) ≡ '\000' ⇒ 0 ≤ strlen{L}(s+k) ≤ i-k;
   
-  axiom
-  memcmp_strlen_left{L}:
-                        ∀ char *s1, char *s2;
-                          (∀ ℤ n;
-                             memcmp{L}(s1, s2, n) ≡ 0 ∧ strlen{L}(s1) < n
-                             ⇒ strlen{L}(s1) ≡ strlen{L}(s2));
+  axiom memcmp_strlen_left{L}:
+    ∀ char *s1, char *s2;
+    ∀ ℤ n;
+      memcmp{L}(s1, s2, n) ≡ 0 ∧ strlen{L}(s1) < n ⇒
+      strlen{L}(s1) ≡ strlen{L}(s2);
   
-  axiom
-  memcmp_strlen_right{L}:
-                         ∀ char *s1, char *s2;
-                           (∀ ℤ n;
-                              memcmp{L}(s1, s2, n) ≡ 0 ∧
-                              strlen{L}(s2) < n ⇒
-                              strlen{L}(s1) ≡ strlen{L}(s2));
+  axiom memcmp_strlen_right{L}:
+    ∀ char *s1, char *s2;
+    ∀ ℤ n;
+      memcmp{L}(s1, s2, n) ≡ 0 ∧ strlen{L}(s2) < n ⇒
+      strlen{L}(s1) ≡ strlen{L}(s2);
   
-  axiom
-  memcmp_strlen_shift_left{L}:
-                              ∀ char *s1, char *s2;
-                                (∀ ℤ k, ℤ n;
-                                   (memcmp{L}(s1, s2+k, n) ≡ 0 ∧ 0 ≤ k)
-                                   ∧ strlen{L}(s1) < n ⇒
-                                   0 ≤ strlen{L}(s2) ∧
-                                   strlen{L}(s2) ≤ k+strlen{L}(s1));
+  axiom memcmp_strlen_shift_left{L}:
+    ∀ char *s1, char *s2;
+    ∀ ℤ k, ℤ n;
+      memcmp{L}(s1, s2+k, n) ≡ 0 ≤ k ∧ strlen{L}(s1) < n ⇒
+      0 ≤ strlen{L}(s2) ≤ k+strlen{L}(s1);
   
-  axiom
-  memcmp_strlen_shift_right{L}:
-                               ∀ char *s1, char *s2;
-                                 (∀ ℤ k, ℤ n;
-                                    (memcmp{L}(s1+k, s2, n) ≡ 0 ∧ 0 ≤ k)
-                                    ∧ strlen{L}(s2) < n ⇒
-                                    0 ≤ strlen{L}(s1) ∧
-                                    strlen{L}(s1) ≤ k+strlen{L}(s2));
+  axiom memcmp_strlen_shift_right{L}:
+    ∀ char *s1, char *s2;
+    ∀ ℤ k, ℤ n;
+      memcmp{L}(s1+k, s2, n) ≡ 0 ≤ k ∧ strlen{L}(s2) < n ⇒
+      0 ≤ strlen{L}(s1) ≤ k+strlen{L}(s2);
   
   }
  */
 /*@
-axiomatic
-  StrCmp {
+axiomatic StrCmp {
   logic ℤ strcmp{L}(char *s1, char *s2) ;
   
-  axiom
-  strcmp_zero{L}:
-                 ∀ char *s1, char *s2;
-                   strcmp{L}(s1, s2) ≡ 0 ⇔
-                   strlen{L}(s1) ≡ strlen{L}(s2) ∧
-                   (∀ ℤ i;
-                      0 ≤ i ∧ i ≤ strlen{L}(s1) ⇒ *(s1+i) ≡ *(s2+i));
+  axiom strcmp_zero{L}:
+    ∀ char *s1, char *s2;
+      strcmp{L}(s1, s2) ≡ 0 ⇔
+      strlen{L}(s1) ≡ strlen{L}(s2) ∧
+      (∀ ℤ i; 0 ≤ i ≤ strlen{L}(s1) ⇒ *(s1+i) ≡ *(s2+i));
   
   }
  */
 /*@
-axiomatic
-  StrNCmp {
+axiomatic StrNCmp {
   logic ℤ strncmp{L}(char *s1, char *s2, ℤ n) ;
   
-  axiom
-  strncmp_zero{L}:
-                  ∀ char *s1, char *s2;
-                    (∀ ℤ n;
-                       strncmp{L}(s1, s2, n) ≡ 0 ⇔
-                       (strlen{L}(s1) < n ∧ strcmp{L}(s1, s2) ≡ 0) ∨
-                       (∀ ℤ i; 0 ≤ i ∧ i < n ⇒ *(s1+i) ≡ *(s2+i)));
+  axiom strncmp_zero{L}:
+    ∀ char *s1, char *s2;
+    ∀ ℤ n;
+      strncmp{L}(s1, s2, n) ≡ 0 ⇔
+      (strlen{L}(s1) < n ∧ strcmp{L}(s1, s2) ≡ 0) ∨
+      (∀ ℤ i; 0 ≤ i < n ⇒ *(s1+i) ≡ *(s2+i));
   
   }
  */
 /*@
-axiomatic
-  StrChr {
+axiomatic StrChr {
   logic 𝔹 strchr{L}(char *s, ℤ c) ;
   
-  axiom
-  strchr_def{L}:
-                ∀ char *s;
-                  (∀ ℤ c;
-                     strchr{L}(s, c) ≡ \true ⇔
-                     (∃ ℤ i;
-                        (0 ≤ i ∧ i ≤ strlen{L}(s)) ∧ *(s+i) ≡ c));
+  axiom strchr_def{L}:
+    ∀ char *s;
+    ∀ ℤ c;
+      strchr{L}(s, c) ≡ \true ⇔
+      (∃ ℤ i; 0 ≤ i ≤ strlen{L}(s) ∧ *(s+i) ≡ c);
   
   }
  */
 /*@
-axiomatic
-  WcsLen {
+axiomatic WcsLen {
   logic ℤ wcslen{L}(wchar_t *s) ;
   
-  axiom
-  wcslen_pos_or_null{L}:
-                        ∀ wchar_t *s;
-                          (∀ ℤ i;
-                             (0 ≤ i ∧
-                              (∀ ℤ j; 0 ≤ j ∧ j < i ⇒ *(s+j) ≢ 0))
-                             ∧ *(s+i) ≡ 0 ⇒ wcslen{L}(s) ≡ i);
+  axiom wcslen_pos_or_null{L}:
+    ∀ wchar_t *s;
+    ∀ ℤ i;
+      0 ≤ i ∧ (∀ ℤ j; 0 ≤ j < i ⇒ *(s+j) ≢ 0) ∧ *(s+i) ≡ 0 ⇒
+      wcslen{L}(s) ≡ i;
   
-  axiom
-  wcslen_neg{L}:
-                ∀ wchar_t *s;
-                  (∀ ℤ i; 0 ≤ i ⇒ *(s+i) ≢ 0) ⇒ wcslen{L}(s) < 0;
+  axiom wcslen_neg{L}:
+    ∀ wchar_t *s;
+      (∀ ℤ i; 0 ≤ i ⇒ *(s+i) ≢ 0) ⇒ wcslen{L}(s) < 0;
   
-  axiom
-  wcslen_before_null{L}:
-                        ∀ wchar_t *s;
-                          (∀ int i;
-                             0 ≤ i ∧ i < wcslen{L}(s) ⇒ *(s+i) ≢ 0);
+  axiom wcslen_before_null{L}:
+    ∀ wchar_t *s;
+    ∀ int i; 0 ≤ i < wcslen{L}(s) ⇒ *(s+i) ≢ 0;
   
-  axiom
-  wcslen_at_null{L}:
-                    ∀ wchar_t *s;
-                      0 ≤ wcslen{L}(s) ⇒ *(s+wcslen{L}(s)) ≡ 0;
+  axiom wcslen_at_null{L}:
+    ∀ wchar_t *s; 0 ≤ wcslen{L}(s) ⇒ *(s+wcslen{L}(s)) ≡ 0;
   
-  axiom
-  wcslen_not_zero{L}:
-                     ∀ wchar_t *s;
-                       (∀ int i;
-                          (0 ≤ i ∧ i ≤ wcslen{L}(s)) ∧ *(s+i) ≢ 0
-                          ⇒ i < wcslen{L}(s));
+  axiom wcslen_not_zero{L}:
+    ∀ wchar_t *s;
+    ∀ int i; 0 ≤ i ≤ wcslen{L}(s) ∧ *(s+i) ≢ 0 ⇒ i < wcslen{L}(s);
   
-  axiom
-  wcslen_zero{L}:
-                 ∀ wchar_t *s;
-                   (∀ int i;
-                      (0 ≤ i ∧ i ≤ wcslen{L}(s)) ∧ *(s+i) ≡ 0 ⇒
-                      i ≡ wcslen{L}(s));
+  axiom wcslen_zero{L}:
+    ∀ wchar_t *s;
+    ∀ int i;
+      0 ≤ i ≤ wcslen{L}(s) ∧ *(s+i) ≡ 0 ⇒ i ≡ wcslen{L}(s);
   
-  axiom
-  wcslen_sup{L}:
-                ∀ wchar_t *s;
-                  (∀ int i;
-                     0 ≤ i ∧ *(s+i) ≡ 0 ⇒
-                     0 ≤ wcslen{L}(s) ∧ wcslen{L}(s) ≤ i);
+  axiom wcslen_sup{L}:
+    ∀ wchar_t *s;
+    ∀ int i; 0 ≤ i ∧ *(s+i) ≡ 0 ⇒ 0 ≤ wcslen{L}(s) ≤ i;
   
-  axiom
-  wcslen_shift{L}:
-                  ∀ wchar_t *s;
-                    (∀ int i;
-                       0 ≤ i ∧ i ≤ wcslen{L}(s) ⇒
-                       wcslen{L}(s+i) ≡ wcslen{L}(s)-i);
+  axiom wcslen_shift{L}:
+    ∀ wchar_t *s;
+    ∀ int i; 0 ≤ i ≤ wcslen{L}(s) ⇒ wcslen{L}(s+i) ≡ wcslen{L}(s)-i;
   
-  axiom
-  wcslen_create{L}:
-                   ∀ wchar_t *s;
-                     (∀ int i;
-                        0 ≤ i ∧ *(s+i) ≡ 0 ⇒
-                        0 ≤ wcslen{L}(s) ∧ wcslen{L}(s) ≤ i);
+  axiom wcslen_create{L}:
+    ∀ wchar_t *s;
+    ∀ int i; 0 ≤ i ∧ *(s+i) ≡ 0 ⇒ 0 ≤ wcslen{L}(s) ≤ i;
   
-  axiom
-  wcslen_create_shift{L}:
-                         ∀ wchar_t *s;
-                           (∀ int i;
-                              (∀ int k;
-                                 (0 ≤ k ∧ k ≤ i) ∧ *(s+i) ≡ 0 ⇒
-                                 0 ≤ wcslen{L}(s+k) ∧
-                                 wcslen{L}(s+k) ≤ i-k));
+  axiom wcslen_create_shift{L}:
+    ∀ wchar_t *s;
+    ∀ int i;
+    ∀ int k;
+      0 ≤ k ≤ i ∧ *(s+i) ≡ 0 ⇒ 0 ≤ wcslen{L}(s+k) ≤ i-k;
   
   }
  */
 /*@
-axiomatic
-  WcsCmp {
+axiomatic WcsCmp {
   logic ℤ wcscmp{L}(wchar_t *s1, wchar_t *s2) ;
   
-  axiom
-  wcscmp_zero{L}:
-                 ∀ wchar_t *s1, wchar_t *s2;
-                   wcscmp{L}(s1, s2) ≡ 0 ⇔
-                   wcslen{L}(s1) ≡ wcslen{L}(s2) ∧
-                   (∀ ℤ i;
-                      0 ≤ i ∧ i ≤ wcslen{L}(s1) ⇒ *(s1+i) ≡ *(s2+i));
+  axiom wcscmp_zero{L}:
+    ∀ wchar_t *s1, wchar_t *s2;
+      wcscmp{L}(s1, s2) ≡ 0 ⇔
+      wcslen{L}(s1) ≡ wcslen{L}(s2) ∧
+      (∀ ℤ i; 0 ≤ i ≤ wcslen{L}(s1) ⇒ *(s1+i) ≡ *(s2+i));
   
   }
  */
 /*@
-axiomatic
-  WcsNCmp {
+axiomatic WcsNCmp {
   logic ℤ wcsncmp{L}(wchar_t *s1, wchar_t *s2, ℤ n) ;
   
-  axiom
-  wcsncmp_zero{L}:
-                  ∀ wchar_t *s1, wchar_t *s2;
-                    (∀ ℤ n;
-                       wcsncmp{L}(s1, s2, n) ≡ 0 ⇔
-                       (wcslen{L}(s1) < n ∧ wcscmp{L}(s1, s2) ≡ 0) ∨
-                       (∀ ℤ i; 0 ≤ i ∧ i < n ⇒ *(s1+i) ≡ *(s2+i)));
+  axiom wcsncmp_zero{L}:
+    ∀ wchar_t *s1, wchar_t *s2;
+    ∀ ℤ n;
+      wcsncmp{L}(s1, s2, n) ≡ 0 ⇔
+      (wcslen{L}(s1) < n ∧ wcscmp{L}(s1, s2) ≡ 0) ∨
+      (∀ ℤ i; 0 ≤ i < n ⇒ *(s1+i) ≡ *(s2+i));
   
   }
  */
@@ -506,7 +423,7 @@ extern size_t strlen(char const *s);
 size_t __e_acsl_strlen(char const *s)
 {
   size_t __retres;
-  __store_block((void *)(& s),8U);
+  __store_block((void *)(& s),8UL);
   __retres = strlen(s);
   __delete_block((void *)(& s));
   return __retres;
@@ -520,20 +437,20 @@ int main(int argc, char **argv)
   /*@ assert \valid(&argc); */
   {
     int __e_acsl_valid;
-    __store_block((void *)(& argc),4U);
-    __store_block((void *)(& argv),8U);
-    __e_acsl_valid = __valid((void *)(& argc),(size_t)sizeof(int));
+    __store_block((void *)(& argc),4UL);
+    __store_block((void *)(& argv),8UL);
+    __e_acsl_valid = __valid((void *)(& argc),sizeof(int));
     e_acsl_assert(__e_acsl_valid,(char *)"Assertion",(char *)"main",
                   (char *)"\\valid(&argc)",12);
   }
   /*@ assert \valid(&argv); */
   {
     int __e_acsl_valid_2;
-    __e_acsl_valid_2 = __valid((void *)(& argv),(size_t)sizeof(char **));
+    __e_acsl_valid_2 = __valid((void *)(& argv),sizeof(char **));
     e_acsl_assert(__e_acsl_valid_2,(char *)"Assertion",(char *)"main",
                   (char *)"\\valid(&argv)",13);
   }
-  /*@ assert ∀ int k; 0 ≤ k ∧ k < argc ⇒ \valid(argv+k); */
+  /*@ assert ∀ int k; 0 ≤ k < argc ⇒ \valid(argv+k); */
   {
     int __e_acsl_forall;
     mpz_t __e_acsl_k;
@@ -560,7 +477,7 @@ int main(int argc, char **argv)
         int __e_acsl_valid_3;
         __e_acsl_k_2 = __gmpz_get_ui((__mpz_struct const *)(__e_acsl_k));
         __e_acsl_valid_3 = __valid((void *)(argv + __e_acsl_k_2),
-                                   (size_t)sizeof(char *));
+                                   sizeof(char *));
         if (__e_acsl_valid_3) ;
         else {
           __e_acsl_forall = 0;
@@ -581,7 +498,7 @@ int main(int argc, char **argv)
     }
     e_acsl_end_loop1: ;
     e_acsl_assert(__e_acsl_forall,(char *)"Assertion",(char *)"main",
-                  (char *)"\\forall int k; 0 <= k && k < argc ==> \\valid(argv+k)",
+                  (char *)"\\forall int k; 0 <= k < argc ==> \\valid(argv+k)",
                   14);
     __gmpz_clear(__e_acsl_k);
   }
@@ -595,7 +512,7 @@ int main(int argc, char **argv)
     mpz_t __e_acsl_sizeof;
     mpz_t __e_acsl_mul;
     int __e_acsl_eq;
-    __e_acsl_block_length = (unsigned long)__block_length((void *)argv);
+    __e_acsl_block_length = __block_length((void *)argv);
     __gmpz_init_set_ui(__e_acsl_block_length_2,__e_acsl_block_length);
     __gmpz_init_set_si(__e_acsl_argc_2,(long)argc);
     __gmpz_init_set_si(__e_acsl_3,(long)1);
@@ -622,7 +539,7 @@ int main(int argc, char **argv)
   {
     int __e_acsl_valid_read;
     __e_acsl_valid_read = __valid_read((void *)(argv + (long)argc),
-                                       (size_t)sizeof(char *));
+                                       sizeof(char *));
     e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"main",
                   (char *)"mem_access: \\valid_read(argv+(long)argc)",17);
     e_acsl_assert(*(argv + (long)argc) == (void *)0,(char *)"Assertion",
@@ -633,16 +550,15 @@ int main(int argc, char **argv)
     int __e_acsl_initialized;
     int __e_acsl_and;
     __e_acsl_initialized = __initialized((void *)(argv + (long)argc),
-                                         (size_t)sizeof(char *));
+                                         sizeof(char *));
     if (__e_acsl_initialized) {
       int __e_acsl_valid_read_2;
       int __e_acsl_valid_4;
       __e_acsl_valid_read_2 = __valid_read((void *)(argv + (long)argc),
-                                           (size_t)sizeof(char *));
+                                           sizeof(char *));
       e_acsl_assert(__e_acsl_valid_read_2,(char *)"RTE",(char *)"main",
                     (char *)"mem_access: \\valid_read(argv+(long)argc)",18);
-      __e_acsl_valid_4 = __valid((void *)*(argv + (long)argc),
-                                 (size_t)sizeof(char));
+      __e_acsl_valid_4 = __valid((void *)*(argv + (long)argc),sizeof(char));
       __e_acsl_and = __e_acsl_valid_4;
     }
     else __e_acsl_and = 0;
@@ -661,23 +577,22 @@ int main(int argc, char **argv)
         int __e_acsl_initialized_2;
         int __e_acsl_and_2;
         __e_acsl_initialized_2 = __initialized((void *)(argv + (long)i),
-                                               (size_t)sizeof(char *));
+                                               sizeof(char *));
         if (__e_acsl_initialized_2) {
           int __e_acsl_valid_read_3;
           int __e_acsl_valid_5;
           __e_acsl_valid_read_3 = __valid_read((void *)(argv + (long)i),
-                                               (size_t)sizeof(char *));
+                                               sizeof(char *));
           e_acsl_assert(__e_acsl_valid_read_3,(char *)"RTE",(char *)"main",
                         (char *)"mem_access: \\valid_read(argv+(long)i)",21);
-          __e_acsl_valid_5 = __valid((void *)*(argv + (long)i),
-                                     (size_t)sizeof(char));
+          __e_acsl_valid_5 = __valid((void *)*(argv + (long)i),sizeof(char));
           __e_acsl_and_2 = __e_acsl_valid_5;
         }
         else __e_acsl_and_2 = 0;
         e_acsl_assert(__e_acsl_and_2,(char *)"Assertion",(char *)"main",
                       (char *)"\\valid(*(argv+i))",21);
       }
-      /*@ assert ∀ int k; 0 ≤ k ∧ k ≤ len ⇒ \valid(*(argv+i)+k); */
+      /*@ assert ∀ int k; 0 ≤ k ≤ len ⇒ \valid(*(argv+i)+k); */
       {
         int __e_acsl_forall_2;
         mpz_t __e_acsl_k_3;
@@ -705,12 +620,12 @@ int main(int argc, char **argv)
             int __e_acsl_valid_6;
             __e_acsl_k_4 = __gmpz_get_ui((__mpz_struct const *)(__e_acsl_k_3));
             __e_acsl_valid_read_4 = __valid_read((void *)(argv + (long)i),
-                                                 (size_t)sizeof(char *));
+                                                 sizeof(char *));
             e_acsl_assert(__e_acsl_valid_read_4,(char *)"RTE",(char *)"main",
                           (char *)"mem_access: \\valid_read(argv+(long)i)",
                           22);
             __e_acsl_valid_6 = __valid((void *)(*(argv + (long)i) + __e_acsl_k_4),
-                                       (size_t)sizeof(char));
+                                       sizeof(char));
             if (__e_acsl_valid_6) ;
             else {
               __e_acsl_forall_2 = 0;
@@ -731,7 +646,7 @@ int main(int argc, char **argv)
         }
         e_acsl_end_loop2: ;
         e_acsl_assert(__e_acsl_forall_2,(char *)"Assertion",(char *)"main",
-                      (char *)"\\forall int k; 0 <= k && k <= len ==> \\valid(*(argv+i)+k)",
+                      (char *)"\\forall int k; 0 <= k <= len ==> \\valid(*(argv+i)+k)",
                       22);
         __gmpz_clear(__e_acsl_k_3);
       }

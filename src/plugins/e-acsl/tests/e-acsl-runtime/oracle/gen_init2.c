@@ -6,7 +6,7 @@ struct __anonstruct___mpz_struct_1 {
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
-typedef unsigned int size_t;
+typedef unsigned long size_t;
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
@@ -23,8 +23,7 @@ unsigned long const rand_max = (unsigned long)32767;
 /*@ ghost extern int __fc_heap_status; */
 
 /*@
-axiomatic
-  dynamic_allocation {
+axiomatic dynamic_allocation {
   predicate is_allocable{L}(size_t n) 
     reads __fc_heap_status;
   
@@ -69,9 +68,9 @@ int a = 0;
 int b;
 void __e_acsl_memory_init(void)
 {
-  __store_block((void *)(& b),4U);
+  __store_block((void *)(& b),4UL);
   __full_init((void *)(& b));
-  __store_block((void *)(& a),4U);
+  __store_block((void *)(& a),4UL);
   __full_init((void *)(& a));
   return;
 }
@@ -82,8 +81,8 @@ int main(void)
   int *p;
   int *q;
   __e_acsl_memory_init();
-  __store_block((void *)(& q),8U);
-  __store_block((void *)(& p),8U);
+  __store_block((void *)(& q),8UL);
+  __store_block((void *)(& p),8UL);
   __full_init((void *)(& p));
   p = & a;
   __full_init((void *)(& q));
@@ -94,14 +93,14 @@ int main(void)
   /*@ assert \initialized(q); */
   {
     int __e_acsl_initialized;
-    __e_acsl_initialized = __initialized((void *)q,(size_t)sizeof(int));
+    __e_acsl_initialized = __initialized((void *)q,sizeof(int));
     e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"main",
                   (char *)"\\initialized(q)",12);
   }
   /*@ assert \initialized(p); */
   {
     int __e_acsl_initialized_2;
-    __e_acsl_initialized_2 = __initialized((void *)p,(size_t)sizeof(int));
+    __e_acsl_initialized_2 = __initialized((void *)p,sizeof(int));
     e_acsl_assert(__e_acsl_initialized_2,(char *)"Assertion",(char *)"main",
                   (char *)"\\initialized(p)",13);
   }
