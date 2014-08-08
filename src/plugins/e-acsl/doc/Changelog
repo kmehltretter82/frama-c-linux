@@ -15,6 +15,11 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
+########################
+Plugin E-ACSL 0.4.1 Neon
+########################
+
+-* E-ACSL       [2014/08/05] Fix bug #1838 about memset.
 -* E-ACSL       [2014/08/05] Fix bug #1818 about initialization of globals.
 -* E-ACSL       [2014/08/04] Fix bug #1696 by clarifying the manual.
 -* E-ACSL       [2014/08/04] Fix bug #1831 about argc and argv.
