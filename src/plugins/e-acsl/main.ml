@@ -85,6 +85,7 @@ E-ACSL is going to work on a copy.";
     in
     let prj =
       Project.create_by_copy
+        ~last:false
 	~selection
 	(Pretty_utils.sfprintf "%s for E-ACSL" name)
     in
