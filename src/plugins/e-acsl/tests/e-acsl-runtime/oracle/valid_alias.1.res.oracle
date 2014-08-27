@@ -58,11 +58,11 @@ tests/e-acsl-runtime/valid_alias.c:17:[value] Assertion got status valid.
 FRAMAC_SHARE/libc/stdlib.h:175:[value] Function __e_acsl_free, behavior deallocation: precondition 'freeable' got status unknown.
 FRAMAC_SHARE/libc/stdlib.h:177:[value] Function __e_acsl_free, behavior deallocation: postcondition got status unknown.
 tests/e-acsl-runtime/valid_alias.c:19:[value] Assertion got status valid.
-tests/e-acsl-runtime/valid_alias.c:19:[kernel] warning: accessing left-value that contains escaping addresses; assert(\defined(&a))
+tests/e-acsl-runtime/valid_alias.c:19:[kernel] warning: accessing left-value that contains escaping addresses: assert \specified(&a);
 tests/e-acsl-runtime/valid_alias.c:19:[kernel] warning: completely indeterminate value in a.
 tests/e-acsl-runtime/valid_alias.c:19:[value] all evaluations are invalid for function call argument
         (void *)a
-tests/e-acsl-runtime/valid_alias.c:19:[kernel] warning: accessing left-value that contains escaping addresses; assert(\defined(&b))
+tests/e-acsl-runtime/valid_alias.c:19:[kernel] warning: accessing left-value that contains escaping addresses: assert \specified(&b);
 tests/e-acsl-runtime/valid_alias.c:19:[kernel] warning: completely indeterminate value in b.
 tests/e-acsl-runtime/valid_alias.c:19:[value] all evaluations are invalid for function call argument
         (void *)b

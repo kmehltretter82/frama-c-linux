@@ -441,6 +441,7 @@ let rec type_predicate_named p =
   | Pfalse | Ptrue -> ()
   | Papp _ -> Error.not_yet "logic function application"
   | Pseparated _ -> Error.not_yet "\\separated"
+  | Pspecified _ -> Error.not_yet "\\specified"
   | Prel(_, t1, t2) -> 
     ignore (type_term t1);
     ignore (type_term t2)
