@@ -90,14 +90,14 @@ predicate diffSize{L1, L2}(ℤ i) =
  */
 /*@
 axiomatic MemCmp {
-  logic ℤ memcmp{L}(char *s1, char *s2, ℤ n) 
-    reads *(s1+(0 .. n-1)), *(s2+(0 .. n-1));
+  logic ℤ memcmp{L1, L2}(char *s1, char *s2, ℤ n) 
+    reads \at(*(s1+(0 .. n-1)),L1), \at(*(s2+(0 .. n-1)),L2);
   
-  axiom memcmp_zero{L}:
+  axiom memcmp_zero{L1, L2}:
     ∀ char *s1, char *s2;
     ∀ ℤ n;
-      memcmp{L}(s1, s2, n) ≡ 0 ⇔
-      (∀ ℤ i; 0 ≤ i < n ⇒ *(s1+i) ≡ *(s2+i));
+      memcmp{L1, L2}(s1, s2, n) ≡ 0 ⇔
+      (∀ ℤ i; 0 ≤ i < n ⇒ \at(*(s1+i),L1) ≡ \at(*(s2+i),L2));
   
   }
  */
@@ -179,25 +179,25 @@ axiomatic StrLen {
   axiom memcmp_strlen_left{L}:
     ∀ char *s1, char *s2;
     ∀ ℤ n;
-      memcmp{L}(s1, s2, n) ≡ 0 ∧ strlen{L}(s1) < n ⇒
+      memcmp{L, L}(s1, s2, n) ≡ 0 ∧ strlen{L}(s1) < n ⇒
       strlen{L}(s1) ≡ strlen{L}(s2);
   
   axiom memcmp_strlen_right{L}:
     ∀ char *s1, char *s2;
     ∀ ℤ n;
-      memcmp{L}(s1, s2, n) ≡ 0 ∧ strlen{L}(s2) < n ⇒
+      memcmp{L, L}(s1, s2, n) ≡ 0 ∧ strlen{L}(s2) < n ⇒
       strlen{L}(s1) ≡ strlen{L}(s2);
   
   axiom memcmp_strlen_shift_left{L}:
     ∀ char *s1, char *s2;
     ∀ ℤ k, ℤ n;
-      memcmp{L}(s1, s2+k, n) ≡ 0 ≤ k ∧ strlen{L}(s1) < n ⇒
+      memcmp{L, L}(s1, s2+k, n) ≡ 0 ≤ k ∧ strlen{L}(s1) < n ⇒
       0 ≤ strlen{L}(s2) ≤ k+strlen{L}(s1);
   
   axiom memcmp_strlen_shift_right{L}:
     ∀ char *s1, char *s2;
     ∀ ℤ k, ℤ n;
-      memcmp{L}(s1+k, s2, n) ≡ 0 ≤ k ∧ strlen{L}(s2) < n ⇒
+      memcmp{L, L}(s1+k, s2, n) ≡ 0 ≤ k ∧ strlen{L}(s2) < n ⇒
       0 ≤ strlen{L}(s1) ≤ k+strlen{L}(s2);
   
   }
