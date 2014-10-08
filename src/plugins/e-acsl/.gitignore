@@ -75,3 +75,4 @@
 /tests/e-acsl-reject/result/*_DEP
 /tests/e-acsl-reject/result/*.log
 /tests/check/obj/*
+.frama-c
