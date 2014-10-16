@@ -49,8 +49,8 @@ tests/e-acsl-runtime/loop.i:21:[kernel] warning: completely indeterminate value 
 tests/e-acsl-runtime/loop.i:21:[kernel] warning: completely indeterminate value in t with offsets [3360..3808],0%32.
 tests/e-acsl-runtime/loop.i:21:[kernel] warning: completely indeterminate value in t with offsets [3840..4288],0%32.
 tests/e-acsl-runtime/loop.i:21:[kernel] warning: completely indeterminate value in t with offsets [4320..4768],0%32.
-tests/e-acsl-runtime/loop.i:21:[value] all evaluations are invalid for function call argument
-        (long)t[__e_acsl_k_2][__e_acsl_l_2]
+tests/e-acsl-runtime/loop.i:21:[value] completely invalid value in evaluation of
+        argument (long)t[__e_acsl_k_2][__e_acsl_l_2]
 [value] using specification for function __gmpz_add
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:143:[value] Function __gmpz_add: precondition got status valid.
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:144:[value] Function __gmpz_add: precondition got status valid.

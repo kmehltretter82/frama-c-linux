@@ -44,7 +44,6 @@ tests/e-acsl-runtime/mainargs.c:18:[value] Assertion got status unknown.
 [value] using specification for function __initialized
 tests/e-acsl-runtime/mainargs.c:18:[kernel] warning: out of bounds read. assert \valid_read(argv+argc);
 tests/e-acsl-runtime/mainargs.c:19:[value] entering loop for the first time
-tests/e-acsl-runtime/mainargs.c:20:[kernel] warning: out of bounds read. assert \valid_read(argv+i);
 FRAMAC_SHARE/libc/string.h:86:[value] Function __e_acsl_strlen: precondition 'valid_string_src' got status unknown.
 [value] using specification for function strlen
 FRAMAC_SHARE/libc/string.h:86:[value] Function strlen: precondition 'valid_string_src' got status unknown.
@@ -52,10 +51,8 @@ FRAMAC_SHARE/libc/string.h:90:[value] cannot evaluate ACSL term, unsupported ACS
 [value] using specification for function __delete_block
 FRAMAC_SHARE/libc/string.h:88:[value] Function __e_acsl_strlen: postcondition got status unknown.
 tests/e-acsl-runtime/mainargs.c:21:[value] Assertion got status unknown.
-tests/e-acsl-runtime/mainargs.c:21:[kernel] warning: out of bounds read. assert \valid_read(argv+i);
 tests/e-acsl-runtime/mainargs.c:22:[value] Assertion got status unknown.
 tests/e-acsl-runtime/mainargs.c:22:[value] entering loop for the first time
-tests/e-acsl-runtime/mainargs.c:22:[kernel] warning: out of bounds read. assert \valid_read(argv+i);
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
