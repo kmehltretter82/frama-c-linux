@@ -81,6 +81,9 @@
 - interprétation des tableaux logiques
 [Dillon] Windows
 - \valid(p) is not true if p is a const pointer (depend on -const-readonly)
+- utiliser == avec des real en arguments : c'est convertit en une égalité sur 
+des floating points, qui ne fait notoirement pas ce qu'on veut 
+(voir tests/e-acsl-runtime/bts1307.i).
 
 [to be check]: no call to full_init or initialize for the assigned result of a 
 function call

@@ -131,6 +131,26 @@ let conditional_to_exp ?(name="if") loc ctx e1 (e2, env2) (e3, env3) =
     in
     e, env
 
+(* If [e] is inserted in a context of type [float] or equivalent, then an
+   explicit cast must be introduced (an explicit coercion is required in C, but
+   it is implicit in the logic world).
+   [lty] is the type of the logic context, while [lty_t] is the logic type of
+   the term which [e] comes from. *)
+let cast_integer_to_float lty lty_t e =
+  if Cil.isIntegralType (Cil.typeOf e) then
+    let ty, correct = match lty, lty_t with
+      | Ctype ty, _ -> ty, true
+      | Lreal, Linteger -> Cil.longDoubleType, false
+      | Lreal, _ -> Cil.longDoubleType, true
+      | (Ltype _ | Lvar _ | Linteger | Larrow _), _ -> assert false
+    in
+    if not correct  then
+      Options.warning
+        "casting an integer to a long double without verification";
+    Cil.mkCast ~force:false ~e ~newt:ty
+  else
+    e
+
 let rec thost_to_host kf env = function
   | TVar { lv_origin = Some v } -> 
     Var (Cil.get_varinfo (Env.get_behavior env) v), env, v.vname
@@ -235,7 +255,13 @@ and context_insensitive_term_to_exp kf env t =
       in
       e, env, false, ""
     else
-      Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)), env, false, ""
+      if Logic_typing.is_integral_type t.term_type then
+        Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)), env, false, ""
+      else
+        (* floating point context: casting the arguments potentially required *)
+        let e1 = cast_integer_to_float t.term_type t1.term_type e1 in
+        let e2 = cast_integer_to_float t.term_type t2.term_type e2 in
+        Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)),  env, false, ""
   | TBinOp(Div | Mod as bop, t1, t2) ->
     let ty = Typing.typ_of_term_operation t in
     let ctx = Some ty in
@@ -276,7 +302,13 @@ and context_insensitive_term_to_exp kf env t =
       e, env, false, ""
     else
       (* no guard required since RTEs are generated separately *)
-      Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)), env, false, ""
+      if Logic_typing.is_integral_type t.term_type then
+        Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)), env, false, ""
+      else
+        (* floating point context: casting the arguments potentially required *)
+        let e1 = cast_integer_to_float t.term_type t1.term_type e1 in
+        let e2 = cast_integer_to_float t.term_type t2.term_type e2 in
+        Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)),  env, false, ""
   | TBinOp(Lt | Gt | Le | Ge | Eq | Ne as bop, t1, t2) ->
     (* comparison operators *)
     let e, env = comparison_to_exp ~loc kf env bop t1 t2 (Some t) in
@@ -638,26 +670,26 @@ and named_predicate_to_exp ?name kf ?rte env p =
 
 and translate_rte_annots: 
     'a. (Format.formatter -> 'a -> unit) -> 'a ->
-    kernel_function -> Env.t -> code_annotation list -> Env.t =
+  kernel_function -> Env.t -> code_annotation list -> Env.t =
   fun pp elt kf env l ->
-  let old_valid = !is_visiting_valid in
-  let old_kind = Env.annotation_kind env in
-  let env = Env.set_annotation_kind env Misc.RTE in
-  let env =
-    List.fold_left
-      (fun env a -> match a.annot_content with
-      | AAssert(_, p) -> 
-	handle_error
-	  (fun env -> 
-	    Options.feedback ~dkey ~level:4 "prevent RTE from %a" pp elt;
-	    translate_named_predicate kf (Env.rte env false) p)
-	  env
-      | _ -> assert false)
-      env
-      l
-  in
-  is_visiting_valid := old_valid;
-  Env.set_annotation_kind env old_kind
+    let old_valid = !is_visiting_valid in
+    let old_kind = Env.annotation_kind env in
+    let env = Env.set_annotation_kind env Misc.RTE in
+    let env =
+      List.fold_left
+        (fun env a -> match a.annot_content with
+        | AAssert(_, p) -> 
+	  handle_error
+	    (fun env -> 
+	      Options.feedback ~dkey ~level:4 "prevent RTE from %a" pp elt;
+	      translate_named_predicate kf (Env.rte env false) p)
+	    env
+        | _ -> assert false)
+        env
+        l
+    in
+    is_visiting_valid := old_valid;
+    Env.set_annotation_kind env old_kind
 
 and translate_rte kf env e =
   let stmt = Cil.mkStmtOneInstr ~valid_sid:true (Skip e.eloc) in

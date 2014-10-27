@@ -15,6 +15,9 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
+-* E-ACSL       [2014/10/27] Add a missing cast when translating an integral
+	        type used in a floating point/real context in an annotation.
+
 ########################
 Plugin E-ACSL 0.4.1 Neon
 ########################
