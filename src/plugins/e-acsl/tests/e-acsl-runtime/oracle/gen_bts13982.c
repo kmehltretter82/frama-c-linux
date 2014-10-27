@@ -31,17 +31,20 @@ struct stat {
    time_t st_ctime ;
    blksize_t st_blksize ;
    blkcnt_t st_blocks ;
-   char *__fc_real_data ;
-   int __fc_real_data_max_size ;
 };
+struct __fc_pos_t {
+   unsigned long __fc_stdio_position ;
+};
+typedef struct __fc_pos_t fpos_t;
 struct __fc_FILE {
    unsigned int __fc_stdio_id ;
-   unsigned int __fc_maxsz ;
-   unsigned int __fc_writepos ;
-   unsigned int __fc_readpos ;
-   int __fc_is_a_socket ;
-   int mode ;
+   fpos_t __fc_position ;
+   char __fc_error ;
+   char __fc_eof ;
+   int __fc_flags ;
    struct stat *__fc_inode ;
+   unsigned char *__fc_real_data ;
+   int __fc_real_data_max_size ;
 };
 typedef struct __fc_FILE FILE;
 /*@
