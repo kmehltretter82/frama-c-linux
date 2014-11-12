@@ -50,9 +50,9 @@ typedef struct __fc_FILE FILE;
 /*@
 model __mpz_struct { ℤ n };
 */
-int random_counter __attribute__((__unused__));
+int random_counter __attribute__((__unused__, __FRAMA_C_MODEL__));
 unsigned long const rand_max = (unsigned long)32767;
-/*@ ghost extern int __fc_heap_status; */
+/*@ ghost extern int __fc_heap_status __attribute__((__FRAMA_C_MODEL__)); */
 
 /*@
 axiomatic dynamic_allocation {
