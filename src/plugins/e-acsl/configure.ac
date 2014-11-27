@@ -26,15 +26,8 @@
 
 m4_define([plugin_file],Makefile.in)
 
-# m4_define([FRAMA_C_ENV],
-#           [m4_normalize(m4_esyscmd([echo $FRAMA_C]))])
-
 m4_define([FRAMAC_SHARE_ENV],
           [m4_normalize(m4_esyscmd([echo $FRAMAC_SHARE]))])
-
-# m4_define([FRAMA_C],
-# 	  [m4_ifval(FRAMA_C_ENV,[FRAMA_C_ENV],
-#                                 [echo frama-c])])
 
 m4_define([FRAMAC_SHARE],
 	  [m4_ifval(FRAMAC_SHARE_ENV,[FRAMAC_SHARE_ENV],
@@ -45,7 +38,7 @@ m4_ifndef([FRAMAC_M4_MACROS], [m4_include(FRAMAC_SHARE/configure.ac)])
 check_plugin(e_acsl,PLUGIN_RELATIVE_PATH(plugin_file),
 	     [support for E-ACSL plug-in],yes,yes)
 
-plugin_require(e_acsl,rte_annotation)
+plugin_require(e_acsl,rtegen)
 check_plugin_dependencies
 
 # Check Frama-C version
@@ -59,8 +52,8 @@ VERSION_NUMBER=`echo $DEV_VERSION_NUMBER | sed -e 's/\(.*\)+dev/\1/' `
 REQUIRED_NUMBER=20140301
 
 case $FRAMAC_VERSION in
-  Neon-20140301+dev*)
-    # # at the time being, must use the Frama-C development version
+  Neon-$REQUIRED_NUMBER+dev*)
+    # at the time being, must use the Frama-C development version
     ;;
   *)
     if test $VERSION_NUMBER -lt $REQUIRED_NUMBER; then
