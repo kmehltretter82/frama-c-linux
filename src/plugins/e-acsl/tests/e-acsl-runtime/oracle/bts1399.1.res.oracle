@@ -1,10 +1,15 @@
-[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/e_acsl.h"
-[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/e_acsl_gmp_types.h"
-[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/e_acsl_gmp.h"
-[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel_api.h"
-[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/memory_model/e_acsl_bittree.h"
-[kernel] preprocessing with "gcc -C -E -I. -IFRAMAC_SHARE/e-acsl -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h"
-[kernel] preprocessing with "gcc -C -E -I. -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc tests/e-acsl-runtime/bts1399.c"
+[kernel] Parsing FRAMAC_SHARE/libc/__fc_builtin_for_normalization.i (no preprocessing)
+[kernel] warning: your preprocessor is not known to handle option ` -nostdinc'. If pre-processing fails because of it, please add -no-cpp-gnu-like option to Frama-C's command-line. If you do not want to see this warning again, use explicitely -cpp-gnu-like option.
+[kernel] warning: your preprocessor is not known to handle option `-dD'. If pre-processing fails because of it, please add -no-cpp-gnu-like option to Frama-C's command-line. If you do not want to see this warning again, use explicitely -cpp-gnu-like option.
+[kernel] preprocessing with "CPP -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc -dD -nostdinc -D__FC_MACHDEP_X86_32 -IFRAMAC_SHARE/libc <file.c>"
+[kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl.h (with preprocessing)
+[kernel] warning: trying to preprocess annotation with an unknown preprocessor.
+[kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl_gmp_types.h (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl_gmp.h (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel_api.h (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/e-acsl/memory_model/e_acsl_bittree.h (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h (with preprocessing)
+[kernel] Parsing tests/e-acsl-runtime/bts1399.c (with preprocessing)
 [e-acsl] beginning translation.
 FRAMAC_SHARE/libc/stdlib.h:185:[e-acsl] warning: E-ACSL construct `\allocable' is not yet supported. Ignoring annotation.
 FRAMAC_SHARE/libc/stdlib.h:185:[e-acsl] warning: E-ACSL construct `\freeable' is not yet supported. Ignoring annotation.
