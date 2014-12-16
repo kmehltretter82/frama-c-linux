@@ -1,9 +1,5 @@
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_builtin_for_normalization.i (no preprocessing)
-[kernel] warning: your preprocessor is not known to handle option ` -nostdinc'. If pre-processing fails because of it, please add -no-cpp-gnu-like option to Frama-C's command-line. If you do not want to see this warning again, use explicitely -cpp-gnu-like option.
-[kernel] warning: your preprocessor is not known to handle option `-dD'. If pre-processing fails because of it, please add -no-cpp-gnu-like option to Frama-C's command-line. If you do not want to see this warning again, use explicitely -cpp-gnu-like option.
-[kernel] preprocessing with "CPP -DE_ACSL_MACHDEP=x86_32 -IFRAMAC_SHARE/libc -IFRAMAC_SHARE/libc -dD -nostdinc -D__FC_MACHDEP_X86_32 -IFRAMAC_SHARE/libc <file.c>"
 [kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl.h (with preprocessing)
-[kernel] warning: trying to preprocess annotation with an unknown preprocessor.
 [kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl_gmp_types.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl_gmp.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel_api.h (with preprocessing)
@@ -61,11 +57,13 @@ FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:117:[value] Function __gmpz_clear: precondition
 FRAMAC_SHARE/libc/stdlib.h:175:[value] Function __e_acsl_free, behavior deallocation: precondition 'freeable' got status unknown.
 FRAMAC_SHARE/libc/stdlib.h:177:[value] Function __e_acsl_free, behavior deallocation: postcondition got status unknown.
 tests/e-acsl-runtime/valid_alias.c:19:[value] Assertion got status valid.
-tests/e-acsl-runtime/valid_alias.c:19:[kernel] warning: accessing left-value that contains escaping addresses: assert \specified(&a);
+tests/e-acsl-runtime/valid_alias.c:19:[kernel] warning: accessing left-value that contains escaping addresses:
+                  assert ¬\dangling(&a);
 tests/e-acsl-runtime/valid_alias.c:19:[kernel] warning: completely indeterminate value in a.
 tests/e-acsl-runtime/valid_alias.c:19:[value] completely invalid value in evaluation of
         argument (void *)a
-tests/e-acsl-runtime/valid_alias.c:19:[kernel] warning: accessing left-value that contains escaping addresses: assert \specified(&b);
+tests/e-acsl-runtime/valid_alias.c:19:[kernel] warning: accessing left-value that contains escaping addresses:
+                  assert ¬\dangling(&b);
 tests/e-acsl-runtime/valid_alias.c:19:[kernel] warning: completely indeterminate value in b.
 tests/e-acsl-runtime/valid_alias.c:19:[value] completely invalid value in evaluation of
         argument (void *)b
