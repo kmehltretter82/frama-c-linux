@@ -58,12 +58,12 @@ let unmemoized_extend_ast () =
 	 Config.datadir);
     Kernel.Keep_unused_specified_functions.off ();
     let register s =
-      File.pre_register
-	(File.NeedCPP 
-	   (s, 
-	    File.get_preprocessor_command () 
-	    ^ Pretty_utils.sfprintf " -I%s" 
-	      (Options.Share.dir ~error:true ())))
+      let cpp = 
+        fst (File.get_preprocessor_command ()) ^
+          Pretty_utils.sfprintf
+            " -I%s" (Options.Share.dir ~error:true ())
+      in
+      File.pre_register (File.from_filename ~cpp s)
     in
     List.iter register (Misc.library_files ())
   in
