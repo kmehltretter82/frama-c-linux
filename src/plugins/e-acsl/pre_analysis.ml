@@ -323,7 +323,7 @@ module rec Transfer
     | Pfreeable _ -> Error.not_yet "\\freeable"
     | Pfresh _ -> Error.not_yet "\\fresh"
     | Pseparated _ -> Error.not_yet "\\separated"
-    | Pspecified _ -> Error.not_yet "\\specified"
+    | Pdangling _ -> Error.not_yet "\\dangling"
     | Ptrue | Pfalse | Papp _ | Prel _
     | Pand _ | Por _ | Pxor _ | Pimplies _ | Piff _ | Pnot _ | Pif _ 
     | Plet _ | Pforall _ | Pexists _ | Pat _ | Psubtype _ ->
