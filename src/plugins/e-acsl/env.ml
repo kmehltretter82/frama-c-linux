@@ -111,9 +111,14 @@ let empty v =
     loop_invariants = [];
     cpt = 0 }
 
+
 let top init env = 
   if init then env.init_env, []
   else match env.env_stack with [] -> assert false | hd :: tl -> hd, tl
+
+let has_no_new_stmt env =
+  let local, _ = top false env in
+  local.block_info = empty_block
 
 (* ************************************************************************** *)
 (** {2 Loop invariants} *)

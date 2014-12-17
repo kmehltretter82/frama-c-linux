@@ -29,7 +29,10 @@ open Cil_datatype
 (** {2 Builders} *)
 (* ************************************************************************** *)
 
+exception Unregistered_library_function of string
 val mk_call: loc:Location.t -> ?result:lval -> string -> exp list -> stmt
+(** @raise Unregistered_library_function *)
+
 val mk_debug_mmodel_stmt: stmt -> stmt
 
 type annotation_kind = 

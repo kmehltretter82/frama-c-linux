@@ -723,6 +723,21 @@ let predicate_to_exp kf p =
   assert (Typ.equal (Cil.typeOf e) Cil.intType);
   e  
 
+exception No_simple_translation of term
+
+(* This function is used by plug-in [Cfp]. *)
+let term_to_exp ctx t =
+  Typing.type_term t;
+  let env = Env.empty (new Visitor.frama_c_copy Project_skeleton.dummy) in
+  let env = Env.push env in
+  let env = Env.rte env false in
+  let e, env =
+    try term_to_exp (Kernel_function.dummy ()) env ctx t
+    with Misc.Unregistered_library_function _ -> raise (No_simple_translation t)
+  in
+  if not (Env.has_no_new_stmt env) then raise (No_simple_translation t);
+  e
+
 (* ************************************************************************** *)
 (* [translate_*] translates a given ACSL annotation into the corresponding C
    statement (if any) for runtime assertion checking *)

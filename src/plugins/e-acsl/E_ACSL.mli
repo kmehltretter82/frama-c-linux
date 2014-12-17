@@ -22,10 +22,27 @@
 
 (** E-ACSL. *)
 
+open Cil_types
+
+module Error: sig
+  exception Typing_error of string
+  exception Not_yet of string
+end
+
+module Translate: sig
+  exception No_simple_translation of term
+  val term_to_exp: typ option -> term -> exp
+(** @raise Typing_error when the given term cannot be typed (something wrong
+    happends with this term)
+    @raise Not_yet when the given term contains an unsupported construct.
+    @raise No_simple_translation when the given term cannot be translated into
+    a single expression. *)
+end
+
 (** No function is directly exported: they are dynamically registered. *)
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make"
 End:
 *)

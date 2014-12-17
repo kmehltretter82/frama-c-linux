@@ -43,6 +43,9 @@ val translate_rte_annots:
   code_annotation list ->
   Env.t
 
+exception No_simple_translation of term
+val term_to_exp: typ option -> term -> exp
+
 val predicate_to_exp: kernel_function -> predicate named -> exp
 
 val set_original_project: Project.t -> unit

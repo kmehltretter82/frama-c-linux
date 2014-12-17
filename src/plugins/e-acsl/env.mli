@@ -32,6 +32,10 @@ type t
 val dummy: t
 val empty: Visitor.frama_c_visitor -> t
 
+val has_no_new_stmt: t -> bool
+(** Assume that a local context has been previously pushed.
+    @return true iff the given env does not contain any new statement. *)
+
 val new_var:
   loc:location -> ?init:bool -> ?global:bool -> ?name:string -> 
   t -> term option -> typ -> 
