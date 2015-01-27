@@ -31,7 +31,10 @@ open Cil_datatype
 
 exception Unregistered_library_function of string
 val mk_call: loc:Location.t -> ?result:lval -> string -> exp list -> stmt
-(** @raise Unregistered_library_function *)
+(** Call an E-ACSL library function.
+    @raise Unregistered_library_function if the given string does not represent
+    such a function or if these functions were never registered (only possible
+    when using E-ACSL through its API. *)
 
 val mk_debug_mmodel_stmt: stmt -> stmt
 
