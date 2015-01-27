@@ -85,8 +85,10 @@ extern size_t __memory_size;
 predicate diffSize{L1, L2}(ℤ i) =
   \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
  */
-int global_i = 0;
+int global_i;
+
 int *global_i_ptr = & global_i;
+int global_i = 0;
 /*@ requires global_i ≡ 0;
     requires \valid(global_i_ptr);
     requires global_i_ptr ≡ &global_i;
@@ -112,12 +114,12 @@ void __e_acsl_loop(void)
     __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl_global_i),
                              (__mpz_struct const *)(__e_acsl));
     e_acsl_assert(__e_acsl_eq == 0,(char *)"Precondition",(char *)"loop",
-                  (char *)"global_i == 0",10);
+                  (char *)"global_i == 0",11);
     __e_acsl_valid = __valid((void *)global_i_ptr,sizeof(int));
     e_acsl_assert(__e_acsl_valid,(char *)"Precondition",(char *)"loop",
-                  (char *)"\\valid(global_i_ptr)",11);
+                  (char *)"\\valid(global_i_ptr)",12);
     e_acsl_assert(global_i_ptr == & global_i,(char *)"Precondition",
-                  (char *)"loop",(char *)"global_i_ptr == &global_i",12);
+                  (char *)"loop",(char *)"global_i_ptr == &global_i",13);
     __gmpz_clear(__e_acsl_global_i);
     __gmpz_clear(__e_acsl);
     loop();

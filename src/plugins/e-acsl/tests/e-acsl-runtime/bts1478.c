@@ -4,8 +4,9 @@
    EXECNOW: LOG gen_bts14782.c BIN gen_bts14782.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/bts1478.c -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_bts14782.c > /dev/null && ./gcc_test.sh bts14782
 */
 
-int global_i = 0;
+int global_i;
 int* global_i_ptr = &global_i;
+int global_i = 0;
 
 /*@ requires global_i == 0;
     requires \valid(global_i_ptr);

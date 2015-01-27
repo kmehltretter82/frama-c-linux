@@ -22,16 +22,16 @@
   global_i_ptr ∈ {{ &global_i }}
 [value] using specification for function __store_block
 [value] using specification for function __full_init
-tests/e-acsl-runtime/bts1478.c:10:[value] Function __e_acsl_loop: precondition got status valid.
 tests/e-acsl-runtime/bts1478.c:11:[value] Function __e_acsl_loop: precondition got status valid.
 tests/e-acsl-runtime/bts1478.c:12:[value] Function __e_acsl_loop: precondition got status valid.
+tests/e-acsl-runtime/bts1478.c:13:[value] Function __e_acsl_loop: precondition got status valid.
 [value] using specification for function e_acsl_assert
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
 [value] using specification for function __valid
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
-tests/e-acsl-runtime/bts1478.c:10:[value] Function loop: precondition got status valid.
 tests/e-acsl-runtime/bts1478.c:11:[value] Function loop: precondition got status valid.
 tests/e-acsl-runtime/bts1478.c:12:[value] Function loop: precondition got status valid.
+tests/e-acsl-runtime/bts1478.c:13:[value] Function loop: precondition got status valid.
 [value] using specification for function __delete_block
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main
