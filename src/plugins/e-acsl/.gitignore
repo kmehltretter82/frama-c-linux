@@ -76,3 +76,4 @@
 /tests/e-acsl-reject/result/*.log
 /tests/check/obj/*
 .frama-c
+tests/ptests_config
