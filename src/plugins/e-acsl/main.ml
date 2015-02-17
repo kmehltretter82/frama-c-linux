@@ -215,16 +215,18 @@ let change_printer =
     if !first then begin
       first := false;
       let r = Str.regexp "^__fc_" in
-      let pp () = object
-        inherit (Printer.extensible_printer ()) as super
-        method !varinfo fmt vi =
-          if not vi.Cil_types.vghost then
-            let s = Str.replace_first r "" vi.Cil_types.vname in
-            Format.fprintf fmt "%s" s
-          else
-            super#varinfo fmt vi
+      let module Printer_class(X: Printer.PrinterClass) = struct
+        class printer = object
+          inherit X.printer as super
+          method !varinfo fmt vi =
+            if not vi.Cil_types.vghost then
+              let s = Str.replace_first r "" vi.Cil_types.vname in
+              Format.fprintf fmt "%s" s
+            else
+              super#varinfo fmt vi
+        end
       end in
-      Printer.change_printer pp
+      Printer.update_printer (module Printer_class: Printer.PrinterExtension)
     end
 
 let main () =
