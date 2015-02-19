@@ -27,8 +27,9 @@ module P = Plugin.Register
      let shortname = "e-acsl"
      let help = "Executable ANSI/ISO C Specification Language --- runtime \
 assertion checker generator"
-   end)
-include P
+  end)
+module PP = P (* [PP] required to avoid an ocamldoc error in OCaml 4.02 *)
+include PP
 
 module Check =
   False
