@@ -7,9 +7,9 @@
 [kernel] Parsing FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h (with preprocessing)
 [kernel] Parsing tests/e-acsl-runtime/vector.c (with preprocessing)
 [e-acsl] beginning translation.
-FRAMAC_SHARE/libc/stdlib.h:185:[e-acsl] warning: E-ACSL construct `\allocable' is not yet supported. Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:185:[e-acsl] warning: E-ACSL construct `\freeable' is not yet supported. Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:169:[e-acsl] warning: E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:187:[e-acsl] warning: E-ACSL construct `\allocable' is not yet supported. Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:187:[e-acsl] warning: E-ACSL construct `\freeable' is not yet supported. Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:171:[e-acsl] warning: E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
 tests/e-acsl-runtime/vector.c:21:[e-acsl] warning: E-ACSL construct `complete behaviors' is not yet supported.
                   Ignoring annotation.
 tests/e-acsl-runtime/vector.c:21:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
@@ -18,10 +18,10 @@ tests/e-acsl-runtime/vector.c:21:[e-acsl] warning: E-ACSL construct `assigns cla
                   Ignoring annotation.
 tests/e-acsl-runtime/vector.c:21:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
                   Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:174:[e-acsl] warning: E-ACSL construct `\free' is not yet supported. Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:174:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+FRAMAC_SHARE/libc/stdlib.h:176:[e-acsl] warning: E-ACSL construct `\free' is not yet supported. Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:176:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
                   Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:174:[e-acsl] warning: E-ACSL construct `\allocate' is not yet supported. Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:176:[e-acsl] warning: E-ACSL construct `\allocate' is not yet supported. Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
@@ -42,8 +42,8 @@ tests/e-acsl-runtime/vector.c:26:[value] Assertion got status valid.
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
 [value] using specification for function __full_init
 [value] using specification for function __delete_block
-FRAMAC_SHARE/libc/stdlib.h:160:[value] Function __e_acsl_malloc, behavior allocation: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
-FRAMAC_SHARE/libc/stdlib.h:165:[value] Function __e_acsl_malloc, behavior no_allocation: postcondition got status invalid. (Behavior may be inactive, no reduction performed.)
+FRAMAC_SHARE/libc/stdlib.h:162:[value] Function __e_acsl_malloc, behavior allocation: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
+FRAMAC_SHARE/libc/stdlib.h:167:[value] Function __e_acsl_malloc, behavior no_allocation: postcondition got status invalid. (Behavior may be inactive, no reduction performed.)
 tests/e-acsl-runtime/vector.c:16:[value] entering loop for the first time
 tests/e-acsl-runtime/vector.c:29:[value] Assertion got status unknown.
 tests/e-acsl-runtime/vector.c:30:[value] Assertion got status unknown.
@@ -55,8 +55,8 @@ FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:127:[value] Function __gmpz_cmp: precondition g
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:128:[value] Function __gmpz_cmp: precondition got status valid.
 [value] using specification for function __gmpz_clear
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:117:[value] Function __gmpz_clear: precondition got status valid.
-FRAMAC_SHARE/libc/stdlib.h:175:[value] Function __e_acsl_free, behavior deallocation: precondition 'freeable' got status unknown.
-FRAMAC_SHARE/libc/stdlib.h:177:[value] Function __e_acsl_free, behavior deallocation: postcondition got status unknown.
+FRAMAC_SHARE/libc/stdlib.h:177:[value] Function __e_acsl_free, behavior deallocation: precondition 'freeable' got status unknown.
+FRAMAC_SHARE/libc/stdlib.h:179:[value] Function __e_acsl_free, behavior deallocation: postcondition got status unknown.
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======

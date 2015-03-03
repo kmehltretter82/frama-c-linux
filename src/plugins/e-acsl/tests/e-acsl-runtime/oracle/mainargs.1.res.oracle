@@ -14,7 +14,7 @@ tests/e-acsl-runtime/mainargs.c:9:[e-acsl] warning: E-ACSL construct `logic func
                   Ignoring annotation.
 tests/e-acsl-runtime/mainargs.c:9:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
                   Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:88:[e-acsl] warning: E-ACSL construct `applying logic function' is not yet supported.
+FRAMAC_SHARE/libc/string.h:90:[e-acsl] warning: E-ACSL construct `applying logic function' is not yet supported.
                   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 [value] Analyzing a complete application starting at main
@@ -69,12 +69,12 @@ tests/e-acsl-runtime/mainargs.c:18:[value] Assertion got status unknown.
 [value] using specification for function __initialized
 tests/e-acsl-runtime/mainargs.c:18:[kernel] warning: out of bounds read. assert \valid_read(argv+(long)argc);
 tests/e-acsl-runtime/mainargs.c:19:[value] entering loop for the first time
-FRAMAC_SHARE/libc/string.h:86:[value] Function __e_acsl_strlen: precondition 'valid_string_src' got status unknown.
+FRAMAC_SHARE/libc/string.h:88:[value] Function __e_acsl_strlen: precondition 'valid_string_src' got status unknown.
 [value] using specification for function strlen
-FRAMAC_SHARE/libc/string.h:86:[value] Function strlen: precondition 'valid_string_src' got status unknown.
-FRAMAC_SHARE/libc/string.h:90:[value] cannot evaluate ACSL term, unsupported ACSL construct: logic functions or predicates
+FRAMAC_SHARE/libc/string.h:88:[value] Function strlen: precondition 'valid_string_src' got status unknown.
+FRAMAC_SHARE/libc/string.h:92:[value] cannot evaluate ACSL term, unsupported ACSL construct: logic functions or predicates
 [value] using specification for function __delete_block
-FRAMAC_SHARE/libc/string.h:88:[value] Function __e_acsl_strlen: postcondition got status unknown.
+FRAMAC_SHARE/libc/string.h:90:[value] Function __e_acsl_strlen: postcondition got status unknown.
 tests/e-acsl-runtime/mainargs.c:21:[value] Assertion got status unknown.
 tests/e-acsl-runtime/mainargs.c:22:[value] Assertion got status unknown.
 tests/e-acsl-runtime/mainargs.c:22:[value] entering loop for the first time
