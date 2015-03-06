@@ -59,7 +59,7 @@ PLUGIN_CMO:= local_config \
 	misc \
 	mpz \
 	pre_analysis \
-	pre_visit \
+	dup_functions \
 	label \
 	env \
 	typing \

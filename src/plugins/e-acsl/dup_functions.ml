@@ -29,7 +29,7 @@ let dkey = Options.dkey_dup
 (* ********************************************************************** *)
 
 let fct_tbl: unit Kernel_function.Hashtbl.t = Kernel_function.Hashtbl.create 7
-let is_generated_function kf = Kernel_function.Hashtbl.mem fct_tbl kf
+let is_generated kf = Kernel_function.Hashtbl.mem fct_tbl kf
 
 let actions = Queue.create ()
 
@@ -365,7 +365,7 @@ if there are memory-related annotations.@]"
 
 end
 
-let dup_functions () =
+let dup () =
   Options.feedback ~level:2 "duplicating annotated functions";
   let prj =
     File.create_project_from_visitor

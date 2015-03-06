@@ -146,7 +146,7 @@ let generate_code =
       apply_on_e_acsl_ast
 	(fun () ->
 	  Options.feedback "beginning translation.";
-	  let dup_prj = Pre_visit.dup_functions () in
+          let dup_prj = Dup_functions.dup () in
 	  let res =
 	    Project.on
 	      dup_prj
