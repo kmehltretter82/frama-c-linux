@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: the contents of argv should be valid
-   EXECNOW: LOG gen_mainargs.c BIN gen_mainargs.out @frama-c@ -machdep x86_64 -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/mainargs.c -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_mainargs.c > /dev/null && ./gcc_test.sh mainargs "" bar baz
-   EXECNOW: LOG gen_mainargs2.c BIN gen_mainargs2.out @frama-c@ -machdep x86_64 -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/mainargs.c -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_mainargs2.c > /dev/null && ./gcc_test.sh mainargs2 "" bar baz
+   EXECNOW: LOG gen_mainargs.c BIN gen_mainargs.out @frama-c@ -machdep x86_64 -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/mainargs.c -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_mainargs.c > /dev/null && ./gcc_runtime.sh mainargs "" bar baz
+   EXECNOW: LOG gen_mainargs2.c BIN gen_mainargs2.out @frama-c@ -machdep x86_64 -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/mainargs.c -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_mainargs2.c > /dev/null && ./gcc_runtime.sh mainargs2 "" bar baz
 */
 
 #include <string.h>
