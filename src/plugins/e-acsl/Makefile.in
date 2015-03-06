@@ -58,6 +58,7 @@ PLUGIN_CMO:= local_config \
 	error \
 	misc \
 	mpz \
+	literal_strings \
 	mmodel_analysis \
 	dup_functions \
 	label \

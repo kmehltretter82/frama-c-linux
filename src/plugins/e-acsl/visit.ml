@@ -109,14 +109,16 @@ class e_acsl_visitor prj generate = object (self)
         (* extend the main with forward initialization and put it at end *)
         if generate then begin
           let must_init =
-            try
-              Varinfo.Hashtbl.iter
-                (fun old_vi i -> match i with None | Some _ -> 
-                  if Mmodel_analysis.must_model_vi old_vi then raise Exit)
-                global_vars;
-              false
-            with Exit ->
-              true
+            not (Literal_strings.is_empty ())
+            ||
+              try
+                Varinfo.Hashtbl.iter
+                  (fun old_vi i -> match i with None | Some _ ->
+                    if Mmodel_analysis.must_model_vi old_vi then raise Exit)
+                  global_vars;
+                false
+              with Exit ->
+                true
           in
           if must_init then begin
             let build_initializer () =
@@ -154,6 +156,20 @@ class e_acsl_visitor prj generate = object (self)
                       model (stmt :: stmts), env)
                   global_vars
                   ([ return ], env)
+              in
+              let stmts =
+                (* literal strings initialization *)
+                Literal_strings.fold
+                  (fun s vi stmts ->
+                    let loc = Location.unknown in
+                    let e = Cil.new_exp ~loc:loc (Const (CStr s)) in
+                    let str_size = Cil.new_exp loc (SizeOfStr s) in
+                    Cil.mkStmtOneInstr ~valid_sid:true (Set(Cil.var vi, e, loc))
+                    :: Misc.mk_store_stmt ~str_size vi
+                    :: Misc.mk_full_init_stmt ~addr:false vi
+                    :: Misc.mk_literal_string vi
+                    :: stmts)
+                  stmts
               in
               let (b, env), stmts = match stmts with
                 | [] -> assert false
@@ -209,6 +225,14 @@ class e_acsl_visitor prj generate = object (self)
                       | _ -> g :: acc)
                       f.globals
                       [ cil_fct; GFun(main, Location.unknown) ]
+                  in
+                  (* add the literal string varinfos as the very first
+                     globals *)
+                  let new_globals =
+                    Literal_strings.fold
+                      (fun _ vi l ->
+                        GVar(vi, { init = None }, Location.unknown) :: l)
+                      new_globals
                   in
                   f.globals <- new_globals
                 | None -> 
@@ -339,13 +363,17 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     assert generate;
     let vars = Env.get_generated_variables !function_env in
     self#reset_env ();
-    f.slocals <- f.slocals @ List.map fst vars;
-    let body = f.sbody in
-    body.blocals <- 
+    let locals, blocks =
       List.fold_left
-      (fun acc (v, b) -> if b then v :: acc else acc) 
-      body.blocals
-      vars
+        (fun (local_vars, block_vars as acc) (v, scope) -> match scope with
+        | Env.Global -> acc
+        | Env.Function -> v :: local_vars, v :: block_vars
+        | Env.Local_block -> v :: local_vars, block_vars)
+        (f.slocals, f.sbody.blocals)
+        vars
+    in
+    f.slocals <- locals;
+    f.sbody.blocals <- blocks
 
   method !vfunc f =
     if generate then
@@ -394,26 +422,31 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     let o = object
       inherit Cil.genericCilVisitor (Cil.copy_visit (Project.current ()))
       method !vexpr e = match e.enode with
-      | Const(CStr s) ->
-        let loc = e.eloc in
-        let _, exp, env = 
-          Env.new_var
-            ~loc
-            ~global:true
-            ~name:"literal_string"
-            env
-            None
-            Cil.charPtrType
-            (fun vi _ -> 
-              let str_size = Cil.new_exp loc (SizeOfStr s) in
-              [ Cil.mkStmtOneInstr 
-                  ~valid_sid:true (Set(Cil.var vi, e, loc));
-                Misc.mk_store_stmt ~str_size vi;
-                Misc.mk_full_init_stmt ~addr:false vi;
-                Misc.mk_literal_string vi ])
-        in
-        env_ref := env;
-        Cil.ChangeTo exp
+      (* the guard below could be optimized: if no annotation **depends on this
+         string**, then it is not required to monitor it.
+         (currently, the guard says: "no annotation uses the memory model" *)
+      | Const(CStr s) when Mmodel_analysis.use_model () ->
+        (try
+           let vi = Literal_strings.find s in
+           (* if the literal string was already created, just get it. *)
+           let exp = Cil.evar ~loc:e.eloc vi in
+           Cil.ChangeTo exp
+         with Not_found ->
+           (* never seen this string before: replace it by a new global var *)
+           let loc = e.eloc in
+           let vi, exp, env =
+             Env.new_var
+               ~loc
+               ~scope:Env.Global
+               ~name:"literal_string"
+               env
+               None
+               Cil.charPtrType
+               (fun _ _ -> [] (* done in the initializer, see {!vglob_aux} *))
+           in
+           Literal_strings.add s vi;
+           env_ref := env;
+           Cil.ChangeTo exp)
       | _ -> 
         Cil.DoChildren
     end in
@@ -669,7 +702,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         if keep then Cil.DoChildren else Cil.JustCopy
       | None -> 
         Cil.DoChildrenPost
-          (fun e -> 
+          (fun e ->
             let e, env = self#literal_string !function_env e in
             function_env := env;
             e)
@@ -699,6 +732,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
 
   initializer
     Misc.reset ();
+    Literal_strings.reset ();
     self#reset_env ();
     Translate.set_original_project (Project.current ())
 

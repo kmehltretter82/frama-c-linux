@@ -17,6 +17,10 @@
   IDX ∈ {1}
   G2 ∈ {2}
   U ∈ {{ "baz" }}
+  __e_acsl_literal_string ∈ {0}
+  __e_acsl_literal_string_2 ∈ {0}
+  __e_acsl_literal_string_3 ∈ {0}
+  __e_acsl_literal_string_4 ∈ {0}
 [value] using specification for function __store_block
 [value] using specification for function __full_init
 [value] using specification for function __literal_string
