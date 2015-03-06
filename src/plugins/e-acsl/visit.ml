@@ -44,7 +44,7 @@ let rename_alloc_function ~create bhv vi =
 let allocate_function env kf =
   List.fold_left
     (fun env vi -> 
-      if Pre_analysis.must_model_vi ~kf vi then
+      if Mmodel_analysis.must_model_vi ~kf vi then
         let vi = Cil.get_varinfo (Env.get_behavior env) vi in
         Env.add_stmt env (Misc.mk_store_stmt vi)
       else
@@ -55,7 +55,7 @@ let allocate_function env kf =
 let deallocate_function env kf  = 
   List.fold_left
     (fun env vi -> 
-      if Pre_analysis.must_model_vi ~kf vi then 
+      if Mmodel_analysis.must_model_vi ~kf vi then 
         let vi = Cil.get_varinfo (Env.get_behavior env) vi in
         Env.add_stmt env (Misc.mk_delete_stmt vi)
       else
@@ -112,7 +112,7 @@ class e_acsl_visitor prj generate = object (self)
             try
               Varinfo.Hashtbl.iter
                 (fun old_vi i -> match i with None | Some _ -> 
-                  if Pre_analysis.must_model_vi old_vi then raise Exit)
+                  if Mmodel_analysis.must_model_vi old_vi then raise Exit)
                 global_vars;
               false
             with Exit ->
@@ -130,7 +130,7 @@ class e_acsl_visitor prj generate = object (self)
                   (fun old_vi i (stmts, env) -> 
                     let new_vi = Cil.get_varinfo self#behavior old_vi in
                     let model blk =
-                      if Pre_analysis.must_model_vi old_vi then
+                      if Mmodel_analysis.must_model_vi old_vi then
                         let blk =
                           if Kernel.LibEntry.get () then blk
                           else
@@ -190,7 +190,7 @@ class e_acsl_visitor prj generate = object (self)
               Globals.Functions.replace_by_definition 
                 spec fundec Location.unknown;
               let cil_fct = GFun(fundec, Location.unknown) in
-              if Pre_analysis.use_model () then
+              if Mmodel_analysis.use_model () then
                 match main_fct with
                 | Some main ->
                   let exp = Cil.evar ~loc:Location.unknown vi in
@@ -229,7 +229,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
                | vi1 :: vi2 :: _ when
                     vi1.vtype = Cil.intType
                     && vi2.vtype = charPtrPtrType
-                      && Pre_analysis.must_model_vi vi2 -> true
+                      && Mmodel_analysis.must_model_vi vi2 -> true
                | _ -> false)
 	    | None -> false
 	  in
@@ -274,7 +274,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       | GVar(vi, i, _) ->
         vi.vghost <- false;
         (* remove initializers on need *)
-        if Pre_analysis.old_must_model_vi self#behavior vi then begin
+        if Mmodel_analysis.old_must_model_vi self#behavior vi then begin
           try
             let old_vi = Cil.get_original_varinfo self#behavior vi in
             match Varinfo.Hashtbl.find global_vars old_vi with
@@ -306,7 +306,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
 
   method !vinit vi _off _i = 
     if generate then
-      if Pre_analysis.must_model_vi vi then begin
+      if Mmodel_analysis.must_model_vi vi then begin
         keep_initializer <- Some true;
         Cil.DoChildrenPost
           (fun i -> 
@@ -510,7 +510,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
             let b, env = 
               Env.pop_and_get env new_stmt ~global_clear:true Env.After 
             in
-            if is_main && Pre_analysis.use_model () then begin
+            if is_main && Mmodel_analysis.use_model () then begin
               let stmts = b.bstmts in
               let l = List.rev stmts in
               match l with
@@ -520,7 +520,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
                 let delete_stmts =
                   Varinfo.Hashtbl.fold_sorted
                     (fun old_vi _ acc ->
-                      if Pre_analysis.must_model_vi old_vi then
+                      if Mmodel_analysis.must_model_vi old_vi then
                         let new_vi = Cil.get_varinfo self#behavior old_vi in
                         Misc.mk_delete_stmt new_vi :: acc
                       else
@@ -580,7 +580,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       (not (may_safely_ignore assigned_lv))
       (Pre_analysis.must_model_lval ~kf ~stmt checked_lv);*)
     if not (may_safely_ignore assigned_lv) && 
-      Pre_analysis.must_model_lval ~kf ~stmt checked_lv 
+      Mmodel_analysis.must_model_lval ~kf ~stmt checked_lv
     then
       let new_stmt =
         Misc.mk_debug_mmodel_stmt (Misc.mk_initialize loc assigned_lv) 
@@ -621,7 +621,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         let add_locals stmts =
           List.fold_left
             (fun acc vi ->
-              if Pre_analysis.old_must_model_vi self#behavior ~kf vi then
+              if Mmodel_analysis.old_must_model_vi self#behavior ~kf vi then
                 Misc.mk_delete_stmt vi :: acc
               else
                 acc)
@@ -633,7 +633,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
             (* keep the return (enclosed in a generated block) at the end;
                preceded by clean if any *)
             let init, tl = 
-              if self#is_main kf && Pre_analysis.use_model () then
+              if self#is_main kf && Mmodel_analysis.use_model () then
                 [ potential_clean; ret ], tl
               else
                 [ ret ], l
@@ -649,8 +649,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         new_blk.bstmts <-
           List.fold_left
           (fun acc vi -> 
-            if Pre_analysis.must_model_vi vi
-            then 
+            if Mmodel_analysis.must_model_vi vi then
               let vi = Cil.get_varinfo self#behavior vi in
               Misc.mk_store_stmt vi :: acc
             else acc)

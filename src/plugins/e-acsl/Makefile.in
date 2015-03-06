@@ -58,7 +58,7 @@ PLUGIN_CMO:= local_config \
 	error \
 	misc \
 	mpz \
-	pre_analysis \
+	mmodel_analysis \
 	dup_functions \
 	label \
 	env \

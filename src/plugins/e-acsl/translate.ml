@@ -503,7 +503,7 @@ and at_to_exp env t_opt label e =
       inherit Cil.nopCilVisitor
       method !vlval (host, _) = match host with
       | Var v -> 
-	if Pre_analysis.old_must_model_vi (Env.get_behavior env) v then 
+        if Mmodel_analysis.old_must_model_vi (Env.get_behavior env) v then
 	  res := true;
 	Cil.SkipChildren
       | Mem _ ->
