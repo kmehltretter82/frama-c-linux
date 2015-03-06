@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: quantifiers
-   EXECNOW: LOG gen_quantif.c BIN gen_quantif.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/quantif.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_quantif.c > /dev/null && ./gcc_test.sh quantif
-   EXECNOW: LOG gen_quantif2.c BIN gen_quantif2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/quantif.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_quantif2.c > /dev/null && ./gcc_test.sh quantif2
+   EXECNOW: LOG gen_quantif.c BIN gen_quantif.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/quantif.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_quantif.c > /dev/null && ./gcc_runtime.sh quantif
+   EXECNOW: LOG gen_quantif2.c BIN gen_quantif2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/quantif.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_quantif2.c > /dev/null && ./gcc_runtime.sh quantif2
 */
 
 int main(void) {

@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: comparison operators
-   EXECNOW: LOG gen_comparison.c BIN gen_comparison.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/comparison.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_comparison.c > /dev/null && ./gcc_test.sh comparison
-   EXECNOW: LOG gen_comparison2.c BIN gen_comparison2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/comparison.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_comparison2.c > /dev/null && ./gcc_test.sh comparison2
+   EXECNOW: LOG gen_comparison.c BIN gen_comparison.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/comparison.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_comparison.c > /dev/null && ./gcc_runtime.sh comparison
+   EXECNOW: LOG gen_comparison2.c BIN gen_comparison2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/comparison.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_comparison2.c > /dev/null && ./gcc_runtime.sh comparison2
 */
 
 int main(void) {

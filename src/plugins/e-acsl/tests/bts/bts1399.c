@@ -1,8 +1,8 @@
 /* run.config
    COMMENT: complex fields and indexes + potential RTE in \initialized
    STDOPT: #"-cpp-extra-args=\"-I`@frama-c@ -print-share-path`/libc\"" +"-val-builtin __malloc:Frama_C_alloc_size -val-builtin __free:Frama_C_free"
-   EXECNOW: LOG gen_bts1399.c BIN gen_bts1399.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/bts/bts1399.c -e-acsl -then-on e-acsl -print -ocode ./tests/bts/result/gen_bts1399.c > /dev/null && ./gcc_test.sh bts1399
-   EXECNOW: LOG gen_bts13992.c BIN gen_bts13992.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/bts/bts1399.c -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/bts/result/gen_bts13992.c > /dev/null && ./gcc_test.sh bts13992
+   EXECNOW: LOG gen_bts1399.c BIN gen_bts1399.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/bts/bts1399.c -e-acsl -then-on e-acsl -print -ocode ./tests/bts/result/gen_bts1399.c > /dev/null && ./gcc_bts.sh bts1399
+   EXECNOW: LOG gen_bts13992.c BIN gen_bts13992.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/bts/bts1399.c -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/bts/result/gen_bts13992.c > /dev/null && ./gcc_bts.sh bts13992
 */
 
 #include "stdlib.h"

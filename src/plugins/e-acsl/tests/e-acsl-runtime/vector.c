@@ -1,8 +1,8 @@
 /* run.config
    COMMENT: function call + initialized
    STDOPT: #"-cpp-extra-args=\"-I`@frama-c@ -print-share-path`/libc\"" +"-val-builtin __malloc:Frama_C_alloc_size -val-builtin __free:Frama_C_free"
-   EXECNOW: LOG gen_vector.c BIN gen_vector.out @frama-c@ -cpp-extra-args="-I`@frama-c@ -print-share-path`/libc" -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/vector.c -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_vector.c > /dev/null && ./gcc_test.sh vector
-   EXECNOW: LOG gen_vector2.c BIN gen_vector2.out @frama-c@ -cpp-extra-args="-I`@frama-c@ -print-share-path`/libc" -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/vector.c -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_vector2.c > /dev/null && ./gcc_test.sh vector2
+   EXECNOW: LOG gen_vector.c BIN gen_vector.out @frama-c@ -cpp-extra-args="-I`@frama-c@ -print-share-path`/libc" -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/vector.c -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_vector.c > /dev/null && ./gcc_runtime.sh vector
+   EXECNOW: LOG gen_vector2.c BIN gen_vector2.out @frama-c@ -cpp-extra-args="-I`@frama-c@ -print-share-path`/libc" -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/vector.c -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_vector2.c > /dev/null && ./gcc_runtime.sh vector2
 */
 
 #include<stdlib.h>

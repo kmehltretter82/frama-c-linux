@@ -1,8 +1,8 @@
 /* run.config
    COMMENT: arithmetic operations
    COMMENT: add the last assertion when fixing BTS #751
-   EXECNOW: LOG gen_arith.c BIN gen_arith.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/arith.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_arith.c > /dev/null && ./gcc_test.sh arith
-   EXECNOW: LOG gen_arith2.c BIN gen_arith2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/arith.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_arith2.c > /dev/null && ./gcc_test.sh arith2
+   EXECNOW: LOG gen_arith.c BIN gen_arith.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/arith.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_arith.c > /dev/null && ./gcc_runtime.sh arith
+   EXECNOW: LOG gen_arith2.c BIN gen_arith2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/arith.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_arith2.c > /dev/null && ./gcc_runtime.sh arith2
 */
 
 int main(void) {

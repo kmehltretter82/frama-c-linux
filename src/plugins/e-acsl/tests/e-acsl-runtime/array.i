@@ -1,8 +1,8 @@
 /* run.config
    COMMENT: arrays
    STDOPT: #"-slevel 5"
-   EXECNOW: LOG gen_array.c BIN gen_array.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/array.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_array.c > /dev/null && ./gcc_test.sh array
-   EXECNOW: LOG gen_array2.c BIN gen_array2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/array.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_array2.c > /dev/null && ./gcc_test.sh array2
+   EXECNOW: LOG gen_array.c BIN gen_array.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/array.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_array.c > /dev/null && ./gcc_runtime.sh array
+   EXECNOW: LOG gen_array2.c BIN gen_array2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/array.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_array2.c > /dev/null && ./gcc_runtime.sh array2
 */
 
 int T1[3],T2[4];

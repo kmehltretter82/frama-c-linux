@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: linear search (example of the SAC'13 article)
-   EXECNOW: LOG gen_linear_search.c BIN gen_linear_search.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/linear_search.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_linear_search.c > /dev/null && ./gcc_test.sh linear_search
-   EXECNOW: LOG gen_linear_search2.c BIN gen_linear_search2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/linear_search.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_linear_search2.c > /dev/null && ./gcc_test.sh linear_search2
+   EXECNOW: LOG gen_linear_search.c BIN gen_linear_search.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/linear_search.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_linear_search.c > /dev/null && ./gcc_runtime.sh linear_search
+   EXECNOW: LOG gen_linear_search2.c BIN gen_linear_search2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/linear_search.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_linear_search2.c > /dev/null && ./gcc_runtime.sh linear_search2
 */
 
 int A[10];
