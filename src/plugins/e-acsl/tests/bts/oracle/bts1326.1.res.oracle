@@ -5,7 +5,7 @@
 [kernel] Parsing FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel_api.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/e-acsl/memory_model/e_acsl_bittree.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h (with preprocessing)
-[kernel] Parsing tests/e-acsl-runtime/bts1326.i (no preprocessing)
+[kernel] Parsing tests/bts/bts1326.i (no preprocessing)
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
 [value] Analyzing a complete application starting at main
@@ -21,7 +21,7 @@
 [value] using specification for function __store_block
 [value] using specification for function __initialize
 [value] using specification for function __delete_block
-tests/e-acsl-runtime/bts1326.i:10:[value] Function atp_NORMAL_computeAverageAccel: postcondition got status valid.
+tests/bts/bts1326.i:10:[value] Function atp_NORMAL_computeAverageAccel: postcondition got status valid.
 [value] using specification for function __gmpz_init_set_si
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: precondition got status valid.
 [value] using specification for function __gmpz_init
@@ -33,7 +33,7 @@ FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:145:[value] Function __gmpz_add: precondition g
 [value] using specification for function __gmpz_cmp
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:127:[value] Function __gmpz_cmp: precondition got status valid.
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:128:[value] Function __gmpz_cmp: precondition got status valid.
-tests/e-acsl-runtime/bts1326.i:11:[value] Assertion 'E_ACSL' got status valid.
+tests/bts/bts1326.i:11:[value] Assertion 'E_ACSL' got status valid.
 [value] using specification for function e_acsl_assert
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_tdiv_q
@@ -42,7 +42,7 @@ FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:165:[value] Function __gmpz_tdiv_q: preconditio
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:166:[value] Function __gmpz_tdiv_q: precondition got status valid.
 [value] using specification for function __gmpz_clear
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:117:[value] Function __gmpz_clear: precondition got status valid.
-tests/e-acsl-runtime/bts1326.i:10:[value] Function __e_acsl_atp_NORMAL_computeAverageAccel: postcondition got status valid.
+tests/bts/bts1326.i:10:[value] Function __e_acsl_atp_NORMAL_computeAverageAccel: postcondition got status valid.
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======

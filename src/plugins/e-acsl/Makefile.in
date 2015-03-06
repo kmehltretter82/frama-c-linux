@@ -112,7 +112,7 @@ $(PLUGIN_DIR)/local_config.ml: $(PLUGIN_DIR)/Makefile.in VERSION
 
 ifeq (@MAY_RUN_TESTS@,yes)
 
-PLUGIN_TESTS_DIRS:=e-acsl-reject e-acsl-runtime
+PLUGIN_TESTS_DIRS:=e-acsl-reject e-acsl-runtime bts
 E_ACSL_TESTS: $(PLUGIN_DIR)/tests/test_config
 
 endif

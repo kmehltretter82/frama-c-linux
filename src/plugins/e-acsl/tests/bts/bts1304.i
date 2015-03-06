@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: argument of functions must be kept, so keep its parameter
-   EXECNOW: LOG gen_bts1304.c BIN gen_bts1304.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/bts1304.i -constfold -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_bts1304.c > /dev/null && ./gcc_test.sh bts1304
-   EXECNOW: LOG gen_bts13042.c BIN gen_bts13042.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/bts1304.i -constfold -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_bts13042.c > /dev/null && ./gcc_test.sh bts13042
+   EXECNOW: LOG gen_bts1304.c BIN gen_bts1304.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/bts/bts1304.i -constfold -e-acsl -then-on e-acsl -print -ocode ./tests/bts/result/gen_bts1304.c > /dev/null && ./gcc_test.sh bts1304
+   EXECNOW: LOG gen_bts13042.c BIN gen_bts13042.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/bts/bts1304.i -constfold -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/bts/result/gen_bts13042.c > /dev/null && ./gcc_test.sh bts13042
 */
 
 struct msgA { int type; int a[2]; };

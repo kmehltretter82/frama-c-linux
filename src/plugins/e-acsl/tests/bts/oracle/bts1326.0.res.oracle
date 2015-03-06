@@ -5,7 +5,7 @@
 [kernel] Parsing FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel_api.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/e-acsl/memory_model/e_acsl_bittree.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h (with preprocessing)
-[kernel] Parsing tests/e-acsl-runtime/bts1717.i (no preprocessing)
+[kernel] Parsing tests/bts/bts1326.i (no preprocessing)
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
 [value] Analyzing a complete application starting at main
@@ -19,13 +19,14 @@
   __e_acsl_internal_heap ∈ [--..--]
   __memory_size ∈ [--..--]
 [value] using specification for function __store_block
-[value] using specification for function __full_init
-tests/e-acsl-runtime/bts1717.i:13:[value] Assertion got status valid.
-[value] using specification for function __initialized
-[value] using specification for function __valid
+[value] using specification for function __initialize
+[value] using specification for function __delete_block
+tests/bts/bts1326.i:10:[value] Function atp_NORMAL_computeAverageAccel: postcondition got status valid.
+[value] using specification for function __valid_read
 [value] using specification for function e_acsl_assert
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
-[value] using specification for function __delete_block
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
+tests/bts/bts1326.i:10:[value] Function __e_acsl_atp_NORMAL_computeAverageAccel: postcondition got status valid.
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======

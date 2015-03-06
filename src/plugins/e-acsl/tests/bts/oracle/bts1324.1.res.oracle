@@ -5,7 +5,7 @@
 [kernel] Parsing FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel_api.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/e-acsl/memory_model/e_acsl_bittree.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h (with preprocessing)
-[kernel] Parsing tests/e-acsl-runtime/bts1324.i (no preprocessing)
+[kernel] Parsing tests/bts/bts1324.i (no preprocessing)
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
 [value] Analyzing a complete application starting at main
@@ -33,7 +33,7 @@ FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:94:[value] Function __gmpz_set: precondition go
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:95:[value] Function __gmpz_set: precondition got status valid.
 [value] using specification for function __gmpz_clear
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:117:[value] Function __gmpz_clear: precondition got status valid.
-tests/e-acsl-runtime/bts1324.i:8:[value] entering loop for the first time
+tests/bts/bts1324.i:8:[value] entering loop for the first time
 [value] using specification for function __gmpz_cmp
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:127:[value] Function __gmpz_cmp: precondition got status valid.
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:128:[value] Function __gmpz_cmp: precondition got status valid.
@@ -43,15 +43,15 @@ FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:151:[value] Function __gmpz_sub: precondition g
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:152:[value] Function __gmpz_sub: precondition got status valid.
 [value] using specification for function __gmpz_get_ui
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:198:[value] Function __gmpz_get_ui: precondition got status valid.
-tests/e-acsl-runtime/bts1324.i:8:[kernel] warning: out of bounds read. assert \valid_read(t+__e_acsl_2);
-tests/e-acsl-runtime/bts1324.i:8:[kernel] warning: out of bounds read. assert \valid_read(t+__e_acsl_i_2);
-tests/e-acsl-runtime/bts1324.i:15:[value] entering loop for the first time
-tests/e-acsl-runtime/bts1324.i:9:[value] Function sorted, behavior yes: postcondition got status valid. (Behavior may be inactive, no reduction performed.)
+tests/bts/bts1324.i:8:[kernel] warning: out of bounds read. assert \valid_read(t+__e_acsl_2);
+tests/bts/bts1324.i:8:[kernel] warning: out of bounds read. assert \valid_read(t+__e_acsl_i_2);
+tests/bts/bts1324.i:15:[value] entering loop for the first time
+tests/bts/bts1324.i:9:[value] Function sorted, behavior yes: postcondition got status valid. (Behavior may be inactive, no reduction performed.)
 [value] using specification for function e_acsl_assert
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
 [value] using specification for function __delete_block
-tests/e-acsl-runtime/bts1324.i:9:[value] Function __e_acsl_sorted, behavior yes: postcondition got status valid. (Behavior may be inactive, no reduction performed.)
-tests/e-acsl-runtime/bts1324.i:25:[value] Assertion got status valid.
+tests/bts/bts1324.i:9:[value] Function __e_acsl_sorted, behavior yes: postcondition got status valid. (Behavior may be inactive, no reduction performed.)
+tests/bts/bts1324.i:25:[value] Assertion got status valid.
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
