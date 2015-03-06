@@ -151,8 +151,8 @@ let generate_code =
 	    Project.on
 	      dup_prj
 	      (fun () ->
-		Pre_analysis.init_mpz ();
-		Pre_analysis.reset ();
+                Mmodel_analysis.init_mpz ();
+                Mmodel_analysis.reset ();
 		let visit prj = Visit.do_visit ~prj true in
 		let prj = File.create_project_from_visitor name visit in
 		Loops.apply_after_transformation prj;
@@ -234,10 +234,10 @@ let main () =
   end else
     if Options.Check.get () then
       apply_on_e_acsl_ast
-	(fun () -> 
-	  Pre_analysis.init_mpz ();
-	  ignore (check ()))
-	()
+        (fun () ->
+          Mmodel_analysis.init_mpz ();
+          ignore (check ()))
+        ()
 
 let () = Db.Main.extend main
 
