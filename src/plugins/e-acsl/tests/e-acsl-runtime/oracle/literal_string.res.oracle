@@ -1,11 +1,3 @@
-[kernel] Parsing FRAMAC_SHARE/libc/__fc_builtin_for_normalization.i (no preprocessing)
-[kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl.h (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl_gmp_types.h (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl_gmp.h (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel_api.h (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/e-acsl/memory_model/e_acsl_bittree.h (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h (with preprocessing)
-[kernel] Parsing tests/e-acsl-runtime/literal_string.i (no preprocessing)
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
 [value] Analyzing a complete application starting at main
@@ -42,4 +34,3 @@ tests/e-acsl-runtime/literal_string.i:13:[value] Assertion got status valid.
 [value] using specification for function __delete_block
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main
-[value] ====== VALUES COMPUTED ======
