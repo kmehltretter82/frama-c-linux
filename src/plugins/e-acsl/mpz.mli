@@ -24,6 +24,9 @@
 
 open Cil_types
 
+val init_t: unit -> unit
+(** Must be called before any use of GMP *)
+
 val set_t: typeinfo -> unit
 
 val t: unit -> typ 

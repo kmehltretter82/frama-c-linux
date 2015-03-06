@@ -98,6 +98,19 @@ let affect ~loc lv ev e =
   with Longlong _ ->
     Error.not_yet "quantification over long long and requiring GMP"
 
+let init_t () =
+  Options.feedback ~level:2 "initializing GMP type.";
+  let set_mpzt = object
+    inherit Cil.nopCilVisitor
+    method !vglob = function
+    | GType({ torig_name = s } as info, _) when s = "mpz_t" ->
+      set_t info;
+      Cil.SkipChildren
+    | _ -> 
+      Cil.SkipChildren
+  end in
+  Cil.visitCilFileSameGlobals set_mpzt (Ast.get ())
+
 (*
 Local Variables:
 compile-command: "make"

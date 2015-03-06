@@ -23,19 +23,6 @@
 open Cil_types
 open Cil_datatype
 
-let init_mpz () =
-  Options.feedback ~level:2 "initializing GMP type.";
-  let set_mpzt = object
-    inherit Cil.nopCilVisitor
-    method !vglob = function
-    | GType({ torig_name = s } as info, _) when s = "mpz_t" ->
-      Mpz.set_t info;
-      Cil.SkipChildren
-    | _ -> 
-      Cil.SkipChildren
-  end in
-  Cil.visitCilFileSameGlobals set_mpzt (Ast.get ())
-
 (* ********************************************************************** *)
 (* Backward dataflow analysis to compute a sound over-approximation of what
    left-values must be tracked by the memory model library *)

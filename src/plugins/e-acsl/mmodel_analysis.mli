@@ -22,9 +22,6 @@
 
 open Cil_types
 
-val init_mpz: unit -> unit
-(** Must be called before any use of GMP *)
-
 (** Compute a sound over-approximation of what left-values must be tracked by
     the memory model library *)
 
