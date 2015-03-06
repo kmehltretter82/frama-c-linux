@@ -22,8 +22,8 @@
 
 open Cil_types
 
-val dup_functions: unit -> Project.t
-val is_generated_function: kernel_function -> bool
+val dup: unit -> Project.t
+val is_generated: kernel_function -> bool
 
 (*
 Local Variables:

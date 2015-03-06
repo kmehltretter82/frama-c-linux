@@ -435,7 +435,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         (* JS: should be done in the new project? *)
         let env = if generate then allocate_function env kf else env in
         (* translate the precondition of the function *)
-        if Pre_visit.is_generated_function (Extlib.the self#current_kf) then
+        if Dup_functions.is_generated (Extlib.the self#current_kf) then
           Project.on prj (Translate.translate_pre_spec kf Kglobal env) !funspec
         else
           env
@@ -495,7 +495,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
           let env = mk_post_env env in
           (* also handle the postcondition of the function and clear the env *)
           let env = 
-            if Pre_visit.is_generated_function (Extlib.the self#current_kf) then
+            if Dup_functions.is_generated (Extlib.the self#current_kf) then
               Project.on
                 prj
                 (Translate.translate_post_spec kf Kglobal env) 
