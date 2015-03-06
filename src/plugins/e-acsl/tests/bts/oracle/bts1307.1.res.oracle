@@ -1,0 +1,69 @@
+[kernel] Parsing FRAMAC_SHARE/libc/__fc_builtin_for_normalization.i (no preprocessing)
+[kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl.h (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl_gmp_types.h (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl_gmp.h (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel_api.h (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/e-acsl/memory_model/e_acsl_bittree.h (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h (with preprocessing)
+[kernel] Parsing tests/bts/bts1307.i (no preprocessing)
+tests/bts/bts1307.i:16:[kernel] warning: Floating-point constant 0.4 is not represented exactly. Will use 0x1.999999999999ap-2. See documentation for option -warn-decimal-float
+[e-acsl] beginning translation.
+tests/bts/bts1307.i:13:[e-acsl] warning: approximating a real number by a float
+tests/bts/bts1307.i:25:[e-acsl] warning: approximating a real number by a float
+tests/bts/bts1307.i:25:[e-acsl] warning: approximating a real number by a float
+[e-acsl] translation done in project "e-acsl".
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value] Values of globals at initialization
+  random_counter ∈ {0}
+  rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __e_acsl_init ∈ [--..--]
+  __e_acsl_internal_heap ∈ [--..--]
+  __memory_size ∈ [--..--]
+[value] using specification for function __store_block
+[value] using specification for function __full_init
+tests/bts/bts1307.i:7:[value] Function __e_acsl_foo: precondition got status valid.
+tests/bts/bts1307.i:8:[value] Function __e_acsl_foo: precondition got status valid.
+tests/bts/bts1307.i:9:[value] Function __e_acsl_foo: precondition got status valid.
+[value] using specification for function __valid
+[value] using specification for function e_acsl_assert
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
+tests/bts/bts1307.i:7:[value] Function foo: precondition got status valid.
+tests/bts/bts1307.i:8:[value] Function foo: precondition got status valid.
+tests/bts/bts1307.i:9:[value] Function foo: precondition got status valid.
+[value] using specification for function __initialize
+[value] using specification for function __delete_block
+tests/bts/bts1307.i:13:[value] Function foo, behavior OverEstimate_Motoring: postcondition got status valid.
+[value] using specification for function __gmpz_init_set_si
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: precondition got status valid.
+[value] using specification for function __gmpz_cmp
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:127:[value] Function __gmpz_cmp: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:128:[value] Function __gmpz_cmp: precondition got status valid.
+[value] using specification for function __gmpz_init
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:39:[value] Function __gmpz_init: precondition got status valid.
+tests/bts/bts1307.i:13:[value] Assertion 'E_ACSL' got status valid.
+[value] using specification for function __gmpz_tdiv_q
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:164:[value] Function __gmpz_tdiv_q: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:165:[value] Function __gmpz_tdiv_q: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:166:[value] Function __gmpz_tdiv_q: precondition got status valid.
+[value] using specification for function __gmpz_get_ui
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:198:[value] Function __gmpz_get_ui: precondition got status valid.
+[value] using specification for function __valid_read
+[value] user error: type long double not implemented. Using double instead
+[value] using specification for function __gmpz_clear
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:117:[value] Function __gmpz_clear: precondition got status valid.
+tests/bts/bts1307.i:13:[value] Function __e_acsl_foo, behavior OverEstimate_Motoring: postcondition got status valid.
+tests/bts/bts1307.i:19:[value] Function __e_acsl_bar: precondition got status valid.
+tests/bts/bts1307.i:20:[value] Function __e_acsl_bar: precondition got status valid.
+tests/bts/bts1307.i:21:[value] Function __e_acsl_bar: precondition got status valid.
+tests/bts/bts1307.i:19:[value] Function bar: precondition got status valid.
+tests/bts/bts1307.i:20:[value] Function bar: precondition got status valid.
+tests/bts/bts1307.i:21:[value] Function bar: precondition got status valid.
+tests/bts/bts1307.i:25:[value] Function bar, behavior UnderEstimate_Motoring: postcondition got status unknown.
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
+tests/bts/bts1307.i:25:[value] Function __e_acsl_bar, behavior UnderEstimate_Motoring: postcondition got status unknown.
+[value] using specification for function __e_acsl_memory_clean
+[value] done for function main
+[value] ====== VALUES COMPUTED ======
