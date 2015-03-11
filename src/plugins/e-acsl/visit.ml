@@ -253,7 +253,8 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
 	 f)
 
   method !vglob_aux = function
-  | GVarDecl(_, vi, _) | GVar(vi, _, _) | GFun({ svar = vi }, _) 
+  | GVarDecl(vi, _) | GVar(vi, _, _)
+  | GFunDecl(_, vi, _) | GFun({ svar = vi }, _)
       when Misc.is_library_loc vi.vdecl ->
     if generate then
       Cil.JustCopyPost
@@ -264,7 +265,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       Misc.register_library_function vi; 
       Cil.SkipChildren
     end
-  | GVarDecl(_, vi, _) | GVar(vi, _, _) | GFun({ svar = vi }, _) 
+  | GVarDecl(vi, _) | GVar(vi, _, _) | GFun({ svar = vi }, _)
       when Cil.is_builtin vi ->
     if generate then Cil.JustCopy else Cil.SkipChildren
   | g when Misc.is_library_loc (Global.loc g) ->
@@ -289,7 +290,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
            [vfile]) *)
         if vi.vorig_name = Kernel.MainFunction.get () then
           main_fct <- Some fundec
-      | GVarDecl(_, vi, _) -> 
+      | GVarDecl(vi, _) | GFunDecl(_, vi, _) ->
         (* do not convert extern ghost variables, because they can't be linked,
            see bts #1392 *)
         if vi.vstorage <> Extern then
@@ -298,7 +299,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         ()
     in
     (match g with
-    | GVar(vi, _, _) | GVarDecl(_, vi, _) -> 
+    | GVar(vi, _, _) | GVarDecl(vi, _) ->
       Varinfo.Hashtbl.replace global_vars vi None
     | _ -> ());
     if generate then Cil.DoChildrenPost(fun g -> List.iter do_it g; g)
