@@ -323,6 +323,10 @@ predicate valid_string{L}(char *s) =
   0 ≤ strlen{L}(s) ∧ \valid{L}(s+(0 .. strlen{L}(s)));
  */
 /*@
+predicate valid_read_string{L}(char *s) =
+  0 ≤ strlen{L}(s) ∧ \valid_read{L}(s+(0 .. strlen{L}(s)));
+ */
+/*@
 predicate valid_string_or_null{L}(char *s) =
   s ≡ \null ∨ valid_string{L}(s);
  */
@@ -334,14 +338,14 @@ predicate valid_wstring{L}(wchar_t *s) =
 predicate valid_wstring_or_null{L}(wchar_t *s) =
   s ≡ \null ∨ valid_wstring{L}(s);
  */
-/*@ requires valid_string_src: valid_string(s);
+/*@ requires valid_string_src: valid_read_string(s);
     ensures \result ≡ strlen(\old(s));
     assigns \result;
     assigns \result \from *(s+(0 ..));
  */
 extern size_t strlen(char const *s);
 
-/*@ requires valid_string_src: valid_string(s);
+/*@ requires valid_string_src: valid_read_string(s);
     ensures \result ≡ strlen(\old(s));
     assigns \result;
     assigns \result \from *(s+(0 ..));
