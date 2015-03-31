@@ -56,6 +56,7 @@ void* __e_acsl_mmodel_memset (void* dest, int val, size_t len) {
 
 
 size_t __memory_size = 0;
+struct _block * last_added_block = NULL; /* proceed with caution */
 /*unsigned cpt_store_block = 0;*/
 
 const int nbr_bits_to_1[256] = {
@@ -103,7 +104,9 @@ void* __store_block(void* ptr, size_t size) {
   tmp->init_cpt = 0;
   tmp->is_litteral_string = false;
   tmp->is_out_of_bound = false;
+  tmp->freeable = false;
   __add_element(tmp);
+  last_added_block = tmp;
   /*cpt_store_block++;*/
   return ptr;
 }
@@ -128,7 +131,8 @@ void* __malloc(size_t size) {
   if(tmp == NULL) return NULL;
   tmp2 = __store_block(tmp, size);
   __memory_size += size;
-  assert(tmp2 != NULL);
+  assert(tmp2 != NULL && last_added_block != NULL);
+  last_added_block->freeable = true;
   return tmp2;
 }
 
@@ -144,6 +148,14 @@ void __free(void* ptr) {
   __memory_size -= tmp->size;
   __remove_element(tmp);
   free(tmp);
+}
+
+int __freeable(void* ptr) {
+  struct _block * tmp;
+  if(ptr == NULL) return false;
+  tmp = __get_exact(ptr);
+  if(tmp == NULL) return false;
+  return tmp->freeable;
 }
 
 /* resize the block starting at ptr to fit its new size,
@@ -197,6 +209,7 @@ void* __realloc(void* ptr, size_t size) {
     }
   }
   tmp->size = size;
+  tmp->freeable = true;
   __memory_size += size;
   return (void*)tmp->ptr;
 }
@@ -211,7 +224,8 @@ void* __calloc(size_t nbr_block, size_t size_block) {
   if(tmp == NULL) return NULL;
   tmp2 = __store_block(tmp, nbr_block * size_block);
   __memory_size += nbr_block * size_block;
-  assert(tmp2 != NULL);
+  assert(tmp2 != NULL && last_added_block != NULL);
+  last_added_block->freeable = true;
   return tmp2;
 }
 

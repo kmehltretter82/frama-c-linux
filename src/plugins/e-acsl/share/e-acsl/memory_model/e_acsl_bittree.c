@@ -312,11 +312,11 @@ void __add_element (struct _block * ptr) {
 }
 
 
-/* return the block B such as : begin addr of B == ptr
-   we suppose that such a block exists, but we could return NULL if not */
+/* return the block B such as: begin addr of B == ptr if such a block exists,
+   return NULL otherwise */
 /*@ assigns \nothing;
   @ ensures \valid(\result);
-  @ ensures \result->ptr == (size_t)ptr;
+  @ ensures \result == \null || \result->ptr == (size_t)ptr;
   @*/
 struct _block * __get_exact (void * ptr) {
   struct bittree * tmp = __root;
@@ -326,8 +326,8 @@ struct _block * __get_exact (void * ptr) {
   /*@ loop assigns tmp;
     @*/
   while(!tmp->is_leaf) {
-    // prefix is consistent
-    assert((tmp->addr & tmp->mask) == ((size_t)ptr & tmp->mask));
+    // if the ptr we are looking for does not share the prefix of tmp
+    if((tmp->addr & tmp->mask) != ((size_t)ptr & tmp->mask)) return NULL;
     // two sons
     assert(tmp->left != NULL && tmp->right != NULL);
     // the prefix of one son is consistent
@@ -337,12 +337,10 @@ struct _block * __get_exact (void * ptr) {
     else if((tmp->left->addr & tmp->left->mask)
 	    == ((size_t)ptr & tmp->left->mask))
       tmp = tmp->left;
-    else
-      assert(0);
+    else return NULL;
   }
 
-  assert(tmp->is_leaf);
-  assert(tmp->leaf->ptr == (size_t)ptr);
+  if(tmp->leaf->ptr != (size_t)ptr) return NULL;
   return tmp->leaf;
 }
 
