@@ -8,8 +8,8 @@ typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
 typedef unsigned int size_t;
 struct spongeStateStruct {
-   unsigned char __attribute__((__aligned__(32))) state[1600 / 8] ;
-   unsigned char __attribute__((__aligned__(32))) dataQueue[1536 / 8] ;
+   unsigned char __attribute__((__aligned__(32))) state[200] ;
+   unsigned char __attribute__((__aligned__(32))) dataQueue[192] ;
    unsigned int bitsInQueue ;
 } __attribute__((__aligned__(32)));
 typedef struct spongeStateStruct spongeState;
@@ -155,9 +155,7 @@ int main(void)
   state = (spongeState *)__e_acsl_malloc(sizeof(spongeState));
   __initialize((void *)(& state->bitsInQueue),sizeof(unsigned int));
   state->bitsInQueue = (unsigned int)16;
-  /*@ assert
-      ¬\initialized(&state->dataQueue[state->bitsInQueue/(unsigned int)8]);
-  */
+  /*@ assert ¬\initialized(&state->dataQueue[state->bitsInQueue/8]); */
   {
     int __e_acsl_valid_read;
     int __e_acsl_initialized;
@@ -170,7 +168,7 @@ int main(void)
                                          sizeof(unsigned char __attribute__((
                                          __aligned__(32)))));
     e_acsl_assert(! __e_acsl_initialized,(char *)"Assertion",(char *)"main",
-                  (char *)"!\\initialized(&state->dataQueue[state->bitsInQueue/(unsigned int)8])",
+                  (char *)"!\\initialized(&state->dataQueue[state->bitsInQueue/8])",
                   24);
   }
   __e_acsl_free((void *)state);

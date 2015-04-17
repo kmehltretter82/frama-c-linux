@@ -136,11 +136,11 @@ int main(void)
       /*@ assert t[2-i] ≡ 4-i; */
       e_acsl_assert((long long)2 - (long long)i < (long long)3,(char *)"RTE",
                     (char *)"main",
-                    (char *)"index_bound: (long long)((long long)2-(long long)i) < 3",
+                    (char *)"index_bound: (long long)(2-(long long)i) < 3",
                     20);
       e_acsl_assert(0LL <= (long long)2 - (long long)i,(char *)"RTE",
                     (char *)"main",
-                    (char *)"index_bound: 0 <= (long long)((long long)2-(long long)i)",
+                    (char *)"index_bound: 0 <= (long long)(2-(long long)i)",
                     20);
       e_acsl_assert((long long)t[(long long)2 - (long long)i] == (long long)4 - (long long)i,
                     (char *)"Assertion",(char *)"main",

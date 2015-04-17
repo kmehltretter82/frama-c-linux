@@ -116,7 +116,7 @@ int __e_acsl_sorted(int *t, int n)
         __e_acsl_valid_read_2 = __valid_read((void *)(t + ((long long)__e_acsl_i - (long long)1)),
                                              sizeof(int));
         e_acsl_assert(__e_acsl_valid_read_2,(char *)"RTE",(char *)"sorted",
-                      (char *)"mem_access: \\valid_read(t+(long long)((long long)__e_acsl_i-(long long)1))",
+                      (char *)"mem_access: \\valid_read(t+(long long)((long long)__e_acsl_i-1))",
                       8);
         if (*(t + ((long long)__e_acsl_i - (long long)1)) <= *(t + __e_acsl_i)) 
           ;

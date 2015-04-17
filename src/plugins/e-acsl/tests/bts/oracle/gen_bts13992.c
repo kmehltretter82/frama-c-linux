@@ -8,8 +8,8 @@ typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
 typedef unsigned int size_t;
 struct spongeStateStruct {
-   unsigned char __attribute__((__aligned__(32))) state[1600 / 8] ;
-   unsigned char __attribute__((__aligned__(32))) dataQueue[1536 / 8] ;
+   unsigned char __attribute__((__aligned__(32))) state[200] ;
+   unsigned char __attribute__((__aligned__(32))) dataQueue[192] ;
    unsigned int bitsInQueue ;
 } __attribute__((__aligned__(32)));
 typedef struct spongeStateStruct spongeState;
@@ -202,38 +202,36 @@ int main(void)
   state = (spongeState *)__e_acsl_malloc(sizeof(spongeState));
   __initialize((void *)(& state->bitsInQueue),sizeof(unsigned int));
   state->bitsInQueue = (unsigned int)16;
-  /*@ assert
-      ¬\initialized(&state->dataQueue[state->bitsInQueue/(unsigned int)8]);
-  */
+  /*@ assert ¬\initialized(&state->dataQueue[state->bitsInQueue/8]); */
   {
     mpz_t __e_acsl;
-    mpz_t __e_acsl_cast;
     mpz_t __e_acsl_2;
+    mpz_t __e_acsl_3;
     int __e_acsl_div_guard;
     mpz_t __e_acsl_div;
-    unsigned long __e_acsl_3;
+    unsigned long __e_acsl_4;
     int __e_acsl_initialized;
     __gmpz_init_set_ui(__e_acsl,(unsigned long)state->bitsInQueue);
-    __gmpz_init_set_ui(__e_acsl_cast,(unsigned long)((unsigned int)8));
-    __gmpz_init_set_si(__e_acsl_2,0L);
-    __e_acsl_div_guard = __gmpz_cmp((__mpz_struct const *)(__e_acsl_cast),
-                                    (__mpz_struct const *)(__e_acsl_2));
+    __gmpz_init_set_si(__e_acsl_2,(long)8);
+    __gmpz_init_set_si(__e_acsl_3,0L);
+    __e_acsl_div_guard = __gmpz_cmp((__mpz_struct const *)(__e_acsl_2),
+                                    (__mpz_struct const *)(__e_acsl_3));
     __gmpz_init(__e_acsl_div);
-    /*@ assert E_ACSL: (unsigned int)8 ≢ 0; */
+    /*@ assert E_ACSL: 8 ≢ 0; */
     e_acsl_assert(! (__e_acsl_div_guard == 0),(char *)"Assertion",
-                  (char *)"main",(char *)"(unsigned int)8 == 0",24);
+                  (char *)"main",(char *)"8 == 0",24);
     __gmpz_tdiv_q(__e_acsl_div,(__mpz_struct const *)(__e_acsl),
-                  (__mpz_struct const *)(__e_acsl_cast));
-    __e_acsl_3 = __gmpz_get_ui((__mpz_struct const *)(__e_acsl_div));
-    __e_acsl_initialized = __initialized((void *)(& state->dataQueue[__e_acsl_3]),
+                  (__mpz_struct const *)(__e_acsl_2));
+    __e_acsl_4 = __gmpz_get_ui((__mpz_struct const *)(__e_acsl_div));
+    __e_acsl_initialized = __initialized((void *)(& state->dataQueue[__e_acsl_4]),
                                          sizeof(unsigned char __attribute__((
                                          __aligned__(32)))));
     e_acsl_assert(! __e_acsl_initialized,(char *)"Assertion",(char *)"main",
-                  (char *)"!\\initialized(&state->dataQueue[state->bitsInQueue/(unsigned int)8])",
+                  (char *)"!\\initialized(&state->dataQueue[state->bitsInQueue/8])",
                   24);
     __gmpz_clear(__e_acsl);
-    __gmpz_clear(__e_acsl_cast);
     __gmpz_clear(__e_acsl_2);
+    __gmpz_clear(__e_acsl_3);
     __gmpz_clear(__e_acsl_div);
   }
   __e_acsl_free((void *)state);
