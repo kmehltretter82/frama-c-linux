@@ -4,15 +4,15 @@
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-  random_counter ∈ {0}
-  rand_max ∈ {32767}
+  __fc_random_counter ∈ {0}
+  __fc_rand_max ∈ {32767}
   __fc_heap_status ∈ [--..--]
   __e_acsl_init ∈ [--..--]
   __e_acsl_internal_heap ∈ [--..--]
   __memory_size ∈ [--..--]
   stdout ∈ {{ NULL ; &S___fc_stdout[0] }}
-  fopen[0..511] ∈ {0}
-  _p__fc_fopen ∈ {{ &fopen[0] }}
+  __fc_fopen[0..511] ∈ {0}
+  _p__fc_fopen ∈ {{ &__fc_fopen[0] }}
   S___fc_stdout[0]{.__fc_stdio_id; .__fc_position; .__fc_error; .__fc_eof} ∈
                [--..--]
                [0].[bits 80 to 95] ∈ UNINITIALIZED

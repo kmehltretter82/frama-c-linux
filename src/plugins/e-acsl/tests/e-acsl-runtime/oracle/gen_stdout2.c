@@ -58,8 +58,8 @@ extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
 /*@
 model __mpz_struct { ℤ n };
 */
-int random_counter __attribute__((__unused__, __FRAMA_C_MODEL__));
-unsigned long const rand_max = (unsigned long)32767;
+int __fc_random_counter __attribute__((__unused__, __FRAMA_C_MODEL__));
+unsigned long const __fc_rand_max = (unsigned long)32767;
 /*@ ghost extern int __fc_heap_status __attribute__((__FRAMA_C_MODEL__)); */
 
 /*@
@@ -82,6 +82,9 @@ extern  __attribute__((__FC_BUILTIN__)) void __delete_block(void *ptr);
 /*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
 
+/*@ assigns \nothing; */
+extern  __attribute__((__FC_BUILTIN__)) void __literal_string(void *ptr);
+
 /*@ ghost extern int __e_acsl_internal_heap; */
 
 /*@ assigns __e_acsl_internal_heap;
@@ -97,8 +100,25 @@ predicate diffSize{L1, L2}(ℤ i) =
  */
 extern FILE *stdout;
 
-FILE fopen[512];
-FILE const *_p__fc_fopen = (FILE const *)(fopen);
+FILE __fc_fopen[512];
+FILE const *_p__fc_fopen = (FILE const *)(__fc_fopen);
+/*@ ensures \result ≡ \null ∨ \subset(\result, &__fc_fopen[0 .. 512-1]);
+    assigns \result;
+    assigns \result \from *(filename+(..)), *(mode+(..)), _p__fc_fopen;
+ */
+extern FILE *fopen(char const *filename, char const *mode);
+
+/*@ ensures \result ≡ \null ∨ \subset(\result, &__fc_fopen[0 .. 512-1]);
+    assigns \result;
+    assigns \result \from *(filename+(..)), *(mode+(..)), _p__fc_fopen;
+ */
+FILE *__e_acsl_fopen(char const *filename, char const *mode)
+{
+  FILE *__retres;
+  __retres = fopen(filename,mode);
+  return __retres;
+}
+
 void __e_acsl_memory_init(void)
 {
   __store_block((void *)(& stdout),8UL);
@@ -108,15 +128,27 @@ void __e_acsl_memory_init(void)
 
 int main(void)
 {
+  char *__e_acsl_literal_string_2;
+  char *__e_acsl_literal_string;
   int __retres;
   FILE *f;
+  FILE *f2;
   __e_acsl_memory_init();
   __store_block((void *)(& f),8UL);
   __full_init((void *)(& f));
   f = stdout;
+  __e_acsl_literal_string = "foo";
+  __store_block((void *)__e_acsl_literal_string,sizeof("foo"));
+  __full_init((void *)__e_acsl_literal_string);
+  __literal_string((void *)__e_acsl_literal_string);
+  __e_acsl_literal_string_2 = "wb";
+  __store_block((void *)__e_acsl_literal_string_2,sizeof("wb"));
+  __full_init((void *)__e_acsl_literal_string_2);
+  __literal_string((void *)__e_acsl_literal_string_2);
+  f2 = __e_acsl_fopen(__e_acsl_literal_string,__e_acsl_literal_string_2);
   /*@ assert f ≡ __fc_stdout; */
   e_acsl_assert(f == stdout,(char *)"Assertion",(char *)"main",
-                (char *)"f == __fc_stdout",12);
+                (char *)"f == __fc_stdout",13);
   __retres = 0;
   __delete_block((void *)(& stdout));
   __delete_block((void *)(& f));
