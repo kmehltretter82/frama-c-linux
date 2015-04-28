@@ -27,8 +27,8 @@ FRAMAC_SHARE/libc/stdlib.h:174:[e-acsl] warning: E-ACSL construct `\allocate' is
 [value] Computing initial state
 [value] Initial state computed
 [value] Values of globals at initialization
-  random_counter ∈ {0}
-  rand_max ∈ {32767}
+  __fc_random_counter ∈ {0}
+  __fc_rand_max ∈ {32767}
   __fc_heap_status ∈ [--..--]
   __e_acsl_init ∈ [--..--]
   __e_acsl_internal_heap ∈ [--..--]

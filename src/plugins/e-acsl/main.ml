@@ -218,11 +218,12 @@ let change_printer =
       let pp () = object
         inherit (Printer.extensible_printer ()) as super
         method !varinfo fmt vi =
-          if not vi.Cil_types.vghost then
+          if vi.Cil_types.vghost || vi.Cil_types.vstorage <> Cil_types.Extern
+          then
+            super#varinfo fmt vi
+          else
             let s = Str.replace_first r "" vi.Cil_types.vname in
             Format.fprintf fmt "%s" s
-          else
-            super#varinfo fmt vi
       end in
       Printer.change_printer pp
     end

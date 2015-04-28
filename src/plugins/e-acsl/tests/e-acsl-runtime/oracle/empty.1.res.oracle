@@ -24,8 +24,8 @@ typedef unsigned int size_t;
 /*@
 model __mpz_struct { ℤ n };
 */
-int random_counter __attribute__((__unused__, __FRAMA_C_MODEL__));
-unsigned long const rand_max = (unsigned long)32767;
+int __fc_random_counter __attribute__((__unused__, __FRAMA_C_MODEL__));
+unsigned long const __fc_rand_max = (unsigned long)32767;
 /*@ ghost extern int __fc_heap_status __attribute__((__FRAMA_C_MODEL__)); */
 
 /*@
