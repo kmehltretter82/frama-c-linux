@@ -51,9 +51,12 @@ let extended_ast_project: extended_project ref = ref To_be_extended
 
 let unmemoized_extend_ast () =
   let extend () =
+    let share = Options.Share.dir ~error:true () in
     Options.feedback ~level:3 "setting kernel options for E-ACSL.";
     Kernel.CppExtraArgs.add
-      (Pretty_utils.sfprintf " -DE_ACSL_MACHDEP=%s" (Kernel.Machdep.get ()));
+      (Pretty_utils.sfprintf " -DE_ACSL_MACHDEP=%s -I%s/memory_model"
+         (Kernel.Machdep.get ())
+         share);
     Kernel.Keep_unused_specified_functions.off ();
     let ppc, ppk = File.get_preprocessor_command () in
     let register s =
@@ -61,7 +64,7 @@ let unmemoized_extend_ast () =
         (File.NeedCPP
            (s,
             ppc
-            ^ Pretty_utils.sfprintf " -I%s" (Options.Share.dir ~error:true ()),
+            ^ Pretty_utils.sfprintf " -I%s" share,
             ppk))
     in
     List.iter register (Misc.library_files ())
