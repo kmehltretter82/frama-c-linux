@@ -53,9 +53,7 @@ let unmemoized_extend_ast () =
   let extend () =
     Options.feedback ~level:3 "setting kernel options for E-ACSL.";
     Kernel.CppExtraArgs.add
-      (Pretty_utils.sfprintf " -DE_ACSL_MACHDEP=%s -I%s/libc" 
-	 (Kernel.Machdep.get ())
-	 Config.datadir);
+      (Pretty_utils.sfprintf " -DE_ACSL_MACHDEP=%s" (Kernel.Machdep.get ()));
     Kernel.Keep_unused_specified_functions.off ();
     let ppc, ppk = File.get_preprocessor_command () in
     let register s =
