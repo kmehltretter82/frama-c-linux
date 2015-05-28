@@ -32,6 +32,39 @@ axiomatic dynamic_allocation {
  */
 /*@ ghost extern int __e_acsl_init; */
 
+/*@ requires ¬\initialized(z);
+    ensures \valid(\old(z));
+    ensures \initialized(\old(z));
+    assigns *z;
+    assigns *z \from n;
+    allocates \old(z);
+ */
+extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init_set_ui(__mpz_struct * /*[1]*/ z,
+                                                                unsigned long n);
+
+/*@ requires ¬\initialized(z);
+    ensures \valid(\old(z));
+    ensures \initialized(\old(z));
+    assigns *z;
+    assigns *z \from n;
+    allocates \old(z);
+ */
+extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z,
+                                                                long n);
+
+/*@ requires \valid(x);
+    assigns *x;
+    assigns *x \from *x; */
+extern  __attribute__((__FC_BUILTIN__)) void __gmpz_clear(__mpz_struct * /*[1]*/ x);
+
+/*@ requires \valid_read(z1);
+    requires \valid_read(z2);
+    assigns \result;
+    assigns \result \from *z1, *z2;
+ */
+extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
+                                                       __mpz_struct const * /*[1]*/ z2);
+
 /*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __init_args(int argc_ref,
                                                          char **argv_ref);
@@ -404,11 +437,19 @@ int main(int argc, char **argv)
   /*@ assert \block_length(argv) ≡ (argc+1)*sizeof(char *); */
   {
     unsigned long __e_acsl_block_length;
+    mpz_t __e_acsl_block_length_2;
+    mpz_t __e_acsl;
+    int __e_acsl_eq;
     __e_acsl_block_length = __block_length((void *)argv);
-    e_acsl_assert(__e_acsl_block_length == (unsigned long)(((long)argc + (long)1) * 8L),
-                  (char *)"Assertion",(char *)"main",
+    __gmpz_init_set_ui(__e_acsl_block_length_2,__e_acsl_block_length);
+    __gmpz_init_set_si(__e_acsl,((long)argc + (long)1) * 8L);
+    __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl_block_length_2),
+                             (__mpz_struct const *)(__e_acsl));
+    e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"main",
                   (char *)"\\block_length(argv) == (argc+1)*sizeof(char *)",
                   15);
+    __gmpz_clear(__e_acsl_block_length_2);
+    __gmpz_clear(__e_acsl);
   }
   /*@ assert *(argv+argc) ≡ \null; */
   {

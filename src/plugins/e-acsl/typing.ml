@@ -57,7 +57,7 @@ let pretty_eacsl_typ fmt = function
   | Z -> Format.fprintf fmt "Z"
   | No_integral lty -> Format.fprintf fmt "%a" Printer.pp_logic_type lty
 
-let typ_of_integer i unsigned = 
+let ikind_of_integer i unsigned = 
   (* int whenever possible to prevent superfluous casts in the generated code *)
   if Cil.fitsInInt IInt i then IInt else Cil.intKindForValue i unsigned
 
@@ -65,8 +65,8 @@ let typ_of_eacsl_typ = function
   | Interv(l, u) -> 
     let is_pos = Z.ge l Z.zero in
     (try 
-       let ty_l = TInt(typ_of_integer l is_pos, []) in
-       let ty_u = TInt(typ_of_integer u is_pos, []) in
+       let ty_l = TInt(ikind_of_integer l is_pos, []) in
+       let ty_u = TInt(ikind_of_integer u is_pos, []) in
        Cil.arithmeticConversion ty_l ty_u
      with Cil.Not_representable -> 
        Mpz.t ())
@@ -322,12 +322,22 @@ let rec type_term t =
       dup (join ty2) ty3
     | Tat(t, _)
     | Tbase_addr(_, t) -> dup type_term t
-    | Toffset(_, t)
-    | Tblock_length(_, t) -> 
+    | Toffset(_, t) ->
       ignore (type_term t);
-      (* TODO: to be improved by computing the length of the type of the
-	 pointer *)
-      dup eacsl_typ_of_typ Cil.theMachine.Cil.typeOfSizeOf
+      let n = Z.div (Bit_utils.max_bit_address ()) (Z.of_int 8) in
+      let ty =
+        try TInt(ikind_of_integer n true, [])
+        with Cil.Not_representable -> Mpz.t ()
+      in
+      dup eacsl_typ_of_typ ty
+    | Tblock_length(_, t) ->
+      ignore (type_term t);
+      let n = Z.div (Bit_utils.max_bit_size ()) (Z.of_int 8) in
+      let ty =
+        try TInt(ikind_of_integer n true, [])
+        with Cil.Not_representable -> Mpz.t ()
+      in
+      dup eacsl_typ_of_typ ty
     | Tnull -> dup int_to_interv 0
     | TLogic_coerce(_, t) -> dup type_term t
     | TCoerce(t, ty) -> 

@@ -84,7 +84,7 @@ let name_of_mpz_arith_bop = function
 let constant_to_exp ~loc = function
   | Integer(n, repr) ->
     (try
-       let kind = Typing.typ_of_integer n (Integer.ge n Integer.zero) in
+       let kind = Typing.ikind_of_integer n (Integer.ge n Integer.zero) in
        if Typing.is_representable n kind then 
          Cil.kinteger64 ~loc ~kind ?repr n, false
        else 
