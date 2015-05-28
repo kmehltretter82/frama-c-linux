@@ -15,14 +15,7 @@
 tests/e-acsl-runtime/array.i:12:[value] entering loop for the first time
 tests/e-acsl-runtime/array.i:13:[value] entering loop for the first time
 tests/e-acsl-runtime/array.i:15:[value] Assertion got status unknown.
-[value] using specification for function __gmpz_init_set_si
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: precondition got status valid.
-[value] using specification for function __gmpz_cmp
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:127:[value] Function __gmpz_cmp: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:128:[value] Function __gmpz_cmp: precondition got status valid.
 [value] using specification for function e_acsl_assert
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
-[value] using specification for function __gmpz_clear
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:117:[value] Function __gmpz_clear: precondition got status valid.
 tests/e-acsl-runtime/array.i:16:[value] Assertion got status unknown.
 [value] done for function main

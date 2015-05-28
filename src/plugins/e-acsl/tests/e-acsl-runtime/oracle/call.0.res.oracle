@@ -6,7 +6,11 @@ tests/e-acsl-runtime/call.c:18:[e-acsl] warning: E-ACSL construct `disjoint beha
                   Ignoring annotation.
 tests/e-acsl-runtime/call.c:18:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
                   Ignoring annotation.
-tests/e-acsl-runtime/call.c:18:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+FRAMAC_SHARE/libc/stdlib.h:159:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:159:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:164:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
                   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 [value] Analyzing a complete application starting at main

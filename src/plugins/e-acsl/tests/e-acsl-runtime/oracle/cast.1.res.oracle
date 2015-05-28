@@ -11,11 +11,24 @@
   __e_acsl_internal_heap ∈ [--..--]
   __memory_size ∈ [--..--]
 tests/e-acsl-runtime/cast.i:12:[value] Assertion got status valid.
+[value] using specification for function __gmpz_init_set_si
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: precondition got status valid.
+[value] using specification for function __gmpz_cmp
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:127:[value] Function __gmpz_cmp: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:128:[value] Function __gmpz_cmp: precondition got status valid.
 [value] using specification for function e_acsl_assert
-FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
+[value] using specification for function __gmpz_clear
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:117:[value] Function __gmpz_clear: precondition got status valid.
 tests/e-acsl-runtime/cast.i:13:[value] Assertion got status valid.
 tests/e-acsl-runtime/cast.i:15:[value] Assertion got status valid.
 tests/e-acsl-runtime/cast.i:16:[value] Assertion got status valid.
+[value] using specification for function __gmpz_init_set_ui
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:55:[value] Function __gmpz_init_set_ui: precondition got status valid.
 tests/e-acsl-runtime/cast.i:19:[value] Assertion got status valid.
+[value] using specification for function __gmpz_init_set_str
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:73:[value] Function __gmpz_init_set_str: precondition got status valid.
+[value] using specification for function __gmpz_get_ui
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:198:[value] Function __gmpz_get_ui: precondition got status valid.
 tests/e-acsl-runtime/cast.i:20:[value] Assertion got status valid.
 [value] done for function main
