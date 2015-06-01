@@ -6,7 +6,7 @@
         | { "\allocation" one-label? "(" term ")" };
        \
   pred ::= { "\allocable" one-label? "(" term ")" };
-       |  { "\freeable" one-label? "(" term ")" };
+       | "\freeable" { one-label? } "(" term ")" ;
        | { "\fresh" two-labels? "(" term, term ")" };
        | "\valid" { one-label? } "(" location-address ")" ;
        | "\valid_read" { one-label? } "(" location-address ")";

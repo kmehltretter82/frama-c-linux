@@ -456,7 +456,7 @@ and comparison_to_exp
   else
     Cil.new_exp  ~loc (BinOp(bop, e1, e2, Cil.intType)), env
 
-(* \base_addr and \block_length annotations *)
+(* \base_addr, \block_length and \freeable annotations *)
 and mmodel_call ~loc kf name ctx env t =
   let e, env = term_to_exp kf (Env.rte env true) None t in
   let _, res, env = 
@@ -657,7 +657,10 @@ and named_predicate_content_to_exp ?name kf env p =
     | _ -> mmodel_call_with_size ~loc kf "initialized" Cil.intType env t)
   | Pinitialized _ -> not_yet env "labeled \\initialized"
   | Pallocable _ -> not_yet env "\\allocate"
-  | Pfreeable _ -> not_yet env "\\free"
+  | Pfreeable(LogicLabel(_, label), t) when label = "Here" ->
+    let res, env, _, _ = mmodel_call ~loc kf "freeable" Cil.intType env t in
+    res, env
+  | Pfreeable _ -> not_yet env "labeled \\freeable"
   | Pfresh _ -> not_yet env "\\fresh"
   | Psubtype _ -> Error.untypable "subtyping relation" (* Jessie specific *)
 
