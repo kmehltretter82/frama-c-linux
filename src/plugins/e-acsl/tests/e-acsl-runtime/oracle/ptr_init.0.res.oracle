@@ -1,5 +1,5 @@
 [e-acsl] beginning translation.
-FRAMAC_SHARE/libc/stdlib.h:171:[e-acsl] warning: E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:155:[e-acsl] warning: E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
 tests/e-acsl-runtime/ptr_init.c:22:[e-acsl] warning: E-ACSL construct `complete behaviors' is not yet supported.
                   Ignoring annotation.
 tests/e-acsl-runtime/ptr_init.c:22:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
