@@ -56,7 +56,6 @@ void* __e_acsl_mmodel_memset (void* dest, int val, size_t len) {
 
 
 size_t __memory_size = 0;
-struct _block * last_added_block = NULL; /* proceed with caution */
 /*unsigned cpt_store_block = 0;*/
 
 const int nbr_bits_to_1[256] = {
@@ -92,7 +91,8 @@ void __init_args(int argc, char **argv) {
   }
 }
 
-/* store the block of size bytes starting at ptr */
+/* store the block of size bytes starting at ptr, the new block is returned.
+ * Warning: the return type is implicitly (struct _block*). */
 void* __store_block(void* ptr, size_t size) {
   struct _block * tmp;
   assert(ptr != NULL);
@@ -106,9 +106,8 @@ void* __store_block(void* ptr, size_t size) {
   tmp->is_out_of_bound = false;
   tmp->freeable = false;
   __add_element(tmp);
-  last_added_block = tmp;
   /*cpt_store_block++;*/
-  return ptr;
+  return tmp;
 }
 
 /* remove the block starting at ptr */
@@ -125,15 +124,16 @@ void __delete_block(void* ptr) {
 /* allocate size bytes and store the returned block
  * for further information, see malloc */
 void* __malloc(size_t size) {
-  void * tmp, * tmp2;
+  void * tmp;
+  struct _block * new_block;
   if(size <= 0) return NULL;
   tmp = malloc(size);
   if(tmp == NULL) return NULL;
-  tmp2 = __store_block(tmp, size);
+  new_block = __store_block(tmp, size);
   __memory_size += size;
-  assert(tmp2 != NULL && last_added_block != NULL);
-  last_added_block->freeable = true;
-  return tmp2;
+  assert(new_block != NULL && (void*)new_block->ptr != NULL);
+  new_block->freeable = true;
+  return (void*)new_block->ptr;
 }
 
 /* free the block starting at ptr,
@@ -218,15 +218,16 @@ void* __realloc(void* ptr, size_t size) {
  * this memory is set to zero, the returned block is stored,
  * for further information, see calloc */
 void* __calloc(size_t nbr_block, size_t size_block) {
-  void * tmp, * tmp2;
+  void * tmp;
+  struct _block * new_block;
   if(nbr_block * size_block <= 0) return NULL;
   tmp = calloc(nbr_block, size_block);
   if(tmp == NULL) return NULL;
-  tmp2 = __store_block(tmp, nbr_block * size_block);
+  new_block = __store_block(tmp, nbr_block * size_block);
   __memory_size += nbr_block * size_block;
-  assert(tmp2 != NULL && last_added_block != NULL);
-  last_added_block->freeable = true;
-  return tmp2;
+  assert(new_block != NULL && (void*)new_block->ptr != NULL);
+  new_block->freeable = true;
+  return (void*)new_block->ptr;
 }
 
 /* mark the size bytes of ptr as initialized */
