@@ -91,7 +91,8 @@ void __init_args(int argc, char **argv) {
   }
 }
 
-/* store the block of size bytes starting at ptr */
+/* store the block of size bytes starting at ptr, the new block is returned.
+ * Warning: the return type is implicitly (struct _block*). */
 void* __store_block(void* ptr, size_t size) {
   struct _block * tmp;
   assert(ptr != NULL);
