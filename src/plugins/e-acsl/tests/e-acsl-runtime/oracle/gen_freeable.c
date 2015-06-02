@@ -6,7 +6,7 @@ struct __anonstruct___mpz_struct_1 {
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
-typedef unsigned int size_t;
+typedef unsigned long size_t;
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
@@ -35,29 +35,6 @@ void __free(void *p);
 
 /*@ ghost extern int __e_acsl_init; */
 
-/*@ requires ¬\initialized(z);
-    ensures \valid(\old(z));
-    ensures \initialized(\old(z));
-    assigns *z;
-    assigns *z \from n;
-    allocates \old(z);
- */
-extern  __attribute__((__FC_BUILTIN__)) void __gmpz_init_set_si(__mpz_struct * /*[1]*/ z,
-                                                                long n);
-
-/*@ requires \valid(x);
-    assigns *x;
-    assigns *x \from *x; */
-extern  __attribute__((__FC_BUILTIN__)) void __gmpz_clear(__mpz_struct * /*[1]*/ x);
-
-/*@ requires \valid_read(z1);
-    requires \valid_read(z2);
-    assigns \result;
-    assigns \result \from *z1, *z2;
- */
-extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__mpz_struct const * /*[1]*/ z1,
-                                                       __mpz_struct const * /*[1]*/ z2);
-
 /*@ assigns \result;
     assigns \result \from ptr; */
 extern  __attribute__((__FC_BUILTIN__)) int __freeable(void *ptr);
@@ -71,20 +48,7 @@ extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
 extern  __attribute__((__FC_BUILTIN__)) void __delete_block(void *ptr);
 
 /*@ assigns \nothing; */
-extern  __attribute__((__FC_BUILTIN__)) void __initialize(void *ptr,
-                                                          size_t size);
-
-/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
-
-/*@ ensures \result ≡ 0 ∨ \result ≡ 1;
-    ensures
-      \result ≡ 1 ⇒ \initialized((char *)\old(ptr)+(0 .. \old(size)-1));
-    assigns \result;
-    assigns \result \from *((char *)ptr+(0 .. size-1));
- */
-extern  __attribute__((__FC_BUILTIN__)) int __initialized(void *ptr,
-                                                          size_t size);
 
 /*@ ghost extern int __e_acsl_internal_heap; */
 
@@ -120,7 +84,7 @@ extern size_t __memory_size;
 void *__e_acsl_malloc(size_t size)
 {
   void *__retres;
-  __store_block((void *)(& __retres),4U);
+  __store_block((void *)(& __retres),8UL);
   __retres = __malloc(size);
   __delete_block((void *)(& __retres));
   return __retres;
@@ -150,7 +114,7 @@ void __e_acsl_free(void *p)
   int __e_acsl_at;
   {
     int __e_acsl_implies;
-    __store_block((void *)(& p),4U);
+    __store_block((void *)(& p),8UL);
     if (! (p != (void *)0)) __e_acsl_implies = 1;
     else {
       int __e_acsl_freeable;
@@ -159,7 +123,7 @@ void __e_acsl_free(void *p)
     }
     e_acsl_assert(__e_acsl_implies,(char *)"Precondition",(char *)"free",
                   (char *)"p != \\null ==> \\freeable(p)",175);
-    __store_block((void *)(& __e_acsl_at),4U);
+    __store_block((void *)(& __e_acsl_at),4UL);
     __e_acsl_at = p != (void *)0;
     __free(p);
   }
@@ -172,76 +136,51 @@ predicate diffSize{L1, L2}(ℤ i) =
   \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
 
 */
-int LAST;
-int *new_inversed(int len, int *v)
-{
-  int i;
-  int *p;
-  __store_block((void *)(& p),4U);
-  __full_init((void *)(& p));
-  p = (int *)__e_acsl_malloc(sizeof(int) * (unsigned int)len);
-  i = 0;
-  while (i < len) {
-    __initialize((void *)(p + i),sizeof(int));
-    *(p + i) = *(v + ((len - i) - 1));
-    i ++;
-  }
-  __delete_block((void *)(& p));
-  return p;
-}
-
 int main(void)
 {
   int __retres;
-  int x;
-  int v1[3];
-  int *v2;
-  __store_block((void *)(& v2),4U);
-  __store_block((void *)(v1),12U);
-  x = 3;
-  __initialize((void *)(v1),sizeof(int));
-  v1[0] = 1;
-  __initialize((void *)(& v1[1]),sizeof(int));
-  v1[1] = 2;
-  __initialize((void *)(& v1[2]),sizeof(int));
-  v1[2] = x;
-  LAST = v1[2];
-  /*@ assert \initialized(&v1[2]); */
+  int *p;
+  __store_block((void *)(& p),8UL);
+  /*@ assert ¬\freeable(p); */
   {
-    int __e_acsl_initialized;
-    __e_acsl_initialized = __initialized((void *)(& v1[2]),sizeof(int));
-    e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"main",
-                  (char *)"\\initialized(&v1[2])",26);
+    int __e_acsl_freeable;
+    __e_acsl_freeable = __freeable((void *)p);
+    e_acsl_assert(! __e_acsl_freeable,(char *)"Assertion",(char *)"main",
+                  (char *)"!\\freeable(p)",15);
   }
-  __full_init((void *)(& v2));
-  v2 = new_inversed(3,v1);
-  LAST = *(v2 + 2);
-  /*@ assert \initialized(v2+2); */
+  /*@ assert ¬\freeable((void *)0); */
   {
-    int __e_acsl_initialized_2;
-    __e_acsl_initialized_2 = __initialized((void *)(v2 + (long)2),
-                                           sizeof(int));
-    e_acsl_assert(__e_acsl_initialized_2,(char *)"Assertion",(char *)"main",
-                  (char *)"\\initialized(v2+2)",29);
+    int __e_acsl_freeable_2;
+    __e_acsl_freeable_2 = __freeable((void *)0);
+    e_acsl_assert(! __e_acsl_freeable_2,(char *)"Assertion",(char *)"main",
+                  (char *)"!\\freeable((void *)0)",16);
   }
-  /*@ assert LAST ≡ 1; */
+  __full_init((void *)(& p));
+  p = (int *)__e_acsl_malloc((unsigned long)4 * sizeof(int));
+  /*@ assert ¬\freeable(p+1); */
   {
-    mpz_t __e_acsl_LAST;
-    mpz_t __e_acsl;
-    int __e_acsl_eq;
-    __gmpz_init_set_si(__e_acsl_LAST,(long)LAST);
-    __gmpz_init_set_si(__e_acsl,(long)1);
-    __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl_LAST),
-                             (__mpz_struct const *)(__e_acsl));
-    e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"main",
-                  (char *)"LAST == 1",30);
-    __gmpz_clear(__e_acsl_LAST);
-    __gmpz_clear(__e_acsl);
+    int __e_acsl_freeable_3;
+    __e_acsl_freeable_3 = __freeable((void *)(p + 1));
+    e_acsl_assert(! __e_acsl_freeable_3,(char *)"Assertion",(char *)"main",
+                  (char *)"!\\freeable(p+1)",18);
   }
-  __e_acsl_free((void *)v2);
+  /*@ assert \freeable(p); */
+  {
+    int __e_acsl_freeable_4;
+    __e_acsl_freeable_4 = __freeable((void *)p);
+    e_acsl_assert(__e_acsl_freeable_4,(char *)"Assertion",(char *)"main",
+                  (char *)"\\freeable(p)",19);
+  }
+  __e_acsl_free((void *)p);
+  /*@ assert ¬\freeable(p); */
+  {
+    int __e_acsl_freeable_5;
+    __e_acsl_freeable_5 = __freeable((void *)p);
+    e_acsl_assert(! __e_acsl_freeable_5,(char *)"Assertion",(char *)"main",
+                  (char *)"!\\freeable(p)",21);
+  }
   __retres = 0;
-  __delete_block((void *)(& v2));
-  __delete_block((void *)(v1));
+  __delete_block((void *)(& p));
   __e_acsl_memory_clean();
   return __retres;
 }

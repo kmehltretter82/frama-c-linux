@@ -36,6 +36,10 @@ void __free(void *p);
 /*@ ghost extern int __e_acsl_init; */
 
 /*@ assigns \result;
+    assigns \result \from ptr; */
+extern  __attribute__((__FC_BUILTIN__)) int __freeable(void *ptr);
+
+/*@ assigns \result;
     assigns \result \from *((char *)ptr+(0 .. size-1)); */
 extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
                                                             size_t size);
@@ -133,10 +137,21 @@ void *__e_acsl_malloc(size_t size)
 void __e_acsl_free(void *p)
 {
   int __e_acsl_at;
-  __store_block((void *)(& p),8UL);
-  __store_block((void *)(& __e_acsl_at),4UL);
-  __e_acsl_at = p != (void *)0;
-  __free(p);
+  {
+    int __e_acsl_implies;
+    __store_block((void *)(& p),8UL);
+    if (! (p != (void *)0)) __e_acsl_implies = 1;
+    else {
+      int __e_acsl_freeable;
+      __e_acsl_freeable = __freeable(p);
+      __e_acsl_implies = __e_acsl_freeable;
+    }
+    e_acsl_assert(__e_acsl_implies,(char *)"Precondition",(char *)"free",
+                  (char *)"p != \\null ==> \\freeable(p)",175);
+    __store_block((void *)(& __e_acsl_at),4UL);
+    __e_acsl_at = p != (void *)0;
+    __free(p);
+  }
   __delete_block((void *)(& p));
   return;
 }

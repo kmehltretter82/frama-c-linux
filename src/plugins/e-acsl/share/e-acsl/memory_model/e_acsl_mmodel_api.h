@@ -47,6 +47,7 @@ struct _block {
   size_t init_cpt;
   _Bool is_litteral_string;
   _Bool is_out_of_bound;
+  _Bool freeable;
 };
 
 /* print the information about a block */

@@ -1,6 +1,5 @@
 [e-acsl] beginning translation.
 FRAMAC_SHARE/libc/stdlib.h:185:[e-acsl] warning: E-ACSL construct `\allocable' is not yet supported. Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:185:[e-acsl] warning: E-ACSL construct `\freeable' is not yet supported. Ignoring annotation.
 FRAMAC_SHARE/libc/stdlib.h:169:[e-acsl] warning: E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
 tests/bts/bts1399.c:19:[e-acsl] warning: E-ACSL construct `complete behaviors' is not yet supported.
                   Ignoring annotation.
@@ -18,7 +17,6 @@ FRAMAC_SHARE/libc/stdlib.h:162:[e-acsl] warning: E-ACSL construct `complete beha
                   Ignoring annotation.
 FRAMAC_SHARE/libc/stdlib.h:162:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
                   Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:174:[e-acsl] warning: E-ACSL construct `\free' is not yet supported. Ignoring annotation.
 FRAMAC_SHARE/libc/stdlib.h:174:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
                   Ignoring annotation.
 FRAMAC_SHARE/libc/stdlib.h:174:[e-acsl] warning: E-ACSL construct `\allocate' is not yet supported. Ignoring annotation.
@@ -46,6 +44,12 @@ FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got
 [value] using specification for function __initialized
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
 FRAMAC_SHARE/libc/stdlib.h:175:[value] Function __e_acsl_free, behavior deallocation: precondition 'freeable' got status unknown.
+[value] using specification for function __freeable
+:0:[value] Assigning imprecise value to __e_acsl_implies.
+        The imprecision originates from Arithmetic {FRAMAC_SHARE/libc/stdlib.h:175}
+FRAMAC_SHARE/libc/stdlib.h:175:[value] Reading left-value __e_acsl_implies.
+        It contains a garbled mix of {Frama_C_alloc} because of Arithmetic
+        {FRAMAC_SHARE/libc/stdlib.h:175}.
 FRAMAC_SHARE/libc/stdlib.h:177:[value] Function __e_acsl_free, behavior deallocation: postcondition got status unknown.
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main

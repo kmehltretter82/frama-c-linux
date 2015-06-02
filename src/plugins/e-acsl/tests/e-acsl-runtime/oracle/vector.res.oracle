@@ -1,6 +1,5 @@
 [e-acsl] beginning translation.
 FRAMAC_SHARE/libc/stdlib.h:185:[e-acsl] warning: E-ACSL construct `\allocable' is not yet supported. Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:185:[e-acsl] warning: E-ACSL construct `\freeable' is not yet supported. Ignoring annotation.
 FRAMAC_SHARE/libc/stdlib.h:169:[e-acsl] warning: E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
 tests/e-acsl-runtime/vector.c:21:[e-acsl] warning: E-ACSL construct `complete behaviors' is not yet supported.
                   Ignoring annotation.
@@ -10,7 +9,6 @@ tests/e-acsl-runtime/vector.c:21:[e-acsl] warning: E-ACSL construct `assigns cla
                   Ignoring annotation.
 tests/e-acsl-runtime/vector.c:21:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
                   Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:174:[e-acsl] warning: E-ACSL construct `\free' is not yet supported. Ignoring annotation.
 FRAMAC_SHARE/libc/stdlib.h:174:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
                   Ignoring annotation.
 FRAMAC_SHARE/libc/stdlib.h:174:[e-acsl] warning: E-ACSL construct `\allocate' is not yet supported. Ignoring annotation.
@@ -48,6 +46,12 @@ FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:128:[value] Function __gmpz_cmp: precondition g
 [value] using specification for function __gmpz_clear
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:117:[value] Function __gmpz_clear: precondition got status valid.
 FRAMAC_SHARE/libc/stdlib.h:175:[value] Function __e_acsl_free, behavior deallocation: precondition 'freeable' got status unknown.
+[value] using specification for function __freeable
+:0:[value] Assigning imprecise value to __e_acsl_implies.
+        The imprecision originates from Arithmetic {FRAMAC_SHARE/libc/stdlib.h:175}
+FRAMAC_SHARE/libc/stdlib.h:175:[value] Reading left-value __e_acsl_implies.
+        It contains a garbled mix of {Frama_C_alloc} because of Arithmetic
+        {FRAMAC_SHARE/libc/stdlib.h:175}.
 FRAMAC_SHARE/libc/stdlib.h:177:[value] Function __e_acsl_free, behavior deallocation: postcondition got status unknown.
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main
