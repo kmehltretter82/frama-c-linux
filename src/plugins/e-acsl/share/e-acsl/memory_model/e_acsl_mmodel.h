@@ -38,6 +38,10 @@ void * __malloc(size_t size)
 void __free(void * ptr)
   __attribute__((FC_BUILTIN));
 
+/*@ assigns \result \from ptr; */
+int __freeable(void * ptr)
+  __attribute__((FC_BUILTIN));
+
 /* resize the block starting at ptr to fit its new size,
  * for further information, see realloc */
 /*@ assigns \result \from *(((char*)ptr)+(0..size-1)); */

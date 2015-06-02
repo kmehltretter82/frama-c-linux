@@ -15,6 +15,9 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
+-  E-ACSL       [2015/06/01] Support of \freeable. Thus illegal calls to
+	        free (e.g. double free) are detected.
+-* E-ACSL       [2015/05/28] Fix types of \block_length and \offset.
 -  E-ACSL       [2015/05/27] Search .h in the E-ACSL memory model by
 	        default (easier to use declarations like __memory_size).
 -  E-ACSL       [2015/05/27] Compatibility with new Frama-C Sodium option

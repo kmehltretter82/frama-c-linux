@@ -1,0 +1,40 @@
+[e-acsl] beginning translation.
+FRAMAC_SHARE/libc/stdlib.h:173:[e-acsl] warning: E-ACSL construct `\allocable' is not yet supported. Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:155:[e-acsl] warning: E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
+tests/e-acsl-runtime/freeable.c:13:[e-acsl] warning: E-ACSL construct `complete behaviors' is not yet supported.
+                  Ignoring annotation.
+tests/e-acsl-runtime/freeable.c:13:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
+                  Ignoring annotation.
+tests/e-acsl-runtime/freeable.c:13:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:159:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:159:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:164:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:164:[e-acsl] warning: E-ACSL construct `complete behaviors' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:164:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:176:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:176:[e-acsl] warning: E-ACSL construct `\allocate' is not yet supported. Ignoring annotation.
+[e-acsl] translation done in project "e-acsl".
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value] Values of globals at initialization
+  __fc_random_counter ∈ {0}
+  __fc_rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __e_acsl_init ∈ [--..--]
+  __e_acsl_internal_heap ∈ [--..--]
+  __memory_size ∈ [--..--]
+[value] using specification for function __store_block
+tests/e-acsl-runtime/freeable.c:15:[value] Assertion got status unknown.
+tests/e-acsl-runtime/freeable.c:15:[kernel] warning: accessing uninitialized left-value: assert \initialized(&p);
+tests/e-acsl-runtime/freeable.c:15:[kernel] warning: completely indeterminate value in p.
+tests/e-acsl-runtime/freeable.c:15:[value] completely invalid value in evaluation of
+        argument (void *)p
+[value] done for function main

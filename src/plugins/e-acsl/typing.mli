@@ -26,7 +26,7 @@ open Cil_types
 (** {2 Typing} *)
 (******************************************************************************)
 
-val typ_of_integer: Integer.t -> bool -> ikind
+val ikind_of_integer: Integer.t -> bool -> ikind
 (** Compute the best type of a bigint. The boolean must be [true] for unsigned
     and [false] for signed.
     @raise Cil.Not_representable if the integer does not fit in any C type. *)

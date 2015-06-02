@@ -6,13 +6,7 @@ struct __anonstruct___mpz_struct_1 {
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
-typedef unsigned int size_t;
-struct spongeStateStruct {
-   unsigned char __attribute__((__aligned__(32))) state[200] ;
-   unsigned char __attribute__((__aligned__(32))) dataQueue[192] ;
-   unsigned int bitsInQueue ;
-} __attribute__((__aligned__(32)));
-typedef struct spongeStateStruct spongeState;
+typedef unsigned long size_t;
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
@@ -54,29 +48,7 @@ extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
 extern  __attribute__((__FC_BUILTIN__)) void __delete_block(void *ptr);
 
 /*@ assigns \nothing; */
-extern  __attribute__((__FC_BUILTIN__)) void __initialize(void *ptr,
-                                                          size_t size);
-
-/*@ assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
-
-/*@ ensures \result ≡ 0 ∨ \result ≡ 1;
-    ensures
-      \result ≡ 1 ⇒ \valid_read((char *)\old(ptr)+(0 .. \old(size)-1));
-    assigns \result;
-    assigns \result \from *((char *)ptr+(0 .. size-1));
- */
-extern  __attribute__((__FC_BUILTIN__)) int __valid_read(void *ptr,
-                                                         size_t size);
-
-/*@ ensures \result ≡ 0 ∨ \result ≡ 1;
-    ensures
-      \result ≡ 1 ⇒ \initialized((char *)\old(ptr)+(0 .. \old(size)-1));
-    assigns \result;
-    assigns \result \from *((char *)ptr+(0 .. size-1));
- */
-extern  __attribute__((__FC_BUILTIN__)) int __initialized(void *ptr,
-                                                          size_t size);
 
 /*@ ghost extern int __e_acsl_internal_heap; */
 
@@ -112,7 +84,7 @@ extern size_t __memory_size;
 void *__e_acsl_malloc(size_t size)
 {
   void *__retres;
-  __store_block((void *)(& __retres),4U);
+  __store_block((void *)(& __retres),8UL);
   __retres = __malloc(size);
   __delete_block((void *)(& __retres));
   return __retres;
@@ -142,7 +114,7 @@ void __e_acsl_free(void *p)
   int __e_acsl_at;
   {
     int __e_acsl_implies;
-    __store_block((void *)(& p),4U);
+    __store_block((void *)(& p),8UL);
     if (! (p != (void *)0)) __e_acsl_implies = 1;
     else {
       int __e_acsl_freeable;
@@ -151,7 +123,7 @@ void __e_acsl_free(void *p)
     }
     e_acsl_assert(__e_acsl_implies,(char *)"Precondition",(char *)"free",
                   (char *)"p != \\null ==> \\freeable(p)",177);
-    __store_block((void *)(& __e_acsl_at),4U);
+    __store_block((void *)(& __e_acsl_at),4UL);
     __e_acsl_at = p != (void *)0;
     __free(p);
   }
@@ -167,31 +139,48 @@ predicate diffSize{L1, L2}(ℤ i) =
 int main(void)
 {
   int __retres;
-  spongeState *state;
-  __store_block((void *)(& state),4U);
-  __full_init((void *)(& state));
-  state = (spongeState *)__e_acsl_malloc(sizeof(spongeState));
-  __initialize((void *)(& state->bitsInQueue),sizeof(unsigned int));
-  state->bitsInQueue = (unsigned int)16;
-  /*@ assert ¬\initialized(&state->dataQueue[state->bitsInQueue/8]); */
+  int *p;
+  __store_block((void *)(& p),8UL);
+  /*@ assert ¬\freeable(p); */
   {
-    int __e_acsl_valid_read;
-    int __e_acsl_initialized;
-    __e_acsl_valid_read = __valid_read((void *)(& state->bitsInQueue),
-                                       sizeof(unsigned int));
-    e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"main",
-                  (char *)"mem_access: \\valid_read(&state->bitsInQueue)",24);
-    __e_acsl_initialized = __initialized((void *)(& state->dataQueue[
-                                         state->bitsInQueue / (unsigned int)8]),
-                                         sizeof(unsigned char __attribute__((
-                                         __aligned__(32)))));
-    e_acsl_assert(! __e_acsl_initialized,(char *)"Assertion",(char *)"main",
-                  (char *)"!\\initialized(&state->dataQueue[state->bitsInQueue/8])",
-                  24);
+    int __e_acsl_freeable;
+    __e_acsl_freeable = __freeable((void *)p);
+    e_acsl_assert(! __e_acsl_freeable,(char *)"Assertion",(char *)"main",
+                  (char *)"!\\freeable(p)",15);
   }
-  __e_acsl_free((void *)state);
+  /*@ assert ¬\freeable((void *)0); */
+  {
+    int __e_acsl_freeable_2;
+    __e_acsl_freeable_2 = __freeable((void *)0);
+    e_acsl_assert(! __e_acsl_freeable_2,(char *)"Assertion",(char *)"main",
+                  (char *)"!\\freeable((void *)0)",16);
+  }
+  __full_init((void *)(& p));
+  p = (int *)__e_acsl_malloc((unsigned long)4 * sizeof(int));
+  /*@ assert ¬\freeable(p+1); */
+  {
+    int __e_acsl_freeable_3;
+    __e_acsl_freeable_3 = __freeable((void *)(p + (long)1));
+    e_acsl_assert(! __e_acsl_freeable_3,(char *)"Assertion",(char *)"main",
+                  (char *)"!\\freeable(p+1)",18);
+  }
+  /*@ assert \freeable(p); */
+  {
+    int __e_acsl_freeable_4;
+    __e_acsl_freeable_4 = __freeable((void *)p);
+    e_acsl_assert(__e_acsl_freeable_4,(char *)"Assertion",(char *)"main",
+                  (char *)"\\freeable(p)",19);
+  }
+  __e_acsl_free((void *)p);
+  /*@ assert ¬\freeable(p); */
+  {
+    int __e_acsl_freeable_5;
+    __e_acsl_freeable_5 = __freeable((void *)p);
+    e_acsl_assert(! __e_acsl_freeable_5,(char *)"Assertion",(char *)"main",
+                  (char *)"!\\freeable(p)",21);
+  }
   __retres = 0;
-  __delete_block((void *)(& state));
+  __delete_block((void *)(& p));
   __e_acsl_memory_clean();
   return __retres;
 }
