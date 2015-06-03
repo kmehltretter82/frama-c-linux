@@ -69,10 +69,6 @@ void  __add_element(struct _block *);
    we suppose that such a block exists, but we could return NULL if not */
 struct _block * __get_exact(void *);
 
-/* return the block B such as : begin addr of B > ptr
-   or NULL if such a block does not exist */
-struct _block * __get_next(void *);
-
 /* return the block B containing ptr, such as :
    begin addr of B <= ptr < (begin addr + size) of B
    or NULL if such a block does not exist */
