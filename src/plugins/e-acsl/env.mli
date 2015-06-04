@@ -36,20 +36,24 @@ val has_no_new_stmt: t -> bool
 (** Assume that a local context has been previously pushed.
     @return true iff the given env does not contain any new statement. *)
 
+type scope =
+  | Global
+  | Function
+  | Local_block
+
 val new_var:
-  loc:location -> ?init:bool -> ?global:bool -> ?name:string -> 
+  loc:location -> ?init:bool -> ?scope:scope -> ?name:string ->
   t -> term option -> typ -> 
   (varinfo -> exp (* the var as exp *) -> stmt list) -> 
   varinfo * exp * t
 (** [new_var env t ty mk_stmts] extends [env] with a fresh variable of type
-    [ty] corresponding to [t]. [global] indicates whether the new variable is
-    global to the current function or local to the local block (default is
-    [false], i.e. local). [init] indicates if the initial env must be used.
+    [ty] corresponding to [t]. [scope] is the scope of the new variable (default
+    is [Block]). [init] indicates if the initial env must be used.
     @return this variable as both a C variable and a C expression already
     initialized by applying it to [mk_stmts]. *)
 
 val new_var_and_mpz_init:
-  loc:location -> ?init:bool -> ?global:bool -> ?name:string -> 
+  loc:location -> ?init:bool -> ?scope:scope -> ?name:string -> 
   t -> term option -> 
   (varinfo -> exp (* the var as exp *) -> stmt list) -> 
   varinfo * exp * t
@@ -93,7 +97,7 @@ val pop: t -> t
 val transfer: from:t -> t -> t
 (** Pop the last local context of [from] and push it into the other env. *)
 
-val get_generated_variables: t -> (varinfo * bool) list
+val get_generated_variables: t -> (varinfo * scope) list
 (** All the new variables local to the visited function. 
     The boolean indicates whether the varinfo must be added to the outermost
     function block. *)

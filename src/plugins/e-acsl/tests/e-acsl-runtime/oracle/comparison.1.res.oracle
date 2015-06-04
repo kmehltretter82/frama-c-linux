@@ -23,9 +23,6 @@ FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:117:[value] Function __gmpz_clear: precondition
 tests/e-acsl-runtime/comparison.i:10:[value] Assertion got status valid.
 tests/e-acsl-runtime/comparison.i:11:[value] Assertion got status valid.
 tests/e-acsl-runtime/comparison.i:12:[value] Assertion got status valid.
-[value] using specification for function __store_block
-[value] using specification for function __full_init
-[value] using specification for function __literal_string
 tests/e-acsl-runtime/comparison.i:14:[value] Assertion got status valid.
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
 tests/e-acsl-runtime/comparison.i:17:[value] Assertion got status valid.

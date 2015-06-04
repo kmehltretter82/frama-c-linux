@@ -517,7 +517,7 @@ and at_to_exp env t_opt label e =
     Env.new_var
       ~loc
       ~name:"at" 
-      ~global:true
+      ~scope:Env.Function
       env
       t_opt
       (Cil.typeOf e) 

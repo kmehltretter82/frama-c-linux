@@ -31,17 +31,6 @@ axiomatic dynamic_allocation {
  */
 /*@ ghost extern int __e_acsl_init; */
 
-/*@ assigns \result;
-    assigns \result \from *((char *)ptr+(0 .. size-1)); */
-extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
-                                                            size_t size);
-
-/*@ assigns \nothing; */
-extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
-
-/*@ assigns \nothing; */
-extern  __attribute__((__FC_BUILTIN__)) void __literal_string(void *ptr);
-
 /*@ ghost extern int __e_acsl_internal_heap; */
 
 extern size_t __memory_size;
@@ -52,7 +41,6 @@ predicate diffSize{L1, L2}(ℤ i) =
  */
 int main(void)
 {
-  char *__e_acsl_literal_string;
   int __retres;
   int x;
   int y;
@@ -69,11 +57,7 @@ int main(void)
   /*@ assert y ≥ 1; */
   e_acsl_assert(y >= 1,(char *)"Assertion",(char *)"main",(char *)"y >= 1",
                 12);
-  __e_acsl_literal_string = "toto";
-  __store_block((void *)__e_acsl_literal_string,sizeof("toto"));
-  __full_init((void *)__e_acsl_literal_string);
-  __literal_string((void *)__e_acsl_literal_string);
-  s = (char *)__e_acsl_literal_string;
+  s = (char *)"toto";
   /*@ assert s ≡ s; */
   e_acsl_assert(s == s,(char *)"Assertion",(char *)"main",(char *)"s == s",
                 14);

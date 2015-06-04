@@ -24,6 +24,11 @@ module E_acsl_label = Label
 open Cil_types
 open Cil_datatype
 
+type scope =
+  | Global
+  | Function
+  | Local_block
+
 type mpz_tbl = {   
   new_exps: (varinfo * exp) Term.Map.t; (* generated mpz variables as exp from
 					   terms *)
@@ -47,9 +52,9 @@ type local_env =
 type t = 
     { visitor: Visitor.frama_c_visitor; 
       annotation_kind: Misc.annotation_kind;
-      new_global_vars: (varinfo * bool) list; 
-      (* generated variables at function level. The boolean indicates whether
-	 the varinfo must be added to the outermost function block. *)
+      new_global_vars: (varinfo * scope) list;
+      (* generated variables. The scope indicates the level where the variable
+         should be added. *)
       global_mpz_tbl: mpz_tbl;
       env_stack: local_env list;
       init_env: local_env;
@@ -59,16 +64,26 @@ type t =
       cpt: int; (* counter used when generating variables *) }
 
 module Varname: sig 
-  val get: string -> string 
+  val get: scope:scope -> string -> string
   val clear: unit -> unit
 end = struct
 
   module H = Datatype.String.Hashtbl
   let tbl = H.create 7
+  let globals = H.create 7
 
-  let get s = 
-    let _, u = Extlib.make_unique_name (H.mem tbl) ~sep:"_" s in
-    H.add tbl u ();
+  let get ~scope s = 
+    let _, u =
+      Extlib.make_unique_name
+        (fun s -> H.mem tbl s || H.mem globals s)
+        ~sep:"_"
+        s
+    in
+    let add = match scope with
+      | Global -> H.add globals
+      | Function | Local_block -> H.add tbl
+    in
+    add u ();
     u
 
   let clear () = H.clear tbl
@@ -152,7 +167,7 @@ let generate_rte env =
 (* eta-expansion required for typing generalisation *)
 let acc_list_rev acc l = List.fold_left (fun acc x -> x :: acc) acc l
 
-let do_new_var ~loc init ?(global=false) ?(name="") env t ty mk_stmts =
+let do_new_var ~loc init ?(scope=Local_block) ?(name="") env t ty mk_stmts =
   let local_env, tl_env = top init env in
   let local_block = local_env.block_info in
   let is_t = Mpz.is_t ty in
@@ -163,7 +178,7 @@ let do_new_var ~loc init ?(global=false) ?(name="") env t ty mk_stmts =
       ~source:true
       false (* is a global? *)
       false (* is a formal? *)
-      (Varname.get ("__e_acsl" ^ if name = "" then "" else "_" ^ name))
+      (Varname.get ~scope ("__e_acsl" ^ if name = "" then "" else "_" ^ name))
       ty
   in
   v.vreferenced <- true;
@@ -171,9 +186,9 @@ let do_new_var ~loc init ?(global=false) ?(name="") env t ty mk_stmts =
   let e = Cil.evar v in
   let stmts = mk_stmts v e in
   let new_stmts = acc_list_rev local_block.new_stmts stmts in
-  let new_block_vars = 
-    if global then local_block.new_block_vars 
-    else v :: local_block.new_block_vars
+  let new_block_vars = match scope with
+    | Global | Function -> local_block.new_block_vars
+    | Local_block -> v :: local_block.new_block_vars
   in
   let new_block = 
     { new_block_vars = new_block_vars; 
@@ -193,15 +208,16 @@ let do_new_var ~loc init ?(global=false) ?(name="") env t ty mk_stmts =
 	| None -> tbl.new_exps
 	| Some t -> Term.Map.add t (v, e) tbl.new_exps }
     in
-    if global then
+    match scope with
+    | Global | Function ->
       let local_env = { local_env with block_info = new_block } in
-      (* also memoise the new variable, but must never be used *)
+      (* also memoize the new variable, but must never be used *)
       { env with
 	cpt = n;
-	new_global_vars = (v, true) :: env.new_global_vars;
+        new_global_vars = (v, scope) :: env.new_global_vars;
 	global_mpz_tbl = extend_tbl env.global_mpz_tbl;
 	env_stack = local_env :: tl_env }
-    else
+    | Local_block ->
       let local_env = 
 	{ block_info = new_block; 
 	  mpz_tbl = extend_tbl local_env.mpz_tbl;
@@ -210,12 +226,9 @@ let do_new_var ~loc init ?(global=false) ?(name="") env t ty mk_stmts =
       { env with 
 	cpt = n; 
 	env_stack = local_env :: tl_env;
-	new_global_vars = (v, false) :: env.new_global_vars }
+        new_global_vars = (v, scope) :: env.new_global_vars }
   end else
-    let new_global_vars = 
-      if global then (v, true) :: env.new_global_vars 
-      else (v, false) :: env.new_global_vars
-    in
+    let new_global_vars = (v, scope) :: env.new_global_vars in
     let local_env = 
       { local_env with 
 	block_info = new_block; 
@@ -229,7 +242,7 @@ let do_new_var ~loc init ?(global=false) ?(name="") env t ty mk_stmts =
 
 exception No_term
 
-let new_var ~loc ?(init=false) ?(global=false) ?name env t ty mk_stmts = 
+let new_var ~loc ?(init=false) ?(scope=Local_block) ?name env t ty mk_stmts =
   let local_env, _ = top init env in
   let memo tbl =
     try
@@ -239,17 +252,18 @@ let new_var ~loc ?(init=false) ?(global=false) ?name env t ty mk_stmts =
 	let v, e = Term.Map.find t tbl.new_exps in
 	if Typ.equal ty v.vtype then v, e, env else raise No_term
     with Not_found | No_term -> 
-      do_new_var ~loc ~global init ?name env t ty mk_stmts  
+      do_new_var ~loc ~scope init ?name env t ty mk_stmts  
   in
-  if global then begin
+  match scope with
+  | Global | Function ->
     assert (not init);
     memo env.global_mpz_tbl
-  end else
+  | Local_block ->
     memo local_env.mpz_tbl
 
-let new_var_and_mpz_init ~loc ?init ?global ?name env t mk_stmts = 
+let new_var_and_mpz_init ~loc ?init ?scope ?name env t mk_stmts =
   new_var 
-    ~loc ?init ?global ?name env t (Mpz.t ()) 
+    ~loc ?init ?scope ?name env t (Mpz.t ()) 
     (fun v e -> Mpz.init ~loc e :: mk_stmts v e)
 
 module Logic_binding = struct
@@ -412,7 +426,9 @@ module Context = struct
       let env =
 	{ env with new_global_vars = 
 	    List.filter
-	      (fun (v, b) -> b && List.for_all (fun (v', _) -> v != v') vars) 
+              (fun (v, scope) ->
+                (scope = Global || scope = Function)
+                && List.for_all (fun (v', _) -> v != v') vars)
 	      !ctx 
 	      @ vars }
       in

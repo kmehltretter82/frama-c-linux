@@ -6,7 +6,6 @@ if [ $# -gt 2 ]; then
     shift
     shift
     BUILTIN=$1
-    shift;
     ARGS=$@
 fi
 

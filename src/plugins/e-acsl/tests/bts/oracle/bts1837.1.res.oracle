@@ -10,31 +10,25 @@
   __e_acsl_init ∈ [--..--]
   __e_acsl_internal_heap ∈ [--..--]
   __memory_size ∈ [--..--]
-  T ∈ {0}
-  G ∈ {0}
   S ∈ {0}
-  S2 ∈ {0}
-  IDX ∈ {1}
-  G2 ∈ {2}
-  U ∈ {{ "baz" }}
   __e_acsl_literal_string ∈ {0}
   __e_acsl_literal_string_2 ∈ {0}
   __e_acsl_literal_string_3 ∈ {0}
-  __e_acsl_literal_string_4 ∈ {0}
 [value] using specification for function __store_block
 [value] using specification for function __full_init
 [value] using specification for function __literal_string
-tests/e-acsl-runtime/literal_string.i:24:[value] Assertion got status valid.
+tests/bts/bts1837.i:19:[value] entering loop for the first time
+tests/bts/bts1837.i:21:[value] Assertion got status valid.
+[value] using specification for function __initialized
 [value] using specification for function __valid_read
 [value] using specification for function e_acsl_assert
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
-FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
-tests/e-acsl-runtime/literal_string.i:25:[value] Assertion got status valid.
-[value] using specification for function __initialized
-tests/e-acsl-runtime/literal_string.i:26:[value] Assertion got status valid.
-tests/e-acsl-runtime/literal_string.i:27:[value] Assertion got status valid.
+tests/bts/bts1837.i:22:[value] Assertion got status valid.
 [value] using specification for function __valid
-tests/e-acsl-runtime/literal_string.i:13:[value] Assertion got status valid.
 [value] using specification for function __delete_block
+tests/bts/bts1837.i:19:[kernel] warning: signed overflow. assert -2147483648 ≤ i-1;
+tests/bts/bts1837.i:11:[value] Assertion got status valid.
+tests/bts/bts1837.i:12:[value] Assertion got status valid.
+tests/bts/bts1837.i:13:[value] Assertion got status valid.
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main

@@ -23,6 +23,8 @@
 -  E-ACSL       [2015/05/27] Compatibility with new Frama-C Sodium option
 	        -frama-c-stdlib.
 -* E-ACSL       [2015/04/28] Fix bug when using fopen.
+-* E-ACSL       [2015/03/06] Fix bugs #1636 and #1837 about scoping of literal
+	        strings.
 o  E-ACSL       [2014/12/17] Export a minimal API for other plug-ins.
 -* E-ACSL       [2014/10/27] Add a missing cast when translating an integral
 	        type used in a floating point/real context in an annotation.

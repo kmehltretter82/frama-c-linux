@@ -34,8 +34,5 @@
   S___fc_real_data_0_S___fc_stdout[0..1] ∈ [--..--]
   S___fc_inode_1_S___fc_stdout[0..1] ∈ [--..--]
   S___fc_real_data_1_S___fc_stdout[0..1] ∈ [--..--]
-[value] using specification for function __store_block
-[value] using specification for function __full_init
-[value] using specification for function __literal_string
 [value] using specification for function printf
 [value] done for function main

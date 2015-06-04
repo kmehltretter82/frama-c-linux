@@ -63,17 +63,6 @@ axiomatic dynamic_allocation {
  */
 /*@ ghost extern int __e_acsl_init; */
 
-/*@ assigns \result;
-    assigns \result \from *((char *)ptr+(0 .. size-1)); */
-extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
-                                                            size_t size);
-
-/*@ assigns \nothing; */
-extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
-
-/*@ assigns \nothing; */
-extern  __attribute__((__FC_BUILTIN__)) void __literal_string(void *ptr);
-
 /*@ ghost extern int __e_acsl_internal_heap; */
 
 extern size_t __memory_size;
@@ -92,7 +81,6 @@ extern int printf(char const *format , ...);
 
 int main(void)
 {
-  char *__e_acsl_literal_string;
   int __retres;
   int x;
   int t[2];
@@ -101,12 +89,7 @@ int main(void)
   i = 1;
   t[0] = 1;
   t[1] = 2;
-  __e_acsl_literal_string = "X=%d, t[0]=%d, t[1]=%d\n";
-  __store_block((void *)__e_acsl_literal_string,
-                sizeof("X=%d, t[0]=%d, t[1]=%d\n"));
-  __full_init((void *)__e_acsl_literal_string);
-  __literal_string((void *)__e_acsl_literal_string);
-  printf(__e_acsl_literal_string,x,t[0],t[i]);
+  printf("X=%d, t[0]=%d, t[1]=%d\n",x,t[0],t[i]);
   __retres = 0;
   return __retres;
 }
