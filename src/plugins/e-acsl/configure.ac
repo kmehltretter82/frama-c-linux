@@ -39,7 +39,9 @@ check_plugin(e_acsl,PLUGIN_RELATIVE_PATH(plugin_file),
 	     [support for E-ACSL plug-in],yes,yes)
 
 plugin_require(e_acsl,rtegen)
-check_plugin_dependencies
+
+# restrict the plug-in dependency checking to external plug-in configuration 
+m4_ifndef([FRAMAC_MAIN_AUTOCONF],[check_plugin_dependencies],[])
 
 # Check Frama-C version
 #######################
