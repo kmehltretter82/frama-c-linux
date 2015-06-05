@@ -275,3 +275,11 @@
 
 \newcommand{\optionuse}[2]{\texttt{#1#2}\optionidx{#1}{#2}}
 \newcommand{\textttuse}[1]{\texttt{#1}\codeidx{#1}}
+
+\definecolor{gris}{gray}{0.85}
+\makeatletter
+\newenvironment{important}%
+{\hspace{5pt plus \linewidth minus \marginparsep}%
+ \begin{lrbox}{\@tempboxa}%
+   \begin{minipage}{\linewidth - 2\fboxsep}}
+{\end{minipage}\end{lrbox}\colorbox{gris}{\usebox{\@tempboxa}}}
