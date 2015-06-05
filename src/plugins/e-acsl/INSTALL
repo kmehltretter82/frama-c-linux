@@ -41,14 +41,14 @@ See below for more detailed and specific instructions.
 
 - GNU make version >= 3.81
 - Objective Caml >= 3.12.1;
-- Frama-C = Fluorine-20130601
+- Frama-C = Sodium-20150201
   (no warranty that this plug-in works with a more recent version of Frama-C)
 
 - The native version of the plug-in is only available if native dynamic linking
   feature of OCaml is available on your system (see Frama-C User Manual, 
   Section 3.1). 
 - Optionally, the GMP library >= 4.3
-  It is required to run the tests and to run the generated programs, 
+  It is required to run the tests and to run some generated programs, 
   but not to run the plug-in through Frama-C.
 
 ===============================================================================

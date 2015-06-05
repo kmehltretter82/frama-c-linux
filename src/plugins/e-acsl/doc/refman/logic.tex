@@ -3,7 +3,7 @@
   \
   [ { logic-def } ] ::= { logic-const-def } ;
           | { logic-function-def } ;
-          | { predicate-def } ;
+          | { logic-predicate-def } ;
   \
   [ { type-expr } ] ::= { id };
   \
@@ -11,7 +11,7 @@
   \
   [ { logic-function-def } ] ::= { "logic" type-expr id parameters "=" term ";" }
   \
-  [ { predicate-def } ] ::= { "predicate" id parameters? "=" pred ";" }
+  [ { logic-predicate-def } ] ::= { "predicate" id parameters? "=" pred ";" }
   \
   { parameters } ::= { "(" parameter (, parameter)* ")" }
   \

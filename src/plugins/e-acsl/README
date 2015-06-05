@@ -43,12 +43,12 @@ The user manual is available at:
 
 The standard use is the following:
 
-$ frama-c -e-acsl <files> -then-on e-acsl -print -ocode generated_code.c
+$ frama-c -e-acsl <files> -then-last -print -ocode generated_code.c
 
 Option -e-acsl runs the Frama-C's E-ACSL plug-in on the given <files>: it
-computes a new Frama-C project called `e-acsl'. Option -then-on switches to 
-this project while options -print and -ocode pretty prints the corresponding C 
-code into file `generated_code'.
+generates a new Frama-C project. Option -then-last switches to this project
+while options -print and -ocode pretty prints the corresponding C code into file
+`generated_code'.
 
 Here the only E-ACSL specific option is -e-acsl. The others (-then-on, -print
 and -ocode) are standard Frama-C options, described in the Frama-C User Manual
@@ -79,7 +79,7 @@ int main(void) {
 
 Since the assertion is always true, the generated code behaves in the same way 
 that just returning 0:
-$ frama-c -e-acsl true.i -then-on e-acsl -print -ocode gen_true.i
+$ frama-c -e-acsl true.i -then-last -print -ocode gen_true.i
 $ gcc `frama-c -print-share-path`/e-acsl/e_acsl.c gen_true.i -o gen_true
 $ ./gen_true
 $ echo $?
@@ -94,7 +94,7 @@ int main(void) {
 }
 
 Since the assertion is always false, the generated code fails at runtime:
-$ frama-c -e-acsl false.i -then-on e-acsl -print -ocode gen_false.i
+$ frama-c -e-acsl false.i -then-last -print -ocode gen_false.i
 $ gcc `frama-c -print-share-path`/e-acsl/e_acsl.c gen_false.i -o gen_false
 $ ./gen_false
 Assertion failed at line 3.

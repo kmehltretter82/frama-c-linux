@@ -15,6 +15,10 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
+########################
+Plugin E-ACSL 0.5 Sodium
+########################
+
 -  E-ACSL       [2015/06/01] Support of \freeable. Thus illegal calls to
 	        free (e.g. double free) are detected.
 -* E-ACSL       [2015/05/28] Fix types of \block_length and \offset.

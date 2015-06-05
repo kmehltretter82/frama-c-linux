@@ -1,13 +1,13 @@
 \begin{syntax}
   statement ::= "/*@" loop-annot "*/" ;
-  "while" "(" expr ")" statement ;
+  "while" "(" C-expression ")" C-statement ;
   | "/*@" loop-annot "*/" ;
     "for";
-  "(" expr ";" expr ";" expr ")";
+  "(" C-expression ";" C-expression ";" C-expression ")";
   statement ;
   | "/*@" loop-annot "*/" ;
-  "do" statement ;
-  "while" "(" expr ")" ";"
+  "do" C-statement ;
+  "while" "(" C-expression ")" ";"
   \
   loop-annot ::= loop-clause* ;
   { loop-behavior* } ;

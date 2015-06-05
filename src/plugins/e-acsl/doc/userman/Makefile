@@ -16,7 +16,7 @@ default: main.pdf
 main.pdf: $(DEPS_MODERN)
 
 EACSL_VERSION= $(shell cat $(VERSION_FILE))
-FC_VERSION= Neon
+FC_VERSION= Sodium
 
 EACSL_DIR=../..
 DISTRIB_DIR=$(HOME)/frama-c/doc/www/distrib
