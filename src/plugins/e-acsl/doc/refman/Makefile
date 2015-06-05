@@ -20,7 +20,7 @@ e-acsl: e-acsl-implementation.pdf e-acsl.pdf main.pdf
 
 all: e-acsl
 
-LANGUAGE_VERSION=1.8
+LANGUAGE_VERSION=1.9
 EACSL_VERSION=$(shell cat $(VERSION_FILE))
 
 EACSL_DIR=../..

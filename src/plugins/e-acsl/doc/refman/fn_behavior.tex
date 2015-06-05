@@ -3,9 +3,9 @@
                             { decreases-clause? } simple-clause*;
                             named-behavior* { completeness-clause* }
   \
-  requires-clause ::= "requires" predicate ";"
+  requires-clause ::= "requires" pred ";"
   \
-  { decreases-clause } ::= { "decreases" term ("for" ident)? ";" }
+  { decreases-clause } ::= { "decreases" term ("for" id)? ";" }
   \
   [ simple-clause ] ::= { assigns-clause } | ensures-clause
   \
@@ -15,13 +15,13 @@
   \
   { location } ::= { tset }
   \
-  ensures-clause ::= "ensures" predicate ";"
+  ensures-clause ::= "ensures" pred ";"
   \
   named-behavior ::= "behavior" id ":" behavior-body
   \
   behavior-body ::= assumes-clause* requires-clause* simple-clause*
   \
-  assumes-clause ::= "assumes" predicate ";"
+  assumes-clause ::= "assumes" pred ";"
   \
   { completeness-clause } ::= { "complete" "behaviors" (id (","id)*)? ";" } ;
      | { "disjoint" "behaviors" (id (","id)*)? ";" }
