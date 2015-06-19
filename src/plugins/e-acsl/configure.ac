@@ -49,8 +49,8 @@ m4_ifndef([FRAMAC_MAIN_AUTOCONF],[check_plugin_dependencies],[])
 AC_MSG_CHECKING(for Frama-C version)
 AC_MSG_RESULT($FRAMAC_VERSION)
 
-DEV_VERSION_NUMBER=`echo $FRAMAC_VERSION | sed -e 's/.*-\(.*\)/\1/' `
-VERSION_NUMBER=`echo $DEV_VERSION_NUMBER | sed -e 's/\(.*\)+dev/\1/' `
+VERSION_NUMBER=`echo $FRAMAC_VERSION | sed -n -e 's/[[a-zA-Z]]\+-\([[0-9]]\+\)-.*/\1/p'`
+EXTRA_VERSION_NUMBER=`echo $FRAMAC_VERSION | sed -n -e 's/[[a-zA-Z]]\+-[[0-9]]\+-\(.*\)/\1/p'`
 REQUIRED_NUMBER=20150201
 REQUIRED_NAME=Sodium
 
@@ -59,7 +59,10 @@ case $FRAMAC_VERSION in
   #   # at the time being, must use the Frama-C development version
   #   ;;
   $REQUIRED_NAME-$REQUIRED_NUMBER*)
-      ;;
+    if test -n "$EXTRA_VERSION_NUMBER"; then
+      AC_MSG_WARN(no guarantee of compatibility with your Frama-C custom \
+version of $REQUIRED_NAME)
+    fi;;
   *)
     if test $VERSION_NUMBER -lt $REQUIRED_NUMBER; then
       AC_MSG_ERROR(Frama-C version must be at least \
