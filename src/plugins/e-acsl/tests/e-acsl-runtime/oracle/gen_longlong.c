@@ -127,8 +127,7 @@ unsigned long long my_pow(unsigned int x, unsigned int n)
     __retres = (unsigned long long)1;
     goto return_label;
   }
-  {
-    /*sequence*/
+  { /* sequence */
     tmp_0 = my_pow(x,n / (unsigned int)2);
     tmp = (int)tmp_0;
   }

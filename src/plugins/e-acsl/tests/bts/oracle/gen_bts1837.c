@@ -167,8 +167,7 @@ int main(void)
   i = 4;
   while (1) {
     int tmp;
-    {
-      /*sequence*/
+    { /* sequence */
       tmp = i;
       i --;
       ;
