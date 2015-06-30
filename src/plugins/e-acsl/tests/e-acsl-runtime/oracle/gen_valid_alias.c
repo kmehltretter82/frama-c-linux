@@ -151,7 +151,7 @@ void __e_acsl_free(void *p)
       __e_acsl_implies = __e_acsl_freeable;
     }
     e_acsl_assert(__e_acsl_implies,(char *)"Precondition",(char *)"free",
-                  (char *)"p != \\null ==> \\freeable(p)",177);
+                  (char *)"p != \\null ==> \\freeable(p)",178);
     __store_block((void *)(& __e_acsl_at),4U);
     __e_acsl_at = p != (void *)0;
     __free(p);

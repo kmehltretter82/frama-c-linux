@@ -1,25 +1,25 @@
 [e-acsl] beginning translation.
-FRAMAC_SHARE/libc/stdlib.h:173:[e-acsl] warning: E-ACSL construct `\allocable' is not yet supported. Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:155:[e-acsl] warning: E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:174:[e-acsl] warning: E-ACSL construct `\allocable' is not yet supported. Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:156:[e-acsl] warning: E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
 tests/e-acsl-runtime/freeable.c:13:[e-acsl] warning: E-ACSL construct `complete behaviors' is not yet supported.
                   Ignoring annotation.
 tests/e-acsl-runtime/freeable.c:13:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
                   Ignoring annotation.
 tests/e-acsl-runtime/freeable.c:13:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
                   Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:159:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+FRAMAC_SHARE/libc/stdlib.h:160:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
                   Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:159:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+FRAMAC_SHARE/libc/stdlib.h:160:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
                   Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:164:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+FRAMAC_SHARE/libc/stdlib.h:165:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
                   Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:164:[e-acsl] warning: E-ACSL construct `complete behaviors' is not yet supported.
+FRAMAC_SHARE/libc/stdlib.h:165:[e-acsl] warning: E-ACSL construct `complete behaviors' is not yet supported.
                   Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:164:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
+FRAMAC_SHARE/libc/stdlib.h:165:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
                   Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:176:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+FRAMAC_SHARE/libc/stdlib.h:177:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
                   Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:176:[e-acsl] warning: E-ACSL construct `\allocate' is not yet supported. Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:177:[e-acsl] warning: E-ACSL construct `\allocate' is not yet supported. Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
