@@ -12,6 +12,8 @@
 - [David Mentré] tset
 - [Guillaume] voir les valeurs quand la spec échoue, voir Boogaloo@RV'13 à ce 
   sujet
+- [Tout le monde] scripts de compilation du programme généré
+- [Enseignement] assigns
 
 =====
 - Voir avec Guillaume et Nikolaï ce dont ils ont besoin comme API pour faire
@@ -102,3 +104,5 @@ function call
 - inclure exemple du E-ACSL User Manual
 - inclure exemple du E-ACSL Tutorial
 - currently, tests require a non-free version of Frama-C (built-ins Value)
+- [Guillaume] tests de non-régression de temps d'exécution (+ conso mémoire)
+  pour voir les dégradations/gains de performance.
