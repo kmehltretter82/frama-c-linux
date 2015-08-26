@@ -218,6 +218,20 @@ headers::
 		Makefile.in configure.ac \
 		share/e-acsl/*.[ch] share/e-acsl/*/*.[ch]
 
+##########
+# Merlin #
+##########
+
+FRAMAC_SRC?=$(HOME)/GIT/FRAMA-C/master
+.merlin:
+	echo "FLG $(FRAMAC_USER_MERLIN_FLAGS)" > .merlin
+	find `echo "$(FRAMAC_SRC)/src" | xargs -n 1 -d ' ' readlink -f` \( -name .svn -o -name tests -o -name doc -o -name result -o -name -o -name oracle -o -name "*.cache" -o -name .git \) -prune -o \( -type d -printf "S %p\n"  \) >> .merlin
+	echo "B $(FRAMAC_LIBDIR)" >> .merlin
+	echo $(OCAMLGRAPH_MERLIN) >> .merlin
+	echo "PKG findlib" >> .merlin
+	echo "PKG zarith" >> .merlin
+	echo "PKG lablgtk2" >> .merlin
+
 ################
 # Generic part #
 ################

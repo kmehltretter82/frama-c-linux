@@ -79,3 +79,4 @@
 .frama-c
 tests/ptests_config
 META.frama-c-e_acsl
+.merlin
