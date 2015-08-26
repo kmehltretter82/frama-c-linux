@@ -19,7 +19,7 @@ FRAMAC_SHARE/libc/stdio.h:107:[e-acsl] warning: E-ACSL construct `logic function
   __memory_size ∈ [--..--]
   stdout ∈ {{ NULL ; &S___fc_stdout[0] }}
   __fc_fopen[0..511] ∈ {0}
-  _p__fc_fopen ∈ {{ &__fc_fopen[0] }}
+  __p_fc_fopen ∈ {{ &__fc_fopen[0] }}
   __e_acsl_literal_string ∈ {0}
   __e_acsl_literal_string_2 ∈ {0}
   S___fc_stdout[0]{.__fc_stdio_id; .__fc_position; .__fc_error; .__fc_eof} ∈

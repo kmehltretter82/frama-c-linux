@@ -74,7 +74,7 @@ predicate diffSize{L1, L2}(ℤ i) =
 extern FILE *stdout;
 
 FILE __fc_fopen[512];
-FILE const *_p__fc_fopen = (FILE const *)(__fc_fopen);
+FILE * const __p_fc_fopen = __fc_fopen;
 /*@ assigns *__fc_stdout;
     assigns *__fc_stdout \from *(format+(..)); */
 extern int printf(char const *format , ...);

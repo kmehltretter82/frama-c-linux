@@ -103,16 +103,16 @@ predicate diffSize{L1, L2}(ℤ i) =
 extern FILE *stdout;
 
 FILE __fc_fopen[512];
-FILE const *_p__fc_fopen = (FILE const *)(__fc_fopen);
+FILE * const __p_fc_fopen = __fc_fopen;
 /*@ ensures \result ≡ \null ∨ \subset(\result, &__fc_fopen[0 .. 512-1]);
     assigns \result;
-    assigns \result \from *(filename+(..)), *(mode+(..)), _p__fc_fopen;
+    assigns \result \from *(filename+(..)), *(mode+(..)), __p_fc_fopen;
  */
 extern FILE *fopen(char const *filename, char const *mode);
 
 /*@ ensures \result ≡ \null ∨ \subset(\result, &__fc_fopen[0 .. 512-1]);
     assigns \result;
-    assigns \result \from *(filename+(..)), *(mode+(..)), _p__fc_fopen;
+    assigns \result \from *(filename+(..)), *(mode+(..)), __p_fc_fopen;
  */
 FILE *__e_acsl_fopen(char const *filename, char const *mode)
 {
