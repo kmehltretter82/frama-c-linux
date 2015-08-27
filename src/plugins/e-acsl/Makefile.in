@@ -60,6 +60,7 @@ PLUGIN_CMO:= local_config \
 	dup_functions \
 	label \
 	env \
+	interval \
 	typing \
 	quantif \
 	translate \
