@@ -352,34 +352,19 @@ struct _block * __get_cont (void * ptr) {
   struct bittree * tmp = __root;
   if(__root == NULL || ptr == NULL) return NULL;
 
-  struct bittree * t [WORDBITS];
-  short ind = -1;
+  struct bittree * other_choice = NULL;
   
   while(1) {
     if(tmp->is_leaf) {
       /* tmp cannot contain ptr because its begin addr is higher */
-      if(tmp->addr > (size_t)ptr) {
-	if(ind == -1)
-	  return NULL;
-	else {
-	  tmp = t[ind];
-	  ind--;
-	  continue;
-	}
-      }
+      if(tmp->addr > (size_t)ptr) return NULL;
       /* tmp->addr <= ptr, tmp may contain ptr
 	 ptr is contained if tmp is large enough (begin addr + size) */
       else if((size_t)ptr < tmp->leaf->size + tmp->addr
               || (tmp->leaf->size == 0 && (size_t)ptr == tmp->leaf->ptr))
 	return tmp->leaf;
       /* tmp->addr <= ptr, but tmp->addr is not large enough */
-      else if (ind == -1)
-	return NULL;
-      else {
-	tmp = t[ind];
-	ind--;
-	continue;
-      }
+      else return NULL;
     }
     
     assert(tmp->left != NULL && tmp->right != NULL);
@@ -387,19 +372,18 @@ struct _block * __get_cont (void * ptr) {
     /* the right child has the highest address, so we test it first */
     if(((size_t)tmp->right->addr & tmp->right->mask)
        <= ((size_t)ptr & tmp->right->mask)) {
-      ind++;
-      t[ind] = tmp->left;
+      other_choice = tmp->left;
       tmp = tmp->right;
     }
     else if(((size_t)tmp->left->addr & tmp->left->mask)
 	    <= ((size_t)ptr & tmp->left->mask))
       tmp = tmp->left;
     else {
-      if(ind == -1)
+      if(other_choice == NULL)
 	return NULL;
       else {
-	tmp = t[ind];
-	ind--;
+	tmp = other_choice;
+	other_choice = NULL;
       }
     }
   }
