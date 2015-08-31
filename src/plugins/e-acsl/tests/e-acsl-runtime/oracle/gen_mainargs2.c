@@ -177,7 +177,8 @@ axiomatic MemCmp {
  */
 /*@
 axiomatic MemChr {
-  logic 𝔹 memchr{L}(char *s, ℤ c, ℤ n) ;
+  logic 𝔹 memchr{L}(char *s, ℤ c, ℤ n) 
+    reads *(s+(0 .. n-1));
   
   axiom memchr_def{L}:
     ∀ char *s;
@@ -190,7 +191,8 @@ axiomatic MemChr {
  */
 /*@
 axiomatic MemSet {
-  logic 𝔹 memset{L}(char *s, ℤ c, ℤ n) ;
+  logic 𝔹 memset{L}(char *s, ℤ c, ℤ n) 
+    reads *(s+(0 .. n-1));
   
   axiom memset_def{L}:
     ∀ char *s;
@@ -203,7 +205,8 @@ axiomatic MemSet {
  */
 /*@
 axiomatic StrLen {
-  logic ℤ strlen{L}(char *s) ;
+  logic ℤ strlen{L}(char *s) 
+    reads *(s+(0 ..));
   
   axiom strlen_pos_or_null{L}:
     ∀ char *s;
@@ -278,7 +281,8 @@ axiomatic StrLen {
  */
 /*@
 axiomatic StrCmp {
-  logic ℤ strcmp{L}(char *s1, char *s2) ;
+  logic ℤ strcmp{L}(char *s1, char *s2) 
+    reads *(s1+(0 .. strlen{L}(s1))), *(s2+(0 .. strlen{L}(s2)));
   
   axiom strcmp_zero{L}:
     ∀ char *s1, char *s2;
@@ -290,7 +294,8 @@ axiomatic StrCmp {
  */
 /*@
 axiomatic StrNCmp {
-  logic ℤ strncmp{L}(char *s1, char *s2, ℤ n) ;
+  logic ℤ strncmp{L}(char *s1, char *s2, ℤ n) 
+    reads *(s1+(0 .. n-1)), *(s2+(0 .. n-1));
   
   axiom strncmp_zero{L}:
     ∀ char *s1, char *s2;
@@ -303,7 +308,8 @@ axiomatic StrNCmp {
  */
 /*@
 axiomatic StrChr {
-  logic 𝔹 strchr{L}(char *s, ℤ c) ;
+  logic 𝔹 strchr{L}(char *s, ℤ c) 
+    reads *(s+(0 .. strlen{L}(s)));
   
   axiom strchr_def{L}:
     ∀ char *s;
@@ -315,7 +321,8 @@ axiomatic StrChr {
  */
 /*@
 axiomatic WcsLen {
-  logic ℤ wcslen{L}(wchar_t *s) ;
+  logic ℤ wcslen{L}(wchar_t *s) 
+    reads *(s+(0 ..));
   
   axiom wcslen_pos_or_null{L}:
     ∀ wchar_t *s;
@@ -365,7 +372,8 @@ axiomatic WcsLen {
  */
 /*@
 axiomatic WcsCmp {
-  logic ℤ wcscmp{L}(wchar_t *s1, wchar_t *s2) ;
+  logic ℤ wcscmp{L}(wchar_t *s1, wchar_t *s2) 
+    reads *(s1+(0 .. wcslen{L}(s1))), *(s2+(0 .. wcslen{L}(s2)));
   
   axiom wcscmp_zero{L}:
     ∀ wchar_t *s1, wchar_t *s2;
@@ -377,7 +385,8 @@ axiomatic WcsCmp {
  */
 /*@
 axiomatic WcsNCmp {
-  logic ℤ wcsncmp{L}(wchar_t *s1, wchar_t *s2, ℤ n) ;
+  logic ℤ wcsncmp{L}(wchar_t *s1, wchar_t *s2, ℤ n) 
+    reads *(s1+(0 .. n-1)), *(s2+(0 .. n-1));
   
   axiom wcsncmp_zero{L}:
     ∀ wchar_t *s1, wchar_t *s2;
