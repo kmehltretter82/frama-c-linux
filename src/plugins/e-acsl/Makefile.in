@@ -222,15 +222,24 @@ headers::
 # Merlin #
 ##########
 
-FRAMAC_SRC?=$(HOME)/GIT/FRAMA-C/master
-.merlin:
-	echo "FLG $(FRAMAC_USER_MERLIN_FLAGS)" > .merlin
-	find `echo "$(FRAMAC_SRC)/src" | xargs -n 1 -d ' ' readlink -f` \( -name .svn -o -name tests -o -name doc -o -name result -o -name -o -name oracle -o -name "*.cache" -o -name .git \) -prune -o \( -type d -printf "S %p\n"  \) >> .merlin
-	echo "B $(FRAMAC_LIBDIR)" >> .merlin
-	echo $(OCAMLGRAPH_MERLIN) >> .merlin
-	echo "PKG findlib" >> .merlin
-	echo "PKG zarith" >> .merlin
-	echo "PKG lablgtk2" >> .merlin
+FRAMAC_SRC?=$(FRAMAC_TOP_SRCDIR)
+
+$(PLUGIN_DIR)/.merlin: $(PLUGIN_DIR)/Makefile
+	echo "FLG $(FRAMAC_USER_MERLIN_FLAGS)" > $@
+	find `echo "$(FRAMAC_SRC)/src" | xargs -n 1 -d ' ' readlink -f` \( -name .svn -o -name tests -o -name doc -o -name result -o -name -o -name oracle -o -name "*.cache" -o -name .git \) -prune -o \( -type d -printf "S %p\n"  \) >> $@
+ifeq ("$(FRAMAC_MAKE)","yes")
+# internal compilation: do not assume kernel files are already installed
+	find `echo "$(FRAMAC_SRC)/src" | xargs -n 1 -d ' ' readlink -f` \( -name .svn -o -name tests -o -name doc -o -name result -o -name -o -name oracle -o -name "*.cache" -o -name .git \) -prune -o \( -type d -printf "B %p\n"  \) >> $@
+
+else
+	echo "B $(FRAMAC_LIBDIR)" >> $@
+endif
+	echo $(OCAMLGRAPH_MERLIN) >> $@
+	echo "PKG findlib" >> $@
+	echo "PKG zarith" >> $@
+	echo "PKG lablgtk2" >> $@
+
+merlin: $(PLUGIN_DIR)/.merlin
 
 ################
 # Generic part #
