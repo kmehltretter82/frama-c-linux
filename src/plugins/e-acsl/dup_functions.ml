@@ -341,7 +341,8 @@ if there are memory-related annotations.@]"
     | Before_gmp -> before_memory_model <- Gmp
     | Gmp | Memory_model -> ()
     | After_gmp -> before_memory_model <- Memory_model
-    | Code -> assert false);
+    | Code -> () (* still processing the GMP and memory model headers,
+                    but reading some libc code *));
     Cil.JustCopy
   | GVarDecl(vi, _) | GFunDecl(_, vi, _) | GFun({ svar = vi }, _)
       when Cil.is_builtin vi ->

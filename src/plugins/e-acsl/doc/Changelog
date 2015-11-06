@@ -15,6 +15,9 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
+-* E-ACSL       [2015/11/06] Fix a crash occuring when using a recent libc
+	        while GMP headers provided by E-ACSL are used.
+
 ########################
 Plugin E-ACSL 0.5 Sodium
 ########################
