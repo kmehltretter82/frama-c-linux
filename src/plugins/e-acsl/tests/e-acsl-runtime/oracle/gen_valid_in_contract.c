@@ -98,18 +98,18 @@ struct list *f(struct list *l)
   struct list *__retres;
   __store_block((void *)(& __retres),4U);
   __store_block((void *)(& l),4U);
-  if (l == (void *)0) {
+  if (l == (struct list *)0) {
     __full_init((void *)(& __retres));
     __retres = l;
     goto return_label;
   }
-  if (l->next == (void *)0) {
+  if (l->next == (struct list *)0) {
     __full_init((void *)(& __retres));
     __retres = l;
     goto return_label;
   }
   __full_init((void *)(& __retres));
-  __retres = (struct list *)((void *)0);
+  __retres = (struct list *)0;
   return_label:
     __delete_block((void *)(& l));
     __delete_block((void *)(& __retres));
@@ -187,7 +187,7 @@ struct list *__e_acsl_f(struct list *l)
 int main(void)
 {
   int __retres;
-  __e_acsl_f((struct list *)((void *)0));
+  __e_acsl_f((struct list *)0);
   __retres = 0;
   __e_acsl_memory_clean();
   return __retres;
