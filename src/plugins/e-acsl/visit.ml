@@ -85,8 +85,19 @@ class e_acsl_visitor prj generate = object (self)
 
   val mutable keep_initializer = None
 
-  val global_vars: init option Varinfo.Hashtbl.t = Varinfo.Hashtbl.create 7
-  (* keys belong to the original project while values belong to the new one *)
+  val global_vars: ioffset Varinfo.Hashtbl.t = Varinfo.Hashtbl.create 7
+  (* A hashtable mapping global variables (as Cil_type.varinfo) to their
+   initialisers aiming to capture memory allocated by global variable
+   declarations and initilisation. At runtime the memory blocks corresponding
+   to space occupied by global recorded via a call to [__e_acsl_memory_init]
+   instrumented before anything    (or almost anything) else in the [main]
+   function. Each variable (say V) stored by [global_vars] will be handled in
+   the body of [__e_acsl_memory_init] as follows:
+      __store_block(...); // Record a memory block used by the variable
+      __full_init(...);   // ... and mark it as initialised memory
+
+    NOTE: In [global_vars] keys belong to the original project while values
+    belong to the new one *)
 
   method private reset_env () =
     function_env := Env.empty (self :> Visitor.frama_c_visitor)
@@ -131,6 +142,11 @@ class e_acsl_visitor prj generate = object (self)
                 Varinfo.Hashtbl.fold_sorted
                   (fun old_vi i (stmts, env) -> 
                     let new_vi = Cil.get_varinfo self#behavior old_vi in
+                    (* Function that creates an initialisation statement
+                    of the form [__full_init(...)]) for every global
+                    variable which needs to be tracked and is not a frama-C
+                    builtin and further appends it to the given list of
+                    statements ([blk]) *)
                     let model blk =
                       if Mmodel_analysis.must_model_vi old_vi then
                         let blk =
@@ -171,6 +187,7 @@ class e_acsl_visitor prj generate = object (self)
                     :: stmts)
                   stmts
               in
+              (* Create a new code block with generated sstatements *)
               let (b, env), stmts = match stmts with
                 | [] -> assert false
                 | stmt :: stmts ->
@@ -179,14 +196,19 @@ class e_acsl_visitor prj generate = object (self)
               function_env := env;
               let stmts = Cil.mkStmt ~valid_sid:true (Block b) :: stmts in
               let blk = Cil.mkBlock stmts in
+              (* Create [__e_acsl_memory_init] function with definition
+               for initialisation of global variables *)
               let fname = "__e_acsl_memory_init" in
-              let vi = 
+              let vi = (* Name and type of the function *)
                 Cil.makeGlobalVar ~source:true
                   fname
                   (TFun(Cil.voidType, Some [], false, []))
               in
               vi.vdefined <- true;
+              (* There is no contract associated with the function *)
               let spec = Cil.empty_funspec () in
+              (* Create function definition which has the list of the
+               * generated initialisation statements *)
               let fundec =
                 { svar = vi;
                   sformals = [];
@@ -199,6 +221,7 @@ class e_acsl_visitor prj generate = object (self)
               in
               self#add_generated_variables_in_function fundec;
               let fct = Definition(fundec, Location.unknown) in
+             (* Create and register [__e_acsl_memory_init] as kernel function *)
               let kf =
                 { fundec = fct; return_stmt = Some return; spec = spec } 
               in
@@ -210,11 +233,14 @@ class e_acsl_visitor prj generate = object (self)
                 match main_fct with
                 | Some main ->
                   let exp = Cil.evar ~loc:Location.unknown vi in
+                  (* Create [__e_acsl_memory_init();] call *)
                   let stmt = 
                     Cil.mkStmtOneInstr ~valid_sid:true 
                       (Call(None, exp, [], Location.unknown))
                   in
                   vi.vreferenced <- true;
+                  (* Add [__e_acsl_memory_init();] call as the first statement
+                   to the [main] function *)
                   main.sbody.bstmts <- stmt :: main.sbody.bstmts;
                   let new_globals =
                     List.fold_right
