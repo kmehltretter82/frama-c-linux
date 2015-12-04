@@ -85,7 +85,7 @@ class e_acsl_visitor prj generate = object (self)
 
   val mutable keep_initializer = None
 
-  val global_vars: ioffset Varinfo.Hashtbl.t = Varinfo.Hashtbl.create 7
+  val global_vars: init option Varinfo.Hashtbl.t = Varinfo.Hashtbl.create 7
   (* A hashtable mapping global variables (as Cil_type.varinfo) to their
    initialisers aiming to capture memory allocated by global variable
    declarations and initilisation. At runtime the memory blocks corresponding
