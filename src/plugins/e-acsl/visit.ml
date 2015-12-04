@@ -164,12 +164,7 @@ class e_acsl_visitor prj generate = object (self)
                     | None -> model stmts, env
                     | Some (CompoundInit _) -> assert false
                     | Some (SingleInit e) -> 
-                      let e, env = self#literal_string env e in
-                      let stmt = 
-                        Cil.mkStmtOneInstr ~valid_sid:true
-                          (Set(Cil.var new_vi, e, e.eloc))
-                      in
-                      model (stmt :: stmts), env)
+                        let _, env = self#literal_string env e in stmts, env)
                   global_vars
                   ([ return ], env)
               in
