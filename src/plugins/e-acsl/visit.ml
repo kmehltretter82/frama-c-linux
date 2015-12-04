@@ -322,18 +322,8 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     if generate then Cil.JustCopy else Cil.SkipChildren
   | g ->
     let do_it = function
-      | GVar(vi, i, _) ->
-        vi.vghost <- false;
-        (* remove initializers on need *)
-        if Mmodel_analysis.old_must_model_vi self#behavior vi then begin
-          try
-            let old_vi = Cil.get_original_varinfo self#behavior vi in
-            match Varinfo.Hashtbl.find global_vars old_vi with
-            | None -> ()
-            | Some _ -> i.init <- None
-          with Not_found ->
-            assert false
-        end
+      | GVar(vi, _, _) ->
+        vi.vghost <- false; ()
       | GFun({ svar = vi } as fundec, _) ->
         vi.vghost <- false;
         (* remember that we have to remove the main later (see method
