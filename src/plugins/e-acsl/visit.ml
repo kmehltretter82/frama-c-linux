@@ -83,7 +83,9 @@ class e_acsl_visitor prj generate = object (self)
      [None] while the global corresponding to this fundec has not been
      visited *)
 
-  val mutable keep_initializer = None
+  val mutable is_initializer = false
+  (* Global flag set to a [true] value if a currently visited node
+    belongs to a global initialiser and set to [false] otherwise *)
 
   val global_vars: init option Varinfo.Hashtbl.t = Varinfo.Hashtbl.create 7
   (* A hashtable mapping global variables (as Cil_type.varinfo) to their
@@ -335,22 +337,29 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     in
     (match g with
     | GVar(vi, _, _) | GVarDecl(vi, _) ->
-      Varinfo.Hashtbl.replace global_vars vi None
+      Varinfo.Hashtbl.add global_vars vi None
     | _ -> ());
     if generate then Cil.DoChildrenPost(fun g -> List.iter do_it g; g)
     else Cil.DoChildren
 
-  method !vinit vi _off _i = 
+  (* Process global variable initialisers and add mappings from global
+    variables to their initialisers to [global_vars]. Note that [add] method
+    should be used instead [replace]. This is because a single variable can
+    be assicoated with multiple initialisers and all of them need to be
+    captured. Also note that the below function captures only [SingleInit]s.
+    All compound initialisers (which contain single ones) are unrapped and
+    thrown away. *)
+  method !vinit vi _off _i =
     if generate then
       if Mmodel_analysis.must_model_vi vi then begin
-        keep_initializer <- Some true;
+        is_initializer <- true;
         Cil.DoChildrenPost
-          (fun i -> 
-            (match keep_initializer with
-            | Some false -> Varinfo.Hashtbl.replace global_vars vi (Some i)
-            | Some true | None -> ());
-            keep_initializer <- None; 
-            i)
+          (fun i ->
+            (match is_initializer with
+            | true -> Varinfo.Hashtbl.add global_vars vi (Some i)
+            | false-> ());
+            is_initializer <- false;
+          i)
       end else
         Cil.JustCopy
     else
@@ -704,20 +713,9 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     in
     if generate then Cil.DoChildrenPost handle_memory else Cil.DoChildren
 
-  method !vexpr exp = 
+  method !vexpr _ = 
     if generate then
-      match keep_initializer with
-      | Some false -> Cil.JustCopy
-      | Some true ->
-        let keep = match exp.enode with Const(CStr _) -> false | _ -> true  in
-        keep_initializer <- Some keep;
-        if keep then Cil.DoChildren else Cil.JustCopy
-      | None -> 
-        Cil.DoChildrenPost
-          (fun e ->
-            let e, env = self#literal_string !function_env e in
-            function_env := env;
-            e)
+      Cil.DoChildren 
     else
       Cil.SkipChildren
 
