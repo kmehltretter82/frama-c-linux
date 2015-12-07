@@ -337,7 +337,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     in
     (match g with
     | GVar(vi, _, _) | GVarDecl(vi, _) ->
-      Varinfo.Hashtbl.add global_vars vi None
+      Varinfo.Hashtbl.replace global_vars vi None
     | _ -> ());
     if generate then Cil.DoChildrenPost(fun g -> List.iter do_it g; g)
     else Cil.DoChildren
@@ -572,11 +572,17 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
               | ret :: l ->
                 let loc = Stmt.loc stmt in
                 let delete_stmts =
-                  Varinfo.Hashtbl.fold_sorted
-                    (fun old_vi _ acc ->
+                  Varinfo.Hashtbl.fold
+                    (fun old_vi i acc ->
                       if Mmodel_analysis.must_model_vi old_vi then
                         let new_vi = Cil.get_varinfo self#behavior old_vi in
-                        Misc.mk_delete_stmt new_vi :: acc
+                        (* Since there are multiple entries for same variables
+                         do delete only variables without initialisers, this
+                         ensures that each variable is released once only *)
+                         (match i with
+                          | None ->  Misc.mk_delete_stmt new_vi :: acc
+                          | _ -> acc
+                         )
                       else
                         acc)
                     global_vars
