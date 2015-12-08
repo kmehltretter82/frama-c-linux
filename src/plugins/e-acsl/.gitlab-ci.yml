@@ -5,3 +5,7 @@ Tests:
   - "./configure"
   - make -j 12
   - make PTESTS_OPTS="-error-code -j 4" tests -j 12
+  - make clean
+  tags:
+  except:
+  - tags
