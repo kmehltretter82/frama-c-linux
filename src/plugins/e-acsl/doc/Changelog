@@ -15,6 +15,8 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
+-* E-ACSL		[2015/08/12] Fix bug #0001817: Literal strings in global
+			arrays with compound initializers are not correctly initialized.
 -* E-ACSL       [2015/11/06] Fix a crash occuring when using a recent libc
 	        while GMP headers provided by E-ACSL are used.
 
