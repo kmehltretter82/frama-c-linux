@@ -150,7 +150,7 @@ int main(void)
   struct list *l;
   __store_block((void *)(& l),4U);
   __full_init((void *)(& l));
-  l = (struct list *)((void *)0);
+  l = (struct list *)0;
   __full_init((void *)(& l));
   l = add(l,4);
   __full_init((void *)(& l));
