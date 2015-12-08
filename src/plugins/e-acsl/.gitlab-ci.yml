@@ -1,0 +1,7 @@
+Tests:
+  script:
+  - eval `opam config env`
+  - autoconf
+  - "./configure"
+  - make -j 12
+  - make PTESTS_OPTS="-error-code -j 4" tests -j 12
