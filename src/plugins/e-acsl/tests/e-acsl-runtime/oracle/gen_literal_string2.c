@@ -112,7 +112,7 @@ predicate diffSize{L1, L2}(ℤ i) =
  */
 int main(void);
 
-char *T;
+char *T = (char *)"bar";
 int G = 0;
 void f(void)
 {
@@ -134,8 +134,8 @@ void f(void)
   return;
 }
 
-char *S;
-char *S2;
+char *S = (char *)"foo";
+char *S2 = (char *)"foo2";
 int IDX = 1;
 int G2 = 2;
 char *U = (char *)"baz";
@@ -159,13 +159,10 @@ void __e_acsl_memory_init(void)
   __literal_string((void *)__e_acsl_literal_string_2);
   __store_block((void *)(& S2),4U);
   __full_init((void *)(& S2));
-  S2 = (char *)__e_acsl_literal_string_4;
   __store_block((void *)(& S),4U);
   __full_init((void *)(& S));
-  S = (char *)__e_acsl_literal_string_3;
   __store_block((void *)(& T),4U);
   __full_init((void *)(& T));
-  T = (char *)__e_acsl_literal_string_2;
   return;
 }
 
