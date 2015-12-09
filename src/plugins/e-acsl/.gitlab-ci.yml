@@ -1,11 +1,6 @@
 Tests:
   script:
-  - eval `opam config env`
-  - autoconf
-  - "./configure"
-  - make -j 12
-  - make PTESTS_OPTS="-error-code -j 4" tests -j 12
-  - make clean
+  - ~oci/oci/bin/bf_client.native xpra --socket ~oci/data/oci-data/oci.socket --rootfs 1 --frama-c master --E-ACSL $(git rev-parse HEAD) E-ACSL
   tags:
   except:
   - tags
