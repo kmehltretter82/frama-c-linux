@@ -732,7 +732,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         (fun e ->
           let e, env = self#literal_string !function_env e in
           function_env := env;
-        e)
+          e)
     end else
       Cil.SkipChildren
 
