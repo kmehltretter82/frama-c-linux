@@ -15,7 +15,7 @@ end)
 (* ************************************************************************** *)
 
 module Fct_name = 
-  EmptyString
+  Empty_string
     (struct
       let option_name = "-ppt-fct" 
       let help = "Name of the function in which the property is defined"
@@ -23,7 +23,7 @@ module Fct_name =
      end)
 
 module Ppt_name = 
-  EmptyString
+  Empty_string
     (struct
       let option_name = "-ppt-name" 
       let help = "Name of the property (assertion, ...)"
