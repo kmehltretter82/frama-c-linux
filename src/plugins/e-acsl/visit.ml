@@ -83,10 +83,23 @@ class e_acsl_visitor prj generate = object (self)
      [None] while the global corresponding to this fundec has not been
      visited *)
 
-  val mutable keep_initializer = None
+  val mutable is_initializer = false
+  (* Global flag set to [true] if a currently visited node
+    belongs to a global initializer and set to [false] otherwise *)
 
   val global_vars: init option Varinfo.Hashtbl.t = Varinfo.Hashtbl.create 7
-  (* keys belong to the original project while values belong to the new one *)
+  (* Hashtable mapping global variables (as Cil_type.varinfo) to their
+   initializers aiming to capture memory allocated by global variable
+   declarations and initilisation. At runtime the memory blocks corresponding
+   to space occupied by global are recorded via a call to 
+   [__e_acsl_memory_init] instrumented before (almost) anything else in the 
+   [main] function. Each variable stored by [global_vars] will be handled in
+   the body of [__e_acsl_memory_init] as follows:
+      __store_block(...); // Record a memory block used by the variable
+      __full_init(...);   // ... and mark it as initialized memory
+
+    NOTE: In [global_vars] keys belong to the original project while values
+    belong to the new one *)
 
   method private reset_env () =
     function_env := Env.empty (self :> Visitor.frama_c_visitor)
@@ -131,6 +144,11 @@ class e_acsl_visitor prj generate = object (self)
                 Varinfo.Hashtbl.fold_sorted
                   (fun old_vi i (stmts, env) -> 
                     let new_vi = Cil.get_varinfo self#behavior old_vi in
+                    (* [model] creates an initialization statement
+                    of the form [__full_init(...)]) for every global
+                    variable which needs to be tracked and is not a Frama-C
+                    builtin. Further the statement is appended to the provided
+                    list of statements ([blk]) *)
                     let model blk =
                       if Mmodel_analysis.must_model_vi old_vi then
                         let blk =
@@ -148,12 +166,7 @@ class e_acsl_visitor prj generate = object (self)
                     | None -> model stmts, env
                     | Some (CompoundInit _) -> assert false
                     | Some (SingleInit e) -> 
-                      let e, env = self#literal_string env e in
-                      let stmt = 
-                        Cil.mkStmtOneInstr ~valid_sid:true
-                          (Set(Cil.var new_vi, e, e.eloc))
-                      in
-                      model (stmt :: stmts), env)
+                      let _, env = self#literal_string env e in stmts, env)
                   global_vars
                   ([ return ], env)
               in
@@ -171,6 +184,7 @@ class e_acsl_visitor prj generate = object (self)
                     :: stmts)
                   stmts
               in
+              (* Create a new code block with generated statements *)
               let (b, env), stmts = match stmts with
                 | [] -> assert false
                 | stmt :: stmts ->
@@ -179,14 +193,19 @@ class e_acsl_visitor prj generate = object (self)
               function_env := env;
               let stmts = Cil.mkStmt ~valid_sid:true (Block b) :: stmts in
               let blk = Cil.mkBlock stmts in
+              (* Create [__e_acsl_memory_init] function with definition
+               for initialization of global variables *)
               let fname = "__e_acsl_memory_init" in
-              let vi = 
+              let vi =
                 Cil.makeGlobalVar ~source:true
                   fname
                   (TFun(Cil.voidType, Some [], false, []))
               in
               vi.vdefined <- true;
+              (* There is no contract associated with the function *)
               let spec = Cil.empty_funspec () in
+              (* Create function definition which has the list of the
+               * generated initialization statements *)
               let fundec =
                 { svar = vi;
                   sformals = [];
@@ -199,6 +218,7 @@ class e_acsl_visitor prj generate = object (self)
               in
               self#add_generated_variables_in_function fundec;
               let fct = Definition(fundec, Location.unknown) in
+             (* Create and register [__e_acsl_memory_init] as kernel function *)
               let kf =
                 { fundec = fct; return_stmt = Some return; spec = spec } 
               in
@@ -210,11 +230,14 @@ class e_acsl_visitor prj generate = object (self)
                 match main_fct with
                 | Some main ->
                   let exp = Cil.evar ~loc:Location.unknown vi in
+                  (* Create [__e_acsl_memory_init();] call *)
                   let stmt = 
                     Cil.mkStmtOneInstr ~valid_sid:true 
                       (Call(None, exp, [], Location.unknown))
                   in
                   vi.vreferenced <- true;
+                  (* Add [__e_acsl_memory_init();] call as the first statement
+                   to the [main] function *)
                   main.sbody.bstmts <- stmt :: main.sbody.bstmts;
                   let new_globals =
                     List.fold_right
@@ -296,18 +319,8 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     if generate then Cil.JustCopy else Cil.SkipChildren
   | g ->
     let do_it = function
-      | GVar(vi, i, _) ->
-        vi.vghost <- false;
-        (* remove initializers on need *)
-        if Mmodel_analysis.old_must_model_vi self#behavior vi then begin
-          try
-            let old_vi = Cil.get_original_varinfo self#behavior vi in
-            match Varinfo.Hashtbl.find global_vars old_vi with
-            | None -> ()
-            | Some _ -> i.init <- None
-          with Not_found ->
-            assert false
-        end
+      | GVar(vi, _, _) ->
+        vi.vghost <- false; ()
       | GFun({ svar = vi } as fundec, _) ->
         vi.vghost <- false;
         (* remember that we have to remove the main later (see method
@@ -324,22 +337,31 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     in
     (match g with
     | GVar(vi, _, _) | GVarDecl(vi, _) ->
+      (* Make a unique mapping for each global variable omitting initializers.
+       Initializers (used to capture literal strings) are added to
+       [global_vars] via the [vinit] visitor method (see comments below). *)
       Varinfo.Hashtbl.replace global_vars vi None
     | _ -> ());
     if generate then Cil.DoChildrenPost(fun g -> List.iter do_it g; g)
     else Cil.DoChildren
 
-  method !vinit vi _off _i = 
+  (* Add mappings from global variables to their initializers to [global_vars].
+     Note that the below function captures only [SingleInit]s. All compound
+     initializers (which contain single ones) are unrapped and thrown away. *)
+  method !vinit vi _off _i =
     if generate then
       if Mmodel_analysis.must_model_vi vi then begin
-        keep_initializer <- Some true;
+        is_initializer <- true;
         Cil.DoChildrenPost
-          (fun i -> 
-            (match keep_initializer with
-            | Some false -> Varinfo.Hashtbl.replace global_vars vi (Some i)
-            | Some true | None -> ());
-            keep_initializer <- None; 
-            i)
+          (fun i ->
+            (match is_initializer with
+            (* Note the use of [add] instead [replace]. This is because a
+             single variable can be associated with multiple initializers
+             and all of them need to be captured. *)
+            | true -> Varinfo.Hashtbl.add global_vars vi (Some i)
+            | false-> ());
+            is_initializer <- false;
+          i)
       end else
         Cil.JustCopy
     else
@@ -553,10 +575,15 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
                 let loc = Stmt.loc stmt in
                 let delete_stmts =
                   Varinfo.Hashtbl.fold_sorted
-                    (fun old_vi _ acc ->
+                    (fun old_vi i acc ->
                       if Mmodel_analysis.must_model_vi old_vi then
                         let new_vi = Cil.get_varinfo self#behavior old_vi in
-                        Misc.mk_delete_stmt new_vi :: acc
+                        (* Since there are multiple entries for same variables
+                         do delete only variables without initializers, this
+                         ensures that each variable is released once only *)
+                         (match i with
+                         | None -> Misc.mk_delete_stmt new_vi :: acc
+                         | Some _ -> acc)
                       else
                         acc)
                     global_vars
@@ -693,21 +720,20 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     in
     if generate then Cil.DoChildrenPost handle_memory else Cil.DoChildren
 
-  method !vexpr exp = 
-    if generate then
-      match keep_initializer with
-      | Some false -> Cil.JustCopy
-      | Some true ->
-        let keep = match exp.enode with Const(CStr _) -> false | _ -> true  in
-        keep_initializer <- Some keep;
-        if keep then Cil.DoChildren else Cil.JustCopy
-      | None -> 
-        Cil.DoChildrenPost
-          (fun e ->
-            let e, env = self#literal_string !function_env e in
-            function_env := env;
-            e)
-    else
+  (* Processing expressions for the purpose of replacing literal strings found
+   in the code with variables generated by E-ACSL. *)
+  method !vexpr _ = 
+    if generate then begin
+      match is_initializer with
+      (* Do not touch global initializers because they accept only constants *)
+      | true -> Cil.DoChildren
+      (* Replace literal strings elsewhere *)
+      | false -> Cil.DoChildrenPost
+        (fun e ->
+          let e, env = self#literal_string !function_env e in
+          function_env := env;
+          e)
+    end else
       Cil.SkipChildren
 
   method !vterm _ =
@@ -736,7 +762,6 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     Literal_strings.reset ();
     self#reset_env ();
     Translate.set_original_project (Project.current ())
-
 end
 
 let do_visit ?(prj=Project.current ()) generate =

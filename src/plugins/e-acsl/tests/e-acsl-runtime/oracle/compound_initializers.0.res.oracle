@@ -1,0 +1,52 @@
+[e-acsl] beginning translation.
+[e-acsl] translation done in project "e-acsl".
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value] Values of globals at initialization
+  __fc_random_counter ∈ {0}
+  __fc_rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __e_acsl_init ∈ [--..--]
+  __e_acsl_internal_heap ∈ [--..--]
+  __memory_size ∈ [--..--]
+  _F ∈ {9}
+  _A[0] ∈ {{ "XX" }}
+    [1] ∈ {{ "YY" }}
+  _B ∈ {{ "ZZ" }}
+  _C ∈ {0}
+  _D[0] ∈ {44}
+    [1] ∈ {88}
+  _E ∈ {44}
+  _G[0].str ∈ {{ "First" }}
+    [0].num ∈ {99}
+    [1].str ∈ {{ "Second" }}
+    [1].num ∈ {147}
+  __e_acsl_literal_string ∈ {0}
+  __e_acsl_literal_string_2 ∈ {0}
+  __e_acsl_literal_string_3 ∈ {0}
+  __e_acsl_literal_string_4 ∈ {0}
+  __e_acsl_literal_string_5 ∈ {0}
+[value] using specification for function __store_block
+[value] using specification for function __full_init
+[value] using specification for function __literal_string
+tests/e-acsl-runtime/compound_initializers.c:35:[value] Assertion got status valid.
+[value] using specification for function __valid
+[value] using specification for function e_acsl_assert
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
+tests/e-acsl-runtime/compound_initializers.c:36:[value] Assertion got status valid.
+[value] using specification for function __initialized
+[value] using specification for function __valid_read
+tests/e-acsl-runtime/compound_initializers.c:37:[value] Assertion got status valid.
+tests/e-acsl-runtime/compound_initializers.c:38:[value] Assertion got status valid.
+tests/e-acsl-runtime/compound_initializers.c:39:[value] Assertion got status valid.
+tests/e-acsl-runtime/compound_initializers.c:40:[value] Assertion got status valid.
+tests/e-acsl-runtime/compound_initializers.c:41:[value] Assertion got status valid.
+tests/e-acsl-runtime/compound_initializers.c:42:[value] Assertion got status valid.
+tests/e-acsl-runtime/compound_initializers.c:43:[value] Assertion got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
+tests/e-acsl-runtime/compound_initializers.c:44:[value] Assertion got status valid.
+tests/e-acsl-runtime/compound_initializers.c:45:[value] Assertion got status valid.
+[value] using specification for function __delete_block
+[value] using specification for function __e_acsl_memory_clean
+[value] done for function main

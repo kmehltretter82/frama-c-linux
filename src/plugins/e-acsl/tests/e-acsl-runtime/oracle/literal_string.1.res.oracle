@@ -10,10 +10,10 @@
   __e_acsl_init ∈ [--..--]
   __e_acsl_internal_heap ∈ [--..--]
   __memory_size ∈ [--..--]
-  T ∈ {0}
+  T ∈ {{ "bar" }}
   G ∈ {0}
-  S ∈ {0}
-  S2 ∈ {0}
+  S ∈ {{ "foo" }}
+  S2 ∈ {{ "foo2" }}
   IDX ∈ {1}
   G2 ∈ {2}
   U ∈ {{ "baz" }}

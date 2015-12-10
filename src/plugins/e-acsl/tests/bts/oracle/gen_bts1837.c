@@ -86,7 +86,7 @@ extern size_t __memory_size;
 predicate diffSize{L1, L2}(ℤ i) =
   \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
  */
-char *S;
+char *S = (char *)"foo";
 int f(void)
 {
   int __retres;
@@ -155,7 +155,6 @@ void __e_acsl_memory_init(void)
   __literal_string((void *)__e_acsl_literal_string_2);
   __store_block((void *)(& S),4U);
   __full_init((void *)(& S));
-  S = (char *)__e_acsl_literal_string;
   return;
 }
 

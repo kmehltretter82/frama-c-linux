@@ -1,0 +1,6 @@
+Tests:
+  script:
+  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --rootfs 1 --frama-c master --E-ACSL $(git rev-parse HEAD) E-ACSL
+  tags:
+  except:
+  - tags
