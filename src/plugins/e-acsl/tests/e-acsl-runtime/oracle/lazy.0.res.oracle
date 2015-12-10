@@ -1,7 +1,4 @@
 [e-acsl] beginning translation.
-tests/e-acsl-runtime/lazy.i:12:[rte] warning: divisor assert broken: 0 ≢ 0
-tests/e-acsl-runtime/lazy.i:14:[rte] warning: divisor assert broken: 0 ≢ 0
-tests/e-acsl-runtime/lazy.i:16:[rte] warning: divisor assert broken: 0 ≢ 0
 [e-acsl] translation done in project "e-acsl".
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
