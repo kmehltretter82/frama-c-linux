@@ -127,8 +127,8 @@ void __e_acsl_memory_init(void)
   __store_block((void *)__e_acsl_literal_string_2,sizeof("wb"));
   __full_init((void *)__e_acsl_literal_string_2);
   __literal_string((void *)__e_acsl_literal_string_2);
-  __e_acsl_literal_string = "foo";
-  __store_block((void *)__e_acsl_literal_string,sizeof("foo"));
+  __e_acsl_literal_string = "/tmp/foo";
+  __store_block((void *)__e_acsl_literal_string,sizeof("/tmp/foo"));
   __full_init((void *)__e_acsl_literal_string);
   __literal_string((void *)__e_acsl_literal_string);
   __store_block((void *)(& stdout),8UL);
