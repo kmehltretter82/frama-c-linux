@@ -46,9 +46,9 @@ check_tool() {
 
 # Getopt options
 LONGOPTIONS="help,compile,compile-only,print,debug:,ocode:,oexec:,verbose:, \
-  frama-c-only,extra-cpp-args,rtl,frama-c-stdlib,full-mmodel,gmp,
+  frama-c-only,extra-cpp-args,rtl,frama-c-stdlib,full-mmodel,gmp,quiet,
   ld-flags:,cpp-flags:"
-SHORTOPTIONS="h,c,C,p,d:,o:,O:,v:,f,E:,R,L,M,l:,e:,g"
+SHORTOPTIONS="h,c,C,p,d:,o:,O:,v:,f,E:,R,L,M,l:,e:,g,q"
 # Prefix for an error message due to wrong arguments
 ERROR="ERROR parsing arguments:"
 
@@ -105,6 +105,7 @@ EACSL_CPP_FLAGS="
 EACSL_LD_FLAGS="-lgmp -lm"
 
 # Variables holding getopt options
+OPTION_ECHO="set -x"                     # Echo executed commands to STDOUT
 OPTION_INSTRUMENT=1                      # Perform E-ACSL instrumentation
 OPTION_PRINT=                            # Output instrumented code
 OPTION_DEBUG=                            # Set frama-c debug flag
@@ -162,6 +163,8 @@ manpage() {
   echo "      pass the specified flags to the linker"
   echo "  -e, --cpp-flags <FLAGS>"
   echo "      pass the specified flags to the pre-processor (compile-time)"
+  echo "  -q, --quiet"
+  echo "      suppress any output except for errors and warnings"
   echo ""
   echo "EXAMPLES:"
   echo "  # Instrument foo.c and output the instrumented code to a.out.frama.c"
@@ -202,6 +205,13 @@ do
     --help|-h)
       shift;
       manpage;
+    ;;
+    # Do not echo commands to STDOUT
+    --quiet|-q)
+      shift;
+      OPTION_ECHO=
+      OPTION_DEBUG="-debug 0"
+      OPTION_VERBOSE="-verbose 0"
     ;;
     # Do compile instrumented code
     --compile|-c)
@@ -309,7 +319,7 @@ fi
 
 # Instrument
 if [ -n "$OPTION_INSTRUMENT" ]; then
-  (set -x; \
+  ($OPTION_ECHO; \
     $FRAMAC \
     $FRAMAC_FLAGS \
     $MACHDEP \
@@ -336,14 +346,14 @@ if test -n "$OPTION_COMPILE"  ; then
   # Compile the original files only if the instrumentation option is given,
   # otherwise the provided sources are assumed to be E-ACSL instrumented files
   if [ -n "$OPTION_INSTRUMENT" ]; then
-    (set -x; $CC $CPPFLAGS $CFLAGS "$@" -o "$OPTION_OEXEC" $LDFLAGS);
-    error "fail to compile/link un-instrumented code" $?;
+    ($OPTION_ECHO; $CC $CPPFLAGS $CFLAGS "$@" -o "$OPTION_OEXEC" $LDFLAGS);
+    error "fail to compile/link un-instrumented code: $@" $?;
   else
     OPTION_OCODE="$@"
   fi
   # Compile and link E-ACSL-instrumented file
-  (set -x; $CC $CPPFLAGS $CFLAGS $EACSL_CPP_FLAGS $RTL \
+  ($OPTION_ECHO; $CC $CPPFLAGS $CFLAGS $EACSL_CPP_FLAGS $RTL \
     "$OPTION_OCODE" -o "$OPTION_OEXEC.e-acsl" $LDFLAGS $EACSL_LD_FLAGS)
-  error "fail to compile/link instrumented code" $?;
+  error "fail to compile/link instrumented code: $@" $?;
 fi
 exit 0;
