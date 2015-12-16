@@ -54,7 +54,7 @@ ERROR="ERROR parsing arguments:"
 
 # Gcc
 CC="`check_tool 'gcc'`"
-CFLAGS="-std=c99 -g3 -O2 -fno-builtin -Wall \
+CFLAGS="-std=c99 -g3 -O2 -pedantic -fno-builtin -Wall \
     -Wno-long-long \
     -Wno-attributes \
     -Wno-unused-result \
@@ -67,11 +67,12 @@ CPPFLAGS=""
 LDFLAGS=""
 # Frama-C
 FRAMAC="`check_tool 'frama-c'`"
+FRAMAC_CONGIG="`check_tool 'frama-c-config'`"
 FRAMAC_FLAGS="-implicit-function-declaration ignore"
 
 # E-ACSL source that needed for compilation
-FRAMA_C_SHARE="`frama-c -print-share-path`"
-EACSL_SHARE="`$FRAMAC -print-share-path`/e-acsl"
+FRAMA_C_SHARE="`$FRAMAC_CONGIG -print-share-path`"
+EACSL_SHARE="$FRAMA_C_SHARE/e-acsl"
 RTL="$EACSL_SHARE/e_acsl.c                      \
   $EACSL_SHARE/memory_model/e_acsl_mmodel.c     \
   $EACSL_SHARE/memory_model/e_acsl_bittree.c    \
