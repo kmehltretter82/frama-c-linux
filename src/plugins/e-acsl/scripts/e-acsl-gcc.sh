@@ -46,9 +46,9 @@ check_tool() {
 
 # Getopt options
 LONGOPTIONS="help,compile,compile-only,print,debug:,ocode:,oexec:,verbose:, \
-  frama-c-only,extra-cpp-args,rtl,frama-c-stdlib,full-mmodel,gmp,quiet,
+  frama-c-only,extra-cpp-args,rtl,frama-c-stdlib,full-mmodel,gmp,quiet,logfile:,
   ld-flags:,cpp-flags:"
-SHORTOPTIONS="h,c,C,p,d:,o:,O:,v:,f,E:,R,L,M,l:,e:,g,q"
+SHORTOPTIONS="h,c,C,p,d:,o:,O:,v:,f,E:,R,L,M,l:,e:,g,q,s:"
 # Prefix for an error message due to wrong arguments
 ERROR="ERROR parsing arguments:"
 
@@ -165,6 +165,8 @@ manpage() {
   echo "      pass the specified flags to the pre-processor (compile-time)"
   echo "  -q, --quiet"
   echo "      suppress any output except for errors and warnings"
+  echo "  -s, --logfile <FILE>"
+  echo "      redirect all output to a given log file"
   echo ""
   echo "EXAMPLES:"
   echo "  # Instrument foo.c and output the instrumented code to a.out.frama.c"
@@ -212,6 +214,13 @@ do
       OPTION_ECHO=
       OPTION_DEBUG="-debug 0"
       OPTION_VERBOSE="-verbose 0"
+    ;;
+    # Redirect all output to a given file
+    --logfile|-s)
+        shift;
+        exec > $1
+        exec 2> $1
+        shift;
     ;;
     # Do compile instrumented code
     --compile|-c)
