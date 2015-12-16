@@ -24,10 +24,13 @@
 
 # Convenience wrapper for small runs of E-ACSL Frama-C plugin
 
-# Print a message to STDERR and exit
+# Print a message to STDERR and exit. If the second argument (exit code)
+# if provided and it is '0' then do nothing.
 error () {
-  echo "e-acsl-gcc: fatal error: $1" 1>&2
-  exit 1;
+  if [ -z "$2" ] || ! [ "$2" = 0 ]; then
+    echo "e-acsl-gcc: fatal error: $1" 1>&2
+    exit 1;
+  fi
 }
 
 # Check if an executable can be found by in the PATH
@@ -51,7 +54,15 @@ ERROR="ERROR parsing arguments:"
 
 # Gcc
 CC="`check_tool 'gcc'`"
-CFLAGS="-std=c99 -w -g3 -O2 -fno-builtin"
+CFLAGS="-std=c99 -g3 -O2 -fno-builtin -Wall \
+    -Wno-long-long \
+    -Wno-attributes \
+    -Wno-unused-result \
+    -Wno-unused-value \
+    -Wno-unused-variable \
+    -Wno-unused-but-set-variable \
+    -Wno-implicit-function-declaration \
+    -Wno-attributes"
 CPPFLAGS=""
 LDFLAGS=""
 # Frama-C
@@ -298,6 +309,8 @@ if [ -n "$OPTION_INSTRUMENT" ]; then
     $OPTION_EACSL \
     -print \
     -ocode "$OPTION_OCODE");
+    # Hard abort based on the return code as the above runs in a subshell
+    error "aborted by frama-c" $?;
   # Print translated code
   if [ -n "$OPTION_PRINT" ]; then
     $CAT $OPTION_OCODE
@@ -310,12 +323,14 @@ if test -n "$OPTION_COMPILE"  ; then
   # otherwise the provided sources are assumed to be E-ACSL instrumented
   # files
   if [ -n "$OPTION_INSTRUMENT" ]; then
-    (set -x; $CC $CPPFLAGS $CFLAGS "$@" -o "$OPTION_OEXEC" $LDFLAGS)
+    (set -x; $CC $CPPFLAGS $CFLAGS "$@" -o "$OPTION_OEXEC" $LDFLAGS);
+    error "fail to compile/link un-instrumented code" $?;
   else
     OPTION_OCODE="$@"
   fi
   # Compile and link E-ACSL-instrumented file
   (set -x; $CC $CPPFLAGS $CFLAGS $EACSL_CPP_FLAGS $RTL \
     "$OPTION_OCODE" -o "$OPTION_OEXEC.e-acsl" $LDFLAGS $EACSL_LD_FLAGS)
+  error "fail to compile/link instrumented code" $?;
 fi
 exit 0;
