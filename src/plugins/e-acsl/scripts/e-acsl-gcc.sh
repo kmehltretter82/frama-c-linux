@@ -47,8 +47,8 @@ check_tool() {
 # Getopt options
 LONGOPTIONS="help,compile,compile-only,print,debug:,ocode:,oexec:,verbose:, \
   frama-c-only,extra-cpp-args,rtl,frama-c-stdlib,full-mmodel,gmp,quiet,logfile:,
-  ld-flags:,cpp-flags:"
-SHORTOPTIONS="h,c,C,p,d:,o:,O:,v:,f,E:,R,L,M,l:,e:,g,q,s:"
+  ld-flags:,cpp-flags:,frama-c-extra:"
+SHORTOPTIONS="h,c,C,p,d:,o:,O:,v:,f,E:,R,L,M,l:,e:,g,q,s:,F:"
 # Prefix for an error message due to wrong arguments
 ERROR="ERROR parsing arguments:"
 
@@ -105,6 +105,7 @@ EACSL_CPP_FLAGS="
 EACSL_LD_FLAGS="-lgmp -lm"
 
 # Variables holding getopt options
+OPTION_FRAMAC_EXTRA=                     # Extra Frama-C options
 OPTION_ECHO="set -x"                     # Echo executed commands to STDOUT
 OPTION_INSTRUMENT=1                      # Perform E-ACSL instrumentation
 OPTION_PRINT=                            # Output instrumented code
@@ -167,6 +168,8 @@ manpage() {
   echo "      suppress any output except for errors and warnings"
   echo "  -s, --logfile <FILE>"
   echo "      redirect all output to a given log file"
+  echo "  -F, --frama-c-extra <OPTION>"
+  echo "      pass an extra option to frama-c invocation"
   echo ""
   echo "EXAMPLES:"
   echo "  # Instrument foo.c and output the instrumented code to a.out.frama.c"
@@ -220,6 +223,12 @@ do
         shift;
         exec > $1
         exec 2> $1
+        shift;
+    ;;
+    # Pass an option to a frama-c invocation
+    --frama-c-extra|-F)
+        shift;
+        OPTION_FRAMAC_EXTRA="$OPTION_FRAMAC_EXTRA $1"
         shift;
     ;;
     # Do compile instrumented code
@@ -332,6 +341,7 @@ if [ -n "$OPTION_INSTRUMENT" ]; then
     $FRAMAC \
     $FRAMAC_FLAGS \
     $MACHDEP \
+    $OPTION_FRAMAC_EXTRA \
     -cpp-extra-args="$OPTION_EXTRA_CPP" \
     -e-acsl-share $EACSL_SHARE \
     $OPTION_VERBOSE \
