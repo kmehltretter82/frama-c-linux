@@ -218,7 +218,7 @@ headers::
 	headache -c license/headache_config.txt -h license/CEA_LGPL \
 		*.ml *.mli \
 		Makefile.in configure.ac \
-		share/e-acsl/*.[ch] share/e-acsl/*/*.[ch]
+		share/e-acsl/*.[ch] share/e-acsl/*/*.[ch] scripts/*.sh
 
 ################
 # Generic part #
