@@ -112,7 +112,7 @@ OPTION_VERBOSE=                          # Set frama-c verbose flag
 OPTION_COMPILE=                          # Compile instrumented program
 OPTION_OCODE="a.out.frama.c"             # Name of the translated file
 OPTION_OEXEC="a.out"                     # Generated executable name
-OPTION_EACSL="-e-acsl -then-on e-acsl"   # Specifies E-ACSL run
+OPTION_EACSL="-e-acsl -then-last"        # Specifies E-ACSL run
 OPTION_FRAMA_STDLIB="-no-frama-c-stdlib" # Use Frama-C stdlib
 OPTION_FULL_MMODEL=                      # Instrument as much as possible
 OPTION_GMP=                              # Use GMP integers everywhere
@@ -123,8 +123,10 @@ manpage() {
   echo "  e-acsl-gcc -- convenience wrapper instrumentation of C files with"
   echo "   the E-ACSL Frama-C plugin and their subsequent compilation using"
   echo "   GNU compiler collection (GCC)"
+  echo ""
   echo "SYNOPSIS"
   echo "  e-acsl-gcc <OPTIONS> <C-FILES>"
+  echo ""
   echo "OPTIONS"
   echo "  -h, --help"
   echo "      show this help page"
@@ -137,9 +139,11 @@ manpage() {
   echo "  -d, --debug <N>"
   echo "      pass a value to Frama-C -debug option"
   echo "  -o, --ocode <FILENAME>"
-  echo "      name of the output source file"
+  echo "      name of the output source file, defaults to a.out.frama.c"
   echo "  -O, --oexec <FILENAME>"
-  echo "      name of the compiled executable"
+  echo "      name of the executable generated from the un-instrumented code."
+  echo "      Executable compiled from the E-ACSL instrumented sources is"
+  echo "      appended .e.acsl suffix. Defaults to a.out and a.out.e-acsl"
   echo "  -v, --verbose <N>"
   echo "      pass a value to Frama-C -verbose option"
   echo "  -f, --frama-c-only"
@@ -158,6 +162,16 @@ manpage() {
   echo "      pass the specified flags to the linker"
   echo "  -e, --cpp-flags <FLAGS>"
   echo "      pass the specified flags to the pre-processor (compile-time)"
+  echo ""
+  echo "EXAMPLES:"
+  echo "  # Instrument foo.c and output the instrumented code to a.out.frama.c"
+  echo "      e-acsl-gcc.sh foo.c"
+  echo "  # Instrument foo.c, output the instrumented code to gen_foo.c and"
+  echo "  # compile foo.c into foo and gen_foo.c into foo.e-acsl"
+  echo "      e-acsl-gcc.sh -c -ogen_foo.c -Ofoo foo.c"
+  echo "  # Assume gen_foo.c has been instrumented by E-ACSL and compile it"
+  echo "  # into a.out.e-acsl"
+  echo "      e-acsl-gcc.sh -C gen_foo.c"
   exit 1
 }
 
@@ -310,7 +324,6 @@ if [ -n "$OPTION_INSTRUMENT" ]; then
     $OPTION_EACSL \
     -print \
     -ocode "$OPTION_OCODE");
-    # Hard abort based on the return code as the above runs in a subshell
     error "aborted by frama-c" $?;
   # Print translated code
   if [ -n "$OPTION_PRINT" ]; then
@@ -320,9 +333,8 @@ fi
 
 # Compile
 if test -n "$OPTION_COMPILE"  ; then
-  # Compile original files only if the instrumentation option is given,
-  # otherwise the provided sources are assumed to be E-ACSL instrumented
-  # files
+  # Compile the original files only if the instrumentation option is given,
+  # otherwise the provided sources are assumed to be E-ACSL instrumented files
   if [ -n "$OPTION_INSTRUMENT" ]; then
     (set -x; $CC $CPPFLAGS $CFLAGS "$@" -o "$OPTION_OEXEC" $LDFLAGS);
     error "fail to compile/link un-instrumented code" $?;
