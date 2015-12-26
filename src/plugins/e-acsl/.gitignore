@@ -1,7 +1,7 @@
 *~
-/*.o
-/*.cm*
-/*.annot
+*.o
+*.cm*
+*.annot
 /*_DEP
 /configure
 /config.log
