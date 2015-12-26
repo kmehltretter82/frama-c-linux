@@ -25,7 +25,7 @@
 # Convenience wrapper for small runs of E-ACSL Frama-C plugin
 
 # Print a message to STDERR and exit. If the second argument (exit code)
-# if provided and it is '0' then do nothing.
+# is provided and it is '0' then do nothing.
 error () {
   if [ -z "$2" ] || ! [ "$2" = 0 ]; then
     echo "e-acsl-gcc: fatal error: $1" 1>&2
