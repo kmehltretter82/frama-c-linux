@@ -9,6 +9,6 @@
 
 int main(){
   FILE *f = stdout;
-  FILE *f2 = fopen("foo","wb");
-  //@ assert f == stdout;  
+  FILE *f2 = fopen("/tmp/foo","wb");
+  //@ assert f == stdout;
 }

@@ -135,6 +135,7 @@ install::
 	      $(E_ACSL_DIR)/doc/manuals/e-acsl-implementation.pdf \
 	      $(E_ACSL_DIR)/doc/manuals/e-acsl-manual.pdf \
 		$(FRAMAC_SHARE)/manuals
+	find scripts -maxdepth 1 -type f -executable -exec $(CP) {} $(BINDIR) \;
 
 uninstall::
 	$(PRINT_RM) E-ACSL share files
@@ -143,6 +144,7 @@ uninstall::
 	$(RM) $(FRAMAC_SHARE)/manuals/e-acsl.pdf \
 	      $(FRAMAC_SHARE)/manuals/e-acsl-implementation.pdf \
 	      $(FRAMAC_SHARE)/manuals/e-acsl-manual.pdf
+	find scripts -maxdepth 1 -type f -executable -execdir $(RM) $(BINDIR)/{} \;
 
 ################################
 # Building source distribution #
@@ -216,7 +218,7 @@ headers::
 	headache -c license/headache_config.txt -h license/CEA_LGPL \
 		*.ml *.mli \
 		Makefile.in configure.ac \
-		share/e-acsl/*.[ch] share/e-acsl/*/*.[ch]
+		share/e-acsl/*.[ch] share/e-acsl/*/*.[ch] scripts/*.sh
 
 ################
 # Generic part #
