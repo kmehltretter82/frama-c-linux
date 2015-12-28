@@ -136,7 +136,7 @@ install::
 	      $(E_ACSL_DIR)/doc/manuals/e-acsl-manual.pdf \
 		$(FRAMAC_SHARE)/manuals
 	$(PRINT_INSTALL) E-ACSL scripts
-	find scripts -maxdepth 1 -type f -executable -exec $(CP) {} $(BINDIR) \;
+	$(CP) $(E_ACSL_DIR)/scripts/e-acsl-gcc.sh $(BINDIR)
 
 uninstall::
 	$(PRINT_RM) E-ACSL share files
@@ -146,7 +146,7 @@ uninstall::
 	      $(FRAMAC_SHARE)/manuals/e-acsl-implementation.pdf \
 	      $(FRAMAC_SHARE)/manuals/e-acsl-manual.pdf
 	$(PRINT_RM) E-ACSL scripts
-	find scripts -maxdepth 1 -type f -executable -execdir $(RM) $(BINDIR)/{} \;
+	$(RM) $(BINDIR)/e-acsl-gcc.sh
 
 ################################
 # Building source distribution #
