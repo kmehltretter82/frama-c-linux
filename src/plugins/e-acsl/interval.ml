@@ -67,6 +67,8 @@ let interv_of_unknown_block =
     (let u = Integer.div (Bit_utils.max_bit_address ()) Integer.eight in
      make Integer.zero u)
 
+let add i n = { lower = Integer.add i.lower n; upper = Integer.add i.upper n }
+
 (* intervals as a lattice *)
 
 let meet i1 i2 =

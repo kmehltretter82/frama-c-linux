@@ -62,6 +62,7 @@ PLUGIN_CMO:= local_config \
 	env \
 	interval \
 	typing \
+	new_typing \
 	quantif \
 	translate \
 	loops \

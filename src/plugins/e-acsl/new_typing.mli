@@ -20,32 +20,46 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Interval inference for terms.
+open Cil_types
 
-    Compute the smallest interval that fits to contain all the possible values
-    of a given integer term. *)
+(******************************************************************************)
+(** {2 Typing} *)
+(******************************************************************************)
 
-type interv = private { lower: Integer.t; upper: Integer.t }
-include Datatype.S with type t = interv
+type integer_ty =
+  | Gmp
+  | C_type of ikind
 
-module Env: sig
-  type t
-  val empty: t
-  val add: Cil_types.logic_var -> interv -> t -> t
-end
+val type_named_predicate: ?must_clear:bool -> predicate named -> unit
+(** Compute the type of each term of the given predicate. *)
 
-val interv_of_typ: Cil_types.typ -> t
+val typ_of_term: term -> typ
+(** Get the type of the given term. {!type_named_predicate} must already have
+    been called on the englobing predicate. *)
 
-val add: t -> Integer.t -> t
-val join: t -> t -> t
-val meet: t -> t -> t
+val cast_of_term: term -> typ option
+(** Get the type which the given term must be converted to after its translation
+    (if any). {!type_named_predicate} must already have been called on the
+    englobing predicate. *)
 
-exception Not_an_integer
-val infer: Env.t -> Cil_types.term -> t
-(** [infer t] infers the smallest possible integer interval which the values
-    of the term can fit in. Assume than the type of [t] is an integral type.
-    @raise Not_an_integer if the type of the term is not a subtype of
-    [Linteger]. *)
+val clear: unit -> unit
+(** Remove all the previously computed types. *)
+
+(******************************************************************************)
+(** {2 Other typing-related functions} *)
+(******************************************************************************)
+
+val is_representable: Integer.t -> ikind -> bool
+(** Is the given constant representable in the given kind? *)
+
+(******************************************************************************)
+(** {2 Internal stuff} *)
+(******************************************************************************)
+
+val compute_quantif_guards_ref
+    : (predicate named -> logic_var list -> predicate named ->
+       (term * relation * logic_var * relation * term) list) ref
+(** Forward reference. *)
 
 (*
 Local Variables:
