@@ -452,6 +452,7 @@ let rec type_predicate_named p =
   | Papp _ -> Error.not_yet "logic function application"
   | Pseparated _ -> Error.not_yet "\\separated"
   | Pdangling _ -> Error.not_yet "\\dangling"
+  | Pvalid_function _ -> Error.not_yet "\\valid_function"
   | Prel(_, t1, t2) -> 
     ignore (type_term t1);
     ignore (type_term t2)

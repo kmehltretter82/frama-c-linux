@@ -310,6 +310,7 @@ module rec Transfer
     | Pfresh _ -> Error.not_yet "\\fresh"
     | Pseparated _ -> Error.not_yet "\\separated"
     | Pdangling _ -> Error.not_yet "\\dangling"
+    | Pvalid_function _ -> Error.not_yet "\\valid_function"
     | Ptrue | Pfalse | Papp _ | Prel _
     | Pand _ | Por _ | Pxor _ | Pimplies _ | Piff _ | Pnot _ | Pif _ 
     | Plet _ | Pforall _ | Pexists _ | Pat _ | Psubtype _ ->
