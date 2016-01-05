@@ -45,7 +45,7 @@ FRAMAC_SHARE/libc/stdlib.h:168:[value] Function __e_acsl_malloc, behavior no_all
 tests/e-acsl-runtime/vector.c:16:[value] entering loop for the first time
 tests/e-acsl-runtime/vector.c:29:[value] Assertion got status unknown.
 tests/e-acsl-runtime/vector.c:30:[value] Assertion got status unknown.
-tests/e-acsl-runtime/vector.c:30:[kernel] warning: accessing uninitialized left-value: assert \initialized(&LAST);
+tests/e-acsl-runtime/vector.c:30:[kernel] warning: accessing uninitialized left-value. assert \initialized(&LAST);
 FRAMAC_SHARE/libc/stdlib.h:178:[value] Function __e_acsl_free, behavior deallocation: precondition 'freeable' got status unknown.
 [value] using specification for function __freeable
 :0:[value] Assigning imprecise value to __e_acsl_implies.

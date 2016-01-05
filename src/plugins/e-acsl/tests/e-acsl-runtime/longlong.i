@@ -1,6 +1,6 @@
 /* run.config
    COMMENT: upgrading longlong to GMP
-   STDOPT: +"-val-ignore-recursive-calls"
+   STDOPT: +"-no-eva -val-ignore-recursive-calls"
    EXECNOW: LOG gen_longlong.c BIN gen_longlong.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/longlong.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_longlong.c > /dev/null && ./gcc_runtime.sh longlong
    EXECNOW: LOG gen_longlong2.c BIN gen_longlong2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/longlong.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_longlong2.c > /dev/null && ./gcc_runtime.sh longlong2
 */

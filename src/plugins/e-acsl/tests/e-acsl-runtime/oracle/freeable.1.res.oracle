@@ -25,8 +25,7 @@ FRAMAC_SHARE/libc/stdlib.h:177:[e-acsl] warning: E-ACSL construct `\allocate' is
   __memory_size ∈ [--..--]
 [value] using specification for function __store_block
 tests/e-acsl-runtime/freeable.c:15:[value] Assertion got status unknown.
-tests/e-acsl-runtime/freeable.c:15:[kernel] warning: accessing uninitialized left-value: assert \initialized(&p);
-tests/e-acsl-runtime/freeable.c:15:[kernel] warning: completely indeterminate value in p.
 tests/e-acsl-runtime/freeable.c:15:[value] completely invalid value in evaluation of
         argument (void *)p
+tests/e-acsl-runtime/freeable.c:15:[kernel] warning: accessing uninitialized left-value. assert \initialized(&p);
 [value] done for function main

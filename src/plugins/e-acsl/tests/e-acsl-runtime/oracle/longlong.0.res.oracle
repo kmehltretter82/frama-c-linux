@@ -45,9 +45,7 @@ FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:172:[value] Function __gmpz_tdiv_r: preconditio
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:173:[value] Function __gmpz_tdiv_r: precondition got status valid.
 [value] using specification for function __gmpz_get_ui
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:198:[value] Function __gmpz_get_ui: precondition got status valid.
-tests/e-acsl-runtime/longlong.i:19:[value] Reading left-value __e_acsl_4.
-        It contains a garbled mix of {x} because of Arithmetic.
-tests/e-acsl-runtime/longlong.i:19:[kernel] warning: pointer comparison:
+tests/e-acsl-runtime/longlong.i:19:[kernel] warning: pointer comparison.
                   assert \pointer_comparable((void *)__e_acsl_4, (void *)1);
 [value] using specification for function __gmpz_clear
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:117:[value] Function __gmpz_clear: precondition got status valid.

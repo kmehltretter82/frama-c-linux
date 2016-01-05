@@ -39,7 +39,7 @@ FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:165:[value] Function __gmpz_tdiv_q: preconditio
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:166:[value] Function __gmpz_tdiv_q: precondition got status valid.
 [value] using specification for function __gmpz_get_ui
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:198:[value] Function __gmpz_get_ui: precondition got status valid.
-tests/e-acsl-runtime/ptr.i:16:[kernel] warning: accessing out of bounds index [0..4294967295]. assert __e_acsl_9 < 3;
+tests/e-acsl-runtime/ptr.i:16:[kernel] warning: accessing out of bounds index. assert __e_acsl_9 < 3;
 tests/e-acsl-runtime/ptr.i:18:[value] entering loop for the first time
 tests/e-acsl-runtime/ptr.i:19:[value] Assertion got status valid.
 [value] using specification for function __gmpz_add
@@ -51,7 +51,7 @@ tests/e-acsl-runtime/ptr.i:20:[value] Assertion got status valid.
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:150:[value] Function __gmpz_sub: precondition got status valid.
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:151:[value] Function __gmpz_sub: precondition got status valid.
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:152:[value] Function __gmpz_sub: precondition got status valid.
-tests/e-acsl-runtime/ptr.i:20:[kernel] warning: accessing out of bounds index [0..4294967295]. assert __e_acsl_15 < 3;
+tests/e-acsl-runtime/ptr.i:20:[kernel] warning: accessing out of bounds index. assert __e_acsl_15 < 3;
 tests/e-acsl-runtime/ptr.i:21:[value] Assertion got status valid.
 tests/e-acsl-runtime/ptr.i:19:[value] Assertion got status unknown.
 tests/e-acsl-runtime/ptr.i:20:[value] Assertion got status unknown.

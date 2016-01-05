@@ -16,9 +16,9 @@
 [value] using specification for function __valid_read
 [value] using specification for function e_acsl_assert
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
-tests/e-acsl-runtime/valid_in_contract.c:21:[kernel] warning: out of bounds read. assert \valid_read(&l->next);
 tests/e-acsl-runtime/valid_in_contract.c:21:[value] completely invalid value in evaluation of
         argument (void *)l->next
+tests/e-acsl-runtime/valid_in_contract.c:21:[kernel] warning: out of bounds read. assert \valid_read(&l->next);
 [value] using specification for function __full_init
 [value] using specification for function __delete_block
 tests/e-acsl-runtime/valid_in_contract.c:18:[value] Function f, behavior B1: postcondition got status valid.

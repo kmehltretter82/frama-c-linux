@@ -58,11 +58,10 @@ FRAMAC_SHARE/libc/stdlib.h:178:[value] Reading left-value __e_acsl_implies.
         {FRAMAC_SHARE/libc/stdlib.h:178}.
 FRAMAC_SHARE/libc/stdlib.h:180:[value] Function __e_acsl_free, behavior deallocation: postcondition got status unknown.
 tests/e-acsl-runtime/valid.c:49:[value] Assertion got status valid.
-tests/e-acsl-runtime/valid.c:49:[kernel] warning: accessing left-value that contains escaping addresses:
-                  assert ¬\dangling(&a);
-tests/e-acsl-runtime/valid.c:49:[kernel] warning: completely indeterminate value in a.
 tests/e-acsl-runtime/valid.c:49:[value] completely invalid value in evaluation of
         argument (void *)a
+tests/e-acsl-runtime/valid.c:49:[kernel] warning: accessing left-value that contains escaping addresses.
+                  assert ¬\dangling(&a);
 tests/e-acsl-runtime/valid.c:50:[value] Assertion got status valid.
 tests/e-acsl-runtime/valid.c:30:[value] Assertion got status valid.
 [value] using specification for function __e_acsl_memory_clean
