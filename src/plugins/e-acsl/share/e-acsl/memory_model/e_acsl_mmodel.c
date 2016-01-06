@@ -164,16 +164,15 @@ void* __realloc(void* ptr, size_t size) {
   struct _block * tmp;
   void * new_ptr;
   if(ptr == NULL) return __malloc(size);
-  if(size <= 0) {
-    __memory_size -= __get_exact(ptr)->size;
+  if(size == 0) {
     __free(ptr);
     return NULL;
   }
   tmp = __get_exact(ptr);
-  __memory_size -= tmp->size;
   assert(tmp != NULL);
   new_ptr = realloc((void*)tmp->ptr, size);
   if(new_ptr == NULL) return NULL;
+  __memory_size -= tmp->size;
   tmp->ptr = (size_t)new_ptr;
   /* uninitialized, do nothing */
   if(tmp->init_cpt == 0) ;
@@ -240,7 +239,7 @@ void __initialize (void * ptr, size_t size) {
     else if(__warning_level == IGNORE) return;
     else { __warning("initialize"); return; }
   }
-  
+
   assert(size > 0);
   tmp = __get_cont(ptr);
 
@@ -249,10 +248,10 @@ void __initialize (void * ptr, size_t size) {
     else if(__warning_level == IGNORE) return;
     else { __warning("initialize"); return; }
   }
-  
+
   /* already fully initialized, do nothing */
   if(tmp->init_cpt == tmp->size) return;
-	
+
   /* fully uninitialized */
   if(tmp->init_cpt == 0) {
     int nb = needed_bytes(tmp->size);
@@ -261,13 +260,13 @@ void __initialize (void * ptr, size_t size) {
   }
 
   for(i = 0; i < size; i++) {
-    int byte_offset = (size_t)ptr - tmp->ptr + i; 
+    int byte_offset = (size_t)ptr - tmp->ptr + i;
     int ind = byte_offset / 8;
     unsigned char mask_bit = 1U << (7 - (byte_offset % 8));
     if((tmp->init_ptr[ind] & mask_bit) == 0) tmp->init_cpt++;
     tmp->init_ptr[ind] |= mask_bit;
   }
-  
+
   /* now fully initialized */
   if(tmp->init_cpt == tmp->size) {
     free(tmp->init_ptr);
@@ -286,7 +285,7 @@ void __full_init (void * ptr) {
   }
 
   tmp = __get_exact(ptr);
-  
+
   if(tmp == NULL) {
     if(__warning_level == ERROR) assert(0);
     else if(__warning_level == IGNORE) return;
@@ -297,7 +296,7 @@ void __full_init (void * ptr) {
     free(tmp->init_ptr);
     tmp->init_ptr = NULL;
   }
-  
+
   tmp->init_cpt = tmp->size;
 }
 
@@ -312,7 +311,7 @@ void __literal_string (void * ptr) {
   }
 
   tmp = __get_exact(ptr);
-  
+
   if(tmp == NULL) {
     if(__warning_level == ERROR) assert(0);
     else if(__warning_level == IGNORE) return;
@@ -331,15 +330,15 @@ int __initialized (void * ptr, size_t size) {
   tmp = __get_cont(ptr);
   if(tmp == NULL)
     return false;
-  
+
   /* fully uninitialized */
   if(tmp->init_cpt == 0) return false;
   /* fully initialized */
   if(tmp->init_cpt == tmp->size) return true;
-  
+
   for(i = 0; i < size; i++) {
     /* if one byte is uninitialized */
-    int byte_offset = (size_t)ptr - tmp->ptr + i; 
+    int byte_offset = (size_t)ptr - tmp->ptr + i;
     int ind = byte_offset / 8;
     unsigned char mask_bit = 1U << (7 - (byte_offset % 8));
     if((tmp->init_ptr[ind] & mask_bit) == 0) return false;
