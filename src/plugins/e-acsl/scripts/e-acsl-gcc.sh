@@ -59,6 +59,7 @@ CFLAGS="-std=c99 -g3 -O2 -pedantic -fno-builtin -Wall \
     -Wno-attributes \
     -Wno-unused-result \
     -Wno-unused-value \
+    -Wno-unused-function \
     -Wno-unused-variable \
     -Wno-unused-but-set-variable \
     -Wno-implicit-function-declaration \
@@ -122,7 +123,7 @@ OPTION_EXTRA_CPP="-I$FRAMA_C_SHARE/libc $CPPMACHDEP" # Extra CPP flags
 
 manpage() {
   echo "NAME"
-  echo "  e-acsl-gcc -- convenience wrapper instrumentation of C files with"
+  echo "  e-acsl-gcc -- convenience wrapper for instrumentation of C files with"
   echo "   the E-ACSL Frama-C plugin and their subsequent compilation using"
   echo "   GNU compiler collection (GCC)"
   echo ""
@@ -212,6 +213,7 @@ do
       manpage;
     ;;
     # Do not echo commands to STDOUT
+    # Set log and debug flags to minimal verbosity levels
     --quiet|-q)
       shift;
       OPTION_ECHO=
