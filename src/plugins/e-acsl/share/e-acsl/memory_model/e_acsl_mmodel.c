@@ -20,13 +20,13 @@
 /*                                                                        */
 /**************************************************************************/
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
 #include <assert.h>
 #include "e_acsl_mmodel_api.h"
 #include "e_acsl_mmodel.h"
+#include "../e_acsl_printf.h"
 
 // E-ACSL warnings {{{
 #define WARNING 0   // Output a warning message to stderr
@@ -43,7 +43,7 @@ static int warning_level = E_ACSL_WARNING;
 // based on the current warning level
 static void warning(const char* message) {
   if (warning_level != IGNORE) {
-    fprintf(stderr, "warning: %s\n", message);
+    eprintf("warning: %s\n", message);
     if (warning_level == ERROR)
       abort();
   }
@@ -270,11 +270,9 @@ void __initialize (void * ptr, size_t size) {
 /* mark all bytes of ptr as initialized */
 void __full_init (void * ptr) {
   struct _block * tmp;
-
   return_warning(ptr == NULL, "full_init");
 
   tmp = __get_exact(ptr);
-
   return_warning(tmp == NULL, "full_init");
 
   if (tmp->init_ptr != NULL) {
@@ -288,13 +286,9 @@ void __full_init (void * ptr) {
 /* mark a block as litteral string */
 void __literal_string (void * ptr) {
   struct _block * tmp;
-
   return_warning(ptr == NULL, "literal_string");
-
   tmp = __get_exact(ptr);
-
   return_warning(tmp == NULL, "literal_string");
-
   tmp->is_litteral_string = true;
 }
 
