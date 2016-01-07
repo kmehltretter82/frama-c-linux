@@ -384,14 +384,14 @@ void __out_of_bound(void* ptr, _Bool flag) {
 void __print_block (struct _block * ptr) {
   if (ptr != NULL) {
     printf("%p; %zu Bytes; %slitteral; [init] : %li ",
-	   (char*)ptr->ptr, ptr->size,
-	   ptr->is_litteral_string ? "" : "not ", ptr->init_cpt);
+      (char*)ptr->ptr, ptr->size,
+      ptr->is_litteral_string ? "" : "not ", ptr->init_cpt);
     if(ptr->init_ptr != NULL) {
       unsigned i;
       for(i = 0; i < ptr->size; i++) {
-	int ind = i / 8;
-	int one_bit = (unsigned)1 << (8 - (i % 8) - 1);
-	printf("%i", (ptr->init_ptr[ind] & one_bit) != 0);
+        int ind = i / 8;
+        int one_bit = (unsigned)1 << (8 - (i % 8) - 1);
+        printf("%i", (ptr->init_ptr[ind] & one_bit) != 0);
       }
     }
     printf("\n");
