@@ -23,7 +23,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include <assert.h>
 #include "e_acsl_mmodel_api.h"
 #include "e_acsl_mmodel.h"
 #include "../e_acsl_printf.h"

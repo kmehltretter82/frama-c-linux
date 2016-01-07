@@ -33,6 +33,12 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <unistd.h>
+#include <limits.h>
+
+// For PATH_MAX in Linux
+#ifdef __linux__
+  #include <linux/limits.h>
+#endif
 
 static void printf(char *fmt, ...);
 
@@ -262,11 +268,6 @@ static void eprintf(char *fmt, ...) {
 }
 
 static void vabort(char *fmt, ...) {
-  char *mtstr = "E_ACSL ERROR:";
-  char extfmt [strlen(mtstr) + strlen(fmt) + 1] ;
-  sprintf(extfmt,"%s%s",mtstr,fmt);
-  fmt = extfmt;
-
   va_list va;
   va_start(va,fmt);
   _format(NULL,_charc_stderr,fmt,va);
@@ -289,3 +290,25 @@ static void sprintf(char* s,char *fmt, ...) {
   putcp(&s,0);
   va_end(va);
 }
+
+#define assert(expr) \
+  ((expr) ? (void)(0) : vabort("%s at %s:%d\n", \
+    #expr, __FILE__,__LINE__))
+
+static void vassert_fail(int expr, int line, char *file, char *fmt,  ...) {
+  if (!expr) {
+    char *afmt = "%s at %s:%d\n";
+    char buf [strlen(fmt) + strlen(afmt) + PATH_MAX +  11];
+    sprintf(buf, afmt, fmt, file, line);
+    fmt = buf;
+
+    va_list va;
+    va_start(va,fmt);
+    _format(NULL,_charc_stderr,fmt,va);
+    va_end(va);
+    abort();
+  }
+}
+
+#define vassert(expr, fmt, ...) \
+    vassert_fail(expr, __LINE__, __FILE__, fmt, __VA_ARGS__)
