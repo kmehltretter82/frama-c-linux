@@ -112,9 +112,7 @@ void* __store_block(void* ptr, size_t size) {
 
 /* remove the block starting at ptr */
 void __delete_block(void* ptr) {
-  struct _block * tmp;
-  assert(ptr != NULL);
-  tmp = __get_exact(ptr);
+  struct _block * tmp = __get_exact(ptr);
   assert(tmp != NULL);
   __clean_init(tmp);
   __remove_element(tmp);
@@ -293,11 +291,9 @@ void __literal_string (void * ptr) {
 
 /* return whether the size bytes of ptr are initialized */
 int __initialized (void * ptr, size_t size) {
-  struct _block * tmp;
   unsigned i;
-  assert(ptr != NULL);
   assert(size > 0);
-  tmp = __get_cont(ptr);
+  struct _block * tmp = __get_cont(ptr);
   if(tmp == NULL)
     return false;
 
@@ -318,9 +314,7 @@ int __initialized (void * ptr, size_t size) {
 
 /* return the length (in bytes) of the block containing ptr */
 size_t __block_length(void* ptr) {
-  struct _block * tmp;
-  assert(ptr != NULL);
-  tmp = __get_cont(ptr);
+  struct _block * tmp = __get_cont(ptr);
   assert(tmp != NULL);
   return tmp->size;
 }
@@ -351,26 +345,20 @@ int __valid_read(void* ptr, size_t size) {
 
 /* return the base address of the block containing ptr */
 void* __base_addr(void* ptr) {
-  struct _block * tmp;
-  assert(ptr != NULL);
-  tmp = __get_cont(ptr);
+  struct _block * tmp = __get_cont(ptr);
   assert(tmp != NULL);
   return (void*)tmp->ptr;
 }
 
 /* return the offset of ptr within its block */
 int __offset(void* ptr) {
-  struct _block * tmp;
-  assert(ptr != NULL);
-  tmp = __get_cont(ptr);
+  struct _block * tmp = __get_cont(ptr);
   assert(tmp != NULL);
   return ((size_t)ptr - tmp->ptr);
 }
 
 void __out_of_bound(void* ptr, _Bool flag) {
-  struct _block * tmp;
-  assert(ptr != NULL);
-  tmp = __get_cont(ptr);
+  struct _block * tmp = __get_cont(ptr);
   assert(tmp != NULL);
   tmp->is_out_of_bound = flag;
 }
