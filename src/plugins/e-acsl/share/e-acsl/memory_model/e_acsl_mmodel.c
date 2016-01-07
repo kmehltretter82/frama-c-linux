@@ -28,23 +28,34 @@
 #include "e_acsl_mmodel_api.h"
 #include "e_acsl_mmodel.h"
 
+// E-ACSL warnings {{{
+#define WARNING 0   // Output a warning message to stderr
+#define ERROR   1   // Treat warnings as errors and abort execution
+#define IGNORE  2   // Ignore warnings
 
-#define WARNING 0
-#define ERROR 1
-#define IGNORE 2
-
-
-#ifdef E_ACSL_WARNING
-int __warning_level = E_ACSL_WARNING;
-#else
-int __warning_level = WARNING;
+#ifndef E_ACSL_WARNING
+#define E_ACSL_WARNING WARNING
 #endif
 
+static int warning_level = E_ACSL_WARNING;
 
-void __warning(const char* fct_name) {
-  fprintf(stderr,
-	  "warning: E_ACSL function '%s' called with null pointer\n", fct_name);
+// Issue a warning to stderr or abort a program
+// based on the current warning level
+static void warning(const char* message) {
+  if (warning_level != IGNORE) {
+    fprintf(stderr, "warning: %s\n", message);
+    if (warning_level == ERROR)
+      abort();
+  }
 }
+
+// Shortcut for issuing a warning and returning from a function
+#define return_warning(_cond,_msg) \
+  if(_cond) { \
+    warning(_msg); \
+    return; \
+  }
+// }}}
 
 void* __e_acsl_mmodel_memset (void* dest, int val, size_t len) {
   unsigned char *ptr = (unsigned char*)dest;
@@ -231,20 +242,12 @@ void __initialize (void * ptr, size_t size) {
   struct _block * tmp;
   unsigned i;
 
-  if(ptr == NULL) {
-    if(__warning_level == ERROR) assert(0);
-    else if(__warning_level == IGNORE) return;
-    else { __warning("initialize"); return; }
-  }
+  return_warning(ptr == NULL, "initialize");
 
   assert(size > 0);
   tmp = __get_cont(ptr);
 
-  if(tmp == NULL) {
-    if(__warning_level == ERROR) assert(0);
-    else if(__warning_level == IGNORE) return;
-    else { __warning("initialize"); return; }
-  }
+  return_warning(tmp == NULL, "initialize");
 
   /* already fully initialized, do nothing */
   if(tmp->init_cpt == tmp->size) return;
@@ -275,19 +278,11 @@ void __initialize (void * ptr, size_t size) {
 void __full_init (void * ptr) {
   struct _block * tmp;
 
-  if(ptr == NULL) {
-    if(__warning_level == ERROR) assert(0);
-    else if(__warning_level == IGNORE) return;
-    else { __warning("full_init"); return; }
-  }
+  return_warning(ptr == NULL, "full_init");
 
   tmp = __get_exact(ptr);
 
-  if(tmp == NULL) {
-    if(__warning_level == ERROR) assert(0);
-    else if(__warning_level == IGNORE) return;
-    else { __warning("full_init"); return; }
-  }
+  return_warning(tmp == NULL, "full_init");
 
   if (tmp->init_ptr != NULL) {
     free(tmp->init_ptr);
@@ -301,19 +296,11 @@ void __full_init (void * ptr) {
 void __literal_string (void * ptr) {
   struct _block * tmp;
 
-  if(ptr == NULL) {
-    if(__warning_level == ERROR) assert(0);
-    else if(__warning_level == IGNORE) return;
-    else { __warning("literal_string"); return; }
-  }
+  return_warning(ptr == NULL, "literal_string");
 
   tmp = __get_exact(ptr);
 
-  if(tmp == NULL) {
-    if(__warning_level == ERROR) assert(0);
-    else if(__warning_level == IGNORE) return;
-    else { __warning("literal_string"); return; }
-  }
+  return_warning(tmp == NULL, "literal_string");
 
   tmp->is_litteral_string = true;
 }
