@@ -46,7 +46,6 @@ void __warning(const char* fct_name) {
 	  "warning: E_ACSL function '%s' called with null pointer\n", fct_name);
 }
 
-
 void* __e_acsl_mmodel_memset (void* dest, int val, size_t len) {
   unsigned char *ptr = (unsigned char*)dest;
   while (len-- > 0)
@@ -54,11 +53,10 @@ void* __e_acsl_mmodel_memset (void* dest, int val, size_t len) {
   return dest;
 }
 
-
 size_t __memory_size = 0;
 /*unsigned cpt_store_block = 0;*/
 
-const int nbr_bits_to_1[256] = {
+static const int nbr_bits_to_1[256] = {
   0,1,1,2,1,2,2,3,1,2,2,3,2,3,3,4,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,4,5,5,6,5,6,6,7,5,6,6,7,6,7,7,8
 };
 
@@ -73,10 +71,9 @@ size_t __get_memory_size(void) {
   @ ensures size%8 == 0 ==> \result == size/8;
   @ ensures size%8 != 0 ==> \result == size/8+1;
   @*/
-size_t needed_bytes (size_t size) {
+static size_t needed_bytes (size_t size) {
   return (size % 8) == 0 ? (size/8) : (size/8 + 1);
 }
-
 
 /* adds argc / argv to the memory model */
 void __init_args(int argc, char **argv) {
