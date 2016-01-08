@@ -92,8 +92,8 @@ let copy_ppt old_prj new_prj old_ppt new_ppt =
 (* ********************************************************************** *)
 
 let dup_spec_status old_prj kf new_kf old_spec new_spec =
-  let old_ppts = Property.ip_of_spec kf Kglobal old_spec in
-  let new_ppts = Property.ip_of_spec new_kf Kglobal new_spec in
+  let old_ppts = Property.ip_of_spec kf Kglobal ~active:[] old_spec in
+  let new_ppts = Property.ip_of_spec new_kf Kglobal ~active:[] new_spec in
   List.iter2 (copy_ppt old_prj (Project.current ())) old_ppts new_ppts
 
 let dup_funspec tbl bhv spec =

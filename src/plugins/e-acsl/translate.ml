@@ -853,20 +853,20 @@ let translate_pre_spec kf kinstr env spec =
     | [] -> ()
     | l ->
       unsupported
-	(List.iter
-	   (fun l ->
-	     if must_translate (Property.ip_of_complete kf kinstr l) then
-	       not_yet env "complete behaviors"))
-	l);
+        (List.iter
+           (fun l ->
+             if must_translate (Property.ip_of_complete kf kinstr ~active:[] l)
+             then not_yet env "complete behaviors"))
+        l);
     (match spec.spec_disjoint_behaviors with
     | [] -> ()
     | l ->
       unsupported
-	(List.iter
-	   (fun l ->
-	     if must_translate (Property.ip_of_disjoint kf kinstr l) then
-	       not_yet env "disjoint behaviors"))
-	l);
+        (List.iter
+           (fun l ->
+             if must_translate (Property.ip_of_disjoint kf kinstr ~active:[] l)
+             then not_yet env "disjoint behaviors"))
+        l);
     env
   in
   let env = convert_unsupported_clauses env in
