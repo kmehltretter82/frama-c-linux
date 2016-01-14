@@ -564,6 +564,7 @@ and named_predicate_content_to_exp ?name kf env p =
   | Papp _ -> not_yet env "logic function application"
   | Pseparated _ -> not_yet env "\\separated"
   | Pdangling _ -> not_yet env "\\dangling"
+  | Pvalid_function _ -> not_yet env "\\valid_function"
   | Prel(rel, t1, t2) -> 
     let e, env = 
       comparison_to_exp ~loc kf env (relation_to_binop rel) t1 t2 None 
