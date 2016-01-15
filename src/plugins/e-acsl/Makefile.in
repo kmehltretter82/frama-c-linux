@@ -136,7 +136,8 @@ install::
 	      $(E_ACSL_DIR)/doc/manuals/e-acsl-manual.pdf \
 		$(FRAMAC_SHARE)/manuals
 	$(PRINT_INSTALL) E-ACSL scripts
-	$(CP) $(E_ACSL_DIR)/scripts/e-acsl-gcc.sh $(BINDIR)
+	$(MKDIR) $(BINDIR)
+	$(CP) $(E_ACSL_DIR)/scripts/e-acsl-gcc.sh $(BINDIR)/
 
 uninstall::
 	$(PRINT_RM) E-ACSL share files
