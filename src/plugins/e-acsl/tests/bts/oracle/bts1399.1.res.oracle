@@ -25,6 +25,7 @@ FRAMAC_SHARE/libc/stdlib.h:177:[e-acsl] warning: E-ACSL construct `\allocate' is
   __memory_size ∈ [--..--]
 [value] using specification for function __store_block
 [value] using specification for function __full_init
+FRAMAC_SHARE/libc/stdlib.h:156:[value] allocating variable __malloc___e_acsl_malloc_l156
 [value] using specification for function __delete_block
 FRAMAC_SHARE/libc/stdlib.h:163:[value] Function __e_acsl_malloc, behavior allocation: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
 FRAMAC_SHARE/libc/stdlib.h:168:[value] Function __e_acsl_malloc, behavior no_allocation: postcondition got status invalid. (Behavior may be inactive, no reduction performed.)
@@ -56,8 +57,8 @@ FRAMAC_SHARE/libc/stdlib.h:178:[value] Function __e_acsl_free, behavior dealloca
 :0:[value] Assigning imprecise value to __e_acsl_implies.
         The imprecision originates from Arithmetic {FRAMAC_SHARE/libc/stdlib.h:178}
 FRAMAC_SHARE/libc/stdlib.h:178:[value] Reading left-value __e_acsl_implies.
-        It contains a garbled mix of {Frama_C_alloc} because of Arithmetic
-        {FRAMAC_SHARE/libc/stdlib.h:178}.
+        It contains a garbled mix of {__malloc___e_acsl_malloc_l156} because of
+        Arithmetic {FRAMAC_SHARE/libc/stdlib.h:178}.
 FRAMAC_SHARE/libc/stdlib.h:180:[value] Function __e_acsl_free, behavior deallocation: postcondition got status unknown.
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main

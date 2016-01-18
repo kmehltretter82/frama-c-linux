@@ -25,9 +25,11 @@ FRAMAC_SHARE/libc/stdlib.h:165:[e-acsl] warning: E-ACSL construct `logic functio
   __memory_size ∈ [--..--]
 [value] using specification for function __store_block
 [value] using specification for function __full_init
+FRAMAC_SHARE/libc/stdlib.h:156:[value] allocating variable __malloc___e_acsl_malloc_l156
 [value] using specification for function __delete_block
 FRAMAC_SHARE/libc/stdlib.h:163:[value] Function __e_acsl_malloc, behavior allocation: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
 FRAMAC_SHARE/libc/stdlib.h:168:[value] Function __e_acsl_malloc, behavior no_allocation: postcondition got status invalid. (Behavior may be inactive, no reduction performed.)
+FRAMAC_SHARE/libc/stdlib.h:156:[value] allocating variable __malloc___e_acsl_malloc_l156_0
 [value] using specification for function __initialize
 tests/e-acsl-runtime/call.c:12:[value] Function f: postcondition got status valid.
 [value] using specification for function __valid
