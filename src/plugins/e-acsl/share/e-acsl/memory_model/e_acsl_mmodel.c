@@ -56,6 +56,13 @@ static void warning(const char* message) {
   }
 // }}}
 
+void* __e_acsl_mmodel_memset(void* dest, int val, size_t len) {
+  unsigned char *ptr = (unsigned char*)dest;
+  while (len-- > 0)
+    *ptr++ = val;
+  return dest;
+}
+
 size_t __memory_size = 0;
 /*unsigned cpt_store_block = 0;*/
 
@@ -184,7 +191,7 @@ void* __realloc(void* ptr, size_t size) {
     else {
       int nb = needed_bytes(size);
       tmp->init_ptr = malloc(nb);
-      memset(tmp->init_ptr, 0xFF, nb);
+      __e_acsl_mmodel_memset(tmp->init_ptr, 0xFF, nb);
       if(size%8 != 0)
 	tmp->init_ptr[size/8] <<= (8 - size%8);
     }
@@ -246,7 +253,7 @@ void __initialize (void * ptr, size_t size) {
   if(tmp->init_cpt == 0) {
     int nb = needed_bytes(tmp->size);
     tmp->init_ptr = malloc(nb);
-    memset(tmp->init_ptr, 0, nb);
+    __e_acsl_mmodel_memset(tmp->init_ptr, 0, nb);
   }
 
   for(i = 0; i < size; i++) {
