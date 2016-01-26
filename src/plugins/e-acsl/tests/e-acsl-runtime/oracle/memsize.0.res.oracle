@@ -1,0 +1,64 @@
+[e-acsl] beginning translation.
+[e-acsl] warning: annotating undefined function `realloc':
+                  the generated program may miss memory instrumentation
+                  if there are memory-related annotations.
+FRAMAC_SHARE/libc/stdlib.h:156:[e-acsl] warning: E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:200:[e-acsl] warning: E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:200:[e-acsl] warning: E-ACSL construct `\allocable' is not yet supported. Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:174:[e-acsl] warning: E-ACSL construct `\allocable' is not yet supported. Ignoring annotation.
+tests/e-acsl-runtime/memsize.c:21:[e-acsl] warning: E-ACSL construct `complete behaviors' is not yet supported.
+                  Ignoring annotation.
+tests/e-acsl-runtime/memsize.c:21:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
+                  Ignoring annotation.
+tests/e-acsl-runtime/memsize.c:21:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:160:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:160:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:165:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:165:[e-acsl] warning: E-ACSL construct `complete behaviors' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:165:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:177:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:177:[e-acsl] warning: E-ACSL construct `\allocate' is not yet supported. Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:177:[e-acsl] warning: E-ACSL construct `complete behaviors' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:177:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:215:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:215:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:208:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:222:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:146:[kernel] warning: Neither code nor specification for function calloc, generating default assigns from the prototype
+[e-acsl] translation done in project "e-acsl".
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value] Values of globals at initialization
+  __fc_random_counter ∈ {0}
+  __fc_rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __e_acsl_init ∈ [--..--]
+  __e_acsl_internal_heap ∈ [--..--]
+  __memory_size ∈ [--..--]
+  __fc_fopen[0..511] ∈ {0}
+  __p_fc_fopen ∈ {{ &__fc_fopen[0] }}
+[value] using specification for function __store_block
+[value] using specification for function __full_init
+[value] using specification for function __malloc
+[value] using specification for function __delete_block
+FRAMAC_SHARE/libc/stdlib.h:163:[value] Function __e_acsl_malloc, behavior allocation: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
+FRAMAC_SHARE/libc/stdlib.h:168:[value] Function __e_acsl_malloc, behavior no_allocation: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
+tests/e-acsl-runtime/memsize.c:24:[value] Assertion got status unknown.
+[value] using specification for function e_acsl_assert
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
+tests/e-acsl-runtime/memsize.c:26:[value] Assertion got status invalid (stopping propagation).
+[value] done for function main

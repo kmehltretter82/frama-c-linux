@@ -20,45 +20,53 @@
 /*                                                                        */
 /**************************************************************************/
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include <assert.h>
 #include "e_acsl_mmodel_api.h"
 #include "e_acsl_mmodel.h"
+#include "../e_acsl_printf.h"
 
+// E-ACSL warnings {{{
+#define WARNING 0   // Output a warning message to stderr
+#define ERROR   1   // Treat warnings as errors and abort execution
+#define IGNORE  2   // Ignore warnings
 
-#define WARNING 0
-#define ERROR 1
-#define IGNORE 2
-
-
-#ifdef E_ACSL_WARNING
-int __warning_level = E_ACSL_WARNING;
-#else
-int __warning_level = WARNING;
+#ifndef E_ACSL_WARNING
+#define E_ACSL_WARNING WARNING
 #endif
 
+static int warning_level = E_ACSL_WARNING;
 
-void __warning(const char* fct_name) {
-  fprintf(stderr,
-	  "warning: E_ACSL function '%s' called with null pointer\n", fct_name);
+// Issue a warning to stderr or abort a program
+// based on the current warning level
+static void warning(const char* message) {
+  if (warning_level != IGNORE) {
+    eprintf("warning: %s\n", message);
+    if (warning_level == ERROR)
+      abort();
+  }
 }
 
+// Shortcut for issuing a warning and returning from a function
+#define return_warning(_cond,_msg) \
+  if(_cond) { \
+    warning(_msg); \
+    return; \
+  }
+// }}}
 
-void* __e_acsl_mmodel_memset (void* dest, int val, size_t len) {
+void* __e_acsl_mmodel_memset(void* dest, int val, size_t len) {
   unsigned char *ptr = (unsigned char*)dest;
   while (len-- > 0)
     *ptr++ = val;
   return dest;
 }
 
-
 size_t __memory_size = 0;
 /*unsigned cpt_store_block = 0;*/
 
-const int nbr_bits_to_1[256] = {
+static const int nbr_bits_to_1[256] = {
   0,1,1,2,1,2,2,3,1,2,2,3,2,3,3,4,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,4,5,5,6,5,6,6,7,5,6,6,7,6,7,7,8
 };
 
@@ -73,10 +81,9 @@ size_t __get_memory_size(void) {
   @ ensures size%8 == 0 ==> \result == size/8;
   @ ensures size%8 != 0 ==> \result == size/8+1;
   @*/
-size_t needed_bytes (size_t size) {
+static size_t needed_bytes (size_t size) {
   return (size % 8) == 0 ? (size/8) : (size/8 + 1);
 }
-
 
 /* adds argc / argv to the memory model */
 void __init_args(int argc, char **argv) {
@@ -112,9 +119,7 @@ void* __store_block(void* ptr, size_t size) {
 
 /* remove the block starting at ptr */
 void __delete_block(void* ptr) {
-  struct _block * tmp;
-  assert(ptr != NULL);
-  tmp = __get_exact(ptr);
+  struct _block * tmp = __get_exact(ptr);
   assert(tmp != NULL);
   __clean_init(tmp);
   __remove_element(tmp);
@@ -164,16 +169,15 @@ void* __realloc(void* ptr, size_t size) {
   struct _block * tmp;
   void * new_ptr;
   if(ptr == NULL) return __malloc(size);
-  if(size <= 0) {
-    __memory_size -= __get_exact(ptr)->size;
+  if(size == 0) {
     __free(ptr);
     return NULL;
   }
   tmp = __get_exact(ptr);
-  __memory_size -= tmp->size;
   assert(tmp != NULL);
   new_ptr = realloc((void*)tmp->ptr, size);
   if(new_ptr == NULL) return NULL;
+  __memory_size -= tmp->size;
   tmp->ptr = (size_t)new_ptr;
   /* uninitialized, do nothing */
   if(tmp->init_cpt == 0) ;
@@ -235,24 +239,16 @@ void __initialize (void * ptr, size_t size) {
   struct _block * tmp;
   unsigned i;
 
-  if(ptr == NULL) {
-    if(__warning_level == ERROR) assert(0);
-    else if(__warning_level == IGNORE) return;
-    else { __warning("initialize"); return; }
-  }
-  
+  return_warning(ptr == NULL, "initialize");
+
   assert(size > 0);
   tmp = __get_cont(ptr);
 
-  if(tmp == NULL) {
-    if(__warning_level == ERROR) assert(0);
-    else if(__warning_level == IGNORE) return;
-    else { __warning("initialize"); return; }
-  }
-  
+  return_warning(tmp == NULL, "initialize");
+
   /* already fully initialized, do nothing */
   if(tmp->init_cpt == tmp->size) return;
-	
+
   /* fully uninitialized */
   if(tmp->init_cpt == 0) {
     int nb = needed_bytes(tmp->size);
@@ -261,13 +257,13 @@ void __initialize (void * ptr, size_t size) {
   }
 
   for(i = 0; i < size; i++) {
-    int byte_offset = (size_t)ptr - tmp->ptr + i; 
+    int byte_offset = (size_t)ptr - tmp->ptr + i;
     int ind = byte_offset / 8;
     unsigned char mask_bit = 1U << (7 - (byte_offset % 8));
     if((tmp->init_ptr[ind] & mask_bit) == 0) tmp->init_cpt++;
     tmp->init_ptr[ind] |= mask_bit;
   }
-  
+
   /* now fully initialized */
   if(tmp->init_cpt == tmp->size) {
     free(tmp->init_ptr);
@@ -278,68 +274,44 @@ void __initialize (void * ptr, size_t size) {
 /* mark all bytes of ptr as initialized */
 void __full_init (void * ptr) {
   struct _block * tmp;
-
-  if(ptr == NULL) {
-    if(__warning_level == ERROR) assert(0);
-    else if(__warning_level == IGNORE) return;
-    else { __warning("full_init"); return; }
-  }
+  return_warning(ptr == NULL, "full_init");
 
   tmp = __get_exact(ptr);
-  
-  if(tmp == NULL) {
-    if(__warning_level == ERROR) assert(0);
-    else if(__warning_level == IGNORE) return;
-    else { __warning("full_init"); return; }
-  }
+  return_warning(tmp == NULL, "full_init");
 
   if (tmp->init_ptr != NULL) {
     free(tmp->init_ptr);
     tmp->init_ptr = NULL;
   }
-  
+
   tmp->init_cpt = tmp->size;
 }
 
 /* mark a block as litteral string */
 void __literal_string (void * ptr) {
   struct _block * tmp;
-
-  if(ptr == NULL) {
-    if(__warning_level == ERROR) assert(0);
-    else if(__warning_level == IGNORE) return;
-    else { __warning("literal_string"); return; }
-  }
-
+  return_warning(ptr == NULL, "literal_string");
   tmp = __get_exact(ptr);
-  
-  if(tmp == NULL) {
-    if(__warning_level == ERROR) assert(0);
-    else if(__warning_level == IGNORE) return;
-    else { __warning("literal_string"); return; }
-  }
-
+  return_warning(tmp == NULL, "literal_string");
   tmp->is_litteral_string = true;
 }
 
 /* return whether the size bytes of ptr are initialized */
 int __initialized (void * ptr, size_t size) {
-  struct _block * tmp;
   unsigned i;
-  assert(ptr != NULL);
   assert(size > 0);
-  tmp = __get_cont(ptr);
+  struct _block * tmp = __get_cont(ptr);
   if(tmp == NULL)
     return false;
-  
+
   /* fully uninitialized */
   if(tmp->init_cpt == 0) return false;
   /* fully initialized */
   if(tmp->init_cpt == tmp->size) return true;
-  
+
   for(i = 0; i < size; i++) {
     /* if one byte is uninitialized */
-    int byte_offset = (size_t)ptr - tmp->ptr + i; 
+    int byte_offset = (size_t)ptr - tmp->ptr + i;
     int ind = byte_offset / 8;
     unsigned char mask_bit = 1U << (7 - (byte_offset % 8));
     if((tmp->init_ptr[ind] & mask_bit) == 0) return false;
@@ -349,9 +321,7 @@ int __initialized (void * ptr, size_t size) {
 
 /* return the length (in bytes) of the block containing ptr */
 size_t __block_length(void* ptr) {
-  struct _block * tmp;
-  assert(ptr != NULL);
-  tmp = __get_cont(ptr);
+  struct _block * tmp = __get_cont(ptr);
   assert(tmp != NULL);
   return tmp->size;
 }
@@ -382,26 +352,20 @@ int __valid_read(void* ptr, size_t size) {
 
 /* return the base address of the block containing ptr */
 void* __base_addr(void* ptr) {
-  struct _block * tmp;
-  assert(ptr != NULL);
-  tmp = __get_cont(ptr);
+  struct _block * tmp = __get_cont(ptr);
   assert(tmp != NULL);
   return (void*)tmp->ptr;
 }
 
 /* return the offset of ptr within its block */
 int __offset(void* ptr) {
-  struct _block * tmp;
-  assert(ptr != NULL);
-  tmp = __get_cont(ptr);
+  struct _block * tmp = __get_cont(ptr);
   assert(tmp != NULL);
   return ((size_t)ptr - tmp->ptr);
 }
 
 void __out_of_bound(void* ptr, _Bool flag) {
-  struct _block * tmp;
-  assert(ptr != NULL);
-  tmp = __get_cont(ptr);
+  struct _block * tmp = __get_cont(ptr);
   assert(tmp != NULL);
   tmp->is_out_of_bound = flag;
 }
@@ -414,14 +378,14 @@ void __out_of_bound(void* ptr, _Bool flag) {
 void __print_block (struct _block * ptr) {
   if (ptr != NULL) {
     printf("%p; %zu Bytes; %slitteral; [init] : %li ",
-	   (char*)ptr->ptr, ptr->size,
-	   ptr->is_litteral_string ? "" : "not ", ptr->init_cpt);
+      (char*)ptr->ptr, ptr->size,
+      ptr->is_litteral_string ? "" : "not ", ptr->init_cpt);
     if(ptr->init_ptr != NULL) {
       unsigned i;
       for(i = 0; i < ptr->size; i++) {
-	int ind = i / 8;
-	int one_bit = (unsigned)1 << (8 - (i % 8) - 1);
-	printf("%i", (ptr->init_ptr[ind] & one_bit) != 0);
+        int ind = i / 8;
+        int one_bit = (unsigned)1 << (8 - (i % 8) - 1);
+        printf("%i", (ptr->init_ptr[ind] & one_bit) != 0);
       }
     }
     printf("\n");
