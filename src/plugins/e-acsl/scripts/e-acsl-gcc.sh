@@ -56,6 +56,9 @@ ERROR="ERROR parsing arguments:"
 # architecture we need to make sure that same architecture is used for
 # instrumentation and for compilation.
 MACHDEPFLAGS="`getconf LONG_BIT`"
+# Check if getconf gives out the value accepted by Frama-C/GCC
+echo "$MACHDEPFLAGS" | grep '16\|32\|64' \
+  || error "$MACHDEPFLAGS-bit architecture not supported"
 # -machdep option sent to frama-c
 MACHDEP="-machdep gcc_x86_$MACHDEPFLAGS"
 # Macro for correct preprocessing of Frama-C generated code
