@@ -15,8 +15,8 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
--* E-ACSL       [2015/08/12] Fix bug #1817 about incloorect initialization of
-	        literal strings in global in arrays with compound initializers.
+-* E-ACSL       [2015/12/08] Fix bug #1817 about incorrect initialization of
+	        literal strings in global arrays with compound initializers.
 -* E-ACSL       [2015/11/06] Fix a crash occuring when using a recent libc
 	        while GMP headers provided by E-ACSL are used.
 
@@ -52,7 +52,8 @@ Plugin E-ACSL 0.4.1 Neon
 	        (Frama-C) libc which prevents linking of the generated C code.
 -* E-ACSL       [2014/05/21] Fix bug #1782 about incorrect URL in the
 	        documentation.
--  E-ACSL       [2014/03/27] Remove spurious warnings when using type `real`.
+-  E-ACSL       [2014/03/27] Remove spurious warnings when using type real
+	        numbers.
 -* E-ACSL       [2014/03/26] Fix bug #1692 about wrong localisation of
 	        some messages.
 -  E-ACSL       [2014/03/26] Remove a spurious warning when an annotated
@@ -80,7 +81,7 @@ Plugin E-ACSL 0.3 Fluorine_20130601
 
 -  E-ACSL       [2013/09/18] More precise message for unsupported contract
 	        clauses.
--  E-ACSL       [2013/09/18] Use Gmp still less often.
+-  E-ACSL       [2013/09/18] Use GMP still less often.
 -* E-ACSL       [2013/09/18] Fix bug which may occur with divisions and modulos.
 -  E-ACSL       [2013/09/10] Improve ACSL contracts of the E-ACSL C library.
 -  E-ACSL       [2013/09/06] Support of loop invariants.
