@@ -20,17 +20,15 @@
 /*                                                                        */
 /**************************************************************************/
 
-#include <assert.h>
 #include <errno.h>
 #include <unistd.h>
-#include "stdio.h"
 #include "stdlib.h"
 #include "stdbool.h"
 #include "math.h"
 #include "e_acsl_mmodel_api.h"
 #include "e_acsl_bittree.h"
 #include "e_acsl_mmodel.h"
-
+#include "../e_acsl_printf.h"
 
 #if WORDBITS == 16
 
@@ -50,11 +48,11 @@ const size_t Tmasks[] = {
 0xfffff800,0xfffffc00,0xfffffe00,0xffffff00,0xffffff80,0xffffffc0,0xffffffe0,
 0xfffffff0,0xfffffff8,0xfffffffc,0xfffffffe,0xffffffff};
 
-const int Teq[] = 
+const int Teq[] =
   { 0,-1,3,-3,6,-5,7,-7,12,-9,11,-11,14,-13,15,-15,24,-17,19,-19,22,
     -21,23,-23,28,-25,27,-27,30,-29,31,32,-32 };
 
-const int Tneq[] = 
+const int Tneq[] =
   { 0,0,1,-2,2,-4,5,-6,4,-8,9,-10,10,-12,13,-14,8,-16,17,-18,18,-20,21,-22,20,
     -24,25,-26,26,-28,29,-30,-31 };
 
@@ -79,12 +77,12 @@ const size_t Tmasks[] = {
 0xfffffffffffffff8,0xfffffffffffffffc,0xfffffffffffffffe,0xffffffffffffffff};
 
 
-const int Teq[] = 
+const int Teq[] =
   { 0,-1,3,-3,6,-5,7,-7,12,-9,11,-11,14,-13,15,-15,24,-17,19,-19,22,-21,23,-23,
     28,-25,27,-27,30,-29,31,-31,48,-33,35,-35,38,-37,39,-39,44,-41,43,-43,46,
     -45,47,-47,56,-49,51,-51,54,-53,55,-55,60,-57,59,-59,62,-61,63,64,-64 };
 
-const int Tneq[] = 
+const int Tneq[] =
   { 0,0,1,-2,2,-4,5,-6,4,-8,9,-10,10,-12,13,-14,8,-16,17,-18,18,-20,21,-22,20,
     -24,25,-26,26,-28,29,-30,16,-32,33,-34,34,-36,37,-38,36,-40,41,-42,42,-44,
     45,-46,40,-48,49,-50,50,-52,53,-54,52,-56,57,-58,58,-60,61,-62,-63 };
@@ -113,7 +111,7 @@ size_t mask(size_t a, size_t b) {
   size_t nxor = ~(a ^ b), ret;
   int i = WORDBITS/2; /* dichotomic search, starting in the middle */
   /*cpt_mask++;*/
-  
+
   /* if the current mask matches we use transition from Teq, else from Tneq
      we stop as soon as i is negative, meaning that we found the mask
      a negative element i from Teq or Tneq means stop and return Tmasks[-i] */
@@ -181,7 +179,7 @@ struct bittree * __get_leaf_from_block (struct _block * ptr) {
 void __remove_element (struct _block * ptr) {
   struct bittree * leaf_to_delete = __get_leaf_from_block (ptr);
   assert(leaf_to_delete->leaf == ptr);
-  
+
   if(leaf_to_delete->father == NULL)
     // the leaf is the root
     __root = NULL;
@@ -251,7 +249,7 @@ struct bittree * __most_similar_node (struct _block * ptr) {
 void __add_element (struct _block * ptr) {
   struct bittree * new_leaf;
   assert(ptr != NULL);
-  
+
   new_leaf = malloc(sizeof(struct bittree));
   assert(new_leaf != NULL);
   new_leaf->is_leaf = true;
@@ -266,7 +264,7 @@ void __add_element (struct _block * ptr) {
     __root = new_leaf;
   else {
     struct bittree * brother = __most_similar_node (ptr), * father, * aux;
-    
+
     assert(brother != NULL);
     father = malloc(sizeof(struct bittree));
     assert(father != NULL);
@@ -282,7 +280,7 @@ void __add_element (struct _block * ptr) {
       father->right = new_leaf;
     }
     new_leaf->father = father;
-    
+
     if(brother == __root) {
       father->father = NULL;
       father->mask = mask(brother->addr & brother->mask, ptr->ptr);
@@ -354,7 +352,7 @@ struct _block * __get_cont (void * ptr) {
 
   struct bittree * t [WORDBITS];
   short ind = -1;
-  
+
   while(1) {
     if(tmp->is_leaf) {
       /* tmp cannot contain ptr because its begin addr is higher */
@@ -381,7 +379,7 @@ struct _block * __get_cont (void * ptr) {
 	continue;
       }
     }
-    
+
     assert(tmp->left != NULL && tmp->right != NULL);
 
     /* the right child has the highest address, so we test it first */

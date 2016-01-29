@@ -52,13 +52,28 @@ SHORTOPTIONS="h,c,C,p,d:,o:,O:,v:,f,E:,R,L,M,l:,e:,g,q,s:,F:"
 # Prefix for an error message due to wrong arguments
 ERROR="ERROR parsing arguments:"
 
+# Architecture-dependent flags. Since by default Frama-C uses 32-bit
+# architecture we need to make sure that same architecture is used for
+# instrumentation and for compilation.
+MACHDEPFLAGS="`getconf LONG_BIT`"
+# Check if getconf gives out the value accepted by Frama-C/GCC
+echo "$MACHDEPFLAGS" | grep '16\|32\|64' \
+  || error "$MACHDEPFLAGS-bit architecture not supported"
+# -machdep option sent to frama-c
+MACHDEP="-machdep gcc_x86_$MACHDEPFLAGS"
+# Macro for correct preprocessing of Frama-C generated code
+CPPMACHDEP="-D__FC_MACHDEP_X86_$MACHDEPFLAGS"
+# GCC machine option
+GCCMACHDEP="-m$MACHDEPFLAGS"
+
 # Gcc
 CC="`check_tool 'gcc'`"
-CFLAGS="-std=c99 -g3 -O2 -pedantic -fno-builtin -Wall \
+CFLAGS="-std=c99 $GCCMACHDEP -g3 -O2 -pedantic -fno-builtin -Wall \
     -Wno-long-long \
     -Wno-attributes \
     -Wno-unused-result \
     -Wno-unused-value \
+    -Wno-unused-function \
     -Wno-unused-variable \
     -Wno-unused-but-set-variable \
     -Wno-implicit-function-declaration \
@@ -77,25 +92,6 @@ RTL="$EACSL_SHARE/e_acsl.c                      \
   $EACSL_SHARE/memory_model/e_acsl_mmodel.c     \
   $EACSL_SHARE/memory_model/e_acsl_bittree.c    \
 "
-
-# Frama-c machdep option
-ARCH="$(uname -m | tr -d '\n')"
-case $ARCH in
-  x86_64)
-    MACHDEPFLAGS="86_64"
-  ;;
-  i686)
-    MACHDEPFLAGS="86_32"
-  ;;
-  *)
-    error "Unsupported archirtecture: $ARCH"
-  ;;
-esac
-
-# -machdep option sent to frama-c
-MACHDEP="-machdep gcc_x$MACHDEPFLAGS"
-# Macro for correct preprocessing of Frama-C generated code
-CPPMACHDEP="-D__FC_MACHDEP_X$MACHDEPFLAGS"
 
 # CPP and LD flags for compilation of E-ACSL-generated sources
 EACSL_CPP_FLAGS="
@@ -122,7 +118,7 @@ OPTION_EXTRA_CPP="-I$FRAMA_C_SHARE/libc $CPPMACHDEP" # Extra CPP flags
 
 manpage() {
   echo "NAME"
-  echo "  e-acsl-gcc -- convenience wrapper instrumentation of C files with"
+  echo "  e-acsl-gcc -- convenience wrapper for instrumentation of C files with"
   echo "   the E-ACSL Frama-C plugin and their subsequent compilation using"
   echo "   GNU compiler collection (GCC)"
   echo ""
@@ -212,6 +208,7 @@ do
       manpage;
     ;;
     # Do not echo commands to STDOUT
+    # Set log and debug flags to minimal verbosity levels
     --quiet|-q)
       shift;
       OPTION_ECHO=
