@@ -93,31 +93,6 @@ CFLAGS="-std=c99 $GCCMACHDEP -g3 -O2 -pedantic -fno-builtin -Wall \
 CPPFLAGS=""
 LDFLAGS=""
 
-# E-ACSL source that needed for compilation
-EACSL_SHARE="$FRAMA_C_SHARE/e-acsl"
-RTL_BITTREE="\
-  $EACSL_SHARE/e_acsl.c \
-  $EACSL_SHARE/memory_model/e_acsl_mmodel.c \
-  $EACSL_SHARE/memory_model/e_acsl_bittree.c \
-"
-RTL_SPLAYTREE="\
-  $EACSL_SHARE/e_acsl.c \
-  $EACSL_SHARE/memory_model/e_acsl_splay_tree.c \
-  $EACSL_SHARE/memory_model/e_acsl_mmodel.c \
-"
-RTL_TREE="\
-  $EACSL_SHARE/e_acsl.c \
-  $EACSL_SHARE/memory_model/e_acsl_tree.c \
-  $EACSL_SHARE/memory_model/e_acsl_mmodel.c \
-"
-RTL_LIST="\
-  $EACSL_SHARE/e_acsl.c \
-  $EACSL_SHARE/memory_model/e_acsl_list.c \
-  $EACSL_SHARE/memory_model/e_acsl_mmodel.c \
-"
-
-RTL="$RTL_BITTREE"
-
 # C, CPP and LD flags for compilation of E-ACSL-generated sources
 EACSL_CFLAGS=""
 EACSL_CPPFLAGS="
@@ -201,7 +176,7 @@ manpage() {
   echo "      memory model (i.e., runtime library) to be used at compile time."
   echo "      Valid arguments are:"
   echo "        bittree     - memory modelling using a Patricie trie ADT"
-  echo "        splaytree   - memory modelling using a splay tree ADT"
+  echo "        splay_tree  - memory modelling using a splay tree ADT"
   echo "        list        - memory modelling using a linked-list ADT"
   echo "        tree        - memory modelling using a binary tree ADT"
   echo "  -P, --production"
@@ -384,25 +359,10 @@ do
     ;;
     -m|--memory-model)
       shift;
-      mmodel="$1"
+      OPTION_MMODEL="$1"
+      echo $OPTION_MMODEL | grep "\(tree\|bittree\|splay_tree\|list\)"
+      error "no such memory model: $OPTION_MMODEL" $?
       shift;
-      case $mmodel in
-        bittree)
-          RTL="$RTL_BITTREE"
-        ;;
-        splaytree)
-          RTL="$RTL_SPLAYTREE"
-        ;;
-        tree)
-          RTL="$RTL_TREE"
-        ;;
-        list)
-          RTL="$RTL_LIST"
-        ;;
-        *)
-          error "Unknown model memory model: '$mmodel'"
-        ;;
-      esac
     ;;
   esac
 done
@@ -415,6 +375,11 @@ fi
 
 # Instrument
 if [ -n "$OPTION_INSTRUMENT" ]; then
+  # Memory model sources
+  RTL="$EACSL_SHARE/e_acsl.c \
+    $EACSL_SHARE/memory_model/e_acsl_mmodel.c \
+    $EACSL_SHARE/memory_model/e_acsl_$OPTION_MMODEL.c"
+
   ($OPTION_ECHO; \
     $FRAMAC \
     $FRAMAC_FLAGS \
