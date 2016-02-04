@@ -283,7 +283,7 @@ done
 shift;
 
 # Bail if no files to translate are given
-if test -z "$1"; then
+if [ -z "$1" ]; then
   error "no input files";
 fi
 
@@ -381,7 +381,7 @@ if [ -n "$OPTION_INSTRUMENT" ]; then
 fi
 
 # Compile
-if test -n "$OPTION_COMPILE"  ; then
+if [ -n "$OPTION_COMPILE" ]; then
   # Compile the original files only if the instrumentation option is given,
   # otherwise the provided sources are assumed to be E-ACSL instrumented files
   if [ -n "$OPTION_INSTRUMENT" ]; then
