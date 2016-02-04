@@ -55,9 +55,8 @@ ERROR="ERROR parsing arguments:"
 
 # Frama-C
 FRAMAC="`check_tool 'frama-c'`"
-FRAMAC_CONGIG="`check_tool 'frama-c-config'`"
 FRAMAC_FLAGS=""
-FRAMA_C_SHARE="`$FRAMAC_CONGIG -print-share-path`"
+FRAMAC_SHARE="`$FRAMAC -print-share-path`"
 
 # Architecture-dependent flags. Since by default Frama-C uses 32-bit
 # architecture we need to make sure that same architecture is used for
@@ -102,7 +101,6 @@ EACSL_CPPFLAGS="
 EACSL_LDFLAGS="-lgmp -lm"
 
 # Variables holding getopt options
-OPTION_FRAMAC_EXTRA=                     # Extra Frama-C options
 OPTION_ECHO="set -x"                     # Echo executed commands to STDOUT
 OPTION_INSTRUMENT=1                      # Perform E-ACSL instrumentation
 OPTION_PRINT=                            # Output instrumented code
@@ -122,7 +120,7 @@ OPTION_DEBUG_LOG_MACRO=""                # Specification of debug log file
 # of standard functions.
 OPTION_BUILTINS="-DE_ACSL_BUILTINS"
 # Extra CPP flags for frama-c
-OPTION_EXTRA_CPP="-D$EACSL_MACRO_ID -I$FRAMA_C_SHARE/libc $CPPMACHDEP"
+OPTION_EXTRA_CPP="-D$EACSL_MACRO_ID -I$FRAMAC_SHARE/libc $CPPMACHDEP"
 
 manpage() {
   echo "NAME"
@@ -251,7 +249,7 @@ do
     # Pass an option to a frama-c invocation
     --frama-c-extra|-F)
         shift;
-        OPTION_FRAMAC_EXTRA="$OPTION_FRAMAC_EXTRA $1"
+        FRAMAC_FLAGS="$FRAMAC_FLAGS $1"
         shift;
     ;;
     # Do compile instrumented code
@@ -384,7 +382,6 @@ if [ -n "$OPTION_INSTRUMENT" ]; then
     $FRAMAC \
     $FRAMAC_FLAGS \
     $MACHDEP \
-    $OPTION_FRAMAC_EXTRA \
     -cpp-extra-args="$OPTION_EXTRA_CPP" \
     -e-acsl-share $EACSL_SHARE \
     $OPTION_VERBOSE \
