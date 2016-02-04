@@ -347,6 +347,11 @@ EACSL_RTL="$EACSL_SHARE/e_acsl.c \
   $EACSL_SHARE/memory_model/e_acsl_mmodel.c \
   $EACSL_SHARE/memory_model/e_acsl_$OPTION_EACSL_MMODEL.c"
 
+# Output file names
+OCODE="$OPTION_OCODE" # E-ACSL instrumented source
+OEXEC="$OPTION_OEXEC" # Output name of the original executable
+EACSL_OEXEC="$OPTION_OEXEC.e-acsl" # Output name of E-ACSL-modified executable
+
 # Instrument
 if [ -n "$OPTION_INSTRUMENT" ]; then
   ($OPTION_ECHO; \
@@ -376,10 +381,10 @@ if test -n "$OPTION_COMPILE"  ; then
   # Compile the original files only if the instrumentation option is given,
   # otherwise the provided sources are assumed to be E-ACSL instrumented files
   if [ -n "$OPTION_INSTRUMENT" ]; then
-    ($OPTION_ECHO; $CC $CPPFLAGS $CFLAGS "$@" -o "$OPTION_OEXEC" $LDFLAGS);
+    ($OPTION_ECHO; $CC $CPPFLAGS $CFLAGS "$@" -o "$OEXEC" $LDFLAGS);
     error "fail to compile/link un-instrumented code: $@" $?;
   else
-    OPTION_OCODE="$@"
+    OCODE="$@"
   fi
   # Compile and link E-ACSL-instrumented file
   ($OPTION_ECHO;
@@ -390,8 +395,8 @@ if test -n "$OPTION_COMPILE"  ; then
      $OPTION_DEBUG_MACRO \
      $OPTION_DEBUG_LOG_MACRO \
      $OPTION_BUILTINS \
-     -o "$OPTION_OEXEC.e-acsl" \
-     "$OPTION_OCODE" \
+     -o "$EACSL_OEXEC" \
+     "$OCODE" \
      $LDFLAGS $EACSL_LDFLAGS)
   error "fail to compile/link instrumented code: $@" $?;
 fi
