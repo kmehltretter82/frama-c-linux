@@ -138,6 +138,7 @@ install::
 	$(PRINT_INSTALL) E-ACSL scripts
 	$(MKDIR) $(BINDIR)
 	$(CP) $(E_ACSL_DIR)/scripts/e-acsl-gcc.sh $(BINDIR)/
+	$(CP) $(E_ACSL_DIR)/man/e-acsl-gcc.sh.1 $(MANDIR)/man1/
 
 uninstall::
 	$(PRINT_RM) E-ACSL share files
@@ -148,6 +149,7 @@ uninstall::
 	      $(FRAMAC_SHARE)/manuals/e-acsl-manual.pdf
 	$(PRINT_RM) E-ACSL scripts
 	$(RM) $(BINDIR)/e-acsl-gcc.sh
+	$(RM) $(MANDIR)/man1/e-acsl-gcc.sh.1
 
 ################################
 # Building source distribution #
@@ -165,6 +167,8 @@ EACSL_DISTRIB_FILES=\
 	configure.ac Makefile.in \
 	doc/Changelog \
 	$(DOC_FILES) \
+	scripts/e-acsl-gcc.sh \
+	man/e-acsl-gcc.sh.1 \
 	share/e-acsl/*.[ch] \
 	share/e-acsl/memory_model/e_acsl_bittree.[ch] \
 	share/e-acsl/memory_model/e_acsl_mmodel*.[ch] \
