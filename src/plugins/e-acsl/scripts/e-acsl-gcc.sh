@@ -67,42 +67,10 @@ CPPMACHDEP="-D__FC_MACHDEP_X86_$MACHDEPFLAGS"
 # GCC machine option
 GCCMACHDEP="-m$MACHDEPFLAGS"
 
-# Frama-C
-FRAMAC="`check_tool 'frama-c'`"
-FRAMAC_FLAGS=""
-FRAMAC_SHARE="`$FRAMAC -print-share-path`"
-EACSL_SHARE="$FRAMAC_SHARE/e-acsl"
-EACSL_MMODEL="bittree"
-
-# Macro that identifies E-ACSL compilation. Passed to Framac and GCC runs
-# but not to the original compilation
-EACSL_MACRO_ID="__E_ACSL__"
-
-# Gcc
-CC="`check_tool 'gcc'`"
-CFLAGS="-std=c99 $GCCMACHDEP -g3 -O2 -pedantic -fno-builtin -Wall \
-    -Wno-long-long \
-    -Wno-attributes \
-    -Wno-unused \
-    -Wno-unused-function \
-    -Wno-unused-result \
-    -Wno-unused-value \
-    -Wno-unused-function \
-    -Wno-unused-variable \
-    -Wno-unused-but-set-variable \
-    -Wno-implicit-function-declaration"
-CPPFLAGS=""
-LDFLAGS=""
-
-# C, CPP and LD flags for compilation of E-ACSL-generated sources
-EACSL_CFLAGS=""
-EACSL_CPPFLAGS="
-    -I$EACSL_SHARE
-    -D$EACSL_MACRO_ID
-    -D__FC_errno=(*__errno_location())"
-EACSL_LDFLAGS="-lgmp -lm"
-
 # Variables holding getopt options
+OPTION_CFLAGS=                           # Compiler flags
+OPTION_CPPFLAGS=                         # Preprocessor flags
+OPTION_LDFLAGS=                          # Linker flags
 OPTION_ECHO="set -x"                     # Echo executed commands to STDOUT
 OPTION_INSTRUMENT=1                      # Perform E-ACSL instrumentation
 OPTION_PRINT=                            # Output instrumented code
@@ -117,12 +85,12 @@ OPTION_FULL_MMODEL=                      # Instrument as much as possible
 OPTION_GMP=                              # Use GMP integers everywhere
 OPTION_DEBUG_MACRO="-DE_ACSL_DEBUG"      # Debug macro
 OPTION_DEBUG_LOG_MACRO=""                # Specification of debug log file
+OPTION_FRAMAC_CPP_EXTRA=""               # Extra CPP flags for frama-c
+OPTION_EACSL_MMODEL="bittree"            # Memory model used
 # The following option controls whether to use gcc builtins
 # (e.g., __builtin_strlen) in RTL or fall back to custom implementations
 # of standard functions.
 OPTION_BUILTINS="-DE_ACSL_BUILTINS"
-# Extra CPP flags for frama-c
-OPTION_EXTRA_CPP="-D$EACSL_MACRO_ID -I$FRAMAC_SHARE/libc $CPPMACHDEP"
 
 manpage() {
   printf "e-acsl-gcc.sh - instrument and compile C files with E-ACSL
@@ -239,19 +207,19 @@ do
     # Additional CPP arguments
     --extra-cpp-args|-E)
       shift;
-      OPTION_EXTRA_CPP="$OPTION_EXTRA_CPP $1"
+      OPTION_FRAMAC_CPP_EXTRA="$OPTION_FRAMAC_CPP_EXTRA $1"
       shift;
     ;;
     # Additional flags passed to the linker
     --ld-flags|-l)
       shift;
-      LDFLAGS="$LDFLAGS $1"
+      OPTION_LDFLAGS="$OPTION_LDFLAGS $1"
       shift;
     ;;
     # Additional flags passed to the pre-processor (compile-time)
     --cpp-flags|-e)
       shift;
-      CPPFLAGS="$CPPFLAGS $1"
+      OPTION_CPPFLAGS="$OPTION_CPPFLAGS $1"
       shift;
     ;;
     # Do not perform the instrumentation, only compile the provided sources
@@ -297,9 +265,9 @@ do
     ;;
     -m|--memory-model)
       shift;
-      EACSL_MMODEL="$1"
-      echo $EACSL_MMODEL | grep "\(tree\|bittree\|splay_tree\|list\)"
-      error "no such memory model: $EACSL_MMODEL" $?
+      OPTION_EACSL_MMODEL="$1"
+      echo $OPTION_EACSL_MMODEL | grep "\(tree\|bittree\|splay_tree\|list\)"
+      error "no such memory model: $OPTION_EACSL_MMODEL" $?
       shift;
     ;;
   esac
@@ -311,18 +279,60 @@ if test -z "$1"; then
   error "no input files";
 fi
 
+# Frama-C and related flags
+FRAMAC="`check_tool 'frama-c'`"
+FRAMAC_FLAGS=""
+FRAMAC_SHARE="`$FRAMAC -print-share-path`"
+FRAMAC_CPP_EXTRA="
+  $OPTION_FRAMAC_CPP_EXTRA
+  -D$EACSL_MACRO_ID
+  -I$FRAMAC_SHARE/libc
+  $CPPMACHDEP
+"
+EACSL_SHARE="$FRAMAC_SHARE/e-acsl"
+EACSL_MMODEL="$OPTION_EACSL_MMODEL"
+
+# Macro that identifies E-ACSL compilation. Passed to Frama-C
+# and GCC runs but not to the original compilation
+EACSL_MACRO_ID="__E_ACSL__"
+
+# Gcc and related flags
+CC="`check_tool 'gcc'`"
+CFLAGS="$OPTION_CFLAGS
+    -std=c99 $GCCMACHDEP -g3 -O2 -pedantic -fno-builtin
+    -Wall \
+    -Wno-long-long \
+    -Wno-attributes \
+    -Wno-unused \
+    -Wno-unused-function \
+    -Wno-unused-result \
+    -Wno-unused-value \
+    -Wno-unused-function \
+    -Wno-unused-variable \
+    -Wno-unused-but-set-variable \
+    -Wno-implicit-function-declaration"
+CPPFLAGS="$OPTION_CPPFLAGS"
+LDFLAGS="$OPTION_LDFLAGS"
+
+# C, CPP and LD flags for compilation of E-ACSL-generated sources
+EACSL_CFLAGS=""
+EACSL_CPPFLAGS="
+    -I$EACSL_SHARE
+    -D$EACSL_MACRO_ID
+    -D__FC_errno=(*__errno_location())"
+EACSL_LDFLAGS="-lgmp -lm"
+# Memory model sources
+EACSL_RTL="$EACSL_SHARE/e_acsl.c \
+  $EACSL_SHARE/memory_model/e_acsl_mmodel.c \
+  $EACSL_SHARE/memory_model/e_acsl_$OPTION_EACSL_MMODEL.c"
+
 # Instrument
 if [ -n "$OPTION_INSTRUMENT" ]; then
-  # Memory model sources
-  RTL="$EACSL_SHARE/e_acsl.c \
-    $EACSL_SHARE/memory_model/e_acsl_mmodel.c \
-    $EACSL_SHARE/memory_model/e_acsl_$EACSL_MMODEL.c"
-
   ($OPTION_ECHO; \
     $FRAMAC \
     $FRAMAC_FLAGS \
     $MACHDEP \
-    -cpp-extra-args="$OPTION_EXTRA_CPP" \
+    -cpp-extra-args="$OPTION_FRAMAC_CPP_EXTRA" \
     -e-acsl-share $EACSL_SHARE \
     $OPTION_VERBOSE \
     $OPTION_DEBUG \
@@ -355,7 +365,7 @@ if test -n "$OPTION_COMPILE"  ; then
    $CC \
      $CFLAGS $CPPFLAGS \
      $EACSL_CFLAGS $EACSL_CPPFLAGS \
-     $RTL \
+     $EACSL_RTL \
      $OPTION_DEBUG_MACRO \
      $OPTION_DEBUG_LOG_MACRO \
      $OPTION_BUILTINS \
