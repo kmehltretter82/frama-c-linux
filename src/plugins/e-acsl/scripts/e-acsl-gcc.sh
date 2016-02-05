@@ -33,149 +33,76 @@ error () {
   fi
 }
 
-# Check if an executable can be found by in the PATH
+# Check if a given executable name can be found by in the PATH
 has_tool() {
   which "$@" >/dev/null 2>&1 && return 0 || return 1
 }
 
-# Abort if a given executable cannot be found in the $PATH
+# Check if a given executable name is indeed an executable or can be found
+# in the $PATH. Abort the execution if not.
 check_tool() {
-  has_tool "$1" && echo "$1" \
-    || error "Cannot find '$1' executable in the \$PATH"
+   { has_tool "$1" || test -e "$1"; } || error "No executable $1 found";
 }
 
 # Getopt options
 LONGOPTIONS="help,compile,compile-only,print,debug:,ocode:,oexec:,verbose:, \
-  frama-c-only,extra-cpp-args,rtl,frama-c-stdlib,full-mmodel,gmp,quiet,logfile:,
-  ld-flags:,cpp-flags:,frama-c-extra:"
-SHORTOPTIONS="h,c,C,p,d:,o:,O:,v:,f,E:,R,L,M,l:,e:,g,q,s:,F:"
+  frama-c-only,extra-cpp-args:,frama-c-stdlib,full-mmodel,gmp,quiet,logfile:,
+  ld-flags:,cpp-flags:,frama-c-extra:,memory-model:,production,no-stdlib,
+  debug-log:,frama-c:,gcc:"
+SHORTOPTIONS="h,c,C,p,d:,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,P,N,D:I:G:"
 # Prefix for an error message due to wrong arguments
 ERROR="ERROR parsing arguments:"
 
-# Architecture-dependent flags. Since by default Frama-C uses 32-bit
-# architecture we need to make sure that same architecture is used for
-# instrumentation and for compilation.
-MACHDEPFLAGS="`getconf LONG_BIT`"
-# Check if getconf gives out the value accepted by Frama-C/GCC
-echo "$MACHDEPFLAGS" | grep '16\|32\|64' \
-  || error "$MACHDEPFLAGS-bit architecture not supported"
-# -machdep option sent to frama-c
-MACHDEP="-machdep gcc_x86_$MACHDEPFLAGS"
-# Macro for correct preprocessing of Frama-C generated code
-CPPMACHDEP="-D__FC_MACHDEP_X86_$MACHDEPFLAGS"
-# GCC machine option
-GCCMACHDEP="-m$MACHDEPFLAGS"
-
-# Gcc
-CC="`check_tool 'gcc'`"
-CFLAGS="-std=c99 $GCCMACHDEP -g3 -O2 -pedantic -fno-builtin -Wall \
-    -Wno-long-long \
-    -Wno-attributes \
-    -Wno-unused-result \
-    -Wno-unused-value \
-    -Wno-unused-function \
-    -Wno-unused-variable \
-    -Wno-unused-but-set-variable \
-    -Wno-implicit-function-declaration \
-    -Wno-attributes"
-CPPFLAGS=""
-LDFLAGS=""
-# Frama-C
-FRAMAC="`check_tool 'frama-c'`"
-FRAMAC_CONGIG="`check_tool 'frama-c-config'`"
-FRAMAC_FLAGS="-implicit-function-declaration ignore"
-
-# E-ACSL source that needed for compilation
-FRAMA_C_SHARE="`$FRAMAC_CONGIG -print-share-path`"
-EACSL_SHARE="$FRAMA_C_SHARE/e-acsl"
-RTL="$EACSL_SHARE/e_acsl.c                      \
-  $EACSL_SHARE/memory_model/e_acsl_mmodel.c     \
-  $EACSL_SHARE/memory_model/e_acsl_bittree.c    \
-"
-
-# CPP and LD flags for compilation of E-ACSL-generated sources
-EACSL_CPP_FLAGS="
-    -D__FC_errno=(*__errno_location())
-    -D__builtin_printf=printf
-    -D__builtin_memcpy=memcpy"
-EACSL_LD_FLAGS="-lgmp -lm"
-
 # Variables holding getopt options
-OPTION_FRAMAC_EXTRA=                     # Extra Frama-C options
+OPTION_CFLAGS=                           # Compiler flags
+OPTION_CPPFLAGS=                         # Preprocessor flags
+OPTION_LDFLAGS=                          # Linker flags
+OPTION_FRAMAC="frama-c"                  # Frama-C executable name
+OPTION_CC="gcc"                          # GCC executable name
 OPTION_ECHO="set -x"                     # Echo executed commands to STDOUT
 OPTION_INSTRUMENT=1                      # Perform E-ACSL instrumentation
 OPTION_PRINT=                            # Output instrumented code
-OPTION_DEBUG=                            # Set frama-c debug flag
-OPTION_VERBOSE=                          # Set frama-c verbose flag
+OPTION_DEBUG=                            # Set Frama-C debug flag
+OPTION_VERBOSE=                          # Set Frama-C verbose flag
 OPTION_COMPILE=                          # Compile instrumented program
-OPTION_OCODE="a.out.frama.c"             # Name of the translated file
-OPTION_OEXEC="a.out"                     # Generated executable name
+OPTION_OUTPUT_CODE="a.out.frama.c"       # Name of the translated file
+OPTION_OUTPUT_EXEC="a.out"               # Generated executable name
 OPTION_EACSL="-e-acsl -then-last"        # Specifies E-ACSL run
 OPTION_FRAMA_STDLIB="-no-frama-c-stdlib" # Use Frama-C stdlib
 OPTION_FULL_MMODEL=                      # Instrument as much as possible
 OPTION_GMP=                              # Use GMP integers everywhere
-OPTION_EXTRA_CPP="-I$FRAMA_C_SHARE/libc $CPPMACHDEP" # Extra CPP flags
+OPTION_DEBUG_MACRO="-DE_ACSL_DEBUG"      # Debug macro
+OPTION_DEBUG_LOG_MACRO=""                # Specification of debug log file
+OPTION_FRAMAC_CPP_EXTRA=""               # Extra CPP flags for Frama-C
+OPTION_EACSL_MMODEL="bittree"            # Memory model used
+# The following option controls whether to use gcc builtins
+# (e.g., __builtin_strlen) in RTL or fall back to custom implementations
+# of standard functions.
+OPTION_BUILTINS="-DE_ACSL_BUILTINS"
 
 manpage() {
-  echo "NAME"
-  echo "  e-acsl-gcc -- convenience wrapper for instrumentation of C files with"
-  echo "   the E-ACSL Frama-C plugin and their subsequent compilation using"
-  echo "   GNU compiler collection (GCC)"
-  echo ""
-  echo "SYNOPSIS"
-  echo "  e-acsl-gcc <OPTIONS> <C-FILES>"
-  echo ""
-  echo "OPTIONS"
-  echo "  -h, --help"
-  echo "      show this help page"
-  echo "  -c, --compile"
-  echo "      compile generated and original files"
-  echo "  -C, --compile-only"
-  echo "      compile input files as if they were generated by E-ACSL"
-  echo "  -p, --print"
-  echo "      output the code generated by E-ACSL to STDOUT"
-  echo "  -d, --debug <N>"
-  echo "      pass a value to Frama-C -debug option"
-  echo "  -o, --ocode <FILENAME>"
-  echo "      name of the output source file, defaults to a.out.frama.c"
-  echo "  -O, --oexec <FILENAME>"
-  echo "      name of the executable generated from the un-instrumented code."
-  echo "      Executable compiled from the E-ACSL instrumented sources is"
-  echo "      appended .e.acsl suffix. Defaults to a.out and a.out.e-acsl"
-  echo "  -v, --verbose <N>"
-  echo "      pass a value to Frama-C -verbose option"
-  echo "  -f, --frama-c-only"
-  echo "      run input source files through Frama-C without E-ACSL"
-  echo "  -E, --extra-cpp-args <FLAGS>"
-  echo "      pass additional arguments to the Frama-C pre-processor"
-  echo "  -R, --rtl"
-  echo "      output E_ACSL runtime libraries to STDOUT"
-  echo "  -L, --frama-c-stdlib"
-  echo "      use Frama-C standard library"
-  echo "  -M, --full-mmodel"
-  echo "      maximise memory-related instrumentation"
-  echo "  -g, --gmp"
-  echo "      always use GMP integers instead of C integral types"
-  echo "  -l, --ld-flags <FLAGS>"
-  echo "      pass the specified flags to the linker"
-  echo "  -e, --cpp-flags <FLAGS>"
-  echo "      pass the specified flags to the pre-processor (compile-time)"
-  echo "  -q, --quiet"
-  echo "      suppress any output except for errors and warnings"
-  echo "  -s, --logfile <FILE>"
-  echo "      redirect all output to a given log file"
-  echo "  -F, --frama-c-extra <OPTION>"
-  echo "      pass an extra option to frama-c invocation"
-  echo ""
-  echo "EXAMPLES:"
-  echo "  # Instrument foo.c and output the instrumented code to a.out.frama.c"
-  echo "      e-acsl-gcc.sh foo.c"
-  echo "  # Instrument foo.c, output the instrumented code to gen_foo.c and"
-  echo "  # compile foo.c into foo and gen_foo.c into foo.e-acsl"
-  echo "      e-acsl-gcc.sh -c -ogen_foo.c -Ofoo foo.c"
-  echo "  # Assume gen_foo.c has been instrumented by E-ACSL and compile it"
-  echo "  # into a.out.e-acsl"
-  echo "      e-acsl-gcc.sh -C gen_foo.c"
+  printf "e-acsl-gcc.sh - instrument and compile C files with E-ACSL
+Usage: e-acsl-gcc.sh [options] files
+Options:
+  -h         show this help page
+  -c         compile instrumented code
+  -l         pass additional options to the linker
+  -e         pass additional options to the pre-preprocessor
+  -E         pass additional arguments to the Frama-C pre-processor
+  -p         output the generated code with rich formatting to STDOUT
+  -o <file>  output the generated code to <file> [a.out.frama.c]
+  -O <file>  output the generated executables to <file> [a.out, a.out.e-acsl]
+  -M         maximise memory-related instrumentation
+  -g         always use GMP integers instead of C integral types
+  -q         suppress any output except for errors and warnings
+  -s <file>  redirect all output to <file>
+  -P         compile executable without debug features
+  -I <file>  specify Frama-C executable [frama-c]
+  -G <file>  specify C compiler executable [gcc]
+
+Notes:
+  This help page shows only basic options.
+  See man (1) e-acsl-gcc.sh for full up-to-date documentation.\n"
   exit 1
 }
 
@@ -217,16 +144,16 @@ do
     ;;
     # Redirect all output to a given file
     --logfile|-s)
-        shift;
-        exec > $1
-        exec 2> $1
-        shift;
+      shift;
+      exec > $1
+      exec 2> $1
+      shift;
     ;;
-    # Pass an option to a frama-c invocation
+    # Pass an option to a Frama-C invocation
     --frama-c-extra|-F)
-        shift;
-        OPTION_FRAMAC_EXTRA="$OPTION_FRAMAC_EXTRA $1"
-        shift;
+      shift;
+      FRAMAC_FLAGS="$FRAMAC_FLAGS $1"
+      shift;
     ;;
     # Do compile instrumented code
     --compile|-c)
@@ -262,32 +189,32 @@ do
     # code is to be written
     --ocode|-o)
       shift;
-      OPTION_OCODE="$1"
+      OPTION_OUTPUT_CODE="$1"
       shift
     ;;
     # Specify the base name of the executable generated from the
     # instrumented and non-instrumented sources.
     --oexec|-O)
       shift;
-      OPTION_OEXEC="$1"
+      OPTION_OUTPUT_EXEC="$1"
       shift
     ;;
     # Additional CPP arguments
     --extra-cpp-args|-E)
       shift;
-      OPTION_EXTRA_CPP="$OPTION_EXTRA_CPP$1"
+      OPTION_FRAMAC_CPP_EXTRA="$OPTION_FRAMAC_CPP_EXTRA $1"
       shift;
     ;;
     # Additional flags passed to the linker
     --ld-flags|-l)
       shift;
-      LDFLAGS="$LDFLAGS $1"
+      OPTION_LDFLAGS="$OPTION_LDFLAGS $1"
       shift;
     ;;
     # Additional flags passed to the pre-processor (compile-time)
     --cpp-flags|-e)
       shift;
-      CPPFLAGS="$CPPFLAGS $1"
+      OPTION_CPPFLAGS="$OPTION_CPPFLAGS $1"
       shift;
     ;;
     # Do not perform the instrumentation, only compile the provided sources
@@ -298,15 +225,10 @@ do
       OPTION_INSTRUMENT=
       OPTION_COMPILE="1"
     ;;
-    # Run only frama-c related instrumentation
+    # Run only Frama-C related instrumentation
     --frama-c-only|-f)
       shift;
       OPTION_EACSL=
-    ;;
-    # Output the RTL files
-    --rtl|-R)
-      echo $RTL
-      exit 0;
     ;;
     # Do use Frama-C stdlib, which is the default behaviour of Frama-C
     --frama-c-stdlib|-L)
@@ -323,14 +245,123 @@ do
       shift;
       OPTION_GMP="-e-acsl-gmp-only"
     ;;
+    -P|--production)
+      shift;
+      OPTION_DEBUG_MACRO=""
+    ;;
+    -N|--no-stdlib)
+      shift;
+      OPTION_BUILTINS=""
+    ;;
+    -D|--debug-log)
+      shift;
+      OPTION_DEBUG_LOG_MACRO="-DE_ACSL_DEBUG_LOG=$1"
+      shift;
+    ;;
+    # Supply Frama-C executable name
+    -I|--frama-c)
+      shift;
+      OPTION_FRAMAC="$1"
+      shift;
+    ;;
+    # Supply GCC executable name
+    -G|--gcc)
+      shift;
+      OPTION_CC="$1"
+      shift;
+    ;;
+    # A memory model to link against
+    -m|--memory-model)
+      shift;
+      echo $1 | grep "\(tree\|bittree\|splay_tree\|list\)"
+      error "no such memory model: $1" $?
+      OPTION_EACSL_MMODEL="$1"
+      shift;
+    ;;
   esac
 done
 shift;
 
 # Bail if no files to translate are given
-if test -z "$1"; then
+if [ -z "$1" ]; then
   error "no input files";
 fi
+
+# Architecture-dependent flags. Since by default Frama-C uses 32-bit
+# architecture we need to make sure that same architecture is used for
+# instrumentation and for compilation.
+MACHDEPFLAGS="`getconf LONG_BIT`"
+# Check if getconf gives out the value accepted by Frama-C/GCC
+echo "$MACHDEPFLAGS" | grep '16\|32\|64' 2>&1 >/dev/null \
+  || error "$MACHDEPFLAGS-bit architecture not supported"
+# -machdep option sent to Frama-C
+MACHDEP="-machdep gcc_x86_$MACHDEPFLAGS"
+# Macro for correct preprocessing of Frama-C generated code
+CPPMACHDEP="-D__FC_MACHDEP_X86_$MACHDEPFLAGS"
+# GCC machine option
+GCCMACHDEP="-m$MACHDEPFLAGS"
+
+# Check if Frama-C and GCC executable names
+check_tool "$OPTION_FRAMAC"
+check_tool "$OPTION_CC"
+
+# Frama-C and related flags
+FRAMAC="$OPTION_FRAMAC"
+FRAMAC_FLAGS=""
+FRAMAC_SHARE="`$FRAMAC -print-share-path`"
+FRAMAC_CPP_EXTRA="
+  $OPTION_FRAMAC_CPP_EXTRA
+  -D$EACSL_MACRO_ID
+  -I$FRAMAC_SHARE/libc
+  $CPPMACHDEP"
+EACSL_SHARE="$FRAMAC_SHARE/e-acsl"
+EACSL_MMODEL="$OPTION_EACSL_MMODEL"
+
+# Macro that identifies E-ACSL compilation. Passed to Frama-C
+# and GCC runs but not to the original compilation
+EACSL_MACRO_ID="__E_ACSL__"
+
+# Gcc and related flags
+CC="$OPTION_CC"
+CFLAGS="$OPTION_CFLAGS
+  -std=c99 $GCCMACHDEP -g3 -O2 -pedantic -fno-builtin
+  -Wall \
+  -Wno-long-long \
+  -Wno-attributes \
+  -Wno-unused \
+  -Wno-unused-function \
+  -Wno-unused-result \
+  -Wno-unused-value \
+  -Wno-unused-function \
+  -Wno-unused-variable \
+  -Wno-unused-but-set-variable \
+  -Wno-implicit-function-declaration \
+  -Wno-unknown-warning-option \
+  -Wno-extra-semi \
+  -Wno-tautological-compare \
+  -Wno-gnu-empty-struct \
+  -Wno-incompatible-pointer-types-discards-qualifiers \
+  -Wno-empty-body"
+CPPFLAGS="$OPTION_CPPFLAGS"
+LDFLAGS="$OPTION_LDFLAGS"
+
+# C, CPP and LD flags for compilation of E-ACSL-generated sources
+EACSL_CFLAGS=""
+EACSL_CPPFLAGS="
+  -I$EACSL_SHARE
+  -D$EACSL_MACRO_ID
+  -D__FC_errno=(*__errno_location())"
+EACSL_LDFLAGS="-lgmp -lm"
+# Memory model sources
+EACSL_RTL="$EACSL_SHARE/e_acsl.c \
+  $EACSL_SHARE/memory_model/e_acsl_mmodel.c \
+  $EACSL_SHARE/memory_model/e_acsl_$OPTION_EACSL_MMODEL.c"
+
+# Output file names
+OUTPUT_CODE="$OPTION_OUTPUT_CODE" # E-ACSL instrumented source
+OUTPUT_EXEC="$OPTION_OUTPUT_EXEC" # Output name of the original executable
+# Output name of E-ACSL-modified executable
+EACSL_OUTPUT_EXEC="$OPTION_OUTPUT_EXEC.e-acsl"
 
 # Instrument
 if [ -n "$OPTION_INSTRUMENT" ]; then
@@ -338,8 +369,7 @@ if [ -n "$OPTION_INSTRUMENT" ]; then
     $FRAMAC \
     $FRAMAC_FLAGS \
     $MACHDEP \
-    $OPTION_FRAMAC_EXTRA \
-    -cpp-extra-args="$OPTION_EXTRA_CPP" \
+    -cpp-extra-args="$OPTION_FRAMAC_CPP_EXTRA" \
     -e-acsl-share $EACSL_SHARE \
     $OPTION_VERBOSE \
     $OPTION_DEBUG \
@@ -349,27 +379,36 @@ if [ -n "$OPTION_INSTRUMENT" ]; then
     "$@" \
     $OPTION_EACSL \
     -print \
-    -ocode "$OPTION_OCODE");
-    error "aborted by frama-c" $?;
+    -ocode "$OPTION_OUTPUT_CODE");
+    error "aborted by Frama-C" $?;
   # Print translated code
   if [ -n "$OPTION_PRINT" ]; then
-    $CAT $OPTION_OCODE
+    $CAT $OPTION_OUTPUT_CODE
   fi
 fi
 
 # Compile
-if test -n "$OPTION_COMPILE"  ; then
+if [ -n "$OPTION_COMPILE" ]; then
   # Compile the original files only if the instrumentation option is given,
   # otherwise the provided sources are assumed to be E-ACSL instrumented files
   if [ -n "$OPTION_INSTRUMENT" ]; then
-    ($OPTION_ECHO; $CC $CPPFLAGS $CFLAGS "$@" -o "$OPTION_OEXEC" $LDFLAGS);
+    ($OPTION_ECHO; $CC $CPPFLAGS $CFLAGS "$@" -o "$OUTPUT_EXEC" $LDFLAGS);
     error "fail to compile/link un-instrumented code: $@" $?;
   else
-    OPTION_OCODE="$@"
+    OUTPUT_CODE="$@"
   fi
   # Compile and link E-ACSL-instrumented file
-  ($OPTION_ECHO; $CC $CPPFLAGS $CFLAGS $EACSL_CPP_FLAGS $RTL \
-    "$OPTION_OCODE" -o "$OPTION_OEXEC.e-acsl" $LDFLAGS $EACSL_LD_FLAGS)
+  ($OPTION_ECHO;
+   $CC \
+     $CFLAGS $CPPFLAGS \
+     $EACSL_CFLAGS $EACSL_CPPFLAGS \
+     $EACSL_RTL \
+     $OPTION_DEBUG_MACRO \
+     $OPTION_DEBUG_LOG_MACRO \
+     $OPTION_BUILTINS \
+     -o "$EACSL_OUTPUT_EXEC" \
+     "$OUTPUT_CODE" \
+     $LDFLAGS $EACSL_LDFLAGS)
   error "fail to compile/link instrumented code: $@" $?;
 fi
 exit 0;

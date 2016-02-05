@@ -15,10 +15,13 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
+-  E-ACSL       [2016/02/03] Added scripts/testrun.sh - a convenience wrapper
+	        around e-acsl-gcc.sh for use with testing.
+-* E-ACSL       [2016/01/15] Fix installation with custom --prefix.
 -* E-ACSL       [2016/01/05] Fix bug in the memory model that caused the
 	        tracked size of heap memory be computed incorrectly.
--  E-ACSL       [2015/12/15] Added a convenience script for small runs of the
-	        E-ACSL plugin.
+-  E-ACSL       [2015/12/15] Added a convenience script e-acsl-gcc.sh for
+	        small runs of the E-ACSL plugin.
 -* E-ACSL       [2015/12/08] Fix bug #1817 about incorrect initialization of
 	        literal strings in global arrays with compound initializers.
 -* E-ACSL       [2015/11/06] Fix a crash occuring when using a recent libc
