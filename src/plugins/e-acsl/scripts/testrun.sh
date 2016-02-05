@@ -60,7 +60,9 @@ RUNS=1
 # Error reporting
 error() {
   echo "Error: $1" 1>&2
-  echo "See $2 for details" 1>&2
+  if [ -n "$DEBUG" ]; then
+    echo "See $2 for details" 1>&2
+  fi
   exit 1
 }
 
