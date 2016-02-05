@@ -144,6 +144,7 @@ int main(void)
   /*@ assert ¬\freeable(p); */
   {
     int __e_acsl_freeable;
+    /*@ assert Value: initialisation: \initialized(&p); */
     __e_acsl_freeable = __freeable((void *)p);
     e_acsl_assert(! __e_acsl_freeable,(char *)"Assertion",(char *)"main",
                   (char *)"!\\freeable(p)",15);

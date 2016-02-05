@@ -6,7 +6,7 @@ struct __anonstruct___mpz_struct_1 {
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
-typedef unsigned int size_t;
+typedef unsigned long size_t;
 struct list {
    int element ;
    struct list *next ;
@@ -102,7 +102,7 @@ extern size_t __memory_size;
 void *__e_acsl_malloc(size_t size)
 {
   void *__retres;
-  __store_block((void *)(& __retres),4U);
+  __store_block((void *)(& __retres),8UL);
   __retres = __malloc(size);
   __delete_block((void *)(& __retres));
   return __retres;
@@ -116,8 +116,8 @@ predicate diffSize{L1, L2}(ℤ i) =
 struct list *add(struct list *l, int i)
 {
   struct list *new;
-  __store_block((void *)(& new),4U);
-  __store_block((void *)(& l),4U);
+  __store_block((void *)(& new),8UL);
+  __store_block((void *)(& l),8UL);
   __full_init((void *)(& new));
   new = (struct list *)__e_acsl_malloc(sizeof(struct list));
   /*@ assert \valid(new); */
@@ -148,7 +148,7 @@ int main(void)
 {
   int __retres;
   struct list *l;
-  __store_block((void *)(& l),4U);
+  __store_block((void *)(& l),8UL);
   __full_init((void *)(& l));
   l = (struct list *)0;
   __full_init((void *)(& l));

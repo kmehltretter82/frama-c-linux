@@ -6,7 +6,7 @@ struct __anonstruct___mpz_struct_1 {
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
-typedef unsigned int size_t;
+typedef unsigned long size_t;
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
@@ -56,14 +56,14 @@ int main(void)
   e_acsl_assert(0 != ~ 0,(char *)"Assertion",(char *)"main",
                 (char *)"0 != ~0",14);
   /*@ assert x+1 ≡ -2; */
-  e_acsl_assert((long long)x + (long long)1 == (long long)(-2),
-                (char *)"Assertion",(char *)"main",(char *)"x+1 == -2",16);
+  e_acsl_assert((long)x + (long)1 == (long)(-2),(char *)"Assertion",
+                (char *)"main",(char *)"x+1 == -2",16);
   /*@ assert x-1 ≡ -4; */
-  e_acsl_assert((long long)x - (long long)1 == (long long)(-4),
-                (char *)"Assertion",(char *)"main",(char *)"x-1 == -4",17);
+  e_acsl_assert((long)x - (long)1 == (long)(-4),(char *)"Assertion",
+                (char *)"main",(char *)"x-1 == -4",17);
   /*@ assert x*3 ≡ -9; */
-  e_acsl_assert((long long)x * (long long)3 == (long long)(-9),
-                (char *)"Assertion",(char *)"main",(char *)"x*3 == -9",18);
+  e_acsl_assert((long)x * (long)3 == (long)(-9),(char *)"Assertion",
+                (char *)"main",(char *)"x*3 == -9",18);
   /*@ assert x/3 ≡ -1; */
   e_acsl_assert(x / 3 == -1,(char *)"Assertion",(char *)"main",
                 (char *)"x/3 == -1",19);
@@ -80,10 +80,9 @@ int main(void)
   e_acsl_assert(3 % -2 == 1,(char *)"Assertion",(char *)"main",
                 (char *)"3%-2 == 1",23);
   /*@ assert ((x*2+(3+y))-4)+(x-y) ≡ -10; */
-  e_acsl_assert((((long long)x * (long long)2 + ((long long)3 + (long long)y)) - (long long)4) + (
-                (long long)x - (long long)y) == (long long)(-10),
-                (char *)"Assertion",(char *)"main",
-                (char *)"((x*2+(3+y))-4)+(x-y) == -10",25);
+  e_acsl_assert((((long)x * (long)2 + ((long)3 + (long)y)) - (long)4) + (
+                (long)x - (long)y) == (long)(-10),(char *)"Assertion",
+                (char *)"main",(char *)"((x*2+(3+y))-4)+(x-y) == -10",25);
   /*@ assert (0≡1) ≡ !(0≡0); */
   e_acsl_assert((0 == 1) == ! (0 == 0),(char *)"Assertion",(char *)"main",
                 (char *)"(0==1) == !(0==0)",27);

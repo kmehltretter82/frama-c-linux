@@ -6,7 +6,7 @@ struct __anonstruct___mpz_struct_1 {
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
-typedef unsigned int size_t;
+typedef unsigned long size_t;
 struct list {
    int element ;
    struct list *next ;
@@ -96,8 +96,8 @@ predicate diffSize{L1, L2}(ℤ i) =
 struct list *f(struct list *l)
 {
   struct list *__retres;
-  __store_block((void *)(& __retres),4U);
-  __store_block((void *)(& l),4U);
+  __store_block((void *)(& __retres),8UL);
+  __store_block((void *)(& l),8UL);
   if (l == (struct list *)0) {
     __full_init((void *)(& __retres));
     __retres = l;
@@ -132,9 +132,9 @@ struct list *__e_acsl_f(struct list *l)
   struct list *__e_acsl_at_2;
   int __e_acsl_at;
   struct list *__retres;
-  __store_block((void *)(& __retres),4U);
-  __store_block((void *)(& l),4U);
-  __store_block((void *)(& __e_acsl_at_4),4U);
+  __store_block((void *)(& __retres),8UL);
+  __store_block((void *)(& l),8UL);
+  __store_block((void *)(& __e_acsl_at_4),8UL);
   __e_acsl_at_4 = l;
   {
     int __e_acsl_valid;
@@ -152,6 +152,7 @@ struct list *__e_acsl_f(struct list *l)
                                            sizeof(struct list *));
         e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"f",
                       (char *)"mem_access: \\valid_read(&l->next)",21);
+        /*@ assert Value: mem_access: \valid_read(&l->next); */
         __e_acsl_valid_2 = __valid((void *)l->next,sizeof(struct list));
         __e_acsl_and = __e_acsl_valid_2;
       }
@@ -161,9 +162,9 @@ struct list *__e_acsl_f(struct list *l)
     else __e_acsl_and_2 = 0;
     __e_acsl_at_3 = __e_acsl_and_2;
   }
-  __store_block((void *)(& __e_acsl_at_2),4U);
+  __store_block((void *)(& __e_acsl_at_2),8UL);
   __e_acsl_at_2 = l;
-  __store_block((void *)(& __e_acsl_at),4U);
+  __store_block((void *)(& __e_acsl_at),4UL);
   __e_acsl_at = l == (void *)0;
   __retres = f(l);
   {

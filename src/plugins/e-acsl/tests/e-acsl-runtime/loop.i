@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: loop invariants
    STDOPT: +"-slevel 160"
-   EXECNOW: LOG gen_loop.c BIN gen_loop.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/loop.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_loop.c > /dev/null && ./gcc_runtime.sh loop
+   COMMENT: no diff
    EXECNOW: LOG gen_loop2.c BIN gen_loop2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/loop.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_loop2.c > /dev/null && ./gcc_runtime.sh loop2
 */
 

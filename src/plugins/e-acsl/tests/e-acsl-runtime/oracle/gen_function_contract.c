@@ -6,7 +6,7 @@ struct __anonstruct___mpz_struct_1 {
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
-typedef unsigned int size_t;
+typedef unsigned long size_t;
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
@@ -141,15 +141,15 @@ void __e_acsl_j(void)
 {
   e_acsl_assert(X == 5,(char *)"Precondition",(char *)"j",(char *)"X == 5",
                 29);
-  e_acsl_assert((long long)X == (long long)3 + (long long)Y,
-                (char *)"Precondition",(char *)"j",(char *)"X == 3+Y",32);
+  e_acsl_assert((long)X == (long)3 + (long)Y,(char *)"Precondition",
+                (char *)"j",(char *)"X == 3+Y",32);
   e_acsl_assert(Y == 2,(char *)"Precondition",(char *)"j",(char *)"Y == 2",
                 33);
   j();
   e_acsl_assert(X == 3,(char *)"Postcondition",(char *)"j",(char *)"X == 3",
                 30);
-  e_acsl_assert((long long)X == (long long)Y + (long long)1,
-                (char *)"Postcondition",(char *)"j",(char *)"X == Y+1",34);
+  e_acsl_assert((long)X == (long)Y + (long)1,(char *)"Postcondition",
+                (char *)"j",(char *)"X == Y+1",34);
   return;
 }
 
@@ -197,7 +197,7 @@ void __e_acsl_k(void)
                   (char *)"X == 3 && Y == 2 ==> X == 3",44);
     if (X == 3) __e_acsl_and_2 = Y == 2; else __e_acsl_and_2 = 0;
     if (! __e_acsl_and_2) __e_acsl_implies_3 = 1;
-    else __e_acsl_implies_3 = (long long)X + (long long)Y == (long long)5;
+    else __e_acsl_implies_3 = (long)X + (long)Y == (long)5;
     e_acsl_assert(__e_acsl_implies_3,(char *)"Precondition",(char *)"k",
                   (char *)"X == 3 && Y == 2 ==> X+Y == 5",45);
     k();
@@ -280,7 +280,7 @@ void __e_acsl_m(void)
     e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",(char *)"m",
                   (char *)"\\old(X == 5 && Y == 2) ==> X == 7",62);
     if (! __e_acsl_at_3) __e_acsl_implies_3 = 1;
-    else __e_acsl_implies_3 = (long long)X == (long long)__e_acsl_at_4 + (long long)Y;
+    else __e_acsl_implies_3 = (long)X == (long)__e_acsl_at_4 + (long)Y;
     e_acsl_assert(__e_acsl_implies_3,(char *)"Postcondition",(char *)"m",
                   (char *)"\\old(X == 5 && Y == 2) ==> X == \\old(X)+Y",63);
     return;

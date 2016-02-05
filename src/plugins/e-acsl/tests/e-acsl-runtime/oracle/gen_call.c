@@ -6,7 +6,7 @@ struct __anonstruct___mpz_struct_1 {
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
-typedef unsigned int size_t;
+typedef unsigned long size_t;
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
@@ -89,7 +89,7 @@ extern size_t __memory_size;
 void *__e_acsl_malloc(size_t size)
 {
   void *__retres;
-  __store_block((void *)(& __retres),4U);
+  __store_block((void *)(& __retres),8UL);
   __retres = __malloc(size);
   __delete_block((void *)(& __retres));
   return __retres;
@@ -103,8 +103,8 @@ predicate diffSize{L1, L2}(ℤ i) =
 /*@ ensures \valid(\result); */
 int *f(int *x, int *y)
 {
-  __store_block((void *)(& x),4U);
-  __store_block((void *)(& y),4U);
+  __store_block((void *)(& x),8UL);
+  __store_block((void *)(& y),8UL);
   __initialize((void *)y,sizeof(int));
   *y = 1;
   __delete_block((void *)(& x));
@@ -116,9 +116,9 @@ int *f(int *x, int *y)
 int *__e_acsl_f(int *x, int *y)
 {
   int *__retres;
-  __store_block((void *)(& __retres),4U);
-  __store_block((void *)(& x),4U);
-  __store_block((void *)(& y),4U);
+  __store_block((void *)(& __retres),8UL);
+  __store_block((void *)(& x),8UL);
+  __store_block((void *)(& y),8UL);
   __retres = f(x,y);
   {
     int __e_acsl_valid;
@@ -139,9 +139,9 @@ int main(void)
   int *p;
   int *q;
   int *r;
-  __store_block((void *)(& q),4U);
-  __store_block((void *)(& p),4U);
-  __store_block((void *)(& x),4U);
+  __store_block((void *)(& q),8UL);
+  __store_block((void *)(& p),8UL);
+  __store_block((void *)(& x),4UL);
   __full_init((void *)(& x));
   x = 0;
   __full_init((void *)(& q));

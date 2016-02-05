@@ -20,8 +20,10 @@
   _E ∈ {44}
   _G[0].str ∈ {{ "First" }}
     [0].num ∈ {99}
+    [0].[bits 96 to 127] ∈ {0}
     [1].str ∈ {{ "Second" }}
     [1].num ∈ {147}
+    [1].[bits 96 to 127] ∈ {0}
   __e_acsl_literal_string ∈ {0}
   __e_acsl_literal_string_2 ∈ {0}
   __e_acsl_literal_string_3 ∈ {0}

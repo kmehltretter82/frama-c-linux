@@ -10,7 +10,7 @@ struct __anonstruct___mpz_struct_1 {
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
-typedef unsigned int size_t;
+typedef unsigned long size_t;
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
@@ -129,11 +129,11 @@ void __e_acsl_memory_init(void)
   __store_block((void *)__e_acsl_literal_string_2,sizeof("bar"));
   __full_init((void *)__e_acsl_literal_string_2);
   __literal_string((void *)__e_acsl_literal_string_2);
-  __store_block((void *)(& S2),4U);
+  __store_block((void *)(& S2),8UL);
   __full_init((void *)(& S2));
-  __store_block((void *)(& S),4U);
+  __store_block((void *)(& S),8UL);
   __full_init((void *)(& S));
-  __store_block((void *)(& T),4U);
+  __store_block((void *)(& T),8UL);
   __full_init((void *)(& T));
   return;
 }
@@ -143,7 +143,7 @@ int main(void)
   int __retres;
   char *SS;
   __e_acsl_memory_init();
-  __store_block((void *)(& SS),4U);
+  __store_block((void *)(& SS),8UL);
   __full_init((void *)(& SS));
   SS = (char *)__e_acsl_literal_string;
   /*@ assert *(S+G2) ≡ 'o'; */

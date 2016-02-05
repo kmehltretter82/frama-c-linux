@@ -1,2 +1,4 @@
-OPT: -check -e-acsl -then-last -kernel-verbose 0 -val -no-val-print -no-val-show-progress -no-results
+LOG: gen_@PTEST_NAME@.c
+OPT: -machdep gcc_x86_64 -check -e-acsl -then-last -print -ocode tests/e-acsl-runtime/result/gen_@PTEST_NAME@.c -kernel-verbose 0 -val -no-val-print -no-val-show-progress -no-results
+EXECNOW: ./scripts/testrun.sh @PTEST_NAME@ e-acsl-runtime
 OPT: -check -e-acsl -e-acsl-gmp-only -then-last -kernel-verbose 0 -val -no-val-print -no-val-show-progress -no-results

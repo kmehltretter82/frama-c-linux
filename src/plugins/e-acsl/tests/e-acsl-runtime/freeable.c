@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: \freeable
    STDOPT: +"-val-builtin __malloc:Frama_C_alloc_size -val-builtin __free:Frama_C_free"
-   EXECNOW: LOG gen_freeable.c BIN gen_freeable.out @frama-c@ -machdep gcc_x86_64 -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/freeable.c -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_freeable.c > /dev/null && ./gcc_runtime.sh freeable
+   COMMENT: no diff
    EXECNOW: LOG gen_freeable2.c BIN gen_freeable2.out @frama-c@ -machdep gcc_x86_64 -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/freeable.c -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_freeable2.c > /dev/null && ./gcc_runtime.sh freeable2
 */
 

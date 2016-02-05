@@ -1,6 +1,6 @@
 /* run.config
    COMMENT: non integer constants
-   EXECNOW: LOG gen_other_constants.c BIN gen_other_constants.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/other_constants.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_other_constants.c > /dev/null && ./gcc_runtime.sh other_constants
+   COMMENT: no diff
    EXECNOW: LOG gen_other_constants2.c BIN gen_other_constants2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/other_constants.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_other_constants2.c > /dev/null && ./gcc_runtime.sh other_constants2
 */
 

@@ -565,6 +565,7 @@ int main(void)
     __e_acsl_initialized_17 = __initialized((void *)(& a),sizeof(int *));
     if (__e_acsl_initialized_17) {
       int __e_acsl_valid_18;
+      /*@ assert Value: dangling_pointer: ¬\dangling(&a); */
       __e_acsl_valid_18 = __valid((void *)a,sizeof(int));
       __e_acsl_and_27 = __e_acsl_valid_18;
     }

@@ -28,6 +28,10 @@ tests/e-acsl-runtime/mainargs.c:14:[value] warning: assertion got status unknown
 tests/e-acsl-runtime/mainargs.c:14:[value] entering loop for the first time
 tests/e-acsl-runtime/mainargs.c:15:[value] warning: assertion got status unknown.
 [value] using specification for function __block_length
+[value] using specification for function __gmpz_init_set_ui
+[value] using specification for function __gmpz_init_set_si
+[value] using specification for function __gmpz_cmp
+[value] using specification for function __gmpz_clear
 tests/e-acsl-runtime/mainargs.c:17:[value] warning: assertion got status unknown.
 [value] using specification for function __valid_read
 tests/e-acsl-runtime/mainargs.c:17:[kernel] warning: out of bounds read. assert \valid_read(argv+argc);

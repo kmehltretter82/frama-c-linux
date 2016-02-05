@@ -6,7 +6,7 @@ struct __anonstruct___mpz_struct_1 {
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
-typedef unsigned int size_t;
+typedef unsigned long size_t;
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
@@ -131,6 +131,8 @@ unsigned long long my_pow(unsigned int x, unsigned int n)
     tmp_0 = my_pow(x,n / (unsigned int)2);
     tmp = (int)tmp_0;
   }
+  /*@ assert Value: signed_overflow: -2147483648 ≤ tmp*tmp; */
+  /*@ assert Value: signed_overflow: tmp*tmp ≤ 2147483647; */
   tmp *= tmp;
   if (n % (unsigned int)2 == (unsigned int)0) {
     __retres = (unsigned long long)tmp;
@@ -158,7 +160,7 @@ int main(void)
     unsigned long __e_acsl_4;
     __gmpz_init_set_si(__e_acsl,(long)2);
     __gmpz_init(__e_acsl_x);
-    __gmpz_import(__e_acsl_x,1U,1,8U,0,0U,(void const *)(& x));
+    __gmpz_import(__e_acsl_x,1UL,1,8UL,0,0UL,(void const *)(& x));
     __gmpz_init(__e_acsl_mul);
     __gmpz_mul(__e_acsl_mul,(__mpz_struct const *)(__e_acsl),
                (__mpz_struct const *)(__e_acsl_x));
@@ -176,6 +178,10 @@ int main(void)
     __gmpz_tdiv_r(__e_acsl_mod,(__mpz_struct const *)(__e_acsl_add),
                   (__mpz_struct const *)(__e_acsl));
     __e_acsl_4 = __gmpz_get_ui((__mpz_struct const *)(__e_acsl_mod));
+    /*@ assert
+        Value: ptr_comparison:
+          \pointer_comparable((void *)__e_acsl_4, (void *)1);
+    */
     e_acsl_assert(__e_acsl_4 == 1,(char *)"Assertion",(char *)"main",
                   (char *)"(2*x+1)%2 == 1",19);
     __gmpz_clear(__e_acsl);

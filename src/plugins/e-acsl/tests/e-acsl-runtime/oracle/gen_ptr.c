@@ -6,7 +6,7 @@ struct __anonstruct___mpz_struct_1 {
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
-typedef unsigned int size_t;
+typedef unsigned long size_t;
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
@@ -83,9 +83,9 @@ int main(void)
   int x;
   int t[3];
   int *p;
-  __store_block((void *)(& p),4U);
-  __store_block((void *)(t),12U);
-  __store_block((void *)(& x),4U);
+  __store_block((void *)(& p),8UL);
+  __store_block((void *)(t),12UL);
+  __store_block((void *)(& x),4UL);
   __full_init((void *)(& x));
   x = 1;
   __initialize((void *)(t),sizeof(int));
@@ -130,19 +130,14 @@ int main(void)
                     (char *)"index_bound: i < 3",19);
       e_acsl_assert(0 <= i,(char *)"RTE",(char *)"main",
                     (char *)"index_bound: 0 <= i",19);
-      e_acsl_assert((long long)t[i] == (long long)i + (long long)2,
-                    (char *)"Assertion",(char *)"main",(char *)"t[i] == i+2",
-                    19);
+      e_acsl_assert((long)t[i] == (long)i + (long)2,(char *)"Assertion",
+                    (char *)"main",(char *)"t[i] == i+2",19);
       /*@ assert t[2-i] ≡ 4-i; */
-      e_acsl_assert((long long)2 - (long long)i < (long long)3,(char *)"RTE",
-                    (char *)"main",
-                    (char *)"index_bound: (long long)(2-(long long)i) < 3",
-                    20);
-      e_acsl_assert(0LL <= (long long)2 - (long long)i,(char *)"RTE",
-                    (char *)"main",
-                    (char *)"index_bound: 0 <= (long long)(2-(long long)i)",
-                    20);
-      e_acsl_assert((long long)t[(long long)2 - (long long)i] == (long long)4 - (long long)i,
+      e_acsl_assert((long)2 - (long)i < (long)3,(char *)"RTE",(char *)"main",
+                    (char *)"index_bound: (long)(2-(long)i) < 3",20);
+      e_acsl_assert(0L <= (long)2 - (long)i,(char *)"RTE",(char *)"main",
+                    (char *)"index_bound: 0 <= (long)(2-(long)i)",20);
+      e_acsl_assert((long)t[(long)2 - (long)i] == (long)4 - (long)i,
                     (char *)"Assertion",(char *)"main",
                     (char *)"t[2-i] == 4-i",20);
       /*@ assert *(&t[2]-i) ≡ 4-i; */
@@ -152,7 +147,7 @@ int main(void)
                                              sizeof(int));
         e_acsl_assert(__e_acsl_valid_read_2,(char *)"RTE",(char *)"main",
                       (char *)"mem_access: \\valid_read(&t[2]-i)",21);
-        e_acsl_assert((long long)*(& t[2] - i) == (long long)4 - (long long)i,
+        e_acsl_assert((long)*(& t[2] - i) == (long)4 - (long)i,
                       (char *)"Assertion",(char *)"main",
                       (char *)"*(&t[2]-i) == 4-i",21);
       }

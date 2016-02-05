@@ -1,6 +1,6 @@
 /* run.config
    COMMENT: terms and predicates using lazy operators
-   EXECNOW: LOG gen_lazy.c BIN gen_lazy.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/lazy.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_lazy.c > /dev/null && ./gcc_runtime.sh lazy -Wno-div-by-zero
+   COMMENT: no diff
    EXECNOW: LOG gen_lazy2.c BIN gen_lazy2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/lazy.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_lazy2.c > /dev/null && ./gcc_runtime.sh lazy2
 */
 

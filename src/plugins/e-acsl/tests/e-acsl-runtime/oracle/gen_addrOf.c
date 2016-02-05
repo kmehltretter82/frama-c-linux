@@ -6,7 +6,7 @@ struct __anonstruct___mpz_struct_1 {
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
-typedef unsigned int size_t;
+typedef unsigned long size_t;
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
@@ -69,9 +69,9 @@ void f(void)
   int m;
   int *u;
   int *p;
-  __store_block((void *)(& p),4U);
-  __store_block((void *)(& u),4U);
-  __store_block((void *)(& m),4U);
+  __store_block((void *)(& p),8UL);
+  __store_block((void *)(& u),8UL);
+  __store_block((void *)(& m),4UL);
   __full_init((void *)(& u));
   u = & m;
   __full_init((void *)(& p));

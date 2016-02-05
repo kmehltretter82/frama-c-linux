@@ -6,7 +6,7 @@ struct __anonstruct___mpz_struct_1 {
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
-typedef unsigned int size_t;
+typedef unsigned long size_t;
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
@@ -55,7 +55,7 @@ int __e_acsl_f(int x)
   __e_acsl_at_2 = x;
   __e_acsl_at = x;
   __retres = f(x);
-  e_acsl_assert(__retres == (int)((long long)__e_acsl_at - (long long)__e_acsl_at_2),
+  e_acsl_assert(__retres == (int)((long)__e_acsl_at - (long)__e_acsl_at_2),
                 (char *)"Postcondition",(char *)"f",
                 (char *)"\\result == (int)(\\old(x)-\\old(x))",7);
   return __retres;

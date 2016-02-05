@@ -6,7 +6,7 @@ struct __anonstruct___mpz_struct_1 {
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
-typedef unsigned int size_t;
+typedef unsigned long size_t;
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
@@ -113,7 +113,7 @@ extern size_t __memory_size;
 void *__e_acsl_malloc(size_t size)
 {
   void *__retres;
-  __store_block((void *)(& __retres),4U);
+  __store_block((void *)(& __retres),8UL);
   __retres = __malloc(size);
   __delete_block((void *)(& __retres));
   return __retres;
@@ -143,7 +143,7 @@ void __e_acsl_free(void *p)
   int __e_acsl_at;
   {
     int __e_acsl_implies;
-    __store_block((void *)(& p),4U);
+    __store_block((void *)(& p),8UL);
     if (! (p != (void *)0)) __e_acsl_implies = 1;
     else {
       int __e_acsl_freeable;
@@ -152,7 +152,7 @@ void __e_acsl_free(void *p)
     }
     e_acsl_assert(__e_acsl_implies,(char *)"Precondition",(char *)"free",
                   (char *)"p != \\null ==> \\freeable(p)",178);
-    __store_block((void *)(& __e_acsl_at),4U);
+    __store_block((void *)(& __e_acsl_at),4UL);
     __e_acsl_at = p != (void *)0;
     __free(p);
   }
@@ -171,8 +171,8 @@ int main(void)
   int *a;
   int *b;
   int n;
-  __store_block((void *)(& b),4U);
-  __store_block((void *)(& a),4U);
+  __store_block((void *)(& b),8UL);
+  __store_block((void *)(& a),8UL);
   n = 0;
   /*@ assert ¬\valid(a) ∧ ¬\valid(b); */
   {
@@ -261,6 +261,7 @@ int main(void)
     __e_acsl_initialized_6 = __initialized((void *)(& a),sizeof(int *));
     if (__e_acsl_initialized_6) {
       int __e_acsl_valid_5;
+      /*@ assert Value: dangling_pointer: ¬\dangling(&a); */
       __e_acsl_valid_5 = __valid((void *)a,sizeof(int));
       __e_acsl_and_8 = __e_acsl_valid_5;
     }
@@ -271,6 +272,7 @@ int main(void)
       __e_acsl_initialized_7 = __initialized((void *)(& b),sizeof(int *));
       if (__e_acsl_initialized_7) {
         int __e_acsl_valid_6;
+        /*@ assert Value: dangling_pointer: ¬\dangling(&b); */
         __e_acsl_valid_6 = __valid((void *)b,sizeof(int));
         __e_acsl_and_9 = __e_acsl_valid_6;
       }

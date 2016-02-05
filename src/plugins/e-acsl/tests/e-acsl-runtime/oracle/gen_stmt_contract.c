@@ -6,7 +6,7 @@ struct __anonstruct___mpz_struct_1 {
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
-typedef unsigned int size_t;
+typedef unsigned long size_t;
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
@@ -84,17 +84,15 @@ int main(void)
   {
     e_acsl_assert(x == 5,(char *)"Precondition",(char *)"main",
                   (char *)"x == 5",24);
-    e_acsl_assert((long long)x == (long long)3 + (long long)y,
-                  (char *)"Precondition",(char *)"main",(char *)"x == 3+y",
-                  27);
+    e_acsl_assert((long)x == (long)3 + (long)y,(char *)"Precondition",
+                  (char *)"main",(char *)"x == 3+y",27);
     e_acsl_assert(y == 2,(char *)"Precondition",(char *)"main",
                   (char *)"y == 2",28);
     x = 3;
     e_acsl_assert(x == 3,(char *)"Postcondition",(char *)"main",
                   (char *)"x == 3",25);
-    e_acsl_assert((long long)x == (long long)y + (long long)1,
-                  (char *)"Postcondition",(char *)"main",(char *)"x == y+1",
-                  29);
+    e_acsl_assert((long)x == (long)y + (long)1,(char *)"Postcondition",
+                  (char *)"main",(char *)"x == y+1",29);
   }
   /*@ behavior b1:
         assumes x ≡ 1;
@@ -122,7 +120,7 @@ int main(void)
                   (char *)"x == 3 && y == 2 ==> x == 3",38);
     if (x == 3) __e_acsl_and_2 = y == 2; else __e_acsl_and_2 = 0;
     if (! __e_acsl_and_2) __e_acsl_implies_3 = 1;
-    else __e_acsl_implies_3 = (long long)x + (long long)y == (long long)5;
+    else __e_acsl_implies_3 = (long)x + (long)y == (long)5;
     e_acsl_assert(__e_acsl_implies_3,(char *)"Precondition",(char *)"main",
                   (char *)"x == 3 && y == 2 ==> x+y == 5",39);
     x += y;

@@ -6,7 +6,7 @@ struct __anonstruct___mpz_struct_1 {
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
-typedef unsigned int size_t;
+typedef unsigned long size_t;
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
@@ -106,7 +106,7 @@ void nested_loops(void)
               e_acsl_assert(0 <= __e_acsl_k,(char *)"RTE",
                             (char *)"nested_loops",
                             (char *)"index_bound: 0 <= __e_acsl_k",21);
-              if ((long long)t[__e_acsl_k][__e_acsl_l] == (long long)__e_acsl_k * (long long)__e_acsl_l) 
+              if ((long)t[__e_acsl_k][__e_acsl_l] == (long)__e_acsl_k * (long)__e_acsl_l) 
                 ;
               else {
                 __e_acsl_forall = 0;
@@ -159,7 +159,11 @@ void nested_loops(void)
                   e_acsl_assert(0 <= __e_acsl_k_2,(char *)"RTE",
                                 (char *)"nested_loops",
                                 (char *)"index_bound: 0 <= __e_acsl_k_2",21);
-                  if ((long long)t[__e_acsl_k_2][__e_acsl_l_2] == (long long)__e_acsl_k_2 * (long long)__e_acsl_l_2) 
+                  /*@ assert
+                      Value: initialisation:
+                        \initialized(&t[__e_acsl_k_2][__e_acsl_l_2]);
+                  */
+                  if ((long)t[__e_acsl_k_2][__e_acsl_l_2] == (long)__e_acsl_k_2 * (long)__e_acsl_l_2) 
                     ;
                   else {
                     __e_acsl_forall_2 = 0;

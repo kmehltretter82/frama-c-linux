@@ -6,7 +6,7 @@ struct __anonstruct___mpz_struct_1 {
 };
 typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
 typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
-typedef unsigned int size_t;
+typedef unsigned long size_t;
 /*@ requires predicate ≢ 0;
     assigns \nothing; */
 extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
@@ -87,7 +87,7 @@ extern size_t __memory_size;
 void *__e_acsl_malloc(size_t size)
 {
   void *__retres;
-  __store_block((void *)(& __retres),4U);
+  __store_block((void *)(& __retres),8UL);
   __retres = __malloc(size);
   __delete_block((void *)(& __retres));
   return __retres;
@@ -109,7 +109,7 @@ void f(void)
 void g(int *C, int *D)
 {
   /*@ assert \initialized(&C); */
-  __store_block((void *)(& C),4U);
+  __store_block((void *)(& C),8UL);
   e_acsl_assert(1,(char *)"Assertion",(char *)"g",
                 (char *)"\\initialized(&C)",19);
   __delete_block((void *)(& C));
@@ -118,9 +118,9 @@ void g(int *C, int *D)
 
 void __e_acsl_memory_init(void)
 {
-  __store_block((void *)(& B),4U);
+  __store_block((void *)(& B),8UL);
   __full_init((void *)(& B));
-  __store_block((void *)(& A),4U);
+  __store_block((void *)(& A),8UL);
   __full_init((void *)(& A));
   return;
 }
@@ -131,8 +131,8 @@ int main(void)
   int *x;
   int *y;
   __e_acsl_memory_init();
-  __store_block((void *)(& y),4U);
-  __store_block((void *)(& x),4U);
+  __store_block((void *)(& y),8UL);
+  __store_block((void *)(& x),8UL);
   B = (int *)__e_acsl_malloc(sizeof(int));
   __full_init((void *)(& y));
   y = (int *)__e_acsl_malloc(sizeof(int));

@@ -470,6 +470,7 @@ int main(int argc, char **argv)
     __e_acsl_valid_read = __valid_read((void *)(argv + argc),sizeof(char *));
     e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"main",
                   (char *)"mem_access: \\valid_read(argv+argc)",17);
+    /*@ assert Value: mem_access: \valid_read(argv+argc); */
     e_acsl_assert(*(argv + argc) == (void *)0,(char *)"Assertion",
                   (char *)"main",(char *)"*(argv+argc) == \\null",17);
   }
@@ -486,6 +487,7 @@ int main(int argc, char **argv)
                                            sizeof(char *));
       e_acsl_assert(__e_acsl_valid_read_2,(char *)"RTE",(char *)"main",
                     (char *)"mem_access: \\valid_read(argv+argc)",18);
+      /*@ assert Value: mem_access: \valid_read(argv+argc); */
       __e_acsl_valid_4 = __valid((void *)*(argv + argc),sizeof(char));
       __e_acsl_and = __e_acsl_valid_4;
     }
