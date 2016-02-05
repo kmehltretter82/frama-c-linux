@@ -98,7 +98,7 @@ Options:
   -s <file>  redirect all output to <file>
   -P         compile executable without debug features
   -I <file>  specify Frama-C executable [frama-c]
-  -G <file>  specify GCC executable [gcc]
+  -G <file>  specify C compiler executable [gcc]
 
 Notes:
   This help page shows only basic options.
@@ -335,7 +335,13 @@ CFLAGS="$OPTION_CFLAGS
   -Wno-unused-function \
   -Wno-unused-variable \
   -Wno-unused-but-set-variable \
-  -Wno-implicit-function-declaration"
+  -Wno-implicit-function-declaration \
+  -Wno-unknown-warning-option \
+  -Wno-extra-semi \
+  -Wno-tautological-compare \
+  -Wno-gnu-empty-struct \
+  -Wno-incompatible-pointer-types-discards-qualifiers \
+  -Wno-empty-body"
 CPPFLAGS="$OPTION_CPPFLAGS"
 LDFLAGS="$OPTION_LDFLAGS"
 
