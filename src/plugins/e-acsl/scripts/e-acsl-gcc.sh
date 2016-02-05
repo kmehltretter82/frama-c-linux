@@ -96,7 +96,7 @@ Options:
     -g         always use GMP integers instead of C integral types
     -q         suppress any output except for errors and warnings
     -s <file>  redirect all output to <file>
-    -P         compile executatle without debug features
+    -P         compile executable without debug features
     -I <file>  specify Frama-C executable [frama-c]
     -G <file>  specify GCC executable [gcc]
 
