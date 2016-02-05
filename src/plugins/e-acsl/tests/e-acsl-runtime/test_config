@@ -1,4 +1,4 @@
 LOG: gen_@PTEST_NAME@.c
-OPT: -machdep gcc_x86_64 -check -e-acsl -then-last -load-script tests/print.ml -print -ocode tests/e-acsl-runtime/result/gen_@PTEST_NAME@.c -kernel-verbose 0 -val -no-val-print -no-val-show-progress -no-results
+OPT: -machdep gcc_x86_64 -check -e-acsl -then-last -load-script tests/print.cmxs -print -ocode tests/e-acsl-runtime/result/gen_@PTEST_NAME@.c -kernel-verbose 0 -val -no-val-print -no-val-show-progress -no-results
 EXECNOW: ./scripts/testrun.sh @PTEST_NAME@ e-acsl-runtime "" "--frama-c=@frama-c@"
 OPT: -check -e-acsl -e-acsl-gmp-only -then-last -kernel-verbose 0 -val -no-val-print -no-val-show-progress -no-results
