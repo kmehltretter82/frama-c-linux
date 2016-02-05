@@ -65,8 +65,8 @@ OPTION_PRINT=                            # Output instrumented code
 OPTION_DEBUG=                            # Set Frama-C debug flag
 OPTION_VERBOSE=                          # Set Frama-C verbose flag
 OPTION_COMPILE=                          # Compile instrumented program
-OPTION_OCODE="a.out.frama.c"             # Name of the translated file
-OPTION_OEXEC="a.out"                     # Generated executable name
+OPTION_OUTPUT_CODE="a.out.frama.c"       # Name of the translated file
+OPTION_OUTPUT_EXEC="a.out"               # Generated executable name
 OPTION_EACSL="-e-acsl -then-last"        # Specifies E-ACSL run
 OPTION_FRAMA_STDLIB="-no-frama-c-stdlib" # Use Frama-C stdlib
 OPTION_FULL_MMODEL=                      # Instrument as much as possible
@@ -189,14 +189,14 @@ do
     # code is to be written
     --ocode|-o)
       shift;
-      OPTION_OCODE="$1"
+      OPTION_OUTPUT_CODE="$1"
       shift
     ;;
     # Specify the base name of the executable generated from the
     # instrumented and non-instrumented sources.
     --oexec|-O)
       shift;
-      OPTION_OEXEC="$1"
+      OPTION_OUTPUT_EXEC="$1"
       shift
     ;;
     # Additional CPP arguments
@@ -352,9 +352,10 @@ EACSL_RTL="$EACSL_SHARE/e_acsl.c \
   $EACSL_SHARE/memory_model/e_acsl_$OPTION_EACSL_MMODEL.c"
 
 # Output file names
-OCODE="$OPTION_OCODE" # E-ACSL instrumented source
-OEXEC="$OPTION_OEXEC" # Output name of the original executable
-EACSL_OEXEC="$OPTION_OEXEC.e-acsl" # Output name of E-ACSL-modified executable
+OUTPUT_CODE="$OPTION_OUTPUT_CODE" # E-ACSL instrumented source
+OUTPUT_EXEC="$OPTION_OUTPUT_EXEC" # Output name of the original executable
+# Output name of E-ACSL-modified executable
+EACSL_OUTPUT_EXEC="$OPTION_OUTPUT_EXEC.e-acsl"
 
 # Instrument
 if [ -n "$OPTION_INSTRUMENT" ]; then
@@ -372,11 +373,11 @@ if [ -n "$OPTION_INSTRUMENT" ]; then
     "$@" \
     $OPTION_EACSL \
     -print \
-    -ocode "$OPTION_OCODE");
+    -ocode "$OPTION_OUTPUT_CODE");
     error "aborted by Frama-C" $?;
   # Print translated code
   if [ -n "$OPTION_PRINT" ]; then
-    $CAT $OPTION_OCODE
+    $CAT $OPTION_OUTPUT_CODE
   fi
 fi
 
@@ -385,10 +386,10 @@ if [ -n "$OPTION_COMPILE" ]; then
   # Compile the original files only if the instrumentation option is given,
   # otherwise the provided sources are assumed to be E-ACSL instrumented files
   if [ -n "$OPTION_INSTRUMENT" ]; then
-    ($OPTION_ECHO; $CC $CPPFLAGS $CFLAGS "$@" -o "$OEXEC" $LDFLAGS);
+    ($OPTION_ECHO; $CC $CPPFLAGS $CFLAGS "$@" -o "$OUTPUT_EXEC" $LDFLAGS);
     error "fail to compile/link un-instrumented code: $@" $?;
   else
-    OCODE="$@"
+    OUTPUT_CODE="$@"
   fi
   # Compile and link E-ACSL-instrumented file
   ($OPTION_ECHO;
@@ -399,8 +400,8 @@ if [ -n "$OPTION_COMPILE" ]; then
      $OPTION_DEBUG_MACRO \
      $OPTION_DEBUG_LOG_MACRO \
      $OPTION_BUILTINS \
-     -o "$EACSL_OEXEC" \
-     "$OCODE" \
+     -o "$EACSL_OUTPUT_EXEC" \
+     "$OUTPUT_CODE" \
      $LDFLAGS $EACSL_LDFLAGS)
   error "fail to compile/link instrumented code: $@" $?;
 fi
