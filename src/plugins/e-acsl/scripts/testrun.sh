@@ -29,7 +29,8 @@
 #   3. Compare outputs of the above
 
 # Arguments:
-#   $1 - base name of the source file to use (e.g., addrOf)
+#   $1 - base name of the source file to use excluding an
+#     extension (e.g., addrOf)
 #   $2 - base name of the test suite directory the test file is located in.
 #     (for instance e-acsl-runtime). Provided that ROOT is the directory
 #     holding the E-ACSL repository there should be either:
@@ -37,10 +38,14 @@
 #     $ROOT/test/e-acsl-runtime/addrOf.c
 #   $3 - if specified this script re-runs test sequence generating using
 #       -e-acsl-gmp-only option
+#   $4 - debug flag
 
-PREFIX="$1" # Prefix (test suite) directory, e.g., bts, e-acsl-runtime
-TEST="$2" # Based name of the test file with extension stripped
+set -e
+
+TEST="$1" # Based name of the test file with extension stripped
+PREFIX="$2" # Prefix (test suite) directory, e.g., bts, e-acsl-runtime
 GMP="$3" # Whether to use a subsequent run with -e-acsl-gmp-only
+DEBUG="$4" # Debug flag
 
 ROOTDIR="`readlink -f $(dirname $0)/../`" # Root directory of the repository
 TESTDIR="$ROOTDIR/tests/$PREFIX"
@@ -52,15 +57,22 @@ LOG="$RESDIR/$TEST.testrun" # Base name for log files
 OUT="$RESDIR/gen_$TEST"     # Base name for output
 RUNS=1
 
-# Remove all old logs and executables before running new tests
-rm -f $LOG.* $OUT.*
-
 # Error reporting
 error() {
   echo "Error: $1" 1>&2
   echo "See $2 for details" 1>&2
   exit 1
 }
+
+# Clean up log/output files unless the DEBUG flag is set
+clean() {
+    if [ -z "$DEBUG" ]; then
+        rm -f $LOG.* $OUT.*
+    fi
+}
+
+ # Do clean up on exit
+trap "clean" EXIT HUP INT QUIT TERM
 
 # Instrument the given test using e-acsl-gcc.sh and compare outputs of the
 # executables generated from instrumented and non-instrumented sources
@@ -95,3 +107,4 @@ run_test
 if test -n "$GMP"; then
   run_test "--gmp"
 fi
+exit 0
