@@ -144,16 +144,16 @@ do
     ;;
     # Redirect all output to a given file
     --logfile|-s)
-        shift;
-        exec > $1
-        exec 2> $1
-        shift;
+      shift;
+      exec > $1
+      exec 2> $1
+      shift;
     ;;
     # Pass an option to a Frama-C invocation
     --frama-c-extra|-F)
-        shift;
-        FRAMAC_FLAGS="$FRAMAC_FLAGS $1"
-        shift;
+      shift;
+      FRAMAC_FLAGS="$FRAMAC_FLAGS $1"
+      shift;
     ;;
     # Do compile instrumented code
     --compile|-c)
@@ -254,21 +254,21 @@ do
       OPTION_BUILTINS=""
     ;;
     -D|--debug-log)
-        shift;
-        OPTION_DEBUG_LOG_MACRO="-DE_ACSL_DEBUG_LOG=$1"
-        shift;
+      shift;
+      OPTION_DEBUG_LOG_MACRO="-DE_ACSL_DEBUG_LOG=$1"
+      shift;
     ;;
     # Supply Frama-C executable name
     -I|--frama-c)
-        shift;
-        OPTION_FRAMAC="$1"
-        shift;
+      shift;
+      OPTION_FRAMAC="$1"
+      shift;
     ;;
     # Supply GCC executable name
     -G|--gcc)
-        shift;
-        OPTION_CC="$1"
-        shift;
+      shift;
+      OPTION_CC="$1"
+      shift;
     ;;
     # A memory model to link against
     -m|--memory-model)
