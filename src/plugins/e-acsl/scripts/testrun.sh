@@ -57,12 +57,16 @@ LOG="$RESDIR/$TEST.testrun" # Base name for log files
 OUT="$RESDIR/gen_$TEST"     # Base name for output
 RUNS=1
 
+debug() {
+  if [ -n "$DEBUG" ]; then
+    echo "$1" 1>&2
+  fi
+}
+
 # Error reporting
 error() {
   echo "Error: $1" 1>&2
-  if [ -n "$DEBUG" ]; then
-    echo "See $2 for details" 1>&2
-  fi
+  debug "See $2 for details"
   exit 1
 }
 
@@ -91,11 +95,14 @@ run_test() {
     --compile $TESTFILE --ocode=$ocode --logfile=$logfile
     --memory-model=$MODEL --oexec=$oexec $extra"
 
+  debug "Run $EACSL_GCC"
   $EACSL_GCC || error "Command $EACSL_GCC failed" "$logfile"
 
   # Log outputs of the generated executables
-  $oexec         2>&1 > $oexeclog.native
-  $oexec.e-acsl  2>&1 > $oexeclog.e-acsl
+  debug "Run and log native execution to $oexeclog.native"
+  $oexec        2>&1 > $oexeclog.native
+  debug "Run and log E-ACSL execution to $oexeclog.e-acsl"
+  $oexec.e-acsl 2>&1 > $oexeclog.e-acsl
 
   ## Make sure that instrumented and uninstrumented programs have same outputs
   diff $oexeclog.native $oexeclog.e-acsl ||
