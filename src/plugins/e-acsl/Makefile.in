@@ -138,6 +138,7 @@ install::
 	$(PRINT_INSTALL) E-ACSL scripts
 	$(MKDIR) $(BINDIR)
 	$(CP) $(E_ACSL_DIR)/scripts/e-acsl-gcc.sh $(BINDIR)/
+	$(PRINT_INSTALL) man pages
 	$(CP) $(E_ACSL_DIR)/man/e-acsl-gcc.sh.1 $(MANDIR)/man1/
 
 uninstall::
@@ -149,6 +150,7 @@ uninstall::
 	      $(FRAMAC_SHARE)/manuals/e-acsl-manual.pdf
 	$(PRINT_RM) E-ACSL scripts
 	$(RM) $(BINDIR)/e-acsl-gcc.sh
+	$(PRINT_RM) man pages
 	$(RM) $(MANDIR)/man1/e-acsl-gcc.sh.1
 
 ################################
