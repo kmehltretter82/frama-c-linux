@@ -38,14 +38,16 @@
 #     $ROOT/test/e-acsl-runtime/addrOf.c
 #   $3 - if specified this script re-runs test sequence generating using
 #       -e-acsl-gmp-only option
-#   $4 - debug flag
+#   $4 - extra flags for e-acsl-gcc.sh
+#   $5 - debug flag
 
 set -e
 
 TEST="$1" # Based name of the test file with extension stripped
 PREFIX="$2" # Prefix (test suite) directory, e.g., bts, e-acsl-runtime
 GMP="$3" # Whether to use a subsequent run with -e-acsl-gmp-only
-DEBUG="$4" # Debug flag
+EXTRA="$4" # Extra flags for e-acsl-gcc.sh
+DEBUG="$5" # Debug flag
 
 ROOTDIR="`readlink -f $(dirname $0)/../`" # Root directory of the repository
 TESTDIR="$ROOTDIR/tests/$PREFIX"
@@ -112,8 +114,8 @@ run_test() {
   RUNS=$((RUNS+1))
 }
 
-run_test
+run_test "$EXTRA"
 if test -n "$GMP"; then
-  run_test "--gmp"
+  run_test "--gmp $EXTRA"
 fi
 exit 0
