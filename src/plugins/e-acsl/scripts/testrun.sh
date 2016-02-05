@@ -87,7 +87,7 @@ run_test() {
 
   # Command for instrumenting the source file and compiling the original
   # and the instrumented code
-  EACSL_GCC="e-acsl-gcc.sh
+  EACSL_GCC="./scripts/e-acsl-gcc.sh
     --compile $TESTFILE --ocode=$ocode --logfile=$logfile
     --memory-model=$MODEL --oexec=$oexec $extra"
 
