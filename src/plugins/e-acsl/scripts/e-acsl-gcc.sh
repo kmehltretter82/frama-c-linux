@@ -84,21 +84,21 @@ manpage() {
   printf "e-acsl-gcc.sh - instrument and compile C files with E-ACSL
 Usage: e-acsl-gcc.sh [options] files
 Options:
-    -h         show this help page
-    -c         compile instrumented code
-    -l         pass additional options to the linker
-    -e         pass additional options to the pre-preprocessor
-    -E         pass additional arguments to the Frama-C pre-processor
-    -p         output the generated code with rich formatting to STDOUT
-    -o <file>  output the generated code to <file> [a.out.frama.c]
-    -O <file>  output the generated executables to <file> [a.out, a.out.e-acsl]
-    -M         maximise memory-related instrumentation
-    -g         always use GMP integers instead of C integral types
-    -q         suppress any output except for errors and warnings
-    -s <file>  redirect all output to <file>
-    -P         compile executable without debug features
-    -I <file>  specify Frama-C executable [frama-c]
-    -G <file>  specify GCC executable [gcc]
+  -h         show this help page
+  -c         compile instrumented code
+  -l         pass additional options to the linker
+  -e         pass additional options to the pre-preprocessor
+  -E         pass additional arguments to the Frama-C pre-processor
+  -p         output the generated code with rich formatting to STDOUT
+  -o <file>  output the generated code to <file> [a.out.frama.c]
+  -O <file>  output the generated executables to <file> [a.out, a.out.e-acsl]
+  -M         maximise memory-related instrumentation
+  -g         always use GMP integers instead of C integral types
+  -q         suppress any output except for errors and warnings
+  -s <file>  redirect all output to <file>
+  -P         compile executable without debug features
+  -I <file>  specify Frama-C executable [frama-c]
+  -G <file>  specify GCC executable [gcc]
 
 Notes:
   This help page shows only basic options.
@@ -324,27 +324,27 @@ EACSL_MACRO_ID="__E_ACSL__"
 # Gcc and related flags
 CC="$OPTION_CC"
 CFLAGS="$OPTION_CFLAGS
-    -std=c99 $GCCMACHDEP -g3 -O2 -pedantic -fno-builtin
-    -Wall \
-    -Wno-long-long \
-    -Wno-attributes \
-    -Wno-unused \
-    -Wno-unused-function \
-    -Wno-unused-result \
-    -Wno-unused-value \
-    -Wno-unused-function \
-    -Wno-unused-variable \
-    -Wno-unused-but-set-variable \
-    -Wno-implicit-function-declaration"
+  -std=c99 $GCCMACHDEP -g3 -O2 -pedantic -fno-builtin
+  -Wall \
+  -Wno-long-long \
+  -Wno-attributes \
+  -Wno-unused \
+  -Wno-unused-function \
+  -Wno-unused-result \
+  -Wno-unused-value \
+  -Wno-unused-function \
+  -Wno-unused-variable \
+  -Wno-unused-but-set-variable \
+  -Wno-implicit-function-declaration"
 CPPFLAGS="$OPTION_CPPFLAGS"
 LDFLAGS="$OPTION_LDFLAGS"
 
 # C, CPP and LD flags for compilation of E-ACSL-generated sources
 EACSL_CFLAGS=""
 EACSL_CPPFLAGS="
-    -I$EACSL_SHARE
-    -D$EACSL_MACRO_ID
-    -D__FC_errno=(*__errno_location())"
+  -I$EACSL_SHARE
+  -D$EACSL_MACRO_ID
+  -D__FC_errno=(*__errno_location())"
 EACSL_LDFLAGS="-lgmp -lm"
 # Memory model sources
 EACSL_RTL="$EACSL_SHARE/e_acsl.c \
