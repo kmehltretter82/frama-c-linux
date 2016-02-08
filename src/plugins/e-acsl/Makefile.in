@@ -116,7 +116,7 @@ ifeq (@MAY_RUN_TESTS@,yes)
 $(PLUGIN_DIR)/tests/print.cmxs: OFLAGS=-I $(FRAMAC_LIBDIR)
 $(PLUGIN_DIR)/tests/print.cmo: BFLAGS=-I $(FRAMAC_LIBDIR)
 
-PLUGIN_TESTS_DIRS:=e-acsl-reject e-acsl-runtime bts
+PLUGIN_TESTS_DIRS:=e-acsl-reject e-acsl-runtime bts gmp
 E_ACSL_TESTS: $(PLUGIN_DIR)/tests/test_config \
 	$(PLUGIN_DIR)/tests/print.cmxs \
 	$(PLUGIN_DIR)/tests/print.cmo
