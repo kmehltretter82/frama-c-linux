@@ -4,16 +4,15 @@ int main(void)
   int __retres;
   int x;
   /*@ assert 0 ≡ 0; */
-  e_acsl_assert(0 == 0,(char *)"Assertion",(char *)"main",(char *)"0 == 0",8);
+  e_acsl_assert(0 == 0,(char *)"Assertion",(char *)"main",(char *)"0 == 0",6);
   x = 0;
   x ++;
   /*@ assert 0 ≢ 1; */
-  e_acsl_assert(0 != 1,(char *)"Assertion",(char *)"main",(char *)"0 != 1",
-                10);
+  e_acsl_assert(0 != 1,(char *)"Assertion",(char *)"main",(char *)"0 != 1",8);
   /*@ assert 1152921504606846975 ≡ 0xfffffffffffffff; */
   e_acsl_assert(1152921504606846975 == 0xfffffffffffffff,(char *)"Assertion",
                 (char *)"main",
-                (char *)"1152921504606846975 == 0xfffffffffffffff",11);
+                (char *)"1152921504606846975 == 0xfffffffffffffff",9);
   /*@ assert
       0xffffffffffffffffffffffffffffffff ≡
       0xffffffffffffffffffffffffffffffff;
@@ -27,7 +26,7 @@ int main(void)
                              (__mpz_struct const *)(__e_acsl));
     e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"main",
                   (char *)"0xffffffffffffffffffffffffffffffff == 0xffffffffffffffffffffffffffffffff",
-                  13);
+                  11);
     __gmpz_clear(__e_acsl);
   }
   __retres = 0;

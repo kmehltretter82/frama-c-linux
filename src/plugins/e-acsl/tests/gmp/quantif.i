@@ -1,7 +1,5 @@
 /* run.config
    COMMENT: quantifiers
-   COMMENT: no diff
-   COMMENT: no diff
 */
 
 int main(void) {

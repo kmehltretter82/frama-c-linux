@@ -1,8 +1,6 @@
 /* run.config
    COMMENT: arithmetic operations
    COMMENT: add the last assertion when fixing BTS #751
-   COMMENT: no diff
-   COMMENT: no diff
 */
 
 int main(void) {

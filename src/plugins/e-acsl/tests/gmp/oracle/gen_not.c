@@ -5,11 +5,11 @@ int main(void)
   int x;
   x = 0;
   /*@ assert x ≡ 0; */
-  e_acsl_assert(x == 0,(char *)"Assertion",(char *)"main",(char *)"x == 0",8);
+  e_acsl_assert(x == 0,(char *)"Assertion",(char *)"main",(char *)"x == 0",6);
   if (x) 
     /*@ assert x ≢ 0; */
     e_acsl_assert(x != 0,(char *)"Assertion",(char *)"main",(char *)"x != 0",
-                  9);
+                  7);
   __retres = 0;
   return __retres;
 }

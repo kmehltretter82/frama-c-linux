@@ -1,8 +1,6 @@
 /* run.config
    COMMENT: arrays
    STDOPT: #"-slevel 5"
-   COMMENT: no diff
-   COMMENT: no diff
 */
 
 int T1[3],T2[4];

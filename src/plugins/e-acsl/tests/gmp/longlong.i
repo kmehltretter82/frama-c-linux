@@ -1,8 +1,6 @@
 /* run.config
    COMMENT: upgrading longlong to GMP
    STDOPT: +"-no-eva -val-ignore-recursive-calls"
-   COMMENT: no diff
-   COMMENT: no diff
 */
 
 unsigned long long my_pow(unsigned int x, unsigned int n) {

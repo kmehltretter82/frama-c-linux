@@ -1,7 +1,5 @@
 /* run.config
    COMMENT: integer constant + a stmt after the assertion
-   COMMENT: no diff
-   COMMENT: no diff
 */
 int main(void) {
   int x;

@@ -55,7 +55,7 @@ int main(void)
     __gmpz_init(__e_acsl_mod);
     /*@ assert E_ACSL: 2 ≢ 0; */
     e_acsl_assert(! (__e_acsl_mod_guard == 0),(char *)"Assertion",
-                  (char *)"main",(char *)"2 == 0",19);
+                  (char *)"main",(char *)"2 == 0",17);
     __gmpz_tdiv_r(__e_acsl_mod,(__mpz_struct const *)(__e_acsl_add),
                   (__mpz_struct const *)(__e_acsl));
     __e_acsl_4 = __gmpz_get_ui((__mpz_struct const *)(__e_acsl_mod));
@@ -64,7 +64,7 @@ int main(void)
           \pointer_comparable((void *)__e_acsl_4, (void *)1);
     */
     e_acsl_assert(__e_acsl_4 == 1,(char *)"Assertion",(char *)"main",
-                  (char *)"(2*x+1)%2 == 1",19);
+                  (char *)"(2*x+1)%2 == 1",17);
     __gmpz_clear(__e_acsl);
     __gmpz_clear(__e_acsl_x);
     __gmpz_clear(__e_acsl_mul);

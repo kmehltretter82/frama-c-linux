@@ -22,6 +22,6 @@ FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] warning: function e_acsl_assert: precond
 [value] using specification for function __gmpz_sub
 [value] using specification for function __gmpz_mul
 [value] using specification for function __gmpz_tdiv_q
-[value] using specification for function __gmpz_init_set_ui
+[value] using specification for function __gmpz_init_set_str
 [value] using specification for function __gmpz_tdiv_r
 [value] done for function main

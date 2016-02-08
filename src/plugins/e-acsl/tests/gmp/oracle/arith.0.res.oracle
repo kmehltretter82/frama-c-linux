@@ -11,4 +11,11 @@
   __e_acsl_internal_heap ∈ [--..--]
   __memory_size ∈ [--..--]
 [value] using specification for function e_acsl_assert
+[value] using specification for function __gmpz_init_set_str
+[value] using specification for function __gmpz_init_set_si
+[value] using specification for function __gmpz_cmp
+[value] using specification for function __gmpz_init
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] warning: function e_acsl_assert: precondition got status unknown.
+[value] using specification for function __gmpz_tdiv_q
+[value] using specification for function __gmpz_clear
 [value] done for function main

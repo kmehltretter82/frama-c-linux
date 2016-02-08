@@ -1,7 +1,5 @@
 /* run.config
    COMMENT: \at
-   COMMENT: no diff
-   COMMENT: no diff
 */
 
 int A = 0;

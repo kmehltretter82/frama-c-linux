@@ -10,14 +10,14 @@
   __e_acsl_init ∈ [--..--]
   __e_acsl_internal_heap ∈ [--..--]
   __memory_size ∈ [--..--]
-tests/gmp/longlong.i:11:[value] warning: recursive call during value analysis
-                 of my_pow (my_pow <- my_pow :: tests/gmp/longlong.i:18 <- main).
+tests/gmp/longlong.i:9:[value] warning: recursive call during value analysis
+                 of my_pow (my_pow <- my_pow :: tests/gmp/longlong.i:16 <- main).
                  Using specification of my_pow.
 [value] user error: Recursive call on an unspecified function. Using potentially invalid
                     inferred assigns 'assigns \result \from x, n;'
 [value] using specification for function my_pow
-tests/gmp/longlong.i:12:[kernel] warning: signed overflow. assert -2147483648 ≤ tmp*tmp;
-tests/gmp/longlong.i:12:[kernel] warning: signed overflow. assert tmp*tmp ≤ 2147483647;
+tests/gmp/longlong.i:10:[kernel] warning: signed overflow. assert -2147483648 ≤ tmp*tmp;
+tests/gmp/longlong.i:10:[kernel] warning: signed overflow. assert tmp*tmp ≤ 2147483647;
 [value] using specification for function __gmpz_init_set_si
 [value] using specification for function __gmpz_init
 [value] using specification for function __gmpz_import
@@ -29,7 +29,7 @@ FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:82:[value] warning: function __gmpz_import: pre
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] warning: function e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_tdiv_r
 [value] using specification for function __gmpz_get_ui
-tests/gmp/longlong.i:19:[kernel] warning: pointer comparison.
+tests/gmp/longlong.i:17:[kernel] warning: pointer comparison.
                   assert \pointer_comparable((void *)__e_acsl_4, (void *)1);
 [value] using specification for function __gmpz_clear
 [value] done for function main
