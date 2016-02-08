@@ -307,7 +307,6 @@ check_tool "$OPTION_CC"
 
 # Frama-C and related flags
 FRAMAC="$OPTION_FRAMAC"
-FRAMAC_FLAGS=""
 FRAMAC_SHARE="`$FRAMAC -print-share-path`"
 FRAMAC_CPP_EXTRA="
   $OPTION_FRAMAC_CPP_EXTRA
