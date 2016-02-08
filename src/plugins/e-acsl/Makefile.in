@@ -139,6 +139,7 @@ install::
 	$(MKDIR) $(BINDIR)
 	$(CP) $(E_ACSL_DIR)/scripts/e-acsl-gcc.sh $(BINDIR)/
 	$(PRINT_INSTALL) man pages
+	$(MKDIR) $(MANDIR)
 	$(CP) $(E_ACSL_DIR)/man/e-acsl-gcc.sh.1 $(MANDIR)/man1/
 
 uninstall::
