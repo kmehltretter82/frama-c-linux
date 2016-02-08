@@ -2,7 +2,7 @@
    COMMENT: function call
    STDOPT: +"-val-builtin __malloc:Frama_C_alloc_size -val-builtin __free:Frama_C_free"
    COMMENT: no diff
-   EXECNOW: LOG gen_call2.c BIN gen_call2.out @frama-c@ -cpp-extra-args="-I`@frama-c@ -print-share-path`/libc" -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/call.c -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_call2.c > /dev/null && ./gcc_runtime.sh call2
+   COMMENT: no diff
 */
 
 #include <stdlib.h>

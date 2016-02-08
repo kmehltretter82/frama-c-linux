@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: Compound initializers
    COMMENT: no diff
-   EXECNOW: LOG gen_compound_initializers2.c BIN gen_compound_initializers2.out @frama-c@ -machdep x86_64 -cpp-extra-args="-I`@frama-c@ -print-share-path`/libc" -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/compound_initializers.c -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_compound_initializers2.c > /dev/null && ./gcc_runtime.sh compound_initializers2
+   COMMENT: no diff
 */
 
 

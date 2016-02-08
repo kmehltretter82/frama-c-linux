@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: pointers and pointer arithmetic
    COMMENT: no diff
-   EXECNOW: LOG gen_ptr2.c BIN gen_ptr2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/ptr.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_ptr2.c > /dev/null && ./gcc_runtime.sh ptr2
+   COMMENT: no diff
 */
 
 int main(void) {

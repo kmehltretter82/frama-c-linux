@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: stmt contract
    COMMENT: no diff
-   EXECNOW: LOG gen_stmt_contract2.c BIN gen_stmt_contract2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/stmt_contract.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_stmt_contract2.c > /dev/null && ./gcc_runtime.sh stmt_contract2
+   COMMENT: no diff
 */
 int main(void) {
   int x = 0, y = 2;

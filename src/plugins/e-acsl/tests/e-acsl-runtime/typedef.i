@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: typedef (from a Bernard's bug report)
    COMMENT: no diff
-   EXECNOW: LOG gen_typedef2.c BIN gen_typedef2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/typedef.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_typedef2.c > /dev/null && ./gcc_runtime.sh typedef2
+   COMMENT: no diff
 */
 
 typedef unsigned char uint8;

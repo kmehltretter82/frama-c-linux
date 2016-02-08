@@ -75,6 +75,8 @@
 /tests/e-acsl-reject/result/*_DEP
 /tests/e-acsl-reject/result/*.log
 /tests/bts/result/*
+/tests/gmp/result/*.log
+/tests/gmp/result/gen*.c
 /tests/check/obj/*
 .frama-c
 tests/ptests_config

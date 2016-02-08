@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: initialization of globals (bts #1818)
    COMMENT: no diff
-   EXECNOW: LOG gen_init2.c BIN gen_init2.out @frama-c@ -machdep x86_64 -cpp-extra-args="-I`@frama-c@ -print-share-path`/libc" -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/init.c -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_init2.c > /dev/null && ./gcc_runtime.sh init2
+   COMMENT: no diff
 */
 
 int a = 0, b;

@@ -2,7 +2,7 @@
    COMMENT: initialized and function calls
    STDOPT: #"-cpp-extra-args=\"-I`@frama-c@ -print-share-path`/libc\""
    COMMENT: no diff
-   EXECNOW: LOG gen_ptr_init2.c BIN gen_ptr_init2.out @frama-c@ -cpp-extra-args="-I`@frama-c@ -print-share-path`/libc" -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/ptr_init.c -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_ptr_init2.c > /dev/null && ./gcc_runtime.sh ptr_init2
+   COMMENT: no diff
 */
 
 #include "stdlib.h"

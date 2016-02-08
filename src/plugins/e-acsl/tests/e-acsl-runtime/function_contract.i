@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: function contract
    COMMENT: no diff
-   EXECNOW: LOG gen_function_contract2.c BIN gen_function_contract2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/function_contract.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_function_contract2.c > /dev/null && ./gcc_runtime.sh function_contract2
+   COMMENT: no diff
 */
 
 int X = 0, Y = 2;

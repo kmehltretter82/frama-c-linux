@@ -2,7 +2,7 @@
    COMMENT: __fc_stdout et __fc_fopen
    STDOPT: #"-pp-annot"
    COMMENT: no diff
-   EXECNOW: LOG gen_stdout2.c BIN gen_stdout2.out @frama-c@ -machdep x86_64 -pp-annot -cpp-extra-args="-I`@frama-c@ -print-share-path`/libc" -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/stdout.c -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_stdout2.c > /dev/null && ./gcc_runtime.sh stdout2
+   COMMENT: no diff
 */
 
 #include<stdio.h>

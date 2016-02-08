@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: structured stmt with several code annotations inside
    COMMENT: no diff
-   EXECNOW: LOG gen_nested_code_annot2.c BIN gen_nested_code_annot2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/nested_code_annot.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_nested_code_annot2.c > /dev/null && ./gcc_runtime.sh nested_code_annot2
+   COMMENT: no diff
 */
 
 int main(void) {

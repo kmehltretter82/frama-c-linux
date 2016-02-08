@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: Checking heap memory size
    COMMENT: no diff
-   EXECNOW: LOG gen_memsize2.c BIN gen_memsize2.out @frama-c@ -machdep=gcc_x86_$(getconf LONG_BIT) -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/memsize.c -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_memsize2.c > /dev/null && ./gcc_runtime.sh memsize2
+   COMMENT: no diff
 */
 
 #include <stdlib.h>

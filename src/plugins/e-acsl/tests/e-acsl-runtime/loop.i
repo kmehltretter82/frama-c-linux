@@ -2,7 +2,7 @@
    COMMENT: loop invariants
    STDOPT: +"-slevel 160"
    COMMENT: no diff
-   EXECNOW: LOG gen_loop2.c BIN gen_loop2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/loop.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_loop2.c > /dev/null && ./gcc_runtime.sh loop2
+   COMMENT: no diff
 */
 
 void simple_loop() {

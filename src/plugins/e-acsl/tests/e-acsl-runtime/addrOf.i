@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: addrOf
    COMMENT: no diff
-   EXECNOW: LOG gen_addrOf2.c BIN gen_addrOf2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/addrOf.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_addrOf2.c > /dev/null && ./gcc_runtime.sh addrOf2
+   COMMENT: no diff
 */
 
 void f(){

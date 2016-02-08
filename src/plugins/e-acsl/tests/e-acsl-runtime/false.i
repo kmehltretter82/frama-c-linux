@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: assert \false
    COMMENT: no diff
-   EXECNOW: LOG gen_false2.c BIN gen_false2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/false.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_false2.c > /dev/null && ./gcc_runtime.sh false2
+   COMMENT: no diff
 */
 int main(void) {
   int x = 0;
