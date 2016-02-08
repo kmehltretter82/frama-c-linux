@@ -20,55 +20,38 @@ FRAMAC_SHARE/libc/string.h:93:[e-acsl] warning: E-ACSL construct `applying logic
   __e_acsl_internal_heap ∈ [--..--]
   __memory_size ∈ [--..--]
 [value] using specification for function __init_args
-tests/e-acsl-runtime/mainargs.c:12:[value] Assertion got status valid.
 [value] using specification for function __store_block
 [value] using specification for function __valid
 [value] using specification for function e_acsl_assert
-FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
-tests/e-acsl-runtime/mainargs.c:13:[value] Assertion got status valid.
-tests/e-acsl-runtime/mainargs.c:14:[value] Assertion got status unknown.
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] warning: function e_acsl_assert: precondition got status unknown.
+tests/e-acsl-runtime/mainargs.c:14:[value] warning: assertion got status unknown.
 [value] using specification for function __gmpz_init
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:39:[value] Function __gmpz_init: precondition got status valid.
 [value] using specification for function __gmpz_init_set_si
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: precondition got status valid.
 [value] using specification for function __gmpz_set
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:94:[value] Function __gmpz_set: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:95:[value] Function __gmpz_set: precondition got status valid.
 [value] using specification for function __gmpz_clear
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:117:[value] Function __gmpz_clear: precondition got status valid.
 tests/e-acsl-runtime/mainargs.c:14:[value] entering loop for the first time
 [value] using specification for function __gmpz_cmp
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:127:[value] Function __gmpz_cmp: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:128:[value] Function __gmpz_cmp: precondition got status valid.
 [value] using specification for function __gmpz_get_ui
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:198:[value] Function __gmpz_get_ui: precondition got status valid.
 [value] using specification for function __gmpz_add
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:143:[value] Function __gmpz_add: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:144:[value] Function __gmpz_add: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:145:[value] Function __gmpz_add: precondition got status valid.
-tests/e-acsl-runtime/mainargs.c:15:[value] Assertion got status unknown.
+tests/e-acsl-runtime/mainargs.c:15:[value] warning: assertion got status unknown.
 [value] using specification for function __block_length
 [value] using specification for function __gmpz_init_set_ui
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:55:[value] Function __gmpz_init_set_ui: precondition got status valid.
 [value] using specification for function __gmpz_mul
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:157:[value] Function __gmpz_mul: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:158:[value] Function __gmpz_mul: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:159:[value] Function __gmpz_mul: precondition got status valid.
-tests/e-acsl-runtime/mainargs.c:17:[value] Assertion got status unknown.
+tests/e-acsl-runtime/mainargs.c:17:[value] warning: assertion got status unknown.
 [value] using specification for function __valid_read
 tests/e-acsl-runtime/mainargs.c:17:[kernel] warning: out of bounds read. assert \valid_read(argv+(long)argc);
-tests/e-acsl-runtime/mainargs.c:18:[value] Assertion got status unknown.
+tests/e-acsl-runtime/mainargs.c:18:[value] warning: assertion got status unknown.
 [value] using specification for function __initialized
 tests/e-acsl-runtime/mainargs.c:18:[kernel] warning: out of bounds read. assert \valid_read(argv+(long)argc);
 tests/e-acsl-runtime/mainargs.c:19:[value] entering loop for the first time
-FRAMAC_SHARE/libc/string.h:91:[value] Function __e_acsl_strlen: precondition 'valid_string_src' got status unknown.
+FRAMAC_SHARE/libc/string.h:91:[value] warning: function __e_acsl_strlen: precondition 'valid_string_src' got status unknown.
 [value] using specification for function strlen
-FRAMAC_SHARE/libc/string.h:91:[value] Function strlen: precondition 'valid_string_src' got status unknown.
+FRAMAC_SHARE/libc/string.h:91:[value] warning: function strlen: precondition 'valid_string_src' got status unknown.
 FRAMAC_SHARE/libc/string.h:91:[value] cannot evaluate ACSL term, unsupported ACSL construct: logic functions or predicates
 [value] using specification for function __delete_block
-FRAMAC_SHARE/libc/string.h:93:[value] Function __e_acsl_strlen: postcondition got status unknown.
-tests/e-acsl-runtime/mainargs.c:21:[value] Assertion got status unknown.
-tests/e-acsl-runtime/mainargs.c:22:[value] Assertion got status unknown.
+FRAMAC_SHARE/libc/string.h:93:[value] warning: function __e_acsl_strlen: postcondition got status unknown.
+tests/e-acsl-runtime/mainargs.c:21:[value] warning: assertion got status unknown.
+tests/e-acsl-runtime/mainargs.c:22:[value] warning: assertion got status unknown.
 tests/e-acsl-runtime/mainargs.c:22:[value] entering loop for the first time
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main

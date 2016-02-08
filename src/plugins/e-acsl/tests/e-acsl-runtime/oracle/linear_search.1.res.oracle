@@ -12,47 +12,33 @@
   __memory_size ∈ [--..--]
   A[0..9] ∈ {0}
 tests/e-acsl-runtime/linear_search.i:30:[value] entering loop for the first time
-tests/e-acsl-runtime/linear_search.i:9:[value] Function __e_acsl_search: precondition got status unknown.
+tests/e-acsl-runtime/linear_search.i:9:[value] warning: function __e_acsl_search: precondition got status unknown.
 [value] using specification for function __gmpz_init
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:39:[value] Function __gmpz_init: precondition got status valid.
 [value] using specification for function __gmpz_init_set_si
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: precondition got status valid.
 [value] using specification for function __gmpz_set
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:94:[value] Function __gmpz_set: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:95:[value] Function __gmpz_set: precondition got status valid.
 [value] using specification for function __gmpz_clear
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:117:[value] Function __gmpz_clear: precondition got status valid.
 tests/e-acsl-runtime/linear_search.i:9:[value] entering loop for the first time
 [value] using specification for function __gmpz_cmp
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:127:[value] Function __gmpz_cmp: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:128:[value] Function __gmpz_cmp: precondition got status valid.
 [value] using specification for function __gmpz_get_ui
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:198:[value] Function __gmpz_get_ui: precondition got status valid.
 tests/e-acsl-runtime/linear_search.i:9:[kernel] warning: accessing out of bounds index. assert __e_acsl_i_2 < 10;
 [value] using specification for function __gmpz_add
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:143:[value] Function __gmpz_add: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:144:[value] Function __gmpz_add: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:145:[value] Function __gmpz_add: precondition got status valid.
 tests/e-acsl-runtime/linear_search.i:9:[kernel] warning: accessing out of bounds index. assert __e_acsl_3 < 10;
 [value] using specification for function e_acsl_assert
-FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] warning: function e_acsl_assert: precondition got status unknown.
 tests/e-acsl-runtime/linear_search.i:14:[value] entering loop for the first time
 tests/e-acsl-runtime/linear_search.i:14:[kernel] warning: accessing out of bounds index. assert __e_acsl_j_4 < 10;
 tests/e-acsl-runtime/linear_search.i:11:[value] entering loop for the first time
 tests/e-acsl-runtime/linear_search.i:11:[kernel] warning: accessing out of bounds index. assert __e_acsl_j_2 < 10;
-tests/e-acsl-runtime/linear_search.i:9:[value] Function search: precondition got status unknown.
+tests/e-acsl-runtime/linear_search.i:9:[value] warning: function search: precondition got status unknown.
 tests/e-acsl-runtime/linear_search.i:20:[value] entering loop for the first time
 tests/e-acsl-runtime/linear_search.i:20:[kernel] warning: accessing out of bounds index. assert __e_acsl_i_2 < 10;
-tests/e-acsl-runtime/linear_search.i:19:[value] Loop invariant got status valid.
-tests/e-acsl-runtime/linear_search.i:20:[value] Loop invariant got status unknown.
+tests/e-acsl-runtime/linear_search.i:20:[value] warning: loop invariant got status unknown.
 tests/e-acsl-runtime/linear_search.i:21:[value] entering loop for the first time
 tests/e-acsl-runtime/linear_search.i:20:[kernel] warning: accessing out of bounds index. assert __e_acsl_i_4 < 10;
-tests/e-acsl-runtime/linear_search.i:12:[value] Function search, behavior exists: postcondition got status invalid. (Behavior may be inactive, no reduction performed.)
-tests/e-acsl-runtime/linear_search.i:12:[value] Function search, behavior exists: postcondition got status valid. (Behavior may be inactive, no reduction performed.)
-tests/e-acsl-runtime/linear_search.i:15:[value] Function search, behavior not_exists: postcondition got status valid. (Behavior may be inactive, no reduction performed.)
-tests/e-acsl-runtime/linear_search.i:15:[value] Function search, behavior not_exists: postcondition got status invalid. (Behavior may be inactive, no reduction performed.)
-tests/e-acsl-runtime/linear_search.i:12:[value] Function __e_acsl_search, behavior exists: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
-tests/e-acsl-runtime/linear_search.i:15:[value] Function __e_acsl_search, behavior not_exists: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
-tests/e-acsl-runtime/linear_search.i:33:[value] Assertion got status unknown.
-tests/e-acsl-runtime/linear_search.i:36:[value] Assertion got status unknown.
+tests/e-acsl-runtime/linear_search.i:12:[value] warning: function search, behavior exists: postcondition got status invalid. (Behavior may be inactive, no reduction performed.)
+tests/e-acsl-runtime/linear_search.i:15:[value] warning: function search, behavior not_exists: postcondition got status invalid. (Behavior may be inactive, no reduction performed.)
+tests/e-acsl-runtime/linear_search.i:12:[value] warning: function __e_acsl_search, behavior exists: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
+tests/e-acsl-runtime/linear_search.i:15:[value] warning: function __e_acsl_search, behavior not_exists: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
+tests/e-acsl-runtime/linear_search.i:33:[value] warning: assertion got status unknown.
+tests/e-acsl-runtime/linear_search.i:36:[value] warning: assertion got status unknown.
 [value] done for function main
