@@ -1,6 +1,6 @@
 /* run.config
    COMMENT: bts #1837, about initialization of literal strings
-   EXECNOW: LOG gen_bts1837.c BIN gen_bts1837.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/bts/bts1837.i -e-acsl -then-last -print -ocode ./tests/bts/result/gen_bts1837.c > /dev/null && ./gcc_bts.sh bts1837
+   COMMENT: no diff
 */
 
 char *S = "foo";

@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: complex term left-values
-   EXECNOW: LOG gen_bts1326.c BIN gen_bts1326.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/bts/bts1326.i -e-acsl -then-on e-acsl -print -ocode ./tests/bts/result/gen_bts1326.c > /dev/null && ./gcc_bts.sh bts1326
-   EXECNOW: LOG gen_bts13262.c BIN gen_bts13262.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/bts/bts1326.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/bts/result/gen_bts13262.c > /dev/null && ./gcc_bts.sh bts13262
+   COMMENT: no diff
+   COMMENT: no diff
 */
 
 typedef int ArrayInt[5];

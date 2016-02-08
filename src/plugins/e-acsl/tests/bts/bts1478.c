@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: bts #1478 about wrong detection of initializers in pre-analysis
-   EXECNOW: LOG gen_bts1478.c BIN gen_bts1478.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/bts/bts1478.c -e-acsl -then-on e-acsl -print -ocode ./tests/bts/result/gen_bts1478.c > /dev/null && ./gcc_bts.sh bts1478
-   EXECNOW: LOG gen_bts14782.c BIN gen_bts14782.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/bts/bts1478.c -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/bts/result/gen_bts14782.c > /dev/null && ./gcc_bts.sh bts14782
+   COMMENT: no diff
+   COMMENT: no diff
 */
 
 int global_i;
