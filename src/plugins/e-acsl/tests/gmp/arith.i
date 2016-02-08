@@ -2,7 +2,7 @@
    COMMENT: arithmetic operations
    COMMENT: add the last assertion when fixing BTS #751
    COMMENT: no diff
-   EXECNOW: LOG gen_arith2.c BIN gen_arith2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/gmp/arith.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/gmp/result/gen_arith2.c > /dev/null && ./gcc_runtime.sh arith2
+   COMMENT: no diff
 */
 
 int main(void) {

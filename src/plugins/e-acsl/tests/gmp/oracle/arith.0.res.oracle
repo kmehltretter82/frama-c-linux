@@ -10,24 +10,5 @@
   __e_acsl_init ∈ [--..--]
   __e_acsl_internal_heap ∈ [--..--]
   __memory_size ∈ [--..--]
-tests/gmp/arith.i:12:[value] Assertion got status valid.
 [value] using specification for function e_acsl_assert
-FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
-tests/gmp/arith.i:13:[value] Assertion got status valid.
-tests/gmp/arith.i:14:[value] Assertion got status valid.
-tests/gmp/arith.i:16:[value] Assertion got status valid.
-tests/gmp/arith.i:17:[value] Assertion got status valid.
-tests/gmp/arith.i:18:[value] Assertion got status valid.
-tests/gmp/arith.i:19:[value] Assertion got status valid.
-tests/gmp/arith.i:20:[value] Assertion got status valid.
-tests/gmp/arith.i:21:[value] Assertion got status valid.
-tests/gmp/arith.i:22:[value] Assertion got status valid.
-tests/gmp/arith.i:23:[value] Assertion got status valid.
-tests/gmp/arith.i:25:[value] Assertion got status valid.
-tests/gmp/arith.i:27:[value] Assertion got status valid.
-tests/gmp/arith.i:28:[value] Assertion got status valid.
-tests/gmp/arith.i:29:[value] Assertion got status valid.
-tests/gmp/arith.i:30:[value] Assertion got status valid.
-tests/gmp/arith.i:32:[value] Assertion got status valid.
-tests/gmp/arith.i:33:[value] Assertion got status valid.
 [value] done for function main

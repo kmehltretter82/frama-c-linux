@@ -2,7 +2,7 @@
    COMMENT: cast
    STDOPT: #"-no-warn-signed-downcast" #"-no-warn-unsigned-downcast"
    COMMENT: no diff
-   EXECNOW: LOG gen_cast2.c BIN gen_cast2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/gmp/cast.i -e-acsl-gmp-only -no-warn-signed-downcast -no-warn-unsigned-downcast -e-acsl -then-on e-acsl -print -ocode ./tests/gmp/result/gen_cast2.c > /dev/null && ./gcc_runtime.sh cast2
+   COMMENT: no diff
 */
 
 int main(void) {

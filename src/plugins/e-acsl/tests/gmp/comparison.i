@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: comparison operators
    COMMENT: no diff
-   EXECNOW: LOG gen_comparison2.c BIN gen_comparison2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/gmp/comparison.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/gmp/result/gen_comparison2.c > /dev/null && ./gcc_runtime.sh comparison2
+   COMMENT: no diff
 */
 
 int main(void) {

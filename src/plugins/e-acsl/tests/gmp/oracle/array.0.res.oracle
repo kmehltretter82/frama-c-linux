@@ -12,5 +12,10 @@
   __memory_size ∈ [--..--]
   T1[0..2] ∈ {0}
   T2[0..3] ∈ {0}
+tests/gmp/array.i:12:[value] entering loop for the first time
+tests/gmp/array.i:13:[value] entering loop for the first time
+tests/gmp/array.i:15:[value] warning: assertion got status unknown.
 [value] using specification for function e_acsl_assert
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] warning: function e_acsl_assert: precondition got status unknown.
+tests/gmp/array.i:16:[value] warning: assertion got status unknown.
 [value] done for function main
