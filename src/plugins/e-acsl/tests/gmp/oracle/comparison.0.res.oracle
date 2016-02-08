@@ -1,0 +1,32 @@
+[e-acsl] beginning translation.
+[e-acsl] translation done in project "e-acsl".
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value] Values of globals at initialization
+  __fc_random_counter ∈ {0}
+  __fc_rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __e_acsl_init ∈ [--..--]
+  __e_acsl_internal_heap ∈ [--..--]
+  __memory_size ∈ [--..--]
+tests/gmp/comparison.i:9:[value] Assertion got status valid.
+[value] using specification for function e_acsl_assert
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
+tests/gmp/comparison.i:10:[value] Assertion got status valid.
+tests/gmp/comparison.i:11:[value] Assertion got status valid.
+tests/gmp/comparison.i:12:[value] Assertion got status valid.
+tests/gmp/comparison.i:14:[value] Assertion got status valid.
+tests/gmp/comparison.i:17:[value] Assertion got status valid.
+tests/gmp/comparison.i:18:[value] Assertion got status valid.
+tests/gmp/comparison.i:19:[value] Assertion got status valid.
+tests/gmp/comparison.i:20:[value] Assertion got status valid.
+tests/gmp/comparison.i:21:[value] Assertion got status valid.
+tests/gmp/comparison.i:22:[value] Assertion got status valid.
+tests/gmp/comparison.i:24:[value] Assertion got status valid.
+tests/gmp/comparison.i:25:[value] Assertion got status valid.
+tests/gmp/comparison.i:26:[value] Assertion got status valid.
+tests/gmp/comparison.i:27:[value] Assertion got status valid.
+tests/gmp/comparison.i:28:[value] Assertion got status valid.
+tests/gmp/comparison.i:29:[value] Assertion got status valid.
+[value] done for function main

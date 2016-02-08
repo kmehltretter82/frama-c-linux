@@ -10,8 +10,8 @@
   __e_acsl_init ∈ [--..--]
   __e_acsl_internal_heap ∈ [--..--]
   __memory_size ∈ [--..--]
-tests/e-acsl-runtime/longlong.i:11:[value] warning: recursive call during value analysis
-                 of my_pow (my_pow <- my_pow :: tests/e-acsl-runtime/longlong.i:18 <- main).
+tests/gmp/longlong.i:11:[value] warning: recursive call during value analysis
+                 of my_pow (my_pow <- my_pow :: tests/gmp/longlong.i:18 <- main).
                  Using specification of my_pow.
 [value] user error: Recursive call on an unspecified function. Using potentially invalid
                     inferred assigns 'assigns \result \from x, n;'

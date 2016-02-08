@@ -2,7 +2,7 @@
    COMMENT: upgrading longlong to GMP
    STDOPT: +"-no-eva -val-ignore-recursive-calls"
    COMMENT: no diff
-   EXECNOW: LOG gen_longlong2.c BIN gen_longlong2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/longlong.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_longlong2.c > /dev/null && ./gcc_runtime.sh longlong2
+   EXECNOW: LOG gen_longlong2.c BIN gen_longlong2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/gmp/longlong.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/gmp/result/gen_longlong2.c > /dev/null && ./gcc_runtime.sh longlong2
 */
 
 unsigned long long my_pow(unsigned int x, unsigned int n) {

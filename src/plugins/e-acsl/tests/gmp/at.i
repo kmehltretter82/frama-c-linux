@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: \at
    COMMENT: no diff
-   EXECNOW: LOG gen_at2.c BIN gen_at2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/at.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_at2.c > /dev/null && ./gcc_runtime.sh at2 -Wno-unused-label
+   EXECNOW: LOG gen_at2.c BIN gen_at2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/gmp/at.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/gmp/result/gen_at2.c > /dev/null && ./gcc_runtime.sh at2 -Wno-unused-label
 */
 
 int A = 0;

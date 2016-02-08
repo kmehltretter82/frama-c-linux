@@ -10,7 +10,6 @@
   __e_acsl_init ∈ [--..--]
   __e_acsl_internal_heap ∈ [--..--]
   __memory_size ∈ [--..--]
-tests/e-acsl-runtime/quantif.i:11:[value] warning: assertion got status unknown.
 [value] using specification for function __gmpz_init
 [value] using specification for function __gmpz_init_set_si
 [value] using specification for function __gmpz_set

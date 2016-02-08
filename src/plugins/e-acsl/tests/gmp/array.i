@@ -2,7 +2,7 @@
    COMMENT: arrays
    STDOPT: #"-slevel 5"
    COMMENT: no diff
-   EXECNOW: LOG gen_array2.c BIN gen_array2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/array.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_array2.c > /dev/null && ./gcc_runtime.sh array2
+   EXECNOW: LOG gen_array2.c BIN gen_array2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/gmp/array.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/gmp/result/gen_array2.c > /dev/null && ./gcc_runtime.sh array2
 */
 
 int T1[3],T2[4];
