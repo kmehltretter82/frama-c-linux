@@ -1,7 +1,5 @@
 /* run.config
    COMMENT: \result
-   COMMENT: no diff
-   COMMENT: no diff
 */
 
 /*@ ensures \result == (int)(x - x); */

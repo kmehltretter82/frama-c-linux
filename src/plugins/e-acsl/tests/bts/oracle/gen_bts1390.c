@@ -76,7 +76,7 @@ void *__e_acsl_memchr(void const *buf, int c, size_t n)
                                              sizeof(char));
         e_acsl_assert(__e_acsl_valid_read_3,(char *)"RTE",(char *)"memchr",
                       (char *)"mem_access: \\valid_read((char *)buf+__e_acsl_k)",
-                      15);
+                      12);
         if ((int)*((char *)buf + __e_acsl_k) != c) ;
         else {
           __e_acsl_forall_2 = 0;
@@ -104,7 +104,7 @@ void *__e_acsl_memchr(void const *buf, int c, size_t n)
                                            sizeof(char));
         e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"memchr",
                       (char *)"mem_access: \\valid_read((char *)buf+__e_acsl_i)",
-                      11);
+                      8);
         if (! ((int)*((char *)buf + __e_acsl_i) == c)) ;
         else {
           __e_acsl_exists = 1;
@@ -138,7 +138,7 @@ void *__e_acsl_memchr(void const *buf, int c, size_t n)
                                                sizeof(char));
           e_acsl_assert(__e_acsl_valid_read_2,(char *)"RTE",(char *)"memchr",
                         (char *)"mem_access: \\valid_read((char *)__e_acsl_at_2+__e_acsl_j)",
-                        13);
+                        10);
           if ((int)*((char *)__e_acsl_at_2 + __e_acsl_j) != __e_acsl_at_3) 
             ;
           else {
@@ -153,13 +153,13 @@ void *__e_acsl_memchr(void const *buf, int c, size_t n)
     }
     e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",(char *)"memchr",
                   (char *)"\\old(\\exists integer i; 0 <= i < n && (int)*((char *)buf+i) == c) ==>\n(\\forall int j;\n   0 <= j < \\offset((char *)\\result) ==>\n   (int)*((char *)\\old(buf)+j) != \\old(c))",
-                  13);
+                  10);
     if (! __e_acsl_at_4) __e_acsl_implies_2 = 1;
     else __e_acsl_implies_2 = __retres == (void *)0;
     e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",
                   (char *)"memchr",
                   (char *)"\\old(\\forall integer k; 0 <= k < n ==> (int)*((char *)buf+k) != c) ==>\n\\result == (void *)0",
-                  16);
+                  13);
     __delete_block((void *)(& buf));
     __delete_block((void *)(& __retres));
     return __retres;

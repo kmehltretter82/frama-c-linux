@@ -30,48 +30,48 @@ int main(void)
     }
     else __e_acsl_and = 0;
     e_acsl_assert(__e_acsl_and,(char *)"RTE",(char *)"main",
-                  (char *)"mem_access: \\valid_read(p)",13);
+                  (char *)"mem_access: \\valid_read(p)",11);
     e_acsl_assert(*p == 1,(char *)"Assertion",(char *)"main",
-                  (char *)"*p == 1",13);
+                  (char *)"*p == 1",11);
   }
   /*@ assert t[0] ≡ 2; */
   e_acsl_assert(t[0] == 2,(char *)"Assertion",(char *)"main",
-                (char *)"t[0] == 2",14);
+                (char *)"t[0] == 2",12);
   /*@ assert t[2] ≡ 4; */
   e_acsl_assert(t[2] == 4,(char *)"Assertion",(char *)"main",
-                (char *)"t[2] == 4",15);
+                (char *)"t[2] == 4",13);
   /*@ assert t[(2*sizeof(int))/sizeof((int)0x0)] ≡ 4; */
   e_acsl_assert(t[(2 * 4) / 4] == 4,(char *)"Assertion",(char *)"main",
-                (char *)"t[(2*sizeof(int))/sizeof((int)0x0)] == 4",16);
+                (char *)"t[(2*sizeof(int))/sizeof((int)0x0)] == 4",14);
   {
     int i;
     i = 0;
     while (i < 2) {
       /*@ assert t[i] ≡ i+2; */
       e_acsl_assert(i < 3,(char *)"RTE",(char *)"main",
-                    (char *)"index_bound: i < 3",19);
+                    (char *)"index_bound: i < 3",17);
       e_acsl_assert(0 <= i,(char *)"RTE",(char *)"main",
-                    (char *)"index_bound: 0 <= i",19);
+                    (char *)"index_bound: 0 <= i",17);
       e_acsl_assert((long)t[i] == (long)i + (long)2,(char *)"Assertion",
-                    (char *)"main",(char *)"t[i] == i+2",19);
+                    (char *)"main",(char *)"t[i] == i+2",17);
       /*@ assert t[2-i] ≡ 4-i; */
       e_acsl_assert((long)2 - (long)i < (long)3,(char *)"RTE",(char *)"main",
-                    (char *)"index_bound: (long)(2-(long)i) < 3",20);
+                    (char *)"index_bound: (long)(2-(long)i) < 3",18);
       e_acsl_assert(0L <= (long)2 - (long)i,(char *)"RTE",(char *)"main",
-                    (char *)"index_bound: 0 <= (long)(2-(long)i)",20);
+                    (char *)"index_bound: 0 <= (long)(2-(long)i)",18);
       e_acsl_assert((long)t[(long)2 - (long)i] == (long)4 - (long)i,
                     (char *)"Assertion",(char *)"main",
-                    (char *)"t[2-i] == 4-i",20);
+                    (char *)"t[2-i] == 4-i",18);
       /*@ assert *(&t[2]-i) ≡ 4-i; */
       {
         int __e_acsl_valid_read_2;
         __e_acsl_valid_read_2 = __valid_read((void *)(& t[2] - i),
                                              sizeof(int));
         e_acsl_assert(__e_acsl_valid_read_2,(char *)"RTE",(char *)"main",
-                      (char *)"mem_access: \\valid_read(&t[2]-i)",21);
+                      (char *)"mem_access: \\valid_read(&t[2]-i)",19);
         e_acsl_assert((long)*(& t[2] - i) == (long)4 - (long)i,
                       (char *)"Assertion",(char *)"main",
-                      (char *)"*(&t[2]-i) == 4-i",21);
+                      (char *)"*(&t[2]-i) == 4-i",19);
       }
       i ++;
     }
@@ -92,9 +92,9 @@ int main(void)
     }
     else __e_acsl_and_2 = 0;
     e_acsl_assert(__e_acsl_and_2,(char *)"RTE",(char *)"main",
-                  (char *)"mem_access: \\valid_read(p)",27);
+                  (char *)"mem_access: \\valid_read(p)",25);
     e_acsl_assert(*p == 5,(char *)"Assertion",(char *)"main",
-                  (char *)"*p == 5",27);
+                  (char *)"*p == 5",25);
   }
   __retres = 0;
   __delete_block((void *)(& p));

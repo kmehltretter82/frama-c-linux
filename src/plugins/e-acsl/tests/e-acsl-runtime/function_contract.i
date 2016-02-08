@@ -1,7 +1,5 @@
 /* run.config
    COMMENT: function contract
-   COMMENT: no diff
-   COMMENT: no diff
 */
 
 int X = 0, Y = 2;

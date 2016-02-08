@@ -21,14 +21,14 @@ int main(void)
     __e_acsl_valid_read = __valid_read((void *)(& state->bitsInQueue),
                                        sizeof(unsigned int));
     e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"main",
-                  (char *)"mem_access: \\valid_read(&state->bitsInQueue)",24);
+                  (char *)"mem_access: \\valid_read(&state->bitsInQueue)",22);
     __e_acsl_initialized = __initialized((void *)(& state->dataQueue[
                                          state->bitsInQueue / (unsigned int)8]),
                                          sizeof(unsigned char __attribute__((
                                          __aligned__(32)))));
     e_acsl_assert(! __e_acsl_initialized,(char *)"Assertion",(char *)"main",
                   (char *)"!\\initialized(&state->dataQueue[state->bitsInQueue/8])",
-                  24);
+                  22);
   }
   __e_acsl_free((void *)state);
   __retres = 0;

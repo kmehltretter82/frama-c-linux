@@ -1,6 +1,5 @@
 /* run.config
    COMMENT: pointer to an empty struct
-   COMMENT: no diff
 */
 
 struct toto {};

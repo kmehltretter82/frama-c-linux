@@ -1,7 +1,5 @@
 /* run.config
    COMMENT: terms and predicates using lazy operators
-   COMMENT: no diff
-   COMMENT: no diff
 */
 
 int main(void) {

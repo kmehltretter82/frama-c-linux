@@ -1,7 +1,5 @@
 /* run.config
    COMMENT: structured stmt with several code annotations inside
-   COMMENT: no diff
-   COMMENT: no diff
 */
 
 int main(void) {

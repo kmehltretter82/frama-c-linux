@@ -1,8 +1,6 @@
 /* run.config
    COMMENT: loop invariants
    STDOPT: +"-slevel 160"
-   COMMENT: no diff
-   COMMENT: no diff
 */
 
 void simple_loop() {

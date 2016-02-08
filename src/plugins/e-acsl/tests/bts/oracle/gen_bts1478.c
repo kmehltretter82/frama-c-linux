@@ -21,12 +21,12 @@ void __e_acsl_loop(void)
   {
     int __e_acsl_valid;
     e_acsl_assert(global_i == 0,(char *)"Precondition",(char *)"loop",
-                  (char *)"global_i == 0",11);
+                  (char *)"global_i == 0",9);
     __e_acsl_valid = __valid((void *)global_i_ptr,sizeof(int));
     e_acsl_assert(__e_acsl_valid,(char *)"Precondition",(char *)"loop",
-                  (char *)"\\valid(global_i_ptr)",12);
+                  (char *)"\\valid(global_i_ptr)",10);
     e_acsl_assert(global_i_ptr == & global_i,(char *)"Precondition",
-                  (char *)"loop",(char *)"global_i_ptr == &global_i",13);
+                  (char *)"loop",(char *)"global_i_ptr == &global_i",11);
     loop();
   }
   return;

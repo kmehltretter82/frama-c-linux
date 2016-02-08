@@ -2,7 +2,7 @@
 [e-acsl] warning: annotating undefined function `fopen':
                   the generated program may miss memory instrumentation
                   if there are memory-related annotations.
-tests/e-acsl-runtime/stdout.c:10:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+tests/e-acsl-runtime/stdout.c:8:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
                   Ignoring annotation.
 FRAMAC_SHARE/libc/stdio.h:107:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
                   Ignoring annotation.
@@ -66,7 +66,7 @@ FRAMAC_SHARE/libc/stdio.h:107:[e-acsl] warning: E-ACSL construct `logic function
 [value] using specification for function __full_init
 [value] using specification for function __literal_string
 [value] using specification for function fopen
-tests/e-acsl-runtime/stdout.c:13:[value] warning: assertion got status unknown.
+tests/e-acsl-runtime/stdout.c:11:[value] warning: assertion got status unknown.
 [value] using specification for function e_acsl_assert
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] warning: function e_acsl_assert: precondition got status unknown.
 [value] using specification for function __delete_block

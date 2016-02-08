@@ -1,7 +1,5 @@
 /* run.config
    COMMENT: pointers and pointer arithmetic
-   COMMENT: no diff
-   COMMENT: no diff
 */
 
 int main(void) {

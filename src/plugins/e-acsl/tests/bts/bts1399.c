@@ -1,8 +1,6 @@
 /* run.config
    COMMENT: complex fields and indexes + potential RTE in \initialized
    STDOPT: +"-val-builtin __malloc:Frama_C_alloc_size -val-builtin __free:Frama_C_free"
-   COMMENT: no diff
-   COMMENT: no diff
 */
 
 #include "stdlib.h"

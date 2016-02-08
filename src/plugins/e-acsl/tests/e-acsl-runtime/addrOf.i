@@ -1,7 +1,5 @@
 /* run.config
    COMMENT: addrOf
-   COMMENT: no diff
-   COMMENT: no diff
 */
 
 void f(){

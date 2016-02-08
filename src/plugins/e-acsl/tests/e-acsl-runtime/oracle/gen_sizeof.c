@@ -7,7 +7,7 @@ int main(void)
   x ++;
   /*@ assert sizeof(int) ≡ sizeof(x); */
   e_acsl_assert(4 == 4,(char *)"Assertion",(char *)"main",
-                (char *)"sizeof(int) == sizeof(x)",10);
+                (char *)"sizeof(int) == sizeof(x)",8);
   __retres = 0;
   return __retres;
 }

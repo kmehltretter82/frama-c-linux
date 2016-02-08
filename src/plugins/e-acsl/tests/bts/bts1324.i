@@ -1,7 +1,5 @@
 /* run.config
    COMMENT: fixed bug with typing of universal quantification
-   COMMENT: no diff
-   COMMENT: no diff
 */
 
 /*@ behavior yes:

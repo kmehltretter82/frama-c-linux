@@ -1,6 +1,5 @@
 /* run.config
    COMMENT: bts #1837, about initialization of literal strings
-   COMMENT: no diff
 */
 
 char *S = "foo";

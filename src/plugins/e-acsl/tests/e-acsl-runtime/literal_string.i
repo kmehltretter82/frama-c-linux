@@ -1,7 +1,5 @@
 /* run.config
    COMMENT: literal string
-   COMMENT: no diff
-   COMMENT: no diff
 */
 
 int main(void);

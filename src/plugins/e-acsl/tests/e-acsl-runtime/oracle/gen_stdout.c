@@ -28,7 +28,7 @@ int main(void)
   f2 = __e_acsl_fopen(__e_acsl_literal_string,__e_acsl_literal_string_2);
   /*@ assert f ≡ __fc_stdout; */
   e_acsl_assert(f == stdout,(char *)"Assertion",(char *)"main",
-                (char *)"f == __fc_stdout",13);
+                (char *)"f == __fc_stdout",11);
   __retres = 0;
   __delete_block((void *)(& stdout));
   __delete_block((void *)(& f));

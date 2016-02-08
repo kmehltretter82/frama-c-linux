@@ -11,10 +11,10 @@
   __e_acsl_internal_heap ∈ [--..--]
   __memory_size ∈ [--..--]
 [value] using specification for function e_acsl_assert
-tests/e-acsl-runtime/loop.i:21:[value] warning: loop invariant got status unknown.
+tests/e-acsl-runtime/loop.i:19:[value] warning: loop invariant got status unknown.
 [value] Semantic level unrolling superposing up to 100 states
-tests/e-acsl-runtime/loop.i:21:[value] entering loop for the first time
+tests/e-acsl-runtime/loop.i:19:[value] entering loop for the first time
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] warning: function e_acsl_assert: precondition got status invalid.
-tests/e-acsl-runtime/loop.i:21:[kernel] warning: accessing uninitialized left-value.
+tests/e-acsl-runtime/loop.i:19:[kernel] warning: accessing uninitialized left-value.
                   assert \initialized(&t[__e_acsl_k_2][__e_acsl_l_2]);
 [value] done for function main

@@ -1,8 +1,6 @@
 /* run.config
    COMMENT: ghost code
-   STDOPT: #"-cpp-extra-args=\"-I`@frama-c@ -print-share-path`/libc\"" +"-val-builtin __malloc:Frama_C_alloc_size -val-builtin __free:Frama_C_free"
-   COMMENT: no diff
-   COMMENT: no diff
+   STDOPT: +"-val-builtin __malloc:Frama_C_alloc_size -val-builtin __free:Frama_C_free"
 */
 
 /*@ ghost int G = 0; */

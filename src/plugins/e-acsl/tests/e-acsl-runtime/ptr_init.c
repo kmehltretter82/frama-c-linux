@@ -1,8 +1,5 @@
 /* run.config
    COMMENT: initialized and function calls
-   STDOPT: #"-cpp-extra-args=\"-I`@frama-c@ -print-share-path`/libc\""
-   COMMENT: no diff
-   COMMENT: no diff
 */
 
 #include "stdlib.h"

@@ -1,11 +1,11 @@
 [e-acsl] beginning translation.
 FRAMAC_SHARE/libc/stdlib.h:174:[e-acsl] warning: E-ACSL construct `\allocable' is not yet supported. Ignoring annotation.
 FRAMAC_SHARE/libc/stdlib.h:156:[e-acsl] warning: E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
-tests/e-acsl-runtime/valid_alias.c:10:[e-acsl] warning: E-ACSL construct `complete behaviors' is not yet supported.
+tests/e-acsl-runtime/valid_alias.c:8:[e-acsl] warning: E-ACSL construct `complete behaviors' is not yet supported.
                   Ignoring annotation.
-tests/e-acsl-runtime/valid_alias.c:10:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
+tests/e-acsl-runtime/valid_alias.c:8:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
                   Ignoring annotation.
-tests/e-acsl-runtime/valid_alias.c:10:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+tests/e-acsl-runtime/valid_alias.c:8:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
                   Ignoring annotation.
 FRAMAC_SHARE/libc/stdlib.h:160:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
                   Ignoring annotation.
@@ -51,13 +51,13 @@ FRAMAC_SHARE/libc/stdlib.h:178:[value] Reading left-value __e_acsl_implies.
         It contains a garbled mix of {__malloc___e_acsl_malloc_l156} because of
         Arithmetic {FRAMAC_SHARE/libc/stdlib.h:178}.
 FRAMAC_SHARE/libc/stdlib.h:180:[value] warning: function __e_acsl_free, behavior deallocation: postcondition got status unknown.
-tests/e-acsl-runtime/valid_alias.c:19:[value] completely invalid value in evaluation of
+tests/e-acsl-runtime/valid_alias.c:17:[value] completely invalid value in evaluation of
         argument (void *)a
-tests/e-acsl-runtime/valid_alias.c:19:[kernel] warning: accessing left-value that contains escaping addresses.
+tests/e-acsl-runtime/valid_alias.c:17:[kernel] warning: accessing left-value that contains escaping addresses.
                   assert ¬\dangling(&a);
-tests/e-acsl-runtime/valid_alias.c:19:[value] completely invalid value in evaluation of
+tests/e-acsl-runtime/valid_alias.c:17:[value] completely invalid value in evaluation of
         argument (void *)b
-tests/e-acsl-runtime/valid_alias.c:19:[kernel] warning: accessing left-value that contains escaping addresses.
+tests/e-acsl-runtime/valid_alias.c:17:[kernel] warning: accessing left-value that contains escaping addresses.
                   assert ¬\dangling(&b);
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main

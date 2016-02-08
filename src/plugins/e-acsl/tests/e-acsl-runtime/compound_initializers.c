@@ -1,7 +1,5 @@
 /* run.config
    COMMENT: Compound initializers
-   COMMENT: no diff
-   COMMENT: no diff
 */
 
 

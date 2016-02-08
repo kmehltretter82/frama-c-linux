@@ -1,8 +1,5 @@
 /* run.config
    COMMENT: bts #1390, issue with typing of quantified variables
-   COMMENT: no diff
-   COMMENT: no diff
-   COMMENT: no diff
 */
 
 #include "stdlib.h"

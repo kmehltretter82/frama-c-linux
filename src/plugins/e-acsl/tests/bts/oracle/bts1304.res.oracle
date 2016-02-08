@@ -11,10 +11,10 @@
   __e_acsl_internal_heap ∈ [--..--]
   __memory_size ∈ [--..--]
 [value] using specification for function __store_block
-tests/bts/bts1304.i:23:[value] entering loop for the first time
+tests/bts/bts1304.i:21:[value] entering loop for the first time
 [value] using specification for function __initialize
 [value] using specification for function __delete_block
-tests/bts/bts1304.i:25:[value] warning: assertion got status unknown.
+tests/bts/bts1304.i:23:[value] warning: assertion got status unknown.
 [value] using specification for function __initialized
 [value] using specification for function e_acsl_assert
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] warning: function e_acsl_assert: precondition got status unknown.

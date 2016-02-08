@@ -1,7 +1,5 @@
 /* run.config
    COMMENT: alias
-   COMMENT: no diff
-   COMMENT: no diff
 */
 
 void f(int* dest, int val)

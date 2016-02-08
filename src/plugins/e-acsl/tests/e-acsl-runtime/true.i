@@ -1,7 +1,5 @@
 /* run.config
    COMMENT: assert \true
-   COMMENT: no diff
-   COMMENT: no diff
 */
 int main(void) {
   int x = 0;

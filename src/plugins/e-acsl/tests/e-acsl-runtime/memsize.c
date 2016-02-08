@@ -1,7 +1,5 @@
 /* run.config
    COMMENT: Checking heap memory size
-   COMMENT: no diff
-   COMMENT: no diff
 */
 
 #include <stdlib.h>

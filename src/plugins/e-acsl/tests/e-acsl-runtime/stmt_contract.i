@@ -1,8 +1,7 @@
 /* run.config
    COMMENT: stmt contract
-   COMMENT: no diff
-   COMMENT: no diff
 */
+
 int main(void) {
   int x = 0, y = 2;
   // one ensures

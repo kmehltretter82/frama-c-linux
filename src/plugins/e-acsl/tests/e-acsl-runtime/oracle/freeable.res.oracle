@@ -1,11 +1,11 @@
 [e-acsl] beginning translation.
 FRAMAC_SHARE/libc/stdlib.h:174:[e-acsl] warning: E-ACSL construct `\allocable' is not yet supported. Ignoring annotation.
 FRAMAC_SHARE/libc/stdlib.h:156:[e-acsl] warning: E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
-tests/e-acsl-runtime/freeable.c:13:[e-acsl] warning: E-ACSL construct `complete behaviors' is not yet supported.
+tests/e-acsl-runtime/freeable.c:11:[e-acsl] warning: E-ACSL construct `complete behaviors' is not yet supported.
                   Ignoring annotation.
-tests/e-acsl-runtime/freeable.c:13:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
+tests/e-acsl-runtime/freeable.c:11:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
                   Ignoring annotation.
-tests/e-acsl-runtime/freeable.c:13:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+tests/e-acsl-runtime/freeable.c:11:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
                   Ignoring annotation.
 FRAMAC_SHARE/libc/stdlib.h:160:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
                   Ignoring annotation.
@@ -32,8 +32,8 @@ FRAMAC_SHARE/libc/stdlib.h:177:[e-acsl] warning: E-ACSL construct `\allocate' is
   __e_acsl_internal_heap ∈ [--..--]
   __memory_size ∈ [--..--]
 [value] using specification for function __store_block
-tests/e-acsl-runtime/freeable.c:15:[value] warning: assertion got status unknown.
-tests/e-acsl-runtime/freeable.c:15:[value] completely invalid value in evaluation of
+tests/e-acsl-runtime/freeable.c:13:[value] warning: assertion got status unknown.
+tests/e-acsl-runtime/freeable.c:13:[value] completely invalid value in evaluation of
         argument (void *)p
-tests/e-acsl-runtime/freeable.c:15:[kernel] warning: accessing uninitialized left-value. assert \initialized(&p);
+tests/e-acsl-runtime/freeable.c:13:[kernel] warning: accessing uninitialized left-value. assert \initialized(&p);
 [value] done for function main

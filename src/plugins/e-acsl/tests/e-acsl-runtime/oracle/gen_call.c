@@ -23,7 +23,7 @@ int *__e_acsl_f(int *x, int *y)
     int __e_acsl_valid;
     __e_acsl_valid = __valid((void *)__retres,sizeof(int));
     e_acsl_assert(__e_acsl_valid,(char *)"Postcondition",(char *)"f",
-                  (char *)"\\valid(\\result)",12);
+                  (char *)"\\valid(\\result)",10);
     __delete_block((void *)(& x));
     __delete_block((void *)(& y));
     __delete_block((void *)(& __retres));

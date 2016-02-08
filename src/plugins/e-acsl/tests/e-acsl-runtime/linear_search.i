@@ -1,7 +1,5 @@
 /* run.config
    COMMENT: linear search (example from the SAC'13 article)
-   COMMENT: no diff
-   COMMENT: no diff
 */
 
 int A[10];

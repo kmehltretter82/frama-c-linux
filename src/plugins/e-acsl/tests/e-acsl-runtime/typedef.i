@@ -1,7 +1,5 @@
 /* run.config
    COMMENT: typedef (from a Bernard's bug report)
-   COMMENT: no diff
-   COMMENT: no diff
 */
 
 typedef unsigned char uint8;

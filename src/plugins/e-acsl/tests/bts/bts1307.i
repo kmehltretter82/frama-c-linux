@@ -1,7 +1,5 @@
 /* run.config
    COMMENT: spec with floats and reals
-   COMMENT: no diff
-   COMMENT: no diff
 */
 
 /*@ requires \valid(Mtmax_in);

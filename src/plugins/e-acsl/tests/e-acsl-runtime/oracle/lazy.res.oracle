@@ -11,7 +11,7 @@
   __e_acsl_internal_heap ∈ [--..--]
   __memory_size ∈ [--..--]
 [value] using specification for function e_acsl_assert
+tests/e-acsl-runtime/lazy.i:15:[value] warning: assertion got status unknown.
+tests/e-acsl-runtime/lazy.i:16:[value] warning: assertion got status unknown.
 tests/e-acsl-runtime/lazy.i:17:[value] warning: assertion got status unknown.
-tests/e-acsl-runtime/lazy.i:18:[value] warning: assertion got status unknown.
-tests/e-acsl-runtime/lazy.i:19:[value] warning: assertion got status unknown.
 [value] done for function main

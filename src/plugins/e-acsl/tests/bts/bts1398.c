@@ -1,8 +1,5 @@
 /* run.config
    COMMENT: variadic function call
-   COMMENT: no diff
-   COMMENT: no diff
-   COMMENT: no diff
 */
 
 #include "stdio.h"

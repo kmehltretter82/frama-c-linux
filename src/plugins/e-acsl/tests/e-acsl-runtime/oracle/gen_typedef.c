@@ -7,7 +7,7 @@ int main(void)
   x = (unsigned char)0;
   /*@ assert x ≡ 0; */
   e_acsl_assert((int)x == 0,(char *)"Assertion",(char *)"main",
-                (char *)"x == 0",11);
+                (char *)"x == 0",9);
   __retres = 0;
   return __retres;
 }

@@ -22,7 +22,7 @@ int main(void)
       }
       else __e_acsl_and = 0;
       e_acsl_assert(__e_acsl_and,(char *)"Assertion",(char *)"main",
-                    (char *)"\\valid(p)",13);
+                    (char *)"\\valid(p)",10);
     }
     __retres = 0;
     goto return_label;

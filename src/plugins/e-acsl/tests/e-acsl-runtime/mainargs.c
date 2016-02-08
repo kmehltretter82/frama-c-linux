@@ -1,7 +1,5 @@
 /* run.config
    COMMENT: the contents of argv should be valid
-   COMMENT: no diff
-   COMMENT: no diff
 */
 
 #include <string.h>

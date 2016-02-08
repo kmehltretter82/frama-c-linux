@@ -1,8 +1,5 @@
 /* run.config
    COMMENT: bts #1717, issue with labels on memory-related statements
-   COMMENT: no diff
-   COMMENT: no diff
-   COMMENT: no diff
 */
 
 int main(void) {

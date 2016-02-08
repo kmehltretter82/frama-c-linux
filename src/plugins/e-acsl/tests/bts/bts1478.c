@@ -1,7 +1,5 @@
 /* run.config
    COMMENT: bts #1478 about wrong detection of initializers in pre-analysis
-   COMMENT: no diff
-   COMMENT: no diff
 */
 
 int global_i;

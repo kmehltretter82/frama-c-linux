@@ -38,7 +38,7 @@ int main(void)
     int __e_acsl_initialized;
     __e_acsl_initialized = __initialized((void *)(& v1[2]),sizeof(int));
     e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"main",
-                  (char *)"\\initialized(&v1[2])",26);
+                  (char *)"\\initialized(&v1[2])",24);
   }
   __full_init((void *)(& v2));
   v2 = new_inversed(3,v1);
@@ -48,12 +48,12 @@ int main(void)
     int __e_acsl_initialized_2;
     __e_acsl_initialized_2 = __initialized((void *)(v2 + 2),sizeof(int));
     e_acsl_assert(__e_acsl_initialized_2,(char *)"Assertion",(char *)"main",
-                  (char *)"\\initialized(v2+2)",29);
+                  (char *)"\\initialized(v2+2)",27);
   }
   /*@ assert LAST ≡ 1; */
   /*@ assert Value: initialisation: \initialized(&LAST); */
   e_acsl_assert(LAST == 1,(char *)"Assertion",(char *)"main",
-                (char *)"LAST == 1",30);
+                (char *)"LAST == 1",28);
   __e_acsl_free((void *)v2);
   __retres = 0;
   __delete_block((void *)(& v2));

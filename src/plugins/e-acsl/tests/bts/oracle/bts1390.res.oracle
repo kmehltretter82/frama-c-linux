@@ -15,17 +15,17 @@
 [value] using specification for function __store_block
 [value] using specification for function __full_init
 [value] using specification for function __literal_string
-tests/bts/bts1390.c:15:[value] entering loop for the first time
+tests/bts/bts1390.c:12:[value] entering loop for the first time
 [value] using specification for function __valid_read
 [value] using specification for function e_acsl_assert
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] warning: function e_acsl_assert: precondition got status unknown.
-tests/bts/bts1390.c:11:[value] entering loop for the first time
-tests/bts/bts1390.c:20:[value] entering loop for the first time
+tests/bts/bts1390.c:8:[value] entering loop for the first time
+tests/bts/bts1390.c:17:[value] entering loop for the first time
 [value] using specification for function __delete_block
-tests/bts/bts1390.c:16:[value] warning: function memchr, behavior not_exists: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
-tests/bts/bts1390.c:13:[value] entering loop for the first time
+tests/bts/bts1390.c:13:[value] warning: function memchr, behavior not_exists: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
+tests/bts/bts1390.c:10:[value] entering loop for the first time
 [value] using specification for function __offset
-tests/bts/bts1390.c:16:[value] warning: function __e_acsl_memchr, behavior not_exists: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
-tests/bts/bts1390.c:21:[kernel] warning: out of bounds read. assert \valid_read(s);
+tests/bts/bts1390.c:13:[value] warning: function __e_acsl_memchr, behavior not_exists: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
+tests/bts/bts1390.c:18:[kernel] warning: out of bounds read. assert \valid_read(s);
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main

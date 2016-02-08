@@ -1,7 +1,5 @@
 /* run.config
    COMMENT: argument of functions must be kept, so keep its parameter
-   COMMENT: no diff
-   COMMENT: no diff
 */
 
 struct msgA { int type; int a[2]; };

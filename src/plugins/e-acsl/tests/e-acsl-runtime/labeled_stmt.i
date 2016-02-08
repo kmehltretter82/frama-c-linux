@@ -1,7 +1,5 @@
 /* run.config
    COMMENT: labeled stmt and gotos
-   COMMENT: no diff
-   COMMENT: no diff
 */
 
 int X = 0;

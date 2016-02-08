@@ -1,7 +1,5 @@
 /* run.config
    COMMENT: non integer constants
-   COMMENT: no diff
-   COMMENT: no diff
 */
 
 enum bool { false, true };

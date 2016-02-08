@@ -1,7 +1,5 @@
 /* run.config
    COMMENT: complex term left-values
-   COMMENT: no diff
-   COMMENT: no diff
 */
 
 typedef int ArrayInt[5];
