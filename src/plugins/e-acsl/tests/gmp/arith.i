@@ -17,7 +17,7 @@ int main(void) {
   /*@ assert x-1 == -4; */ ;
   /*@ assert x*3 == -9; */ ;
   /*@ assert x/3 == -1; */ ;
-  /*@ assert 0xfffffffffff/0xfffffffffff == 1; */ ;
+  /*@ assert 0xffffffffffffffffffffff/0xffffffffffffffffffffff == 1; */ ;
   /*@ assert x % 2 == -1; */ ;
   /*@ assert -3 % -2 == -1; */ ;
   /*@ assert 3 % -2 == 1; */ ;
