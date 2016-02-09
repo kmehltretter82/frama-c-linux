@@ -39,25 +39,7 @@ FRAMAC_SHARE/libc/stdlib.h:222:[e-acsl] warning: E-ACSL construct `logic functio
                   Ignoring annotation.
 FRAMAC_SHARE/libc/stdlib.h:146:[kernel] warning: Neither code nor specification for function calloc, generating default assigns from the prototype
 [e-acsl] translation done in project "e-acsl".
-[value] Analyzing a complete application starting at main
-[value] Computing initial state
-[value] Initial state computed
-[value] Values of globals at initialization
-  __fc_random_counter ∈ {0}
-  __fc_rand_max ∈ {32767}
-  __fc_heap_status ∈ [--..--]
-  __e_acsl_init ∈ [--..--]
-  __e_acsl_internal_heap ∈ [--..--]
-  __memory_size ∈ [--..--]
-  __fc_fopen[0..511] ∈ {0}
-  __p_fc_fopen ∈ {{ &__fc_fopen[0] }}
-[value] using specification for function __store_block
-[value] using specification for function __full_init
-[value] using specification for function __malloc
-[value] using specification for function __delete_block
 FRAMAC_SHARE/libc/stdlib.h:163:[value] warning: function __e_acsl_malloc, behavior allocation: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
 FRAMAC_SHARE/libc/stdlib.h:168:[value] warning: function __e_acsl_malloc, behavior no_allocation: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
 tests/e-acsl-runtime/memsize.c:22:[value] warning: assertion got status unknown.
-[value] using specification for function e_acsl_assert
 tests/e-acsl-runtime/memsize.c:24:[value] warning: assertion got status invalid (stopping propagation).
-[value] done for function main

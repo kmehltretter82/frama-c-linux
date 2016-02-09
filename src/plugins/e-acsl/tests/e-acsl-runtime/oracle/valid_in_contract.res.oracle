@@ -1,25 +1,4 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
-[value] Analyzing a complete application starting at main
-[value] Computing initial state
-[value] Initial state computed
-[value] Values of globals at initialization
-  __fc_random_counter ∈ {0}
-  __fc_rand_max ∈ {32767}
-  __fc_heap_status ∈ [--..--]
-  __e_acsl_init ∈ [--..--]
-  __e_acsl_internal_heap ∈ [--..--]
-  __memory_size ∈ [--..--]
-[value] using specification for function __store_block
-[value] using specification for function __valid
-[value] using specification for function __initialized
-[value] using specification for function __valid_read
-[value] using specification for function e_acsl_assert
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] warning: function e_acsl_assert: precondition got status unknown.
-tests/e-acsl-runtime/valid_in_contract.c:19:[value] completely invalid value in evaluation of
-        argument (void *)l->next
 tests/e-acsl-runtime/valid_in_contract.c:19:[kernel] warning: out of bounds read. assert \valid_read(&l->next);
-[value] using specification for function __full_init
-[value] using specification for function __delete_block
-[value] using specification for function __e_acsl_memory_clean
-[value] done for function main

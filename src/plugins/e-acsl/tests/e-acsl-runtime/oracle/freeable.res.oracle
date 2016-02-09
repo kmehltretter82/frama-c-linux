@@ -21,19 +21,5 @@ FRAMAC_SHARE/libc/stdlib.h:177:[e-acsl] warning: E-ACSL construct `assigns claus
                   Ignoring annotation.
 FRAMAC_SHARE/libc/stdlib.h:177:[e-acsl] warning: E-ACSL construct `\allocate' is not yet supported. Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[value] Analyzing a complete application starting at main
-[value] Computing initial state
-[value] Initial state computed
-[value] Values of globals at initialization
-  __fc_random_counter ∈ {0}
-  __fc_rand_max ∈ {32767}
-  __fc_heap_status ∈ [--..--]
-  __e_acsl_init ∈ [--..--]
-  __e_acsl_internal_heap ∈ [--..--]
-  __memory_size ∈ [--..--]
-[value] using specification for function __store_block
 tests/e-acsl-runtime/freeable.c:13:[value] warning: assertion got status unknown.
-tests/e-acsl-runtime/freeable.c:13:[value] completely invalid value in evaluation of
-        argument (void *)p
 tests/e-acsl-runtime/freeable.c:13:[kernel] warning: accessing uninitialized left-value. assert \initialized(&p);
-[value] done for function main
