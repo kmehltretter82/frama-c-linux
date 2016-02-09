@@ -27,43 +27,26 @@ FRAMAC_SHARE/libc/stdlib.h:177:[e-acsl] warning: E-ACSL construct `\allocate' is
   Z ∈ {0}
 [value] using specification for function __store_block
 [value] using specification for function __full_init
-tests/e-acsl-runtime/valid.c:35:[value] Assertion got status valid.
 [value] using specification for function __initialized
 [value] using specification for function __valid
 [value] using specification for function e_acsl_assert
-FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] warning: function e_acsl_assert: precondition got status unknown.
 FRAMAC_SHARE/libc/stdlib.h:156:[value] allocating variable __malloc___e_acsl_malloc_l156
 [value] using specification for function __delete_block
-FRAMAC_SHARE/libc/stdlib.h:163:[value] Function __e_acsl_malloc, behavior allocation: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
-FRAMAC_SHARE/libc/stdlib.h:168:[value] Function __e_acsl_malloc, behavior no_allocation: postcondition got status invalid. (Behavior may be inactive, no reduction performed.)
-tests/e-acsl-runtime/valid.c:37:[value] Assertion got status valid.
-tests/e-acsl-runtime/valid.c:39:[value] Assertion got status valid.
-tests/e-acsl-runtime/valid.c:15:[value] Function __e_acsl_f: precondition got status valid.
-tests/e-acsl-runtime/valid.c:15:[value] Function f: precondition got status valid.
-tests/e-acsl-runtime/valid.c:19:[value] Assertion got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
-tests/e-acsl-runtime/valid.c:21:[value] Assertion got status valid.
-tests/e-acsl-runtime/valid.c:16:[value] Function f: postcondition got status valid.
-tests/e-acsl-runtime/valid.c:16:[value] Function __e_acsl_f: postcondition got status valid.
-tests/e-acsl-runtime/valid.c:41:[value] Assertion got status valid.
-tests/e-acsl-runtime/valid.c:43:[value] Assertion got status valid.
-tests/e-acsl-runtime/valid.c:46:[value] Assertion got status valid.
+FRAMAC_SHARE/libc/stdlib.h:163:[value] warning: function __e_acsl_malloc, behavior allocation: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
+FRAMAC_SHARE/libc/stdlib.h:168:[value] warning: function __e_acsl_malloc, behavior no_allocation: postcondition got status invalid. (Behavior may be inactive, no reduction performed.)
 [value] using specification for function __valid_read
-tests/e-acsl-runtime/valid.c:47:[value] Assertion got status valid.
-FRAMAC_SHARE/libc/stdlib.h:178:[value] Function __e_acsl_free, behavior deallocation: precondition 'freeable' got status unknown.
+FRAMAC_SHARE/libc/stdlib.h:178:[value] warning: function __e_acsl_free, behavior deallocation: precondition 'freeable' got status unknown.
 [value] using specification for function __freeable
 :0:[value] Assigning imprecise value to __e_acsl_implies.
         The imprecision originates from Arithmetic {FRAMAC_SHARE/libc/stdlib.h:178}
 FRAMAC_SHARE/libc/stdlib.h:178:[value] Reading left-value __e_acsl_implies.
         It contains a garbled mix of {__malloc___e_acsl_malloc_l156} because of
         Arithmetic {FRAMAC_SHARE/libc/stdlib.h:178}.
-FRAMAC_SHARE/libc/stdlib.h:180:[value] Function __e_acsl_free, behavior deallocation: postcondition got status unknown.
-tests/e-acsl-runtime/valid.c:49:[value] Assertion got status valid.
+FRAMAC_SHARE/libc/stdlib.h:180:[value] warning: function __e_acsl_free, behavior deallocation: postcondition got status unknown.
 tests/e-acsl-runtime/valid.c:49:[value] completely invalid value in evaluation of
         argument (void *)a
 tests/e-acsl-runtime/valid.c:49:[kernel] warning: accessing left-value that contains escaping addresses.
                   assert ¬\dangling(&a);
-tests/e-acsl-runtime/valid.c:50:[value] Assertion got status valid.
-tests/e-acsl-runtime/valid.c:30:[value] Assertion got status valid.
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main

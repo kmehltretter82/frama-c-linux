@@ -30,29 +30,14 @@
 [value] using specification for function __store_block
 [value] using specification for function __full_init
 [value] using specification for function __literal_string
-tests/e-acsl-runtime/compound_initializers.c:35:[value] Assertion got status valid.
 [value] using specification for function __valid
 [value] using specification for function e_acsl_assert
-FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
-tests/e-acsl-runtime/compound_initializers.c:36:[value] Assertion got status valid.
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] warning: function e_acsl_assert: precondition got status unknown.
 [value] using specification for function __initialized
 [value] using specification for function __valid_read
-tests/e-acsl-runtime/compound_initializers.c:37:[value] Assertion got status valid.
-tests/e-acsl-runtime/compound_initializers.c:38:[value] Assertion got status valid.
-tests/e-acsl-runtime/compound_initializers.c:39:[value] Assertion got status valid.
-tests/e-acsl-runtime/compound_initializers.c:40:[value] Assertion got status valid.
-tests/e-acsl-runtime/compound_initializers.c:41:[value] Assertion got status valid.
-tests/e-acsl-runtime/compound_initializers.c:42:[value] Assertion got status valid.
-tests/e-acsl-runtime/compound_initializers.c:43:[value] Assertion got status valid.
 [value] using specification for function __gmpz_init_set_si
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:64:[value] Function __gmpz_init_set_si: precondition got status valid.
 [value] using specification for function __gmpz_cmp
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:127:[value] Function __gmpz_cmp: precondition got status valid.
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:128:[value] Function __gmpz_cmp: precondition got status valid.
 [value] using specification for function __gmpz_clear
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:117:[value] Function __gmpz_clear: precondition got status valid.
-tests/e-acsl-runtime/compound_initializers.c:44:[value] Assertion got status valid.
-tests/e-acsl-runtime/compound_initializers.c:45:[value] Assertion got status valid.
 [value] using specification for function __delete_block
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main

@@ -10,7 +10,5 @@
   __e_acsl_init ∈ [--..--]
   __e_acsl_internal_heap ∈ [--..--]
   __memory_size ∈ [--..--]
-tests/e-acsl-runtime/nested_code_annot.i:9:[value] Assertion got status valid.
 [value] using specification for function e_acsl_assert
-FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
 [value] done for function main

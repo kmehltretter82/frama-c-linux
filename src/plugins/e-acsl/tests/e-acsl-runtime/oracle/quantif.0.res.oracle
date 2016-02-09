@@ -10,22 +10,21 @@
   __e_acsl_init ∈ [--..--]
   __e_acsl_internal_heap ∈ [--..--]
   __memory_size ∈ [--..--]
-tests/e-acsl-runtime/quantif.i:11:[value] Assertion got status unknown.
+tests/e-acsl-runtime/quantif.i:11:[value] warning: assertion got status unknown.
 tests/e-acsl-runtime/quantif.i:11:[value] entering loop for the first time
 [value] using specification for function e_acsl_assert
-FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status valid.
-tests/e-acsl-runtime/quantif.i:12:[value] Assertion got status unknown.
+tests/e-acsl-runtime/quantif.i:12:[value] warning: assertion got status unknown.
 tests/e-acsl-runtime/quantif.i:12:[value] entering loop for the first time
-tests/e-acsl-runtime/quantif.i:13:[value] Assertion got status unknown.
+tests/e-acsl-runtime/quantif.i:13:[value] warning: assertion got status unknown.
 tests/e-acsl-runtime/quantif.i:13:[value] entering loop for the first time
-tests/e-acsl-runtime/quantif.i:14:[value] Assertion got status unknown.
+tests/e-acsl-runtime/quantif.i:14:[value] warning: assertion got status unknown.
 tests/e-acsl-runtime/quantif.i:14:[value] entering loop for the first time
-tests/e-acsl-runtime/quantif.i:18:[value] Assertion got status unknown.
+tests/e-acsl-runtime/quantif.i:18:[value] warning: assertion got status unknown.
 tests/e-acsl-runtime/quantif.i:18:[value] entering loop for the first time
-FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
-tests/e-acsl-runtime/quantif.i:23:[value] Assertion got status unknown.
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] warning: function e_acsl_assert: precondition got status unknown.
+tests/e-acsl-runtime/quantif.i:23:[value] warning: assertion got status unknown.
 tests/e-acsl-runtime/quantif.i:23:[value] entering loop for the first time
-tests/e-acsl-runtime/quantif.i:27:[value] Assertion got status unknown.
+tests/e-acsl-runtime/quantif.i:27:[value] warning: assertion got status unknown.
 tests/e-acsl-runtime/quantif.i:27:[value] entering loop for the first time
 tests/e-acsl-runtime/quantif.i:28:[value] entering loop for the first time
 [value] done for function main

@@ -47,10 +47,9 @@ FRAMAC_SHARE/libc/stdio.h:106:[e-acsl] warning: E-ACSL construct `logic function
 [value] using specification for function __full_init
 [value] using specification for function __literal_string
 [value] using specification for function fopen
-FRAMAC_SHARE/libc/stdio.h:106:[value] Function __e_acsl_fopen: postcondition got status valid.
-tests/e-acsl-runtime/stdout.c:13:[value] Assertion got status unknown.
+tests/e-acsl-runtime/stdout.c:13:[value] warning: assertion got status unknown.
 [value] using specification for function e_acsl_assert
-FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] warning: function e_acsl_assert: precondition got status unknown.
 [value] using specification for function __delete_block
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main
