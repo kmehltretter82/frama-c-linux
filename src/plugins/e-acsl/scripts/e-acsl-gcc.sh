@@ -92,7 +92,7 @@ Options:
   -p         output the generated code with rich formatting to STDOUT
   -o <file>  output the generated code to <file> [a.out.frama.c]
   -O <file>  output the generated executables to <file> [a.out, a.out.e-acsl]
-  -M         maximise memory-related instrumentation
+  -M         maximize memory-related instrumentation
   -g         always use GMP integers instead of C integral types
   -q         suppress any output except for errors and warnings
   -s <file>  redirect all output to <file>
