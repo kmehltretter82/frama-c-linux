@@ -8,6 +8,7 @@ DEPS_MODERN=eacslversion.tex biblio.bib macros.tex \
 	provides.tex \
 	limitations.tex \
 	changes.tex \
+	eacslgcc.tex \
 	$(C_CODE) \
 	$(VERSION_FILE)
 
@@ -20,7 +21,7 @@ FC_VERSION= Sodium
 
 EACSL_DIR=../..
 DISTRIB_DIR=$(HOME)/frama-c/doc/www/distrib
-install: 
+install:
 	cp -f main.pdf $(EACSL_DIR)/doc/manuals/e-acsl-manual.pdf
 #	cp -f main.pdf \
 	  $(DISTRIB_DIR)/download/e-acsl/e-acsl-manual-$(EACSL_VERSION).pdf
