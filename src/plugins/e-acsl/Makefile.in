@@ -2,7 +2,7 @@
 #                                                                        #
 #  This file is part of the Frama-C's E-ACSL plug-in.                    #
 #                                                                        #
-#  Copyright (C) 2012-2015                                               #
+#  Copyright (C) 2012-2016                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -178,7 +178,8 @@ EACSL_DISTRIB_FILES=\
 	tests/test_config.in \
 	tests/e-acsl-reject/test_config tests/e-acsl-reject/*.i \
 	tests/e-acsl-runtime/test_config tests/e-acsl-runtime/*.[ci] \
-	license/CEA_LGPL license/headache_config.txt license/LGPLv2.1 \
+	license/CEA_LGPL licence/SPARETIMELABS \
+	license/headache_config.txt license/LGPLv2.1 \
 	INSTALL README VERSION .depend
 
 # BE CAREFUL: manually remove all *.ml* files which should not be released!
@@ -229,6 +230,8 @@ headers::
 		*.ml *.mli \
 		Makefile.in configure.ac \
 		share/e-acsl/*.[ch] share/e-acsl/*/*.[ch] scripts/*.sh
+	headache -c license/headache_config.txt -h license/SPARETIMELABS \
+		share/e-acsl/e_acsl_printf.h
 
 ################
 # Generic part #
