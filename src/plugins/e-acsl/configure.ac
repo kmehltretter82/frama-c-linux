@@ -55,14 +55,14 @@ REQUIRED_NUMBER=20151002
 REQUIRED_NAME=Magnesium
 
 case $FRAMAC_VERSION in
-  # $REQUIRED_NAME-$REQUIRED_NUMBER+dev*)
-  #   # at the time being, must use the Frama-C development version
-  #   ;;
-  $REQUIRED_NAME-$REQUIRED_NUMBER*)
-    if test -n "$EXTRA_VERSION_NUMBER"; then
-      AC_MSG_WARN(no guarantee of compatibility with your Frama-C custom \
-version of $REQUIRED_NAME)
-    fi;;
+  $REQUIRED_NAME-$REQUIRED_NUMBER+dev*)
+    # at the time being, must use the Frama-C development version
+    ;;
+#   $REQUIRED_NAME-$REQUIRED_NUMBER*)
+#     if test -n "$EXTRA_VERSION_NUMBER"; then
+#       AC_MSG_WARN(no guarantee of compatibility with your Frama-C custom \
+# version of $REQUIRED_NAME)
+#     fi;;
   *)
     if test $VERSION_NUMBER -lt $REQUIRED_NUMBER; then
       AC_MSG_ERROR(Frama-C version must be at least \
