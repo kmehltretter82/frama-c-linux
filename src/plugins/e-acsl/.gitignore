@@ -74,6 +74,7 @@
 /tests/e-acsl-reject/result/*.annot
 /tests/e-acsl-reject/result/*_DEP
 /tests/e-acsl-reject/result/*.log
+/tests/no-main/result/*.log
 /tests/bts/result/*
 /tests/gmp/result/*.log
 /tests/gmp/result/gen*.c
