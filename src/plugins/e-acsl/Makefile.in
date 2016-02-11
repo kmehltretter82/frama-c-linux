@@ -178,7 +178,7 @@ EACSL_DISTRIB_FILES=\
 	tests/test_config.in \
 	tests/e-acsl-reject/test_config tests/e-acsl-reject/*.i \
 	tests/e-acsl-runtime/test_config tests/e-acsl-runtime/*.[ci] \
-	license/CEA_LGPL licence/SPARETIMELABS \
+	license/CEA_LGPL license/SPARETIMELABS \
 	license/headache_config.txt license/LGPLv2.1 \
 	INSTALL README VERSION .depend
 
