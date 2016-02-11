@@ -2,6 +2,9 @@ MAIN=main
 
 C_CODE=$(wildcard examples/*.[ci])
 VERSION_FILE=../../VERSION
+FC_VERSION= Magnesium
+
+EACSL_VERSION= $(shell cat $(VERSION_FILE))
 
 DEPS_MODERN=eacslversion.tex biblio.bib macros.tex \
 	introduction.tex \
@@ -15,9 +18,6 @@ DEPS_MODERN=eacslversion.tex biblio.bib macros.tex \
 default: main.pdf
 
 main.pdf: $(DEPS_MODERN)
-
-EACSL_VERSION= $(shell cat $(VERSION_FILE))
-FC_VERSION= Sodium
 
 EACSL_DIR=../..
 DISTRIB_DIR=$(HOME)/frama-c/doc/www/distrib

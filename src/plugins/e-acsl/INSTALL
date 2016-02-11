@@ -39,9 +39,7 @@ See below for more detailed and specific instructions.
 				  REQUIREMENTS
 ===============================================================================
 
-- GNU make version >= 3.81
-- Objective Caml >= 3.12.1;
-- Frama-C = Sodium-20150201
+- Frama-C = Magnesium-20151002
   (no warranty that this plug-in works with a more recent version of Frama-C)
 
 - The native version of the plug-in is only available if native dynamic linking
