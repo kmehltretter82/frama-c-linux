@@ -15,7 +15,7 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
--  E-ACSL       [2016/02/03] Added scripts/testrun.sh - a convenience wrapper
+o  E-ACSL       [2016/02/03] Added scripts/testrun.sh - a convenience wrapper
 	        around e-acsl-gcc.sh for use with testing.
 -* E-ACSL       [2016/01/15] Fix installation with custom --prefix.
 -* E-ACSL       [2016/01/05] Fix bug in the memory model that caused the

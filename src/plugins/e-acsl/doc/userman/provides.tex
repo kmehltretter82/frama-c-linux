@@ -101,9 +101,9 @@ unsigned long const __fc_rand_max = (unsigned long)32767;
 
 /*@
 axiomatic dynamic_allocation {
-  predicate is_allocable{L}(size_t n) 
+  predicate is_allocable{L}(size_t n)
     reads __fc_heap_status;
-  
+
   }
  */
 /*@ ghost extern int __e_acsl_init; */
@@ -135,7 +135,7 @@ constant declarations and global \acsl annotations that are not in the initial
 file \texttt{first.i}. They are part of the included \eacsl monitoring
 library. You can safely ignore it right now. The translated \texttt{main}
 function of \texttt{first.i} is displayed at the end. After each \eacsl
-annotation, a line has been added. 
+annotation, a line has been added.
 
 \begin{ccode}
   /*@ assert x == 0; */
@@ -519,9 +519,9 @@ restrictions.
 
 The \eacsl plug-in may work even if there is no \texttt{main} function.
 Consider for instance the following annotated program without such a
-\texttt{main}.  
+\texttt{main}.
 
-\listingname{no\_main.i} 
+\listingname{no\_main.i}
 \cinput{examples/no_main.i}
 
 The instrumented code is generated as usual, even though you get an additional
@@ -565,7 +565,7 @@ The \eacsl plug-in may also work if some functions have no implementation.
 Consider for instance the following annotated program for which the
 implementation of the function \texttt{my\_pow} is not provided.
 
-\listingname{no\_code.c} 
+\listingname{no\_code.c}
 \cinput{examples/no_code.c}
 
 The instrumented code is generated as usual, even though you get an additional
@@ -575,7 +575,7 @@ warning.
 [e-acsl] warning: annotating undefined function `my_pow':
                   the generated program may miss memory instrumentation
                   if there are memory-related annotations.
-[kernel] warning: No code nor implicit assigns clause for function my_pow, 
+[kernel] warning: No code nor implicit assigns clause for function my_pow,
 generating default assigns from the prototype
 [e-acsl] translation done in project "e-acsl".
 \end{shell}
@@ -647,7 +647,7 @@ even if the \eacsl plug-in keeps the maximum amount of information, the results
 of already executed analyzers (such as validity status of annotations) are not
 known in this new project. If you want to keep them, you have to set the option
 \optiondef{-}{e-acsl-prepare} when the first analysis is asked for.
- 
+
 In this context, the \eacsl plug-in does not generate code for annotations
 proven valid by another plug-in, except if you explicitly set the option
 \optiondef{-}{e-acsl-valid}. For instance, \valueplugin~\cite{value} is able to
@@ -678,7 +678,7 @@ plug-in is running.
 \section{Customization}
 \label{sec:custom}
 
-There are several ways to customize the \eacsl plug-in. 
+There are several ways to customize the \eacsl plug-in.
 
 First, the name of the generated project -- which is \texttt{e-acsl} by
 default -- may be changed by setting the option \optiondef{-}{e-acsl-project}.
@@ -760,7 +760,7 @@ parts of the translation, as detailed below.
 \begin{center}
 \begin{tabular}{|l|l|}
 \hline
-analysis & minimization of the instrumentation for memory-related annotation 
+analysis & minimization of the instrumentation for memory-related annotation
 (section~\ref{sec:memory}) \\
 \hline
 duplication & duplication of functions with contracts
@@ -773,3 +773,5 @@ typing & minimization of the instrumentation for integers
 \hline
 \end{tabular}
 \end{center}
+
+
