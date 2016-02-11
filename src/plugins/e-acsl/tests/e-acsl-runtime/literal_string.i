@@ -1,7 +1,5 @@
 /* run.config
    COMMENT: literal string
-   EXECNOW: LOG gen_literal_string.c BIN gen_literal_string.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/literal_string.i -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_literal_string.c > /dev/null && ./gcc_runtime.sh literal_string
-   EXECNOW: LOG gen_literal_string2.c BIN gen_literal_string2.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/e-acsl-runtime/literal_string.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/e-acsl-runtime/result/gen_literal_string2.c > /dev/null && ./gcc_runtime.sh literal_string2
 */
 
 int main(void);

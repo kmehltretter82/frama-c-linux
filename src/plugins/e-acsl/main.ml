@@ -152,7 +152,7 @@ let generate_code =
 	    Project.on
 	      dup_prj
 	      (fun () ->
-               Mpz.init_t ();
+                Mpz.init_t ();
                 Mmodel_analysis.reset ();
 		let visit prj = Visit.do_visit ~prj true in
 		let prj = File.create_project_from_visitor name visit in
@@ -165,6 +165,9 @@ let generate_code =
 		  ~project:prj
 		  ();
 		Resulting_projects.mark_as_computed ();
+                Project.copy
+                  ~selection:(State_selection.singleton Kernel.Files.self)
+                  prj;
 		prj)
 	      ()
 	  in

@@ -1,8 +1,5 @@
 /* run.config
    COMMENT: bts #1717, issue with labels on memory-related statements
-   STDOPT: #"-cpp-extra-args=\"-I`@frama-c@ -print-share-path`/libc\""
-   EXECNOW: LOG gen_bts1717.c BIN gen_bts1717.out @frama-c@ -cpp-extra-args="-I`@frama-c@ -print-share-path`/libc" -e-acsl-share ./share/e-acsl ./tests/bts/bts1717.i -e-acsl -then-on e-acsl -print -ocode ./tests/bts/result/gen_bts1717.c > /dev/null && ./gcc_bts.sh bts1717
-   EXECNOW: LOG gen_bts17172.c BIN gen_bts17172.out @frama-c@ -cpp-extra-args="-I`@frama-c@ -print-share-path`/libc" -e-acsl-share ./share/e-acsl ./tests/bts/bts1717.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/bts/result/gen_bts17172.c > /dev/null && ./gcc_bts.sh bts17172
 */
 
 int main(void) {

@@ -1,0 +1,12 @@
+[e-acsl] beginning translation.
+[e-acsl] translation done in project "e-acsl".
+tests/e-acsl-runtime/linear_search.i:7:[value] warning: function __e_acsl_search: precondition got status unknown.
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] warning: function e_acsl_assert: precondition got status unknown.
+tests/e-acsl-runtime/linear_search.i:7:[value] warning: function search: precondition got status unknown.
+tests/e-acsl-runtime/linear_search.i:18:[value] warning: loop invariant got status unknown.
+tests/e-acsl-runtime/linear_search.i:10:[value] warning: function search, behavior exists: postcondition got status invalid. (Behavior may be inactive, no reduction performed.)
+tests/e-acsl-runtime/linear_search.i:13:[value] warning: function search, behavior not_exists: postcondition got status invalid. (Behavior may be inactive, no reduction performed.)
+tests/e-acsl-runtime/linear_search.i:10:[value] warning: function __e_acsl_search, behavior exists: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
+tests/e-acsl-runtime/linear_search.i:13:[value] warning: function __e_acsl_search, behavior not_exists: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
+tests/e-acsl-runtime/linear_search.i:31:[value] warning: assertion got status unknown.
+tests/e-acsl-runtime/linear_search.i:34:[value] warning: assertion got status unknown.

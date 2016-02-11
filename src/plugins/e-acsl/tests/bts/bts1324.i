@@ -1,7 +1,5 @@
 /* run.config
    COMMENT: fixed bug with typing of universal quantification
-   EXECNOW: LOG gen_bts1324.c BIN gen_bts1324.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/bts/bts1324.i -e-acsl -then-on e-acsl -print -ocode ./tests/bts/result/gen_bts1324.c > /dev/null && ./gcc_bts.sh bts1324
-   EXECNOW: LOG gen_bts13242.c BIN gen_bts13242.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/bts/bts1324.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/bts/result/gen_bts13242.c > /dev/null && ./gcc_bts.sh bts13242
 */
 
 /*@ behavior yes:

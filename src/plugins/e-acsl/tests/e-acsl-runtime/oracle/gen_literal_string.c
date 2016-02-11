@@ -3,90 +3,6 @@ char *__e_acsl_literal_string;
 char *__e_acsl_literal_string_4;
 char *__e_acsl_literal_string_3;
 char *__e_acsl_literal_string_2;
-struct __anonstruct___mpz_struct_1 {
-   int _mp_alloc ;
-   int _mp_size ;
-   unsigned long *_mp_d ;
-};
-typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
-typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
-typedef unsigned int size_t;
-/*@ requires predicate ≢ 0;
-    assigns \nothing; */
-extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
-                                                           char *kind,
-                                                           char *fct,
-                                                           char *pred_txt,
-                                                           int line);
-
-/*@
-model __mpz_struct { ℤ n };
-*/
-int __fc_random_counter __attribute__((__unused__, __FRAMA_C_MODEL__));
-unsigned long const __fc_rand_max = (unsigned long)32767;
-/*@ ghost extern int __fc_heap_status __attribute__((__FRAMA_C_MODEL__)); */
-
-/*@
-axiomatic dynamic_allocation {
-  predicate is_allocable{L}(size_t n) 
-    reads __fc_heap_status;
-  
-  }
- */
-/*@ ghost extern int __e_acsl_init; */
-
-/*@ assigns \result;
-    assigns \result \from *((char *)ptr+(0 .. size-1)); */
-extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
-                                                            size_t size);
-
-/*@ assigns \nothing; */
-extern  __attribute__((__FC_BUILTIN__)) void __delete_block(void *ptr);
-
-/*@ assigns \nothing; */
-extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
-
-/*@ assigns \nothing; */
-extern  __attribute__((__FC_BUILTIN__)) void __literal_string(void *ptr);
-
-/*@ ensures \result ≡ 0 ∨ \result ≡ 1;
-    ensures \result ≡ 1 ⇒ \valid((char *)\old(ptr)+(0 .. \old(size)-1));
-    assigns \result;
-    assigns \result \from *((char *)ptr+(0 .. size-1));
- */
-extern  __attribute__((__FC_BUILTIN__)) int __valid(void *ptr, size_t size);
-
-/*@ ensures \result ≡ 0 ∨ \result ≡ 1;
-    ensures
-      \result ≡ 1 ⇒ \valid_read((char *)\old(ptr)+(0 .. \old(size)-1));
-    assigns \result;
-    assigns \result \from *((char *)ptr+(0 .. size-1));
- */
-extern  __attribute__((__FC_BUILTIN__)) int __valid_read(void *ptr,
-                                                         size_t size);
-
-/*@ ensures \result ≡ 0 ∨ \result ≡ 1;
-    ensures
-      \result ≡ 1 ⇒ \initialized((char *)\old(ptr)+(0 .. \old(size)-1));
-    assigns \result;
-    assigns \result \from *((char *)ptr+(0 .. size-1));
- */
-extern  __attribute__((__FC_BUILTIN__)) int __initialized(void *ptr,
-                                                          size_t size);
-
-/*@ ghost extern int __e_acsl_internal_heap; */
-
-/*@ assigns __e_acsl_internal_heap;
-    assigns __e_acsl_internal_heap \from __e_acsl_internal_heap;
- */
-extern  __attribute__((__FC_BUILTIN__)) void __e_acsl_memory_clean(void);
-
-extern size_t __memory_size;
-
-/*@
-predicate diffSize{L1, L2}(ℤ i) =
-  \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
- */
 int main(void);
 
 char *T = (char *)"bar";
@@ -98,9 +14,9 @@ void f(void)
     int __e_acsl_valid_read;
     __e_acsl_valid_read = __valid_read((void *)(T + G),sizeof(char));
     e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"f",
-                  (char *)"mem_access: \\valid_read(T+G)",13);
+                  (char *)"mem_access: \\valid_read(T+G)",11);
     e_acsl_assert((int)*(T + G) == 'b',(char *)"Assertion",(char *)"f",
-                  (char *)"*(T+G) == \'b\'",13);
+                  (char *)"*(T+G) == \'b\'",11);
   }
   G ++;
   return;
@@ -129,11 +45,11 @@ void __e_acsl_memory_init(void)
   __store_block((void *)__e_acsl_literal_string_2,sizeof("bar"));
   __full_init((void *)__e_acsl_literal_string_2);
   __literal_string((void *)__e_acsl_literal_string_2);
-  __store_block((void *)(& S2),4U);
+  __store_block((void *)(& S2),8UL);
   __full_init((void *)(& S2));
-  __store_block((void *)(& S),4U);
+  __store_block((void *)(& S),8UL);
   __full_init((void *)(& S));
-  __store_block((void *)(& T),4U);
+  __store_block((void *)(& T),8UL);
   __full_init((void *)(& T));
   return;
 }
@@ -143,7 +59,7 @@ int main(void)
   int __retres;
   char *SS;
   __e_acsl_memory_init();
-  __store_block((void *)(& SS),4U);
+  __store_block((void *)(& SS),8UL);
   __full_init((void *)(& SS));
   SS = (char *)__e_acsl_literal_string;
   /*@ assert *(S+G2) ≡ 'o'; */
@@ -151,23 +67,23 @@ int main(void)
     int __e_acsl_valid_read;
     __e_acsl_valid_read = __valid_read((void *)(S + G2),sizeof(char));
     e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"main",
-                  (char *)"mem_access: \\valid_read(S+G2)",24);
+                  (char *)"mem_access: \\valid_read(S+G2)",22);
     e_acsl_assert((int)*(S + G2) == 'o',(char *)"Assertion",(char *)"main",
-                  (char *)"*(S+G2) == \'o\'",24);
+                  (char *)"*(S+G2) == \'o\'",22);
   }
   /*@ assert \initialized(S); */
   {
     int __e_acsl_initialized;
     __e_acsl_initialized = __initialized((void *)S,sizeof(char));
     e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"main",
-                  (char *)"\\initialized(S)",25);
+                  (char *)"\\initialized(S)",23);
   }
   /*@ assert \valid_read(S2); */
   {
     int __e_acsl_valid_read_2;
     __e_acsl_valid_read_2 = __valid_read((void *)S2,sizeof(char));
     e_acsl_assert(__e_acsl_valid_read_2,(char *)"Assertion",(char *)"main",
-                  (char *)"\\valid_read(S2)",26);
+                  (char *)"\\valid_read(S2)",24);
   }
   /*@ assert ¬\valid(SS); */
   {
@@ -181,7 +97,7 @@ int main(void)
     }
     else __e_acsl_and = 0;
     e_acsl_assert(! __e_acsl_and,(char *)"Assertion",(char *)"main",
-                  (char *)"!\\valid(SS)",27);
+                  (char *)"!\\valid(SS)",25);
   }
   f();
   __retres = 0;

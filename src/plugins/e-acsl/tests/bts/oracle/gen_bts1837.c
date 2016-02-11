@@ -2,98 +2,14 @@
 char *__e_acsl_literal_string_3;
 char *__e_acsl_literal_string;
 char *__e_acsl_literal_string_2;
-struct __anonstruct___mpz_struct_1 {
-   int _mp_alloc ;
-   int _mp_size ;
-   unsigned long *_mp_d ;
-};
-typedef struct __anonstruct___mpz_struct_1 __mpz_struct;
-typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
-typedef unsigned int size_t;
-/*@ requires predicate ≢ 0;
-    assigns \nothing; */
-extern  __attribute__((__FC_BUILTIN__)) void e_acsl_assert(int predicate,
-                                                           char *kind,
-                                                           char *fct,
-                                                           char *pred_txt,
-                                                           int line);
-
-/*@
-model __mpz_struct { ℤ n };
-*/
-int __fc_random_counter __attribute__((__unused__, __FRAMA_C_MODEL__));
-unsigned long const __fc_rand_max = (unsigned long)32767;
-/*@ ghost extern int __fc_heap_status __attribute__((__FRAMA_C_MODEL__)); */
-
-/*@
-axiomatic dynamic_allocation {
-  predicate is_allocable{L}(size_t n) 
-    reads __fc_heap_status;
-  
-  }
- */
-/*@ ghost extern int __e_acsl_init; */
-
-/*@ assigns \result;
-    assigns \result \from *((char *)ptr+(0 .. size-1)); */
-extern  __attribute__((__FC_BUILTIN__)) void *__store_block(void *ptr,
-                                                            size_t size);
-
-/*@ assigns \nothing; */
-extern  __attribute__((__FC_BUILTIN__)) void __delete_block(void *ptr);
-
-/*@ assigns \nothing; */
-extern  __attribute__((__FC_BUILTIN__)) void __full_init(void *ptr);
-
-/*@ assigns \nothing; */
-extern  __attribute__((__FC_BUILTIN__)) void __literal_string(void *ptr);
-
-/*@ ensures \result ≡ 0 ∨ \result ≡ 1;
-    ensures \result ≡ 1 ⇒ \valid((char *)\old(ptr)+(0 .. \old(size)-1));
-    assigns \result;
-    assigns \result \from *((char *)ptr+(0 .. size-1));
- */
-extern  __attribute__((__FC_BUILTIN__)) int __valid(void *ptr, size_t size);
-
-/*@ ensures \result ≡ 0 ∨ \result ≡ 1;
-    ensures
-      \result ≡ 1 ⇒ \valid_read((char *)\old(ptr)+(0 .. \old(size)-1));
-    assigns \result;
-    assigns \result \from *((char *)ptr+(0 .. size-1));
- */
-extern  __attribute__((__FC_BUILTIN__)) int __valid_read(void *ptr,
-                                                         size_t size);
-
-/*@ ensures \result ≡ 0 ∨ \result ≡ 1;
-    ensures
-      \result ≡ 1 ⇒ \initialized((char *)\old(ptr)+(0 .. \old(size)-1));
-    assigns \result;
-    assigns \result \from *((char *)ptr+(0 .. size-1));
- */
-extern  __attribute__((__FC_BUILTIN__)) int __initialized(void *ptr,
-                                                          size_t size);
-
-/*@ ghost extern int __e_acsl_internal_heap; */
-
-/*@ assigns __e_acsl_internal_heap;
-    assigns __e_acsl_internal_heap \from __e_acsl_internal_heap;
- */
-extern  __attribute__((__FC_BUILTIN__)) void __e_acsl_memory_clean(void);
-
-extern size_t __memory_size;
-
-/*@
-predicate diffSize{L1, L2}(ℤ i) =
-  \at(__memory_size,L1)-\at(__memory_size,L2) ≡ i;
- */
 char *S = (char *)"foo";
 int f(void)
 {
   int __retres;
   char *s1;
   char *s2;
-  __store_block((void *)(& s2),4U);
-  __store_block((void *)(& s1),4U);
+  __store_block((void *)(& s2),8UL);
+  __store_block((void *)(& s1),8UL);
   __full_init((void *)(& s1));
   s1 = (char *)__e_acsl_literal_string;
   __full_init((void *)(& s2));
@@ -103,7 +19,7 @@ int f(void)
     int __e_acsl_valid_read;
     __e_acsl_valid_read = __valid_read((void *)S,sizeof(char));
     e_acsl_assert(__e_acsl_valid_read,(char *)"Assertion",(char *)"f",
-                  (char *)"\\valid_read(S)",11);
+                  (char *)"\\valid_read(S)",10);
   }
   /*@ assert \valid_read(s1); */
   {
@@ -117,7 +33,7 @@ int f(void)
     }
     else __e_acsl_and = 0;
     e_acsl_assert(__e_acsl_and,(char *)"Assertion",(char *)"f",
-                  (char *)"\\valid_read(s1)",12);
+                  (char *)"\\valid_read(s1)",11);
   }
   /*@ assert \valid_read(s2); */
   {
@@ -131,7 +47,7 @@ int f(void)
     }
     else __e_acsl_and_2 = 0;
     e_acsl_assert(__e_acsl_and_2,(char *)"Assertion",(char *)"f",
-                  (char *)"\\valid_read(s2)",13);
+                  (char *)"\\valid_read(s2)",12);
   }
   __retres = 0;
   __delete_block((void *)(& s2));
@@ -153,7 +69,7 @@ void __e_acsl_memory_init(void)
   __store_block((void *)__e_acsl_literal_string_2,sizeof("bar"));
   __full_init((void *)__e_acsl_literal_string_2);
   __literal_string((void *)__e_acsl_literal_string_2);
-  __store_block((void *)(& S),4U);
+  __store_block((void *)(& S),8UL);
   __full_init((void *)(& S));
   return;
 }
@@ -168,13 +84,14 @@ int main(void)
     int tmp;
     { /* sequence */
       tmp = i;
+      /*@ assert Value: signed_overflow: -2147483648 ≤ i-1; */
       i --;
       ;
     }
     if (! tmp) break;
     {
       char *s;
-      __store_block((void *)(& s),4U);
+      __store_block((void *)(& s),8UL);
       __full_init((void *)(& s));
       s = (char *)__e_acsl_literal_string_3;
       /*@ assert \valid_read(s); */
@@ -189,7 +106,7 @@ int main(void)
         }
         else __e_acsl_and = 0;
         e_acsl_assert(__e_acsl_and,(char *)"Assertion",(char *)"main",
-                      (char *)"\\valid_read(s)",21);
+                      (char *)"\\valid_read(s)",20);
       }
       /*@ assert ¬\valid(s); */
       {
@@ -203,7 +120,7 @@ int main(void)
         }
         else __e_acsl_and_2 = 0;
         e_acsl_assert(! __e_acsl_and_2,(char *)"Assertion",(char *)"main",
-                      (char *)"!\\valid(s)",22);
+                      (char *)"!\\valid(s)",21);
         __delete_block((void *)(& s));
       }
     }

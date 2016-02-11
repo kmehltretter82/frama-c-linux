@@ -58,7 +58,10 @@
 /tests/e-acsl-runtime/result/gen_*.c
 /tests/e-acsl-runtime/result/gen_*.out
 /tests/e-acsl-reject/result/*.log
+/tests/no-main/result/*.log
 /tests/bts/result/*
+/tests/gmp/result/*.log
+/tests/gmp/result/gen*.c
 /tests/check/obj/*
 .frama-c
 tests/ptests_config

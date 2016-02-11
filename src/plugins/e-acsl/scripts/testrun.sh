@@ -38,14 +38,16 @@
 #     $ROOT/test/e-acsl-runtime/addrOf.c
 #   $3 - if specified this script re-runs test sequence generating using
 #       -e-acsl-gmp-only option
-#   $4 - debug flag
+#   $4 - extra flags for e-acsl-gcc.sh
+#   $5 - debug flag
 
 set -e
 
 TEST="$1" # Based name of the test file with extension stripped
 PREFIX="$2" # Prefix (test suite) directory, e.g., bts, e-acsl-runtime
 GMP="$3" # Whether to use a subsequent run with -e-acsl-gmp-only
-DEBUG="$4" # Debug flag
+EXTRA="$4" # Extra flags for e-acsl-gcc.sh
+DEBUG="$5" # Debug flag
 
 ROOTDIR="`readlink -f $(dirname $0)/../`" # Root directory of the repository
 TESTDIR="$ROOTDIR/tests/$PREFIX"
@@ -57,10 +59,16 @@ LOG="$RESDIR/$TEST.testrun" # Base name for log files
 OUT="$RESDIR/gen_$TEST"     # Base name for output
 RUNS=1
 
+debug() {
+  if [ -n "$DEBUG" ]; then
+    echo "$1" 1>&2
+  fi
+}
+
 # Error reporting
 error() {
   echo "Error: $1" 1>&2
-  echo "See $2 for details" 1>&2
+  debug "See $2 for details"
   exit 1
 }
 
@@ -85,15 +93,18 @@ run_test() {
 
   # Command for instrumenting the source file and compiling the original
   # and the instrumented code
-  EACSL_GCC="e-acsl-gcc.sh
+  EACSL_GCC="./scripts/e-acsl-gcc.sh
     --compile $TESTFILE --ocode=$ocode --logfile=$logfile
     --memory-model=$MODEL --oexec=$oexec $extra"
 
+  debug "Run $EACSL_GCC"
   $EACSL_GCC || error "Command $EACSL_GCC failed" "$logfile"
 
   # Log outputs of the generated executables
-  $oexec         2>&1 > $oexeclog.native
-  $oexec.e-acsl  2>&1 > $oexeclog.e-acsl
+  debug "Run and log native execution to $oexeclog.native"
+  $oexec        2>&1 > $oexeclog.native || true
+  debug "Run and log E-ACSL execution to $oexeclog.e-acsl"
+  $oexec.e-acsl 2>&1 > $oexeclog.e-acsl || true
 
   ## Make sure that instrumented and uninstrumented programs have same outputs
   diff $oexeclog.native $oexeclog.e-acsl ||
@@ -103,8 +114,8 @@ run_test() {
   RUNS=$((RUNS+1))
 }
 
-run_test
+run_test "$EXTRA"
 if test -n "$GMP"; then
-  run_test "--gmp"
+  run_test "--gmp $EXTRA"
 fi
 exit 0

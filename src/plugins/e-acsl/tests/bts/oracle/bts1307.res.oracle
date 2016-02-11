@@ -1,44 +1,9 @@
-[kernel] Parsing FRAMAC_SHARE/libc/__fc_builtin_for_normalization.i (no preprocessing)
-[kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl.h (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl_gmp_types.h (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl_gmp.h (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel_api.h (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/e-acsl/memory_model/e_acsl_bittree.h (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h (with preprocessing)
-[kernel] Parsing tests/e-acsl-runtime/bts1307.i (no preprocessing)
-tests/e-acsl-runtime/bts1307.i:16:[kernel] warning: Floating-point constant 0.4 is not represented exactly. Will use 0x1.999999999999ap-2. See documentation for option -warn-decimal-float
+tests/bts/bts1307.i:14:[kernel] warning: Floating-point constant 0.4 is not represented exactly. Will use 0x1.999999999999ap-2. See documentation for option -warn-decimal-float
 [e-acsl] beginning translation.
-tests/e-acsl-runtime/bts1307.i:13:[e-acsl] warning: approximating a real number by a float
-tests/e-acsl-runtime/bts1307.i:25:[e-acsl] warning: approximating a real number by a float
-tests/e-acsl-runtime/bts1307.i:25:[e-acsl] warning: approximating a real number by a float
+tests/bts/bts1307.i:11:[e-acsl] warning: approximating a real number by a float
+tests/bts/bts1307.i:23:[e-acsl] warning: approximating a real number by a float
+tests/bts/bts1307.i:23:[e-acsl] warning: approximating a real number by a float
 [e-acsl] translation done in project "e-acsl".
-[value] Analyzing a complete application starting at main
-[value] Computing initial state
-[value] Initial state computed
-[value] Values of globals at initialization
-  random_counter ∈ {0}
-  rand_max ∈ {32767}
-  __fc_heap_status ∈ [--..--]
-  __e_acsl_init ∈ [--..--]
-  __e_acsl_internal_heap ∈ [--..--]
-  __memory_size ∈ [--..--]
-[value] using specification for function __store_block
-[value] using specification for function __full_init
-tests/e-acsl-runtime/bts1307.i:7:[value] Function __e_acsl_foo: precondition got status valid.
-tests/e-acsl-runtime/bts1307.i:8:[value] Function __e_acsl_foo: precondition got status valid.
-tests/e-acsl-runtime/bts1307.i:9:[value] Function __e_acsl_foo: precondition got status valid.
-[value] using specification for function __valid
-[value] using specification for function e_acsl_assert
-FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status unknown.
-tests/e-acsl-runtime/bts1307.i:7:[value] Function foo: precondition got status valid.
-tests/e-acsl-runtime/bts1307.i:8:[value] Function foo: precondition got status valid.
-tests/e-acsl-runtime/bts1307.i:9:[value] Function foo: precondition got status valid.
-[value] using specification for function __initialize
-[value] using specification for function __delete_block
-tests/e-acsl-runtime/bts1307.i:13:[value] Function foo, behavior OverEstimate_Motoring: postcondition got status valid.
-[value] using specification for function __valid_read
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] warning: function e_acsl_assert: precondition got status unknown.
 [value] user error: type long double not implemented. Using double instead
-FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] Function e_acsl_assert: precondition got status invalid.
-tests/e-acsl-runtime/bts1307.i:13:[value] Function __e_acsl_foo, behavior OverEstimate_Motoring: no state left in which to evaluate postcondition, status not computed.
-[value] done for function main
-[value] ====== VALUES COMPUTED ======
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] warning: function e_acsl_assert: precondition got status invalid.

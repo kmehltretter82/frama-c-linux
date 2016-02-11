@@ -1,7 +1,5 @@
 /* run.config
    COMMENT: spec with floats and reals
-   EXECNOW: LOG gen_bts1307.c BIN gen_bts1307.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/bts/bts1307.i -e-acsl -then-on e-acsl -print -ocode ./tests/bts/result/gen_bts1307.c > /dev/null && ./gcc_bts.sh bts1307
-   EXECNOW: LOG gen_bts13072.c BIN gen_bts13072.out @frama-c@ -e-acsl-share ./share/e-acsl ./tests/bts/bts1307.i -e-acsl-gmp-only -e-acsl -then-on e-acsl -print -ocode ./tests/bts/result/gen_bts13072.c > /dev/null && ./gcc_bts.sh bts13072
 */
 
 /*@ requires \valid(Mtmax_in);
