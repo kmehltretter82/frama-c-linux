@@ -49,10 +49,10 @@ m4_ifndef([FRAMAC_MAIN_AUTOCONF],[check_plugin_dependencies],[])
 AC_MSG_CHECKING(for Frama-C version)
 AC_MSG_RESULT($FRAMAC_VERSION)
 
-VERSION_NUMBER=`echo $FRAMAC_VERSION | sed -n -e 's/[[a-zA-Z]]\+-\([[0-9]]\+\)-.*/\1/p'`
+VERSION_NUMBER=`echo $FRAMAC_VERSION | sed -n -e 's/[[a-zA-Z]]\+-\([[0-9]]\+\).*/\1/p'`
 EXTRA_VERSION_NUMBER=`echo $FRAMAC_VERSION | sed -n -e 's/[[a-zA-Z]]\+-[[0-9]]\+-\(.*\)/\1/p'`
-REQUIRED_NUMBER=20150201
-REQUIRED_NAME=Sodium
+REQUIRED_NUMBER=20151002
+REQUIRED_NAME=Magnesium
 
 case $FRAMAC_VERSION in
   # $REQUIRED_NAME-$REQUIRED_NUMBER+dev*)
