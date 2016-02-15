@@ -216,6 +216,7 @@ int main(void)
   float f;
   float g;
   float h;
+  __e_acsl_memory_init((int *)0,(char ***)0);
   __store_block((void *)(& h),4UL);
   __store_block((void *)(& g),4UL);
   __store_block((void *)(& f),4UL);

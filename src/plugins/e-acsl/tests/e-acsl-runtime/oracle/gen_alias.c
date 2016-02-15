@@ -17,6 +17,7 @@ int main(void)
 {
   int __retres;
   int i;
+  __e_acsl_memory_init((int *)0,(char ***)0);
   __store_block((void *)(& i),4UL);
   f(& i,255);
   /*@ assert \initialized(&i); */

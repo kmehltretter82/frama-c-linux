@@ -21,11 +21,14 @@
 /**************************************************************************/
 
 #include <stdlib.h>
-#include <string.h>
 #include <stdbool.h>
+
+#include "e_acsl_syscall.h"
+#include "e_acsl_string.h"
 #include "e_acsl_mmodel_api.h"
 #include "e_acsl_mmodel.h"
-#include "../e_acsl_printf.h"
+#include "e_acsl_assert.h"
+#include "e_acsl_printf.h"
 
 // E-ACSL warnings {{{
 #define WARNING 0   // Output a warning message to stderr
@@ -56,25 +59,24 @@ static void warning(const char* message) {
   }
 // }}}
 
-void* __e_acsl_mmodel_memset(void* dest, int val, size_t len) {
-  unsigned char *ptr = (unsigned char*)dest;
-  while (len-- > 0)
-    *ptr++ = val;
-  return dest;
-}
-
-size_t __memory_size = 0;
+size_t __heap_size = 0;
 /*unsigned cpt_store_block = 0;*/
 
 static const int nbr_bits_to_1[256] = {
-  0,1,1,2,1,2,2,3,1,2,2,3,2,3,3,4,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,4,5,5,6,5,6,6,7,5,6,6,7,6,7,7,8
+  0,1,1,2,1,2,2,3,1,2,2,3,2,3,3,4,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,1,2,2,3,2,3,
+  3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,1,2,2,3,2,3,3,4,2,3,3,4,
+  3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,
+  4,5,4,5,5,6,4,5,5,6,5,6,6,7,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,
+  3,4,4,5,4,5,5,6,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,
+  6,7,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,3,4,4,5,
+  4,5,5,6,4,5,5,6,5,6,6,7,4,5,5,6,5,6,6,7,5,6,6,7,6,7,7,8
 };
 
 /*@ assigns \nothing;
-  @ ensures \result == __memory_size;
+  @ ensures \result == __heap_size;
   @*/
 size_t __get_memory_size(void) {
-  return __memory_size;
+  return __heap_size;
 }
 
 /*@ assigns \nothing;
@@ -83,19 +85,6 @@ size_t __get_memory_size(void) {
   @*/
 static size_t needed_bytes (size_t size) {
   return (size % 8) == 0 ? (size/8) : (size/8 + 1);
-}
-
-/* adds argc / argv to the memory model */
-void __init_args(int argc, char **argv) {
-  int i;
-
-  __store_block(argv, (argc+1)*sizeof(char*));
-  __full_init(argv);
-
-  for (i = 0; i < argc; i++) {
-    __store_block(argv[i], strlen(argv[i])+1);
-    __full_init(argv[i]);
-  }
 }
 
 /* store the block of size bytes starting at ptr, the new block is returned.
@@ -135,7 +124,7 @@ void* __malloc(size_t size) {
   tmp = malloc(size);
   if(tmp == NULL) return NULL;
   new_block = __store_block(tmp, size);
-  __memory_size += size;
+  __heap_size += size;
   assert(new_block != NULL && (void*)new_block->ptr != NULL);
   new_block->freeable = true;
   return (void*)new_block->ptr;
@@ -150,7 +139,7 @@ void __free(void* ptr) {
   assert(tmp != NULL);
   free(ptr);
   __clean_init(tmp);
-  __memory_size -= tmp->size;
+  __heap_size -= tmp->size;
   __remove_element(tmp);
   free(tmp);
 }
@@ -168,7 +157,10 @@ int __freeable(void* ptr) {
 void* __realloc(void* ptr, size_t size) {
   struct _block * tmp;
   void * new_ptr;
-  if(ptr == NULL) return __malloc(size);
+  /* ptr is NULL - malloc */
+  if(ptr == NULL)
+    return __malloc(size);
+  /* size is zero - free */
   if(size == 0) {
     __free(ptr);
     return NULL;
@@ -177,8 +169,13 @@ void* __realloc(void* ptr, size_t size) {
   assert(tmp != NULL);
   new_ptr = realloc((void*)tmp->ptr, size);
   if(new_ptr == NULL) return NULL;
-  __memory_size -= tmp->size;
-  tmp->ptr = (size_t)new_ptr;
+  __heap_size -= tmp->size;
+  /* realloc changes start address -- re-enter the element into the ADT */
+  if (tmp->ptr != (size_t)new_ptr) {
+    __remove_element(tmp);
+    tmp->ptr = (size_t)new_ptr;
+    __add_element(tmp);
+  }
   /* uninitialized, do nothing */
   if(tmp->init_cpt == 0) ;
   /* already fully initialized block */
@@ -191,9 +188,9 @@ void* __realloc(void* ptr, size_t size) {
     else {
       int nb = needed_bytes(size);
       tmp->init_ptr = malloc(nb);
-      __e_acsl_mmodel_memset(tmp->init_ptr, 0xFF, nb);
+      memset(tmp->init_ptr, 0xFF, nb);
       if(size%8 != 0)
-	tmp->init_ptr[size/8] <<= (8 - size%8);
+      tmp->init_ptr[size/8] <<= (8 - size%8);
     }
   }
   /* contains initialized and uninitialized parts */
@@ -214,7 +211,7 @@ void* __realloc(void* ptr, size_t size) {
   }
   tmp->size = size;
   tmp->freeable = true;
-  __memory_size += size;
+  __heap_size += size;
   return (void*)tmp->ptr;
 }
 
@@ -228,7 +225,7 @@ void* __calloc(size_t nbr_block, size_t size_block) {
   tmp = calloc(nbr_block, size_block);
   if(tmp == NULL) return NULL;
   new_block = __store_block(tmp, nbr_block * size_block);
-  __memory_size += nbr_block * size_block;
+  __heap_size += nbr_block * size_block;
   assert(new_block != NULL && (void*)new_block->ptr != NULL);
   new_block->freeable = true;
   return (void*)new_block->ptr;
@@ -253,7 +250,7 @@ void __initialize (void * ptr, size_t size) {
   if(tmp->init_cpt == 0) {
     int nb = needed_bytes(tmp->size);
     tmp->init_ptr = malloc(nb);
-    __e_acsl_mmodel_memset(tmp->init_ptr, 0, nb);
+    memset(tmp->init_ptr, 0, nb);
   }
 
   for(i = 0; i < size; i++) {
@@ -364,12 +361,6 @@ int __offset(void* ptr) {
   return ((size_t)ptr - tmp->ptr);
 }
 
-void __out_of_bound(void* ptr, _Bool flag) {
-  struct _block * tmp = __get_cont(ptr);
-  assert(tmp != NULL);
-  tmp->is_out_of_bound = flag;
-}
-
 /*******************/
 /* PRINT           */
 /*******************/
@@ -414,8 +405,24 @@ void __clean_block (struct _block * ptr) {
 
 /* erase the content of the abstract structure */
 void __e_acsl_memory_clean() {
-  __clean_struct();
+  //__clean_struct();
 }
+
+/* adds argc / argv to the memory model */
+void __init_argv(int argc, char **argv) {
+  int i;
+
+  __store_block(argv, (argc+1)*sizeof(char*));
+  __full_init(argv);
+
+  for (i = 0; i < argc; i++) {
+    __store_block(argv[i], strlen(argv[i])+1);
+    __full_init(argv[i]);
+  }
+}
+
+/* initialize contents of the abstract structure and record arguments */
+void __e_acsl_memory_init(int *argc_ref, char ***argv_ref) { }
 
 /**********************/
 /* DEBUG              */

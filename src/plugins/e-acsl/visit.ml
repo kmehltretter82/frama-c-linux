@@ -92,9 +92,9 @@ class e_acsl_visitor prj generate = object (self)
    initializers aiming to capture memory allocated by global variable
    declarations and initilisation. At runtime the memory blocks corresponding
    to space occupied by global are recorded via a call to
-   [__e_acsl_memory_init] instrumented before (almost) anything else in the
+   [__e_acsl_globals_init] instrumented at the beginning of the
    [main] function. Each variable stored by [global_vars] will be handled in
-   the body of [__e_acsl_memory_init] as follows:
+   the body of [__e_acsl_globals_init] as follows:
       __store_block(...); // Record a memory block used by the variable
       __full_init(...);   // ... and mark it as initialized memory
 
@@ -193,9 +193,9 @@ class e_acsl_visitor prj generate = object (self)
               function_env := env;
               let stmts = Cil.mkStmt ~valid_sid:true (Block b) :: stmts in
               let blk = Cil.mkBlock stmts in
-              (* Create [__e_acsl_memory_init] function with definition
+              (* Create [__e_acsl_globals_init] function with definition
                for initialization of global variables *)
-              let fname = "__e_acsl_memory_init" in
+              let fname = "__e_acsl_globals_init" in
               let vi =
                 Cil.makeGlobalVar ~source:true
                   fname
@@ -218,7 +218,7 @@ class e_acsl_visitor prj generate = object (self)
               in
               self#add_generated_variables_in_function fundec;
               let fct = Definition(fundec, Location.unknown) in
-             (* Create and register [__e_acsl_memory_init] as kernel function *)
+             (* Create and register [__e_acsl_globals_init] as kernel function *)
               let kf =
                 { fundec = fct; return_stmt = Some return; spec = spec } 
               in
@@ -230,13 +230,13 @@ class e_acsl_visitor prj generate = object (self)
                 match main_fct with
                 | Some main ->
                   let exp = Cil.evar ~loc:Location.unknown vi in
-                  (* Create [__e_acsl_memory_init();] call *)
+                  (* Create [__e_acsl_globals_init();] call *)
                   let stmt = 
                     Cil.mkStmtOneInstr ~valid_sid:true 
                       (Call(None, exp, [], Location.unknown))
                   in
                   vi.vreferenced <- true;
-                  (* Add [__e_acsl_memory_init();] call as the first statement
+                  (* Add [__e_acsl_globals_init();] call as the first statement
                    to the [main] function *)
                   main.sbody.bstmts <- stmt :: main.sbody.bstmts;
                   let new_globals =
@@ -266,33 +266,41 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
             in
             Project.on prj build_initializer ()
           end; (* must_init *)
-	  let must_init_args = match main_fct with
-	    | Some main ->
-	       let charPtrPtrType = TPtr(Cil.charPtrType,[]) in
-	       (* this might not be valid in an embedded environment,
-		  where int/char** arguments is not necessarily
-		  valid *)
-	       (match main.sformals with
-               | vi1 :: vi2 :: _ when
-                    vi1.vtype = Cil.intType
-                    && vi2.vtype = charPtrPtrType
-                      && Mmodel_analysis.must_model_vi vi2 -> true
-               | _ -> false)
-	    | None -> false
-	  in
-	  if must_init_args then begin
-	    (* init memory store, and then add program arguments if
-	       there are any. must be called before global variables
-	       are initialized. *)
-	    let build_args_initializer () =
-	      let main = Extlib.the main_fct in
-	      let loc = Location.unknown in
-              let args = List.map Cil.evar main.sformals in
-	      let call = Misc.mk_call loc "__init_args" args in
-	      main.sbody.bstmts <- call :: main.sbody.bstmts;
-            in
-            Project.on prj build_args_initializer ()
-	  end;
+    (* Add a call to "__e_acsl_memory_init" that initializes memory storage
+     and potentially records program arguments. Parameters to the
+     "__e_acsl_memory_init" are addresses of program arguments or NULLs if
+     main is declared without arguments. *)
+    let build_mmodel_initializer () =
+      let loc = Location.unknown in
+      match main_fct with
+        | Some main ->
+          let charPtrPtrType = TPtr(Cil.charPtrType,[]) in
+          let args =
+            (* Record arguments only if the first one has int type and the
+              second one is an array of char pointers of equivalent. This is
+              sufficient to capture C99 compliant arguments and GCC extensions
+              with environ. *)
+            match main.sformals with
+              | vi1 :: vi2 :: _
+                when vi1.vtype = Cil.intType && vi2.vtype = charPtrPtrType ->
+                  (* Add a call to __init_args if need argv for analysis *)
+                  if Mmodel_analysis.must_model_vi vi2 then begin
+                    let arg = [ Cil.evar vi1 ; Cil.evar vi2 ] in
+                    let arginit = Misc.mk_call loc "__init_argv" arg in
+                    main.sbody.bstmts <- arginit :: main.sbody.bstmts;
+                  end;
+                  (* Grab addresses of arguments for a call to the main
+                  initialization function, i.e., [__e_acsl_memory_init] *)
+                  List.map Cil.mkAddrOfVi main.sformals;
+              | _ -> let null = Cil.integer loc 0
+            in [ null ; null ] in
+          let init = Misc.mk_call
+            Location.unknown "__e_acsl_memory_init" args in
+          main.sbody.bstmts <- init :: main.sbody.bstmts;
+          ()
+        | None -> ()
+    in if Mmodel_analysis.use_model () then
+      Project.on prj build_mmodel_initializer ();
 	  (* reset copied states at the end to be observationally
 	     equivalent to a standard visitor. *)
 	  Project.clear ~selection ~project:prj ();

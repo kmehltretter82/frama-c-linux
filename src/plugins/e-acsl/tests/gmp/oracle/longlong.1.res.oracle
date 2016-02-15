@@ -9,7 +9,7 @@
   __fc_heap_status ∈ [--..--]
   __e_acsl_init ∈ [--..--]
   __e_acsl_internal_heap ∈ [--..--]
-  __memory_size ∈ [--..--]
+  __heap_size ∈ [--..--]
 tests/gmp/longlong.i:9:[value] warning: recursive call during value analysis
                  of my_pow (my_pow <- my_pow :: tests/gmp/longlong.i:16 <- main).
                  Using specification of my_pow.

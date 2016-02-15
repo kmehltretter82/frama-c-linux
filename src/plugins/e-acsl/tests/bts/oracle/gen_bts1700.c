@@ -7,6 +7,7 @@ int main(void)
   int __retres;
   struct toto s;
   struct toto *p;
+  __e_acsl_memory_init((int *)0,(char ***)0);
   __store_block((void *)(& p),8UL);
   __store_block((void *)(& s),0UL);
   /*@ assert \valid(&s); */

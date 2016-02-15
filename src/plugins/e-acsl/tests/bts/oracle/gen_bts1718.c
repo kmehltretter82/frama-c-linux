@@ -4,6 +4,7 @@ int main(void)
   int __retres;
   int a;
   int *p;
+  __e_acsl_memory_init((int *)0,(char ***)0);
   __store_block((void *)(& p),8UL);
   __store_block((void *)(& a),4UL);
   __full_init((void *)(& a));

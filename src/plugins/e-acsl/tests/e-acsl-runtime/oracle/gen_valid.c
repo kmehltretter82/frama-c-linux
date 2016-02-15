@@ -106,7 +106,7 @@ void g(void)
   return;
 }
 
-void __e_acsl_memory_init(void)
+void __e_acsl_globals_init(void)
 {
   __store_block((void *)(& Z),4UL);
   __full_init((void *)(& Z));
@@ -123,7 +123,8 @@ int main(void)
   int **c;
   int ***d;
   int n;
-  __e_acsl_memory_init();
+  __e_acsl_memory_init((int *)0,(char ***)0);
+  __e_acsl_globals_init();
   __store_block((void *)(& n),4UL);
   __store_block((void *)(& d),8UL);
   __store_block((void *)(& c),8UL);

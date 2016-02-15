@@ -30,6 +30,7 @@ int main(void)
 {
   int __retres;
   int x;
+  __e_acsl_memory_init((int *)0,(char ***)0);
   x = 0;
   f();
   /*@ assert &x ≡ &x; */

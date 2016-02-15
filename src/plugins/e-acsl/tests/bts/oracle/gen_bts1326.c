@@ -99,6 +99,7 @@ int main(void)
   int __retres;
   ArrayInt Accel;
   int av;
+  __e_acsl_memory_init((int *)0,(char ***)0);
   __store_block((void *)(& av),4UL);
   __store_block((void *)(Accel),20UL);
   __initialize((void *)(Accel),sizeof(int));

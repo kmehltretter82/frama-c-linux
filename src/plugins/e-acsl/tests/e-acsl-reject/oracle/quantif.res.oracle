@@ -2,9 +2,7 @@
 [kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl_gmp_types.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl_gmp.h (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel_api.h (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/e-acsl/memory_model/e_acsl_bittree.h (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/e-acsl/memory_model/e_acsl_mmodel.h (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl_mmodel.h (with preprocessing)
 [kernel] Parsing tests/e-acsl-reject/quantif.i (no preprocessing)
 tests/e-acsl-reject/quantif.i:6:[e-acsl] warning: E-ACSL construct `unguarded \forall quantification' is not yet supported.
                   Ignoring annotation.

@@ -17,7 +17,7 @@ void g(int *C, int *D)
   return;
 }
 
-void __e_acsl_memory_init(void)
+void __e_acsl_globals_init(void)
 {
   __store_block((void *)(& B),8UL);
   __full_init((void *)(& B));
@@ -31,7 +31,8 @@ int main(void)
   int __retres;
   int *x;
   int *y;
-  __e_acsl_memory_init();
+  __e_acsl_memory_init((int *)0,(char ***)0);
+  __e_acsl_globals_init();
   __store_block((void *)(& y),8UL);
   __store_block((void *)(& x),8UL);
   B = (int *)__e_acsl_malloc(sizeof(int));

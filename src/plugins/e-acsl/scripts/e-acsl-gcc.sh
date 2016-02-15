@@ -283,7 +283,7 @@ do
     # A memory model to link against
     -m|--memory-model)
       shift;
-      echo $1 | grep "\(tree\|bittree\|splay_tree\|list\)"
+      echo $1 | grep "\(tree\|bittree\|splaytree\|list\|segment\)"
       error "no such memory model: $1" $?
       OPTION_EACSL_MMODEL="$1"
       shift;
@@ -386,10 +386,14 @@ EACSL_CPPFLAGS="
   -D$EACSL_MACRO_ID
   -D__FC_errno=(*__errno_location())"
 EACSL_LDFLAGS="-lgmp -lm"
+
 # Memory model sources
-EACSL_RTL="$EACSL_SHARE/e_acsl.c \
-  $EACSL_SHARE/memory_model/e_acsl_mmodel.c \
-  $EACSL_SHARE/memory_model/e_acsl_$OPTION_EACSL_MMODEL.c"
+if [ $OPTION_EACSL_MMODEL = "segment" ]; then
+  error "Segment model not available in this distribution"
+else
+  EACSL_RTL="$EACSL_SHARE/adt_models/e_acsl_mmodel.c \
+    $EACSL_SHARE/adt_models/e_acsl_$OPTION_EACSL_MMODEL.c"
+fi
 
 # Output file names
 OUTPUT_CODE="$OPTION_OUTPUT_CODE" # E-ACSL instrumented source

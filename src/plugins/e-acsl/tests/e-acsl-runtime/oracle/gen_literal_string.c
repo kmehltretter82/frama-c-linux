@@ -27,7 +27,7 @@ char *S2 = (char *)"foo2";
 int IDX = 1;
 int G2 = 2;
 char *U = (char *)"baz";
-void __e_acsl_memory_init(void)
+void __e_acsl_globals_init(void)
 {
   __e_acsl_literal_string = "ss";
   __store_block((void *)__e_acsl_literal_string,sizeof("ss"));
@@ -58,7 +58,8 @@ int main(void)
 {
   int __retres;
   char *SS;
-  __e_acsl_memory_init();
+  __e_acsl_memory_init((int *)0,(char ***)0);
+  __e_acsl_globals_init();
   __store_block((void *)(& SS),8UL);
   __full_init((void *)(& SS));
   SS = (char *)__e_acsl_literal_string;

@@ -33,9 +33,7 @@ let library_files () =
     [ "e_acsl.h";
       "e_acsl_gmp_types.h";
       "e_acsl_gmp.h";
-      "memory_model/e_acsl_mmodel_api.h";
-      "memory_model/e_acsl_bittree.h";
-      "memory_model/e_acsl_mmodel.h" ]
+      "e_acsl_mmodel.h" ]
 
 let normalized_library_files = 
   lazy (List.map Filepath.normalize (library_files ()))

@@ -55,7 +55,7 @@ int f(void)
   return __retres;
 }
 
-void __e_acsl_memory_init(void)
+void __e_acsl_globals_init(void)
 {
   __e_acsl_literal_string_3 = "toto";
   __store_block((void *)__e_acsl_literal_string_3,sizeof("toto"));
@@ -78,7 +78,8 @@ int main(void)
 {
   int __retres;
   int i;
-  __e_acsl_memory_init();
+  __e_acsl_memory_init((int *)0,(char ***)0);
+  __e_acsl_globals_init();
   i = 4;
   while (1) {
     int tmp;
