@@ -3,7 +3,8 @@ int main(int argc, char **argv)
 {
   int __retres;
   int i;
-  __init_args(argc,argv);
+  __e_acsl_memory_init(& argc,& argv);
+  __init_argv(argc,argv);
   /*@ assert \valid(&argc); */
   {
     int __e_acsl_valid;

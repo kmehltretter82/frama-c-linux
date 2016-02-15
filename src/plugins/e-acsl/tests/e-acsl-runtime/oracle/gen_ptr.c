@@ -5,6 +5,7 @@ int main(void)
   int x;
   int t[3];
   int *p;
+  __e_acsl_memory_init((int *)0,(char ***)0);
   __store_block((void *)(& p),8UL);
   __store_block((void *)(t),12UL);
   __store_block((void *)(& x),4UL);

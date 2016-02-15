@@ -20,15 +20,16 @@
 /*                                                                        */
 /**************************************************************************/
 
-#include <errno.h>
 #include <unistd.h>
-#include "stdlib.h"
-#include "stdbool.h"
-#include "math.h"
+#include <stdlib.h>
+#include <stdbool.h>
+
+#include "e_acsl_syscall.h"
+#include "e_acsl_printf.h"
+#include "e_acsl_assert.h"
 #include "e_acsl_mmodel_api.h"
 #include "e_acsl_bittree.h"
 #include "e_acsl_mmodel.h"
-#include "../e_acsl_printf.h"
 
 #if WORDBITS == 16
 

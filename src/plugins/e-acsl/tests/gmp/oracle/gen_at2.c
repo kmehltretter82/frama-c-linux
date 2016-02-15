@@ -221,6 +221,7 @@ int main(void)
   int __retres;
   int x;
   int t[2];
+  __e_acsl_memory_init((int *)0,(char ***)0);
   __store_block((void *)(t),8UL);
   __store_block((void *)(& x),4UL);
   __full_init((void *)(& x));

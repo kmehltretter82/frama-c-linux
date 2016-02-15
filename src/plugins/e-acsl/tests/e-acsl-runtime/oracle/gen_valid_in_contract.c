@@ -107,6 +107,7 @@ struct list *__e_acsl_f(struct list *l)
 int main(void)
 {
   int __retres;
+  __e_acsl_memory_init((int *)0,(char ***)0);
   __e_acsl_f((struct list *)0);
   __retres = 0;
   __e_acsl_memory_clean();

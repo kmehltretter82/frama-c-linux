@@ -38,6 +38,7 @@ int main(void)
 {
   int __retres;
   struct list *l;
+  __e_acsl_memory_init((int *)0,(char ***)0);
   __store_block((void *)(& l),8UL);
   __full_init((void *)(& l));
   l = (struct list *)0;

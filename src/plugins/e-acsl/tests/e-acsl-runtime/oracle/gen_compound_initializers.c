@@ -18,7 +18,7 @@ int _E = 44;
 int _F = 9;
 struct ST _G[2] =
   {{.str = (char *)"First", .num = 99}, {.str = (char *)"Second", .num = 147}};
-void __e_acsl_memory_init(void)
+void __e_acsl_globals_init(void)
 {
   __e_acsl_literal_string_3 = "ZZ";
   __store_block((void *)__e_acsl_literal_string_3,sizeof("ZZ"));
@@ -60,7 +60,8 @@ void __e_acsl_memory_init(void)
 int main(int argc, char **argv)
 {
   int __retres;
-  __e_acsl_memory_init();
+  __e_acsl_memory_init(& argc,& argv);
+  __e_acsl_globals_init();
   /*@ assert \valid((char **)_A); */
   {
     int __e_acsl_valid;

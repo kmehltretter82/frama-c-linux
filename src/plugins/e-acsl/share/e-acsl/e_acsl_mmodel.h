@@ -24,7 +24,12 @@
 #define E_ACSL_MMODEL
 
 #include "stdlib.h"
-#include "stdbool.h"
+
+/* Runtime assertion verifying a predicate */
+/*@ requires pred != 0;
+  @ assigns \nothing; */
+void e_acsl_assert(int pred, char *kind, char *fct, char *pred_txt, int line)
+  __attribute__((FC_BUILTIN));
 
 /* allocate size bytes and store the returned block
  * for further information, see malloc */
@@ -38,6 +43,8 @@ void * __malloc(size_t size)
 void __free(void * ptr)
   __attribute__((FC_BUILTIN));
 
+/* evaluate to a non-zero value if ptr points to a start address of a block
+ * allocated via a memory allocation function (e.g., malloc, realloc etc) */
 /*@ assigns \result \from ptr; */
 int __freeable(void * ptr)
   __attribute__((FC_BUILTIN));
@@ -56,11 +63,6 @@ void * __calloc(size_t nbr_elt, size_t size_elt)
   __attribute__((FC_BUILTIN));
 
 /* From outside the library, the following functions have no side effect */
-
-/* put argc/argv in memory model */
-/*@ assigns \nothing; */
-void __init_args(int argc_ref, char **argv_ref)
-	__attribute__((FC_BUILTIN));
 
 /* store the block of size bytes starting at ptr */
 /*@ assigns \result \from *(((char*)ptr)+(0..size-1)); */
@@ -117,7 +119,10 @@ void * __base_addr(void * ptr)
 size_t __block_length(void * ptr)
   __attribute__((FC_BUILTIN));
 
-/* return the offset of ptr within its block */
+/* return the offset of ptr within its block
+ * FIXME: The return type of __offset should be changed to size_t.
+ * In the current E-ACSL/Frama-C implementation, however, this change
+ * leads to a Frama-C failure. */
 /*@ ensures \result == \offset(ptr);
   @ assigns \result \from ptr; */
 int __offset(void * ptr)
@@ -130,8 +135,10 @@ int __offset(void * ptr)
 int __initialized(void * ptr, size_t size)
   __attribute__((FC_BUILTIN));
 
-void __out_of_bound(void * ptr, _Bool flag)
-  __attribute__((FC_BUILTIN));
+/* put argv in the memory model */
+/*@ assigns \nothing; */
+void __init_argv(int argc, char **argv)
+	__attribute__((FC_BUILTIN));
 
 /* print the content of the abstract structure */
 void __e_acsl_memory_debug(void)
@@ -145,16 +152,22 @@ void __e_acsl_memory_debug(void)
 void __e_acsl_memory_clean(void)
   __attribute__((FC_BUILTIN));
 
+/* initialize the abstract structure
+ * have to be called before any other statement in `main` */
+/*@ assigns __e_acsl_internal_heap \from __e_acsl_internal_heap; */
+void __e_acsl_memory_init(int *argc_ref, char ***argv)
+  __attribute__((FC_BUILTIN));
+
 /* return the number of bytes dynamically allocated */
 /*@ assigns \result \from __e_acsl_internal_heap; */
-size_t __get_memory_size(void)
+size_t __get_heap_size(void)
   __attribute__((FC_BUILTIN));
 
 /* for predicates */
-extern size_t __memory_size;
+extern size_t __heap_size;
 
 /*@ predicate diffSize{L1,L2}(integer i) =
-  \at(__memory_size, L1) - \at(__memory_size, L2) == i;
+  \at(__heap_size, L1) - \at(__heap_size, L2) == i;
 */
 
 #endif

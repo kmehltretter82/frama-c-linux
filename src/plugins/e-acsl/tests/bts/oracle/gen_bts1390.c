@@ -166,7 +166,7 @@ void *__e_acsl_memchr(void const *buf, int c, size_t n)
   }
 }
 
-void __e_acsl_memory_init(void)
+void __e_acsl_globals_init(void)
 {
   __e_acsl_literal_string = "toto";
   __store_block((void *)__e_acsl_literal_string,sizeof("toto"));
@@ -182,7 +182,8 @@ void __e_acsl_memory_init(void)
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init();
+  __e_acsl_memory_init((int *)0,(char ***)0);
+  __e_acsl_globals_init();
   __e_acsl_memchr((void const *)__e_acsl_literal_string,'o',(unsigned long)4);
   __e_acsl_memchr((void const *)__e_acsl_literal_string_2,'o',
                   (unsigned long)4);

@@ -113,7 +113,7 @@ to be linked against the instrumented file.
 
 Valid arguments are:
   \fIbittree\fP     \- memory modelling using a Patricia trie ADT.
-  \fIsplay_tree\fP  \- memory modelling using a splay tree ADT.
+  \fIsplaytree\fP   \- memory modelling using a splay tree ADT.
   \fIlist\fP        \- memory modelling using a linked-list ADT.
   \fItree\fP        \- memory modelling using a binary tree ADT.
 
@@ -170,10 +170,10 @@ compile \fIfoo.c\fP into \fIfoo\fP and \fIgen_foo.c\fP into \fIfoo.e-acsl\fP.
 The \fB-P\fP option specifies that the instrumentation should omit debug
 functionality.
 
-.B e-acsl-gcc.sh --memory-model=splay_tree -C gen_foo.c
+.B e-acsl-gcc.sh --memory-model=splaytree -C gen_foo.c
 
 Assume \fIgen_foo.c\fP has been instrumented by \fBE-ACSL\fP and compile it into
-\fIa.out.e-acsl\fP using \fBsplay_tree\fP memory model.
+\fIa.out.e-acsl\fP using \fBsplaytree\fP memory model.
 
 .SH SEE ALSO
 \fBgcc\fP(1), \fBcpp\fP(1), \fBld\fP(1), \fBframa-c\fP(1)
