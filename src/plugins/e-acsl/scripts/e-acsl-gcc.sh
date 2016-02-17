@@ -323,7 +323,7 @@ EACSL_MACRO_ID="__E_ACSL__"
 # Gcc and related flags
 CC="$OPTION_CC"
 CFLAGS="$OPTION_CFLAGS
-  -std=c99 $GCCMACHDEP -g3 -O2 -pedantic -fno-builtin
+  -std=c99 $GCCMACHDEP -g3 -O2 -pedantic -fno-builtin -w
   -Wall \
   -Wno-long-long \
   -Wno-attributes \
@@ -335,11 +335,7 @@ CFLAGS="$OPTION_CFLAGS
   -Wno-unused-variable \
   -Wno-unused-but-set-variable \
   -Wno-implicit-function-declaration \
-  -Wno-unknown-warning-option \
   -Wno-extra-semi \
-  -Wno-tautological-compare \
-  -Wno-gnu-empty-struct \
-  -Wno-incompatible-pointer-types-discards-qualifiers \
   -Wno-empty-body"
 CPPFLAGS="$OPTION_CPPFLAGS"
 LDFLAGS="$OPTION_LDFLAGS"

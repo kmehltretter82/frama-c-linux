@@ -29,9 +29,11 @@
 
 #ifndef E_ACSL_SYSCALL
 #define E_ACSL_SYSCALL
+#  include <stdlib.h>
+#  include <fcntl.h>
 #  include <unistd.h>
 #  include <sys/syscall.h>   /* SYS_xxx definitions */
-  int syscall(int number, ...);
+int syscall(int number, ...);
 
 /* Note that the following does not provide a re-declaration for `mmap`. This
  * is because syscall returns int, while mmap should return an integer type wide
