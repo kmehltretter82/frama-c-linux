@@ -137,9 +137,10 @@ install::
 	$(PRINT_INSTALL) E-ACSL share files
 	$(MKDIR) $(FRAMAC_SHARE)/e-acsl
 	$(CP) $(E_ACSL_DIR)/share/e-acsl/*.[ch] $(FRAMAC_SHARE)/e-acsl
-	$(MKDIR) $(FRAMAC_SHARE)/e-acsl/adt_models
+	$(MKDIR) $(FRAMAC_SHARE)/e-acsl/adt_models $(FRAMAC_SHARE)/e-acsl/glibc
 	$(CP) $(E_ACSL_DIR)/share/e-acsl/adt_models/* \
 		$(FRAMAC_SHARE)/e-acsl/adt_models
+	$(CP) $(E_ACSL_DIR)/share/e-acsl/glibc/* $(FRAMAC_SHARE)/e-acsl/glibc
 	$(PRINT_INSTALL) E-ACSL manuals
 	$(MKDIR) $(FRAMAC_SHARE)/manuals
 	$(CP) $(E_ACSL_DIR)/doc/manuals/e-acsl.pdf \
