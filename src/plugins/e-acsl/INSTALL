@@ -92,12 +92,31 @@ Object files: (usually in `frama-c -print-plugin-path`)
 
 Shared files: (usually in `frama-c -print-share-path`/e-acsl)
 -------------
-- e_acsl.[ch]
+- e_acsl_assert.h
+- e_acsl_debug.h
 - e_acsl_gmp.h
 - e_acsl_gmp_types.h
-- memory_model/e_acsl_bittree.[ch]
-- memory_model/e_acsl_mmodel.[ch]
-- memory_model/e_acsl_mmodel_api.[h]
+- e_acsl.h
+- e_acsl_mmodel.h
+- e_acsl_printf.h
+- e_acsl_string.h
+- e_acsl_syscall.h
+- glibc/memcpy.c
+- glibc/wordcopy.c
+- glibc/strncmp.c
+- glibc/memcopy.h
+- glibc/pagecopy.h
+- glibc/strlen.c
+- glibc/memmove.c
+- glibc/memset.c
+- glibc/strcmp.c
+- adt_models/e_acsl_bittree.h
+- adt_models/e_acsl_list.c
+- adt_models/e_acsl_splaytree.c
+- adt_models/e_acsl_mmodel.c
+- adt_models/e_acsl_mmodel_api.h
+- adt_models/e_acsl_tree.c
+- adt_models/e_acsl_bittree.c
 
 Manuals: (usually in `frama-c -print-share-path`/manuals)
 --------
