@@ -30,35 +30,6 @@
 #include "e_acsl_assert.h"
 #include "e_acsl_printf.h"
 
-// E-ACSL warnings {{{
-#define WARNING 0   // Output a warning message to stderr
-#define ERROR   1   // Treat warnings as errors and abort execution
-#define IGNORE  2   // Ignore warnings
-
-#ifndef E_ACSL_WARNING
-#define E_ACSL_WARNING WARNING
-#endif
-
-static int warning_level = E_ACSL_WARNING;
-
-// Issue a warning to stderr or abort a program
-// based on the current warning level
-static void warning(const char* message) {
-  if (warning_level != IGNORE) {
-    eprintf("warning: %s\n", message);
-    if (warning_level == ERROR)
-      abort();
-  }
-}
-
-// Shortcut for issuing a warning and returning from a function
-#define return_warning(_cond,_msg) \
-  if(_cond) { \
-    warning(_msg); \
-    return; \
-  }
-// }}}
-
 size_t __heap_size = 0;
 /*unsigned cpt_store_block = 0;*/
 
@@ -236,12 +207,14 @@ void __initialize (void * ptr, size_t size) {
   struct _block * tmp;
   unsigned i;
 
-  return_warning(ptr == NULL, "initialize");
+  if (!ptr)
+    return;
 
   assert(size > 0);
   tmp = __get_cont(ptr);
 
-  return_warning(tmp == NULL, "initialize");
+  if (tmp == NULL)
+    return;
 
   /* already fully initialized, do nothing */
   if(tmp->init_cpt == tmp->size) return;
@@ -271,10 +244,12 @@ void __initialize (void * ptr, size_t size) {
 /* mark all bytes of ptr as initialized */
 void __full_init (void * ptr) {
   struct _block * tmp;
-  return_warning(ptr == NULL, "full_init");
+  if (ptr == NULL)
+    return NULL;
 
   tmp = __get_exact(ptr);
-  return_warning(tmp == NULL, "full_init");
+  if (tmp == NULL)
+    return;
 
   if (tmp->init_ptr != NULL) {
     free(tmp->init_ptr);
@@ -286,10 +261,11 @@ void __full_init (void * ptr) {
 
 /* mark a block as litteral string */
 void __literal_string (void * ptr) {
-  struct _block * tmp;
-  return_warning(ptr == NULL, "literal_string");
-  tmp = __get_exact(ptr);
-  return_warning(tmp == NULL, "literal_string");
+  if (ptr == NULL)
+    return;
+  struct _block * tmp = __get_exact(ptr);
+  if (temp == NULL)
+    return;
   tmp->is_litteral_string = true;
 }
 
