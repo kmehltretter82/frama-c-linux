@@ -24,8 +24,8 @@
 #include "e_acsl_printf.h"
 #include "e_acsl_assert.h"
 #include "e_acsl_debug.h"
-#include "e_acsl_mmodel.h"
 #include "e_acsl_mmodel_api.h"
+#include "e_acsl_adt_api.h"
 
 size_t __heap_size = 0;
 
