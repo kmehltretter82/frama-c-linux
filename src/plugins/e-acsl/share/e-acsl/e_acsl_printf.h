@@ -42,10 +42,11 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <limits.h>
+#include <sys/stat.h>
 
 // For PATH_MAX in Linux
 #ifdef __linux__
-  #include <linux/limits.h>
+#  include <linux/limits.h>
 #endif
 
 /* Malloc/stdio free printf

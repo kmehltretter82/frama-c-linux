@@ -352,7 +352,7 @@ EACSL_MACRO_ID="__E_ACSL__"
 # Gcc and related flags
 CC="$OPTION_CC"
 CFLAGS="$OPTION_CFLAGS
-  -std=c99 $GCCMACHDEP -g3 -O2 -pedantic -fno-builtin
+  -std=c99 $GCCMACHDEP -g3 -O2 -pedantic -fno-builtin -w
   -Wall \
   -Wno-long-long \
   -Wno-attributes \
@@ -365,6 +365,7 @@ CFLAGS="$OPTION_CFLAGS
   -Wno-unused-variable \
   -Wno-unused-but-set-variable \
   -Wno-implicit-function-declaration \
+  -Wno-extra-semi \
   -Wno-empty-body"
 
 # Disable extra warning for clang

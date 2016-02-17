@@ -20,79 +20,80 @@
 /*                                                                        */
 /**************************************************************************/
 
-/* Stringification {{{ */
-#define STRINGIFY(x) #x
-#define TOSTRING(x) STRINGIFY(x)
-#define __AT__ __FILE__ ":" TOSTRING(__LINE__)
+/* Stringification macros {{{ */
+#ifndef E_ACSL_STRINGIFICATION
+#define E_ACSL_STRINGIFICATION
+#  define STRINGIFY(x) #x
+#  define TOSTRING(x) STRINGIFY(x)
+#  define __AT__ __FILE__ ":" TOSTRING(__LINE__)
+#endif
 /* }}} */
 
-/** Debugging support.
+/** Debugging support {{{
  * Enabled in the presence of the E_ACSL_DEBUG macro */
-
-// Debug/Log print macros {{{
 #ifdef E_ACSL_DEBUG
 
-  // Default location of the E_ACSL log file
-  #ifndef E_ACSL_DEBUG_LOG
-    #define E_ACSL_DEBUG_LOG /tmp/e-acsl.log
-  #endif
+/* Default location of the E_ACSL log file */
+#ifndef E_ACSL_DEBUG_LOG
+#  define E_ACSL_DEBUG_LOG /tmp/e-acsl.log
+#endif
 
-  // Name of the debug log file
-  static const char *dlog_name = TOSTRING(E_ACSL_DEBUG_LOG);
+/* Name of the debug log file */
+static const char *dlog_name = TOSTRING(E_ACSL_DEBUG_LOG);
 
-  // File descriptior associated with the debug log file
-  static int dlog_fd = -1;
+/* File descriptior associated with the debug log file */
+static int dlog_fd = -1;
 
-  // Output a message to a log file
-  #define DLOG(...) dprintf(dlog_fd, __VA_ARGS__)
+/* Output a message to a log file */
+#define DLOG(...) dprintf(dlog_fd, __VA_ARGS__)
 
-  // Debug-time assertion based on assert (see e_acsl.print.h)
-  #define DASSERT(_e) assert(_e)
+/* Debug-time assertion based on assert (see e_acsl.print.h) */
+#define DASSERT(_e) assert(_e)
 
-  // Debug-time assertion based on vassert (see e_acsl.print.h)
-  #define DVASSERT(_expr, _fmt, ...) vassert(_expr, _fmt, __VA_ARGS__)
+/* Debug-time assertion based on vassert (see e_acsl.print.h) */
+#define DVASSERT(_expr, _fmt, ...) vassert(_expr, _fmt, __VA_ARGS__)
 
-  // Initialization of the debug report file:
-  //  - open file descriptor
-  //  - add program arguments to the log
-  static void initialize_report_file(int *argc, char ***argv) {
-    // Redirect the log to stderr is just set to be defined or set to '-'
-    if (!strcmp(dlog_name, "-") || !strcmp(dlog_name, "1")) {
-      dlog_fd = 2;
-    } else {
-      dlog_fd = open(dlog_name, O_WRONLY | O_CREAT | O_TRUNC  |O_NONBLOCK
-        | O_NOCTTY, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
-    }
-
-    if (dlog_fd == -1)
-      vabort("Cannot open file descriptor for %s\n", dlog_name);
-    else {
-      DLOG("<<< E-ACSL instrumented run >>>\n");
-      DLOG("<<< Program arguments: ");
-      if (argc && argv) {
-        int i;
-        for (i = 0; i < *argc; i++)
-          DLOG("%s ", (*argv)[i]);
-        DLOG(">>>\n");
-      } else {
-        DLOG("unknown >>>\n");
-      }
-    }
+/* Initialization of the debug report file:
+ *  - open file descriptor
+ *  - add program arguments to the log */
+static void initialize_report_file(int *argc, char ***argv) {
+  // Redirect the log to stderr is just set to be defined or set to '-'
+  if (!strcmp(dlog_name, "-") || !strcmp(dlog_name, "1")) {
+    dlog_fd = 2;
+  } else {
+    dlog_fd = open(dlog_name, O_WRONLY | O_CREAT | O_TRUNC  |O_NONBLOCK
+      | O_NOCTTY, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
   }
 
-  static int debug_stop_number = 0;
-  int getchar(void);
+  if (dlog_fd == -1)
+    vabort("Cannot open file descriptor for %s\n", dlog_name);
+  else {
+    DLOG("<<< E-ACSL instrumented run >>>\n");
+    DLOG("<<< Program arguments: ");
+    if (argc && argv) {
+      int i;
+      for (i = 0; i < *argc; i++)
+        DLOG("%s ", (*argv)[i]);
+      DLOG(">>>\n");
+    } else {
+      DLOG("unknown >>>\n");
+    }
+  }
+}
 
-  #define STOP { \
-    DLOG(" << ==================== " "Debug Stop Point %d in '%s' at %s:%d" \
-        " ==================== >> ", \
+static int debug_stop_number = 0;
+int getchar(void);
+
+#define STOP { \
+  DLOG(" << ==================== " "Debug Stop Point %d in '%s' at %s:%d" \
+    " ==================== >> ", \
     ++debug_stop_number, __func__, __FILE__, __LINE__); \
     getchar(); \
-  }
+}
 #else
-  #define initialize_report_file(...)
-  #define DLOG(...)
-  #define DASSERT(_e)
-  #define DVASSERT(_expr, _fmt, ...)
+#  define initialize_report_file(...)
+#  define DLOG(...)
+#  define DASSERT(_e)
+#  define DVASSERT(_expr, _fmt, ...)
 #endif
 // }}}

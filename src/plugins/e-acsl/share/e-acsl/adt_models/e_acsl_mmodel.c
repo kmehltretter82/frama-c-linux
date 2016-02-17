@@ -20,18 +20,14 @@
 /*                                                                        */
 /**************************************************************************/
 
-#include <stdlib.h>
-#include <stdbool.h>
-
-#include "e_acsl_syscall.h"
 #include "e_acsl_string.h"
-#include "e_acsl_mmodel_api.h"
-#include "e_acsl_mmodel.h"
-#include "e_acsl_assert.h"
 #include "e_acsl_printf.h"
+#include "e_acsl_assert.h"
+#include "e_acsl_debug.h"
+#include "e_acsl_mmodel.h"
+#include "e_acsl_mmodel_api.h"
 
 size_t __heap_size = 0;
-/*unsigned cpt_store_block = 0;*/
 
 static const int nbr_bits_to_1[256] = {
   0,1,1,2,1,2,2,3,1,2,2,3,2,3,3,4,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,1,2,2,3,2,3,
@@ -62,9 +58,9 @@ static size_t needed_bytes (size_t size) {
  * Warning: the return type is implicitly (struct _block*). */
 void* __store_block(void* ptr, size_t size) {
   struct _block * tmp;
-  assert(ptr != NULL);
+  DASSERT(ptr != NULL);
   tmp = malloc(sizeof(struct _block));
-  assert(tmp != NULL);
+  DASSERT(tmp != NULL);
   tmp->ptr = (size_t)ptr;
   tmp->size = size;
   tmp->init_ptr = NULL;
@@ -80,7 +76,7 @@ void* __store_block(void* ptr, size_t size) {
 /* remove the block starting at ptr */
 void __delete_block(void* ptr) {
   struct _block * tmp = __get_exact(ptr);
-  assert(tmp != NULL);
+  DASSERT(tmp != NULL);
   __clean_init(tmp);
   __remove_element(tmp);
   free(tmp);
@@ -91,12 +87,14 @@ void __delete_block(void* ptr) {
 void* __malloc(size_t size) {
   void * tmp;
   struct _block * new_block;
-  if(size <= 0) return NULL;
+  if(size <= 0)
+    return NULL;
   tmp = malloc(size);
-  if(tmp == NULL) return NULL;
+  if(tmp == NULL)
+    return NULL;
   new_block = __store_block(tmp, size);
   __heap_size += size;
-  assert(new_block != NULL && (void*)new_block->ptr != NULL);
+  DASSERT(new_block != NULL && (void*)new_block->ptr != NULL);
   new_block->freeable = true;
   return (void*)new_block->ptr;
 }
@@ -105,9 +103,10 @@ void* __malloc(size_t size) {
  * for further information, see free */
 void __free(void* ptr) {
   struct _block * tmp;
-  if(ptr == NULL) return;
+  if(ptr == NULL)
+    return;
   tmp = __get_exact(ptr);
-  assert(tmp != NULL);
+  DASSERT(tmp != NULL);
   free(ptr);
   __clean_init(tmp);
   __heap_size -= tmp->size;
@@ -117,9 +116,11 @@ void __free(void* ptr) {
 
 int __freeable(void* ptr) {
   struct _block * tmp;
-  if(ptr == NULL) return false;
+  if(ptr == NULL)
+    return false;
   tmp = __get_exact(ptr);
-  if(tmp == NULL) return false;
+  if(tmp == NULL)
+    return false;
   return tmp->freeable;
 }
 
@@ -137,9 +138,10 @@ void* __realloc(void* ptr, size_t size) {
     return NULL;
   }
   tmp = __get_exact(ptr);
-  assert(tmp != NULL);
+  DASSERT(tmp != NULL);
   new_ptr = realloc((void*)tmp->ptr, size);
-  if(new_ptr == NULL) return NULL;
+  if(new_ptr == NULL)
+    return NULL;
   __heap_size -= tmp->size;
   /* realloc changes start address -- re-enter the element into the ADT */
   if (tmp->ptr != (size_t)new_ptr) {
@@ -192,12 +194,14 @@ void* __realloc(void* ptr, size_t size) {
 void* __calloc(size_t nbr_block, size_t size_block) {
   void * tmp;
   struct _block * new_block;
-  if(nbr_block * size_block <= 0) return NULL;
+  if(nbr_block * size_block <= 0)
+    return NULL;
   tmp = calloc(nbr_block, size_block);
-  if(tmp == NULL) return NULL;
+  if(tmp == NULL)
+    return NULL;
   new_block = __store_block(tmp, nbr_block * size_block);
   __heap_size += nbr_block * size_block;
-  assert(new_block != NULL && (void*)new_block->ptr != NULL);
+  DASSERT(new_block != NULL && (void*)new_block->ptr != NULL);
   new_block->freeable = true;
   return (void*)new_block->ptr;
 }
@@ -205,19 +209,16 @@ void* __calloc(size_t nbr_block, size_t size_block) {
 /* mark the size bytes of ptr as initialized */
 void __initialize (void * ptr, size_t size) {
   struct _block * tmp;
-  unsigned i;
-
-  if (!ptr)
+  if(!ptr)
     return;
 
-  assert(size > 0);
   tmp = __get_cont(ptr);
-
-  if (tmp == NULL)
+  if(tmp == NULL)
     return;
 
   /* already fully initialized, do nothing */
-  if(tmp->init_cpt == tmp->size) return;
+  if(tmp->init_cpt == tmp->size)
+    return;
 
   /* fully uninitialized */
   if(tmp->init_cpt == 0) {
@@ -226,6 +227,7 @@ void __initialize (void * ptr, size_t size) {
     memset(tmp->init_ptr, 0, nb);
   }
 
+  unsigned i;
   for(i = 0; i < size; i++) {
     int byte_offset = (size_t)ptr - tmp->ptr + i;
     int ind = byte_offset / 8;
@@ -245,7 +247,7 @@ void __initialize (void * ptr, size_t size) {
 void __full_init (void * ptr) {
   struct _block * tmp;
   if (ptr == NULL)
-    return NULL;
+    return;
 
   tmp = __get_exact(ptr);
   if (tmp == NULL)
@@ -261,10 +263,11 @@ void __full_init (void * ptr) {
 
 /* mark a block as litteral string */
 void __literal_string (void * ptr) {
+  struct _block * tmp;
   if (ptr == NULL)
     return;
-  struct _block * tmp = __get_exact(ptr);
-  if (temp == NULL)
+  tmp = __get_exact(ptr);
+  if (tmp == NULL)
     return;
   tmp->is_litteral_string = true;
 }
@@ -272,22 +275,24 @@ void __literal_string (void * ptr) {
 /* return whether the size bytes of ptr are initialized */
 int __initialized (void * ptr, size_t size) {
   unsigned i;
-  assert(size > 0);
   struct _block * tmp = __get_cont(ptr);
   if(tmp == NULL)
     return false;
 
   /* fully uninitialized */
-  if(tmp->init_cpt == 0) return false;
+  if(tmp->init_cpt == 0)
+    return false;
   /* fully initialized */
-  if(tmp->init_cpt == tmp->size) return true;
+  if(tmp->init_cpt == tmp->size)
+    return true;
 
   for(i = 0; i < size; i++) {
     /* if one byte is uninitialized */
     int byte_offset = (size_t)ptr - tmp->ptr + i;
     int ind = byte_offset / 8;
     unsigned char mask_bit = 1U << (7 - (byte_offset % 8));
-    if((tmp->init_ptr[ind] & mask_bit) == 0) return false;
+    if((tmp->init_ptr[ind] & mask_bit) == 0)
+      return false;
   }
   return true;
 }
@@ -295,7 +300,8 @@ int __initialized (void * ptr, size_t size) {
 /* return the length (in bytes) of the block containing ptr */
 size_t __block_length(void* ptr) {
   struct _block * tmp = __get_cont(ptr);
-  assert(tmp != NULL);
+  /* Hard failure when un-allocated memory is used  */
+  vassert(tmp != NULL, "\\block_length of unallocated memory", NULL);
   return tmp->size;
 }
 
@@ -304,7 +310,6 @@ int __valid(void* ptr, size_t size) {
   struct _block * tmp;
   if(ptr == NULL)
     return false;
-  //assert(size > 0);
   tmp = __get_cont(ptr);
   return (tmp == NULL) ?
     false : ( tmp->size - ( (size_t)ptr - tmp->ptr ) >= size
@@ -316,7 +321,6 @@ int __valid_read(void* ptr, size_t size) {
   struct _block * tmp;
   if(ptr == NULL)
     return false;
-  //assert(size > 0);
   tmp = __get_cont(ptr);
   return (tmp == NULL) ?
     false : ( tmp->size - ( (size_t)ptr - tmp->ptr ) >= size
@@ -326,37 +330,15 @@ int __valid_read(void* ptr, size_t size) {
 /* return the base address of the block containing ptr */
 void* __base_addr(void* ptr) {
   struct _block * tmp = __get_cont(ptr);
-  assert(tmp != NULL);
+  vassert(tmp != NULL, "\\base_addr of unallocated memory", NULL);
   return (void*)tmp->ptr;
 }
 
 /* return the offset of ptr within its block */
 int __offset(void* ptr) {
   struct _block * tmp = __get_cont(ptr);
-  assert(tmp != NULL);
+  vassert(tmp != NULL, "\\offset of unallocated memory", NULL);
   return ((size_t)ptr - tmp->ptr);
-}
-
-/*******************/
-/* PRINT           */
-/*******************/
-
-/* print the information about a block */
-void __print_block (struct _block * ptr) {
-  if (ptr != NULL) {
-    printf("%p; %zu Bytes; %slitteral; [init] : %li ",
-      (char*)ptr->ptr, ptr->size,
-      ptr->is_litteral_string ? "" : "not ", ptr->init_cpt);
-    if(ptr->init_ptr != NULL) {
-      unsigned i;
-      for(i = 0; i < ptr->size; i++) {
-        int ind = i / 8;
-        int one_bit = (unsigned)1 << (8 - (i % 8) - 1);
-        printf("%i", (ptr->init_ptr[ind] & one_bit) != 0);
-      }
-    }
-    printf("\n");
-  }
 }
 
 /********************/
@@ -374,14 +356,15 @@ void __clean_init (struct _block * ptr) {
 
 /* erase all information about a block */
 void __clean_block (struct _block * ptr) {
-  if(ptr == NULL) return;
-  __clean_init(ptr);
-  free(ptr);
+  if(ptr) {
+    __clean_init(ptr);
+    free(ptr);
+  }
 }
 
 /* erase the content of the abstract structure */
 void __e_acsl_memory_clean() {
-  //__clean_struct();
+  __clean_struct();
 }
 
 /* adds argc / argv to the memory model */
@@ -403,6 +386,24 @@ void __e_acsl_memory_init(int *argc_ref, char ***argv_ref) { }
 /**********************/
 /* DEBUG              */
 /**********************/
+
+/* print the information about a block */
+void __print_block (struct _block * ptr) {
+  if (ptr != NULL) {
+    printf("%p; %zu Bytes; %slitteral; [init] : %li ",
+      (char*)ptr->ptr, ptr->size,
+      ptr->is_litteral_string ? "" : "not ", ptr->init_cpt);
+    if(ptr->init_ptr != NULL) {
+      unsigned i;
+      for(i = 0; i < ptr->size; i++) {
+        int ind = i / 8;
+        int one_bit = (unsigned)1 << (8 - (i % 8) - 1);
+        printf("%i", (ptr->init_ptr[ind] & one_bit) != 0);
+      }
+    }
+    printf("\n");
+  }
+}
 
 /* print the content of the abstract structure */
 void __debug() {
