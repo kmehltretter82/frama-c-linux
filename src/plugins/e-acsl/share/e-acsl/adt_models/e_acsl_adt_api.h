@@ -39,7 +39,7 @@
 #endif
 
 /* Memory block allocated and may be deallocated */
-struct _block {
+static struct _block {
   size_t ptr;	/* begin address */
   size_t size;	/* size in bytes */
 /* Keep trace of initialized sub-blocks within a memory block */
@@ -51,33 +51,33 @@ struct _block {
 };
 
 /* print the information about a block */
-void __print_block(struct _block * ptr );
+static void __print_block(struct _block * ptr );
 
 /* erase information about initialization of a block */
-void __clean_init(struct _block * ptr );
+static void __clean_init(struct _block * ptr );
 
 /* erase all information about a block */
-void __clean_block(struct _block * ptr);
+static void __clean_block(struct _block * ptr);
 
 /* remove the block from the structure */
-void  __remove_element(struct _block *);
+static void  __remove_element(struct _block *);
 
 /* add a block in the structure */
-void  __add_element(struct _block *);
+static void  __add_element(struct _block *);
 
 /* return the block B such as : begin addr of B == ptr
    we suppose that such a block exists, but we could return NULL if not */
-struct _block * __get_exact(void *);
+static struct _block * __get_exact(void *);
 
 /* return the block B containing ptr, such as :
    begin addr of B <= ptr < (begin addr + size) of B
    or NULL if such a block does not exist */
-struct _block * __get_cont(void *);
+static struct _block * __get_cont(void *);
 
 /* erase the content of the structure */
-void __clean_struct(void);
+static void __clean_struct(void);
 
 /* print the content of the structure */
-void  __debug_struct(void);
+static void  __debug_struct(void);
 
 #endif

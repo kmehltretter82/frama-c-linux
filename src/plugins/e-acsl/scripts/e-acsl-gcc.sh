@@ -392,8 +392,7 @@ EACSL_LDFLAGS="-lgmp -lm"
 if [ $OPTION_EACSL_MMODEL = "segment" ]; then
   error "Segment model not available in this distribution"
 else
-  EACSL_RTL="$EACSL_SHARE/adt_models/e_acsl_mmodel.c \
-    $EACSL_SHARE/adt_models/e_acsl_$OPTION_EACSL_MMODEL.c"
+  EACSL_RTL="$EACSL_SHARE/adt_models/e_acsl_"$OPTION_EACSL_MMODEL"_mmodel.c"
 fi
 
 # Output file names
