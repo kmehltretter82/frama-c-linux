@@ -340,7 +340,6 @@ static struct _block * __get_exact (void * ptr) {
   return tmp->leaf;
 }
 
-
 /* return the block B containing ptr, such as :
    begin addr of B <= ptr < (begin addr + size) of B
    or NULL if such a block does not exist */
