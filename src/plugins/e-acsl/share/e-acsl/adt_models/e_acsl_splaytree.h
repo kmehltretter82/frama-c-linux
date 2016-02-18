@@ -192,7 +192,7 @@ static void debug_rec(struct _node * ptr) {
   debug_rec(ptr->right);
 }
 
-void __e_acsl_debug_struct() {
+static void debug_struct() {
   DLOG("\t\t\t------------DEBUG\n");
   debug_rec(__root);
   DLOG("\t\t\t-----------------\n");

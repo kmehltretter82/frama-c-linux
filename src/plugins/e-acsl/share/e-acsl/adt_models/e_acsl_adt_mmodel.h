@@ -409,9 +409,11 @@ void __e_acsl_print_block (struct _block * ptr) {
   }
 }
 
+static void debug_struct();
+
 /* print the content of the abstract structure */
 void __e_acsl_debug() {
-  __e_acsl_debug_struct();
+  debug_struct();
 }
 
 #endif
