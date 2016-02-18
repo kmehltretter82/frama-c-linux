@@ -154,8 +154,8 @@ static void debug_rec(struct _node * ptr) {
 
 static void debug_struct() {
   DLOG("\t\t\t------------DEBUG\n");
-  __debug_rec(__root);
-  DLOF("\t\t\t-----------------\n");
+  debug_rec(__root);
+  DLOG("\t\t\t-----------------\n");
 }
 
 #endif
