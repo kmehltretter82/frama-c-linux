@@ -23,6 +23,7 @@
 #ifndef E_ACSL_SPLAYTREE
 #define E_ACSL_SPLAYTREE
 
+#include "e_acsl_malloc.h"
 #include "e_acsl_syscall.h"
 #include "e_acsl_printf.h"
 #include "e_acsl_assert.h"
@@ -134,7 +135,7 @@ static void __add_element(struct _block* ptr) {
     else if(z->value->ptr < ptr->ptr) z = z->right;
     else return;
   }
-  z = malloc(sizeof(struct _node));
+  z = native_malloc(sizeof(struct _node));
   z->left = z->right = NULL;
   z->value = ptr;
   z->parent = p;
@@ -172,7 +173,7 @@ static void __clean_rec(struct _node * ptr) {
   __clean_block(ptr->value);
   __clean_rec(ptr->left);
   __clean_rec(ptr->right);
-  free(ptr);
+  native_free(ptr);
   ptr = NULL;
 }
 

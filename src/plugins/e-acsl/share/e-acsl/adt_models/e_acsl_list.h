@@ -23,6 +23,7 @@
 #ifndef E_ACSL_LIST
 #define E_ACSL_LIST
 
+#include "e_acsl_malloc.h"
 #include "e_acsl_syscall.h"
 #include "e_acsl_printf.h"
 #include "e_acsl_assert.h"
@@ -43,7 +44,7 @@ static void __remove_element(struct _block* ptr) {
   /* first element */
   if(tmp1->value->ptr == ptr->ptr) {
     __list = tmp1->next;
-    free(tmp1);
+    native_free(tmp1);
   }
 
   for(; tmp2 != NULL && tmp2->value->ptr < ptr->ptr;) {
@@ -53,14 +54,14 @@ static void __remove_element(struct _block* ptr) {
   if(tmp2 == NULL) return;
   if(tmp2->value->ptr == ptr->ptr) {
     tmp1->next = tmp2->next;
-    free(tmp2);
+    native_free(tmp2);
   }
 }
 
 
 static void __add_element(struct _block* ptr) {
   struct _node * tmp1 = __list, * tmp2, * new;
-  new = malloc(sizeof(struct _node));
+  new = native_malloc(sizeof(struct _node));
   if(new == NULL) return;
   new->value = ptr;
   new->next = NULL;
@@ -118,7 +119,7 @@ static void __clean_struct() {
   for(; __list != NULL ;) {
     __clean_block(__list->value);
     next = __list->next;
-    free(__list);
+    native_free(__list);
     __list = next;
   }
 }

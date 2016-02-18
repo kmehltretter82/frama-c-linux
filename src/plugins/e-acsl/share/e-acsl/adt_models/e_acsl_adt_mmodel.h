@@ -23,6 +23,7 @@
 #ifndef E_ACSL_ADT_MMODEL
 #define E_ACSL_ADT_MMODEL
 
+#include "e_acsl_malloc.h"
 #include "e_acsl_string.h"
 #include "e_acsl_printf.h"
 #include "e_acsl_assert.h"
@@ -62,7 +63,7 @@ static size_t needed_bytes (size_t size) {
 void* __store_block(void* ptr, size_t size) {
   struct _block * tmp;
   DASSERT(ptr != NULL);
-  tmp = malloc(sizeof(struct _block));
+  tmp = native_malloc(sizeof(struct _block));
   DASSERT(tmp != NULL);
   tmp->ptr = (size_t)ptr;
   tmp->size = size;
@@ -82,7 +83,7 @@ void __delete_block(void* ptr) {
   DASSERT(tmp != NULL);
   __clean_init(tmp);
   __remove_element(tmp);
-  free(tmp);
+  native_free(tmp);
 }
 
 /* allocate size bytes and store the returned block
@@ -92,7 +93,7 @@ void* __malloc(size_t size) {
   struct _block * new_block;
   if(size <= 0)
     return NULL;
-  tmp = malloc(size);
+  tmp = native_malloc(size);
   if(tmp == NULL)
     return NULL;
   new_block = __store_block(tmp, size);
@@ -110,11 +111,11 @@ void __free(void* ptr) {
     return;
   tmp = __get_exact(ptr);
   DASSERT(tmp != NULL);
-  free(ptr);
+  native_free(ptr);
   __clean_init(tmp);
   __heap_size -= tmp->size;
   __remove_element(tmp);
-  free(tmp);
+  native_free(tmp);
 }
 
 int __freeable(void* ptr) {
@@ -142,7 +143,7 @@ void* __realloc(void* ptr, size_t size) {
   }
   tmp = __get_exact(ptr);
   DASSERT(tmp != NULL);
-  new_ptr = realloc((void*)tmp->ptr, size);
+  new_ptr = native_realloc((void*)tmp->ptr, size);
   if(new_ptr == NULL)
     return NULL;
   __heap_size -= tmp->size;
@@ -163,7 +164,7 @@ void* __realloc(void* ptr, size_t size) {
     /* realloc bigger larger block */
     else {
       int nb = needed_bytes(size);
-      tmp->init_ptr = malloc(nb);
+      tmp->init_ptr = native_malloc(nb);
       memset(tmp->init_ptr, 0xFF, nb);
       if(size%8 != 0)
       tmp->init_ptr[size/8] <<= (8 - size%8);
@@ -174,14 +175,14 @@ void* __realloc(void* ptr, size_t size) {
     int nb = needed_bytes(size);
     int nb_old = needed_bytes(tmp->size);
     int i;
-    tmp->init_ptr = realloc(tmp->init_ptr, nb);
+    tmp->init_ptr = native_realloc(tmp->init_ptr, nb);
     for(i = nb_old; i < nb; i++)
       tmp->init_ptr[i] = 0;
     tmp->init_cpt = 0;
     for(i = 0; i < nb; i++)
       tmp->init_cpt += nbr_bits_to_1[tmp->init_ptr[i]];
     if(tmp->init_cpt == size || tmp->init_cpt == 0) {
-      free(tmp->init_ptr);
+      native_free(tmp->init_ptr);
       tmp->init_ptr = NULL;
     }
   }
@@ -199,7 +200,7 @@ void* __calloc(size_t nbr_block, size_t size_block) {
   struct _block * new_block;
   if(nbr_block * size_block <= 0)
     return NULL;
-  tmp = calloc(nbr_block, size_block);
+  tmp = native_calloc(nbr_block, size_block);
   if(tmp == NULL)
     return NULL;
   new_block = __store_block(tmp, nbr_block * size_block);
@@ -226,7 +227,7 @@ void __initialize (void * ptr, size_t size) {
   /* fully uninitialized */
   if(tmp->init_cpt == 0) {
     int nb = needed_bytes(tmp->size);
-    tmp->init_ptr = malloc(nb);
+    tmp->init_ptr = native_malloc(nb);
     memset(tmp->init_ptr, 0, nb);
   }
 
@@ -241,7 +242,7 @@ void __initialize (void * ptr, size_t size) {
 
   /* now fully initialized */
   if(tmp->init_cpt == tmp->size) {
-    free(tmp->init_ptr);
+    native_free(tmp->init_ptr);
     tmp->init_ptr = NULL;
   }
 }
@@ -257,7 +258,7 @@ void __full_init (void * ptr) {
     return;
 
   if (tmp->init_ptr != NULL) {
-    free(tmp->init_ptr);
+    native_free(tmp->init_ptr);
     tmp->init_ptr = NULL;
   }
 
@@ -351,7 +352,7 @@ int __offset(void* ptr) {
 /* erase information about initialization of a block */
 void __clean_init (struct _block * ptr) {
   if(ptr->init_ptr != NULL) {
-    free(ptr->init_ptr);
+    native_free(ptr->init_ptr);
     ptr->init_ptr = NULL;
   }
   ptr->init_cpt = 0;
@@ -361,7 +362,7 @@ void __clean_init (struct _block * ptr) {
 void __clean_block (struct _block * ptr) {
   if(ptr) {
     __clean_init(ptr);
-    free(ptr);
+    native_free(ptr);
   }
 }
 
