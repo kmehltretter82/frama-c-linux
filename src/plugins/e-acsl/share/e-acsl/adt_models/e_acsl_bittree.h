@@ -431,31 +431,33 @@ static void __clean_struct () {
 /* DEBUG             */
 /*********************/
 
+#ifdef E_ACSL_DEBUG
 /* called from __debug_struct */
 /* recursively print the content of the structure */
 /*@ assigns \nothing;
   @*/
-static void __debug_rec (struct bittree * ptr, int depth) {
+static void debug_rec (struct bittree * ptr, int depth) {
   int i;
   if(ptr == NULL)
     return;
   for(i = 0; i < depth; i++)
-    printf("  ");
+    DLOG("  ");
   if(ptr->is_leaf)
-    __print_block(ptr->leaf);
+    __e_acsl_print_block(ptr->leaf);
   else {
-    printf("%p -- %p\n", (void*)ptr->mask, (void*)ptr->addr);
-    __debug_rec(ptr->left, depth+1);
-    __debug_rec(ptr->right, depth+1);
+    DLOG("%p -- %p\n", (void*)ptr->mask, (void*)ptr->addr);
+    debug_rec(ptr->left, depth+1);
+    debug_rec(ptr->right, depth+1);
   }
 }
 
 /* print the content of the structure */
 /*@ assigns \nothing;
   @*/
-static void __debug_struct () {
-  printf("------------DEBUG\n");
-  __debug_rec(__root, 0);
-  printf("-----------------\n");
+void __e_acsl_debug_struct () {
+  DLOG("------------DEBUG\n");
+  debug_rec(__root, 0);
+  DLOG("-----------------\n");
 }
+#endif
 #endif

@@ -20,6 +20,9 @@
 /*                                                                        */
 /**************************************************************************/
 
+#ifndef E_ACSL_ADT_MMODEL
+#define E_ACSL_ADT_MMODEL
+
 #include "e_acsl_string.h"
 #include "e_acsl_printf.h"
 #include "e_acsl_assert.h"
@@ -386,11 +389,12 @@ void __e_acsl_memory_init(int *argc_ref, char ***argv_ref) { }
 /**********************/
 /* DEBUG              */
 /**********************/
+#ifdef E_ACSL_DEBUG
 
 /* print the information about a block */
-void __print_block (struct _block * ptr) {
+void __e_acsl_print_block (struct _block * ptr) {
   if (ptr != NULL) {
-    printf("%p; %zu Bytes; %slitteral; [init] : %li ",
+    DLOG("%p; %zu Bytes; %slitteral; [init] : %li ",
       (char*)ptr->ptr, ptr->size,
       ptr->is_litteral_string ? "" : "not ", ptr->init_cpt);
     if(ptr->init_ptr != NULL) {
@@ -398,14 +402,17 @@ void __print_block (struct _block * ptr) {
       for(i = 0; i < ptr->size; i++) {
         int ind = i / 8;
         int one_bit = (unsigned)1 << (8 - (i % 8) - 1);
-        printf("%i", (ptr->init_ptr[ind] & one_bit) != 0);
+        DLOG("%i", (ptr->init_ptr[ind] & one_bit) != 0);
       }
     }
-    printf("\n");
+    DLOG("\n");
   }
 }
 
 /* print the content of the abstract structure */
-void __debug() {
-  __debug_struct();
+void __e_acsl_debug() {
+  __e_acsl_debug_struct();
 }
+
+#endif
+#endif

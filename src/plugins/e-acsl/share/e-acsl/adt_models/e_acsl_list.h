@@ -123,14 +123,19 @@ static void __clean_struct() {
   }
 }
 
-
-static void __debug_struct() {
+/*********************/
+/* DEBUG             */
+/*********************/
+#ifdef E_ACSL_DEBUG
+void __e_acsl_debug_struct() {
   struct _node * tmp = __list;
-  printf("\t\t\t------------DEBUG\n");
+  DLOG("\t\t\t------------DEBUG\n");
   for(; tmp != NULL; tmp = tmp->next) {
-    printf("\t\t\t");
-    __print_block(tmp->value);
+    DLOG("\t\t\t");
+    __e_acsl_print_block(tmp->value);
   }
-  printf("\t\t\t-----------------\n");
+  DLOG("\t\t\t-----------------\n");
 }
+
+#endif
 #endif
