@@ -20,6 +20,9 @@
 /*                                                                        */
 /**************************************************************************/
 
+#ifndef E_ACSL_LIST
+#define E_ACSL_LIST
+
 #include "e_acsl_syscall.h"
 #include "e_acsl_printf.h"
 #include "e_acsl_assert.h"
@@ -130,4 +133,4 @@ static void __debug_struct() {
   }
   printf("\t\t\t-----------------\n");
 }
-
+#endif

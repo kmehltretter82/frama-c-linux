@@ -20,5 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#include "e_acsl_adt_mmodel.h"
-#include "e_acsl_splaytree.h"
+#ifndef E_ACSL_SPLAYTREE_MMODEL
+#define E_ACSL_SPLAYTREE_MMODEL
+#  include "e_acsl_adt_mmodel.h"
+#  include "e_acsl_splaytree.h"
+#endif

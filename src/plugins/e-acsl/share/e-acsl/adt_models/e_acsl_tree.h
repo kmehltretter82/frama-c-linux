@@ -20,6 +20,9 @@
 /*                                                                        */
 /**************************************************************************/
 
+#ifndef E_ACSL_BINTREE
+#define E_ACSL_BINTREE
+
 #include "e_acsl_syscall.h"
 #include "e_acsl_printf.h"
 #include "e_acsl_assert.h"
@@ -151,3 +154,4 @@ static void __debug_struct() {
   __debug_rec(__root);
   printf("\t\t\t-----------------\n");
 }
+#endif

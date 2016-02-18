@@ -20,5 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#include "e_acsl_adt_mmodel.h"
-#include "e_acsl_list.h"
+#ifndef E_ACSL_LIST_MMODEL
+#define E_ACSL_LIST_MMODEL
+#  include "e_acsl_adt_mmodel.h"
+#  include "e_acsl_list.h"
+#endif

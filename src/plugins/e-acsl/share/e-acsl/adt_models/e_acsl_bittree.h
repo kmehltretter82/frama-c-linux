@@ -20,8 +20,9 @@
 /*                                                                        */
 /**************************************************************************/
 
-#include <unistd.h>
-#include <stdlib.h>
+#ifndef E_ACSL_BITTREE
+#define E_ACSL_BITTREE
+
 #include <stdbool.h>
 
 #include "e_acsl_syscall.h"
@@ -457,3 +458,4 @@ static void __debug_struct () {
   __debug_rec(__root, 0);
   printf("-----------------\n");
 }
+#endif
