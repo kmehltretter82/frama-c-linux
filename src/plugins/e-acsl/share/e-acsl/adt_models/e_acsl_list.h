@@ -28,7 +28,7 @@
 #include "e_acsl_assert.h"
 #include "e_acsl_adt_api.h"
 
-struct _node {
+static struct _node {
   struct _block * value;
   struct _node * next;
 };
@@ -127,7 +127,7 @@ static void __clean_struct() {
 /* DEBUG             */
 /*********************/
 #ifdef E_ACSL_DEBUG
-void __e_acsl_debug_struct() {
+static void debug_struct() {
   struct _node * tmp = __list;
   DLOG("\t\t\t------------DEBUG\n");
   for(; tmp != NULL; tmp = tmp->next) {

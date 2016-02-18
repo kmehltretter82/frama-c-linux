@@ -454,7 +454,7 @@ static void debug_rec (struct bittree * ptr, int depth) {
 /* print the content of the structure */
 /*@ assigns \nothing;
   @*/
-void __e_acsl_debug_struct () {
+static void debug_struct () {
   DLOG("------------DEBUG\n");
   debug_rec(__root, 0);
   DLOG("-----------------\n");
