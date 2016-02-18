@@ -17,8 +17,8 @@ void f(void)
   {
     int __e_acsl_initialized;
     __e_acsl_initialized = __initialized((void *)p,sizeof(int));
-    e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"f",
-                  (char *)"\\initialized(p)",10);
+    __e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"f",
+                    (char *)"\\initialized(p)",10);
   }
   __delete_block((void *)(& p));
   __delete_block((void *)(& u));
@@ -34,8 +34,8 @@ int main(void)
   x = 0;
   f();
   /*@ assert &x ≡ &x; */
-  e_acsl_assert(& x == & x,(char *)"Assertion",(char *)"main",
-                (char *)"&x == &x",16);
+  __e_acsl_assert(& x == & x,(char *)"Assertion",(char *)"main",
+                  (char *)"&x == &x",16);
   __retres = 0;
   __e_acsl_memory_clean();
   return __retres;

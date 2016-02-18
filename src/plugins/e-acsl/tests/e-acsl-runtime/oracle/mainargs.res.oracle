@@ -9,7 +9,7 @@ FRAMAC_SHARE/libc/string.h:91:[e-acsl] warning: E-ACSL construct `assigns clause
 FRAMAC_SHARE/libc/string.h:93:[e-acsl] warning: E-ACSL construct `applying logic function' is not yet supported.
                   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] warning: function e_acsl_assert: precondition got status unknown.
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] warning: function __e_acsl_assert: precondition got status unknown.
 tests/e-acsl-runtime/mainargs.c:12:[value] warning: assertion got status unknown.
 tests/e-acsl-runtime/mainargs.c:13:[value] warning: assertion got status unknown.
 tests/e-acsl-runtime/mainargs.c:15:[value] warning: assertion got status unknown.

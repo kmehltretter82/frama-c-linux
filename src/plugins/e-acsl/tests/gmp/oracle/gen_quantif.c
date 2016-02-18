@@ -23,9 +23,9 @@ int main(void)
       __e_acsl_x ++;
     }
     e_acsl_end_loop1: ;
-    e_acsl_assert(__e_acsl_forall,(char *)"Assertion",(char *)"main",
-                  (char *)"\\forall integer x; 0 <= x <= 1 ==> x == 0 || x == 1",
-                  9);
+    __e_acsl_assert(__e_acsl_forall,(char *)"Assertion",(char *)"main",
+                    (char *)"\\forall integer x; 0 <= x <= 1 ==> x == 0 || x == 1",
+                    9);
   }
   /*@ assert ∀ ℤ x; 0 < x ≤ 1 ⇒ x ≡ 1; */
   {
@@ -43,8 +43,8 @@ int main(void)
       __e_acsl_x_2 ++;
     }
     e_acsl_end_loop2: ;
-    e_acsl_assert(__e_acsl_forall_2,(char *)"Assertion",(char *)"main",
-                  (char *)"\\forall integer x; 0 < x <= 1 ==> x == 1",10);
+    __e_acsl_assert(__e_acsl_forall_2,(char *)"Assertion",(char *)"main",
+                    (char *)"\\forall integer x; 0 < x <= 1 ==> x == 1",10);
   }
   /*@ assert ∀ ℤ x; 0 < x < 1 ⇒ \false; */
   {
@@ -62,8 +62,8 @@ int main(void)
       __e_acsl_x_3 ++;
     }
     e_acsl_end_loop3: ;
-    e_acsl_assert(__e_acsl_forall_3,(char *)"Assertion",(char *)"main",
-                  (char *)"\\forall integer x; 0 < x < 1 ==> \\false",11);
+    __e_acsl_assert(__e_acsl_forall_3,(char *)"Assertion",(char *)"main",
+                    (char *)"\\forall integer x; 0 < x < 1 ==> \\false",11);
   }
   /*@ assert ∀ ℤ x; 0 ≤ x < 1 ⇒ x ≡ 0; */
   {
@@ -81,8 +81,8 @@ int main(void)
       __e_acsl_x_4 ++;
     }
     e_acsl_end_loop4: ;
-    e_acsl_assert(__e_acsl_forall_4,(char *)"Assertion",(char *)"main",
-                  (char *)"\\forall integer x; 0 <= x < 1 ==> x == 0",12);
+    __e_acsl_assert(__e_acsl_forall_4,(char *)"Assertion",(char *)"main",
+                    (char *)"\\forall integer x; 0 <= x < 1 ==> x == 0",12);
   }
   /*@ assert
       ∀ ℤ x, ℤ y, ℤ z;
@@ -115,9 +115,9 @@ int main(void)
       __e_acsl_x_5 ++;
     }
     e_acsl_end_loop5: ;
-    e_acsl_assert(__e_acsl_forall_5,(char *)"Assertion",(char *)"main",
-                  (char *)"\\forall integer x, integer y, integer z;\n  0 <= x < 2 && 0 <= y < 5 && 0 <= z <= y ==> x+z <= y+1",
-                  16);
+    __e_acsl_assert(__e_acsl_forall_5,(char *)"Assertion",(char *)"main",
+                    (char *)"\\forall integer x, integer y, integer z;\n  0 <= x < 2 && 0 <= y < 5 && 0 <= z <= y ==> x+z <= y+1",
+                    16);
   }
   /*@ assert ∃ int x; 0 ≤ x < 10 ∧ x ≡ 5; */
   {
@@ -135,8 +135,8 @@ int main(void)
       __e_acsl_x_6 ++;
     }
     e_acsl_end_loop6: ;
-    e_acsl_assert(__e_acsl_exists,(char *)"Assertion",(char *)"main",
-                  (char *)"\\exists int x; 0 <= x < 10 && x == 5",21);
+    __e_acsl_assert(__e_acsl_exists,(char *)"Assertion",(char *)"main",
+                    (char *)"\\exists int x; 0 <= x < 10 && x == 5",21);
   }
   /*@ assert
       ∀ int x;
@@ -179,9 +179,9 @@ int main(void)
       __e_acsl_x_7 ++;
     }
     e_acsl_end_loop8: ;
-    e_acsl_assert(__e_acsl_forall_6,(char *)"Assertion",(char *)"main",
-                  (char *)"\\forall int x;\n  0 <= x < 10 ==> x%2 == 0 ==> (\\exists integer y; 0 <= y <= x/2 && x == 2*y)",
-                  25);
+    __e_acsl_assert(__e_acsl_forall_6,(char *)"Assertion",(char *)"main",
+                    (char *)"\\forall int x;\n  0 <= x < 10 ==> x%2 == 0 ==> (\\exists integer y; 0 <= y <= x/2 && x == 2*y)",
+                    25);
   }
   __retres = 0;
   return __retres;

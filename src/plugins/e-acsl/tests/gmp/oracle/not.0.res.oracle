@@ -10,5 +10,5 @@
   __e_acsl_init ∈ [--..--]
   __e_acsl_internal_heap ∈ [--..--]
   __heap_size ∈ [--..--]
-[value] using specification for function e_acsl_assert
+[value] using specification for function __e_acsl_assert
 [value] done for function main

@@ -24,8 +24,8 @@ int main(void)
   {
     int __e_acsl_initialized;
     __e_acsl_initialized = __initialized((void *)(& i),sizeof(int));
-    e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"main",
-                  (char *)"\\initialized(&i)",14);
+    __e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"main",
+                    (char *)"\\initialized(&i)",14);
   }
   __retres = 0;
   __delete_block((void *)(& i));

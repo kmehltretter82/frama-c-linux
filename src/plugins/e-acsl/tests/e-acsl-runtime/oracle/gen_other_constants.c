@@ -7,11 +7,11 @@ int main(void)
 {
   int __retres;
   /*@ assert 'c' ≡ 'c'; */
-  e_acsl_assert('c' == 'c',(char *)"Assertion",(char *)"main",
-                (char *)"\'c\' == \'c\'",10);
+  __e_acsl_assert('c' == 'c',(char *)"Assertion",(char *)"main",
+                  (char *)"\'c\' == \'c\'",10);
   /*@ assert false ≢ true; */
-  e_acsl_assert(false != true,(char *)"Assertion",(char *)"main",
-                (char *)"false != true",11);
+  __e_acsl_assert(false != true,(char *)"Assertion",(char *)"main",
+                  (char *)"false != true",11);
   __retres = 0;
   return __retres;
 }

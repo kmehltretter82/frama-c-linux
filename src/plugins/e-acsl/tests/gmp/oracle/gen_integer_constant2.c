@@ -10,8 +10,8 @@ int main(void)
     __gmpz_init_set_si(__e_acsl,(long)0);
     __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl),
                              (__mpz_struct const *)(__e_acsl));
-    e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"main",
-                  (char *)"0 == 0",6);
+    __e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"main",
+                    (char *)"0 == 0",6);
     __gmpz_clear(__e_acsl);
   }
   x = 0;
@@ -25,8 +25,8 @@ int main(void)
     __gmpz_init_set_si(__e_acsl_3,(long)1);
     __e_acsl_ne = __gmpz_cmp((__mpz_struct const *)(__e_acsl_2),
                              (__mpz_struct const *)(__e_acsl_3));
-    e_acsl_assert(__e_acsl_ne != 0,(char *)"Assertion",(char *)"main",
-                  (char *)"0 != 1",8);
+    __e_acsl_assert(__e_acsl_ne != 0,(char *)"Assertion",(char *)"main",
+                    (char *)"0 != 1",8);
     __gmpz_clear(__e_acsl_2);
     __gmpz_clear(__e_acsl_3);
   }
@@ -37,8 +37,8 @@ int main(void)
     __gmpz_init_set_ui(__e_acsl_4,1152921504606846975);
     __e_acsl_eq_2 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_4),
                                (__mpz_struct const *)(__e_acsl_4));
-    e_acsl_assert(__e_acsl_eq_2 == 0,(char *)"Assertion",(char *)"main",
-                  (char *)"1152921504606846975 == 0xfffffffffffffff",9);
+    __e_acsl_assert(__e_acsl_eq_2 == 0,(char *)"Assertion",(char *)"main",
+                    (char *)"1152921504606846975 == 0xfffffffffffffff",9);
     __gmpz_clear(__e_acsl_4);
   }
   /*@ assert
@@ -52,9 +52,9 @@ int main(void)
                         10);
     __e_acsl_eq_3 = __gmpz_cmp((__mpz_struct const *)(__e_acsl_5),
                                (__mpz_struct const *)(__e_acsl_5));
-    e_acsl_assert(__e_acsl_eq_3 == 0,(char *)"Assertion",(char *)"main",
-                  (char *)"0xffffffffffffffffffffffffffffffff == 0xffffffffffffffffffffffffffffffff",
-                  11);
+    __e_acsl_assert(__e_acsl_eq_3 == 0,(char *)"Assertion",(char *)"main",
+                    (char *)"0xffffffffffffffffffffffffffffffff == 0xffffffffffffffffffffffffffffffff",
+                    11);
     __gmpz_clear(__e_acsl_5);
   }
   __retres = 0;

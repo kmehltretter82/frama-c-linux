@@ -33,7 +33,7 @@
 
 /*@ requires predicate != 0;
   @ assigns \nothing; */
-void e_acsl_assert(int predicate,
+void __e_acsl_assert(int predicate,
 		   char *kind,
 		   char *fct,
 		   char *pred_txt,
