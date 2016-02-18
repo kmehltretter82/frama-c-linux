@@ -25,8 +25,8 @@ FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:82:[value] warning: function __gmpz_import: pre
 [value] using specification for function __gmpz_mul
 [value] using specification for function __gmpz_add
 [value] using specification for function __gmpz_cmp
-[value] using specification for function e_acsl_assert
-FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] warning: function e_acsl_assert: precondition got status unknown.
+[value] using specification for function __e_acsl_assert
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] warning: function __e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_tdiv_r
 tests/gmp/longlong.i:17:[kernel] warning: pointer comparison.
                   assert \pointer_comparable((void *)__e_acsl_eq, (void *)0);

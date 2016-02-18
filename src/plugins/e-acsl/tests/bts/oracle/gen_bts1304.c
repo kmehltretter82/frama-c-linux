@@ -40,9 +40,9 @@ int main(void)
   {
     int __e_acsl_initialized;
     __e_acsl_initialized = __initialized((void *)(buf),sizeof(union msg));
-    e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"main",
-                  (char *)"\\initialized((union msg *)((unsigned char *)buf))",
-                  23);
+    __e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"main",
+                    (char *)"\\initialized((union msg *)((unsigned char *)buf))",
+                    23);
   }
   __retres = 0;
   __delete_block((void *)(buf));

@@ -39,7 +39,7 @@
 #endif
 
 /* Memory block allocated and may be deallocated */
-static struct _block {
+struct _block {
   size_t ptr;	/* begin address */
   size_t size;	/* size in bytes */
 /* Keep trace of initialized sub-blocks within a memory block */

@@ -22,8 +22,8 @@ struct list *add(struct list *l, int i)
       __e_acsl_and = __e_acsl_valid;
     }
     else __e_acsl_and = 0;
-    e_acsl_assert(__e_acsl_and,(char *)"Assertion",(char *)"add",
-                  (char *)"\\valid(new)",18);
+    __e_acsl_assert(__e_acsl_and,(char *)"Assertion",(char *)"add",
+                    (char *)"\\valid(new)",18);
   }
   __initialize((void *)(& new->element),sizeof(int));
   new->element = i;

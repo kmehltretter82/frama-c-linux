@@ -81,10 +81,10 @@ static void runtime_assert(int predicate, char *kind,
   }
 }
 
-/* Alias for runtime assertions. Since `e_acsl_assert` is added as a weak alias
- * user-defined implementation of the `e_acsl_assert` function will be
+/* Alias for runtime assertions. Since `__e_acsl_assert` is added as a weak
+ * alias user-defined implementation of the `__e_acsl_assert` function will be
  * preferred at link time. */
-void e_acsl_assert(int pred, char *kind, char *fct, char *pred_txt, int line)
+void __e_acsl_assert(int pred, char *kind, char *fct, char *pred_txt, int line)
   __attribute__ ((weak, alias ("runtime_assert")));
 
 #endif

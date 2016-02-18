@@ -24,21 +24,21 @@ int main(void)
   __full_init((void *)(& q));
   q = & b;
   /*@ assert \initialized(&b); */
-  e_acsl_assert(1,(char *)"Assertion",(char *)"main",
-                (char *)"\\initialized(&b)",9);
+  __e_acsl_assert(1,(char *)"Assertion",(char *)"main",
+                  (char *)"\\initialized(&b)",9);
   /*@ assert \initialized(q); */
   {
     int __e_acsl_initialized;
     __e_acsl_initialized = __initialized((void *)q,sizeof(int));
-    e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"main",
-                  (char *)"\\initialized(q)",10);
+    __e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"main",
+                    (char *)"\\initialized(q)",10);
   }
   /*@ assert \initialized(p); */
   {
     int __e_acsl_initialized_2;
     __e_acsl_initialized_2 = __initialized((void *)p,sizeof(int));
-    e_acsl_assert(__e_acsl_initialized_2,(char *)"Assertion",(char *)"main",
-                  (char *)"\\initialized(p)",11);
+    __e_acsl_assert(__e_acsl_initialized_2,(char *)"Assertion",
+                    (char *)"main",(char *)"\\initialized(p)",11);
   }
   __retres = 0;
   __delete_block((void *)(& b));

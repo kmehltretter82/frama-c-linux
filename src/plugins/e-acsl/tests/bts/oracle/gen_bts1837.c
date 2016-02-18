@@ -18,8 +18,8 @@ int f(void)
   {
     int __e_acsl_valid_read;
     __e_acsl_valid_read = __valid_read((void *)S,sizeof(char));
-    e_acsl_assert(__e_acsl_valid_read,(char *)"Assertion",(char *)"f",
-                  (char *)"\\valid_read(S)",10);
+    __e_acsl_assert(__e_acsl_valid_read,(char *)"Assertion",(char *)"f",
+                    (char *)"\\valid_read(S)",10);
   }
   /*@ assert \valid_read(s1); */
   {
@@ -32,8 +32,8 @@ int f(void)
       __e_acsl_and = __e_acsl_valid_read_2;
     }
     else __e_acsl_and = 0;
-    e_acsl_assert(__e_acsl_and,(char *)"Assertion",(char *)"f",
-                  (char *)"\\valid_read(s1)",11);
+    __e_acsl_assert(__e_acsl_and,(char *)"Assertion",(char *)"f",
+                    (char *)"\\valid_read(s1)",11);
   }
   /*@ assert \valid_read(s2); */
   {
@@ -46,8 +46,8 @@ int f(void)
       __e_acsl_and_2 = __e_acsl_valid_read_3;
     }
     else __e_acsl_and_2 = 0;
-    e_acsl_assert(__e_acsl_and_2,(char *)"Assertion",(char *)"f",
-                  (char *)"\\valid_read(s2)",12);
+    __e_acsl_assert(__e_acsl_and_2,(char *)"Assertion",(char *)"f",
+                    (char *)"\\valid_read(s2)",12);
   }
   __retres = 0;
   __delete_block((void *)(& s2));
@@ -106,8 +106,8 @@ int main(void)
           __e_acsl_and = __e_acsl_valid_read;
         }
         else __e_acsl_and = 0;
-        e_acsl_assert(__e_acsl_and,(char *)"Assertion",(char *)"main",
-                      (char *)"\\valid_read(s)",20);
+        __e_acsl_assert(__e_acsl_and,(char *)"Assertion",(char *)"main",
+                        (char *)"\\valid_read(s)",20);
       }
       /*@ assert ¬\valid(s); */
       {
@@ -120,8 +120,8 @@ int main(void)
           __e_acsl_and_2 = __e_acsl_valid;
         }
         else __e_acsl_and_2 = 0;
-        e_acsl_assert(! __e_acsl_and_2,(char *)"Assertion",(char *)"main",
-                      (char *)"!\\valid(s)",21);
+        __e_acsl_assert(! __e_acsl_and_2,(char *)"Assertion",(char *)"main",
+                        (char *)"!\\valid(s)",21);
         __delete_block((void *)(& s));
       }
     }

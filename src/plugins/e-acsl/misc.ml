@@ -122,7 +122,7 @@ let get_orig_name kf =
   else
     name
 
-let e_acsl_guard_name = "e_acsl_assert"
+let e_acsl_guard_name = "__e_acsl_assert"
 
 (* Build a C conditional doing a runtime assertion check. *)
 let mk_e_acsl_guard ?(reverse=false) kind kf e p =

@@ -13,10 +13,10 @@ void f(void)
   {
     int __e_acsl_valid_read;
     __e_acsl_valid_read = __valid_read((void *)(T + G),sizeof(char));
-    e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"f",
-                  (char *)"mem_access: \\valid_read(T+G)",11);
-    e_acsl_assert((int)*(T + G) == 'b',(char *)"Assertion",(char *)"f",
-                  (char *)"*(T+G) == \'b\'",11);
+    __e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"f",
+                    (char *)"mem_access: \\valid_read(T+G)",11);
+    __e_acsl_assert((int)*(T + G) == 'b',(char *)"Assertion",(char *)"f",
+                    (char *)"*(T+G) == \'b\'",11);
   }
   G ++;
   return;
@@ -67,24 +67,24 @@ int main(void)
   {
     int __e_acsl_valid_read;
     __e_acsl_valid_read = __valid_read((void *)(S + G2),sizeof(char));
-    e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"main",
-                  (char *)"mem_access: \\valid_read(S+G2)",22);
-    e_acsl_assert((int)*(S + G2) == 'o',(char *)"Assertion",(char *)"main",
-                  (char *)"*(S+G2) == \'o\'",22);
+    __e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"main",
+                    (char *)"mem_access: \\valid_read(S+G2)",22);
+    __e_acsl_assert((int)*(S + G2) == 'o',(char *)"Assertion",(char *)"main",
+                    (char *)"*(S+G2) == \'o\'",22);
   }
   /*@ assert \initialized(S); */
   {
     int __e_acsl_initialized;
     __e_acsl_initialized = __initialized((void *)S,sizeof(char));
-    e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"main",
-                  (char *)"\\initialized(S)",23);
+    __e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"main",
+                    (char *)"\\initialized(S)",23);
   }
   /*@ assert \valid_read(S2); */
   {
     int __e_acsl_valid_read_2;
     __e_acsl_valid_read_2 = __valid_read((void *)S2,sizeof(char));
-    e_acsl_assert(__e_acsl_valid_read_2,(char *)"Assertion",(char *)"main",
-                  (char *)"\\valid_read(S2)",24);
+    __e_acsl_assert(__e_acsl_valid_read_2,(char *)"Assertion",(char *)"main",
+                    (char *)"\\valid_read(S2)",24);
   }
   /*@ assert ¬\valid(SS); */
   {
@@ -97,8 +97,8 @@ int main(void)
       __e_acsl_and = __e_acsl_valid;
     }
     else __e_acsl_and = 0;
-    e_acsl_assert(! __e_acsl_and,(char *)"Assertion",(char *)"main",
-                  (char *)"!\\valid(SS)",25);
+    __e_acsl_assert(! __e_acsl_and,(char *)"Assertion",(char *)"main",
+                    (char *)"!\\valid(SS)",25);
   }
   f();
   __retres = 0;

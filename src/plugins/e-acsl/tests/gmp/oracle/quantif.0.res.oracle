@@ -12,7 +12,7 @@
   __heap_size ∈ [--..--]
 tests/gmp/quantif.i:9:[value] warning: assertion got status unknown.
 tests/gmp/quantif.i:9:[value] entering loop for the first time
-[value] using specification for function e_acsl_assert
+[value] using specification for function __e_acsl_assert
 tests/gmp/quantif.i:10:[value] warning: assertion got status unknown.
 tests/gmp/quantif.i:10:[value] entering loop for the first time
 tests/gmp/quantif.i:11:[value] warning: assertion got status unknown.
@@ -21,7 +21,7 @@ tests/gmp/quantif.i:12:[value] warning: assertion got status unknown.
 tests/gmp/quantif.i:12:[value] entering loop for the first time
 tests/gmp/quantif.i:16:[value] warning: assertion got status unknown.
 tests/gmp/quantif.i:16:[value] entering loop for the first time
-FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] warning: function e_acsl_assert: precondition got status unknown.
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] warning: function __e_acsl_assert: precondition got status unknown.
 tests/gmp/quantif.i:21:[value] warning: assertion got status unknown.
 tests/gmp/quantif.i:21:[value] entering loop for the first time
 tests/gmp/quantif.i:25:[value] warning: assertion got status unknown.
