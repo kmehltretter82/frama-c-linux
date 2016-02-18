@@ -23,7 +23,7 @@
 #ifndef E_ACSL_MMODEL
 #define E_ACSL_MMODEL
 
-#include "stdlib.h"
+#include <stddef.h>
 
 /* Runtime assertion verifying a predicate */
 /*@ requires pred != 0;

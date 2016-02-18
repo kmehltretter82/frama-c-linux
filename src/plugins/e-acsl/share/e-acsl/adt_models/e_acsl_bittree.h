@@ -25,6 +25,7 @@
 
 #include <stdbool.h>
 
+#include "e_acsl_malloc.h"
 #include "e_acsl_syscall.h"
 #include "e_acsl_printf.h"
 #include "e_acsl_assert.h"
@@ -201,7 +202,7 @@ static void __remove_element (struct _block * ptr) {
       brother->left->father = father;
       brother->right->father = father;
     }
-    free(brother);
+    native_free(brother);
     /* necessary ? -- begin */
     if(father->father != NULL) {
       father->father->mask = mask(father->father->left->addr
@@ -211,7 +212,7 @@ static void __remove_element (struct _block * ptr) {
     }
     /* necessary ? -- end */
   }
-  free(leaf_to_delete);
+  native_free(leaf_to_delete);
 }
 
 
@@ -250,7 +251,7 @@ static void __add_element (struct _block * ptr) {
   struct bittree * new_leaf;
   assert(ptr != NULL);
 
-  new_leaf = malloc(sizeof(struct bittree));
+  new_leaf = native_malloc(sizeof(struct bittree));
   assert(new_leaf != NULL);
   new_leaf->is_leaf = true;
   new_leaf->addr = ptr->ptr;
@@ -266,7 +267,7 @@ static void __add_element (struct _block * ptr) {
     struct bittree * brother = __most_similar_node (ptr), * father, * aux;
 
     assert(brother != NULL);
-    father = malloc(sizeof(struct bittree));
+    father = native_malloc(sizeof(struct bittree));
     assert(father != NULL);
     father->is_leaf = false;
     father->addr = brother->addr & new_leaf->addr;
@@ -418,7 +419,7 @@ static void __clean_rec (struct bittree * ptr) {
     __clean_rec(ptr->right);
     ptr->left = ptr->right = NULL;
   }
-  free(ptr);
+  native_free(ptr);
 }
 
 /* erase the content of the structure */

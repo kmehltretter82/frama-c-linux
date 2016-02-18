@@ -23,6 +23,7 @@
 #ifndef E_ACSL_BINTREE
 #define E_ACSL_BINTREE
 
+#include "e_acsl_malloc.h"
 #include "e_acsl_syscall.h"
 #include "e_acsl_printf.h"
 #include "e_acsl_assert.h"
@@ -51,7 +52,7 @@ static void __remove_element(struct _block* ptr) {
       if(father->left == tmp) father->left = tmp->right;
       else father->right = tmp->right;
     }
-    free(tmp);
+    native_free(tmp);
   }
   else if(tmp->right == NULL) {
     if(__root == tmp) __root = tmp->left;
@@ -59,7 +60,7 @@ static void __remove_element(struct _block* ptr) {
       if(father->left == tmp) father->left = tmp->left;
       else father->right = tmp->left;
     }
-    free(tmp);
+    native_free(tmp);
   }
   else { /* two children */
     struct _node * cursor = tmp->right;
@@ -68,7 +69,7 @@ static void __remove_element(struct _block* ptr) {
     tmp->value = cursor->value;
     if(father->left == cursor) father->left = cursor->right;
     else father->right = cursor->right;
-    free(cursor);
+    native_free(cursor);
   }
 }
 
@@ -76,7 +77,7 @@ static void __remove_element(struct _block* ptr) {
 static void __add_element(struct _block* ptr) {
   enum {LEFT, RIGHT} pos;
   struct _node * new, * tmp = __root, * father = NULL;
-  new = malloc(sizeof(struct _node));
+  new = native_malloc(sizeof(struct _node));
   if(new == NULL) return;
   new->value = ptr;
   new->left = new->right = NULL;
@@ -132,7 +133,7 @@ static void __clean_rec(struct _node * ptr) {
   __clean_block(ptr->value);
   __clean_rec(ptr->left);
   __clean_rec(ptr->right);
-  free(ptr);
+  native_free(ptr);
   ptr = NULL;
 }
 
