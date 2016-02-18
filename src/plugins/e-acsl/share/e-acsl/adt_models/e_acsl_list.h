@@ -20,29 +20,29 @@
 /*                                                                        */
 /**************************************************************************/
 
-#include "e_acsl_mmodel_api.h"
-#include "e_acsl_mmodel.h"
-#include "stdio.h"
+#include "e_acsl_syscall.h"
+#include "e_acsl_printf.h"
+#include "e_acsl_assert.h"
+#include "e_acsl_adt_api.h"
 
 struct _node {
   struct _block * value;
   struct _node * next;
 };
 
-struct _node * __list = NULL;
+static struct _node * __list = NULL;
 
-
-void __remove_element(struct _block* ptr) {
+static void __remove_element(struct _block* ptr) {
   struct _node * tmp1 = __list, * tmp2;
   if(tmp1 == NULL) return;
   tmp2 = tmp1->next;
-  
+
   /* first element */
   if(tmp1->value->ptr == ptr->ptr) {
     __list = tmp1->next;
     free(tmp1);
   }
-  
+
   for(; tmp2 != NULL && tmp2->value->ptr < ptr->ptr;) {
     tmp1 = tmp2;
     tmp2 = tmp2->next;
@@ -55,7 +55,7 @@ void __remove_element(struct _block* ptr) {
 }
 
 
-void __add_element(struct _block* ptr) {
+static void __add_element(struct _block* ptr) {
   struct _node * tmp1 = __list, * tmp2, * new;
   new = malloc(sizeof(struct _node));
   if(new == NULL) return;
@@ -83,7 +83,7 @@ void __add_element(struct _block* ptr) {
 }
 
 
-struct _block* __get_exact(void* ptr) {
+static struct _block* __get_exact(void* ptr) {
   struct _node * tmp = __list;
   for(; tmp != NULL;) {
     if(tmp->value->ptr == (size_t)ptr)
@@ -96,7 +96,7 @@ struct _block* __get_exact(void* ptr) {
 }
 
 
-struct _block* __get_cont(void* ptr) {
+static struct _block* __get_cont(void* ptr) {
   struct _node * tmp = __list;
   for(; tmp != NULL; tmp = tmp->next) {
     if(tmp->value->ptr > (size_t)ptr)
@@ -110,7 +110,7 @@ struct _block* __get_cont(void* ptr) {
 }
 
 
-void __clean_struct() {
+static void __clean_struct() {
   struct _node * next;
   for(; __list != NULL ;) {
     __clean_block(__list->value);
@@ -121,7 +121,7 @@ void __clean_struct() {
 }
 
 
-void __debug_struct() {
+static void __debug_struct() {
   struct _node * tmp = __list;
   printf("\t\t\t------------DEBUG\n");
   for(; tmp != NULL; tmp = tmp->next) {

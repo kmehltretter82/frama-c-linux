@@ -20,18 +20,19 @@
 /*                                                                        */
 /**************************************************************************/
 
-#include "e_acsl_mmodel_api.h"
-#include "e_acsl_mmodel.h"
-#include "stdio.h"
+#include "e_acsl_syscall.h"
+#include "e_acsl_printf.h"
+#include "e_acsl_assert.h"
+#include "e_acsl_adt_api.h"
 
-struct _node {
+static struct _node {
   struct _block * value;
   struct _node * left, * right;
 };
 
-struct _node * __root = NULL;
+static struct _node * __root = NULL;
 
-void __remove_element(struct _block* ptr) {
+static void __remove_element(struct _block* ptr) {
   struct _node * tmp = __root, * father = NULL;
 
   while(tmp != NULL) {
@@ -69,14 +70,14 @@ void __remove_element(struct _block* ptr) {
 }
 
 
-void __add_element(struct _block* ptr) {
+static void __add_element(struct _block* ptr) {
   enum {LEFT, RIGHT} pos;
   struct _node * new, * tmp = __root, * father = NULL;
   new = malloc(sizeof(struct _node));
   if(new == NULL) return;
   new->value = ptr;
   new->left = new->right = NULL;
-  
+
   if(__root == NULL) {
     __root = new;
     return;
@@ -97,7 +98,7 @@ void __add_element(struct _block* ptr) {
 }
 
 
-struct _block* __get_exact(void* ptr) {
+static struct _block* __get_exact(void* ptr) {
   struct _node * tmp = __root;
   while(tmp != NULL) {
     if(tmp->value->ptr > (size_t)ptr) tmp = tmp->left;
@@ -108,7 +109,7 @@ struct _block* __get_exact(void* ptr) {
 }
 
 
-struct _block* _get_cont_rec(struct _node * node, void* ptr) {
+static struct _block* _get_cont_rec(struct _node * node, void* ptr) {
   if(node == NULL) return NULL;
   else if(node->value->ptr > (size_t)ptr) return _get_cont_rec(node->left, ptr);
   else if(node->value->size == 0 && node->value->ptr == (size_t)ptr)
@@ -118,12 +119,12 @@ struct _block* _get_cont_rec(struct _node * node, void* ptr) {
 }
 
 
-struct _block* __get_cont(void* ptr) {
+static struct _block* __get_cont(void* ptr) {
   return _get_cont_rec(__root, ptr);
 }
 
 
-void __clean_rec(struct _node * ptr) {
+static void __clean_rec(struct _node * ptr) {
   if(ptr == NULL) return;
   __clean_block(ptr->value);
   __clean_rec(ptr->left);
@@ -132,12 +133,12 @@ void __clean_rec(struct _node * ptr) {
   ptr = NULL;
 }
 
-void __clean_struct() {
+static void __clean_struct() {
   __clean_rec(__root);
 }
 
 
-void __debug_rec(struct _node * ptr) {
+static void __debug_rec(struct _node * ptr) {
   if(ptr == NULL) return;
   __debug_rec(ptr->left);
   printf("\t\t\t");
@@ -145,9 +146,8 @@ void __debug_rec(struct _node * ptr) {
   __debug_rec(ptr->right);
 }
 
-void __debug_struct() {
+static void __debug_struct() {
   printf("\t\t\t------------DEBUG\n");
   __debug_rec(__root);
   printf("\t\t\t-----------------\n");
 }
-
