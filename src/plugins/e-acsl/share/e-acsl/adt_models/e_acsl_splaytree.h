@@ -180,17 +180,23 @@ static void __clean_struct() {
   __clean_rec(__root);
 }
 
-static void __debug_rec(struct _node * ptr) {
+/*********************/
+/* DEBUG             */
+/*********************/
+#ifdef E_ACSL_DEBUG
+static void debug_rec(struct _node * ptr) {
   if(ptr == NULL) return;
-  __debug_rec(ptr->left);
-  printf("\t\t\t");
-  __print_block(ptr->value);
-  __debug_rec(ptr->right);
+  debug_rec(ptr->left);
+  DLOG("\t\t\t");
+  __e_acsl_print_block(ptr->value);
+  debug_rec(ptr->right);
 }
 
-static void __debug_struct() {
-  printf("\t\t\t------------DEBUG\n");
-  __debug_rec(__root);
-  printf("\t\t\t-----------------\n");
+void __e_acsl_debug_struct() {
+  DLOG("\t\t\t------------DEBUG\n");
+  debug_rec(__root);
+  DLOG("\t\t\t-----------------\n");
 }
+
+#endif
 #endif
