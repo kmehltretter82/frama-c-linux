@@ -20,5 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#include "e_acsl_adt_mmodel.h"
-#include "e_acsl_tree.h"
+#ifndef E_ACSL_BINTREE_MMODEL
+#define E_ACSL_BINTREE_MMODEL
+#  include "e_acsl_adt_mmodel.h"
+#  include "e_acsl_tree.h"
+#endif
