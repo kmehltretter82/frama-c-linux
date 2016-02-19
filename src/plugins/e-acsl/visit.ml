@@ -180,7 +180,7 @@ class e_acsl_visitor prj generate = object (self)
                     Cil.mkStmtOneInstr ~valid_sid:true (Set(Cil.var vi, e, loc))
                     :: Misc.mk_store_stmt ~str_size vi
                     :: Misc.mk_full_init_stmt ~addr:false vi
-                    :: Misc.mk_literal_string vi
+                    :: Misc.mk_readonly vi
                     :: stmts)
                   stmts
               in

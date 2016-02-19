@@ -76,7 +76,7 @@ val mk_store_stmt: ?str_size:exp -> varinfo -> stmt
 val mk_delete_stmt: varinfo -> stmt
 val mk_full_init_stmt: ?addr:bool -> varinfo -> stmt
 val mk_initialize: loc:location -> lval -> stmt
-val mk_literal_string: varinfo -> stmt
+val mk_readonly: varinfo -> stmt
 
 (* ************************************************************************** *)
 (** {2 Other stuff} *)

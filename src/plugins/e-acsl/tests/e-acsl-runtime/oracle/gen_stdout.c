@@ -6,11 +6,11 @@ void __e_acsl_globals_init(void)
   __e_acsl_literal_string_2 = "wb";
   __store_block((void *)__e_acsl_literal_string_2,sizeof("wb"));
   __full_init((void *)__e_acsl_literal_string_2);
-  __literal_string((void *)__e_acsl_literal_string_2);
+  __readonly((void *)__e_acsl_literal_string_2);
   __e_acsl_literal_string = "/tmp/foo";
   __store_block((void *)__e_acsl_literal_string,sizeof("/tmp/foo"));
   __full_init((void *)__e_acsl_literal_string);
-  __literal_string((void *)__e_acsl_literal_string);
+  __readonly((void *)__e_acsl_literal_string);
   __store_block((void *)(& stdout),8UL);
   __full_init((void *)(& stdout));
   return;

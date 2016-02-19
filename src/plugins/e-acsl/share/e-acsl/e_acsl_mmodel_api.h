@@ -84,9 +84,9 @@ void __initialize(void * ptr, size_t size)
 void __full_init(void * ptr)
   __attribute__((FC_BUILTIN));
 
-/* marks a block as litteral string */
+/* marks a block as read-only */
 /*@ assigns \nothing; */
-void __literal_string(void * ptr)
+void __readonly(void * ptr)
   __attribute__((FC_BUILTIN));
 
 /* ****************** */

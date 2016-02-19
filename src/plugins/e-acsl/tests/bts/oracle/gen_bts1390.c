@@ -173,11 +173,11 @@ void __e_acsl_globals_init(void)
   __e_acsl_literal_string = "toto";
   __store_block((void *)__e_acsl_literal_string,sizeof("toto"));
   __full_init((void *)__e_acsl_literal_string);
-  __literal_string((void *)__e_acsl_literal_string);
+  __readonly((void *)__e_acsl_literal_string);
   __e_acsl_literal_string_2 = "tata";
   __store_block((void *)__e_acsl_literal_string_2,sizeof("tata"));
   __full_init((void *)__e_acsl_literal_string_2);
-  __literal_string((void *)__e_acsl_literal_string_2);
+  __readonly((void *)__e_acsl_literal_string_2);
   return;
 }
 
