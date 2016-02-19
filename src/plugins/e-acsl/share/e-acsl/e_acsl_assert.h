@@ -87,4 +87,14 @@ static void runtime_assert(int predicate, char *kind,
 void __e_acsl_assert(int pred, char *kind, char *fct, char *pred_txt, int line)
   __attribute__ ((weak, alias ("runtime_assert")));
 
+/* Instances of assertions shared accross different memory models */
+
+/* Abort the execution if the size of the pointer computed during
+ * instrumentation (_ptr_sz) does not match the size of the pointer used
+ * by a compiler (void*) */
+#define arch_assert(_ptr_sz) \
+  vassert(_ptr_sz == sizeof(void*), \
+    "Mismatch of instrumentation- and compile-time pointer sizes: " \
+    "%lu vs %lu\n", _ptr_sz, sizeof(void*))
+
 #endif

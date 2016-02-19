@@ -184,7 +184,7 @@ void __e_acsl_globals_init(void)
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
   __e_acsl_memchr((void const *)__e_acsl_literal_string,'o',(unsigned long)4);
   __e_acsl_memchr((void const *)__e_acsl_literal_string_2,'o',

@@ -123,7 +123,7 @@ int main(void)
   int **c;
   int ***d;
   int n;
-  __e_acsl_memory_init((int *)0,(char ***)0);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
   __store_block((void *)(& n),4UL);
   __store_block((void *)(& d),8UL);

@@ -31,7 +31,7 @@ int main(void)
   int __retres;
   int *x;
   int *y;
-  __e_acsl_memory_init((int *)0,(char ***)0);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
   __store_block((void *)(& y),8UL);
   __store_block((void *)(& x),8UL);

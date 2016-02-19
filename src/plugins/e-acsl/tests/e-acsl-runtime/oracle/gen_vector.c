@@ -23,7 +23,7 @@ int main(void)
   int x;
   int v1[3];
   int *v2;
-  __e_acsl_memory_init((int *)0,(char ***)0);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __store_block((void *)(& v2),8UL);
   __store_block((void *)(v1),12UL);
   x = 3;

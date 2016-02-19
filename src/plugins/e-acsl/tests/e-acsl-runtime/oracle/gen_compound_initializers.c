@@ -60,7 +60,7 @@ void __e_acsl_globals_init(void)
 int main(int argc, char **argv)
 {
   int __retres;
-  __e_acsl_memory_init(& argc,& argv);
+  __e_acsl_memory_init(& argc,& argv,8UL);
   __e_acsl_globals_init();
   /*@ assert \valid((char **)_A); */
   {
