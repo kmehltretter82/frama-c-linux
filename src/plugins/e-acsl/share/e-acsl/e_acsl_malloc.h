@@ -24,12 +24,13 @@
 /* Bindings for memory allocation */
 /**********************************/
 
+#include <features.h>
+#include <stddef.h>
+
 #ifndef E_ACSL_MALLOC
 #define E_ACSL_MALLOC
 
-#include <stddef.h>
-
-#ifndef __GLIBC__
+#ifdef __GLIBC__
 /* Real functions for dynamic memory allocation in Glibc */
 extern void  *__libc_malloc(size_t);
 extern void  *__libc_realloc(void*, size_t);
