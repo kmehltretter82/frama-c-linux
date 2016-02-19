@@ -58,7 +58,7 @@ int main(void)
 {
   int __retres;
   char *SS;
-  __e_acsl_memory_init((int *)0,(char ***)0);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
   __store_block((void *)(& SS),8UL);
   __full_init((void *)(& SS));

@@ -384,8 +384,13 @@ void __init_argv(int argc, char **argv) {
   }
 }
 
-/* initialize contents of the abstract structure and record arguments */
-void __e_acsl_memory_init(int *argc_ref, char ***argv_ref) { }
+/* initialize contents of the abstract structure and record arguments
+ *  argc_ref address the variable holding the argc parameter
+ *  argv_ref address the variable holding the argv parameter
+ *  ptr_size the size of the pointer computed during instrumentation. */
+void __e_acsl_memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
+  arch_assert(ptr_size);
+}
 
 /**********************/
 /* DEBUG              */

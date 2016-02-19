@@ -21,7 +21,7 @@ int main(void)
   int __retres;
   FILE *f;
   FILE *f2;
-  __e_acsl_memory_init((int *)0,(char ***)0);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
   __store_block((void *)(& f),8UL);
   __full_init((void *)(& f));

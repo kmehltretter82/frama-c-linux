@@ -9,7 +9,7 @@ int main(void)
 {
   int __retres;
   spongeState *state;
-  __e_acsl_memory_init((int *)0,(char ***)0);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __store_block((void *)(& state),8UL);
   __full_init((void *)(& state));
   state = (spongeState *)__e_acsl_malloc(sizeof(spongeState));

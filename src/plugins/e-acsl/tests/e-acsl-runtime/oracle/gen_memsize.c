@@ -4,7 +4,7 @@ int main(int argc, char **argv)
   int __retres;
   char *a;
   char *b;
-  __e_acsl_memory_init(& argc,& argv);
+  __e_acsl_memory_init(& argc,& argv,8UL);
   __store_block((void *)(& b),8UL);
   __store_block((void *)(& a),8UL);
   __full_init((void *)(& a));

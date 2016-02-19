@@ -155,7 +155,7 @@ void __e_acsl_memory_clean(void)
 /* initialize the abstract structure
  * have to be called before any other statement in `main` */
 /*@ assigns __e_acsl_internal_heap \from __e_acsl_internal_heap; */
-void __e_acsl_memory_init(int *argc_ref, char ***argv)
+void __e_acsl_memory_init(int *argc_ref, char ***argv, size_t ptr_size)
   __attribute__((FC_BUILTIN));
 
 /* return the number of bytes dynamically allocated */

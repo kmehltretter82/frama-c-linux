@@ -5,7 +5,7 @@ int main(void)
   int *a;
   int *b;
   int n;
-  __e_acsl_memory_init((int *)0,(char ***)0);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __store_block((void *)(& b),8UL);
   __store_block((void *)(& a),8UL);
   n = 0;

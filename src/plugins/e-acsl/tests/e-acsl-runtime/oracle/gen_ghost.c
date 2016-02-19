@@ -14,7 +14,7 @@ int main(void)
 {
   int __retres;
   int *q;
-  __e_acsl_memory_init((int *)0,(char ***)0);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
   __store_block((void *)(& q),8UL);
   P = & G;

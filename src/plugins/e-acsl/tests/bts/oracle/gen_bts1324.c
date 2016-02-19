@@ -83,7 +83,7 @@ int main(void)
   int __retres;
   int t[7];
   int n;
-  __e_acsl_memory_init((int *)0,(char ***)0);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __store_block((void *)(t),28UL);
   __initialize((void *)(t),sizeof(int));
   t[0] = 1;

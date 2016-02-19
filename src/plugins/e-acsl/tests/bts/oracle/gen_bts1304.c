@@ -29,7 +29,7 @@ int main(void)
   int __retres;
   unsigned char buf[sizeof(union msg)];
   int i;
-  __e_acsl_memory_init((int *)0,(char ***)0);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __store_block((void *)(buf),16UL);
   i = 0;
   while ((unsigned long)i < sizeof(buf) / (unsigned long)4) {

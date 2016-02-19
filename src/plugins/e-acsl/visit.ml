@@ -275,6 +275,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       match main_fct with
         | Some main ->
           let charPtrPtrType = TPtr(Cil.charPtrType,[]) in
+          let ptrSz = (Cil.sizeOf loc Cil.voidPtrType) in
           let args =
             (* Record arguments only if the first one has int type and the
               second one is an array of char pointers of equivalent. This is
@@ -293,7 +294,8 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
                   initialization function, i.e., [__e_acsl_memory_init] *)
                   List.map Cil.mkAddrOfVi main.sformals;
               | _ -> let null = Cil.integer loc 0
-            in [ null ; null ] in
+            in [ null ; null  ] in
+          let args = args @ [ptrSz] in
           let init = Misc.mk_call
             Location.unknown "__e_acsl_memory_init" args in
           main.sbody.bstmts <- init :: main.sbody.bstmts;

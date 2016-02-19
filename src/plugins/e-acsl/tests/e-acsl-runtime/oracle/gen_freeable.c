@@ -3,7 +3,7 @@ int main(void)
 {
   int __retres;
   int *p;
-  __e_acsl_memory_init((int *)0,(char ***)0);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __store_block((void *)(& p),8UL);
   /*@ assert ¬\freeable(p); */
   {
