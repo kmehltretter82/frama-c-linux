@@ -31,6 +31,8 @@
 #include "e_acsl_assert.h"
 #include "e_acsl_adt_api.h"
 
+#define WORDBITS __WORDSIZE
+
 static size_t mask(size_t, size_t);
 
 #if WORDBITS == 16
@@ -78,7 +80,6 @@ static const size_t Tmasks[] = {
 0xfffffffffffff800,0xfffffffffffffc00,0xfffffffffffffe00,0xffffffffffffff00,
 0xffffffffffffff80,0xffffffffffffffc0,0xffffffffffffffe0,0xfffffffffffffff0,
 0xfffffffffffffff8,0xfffffffffffffffc,0xfffffffffffffffe,0xffffffffffffffff};
-
 
 static const int Teq[] =
   { 0,-1,3,-3,6,-5,7,-7,12,-9,11,-11,14,-13,15,-15,24,-17,19,-19,22,-21,23,-23,
