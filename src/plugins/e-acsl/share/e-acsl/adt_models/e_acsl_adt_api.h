@@ -26,18 +26,6 @@
 #include "stdlib.h"
 #include "stdbool.h"
 
-#if E_ACSL_MACHDEP == x86_64
-#define WORDBITS 64
-#elif E_ACSL_MACHDEP == x86_32
-#define WORDBITS 32
-#elif E_ACSL_MACHDEP == ppc_32
-#define WORDBITS 32
-#elif E_ACSL_MACHDEP == x86_16
-#define WORDBITS 16
-#else
-#define WORDBITS 32
-#endif
-
 /* Memory block allocated and may be deallocated */
 struct _block {
   size_t ptr;	/* begin address */
