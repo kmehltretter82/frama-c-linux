@@ -232,9 +232,9 @@ let mk_delete_stmt vi =
   in
   mk_debug_mmodel_stmt stmt
 
-let mk_literal_string vi =
+let mk_readonly vi =
   let loc = vi.vdecl in
-  let stmt = mk_call ~loc "__literal_string" [ Cil.evar ~loc vi ] in
+  let stmt = mk_call ~loc "__readonly" [ Cil.evar ~loc vi ] in
   mk_debug_mmodel_stmt stmt
 
 (* ************************************************************************** *)

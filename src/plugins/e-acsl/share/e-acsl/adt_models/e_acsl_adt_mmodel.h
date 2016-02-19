@@ -69,7 +69,7 @@ void* __store_block(void* ptr, size_t size) {
   tmp->size = size;
   tmp->init_ptr = NULL;
   tmp->init_cpt = 0;
-  tmp->is_litteral_string = false;
+  tmp->is_readonly = false;
   tmp->is_out_of_bound = false;
   tmp->freeable = false;
   __add_element(tmp);
@@ -265,15 +265,15 @@ void __full_init (void * ptr) {
   tmp->init_cpt = tmp->size;
 }
 
-/* mark a block as litteral string */
-void __literal_string (void * ptr) {
+/* mark a block as read-only */
+void __readonly (void * ptr) {
   struct _block * tmp;
   if (ptr == NULL)
     return;
   tmp = __get_exact(ptr);
   if (tmp == NULL)
     return;
-  tmp->is_litteral_string = true;
+  tmp->is_readonly = true;
 }
 
 /* return whether the size bytes of ptr are initialized */
@@ -317,7 +317,7 @@ int __valid(void* ptr, size_t size) {
   tmp = __get_cont(ptr);
   return (tmp == NULL) ?
     false : ( tmp->size - ( (size_t)ptr - tmp->ptr ) >= size
-	      && !tmp->is_litteral_string && !tmp->is_out_of_bound);
+	      && !tmp->is_readonly && !tmp->is_out_of_bound);
 }
 
 /* return whether the size bytes of ptr are readable */
@@ -402,7 +402,7 @@ void __e_acsl_print_block (struct _block * ptr) {
   if (ptr != NULL) {
     DLOG("%p; %zu Bytes; %slitteral; [init] : %li ",
       (char*)ptr->ptr, ptr->size,
-      ptr->is_litteral_string ? "" : "not ", ptr->init_cpt);
+      ptr->is_readonly ? "" : "not ", ptr->init_cpt);
     if(ptr->init_ptr != NULL) {
       unsigned i;
       for(i = 0; i < ptr->size; i++) {

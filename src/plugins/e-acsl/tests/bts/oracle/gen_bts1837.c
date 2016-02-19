@@ -60,15 +60,15 @@ void __e_acsl_globals_init(void)
   __e_acsl_literal_string_3 = "toto";
   __store_block((void *)__e_acsl_literal_string_3,sizeof("toto"));
   __full_init((void *)__e_acsl_literal_string_3);
-  __literal_string((void *)__e_acsl_literal_string_3);
+  __readonly((void *)__e_acsl_literal_string_3);
   __e_acsl_literal_string = "foo";
   __store_block((void *)__e_acsl_literal_string,sizeof("foo"));
   __full_init((void *)__e_acsl_literal_string);
-  __literal_string((void *)__e_acsl_literal_string);
+  __readonly((void *)__e_acsl_literal_string);
   __e_acsl_literal_string_2 = "bar";
   __store_block((void *)__e_acsl_literal_string_2,sizeof("bar"));
   __full_init((void *)__e_acsl_literal_string_2);
-  __literal_string((void *)__e_acsl_literal_string_2);
+  __readonly((void *)__e_acsl_literal_string_2);
   __store_block((void *)(& S),8UL);
   __full_init((void *)(& S));
   return;
