@@ -96,7 +96,7 @@ struct list *__e_acsl_f(struct list *l)
     if (! __e_acsl_at_3) __e_acsl_implies_2 = 1;
     else __e_acsl_implies_2 = __retres == __e_acsl_at_4;
     e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",(char *)"f",
-                  (char *)"\\old(!\\valid(l) && !\\valid(l->next)) ==> \\result == \\old(l)",
+                  (char *)"\\old(!\\valid{Here}(l) && !\\valid{Here}(l->next)) ==> \\result == \\old(l)",
                   20);
     __delete_block((void *)(& l));
     __delete_block((void *)(& __retres));
