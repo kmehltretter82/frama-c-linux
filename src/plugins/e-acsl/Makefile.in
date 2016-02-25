@@ -29,9 +29,6 @@
 ifndef FRAMAC_SHARE
 FRAMAC_SHARE  :=$(shell frama-c-config -print-share-path)
 endif
-ifndef FRAMAC_LIBDIR
-FRAMAC_LIBDIR :=$(shell frama-c-config -print-libpath)
-endif
 
 # OCAMLVERSION and HAS_OCAML312 are defined in Frama-C common Makefile but
 # cannot be used at this point. Unfortunatly cannot reuse the same variable name
@@ -113,13 +110,14 @@ $(PLUGIN_DIR)/local_config.ml: $(PLUGIN_DIR)/Makefile.in VERSION
 
 ifeq (@MAY_RUN_TESTS@,yes)
 
-$(PLUGIN_DIR)/tests/print.cmxs: OFLAGS=-I $(FRAMAC_LIBDIR)
-$(PLUGIN_DIR)/tests/print.cmo: BFLAGS=-I $(FRAMAC_LIBDIR)
+$(PLUGIN_DIR)/tests/print.cmxs: OFLAGS=-I $(FRAMAC_LIB)
+$(PLUGIN_DIR)/tests/print.cmo: BFLAGS=-I $(FRAMAC_LIB)
 
 PLUGIN_TESTS_DIRS:=e-acsl-reject e-acsl-runtime bts gmp no-main
 E_ACSL_TESTS: $(PLUGIN_DIR)/tests/test_config \
 	$(PLUGIN_DIR)/tests/print.cmxs \
 	$(PLUGIN_DIR)/tests/print.cmo
+
 endif
 
 ############
