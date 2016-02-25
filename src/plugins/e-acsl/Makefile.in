@@ -128,7 +128,8 @@ endif
 
 clean::
 	$(PRINT_RM) generated test files
-	$(RM) $(PLUGIN_DIR)/tests/*.cm*
+	$(RM) $(E_ACSL_DIR)/tests/*.cm* $(E_ACSL_DIR)/tests/*.o
+	$(RM) $(E_ACSL_DIR)/tests/test_config
 
 ###########
 # Install #

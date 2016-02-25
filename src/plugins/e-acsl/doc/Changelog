@@ -15,6 +15,12 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
+-* E-ACSL       [2016/02/25] Fix 'make clean' in tests.
+
+###########################
+Plugin E-ACSL 0.6 Magnesium
+###########################
+
 -* E-ACSL       [2016/01/15] Fix installation with custom --prefix.
 -* E-ACSL       [2016/01/05] Fix bug in the memory model that caused the
 	        tracked size of heap memory be computed incorrectly.
