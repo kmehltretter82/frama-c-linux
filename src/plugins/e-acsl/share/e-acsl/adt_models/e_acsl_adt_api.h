@@ -34,7 +34,6 @@ struct _block {
   unsigned char * init_ptr; /* dynamic array of booleans */
   size_t init_cpt;
   _Bool is_readonly;
-  _Bool is_out_of_bound;
   _Bool freeable;
 };
 

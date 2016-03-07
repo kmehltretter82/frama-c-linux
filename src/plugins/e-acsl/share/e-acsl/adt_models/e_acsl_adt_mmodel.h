@@ -23,11 +23,11 @@
 #ifndef E_ACSL_ADT_MMODEL
 #define E_ACSL_ADT_MMODEL
 
-#include "e_acsl_malloc.h"
 #include "e_acsl_string.h"
 #include "e_acsl_printf.h"
 #include "e_acsl_assert.h"
 #include "e_acsl_debug.h"
+#include "e_acsl_malloc.h"
 #include "e_acsl_mmodel_api.h"
 #include "e_acsl_adt_api.h"
 
@@ -70,10 +70,8 @@ void* __store_block(void* ptr, size_t size) {
   tmp->init_ptr = NULL;
   tmp->init_cpt = 0;
   tmp->is_readonly = false;
-  tmp->is_out_of_bound = false;
   tmp->freeable = false;
   __add_element(tmp);
-  /*cpt_store_block++;*/
   return tmp;
 }
 
@@ -317,7 +315,7 @@ int __valid(void* ptr, size_t size) {
   tmp = __get_cont(ptr);
   return (tmp == NULL) ?
     false : ( tmp->size - ( (size_t)ptr - tmp->ptr ) >= size
-	      && !tmp->is_readonly && !tmp->is_out_of_bound);
+	      && !tmp->is_readonly);
 }
 
 /* return whether the size bytes of ptr are readable */
@@ -327,8 +325,7 @@ int __valid_read(void* ptr, size_t size) {
     return false;
   tmp = __get_cont(ptr);
   return (tmp == NULL) ?
-    false : ( tmp->size - ( (size_t)ptr - tmp->ptr ) >= size
-	      && !tmp->is_out_of_bound);
+    false : (tmp->size - ((size_t)ptr - tmp->ptr) >= size);
 }
 
 /* return the base address of the block containing ptr */
