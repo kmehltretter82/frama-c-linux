@@ -191,6 +191,26 @@ int main(void)
     __e_acsl_assert(! __e_acsl_initialized_18,(char *)"Assertion",
                     (char *)"main",(char *)"!\\initialized(q)",65);
   }
+  __full_init((void *)(& q));
+  q = (int *)(& q - 1024 * 5);
+  __full_init((void *)(& q));
+  q = (int *)128;
+  /*@ assert ¬\initialized(q); */
+  {
+    int __e_acsl_initialized_19;
+    __e_acsl_initialized_19 = __initialized((void *)q,sizeof(int));
+    __e_acsl_assert(! __e_acsl_initialized_19,(char *)"Assertion",
+                    (char *)"main",(char *)"!\\initialized(q)",73);
+  }
+  __full_init((void *)(& p));
+  p = (int *)0;
+  /*@ assert ¬\initialized(p); */
+  {
+    int __e_acsl_initialized_20;
+    __e_acsl_initialized_20 = __initialized((void *)p,sizeof(int));
+    __e_acsl_assert(! __e_acsl_initialized_20,(char *)"Assertion",
+                    (char *)"main",(char *)"!\\initialized(p)",76);
+  }
   __retres = 0;
   __delete_block((void *)(& B));
   __delete_block((void *)(& A));

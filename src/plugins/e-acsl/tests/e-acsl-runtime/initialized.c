@@ -34,26 +34,26 @@ int main(void) {
   /* Local variables also initialized by assignments */
   b = 0;
   d[0] = 1;
-  /*@assert \initialized(&b) ; */
-  /*@assert \initialized(q) ;  */
-  /*@assert ! \initialized(&d) ;  */
+  /*@assert \initialized(&b); */
+  /*@assert \initialized(q);  */
+  /*@assert ! \initialized(&d);  */
   d[1] = 1;
-  /*@assert \initialized(&d) ;  */
+  /*@assert \initialized(&d);  */
 
   /* Malloc allocates un-initialized memory */
   p = (int*)malloc(sizeof(int*));
-  /*@assert ! \initialized(p) ; */
+  /*@assert ! \initialized(p); */
 
   /* Calloc allocates initialized memory */
   q = (int*)calloc(1, sizeof(int));
-  /*@ assert \initialized(q) ; */
+  /*@ assert \initialized(q); */
 
   /* Block reallocared using `realloc' carries initialization of the of the
    * existing fragment but does not initialize the newly allocated one */
   q = (int*)realloc(q, 2*sizeof(int));
-  /*@assert \initialized(q) ; */
+  /*@assert \initialized(q); */
   q++;
-  /*@assert ! \initialized(q) ; */
+  /*@assert ! \initialized(q); */
   q--;
 
   /* Initialized on un-allocated regions is always false. This does not lead
@@ -61,6 +61,17 @@ int main(void) {
    * mode. */
   free(p);
   free(q);
-  /*@assert ! \initialized(p) ; */
-  /*@assert ! \initialized(q) ; */
+  /*@assert ! \initialized(p); */
+  /*@assert ! \initialized(q); */
+
+  /* Spoofing access to  non-existing stack address */
+  q = (int*)(&q - 1024*5);
+  /*assert ! \initialized(q); */
+
+  /* Spoofing access to  non-existing global address */
+  q = (int*)128;
+  /*@assert ! \initialized(q); */
+
+  p = NULL;
+  /*@assert ! \initialized(p); */
 }
