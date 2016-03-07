@@ -29,7 +29,7 @@
 #include "e_acsl_assert.h"
 #include "e_acsl_adt_api.h"
 
-static struct _node {
+struct _node {
   struct _block * value;
   struct _node * left, * right, * parent;
 };

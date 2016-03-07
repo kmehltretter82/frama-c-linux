@@ -29,7 +29,7 @@
 #include "e_acsl_assert.h"
 #include "e_acsl_adt_api.h"
 
-static struct _node {
+struct _node {
   struct _block * value;
   struct _node * left, * right;
 };
@@ -75,7 +75,7 @@ static void __remove_element(struct _block* ptr) {
 
 
 static void __add_element(struct _block* ptr) {
-  enum {LEFT, RIGHT} pos;
+  enum {LEFT, RIGHT} pos = 0;
   struct _node * new, * tmp = __root, * father = NULL;
   new = native_malloc(sizeof(struct _node));
   if(new == NULL) return;
