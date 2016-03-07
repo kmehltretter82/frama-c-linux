@@ -162,10 +162,11 @@ void* __realloc(void* ptr, size_t size) {
     /* realloc bigger larger block */
     else {
       int nb = needed_bytes(size);
+      int nb_old = needed_bytes(tmp->size);
       tmp->init_ptr = native_malloc(nb);
-      memset(tmp->init_ptr, 0xFF, nb);
-      if(size%8 != 0)
-      tmp->init_ptr[size/8] <<= (8 - size%8);
+      memset(tmp->init_ptr, 0xFF, nb_old);
+      if(tmp->size%8 != 0)
+        tmp->init_ptr[tmp->size/8] &= ~(255 << tmp->size%8);
     }
   }
   /* contains initialized and uninitialized parts */
@@ -292,11 +293,10 @@ int __initialized (void * ptr, size_t size) {
     return true;
 
   for(i = 0; i < size; i++) {
-    /* if one byte is uninitialized */
-    int byte_offset = (size_t)ptr - tmp->ptr + i;
-    int ind = byte_offset / 8;
-    unsigned char mask_bit = 1U << (7 - (byte_offset % 8));
-    if((tmp->init_ptr[ind] & mask_bit) == 0)
+    size_t offset = (uintptr_t)ptr - tmp->ptr + i;
+    int byte = offset/8;
+    int bit = offset%8;
+    if (((tmp->init_ptr[byte] >> bit) & 1) == 0)
       return false;
   }
   return true;
@@ -400,16 +400,13 @@ void __e_acsl_memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
 /* print the information about a block */
 void __e_acsl_print_block (struct _block * ptr) {
   if (ptr != NULL) {
-    DLOG("%p; %zu Bytes; %slitteral; [init] : %li ",
+    DLOG("%a; %lu Bytes; %slitteral; [init] : %d ",
       (char*)ptr->ptr, ptr->size,
       ptr->is_readonly ? "" : "not ", ptr->init_cpt);
     if(ptr->init_ptr != NULL) {
       unsigned i;
-      for(i = 0; i < ptr->size; i++) {
-        int ind = i / 8;
-        int one_bit = (unsigned)1 << (8 - (i % 8) - 1);
-        DLOG("%i", (ptr->init_ptr[ind] & one_bit) != 0);
-      }
+      for(i = 0; i < ptr->size/8; i++) 
+        DLOG("%b ", ptr->init_ptr[i]);
     }
     DLOG("\n");
   }
