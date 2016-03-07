@@ -195,16 +195,19 @@ void* __realloc(void* ptr, size_t size) {
  * for further information, see calloc */
 void* __calloc(size_t nbr_block, size_t size_block) {
   void * tmp;
+  size_t size = nbr_block * size_block;
   struct _block * new_block;
-  if(nbr_block * size_block <= 0)
+  if(size <= 0)
     return NULL;
   tmp = native_calloc(nbr_block, size_block);
   if(tmp == NULL)
     return NULL;
-  new_block = __store_block(tmp, nbr_block * size_block);
+  new_block = __store_block(tmp, size);
   __heap_size += nbr_block * size_block;
   DASSERT(new_block != NULL && (void*)new_block->ptr != NULL);
+  /* Mark allocated block as freeable and initialized */
   new_block->freeable = true;
+  new_block->init_cpt = size;
   return (void*)new_block->ptr;
 }
 
