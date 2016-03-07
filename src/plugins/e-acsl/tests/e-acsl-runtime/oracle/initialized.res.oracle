@@ -58,3 +58,5 @@ FRAMAC_SHARE/libc/stdlib.h:178:[kernel] warning: pointer comparison. assert \poi
 FRAMAC_SHARE/libc/stdlib.h:177:[kernel] warning: pointer comparison. assert \pointer_comparable(p, (void *)0);
 tests/e-acsl-runtime/initialized.c:64:[value] warning: assertion got status unknown.
 tests/e-acsl-runtime/initialized.c:65:[value] warning: assertion got status unknown.
+tests/e-acsl-runtime/initialized.c:73:[value] warning: assertion got status unknown.
+tests/e-acsl-runtime/initialized.c:76:[value] warning: assertion got status unknown.
