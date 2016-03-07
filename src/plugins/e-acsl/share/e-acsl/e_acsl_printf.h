@@ -190,7 +190,7 @@ static void bits2a(long int v, int size, char *bf, int l2r) {
   if (l2r) {
     for(i = 0; i < size; i++) {
       *bf++ = '0' + ((v >> i) & 1);
-      if (i && i+1 < size && (i+1)%4 == 0)
+      if (i && i+1 < size && (i+1)%8 == 0)
         *bf++  = ' ';
     }
   } else {
