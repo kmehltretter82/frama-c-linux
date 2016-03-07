@@ -1,10 +1,10 @@
 [e-acsl] beginning translation.
 FRAMAC_SHARE/libc/stdlib.h:156:[e-acsl] warning: E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
-tests/e-acsl-runtime/offset.c:10:[e-acsl] warning: E-ACSL construct `complete behaviors' is not yet supported.
+tests/e-acsl-runtime/base_addr.c:10:[e-acsl] warning: E-ACSL construct `complete behaviors' is not yet supported.
                   Ignoring annotation.
-tests/e-acsl-runtime/offset.c:10:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
+tests/e-acsl-runtime/base_addr.c:10:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
                   Ignoring annotation.
-tests/e-acsl-runtime/offset.c:10:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+tests/e-acsl-runtime/base_addr.c:10:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
                   Ignoring annotation.
 FRAMAC_SHARE/libc/stdlib.h:160:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
                   Ignoring annotation.
@@ -15,13 +15,13 @@ FRAMAC_SHARE/libc/stdlib.h:165:[e-acsl] warning: E-ACSL construct `logic functio
 [e-acsl] translation done in project "e-acsl".
 FRAMAC_SHARE/libc/stdlib.h:163:[value] warning: function __e_acsl_malloc, behavior allocation: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
 FRAMAC_SHARE/libc/stdlib.h:168:[value] warning: function __e_acsl_malloc, behavior no_allocation: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
-tests/e-acsl-runtime/offset.c:39:[value] warning: assertion got status unknown.
+tests/e-acsl-runtime/base_addr.c:44:[value] warning: assertion got status unknown.
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/e-acsl-runtime/offset.c:40:[value] warning: assertion got status unknown.
-tests/e-acsl-runtime/offset.c:41:[value] warning: assertion got status unknown.
-tests/e-acsl-runtime/offset.c:43:[value] warning: assertion got status unknown.
-tests/e-acsl-runtime/offset.c:44:[value] warning: assertion got status unknown.
-tests/e-acsl-runtime/offset.c:49:[value] warning: assertion got status unknown.
-tests/e-acsl-runtime/offset.c:51:[value] warning: assertion got status unknown.
-tests/e-acsl-runtime/offset.c:53:[value] warning: assertion got status unknown.
-tests/e-acsl-runtime/offset.c:55:[value] warning: assertion got status unknown.
+tests/e-acsl-runtime/base_addr.c:45:[value] warning: assertion got status unknown.
+tests/e-acsl-runtime/base_addr.c:46:[value] warning: assertion got status unknown.
+tests/e-acsl-runtime/base_addr.c:48:[value] warning: assertion got status unknown.
+tests/e-acsl-runtime/base_addr.c:49:[value] warning: assertion got status unknown.
+tests/e-acsl-runtime/base_addr.c:55:[value] warning: assertion got status unknown.
+tests/e-acsl-runtime/base_addr.c:57:[value] warning: assertion got status unknown.
+tests/e-acsl-runtime/base_addr.c:59:[value] warning: assertion got status unknown.
+tests/e-acsl-runtime/base_addr.c:61:[value] warning: assertion got status unknown.
