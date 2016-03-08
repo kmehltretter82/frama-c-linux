@@ -235,11 +235,11 @@ void __initialize (void * ptr, size_t size) {
 
   unsigned i;
   for(i = 0; i < size; i++) {
-    int byte_offset = (size_t)ptr - tmp->ptr + i;
-    int ind = byte_offset / 8;
-    unsigned char mask_bit = 1U << (7 - (byte_offset % 8));
-    if((tmp->init_ptr[ind] & mask_bit) == 0) tmp->init_cpt++;
-    tmp->init_ptr[ind] |= mask_bit;
+    size_t offset = (uintptr_t)ptr - tmp->ptr + i;
+    int byte = offset/8;
+    int bit = offset%8;
+    tmp->init_ptr[byte] |= 1 << bit;
+    tmp->init_cpt++;
   }
 
   /* now fully initialized */
@@ -405,7 +405,7 @@ void __e_acsl_print_block (struct _block * ptr) {
       ptr->is_readonly ? "" : "not ", ptr->init_cpt);
     if(ptr->init_ptr != NULL) {
       unsigned i;
-      for(i = 0; i < ptr->size/8; i++) 
+      for(i = 0; i < ptr->size/8; i++)
         DLOG("%b ", ptr->init_ptr[i]);
     }
     DLOG("\n");

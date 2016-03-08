@@ -7,6 +7,8 @@
 int A = 0;
 int B;
 
+#define ODD(_n) (_n%2 != 0)
+
 int main(void) {
   /* All globals are initialized, even if the initializer is not given */
   int *p = &A;
@@ -74,4 +76,26 @@ int main(void) {
 
   p = NULL;
   /*@assert ! \initialized(p); */
+
+  /* Partial initialization */
+  int size = 100;
+  char *partsc = malloc(size*sizeof(char));
+  char *partsi = malloc(size*sizeof(int));
+
+  for (int i = 0; i < size; i++) {
+    if (ODD(i))
+      partsc[i] = '0';
+    else
+      partsi[i] = 0;
+  }
+
+  for (int i = 0; i < size; i++) {
+    if (ODD(i)) {
+      /* @assert \initialized(partsc + i);   */
+      /* @assert ! \initialized(partsi + i); */
+    } else {
+      /* @assert \initialized(partsi + i);   */
+      /* @assert ! \initialized(partsc + i); */
+    }
+  }
 }
