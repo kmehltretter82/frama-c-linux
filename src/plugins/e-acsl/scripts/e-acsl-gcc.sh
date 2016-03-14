@@ -48,7 +48,7 @@ check_tool() {
 LONGOPTIONS="help,compile,compile-only,print,debug:,ocode:,oexec:,verbose:, \
   frama-c-only,extra-cpp-args:,frama-c-stdlib,full-mmodel,gmp,quiet,logfile:,
   ld-flags:,cpp-flags:,frama-c-extra:,memory-model:,production,no-stdlib,
-  debug-log:,frama-c:,gcc:"
+  debug-log:,frama-c:,gcc:,e-acsl-share:"
 SHORTOPTIONS="h,c,C,p,d:,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,P,N,D:I:G:"
 # Prefix for an error message due to wrong arguments
 ERROR="ERROR parsing arguments:"
@@ -105,6 +105,9 @@ Notes:
   See man (1) e-acsl-gcc.sh for full up-to-date documentation.\n"
   exit 1
 }
+
+# Base dir of this script
+BASEDIR=$(readlink -f `dirname $0`)
 
 # See if pygmentize if available for color highlighting and default to plain
 # cat command otherwise
@@ -270,6 +273,13 @@ do
       OPTION_CC="$1"
       shift;
     ;;
+    # Specify EACSL_SHARE directory (where C runtime library lives) by hand
+    # rather than compute it
+    --e-acsl-share)
+      shift;
+      OPTION_EACSL_SHARE="$1"
+      shift;
+    ;;
     # A memory model to link against
     -m|--memory-model)
       shift;
@@ -285,6 +295,11 @@ shift;
 # Bail if no files to translate are given
 if [ -z "$1" ]; then
   error "no input files";
+fi
+
+# Check if this is `development' of installed version.
+if [ -f "$BASEDIR/../E_ACSL.mli" ]; then
+  DEVELOPMENT=1
 fi
 
 # Architecture-dependent flags. Since by default Frama-C uses 32-bit
@@ -313,8 +328,22 @@ FRAMAC_CPP_EXTRA="
   -D$EACSL_MACRO_ID
   -I$FRAMAC_SHARE/libc
   $CPPMACHDEP"
-EACSL_SHARE="$FRAMAC_SHARE/e-acsl"
 EACSL_MMODEL="$OPTION_EACSL_MMODEL"
+
+# E-ACSL share directory
+# If specified explicitly via the --e-acsl-share option than use that ...
+if [ -n "$OPTION_EACSL_SHARE" ]; then
+  EACSL_SHARE="$OPTION_EACSL_SHARE"
+# ... otherwise compute it
+else
+  # Installed version path
+  if [ -z "$DEVELOPMENT" ]; then
+    EACSL_SHARE="$BASEDIR/../share/frama-c/e-acsl/"
+  # Development version path
+  else
+    EACSL_SHARE="$BASEDIR/../share/e-acsl"
+  fi
+fi
 
 # Macro that identifies E-ACSL compilation. Passed to Frama-C
 # and GCC runs but not to the original compilation
@@ -327,6 +356,7 @@ CFLAGS="$OPTION_CFLAGS
   -Wall \
   -Wno-long-long \
   -Wno-attributes \
+  -Wno-undef \
   -Wno-unused \
   -Wno-unused-function \
   -Wno-unused-result \
@@ -335,12 +365,17 @@ CFLAGS="$OPTION_CFLAGS
   -Wno-unused-variable \
   -Wno-unused-but-set-variable \
   -Wno-implicit-function-declaration \
-  -Wno-unknown-warning-option \
-  -Wno-extra-semi \
-  -Wno-tautological-compare \
-  -Wno-gnu-empty-struct \
-  -Wno-incompatible-pointer-types-discards-qualifiers \
   -Wno-empty-body"
+
+# Disable extra warning for clang
+if [ "`basename $CC`" = 'clang' ]; then
+  CFLAGS="-Wno-unknown-warning-option \
+    -Wno-extra-semi \
+    -Wno-tautological-compare \
+    -Wno-gnu-empty-struct \
+    -Wno-incompatible-pointer-types-discards-qualifiers"
+fi
+
 CPPFLAGS="$OPTION_CPPFLAGS"
 LDFLAGS="$OPTION_LDFLAGS"
 
