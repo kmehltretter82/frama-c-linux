@@ -273,7 +273,7 @@ do
       OPTION_CC="$1"
       shift;
     ;;
-    # Specify EACAL_SHARE directory (where C runtime library lives) by hand
+    # Specify EACSL_SHARE directory (where C runtime library lives) by hand
     # rather than compute it
     --e-acsl-share)
       shift;
@@ -367,7 +367,7 @@ CFLAGS="$OPTION_CFLAGS
   -Wno-implicit-function-declaration \
   -Wno-empty-body"
 
-# Disable extra warning for a clang
+# Disable extra warning for clang
 if [ "`basename $CC`" = 'clang' ]; then
   CFLAGS="-Wno-unknown-warning-option \
     -Wno-extra-semi \
