@@ -135,11 +135,6 @@ int __offset(void * ptr)
 int __initialized(void * ptr, size_t size)
   __attribute__((FC_BUILTIN));
 
-/* put argv in the memory model */
-/*@ assigns \nothing; */
-void __init_argv(int argc, char **argv)
-	__attribute__((FC_BUILTIN));
-
 /* print the content of the abstract structure */
 void __e_acsl_memory_debug(void)
   __attribute__((FC_BUILTIN));

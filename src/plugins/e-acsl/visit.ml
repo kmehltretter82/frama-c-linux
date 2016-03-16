@@ -284,12 +284,6 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
           match main.sformals with
           | vi1 :: vi2 :: _
             when vi1.vtype = Cil.intType && vi2.vtype = charPtrPtrType ->
-              (* Add a call to __init_args if need argv for analysis *)
-              if Mmodel_analysis.must_model_vi vi2 then begin
-                let arg = [ Cil.evar vi1 ; Cil.evar vi2 ] in
-                let arginit = Misc.mk_call loc "__init_argv" arg in
-                main.sbody.bstmts <- arginit :: main.sbody.bstmts;
-              end;
               (* Grab addresses of arguments for a call to the main
               initialization function, i.e., [__e_acsl_memory_init] *)
               List.map Cil.mkAddrOfVi main.sformals;

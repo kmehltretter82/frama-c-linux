@@ -393,7 +393,7 @@ void __e_acsl_memory_clean() {
 }
 
 /* adds argc / argv to the memory model */
-void __init_argv(int argc, char **argv) {
+static void __init_argv(int argc, char **argv) {
   int i;
 
   __store_block(argv, (argc+1)*sizeof(char*));
@@ -411,6 +411,8 @@ void __init_argv(int argc, char **argv) {
  *  ptr_size the size of the pointer computed during instrumentation. */
 void __e_acsl_memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
   arch_assert(ptr_size);
+  if (argc_ref)
+    __init_argv(*argc_ref, *argv_ref);
 }
 
 /**********************/
