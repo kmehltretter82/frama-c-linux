@@ -33,7 +33,7 @@ int main(void) {
   /*@assert \initialized(&c) ; */
   /*@assert ! \initialized(&d) ; */
 
-  /* Local variables also initialized by assignments */
+  /* Local variables can also be initialized by assignments */
   b = 0;
   d[0] = 1;
   /*@assert \initialized(&b); */
@@ -50,7 +50,7 @@ int main(void) {
   q = (int*)calloc(1, sizeof(int));
   /*@ assert \initialized(q); */
 
-  /* Block reallocared using `realloc' carries initialization of the of the
+  /* Block reallocared using `realloc' carries initialization of the
    * existing fragment but does not initialize the newly allocated one */
   q = (int*)realloc(q, 2*sizeof(int));
   /*@assert \initialized(q); */
@@ -58,19 +58,19 @@ int main(void) {
   /*@assert ! \initialized(q); */
   q--;
 
-  /* Initialized on un-allocated regions is always false. This does not lead
-   * to undefined bevaviours in production mode or assertion failures in debug
-   * mode. */
+  /* An initialized on an un-allocated region is always false. This does not
+   * lead to undefined bevaviours in production mode or assertion failures in
+   * debug mode. */
   free(p);
   free(q);
   /*@assert ! \initialized(p); */
   /*@assert ! \initialized(q); */
 
-  /* Spoofing access to  non-existing stack address */
+  /* Spoofing access to a non-existing stack address */
   q = (int*)(&q - 1024*5);
   /*assert ! \initialized(q); */
 
-  /* Spoofing access to  non-existing global address */
+  /* Spoofing access to a non-existing global address */
   q = (int*)128;
   /*@assert ! \initialized(q); */
 
