@@ -278,7 +278,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         let ptrSz = (Cil.sizeOf loc Cil.voidPtrType) in
         let args =
           (* Record arguments only if the first one has int type and the
-            second one is an array of char pointers of equivalent. This is
+            second one is an array of char pointers or equivalent. This is
             sufficient to capture C99 compliant arguments and GCC extensions
             with environ. *)
           match main.sformals with
