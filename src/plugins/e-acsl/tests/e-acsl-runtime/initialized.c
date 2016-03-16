@@ -116,4 +116,11 @@ int main(void) {
       /* @assert ! \initialized(partsc + i); */
     }
   }
+
+  /* Check duplicate initialization does not affect correct count of
+   * initialized bits (relevant for ADT models only). */
+  int dup [2];
+  dup[0] = 1;
+  dup[0] = 1;
+  /* @assert ! \initialized(&dup); */
 }

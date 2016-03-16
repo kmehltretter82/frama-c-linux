@@ -23,6 +23,7 @@ int main(void)
   int size;
   char *partsc;
   char *partsi;
+  int dup[2];
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
   __store_block((void *)(d),16UL);
@@ -333,6 +334,8 @@ int main(void)
       i_0 ++;
     }
   }
+  dup[0] = 1;
+  dup[0] = 1;
   __retres = 0;
   __delete_block((void *)(& B));
   __delete_block((void *)(& A));
