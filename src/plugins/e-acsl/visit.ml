@@ -273,34 +273,34 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     let build_mmodel_initializer () =
       let loc = Location.unknown in
       match main_fct with
-        | Some main ->
-          let charPtrPtrType = TPtr(Cil.charPtrType,[]) in
-          let ptrSz = (Cil.sizeOf loc Cil.voidPtrType) in
-          let args =
-            (* Record arguments only if the first one has int type and the
-              second one is an array of char pointers of equivalent. This is
-              sufficient to capture C99 compliant arguments and GCC extensions
-              with environ. *)
-            match main.sformals with
-              | vi1 :: vi2 :: _
-                when vi1.vtype = Cil.intType && vi2.vtype = charPtrPtrType ->
-                  (* Add a call to __init_args if need argv for analysis *)
-                  if Mmodel_analysis.must_model_vi vi2 then begin
-                    let arg = [ Cil.evar vi1 ; Cil.evar vi2 ] in
-                    let arginit = Misc.mk_call loc "__init_argv" arg in
-                    main.sbody.bstmts <- arginit :: main.sbody.bstmts;
-                  end;
-                  (* Grab addresses of arguments for a call to the main
-                  initialization function, i.e., [__e_acsl_memory_init] *)
-                  List.map Cil.mkAddrOfVi main.sformals;
-              | _ -> let null = Cil.zero loc
-            in [ null ; null  ] in
-          let args = args @ [ptrSz] in
-          let init = Misc.mk_call
-            Location.unknown "__e_acsl_memory_init" args in
-          main.sbody.bstmts <- init :: main.sbody.bstmts;
-          ()
-        | None -> ()
+      | Some main ->
+        let charPtrPtrType = TPtr(Cil.charPtrType,[]) in
+        let ptrSz = (Cil.sizeOf loc Cil.voidPtrType) in
+        let args =
+          (* Record arguments only if the first one has int type and the
+            second one is an array of char pointers of equivalent. This is
+            sufficient to capture C99 compliant arguments and GCC extensions
+            with environ. *)
+          match main.sformals with
+          | vi1 :: vi2 :: _
+            when vi1.vtype = Cil.intType && vi2.vtype = charPtrPtrType ->
+              (* Add a call to __init_args if need argv for analysis *)
+              if Mmodel_analysis.must_model_vi vi2 then begin
+                let arg = [ Cil.evar vi1 ; Cil.evar vi2 ] in
+                let arginit = Misc.mk_call loc "__init_argv" arg in
+                main.sbody.bstmts <- arginit :: main.sbody.bstmts;
+              end;
+              (* Grab addresses of arguments for a call to the main
+              initialization function, i.e., [__e_acsl_memory_init] *)
+              List.map Cil.mkAddrOfVi main.sformals;
+          | _ -> let null = Cil.zero loc
+          in [ null ; null  ] 
+        in
+        let args = args @ [ptrSz] in
+        let init = Misc.mk_call loc "__e_acsl_memory_init" args in
+        main.sbody.bstmts <- init :: main.sbody.bstmts;
+        ()
+      | None -> ()
     in if Mmodel_analysis.use_model () then
       Project.on prj build_mmodel_initializer ();
 	  (* reset copied states at the end to be observationally
