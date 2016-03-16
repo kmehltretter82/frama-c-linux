@@ -20,6 +20,9 @@
 /*                                                                        */
 /**************************************************************************/
 
+/* Bit-level manipulations and endianness checks.
+ * Should be included after e_acsl_printf.h and e_acsl_string.h headers. */
+
 #ifndef E_ACSL_BITS
 #define E_ACSL_BITS
 
@@ -32,9 +35,9 @@
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #  error "Big-endian byte order is unsupported"
 #elif __BYTE_ORDER__ == __ORDER_PDP_ENDIAN__
-#  error "PDP byte order is unsupported"
+#  error "PDP-endian byte order is unsupported"
 #elif __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__
-#  error "UNknown byte order"
+#  error "Unknown byte order"
 #endif
 
 /* Bit-level manipulations {{{ */

@@ -25,6 +25,7 @@
 
 #include "e_acsl_string.h"
 #include "e_acsl_printf.h"
+#include "e_acsl_bits.h"
 #include "e_acsl_assert.h"
 #include "e_acsl_debug.h"
 #include "e_acsl_malloc.h"
@@ -181,9 +182,9 @@ void* __realloc(void* ptr, size_t size) {
 
       /* Adjust bits in the last byte */
       if(tmp->size%8 != 0) {
-        /* Get fully initialize byte (255), shift right by the number of bytes
-         * that need to be pertained and flip, so zeroes becomes one and vice
-         * versa. E.g., in the above example this is as follows:
+        /* Get a fully initialized byte (255), shift right by the number
+         * of bytes that need to be pertained and flip, so zeroes becomes
+         * one and vice versa. E.g., in the above example this is as follows:
          *  1111 1111   -    255
          *  0001 1111   -    255 << tmp->size%8
          *  1110 0000   -    ~(255 << tmp->size%8) */
