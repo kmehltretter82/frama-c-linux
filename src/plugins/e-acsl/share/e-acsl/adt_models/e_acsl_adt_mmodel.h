@@ -161,12 +161,34 @@ void* __realloc(void* ptr, size_t size) {
       tmp->init_cpt = size;
     /* realloc bigger larger block */
     else {
+      /* Since realloc increases the size of the block full initialization
+       * becomes partial initialization, that is, we need to allocate
+       * tmp->init_ptr and set its first `old size' bits. */
+
+      /* Size of tmp->init_ptr in the new block  */
       int nb = needed_bytes(size);
+      /* Number of bits that need to be set in tmp->init_ptr */
       int nb_old = needed_bytes(tmp->size);
+
+      /* Allocate tmp->init_ptr that tracks partial initialization and fully
+       * set nb_old bytes. Note that nb_old is not a multiple of 8 (i.e., bit
+       * size of a byte), the last (8 - old_size%8) bits of the last byte in
+       * tmp->init_ptr need to be unset. E.g., if the old size is 11 and the
+       * new size if 14 then tmp->init_ptr is 2 bytes and last 5 bits of
+       * tmp->init_ptr[1] should be unset. */
       tmp->init_ptr = native_malloc(nb);
       memset(tmp->init_ptr, 0xFF, nb_old);
-      if(tmp->size%8 != 0)
+
+      /* Adjust bits in the last byte */
+      if(tmp->size%8 != 0) {
+        /* Get fully initialize byte (255), shift right by the number of bytes
+         * that need to be pertained and flip, so zeroes becomes one and vice
+         * versa. E.g., in the above example this is as follows:
+         *  1111 1111   -    255
+         *  0001 1111   -    255 << tmp->size%8
+         *  1110 0000   -    ~(255 << tmp->size%8) */
         tmp->init_ptr[tmp->size/8] &= ~(255 << tmp->size%8);
+      }
     }
   }
   /* contains initialized and uninitialized parts */
