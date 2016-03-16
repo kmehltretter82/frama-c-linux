@@ -293,7 +293,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
                   (* Grab addresses of arguments for a call to the main
                   initialization function, i.e., [__e_acsl_memory_init] *)
                   List.map Cil.mkAddrOfVi main.sformals;
-              | _ -> let null = Cil.integer loc 0
+              | _ -> let null = Cil.zero loc
             in [ null ; null  ] in
           let args = args @ [ptrSz] in
           let init = Misc.mk_call
