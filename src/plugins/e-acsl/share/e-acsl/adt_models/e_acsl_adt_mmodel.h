@@ -313,6 +313,7 @@ int __initialized (void * ptr, size_t size) {
   if(tmp->init_cpt == tmp->size)
     return true;
 
+  /* see implementation of function __initialize for details */
   for(i = 0; i < size; i++) {
     size_t offset = (uintptr_t)ptr - tmp->ptr + i;
     int byte = offset/8;
