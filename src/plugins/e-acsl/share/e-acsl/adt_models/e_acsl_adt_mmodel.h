@@ -264,26 +264,18 @@ void __initialize (void * ptr, size_t size) {
    * initialization of `size' bytes starting from `ptr'. */
   unsigned i;
   for(i = 0; i < size; i++) {
-    // Byte-offset within the block, i.e., mark `offset' byte as initialized
+    /* byte-offset within the block, i.e., mark `offset' byte as initialized */
     size_t offset = (uintptr_t)ptr - tmp->ptr + i;
-    // Byte offset within tmp->init_ptr, i.e., a byte containing the bit to
-    // be toggled
+    /* byte offset within tmp->init_ptr, i.e., a byte containing the bit to
+       be toggled */
     int byte = offset/8;
-    // Bit-offset within the above byte, i.e., bit to be toggled
+    /* bit-offset within the above byte, i.e., bit to be toggled */
     int bit = offset%8;
 
-    if (((tmp->init_ptr[byte] >> bit) & 1) == 0) { // if the bit is not set ...
-      tmp->init_ptr[byte] |= 1 << bit; // ... set the bit and ...
-      tmp->init_cpt++; // ... increment the counter tracking the number
-                       // of initialized bits.
+    if (!bitcheck(bit, tmp->init_ptr[byte])) { /* if bit is unset ... */
+      bitset(bit, tmp->init_ptr[byte]); /* ... set the bit ... */
+      tmp->init_cpt++; /* ... and increment initialized bytes count */
     }
-    /* NOTE:
-     *   ((tmp->init_ptr[byte] >> bit) & 1)
-     *     - shift's the bit of interest to position [0] and applies bitwise
-     *     AND using mask '1000 0000', then if the result is 0 the bit is unset
-     *  1 << bit
-     *    - bit-mask that has 1 shifted to the bit offset and the remaining
-     *    bits are all zeroes */
   }
 
   /* now fully initialized */
@@ -341,7 +333,7 @@ int __initialized (void * ptr, size_t size) {
     size_t offset = (uintptr_t)ptr - tmp->ptr + i;
     int byte = offset/8;
     int bit = offset%8;
-    if (((tmp->init_ptr[byte] >> bit) & 1) == 0)
+    if (!bitcheck(bit, tmp->init_ptr[byte]))
       return false;
   }
   return true;
