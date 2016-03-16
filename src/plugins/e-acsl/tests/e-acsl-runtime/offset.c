@@ -48,9 +48,9 @@ int main(void) {
 
   /*@ assert \offset(q) == 0; */
   q++;
-  /*@ assert \offset(q) == 8; */
+  /*@ assert \offset(q) == sizeof(long); */
   q += 2;
-  /*@ assert \offset(q) == 24; */
+  /*@ assert \offset(q) == sizeof(long)*3; */
   q += 4;
-  /*@ assert \offset(q) == 56; */
+  /*@ assert \offset(q) == sizeof(long)*7; */
 }
