@@ -233,13 +233,34 @@ void __initialize (void * ptr, size_t size) {
     memset(tmp->init_ptr, 0, nb);
   }
 
+  /* partial initialization is kept via a character array accessible via the
+   * tmp->init_ptr. This is such that a N-th bit of tmp->init_ptr tracks
+   * initialization of the N-th byte of the memory block tracked by tmp.
+   *
+   * The following sets individual bits in tmp->init_ptr that track
+   * initialization of `size' bytes starting from `ptr'. */
   unsigned i;
   for(i = 0; i < size; i++) {
+    // Byte-offset within the block, i.e., mark `offset' byte as initialized
     size_t offset = (uintptr_t)ptr - tmp->ptr + i;
+    // Byte offset within tmp->init_ptr, i.e., a byte containing the bit to
+    // be toggled
     int byte = offset/8;
+    // Bit-offset within the above byte, i.e., bit to be toggled
     int bit = offset%8;
-    tmp->init_ptr[byte] |= 1 << bit;
-    tmp->init_cpt++;
+
+    if (((tmp->init_ptr[byte] >> bit) & 1) == 0) { // if the bit is not set ...
+      tmp->init_ptr[byte] |= 1 << bit; // ... set the bit and ...
+      tmp->init_cpt++; // ... increment the counter tracking the number
+                       // of initialized bits.
+    }
+    /* NOTE:
+     *   ((tmp->init_ptr[byte] >> bit) & 1)
+     *     - shift's the bit of interest to position [0] and applies bitwise
+     *     AND using mask '1000 0000', then if the result is 0 the bit is unset
+     *  1 << bit
+     *    - bit-mask that has 1 shifted to the bit offset and the remaining
+     *    bits are all zeroes */
   }
 
   /* now fully initialized */
