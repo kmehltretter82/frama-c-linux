@@ -79,8 +79,8 @@ int main(void) {
 
   /* Partial initialization */
   int size = 100;
-  char *partsc = malloc(size*sizeof(char));
-  char *partsi = malloc(size*sizeof(int));
+  char *partsc = (char*)malloc(size*sizeof(char));
+  char *partsi = (char*)malloc(size*sizeof(int));
 
   for (int i = 0; i < size; i++) {
     if (ODD(i))

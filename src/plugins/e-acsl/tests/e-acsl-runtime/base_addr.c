@@ -1,5 +1,5 @@
 /* run.config
-   COMMENT: Behaviours of the \base_addr E-ACSL predicate
+ * COMMENT: Behaviours of the \base_addr E-ACSL predicate
 */
 
 #include <stdlib.h>
@@ -45,8 +45,8 @@ int main(void) {
   /*@ assert \base_addr(p+1) == \base_addr(pd+5); */
   /*@ assert \base_addr(p+11) == \base_addr(pd+1); */
   p += 5;
-  /*@ assert \base_addr(p+5) == \base_addr(p-5); */
-  /*@ assert \base_addr(p-5) == \base_addr(p+5); */
+  /*@ assert \base_addr(p+5) == \base_addr(pd); */
+  /*@ assert \base_addr(p-5) == \base_addr(pd); */
 
   /* Heap memory [multiple segments] */
   long *q = malloc(30*sizeof(long));

@@ -213,25 +213,25 @@ int main(void)
   }
   __full_init((void *)(& p));
   p += 5;
-  /*@ assert \base_addr(p+5) ≡ \base_addr(p-5); */
+  /*@ assert \base_addr(p+5) ≡ \base_addr(pd); */
   {
     void *__e_acsl_base_addr_31;
     void *__e_acsl_base_addr_32;
     __e_acsl_base_addr_31 = __base_addr((void *)(p + 5));
-    __e_acsl_base_addr_32 = __base_addr((void *)(p - 5));
+    __e_acsl_base_addr_32 = __base_addr((void *)pd);
     __e_acsl_assert(__e_acsl_base_addr_31 == __e_acsl_base_addr_32,
                     (char *)"Assertion",(char *)"main",
-                    (char *)"\\base_addr(p+5) == \\base_addr(p-5)",48);
+                    (char *)"\\base_addr(p+5) == \\base_addr(pd)",48);
   }
-  /*@ assert \base_addr(p-5) ≡ \base_addr(p+5); */
+  /*@ assert \base_addr(p-5) ≡ \base_addr(pd); */
   {
     void *__e_acsl_base_addr_33;
     void *__e_acsl_base_addr_34;
     __e_acsl_base_addr_33 = __base_addr((void *)(p - 5));
-    __e_acsl_base_addr_34 = __base_addr((void *)(p + 5));
+    __e_acsl_base_addr_34 = __base_addr((void *)pd);
     __e_acsl_assert(__e_acsl_base_addr_33 == __e_acsl_base_addr_34,
                     (char *)"Assertion",(char *)"main",
-                    (char *)"\\base_addr(p-5) == \\base_addr(p+5)",49);
+                    (char *)"\\base_addr(p-5) == \\base_addr(pd)",49);
   }
   __full_init((void *)(& q));
   q = (long *)__e_acsl_malloc((unsigned long)30 * sizeof(long));
