@@ -42,23 +42,23 @@ FRAMAC_SHARE/libc/stdlib.h:146:[kernel] warning: Neither code nor specification 
 FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] warning: function __e_acsl_assert: precondition got status unknown.
 FRAMAC_SHARE/libc/stdlib.h:163:[value] warning: function __e_acsl_malloc, behavior allocation: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
 FRAMAC_SHARE/libc/stdlib.h:168:[value] warning: function __e_acsl_malloc, behavior no_allocation: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
-tests/e-acsl-runtime/initialized.c:47:[value] warning: assertion got status unknown.
-tests/e-acsl-runtime/initialized.c:51:[value] warning: assertion got status unknown.
+tests/e-acsl-runtime/initialized.c:59:[value] warning: assertion got status unknown.
+tests/e-acsl-runtime/initialized.c:63:[value] warning: assertion got status unknown.
 FRAMAC_SHARE/libc/stdlib.h:201:[value] warning: function __e_acsl_realloc: precondition got status unknown.
 FRAMAC_SHARE/libc/stdlib.h:216:[value] warning: function __e_acsl_realloc, behavior dealloc: precondition got status unknown. (Behavior may be inactive, no reduction performed.)
 FRAMAC_SHARE/libc/stdlib.h:211:[value] warning: function __e_acsl_realloc, behavior alloc: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
 FRAMAC_SHARE/libc/stdlib.h:218:[value] warning: function __e_acsl_realloc, behavior dealloc: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
 FRAMAC_SHARE/libc/stdlib.h:219:[value] warning: function __e_acsl_realloc, behavior dealloc: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
 FRAMAC_SHARE/libc/stdlib.h:226:[value] warning: function __e_acsl_realloc, behavior fail: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
-tests/e-acsl-runtime/initialized.c:56:[value] warning: assertion got status unknown.
-tests/e-acsl-runtime/initialized.c:58:[value] warning: assertion got status unknown.
+tests/e-acsl-runtime/initialized.c:68:[value] warning: assertion got status unknown.
+tests/e-acsl-runtime/initialized.c:70:[value] warning: assertion got status unknown.
 FRAMAC_SHARE/libc/stdlib.h:178:[value] warning: function __e_acsl_free, behavior deallocation: precondition 'freeable' got status unknown. (Behavior may be inactive, no reduction performed.)
 FRAMAC_SHARE/libc/stdlib.h:180:[value] warning: function __e_acsl_free, behavior deallocation: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
 FRAMAC_SHARE/libc/stdlib.h:178:[kernel] warning: pointer comparison. assert \pointer_comparable(p, (void *)0);
 FRAMAC_SHARE/libc/stdlib.h:177:[kernel] warning: pointer comparison. assert \pointer_comparable(p, (void *)0);
-tests/e-acsl-runtime/initialized.c:66:[value] warning: assertion got status unknown.
-tests/e-acsl-runtime/initialized.c:67:[value] warning: assertion got status unknown.
-tests/e-acsl-runtime/initialized.c:75:[value] warning: assertion got status unknown.
 tests/e-acsl-runtime/initialized.c:78:[value] warning: assertion got status unknown.
-tests/e-acsl-runtime/initialized.c:89:[kernel] warning: out of bounds write. assert \valid(partsi+i);
-tests/e-acsl-runtime/initialized.c:87:[kernel] warning: out of bounds write. assert \valid(partsc+i);
+tests/e-acsl-runtime/initialized.c:79:[value] warning: assertion got status unknown.
+tests/e-acsl-runtime/initialized.c:87:[value] warning: assertion got status unknown.
+tests/e-acsl-runtime/initialized.c:90:[value] warning: assertion got status unknown.
+tests/e-acsl-runtime/initialized.c:101:[kernel] warning: out of bounds write. assert \valid(partsi+i);
+tests/e-acsl-runtime/initialized.c:99:[kernel] warning: out of bounds write. assert \valid(partsc+i);

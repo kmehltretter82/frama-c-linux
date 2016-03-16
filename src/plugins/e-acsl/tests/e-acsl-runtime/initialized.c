@@ -21,6 +21,7 @@ int main(void) {
   /* A local variable without an initializer is uninitialized */
   int a = 0;
   int b;
+  long *r;
   long c[2] = { 1, 1 };
   long d[2];
   p = &a;
@@ -35,12 +36,23 @@ int main(void) {
 
   /* Local variables can also be initialized by assignments */
   b = 0;
-  d[0] = 1;
-  /*@assert \initialized(&b); */
   /*@assert \initialized(q);  */
-  /*@assert ! \initialized(&d);  */
+  /*@assert \initialized(&b); */
+
+  r = d;
+  /*@assert ! \initialized(&d); */
+  /*@assert ! \initialized(r); */
+  /*@assert ! \initialized(r+1); */
+
+  d[0] = 1;
+  /*@assert ! \initialized(&d); */
+  /*@assert \initialized(r); */
+  /*@assert ! \initialized(r+1); */
+
   d[1] = 1;
-  /*@assert \initialized(&d);  */
+  /*@assert \initialized(&d); */
+  /*@assert \initialized(r); */
+  /*@assert \initialized(r+1); */
 
   /* Malloc allocates un-initialized memory */
   p = (int*)malloc(sizeof(int*));
