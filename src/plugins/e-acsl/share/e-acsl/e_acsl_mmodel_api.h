@@ -148,13 +148,13 @@ void __e_acsl_memory_debug(void)
 
 /* erase the content of the abstract structure
  * have to be called at the end of the `main` */
-/*@ assigns __e_acsl_internal_heap \from __e_acsl_internal_heap; */
+/*@ assigns \nothing; */
 void __e_acsl_memory_clean(void)
   __attribute__((FC_BUILTIN));
 
 /* initialize the abstract structure
  * have to be called before any other statement in `main` */
-/*@ assigns __e_acsl_internal_heap \from __e_acsl_internal_heap; */
+/*@ assigns \nothing; */
 void __e_acsl_memory_init(int *argc_ref, char ***argv, size_t ptr_size)
   __attribute__((FC_BUILTIN));
 
