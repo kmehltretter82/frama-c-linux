@@ -40,16 +40,22 @@ int main(void) {
   /*@assert \initialized(&b); */
 
   r = d;
+  /*@assert ! \initialized(d); */
+  /*@assert ! \initialized(d+1); */
   /*@assert ! \initialized(&d); */
   /*@assert ! \initialized(r); */
   /*@assert ! \initialized(r+1); */
 
   d[0] = 1;
+  /*@assert \initialized(d); */
+  /*@assert ! \initialized(d+1); */
   /*@assert ! \initialized(&d); */
   /*@assert \initialized(r); */
   /*@assert ! \initialized(r+1); */
 
   d[1] = 1;
+  /*@assert \initialized(d); */
+  /*@assert \initialized(d+1); */
   /*@assert \initialized(&d); */
   /*@assert \initialized(r); */
   /*@assert \initialized(r+1); */
