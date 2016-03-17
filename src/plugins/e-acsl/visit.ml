@@ -273,23 +273,30 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
              NULLs if main is declared without arguments. *)
           let build_mmodel_initializer () =
             let loc = Location.unknown in
+            let nulls = [ Cil.zero loc ; Cil.zero loc ] in
             let handle_main main =
               let args =
-                let charPtrPtrType = TPtr(Cil.charPtrType,[]) in
-                (* Record arguments only if the first one has int type and the
-                   second one is an array of char pointers or equivalent. This
-                   is sufficient to capture C99 compliant arguments and GCC
+                (* Record arguments only if the first one has an integral type
+                   (so it can be long or size_t) and the second has a pointer
+                   type, so a argument strings can be recorded. This is
+                   sufficient to capture C99 compliant arguments and GCC
                    extensions with environ. *)
                 match main.sformals with
-                | vi1 :: vi2 :: _
-                    when vi1.vtype = Cil.intType
-                    && vi2.vtype = charPtrPtrType ->
+                | argc :: argv :: _
+                    when Cil.isIntegralType argc.vtype &&
+                    Cil.isPointerType (Cil.unrollTypeDeep argv.vtype) ->
                 (* Grab addresses of arguments for a call to the main
                    initialization function, i.e., [__e_acsl_memory_init] *)
                   List.map Cil.mkAddrOfVi main.sformals;
+                (* No arguments to main given *)
+                | [] -> nulls
+                (* Some non-standard arguments: for instance argv is of
+                   primitive type or argc is a pointer. Warn the user but carry
+                   on as if no arguments to main has been given. *)
                 | _ ->
-                  let null = Cil.zero loc in
-                  [ null ; null  ]
+                  Options.warning "non-standard arguments to main may \
+introduce too limited instrumentation.";
+                  nulls
               in
               let ptr_size = Cil.sizeOf loc Cil.voidPtrType in
               let args = args @ [ ptr_size ] in
