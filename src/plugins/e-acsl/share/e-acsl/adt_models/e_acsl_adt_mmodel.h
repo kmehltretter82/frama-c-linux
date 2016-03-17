@@ -173,7 +173,7 @@ void* __realloc(void* ptr, size_t size) {
       /* Allocate memory to store partial initialization */
       tmp->init_ptr = native_calloc(1, nb);
       /* Carry out initialization of the old block */
-      bitwise_memset(tmp->init_ptr, tmp->size, 1, 0);
+      setbits(tmp->init_ptr, tmp->size);
     }
   }
   /* contains initialized and uninitialized parts */
@@ -256,8 +256,8 @@ void __initialize (void * ptr, size_t size) {
     /* bit-offset within the above byte, i.e., bit to be toggled */
     int bit = offset%8;
 
-    if (!bitcheck(bit, tmp->init_ptr[byte])) { /* if bit is unset ... */
-      bitset(bit, tmp->init_ptr[byte]); /* ... set the bit ... */
+    if (!checkbit(bit, tmp->init_ptr[byte])) { /* if bit is unset ... */
+      setbit(bit, tmp->init_ptr[byte]); /* ... set the bit ... */
       tmp->init_cpt++; /* ... and increment initialized bytes count */
     }
   }
@@ -317,7 +317,7 @@ int __initialized (void * ptr, size_t size) {
     size_t offset = (uintptr_t)ptr - tmp->ptr + i;
     int byte = offset/8;
     int bit = offset%8;
-    if (!bitcheck(bit, tmp->init_ptr[byte]))
+    if (!checkbit(bit, tmp->init_ptr[byte]))
       return false;
   }
   return true;

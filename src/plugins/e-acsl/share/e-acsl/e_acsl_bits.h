@@ -26,6 +26,8 @@
 #ifndef E_ACSL_BITS
 #define E_ACSL_BITS
 
+#include <stdint.h>
+
 /* FIXME: Present implementation is built for little-endian byte order.  That
  * is, the implementation assumes that least significant bytes are stored at
  * the highest memory addresses. In future support for big-endian/PDP byte
@@ -41,91 +43,59 @@
 #endif
 
 /* Bit-level manipulations {{{ */
+
+/* 64-bit type with all bits set to zeroes */
+const uint64_t ZERO = 0;
+
+/* 64-bit type with all bits set to ones */
+const uint64_t ONE  = ~0;
+
 /* Set a given bit in a number to '1'.
  * Example: bitset(7, x) changes 7th lowest bit of x to 1 */
-#define bitset(_bit,_number) (_number |= 1 << _bit)
+#define setbit(_bit,_number) (_number |= 1 << _bit)
 
 /* Same as bitset but the bit is set of 0 */
-#define bitclear(_bit, _number) (_number &= ~(1 << _bit))
+#define clearbit(_bit, _number) (_number &= ~(1 << _bit))
 
 /* Evaluates to a true value if a given bit in a number is set to 1. */
-#define bitcheck(_bit, _number) ((_number >> _bit) & 1)
+#define checkbit(_bit, _number) ((_number >> _bit) & 1)
 
 /* Toggle a given bit. */
-#define bittoggle(_bit, _number) (_number ^= 1 << _bit)
+#define togglebit(_bit, _number) (_number ^= 1 << _bit)
 
 /* Set a given bit to a specified value (e.g., 0 or 1). */
-#define bitchange(_bit, _val, _number) \
+#define changebit(_bit, _val, _number) \
   (_number ^= (-_val ^ _number) & (1 << _bit))
 
-/* Fill the first n + skip bits of the memory area pointed to by s with ones
- * (c != 0) or zeroes (c == 0).
- *
- * Example:
- *  let p1 be a pointer to  1111 1111 1111 1111 and
- *  p0 be a pointer to 0000 0000 0000 0000, then
- *
- *  bitwise_memset(p0, 4, 1, 0)
- *    1111 0000 0000 0000
- *  bitwise_memset(p1, 3, 0, 2)
- *    1100 0111 1111 1111
- *
- * NB: In the grand scheme of things it is convenient to have a function that
- * can set bits in a universal manner (such as the function below). On the other
- * hand for blocks smaller than 64 bits using integers may be a faster way of
- * dealing with bitwise operations. */
-static void bitwise_memset(void *s, size_t n, int c, unsigned int skip) {
-  char *p = (char*)s;
+/* Set up to 64-bit in given number (from the left)
+ * Example: setbits64(x, 7) sets first 7 bits in x to ones */
+#define setbits64(_number, _bits)   (_number |= ~(ONE << _bits))
 
-  if (skip) {
-    p += (skip/8);
-    skip = skip%8;
+/* Same as setbits64 but clears bits (sets to zeroes) */
+#define clearbits64(_number, _bits) (_number &= ONE << _bits)
 
-    if (skip) {
-      int mask = 255;
+/* Assume _number is a 64-bit number and sets _bits from the right to ones
+ * Example: let x is a 64-bit zero, then setbits64(x, 7) will yield:
+ *   00000000 00000000 00000000 00000000 00000000 00000000 00000000 01111111 */
+#define setbits64_right(_number, _bits)   (_number |= ~(ONE >> _bits))
 
-      if (skip)
-        mask = (mask << skip);
-      if (n < 8 - skip)
-        mask = mask & (255 >> (8 - skip - n));
+/* Same as setbits64_right but clears bits (sets to zeroes) */
+#define clearbits64_right(_number, _bits) (_number &= ONE >> _bits)
 
-      n = (n >= 8 - skip) ? n - 8 + skip : 0;
-
-      if (c)
-        p[0]  = p[0] | mask;
-      else
-        p[0]  = p[0] & (mask ^ 255);
-      p++;
-    }
-  }
-
-  if (n) {
-    size_t bytes = n/8;
-    if (bytes)
-      memset(p, c ? 255 : 0, bytes);
-
-    if (c)
-      p[bytes]  = p[bytes] | (255 >> (8 - n%8));
-    else
-      p[bytes]  = p[bytes] & (255 << n%8);
-  }
+void setbits(void *ptr, size_t size) {
+  size_t i;
+  int64_t *lp = (int64_t*)ptr;
+  for (i = 0; i < size/64; i++)
+    *(lp+i) |= ONE;
+  setbits64(*(lp+i), size%64);
 }
 
-/* Same as bitwise_memset with skip parameter 0 but sets the bits from right
- * to left. Example:
- *  let p1 be a pointer to  1111 1111 1111 1111, then
- *    bitwise_memset_backwards(p1, 5, 0) will lead to
- *      1111 1111 1110 0000 */
-static void bitwise_memset_backwards(void *s, size_t n, int c) {
-  char *p = (char*)s;
-  int bytes = n/8;
-  p -= bytes;
-  memset(p, c ? 255 : 0, bytes);
-  p--;
-  if (!c)
-    p[0]  = p[0] & (255 >> n%8);
-  else
-    p[0]  = p[0] | (255 << (8 - n%8));
+void clearbits(void *ptr, size_t size) {
+  size_t i;
+  int64_t *lp = (int64_t*)ptr;
+  for (i = 0; i < size/64; i++)
+    *(lp+i) &= ZERO;
+  clearbits64(*(lp+i), size%64);
 }
 /* }}} */
 #endif
