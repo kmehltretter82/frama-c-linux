@@ -51,12 +51,30 @@ size_t __get_memory_size(void) {
   return __heap_size;
 }
 
-/*@ assigns \nothing;
-  @ ensures size%8 == 0 ==> \result == size/8;
-  @ ensures size%8 != 0 ==> \result == size/8+1;
-  @*/
-static size_t needed_bytes (size_t size) {
-  return (size % 8) == 0 ? (size/8) : (size/8 + 1);
+/* given the size of the memory block (_size) return (or rather evaluate to)
+ * size in bytes requred to represent its partial initialization */
+#define needed_bytes(_size) \
+  ((_size % 8) == 0 ? (_size/8) : (_size/8 + 1))
+
+/**************************/
+/* ALLOCATION             */
+/**************************/
+
+/* erase information about initialization of a block */
+static void __clean_init (struct _block * ptr) {
+  if(ptr->init_ptr != NULL) {
+    native_free(ptr->init_ptr);
+    ptr->init_ptr = NULL;
+  }
+  ptr->init_cpt = 0;
+}
+
+/* erase all information about a block */
+static void __clean_block (struct _block * ptr) {
+  if(ptr) {
+    __clean_init(ptr);
+    native_free(ptr);
+  }
 }
 
 /* store the block of size bytes starting at ptr, the new block is returned.
@@ -78,6 +96,7 @@ void* __store_block(void* ptr, size_t size) {
 
 /* remove the block starting at ptr */
 void __delete_block(void* ptr) {
+  DASSERT(ptr != NULL);
   struct _block * tmp = __get_exact(ptr);
   DASSERT(tmp != NULL);
   __clean_init(tmp);
@@ -162,17 +181,13 @@ void* __realloc(void* ptr, size_t size) {
       tmp->init_cpt = size;
     /* realloc bigger larger block */
     else {
-      /* Since realloc increases the size of the block full initialization
-       * becomes partial initialization, that is, we need to allocate
-       * tmp->init_ptr and set its first `old size' bits. */
-
-      /* Size of tmp->init_ptr in the new block  */
+      /* size of tmp->init_ptr in the new block  */
       int nb = needed_bytes(size);
-      /* Number of bits that need to be set in tmp->init_ptr */
+      /* number of bits that need to be set in tmp->init_ptr */
       int nb_old = needed_bytes(tmp->size);
-      /* Allocate memory to store partial initialization */
+      /* allocate memory to store partial initialization */
       tmp->init_ptr = native_calloc(1, nb);
-      /* Carry out initialization of the old block */
+      /* carry out initialization of the old block */
       setbits(tmp->init_ptr, tmp->size);
     }
   }
@@ -218,6 +233,10 @@ void* __calloc(size_t nbr_block, size_t size_block) {
   new_block->init_cpt = size;
   return (void*)new_block->ptr;
 }
+
+/**************************/
+/* INITIALIZATION         */
+/**************************/
 
 /* mark the size bytes of ptr as initialized */
 void __initialize (void * ptr, size_t size) {
@@ -298,6 +317,10 @@ void __readonly (void * ptr) {
   tmp->is_readonly = true;
 }
 
+/**************************/
+/* PREDICATES             */
+/**************************/
+
 /* return whether the size bytes of ptr are initialized */
 int __initialized (void * ptr, size_t size) {
   unsigned i;
@@ -366,33 +389,16 @@ int __offset(void* ptr) {
   return ((size_t)ptr - tmp->ptr);
 }
 
-/********************/
-/* CLEAN            */
-/********************/
-
-/* erase information about initialization of a block */
-void __clean_init (struct _block * ptr) {
-  if(ptr->init_ptr != NULL) {
-    native_free(ptr->init_ptr);
-    ptr->init_ptr = NULL;
-  }
-  ptr->init_cpt = 0;
-}
-
-/* erase all information about a block */
-void __clean_block (struct _block * ptr) {
-  if(ptr) {
-    __clean_init(ptr);
-    native_free(ptr);
-  }
-}
+/**************************/
+/* PROGRAM INITIALIZATION */
+/**************************/
 
 /* erase the content of the abstract structure */
 void __e_acsl_memory_clean() {
   __clean_struct();
 }
 
-/* adds argc / argv to the memory model */
+/* adds argv to the memory model */
 static void __init_argv(int argc, char **argv) {
   int i;
 
@@ -406,9 +412,9 @@ static void __init_argv(int argc, char **argv) {
 }
 
 /* initialize contents of the abstract structure and record arguments
- *  argc_ref address the variable holding the argc parameter
- *  argv_ref address the variable holding the argv parameter
- *  ptr_size the size of the pointer computed during instrumentation. */
+ *  'argc_ref` address the variable holding the argc parameter
+ *  'argv_ref` address the variable holding the argv parameter
+ *  'ptr_size` the size of the pointer computed during instrumentation. */
 void __e_acsl_memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
   arch_assert(ptr_size);
   if (argc_ref)
