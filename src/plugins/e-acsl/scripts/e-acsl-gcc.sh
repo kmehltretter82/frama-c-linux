@@ -357,11 +357,7 @@ error "Cannot find required $EACSL_SHARE/e_acsl_mmodel_api.h header" \
 mmodel_sources() {
   model=""
   case "$1" in
-    bittree) model="adt_models/e_acsl_bittree_mmodel.c" ;;
-    splaytree) model="adt_models/e_acsl_splaytree_mmodel.c" ;;
-    tree) model="adt_models/e_acsl_tree_mmodel.c" ;;
-    list) model="adt_models/e_acsl_list_mmodel.c" ;;
-    foo) model="adt_models/e_acsl_foo_mmodel.c" ;;
+    bittree) model="bittree_model/e_acsl_bittree_mmodel.c" ;;
     *) error "Memory model '$1' does not exist" ;;
   esac
   model="$EACSL_SHARE/$model"
