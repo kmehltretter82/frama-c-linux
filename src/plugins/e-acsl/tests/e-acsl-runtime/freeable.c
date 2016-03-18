@@ -3,10 +3,12 @@
    STDOPT: +"-val-builtin __malloc:Frama_C_alloc_size -val-builtin __free:Frama_C_free"
 */
 
-#include "stdlib.h"
+#include <stdlib.h>
 
 extern void *malloc(size_t p);
 extern void free(void* p);
+
+char array[1024];
 
 int main(void) {
   int *p;
@@ -17,4 +19,8 @@ int main(void) {
   /*@ assert \freeable(p); */
   free(p);
   /*@ assert ! \freeable(p); */
+
+  // test cases for BTS #1830
+  /*@ assert ! \freeable(array); */
+  /*@ assert ! \freeable(&(array[5])); */
 }
