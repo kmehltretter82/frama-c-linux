@@ -20,12 +20,25 @@
 /*                                                                        */
 /**************************************************************************/
 
-/* Re-declaration of standard libc syscall-based functions using direct
- * application of syscall. The aim is to avoid issues for the case when a
+/*! ***********************************************************************
+ * \file  e_acsl_syscall.h
+ * \brief E-ACSL \p syscall bindings.
+ *
+ * Re-declaration of standard libc syscall-based functions using direct
+ * application of \p syscall. The aim is to avoid issues for the case when a
  * target program provides custom implementations or wrappers for such
  * functions. For instance, if an instrumented program provides a custom
  * implementation of `write` E-ACSL RTL will still use the native system
- * call. */
+ * call.
+ *
+ * Note that this header following does not provide a re-declaration for \p
+ * mmap.  This is because \p  syscall returns \p  int, while \p  mmap should
+ * return an integer type wide enough to hold a memory address address. Also,
+ * since there is no \p sbrk system call, a re-declaration of \p  sbrk is also
+ * missing. As a result, programs providing custom definitions of \p syscall,
+ * \p mmap or \p sbrk should be rejected. Re-definitions of the below functions
+ * should be safe.
+***************************************************************************/
 
 #ifndef E_ACSL_SYSCALL
 #define E_ACSL_SYSCALL
@@ -33,14 +46,8 @@
 #  include <fcntl.h>
 #  include <unistd.h>
 #  include <sys/syscall.h>   /* SYS_xxx definitions */
-int syscall(int number, ...);
 
-/* Note that the following does not provide a re-declaration for `mmap`. This
- * is because syscall returns int, while mmap should return an integer type wide
- * enough to hold a memory address address. Also, since there is no `sbrk`
- * system call, re-declaration of sbrk is also missing. As a result, programs
- * providing custom definitions of `syscall`, `mmap` or `sbrk` should be
- * rejected. Re-definitions of the below functions should be safe. */
+int syscall(int number, ...);
 
 #  define write(...) syscall(SYS_write, __VA_ARGS__)
 #  define open(...) syscall(SYS_open, __VA_ARGS__)
