@@ -276,26 +276,20 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
             let nulls = [ Cil.zero loc ; Cil.zero loc ] in
             let handle_main main =
               let args =
-                (* Record arguments only if the first one has an integral type
-                   (so it can be long or size_t) and the second has a pointer
-                   type, so a argument strings can be recorded. This is
-                   sufficient to capture C99 compliant arguments and GCC
-                   extensions with environ. *)
+                (* record arguments only if the second has a pointer type, so a
+                   argument strings can be recorded. This is sufficient to
+                   capture C99 compliant arguments and GCC extensions with
+                   environ. *)
                 match main.sformals with
-                | argc :: argv :: _
-                    when Cil.isIntegralType argc.vtype &&
-                    Cil.isPointerType (Cil.unrollTypeDeep argv.vtype) ->
-                (* Grab addresses of arguments for a call to the main
-                   initialization function, i.e., [__e_acsl_memory_init] *)
+                | [] ->
+                  (* no arguments to main given *)
+                  nulls
+                | _argc :: argv :: _ when Cil.isPointerType argv.vtype ->
+                  (* grab addresses of arguments for a call to the main
+                     initialization function, i.e., [__e_acsl_memory_init] *)
                   List.map Cil.mkAddrOfVi main.sformals;
-                (* No arguments to main given *)
-                | [] -> nulls
-                (* Some non-standard arguments: for instance argv is of
-                   primitive type or argc is a pointer. Warn the user but carry
-                   on as if no arguments to main has been given. *)
-                | _ ->
-                  Options.warning "non-standard arguments to main may \
-introduce too limited instrumentation.";
+                | _ :: _ ->
+                  (* some non-standard arguments. *)
                   nulls
               in
               let ptr_size = Cil.sizeOf loc Cil.voidPtrType in
