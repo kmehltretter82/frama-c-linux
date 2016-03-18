@@ -74,9 +74,9 @@ void *__e_acsl_memchr(void const *buf, int c, size_t n)
         int __e_acsl_valid_read_3;
         __e_acsl_valid_read_3 = __valid_read((void *)((char *)buf + __e_acsl_k),
                                              sizeof(char));
-        e_acsl_assert(__e_acsl_valid_read_3,(char *)"RTE",(char *)"memchr",
-                      (char *)"mem_access: \\valid_read((char *)buf+__e_acsl_k)",
-                      12);
+        __e_acsl_assert(__e_acsl_valid_read_3,(char *)"RTE",(char *)"memchr",
+                        (char *)"mem_access: \\valid_read((char *)buf+__e_acsl_k)",
+                        12);
         if ((int)*((char *)buf + __e_acsl_k) != c) ;
         else {
           __e_acsl_forall_2 = 0;
@@ -102,9 +102,9 @@ void *__e_acsl_memchr(void const *buf, int c, size_t n)
         int __e_acsl_valid_read;
         __e_acsl_valid_read = __valid_read((void *)((char *)buf + __e_acsl_i),
                                            sizeof(char));
-        e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"memchr",
-                      (char *)"mem_access: \\valid_read((char *)buf+__e_acsl_i)",
-                      8);
+        __e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"memchr",
+                        (char *)"mem_access: \\valid_read((char *)buf+__e_acsl_i)",
+                        8);
         if (! ((int)*((char *)buf + __e_acsl_i) == c)) ;
         else {
           __e_acsl_exists = 1;
@@ -136,9 +136,10 @@ void *__e_acsl_memchr(void const *buf, int c, size_t n)
           int __e_acsl_valid_read_2;
           __e_acsl_valid_read_2 = __valid_read((void *)((char *)__e_acsl_at_2 + __e_acsl_j),
                                                sizeof(char));
-          e_acsl_assert(__e_acsl_valid_read_2,(char *)"RTE",(char *)"memchr",
-                        (char *)"mem_access: \\valid_read((char *)__e_acsl_at_2+__e_acsl_j)",
-                        10);
+          __e_acsl_assert(__e_acsl_valid_read_2,(char *)"RTE",
+                          (char *)"memchr",
+                          (char *)"mem_access: \\valid_read((char *)__e_acsl_at_2+__e_acsl_j)",
+                          10);
           if ((int)*((char *)__e_acsl_at_2 + __e_acsl_j) != __e_acsl_at_3) 
             ;
           else {
@@ -151,38 +152,40 @@ void *__e_acsl_memchr(void const *buf, int c, size_t n)
       e_acsl_end_loop2: ;
       __e_acsl_implies = __e_acsl_forall;
     }
-    e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",(char *)"memchr",
-                  (char *)"\\old(\\exists integer i; 0 <= i < n && (int)*((char *)buf+i) == c) ==>\n(\\forall int j;\n   0 <= j < \\offset((char *)\\result) ==>\n   (int)*((char *)\\old(buf)+j) != \\old(c))",
-                  10);
+    __e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",
+                    (char *)"memchr",
+                    (char *)"\\old(\\exists integer i; 0 <= i < n && (int)*((char *)buf+i) == c) ==>\n(\\forall int j;\n   0 <= j < \\offset((char *)\\result) ==>\n   (int)*((char *)\\old(buf)+j) != \\old(c))",
+                    10);
     if (! __e_acsl_at_4) __e_acsl_implies_2 = 1;
     else __e_acsl_implies_2 = __retres == (void *)0;
-    e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",
-                  (char *)"memchr",
-                  (char *)"\\old(\\forall integer k; 0 <= k < n ==> (int)*((char *)buf+k) != c) ==>\n\\result == (void *)0",
-                  13);
+    __e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",
+                    (char *)"memchr",
+                    (char *)"\\old(\\forall integer k; 0 <= k < n ==> (int)*((char *)buf+k) != c) ==>\n\\result == (void *)0",
+                    13);
     __delete_block((void *)(& buf));
     __delete_block((void *)(& __retres));
     return __retres;
   }
 }
 
-void __e_acsl_memory_init(void)
+void __e_acsl_globals_init(void)
 {
   __e_acsl_literal_string = "toto";
   __store_block((void *)__e_acsl_literal_string,sizeof("toto"));
   __full_init((void *)__e_acsl_literal_string);
-  __literal_string((void *)__e_acsl_literal_string);
+  __readonly((void *)__e_acsl_literal_string);
   __e_acsl_literal_string_2 = "tata";
   __store_block((void *)__e_acsl_literal_string_2,sizeof("tata"));
   __full_init((void *)__e_acsl_literal_string_2);
-  __literal_string((void *)__e_acsl_literal_string_2);
+  __readonly((void *)__e_acsl_literal_string_2);
   return;
 }
 
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init();
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
+  __e_acsl_globals_init();
   __e_acsl_memchr((void const *)__e_acsl_literal_string,'o',(unsigned long)4);
   __e_acsl_memchr((void const *)__e_acsl_literal_string_2,'o',
                   (unsigned long)4);

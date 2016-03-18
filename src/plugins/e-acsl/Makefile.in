@@ -137,9 +137,10 @@ install::
 	$(PRINT_INSTALL) E-ACSL share files
 	$(MKDIR) $(FRAMAC_SHARE)/e-acsl
 	$(CP) $(E_ACSL_DIR)/share/e-acsl/*.[ch] $(FRAMAC_SHARE)/e-acsl
-	$(MKDIR) $(FRAMAC_SHARE)/e-acsl/memory_model
-	$(CP) $(E_ACSL_DIR)/share/e-acsl/memory_model/* \
-		$(FRAMAC_SHARE)/e-acsl/memory_model
+	$(MKDIR) $(FRAMAC_SHARE)/e-acsl/bittree_model $(FRAMAC_SHARE)/e-acsl/glibc
+	$(CP) $(E_ACSL_DIR)/share/e-acsl/bittree_model/* \
+		$(FRAMAC_SHARE)/e-acsl/bittree_model
+	$(CP) $(E_ACSL_DIR)/share/e-acsl/glibc/* $(FRAMAC_SHARE)/e-acsl/glibc
 	$(PRINT_INSTALL) E-ACSL manuals
 	$(MKDIR) $(FRAMAC_SHARE)/manuals
 	$(CP) $(E_ACSL_DIR)/doc/manuals/e-acsl.pdf \
@@ -184,8 +185,8 @@ EACSL_DISTRIB_FILES=\
 	scripts/e-acsl-gcc.sh \
 	man/e-acsl-gcc.sh.1 \
 	share/e-acsl/*.[ch] \
-	share/e-acsl/memory_model/e_acsl_bittree.[ch] \
-	share/e-acsl/memory_model/e_acsl_mmodel*.[ch] \
+	share/e-acsl/bittree_model/e_acsl_bittree.[ch] \
+	share/e-acsl/bittree_model/e_acsl_mmodel*.[ch] \
 	tests/test_config.in \
 	tests/e-acsl-reject/test_config tests/e-acsl-reject/*.i \
 	tests/e-acsl-runtime/test_config tests/e-acsl-runtime/*.[ci] \

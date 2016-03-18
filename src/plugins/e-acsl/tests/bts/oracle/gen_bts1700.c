@@ -7,14 +7,15 @@ int main(void)
   int __retres;
   struct toto s;
   struct toto *p;
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __store_block((void *)(& p),8UL);
   __store_block((void *)(& s),0UL);
   /*@ assert \valid(&s); */
   {
     int __e_acsl_valid;
     __e_acsl_valid = __valid((void *)(& s),sizeof(struct toto));
-    e_acsl_assert(__e_acsl_valid,(char *)"Assertion",(char *)"main",
-                  (char *)"\\valid(&s)",9);
+    __e_acsl_assert(__e_acsl_valid,(char *)"Assertion",(char *)"main",
+                    (char *)"\\valid(&s)",9);
   }
   __full_init((void *)(& p));
   p = & s;
@@ -29,8 +30,8 @@ int main(void)
       __e_acsl_and = __e_acsl_valid_2;
     }
     else __e_acsl_and = 0;
-    e_acsl_assert(__e_acsl_and,(char *)"Assertion",(char *)"main",
-                  (char *)"\\valid(p)",12);
+    __e_acsl_assert(__e_acsl_and,(char *)"Assertion",(char *)"main",
+                    (char *)"\\valid(p)",12);
   }
   __retres = 0;
   __delete_block((void *)(& p));

@@ -31,12 +31,12 @@
 /* Dedicated E-ACSL function */
 /*****************************/
 
-/*@ requires predicate != 0; 
+/*@ requires predicate != 0;
   @ assigns \nothing; */
-void e_acsl_assert(int predicate, 
-		   char *kind, 
-		   char *fct, 
-		   char *pred_txt, 
+void __e_acsl_assert(int predicate,
+		   char *kind,
+		   char *fct,
+		   char *pred_txt,
 		   int line)
   __attribute__((FC_BUILTIN));
 

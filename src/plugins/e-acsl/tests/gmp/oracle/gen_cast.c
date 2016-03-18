@@ -7,26 +7,26 @@ int main(void)
   x = (long)0;
   y = 0;
   /*@ assert (int)x ≡ y; */
-  e_acsl_assert((int)x == y,(char *)"Assertion",(char *)"main",
-                (char *)"(int)x == y",10);
+  __e_acsl_assert((int)x == y,(char *)"Assertion",(char *)"main",
+                  (char *)"(int)x == y",10);
   /*@ assert x ≡ (long)y; */
-  e_acsl_assert(x == (long)y,(char *)"Assertion",(char *)"main",
-                (char *)"x == (long)y",11);
+  __e_acsl_assert(x == (long)y,(char *)"Assertion",(char *)"main",
+                  (char *)"x == (long)y",11);
   /*@ assert y ≡ (int)0; */
-  e_acsl_assert(y == 0,(char *)"Assertion",(char *)"main",
-                (char *)"y == (int)0",13);
+  __e_acsl_assert(y == 0,(char *)"Assertion",(char *)"main",
+                  (char *)"y == (int)0",13);
   /*@ assert (unsigned int)y ≡ (unsigned int)0; */
-  e_acsl_assert((unsigned int)y == (unsigned int)0,(char *)"Assertion",
-                (char *)"main",(char *)"(unsigned int)y == (unsigned int)0",
-                14);
+  __e_acsl_assert((unsigned int)y == (unsigned int)0,(char *)"Assertion",
+                  (char *)"main",
+                  (char *)"(unsigned int)y == (unsigned int)0",14);
   /*@ assert y ≢ (int)0xfffffffffffffff; */
-  e_acsl_assert(y != (int)0xfffffffffffffff,(char *)"Assertion",
-                (char *)"main",(char *)"y != (int)0xfffffffffffffff",17);
+  __e_acsl_assert(y != (int)0xfffffffffffffff,(char *)"Assertion",
+                  (char *)"main",(char *)"y != (int)0xfffffffffffffff",17);
   /*@ assert (unsigned int)y ≢ (unsigned int)0xfffffffffffffff; */
-  e_acsl_assert((unsigned int)y != (unsigned int)0xfffffffffffffff,
-                (char *)"Assertion",(char *)"main",
-                (char *)"(unsigned int)y != (unsigned int)0xfffffffffffffff",
-                18);
+  __e_acsl_assert((unsigned int)y != (unsigned int)0xfffffffffffffff,
+                  (char *)"Assertion",(char *)"main",
+                  (char *)"(unsigned int)y != (unsigned int)0xfffffffffffffff",
+                  18);
   __retres = 0;
   return __retres;
 }

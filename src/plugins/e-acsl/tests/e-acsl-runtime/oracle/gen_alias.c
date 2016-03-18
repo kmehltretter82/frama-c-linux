@@ -17,14 +17,15 @@ int main(void)
 {
   int __retres;
   int i;
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __store_block((void *)(& i),4UL);
   f(& i,255);
   /*@ assert \initialized(&i); */
   {
     int __e_acsl_initialized;
     __e_acsl_initialized = __initialized((void *)(& i),sizeof(int));
-    e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"main",
-                  (char *)"\\initialized(&i)",14);
+    __e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"main",
+                    (char *)"\\initialized(&i)",14);
   }
   __retres = 0;
   __delete_block((void *)(& i));

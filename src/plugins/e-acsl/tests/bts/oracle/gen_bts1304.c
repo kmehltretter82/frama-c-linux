@@ -29,6 +29,7 @@ int main(void)
   int __retres;
   unsigned char buf[sizeof(union msg)];
   int i;
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __store_block((void *)(buf),16UL);
   i = 0;
   while ((unsigned long)i < sizeof(buf) / (unsigned long)4) {
@@ -39,9 +40,9 @@ int main(void)
   {
     int __e_acsl_initialized;
     __e_acsl_initialized = __initialized((void *)(buf),sizeof(union msg));
-    e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"main",
-                  (char *)"\\initialized((union msg *)((unsigned char *)buf))",
-                  23);
+    __e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"main",
+                    (char *)"\\initialized((union msg *)((unsigned char *)buf))",
+                    23);
   }
   __retres = 0;
   __delete_block((void *)(buf));

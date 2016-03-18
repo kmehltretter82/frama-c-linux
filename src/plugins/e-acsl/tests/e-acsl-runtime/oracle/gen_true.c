@@ -6,7 +6,7 @@ int main(void)
   x = 0;
   x ++;
   /*@ assert \true; */
-  e_acsl_assert(1,(char *)"Assertion",(char *)"main",(char *)"\\true",8);
+  __e_acsl_assert(1,(char *)"Assertion",(char *)"main",(char *)"\\true",8);
   __retres = 0;
   return __retres;
 }

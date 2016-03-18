@@ -20,19 +20,19 @@ void __e_acsl_loop(void)
 {
   {
     int __e_acsl_valid;
-    e_acsl_assert(global_i == 0,(char *)"Precondition",(char *)"loop",
-                  (char *)"global_i == 0",9);
+    __e_acsl_assert(global_i == 0,(char *)"Precondition",(char *)"loop",
+                    (char *)"global_i == 0",9);
     __e_acsl_valid = __valid((void *)global_i_ptr,sizeof(int));
-    e_acsl_assert(__e_acsl_valid,(char *)"Precondition",(char *)"loop",
-                  (char *)"\\valid(global_i_ptr)",10);
-    e_acsl_assert(global_i_ptr == & global_i,(char *)"Precondition",
-                  (char *)"loop",(char *)"global_i_ptr == &global_i",11);
+    __e_acsl_assert(__e_acsl_valid,(char *)"Precondition",(char *)"loop",
+                    (char *)"\\valid(global_i_ptr)",10);
+    __e_acsl_assert(global_i_ptr == & global_i,(char *)"Precondition",
+                    (char *)"loop",(char *)"global_i_ptr == &global_i",11);
     loop();
   }
   return;
 }
 
-void __e_acsl_memory_init(void)
+void __e_acsl_globals_init(void)
 {
   __store_block((void *)(& global_i_ptr),8UL);
   __full_init((void *)(& global_i_ptr));
@@ -44,7 +44,8 @@ void __e_acsl_memory_init(void)
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init();
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
+  __e_acsl_globals_init();
   __e_acsl_loop();
   __retres = 0;
   __delete_block((void *)(& global_i_ptr));
