@@ -20,45 +20,50 @@
 /*                                                                        */
 /**************************************************************************/
 
-#include <errno.h>
-#include <unistd.h>
-#include "stdlib.h"
-#include "stdbool.h"
-#include "math.h"
-#include "e_acsl_mmodel_api.h"
-#include "e_acsl_bittree.h"
-#include "e_acsl_mmodel.h"
-#include "../e_acsl_printf.h"
+#ifndef E_ACSL_BITTREE
+#define E_ACSL_BITTREE
+
+#include <stdbool.h>
+
+#include "e_acsl_malloc.h"
+#include "e_acsl_syscall.h"
+#include "e_acsl_printf.h"
+#include "e_acsl_assert.h"
+#include "e_acsl_adt_api.h"
+
+#define WORDBITS __WORDSIZE
+
+static size_t mask(size_t, size_t);
 
 #if WORDBITS == 16
 
-const size_t Tmasks[] = {
+static const size_t Tmasks[] = {
 0x0,0x8000,0xc000,0xe000,0xf000,0xf800,0xfc00,0xfe00,0xff00,0xff80,0xffc0,
 0xffe0,0xfff0,0xfff8,0xfffc,0xfffe,0xffff};
 
-const int Teq[] = {0,-1,3,-3,6,-5,7,-7,12,-9,11,-11,14,-13,15,16,-16};
-const int Tneq[] = {0,0,1,-2,2,-4,5,-6,4,-8,9,-10,10,-12,13,-14,-15};
+static const int Teq[] = {0,-1,3,-3,6,-5,7,-7,12,-9,11,-11,14,-13,15,16,-16};
+static const int Tneq[] = {0,0,1,-2,2,-4,5,-6,4,-8,9,-10,10,-12,13,-14,-15};
 
 #elif WORDBITS == 32
 
-const size_t Tmasks[] = {
+static const size_t Tmasks[] = {
 0x0,0x80000000,0xc0000000,0xe0000000,0xf0000000,0xf8000000,0xfc000000,
 0xfe000000,0xff000000,0xff800000,0xffc00000,0xffe00000,0xfff00000,0xfff80000,
 0xfffc0000,0xfffe0000,0xffff0000,0xffff8000,0xffffc000,0xffffe000,0xfffff000,
 0xfffff800,0xfffffc00,0xfffffe00,0xffffff00,0xffffff80,0xffffffc0,0xffffffe0,
 0xfffffff0,0xfffffff8,0xfffffffc,0xfffffffe,0xffffffff};
 
-const int Teq[] =
+static const int Teq[] =
   { 0,-1,3,-3,6,-5,7,-7,12,-9,11,-11,14,-13,15,-15,24,-17,19,-19,22,
     -21,23,-23,28,-25,27,-27,30,-29,31,32,-32 };
 
-const int Tneq[] =
+static const int Tneq[] =
   { 0,0,1,-2,2,-4,5,-6,4,-8,9,-10,10,-12,13,-14,8,-16,17,-18,18,-20,21,-22,20,
     -24,25,-26,26,-28,29,-30,-31 };
 
 #else /* WORDBITS == 64 */
 
-const size_t Tmasks[] = {
+static const size_t Tmasks[] = {
 0x0,0x8000000000000000,0xc000000000000000,0xe000000000000000,0xf000000000000000,
 0xf800000000000000,0xfc00000000000000,0xfe00000000000000,0xff00000000000000,
 0xff80000000000000,0xffc0000000000000,0xffe0000000000000,0xfff0000000000000,
@@ -76,20 +81,19 @@ const size_t Tmasks[] = {
 0xffffffffffffff80,0xffffffffffffffc0,0xffffffffffffffe0,0xfffffffffffffff0,
 0xfffffffffffffff8,0xfffffffffffffffc,0xfffffffffffffffe,0xffffffffffffffff};
 
-
-const int Teq[] =
+static const int Teq[] =
   { 0,-1,3,-3,6,-5,7,-7,12,-9,11,-11,14,-13,15,-15,24,-17,19,-19,22,-21,23,-23,
     28,-25,27,-27,30,-29,31,-31,48,-33,35,-35,38,-37,39,-39,44,-41,43,-43,46,
     -45,47,-47,56,-49,51,-51,54,-53,55,-55,60,-57,59,-59,62,-61,63,64,-64 };
 
-const int Tneq[] =
+static const int Tneq[] =
   { 0,0,1,-2,2,-4,5,-6,4,-8,9,-10,10,-12,13,-14,8,-16,17,-18,18,-20,21,-22,20,
     -24,25,-26,26,-28,29,-30,16,-32,33,-34,34,-36,37,-38,36,-40,41,-42,42,-44,
     45,-46,40,-48,49,-50,50,-52,53,-54,52,-56,57,-58,58,-60,61,-62,-63 };
 
 #endif
 
-struct bittree {
+static struct bittree {
   _Bool is_leaf;
   size_t addr,  mask;
   struct bittree * left, * right, * father;
@@ -107,7 +111,7 @@ struct bittree {
   @ ensures (a & \result) == (b & \result);
   @ ensures \exists int i; 0 <= i <= WORDBITS && \result == Tmasks[i];
   @*/
-size_t mask(size_t a, size_t b) {
+static size_t mask(size_t a, size_t b) {
   size_t nxor = ~(a ^ b), ret;
   int i = WORDBITS/2; /* dichotomic search, starting in the middle */
   /*cpt_mask++;*/
@@ -144,7 +148,7 @@ size_t mask(size_t a, size_t b) {
   @ ensures \valid(\result);
   @ ensures \result->leaf == ptr;
   @*/
-struct bittree * __get_leaf_from_block (struct _block * ptr) {
+static struct bittree * __get_leaf_from_block (struct _block * ptr) {
   struct bittree * curr = __root;
   assert(__root != NULL);
   assert(ptr != NULL);
@@ -176,7 +180,7 @@ struct bittree * __get_leaf_from_block (struct _block * ptr) {
 /* the block we are looking for has to be in the tree */
 /*@ requires \valid(ptr);
   @*/
-void __remove_element (struct _block * ptr) {
+static void __remove_element (struct _block * ptr) {
   struct bittree * leaf_to_delete = __get_leaf_from_block (ptr);
   assert(leaf_to_delete->leaf == ptr);
 
@@ -199,7 +203,7 @@ void __remove_element (struct _block * ptr) {
       brother->left->father = father;
       brother->right->father = father;
     }
-    free(brother);
+    native_free(brother);
     /* necessary ? -- begin */
     if(father->father != NULL) {
       father->father->mask = mask(father->father->left->addr
@@ -209,7 +213,7 @@ void __remove_element (struct _block * ptr) {
     }
     /* necessary ? -- end */
   }
-  free(leaf_to_delete);
+  native_free(leaf_to_delete);
 }
 
 
@@ -220,7 +224,7 @@ void __remove_element (struct _block * ptr) {
   @ assigns \nothing;
   @ ensures \valid(\result);
   @*/
-struct bittree * __most_similar_node (struct _block * ptr) {
+static struct bittree * __most_similar_node (struct _block * ptr) {
   struct bittree * curr = __root;
   size_t left_prefix, right_prefix;
   assert(ptr != NULL);
@@ -241,16 +245,14 @@ struct bittree * __most_similar_node (struct _block * ptr) {
   }
 }
 
-
-
 /* add a block in the structure */
 /*@ requires \valid(ptr);
   @*/
-void __add_element (struct _block * ptr) {
+static void __add_element (struct _block * ptr) {
   struct bittree * new_leaf;
   assert(ptr != NULL);
 
-  new_leaf = malloc(sizeof(struct bittree));
+  new_leaf = native_malloc(sizeof(struct bittree));
   assert(new_leaf != NULL);
   new_leaf->is_leaf = true;
   new_leaf->addr = ptr->ptr;
@@ -266,7 +268,7 @@ void __add_element (struct _block * ptr) {
     struct bittree * brother = __most_similar_node (ptr), * father, * aux;
 
     assert(brother != NULL);
-    father = malloc(sizeof(struct bittree));
+    father = native_malloc(sizeof(struct bittree));
     assert(father != NULL);
     father->is_leaf = false;
     father->addr = brother->addr & new_leaf->addr;
@@ -309,14 +311,13 @@ void __add_element (struct _block * ptr) {
   }
 }
 
-
 /* return the block B such as: begin addr of B == ptr if such a block exists,
    return NULL otherwise */
 /*@ assigns \nothing;
   @ ensures \valid(\result);
   @ ensures \result == \null || \result->ptr == (size_t)ptr;
   @*/
-struct _block * __get_exact (void * ptr) {
+static struct _block * __get_exact (void * ptr) {
   struct bittree * tmp = __root;
   assert(__root != NULL);
   assert(ptr != NULL);
@@ -342,11 +343,10 @@ struct _block * __get_exact (void * ptr) {
   return tmp->leaf;
 }
 
-
 /* return the block B containing ptr, such as :
    begin addr of B <= ptr < (begin addr + size) of B
    or NULL if such a block does not exist */
-struct _block * __get_cont (void * ptr) {
+static struct _block * __get_cont (void * ptr) {
   struct bittree * tmp = __root;
   if(__root == NULL || ptr == NULL) return NULL;
 
@@ -409,7 +409,7 @@ struct _block * __get_cont (void * ptr) {
 
 /* called from __clean_struct */
 /* recursively erase the content of the structure */
-void __clean_rec (struct bittree * ptr) {
+static void __clean_rec (struct bittree * ptr) {
   if(ptr == NULL) return;
   else if(ptr->is_leaf) {
     __clean_block(ptr->leaf);
@@ -420,44 +420,46 @@ void __clean_rec (struct bittree * ptr) {
     __clean_rec(ptr->right);
     ptr->left = ptr->right = NULL;
   }
-  free(ptr);
+  native_free(ptr);
 }
 
 /* erase the content of the structure */
-void __clean_struct () {
+static void __clean_struct () {
   __clean_rec(__root);
   __root = NULL;
-  /*printf("%i &\n", cpt_mask);*/
 }
 
 /*********************/
 /* DEBUG             */
 /*********************/
 
+#ifdef E_ACSL_DEBUG
 /* called from __debug_struct */
 /* recursively print the content of the structure */
 /*@ assigns \nothing;
   @*/
-void __debug_rec (struct bittree * ptr, int depth) {
+static void debug_rec (struct bittree * ptr, int depth) {
   int i;
   if(ptr == NULL)
     return;
   for(i = 0; i < depth; i++)
-    printf("  ");
+    DLOG("  ");
   if(ptr->is_leaf)
-    __print_block(ptr->leaf);
+    __e_acsl_print_block(ptr->leaf);
   else {
-    printf("%p -- %p\n", (void*)ptr->mask, (void*)ptr->addr);
-    __debug_rec(ptr->left, depth+1);
-    __debug_rec(ptr->right, depth+1);
+    DLOG("%p -- %p\n", (void*)ptr->mask, (void*)ptr->addr);
+    debug_rec(ptr->left, depth+1);
+    debug_rec(ptr->right, depth+1);
   }
 }
 
 /* print the content of the structure */
 /*@ assigns \nothing;
   @*/
-void __debug_struct () {
-  printf("------------DEBUG\n");
-  __debug_rec(__root, 0);
-  printf("-----------------\n");
+static void debug_struct () {
+  DLOG("------------DEBUG\n");
+  debug_rec(__root, 0);
+  DLOG("-----------------\n");
 }
+#endif
+#endif

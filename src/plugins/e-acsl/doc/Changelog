@@ -15,6 +15,9 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
+-* E-ACSL       [2016/01/15] Fixed several bugs related to incorrect partial
+	        initialization of tracked memory blocks in the E-ACSL runtime
+	        library.
 -* E-ACSL       [2016/02/25] Fix 'make clean' in tests.
 
 ###########################

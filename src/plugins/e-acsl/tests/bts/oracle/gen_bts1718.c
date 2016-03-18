@@ -4,6 +4,7 @@ int main(void)
   int __retres;
   int a;
   int *p;
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __store_block((void *)(& p),8UL);
   __store_block((void *)(& a),4UL);
   __full_init((void *)(& a));
@@ -21,8 +22,8 @@ int main(void)
         __e_acsl_and = __e_acsl_valid;
       }
       else __e_acsl_and = 0;
-      e_acsl_assert(__e_acsl_and,(char *)"Assertion",(char *)"main",
-                    (char *)"\\valid(p)",13);
+      __e_acsl_assert(__e_acsl_and,(char *)"Assertion",(char *)"main",
+                      (char *)"\\valid(p)",13);
     }
     __retres = 0;
     goto return_label;

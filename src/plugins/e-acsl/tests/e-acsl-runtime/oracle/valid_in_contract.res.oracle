@@ -1,4 +1,4 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
-FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] warning: function e_acsl_assert: precondition got status unknown.
+FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] warning: function __e_acsl_assert: precondition got status unknown.
 tests/e-acsl-runtime/valid_in_contract.c:19:[kernel] warning: out of bounds read. assert \valid_read(&l->next);

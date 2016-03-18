@@ -33,9 +33,7 @@ let library_files () =
     [ "e_acsl.h";
       "e_acsl_gmp_types.h";
       "e_acsl_gmp.h";
-      "memory_model/e_acsl_mmodel_api.h";
-      "memory_model/e_acsl_bittree.h";
-      "memory_model/e_acsl_mmodel.h" ]
+      "e_acsl_mmodel_api.h" ]
 
 let normalized_library_files = 
   lazy (List.map Filepath.normalize (library_files ()))
@@ -124,7 +122,7 @@ let get_orig_name kf =
   else
     name
 
-let e_acsl_guard_name = "e_acsl_assert"
+let e_acsl_guard_name = "__e_acsl_assert"
 
 (* Build a C conditional doing a runtime assertion check. *)
 let mk_e_acsl_guard ?(reverse=false) kind kf e p =
@@ -234,9 +232,9 @@ let mk_delete_stmt vi =
   in
   mk_debug_mmodel_stmt stmt
 
-let mk_literal_string vi =
+let mk_readonly vi =
   let loc = vi.vdecl in
-  let stmt = mk_call ~loc "__literal_string" [ Cil.evar ~loc vi ] in
+  let stmt = mk_call ~loc "__readonly" [ Cil.evar ~loc vi ] in
   mk_debug_mmodel_stmt stmt
 
 (* ************************************************************************** *)

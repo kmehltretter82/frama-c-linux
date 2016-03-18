@@ -7,19 +7,19 @@ int __e_acsl_main(void)
   goto L1;
   L1:
     /*@ assert X ≡ 0; */
-    e_acsl_assert(X == 0,(char *)"Assertion",(char *)"main",(char *)"X == 0",
-                  10);
+    __e_acsl_assert(X == 0,(char *)"Assertion",(char *)"main",
+                    (char *)"X == 0",10);
     X = 1;
   goto L2;
   L2:
     /*@ requires X ≡ 1;
         ensures X ≡ 2; */
     {
-      e_acsl_assert(X == 1,(char *)"Precondition",(char *)"main",
-                    (char *)"X == 1",12);
+      __e_acsl_assert(X == 1,(char *)"Precondition",(char *)"main",
+                      (char *)"X == 1",12);
       X = 2;
-      e_acsl_assert(X == 2,(char *)"Postcondition",(char *)"main",
-                    (char *)"X == 2",12);
+      __e_acsl_assert(X == 2,(char *)"Postcondition",(char *)"main",
+                      (char *)"X == 2",12);
     }
   if (X) {
     X = 3;
@@ -35,8 +35,8 @@ int main(void)
 {
   int __retres;
   __retres = __e_acsl_main();
-  e_acsl_assert(X == 3,(char *)"Postcondition",(char *)"main",
-                (char *)"X == 3",7);
+  __e_acsl_assert(X == 3,(char *)"Postcondition",(char *)"main",
+                  (char *)"X == 3",7);
   return __retres;
 }
 

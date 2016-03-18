@@ -5,6 +5,7 @@ int main(void)
   int *a;
   int *b;
   int n;
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __store_block((void *)(& b),8UL);
   __store_block((void *)(& a),8UL);
   n = 0;
@@ -33,8 +34,8 @@ int main(void)
       __e_acsl_and_3 = ! __e_acsl_and_2;
     }
     else __e_acsl_and_3 = 0;
-    e_acsl_assert(__e_acsl_and_3,(char *)"Assertion",(char *)"main",
-                  (char *)"!\\valid(a) && !\\valid(b)",10);
+    __e_acsl_assert(__e_acsl_and_3,(char *)"Assertion",(char *)"main",
+                    (char *)"!\\valid(a) && !\\valid(b)",10);
   }
   __full_init((void *)(& a));
   a = (int *)__e_acsl_malloc(sizeof(int));
@@ -67,8 +68,8 @@ int main(void)
       __e_acsl_and_6 = __e_acsl_and_5;
     }
     else __e_acsl_and_6 = 0;
-    e_acsl_assert(__e_acsl_and_6,(char *)"Assertion",(char *)"main",
-                  (char *)"\\valid(a) && \\valid(b)",14);
+    __e_acsl_assert(__e_acsl_and_6,(char *)"Assertion",(char *)"main",
+                    (char *)"\\valid(a) && \\valid(b)",14);
   }
   /*@ assert *b ≡ n; */
   {
@@ -81,10 +82,10 @@ int main(void)
       __e_acsl_and_7 = __e_acsl_valid_read;
     }
     else __e_acsl_and_7 = 0;
-    e_acsl_assert(__e_acsl_and_7,(char *)"RTE",(char *)"main",
-                  (char *)"mem_access: \\valid_read(b)",15);
-    e_acsl_assert(*b == n,(char *)"Assertion",(char *)"main",
-                  (char *)"*b == n",15);
+    __e_acsl_assert(__e_acsl_and_7,(char *)"RTE",(char *)"main",
+                    (char *)"mem_access: \\valid_read(b)",15);
+    __e_acsl_assert(*b == n,(char *)"Assertion",(char *)"main",
+                    (char *)"*b == n",15);
   }
   __e_acsl_free((void *)b);
   /*@ assert ¬\valid(a) ∧ ¬\valid(b); */
@@ -114,8 +115,8 @@ int main(void)
       __e_acsl_and_10 = ! __e_acsl_and_9;
     }
     else __e_acsl_and_10 = 0;
-    e_acsl_assert(__e_acsl_and_10,(char *)"Assertion",(char *)"main",
-                  (char *)"!\\valid(a) && !\\valid(b)",17);
+    __e_acsl_assert(__e_acsl_and_10,(char *)"Assertion",(char *)"main",
+                    (char *)"!\\valid(a) && !\\valid(b)",17);
   }
   __retres = 0;
   __delete_block((void *)(& b));

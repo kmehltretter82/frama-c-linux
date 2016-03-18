@@ -22,8 +22,8 @@ int *__e_acsl_f(int *x, int *y)
   {
     int __e_acsl_valid;
     __e_acsl_valid = __valid((void *)__retres,sizeof(int));
-    e_acsl_assert(__e_acsl_valid,(char *)"Postcondition",(char *)"f",
-                  (char *)"\\valid(\\result)",10);
+    __e_acsl_assert(__e_acsl_valid,(char *)"Postcondition",(char *)"f",
+                    (char *)"\\valid(\\result)",10);
     __delete_block((void *)(& x));
     __delete_block((void *)(& y));
     __delete_block((void *)(& __retres));
@@ -38,6 +38,7 @@ int main(void)
   int *p;
   int *q;
   int *r;
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __store_block((void *)(& q),8UL);
   __store_block((void *)(& p),8UL);
   __store_block((void *)(& x),4UL);

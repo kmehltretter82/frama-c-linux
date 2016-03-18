@@ -48,7 +48,7 @@ check_tool() {
 LONGOPTIONS="help,compile,compile-only,print,debug:,ocode:,oexec:,verbose:, \
   frama-c-only,extra-cpp-args:,frama-c-stdlib,full-mmodel,gmp,quiet,logfile:,
   ld-flags:,cpp-flags:,frama-c-extra:,memory-model:,production,no-stdlib,
-  debug-log:,frama-c:,gcc:"
+  debug-log:,frama-c:,gcc:,e-acsl-share:"
 SHORTOPTIONS="h,c,C,p,d:,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,P,N,D:I:G:"
 # Prefix for an error message due to wrong arguments
 ERROR="ERROR parsing arguments:"
@@ -74,7 +74,8 @@ OPTION_GMP=                              # Use GMP integers everywhere
 OPTION_DEBUG_MACRO="-DE_ACSL_DEBUG"      # Debug macro
 OPTION_DEBUG_LOG_MACRO=""                # Specification of debug log file
 OPTION_FRAMAC_CPP_EXTRA=""               # Extra CPP flags for Frama-C
-OPTION_EACSL_MMODEL="bittree"            # Memory model used
+OPTION_EACSL_MMODELS="bittree"           # Memory model used
+OPTION_EACSL_SHARE=                      # Custom E-ACSL share directory
 # The following option controls whether to use gcc builtins
 # (e.g., __builtin_strlen) in RTL or fall back to custom implementations
 # of standard functions.
@@ -105,6 +106,9 @@ Notes:
   See man (1) e-acsl-gcc.sh for full up-to-date documentation.\n"
   exit 1
 }
+
+# Base dir of this script
+BASEDIR=$(readlink -f `dirname $0`)
 
 # See if pygmentize if available for color highlighting and default to plain
 # cat command otherwise
@@ -270,12 +274,18 @@ do
       OPTION_CC="$1"
       shift;
     ;;
-    # A memory model to link against
+    # Specify EACSL_SHARE directory (where C runtime library lives) by hand
+    # rather than compute it
+    --e-acsl-share)
+      shift;
+      OPTION_EACSL_SHARE="$1"
+      shift;
+    ;;
+    # A memory model  (or models) to link against
     -m|--memory-model)
       shift;
-      echo $1 | grep "\(tree\|bittree\|splay_tree\|list\)"
-      error "no such memory model: $1" $?
-      OPTION_EACSL_MMODEL="$1"
+      # Convert comma-separated string into white-space separated string
+      OPTION_EACSL_MMODELS="`echo $1 | sed -s 's/,/ /g'`"
       shift;
     ;;
   esac
@@ -285,6 +295,11 @@ shift;
 # Bail if no files to translate are given
 if [ -z "$1" ]; then
   error "no input files";
+fi
+
+# Check if this is `development' of installed version.
+if [ -f "$BASEDIR/../E_ACSL.mli" ]; then
+  DEVELOPMENT=1
 fi
 
 # Architecture-dependent flags. Since by default Frama-C uses 32-bit
@@ -313,8 +328,50 @@ FRAMAC_CPP_EXTRA="
   -D$EACSL_MACRO_ID
   -I$FRAMAC_SHARE/libc
   $CPPMACHDEP"
-EACSL_SHARE="$FRAMAC_SHARE/e-acsl"
 EACSL_MMODEL="$OPTION_EACSL_MMODEL"
+
+# E-ACSL share directory
+# If specified explicitly via the --e-acsl-share option than use that ...
+if [ -n "$OPTION_EACSL_SHARE" ]; then
+  EACSL_SHARE="$OPTION_EACSL_SHARE"
+# ... otherwise compute it
+else
+  # Installed version path
+  if [ -z "$DEVELOPMENT" ]; then
+    EACSL_SHARE="$BASEDIR/../share/frama-c/e-acsl/"
+  # Development version path
+  else
+    EACSL_SHARE="$BASEDIR/../share/e-acsl"
+  fi
+fi
+
+# Check if the E-ACSL share directory is indeed an E-ACSL share directory that
+# contains required C code. The check involves looking up
+# $EACSL_SHARE/e_acsl_mmodel_api.h - one of the headers required by the Frama-C
+# invocation. This is a week check but it is better than nothing.
+error "Cannot find required $EACSL_SHARE/e_acsl_mmodel_api.h header" \
+  `test -f $EACSL_SHARE/e_acsl_mmodel_api.h; echo $?`
+
+# Echo the name of the source file corresponding to the name of a memory model
+# or report an error of the given model does not exist.
+mmodel_sources() {
+  model=""
+  case "$1" in
+    bittree) model="bittree_model/e_acsl_bittree_mmodel.c" ;;
+    *) error "Memory model '$1' does not exist" ;;
+  esac
+  model="$EACSL_SHARE/$model"
+  if ! [ -f "$model" ]; then
+    error "Memory model '$1' exists but not available in this distribution"
+  else
+    echo "$model"
+  fi
+}
+
+# Once EACSL_SHARE is defined check the memory models provided at inputs
+for mod in $OPTION_EACSL_MMODELS; do
+  mmodel_sources $mod > /dev/null
+done
 
 # Macro that identifies E-ACSL compilation. Passed to Frama-C
 # and GCC runs but not to the original compilation
@@ -327,6 +384,7 @@ CFLAGS="$OPTION_CFLAGS
   -Wall \
   -Wno-long-long \
   -Wno-attributes \
+  -Wno-undef \
   -Wno-unused \
   -Wno-unused-function \
   -Wno-unused-result \
@@ -335,12 +393,17 @@ CFLAGS="$OPTION_CFLAGS
   -Wno-unused-variable \
   -Wno-unused-but-set-variable \
   -Wno-implicit-function-declaration \
-  -Wno-unknown-warning-option \
-  -Wno-extra-semi \
-  -Wno-tautological-compare \
-  -Wno-gnu-empty-struct \
-  -Wno-incompatible-pointer-types-discards-qualifiers \
   -Wno-empty-body"
+
+# Disable extra warning for clang
+if [ "`basename $CC`" = 'clang' ]; then
+  CFLAGS="-Wno-unknown-warning-option \
+    -Wno-extra-semi \
+    -Wno-tautological-compare \
+    -Wno-gnu-empty-struct \
+    -Wno-incompatible-pointer-types-discards-qualifiers"
+fi
+
 CPPFLAGS="$OPTION_CPPFLAGS"
 LDFLAGS="$OPTION_LDFLAGS"
 
@@ -351,10 +414,6 @@ EACSL_CPPFLAGS="
   -D$EACSL_MACRO_ID
   -D__FC_errno=(*__errno_location())"
 EACSL_LDFLAGS="-lgmp -lm"
-# Memory model sources
-EACSL_RTL="$EACSL_SHARE/e_acsl.c \
-  $EACSL_SHARE/memory_model/e_acsl_mmodel.c \
-  $EACSL_SHARE/memory_model/e_acsl_$OPTION_EACSL_MMODEL.c"
 
 # Output file names
 OUTPUT_CODE="$OPTION_OUTPUT_CODE" # E-ACSL instrumented source
@@ -396,18 +455,30 @@ if [ -n "$OPTION_COMPILE" ]; then
   else
     OUTPUT_CODE="$@"
   fi
-  # Compile and link E-ACSL-instrumented file
-  ($OPTION_ECHO;
-   $CC \
-     $CFLAGS $CPPFLAGS \
-     $EACSL_CFLAGS $EACSL_CPPFLAGS \
-     $EACSL_RTL \
-     $OPTION_DEBUG_MACRO \
-     $OPTION_DEBUG_LOG_MACRO \
-     $OPTION_BUILTINS \
-     -o "$EACSL_OUTPUT_EXEC" \
-     "$OUTPUT_CODE" \
-     $LDFLAGS $EACSL_LDFLAGS)
-  error "fail to compile/link instrumented code: $@" $?;
+  # Compile and link E-ACSL-instrumented file with all models specified
+  for mod in $OPTION_EACSL_MMODELS; do
+    # If multiple models are specified then the generated executable
+    # is appended a '-MODEL' suffix, where MODEL is the name of the memory
+    # model used
+    if ! [ "`echo $OPTION_EACSL_MMODELS | wc -w`" = 1 ]; then
+      OUTPUT_EXEC="$EACSL_OUTPUT_EXEC-$mod"
+    else
+      OUTPUT_EXEC="$EACSL_OUTPUT_EXEC"
+    fi
+    # Sources of the selected memory model
+    EACSL_RTL=`mmodel_sources "$mod"`
+    ($OPTION_ECHO;
+     $CC \
+       $CFLAGS $CPPFLAGS \
+       $EACSL_CFLAGS $EACSL_CPPFLAGS \
+       $EACSL_RTL \
+       $OPTION_DEBUG_MACRO \
+       $OPTION_DEBUG_LOG_MACRO \
+       $OPTION_BUILTINS \
+       -o "$OUTPUT_EXEC" \
+       "$OUTPUT_CODE" \
+       $LDFLAGS $EACSL_LDFLAGS)
+    error "fail to compile/link instrumented code: $@" $?;
+  done
 fi
 exit 0;

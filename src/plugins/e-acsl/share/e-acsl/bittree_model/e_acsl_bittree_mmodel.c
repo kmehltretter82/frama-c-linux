@@ -3,7 +3,7 @@
 /*  This file is part of the Frama-C's E-ACSL plug-in.                    */
 /*                                                                        */
 /*  Copyright (C) 2012-2016                                               */
-/*    CEA (Commissariat à l'énergie atomique et aux énergies              */
+/*    CEA (Commissariat Ã  l'Ã©nergie atomique et aux Ã©nergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
 /*  you can redistribute it and/or modify it under the terms of the GNU   */
@@ -20,11 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef E_ACSL_BITTREE
-#define E_ACSL_BITTREE
-
-#include "stdlib.h"
-
-size_t mask(size_t, size_t);
-
+#ifndef E_ACSL_BITTREE_MMODEL
+#define E_ACSL_BITTREE_MMODEL
+#  include "e_acsl_adt_mmodel.h"
+#  include "e_acsl_bittree.h"
 #endif

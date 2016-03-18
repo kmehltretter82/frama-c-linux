@@ -69,8 +69,8 @@ struct list *__e_acsl_f(struct list *l)
         int __e_acsl_valid_2;
         __e_acsl_valid_read = __valid_read((void *)(& l->next),
                                            sizeof(struct list *));
-        e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"f",
-                      (char *)"mem_access: \\valid_read(&l->next)",19);
+        __e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"f",
+                        (char *)"mem_access: \\valid_read(&l->next)",19);
         /*@ assert Value: mem_access: \valid_read(&l->next); */
         __e_acsl_valid_2 = __valid((void *)l->next,sizeof(struct list));
         __e_acsl_and = __e_acsl_valid_2;
@@ -91,13 +91,13 @@ struct list *__e_acsl_f(struct list *l)
     int __e_acsl_implies_2;
     if (! __e_acsl_at) __e_acsl_implies = 1;
     else __e_acsl_implies = __retres == __e_acsl_at_2;
-    e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",(char *)"f",
-                  (char *)"\\old(l == \\null) ==> \\result == \\old(l)",16);
+    __e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",(char *)"f",
+                    (char *)"\\old(l == \\null) ==> \\result == \\old(l)",16);
     if (! __e_acsl_at_3) __e_acsl_implies_2 = 1;
     else __e_acsl_implies_2 = __retres == __e_acsl_at_4;
-    e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",(char *)"f",
-                  (char *)"\\old(!\\valid{Here}(l) && !\\valid{Here}(l->next)) ==> \\result == \\old(l)",
-                  20);
+    __e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",(char *)"f",
+                    (char *)"\\old(!\\valid{Here}(l) && !\\valid{Here}(l->next)) ==> \\result == \\old(l)",
+                    20);
     __delete_block((void *)(& l));
     __delete_block((void *)(& __retres));
     return __retres;
@@ -107,6 +107,7 @@ struct list *__e_acsl_f(struct list *l)
 int main(void)
 {
   int __retres;
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_f((struct list *)0);
   __retres = 0;
   __e_acsl_memory_clean();

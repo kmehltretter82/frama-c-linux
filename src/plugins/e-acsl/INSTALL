@@ -43,10 +43,10 @@ See below for more detailed and specific instructions.
   (no warranty that this plug-in works with a more recent version of Frama-C)
 
 - The native version of the plug-in is only available if native dynamic linking
-  feature of OCaml is available on your system (see Frama-C User Manual, 
-  Section 3.1). 
+  feature of OCaml is available on your system (see Frama-C User Manual,
+  Section 3.1).
 - Optionally, the GMP library >= 4.3
-  It is required to run the tests and to run some generated programs, 
+  It is required to run the tests and to run some generated programs,
   but not to run the plug-in through Frama-C.
 
 ===============================================================================
@@ -92,12 +92,28 @@ Object files: (usually in `frama-c -print-plugin-path`)
 
 Shared files: (usually in `frama-c -print-share-path`/e-acsl)
 -------------
-- e_acsl.[ch]
+- e_acsl_assert.h
+- e_acsl_debug.h
 - e_acsl_gmp.h
 - e_acsl_gmp_types.h
-- memory_model/e_acsl_bittree.[ch]
-- memory_model/e_acsl_mmodel.[ch]
-- memory_model/e_acsl_mmodel_api.[h]
+- e_acsl.h
+- e_acsl_mmodel.h
+- e_acsl_printf.h
+- e_acsl_string.h
+- e_acsl_syscall.h
+- glibc/memcpy.c
+- glibc/wordcopy.c
+- glibc/strncmp.c
+- glibc/memcopy.h
+- glibc/pagecopy.h
+- glibc/strlen.c
+- glibc/memmove.c
+- glibc/memset.c
+- glibc/strcmp.c
+- bittree_model/e_acsl_mmodel.c
+- bittree_model/e_acsl_mmodel_api.h
+- bittree_model/e_acsl_bittree.h
+- bittree_model/e_acsl_bittree.c
 
 Manuals: (usually in `frama-c -print-share-path`/manuals)
 --------
@@ -129,7 +145,7 @@ Test your installation by running:
   frama-c.byte -e-acsl tests/e-acsl-runtime/true.i -then-on e-acsl -print
   frama-c -e-acsl tests/e-acsl-runtime/true.i -then-on e-acsl -print
 
-The second command only works if native dynamic linking of OCaml is available 
+The second command only works if native dynamic linking of OCaml is available
 on your system.
 
 ===============================================================================
