@@ -20,37 +20,51 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Type system which computes the smallest C type that fits to contain all the
+    possible values of a given integer term or predicate. Also compute the
+    required casts. *)
+
 open Cil_types
 
 (******************************************************************************)
-(** {2 Typing} *)
+(** {2 Datatypes} *)
 (******************************************************************************)
 
 type integer_ty =
   | Gmp
   | C_type of ikind
+  | Other
+
+val typ_of_integer_ty: integer_ty -> typ
+
+val join: integer_ty -> integer_ty -> integer_ty
+
+(******************************************************************************)
+(** {2 Typing} *)
+(******************************************************************************)
+
+val type_term: ctx:integer_ty -> term -> unit
+(** Compute the type of each subterm of the given term. *)
 
 val type_named_predicate: ?must_clear:bool -> predicate named -> unit
 (** Compute the type of each term of the given predicate. *)
 
-val typ_of_term: term -> typ
+val get_integer_ty: term -> integer_ty
+val get_integer_ty_of_predicate: predicate named -> integer_ty
+
+val get_typ: term -> typ
 (** Get the type of the given term. {!type_named_predicate} must already have
     been called on the englobing predicate. *)
 
-val cast_of_term: term -> typ option
+val get_cast: term -> typ option
 (** Get the type which the given term must be converted to after its translation
     (if any). {!type_named_predicate} must already have been called on the
     englobing predicate. *)
 
+val get_cast_of_predicate: predicate named -> typ option
+
 val clear: unit -> unit
 (** Remove all the previously computed types. *)
-
-(******************************************************************************)
-(** {2 Other typing-related functions} *)
-(******************************************************************************)
-
-val is_representable: Integer.t -> ikind -> bool
-(** Is the given constant representable in the given kind? *)
 
 (******************************************************************************)
 (** {2 Internal stuff} *)

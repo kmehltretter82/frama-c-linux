@@ -310,7 +310,8 @@ module rec Transfer
   let register_object kf state_ref = object
     inherit Visitor.frama_c_inplace
     method !vpredicate = function
-    | Pvalid(_, t) | Pvalid_read(_, t) | Pinitialized(_, t) | Pfreeable(_, t) ->
+    | Pvalid(_, t) | Pvalid_read(_, t) | Pvalid_function t
+    | Pinitialized(_, t) | Pfreeable(_, t) ->
       (*	Options.feedback "REGISTER %a" Cil.d_term t;*)
       state_ref := register_term kf !state_ref t;
       Cil.DoChildren
@@ -318,7 +319,6 @@ module rec Transfer
     | Pfresh _ -> Error.not_yet "\\fresh"
     | Pseparated _ -> Error.not_yet "\\separated"
     | Pdangling _ -> Error.not_yet "\\dangling"
-    | Pvalid_function _ -> Error.not_yet "\\valid_function"
     | Ptrue | Pfalse | Papp _ | Prel _
     | Pand _ | Por _ | Pxor _ | Pimplies _ | Piff _ | Pnot _ | Pif _ 
     | Plet _ | Pforall _ | Pexists _ | Pat _ | Psubtype _ ->

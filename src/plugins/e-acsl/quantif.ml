@@ -29,7 +29,7 @@ let named_predicate_to_exp_ref
     = Extlib.mk_fun "named_predicate_to_exp_ref"
 
 let term_to_exp_ref
-    : (kernel_function -> Env.t -> typ option -> term -> exp * Env.t) ref
+    : (kernel_function -> Env.t -> term -> exp * Env.t) ref
     = Extlib.mk_fun "term_to_exp_ref"
 
 let compute_quantif_guards quantif bounded_vars hyps =
@@ -105,7 +105,7 @@ let compute_quantif_guards quantif bounded_vars hyps =
     Error.untypable msg);
   List.rev acc
 
-let () = Typing.compute_quantif_guards_ref := compute_quantif_guards
+let () = New_typing.compute_quantif_guards_ref := compute_quantif_guards
 
 module Label_ids = 
   State_builder.Counter(struct let name = "E_ACSL.Label_ids" end)
@@ -163,18 +163,24 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
 	 stmts *)
       [ mkStmt ~valid_sid:true (Block blk) ], env
     | (t1, rel1, logic_x, rel2, t2) :: tl ->
+      let ctx =
+        let ty1 = New_typing.get_integer_ty t1 in
+        let ty2 = New_typing.get_integer_ty t2 in
+        New_typing.join ty1 ty2
+      in
+      let ty = New_typing.typ_of_integer_ty ctx in
       let t_plus_one t =
 	Logic_const.term ~loc
 	  (TBinOp(PlusA, t, Logic_const.tinteger ~loc 1))
 	  Linteger
       in
       let t1 = match rel1 with
-	| Rlt -> 
-	  let t = t_plus_one t1 in
-	  Typing.type_term t;
-	  t
-	| Rle -> t1
-	| Rgt | Rge | Req | Rneq -> assert false
+        | Rlt ->
+          let t = t_plus_one t1 in
+          New_typing.type_term ~ctx t;
+          t
+        | Rle -> t1
+        | Rgt | Rge | Req | Rneq -> assert false
       in
       let t2_one, bop2 = match rel2 with
 	| Rlt -> t2, Lt
@@ -185,8 +191,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
 	  t_plus_one t2, Le
 	| Rgt | Rge | Req | Rneq -> assert false
       in
-      Typing.type_term t2_one;
-      let ty = Typing.principal_type t1 t2_one in
+      New_typing.type_term ~ctx t2_one;
       (* loop counter corresponding to the quantified variable *)
       let var_x, x, env = Env.Logic_binding.add ~ty env logic_x in
       let lv_x = var var_x in
@@ -194,11 +199,10 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
 	if Gmpz.is_t ty then Env.add_stmt env (Gmpz.init ~loc x) else env 
       in
       let llv = cvar_to_lvar var_x in
-      if not (Gmpz.is_t ty) then Typing.unsafe_unify ~from:logic_x llv;
       (* build the inner loops and loop body *)
       let body, env = mk_for_loop env tl in
       (* initialize the loop counter to [t1] *)
-      let e1, env = term_to_exp kf (Env.push env) (Some ty) t1 in
+      let e1, env = term_to_exp kf (Env.push env) t1 in
       let init_blk, env = 
 	Env.pop_and_get 
 	  env
@@ -210,8 +214,8 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
       let stmts_block b = [ mkStmt ~valid_sid:true (Block b) ] in
       let tlv = Logic_const.tvar ~loc llv in
       let guard = Logic_const.term ~loc (TBinOp(bop2, tlv, t2)) Linteger in
-      Typing.type_term guard;
-      let guard_exp, env = term_to_exp kf (Env.push env) (Some intType) guard in
+      New_typing.type_term ~ctx:(New_typing.C_type IInt) guard;
+      let guard_exp, env = term_to_exp kf (Env.push env) guard in
       let break_stmt = mkStmt ~valid_sid:true (Break guard_exp.eloc) in
       let guard_blk, env =
 	Env.pop_and_get
@@ -228,8 +232,8 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
       (* increment the loop counter [x++] *)
       let tlv_one = t_plus_one tlv in
       (* previous typing ensures that [x++] fits type [ty] *)
-      Typing.unsafe_set_term tlv_one ty;
-      let incr, env = term_to_exp kf (Env.push env) (Some ty) tlv_one in
+      New_typing.type_term ~ctx tlv_one;
+      let incr, env = term_to_exp kf (Env.push env) tlv_one in
       let next_blk, env = 
 	Env.pop_and_get
 	  env

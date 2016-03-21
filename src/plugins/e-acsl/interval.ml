@@ -49,7 +49,7 @@ let singleton_of_int n =
   let z = Integer.of_int n in
   make z z
 
-let interv_of_typ ty = match Cil.unrollType ty with
+let rec interv_of_typ ty = match Cil.unrollType ty with
   | TInt (k,_) as ty ->
     let n = Cil.bitsSizeOf ty in
     let l, u =
@@ -57,6 +57,7 @@ let interv_of_typ ty = match Cil.unrollType ty with
       else Integer.zero, Cil.max_unsigned_number n
     in
     make l u
+  | TEnum(enuminfo, _) -> interv_of_typ (TInt (enuminfo.ekind, []))
   | _ ->
     raise Not_an_integer
 
@@ -120,6 +121,13 @@ let rec infer env t =
   | TConst (Integer (n,_)) -> make n n
   | TConst (LChr c) ->
     let n = Cil.charConstToInt c in
+    make n n
+  | TConst (LEnum enumitem) ->
+    let rec find_idx n = function
+      | [] -> assert false
+      | ei :: l -> if ei == enumitem then n else find_idx (n + 1) l
+    in
+    let n = Integer.of_int (find_idx 0 enumitem.eihost.eitems) in
     make n n
   | TLval lv -> infer_term_lval env lv
   | TSizeOf ty -> infer_sizeof ty
@@ -228,7 +236,7 @@ let rec infer env t =
   | Trange (_,_) -> Error.not_yet "trange"
   | Tlet (_,_) -> Error.not_yet "let binding"
 
-  | TConst (LStr _ | LWStr _ | LReal _ | LEnum _)
+  | TConst (LStr _ | LWStr _ | LReal _)
   | TBinOp (PlusPI,_,_)
   | TBinOp (IndexPI,_,_)
   | TBinOp (MinusPI,_,_)

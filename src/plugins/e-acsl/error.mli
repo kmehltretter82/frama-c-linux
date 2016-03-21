@@ -22,7 +22,7 @@
 
 (** Handling errors. *)
 
-exception Typing_error of string
+exception New_typing_error of string
 exception Not_yet of string
 
 val untypable: string -> 'a
