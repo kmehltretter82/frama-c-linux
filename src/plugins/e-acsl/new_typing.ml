@@ -219,7 +219,7 @@ let rec type_term env ~ctx t =
       ignore (type_term env ~ctx t2);
       ctx
     | TBinOp ((Lt | Gt | Le | Ge | Eq | Ne), t1, t2) ->
-      assert (compare ctx c_int >= 1);
+      assert (compare ctx c_int >= 0);
       let ctx =
         try
           let i1 = Interval.infer env t1 in
@@ -302,7 +302,7 @@ let rec type_term env ~ctx t =
       Other
 
     | TBinOp ((PlusPI | IndexPI | MinusPI), t1, t2) ->
-(*      Options.feedback "BIN PI"; (* HERE *)*)
+(*      Options.feedback "BIN PI %a ; %a" Printer.pp_term t1 Printer.pp_term t2; (* HERE *)*)
       (* it is a pointer, as well as [t1], while [t2] is a size_t.
          Both [t1] and [t2] must be typed. *)
       ignore (type_term env ~ctx:Other t1);
@@ -438,12 +438,12 @@ let rec type_predicate_named env p =
   coerce ~ctx:c_int ty
 
 let type_term ~ctx t =
-  Options.feedback ~dkey ~level:4 "typing term %a."
-    Printer.pp_term t;
+  Options.feedback ~dkey ~level:4 "typing term '%a' in ctx '%a'."
+    Printer.pp_term t pretty ctx;
   ignore (type_term Interval.Env.empty ~ctx t)
 
 let type_named_predicate ?(must_clear=true) p =
-  Options.feedback ~dkey ~level:3 "typing predicate %a."
+  Options.feedback ~dkey ~level:3 "typing predicate '%a'."
     Printer.pp_predicate_named p;
   if must_clear then Memo.clear ();
   ignore (type_predicate_named Interval.Env.empty p)

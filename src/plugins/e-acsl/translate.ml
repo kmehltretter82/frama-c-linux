@@ -550,7 +550,8 @@ and mmodel_call_with_size ~loc kf name ctx env t =
           | TPtr (t', _) -> Cil.new_exp ~loc (SizeOf t')
           | _ -> assert false
         in
-        [ Misc.mk_call ~loc ~result:(Cil.var v) ("__" ^ name) [ e; sizeof ] ])
+        [ Misc.mk_call
+            ~loc ~result:(Cil.var v) (Misc.mk_api_name name) [ e; sizeof ] ])
   in
   res, env
 
