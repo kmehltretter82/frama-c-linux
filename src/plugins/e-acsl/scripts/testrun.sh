@@ -39,7 +39,7 @@
 #   $3 - if specified this script re-runs test sequence generating using
 #       -e-acsl-gmp-only option
 #   $4 - extra flags for e-acsl-gcc.sh
-#   $5 - debug flag
+#   $5 - debug flag - pring extra messages and retain log files
 
 set -e
 
@@ -50,37 +50,60 @@ EXTRA="$4" # Extra flags for e-acsl-gcc.sh
 DEBUG="$5" # Debug flag
 
 ROOTDIR="`readlink -f $(dirname $0)/../`" # Root directory of the repository
-TESTDIR="$ROOTDIR/tests/$PREFIX"
-RESDIR=$TESTDIR/result # result directory within the test suite
+TESTDIR="$ROOTDIR/tests/$PREFIX" # Test suite directory
+RESDIR=$TESTDIR/result # Result directory within the test suite
 TESTFILE=`ls $TESTDIR/$TEST.[ic]` # Source test file
-MODEL="bittree" # Memory model to link against.
+MODEL="bittree" # Memory model to link against
 
 LOG="$RESDIR/$TEST.testrun" # Base name for log files
 OUT="$RESDIR/gen_$TEST"     # Base name for output
-RUNS=1
+RUNS=1                      # Nth run of `run_test` function
 
+# Print a message if the DEBUG flag is set
 debug() {
   if [ -n "$DEBUG" ]; then
-    echo "$1" 1>&2
+    echo " ** DEBUG: $1" 1>&2
   fi
-}
-
-# Error reporting
-error() {
-  echo "Error: $1" 1>&2
-  debug "See $2 for details"
-  exit 1
 }
 
 # Clean up log/output files unless the DEBUG flag is set
 clean() {
-    if [ -z "$DEBUG" ]; then
-        rm -f $LOG.* $OUT.*
-    fi
+  if [ -z "$DEBUG" ]; then
+    rm -f $LOG.* $OUT.*
+  fi
+}
+
+# Error reporting
+#  $1 - error message
+#  $2 - log file. If supplied the contents of the log file are dumpmed to
+#     STDERR with each line prefixed by ' > '.
+error() {
+  echo "Error: $1" 1>&2
+  if [ -n "$2" ]; then
+    cat $2 2>&1 | sed 's/^/ > /' 1>&2
+    debug "See $2 for details"
+  fi
+  exit 1
 }
 
  # Do clean up on exit
 trap "clean" EXIT HUP INT QUIT TERM
+
+# Run executable and report results
+#  $1 - path to an executable
+#  $2 - file for logging the outputs of the command
+#  $3 - the type of the executable (e.g., original executable
+#    or an executable generated from the instrumented sources)
+run_executable() {
+  local executable="$1"
+  local log="$2"
+  local type="$3"
+
+  debug "Run and log $executable"
+  if ! `$executable > $log 2>&1`; then
+    error "[$3 run]: Runtime failure in test case $TEST:" $log
+  fi
+}
 
 # Instrument the given test using e-acsl-gcc.sh and compare outputs of the
 # executables generated from instrumented and non-instrumented sources
@@ -93,27 +116,26 @@ run_test() {
 
   # Command for instrumenting the source file and compiling the original
   # and the instrumented code
-  EACSL_GCC="./scripts/e-acsl-gcc.sh
-    --compile $TESTFILE --ocode=$ocode --logfile=$logfile
+  EACSL_GCC="./scripts/e-acsl-gcc.sh \
+    --compile $TESTFILE --ocode=$ocode --logfile=$logfile \
     --memory-model=$MODEL --oexec=$oexec $extra"
 
   debug "Run $EACSL_GCC"
   $EACSL_GCC || error "Command $EACSL_GCC failed" "$logfile"
 
   # Log outputs of the generated executables
-  debug "Run and log native execution to $oexeclog.native"
-  $oexec        > $oexeclog.native 2>&1
-  debug "Run and log E-ACSL execution to $oexeclog.e-acsl"
-  $oexec.e-acsl > $oexeclog.e-acsl 2>&1
+  run_executable $oexec         $oexeclog.native "Native"
+  run_executable $oexec.e-acsl  $oexeclog.e-acsl "Instrumented"
 
   ## Make sure that instrumented and uninstrumented programs have same outputs
-  diff $oexeclog.native $oexeclog.e-acsl ||
-    error "Output of programs before and after instrumentation differ" \
-      "output of $oexec and $oexec.e-acsl"
+  debug "Compare outputs of $oexec and $oexec.e-acsl"
+  diff -ur -N $oexeclog.native $oexeclog.e-acsl > $oexeclog.diff 2>&1 || \
+    error "Output of instrumented and original programs differ" $oexeclog.diff
 
   RUNS=$((RUNS+1))
 }
 
+# Run GMP tests if specified
 run_test "$EXTRA"
 if test -n "$GMP"; then
   run_test "--gmp $EXTRA"
