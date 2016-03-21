@@ -250,10 +250,10 @@ let rec type_term env ~ctx t =
     | TCoerce(t', _) ->
       (* in any case, must type the subterms *)
       (try
-         let i = Interval.infer env t in
-        (* nothing to do more: [i] is already more precise than what we could
-           infer from the arguments of the cast. Also, do not type the internal
-           term: possibly it is not even an integer *)
+         let i = Interval.infer env t' in
+         (* nothing to do more: [i] is already more precise than what we could
+            infer from the arguments of the cast. Also, do not type the internal
+            term: possibly it is not even an integer *)
          let ty = ty_of_interv i in
          ignore (type_term env ~ctx:ty t');
          ty

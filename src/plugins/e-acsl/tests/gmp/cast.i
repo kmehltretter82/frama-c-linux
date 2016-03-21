@@ -15,7 +15,7 @@ int main(void) {
   						          to unsigned int */
 
   /*@ assert y != (int)0xfffffffffffffff; */ ; // cast from integer to int
-  /*@ assert (unsigned int) y != (unsigned int)0xfffffffffffffff; */ ; 
+  /*@ assert (unsigned int) y != (unsigned int)0xfffffffffffffff; */ ;
   /* cast from integer to unsigned int */
 
   return 0;

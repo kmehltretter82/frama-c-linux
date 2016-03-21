@@ -100,8 +100,8 @@ let add_cast ~loc ?name env ctx is_mpz_string t_opt e =
   | None -> e, env
   | Some ctx ->
     let ty = Cil.typeOf e in
-    (*  Options.feedback "exp %a in context %a"
-        Printer.pp_exp e Printer.pp_typ ctx;*)
+(*    Options.feedback "exp %a of type %a in context %a"
+      Printer.pp_exp e Printer.pp_typ ty Printer.pp_typ ctx;*)
     if Gmpz.is_t ctx then
       if Gmpz.is_t ty then
         e, env
@@ -137,11 +137,7 @@ let add_cast ~loc ?name env ctx is_mpz_string t_opt e =
         in
         e, env
       else
-        (if Cil.isIntegralType ctx && Cil.isIntegralType ty then
-            Cil.mkCast e (Cil.arithmeticConversion ctx ty)
-         else
-            e),
-        env
+        Cil.mkCastT ~force:false ~e ~oldt:ty ~newt:ctx, env
 
 let constant_to_exp ~loc t = function
   | Integer(n, repr) ->
