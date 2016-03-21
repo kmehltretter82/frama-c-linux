@@ -90,7 +90,7 @@ error() {
   exit 1
 }
 
- # Do a clean-up on exit
+# Do a clean-up on exit
 trap "clean" EXIT HUP INT QUIT TERM
 
 # Run executable and report results
@@ -141,7 +141,7 @@ run_test() {
 
 # Run GMP tests if specified
 run_test "$EXTRA"
-if test -n "$GMP"; then
+if [ -n "$GMP" ]; then
   run_test "--gmp $EXTRA"
 fi
 exit 0
