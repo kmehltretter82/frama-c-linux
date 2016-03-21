@@ -61,6 +61,10 @@ let typ_of_integer_ty = function
 
 let c_int = C_type IInt
 
+let size_t () = match Cil.theMachine.Cil.typeOfSizeOf with
+  | TInt(kind, _) -> C_type kind
+  | _ -> assert false
+
 include Datatype.Make
 (struct
   type t = integer_ty
@@ -302,15 +306,10 @@ let rec type_term env ~ctx t =
       Other
 
     | TBinOp ((PlusPI | IndexPI | MinusPI), t1, t2) ->
-(*      Options.feedback "BIN PI %a ; %a" Printer.pp_term t1 Printer.pp_term t2; (* HERE *)*)
       (* it is a pointer, as well as [t1], while [t2] is a size_t.
          Both [t1] and [t2] must be typed. *)
       ignore (type_term env ~ctx:Other t1);
-      let size_t_kind = match Cil.theMachine.Cil.typeOfSizeOf with
-        | TInt(kind, _) -> kind
-        | _ -> assert false
-      in
-      ignore (type_term env ~ctx:(C_type size_t_kind) t2);
+      ignore (type_term env ~ctx:(size_t ()) t2);
       Other
 
     | Tapp (_,_,_) -> Error.not_yet "logic function application"
@@ -345,9 +344,8 @@ and type_term_offset env = function
   | TField(_, toff)
   | TModel(_, toff) -> type_term_offset env toff
   | TIndex(t, toff) ->
-    (* HERE: Other est faux ? *)
-    Options.feedback "INDEX";
-    ignore (type_term env ~ctx:Other t);
+    (* [t] is an array index which must fits into size_t *)
+    ignore (type_term env ~ctx:(size_t ()) t);
     type_term_offset env toff
 
 let rec type_predicate_named env p =
