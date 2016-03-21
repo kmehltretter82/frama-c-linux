@@ -102,9 +102,9 @@ run_test() {
 
   # Log outputs of the generated executables
   debug "Run and log native execution to $oexeclog.native"
-  $oexec        2>&1 > $oexeclog.native || true
+  $oexec        > $oexeclog.native 2>&1
   debug "Run and log E-ACSL execution to $oexeclog.e-acsl"
-  $oexec.e-acsl 2>&1 > $oexeclog.e-acsl || true
+  $oexec.e-acsl > $oexeclog.e-acsl 2>&1
 
   ## Make sure that instrumented and uninstrumented programs have same outputs
   diff $oexeclog.native $oexeclog.e-acsl ||
