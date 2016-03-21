@@ -24,30 +24,34 @@
 
 # Convenience script for running tests with E-ACSL. Given a source file the
 # sequence is as follows:
-#   1. Perform E-ACSL instrumentation
-#   2. Compile instrumented and original files
-#   3. Compare outputs of the above
+#   1. Instrument and compile a given source file with `e-acsl-gcc.sh`
+#   2. Run executables generated from the instrumented and original sources
+#      and compare their outputs
+
+# Test failure is detected if:
+#   - `e-acsl-gcc.sh` fails (i.e., instrumentation- or compile-time failure)
+#   - A generated executable exists with a non-zero status
+#   - Outputs produced by executables generated from the original and
+#     instrumented sources differ
 
 # Arguments:
-#   $1 - base name of the source file to use excluding an
-#     extension (e.g., addrOf)
-#   $2 - base name of the test suite directory the test file is located in.
-#     (for instance e-acsl-runtime). Provided that ROOT is the directory
-#     holding the E-ACSL repository there should be either:
-#     $ROOT/test/e-acsl-runtime/addrOf.i or
-#     $ROOT/test/e-acsl-runtime/addrOf.c
-#   $3 - if specified this script re-runs test sequence generating using
-#       -e-acsl-gmp-only option
-#   $4 - extra flags for e-acsl-gcc.sh
-#   $5 - debug flag - pring extra messages and retain log files
+#   $1 - base name of a test source file excluding its extension (e.g., addrOf)
+#   $2 - base name of a test suite directory the test file is located in
+#     (e.g., e-acsl-runtime). Provided that ROOT is the directory
+#     holding an E-ACSL repository there should be either:
+#       * $ROOT/test/e-acsl-runtime/addrOf.i or
+#       * $ROOT/test/e-acsl-runtime/addrOf.c
+#   $3 - if specified, re-run test sequence with -e-acsl-gmp-only flag
+#   $4 - extra flags for a `e-acsl-gcc.sh` run
+#   $5 - if specified print extra messages and retain log files (DEBUG option)
 
 set -e
 
-TEST="$1" # Based name of the test file with extension stripped
-PREFIX="$2" # Prefix (test suite) directory, e.g., bts, e-acsl-runtime
-GMP="$3" # Whether to use a subsequent run with -e-acsl-gmp-only
-EXTRA="$4" # Extra flags for e-acsl-gcc.sh
-DEBUG="$5" # Debug flag
+TEST="$1"   # Base name of the test file
+PREFIX="$2" # Test suite directory (e.g., e-acsl-runtime)
+GMP="$3"    # Whether to issue an additional run with -e-acsl-gmp-only
+EXTRA="$4"  # Extra e-acsl-gcc.sh flags
+DEBUG="$5"  # Debug option
 
 ROOTDIR="`readlink -f $(dirname $0)/../`" # Root directory of the repository
 TESTDIR="$ROOTDIR/tests/$PREFIX" # Test suite directory
@@ -56,7 +60,7 @@ TESTFILE=`ls $TESTDIR/$TEST.[ic]` # Source test file
 MODEL="bittree" # Memory model to link against
 
 LOG="$RESDIR/$TEST.testrun" # Base name for log files
-OUT="$RESDIR/gen_$TEST"     # Base name for output
+OUT="$RESDIR/gen_$TEST"     # Base name for instrumented files
 RUNS=1                      # Nth run of `run_test` function
 
 # Print a message if the DEBUG flag is set
@@ -66,7 +70,7 @@ debug() {
   fi
 }
 
-# Clean up log/output files unless the DEBUG flag is set
+# Clean up log/output files unless DEBUG is set
 clean() {
   if [ -z "$DEBUG" ]; then
     rm -f $LOG.* $OUT.*
@@ -75,7 +79,7 @@ clean() {
 
 # Error reporting
 #  $1 - error message
-#  $2 - log file. If supplied the contents of the log file are dumpmed to
+#  $2 - log file. If supplied, the contents of the log file are dumped to
 #     STDERR with each line prefixed by ' > '.
 error() {
   echo "Error: $1" 1>&2
@@ -86,14 +90,14 @@ error() {
   exit 1
 }
 
- # Do clean up on exit
+ # Do a clean-up on exit
 trap "clean" EXIT HUP INT QUIT TERM
 
 # Run executable and report results
 #  $1 - path to an executable
-#  $2 - file for logging the outputs of the command
-#  $3 - the type of the executable (e.g., original executable
-#    or an executable generated from the instrumented sources)
+#  $2 - path to a log file
+#  $3 - type of the executable (i.e., generated from original or instrumented
+#    sources)
 run_executable() {
   local executable="$1"
   local log="$2"
@@ -127,7 +131,7 @@ run_test() {
   run_executable $oexec         $oexeclog.native "Native"
   run_executable $oexec.e-acsl  $oexeclog.e-acsl "Instrumented"
 
-  ## Make sure that instrumented and uninstrumented programs have same outputs
+  # Make sure that instrumented and uninstrumented programs have same outputs
   debug "Compare outputs of $oexec and $oexec.e-acsl"
   diff -ur -N $oexeclog.native $oexeclog.e-acsl > $oexeclog.diff 2>&1 || \
     error "Output of instrumented and original programs differ" $oexeclog.diff
