@@ -20,27 +20,34 @@
 /*                                                                        */
 /**************************************************************************/
 
+/*! ***********************************************************************
+ * \file  e_acsl_assert.h
+ * \brief E-ACSL assertions and abort statements.
+***************************************************************************/
+
 #ifndef E_ACSL_ASSERT
 #define E_ACSL_ASSERT
 
 #include "e_acsl_string.h"
 #include "e_acsl_printf.h"
 
-/* Drop-in replacement for abort function */
+/*! \brief Drop-in replacement for abort function */
 #define abort() exec_abort(__LINE__, __FILE__)
 
-/* Output a message to error stream using printf-like format string and abort
- * the execution. This is a wrapper for eprintf combined with abort */
+/*! \brief Output a message to error stream using printf-like format string
+ * and abort the execution.
+ *
+ * This is a wrapper for \p eprintf combined with \p abort */
 static void vabort(char *fmt, ...);
 
-/* Drop-in replacement for system-wide assert macro */
+/*! \brief Drop-in replacement for system-wide assert macro */
 #define assert(expr) \
   ((expr) ? (void)(0) : vabort("%s at %s:%d\n", \
     #expr, __FILE__,__LINE__))
 
-/* Assert with printf-like error message support */
+/*! \brief Assert with printf-like error message support */
 #define vassert(expr, fmt, ...) \
-    vassert_fail(expr, __LINE__, __FILE__, fmt, __VA_ARGS__)
+  vassert_fail(expr, __LINE__, __FILE__, fmt, __VA_ARGS__)
 
 static void exec_abort(int line, const char *file) {
   eprintf("Execution aborted (%s:%d)\n", file, line);
@@ -62,7 +69,7 @@ static void vassert_fail(int expr, int line, char *file, char *fmt,  ...) {
   }
 }
 
-/* Print a message to stderr and abort the execution */
+/*! \brief Print a message to stderr and abort the execution */
 static void vabort(char *fmt, ...) {
   va_list va;
   va_start(va,fmt);
@@ -71,7 +78,7 @@ static void vabort(char *fmt, ...) {
   abort();
 }
 
-/* Default implementation of E-ACSL runtime assertions */
+/*! \brief Default implementation of E-ACSL runtime assertions */
 static void runtime_assert(int predicate, char *kind,
   char *fct, char *pred_txt, int line) {
   if (!predicate) {
@@ -81,17 +88,18 @@ static void runtime_assert(int predicate, char *kind,
   }
 }
 
-/* Alias for runtime assertions. Since `__e_acsl_assert` is added as a weak
- * alias user-defined implementation of the `__e_acsl_assert` function will be
- * preferred at link time. */
+/*! \brief Alias for runtime assertions.
+ *
+ * Since \p __e_acsl_assert is added as a weak alias user-defined implementation
+ * of the \p __e_acsl_assert function will be preferred at link time. */
 void __e_acsl_assert(int pred, char *kind, char *fct, char *pred_txt, int line)
   __attribute__ ((weak, alias ("runtime_assert")));
 
 /* Instances of assertions shared accross different memory models */
 
-/* Abort the execution if the size of the pointer computed during
- * instrumentation (_ptr_sz) does not match the size of the pointer used
- * by a compiler (void*) */
+/*! \brief Abort the execution if the size of the pointer computed during
+ * instrumentation (\p _ptr_sz) does not match the size of the pointer used
+ * by a compiler (\p void*) */
 #define arch_assert(_ptr_sz) \
   vassert(_ptr_sz == sizeof(void*), \
     "Mismatch of instrumentation- and compile-time pointer sizes: " \

@@ -106,6 +106,12 @@ if test -z $HAVE_GMP; then
   AC_MSG_WARN([GMP library missing: non-regression tests unavailable.])
 fi
 
+# Doxygen
+#########
+AC_CHECK_PROG(DOXYGEN,doxygen,doxygen,no)
+AC_CHECK_PROG(HAVE_DOT,dot,YES,no)
+AC_OUTPUT([ doc/doxygen/doxygen.cfg ], [  ])
+
 #######################
 # Generating Makefile #
 #######################

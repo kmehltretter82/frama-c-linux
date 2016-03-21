@@ -33,6 +33,39 @@
 /*                                                                          */
 /****************************************************************************/
 
+/*! ***********************************************************************
+ * \file   e_acsl_printf.h
+ * \brief Malloc and stdio free implementation printf.
+ *
+ * Supported format strings:
+ * - Flag characters:
+ *     - 0       - the following value will be is zero-padded.
+ *
+ * - Field width:
+ *     - Optional positive decimal integer following flag characters.
+ *
+ * - Length modifier:
+ *     - l       - the following integer conversion corresponds to a long int or
+ *                  unsigned long int argument.
+ *
+ * - Standard conversion specifiers:
+ *    - d       - signed integers.
+ *    - u       - unsigned integers.
+ *    - f       - floating point numbers. Floating point numbers do not support
+ *    -             precision specification.
+ *    - x,X     - hexadecimal numbers.
+ *    - p       - void pointers.
+ *
+ * - Non-standard conversion specifiers:
+ *     - a       - memory-address.
+ *     - b, B    - print field width bits of a number left-to-right (b) or
+ *      right-to-left (B). Unless specified field-width of 8 is used. Bits
+ *      over a 64-bit boundary are ignored.
+ *     - v, V    - print first field width bits of a memory region given by a
+ *      void pointer left-to-right (v) or right-to-left (V). Unless specified
+ *      field-width of 8 is used.
+***************************************************************************/
+
 #ifndef E_ACSL_PRINTF
 #define E_ACSL_PRINTF
 
@@ -49,37 +82,7 @@
 #  include <linux/limits.h>
 #endif
 
-/* Malloc/stdio free printf
- *
- * NOTE: The below implementation does not require system-wide I/O (stdio.h).
- *
- * Supported format strings:
- * - Flag characters:
- *     0       - the following value will be is zero-padded.
- *
- * - Field width:
- *     Optional positive decimal integer following flag characters.
- *
- * - Length modifier:
- *     l       - the following integer conversion corresponds to a long int or
- *                  unsigned long int argument.
- *
- * - Standard conversion specifiers:
- *     d       - signed integers.
- *     u       - unsigned integers.
- *     f       - floating point numbers. Floating point numbers do not support
- *                 precision specification.
- *     x,X     - hexadecimal numbers.
- *     p       - void pointers.
- *
- * - Non-standard conversion specifiers:
- *     a       - memory-address.
- *     b, B    - print field width bits of a number left-to-right (b) or
- *      right-to-left (B). Unless specified field-width of 8 is used. Bits
- *      over a 64-bit boundary are ignored.
- *     v, V    - print first field width bits of a memory region given by a
- *      void pointer left-to-right (v) or right-to-left (V). Unless specified
- *      field-width of 8 is used. */
+
 
 /* ****************** */
 /* Public API         */

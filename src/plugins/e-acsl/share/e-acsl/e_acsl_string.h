@@ -20,18 +20,21 @@
 /*                                                                        */
 /**************************************************************************/
 
-/** Replacement of system-wide <string.h> header for use with E-ACSL
+/*! ***********************************************************************
+ * \file   e_acsl_string.h
+ * \brief Replacement of system-wide \p <string.h> header for use with E-ACSL
  * runtime library.
  *
  * Intended use:
- *  - For the case when the sources are compiled using GCC prefer __builtin_
- *    versions of some of the string.h functions (e.g., memset). This is mostly
- *    because the GCC builtins are on average faster.  *
+ *  - For the case when the sources are compiled using GCC prefer \p __builtin_
+ *    versions of some of the string.h functions (e.g., \p memset). This is
+ *    mostly because the GCC builtins are on average faster.
  *  - For the case it is not GCC system-wide versions should be used. This
- *    and the above options require E_ACSL_BUILTINS macro to be defined
+ *    and the above options require \p E_ACSL_BUILTINS macro to be defined
  *    at compile-time.
  *  - For the case when the analysed program contains customised definitions
- *    of string.h functions use GLIBC-based implementations. */
+ *    of string.h functions use GLIBC-based implementations.
+***************************************************************************/
 
 #ifndef E_ACSL_STD_STRING
 #define E_ACSL_STD_STRING

@@ -70,3 +70,6 @@ META.frama-c-e_acsl
 Makefile.plugin.generated
 E_ACSL.check_mli_exists
 top/
+doc/doxygen/doxygen.cfg
+doc/doxygen/html
+doc/doxygen/warn.log
