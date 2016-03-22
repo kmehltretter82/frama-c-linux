@@ -100,8 +100,6 @@ let add_cast ~loc ?name env ctx is_mpz_string t_opt e =
   | None -> e, env
   | Some ctx ->
     let ty = Cil.typeOf e in
-(*    Options.feedback "exp %a of type %a in context %a"
-      Printer.pp_exp e Printer.pp_typ ty Printer.pp_typ ctx;*)
     if Gmpz.is_t ctx then
       if Gmpz.is_t ty then
         e, env
@@ -294,7 +292,7 @@ and context_insensitive_term_to_exp kf env t =
     else
       Cil.new_exp ~loc (UnOp(op, e, ty)), env, false, ""
   | TUnOp(LNot, t) ->
-    let ty = Typing.get_typ t in
+    let ty = Typing.get_op t in
     if Gmpz.is_t ty then
       (* [!t] is converted into [t == 0] *)
       let zero = Logic_const.tinteger 0 in
@@ -378,7 +376,7 @@ and context_insensitive_term_to_exp kf env t =
         Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)),  env, false, ""
   | TBinOp(Lt | Gt | Le | Ge | Eq | Ne as bop, t1, t2) ->
     (* comparison operators *)
-    let ity = Typing.get_integer_ty t in
+    let ity = Typing.get_integer_op t in
     let e, env = comparison_to_exp ~loc kf env ity bop t1 t2 (Some t) in
     e, env, false, ""
   | TBinOp((Shiftlt | Shiftrt), _, _) ->
@@ -627,7 +625,7 @@ and named_predicate_content_to_exp ?name kf env p =
   | Pdangling _ -> not_yet env "\\dangling"
   | Pvalid_function _ -> not_yet env "\\valid_function"
   | Prel(rel, t1, t2) ->
-    let ity = Typing.get_integer_ty_of_predicate p in
+    let ity = Typing.get_integer_op_of_predicate p in
     comparison_to_exp ~loc kf env ity (relation_to_binop rel) t1 t2 None
   | Pand(p1, p2) ->
     (* p1 && p2 <==> if p1 then p2 else false *)

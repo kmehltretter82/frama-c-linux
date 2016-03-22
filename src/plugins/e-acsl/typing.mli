@@ -54,12 +54,15 @@ val type_named_predicate: ?must_clear:bool -> predicate named -> unit
 (** Compute the type of each term of the given predicate. *)
 
 val get_integer_ty: term -> integer_ty
-val get_integer_ty_of_predicate: predicate named -> integer_ty
+val get_integer_op: term -> integer_ty
+val get_integer_op_of_predicate: predicate named -> integer_ty
 
 val get_typ: term -> typ
 (** Get the type of the given term which must be an integer.
     {!type_named_predicate} must already have been called on the englobing
     predicate. *)
+
+val get_op: term -> typ
 
 val get_cast: term -> typ option
 (** Get the type which the given term must be converted to after its translation
