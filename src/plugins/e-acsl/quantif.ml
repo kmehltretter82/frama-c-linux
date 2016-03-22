@@ -214,7 +214,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
       let stmts_block b = [ mkStmt ~valid_sid:true (Block b) ] in
       let tlv = Logic_const.tvar ~loc llv in
       let guard = Logic_const.term ~loc (TBinOp(bop2, tlv, t2)) Linteger in
-      New_typing.type_term ~ctx:(New_typing.C_type IInt) guard;
+      New_typing.type_term ~ctx:New_typing.c_int guard;
       let guard_exp, env = term_to_exp kf (Env.push env) guard in
       let break_stmt = mkStmt ~valid_sid:true (Break guard_exp.eloc) in
       let guard_blk, env =

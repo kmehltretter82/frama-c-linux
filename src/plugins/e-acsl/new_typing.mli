@@ -30,10 +30,14 @@ open Cil_types
 (** {2 Datatypes} *)
 (******************************************************************************)
 
-type integer_ty =
+type integer_ty = private
   | Gmp
   | C_type of ikind
   | Other
+
+val gmp: integer_ty
+val c_int: integer_ty
+val ikind: ikind -> integer_ty
 
 val typ_of_integer_ty: integer_ty -> typ
 

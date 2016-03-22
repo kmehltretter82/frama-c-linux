@@ -41,6 +41,10 @@ type integer_ty =
   | C_type of ikind
   | Other
 
+let gmp = Gmp
+let c_int = C_type IInt
+let ikind ik = C_type ik
+
 let join ty1 ty2 = match ty1, ty2 with
   | Other, Other -> Other
   | Other, (Gmp | C_type _) | (Gmp | C_type _), Other ->
@@ -58,8 +62,6 @@ let typ_of_integer_ty = function
   | Gmp -> Gmpz.t ()
   | C_type ik -> TInt(ik, [])
   | Other -> Options.fatal "[typing] not an integer type"
-
-let c_int = C_type IInt
 
 let size_t () = match Cil.theMachine.Cil.typeOfSizeOf with
   | TInt(kind, _) -> C_type kind
@@ -132,16 +134,18 @@ end
 
 (* Compute the smallest type (bigger than [int]) which can contain the whole
    interval. It is the \theta operator of the JFLA's paper. *)
-let ty_of_interv i =
+let ty_of_interv ~ctx i =
   let open Interval in
   let is_pos = Integer.ge i.lower Integer.zero in
   try
     let lkind = Cil.intKindForValue i.lower is_pos in
     let ukind = Cil.intKindForValue i.upper is_pos in
     let kind = if Cil.intTypeIncluded lkind ukind then ukind else lkind in
-    (* int whenever possible to prevent superfluous casts in the generated
+    (* ctx type whenever possible to prevent superfluous casts in the generated
        code *)
-    if Cil.intTypeIncluded kind IInt then c_int else C_type kind
+    (match ctx with
+    | Gmp | Other -> C_type kind
+    | C_type ik -> if Cil.intTypeIncluded kind ik then ctx else C_type kind)
   with Cil.Not_representable ->
     Gmp
 
@@ -174,7 +178,7 @@ let rec type_term env ~ctx t =
     | TAlignOf _ ->
       (try
          let i = Interval.infer env t in
-         ty_of_interv i
+         ty_of_interv ~ctx i
        with Interval.Not_an_integer ->
          Other)
 
@@ -182,7 +186,7 @@ let rec type_term env ~ctx t =
       (try
          let i = Interval.infer env t in
          type_term_lval env tlv;
-         ty_of_interv i
+         ty_of_interv ~ctx i
        with Interval.Not_an_integer ->
          Other)
 
@@ -193,7 +197,7 @@ let rec type_term env ~ctx t =
          let i = Interval.infer env t in
          (* [t'] must be typed, but it is a pointer *)
          ignore (type_term env ~ctx:Other t');
-         ty_of_interv i
+         ty_of_interv ~ctx i
        with Interval.Not_an_integer ->
          Other)
 
@@ -203,14 +207,14 @@ let rec type_term env ~ctx t =
          (* [t1] and [t2] must be typed, but they are pointers *)
          ignore (type_term env ~ctx:Other t1);
          ignore (type_term env ~ctx:Other t2);
-         ty_of_interv i
+         ty_of_interv ~ctx i
        with Interval.Not_an_integer ->
          Other)
 
     | TUnOp (_, t') ->
       let i = Interval.infer env t in
       let i' = Interval.infer env t' in
-      let ctx = mk_ctx (ty_of_interv (Interval.join i i')) in
+      let ctx = mk_ctx (ty_of_interv ~ctx (Interval.join i i')) in
       ignore (type_term env ~ctx t');
       ctx
 
@@ -218,7 +222,9 @@ let rec type_term env ~ctx t =
       let i = Interval.infer env t in
       let i1 = Interval.infer env t1 in
       let i2 = Interval.infer env t2 in
-      let ctx = mk_ctx (ty_of_interv (Interval.join i (Interval.join i1 i2))) in
+      let ctx =
+        mk_ctx (ty_of_interv ~ctx (Interval.join i (Interval.join i1 i2)))
+      in
       ignore (type_term env ~ctx t1);
       ignore (type_term env ~ctx t2);
       ctx
@@ -228,7 +234,7 @@ let rec type_term env ~ctx t =
         try
           let i1 = Interval.infer env t1 in
           let i2 = Interval.infer env t2 in
-          mk_ctx (ty_of_interv (Interval.join i1 i2))
+          mk_ctx (ty_of_interv ~ctx (Interval.join i1 i2))
         with Interval.Not_an_integer ->
           Other
       in
@@ -244,7 +250,7 @@ let rec type_term env ~ctx t =
       (* both operands fit in an int. *)
       ignore (type_term env ~ctx:c_int t1);
       ignore (type_term env ~ctx:c_int t2);
-      ty_of_interv (Interval.join i1 i2)
+      ty_of_interv ~ctx (Interval.join i1 i2)
 
     | TBinOp (BAnd, _, _) -> Error.not_yet "bitwise and"
     | TBinOp (BXor, _, _) -> Error.not_yet "bitwise xor"
@@ -258,7 +264,7 @@ let rec type_term env ~ctx t =
          (* nothing to do more: [i] is already more precise than what we could
             infer from the arguments of the cast. Also, do not type the internal
             term: possibly it is not even an integer *)
-         let ty = ty_of_interv i in
+         let ty = ty_of_interv ~ctx i in
          ignore (type_term env ~ctx:ty t');
          ty
        with Interval.Not_an_integer ->
@@ -273,7 +279,7 @@ let rec type_term env ~ctx t =
         try
           let i2 = Interval.infer env t2 in
           let i3 = Interval.infer env t3 in
-          mk_ctx (ty_of_interv (Interval.join i (Interval.join i2 i3)))
+          mk_ctx (ty_of_interv ~ctx (Interval.join i (Interval.join i2 i3)))
         with Interval.Not_an_integer ->
           Other
       in
@@ -288,7 +294,7 @@ let rec type_term env ~ctx t =
       let i = Interval.infer env t in
       let i1 = Interval.infer env t1 in
       let i2 = Interval.infer env t2 in
-      let ty = ty_of_interv (Interval.join i (Interval.join i1 i2)) in
+      let ty = ty_of_interv ~ctx (Interval.join i (Interval.join i1 i2)) in
       ignore (type_term env ~ctx:ty t1);
       ignore (type_term env ~ctx:ty t2);
       ty
@@ -361,7 +367,7 @@ let rec type_predicate_named env p =
           let i1 = Interval.infer env t1 in
           let i2 = Interval.infer env t2 in
           let i = Interval.join i1 i2 in
-          mk_ctx (ty_of_interv i)
+          mk_ctx (ty_of_interv ~ctx:c_int i)
         with Interval.Not_an_integer ->
           Other
       in
@@ -409,7 +415,21 @@ let rec type_predicate_named env p =
               | _ -> assert false
             in
             let i = Interval.join i1 i2 in
-            let ctx = mk_ctx (ty_of_interv i) in
+            let ctx = match x.lv_type with
+              | Linteger -> Gmp
+              | Ctype ty ->
+                (match Cil.unrollType ty with
+                | TInt(ik, _) -> C_type ik
+                | ty ->
+                  Options.fatal "unexpected type %a for quantified variable %a"
+                    Printer.pp_typ ty
+                    Printer.pp_logic_var x)
+              | lty ->
+                Options.fatal "unexpected type %a for quantified variable %a"
+                  Printer.pp_logic_type lty
+                  Printer.pp_logic_var x
+            in
+            let ctx = mk_ctx (ty_of_interv ~ctx i) in
             ignore (type_term env ~ctx t1);
             ignore (type_term env ~ctx t2);
             Interval.Env.add x i env)

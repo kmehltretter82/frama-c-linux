@@ -300,7 +300,7 @@ and context_insensitive_term_to_exp kf env t =
       let zero = Logic_const.tinteger 0 in
       let e, env =
         comparison_to_exp
-          kf ~loc ~name:"not" env New_typing.Gmp Eq t zero (Some t)
+          kf ~loc ~name:"not" env New_typing.gmp Eq t zero (Some t)
       in
       e, env, false, ""
     else begin
@@ -346,7 +346,7 @@ and context_insensitive_term_to_exp kf env t =
       (* do not generate [e2] from [t2] twice *)
       let guard, env =
         let name = name_of_binop bop ^ "_guard" in
-        comparison_to_exp ~loc kf env New_typing.Gmp ~e1:e2 ~name Eq t2 zero t
+        comparison_to_exp ~loc kf env New_typing.gmp ~e1:e2 ~name Eq t2 zero t
       in
       let mk_stmts _v e = 
 	assert (Gmpz.is_t ty);
@@ -798,13 +798,13 @@ exception No_simple_translation of term
 (* This function is used by plug-in [Cfp]. *)
 let term_to_exp typ t =
   let ctx = match typ with
-    | None -> New_typing.C_type IInt (* useless, but required *)
+    | None -> New_typing.c_int (* useless, but required *)
     | Some typ ->
-      if Gmpz.is_t typ then New_typing.Gmp
+      if Gmpz.is_t typ then New_typing.gmp
       else
         match typ with
-        | TInt(i, _) -> New_typing.C_type i
-        | _ -> New_typing.C_type IInt (* useless, but required *)
+        | TInt(ik, _) -> New_typing.ikind ik
+        | _ -> New_typing.c_int (* useless, but required *)
   in
   New_typing.type_term ~ctx t;
   let env = Env.empty (new Visitor.frama_c_copy Project_skeleton.dummy) in
