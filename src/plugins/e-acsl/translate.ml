@@ -142,12 +142,12 @@ let add_cast ~loc ?name env ctx is_mpz_string t_opt e =
 let constant_to_exp ~loc t = function
   | Integer(n, repr) ->
     (try
-       let ity = New_typing.get_integer_ty t in
+       let ity = Typing.get_integer_ty t in
        match ity with
-       | New_typing.Other -> assert false
-       | New_typing.Gmp -> raise Cil.Not_representable
-       | New_typing.C_type kind ->
-         let cast = New_typing.get_cast t in
+       | Typing.Other -> assert false
+       | Typing.Gmp -> raise Cil.Not_representable
+       | Typing.C_type kind ->
+         let cast = Typing.get_cast t in
          match cast, kind with
          | Some ty, (ILongLong | IULongLong) when Gmpz.is_t ty ->
            raise Cil.Not_representable
@@ -175,7 +175,7 @@ let conditional_to_exp ?(name="if") loc t_opt e1 (e2, env2) (e3, env3) =
   | _ ->
     let ty = match t_opt with
       | None (* predicate *) -> Cil.intType
-      | Some t -> New_typing.get_typ t
+      | Some t -> Typing.get_typ t
     in
     let _, e, env =
       Env.new_var
@@ -274,7 +274,7 @@ and context_insensitive_term_to_exp kf env t =
     let e, env = term_to_exp kf env t in
     Cil.new_exp ~loc (AlignOfE e), env, false, "alignof"
   | TUnOp(Neg | BNot as op, t') ->
-    let ty = New_typing.get_typ t in
+    let ty = Typing.get_typ t in
     let e, env = term_to_exp kf env t' in
     if Gmpz.is_t ty then
       let name, vname = match op with
@@ -294,13 +294,12 @@ and context_insensitive_term_to_exp kf env t =
     else
       Cil.new_exp ~loc (UnOp(op, e, ty)), env, false, ""
   | TUnOp(LNot, t) ->
-    let ty = New_typing.get_typ t in
+    let ty = Typing.get_typ t in
     if Gmpz.is_t ty then
       (* [!t] is converted into [t == 0] *)
       let zero = Logic_const.tinteger 0 in
       let e, env =
-        comparison_to_exp
-          kf ~loc ~name:"not" env New_typing.gmp Eq t zero (Some t)
+        comparison_to_exp kf ~loc ~name:"not" env Typing.gmp Eq t zero (Some t)
       in
       e, env, false, ""
     else begin
@@ -309,7 +308,7 @@ and context_insensitive_term_to_exp kf env t =
       Cil.new_exp ~loc (UnOp(LNot, e, Cil.intType)), env, false, ""
     end
   | TBinOp(PlusA | MinusA | Mult as bop, t1, t2) ->
-    let ty = New_typing.get_typ t in
+    let ty = Typing.get_typ t in
     let e1, env = term_to_exp kf env t1 in
     let e2, env = term_to_exp kf env t2 in
     if Gmpz.is_t ty then
@@ -329,24 +328,24 @@ and context_insensitive_term_to_exp kf env t =
         let e2 = cast_integer_to_float t.term_type t2.term_type e2 in
         Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)),  env, false, ""
   | TBinOp(Div | Mod as bop, t1, t2) ->
-    let ty = New_typing.get_typ t in
+    let ty = Typing.get_typ t in
     let e1, env = term_to_exp kf env t1 in
     let e2, env = term_to_exp kf env t2 in
     if Gmpz.is_t ty then
       (* TODO: preventing division by zero should not be required anymore.
          RTE should do this automatically. *)
-      let ctx = New_typing.get_integer_ty t in
+      let ctx = Typing.get_integer_ty t in
       let t = Some t in
       let name = name_of_mpz_arith_bop bop in
       (* [TODO] can now do better since the type system got some info about
          possible values of [t2] *)
       (* guarding divisions and modulos *)
       let zero = Logic_const.tinteger 0 in
-      New_typing.type_term ~ctx zero;
+      Typing.type_term ~ctx zero;
       (* do not generate [e2] from [t2] twice *)
       let guard, env =
         let name = name_of_binop bop ^ "_guard" in
-        comparison_to_exp ~loc kf env New_typing.gmp ~e1:e2 ~name Eq t2 zero t
+        comparison_to_exp ~loc kf env Typing.gmp ~e1:e2 ~name Eq t2 zero t
       in
       let mk_stmts _v e = 
 	assert (Gmpz.is_t ty);
@@ -377,7 +376,7 @@ and context_insensitive_term_to_exp kf env t =
         Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)),  env, false, ""
   | TBinOp(Lt | Gt | Le | Ge | Eq | Ne as bop, t1, t2) ->
     (* comparison operators *)
-    let ity = New_typing.get_integer_ty t in
+    let ity = Typing.get_integer_ty t in
     let e, env = comparison_to_exp ~loc kf env ity bop t1 t2 (Some t) in
     e, env, false, ""
   | TBinOp((Shiftlt | Shiftrt), _, _) ->
@@ -474,7 +473,7 @@ and term_to_exp kf env t =
   let t = match t.term_node with TLogic_coerce(_, t) -> t | _ -> t in
   let e, env, is_mpz_string, name = context_insensitive_term_to_exp kf env t in
   let env = if generate_rte then translate_rte kf env e else env in
-  let cast = New_typing.get_cast t in
+  let cast = Typing.get_cast t in
   let name = if name = "" then None else Some name in
   add_cast
     ~loc:t.term_loc
@@ -497,7 +496,7 @@ and comparison_to_exp
   in
   let e2, env = term_to_exp kf env t2 in
   match ity with
-  | New_typing.Gmp ->
+  | Typing.Gmp ->
     let _, e, env =
       Env.new_var
         ~loc
@@ -509,7 +508,7 @@ and comparison_to_exp
           [ Misc.mk_call ~loc ~result:(Cil.var v) "__gmpz_cmp" [ e1; e2 ] ])
     in
     Cil.new_exp ~loc (BinOp(bop, e, Cil.zero ~loc, Cil.intType)), env
-  | New_typing.C_type _ | New_typing.Other ->
+  | Typing.C_type _ | Typing.Other ->
     Cil.new_exp  ~loc (BinOp(bop, e1, e2, Cil.intType)), env
 
 (* \base_addr, \block_length and \freeable annotations *)
@@ -626,7 +625,7 @@ and named_predicate_content_to_exp ?name kf env p =
   | Pdangling _ -> not_yet env "\\dangling"
   | Pvalid_function _ -> not_yet env "\\valid_function"
   | Prel(rel, t1, t2) ->
-    let ity = New_typing.get_integer_ty_of_predicate p in
+    let ity = Typing.get_integer_ty_of_predicate p in
     comparison_to_exp ~loc kf env ity (relation_to_binop rel) t1 t2 None
   | Pand(p1, p2) ->
     (* p1 && p2 <==> if p1 then p2 else false *)
@@ -695,13 +694,13 @@ and named_predicate_content_to_exp ?name kf env p =
     end else begin
       match t.term_node, t.term_type with
       | TLval tlv, Ctype ty ->
-	let init = 
-	  Logic_const.pinitialized ~loc (llabel, Misc.term_addr_of ~loc tlv ty)
-	in
-	New_typing.type_named_predicate ~must_clear:false init;
-	let p = Logic_const.pand ~loc (init, p) in
-	is_visiting_valid := true;
-	named_predicate_to_exp kf env p
+        let init =
+          Logic_const.pinitialized ~loc (llabel, Misc.term_addr_of ~loc tlv ty)
+        in
+        Typing.type_named_predicate ~must_clear:false init;
+        let p = Logic_const.pand ~loc (init, p) in
+        is_visiting_valid := true;
+        named_predicate_to_exp kf env p
       | _ -> call_valid t
     end
   | Pvalid _ -> not_yet env "labeled \\valid"
@@ -728,7 +727,7 @@ and named_predicate_to_exp ?name kf ?rte env p =
   let env = Env.rte env false in
   let e, env = named_predicate_content_to_exp ?name kf env p in
   let env = if rte then translate_rte kf env e else env in
-  let cast = New_typing.get_cast_of_predicate p in
+  let cast = Typing.get_cast_of_predicate p in
   add_cast
     ~loc:p.loc
     ?name
@@ -770,7 +769,7 @@ and translate_named_predicate kf env p =
   Options.feedback ~dkey ~level:3 "translating predicate %a" 
     Printer.pp_predicate_named p;
   let rte = Env.generate_rte env in
-  New_typing.type_named_predicate ~must_clear:rte p;
+  Typing.type_named_predicate ~must_clear:rte p;
   let e, env = named_predicate_to_exp kf ~rte env p in
   assert (Typ.equal (Cil.typeOf e) Cil.intType);
   Env.add_stmt
@@ -787,26 +786,26 @@ let () =
 (* This function is used by Guillaume.
    However, it is correct to use it only in specific contexts. *)
 let predicate_to_exp kf p =
-  New_typing.type_named_predicate ~must_clear:true p;
+  Typing.type_named_predicate ~must_clear:true p;
   let empty_env = Env.empty (new Visitor.frama_c_copy Project_skeleton.dummy) in
   let e, _ = named_predicate_to_exp kf empty_env p in
   assert (Typ.equal (Cil.typeOf e) Cil.intType);
-  e  
+  e
 
 exception No_simple_translation of term
 
 (* This function is used by plug-in [Cfp]. *)
 let term_to_exp typ t =
   let ctx = match typ with
-    | None -> New_typing.c_int (* useless, but required *)
+    | None -> Typing.c_int (* useless, but required *)
     | Some typ ->
-      if Gmpz.is_t typ then New_typing.gmp
+      if Gmpz.is_t typ then Typing.gmp
       else
         match typ with
-        | TInt(ik, _) -> New_typing.ikind ik
-        | _ -> New_typing.c_int (* useless, but required *)
+        | TInt(ik, _) -> Typing.ikind ik
+        | _ -> Typing.c_int (* useless, but required *)
   in
-  New_typing.type_term ~ctx t;
+  Typing.type_term ~ctx t;
   let env = Env.empty (new Visitor.frama_c_copy Project_skeleton.dummy) in
   let env = Env.push env in
   let env = Env.rte env false in

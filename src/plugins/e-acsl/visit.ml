@@ -774,7 +774,7 @@ let do_visit ?(prj=Project.current ()) generate =
     (if generate then "translating" else "checking")
     Project.pretty prj;
   let vis =
-    Extlib.try_finally ~finally:New_typing.clear (new e_acsl_visitor prj) generate
+    Extlib.try_finally ~finally:Typing.clear (new e_acsl_visitor prj) generate
   in
   (* explicit type annotation in order to check that no new method is
      introduced by error *)

@@ -105,7 +105,7 @@ let compute_quantif_guards quantif bounded_vars hyps =
     Error.untypable msg);
   List.rev acc
 
-let () = New_typing.compute_quantif_guards_ref := compute_quantif_guards
+let () = Typing.compute_quantif_guards_ref := compute_quantif_guards
 
 module Label_ids = 
   State_builder.Counter(struct let name = "E_ACSL.Label_ids" end)
@@ -164,34 +164,34 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
       [ mkStmt ~valid_sid:true (Block blk) ], env
     | (t1, rel1, logic_x, rel2, t2) :: tl ->
       let ctx =
-        let ty1 = New_typing.get_integer_ty t1 in
-        let ty2 = New_typing.get_integer_ty t2 in
-        New_typing.join ty1 ty2
+        let ty1 = Typing.get_integer_ty t1 in
+        let ty2 = Typing.get_integer_ty t2 in
+        Typing.join ty1 ty2
       in
-      let ty = New_typing.typ_of_integer_ty ctx in
+      let ty = Typing.typ_of_integer_ty ctx in
       let t_plus_one t =
-	Logic_const.term ~loc
-	  (TBinOp(PlusA, t, Logic_const.tinteger ~loc 1))
-	  Linteger
+        Logic_const.term ~loc
+          (TBinOp(PlusA, t, Logic_const.tinteger ~loc 1))
+          Linteger
       in
       let t1 = match rel1 with
         | Rlt ->
           let t = t_plus_one t1 in
-          New_typing.type_term ~ctx t;
+          Typing.type_term ~ctx t;
           t
         | Rle -> t1
         | Rgt | Rge | Req | Rneq -> assert false
       in
       let t2_one, bop2 = match rel2 with
-	| Rlt -> t2, Lt
-	| Rle -> 
-	  (* we increment the loop counter one more time (at the end of the
-	     loop). Thus to prevent  overflow, check the type of [t2 + 1]
-	     instead of [t2]. *) 
-	  t_plus_one t2, Le
-	| Rgt | Rge | Req | Rneq -> assert false
+        | Rlt -> t2, Lt
+        | Rle ->
+          (* we increment the loop counter one more time (at the end of the
+             loop). Thus to prevent  overflow, check the type of [t2 + 1]
+             instead of [t2]. *)
+          t_plus_one t2, Le
+        | Rgt | Rge | Req | Rneq -> assert false
       in
-      New_typing.type_term ~ctx t2_one;
+      Typing.type_term ~ctx t2_one;
       (* loop counter corresponding to the quantified variable *)
       let var_x, x, env = Env.Logic_binding.add ~ty env logic_x in
       let lv_x = var var_x in
@@ -214,7 +214,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
       let stmts_block b = [ mkStmt ~valid_sid:true (Block b) ] in
       let tlv = Logic_const.tvar ~loc llv in
       let guard = Logic_const.term ~loc (TBinOp(bop2, tlv, t2)) Linteger in
-      New_typing.type_term ~ctx:New_typing.c_int guard;
+      Typing.type_term ~ctx:Typing.c_int guard;
       let guard_exp, env = term_to_exp kf (Env.push env) guard in
       let break_stmt = mkStmt ~valid_sid:true (Break guard_exp.eloc) in
       let guard_blk, env =
@@ -232,7 +232,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
       (* increment the loop counter [x++] *)
       let tlv_one = t_plus_one tlv in
       (* previous typing ensures that [x++] fits type [ty] *)
-      New_typing.type_term ~ctx tlv_one;
+      Typing.type_term ~ctx tlv_one;
       let incr, env = term_to_exp kf (Env.push env) tlv_one in
       let next_blk, env = 
 	Env.pop_and_get

@@ -61,14 +61,12 @@ PLUGIN_CMO:= local_config \
 	label \
 	env \
 	interval \
-	new_typing \
+	typing \
 	quantif \
 	translate \
 	loops \
 	visit \
 	main
-
-#	typing \
 
 PLUGIN_HAS_MLI:=yes
 PLUGIN_DISTRIBUTED:=no
