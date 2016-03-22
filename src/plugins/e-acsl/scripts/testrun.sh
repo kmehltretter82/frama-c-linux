@@ -121,7 +121,7 @@ run_test() {
   # and the instrumented code
   EACSL_GCC="./scripts/e-acsl-gcc.sh \
     --compile $TESTFILE --ocode=$ocode --logfile=$logfile \
-    --memory-model=$MODEL --oexec=$oexec $extra"
+    --instrumented-only --memory-model=$MODEL --oexec=$oexec $extra"
 
   debug "Run $EACSL_GCC"
   $EACSL_GCC || error "Command $EACSL_GCC failed" "$logfile"
