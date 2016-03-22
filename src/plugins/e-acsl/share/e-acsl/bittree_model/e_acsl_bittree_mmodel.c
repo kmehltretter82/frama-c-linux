@@ -368,7 +368,7 @@ void* __base_addr(void* ptr) {
   return (void*)tmp->ptr;
 }
 
-/* return the offset of ptr within its block */
+/* return the offset of `ptr` within its block */
 int __offset(void* ptr) {
   struct _block * tmp = get_cont(ptr);
   vassert(tmp != NULL, "\\offset of unallocated memory", NULL);
@@ -384,7 +384,7 @@ void __e_acsl_memory_clean() {
   clean_struct();
 }
 
-/* adds argv to the memory model */
+/* add `argv` to the memory model */
 static void __init_argv(int argc, char **argv) {
   int i;
 

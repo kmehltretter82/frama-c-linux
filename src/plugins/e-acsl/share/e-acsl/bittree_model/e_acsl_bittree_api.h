@@ -31,41 +31,40 @@
 #include "stdlib.h"
 #include "stdbool.h"
 
-/* Memory block allocated and may be deallocated */
+/*! \brief Structure representing an allocated memory block */
 struct _block {
-  size_t ptr;	/* base address */
-  size_t size;	/* block length */
-/* Keep trace of initialized sub-blocks within a memory block */
-  unsigned char * init_ptr; /* dynamic array of booleans */
-  size_t init_cpt;
-  _Bool is_readonly;
-  _Bool freeable;
+  size_t ptr;  //!< Base address
+  size_t size; //!< Block length (in bytes)
+  unsigned char * init_ptr; //!< Per-bit initialization
+  size_t init_cpt; //!< Number of initialized bytes
+  _Bool is_readonly; //!< True if a block is marked read-only
+  _Bool freeable; //!< True if a block can be de-allocated using `free`
 };
 
-/* remove the block from the structure */
-static void remove_element(struct _block *);
+/*! \brief Remove a block from the structure */
+static void remove_element(struct _block *b);
 
-/* add a block in the structure */
-static void add_element(struct _block *);
+/*! \brief Add a block to the structure */
+static void add_element(struct _block *b);
 
-/* return the block B such as : begin addr of B == ptr
-   we suppose that such a block exists, but we could return NULL if not */
-static struct _block * get_exact(void *);
+/*! \brief Return block B such that: `\base_addr(B->ptr) == ptr`.
+NB: The function assumes that such a block exists. */
+static struct _block * get_exact(void *ptr);
 
-/* return the block B containing ptr, such as :
-   begin addr of B <= ptr < (begin addr + size) of B
-   or NULL if such a block does not exist */
-static struct _block * get_cont(void *);
+/*! \brief Return block B such that:
+   `\base_addr(B->ptr) <= ptr < (\base_addr(B->ptr) + size)`
+   or NULL if such a block does not exist. */
+static struct _block * get_cont(void *ptr);
 
-/* erase the content of the structure */
+/*! \brief Erase the contents of the structure */
 static void clean_struct(void);
 
-/* print the information about a block */
-static void print_block(struct _block * ptr );
+/*! \brief Print information about a given block */
+static void print_block(struct _block *b);
 
-/* erase information about initialization of a block */
-static void clean_init(struct _block * ptr );
+/*! \brief Erase information about a block's initialization */
+static void clean_init(struct _block *b);
 
-/* erase all information about a block */
-static void clean_block(struct _block * ptr);
+/*! \brief Erase all information about a given block */
+static void clean_block(struct _block *b);
 #endif
