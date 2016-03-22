@@ -191,6 +191,7 @@ let rec type_term env ~ctx t =
        with Interval.Not_an_integer ->
          Other)
 
+    | Toffset(_, t')
     | Tblock_length(_, t')
     | TSizeOfE t'
     | TAlignOfE t' ->
@@ -306,7 +307,6 @@ let rec type_term env ~ctx t =
       type_term_lval env tlv;
       Other
 
-    | Toffset(_, t)
     | Tbase_addr (_, t) ->
       (* it is a pointer, as well as [t], but [t] must be typed. *)
       ignore (type_term env ~ctx:Other t);
