@@ -58,10 +58,11 @@ let join ty1 ty2 = match ty1, ty2 with
       Options.fatal "[typing] join failure: unexpected result %a"
         Printer.pp_typ ty
 
+exception Not_an_integer
 let typ_of_integer_ty = function
   | Gmp -> Gmpz.t ()
   | C_type ik -> TInt(ik, [])
-  | Other -> Options.fatal "[typing] not an integer type"
+  | Other -> raise Not_an_integer
 
 let size_t () = match Cil.theMachine.Cil.typeOfSizeOf with
   | TInt(kind, _) -> C_type kind
@@ -478,17 +479,19 @@ let get_integer_ty_of_predicate p =
 
 let get_typ t =
   let info = Memo.get t in
-  typ_of_integer_ty info.ty
+  try typ_of_integer_ty info.ty with Not_an_integer -> assert false
 
 let get_cast t =
   Cil.CurrentLoc.set t.term_loc;
   let info = Memo.get t in
-  Extlib.opt_map typ_of_integer_ty info.cast
+  try Extlib.opt_map typ_of_integer_ty info.cast
+  with Not_an_integer -> None
 
 let get_cast_of_predicate p =
   (* the env is useless *)
   let info = type_predicate_named Interval.Env.empty p in
-  Extlib.opt_map typ_of_integer_ty info.cast
+  try Extlib.opt_map typ_of_integer_ty info.cast
+  with Not_an_integer -> assert false
 
 let clear = Memo.clear
 
