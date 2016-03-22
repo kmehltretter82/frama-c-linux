@@ -109,12 +109,6 @@ let infer_sizeof ty =
 
 let infer_alignof ty = singleton_of_int (Cil.bytesAlignOf ty)
 
-(* used to infer type for offsets *)
-type offset_interv =
-  | I_no_offset (* no offset for this lvalue: will use the host *)
-  | I_field of interv (* a field with its infered interval *)
-  | I_index (* an index *)
-
 let rec infer env t =
   let get_cty t = match t.term_type with Ctype ty -> ty | _ -> assert false in
   match t.term_node with
@@ -251,12 +245,12 @@ let rec infer env t =
   | Ttype _
   | Tempty_set  -> raise Not_an_integer
 
-and infer_term_lval env (host, offset) =
-  let io = infer_term_offset env offset in
-  match io with
-  | I_no_offset -> infer_term_host env host
-  | I_field i -> i
-  | I_index -> raise Not_an_integer
+and infer_term_lval env (host, offset as tlv) =
+  match offset with
+  | TNoOffset -> infer_term_host env host
+  | _ ->
+    let ty = Logic_utils.logicCType (Cil.typeOfTermLval tlv) in
+    interv_of_typ ty
 
 and infer_term_host env = function
   | TVar v ->
@@ -271,21 +265,6 @@ and infer_term_host env = function
       Options.fatal "unexpected type %a for term %a"
         Printer.pp_typ ty
         Printer.pp_term t
-
-and infer_term_offset env = function
-  | TNoOffset  -> I_no_offset
-  | TField (f, o) ->
-    let io = infer_term_offset env o in
-    (match io with
-    | I_no_offset -> I_field (interv_of_typ f.ftype)
-    | I_field _ as i -> i
-    | I_index ->
-      (match Cil.unrollType f.ftype with
-      | TArray(ty, _, _, _) -> I_field (interv_of_typ ty)
-      | TPtr _ -> raise Not_an_integer
-      | _ -> assert false))
-  | TIndex _ -> I_index
-  | TModel _ -> Error.not_yet "model"
 
 (*
 Local Variables:
