@@ -20,6 +20,11 @@
 /*                                                                        */
 /**************************************************************************/
 
+/*! ***********************************************************************
+ * \file   e_acsl_debug.h
+ * \brief  Debug-level functions and macros
+***************************************************************************/
+
 /* Stringification macros {{{ */
 #ifndef E_ACSL_STRINGIFICATION
 #define E_ACSL_STRINGIFICATION
@@ -38,22 +43,22 @@
 #  define E_ACSL_DEBUG_LOG /tmp/e-acsl.log
 #endif
 
-/* Name of the debug log file */
+/*! \brief Name of the debug log file */
 static const char *dlog_name = TOSTRING(E_ACSL_DEBUG_LOG);
 
-/* File descriptior associated with the debug log file */
+/*! \brief File descriptor associated with the debug log file */
 static int dlog_fd = -1;
 
-/* Output a message to a log file */
+/*! \brief Output a message to a log file */
 #define DLOG(...) dprintf(dlog_fd, __VA_ARGS__)
 
-/* Debug-time assertion based on assert (see e_acsl.print.h) */
+/*! \brief Debug-time assertion based on assert (see e_acsl.print.h) */
 #define DASSERT(_e) assert(_e)
 
-/* Debug-time assertion based on vassert (see e_acsl.print.h) */
+/*! \brief Debug-time assertion based on vassert (see e_acsl.print.h) */
 #define DVASSERT(_expr, _fmt, ...) vassert(_expr, _fmt, __VA_ARGS__)
 
-/* Initialization of the debug report file:
+/*! \brief Initialize debug report file:
  *  - open file descriptor
  *  - add program arguments to the log */
 static void initialize_report_file(int *argc, char ***argv) {
