@@ -20,16 +20,21 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef E_ACSL_MMODEL_API
-#define E_ACSL_MMODEL_API
+/*! ***********************************************************************
+ * \file  e_acsl_bittree_api.h
+ * \brief Patricia Trie API
+***************************************************************************/
+
+#ifndef E_ACSL_BITTREE_API
+#define E_ACSL_BITTREE_API
 
 #include "stdlib.h"
 #include "stdbool.h"
 
 /* Memory block allocated and may be deallocated */
 struct _block {
-  size_t ptr;	/* begin address */
-  size_t size;	/* size in bytes */
+  size_t ptr;	/* base address */
+  size_t size;	/* block length */
 /* Keep trace of initialized sub-blocks within a memory block */
   unsigned char * init_ptr; /* dynamic array of booleans */
   size_t init_cpt;
