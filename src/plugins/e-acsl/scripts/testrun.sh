@@ -25,14 +25,13 @@
 # Convenience script for running tests with E-ACSL. Given a source file the
 # sequence is as follows:
 #   1. Instrument and compile a given source file with `e-acsl-gcc.sh`
-#   2. Run executables generated from the instrumented and original sources
-#      and compare their outputs
+#   2. Run executables generated from the instrumented source
+#      and check that it does not fail
 
 # Test failure is detected if:
 #   - `e-acsl-gcc.sh` fails (i.e., instrumentation- or compile-time failure)
 #   - A generated executable exists with a non-zero status
-#   - Outputs produced by executables generated from the original and
-#     instrumented sources differ
+#   - The run of this executable stops with a non-zero exit status
 
 # Arguments:
 #   $1 - base name of a test source file excluding its extension (e.g., addrOf)
@@ -109,8 +108,8 @@ run_executable() {
   fi
 }
 
-# Instrument the given test using e-acsl-gcc.sh and compare outputs of the
-# executables generated from instrumented and non-instrumented sources
+# Instrument the given test using e-acsl-gcc.sh and check that the generated
+# executable stops with a zero exit status
 run_test() {
   local ocode=$OUT.$RUNS.c # Generated source file
   local logfile=$LOG.$RUNS.elog # Log file for e-acsl-gcc.sh output
@@ -128,13 +127,7 @@ run_test() {
   $EACSL_GCC || error "Command $EACSL_GCC failed" "$logfile"
 
   # Log outputs of the generated executables
-  run_executable $oexec         $oexeclog.native "Native"
   run_executable $oexec.e-acsl  $oexeclog.e-acsl "Instrumented"
-
-  # Make sure that instrumented and uninstrumented programs have same outputs
-  debug "Compare outputs of $oexec and $oexec.e-acsl"
-  diff -ur -N $oexeclog.native $oexeclog.e-acsl > $oexeclog.diff 2>&1 || \
-    error "Output of instrumented and original programs differ" $oexeclog.diff
 
   RUNS=$((RUNS+1))
 }
