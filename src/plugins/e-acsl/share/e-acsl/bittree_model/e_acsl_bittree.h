@@ -20,6 +20,11 @@
 /*                                                                        */
 /**************************************************************************/
 
+/*! ***********************************************************************
+ * \file  e_acsl_bittree.h
+ * \brief Patricia Trie API Implementation
+***************************************************************************/
+
 #ifndef E_ACSL_BITTREE
 #define E_ACSL_BITTREE
 
@@ -29,7 +34,7 @@
 #include "e_acsl_syscall.h"
 #include "e_acsl_printf.h"
 #include "e_acsl_assert.h"
-#include "e_acsl_adt_api.h"
+#include "e_acsl_bittree_api.h"
 
 #define WORDBITS __WORDSIZE
 
@@ -434,31 +439,44 @@ static void __clean_struct () {
 /*********************/
 
 #ifdef E_ACSL_DEBUG
+
+static void __print_block(struct _block * ptr) {
+  if (ptr != NULL) {
+    DLOG("%a; %lu Bytes; %slitteral; [init] : %d ",
+      (char*)ptr->ptr, ptr->size,
+      ptr->is_readonly ? "" : "not ", ptr->init_cpt);
+    if(ptr->init_ptr != NULL) {
+      unsigned i;
+      for(i = 0; i < ptr->size/8; i++)
+        DLOG("%b ", ptr->init_ptr[i]);
+    }
+    DLOG("\n");
+  }
+}
+
 /* called from __debug_struct */
-/* recursively print the content of the structure */
-/*@ assigns \nothing;
-  @*/
-static void debug_rec (struct bittree * ptr, int depth) {
+/* recursively print the content of the structure starting from a given node */
+/*@ assigns \nothing; */
+static void print_bittree_node(struct bittree * ptr, int depth) {
   int i;
   if(ptr == NULL)
     return;
   for(i = 0; i < depth; i++)
     DLOG("  ");
   if(ptr->is_leaf)
-    __e_acsl_print_block(ptr->leaf);
+    __print_block(ptr->leaf);
   else {
     DLOG("%p -- %p\n", (void*)ptr->mask, (void*)ptr->addr);
-    debug_rec(ptr->left, depth+1);
-    debug_rec(ptr->right, depth+1);
+    print_bittree_node(ptr->left, depth+1);
+    print_bittree_node(ptr->right, depth+1);
   }
 }
 
-/* print the content of the structure */
-/*@ assigns \nothing;
-  @*/
-static void debug_struct () {
+/* print the contents of the entire bittree */
+/*@ assigns \nothing; */
+static void print_bittree() {
   DLOG("------------DEBUG\n");
-  debug_rec(__root, 0);
+  print_bittree_node(__root, 0);
   DLOG("-----------------\n");
 }
 #endif
