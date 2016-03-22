@@ -24,6 +24,8 @@
 Plugin E-ACSL 0.6 Magnesium
 ###########################
 
+-* E-ACSL       [2016/01/22] Added an e-acsl-gcc.sh option allowing to skip
+	        compilation of original sources.
 -* E-ACSL       [2016/01/15] Fix installation with custom --prefix.
 -* E-ACSL       [2016/01/05] Fix bug in the memory model that caused the
 	        tracked size of heap memory be computed incorrectly.

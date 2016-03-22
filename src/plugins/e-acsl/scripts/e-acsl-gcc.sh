@@ -48,8 +48,8 @@ check_tool() {
 LONGOPTIONS="help,compile,compile-only,print,debug:,ocode:,oexec:,verbose:, \
   frama-c-only,extra-cpp-args:,frama-c-stdlib,full-mmodel,gmp,quiet,logfile:,
   ld-flags:,cpp-flags:,frama-c-extra:,memory-model:,production,no-stdlib,
-  debug-log:,frama-c:,gcc:,e-acsl-share:"
-SHORTOPTIONS="h,c,C,p,d:,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,P,N,D:I:G:"
+  debug-log:,frama-c:,gcc:,e-acsl-share:,instrumented-only"
+SHORTOPTIONS="h,c,C,p,d:,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,P,N,D:,I:,G:,X"
 # Prefix for an error message due to wrong arguments
 ERROR="ERROR parsing arguments:"
 
@@ -76,6 +76,7 @@ OPTION_DEBUG_LOG_MACRO=""                # Specification of debug log file
 OPTION_FRAMAC_CPP_EXTRA=""               # Extra CPP flags for Frama-C
 OPTION_EACSL_MMODELS="bittree"           # Memory model used
 OPTION_EACSL_SHARE=                      # Custom E-ACSL share directory
+OPTION_INSTRUMENTED_ONLY=                # Do not compile original code
 # The following option controls whether to use gcc builtins
 # (e.g., __builtin_strlen) in RTL or fall back to custom implementations
 # of standard functions.
@@ -233,6 +234,11 @@ do
     --frama-c-only|-f)
       shift;
       OPTION_EACSL=
+    ;;
+    # Do not compile original source file
+    --instrumented-only|-X)
+      shift;
+      OPTION_INSTRUMENTED_ONLY=1
     ;;
     # Do use Frama-C stdlib, which is the default behaviour of Frama-C
     --frama-c-stdlib|-L)
@@ -449,7 +455,7 @@ fi
 if [ -n "$OPTION_COMPILE" ]; then
   # Compile the original files only if the instrumentation option is given,
   # otherwise the provided sources are assumed to be E-ACSL instrumented files
-  if [ -n "$OPTION_INSTRUMENT" ]; then
+  if [ -n "$OPTION_INSTRUMENT" ] && [ -z "$OPTION_INSTRUMENTED_ONLY" ]; then
     ($OPTION_ECHO; $CC $CPPFLAGS $CFLAGS "$@" -o "$OUTPUT_EXEC" $LDFLAGS);
     error "fail to compile/link un-instrumented code: $@" $?;
   else
