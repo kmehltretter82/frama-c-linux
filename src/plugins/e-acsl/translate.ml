@@ -298,6 +298,8 @@ and context_insensitive_term_to_exp kf env t =
     if Gmpz.is_t ty then
       (* [!t] is converted into [t == 0] *)
       let zero = Logic_const.tinteger 0 in
+      let ctx = Typing.get_integer_ty t in
+      Typing.type_term ~ctx zero;
       let e, env =
         comparison_to_exp kf ~loc ~name:"not" env Typing.gmp Eq t zero (Some t)
       in
