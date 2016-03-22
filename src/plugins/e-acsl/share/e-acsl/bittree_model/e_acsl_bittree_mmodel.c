@@ -63,23 +63,6 @@ size_t __get_memory_size(void) {
 /* ALLOCATION             */
 /**************************/
 
-/* erase information about initialization of a block */
-static void __clean_init (struct _block * ptr) {
-  if(ptr->init_ptr != NULL) {
-    native_free(ptr->init_ptr);
-    ptr->init_ptr = NULL;
-  }
-  ptr->init_cpt = 0;
-}
-
-/* erase all information about a block */
-static void __clean_block (struct _block * ptr) {
-  if(ptr) {
-    __clean_init(ptr);
-    native_free(ptr);
-  }
-}
-
 /* store the block of size bytes starting at ptr, the new block is returned.
  * Warning: the return type is implicitly (struct _block*). */
 void* __store_block(void* ptr, size_t size) {
@@ -414,10 +397,6 @@ static void __init_argv(int argc, char **argv) {
   }
 }
 
-/* initialize contents of the abstract structure and record arguments
- *  'argc_ref` address the variable holding the argc parameter
- *  'argv_ref` address the variable holding the argv parameter
- *  'ptr_size` the size of the pointer computed during instrumentation. */
 void __e_acsl_memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
   arch_assert(ptr_size);
   if (argc_ref)
@@ -428,7 +407,6 @@ void __e_acsl_memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
 /* DEBUG              */
 /**********************/
 #ifdef E_ACSL_DEBUG
-
 /*! \brief print the information about a block */
 void __e_acsl_print_block (struct _block * ptr) {
   __print_block(ptr);
@@ -438,6 +416,5 @@ void __e_acsl_print_block (struct _block * ptr) {
 void __e_acsl_print_bittree() {
   print_bittree();
 }
-
 #endif
 #endif

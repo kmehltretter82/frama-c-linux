@@ -411,6 +411,22 @@ static struct _block * __get_cont (void * ptr) {
 /*******************/
 /* CLEAN           */
 /*******************/
+/* erase information about initialization of a block */
+static void __clean_init (struct _block * ptr) {
+  if(ptr->init_ptr != NULL) {
+    native_free(ptr->init_ptr);
+    ptr->init_ptr = NULL;
+  }
+  ptr->init_cpt = 0;
+}
+
+/* erase all information about a block */
+static void __clean_block (struct _block * ptr) {
+  if(ptr) {
+    __clean_init(ptr);
+    native_free(ptr);
+  }
+}
 
 /* called from __clean_struct */
 /* recursively erase the content of the structure */
@@ -454,7 +470,6 @@ static void __print_block(struct _block * ptr) {
   }
 }
 
-/* called from __debug_struct */
 /* recursively print the content of the structure starting from a given node */
 /*@ assigns \nothing; */
 static void print_bittree_node(struct bittree * ptr, int depth) {

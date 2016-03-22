@@ -42,15 +42,6 @@ struct _block {
   _Bool freeable;
 };
 
-/* print the information about a block */
-static void __print_block(struct _block * ptr );
-
-/* erase information about initialization of a block */
-static void __clean_init(struct _block * ptr );
-
-/* erase all information about a block */
-static void __clean_block(struct _block * ptr);
-
 /* remove the block from the structure */
 static void  __remove_element(struct _block *);
 
@@ -68,6 +59,15 @@ static struct _block * __get_cont(void *);
 
 /* erase the content of the structure */
 static void __clean_struct(void);
+
+/* print the information about a block */
+static void __print_block(struct _block * ptr );
+
+/* erase information about initialization of a block */
+static void __clean_init(struct _block * ptr );
+
+/* erase all information about a block */
+static void __clean_block(struct _block * ptr);
 
 /* print the content of the structure */
 static void  __debug_struct(void);
