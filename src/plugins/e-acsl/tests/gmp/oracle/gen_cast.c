@@ -16,8 +16,7 @@ int main(void)
   __e_acsl_assert(y == 0,(char *)"Assertion",(char *)"main",
                   (char *)"y == (int)0",13);
   /*@ assert (unsigned int)y ≡ (unsigned int)0; */
-  __e_acsl_assert((unsigned int)y == (unsigned int)0,(char *)"Assertion",
-                  (char *)"main",
+  __e_acsl_assert((unsigned int)y == 0,(char *)"Assertion",(char *)"main",
                   (char *)"(unsigned int)y == (unsigned int)0",14);
   /*@ assert y ≢ (int)0xfffffffffffffff; */
   __e_acsl_assert(y != (int)0xfffffffffffffff,(char *)"Assertion",
