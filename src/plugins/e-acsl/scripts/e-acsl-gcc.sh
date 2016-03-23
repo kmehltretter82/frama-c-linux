@@ -458,14 +458,21 @@ fi
 
 # Compile
 if [ -n "$OPTION_COMPILE" ]; then
-  # Compile the original files only if the instrumentation option is given,
-  # otherwise the provided sources are assumed to be E-ACSL instrumented files
-  if [ -n "$OPTION_INSTRUMENT" ] && [ -z "$OPTION_INSTRUMENTED_ONLY" ]; then
-    ($OPTION_ECHO; $CC $CPPFLAGS $CFLAGS "$@" -o "$OUTPUT_EXEC" $LDFLAGS);
-    error "fail to compile/link un-instrumented code: $@" $?;
+  # Compile original source code
+  # $OPTION_INSTRUMENT is set -- both, instrumented and original, sources are
+  # available. Do compile the original program unless instructed to not do so
+  # by a user
+  if [ -n "$OPTION_INSTRUMENT" ]; then
+    if [ -z "$OPTION_INSTRUMENTED_ONLY" ]; then
+      ($OPTION_ECHO; $CC $CPPFLAGS $CFLAGS "$@" -o "$OUTPUT_EXEC" $LDFLAGS);
+      error "fail to compile/link un-instrumented code: $@" $?;
+    fi
+  # If $OPTION_INSTRUMENT is unset then the sources are assumed to be already
+  # instrumented, so skip compilation of the original files
   else
     OUTPUT_CODE="$@"
   fi
+
   # Compile and link E-ACSL-instrumented file with all models specified
   for mod in $OPTION_EACSL_MMODELS; do
     # If multiple models are specified then the generated executable
