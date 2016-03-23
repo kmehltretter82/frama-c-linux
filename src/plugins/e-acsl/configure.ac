@@ -40,7 +40,7 @@ check_plugin(e_acsl,PLUGIN_RELATIVE_PATH(plugin_file),
 
 plugin_require(e_acsl,rtegen)
 
-# restrict the plug-in dependency checking to external plug-in configuration 
+# restrict the plug-in dependency checking to external plug-in configuration
 m4_ifndef([FRAMAC_MAIN_AUTOCONF],[check_plugin_dependencies],[])
 
 # Check Frama-C version
@@ -111,7 +111,7 @@ fi
 
 AC_CHECK_PROG(DOXYGEN,doxygen,doxygen,no)
 AC_CHECK_PROG(HAVE_DOT,dot,YES,no)
-AC_OUTPUT([ PLUGIN_RELATIVE_PATH(doc/doxygen/doxygen.cfg) ], [  ])
+AC_OUTPUT(PLUGIN_RELATIVE_PATH(doc/doxygen/doxygen.cfg), [  ])
 
 #######################
 # Generating Makefile #
