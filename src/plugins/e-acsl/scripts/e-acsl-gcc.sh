@@ -368,6 +368,7 @@ mmodel_sources() {
   model=""
   case "$1" in
     bittree) model="bittree_model/e_acsl_bittree_mmodel.c" ;;
+    segment) model="segment_model/e_acsl_segment_mmodel.c" ;;
     *) error "Memory model '$1' does not exist" ;;
   esac
   model="$EACSL_SHARE/$model"
