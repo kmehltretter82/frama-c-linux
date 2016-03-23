@@ -39,6 +39,9 @@ include Datatype.Make
   let name = "E_ACSL.Interval.t"
   let reprs = [ { lower = Integer.zero; upper = Integer.one } ]
   include Datatype.Undefined
+  let pretty fmt i =
+    let pp = Integer.pretty ~hexa:false in
+    Format.fprintf fmt "[ %a; %a ]" pp i.lower pp i.upper
  end)
 
 (* constructors *)

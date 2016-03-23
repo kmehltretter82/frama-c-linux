@@ -165,12 +165,14 @@ let coerce ~ctx ~op ty =
 (** {2 Type system} *)
 (******************************************************************************)
 
-let mk_ctx c = match c with
+let mk_ctx ?(force=false) c =
+  if force then c
+  else match c with
   | Other -> Other
   | Gmp | C_type _ -> if Options.Gmp_only.get () then Gmp else c
 
-let rec type_term env ~ctx t =
-  let ctx = mk_ctx ctx in
+let rec type_term env ?force ~ctx t =
+  let ctx = mk_ctx ?force ctx in
   let dup ty = ty, ty in
   let infer t =
     Cil.CurrentLoc.set t.term_loc;
@@ -296,7 +298,7 @@ let rec type_term env ~ctx t =
       let ctx =
         try
           let i = Interval.infer env t' in
-          (* nothing to do more: [i] is already more precise than what we
+          (* nothing more to do: [i] is already more precise than what we
              could infer from the arguments of the cast. Also, do not type the
              internal term: possibly it is not even an integer *)
           ty_of_interv ~ctx i
@@ -354,7 +356,7 @@ let rec type_term env ~ctx t =
       (* it is a pointer, as well as [t1], while [t2] is a size_t.
          Both [t1] and [t2] must be typed. *)
       ignore (type_term env ~ctx:Other t1);
-      ignore (type_term env ~ctx:(size_t ()) t2);
+      ignore (type_term env ~force:true ~ctx:(size_t ()) t2);
       dup Other
 
     | Tapp (_,_,_) -> Error.not_yet "logic function application"
@@ -390,7 +392,7 @@ and type_term_offset env = function
   | TModel(_, toff) -> type_term_offset env toff
   | TIndex(t, toff) ->
     (* [t] is an array index which must fits into size_t *)
-    ignore (type_term env ~ctx:(size_t ()) t);
+    ignore (type_term env ~force:true ~ctx:(size_t ()) t);
     type_term_offset env toff
 
 let rec type_predicate_named env p =
