@@ -109,7 +109,7 @@ Notes:
 }
 
 # Base dir of this script
-BASEDIR=$(readlink -f `dirname $0`)
+BASEDIR="$(readlink -f `dirname $0`)"
 
 # See if pygmentize if available for color highlighting and default to plain
 # cat command otherwise
@@ -303,9 +303,23 @@ if [ -z "$1" ]; then
   error "no input files";
 fi
 
-# Check if this is `development' of installed version.
+# Check if this is a development or an installed version
 if [ -f "$BASEDIR/../E_ACSL.mli" ]; then
-  DEVELOPMENT=1
+  # Development version
+  DEVELOPMENT="$(readlink -f "$BASEDIR/..")"
+  # Check if the project has been built, as if this is a non-installed
+  # version that has not been built Frama-C will fallback to an installed one
+  # for instrumentation but still use local RTL
+  error "Plugin in $DEVELOPMENT not compiled" \
+    `test -f "$DEVELOPMENT/META.frama-c-e_acsl"; echo $?`
+  EACSL_SHARE="$DEVELOPMENT/share/e-acsl"
+  # Add the project directory to FRAMAC_PLUGINS,
+  # otherwise Frama-C uses an installed version
+  FRAMAC_FLAGS="-add-path=$DEVELOPMENT $FRAMAC_FLAGS"
+else
+  # Installed version. FRAMAC_SHARE should not be used here as Frama-C
+  # and E-ACSL may not be installed to the same location
+  EACSL_SHARE="$BASEDIR/../share/frama-c/e-acsl/"
 fi
 
 # Architecture-dependent flags. Since by default Frama-C uses 32-bit
@@ -336,19 +350,9 @@ FRAMAC_CPP_EXTRA="
   $CPPMACHDEP"
 EACSL_MMODEL="$OPTION_EACSL_MMODEL"
 
-# E-ACSL share directory
-# If specified explicitly via the --e-acsl-share option than use that ...
+# Re-set EACSL_SHARE  directory is it has been given by the user
 if [ -n "$OPTION_EACSL_SHARE" ]; then
   EACSL_SHARE="$OPTION_EACSL_SHARE"
-# ... otherwise compute it
-else
-  # Installed version path
-  if [ -z "$DEVELOPMENT" ]; then
-    EACSL_SHARE="$BASEDIR/../share/frama-c/e-acsl/"
-  # Development version path
-  else
-    EACSL_SHARE="$BASEDIR/../share/e-acsl"
-  fi
 fi
 
 # Check if the E-ACSL share directory is indeed an E-ACSL share directory that
@@ -356,7 +360,7 @@ fi
 # $EACSL_SHARE/e_acsl_mmodel_api.h - one of the headers required by the Frama-C
 # invocation. This is a week check but it is better than nothing.
 error "Cannot find required $EACSL_SHARE/e_acsl_mmodel_api.h header" \
-  `test -f $EACSL_SHARE/e_acsl_mmodel_api.h; echo $?`
+  `test -f "$EACSL_SHARE/e_acsl_mmodel_api.h"; echo $?`
 
 # Echo the name of the source file corresponding to the name of a memory model
 # or report an error of the given model does not exist.
@@ -434,7 +438,7 @@ if [ -n "$OPTION_INSTRUMENT" ]; then
     $FRAMAC_FLAGS \
     $MACHDEP \
     -cpp-extra-args="$OPTION_FRAMAC_CPP_EXTRA" \
-    -e-acsl-share $EACSL_SHARE \
+    -e-acsl-share=$EACSL_SHARE \
     $OPTION_VERBOSE \
     $OPTION_DEBUG \
     $OPTION_FRAMA_STDLIB \
