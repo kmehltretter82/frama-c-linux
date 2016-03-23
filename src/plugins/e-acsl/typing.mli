@@ -58,7 +58,7 @@ val get_integer_op: term -> integer_ty
 val get_integer_op_of_predicate: predicate named -> integer_ty
 
 val get_typ: term -> typ
-(** Get the type of the given term which must be an integer.
+(** Get the type of the given term.
     {!type_named_predicate} must already have been called on the englobing
     predicate. *)
 

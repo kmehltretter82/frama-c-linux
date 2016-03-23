@@ -192,11 +192,11 @@ let rec type_term env ~ctx t =
       let ty =
         try
           let i = Interval.infer env t in
-          type_term_lval env tlv;
           ty_of_interv ~ctx i
         with Interval.Not_an_integer ->
           Other
       in
+      type_term_lval env tlv;
       dup ty
 
     | Toffset(_, t')
@@ -210,7 +210,7 @@ let rec type_term env ~ctx t =
           ignore (type_term env ~ctx:Other t');
           ty_of_interv ~ctx i
         with Interval.Not_an_integer ->
-          Other
+          assert false
       in
       dup ty
 
@@ -223,50 +223,51 @@ let rec type_term env ~ctx t =
           ignore (type_term env ~ctx:Other t2);
           ty_of_interv ~ctx i
         with Interval.Not_an_integer ->
-          Other
+          assert false
       in
       dup ty
 
     | TUnOp (unop, t') ->
-      let ty =
-        let i = Interval.infer env t in
-        let i' = Interval.infer env t' in
-        let ctx = mk_ctx (ty_of_interv ~ctx (Interval.join i i')) in
-        ignore (type_term env ~ctx t');
-        ctx
+      let ctx =
+        try
+          let i = Interval.infer env t in
+          let i' = Interval.infer env t' in
+          mk_ctx (ty_of_interv ~ctx (Interval.join i i'))
+        with Interval.Not_an_integer ->
+          Other (* real *)
       in
+      ignore (type_term env ~ctx t');
       (match unop with
-      | LNot -> c_int, ty (* converted into [t == 0] in casse of GMP *)
-      | Neg | BNot -> dup ty)
+      | LNot -> c_int, ctx (* converted into [t == 0] in casse of GMP *)
+      | Neg | BNot -> dup ctx)
 
     | TBinOp((PlusA | MinusA | Mult | Div | Mod | Shiftlt | Shiftrt), t1, t2) ->
-      let ty =
-        let i = Interval.infer env t in
-        let i1 = Interval.infer env t1 in
-        let i2 = Interval.infer env t2 in
-        let ctx =
+      let ctx =
+        try
+          let i = Interval.infer env t in
+          let i1 = Interval.infer env t1 in
+          let i2 = Interval.infer env t2 in
           mk_ctx (ty_of_interv ~ctx (Interval.join i (Interval.join i1 i2)))
-        in
-        ignore (type_term env ~ctx t1);
-        ignore (type_term env ~ctx t2);
-        ctx
+        with Interval.Not_an_integer ->
+          Other (* real *)
       in
-      dup ty
+      ignore (type_term env ~ctx t1);
+      ignore (type_term env ~ctx t2);
+      dup ctx
 
     | TBinOp ((Lt | Gt | Le | Ge | Eq | Ne), t1, t2) ->
       assert (compare ctx c_int >= 0);
-      let ty =
-        let ctx =
-          try
-            let i1 = Interval.infer env t1 in
-            let i2 = Interval.infer env t2 in
-            mk_ctx (ty_of_interv ~ctx (Interval.join i1 i2))
-          with Interval.Not_an_integer ->
-            Other
-        in
-        ignore (type_term env ~ctx t1);
-        ignore (type_term env ~ctx t2);
-        match ctx with
+      let ctx =
+        try
+          let i1 = Interval.infer env t1 in
+          let i2 = Interval.infer env t2 in
+          mk_ctx (ty_of_interv ~ctx (Interval.join i1 i2))
+        with Interval.Not_an_integer ->
+          Other
+      in
+      ignore (type_term env ~ctx t1);
+      ignore (type_term env ~ctx t2);
+      let ty = match ctx with
         | Other -> c_int
         | Gmp | C_type _ -> ctx
       in
@@ -274,14 +275,16 @@ let rec type_term env ~ctx t =
 
     | TBinOp ((LAnd | LOr), t1, t2) ->
       let ty =
-        assert (compare ctx c_int >= 1);
-        let i1 = Interval.infer env t1 in
-        let i2 = Interval.infer env t2 in
-        (* both operands fit in an int. *)
-        ignore (type_term env ~ctx:c_int t1);
-        ignore (type_term env ~ctx:c_int t2);
-        ty_of_interv ~ctx (Interval.join i1 i2)
+        try
+          let i1 = Interval.infer env t1 in
+          let i2 = Interval.infer env t2 in
+          ty_of_interv ~ctx (Interval.join i1 i2)
+        with Interval.Not_an_integer ->
+          Other
       in
+      (* both operands fit in an int. *)
+      ignore (type_term env ~ctx:c_int t1);
+      ignore (type_term env ~ctx:c_int t2);
       dup ty
 
     | TBinOp (BAnd, _, _) -> Error.not_yet "bitwise and"
@@ -290,55 +293,51 @@ let rec type_term env ~ctx t =
 
     | TCastE(_, t')
     | TCoerce(t', _) ->
-      let ty =
-        (* in any case, must type the subterms *)
+      let ctx =
         try
           let i = Interval.infer env t' in
-          (* nothing to do more: [i] is already more precise than what we could
-             infer from the arguments of the cast. Also, do not type the
+          (* nothing to do more: [i] is already more precise than what we
+             could infer from the arguments of the cast. Also, do not type the
              internal term: possibly it is not even an integer *)
-          let ty = ty_of_interv ~ctx i in
-          ignore (type_term env ~ctx:ty t');
-          ty
+          ty_of_interv ~ctx i
         with Interval.Not_an_integer ->
-          ignore (type_term env ~ctx:Other t');
           Other
       in
-      dup ty
+      ignore (type_term env ~ctx t');
+      dup ctx
 
     | Tif (t1, t2, t3) ->
-      let ty =
-        let ctx = mk_ctx c_int in
-        ignore (type_term env ~ctx t1);
-        let i = Interval.infer env t in
-        let ctx =
-          try
-            let i2 = Interval.infer env t2 in
-            let i3 = Interval.infer env t3 in
-            mk_ctx (ty_of_interv ~ctx (Interval.join i (Interval.join i2 i3)))
-          with Interval.Not_an_integer ->
-            Other
-        in
-        ignore (type_term env ~ctx t2);
-        ignore (type_term env ~ctx t3);
-        ctx
+      let ctx = mk_ctx c_int in
+      ignore (type_term env ~ctx t1);
+      let i = Interval.infer env t in
+      let ctx =
+        try
+          let i2 = Interval.infer env t2 in
+          let i3 = Interval.infer env t3 in
+          mk_ctx (ty_of_interv ~ctx (Interval.join i (Interval.join i2 i3)))
+        with Interval.Not_an_integer ->
+          Other
       in
-      dup ty
+      ignore (type_term env ~ctx t2);
+      ignore (type_term env ~ctx t3);
+      dup ctx
 
     | Tat (t, _)
     | TLogic_coerce (_, t) -> dup (type_term env ~ctx t).ty
 
     | TCoerceE (t1, t2) ->
-      let ty =
-        let i = Interval.infer env t in
-        let i1 = Interval.infer env t1 in
-        let i2 = Interval.infer env t2 in
-        let ty = ty_of_interv ~ctx (Interval.join i (Interval.join i1 i2)) in
-        ignore (type_term env ~ctx:ty t1);
-        ignore (type_term env ~ctx:ty t2);
-        ty
+      let ctx =
+        try
+          let i = Interval.infer env t in
+          let i1 = Interval.infer env t1 in
+          let i2 = Interval.infer env t2 in
+          ty_of_interv ~ctx (Interval.join i (Interval.join i1 i2))
+        with Interval.Not_an_integer ->
+          Other
       in
-      dup ty
+      ignore (type_term env ~ctx t1);
+      ignore (type_term env ~ctx t2);
+      dup ctx
 
     | TAddrOf tlv
     | TStartOf tlv ->
@@ -516,13 +515,21 @@ let get_integer_op t = (Memo.get t).op
 let get_integer_op_of_predicate p =
   (type_predicate_named Interval.Env.empty (* the env is useless *) p).op
 
+let extract_typ t ty =
+  try typ_of_integer_ty ty
+  with Not_an_integer ->
+    let ty = t.term_type in
+    if Cil.isLogicRealType ty then TFloat(FLongDouble, [])
+    else if Cil.isLogicFloatType ty then Logic_utils.logicCType ty
+    else assert false
+
 let get_typ t =
   let info = Memo.get t in
-  try typ_of_integer_ty info.ty with Not_an_integer -> assert false
+  extract_typ t info.ty
 
 let get_op t =
   let info = Memo.get t in
-  try typ_of_integer_ty info.op with Not_an_integer -> assert false
+  extract_typ t info.op
 
 let get_cast t =
   Cil.CurrentLoc.set t.term_loc;
