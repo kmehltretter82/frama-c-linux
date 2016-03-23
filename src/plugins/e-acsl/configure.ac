@@ -108,9 +108,10 @@ fi
 
 # Doxygen
 #########
+
 AC_CHECK_PROG(DOXYGEN,doxygen,doxygen,no)
 AC_CHECK_PROG(HAVE_DOT,dot,YES,no)
-AC_OUTPUT([ doc/doxygen/doxygen.cfg ], [  ])
+AC_OUTPUT([ PLUGIN_RELATIVE_PATH(doc/doxygen/doxygen.cfg) ], [  ])
 
 #######################
 # Generating Makefile #

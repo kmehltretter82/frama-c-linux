@@ -280,14 +280,16 @@ $(E_ACSL_DIR)/Makefile: $(E_ACSL_DIR)/Makefile.in $(CONFIG_STATUS_DIR_DEP)
 	cd $(CONFIG_STATUS_DIR) && ./config.status
 
 #####################################
-# Doxygen 													#
+# Doxygen                           #
 #####################################
+
 DOXYGEN = @DOXYGEN@
 doxygen:
 	if ! test $(DOXYGEN) = "no"; then \
-		$(DOXYGEN) doc/doxygen/doxygen.cfg ; \
+		$(DOXYGEN) $(E_ACSL_DIR)/doc/doxygen/doxygen.cfg ; \
 	else \
-	  echo "Warning: Skip doxygen documentation: Doxygen executable not found."; \
+	  echo "Warning: Skip doxygen documentation: \
+Doxygen executable not found."; \
 	fi
 
 doc:: doxygen
