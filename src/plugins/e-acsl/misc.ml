@@ -244,6 +244,9 @@ let mk_readonly vi =
 let term_addr_of ~loc tlv ty =
   Logic_const.taddrof ~loc tlv (Ctype (TPtr(ty, [])))
 
+let is_alloc_name fn =
+  fn = "malloc" || fn = "free" || fn = "realloc" || fn = "calloc"
+
 (*
 Local Variables:
 compile-command: "make"
