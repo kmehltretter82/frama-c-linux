@@ -85,6 +85,7 @@ val mk_readonly: varinfo -> stmt
 val term_addr_of: loc:location -> term_lval -> typ -> term
 val is_generated_varinfo: varinfo -> bool
 val is_generated_kf: kernel_function -> bool
+val is_alloc_name: string -> bool
 
 (*
 Local Variables:
