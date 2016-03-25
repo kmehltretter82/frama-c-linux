@@ -50,8 +50,7 @@ end = struct
   let heap_allocation_ref = ref false
   let has_heap_allocations () = !heap_allocation_ref
   let check_heap_allocations fn =
-    heap_allocation_ref := !heap_allocation_ref || (Misc.is_alloc_name fn);
-    ()
+    heap_allocation_ref := !heap_allocation_ref || Misc.is_alloc_name fn
 
   let current_kf = ref None
   let default_varinfos = function None -> Varinfo.Hptset.empty | Some s -> s 
@@ -136,7 +135,8 @@ end = struct
   let clear () = 
     Kernel_function.Hashtbl.clear tbl;
     consolidated_set := Varinfo.Hptset.empty;
-    is_consolidated_ref := false
+    is_consolidated_ref := false;
+    heap_allocation_ref := false
 
 end
 
