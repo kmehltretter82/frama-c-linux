@@ -20,51 +20,51 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef E_ACSL_MMODEL_API
-#define E_ACSL_MMODEL_API
+/*! ***********************************************************************
+ * \file  e_acsl_bittree_api.h
+ * \brief Patricia Trie API
+***************************************************************************/
+
+#ifndef E_ACSL_BITTREE_API
+#define E_ACSL_BITTREE_API
 
 #include "stdlib.h"
 #include "stdbool.h"
 
-/* Memory block allocated and may be deallocated */
+/*! \brief Structure representing an allocated memory block */
 struct _block {
-  size_t ptr;	/* begin address */
-  size_t size;	/* size in bytes */
-/* Keep trace of initialized sub-blocks within a memory block */
-  unsigned char * init_ptr; /* dynamic array of booleans */
-  size_t init_cpt;
-  _Bool is_readonly;
-  _Bool freeable;
+  size_t ptr;  //!< Base address
+  size_t size; //!< Block length (in bytes)
+  unsigned char * init_ptr; //!< Per-bit initialization
+  size_t init_cpt; //!< Number of initialized bytes
+  _Bool is_readonly; //!< True if a block is marked read-only
+  _Bool freeable; //!< True if a block can be de-allocated using `free`
 };
 
-/* print the information about a block */
-static void __print_block(struct _block * ptr );
+/*! \brief Remove a block from the structure */
+static void remove_element(struct _block *b);
 
-/* erase information about initialization of a block */
-static void __clean_init(struct _block * ptr );
+/*! \brief Add a block to the structure */
+static void add_element(struct _block *b);
 
-/* erase all information about a block */
-static void __clean_block(struct _block * ptr);
+/*! \brief Return block B such that: `\base_addr(B->ptr) == ptr`.
+NB: The function assumes that such a block exists. */
+static struct _block * get_exact(void *ptr);
 
-/* remove the block from the structure */
-static void  __remove_element(struct _block *);
+/*! \brief Return block B such that:
+   `\base_addr(B->ptr) <= ptr < (\base_addr(B->ptr) + size)`
+   or NULL if such a block does not exist. */
+static struct _block * get_cont(void *ptr);
 
-/* add a block in the structure */
-static void  __add_element(struct _block *);
+/*! \brief Erase the contents of the structure */
+static void clean_struct(void);
 
-/* return the block B such as : begin addr of B == ptr
-   we suppose that such a block exists, but we could return NULL if not */
-static struct _block * __get_exact(void *);
+/*! \brief Print information about a given block */
+static void print_block(struct _block *b);
 
-/* return the block B containing ptr, such as :
-   begin addr of B <= ptr < (begin addr + size) of B
-   or NULL if such a block does not exist */
-static struct _block * __get_cont(void *);
+/*! \brief Erase information about a block's initialization */
+static void clean_init(struct _block *b);
 
-/* erase the content of the structure */
-static void __clean_struct(void);
-
-/* print the content of the structure */
-static void  __debug_struct(void);
-
+/*! \brief Erase all information about a given block */
+static void clean_block(struct _block *b);
 #endif

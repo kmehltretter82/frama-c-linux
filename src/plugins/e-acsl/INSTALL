@@ -110,10 +110,9 @@ Shared files: (usually in `frama-c -print-share-path`/e-acsl)
 - glibc/memmove.c
 - glibc/memset.c
 - glibc/strcmp.c
-- bittree_model/e_acsl_mmodel.c
-- bittree_model/e_acsl_mmodel_api.h
+- bittree_model/e_acsl_bittree_api.h
 - bittree_model/e_acsl_bittree.h
-- bittree_model/e_acsl_bittree.c
+- bittree_model/e_acsl_bittree_mmodel.c
 
 Manuals: (usually in `frama-c -print-share-path`/manuals)
 --------

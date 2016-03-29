@@ -99,7 +99,7 @@ void __initialize(void * ptr, size_t size)
 void __full_init(void * ptr)
   __attribute__((FC_BUILTIN));
 
-/*! \brief Mark a memory block which start address is given by \ptr as
+/*! \brief Mark a memory block which start address is given by \p ptr as
  * read-only. */
 /*@ assigns \nothing; */
 void __readonly(void * ptr)

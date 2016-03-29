@@ -118,7 +118,7 @@ int main(void) {
   }
 
   /* Check duplicate initialization does not affect correct count of
-   * initialized bits (relevant for ADT models only). */
+   * initialized bits (relevant for bittree model). */
   int dup [2];
   dup[0] = 1;
   dup[0] = 1;
