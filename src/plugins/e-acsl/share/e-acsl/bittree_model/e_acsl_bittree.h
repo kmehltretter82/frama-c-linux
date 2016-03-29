@@ -292,12 +292,11 @@ static void add_element (struct _block * ptr) {
       father->father = NULL;
       father->mask = mask(brother->addr & brother->mask, ptr->ptr);
       __root = father;
-    }
-    else {
+    } else {
       if (brother->father->left == brother)
-	brother->father->left = father;
+        brother->father->left = father;
       else
-	brother->father->right = father;
+        brother->father->right = father;
       father->father = brother->father;
 
       /* necessary ? -- begin */
@@ -309,10 +308,10 @@ static void add_element (struct _block * ptr) {
     brother->father = father;
     if(!brother->is_leaf)
       brother->mask = mask(brother->left->addr & brother->left->mask,
-			   brother->right->addr & brother->right->mask);
+      brother->right->addr & brother->right->mask);
 
     assert((father->left == brother && father->right == new_leaf)
-	   || (father->left == new_leaf && father->right == brother));
+     || (father->left == new_leaf && father->right == brother));
   }
 }
 
@@ -362,12 +361,13 @@ static struct _block * get_cont (void * ptr) {
       /* tmp cannot contain ptr because its begin addr is higher */
       if(tmp->addr > (size_t)ptr) return NULL;
       /* tmp->addr <= ptr, tmp may contain ptr
-	 ptr is contained if tmp is large enough (begin addr + size) */
+       ptr is contained if tmp is large enough (begin addr + size) */
       else if((size_t)ptr < tmp->leaf->size + tmp->addr
               || (tmp->leaf->size == 0 && (size_t)ptr == tmp->leaf->ptr))
-	return tmp->leaf;
+        return tmp->leaf;
       /* tmp->addr <= ptr, but tmp->addr is not large enough */
-      else return NULL;
+      else
+        return NULL;
     }
 
     assert(tmp->left != NULL && tmp->right != NULL);
@@ -383,10 +383,10 @@ static struct _block * get_cont (void * ptr) {
       tmp = tmp->left;
     else {
       if(other_choice == NULL)
-	return NULL;
+        return NULL;
       else {
-	tmp = other_choice;
-	other_choice = NULL;
+        tmp = other_choice;
+        other_choice = NULL;
       }
     }
   }
