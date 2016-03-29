@@ -22,7 +22,7 @@
 
 /*! ***********************************************************************
  * \file  e_acsl.h
- * \brief E-ACSL Public API for functionality shared by all memory models
+ * \brief E-ACSL Public API independent of memory models
  ***************************************************************************/
 
 #ifndef E_ACSL
