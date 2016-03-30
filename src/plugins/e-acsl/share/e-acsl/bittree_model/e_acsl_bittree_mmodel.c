@@ -407,14 +407,14 @@ void __e_acsl_memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
 /* DEBUG              */
 /**********************/
 #ifdef E_ACSL_DEBUG
-/*! \brief print the information about a block */
+/*! \brief print the information about a tracked block */
 void __e_acsl_print_block (bt_block * ptr) {
   bt_print_block(ptr);
 }
 
-/*! \brief print the content of the abstract structure */
+/*! \brief print the content of the bittree */
 void __e_acsl_print_bittree() {
-  print_bittree();
+  bt_print();
 }
 #endif
 #endif

@@ -36,12 +36,22 @@ struct bt_block {
   size_t ptr;  //!< Base address
   size_t size; //!< Block length (in bytes)
   unsigned char * init_ptr; //!< Per-bit initialization
-  size_t init_cpt; //!< Number of initialized bytes
+  size_t init_cpt; //!< Number of initialized bytes within a block
   _Bool is_readonly; //!< True if a block is marked read-only
   _Bool freeable; //!< True if a block can be de-allocated using `free`
 };
 
 typedef struct bt_block bt_block;
+
+/*! \brief Structure representing a bittree node */
+struct bt_node {
+  _Bool is_leaf;
+  size_t addr,  mask;
+  struct bt_node * left, * right, * parent;
+  bt_block * leaf;
+};
+
+typedef struct bt_node bt_node;
 
 /*! \brief Remove a block from the structure */
 static void bt_remove(bt_block *b);
@@ -61,12 +71,24 @@ static bt_block * bt_find(void *ptr);
 /*! \brief Erase the contents of the structure */
 static void bt_clean(void);
 
-/*! \brief Print information about a given block */
-static void bt_print_block(bt_block *b);
-
 /*! \brief Erase information about a block's initialization */
 static void bt_clean_block_init(bt_block *b);
 
 /*! \brief Erase all information about a given block */
 static void bt_clean_block(bt_block *b);
+
+#ifdef E_ACSL_DEBUG
+/*! \brief Print information about a given block */
+static void bt_print_block(bt_block *b);
+
+/*! \brief Recursively print the contents of the bittree starting from a
+ * given node */
+/*@ assigns \nothing; */
+static void bt_print_node(bt_node * ptr, int depth);
+
+/*! \brief Print the contents of the entire bittree */
+/*@ assigns \nothing; */
+static void bt_print();
+#endif
+
 #endif
