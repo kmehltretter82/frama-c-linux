@@ -103,7 +103,7 @@ static struct bittree {
   size_t addr,  mask;
   struct bittree * left, * right, * father;
   struct _block * leaf;
-} * __root = NULL;
+} * bt_root = NULL;
 
 /*unsigned cpt_mask = 0;*/
 
@@ -148,14 +148,14 @@ static size_t mask(size_t a, size_t b) {
 /* called from remove_element */
 /* the block we are looking for has to be in the tree */
 /*@ requires \valid(ptr);
-  @ requires \valid(__root);
+  @ requires \valid(bt_root);
   @ assigns \nothing;
   @ ensures \valid(\result);
   @ ensures \result->leaf == ptr;
   @*/
 static struct bittree * __get_leaf_from_block (struct _block * ptr) {
-  struct bittree * curr = __root;
-  assert(__root != NULL);
+  struct bittree * curr = bt_root;
+  assert(bt_root != NULL);
   assert(ptr != NULL);
 
   /*@ loop assigns curr;
@@ -191,7 +191,7 @@ static void remove_element (struct _block * ptr) {
 
   if(leaf_to_delete->father == NULL)
     // the leaf is the root
-    __root = NULL;
+    bt_root = NULL;
   else {
     struct bittree * brother, * father;
     father = leaf_to_delete->father;
@@ -225,15 +225,15 @@ static void remove_element (struct _block * ptr) {
 /* called from add_element */
 /* the returned node will be the brother of the soon to be added node */
 /*@ requires \valid(ptr);
-  @ requires \valid(__root);
+  @ requires \valid(bt_root);
   @ assigns \nothing;
   @ ensures \valid(\result);
   @*/
 static struct bittree * __most_similar_node (struct _block * ptr) {
-  struct bittree * curr = __root;
+  struct bittree * curr = bt_root;
   size_t left_prefix, right_prefix;
   assert(ptr != NULL);
-  assert(__root != NULL);
+  assert(bt_root != NULL);
 
   while(1) {
     if(curr->is_leaf)
@@ -267,8 +267,8 @@ static void add_element (struct _block * ptr) {
   new_leaf->father = NULL;
   new_leaf->leaf = ptr;
 
-  if(__root == NULL)
-    __root = new_leaf;
+  if(bt_root == NULL)
+    bt_root = new_leaf;
   else {
     struct bittree * brother = __most_similar_node (ptr), * father, * aux;
 
@@ -288,10 +288,10 @@ static void add_element (struct _block * ptr) {
     }
     new_leaf->father = father;
 
-    if(brother == __root) {
+    if(brother == bt_root) {
       father->father = NULL;
       father->mask = mask(brother->addr & brother->mask, ptr->ptr);
-      __root = father;
+      bt_root = father;
     } else {
       if (brother->father->left == brother)
         brother->father->left = father;
@@ -322,8 +322,8 @@ static void add_element (struct _block * ptr) {
   @ ensures \result == \null || \result->ptr == (size_t)ptr;
   @*/
 static struct _block * get_exact (void * ptr) {
-  struct bittree * tmp = __root;
-  assert(__root != NULL);
+  struct bittree * tmp = bt_root;
+  assert(bt_root != NULL);
   assert(ptr != NULL);
 
   /*@ loop assigns tmp;
@@ -351,8 +351,8 @@ static struct _block * get_exact (void * ptr) {
    begin addr of B <= ptr < (begin addr + size) of B
    or NULL if such a block does not exist */
 static struct _block * get_cont (void * ptr) {
-  struct bittree * tmp = __root;
-  if(__root == NULL || ptr == NULL) return NULL;
+  struct bittree * tmp = bt_root;
+  if(bt_root == NULL || ptr == NULL) return NULL;
 
   struct bittree * other_choice = NULL;
 
@@ -430,8 +430,8 @@ static void clean_rec (struct bittree * ptr) {
 
 /* erase the content of the structure */
 static void clean_struct () {
-  clean_rec(__root);
-  __root = NULL;
+  clean_rec(bt_root);
+  bt_root = NULL;
 }
 
 /*********************/
@@ -475,7 +475,7 @@ static void print_bittree_node(struct bittree * ptr, int depth) {
 /*@ assigns \nothing; */
 static void print_bittree() {
   DLOG("------------DEBUG\n");
-  print_bittree_node(__root, 0);
+  print_bittree_node(bt_root, 0);
   DLOG("-----------------\n");
 }
 #endif
