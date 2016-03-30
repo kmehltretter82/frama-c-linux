@@ -401,7 +401,7 @@ static void bt_clean_block_init (bt_block * ptr) {
     native_free(ptr->init_ptr);
     ptr->init_ptr = NULL;
   }
-  ptr->init_cpt = 0;
+  ptr->init_bytes = 0;
 }
 
 /* erase all information about a block */
@@ -442,7 +442,7 @@ static void bt_print_block(bt_block * ptr) {
   if (ptr != NULL) {
     DLOG("%a; %lu Bytes; %slitteral; [init] : %d ",
       (char*)ptr->ptr, ptr->size,
-      ptr->is_readonly ? "" : "not ", ptr->init_cpt);
+      ptr->is_readonly ? "" : "not ", ptr->init_bytes);
     if(ptr->init_ptr != NULL) {
       unsigned i;
       for(i = 0; i < ptr->size/8; i++)

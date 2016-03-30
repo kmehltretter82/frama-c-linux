@@ -36,7 +36,7 @@ struct bt_block {
   size_t ptr;  //!< Base address
   size_t size; //!< Block length (in bytes)
   unsigned char * init_ptr; //!< Per-bit initialization
-  size_t init_cpt; //!< Number of initialized bytes within a block
+  size_t init_bytes; //!< Number of initialized bytes within a block
   _Bool is_readonly; //!< True if a block is marked read-only
   _Bool freeable; //!< True if a block can be de-allocated using `free`
 };

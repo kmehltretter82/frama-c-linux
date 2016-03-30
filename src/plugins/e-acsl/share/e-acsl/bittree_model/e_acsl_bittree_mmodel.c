@@ -73,7 +73,7 @@ void* __store_block(void* ptr, size_t size) {
   tmp->ptr = (size_t)ptr;
   tmp->size = size;
   tmp->init_ptr = NULL;
-  tmp->init_cpt = 0;
+  tmp->init_bytes = 0;
   tmp->is_readonly = false;
   tmp->freeable = false;
   bt_insert(tmp);
@@ -158,13 +158,13 @@ void* __realloc(void* ptr, size_t size) {
     bt_insert(tmp);
   }
   /* uninitialized, do nothing */
-  if(tmp->init_cpt == 0) ;
+  if(tmp->init_bytes == 0) ;
   /* already fully initialized block */
-  else if (tmp->init_cpt == tmp->size) {
+  else if (tmp->init_bytes == tmp->size) {
     /* realloc smaller block */
     if(size <= tmp->size)
       /* adjust new size, allocation not necessary */
-      tmp->init_cpt = size;
+      tmp->init_bytes = size;
     /* realloc bigger larger block */
     else {
       /* size of tmp->init_ptr in the new block  */
@@ -185,10 +185,10 @@ void* __realloc(void* ptr, size_t size) {
     tmp->init_ptr = native_realloc(tmp->init_ptr, nb);
     for(i = nb_old; i < nb; i++)
       tmp->init_ptr[i] = 0;
-    tmp->init_cpt = 0;
+    tmp->init_bytes = 0;
     for(i = 0; i < nb; i++)
-      tmp->init_cpt += nbr_bits_to_1[tmp->init_ptr[i]];
-    if(tmp->init_cpt == size || tmp->init_cpt == 0) {
+      tmp->init_bytes += nbr_bits_to_1[tmp->init_ptr[i]];
+    if(tmp->init_bytes == size || tmp->init_bytes == 0) {
       native_free(tmp->init_ptr);
       tmp->init_ptr = NULL;
     }
@@ -216,7 +216,7 @@ void* __calloc(size_t nbr_block, size_t size_block) {
   DASSERT(new_block != NULL && (void*)new_block->ptr != NULL);
   /* Mark allocated block as freeable and initialized */
   new_block->freeable = true;
-  new_block->init_cpt = size;
+  new_block->init_bytes = size;
   return (void*)new_block->ptr;
 }
 
@@ -235,11 +235,11 @@ void __initialize (void * ptr, size_t size) {
     return;
 
   /* already fully initialized, do nothing */
-  if(tmp->init_cpt == tmp->size)
+  if(tmp->init_bytes == tmp->size)
     return;
 
   /* fully uninitialized */
-  if(tmp->init_cpt == 0) {
+  if(tmp->init_bytes == 0) {
     int nb = needed_bytes(tmp->size);
     tmp->init_ptr = native_malloc(nb);
     memset(tmp->init_ptr, 0, nb);
@@ -263,12 +263,12 @@ void __initialize (void * ptr, size_t size) {
 
     if (!checkbit(bit, tmp->init_ptr[byte])) { /* if bit is unset ... */
       setbit(bit, tmp->init_ptr[byte]); /* ... set the bit ... */
-      tmp->init_cpt++; /* ... and increment initialized bytes count */
+      tmp->init_bytes++; /* ... and increment initialized bytes count */
     }
   }
 
   /* now fully initialized */
-  if(tmp->init_cpt == tmp->size) {
+  if(tmp->init_bytes == tmp->size) {
     native_free(tmp->init_ptr);
     tmp->init_ptr = NULL;
   }
@@ -288,8 +288,7 @@ void __full_init (void * ptr) {
     native_free(tmp->init_ptr);
     tmp->init_ptr = NULL;
   }
-
-  tmp->init_cpt = tmp->size;
+  tmp->init_bytes = tmp->size;
 }
 
 /* mark a block as read-only */
@@ -315,10 +314,10 @@ int __initialized (void * ptr, size_t size) {
     return false;
 
   /* fully uninitialized */
-  if(tmp->init_cpt == 0)
+  if(tmp->init_bytes == 0)
     return false;
   /* fully initialized */
-  if(tmp->init_cpt == tmp->size)
+  if(tmp->init_bytes == tmp->size)
     return true;
 
   /* see implementation of function __initialize for details */
