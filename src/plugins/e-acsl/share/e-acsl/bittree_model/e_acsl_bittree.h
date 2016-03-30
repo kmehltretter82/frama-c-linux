@@ -356,7 +356,6 @@ static struct _block * get_cont (void * ptr) {
   if(__root == NULL || ptr == NULL) return NULL;
 
   struct bittree * other_choice = NULL;
-
   while(1) {
     if(tmp->is_leaf) {
       /* tmp cannot contain ptr because its begin addr is higher */
