@@ -414,15 +414,15 @@ static void clean_block (struct _block * ptr) {
 
 /* called from clean_struct */
 /* recursively erase the content of the structure */
-static void __clean_rec (struct bittree * ptr) {
+static void clean_rec (struct bittree * ptr) {
   if(ptr == NULL) return;
   else if(ptr->is_leaf) {
     clean_block(ptr->leaf);
     ptr->leaf = NULL;
   }
   else {
-    __clean_rec(ptr->left);
-    __clean_rec(ptr->right);
+    clean_rec(ptr->left);
+    clean_rec(ptr->right);
     ptr->left = ptr->right = NULL;
   }
   native_free(ptr);
@@ -430,7 +430,7 @@ static void __clean_rec (struct bittree * ptr) {
 
 /* erase the content of the structure */
 static void clean_struct () {
-  __clean_rec(__root);
+  clean_rec(__root);
   __root = NULL;
 }
 
