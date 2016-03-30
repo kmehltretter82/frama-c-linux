@@ -64,29 +64,29 @@ size_t __get_memory_size(void) {
 /**************************/
 
 /* store the block of size bytes starting at ptr, the new block is returned.
- * Warning: the return type is implicitly (struct _block*). */
+ * Warning: the return type is implicitly (bt_block*). */
 void* __store_block(void* ptr, size_t size) {
-  struct _block * tmp;
+  bt_block * tmp;
   DASSERT(ptr != NULL);
-  tmp = native_malloc(sizeof(struct _block));
+  tmp = native_malloc(sizeof(bt_block));
   DASSERT(tmp != NULL);
   tmp->ptr = (size_t)ptr;
   tmp->size = size;
   tmp->init_ptr = NULL;
-  tmp->init_cpt = 0;
+  tmp->init_bytes = 0;
   tmp->is_readonly = false;
   tmp->freeable = false;
-  add_element(tmp);
+  bt_insert(tmp);
   return tmp;
 }
 
 /* remove the block starting at ptr */
 void __delete_block(void* ptr) {
   DASSERT(ptr != NULL);
-  struct _block * tmp = get_exact(ptr);
+  bt_block * tmp = bt_lookup(ptr);
   DASSERT(tmp != NULL);
-  clean_init(tmp);
-  remove_element(tmp);
+  bt_clean_block_init(tmp);
+  bt_remove(tmp);
   native_free(tmp);
 }
 
@@ -94,7 +94,7 @@ void __delete_block(void* ptr) {
  * for further information, see malloc */
 void* __malloc(size_t size) {
   void * tmp;
-  struct _block * new_block;
+  bt_block * new_block;
   if(size <= 0)
     return NULL;
   tmp = native_malloc(size);
@@ -110,23 +110,23 @@ void* __malloc(size_t size) {
 /* free the block starting at ptr,
  * for further information, see free */
 void __free(void* ptr) {
-  struct _block * tmp;
+  bt_block * tmp;
   if(ptr == NULL)
     return;
-  tmp = get_exact(ptr);
+  tmp = bt_lookup(ptr);
   DASSERT(tmp != NULL);
   native_free(ptr);
-  clean_init(tmp);
+  bt_clean_block_init(tmp);
   __heap_size -= tmp->size;
-  remove_element(tmp);
+  bt_remove(tmp);
   native_free(tmp);
 }
 
 int __freeable(void* ptr) {
-  struct _block * tmp;
+  bt_block * tmp;
   if(ptr == NULL)
     return false;
-  tmp = get_exact(ptr);
+  tmp = bt_lookup(ptr);
   if(tmp == NULL)
     return false;
   return tmp->freeable;
@@ -135,7 +135,7 @@ int __freeable(void* ptr) {
 /* resize the block starting at ptr to fit its new size,
  * for further information, see realloc */
 void* __realloc(void* ptr, size_t size) {
-  struct _block * tmp;
+  bt_block * tmp;
   void * new_ptr;
   /* ptr is NULL - malloc */
   if(ptr == NULL)
@@ -145,7 +145,7 @@ void* __realloc(void* ptr, size_t size) {
     __free(ptr);
     return NULL;
   }
-  tmp = get_exact(ptr);
+  tmp = bt_lookup(ptr);
   DASSERT(tmp != NULL);
   new_ptr = native_realloc((void*)tmp->ptr, size);
   if(new_ptr == NULL)
@@ -153,18 +153,18 @@ void* __realloc(void* ptr, size_t size) {
   __heap_size -= tmp->size;
   /* realloc changes start address -- re-enter the element */
   if (tmp->ptr != (size_t)new_ptr) {
-    remove_element(tmp);
+    bt_remove(tmp);
     tmp->ptr = (size_t)new_ptr;
-    add_element(tmp);
+    bt_insert(tmp);
   }
   /* uninitialized, do nothing */
-  if(tmp->init_cpt == 0) ;
+  if(tmp->init_bytes == 0) ;
   /* already fully initialized block */
-  else if (tmp->init_cpt == tmp->size) {
+  else if (tmp->init_bytes == tmp->size) {
     /* realloc smaller block */
     if(size <= tmp->size)
       /* adjust new size, allocation not necessary */
-      tmp->init_cpt = size;
+      tmp->init_bytes = size;
     /* realloc bigger larger block */
     else {
       /* size of tmp->init_ptr in the new block  */
@@ -185,10 +185,10 @@ void* __realloc(void* ptr, size_t size) {
     tmp->init_ptr = native_realloc(tmp->init_ptr, nb);
     for(i = nb_old; i < nb; i++)
       tmp->init_ptr[i] = 0;
-    tmp->init_cpt = 0;
+    tmp->init_bytes = 0;
     for(i = 0; i < nb; i++)
-      tmp->init_cpt += nbr_bits_to_1[tmp->init_ptr[i]];
-    if(tmp->init_cpt == size || tmp->init_cpt == 0) {
+      tmp->init_bytes += nbr_bits_to_1[tmp->init_ptr[i]];
+    if(tmp->init_bytes == size || tmp->init_bytes == 0) {
       native_free(tmp->init_ptr);
       tmp->init_ptr = NULL;
     }
@@ -205,7 +205,7 @@ void* __realloc(void* ptr, size_t size) {
 void* __calloc(size_t nbr_block, size_t size_block) {
   void * tmp;
   size_t size = nbr_block * size_block;
-  struct _block * new_block;
+  bt_block * new_block;
   if(size <= 0)
     return NULL;
   tmp = native_calloc(nbr_block, size_block);
@@ -216,7 +216,7 @@ void* __calloc(size_t nbr_block, size_t size_block) {
   DASSERT(new_block != NULL && (void*)new_block->ptr != NULL);
   /* Mark allocated block as freeable and initialized */
   new_block->freeable = true;
-  new_block->init_cpt = size;
+  new_block->init_bytes = size;
   return (void*)new_block->ptr;
 }
 
@@ -226,20 +226,20 @@ void* __calloc(size_t nbr_block, size_t size_block) {
 
 /* mark the size bytes of ptr as initialized */
 void __initialize (void * ptr, size_t size) {
-  struct _block * tmp;
+  bt_block * tmp;
   if(!ptr)
     return;
 
-  tmp = get_cont(ptr);
+  tmp = bt_find(ptr);
   if(tmp == NULL)
     return;
 
   /* already fully initialized, do nothing */
-  if(tmp->init_cpt == tmp->size)
+  if(tmp->init_bytes == tmp->size)
     return;
 
   /* fully uninitialized */
-  if(tmp->init_cpt == 0) {
+  if(tmp->init_bytes == 0) {
     int nb = needed_bytes(tmp->size);
     tmp->init_ptr = native_malloc(nb);
     memset(tmp->init_ptr, 0, nb);
@@ -263,12 +263,12 @@ void __initialize (void * ptr, size_t size) {
 
     if (!checkbit(bit, tmp->init_ptr[byte])) { /* if bit is unset ... */
       setbit(bit, tmp->init_ptr[byte]); /* ... set the bit ... */
-      tmp->init_cpt++; /* ... and increment initialized bytes count */
+      tmp->init_bytes++; /* ... and increment initialized bytes count */
     }
   }
 
   /* now fully initialized */
-  if(tmp->init_cpt == tmp->size) {
+  if(tmp->init_bytes == tmp->size) {
     native_free(tmp->init_ptr);
     tmp->init_ptr = NULL;
   }
@@ -276,11 +276,11 @@ void __initialize (void * ptr, size_t size) {
 
 /* mark all bytes of ptr as initialized */
 void __full_init (void * ptr) {
-  struct _block * tmp;
+  bt_block * tmp;
   if (ptr == NULL)
     return;
 
-  tmp = get_exact(ptr);
+  tmp = bt_lookup(ptr);
   if (tmp == NULL)
     return;
 
@@ -288,16 +288,15 @@ void __full_init (void * ptr) {
     native_free(tmp->init_ptr);
     tmp->init_ptr = NULL;
   }
-
-  tmp->init_cpt = tmp->size;
+  tmp->init_bytes = tmp->size;
 }
 
 /* mark a block as read-only */
 void __readonly (void * ptr) {
-  struct _block * tmp;
+  bt_block * tmp;
   if (ptr == NULL)
     return;
-  tmp = get_exact(ptr);
+  tmp = bt_lookup(ptr);
   if (tmp == NULL)
     return;
   tmp->is_readonly = true;
@@ -310,15 +309,15 @@ void __readonly (void * ptr) {
 /* return whether the size bytes of ptr are initialized */
 int __initialized (void * ptr, size_t size) {
   unsigned i;
-  struct _block * tmp = get_cont(ptr);
+  bt_block * tmp = bt_find(ptr);
   if(tmp == NULL)
     return false;
 
   /* fully uninitialized */
-  if(tmp->init_cpt == 0)
+  if(tmp->init_bytes == 0)
     return false;
   /* fully initialized */
-  if(tmp->init_cpt == tmp->size)
+  if(tmp->init_bytes == tmp->size)
     return true;
 
   /* see implementation of function __initialize for details */
@@ -334,7 +333,7 @@ int __initialized (void * ptr, size_t size) {
 
 /* return the length (in bytes) of the block containing ptr */
 size_t __block_length(void* ptr) {
-  struct _block * tmp = get_cont(ptr);
+  bt_block * tmp = bt_find(ptr);
   /* Hard failure when un-allocated memory is used  */
   vassert(tmp != NULL, "\\block_length of unallocated memory", NULL);
   return tmp->size;
@@ -342,10 +341,10 @@ size_t __block_length(void* ptr) {
 
 /* return whether the size bytes of ptr are readable/writable */
 int __valid(void* ptr, size_t size) {
-  struct _block * tmp;
+  bt_block * tmp;
   if(ptr == NULL)
     return false;
-  tmp = get_cont(ptr);
+  tmp = bt_find(ptr);
   return (tmp == NULL) ?
     false : ( tmp->size - ( (size_t)ptr - tmp->ptr ) >= size
 	      && !tmp->is_readonly);
@@ -353,24 +352,24 @@ int __valid(void* ptr, size_t size) {
 
 /* return whether the size bytes of ptr are readable */
 int __valid_read(void* ptr, size_t size) {
-  struct _block * tmp;
+  bt_block * tmp;
   if(ptr == NULL)
     return false;
-  tmp = get_cont(ptr);
+  tmp = bt_find(ptr);
   return (tmp == NULL) ?
     false : (tmp->size - ((size_t)ptr - tmp->ptr) >= size);
 }
 
 /* return the base address of the block containing ptr */
 void* __base_addr(void* ptr) {
-  struct _block * tmp = get_cont(ptr);
+  bt_block * tmp = bt_find(ptr);
   vassert(tmp != NULL, "\\base_addr of unallocated memory", NULL);
   return (void*)tmp->ptr;
 }
 
 /* return the offset of `ptr` within its block */
 int __offset(void* ptr) {
-  struct _block * tmp = get_cont(ptr);
+  bt_block * tmp = bt_find(ptr);
   vassert(tmp != NULL, "\\offset of unallocated memory", NULL);
   return ((size_t)ptr - tmp->ptr);
 }
@@ -381,7 +380,7 @@ int __offset(void* ptr) {
 
 /* erase the content of the abstract structure */
 void __e_acsl_memory_clean() {
-  clean_struct();
+  bt_clean();
 }
 
 /* add `argv` to the memory model */
@@ -407,14 +406,14 @@ void __e_acsl_memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
 /* DEBUG              */
 /**********************/
 #ifdef E_ACSL_DEBUG
-/*! \brief print the information about a block */
-void __e_acsl_print_block (struct _block * ptr) {
-  print_block(ptr);
+/*! \brief print the information about a tracked block */
+void __e_acsl_print_block (bt_block * ptr) {
+  bt_print_block(ptr);
 }
 
-/*! \brief print the content of the abstract structure */
+/*! \brief print the content of the bittree */
 void __e_acsl_print_bittree() {
-  print_bittree();
+  bt_print();
 }
 #endif
 #endif
