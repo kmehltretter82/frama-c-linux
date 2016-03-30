@@ -145,7 +145,7 @@ static size_t mask(size_t a, size_t b) {
 }
 
 
-/* called from remove_element */
+/* called from bt_remove */
 /* the block we are looking for has to be in the tree */
 /*@ requires \valid(ptr);
   @ requires \valid(bt_root);
@@ -185,7 +185,7 @@ static struct bittree * __get_leaf_from_block (struct _block * ptr) {
 /* the block we are looking for has to be in the tree */
 /*@ requires \valid(ptr);
   @*/
-static void remove_element (struct _block * ptr) {
+static void bt_remove (struct _block * ptr) {
   struct bittree * leaf_to_delete = __get_leaf_from_block (ptr);
   assert(leaf_to_delete->leaf == ptr);
 
@@ -222,7 +222,7 @@ static void remove_element (struct _block * ptr) {
 }
 
 
-/* called from add_element */
+/* called from bt_insert */
 /* the returned node will be the brother of the soon to be added node */
 /*@ requires \valid(ptr);
   @ requires \valid(bt_root);
@@ -253,7 +253,7 @@ static struct bittree * __most_similar_node (struct _block * ptr) {
 /* add a block in the structure */
 /*@ requires \valid(ptr);
   @*/
-static void add_element (struct _block * ptr) {
+static void bt_insert (struct _block * ptr) {
   struct bittree * new_leaf;
   assert(ptr != NULL);
 
@@ -321,7 +321,7 @@ static void add_element (struct _block * ptr) {
   @ ensures \valid(\result);
   @ ensures \result == \null || \result->ptr == (size_t)ptr;
   @*/
-static struct _block * get_exact (void * ptr) {
+static struct _block * bt_lookup (void * ptr) {
   struct bittree * tmp = bt_root;
   assert(bt_root != NULL);
   assert(ptr != NULL);
@@ -350,7 +350,7 @@ static struct _block * get_exact (void * ptr) {
 /* return the block B containing ptr, such as :
    begin addr of B <= ptr < (begin addr + size) of B
    or NULL if such a block does not exist */
-static struct _block * get_cont (void * ptr) {
+static struct _block * bt_find (void * ptr) {
   struct bittree * tmp = bt_root;
   if(bt_root == NULL || ptr == NULL) return NULL;
 
@@ -396,7 +396,7 @@ static struct _block * get_cont (void * ptr) {
 /* CLEAN           */
 /*******************/
 /* erase information about initialization of a block */
-static void clean_init (struct _block * ptr) {
+static void bt_clean_block_init (struct _block * ptr) {
   if(ptr->init_ptr != NULL) {
     native_free(ptr->init_ptr);
     ptr->init_ptr = NULL;
@@ -405,32 +405,32 @@ static void clean_init (struct _block * ptr) {
 }
 
 /* erase all information about a block */
-static void clean_block (struct _block * ptr) {
+static void bt_clean_block (struct _block * ptr) {
   if(ptr) {
-    clean_init(ptr);
+    bt_clean_block_init(ptr);
     native_free(ptr);
   }
 }
 
-/* called from clean_struct */
+/* called from bt_clean */
 /* recursively erase the content of the structure */
-static void clean_rec (struct bittree * ptr) {
+static void bt_clean_rec (struct bittree * ptr) {
   if(ptr == NULL) return;
   else if(ptr->is_leaf) {
-    clean_block(ptr->leaf);
+    bt_clean_block(ptr->leaf);
     ptr->leaf = NULL;
   }
   else {
-    clean_rec(ptr->left);
-    clean_rec(ptr->right);
+    bt_clean_rec(ptr->left);
+    bt_clean_rec(ptr->right);
     ptr->left = ptr->right = NULL;
   }
   native_free(ptr);
 }
 
 /* erase the content of the structure */
-static void clean_struct () {
-  clean_rec(bt_root);
+static void bt_clean () {
+  bt_clean_rec(bt_root);
   bt_root = NULL;
 }
 
@@ -440,7 +440,7 @@ static void clean_struct () {
 
 #ifdef E_ACSL_DEBUG
 
-static void print_block(struct _block * ptr) {
+static void bt_print_block(struct _block * ptr) {
   if (ptr != NULL) {
     DLOG("%a; %lu Bytes; %slitteral; [init] : %d ",
       (char*)ptr->ptr, ptr->size,
@@ -463,7 +463,7 @@ static void print_bittree_node(struct bittree * ptr, int depth) {
   for(i = 0; i < depth; i++)
     DLOG("  ");
   if(ptr->is_leaf)
-    print_block(ptr->leaf);
+    bt_print_block(ptr->leaf);
   else {
     DLOG("%p -- %p\n", (void*)ptr->mask, (void*)ptr->addr);
     print_bittree_node(ptr->left, depth+1);

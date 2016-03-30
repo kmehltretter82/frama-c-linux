@@ -76,17 +76,17 @@ void* __store_block(void* ptr, size_t size) {
   tmp->init_cpt = 0;
   tmp->is_readonly = false;
   tmp->freeable = false;
-  add_element(tmp);
+  bt_insert(tmp);
   return tmp;
 }
 
 /* remove the block starting at ptr */
 void __delete_block(void* ptr) {
   DASSERT(ptr != NULL);
-  struct _block * tmp = get_exact(ptr);
+  struct _block * tmp = bt_lookup(ptr);
   DASSERT(tmp != NULL);
-  clean_init(tmp);
-  remove_element(tmp);
+  bt_clean_block_init(tmp);
+  bt_remove(tmp);
   native_free(tmp);
 }
 
@@ -113,12 +113,12 @@ void __free(void* ptr) {
   struct _block * tmp;
   if(ptr == NULL)
     return;
-  tmp = get_exact(ptr);
+  tmp = bt_lookup(ptr);
   DASSERT(tmp != NULL);
   native_free(ptr);
-  clean_init(tmp);
+  bt_clean_block_init(tmp);
   __heap_size -= tmp->size;
-  remove_element(tmp);
+  bt_remove(tmp);
   native_free(tmp);
 }
 
@@ -126,7 +126,7 @@ int __freeable(void* ptr) {
   struct _block * tmp;
   if(ptr == NULL)
     return false;
-  tmp = get_exact(ptr);
+  tmp = bt_lookup(ptr);
   if(tmp == NULL)
     return false;
   return tmp->freeable;
@@ -145,7 +145,7 @@ void* __realloc(void* ptr, size_t size) {
     __free(ptr);
     return NULL;
   }
-  tmp = get_exact(ptr);
+  tmp = bt_lookup(ptr);
   DASSERT(tmp != NULL);
   new_ptr = native_realloc((void*)tmp->ptr, size);
   if(new_ptr == NULL)
@@ -153,9 +153,9 @@ void* __realloc(void* ptr, size_t size) {
   __heap_size -= tmp->size;
   /* realloc changes start address -- re-enter the element */
   if (tmp->ptr != (size_t)new_ptr) {
-    remove_element(tmp);
+    bt_remove(tmp);
     tmp->ptr = (size_t)new_ptr;
-    add_element(tmp);
+    bt_insert(tmp);
   }
   /* uninitialized, do nothing */
   if(tmp->init_cpt == 0) ;
@@ -230,7 +230,7 @@ void __initialize (void * ptr, size_t size) {
   if(!ptr)
     return;
 
-  tmp = get_cont(ptr);
+  tmp = bt_find(ptr);
   if(tmp == NULL)
     return;
 
@@ -280,7 +280,7 @@ void __full_init (void * ptr) {
   if (ptr == NULL)
     return;
 
-  tmp = get_exact(ptr);
+  tmp = bt_lookup(ptr);
   if (tmp == NULL)
     return;
 
@@ -297,7 +297,7 @@ void __readonly (void * ptr) {
   struct _block * tmp;
   if (ptr == NULL)
     return;
-  tmp = get_exact(ptr);
+  tmp = bt_lookup(ptr);
   if (tmp == NULL)
     return;
   tmp->is_readonly = true;
@@ -310,7 +310,7 @@ void __readonly (void * ptr) {
 /* return whether the size bytes of ptr are initialized */
 int __initialized (void * ptr, size_t size) {
   unsigned i;
-  struct _block * tmp = get_cont(ptr);
+  struct _block * tmp = bt_find(ptr);
   if(tmp == NULL)
     return false;
 
@@ -334,7 +334,7 @@ int __initialized (void * ptr, size_t size) {
 
 /* return the length (in bytes) of the block containing ptr */
 size_t __block_length(void* ptr) {
-  struct _block * tmp = get_cont(ptr);
+  struct _block * tmp = bt_find(ptr);
   /* Hard failure when un-allocated memory is used  */
   vassert(tmp != NULL, "\\block_length of unallocated memory", NULL);
   return tmp->size;
@@ -345,7 +345,7 @@ int __valid(void* ptr, size_t size) {
   struct _block * tmp;
   if(ptr == NULL)
     return false;
-  tmp = get_cont(ptr);
+  tmp = bt_find(ptr);
   return (tmp == NULL) ?
     false : ( tmp->size - ( (size_t)ptr - tmp->ptr ) >= size
 	      && !tmp->is_readonly);
@@ -356,21 +356,21 @@ int __valid_read(void* ptr, size_t size) {
   struct _block * tmp;
   if(ptr == NULL)
     return false;
-  tmp = get_cont(ptr);
+  tmp = bt_find(ptr);
   return (tmp == NULL) ?
     false : (tmp->size - ((size_t)ptr - tmp->ptr) >= size);
 }
 
 /* return the base address of the block containing ptr */
 void* __base_addr(void* ptr) {
-  struct _block * tmp = get_cont(ptr);
+  struct _block * tmp = bt_find(ptr);
   vassert(tmp != NULL, "\\base_addr of unallocated memory", NULL);
   return (void*)tmp->ptr;
 }
 
 /* return the offset of `ptr` within its block */
 int __offset(void* ptr) {
-  struct _block * tmp = get_cont(ptr);
+  struct _block * tmp = bt_find(ptr);
   vassert(tmp != NULL, "\\offset of unallocated memory", NULL);
   return ((size_t)ptr - tmp->ptr);
 }
@@ -381,7 +381,7 @@ int __offset(void* ptr) {
 
 /* erase the content of the abstract structure */
 void __e_acsl_memory_clean() {
-  clean_struct();
+  bt_clean();
 }
 
 /* add `argv` to the memory model */
@@ -409,7 +409,7 @@ void __e_acsl_memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
 #ifdef E_ACSL_DEBUG
 /*! \brief print the information about a block */
 void __e_acsl_print_block (struct _block * ptr) {
-  print_block(ptr);
+  bt_print_block(ptr);
 }
 
 /*! \brief print the content of the abstract structure */

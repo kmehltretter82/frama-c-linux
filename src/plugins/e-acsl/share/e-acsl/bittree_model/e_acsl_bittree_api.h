@@ -42,29 +42,29 @@ struct _block {
 };
 
 /*! \brief Remove a block from the structure */
-static void remove_element(struct _block *b);
+static void bt_remove(struct _block *b);
 
 /*! \brief Add a block to the structure */
-static void add_element(struct _block *b);
+static void bt_insert(struct _block *b);
 
 /*! \brief Return block B such that: `\base_addr(B->ptr) == ptr`.
 NB: The function assumes that such a block exists. */
-static struct _block * get_exact(void *ptr);
+static struct _block * bt_lookup(void *ptr);
 
 /*! \brief Return block B such that:
    `\base_addr(B->ptr) <= ptr < (\base_addr(B->ptr) + size)`
    or NULL if such a block does not exist. */
-static struct _block * get_cont(void *ptr);
+static struct _block * bt_find(void *ptr);
 
 /*! \brief Erase the contents of the structure */
-static void clean_struct(void);
+static void bt_clean(void);
 
 /*! \brief Print information about a given block */
-static void print_block(struct _block *b);
+static void bt_print_block(struct _block *b);
 
 /*! \brief Erase information about a block's initialization */
-static void clean_init(struct _block *b);
+static void bt_clean_block_init(struct _block *b);
 
 /*! \brief Erase all information about a given block */
-static void clean_block(struct _block *b);
+static void bt_clean_block(struct _block *b);
 #endif
