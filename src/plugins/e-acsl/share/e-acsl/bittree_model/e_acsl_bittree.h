@@ -102,7 +102,7 @@ static struct bittree {
   _Bool is_leaf;
   size_t addr,  mask;
   struct bittree * left, * right, * father;
-  struct _block * leaf;
+  bt_block * leaf;
 } * bt_root = NULL;
 
 /*unsigned cpt_mask = 0;*/
@@ -153,7 +153,7 @@ static size_t mask(size_t a, size_t b) {
   @ ensures \valid(\result);
   @ ensures \result->leaf == ptr;
   @*/
-static struct bittree * __get_leaf_from_block (struct _block * ptr) {
+static struct bittree * __get_leaf_from_block (bt_block * ptr) {
   struct bittree * curr = bt_root;
   assert(bt_root != NULL);
   assert(ptr != NULL);
@@ -185,7 +185,7 @@ static struct bittree * __get_leaf_from_block (struct _block * ptr) {
 /* the block we are looking for has to be in the tree */
 /*@ requires \valid(ptr);
   @*/
-static void bt_remove (struct _block * ptr) {
+static void bt_remove (bt_block * ptr) {
   struct bittree * leaf_to_delete = __get_leaf_from_block (ptr);
   assert(leaf_to_delete->leaf == ptr);
 
@@ -229,7 +229,7 @@ static void bt_remove (struct _block * ptr) {
   @ assigns \nothing;
   @ ensures \valid(\result);
   @*/
-static struct bittree * __most_similar_node (struct _block * ptr) {
+static struct bittree * __most_similar_node (bt_block * ptr) {
   struct bittree * curr = bt_root;
   size_t left_prefix, right_prefix;
   assert(ptr != NULL);
@@ -253,7 +253,7 @@ static struct bittree * __most_similar_node (struct _block * ptr) {
 /* add a block in the structure */
 /*@ requires \valid(ptr);
   @*/
-static void bt_insert (struct _block * ptr) {
+static void bt_insert (bt_block * ptr) {
   struct bittree * new_leaf;
   assert(ptr != NULL);
 
@@ -321,7 +321,7 @@ static void bt_insert (struct _block * ptr) {
   @ ensures \valid(\result);
   @ ensures \result == \null || \result->ptr == (size_t)ptr;
   @*/
-static struct _block * bt_lookup (void * ptr) {
+static bt_block * bt_lookup (void * ptr) {
   struct bittree * tmp = bt_root;
   assert(bt_root != NULL);
   assert(ptr != NULL);
@@ -350,7 +350,7 @@ static struct _block * bt_lookup (void * ptr) {
 /* return the block B containing ptr, such as :
    begin addr of B <= ptr < (begin addr + size) of B
    or NULL if such a block does not exist */
-static struct _block * bt_find (void * ptr) {
+static bt_block * bt_find (void * ptr) {
   struct bittree * tmp = bt_root;
   if(bt_root == NULL || ptr == NULL) return NULL;
 
@@ -396,7 +396,7 @@ static struct _block * bt_find (void * ptr) {
 /* CLEAN           */
 /*******************/
 /* erase information about initialization of a block */
-static void bt_clean_block_init (struct _block * ptr) {
+static void bt_clean_block_init (bt_block * ptr) {
   if(ptr->init_ptr != NULL) {
     native_free(ptr->init_ptr);
     ptr->init_ptr = NULL;
@@ -405,7 +405,7 @@ static void bt_clean_block_init (struct _block * ptr) {
 }
 
 /* erase all information about a block */
-static void bt_clean_block (struct _block * ptr) {
+static void bt_clean_block (bt_block * ptr) {
   if(ptr) {
     bt_clean_block_init(ptr);
     native_free(ptr);
@@ -440,7 +440,7 @@ static void bt_clean () {
 
 #ifdef E_ACSL_DEBUG
 
-static void bt_print_block(struct _block * ptr) {
+static void bt_print_block(bt_block * ptr) {
   if (ptr != NULL) {
     DLOG("%a; %lu Bytes; %slitteral; [init] : %d ",
       (char*)ptr->ptr, ptr->size,
