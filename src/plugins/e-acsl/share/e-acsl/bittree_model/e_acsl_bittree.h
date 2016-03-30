@@ -324,7 +324,9 @@ static bt_block * bt_lookup (void * ptr) {
     @*/
   while(!tmp->is_leaf) {
     // if the ptr we are looking for does not share the prefix of tmp
-    if((tmp->addr & tmp->mask) != ((size_t)ptr & tmp->mask)) return NULL;
+    if((tmp->addr & tmp->mask) != ((size_t)ptr & tmp->mask))
+      return NULL;
+
     // two children
     DASSERT(tmp->left != NULL && tmp->right != NULL);
     // the prefix of one child is consistent
@@ -334,10 +336,12 @@ static bt_block * bt_lookup (void * ptr) {
     else if((tmp->left->addr & tmp->left->mask)
 	    == ((size_t)ptr & tmp->left->mask))
       tmp = tmp->left;
-    else return NULL;
+    else
+      return NULL;
   }
 
-  if(tmp->leaf->ptr != (size_t)ptr) return NULL;
+  if(tmp->leaf->ptr != (size_t)ptr)
+    return NULL;
   return tmp->leaf;
 }
 
@@ -346,14 +350,16 @@ static bt_block * bt_lookup (void * ptr) {
    or NULL if such a block does not exist */
 static bt_block * bt_find (void * ptr) {
   bt_node * tmp = bt_root;
-  if(bt_root == NULL || ptr == NULL) return NULL;
+  if(bt_root == NULL || ptr == NULL)
+    return NULL;
 
   bt_node * other_choice = NULL;
 
   while(1) {
     if(tmp->is_leaf) {
       /* tmp cannot contain ptr because its begin addr is higher */
-      if(tmp->addr > (size_t)ptr) return NULL;
+      if(tmp->addr > (size_t)ptr)
+        return NULL;
       /* tmp->addr <= ptr, tmp may contain ptr
        ptr is contained if tmp is large enough (begin addr + size) */
       else if((size_t)ptr < tmp->leaf->size + tmp->addr

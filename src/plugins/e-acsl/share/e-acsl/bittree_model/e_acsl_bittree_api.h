@@ -59,13 +59,15 @@ static void bt_remove(bt_block *b);
 /*! \brief Add a block to the structure */
 static void bt_insert(bt_block *b);
 
-/*! \brief Return block B such that: `\base_addr(B->ptr) == ptr`.
-NB: The function assumes that such a block exists. */
+/*! \brief Look-up a memory block by its base address
+  NB: The function assumes that such a block exists. */
 static bt_block * bt_lookup(void *ptr);
 
-/*! \brief Return block B such that:
-   `\base_addr(B->ptr) <= ptr < (\base_addr(B->ptr) + size)`
-   or NULL if such a block does not exist. */
+/*! \brief Find a memory block containing a given memory address
+ *
+ * Return block B such that:
+ *  `\base_addr(B->ptr) <= ptr < (\base_addr(B->ptr) + size)`
+ *  or NULL if such a block does not exist. */
 static bt_block * bt_find(void *ptr);
 
 /*! \brief Erase the contents of the structure */
