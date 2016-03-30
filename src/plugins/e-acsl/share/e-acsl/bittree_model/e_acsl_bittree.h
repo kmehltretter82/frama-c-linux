@@ -101,7 +101,7 @@ static const int Tneq[] =
 static struct bittree {
   _Bool is_leaf;
   size_t addr,  mask;
-  struct bittree * left, * right, * father;
+  struct bittree * left, * right, * parent;
   bt_block * leaf;
 } * bt_root = NULL;
 
@@ -163,9 +163,9 @@ static struct bittree * __get_leaf_from_block (bt_block * ptr) {
   while(!curr->is_leaf) {
     // the prefix is consistent
     DASSERT((curr->addr & curr->mask) == (ptr->ptr & curr->mask));
-    // two sons
+    // two children
     DASSERT(curr->left != NULL && curr->right != NULL);
-    // the prefix of one son is consistent
+    // the prefix of one child is consistent
     if((curr->right->addr & curr->right->mask)
        == (ptr->ptr & curr->right->mask))
       curr = curr->right;
@@ -189,32 +189,32 @@ static void bt_remove (bt_block * ptr) {
   struct bittree * leaf_to_delete = __get_leaf_from_block (ptr);
   DASSERT(leaf_to_delete->leaf == ptr);
 
-  if(leaf_to_delete->father == NULL)
+  if(leaf_to_delete->parent == NULL)
     // the leaf is the root
     bt_root = NULL;
   else {
-    struct bittree * brother, * father;
-    father = leaf_to_delete->father;
-    brother = (leaf_to_delete == father->left) ? father->right : father->left;
-    DASSERT(brother != NULL);
-    // copying all brother's fields into the father's
-    father->is_leaf = brother->is_leaf;
-    father->addr = brother->addr;
-    father->mask = brother->mask;
-    father->left = brother->left;
-    father->right = brother->right;
-    father->leaf = brother->leaf;
-    if(!brother->is_leaf) {
-      brother->left->father = father;
-      brother->right->father = father;
+    struct bittree * sibling, * parent;
+    parent = leaf_to_delete->parent;
+    sibling = (leaf_to_delete == parent->left) ? parent->right : parent->left;
+    DASSERT(sibling != NULL);
+    // copying all sibling's fields into the parent's
+    parent->is_leaf = sibling->is_leaf;
+    parent->addr = sibling->addr;
+    parent->mask = sibling->mask;
+    parent->left = sibling->left;
+    parent->right = sibling->right;
+    parent->leaf = sibling->leaf;
+    if(!sibling->is_leaf) {
+      sibling->left->parent = parent;
+      sibling->right->parent = parent;
     }
-    native_free(brother);
+    native_free(sibling);
     /* necessary ? -- begin */
-    if(father->father != NULL) {
-      father->father->mask = mask(father->father->left->addr
-				  & father->father->left->mask,
-				  father->father->right->addr
-				  & father->father->right->mask);
+    if(parent->parent != NULL) {
+      parent->parent->mask = mask(parent->parent->left->addr
+				  & parent->parent->left->mask,
+				  parent->parent->right->addr
+				  & parent->parent->right->mask);
     }
     /* necessary ? -- end */
   }
@@ -223,7 +223,7 @@ static void bt_remove (bt_block * ptr) {
 
 
 /* called from bt_insert */
-/* the returned node will be the brother of the soon to be added node */
+/* the returned node will be the sibling of the soon to be added node */
 /*@ requires \valid(ptr);
   @ requires \valid(bt_root);
   @ assigns \nothing;
@@ -264,54 +264,54 @@ static void bt_insert (bt_block * ptr) {
   new_leaf->mask = Tmasks[WORDBITS]; /* ~0ul */
   new_leaf->left = NULL;
   new_leaf->right = NULL;
-  new_leaf->father = NULL;
+  new_leaf->parent = NULL;
   new_leaf->leaf = ptr;
 
   if(bt_root == NULL)
     bt_root = new_leaf;
   else {
-    struct bittree * brother = __most_similar_node (ptr), * father, * aux;
+    struct bittree * sibling = __most_similar_node (ptr), * parent, * aux;
 
-    DASSERT(brother != NULL);
-    father = native_malloc(sizeof(struct bittree));
-    DASSERT(father != NULL);
-    father->is_leaf = false;
-    father->addr = brother->addr & new_leaf->addr;
-    /*father->mask = mask(brother->addr & brother->mask, ptr->ptr);*/
-    father->leaf = NULL;
-    if(new_leaf->addr <= brother->addr) {
-      father->left = new_leaf;
-      father->right = brother;
+    DASSERT(sibling != NULL);
+    parent = native_malloc(sizeof(struct bittree));
+    DASSERT(parent != NULL);
+    parent->is_leaf = false;
+    parent->addr = sibling->addr & new_leaf->addr;
+    /*parent->mask = mask(sibling->addr & sibling->mask, ptr->ptr);*/
+    parent->leaf = NULL;
+    if(new_leaf->addr <= sibling->addr) {
+      parent->left = new_leaf;
+      parent->right = sibling;
     } else {
-      father->left = brother;
-      father->right = new_leaf;
+      parent->left = sibling;
+      parent->right = new_leaf;
     }
-    new_leaf->father = father;
+    new_leaf->parent = parent;
 
-    if(brother == bt_root) {
-      father->father = NULL;
-      father->mask = mask(brother->addr & brother->mask, ptr->ptr);
-      bt_root = father;
+    if(sibling == bt_root) {
+      parent->parent = NULL;
+      parent->mask = mask(sibling->addr & sibling->mask, ptr->ptr);
+      bt_root = parent;
     } else {
-      if (brother->father->left == brother)
-        brother->father->left = father;
+      if (sibling->parent->left == sibling)
+        sibling->parent->left = parent;
       else
-        brother->father->right = father;
-      father->father = brother->father;
+        sibling->parent->right = parent;
+      parent->parent = sibling->parent;
 
       /* necessary ? -- begin */
-      aux = father;
+      aux = parent;
       aux->mask = mask(aux->left->addr & aux->left->mask,
 		       aux->right->addr & aux->right->mask);
       /* necessary ? -- end */
     }
-    brother->father = father;
-    if(!brother->is_leaf)
-      brother->mask = mask(brother->left->addr & brother->left->mask,
-      brother->right->addr & brother->right->mask);
+    sibling->parent = parent;
+    if(!sibling->is_leaf)
+      sibling->mask = mask(sibling->left->addr & sibling->left->mask,
+      sibling->right->addr & sibling->right->mask);
 
-    DASSERT((father->left == brother && father->right == new_leaf)
-     || (father->left == new_leaf && father->right == brother));
+    DASSERT((parent->left == sibling && parent->right == new_leaf)
+     || (parent->left == new_leaf && parent->right == sibling));
   }
 }
 
@@ -331,9 +331,9 @@ static bt_block * bt_lookup (void * ptr) {
   while(!tmp->is_leaf) {
     // if the ptr we are looking for does not share the prefix of tmp
     if((tmp->addr & tmp->mask) != ((size_t)ptr & tmp->mask)) return NULL;
-    // two sons
+    // two children
     DASSERT(tmp->left != NULL && tmp->right != NULL);
-    // the prefix of one son is consistent
+    // the prefix of one child is consistent
     if((tmp->right->addr & tmp->right->mask)
        == ((size_t)ptr & tmp->right->mask))
       tmp = tmp->right;
