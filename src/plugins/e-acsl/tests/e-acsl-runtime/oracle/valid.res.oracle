@@ -21,10 +21,10 @@ FRAMAC_SHARE/libc/stdlib.h:177:[e-acsl] warning: E-ACSL construct `assigns claus
                   Ignoring annotation.
 FRAMAC_SHARE/libc/stdlib.h:177:[e-acsl] warning: E-ACSL construct `\allocate' is not yet supported. Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] warning: function __e_acsl_assert: precondition got status unknown.
-FRAMAC_SHARE/libc/stdlib.h:163:[value] warning: function __e_acsl_malloc, behavior allocation: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
-FRAMAC_SHARE/libc/stdlib.h:168:[value] warning: function __e_acsl_malloc, behavior no_allocation: postcondition got status invalid. (Behavior may be inactive, no reduction performed.)
-FRAMAC_SHARE/libc/stdlib.h:178:[value] warning: function __e_acsl_free, behavior deallocation: precondition 'freeable' got status unknown.
-FRAMAC_SHARE/libc/stdlib.h:180:[value] warning: function __e_acsl_free, behavior deallocation: postcondition got status unknown.
+FRAMAC_SHARE/e-acsl/e_acsl.h:43:[value] warning: function __e_acsl_assert: precondition got status unknown.
+FRAMAC_SHARE/libc/stdlib.h:163:[value] warning: function __gen_e_acsl_malloc, behavior allocation: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
+FRAMAC_SHARE/libc/stdlib.h:168:[value] warning: function __gen_e_acsl_malloc, behavior no_allocation: postcondition got status invalid. (Behavior may be inactive, no reduction performed.)
+FRAMAC_SHARE/libc/stdlib.h:178:[value] warning: function __gen_e_acsl_free, behavior deallocation: precondition 'freeable' got status unknown.
+FRAMAC_SHARE/libc/stdlib.h:180:[value] warning: function __gen_e_acsl_free, behavior deallocation: postcondition got status unknown.
 tests/e-acsl-runtime/valid.c:47:[kernel] warning: accessing left-value that contains escaping addresses.
                   assert ¬\dangling(&a);

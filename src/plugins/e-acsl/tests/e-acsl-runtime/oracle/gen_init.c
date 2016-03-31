@@ -3,10 +3,10 @@ int a = 0;
 int b;
 void __e_acsl_globals_init(void)
 {
-  __store_block((void *)(& b),4UL);
-  __full_init((void *)(& b));
-  __store_block((void *)(& a),4UL);
-  __full_init((void *)(& a));
+  __e_acsl_store_block((void *)(& b),4UL);
+  __e_acsl_full_init((void *)(& b));
+  __e_acsl_store_block((void *)(& a),4UL);
+  __e_acsl_full_init((void *)(& a));
   return;
 }
 
@@ -17,34 +17,34 @@ int main(void)
   int *q;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
-  __store_block((void *)(& q),8UL);
-  __store_block((void *)(& p),8UL);
-  __full_init((void *)(& p));
+  __e_acsl_store_block((void *)(& q),8UL);
+  __e_acsl_store_block((void *)(& p),8UL);
+  __e_acsl_full_init((void *)(& p));
   p = & a;
-  __full_init((void *)(& q));
+  __e_acsl_full_init((void *)(& q));
   q = & b;
   /*@ assert \initialized(&b); */
   __e_acsl_assert(1,(char *)"Assertion",(char *)"main",
                   (char *)"\\initialized(&b)",9);
   /*@ assert \initialized(q); */
   {
-    int __e_acsl_initialized;
-    __e_acsl_initialized = __initialized((void *)q,sizeof(int));
-    __e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"main",
-                    (char *)"\\initialized(q)",10);
+    int __gen_e_acsl_initialized;
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)q,sizeof(int));
+    __e_acsl_assert(__gen_e_acsl_initialized,(char *)"Assertion",
+                    (char *)"main",(char *)"\\initialized(q)",10);
   }
   /*@ assert \initialized(p); */
   {
-    int __e_acsl_initialized_2;
-    __e_acsl_initialized_2 = __initialized((void *)p,sizeof(int));
-    __e_acsl_assert(__e_acsl_initialized_2,(char *)"Assertion",
+    int __gen_e_acsl_initialized_2;
+    __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)p,sizeof(int));
+    __e_acsl_assert(__gen_e_acsl_initialized_2,(char *)"Assertion",
                     (char *)"main",(char *)"\\initialized(p)",11);
   }
   __retres = 0;
-  __delete_block((void *)(& b));
-  __delete_block((void *)(& a));
-  __delete_block((void *)(& q));
-  __delete_block((void *)(& p));
+  __e_acsl_delete_block((void *)(& b));
+  __e_acsl_delete_block((void *)(& a));
+  __e_acsl_delete_block((void *)(& q));
+  __e_acsl_delete_block((void *)(& p));
   __e_acsl_memory_clean();
   return __retres;
 }

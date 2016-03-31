@@ -10,32 +10,32 @@ int main(void)
   int __retres;
   spongeState *state;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
-  __store_block((void *)(& state),8UL);
-  __full_init((void *)(& state));
-  state = (spongeState *)__e_acsl_malloc(sizeof(spongeState));
-  __initialize((void *)(& state->bitsInQueue),sizeof(unsigned int));
+  __e_acsl_store_block((void *)(& state),8UL);
+  __e_acsl_full_init((void *)(& state));
+  state = (spongeState *)__gen_e_acsl_malloc(sizeof(spongeState));
+  __e_acsl_initialize((void *)(& state->bitsInQueue),sizeof(unsigned int));
   state->bitsInQueue = (unsigned int)16;
   /*@ assert ¬\initialized(&state->dataQueue[state->bitsInQueue/8]); */
   {
-    int __e_acsl_valid_read;
-    int __e_acsl_initialized;
-    __e_acsl_valid_read = __valid_read((void *)(& state->bitsInQueue),
-                                       sizeof(unsigned int));
-    __e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"main",
+    int __gen_e_acsl_valid_read;
+    int __gen_e_acsl_initialized;
+    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(& state->bitsInQueue),
+                                                  sizeof(unsigned int));
+    __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"main",
                     (char *)"mem_access: \\valid_read(&state->bitsInQueue)",
                     22);
-    __e_acsl_initialized = __initialized((void *)(& state->dataQueue[
-                                         state->bitsInQueue / (unsigned int)8]),
-                                         sizeof(unsigned char __attribute__((
-                                         __aligned__(32)))));
-    __e_acsl_assert(! __e_acsl_initialized,(char *)"Assertion",
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& state->dataQueue[
+                                                    state->bitsInQueue / (unsigned int)8]),
+                                                    sizeof(unsigned char __attribute__((
+                                                    __aligned__(32)))));
+    __e_acsl_assert(! __gen_e_acsl_initialized,(char *)"Assertion",
                     (char *)"main",
                     (char *)"!\\initialized(&state->dataQueue[state->bitsInQueue/8])",
                     22);
   }
-  __e_acsl_free((void *)state);
+  __gen_e_acsl_free((void *)state);
   __retres = 0;
-  __delete_block((void *)(& state));
+  __e_acsl_delete_block((void *)(& state));
   __e_acsl_memory_clean();
   return __retres;
 }

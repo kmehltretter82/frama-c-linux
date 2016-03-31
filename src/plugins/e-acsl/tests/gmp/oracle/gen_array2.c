@@ -22,31 +22,31 @@ int main(void)
   }
   /*@ assert T1[0] ≡ T2[0]; */
   {
-    mpz_t __e_acsl;
-    mpz_t __e_acsl_2;
-    int __e_acsl_eq;
-    __gmpz_init_set_si(__e_acsl,(long)T1[0]);
-    __gmpz_init_set_si(__e_acsl_2,(long)T2[0]);
-    __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl),
-                             (__mpz_struct const *)(__e_acsl_2));
-    __e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"main",
+    mpz_t __gen_e_acsl_;
+    mpz_t __gen_e_acsl__2;
+    int __gen_e_acsl_eq;
+    __gmpz_init_set_si(__gen_e_acsl_,(long)T1[0]);
+    __gmpz_init_set_si(__gen_e_acsl__2,(long)T2[0]);
+    __gen_e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__gen_e_acsl_),
+                                 (__mpz_struct const *)(__gen_e_acsl__2));
+    __e_acsl_assert(__gen_e_acsl_eq == 0,(char *)"Assertion",(char *)"main",
                     (char *)"T1[0] == T2[0]",13);
-    __gmpz_clear(__e_acsl);
-    __gmpz_clear(__e_acsl_2);
+    __gmpz_clear(__gen_e_acsl_);
+    __gmpz_clear(__gen_e_acsl__2);
   }
   /*@ assert T1[1] ≢ T2[1]; */
   {
-    mpz_t __e_acsl_3;
-    mpz_t __e_acsl_4;
-    int __e_acsl_ne;
-    __gmpz_init_set_si(__e_acsl_3,(long)T1[1]);
-    __gmpz_init_set_si(__e_acsl_4,(long)T2[1]);
-    __e_acsl_ne = __gmpz_cmp((__mpz_struct const *)(__e_acsl_3),
-                             (__mpz_struct const *)(__e_acsl_4));
-    __e_acsl_assert(__e_acsl_ne != 0,(char *)"Assertion",(char *)"main",
+    mpz_t __gen_e_acsl__3;
+    mpz_t __gen_e_acsl__4;
+    int __gen_e_acsl_ne;
+    __gmpz_init_set_si(__gen_e_acsl__3,(long)T1[1]);
+    __gmpz_init_set_si(__gen_e_acsl__4,(long)T2[1]);
+    __gen_e_acsl_ne = __gmpz_cmp((__mpz_struct const *)(__gen_e_acsl__3),
+                                 (__mpz_struct const *)(__gen_e_acsl__4));
+    __e_acsl_assert(__gen_e_acsl_ne != 0,(char *)"Assertion",(char *)"main",
                     (char *)"T1[1] != T2[1]",14);
-    __gmpz_clear(__e_acsl_3);
-    __gmpz_clear(__e_acsl_4);
+    __gmpz_clear(__gen_e_acsl__3);
+    __gmpz_clear(__gen_e_acsl__4);
   }
   __retres = 0;
   return __retres;

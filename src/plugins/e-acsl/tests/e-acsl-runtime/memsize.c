@@ -14,58 +14,58 @@
 # endif
 # endif
 
-extern size_t __heap_size;
+extern size_t __e_acsl_heap_size;
 
 int main(int argc, char **argv) {
     // Allocation increases
     char *a = malloc(7);
-    /*@assert (__heap_size == 7);  */
+    /*@assert (__e_acsl_heap_size == 7);  */
     char *b = malloc(14);
-    /*@assert (__heap_size == 21);  */
+    /*@assert (__e_acsl_heap_size == 21);  */
 
     // Allocation decreases
     free(a);
-    /*@assert (__heap_size == 14);  */
+    /*@assert (__e_acsl_heap_size == 14);  */
 
     // Make sure that free with NULL behaves and does not affect allocation
     a = NULL;
     free(a);
-    /*@assert (__heap_size == 14);  */
+    /*@assert (__e_acsl_heap_size == 14);  */
 
     // Realloc decreases allocation
     b = realloc(b, 9);
-    /*@assert (__heap_size == 9);  */
+    /*@assert (__e_acsl_heap_size == 9);  */
 
     // Realloc increases allocation
     b = realloc(b, 18);
-    /*@assert (__heap_size == 18);  */
+    /*@assert (__e_acsl_heap_size == 18);  */
 
     // Realloc with 0 is equivalent to free
     b = realloc(b, 0);
     b = NULL;
-    /*@assert (__heap_size == 0);  */
+    /*@assert (__e_acsl_heap_size == 0);  */
 
     // realloc with 0 is equivalent to malloc
     b = realloc(b, 8);
-    /*@assert (__heap_size == 8);  */
+    /*@assert (__e_acsl_heap_size == 8);  */
 
     // Abandon b and behave like malloc again
     b = realloc(NULL, 8);
-    /*@assert (__heap_size == 16);  */
+    /*@assert (__e_acsl_heap_size == 16);  */
 
     // Make realloc fail by supplying a huge number
     b = realloc(NULL, UINTPTR_MAX);
-    /*@assert (__heap_size == 16);  */
+    /*@assert (__e_acsl_heap_size == 16);  */
     /*@assert (b == NULL);  */
 
     // Same as test for calloc ...
     b = calloc(UINTPTR_MAX,UINTPTR_MAX);
-    /*@assert (__heap_size == 16);  */
+    /*@assert (__e_acsl_heap_size == 16);  */
     /*@assert (b == NULL);  */
 
     // ... and for malloc
     b = malloc(UINTPTR_MAX);
-    /*@assert (__heap_size == 16);  */
+    /*@assert (__e_acsl_heap_size == 16);  */
     /*@assert (b == NULL);  */
     return 0;
 }

@@ -10,9 +10,9 @@ int main(void)
     while (i < 10) {
       /*@ invariant 0 ≤ i < 10; */
       {
-        int __e_acsl_and;
-        if (0 <= i) __e_acsl_and = i < 10; else __e_acsl_and = 0;
-        __e_acsl_assert(__e_acsl_and,(char *)"Invariant",(char *)"main",
+        int __gen_e_acsl_and;
+        if (0 <= i) __gen_e_acsl_and = i < 10; else __gen_e_acsl_and = 0;
+        __e_acsl_assert(__gen_e_acsl_and,(char *)"Invariant",(char *)"main",
                         (char *)"0 <= i < 10",9);
       }
       x += i;
