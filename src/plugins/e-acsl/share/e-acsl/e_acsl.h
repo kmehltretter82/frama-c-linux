@@ -31,9 +31,18 @@
 /******************************/
 /* Dedicated E-ACSL assertion */
 /******************************/
-/*@ requires predicate != 0;
+
+/*! \brief Runtime assertion verifying a predicate
+ *  \param pred  integer code of a predicate
+ *  \param kind  a C string representing an annotation's
+ *    kind (e.g., "Assertion")
+ *  \param fct
+ *  \param pred_txt  stringified predicate
+ *  \param line  line number of the predicate placement in the
+ *    un-instrumented file */
+/*@ requires pred != 0;
   @ assigns \nothing; */
-void __e_acsl_assert(int predicate,
+void __e_acsl_assert(int pred,
 		   char *kind,
 		   char *fct,
 		   char *pred_txt,
