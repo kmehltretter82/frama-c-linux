@@ -32,13 +32,13 @@
 #include "e_acsl_string.h"
 #include "e_acsl_printf.h"
 #include "e_acsl_bits.h"
-#include "__e_acsl_assert.h"
+#include "e_acsl_assert.h"
 #include "e_acsl_debug.h"
 #include "e_acsl_malloc.h"
 #include "e_acsl_mmodel_api.h"
 #include "e_acsl_bittree.h"
 
-size_t __heap_size = 0;
+size_t __e_acsl_heap_size = 0;
 
 static const int nbr_bits_to_1[256] = {
   0,1,1,2,1,2,2,3,1,2,2,3,2,3,3,4,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,1,2,2,3,2,3,
@@ -51,7 +51,7 @@ static const int nbr_bits_to_1[256] = {
 };
 
 size_t __get_memory_size(void) {
-  return __heap_size;
+  return __e_acsl_heap_size;
 }
 
 /* given the size of the memory block (_size) return (or rather evaluate to)
@@ -101,7 +101,7 @@ void* __e_acsl_malloc(size_t size) {
   if(tmp == NULL)
     return NULL;
   new_block = __e_acsl_store_block(tmp, size);
-  __heap_size += size;
+  __e_acsl_heap_size += size;
   DASSERT(new_block != NULL && (void*)new_block->ptr != NULL);
   new_block->freeable = true;
   return (void*)new_block->ptr;
@@ -117,7 +117,7 @@ void __e_acsl_free(void* ptr) {
   DASSERT(tmp != NULL);
   native_free(ptr);
   bt_clean_block_init(tmp);
-  __heap_size -= tmp->size;
+  __e_acsl_heap_size -= tmp->size;
   bt_remove(tmp);
   native_free(tmp);
 }
@@ -150,7 +150,7 @@ void* __e_acsl_realloc(void* ptr, size_t size) {
   new_ptr = native_realloc((void*)tmp->ptr, size);
   if(new_ptr == NULL)
     return NULL;
-  __heap_size -= tmp->size;
+  __e_acsl_heap_size -= tmp->size;
   /* realloc changes start address -- re-enter the element */
   if (tmp->ptr != (size_t)new_ptr) {
     bt_remove(tmp);
@@ -195,7 +195,7 @@ void* __e_acsl_realloc(void* ptr, size_t size) {
   }
   tmp->size = size;
   tmp->freeable = true;
-  __heap_size += size;
+  __e_acsl_heap_size += size;
   return (void*)tmp->ptr;
 }
 
@@ -212,7 +212,7 @@ void* __e_acsl_calloc(size_t nbr_block, size_t size_block) {
   if(tmp == NULL)
     return NULL;
   new_block = __e_acsl_store_block(tmp, size);
-  __heap_size += nbr_block * size_block;
+  __e_acsl_heap_size += nbr_block * size_block;
   DASSERT(new_block != NULL && (void*)new_block->ptr != NULL);
   /* Mark allocated block as freeable and initialized */
   new_block->freeable = true;
@@ -417,3 +417,5 @@ void __e_acsl_print_bittree() {
 }
 #endif
 #endif
+
+
