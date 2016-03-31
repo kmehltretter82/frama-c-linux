@@ -7,15 +7,15 @@ int f(int x)
 }
 
 /*@ ensures \result ≡ (int)(\old(x)-\old(x)); */
-int __e_acsl_f(int x)
+int __gen_e_acsl_f(int x)
 {
-  int __e_acsl_at_2;
-  int __e_acsl_at;
+  int __gen_e_acsl_at_2;
+  int __gen_e_acsl_at;
   int __retres;
-  __e_acsl_at_2 = x;
-  __e_acsl_at = x;
+  __gen_e_acsl_at_2 = x;
+  __gen_e_acsl_at = x;
   __retres = f(x);
-  __e_acsl_assert(__retres == (int)((long)__e_acsl_at - (long)__e_acsl_at_2),
+  __e_acsl_assert(__retres == (int)((long)__gen_e_acsl_at - (long)__gen_e_acsl_at_2),
                   (char *)"Postcondition",(char *)"f",
                   (char *)"\\result == (int)(\\old(x)-\\old(x))",5);
   return __retres;
@@ -29,7 +29,7 @@ int g(int x)
 }
 
 /*@ ensures \result ≡ Y; */
-int __e_acsl_g(int x)
+int __gen_e_acsl_g(int x)
 {
   int __retres;
   __retres = g(x);
@@ -47,7 +47,7 @@ int h(void)
 }
 
 /*@ ensures \result ≡ 0; */
-int __e_acsl_h(void)
+int __gen_e_acsl_h(void)
 {
   int __retres;
   __retres = h();
@@ -59,9 +59,9 @@ int __e_acsl_h(void)
 int main(void)
 {
   int __retres;
-  __e_acsl_f(1);
-  __e_acsl_g(Y);
-  __e_acsl_h();
+  __gen_e_acsl_f(1);
+  __gen_e_acsl_g(Y);
+  __gen_e_acsl_h();
   __retres = 0;
   return __retres;
 }

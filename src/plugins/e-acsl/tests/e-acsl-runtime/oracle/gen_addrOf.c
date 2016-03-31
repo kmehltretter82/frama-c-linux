@@ -4,25 +4,25 @@ void f(void)
   int m;
   int *u;
   int *p;
-  __store_block((void *)(& p),8UL);
-  __store_block((void *)(& u),8UL);
-  __store_block((void *)(& m),4UL);
-  __full_init((void *)(& u));
+  __e_acsl_store_block((void *)(& p),8UL);
+  __e_acsl_store_block((void *)(& u),8UL);
+  __e_acsl_store_block((void *)(& m),4UL);
+  __e_acsl_full_init((void *)(& u));
   u = & m;
-  __full_init((void *)(& p));
+  __e_acsl_full_init((void *)(& p));
   p = u;
-  __full_init((void *)(& m));
+  __e_acsl_full_init((void *)(& m));
   m = 123;
   /*@ assert \initialized(p); */
   {
-    int __e_acsl_initialized;
-    __e_acsl_initialized = __initialized((void *)p,sizeof(int));
-    __e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"f",
+    int __gen_e_acsl_initialized;
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)p,sizeof(int));
+    __e_acsl_assert(__gen_e_acsl_initialized,(char *)"Assertion",(char *)"f",
                     (char *)"\\initialized(p)",10);
   }
-  __delete_block((void *)(& p));
-  __delete_block((void *)(& u));
-  __delete_block((void *)(& m));
+  __e_acsl_delete_block((void *)(& p));
+  __e_acsl_delete_block((void *)(& u));
+  __e_acsl_delete_block((void *)(& m));
   return;
 }
 

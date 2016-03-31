@@ -1,6 +1,6 @@
 /* run.config
    COMMENT: complex fields and indexes + potential RTE in \initialized
-   STDOPT: +"-val-builtin __malloc:Frama_C_alloc_size -val-builtin __free:Frama_C_free"
+   STDOPT: +"-val-builtin __e_acsl_malloc:Frama_C_alloc_size -val-builtin __e_acsl_free:Frama_C_free"
 */
 
 #include "stdlib.h"
@@ -17,7 +17,7 @@ typedef struct spongeStateStruct spongeState;
 int main(void) {
   spongeState* state = (spongeState*) malloc(sizeof(spongeState));
   state->bitsInQueue = 16;
-  
+
   /*@ assert
       ! \initialized(&state->dataQueue[state->bitsInQueue/(unsigned int)8]);
     */

@@ -17,10 +17,10 @@ union msg {
 };
 void read_sensor_4(unsigned int *m)
 {
-  __store_block((void *)(& m),8UL);
-  __initialize((void *)m,sizeof(unsigned int));
+  __e_acsl_store_block((void *)(& m),8UL);
+  __e_acsl_initialize((void *)m,sizeof(unsigned int));
   *m = (unsigned int)0;
-  __delete_block((void *)(& m));
+  __e_acsl_delete_block((void *)(& m));
   return;
 }
 
@@ -30,7 +30,7 @@ int main(void)
   unsigned char buf[sizeof(union msg)];
   int i;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
-  __store_block((void *)(buf),16UL);
+  __e_acsl_store_block((void *)(buf),16UL);
   i = 0;
   while ((unsigned long)i < sizeof(buf) / (unsigned long)4) {
     read_sensor_4((unsigned int *)(buf) + i);
@@ -38,14 +38,16 @@ int main(void)
   }
   /*@ assert \initialized((union msg *)((unsigned char *)buf)); */
   {
-    int __e_acsl_initialized;
-    __e_acsl_initialized = __initialized((void *)(buf),sizeof(union msg));
-    __e_acsl_assert(__e_acsl_initialized,(char *)"Assertion",(char *)"main",
+    int __gen_e_acsl_initialized;
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(buf),
+                                                    sizeof(union msg));
+    __e_acsl_assert(__gen_e_acsl_initialized,(char *)"Assertion",
+                    (char *)"main",
                     (char *)"\\initialized((union msg *)((unsigned char *)buf))",
                     23);
   }
   __retres = 0;
-  __delete_block((void *)(buf));
+  __e_acsl_delete_block((void *)(buf));
   __e_acsl_memory_clean();
   return __retres;
 }

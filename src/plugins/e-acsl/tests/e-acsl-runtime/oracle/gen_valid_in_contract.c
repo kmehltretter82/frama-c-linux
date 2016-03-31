@@ -15,23 +15,23 @@ struct list {
 struct list *f(struct list *l)
 {
   struct list *__retres;
-  __store_block((void *)(& __retres),8UL);
-  __store_block((void *)(& l),8UL);
+  __e_acsl_store_block((void *)(& __retres),8UL);
+  __e_acsl_store_block((void *)(& l),8UL);
   if (l == (struct list *)0) {
-    __full_init((void *)(& __retres));
+    __e_acsl_full_init((void *)(& __retres));
     __retres = l;
     goto return_label;
   }
   if (l->next == (struct list *)0) {
-    __full_init((void *)(& __retres));
+    __e_acsl_full_init((void *)(& __retres));
     __retres = l;
     goto return_label;
   }
-  __full_init((void *)(& __retres));
+  __e_acsl_full_init((void *)(& __retres));
   __retres = (struct list *)0;
   return_label:
-    __delete_block((void *)(& l));
-    __delete_block((void *)(& __retres));
+    __e_acsl_delete_block((void *)(& l));
+    __e_acsl_delete_block((void *)(& __retres));
     return __retres;
 }
 
@@ -44,62 +44,64 @@ struct list *f(struct list *l)
       assumes ¬\valid(l->next);
       ensures \result ≡ \old(l);
  */
-struct list *__e_acsl_f(struct list *l)
+struct list *__gen_e_acsl_f(struct list *l)
 {
-  struct list *__e_acsl_at_4;
-  int __e_acsl_at_3;
-  struct list *__e_acsl_at_2;
-  int __e_acsl_at;
+  struct list *__gen_e_acsl_at_4;
+  int __gen_e_acsl_at_3;
+  struct list *__gen_e_acsl_at_2;
+  int __gen_e_acsl_at;
   struct list *__retres;
-  __store_block((void *)(& __retres),8UL);
-  __store_block((void *)(& l),8UL);
-  __store_block((void *)(& __e_acsl_at_4),8UL);
-  __e_acsl_at_4 = l;
+  __e_acsl_store_block((void *)(& __retres),8UL);
+  __e_acsl_store_block((void *)(& l),8UL);
+  __e_acsl_store_block((void *)(& __gen_e_acsl_at_4),8UL);
+  __gen_e_acsl_at_4 = l;
   {
-    int __e_acsl_valid;
-    int __e_acsl_and_2;
-    __e_acsl_valid = __valid((void *)l,sizeof(struct list));
-    if (! __e_acsl_valid) {
-      int __e_acsl_initialized;
-      int __e_acsl_and;
-      __e_acsl_initialized = __initialized((void *)(& l->next),
-                                           sizeof(struct list *));
-      if (__e_acsl_initialized) {
-        int __e_acsl_valid_read;
-        int __e_acsl_valid_2;
-        __e_acsl_valid_read = __valid_read((void *)(& l->next),
-                                           sizeof(struct list *));
-        __e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"f",
+    int __gen_e_acsl_valid;
+    int __gen_e_acsl_and_2;
+    __gen_e_acsl_valid = __e_acsl_valid((void *)l,sizeof(struct list));
+    if (! __gen_e_acsl_valid) {
+      int __gen_e_acsl_initialized;
+      int __gen_e_acsl_and;
+      __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& l->next),
+                                                      sizeof(struct list *));
+      if (__gen_e_acsl_initialized) {
+        int __gen_e_acsl_valid_read;
+        int __gen_e_acsl_valid_2;
+        __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(& l->next),
+                                                      sizeof(struct list *));
+        __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"f",
                         (char *)"mem_access: \\valid_read(&l->next)",19);
         /*@ assert Value: mem_access: \valid_read(&l->next); */
-        __e_acsl_valid_2 = __valid((void *)l->next,sizeof(struct list));
-        __e_acsl_and = __e_acsl_valid_2;
+        __gen_e_acsl_valid_2 = __e_acsl_valid((void *)l->next,
+                                              sizeof(struct list));
+        __gen_e_acsl_and = __gen_e_acsl_valid_2;
       }
-      else __e_acsl_and = 0;
-      __e_acsl_and_2 = ! __e_acsl_and;
+      else __gen_e_acsl_and = 0;
+      __gen_e_acsl_and_2 = ! __gen_e_acsl_and;
     }
-    else __e_acsl_and_2 = 0;
-    __e_acsl_at_3 = __e_acsl_and_2;
+    else __gen_e_acsl_and_2 = 0;
+    __gen_e_acsl_at_3 = __gen_e_acsl_and_2;
   }
-  __store_block((void *)(& __e_acsl_at_2),8UL);
-  __e_acsl_at_2 = l;
-  __store_block((void *)(& __e_acsl_at),4UL);
-  __e_acsl_at = l == (void *)0;
+  __e_acsl_store_block((void *)(& __gen_e_acsl_at_2),8UL);
+  __gen_e_acsl_at_2 = l;
+  __e_acsl_store_block((void *)(& __gen_e_acsl_at),4UL);
+  __gen_e_acsl_at = l == (void *)0;
   __retres = f(l);
   {
-    int __e_acsl_implies;
-    int __e_acsl_implies_2;
-    if (! __e_acsl_at) __e_acsl_implies = 1;
-    else __e_acsl_implies = __retres == __e_acsl_at_2;
-    __e_acsl_assert(__e_acsl_implies,(char *)"Postcondition",(char *)"f",
+    int __gen_e_acsl_implies;
+    int __gen_e_acsl_implies_2;
+    if (! __gen_e_acsl_at) __gen_e_acsl_implies = 1;
+    else __gen_e_acsl_implies = __retres == __gen_e_acsl_at_2;
+    __e_acsl_assert(__gen_e_acsl_implies,(char *)"Postcondition",(char *)"f",
                     (char *)"\\old(l == \\null) ==> \\result == \\old(l)",16);
-    if (! __e_acsl_at_3) __e_acsl_implies_2 = 1;
-    else __e_acsl_implies_2 = __retres == __e_acsl_at_4;
-    __e_acsl_assert(__e_acsl_implies_2,(char *)"Postcondition",(char *)"f",
+    if (! __gen_e_acsl_at_3) __gen_e_acsl_implies_2 = 1;
+    else __gen_e_acsl_implies_2 = __retres == __gen_e_acsl_at_4;
+    __e_acsl_assert(__gen_e_acsl_implies_2,(char *)"Postcondition",
+                    (char *)"f",
                     (char *)"\\old(!\\valid{Here}(l) && !\\valid{Here}(l->next)) ==> \\result == \\old(l)",
                     20);
-    __delete_block((void *)(& l));
-    __delete_block((void *)(& __retres));
+    __e_acsl_delete_block((void *)(& l));
+    __e_acsl_delete_block((void *)(& __retres));
     return __retres;
   }
 }
@@ -108,7 +110,7 @@ int main(void)
 {
   int __retres;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
-  __e_acsl_f((struct list *)0);
+  __gen_e_acsl_f((struct list *)0);
   __retres = 0;
   __e_acsl_memory_clean();
   return __retres;

@@ -20,16 +20,16 @@ int main(void)
       0xffffffffffffffffffffffffffffffff;
   */
   {
-    mpz_t __e_acsl;
-    int __e_acsl_eq;
-    __gmpz_init_set_str(__e_acsl,"340282366920938463463374607431768211455",
-                        10);
-    __e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__e_acsl),
-                             (__mpz_struct const *)(__e_acsl));
-    __e_acsl_assert(__e_acsl_eq == 0,(char *)"Assertion",(char *)"main",
+    mpz_t __gen_e_acsl_;
+    int __gen_e_acsl_eq;
+    __gmpz_init_set_str(__gen_e_acsl_,
+                        "340282366920938463463374607431768211455",10);
+    __gen_e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__gen_e_acsl_),
+                                 (__mpz_struct const *)(__gen_e_acsl_));
+    __e_acsl_assert(__gen_e_acsl_eq == 0,(char *)"Assertion",(char *)"main",
                     (char *)"0xffffffffffffffffffffffffffffffff == 0xffffffffffffffffffffffffffffffff",
                     11);
-    __gmpz_clear(__e_acsl);
+    __gmpz_clear(__gen_e_acsl_);
   }
   __retres = 0;
   return __retres;
