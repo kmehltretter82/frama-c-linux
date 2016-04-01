@@ -8,34 +8,35 @@ int main(void)
   struct toto s;
   struct toto *p;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
-  __store_block((void *)(& p),8UL);
-  __store_block((void *)(& s),0UL);
+  __e_acsl_store_block((void *)(& p),8UL);
+  __e_acsl_store_block((void *)(& s),0UL);
   /*@ assert \valid(&s); */
   {
-    int __e_acsl_valid;
-    __e_acsl_valid = __valid((void *)(& s),sizeof(struct toto));
-    __e_acsl_assert(__e_acsl_valid,(char *)"Assertion",(char *)"main",
+    int __gen_e_acsl_valid;
+    __gen_e_acsl_valid = __e_acsl_valid((void *)(& s),sizeof(struct toto));
+    __e_acsl_assert(__gen_e_acsl_valid,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid(&s)",9);
   }
-  __full_init((void *)(& p));
+  __e_acsl_full_init((void *)(& p));
   p = & s;
   /*@ assert \valid(p); */
   {
-    int __e_acsl_initialized;
-    int __e_acsl_and;
-    __e_acsl_initialized = __initialized((void *)(& p),sizeof(struct toto *));
-    if (__e_acsl_initialized) {
-      int __e_acsl_valid_2;
-      __e_acsl_valid_2 = __valid((void *)p,sizeof(struct toto));
-      __e_acsl_and = __e_acsl_valid_2;
+    int __gen_e_acsl_initialized;
+    int __gen_e_acsl_and;
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& p),
+                                                    sizeof(struct toto *));
+    if (__gen_e_acsl_initialized) {
+      int __gen_e_acsl_valid_2;
+      __gen_e_acsl_valid_2 = __e_acsl_valid((void *)p,sizeof(struct toto));
+      __gen_e_acsl_and = __gen_e_acsl_valid_2;
     }
-    else __e_acsl_and = 0;
-    __e_acsl_assert(__e_acsl_and,(char *)"Assertion",(char *)"main",
+    else __gen_e_acsl_and = 0;
+    __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid(p)",12);
   }
   __retres = 0;
-  __delete_block((void *)(& p));
-  __delete_block((void *)(& s));
+  __e_acsl_delete_block((void *)(& p));
+  __e_acsl_delete_block((void *)(& s));
   __e_acsl_memory_clean();
   return __retres;
 }

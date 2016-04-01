@@ -9,12 +9,12 @@
   __fc_heap_status ∈ [--..--]
   __e_acsl_init ∈ [--..--]
   __e_acsl_internal_heap ∈ [--..--]
-  __heap_size ∈ [--..--]
+  __e_acsl_heap_size ∈ [--..--]
   A ∈ {0}
 [value] using specification for function __e_acsl_memory_init
-[value] using specification for function __store_block
-[value] using specification for function __full_init
-[value] using specification for function __delete_block
+[value] using specification for function __e_acsl_store_block
+[value] using specification for function __e_acsl_full_init
+[value] using specification for function __e_acsl_delete_block
 [value] using specification for function __e_acsl_assert
 tests/gmp/at.i:12:[value] cannot evaluate ACSL term, \at() on a C label is unsupported
 tests/gmp/at.i:12:[value] warning: assertion got status unknown.
@@ -24,9 +24,9 @@ tests/gmp/at.i:52:[value] cannot evaluate ACSL term, \at() on a C label is unsup
 tests/gmp/at.i:52:[value] warning: assertion got status unknown.
 tests/gmp/at.i:53:[value] cannot evaluate ACSL term, \at() on a C label is unsupported
 tests/gmp/at.i:53:[value] warning: assertion got status unknown.
-[value] using specification for function __initialize
-[value] using specification for function __valid_read
-FRAMAC_SHARE/e-acsl/e_acsl.h:34:[value] warning: function __e_acsl_assert: precondition got status unknown.
+[value] using specification for function __e_acsl_initialize
+[value] using specification for function __e_acsl_valid_read
+FRAMAC_SHARE/e-acsl/e_acsl.h:43:[value] warning: function __e_acsl_assert: precondition got status unknown.
 tests/gmp/at.i:30:[value] cannot evaluate ACSL term, \at() on a C label is unsupported
 tests/gmp/at.i:30:[value] warning: assertion got status unknown.
 tests/gmp/at.i:32:[value] cannot evaluate ACSL term, \at() on a C label is unsupported

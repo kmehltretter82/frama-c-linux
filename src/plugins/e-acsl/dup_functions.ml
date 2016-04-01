@@ -291,7 +291,7 @@ class dup_functions_visitor prj = object (self)
 		     (Extlib.the self#current_kf)))
 	-> 
     self#next ();
-    let name = "__e_acsl_" ^ vi.vname in
+    let name = Misc.mk_gen_name vi.vname in
     let new_vi = 
       Project.on prj (Cil.makeGlobalVar name) vi.vtype
     in

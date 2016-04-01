@@ -1,6 +1,6 @@
 /* run.config
    COMMENT: allocation and de-allocation of local variables
-   STDOPT: +"-val-builtin __malloc:Frama_C_alloc_size -val-builtin __free:Frama_C_free"
+   STDOPT: +"-val-builtin __e_acsl_malloc:Frama_C_alloc_size -val-builtin __e_acsl_free:Frama_C_free"
 */
 
 #include <stdlib.h>

@@ -28,7 +28,7 @@ let dkey = Options.dkey_translation
 
 let rename_alloc_function ~create bhv vi =
   if Misc.is_alloc_name vi.vname then
-    let new_name =  "__" ^ vi.vname in
+    let new_name =  Misc.mk_api_name vi.vname in
     let kf =
       try Globals.Functions.find_by_name new_name
       with Not_found -> assert false
@@ -89,11 +89,11 @@ class e_acsl_visitor prj generate = object (self)
      initializers aiming to capture memory allocated by global variable
      declarations and initilisation. At runtime the memory blocks corresponding
      to space occupied by global are recorded via a call to
-     [__e_acsl_globals_init] instrumented at the beginning of the
+     [__gen_e_acsl_globals_init] instrumented at the beginning of the
      [main] function. Each variable stored by [global_vars] will be handled in
-     the body of [__e_acsl_globals_init] as follows:
-     __store_block(...); // Record a memory block used by the variable
-     __full_init(...);   // ... and mark it as initialized memory
+     the body of [__gen_e_acsl_globals_init] as follows:
+     __e_acsl_store_block(...); // Record a memory block used by the variable
+     __e_acsl_full_init(...);   // ... and mark it as initialized memory
 
      NOTE: In [global_vars] keys belong to the original project while values
      belong to the new one *)
@@ -142,7 +142,7 @@ class e_acsl_visitor prj generate = object (self)
                   (fun old_vi i (stmts, env) ->
                     let new_vi = Cil.get_varinfo self#behavior old_vi in
                     (* [model] creates an initialization statement
-                       of the form [__full_init(...)] for every global
+                       of the form [__e_acsl_full_init(...)] for every global
                        variable which needs to be tracked and is not a Frama-C
                        builtin. Further the statement is appended to the
                        provided list of statements ([blk]) *)
@@ -192,7 +192,7 @@ class e_acsl_visitor prj generate = object (self)
               let blk = Cil.mkBlock stmts in
               (* Create [__e_acsl_globals_init] function with definition
                for initialization of global variables *)
-              let fname = "__e_acsl_globals_init" in
+              let fname = (Misc.mk_api_name "globals_init") in
               let vi =
                 Cil.makeGlobalVar ~source:true
                   fname
@@ -291,7 +291,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
               in
               let ptr_size = Cil.sizeOf loc Cil.voidPtrType in
               let args = args @ [ ptr_size ] in
-              let init = Misc.mk_call loc "__e_acsl_memory_init" args in
+              let init = Misc.mk_call loc (Misc.mk_api_name "memory_init") args in
               main.sbody.bstmts <- init :: main.sbody.bstmts
             in
             Extlib.may handle_main main_fct
@@ -592,7 +592,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
                       else
                         acc)
                     global_vars
-                    [ Misc.mk_call ~loc "__e_acsl_memory_clean" []; ret ]
+                    [ Misc.mk_call ~loc (Misc.mk_api_name "memory_clean") []; ret ]
                 in
                 b.bstmts <- List.rev l @ delete_stmts
             end;

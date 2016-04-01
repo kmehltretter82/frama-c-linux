@@ -1,6 +1,6 @@
 /* run.config
    COMMENT: function contract involving \valid
-   STDOPT: +"-val-builtin __malloc:Frama_C_alloc_size -val-builtin __free:Frama_C_free"
+   STDOPT: +"-val-builtin __e_acsl_malloc:Frama_C_alloc_size -val-builtin __e_acsl_free:Frama_C_free"
 */
 
 #include <stdlib.h>

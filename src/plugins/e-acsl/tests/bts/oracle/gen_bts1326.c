@@ -8,12 +8,12 @@ typedef int ArrayInt[5];
  */
 void atp_NORMAL_computeAverageAccel(ArrayInt *Accel, int *AverageAccel)
 {
-  __store_block((void *)(& Accel),8UL);
-  __store_block((void *)(& AverageAccel),8UL);
-  __initialize((void *)AverageAccel,sizeof(int));
+  __e_acsl_store_block((void *)(& Accel),8UL);
+  __e_acsl_store_block((void *)(& AverageAccel),8UL);
+  __e_acsl_initialize((void *)AverageAccel,sizeof(int));
   *AverageAccel = (((((*Accel)[4] + (*Accel)[3]) + (*Accel)[2]) + (*Accel)[1]) + (*Accel)[0]) / 5;
-  __delete_block((void *)(& Accel));
-  __delete_block((void *)(& AverageAccel));
+  __e_acsl_delete_block((void *)(& Accel));
+  __e_acsl_delete_block((void *)(& AverageAccel));
   return;
 }
 
@@ -23,77 +23,79 @@ void atp_NORMAL_computeAverageAccel(ArrayInt *Accel, int *AverageAccel)
                                                                     Accel))[1])+(*
         \old(Accel))[0])/5;
  */
-void __e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
-                                             int *AverageAccel)
+void __gen_e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
+                                                 int *AverageAccel)
 {
-  ArrayInt *__e_acsl_at_6;
-  ArrayInt *__e_acsl_at_5;
-  ArrayInt *__e_acsl_at_4;
-  ArrayInt *__e_acsl_at_3;
-  ArrayInt *__e_acsl_at_2;
-  int *__e_acsl_at;
-  __store_block((void *)(& Accel),8UL);
-  __store_block((void *)(& AverageAccel),8UL);
-  __store_block((void *)(& __e_acsl_at_6),8UL);
-  __e_acsl_at_6 = Accel;
-  __store_block((void *)(& __e_acsl_at_5),8UL);
-  __e_acsl_at_5 = Accel;
-  __store_block((void *)(& __e_acsl_at_4),8UL);
-  __e_acsl_at_4 = Accel;
-  __store_block((void *)(& __e_acsl_at_3),8UL);
-  __e_acsl_at_3 = Accel;
-  __store_block((void *)(& __e_acsl_at_2),8UL);
-  __e_acsl_at_2 = Accel;
-  __store_block((void *)(& __e_acsl_at),8UL);
-  __e_acsl_at = AverageAccel;
+  ArrayInt *__gen_e_acsl_at_6;
+  ArrayInt *__gen_e_acsl_at_5;
+  ArrayInt *__gen_e_acsl_at_4;
+  ArrayInt *__gen_e_acsl_at_3;
+  ArrayInt *__gen_e_acsl_at_2;
+  int *__gen_e_acsl_at;
+  __e_acsl_store_block((void *)(& Accel),8UL);
+  __e_acsl_store_block((void *)(& AverageAccel),8UL);
+  __e_acsl_store_block((void *)(& __gen_e_acsl_at_6),8UL);
+  __gen_e_acsl_at_6 = Accel;
+  __e_acsl_store_block((void *)(& __gen_e_acsl_at_5),8UL);
+  __gen_e_acsl_at_5 = Accel;
+  __e_acsl_store_block((void *)(& __gen_e_acsl_at_4),8UL);
+  __gen_e_acsl_at_4 = Accel;
+  __e_acsl_store_block((void *)(& __gen_e_acsl_at_3),8UL);
+  __gen_e_acsl_at_3 = Accel;
+  __e_acsl_store_block((void *)(& __gen_e_acsl_at_2),8UL);
+  __gen_e_acsl_at_2 = Accel;
+  __e_acsl_store_block((void *)(& __gen_e_acsl_at),8UL);
+  __gen_e_acsl_at = AverageAccel;
   atp_NORMAL_computeAverageAccel(Accel,AverageAccel);
   {
-    int __e_acsl_valid_read;
-    int __e_acsl_valid_read_2;
-    int __e_acsl_valid_read_3;
-    int __e_acsl_valid_read_4;
-    int __e_acsl_valid_read_5;
-    int __e_acsl_valid_read_6;
-    __e_acsl_valid_read = __valid_read((void *)(*__e_acsl_at_6),sizeof(int));
-    __e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",
+    int __gen_e_acsl_valid_read;
+    int __gen_e_acsl_valid_read_2;
+    int __gen_e_acsl_valid_read_3;
+    int __gen_e_acsl_valid_read_4;
+    int __gen_e_acsl_valid_read_5;
+    int __gen_e_acsl_valid_read_6;
+    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(*__gen_e_acsl_at_6),
+                                                  sizeof(int));
+    __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",
                     (char *)"atp_NORMAL_computeAverageAccel",
-                    (char *)"mem_access: \\valid_read((int *)*__e_acsl_at_6)",
+                    (char *)"mem_access: \\valid_read((int *)*__gen_e_acsl_at_6)",
                     8);
-    __e_acsl_valid_read_2 = __valid_read((void *)(& (*__e_acsl_at_5)[1]),
-                                         sizeof(int));
-    __e_acsl_assert(__e_acsl_valid_read_2,(char *)"RTE",
+    __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(& (*__gen_e_acsl_at_5)[1]),
+                                                    sizeof(int));
+    __e_acsl_assert(__gen_e_acsl_valid_read_2,(char *)"RTE",
                     (char *)"atp_NORMAL_computeAverageAccel",
-                    (char *)"mem_access: \\valid_read(&(*__e_acsl_at_5)[1])",
+                    (char *)"mem_access: \\valid_read(&(*__gen_e_acsl_at_5)[1])",
                     8);
-    __e_acsl_valid_read_3 = __valid_read((void *)(& (*__e_acsl_at_4)[2]),
-                                         sizeof(int));
-    __e_acsl_assert(__e_acsl_valid_read_3,(char *)"RTE",
+    __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)(& (*__gen_e_acsl_at_4)[2]),
+                                                    sizeof(int));
+    __e_acsl_assert(__gen_e_acsl_valid_read_3,(char *)"RTE",
                     (char *)"atp_NORMAL_computeAverageAccel",
-                    (char *)"mem_access: \\valid_read(&(*__e_acsl_at_4)[2])",
+                    (char *)"mem_access: \\valid_read(&(*__gen_e_acsl_at_4)[2])",
                     8);
-    __e_acsl_valid_read_4 = __valid_read((void *)(& (*__e_acsl_at_3)[3]),
-                                         sizeof(int));
-    __e_acsl_assert(__e_acsl_valid_read_4,(char *)"RTE",
+    __gen_e_acsl_valid_read_4 = __e_acsl_valid_read((void *)(& (*__gen_e_acsl_at_3)[3]),
+                                                    sizeof(int));
+    __e_acsl_assert(__gen_e_acsl_valid_read_4,(char *)"RTE",
                     (char *)"atp_NORMAL_computeAverageAccel",
-                    (char *)"mem_access: \\valid_read(&(*__e_acsl_at_3)[3])",
+                    (char *)"mem_access: \\valid_read(&(*__gen_e_acsl_at_3)[3])",
                     8);
-    __e_acsl_valid_read_5 = __valid_read((void *)(& (*__e_acsl_at_2)[4]),
-                                         sizeof(int));
-    __e_acsl_assert(__e_acsl_valid_read_5,(char *)"RTE",
+    __gen_e_acsl_valid_read_5 = __e_acsl_valid_read((void *)(& (*__gen_e_acsl_at_2)[4]),
+                                                    sizeof(int));
+    __e_acsl_assert(__gen_e_acsl_valid_read_5,(char *)"RTE",
                     (char *)"atp_NORMAL_computeAverageAccel",
-                    (char *)"mem_access: \\valid_read(&(*__e_acsl_at_2)[4])",
+                    (char *)"mem_access: \\valid_read(&(*__gen_e_acsl_at_2)[4])",
                     8);
-    __e_acsl_valid_read_6 = __valid_read((void *)__e_acsl_at,sizeof(int));
-    __e_acsl_assert(__e_acsl_valid_read_6,(char *)"RTE",
+    __gen_e_acsl_valid_read_6 = __e_acsl_valid_read((void *)__gen_e_acsl_at,
+                                                    sizeof(int));
+    __e_acsl_assert(__gen_e_acsl_valid_read_6,(char *)"RTE",
                     (char *)"atp_NORMAL_computeAverageAccel",
-                    (char *)"mem_access: \\valid_read(__e_acsl_at)",8);
-    __e_acsl_assert(*__e_acsl_at == (((((long)(*__e_acsl_at_2)[4] + (long)(*__e_acsl_at_3)[3]) + (long)(*__e_acsl_at_4)[2]) + (long)(*__e_acsl_at_5)[1]) + (long)(*__e_acsl_at_6)[0]) / (long)5,
+                    (char *)"mem_access: \\valid_read(__gen_e_acsl_at)",8);
+    __e_acsl_assert(*__gen_e_acsl_at == (((((long)(*__gen_e_acsl_at_2)[4] + (long)(*__gen_e_acsl_at_3)[3]) + (long)(*__gen_e_acsl_at_4)[2]) + (long)(*__gen_e_acsl_at_5)[1]) + (long)(*__gen_e_acsl_at_6)[0]) / (long)5,
                     (char *)"Postcondition",
                     (char *)"atp_NORMAL_computeAverageAccel",
                     (char *)"*\\old(AverageAccel) ==\n(((((*\\old(Accel))[4]+(*\\old(Accel))[3])+(*\\old(Accel))[2])+(*\\old(Accel))[1])+(*\n  \\old(Accel))[0])/5",
                     8);
-    __delete_block((void *)(& Accel));
-    __delete_block((void *)(& AverageAccel));
+    __e_acsl_delete_block((void *)(& Accel));
+    __e_acsl_delete_block((void *)(& AverageAccel));
     return;
   }
 }
@@ -104,22 +106,22 @@ int main(void)
   ArrayInt Accel;
   int av;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
-  __store_block((void *)(& av),4UL);
-  __store_block((void *)(Accel),20UL);
-  __initialize((void *)(Accel),sizeof(int));
+  __e_acsl_store_block((void *)(& av),4UL);
+  __e_acsl_store_block((void *)(Accel),20UL);
+  __e_acsl_initialize((void *)(Accel),sizeof(int));
   Accel[0] = 1;
-  __initialize((void *)(& Accel[1]),sizeof(int));
+  __e_acsl_initialize((void *)(& Accel[1]),sizeof(int));
   Accel[1] = 2;
-  __initialize((void *)(& Accel[2]),sizeof(int));
+  __e_acsl_initialize((void *)(& Accel[2]),sizeof(int));
   Accel[2] = 3;
-  __initialize((void *)(& Accel[3]),sizeof(int));
+  __e_acsl_initialize((void *)(& Accel[3]),sizeof(int));
   Accel[3] = 4;
-  __initialize((void *)(& Accel[4]),sizeof(int));
+  __e_acsl_initialize((void *)(& Accel[4]),sizeof(int));
   Accel[4] = 5;
-  __e_acsl_atp_NORMAL_computeAverageAccel(& Accel,& av);
+  __gen_e_acsl_atp_NORMAL_computeAverageAccel(& Accel,& av);
   __retres = 0;
-  __delete_block((void *)(& av));
-  __delete_block((void *)(Accel));
+  __e_acsl_delete_block((void *)(& av));
+  __e_acsl_delete_block((void *)(Accel));
   __e_acsl_memory_clean();
   return __retres;
 }
