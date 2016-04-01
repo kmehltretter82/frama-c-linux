@@ -83,12 +83,12 @@ val mk_readonly: varinfo -> stmt
 val term_addr_of: loc:location -> term_lval -> typ -> term
 
 (* ************************************************************************** *)
-(** {2 Handling prefixes of generated and library functions and variables} *)
+(** {2 Handling prefixes of generated library functions and variables} *)
 (* ************************************************************************** *)
 
 val is_alloc_name: string -> bool
-(** @return return true if a given string matches the name of a
-   memory-allocation function recognised by E-ACSL. *)
+(** @return true if a given string matches the name of a
+   memory-allocation function recognized by E-ACSL. *)
 
 val mk_api_name: string -> string
 (** @return given some base name append it with a prefix used
