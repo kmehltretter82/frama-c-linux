@@ -115,8 +115,9 @@ let startswith p s =
 (* if string s is prefixed with string p, then return s without p, otherwise
  * return s as is *)
 let strip_prefix p s =
+  let lp = String.length p in
   if startswith p s then
-    String.sub s (String.length p) (String.length s - String.length p)
+    String.sub s lp (String.length s - lp)
   else
     s
 
