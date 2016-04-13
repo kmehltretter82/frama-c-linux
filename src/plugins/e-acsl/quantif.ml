@@ -191,10 +191,10 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
       let var_x, x, env = Env.Logic_binding.add ~ty env logic_x in
       let lv_x = var var_x in
       let env = 
-	if Mpz.is_t ty then Env.add_stmt env (Mpz.init ~loc x) else env 
+	if Gmpz.is_t ty then Env.add_stmt env (Gmpz.init ~loc x) else env 
       in
       let llv = cvar_to_lvar var_x in
-      if not (Mpz.is_t ty) then Typing.unsafe_unify ~from:logic_x llv;
+      if not (Gmpz.is_t ty) then Typing.unsafe_unify ~from:logic_x llv;
       (* build the inner loops and loop body *)
       let body, env = mk_for_loop env tl in
       (* initialize the loop counter to [t1] *)
@@ -202,7 +202,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
       let init_blk, env = 
 	Env.pop_and_get 
 	  env
-	  (Mpz.affect ~loc:e1.eloc lv_x x e1)
+	  (Gmpz.affect ~loc:e1.eloc lv_x x e1)
 	  ~global_clear:false
 	  Env.Middle
       in
@@ -233,7 +233,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
       let next_blk, env = 
 	Env.pop_and_get
 	  env
-	  (Mpz.affect ~loc:incr.eloc lv_x x incr)
+	  (Gmpz.affect ~loc:incr.eloc lv_x x incr)
 	  ~global_clear:false
 	  Env.Middle
       in

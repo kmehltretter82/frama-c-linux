@@ -54,7 +54,7 @@ PLUGIN_CMO:= local_config \
 	rte \
 	error \
 	misc \
-	mpz \
+	gmpz \
 	literal_strings \
 	mmodel_analysis \
 	dup_functions \

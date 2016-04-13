@@ -118,7 +118,7 @@ let conditional_to_exp ?(name="if") loc ctx e1 (e2, env2) (e3, env3) =
 	ctx
 	(fun v ev ->
 	  let lv = Cil.var v in
-	  let affect e = Mpz.init_set ~loc lv ev e in
+	  let affect e = Gmpz.init_set ~loc lv ev e in
 	  let then_block, _ = 
 	    let s = affect e2 in
 	    Env.pop_and_get env2 s ~global_clear:false Env.Middle
@@ -210,7 +210,7 @@ and context_insensitive_term_to_exp kf env t =
   | TUnOp(Neg | BNot as op, t') ->
     let ty = Typing.typ_of_term_operation t in
     let e, env = term_to_exp kf env (Some ty) t' in
-    if Mpz.is_t ty then
+    if Gmpz.is_t ty then
       let name, vname = match op with
 	| Neg -> "__gmpz_neg", "neg"
 	| BNot -> "__gmpz_com", "bnot"
@@ -229,7 +229,7 @@ and context_insensitive_term_to_exp kf env t =
       Cil.new_exp ~loc (UnOp(op, e, ty)), env, false, ""
   | TUnOp(LNot, t) ->
     let ty = Typing.typ_of_term_operation t in
-    if Mpz.is_t ty then
+    if Gmpz.is_t ty then
       (* [!t] is converted into [t == 0] *)
       let zero = Logic_const.tinteger 0 in
       let e, env = 
@@ -246,7 +246,7 @@ and context_insensitive_term_to_exp kf env t =
     let ctx = Some ty in
     let e1, env = term_to_exp kf env ctx t1 in
     let e2, env = term_to_exp kf env ctx t2 in
-    if Mpz.is_t ty then
+    if Gmpz.is_t ty then
       let name = name_of_mpz_arith_bop bop in
       let mk_stmts _ e = [ Misc.mk_call ~loc name [ e; e1; e2 ] ] in
       let name = name_of_binop bop in
@@ -267,7 +267,7 @@ and context_insensitive_term_to_exp kf env t =
     let ctx = Some ty in
     let e1, env = term_to_exp kf env ctx t1 in
     let e2, env = term_to_exp kf env ctx t2 in
-    if Mpz.is_t ty then 
+    if Gmpz.is_t ty then 
       (* TODO: preventing division by zero should not be required anymore.
 	 RTE should do this automatically. *)
       let t = Some t in
@@ -283,7 +283,7 @@ and context_insensitive_term_to_exp kf env t =
 	comparison_to_exp ~loc kf env ~e1:(e2, ty) ~name Eq t2 zero t 
       in
       let mk_stmts _v e = 
-	assert (Mpz.is_t ty);
+	assert (Gmpz.is_t ty);
 	let vis = Env.get_visitor env in
 	let kf = Extlib.the vis#current_kf in
 	let cond = 
@@ -346,8 +346,8 @@ and context_insensitive_term_to_exp kf env t =
 	 second is an integer type, or the reverse *)
       let ty1 = Typing.typ_of_term t1 in
       let ty2 = Typing.typ_of_term t2 in
-      if Mpz.is_t ty1 then Some Cil.longType, Some ty2, ty2
-      else if Mpz.is_t ty2 then Some ty1, Some Cil.longType, ty1
+      if Gmpz.is_t ty1 then Some Cil.longType, Some ty2, ty2
+      else if Gmpz.is_t ty2 then Some ty1, Some Cil.longType, ty1
       else Some ty1, Some ty2, if Cil.isIntegralType ty1 then ty2 else ty1
     in
     let e1, env = term_to_exp kf env ctx1 t1 in
@@ -441,7 +441,7 @@ and comparison_to_exp
       e1, env, ctx
   in
   let e2, env = term_to_exp kf env (Some ctx) t2 in
-  if Mpz.is_t ctx then
+  if Gmpz.is_t ctx then
     let _, e, env =
       Env.new_var
 	~loc
@@ -533,7 +533,7 @@ and at_to_exp env t_opt label e =
     method !vstmt_aux stmt = 
       (* either a standard C affectation or an mpz one according to type of
 	 [e] *) 
-      let new_stmt = Mpz.init_set ~loc (Cil.var res_v) res e in
+      let new_stmt = Gmpz.init_set ~loc (Cil.var res_v) res e in
       assert (!env_ref == new_env);
       (* generate the new block of code for the labeled statement and the
 	 corresponding environment *)
