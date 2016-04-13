@@ -69,13 +69,13 @@ let typ_of_eacsl_typ = function
        let ty_u = TInt(ikind_of_integer u is_pos, []) in
        Cil.arithmeticConversion ty_l ty_u
      with Cil.Not_representable -> 
-       Mpz.t ())
-  | Z -> Mpz.t ()
+       Gmpz.t ())
+  | Z -> Gmpz.t ()
   | No_integral (Ctype ty) -> ty
   | No_integral ty when Logic_const.is_boolean_type ty -> assert false
   | No_integral (Ltype _) -> Error.not_yet "typing of user-defined logic type"
   | No_integral (Lvar _) -> Error.not_yet "type variable"
-  | No_integral Linteger -> Mpz.t ()
+  | No_integral Linteger -> Gmpz.t ()
   | No_integral Lreal -> TFloat(FLongDouble, [])
   | No_integral (Larrow _) -> Error.not_yet "functional type"
 
@@ -88,7 +88,7 @@ let eacsl_typ_of_typ ty =
       else Z.zero, Cil.max_unsigned_number n
     in
     Interv(l, u)
-  | ty when Mpz.is_t ty -> Z
+  | ty when Gmpz.is_t ty -> Z
   | ty -> No_integral (Ctype ty)
 
 exception Cannot_compare
@@ -164,10 +164,10 @@ let generic_typ (which: < f: 'a. 'a * 'a -> 'a >) t =
   Cil.CurrentLoc.set t.term_loc;
     if Options.Gmp_only.get () then 
       let ty = match t.term_type with
-	| Linteger -> Mpz.t ()
-	| Ctype ty when Cil.isIntegralType ty -> Mpz.t ()
+	| Linteger -> Gmpz.t ()
+	| Ctype ty when Cil.isIntegralType ty -> Gmpz.t ()
 	| Ctype ty -> ty
-	| Ltype _ as ty when Logic_const.is_boolean_type ty -> Mpz.t ()
+	| Ltype _ as ty when Logic_const.is_boolean_type ty -> Gmpz.t ()
 	| Ltype _ -> Error.not_yet "typing of user-defined logic type"
 	| Lvar _ -> Error.not_yet "type variable"
 	| Lreal -> TFloat(FLongDouble, [])
@@ -327,7 +327,7 @@ let rec type_term t =
       let n = Z.div (Bit_utils.max_bit_address ()) (Z.of_int 8) in
       let ty =
         try TInt(ikind_of_integer n true, [])
-        with Cil.Not_representable -> Mpz.t ()
+        with Cil.Not_representable -> Gmpz.t ()
       in
       dup eacsl_typ_of_typ ty
     | Tblock_length(_, t) ->
@@ -335,7 +335,7 @@ let rec type_term t =
       let n = Z.div (Bit_utils.max_bit_size ()) (Z.of_int 8) in
       let ty =
         try TInt(ikind_of_integer n true, [])
-        with Cil.Not_representable -> Mpz.t ()
+        with Cil.Not_representable -> Gmpz.t ()
       in
       dup eacsl_typ_of_typ ty
     | Tnull -> dup int_to_interv 0
@@ -533,15 +533,15 @@ let context_sensitive ~loc ?name env ctx is_mpz_string t_opt e =
 	?name
 	env
 	t_opt
-	(Mpz.t ())
-	(fun lv v -> [ Mpz.init_set ~loc (Cil.var lv) v e ])
+	(Gmpz.t ())
+	(fun lv v -> [ Gmpz.init_set ~loc (Cil.var lv) v e ])
     in
     e, env
   in
   let do_int_ctx ty =
     (* handle a C-integer context *)
     let e, env = if is_mpz_string then mk_mpz e else e, env in
-    if (Mpz.is_t ty || is_mpz_string) then
+    if (Gmpz.is_t ty || is_mpz_string) then
       (* we get an mpz, but it fits into a C integer: convert it *)
       let fname, new_ty = 
 	if Cil.isSignedInteger ty then 
@@ -566,14 +566,14 @@ let context_sensitive ~loc ?name env ctx is_mpz_string t_opt e =
 	  e),
       env
   in
-  if Mpz.is_t ctx then
-    if Mpz.is_t ty then
+  if Gmpz.is_t ctx then
+    if Gmpz.is_t ty then
       e, env
     else
       (* Convert the C integer into a mpz. 
 	 Remember: very long integer constants have been temporary converted
 	 into strings;
-	 also possible to get a non integralType (or Mpz.t) with a non-one in
+	 also possible to get a non integralType (or Gmpz.t) with a non-one in
 	 the case of \null *)
       let e = 
 	if Cil.isIntegralType ty || is_mpz_string then e
@@ -586,13 +586,13 @@ let context_sensitive ~loc ?name env ctx is_mpz_string t_opt e =
 let principal_type t1 t2 = 
   let ty1 = typ_of_term t1 in
   let ty2 = typ_of_term t2 in
-  (* possible to get an integralType (or Mpz.t) from a non-one in the case of
+  (* possible to get an integralType (or Gmpz.t) from a non-one in the case of
      \null *)
   if Cil.isIntegralType ty1 then
     if Cil.isIntegralType ty2 then Cil.arithmeticConversion ty1 ty2
-    else if Mpz.is_t ty2 then ty2 else ty1
-  else if Mpz.is_t ty1 then
-    if Cil.isIntegralType ty2 || Mpz.is_t ty2 then ty1 else ty2
+    else if Gmpz.is_t ty2 then ty2 else ty1
+  else if Gmpz.is_t ty1 then
+    if Cil.isIntegralType ty2 || Gmpz.is_t ty2 then ty1 else ty2
   else 
     ty2
 
