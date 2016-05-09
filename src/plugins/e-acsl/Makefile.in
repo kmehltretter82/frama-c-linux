@@ -120,6 +120,24 @@ E_ACSL_TESTS: $(PLUGIN_DIR)/tests/test_config \
 
 endif
 
+######################
+# Benchmarking tools #
+######################
+BM_TOOLS_SOURCES = benchmarking/tools/fc-time.c
+BM_TOOLS_BINARIES = $(patsubst %.c,%, $(BM_TOOLS_SOURCES))
+
+CFLAGS = -g3 -O2 -std=c11 -pedantic -Wall -Wno-unused-result
+
+$(BM_TOOLS_BINARIES): % : %.c
+	$(PRINT_CC) $@
+	$(CC) $(CFLAGS) -o $@ $^
+
+all:: $(BM_TOOLS_BINARIES)
+
+clean::
+	$(PRINT_RM) benchmarking tools
+	$(RM) $(BM_TOOLS_BINARIES)
+
 ############
 # Cleaning #
 ############
