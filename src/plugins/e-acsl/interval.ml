@@ -85,10 +85,10 @@ let join i1 i2 =
 
 module Env = struct
   open Cil_datatype
-  type t = interv Logic_var.Map.t
-  let empty = Logic_var.Map.empty
-  let add = Logic_var.Map.add
-  let find = Logic_var.Map.find
+  let tbl: interv Logic_var.Hashtbl.t = Logic_var.Hashtbl.create 7
+  let clear () = Logic_var.Hashtbl.clear tbl
+  let add = Logic_var.Hashtbl.add tbl
+  let find = Logic_var.Hashtbl.find tbl
 end
 
 (* ********************************************************************* *)
@@ -112,7 +112,7 @@ let infer_sizeof ty =
 
 let infer_alignof ty = singleton_of_int (Cil.bytesAlignOf ty)
 
-let rec infer env t =
+let rec infer t =
   let get_cty t = match t.term_type with Ctype ty -> ty | _ -> assert false in
   match t.term_node with
   | TConst (Integer (n,_)) -> make n n
@@ -126,7 +126,7 @@ let rec infer env t =
     in
     let n = Integer.of_int (find_idx 0 enumitem.eihost.eitems) in
     make n n
-  | TLval lv -> infer_term_lval env lv
+  | TLval lv -> infer_term_lval lv
   | TSizeOf ty -> infer_sizeof ty
   | TSizeOfE t -> infer_sizeof (get_cty t)
   | TSizeOfStr str -> singleton_of_int (String.length str + 1 (* '\0' *))
@@ -134,10 +134,10 @@ let rec infer env t =
   | TAlignOfE t -> infer_alignof (get_cty t)
 
   | TUnOp (Neg, t) ->
-    let { lower; upper } = infer env t in
+    let { lower; upper } = infer t in
     make (Integer.neg upper) (Integer.neg lower)
   | TUnOp (BNot, t) ->
-    let { lower; upper } = infer env t in
+    let { lower; upper } = infer t in
     let nl = Integer.lognot lower in
     let nu = Integer.lognot upper in
     make (Integer.min nl nu) (Integer.max nl nu)
@@ -146,20 +146,20 @@ let rec infer env t =
   | TBinOp ((Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr), _, _) ->
     make Integer.zero Integer.one
   | TBinOp (PlusA, t1, t2) ->
-    let i1 = infer env t1 in
-    let i2 = infer env t2 in
+    let i1 = infer t1 in
+    let i2 = infer t2 in
     make (Integer.add i1.lower i2.lower) (Integer.add i1.upper i2.upper)
   | TBinOp (MinusA, t1, t2) ->
-    let i1 = infer env t1 in
-    let i2 = infer env t2 in
+    let i1 = infer t1 in
+    let i2 = infer t2 in
     make (Integer.sub i1.lower i2.upper) (Integer.sub i1.upper i2.lower)
   | TBinOp (Mult, t1, t2) ->
-    let i1 = infer env t1 in
-    let i2 = infer env t2 in
+    let i1 = infer t1 in
+    let i2 = infer t2 in
     combine Integer.mul i1 i2
   | TBinOp (Div, t1, t2) ->
-    let i1 = infer env t1 in
-    let i2 = infer env t2 in
+    let i1 = infer t1 in
+    let i2 = infer t2 in
     if Integer.le i2.lower Integer.zero && Integer.ge i2.upper Integer.zero then
       (* 0 \in i2 *)
       let l = Integer.min i1.lower (Integer.neg i1.upper) in
@@ -172,8 +172,8 @@ let rec infer env t =
       in
       combine div i1 i2
   | TBinOp (Mod, t1, t2) ->
-    let i1 = infer env t1 in
-    let i2 = infer env t2 in
+    let i1 = infer t1 in
+    let i2 = infer t2 in
     (* the sign of the result is the sign of [t1];
        also no more elements than [t2-1] and no more than [t1] *)
     let nb1 = Integer.max (Integer.abs i1.lower) (Integer.abs i1.upper) in
@@ -198,14 +198,14 @@ let rec infer env t =
 
   | TCastE (ty, t)
   | TCoerce (t, ty) ->
-    let it = infer env t in
+    let it = infer t in
     let ity = interv_of_typ ty in
     meet it ity
   | Tif (_, t2, t3) ->
-    let i2 = infer env t2 in
-    let i3 = infer env t3 in
+    let i2 = infer t2 in
+    let i3 = infer t3 in
     join i2 i3
-  | Tat (t, _) -> infer env t
+  | Tat (t, _) -> infer t
   | TBinOp (MinusPP, t, _) ->
     (match Cil.unrollType (get_cty t) with
     | TArray(_, _, { scache = Computed n }, _) ->
@@ -221,10 +221,10 @@ let rec infer env t =
     | TArray _ | TPtr _ -> Lazy.force interv_of_unknown_block
     | _ -> assert false)
   | Tnull  -> singleton_of_int 0
-  | TLogic_coerce (_, t) -> infer env t
+  | TLogic_coerce (_, t) -> infer t
   | TCoerceE (t1, t2) ->
-    let i1 = infer env t1 in
-    let i2 = infer env t2 in
+    let i1 = infer t1 in
+    let i2 = infer t2 in
     meet i1 i2
 
   | Tapp (_,_,_) -> Error.not_yet "logic function application"
@@ -248,16 +248,16 @@ let rec infer env t =
   | Ttype _
   | Tempty_set  -> raise Not_an_integer
 
-and infer_term_lval env (host, offset as tlv) =
+and infer_term_lval (host, offset as tlv) =
   match offset with
-  | TNoOffset -> infer_term_host env host
+  | TNoOffset -> infer_term_host host
   | _ ->
     let ty = Logic_utils.logicCType (Cil.typeOfTermLval tlv) in
     interv_of_typ ty
 
-and infer_term_host env = function
+and infer_term_host = function
   | TVar v ->
-    (try Env.find v env
+    (try Env.find v
      with Not_found -> interv_of_typ (Logic_utils.logicCType v.lv_type))
   | TResult ty -> interv_of_typ ty
   | TMem t ->

@@ -29,9 +29,8 @@ type interv = private { lower: Integer.t; upper: Integer.t }
 include Datatype.S with type t = interv
 
 module Env: sig
-  type t
-  val empty: t
-  val add: Cil_types.logic_var -> interv -> t -> t
+  val clear: unit -> unit
+  val add: Cil_types.logic_var -> interv -> unit
 end
 
 val interv_of_typ: Cil_types.typ -> t
@@ -41,7 +40,7 @@ val join: t -> t -> t
 val meet: t -> t -> t
 
 exception Not_an_integer
-val infer: Env.t -> Cil_types.term -> t
+val infer: Cil_types.term -> t
 (** [infer t] infers the smallest possible integer interval which the values
     of the term can fit in. Assume than the type of [t] is an integral type.
     @raise Not_an_integer if the type of the term is not a subtype of

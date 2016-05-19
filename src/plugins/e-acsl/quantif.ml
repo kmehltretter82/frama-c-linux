@@ -168,7 +168,6 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
         let ty2 = Typing.get_integer_ty t2 in
         Typing.join ty1 ty2
       in
-      let ty = Typing.typ_of_integer_ty ctx in
       let t_plus_one t =
         Logic_const.term ~loc
           (TBinOp(PlusA, t, Logic_const.tinteger ~loc 1))
@@ -177,7 +176,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
       let t1 = match rel1 with
         | Rlt ->
           let t = t_plus_one t1 in
-          Typing.type_term ~ctx t;
+          Typing.type_term ~force:true ~ctx t;
           t
         | Rle -> t1
         | Rgt | Rge | Req | Rneq -> assert false
@@ -186,35 +185,46 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
         | Rlt -> t2, Lt
         | Rle ->
           (* we increment the loop counter one more time (at the end of the
-             loop). Thus to prevent  overflow, check the type of [t2 + 1]
+             loop). Thus to prevent overflow, check the type of [t2+1]
              instead of [t2]. *)
           t_plus_one t2, Le
         | Rgt | Rge | Req | Rneq -> assert false
       in
-      Typing.type_term ~ctx t2_one;
+      Typing.type_term ~force:true ~ctx t2_one;
+      let ctx_one =
+        let ty1 = Typing.get_integer_ty t1 in
+        let ty2 = Typing.get_integer_ty t2_one in
+        Typing.join ty1 ty2
+      in
+      let ty = Typing.typ_of_integer_ty ctx_one in
       (* loop counter corresponding to the quantified variable *)
       let var_x, x, env = Env.Logic_binding.add ~ty env logic_x in
       let lv_x = var var_x in
-      let env = 
-	if Gmpz.is_t ty then Env.add_stmt env (Gmpz.init ~loc x) else env 
+      let env = match ctx_one with
+        | Typing.C_type _ -> env
+        | Typing.Gmp -> Env.add_stmt env (Gmpz.init ~loc x)
+        | Typing.Other -> assert false
       in
-      let llv = cvar_to_lvar var_x in
       (* build the inner loops and loop body *)
       let body, env = mk_for_loop env tl in
       (* initialize the loop counter to [t1] *)
       let e1, env = term_to_exp kf (Env.push env) t1 in
-      let init_blk, env = 
-	Env.pop_and_get 
-	  env
-	  (Gmpz.affect ~loc:e1.eloc lv_x x e1)
-	  ~global_clear:false
-	  Env.Middle
+      let init_blk, env =
+        Env.pop_and_get
+          env
+          (Gmpz.affect ~loc:e1.eloc lv_x x e1)
+          ~global_clear:false
+          Env.Middle
       in
       (* generate the guard [x bop t2] *)
       let stmts_block b = [ mkStmt ~valid_sid:true (Block b) ] in
-      let tlv = Logic_const.tvar ~loc llv in
-      let guard = Logic_const.term ~loc (TBinOp(bop2, tlv, t2)) Linteger in
-      Typing.type_term ~ctx:Typing.c_int guard;
+      let tlv = Logic_const.tvar ~loc logic_x in
+      let guard =
+        (* must copy [t2] to force being typed again *)
+        Logic_const.term ~loc
+          (TBinOp(bop2, tlv, { t2 with term_node = t2.term_node } )) Linteger
+      in
+      Typing.type_term ~force:true ~ctx:Typing.c_int guard;
       let guard_exp, env = term_to_exp kf (Env.push env) guard in
       let break_stmt = mkStmt ~valid_sid:true (Break guard_exp.eloc) in
       let guard_blk, env =
@@ -232,7 +242,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
       (* increment the loop counter [x++] *)
       let tlv_one = t_plus_one tlv in
       (* previous typing ensures that [x++] fits type [ty] *)
-      Typing.type_term ~ctx tlv_one;
+      Typing.type_term ~force:true ~ctx:ctx_one tlv_one;
       let incr, env = term_to_exp kf (Env.push env) tlv_one in
       let next_blk, env = 
 	Env.pop_and_get

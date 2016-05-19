@@ -35,6 +35,8 @@ type integer_ty = private
   | C_type of ikind
   | Other
 
+include Datatype.S with type t = integer_ty
+
 val gmp: integer_ty
 val c_int: integer_ty
 val ikind: ikind -> integer_ty
@@ -47,8 +49,10 @@ val join: integer_ty -> integer_ty -> integer_ty
 (** {2 Typing} *)
 (******************************************************************************)
 
-val type_term: ctx:integer_ty -> term -> unit
-(** Compute the type of each subterm of the given term. *)
+val type_term: force:bool -> ctx:integer_ty -> term -> unit
+(** Compute the type of each subterm of the given term in the given context. If
+    [force] is true, then the conversion to the given context is done even if
+    -e-acsl-gmp-only is set. *)
 
 val type_named_predicate: ?must_clear:bool -> predicate named -> unit
 (** Compute the type of each term of the given predicate. *)

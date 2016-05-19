@@ -161,7 +161,7 @@ int __gen_e_acsl_search(int elt)
         __gen_e_acsl_forall = 0;
         goto e_acsl_end_loop3;
       }
-      __gen_e_acsl_i = (int)(__gen_e_acsl_i + 1L);
+      __gen_e_acsl_i ++;
     }
     e_acsl_end_loop3: ;
     __e_acsl_assert(__gen_e_acsl_forall,(char *)"Precondition",
@@ -184,7 +184,7 @@ int __gen_e_acsl_search(int elt)
           __gen_e_acsl_forall_2 = 0;
           goto e_acsl_end_loop5;
         }
-        __gen_e_acsl_j_2 = (int)(__gen_e_acsl_j_2 + 1L);
+        __gen_e_acsl_j_2 ++;
       }
       e_acsl_end_loop5: ;
       __gen_e_acsl_at_2 = __gen_e_acsl_forall_2;
@@ -205,7 +205,7 @@ int __gen_e_acsl_search(int elt)
           __gen_e_acsl_exists = 1;
           goto e_acsl_end_loop4;
         }
-        __gen_e_acsl_j = (int)(__gen_e_acsl_j + 1L);
+        __gen_e_acsl_j ++;
       }
       e_acsl_end_loop4: ;
       __gen_e_acsl_at = __gen_e_acsl_exists;

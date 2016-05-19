@@ -45,18 +45,21 @@ let gmp = Gmp
 let c_int = C_type IInt
 let ikind ik = C_type ik
 
-let join ty1 ty2 = match ty1, ty2 with
-  | Other, Other -> Other
-  | Other, (Gmp | C_type _) | (Gmp | C_type _), Other ->
-    Options.fatal "[typing] join failure: integer and non integer type"
-  | Gmp, _ | _, Gmp -> Gmp
-  | C_type i1, C_type i2 ->
-    let ty = Cil.arithmeticConversion (TInt(i1, [])) (TInt(i2, [])) in
-    match ty with
-    | TInt(i, _) -> C_type i
-    | _ ->
-      Options.fatal "[typing] join failure: unexpected result %a"
-        Printer.pp_typ ty
+let join ty1 ty2 =
+  if Options.Gmp_only.get () then Gmp
+  else
+    match ty1, ty2 with
+    | Other, Other -> Other
+    | Other, (Gmp | C_type _) | (Gmp | C_type _), Other ->
+      Options.fatal "[typing] join failure: integer and non integer type"
+    | Gmp, _ | _, Gmp -> Gmp
+    | C_type i1, C_type i2 ->
+      let ty = Cil.arithmeticConversion (TInt(i1, [])) (TInt(i2, [])) in
+      match ty with
+      | TInt(i, _) -> C_type i
+      | _ ->
+        Options.fatal "[typing] join failure: unexpected result %a"
+          Printer.pp_typ ty
 
 exception Not_an_integer
 let typ_of_integer_ty = function
@@ -165,14 +168,14 @@ let coerce ~ctx ~op ty =
 (** {2 Type system} *)
 (******************************************************************************)
 
-let mk_ctx ?(force=false) c =
+let mk_ctx ~force c =
   if force then c
   else match c with
   | Other -> Other
   | Gmp | C_type _ -> if Options.Gmp_only.get () then Gmp else c
 
-let rec type_term env ?force ~ctx t =
-  let ctx = mk_ctx ?force ctx in
+let rec type_term ~force ~ctx t =
+  let ctx = mk_ctx ~force ctx in
   let dup ty = ty, ty in
   let infer t =
     Cil.CurrentLoc.set t.term_loc;
@@ -183,22 +186,21 @@ let rec type_term env ?force ~ctx t =
     | TAlignOf _ ->
       let ty =
         try
-          let i = Interval.infer env t in
+          let i = Interval.infer t in
           ty_of_interv ~ctx i
         with Interval.Not_an_integer ->
           Other
       in
       dup ty
-
     | TLval tlv ->
       let ty =
         try
-          let i = Interval.infer env t in
+          let i = Interval.infer t in
           ty_of_interv ~ctx i
         with Interval.Not_an_integer ->
           Other
       in
-      type_term_lval env tlv;
+      type_term_lval tlv;
       dup ty
 
     | Toffset(_, t')
@@ -207,9 +209,9 @@ let rec type_term env ?force ~ctx t =
     | TAlignOfE t' ->
       let ty =
         try
-          let i = Interval.infer env t in
+          let i = Interval.infer t in
           (* [t'] must be typed, but it is a pointer *)
-          ignore (type_term env ~ctx:Other t');
+          ignore (type_term ~force:false ~ctx:Other t');
           ty_of_interv ~ctx i
         with Interval.Not_an_integer ->
           assert false
@@ -219,10 +221,10 @@ let rec type_term env ?force ~ctx t =
     | TBinOp (MinusPP, t1, t2) ->
       let ty =
         try
-          let i = Interval.infer env t in
+          let i = Interval.infer t in
           (* [t1] and [t2] must be typed, but they are pointers *)
-          ignore (type_term env ~ctx:Other t1);
-          ignore (type_term env ~ctx:Other t2);
+          ignore (type_term ~force:false ~ctx:Other t1);
+          ignore (type_term ~force:false ~ctx:Other t2);
           ty_of_interv ~ctx i
         with Interval.Not_an_integer ->
           assert false
@@ -232,13 +234,13 @@ let rec type_term env ?force ~ctx t =
     | TUnOp (unop, t') ->
       let ctx =
         try
-          let i = Interval.infer env t in
-          let i' = Interval.infer env t' in
-          mk_ctx (ty_of_interv ~ctx (Interval.join i i'))
+          let i = Interval.infer t in
+          let i' = Interval.infer t' in
+          mk_ctx ~force:false (ty_of_interv ~ctx (Interval.join i i'))
         with Interval.Not_an_integer ->
           Other (* real *)
       in
-      ignore (type_term env ~ctx t');
+      ignore (type_term ~force:false ~ctx t');
       (match unop with
       | LNot -> c_int, ctx (* converted into [t == 0] in casse of GMP *)
       | Neg | BNot -> dup ctx)
@@ -246,29 +248,30 @@ let rec type_term env ?force ~ctx t =
     | TBinOp((PlusA | MinusA | Mult | Div | Mod | Shiftlt | Shiftrt), t1, t2) ->
       let ctx =
         try
-          let i = Interval.infer env t in
-          let i1 = Interval.infer env t1 in
-          let i2 = Interval.infer env t2 in
-          mk_ctx (ty_of_interv ~ctx (Interval.join i (Interval.join i1 i2)))
+          let i = Interval.infer t in
+          let i1 = Interval.infer t1 in
+          let i2 = Interval.infer t2 in
+          let ctx = ty_of_interv ~ctx (Interval.join i (Interval.join i1 i2)) in
+          mk_ctx ~force:false ctx
         with Interval.Not_an_integer ->
           Other (* real *)
       in
-      ignore (type_term env ~ctx t1);
-      ignore (type_term env ~ctx t2);
+      ignore (type_term ~force ~ctx t1);
+      ignore (type_term ~force ~ctx t2);
       dup ctx
 
     | TBinOp ((Lt | Gt | Le | Ge | Eq | Ne), t1, t2) ->
       assert (compare ctx c_int >= 0);
       let ctx =
         try
-          let i1 = Interval.infer env t1 in
-          let i2 = Interval.infer env t2 in
-          mk_ctx (ty_of_interv ~ctx (Interval.join i1 i2))
+          let i1 = Interval.infer t1 in
+          let i2 = Interval.infer t2 in
+          mk_ctx ~force:false (ty_of_interv ~ctx (Interval.join i1 i2))
         with Interval.Not_an_integer ->
           Other
       in
-      ignore (type_term env ~ctx t1);
-      ignore (type_term env ~ctx t2);
+      ignore (type_term ~force:false ~ctx t1);
+      ignore (type_term ~force:false ~ctx t2);
       let ty = match ctx with
         | Other -> c_int
         | Gmp | C_type _ -> ctx
@@ -278,15 +281,15 @@ let rec type_term env ?force ~ctx t =
     | TBinOp ((LAnd | LOr), t1, t2) ->
       let ty =
         try
-          let i1 = Interval.infer env t1 in
-          let i2 = Interval.infer env t2 in
+          let i1 = Interval.infer t1 in
+          let i2 = Interval.infer t2 in
           ty_of_interv ~ctx (Interval.join i1 i2)
         with Interval.Not_an_integer ->
           Other
       in
       (* both operands fit in an int. *)
-      ignore (type_term env ~ctx:c_int t1);
-      ignore (type_term env ~ctx:c_int t2);
+      ignore (type_term ~force:false ~ctx:c_int t1);
+      ignore (type_term ~force:false ~ctx:c_int t2);
       dup ty
 
     | TBinOp (BAnd, _, _) -> Error.not_yet "bitwise and"
@@ -297,7 +300,7 @@ let rec type_term env ?force ~ctx t =
     | TCoerce(t', _) ->
       let ctx =
         try
-          let i = Interval.infer env t' in
+          let i = Interval.infer t' in
           (* nothing more to do: [i] is already more precise than what we
              could infer from the arguments of the cast. Also, do not type the
              internal term: possibly it is not even an integer *)
@@ -305,58 +308,59 @@ let rec type_term env ?force ~ctx t =
         with Interval.Not_an_integer ->
           Other
       in
-      ignore (type_term env ~ctx t');
+      ignore (type_term ~force:false ~ctx t');
       dup ctx
 
     | Tif (t1, t2, t3) ->
-      let ctx = mk_ctx c_int in
-      ignore (type_term env ~ctx t1);
-      let i = Interval.infer env t in
+      let ctx1 = mk_ctx ~force:true c_int in
+      ignore (type_term ~force:true ~ctx:ctx1 t1);
+      let i = Interval.infer t in
       let ctx =
         try
-          let i2 = Interval.infer env t2 in
-          let i3 = Interval.infer env t3 in
-          mk_ctx (ty_of_interv ~ctx (Interval.join i (Interval.join i2 i3)))
+          let i2 = Interval.infer t2 in
+          let i3 = Interval.infer t3 in
+          let ctx = ty_of_interv ~ctx (Interval.join i (Interval.join i2 i3)) in
+          mk_ctx ~force:false ctx
         with Interval.Not_an_integer ->
           Other
       in
-      ignore (type_term env ~ctx t2);
-      ignore (type_term env ~ctx t3);
+      ignore (type_term ~force:false ~ctx t2);
+      ignore (type_term ~force:false ~ctx t3);
       dup ctx
 
     | Tat (t, _)
-    | TLogic_coerce (_, t) -> dup (type_term env ~ctx t).ty
+    | TLogic_coerce (_, t) -> dup (type_term ~force:false ~ctx t).ty
 
     | TCoerceE (t1, t2) ->
       let ctx =
         try
-          let i = Interval.infer env t in
-          let i1 = Interval.infer env t1 in
-          let i2 = Interval.infer env t2 in
+          let i = Interval.infer t in
+          let i1 = Interval.infer t1 in
+          let i2 = Interval.infer t2 in
           ty_of_interv ~ctx (Interval.join i (Interval.join i1 i2))
         with Interval.Not_an_integer ->
           Other
       in
-      ignore (type_term env ~ctx t1);
-      ignore (type_term env ~ctx t2);
+      ignore (type_term ~force:true ~ctx t1);
+      ignore (type_term ~force:true ~ctx t2);
       dup ctx
 
     | TAddrOf tlv
     | TStartOf tlv ->
       (* it is a pointer, as well as [t], but [t] must be typed. *)
-      type_term_lval env tlv;
+      type_term_lval tlv;
       dup Other
 
     | Tbase_addr (_, t) ->
       (* it is a pointer, as well as [t], but [t] must be typed. *)
-      ignore (type_term env ~ctx:Other t);
+      ignore (type_term ~force:false ~ctx:Other t);
       dup Other
 
     | TBinOp ((PlusPI | IndexPI | MinusPI), t1, t2) ->
       (* it is a pointer, as well as [t1], while [t2] is a size_t.
          Both [t1] and [t2] must be typed. *)
-      ignore (type_term env ~ctx:Other t1);
-      ignore (type_term env ~force:true ~ctx:(size_t ()) t2);
+      ignore (type_term ~force:false ~ctx:Other t1);
+      ignore (type_term ~force:true ~ctx:(size_t ()) t2);
       dup Other
 
     | Tapp (_,_,_) -> Error.not_yet "logic function application"
@@ -377,25 +381,25 @@ let rec type_term env ?force ~ctx t =
   in
   Memo.memo (fun t -> let ty, op = infer t in coerce ~ctx ~op ty) t
 
-and type_term_lval env (host, offset) =
-  type_term_lhost env host;
-  type_term_offset env offset
+and type_term_lval (host, offset) =
+  type_term_lhost host;
+  type_term_offset offset
 
-and type_term_lhost env = function
+and type_term_lhost = function
   | TVar _
   | TResult _ -> ()
-  | TMem t -> ignore (type_term env ~ctx:Other t)
+  | TMem t -> ignore (type_term ~force:false ~ctx:Other t)
 
-and type_term_offset env = function
+and type_term_offset = function
   | TNoOffset -> ()
   | TField(_, toff)
-  | TModel(_, toff) -> type_term_offset env toff
+  | TModel(_, toff) -> type_term_offset toff
   | TIndex(t, toff) ->
-    (* [t] is an array index which must fits into size_t *)
-    ignore (type_term env ~force:true ~ctx:(size_t ()) t);
-    type_term_offset env toff
+    (* [t] is an array index which must fit into size_t *)
+    ignore (type_term ~force:true ~ctx:(size_t ()) t);
+    type_term_offset toff
 
-let rec type_predicate_named env p =
+let rec type_predicate_named p =
   Cil.CurrentLoc.set p.loc;
   let op = match p.content with
     | Pfalse | Ptrue -> c_int
@@ -405,15 +409,15 @@ let rec type_predicate_named env p =
     | Prel(_, t1, t2) ->
       let ctx =
         try
-          let i1 = Interval.infer env t1 in
-          let i2 = Interval.infer env t2 in
+          let i1 = Interval.infer t1 in
+          let i2 = Interval.infer t2 in
           let i = Interval.join i1 i2 in
-          mk_ctx (ty_of_interv ~ctx:c_int i)
+          mk_ctx ~force:false (ty_of_interv ~ctx:c_int i)
         with Interval.Not_an_integer ->
           Other
       in
-      ignore (type_term env ~ctx t1);
-      ignore (type_term env ~ctx t2);
+      ignore (type_term ~force:false ~ctx t1);
+      ignore (type_term ~force:false ~ctx t2);
       (match ctx with
       | Other -> c_int
       | Gmp | C_type _ -> ctx)
@@ -422,62 +426,59 @@ let rec type_predicate_named env p =
     | Pxor(p1, p2)
     | Pimplies(p1, p2)
     | Piff(p1, p2) ->
-      ignore (type_predicate_named env p1);
-      ignore (type_predicate_named env p2);
+      ignore (type_predicate_named p1);
+      ignore (type_predicate_named p2);
       c_int
     | Pnot p ->
-      ignore (type_predicate_named env p);
+      ignore (type_predicate_named p);
       c_int
     | Pif(t, p1, p2) ->
-      let ctx = mk_ctx c_int in
-      ignore (type_term env ~ctx t);
-      ignore (type_predicate_named env p1);
-      ignore (type_predicate_named env p2);
+      let ctx = mk_ctx ~force:true c_int in
+      ignore (type_term ~force:true ~ctx t);
+      ignore (type_predicate_named p1);
+      ignore (type_predicate_named p2);
       c_int
     | Plet _ -> Error.not_yet "let _ = _ in _"
+
     | Pforall(bounded_vars, { content = Pimplies(hyps, goal) })
     | Pexists(bounded_vars, { content = Pand(hyps, goal) }) ->
       let guards = !compute_quantif_guards_ref p bounded_vars hyps in
-      let env =
-        List.fold_left
-          (fun env (t1, r1, x, r2, t2) ->
-            let i1 = Interval.infer env t1 in
-            let i1 = match r1 with
-              | Rlt -> Interval.add i1 Integer.one
-              | Rle -> i1
-              | _ -> assert false
-            in
-            let i2 = Interval.infer env t2 in
+      List.iter
+        (fun (t1, r1, x, r2, t2) ->
+          let i1 = Interval.infer t1 in
+          let i1 = match r1 with
+            | Rlt -> Interval.add i1 Integer.one
+            | Rle -> i1
+            | _ -> assert false
+          in
+          let i2 = Interval.infer t2 in
             (* add one to [i2], since we increment the loop counter one more
-               time before going out the loop. *)
-            let i2 = match r2 with
-              | Rlt -> i2
-              | Rle -> Interval.add i2 Integer.one
-              | _ -> assert false
-            in
-            let i = Interval.join i1 i2 in
-            let ctx = match x.lv_type with
-              | Linteger -> Gmp
-              | Ctype ty ->
-                (match Cil.unrollType ty with
-                | TInt(ik, _) -> C_type ik
-                | ty ->
-                  Options.fatal "unexpected type %a for quantified variable %a"
-                    Printer.pp_typ ty
-                    Printer.pp_logic_var x)
-              | lty ->
+               time before going outside the loop. *)
+          let i2 = match r2 with
+            | Rlt -> i2
+            | Rle -> Interval.add i2 Integer.one
+            | _ -> assert false
+          in
+          let i = Interval.join i1 i2 in
+          let ctx = match x.lv_type with
+            | Linteger -> mk_ctx ~force:false (ty_of_interv ~ctx:Gmp i)
+            | Ctype ty ->
+              (match Cil.unrollType ty with
+              | TInt(ik, _) -> C_type ik
+              | ty ->
                 Options.fatal "unexpected type %a for quantified variable %a"
-                  Printer.pp_logic_type lty
-                  Printer.pp_logic_var x
-            in
-            let ctx = mk_ctx (ty_of_interv ~ctx i) in
-            ignore (type_term env ~ctx t1);
-            ignore (type_term env ~ctx t2);
-            Interval.Env.add x i env)
-          env
-          guards
-      in
-      (type_predicate_named env goal).ty
+                  Printer.pp_typ ty
+                  Printer.pp_logic_var x)
+            | lty ->
+              Options.fatal "unexpected type %a for quantified variable %a"
+                Printer.pp_logic_type lty
+                Printer.pp_logic_var x
+          in
+          ignore (type_term ~force:true ~ctx t1);
+          ignore (type_term ~force:true ~ctx t2);
+          Interval.Env.add x i)
+        guards;
+      (type_predicate_named goal).ty
 
     | Pinitialized(_, t)
     | Pfreeable(_, t)
@@ -485,27 +486,30 @@ let rec type_predicate_named env p =
     | Pvalid(_, t)
     | Pvalid_read(_, t)
     | Pvalid_function t ->
-      ignore (type_term env ~ctx:Other t);
+      ignore (type_term ~force:false ~ctx:Other t);
       c_int
 
     | Pforall _ -> Error.not_yet "unguarded \\forall quantification"
     | Pexists _ -> Error.not_yet "unguarded \\exists quantification"
-    | Pat(p, _) -> (type_predicate_named env p).ty
+    | Pat(p, _) -> (type_predicate_named p).ty
     | Pfresh _ -> Error.not_yet "\\fresh"
     | Psubtype _ -> Error.not_yet "subtyping relation" (* Jessie specific *)
   in
   coerce ~ctx:c_int ~op c_int
 
-let type_term ~ctx t =
+let type_term ~force ~ctx t =
   Options.feedback ~dkey ~level:4 "typing term '%a' in ctx '%a'."
     Printer.pp_term t pretty ctx;
-  ignore (type_term Interval.Env.empty ~ctx t)
+  ignore (type_term ~force ~ctx t)
 
 let type_named_predicate ?(must_clear=true) p =
   Options.feedback ~dkey ~level:3 "typing predicate '%a'."
     Printer.pp_predicate_named p;
-  if must_clear then Memo.clear ();
-  ignore (type_predicate_named Interval.Env.empty p)
+  if must_clear then begin
+    Interval.Env.clear ();
+    Memo.clear ()
+  end;
+  ignore (type_predicate_named p)
 
 (******************************************************************************)
 (** {2 Getters} *)
@@ -513,17 +517,19 @@ let type_named_predicate ?(must_clear=true) p =
 
 let get_integer_ty t = (Memo.get t).ty
 let get_integer_op t = (Memo.get t).op
-
-let get_integer_op_of_predicate p =
-  (type_predicate_named Interval.Env.empty (* the env is useless *) p).op
+let get_integer_op_of_predicate p = (type_predicate_named p).op
 
 let extract_typ t ty =
   try typ_of_integer_ty ty
   with Not_an_integer ->
-    let ty = t.term_type in
-    if Cil.isLogicRealType ty then TFloat(FLongDouble, [])
-    else if Cil.isLogicFloatType ty then Logic_utils.logicCType ty
-    else assert false
+    let lty = t.term_type in
+    if Cil.isLogicRealType lty then TFloat(FLongDouble, [])
+    else if Cil.isLogicFloatType lty then Logic_utils.logicCType lty
+    else
+      Kernel.fatal "unexpected types %a and %a for term %a"
+        Printer.pp_logic_type lty
+        pretty ty
+        Printer.pp_term t
 
 let get_typ t =
   let info = Memo.get t in
@@ -540,8 +546,7 @@ let get_cast t =
   with Not_an_integer -> None
 
 let get_cast_of_predicate p =
-  (* the env is useless *)
-  let info = type_predicate_named Interval.Env.empty p in
+  let info = type_predicate_named p in
   try Extlib.opt_map typ_of_integer_ty info.cast
   with Not_an_integer -> assert false
 

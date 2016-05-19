@@ -151,6 +151,7 @@ let constant_to_exp ~loc t = function
            raise Cil.Not_representable
          | (None | Some _), _ -> Cil.kinteger64 ~loc ~kind ?repr n, false
      with Cil.Not_representable ->
+       
        (* too big integer *)
        Cil.mkString ~loc (Integer.to_string n), true)
   | LStr s -> Cil.new_exp ~loc (Const (CStr s)), false
@@ -297,7 +298,7 @@ and context_insensitive_term_to_exp kf env t =
       (* [!t] is converted into [t == 0] *)
       let zero = Logic_const.tinteger 0 in
       let ctx = Typing.get_integer_ty t in
-      Typing.type_term ~ctx zero;
+      Typing.type_term ~force:false ~ctx zero;
       let e, env =
         comparison_to_exp kf ~loc ~name:"not" env Typing.gmp Eq t zero (Some t)
       in
@@ -341,7 +342,7 @@ and context_insensitive_term_to_exp kf env t =
          possible values of [t2] *)
       (* guarding divisions and modulos *)
       let zero = Logic_const.tinteger 0 in
-      Typing.type_term ~ctx zero;
+      Typing.type_term ~force:false ~ctx zero;
       (* do not generate [e2] from [t2] twice *)
       let guard, env =
         let name = name_of_binop bop ^ "_guard" in
@@ -805,7 +806,7 @@ let term_to_exp typ t =
         | TInt(ik, _) -> Typing.ikind ik
         | _ -> Typing.c_int (* useless, but required *)
   in
-  Typing.type_term ~ctx t;
+  Typing.type_term ~force:false ~ctx t;
   let env = Env.empty (new Visitor.frama_c_copy Project_skeleton.dummy) in
   let env = Env.push env in
   let env = Env.rte env false in
