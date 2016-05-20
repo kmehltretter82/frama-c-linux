@@ -15,10 +15,6 @@ void f(void) {
   A = 3;
 }
 
-/* /\*@ requires \valid(p); */
-/*   @ requires \valid(p+1); */
-/*   @ requires \valid(q); */
-/*   @*\/ */
 void g(int *p, int *q) {
   *p = 0;
   *(p+1) = 1;
@@ -30,6 +26,7 @@ void g(int *p, int *q) {
   /*@ assert (\at(*(p+\at(*q,L1)),L2) == 2); */
  L3:
   /*@ assert (\at(*(p+\at(*q,L1)),Here) == 2); */
+
   //  /*@ assert (\at(*(p+\at(*q,L1)),L3) == 2); */ // doesn't work yet
   //  /*@ assert (\at(*(p+\at(*q,L2)),L1)) == 1; */
   return ;

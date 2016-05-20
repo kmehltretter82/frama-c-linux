@@ -329,7 +329,7 @@ let rec type_term ~force ~ctx t =
       dup ctx
 
     | Tat (t, _)
-    | TLogic_coerce (_, t) -> dup (type_term ~force:false ~ctx t).ty
+    | TLogic_coerce (_, t) -> dup (type_term ~force ~ctx t).ty
 
     | TCoerceE (t1, t2) ->
       let ctx =

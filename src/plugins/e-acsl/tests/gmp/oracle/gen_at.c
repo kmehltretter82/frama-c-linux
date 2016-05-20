@@ -34,9 +34,9 @@ void f(void)
 
 void g(int *p, int *q)
 {
-  int __gen_e_acsl_at_3;
+  unsigned long __gen_e_acsl_at_3;
   int __gen_e_acsl_at_2;
-  int __gen_e_acsl_at;
+  unsigned long __gen_e_acsl_at;
   __e_acsl_store_block((void *)(& p),8UL);
   __e_acsl_store_block((void *)(& q),8UL);
   __e_acsl_initialize((void *)p,sizeof(int));
@@ -50,17 +50,17 @@ void g(int *p, int *q)
       int __gen_e_acsl_valid_read_3;
       __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)q,sizeof(int));
       __e_acsl_assert(__gen_e_acsl_valid_read_3,(char *)"RTE",(char *)"g",
-                      (char *)"mem_access: \\valid_read(q)",32);
-      __e_acsl_store_block((void *)(& __gen_e_acsl_at_3),4UL);
-      __gen_e_acsl_at_3 = *q;
+                      (char *)"mem_access: \\valid_read(q)",28);
+      __e_acsl_store_block((void *)(& __gen_e_acsl_at_3),8UL);
+      __gen_e_acsl_at_3 = (unsigned long)*q;
     }
     {
       int __gen_e_acsl_valid_read;
       __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)q,sizeof(int));
       __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"g",
-                      (char *)"mem_access: \\valid_read(q)",30);
-      __e_acsl_store_block((void *)(& __gen_e_acsl_at),4UL);
-      __gen_e_acsl_at = *q;
+                      (char *)"mem_access: \\valid_read(q)",26);
+      __e_acsl_store_block((void *)(& __gen_e_acsl_at),8UL);
+      __gen_e_acsl_at = (unsigned long)*q;
     }
     __e_acsl_initialize((void *)p,sizeof(int));
   *p = 2;
@@ -75,14 +75,14 @@ void g(int *p, int *q)
                                                       sizeof(int));
       __e_acsl_assert(__gen_e_acsl_valid_read_2,(char *)"RTE",(char *)"g",
                       (char *)"mem_access: \\valid_read(p+__gen_e_acsl_at)",
-                      30);
+                      26);
       __e_acsl_store_block((void *)(& __gen_e_acsl_at_2),4UL);
       __gen_e_acsl_at_2 = *(p + __gen_e_acsl_at);
     }
     A = 4;
   /*@ assert \at(*(p+\at(*q,L1)),L2) ≡ 2; */
   __e_acsl_assert(__gen_e_acsl_at_2 == 2,(char *)"Assertion",(char *)"g",
-                  (char *)"\\at(*(p+\\at(*q,L1)),L2) == 2",30);
+                  (char *)"\\at(*(p+\\at(*q,L1)),L2) == 2",26);
   L3:
     /*@ assert \at(*(p+\at(*q,L1)),Here) ≡ 2; */
     {
@@ -91,10 +91,10 @@ void g(int *p, int *q)
                                                       sizeof(int));
       __e_acsl_assert(__gen_e_acsl_valid_read_4,(char *)"RTE",(char *)"g",
                       (char *)"mem_access: \\valid_read(p+__gen_e_acsl_at_3)",
-                      32);
+                      28);
       __e_acsl_assert(*(p + __gen_e_acsl_at_3) == 2,(char *)"Assertion",
                       (char *)"g",(char *)"\\at(*(p+\\at(*q,L1)),Here) == 2",
-                      32);
+                      28);
     }
     __e_acsl_delete_block((void *)(& p));
     __e_acsl_delete_block((void *)(& q));
@@ -129,12 +129,12 @@ int main(void)
     __e_acsl_store_block((void *)(& __gen_e_acsl_at_3),4UL);
     __gen_e_acsl_at_3 = x;
     __e_acsl_store_block((void *)(& __gen_e_acsl_at_2),8UL);
-    __gen_e_acsl_at_2 = (long)x + (long)1;
+    __gen_e_acsl_at_2 = x + 1;
     __e_acsl_store_block((void *)(& __gen_e_acsl_at),4UL);
     __gen_e_acsl_at = x;
     /*@ assert x ≡ 0; */
     __e_acsl_assert(x == 0,(char *)"Assertion",(char *)"main",
-                    (char *)"x == 0",46);
+                    (char *)"x == 0",43);
     __e_acsl_full_init((void *)(& x));
     x = 1;
   __e_acsl_full_init((void *)(& x));
@@ -142,14 +142,13 @@ int main(void)
   __gen_e_acsl_f();
   /*@ assert \at(x,L) ≡ 0; */
   __e_acsl_assert(__gen_e_acsl_at == 0,(char *)"Assertion",(char *)"main",
-                  (char *)"\\at(x,L) == 0",51);
+                  (char *)"\\at(x,L) == 0",48);
   /*@ assert \at(x+1,L) ≡ 1; */
-  __e_acsl_assert(__gen_e_acsl_at_2 == (long)1,(char *)"Assertion",
-                  (char *)"main",(char *)"\\at(x+1,L) == 1",52);
+  __e_acsl_assert(__gen_e_acsl_at_2 == 1,(char *)"Assertion",(char *)"main",
+                  (char *)"\\at(x+1,L) == 1",49);
   /*@ assert \at(x,L)+1 ≡ 1; */
-  __e_acsl_assert((long)__gen_e_acsl_at_3 + (long)1 == (long)1,
-                  (char *)"Assertion",(char *)"main",
-                  (char *)"\\at(x,L)+1 == 1",53);
+  __e_acsl_assert(__gen_e_acsl_at_3 + 1 == 1,(char *)"Assertion",
+                  (char *)"main",(char *)"\\at(x,L)+1 == 1",50);
   g(t,& x);
   __retres = 0;
   __e_acsl_delete_block((void *)(t));
@@ -169,7 +168,7 @@ int __gen_e_acsl_h(int x)
   __gen_e_acsl_at = x;
   __retres = h(x);
   __e_acsl_assert(__retres == __gen_e_acsl_at,(char *)"Postcondition",
-                  (char *)"h",(char *)"\\result == \\old(x)",38);
+                  (char *)"h",(char *)"\\result == \\old(x)",35);
   __e_acsl_delete_block((void *)(& x));
   __e_acsl_delete_block((void *)(& __retres));
   return __retres;
