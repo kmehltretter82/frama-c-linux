@@ -540,7 +540,6 @@ let get_op t =
   extract_typ t info.op
 
 let get_cast t =
-  Cil.CurrentLoc.set t.term_loc;
   let info = Memo.get t in
   try Extlib.opt_map typ_of_integer_ty info.cast
   with Not_an_integer -> None

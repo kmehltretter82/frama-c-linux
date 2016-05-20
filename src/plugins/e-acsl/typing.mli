@@ -35,8 +35,6 @@ type integer_ty = private
   | C_type of ikind
   | Other
 
-include Datatype.S with type t = integer_ty
-
 val gmp: integer_ty
 val c_int: integer_ty
 val ikind: ikind -> integer_ty
