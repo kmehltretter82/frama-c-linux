@@ -196,7 +196,10 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
         let ty2 = Typing.get_integer_ty t2_one in
         Typing.join ty1 ty2
       in
-      let ty = Typing.typ_of_integer_ty ctx_one in
+      let ty =
+        try Typing.typ_of_integer_ty ctx_one
+        with Typing.Not_an_integer -> assert false
+      in
       (* loop counter corresponding to the quantified variable *)
       let var_x, x, env = Env.Logic_binding.add ~ty env logic_x in
       let lv_x = var var_x in
