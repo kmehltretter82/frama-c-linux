@@ -4,8 +4,10 @@ int main(void)
   int __retres;
   int x;
   int y;
+  long z;
   x = -3;
   y = 2;
+  z = 2L;
   /*@ assert -3 ≡ x; */
   __e_acsl_assert(-3 == x,(char *)"Assertion",(char *)"main",
                   (char *)"-3 == x",10);
@@ -86,6 +88,44 @@ int main(void)
                   (char *)"division_by_zero: y != 0",31);
   __e_acsl_assert(4 / y == 2,(char *)"Assertion",(char *)"main",
                   (char *)"4/y == 2",31);
+  /*@ assert 1+(z+1)/(y-123456789123456789) ≡ 1; */
+  {
+    mpz_t __gen_e_acsl_z;
+    mpz_t __gen_e_acsl__4;
+    mpz_t __gen_e_acsl_add;
+    mpz_t __gen_e_acsl__5;
+    mpz_t __gen_e_acsl__6;
+    int __gen_e_acsl_div_guard_2;
+    mpz_t __gen_e_acsl_div_2;
+    unsigned long __gen_e_acsl__7;
+    __gmpz_init_set_si(__gen_e_acsl_z,z);
+    __gmpz_init_set_ui(__gen_e_acsl__4,(unsigned long)1);
+    __gmpz_init(__gen_e_acsl_add);
+    __gmpz_add(__gen_e_acsl_add,(__mpz_struct const *)(__gen_e_acsl_z),
+               (__mpz_struct const *)(__gen_e_acsl__4));
+    __gmpz_init_set_si(__gen_e_acsl__5,y - (long)123456789123456789);
+    __gmpz_init_set_ui(__gen_e_acsl__6,0UL);
+    __gen_e_acsl_div_guard_2 = __gmpz_cmp((__mpz_struct const *)(__gen_e_acsl__5),
+                                          (__mpz_struct const *)(__gen_e_acsl__6));
+    __gmpz_init(__gen_e_acsl_div_2);
+    /*@ assert E_ACSL: y-123456789123456789 ≢ 0; */
+    __e_acsl_assert(! (__gen_e_acsl_div_guard_2 == 0),(char *)"Assertion",
+                    (char *)"main",(char *)"y-123456789123456789 == 0",34);
+    __gmpz_tdiv_q(__gen_e_acsl_div_2,
+                  (__mpz_struct const *)(__gen_e_acsl_add),
+                  (__mpz_struct const *)(__gen_e_acsl__5));
+    __gen_e_acsl__7 = __gmpz_get_ui((__mpz_struct const *)(__gen_e_acsl_div_2));
+    /*@ assert Value: signed_overflow: 1+__gen_e_acsl__7 ≤ 2147483647; */
+    __e_acsl_assert(1 + __gen_e_acsl__7 == 1,(char *)"Assertion",
+                    (char *)"main",
+                    (char *)"1+(z+1)/(y-123456789123456789) == 1",34);
+    __gmpz_clear(__gen_e_acsl_z);
+    __gmpz_clear(__gen_e_acsl__4);
+    __gmpz_clear(__gen_e_acsl_add);
+    __gmpz_clear(__gen_e_acsl__5);
+    __gmpz_clear(__gen_e_acsl__6);
+    __gmpz_clear(__gen_e_acsl_div_2);
+  }
   __retres = 0;
   return __retres;
 }
