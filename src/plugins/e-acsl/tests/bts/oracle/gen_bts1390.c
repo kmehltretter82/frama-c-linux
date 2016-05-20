@@ -37,7 +37,6 @@ void *memchr(void const *buf, int c, size_t n)
   s = (char *)buf;
   i = 0;
   while ((size_t)i < n) {
-    /*@ assert Value: mem_access: \valid_read(s); */
     if ((int)*s == c) {
       __e_acsl_full_init((void *)(& __retres));
       __retres = (void *)s;
@@ -80,7 +79,7 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
     int __gen_e_acsl_forall_2;
     unsigned long __gen_e_acsl_k;
     __gen_e_acsl_forall_2 = 1;
-    __gen_e_acsl_k = (unsigned long)0;
+    __gen_e_acsl_k = 0;
     while (1) {
       if (__gen_e_acsl_k < n) ; else break;
       {
@@ -97,7 +96,19 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
           goto e_acsl_end_loop3;
         }
       }
-      __gen_e_acsl_k ++;
+      {
+        mpz_t __gen_e_acsl__5;
+        mpz_t __gen_e_acsl_add_3;
+        unsigned long __gen_e_acsl__6;
+        __gmpz_init_set_ui(__gen_e_acsl__5,1UL);
+        __gmpz_init(__gen_e_acsl_add_3);
+        __gmpz_add(__gen_e_acsl_add_3,(__mpz_struct const *)__gen_e_acsl_k,
+                   (__mpz_struct const *)(__gen_e_acsl__5));
+        __gen_e_acsl__6 = __gmpz_get_ui((__mpz_struct const *)(__gen_e_acsl_add_3));
+        __gen_e_acsl_k = __gen_e_acsl__6;
+        __gmpz_clear(__gen_e_acsl__5);
+        __gmpz_clear(__gen_e_acsl_add_3);
+      }
     }
     e_acsl_end_loop3: ;
     __gen_e_acsl_at_4 = __gen_e_acsl_forall_2;
@@ -109,7 +120,7 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
     int __gen_e_acsl_exists;
     unsigned long __gen_e_acsl_i;
     __gen_e_acsl_exists = 0;
-    __gen_e_acsl_i = (unsigned long)0;
+    __gen_e_acsl_i = 0;
     while (1) {
       if (__gen_e_acsl_i < n) ; else break;
       {
@@ -126,7 +137,19 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
           goto e_acsl_end_loop1;
         }
       }
-      __gen_e_acsl_i ++;
+      {
+        mpz_t __gen_e_acsl_;
+        mpz_t __gen_e_acsl_add;
+        unsigned long __gen_e_acsl__2;
+        __gmpz_init_set_ui(__gen_e_acsl_,1UL);
+        __gmpz_init(__gen_e_acsl_add);
+        __gmpz_add(__gen_e_acsl_add,(__mpz_struct const *)__gen_e_acsl_i,
+                   (__mpz_struct const *)(__gen_e_acsl_));
+        __gen_e_acsl__2 = __gmpz_get_ui((__mpz_struct const *)(__gen_e_acsl_add));
+        __gen_e_acsl_i = __gen_e_acsl__2;
+        __gmpz_clear(__gen_e_acsl_);
+        __gmpz_clear(__gen_e_acsl_add);
+      }
     }
     e_acsl_end_loop1: ;
     __gen_e_acsl_at = __gen_e_acsl_exists;
@@ -140,13 +163,12 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
       int __gen_e_acsl_forall;
       unsigned long __gen_e_acsl_j;
       __gen_e_acsl_forall = 1;
-      __gen_e_acsl_j = (unsigned long)0;
+      __gen_e_acsl_j = 0;
       while (1) {
         {
           int __gen_e_acsl_offset;
           __gen_e_acsl_offset = __e_acsl_offset(__retres);
-          if (__gen_e_acsl_j < (unsigned long)__gen_e_acsl_offset) ;
-          else break;
+          if (__gen_e_acsl_j < __gen_e_acsl_offset) ; else break;
         }
         {
           int __gen_e_acsl_valid_read_2;
@@ -163,7 +185,19 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
             goto e_acsl_end_loop2;
           }
         }
-        __gen_e_acsl_j ++;
+        {
+          mpz_t __gen_e_acsl__3;
+          mpz_t __gen_e_acsl_add_2;
+          unsigned long __gen_e_acsl__4;
+          __gmpz_init_set_ui(__gen_e_acsl__3,1UL);
+          __gmpz_init(__gen_e_acsl_add_2);
+          __gmpz_add(__gen_e_acsl_add_2,(__mpz_struct const *)__gen_e_acsl_j,
+                     (__mpz_struct const *)(__gen_e_acsl__3));
+          __gen_e_acsl__4 = __gmpz_get_ui((__mpz_struct const *)(__gen_e_acsl_add_2));
+          __gen_e_acsl_j = __gen_e_acsl__4;
+          __gmpz_clear(__gen_e_acsl__3);
+          __gmpz_clear(__gen_e_acsl_add_2);
+        }
       }
       e_acsl_end_loop2: ;
       __gen_e_acsl_implies = __gen_e_acsl_forall;

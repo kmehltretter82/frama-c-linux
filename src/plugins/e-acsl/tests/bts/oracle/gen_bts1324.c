@@ -78,29 +78,13 @@ int __gen_e_acsl_sorted(int *t, int n)
     while (1) {
       if (__gen_e_acsl_i < n) ; else break;
       {
-<<<<<<< HEAD
         int __gen_e_acsl_valid_read;
         int __gen_e_acsl_valid_read_2;
-        __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(t + (unsigned long)((unsigned int)__gen_e_acsl_i)),
+        __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(t + (unsigned long)__gen_e_acsl_i),
                                                       sizeof(int));
         __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",
                         (char *)"sorted",
                         (char *)"mem_access: \\valid_read(t+(unsigned long)__gen_e_acsl_i)",
-||||||| merged common ancestors
-        int __e_acsl_valid_read;
-        int __e_acsl_valid_read_2;
-        __e_acsl_valid_read = __valid_read((void *)(t + (unsigned long)((unsigned int)__e_acsl_i)),
-                                           sizeof(int));
-        __e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"sorted",
-                        (char *)"mem_access: \\valid_read(t+(unsigned long)__e_acsl_i)",
-=======
-        int __e_acsl_valid_read;
-        int __e_acsl_valid_read_2;
-        __e_acsl_valid_read = __valid_read((void *)(t + (unsigned long)__e_acsl_i),
-                                           sizeof(int));
-        __e_acsl_assert(__e_acsl_valid_read,(char *)"RTE",(char *)"sorted",
-                        (char *)"mem_access: \\valid_read(t+(unsigned long)__e_acsl_i)",
->>>>>>> [tests] fix additional oracles
                         6);
         __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(t + (unsigned long)(
                                                                  __gen_e_acsl_i - 1)),
@@ -116,13 +100,7 @@ int __gen_e_acsl_sorted(int *t, int n)
           goto e_acsl_end_loop1;
         }
       }
-<<<<<<< HEAD
-      __gen_e_acsl_i ++;
-||||||| merged common ancestors
-      __e_acsl_i ++;
-=======
-      __e_acsl_i = (int)(__e_acsl_i + 1L);
->>>>>>> [tests] fix additional oracles
+      __gen_e_acsl_i = (int)(__gen_e_acsl_i + 1L);
     }
     e_acsl_end_loop1: ;
     __gen_e_acsl_at = __gen_e_acsl_forall;
