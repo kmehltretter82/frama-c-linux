@@ -33,7 +33,7 @@ let compute_quantif_guards_ref
     = Extlib.mk_fun "compute_quantif_guards_ref"
 
 (******************************************************************************)
-(** Datatypes and memoization *)
+(** Datatype and constructor *)
 (******************************************************************************)
 
 type integer_ty =
@@ -45,28 +45,7 @@ let gmp = Gmp
 let c_int = C_type IInt
 let ikind ik = C_type ik
 
-let join ty1 ty2 =
-  if Options.Gmp_only.get () then Gmp
-  else
-    match ty1, ty2 with
-    | Other, Other -> Other
-    | Other, (Gmp | C_type _) | (Gmp | C_type _), Other ->
-      Options.fatal "[typing] join failure: integer and non integer type"
-    | Gmp, _ | _, Gmp -> Gmp
-    | C_type i1, C_type i2 ->
-      let ty = Cil.arithmeticConversion (TInt(i1, [])) (TInt(i2, [])) in
-      match ty with
-      | TInt(i, _) -> C_type i
-      | _ ->
-        Options.fatal "[typing] join failure: unexpected result %a"
-          Printer.pp_typ ty
-
-exception Not_an_integer
-let typ_of_integer_ty = function
-  | Gmp -> Gmpz.t ()
-  | C_type ik -> TInt(ik, [])
-  | Other -> raise Not_an_integer
-
+(* the integer_ty corresponding to size_t *)
 let size_t () = match Cil.theMachine.Cil.typeOfSizeOf with
   | TInt(kind, _) -> C_type kind
   | _ -> assert false
@@ -93,6 +72,36 @@ include Datatype.Make
     | C_type k -> Printer.pp_ikind fmt k
     | Other -> Format.pp_print_string fmt "OTHER"
  end)
+
+(******************************************************************************)
+(** Basic operations *)
+(******************************************************************************)
+
+let join ty1 ty2 =
+  if Options.Gmp_only.get () then Gmp
+  else
+    match ty1, ty2 with
+    | Other, Other -> Other
+    | Other, (Gmp | C_type _) | (Gmp | C_type _), Other ->
+      Options.fatal "[typing] join failure: integer and non integer type"
+    | Gmp, _ | _, Gmp -> Gmp
+    | C_type i1, C_type i2 ->
+      let ty = Cil.arithmeticConversion (TInt(i1, [])) (TInt(i2, [])) in
+      match ty with
+      | TInt(i, _) -> C_type i
+      | _ ->
+        Options.fatal "[typing] join failure: unexpected result %a"
+          Printer.pp_typ ty
+
+exception Not_an_integer
+let typ_of_integer_ty = function
+  | Gmp -> Gmpz.t ()
+  | C_type ik -> TInt(ik, [])
+  | Other -> raise Not_an_integer
+
+(******************************************************************************)
+(** Memoization *)
+(******************************************************************************)
 
 type computed_info =
     { ty: t;  (* type required for the term *)
@@ -154,6 +163,8 @@ let ty_of_interv ~ctx i =
   with Cil.Not_representable ->
     Gmp
 
+(* compute a new {!computed_info} by coercing the given type [ty] to the given
+   context [ctx]. [op] is the type for the operator. *)
 let coerce ~ctx ~op ty =
   if compare ty ctx = 1 then begin
     (* type larger than the expected context,
@@ -168,17 +179,24 @@ let coerce ~ctx ~op ty =
 (** {2 Type system} *)
 (******************************************************************************)
 
+(* generate a context [c]. Take --e-acsl-gmp-only into account iff not
+   [force]. *)
 let mk_ctx ~force c =
   if force then c
   else match c with
   | Other -> Other
   | Gmp | C_type _ -> if Options.Gmp_only.get () then Gmp else c
 
+(* type the term [t] in a context [ctx]. Take --e-acsl-gmp-only into account iff
+   not [force]. *)
 let rec type_term ~force ~ctx t =
   let ctx = mk_ctx ~force ctx in
   let dup ty = ty, ty in
   let infer t =
     Cil.CurrentLoc.set t.term_loc;
+    (* this pattern matching implements the formal rules of the JFLA's paper
+       (and of course also covers the missing cases). Also enforce the invariant
+       that every subterm is typed, even if it is not an integer. *)
     match t.term_node with
     | TConst (Integer _ | LChr _ | LEnum _)
     | TSizeOf _
@@ -214,7 +232,7 @@ let rec type_term ~force ~ctx t =
           ignore (type_term ~force:false ~ctx:Other t');
           ty_of_interv ~ctx i
         with Interval.Not_an_integer ->
-          assert false
+          assert false (* this term is an integer *)
       in
       dup ty
 
@@ -227,7 +245,7 @@ let rec type_term ~force ~ctx t =
           ignore (type_term ~force:false ~ctx:Other t2);
           ty_of_interv ~ctx i
         with Interval.Not_an_integer ->
-          assert false
+          assert false (* this term is an integer *)
       in
       dup ty
 
@@ -242,7 +260,7 @@ let rec type_term ~force ~ctx t =
       in
       ignore (type_term ~force:false ~ctx t');
       (match unop with
-      | LNot -> c_int, ctx (* converted into [t == 0] in casse of GMP *)
+      | LNot -> c_int, ctx (* converted into [t == 0] in case of GMP *)
       | Neg | BNot -> dup ctx)
 
     | TBinOp((PlusA | MinusA | Mult | Div | Mod | Shiftlt | Shiftrt), t1, t2) ->
@@ -302,8 +320,7 @@ let rec type_term ~force ~ctx t =
         try
           let i = Interval.infer t' in
           (* nothing more to do: [i] is already more precise than what we
-             could infer from the arguments of the cast. Also, do not type the
-             internal term: possibly it is not even an integer *)
+             could infer from the arguments of the cast. *)
           ty_of_interv ~ctx i
         with Interval.Not_an_integer ->
           Other
@@ -312,7 +329,7 @@ let rec type_term ~force ~ctx t =
       dup ctx
 
     | Tif (t1, t2, t3) ->
-      let ctx1 = mk_ctx ~force:true c_int in
+      let ctx1 = mk_ctx ~force:true c_int (* an int must be generated *) in
       ignore (type_term ~force:true ~ctx:ctx1 t1);
       let i = Interval.infer t in
       let ctx =
@@ -341,24 +358,24 @@ let rec type_term ~force ~ctx t =
         with Interval.Not_an_integer ->
           Other
       in
-      ignore (type_term ~force:true ~ctx t1);
-      ignore (type_term ~force:true ~ctx t2);
+      ignore (type_term ~force:false ~ctx t1);
+      ignore (type_term ~force:false ~ctx t2);
       dup ctx
 
     | TAddrOf tlv
     | TStartOf tlv ->
-      (* it is a pointer, as well as [t], but [t] must be typed. *)
+      (* it is a pointer, but subterms must be typed. *)
       type_term_lval tlv;
       dup Other
 
     | Tbase_addr (_, t) ->
-      (* it is a pointer, as well as [t], but [t] must be typed. *)
+      (* it is a pointer, but subterms must be typed. *)
       ignore (type_term ~force:false ~ctx:Other t);
       dup Other
 
     | TBinOp ((PlusPI | IndexPI | MinusPI), t1, t2) ->
-      (* it is a pointer, as well as [t1], while [t2] is a size_t.
-         Both [t1] and [t2] must be typed. *)
+      (* it is a pointer, while [t2] is a size_t. But both [t1] and [t2] must
+         be typed. *)
       ignore (type_term ~force:false ~ctx:Other t1);
       ignore (type_term ~force:true ~ctx:(size_t ()) t2);
       dup Other
@@ -401,6 +418,7 @@ and type_term_offset = function
 
 let rec type_predicate_named p =
   Cil.CurrentLoc.set p.loc;
+  (* this pattern matching also follows the formal rules of the JFLA's paper *)
   let op = match p.content with
     | Pfalse | Ptrue -> c_int
     | Papp _ -> Error.not_yet "logic function application"
@@ -474,6 +492,8 @@ let rec type_predicate_named p =
                 Printer.pp_logic_type lty
                 Printer.pp_logic_var x
           in
+          (* forcing when typing bounds prevents to generate an extra useless
+             GMP variable when --e-acsl-gmp-only *)
           ignore (type_term ~force:true ~ctx t1);
           ignore (type_term ~force:true ~ctx t2);
           Interval.Env.add x i)
@@ -519,6 +539,7 @@ let get_integer_ty t = (Memo.get t).ty
 let get_integer_op t = (Memo.get t).op
 let get_integer_op_of_predicate p = (type_predicate_named p).op
 
+(* {!typ_of_integer}, but handle the not-integer cases. *)
 let extract_typ t ty =
   try typ_of_integer_ty ty
   with Not_an_integer ->

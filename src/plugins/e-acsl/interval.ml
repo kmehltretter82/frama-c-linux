@@ -81,7 +81,7 @@ let meet i1 i2 =
 let join i1 i2 =
   make (Integer.min i1.lower i2.lower) (Integer.max i1.upper i2.upper)
 
-(* persistent environments *)
+(* imperative environments *)
 
 module Env = struct
   open Cil_datatype
@@ -98,6 +98,8 @@ end
 let combine op i1 i2 =
   (* probably not the most efficient way to compute the result, but the
      shortest and the simplest *)
+   (* TODO: alternatively, we could use Value's domain for that purpose. The Cfp
+      plug-in actually implements this solution. *)
   let ll = op i1.lower i2.lower in
   let lu = op i1.lower i2.upper in
   let ul = op i1.upper i2.lower in
