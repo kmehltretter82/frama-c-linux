@@ -15,6 +15,10 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
+-  E-ACSL       [2016/05/23] Re-implementation of the type system which
+	        improves the efficiency of the generated code over integers.
+-* E-ACSL       [2016/05/23] Fix bug #2191 about complicate structs and
+	        literate string.
 -* E-ACSL       [2016/05/23] Fix bug #1395 about recursive functions.
 -* E-ACSL       [2016/04/07] Fix 'make install' when executed within Frama-C.
 -* E-ACSL       [2016/03/31] Improve performance of Patricia Trie memory model.
