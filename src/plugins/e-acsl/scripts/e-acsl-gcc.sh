@@ -303,6 +303,15 @@ if [ -z "$1" ]; then
   error "no input files";
 fi
 
+# Check Frama-C and GCC executable names
+check_tool "$OPTION_FRAMAC"
+check_tool "$OPTION_CC"
+
+# Frama-C directories
+FRAMAC="$OPTION_FRAMAC"
+FRAMAC_SHARE="`$FRAMAC -print-share-path`"
+FRAMAC_PLUGIN="`$FRAMAC -print-plugin-path`"
+
 # Check if this is a development or an installed version
 if [ -f "$BASEDIR/../E_ACSL.mli" ]; then
   # Development version
@@ -311,7 +320,8 @@ if [ -f "$BASEDIR/../E_ACSL.mli" ]; then
   # version that has not been built Frama-C will fallback to an installed one
   # for instrumentation but still use local RTL
   error "Plugin in $DEVELOPMENT not compiled" \
-    `test -f "$DEVELOPMENT/META.frama-c-e_acsl"; echo $?`
+    `test -f "$DEVELOPMENT/META.frama-c-e_acsl" -o \
+          -f "$FRAMAC_PLUGIN/META.frama-c-e_acsl"; echo $?`
   EACSL_SHARE="$DEVELOPMENT/share/e-acsl"
   # Add the project directory to FRAMAC_PLUGINS,
   # otherwise Frama-C uses an installed version
@@ -336,13 +346,7 @@ CPPMACHDEP="-D__FC_MACHDEP_X86_$MACHDEPFLAGS"
 # GCC machine option
 GCCMACHDEP="-m$MACHDEPFLAGS"
 
-# Check if Frama-C and GCC executable names
-check_tool "$OPTION_FRAMAC"
-check_tool "$OPTION_CC"
-
 # Frama-C and related flags
-FRAMAC="$OPTION_FRAMAC"
-FRAMAC_SHARE="`$FRAMAC -print-share-path`"
 FRAMAC_CPP_EXTRA="
   $OPTION_FRAMAC_CPP_EXTRA
   -D$EACSL_MACRO_ID
