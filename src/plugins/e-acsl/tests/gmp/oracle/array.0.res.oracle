@@ -3,7 +3,7 @@
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed
-[value] Values of globals at initialization
+[value:initial-state] Values of globals at initialization
   __fc_random_counter ∈ {0}
   __fc_rand_max ∈ {32767}
   __fc_heap_status ∈ [--..--]
