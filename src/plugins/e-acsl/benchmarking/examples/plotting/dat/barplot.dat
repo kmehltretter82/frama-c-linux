@@ -1,0 +1,4 @@
+Benchmark   No-model  Segment-model Bittree-model
+grep        2           4.4        18
+sed         3           9          16
+diff        4           9.3        7.3
