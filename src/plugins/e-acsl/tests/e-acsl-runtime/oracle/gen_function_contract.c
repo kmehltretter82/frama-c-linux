@@ -2,14 +2,18 @@
 int X = 0;
 int Y = 2;
 /*@ ensures X ≡ 1; */
+void __gen_e_acsl_f(void);
+
+/*@ ensures X ≡ 1; */
 void f(void)
 {
   X = 1;
   return;
 }
 
-/*@ ensures X ≡ 1; */
-void __gen_e_acsl_f(void);
+/*@ ensures X ≡ 2;
+    ensures Y ≡ 2; */
+void __gen_e_acsl_g(void);
 
 /*@ ensures X ≡ 2;
     ensures Y ≡ 2; */
@@ -19,9 +23,8 @@ void g(void)
   return;
 }
 
-/*@ ensures X ≡ 2;
-    ensures Y ≡ 2; */
-void __gen_e_acsl_g(void);
+/*@ requires X ≡ 2; */
+void __gen_e_acsl_h(void);
 
 /*@ requires X ≡ 2; */
 void h(void)
@@ -30,8 +33,9 @@ void h(void)
   return;
 }
 
-/*@ requires X ≡ 2; */
-void __gen_e_acsl_h(void);
+/*@ requires X ≡ 3;
+    requires Y ≡ 2; */
+void __gen_e_acsl_i(void);
 
 /*@ requires X ≡ 3;
     requires Y ≡ 2; */
@@ -41,9 +45,16 @@ void i(void)
   return;
 }
 
-/*@ requires X ≡ 3;
-    requires Y ≡ 2; */
-void __gen_e_acsl_i(void);
+/*@ behavior b1:
+      requires X ≡ 5;
+      ensures X ≡ 3;
+    
+    behavior b2:
+      requires X ≡ 3+Y;
+      requires Y ≡ 2;
+      ensures X ≡ Y+1;
+ */
+void __gen_e_acsl_j(void);
 
 /*@ behavior b1:
       requires X ≡ 5;
@@ -61,15 +72,16 @@ void j(void)
 }
 
 /*@ behavior b1:
-      requires X ≡ 5;
-      ensures X ≡ 3;
+      assumes X ≡ 1;
+      requires X ≡ 0;
     
     behavior b2:
-      requires X ≡ 3+Y;
-      requires Y ≡ 2;
-      ensures X ≡ Y+1;
+      assumes X ≡ 3;
+      assumes Y ≡ 2;
+      requires X ≡ 3;
+      requires X+Y ≡ 5;
  */
-void __gen_e_acsl_j(void);
+void __gen_e_acsl_k(void);
 
 /*@ behavior b1:
       assumes X ≡ 1;
@@ -87,17 +99,8 @@ void k(void)
   return;
 }
 
-/*@ behavior b1:
-      assumes X ≡ 1;
-      requires X ≡ 0;
-    
-    behavior b2:
-      assumes X ≡ 3;
-      assumes Y ≡ 2;
-      requires X ≡ 3;
-      requires X+Y ≡ 5;
- */
-void __gen_e_acsl_k(void);
+/*@ ensures X ≡ 5; */
+int __gen_e_acsl_l(void);
 
 /*@ ensures X ≡ 5; */
 int l(void)
@@ -107,8 +110,17 @@ int l(void)
   return X;
 }
 
-/*@ ensures X ≡ 5; */
-int __gen_e_acsl_l(void);
+/*@ behavior b1:
+      assumes X ≡ 7;
+      ensures X ≡ 95;
+    
+    behavior b2:
+      assumes X ≡ 5;
+      assumes Y ≡ 2;
+      ensures X ≡ 7;
+      ensures X ≡ \old(X)+Y;
+ */
+void __gen_e_acsl_m(void);
 
 /*@ behavior b1:
       assumes X ≡ 7;
@@ -126,17 +138,18 @@ void m(void)
   return;
 }
 
-/*@ behavior b1:
+/*@ requires X > 0;
+    requires X < 10;
+    
+    behavior b1:
       assumes X ≡ 7;
-      ensures X ≡ 95;
+      ensures X ≡ 8;
     
     behavior b2:
       assumes X ≡ 5;
-      assumes Y ≡ 2;
-      ensures X ≡ 7;
-      ensures X ≡ \old(X)+Y;
+      ensures X ≡ 98;
  */
-void __gen_e_acsl_m(void);
+void __gen_e_acsl_n(void);
 
 /*@ requires X > 0;
     requires X < 10;
@@ -154,19 +167,6 @@ void n(void)
   X ++;
   return;
 }
-
-/*@ requires X > 0;
-    requires X < 10;
-    
-    behavior b1:
-      assumes X ≡ 7;
-      ensures X ≡ 8;
-    
-    behavior b2:
-      assumes X ≡ 5;
-      ensures X ≡ 98;
- */
-void __gen_e_acsl_n(void);
 
 int main(void)
 {

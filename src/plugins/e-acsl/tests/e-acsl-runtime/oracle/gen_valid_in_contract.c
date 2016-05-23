@@ -12,6 +12,17 @@ struct list {
       assumes ¬\valid(l->next);
       ensures \result ≡ \old(l);
  */
+struct list *__gen_e_acsl_f(struct list *l);
+
+/*@ behavior B1:
+      assumes l ≡ \null;
+      ensures \result ≡ \old(l);
+    
+    behavior B2:
+      assumes ¬\valid(l);
+      assumes ¬\valid(l->next);
+      ensures \result ≡ \old(l);
+ */
 struct list *f(struct list *l)
 {
   struct list *__retres;
@@ -34,17 +45,6 @@ struct list *f(struct list *l)
     __e_acsl_delete_block((void *)(& __retres));
     return __retres;
 }
-
-/*@ behavior B1:
-      assumes l ≡ \null;
-      ensures \result ≡ \old(l);
-    
-    behavior B2:
-      assumes ¬\valid(l);
-      assumes ¬\valid(l->next);
-      ensures \result ≡ \old(l);
- */
-struct list *__gen_e_acsl_f(struct list *l);
 
 int main(void)
 {

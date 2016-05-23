@@ -6,6 +6,15 @@ typedef int ArrayInt[5];
                                                                     Accel))[1])+(*
         \old(Accel))[0])/5;
  */
+void __gen_e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
+                                                 int *AverageAccel);
+
+/*@ ensures
+      *\old(AverageAccel) ≡
+      (((((*\old(Accel))[4]+(*\old(Accel))[3])+(*\old(Accel))[2])+(*\old(
+                                                                    Accel))[1])+(*
+        \old(Accel))[0])/5;
+ */
 void atp_NORMAL_computeAverageAccel(ArrayInt *Accel, int *AverageAccel)
 {
   __e_acsl_store_block((void *)(& Accel),8UL);
@@ -16,15 +25,6 @@ void atp_NORMAL_computeAverageAccel(ArrayInt *Accel, int *AverageAccel)
   __e_acsl_delete_block((void *)(& AverageAccel));
   return;
 }
-
-/*@ ensures
-      *\old(AverageAccel) ≡
-      (((((*\old(Accel))[4]+(*\old(Accel))[3])+(*\old(Accel))[2])+(*\old(
-                                                                    Accel))[1])+(*
-        \old(Accel))[0])/5;
- */
-void __gen_e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
-                                                 int *AverageAccel);
 
 int main(void)
 {

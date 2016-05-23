@@ -3,6 +3,10 @@ int *X;
 int Z;
 /*@ requires \valid(x);
     ensures \valid(\result); */
+int *__gen_e_acsl_f(int *x);
+
+/*@ requires \valid(x);
+    ensures \valid(\result); */
 int *f(int *x)
 {
   int *y;
@@ -36,10 +40,6 @@ int *f(int *x)
   __e_acsl_delete_block((void *)(& y));
   return y;
 }
-
-/*@ requires \valid(x);
-    ensures \valid(\result); */
-int *__gen_e_acsl_f(int *x);
 
 void g(void)
 {

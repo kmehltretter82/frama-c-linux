@@ -12,6 +12,19 @@ char *__gen_e_acsl_literal_string_2;
       assumes ∀ ℤ k; 0 ≤ k < n ⇒ (int)*((char *)buf+k) ≢ c;
       ensures \result ≡ (void *)0;
  */
+void *__gen_e_acsl_memchr(void const *buf, int c, size_t n);
+
+/*@ behavior exists:
+      assumes ∃ ℤ i; 0 ≤ i < n ∧ (int)*((char *)buf+i) ≡ c;
+      ensures
+        ∀ int j;
+          0 ≤ j < \offset((char *)\result) ⇒
+          (int)*((char *)\old(buf)+j) ≢ \old(c);
+    
+    behavior not_exists:
+      assumes ∀ ℤ k; 0 ≤ k < n ⇒ (int)*((char *)buf+k) ≢ c;
+      ensures \result ≡ (void *)0;
+ */
 void *memchr(void const *buf, int c, size_t n)
 {
   void *__retres;
@@ -42,19 +55,6 @@ void *memchr(void const *buf, int c, size_t n)
     __e_acsl_delete_block((void *)(& __retres));
     return __retres;
 }
-
-/*@ behavior exists:
-      assumes ∃ ℤ i; 0 ≤ i < n ∧ (int)*((char *)buf+i) ≡ c;
-      ensures
-        ∀ int j;
-          0 ≤ j < \offset((char *)\result) ⇒
-          (int)*((char *)\old(buf)+j) ≢ \old(c);
-    
-    behavior not_exists:
-      assumes ∀ ℤ k; 0 ≤ k < n ⇒ (int)*((char *)buf+k) ≢ c;
-      ensures \result ≡ (void *)0;
- */
-void *__gen_e_acsl_memchr(void const *buf, int c, size_t n);
 
 /*@ behavior exists:
       assumes ∃ ℤ i; 0 ≤ i < n ∧ (int)*((char *)buf+i) ≡ c;
