@@ -266,7 +266,7 @@ int main(void)
                     (char *)"main",(char *)"!\\initialized(p)",65);
   }
   __e_acsl_full_init((void *)(& q));
-  q = (int *)__e_acsl_calloc((unsigned long)1,sizeof(int));
+  q = (int *)__gen_e_acsl_calloc((unsigned long)1,sizeof(int));
   /*@ assert \initialized(q); */
   {
     int __gen_e_acsl_initialized_27;

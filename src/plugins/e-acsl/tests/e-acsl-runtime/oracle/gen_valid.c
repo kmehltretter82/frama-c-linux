@@ -39,28 +39,7 @@ int *f(int *x)
 
 /*@ requires \valid(x);
     ensures \valid(\result); */
-int *__gen_e_acsl_f(int *x)
-{
-  int *__retres;
-  __e_acsl_store_block((void *)(& __retres),8UL);
-  {
-    int __gen_e_acsl_valid;
-    __e_acsl_store_block((void *)(& x),8UL);
-    __gen_e_acsl_valid = __e_acsl_valid((void *)x,sizeof(int));
-    __e_acsl_assert(__gen_e_acsl_valid,(char *)"Precondition",(char *)"f",
-                    (char *)"\\valid(x)",13);
-    __retres = f(x);
-  }
-  {
-    int __gen_e_acsl_valid_2;
-    __gen_e_acsl_valid_2 = __e_acsl_valid((void *)__retres,sizeof(int));
-    __e_acsl_assert(__gen_e_acsl_valid_2,(char *)"Postcondition",(char *)"f",
-                    (char *)"\\valid(\\result)",14);
-    __e_acsl_delete_block((void *)(& x));
-    __e_acsl_delete_block((void *)(& __retres));
-    return __retres;
-  }
-}
+int *__gen_e_acsl_f(int *x);
 
 void g(void)
 {
@@ -107,6 +86,31 @@ void g(void)
   __e_acsl_delete_block((void *)(& u));
   __e_acsl_delete_block((void *)(& m));
   return;
+}
+
+/*@ requires \valid(x);
+    ensures \valid(\result); */
+int *__gen_e_acsl_f(int *x)
+{
+  int *__retres;
+  __e_acsl_store_block((void *)(& __retres),8UL);
+  {
+    int __gen_e_acsl_valid;
+    __e_acsl_store_block((void *)(& x),8UL);
+    __gen_e_acsl_valid = __e_acsl_valid((void *)x,sizeof(int));
+    __e_acsl_assert(__gen_e_acsl_valid,(char *)"Precondition",(char *)"f",
+                    (char *)"\\valid(x)",13);
+    __retres = f(x);
+  }
+  {
+    int __gen_e_acsl_valid_2;
+    __gen_e_acsl_valid_2 = __e_acsl_valid((void *)__retres,sizeof(int));
+    __e_acsl_assert(__gen_e_acsl_valid_2,(char *)"Postcondition",(char *)"f",
+                    (char *)"\\valid(\\result)",14);
+    __e_acsl_delete_block((void *)(& x));
+    __e_acsl_delete_block((void *)(& __retres));
+    return __retres;
+  }
 }
 
 void __e_acsl_globals_init(void)

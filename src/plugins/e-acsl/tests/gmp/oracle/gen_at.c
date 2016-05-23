@@ -30,15 +30,7 @@ void f(void)
 }
 
 /*@ ensures \at(A,Post) ≡ 3; */
-void __gen_e_acsl_f(void)
-{
-  int __gen_e_acsl_at;
-  f();
-  __gen_e_acsl_at = A;
-  __e_acsl_assert(__gen_e_acsl_at == 3,(char *)"Postcondition",(char *)"f",
-                  (char *)"\\at(A,Post) == 3",7);
-  return;
-}
+void __gen_e_acsl_f(void);
 
 void g(int *p, int *q)
 {
@@ -118,21 +110,7 @@ int h(int x)
 }
 
 /*@ ensures \result ≡ \old(x); */
-int __gen_e_acsl_h(int x)
-{
-  int __gen_e_acsl_at;
-  int __retres;
-  __e_acsl_store_block((void *)(& __retres),4UL);
-  __e_acsl_store_block((void *)(& x),4UL);
-  __e_acsl_store_block((void *)(& __gen_e_acsl_at),4UL);
-  __gen_e_acsl_at = x;
-  __retres = h(x);
-  __e_acsl_assert(__retres == __gen_e_acsl_at,(char *)"Postcondition",
-                  (char *)"h",(char *)"\\result == \\old(x)",38);
-  __e_acsl_delete_block((void *)(& x));
-  __e_acsl_delete_block((void *)(& __retres));
-  return __retres;
-}
+int __gen_e_acsl_h(int x);
 
 int main(void)
 {
@@ -178,6 +156,34 @@ int main(void)
   __e_acsl_delete_block((void *)(& x));
   __e_acsl_memory_clean();
   return __retres;
+}
+
+/*@ ensures \result ≡ \old(x); */
+int __gen_e_acsl_h(int x)
+{
+  int __gen_e_acsl_at;
+  int __retres;
+  __e_acsl_store_block((void *)(& __retres),4UL);
+  __e_acsl_store_block((void *)(& x),4UL);
+  __e_acsl_store_block((void *)(& __gen_e_acsl_at),4UL);
+  __gen_e_acsl_at = x;
+  __retres = h(x);
+  __e_acsl_assert(__retres == __gen_e_acsl_at,(char *)"Postcondition",
+                  (char *)"h",(char *)"\\result == \\old(x)",38);
+  __e_acsl_delete_block((void *)(& x));
+  __e_acsl_delete_block((void *)(& __retres));
+  return __retres;
+}
+
+/*@ ensures \at(A,Post) ≡ 3; */
+void __gen_e_acsl_f(void)
+{
+  int __gen_e_acsl_at;
+  f();
+  __gen_e_acsl_at = A;
+  __e_acsl_assert(__gen_e_acsl_at == 3,(char *)"Postcondition",(char *)"f",
+                  (char *)"\\at(A,Post) == 3",7);
+  return;
 }
 
 

@@ -31,63 +31,7 @@ void foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
       ensures
         *\old(Mtmax_out) ≡ *\old(Mtmax_in)+(5-((5/80)**\old(Mwmax))*0.4);
  */
-void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
-{
-  float *__gen_e_acsl_at_3;
-  float *__gen_e_acsl_at_2;
-  float *__gen_e_acsl_at;
-  {
-    int __gen_e_acsl_valid;
-    int __gen_e_acsl_valid_2;
-    int __gen_e_acsl_valid_3;
-    __e_acsl_store_block((void *)(& Mtmax_in),8UL);
-    __e_acsl_store_block((void *)(& Mwmax),8UL);
-    __e_acsl_store_block((void *)(& Mtmax_out),8UL);
-    __gen_e_acsl_valid = __e_acsl_valid((void *)Mtmax_in,sizeof(float));
-    __e_acsl_assert(__gen_e_acsl_valid,(char *)"Precondition",(char *)"foo",
-                    (char *)"\\valid(Mtmax_in)",5);
-    __gen_e_acsl_valid_2 = __e_acsl_valid((void *)Mwmax,sizeof(float));
-    __e_acsl_assert(__gen_e_acsl_valid_2,(char *)"Precondition",
-                    (char *)"foo",(char *)"\\valid(Mwmax)",6);
-    __gen_e_acsl_valid_3 = __e_acsl_valid((void *)Mtmax_out,sizeof(float));
-    __e_acsl_assert(__gen_e_acsl_valid_3,(char *)"Precondition",
-                    (char *)"foo",(char *)"\\valid(Mtmax_out)",7);
-    __e_acsl_store_block((void *)(& __gen_e_acsl_at_3),8UL);
-    __gen_e_acsl_at_3 = Mwmax;
-    __e_acsl_store_block((void *)(& __gen_e_acsl_at_2),8UL);
-    __gen_e_acsl_at_2 = Mtmax_in;
-    __e_acsl_store_block((void *)(& __gen_e_acsl_at),8UL);
-    __gen_e_acsl_at = Mtmax_out;
-    foo(Mtmax_in,Mwmax,Mtmax_out);
-  }
-  {
-    int __gen_e_acsl_valid_read;
-    int __gen_e_acsl_valid_read_2;
-    int __gen_e_acsl_valid_read_3;
-    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)__gen_e_acsl_at_3,
-                                                  sizeof(float));
-    __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"foo",
-                    (char *)"mem_access: \\valid_read(__gen_e_acsl_at_3)",11);
-    __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)__gen_e_acsl_at_2,
-                                                    sizeof(float));
-    __e_acsl_assert(__gen_e_acsl_valid_read_2,(char *)"RTE",(char *)"foo",
-                    (char *)"mem_access: \\valid_read(__gen_e_acsl_at_2)",11);
-    __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)__gen_e_acsl_at,
-                                                    sizeof(float));
-    __e_acsl_assert(__gen_e_acsl_valid_read_3,(char *)"RTE",(char *)"foo",
-                    (char *)"mem_access: \\valid_read(__gen_e_acsl_at)",11);
-    __e_acsl_assert(*__gen_e_acsl_at == *__gen_e_acsl_at_2 + (long double)(
-                                        (long double)5 - ((long double)(
-                                                          5 / 80) * *__gen_e_acsl_at_3) * 0.4),
-                    (char *)"Postcondition",(char *)"foo",
-                    (char *)"*\\old(Mtmax_out) == *\\old(Mtmax_in)+(5-((5/80)**\\old(Mwmax))*0.4)",
-                    11);
-    __e_acsl_delete_block((void *)(& Mtmax_in));
-    __e_acsl_delete_block((void *)(& Mwmax));
-    __e_acsl_delete_block((void *)(& Mtmax_out));
-    return;
-  }
-}
+void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out);
 
 /*@ requires \valid(Mtmin_in);
     requires \valid(Mwmin);
@@ -111,6 +55,43 @@ void bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
   __e_acsl_delete_block((void *)(& Mwmin));
   __e_acsl_delete_block((void *)(& Mtmin_out));
   return;
+}
+
+/*@ requires \valid(Mtmin_in);
+    requires \valid(Mwmin);
+    requires \valid(Mtmin_out);
+    
+    behavior UnderEstimate_Motoring:
+      assumes \true;
+      ensures
+        *\old(Mtmin_out) ≡ *\old(Mtmin_in) < 0.85**\old(Mwmin)?
+          *\old(Mtmin_in) ≢ 0.:
+          0.85**\old(Mwmin) ≢ 0.;
+ */
+void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out);
+
+int main(void)
+{
+  int __retres;
+  float f;
+  float g;
+  float h;
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
+  __e_acsl_store_block((void *)(& h),4UL);
+  __e_acsl_store_block((void *)(& g),4UL);
+  __e_acsl_store_block((void *)(& f),4UL);
+  __e_acsl_full_init((void *)(& f));
+  f = (float)1.0;
+  __e_acsl_full_init((void *)(& g));
+  g = (float)1.0;
+  __gen_e_acsl_foo(& f,& g,& h);
+  __gen_e_acsl_bar(& f,& g,& h);
+  __retres = 0;
+  __e_acsl_delete_block((void *)(& h));
+  __e_acsl_delete_block((void *)(& g));
+  __e_acsl_delete_block((void *)(& f));
+  __e_acsl_memory_clean();
+  return __retres;
 }
 
 /*@ requires \valid(Mtmin_in);
@@ -219,28 +200,71 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
   }
 }
 
-int main(void)
+/*@ requires \valid(Mtmax_in);
+    requires \valid(Mwmax);
+    requires \valid(Mtmax_out);
+    
+    behavior OverEstimate_Motoring:
+      assumes \true;
+      ensures
+        *\old(Mtmax_out) ≡ *\old(Mtmax_in)+(5-((5/80)**\old(Mwmax))*0.4);
+ */
+void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
 {
-  int __retres;
-  float f;
-  float g;
-  float h;
-  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
-  __e_acsl_store_block((void *)(& h),4UL);
-  __e_acsl_store_block((void *)(& g),4UL);
-  __e_acsl_store_block((void *)(& f),4UL);
-  __e_acsl_full_init((void *)(& f));
-  f = (float)1.0;
-  __e_acsl_full_init((void *)(& g));
-  g = (float)1.0;
-  __gen_e_acsl_foo(& f,& g,& h);
-  __gen_e_acsl_bar(& f,& g,& h);
-  __retres = 0;
-  __e_acsl_delete_block((void *)(& h));
-  __e_acsl_delete_block((void *)(& g));
-  __e_acsl_delete_block((void *)(& f));
-  __e_acsl_memory_clean();
-  return __retres;
+  float *__gen_e_acsl_at_3;
+  float *__gen_e_acsl_at_2;
+  float *__gen_e_acsl_at;
+  {
+    int __gen_e_acsl_valid;
+    int __gen_e_acsl_valid_2;
+    int __gen_e_acsl_valid_3;
+    __e_acsl_store_block((void *)(& Mtmax_in),8UL);
+    __e_acsl_store_block((void *)(& Mwmax),8UL);
+    __e_acsl_store_block((void *)(& Mtmax_out),8UL);
+    __gen_e_acsl_valid = __e_acsl_valid((void *)Mtmax_in,sizeof(float));
+    __e_acsl_assert(__gen_e_acsl_valid,(char *)"Precondition",(char *)"foo",
+                    (char *)"\\valid(Mtmax_in)",5);
+    __gen_e_acsl_valid_2 = __e_acsl_valid((void *)Mwmax,sizeof(float));
+    __e_acsl_assert(__gen_e_acsl_valid_2,(char *)"Precondition",
+                    (char *)"foo",(char *)"\\valid(Mwmax)",6);
+    __gen_e_acsl_valid_3 = __e_acsl_valid((void *)Mtmax_out,sizeof(float));
+    __e_acsl_assert(__gen_e_acsl_valid_3,(char *)"Precondition",
+                    (char *)"foo",(char *)"\\valid(Mtmax_out)",7);
+    __e_acsl_store_block((void *)(& __gen_e_acsl_at_3),8UL);
+    __gen_e_acsl_at_3 = Mwmax;
+    __e_acsl_store_block((void *)(& __gen_e_acsl_at_2),8UL);
+    __gen_e_acsl_at_2 = Mtmax_in;
+    __e_acsl_store_block((void *)(& __gen_e_acsl_at),8UL);
+    __gen_e_acsl_at = Mtmax_out;
+    foo(Mtmax_in,Mwmax,Mtmax_out);
+  }
+  {
+    int __gen_e_acsl_valid_read;
+    int __gen_e_acsl_valid_read_2;
+    int __gen_e_acsl_valid_read_3;
+    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)__gen_e_acsl_at_3,
+                                                  sizeof(float));
+    __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"foo",
+                    (char *)"mem_access: \\valid_read(__gen_e_acsl_at_3)",11);
+    __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)__gen_e_acsl_at_2,
+                                                    sizeof(float));
+    __e_acsl_assert(__gen_e_acsl_valid_read_2,(char *)"RTE",(char *)"foo",
+                    (char *)"mem_access: \\valid_read(__gen_e_acsl_at_2)",11);
+    __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)__gen_e_acsl_at,
+                                                    sizeof(float));
+    __e_acsl_assert(__gen_e_acsl_valid_read_3,(char *)"RTE",(char *)"foo",
+                    (char *)"mem_access: \\valid_read(__gen_e_acsl_at)",11);
+    __e_acsl_assert(*__gen_e_acsl_at == *__gen_e_acsl_at_2 + (long double)(
+                                        (long double)5 - ((long double)(
+                                                          5 / 80) * *__gen_e_acsl_at_3) * 0.4),
+                    (char *)"Postcondition",(char *)"foo",
+                    (char *)"*\\old(Mtmax_out) == *\\old(Mtmax_in)+(5-((5/80)**\\old(Mwmax))*0.4)",
+                    11);
+    __e_acsl_delete_block((void *)(& Mtmax_in));
+    __e_acsl_delete_block((void *)(& Mwmax));
+    __e_acsl_delete_block((void *)(& Mtmax_out));
+    return;
+  }
 }
 
 

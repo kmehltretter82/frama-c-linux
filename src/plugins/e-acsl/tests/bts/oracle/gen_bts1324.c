@@ -28,6 +28,43 @@ int sorted(int *t, int n)
       assumes ∀ int i; 0 < i < n ⇒ *(t+(i-1)) ≤ *(t+i);
       ensures \result ≡ 1;
  */
+int __gen_e_acsl_sorted(int *t, int n);
+
+int main(void)
+{
+  int __retres;
+  int t[7];
+  int n;
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
+  __e_acsl_store_block((void *)(t),28UL);
+  __e_acsl_initialize((void *)(t),sizeof(int));
+  t[0] = 1;
+  __e_acsl_initialize((void *)(& t[1]),sizeof(int));
+  t[1] = 4;
+  __e_acsl_initialize((void *)(& t[2]),sizeof(int));
+  t[2] = 4;
+  __e_acsl_initialize((void *)(& t[3]),sizeof(int));
+  t[3] = 5;
+  __e_acsl_initialize((void *)(& t[4]),sizeof(int));
+  t[4] = 5;
+  __e_acsl_initialize((void *)(& t[5]),sizeof(int));
+  t[5] = 5;
+  __e_acsl_initialize((void *)(& t[6]),sizeof(int));
+  t[6] = 7;
+  n = __gen_e_acsl_sorted(t,7);
+  /*@ assert n ≡ 1; */
+  __e_acsl_assert(n == 1,(char *)"Assertion",(char *)"main",(char *)"n == 1",
+                  23);
+  __retres = 0;
+  __e_acsl_delete_block((void *)(t));
+  __e_acsl_memory_clean();
+  return __retres;
+}
+
+/*@ behavior yes:
+      assumes ∀ int i; 0 < i < n ⇒ *(t+(i-1)) ≤ *(t+i);
+      ensures \result ≡ 1;
+ */
 int __gen_e_acsl_sorted(int *t, int n)
 {
   int __gen_e_acsl_at;
@@ -80,37 +117,6 @@ int __gen_e_acsl_sorted(int *t, int n)
     __e_acsl_delete_block((void *)(& t));
     return __retres;
   }
-}
-
-int main(void)
-{
-  int __retres;
-  int t[7];
-  int n;
-  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
-  __e_acsl_store_block((void *)(t),28UL);
-  __e_acsl_initialize((void *)(t),sizeof(int));
-  t[0] = 1;
-  __e_acsl_initialize((void *)(& t[1]),sizeof(int));
-  t[1] = 4;
-  __e_acsl_initialize((void *)(& t[2]),sizeof(int));
-  t[2] = 4;
-  __e_acsl_initialize((void *)(& t[3]),sizeof(int));
-  t[3] = 5;
-  __e_acsl_initialize((void *)(& t[4]),sizeof(int));
-  t[4] = 5;
-  __e_acsl_initialize((void *)(& t[5]),sizeof(int));
-  t[5] = 5;
-  __e_acsl_initialize((void *)(& t[6]),sizeof(int));
-  t[6] = 7;
-  n = __gen_e_acsl_sorted(t,7);
-  /*@ assert n ≡ 1; */
-  __e_acsl_assert(n == 1,(char *)"Assertion",(char *)"main",(char *)"n == 1",
-                  23);
-  __retres = 0;
-  __e_acsl_delete_block((void *)(t));
-  __e_acsl_memory_clean();
-  return __retres;
 }
 
 

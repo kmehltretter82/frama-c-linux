@@ -54,6 +54,19 @@ void *memchr(void const *buf, int c, size_t n)
       assumes ∀ ℤ k; 0 ≤ k < n ⇒ (int)*((char *)buf+k) ≢ c;
       ensures \result ≡ (void *)0;
  */
+void *__gen_e_acsl_memchr(void const *buf, int c, size_t n);
+
+/*@ behavior exists:
+      assumes ∃ ℤ i; 0 ≤ i < n ∧ (int)*((char *)buf+i) ≡ c;
+      ensures
+        ∀ int j;
+          0 ≤ j < \offset((char *)\result) ⇒
+          (int)*((char *)\old(buf)+j) ≢ \old(c);
+    
+    behavior not_exists:
+      assumes ∀ ℤ k; 0 ≤ k < n ⇒ (int)*((char *)buf+k) ≢ c;
+      ensures \result ≡ (void *)0;
+ */
 void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
 {
   int __gen_e_acsl_at_4;
