@@ -123,7 +123,7 @@ endif
 ######################
 # Benchmarking tools #
 ######################
-BM_TOOLS_SOURCES = benchmarking/tools/fc-time.c
+BM_TOOLS_SOURCES = $(PLUGIN_DIR)/benchmarking/tools/fc-time.c
 BM_TOOLS_BINARIES = $(patsubst %.c,%, $(BM_TOOLS_SOURCES))
 
 CFLAGS = -g3 -O2 -std=c11 -pedantic -Wall -Wno-unused-result
