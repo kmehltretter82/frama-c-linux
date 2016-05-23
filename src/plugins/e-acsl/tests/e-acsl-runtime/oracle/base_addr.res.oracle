@@ -1,10 +1,10 @@
 [e-acsl] beginning translation.
 FRAMAC_SHARE/libc/stdlib.h:157:[e-acsl] warning: E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
-tests/e-acsl-runtime/base_addr.c:10:[e-acsl] warning: E-ACSL construct `complete behaviors' is not yet supported.
+tests/e-acsl-runtime/base_addr.c:61:[e-acsl] warning: E-ACSL construct `complete behaviors' is not yet supported.
                   Ignoring annotation.
-tests/e-acsl-runtime/base_addr.c:10:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
+tests/e-acsl-runtime/base_addr.c:61:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
                   Ignoring annotation.
-tests/e-acsl-runtime/base_addr.c:10:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+tests/e-acsl-runtime/base_addr.c:61:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
                   Ignoring annotation.
 FRAMAC_SHARE/libc/stdlib.h:161:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
                   Ignoring annotation.

@@ -12,24 +12,7 @@ int *f(int *x, int *y)
 }
 
 /*@ ensures \valid(\result); */
-int *__gen_e_acsl_f(int *x, int *y)
-{
-  int *__retres;
-  __e_acsl_store_block((void *)(& __retres),8UL);
-  __e_acsl_store_block((void *)(& x),8UL);
-  __e_acsl_store_block((void *)(& y),8UL);
-  __retres = f(x,y);
-  {
-    int __gen_e_acsl_valid;
-    __gen_e_acsl_valid = __e_acsl_valid((void *)__retres,sizeof(int));
-    __e_acsl_assert(__gen_e_acsl_valid,(char *)"Postcondition",(char *)"f",
-                    (char *)"\\valid(\\result)",10);
-    __e_acsl_delete_block((void *)(& x));
-    __e_acsl_delete_block((void *)(& y));
-    __e_acsl_delete_block((void *)(& __retres));
-    return __retres;
-  }
-}
+int *__gen_e_acsl_f(int *x, int *y);
 
 int main(void)
 {
@@ -57,6 +40,26 @@ int main(void)
   __e_acsl_delete_block((void *)(& x));
   __e_acsl_memory_clean();
   return __retres;
+}
+
+/*@ ensures \valid(\result); */
+int *__gen_e_acsl_f(int *x, int *y)
+{
+  int *__retres;
+  __e_acsl_store_block((void *)(& __retres),8UL);
+  __e_acsl_store_block((void *)(& x),8UL);
+  __e_acsl_store_block((void *)(& y),8UL);
+  __retres = f(x,y);
+  {
+    int __gen_e_acsl_valid;
+    __gen_e_acsl_valid = __e_acsl_valid((void *)__retres,sizeof(int));
+    __e_acsl_assert(__gen_e_acsl_valid,(char *)"Postcondition",(char *)"f",
+                    (char *)"\\valid(\\result)",10);
+    __e_acsl_delete_block((void *)(& x));
+    __e_acsl_delete_block((void *)(& y));
+    __e_acsl_delete_block((void *)(& __retres));
+    return __retres;
+  }
 }
 
 

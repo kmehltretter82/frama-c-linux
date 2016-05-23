@@ -69,7 +69,8 @@ int main(int argc, char **argv)
   __e_acsl_assert(b == (char *)0,(char *)"Assertion",(char *)"main",
                   (char *)"b == (char *)((void *)0)",59);
   __e_acsl_full_init((void *)(& b));
-  b = (char *)__e_acsl_calloc(18446744073709551615UL,18446744073709551615UL);
+  b = (char *)__gen_e_acsl_calloc(18446744073709551615UL,
+                                  18446744073709551615UL);
   /*@ assert __e_acsl_heap_size ≡ 16; */
   __e_acsl_assert(__e_acsl_heap_size == (unsigned long)16,
                   (char *)"Assertion",(char *)"main",

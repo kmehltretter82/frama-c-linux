@@ -207,7 +207,7 @@ let dup_global loc old_prj spec bhv kf vi new_vi =
   Annotations.register_funspec new_kf;
   dup_spec_status old_prj kf new_kf spec new_spec;
   Options.feedback ~dkey ~level:2 "function %s" name;
-  GFun(fundec, loc)
+  GFun(fundec, loc), GFunDecl(new_spec, new_vi, loc)
 
 (* ********************************************************************** *)
 (* Visitor *)
@@ -220,26 +220,24 @@ class dup_functions_visitor prj = object (self)
 
   val fct_tbl = Cil_datatype.Varinfo.Hashtbl.create 7
   val mutable before_memory_model = Before_gmp
-  val mutable libc_decls = []
+  val mutable new_definitions: global list = []
+  (* new definitions of the annotated functions which will contain the
+     translation of the E-ACSL constract *)
 
   method private before_memory_model = match before_memory_model with
   | Before_gmp | Gmp | After_gmp -> true
   | Memory_model | Code -> false
 
   method private insert_libc l =
-    match libc_decls with
+    match new_definitions with
     | [] -> l
     | _ :: _ ->
-      let res = List.fold_left (fun acc g -> g :: acc) l libc_decls in
-      libc_decls <- [];
+      (* add the generated definitions of libc at the end of [l]. This way,
+         we are sure that they have access to all of it (in particular, the
+         memory model and GMP) *)
+      let res = l @ new_definitions in
+      new_definitions <- [];
       res
-
-  method private dup_libc g new_g =
-    if self#before_memory_model then begin
-      libc_decls <- new_g :: libc_decls;
-      [ g ]
-    end else
-      self#insert_libc [ g; new_g ]
 
   method private next () =
     match before_memory_model with
@@ -328,12 +326,17 @@ if there are memory-related annotations.@]"
 	in
 	let spec = Annotations.funspec ~populate:false kf in
 	let vi_bhv = Cil.get_varinfo self#behavior vi in
-	let new_g = 
-	  Project.on prj
-	    (dup_global loc (Project.current ()) spec self#behavior kf vi_bhv) 
-	    new_vi 
-	in
-	self#dup_libc g new_g
+        let new_g, new_decl =
+          Project.on prj
+            (dup_global loc (Project.current ()) spec self#behavior kf vi_bhv)
+            new_vi
+        in
+        (* postpone the introduction of the new function definition to the
+           end *)
+        new_definitions <- new_g :: new_definitions;
+        (* put the declaration before the original function in order to solve
+           issue with recursive functions *)
+        [ new_decl; g ]
       | _ -> assert false)
   | GVarDecl(_, loc) | GFunDecl(_, _, loc) | GFun(_, loc)
       when Misc.is_library_loc loc ->
@@ -348,20 +351,20 @@ if there are memory-related annotations.@]"
       when Cil.is_builtin vi ->
     self#next ();
     Cil.JustCopy
-  | _ -> 
+  | _ ->
     self#next ();
-    Cil.DoChildrenPost self#insert_libc
+    Cil.DoChildren
 
   method !vfile _ =
     Cil.DoChildrenPost
       (fun f ->
-	match libc_decls with
-	| [] -> f
-	| _ :: _ -> 
-	  (* required by the few cases where there is no global tagged as
-	     [Code] in the file. *)
-	  f.globals <- self#insert_libc f.globals; 
-	  f)
+        match new_definitions with
+        | [] -> f
+        | _ :: _ ->
+          (* required by the few cases where there is no global tagged as
+             [Code] in the file. *)
+          f.globals <- self#insert_libc f.globals;
+          f)
 
   initializer
     Project.copy ~selection:(Parameter_state.get_selection ()) prj;

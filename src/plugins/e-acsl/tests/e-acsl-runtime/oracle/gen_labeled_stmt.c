@@ -31,6 +31,9 @@ int __gen_e_acsl_main(void)
 }
 
 /*@ ensures X ≡ 3; */
+int main(void);
+
+/*@ ensures X ≡ 3; */
 int main(void)
 {
   int __retres;

@@ -44,6 +44,27 @@ struct list *f(struct list *l)
       assumes ¬\valid(l->next);
       ensures \result ≡ \old(l);
  */
+struct list *__gen_e_acsl_f(struct list *l);
+
+int main(void)
+{
+  int __retres;
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
+  __gen_e_acsl_f((struct list *)0);
+  __retres = 0;
+  __e_acsl_memory_clean();
+  return __retres;
+}
+
+/*@ behavior B1:
+      assumes l ≡ \null;
+      ensures \result ≡ \old(l);
+    
+    behavior B2:
+      assumes ¬\valid(l);
+      assumes ¬\valid(l->next);
+      ensures \result ≡ \old(l);
+ */
 struct list *__gen_e_acsl_f(struct list *l)
 {
   struct list *__gen_e_acsl_at_4;
@@ -104,16 +125,6 @@ struct list *__gen_e_acsl_f(struct list *l)
     __e_acsl_delete_block((void *)(& __retres));
     return __retres;
   }
-}
-
-int main(void)
-{
-  int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
-  __gen_e_acsl_f((struct list *)0);
-  __retres = 0;
-  __e_acsl_memory_clean();
-  return __retres;
 }
 
 

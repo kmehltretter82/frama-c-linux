@@ -102,6 +102,42 @@ int search(int elt)
       assumes ∀ ℤ j; 0 ≤ j < 10 ⇒ A[j] ≢ elt;
       ensures \result ≡ 0;
  */
+int __gen_e_acsl_search(int elt);
+
+int main(void)
+{
+  int __retres;
+  int found;
+  {
+    int i;
+    i = 0;
+    while (i < 10) {
+      A[i] = i * i;
+      i ++;
+    }
+  }
+  found = __gen_e_acsl_search(36);
+  /*@ assert found ≡ 1; */
+  __e_acsl_assert(found == 1,(char *)"Assertion",(char *)"main",
+                  (char *)"found == 1",31);
+  found = __gen_e_acsl_search(5);
+  /*@ assert found ≡ 0; */
+  __e_acsl_assert(found == 0,(char *)"Assertion",(char *)"main",
+                  (char *)"found == 0",34);
+  __retres = 0;
+  return __retres;
+}
+
+/*@ requires ∀ ℤ i; 0 ≤ i < 9 ⇒ A[i] ≤ A[i+1];
+    
+    behavior exists:
+      assumes ∃ ℤ j; 0 ≤ j < 10 ∧ A[j] ≡ elt;
+      ensures \result ≡ 1;
+    
+    behavior not_exists:
+      assumes ∀ ℤ j; 0 ≤ j < 10 ⇒ A[j] ≢ elt;
+      ensures \result ≡ 0;
+ */
 int __gen_e_acsl_search(int elt)
 {
   int __gen_e_acsl_at_2;
@@ -195,30 +231,6 @@ int __gen_e_acsl_search(int elt)
                     13);
     return __retres;
   }
-}
-
-int main(void)
-{
-  int __retres;
-  int found;
-  {
-    int i;
-    i = 0;
-    while (i < 10) {
-      A[i] = i * i;
-      i ++;
-    }
-  }
-  found = __gen_e_acsl_search(36);
-  /*@ assert found ≡ 1; */
-  __e_acsl_assert(found == 1,(char *)"Assertion",(char *)"main",
-                  (char *)"found == 1",31);
-  found = __gen_e_acsl_search(5);
-  /*@ assert found ≡ 0; */
-  __e_acsl_assert(found == 0,(char *)"Assertion",(char *)"main",
-                  (char *)"found == 0",34);
-  __retres = 0;
-  return __retres;
 }
 
 
