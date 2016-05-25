@@ -20,8 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-exception New_typing_error of string
-let untypable s = raise (New_typing_error s)
+exception Typing_error of string
+let untypable s = raise (Typing_error s)
 
 exception Not_yet of string
 let not_yet s = raise (Not_yet s)
@@ -52,7 +52,7 @@ let generic_handle f res x =
   try
     f x
   with
-  | New_typing_error s ->
+  | Typing_error s ->
     let msg = Format.sprintf "@[invalid E-ACSL construct@ `%s'.@]" s in
     Options.warning ~once:true ~current:true "@[%s@ Ignoring annotation.@]" msg;
     Nb_typing.set (Nb_typing.get () + 1);

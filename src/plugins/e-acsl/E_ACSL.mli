@@ -25,7 +25,7 @@
 open Cil_types
 
 module Error: sig
-  exception New_typing_error of string
+  exception Typing_error of string
   exception Not_yet of string
 end
 
