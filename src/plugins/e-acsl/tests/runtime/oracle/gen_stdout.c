@@ -31,7 +31,7 @@ int main(void)
                           __gen_e_acsl_literal_string_2);
   /*@ assert f ≡ __fc_stdout; */
   __e_acsl_assert(f == stdout,(char *)"Assertion",(char *)"main",
-                  (char *)"f == __fc_stdout",11);
+                  (char *)"f == __fc_stdout",10);
   __retres = 0;
   __e_acsl_delete_block((void *)(& stdout));
   __e_acsl_delete_block((void *)(& f));

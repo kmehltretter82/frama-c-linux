@@ -1,6 +1,5 @@
 /* run.config
    COMMENT: __fc_stdout et __fc_fopen
-   STDOPT: #"-pp-annot"
 */
 
 #include<stdio.h>
