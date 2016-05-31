@@ -298,11 +298,13 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       when Misc.is_library_loc vi.vdecl ->
     if generate then
       Cil.JustCopyPost
-        (fun l -> 
-          Misc.register_library_function (Cil.get_varinfo self#behavior vi);
+        (fun l ->
+          let new_vi = Cil.get_varinfo self#behavior vi in
+          Misc.register_library_function new_vi;
+          Builtins.update vi.vname new_vi;
           l)
     else begin
-      Misc.register_library_function vi; 
+      Misc.register_library_function vi;
       Cil.SkipChildren
     end
   | GVarDecl(vi, _) | GVar(vi, _, _) | GFun({ svar = vi }, _)
@@ -316,6 +318,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         vi.vghost <- false; ()
       | GFun({ svar = vi } as fundec, _) ->
         vi.vghost <- false;
+        Builtins.update vi.vname vi;
         (* remember that we have to remove the main later (see method
            [vfile]) *)
         if vi.vorig_name = Kernel.MainFunction.get () then

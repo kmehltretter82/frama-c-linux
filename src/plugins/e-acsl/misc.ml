@@ -52,12 +52,14 @@ let reset () = Datatype.String.Hashtbl.clear library_functions
 
 exception Unregistered_library_function of string
 let mk_call ~loc ?result fname args =
-  let vi =  
+  let vi =
     try Datatype.String.Hashtbl.find library_functions fname
     with Not_found ->
-      (* could not happen in normal mode, but coud be raised when E-ACSL is used
-         as a library *)
-      raise (Unregistered_library_function fname)
+      try Builtins.find fname
+      with Not_found ->
+        (* could not happen in normal mode, but coud be raised when E-ACSL is
+           used as a library *)
+        raise (Unregistered_library_function fname)
   in
   let f = Cil.evar ~loc vi in
   vi.vreferenced <- true;

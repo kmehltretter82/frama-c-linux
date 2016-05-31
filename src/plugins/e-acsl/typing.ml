@@ -162,6 +162,15 @@ end
 (** {2 Coercion rules} *)
 (******************************************************************************)
 
+let ty_of_logic_ty = function
+  | Linteger -> Gmp
+  | Ctype ty -> (match Cil.unrollType ty with
+    | TInt(ik, _) -> C_type ik
+    | _ -> Other)
+  | Lreal | Larrow _ -> Other
+  | Ltype _ -> Error.not_yet "user-defined logic type"
+  | Lvar _ -> Error.not_yet "type variable"
+
 (* Compute the smallest type (bigger than [int]) which can contain the whole
    interval. It is the \theta operator of the JFLA's paper. *)
 let ty_of_interv ?ctx i =
@@ -217,7 +226,7 @@ let rec type_term ~force ?ctx t =
     (* this pattern matching implements the formal rules of the JFLA's paper
        (and of course also covers the missing cases). Also enforce the invariant
        that every subterm is typed, even if it is not an integer. *)
-    match t.term_node with
+    match t.term_node with 
     | TConst (Integer _ | LChr _ | LEnum _)
     | TSizeOf _
     | TSizeOfStr _
@@ -401,7 +410,16 @@ let rec type_term ~force ?ctx t =
       ignore (type_term ~force:true ~ctx:(size_t ()) t2);
       dup Other
 
-    | Tapp (_,_,_) -> Error.not_yet "logic function application"
+    | Tapp(li, _, args) ->
+      let typ_arg lvi arg =
+        let ctx = ty_of_logic_ty lvi.lv_type in
+        ignore (type_term ~force:true ~ctx arg)
+      in
+      List.iter2 typ_arg li.l_profile args;
+      (* [li.l_type is [None] for predicate only: not possible here.
+         Thus using [Extlib.the] is fine *)
+      dup (ty_of_logic_ty (Extlib.the li.l_type))
+
     | Tunion _ -> Error.not_yet "tset union"
     | Tinter _ -> Error.not_yet "tset intersection"
     | Tcomprehension (_,_,_) -> Error.not_yet "tset comprehension"
