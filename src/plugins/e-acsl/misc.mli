@@ -87,6 +87,9 @@ val reorder_ast: unit -> unit
  * E-ACSL runtime library and their dependencies (e.g., typedef size_t) to
  * the very top of the file. *)
 
+val cty: logic_type -> typ
+(* Assume that the logic type is indeed a C type. Just return it. *)
+
 (* ************************************************************************** *)
 (** {2 Handling prefixes of generated library functions and variables} *)
 (* ************************************************************************** *)

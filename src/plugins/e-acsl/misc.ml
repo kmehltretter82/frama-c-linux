@@ -277,6 +277,10 @@ let reorder_ast () =
   let rtl, other = List.partition is_from_library ast.globals in
   ast.globals <- rtl @ other
 
+let cty = function
+  | Ctype ty -> ty
+  | lty -> Options.fatal "Expecting a C type. Got %a" Printer.pp_logic_type lty
+
 (*
 Local Variables:
 compile-command: "make"

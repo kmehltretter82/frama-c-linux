@@ -433,14 +433,6 @@ and context_insensitive_term_to_exp kf env t =
   | Tapp(li, [], args) when Builtins.mem li.l_var_info.lv_name ->
     (* E-ACSL built-in function call *)
     let fname = li.l_var_info.lv_name in
-    let convert_ty name = function
-      | Ctype ty -> ty
-      | lty ->
-        Options.fatal "[Tapp] expected C type for %s in %s. Got %a."
-          name
-          fname
-          Printer.pp_logic_type lty
-    in
     let args, env = (* args computed in the reverse order *)
       try
         List.fold_left
@@ -461,7 +453,7 @@ and context_insensitive_term_to_exp kf env t =
         ~name:(fname ^ "_app")
         env
         (Some t)
-        (convert_ty "result" (Extlib.the li.l_type))
+        (Misc.cty (Extlib.the li.l_type))
         (fun vi _ ->
           [ Misc.mk_call ~loc ~result:(Cil.var vi) fname (List.rev args) ])
     in
