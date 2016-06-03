@@ -13,9 +13,9 @@ FRAMAC_SHARE/e-acsl/e_acsl.h:43:[value] warning: function __e_acsl_assert: preco
 tests/e-acsl-runtime/mainargs.c:12:[value] warning: assertion got status unknown.
 tests/e-acsl-runtime/mainargs.c:13:[value] warning: assertion got status unknown.
 tests/e-acsl-runtime/mainargs.c:15:[value] warning: assertion got status unknown.
-tests/e-acsl-runtime/mainargs.c:15:[kernel] warning: out of bounds read. assert \valid_read(argv+argc);
+tests/e-acsl-runtime/mainargs.c:15:[value] warning: out of bounds read. assert \valid_read(argv+argc);
 tests/e-acsl-runtime/mainargs.c:16:[value] warning: assertion got status unknown.
-tests/e-acsl-runtime/mainargs.c:16:[kernel] warning: out of bounds read. assert \valid_read(argv+argc);
+tests/e-acsl-runtime/mainargs.c:16:[value] warning: out of bounds read. assert \valid_read(argv+argc);
 FRAMAC_SHARE/libc/string.h:91:[value] warning: function __gen_e_acsl_strlen: precondition 'valid_string_src' got status unknown.
 FRAMAC_SHARE/libc/string.h:91:[value] warning: function strlen: precondition 'valid_string_src' got status unknown.
 FRAMAC_SHARE/libc/string.h:93:[value] warning: function __gen_e_acsl_strlen: postcondition got status unknown.
