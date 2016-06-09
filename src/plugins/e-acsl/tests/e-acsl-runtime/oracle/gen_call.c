@@ -28,8 +28,8 @@ int main(void)
   __e_acsl_full_init((void *)(& x));
   x = 0;
   __e_acsl_full_init((void *)(& q));
-  q = (int *)__gen_e_acsl_malloc(sizeof(int));
-  r = (int *)__gen_e_acsl_malloc(sizeof(int));
+  q = (int *)malloc(sizeof(int));
+  r = (int *)malloc(sizeof(int));
   __e_acsl_full_init((void *)(& p));
   p = __gen_e_acsl_f(& x,q);
   __e_acsl_full_init((void *)(& q));

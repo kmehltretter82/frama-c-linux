@@ -1,6 +1,6 @@
 /* run.config
    COMMENT: \valid
-   STDOPT: +"-val-builtin __e_acsl_malloc:Frama_C_alloc_size -val-builtin __e_acsl_free:Frama_C_free"
+   STDOPT: +"-val-builtin malloc:Frama_C_alloc_size -val-builtin free:Frama_C_free"
 */
 
 #include "stdlib.h"

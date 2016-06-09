@@ -12,7 +12,7 @@ int main(void)
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_store_block((void *)(& state),8UL);
   __e_acsl_full_init((void *)(& state));
-  state = (spongeState *)__gen_e_acsl_malloc(sizeof(spongeState));
+  state = (spongeState *)malloc(sizeof(spongeState));
   __e_acsl_initialize((void *)(& state->bitsInQueue),sizeof(unsigned int));
   state->bitsInQueue = (unsigned int)16;
   /*@ assert ¬\initialized(&state->dataQueue[state->bitsInQueue/8]); */
@@ -33,7 +33,7 @@ int main(void)
                     (char *)"!\\initialized(&state->dataQueue[state->bitsInQueue/8])",
                     22);
   }
-  __gen_e_acsl_free((void *)state);
+  free((void *)state);
   __retres = 0;
   __e_acsl_delete_block((void *)(& state));
   __e_acsl_memory_clean();

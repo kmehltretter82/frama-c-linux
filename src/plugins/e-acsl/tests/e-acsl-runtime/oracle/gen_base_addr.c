@@ -178,7 +178,7 @@ int main(void)
                     (char *)"\\base_addr(pl) == \\base_addr(&l)",39);
   }
   __e_acsl_full_init((void *)(& p));
-  p = (char *)__gen_e_acsl_malloc((unsigned long)12);
+  p = (char *)malloc((unsigned long)12);
   __e_acsl_full_init((void *)(& pd));
   pd = p;
   /*@ assert \base_addr(p) ≡ \base_addr(pd); */
@@ -234,7 +234,7 @@ int main(void)
                     (char *)"\\base_addr(p-5) == \\base_addr(pd)",49);
   }
   __e_acsl_full_init((void *)(& q));
-  q = (long *)__gen_e_acsl_malloc((unsigned long)30 * sizeof(long));
+  q = (long *)malloc((unsigned long)30 * sizeof(long));
   __e_acsl_full_init((void *)(& qd));
   qd = q;
   /*@ assert \base_addr(q) ≡ \base_addr(qd); */

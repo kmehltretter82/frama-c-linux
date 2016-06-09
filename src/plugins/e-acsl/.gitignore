@@ -73,3 +73,5 @@ top/
 doc/doxygen/doxygen.cfg
 doc/doxygen/html
 doc/doxygen/warn.log
+benchmarking/tools/fc-time
+contrib/jemalloc/include/jemalloc/jemalloc-e-acsl.h

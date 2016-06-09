@@ -140,6 +140,35 @@ clean::
 	$(PRINT_RM) benchmarking tools
 	$(RM) $(BM_TOOLS_BINARIES)
 
+######################
+# Jemalloc					 #
+######################
+JEMALLOC_DIR = $(PLUGIN_DIR)/contrib/jemalloc
+JEMALLOC_LIBDIR = $(JEMALLOC_DIR)/lib
+JEMALLOC_LIBNAME = libjemalloc-e-acsl.a
+EACSL_JEMALLOC_LIB = $(JEMALLOC_LIBDIR)/$(JEMALLOC_LIBNAME)
+
+PUBLIC_PREFIX  = "__e_acsl_native_" # Prefix of public jemalloc functions
+PRIVATE_PREFIX = "__e_acsl_hidden_" # Suffix of private jemalloc functions
+INSTALL_SUFFIX = "-e-acsl" # Suffix of generated jemalloc library
+
+$(EACSL_JEMALLOC_LIB):
+	cd $(JEMALLOC_DIR) && \
+		./autogen.sh \
+  		--with-jemalloc-prefix="$(PUBLIC_PREFIX)" \
+  		--with-private-namespace="$(PRIVATE_PREFIX)" \
+  		--with-install-suffix="$(INSTALL_SUFFIX)" && \
+		$(MAKE) lib/$(JEMALLOC_LIBNAME)
+
+all:: $(EACSL_JEMALLOC_LIB)
+
+clean::
+	$(PRINT_RM) jemalloc library
+	$(RM) $(EACSL_JEMALLOC_LIB)
+	if test -f $(JEMALLOC_DIR)/Makefile; \
+		then $(MAKE) -C$(JEMALLOC_DIR) distclean; \
+	fi
+
 ############
 # Cleaning #
 ############
@@ -148,7 +177,6 @@ clean::
 	$(PRINT_RM) generated test files
 	$(RM) $(E_ACSL_DIR)/tests/*.cm* $(E_ACSL_DIR)/tests/*.o
 	$(RM) $(E_ACSL_DIR)/tests/test_config
-	$(RM) $(E_ACSL_DIR)/doc/doxygen/html/*
 
 ################################
 # Building source distribution #
@@ -254,6 +282,9 @@ install::
 	      $(E_ACSL_DIR)/doc/manuals/e-acsl-implementation.pdf \
 	      $(E_ACSL_DIR)/doc/manuals/e-acsl-manual.pdf \
 		$(FRAMAC_DATADIR)/manuals
+	$(PRINT_INSTALL) E-ACSL libraries
+	$(MKDIR) $(LIBDIR)
+	$(CP) $(EACSL_JEMALLOC_LIB) $(LIBDIR)
 	$(PRINT_INSTALL) E-ACSL scripts
 	$(MKDIR) $(BINDIR)
 	$(CP) $(E_ACSL_DIR)/scripts/e-acsl-gcc.sh $(BINDIR)/
@@ -268,6 +299,10 @@ uninstall::
 	$(RM) $(FRAMAC_DATADIR)/manuals/e-acsl.pdf \
 	      $(FRAMAC_DATADIR)/manuals/e-acsl-implementation.pdf \
 	      $(FRAMAC_DATADIR)/manuals/e-acsl-manual.pdf
+	$(PRINT_RM) E-ACSL libraries
+	$(PRINT_INSTALL) E-ACSL share files
+	$(MKDIR) $(FRAMAC_DATADIR)/e-acsl
+	$(RM) $(LIBDIR)/$(JEMALLOC_LIBNAME)
 	$(PRINT_RM) E-ACSL scripts
 	$(RM) $(BINDIR)/e-acsl-gcc.sh
 	$(PRINT_RM) man pages
@@ -315,3 +350,8 @@ Doxygen executable not found."; \
 	fi
 
 doc:: doxygen
+
+clean::
+	$(PRINT_RM) generated documentation
+	$(RM) $(E_ACSL_DIR)/doc/doxygen/html/*
+	$(RM) $(E_ACSL_DIR)/doc/code/*

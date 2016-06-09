@@ -1,48 +1,5 @@
 [e-acsl] beginning translation.
-[e-acsl] warning: annotating undefined function `calloc':
-                  the generated program may miss memory instrumentation
-                  if there are memory-related annotations.
-[e-acsl] warning: annotating undefined function `realloc':
-                  the generated program may miss memory instrumentation
-                  if there are memory-related annotations.
-FRAMAC_SHARE/libc/stdlib.h:157:[e-acsl] warning: E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:191:[e-acsl] warning: E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:191:[e-acsl] warning: E-ACSL construct `\allocable' is not yet supported. Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:175:[e-acsl] warning: E-ACSL construct `\allocable' is not yet supported. Ignoring annotation.
 FRAMAC_SHARE/libc/stdlib.h:147:[kernel] warning: No code nor implicit assigns clause for function calloc, generating default assigns from the prototype
-tests/e-acsl-runtime/memsize.c:69:[e-acsl] warning: E-ACSL construct `complete behaviors' is not yet supported.
-                  Ignoring annotation.
-tests/e-acsl-runtime/memsize.c:69:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:206:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:206:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:199:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:213:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:213:[e-acsl] warning: E-ACSL construct `complete behaviors' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:213:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:179:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:178:[e-acsl] warning: E-ACSL construct `\allocate' is not yet supported. Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:178:[e-acsl] warning: E-ACSL construct `complete behaviors' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:178:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:178:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:161:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:161:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:166:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-                  Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-FRAMAC_SHARE/libc/stdlib.h:164:[value] warning: function __gen_e_acsl_malloc, behavior allocation: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
-FRAMAC_SHARE/libc/stdlib.h:169:[value] warning: function __gen_e_acsl_malloc, behavior no_allocation: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
 tests/e-acsl-runtime/memsize.c:22:[value] warning: assertion got status unknown.
 tests/e-acsl-runtime/memsize.c:24:[value] warning: assertion got status invalid (stopping propagation).

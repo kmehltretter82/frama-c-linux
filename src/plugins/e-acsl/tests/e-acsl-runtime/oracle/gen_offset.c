@@ -137,7 +137,7 @@ int main(void)
                     (char *)"main",(char *)"\\offset(pi) == 4",35);
   }
   __e_acsl_full_init((void *)(& p));
-  p = (char *)__gen_e_acsl_malloc((unsigned long)12);
+  p = (char *)malloc((unsigned long)12);
   /*@ assert \offset(p) ≡ 0; */
   {
     int __gen_e_acsl_offset_14;
@@ -176,7 +176,7 @@ int main(void)
                     (char *)"main",(char *)"\\offset(p-5) == 0",44);
   }
   __e_acsl_full_init((void *)(& q));
-  q = (long *)__gen_e_acsl_malloc((unsigned long)30 * sizeof(long));
+  q = (long *)malloc((unsigned long)30 * sizeof(long));
   /*@ assert \offset(q) ≡ 0; */
   {
     int __gen_e_acsl_offset_19;

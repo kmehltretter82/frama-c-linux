@@ -6,7 +6,7 @@ int *new_inversed(int len, int *v)
   int *p;
   __e_acsl_store_block((void *)(& p),8UL);
   __e_acsl_full_init((void *)(& p));
-  p = (int *)__gen_e_acsl_malloc(sizeof(int) * (unsigned long)len);
+  p = (int *)malloc(sizeof(int) * (unsigned long)len);
   i = 0;
   while (i < len) {
     __e_acsl_initialize((void *)(p + i),sizeof(int));
@@ -57,7 +57,7 @@ int main(void)
   /*@ assert Value: initialisation: \initialized(&LAST); */
   __e_acsl_assert(LAST == 1,(char *)"Assertion",(char *)"main",
                   (char *)"LAST == 1",28);
-  __gen_e_acsl_free((void *)v2);
+  free((void *)v2);
   __retres = 0;
   __e_acsl_delete_block((void *)(& v2));
   __e_acsl_delete_block((void *)(v1));

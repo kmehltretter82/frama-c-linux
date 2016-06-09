@@ -9,7 +9,7 @@ struct list *add(struct list *l, int i)
   __e_acsl_store_block((void *)(& new),8UL);
   __e_acsl_store_block((void *)(& l),8UL);
   __e_acsl_full_init((void *)(& new));
-  new = (struct list *)__gen_e_acsl_malloc(sizeof(struct list));
+  new = (struct list *)malloc(sizeof(struct list));
   /*@ assert \valid(new); */
   {
     int __gen_e_acsl_initialized;

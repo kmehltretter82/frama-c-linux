@@ -177,7 +177,7 @@ int main(void)
                     (char *)"!\\valid(a) && !\\valid(b) && !\\valid(X)",33);
   }
   __e_acsl_full_init((void *)(& a));
-  a = (int *)__gen_e_acsl_malloc(sizeof(int));
+  a = (int *)malloc(sizeof(int));
   /*@ assert \valid(a) ∧ ¬\valid(b) ∧ ¬\valid(X); */
   {
     int __gen_e_acsl_initialized_3;
@@ -420,7 +420,7 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_and_26,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid(*(*d))",45);
   }
-  __gen_e_acsl_free((void *)a);
+  free((void *)a);
   /*@ assert ¬\valid(a) ∧ \valid(b) ∧ \valid(X); */
   {
     int __gen_e_acsl_initialized_17;

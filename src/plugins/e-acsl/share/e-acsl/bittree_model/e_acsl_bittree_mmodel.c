@@ -92,7 +92,7 @@ void __e_acsl_delete_block(void* ptr) {
 
 /* allocate size bytes and store the returned block
  * for further information, see malloc */
-void* __e_acsl_malloc(size_t size) {
+void* malloc(size_t size) {
   void * tmp;
   bt_block * new_block;
   if(size <= 0)
@@ -109,7 +109,7 @@ void* __e_acsl_malloc(size_t size) {
 
 /* free the block starting at ptr,
  * for further information, see free */
-void __e_acsl_free(void* ptr) {
+void free(void* ptr) {
   bt_block * tmp;
   if(ptr == NULL)
     return;
@@ -134,15 +134,15 @@ int __e_acsl_freeable(void* ptr) {
 
 /* resize the block starting at ptr to fit its new size,
  * for further information, see realloc */
-void* __e_acsl_realloc(void* ptr, size_t size) {
+void* realloc(void* ptr, size_t size) {
   bt_block * tmp;
   void * new_ptr;
   /* ptr is NULL - malloc */
   if(ptr == NULL)
-    return __e_acsl_malloc(size);
+    return malloc(size);
   /* size is zero - free */
   if(size == 0) {
-    __e_acsl_free(ptr);
+    free(ptr);
     return NULL;
   }
   tmp = bt_lookup(ptr);
@@ -202,7 +202,7 @@ void* __e_acsl_realloc(void* ptr, size_t size) {
 /* allocate memory for an array of nbr_block elements of size_block size,
  * this memory is set to zero, the returned block is stored,
  * for further information, see calloc */
-void* __e_acsl_calloc(size_t nbr_block, size_t size_block) {
+void* calloc(size_t nbr_block, size_t size_block) {
   void * tmp;
   size_t size = nbr_block * size_block;
   bt_block * new_block;

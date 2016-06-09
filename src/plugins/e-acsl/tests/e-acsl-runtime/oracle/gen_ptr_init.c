@@ -35,9 +35,9 @@ int main(void)
   __e_acsl_globals_init();
   __e_acsl_store_block((void *)(& y),8UL);
   __e_acsl_store_block((void *)(& x),8UL);
-  B = (int *)__gen_e_acsl_malloc(sizeof(int));
+  B = (int *)malloc(sizeof(int));
   __e_acsl_full_init((void *)(& y));
-  y = (int *)__gen_e_acsl_malloc(sizeof(int));
+  y = (int *)malloc(sizeof(int));
   __e_acsl_full_init((void *)(& x));
   x = y;
   f();

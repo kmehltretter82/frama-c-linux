@@ -1,4 +1,5 @@
 [e-acsl] beginning translation.
+FRAMAC_SHARE/libc/stdlib.h:147:[kernel] warning: No code nor implicit assigns clause for function calloc, generating default assigns from the prototype
 [e-acsl] translation done in project "e-acsl".
 tests/bts/bts1395.i:8:[value] warning: detected recursive call
                  (__gen_e_acsl_fact <- fact :: tests/bts/bts1395.i:6 <-

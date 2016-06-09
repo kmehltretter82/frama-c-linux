@@ -312,6 +312,9 @@ FRAMAC="$OPTION_FRAMAC"
 FRAMAC_SHARE="`$FRAMAC -print-share-path`"
 FRAMAC_PLUGIN="`$FRAMAC -print-plugin-path`"
 
+# Name of the malloc library to use
+LIBJEMALLOC="libjemalloc-e-acsl.a"
+
 # Check if this is a development or an installed version
 if [ -f "$BASEDIR/../E_ACSL.mli" ]; then
   # Development version
@@ -325,11 +328,13 @@ if [ -f "$BASEDIR/../E_ACSL.mli" ]; then
   EACSL_SHARE="$DEVELOPMENT/share/e-acsl"
   # Add the project directory to FRAMAC_PLUGINS,
   # otherwise Frama-C uses an installed version
-  FRAMAC_FLAGS="-add-path=$DEVELOPMENT/top $FRAMAC_FLAGS"
+  FRAMAC_FLAGS="-add-path=$DEVELOPMENT $FRAMAC_FLAGS"
+  LIBJEMALLOC="$BASEDIR/../contrib/jemalloc/lib/$LIBJEMALLOC"
 else
   # Installed version. FRAMAC_SHARE should not be used here as Frama-C
   # and E-ACSL may not be installed to the same location
   EACSL_SHARE="$BASEDIR/../share/frama-c/e-acsl/"
+  LIBJEMALLOC="$BASEDIR/../lib/$LIBJEMALLOC"
 fi
 
 # Architecture-dependent flags. Since by default Frama-C uses 32-bit
@@ -428,7 +433,7 @@ EACSL_CPPFLAGS="
   -I$EACSL_SHARE
   -D$EACSL_MACRO_ID
   -D__FC_errno=(*__errno_location())"
-EACSL_LDFLAGS="-lgmp -lm"
+EACSL_LDFLAGS="-lgmp -lm $LIBJEMALLOC -lpthread"
 
 # Output file names
 OUTPUT_CODE="$OPTION_OUTPUT_CODE" # E-ACSL instrumented source

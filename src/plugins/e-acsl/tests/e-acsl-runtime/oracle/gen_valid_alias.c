@@ -40,7 +40,7 @@ int main(void)
                     (char *)"!\\valid(a) && !\\valid(b)",10);
   }
   __e_acsl_full_init((void *)(& a));
-  a = (int *)__gen_e_acsl_malloc(sizeof(int));
+  a = (int *)malloc(sizeof(int));
   __e_acsl_initialize((void *)a,sizeof(int));
   *a = n;
   __e_acsl_full_init((void *)(& b));
@@ -92,7 +92,7 @@ int main(void)
     __e_acsl_assert(*b == n,(char *)"Assertion",(char *)"main",
                     (char *)"*b == n",15);
   }
-  __gen_e_acsl_free((void *)b);
+  free((void *)b);
   /*@ assert ¬\valid(a) ∧ ¬\valid(b); */
   {
     int __gen_e_acsl_initialized_6;

@@ -26,18 +26,6 @@ open Cil_datatype
 
 let dkey = Options.dkey_translation
 
-let rename_alloc_function ~create bhv vi =
-  if Misc.is_alloc_name vi.vname then
-    let new_name =  Misc.mk_api_name vi.vname in
-    let kf =
-      try Globals.Functions.find_by_name new_name
-      with Not_found -> assert false
-    in
-    if create then Cil.makeGlobalVar new_name vi.vtype
-    else Cil.get_varinfo bhv (Globals.Functions.get_vi kf)
-  else
-    vi
-
 let allocate_function env kf =
   List.fold_left
     (fun env vi -> 
@@ -382,10 +370,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
          (Annotations.funspec old_kf)
      with Not_found ->
        ());
-    Cil.DoChildrenPost(rename_alloc_function ~create:true self#behavior)
-
-  method !vvrbl _vi =
-    Cil.DoChildrenPost(rename_alloc_function ~create:false self#behavior)
+    Cil.SkipChildren
 
   method private add_generated_variables_in_function f =
     assert generate;
