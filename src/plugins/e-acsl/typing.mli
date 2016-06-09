@@ -22,7 +22,27 @@
 
 (** Type system which computes the smallest C type that may contain all the
     possible values of a given integer term or predicate. Also compute the
-    required casts. *)
+    required casts. It is based on interval inference of module {!Interval}.
+
+    It implement Figure 4 of J. Signoles' JFLA'15 paper "Rester statique pour
+    devenir plus rapide, plus précis et plus mince".
+
+    Example: consider a variable [x] of type [int] and a variable [y] of type
+    char on a (strange) architecture in which values of type [int] belongs to
+    the interval [[-128;127]] and values of type [char] belongs to the interval
+    [[-32;31]], while there are no other integral types. Then here are some
+    information computed from the term [1+(x+1)/(y-64)] by the type system:
+    1. [x+1] must be a GMP (because of the potential overflow)
+    2. consequently [x], which is an [int], must be coerced into a GMP and the
+    same for the number 1 in this addition.
+    3. [y-64] can be computed in an [int] (because the result belongs to the
+    interval [[-96;-33]]).
+    4. [(x+1)/(y-64)] must be a GMP operation because the numerator is a
+    GMP (see 1.). Consequently [y-64] must be coerced into a GMP too. However,
+    the result belongs to the interval [[-3;3]] and thus can be safely coerced
+    to an [int].
+    5. Consequently the addition of the toplevel term [1+(x+1)/(y-64)] can
+    safely be computed in [int]: its result belongs to [[-2;4]]. *)
 
 open Cil_types
 

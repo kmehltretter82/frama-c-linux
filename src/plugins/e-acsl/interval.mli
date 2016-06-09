@@ -22,31 +22,62 @@
 
 (** Interval inference for terms.
 
-    Compute the smallest interval that fits to contain all the possible values
-    of a given integer term. *)
+    Compute the smallest interval that contains all the possible values of a
+    given integer term. The interval of C variables is directly infered from
+    their C type. The interval of logic variables must be registered from
+    outside before computing the interval of a term containing such variables
+    (see module {!Interval.Env}).
+
+    It implement Figure 3 of J. Signoles' JFLA'15 paper "Rester statique pour
+    devenir plus rapide, plus précis et plus mince".
+
+    Example: consider a variable [x] of type [int] on a (strange) architecture
+    in which values of type [int] belongs to the interval [[-128;127]] and a
+    logic variable [[y] which was registered in the environment with an interval
+    [[-32;31]]. Then here are the intervals computed from the term
+    [1+(x+1)/(y-64)]:
+    1. x \in [[128;127]];
+    2. x+1 \in [[129;128]];
+    3. y \in [[-32;31]];
+    4. y-64 \in [[-96;-33]];
+    5. (x+1)/(y-64) \in [[-3;3]];
+    6. 1+(x+1)/(y-64) \in [[-2;4]] *)
 
 type interv = private { lower: Integer.t; upper: Integer.t }
 include Datatype.S with type t = interv
 
-(** Environment for interval computations. *)
-module Env: sig
-  val clear: unit -> unit
-  val add: Cil_types.logic_var -> interv -> unit
-(** Map an interval to a given logic variable *)
-end
+(* ************************************************************************** *)
+(** {3 Intervals as a lattice} *)
+(* ************************************************************************** *)
+
+val join: t -> t -> t
+val meet: t -> t -> t
+
+(* ************************************************************************** *)
+(** {3 Useful operations on intervals} *)
+(* ************************************************************************** *)
 
 val interv_of_typ: Cil_types.typ -> t
 (** @return the smallest interval which contains the given C type. *)
 
 val add: t -> Integer.t -> t
-(** Extend an interval in order to contain the given integer. *)
+(** @return the minimal interval containing both the interval and the integer
+    given as arguments. *)
 
-(** {3 Intervals as a lattice} *)
+(* ************************************************************************** *)
+(** {3 Environment for interval computations} *)
+(* ************************************************************************** *)
 
-val join: t -> t -> t
-val meet: t -> t -> t
+(** Environment which maps logic variables to intervals. This environment must
+    be extended from outside. *)
+module Env: sig
+  val clear: unit -> unit
+  val add: Cil_types.logic_var -> interv -> unit
+end
 
+(* ************************************************************************** *)
 (** {3 Inference system} *)
+(* ************************************************************************** *)
 
 exception Not_an_integer
 val infer: Cil_types.term -> t
