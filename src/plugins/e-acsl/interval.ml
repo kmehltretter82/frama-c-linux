@@ -211,7 +211,10 @@ let rec infer t =
   | TBinOp (MinusPP, t, _) ->
     (match Cil.unrollType (get_cty t) with
     | TArray(_, _, { scache = Computed n (* size in bits *) }, _) ->
-      make Integer.zero (Integer.div (Integer.of_int n) Integer.eight)
+      (* the second argument must be in the same block than [t]. Consequently
+         the result of the difference belongs to [0; \block_length(t)] *)
+      let nb_bytes = if n mod 8 = 0 then n / 8 else n / 8 + 1 in
+      make Integer.zero (Integer.of_int nb_bytes)
     | TArray _ | TPtr _ -> Lazy.force interv_of_unknown_block
     | _ -> assert false)
   | Tblock_length (_, t)
