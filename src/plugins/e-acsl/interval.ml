@@ -210,14 +210,14 @@ let rec infer t =
   | Tat (t, _) -> infer t
   | TBinOp (MinusPP, t, _) ->
     (match Cil.unrollType (get_cty t) with
-    | TArray(_, _, { scache = Computed n }, _) ->
+    | TArray(_, _, { scache = Computed n (* size in bits *) }, _) ->
       make Integer.zero (Integer.div (Integer.of_int n) Integer.eight)
     | TArray _ | TPtr _ -> Lazy.force interv_of_unknown_block
     | _ -> assert false)
   | Tblock_length (_, t)
   | Toffset(_, t) ->
     (match Cil.unrollType (get_cty t) with
-    | TArray(_, _, { scache = Computed n }, _) ->
+    | TArray(_, _, { scache = Computed n (* size in bits *) }, _) ->
       let nb_bytes = if n mod 8 = 0 then n / 8 else n / 8 + 1 in
       singleton_of_int nb_bytes
     | TArray _ | TPtr _ -> Lazy.force interv_of_unknown_block

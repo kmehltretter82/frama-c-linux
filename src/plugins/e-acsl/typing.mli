@@ -50,7 +50,7 @@ open Cil_types
 (** {2 Datatypes} *)
 (******************************************************************************)
 
-(** Types infered by the system. *)
+(** Possible types infered by the system. *)
 type integer_ty = private
   | Gmp
   | C_type of ikind
@@ -66,12 +66,15 @@ val ikind: ikind -> integer_ty
 
 exception Not_an_integer
 val typ_of_integer_ty: integer_ty -> typ
-(** @return the smallest C type corresponding to an {!integer_ty}.
+(** @return the C type corresponding to an {!integer_ty}. That is [Gmpz.t ()]
+    for [Gmp] and [TInt(ik, [[]])] for [Ctype ik].
     @raise Not_an_integer in case of {!Other}. *)
 
 val join: integer_ty -> integer_ty -> integer_ty
-(** {!integer_ty} is almost a join-semi-lattice: assume that if one argument is
-    {!Other}, then the second argument is also {!Other}. *)
+(** {!integer_ty} is a join-semi-lattice if you do not consider [Other]. If
+    there is no [Other] in argument, this function computes the join of this
+    semi-lattice. If one of the argument is {!Other}, the function assumes that
+    the other argument is also {!Other}. In this case, the result is [Other]. *)
 
 (******************************************************************************)
 (** {2 Typing} *)
