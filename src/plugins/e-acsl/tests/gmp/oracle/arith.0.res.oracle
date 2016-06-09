@@ -21,5 +21,5 @@ FRAMAC_SHARE/e-acsl/e_acsl.h:43:[value] warning: function __e_acsl_assert: preco
 [value] using specification for function __gmpz_clear
 [value] using specification for function __gmpz_init_set_si
 [value] using specification for function __gmpz_add
-tests/gmp/arith.i:34:[kernel] warning: signed overflow. assert 1+__gen_e_acsl__7 ≤ 2147483647;
+tests/gmp/arith.i:34:[value] warning: signed overflow. assert 1+__gen_e_acsl__7 ≤ 2147483647;
 [value] done for function main

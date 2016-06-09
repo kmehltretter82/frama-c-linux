@@ -26,5 +26,5 @@ FRAMAC_SHARE/libc/stdlib.h:164:[value] warning: function __gen_e_acsl_malloc, be
 FRAMAC_SHARE/libc/stdlib.h:169:[value] warning: function __gen_e_acsl_malloc, behavior no_allocation: postcondition got status invalid. (Behavior may be inactive, no reduction performed.)
 FRAMAC_SHARE/libc/stdlib.h:179:[value] warning: function __gen_e_acsl_free, behavior deallocation: precondition 'freeable' got status unknown.
 FRAMAC_SHARE/libc/stdlib.h:181:[value] warning: function __gen_e_acsl_free, behavior deallocation: postcondition got status unknown.
-tests/e-acsl-runtime/valid.c:47:[kernel] warning: accessing left-value that contains escaping addresses.
-                  assert ¬\dangling(&a);
+tests/e-acsl-runtime/valid.c:47:[value] warning: accessing left-value that contains escaping addresses.
+                 assert ¬\dangling(&a);
