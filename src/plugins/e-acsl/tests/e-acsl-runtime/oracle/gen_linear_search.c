@@ -35,16 +35,16 @@ int search(int elt)
     __gen_e_acsl_i = 0;
     while (1) {
       if (__gen_e_acsl_i < k) ; else break;
-      __e_acsl_assert(__gen_e_acsl_i < 10,(char *)"RTE",(char *)"search",
-                      (char *)"index_bound: __gen_e_acsl_i < 10",18);
-      __e_acsl_assert(0 <= __gen_e_acsl_i,(char *)"RTE",(char *)"search",
-                      (char *)"index_bound: 0 <= __gen_e_acsl_i",18);
-      if (A[__gen_e_acsl_i] < elt) ;
+      __e_acsl_assert((unsigned int)((unsigned long)__gen_e_acsl_i) < 10,
+                      (char *)"RTE",(char *)"search",
+                      (char *)"index_bound: (unsigned long)__gen_e_acsl_i < 10",
+                      18);
+      if (A[(unsigned long)__gen_e_acsl_i] < elt) ;
       else {
         __gen_e_acsl_forall = 0;
         goto e_acsl_end_loop1;
       }
-      __gen_e_acsl_i ++;
+      __gen_e_acsl_i = (int)(__gen_e_acsl_i + 1L);
     }
     e_acsl_end_loop1: ;
     __e_acsl_assert(__gen_e_acsl_forall,(char *)"Invariant",(char *)"search",
@@ -79,18 +79,16 @@ int search(int elt)
         __gen_e_acsl_i_2 = 0;
         while (1) {
           if (__gen_e_acsl_i_2 < k) ; else break;
-          __e_acsl_assert(__gen_e_acsl_i_2 < 10,(char *)"RTE",
-                          (char *)"search",
-                          (char *)"index_bound: __gen_e_acsl_i_2 < 10",18);
-          __e_acsl_assert(0 <= __gen_e_acsl_i_2,(char *)"RTE",
-                          (char *)"search",
-                          (char *)"index_bound: 0 <= __gen_e_acsl_i_2",18);
-          if (A[__gen_e_acsl_i_2] < elt) ;
+          __e_acsl_assert((unsigned int)((unsigned long)__gen_e_acsl_i_2) < 10,
+                          (char *)"RTE",(char *)"search",
+                          (char *)"index_bound: (unsigned long)__gen_e_acsl_i_2 < 10",
+                          18);
+          if (A[(unsigned long)__gen_e_acsl_i_2] < elt) ;
           else {
             __gen_e_acsl_forall_2 = 0;
             goto e_acsl_end_loop2;
           }
-          __gen_e_acsl_i_2 ++;
+          __gen_e_acsl_i_2 = (int)(__gen_e_acsl_i_2 + 1L);
         }
         e_acsl_end_loop2: ;
         __e_acsl_assert(__gen_e_acsl_forall_2,(char *)"Invariant",
@@ -150,10 +148,10 @@ int __gen_e_acsl_search(int elt)
     __gen_e_acsl_i = 0;
     while (1) {
       if (__gen_e_acsl_i < 9) ; else break;
-      __e_acsl_assert(__gen_e_acsl_i + 1 < 10,(char *)"RTE",(char *)"search",
-                      (char *)"index_bound: (int)(__gen_e_acsl_i+1) < 10",7);
-      __e_acsl_assert(0 <= __gen_e_acsl_i + 1,(char *)"RTE",(char *)"search",
-                      (char *)"index_bound: 0 <= (int)(__gen_e_acsl_i+1)",7);
+      __e_acsl_assert((unsigned int)((unsigned long)(__gen_e_acsl_i + 1)) < 10,
+                      (char *)"RTE",(char *)"search",
+                      (char *)"index_bound: (unsigned long)(__gen_e_acsl_i+1) < 10",
+                      7);
       __e_acsl_assert(__gen_e_acsl_i < 10,(char *)"RTE",(char *)"search",
                       (char *)"index_bound: __gen_e_acsl_i < 10",7);
       __e_acsl_assert(0 <= __gen_e_acsl_i,(char *)"RTE",(char *)"search",

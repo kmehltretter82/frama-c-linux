@@ -55,27 +55,23 @@ void nested_loops(void)
             __gen_e_acsl_l = 0;
             while (1) {
               if (__gen_e_acsl_l < j) ; else break;
-              __e_acsl_assert(__gen_e_acsl_l < 15,(char *)"RTE",
-                              (char *)"nested_loops",
-                              (char *)"index_bound: __gen_e_acsl_l < 15",19);
-              __e_acsl_assert(0 <= __gen_e_acsl_l,(char *)"RTE",
-                              (char *)"nested_loops",
-                              (char *)"index_bound: 0 <= __gen_e_acsl_l",19);
-              __e_acsl_assert(__gen_e_acsl_k < 10,(char *)"RTE",
-                              (char *)"nested_loops",
-                              (char *)"index_bound: __gen_e_acsl_k < 10",19);
-              __e_acsl_assert(0 <= __gen_e_acsl_k,(char *)"RTE",
-                              (char *)"nested_loops",
-                              (char *)"index_bound: 0 <= __gen_e_acsl_k",19);
-              if ((long)t[__gen_e_acsl_k][__gen_e_acsl_l] == (long)__gen_e_acsl_k * (long)__gen_e_acsl_l) 
-                ;
+              __e_acsl_assert((unsigned int)((unsigned long)__gen_e_acsl_l) < 15,
+                              (char *)"RTE",(char *)"nested_loops",
+                              (char *)"index_bound: (unsigned long)__gen_e_acsl_l < 15",
+                              19);
+              __e_acsl_assert((unsigned int)((unsigned long)__gen_e_acsl_k) < 10,
+                              (char *)"RTE",(char *)"nested_loops",
+                              (char *)"index_bound: (unsigned long)__gen_e_acsl_k < 10",
+                              19);
+              if (t[(unsigned long)__gen_e_acsl_k][(unsigned long)__gen_e_acsl_l] == 
+                  __gen_e_acsl_k * __gen_e_acsl_l) ;
               else {
                 __gen_e_acsl_forall = 0;
                 goto e_acsl_end_loop1;
               }
-              __gen_e_acsl_l ++;
+              __gen_e_acsl_l = (int)(__gen_e_acsl_l + 1L);
             }
-            __gen_e_acsl_k ++;
+            __gen_e_acsl_k = (int)(__gen_e_acsl_k + 1L);
           }
           e_acsl_end_loop1: ;
           __e_acsl_assert(__gen_e_acsl_forall,(char *)"Invariant",
@@ -111,36 +107,27 @@ void nested_loops(void)
                 __gen_e_acsl_l_2 = 0;
                 while (1) {
                   if (__gen_e_acsl_l_2 < j) ; else break;
-                  __e_acsl_assert(__gen_e_acsl_l_2 < 15,(char *)"RTE",
-                                  (char *)"nested_loops",
-                                  (char *)"index_bound: __gen_e_acsl_l_2 < 15",
+                  __e_acsl_assert((unsigned int)((unsigned long)__gen_e_acsl_l_2) < 15,
+                                  (char *)"RTE",(char *)"nested_loops",
+                                  (char *)"index_bound: (unsigned long)__gen_e_acsl_l_2 < 15",
                                   19);
-                  __e_acsl_assert(0 <= __gen_e_acsl_l_2,(char *)"RTE",
-                                  (char *)"nested_loops",
-                                  (char *)"index_bound: 0 <= __gen_e_acsl_l_2",
-                                  19);
-                  __e_acsl_assert(__gen_e_acsl_k_2 < 10,(char *)"RTE",
-                                  (char *)"nested_loops",
-                                  (char *)"index_bound: __gen_e_acsl_k_2 < 10",
-                                  19);
-                  __e_acsl_assert(0 <= __gen_e_acsl_k_2,(char *)"RTE",
-                                  (char *)"nested_loops",
-                                  (char *)"index_bound: 0 <= __gen_e_acsl_k_2",
+                  __e_acsl_assert((unsigned int)((unsigned long)__gen_e_acsl_k_2) < 10,
+                                  (char *)"RTE",(char *)"nested_loops",
+                                  (char *)"index_bound: (unsigned long)__gen_e_acsl_k_2 < 10",
                                   19);
                   /*@ assert
                       Value: initialisation:
-                        \initialized(&t[__gen_e_acsl_k_2][__gen_e_acsl_l_2]);
+                        \initialized(&t[(unsigned long)__gen_e_acsl_k_2][(unsigned long)__gen_e_acsl_l_2]);
                   */
-                  if ((long)t[__gen_e_acsl_k_2][__gen_e_acsl_l_2] == 
-                      (long)__gen_e_acsl_k_2 * (long)__gen_e_acsl_l_2) 
-                    ;
+                  if (t[(unsigned long)__gen_e_acsl_k_2][(unsigned long)__gen_e_acsl_l_2] == 
+                      __gen_e_acsl_k_2 * __gen_e_acsl_l_2) ;
                   else {
                     __gen_e_acsl_forall_2 = 0;
                     goto e_acsl_end_loop2;
                   }
-                  __gen_e_acsl_l_2 ++;
+                  __gen_e_acsl_l_2 = (int)(__gen_e_acsl_l_2 + 1L);
                 }
-                __gen_e_acsl_k_2 ++;
+                __gen_e_acsl_k_2 = (int)(__gen_e_acsl_k_2 + 1L);
               }
               e_acsl_end_loop2: ;
               __e_acsl_assert(__gen_e_acsl_forall_2,(char *)"Invariant",

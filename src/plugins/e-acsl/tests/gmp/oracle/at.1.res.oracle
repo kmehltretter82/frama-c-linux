@@ -14,28 +14,30 @@
 [value] using specification for function __e_acsl_memory_init
 [value] using specification for function __e_acsl_store_block
 [value] using specification for function __e_acsl_full_init
-[value] using specification for function __e_acsl_delete_block
 [value] using specification for function __gmpz_init_set_si
+[value] using specification for function __gmpz_init_set
+[value] using specification for function __gmpz_clear
+[value] using specification for function __e_acsl_delete_block
 [value] using specification for function __gmpz_cmp
 [value] using specification for function __e_acsl_assert
 FRAMAC_SHARE/e-acsl/e_acsl.h:43:[value] warning: function __e_acsl_assert: precondition got status unknown.
-[value] using specification for function __gmpz_clear
+[value] using specification for function __gmpz_init_set_ui
 [value] using specification for function __gmpz_init
 [value] using specification for function __gmpz_add
-[value] using specification for function __gmpz_init_set
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:53:[value] warning: function __gmpz_init_set: precondition got status unknown.
 tests/gmp/at.i:12:[value] cannot evaluate ACSL term, \at() on a C label is unsupported
 tests/gmp/at.i:12:[value] warning: assertion got status unknown.
-tests/gmp/at.i:51:[value] cannot evaluate ACSL term, \at() on a C label is unsupported
-tests/gmp/at.i:51:[value] warning: assertion got status unknown.
-tests/gmp/at.i:52:[value] cannot evaluate ACSL term, \at() on a C label is unsupported
-tests/gmp/at.i:52:[value] warning: assertion got status unknown.
-tests/gmp/at.i:53:[value] cannot evaluate ACSL term, \at() on a C label is unsupported
-tests/gmp/at.i:53:[value] warning: assertion got status unknown.
+tests/gmp/at.i:48:[value] cannot evaluate ACSL term, \at() on a C label is unsupported
+tests/gmp/at.i:48:[value] warning: assertion got status unknown.
+tests/gmp/at.i:49:[value] cannot evaluate ACSL term, \at() on a C label is unsupported
+tests/gmp/at.i:49:[value] warning: assertion got status unknown.
+tests/gmp/at.i:50:[value] cannot evaluate ACSL term, \at() on a C label is unsupported
+tests/gmp/at.i:50:[value] warning: assertion got status unknown.
 [value] using specification for function __e_acsl_initialize
 [value] using specification for function __e_acsl_valid_read
-tests/gmp/at.i:30:[value] cannot evaluate ACSL term, \at() on a C label is unsupported
-tests/gmp/at.i:30:[value] warning: assertion got status unknown.
-tests/gmp/at.i:32:[value] cannot evaluate ACSL term, \at() on a C label is unsupported
-tests/gmp/at.i:32:[value] warning: assertion got status unknown.
+tests/gmp/at.i:26:[value] cannot evaluate ACSL term, \at() on a C label is unsupported
+tests/gmp/at.i:26:[value] warning: assertion got status unknown.
+tests/gmp/at.i:28:[value] cannot evaluate ACSL term, \at() on a C label is unsupported
+tests/gmp/at.i:28:[value] warning: assertion got status unknown.
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main

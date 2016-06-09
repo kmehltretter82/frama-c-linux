@@ -60,12 +60,14 @@ PLUGIN_CMO:= local_config \
 	dup_functions \
 	label \
 	env \
+	interval \
 	typing \
 	quantif \
 	translate \
 	loops \
 	visit \
 	main
+
 PLUGIN_HAS_MLI:=yes
 PLUGIN_DISTRIBUTED:=no
 

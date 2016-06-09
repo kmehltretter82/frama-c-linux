@@ -5,12 +5,14 @@ tests/e-acsl-runtime/valid.c:14:[e-acsl] warning: E-ACSL construct `complete beh
                   Ignoring annotation.
 tests/e-acsl-runtime/valid.c:14:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
                   Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:178:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+FRAMAC_SHARE/libc/stdlib.h:179:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
                   Ignoring annotation.
 FRAMAC_SHARE/libc/stdlib.h:178:[e-acsl] warning: E-ACSL construct `\allocate' is not yet supported. Ignoring annotation.
 FRAMAC_SHARE/libc/stdlib.h:178:[e-acsl] warning: E-ACSL construct `complete behaviors' is not yet supported.
                   Ignoring annotation.
 FRAMAC_SHARE/libc/stdlib.h:178:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:178:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
                   Ignoring annotation.
 FRAMAC_SHARE/libc/stdlib.h:161:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
                   Ignoring annotation.

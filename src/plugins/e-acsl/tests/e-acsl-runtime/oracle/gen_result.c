@@ -69,7 +69,7 @@ int __gen_e_acsl_f(int x)
   __gen_e_acsl_at_2 = x;
   __gen_e_acsl_at = x;
   __retres = f(x);
-  __e_acsl_assert(__retres == (int)((long)__gen_e_acsl_at - (long)__gen_e_acsl_at_2),
+  __e_acsl_assert(__retres == (int)(__gen_e_acsl_at - __gen_e_acsl_at_2),
                   (char *)"Postcondition",(char *)"f",
                   (char *)"\\result == (int)(\\old(x)-\\old(x))",5);
   return __retres;

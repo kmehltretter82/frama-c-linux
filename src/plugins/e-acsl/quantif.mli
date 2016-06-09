@@ -35,7 +35,7 @@ val named_predicate_to_exp_ref:
   (kernel_function -> Env.t -> predicate named -> exp * Env.t) ref
 
 val term_to_exp_ref: 
-  (kernel_function -> Env.t -> typ option -> term -> exp * Env.t) ref
+  (kernel_function -> Env.t -> term -> exp * Env.t) ref
 
 (*
 Local Variables:

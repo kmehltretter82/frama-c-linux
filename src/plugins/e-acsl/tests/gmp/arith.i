@@ -1,11 +1,11 @@
 /* run.config
    COMMENT: arithmetic operations
-   COMMENT: add the last assertion when fixing BTS #751
 */
 
 int main(void) {
   int x = -3;
   int y = 2;
+  long z = 2L;
 
   /*@ assert -3 == x; */ ;
   /*@ assert x == -3; */ ;
@@ -28,7 +28,10 @@ int main(void) {
   /*@ assert (0 != 1) == !(0 != 0); */ ;
 
   /*@ assert 0 == !1; */ ;
-  /*@ assert 4 / y == 2; */ /* non trivial division */
+  /*@ assert 4 / y == 2; */ // non trivial division added when fixing bts #751
+
+  // example from the JFLA'15 paper (but for a 64-bit architecture)
+  /*@ assert 1 + ((z+1) / (y-123456789123456789)) == 1; */
 
   return 0;
 }
