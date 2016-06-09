@@ -110,6 +110,8 @@ type computed_info =
                          must be casted to. If [None], no cast needed. *)
     }
 
+(* Memoization module which retrieves the computed info of some terms. If the
+   info is already computed for a term, it is never recomputed *)
 module Memo: sig
   val memo: (term -> computed_info) -> term -> computed_info
   val get: term -> computed_info
@@ -118,6 +120,19 @@ end = struct
 
   module H = Hashtbl.Make(struct
     type t = term
+    (* the comparison over terms is the physical equality. It cannot be the
+       structural one (given by [Cil_datatype.Term.equal]) because the very
+       same term can be used in 2 different contexts which lead to different
+       casts.
+
+       By construction, there are no physically equal terms in the AST
+       built by Cil. Consequently the memoisation should be fully
+       useless. However the translation of E-ACSL guarded quantification
+       generates new terms (see module {!Quantif}) which must be typed. The term
+       corresponding to the bound variable [x] is actually used twice: once in
+       the guard and once for encoding [x+1] when incrementing it. The
+       memoization is only useful here and indeed prevent the generation of
+       one extra variable in some cases. *)
     let equal (t1:term) t2 = t1 == t2
     let hash = Cil_datatype.Term.hash
   end)
