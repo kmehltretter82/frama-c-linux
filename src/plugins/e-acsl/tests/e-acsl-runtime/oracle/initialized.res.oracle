@@ -57,11 +57,11 @@ tests/e-acsl-runtime/initialized.c:74:[value] warning: assertion got status unkn
 tests/e-acsl-runtime/initialized.c:76:[value] warning: assertion got status unknown.
 FRAMAC_SHARE/libc/stdlib.h:179:[value] warning: function __gen_e_acsl_free, behavior deallocation: precondition 'freeable' got status unknown. (Behavior may be inactive, no reduction performed.)
 FRAMAC_SHARE/libc/stdlib.h:181:[value] warning: function __gen_e_acsl_free, behavior deallocation: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
-FRAMAC_SHARE/libc/stdlib.h:179:[value] warning: pointer comparison. assert \pointer_comparable(p, (void *)0);
-FRAMAC_SHARE/libc/stdlib.h:178:[value] warning: pointer comparison. assert \pointer_comparable(p, (void *)0);
+FRAMAC_SHARE/libc/stdlib.h:179:[kernel] warning: pointer comparison. assert \pointer_comparable(p, (void *)0);
+FRAMAC_SHARE/libc/stdlib.h:178:[kernel] warning: pointer comparison. assert \pointer_comparable(p, (void *)0);
 tests/e-acsl-runtime/initialized.c:84:[value] warning: assertion got status unknown.
 tests/e-acsl-runtime/initialized.c:85:[value] warning: assertion got status unknown.
 tests/e-acsl-runtime/initialized.c:93:[value] warning: assertion got status unknown.
 tests/e-acsl-runtime/initialized.c:96:[value] warning: assertion got status unknown.
-tests/e-acsl-runtime/initialized.c:107:[value] warning: out of bounds write. assert \valid(partsi+i);
-tests/e-acsl-runtime/initialized.c:105:[value] warning: out of bounds write. assert \valid(partsc+i);
+tests/e-acsl-runtime/initialized.c:107:[kernel] warning: out of bounds write. assert \valid(partsi+i);
+tests/e-acsl-runtime/initialized.c:105:[kernel] warning: out of bounds write. assert \valid(partsc+i);

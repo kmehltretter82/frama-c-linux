@@ -22,4 +22,4 @@ FRAMAC_SHARE/libc/stdlib.h:166:[e-acsl] warning: E-ACSL construct `logic functio
                   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 tests/e-acsl-runtime/freeable.c:15:[value] warning: assertion got status unknown.
-tests/e-acsl-runtime/freeable.c:15:[value] warning: accessing uninitialized left-value. assert \initialized(&p);
+tests/e-acsl-runtime/freeable.c:15:[kernel] warning: accessing uninitialized left-value. assert \initialized(&p);
