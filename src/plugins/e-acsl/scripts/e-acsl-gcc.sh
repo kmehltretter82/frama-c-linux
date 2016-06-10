@@ -33,6 +33,14 @@ error () {
   fi
 }
 
+# Check whether the first line reported by running command $1 has an identifier
+# specified by $2. E.g., check whether readlink used by the script is GNU and
+# getopt comes from util-linux.
+required_tool() {
+  "$1" --version 2>&1 | head -1 | grep "$2" > /dev/null
+  error "$1 is not $2" $?
+}
+
 # Check if a given executable name can be found by in the PATH
 has_tool() {
   which "$@" >/dev/null 2>&1 && return 0 || return 1
@@ -281,13 +289,13 @@ do
     # Supply Frama-C executable name
     -I|--frama-c)
       shift;
-      OPTION_FRAMAC="$1"
+      OPTION_FRAMAC="$(which $1)"
       shift;
     ;;
     # Supply GCC executable name
     -G|--gcc)
       shift;
-      OPTION_CC="$1"
+      OPTION_CC="$(which $1)"
       shift;
     ;;
     # Specify EACSL_SHARE directory (where C runtime library lives) by hand
