@@ -216,6 +216,7 @@ do
       OPTION_OUTPUT_EXEC="$1"
       shift
     ;;
+    # Specify the output name of the E-ACSL generated executable
     --oexec-e-acsl)
       shift;
       OPTION_EACSL_OUTPUT_EXEC="$1"
