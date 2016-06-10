@@ -56,9 +56,8 @@ check_tool() {
 LONGOPTIONS="help,compile,compile-only,print,debug:,ocode:,oexec:,verbose:,
   frama-c-only,extra-cpp-args:,frama-c-stdlib,full-mmodel,gmp,quiet,logfile:,
   ld-flags:,cpp-flags:,frama-c-extra:,memory-model:,production,no-stdlib,
-  debug-log:,frama-c:,gcc:,e-acsl-share:,instrumented-only,rte,no-int-overflow,
-  oexec-e-acsl:"
-SHORTOPTIONS="i,h,c,C,p,d:,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,P,N,D:,I:,G:,X,a"
+  debug-log:,frama-c:,gcc:,e-acsl-share:,instrumented-only,rte,oexec-e-acsl:"
+SHORTOPTIONS="h,c,C,p,d:,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,P,N,D:,I:,G:,X,a"
 # Prefix for an error message due to wrong arguments
 ERROR="ERROR parsing arguments:"
 
@@ -307,11 +306,7 @@ do
     ;;
     --rte|-a)
       shift
-      OPTION_RTE="-rte -rte-mem -rte-no-float-to-int"
-    ;;
-    --no-int-overflow|-i)
-        shift
-        FRAMAC_FLAGS="-no-warn-signed-overflow -no-warn-unsigned-overflow $FRAMAC_FLAGS"
+      OPTION_RTE="-rte -rte-mem -rte-no-float-to-int -no-warn-signed-overflow -no-warn-unsigned-overflow"
     ;;
     # A memory model  (or models) to link against
     -m|--memory-model)
