@@ -351,7 +351,7 @@ if [ -f "$BASEDIR/../E_ACSL.mli" ]; then
   EACSL_SHARE="$DEVELOPMENT/share/e-acsl"
   # Add the project directory to FRAMAC_PLUGINS,
   # otherwise Frama-C uses an installed version
-  FRAMAC_FLAGS="-add-path=$DEVELOPMENT $FRAMAC_FLAGS"
+  FRAMAC_FLAGS="-add-path=$DEVELOPMENT/top -add-path=$DEVELOPMENT $FRAMAC_FLAGS"
 else
   # Installed version. FRAMAC_SHARE should not be used here as Frama-C
   # and E-ACSL may not be installed to the same location
