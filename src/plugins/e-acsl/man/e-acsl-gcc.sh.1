@@ -111,6 +111,9 @@ redirect all output to a given file.
 .B -F, --frama-c-extra=\fI<FLAGS>
 pass an extra option to a \fBFrama-C\fP invocation.
 .TP
+.B -a, --rte
+annotate a source program with assertions validating pointer or array access prior to instrumentation.
+.TP
 .B -m, --memory-model=\fI<model>
 memory model (i.e., a runtime library for checking memory related annotations)
 to be linked against the instrumented file.
