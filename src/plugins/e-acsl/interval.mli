@@ -32,16 +32,16 @@
     devenir plus rapide, plus précis et plus mince".
 
     Example: consider a variable [x] of type [int] on a (strange) architecture
-    in which values of type [int] belongs to the interval [[-128;127]] and a
-    logic variable [[y] which was registered in the environment with an interval
-    [[-32;31]]. Then here are the intervals computed from the term
+    in which values of type [int] belongs to the interval \[-128;127\] and a
+    logic variable [y] which was registered in the environment with an interval
+    \[-32;31\]. Then here are the intervals computed from the term
     [1+(x+1)/(y-64)]:
-    1. x \in [[128;127]];
-    2. x+1 \in [[129;128]];
-    3. y \in [[-32;31]];
-    4. y-64 \in [[-96;-33]];
-    5. (x+1)/(y-64) \in [[-3;3]];
-    6. 1+(x+1)/(y-64) \in [[-2;4]] *)
+    1. x in \[128;127\];
+    2. x+1 in \[129;128\];
+    3. y in \[-32;31\];
+    4. y-64 in \[-96;-33\];
+    5. (x+1)/(y-64) in \[-3;3\];
+    6. 1+(x+1)/(y-64) in \[-2;4\] *)
 
 type interv = private { lower: Integer.t; upper: Integer.t }
 include Datatype.S with type t = interv
@@ -57,8 +57,11 @@ val meet: t -> t -> t
 (** {3 Useful operations on intervals} *)
 (* ************************************************************************** *)
 
+exception Not_an_integer
+
 val interv_of_typ: Cil_types.typ -> t
-(** @return the smallest interval which contains the given C type. *)
+(** @return the smallest interval which contains the given C type.
+    @raise Not_an_integer if the given type is not an integral type. *)
 
 val add: t -> Integer.t -> t
 (** @return the minimal interval containing both the interval and the integer
@@ -79,7 +82,6 @@ end
 (** {3 Inference system} *)
 (* ************************************************************************** *)
 
-exception Not_an_integer
 val infer: Cil_types.term -> t
 (** [infer t] infers the smallest possible integer interval which the values
     of the term can fit in.

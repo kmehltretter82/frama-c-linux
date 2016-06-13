@@ -62,7 +62,7 @@ val gmp: integer_ty
 val c_int: integer_ty
 val ikind: ikind -> integer_ty
 
-(** {3 Useful operations over {!integer_ty} *)
+(** {3 Useful operations over {!integer_ty}} *)
 
 exception Not_an_integer
 val typ_of_integer_ty: integer_ty -> typ
