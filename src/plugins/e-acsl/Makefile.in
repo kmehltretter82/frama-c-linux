@@ -140,10 +140,10 @@ clean::
 	$(PRINT_RM) benchmarking tools
 	$(RM) $(BM_TOOLS_BINARIES)
 
-######################
-# Jemalloc					 #
-######################
-JEMALLOC_DIR = $(PLUGIN_DIR)/contrib/jemalloc
+################################################
+# E-ACSL C Libs: libjemalloc, libgmp					 #
+################################################
+JEMALLOC_DIR = $(PLUGIN_DIR)/contrib/libjemalloc
 JEMALLOC_LIBDIR = $(JEMALLOC_DIR)/lib
 JEMALLOC_LIBNAME = libjemalloc-e-acsl.a
 EACSL_JEMALLOC_LIB = $(JEMALLOC_LIBDIR)/$(JEMALLOC_LIBNAME)
@@ -158,15 +158,29 @@ $(EACSL_JEMALLOC_LIB):
   		--with-jemalloc-prefix="$(PUBLIC_PREFIX)" \
   		--with-private-namespace="$(PRIVATE_PREFIX)" \
   		--with-install-suffix="$(INSTALL_SUFFIX)" && \
-		$(MAKE) lib/$(JEMALLOC_LIBNAME)
+		$(MAKE) $(MAKEOPTS) lib/$(JEMALLOC_LIBNAME)
 
-all:: $(EACSL_JEMALLOC_LIB)
+GMP_DIR = $(PLUGIN_DIR)/contrib/libgmp
+GMP_LIBDIR = $(GMP_DIR)
+GMP_LIBNAME = libgmp-e-acsl.a
+
+EACSL_GMP_LIB = $(GMP_LIBDIR)/$(GMP_LIBNAME)
+
+$(EACSL_GMP_LIB):
+	cd $(GMP_DIR) && ./configure && $(MAKE) $(MAKEOPTS)
+	$(CP) $(GMP_DIR)/.libs/libgmp.a $(EACSL_GMP_LIB)
+
+all:: $(EACSL_JEMALLOC_LIB) $(EACSL_GMP_LIB)
 
 clean::
-	$(PRINT_RM) jemalloc library
+	$(PRINT_RM) e-acsl contrib libraries
 	$(RM) $(EACSL_JEMALLOC_LIB)
 	if test -f $(JEMALLOC_DIR)/Makefile; \
 		then $(MAKE) -C$(JEMALLOC_DIR) distclean; \
+	fi
+	$(RM) $(EACSL_GMP_LIB)
+	if test -f $(GMP_DIR)/Makefile; \
+		then $(MAKE) -C$(GMP_DIR) distclean; \
 	fi
 
 ############
@@ -285,6 +299,7 @@ install::
 	$(PRINT_INSTALL) E-ACSL libraries
 	$(MKDIR) $(LIBDIR)
 	$(CP) $(EACSL_JEMALLOC_LIB) $(LIBDIR)
+	$(CP) $(EACSL_GMP_LIB) $(LIBDIR)
 	$(PRINT_INSTALL) E-ACSL scripts
 	$(MKDIR) $(BINDIR)
 	$(CP) $(E_ACSL_DIR)/scripts/e-acsl-gcc.sh $(BINDIR)/
@@ -303,6 +318,7 @@ uninstall::
 	$(PRINT_INSTALL) E-ACSL share files
 	$(MKDIR) $(FRAMAC_DATADIR)/e-acsl
 	$(RM) $(LIBDIR)/$(JEMALLOC_LIBNAME)
+	$(RM) $(LIBDIR)/$(GMP_LIBNAME)
 	$(PRINT_RM) E-ACSL scripts
 	$(RM) $(BINDIR)/e-acsl-gcc.sh
 	$(PRINT_RM) man pages
