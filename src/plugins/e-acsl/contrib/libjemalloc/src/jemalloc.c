@@ -36,7 +36,7 @@ bool	opt_junk_free =
     ;
 
 size_t	opt_quarantine = ZU(0);
-bool	opt_redzone = false;
+bool	opt_redzone = true;
 bool	opt_utrace = false;
 bool	opt_xmalloc = false;
 bool	opt_zero = false;
