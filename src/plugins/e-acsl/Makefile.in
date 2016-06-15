@@ -46,6 +46,7 @@ endif
 #########################
 
 PLUGIN_DIR ?=.
+PLUGIN_LIB = $(PLUGIN_DIR)/lib
 PLUGIN_ENABLE:=@ENABLE_E_ACSL@
 PLUGIN_DYNAMIC:=@DYNAMIC_E_ACSL@
 PLUGIN_NAME:=E_ACSL
@@ -144,41 +145,34 @@ clean::
 # E-ACSL C Libs: libjemalloc, libgmp					 #
 ################################################
 JEMALLOC_DIR = $(PLUGIN_DIR)/contrib/libjemalloc
-JEMALLOC_LIBDIR = $(JEMALLOC_DIR)/lib
 JEMALLOC_LIBNAME = libjemalloc-e-acsl.a
-EACSL_JEMALLOC_LIB = $(JEMALLOC_LIBDIR)/$(JEMALLOC_LIBNAME)
+JEMALLOC_LIB = $(PLUGIN_LIB)/$(JEMALLOC_LIBNAME)
 
-PUBLIC_PREFIX  = "__e_acsl_native_" # Prefix of public jemalloc functions
-PRIVATE_PREFIX = "__e_acsl_hidden_" # Suffix of private jemalloc functions
-INSTALL_SUFFIX = "-e-acsl" # Suffix of generated jemalloc library
-
-$(EACSL_JEMALLOC_LIB):
+$(JEMALLOC_LIB):
 	cd $(JEMALLOC_DIR) && \
 		./autogen.sh \
-  		--with-jemalloc-prefix="$(PUBLIC_PREFIX)" \
-  		--with-private-namespace="$(PRIVATE_PREFIX)" \
-  		--with-install-suffix="$(INSTALL_SUFFIX)" && \
+  		--with-jemalloc-prefix="__e_acsl_native_" \
+  		--with-private-namespace="__e_acsl_hidden_" \
+  		--with-install-suffix="-e-acsl" && \
 		$(MAKE) $(MAKEOPTS) lib/$(JEMALLOC_LIBNAME)
+	$(CP) $(JEMALLOC_DIR)/lib/$(JEMALLOC_LIBNAME) $@
 
 GMP_DIR = $(PLUGIN_DIR)/contrib/libgmp
-GMP_LIBDIR = $(GMP_DIR)
 GMP_LIBNAME = libgmp-e-acsl.a
+GMP_LIB = $(PLUGIN_LIB)/$(GMP_LIBNAME)
 
-EACSL_GMP_LIB = $(GMP_LIBDIR)/$(GMP_LIBNAME)
-
-$(EACSL_GMP_LIB):
+$(GMP_LIB):
 	cd $(GMP_DIR) && ./configure && $(MAKE) $(MAKEOPTS)
-	$(CP) $(GMP_DIR)/.libs/libgmp.a $(EACSL_GMP_LIB)
+	$(CP) $(GMP_DIR)/.libs/libgmp.a $@
 
-all:: $(EACSL_JEMALLOC_LIB) $(EACSL_GMP_LIB)
+all:: $(JEMALLOC_LIB) $(GMP_LIB)
 
 clean::
 	$(PRINT_RM) e-acsl contrib libraries
-	$(RM) $(EACSL_JEMALLOC_LIB)
+	$(RM) $(JEMALLOC_LIB) $(GMP_LIB)
 	if test -f $(JEMALLOC_DIR)/Makefile; \
 		then $(MAKE) -C$(JEMALLOC_DIR) distclean; \
 	fi
-	$(RM) $(EACSL_GMP_LIB)
 	if test -f $(GMP_DIR)/Makefile; \
 		then $(MAKE) -C$(GMP_DIR) distclean; \
 	fi
@@ -298,8 +292,8 @@ install::
 		$(FRAMAC_DATADIR)/manuals
 	$(PRINT_INSTALL) E-ACSL libraries
 	$(MKDIR) $(LIBDIR)
-	$(CP) $(EACSL_JEMALLOC_LIB) $(LIBDIR)
-	$(CP) $(EACSL_GMP_LIB) $(LIBDIR)
+	$(CP) $(JEMALLOC_LIB) $(LIBDIR)
+	$(CP) $(GMP_LIB) $(LIBDIR)
 	$(PRINT_INSTALL) E-ACSL scripts
 	$(MKDIR) $(BINDIR)
 	$(CP) $(E_ACSL_DIR)/scripts/e-acsl-gcc.sh $(BINDIR)/

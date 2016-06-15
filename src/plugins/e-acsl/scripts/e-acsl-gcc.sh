@@ -113,6 +113,8 @@ Notes:
 
 # Base dir of this script
 BASEDIR="$(readlink -f `dirname $0`)"
+# Directory with contrib libraries of E-ACSL
+LIBDIR="$BASEDIR/../lib"
 
 # See if pygmentize if available for color highlighting and default to plain
 # cat command otherwise
@@ -328,10 +330,6 @@ FRAMAC="$OPTION_FRAMAC"
 FRAMAC_SHARE="`$FRAMAC -print-share-path`"
 FRAMAC_PLUGIN="`$FRAMAC -print-plugin-path`"
 
-# Name of the malloc library to use
-LIBJEMALLOC="libjemalloc-e-acsl.a"
-LIBGMP="libgmp-e-acsl.a"
-
 # Check if this is a development or an installed version
 if [ -f "$BASEDIR/../E_ACSL.mli" ]; then
   # Development version
@@ -346,14 +344,10 @@ if [ -f "$BASEDIR/../E_ACSL.mli" ]; then
   # Add the project directory to FRAMAC_PLUGINS,
   # otherwise Frama-C uses an installed version
   FRAMAC_FLAGS="-add-path=$DEVELOPMENT $FRAMAC_FLAGS"
-  LIBJEMALLOC="$BASEDIR/../contrib/libjemalloc/lib/$LIBJEMALLOC"
-  LIBGMP="$BASEDIR/../contrib/libgmp/libgmp-e-acsl.a"
 else
   # Installed version. FRAMAC_SHARE should not be used here as Frama-C
   # and E-ACSL may not be installed to the same location
   EACSL_SHARE="$BASEDIR/../share/frama-c/e-acsl/"
-  LIBJEMALLOC="$BASEDIR/../lib/$LIBJEMALLOC"
-  LIBGMP="$BASEDIR/../lib/$LIBGMP"
 fi
 
 # Architecture-dependent flags. Since by default Frama-C uses 32-bit
@@ -450,9 +444,8 @@ LDFLAGS="$OPTION_LDFLAGS"
 EACSL_CFLAGS=""
 EACSL_CPPFLAGS="
   -I$EACSL_SHARE
-  -D$EACSL_MACRO_ID
-  -D__FC_errno=(*__errno_location())"
-EACSL_LDFLAGS="$LIBGMP -lm $LIBJEMALLOC -lpthread"
+  -D$EACSL_MACRO_ID"
+EACSL_LDFLAGS="-lm $LIBDIR/libgmp-e-acsl.a $LIBDIR/libjemalloc-e-acsl.a -lpthread"
 
 # Output file names
 OUTPUT_CODE="$OPTION_OUTPUT_CODE" # E-ACSL instrumented source
