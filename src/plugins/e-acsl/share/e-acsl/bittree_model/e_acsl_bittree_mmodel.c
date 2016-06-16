@@ -104,33 +104,60 @@ static void bittree_delete_block(void* ptr) {
 /* allocate size bytes and store the returned block
  * for further information, see malloc */
 static void* bittree_malloc(size_t size) {
-  void * tmp;
-  bt_block * new_block;
-  if(size <= 0)
+  if(size == 0)
     return NULL;
-  tmp = native_malloc(size);
-  if(tmp == NULL)
-    return NULL;
-  new_block = __e_acsl_store_block(tmp, size);
-  __e_acsl_heap_size += size;
-  DASSERT(new_block != NULL && (void*)new_block->ptr != NULL);
-  new_block->freeable = true;
-  return (void*)new_block->ptr;
+
+  void *res = native_malloc(size);
+  if (res) {
+    bt_block * new_block = bittree_store_block(res, size);
+    __e_acsl_heap_size += size;
+    new_block->freeable = true;
+  }
+  return res;
 }
 
-/* free the block starting at ptr,
- * for further information, see free */
-static void bittree_free(void* ptr) {
-  bt_block * tmp;
-  if(ptr == NULL)
-    return;
-  tmp = bt_lookup(ptr);
-  DASSERT(tmp != NULL);
-  native_free(ptr);
-  bt_clean_block_init(tmp);
-  __e_acsl_heap_size -= tmp->size;
-  bt_remove(tmp);
-  native_free(tmp);
+/* \brief Allocate `size` bytes of memory such that the allocation's base
+ * address is an even multiple of alignment.
+ *
+ * \param alignment - should be the power of two
+ * \param size - should be the multiple of alignment
+ * \return - pointer to the allocated memory if the restrictions placed on size
+ *   and alignment parameters hold. NULL is returned otherwise. */
+void *bittree_aligned_alloc(size_t alignment, size_t size) {
+  /* Check if:
+   *  - size and alignment are greater than zero
+   *  - alignment is a power of 2
+   *  - size is a multiple of alignment */
+  if (size == 0 || alignment > 0 || !powof2(alignment) || (size%alignment))
+    return NULL;
+
+  void *res = native_aligned_alloc(alignment, size);
+  if (res) {
+    bt_block * new_block = bittree_store_block(res, size);
+    new_block->freeable = 1;
+    __e_acsl_heap_size += size;
+  }
+  return res;
+}
+
+/* allocate memory for an array of nbr_block elements of size_block size,
+ * this memory is set to zero, the returned block is stored,
+ * for further information, see calloc */
+void* bittree_calloc(size_t nbr_block, size_t size_block) {
+  /* FIXME: Need an integer overflow check here */
+  size_t size = nbr_block * size_block;
+  if (size == 0)
+    return NULL;
+
+  void *res = native_calloc(nbr_block, size_block);
+  if (res) {
+    bt_block * new_block = bittree_store_block(res, size);
+    __e_acsl_heap_size += size;
+    new_block->freeable = 1;
+    /* Mark allocated block as freeable and initialized */
+    new_block->init_bytes = size;
+  }
+  return res;
 }
 
 /* resize the block starting at ptr to fit its new size,
@@ -200,25 +227,19 @@ void* bittree_realloc(void* ptr, size_t size) {
   return (void*)tmp->ptr;
 }
 
-/* allocate memory for an array of nbr_block elements of size_block size,
- * this memory is set to zero, the returned block is stored,
- * for further information, see calloc */
-void* bittree_calloc(size_t nbr_block, size_t size_block) {
-  void * tmp;
-  size_t size = nbr_block * size_block;
-  bt_block * new_block;
-  if(size <= 0)
-    return NULL;
-  tmp = native_calloc(nbr_block, size_block);
-  if(tmp == NULL)
-    return NULL;
-  new_block = __e_acsl_store_block(tmp, size);
-  __e_acsl_heap_size += nbr_block * size_block;
-  DASSERT(new_block != NULL && (void*)new_block->ptr != NULL);
-  /* Mark allocated block as freeable and initialized */
-  new_block->freeable = true;
-  new_block->init_bytes = size;
-  return (void*)new_block->ptr;
+/* free the block starting at ptr,
+ * for further information, see free */
+static void bittree_free(void* ptr) {
+  bt_block * tmp;
+  if(ptr == NULL)
+    return;
+  tmp = bt_lookup(ptr);
+  DASSERT(tmp != NULL);
+  native_free(ptr);
+  bt_clean_block_init(tmp);
+  __e_acsl_heap_size -= tmp->size;
+  bt_remove(tmp);
+  native_free(tmp);
 }
 /* }}} */
 /* }}} */
@@ -435,7 +456,6 @@ void __e_acsl_print_bittree() {
 /* }}} */
 
 /* ALLOCATION API BINDINGS {{{ */
-
 strong_alias(bittree_malloc,	malloc)
 strong_alias(bittree_calloc, calloc)
 strong_alias(bittree_realloc, realloc)
