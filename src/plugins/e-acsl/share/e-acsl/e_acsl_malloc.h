@@ -60,12 +60,12 @@ extern void  *alloc_func_def(aligned_alloc, size_t, size_t);
 extern int    alloc_func_def(posix_memalign, void **, size_t, size_t);
 extern void   alloc_func_def(free,void*);
 
-# define native_malloc        alloc_func_macro(malloc)
-# define native_realloc       alloc_func_macro(realloc)
-# define native_calloc        alloc_func_macro(calloc)
-# define native_memalign      alloc_func_macro(posix_memalign)
-# define native_aligned_alloc alloc_func_macro(aligned_alloc)
-# define native_free          alloc_func_macro(free)
+# define native_malloc          alloc_func_macro(malloc)
+# define native_realloc         alloc_func_macro(realloc)
+# define native_calloc          alloc_func_macro(calloc)
+# define native_posix_memalign  alloc_func_macro(posix_memalign)
+# define native_aligned_alloc   alloc_func_macro(aligned_alloc)
+# define native_free            alloc_func_macro(free)
 
 /* Return a true value if x is a power of 2 and false otherwise */
 int powof2(size_t x) {

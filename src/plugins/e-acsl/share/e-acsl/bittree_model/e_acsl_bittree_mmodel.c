@@ -62,8 +62,171 @@ static const int nbr_bits_to_1[256] = {
 /**************************/
 size_t __e_acsl_heap_size = 0;
 
-size_t __get_memory_size(void) {
+static size_t memory_size(void) {
   return __e_acsl_heap_size;
+}
+/* }}} */
+
+/**************************/
+/* INITIALIZATION     {{{ */
+/**************************/
+
+/* mark the size bytes of ptr as initialized */
+static void initialize (void * ptr, size_t size) {
+  bt_block * tmp;
+  if(!ptr)
+    return;
+
+  tmp = bt_find(ptr);
+  if(tmp == NULL)
+    return;
+
+  /* already fully initialized, do nothing */
+  if(tmp->init_bytes == tmp->size)
+    return;
+
+  /* fully uninitialized */
+  if(tmp->init_bytes == 0) {
+    int nb = needed_bytes(tmp->size);
+    tmp->init_ptr = native_malloc(nb);
+    memset(tmp->init_ptr, 0, nb);
+  }
+
+  /* partial initialization is kept via a character array accessible via the
+   * tmp->init_ptr. This is such that a N-th bit of tmp->init_ptr tracks
+   * initialization of the N-th byte of the memory block tracked by tmp.
+   *
+   * The following sets individual bits in tmp->init_ptr that track
+   * initialization of `size' bytes starting from `ptr'. */
+  unsigned i;
+  for(i = 0; i < size; i++) {
+    /* byte-offset within the block, i.e., mark `offset' byte as initialized */
+    size_t offset = (uintptr_t)ptr - tmp->ptr + i;
+    /* byte offset within tmp->init_ptr, i.e., a byte containing the bit to
+       be toggled */
+    int byte = offset/8;
+    /* bit-offset within the above byte, i.e., bit to be toggled */
+    int bit = offset%8;
+
+    if (!checkbit(bit, tmp->init_ptr[byte])) { /* if bit is unset ... */
+      setbit(bit, tmp->init_ptr[byte]); /* ... set the bit ... */
+      tmp->init_bytes++; /* ... and increment initialized bytes count */
+    }
+  }
+
+  /* now fully initialized */
+  if(tmp->init_bytes == tmp->size) {
+    native_free(tmp->init_ptr);
+    tmp->init_ptr = NULL;
+  }
+}
+
+/* mark all bytes of ptr as initialized */
+static void full_init (void * ptr) {
+  bt_block * tmp;
+  if (ptr == NULL)
+    return;
+
+  tmp = bt_lookup(ptr);
+  if (tmp == NULL)
+    return;
+
+  if (tmp->init_ptr != NULL) {
+    native_free(tmp->init_ptr);
+    tmp->init_ptr = NULL;
+  }
+  tmp->init_bytes = tmp->size;
+}
+
+/* mark a block as read-only */
+static void readonly(void * ptr) {
+  bt_block * tmp;
+  if (ptr == NULL)
+    return;
+  tmp = bt_lookup(ptr);
+  if (tmp == NULL)
+    return;
+  tmp->is_readonly = true;
+}
+/* }}} */
+
+/**************************/
+/* PREDICATES        {{{  */
+/**************************/
+
+static int freeable(void* ptr) {
+  bt_block * tmp;
+  if(ptr == NULL)
+    return false;
+  tmp = bt_lookup(ptr);
+  if(tmp == NULL)
+    return false;
+  return tmp->freeable;
+}
+
+/* return whether the size bytes of ptr are initialized */
+static int initialized(void * ptr, size_t size) {
+  unsigned i;
+  bt_block * tmp = bt_find(ptr);
+  if(tmp == NULL)
+    return false;
+
+  /* fully uninitialized */
+  if(tmp->init_bytes == 0)
+    return false;
+  /* fully initialized */
+  if(tmp->init_bytes == tmp->size)
+    return true;
+
+  /* see implementation of function `initialize` for details */
+  for(i = 0; i < size; i++) {
+    size_t offset = (uintptr_t)ptr - tmp->ptr + i;
+    int byte = offset/8;
+    int bit = offset%8;
+    if (!checkbit(bit, tmp->init_ptr[byte]))
+      return false;
+  }
+  return true;
+}
+
+/* return the length (in bytes) of the block containing ptr */
+static size_t block_length(void* ptr) {
+  bt_block * tmp = bt_find(ptr);
+  /* Hard failure when un-allocated memory is used  */
+  vassert(tmp != NULL, "\\block_length of unallocated memory", NULL);
+  return tmp->size;
+}
+
+/* return whether the size bytes of ptr are readable/writable */
+static int valid(void* ptr, size_t size) {
+  if(ptr == NULL)
+    return false;
+  bt_block * tmp = bt_find(ptr);
+  return (tmp == NULL) ? false :
+    (tmp->size - ((size_t)ptr - tmp->ptr ) >= size && !tmp->is_readonly);
+}
+
+/* return whether the size bytes of ptr are readable */
+static int valid_read(void* ptr, size_t size) {
+  if(ptr == NULL)
+    return false;
+  bt_block * tmp = bt_find(ptr);
+  return (tmp == NULL) ?
+    false : (tmp->size - ((size_t)ptr - tmp->ptr) >= size);
+}
+
+/* return the base address of the block containing ptr */
+static void* base_addr(void* ptr) {
+  bt_block * tmp = bt_find(ptr);
+  vassert(tmp != NULL, "\\base_addr of unallocated memory", NULL);
+  return (void*)tmp->ptr;
+}
+
+/* return the offset of `ptr` within its block */
+static int offset(void* ptr) {
+  bt_block * tmp = bt_find(ptr);
+  vassert(tmp != NULL, "\\offset of unallocated memory", NULL);
+  return ((size_t)ptr - tmp->ptr);
 }
 /* }}} */
 
@@ -116,30 +279,6 @@ static void* bittree_malloc(size_t size) {
   return res;
 }
 
-/* \brief Allocate `size` bytes of memory such that the allocation's base
- * address is an even multiple of alignment.
- *
- * \param alignment - should be the power of two
- * \param size - should be the multiple of alignment
- * \return - pointer to the allocated memory if the restrictions placed on size
- *   and alignment parameters hold. NULL is returned otherwise. */
-void *bittree_aligned_alloc(size_t alignment, size_t size) {
-  /* Check if:
-   *  - size and alignment are greater than zero
-   *  - alignment is a power of 2
-   *  - size is a multiple of alignment */
-  if (size == 0 || alignment > 0 || !powof2(alignment) || (size%alignment))
-    return NULL;
-
-  void *res = native_aligned_alloc(alignment, size);
-  if (res) {
-    bt_block * new_block = bittree_store_block(res, size);
-    new_block->freeable = 1;
-    __e_acsl_heap_size += size;
-  }
-  return res;
-}
-
 /* allocate memory for an array of nbr_block elements of size_block size,
  * this memory is set to zero, the returned block is stored,
  * for further information, see calloc */
@@ -156,6 +295,55 @@ void* bittree_calloc(size_t nbr_block, size_t size_block) {
     new_block->freeable = 1;
     /* Mark allocated block as freeable and initialized */
     new_block->init_bytes = size;
+  }
+  return res;
+}
+
+/* \brief Allocate `size` bytes of memory such that the allocation's base
+ * address is an even multiple of alignment.
+ *
+ * \param alignment - should be the power of two
+ * \param size - should be the multiple of alignment
+ * \return - pointer to the allocated memory if the restrictions placed on size
+ *   and alignment parameters hold. NULL is returned otherwise. */
+void *bittree_aligned_alloc(size_t alignment, size_t size) {
+  /* Check if:
+   *  - size and alignment are greater than zero
+   *  - alignment is a power of 2
+   *  - size is a multiple of alignment */
+  if (!size || !alignment || !powof2(alignment) || (size%alignment))
+    return NULL;
+
+  void *res = native_aligned_alloc(alignment, size);
+  if (res) {
+    bt_block * new_block = bittree_store_block(res, size);
+    new_block->freeable = 1;
+    __e_acsl_heap_size += size;
+  }
+  return res;
+}
+
+/* \brief Allocate size bytes and place the address of the allocated memory in
+ * `*memptr`.  The address of the allocated memory will be a multiple of
+ * `alignment`, which must be a power of two and a multiple of `sizeof(void*)`.
+ * If size  is  0, then the value placed in *memptr is NULL.
+*/
+int bittree_posix_memalign(void **memptr, size_t alignment, size_t size) {
+ /* Check if:
+   *  - size and alignment are greater than zero
+   *  - alignment is a power of 2 and a multiple of sizeof(void*) */
+  if (!size || !alignment || !powof2(alignment) || alignment%sizeof(void*))
+    return NULL;
+
+  /* Make sure that the first argument to posix memalign is indeed allocated */
+  vassert(valid(memptr, sizeof(void*)),
+      "\\invalid memptr in  posix_memalign", NULL);
+
+  int res = native_posix_memalign(memptr, alignment, size);
+  if (!res) {
+    bt_block * new_block = bittree_store_block(*memptr, size);
+    new_block->freeable = 1;
+    __e_acsl_heap_size += size;
   }
   return res;
 }
@@ -244,198 +432,32 @@ static void bittree_free(void* ptr) {
 /* }}} */
 /* }}} */
 
-/**************************/
-/* INITIALIZATION     {{{ */
-/**************************/
-
-/* mark the size bytes of ptr as initialized */
-void __e_acsl_initialize (void * ptr, size_t size) {
-  bt_block * tmp;
-  if(!ptr)
-    return;
-
-  tmp = bt_find(ptr);
-  if(tmp == NULL)
-    return;
-
-  /* already fully initialized, do nothing */
-  if(tmp->init_bytes == tmp->size)
-    return;
-
-  /* fully uninitialized */
-  if(tmp->init_bytes == 0) {
-    int nb = needed_bytes(tmp->size);
-    tmp->init_ptr = native_malloc(nb);
-    memset(tmp->init_ptr, 0, nb);
-  }
-
-  /* partial initialization is kept via a character array accessible via the
-   * tmp->init_ptr. This is such that a N-th bit of tmp->init_ptr tracks
-   * initialization of the N-th byte of the memory block tracked by tmp.
-   *
-   * The following sets individual bits in tmp->init_ptr that track
-   * initialization of `size' bytes starting from `ptr'. */
-  unsigned i;
-  for(i = 0; i < size; i++) {
-    /* byte-offset within the block, i.e., mark `offset' byte as initialized */
-    size_t offset = (uintptr_t)ptr - tmp->ptr + i;
-    /* byte offset within tmp->init_ptr, i.e., a byte containing the bit to
-       be toggled */
-    int byte = offset/8;
-    /* bit-offset within the above byte, i.e., bit to be toggled */
-    int bit = offset%8;
-
-    if (!checkbit(bit, tmp->init_ptr[byte])) { /* if bit is unset ... */
-      setbit(bit, tmp->init_ptr[byte]); /* ... set the bit ... */
-      tmp->init_bytes++; /* ... and increment initialized bytes count */
-    }
-  }
-
-  /* now fully initialized */
-  if(tmp->init_bytes == tmp->size) {
-    native_free(tmp->init_ptr);
-    tmp->init_ptr = NULL;
-  }
-}
-
-/* mark all bytes of ptr as initialized */
-void __e_acsl_full_init (void * ptr) {
-  bt_block * tmp;
-  if (ptr == NULL)
-    return;
-
-  tmp = bt_lookup(ptr);
-  if (tmp == NULL)
-    return;
-
-  if (tmp->init_ptr != NULL) {
-    native_free(tmp->init_ptr);
-    tmp->init_ptr = NULL;
-  }
-  tmp->init_bytes = tmp->size;
-}
-
-/* mark a block as read-only */
-void __e_acsl_readonly (void * ptr) {
-  bt_block * tmp;
-  if (ptr == NULL)
-    return;
-  tmp = bt_lookup(ptr);
-  if (tmp == NULL)
-    return;
-  tmp->is_readonly = true;
-}
-/* }}} */
-
-/**************************/
-/* PREDICATES        {{{  */
-/**************************/
-
-int __e_acsl_freeable(void* ptr) {
-  bt_block * tmp;
-  if(ptr == NULL)
-    return false;
-  tmp = bt_lookup(ptr);
-  if(tmp == NULL)
-    return false;
-  return tmp->freeable;
-}
-
-/* return whether the size bytes of ptr are initialized */
-int __e_acsl_initialized (void * ptr, size_t size) {
-  unsigned i;
-  bt_block * tmp = bt_find(ptr);
-  if(tmp == NULL)
-    return false;
-
-  /* fully uninitialized */
-  if(tmp->init_bytes == 0)
-    return false;
-  /* fully initialized */
-  if(tmp->init_bytes == tmp->size)
-    return true;
-
-  /* see implementation of function __e_acsl_initialize for details */
-  for(i = 0; i < size; i++) {
-    size_t offset = (uintptr_t)ptr - tmp->ptr + i;
-    int byte = offset/8;
-    int bit = offset%8;
-    if (!checkbit(bit, tmp->init_ptr[byte]))
-      return false;
-  }
-  return true;
-}
-
-/* return the length (in bytes) of the block containing ptr */
-size_t __e_acsl_block_length(void* ptr) {
-  bt_block * tmp = bt_find(ptr);
-  /* Hard failure when un-allocated memory is used  */
-  vassert(tmp != NULL, "\\block_length of unallocated memory", NULL);
-  return tmp->size;
-}
-
-/* return whether the size bytes of ptr are readable/writable */
-int __e_acsl_valid(void* ptr, size_t size) {
-  bt_block * tmp;
-  if(ptr == NULL)
-    return false;
-  tmp = bt_find(ptr);
-  return (tmp == NULL) ?
-    false : ( tmp->size - ( (size_t)ptr - tmp->ptr ) >= size
-	      && !tmp->is_readonly);
-}
-
-/* return whether the size bytes of ptr are readable */
-int __e_acsl_valid_read(void* ptr, size_t size) {
-  bt_block * tmp;
-  if(ptr == NULL)
-    return false;
-  tmp = bt_find(ptr);
-  return (tmp == NULL) ?
-    false : (tmp->size - ((size_t)ptr - tmp->ptr) >= size);
-}
-
-/* return the base address of the block containing ptr */
-void* __e_acsl_base_addr(void* ptr) {
-  bt_block * tmp = bt_find(ptr);
-  vassert(tmp != NULL, "\\base_addr of unallocated memory", NULL);
-  return (void*)tmp->ptr;
-}
-
-/* return the offset of `ptr` within its block */
-int __e_acsl_offset(void* ptr) {
-  bt_block * tmp = bt_find(ptr);
-  vassert(tmp != NULL, "\\offset of unallocated memory", NULL);
-  return ((size_t)ptr - tmp->ptr);
-}
-/* }}} */
-
 /******************************/
 /* PROGRAM INITIALIZATION {{{ */
 /******************************/
 
 /* erase the content of the abstract structure */
-void __e_acsl_memory_clean() {
+static void memory_clean() {
   bt_clean();
 }
 
 /* add `argv` to the memory model */
-static void __init_argv(int argc, char **argv) {
+static void init_argv(int argc, char **argv) {
   int i;
 
-  __e_acsl_store_block(argv, (argc+1)*sizeof(char*));
-  __e_acsl_full_init(argv);
+  bittree_store_block(argv, (argc+1)*sizeof(char*));
+  full_init(argv);
 
   for (i = 0; i < argc; i++) {
-    __e_acsl_store_block(argv[i], strlen(argv[i])+1);
-    __e_acsl_full_init(argv[i]);
+    bittree_store_block(argv[i], strlen(argv[i])+1);
+    full_init(argv[i]);
   }
 }
 
-void __e_acsl_memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
+static void memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
   arch_assert(ptr_size);
   if (argc_ref)
-    __init_argv(*argc_ref, *argv_ref);
+    init_argv(*argc_ref, *argv_ref);
 }
 /* }}} */
 
@@ -455,13 +477,26 @@ void __e_acsl_print_bittree() {
 #endif
 /* }}} */
 
-/* ALLOCATION API BINDINGS {{{ */
+/* API BINDINGS {{{ */
 strong_alias(bittree_malloc,	malloc)
 strong_alias(bittree_calloc, calloc)
 strong_alias(bittree_realloc, realloc)
 strong_alias(bittree_free, free)
 strong_alias(bittree_delete_block, __e_acsl_delete_block)
 strong_alias(bittree_store_block, __e_acsl_store_block)
+strong_alias(offset, __e_acsl_offset)
+strong_alias(base_addr, __e_acsl_base_addr)
+strong_alias(valid_read, __e_acsl_valid_read)
+strong_alias(valid, __e_acsl_valid)
+strong_alias(block_length, __e_acsl_block_length)
+strong_alias(initialized, __e_acsl_initialized)
+strong_alias(freeable, __e_acsl_freeable)
+strong_alias(initialize, __e_acsl_initialize)
+strong_alias(full_init, __e_acsl_full_init)
+strong_alias(readonly, __e_acsl_readonly)
+strong_alias(memory_clean ,__e_acsl_memory_clean)
+strong_alias(memory_init, __e_acsl_memory_init)
+strong_alias(memory_size,__e_acsl_memory_size)
 /* }}} */
 #endif
 
