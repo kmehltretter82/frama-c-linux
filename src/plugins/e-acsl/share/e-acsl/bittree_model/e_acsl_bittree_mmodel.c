@@ -38,8 +38,9 @@
 #include "e_acsl_mmodel_api.h"
 #include "e_acsl_bittree.h"
 
-size_t __e_acsl_heap_size = 0;
-
+/**************************/
+/* SUPPORT            {{{ */
+/**************************/
 static const int nbr_bits_to_1[256] = {
   0,1,1,2,1,2,2,3,1,2,2,3,2,3,3,4,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,1,2,2,3,2,3,
   3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,1,2,2,3,2,3,3,4,2,3,3,4,
@@ -50,22 +51,30 @@ static const int nbr_bits_to_1[256] = {
   4,5,5,6,4,5,5,6,5,6,6,7,4,5,5,6,5,6,6,7,5,6,6,7,6,7,7,8
 };
 
-size_t __get_memory_size(void) {
-  return __e_acsl_heap_size;
-}
-
 /* given the size of the memory block (_size) return (or rather evaluate to)
  * size in bytes requred to represent its partial initialization */
 #define needed_bytes(_size) \
   ((_size % 8) == 0 ? (_size/8) : (_size/8 + 1))
+/* }}} */
 
 /**************************/
-/* ALLOCATION             */
+/* HEAP USAGE         {{{ */
+/**************************/
+size_t __e_acsl_heap_size = 0;
+
+size_t __get_memory_size(void) {
+  return __e_acsl_heap_size;
+}
+/* }}} */
+
+/**************************/
+/* ALLOCATION         {{{ */
 /**************************/
 
+/* STACK ALLOCATION {{{ */
 /* store the block of size bytes starting at ptr, the new block is returned.
  * Warning: the return type is implicitly (bt_block*). */
-void* __e_acsl_store_block(void* ptr, size_t size) {
+static void* bittree_store_block(void* ptr, size_t size) {
   bt_block * tmp;
   DASSERT(ptr != NULL);
   tmp = native_malloc(sizeof(bt_block));
@@ -81,7 +90,7 @@ void* __e_acsl_store_block(void* ptr, size_t size) {
 }
 
 /* remove the block starting at ptr */
-void __e_acsl_delete_block(void* ptr) {
+static void bittree_delete_block(void* ptr) {
   DASSERT(ptr != NULL);
   bt_block * tmp = bt_lookup(ptr);
   DASSERT(tmp != NULL);
@@ -89,10 +98,12 @@ void __e_acsl_delete_block(void* ptr) {
   bt_remove(tmp);
   native_free(tmp);
 }
+/* }}} */
 
+/* HEAP ALLOCATION {{{ */
 /* allocate size bytes and store the returned block
  * for further information, see malloc */
-void* malloc(size_t size) {
+static void* bittree_malloc(size_t size) {
   void * tmp;
   bt_block * new_block;
   if(size <= 0)
@@ -109,7 +120,7 @@ void* malloc(size_t size) {
 
 /* free the block starting at ptr,
  * for further information, see free */
-void free(void* ptr) {
+static void bittree_free(void* ptr) {
   bt_block * tmp;
   if(ptr == NULL)
     return;
@@ -122,19 +133,9 @@ void free(void* ptr) {
   native_free(tmp);
 }
 
-int __e_acsl_freeable(void* ptr) {
-  bt_block * tmp;
-  if(ptr == NULL)
-    return false;
-  tmp = bt_lookup(ptr);
-  if(tmp == NULL)
-    return false;
-  return tmp->freeable;
-}
-
 /* resize the block starting at ptr to fit its new size,
  * for further information, see realloc */
-void* realloc(void* ptr, size_t size) {
+void* bittree_realloc(void* ptr, size_t size) {
   bt_block * tmp;
   void * new_ptr;
   /* ptr is NULL - malloc */
@@ -202,7 +203,7 @@ void* realloc(void* ptr, size_t size) {
 /* allocate memory for an array of nbr_block elements of size_block size,
  * this memory is set to zero, the returned block is stored,
  * for further information, see calloc */
-void* calloc(size_t nbr_block, size_t size_block) {
+void* bittree_calloc(size_t nbr_block, size_t size_block) {
   void * tmp;
   size_t size = nbr_block * size_block;
   bt_block * new_block;
@@ -219,9 +220,11 @@ void* calloc(size_t nbr_block, size_t size_block) {
   new_block->init_bytes = size;
   return (void*)new_block->ptr;
 }
+/* }}} */
+/* }}} */
 
 /**************************/
-/* INITIALIZATION         */
+/* INITIALIZATION     {{{ */
 /**************************/
 
 /* mark the size bytes of ptr as initialized */
@@ -301,10 +304,21 @@ void __e_acsl_readonly (void * ptr) {
     return;
   tmp->is_readonly = true;
 }
+/* }}} */
 
 /**************************/
-/* PREDICATES             */
+/* PREDICATES        {{{  */
 /**************************/
+
+int __e_acsl_freeable(void* ptr) {
+  bt_block * tmp;
+  if(ptr == NULL)
+    return false;
+  tmp = bt_lookup(ptr);
+  if(tmp == NULL)
+    return false;
+  return tmp->freeable;
+}
 
 /* return whether the size bytes of ptr are initialized */
 int __e_acsl_initialized (void * ptr, size_t size) {
@@ -373,10 +387,11 @@ int __e_acsl_offset(void* ptr) {
   vassert(tmp != NULL, "\\offset of unallocated memory", NULL);
   return ((size_t)ptr - tmp->ptr);
 }
+/* }}} */
 
-/**************************/
-/* PROGRAM INITIALIZATION */
-/**************************/
+/******************************/
+/* PROGRAM INITIALIZATION {{{ */
+/******************************/
 
 /* erase the content of the abstract structure */
 void __e_acsl_memory_clean() {
@@ -401,10 +416,11 @@ void __e_acsl_memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
   if (argc_ref)
     __init_argv(*argc_ref, *argv_ref);
 }
+/* }}} */
 
-/**********************/
-/* DEBUG              */
-/**********************/
+/*************************/
+/* DEBUG             {{{ */
+/*************************/
 #ifdef E_ACSL_DEBUG
 /*! \brief print the information about a tracked block */
 void __e_acsl_print_block (bt_block * ptr) {
@@ -416,6 +432,17 @@ void __e_acsl_print_bittree() {
   bt_print();
 }
 #endif
+/* }}} */
+
+/* ALLOCATION API BINDINGS {{{ */
+
+strong_alias(bittree_malloc,	malloc)
+strong_alias(bittree_calloc, calloc)
+strong_alias(bittree_realloc, realloc)
+strong_alias(bittree_free, free)
+strong_alias(bittree_delete_block, __e_acsl_delete_block)
+strong_alias(bittree_store_block, __e_acsl_store_block)
+/* }}} */
 #endif
 
 
