@@ -264,8 +264,7 @@ static void bittree_delete_block(void* ptr) {
 /* }}} */
 
 /* HEAP ALLOCATION {{{ */
-/* allocate size bytes and store the returned block
- * for further information, see malloc */
+/*! \brief Replacement for `malloc` with memory tracking */
 static void* bittree_malloc(size_t size) {
   if(size == 0)
     return NULL;
@@ -279,10 +278,8 @@ static void* bittree_malloc(size_t size) {
   return res;
 }
 
-/* allocate memory for an array of nbr_block elements of size_block size,
- * this memory is set to zero, the returned block is stored,
- * for further information, see calloc */
-void* bittree_calloc(size_t nbr_block, size_t size_block) {
+/*! \brief Replacement for `calloc` with memory tracking */
+static void* bittree_calloc(size_t nbr_block, size_t size_block) {
   /* FIXME: Need an integer overflow check here */
   size_t size = nbr_block * size_block;
   if (size == 0)
@@ -299,14 +296,8 @@ void* bittree_calloc(size_t nbr_block, size_t size_block) {
   return res;
 }
 
-/* \brief Allocate `size` bytes of memory such that the allocation's base
- * address is an even multiple of alignment.
- *
- * \param alignment - should be the power of two
- * \param size - should be the multiple of alignment
- * \return - pointer to the allocated memory if the restrictions placed on size
- *   and alignment parameters hold. NULL is returned otherwise. */
-void *bittree_aligned_alloc(size_t alignment, size_t size) {
+/*! \brief Replacement for `aligned_alloc` with memory tracking */
+static void *bittree_aligned_alloc(size_t alignment, size_t size) {
   /* Check if:
    *  - size and alignment are greater than zero
    *  - alignment is a power of 2
@@ -323,12 +314,8 @@ void *bittree_aligned_alloc(size_t alignment, size_t size) {
   return res;
 }
 
-/* \brief Allocate size bytes and place the address of the allocated memory in
- * `*memptr`.  The address of the allocated memory will be a multiple of
- * `alignment`, which must be a power of two and a multiple of `sizeof(void*)`.
- * If size  is  0, then the value placed in *memptr is NULL.
-*/
-int bittree_posix_memalign(void **memptr, size_t alignment, size_t size) {
+/*! \brief Replacement for `posix_memalign` with memory tracking */
+static int bittree_posix_memalign(void **memptr, size_t alignment, size_t size) {
  /* Check if:
    *  - size and alignment are greater than zero
    *  - alignment is a power of 2 and a multiple of sizeof(void*) */
@@ -348,9 +335,8 @@ int bittree_posix_memalign(void **memptr, size_t alignment, size_t size) {
   return res;
 }
 
-/* resize the block starting at ptr to fit its new size,
- * for further information, see realloc */
-void* bittree_realloc(void* ptr, size_t size) {
+/*! \brief Replacement for `realloc` with memory tracking */
+static void* bittree_realloc(void* ptr, size_t size) {
   bt_block * tmp;
   void * new_ptr;
   /* ptr is NULL - malloc */
@@ -415,8 +401,7 @@ void* bittree_realloc(void* ptr, size_t size) {
   return (void*)tmp->ptr;
 }
 
-/* free the block starting at ptr,
- * for further information, see free */
+/*! \brief Replacement for `free` with memory tracking */
 static void bittree_free(void* ptr) {
   bt_block * tmp;
   if(ptr == NULL)

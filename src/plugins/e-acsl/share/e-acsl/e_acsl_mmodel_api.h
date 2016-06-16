@@ -56,6 +56,23 @@ void * realloc(void * ptr, size_t size)
 void free(void * ptr)
   __attribute__((FC_BUILTIN));
 
+/*! \brief Allocate `size` bytes of memory such that the allocation's base
+ * address is an even multiple of alignment.
+ *
+ * \param alignment - should be the power of two
+ * \param size - should be the multiple of alignment
+ * \return - pointer to the allocated memory if the restrictions placed on size
+ *   and alignment parameters hold. NULL is returned otherwise. */
+void *aligned_alloc(size_t alignment, size_t size)
+  __attribute__((FC_BUILTIN));
+
+/*! \brief Allocate size bytes and place the address of the allocated memory in
+ * `*memptr`.  The address of the allocated memory will be a multiple of
+ * `alignment`, which must be a power of two and a multiple of `sizeof(void*)`.
+ * If size  is  0, then the value placed in *memptr is NULL. */
+int posix_memalign(void **memptr, size_t alignment, size_t size)
+  __attribute__((FC_BUILTIN));
+
 /*! \brief Store stack or globally-allocated memory block
  * starting at an address given by \p ptr.
  *
@@ -102,8 +119,8 @@ int __e_acsl_freeable(void * ptr)
 
 /*! \brief Implementation of the \b \\valid predicate of E-ACSL.
  *
- * Return a non-zero value if the first \p size bytes starting at an address given
- * by \p ptr are readable and writable and 0 otherwise. */
+ * Return a non-zero value if the first \p size bytes starting at an address
+ * given by \p ptr are readable and writable and 0 otherwise. */
 /*@ ensures \result == 0 || \result == 1;
   @ ensures \result == 1 ==> \valid(((char *)ptr)+(0..size-1));
   @ assigns \result \from *(((char*)ptr)+(0..size-1)); */
