@@ -249,6 +249,7 @@ static void* bittree_store_block(void* ptr, size_t size) {
   tmp->is_readonly = false;
   tmp->freeable = false;
   bt_insert(tmp);
+  printf("Store block: %a %d\n", ptr, size);
   return tmp;
 }
 
@@ -259,6 +260,7 @@ static void bittree_delete_block(void* ptr) {
   DASSERT(tmp != NULL);
   bt_clean_block_init(tmp);
   bt_remove(tmp);
+  printf("Delete block: %a %d\n", ptr, tmp->size);
   native_free(tmp);
 }
 /* }}} */
@@ -320,7 +322,7 @@ static int bittree_posix_memalign(void **memptr, size_t alignment, size_t size) 
    *  - size and alignment are greater than zero
    *  - alignment is a power of 2 and a multiple of sizeof(void*) */
   if (!size || !alignment || !powof2(alignment) || alignment%sizeof(void*))
-    return NULL;
+    return -1;
 
   /* Make sure that the first argument to posix memalign is indeed allocated */
   vassert(valid(memptr, sizeof(void*)),
@@ -408,6 +410,7 @@ static void bittree_free(void* ptr) {
     return;
   tmp = bt_lookup(ptr);
   DASSERT(tmp != NULL);
+  printf("Free block: %a %d\n", ptr, tmp->size);
   native_free(ptr);
   bt_clean_block_init(tmp);
   __e_acsl_heap_size -= tmp->size;
@@ -467,6 +470,8 @@ strong_alias(bittree_malloc,	malloc)
 strong_alias(bittree_calloc, calloc)
 strong_alias(bittree_realloc, realloc)
 strong_alias(bittree_free, free)
+strong_alias(bittree_posix_memalign, posix_memalign)
+strong_alias(bittree_aligned_alloc, aligned_alloc)
 strong_alias(bittree_delete_block, __e_acsl_delete_block)
 strong_alias(bittree_store_block, __e_acsl_store_block)
 strong_alias(offset, __e_acsl_offset)
