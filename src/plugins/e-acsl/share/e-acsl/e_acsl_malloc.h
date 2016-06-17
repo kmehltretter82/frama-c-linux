@@ -53,6 +53,10 @@
 # define alloc_func_def(f,...) concat(native_prefix,f)(__VA_ARGS__)
 # define alloc_func_macro(f)   concat(native_prefix,f)
 
+# define public_prefix __e_acsl_
+# define public_alias(f) strong_alias(f, concat(public_prefix,f))
+# define public_alias2(f1,f2) strong_alias(f1, concat(public_prefix,f2))
+
 extern void  *alloc_func_def(malloc, size_t);
 extern void  *alloc_func_def(calloc, size_t, size_t);
 extern void  *alloc_func_def(realloc, void*, size_t);

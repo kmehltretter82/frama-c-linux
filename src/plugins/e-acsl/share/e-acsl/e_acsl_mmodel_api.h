@@ -36,7 +36,7 @@
  *
  * For further information, see \p malloc(3). */
 void * malloc(size_t size)
-  __attribute__((FC_BUILTIN)) ;
+  __attribute__((FC_BUILTIN));
 
 /*! \brief Drop-in replacement for \p calloc with memory tracking enabled.
  *
