@@ -67,7 +67,7 @@
 tests/ptests_config
 META.frama-c-e_acsl
 .merlin
-Makefile.plugin.generated
+.Makefile.plugin.generated
 E_ACSL.check_mli_exists
 top/
 doc/doxygen/doxygen.cfg
