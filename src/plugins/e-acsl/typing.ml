@@ -44,6 +44,7 @@ type integer_ty =
 let gmp = Gmp
 let c_int = C_type IInt
 let ikind ik = C_type ik
+let other = Other
 
 (* the integer_ty corresponding to size_t *)
 let size_t () = match Cil.theMachine.Cil.typeOfSizeOf with
@@ -163,7 +164,7 @@ end
 
 (* Compute the smallest type (bigger than [int]) which can contain the whole
    interval. It is the \theta operator of the JFLA's paper. *)
-let ty_of_interv ~ctx i =
+let ty_of_interv ?ctx i =
   let open Interval in
   let is_pos = Integer.ge i.lower Integer.zero in
   try
@@ -173,8 +174,9 @@ let ty_of_interv ~ctx i =
     (* ctx type whenever possible to prevent superfluous casts in the generated
        code *)
     (match ctx with
-    | Gmp | Other -> C_type kind
-    | C_type ik -> if Cil.intTypeIncluded kind ik then ctx else C_type kind)
+    | None | Some (Gmp | Other) -> C_type kind
+    | Some (C_type ik as ctx) ->
+      if Cil.intTypeIncluded kind ik then ctx else C_type kind)
   with Cil.Not_representable ->
     Gmp
 
@@ -204,8 +206,8 @@ let mk_ctx ~force c =
 
 (* type the term [t] in a context [ctx]. Take --e-acsl-gmp-only into account iff
    not [force]. *)
-let rec type_term ~force ~ctx t =
-  let ctx = mk_ctx ~force ctx in
+let rec type_term ~force ?ctx t =
+  let ctx = Extlib.opt_map (mk_ctx ~force) ctx in
   let dup ty = ty, ty in
   let infer t =
     Cil.CurrentLoc.set t.term_loc;
@@ -220,7 +222,7 @@ let rec type_term ~force ~ctx t =
       let ty =
         try
           let i = Interval.infer t in
-          ty_of_interv ~ctx i
+          ty_of_interv ?ctx i
         with Interval.Not_an_integer ->
           Other
       in
@@ -229,7 +231,7 @@ let rec type_term ~force ~ctx t =
       let ty =
         try
           let i = Interval.infer t in
-          ty_of_interv ~ctx i
+          ty_of_interv ?ctx i
         with Interval.Not_an_integer ->
           Other
       in
@@ -245,7 +247,7 @@ let rec type_term ~force ~ctx t =
           let i = Interval.infer t in
           (* [t'] must be typed, but it is a pointer *)
           ignore (type_term ~force:false ~ctx:Other t');
-          ty_of_interv ~ctx i
+          ty_of_interv ?ctx i
         with Interval.Not_an_integer ->
           assert false (* this term is an integer *)
       in
@@ -258,7 +260,7 @@ let rec type_term ~force ~ctx t =
           (* [t1] and [t2] must be typed, but they are pointers *)
           ignore (type_term ~force:false ~ctx:Other t1);
           ignore (type_term ~force:false ~ctx:Other t2);
-          ty_of_interv ~ctx i
+          ty_of_interv ?ctx i
         with Interval.Not_an_integer ->
           assert false (* this term is an integer *)
       in
@@ -269,7 +271,7 @@ let rec type_term ~force ~ctx t =
         try
           let i = Interval.infer t in
           let i' = Interval.infer t' in
-          mk_ctx ~force:false (ty_of_interv ~ctx (Interval.join i i'))
+          mk_ctx ~force:false (ty_of_interv ?ctx (Interval.join i i'))
         with Interval.Not_an_integer ->
           Other (* real *)
       in
@@ -284,7 +286,7 @@ let rec type_term ~force ~ctx t =
           let i = Interval.infer t in
           let i1 = Interval.infer t1 in
           let i2 = Interval.infer t2 in
-          let ctx = ty_of_interv ~ctx (Interval.join i (Interval.join i1 i2)) in
+          let ctx = ty_of_interv ?ctx (Interval.join i (Interval.join i1 i2)) in
           mk_ctx ~force:false ctx
         with Interval.Not_an_integer ->
           Other (* real *)
@@ -294,12 +296,12 @@ let rec type_term ~force ~ctx t =
       dup ctx
 
     | TBinOp ((Lt | Gt | Le | Ge | Eq | Ne), t1, t2) ->
-      assert (compare ctx c_int >= 0);
+      assert (match ctx with None -> true | Some c -> compare c c_int >= 0);
       let ctx =
         try
           let i1 = Interval.infer t1 in
           let i2 = Interval.infer t2 in
-          mk_ctx ~force:false (ty_of_interv ~ctx (Interval.join i1 i2))
+          mk_ctx ~force:false (ty_of_interv ?ctx (Interval.join i1 i2))
         with Interval.Not_an_integer ->
           Other
       in
@@ -316,7 +318,7 @@ let rec type_term ~force ~ctx t =
         try
           let i1 = Interval.infer t1 in
           let i2 = Interval.infer t2 in
-          ty_of_interv ~ctx (Interval.join i1 i2)
+          ty_of_interv ?ctx (Interval.join i1 i2)
         with Interval.Not_an_integer ->
           Other
       in
@@ -336,7 +338,7 @@ let rec type_term ~force ~ctx t =
           let i = Interval.infer t' in
           (* nothing more to do: [i] is already more precise than what we
              could infer from the arguments of the cast. *)
-          ty_of_interv ~ctx i
+          ty_of_interv ?ctx i
         with Interval.Not_an_integer ->
           Other
       in
@@ -351,7 +353,7 @@ let rec type_term ~force ~ctx t =
         try
           let i2 = Interval.infer t2 in
           let i3 = Interval.infer t3 in
-          let ctx = ty_of_interv ~ctx (Interval.join i (Interval.join i2 i3)) in
+          let ctx = ty_of_interv ?ctx (Interval.join i (Interval.join i2 i3)) in
           mk_ctx ~force:false ctx
         with Interval.Not_an_integer ->
           Other
@@ -361,7 +363,7 @@ let rec type_term ~force ~ctx t =
       dup ctx
 
     | Tat (t, _)
-    | TLogic_coerce (_, t) -> dup (type_term ~force ~ctx t).ty
+    | TLogic_coerce (_, t) -> dup (type_term ~force ?ctx t).ty
 
     | TCoerceE (t1, t2) ->
       let ctx =
@@ -369,7 +371,7 @@ let rec type_term ~force ~ctx t =
           let i = Interval.infer t in
           let i1 = Interval.infer t1 in
           let i2 = Interval.infer t2 in
-          ty_of_interv ~ctx (Interval.join i (Interval.join i1 i2))
+          ty_of_interv ?ctx (Interval.join i (Interval.join i1 i2))
         with Interval.Not_an_integer ->
           Other
       in
@@ -411,7 +413,13 @@ let rec type_term ~force ~ctx t =
     | Ttype _
     | Tempty_set  -> dup Other
   in
-  Memo.memo (fun t -> let ty, op = infer t in coerce ~ctx ~op ty) t
+  Memo.memo
+    (fun t ->
+      let ty, op = infer t in
+      match ctx with
+      | None -> { ty; op; cast = None }
+      | Some ctx -> coerce ~ctx ~op ty)
+    t
 
 and type_term_lval (host, offset) =
   type_term_lhost host;
@@ -532,10 +540,10 @@ let rec type_predicate_named p =
   in
   coerce ~ctx:c_int ~op c_int
 
-let type_term ~force ~ctx t =
+let type_term ~force ?ctx t =
   Options.feedback ~dkey ~level:4 "typing term '%a' in ctx '%a'."
-    Printer.pp_term t pretty ctx;
-  ignore (type_term ~force ~ctx t)
+    Printer.pp_term t (Pretty_utils.pp_opt pretty) ctx;
+  ignore (type_term ~force ?ctx t)
 
 let type_named_predicate ?(must_clear=true) p =
   Options.feedback ~dkey ~level:3 "typing predicate '%a'."

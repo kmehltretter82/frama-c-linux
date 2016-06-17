@@ -151,7 +151,6 @@ let constant_to_exp ~loc t = function
            raise Cil.Not_representable
          | (None | Some _), _ -> Cil.kinteger64 ~loc ~kind ?repr n, false
      with Cil.Not_representable ->
-       
        (* too big integer *)
        Cil.mkString ~loc (Integer.to_string n), true)
   | LStr s -> Cil.new_exp ~loc (Const (CStr s)), false
@@ -510,7 +509,7 @@ and comparison_to_exp
     in
     Cil.new_exp ~loc (BinOp(bop, e, Cil.zero ~loc, Cil.intType)), env
   | Typing.C_type _ | Typing.Other ->
-    Cil.new_exp  ~loc (BinOp(bop, e1, e2, Cil.intType)), env
+    Cil.new_exp ~loc (BinOp(bop, e1, e2, Cil.intType)), env
 
 (* \base_addr, \block_length and \freeable annotations *)
 and mmodel_call ~loc kf name ctx env t =
@@ -797,16 +796,16 @@ exception No_simple_translation of term
 
 (* This function is used by plug-in [Cfp]. *)
 let term_to_exp typ t =
-  let ctx = match typ with
-    | None -> Typing.c_int (* useless, but required *)
-    | Some typ ->
-      if Gmpz.is_t typ then Typing.gmp
-      else
-        match typ with
-        | TInt(ik, _) -> Typing.ikind ik
-        | _ -> Typing.c_int (* useless, but required *)
+  (* infer a context from the given [typ] whenever possible *)
+  let ctx_of_typ ty =
+    if Gmpz.is_t ty then Typing.gmp
+    else
+      match ty with
+      | TInt(ik, _) -> Typing.ikind ik
+      | _ -> Typing.other
   in
-  Typing.type_term ~force:false ~ctx t;
+  let ctx = Extlib.opt_map ctx_of_typ typ in
+  Typing.type_term ~force:false ?ctx t;
   let env = Env.empty (new Visitor.frama_c_copy Project_skeleton.dummy) in
   let env = Env.push env in
   let env = Env.rte env false in
