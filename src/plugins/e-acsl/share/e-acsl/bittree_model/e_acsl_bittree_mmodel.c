@@ -60,10 +60,10 @@ static const int nbr_bits_to_1[256] = {
 /**************************/
 /* HEAP USAGE         {{{ */
 /**************************/
-size_t __e_acsl_heap_size = 0;
+static size_t heap_size = 0;
 
-static size_t memory_size(void) {
-  return __e_acsl_heap_size;
+static size_t get_heap_size(void) {
+  return heap_size;
 }
 /* }}} */
 
@@ -226,7 +226,7 @@ static void* base_addr(void* ptr) {
 static int offset(void* ptr) {
   bt_block * tmp = bt_find(ptr);
   vassert(tmp != NULL, "\\offset of unallocated memory", NULL);
-  return ((size_t)ptr - tmp->ptr);
+  return ((uintptr_t)ptr - tmp->ptr);
 }
 /* }}} */
 
@@ -274,7 +274,7 @@ static void* bittree_malloc(size_t size) {
   void *res = native_malloc(size);
   if (res) {
     bt_block * new_block = bittree_store_block(res, size);
-    __e_acsl_heap_size += size;
+    heap_size += size;
     new_block->freeable = true;
   }
   return res;
@@ -290,7 +290,7 @@ static void* bittree_calloc(size_t nbr_block, size_t size_block) {
   void *res = native_calloc(nbr_block, size_block);
   if (res) {
     bt_block * new_block = bittree_store_block(res, size);
-    __e_acsl_heap_size += size;
+    heap_size += size;
     new_block->freeable = 1;
     /* Mark allocated block as freeable and initialized */
     new_block->init_bytes = size;
@@ -311,7 +311,7 @@ static void *bittree_aligned_alloc(size_t alignment, size_t size) {
   if (res) {
     bt_block * new_block = bittree_store_block(res, size);
     new_block->freeable = 1;
-    __e_acsl_heap_size += size;
+    heap_size += size;
   }
   return res;
 }
@@ -332,7 +332,7 @@ static int bittree_posix_memalign(void **memptr, size_t alignment, size_t size) 
   if (!res) {
     bt_block * new_block = bittree_store_block(*memptr, size);
     new_block->freeable = 1;
-    __e_acsl_heap_size += size;
+    heap_size += size;
   }
   return res;
 }
@@ -354,7 +354,7 @@ static void* bittree_realloc(void* ptr, size_t size) {
   new_ptr = native_realloc((void*)tmp->ptr, size);
   if(new_ptr == NULL)
     return NULL;
-  __e_acsl_heap_size -= tmp->size;
+  heap_size -= tmp->size;
   /* realloc changes start address -- re-enter the element */
   if (tmp->ptr != (uintptr_t)new_ptr) {
     bt_remove(tmp);
@@ -397,7 +397,7 @@ static void* bittree_realloc(void* ptr, size_t size) {
   }
   tmp->size = size;
   tmp->freeable = true;
-  __e_acsl_heap_size += size;
+  heap_size += size;
   return (void*)tmp->ptr;
 }
 
@@ -409,7 +409,7 @@ static void bittree_free(void* ptr) {
   if (!res) {
     vabort("Not a start of block (%a) in free\n", ptr);
   } else {
-    __e_acsl_heap_size -= res->size;
+    heap_size -= res->size;
     native_free(ptr);
     bt_clean_block_init(res);
     bt_remove(res);
@@ -447,23 +447,8 @@ static void memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
 }
 /* }}} */
 
-/*************************/
-/* DEBUG             {{{ */
-/*************************/
-#ifdef E_ACSL_DEBUG
-/*! \brief print the information about a tracked block */
-void __e_acsl_print_block (bt_block * ptr) {
-  bt_print_block(ptr);
-}
-
-/*! \brief print the content of the bittree */
-void __e_acsl_print_bittree() {
-  bt_print();
-}
-#endif
-/* }}} */
-
 /* API BINDINGS {{{ */
+/* Allocation */
 strong_alias(bittree_malloc,	malloc)
 strong_alias(bittree_calloc, calloc)
 strong_alias(bittree_realloc, realloc)
@@ -472,6 +457,7 @@ strong_alias(bittree_posix_memalign, posix_memalign)
 strong_alias(bittree_aligned_alloc, aligned_alloc)
 strong_alias(bittree_delete_block, __e_acsl_delete_block)
 strong_alias(bittree_store_block, __e_acsl_store_block)
+/* Predicates */
 strong_alias(offset, __e_acsl_offset)
 strong_alias(base_addr, __e_acsl_base_addr)
 strong_alias(valid_read, __e_acsl_valid_read)
@@ -479,13 +465,19 @@ strong_alias(valid, __e_acsl_valid)
 strong_alias(block_length, __e_acsl_block_length)
 strong_alias(initialized, __e_acsl_initialized)
 strong_alias(freeable, __e_acsl_freeable)
+strong_alias(readonly, __e_acsl_readonly)
+/* Block initialization  */
 strong_alias(initialize, __e_acsl_initialize)
 strong_alias(full_init, __e_acsl_full_init)
-strong_alias(readonly, __e_acsl_readonly)
+/* Memory state initialization */
 strong_alias(memory_clean ,__e_acsl_memory_clean)
 strong_alias(memory_init, __e_acsl_memory_init)
-strong_alias(memory_size,__e_acsl_memory_size)
+/* Heap size */
+strong_alias(get_heap_size,__e_acsl_get_heap_size)
+strong_alias(heap_size,__e_acsl_heap_size)
+#ifdef E_ACSL_DEBUG /* Debug */
+strong_alias(bt_print_block, __e_acsl_print_bittree)
+strong_alias(bt_print, __e_acsl_print_block)
+#endif
 /* }}} */
 #endif
-
-
