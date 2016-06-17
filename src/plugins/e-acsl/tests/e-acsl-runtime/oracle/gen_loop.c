@@ -55,11 +55,11 @@ void nested_loops(void)
             __gen_e_acsl_l = 0;
             while (1) {
               if (__gen_e_acsl_l < j) ; else break;
-              __e_acsl_assert((unsigned int)((unsigned long)__gen_e_acsl_l) < 15,
+              __e_acsl_assert((unsigned int)((unsigned long)__gen_e_acsl_l) < 15U,
                               (char *)"RTE",(char *)"nested_loops",
                               (char *)"index_bound: (unsigned long)__gen_e_acsl_l < 15",
                               19);
-              __e_acsl_assert((unsigned int)((unsigned long)__gen_e_acsl_k) < 10,
+              __e_acsl_assert((unsigned int)((unsigned long)__gen_e_acsl_k) < 10U,
                               (char *)"RTE",(char *)"nested_loops",
                               (char *)"index_bound: (unsigned long)__gen_e_acsl_k < 10",
                               19);
@@ -107,11 +107,11 @@ void nested_loops(void)
                 __gen_e_acsl_l_2 = 0;
                 while (1) {
                   if (__gen_e_acsl_l_2 < j) ; else break;
-                  __e_acsl_assert((unsigned int)((unsigned long)__gen_e_acsl_l_2) < 15,
+                  __e_acsl_assert((unsigned int)((unsigned long)__gen_e_acsl_l_2) < 15U,
                                   (char *)"RTE",(char *)"nested_loops",
                                   (char *)"index_bound: (unsigned long)__gen_e_acsl_l_2 < 15",
                                   19);
-                  __e_acsl_assert((unsigned int)((unsigned long)__gen_e_acsl_k_2) < 10,
+                  __e_acsl_assert((unsigned int)((unsigned long)__gen_e_acsl_k_2) < 10U,
                                   (char *)"RTE",(char *)"nested_loops",
                                   (char *)"index_bound: (unsigned long)__gen_e_acsl_k_2 < 10",
                                   19);

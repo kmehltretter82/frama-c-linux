@@ -34,7 +34,7 @@ int main(void)
   __e_acsl_assert(123 >= 12,(char *)"Assertion",(char *)"main",
                   (char *)"123 >= 12",18);
   /*@ assert 0xff ≡ 0xff; */
-  __e_acsl_assert(0xff == 0xff,(char *)"Assertion",(char *)"main",
+  __e_acsl_assert(255 == 255,(char *)"Assertion",(char *)"main",
                   (char *)"0xff == 0xff",19);
   /*@ assert 1 ≢ 2; */
   __e_acsl_assert(1 != 2,(char *)"Assertion",(char *)"main",(char *)"1 != 2",
@@ -52,7 +52,7 @@ int main(void)
   __e_acsl_assert(123 >= -12,(char *)"Assertion",(char *)"main",
                   (char *)"123 >= -12",25);
   /*@ assert -0xff ≡ -0xff; */
-  __e_acsl_assert(-0xff == -0xff,(char *)"Assertion",(char *)"main",
+  __e_acsl_assert(-255 == -255,(char *)"Assertion",(char *)"main",
                   (char *)"-0xff == -0xff",26);
   /*@ assert 1 ≢ -2; */
   __e_acsl_assert(1 != -2,(char *)"Assertion",(char *)"main",

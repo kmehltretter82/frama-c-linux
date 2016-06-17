@@ -18,13 +18,13 @@ int main(void)
   __e_acsl_assert(0 != ~ 0,(char *)"Assertion",(char *)"main",
                   (char *)"0 != ~0",12);
   /*@ assert x+1 ≡ -2; */
-  __e_acsl_assert(x + 1 == -2,(char *)"Assertion",(char *)"main",
+  __e_acsl_assert(x + 1L == -2L,(char *)"Assertion",(char *)"main",
                   (char *)"x+1 == -2",14);
   /*@ assert x-1 ≡ -4; */
-  __e_acsl_assert(x - 1 == -4,(char *)"Assertion",(char *)"main",
+  __e_acsl_assert(x - 1L == -4L,(char *)"Assertion",(char *)"main",
                   (char *)"x-1 == -4",15);
   /*@ assert x*3 ≡ -9; */
-  __e_acsl_assert(x * 3 == -9,(char *)"Assertion",(char *)"main",
+  __e_acsl_assert(x * 3L == -9L,(char *)"Assertion",(char *)"main",
                   (char *)"x*3 == -9",16);
   /*@ assert x/3 ≡ -1; */
   __e_acsl_assert(x / 3 == -1,(char *)"Assertion",(char *)"main",
@@ -65,7 +65,7 @@ int main(void)
   __e_acsl_assert(3 % -2 == 1,(char *)"Assertion",(char *)"main",
                   (char *)"3%-2 == 1",21);
   /*@ assert ((x*2+(3+y))-4)+(x-y) ≡ -10; */
-  __e_acsl_assert(((x * 2 + (3 + y)) - 4) + (x - y) == -10,
+  __e_acsl_assert(((x * 2L + (3L + y)) - 4L) + (x - y) == -10L,
                   (char *)"Assertion",(char *)"main",
                   (char *)"((x*2+(3+y))-4)+(x-y) == -10",23);
   /*@ assert (0≡1) ≡ !(0≡0); */
@@ -99,11 +99,11 @@ int main(void)
     mpz_t __gen_e_acsl_div_2;
     unsigned long __gen_e_acsl__7;
     __gmpz_init_set_si(__gen_e_acsl_z,z);
-    __gmpz_init_set_ui(__gen_e_acsl__4,(unsigned long)1);
+    __gmpz_init_set_ui(__gen_e_acsl__4,1UL);
     __gmpz_init(__gen_e_acsl_add);
     __gmpz_add(__gen_e_acsl_add,(__mpz_struct const *)(__gen_e_acsl_z),
                (__mpz_struct const *)(__gen_e_acsl__4));
-    __gmpz_init_set_si(__gen_e_acsl__5,y - (long)123456789123456789);
+    __gmpz_init_set_si(__gen_e_acsl__5,y - 123456789123456789L);
     __gmpz_init_set_ui(__gen_e_acsl__6,0UL);
     __gen_e_acsl_div_guard_2 = __gmpz_cmp((__mpz_struct const *)(__gen_e_acsl__5),
                                           (__mpz_struct const *)(__gen_e_acsl__6));

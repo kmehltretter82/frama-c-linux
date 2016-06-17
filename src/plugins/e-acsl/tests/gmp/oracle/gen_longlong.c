@@ -39,13 +39,13 @@ int main(void)
     int __gen_e_acsl_mod_guard;
     mpz_t __gen_e_acsl_mod;
     unsigned long __gen_e_acsl__4;
-    __gmpz_init_set_ui(__gen_e_acsl_,(unsigned long)2);
+    __gmpz_init_set_ui(__gen_e_acsl_,2UL);
     __gmpz_init(__gen_e_acsl_x);
     __gmpz_import(__gen_e_acsl_x,1UL,1,8UL,0,0UL,(void const *)(& x));
     __gmpz_init(__gen_e_acsl_mul);
     __gmpz_mul(__gen_e_acsl_mul,(__mpz_struct const *)(__gen_e_acsl_),
                (__mpz_struct const *)(__gen_e_acsl_x));
-    __gmpz_init_set_ui(__gen_e_acsl__2,(unsigned long)1);
+    __gmpz_init_set_ui(__gen_e_acsl__2,1UL);
     __gmpz_init(__gen_e_acsl_add);
     __gmpz_add(__gen_e_acsl_add,(__mpz_struct const *)(__gen_e_acsl_mul),
                (__mpz_struct const *)(__gen_e_acsl__2));

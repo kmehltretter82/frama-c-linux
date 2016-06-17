@@ -87,13 +87,13 @@ int __gen_e_acsl_sorted(int *t, int n)
                         (char *)"mem_access: \\valid_read(t+(unsigned long)__gen_e_acsl_i)",
                         6);
         __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(t + (unsigned long)(
-                                                                 __gen_e_acsl_i - 1)),
+                                                                 __gen_e_acsl_i - 1L)),
                                                         sizeof(int));
         __e_acsl_assert(__gen_e_acsl_valid_read_2,(char *)"RTE",
                         (char *)"sorted",
                         (char *)"mem_access: \\valid_read(t+(unsigned long)((long)(__gen_e_acsl_i-1)))",
                         6);
-        if (*(t + (unsigned long)(__gen_e_acsl_i - 1)) <= *(t + (unsigned long)__gen_e_acsl_i)) 
+        if (*(t + (unsigned long)(__gen_e_acsl_i - 1L)) <= *(t + (unsigned long)__gen_e_acsl_i)) 
           ;
         else {
           __gen_e_acsl_forall = 0;

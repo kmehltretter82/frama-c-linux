@@ -37,7 +37,7 @@ void f(void)
   {
     mpz_t __gen_e_acsl_;
     int __gen_e_acsl_eq;
-    __gmpz_init_set_ui(__gen_e_acsl_,(unsigned long)0);
+    __gmpz_init_set_ui(__gen_e_acsl_,0UL);
     __gen_e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__gen_e_acsl_at),
                                  (__mpz_struct const *)(__gen_e_acsl_));
     __e_acsl_assert(__gen_e_acsl_eq == 0,(char *)"Assertion",(char *)"f",
@@ -48,7 +48,7 @@ void f(void)
   {
     mpz_t __gen_e_acsl__2;
     int __gen_e_acsl_eq_2;
-    __gmpz_init_set_ui(__gen_e_acsl__2,(unsigned long)1);
+    __gmpz_init_set_ui(__gen_e_acsl__2,1UL);
     __gen_e_acsl_eq_2 = __gmpz_cmp((__mpz_struct const *)(__gen_e_acsl_at_2),
                                    (__mpz_struct const *)(__gen_e_acsl__2));
     __e_acsl_assert(__gen_e_acsl_eq_2 == 0,(char *)"Assertion",(char *)"f",
@@ -61,7 +61,7 @@ void f(void)
     mpz_t __gen_e_acsl__3;
     int __gen_e_acsl_eq_3;
     __gmpz_init_set_si(__gen_e_acsl_A_3,(long)A);
-    __gmpz_init_set_ui(__gen_e_acsl__3,(unsigned long)2);
+    __gmpz_init_set_ui(__gen_e_acsl__3,2UL);
     __gen_e_acsl_eq_3 = __gmpz_cmp((__mpz_struct const *)(__gen_e_acsl_A_3),
                                    (__mpz_struct const *)(__gen_e_acsl__3));
     __e_acsl_assert(__gen_e_acsl_eq_3 == 0,(char *)"Assertion",(char *)"f",
@@ -73,7 +73,7 @@ void f(void)
   {
     mpz_t __gen_e_acsl__4;
     int __gen_e_acsl_eq_4;
-    __gmpz_init_set_ui(__gen_e_acsl__4,(unsigned long)0);
+    __gmpz_init_set_ui(__gen_e_acsl__4,0UL);
     __gen_e_acsl_eq_4 = __gmpz_cmp((__mpz_struct const *)(__gen_e_acsl_at_3),
                                    (__mpz_struct const *)(__gen_e_acsl__4));
     __e_acsl_assert(__gen_e_acsl_eq_4 == 0,(char *)"Assertion",(char *)"f",
@@ -142,7 +142,7 @@ void g(int *p, int *q)
   {
     mpz_t __gen_e_acsl__2;
     int __gen_e_acsl_eq;
-    __gmpz_init_set_ui(__gen_e_acsl__2,(unsigned long)2);
+    __gmpz_init_set_ui(__gen_e_acsl__2,2UL);
     __gen_e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__gen_e_acsl_at_2),
                                  (__mpz_struct const *)(__gen_e_acsl__2));
     __e_acsl_assert(__gen_e_acsl_eq == 0,(char *)"Assertion",(char *)"g",
@@ -156,7 +156,7 @@ void g(int *p, int *q)
       mpz_t __gen_e_acsl__4;
       int __gen_e_acsl_eq_2;
       __gmpz_init_set_si(__gen_e_acsl__3,(long)*(p + __gen_e_acsl_at_3));
-      __gmpz_init_set_ui(__gen_e_acsl__4,(unsigned long)2);
+      __gmpz_init_set_ui(__gen_e_acsl__4,2UL);
       __gen_e_acsl_eq_2 = __gmpz_cmp((__mpz_struct const *)(__gen_e_acsl__3),
                                      (__mpz_struct const *)(__gen_e_acsl__4));
       __e_acsl_assert(__gen_e_acsl_eq_2 == 0,(char *)"Assertion",(char *)"g",
@@ -206,7 +206,7 @@ int main(void)
       mpz_t __gen_e_acsl__3;
       mpz_t __gen_e_acsl_add;
       __gmpz_init_set_si(__gen_e_acsl_x_3,(long)x);
-      __gmpz_init_set_ui(__gen_e_acsl__3,(unsigned long)1);
+      __gmpz_init_set_ui(__gen_e_acsl__3,1UL);
       __gmpz_init(__gen_e_acsl_add);
       __gmpz_add(__gen_e_acsl_add,(__mpz_struct const *)(__gen_e_acsl_x_3),
                  (__mpz_struct const *)(__gen_e_acsl__3));
@@ -229,7 +229,7 @@ int main(void)
       mpz_t __gen_e_acsl_;
       int __gen_e_acsl_eq;
       __gmpz_init_set_si(__gen_e_acsl_x,(long)x);
-      __gmpz_init_set_ui(__gen_e_acsl_,(unsigned long)0);
+      __gmpz_init_set_ui(__gen_e_acsl_,0UL);
       __gen_e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__gen_e_acsl_x),
                                    (__mpz_struct const *)(__gen_e_acsl_));
       __e_acsl_assert(__gen_e_acsl_eq == 0,(char *)"Assertion",
@@ -246,7 +246,7 @@ int main(void)
   {
     mpz_t __gen_e_acsl__2;
     int __gen_e_acsl_eq_2;
-    __gmpz_init_set_ui(__gen_e_acsl__2,(unsigned long)0);
+    __gmpz_init_set_ui(__gen_e_acsl__2,0UL);
     __gen_e_acsl_eq_2 = __gmpz_cmp((__mpz_struct const *)(__gen_e_acsl_at),
                                    (__mpz_struct const *)(__gen_e_acsl__2));
     __e_acsl_assert(__gen_e_acsl_eq_2 == 0,(char *)"Assertion",
@@ -257,7 +257,7 @@ int main(void)
   {
     mpz_t __gen_e_acsl__4;
     int __gen_e_acsl_eq_3;
-    __gmpz_init_set_ui(__gen_e_acsl__4,(unsigned long)1);
+    __gmpz_init_set_ui(__gen_e_acsl__4,1UL);
     __gen_e_acsl_eq_3 = __gmpz_cmp((__mpz_struct const *)(__gen_e_acsl_at_2),
                                    (__mpz_struct const *)(__gen_e_acsl__4));
     __e_acsl_assert(__gen_e_acsl_eq_3 == 0,(char *)"Assertion",
@@ -269,7 +269,7 @@ int main(void)
     mpz_t __gen_e_acsl__5;
     mpz_t __gen_e_acsl_add_2;
     int __gen_e_acsl_eq_4;
-    __gmpz_init_set_ui(__gen_e_acsl__5,(unsigned long)1);
+    __gmpz_init_set_ui(__gen_e_acsl__5,1UL);
     __gmpz_init(__gen_e_acsl_add_2);
     __gmpz_add(__gen_e_acsl_add_2,(__mpz_struct const *)(__gen_e_acsl_at),
                (__mpz_struct const *)(__gen_e_acsl__5));
@@ -334,7 +334,7 @@ void __gen_e_acsl_f(void)
       __gmpz_init_set(__gen_e_acsl_at,(__mpz_struct const *)(__gen_e_acsl_A));
       __gmpz_clear(__gen_e_acsl_A);
     }
-    __gmpz_init_set_ui(__gen_e_acsl_,(unsigned long)3);
+    __gmpz_init_set_ui(__gen_e_acsl_,3UL);
     __gen_e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__gen_e_acsl_at),
                                  (__mpz_struct const *)(__gen_e_acsl_));
     __e_acsl_assert(__gen_e_acsl_eq == 0,(char *)"Postcondition",(char *)"f",

@@ -79,7 +79,7 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
     int __gen_e_acsl_forall_2;
     unsigned long __gen_e_acsl_k;
     __gen_e_acsl_forall_2 = 1;
-    __gen_e_acsl_k = 0;
+    __gen_e_acsl_k = 0UL;
     while (1) {
       if (__gen_e_acsl_k < n) ; else break;
       {
@@ -120,7 +120,7 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
     int __gen_e_acsl_exists;
     unsigned long __gen_e_acsl_i;
     __gen_e_acsl_exists = 0;
-    __gen_e_acsl_i = 0;
+    __gen_e_acsl_i = 0UL;
     while (1) {
       if (__gen_e_acsl_i < n) ; else break;
       {
@@ -207,7 +207,7 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
                     (char *)"\\old(\\exists integer i; 0 <= i < n && (int)*((char *)buf+i) == c) ==>\n(\\forall int j;\n   0 <= j < \\offset((char *)\\result) ==>\n   (int)*((char *)\\old(buf)+j) != \\old(c))",
                     10);
     if (! __gen_e_acsl_at_4) __gen_e_acsl_implies_2 = 1;
-    else __gen_e_acsl_implies_2 = __retres == (void *)0;
+    else __gen_e_acsl_implies_2 = __retres == (void *)(unsigned char)0;
     __e_acsl_assert(__gen_e_acsl_implies_2,(char *)"Postcondition",
                     (char *)"memchr",
                     (char *)"\\old(\\forall integer k; 0 <= k < n ==> (int)*((char *)buf+k) != c) ==>\n\\result == (void *)0",

@@ -37,7 +37,7 @@ int main(void)
   /*@ assert \initialized(&v1[2]); */
   {
     int __gen_e_acsl_initialized;
-    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& v1[2]),
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& v1[2UL]),
                                                     sizeof(int));
     __e_acsl_assert(__gen_e_acsl_initialized,(char *)"Assertion",
                     (char *)"main",(char *)"\\initialized(&v1[2])",24);
@@ -48,7 +48,7 @@ int main(void)
   /*@ assert \initialized(v2+2); */
   {
     int __gen_e_acsl_initialized_2;
-    __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(v2 + 2),
+    __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(v2 + 2UL),
                                                       sizeof(int));
     __e_acsl_assert(__gen_e_acsl_initialized_2,(char *)"Assertion",
                     (char *)"main",(char *)"\\initialized(v2+2)",27);

@@ -35,7 +35,7 @@ int search(int elt)
     __gen_e_acsl_i = 0;
     while (1) {
       if (__gen_e_acsl_i < k) ; else break;
-      __e_acsl_assert((unsigned int)((unsigned long)__gen_e_acsl_i) < 10,
+      __e_acsl_assert((unsigned int)((unsigned long)__gen_e_acsl_i) < 10U,
                       (char *)"RTE",(char *)"search",
                       (char *)"index_bound: (unsigned long)__gen_e_acsl_i < 10",
                       18);
@@ -79,7 +79,7 @@ int search(int elt)
         __gen_e_acsl_i_2 = 0;
         while (1) {
           if (__gen_e_acsl_i_2 < k) ; else break;
-          __e_acsl_assert((unsigned int)((unsigned long)__gen_e_acsl_i_2) < 10,
+          __e_acsl_assert((unsigned int)((unsigned long)__gen_e_acsl_i_2) < 10U,
                           (char *)"RTE",(char *)"search",
                           (char *)"index_bound: (unsigned long)__gen_e_acsl_i_2 < 10",
                           18);
@@ -145,10 +145,10 @@ int __gen_e_acsl_search(int elt)
     int __gen_e_acsl_forall;
     int __gen_e_acsl_i;
     __gen_e_acsl_forall = 1;
-    __gen_e_acsl_i = 0;
+    __gen_e_acsl_i = (unsigned char)0;
     while (1) {
       if (__gen_e_acsl_i < 9) ; else break;
-      __e_acsl_assert((unsigned int)((unsigned long)(__gen_e_acsl_i + 1)) < 10,
+      __e_acsl_assert((unsigned int)((unsigned long)(__gen_e_acsl_i + 1L)) < 10U,
                       (char *)"RTE",(char *)"search",
                       (char *)"index_bound: (unsigned long)(__gen_e_acsl_i+1) < 10",
                       7);
@@ -156,7 +156,7 @@ int __gen_e_acsl_search(int elt)
                       (char *)"index_bound: __gen_e_acsl_i < 10",7);
       __e_acsl_assert(0 <= __gen_e_acsl_i,(char *)"RTE",(char *)"search",
                       (char *)"index_bound: 0 <= __gen_e_acsl_i",7);
-      if (A[__gen_e_acsl_i] <= A[__gen_e_acsl_i + 1]) ;
+      if (A[__gen_e_acsl_i] <= A[__gen_e_acsl_i + 1UL]) ;
       else {
         __gen_e_acsl_forall = 0;
         goto e_acsl_end_loop3;
@@ -172,7 +172,7 @@ int __gen_e_acsl_search(int elt)
       int __gen_e_acsl_forall_2;
       int __gen_e_acsl_j_2;
       __gen_e_acsl_forall_2 = 1;
-      __gen_e_acsl_j_2 = 0;
+      __gen_e_acsl_j_2 = (unsigned char)0;
       while (1) {
         if (__gen_e_acsl_j_2 < 10) ; else break;
         __e_acsl_assert(__gen_e_acsl_j_2 < 10,(char *)"RTE",(char *)"search",
@@ -193,7 +193,7 @@ int __gen_e_acsl_search(int elt)
       int __gen_e_acsl_exists;
       int __gen_e_acsl_j;
       __gen_e_acsl_exists = 0;
-      __gen_e_acsl_j = 0;
+      __gen_e_acsl_j = (unsigned char)0;
       while (1) {
         if (__gen_e_acsl_j < 10) ; else break;
         __e_acsl_assert(__gen_e_acsl_j < 10,(char *)"RTE",(char *)"search",

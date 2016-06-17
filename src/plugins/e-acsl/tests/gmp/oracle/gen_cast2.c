@@ -52,7 +52,7 @@ int main(void)
     mpz_t __gen_e_acsl__4;
     int __gen_e_acsl_eq_3;
     __gmpz_init_set_si(__gen_e_acsl_y_3,(long)y);
-    __gmpz_init_set_ui(__gen_e_acsl__3,(unsigned long)0);
+    __gmpz_init_set_ui(__gen_e_acsl__3,0UL);
     __gen_e_acsl_cast_3 = __gmpz_get_ui((__mpz_struct const *)(__gen_e_acsl__3));
     __gmpz_init_set_ui(__gen_e_acsl__4,__gen_e_acsl_cast_3);
     __gen_e_acsl_eq_3 = __gmpz_cmp((__mpz_struct const *)(__gen_e_acsl_y_3),
@@ -75,7 +75,7 @@ int main(void)
     __gmpz_init_set_si(__gen_e_acsl_y_4,(long)y);
     __gen_e_acsl_cast_4 = __gmpz_get_ui((__mpz_struct const *)(__gen_e_acsl_y_4));
     __gmpz_init_set_ui(__gen_e_acsl__5,__gen_e_acsl_cast_4);
-    __gmpz_init_set_ui(__gen_e_acsl__6,(unsigned long)0);
+    __gmpz_init_set_ui(__gen_e_acsl__6,0UL);
     __gen_e_acsl_cast_5 = __gmpz_get_ui((__mpz_struct const *)(__gen_e_acsl__6));
     __gmpz_init_set_ui(__gen_e_acsl__7,__gen_e_acsl_cast_5);
     __gen_e_acsl_eq_4 = __gmpz_cmp((__mpz_struct const *)(__gen_e_acsl__5),
@@ -96,7 +96,7 @@ int main(void)
     mpz_t __gen_e_acsl__9;
     int __gen_e_acsl_ne;
     __gmpz_init_set_si(__gen_e_acsl_y_5,(long)y);
-    __gmpz_init_set_ui(__gen_e_acsl__8,0xfffffffffffffff);
+    __gmpz_init_set_ui(__gen_e_acsl__8,1152921504606846975UL);
     __gen_e_acsl_cast_6 = __gmpz_get_ui((__mpz_struct const *)(__gen_e_acsl__8));
     __gmpz_init_set_ui(__gen_e_acsl__9,__gen_e_acsl_cast_6);
     __gen_e_acsl_ne = __gmpz_cmp((__mpz_struct const *)(__gen_e_acsl_y_5),
@@ -119,7 +119,7 @@ int main(void)
     __gmpz_init_set_si(__gen_e_acsl_y_6,(long)y);
     __gen_e_acsl_cast_7 = __gmpz_get_ui((__mpz_struct const *)(__gen_e_acsl_y_6));
     __gmpz_init_set_ui(__gen_e_acsl__10,__gen_e_acsl_cast_7);
-    __gmpz_init_set_ui(__gen_e_acsl__11,0xfffffffffffffff);
+    __gmpz_init_set_ui(__gen_e_acsl__11,1152921504606846975UL);
     __gen_e_acsl_cast_8 = __gmpz_get_ui((__mpz_struct const *)(__gen_e_acsl__11));
     __gmpz_init_set_ui(__gen_e_acsl__12,__gen_e_acsl_cast_8);
     __gen_e_acsl_ne_2 = __gmpz_cmp((__mpz_struct const *)(__gen_e_acsl__10),

@@ -138,7 +138,7 @@ let add_cast ~loc ?name env ctx is_mpz_string t_opt e =
         Cil.mkCastT ~force:false ~e ~oldt:ty ~newt:ctx, env
 
 let constant_to_exp ~loc t = function
-  | Integer(n, repr) ->
+  | Integer(n, _repr) ->
     (try
        let ity = Typing.get_integer_ty t in
        match ity with
@@ -149,7 +149,14 @@ let constant_to_exp ~loc t = function
          match cast, kind with
          | Some ty, (ILongLong | IULongLong) when Gmpz.is_t ty ->
            raise Cil.Not_representable
-         | (None | Some _), _ -> Cil.kinteger64 ~loc ~kind ?repr n, false
+         | (None | Some _), _ ->
+           (* do not keep the initial string representation because the
+              generated constant must reflect its type computed by the type
+              system. For instance, when translating [INT_MAX+1], we must
+              generate a [long long] addition and so [1LL]. If we keep the
+              initial string representation, the kind would be ignored in the
+              generated code and so [1] would be generated. *)
+           Cil.kinteger64 ~loc ~kind (*?repr*) n, false
      with Cil.Not_representable ->
        (* too big integer *)
        Cil.mkString ~loc (Integer.to_string n), true)

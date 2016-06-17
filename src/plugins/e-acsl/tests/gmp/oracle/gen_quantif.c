@@ -7,7 +7,7 @@ int main(void)
     int __gen_e_acsl_forall;
     int __gen_e_acsl_x;
     __gen_e_acsl_forall = 1;
-    __gen_e_acsl_x = 0;
+    __gen_e_acsl_x = (unsigned char)0;
     while (1) {
       if (__gen_e_acsl_x <= 1) ; else break;
       {
@@ -32,7 +32,7 @@ int main(void)
     int __gen_e_acsl_forall_2;
     int __gen_e_acsl_x_2;
     __gen_e_acsl_forall_2 = 1;
-    __gen_e_acsl_x_2 = 0 + 1;
+    __gen_e_acsl_x_2 = (unsigned char)0 + 1;
     while (1) {
       if (__gen_e_acsl_x_2 <= 1) ; else break;
       if (__gen_e_acsl_x_2 == 1) ;
@@ -51,7 +51,7 @@ int main(void)
     int __gen_e_acsl_forall_3;
     int __gen_e_acsl_x_3;
     __gen_e_acsl_forall_3 = 1;
-    __gen_e_acsl_x_3 = 0 + 1;
+    __gen_e_acsl_x_3 = (unsigned char)0 + 1;
     while (1) {
       if (__gen_e_acsl_x_3 < 1) ; else break;
       if (0) ;
@@ -70,7 +70,7 @@ int main(void)
     int __gen_e_acsl_forall_4;
     int __gen_e_acsl_x_4;
     __gen_e_acsl_forall_4 = 1;
-    __gen_e_acsl_x_4 = 0;
+    __gen_e_acsl_x_4 = (unsigned char)0;
     while (1) {
       if (__gen_e_acsl_x_4 < 1) ; else break;
       if (__gen_e_acsl_x_4 == 0) ;
@@ -94,13 +94,13 @@ int main(void)
     int __gen_e_acsl_y;
     int __gen_e_acsl_z;
     __gen_e_acsl_forall_5 = 1;
-    __gen_e_acsl_x_5 = 0;
+    __gen_e_acsl_x_5 = (unsigned char)0;
     while (1) {
       if (__gen_e_acsl_x_5 < 2) ; else break;
-      __gen_e_acsl_y = 0;
+      __gen_e_acsl_y = (unsigned char)0;
       while (1) {
         if (__gen_e_acsl_y < 5) ; else break;
-        __gen_e_acsl_z = 0;
+        __gen_e_acsl_z = (unsigned char)0;
         while (1) {
           if (__gen_e_acsl_z <= __gen_e_acsl_y) ; else break;
           if (__gen_e_acsl_x_5 + __gen_e_acsl_z <= __gen_e_acsl_y + 1) 
@@ -158,9 +158,11 @@ int main(void)
           int __gen_e_acsl_exists_2;
           int __gen_e_acsl_y_2;
           __gen_e_acsl_exists_2 = 0;
-          __gen_e_acsl_y_2 = 0;
+          __gen_e_acsl_y_2 = (unsigned char)0;
           while (1) {
-            if (__gen_e_acsl_y_2 <= __gen_e_acsl_x_7 / 2) ; else break;
+            if (__gen_e_acsl_y_2 <= __gen_e_acsl_x_7 / (unsigned char)2) 
+              ;
+            else break;
             if (! (__gen_e_acsl_x_7 == 2 * __gen_e_acsl_y_2)) ;
             else {
               __gen_e_acsl_exists_2 = 1;

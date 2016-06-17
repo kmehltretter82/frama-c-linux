@@ -16,14 +16,14 @@ int main(void)
   __e_acsl_assert(y == 0,(char *)"Assertion",(char *)"main",
                   (char *)"y == (int)0",13);
   /*@ assert (unsigned int)y ≡ (unsigned int)0; */
-  __e_acsl_assert((unsigned int)y == 0,(char *)"Assertion",(char *)"main",
+  __e_acsl_assert((unsigned int)y == 0U,(char *)"Assertion",(char *)"main",
                   (char *)"(unsigned int)y == (unsigned int)0",14);
   /*@ assert y ≢ (int)0xfffffffffffffff; */
-  __e_acsl_assert(y != (int)0xfffffffffffffff,(char *)"Assertion",
-                  (char *)"main",(char *)"y != (int)0xfffffffffffffff",17);
+  __e_acsl_assert(y != -1,(char *)"Assertion",(char *)"main",
+                  (char *)"y != (int)0xfffffffffffffff",17);
   /*@ assert (unsigned int)y ≢ (unsigned int)0xfffffffffffffff; */
-  __e_acsl_assert((unsigned int)y != (unsigned int)0xfffffffffffffff,
-                  (char *)"Assertion",(char *)"main",
+  __e_acsl_assert((unsigned int)y != 4294967295U,(char *)"Assertion",
+                  (char *)"main",
                   (char *)"(unsigned int)y != (unsigned int)0xfffffffffffffff",
                   18);
   __retres = 0;

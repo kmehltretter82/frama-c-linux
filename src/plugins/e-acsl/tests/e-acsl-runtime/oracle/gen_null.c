@@ -3,8 +3,8 @@ int main(void)
 {
   int __retres;
   /*@ assert \null ≡ (void *)0; */
-  __e_acsl_assert((void *)0 == (void *)0,(char *)"Assertion",(char *)"main",
-                  (char *)"\\null == (void *)0",6);
+  __e_acsl_assert((void *)0 == (void *)(unsigned char)0,(char *)"Assertion",
+                  (char *)"main",(char *)"\\null == (void *)0",6);
   __retres = 0;
   return __retres;
 }

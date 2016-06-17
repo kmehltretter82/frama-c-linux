@@ -129,7 +129,7 @@ int main(void)
     __e_acsl_store_block((void *)(& __gen_e_acsl_at_3),4UL);
     __gen_e_acsl_at_3 = x;
     __e_acsl_store_block((void *)(& __gen_e_acsl_at_2),8UL);
-    __gen_e_acsl_at_2 = x + 1;
+    __gen_e_acsl_at_2 = x + 1L;
     __e_acsl_store_block((void *)(& __gen_e_acsl_at),4UL);
     __gen_e_acsl_at = x;
     /*@ assert x ≡ 0; */
@@ -144,10 +144,10 @@ int main(void)
   __e_acsl_assert(__gen_e_acsl_at == 0,(char *)"Assertion",(char *)"main",
                   (char *)"\\at(x,L) == 0",48);
   /*@ assert \at(x+1,L) ≡ 1; */
-  __e_acsl_assert(__gen_e_acsl_at_2 == 1,(char *)"Assertion",(char *)"main",
+  __e_acsl_assert(__gen_e_acsl_at_2 == 1L,(char *)"Assertion",(char *)"main",
                   (char *)"\\at(x+1,L) == 1",49);
   /*@ assert \at(x,L)+1 ≡ 1; */
-  __e_acsl_assert(__gen_e_acsl_at_3 + 1 == 1,(char *)"Assertion",
+  __e_acsl_assert(__gen_e_acsl_at_3 + 1L == 1L,(char *)"Assertion",
                   (char *)"main",(char *)"\\at(x,L)+1 == 1",50);
   g(t,& x);
   __retres = 0;
