@@ -18,7 +18,7 @@ tests/gmp/longlong.i:9:[value] warning: recursive call during value analysis
 [value] using specification for function my_pow
 tests/gmp/longlong.i:10:[value] warning: signed overflow. assert -2147483648 ≤ tmp*tmp;
 tests/gmp/longlong.i:10:[value] warning: signed overflow. assert tmp*tmp ≤ 2147483647;
-[value] using specification for function __gmpz_init_set_ui
+[value] using specification for function __gmpz_init_set_si
 [value] using specification for function __gmpz_init
 [value] using specification for function __gmpz_import
 FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:88:[value] warning: function __gmpz_import: precondition got status unknown.

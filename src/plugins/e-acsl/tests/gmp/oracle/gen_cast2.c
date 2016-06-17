@@ -52,7 +52,7 @@ int main(void)
     mpz_t __gen_e_acsl__4;
     int __gen_e_acsl_eq_3;
     __gmpz_init_set_si(__gen_e_acsl_y_3,(long)y);
-    __gmpz_init_set_ui(__gen_e_acsl__3,0UL);
+    __gmpz_init_set_si(__gen_e_acsl__3,0L);
     __gen_e_acsl_cast_3 = __gmpz_get_ui((__mpz_struct const *)(__gen_e_acsl__3));
     __gmpz_init_set_ui(__gen_e_acsl__4,__gen_e_acsl_cast_3);
     __gen_e_acsl_eq_3 = __gmpz_cmp((__mpz_struct const *)(__gen_e_acsl_y_3),
@@ -75,7 +75,7 @@ int main(void)
     __gmpz_init_set_si(__gen_e_acsl_y_4,(long)y);
     __gen_e_acsl_cast_4 = __gmpz_get_ui((__mpz_struct const *)(__gen_e_acsl_y_4));
     __gmpz_init_set_ui(__gen_e_acsl__5,__gen_e_acsl_cast_4);
-    __gmpz_init_set_ui(__gen_e_acsl__6,0UL);
+    __gmpz_init_set_si(__gen_e_acsl__6,0L);
     __gen_e_acsl_cast_5 = __gmpz_get_ui((__mpz_struct const *)(__gen_e_acsl__6));
     __gmpz_init_set_ui(__gen_e_acsl__7,__gen_e_acsl_cast_5);
     __gen_e_acsl_eq_4 = __gmpz_cmp((__mpz_struct const *)(__gen_e_acsl__5),

@@ -37,7 +37,7 @@ int main(void)
     mpz_t __gen_e_acsl_div;
     unsigned long __gen_e_acsl__3;
     __gmpz_init_set_str(__gen_e_acsl_,"309485009821345068724781055",10);
-    __gmpz_init_set_ui(__gen_e_acsl__2,0UL);
+    __gmpz_init_set_si(__gen_e_acsl__2,0L);
     __gen_e_acsl_div_guard = __gmpz_cmp((__mpz_struct const *)(__gen_e_acsl_),
                                         (__mpz_struct const *)(__gen_e_acsl__2));
     __gmpz_init(__gen_e_acsl_div);
@@ -99,12 +99,12 @@ int main(void)
     mpz_t __gen_e_acsl_div_2;
     unsigned long __gen_e_acsl__7;
     __gmpz_init_set_si(__gen_e_acsl_z,z);
-    __gmpz_init_set_ui(__gen_e_acsl__4,1UL);
+    __gmpz_init_set_si(__gen_e_acsl__4,1L);
     __gmpz_init(__gen_e_acsl_add);
     __gmpz_add(__gen_e_acsl_add,(__mpz_struct const *)(__gen_e_acsl_z),
                (__mpz_struct const *)(__gen_e_acsl__4));
     __gmpz_init_set_si(__gen_e_acsl__5,y - 123456789123456789L);
-    __gmpz_init_set_ui(__gen_e_acsl__6,0UL);
+    __gmpz_init_set_si(__gen_e_acsl__6,0L);
     __gen_e_acsl_div_guard_2 = __gmpz_cmp((__mpz_struct const *)(__gen_e_acsl__5),
                                           (__mpz_struct const *)(__gen_e_acsl__6));
     __gmpz_init(__gen_e_acsl_div_2);

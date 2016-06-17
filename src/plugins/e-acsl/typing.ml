@@ -170,13 +170,16 @@ let ty_of_interv ?ctx i =
   try
     let lkind = Cil.intKindForValue i.lower is_pos in
     let ukind = Cil.intKindForValue i.upper is_pos in
-    let kind = if Cil.intTypeIncluded lkind ukind then ukind else lkind in
+    (* kind corresponding to the interval *)
+    let itv_kind = if Cil.intTypeIncluded lkind ukind then ukind else lkind in
+    (* convert the kind to [IInt] whenever smaller. *)
+    let kind = if Cil.intTypeIncluded itv_kind IInt then IInt else itv_kind in
     (* ctx type whenever possible to prevent superfluous casts in the generated
        code *)
     (match ctx with
     | None | Some (Gmp | Other) -> C_type kind
     | Some (C_type ik as ctx) ->
-      if Cil.intTypeIncluded kind ik then ctx else C_type kind)
+      if Cil.intTypeIncluded itv_kind ik then ctx else C_type kind)
   with Cil.Not_representable ->
     Gmp
 

@@ -156,7 +156,7 @@ let constant_to_exp ~loc t = function
               generate a [long long] addition and so [1LL]. If we keep the
               initial string representation, the kind would be ignored in the
               generated code and so [1] would be generated. *)
-           Cil.kinteger64 ~loc ~kind (*?repr*) n, false
+           Cil.kinteger64 ~loc ~kind n, false
      with Cil.Not_representable ->
        (* too big integer *)
        Cil.mkString ~loc (Integer.to_string n), true)

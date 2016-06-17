@@ -254,9 +254,9 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
                                                     sizeof(float));
     __e_acsl_assert(__gen_e_acsl_valid_read_3,(char *)"RTE",(char *)"foo",
                     (char *)"mem_access: \\valid_read(__gen_e_acsl_at)",11);
-    __e_acsl_assert(*__gen_e_acsl_at == *__gen_e_acsl_at_2 + ((long double)(unsigned char)5 - 
+    __e_acsl_assert(*__gen_e_acsl_at == *__gen_e_acsl_at_2 + ((long double)5 - 
                                                               ((long double)(
-                                                               (unsigned char)5 / (unsigned char)80) * *__gen_e_acsl_at_3) * 0.4),
+                                                               5 / 80) * *__gen_e_acsl_at_3) * 0.4),
                     (char *)"Postcondition",(char *)"foo",
                     (char *)"*\\old(Mtmax_out) == *\\old(Mtmax_in)+(5-((5/80)**\\old(Mwmax))*0.4)",
                     11);

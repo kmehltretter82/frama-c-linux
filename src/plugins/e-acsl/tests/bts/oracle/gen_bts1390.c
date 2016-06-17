@@ -100,7 +100,7 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
         mpz_t __gen_e_acsl__5;
         mpz_t __gen_e_acsl_add_3;
         unsigned long __gen_e_acsl__6;
-        __gmpz_init_set_ui(__gen_e_acsl__5,1UL);
+        __gmpz_init_set_si(__gen_e_acsl__5,1L);
         __gmpz_init(__gen_e_acsl_add_3);
         __gmpz_add(__gen_e_acsl_add_3,(__mpz_struct const *)__gen_e_acsl_k,
                    (__mpz_struct const *)(__gen_e_acsl__5));
@@ -141,7 +141,7 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
         mpz_t __gen_e_acsl_;
         mpz_t __gen_e_acsl_add;
         unsigned long __gen_e_acsl__2;
-        __gmpz_init_set_ui(__gen_e_acsl_,1UL);
+        __gmpz_init_set_si(__gen_e_acsl_,1L);
         __gmpz_init(__gen_e_acsl_add);
         __gmpz_add(__gen_e_acsl_add,(__mpz_struct const *)__gen_e_acsl_i,
                    (__mpz_struct const *)(__gen_e_acsl_));
@@ -189,7 +189,7 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
           mpz_t __gen_e_acsl__3;
           mpz_t __gen_e_acsl_add_2;
           unsigned long __gen_e_acsl__4;
-          __gmpz_init_set_ui(__gen_e_acsl__3,1UL);
+          __gmpz_init_set_si(__gen_e_acsl__3,1L);
           __gmpz_init(__gen_e_acsl_add_2);
           __gmpz_add(__gen_e_acsl_add_2,(__mpz_struct const *)__gen_e_acsl_j,
                      (__mpz_struct const *)(__gen_e_acsl__3));
@@ -207,7 +207,7 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
                     (char *)"\\old(\\exists integer i; 0 <= i < n && (int)*((char *)buf+i) == c) ==>\n(\\forall int j;\n   0 <= j < \\offset((char *)\\result) ==>\n   (int)*((char *)\\old(buf)+j) != \\old(c))",
                     10);
     if (! __gen_e_acsl_at_4) __gen_e_acsl_implies_2 = 1;
-    else __gen_e_acsl_implies_2 = __retres == (void *)(unsigned char)0;
+    else __gen_e_acsl_implies_2 = __retres == (void *)0;
     __e_acsl_assert(__gen_e_acsl_implies_2,(char *)"Postcondition",
                     (char *)"memchr",
                     (char *)"\\old(\\forall integer k; 0 <= k < n ==> (int)*((char *)buf+k) != c) ==>\n\\result == (void *)0",

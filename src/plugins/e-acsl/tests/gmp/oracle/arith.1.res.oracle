@@ -10,10 +10,9 @@
   __e_acsl_init ∈ [--..--]
   __e_acsl_internal_heap ∈ [--..--]
   __e_acsl_heap_size ∈ [--..--]
-[value] using specification for function __gmpz_init_set_ui
+[value] using specification for function __gmpz_init_set_si
 [value] using specification for function __gmpz_init
 [value] using specification for function __gmpz_neg
-[value] using specification for function __gmpz_init_set_si
 [value] using specification for function __gmpz_cmp
 [value] using specification for function __e_acsl_assert
 FRAMAC_SHARE/e-acsl/e_acsl.h:43:[value] warning: function __e_acsl_assert: precondition got status unknown.
@@ -25,4 +24,5 @@ FRAMAC_SHARE/e-acsl/e_acsl.h:43:[value] warning: function __e_acsl_assert: preco
 [value] using specification for function __gmpz_tdiv_q
 [value] using specification for function __gmpz_init_set_str
 [value] using specification for function __gmpz_tdiv_r
+[value] using specification for function __gmpz_init_set_ui
 [value] done for function main
