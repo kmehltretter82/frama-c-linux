@@ -138,7 +138,7 @@ let add_cast ~loc ?name env ctx is_mpz_string t_opt e =
         Cil.mkCastT ~force:false ~e ~oldt:ty ~newt:ctx, env
 
 let constant_to_exp ~loc t = function
-  | Integer(n, repr) ->
+  | Integer(n, _repr) ->
     (try
        let ity = Typing.get_integer_ty t in
        match ity with
@@ -149,9 +149,15 @@ let constant_to_exp ~loc t = function
          match cast, kind with
          | Some ty, (ILongLong | IULongLong) when Gmpz.is_t ty ->
            raise Cil.Not_representable
-         | (None | Some _), _ -> Cil.kinteger64 ~loc ~kind ?repr n, false
+         | (None | Some _), _ ->
+           (* do not keep the initial string representation because the
+              generated constant must reflect its type computed by the type
+              system. For instance, when translating [INT_MAX+1], we must
+              generate a [long long] addition and so [1LL]. If we keep the
+              initial string representation, the kind would be ignored in the
+              generated code and so [1] would be generated. *)
+           Cil.kinteger64 ~loc ~kind n, false
      with Cil.Not_representable ->
-       
        (* too big integer *)
        Cil.mkString ~loc (Integer.to_string n), true)
   | LStr s -> Cil.new_exp ~loc (Const (CStr s)), false
@@ -510,7 +516,7 @@ and comparison_to_exp
     in
     Cil.new_exp ~loc (BinOp(bop, e, Cil.zero ~loc, Cil.intType)), env
   | Typing.C_type _ | Typing.Other ->
-    Cil.new_exp  ~loc (BinOp(bop, e1, e2, Cil.intType)), env
+    Cil.new_exp ~loc (BinOp(bop, e1, e2, Cil.intType)), env
 
 (* \base_addr, \block_length and \freeable annotations *)
 and mmodel_call ~loc kf name ctx env t =
@@ -797,16 +803,16 @@ exception No_simple_translation of term
 
 (* This function is used by plug-in [Cfp]. *)
 let term_to_exp typ t =
-  let ctx = match typ with
-    | None -> Typing.c_int (* useless, but required *)
-    | Some typ ->
-      if Gmpz.is_t typ then Typing.gmp
-      else
-        match typ with
-        | TInt(ik, _) -> Typing.ikind ik
-        | _ -> Typing.c_int (* useless, but required *)
+  (* infer a context from the given [typ] whenever possible *)
+  let ctx_of_typ ty =
+    if Gmpz.is_t ty then Typing.gmp
+    else
+      match ty with
+      | TInt(ik, _) -> Typing.ikind ik
+      | _ -> Typing.other
   in
-  Typing.type_term ~force:false ~ctx t;
+  let ctx = Extlib.opt_map ctx_of_typ typ in
+  Typing.type_term ~force:false ?ctx t;
   let env = Env.empty (new Visitor.frama_c_copy Project_skeleton.dummy) in
   let env = Env.push env in
   let env = Env.rte env false in

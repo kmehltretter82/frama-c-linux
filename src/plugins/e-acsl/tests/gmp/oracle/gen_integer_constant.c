@@ -12,7 +12,7 @@ int main(void)
   __e_acsl_assert(0 != 1,(char *)"Assertion",(char *)"main",(char *)"0 != 1",
                   8);
   /*@ assert 1152921504606846975 ≡ 0xfffffffffffffff; */
-  __e_acsl_assert(1152921504606846975 == 0xfffffffffffffff,
+  __e_acsl_assert(1152921504606846975UL == 1152921504606846975UL,
                   (char *)"Assertion",(char *)"main",
                   (char *)"1152921504606846975 == 0xfffffffffffffff",9);
   /*@ assert

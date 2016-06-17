@@ -34,7 +34,7 @@ int main(void)
   /*@ assert ¬\freeable(p+1); */
   {
     int __gen_e_acsl_freeable_3;
-    __gen_e_acsl_freeable_3 = __e_acsl_freeable((void *)(p + 1));
+    __gen_e_acsl_freeable_3 = __e_acsl_freeable((void *)(p + 1UL));
     __e_acsl_assert(! __gen_e_acsl_freeable_3,(char *)"Assertion",
                     (char *)"main",(char *)"!\\freeable(p+1)",18);
   }
@@ -63,7 +63,7 @@ int main(void)
   /*@ assert ¬\freeable(&array[5]); */
   {
     int __gen_e_acsl_freeable_7;
-    __gen_e_acsl_freeable_7 = __e_acsl_freeable((void *)(& array[5]));
+    __gen_e_acsl_freeable_7 = __e_acsl_freeable((void *)(& array[5UL]));
     __e_acsl_assert(! __gen_e_acsl_freeable_7,(char *)"Assertion",
                     (char *)"main",(char *)"!\\freeable(&array[5])",25);
   }

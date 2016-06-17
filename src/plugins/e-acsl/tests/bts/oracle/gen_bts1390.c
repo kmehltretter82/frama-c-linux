@@ -79,7 +79,7 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
     int __gen_e_acsl_forall_2;
     unsigned long __gen_e_acsl_k;
     __gen_e_acsl_forall_2 = 1;
-    __gen_e_acsl_k = 0;
+    __gen_e_acsl_k = 0UL;
     while (1) {
       if (__gen_e_acsl_k < n) ; else break;
       {
@@ -100,7 +100,7 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
         mpz_t __gen_e_acsl__5;
         mpz_t __gen_e_acsl_add_3;
         unsigned long __gen_e_acsl__6;
-        __gmpz_init_set_ui(__gen_e_acsl__5,1UL);
+        __gmpz_init_set_si(__gen_e_acsl__5,1L);
         __gmpz_init(__gen_e_acsl_add_3);
         __gmpz_add(__gen_e_acsl_add_3,(__mpz_struct const *)__gen_e_acsl_k,
                    (__mpz_struct const *)(__gen_e_acsl__5));
@@ -120,7 +120,7 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
     int __gen_e_acsl_exists;
     unsigned long __gen_e_acsl_i;
     __gen_e_acsl_exists = 0;
-    __gen_e_acsl_i = 0;
+    __gen_e_acsl_i = 0UL;
     while (1) {
       if (__gen_e_acsl_i < n) ; else break;
       {
@@ -141,7 +141,7 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
         mpz_t __gen_e_acsl_;
         mpz_t __gen_e_acsl_add;
         unsigned long __gen_e_acsl__2;
-        __gmpz_init_set_ui(__gen_e_acsl_,1UL);
+        __gmpz_init_set_si(__gen_e_acsl_,1L);
         __gmpz_init(__gen_e_acsl_add);
         __gmpz_add(__gen_e_acsl_add,(__mpz_struct const *)__gen_e_acsl_i,
                    (__mpz_struct const *)(__gen_e_acsl_));
@@ -189,7 +189,7 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
           mpz_t __gen_e_acsl__3;
           mpz_t __gen_e_acsl_add_2;
           unsigned long __gen_e_acsl__4;
-          __gmpz_init_set_ui(__gen_e_acsl__3,1UL);
+          __gmpz_init_set_si(__gen_e_acsl__3,1L);
           __gmpz_init(__gen_e_acsl_add_2);
           __gmpz_add(__gen_e_acsl_add_2,(__mpz_struct const *)__gen_e_acsl_j,
                      (__mpz_struct const *)(__gen_e_acsl__3));

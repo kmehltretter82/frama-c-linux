@@ -44,14 +44,14 @@ int main(void)
   {
     __e_acsl_assert(x == 5,(char *)"Precondition",(char *)"main",
                     (char *)"x == 5",23);
-    __e_acsl_assert(x == 3 + y,(char *)"Precondition",(char *)"main",
+    __e_acsl_assert(x == 3L + y,(char *)"Precondition",(char *)"main",
                     (char *)"x == 3+y",26);
     __e_acsl_assert(y == 2,(char *)"Precondition",(char *)"main",
                     (char *)"y == 2",27);
     x = 3;
     __e_acsl_assert(x == 3,(char *)"Postcondition",(char *)"main",
                     (char *)"x == 3",24);
-    __e_acsl_assert(x == y + 1,(char *)"Postcondition",(char *)"main",
+    __e_acsl_assert(x == y + 1L,(char *)"Postcondition",(char *)"main",
                     (char *)"x == y+1",28);
   }
   /*@ behavior b1:
@@ -81,7 +81,7 @@ int main(void)
                     (char *)"main",(char *)"x == 3 && y == 2 ==> x == 3",37);
     if (x == 3) __gen_e_acsl_and_2 = y == 2; else __gen_e_acsl_and_2 = 0;
     if (! __gen_e_acsl_and_2) __gen_e_acsl_implies_3 = 1;
-    else __gen_e_acsl_implies_3 = x + y == 5;
+    else __gen_e_acsl_implies_3 = x + y == 5L;
     __e_acsl_assert(__gen_e_acsl_implies_3,(char *)"Precondition",
                     (char *)"main",(char *)"x == 3 && y == 2 ==> x+y == 5",
                     38);

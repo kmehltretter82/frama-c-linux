@@ -25,7 +25,7 @@ int main(void)
                     (char *)"mem_access: \\valid_read(&state->bitsInQueue)",
                     22);
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& state->dataQueue[
-                                                    state->bitsInQueue / 8]),
+                                                    state->bitsInQueue / 8UL]),
                                                     sizeof(unsigned char __attribute__((
                                                     __aligned__(32)))));
     __e_acsl_assert(! __gen_e_acsl_initialized,(char *)"Assertion",
