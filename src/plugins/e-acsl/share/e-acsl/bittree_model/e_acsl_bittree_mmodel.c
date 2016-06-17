@@ -356,9 +356,9 @@ static void* bittree_realloc(void* ptr, size_t size) {
     return NULL;
   __e_acsl_heap_size -= tmp->size;
   /* realloc changes start address -- re-enter the element */
-  if (tmp->ptr != (size_t)new_ptr) {
+  if (tmp->ptr != (uintptr_t)new_ptr) {
     bt_remove(tmp);
-    tmp->ptr = (size_t)new_ptr;
+    tmp->ptr = (uintptr_t)new_ptr;
     bt_insert(tmp);
   }
   /* uninitialized, do nothing */
@@ -366,11 +366,11 @@ static void* bittree_realloc(void* ptr, size_t size) {
   /* already fully initialized block */
   else if (tmp->init_bytes == tmp->size) {
     /* realloc smaller block */
-    if(size <= tmp->size)
+    if (size <= tmp->size) {
       /* adjust new size, allocation not necessary */
       tmp->init_bytes = size;
     /* realloc bigger larger block */
-    else {
+    } else {
       /* size of tmp->init_ptr in the new block  */
       int nb = needed_bytes(size);
       /* number of bits that need to be set in tmp->init_ptr */
@@ -380,19 +380,17 @@ static void* bittree_realloc(void* ptr, size_t size) {
       /* carry out initialization of the old block */
       setbits(tmp->init_ptr, tmp->size);
     }
-  }
-  /* contains initialized and uninitialized parts */
-  else {
+  } else { /* contains initialized and uninitialized parts */
     int nb = needed_bytes(size);
     int nb_old = needed_bytes(tmp->size);
     int i;
     tmp->init_ptr = native_realloc(tmp->init_ptr, nb);
-    for(i = nb_old; i < nb; i++)
+    for (i = nb_old; i < nb; i++)
       tmp->init_ptr[i] = 0;
     tmp->init_bytes = 0;
-    for(i = 0; i < nb; i++)
+    for (i = 0; i < nb; i++)
       tmp->init_bytes += nbr_bits_to_1[tmp->init_ptr[i]];
-    if(tmp->init_bytes == size || tmp->init_bytes == 0) {
+    if (tmp->init_bytes == size || tmp->init_bytes == 0) {
       native_free(tmp->init_ptr);
       tmp->init_ptr = NULL;
     }
@@ -405,17 +403,17 @@ static void* bittree_realloc(void* ptr, size_t size) {
 
 /*! \brief Replacement for `free` with memory tracking */
 static void bittree_free(void* ptr) {
-  bt_block * tmp;
-  if(ptr == NULL)
+  if (!ptr)
     return;
-  tmp = bt_lookup(ptr);
-  DASSERT(tmp != NULL);
-  printf("Free block: %a %d\n", ptr, tmp->size);
-  native_free(ptr);
-  bt_clean_block_init(tmp);
-  __e_acsl_heap_size -= tmp->size;
-  bt_remove(tmp);
-  native_free(tmp);
+  bt_block * res = bt_lookup(ptr);
+  if (!res) {
+    vabort("Not a start of block (%a) in free\n", ptr);
+  } else {
+    __e_acsl_heap_size -= res->size;
+    native_free(ptr);
+    bt_clean_block_init(res);
+    bt_remove(res);
+  }
 }
 /* }}} */
 /* }}} */
