@@ -52,6 +52,10 @@ check_tool() {
    { has_tool "$1" || test -e "$1"; } || error "No executable $1 found";
 }
 
+# Check if getopt is GNU
+required_tool getopt "util-linux"
+required_tool readlink "GNU coreutils"
+
 # Getopt options
 LONGOPTIONS="help,compile,compile-only,print,debug:,ocode:,oexec:,verbose:,
   frama-c-only,extra-cpp-args:,frama-c-stdlib,full-mmodel,gmp,quiet,logfile:,
