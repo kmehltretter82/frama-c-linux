@@ -311,7 +311,8 @@ do
     ;;
     --rte|-a)
       shift
-      OPTION_RTE="-rte -rte-mem -rte-no-float-to-int -no-warn-signed-overflow -no-warn-unsigned-overflow"
+      OPTION_RTE="-rte -rte-mem -rte-no-float-to-int
+        -no-warn-signed-overflow -no-warn-unsigned-overflow -then"
     ;;
     # A memory model  (or models) to link against
     -m|--memory-model)
@@ -479,11 +480,10 @@ if [ -n "$OPTION_INSTRUMENT" ]; then
     $OPTION_FRAMA_STDLIB \
     $OPTION_FULL_MMODEL \
     $OPTION_GMP \
-    $OPTION_RTE \
     "$@" \
-    $OPTION_EACSL \
-    -print \
-    -ocode "$OPTION_OUTPUT_CODE");
+    $OPTION_RTE \
+    $OPTION_EACSL -then-last \
+    -print -ocode "$OPTION_OUTPUT_CODE");
     error "aborted by Frama-C" $?;
   # Print translated code
   if [ -n "$OPTION_PRINT" ]; then
