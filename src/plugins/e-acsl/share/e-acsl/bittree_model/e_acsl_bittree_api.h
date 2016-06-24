@@ -46,7 +46,7 @@ typedef struct bt_block bt_block;
 /*! \brief Structure representing a bittree node */
 struct bt_node {
   _Bool is_leaf;
-  size_t addr,  mask;
+  size_t addr, mask;
   struct bt_node * left, * right, * parent;
   bt_block * leaf;
 };

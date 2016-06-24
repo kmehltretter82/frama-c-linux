@@ -21,8 +21,8 @@
 /**************************************************************************/
 
 /*! ***********************************************************************
- * \file   e_acsl_bittree_mmodel.c
- * \brief  Implementation of E-ACSL public API using a memory model based
+ * \file e_acsl_bittree_mmodel.c
+ * \brief Implementation of E-ACSL public API using a memory model based
  * on Patricia Trie. See e_acsl_mmodel_api.h for details.
 ***************************************************************************/
 
@@ -192,7 +192,7 @@ static int initialized(void * ptr, size_t size) {
 /* return the length (in bytes) of the block containing ptr */
 static size_t block_length(void* ptr) {
   bt_block * tmp = bt_find(ptr);
-  /* Hard failure when un-allocated memory is used  */
+  /* Hard failure when un-allocated memory is used */
   vassert(tmp != NULL, "\\block_length of unallocated memory", NULL);
   return tmp->size;
 }
@@ -242,7 +242,7 @@ static void* store_block(void* ptr, size_t size) {
   DASSERT(ptr != NULL);
   tmp = native_malloc(sizeof(bt_block));
   DASSERT(tmp != NULL);
-  tmp->ptr = (size_t)ptr;
+  tmp->ptr = (uintptr_t)ptr;
   tmp->size = size;
   tmp->init_ptr = NULL;
   tmp->init_bytes = 0;
@@ -324,7 +324,7 @@ static int bittree_posix_memalign(void **memptr, size_t alignment, size_t size) 
 
   /* Make sure that the first argument to posix memalign is indeed allocated */
   vassert(valid(memptr, sizeof(void*)),
-      "\\invalid memptr in  posix_memalign", NULL);
+      "\\invalid memptr in posix_memalign", NULL);
 
   int res = native_posix_memalign(memptr, alignment, size);
   if (!res) {
@@ -369,7 +369,7 @@ static void* bittree_realloc(void* ptr, size_t size) {
       tmp->init_bytes = size;
     /* realloc bigger larger block */
     } else {
-      /* size of tmp->init_ptr in the new block  */
+      /* size of tmp->init_ptr in the new block */
       int nb = needed_bytes(size);
       /* number of bits that need to be set in tmp->init_ptr */
       int nb_old = needed_bytes(tmp->size);
@@ -465,7 +465,7 @@ public_alias(block_length)
 public_alias(initialized)
 public_alias(freeable)
 public_alias(readonly)
-/* Block initialization  */
+/* Block initialization */
 public_alias(initialize)
 public_alias(full_init)
 /* Memory state initialization */
