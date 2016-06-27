@@ -64,7 +64,7 @@
  *    // x => 1000 0001 ... */
 #define setbit(_bit,_number) (_number |= 1 << _bit)
 
-/* Same as bitset but the bit cleared (set of zer0) */
+/* Same as bitset but the bit is cleared (set of zero) */
 #define clearbit(_bit, _number) (_number &= ~(1 << _bit))
 
 /* Evaluates to a true value if a given bit in a number is set to 1.
