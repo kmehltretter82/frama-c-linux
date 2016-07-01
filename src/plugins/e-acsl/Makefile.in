@@ -46,7 +46,6 @@ endif
 #########################
 
 PLUGIN_DIR ?=.
-PLUGIN_LIB = $(PLUGIN_DIR)/lib
 PLUGIN_ENABLE:=@ENABLE_E_ACSL@
 PLUGIN_DYNAMIC:=@DYNAMIC_E_ACSL@
 PLUGIN_NAME:=E_ACSL
@@ -144,9 +143,10 @@ clean::
 ################################################
 # E-ACSL C Libs: libjemalloc, libgmp					 #
 ################################################
+LOCAL_LIB = $(PLUGIN_DIR)/lib
 JEMALLOC_DIR = $(PLUGIN_DIR)/contrib/libjemalloc
 JEMALLOC_LIBNAME = libjemalloc-e-acsl.a
-JEMALLOC_LIB = $(PLUGIN_LIB)/$(JEMALLOC_LIBNAME)
+JEMALLOC_LIB = $(LOCAL_LIB)/$(JEMALLOC_LIBNAME)
 
 $(JEMALLOC_LIB):
 	cd $(JEMALLOC_DIR) && \
@@ -159,7 +159,7 @@ $(JEMALLOC_LIB):
 
 GMP_DIR = $(PLUGIN_DIR)/contrib/libgmp
 GMP_LIBNAME = libgmp-e-acsl.a
-GMP_LIB = $(PLUGIN_LIB)/$(GMP_LIBNAME)
+GMP_LIB = $(LOCAL_LIB)/$(GMP_LIBNAME)
 
 $(GMP_LIB):
 	cd $(GMP_DIR) && ./configure && $(MAKE) $(MAKEOPTS)
