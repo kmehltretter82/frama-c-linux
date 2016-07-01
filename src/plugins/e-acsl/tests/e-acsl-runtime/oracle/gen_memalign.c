@@ -35,7 +35,7 @@ int main(int argc, char const **argv)
   {
     unsigned long __gen_e_acsl_block_length;
     __gen_e_acsl_block_length = __e_acsl_block_length((void *)p);
-    __e_acsl_assert(__gen_e_acsl_block_length == 15,(char *)"Assertion",
+    __e_acsl_assert(__gen_e_acsl_block_length == 15UL,(char *)"Assertion",
                     (char *)"main",(char *)"\\block_length(p) == 15",16);
   }
   /*@ assert \freeable(p); */
@@ -100,7 +100,7 @@ int main(int argc, char const **argv)
   {
     unsigned long __gen_e_acsl_block_length_2;
     __gen_e_acsl_block_length_2 = __e_acsl_block_length((void *)a);
-    __e_acsl_assert(__gen_e_acsl_block_length_2 == 512,(char *)"Assertion",
+    __e_acsl_assert(__gen_e_acsl_block_length_2 == 512UL,(char *)"Assertion",
                     (char *)"main",(char *)"\\block_length(a) == 512",34);
   }
   /*@ assert \freeable(a); */
