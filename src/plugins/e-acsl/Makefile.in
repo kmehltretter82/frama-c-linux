@@ -143,8 +143,8 @@ clean::
 ################################################
 # E-ACSL C Libs: libjemalloc, libgmp					 #
 ################################################
-LOCAL_LIB = $(PLUGIN_DIR)/lib
-JEMALLOC_DIR = $(PLUGIN_DIR)/contrib/libjemalloc
+LOCAL_LIB := $(PLUGIN_DIR)/lib
+JEMALLOC_DIR := $(PLUGIN_DIR)/contrib/libjemalloc
 JEMALLOC_LIBNAME = libjemalloc-e-acsl.a
 JEMALLOC_LIB = $(LOCAL_LIB)/$(JEMALLOC_LIBNAME)
 
@@ -157,7 +157,7 @@ $(JEMALLOC_LIB):
 		$(MAKE) $(MAKEOPTS) lib/$(JEMALLOC_LIBNAME)
 	$(CP) $(JEMALLOC_DIR)/lib/$(JEMALLOC_LIBNAME) $@
 
-GMP_DIR = $(PLUGIN_DIR)/contrib/libgmp
+GMP_DIR := $(PLUGIN_DIR)/contrib/libgmp
 GMP_LIBNAME = libgmp-e-acsl.a
 GMP_LIB = $(LOCAL_LIB)/$(GMP_LIBNAME)
 
