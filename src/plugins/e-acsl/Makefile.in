@@ -140,6 +140,43 @@ clean::
 	$(PRINT_RM) benchmarking tools
 	$(RM) $(BM_TOOLS_BINARIES)
 
+################################################
+# E-ACSL C Libs: libjemalloc, libgmp					 #
+################################################
+LOCAL_LIB = $(PLUGIN_DIR)/lib
+JEMALLOC_DIR = $(PLUGIN_DIR)/contrib/libjemalloc
+JEMALLOC_LIBNAME = libjemalloc-e-acsl.a
+JEMALLOC_LIB = $(LOCAL_LIB)/$(JEMALLOC_LIBNAME)
+
+$(JEMALLOC_LIB):
+	cd $(JEMALLOC_DIR) && \
+		./autogen.sh \
+  		--with-jemalloc-prefix="__e_acsl_native_" \
+  		--with-private-namespace="__e_acsl_hidden_" \
+  		--with-install-suffix="-e-acsl" && \
+		$(MAKE) $(MAKEOPTS) lib/$(JEMALLOC_LIBNAME)
+	$(CP) $(JEMALLOC_DIR)/lib/$(JEMALLOC_LIBNAME) $@
+
+GMP_DIR = $(PLUGIN_DIR)/contrib/libgmp
+GMP_LIBNAME = libgmp-e-acsl.a
+GMP_LIB = $(LOCAL_LIB)/$(GMP_LIBNAME)
+
+$(GMP_LIB):
+	cd $(GMP_DIR) && ./configure && $(MAKE) $(MAKEOPTS)
+	$(CP) $(GMP_DIR)/.libs/libgmp.a $@
+
+all:: $(JEMALLOC_LIB) $(GMP_LIB)
+
+clean::
+	$(PRINT_RM) e-acsl contrib libraries
+	$(RM) $(JEMALLOC_LIB) $(GMP_LIB)
+	if test -f $(JEMALLOC_DIR)/Makefile; \
+		then $(MAKE) -C$(JEMALLOC_DIR) distclean; \
+	fi
+	if test -f $(GMP_DIR)/Makefile; \
+		then $(MAKE) -C$(GMP_DIR) distclean; \
+	fi
+
 ############
 # Cleaning #
 ############
@@ -148,7 +185,6 @@ clean::
 	$(PRINT_RM) generated test files
 	$(RM) $(E_ACSL_DIR)/tests/*.cm* $(E_ACSL_DIR)/tests/*.o
 	$(RM) $(E_ACSL_DIR)/tests/test_config
-	$(RM) $(E_ACSL_DIR)/doc/doxygen/html/*
 
 ################################
 # Building source distribution #
@@ -254,6 +290,10 @@ install::
 	      $(E_ACSL_DIR)/doc/manuals/e-acsl-implementation.pdf \
 	      $(E_ACSL_DIR)/doc/manuals/e-acsl-manual.pdf \
 		$(FRAMAC_DATADIR)/manuals
+	$(PRINT_INSTALL) E-ACSL libraries
+	$(MKDIR) $(LIBDIR)
+	$(CP) $(JEMALLOC_LIB) $(LIBDIR)
+	$(CP) $(GMP_LIB) $(LIBDIR)
 	$(PRINT_INSTALL) E-ACSL scripts
 	$(MKDIR) $(BINDIR)
 	$(CP) $(E_ACSL_DIR)/scripts/e-acsl-gcc.sh $(BINDIR)/
@@ -268,6 +308,11 @@ uninstall::
 	$(RM) $(FRAMAC_DATADIR)/manuals/e-acsl.pdf \
 	      $(FRAMAC_DATADIR)/manuals/e-acsl-implementation.pdf \
 	      $(FRAMAC_DATADIR)/manuals/e-acsl-manual.pdf
+	$(PRINT_RM) E-ACSL libraries
+	$(PRINT_INSTALL) E-ACSL share files
+	$(MKDIR) $(FRAMAC_DATADIR)/e-acsl
+	$(RM) $(LIBDIR)/$(JEMALLOC_LIBNAME)
+	$(RM) $(LIBDIR)/$(GMP_LIBNAME)
 	$(PRINT_RM) E-ACSL scripts
 	$(RM) $(BINDIR)/e-acsl-gcc.sh
 	$(PRINT_RM) man pages
@@ -315,3 +360,8 @@ Doxygen executable not found."; \
 	fi
 
 doc:: doxygen
+
+clean::
+	$(PRINT_RM) generated documentation
+	$(RM) $(E_ACSL_DIR)/doc/doxygen/html/*
+	$(RM) $(E_ACSL_DIR)/doc/code/*

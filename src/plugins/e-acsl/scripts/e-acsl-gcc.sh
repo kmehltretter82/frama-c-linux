@@ -45,11 +45,12 @@ check_tool() {
 }
 
 # Getopt options
-LONGOPTIONS="help,compile,compile-only,print,debug:,ocode:,oexec:,verbose:, \
+LONGOPTIONS="help,compile,compile-only,print,debug:,ocode:,oexec:,verbose:,
   frama-c-only,extra-cpp-args:,frama-c-stdlib,full-mmodel,gmp,quiet,logfile:,
   ld-flags:,cpp-flags:,frama-c-extra:,memory-model:,production,no-stdlib,
-  debug-log:,frama-c:,gcc:,e-acsl-share:,instrumented-only"
-SHORTOPTIONS="h,c,C,p,d:,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,P,N,D:,I:,G:,X"
+  debug-log:,frama-c:,gcc:,e-acsl-share:,instrumented-only,rte,no-int-overflow,
+  oexec-e-acsl:"
+SHORTOPTIONS="i,h,c,C,p,d:,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,P,N,D:,I:,G:,X,a"
 # Prefix for an error message due to wrong arguments
 ERROR="ERROR parsing arguments:"
 
@@ -67,6 +68,7 @@ OPTION_VERBOSE=                          # Set Frama-C verbose flag
 OPTION_COMPILE=                          # Compile instrumented program
 OPTION_OUTPUT_CODE="a.out.frama.c"       # Name of the translated file
 OPTION_OUTPUT_EXEC="a.out"               # Generated executable name
+OPTION_EACSL_OUTPUT_EXEC=""              # Name of E-ACSL executable
 OPTION_EACSL="-e-acsl -then-last"        # Specifies E-ACSL run
 OPTION_FRAMA_STDLIB="-no-frama-c-stdlib" # Use Frama-C stdlib
 OPTION_FULL_MMODEL=                      # Instrument as much as possible
@@ -77,6 +79,7 @@ OPTION_FRAMAC_CPP_EXTRA=""               # Extra CPP flags for Frama-C
 OPTION_EACSL_MMODELS="bittree"           # Memory model used
 OPTION_EACSL_SHARE=                      # Custom E-ACSL share directory
 OPTION_INSTRUMENTED_ONLY=                # Do not compile original code
+OPTION_RTE=                              # Enable assertion generation
 # The following option controls whether to use gcc builtins
 # (e.g., __builtin_strlen) in RTL or fall back to custom implementations
 # of standard functions.
@@ -110,6 +113,8 @@ Notes:
 
 # Base dir of this script
 BASEDIR="$(readlink -f `dirname $0`)"
+# Directory with contrib libraries of E-ACSL
+LIBDIR="$BASEDIR/../lib"
 
 # See if pygmentize if available for color highlighting and default to plain
 # cat command otherwise
@@ -204,6 +209,11 @@ do
       OPTION_OUTPUT_EXEC="$1"
       shift
     ;;
+    --oexec-e-acsl)
+      shift;
+      OPTION_EACSL_OUTPUT_EXEC="$1"
+      shift;
+    ;;
     # Additional CPP arguments
     --extra-cpp-args|-E)
       shift;
@@ -287,6 +297,14 @@ do
       OPTION_EACSL_SHARE="$1"
       shift;
     ;;
+    --rte|-a)
+      shift
+      OPTION_RTE="-rte -rte-mem -rte-no-float-to-int"
+    ;;
+    --no-int-overflow|-i)
+        shift
+        FRAMAC_FLAGS="-no-warn-signed-overflow -no-warn-unsigned-overflow $FRAMAC_FLAGS"
+    ;;
     # A memory model  (or models) to link against
     -m|--memory-model)
       shift;
@@ -325,7 +343,7 @@ if [ -f "$BASEDIR/../E_ACSL.mli" ]; then
   EACSL_SHARE="$DEVELOPMENT/share/e-acsl"
   # Add the project directory to FRAMAC_PLUGINS,
   # otherwise Frama-C uses an installed version
-  FRAMAC_FLAGS="-add-path=$DEVELOPMENT/top $FRAMAC_FLAGS"
+  FRAMAC_FLAGS="-add-path=$DEVELOPMENT $FRAMAC_FLAGS"
 else
   # Installed version. FRAMAC_SHARE should not be used here as Frama-C
   # and E-ACSL may not be installed to the same location
@@ -395,7 +413,7 @@ EACSL_MACRO_ID="__E_ACSL__"
 # Gcc and related flags
 CC="$OPTION_CC"
 CFLAGS="$OPTION_CFLAGS
-  -std=c99 $GCCMACHDEP -g3 -O2 -pedantic -fno-builtin
+  -std=c99 $GCCMACHDEP -g3 -O2 -fno-builtin
   -Wall \
   -Wno-long-long \
   -Wno-attributes \
@@ -426,15 +444,19 @@ LDFLAGS="$OPTION_LDFLAGS"
 EACSL_CFLAGS=""
 EACSL_CPPFLAGS="
   -I$EACSL_SHARE
-  -D$EACSL_MACRO_ID
-  -D__FC_errno=(*__errno_location())"
-EACSL_LDFLAGS="-lgmp -lm"
+  -D$EACSL_MACRO_ID"
+EACSL_LDFLAGS="-lm $LIBDIR/libgmp-e-acsl.a $LIBDIR/libjemalloc-e-acsl.a -lpthread"
 
 # Output file names
 OUTPUT_CODE="$OPTION_OUTPUT_CODE" # E-ACSL instrumented source
 OUTPUT_EXEC="$OPTION_OUTPUT_EXEC" # Output name of the original executable
 # Output name of E-ACSL-modified executable
-EACSL_OUTPUT_EXEC="$OPTION_OUTPUT_EXEC.e-acsl"
+
+if [ -z "$OPTION_EACSL_OUTPUT_EXEC" ]; then
+    EACSL_OUTPUT_EXEC="$OPTION_OUTPUT_EXEC.e-acsl"
+else
+    EACSL_OUTPUT_EXEC="$OPTION_EACSL_OUTPUT_EXEC"
+fi
 
 # Instrument
 if [ -n "$OPTION_INSTRUMENT" ]; then
@@ -449,6 +471,7 @@ if [ -n "$OPTION_INSTRUMENT" ]; then
     $OPTION_FRAMA_STDLIB \
     $OPTION_FULL_MMODEL \
     $OPTION_GMP \
+    $OPTION_RTE \
     "$@" \
     $OPTION_EACSL \
     -print \
@@ -469,7 +492,7 @@ if [ -n "$OPTION_COMPILE" ]; then
   if [ -n "$OPTION_INSTRUMENT" ]; then
     if [ -z "$OPTION_INSTRUMENTED_ONLY" ]; then
       ($OPTION_ECHO; $CC $CPPFLAGS $CFLAGS "$@" -o "$OUTPUT_EXEC" $LDFLAGS);
-      error "fail to compile/link un-instrumented code: $@" $?;
+      error "fail to compile/link un-instrumented code" $?;
     fi
   # If $OPTION_INSTRUMENT is unset then the sources are assumed to be already
   # instrumented, so skip compilation of the original files
@@ -500,7 +523,7 @@ if [ -n "$OPTION_COMPILE" ]; then
        -o "$OUTPUT_EXEC" \
        "$OUTPUT_CODE" \
        $LDFLAGS $EACSL_LDFLAGS)
-    error "fail to compile/link instrumented code: $@" $?;
+    error "fail to compile/link instrumented code" $?
   done
 fi
 exit 0;

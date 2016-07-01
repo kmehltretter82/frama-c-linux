@@ -1,25 +1,5 @@
 [e-acsl] beginning translation.
-FRAMAC_SHARE/libc/stdlib.h:175:[e-acsl] warning: E-ACSL construct `\allocable' is not yet supported. Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:157:[e-acsl] warning: E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
-tests/e-acsl-runtime/freeable.c:25:[e-acsl] warning: E-ACSL construct `complete behaviors' is not yet supported.
-                  Ignoring annotation.
-tests/e-acsl-runtime/freeable.c:25:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:179:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:178:[e-acsl] warning: E-ACSL construct `\allocate' is not yet supported. Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:178:[e-acsl] warning: E-ACSL construct `complete behaviors' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:178:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:178:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:161:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:161:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:166:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-                  Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:147:[kernel] warning: No code nor implicit assigns clause for function calloc, generating default assigns from the prototype
 [e-acsl] translation done in project "e-acsl".
 tests/e-acsl-runtime/freeable.c:15:[value] warning: assertion got status unknown.
 tests/e-acsl-runtime/freeable.c:15:[value] warning: accessing uninitialized left-value. assert \initialized(&p);

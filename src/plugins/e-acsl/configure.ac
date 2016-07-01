@@ -89,28 +89,18 @@ MAY_RUN_TESTS=yes
 
 AC_CHECK_HEADERS([stdio.h],[HAVE_STDIO_H=yes],)
 
-# not sure it can actually happens:
-# look like the configure stops on error if no C compiler detected
+# not sure it can actually happen:
+# looks like configure stops on error if no C compiler detected
 if test -z $HAVE_STDIO_H; then
   MAY_RUN_TESTS=no
   AC_MSG_WARN([stdio.h missing: non-regression tests unavailable.])
-fi
-
-# GMP library
-#############
-
-AC_CHECK_LIB(gmp,__gmpz_init,HAVE_GMP=yes,) # also set LIBS
-
-if test -z $HAVE_GMP; then
-  MAY_RUN_TESTS=no
-  AC_MSG_WARN([GMP library missing: non-regression tests unavailable.])
 fi
 
 # Doxygen
 #########
 
 AC_CHECK_PROG(DOXYGEN,doxygen,doxygen,no)
-AC_CHECK_PROG(HAVE_DOT,dot,YES,no)
+AC_CHECK_PROG(HAVE_DOT,dot,yes,no)
 AC_OUTPUT(PLUGIN_RELATIVE_PATH(doc/doxygen/doxygen.cfg), [  ])
 
 #######################

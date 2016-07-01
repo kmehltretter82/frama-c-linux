@@ -257,7 +257,7 @@ int main(void)
                     (char *)"main",(char *)"\\initialized(r+1)",61);
   }
   __e_acsl_full_init((void *)(& p));
-  p = (int *)__gen_e_acsl_malloc(sizeof(int *));
+  p = (int *)malloc(sizeof(int *));
   /*@ assert ¬\initialized(p); */
   {
     int __gen_e_acsl_initialized_26;
@@ -266,7 +266,7 @@ int main(void)
                     (char *)"main",(char *)"!\\initialized(p)",65);
   }
   __e_acsl_full_init((void *)(& q));
-  q = (int *)__gen_e_acsl_calloc((unsigned long)1,sizeof(int));
+  q = (int *)calloc((unsigned long)1,sizeof(int));
   /*@ assert \initialized(q); */
   {
     int __gen_e_acsl_initialized_27;
@@ -275,7 +275,7 @@ int main(void)
                     (char *)"main",(char *)"\\initialized(q)",69);
   }
   __e_acsl_full_init((void *)(& q));
-  q = (int *)__gen_e_acsl_realloc((void *)q,(unsigned long)2 * sizeof(int));
+  q = (int *)realloc((void *)q,(unsigned long)2 * sizeof(int));
   /*@ assert \initialized(q); */
   {
     int __gen_e_acsl_initialized_28;
@@ -294,8 +294,8 @@ int main(void)
   }
   __e_acsl_full_init((void *)(& q));
   q --;
-  __gen_e_acsl_free((void *)p);
-  __gen_e_acsl_free((void *)q);
+  free((void *)p);
+  free((void *)q);
   /*@ assert ¬\initialized(p); */
   {
     int __gen_e_acsl_initialized_30;
@@ -331,8 +331,8 @@ int main(void)
                     (char *)"main",(char *)"!\\initialized(p)",96);
   }
   size = 100;
-  partsc = (char *)__gen_e_acsl_malloc((unsigned long)size * sizeof(char));
-  partsi = (char *)__gen_e_acsl_malloc((unsigned long)size * sizeof(int));
+  partsc = (char *)malloc((unsigned long)size * sizeof(char));
+  partsi = (char *)malloc((unsigned long)size * sizeof(int));
   {
     int i;
     i = 0;

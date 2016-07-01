@@ -35,29 +35,25 @@
 /*! \brief Drop-in replacement for \p malloc with memory tracking enabled.
  *
  * For further information, see \p malloc(3). */
-/*@ assigns \result \from size; */
-void * __e_acsl_malloc(size_t size)
+void * malloc(size_t size)
   __attribute__((FC_BUILTIN)) ;
 
 /*! \brief Drop-in replacement for \p calloc with memory tracking enabled.
  *
  * For further information, see \p calloc(3). */
-/*@ assigns \result \from nbr_elt,size_elt; */
-void * __e_acsl_calloc(size_t nbr_elt, size_t size_elt)
+void * calloc(size_t nbr_elt, size_t size_elt)
   __attribute__((FC_BUILTIN));
 
 /*! \brief Drop-in replacement for \p realloc with memory tracking enabled.
  *
  * For further information, see realloc(3) */
-/*@ assigns \result \from *(((char*)ptr)+(0..size-1)); */
-void * __e_acsl_realloc(void * ptr, size_t size)
+void * realloc(void * ptr, size_t size)
   __attribute__((FC_BUILTIN));
 
 /*! \brief Drop-in replacement for \p free with memory tracking enabled.
  *
  * For further information, see \p free(3). */
-/*@ assigns *((char*)ptr) \from ptr; */
-void __e_acsl_free(void * ptr)
+void free(void * ptr)
   __attribute__((FC_BUILTIN));
 
 /*! \brief Store stack or globally-allocated memory block

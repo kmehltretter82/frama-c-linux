@@ -30,7 +30,7 @@ int main(void)
                     (char *)"main",(char *)"!\\freeable((void *)0)",16);
   }
   __e_acsl_full_init((void *)(& p));
-  p = (int *)__gen_e_acsl_malloc((unsigned long)4 * sizeof(int));
+  p = (int *)malloc((unsigned long)4 * sizeof(int));
   /*@ assert ¬\freeable(p+1); */
   {
     int __gen_e_acsl_freeable_3;
@@ -45,7 +45,7 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_freeable_4,(char *)"Assertion",
                     (char *)"main",(char *)"\\freeable(p)",19);
   }
-  __gen_e_acsl_free((void *)p);
+  free((void *)p);
   /*@ assert ¬\freeable(p); */
   {
     int __gen_e_acsl_freeable_5;

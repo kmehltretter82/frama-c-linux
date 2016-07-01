@@ -2,6 +2,7 @@
 [e-acsl] warning: annotating undefined function `fopen':
                   the generated program may miss memory instrumentation
                   if there are memory-related annotations.
+FRAMAC_SHARE/libc/stdlib.h:147:[kernel] warning: No code nor implicit assigns clause for function calloc, generating default assigns from the prototype
 tests/e-acsl-runtime/stdout.c:11:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
                   Ignoring annotation.
 FRAMAC_SHARE/libc/stdio.h:107:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.

@@ -176,7 +176,7 @@ int main(void)
   }
   size = (unsigned long)12;
   __e_acsl_full_init((void *)(& p));
-  p = (char *)__gen_e_acsl_malloc(size);
+  p = (char *)malloc(size);
   /*@ assert \block_length(p) ≡ size; */
   {
     unsigned long __gen_e_acsl_block_length_18;
@@ -205,7 +205,7 @@ int main(void)
   }
   size = (unsigned long)30 * sizeof(long);
   __e_acsl_full_init((void *)(& q));
-  q = (long *)__gen_e_acsl_malloc(size);
+  q = (long *)malloc(size);
   /*@ assert \block_length(q) ≡ size; */
   {
     unsigned long __gen_e_acsl_block_length_22;
