@@ -21,7 +21,7 @@
 /**************************************************************************/
 
 /*! ***********************************************************************
- * \file  e_acsl_bittree.h
+ * \file e_acsl_bittree.h
  * \brief Patricia Trie API Implementation
 ***************************************************************************/
 
@@ -468,7 +468,7 @@ static void bt_print_node(bt_node * ptr, int depth) {
   }
 }
 
-static void bt_print() {
+static void bt_print_tree() {
   DLOG("------------DEBUG\n");
   bt_print_node(bt_root, 0);
   DLOG("-----------------\n");
