@@ -182,17 +182,14 @@ clean::
 ############
 
 clean::
-	$(PRINT_RM) cleaning generated test and doc files
+	$(PRINT_RM) cleaning generated test files
 	$(RM) $(E_ACSL_DIR)/tests/*.cm* $(E_ACSL_DIR)/tests/*.o
 	$(RM) $(E_ACSL_DIR)/tests/test_config
 	$(RM) $(foreach dir, $(PLUGIN_TESTS_DIRS), tests/$(dir)/result/*)
-	$(RM) $(E_ACSL_DIR)/doc/doxygen/html/*
-	$(RM) $(E_ACSL_DIR)/doc/doxygen/warn.log
-	$(RM) $(E_ACSL_DIR)/doc/code/*
 
 DISTCLEANFILES = $(wildcard \
-	Makefile config.log config.status configure .depend autom4te.cache/* \
 	doc/doxygen/doxygen.cfg \
+	Makefile config.log config.status configure .depend autom4te.cache/* \
 	META.frama-c-e_acsl Makefile.plugin.generated local_config.ml top/*)
 
 distclean:
@@ -410,3 +407,4 @@ clean::
 	$(PRINT_RM) generated documentation
 	$(RM) $(E_ACSL_DIR)/doc/doxygen/html/*
 	$(RM) $(E_ACSL_DIR)/doc/code/*
+	$(RM) $(E_ACSL_DIR)/doc/doxygen/warn.log
