@@ -125,28 +125,28 @@ endif
 ######################
 # Benchmarking tools #
 ######################
-BM_TOOLS_SOURCES = $(wildcard $(PLUGIN_DIR)/benchmarking/tools/*.c)
-BM_TOOLS_BINARIES = $(patsubst %.c,%, $(BM_TOOLS_SOURCES))
+EACSL_BM_SOURCES = $(wildcard $(PLUGIN_DIR)/benchmarking/tools/*.c)
+EACSL_BM_BINARIES = $(patsubst %.c,%, $(EACSL_BM_SOURCES))
 
 CFLAGS = -g3 -O2 -std=c11 -pedantic -Wall -Wno-unused-result
 
-$(BM_TOOLS_BINARIES): % : %.c
+$(EACSL_BM_BINARIES): % : %.c
 	$(PRINT_CC) $@
 	$(CC) $(CFLAGS) -o $@ $^
 
-all:: $(BM_TOOLS_BINARIES)
+all:: $(EACSL_BM_BINARIES)
 
 clean::
 	$(PRINT_RM) benchmarking tools
-	$(RM) $(BM_TOOLS_BINARIES)
+	$(RM) $(EACSL_BM_BINARIES)
 
 ################################################
 # E-ACSL C Libs: libjemalloc, libgmp					 #
 ################################################
-LOCAL_LIB := $(PLUGIN_DIR)/lib
+EACSL_LIBDIR := $(PLUGIN_DIR)/lib
 JEMALLOC_DIR := $(PLUGIN_DIR)/contrib/libjemalloc
 JEMALLOC_LIBNAME = libjemalloc-e-acsl.a
-JEMALLOC_LIB = $(LOCAL_LIB)/$(JEMALLOC_LIBNAME)
+JEMALLOC_LIB = $(EACSL_LIBDIR)/$(JEMALLOC_LIBNAME)
 
 $(JEMALLOC_LIB):
 	cd $(JEMALLOC_DIR) && \
@@ -159,7 +159,7 @@ $(JEMALLOC_LIB):
 
 GMP_DIR := $(PLUGIN_DIR)/contrib/libgmp
 GMP_LIBNAME = libgmp-e-acsl.a
-GMP_LIB = $(LOCAL_LIB)/$(GMP_LIBNAME)
+GMP_LIB = $(EACSL_LIBDIR)/$(GMP_LIBNAME)
 
 $(GMP_LIB):
 	cd $(GMP_DIR) && ./configure && $(MAKE) $(MAKEOPTS)
@@ -203,11 +203,11 @@ distclean:
 
 EXPORT = e-acsl-$(EACSL_VERSION)
 
-OCAML_FILES = \
+EACSL_OCAML_FILES = \
 	$(filter-out $(wildcard *local_config.ml), $(wildcard *.ml)) \
 	$(wildcard *.mli)
 
-DOC_FILES = \
+EACSL_DOC_FILES = \
 	doc/manuals/e-acsl-manual.pdf  \
 	doc/manuals/e-acsl.pdf \
 	doc/manuals/e-acsl-implementation.pdf \
@@ -215,28 +215,28 @@ DOC_FILES = \
 	doc/Changelog \
 	man/e-acsl-gcc.sh.1
 
-TEST_FILES = \
+EACSL_TEST_FILES = \
 	tests/test_config.in \
 	tests/print.ml \
 	$(foreach dir, $(TESTDIRS), $(wildcard $(dir)/* $(dir)/*/*))
 
-RTL_FILES = $(wildcard share/e-acsl/*.[ch] share/e-acsl/*/*.[ch])
+EACSL_RTL_FILES = $(wildcard share/e-acsl/*.[ch] share/e-acsl/*/*.[ch])
 
-SCRIPT_FILES = scripts/e-acsl-gcc.sh scripts/testrun.sh
+EACSL_SCRIPT_FILES = scripts/e-acsl-gcc.sh scripts/testrun.sh
 
-LICENSE_FILES = \
+EACSL_LICENSE_FILES = \
 	license/CEA_LGPL license/SPARETIMELABS \
 	license/headache_config.txt license/LGPLv2.1
 
 EACSL_DISTRIB_FILES = \
 	configure.ac Makefile.in \
 	INSTALL README VERSION .depend \
-	$(OCAML_FILES) \
-	$(DOC_FILES) \
-	$(TEST_FILES) \
-	$(RTL_FILES) \
-	$(SCRIPT_FILES) \
-	$(LICENSE_FILES)
+	$(EACSL_OCAML_FILES) \
+	$(EACSL_DOC_FILES) \
+	$(EACSL_TEST_FILES) \
+	$(EACSL_RTL_FILES) \
+	$(EACSL_SCRIPT_FILES) \
+	$(EACSL_LICENSE_FILES)
 
 # BE CAREFUL: manually remove all *.ml* files which should not be released!
 e-acsl-distrib: .depend
@@ -270,7 +270,7 @@ WWW	?= /localhome/julien/frama-c/doc/www
 e-acsl-install-distrib: e-acsl-distrib
 	$(PRINT) Copying to website
 	$(CP) $(EXPORT).tar.gz $(WWW)/distrib/download/e-acsl
-	$(CP) $(DOC_FILES) $(WWW)/distrib/download/e-acsl
+	$(CP) $(EACSL_DOC_FILES) $(WWW)/distrib/download/e-acsl
 	$(CP) doc/manuals/e-acsl-manual.pdf \
 	      $(WWW)/distrib/download/e-acsl/e-acsl-manual-$(EACSL_VERSION).pdf
 	$(CP) doc/manuals/e-acsl.pdf \
