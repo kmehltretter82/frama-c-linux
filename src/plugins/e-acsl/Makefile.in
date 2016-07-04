@@ -115,7 +115,7 @@ ifeq (@MAY_RUN_TESTS@,yes)
 $(PLUGIN_DIR)/tests/print.cmxs: OFLAGS=-I $(FRAMAC_LIB)
 $(PLUGIN_DIR)/tests/print.cmo: BFLAGS=-I $(FRAMAC_LIB)
 
-PLUGIN_TESTS_DIRS:=e-acsl-reject e-acsl-runtime bts gmp no-main
+PLUGIN_TESTS_DIRS := e-acsl-reject e-acsl-runtime bts gmp no-main
 E_ACSL_TESTS: $(PLUGIN_DIR)/tests/test_config \
 	$(PLUGIN_DIR)/tests/print.cmxs \
 	$(PLUGIN_DIR)/tests/print.cmo
@@ -125,7 +125,7 @@ endif
 ######################
 # Benchmarking tools #
 ######################
-BM_TOOLS_SOURCES = $(PLUGIN_DIR)/benchmarking/tools/fc-time.c
+BM_TOOLS_SOURCES = $(wildcard $(PLUGIN_DIR)/benchmarking/tools/*.c)
 BM_TOOLS_BINARIES = $(patsubst %.c,%, $(BM_TOOLS_SOURCES))
 
 CFLAGS = -g3 -O2 -std=c11 -pedantic -Wall -Wno-unused-result
@@ -182,37 +182,64 @@ clean::
 ############
 
 clean::
-	$(PRINT_RM) generated test files
+	$(PRINT_RM) cleaning generated test and doc files
 	$(RM) $(E_ACSL_DIR)/tests/*.cm* $(E_ACSL_DIR)/tests/*.o
 	$(RM) $(E_ACSL_DIR)/tests/test_config
+	$(RM) $(foreach dir, $(PLUGIN_TEST_DIRS), tests/$(dir)/result/*)
+	$(RM) $(E_ACSL_DIR)/doc/doxygen/html/*
+	$(RM) $(E_ACSL_DIR)/doc/doxygen/warn.log
+	$(RM) $(E_ACSL_DIR)/doc/code/*
+
+DISTCLEANFILES = $(wildcard \
+	Makefile config.log config.status configure .depend autom4te.cache/* \
+	doc/doxygen/doxygen.cfg \
+	META.frama-c-e_acsl Makefile.plugin.generated local_config.ml top/*)
+
+distclean:
+	$(MAKE) -s clean
+	$(PRINT_RM) generated files
+	$(RM) $(addprefix $(E_ACSL_DIR)/, $(DISTCLEANFILES))
 
 ################################
 # Building source distribution #
 ################################
 
-EXPORT	=e-acsl-$(EACSL_VERSION)
+EXPORT = e-acsl-$(EACSL_VERSION)
 
-DOC_FILES= doc/manuals/e-acsl-manual.pdf  \
-	doc/manuals/e-acsl.pdf doc/manuals/e-acsl-implementation.pdf
+OCAML_FILES = \
+	$(filter-out $(wildcard *local_config.ml), $(wildcard *.ml)) \
+	$(wildcard *.mli)
 
-EACSL_DISTRIB_FILES=\
-  $(filter-out \
-	$(wildcard *local_config.ml), $(wildcard *.ml)) \
-	$(wildcard *.mli) \
-	configure.ac Makefile.in \
+DOC_FILES = \
+	doc/manuals/e-acsl-manual.pdf  \
+	doc/manuals/e-acsl.pdf \
+	doc/manuals/e-acsl-implementation.pdf \
+	doc/doxygen/doxygen.cfg.in \
 	doc/Changelog \
-	$(DOC_FILES) \
-	scripts/e-acsl-gcc.sh \
-	man/e-acsl-gcc.sh.1 \
-	share/e-acsl/*.[ch] \
-	share/e-acsl/bittree_model/e_acsl_bittree.[ch] \
-	share/e-acsl/bittree_model/e_acsl_mmodel*.[ch] \
+	man/e-acsl-gcc.sh.1
+
+TEST_FILES = \
 	tests/test_config.in \
-	tests/e-acsl-reject/test_config tests/e-acsl-reject/*.i \
-	tests/e-acsl-runtime/test_config tests/e-acsl-runtime/*.[ci] \
+	tests/print.ml \
+	$(foreach dir, $(TESTDIRS), $(wildcard $(dir)/* $(dir)/*/*))
+
+RTL_FILES = $(wildcard share/e-acsl/*.[ch] share/e-acsl/*/*.[ch])
+
+SCRIPT_FILES = scripts/e-acsl-gcc.sh scripts/testrun.sh
+
+LICENSE_FILES = \
 	license/CEA_LGPL license/SPARETIMELABS \
-	license/headache_config.txt license/LGPLv2.1 \
-	INSTALL README VERSION .depend
+	license/headache_config.txt license/LGPLv2.1
+
+EACSL_DISTRIB_FILES = \
+	configure.ac Makefile.in \
+	INSTALL README VERSION .depend \
+	$(OCAML_FILES) \
+	$(DOC_FILES) \
+	$(TEST_FILES) \
+	$(RTL_FILES) \
+	$(SCRIPT_FILES) \
+	$(LICENSE_FILES)
 
 # BE CAREFUL: manually remove all *.ml* files which should not be released!
 e-acsl-distrib: .depend
@@ -240,6 +267,8 @@ e-acsl-distrib: .depend
 	$(PRINT) Cleaning
 	$(RM) -fr $(EXPORT)
 
+dist: e-acsl-distrib
+
 WWW	?= /localhome/julien/frama-c/doc/www
 e-acsl-install-distrib: e-acsl-distrib
 	$(PRINT) Copying to website
@@ -251,6 +280,22 @@ e-acsl-install-distrib: e-acsl-distrib
 	      $(WWW)/distrib/download/e-acsl/e-acsl-1.7.pdf
 	$(CP) doc/manuals/e-acsl-implementation.pdf \
 	      $(WWW)/distrib/download/e-acsl/e-acsl-implementation-$(EACSL_VERSION).pdf
+
+##############################
+# Check source distribution  #
+##############################
+distcheck:
+	$(RM) -rf $(EXPORT)*
+	$(MAKE) e-acsl-distrib
+	$(TAR) -xvf $(EXPORT).tar.gz
+	cd $(EXPORT)
+	autoconf
+	./configure
+	$(MAKE)
+	$(MAKE) tests
+	$(MAKE) doc
+	cd ../
+	$(RM) -rf $(EXPORT)*
 
 ##########
 # Header #
