@@ -33,6 +33,14 @@ error () {
   fi
 }
 
+# Check whether the first line reported by running command $1 has an identifier
+# specified by $2. E.g., check whether readlink used by the script is GNU and
+# getopt comes from util-linux.
+required_tool() {
+  "$1" --version 2>&1 | head -1 | grep "$2" > /dev/null
+  error "$1 is not $2" $?
+}
+
 # Check if a given executable name can be found by in the PATH
 has_tool() {
   which "$@" >/dev/null 2>&1 && return 0 || return 1
@@ -44,13 +52,67 @@ check_tool() {
    { has_tool "$1" || test -e "$1"; } || error "No executable $1 found";
 }
 
+# build and output option string for RTE plugin based on a comma-delimited
+# option string
+rte_options() {
+  local optstring="$1"
+  local start="-rte -rte-warn"
+  local opts="-rte-no-all"
+  # RTE integer overflow options coming from Frama-C, presently
+  # they are enabled by default, so they should be negated
+  local intopts="-no-warn-signed-overflow -no-warn-unsigned-overflow"
+  local vopts="mem,int,float,div,ret,precond,shift,all"
+  local all=""
+
+  for opt in $(echo $optstring | tr ',' ' '); do
+    case $opt in
+      mem) # valid pointer or array access
+        opts="$opts -rte-mem"
+      ;;
+      int) # integer overflows
+        intopts=""
+      ;;
+      float) # casts from floating-point to integer
+        opts="$opts -rte-float-to-int"
+      ;;
+      div) # division by zero
+        opts="$opts -rte-div"
+      ;;
+      ret) # return
+      ;;
+      precond) # function calls based on contracts
+        opts="$opts -rte-precond"
+      ;;
+      shift) # left and right shifts by a value out of bounds
+        opts="$opts -rte-shift"
+      ;;
+      all) # all assertions
+        all=1
+      ;;
+      *)
+        return 1;
+      ;;
+    esac
+  done
+
+  if [ -n "$all" ]; then
+    echo $start -rte-all -then
+  else
+    echo $start $opts $intopts -then
+  fi
+  return 0;
+}
+
+# Check if getopt is GNU
+required_tool getopt "util-linux"
+required_tool readlink "GNU coreutils"
+
 # Getopt options
 LONGOPTIONS="help,compile,compile-only,print,debug:,ocode:,oexec:,verbose:,
   frama-c-only,extra-cpp-args:,frama-c-stdlib,full-mmodel,gmp,quiet,logfile:,
   ld-flags:,cpp-flags:,frama-c-extra:,memory-model:,production,no-stdlib,
-  debug-log:,frama-c:,gcc:,e-acsl-share:,instrumented-only,rte,no-int-overflow,
-  oexec-e-acsl:"
-SHORTOPTIONS="i,h,c,C,p,d:,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,P,N,D:,I:,G:,X,a"
+  debug-log:,frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:"
+SHORTOPTIONS="h,c,C,p,d:,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,P,N,D:,I:,G:,X,a:"
 # Prefix for an error message due to wrong arguments
 ERROR="ERROR parsing arguments:"
 
@@ -69,7 +131,7 @@ OPTION_COMPILE=                          # Compile instrumented program
 OPTION_OUTPUT_CODE="a.out.frama.c"       # Name of the translated file
 OPTION_OUTPUT_EXEC="a.out"               # Generated executable name
 OPTION_EACSL_OUTPUT_EXEC=""              # Name of E-ACSL executable
-OPTION_EACSL="-e-acsl -then-last"        # Specifies E-ACSL run
+OPTION_EACSL="-e-acsl"                   # Specifies E-ACSL run
 OPTION_FRAMA_STDLIB="-no-frama-c-stdlib" # Use Frama-C stdlib
 OPTION_FULL_MMODEL=                      # Instrument as much as possible
 OPTION_GMP=                              # Use GMP integers everywhere
@@ -115,14 +177,6 @@ Notes:
 BASEDIR="$(readlink -f `dirname $0`)"
 # Directory with contrib libraries of E-ACSL
 LIBDIR="$BASEDIR/../lib"
-
-# See if pygmentize if available for color highlighting and default to plain
-# cat command otherwise
-if has_tool 'pygmentize'; then
-  CAT="pygmentize -g -O style=colorful,linenos=1"
-else
-  CAT="cat"
-fi
 
 # Run getopt
 ARGS=`getopt -n "$ERROR" -l "$LONGOPTIONS" -o "$SHORTOPTIONS" -- "$@"`
@@ -209,6 +263,7 @@ do
       OPTION_OUTPUT_EXEC="$1"
       shift
     ;;
+    # Specify the output name of the E-ACSL generated executable
     --oexec-e-acsl)
       shift;
       OPTION_EACSL_OUTPUT_EXEC="$1"
@@ -281,13 +336,13 @@ do
     # Supply Frama-C executable name
     -I|--frama-c)
       shift;
-      OPTION_FRAMAC="$1"
+      OPTION_FRAMAC="$(which $1)"
       shift;
     ;;
     # Supply GCC executable name
     -G|--gcc)
       shift;
-      OPTION_CC="$1"
+      OPTION_CC="$(which $1)"
       shift;
     ;;
     # Specify EACSL_SHARE directory (where C runtime library lives) by hand
@@ -298,12 +353,10 @@ do
       shift;
     ;;
     --rte|-a)
-      shift
-      OPTION_RTE="-rte -rte-mem -rte-no-float-to-int"
-    ;;
-    --no-int-overflow|-i)
-        shift
-        FRAMAC_FLAGS="-no-warn-signed-overflow -no-warn-unsigned-overflow $FRAMAC_FLAGS"
+      shift;
+      OPTION_RTE=`rte_options $1`
+      error "Invalid argument $1 to --rte|-a option" $?
+      shift;
     ;;
     # A memory model  (or models) to link against
     -m|--memory-model)
@@ -343,7 +396,7 @@ if [ -f "$BASEDIR/../E_ACSL.mli" ]; then
   EACSL_SHARE="$DEVELOPMENT/share/e-acsl"
   # Add the project directory to FRAMAC_PLUGINS,
   # otherwise Frama-C uses an installed version
-  FRAMAC_FLAGS="-add-path=$DEVELOPMENT $FRAMAC_FLAGS"
+  FRAMAC_FLAGS="-add-path=$DEVELOPMENT/top -add-path=$DEVELOPMENT $FRAMAC_FLAGS"
 else
   # Installed version. FRAMAC_SHARE should not be used here as Frama-C
   # and E-ACSL may not be installed to the same location
@@ -458,6 +511,15 @@ else
     EACSL_OUTPUT_EXEC="$OPTION_EACSL_OUTPUT_EXEC"
 fi
 
+# Build E-ACSL plugin argument string
+if [ -n "$OPTION_EACSL" ]; then
+  OPTION_EACSL="
+    $OPTION_EACSL
+    $OPTION_GMP
+    $OPTION_FULL_MMODEL
+    -then-last"
+fi
+
 # Instrument
 if [ -n "$OPTION_INSTRUMENT" ]; then
   ($OPTION_ECHO; \
@@ -466,20 +528,17 @@ if [ -n "$OPTION_INSTRUMENT" ]; then
     $MACHDEP \
     -cpp-extra-args="$OPTION_FRAMAC_CPP_EXTRA" \
     -e-acsl-share=$EACSL_SHARE \
+    $OPTION_FRAMA_STDLIB \
     $OPTION_VERBOSE \
     $OPTION_DEBUG \
-    $OPTION_FRAMA_STDLIB \
-    $OPTION_FULL_MMODEL \
-    $OPTION_GMP \
-    $OPTION_RTE \
     "$@" \
+    $OPTION_RTE \
     $OPTION_EACSL \
-    -print \
-    -ocode "$OPTION_OUTPUT_CODE");
+    -print -ocode "$OPTION_OUTPUT_CODE");
     error "aborted by Frama-C" $?;
   # Print translated code
   if [ -n "$OPTION_PRINT" ]; then
-    $CAT $OPTION_OUTPUT_CODE
+    cat $OPTION_OUTPUT_CODE
   fi
 fi
 

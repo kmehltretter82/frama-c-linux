@@ -79,6 +79,10 @@ names of the executables generated from the original
 and the modified programs are
 \fIa.out\fP and \fIa.out.e-acsl\fP respectively.
 .TP
+.B --oexec-e-acsl=\fI<FILE>
+name of the executable file generated from the \fBE-ACSL\fP-instrumented file.
+Unless specified, the executable is named as inidicated by the \fB--oexec\fP option.
+.TP
 .B -f, --frama-c-only
 run input source files through \fBFrama-C\fP without \fBE-ACSL\fP instrumentations.
 .TP
@@ -110,6 +114,20 @@ redirect all output to a given file.
 .TP
 .B -F, --frama-c-extra=\fI<FLAGS>
 pass an extra option to a \fBFrama-C\fP invocation.
+.TP
+.B -a, --rte=\fI<OPTSTRING>
+annotate a source program with assertions using a run of an RTE plugin prior to
+E-ACSL. \fIOPTSTRING\fP is a comma-separated string that specifies the types of
+generated assertions.
+Valid arguments are:
+  \fImem\fP \- valid pointer or array accesses.
+  \fIint\fP \- integer overflows.
+  \fIfloat\fP \- casts from floating-point to integer.
+  \fIdiv\fP \- division by zero.
+  \fIret\fP \- return value in non-void functions.
+  \fIprecond\fP \- function calls based on contracts.
+  \fIshift\fP \- left and right shifts by a value out of bounds.
+  \fIall\fP \- all of the above.
 .TP
 .B -m, --memory-model=\fI<model>
 memory model (i.e., a runtime library for checking memory related annotations)

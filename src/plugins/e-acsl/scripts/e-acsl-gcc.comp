@@ -1,0 +1,57 @@
+##########################################################################
+#                                                                        #
+#  This file is part of the Frama-C's E-ACSL plug-in.                    #
+#                                                                        #
+#  Copyright (C) 2012-2016                                               #
+#    CEA (Commissariat à l'énergie atomique et aux énergies              #
+#         alternatives)                                                  #
+#                                                                        #
+#  you can redistribute it and/or modify it under the terms of the GNU   #
+#  Lesser General Public License as published by the Free Software       #
+#  Foundation, version 2.1.                                              #
+#                                                                        #
+#  It is distributed in the hope that it will be useful,                 #
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of        #
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         #
+#  GNU Lesser General Public License for more details.                   #
+#                                                                        #
+#  See the GNU Lesser General Public License version 2.1                 #
+#  for more details (enclosed in the file license/LGPLv2.1).             #
+#                                                                        #
+##########################################################################
+
+# Bash completion for e-acsl-gcc.sh
+
+_eacsl_gcc() {
+  local cur prev opts base
+  COMPREPLY=()
+  cur="${COMP_WORDS[COMP_CWORD]}"
+  prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+  opts="
+    -i -C -p -d -o -O -v -f -E -L -M -l -e -g -q -s -F -P -N -D -I -G -X -a
+    -h -c -msegment -mbittree
+    --verbose= --debug= --debug-log= --logfile= --quiet --production --help
+    --ocode= --oexec= --oexec-e-acsl=
+    --ld-flags= --cpp-flags= --extra-cpp-args=
+    --frama-c-extra= --frama-c= --gcc= --e-acsl-share= --memory-model=
+    --compile --compile-only --print --frama-c-only --instrumented-only
+    --gmp --full-mmodel --rte --no-int-overflow --no-stdlib --frama-c-stdlib"
+
+  case ${prev} in
+    -*)
+      COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
+      return 0
+    ;;
+    *)
+      COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
+      [[ $COMPREPLY == *= ]] && compopt -o nospace
+      return 0
+    ;;
+  esac
+
+  return 0
+}
+complete -F _eacsl_gcc e-acsl-gcc.sh
+
+
