@@ -171,7 +171,7 @@ clean::
 	$(PRINT_RM) e-acsl contrib libraries
 	$(RM) $(JEMALLOC_LIB) $(GMP_LIB)
 	if test -f $(JEMALLOC_DIR)/Makefile; \
-		then $(MAKE) -C$(JEMALLOC_DIR) distclean; \
+		then $(MAKE) -C$(JEMALLOC_DIR) relclean; \
 	fi
 	if test -f $(GMP_DIR)/Makefile; \
 		then $(MAKE) -C$(GMP_DIR) distclean; \
@@ -185,7 +185,7 @@ clean::
 	$(PRINT_RM) cleaning generated test and doc files
 	$(RM) $(E_ACSL_DIR)/tests/*.cm* $(E_ACSL_DIR)/tests/*.o
 	$(RM) $(E_ACSL_DIR)/tests/test_config
-	$(RM) $(foreach dir, $(PLUGIN_TEST_DIRS), tests/$(dir)/result/*)
+	$(RM) $(foreach dir, $(PLUGIN_TESTS_DIRS), tests/$(dir)/result/*)
 	$(RM) $(E_ACSL_DIR)/doc/doxygen/html/*
 	$(RM) $(E_ACSL_DIR)/doc/doxygen/warn.log
 	$(RM) $(E_ACSL_DIR)/doc/code/*
