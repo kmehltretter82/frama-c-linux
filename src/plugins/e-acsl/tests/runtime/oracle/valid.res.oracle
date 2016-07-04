@@ -2,6 +2,5 @@
 FRAMAC_SHARE/libc/stdlib.h:147:[kernel] warning: No code nor implicit assigns clause for function calloc, generating default assigns from the prototype
 [e-acsl] translation done in project "e-acsl".
 FRAMAC_SHARE/e-acsl/e_acsl.h:43:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/e-acsl-runtime/vector.c:27:[value] warning: assertion got status unknown.
-tests/e-acsl-runtime/vector.c:28:[value] warning: assertion got status unknown.
-tests/e-acsl-runtime/vector.c:28:[value] warning: accessing uninitialized left-value. assert \initialized(&LAST);
+tests/runtime/valid.c:47:[value] warning: accessing left-value that contains escaping addresses.
+                 assert ¬\dangling(&a);

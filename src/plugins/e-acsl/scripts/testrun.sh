@@ -36,10 +36,10 @@
 # Arguments:
 #   $1 - base name of a test source file excluding its extension (e.g., addrOf)
 #   $2 - base name of a test suite directory the test file is located in
-#     (e.g., e-acsl-runtime). Provided that ROOT is the directory
+#     (e.g., runtime). Provided that ROOT is the directory
 #     holding an E-ACSL repository there should be either:
-#       * $ROOT/test/e-acsl-runtime/addrOf.i or
-#       * $ROOT/test/e-acsl-runtime/addrOf.c
+#       * $ROOT/test/runtime/addrOf.i or
+#       * $ROOT/test/runtime/addrOf.c
 #   $3 - if specified, re-run test sequence with -e-acsl-gmp-only flag
 #   $4 - extra flags for a `e-acsl-gcc.sh` run
 #   $5 - if specified print extra messages and retain log files (DEBUG option)
@@ -47,7 +47,7 @@
 set -e
 
 TEST="$1"   # Base name of the test file
-PREFIX="$2" # Test suite directory (e.g., e-acsl-runtime)
+PREFIX="$2" # Test suite directory (e.g., runtime)
 GMP="$3"    # Whether to issue an additional run with -e-acsl-gmp-only
 EXTRA="$4"  # Extra e-acsl-gcc.sh flags
 DEBUG="$5"  # Debug option
