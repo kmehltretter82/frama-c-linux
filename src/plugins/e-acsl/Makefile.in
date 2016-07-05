@@ -169,7 +169,6 @@ all:: $(JEMALLOC_LIB) $(GMP_LIB)
 
 clean::
 	$(PRINT_RM) e-acsl contrib libraries
-	$(RM) $(JEMALLOC_LIB) $(GMP_LIB)
 	if test -f $(JEMALLOC_DIR)/Makefile; \
 		then $(MAKE) -C$(JEMALLOC_DIR) relclean; \
 	fi
@@ -188,6 +187,7 @@ clean::
 	$(RM) $(foreach dir, $(PLUGIN_TESTS_DIRS), tests/$(dir)/result/*)
 
 DISTCLEANFILES = $(wildcard \
+	$(JEMALLOC_LIB) $(GMP_LIB) \
 	doc/doxygen/doxygen.cfg \
 	Makefile config.log config.status configure .depend autom4te.cache/* \
 	META.frama-c-e_acsl Makefile.plugin.generated local_config.ml top/*)
