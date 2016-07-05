@@ -148,7 +148,10 @@ JEMALLOC_DIR := $(PLUGIN_DIR)/contrib/libjemalloc
 JEMALLOC_LIBNAME = libjemalloc-e-acsl.a
 JEMALLOC_LIB = $(EACSL_LIBDIR)/$(JEMALLOC_LIBNAME)
 
-$(JEMALLOC_LIB):
+$(EACSL_LIBDIR):
+	$(MKDIR) $(EACSL_LIBDIR)
+
+$(JEMALLOC_LIB): $(EACSL_LIBDIR)
 	cd $(JEMALLOC_DIR) && \
 		./autogen.sh \
   		--with-jemalloc-prefix="__e_acsl_native_" \
@@ -161,7 +164,7 @@ GMP_DIR := $(PLUGIN_DIR)/contrib/libgmp
 GMP_LIBNAME = libgmp-e-acsl.a
 GMP_LIB = $(EACSL_LIBDIR)/$(GMP_LIBNAME)
 
-$(GMP_LIB):
+$(GMP_LIB): $(EACSL_LIBDIR)
 	cd $(GMP_DIR) && ./configure && $(MAKE) $(MAKEOPTS)
 	$(CP) $(GMP_DIR)/.libs/libgmp.a $@
 
@@ -170,10 +173,10 @@ all:: $(JEMALLOC_LIB) $(GMP_LIB)
 clean::
 	$(PRINT_RM) e-acsl contrib libraries
 	if test -f $(JEMALLOC_DIR)/Makefile; \
-		then $(MAKE) -C$(JEMALLOC_DIR) relclean; \
+		then $(MAKE) -s -C$(JEMALLOC_DIR) relclean; \
 	fi
 	if test -f $(GMP_DIR)/Makefile; \
-		then $(MAKE) -C$(GMP_DIR) distclean; \
+		then $(MAKE) -s -C$(GMP_DIR) distclean; \
 	fi
 
 ############
@@ -207,6 +210,9 @@ EACSL_OCAML_FILES = \
 	$(filter-out $(wildcard *local_config.ml), $(wildcard *.ml)) \
 	$(wildcard *.mli)
 
+EACSL_CONTRIB_FILES = \
+  $(shell $(CAT) contrib/MANIFEST | $(SED) 's/^/contrib\//g')
+
 EACSL_DOC_FILES = \
 	doc/manuals/e-acsl-manual.pdf  \
 	doc/manuals/e-acsl.pdf \
@@ -216,9 +222,14 @@ EACSL_DOC_FILES = \
 	man/e-acsl-gcc.sh.1
 
 EACSL_TEST_FILES = \
-	tests/test_config.in \
-	tests/print.ml \
-	$(foreach dir, $(TESTDIRS), $(wildcard $(dir)/* $(dir)/*/*))
+  tests/test_config.in tests/print.ml \
+	$(foreach dir, $(addprefix tests/,$(PLUGIN_TESTS_DIRS)), \
+    $(wildcard \
+      $(dir)/*.[ic] \
+      $(dir)/test_config \
+      $(dir)/oracle/*.c \
+      $(dir)/oracle/*.oracle \
+  ))
 
 EACSL_RTL_FILES = $(wildcard share/e-acsl/*.[ch] share/e-acsl/*/*.[ch])
 
@@ -228,15 +239,18 @@ EACSL_LICENSE_FILES = \
 	license/CEA_LGPL license/SPARETIMELABS \
 	license/headache_config.txt license/LGPLv2.1
 
+EACSL_MISC_FILES = \
+	configure.ac Makefile.in INSTALL README VERSION .depend
+
 EACSL_DISTRIB_FILES = \
-	configure.ac Makefile.in \
-	INSTALL README VERSION .depend \
+	$(EACSL_MISC_FILES) \
 	$(EACSL_OCAML_FILES) \
 	$(EACSL_DOC_FILES) \
 	$(EACSL_TEST_FILES) \
 	$(EACSL_RTL_FILES) \
 	$(EACSL_SCRIPT_FILES) \
-	$(EACSL_LICENSE_FILES)
+	$(EACSL_LICENSE_FILES) \
+  $(EACSL_CONTRIB_FILES)
 
 # BE CAREFUL: manually remove all *.ml* files which should not be released!
 e-acsl-distrib: .depend
@@ -246,19 +260,12 @@ e-acsl-distrib: .depend
 	$(MKDIR) $(EXPORT)
 	$(PRINT_UNTAR) tmp-distrib
 	cd $(EXPORT); \
-	  $(TAR) xf ../tmp.tar; autoconf; \
-	  $(SED) -i \
-	    -e 's/IS_DISTRIBUTED:=no/IS_DISTRIBUTED:=yes/' Makefile.in; \
-	  $(RM) -rf autom4te.cache
+    $(TAR) xf ../tmp.tar && \
+    autoconf && \
+    $(SED) -i -e 's/IS_DISTRIBUTED:=no/IS_DISTRIBUTED:=yes/' Makefile.in && \
+    $(RM) -rf autom4te.cache
 	$(PRINT_RM) tmp-distrib
 	$(RM) tmp.tar
-	$(PRINT_MAKING) test directories
-	for dir in $(EXPORT)/tests/*; do \
-	  if test -d $$dir; then \
-	    $(MKDIR) $$dir/result; \
-	    $(MKDIR) $$dir/oracle; \
-          fi \
-	done
 	$(PRINT_MAKING) archive
 	$(TAR) czf $(EXPORT).tar.gz $(EXPORT)
 	$(PRINT) Cleaning
