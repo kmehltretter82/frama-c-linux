@@ -358,8 +358,6 @@ uninstall::
 	      $(FRAMAC_DATADIR)/manuals/e-acsl-implementation.pdf \
 	      $(FRAMAC_DATADIR)/manuals/e-acsl-manual.pdf
 	$(PRINT_RM) E-ACSL libraries
-	$(PRINT_INSTALL) E-ACSL share files
-	$(MKDIR) $(FRAMAC_DATADIR)/e-acsl
 	$(RM) $(LIBDIR)/$(JEMALLOC_LIBNAME)
 	$(RM) $(LIBDIR)/$(GMP_LIBNAME)
 	$(PRINT_RM) E-ACSL scripts
