@@ -120,11 +120,18 @@ E_ACSL_TESTS: $(PLUGIN_DIR)/tests/test_config \
 	$(PLUGIN_DIR)/tests/print.cmxs \
 	$(PLUGIN_DIR)/tests/print.cmo
 
+clean::
+	$(PRINT_RM) cleaning generated test files
+	$(RM) $(E_ACSL_DIR)/tests/*.cm* $(E_ACSL_DIR)/tests/*.o
+	$(RM) $(E_ACSL_DIR)/tests/test_config
+	$(RM) $(foreach dir, $(PLUGIN_TESTS_DIRS), tests/$(dir)/result/*)
+
 endif
 
 ######################
 # Benchmarking tools #
 ######################
+
 EACSL_BM_SOURCES = $(wildcard $(PLUGIN_DIR)/benchmarking/tools/*.c)
 EACSL_BM_BINARIES = $(patsubst %.c,%, $(EACSL_BM_SOURCES))
 
@@ -143,62 +150,60 @@ clean::
 ################################################
 # E-ACSL C Libs: libjemalloc, libgmp					 #
 ################################################
+
 EACSL_LIBDIR := $(PLUGIN_DIR)/lib
-JEMALLOC_DIR := $(PLUGIN_DIR)/contrib/libjemalloc
-JEMALLOC_LIBNAME = libjemalloc-e-acsl.a
-JEMALLOC_LIB = $(EACSL_LIBDIR)/$(JEMALLOC_LIBNAME)
+EACSL_JEMALLOC_DIR := $(PLUGIN_DIR)/contrib/libjemalloc
+EACSL_JEMALLOC_LIBNAME = libjemalloc-e-acsl.a
+EACSL_JEMALLOC_LIB = $(EACSL_LIBDIR)/$(EACSL_JEMALLOC_LIBNAME)
 
 $(EACSL_LIBDIR):
 	$(MKDIR) $(EACSL_LIBDIR)
 
-$(JEMALLOC_LIB): $(EACSL_LIBDIR)
-	cd $(JEMALLOC_DIR) && \
+$(EACSL_JEMALLOC_LIB): $(EACSL_LIBDIR)
+	cd $(EACSL_JEMALLOC_DIR) && \
 		./autogen.sh \
   		--with-jemalloc-prefix="__e_acsl_native_" \
   		--with-private-namespace="__e_acsl_hidden_" \
   		--with-install-suffix="-e-acsl" && \
-		$(MAKE) $(MAKEOPTS) lib/$(JEMALLOC_LIBNAME)
-	$(CP) $(JEMALLOC_DIR)/lib/$(JEMALLOC_LIBNAME) $@
+		$(MAKE) $(MAKEOPTS) lib/$(EACSL_JEMALLOC_LIBNAME)
+	$(CP) $(EACSL_JEMALLOC_DIR)/lib/$(EACSL_JEMALLOC_LIBNAME) $@
 
-GMP_DIR := $(PLUGIN_DIR)/contrib/libgmp
-GMP_LIBNAME = libgmp-e-acsl.a
-GMP_LIB = $(EACSL_LIBDIR)/$(GMP_LIBNAME)
+EACSL_GMP_DIR := $(PLUGIN_DIR)/contrib/libgmp
+EACSL_GMP_LIBNAME = libgmp-e-acsl.a
+EACSL_GMP_LIB = $(EACSL_LIBDIR)/$(EACSL_GMP_LIBNAME)
 
-$(GMP_LIB): $(EACSL_LIBDIR)
-	cd $(GMP_DIR) && ./configure && $(MAKE) $(MAKEOPTS)
-	$(CP) $(GMP_DIR)/.libs/libgmp.a $@
+$(EACSL_GMP_LIB): $(EACSL_LIBDIR)
+	cd $(EACSL_GMP_DIR) && ./configure && $(MAKE) $(MAKEOPTS)
+	$(CP) $(EACSL_GMP_DIR)/.libs/libgmp.a $@
 
-all:: $(JEMALLOC_LIB) $(GMP_LIB)
+all:: $(EACSL_JEMALLOC_LIB) $(EACSL_GMP_LIB)
 
 clean::
 	$(PRINT_RM) e-acsl contrib libraries
-	if test -f $(JEMALLOC_DIR)/Makefile; \
-		then $(MAKE) -s -C$(JEMALLOC_DIR) relclean; \
+	if test -f $(EACSL_JEMALLOC_DIR)/Makefile; \
+		then $(MAKE) -s -C$(EACSL_JEMALLOC_DIR) relclean; \
 	fi
-	if test -f $(GMP_DIR)/Makefile; \
-		then $(MAKE) -s -C$(GMP_DIR) distclean; \
+	if test -f $(EACSL_GMP_DIR)/Makefile; \
+		then $(MAKE) -s -C$(EACSL_GMP_DIR) distclean; \
 	fi
 
 ############
 # Cleaning #
 ############
 
+EACSL_CLEANFILES = $(wildcard \
+	$(EACSL_JEMALLOC_LIB) $(EACSL_GMP_LIB) \
+	doc/doxygen/doxygen.cfg \
+	Makefile config.log config.status configure .depend autom4te.cache/* \
+	META.frama-c-e_acsl Makefile.plugin.generated local_config.ml top/*)
+
 clean::
 	$(PRINT_RM) cleaning generated test files
 	$(RM) $(E_ACSL_DIR)/tests/*.cm* $(E_ACSL_DIR)/tests/*.o
 	$(RM) $(E_ACSL_DIR)/tests/test_config
 	$(RM) $(foreach dir, $(PLUGIN_TESTS_DIRS), tests/$(dir)/result/*)
-
-DISTCLEANFILES = $(wildcard \
-	$(JEMALLOC_LIB) $(GMP_LIB) \
-	doc/doxygen/doxygen.cfg \
-	Makefile config.log config.status configure .depend autom4te.cache/* \
-	META.frama-c-e_acsl Makefile.plugin.generated local_config.ml top/*)
-
-distclean:
-	$(MAKE) -s clean
 	$(PRINT_RM) generated files
-	$(RM) $(addprefix $(E_ACSL_DIR)/, $(DISTCLEANFILES))
+	$(RM) $(addprefix $(E_ACSL_DIR)/, $(EACSL_CLEANFILES))
 
 ################################
 # Building source distribution #
@@ -206,9 +211,8 @@ distclean:
 
 EXPORT = e-acsl-$(EACSL_VERSION)
 
-EACSL_OCAML_FILES = \
-	$(filter-out $(wildcard *local_config.ml), $(wildcard *.ml)) \
-	$(wildcard *.mli)
+EACSL_OCAML_FILES = $(wildcard *.mli) \
+	$(filter-out $(wildcard *local_config.ml), $(wildcard *.ml))
 
 EACSL_CONTRIB_FILES = \
   $(shell $(CAT) contrib/MANIFEST | $(SED) 's/^/contrib\//g')
@@ -341,8 +345,8 @@ install::
 		$(FRAMAC_DATADIR)/manuals
 	$(PRINT_INSTALL) E-ACSL libraries
 	$(MKDIR) $(LIBDIR)
-	$(CP) $(JEMALLOC_LIB) $(LIBDIR)
-	$(CP) $(GMP_LIB) $(LIBDIR)
+	$(CP) $(EACSL_JEMALLOC_LIB) $(LIBDIR)
+	$(CP) $(EACSL_GMP_LIB) $(LIBDIR)
 	$(PRINT_INSTALL) E-ACSL scripts
 	$(MKDIR) $(BINDIR)
 	$(CP) $(E_ACSL_DIR)/scripts/e-acsl-gcc.sh $(BINDIR)/
@@ -358,8 +362,8 @@ uninstall::
 	      $(FRAMAC_DATADIR)/manuals/e-acsl-implementation.pdf \
 	      $(FRAMAC_DATADIR)/manuals/e-acsl-manual.pdf
 	$(PRINT_RM) E-ACSL libraries
-	$(RM) $(LIBDIR)/$(JEMALLOC_LIBNAME)
-	$(RM) $(LIBDIR)/$(GMP_LIBNAME)
+	$(RM) $(LIBDIR)/$(EACSL_JEMALLOC_LIBNAME)
+	$(RM) $(LIBDIR)/$(EACSL_GMP_LIBNAME)
 	$(PRINT_RM) E-ACSL scripts
 	$(RM) $(BINDIR)/e-acsl-gcc.sh
 	$(PRINT_RM) man pages
