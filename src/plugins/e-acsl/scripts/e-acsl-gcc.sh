@@ -112,7 +112,8 @@ required_tool find "GNU findutils"
 LONGOPTIONS="help,compile,compile-only,print,debug:,ocode:,oexec:,verbose:,
   frama-c-only,extra-cpp-args:,frama-c-stdlib,full-mmodel,gmp,quiet,logfile:,
   ld-flags:,cpp-flags:,frama-c-extra:,memory-model:,production,no-stdlib,
-  debug-log:,frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:"
+  debug-log:,frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:,
+  print-mmodels"
 SHORTOPTIONS="h,c,C,p,d:,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,P,N,D:,I:,G:,X,a:"
 # Prefix for an error message due to wrong arguments
 ERROR="ERROR parsing arguments:"
@@ -135,6 +136,7 @@ OPTION_EACSL_OUTPUT_EXEC=""              # Name of E-ACSL executable
 OPTION_EACSL="-e-acsl"                   # Specifies E-ACSL run
 OPTION_FRAMA_STDLIB="-no-frama-c-stdlib" # Use Frama-C stdlib
 OPTION_FULL_MMODEL=                      # Instrument as much as possible
+OPTION_PRINT_MMODELS=                    # Print memory model names
 OPTION_GMP=                              # Use GMP integers everywhere
 OPTION_DEBUG_MACRO="-DE_ACSL_DEBUG"      # Debug macro
 OPTION_DEBUG_LOG_MACRO=""                # Specification of debug log file
@@ -366,14 +368,14 @@ do
       OPTION_EACSL_MMODELS="`echo $1 | sed -s 's/,/ /g'`"
       shift;
     ;;
+    # Print names of the supported memody models.
+    --print-mmodels)
+      shift;
+      OPTION_PRINT_MMODELS="1"
+    ;;
   esac
 done
 shift;
-
-# Bail if no files to translate are given
-if [ -z "$1" ]; then
-  error "no input files";
-fi
 
 # Check Frama-C and GCC executable names
 check_tool "$OPTION_FRAMAC"
@@ -463,6 +465,12 @@ mmodel_sources() {
   fi
 }
 
+# If specified, print the names of the supported memory models and exit
+if [ -n "$OPTION_PRINT_MMODELS" ]; then
+  mmodel_sources
+  exit 0
+fi
+
 # Once EACSL_SHARE is defined check the memory models provided at inputs
 for mod in $OPTION_EACSL_MMODELS; do
   mmodel_sources $mod > /dev/null
@@ -523,6 +531,11 @@ if [ -n "$OPTION_EACSL" ]; then
     $OPTION_GMP
     $OPTION_FULL_MMODEL
     -then-last"
+fi
+
+# Bail if no files to translate are given
+if [ -z "$1" ]; then
+  error "no input files";
 fi
 
 # Instrument
