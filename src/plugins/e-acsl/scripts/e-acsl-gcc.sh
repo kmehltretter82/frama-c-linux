@@ -103,9 +103,10 @@ rte_options() {
   return 0;
 }
 
-# Check if getopt is GNU
+# Check if the following tools are GNU and abort otherwise
 required_tool getopt "util-linux"
 required_tool readlink "GNU coreutils"
+required_tool find "GNU findutils"
 
 # Getopt options
 LONGOPTIONS="help,compile,compile-only,print,debug:,ocode:,oexec:,verbose:,
@@ -437,20 +438,24 @@ fi
 error "Cannot find required $EACSL_SHARE/e_acsl_mmodel_api.h header" \
   `test -f "$EACSL_SHARE/e_acsl_mmodel_api.h"; echo $?`
 
-# Echo the name of the source file corresponding to the name of a memory model
-# or report an error of the given model does not exist.
+# Echo the absolute path of the source file corresponding to a memory model
+# given by the first argument, or report an error of the given model does not
+# exist. In case no argument is supplied, output the names of the memory models
+# supported in this distribution.
 mmodel_sources() {
-  model=""
-  case "$1" in
-    bittree) model="bittree_model/e_acsl_bittree_mmodel.c" ;;
-    segment) model="segment_model/e_acsl_segment_mmodel.c" ;;
-    *) error "Memory model '$1' does not exist" ;;
-  esac
-  model="$EACSL_SHARE/$model"
-  if ! [ -f "$model" ]; then
-    error "Memory model '$1' exists but not available in this distribution"
+  local model="$1"
+  local models=$(find $EACSL_SHARE -maxdepth 1 \
+     -name '*_model'  -type d -exec basename {} \; | sed 's/_model$//')
+
+  if [ -n "$model" ]; then
+    model=$(echo $models | tr ' ' '\n' | grep "^$model$")
+    if [ -n "$model" ]; then
+      echo "$EACSL_SHARE/$model"_model/e_acsl_"$model"_mmodel.c
+    else
+      error "Memory model '$1' is not available in this distribution"
+    fi
   else
-    echo "$model"
+    echo $models
   fi
 }
 
