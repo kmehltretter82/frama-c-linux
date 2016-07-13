@@ -418,6 +418,10 @@ CPPMACHDEP="-D__FC_MACHDEP_X86_$MACHDEPFLAGS"
 # GCC machine option
 GCCMACHDEP="-m$MACHDEPFLAGS"
 
+# Macro that identifies E-ACSL compilation. Passed to Frama-C
+# and GCC runs but not to the original compilation
+EACSL_MACRO_ID="__E_ACSL__"
+
 # Frama-C and related flags
 FRAMAC_CPP_EXTRA="
   $OPTION_FRAMAC_CPP_EXTRA
@@ -463,10 +467,6 @@ mmodel_sources() {
 for mod in $OPTION_EACSL_MMODELS; do
   mmodel_sources $mod > /dev/null
 done
-
-# Macro that identifies E-ACSL compilation. Passed to Frama-C
-# and GCC runs but not to the original compilation
-EACSL_MACRO_ID="__E_ACSL__"
 
 # Gcc and related flags
 CC="$OPTION_CC"
