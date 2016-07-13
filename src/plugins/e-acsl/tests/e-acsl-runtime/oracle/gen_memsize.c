@@ -8,62 +8,62 @@ int main(int argc, char **argv)
   a = (char *)malloc((unsigned long)7);
   /*@ assert __e_acsl_heap_size ≡ 7; */
   __e_acsl_assert(__e_acsl_heap_size == 7UL,(char *)"Assertion",
-                  (char *)"main",(char *)"__e_acsl_heap_size == 7",22);
+                  (char *)"main",(char *)"__e_acsl_heap_size == 7",14);
   b = (char *)malloc((unsigned long)14);
   /*@ assert __e_acsl_heap_size ≡ 21; */
   __e_acsl_assert(__e_acsl_heap_size == 21UL,(char *)"Assertion",
-                  (char *)"main",(char *)"__e_acsl_heap_size == 21",24);
+                  (char *)"main",(char *)"__e_acsl_heap_size == 21",16);
   free((void *)a);
   /*@ assert __e_acsl_heap_size ≡ 14; */
   __e_acsl_assert(__e_acsl_heap_size == 14UL,(char *)"Assertion",
-                  (char *)"main",(char *)"__e_acsl_heap_size == 14",28);
+                  (char *)"main",(char *)"__e_acsl_heap_size == 14",20);
   a = (char *)0;
   free((void *)a);
   /*@ assert __e_acsl_heap_size ≡ 14; */
   __e_acsl_assert(__e_acsl_heap_size == 14UL,(char *)"Assertion",
-                  (char *)"main",(char *)"__e_acsl_heap_size == 14",33);
+                  (char *)"main",(char *)"__e_acsl_heap_size == 14",25);
   b = (char *)realloc((void *)b,(unsigned long)9);
   /*@ assert __e_acsl_heap_size ≡ 9; */
   __e_acsl_assert(__e_acsl_heap_size == 9UL,(char *)"Assertion",
-                  (char *)"main",(char *)"__e_acsl_heap_size == 9",37);
+                  (char *)"main",(char *)"__e_acsl_heap_size == 9",29);
   b = (char *)realloc((void *)b,(unsigned long)18);
   /*@ assert __e_acsl_heap_size ≡ 18; */
   __e_acsl_assert(__e_acsl_heap_size == 18UL,(char *)"Assertion",
-                  (char *)"main",(char *)"__e_acsl_heap_size == 18",41);
+                  (char *)"main",(char *)"__e_acsl_heap_size == 18",33);
   b = (char *)realloc((void *)b,(unsigned long)0);
   b = (char *)0;
   /*@ assert __e_acsl_heap_size ≡ 0; */
   __e_acsl_assert(__e_acsl_heap_size == 0UL,(char *)"Assertion",
-                  (char *)"main",(char *)"__e_acsl_heap_size == 0",46);
+                  (char *)"main",(char *)"__e_acsl_heap_size == 0",38);
   b = (char *)realloc((void *)b,(unsigned long)8);
   /*@ assert __e_acsl_heap_size ≡ 8; */
   __e_acsl_assert(__e_acsl_heap_size == 8UL,(char *)"Assertion",
-                  (char *)"main",(char *)"__e_acsl_heap_size == 8",50);
+                  (char *)"main",(char *)"__e_acsl_heap_size == 8",42);
   b = (char *)realloc((void *)0,(unsigned long)8);
   /*@ assert __e_acsl_heap_size ≡ 16; */
   __e_acsl_assert(__e_acsl_heap_size == 16UL,(char *)"Assertion",
-                  (char *)"main",(char *)"__e_acsl_heap_size == 16",54);
+                  (char *)"main",(char *)"__e_acsl_heap_size == 16",46);
   b = (char *)realloc((void *)0,18446744073709551615UL);
   /*@ assert __e_acsl_heap_size ≡ 16; */
   __e_acsl_assert(__e_acsl_heap_size == 16UL,(char *)"Assertion",
-                  (char *)"main",(char *)"__e_acsl_heap_size == 16",58);
+                  (char *)"main",(char *)"__e_acsl_heap_size == 16",50);
   /*@ assert b ≡ (char *)((void *)0); */
   __e_acsl_assert(b == (char *)0,(char *)"Assertion",(char *)"main",
-                  (char *)"b == (char *)((void *)0)",59);
+                  (char *)"b == (char *)((void *)0)",51);
   b = (char *)calloc(18446744073709551615UL,18446744073709551615UL);
   /*@ assert __e_acsl_heap_size ≡ 16; */
   __e_acsl_assert(__e_acsl_heap_size == 16UL,(char *)"Assertion",
-                  (char *)"main",(char *)"__e_acsl_heap_size == 16",63);
+                  (char *)"main",(char *)"__e_acsl_heap_size == 16",55);
   /*@ assert b ≡ (char *)((void *)0); */
   __e_acsl_assert(b == (char *)0,(char *)"Assertion",(char *)"main",
-                  (char *)"b == (char *)((void *)0)",64);
+                  (char *)"b == (char *)((void *)0)",56);
   b = (char *)malloc(18446744073709551615UL);
   /*@ assert __e_acsl_heap_size ≡ 16; */
   __e_acsl_assert(__e_acsl_heap_size == 16UL,(char *)"Assertion",
-                  (char *)"main",(char *)"__e_acsl_heap_size == 16",68);
+                  (char *)"main",(char *)"__e_acsl_heap_size == 16",60);
   /*@ assert b ≡ (char *)((void *)0); */
   __e_acsl_assert(b == (char *)0,(char *)"Assertion",(char *)"main",
-                  (char *)"b == (char *)((void *)0)",69);
+                  (char *)"b == (char *)((void *)0)",61);
   __retres = 0;
   __e_acsl_memory_clean();
   return __retres;
