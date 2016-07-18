@@ -36,6 +36,7 @@
 #define E_ACSL_BITS
 
 #include <stdint.h>
+#include <stddef.h>
 
 /* Check if we have little-endian and abort the execution otherwise. */
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
