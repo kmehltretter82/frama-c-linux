@@ -82,8 +82,6 @@
 #  include <linux/limits.h>
 #endif
 
-
-
 /* ****************** */
 /* Public API         */
 /* ****************** */
