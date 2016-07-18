@@ -55,4 +55,6 @@ int syscall(int number, ...);
 #  define getrlimit(...) syscall(SYS_getrlimit, __VA_ARGS__)
 #  define munmap(...) syscall(SYS_munmap, __VA_ARGS__)
 #  define exit(...) syscall(SYS_exit, __VA_ARGS__)
+#  define getpid(...) syscall(SYS_getpid)
+#  define kill(...) syscall(SYS_kill, __VA_ARGS__)
 #endif
