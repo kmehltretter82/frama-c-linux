@@ -103,7 +103,9 @@ run_executable() {
   local log="$2"
   local model="$3"
 
-  debug "Run and log $executable"
+  debug "Run: $executable"
+  debug "Log: $log"
+
   if ! `$executable > $log 2>&1`; then
     error "[$3 model] Runtime failure in test case '$TEST'" $log
   fi
@@ -119,27 +121,33 @@ run_test() {
   local model="$1" # Memory model to link against
   local extra="$2" # Additional arguments to e-acsl-gcc.sh
 
-  # Command for instrumenting the source file and compiling the original
-  # and the instrumented code
-  COMMAND="$EACSLGCC \
-    --compile $TESTFILE --ocode=$ocode --logfile=$logfile \
-    --instrumented-only --memory-model=$model --oexec=$oexec $extra"
+  # e-acsl-gcc.sh reports models as space-separated string. Make a
+  # comma-separated one otherwise the following does not work
+  MODELSTR="$(echo $MODELS | tr ' ' ',')"
+
+  # Command for instrumenting the source file
+  COMMAND="$EACSLGCC $TESTFILE --ocode=$ocode --logfile=$logfile $extra"
 
   debug "Run $COMMAND"
   $COMMAND || error "Command $COMMAND failed" "$logfile"
 
-  # Log outputs of the generated executables
-  run_executable "$oexec.e-acsl" "$oexeclog.e-acsl" "$model"
+  # Compile instrumented source and run executable
+  for model in $MODELS; do
+    # Command for compiling the instrumented file with a given memory model
+    COMMAND="$EACSLGCC --compile-only --memory-model=$model --logfile=$logfile \
+      --oexec-e-acsl=$oexec-$model $ocode"
+    debug "Run $COMMAND"
+    $COMMAND || error "Command $COMMAND failed" "$logfile"
+    run_executable $oexec-$model $oexeclog-$model $model
+  done
 
   RUNS=$((RUNS+1))
 }
 
-for model in $MODELS; do
-  run_test $model "$EXTRA"
-  # Run GMP tests if specified
-  if [ -n "$GMP" ]; then
-    run_test $model "--gmp $EXTRA"
-  fi
-done
+run_test $model "$EXTRA"
+# Run GMP tests if specified
+if [ -n "$GMP" ]; then
+  run_test $model "--gmp $EXTRA"
+fi
 
 exit 0
