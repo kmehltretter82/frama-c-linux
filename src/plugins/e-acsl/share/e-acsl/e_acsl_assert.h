@@ -30,6 +30,8 @@
 
 #include "e_acsl_string.h"
 #include "e_acsl_printf.h"
+#include "e_acsl_syscall.h"
+#include "e_acsl_trace.h"
 
 /*! \brief Drop-in replacement for abort function */
 #define abort() exec_abort(__LINE__, __FILE__)
@@ -42,16 +44,25 @@ static void vabort(char *fmt, ...);
 
 /*! \brief Drop-in replacement for system-wide assert macro */
 #define assert(expr) \
-  ((expr) ? (void)(0) : vabort("%s at %s:%d\n", \
-    #expr, __FILE__,__LINE__))
+  ((expr) ? (void)(0) : vabort("%s at %s:%d\n", "Assertion "#expr" failed", \
+    __FILE__, __LINE__))
 
 /*! \brief Assert with printf-like error message support */
 #define vassert(expr, fmt, ...) \
   vassert_fail(expr, __LINE__, __FILE__, fmt, __VA_ARGS__)
 
 static void exec_abort(int line, const char *file) {
-  eprintf("Execution aborted (%s:%d)\n", file, line);
-  exit(1);
+  trace();
+  kill(getpid(), SIGABRT);
+}
+
+/*! \brief Print a message to stderr and abort the execution */
+static void vabort(char *fmt, ...) {
+  va_list va;
+  va_start(va,fmt);
+  _format(NULL,_charc_stderr,fmt,va);
+  va_end(va);
+  abort();
 }
 
 static void vassert_fail(int expr, int line, char *file, char *fmt,  ...) {
@@ -69,22 +80,13 @@ static void vassert_fail(int expr, int line, char *file, char *fmt,  ...) {
   }
 }
 
-/*! \brief Print a message to stderr and abort the execution */
-static void vabort(char *fmt, ...) {
-  va_list va;
-  va_start(va,fmt);
-  _format(NULL,_charc_stderr,fmt,va);
-  va_end(va);
-  abort();
-}
-
 /*! \brief Default implementation of E-ACSL runtime assertions */
 static void runtime_assert(int predicate, char *kind,
   char *fct, char *pred_txt, int line) {
   if (!predicate) {
     eprintf("%s failed at line %d in function %s.\n"
       "The failing predicate is:\n%s.\n", kind, line, fct, pred_txt);
-    exit(1);
+    abort();
   }
 }
 
