@@ -83,8 +83,8 @@ char* fd_read (int fd, short bufsize) {
   short fetched = 0;
   int rd = 0; /* Count of fetched characters */
 
-  /* Each time the pointer if moved by `size - buffer_size` as initially
-   * the size of 'buffer' is 'buffer_size' */
+  /* Each time the pointer is moved by `size - buffer_size`.
+   * This is because initially the size of `buffer` is `buffer_size`. */
   while ((fetched = read(fd, buffer + size - buffer_size, buffer_size))) {
     rd += fetched;
     if (fetched != -1) {
@@ -136,7 +136,6 @@ ipr_t* __shexec (ipr_t *data) {
     close(infd[1]); close(outfd[1]); close(errfd[1]);
 
     execvp(data->argv[0],data->argv);
-    dup2(oldstderr,2); /* Restore stderr  */
     if (errno) {
       data->error = nstrdup("Failed to execute:\n  ");
       char **arg = data->argv - 1;
@@ -154,8 +153,8 @@ ipr_t* __shexec (ipr_t *data) {
     close(errfd[1]);
     close(infd[0]);
 
-    /* If data->stdin string if supplied, write that string to child's
-       STDIN first */
+    /* If data->stdin string is supplied, write that string to the child's
+       stdin first */
     if (data->stdins)  /* Return NULL if write fails */
       if (write(infd[1], data->stdins, strlen(data->stdins)) == -1)
         return NULL;
@@ -168,15 +167,15 @@ ipr_t* __shexec (ipr_t *data) {
     if (!data->stderrs)
       data->error = nstrdup("Error reading from STDERR pipe");
 
-    /* Close file descriptors we still have open */
+    /* Close file descriptors that are still open */
     close(outfd[0]); /* read  end of STDOUT */
     close(errfd[0]); /* read  end of STDERR */
     close(infd[1]);  /* write end of STDIN */
 
     int status;
-    waitpid(pid,&status,0); /* wait for the child to finish */
+    waitpid(pid, &status, 0); /* wait for the child to finish */
 
-    data->exit_status = WEXITSTATUS(status); /* exis status */
+    data->exit_status = WEXITSTATUS(status); /* exit status */
     data->pid = pid;                         /* process number */
     data->signaled = WIFSIGNALED(status);    /* signal caught */
     data->signo = WTERMSIG(status);          /* signal number caught */
@@ -201,17 +200,19 @@ void free_ipr (ipr_t* ipr) {
 }
 
 /* \brief Execute a command given via parameter `data` in the current shell
- * and its result as `ipr_t` struct.
+ *  and return the dynamically allocated struct `ipr_t` which captures the
+ *  results of the command's execution.
  *
- * \param data - command to execute. This argument is assumed to be a
- *  NULL-terminated array of strings
- * \param sin - if not NULL a C string given via `sin` is supplied as standard
- *  input to the executed command
- * \return - heap-allocated struct `ipr_t` that describes the output of the
- *  executed command. De-allocation of this struct should be performed via the
- *  `free_ipr` function */
+ * \param data - command to execute. `data` is expected to be a NULL-terminated
+ *  array of C strings.
+ * \param sin - if not NULL, a C string given via `sin` is supplied as standard
+ *  input to the executed command.
+ * \return - heap-allocated struct `ipr_t` which describes the output of the
+ *  executed command. Deallocation of this struct must be performed via the
+ *  `free_ipr` function. */
 static ipr_t* shexec (char **data, const char *sin) {
-  /* Allocate and initialise the struct that we use */
+  /* Allocate and initialise the `ipr_t` struct to store the results
+   * of the command execution */
   ipr_t  *ipr = (ipr_t*)native_malloc(sizeof(ipr_t));
   ipr->stderrs = NULL;
   ipr->stdouts = NULL;
@@ -220,6 +221,7 @@ static ipr_t* shexec (char **data, const char *sin) {
   ipr->exit_status = 0;
   ipr->pid = 0;
   ipr->signaled = 0;
+  /* Run the command returning a pointer to `ipr_t` */
   return __shexec(ipr);
 }
 #endif

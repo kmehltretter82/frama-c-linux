@@ -103,8 +103,8 @@ static char *sappend(char *dest, const char *src, const char *delim) {
   return dest;
 }
 
-/** \brief Return 0 if string `str` end with string `pat` and a non-zero value
- * otherwise. The function assumes that both, `str` and `path` are valid,
+/** \brief Return 0 if C string `str` ends with string `pat` and a non-zero
+ * value otherwise. The function assumes that both, `str` and `path` are valid,
  * NUL-terminated C strings. If any of the input strings are NULLs, a non-zero
  * value is returned. */
 static int endswith(char *str, char *pat) {
