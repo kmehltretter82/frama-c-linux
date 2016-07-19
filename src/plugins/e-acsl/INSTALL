@@ -30,8 +30,8 @@
   ./configure --prefix C:/windows/path/with/direct/slash && make && make install
 
 4) Optionally, test your installation by running:
-   frama-c.byte -e-acsl tests/e-acsl-runtime/true.i -then-on e-acsl -print
-   frama-c -e-acsl tests/e-acsl-runtime/true.i -then-on e-acsl -print
+   frama-c.byte -e-acsl tests/runtime/true.i -then-on e-acsl -print
+   frama-c -e-acsl tests/runtime/true.i -then-on e-acsl -print
 
 See below for more detailed and specific instructions.
 
@@ -141,8 +141,8 @@ FRAMAC_PLUGIN: absolute path of the Frama-C plug-in directory.
 This step is optional.
 
 Test your installation by running:
-  frama-c.byte -e-acsl tests/e-acsl-runtime/true.i -then-on e-acsl -print
-  frama-c -e-acsl tests/e-acsl-runtime/true.i -then-on e-acsl -print
+  frama-c.byte -e-acsl tests/runtime/true.i -then-on e-acsl -print
+  frama-c -e-acsl tests/runtime/true.i -then-on e-acsl -print
 
 The second command only works if native dynamic linking of OCaml is available
 on your system.

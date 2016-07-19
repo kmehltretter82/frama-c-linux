@@ -1,1 +1,1 @@
-Like e-acsl-runtime, but also test the -e-acsl-gmp-only mode.
+Like runtime, but also test the -e-acsl-gmp-only mode.

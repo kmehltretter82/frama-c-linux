@@ -244,7 +244,7 @@ libgmp_la_OBJECTS = $(am_libgmp_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
-am__v_lt_1 = 
+am__v_lt_1 =
 libgmp_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libgmp_la_CFLAGS) \
 	$(CFLAGS) $(libgmp_la_LDFLAGS) $(LDFLAGS) -o $@
@@ -261,11 +261,11 @@ am__v_P_1 = :
 AM_V_GEN = $(am__v_GEN_@AM_V@)
 am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
 am__v_GEN_0 = @echo "  GEN     " $@;
-am__v_GEN_1 = 
+am__v_GEN_1 =
 AM_V_at = $(am__v_at_@AM_V@)
 am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
 am__v_at_0 = @
-am__v_at_1 = 
+am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
 am__depfiles_maybe =
@@ -278,7 +278,7 @@ LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 AM_V_CC = $(am__v_CC_@AM_V@)
 am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
 am__v_CC_0 = @echo "  CC      " $@;
-am__v_CC_1 = 
+am__v_CC_1 =
 CCLD = $(CC)
 LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -286,7 +286,7 @@ LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
-am__v_CCLD_1 = 
+am__v_CCLD_1 =
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
@@ -296,7 +296,7 @@ LTCXXCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 AM_V_CXX = $(am__v_CXX_@AM_V@)
 am__v_CXX_ = $(am__v_CXX_@AM_DEFAULT_V@)
 am__v_CXX_0 = @echo "  CXX     " $@;
-am__v_CXX_1 = 
+am__v_CXX_1 =
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
@@ -304,7 +304,7 @@ CXXLINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
-am__v_CXXLD_1 = 
+am__v_CXXLD_1 =
 SOURCES = $(libgmp_la_SOURCES) $(EXTRA_libgmp_la_SOURCES) \
 	$(libgmpxx_la_SOURCES)
 DIST_SOURCES = $(libgmp_la_SOURCES) $(EXTRA_libgmp_la_SOURCES) \
@@ -826,7 +826,7 @@ config.h: stamp-h1
 stamp-h1: $(srcdir)/config.in $(top_builddir)/config.status
 	@rm -f stamp-h1
 	cd $(top_builddir) && $(SHELL) ./config.status config.h
-$(srcdir)/config.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps) 
+$(srcdir)/config.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	($(am__cd) $(top_srcdir) && $(AUTOHEADER))
 	rm -f stamp-h1
 	touch $@
@@ -871,10 +871,10 @@ clean-libLTLIBRARIES:
 	  rm -f $${locs}; \
 	}
 
-libgmp.la: $(libgmp_la_OBJECTS) $(libgmp_la_DEPENDENCIES) $(EXTRA_libgmp_la_DEPENDENCIES) 
+libgmp.la: $(libgmp_la_OBJECTS) $(libgmp_la_DEPENDENCIES) $(EXTRA_libgmp_la_DEPENDENCIES)
 	$(AM_V_CCLD)$(libgmp_la_LINK) -rpath $(libdir) $(libgmp_la_OBJECTS) $(libgmp_la_LIBADD) $(LIBS)
 
-libgmpxx.la: $(libgmpxx_la_OBJECTS) $(libgmpxx_la_DEPENDENCIES) $(EXTRA_libgmpxx_la_DEPENDENCIES) 
+libgmpxx.la: $(libgmpxx_la_OBJECTS) $(libgmpxx_la_DEPENDENCIES) $(EXTRA_libgmpxx_la_DEPENDENCIES)
 	$(AM_V_CXXLD)$(libgmpxx_la_LINK) $(am_libgmpxx_la_rpath) $(libgmpxx_la_OBJECTS) $(libgmpxx_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
@@ -1547,8 +1547,25 @@ clean-mini-gmp:
 	  && $(MAKE) -f "$$abs_srcdir/mini-gmp/tests/Makefile" clean ; \
 	fi
 
+clean-gmp:
+	rm -f demos/pexpr-config.h demos/calc/calc-config.h
+	rm -f cxx/Makefile \
+        demos/Makefile \
+        demos/calc/Makefile \
+        demos/expr/Makefile \
+        doc/Makefile \
+        tests/Makefile \
+        tests/cxx/Makefile \
+        tests/devel/Makefile \
+        tests/misc/Makefile \
+        tests/mpf/Makefile \
+        tests/mpn/Makefile \
+        tests/mpq/Makefile \
+        tests/mpz/Makefile \
+        tests/rand/Makefile
+
 clean-local: clean-mini-gmp
-distclean-local: clean-mini-gmp
+distclean-local: clean-mini-gmp clean-gmp
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

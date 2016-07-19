@@ -448,5 +448,22 @@ clean-mini-gmp:
 	  && $(MAKE) -f "$$abs_srcdir/mini-gmp/tests/Makefile" clean ; \
 	fi
 
+clean-gmp:
+	rm -f demos/pexpr-config.h demos/calc/calc-config.h
+	rm -f cxx/Makefile \
+        demos/Makefile \
+        demos/calc/Makefile \
+        demos/expr/Makefile \
+        doc/Makefile \
+        tests/Makefile \
+        tests/cxx/Makefile \
+        tests/devel/Makefile \
+        tests/misc/Makefile \
+        tests/mpf/Makefile \
+        tests/mpn/Makefile \
+        tests/mpq/Makefile \
+        tests/mpz/Makefile \
+        tests/rand/Makefile
+
 clean-local: clean-mini-gmp
-distclean-local: clean-mini-gmp
+distclean-local: clean-mini-gmp clean-gmp
