@@ -70,7 +70,7 @@ rte_options() {
         opts="$opts -rte-mem"
       ;;
       int) # integer overflows
-        intopts=""
+        intopts="-warn-signed-overflow -warn-unsigned-overflow"
       ;;
       float) # casts from floating-point to integer
         opts="$opts -rte-float-to-int"
