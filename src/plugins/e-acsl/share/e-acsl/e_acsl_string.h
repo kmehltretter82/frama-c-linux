@@ -36,6 +36,8 @@
  *    of string.h functions use GLIBC-based implementations.
 ***************************************************************************/
 
+#include "e_acsl_malloc.h"
+
 #ifndef E_ACSL_STD_STRING
 #define E_ACSL_STD_STRING
 #  if defined(__GNUC__) && defined(E_ACSL_BUILTINS)
@@ -60,4 +62,60 @@
 #    include "glibc/strcmp.c"
 #    include "glibc/strncmp.c"
 #  endif
+
+/* \brief Local version of `strcat` */
+static char *nstrcat(char *dest, const char *src) {
+  memcpy(dest + strlen(dest), src, strlen(src) + 1);
+  return dest;
+}
+
+/* \brief Local version of `strdup` */
+static char *nstrdup(const char *s) {
+  if (s) {
+    size_t len = strlen(s) + 1;
+    void *n = native_malloc(len);
+    return (n == NULL) ? NULL : (char*)memcpy(n, s, len);
+  }
+  return NULL;
+}
+
+/* \brief Append `src` to `dest` by re-allocating `dest`.
+ *
+ * `sappend` assumes that `dest` is either NULL (in which case it is
+ * allocated on the heap) or a heap-allocated C string that can be passed
+ * as an input to realloc.  If `delim` and `dest` are not NULLs them string
+ * `delim` is appended to `dest` before `src`
+ *
+ * \return Result of concatenation of `dest` and `src` */
+static char *sappend(char *dest, const char *src, const char *delim) {
+  if (!dest && src)
+    dest = nstrdup(src);
+  else if (src && dest) {
+    size_t ldelim = delim ? strlen(delim) : 0;
+    size_t len = strlen(src) + strlen(dest) + 1;
+    if (ldelim)
+      len += ldelim;
+    dest = native_realloc(dest, len);
+    if (ldelim)
+      dest = nstrcat(dest, delim);
+    dest = nstrcat(dest, src);
+  }
+  return dest;
+}
+
+/** \brief Return 0 if C string `str` ends with string `pat` and a non-zero
+ * value otherwise. The function assumes that both, `str` and `path` are valid,
+ * NUL-terminated C strings. If any of the input strings are NULLs, a non-zero
+ * value is returned. */
+static int endswith(char *str, char *pat) {
+  if (str && pat) {
+    size_t slen = strlen(str);
+    size_t plen = strlen(pat);
+    if (slen >= plen) {
+      str += slen - plen;
+      return strncmp(str, pat, plen);
+    }
+  }
+  return 1;
+}
 #endif

@@ -21,40 +21,50 @@
 /**************************************************************************/
 
 /*! ***********************************************************************
- * \file  e_acsl_syscall.h
- * \brief E-ACSL \p syscall bindings.
- *
- * Re-declaration of standard libc syscall-based functions using direct
- * application of \p syscall. The aim is to avoid issues for the case when a
- * target program provides custom implementations or wrappers for such
- * functions. For instance, if an instrumented program provides a custom
- * implementation of `write` E-ACSL RTL will still use the native system
- * call.
- *
- * Note that this header following does not provide a re-declaration for \p
- * mmap.  This is because \p  syscall returns \p  int, while \p  mmap should
- * return an integer type wide enough to hold a memory address address. Also,
- * since there is no \p sbrk system call, a re-declaration of \p  sbrk is also
- * missing. As a result, programs providing custom definitions of \p syscall,
- * \p mmap or \p sbrk should be rejected. Re-definitions of the below functions
- * should be safe.
+ * \file  e_acsl_trace.h
+ * \brief Interface for producing backtrace. Requires GLIBC.
 ***************************************************************************/
 
-#ifndef E_ACSL_SYSCALL
-#define E_ACSL_SYSCALL
-#  include <stdlib.h>
-#  include <fcntl.h>
-#  include <unistd.h>
-#  include <sys/syscall.h>   /* SYS_xxx definitions */
+#ifndef E_ACSL_TRACE
+#define E_ACSL_TRACE
 
-int syscall(int number, ...);
+#include "e_acsl_shexec.h"
 
-#  define write(...) syscall(SYS_write, __VA_ARGS__)
-#  define open(...) syscall(SYS_open, __VA_ARGS__)
-#  define close(...) syscall(SYS_close, __VA_ARGS__)
-#  define getrlimit(...) syscall(SYS_getrlimit, __VA_ARGS__)
-#  define munmap(...) syscall(SYS_munmap, __VA_ARGS__)
-#  define exit(...) syscall(SYS_exit, __VA_ARGS__)
-#  define getpid(...) syscall(SYS_getpid)
-#  define kill(...) syscall(SYS_kill, __VA_ARGS__)
+# ifdef __GLIBC__
+#  include <execinfo.h>
+# endif
+
+static void trace() {
+# ifdef __GLIBC__
+# ifdef __linux__
+  int size = 24;
+  void **bb = native_malloc(sizeof(void*)*size);
+  backtrace(bb,size);
+
+  char executable [PATH_MAX];
+  sprintf(executable, "/proc/%d/exe", getpid());
+
+  printf("/** Backtrace **************************/\n");
+  int counter = 0;
+  while (*bb) {
+    char *addr = (char*)native_malloc(21);
+    sprintf(addr,"%p", *bb);
+    char *ar[] = { "addr2line", "-f", "-p", "-C", "-s", "-e",
+      executable, addr, NULL};
+    ipr_t *ipr = shexec(ar, NULL);
+    char *prefix = (counter) ? " - " : "";
+    if (ipr) {
+      char *outs = (char*)ipr->stdouts;
+      outs[strlen(outs)-1] = '\0';
+      if (strlen(outs) && endswith(outs, "??:0") && endswith(outs, "??:?")) {
+        printf("%s%s\n", prefix, outs);
+      }
+    }
+    bb++;
+    counter++;
+  }
+  printf("/***************************************/\n");
+# endif /* __linux__ */
+# endif /* __GLIBC__ */
+}
 #endif
