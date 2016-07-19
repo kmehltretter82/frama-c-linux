@@ -70,7 +70,7 @@ rte_options() {
         opts="$opts -rte-mem"
       ;;
       int) # integer overflows
-        intopts=""
+        intopts="-warn-signed-overflow -warn-unsigned-overflow"
       ;;
       float) # casts from floating-point to integer
         opts="$opts -rte-float-to-int"
@@ -103,15 +103,17 @@ rte_options() {
   return 0;
 }
 
-# Check if getopt is GNU
+# Check if the following tools are GNU and abort otherwise
 required_tool getopt "util-linux"
 required_tool readlink "GNU coreutils"
+required_tool find "GNU findutils"
 
 # Getopt options
 LONGOPTIONS="help,compile,compile-only,print,debug:,ocode:,oexec:,verbose:,
   frama-c-only,extra-cpp-args:,frama-c-stdlib,full-mmodel,gmp,quiet,logfile:,
   ld-flags:,cpp-flags:,frama-c-extra:,memory-model:,production,no-stdlib,
-  debug-log:,frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:"
+  debug-log:,frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:,
+  print-mmodels"
 SHORTOPTIONS="h,c,C,p,d:,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,P,N,D:,I:,G:,X,a:"
 # Prefix for an error message due to wrong arguments
 ERROR="ERROR parsing arguments:"
@@ -134,6 +136,7 @@ OPTION_EACSL_OUTPUT_EXEC=""              # Name of E-ACSL executable
 OPTION_EACSL="-e-acsl"                   # Specifies E-ACSL run
 OPTION_FRAMA_STDLIB="-no-frama-c-stdlib" # Use Frama-C stdlib
 OPTION_FULL_MMODEL=                      # Instrument as much as possible
+OPTION_PRINT_MMODELS=                    # Print memory model names
 OPTION_GMP=                              # Use GMP integers everywhere
 OPTION_DEBUG_MACRO="-DE_ACSL_DEBUG"      # Debug macro
 OPTION_DEBUG_LOG_MACRO=""                # Specification of debug log file
@@ -365,14 +368,14 @@ do
       OPTION_EACSL_MMODELS="`echo $1 | sed -s 's/,/ /g'`"
       shift;
     ;;
+    # Print names of the supported memody models.
+    --print-mmodels)
+      shift;
+      OPTION_PRINT_MMODELS="1"
+    ;;
   esac
 done
 shift;
-
-# Bail if no files to translate are given
-if [ -z "$1" ]; then
-  error "no input files";
-fi
 
 # Check Frama-C and GCC executable names
 check_tool "$OPTION_FRAMAC"
@@ -417,6 +420,10 @@ CPPMACHDEP="-D__FC_MACHDEP_X86_$MACHDEPFLAGS"
 # GCC machine option
 GCCMACHDEP="-m$MACHDEPFLAGS"
 
+# Macro that identifies E-ACSL compilation. Passed to Frama-C
+# and GCC runs but not to the original compilation
+EACSL_MACRO_ID="__E_ACSL__"
+
 # Frama-C and related flags
 FRAMAC_CPP_EXTRA="
   $OPTION_FRAMAC_CPP_EXTRA
@@ -437,31 +444,37 @@ fi
 error "Cannot find required $EACSL_SHARE/e_acsl_mmodel_api.h header" \
   `test -f "$EACSL_SHARE/e_acsl_mmodel_api.h"; echo $?`
 
-# Echo the name of the source file corresponding to the name of a memory model
-# or report an error of the given model does not exist.
+# Echo the absolute path of the source file corresponding to a memory model
+# given by the first argument, or report an error of the given model does not
+# exist. In case no argument is supplied, output the names of the memory models
+# supported in this distribution.
 mmodel_sources() {
-  model=""
-  case "$1" in
-    bittree) model="bittree_model/e_acsl_bittree_mmodel.c" ;;
-    segment) model="segment_model/e_acsl_segment_mmodel.c" ;;
-    *) error "Memory model '$1' does not exist" ;;
-  esac
-  model="$EACSL_SHARE/$model"
-  if ! [ -f "$model" ]; then
-    error "Memory model '$1' exists but not available in this distribution"
+  local model="$1"
+  local models=$(find $EACSL_SHARE -maxdepth 1 \
+     -name '*_model'  -type d -exec basename {} \; | sed 's/_model$//')
+
+  if [ -n "$model" ]; then
+    model=$(echo $models | tr ' ' '\n' | grep "^$model$")
+    if [ -n "$model" ]; then
+      echo "$EACSL_SHARE/$model"_model/e_acsl_"$model"_mmodel.c
+    else
+      error "Memory model '$1' is not available in this distribution"
+    fi
   else
-    echo "$model"
+    echo $models
   fi
 }
+
+# If specified, print the names of the supported memory models and exit
+if [ -n "$OPTION_PRINT_MMODELS" ]; then
+  mmodel_sources
+  exit 0
+fi
 
 # Once EACSL_SHARE is defined check the memory models provided at inputs
 for mod in $OPTION_EACSL_MMODELS; do
   mmodel_sources $mod > /dev/null
 done
-
-# Macro that identifies E-ACSL compilation. Passed to Frama-C
-# and GCC runs but not to the original compilation
-EACSL_MACRO_ID="__E_ACSL__"
 
 # Gcc and related flags
 CC="$OPTION_CC"
@@ -518,6 +531,11 @@ if [ -n "$OPTION_EACSL" ]; then
     $OPTION_GMP
     $OPTION_FULL_MMODEL
     -then-last"
+fi
+
+# Bail if no files to translate are given
+if [ -z "$1" ]; then
+  error "no input files";
 fi
 
 # Instrument

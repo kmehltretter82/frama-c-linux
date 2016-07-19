@@ -52,11 +52,13 @@ GMP="$3"    # Whether to issue an additional run with -e-acsl-gmp-only
 EXTRA="$4"  # Extra e-acsl-gcc.sh flags
 DEBUG="$5"  # Debug option
 
+EACSLGCC="$(dirname $0)/e-acsl-gcc.sh" # E-ACSL wrapper script
+MODELS="$($EACSLGCC --print-mmodels)" # Supported memory models
+
 ROOTDIR="`readlink -f $(dirname $0)/../`" # Root directory of the repository
 TESTDIR="$ROOTDIR/tests/$PREFIX" # Test suite directory
 RESDIR=$TESTDIR/result # Result directory within the test suite
 TESTFILE=`ls $TESTDIR/$TEST.[ic]` # Source test file
-MODEL="bittree" # Memory model to link against
 
 LOG="$RESDIR/$TEST.testrun" # Base name for log files
 OUT="$RESDIR/gen_$TEST"     # Base name for instrumented files
@@ -95,16 +97,17 @@ trap "clean" EXIT HUP INT QUIT TERM
 # Run executable and report results
 #  $1 - path to an executable
 #  $2 - path to a log file
-#  $3 - type of the executable (i.e., generated from original or instrumented
-#    sources)
+#  $3 - memory model the executable has been linked against
 run_executable() {
   local executable="$1"
   local log="$2"
-  local type="$3"
+  local model="$3"
 
-  debug "Run and log $executable"
+  debug "Run: $executable"
+  debug "Log: $log"
+
   if ! `$executable > $log 2>&1`; then
-    error "[$3 run]: Runtime failure in test case $TEST:" $log
+    error "[$3 model] Runtime failure in test case '$TEST'" $log
   fi
 }
 
@@ -115,26 +118,36 @@ run_test() {
   local logfile=$LOG.$RUNS.elog # Log file for e-acsl-gcc.sh output
   local oexec=$OUT.$RUNS.out # Generated executable name
   local oexeclog=$LOG.$RUNS.rlog # Log for executable output
-  local extra="$1" # Additional arguments to e-acsl-gcc.sh
+  local model="$1" # Memory model to link against
+  local extra="$2" # Additional arguments to e-acsl-gcc.sh
 
-  # Command for instrumenting the source file and compiling the original
-  # and the instrumented code
-  EACSL_GCC="./scripts/e-acsl-gcc.sh \
-    --compile $TESTFILE --ocode=$ocode --logfile=$logfile \
-    --instrumented-only --memory-model=$MODEL --oexec=$oexec $extra"
+  # e-acsl-gcc.sh reports models as space-separated string. Make a
+  # comma-separated one otherwise the following does not work
+  MODELSTR="$(echo $MODELS | tr ' ' ',')"
 
-  debug "Run $EACSL_GCC"
-  $EACSL_GCC || error "Command $EACSL_GCC failed" "$logfile"
+  # Command for instrumenting the source file
+  COMMAND="$EACSLGCC $TESTFILE --ocode=$ocode --logfile=$logfile $extra"
 
-  # Log outputs of the generated executables
-  run_executable $oexec.e-acsl  $oexeclog.e-acsl "Instrumented"
+  debug "Run $COMMAND"
+  $COMMAND || error "Command $COMMAND failed" "$logfile"
+
+  # Compile instrumented source and run executable
+  for model in $MODELS; do
+    # Command for compiling the instrumented file with a given memory model
+    COMMAND="$EACSLGCC --compile-only --memory-model=$model --logfile=$logfile \
+      --oexec-e-acsl=$oexec-$model $ocode"
+    debug "Run $COMMAND"
+    $COMMAND || error "Command $COMMAND failed" "$logfile"
+    run_executable $oexec-$model $oexeclog-$model $model
+  done
 
   RUNS=$((RUNS+1))
 }
 
+run_test $model "$EXTRA"
 # Run GMP tests if specified
-run_test "$EXTRA"
 if [ -n "$GMP" ]; then
-  run_test "--gmp $EXTRA"
+  run_test $model "--gmp $EXTRA"
 fi
+
 exit 0
