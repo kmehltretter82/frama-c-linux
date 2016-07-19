@@ -148,7 +148,7 @@ clean::
 	$(RM) $(EACSL_BM_BINARIES)
 
 ################################################
-# E-ACSL C Libs: libjemalloc, libgmp					 #
+# E-ACSL C Libs: libjemalloc, libgmp           #
 ################################################
 
 EACSL_LIBDIR := $(PLUGIN_DIR)/lib
@@ -162,9 +162,9 @@ $(EACSL_LIBDIR):
 $(EACSL_JEMALLOC_LIB): $(EACSL_LIBDIR)
 	cd $(EACSL_JEMALLOC_DIR) && \
 		./autogen.sh \
-  		--with-jemalloc-prefix="__e_acsl_native_" \
-  		--with-private-namespace="__e_acsl_hidden_" \
-  		--with-install-suffix="-e-acsl" && \
+			--with-jemalloc-prefix="__e_acsl_native_" \
+			--with-private-namespace="__e_acsl_hidden_" \
+			--with-install-suffix="-e-acsl" && \
 		$(MAKE) $(MAKEOPTS) lib/$(EACSL_JEMALLOC_LIBNAME)
 	$(CP) $(EACSL_JEMALLOC_DIR)/lib/$(EACSL_JEMALLOC_LIBNAME) $@
 
@@ -178,7 +178,7 @@ $(EACSL_GMP_LIB): $(EACSL_LIBDIR)
 
 all:: $(EACSL_JEMALLOC_LIB) $(EACSL_GMP_LIB)
 
-clean::
+e-acsl-distclean::
 	$(PRINT_RM) e-acsl contrib libraries
 	if test -f $(EACSL_JEMALLOC_DIR)/Makefile; \
 		then $(MAKE) -s -C$(EACSL_JEMALLOC_DIR) relclean; \
@@ -197,12 +197,8 @@ EACSL_CLEANFILES = $(wildcard \
 	Makefile config.log config.status configure .depend autom4te.cache/* \
 	META.frama-c-e_acsl Makefile.plugin.generated local_config.ml top/*)
 
-clean::
-	$(PRINT_RM) cleaning generated test files
-	$(RM) $(E_ACSL_DIR)/tests/*.cm* $(E_ACSL_DIR)/tests/*.o
-	$(RM) $(E_ACSL_DIR)/tests/test_config
-	$(RM) $(foreach dir, $(PLUGIN_TESTS_DIRS), tests/$(dir)/result/*)
-	$(PRINT_RM) generated files
+e-acsl-distclean:: clean
+	$(PRINT_RM) generated project files
 	$(RM) $(addprefix $(E_ACSL_DIR)/, $(EACSL_CLEANFILES))
 
 ################################
@@ -227,7 +223,7 @@ EACSL_DOC_FILES = \
 
 EACSL_TEST_FILES = \
   tests/test_config.in tests/print.ml \
-	$(foreach dir, $(addprefix tests/,$(PLUGIN_TESTS_DIRS)), \
+  $(foreach dir, $(addprefix tests/,$(PLUGIN_TESTS_DIRS)), \
     $(wildcard \
       $(dir)/*.[ic] \
       $(dir)/test_config \
@@ -240,20 +236,20 @@ EACSL_RTL_FILES = $(wildcard share/e-acsl/*.[ch] share/e-acsl/*/*.[ch])
 EACSL_SCRIPT_FILES = scripts/e-acsl-gcc.sh scripts/testrun.sh
 
 EACSL_LICENSE_FILES = \
-	license/CEA_LGPL license/SPARETIMELABS \
-	license/headache_config.txt license/LGPLv2.1
+  license/CEA_LGPL license/SPARETIMELABS \
+  license/headache_config.txt license/LGPLv2.1
 
 EACSL_MISC_FILES = \
-	configure.ac Makefile.in INSTALL README VERSION .depend
+  configure.ac Makefile.in INSTALL README VERSION .depend
 
 EACSL_DISTRIB_FILES = \
-	$(EACSL_MISC_FILES) \
-	$(EACSL_OCAML_FILES) \
-	$(EACSL_DOC_FILES) \
-	$(EACSL_TEST_FILES) \
-	$(EACSL_RTL_FILES) \
-	$(EACSL_SCRIPT_FILES) \
-	$(EACSL_LICENSE_FILES) \
+  $(EACSL_MISC_FILES) \
+  $(EACSL_OCAML_FILES) \
+  $(EACSL_DOC_FILES) \
+  $(EACSL_TEST_FILES) \
+  $(EACSL_RTL_FILES) \
+  $(EACSL_SCRIPT_FILES) \
+  $(EACSL_LICENSE_FILES) \
   $(EACSL_CONTRIB_FILES)
 
 # BE CAREFUL: manually remove all *.ml* files which should not be released!
@@ -264,18 +260,16 @@ e-acsl-distrib: .depend
 	$(MKDIR) $(EXPORT)
 	$(PRINT_UNTAR) tmp-distrib
 	cd $(EXPORT); \
-    $(TAR) xf ../tmp.tar && \
-    autoconf && \
-    $(SED) -i -e 's/IS_DISTRIBUTED:=no/IS_DISTRIBUTED:=yes/' Makefile.in && \
-    $(RM) -rf autom4te.cache
+		$(TAR) xf ../tmp.tar && \
+		autoconf && \
+		$(SED) -i -e 's/IS_DISTRIBUTED:=no/IS_DISTRIBUTED:=yes/' Makefile.in && \
+		$(RM) -rf autom4te.cache
 	$(PRINT_RM) tmp-distrib
 	$(RM) tmp.tar
 	$(PRINT_MAKING) archive
 	$(TAR) czf $(EXPORT).tar.gz $(EXPORT)
 	$(PRINT) Cleaning
 	$(RM) -fr $(EXPORT)
-
-dist: e-acsl-distrib
 
 WWW	?= /localhome/julien/frama-c/doc/www
 e-acsl-install-distrib: e-acsl-distrib
@@ -292,18 +286,16 @@ e-acsl-install-distrib: e-acsl-distrib
 ##############################
 # Check source distribution  #
 ##############################
-distcheck:
+e-acsl-distrib-check:
 	$(RM) -rf $(EXPORT)*
 	$(MAKE) e-acsl-distrib
 	$(TAR) -xvf $(EXPORT).tar.gz
-	cd $(EXPORT)
-	autoconf
-	./configure
-	$(MAKE)
-	$(MAKE) tests
-	$(MAKE) doc
-	cd ../
-	$(RM) -rf $(EXPORT)*
+	cd $(EXPORT) && ./configure && \
+    $(MAKE) && \
+    $(MAKE) doc && \
+    $(MAKE) tests && \
+    cd ../ && \
+    $(RM) -rf $(EXPORT)*
 
 ##########
 # Header #
@@ -342,7 +334,7 @@ install::
 	$(CP) $(E_ACSL_DIR)/doc/manuals/e-acsl.pdf \
 	      $(E_ACSL_DIR)/doc/manuals/e-acsl-implementation.pdf \
 	      $(E_ACSL_DIR)/doc/manuals/e-acsl-manual.pdf \
-		$(FRAMAC_DATADIR)/manuals
+	$(FRAMAC_DATADIR)/manuals
 	$(PRINT_INSTALL) E-ACSL libraries
 	$(MKDIR) $(LIBDIR)
 	$(CP) $(EACSL_JEMALLOC_LIB) $(LIBDIR)
@@ -376,7 +368,7 @@ uninstall::
 ifeq (@MAY_RUN_TESTS@,yes)
 
 $(E_ACSL_DIR)/tests/test_config: $(E_ACSL_DIR)/tests/test_config.in \
-				$(E_ACSL_DIR)/Makefile
+	$(E_ACSL_DIR)/Makefile
 	$(PRINT_MAKING) $@
 	$(SED) -e "s|@SEDCMD@|`which sed `|g" $< > $@
 
@@ -406,7 +398,7 @@ doxygen:
 	if ! test $(DOXYGEN) = "no"; then \
 		$(DOXYGEN) $(E_ACSL_DIR)/doc/doxygen/doxygen.cfg ; \
 	else \
-	  echo "Warning: Skip doxygen documentation: \
+		echo "Warning: Skip doxygen documentation: \
 Doxygen executable not found."; \
 	fi
 
