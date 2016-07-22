@@ -3,7 +3,7 @@
 #  This file is part of the Frama-C's E-ACSL plug-in.                    #
 #                                                                        #
 #  Copyright (C) 2012-2016                                               #
-#    CEA (Commissariat à l'énergie atomique et aux énergies              #
+#    CEA (Commissariat Ã  l'Ã©nergie atomique et aux Ã©nergies              #
 #         alternatives)                                                  #
 #                                                                        #
 #  you can redistribute it and/or modify it under the terms of the GNU   #
@@ -113,11 +113,11 @@ $(PLUGIN_DIR)/local_config.ml: $(PLUGIN_DIR)/Makefile.in VERSION
 ifeq (@MAY_RUN_TESTS@,yes)
 
 PLUGIN_TESTS_DIRS := reject runtime bts gmp no-main
-PLUGIN_TESTS_LIB:=$(PLUGIN_DIR)/tests/print.ml
-
+PLUGIN_TESTS_LIB := $(PLUGIN_DIR)/tests/print.ml
 E_ACSL_TESTS: $(PLUGIN_DIR)/tests/test_config
 
-$(PLUGIN_DIR)/tests/ptests_config: \
+E_ACSL_DEFAULT_TESTS: \
+	$(PLUGIN_DIR)/tests/test_config \
 	$(PLUGIN_DIR)/tests/print.cmxs \
 	$(PLUGIN_DIR)/tests/print.cmo
 
