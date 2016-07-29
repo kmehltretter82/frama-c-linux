@@ -112,10 +112,12 @@ $(PLUGIN_DIR)/local_config.ml: $(PLUGIN_DIR)/Makefile.in VERSION
 
 ifeq (@MAY_RUN_TESTS@,yes)
 
-$(PLUGIN_DIR)/tests/print.cmxs: OFLAGS=-I $(FRAMAC_LIB)
-$(PLUGIN_DIR)/tests/print.cmo: BFLAGS=-I $(FRAMAC_LIB)
+$(PLUGIN_DIR)/tests/print.cmxs: OFLAGS=-I $(FRAMAC_LIB) -I tests
+$(PLUGIN_DIR)/tests/print.cmo: BFLAGS=-I $(FRAMAC_LIB) -I tests
+$(PLUGIN_DIR)/tests/print.cmx: OFLAGS=-I $(FRAMAC_LIB) -I tests
 
 PLUGIN_TESTS_DIRS := reject runtime bts gmp no-main
+
 E_ACSL_TESTS: $(PLUGIN_DIR)/tests/test_config \
 	$(PLUGIN_DIR)/tests/print.cmxs \
 	$(PLUGIN_DIR)/tests/print.cmo
