@@ -52,7 +52,7 @@ GMP="$3"    # Whether to issue an additional run with -e-acsl-gmp-only
 EXTRA="$4"  # Extra e-acsl-gcc.sh flags
 DEBUG="$5"  # Debug option
 
-EACSLGCC="$(dirname $0)/e-acsl-gcc.sh" # E-ACSL wrapper script
+EACSLGCC="$(dirname $0)/e-acsl-gcc.sh $EXTRA" # E-ACSL wrapper script
 
 ROOTDIR="`readlink -f $(dirname $0)/../`" # Root directory of the repository
 TESTDIR="$ROOTDIR/tests/$PREFIX" # Test suite directory
@@ -143,10 +143,10 @@ run_test() {
   RUNS=$((RUNS+1))
 }
 
-run_test "$EXTRA"
+run_test ""
 # Run GMP tests if specified
 if [ -n "$GMP" ]; then
-  run_test "--gmp $EXTRA"
+  run_test "--gmp"
 fi
 
 exit 0
