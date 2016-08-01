@@ -52,8 +52,7 @@ GMP="$3"    # Whether to issue an additional run with -e-acsl-gmp-only
 EXTRA="$4"  # Extra e-acsl-gcc.sh flags
 DEBUG="$5"  # Debug option
 
-EACSLGCC="$(dirname $0)/e-acsl-gcc.sh" # E-ACSL wrapper script
-MODELS="$($EACSLGCC --print-mmodels)" # Supported memory models
+EACSLGCC="$(dirname $0)/e-acsl-gcc.sh $EXTRA" # E-ACSL wrapper script
 
 ROOTDIR="`readlink -f $(dirname $0)/../`" # Root directory of the repository
 TESTDIR="$ROOTDIR/tests/$PREFIX" # Test suite directory
@@ -118,8 +117,8 @@ run_test() {
   local logfile=$LOG.$RUNS.elog # Log file for e-acsl-gcc.sh output
   local oexec=$OUT.$RUNS.out # Generated executable name
   local oexeclog=$LOG.$RUNS.rlog # Log for executable output
-  local model="$1" # Memory model to link against
-  local extra="$2" # Additional arguments to e-acsl-gcc.sh
+  local extra="$1" # Additional arguments to e-acsl-gcc.sh
+  MODELS="$($EACSLGCC $extra --print-mmodels)" # Supported memory models
 
   # e-acsl-gcc.sh reports models as space-separated string. Make a
   # comma-separated one otherwise the following does not work
@@ -144,10 +143,10 @@ run_test() {
   RUNS=$((RUNS+1))
 }
 
-run_test $model "$EXTRA"
+run_test ""
 # Run GMP tests if specified
 if [ -n "$GMP" ]; then
-  run_test $model "--gmp $EXTRA"
+  run_test "--gmp"
 fi
 
 exit 0
