@@ -34,8 +34,7 @@ error () {
 }
 
 # Check whether the first line reported by running command $1 has an identifier
-# specified by $2. E.g., check whether readlink used by the script is GNU and
-# getopt comes from util-linux.
+# specified by $2.
 required_tool() {
   "$1" --version 2>&1 | head -1 | grep "$2" > /dev/null
   error "$1 is not $2" $?
@@ -52,8 +51,24 @@ check_tool() {
    { has_tool "$1" || test -e "$1"; } || error "No executable $1 found";
 }
 
-# build and output option string for RTE plugin based on a comma-delimited
-# option string
+# Portable realpath using pwd
+realpath() {
+  if [ -e "$1" ]; then
+    if [ -d "$1" ]; then
+      (cd "$1" && pwd)
+    else
+      local name=$(basename "$1")
+      local dir=$(cd $(dirname "$1") && pwd)
+      echo $dir/$name
+    fi
+    return 0
+  else
+    echo "realpath: no such file or directory: '$1'" 1>&2
+    return 1
+  fi
+}
+
+# Process option string for RTE plugin
 rte_options() {
   local optstring="$1"
   local start="-rte -rte-warn"
@@ -105,7 +120,6 @@ rte_options() {
 
 # Check if the following tools are GNU and abort otherwise
 required_tool getopt "util-linux"
-required_tool readlink "GNU coreutils"
 required_tool find "GNU findutils"
 
 # Getopt options
@@ -177,7 +191,7 @@ Notes:
 }
 
 # Base dir of this script
-BASEDIR="$(readlink -f `dirname $0`)"
+BASEDIR="$(realpath `dirname $0`)"
 # Directory with contrib libraries of E-ACSL
 LIBDIR="$BASEDIR/../lib"
 
@@ -389,7 +403,7 @@ FRAMAC="$OPTION_FRAMAC"
 # Check if this is a development or an installed version
 if [ -f "$BASEDIR/../E_ACSL.mli" ]; then
   # Development version
-  DEVELOPMENT="$(readlink -f "$BASEDIR/..")"
+  DEVELOPMENT="$(realpath "$BASEDIR/..")"
   # Check if the project has been built, as if this is a non-installed
   # version that has not been built Frama-C will fallback to an installed one
   # for instrumentation but still use local RTL
