@@ -71,5 +71,7 @@ top/
 doc/doxygen/doxygen.cfg
 doc/doxygen/html
 doc/doxygen/warn.log
-lib/libgmp-e-acsl.a
-lib/libjemalloc-e-acsl.a
+lib/libeacsl-jemalloc.a
+lib/libeacsl-gmp.a
+lib/libeacsl-bittree-rtl.a
+lib/libeacsl-segment-rtl.a

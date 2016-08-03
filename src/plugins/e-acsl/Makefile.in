@@ -126,16 +126,16 @@ endif
 
 EACSL_LIBDIR := $(EACSL_PLUGIN_DIR)/lib
 EACSL_JEMALLOC_DIR := $(EACSL_PLUGIN_DIR)/contrib/libjemalloc
-EACSL_JEMALLOC_LIBNAME = libjemalloc-e-acsl.a
+EACSL_JEMALLOC_LIBNAME = libeacsl-jemalloc.a
 EACSL_JEMALLOC_LIB = $(EACSL_LIBDIR)/$(EACSL_JEMALLOC_LIBNAME)
 
 $(EACSL_JEMALLOC_LIB):
-	cd $(EACSL_JEMALLOC_DIR) && \
-		$(MAKE) $(MAKEOPTS) lib/$(EACSL_JEMALLOC_LIBNAME)
+	cd $(EACSL_JEMALLOC_DIR) && $(MAKE) $(MAKEOPTS)
 	$(MKDIR) $(EACSL_LIBDIR)
-	$(CP) $(EACSL_JEMALLOC_DIR)/lib/$(EACSL_JEMALLOC_LIBNAME) $@
+	$(CP) $(EACSL_JEMALLOC_DIR)/lib/libjemalloc.a $@
 
-EACSL_GMP_LIBNAME = libgmp-e-acsl.a
+EACSL_GMP_DIR := $(EACSL_PLUGIN_DIR)/contrib/libgmp
+EACSL_GMP_LIBNAME = libeacsl-gmp.a
 EACSL_GMP_LIB = $(EACSL_LIBDIR)/$(EACSL_GMP_LIBNAME)
 EACSL_GMP_DIR := $(EACSL_PLUGIN_DIR)/contrib/libgmp
 EACSL_GMP_MINI = mini-gmp.o
@@ -179,7 +179,7 @@ e-acsl-distclean::
 # E-ACSL Runtime Library                       #
 ################################################
 
-EACSL_SHARE := $(PLUGIN_DIR)/share/e-acsl
+EACSL_SHARE := $(EACSL_PLUGIN_DIR)/share/e-acsl
 RTLFAGS := -std=c99 -Wall -Wno-unused -Wno-attributes -I$(EACSL_SHARE) \
   -g3 -O2 -fno-omit-frame-pointer -DE_ACSL_DEBUG -DE_ACSL_BUILTINS
 
