@@ -181,6 +181,8 @@ e-acsl-distclean::
 
 EACSL_SHARE := $(EACSL_PLUGIN_DIR)/share/e-acsl
 
+EACSL_RTL_SRC = $(wildcard $(EACSL_SHARE)/*.[ch] $(EACSL_SHARE)/*/*.[ch])
+
 RTLFAGS = -std=c99 -Wall -Wno-unused -Wno-attributes -I$(EACSL_SHARE) \
   -fno-omit-frame-pointer -DE_ACSL_BUILTINS
 
@@ -203,16 +205,14 @@ MKRTL = \
   $(RM) -f $$object && \
   ranlib $2
 
-$(EACSL_LIBDIR)/libeacsl-%-rtl.a: $(EACSL_SHARE)/*/*_%_mmodel.c
-	$(call MKRTL, $(RTLFAGS), $@, $^)
+$(EACSL_LIBDIR)/libeacsl-%-rtl.a: $(EACSL_SHARE)/*/*_%_mmodel.c $(EACSL_RTL_SRC)
+	$(call MKRTL, $(RTLFAGS), $@, $<)
 
 EACSL_RTL = $(EACSL_LIBDIR)/libeacsl-bittree-rtl.a
 
 ifneq ($(wildcard $(EACSL_SHARE)/segment_model),)
   EACSL_RTL += $(EACSL_LIBDIR)/libeacsl-segment-rtl.a
 endif
-
-librtl: $(EACSL_RTL)
 
 clean::
 	$(PRINT_RM) E-ACSL runtime library
@@ -264,7 +264,7 @@ EACSL_TEST_FILES = \
       $(dir)/oracle/*.oracle \
   ))
 
-EACSL_RTL_FILES = $(wildcard share/e-acsl/*.[ch] share/e-acsl/*/*.[ch])
+EACSL_RTL_FILES = $(EACSL_RTL_SRC)
 
 EACSL_SCRIPT_FILES = scripts/e-acsl-gcc.sh scripts/testrun.sh
 
