@@ -175,6 +175,44 @@ e-acsl-distclean::
 		then $(MAKE) -s -C$(EACSL_GMP_DIR) distclean; \
 	fi
 
+################################################
+# E-ACSL Runtime Library                       #
+################################################
+
+EACSL_SHARE := $(PLUGIN_DIR)/share/e-acsl
+RTLFAGS := -std=c99 -Wall -Wno-unused -Wno-attributes -I$(EACSL_SHARE) \
+  -g3 -O2 -fno-omit-frame-pointer -DE_ACSL_DEBUG -DE_ACSL_BUILTINS
+
+# Build a static library
+  # $1 Compile-time flags
+  # $2 Library path
+  # $3 Source files
+MKRTL = \
+  object=$$(basename -s .a $2).o && \
+  echo 'CC          $3' && \
+  $(CC) $1 -c -o$$object $3 && \
+  echo 'AR          $2' && \
+  $(AR) crus $2 $$object && \
+  $(RM) -f $$object && \
+  ranlib $2
+
+$(EACSL_LIBDIR)/libeacsl-%-rtl.a: $(EACSL_SHARE)/*/*_%_mmodel.c
+	$(call MKRTL, $(RTLFAGS), $@, $^)
+
+EACSL_RTL = $(EACSL_LIBDIR)/libeacsl-bittree-rtl.a
+
+ifneq ($(wildcard $(EACSL_SHARE)/segment_model),)
+  EACSL_RTL += $(EACSL_LIBDIR)/libeacsl-segment-rtl.a
+endif
+
+librtl: $(EACSL_RTL)
+
+clean::
+	$(PRINT_RM) E-ACSL runtime library
+	$(RM) $(EACSL_RTL)
+
+all:: $(EACSL_RTL)
+
 ############
 # Cleaning #
 ############
