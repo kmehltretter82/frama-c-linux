@@ -180,8 +180,15 @@ e-acsl-distclean::
 ################################################
 
 EACSL_SHARE := $(EACSL_PLUGIN_DIR)/share/e-acsl
-RTLFAGS := -std=c99 -Wall -Wno-unused -Wno-attributes -I$(EACSL_SHARE) \
-  -g3 -O2 -fno-omit-frame-pointer -DE_ACSL_DEBUG -DE_ACSL_BUILTINS
+
+RTLFAGS = -std=c99 -Wall -Wno-unused -Wno-attributes -I$(EACSL_SHARE) \
+  -fno-omit-frame-pointer -DE_ACSL_BUILTINS
+
+ifeq (@OPTIMIZED_RTL@,no)
+RTLFAGS += -DE_ACSL_DEBUG -g3 -O0
+else
+RTLFAGS += -O3
+endif
 
 # Build a static library
   # $1 Compile-time flags

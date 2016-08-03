@@ -110,10 +110,18 @@ AC_ARG_ENABLE(full-gmp,
     ["Disable runtime assertions in the RTL"]),
     [FULL_GMP="yes"],[FULL_GMP="no"])
 
+# RTL
+#####
+AC_ARG_ENABLE(optimized-rtl,
+    AS_HELP_STRING([--enable-optimized-rtl],
+    ["Disable runtime assertions in the RTL"]),
+    [OPTIMIZED_RTL="yes"],[OPTIMIZED_RTL="no"])
+
 #######################
 # Generating Makefile #
 #######################
 
+AC_SUBST(OPTIMIZED_RTL)
 AC_SUBST(MAY_RUN_TESTS)
 AC_SUBST(OCAMLVERSION)
 AC_SUBST(FULL_GMP)
@@ -138,5 +146,4 @@ fi
 AC_MSG_NOTICE([Configure libjemalloc])
 (cd plugin_dir/contrib/libjemalloc && ./autogen.sh \
   --with-jemalloc-prefix="__e_acsl_native_" \
-  --with-private-namespace="__e_acsl_hidden_" \
-  --with-install-suffix="-e-acsl")
+  --with-private-namespace="__e_acsl_hidden_")
