@@ -206,7 +206,7 @@ class e_acsl_visitor prj generate = object (self)
               (* Create and register [__e_acsl_globals_init] as kernel
                  function *)
               let kf =
-                { fundec = fct; return_stmt = Some return; spec = spec }
+                { fundec = fct; spec = spec }
               in
               Globals.Functions.register kf;
               Globals.Functions.replace_by_definition
