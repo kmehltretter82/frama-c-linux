@@ -23,7 +23,7 @@
 (** E-ACSL built-in database. *)
 
 val mem: string -> bool
-(** @return true ifl the given function name is an E-ACSL built-in *)
+(** @return true iff the given function name is an E-ACSL built-in *)
 
 val find: string -> Cil_types.varinfo
 (** Get the varinfo corresponding to the given E-ACSL built-in name.
