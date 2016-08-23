@@ -378,8 +378,7 @@ install::
 	$(FRAMAC_DATADIR)/manuals
 	$(PRINT_INSTALL) E-ACSL libraries
 	$(MKDIR) $(LIBDIR)
-	$(CP) $(EACSL_JEMALLOC_LIB) $(LIBDIR)
-	$(CP) $(EACSL_GMP_LIB) $(LIBDIR)
+	$(CP) $(EACSL_LIBDIR)/libeacsl-*.a $(LIBDIR)
 	$(PRINT_INSTALL) E-ACSL scripts
 	$(MKDIR) $(BINDIR)
 	$(CP) $(E_ACSL_DIR)/scripts/e-acsl-gcc.sh $(BINDIR)/

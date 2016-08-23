@@ -118,6 +118,30 @@ rte_options() {
   return 0;
 }
 
+# Locate the sources of available E-ACSL memory models
+# - If no arguments specified then print the names of all memory models
+#    available in this distribution of E-ACSL.
+# - If an argument is specified then it is assumed to be the name of a memory
+#    model. In this case the following function prints the full path to a static
+#    library representing this memory model.
+mmodel_sources() {
+  local models="$(find $LIBDIR/ -name 'libeacsl-*-rtl.a' -exec basename {} \; \
+    | sed 's/^libeacsl-\(.*\)-rtl.a/\1/')"
+
+  if [ -n "$1" ]; then
+    local modelname="$(echo $models | tr ' ' '\n' | grep "^$1$")"
+    local modelpath="$(realpath $LIBDIR/libeacsl-$modelname-rtl.a 2>/dev/null)"
+
+    if [ -n "$modelpath" ]; then
+      echo $modelpath
+    else
+      error "Memory model '$1' is not available in this distribution"
+    fi
+  else
+    echo $models
+  fi
+}
+
 # Check if the following tools are GNU and abort otherwise
 required_tool getopt "util-linux"
 required_tool find "GNU findutils"
@@ -150,7 +174,6 @@ OPTION_EACSL_OUTPUT_EXEC=""              # Name of E-ACSL executable
 OPTION_EACSL="-e-acsl"                   # Specifies E-ACSL run
 OPTION_FRAMA_STDLIB="-no-frama-c-stdlib" # Use Frama-C stdlib
 OPTION_FULL_MMODEL=                      # Instrument as much as possible
-OPTION_PRINT_MMODELS=                    # Print memory model names
 OPTION_GMP=                              # Use GMP integers everywhere
 OPTION_FRAMAC_CPP_EXTRA=""               # Extra CPP flags for Frama-C
 OPTION_EACSL_MMODELS="bittree"           # Memory model used
@@ -366,7 +389,8 @@ do
     # Print names of the supported memody models.
     --print-mmodels)
       shift;
-      OPTION_PRINT_MMODELS="1"
+      mmodel_sources
+      exit 0
     ;;
   esac
 done
@@ -426,33 +450,9 @@ if [ -n "$OPTION_EACSL_SHARE" ]; then
   EACSL_SHARE="$OPTION_EACSL_SHARE"
 fi
 
-mmodel_sources() {
-  local models="$(find $LIBDIR -name 'libeacsl-*-rtl.a' -exec basename {}  \; \
-    | sed 's/^libeacsl-\(.*\)-rtl.a/\1/')"
-
-  if [ -n "$1" ]; then
-    local modelname="$(echo $models | tr ' ' '\n' | grep "^$1$")"
-    local modelpath="$(realpath $LIBDIR/libeacsl-$modelname-rtl.a)"
-
-    if [ -n "$modelpath" ]; then
-      echo $modelpath
-    else
-      error "Memory model '$1' is not available in this distribution"
-    fi
-  else
-    echo $models
-  fi
-}
-
-# If specified, print the names of the supported memory models and exit
-if [ -n "$OPTION_PRINT_MMODELS" ]; then
-  mmodel_sources
-  exit 0
-fi
-
 # Once EACSL_SHARE is defined check the memory models provided at inputs
 for mod in $OPTION_EACSL_MMODELS; do
-  mmodel_sources $mod > /dev/null
+  mmodel_sources $mod
 done
 
 # Gcc and related flags
