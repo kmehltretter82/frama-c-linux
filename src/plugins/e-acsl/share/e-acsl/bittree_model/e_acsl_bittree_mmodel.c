@@ -451,6 +451,7 @@ strong_alias(bittree_malloc,	malloc)
 strong_alias(bittree_calloc, calloc)
 strong_alias(bittree_realloc, realloc)
 strong_alias(bittree_free, free)
+strong_alias(bittree_free, cfree)
 strong_alias(bittree_posix_memalign, posix_memalign)
 strong_alias(bittree_aligned_alloc, aligned_alloc)
 /* Explicit tracking */
