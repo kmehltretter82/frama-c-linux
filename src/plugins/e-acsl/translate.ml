@@ -997,6 +997,7 @@ let translate_pre_code_annotation kf stmt env annot =
       then not_yet env "allocation"
       else env
     | APragma _ -> not_yet env "pragma"
+    | AExtended _ -> env (* never translate extensions. *)
   in
   handle_error convert env
 
@@ -1008,7 +1009,8 @@ let translate_post_code_annotation kf stmt env annot =
     | AVariant _
     | AAssigns _
     | AAllocation _
-    | APragma _ -> env
+    | APragma _
+    | AExtended _ -> env
   in
   handle_error convert env
 
