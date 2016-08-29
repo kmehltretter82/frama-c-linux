@@ -236,7 +236,7 @@ see https://www.gnu.org/licenses/.  */
     (y) = __mpz_srcptr_swap__tmp;					\
   } while (0)
 
-const int mp_bits_per_limb = GMP_LIMB_BITS;
+static const int mp_bits_per_limb = GMP_LIMB_BITS;
 
 
 /* Memory allocation and other helper functions. */
@@ -254,7 +254,7 @@ gmp_default_alloc (size_t size)
 
   assert (size > 0);
 
-  p = malloc (size);
+  p = (void*)malloc(size);
   if (!p)
     gmp_die("gmp_default_alloc: Virtual memory exhausted.");
 
@@ -4372,3 +4372,59 @@ mpz_export (void *r, size_t *countp, int order, size_t size, int endian,
 
   return r;
 }
+
+/************/
+/* ALIASING */
+/************/
+/** Define `aliasname` as a strong alias for `name`. */
+# define strong_alias(name, aliasname) _strong_alias(name, aliasname)
+# define _strong_alias(name, aliasname) \
+  extern __typeof (name) aliasname __attribute__ ((alias (#name)));
+
+/****************/
+/* Initializers */
+/****************/
+strong_alias(mpz_init,__gmpz_init)
+strong_alias(mpz_init_set,__gmpz_init_set)
+strong_alias(mpz_init_set_ui,__gmpz_init_set_ui)
+strong_alias(mpz_init_set_si,__gmpz_init_set_si)
+strong_alias(mpz_init_set_str,__gmpz_init_set_str)
+strong_alias(mpz_import,__gmpz_import)
+
+/***************/
+/* Assignments */
+/***************/
+strong_alias(mpz_set,__gmpz_set)
+strong_alias(mpz_set_ui,__gmpz_set_ui)
+strong_alias(mpz_set_si,__gmpz_set_si)
+
+/*************/
+/* Finalizer */
+/*************/
+strong_alias(mpz_clear,__gmpz_clear)
+
+/********************/
+/* Logical operator */
+/********************/
+strong_alias(mpz_cmp,__gmpz_cmp)
+
+/************************/
+/* Arithmetic operators */
+/************************/
+strong_alias(mpz_neg,__gmpz_neg)
+strong_alias(mpz_add,__gmpz_add)
+strong_alias(mpz_sub,__gmpz_sub)
+strong_alias(mpz_mul,__gmpz_mul)
+strong_alias(mpz_tdiv_q,__gmpz_tdiv_q)
+strong_alias(mpz_tdiv_r,__gmpz_tdiv_r)
+
+/*********************/
+/* Bitwise operators */
+/*********************/
+strong_alias(mpz_com,__gmpz_com)
+
+/************************/
+/* Coercions to C types */
+/************************/
+strong_alias(mpz_get_si,__gmpz_get_si)
+strong_alias(mpz_get_ui,__gmpz_get_ui)

@@ -159,22 +159,38 @@ EACSL_JEMALLOC_LIB = $(EACSL_LIBDIR)/$(EACSL_JEMALLOC_LIBNAME)
 
 $(EACSL_JEMALLOC_LIB):
 	cd $(EACSL_JEMALLOC_DIR) && \
-		./autogen.sh \
-			--with-jemalloc-prefix="__e_acsl_native_" \
-			--with-private-namespace="__e_acsl_hidden_" \
-			--with-install-suffix="-e-acsl" && \
 		$(MAKE) $(MAKEOPTS) lib/$(EACSL_JEMALLOC_LIBNAME)
 	$(MKDIR) $(EACSL_LIBDIR)
 	$(CP) $(EACSL_JEMALLOC_DIR)/lib/$(EACSL_JEMALLOC_LIBNAME) $@
 
-EACSL_GMP_DIR := $(PLUGIN_DIR)/contrib/libgmp
 EACSL_GMP_LIBNAME = libgmp-e-acsl.a
 EACSL_GMP_LIB = $(EACSL_LIBDIR)/$(EACSL_GMP_LIBNAME)
+EACSL_GMP_DIR := $(PLUGIN_DIR)/contrib/libgmp
+EACSL_GMP_MINI = mini-gmp.o
 
+ifeq (@FULL_GMP@, no)
+############
+# Mini GMP #
+############
+CPPGMPFLAGS += -Dmalloc=__e_acsl_native_malloc
+CPPGMPFLAGS += -Drealloc=__e_acsl_native_realloc
+CPPGMPFLAGS += -Dfree=__e_acsl_native_free
+
+$(EACSL_GMP_LIB): $(EACSL_GMP_DIR)/mini-gmp/mini-gmp.c
+	echo 'CC          $< '
+	$(CC) $< $(CPPGMPFLAGS) -c -O2 -g3 -o$(EACSL_GMP_MINI)
+	echo 'AR          $@'
+	$(AR) crus $(EACSL_GMP_LIB) $(EACSL_GMP_MINI)
+	ranlib $(EACSL_GMP_LIB)
+else
+############
+# Full GMP #
+############
 $(EACSL_GMP_LIB):
-	cd $(EACSL_GMP_DIR) && ./configure && $(MAKE) $(MAKEOPTS)
+	cd $(EACSL_GMP_DIR) && $(MAKE) $(MAKEOPTS)
 	$(MKDIR) $(EACSL_LIBDIR)
 	$(CP) $(EACSL_GMP_DIR)/.libs/libgmp.a $@
+endif
 
 all:: $(EACSL_JEMALLOC_LIB) $(EACSL_GMP_LIB)
 
