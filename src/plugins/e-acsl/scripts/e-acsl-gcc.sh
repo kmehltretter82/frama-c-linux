@@ -427,10 +427,9 @@ GCCMACHDEP="-m$MACHDEPFLAGS"
 EACSL_MACRO_ID="__E_ACSL__"
 
 # Frama-C and related flags
-FRAMAC_CPP_EXTRA="
-  $OPTION_FRAMAC_CPP_EXTRA
-  -D$EACSL_MACRO_ID
-  -I$FRAMAC_SHARE/libc
+FRAMAC_CPP_EXTRA="$OPTION_FRAMAC_CPP_EXTRA \
+  -I$FRAMAC_SHARE/libc \
+  -D__NO_CTYPE \
   $CPPMACHDEP"
 EACSL_MMODEL="$OPTION_EACSL_MMODEL"
 
@@ -481,7 +480,7 @@ done
 # Gcc and related flags
 CC="$OPTION_CC"
 CFLAGS="$OPTION_CFLAGS
-  -std=c99 $GCCMACHDEP -g3 -O2 -fno-builtin -fno-merge-constants
+  -std=c99 $GCCMACHDEP -g3 -fno-builtin -fno-merge-constants
   -Wall \
   -Wno-long-long \
   -Wno-attributes \
@@ -495,6 +494,12 @@ CFLAGS="$OPTION_CFLAGS
   -Wno-unused-but-set-variable \
   -Wno-implicit-function-declaration \
   -Wno-empty-body"
+
+if test -z "$OPTION_DEBUG_MACRO"; then
+  CFLAGS="-O2 $CFLAGS"
+else
+  CFLAGS="-O0 $CFLAGS"
+fi
 
 # Disable extra warning for clang
 if [ "`basename $CC`" = 'clang' ]; then
@@ -546,7 +551,7 @@ if [ -n "$OPTION_INSTRUMENT" ]; then
     $FRAMAC \
     $FRAMAC_FLAGS \
     $MACHDEP \
-    -cpp-extra-args="$OPTION_FRAMAC_CPP_EXTRA" \
+    -cpp-extra-args="$FRAMAC_CPP_EXTRA" \
     -e-acsl-share=$EACSL_SHARE \
     $OPTION_FRAMA_STDLIB \
     $OPTION_VERBOSE \
