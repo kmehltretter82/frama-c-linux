@@ -481,7 +481,7 @@ done
 # Gcc and related flags
 CC="$OPTION_CC"
 CFLAGS="$OPTION_CFLAGS
-  -std=c99 $GCCMACHDEP -g3 -O2 -fno-builtin
+  -std=c99 $GCCMACHDEP -g3 -O2 -fno-builtin -fno-merge-constants
   -Wall \
   -Wno-long-long \
   -Wno-attributes \
