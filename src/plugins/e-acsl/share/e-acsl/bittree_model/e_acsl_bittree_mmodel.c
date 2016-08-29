@@ -68,6 +68,20 @@ static size_t get_heap_size(void) {
 /* }}} */
 
 /**************************/
+/* DEBUG              {{{ */
+/**************************/
+#ifdef E_ACSL_DEBUG
+/* Notion of current location for debugging purposes  */
+static struct current_location {
+  int line;
+  char *file;
+} cloc = { 0, "undefined" };
+
+#define update_cloc(_file, _line) { cloc.line = _line; cloc.file = _file; }
+#endif
+/* }}} */
+
+/**************************/
 /* INITIALIZATION     {{{ */
 /**************************/
 
@@ -238,28 +252,66 @@ static int offset(void* ptr) {
 /* store the block of size bytes starting at ptr, the new block is returned.
  * Warning: the return type is implicitly (bt_block*). */
 static void* store_block(void* ptr, size_t size) {
-  bt_block * tmp;
-  DASSERT(ptr != NULL);
-  tmp = native_malloc(sizeof(bt_block));
-  DASSERT(tmp != NULL);
-  tmp->ptr = (uintptr_t)ptr;
-  tmp->size = size;
-  tmp->init_ptr = NULL;
-  tmp->init_bytes = 0;
-  tmp->is_readonly = false;
-  tmp->freeable = false;
-  bt_insert(tmp);
+#ifdef E_ACSL_DEBUG
+  if (ptr == NULL)
+    vabort("Attempt to record NULL block");
+  else {
+    char *check = (char*)ptr;
+    bt_block * block_check = bt_find(ptr);
+    if (block_check) {
+      vabort("\nRecording %a [%lu] at %s:%d failed."
+          " Overlapping block %a [%lu] found at %s:%d\n",
+          ptr, size, cloc.file, cloc.line, base_addr(check),
+          block_length(check), block_check->file, block_check->line);
+    }
+    check += size - 1;
+    block_check = bt_find(check);
+    if (block_check) {
+      vabort("\nRecording %a [%lu] at %d failed."
+          " Overlapping block %a [%lu] found at %s:%d\n",
+          ptr, size, cloc.file, cloc.line, base_addr(check),
+          block_length(check), block_check->file, block_check->line);
+    }
+  }
+#endif
+  bt_block * tmp = NULL;
+  if (ptr) {
+    tmp = native_malloc(sizeof(bt_block));
+    tmp->ptr = (uintptr_t)ptr;
+    tmp->size = size;
+    tmp->init_ptr = NULL;
+    tmp->init_bytes = 0;
+    tmp->is_readonly = false;
+    tmp->freeable = false;
+    bt_insert(tmp);
+#ifdef E_ACSL_DEBUG
+    tmp->line = 0;
+    tmp->file = "undefined";
+#endif
+  }
   return tmp;
 }
 
 /* remove the block starting at ptr */
 static void delete_block(void* ptr) {
-  DASSERT(ptr != NULL);
-  bt_block * tmp = bt_lookup(ptr);
-  DASSERT(tmp != NULL);
-  bt_clean_block_init(tmp);
-  bt_remove(tmp);
-  native_free(tmp);
+#ifdef E_ACSL_DEBUG
+  /* Make sure the recorded block is not NULL */
+  if (!ptr)
+    vabort("Attempt to delete NULL block");
+#endif
+  if (ptr != NULL) {
+    bt_block * tmp = bt_lookup(ptr);
+#ifdef E_ACSL_DEBUG
+    /* Make sure the removed block exists in the tracked allocation */
+    if (!tmp)
+      vabort("Attempt to delete untracked block");
+#endif
+    if (tmp) {
+      bt_clean_block_init(tmp);
+      bt_remove(tmp);
+      native_free(tmp);
+    }
+  }
 }
 /* }}} */
 
@@ -445,6 +497,51 @@ static void memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
 }
 /* }}} */
 
+#ifdef E_ACSL_DEBUG
+
+/* Debug version of store block with location tracking. This function is aimed
+ * at manual debugging.  While there is no easy way of traking file/line numbers
+ * recorded memory blocks with the use of the following macros placed after the
+ * declaration of __e_acsl_store_block:
+ *
+ * #define __e_acsl_store_block(...) \
+ *    __e_acsl_store_block_debug(__FILE__, __LINE__, __VA_ARGS__)
+ *
+ * The above macros with rewrite of instances of __e_acsl_store_block generating
+ * origin information of tracked memory blocks.
+*/
+void* store_block_debug(char *file, int line, void* ptr, size_t size) {
+  update_cloc(file, line);
+  bt_block * res = store_block(ptr, size);
+  if (res) {
+    res->line = line;
+    res->file = file;
+  }
+  return res;
+}
+
+void delete_block_debug(char *file, int line, void* ptr) {
+  update_cloc(file, line);
+  bt_block * tmp = bt_lookup(ptr);
+  if (!tmp) {
+    vabort("Block with base address %a not found in allocation at %s:%d",
+        ptr, file, line);
+  }
+  delete_block(ptr);
+}
+
+/* Debug print of block information */
+void block_info(char *p) {
+  bt_block * res = bt_find(p);
+  if (res) {
+    printf(" << %a >> %a [%lu] => %lu \n",
+      p, base_addr(p), offset(p), block_length(p));
+  } else {
+    printf(" << %a >> not allocated\n", p);
+  }
+}
+#endif
+
 /* API BINDINGS {{{ */
 /* Heap allocation (native) */
 strong_alias(bittree_malloc,	malloc)
@@ -478,6 +575,9 @@ public_alias(heap_size)
 #ifdef E_ACSL_DEBUG /* Debug */
 public_alias(bt_print_block)
 public_alias(bt_print_tree)
+public_alias(block_info)
+public_alias(store_block_debug)
+public_alias(delete_block_debug)
 #endif
 /* }}} */
 #endif
