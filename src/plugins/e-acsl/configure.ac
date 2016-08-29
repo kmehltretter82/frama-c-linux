@@ -119,3 +119,19 @@ AC_SUBST(OCAMLVERSION)
 AC_SUBST(FULL_GMP)
 
 write_plugin_config(Makefile)
+
+###############################
+# Configure contrib libraries #
+###############################
+# Configure libgmp
+if test "$FULL_GMP" = yes; then
+  AC_MSG_NOTICE([Configure libgmp])
+  (cd contrib/libgmp && ./configure)
+fi
+
+# Configure libjemalloc
+AC_MSG_NOTICE([Configure libjemalloc])
+(cd contrib/libjemalloc && ./autogen.sh \
+  --with-jemalloc-prefix="__e_acsl_native_" \
+  --with-private-namespace="__e_acsl_hidden_" \
+  --with-install-suffix="-e-acsl")

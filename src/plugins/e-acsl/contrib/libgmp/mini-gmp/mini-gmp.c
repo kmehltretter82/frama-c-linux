@@ -247,9 +247,6 @@ gmp_die (const char *msg)
   abort();
 }
 
-void * __e_acsl_native_malloc(size_t);
-void* __e_acsl_native_realloc(void*, size_t);
-
 static void *
 gmp_default_alloc (size_t size)
 {
@@ -257,7 +254,7 @@ gmp_default_alloc (size_t size)
 
   assert (size > 0);
 
-  p = __e_acsl_native_malloc(size);
+  p = (void*)malloc(size);
   if (!p)
     gmp_die("gmp_default_alloc: Virtual memory exhausted.");
 
@@ -269,7 +266,7 @@ gmp_default_realloc (void *old, size_t old_size, size_t new_size)
 {
   void * p;
 
-  p = __e_acsl_native_realloc (old, new_size);
+  p = realloc (old, new_size);
 
   if (!p)
     gmp_die("gmp_default_realloc: Virtual memory exhausted.");
@@ -280,7 +277,7 @@ gmp_default_realloc (void *old, size_t old_size, size_t new_size)
 static void
 gmp_default_free (void *p, size_t size)
 {
-  __e_acsl_native_free (p);
+  free (p);
 }
 
 static void * (*gmp_allocate_func) (size_t) = gmp_default_alloc;
