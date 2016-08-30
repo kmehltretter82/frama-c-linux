@@ -114,7 +114,6 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
     __gen_e_acsl_at_4 = __gen_e_acsl_forall_2;
   }
   __gen_e_acsl_at_3 = c;
-  __e_acsl_store_block((void *)(& __gen_e_acsl_at_2),8UL);
   __gen_e_acsl_at_2 = buf;
   {
     int __gen_e_acsl_exists;
