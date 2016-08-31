@@ -311,7 +311,7 @@ do
     # Do use Frama-C stdlib, which is the default behaviour of Frama-C
     --frama-c-stdlib|-L)
       shift;
-      OPTION_FRAMA_STDLIB=""
+      OPTION_FRAMA_STDLIB="-frama-c-stdlib"
     ;;
     # Use as much memory-related instrumentation as possible
     -M|--full-mmodel)
@@ -427,10 +427,7 @@ GCCMACHDEP="-m$MACHDEPFLAGS"
 EACSL_MACRO_ID="__E_ACSL__"
 
 # Frama-C and related flags
-FRAMAC_CPP_EXTRA="$OPTION_FRAMAC_CPP_EXTRA \
-  -I$FRAMAC_SHARE/libc \
-  -D__NO_CTYPE \
-  $CPPMACHDEP"
+FRAMAC_CPP_EXTRA="$OPTION_FRAMAC_CPP_EXTRA $CPPMACHDEP"
 EACSL_MMODEL="$OPTION_EACSL_MMODEL"
 
 # Re-set EACSL_SHARE  directory is it has been given by the user
