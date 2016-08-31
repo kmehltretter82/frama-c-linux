@@ -191,7 +191,7 @@ let predicate_to_exp =
     ~journalize:false
     "predicate_to_exp"
     (Datatype.func2
-       Kernel_function.ty Cil_datatype.Predicate_named.ty Cil_datatype.Exp.ty)
+       Kernel_function.ty Cil_datatype.Predicate.ty Cil_datatype.Exp.ty)
     Translate.predicate_to_exp
 
 let add_e_acsl_library _files = 

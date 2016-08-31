@@ -143,10 +143,10 @@ let mk_gen_name name =
 
 (* Build a C conditional doing a runtime assertion check. *)
 let mk_e_acsl_guard ?(reverse=false) kind kf e p =
-  let loc = p.loc in
+  let loc = p.pred_loc in
   let msg = 
     Kernel.Unicode.without_unicode
-      (Pretty_utils.sfprintf "%a@?" Printer.pp_predicate_named) p 
+      (Pretty_utils.sfprintf "%a@?" Printer.pp_predicate) p 
   in
   let line = (fst loc).Lexing.pos_lnum in
   let e = 

@@ -46,7 +46,7 @@ type annotation_kind =
   | RTE
 
 val mk_e_acsl_guard: 
-  ?reverse:bool -> annotation_kind -> kernel_function -> exp -> predicate named 
+  ?reverse:bool -> annotation_kind -> kernel_function -> exp -> predicate 
   -> stmt
 
 val mk_block: Project.t -> stmt -> block -> stmt

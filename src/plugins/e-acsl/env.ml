@@ -59,7 +59,7 @@ type t =
       env_stack: local_env list;
       init_env: local_env;
       var_mapping: Varinfo.t Logic_var.Map.t; (* bind logic var to C var *)
-      loop_invariants: predicate named list list;
+      loop_invariants: predicate list list;
       (* list of loop invariants for each currently visited loops *) 
       cpt: int; (* counter used when generating variables *) }
 
