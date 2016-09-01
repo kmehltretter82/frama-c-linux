@@ -257,20 +257,20 @@ static void* store_block(void* ptr, size_t size) {
     vabort("Attempt to record NULL block");
   else {
     char *check = (char*)ptr;
-    bt_block * block_check = bt_find(ptr);
-    if (block_check) {
+    bt_block * exitsing_block = bt_find(ptr);
+    if (exitsing_block) {
       vabort("\nRecording %a [%lu] at %s:%d failed."
           " Overlapping block %a [%lu] found at %s:%d\n",
           ptr, size, cloc.file, cloc.line, base_addr(check),
-          block_length(check), block_check->file, block_check->line);
+          block_length(check), exitsing_block->file, exitsing_block->line);
     }
     check += size - 1;
-    block_check = bt_find(check);
-    if (block_check) {
+    exitsing_block = bt_find(check);
+    if (exitsing_block) {
       vabort("\nRecording %a [%lu] at %d failed."
           " Overlapping block %a [%lu] found at %s:%d\n",
           ptr, size, cloc.file, cloc.line, base_addr(check),
-          block_length(check), block_check->file, block_check->line);
+          block_length(check), exitsing_block->file, exitsing_block->line);
     }
   }
 #endif
@@ -524,7 +524,7 @@ void delete_block_debug(char *file, int line, void* ptr) {
   update_cloc(file, line);
   bt_block * tmp = bt_lookup(ptr);
   if (!tmp) {
-    vabort("Block with base address %a not found in allocation at %s:%d",
+    vabort("Block with base address %a not found in the memory model at %s:%d",
         ptr, file, line);
   }
   delete_block(ptr);
