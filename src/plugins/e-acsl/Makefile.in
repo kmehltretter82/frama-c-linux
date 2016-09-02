@@ -77,19 +77,8 @@ PLUGIN_DISTRIB_BIN:=no
 ###############
 # Local Flags #
 ###############
-
-# Enable -warn-error in development mode, but not in distribution mode
 # Do not edit the line below: it is automatically set by 'make e-acsl-distrib'
 IS_DISTRIBUTED:=no
-ifneq ($(IS_DISTRIBUTED),yes)
-ifeq ($(EACSL_HAS_OCAML312),yes)
-EACSL_DEV_FLAGS=-warn-error +a
-else
-EACSL_DEV_FLAGS=-warn-error A
-endif
-endif
-PLUGIN_BFLAGS:=$(EACSL_DEV_FLAGS)
-PLUGIN_OFLAGS:=$(EACSL_DEV_FLAGS)
 
 #######################
 # Local configuration #

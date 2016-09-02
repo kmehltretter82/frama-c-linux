@@ -563,21 +563,6 @@ and at_to_exp env t_opt label e =
      That is this variable which is the resulting expression. 
      ACSL typing rule ensures that the type of this variable is the same as
      the one of [e]. *)
-  let must_model_new_var e =
-    let res = ref false in
-    let o = object
-      inherit Cil.nopCilVisitor
-      method !vlval (host, _) = match host with
-      | Var v -> 
-        if Mmodel_analysis.old_must_model_vi (Env.get_behavior env) v then
-	  res := true;
-	Cil.SkipChildren
-      | Mem _ ->
-	Cil.DoChildren
-    end in
-    ignore (Cil.visitCilExpr o e);
-    !res
-  in
   let loc = Stmt.loc stmt in
   let res_v, res, new_env =
     Env.new_var
@@ -587,8 +572,7 @@ and at_to_exp env t_opt label e =
       env
       t_opt
       (Cil.typeOf e) 
-      (fun v _ -> 
-	if must_model_new_var e then [ Misc.mk_store_stmt v ] else [])
+      (fun _ _ -> [])
   in
   let env_ref = ref new_env in
   (* visitor modifying in place the labeled statement in order to store [e]

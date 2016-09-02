@@ -39,6 +39,10 @@ struct bt_block {
   size_t init_bytes; //!< Number of initialized bytes within a block
   _Bool is_readonly; //!< True if a block is marked read-only
   _Bool freeable; //!< True if a block can be de-allocated using `free`
+#ifdef E_ACSL_DEBUG
+  size_t line; //!< Line number where this block was recorded
+  char* file; //!< File name where this block was recorded
+#endif
 };
 
 typedef struct bt_block bt_block;
