@@ -118,25 +118,6 @@ clean::
 
 endif
 
-######################
-# Benchmarking tools #
-######################
-
-EACSL_BM_SOURCES = $(wildcard $(PLUGIN_DIR)/benchmarking/tools/*.c)
-EACSL_BM_BINARIES = $(patsubst %.c,%, $(EACSL_BM_SOURCES))
-
-CFLAGS = -g3 -O2 -std=c11 -pedantic -Wall -Wno-unused-result
-
-$(EACSL_BM_BINARIES): % : %.c
-	$(PRINT_CC) $@
-	$(CC) $(CFLAGS) -o $@ $^
-
-all:: $(EACSL_BM_BINARIES)
-
-clean::
-	$(PRINT_RM) benchmarking tools
-	$(RM) $(EACSL_BM_BINARIES)
-
 ################################################
 # E-ACSL C Libs: libjemalloc, libgmp           #
 ################################################

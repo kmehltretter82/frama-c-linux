@@ -73,6 +73,5 @@ top/
 doc/doxygen/doxygen.cfg
 doc/doxygen/html
 doc/doxygen/warn.log
-benchmarking/tools/fc-time
 lib/libgmp-e-acsl.a
 lib/libjemalloc-e-acsl.a
