@@ -34,9 +34,9 @@ let term_to_exp_ref
 
 let compute_quantif_guards quantif bounded_vars hyps =
   let error msg pp x =
-    let msg1 = Pretty_utils.sfprintf msg pp x in
+    let msg1 = Format.asprintf msg pp x in
     let msg2 =
-      Pretty_utils.sfprintf "@[ in quantification@ %a@]"
+      Format.asprintf "@[ in quantification@ %a@]"
         Printer.pp_predicate_named quantif
     in
     Error.untypable (msg1 ^ msg2)
@@ -93,7 +93,7 @@ let compute_quantif_guards quantif bounded_vars hyps =
   | [] -> ()
   | _ :: _ ->
     let msg = 
-      Pretty_utils.sfprintf
+      Format.asprintf
 	"@[unguarded variable%s %tin quantification@ %a@]" 
 	(if List.length vars = 1 then "" else "s") 
 	(fun fmt -> 

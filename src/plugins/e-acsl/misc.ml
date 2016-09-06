@@ -146,7 +146,7 @@ let mk_e_acsl_guard ?(reverse=false) kind kf e p =
   let loc = p.loc in
   let msg = 
     Kernel.Unicode.without_unicode
-      (Pretty_utils.sfprintf "%a@?" Printer.pp_predicate_named) p 
+      (Format.asprintf "%a@?" Printer.pp_predicate_named) p
   in
   let line = (fst loc).Lexing.pos_lnum in
   let e = 
