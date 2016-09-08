@@ -761,6 +761,11 @@ let do_visit ?(prj=Project.current ()) generate =
   let vis =
     Extlib.try_finally ~finally:Typing.clear (new e_acsl_visitor prj) generate
   in
+  (* After instrumentation it may happen so that some of the instrumented
+   * function calls will appear above their respective declarations. The
+   * following reorders the modified AST to put all internal declarations atop
+   * of the file. *)
+  Misc.reorder_ast ();
   (* explicit type annotation in order to check that no new method is
      introduced by error *)
   (vis : Visitor.frama_c_visitor)

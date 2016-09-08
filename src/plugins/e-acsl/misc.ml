@@ -47,6 +47,23 @@ let register_library_function vi =
 
 let reset () = Datatype.String.Hashtbl.clear library_functions
 
+let reorder_ast () =
+  let ast = Ast.get() in
+  let rtl, other = List.partition
+  (fun g ->
+    match g with
+    | GType(ti, _) when
+      ti.tname = "size_t" ||
+      ti.tname = "__mpz_struct" ||
+      ti.tname = "mpz_t" -> false
+    | GCompTag (ci, _) when ci.cname = "__e_acsl_mpz_struct" -> false
+    | GFunDecl(_, _, loc) when is_library_loc loc -> false
+    | GVarDecl(_, loc) when is_library_loc loc -> false
+    | _ -> true)
+  ast.globals in
+  ast.globals <- (List.append other rtl);
+  ()
+
 (* ************************************************************************** *)
 (** {2 Builders} *)
 (* ************************************************************************** *)

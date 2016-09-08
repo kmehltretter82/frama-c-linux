@@ -32,14 +32,13 @@
 /* GMP types */
 /*************/
 
-typedef struct {
+struct __e_acsl_mpz_struct {
   int _mp_alloc;
   int _mp_size;
-  unsigned long int *_mp_d;
-} __mpz_struct;
+  unsigned long *_mp_d;
+};
 
-/*@ model __mpz_struct { integer n; }; */
-
-typedef __mpz_struct mpz_t[1] __attribute__((FC_BUILTIN));
+typedef struct __e_acsl_mpz_struct __mpz_struct;
+typedef __mpz_struct ( __attribute__((__FC_BUILTIN__)) mpz_t)[1];
 
 #endif
