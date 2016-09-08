@@ -31,7 +31,6 @@ let library_files () =
   List.map
     (fun d -> Options.Share.file ~error:true d)
     [ "e_acsl.h";
-      "e_acsl_gmp_types.h";
       "e_acsl_gmp.h";
       "e_acsl_mmodel_api.h" ]
 
@@ -46,23 +45,6 @@ let register_library_function vi =
   Datatype.String.Hashtbl.add library_functions vi.vname vi
 
 let reset () = Datatype.String.Hashtbl.clear library_functions
-
-let reorder_ast () =
-  let ast = Ast.get() in
-  let rtl, other = List.partition
-  (fun g ->
-    match g with
-    | GType(ti, _) when
-      ti.tname = "size_t" ||
-      ti.tname = "__mpz_struct" ||
-      ti.tname = "mpz_t" -> false
-    | GCompTag (ci, _) when ci.cname = "__e_acsl_mpz_struct" -> false
-    | GFunDecl(_, _, loc) when is_library_loc loc -> false
-    | GVarDecl(_, loc) when is_library_loc loc -> false
-    | _ -> true)
-  ast.globals in
-  ast.globals <- (List.append other rtl);
-  ()
 
 (* ************************************************************************** *)
 (** {2 Builders} *)
@@ -140,6 +122,9 @@ let strip_prefix p s =
 
 let is_generated_varinfo vi =
   startswith e_acsl_gen_prefix vi.vname
+
+let is_library_name name =
+  startswith e_acsl_api_prefix name
 
 let is_generated_kf kf =
   let name = Kernel_function.get_vi kf in
@@ -279,6 +264,20 @@ let mk_readonly vi =
 
 let term_addr_of ~loc tlv ty =
   Logic_const.taddrof ~loc tlv (Ctype (TPtr(ty, [])))
+
+let reorder_ast () =
+  let ast = Ast.get() in
+  let rtl, other = List.partition
+  (fun g ->
+    match g with
+    | GType(ti, _) when ti.tname = "size_t" || is_library_name ti.tname -> false
+    | GCompTag (ci, _) when is_library_name ci.cname -> false
+    | GFunDecl(_, _, loc) when is_library_loc loc -> false
+    | GVarDecl(_, loc) when is_library_loc loc -> false
+    | _ -> true)
+  ast.globals in
+  ast.globals <- (List.append other rtl);
+  ()  
 
 (*
 Local Variables:

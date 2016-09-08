@@ -48,14 +48,14 @@ int main(int argc, char **argv)
   /*@ assert \block_length(argv) ≡ (argc+1)*sizeof(char *); */
   {
     unsigned long __gen_e_acsl_block_length;
-    mpz_t __gen_e_acsl_block_length_2;
-    mpz_t __gen_e_acsl_;
+    __e_acsl_mpz_t __gen_e_acsl_block_length_2;
+    __e_acsl_mpz_t __gen_e_acsl_;
     int __gen_e_acsl_eq;
     __gen_e_acsl_block_length = __e_acsl_block_length((void *)argv);
     __gmpz_init_set_ui(__gen_e_acsl_block_length_2,__gen_e_acsl_block_length);
     __gmpz_init_set_si(__gen_e_acsl_,(argc + 1L) * 8);
-    __gen_e_acsl_eq = __gmpz_cmp((__mpz_struct const *)(__gen_e_acsl_block_length_2),
-                                 (__mpz_struct const *)(__gen_e_acsl_));
+    __gen_e_acsl_eq = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_block_length_2),
+                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
     __e_acsl_assert(__gen_e_acsl_eq == 0,(char *)"Assertion",(char *)"main",
                     (char *)"\\block_length(argv) == (argc+1)*sizeof(char *)",
                     13);

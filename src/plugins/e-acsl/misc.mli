@@ -69,10 +69,6 @@ val library_files: unit -> string list
 val is_library_loc: location -> bool
 val register_library_function: varinfo -> unit
 val reset: unit -> unit
-val reorder_ast: unit -> unit
-(* Reorder current AST by bringing all global declarations belonging to the
- * E-ACSL runtime library and their dependencies (e.g., typedef size_t) to
- * the very top of the file. *)
 
 val mk_store_stmt: ?str_size:exp -> varinfo -> stmt
 val mk_delete_stmt: varinfo -> stmt
@@ -85,6 +81,11 @@ val mk_readonly: varinfo -> stmt
 (* ************************************************************************** *)
 
 val term_addr_of: loc:location -> term_lval -> typ -> term
+
+val reorder_ast: unit -> unit
+(* Reorder current AST by bringing all global declarations belonging to the
+ * E-ACSL runtime library and their dependencies (e.g., typedef size_t) to
+ * the very top of the file. *)
 
 (* ************************************************************************** *)
 (** {2 Handling prefixes of generated library functions and variables} *)
