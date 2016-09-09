@@ -101,7 +101,7 @@ $(PLUGIN_DIR)/local_config.ml: $(PLUGIN_DIR)/Makefile.in VERSION
 
 ifeq (@MAY_RUN_TESTS@,yes)
 
-PLUGIN_TESTS_DIRS := reject runtime bts gmp no-main
+PLUGIN_TESTS_DIRS := reject runtime bts gmp no-main full-mmodel
 PLUGIN_TESTS_LIB := $(PLUGIN_DIR)/tests/print.ml
 E_ACSL_TESTS: $(PLUGIN_DIR)/tests/test_config
 
