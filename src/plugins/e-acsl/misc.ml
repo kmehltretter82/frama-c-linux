@@ -267,17 +267,13 @@ let term_addr_of ~loc tlv ty =
 
 let reorder_ast () =
   let ast = Ast.get() in
-  let rtl, other = List.partition
-  (fun g ->
-    match g with
+  let is_from_library = function
     | GType(ti, _) when ti.tname = "size_t" || is_library_name ti.tname -> false
     | GCompTag (ci, _) when is_library_name ci.cname -> false
-    | GFunDecl(_, _, loc) when is_library_loc loc -> false
-    | GVarDecl(_, loc) when is_library_loc loc -> false
-    | _ -> true)
-  ast.globals in
-  ast.globals <- (List.append other rtl);
-  ()  
+    | GFunDecl(_, _, loc) | GVarDecl(_, loc) when is_library_loc loc -> false
+    | _ -> true in
+  let rtl, other = List.partition is_from_library ast.globals in
+  ast.globals <- other @ rtl
 
 (*
 Local Variables:
