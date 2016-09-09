@@ -156,11 +156,6 @@ let generate_code =
                 Mmodel_analysis.reset ();
 		let visit prj = Visit.do_visit ~prj true in
 		let prj = File.create_project_from_visitor name visit in
-                (* Some of the instrumented function calls may appear above
-                   their respective declarations. The following reorders the
-                   modified  AST and puts all internal declarations atop of
-                   the file. *)
-                Project.on prj Misc.reorder_ast ();
 		Loops.apply_after_transformation prj;
 		(* remove the RTE's results computed from E-ACSL: their are
 		   partial and associated with the wrong kernel function (the

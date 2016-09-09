@@ -268,12 +268,12 @@ let term_addr_of ~loc tlv ty =
 let reorder_ast () =
   let ast = Ast.get() in
   let is_from_library = function
-    | GType(ti, _) when ti.tname = "size_t" || is_library_name ti.tname -> false
-    | GCompTag (ci, _) when is_library_name ci.cname -> false
-    | GFunDecl(_, _, loc) | GVarDecl(_, loc) when is_library_loc loc -> false
-    | _ -> true in
+    | GType(ti, _) when ti.tname = "size_t" || is_library_name ti.tname -> true
+    | GCompTag (ci, _) when is_library_name ci.cname -> true
+    | GFunDecl(_, _, loc) | GVarDecl(_, loc) when is_library_loc loc -> true
+    | _ -> false in
   let rtl, other = List.partition is_from_library ast.globals in
-  ast.globals <- other @ rtl
+  ast.globals <- rtl @ other
 
 (*
 Local Variables:
