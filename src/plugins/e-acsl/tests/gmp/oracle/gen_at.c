@@ -51,7 +51,6 @@ void g(int *p, int *q)
       __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)q,sizeof(int));
       __e_acsl_assert(__gen_e_acsl_valid_read_3,(char *)"RTE",(char *)"g",
                       (char *)"mem_access: \\valid_read(q)",28);
-      __e_acsl_store_block((void *)(& __gen_e_acsl_at_3),8UL);
       __gen_e_acsl_at_3 = (unsigned long)*q;
     }
     {
@@ -59,7 +58,6 @@ void g(int *p, int *q)
       __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)q,sizeof(int));
       __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"g",
                       (char *)"mem_access: \\valid_read(q)",26);
-      __e_acsl_store_block((void *)(& __gen_e_acsl_at),8UL);
       __gen_e_acsl_at = (unsigned long)*q;
     }
     __e_acsl_initialize((void *)p,sizeof(int));
@@ -76,7 +74,6 @@ void g(int *p, int *q)
       __e_acsl_assert(__gen_e_acsl_valid_read_2,(char *)"RTE",(char *)"g",
                       (char *)"mem_access: \\valid_read(p+__gen_e_acsl_at)",
                       26);
-      __e_acsl_store_block((void *)(& __gen_e_acsl_at_2),4UL);
       __gen_e_acsl_at_2 = *(p + __gen_e_acsl_at);
     }
     A = 4;
@@ -126,11 +123,8 @@ int main(void)
   __e_acsl_full_init((void *)(& x));
   x = __gen_e_acsl_h(0);
   L:
-    __e_acsl_store_block((void *)(& __gen_e_acsl_at_3),4UL);
     __gen_e_acsl_at_3 = x;
-    __e_acsl_store_block((void *)(& __gen_e_acsl_at_2),8UL);
     __gen_e_acsl_at_2 = x + 1L;
-    __e_acsl_store_block((void *)(& __gen_e_acsl_at),4UL);
     __gen_e_acsl_at = x;
     /*@ assert x ≡ 0; */
     __e_acsl_assert(x == 0,(char *)"Assertion",(char *)"main",
@@ -164,7 +158,6 @@ int __gen_e_acsl_h(int x)
   int __retres;
   __e_acsl_store_block((void *)(& __retres),4UL);
   __e_acsl_store_block((void *)(& x),4UL);
-  __e_acsl_store_block((void *)(& __gen_e_acsl_at),4UL);
   __gen_e_acsl_at = x;
   __retres = h(x);
   __e_acsl_assert(__retres == __gen_e_acsl_at,(char *)"Postcondition",

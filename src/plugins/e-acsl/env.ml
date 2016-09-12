@@ -277,7 +277,7 @@ module Logic_binding = struct
 	| Ltype _ as ty when Logic_const.is_boolean_type ty -> Cil.charType
 	| Ltype _ | Lvar _ | Lreal | Larrow _ as lty -> 
 	  let msg = 
-	    Pretty_utils.sfprintf 
+	    Format.asprintf
 	      "logic variable of type %a" Logic_type.pretty lty
 	  in
 	  Error.not_yet msg

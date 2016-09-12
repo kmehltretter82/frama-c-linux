@@ -54,7 +54,7 @@ let unmemoized_extend_ast () =
     let share = Options.Share.dir ~error:true () in
     Options.feedback ~level:3 "setting kernel options for E-ACSL.";
     Kernel.CppExtraArgs.add
-      (Pretty_utils.sfprintf " -DE_ACSL_MACHDEP=%s -I%s/memory_model"
+      (Format.asprintf " -DE_ACSL_MACHDEP=%s -I%s/memory_model"
          (Kernel.Machdep.get ())
          share);
     Kernel.Keep_unused_specified_functions.off ();
@@ -64,7 +64,7 @@ let unmemoized_extend_ast () =
         (File.NeedCPP
            (s,
             ppc
-            ^ Pretty_utils.sfprintf " -I%s" share,
+            ^ Format.asprintf " -I%s" share,
             ppk))
     in
     List.iter register (Misc.library_files ())
@@ -89,7 +89,7 @@ E-ACSL is going to work on a copy.";
       Project.create_by_copy
         ~last:false
 	~selection
-	(Pretty_utils.sfprintf "%s for E-ACSL" name)
+	(Format.asprintf "%s for E-ACSL" name)
     in
     Project.on prj
       (fun () ->
