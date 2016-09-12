@@ -338,7 +338,8 @@ let rec type_term ~force ?ctx t =
     | TCoerce(t', _) ->
       let ctx =
         try
-          let i = Interval.infer t' in
+          (* compute the smallest interval from the whole term [t] *)
+          let i = Interval.infer t in
           (* nothing more to do: [i] is already more precise than what we
              could infer from the arguments of the cast. *)
           ty_of_interv ?ctx i
