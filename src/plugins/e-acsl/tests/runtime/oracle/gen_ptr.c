@@ -54,13 +54,13 @@ int main(void)
     i = 0;
     while (i < 2) {
       /*@ assert t[i] ≡ i+2; */
-      __e_acsl_assert((unsigned int)((unsigned long)i) < 3U,(char *)"RTE",
+      __e_acsl_assert((unsigned long)((unsigned int)i) < 3U,(char *)"RTE",
                       (char *)"main",
                       (char *)"index_bound: (unsigned long)i < 3",17);
       __e_acsl_assert(t[(unsigned long)i] == i + 2L,(char *)"Assertion",
                       (char *)"main",(char *)"t[i] == i+2",17);
       /*@ assert t[2-i] ≡ 4-i; */
-      __e_acsl_assert((unsigned int)((unsigned long)(2L - i)) < 3U,
+      __e_acsl_assert((unsigned long)((unsigned int)(2L - i)) < 3U,
                       (char *)"RTE",(char *)"main",
                       (char *)"index_bound: (unsigned long)((long)(2-i)) < 3",
                       18);

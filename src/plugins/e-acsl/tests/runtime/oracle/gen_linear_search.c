@@ -35,7 +35,7 @@ int search(int elt)
     __gen_e_acsl_i = 0;
     while (1) {
       if (__gen_e_acsl_i < k) ; else break;
-      __e_acsl_assert((unsigned int)((unsigned long)__gen_e_acsl_i) < 10U,
+      __e_acsl_assert((unsigned long)((unsigned int)__gen_e_acsl_i) < 10U,
                       (char *)"RTE",(char *)"search",
                       (char *)"index_bound: (unsigned long)__gen_e_acsl_i < 10",
                       18);
@@ -79,7 +79,7 @@ int search(int elt)
         __gen_e_acsl_i_2 = 0;
         while (1) {
           if (__gen_e_acsl_i_2 < k) ; else break;
-          __e_acsl_assert((unsigned int)((unsigned long)__gen_e_acsl_i_2) < 10U,
+          __e_acsl_assert((unsigned long)((unsigned int)__gen_e_acsl_i_2) < 10U,
                           (char *)"RTE",(char *)"search",
                           (char *)"index_bound: (unsigned long)__gen_e_acsl_i_2 < 10",
                           18);
@@ -148,7 +148,7 @@ int __gen_e_acsl_search(int elt)
     __gen_e_acsl_i = 0;
     while (1) {
       if (__gen_e_acsl_i < 9) ; else break;
-      __e_acsl_assert((unsigned int)((unsigned long)(__gen_e_acsl_i + 1L)) < 10U,
+      __e_acsl_assert((unsigned long)((unsigned int)(__gen_e_acsl_i + 1L)) < 10U,
                       (char *)"RTE",(char *)"search",
                       (char *)"index_bound: (unsigned long)(__gen_e_acsl_i+1) < 10",
                       7);

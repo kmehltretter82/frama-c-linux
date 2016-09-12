@@ -18,8 +18,9 @@ FRAMAC_SHARE/libc/stdlib.h:160:[kernel] warning: No code nor implicit assigns cl
 [value] using specification for function __gmpz_init
 FRAMAC_SHARE/e-acsl/e_acsl.h:43:[value] warning: function __e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_tdiv_q
-[value] using specification for function __gmpz_get_ui
+[value] using specification for function __gmpz_get_si
 [value] using specification for function __gmpz_clear
 [value] using specification for function __gmpz_add
+tests/gmp/arith.i:34:[value] warning: signed overflow. assert -2147483648 ≤ 1+__gen_e_acsl__7;
 tests/gmp/arith.i:34:[value] warning: signed overflow. assert 1+__gen_e_acsl__7 ≤ 2147483647;
 [value] done for function main

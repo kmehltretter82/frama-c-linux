@@ -78,11 +78,11 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
   __e_acsl_store_block((void *)(& buf),8UL);
   {
     int __gen_e_acsl_forall_2;
-    unsigned long __gen_e_acsl_k;
+    unsigned int __gen_e_acsl_k;
     __gen_e_acsl_forall_2 = 1;
     __gen_e_acsl_k = 0U;
     while (1) {
-      if (__gen_e_acsl_k < (unsigned int)((int)n)) ; else break;
+      if (__gen_e_acsl_k < (int)((unsigned int)n)) ; else break;
       {
         int __gen_e_acsl_valid_read_3;
         __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)((char *)buf + __gen_e_acsl_k),
@@ -106,11 +106,11 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
   __gen_e_acsl_at_2 = buf;
   {
     int __gen_e_acsl_exists;
-    unsigned long __gen_e_acsl_i;
+    unsigned int __gen_e_acsl_i;
     __gen_e_acsl_exists = 0;
     __gen_e_acsl_i = 0U;
     while (1) {
-      if (__gen_e_acsl_i < (unsigned int)((int)n)) ; else break;
+      if (__gen_e_acsl_i < (int)((unsigned int)n)) ; else break;
       {
         int __gen_e_acsl_valid_read;
         __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)((char *)buf + __gen_e_acsl_i),
@@ -137,14 +137,15 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
     if (! __gen_e_acsl_at) __gen_e_acsl_implies = 1;
     else {
       int __gen_e_acsl_forall;
-      unsigned long __gen_e_acsl_j;
+      unsigned int __gen_e_acsl_j;
       __gen_e_acsl_forall = 1;
       __gen_e_acsl_j = 0;
       while (1) {
         {
           int __gen_e_acsl_offset;
           __gen_e_acsl_offset = __e_acsl_offset(__retres);
-          if (__gen_e_acsl_j < (unsigned int)__gen_e_acsl_offset) ;
+          if (__gen_e_acsl_j < (int)((unsigned int)__gen_e_acsl_offset)) 
+            ;
           else break;
         }
         {
