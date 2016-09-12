@@ -119,7 +119,7 @@ let add_cast ~loc ?name env ctx is_mpz_string t_opt e =
       if (Gmpz.is_t ty || is_mpz_string) then
         (* we get an mpz, but it fits into a C integer: convert it *)
         let fname, new_ty =
-          if Cil.isSignedInteger ty then
+          if Cil.isSignedInteger ctx then
             "__gmpz_get_si", Cil.longType
           else
             "__gmpz_get_ui", Cil.ulongType

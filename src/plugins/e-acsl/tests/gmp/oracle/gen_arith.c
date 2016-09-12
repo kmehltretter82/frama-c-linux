@@ -35,7 +35,7 @@ int main(void)
     __e_acsl_mpz_t __gen_e_acsl__2;
     int __gen_e_acsl_div_guard;
     __e_acsl_mpz_t __gen_e_acsl_div;
-    unsigned long __gen_e_acsl__3;
+    long __gen_e_acsl__3;
     __gmpz_init_set_str(__gen_e_acsl_,"309485009821345068724781055",10);
     __gmpz_init_set_si(__gen_e_acsl__2,0L);
     __gen_e_acsl_div_guard = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_),
@@ -48,7 +48,7 @@ int main(void)
     __gmpz_tdiv_q(__gen_e_acsl_div,
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_),
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
-    __gen_e_acsl__3 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_div));
+    __gen_e_acsl__3 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_div));
     __e_acsl_assert(__gen_e_acsl__3 == 1,(char *)"Assertion",(char *)"main",
                     (char *)"0xffffffffffffffffffffff/0xffffffffffffffffffffff == 1",
                     18);
@@ -98,7 +98,7 @@ int main(void)
     __e_acsl_mpz_t __gen_e_acsl__6;
     int __gen_e_acsl_div_guard_2;
     __e_acsl_mpz_t __gen_e_acsl_div_2;
-    unsigned long __gen_e_acsl__7;
+    long __gen_e_acsl__7;
     __gmpz_init_set_si(__gen_e_acsl_z,z);
     __gmpz_init_set_si(__gen_e_acsl__4,1L);
     __gmpz_init(__gen_e_acsl_add);
@@ -116,7 +116,8 @@ int main(void)
     __gmpz_tdiv_q(__gen_e_acsl_div_2,
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_add),
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__5));
-    __gen_e_acsl__7 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_div_2));
+    __gen_e_acsl__7 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_div_2));
+    /*@ assert Value: signed_overflow: -2147483648 ≤ 1+__gen_e_acsl__7; */
     /*@ assert Value: signed_overflow: 1+__gen_e_acsl__7 ≤ 2147483647; */
     __e_acsl_assert(1 + __gen_e_acsl__7 == 1,(char *)"Assertion",
                     (char *)"main",
