@@ -31,7 +31,6 @@ let library_files () =
   List.map
     (fun d -> Options.Share.file ~error:true d)
     [ "e_acsl.h";
-      "e_acsl_gmp_types.h";
       "e_acsl_gmp.h";
       "e_acsl_mmodel_api.h" ]
 
@@ -123,6 +122,9 @@ let strip_prefix p s =
 
 let is_generated_varinfo vi =
   startswith e_acsl_gen_prefix vi.vname
+
+let is_library_name name =
+  startswith e_acsl_api_prefix name
 
 let is_generated_kf kf =
   let name = Kernel_function.get_vi kf in
@@ -262,6 +264,16 @@ let mk_readonly vi =
 
 let term_addr_of ~loc tlv ty =
   Logic_const.taddrof ~loc tlv (Ctype (TPtr(ty, [])))
+
+let reorder_ast () =
+  let ast = Ast.get() in
+  let is_from_library = function
+    | GType(ti, _) when ti.tname = "size_t" || is_library_name ti.tname -> true
+    | GCompTag (ci, _) when is_library_name ci.cname -> true
+    | GFunDecl(_, _, loc) | GVarDecl(_, loc) when is_library_loc loc -> true
+    | _ -> false in
+  let rtl, other = List.partition is_from_library ast.globals in
+  ast.globals <- rtl @ other
 
 (*
 Local Variables:

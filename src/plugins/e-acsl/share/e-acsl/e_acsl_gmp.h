@@ -34,7 +34,18 @@
 #define E_ACSL_GMP
 
 #include "stdlib.h"
-#include "e_acsl_gmp_types.h"
+
+#define mpz_struct __e_acsl_mpz_struct
+#define mpz_t      __e_acsl_mpz_t
+
+struct mpz_struct {
+  int _mp_alloc;
+  int _mp_size;
+  unsigned long *_mp_d;
+};
+
+typedef struct mpz_struct mpz_struct;
+typedef mpz_struct (__attribute__((__FC_BUILTIN__)) mpz_t)[1];
 
 /****************/
 /* Initializers */

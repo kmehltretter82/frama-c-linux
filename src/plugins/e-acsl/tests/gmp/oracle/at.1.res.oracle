@@ -24,7 +24,7 @@ FRAMAC_SHARE/libc/stdlib.h:160:[kernel] warning: No code nor implicit assigns cl
 FRAMAC_SHARE/e-acsl/e_acsl.h:43:[value] warning: function __e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_init
 [value] using specification for function __gmpz_add
-FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:53:[value] warning: function __gmpz_init_set: precondition got status unknown.
+FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:64:[value] warning: function __gmpz_init_set: precondition got status unknown.
 tests/gmp/at.i:12:[value] cannot evaluate ACSL term, \at() on a C label is unsupported
 tests/gmp/at.i:12:[value] warning: assertion got status unknown.
 tests/gmp/at.i:48:[value] cannot evaluate ACSL term, \at() on a C label is unsupported

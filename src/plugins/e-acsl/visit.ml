@@ -755,6 +755,12 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
 end
 
 let do_visit ?(prj=Project.current ()) generate =
+  (* The main visitor proceeds by tracking declarations belonging to the
+     E-ACSL runtime library and then using these declarations to generate
+     statements used in instrumentation. The following code reorders AST 
+     so declarations belonging to E-ACSL library appear atop of any location 
+     requiring instrumentation. *)
+  Misc.reorder_ast ();  
   Options.feedback ~level:2 "%s annotations in %a." 
     (if generate then "translating" else "checking")
     Project.pretty prj;

@@ -103,7 +103,7 @@ let init_t () =
   let set_mpzt = object
     inherit Cil.nopCilVisitor
     method !vglob = function
-    | GType({ torig_name = s } as info, _) when s = "mpz_t" ->
+    | GType({ torig_name = s } as info, _) when s = "__e_acsl_mpz_t" ->
       set_t info;
       Cil.SkipChildren
     | _ -> 

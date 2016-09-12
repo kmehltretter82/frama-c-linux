@@ -82,6 +82,11 @@ val mk_readonly: varinfo -> stmt
 
 val term_addr_of: loc:location -> term_lval -> typ -> term
 
+val reorder_ast: unit -> unit
+(* Reorder current AST by bringing all global declarations belonging to the
+ * E-ACSL runtime library and their dependencies (e.g., typedef size_t) to
+ * the very top of the file. *)
+
 (* ************************************************************************** *)
 (** {2 Handling prefixes of generated library functions and variables} *)
 (* ************************************************************************** *)
