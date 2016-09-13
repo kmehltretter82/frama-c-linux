@@ -44,7 +44,7 @@ int main(int argc, char **argv)
     }
     else __gen_e_acsl_and = 0;
     __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
-                    (char *)"\\valid_read(_G[0].str)",18);
+                    (char *)"\\valid_read(_G[0].str)",22);
   }
   __retres = 0;
   __e_acsl_delete_block((void *)(_G));
