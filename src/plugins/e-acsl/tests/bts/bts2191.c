@@ -1,3 +1,7 @@
+/* run.config
+   COMMENT: bts #2191, issue with unrolling types of struct members
+*/
+
 struct ST {
     char *str;
     int num;
