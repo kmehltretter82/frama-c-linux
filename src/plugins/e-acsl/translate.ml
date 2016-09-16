@@ -607,8 +607,8 @@ and at_to_exp env t_opt label e =
    any) in the given environment. Also extend this environment which includes
    the generating constructs. *)
 and named_predicate_content_to_exp ?name kf env p =
-  let loc = p.loc in
-  match p.content with
+  let loc = p.pred_loc in
+  match p.pred_content with
   | Pfalse -> Cil.zero ~loc, env
   | Ptrue -> Cil.one ~loc, env
   | Papp _ -> not_yet env "logic function application"
@@ -720,7 +720,7 @@ and named_predicate_to_exp ?name kf ?rte env p =
   let env = if rte then translate_rte kf env e else env in
   let cast = Typing.get_cast_of_predicate p in
   add_cast
-    ~loc:p.loc
+    ~loc:p.pred_loc
     ?name
     env
     cast
@@ -758,7 +758,7 @@ and translate_rte kf env e =
 
 and translate_named_predicate kf env p =
   Options.feedback ~dkey ~level:3 "translating predicate %a" 
-    Printer.pp_predicate_named p;
+    Printer.pp_predicate p;
   let rte = Env.generate_rte env in
   Typing.type_named_predicate ~must_clear:rte p;
   let e, env = named_predicate_to_exp kf ~rte env p in
@@ -772,7 +772,7 @@ let named_predicate_to_exp ?name kf env p =
 
 let () = 
   Quantif.term_to_exp_ref := term_to_exp;
-  Quantif.named_predicate_to_exp_ref := named_predicate_to_exp
+  Quantif.predicate_to_exp_ref := named_predicate_to_exp
 
 (* This function is used by Guillaume.
    However, it is correct to use it only in specific contexts. *)
@@ -814,10 +814,10 @@ let term_to_exp typ t =
 
 let assumes_predicate bhv =
   List.fold_left
-    (fun acc p -> 
-      Logic_const.pand
-	~loc:p.ip_loc
-	(acc, Logic_const.unamed ~loc:p.ip_loc p.ip_content))
+    (fun acc p ->
+      let loc = p.ip_content.pred_loc in
+      Logic_const.pand ~loc (acc,
+                             Logic_const.unamed ~loc p.ip_content.pred_content))
     Logic_const.ptrue
     bhv.b_assumes
 
@@ -842,13 +842,14 @@ let translate_preconditions kf kinstr env behaviors =
     let assumes_pred = assumes_predicate b in
     List.fold_left
       (fun env p ->
-	let do_it env =
-	  if must_translate (Property.ip_of_requires kf kinstr b p) then
-	    let loc = p.ip_loc in
-	    let p = 
-	      Logic_const.pimplies
-		~loc
-		(assumes_pred, Logic_const.unamed ~loc p.ip_content)
+         let do_it env =
+           if must_translate (Property.ip_of_requires kf kinstr b p) then
+             let loc = p.ip_content.pred_loc in
+             let p = 
+               Logic_const.pimplies
+                 ~loc
+                 (assumes_pred,
+                  Logic_const.unamed ~loc p.ip_content.pred_content)
 	    in
 	    translate_named_predicate kf env p
 	  else
@@ -881,13 +882,13 @@ let translate_postconditions kf kinstr env behaviors =
 	  let do_it env =
 	    match t with
 	    | Normal -> 
-	      let loc = p.ip_loc in
+	      let loc = p.ip_content.pred_loc in
 	      let p = p.ip_content in
 	      let p = 
 		Logic_const.pimplies 
 		  ~loc
 		  (Logic_const.pold ~loc assumes_pred, 
-		   Logic_const.unamed ~loc p) 
+		   Logic_const.unamed ~loc p.pred_content) 
 	      in
 	      translate_named_predicate kf env p
 	    | Exits | Breaks | Continues | Returns ->

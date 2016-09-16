@@ -737,7 +737,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         | _ -> ());
         t)
 
-  method !vpredicate _ =
+  method !vpredicate_node _ =
     Cil.DoChildrenPost
       (function
       | Pat(_, StmtLabel s_ref) as p ->

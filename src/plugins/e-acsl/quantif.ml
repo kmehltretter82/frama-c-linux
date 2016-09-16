@@ -24,8 +24,8 @@ open Cil_types
 open Cil
 open Cil_datatype
 
-let named_predicate_to_exp_ref
-    : (kernel_function -> Env.t -> predicate named -> exp * Env.t) ref
+let predicate_to_exp_ref
+    : (kernel_function -> Env.t -> predicate -> exp * Env.t) ref
     = Extlib.mk_fun "named_predicate_to_exp_ref"
 
 let term_to_exp_ref
@@ -37,7 +37,7 @@ let compute_quantif_guards quantif bounded_vars hyps =
     let msg1 = Format.asprintf msg pp x in
     let msg2 =
       Format.asprintf "@[ in quantification@ %a@]"
-        Printer.pp_predicate_named quantif
+        Printer.pp_predicate quantif
     in
     Error.untypable (msg1 ^ msg2)
   in
@@ -58,8 +58,8 @@ let compute_quantif_guards quantif bounded_vars hyps =
       else error "@[invalid binder %a@]" Printer.pp_term t
     | _ -> error "@[invalid binder %a@]" Printer.pp_term t
   in
-  let rec parse acc vars p = match p.content with
-    | Pand(p, { content = Prel((Rlt | Rle) as r, t1, t2) }) ->
+  let rec parse acc vars p = match p.pred_content with
+    | Pand(p, { pred_content = Prel((Rlt | Rle) as r, t1, t2) }) ->
       (* && is left-associative in the AST *)
       let acc, partial, vars = parse acc vars p in
       (match partial with
@@ -82,7 +82,7 @@ let compute_quantif_guards quantif bounded_vars hyps =
     | Prel((Rlt | Rle) as r, t1, t2) ->
       (* left-most predicate: the searched variable is [t2] *)
       left_term acc vars (t1, r) t2
-    | _ -> error "@[invalid guard %a@]" Printer.pp_predicate_named p
+    | _ -> error "@[invalid guard %a@]" Printer.pp_predicate p
   in
   let acc, partial, vars = parse [] bounded_vars hyps in
   (match partial with
@@ -100,7 +100,7 @@ let compute_quantif_guards quantif bounded_vars hyps =
 	  List.iter
 	    (fun v -> Format.fprintf fmt "@[%a @]" Printer.pp_logic_var v) 
 	    vars)
-	Printer.pp_predicate_named quantif
+	Printer.pp_predicate quantif
     in
     Error.untypable msg);
   List.rev acc
@@ -119,7 +119,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
     if is_forall then o, z, (fun x -> x) 
     else z, o, (fun e -> new_exp ~loc:e.eloc (UnOp(LNot, e, intType)))
   in
-  let named_predicate_to_exp = !named_predicate_to_exp_ref in
+  let named_predicate_to_exp = !predicate_to_exp_ref in
   let term_to_exp = !term_to_exp_ref in
   (* universal quantification over integers (or a subtype of integer) *)
   let guards = compute_quantif_guards p bounded_vars hyps in
@@ -281,12 +281,12 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
   res, env
 
 let quantif_to_exp kf env p = 
-  let loc = p.loc in
-  match p.content with
-  | Pforall(bounded_vars, { content = Pimplies(hyps, goal) }) -> 
+  let loc = p.pred_loc in
+  match p.pred_content with
+  | Pforall(bounded_vars, { pred_content = Pimplies(hyps, goal) }) -> 
     convert kf env loc true p bounded_vars hyps goal
   | Pforall _ -> Error.not_yet "unguarded \\forall quantification"
-  | Pexists(bounded_vars, { content = Pand(hyps, goal) }) -> 
+  | Pexists(bounded_vars, { pred_content = Pand(hyps, goal) }) -> 
     convert kf env loc false p bounded_vars hyps goal
   | Pexists _ -> Error.not_yet "unguarded \\exists quantification"
   | _ -> assert false

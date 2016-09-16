@@ -86,7 +86,7 @@ val type_term: force:bool -> ?ctx:integer_ty -> term -> unit
     [force] is true, then the conversion to the given context is done even if
     -e-acsl-gmp-only is set. *)
 
-val type_named_predicate: ?must_clear:bool -> predicate named -> unit
+val type_named_predicate: ?must_clear:bool -> predicate -> unit
 (** Compute the type of each term of the given predicate.
     Set {!must_clear} to false in order to not reset the environment. *)
 
@@ -107,7 +107,7 @@ val get_integer_op: term -> integer_ty
     It is meaningless to call this function over a non-arithmetical/logical
     operator. *)
 
-val get_integer_op_of_predicate: predicate named -> integer_ty
+val get_integer_op_of_predicate: predicate -> integer_ty
 (** @return the infered type for the top operation of the given predicate. *)
 
 val get_typ: term -> typ
@@ -120,7 +120,7 @@ val get_op: term -> typ
 val get_cast: term -> typ option
 (** Get the type which the given term must be converted to (if any). *)
 
-val get_cast_of_predicate: predicate named -> typ option
+val get_cast_of_predicate: predicate -> typ option
 (** Like {!get_cast}, but for predicates. *)
 
 (******************************************************************************)
@@ -128,7 +128,7 @@ val get_cast_of_predicate: predicate named -> typ option
 (******************************************************************************)
 
 val compute_quantif_guards_ref
-    : (predicate named -> logic_var list -> predicate named ->
+    : (predicate -> logic_var list -> predicate ->
        (term * relation * logic_var * relation * term) list) ref
 (** Forward reference. *)
 

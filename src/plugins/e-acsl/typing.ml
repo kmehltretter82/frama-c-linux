@@ -28,7 +28,7 @@ open Cil_types
 let dkey = Options.dkey_typing
 
 let compute_quantif_guards_ref
-    : (predicate named -> logic_var list -> predicate named ->
+    : (predicate -> logic_var list -> predicate ->
        (term * relation * logic_var * relation * term) list) ref
     = Extlib.mk_fun "compute_quantif_guards_ref"
 
@@ -443,10 +443,10 @@ and type_term_offset = function
     ignore (type_term ~force:true ~ctx:(size_t ()) t);
     type_term_offset toff
 
-let rec type_predicate_named p =
-  Cil.CurrentLoc.set p.loc;
+let rec type_predicate p =
+  Cil.CurrentLoc.set p.pred_loc;
   (* this pattern matching also follows the formal rules of the JFLA's paper *)
-  let op = match p.content with
+  let op = match p.pred_content with
     | Pfalse | Ptrue -> c_int
     | Papp _ -> Error.not_yet "logic function application"
     | Pseparated _ -> Error.not_yet "\\separated"
@@ -471,22 +471,22 @@ let rec type_predicate_named p =
     | Pxor(p1, p2)
     | Pimplies(p1, p2)
     | Piff(p1, p2) ->
-      ignore (type_predicate_named p1);
-      ignore (type_predicate_named p2);
+      ignore (type_predicate p1);
+      ignore (type_predicate p2);
       c_int
     | Pnot p ->
-      ignore (type_predicate_named p);
+      ignore (type_predicate p);
       c_int
     | Pif(t, p1, p2) ->
       let ctx = mk_ctx ~force:true c_int in
       ignore (type_term ~force:true ~ctx t);
-      ignore (type_predicate_named p1);
-      ignore (type_predicate_named p2);
+      ignore (type_predicate p1);
+      ignore (type_predicate p2);
       c_int
     | Plet _ -> Error.not_yet "let _ = _ in _"
 
-    | Pforall(bounded_vars, { content = Pimplies(hyps, goal) })
-    | Pexists(bounded_vars, { content = Pand(hyps, goal) }) ->
+    | Pforall(bounded_vars, { pred_content = Pimplies(hyps, goal) })
+    | Pexists(bounded_vars, { pred_content = Pand(hyps, goal) }) ->
       let guards = !compute_quantif_guards_ref p bounded_vars hyps in
       List.iter
         (fun (t1, r1, x, r2, t2) ->
@@ -525,7 +525,7 @@ let rec type_predicate_named p =
           ignore (type_term ~force:true ~ctx t2);
           Interval.Env.add x i)
         guards;
-      (type_predicate_named goal).ty
+      (type_predicate goal).ty
 
     | Pinitialized(_, t)
     | Pfreeable(_, t)
@@ -538,7 +538,7 @@ let rec type_predicate_named p =
 
     | Pforall _ -> Error.not_yet "unguarded \\forall quantification"
     | Pexists _ -> Error.not_yet "unguarded \\exists quantification"
-    | Pat(p, _) -> (type_predicate_named p).ty
+    | Pat(p, _) -> (type_predicate p).ty
     | Pfresh _ -> Error.not_yet "\\fresh"
     | Psubtype _ -> Error.not_yet "subtyping relation" (* Jessie specific *)
   in
@@ -551,12 +551,12 @@ let type_term ~force ?ctx t =
 
 let type_named_predicate ?(must_clear=true) p =
   Options.feedback ~dkey ~level:3 "typing predicate '%a'."
-    Printer.pp_predicate_named p;
+    Printer.pp_predicate p;
   if must_clear then begin
     Interval.Env.clear ();
     Memo.clear ()
   end;
-  ignore (type_predicate_named p)
+  ignore (type_predicate p)
 
 (******************************************************************************)
 (** {2 Getters} *)
@@ -564,7 +564,7 @@ let type_named_predicate ?(must_clear=true) p =
 
 let get_integer_ty t = (Memo.get t).ty
 let get_integer_op t = (Memo.get t).op
-let get_integer_op_of_predicate p = (type_predicate_named p).op
+let get_integer_op_of_predicate p = (type_predicate p).op
 
 (* {!typ_of_integer}, but handle the not-integer cases. *)
 let extract_typ t ty =
@@ -593,7 +593,7 @@ let get_cast t =
   with Not_an_integer -> None
 
 let get_cast_of_predicate p =
-  let info = type_predicate_named p in
+  let info = type_predicate p in
   try Extlib.opt_map typ_of_integer_ty info.cast
   with Not_an_integer -> assert false
 
