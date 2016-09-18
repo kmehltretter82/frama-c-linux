@@ -74,6 +74,9 @@ PLUGIN_DISTRIBUTED:=no
 PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure
 PLUGIN_DISTRIB_BIN:=no
 
+# We "save" this variable so that it can be used once PLUGIN_DIR has been reset
+EACSL_PLUGIN_DIR:=$(PLUGIN_DIR)
+
 ###############
 # Local Flags #
 ###############
@@ -84,11 +87,11 @@ IS_DISTRIBUTED:=no
 # Local configuration #
 #######################
 
-PLUGIN_GENERATED:= $(PLUGIN_DIR)/local_config.ml
+PLUGIN_GENERATED:= $(EACSL_PLUGIN_DIR)/local_config.ml
 
-EACSL_VERSION=$(shell $(SED) -e 's/\\(.*\\)/\\1/' VERSION)
+EACSL_VERSION:=$(shell $(SED) -e 's/\\(.*\\)/\\1/' $(EACSL_PLUGIN_DIR)/VERSION)
 
-$(PLUGIN_DIR)/local_config.ml: $(PLUGIN_DIR)/Makefile.in VERSION
+$(EACSL_PLUGIN_DIR)/local_config.ml: $(EACSL_PLUGIN_DIR)/Makefile.in $(EACSL_PLUGIN_DIR)/VERSION
 	$(PRINT_MAKING) $@
 	$(RM) $@
 	$(ECHO) "(* This file was automatically generated from $<. Don't edit it. *)" >> $@
@@ -102,13 +105,13 @@ $(PLUGIN_DIR)/local_config.ml: $(PLUGIN_DIR)/Makefile.in VERSION
 ifeq (@MAY_RUN_TESTS@,yes)
 
 PLUGIN_TESTS_DIRS := reject runtime bts gmp no-main full-mmodel
-PLUGIN_TESTS_LIB := $(PLUGIN_DIR)/tests/print.ml
-E_ACSL_TESTS: $(PLUGIN_DIR)/tests/test_config
+PLUGIN_TESTS_LIB := $(EACSL_PLUGIN_DIR)/tests/print.ml
+E_ACSL_TESTS: $(EACSL_PLUGIN_DIR)/tests/test_config
 
 E_ACSL_DEFAULT_TESTS: \
-	$(PLUGIN_DIR)/tests/test_config \
-	$(PLUGIN_DIR)/tests/print.cmxs \
-	$(PLUGIN_DIR)/tests/print.cmo
+	$(EACSL_PLUGIN_DIR)/tests/test_config \
+	$(EACSL_PLUGIN_DIR)/tests/print.cmxs \
+	$(EACSL_PLUGIN_DIR)/tests/print.cmo
 
 clean::
 	$(PRINT_RM) cleaning generated test files
@@ -122,8 +125,8 @@ endif
 # E-ACSL C Libs: libjemalloc, libgmp           #
 ################################################
 
-EACSL_LIBDIR := $(PLUGIN_DIR)/lib
-EACSL_JEMALLOC_DIR := $(PLUGIN_DIR)/contrib/libjemalloc
+EACSL_LIBDIR := $(EACSL_PLUGIN_DIR)/lib
+EACSL_JEMALLOC_DIR := $(EACSL_PLUGIN_DIR)/contrib/libjemalloc
 EACSL_JEMALLOC_LIBNAME = libjemalloc-e-acsl.a
 EACSL_JEMALLOC_LIB = $(EACSL_LIBDIR)/$(EACSL_JEMALLOC_LIBNAME)
 
@@ -135,7 +138,7 @@ $(EACSL_JEMALLOC_LIB):
 
 EACSL_GMP_LIBNAME = libgmp-e-acsl.a
 EACSL_GMP_LIB = $(EACSL_LIBDIR)/$(EACSL_GMP_LIBNAME)
-EACSL_GMP_DIR := $(PLUGIN_DIR)/contrib/libgmp
+EACSL_GMP_DIR := $(EACSL_PLUGIN_DIR)/contrib/libgmp
 EACSL_GMP_MINI = mini-gmp.o
 
 ifeq (@FULL_GMP@, no)
