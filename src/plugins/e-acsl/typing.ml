@@ -165,21 +165,26 @@ end
 (* Compute the smallest type (bigger than [int]) which can contain the whole
    interval. It is the \theta operator of the JFLA's paper. *)
 let ty_of_interv ?ctx i =
-  let open Interval in
-  let is_pos = Integer.ge i.lower Integer.zero in
   try
-    let lkind = Cil.intKindForValue i.lower is_pos in
-    let ukind = Cil.intKindForValue i.upper is_pos in
-    (* kind corresponding to the interval *)
-    let itv_kind = if Cil.intTypeIncluded lkind ukind then ukind else lkind in
+    let itv_kind =
+      if Ival.is_bottom i then IInt
+      else match Ival.min_and_max i with
+        | Some l, Some u ->
+          let is_pos = Integer.ge l Integer.zero in
+          let lkind = Cil.intKindForValue l is_pos in
+          let ukind = Cil.intKindForValue u is_pos in
+          (* kind corresponding to the interval *)
+          if Cil.intTypeIncluded lkind ukind then ukind else lkind
+        | _, _ -> assert false (* should not happen *)
+    in
     (* convert the kind to [IInt] whenever smaller. *)
     let kind = if Cil.intTypeIncluded itv_kind IInt then IInt else itv_kind in
     (* ctx type whenever possible to prevent superfluous casts in the generated
        code *)
     (match ctx with
-    | None | Some (Gmp | Other) -> C_type kind
-    | Some (C_type ik as ctx) ->
-      if Cil.intTypeIncluded itv_kind ik then ctx else C_type kind)
+     | None | Some (Gmp | Other) -> C_type kind
+     | Some (C_type ik as ctx) ->
+       if Cil.intTypeIncluded itv_kind ik then ctx else C_type kind)
   with Cil.Not_representable ->
     Gmp
 
@@ -274,7 +279,7 @@ let rec type_term ~force ?ctx t =
         try
           let i = Interval.infer t in
           let i' = Interval.infer t' in
-          mk_ctx ~force:false (ty_of_interv ?ctx (Interval.join i i'))
+          mk_ctx ~force:false (ty_of_interv ?ctx (Ival.join i i'))
         with Interval.Not_an_integer ->
           Other (* real *)
       in
@@ -289,7 +294,7 @@ let rec type_term ~force ?ctx t =
           let i = Interval.infer t in
           let i1 = Interval.infer t1 in
           let i2 = Interval.infer t2 in
-          let ctx = ty_of_interv ?ctx (Interval.join i (Interval.join i1 i2)) in
+          let ctx = ty_of_interv ?ctx (Ival.join i (Ival.join i1 i2)) in
           mk_ctx ~force:false ctx
         with Interval.Not_an_integer ->
           Other (* real *)
@@ -304,7 +309,7 @@ let rec type_term ~force ?ctx t =
         try
           let i1 = Interval.infer t1 in
           let i2 = Interval.infer t2 in
-          mk_ctx ~force:false (ty_of_interv ?ctx (Interval.join i1 i2))
+          mk_ctx ~force:false (ty_of_interv ?ctx (Ival.join i1 i2))
         with Interval.Not_an_integer ->
           Other
       in
@@ -321,7 +326,7 @@ let rec type_term ~force ?ctx t =
         try
           let i1 = Interval.infer t1 in
           let i2 = Interval.infer t2 in
-          ty_of_interv ?ctx (Interval.join i1 i2)
+          ty_of_interv ?ctx (Ival.join i1 i2)
         with Interval.Not_an_integer ->
           Other
       in
@@ -357,7 +362,7 @@ let rec type_term ~force ?ctx t =
         try
           let i2 = Interval.infer t2 in
           let i3 = Interval.infer t3 in
-          let ctx = ty_of_interv ?ctx (Interval.join i (Interval.join i2 i3)) in
+          let ctx = ty_of_interv ?ctx (Ival.join i (Ival.join i2 i3)) in
           mk_ctx ~force:false ctx
         with Interval.Not_an_integer ->
           Other
@@ -375,7 +380,7 @@ let rec type_term ~force ?ctx t =
           let i = Interval.infer t in
           let i1 = Interval.infer t1 in
           let i2 = Interval.infer t2 in
-          ty_of_interv ?ctx (Interval.join i (Interval.join i1 i2))
+          ty_of_interv ?ctx (Ival.join i (Ival.join i1 i2))
         with Interval.Not_an_integer ->
           Other
       in
@@ -456,7 +461,7 @@ let rec type_predicate p =
         try
           let i1 = Interval.infer t1 in
           let i2 = Interval.infer t2 in
-          let i = Interval.join i1 i2 in
+          let i = Ival.join i1 i2 in
           mk_ctx ~force:false (ty_of_interv ~ctx:c_int i)
         with Interval.Not_an_integer ->
           Other
@@ -492,7 +497,7 @@ let rec type_predicate p =
         (fun (t1, r1, x, r2, t2) ->
           let i1 = Interval.infer t1 in
           let i1 = match r1 with
-            | Rlt -> Interval.add i1 Integer.one
+            | Rlt -> Ival.add_singleton_int Integer.one i1
             | Rle -> i1
             | _ -> assert false
           in
@@ -501,10 +506,10 @@ let rec type_predicate p =
                time before going outside the loop. *)
           let i2 = match r2 with
             | Rlt -> i2
-            | Rle -> Interval.add i2 Integer.one
+            | Rle -> Ival.add_singleton_int Integer.one i2
             | _ -> assert false
           in
-          let i = Interval.join i1 i2 in
+          let i = Ival.join i1 i2 in
           let ctx = match x.lv_type with
             | Linteger -> mk_ctx ~force:false (ty_of_interv ~ctx:Gmp i)
             | Ctype ty ->
