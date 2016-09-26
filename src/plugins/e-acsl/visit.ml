@@ -295,7 +295,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
   method !vglob_aux = function
   | GVarDecl(vi, _) | GVar(vi, _, _)
   | GFunDecl(_, vi, _) | GFun({ svar = vi }, _)
-      when Misc.is_library_loc vi.vdecl ->
+      when Misc.is_library_loc vi.vdecl || Builtins.mem vi.vname ->
     if generate then
       Cil.JustCopyPost
         (fun l ->
