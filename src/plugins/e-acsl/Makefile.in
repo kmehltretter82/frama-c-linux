@@ -89,8 +89,6 @@ IS_DISTRIBUTED:=no
 
 PLUGIN_GENERATED:= $(EACSL_PLUGIN_DIR)/local_config.ml
 
-EACSL_VERSION:=$(shell $(SED) -e 's/\\(.*\\)/\\1/' $(EACSL_PLUGIN_DIR)/VERSION)
-
 $(EACSL_PLUGIN_DIR)/local_config.ml: $(EACSL_PLUGIN_DIR)/Makefile.in $(EACSL_PLUGIN_DIR)/VERSION
 	$(PRINT_MAKING) $@
 	$(RM) $@
@@ -306,6 +304,12 @@ headers::
 ################
 
 include $(FRAMAC_SHARE)/Makefile.dynamic
+
+################
+# Version      #
+################
+
+EACSL_VERSION:=$(shell sed -e 's/\\(.*\\)/\\1/' $(EACSL_PLUGIN_DIR)/VERSION)
 
 ###########
 # Install #
