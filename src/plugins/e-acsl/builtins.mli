@@ -3,7 +3,7 @@
 (*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
 (*  Copyright (C) 2012-2016                                               *)
-(*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
+(*    CEA (Commissariat Ã  l'Ã©nergie atomique et aux Ã©nergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
 (*  you can redistribute it and/or modify it under the terms of the GNU   *)
@@ -20,23 +20,18 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include Plugin.S (** implementation of Log.S for E-ACSL *)
+(** E-ACSL built-in database. *)
 
-module Check: Parameter_sig.Bool
-module Run: Parameter_sig.Bool
-module Valid: Parameter_sig.Bool
-module Prepare: Parameter_sig.Bool
-module Gmp_only: Parameter_sig.Bool
-module Full_mmodel: Parameter_sig.Bool
-module Project_name: Parameter_sig.String
-module Builtins: Parameter_sig.String_set
+val mem: string -> bool
+(** @return true iff the given function name is an E-ACSL built-in *)
 
-val must_visit: unit -> bool
+val find: string -> Cil_types.varinfo
+(** Get the varinfo corresponding to the given E-ACSL built-in name.
+    @raise Not_found if it is not a built-in *)
 
-val dkey_analysis: Log.category
-val dkey_dup: Log.category
-val dkey_translation: Log.category
-val dkey_typing: Log.category
+val update: string -> Cil_types.varinfo -> unit
+(** If the given name is an E-ACSL built-in, change its old varinfo by the given
+    new one. *)
 
 (*
 Local Variables:

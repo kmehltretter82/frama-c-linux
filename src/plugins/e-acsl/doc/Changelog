@@ -15,7 +15,6 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
-=======
 -* E-ACSL       [2016/07/21] Enable reporting of stack traces during assertion
 	        failures in instrumented programs.
 -* E-ACSL       [2016/07/13] Add an e-acsl-gcc.sh option (--print--models)
@@ -26,14 +25,16 @@
 	        with E-ACSL runtime library.
 -* E-ACSL       [2016/07/01] Add custom implementation of malloc for use with
 	        E-ACSL runtime library (via jemalloc library).
--* E-ACSL       [2016/05/22] Add an e-acsl-gcc.sh option (--rte|-a) allowing to
-	        annotate the source program with memory-safety assertions prior to
-	        instrumentation.
->>>>>>> Changelog updates
+-  E-ACSL       [2016/05/31] New option -e-acsl-builtins which allows to
+	        declare pure C functions which can be used in logic
+	        function application.
 -  E-ACSL       [2016/05/23] Re-implementation of the type system which
 	        improves the efficiency of the generated code over integers.
 -* E-ACSL       [2016/05/23] Fix bug #2191 about complicate structs and
 	        literate string.
+-* E-ACSL       [2016/05/22] Add an e-acsl-gcc.sh option (--rte|-a) allowing to
+	        annotate the source program with memory-safety assertions prior
+	        to instrumentation.
 -* E-ACSL       [2016/05/23] Fix bug #1395 about recursive functions.
 -* E-ACSL       [2016/04/07] Fix 'make install' when executed within Frama-C.
 -* E-ACSL       [2016/03/31] Improve performance of Patricia Trie memory model.

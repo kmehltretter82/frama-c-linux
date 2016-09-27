@@ -232,7 +232,12 @@ let rec infer t =
     let i2 = infer t2 in
     meet i1 i2
 
-  | Tapp (_,_,_) -> Error.not_yet "logic function application"
+  | Tapp (li, _, _args) ->
+    (match li.l_type with
+    | None -> assert false (* [None] only possible for predicates *)
+    | Some Linteger -> Error.not_yet "logic function returning an integer"
+    | Some (Ctype ty) -> interv_of_typ ty
+    | Some _ -> raise Not_an_integer)
   | Tunion _ -> Error.not_yet "tset union"
   | Tinter _ -> Error.not_yet "tset intersection"
   | Tcomprehension (_,_,_) -> Error.not_yet "tset comprehension"

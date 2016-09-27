@@ -31,7 +31,7 @@ open Cil_datatype
 
 exception Unregistered_library_function of string
 val mk_call: loc:Location.t -> ?result:lval -> string -> exp list -> stmt
-(** Call an E-ACSL library function.
+(** Call an E-ACSL library function or an E-ACSL built-in.
     @raise Unregistered_library_function if the given string does not represent
     such a function or if these functions were never registered (only possible
     when using E-ACSL through its API. *)
@@ -86,6 +86,9 @@ val reorder_ast: unit -> unit
 (* Reorder current AST by bringing all global declarations belonging to the
  * E-ACSL runtime library and their dependencies (e.g., typedef size_t) to
  * the very top of the file. *)
+
+val cty: logic_type -> typ
+(* Assume that the logic type is indeed a C type. Just return it. *)
 
 (* ************************************************************************** *)
 (** {2 Handling prefixes of generated library functions and variables} *)

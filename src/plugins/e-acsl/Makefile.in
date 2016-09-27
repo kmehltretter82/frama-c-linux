@@ -53,6 +53,7 @@ PLUGIN_CMO:= local_config \
 	options \
 	rte \
 	error \
+	builtins \
 	misc \
 	gmpz \
 	literal_strings \

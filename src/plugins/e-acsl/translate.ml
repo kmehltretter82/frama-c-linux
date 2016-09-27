@@ -430,7 +430,36 @@ and context_insensitive_term_to_exp kf env t =
   | TStartOf lv -> 
     let lv, env, _ = tlval_to_lval kf env lv in
     Cil.mkAddrOrStartOf ~loc lv, env, false, "startof"
-  | Tapp _ -> not_yet env "applying logic function"
+  | Tapp(li, [], args) when Builtins.mem li.l_var_info.lv_name ->
+    (* E-ACSL built-in function call *)
+    let fname = li.l_var_info.lv_name in
+    let args, env = (* args computed in the reverse order *)
+      try
+        List.fold_left
+          (fun (l, env) a ->
+            let e, env = term_to_exp kf env a in
+            e :: l, env)
+          ([], env)
+          args
+      with Invalid_argument _ ->
+        Options.fatal "[Tapp] unexpected number of arguments when calling %s"
+          fname
+    in
+    (* build the varinfo (as an expression) which stores the result of the
+       function call. *)
+    let _, e, env =
+      Env.new_var
+        ~loc
+        ~name:(fname ^ "_app")
+        env
+        (Some t)
+        (Misc.cty (Extlib.the li.l_type))
+        (fun vi _ ->
+          [ Misc.mk_call ~loc ~result:(Cil.var vi) fname (List.rev args) ])
+    in
+    e, env, false, "app"
+  | Tapp _ ->
+    not_yet env "applying logic function"
   | Tlambda _ -> not_yet env "functional"
   | TDataCons _ -> not_yet env "constructor"
   | Tif(t1, t2, t3) ->
