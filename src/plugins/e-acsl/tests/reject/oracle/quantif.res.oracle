@@ -27,7 +27,7 @@ tests/reject/quantif.i:12:[e-acsl] warning: invalid E-ACSL construct
                   ∀ ℤ x, ℤ y; (0 ≤ x ≤ 3) ∨ (0 ≤ y ≤ 3) ⇒ x ≥ 0'.
                   Ignoring annotation.
 tests/reject/quantif.i:13:[e-acsl] warning: invalid E-ACSL construct
-                  `invalid binder x+1 in quantification ∀ int x; 0 ≤ x+1 ≤ 3 ⇒ x ≥ 0'.
+                  `invalid binder x + 1 in quantification ∀ int x; 0 ≤ x + 1 ≤ 3 ⇒ x ≥ 0'.
                   Ignoring annotation.
 tests/reject/quantif.i:14:[e-acsl] warning: invalid E-ACSL construct
                   `too much constraint(s) in quantification ∀ ℤ x; 0 ≤ x < 10 ∧ 9 ≤ x < 20 ⇒ x > z'.
@@ -35,7 +35,7 @@ tests/reject/quantif.i:14:[e-acsl] warning: invalid E-ACSL construct
 tests/reject/quantif.i:15:[e-acsl] warning: invalid E-ACSL construct
                   `invalid binder y in quantification
                   ∀ ℤ x, ℤ z, ℤ y;
-                    0 ≤ x < 2 ∧ 0 ≤ y < 5 ∧ 0 ≤ z ≤ y ⇒ x+z ≤ y+1'.
+                    0 ≤ x < 2 ∧ 0 ≤ y < 5 ∧ 0 ≤ z ≤ y ⇒ x + z ≤ y + 1'.
                   Ignoring annotation.
 [e-acsl] 9 annotations were ignored, being untypable.
 [e-acsl] 1 annotation was ignored, being unsupported.

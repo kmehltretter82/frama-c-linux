@@ -50,12 +50,12 @@ int main(void)
                     (char *)"main",(char *)"\\offset(PA) == 0",15);
   }
   PA ++;
-  /*@ assert \offset(PA+1) ≡ 8; */
+  /*@ assert \offset(PA + 1) ≡ 8; */
   {
     int __gen_e_acsl_offset_4;
     __gen_e_acsl_offset_4 = __e_acsl_offset((void *)(PA + 1UL));
     __e_acsl_assert(__gen_e_acsl_offset_4 == 8UL,(char *)"Assertion",
-                    (char *)"main",(char *)"\\offset(PA+1) == 8",17);
+                    (char *)"main",(char *)"\\offset(PA + 1) == 8",17);
   }
   __e_acsl_initialize((void *)(a),sizeof(int));
   a[0] = 1;
@@ -104,19 +104,19 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_offset_9 == 0UL,(char *)"Assertion",
                     (char *)"main",(char *)"\\offset(pl) == 0",29);
   }
-  /*@ assert \offset(pl+1) ≡ 1; */
+  /*@ assert \offset(pl + 1) ≡ 1; */
   {
     int __gen_e_acsl_offset_10;
     __gen_e_acsl_offset_10 = __e_acsl_offset((void *)(pl + 1UL));
     __e_acsl_assert(__gen_e_acsl_offset_10 == 1UL,(char *)"Assertion",
-                    (char *)"main",(char *)"\\offset(pl+1) == 1",30);
+                    (char *)"main",(char *)"\\offset(pl + 1) == 1",30);
   }
-  /*@ assert \offset(pl+7) ≡ 7; */
+  /*@ assert \offset(pl + 7) ≡ 7; */
   {
     int __gen_e_acsl_offset_11;
     __gen_e_acsl_offset_11 = __e_acsl_offset((void *)(pl + 7UL));
     __e_acsl_assert(__gen_e_acsl_offset_11 == 7UL,(char *)"Assertion",
-                    (char *)"main",(char *)"\\offset(pl+7) == 7",31);
+                    (char *)"main",(char *)"\\offset(pl + 7) == 7",31);
   }
   __e_acsl_full_init((void *)(& pi));
   pi = (int *)(& l);
@@ -145,35 +145,35 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_offset_14 == 0UL,(char *)"Assertion",
                     (char *)"main",(char *)"\\offset(p) == 0",39);
   }
-  /*@ assert \offset(p+1) ≡ 1; */
+  /*@ assert \offset(p + 1) ≡ 1; */
   {
     int __gen_e_acsl_offset_15;
     __gen_e_acsl_offset_15 = __e_acsl_offset((void *)(p + 1UL));
     __e_acsl_assert(__gen_e_acsl_offset_15 == 1UL,(char *)"Assertion",
-                    (char *)"main",(char *)"\\offset(p+1) == 1",40);
+                    (char *)"main",(char *)"\\offset(p + 1) == 1",40);
   }
-  /*@ assert \offset(p+11) ≡ 11; */
+  /*@ assert \offset(p + 11) ≡ 11; */
   {
     int __gen_e_acsl_offset_16;
     __gen_e_acsl_offset_16 = __e_acsl_offset((void *)(p + 11UL));
     __e_acsl_assert(__gen_e_acsl_offset_16 == 11UL,(char *)"Assertion",
-                    (char *)"main",(char *)"\\offset(p+11) == 11",41);
+                    (char *)"main",(char *)"\\offset(p + 11) == 11",41);
   }
   __e_acsl_full_init((void *)(& p));
   p += 5;
-  /*@ assert \offset(p+5) ≡ 10; */
+  /*@ assert \offset(p + 5) ≡ 10; */
   {
     int __gen_e_acsl_offset_17;
     __gen_e_acsl_offset_17 = __e_acsl_offset((void *)(p + 5UL));
     __e_acsl_assert(__gen_e_acsl_offset_17 == 10UL,(char *)"Assertion",
-                    (char *)"main",(char *)"\\offset(p+5) == 10",43);
+                    (char *)"main",(char *)"\\offset(p + 5) == 10",43);
   }
-  /*@ assert \offset(p-5) ≡ 0; */
+  /*@ assert \offset(p - 5) ≡ 0; */
   {
     int __gen_e_acsl_offset_18;
     __gen_e_acsl_offset_18 = __e_acsl_offset((void *)(p - 5UL));
     __e_acsl_assert(__gen_e_acsl_offset_18 == 0UL,(char *)"Assertion",
-                    (char *)"main",(char *)"\\offset(p-5) == 0",44);
+                    (char *)"main",(char *)"\\offset(p - 5) == 0",44);
   }
   __e_acsl_full_init((void *)(& q));
   q = (long *)malloc((unsigned long)30 * sizeof(long));
@@ -195,22 +195,22 @@ int main(void)
   }
   __e_acsl_full_init((void *)(& q));
   q += 2;
-  /*@ assert \offset(q) ≡ sizeof(long)*3; */
+  /*@ assert \offset(q) ≡ sizeof(long) * 3; */
   {
     int __gen_e_acsl_offset_21;
     __gen_e_acsl_offset_21 = __e_acsl_offset((void *)q);
     __e_acsl_assert(__gen_e_acsl_offset_21 == 8 * 3UL,(char *)"Assertion",
-                    (char *)"main",(char *)"\\offset(q) == sizeof(long)*3",
+                    (char *)"main",(char *)"\\offset(q) == sizeof(long) * 3",
                     53);
   }
   __e_acsl_full_init((void *)(& q));
   q += 4;
-  /*@ assert \offset(q) ≡ sizeof(long)*7; */
+  /*@ assert \offset(q) ≡ sizeof(long) * 7; */
   {
     int __gen_e_acsl_offset_22;
     __gen_e_acsl_offset_22 = __e_acsl_offset((void *)q);
     __e_acsl_assert(__gen_e_acsl_offset_22 == 8 * 7UL,(char *)"Assertion",
-                    (char *)"main",(char *)"\\offset(q) == sizeof(long)*7",
+                    (char *)"main",(char *)"\\offset(q) == sizeof(long) * 7",
                     55);
   }
   __retres = 0;

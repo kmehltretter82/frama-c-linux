@@ -2,18 +2,20 @@
 typedef int ArrayInt[5];
 /*@ ensures
       *\old(AverageAccel) ≡
-      (((((*\old(Accel))[4]+(*\old(Accel))[3])+(*\old(Accel))[2])+(*\old(
-                                                                    Accel))[1])+(*
-        \old(Accel))[0])/5;
+      (((((*\old(Accel))[4] + (*\old(Accel))[3]) + (*\old(Accel))[2]) +
+        (*\old(Accel))[1])
+       + (*\old(Accel))[0])
+      / 5;
  */
 void __gen_e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
                                                  int *AverageAccel);
 
 /*@ ensures
       *\old(AverageAccel) ≡
-      (((((*\old(Accel))[4]+(*\old(Accel))[3])+(*\old(Accel))[2])+(*\old(
-                                                                    Accel))[1])+(*
-        \old(Accel))[0])/5;
+      (((((*\old(Accel))[4] + (*\old(Accel))[3]) + (*\old(Accel))[2]) +
+        (*\old(Accel))[1])
+       + (*\old(Accel))[0])
+      / 5;
  */
 void atp_NORMAL_computeAverageAccel(ArrayInt *Accel, int *AverageAccel)
 {
@@ -54,9 +56,10 @@ int main(void)
 
 /*@ ensures
       *\old(AverageAccel) ≡
-      (((((*\old(Accel))[4]+(*\old(Accel))[3])+(*\old(Accel))[2])+(*\old(
-                                                                    Accel))[1])+(*
-        \old(Accel))[0])/5;
+      (((((*\old(Accel))[4] + (*\old(Accel))[3]) + (*\old(Accel))[2]) +
+        (*\old(Accel))[1])
+       + (*\old(Accel))[0])
+      / 5;
  */
 void __gen_e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
                                                  int *AverageAccel)
@@ -121,7 +124,7 @@ void __gen_e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
     __e_acsl_assert(*__gen_e_acsl_at == (int)((((((*__gen_e_acsl_at_2)[4UL] + (*__gen_e_acsl_at_3)[3UL]) + (*__gen_e_acsl_at_4)[2UL]) + (*__gen_e_acsl_at_5)[1UL]) + (*__gen_e_acsl_at_6)[0UL]) / 5L),
                     (char *)"Postcondition",
                     (char *)"atp_NORMAL_computeAverageAccel",
-                    (char *)"*\\old(AverageAccel) ==\n(((((*\\old(Accel))[4]+(*\\old(Accel))[3])+(*\\old(Accel))[2])+(*\\old(Accel))[1])+(*\n  \\old(Accel))[0])/5",
+                    (char *)"*\\old(AverageAccel) ==\n(((((*\\old(Accel))[4] + (*\\old(Accel))[3]) + (*\\old(Accel))[2]) +\n  (*\\old(Accel))[1])\n + (*\\old(Accel))[0])\n/ 5",
                     8);
     __e_acsl_delete_block((void *)(& Accel));
     __e_acsl_delete_block((void *)(& AverageAccel));

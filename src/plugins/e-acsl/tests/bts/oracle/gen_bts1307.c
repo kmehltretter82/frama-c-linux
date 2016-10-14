@@ -6,7 +6,8 @@
     behavior OverEstimate_Motoring:
       assumes \true;
       ensures
-        *\old(Mtmax_out) ≡ *\old(Mtmax_in)+(5-((5/80)**\old(Mwmax))*0.4);
+        *\old(Mtmax_out) ≡
+        *\old(Mtmax_in) + (5 - ((5 / 80) * *\old(Mwmax)) * 0.4);
  */
 void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out);
 
@@ -17,7 +18,8 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out);
     behavior OverEstimate_Motoring:
       assumes \true;
       ensures
-        *\old(Mtmax_out) ≡ *\old(Mtmax_in)+(5-((5/80)**\old(Mwmax))*0.4);
+        *\old(Mtmax_out) ≡
+        *\old(Mtmax_in) + (5 - ((5 / 80) * *\old(Mwmax)) * 0.4);
  */
 void foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
 {
@@ -40,9 +42,9 @@ void foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     behavior UnderEstimate_Motoring:
       assumes \true;
       ensures
-        *\old(Mtmin_out) ≡ *\old(Mtmin_in) < 0.85**\old(Mwmin)?
+        *\old(Mtmin_out) ≡ *\old(Mtmin_in) < 0.85 * *\old(Mwmin)?
           *\old(Mtmin_in) ≢ 0.:
-          0.85**\old(Mwmin) ≢ 0.;
+          0.85 * *\old(Mwmin) ≢ 0.;
  */
 void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out);
 
@@ -53,9 +55,9 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out);
     behavior UnderEstimate_Motoring:
       assumes \true;
       ensures
-        *\old(Mtmin_out) ≡ *\old(Mtmin_in) < 0.85**\old(Mwmin)?
+        *\old(Mtmin_out) ≡ *\old(Mtmin_in) < 0.85 * *\old(Mwmin)?
           *\old(Mtmin_in) ≢ 0.:
-          0.85**\old(Mwmin) ≢ 0.;
+          0.85 * *\old(Mwmin) ≢ 0.;
  */
 void bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
 {
@@ -101,9 +103,9 @@ int main(void)
     behavior UnderEstimate_Motoring:
       assumes \true;
       ensures
-        *\old(Mtmin_out) ≡ *\old(Mtmin_in) < 0.85**\old(Mwmin)?
+        *\old(Mtmin_out) ≡ *\old(Mtmin_in) < 0.85 * *\old(Mwmin)?
           *\old(Mtmin_in) ≢ 0.:
-          0.85**\old(Mwmin) ≢ 0.;
+          0.85 * *\old(Mwmin) ≢ 0.;
  */
 void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
 {
@@ -185,7 +187,7 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
       __gen_e_acsl_if = 0.85 * *__gen_e_acsl_at_6 != 0.;
     }
     __e_acsl_assert(__gen_e_acsl_if,(char *)"Postcondition",(char *)"bar",
-                    (char *)"*\\old(Mtmin_out) == *\\old(Mtmin_in) < 0.85**\\old(Mwmin)?\n  *\\old(Mtmin_in) != 0.:\n  0.85**\\old(Mwmin) != 0.",
+                    (char *)"*\\old(Mtmin_out) == *\\old(Mtmin_in) < 0.85 * *\\old(Mwmin)?\n  *\\old(Mtmin_in) != 0.:\n  0.85 * *\\old(Mwmin) != 0.",
                     23);
     __e_acsl_delete_block((void *)(& Mtmin_in));
     __e_acsl_delete_block((void *)(& Mwmin));
@@ -201,7 +203,8 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     behavior OverEstimate_Motoring:
       assumes \true;
       ensures
-        *\old(Mtmax_out) ≡ *\old(Mtmax_in)+(5-((5/80)**\old(Mwmax))*0.4);
+        *\old(Mtmax_out) ≡
+        *\old(Mtmax_in) + (5 - ((5 / 80) * *\old(Mwmax)) * 0.4);
  */
 void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
 {
@@ -249,7 +252,7 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
                                                               ((long double)(
                                                                5 / 80) * *__gen_e_acsl_at_3) * 0.4),
                     (char *)"Postcondition",(char *)"foo",
-                    (char *)"*\\old(Mtmax_out) == *\\old(Mtmax_in)+(5-((5/80)**\\old(Mwmax))*0.4)",
+                    (char *)"*\\old(Mtmax_out) == *\\old(Mtmax_in) + (5 - ((5 / 80) * *\\old(Mwmax)) * 0.4)",
                     11);
     __e_acsl_delete_block((void *)(& Mtmax_in));
     __e_acsl_delete_block((void *)(& Mwmax));

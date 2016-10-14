@@ -11,16 +11,16 @@ char *T = (char *)"bar";
 int G = 0;
 void f(void)
 {
-  /*@ assert *(T+G) ≡ 'b'; */
+  /*@ assert *(T + G) ≡ 'b'; */
   {
     int __gen_e_acsl_valid_read;
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(T + (unsigned long)G),
                                                   sizeof(char));
     __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"f",
-                    (char *)"mem_access: \\valid_read(T+(unsigned long)G)",
+                    (char *)"mem_access: \\valid_read(T + (unsigned long)G)",
                     11);
     __e_acsl_assert(*(T + (unsigned long)G) == 'b',(char *)"Assertion",
-                    (char *)"f",(char *)"*(T+G) == \'b\'",11);
+                    (char *)"f",(char *)"*(T + G) == \'b\'",11);
   }
   G ++;
   return;
@@ -83,16 +83,16 @@ int main(void)
   __e_acsl_store_block((void *)(& SS),8UL);
   __e_acsl_full_init((void *)(& SS));
   SS = (char *)__gen_e_acsl_literal_string;
-  /*@ assert *(S+G2) ≡ 'o'; */
+  /*@ assert *(S + G2) ≡ 'o'; */
   {
     int __gen_e_acsl_valid_read;
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(S + (unsigned long)G2),
                                                   sizeof(char));
     __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"main",
-                    (char *)"mem_access: \\valid_read(S+(unsigned long)G2)",
+                    (char *)"mem_access: \\valid_read(S + (unsigned long)G2)",
                     25);
     __e_acsl_assert(*(S + (unsigned long)G2) == 'o',(char *)"Assertion",
-                    (char *)"main",(char *)"*(S+G2) == \'o\'",25);
+                    (char *)"main",(char *)"*(S + G2) == \'o\'",25);
   }
   /*@ assert \initialized(S); */
   {

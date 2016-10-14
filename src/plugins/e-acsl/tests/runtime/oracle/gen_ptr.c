@@ -42,43 +42,43 @@ int main(void)
   /*@ assert t[2] ≡ 4; */
   __e_acsl_assert(t[2UL] == 4,(char *)"Assertion",(char *)"main",
                   (char *)"t[2] == 4",13);
-  /*@ assert t[(2*sizeof(int))/sizeof((int)0x0)] ≡ 4; */
+  /*@ assert t[(2 * sizeof(int)) / sizeof((int)0x0)] ≡ 4; */
   __e_acsl_assert((unsigned long)((unsigned long)(2 * 4) / 4) < 3,
                   (char *)"RTE",(char *)"main",
-                  (char *)"index_bound: (unsigned long)((unsigned long)(2*4)/4) < 3",
+                  (char *)"index_bound: (unsigned long)((unsigned long)(2 * 4) / 4) < 3",
                   14);
   __e_acsl_assert(t[(2UL * 4) / 4] == 4,(char *)"Assertion",(char *)"main",
-                  (char *)"t[(2*sizeof(int))/sizeof((int)0x0)] == 4",14);
+                  (char *)"t[(2 * sizeof(int)) / sizeof((int)0x0)] == 4",14);
   {
     int i;
     i = 0;
     while (i < 2) {
-      /*@ assert t[i] ≡ i+2; */
+      /*@ assert t[i] ≡ i + 2; */
       __e_acsl_assert((unsigned long)((unsigned int)i) < 3U,(char *)"RTE",
                       (char *)"main",
                       (char *)"index_bound: (unsigned long)i < 3",17);
       __e_acsl_assert(t[(unsigned long)i] == i + 2L,(char *)"Assertion",
-                      (char *)"main",(char *)"t[i] == i+2",17);
-      /*@ assert t[2-i] ≡ 4-i; */
+                      (char *)"main",(char *)"t[i] == i + 2",17);
+      /*@ assert t[2 - i] ≡ 4 - i; */
       __e_acsl_assert((unsigned long)((unsigned int)(2L - i)) < 3U,
                       (char *)"RTE",(char *)"main",
-                      (char *)"index_bound: (unsigned long)((long)(2-i)) < 3",
+                      (char *)"index_bound: (unsigned long)((long)(2 - i)) < 3",
                       18);
       __e_acsl_assert(t[(unsigned long)(2L - i)] == 4L - i,
                       (char *)"Assertion",(char *)"main",
-                      (char *)"t[2-i] == 4-i",18);
-      /*@ assert *(&t[2]-i) ≡ 4-i; */
+                      (char *)"t[2 - i] == 4 - i",18);
+      /*@ assert *(&t[2] - i) ≡ 4 - i; */
       {
         int __gen_e_acsl_valid_read_2;
         __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(& t[2UL] - (unsigned long)i),
                                                         sizeof(int));
         __e_acsl_assert(__gen_e_acsl_valid_read_2,(char *)"RTE",
                         (char *)"main",
-                        (char *)"mem_access: \\valid_read(&t[2]-(unsigned long)i)",
+                        (char *)"mem_access: \\valid_read(&t[2] - (unsigned long)i)",
                         19);
         __e_acsl_assert(*(& t[2UL] - (unsigned long)i) == 4L - i,
                         (char *)"Assertion",(char *)"main",
-                        (char *)"*(&t[2]-i) == 4-i",19);
+                        (char *)"*(&t[2] - i) == 4 - i",19);
       }
       i ++;
     }
