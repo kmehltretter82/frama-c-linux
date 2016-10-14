@@ -184,7 +184,7 @@ let ty_of_interv ?ctx i =
           let ukind = Cil.intKindForValue u is_pos in
           (* kind corresponding to the interval *)
           if Cil.intTypeIncluded lkind ukind then ukind else lkind
-        | _, _ -> assert false (* should not happen *)
+        | _, _ -> Kernel.fatal ~current:true "ival: %a" Ival.pretty i
     in
     (* convert the kind to [IInt] whenever smaller. *)
     let kind = if Cil.intTypeIncluded itv_kind IInt then IInt else itv_kind in
