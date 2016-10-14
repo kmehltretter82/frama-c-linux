@@ -43,12 +43,7 @@ int main(void)
   __e_acsl_assert(t[2L] == 4,(char *)"Assertion",(char *)"main",
                   (char *)"t[2] == 4",13);
   /*@ assert t[(2*sizeof(int))/sizeof((int)0x0)] ≡ 4; */
-  __e_acsl_assert((long)((long)(2 * 4) / 4) < 3,(char *)"RTE",(char *)"main",
-                  (char *)"index_bound: (long)((long)(2*4)/4) < 3",14);
-  __e_acsl_assert(0 <= (long)((long)(2 * 4) / 4),(char *)"RTE",
-                  (char *)"main",
-                  (char *)"index_bound: 0 <= (long)((long)(2*4)/4)",14);
-  __e_acsl_assert(t[(2L * 4) / 4] == 4,(char *)"Assertion",(char *)"main",
+  __e_acsl_assert(t[(2 * 4) / 4] == 4,(char *)"Assertion",(char *)"main",
                   (char *)"t[(2*sizeof(int))/sizeof((int)0x0)] == 4",14);
   {
     int i;

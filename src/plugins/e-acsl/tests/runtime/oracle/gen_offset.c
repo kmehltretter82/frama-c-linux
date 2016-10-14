@@ -199,7 +199,7 @@ int main(void)
   {
     int __gen_e_acsl_offset_21;
     __gen_e_acsl_offset_21 = __e_acsl_offset((void *)q);
-    __e_acsl_assert(__gen_e_acsl_offset_21 == 8 * 3UL,(char *)"Assertion",
+    __e_acsl_assert(__gen_e_acsl_offset_21 == 8 * 3,(char *)"Assertion",
                     (char *)"main",(char *)"\\offset(q) == sizeof(long)*3",
                     53);
   }
@@ -209,7 +209,7 @@ int main(void)
   {
     int __gen_e_acsl_offset_22;
     __gen_e_acsl_offset_22 = __e_acsl_offset((void *)q);
-    __e_acsl_assert(__gen_e_acsl_offset_22 == 8 * 7UL,(char *)"Assertion",
+    __e_acsl_assert(__gen_e_acsl_offset_22 == 8 * 7,(char *)"Assertion",
                     (char *)"main",(char *)"\\offset(q) == sizeof(long)*7",
                     55);
   }
