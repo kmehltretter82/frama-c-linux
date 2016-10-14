@@ -4,5 +4,4 @@ FRAMAC_SHARE/libc/stdlib.h:160:[kernel] warning: No code nor implicit assigns cl
 tests/runtime/loop.i:19:[value] warning: loop invariant got status unknown.
 FRAMAC_SHARE/e-acsl/e_acsl.h:43:[value] warning: function __e_acsl_assert: precondition got status invalid.
 tests/runtime/loop.i:19:[value] warning: accessing uninitialized left-value.
-                 assert
-                 \initialized(&t[(unsigned long)__gen_e_acsl_k_2][(unsigned long)__gen_e_acsl_l_2]);
+                 assert \initialized(&t[__gen_e_acsl_k_2][__gen_e_acsl_l_2]);

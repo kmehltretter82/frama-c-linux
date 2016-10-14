@@ -46,10 +46,8 @@ let c_int = C_type IInt
 let ikind ik = C_type ik
 let other = Other
 
-(* the integer_ty corresponding to size_t *)
-let size_t () = match Cil.theMachine.Cil.typeOfSizeOf with
-  | TInt(kind, _) -> C_type kind
-  | _ -> assert false
+(* the integer_ty corresponding to the largest possible offset. *)
+let offset_ty () = C_type Cil.theMachine.Cil.ptrdiffKind
 
 include Datatype.Make
 (struct
@@ -412,7 +410,7 @@ let rec type_term ~force ?ctx t =
       (* it is a pointer, while [t2] is a size_t. But both [t1] and [t2] must
          be typed. *)
       ignore (type_term ~force:false ~ctx:Other t1);
-      ignore (type_term ~force:true ~ctx:(size_t ()) t2);
+      ignore (type_term ~force:true ~ctx:(offset_ty ()) t2);
       dup Other
 
     | Tapp(li, _, args) ->
@@ -462,8 +460,8 @@ and type_term_offset = function
   | TField(_, toff)
   | TModel(_, toff) -> type_term_offset toff
   | TIndex(t, toff) ->
-    (* [t] is an array index which must fit into size_t *)
-    ignore (type_term ~force:true ~ctx:(size_t ()) t);
+    (* [t] is an array index which must fit into offset_ty *)
+    ignore (type_term ~force:true ~ctx:(offset_ty ()) t);
     type_term_offset toff
 
 let rec type_predicate p =
