@@ -122,14 +122,8 @@ let rec infer t =
     let i1 = infer t1 in
     let i2 = infer t2 in
     Ival.c_rem i1 i2
-  | TBinOp (Shiftlt , t1, t2) ->
-    let i1 = infer t1 in
-    let i2 = infer t2 in
-    Ival.shift_left i1 i2
-  | TBinOp (Shiftrt , t1, t2) ->
-    let i1 = infer t1 in
-    let i2 = infer t2 in
-    Ival.shift_right i1 i2
+  | TBinOp (Shiftlt , _, _) -> Error.not_yet "right shift"
+  | TBinOp (Shiftrt , _, _) -> Error.not_yet "left shift"
   | TBinOp (BAnd, _, _) -> Error.not_yet "bitwise and"
   | TBinOp (BXor, t1, t2) ->
     let i1 = infer t1 in
