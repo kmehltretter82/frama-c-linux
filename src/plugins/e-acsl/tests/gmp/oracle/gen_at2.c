@@ -91,9 +91,9 @@ void f(void)
 
 void g(int *p, int *q)
 {
-  unsigned long __gen_e_acsl_at_3;
+  int __gen_e_acsl_at_3;
   __e_acsl_mpz_t __gen_e_acsl_at_2;
-  unsigned long __gen_e_acsl_at;
+  int __gen_e_acsl_at;
   __e_acsl_store_block((void *)(& p),8UL);
   __e_acsl_store_block((void *)(& q),8UL);
   __e_acsl_initialize((void *)p,sizeof(int));
@@ -108,14 +108,14 @@ void g(int *p, int *q)
       __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)q,sizeof(int));
       __e_acsl_assert(__gen_e_acsl_valid_read_3,(char *)"RTE",(char *)"g",
                       (char *)"mem_access: \\valid_read(q)",28);
-      __gen_e_acsl_at_3 = (unsigned long)*q;
+      __gen_e_acsl_at_3 = *q;
     }
     {
       int __gen_e_acsl_valid_read;
       __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)q,sizeof(int));
       __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"g",
                       (char *)"mem_access: \\valid_read(q)",26);
-      __gen_e_acsl_at = (unsigned long)*q;
+      __gen_e_acsl_at = *q;
     }
     __e_acsl_initialize((void *)p,sizeof(int));
   *p = 2;

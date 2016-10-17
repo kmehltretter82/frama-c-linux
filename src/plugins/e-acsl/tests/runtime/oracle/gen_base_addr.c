@@ -48,7 +48,7 @@ int main(void)
   {
     void *__gen_e_acsl_base_addr_3;
     void *__gen_e_acsl_base_addr_4;
-    __gen_e_acsl_base_addr_3 = __e_acsl_base_addr((void *)(& A[3UL]));
+    __gen_e_acsl_base_addr_3 = __e_acsl_base_addr((void *)(& A[3L]));
     __gen_e_acsl_base_addr_4 = __e_acsl_base_addr((void *)PA);
     __e_acsl_assert(__gen_e_acsl_base_addr_3 == __gen_e_acsl_base_addr_4,
                     (char *)"Assertion",(char *)"main",
@@ -69,8 +69,8 @@ int main(void)
   {
     void *__gen_e_acsl_base_addr_7;
     void *__gen_e_acsl_base_addr_8;
-    __gen_e_acsl_base_addr_7 = __e_acsl_base_addr((void *)(PA + 2UL));
-    __gen_e_acsl_base_addr_8 = __e_acsl_base_addr((void *)(& A[3UL]));
+    __gen_e_acsl_base_addr_7 = __e_acsl_base_addr((void *)(PA + 2L));
+    __gen_e_acsl_base_addr_8 = __e_acsl_base_addr((void *)(& A[3L]));
     __e_acsl_assert(__gen_e_acsl_base_addr_7 == __gen_e_acsl_base_addr_8,
                     (char *)"Assertion",(char *)"main",
                     (char *)"\\base_addr(PA+2) == \\base_addr(&A[3])",17);
@@ -99,7 +99,7 @@ int main(void)
   {
     void *__gen_e_acsl_base_addr_11;
     void *__gen_e_acsl_base_addr_12;
-    __gen_e_acsl_base_addr_11 = __e_acsl_base_addr((void *)(& a[3UL]));
+    __gen_e_acsl_base_addr_11 = __e_acsl_base_addr((void *)(& a[3L]));
     __gen_e_acsl_base_addr_12 = __e_acsl_base_addr((void *)pa);
     __e_acsl_assert(__gen_e_acsl_base_addr_11 == __gen_e_acsl_base_addr_12,
                     (char *)"Assertion",(char *)"main",
@@ -121,7 +121,7 @@ int main(void)
   {
     void *__gen_e_acsl_base_addr_15;
     void *__gen_e_acsl_base_addr_16;
-    __gen_e_acsl_base_addr_15 = __e_acsl_base_addr((void *)(pa + 2UL));
+    __gen_e_acsl_base_addr_15 = __e_acsl_base_addr((void *)(pa + 2L));
     __gen_e_acsl_base_addr_16 = __e_acsl_base_addr((void *)(a));
     __e_acsl_assert(__gen_e_acsl_base_addr_15 == __gen_e_acsl_base_addr_16,
                     (char *)"Assertion",(char *)"main",
@@ -145,7 +145,7 @@ int main(void)
   {
     void *__gen_e_acsl_base_addr_19;
     void *__gen_e_acsl_base_addr_20;
-    __gen_e_acsl_base_addr_19 = __e_acsl_base_addr((void *)(pl + 2UL));
+    __gen_e_acsl_base_addr_19 = __e_acsl_base_addr((void *)(pl + 2L));
     __gen_e_acsl_base_addr_20 = __e_acsl_base_addr((void *)(& l));
     __e_acsl_assert(__gen_e_acsl_base_addr_19 == __gen_e_acsl_base_addr_20,
                     (char *)"Assertion",(char *)"main",
@@ -195,8 +195,8 @@ int main(void)
   {
     void *__gen_e_acsl_base_addr_27;
     void *__gen_e_acsl_base_addr_28;
-    __gen_e_acsl_base_addr_27 = __e_acsl_base_addr((void *)(p + 1UL));
-    __gen_e_acsl_base_addr_28 = __e_acsl_base_addr((void *)(pd + 5UL));
+    __gen_e_acsl_base_addr_27 = __e_acsl_base_addr((void *)(p + 1L));
+    __gen_e_acsl_base_addr_28 = __e_acsl_base_addr((void *)(pd + 5L));
     __e_acsl_assert(__gen_e_acsl_base_addr_27 == __gen_e_acsl_base_addr_28,
                     (char *)"Assertion",(char *)"main",
                     (char *)"\\base_addr(p+1) == \\base_addr(pd+5)",45);
@@ -205,8 +205,8 @@ int main(void)
   {
     void *__gen_e_acsl_base_addr_29;
     void *__gen_e_acsl_base_addr_30;
-    __gen_e_acsl_base_addr_29 = __e_acsl_base_addr((void *)(p + 11UL));
-    __gen_e_acsl_base_addr_30 = __e_acsl_base_addr((void *)(pd + 1UL));
+    __gen_e_acsl_base_addr_29 = __e_acsl_base_addr((void *)(p + 11L));
+    __gen_e_acsl_base_addr_30 = __e_acsl_base_addr((void *)(pd + 1L));
     __e_acsl_assert(__gen_e_acsl_base_addr_29 == __gen_e_acsl_base_addr_30,
                     (char *)"Assertion",(char *)"main",
                     (char *)"\\base_addr(p+11) == \\base_addr(pd+1)",46);
@@ -217,7 +217,7 @@ int main(void)
   {
     void *__gen_e_acsl_base_addr_31;
     void *__gen_e_acsl_base_addr_32;
-    __gen_e_acsl_base_addr_31 = __e_acsl_base_addr((void *)(p + 5UL));
+    __gen_e_acsl_base_addr_31 = __e_acsl_base_addr((void *)(p + 5L));
     __gen_e_acsl_base_addr_32 = __e_acsl_base_addr((void *)pd);
     __e_acsl_assert(__gen_e_acsl_base_addr_31 == __gen_e_acsl_base_addr_32,
                     (char *)"Assertion",(char *)"main",
@@ -227,7 +227,7 @@ int main(void)
   {
     void *__gen_e_acsl_base_addr_33;
     void *__gen_e_acsl_base_addr_34;
-    __gen_e_acsl_base_addr_33 = __e_acsl_base_addr((void *)(p - 5UL));
+    __gen_e_acsl_base_addr_33 = __e_acsl_base_addr((void *)(p - 5L));
     __gen_e_acsl_base_addr_34 = __e_acsl_base_addr((void *)pd);
     __e_acsl_assert(__gen_e_acsl_base_addr_33 == __gen_e_acsl_base_addr_34,
                     (char *)"Assertion",(char *)"main",

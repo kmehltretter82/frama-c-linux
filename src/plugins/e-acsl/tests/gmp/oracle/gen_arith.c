@@ -18,13 +18,13 @@ int main(void)
   __e_acsl_assert(0 != ~ 0,(char *)"Assertion",(char *)"main",
                   (char *)"0 != ~0",12);
   /*@ assert x+1 ≡ -2; */
-  __e_acsl_assert(x + 1L == -2L,(char *)"Assertion",(char *)"main",
+  __e_acsl_assert(x + 1L == -2,(char *)"Assertion",(char *)"main",
                   (char *)"x+1 == -2",14);
   /*@ assert x-1 ≡ -4; */
-  __e_acsl_assert(x - 1L == -4L,(char *)"Assertion",(char *)"main",
+  __e_acsl_assert(x - 1L == -4,(char *)"Assertion",(char *)"main",
                   (char *)"x-1 == -4",15);
   /*@ assert x*3 ≡ -9; */
-  __e_acsl_assert(x * 3L == -9L,(char *)"Assertion",(char *)"main",
+  __e_acsl_assert(x * 3L == -9,(char *)"Assertion",(char *)"main",
                   (char *)"x*3 == -9",16);
   /*@ assert x/3 ≡ -1; */
   __e_acsl_assert(x / 3 == -1,(char *)"Assertion",(char *)"main",
@@ -66,7 +66,7 @@ int main(void)
   __e_acsl_assert(3 % -2 == 1,(char *)"Assertion",(char *)"main",
                   (char *)"3%-2 == 1",21);
   /*@ assert ((x*2+(3+y))-4)+(x-y) ≡ -10; */
-  __e_acsl_assert(((x * 2L + (3L + y)) - 4L) + (x - y) == -10L,
+  __e_acsl_assert(((x * 2L + (3L + y)) - 4L) + (x - y) == -10,
                   (char *)"Assertion",(char *)"main",
                   (char *)"((x*2+(3+y))-4)+(x-y) == -10",23);
   /*@ assert (0≡1) ≡ !(0≡0); */

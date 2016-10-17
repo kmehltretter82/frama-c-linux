@@ -46,10 +46,8 @@ let c_int = C_type IInt
 let ikind ik = C_type ik
 let other = Other
 
-(* the integer_ty corresponding to size_t *)
-let size_t () = match Cil.theMachine.Cil.typeOfSizeOf with
-  | TInt(kind, _) -> C_type kind
-  | _ -> assert false
+(* the integer_ty corresponding to the largest possible offset. *)
+let offset_ty () = C_type Cil.theMachine.Cil.ptrdiffKind
 
 include Datatype.Make
 (struct
@@ -226,12 +224,24 @@ let mk_ctx ~force c =
 let rec type_term ~force ?ctx t =
   let ctx = Extlib.opt_map (mk_ctx ~force) ctx in
   let dup ty = ty, ty in
+  let compute_ctx ?ctx i =
+    (* in order to get a minimal amount of generated casts for operators, the
+       result is typed in the given context [ctx], but not the operands.
+       This function returns a tuple (ctx_of_result, ctx_of_operands) *)
+    match ctx with
+    | None ->
+      (* no context: factorize *)
+      dup (mk_ctx ~force:false (ty_of_interv i))
+    | Some ctx ->
+      mk_ctx ~force:false (ty_of_interv ~ctx i),
+      mk_ctx ~force:false (ty_of_interv i)
+  in
   let infer t =
     Cil.CurrentLoc.set t.term_loc;
     (* this pattern matching implements the formal rules of the JFLA's paper
        (and of course also covers the missing cases). Also enforce the invariant
        that every subterm is typed, even if it is not an integer. *)
-    match t.term_node with 
+    match t.term_node with
     | TConst (Integer _ | LChr _ | LEnum _)
     | TSizeOf _
     | TSizeOfStr _
@@ -284,33 +294,32 @@ let rec type_term ~force ?ctx t =
       dup ty
 
     | TUnOp (unop, t') ->
-      let ctx =
+      let ctx_res, ctx =
         try
           let i = Interval.infer t in
           let i' = Interval.infer t' in
-          mk_ctx ~force:false (ty_of_interv ?ctx (Ival.join i i'))
+          compute_ctx ?ctx (Ival.join i i')
         with Interval.Not_an_integer ->
-          Other (* real *)
+          dup Other (* real *)
       in
       ignore (type_term ~force:false ~ctx t');
       (match unop with
-      | LNot -> c_int, ctx (* converted into [t == 0] in case of GMP *)
-      | Neg | BNot -> dup ctx)
+      | LNot -> c_int, ctx_res (* converted into [t == 0] in case of GMP *)
+      | Neg | BNot -> dup ctx_res)
 
     | TBinOp((PlusA | MinusA | Mult | Div | Mod | Shiftlt | Shiftrt), t1, t2) ->
-      let ctx =
+      let ctx_res, ctx =
         try
           let i = Interval.infer t in
           let i1 = Interval.infer t1 in
           let i2 = Interval.infer t2 in
-          let ctx = ty_of_interv ?ctx (Ival.join i (Ival.join i1 i2)) in
-          mk_ctx ~force:false ctx
+          compute_ctx ?ctx (Ival.join i (Ival.join i1 i2))
         with Interval.Not_an_integer ->
-          Other (* real *)
+          dup Other (* real *)
       in
       ignore (type_term ~force ~ctx t1);
       ignore (type_term ~force ~ctx t2);
-      dup ctx
+      dup ctx_res
 
     | TBinOp ((Lt | Gt | Le | Ge | Eq | Ne), t1, t2) ->
       assert (match ctx with None -> true | Some c -> compare c c_int >= 0);
@@ -412,7 +421,7 @@ let rec type_term ~force ?ctx t =
       (* it is a pointer, while [t2] is a size_t. But both [t1] and [t2] must
          be typed. *)
       ignore (type_term ~force:false ~ctx:Other t1);
-      ignore (type_term ~force:true ~ctx:(size_t ()) t2);
+      ignore (type_term ~force:true ~ctx:(offset_ty ()) t2);
       dup Other
 
     | Tapp(li, _, args) ->
@@ -462,8 +471,8 @@ and type_term_offset = function
   | TField(_, toff)
   | TModel(_, toff) -> type_term_offset toff
   | TIndex(t, toff) ->
-    (* [t] is an array index which must fit into size_t *)
-    ignore (type_term ~force:true ~ctx:(size_t ()) t);
+    (* [t] is an array index which must fit into offset_ty *)
+    ignore (type_term ~force:true ~ctx:(offset_ty ()) t);
     type_term_offset toff
 
 let rec type_predicate p =
