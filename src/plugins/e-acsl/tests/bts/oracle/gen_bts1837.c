@@ -89,7 +89,7 @@ int main(void)
     int tmp;
     { /* sequence */
       tmp = i;
-      /*@ assert Value: signed_overflow: -2147483648 ≤ i-1; */
+      /*@ assert Value: signed_overflow: -2147483648 ≤ i - 1; */
       i --;
       ;
     }

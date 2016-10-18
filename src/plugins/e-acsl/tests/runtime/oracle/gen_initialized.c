@@ -164,13 +164,13 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_initialized_14,(char *)"Assertion",
                     (char *)"main",(char *)"!\\initialized(r)",46);
   }
-  /*@ assert ¬\initialized(r+1); */
+  /*@ assert ¬\initialized(r + 1); */
   {
     int __gen_e_acsl_initialized_15;
     __gen_e_acsl_initialized_15 = __e_acsl_initialized((void *)(r + 1L),
                                                        sizeof(long));
     __e_acsl_assert(! __gen_e_acsl_initialized_15,(char *)"Assertion",
-                    (char *)"main",(char *)"!\\initialized(r+1)",47);
+                    (char *)"main",(char *)"!\\initialized(r + 1)",47);
   }
   __e_acsl_initialize((void *)(d),sizeof(long));
   d[0] = (long)1;
@@ -206,13 +206,13 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_initialized_19,(char *)"Assertion",
                     (char *)"main",(char *)"\\initialized(r)",53);
   }
-  /*@ assert ¬\initialized(r+1); */
+  /*@ assert ¬\initialized(r + 1); */
   {
     int __gen_e_acsl_initialized_20;
     __gen_e_acsl_initialized_20 = __e_acsl_initialized((void *)(r + 1L),
                                                        sizeof(long));
     __e_acsl_assert(! __gen_e_acsl_initialized_20,(char *)"Assertion",
-                    (char *)"main",(char *)"!\\initialized(r+1)",54);
+                    (char *)"main",(char *)"!\\initialized(r + 1)",54);
   }
   __e_acsl_initialize((void *)(& d[1]),sizeof(long));
   d[1] = (long)1;
@@ -248,13 +248,13 @@ int main(void)
     __e_acsl_assert(__gen_e_acsl_initialized_24,(char *)"Assertion",
                     (char *)"main",(char *)"\\initialized(r)",60);
   }
-  /*@ assert \initialized(r+1); */
+  /*@ assert \initialized(r + 1); */
   {
     int __gen_e_acsl_initialized_25;
     __gen_e_acsl_initialized_25 = __e_acsl_initialized((void *)(r + 1L),
                                                        sizeof(long));
     __e_acsl_assert(__gen_e_acsl_initialized_25,(char *)"Assertion",
-                    (char *)"main",(char *)"\\initialized(r+1)",61);
+                    (char *)"main",(char *)"\\initialized(r + 1)",61);
   }
   __e_acsl_full_init((void *)(& p));
   p = (int *)malloc(sizeof(int *));
@@ -338,10 +338,10 @@ int main(void)
     i = 0;
     while (i < size) {
       if (i % 2 != 0) 
-        /*@ assert Value: mem_access: \valid(partsc+i); */
+        /*@ assert Value: mem_access: \valid(partsc + i); */
         *(partsc + i) = (char)'0';
       else 
-        /*@ assert Value: mem_access: \valid(partsi+i); */
+        /*@ assert Value: mem_access: \valid(partsi + i); */
         *(partsi + i) = (char)0;
       i ++;
     }

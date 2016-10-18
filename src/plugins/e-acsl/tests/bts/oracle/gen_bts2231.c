@@ -3,7 +3,7 @@ long A = (long)0;
 int main(void)
 {
   int __retres;
-  /*@ assert A+(long)((long)(3*A)-1) ≡ -1; */
+  /*@ assert A + (long)((long)(3 * A) - 1) ≡ -1; */
   {
     __e_acsl_mpz_t __gen_e_acsl_A;
     __e_acsl_mpz_t __gen_e_acsl_;
@@ -20,7 +20,7 @@ int main(void)
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_A));
     __gen_e_acsl__2 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_mul));
     /*@ assert
-        Value: signed_overflow: -9223372036854775808 ≤ __gen_e_acsl__2-1;
+        Value: signed_overflow: -9223372036854775808 ≤ __gen_e_acsl__2 - 1;
     */
     __gmpz_init_set_si(__gen_e_acsl__3,__gen_e_acsl__2 - 1L);
     __gmpz_init(__gen_e_acsl_add);
@@ -31,7 +31,7 @@ int main(void)
     __gen_e_acsl_eq = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_add),
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__4));
     __e_acsl_assert(__gen_e_acsl_eq == 0,(char *)"Assertion",(char *)"main",
-                    (char *)"A+(long)((long)(3*A)-1) == -1",8);
+                    (char *)"A + (long)((long)(3 * A) - 1) == -1",8);
     __gmpz_clear(__gen_e_acsl_A);
     __gmpz_clear(__gen_e_acsl_);
     __gmpz_clear(__gen_e_acsl_mul);

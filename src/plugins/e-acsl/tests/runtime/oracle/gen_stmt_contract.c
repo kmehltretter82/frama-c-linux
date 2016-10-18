@@ -37,22 +37,22 @@ int main(void)
         ensures x ≡ 3;
       
       behavior b2:
-        requires x ≡ 3+y;
+        requires x ≡ 3 + y;
         requires y ≡ 2;
-        ensures x ≡ y+1;
+        ensures x ≡ y + 1;
   */
   {
     __e_acsl_assert(x == 5,(char *)"Precondition",(char *)"main",
                     (char *)"x == 5",23);
     __e_acsl_assert(x == 3L + y,(char *)"Precondition",(char *)"main",
-                    (char *)"x == 3+y",26);
+                    (char *)"x == 3 + y",26);
     __e_acsl_assert(y == 2,(char *)"Precondition",(char *)"main",
                     (char *)"y == 2",27);
     x = 3;
     __e_acsl_assert(x == 3,(char *)"Postcondition",(char *)"main",
                     (char *)"x == 3",24);
     __e_acsl_assert(x == y + 1L,(char *)"Postcondition",(char *)"main",
-                    (char *)"x == y+1",28);
+                    (char *)"x == y + 1",28);
   }
   /*@ behavior b1:
         assumes x ≡ 1;
@@ -62,7 +62,7 @@ int main(void)
         assumes x ≡ 3;
         assumes y ≡ 2;
         requires x ≡ 3;
-        requires x+y ≡ 5;
+        requires x + y ≡ 5;
   */
   {
     int __gen_e_acsl_implies;
@@ -83,7 +83,7 @@ int main(void)
     if (! __gen_e_acsl_and_2) __gen_e_acsl_implies_3 = 1;
     else __gen_e_acsl_implies_3 = x + y == 5L;
     __e_acsl_assert(__gen_e_acsl_implies_3,(char *)"Precondition",
-                    (char *)"main",(char *)"x == 3 && y == 2 ==> x+y == 5",
+                    (char *)"main",(char *)"x == 3 && y == 2 ==> x + y == 5",
                     38);
     x += y;
   }

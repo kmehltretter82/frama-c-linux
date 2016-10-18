@@ -50,9 +50,9 @@ void i(void)
       ensures X ≡ 3;
     
     behavior b2:
-      requires X ≡ 3+Y;
+      requires X ≡ 3 + Y;
       requires Y ≡ 2;
-      ensures X ≡ Y+1;
+      ensures X ≡ Y + 1;
  */
 void __gen_e_acsl_j(void);
 
@@ -61,9 +61,9 @@ void __gen_e_acsl_j(void);
       ensures X ≡ 3;
     
     behavior b2:
-      requires X ≡ 3+Y;
+      requires X ≡ 3 + Y;
       requires Y ≡ 2;
-      ensures X ≡ Y+1;
+      ensures X ≡ Y + 1;
  */
 void j(void)
 {
@@ -79,7 +79,7 @@ void j(void)
       assumes X ≡ 3;
       assumes Y ≡ 2;
       requires X ≡ 3;
-      requires X+Y ≡ 5;
+      requires X + Y ≡ 5;
  */
 void __gen_e_acsl_k(void);
 
@@ -91,7 +91,7 @@ void __gen_e_acsl_k(void);
       assumes X ≡ 3;
       assumes Y ≡ 2;
       requires X ≡ 3;
-      requires X+Y ≡ 5;
+      requires X + Y ≡ 5;
  */
 void k(void)
 {
@@ -118,7 +118,7 @@ int l(void)
       assumes X ≡ 5;
       assumes Y ≡ 2;
       ensures X ≡ 7;
-      ensures X ≡ \old(X)+Y;
+      ensures X ≡ \old(X) + Y;
  */
 void __gen_e_acsl_m(void);
 
@@ -130,7 +130,7 @@ void __gen_e_acsl_m(void);
       assumes X ≡ 5;
       assumes Y ≡ 2;
       ensures X ≡ 7;
-      ensures X ≡ \old(X)+Y;
+      ensures X ≡ \old(X) + Y;
  */
 void m(void)
 {
@@ -229,7 +229,7 @@ void __gen_e_acsl_n(void)
       assumes X ≡ 5;
       assumes Y ≡ 2;
       ensures X ≡ 7;
-      ensures X ≡ \old(X)+Y;
+      ensures X ≡ \old(X) + Y;
  */
 void __gen_e_acsl_m(void)
 {
@@ -267,7 +267,8 @@ void __gen_e_acsl_m(void)
     else __gen_e_acsl_implies_3 = X == __gen_e_acsl_at_4 + Y;
     __e_acsl_assert(__gen_e_acsl_implies_3,(char *)"Postcondition",
                     (char *)"m",
-                    (char *)"\\old(X == 5 && Y == 2) ==> X == \\old(X)+Y",61);
+                    (char *)"\\old(X == 5 && Y == 2) ==> X == \\old(X) + Y",
+                    61);
     return;
   }
 }
@@ -290,7 +291,7 @@ int __gen_e_acsl_l(void)
       assumes X ≡ 3;
       assumes Y ≡ 2;
       requires X ≡ 3;
-      requires X+Y ≡ 5;
+      requires X + Y ≡ 5;
  */
 void __gen_e_acsl_k(void)
 {
@@ -313,7 +314,7 @@ void __gen_e_acsl_k(void)
     if (! __gen_e_acsl_and_2) __gen_e_acsl_implies_3 = 1;
     else __gen_e_acsl_implies_3 = X + Y == 5L;
     __e_acsl_assert(__gen_e_acsl_implies_3,(char *)"Precondition",
-                    (char *)"k",(char *)"X == 3 && Y == 2 ==> X+Y == 5",43);
+                    (char *)"k",(char *)"X == 3 && Y == 2 ==> X + Y == 5",43);
     k();
   }
   return;
@@ -324,23 +325,23 @@ void __gen_e_acsl_k(void)
       ensures X ≡ 3;
     
     behavior b2:
-      requires X ≡ 3+Y;
+      requires X ≡ 3 + Y;
       requires Y ≡ 2;
-      ensures X ≡ Y+1;
+      ensures X ≡ Y + 1;
  */
 void __gen_e_acsl_j(void)
 {
   __e_acsl_assert(X == 5,(char *)"Precondition",(char *)"j",(char *)"X == 5",
                   27);
   __e_acsl_assert(X == 3L + Y,(char *)"Precondition",(char *)"j",
-                  (char *)"X == 3+Y",30);
+                  (char *)"X == 3 + Y",30);
   __e_acsl_assert(Y == 2,(char *)"Precondition",(char *)"j",(char *)"Y == 2",
                   31);
   j();
   __e_acsl_assert(X == 3,(char *)"Postcondition",(char *)"j",
                   (char *)"X == 3",28);
   __e_acsl_assert(X == Y + 1L,(char *)"Postcondition",(char *)"j",
-                  (char *)"X == Y+1",32);
+                  (char *)"X == Y + 1",32);
   return;
 }
 

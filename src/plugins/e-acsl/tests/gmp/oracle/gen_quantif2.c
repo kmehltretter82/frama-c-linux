@@ -246,7 +246,7 @@ int main(void)
   }
   /*@ assert
       ∀ ℤ x, ℤ y, ℤ z;
-        0 ≤ x < 2 ∧ 0 ≤ y < 5 ∧ 0 ≤ z ≤ y ⇒ x+z ≤ y+1;
+        0 ≤ x < 2 ∧ 0 ≤ y < 5 ∧ 0 ≤ z ≤ y ⇒ x + z ≤ y + 1;
   */
   {
     int __gen_e_acsl_forall_5;
@@ -374,7 +374,7 @@ int main(void)
     }
     e_acsl_end_loop5: ;
     __e_acsl_assert(__gen_e_acsl_forall_5,(char *)"Assertion",(char *)"main",
-                    (char *)"\\forall integer x, integer y, integer z;\n  0 <= x < 2 && 0 <= y < 5 && 0 <= z <= y ==> x+z <= y+1",
+                    (char *)"\\forall integer x, integer y, integer z;\n  0 <= x < 2 && 0 <= y < 5 && 0 <= z <= y ==> x + z <= y + 1",
                     16);
     __gmpz_clear(__gen_e_acsl_x_5);
     __gmpz_clear(__gen_e_acsl_y);
@@ -432,7 +432,7 @@ int main(void)
   /*@ assert
       ∀ int x;
         0 ≤ x < 10 ⇒
-        x%2 ≡ 0 ⇒ (∃ ℤ y; 0 ≤ y ≤ x/2 ∧ x ≡ 2*y);
+        x % 2 ≡ 0 ⇒ (∃ ℤ y; 0 ≤ y ≤ x / 2 ∧ x ≡ 2 * y);
   */
   {
     int __gen_e_acsl_forall_6;
@@ -571,7 +571,7 @@ int main(void)
     }
     e_acsl_end_loop8: ;
     __e_acsl_assert(__gen_e_acsl_forall_6,(char *)"Assertion",(char *)"main",
-                    (char *)"\\forall int x;\n  0 <= x < 10 ==> x%2 == 0 ==> (\\exists integer y; 0 <= y <= x/2 && x == 2*y)",
+                    (char *)"\\forall int x;\n  0 <= x < 10 ==>\n  x % 2 == 0 ==> (\\exists integer y; 0 <= y <= x / 2 && x == 2 * y)",
                     25);
     __gmpz_clear(__gen_e_acsl_x_7);
   }
