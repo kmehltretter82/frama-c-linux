@@ -183,9 +183,6 @@ EACSL_SHARE := $(EACSL_PLUGIN_DIR)/share/e-acsl
 
 EACSL_RTL_SRC = $(wildcard $(EACSL_SHARE)/*.[ch] $(EACSL_SHARE)/*/*.[ch])
 
-foo:
-	echo $(EACSL_RTL_SRC)
-
 RTLFAGS = -std=c99 -Wall -Wno-unused -Wno-attributes -I$(EACSL_SHARE) \
   -fno-omit-frame-pointer -DE_ACSL_BUILTINS
 
