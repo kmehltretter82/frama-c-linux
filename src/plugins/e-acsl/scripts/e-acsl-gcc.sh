@@ -118,13 +118,13 @@ rte_options() {
   return 0;
 }
 
-# Locate the sources of available E-ACSL memory models
-# - If no arguments specified then print the names of all memory models
+# Locate available E-ACSL memory models
+# - If no arguments are given then print the names of all memory models
 #    available in this distribution of E-ACSL.
 # - If an argument is specified then it is assumed to be the name of a memory
 #    model. In this case the following function prints the full path to a static
 #    library representing this memory model.
-mmodel_sources() {
+mmodel_lib() {
   local models="$(find $LIBDIR/ -name 'libeacsl-*-rtl.a' -exec basename {} \; \
     | sed 's/^libeacsl-\(.*\)-rtl.a/\1/')"
 
@@ -389,7 +389,7 @@ do
     # Print names of the supported memody models.
     --print-mmodels)
       shift;
-      mmodel_sources
+      mmodel_lib
       exit 0
     ;;
   esac
@@ -452,7 +452,7 @@ fi
 
 # Once EACSL_SHARE is defined check the memory models provided at inputs
 for mod in $OPTION_EACSL_MMODELS; do
-  mmodel_sources $mod
+  mmodel_lib $mod
 done
 
 # Gcc and related flags
@@ -574,7 +574,7 @@ if [ -n "$OPTION_COMPILE" ]; then
       OUTPUT_EXEC="$EACSL_OUTPUT_EXEC"
     fi
     # Sources of the selected memory model
-    EACSL_RTL=`mmodel_sources "$mod"`
+    EACSL_RTL=`mmodel_lib "$mod"`
     ($OPTION_ECHO;
      $CC \
        $CFLAGS $CPPFLAGS \

@@ -114,7 +114,7 @@ AC_ARG_ENABLE(full-gmp,
 #####
 AC_ARG_ENABLE(optimized-rtl,
     AS_HELP_STRING([--enable-optimized-rtl],
-    ["Disable runtime assertions in the RTL"]),
+    ["Enable runtime library optimizations"]),
     [OPTIMIZED_RTL="yes"],[OPTIMIZED_RTL="no"])
 
 #######################

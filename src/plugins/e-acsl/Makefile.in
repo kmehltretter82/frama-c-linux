@@ -183,13 +183,16 @@ EACSL_SHARE := $(EACSL_PLUGIN_DIR)/share/e-acsl
 
 EACSL_RTL_SRC = $(wildcard $(EACSL_SHARE)/*.[ch] $(EACSL_SHARE)/*/*.[ch])
 
+foo:
+	echo $(EACSL_RTL_SRC)
+
 RTLFAGS = -std=c99 -Wall -Wno-unused -Wno-attributes -I$(EACSL_SHARE) \
   -fno-omit-frame-pointer -DE_ACSL_BUILTINS
 
 ifeq (@OPTIMIZED_RTL@,no)
 RTLFAGS += -DE_ACSL_DEBUG -g3 -O0
 else
-RTLFAGS += -O3
+RTLFAGS += -O2
 endif
 
 # Build a static library
@@ -205,7 +208,7 @@ MKRTL = \
   $(RM) -f $$object && \
   ranlib $2
 
-$(EACSL_LIBDIR)/libeacsl-%-rtl.a: $(EACSL_SHARE)/*/*_%_mmodel.c $(EACSL_RTL_SRC)
+$(EACSL_LIBDIR)/libeacsl-%-rtl.a: $(EACSL_SHARE)/%_model/e_acsl_*_mmodel.c $(EACSL_RTL_SRC)
 	$(call MKRTL, $(RTLFAGS), $@, $<)
 
 EACSL_RTL = $(EACSL_LIBDIR)/libeacsl-bittree-rtl.a
@@ -394,8 +397,7 @@ uninstall::
 	      $(FRAMAC_DATADIR)/manuals/e-acsl-implementation.pdf \
 	      $(FRAMAC_DATADIR)/manuals/e-acsl-manual.pdf
 	$(PRINT_RM) E-ACSL libraries
-	$(RM) $(LIBDIR)/$(EACSL_JEMALLOC_LIBNAME)
-	$(RM) $(LIBDIR)/$(EACSL_GMP_LIBNAME)
+	$(RM) $(LIBDIR)/libeacsl-*.a
 	$(PRINT_RM) E-ACSL scripts
 	$(RM) $(BINDIR)/e-acsl-gcc.sh
 	$(PRINT_RM) man pages
