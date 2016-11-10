@@ -125,17 +125,22 @@ rte_options() {
 #    model. In this case the following function prints the full path to a static
 #    library representing this memory model.
 mmodel_lib() {
-  local models="$(find $LIBDIR/ -name 'libeacsl-*-rtl.a' -exec basename {} \; \
-    | sed 's/^libeacsl-\(.*\)-rtl.a/\1/')"
+  local rt_feature="opt"
+  if [ -n "$OPTION_RT_DEBUG" ]; then
+    rt_feature="debug"
+  fi
+
+  local models="$(find $LIBDIR/ -name 'libeacsl-*-rtl-opt.a' -exec basename {} \; \
+    | sed 's/^libeacsl-\(.*\)-rtl-opt.a/\1/')"
 
   if [ -n "$1" ]; then
     local modelname="$(echo $models | tr ' ' '\n' | grep "^$1$")"
-    local modelpath="$(realpath $LIBDIR/libeacsl-$modelname-rtl.a 2>/dev/null)"
+    local modelpath="$(realpath $LIBDIR/libeacsl-$modelname-rtl-$rt_feature.a 2>/dev/null)"
 
     if [ -n "$modelpath" ]; then
       echo $modelpath
     else
-      error "Memory model '$1' is not available in this distribution"
+      error "Memory model '$1'-$rt_feature is not available in this distribution"
     fi
   else
     echo $models
@@ -151,8 +156,8 @@ LONGOPTIONS="help,compile,compile-only,print,debug:,ocode:,oexec:,verbose:,
   frama-c-only,extra-cpp-args:,frama-c-stdlib,full-mmodel,gmp,quiet,logfile:,
   ld-flags:,cpp-flags:,frama-c-extra:,memory-model:,
   frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:,
-  print-mmodels"
-SHORTOPTIONS="h,c,C,p,d:,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,I:,G:,X,a:"
+  print-mmodels,rt-debug"
+SHORTOPTIONS="h,c,C,p,d:,D,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,I:,G:,X,a:"
 # Prefix for an error message due to wrong arguments
 ERROR="ERROR parsing arguments:"
 
@@ -168,6 +173,7 @@ OPTION_PRINT=                            # Output instrumented code
 OPTION_DEBUG=                            # Set Frama-C debug flag
 OPTION_VERBOSE=                          # Set Frama-C verbose flag
 OPTION_COMPILE=                          # Compile instrumented program
+OPTION_RT_DEBUG=                         # Enable runtime debug features
 OPTION_OUTPUT_CODE="a.out.frama.c"       # Name of the translated file
 OPTION_OUTPUT_EXEC="a.out"               # Generated executable name
 OPTION_EACSL_OUTPUT_EXEC=""              # Name of E-ACSL executable
@@ -245,6 +251,12 @@ do
       exec > $1
       exec 2> $1
       shift;
+    ;;
+    # Enable runtime debug features, i.e., compile unoptimized executable
+    # with assertions, extra checks and other debug features
+    --rt-debug|-D)
+      shift
+      OPTION_RT_DEBUG=1
     ;;
     # Pass an option to a Frama-C invocation
     --frama-c-extra|-F)

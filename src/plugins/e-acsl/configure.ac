@@ -110,13 +110,6 @@ AC_ARG_ENABLE(full-gmp,
     ["Disable runtime assertions in the RTL"]),
     [FULL_GMP="yes"],[FULL_GMP="no"])
 
-# RTL
-#####
-AC_ARG_ENABLE(optimized-rtl,
-    AS_HELP_STRING([--enable-optimized-rtl],
-    ["Enable runtime library optimizations"]),
-    [OPTIMIZED_RTL="yes"],[OPTIMIZED_RTL="no"])
-
 #######################
 # Generating Makefile #
 #######################

@@ -15,6 +15,8 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
+-* E-ACSL       [2016/08/02] Added --rt-debug feature to e-acsl-gcc.sh.
+	        --enable-optimized-rtl configure option removed
 -* E-ACSL       [2016/08/02] Added --enable-optimized-rtl option to configure
 -* E-ACSL       [2016/08/02] Removed --production|-P, --no-stdlib|-N and
 	        --debug-log|-D options of e-acsl-gcc.sh.

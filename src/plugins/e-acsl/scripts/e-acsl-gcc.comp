@@ -31,7 +31,7 @@ _eacsl_gcc() {
   opts="
     -i -C -p -d -o -O -v -f -E -L -M -l -e -g -q -s -F -P -N -D -I -G -X -a
     -h -c -msegment -mbittree
-    --verbose= --debug= --debug-log= --logfile= --quiet --production --help
+    --verbose= --debug= --debug-log= --logfile= --quiet --rt-debug --help
     --ocode= --oexec= --oexec-e-acsl=
     --ld-flags= --cpp-flags= --extra-cpp-args=
     --frama-c-extra= --frama-c= --gcc= --e-acsl-share= --memory-model=
