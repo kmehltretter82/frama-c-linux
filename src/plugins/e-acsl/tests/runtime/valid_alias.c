@@ -1,6 +1,6 @@
 /* run.config
    COMMENT: \valid in presence of aliasing
-   STDOPT: +"-val-builtin malloc:Frama_C_alloc_size -val-builtin free:Frama_C_free"
+   STDOPT: +"-val-builtin malloc:Frama_C_alloc_size,free:Frama_C_free -no-val-malloc-returns-null"
 */
 
 #include "stdlib.h"
