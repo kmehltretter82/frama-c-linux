@@ -132,9 +132,10 @@ run_test() {
 
   # Compile instrumented source and run executable
   for model in $MODELS; do
-    # Command for compiling the instrumented file with a given memory model
-    COMMAND="$EACSLGCC --compile-only --memory-model=$model --logfile=$logfile \
-      --oexec-e-acsl=$oexec-$model $ocode"
+    # Command for compiling the instrumented file with a given memory model.
+    # Make sure executables are compiled in the debug mode.
+    COMMAND="$EACSLGCC --compile-only --rt-debug --memory-model=$model \
+      --logfile=$logfile --oexec-e-acsl=$oexec-$model $ocode"
     debug "Run $COMMAND"
     $COMMAND || error "Command $COMMAND failed" "$logfile"
     run_executable $oexec-$model $oexeclog-$model $model

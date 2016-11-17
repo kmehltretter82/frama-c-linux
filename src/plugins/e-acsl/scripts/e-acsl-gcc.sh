@@ -34,8 +34,7 @@ error () {
 }
 
 # Check whether the first line reported by running command $1 has an identifier
-# specified by $2. E.g., check whether readlink used by the script is GNU and
-# getopt comes from util-linux.
+# specified by $2.
 required_tool() {
   "$1" --version 2>&1 | head -1 | grep "$2" > /dev/null
   error "$1 is not $2" $?
@@ -52,8 +51,24 @@ check_tool() {
    { has_tool "$1" || test -e "$1"; } || error "No executable $1 found";
 }
 
-# build and output option string for RTE plugin based on a comma-delimited
-# option string
+# Portable realpath using pwd
+realpath() {
+  if [ -e "$1" ]; then
+    if [ -d "$1" ]; then
+      (cd "$1" && pwd)
+    else
+      local name=$(basename "$1")
+      local dir=$(cd $(dirname "$1") && pwd)
+      echo $dir/$name
+    fi
+    return 0
+  else
+    echo "realpath: no such file or directory: '$1'" 1>&2
+    return 1
+  fi
+}
+
+# Process option string for RTE plugin
 rte_options() {
   local optstring="$1"
   local start="-rte -rte-warn"
@@ -103,18 +118,46 @@ rte_options() {
   return 0;
 }
 
+# Locate available E-ACSL memory models
+# - If no arguments are given then print the names of all memory models
+#    available in this distribution of E-ACSL.
+# - If an argument is specified then it is assumed to be the name of a memory
+#    model. In this case the following function prints the full path to a static
+#    library representing this memory model.
+mmodel_lib() {
+  local rt_feature="opt"
+  if [ -n "$OPTION_RT_DEBUG" ]; then
+    rt_feature="debug"
+  fi
+
+  local models="$(find $LIBDIR/ -name 'libeacsl-*-rtl-opt.a' -exec basename {} \; \
+    | sed 's/^libeacsl-\(.*\)-rtl-opt.a/\1/')"
+
+  if [ -n "$1" ]; then
+    local modelname="$(echo $models | tr ' ' '\n' | grep "^$1$")"
+    local modelpath="$(realpath $LIBDIR/libeacsl-$modelname-rtl-$rt_feature.a 2>/dev/null)"
+
+    if [ -n "$modelpath" ]; then
+      echo $modelpath
+    else
+      error "Memory model '$1'-$rt_feature is not available in this distribution"
+    fi
+  else
+    echo $models
+  fi
+}
+
 # Check if the following tools are GNU and abort otherwise
 required_tool getopt "util-linux"
-required_tool readlink "GNU coreutils"
 required_tool find "GNU findutils"
 
 # Getopt options
 LONGOPTIONS="help,compile,compile-only,print,debug:,ocode:,oexec:,verbose:,
   frama-c-only,extra-cpp-args:,frama-c-stdlib,full-mmodel,gmp,quiet,logfile:,
-  ld-flags:,cpp-flags:,frama-c-extra:,memory-model:,production,no-stdlib,
-  debug-log:,frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:,
-  print-mmodels"
-SHORTOPTIONS="h,c,C,p,d:,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,P,N,D:,I:,G:,X,a:"
+  ld-flags:,cpp-flags:,frama-c-extra:,memory-model:,
+  frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:,
+  print-mmodels,rt-debug"
+SHORTOPTIONS="h,c,C,p,d:,D,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,I:,G:,X,a:"
 # Prefix for an error message due to wrong arguments
 ERROR="ERROR parsing arguments:"
 
@@ -130,25 +173,19 @@ OPTION_PRINT=                            # Output instrumented code
 OPTION_DEBUG=                            # Set Frama-C debug flag
 OPTION_VERBOSE=                          # Set Frama-C verbose flag
 OPTION_COMPILE=                          # Compile instrumented program
+OPTION_RT_DEBUG=                         # Enable runtime debug features
 OPTION_OUTPUT_CODE="a.out.frama.c"       # Name of the translated file
 OPTION_OUTPUT_EXEC="a.out"               # Generated executable name
 OPTION_EACSL_OUTPUT_EXEC=""              # Name of E-ACSL executable
 OPTION_EACSL="-e-acsl"                   # Specifies E-ACSL run
 OPTION_FRAMA_STDLIB="-no-frama-c-stdlib" # Use Frama-C stdlib
 OPTION_FULL_MMODEL=                      # Instrument as much as possible
-OPTION_PRINT_MMODELS=                    # Print memory model names
 OPTION_GMP=                              # Use GMP integers everywhere
-OPTION_DEBUG_MACRO="-DE_ACSL_DEBUG"      # Debug macro
-OPTION_DEBUG_LOG_MACRO=""                # Specification of debug log file
 OPTION_FRAMAC_CPP_EXTRA=""               # Extra CPP flags for Frama-C
 OPTION_EACSL_MMODELS="bittree"           # Memory model used
 OPTION_EACSL_SHARE=                      # Custom E-ACSL share directory
 OPTION_INSTRUMENTED_ONLY=                # Do not compile original code
 OPTION_RTE=                              # Enable assertion generation
-# The following option controls whether to use gcc builtins
-# (e.g., __builtin_strlen) in RTL or fall back to custom implementations
-# of standard functions.
-OPTION_BUILTINS="-DE_ACSL_BUILTINS"
 
 manpage() {
   printf "e-acsl-gcc.sh - instrument and compile C files with E-ACSL
@@ -157,16 +194,15 @@ Options:
   -h         show this help page
   -c         compile instrumented code
   -l         pass additional options to the linker
-  -e         pass additional options to the pre-preprocessor
-  -E         pass additional arguments to the Frama-C pre-processor
-  -p         output the generated code with rich formatting to STDOUT
+  -e         pass additional options to the prepreprocessor
+  -E         pass additional arguments to the Frama-C preprocessor
+  -p         output the generated code to STDOUT
   -o <file>  output the generated code to <file> [a.out.frama.c]
   -O <file>  output the generated executables to <file> [a.out, a.out.e-acsl]
   -M         maximize memory-related instrumentation
   -g         always use GMP integers instead of C integral types
   -q         suppress any output except for errors and warnings
   -s <file>  redirect all output to <file>
-  -P         compile executable without debug features
   -I <file>  specify Frama-C executable [frama-c]
   -G <file>  specify C compiler executable [gcc]
 
@@ -177,7 +213,7 @@ Notes:
 }
 
 # Base dir of this script
-BASEDIR="$(readlink -f `dirname $0`)"
+BASEDIR="$(realpath `dirname $0`)"
 # Directory with contrib libraries of E-ACSL
 LIBDIR="$BASEDIR/../lib"
 
@@ -215,6 +251,12 @@ do
       exec > $1
       exec 2> $1
       shift;
+    ;;
+    # Enable runtime debug features, i.e., compile unoptimized executable
+    # with assertions, extra checks and other debug features
+    --rt-debug|-D)
+      shift
+      OPTION_RT_DEBUG=1
     ;;
     # Pass an option to a Frama-C invocation
     --frama-c-extra|-F)
@@ -323,19 +365,6 @@ do
       shift;
       OPTION_GMP="-e-acsl-gmp-only"
     ;;
-    -P|--production)
-      shift;
-      OPTION_DEBUG_MACRO=""
-    ;;
-    -N|--no-stdlib)
-      shift;
-      OPTION_BUILTINS=""
-    ;;
-    -D|--debug-log)
-      shift;
-      OPTION_DEBUG_LOG_MACRO="-DE_ACSL_DEBUG_LOG=$1"
-      shift;
-    ;;
     # Supply Frama-C executable name
     -I|--frama-c)
       shift;
@@ -355,6 +384,7 @@ do
       OPTION_EACSL_SHARE="$1"
       shift;
     ;;
+    # Runtime assertion generation
     --rte|-a)
       shift;
       OPTION_RTE=`rte_options $1`
@@ -371,7 +401,8 @@ do
     # Print names of the supported memody models.
     --print-mmodels)
       shift;
-      OPTION_PRINT_MMODELS="1"
+      mmodel_lib
+      exit 0
     ;;
   esac
 done
@@ -389,7 +420,7 @@ FRAMAC="$OPTION_FRAMAC"
 # Check if this is a development or an installed version
 if [ -f "$BASEDIR/../E_ACSL.mli" ]; then
   # Development version
-  DEVELOPMENT="$(readlink -f "$BASEDIR/..")"
+  DEVELOPMENT="$(realpath "$BASEDIR/..")"
   # Check if the project has been built, as if this is a non-installed
   # version that has not been built Frama-C will fallback to an installed one
   # for instrumentation but still use local RTL
@@ -400,7 +431,7 @@ if [ -f "$BASEDIR/../E_ACSL.mli" ]; then
   # Add the project directory to FRAMAC_PLUGINS,
   # otherwise Frama-C uses an installed version
   if test -f "$DEVELOPMENT/META.frama-c-e_acsl"; then
-      FRAMAC_FLAGS="-add-path=$DEVELOPMENT/top -add-path=$DEVELOPMENT $FRAMAC_FLAGS";
+    FRAMAC_FLAGS="-add-path=$DEVELOPMENT/top -add-path=$DEVELOPMENT $FRAMAC_FLAGS";
   fi
 else
   # Installed version. FRAMAC_SHARE should not be used here as Frama-C
@@ -422,10 +453,6 @@ CPPMACHDEP="-D__FC_MACHDEP_X86_$MACHDEPFLAGS"
 # GCC machine option
 GCCMACHDEP="-m$MACHDEPFLAGS"
 
-# Macro that identifies E-ACSL compilation. Passed to Frama-C
-# and GCC runs but not to the original compilation
-EACSL_MACRO_ID="__E_ACSL__"
-
 # Frama-C and related flags
 FRAMAC_CPP_EXTRA="$OPTION_FRAMAC_CPP_EXTRA $CPPMACHDEP"
 EACSL_MMODEL="$OPTION_EACSL_MMODEL"
@@ -435,43 +462,9 @@ if [ -n "$OPTION_EACSL_SHARE" ]; then
   EACSL_SHARE="$OPTION_EACSL_SHARE"
 fi
 
-# Check if the E-ACSL share directory is indeed an E-ACSL share directory that
-# contains required C code. The check involves looking up
-# $EACSL_SHARE/e_acsl_mmodel_api.h - one of the headers required by the Frama-C
-# invocation. This is a week check but it is better than nothing.
-error "Cannot find required $EACSL_SHARE/e_acsl_mmodel_api.h header" \
-  `test -f "$EACSL_SHARE/e_acsl_mmodel_api.h"; echo $?`
-
-# Echo the absolute path of the source file corresponding to a memory model
-# given by the first argument, or report an error of the given model does not
-# exist. In case no argument is supplied, output the names of the memory models
-# supported in this distribution.
-mmodel_sources() {
-  local model="$1"
-  local models=$(find $EACSL_SHARE -maxdepth 1 \
-     -name '*_model'  -type d -exec basename {} \; | sed 's/_model$//')
-
-  if [ -n "$model" ]; then
-    model=$(echo $models | tr ' ' '\n' | grep "^$model$")
-    if [ -n "$model" ]; then
-      echo "$EACSL_SHARE/$model"_model/e_acsl_"$model"_mmodel.c
-    else
-      error "Memory model '$1' is not available in this distribution"
-    fi
-  else
-    echo $models
-  fi
-}
-
-# If specified, print the names of the supported memory models and exit
-if [ -n "$OPTION_PRINT_MMODELS" ]; then
-  mmodel_sources
-  exit 0
-fi
-
 # Once EACSL_SHARE is defined check the memory models provided at inputs
 for mod in $OPTION_EACSL_MMODELS; do
-  mmodel_sources $mod > /dev/null
+  mmodel_lib $mod
 done
 
 # Gcc and related flags
@@ -510,12 +503,13 @@ fi
 CPPFLAGS="$OPTION_CPPFLAGS"
 LDFLAGS="$OPTION_LDFLAGS"
 
+LIBGMP="$(realpath $LIBDIR/libeacsl-jemalloc.a)"
+LIBJEMALLOC="$(realpath $LIBDIR/libeacsl-gmp.a)"
+
 # C, CPP and LD flags for compilation of E-ACSL-generated sources
 EACSL_CFLAGS=""
-EACSL_CPPFLAGS="
-  -I$EACSL_SHARE
-  -D$EACSL_MACRO_ID"
-EACSL_LDFLAGS="-lm $LIBDIR/libgmp-e-acsl.a $LIBDIR/libjemalloc-e-acsl.a -lpthread"
+EACSL_CPPFLAGS="-I$EACSL_SHARE"
+EACSL_LDFLAGS="-lm $LIBGMP $LIBJEMALLOC -lpthread"
 
 # Output file names
 OUTPUT_CODE="$OPTION_OUTPUT_CODE" # E-ACSL instrumented source
@@ -592,18 +586,16 @@ if [ -n "$OPTION_COMPILE" ]; then
       OUTPUT_EXEC="$EACSL_OUTPUT_EXEC"
     fi
     # Sources of the selected memory model
-    EACSL_RTL=`mmodel_sources "$mod"`
+    EACSL_RTL=`mmodel_lib "$mod"`
     ($OPTION_ECHO;
      $CC \
        $CFLAGS $CPPFLAGS \
        $EACSL_CFLAGS $EACSL_CPPFLAGS \
-       $EACSL_RTL \
-       $OPTION_DEBUG_MACRO \
-       $OPTION_DEBUG_LOG_MACRO \
-       $OPTION_BUILTINS \
        -o "$OUTPUT_EXEC" \
        "$OUTPUT_CODE" \
-       $LDFLAGS $EACSL_LDFLAGS)
+       $EACSL_RTL \
+       $LDFLAGS \
+       $EACSL_LDFLAGS)
     error "fail to compile/link instrumented code" $?
   done
 fi

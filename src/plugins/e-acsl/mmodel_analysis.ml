@@ -230,8 +230,7 @@ module rec Transfer
     | Var vi -> add_vi state vi
     | Mem e -> 
       match base_addr e with
-      | None -> 
-        Kernel.fatal "[pre_analysis] no base address for %a" Printer.pp_exp e
+      | None -> state
       | Some vi -> add_vi state vi
 
   (* if [e] contains a pointer left-value, then also monitor the host *)
@@ -516,9 +515,7 @@ let register_predicate kf pred state =
               | Var vi -> Varinfo.Hptset.add vi state
               | Mem e -> 
                 match base_addr e with
-                | None -> 
-                  Kernel.fatal "[pre_analysis] no base address for %a" 
-                    Printer.pp_exp e
+                | None -> state
                 | Some vi -> Varinfo.Hptset.add vi state
             else
               state

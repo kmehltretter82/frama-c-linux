@@ -45,6 +45,10 @@ show a help page.
 compile the generated and the original (supplied) sources.
 By default no compilation is performed.
 .TP
+.B -D, --rt-debug
+Enable runtime debug features, i.e., compile unoptimized executable
+with assertions and extra checks.
+.TP
 .B -X, --instrumented-only
 Do not compile original code. Has effect only in the presence of the \fI-c\fP
 flag.
@@ -141,25 +145,6 @@ By default the Patricia trie  memory model is used.
 .TP
 .B --print-models
 Print the names of the supported memory models
-.TP
-.B -P, --production
-generate an optimized executable with all debug features disabled.
-Unoptimized executables (default) may lead to a significant
-performance slowdown.
-.TP
-.B -N, --no-stdlib
-if specified the \fBE-ACSL\fP runtime library uses custom
-implementations of standard library functions (such as \fBmemset\fP).
-By default \fBGCC\fP builtins are used (e.g., \fB__builtin_memset\fP).
-.TP
-.B -D, --debug-log=\fI<FILE>
-the name of the file for logging of the debugging output of
-modified executables. If '-' is specified then the
-output is redirected to \fISTDERR\fP. By default
-the debug output is redirected to
-\fI/tmp/e-acsl.log\fP. This option is only meaningful
-in the absence of the \fB-P\fP flag that disables debug logging for
-performance reasons.
 .TP
 .B -I, --frama-c=\fI<FILE>
 the name of the \fBFrama-C\fP executable. By default the
