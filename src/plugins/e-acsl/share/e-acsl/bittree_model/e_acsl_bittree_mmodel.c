@@ -35,6 +35,7 @@
 #include "e_acsl_assert.h"
 #include "e_acsl_debug.h"
 #include "e_acsl_malloc.h"
+#include "e_acsl_safe_locations.h"
 #include "e_acsl_mmodel_api.h"
 #include "e_acsl_bittree.h"
 
@@ -492,8 +493,19 @@ static void init_argv(int argc, char **argv) {
 
 static void memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
   arch_assert(ptr_size);
+  /* Tracking program arguments */
   if (argc_ref)
     init_argv(*argc_ref, *argv_ref);
+  /* Tracking safe locations */
+  collect_safe_locations();
+  int i;
+  for (i = 0; i < safe_location_counter; i++) {
+    void *addr = (void*)safe_locations[i].address;
+    uintptr_t len = safe_locations[i].length;
+    store_block(addr, len);
+    if (safe_locations[i].initialized)
+      initialize(addr, len);
+  }
 }
 /* }}} */
 
