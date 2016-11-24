@@ -1182,24 +1182,29 @@ static void print_pgm_layout() {
   DLOG("|Heap Shadow Start:          %19lu\n", pgm_layout.heap_shadow_start);
   DLOG("|Heap Shadow End:            %19lu\n", pgm_layout.heap_shadow_end);
   DLOG("| --- Global -----------------------------------\n");
-  DLOG("|Global Shadow Size:         %16lu MB\n",
-    MB_SZ(pgm_layout.global_shadow_size));
+  DLOG("|Global Shadow Size:         %16lu MB\n", MB_SZ(pgm_layout.global_shadow_size));
   DLOG("|Global Start:               %19lu\n", pgm_layout.global_start);
   DLOG("|Global End:                 %19lu\n", pgm_layout.global_end);
   DLOG("| --- Short Global Shadow ----------------------\n");
-  DLOG("|Short Global Shadow Offset: %19lu\n",
-    pgm_layout.short_global_shadow_offset);
-  DLOG("|Short Global Shadow Start:  %19lu\n",
-    pgm_layout.short_global_shadow_start);
-  DLOG("|Short Global Shadow End:    %19lu\n",
-    pgm_layout.short_global_shadow_end);
+  DLOG("|Short Global Shadow Offset: %19lu\n", pgm_layout.short_global_shadow_offset);
+  DLOG("|Short Global Shadow Start:  %19lu\n", pgm_layout.short_global_shadow_start);
+  DLOG("|Short Global Shadow End:    %19lu\n", pgm_layout.short_global_shadow_end);
   DLOG("| --- Long Global Shadow -----------------------\n");
-  DLOG("|Long Global Shadow Offset:  %19lu\n",
-    pgm_layout.long_global_shadow_offset);
-  DLOG("|Long Global Shadow Start:   %19lu\n",
-    pgm_layout.long_global_shadow_start);
-  DLOG("|Long Global Shadow End:     %19lu\n",
-    pgm_layout.long_global_shadow_end);
+  DLOG("|Long Global Shadow Offset:  %19lu\n", pgm_layout.long_global_shadow_offset);
+  DLOG("|Long Global Shadow Start:   %19lu\n", pgm_layout.long_global_shadow_start);
+  DLOG("|Long Global Shadow End:     %19lu\n", pgm_layout.long_global_shadow_end);
+  DLOG("| --- TLS -----------------------------------\n");
+  DLOG("|TLS Shadow Size:            %16lu MB\n", MB_SZ(pgm_layout.tls_shadow_size));
+  DLOG("|TLS Start:                  %19lu\n", pgm_layout.tls_start);
+  DLOG("|TLS End:                    %19lu\n", pgm_layout.tls_end);
+  DLOG("| --- Short TLS Shadow ----------------------\n");
+  DLOG("|Short TLS Shadow Offset:    %19lu\n", pgm_layout.short_tls_shadow_offset);
+  DLOG("|Short TLS Shadow Start:     %19lu\n", pgm_layout.short_tls_shadow_start);
+  DLOG("|Short TLS Shadow End:       %19lu\n", pgm_layout.short_tls_shadow_end);
+  DLOG("| --- Long TLS Shadow -----------------------\n");
+  DLOG("|Long TLS Shadow Offset:     %19lu\n", pgm_layout.long_tls_shadow_offset);
+  DLOG("|Long TLS Shadow Start:      %19lu\n", pgm_layout.long_tls_shadow_start);
+  DLOG("|Long TLS Shadow End:        %19lu\n", pgm_layout.long_tls_shadow_end);
   DLOG("------------------------------------------------\n");
 }
 
@@ -1224,25 +1229,28 @@ static void which_segment(uintptr_t addr) {
 /*! \brief Print program layout. This function outputs start/end addresses of
  * various program segments, their shadow counterparts and sizes of shadow
  * regions used. */
-#define D_LAYOUT print_pgm_layout()
-void ___e_acsl_d_layout() { D_LAYOUT; }
+#define DEBUG_PRINT_LAYOUT print_pgm_layout()
+void ___e_acsl_debug_print_layout() { DEBUG_PRINT_LAYOUT; }
 
 /*! \brief Print the shadow segment address addr belongs to */
-#define D_LOC(_addr) which_segment(_addr)
-void ___e_acsl_d_loc(uintptr_t addr) { D_LOC(addr); }
+#define DEBUG_PRINT_SEGMENT(_addr) which_segment(_addr)
+void ___e_acsl_debug_print_segment(uintptr_t addr) { DEBUG_PRINT_SEGMENT(addr); }
 
 /*! \brief Print human-readable representation of a shadow region corresponding
  * to a memory address addr. The second argument (size) if the size of the
  * shadow region to be printed. Normally addr argument is a base address of a
  * memory block and size is its length. */
-#define D_SHADOW(addr, size) print_shadows((uintptr_t)addr, (size_t)size)
-void ___e_acsl_d_shadow(uintptr_t addr, size_t size) { D_SHADOW(addr, size); }
+#define DEBUG_PRINT_SHADOW(addr, size) \
+  print_shadows((uintptr_t)addr, (size_t)size)
+void ___e_acsl_debug_print_shadow(uintptr_t addr, size_t size) {
+  DEBUG_PRINT_SHADOW(addr, size);
+}
 
 #else
 /* \cond exclude from doxygen */
-#define D_SHADOW(addr, size)
-#define D_INFO(addr)
-#define D_LAYOUT
+#define DEBUG_PRINT_SHADOW(addr, size)
+#define DEBUG_PRINT_LAYOUT
+#define DEBUG_PRINT_SEGMENT(addr)
 /* \endcond */
 #endif
 /* }}} */

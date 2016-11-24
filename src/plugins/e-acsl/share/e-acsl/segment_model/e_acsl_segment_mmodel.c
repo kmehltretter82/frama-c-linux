@@ -146,6 +146,7 @@ static void memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
   init_pgm_layout(argc_ref, argv_ref);
   if (argc_ref && argv_ref)
     argv_alloca(*argc_ref, *argv_ref);
+  DEBUG_PRINT_LAYOUT;
 }
 
 static void memory_clean(void) {

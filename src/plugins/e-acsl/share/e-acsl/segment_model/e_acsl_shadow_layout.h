@@ -55,6 +55,9 @@ char *strerror(int errnum);
 /*! \brief Size of a stack shadow */
 #define STACK_SHADOW_SIZE (72 * MB)
 
+/*! \brief Size of the TLS shadow */
+#define TLS_SHADOW_SIZE (64 * MB)
+
 /*! \brief Pointer size (in bytes) for a given system */
 #define PTR_SZ sizeof(uintptr_t)
 
@@ -64,6 +67,44 @@ char *strerror(int errnum);
  * but the availability of such integer types is implementation specific. */
 #define ULONG_BYTES 8
 #define ULONG_BITS 64
+
+/* Thread-local storage information {{{ */
+
+/*! Thread-local storage (TLS) keeps track of copies of per-thread variables.
+ * Even though at the present stage RTL of E-ACSL is not thread-safe, some
+ * of the variables (for instance ::errno) are allocated there. In X86 TLS
+ * is typically located somewhere below the program's stack but above mmap
+ * areas. TLS is typically separated into two sections: .tdata and .tbss.
+ * Similar to globals using .data and .bss, .tdata keeps track of initialized
+ * thread-local variables, while .tbss holds uninitialized ones.
+ *
+ * Start and end addresses of TLS are obtained by taking addresses of
+ * initialized and initialized variables in TLS (::id_tdata and ::id_tss)
+ * and adding fixed amount of shadow space around them. Visually it looks
+ * as follows:
+ *
+ *   end TLS address (&id_tdata + TLS_SHADOW_SIZE/2)
+ *   id_tdata address
+ *   ...
+ *   id_tbss address
+ *   start TLS address (&id_bss - TLS_SHADOW_SIZE/2)
+ */
+
+static __thread int id_tdata = 1;
+static __thread int id_tbss;
+
+/*! Set TLS size and its end and start addresses. */
+static void set_tls_bounds(uintptr_t *tls_end,
+    uintptr_t *tls_start, uintptr_t *tls_size) {
+  uintptr_t
+    data = (uintptr_t)&id_tdata,
+    bss = (uintptr_t)&id_tbss;
+
+  *tls_end = ((data > bss) ? data : bss)	 + TLS_SHADOW_SIZE/2;
+  *tls_start = ((data > bss) ? bss  : data) - TLS_SHADOW_SIZE/2,
+  *tls_size = *tls_end - *tls_start;
+}
+/* }}} */
 
 /* Program stack information {{{ */
 extern char ** environ;
@@ -130,38 +171,61 @@ static void *do_mmap(size_t size) {
 }
 /* }}} */
 
+/** Shadow Offset {{{ */
+/*! Compute shadow offset between the start address of a shadow area and a
+ * start address of a segment */
+static uintptr_t shadow_offset(void *shadow, uintptr_t start_addr) {
+  uintptr_t start_shadow = (uintptr_t)shadow;
+
+  return (start_shadow > start_addr) ?
+    start_shadow - start_addr : start_addr - start_shadow;
+}
+/* }}} */
+
 /* Program Layout {{{ */
 
-/* Memory segments ************************************************************
- *  ----------------------------------------> Maximal address
- *  Kernel Segment
- *  ---------------------------------------->
- *  Environment Segment [ argc, argv, env ]
- * -----------------------------------------> Stack End Address
- *  Program Stack Segment [ Used stack ]
- * -----------------------------------------> Stack Start Address
- *  Unused Stack Segment
- * -----------------------------------------> Stack Soft Bound Address
- *  Stack Grow Segment
- * ----------------------------------------->
- *  Lib Segment
- * -----------------------------------------> Stack Shadow Start Address
- *  Stack Shadow Region
- * -----------------------------------------> Stack Shadow End Address
- *  Unused Space Segment
- * ----------------------------------------->
- *  Heap Shadow Region
- * -----------------------------------------> Heap Shadow Start Address
- * -----------------------------------------> Heap End Address
- *  Heap
- * -----------------------------------------> Heap Start Address [Initial Brk]
- *  BSS Segment  [ Uninitialised Globals ]
- * ----------------------------------------->
- *  Data Segment [ Initialised Globals   ]
- * ----------------------------------------->
- *  Text Segment [ Constants ]
- * -----------------------------------------> NULL (minimal address)
-******************************************************************************/
+
+/*****************************************************************************
+ * Memory Layout *************************************************************
+ *****************************************************************************
+  ----------------------------------------> Max address
+  Kernel Space
+  ---------------------------------------->
+  Non-canonical address space (only in 64-bit)
+  ---------------------------------------->
+  Environment variables [ GLIBC extension ]
+ ----------------------------------------->
+  Program arguments [ argc, argv ]
+ -----------------------------------------> Stack End
+  Stack [ Grows downwards ]
+ ----------------------------------------->
+  Thread-local storage (TLS) [ TDATA and TBSS ]
+ ----------------------------------------->
+  Shadow memory [ Heap, Stack, Global, TLS ]
+ ----------------------------------------->
+  Object mappings
+ ----------------------------------------->
+ ----------------------------------------->
+  Heap [ Grows upwards^ ]
+ -----------------------------------------> Heap Start [Initial Brk]
+  BSS Segment  [ Uninitialised Globals ]
+ ----------------------------------------->
+  Data Segment [ Initialised Globals   ]
+ ----------------------------------------->
+  ROData [ Potentially ]
+ ----------------------------------------->
+  Text Segment [ Constants ]
+ -----------------------------------------> NULL (0)
+ *****************************************************************************
+NOTE: Above memory layout scheme generally applies to Linux Kernel/gcc/glibc.
+  It is also an approximation slanted towards 64-bit virtual process layout.
+  In reality layouts may vary.
+
+NOTE: With mmap allocations heap does not necessarily grows from program break
+  upwards. Typically mmap will allocate memory somewhere closer to stack. This
+  implementation, however, uses brk allocations, thus forcing stack to grow
+  upwards from program break.
+*/
 
 static struct program_layout pgm_layout;
 
@@ -216,8 +280,21 @@ struct program_layout {
   uintptr_t long_global_shadow_start;
   uintptr_t long_global_shadow_offset;
 
+  /* Same as `global_...` but for shadowing thread-local storage */
+  uintptr_t tls_end;
+  uintptr_t tls_start;
+  size_t tls_shadow_size;
+
+  uintptr_t short_tls_shadow_end;
+  uintptr_t short_tls_shadow_start;
+  uintptr_t short_tls_shadow_offset;
+
+  uintptr_t long_tls_shadow_end;
+  uintptr_t long_tls_shadow_start;
+  uintptr_t long_tls_shadow_offset;
+
   /*! Carries a non-zero value if shadow layout has been initialized and
-   * evaluates to zero otehrwise. */
+   * evaluates to zero otherwise. */
   int initialized;
 };
 
@@ -231,8 +308,7 @@ struct program_layout {
 static void init_pgm_layout(int *argc_ref, char ***argv_ref) {
   DLOG("<<< Initialize shadow layout >>>\n");
   /* Setting up stack. Stack grows downwards starting from the stack end
-   * address (i.e., the address of the stack pointer) at the time of
-   * initialization. */
+   * address initialization. */
   pgm_layout.stack_shadow_size = STACK_SHADOW_SIZE;
   pgm_layout.stack_end = get_stack_end(argc_ref, argv_ref);
   pgm_layout.stack_start =
@@ -242,21 +318,21 @@ static void init_pgm_layout(int *argc_ref, char ***argv_ref) {
    * changes. Very approximate for the moment,  */
   pgm_layout.stack_soft_bound = pgm_layout.stack_end - get_stack_size();
 
-  /* Short (byte) stack shadow region */
+  /* Primary stack shadow region */
   void * short_stack_shadow = do_mmap(pgm_layout.stack_shadow_size);
   pgm_layout.short_stack_shadow_start = (uintptr_t)short_stack_shadow;
   pgm_layout.short_stack_shadow_end =
     (uintptr_t)short_stack_shadow + pgm_layout.stack_shadow_size;
   pgm_layout.short_stack_shadow_offset =
-    pgm_layout.stack_end - pgm_layout.short_stack_shadow_end;
+    shadow_offset(short_stack_shadow, pgm_layout.stack_start);
 
-  /* Long (block) stack shadow region */
+  /* Secondary stack shadow region */
   void *long_stack_shadow  = do_mmap(pgm_layout.stack_shadow_size);
   pgm_layout.long_stack_shadow_start = (uintptr_t)long_stack_shadow;
   pgm_layout.long_stack_shadow_end =
     (uintptr_t)long_stack_shadow + pgm_layout.stack_shadow_size;
   pgm_layout.long_stack_shadow_offset =
-    pgm_layout.stack_end - pgm_layout.long_stack_shadow_end;
+    shadow_offset(long_stack_shadow, pgm_layout.stack_start);
 
   /* Setting heap. Heap grows upwards starting from the current program break.
    Alternative approach would be to use the end of BSS but in fact the end of
@@ -272,7 +348,7 @@ static void init_pgm_layout(int *argc_ref, char ***argv_ref) {
   pgm_layout.heap_shadow_end =
     (uintptr_t)heap_shadow + pgm_layout.heap_shadow_size;
   pgm_layout.heap_shadow_offset =
-    pgm_layout.heap_shadow_start - pgm_layout.heap_start;
+      shadow_offset(heap_shadow, pgm_layout.heap_start);
 
   /* Setting shadow for globals */
   /* In all likelihood it is reasonably safe to assume that first
@@ -282,21 +358,41 @@ static void init_pgm_layout(int *argc_ref, char ***argv_ref) {
   pgm_layout.global_shadow_size
     = pgm_layout.global_end - pgm_layout.global_start;
 
-  /* Short (byte) global shadow region */
+  /* Primary global shadow region */
   void * short_global_shadow = do_mmap(pgm_layout.global_shadow_size);
   pgm_layout.short_global_shadow_start = (uintptr_t)short_global_shadow;
   pgm_layout.short_global_shadow_end =
     (uintptr_t)short_global_shadow + pgm_layout.global_shadow_size;
   pgm_layout.short_global_shadow_offset =
-    pgm_layout.short_global_shadow_start - pgm_layout.global_start;
+    shadow_offset(short_global_shadow, pgm_layout.global_start);
 
-  /* Long (block) global shadow region */
+  /* Secondary global shadow */
   void *long_global_shadow  = do_mmap(pgm_layout.global_shadow_size);
   pgm_layout.long_global_shadow_start = (uintptr_t)long_global_shadow;
   pgm_layout.long_global_shadow_end =
     (uintptr_t)long_global_shadow + pgm_layout.global_shadow_size;
   pgm_layout.long_global_shadow_offset =
-    pgm_layout.long_global_shadow_end - pgm_layout.global_end;
+    shadow_offset(long_global_shadow, pgm_layout.global_start);
+
+  /* Setting shadow for thread-local storage (TLS). */
+  set_tls_bounds(&pgm_layout.tls_end, &pgm_layout.tls_start,
+      &pgm_layout.tls_shadow_size);
+
+  /* Primary TLS shadow */
+  void * short_tls_shadow = do_mmap(pgm_layout.tls_shadow_size);
+  pgm_layout.short_tls_shadow_start = (uintptr_t)short_tls_shadow;
+  pgm_layout.short_tls_shadow_end =
+    (uintptr_t)short_tls_shadow + pgm_layout.tls_shadow_size;
+  pgm_layout.short_tls_shadow_offset =
+    shadow_offset(short_tls_shadow, pgm_layout.tls_start);
+
+  /* Secondary TLS shadow */
+  void *long_tls_shadow  = do_mmap(pgm_layout.tls_shadow_size);
+  pgm_layout.long_tls_shadow_start = (uintptr_t)long_tls_shadow;
+  pgm_layout.long_tls_shadow_end =
+    (uintptr_t)long_tls_shadow + pgm_layout.tls_shadow_size;
+  pgm_layout.long_tls_shadow_offset =
+    shadow_offset(long_tls_shadow, pgm_layout.tls_start);
 
   /* The shadow layout has been initialized */
   pgm_layout.initialized = 1;
