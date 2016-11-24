@@ -128,6 +128,9 @@ mmodel_lib() {
   local rt_feature="opt"
   if [ -n "$OPTION_RT_DEBUG" ]; then
     rt_feature="debug"
+    OPTION_CFLAGS="$OPTION_CFLAGS -O0 -fno-omit-frame-pointer"
+  else
+    OPTION_CFLAGS="$OPTION_CFLAGS -O2"
   fi
 
   local models="$(find $LIBDIR/ -name 'libeacsl-*-rtl-opt.a' -exec basename {} \; \
@@ -485,12 +488,6 @@ CFLAGS="$OPTION_CFLAGS
   -Wno-implicit-function-declaration \
   -Wno-empty-body"
 
-if test -z "$OPTION_DEBUG_MACRO"; then
-  CFLAGS="-O2 $CFLAGS"
-else
-  CFLAGS="-O0 $CFLAGS"
-fi
-
 # Disable extra warning for clang
 if [ "`basename $CC`" = 'clang' ]; then
   CFLAGS="-Wno-unknown-warning-option \
@@ -600,3 +597,4 @@ if [ -n "$OPTION_COMPILE" ]; then
   done
 fi
 exit 0;
+
