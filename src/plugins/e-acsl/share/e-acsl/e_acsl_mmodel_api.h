@@ -193,14 +193,14 @@ void __e_acsl_memory_init(int *argc_ref, char ***argv, size_t ptr_size)
 
 /*! \brief Return the cumulative size (in bytes) of tracked heap allocation. */
 /*@ assigns \result \from __e_acsl_internal_heap; */
-size_t __e_acsl_get_heap_size(void)
+size_t __e_acsl_get_heap_allocation_size(void)
   __attribute__((FC_BUILTIN));
 
 /*! \brief A variable holding a cumulative size (in bytes) of tracked
  * heap allocation. */
-extern size_t __e_acsl_heap_size;
+extern size_t __e_acsl_heap_allocation_size;
 
 /*@ predicate diffSize{L1,L2}(integer i) =
-  \at(__e_acsl_heap_size, L1) - \at(__e_acsl_heap_size, L2) == i;
+  \at(__e_acsl_heap_allocation_size, L1) - \at(__e_acsl_heap_allocation_size, L2) == i;
 */
 #endif

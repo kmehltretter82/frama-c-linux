@@ -7,7 +7,7 @@
 #include <stdlib.h>
 
 int main(void) {
-    /* @assert (__heap_size == 0);  */
+    /* @assert (__heap_allocation_size == 0);  */
     char *a = malloc(7);
-    /* @assert (__heap_size == 7);  */
+    /* @assert (__heap_allocation_size == 7);  */
 }

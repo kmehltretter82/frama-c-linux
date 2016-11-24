@@ -13,7 +13,7 @@ FRAMAC_SHARE/libc/stdlib.h:276:[kernel] warning: No code nor implicit assigns cl
   __fc_wctomb_state ∈ {0}
   __e_acsl_init ∈ [--..--]
   __e_acsl_internal_heap ∈ [--..--]
-  __e_acsl_heap_size ∈ [--..--]
+  __e_acsl_heap_allocation_size ∈ [--..--]
 tests/gmp/longlong.i:9:[value] warning: recursive call during value analysis
                  of my_pow (my_pow <- my_pow :: tests/gmp/longlong.i:16 <- main).
                  Using specification of my_pow.
