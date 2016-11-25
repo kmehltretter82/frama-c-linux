@@ -43,10 +43,10 @@
 /*! \brief Size (in bytes) of a long block on the stack. */
 #define LONG_BLOCK 8
 
-/*! \brief Bit offset in a short shadow byte that represents initialization. */
+/*! \brief Bit offset in a primary shadow byte that represents initialization. */
 #define INIT_BIT 0
 
-/*! \brief Bit offset in a short shadow byte that represents read-only or
+/*! \brief Bit offset in a primary shadow byte that represents read-only or
  * read-write access.
  *
  * This is such that the value of 1 is read-only, and 0 is read/write */
@@ -67,16 +67,16 @@
 
 /*! \brief Short shadow of a long block consists of a 8-byte segment + a
  * remainder. For instance, a 18-byte block is represented by two 8-byte
- * segments + 2 bytes.  Each byte of a segment stores an offset in the long
+ * segments + 2 bytes.  Each byte of a segment stores an offset in the secondary
  * shadow. The offsets for each such segment can be expressed using the
  * following number obtained by compressing all eight bytes with offsets set
  * into a single block. */
 #define LONG_BLOCK_MASK 15913703276567643328UL
 
 /*! \brief 6 higher bytes of a memory cell on stack that belongs to a long
- * memory block store offsets relative to meta-data in long shadow. The offsets
- * start with the below number. E.g., if the bits store 51, then the offset at
- * which to read meta-data is (51 - 48). */
+ * memory block store offsets relative to meta-data in the secondary shadow. The
+ * offsets start with the below number. E.g., if the bits store 51, then the
+ * offset at which to read meta-data is (51 - 48). */
 #define LONG_BLOCK_INDEX_START 48
 
 /*! \brief Increase the size to a multiple of a segment size. */
@@ -211,7 +211,7 @@ static int freeable(void *ptr);
  * This macro really belongs where static_allocated is defined, but
  * since it is used across this whole file it needs to be defined here. */
 #define static_allocated_one(addr, global) \
-  ((int)SHORT_SHADOW(addr, global))
+  ((int)PRIMARY_SHADOW(addr, global))
 
 /* Runtime assertions */
 #define VALIDATE_ALIGNMENT(_addr) \
@@ -221,7 +221,7 @@ static int freeable(void *ptr);
 /* Debug-level macros for validating memory accesses and allocation */
 #ifdef E_ACSL_DEBUG
 #  define DVALIDATE_SHADOW_LAYOUT \
-    DVASSERT(pgm_layout.initialized != 0, "Un-initialized shadow layout", NULL)
+    DVASSERT(mem_layout.initialized != 0, "Un-initialized shadow layout", NULL)
 
 #  define DVALIDATE_HEAP_ACCESS(_addr, _size) \
      DVALIDATE_SHADOW_LAYOUT; \
@@ -326,8 +326,8 @@ static uintptr_t predicate(uintptr_t addr, char p) {
  * and then for a block of 5 bytes its base offset if 11 etc. */
 static const char short_offsets_base [] = { 0, 1, 2, 4, 7, 11, 16, 22, 29 };
 
-/*! \brief Static (stack or global) memory-allocation. Record allocation of a
- * given memory block and update shadow regions.
+/*! \brief Stack or global memory-allocation. Record allocation of a
+ * given memory block and update shadows.
  *
  * \param ptr - pointer to a base memory address of the stack memory block.
  * \param size - size of the stack memory block.
@@ -337,11 +337,11 @@ static void shadow_alloca(void *ptr, size_t size, int global) {
   DVALIDATE_SHADOW_LAYOUT;
 
   unsigned char *short_shadowed =
-    (unsigned char*)SHORT_SHADOW((uintptr_t)ptr, global);
+    (unsigned char*)PRIMARY_SHADOW(ptr, global);
   uint64_t *short_shadowed_alt =
-    (uint64_t *)SHORT_SHADOW((uintptr_t)ptr, global);
+    (uint64_t *)PRIMARY_SHADOW(ptr, global);
   unsigned int *long_shadowed =
-    (unsigned int*)LONG_SHADOW((uintptr_t)ptr, global);
+    (unsigned int*)SECONDARY_SHADOW(ptr, global);
 
   /* Flip read-only bit for zero-size blocks. That is, physically it exists
    * but one cannot write to it. Further, the flipped read-only bit will also
@@ -391,8 +391,8 @@ static void static_shadow_freea(void *ptr, int global) {
 
   size_t size = block_length(ptr);
 
-  memset((void*)SHORT_SHADOW(ptr, global), 0, size);
-  memset((void*)LONG_SHADOW(ptr, global), 0, size);
+  memset((void*)PRIMARY_SHADOW(ptr, global), 0, size);
+  memset((void*)SECONDARY_SHADOW(ptr, global), 0, size);
 }
 
 /*! \brief Wrapper around ::static_shadow_freea for stack addresses */
@@ -409,7 +409,7 @@ static void static_shadow_freea(void *ptr, int global) {
  * applied to a stack or global address. */
 static int static_allocated(uintptr_t addr, long size, int global) {
   DVALIDATE_SHADOW_LAYOUT;
-  unsigned char *short_shadowed = (unsigned char*)SHORT_SHADOW(addr, global);
+  unsigned char *short_shadowed = (unsigned char*)PRIMARY_SHADOW(addr, global);
   /* Unless the address belongs to tracked allocation 0 is returned */
   if (short_shadowed[0]) {
     unsigned int code = (short_shadowed[0] >> 2);
@@ -418,7 +418,7 @@ static int static_allocated(uintptr_t addr, long size, int global) {
     if (long_block) {
       offset = code - LONG_BLOCK_INDEX_START;
       unsigned int *long_shadowed =
-        (unsigned int*)LONG_SHADOW(addr - offset, global) ;
+        (unsigned int*)SECONDARY_SHADOW(addr - offset, global) ;
       length = long_shadowed[0];
       offset = long_shadowed[1] + offset;
     } else {
@@ -444,7 +444,7 @@ static int static_initialized(uintptr_t addr, long size, int global) {
   DVALIDATE_STATIC_ACCESS(addr, size, global);
 
   int result = 1;
-  uint64_t *shadow = (uint64_t*)SHORT_SHADOW(addr, global);
+  uint64_t *shadow = (uint64_t*)PRIMARY_SHADOW(addr, global);
   while (size > 0) {
     int rem = (size >= ULONG_BYTES) ? ULONG_BYTES : size;
     uint64_t mask = static_init_masks[rem];
@@ -471,7 +471,7 @@ static int static_initialized(uintptr_t addr, long size, int global) {
  * read-only parts, that is to check whether the block has read-only access it
  * is sufficient to check any of its bytes. */
 #define global_readonly(_addr) \
-  checkbit(READONLY_BIT, (*(char*)SHORT_GLOBAL_SHADOW(addr)))
+  checkbit(READONLY_BIT, (*(char*)PRIMARY_GLOBAL_SHADOW(addr)))
 
 /*! \brief Querying information about a specific global or stack memory address
  * (based on the value of parameter `global'). The return value is interpreted
@@ -490,7 +490,7 @@ static int static_initialized(uintptr_t addr, long size, int global) {
  * unspecified. */
 static uintptr_t static_info(uintptr_t addr, char type, int global) {
   DVALIDATE_STATIC_LOCATION(addr, global);
-  unsigned char *short_shadowed = (unsigned char*)SHORT_SHADOW(addr, global);
+  unsigned char *short_shadowed = (unsigned char*)PRIMARY_SHADOW(addr, global);
 
   /* Unless the address belongs to tracked allocation 0 is returned */
   if (short_shadowed[0]) {
@@ -499,7 +499,7 @@ static uintptr_t static_info(uintptr_t addr, char type, int global) {
     if (long_block) {
       unsigned int offset = code - LONG_BLOCK_INDEX_START;
       unsigned int *long_shadowed =
-        (unsigned int*)LONG_SHADOW(addr - offset, global) ;
+        (unsigned int*)SECONDARY_SHADOW(addr - offset, global) ;
       switch(type) {
         case 'B': /* Base address */
           return addr - offset - long_shadowed[1];
@@ -567,7 +567,7 @@ static void initialize_static_region(uintptr_t addr, long size, int global) {
    * That is, `*shadow |= static_init_masks[1]` will set only the least
    * significant bit in *shadow. */
 
-  uint64_t *shadow = (uint64_t*)SHORT_SHADOW(addr, global);
+  uint64_t *shadow = (uint64_t*)PRIMARY_SHADOW(addr, global);
   while (size > 0) {
     int rem = (size >= ULONG_BYTES) ? ULONG_BYTES : size;
     size -= ULONG_BYTES;
@@ -603,7 +603,7 @@ static void mark_readonly (uintptr_t addr, long size) {
     size, addr, block_length(addr), base_addr(addr));
 
   /* See comments in ::initialize_static_region for details */
-  uint64_t *shadow = (uint64_t*)SHORT_GLOBAL_SHADOW(addr);
+  uint64_t *shadow = (uint64_t*)PRIMARY_GLOBAL_SHADOW(addr);
   while (size > 0) {
     int rem = (size >= ULONG_BYTES) ? ULONG_BYTES : size;
     size -= ULONG_BYTES;
@@ -632,7 +632,7 @@ static void argv_alloca(int argc,  char ** argv) {
 
 /*! \brief Amount of heap memory allocated by the program.
  * Variable visible externally. */
-static size_t heap_size = 0;
+static size_t heap_allocation_size = 0;
 
 /*! \brief Create a heap shadow for an allocated memory block starting at `ptr`
  * and of length `size`. Optionally mark it as initialized if `init`
@@ -644,7 +644,7 @@ static void set_heap_segment(void *ptr, size_t size, size_t init) {
     return;
 
   VALIDATE_ALIGNMENT(ptr); /* Make sure alignment is right */
-  heap_size += size; /* Adjuct tracked allocation size */
+  heap_allocation_size += size; /* Adjuct tracked allocation size */
 
   /* Get aligned size of the block, i.e., an actual size of the
    * allocated block */
@@ -743,8 +743,8 @@ static void shadow_free(void *res) {
       void *meta_shadow = (void*)(HEAP_SHADOW(ptr) - HEAP_SEGMENT);
       memset(meta_shadow, 0, HEAP_SHADOW_BLOCK_SIZE(size));
       native_free(ptr - HEAP_SEGMENT);
-      /* Adjuct tracked allocation size carried via `__e_acsl_heap_size` */
-      heap_size -= size;
+      /* Adjuct tracked allocation size carried via `__e_acsl_heap_allocation_size` */
+      heap_allocation_size -= size;
     } else {
       vabort("Not a start of block (%a) in free\n", ptr);
     }
@@ -780,7 +780,7 @@ static void* shadow_realloc(void *p, size_t size) {
         /* Number of block segments in the new allocation */
         size_t new_segments = BLOCK_SEGMENTS(size);
         /* Adjuct tracked allocation size */
-        heap_size += -old_size + size;
+        heap_allocation_size += -old_size + size;
 
         /* Address of the meta-block in old allocation */
         uintptr_t *meta_shadow = (uintptr_t*)(HEAP_SHADOW(ptr) - HEAP_SEGMENT);
@@ -1080,7 +1080,7 @@ static void initialize(void *ptr, size_t n) {
 
 /* Internal state print {{{ */
 #ifdef E_ACSL_DEBUG
-/* ! \brief Print human-readable representation of a byte in a short (byte)
+/* ! \brief Print human-readable representation of a byte in a primary
  * shadow */
 static void printbyte(unsigned char c, char buf[]) {
   if (c >> 2 < LONG_BLOCK_INDEX_START) {
@@ -1095,13 +1095,13 @@ static void printbyte(unsigned char c, char buf[]) {
 }
 
 /*! \brief Print human-readable (well, ish) representation of a memory block
- * using short (byte) and long (block) shadow regions */
+ * using primary and secondary shadows. */
 static void print_static_shadows(uintptr_t addr, size_t size, int global) {
   char short_buf[256];
   char long_buf[256];
 
-  unsigned char *short_shadowed = (unsigned char*)SHORT_SHADOW(addr, global);
-  unsigned int *long_shadowed = (unsigned int*)LONG_SHADOW(addr, global);
+  unsigned char *short_shadowed = (unsigned char*)PRIMARY_SHADOW(addr, global);
+  unsigned int *long_shadowed = (unsigned int*)SECONDARY_SHADOW(addr, global);
 
   int i, j = 0;
   for (i = 0; i < size; i++) {
@@ -1152,60 +1152,27 @@ static void print_shadows(uintptr_t addr, size_t size) {
     print_heap_shadows(addr, size);
 }
 
-static void print_pgm_layout() {
-  DLOG("| --- Stack ------------------------------------\n");
-  DLOG("|Stack Shadow Size:          %16lu MB\n",
-    MB_SZ(pgm_layout.stack_shadow_size));
-  DLOG("|Stack Start:                %19lu\n", pgm_layout.stack_start);
-  DLOG("|Stack End:                  %19lu\n", pgm_layout.stack_end);
-  DLOG("|Stack Soft Bound:           %19lu\n", pgm_layout.stack_soft_bound);
-  DLOG("| --- Short Stack Shadow -----------------------\n");
-  DLOG("|Short Stack Shadow Offset:  %19lu\n",
-    pgm_layout.short_stack_shadow_offset);
-  DLOG("|Short Stack Shadow Start:   %19lu\n",
-    pgm_layout.short_stack_shadow_start);
-  DLOG("|Short Stack Shadow End:     %19lu\n",
-    pgm_layout.short_stack_shadow_end);
-  DLOG("| --- Long Stack Shadow ------------------------\n");
-  DLOG("|Long Stack Shadow Offset:   %19lu\n",
-    pgm_layout.long_stack_shadow_offset);
-  DLOG("|Long Stack Shadow Start:    %19lu\n",
-    pgm_layout.long_stack_shadow_start);
-  DLOG("|Long Stack Shadow End:      %19lu\n",
-    pgm_layout.long_stack_shadow_end);
-  DLOG("| --- Heap -------------------------------------\n");
-  DLOG("|Heap Shadow Size:           %16lu MB\n",
-    MB_SZ(pgm_layout.heap_shadow_size));
-  DLOG("|Heap Shadow Offset:         %19lu\n", pgm_layout.heap_shadow_offset);
-  DLOG("|Heap Start:                 %19lu\n", pgm_layout.heap_start);
-  DLOG("|Heap End:                   %19lu\n", pgm_layout.heap_end);
-  DLOG("|Heap Shadow Start:          %19lu\n", pgm_layout.heap_shadow_start);
-  DLOG("|Heap Shadow End:            %19lu\n", pgm_layout.heap_shadow_end);
-  DLOG("| --- Global -----------------------------------\n");
-  DLOG("|Global Shadow Size:         %16lu MB\n", MB_SZ(pgm_layout.global_shadow_size));
-  DLOG("|Global Start:               %19lu\n", pgm_layout.global_start);
-  DLOG("|Global End:                 %19lu\n", pgm_layout.global_end);
-  DLOG("| --- Short Global Shadow ----------------------\n");
-  DLOG("|Short Global Shadow Offset: %19lu\n", pgm_layout.short_global_shadow_offset);
-  DLOG("|Short Global Shadow Start:  %19lu\n", pgm_layout.short_global_shadow_start);
-  DLOG("|Short Global Shadow End:    %19lu\n", pgm_layout.short_global_shadow_end);
-  DLOG("| --- Long Global Shadow -----------------------\n");
-  DLOG("|Long Global Shadow Offset:  %19lu\n", pgm_layout.long_global_shadow_offset);
-  DLOG("|Long Global Shadow Start:   %19lu\n", pgm_layout.long_global_shadow_start);
-  DLOG("|Long Global Shadow End:     %19lu\n", pgm_layout.long_global_shadow_end);
-  DLOG("| --- TLS -----------------------------------\n");
-  DLOG("|TLS Shadow Size:            %16lu MB\n", MB_SZ(pgm_layout.tls_shadow_size));
-  DLOG("|TLS Start:                  %19lu\n", pgm_layout.tls_start);
-  DLOG("|TLS End:                    %19lu\n", pgm_layout.tls_end);
-  DLOG("| --- Short TLS Shadow ----------------------\n");
-  DLOG("|Short TLS Shadow Offset:    %19lu\n", pgm_layout.short_tls_shadow_offset);
-  DLOG("|Short TLS Shadow Start:     %19lu\n", pgm_layout.short_tls_shadow_start);
-  DLOG("|Short TLS Shadow End:       %19lu\n", pgm_layout.short_tls_shadow_end);
-  DLOG("| --- Long TLS Shadow -----------------------\n");
-  DLOG("|Long TLS Shadow Offset:     %19lu\n", pgm_layout.long_tls_shadow_offset);
-  DLOG("|Long TLS Shadow Start:      %19lu\n", pgm_layout.long_tls_shadow_start);
-  DLOG("|Long TLS Shadow End:        %19lu\n", pgm_layout.long_tls_shadow_end);
-  DLOG("------------------------------------------------\n");
+static void print_memory_segment(struct memory_segment *seg, const char *name) {
+  DLOG(" --- %s ------------------------------------------\n", name);
+  DLOG("%s Shadow Size:               %16lu MB\n", name, MB_SZ(seg->shadow_size));
+  DLOG("%s Start:                     %19lu\n", name, seg->start);
+  DLOG("%s End:                       %19lu\n", name, seg->end);
+  DLOG("%s Primary Shadow Offset:     %19lu\n", name, seg->prim_offset);
+  DLOG("%s Primary Shadow Start:      %19lu\n", name, seg->prim_start);
+  DLOG("%s Primary Shadow End:        %19lu\n", name, seg->prim_end);
+  if (seg->sec_start) {
+    DLOG("%s Secondary Shadow Offset:   %19lu\n", name, seg->sec_offset);
+    DLOG("%s Secondary Shadow Start:    %19lu\n", name, seg->sec_start);
+    DLOG("%s Secondary Shadow End:      %19lu\n", name, seg->sec_end);
+  }
+}
+
+static void print_memory_layout() {
+  print_memory_segment(&mem_layout.heap, "Heap");
+  print_memory_segment(&mem_layout.stack, "Stack");
+  print_memory_segment(&mem_layout.global, "Global");
+  print_memory_segment(&mem_layout.tls, "TLS");
+  DLOG("-----------------------------------------------------\n");
 }
 
 /*! \brief Output the shadow segment the address belongs to */
@@ -1229,7 +1196,7 @@ static void which_segment(uintptr_t addr) {
 /*! \brief Print program layout. This function outputs start/end addresses of
  * various program segments, their shadow counterparts and sizes of shadow
  * regions used. */
-#define DEBUG_PRINT_LAYOUT print_pgm_layout()
+#define DEBUG_PRINT_LAYOUT print_memory_layout()
 void ___e_acsl_debug_print_layout() { DEBUG_PRINT_LAYOUT; }
 
 /*! \brief Print the shadow segment address addr belongs to */

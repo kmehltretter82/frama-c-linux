@@ -136,21 +136,29 @@ static int initialized(void * ptr, size_t size) {
   return 0;
 }
 
-static size_t get_heap_size(void) {
-  return heap_size;
+static size_t get_heap_allocation_size(void) {
+  return heap_allocation_size;
 }
 
 static void memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
+  /** Verify that the given size of a pointer matches the one in the present
+   * architecture. This is a guard against Frama-C instrumentations using
+   * architectures different to the given one. */
   arch_assert(ptr_size);
+  /* Initialize report file with debug logs (only in debug mode). */
   initialize_report_file(argc_ref, argv_ref);
-  init_pgm_layout(argc_ref, argv_ref);
+  /* Lift stack limit to account for extra stack memory overhead.  */
+  increase_stack_limit(get_stack_size()*2);
+  /* Allocate and log shadow memory layout of the execution. */
+  init_memory_layout(argc_ref, argv_ref);
+  DEBUG_PRINT_LAYOUT;
+  /* Track program arguments. */
   if (argc_ref && argv_ref)
     argv_alloca(*argc_ref, *argv_ref);
-  DEBUG_PRINT_LAYOUT;
 }
 
 static void memory_clean(void) {
-  clean_pgm_layout();
+  clean_memory_layout();
 }
 
 /* API BINDINGS {{{ */
@@ -181,6 +189,6 @@ public_alias(full_init)
 public_alias(memory_clean)
 public_alias(memory_init)
 /* Heap size */
-public_alias(get_heap_size)
-public_alias(heap_size)
+public_alias(get_heap_allocation_size)
+public_alias(heap_allocation_size)
 /* }}} */
