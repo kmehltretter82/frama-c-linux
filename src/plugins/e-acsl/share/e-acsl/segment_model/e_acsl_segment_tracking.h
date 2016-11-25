@@ -65,7 +65,7 @@
  * These remaining bytes reuse the shadow of [0,7]. */
 #define LONG_BLOCK_BOUNDARY(_size) (_size - _size%LONG_BLOCK)
 
-/*! \brief Short shadow of a long block consists of a 8-byte segment + a
+/*! \brief Primary shadow of a long block consists of a 8-byte segment + a
  * remainder. For instance, a 18-byte block is represented by two 8-byte
  * segments + 2 bytes.  Each byte of a segment stores an offset in the secondary
  * shadow. The offsets for each such segment can be expressed using the
@@ -225,7 +225,7 @@ static int freeable(void *ptr);
 
 #  define DVALIDATE_HEAP_ACCESS(_addr, _size) \
      DVALIDATE_SHADOW_LAYOUT; \
-     DVASSERT(IS_ON_HEAP((uintptr_t)_addr), \
+     DVASSERT(IS_ON_HEAP(_addr), \
        "Expected heap location: %a\n   ", _addr); \
      DVASSERT(heap_allocated((uintptr_t)_addr, _size), \
        "Operation on unallocated heap block [%a + %lu]\n   ",  _addr, _size)
@@ -233,7 +233,7 @@ static int freeable(void *ptr);
 #  define segstr(_global)  ((_global) ? "global" : "stack")
 #  define DVALIDATE_STATIC_ACCESS(_addr, _size, _global) \
      DVALIDATE_SHADOW_LAYOUT; \
-     DVASSERT(IS_ON_STATIC((uintptr_t)_addr, _global), \
+     DVASSERT(IS_ON_STATIC(_addr, _global), \
        "Expected %s location: %a\n   ", segstr(_global), _addr); \
      DVASSERT(static_allocated((uintptr_t)_addr, _size, _global), \
        "Operation on unallocated %s block [%a + %lu]\n   ", \
@@ -241,7 +241,7 @@ static int freeable(void *ptr);
 
 #  define DVALIDATE_STATIC_LOCATION(_addr, _global) \
      DVALIDATE_SHADOW_LAYOUT; \
-     DVASSERT(IS_ON_STATIC((uintptr_t)_addr, _global), \
+     DVASSERT(IS_ON_STATIC(_addr, _global), \
        "Expected %s location: %a\n   ", segstr(_global), _addr); \
      DVASSERT(static_allocated_one((uintptr_t)_addr, _global), \
        "Operation on unallocated %s block [%a]\n   ", segstr(_global),  _addr)
@@ -306,11 +306,11 @@ static uintptr_t predicate(uintptr_t addr, char p) {
 #define block_length(_addr) predicate((uintptr_t)_addr, 'L')
 /*! \brief Return a base address of a memory block address `_addr` belongs to
  * \param uintptr_t _addr - a memory address */
-#define base_addr(_addr)    predicate((uintptr_t)_addr, 'B')
+#define base_addr(_addr) predicate((uintptr_t)_addr, 'B')
 /*! \brief Return a byte offset of a memory address given by `_addr` within
  * its block
  * \param uintptr_t _addr - a memory address */
-#define offset(_addr)       predicate((uintptr_t)_addr, 'O')
+#define offset(_addr) predicate((uintptr_t)_addr, 'O')
 /* }}} */
 
 /* Static allocation {{{ */
@@ -336,39 +336,39 @@ static const char short_offsets_base [] = { 0, 1, 2, 4, 7, 11, 16, 22, 29 };
 static void shadow_alloca(void *ptr, size_t size, int global) {
   DVALIDATE_SHADOW_LAYOUT;
 
-  unsigned char *short_shadowed =
+  unsigned char *prim_shadow =
     (unsigned char*)PRIMARY_SHADOW(ptr, global);
-  uint64_t *short_shadowed_alt =
+  uint64_t *prim_shadow_alt =
     (uint64_t *)PRIMARY_SHADOW(ptr, global);
-  unsigned int *long_shadowed =
+  unsigned int *sec_shadow =
     (unsigned int*)SECONDARY_SHADOW(ptr, global);
 
   /* Flip read-only bit for zero-size blocks. That is, physically it exists
    * but one cannot write to it. Further, the flipped read-only bit will also
    * identify such block as allocated */
   if (!size)
-    setbit(READONLY_BIT, short_shadowed[0]);
+    setbit(READONLY_BIT, prim_shadow[0]);
 
   unsigned int i, j = 0, k = 0;
   if (IS_LONG_BLOCK(size)) { /* Long blocks */
     int boundary = LONG_BLOCK_BOUNDARY(size);
     for (i = 0; i < boundary; i += LONG_BLOCK) {
-      /* Set values for a long shadow */
-      long_shadowed[j++] = size;
-      long_shadowed[j++] = i;
-      /* Set offsets in the short shadow */
-      short_shadowed_alt[k++] = LONG_BLOCK_MASK;
+      /* Set-up a secondary shadow segment */
+      sec_shadow[j++] = size;
+      sec_shadow[j++] = i;
+      /* Set primary shadow offsets */
+      prim_shadow_alt[k++] = LONG_BLOCK_MASK;
     }
 
     /* Write out the remainder */
     for (i = boundary; i < size; i++) {
       unsigned char offset = i%LONG_BLOCK + LONG_BLOCK_INDEX_START + LONG_BLOCK;
-      short_shadowed[i] = (offset << 2);
+      prim_shadow[i] = (offset << 2);
     }
   } else { /* Short blocks */
     for (i = 0; i < size; i++) {
       unsigned char code = short_offsets_base[size] + i;
-      short_shadowed[i] = (code << 2);
+      prim_shadow[i] = (code << 2);
     }
   }
 }
@@ -409,18 +409,18 @@ static void static_shadow_freea(void *ptr, int global) {
  * applied to a stack or global address. */
 static int static_allocated(uintptr_t addr, long size, int global) {
   DVALIDATE_SHADOW_LAYOUT;
-  unsigned char *short_shadowed = (unsigned char*)PRIMARY_SHADOW(addr, global);
+  unsigned char *prim_shadow = (unsigned char*)PRIMARY_SHADOW(addr, global);
   /* Unless the address belongs to tracked allocation 0 is returned */
-  if (short_shadowed[0]) {
-    unsigned int code = (short_shadowed[0] >> 2);
+  if (prim_shadow[0]) {
+    unsigned int code = (prim_shadow[0] >> 2);
     unsigned int long_block = (code >= LONG_BLOCK_INDEX_START);
     size_t length, offset;
     if (long_block) {
       offset = code - LONG_BLOCK_INDEX_START;
-      unsigned int *long_shadowed =
+      unsigned int *sec_shadow =
         (unsigned int*)SECONDARY_SHADOW(addr - offset, global) ;
-      length = long_shadowed[0];
-      offset = long_shadowed[1] + offset;
+      length = sec_shadow[0];
+      offset = sec_shadow[1] + offset;
     } else {
       offset = short_offsets[code];
       length = short_lengths[code];
@@ -490,23 +490,23 @@ static int static_initialized(uintptr_t addr, long size, int global) {
  * unspecified. */
 static uintptr_t static_info(uintptr_t addr, char type, int global) {
   DVALIDATE_STATIC_LOCATION(addr, global);
-  unsigned char *short_shadowed = (unsigned char*)PRIMARY_SHADOW(addr, global);
+  unsigned char *prim_shadow = (unsigned char*)PRIMARY_SHADOW(addr, global);
 
   /* Unless the address belongs to tracked allocation 0 is returned */
-  if (short_shadowed[0]) {
-    unsigned int code = (short_shadowed[0] >> 2);
+  if (prim_shadow[0]) {
+    unsigned int code = (prim_shadow[0] >> 2);
     unsigned int long_block = (code >= LONG_BLOCK_INDEX_START);
     if (long_block) {
       unsigned int offset = code - LONG_BLOCK_INDEX_START;
-      unsigned int *long_shadowed =
+      unsigned int *sec_shadow =
         (unsigned int*)SECONDARY_SHADOW(addr - offset, global) ;
       switch(type) {
         case 'B': /* Base address */
-          return addr - offset - long_shadowed[1];
+          return addr - offset - sec_shadow[1];
         case 'O': /* Offset */
-          return long_shadowed[1] + offset;
+          return sec_shadow[1] + offset;
         case 'L': /* Length */
-          return long_shadowed[0];
+          return sec_shadow[0];
         default:
           DASSERT(0 && "Unknown static query type");
       }
@@ -1084,11 +1084,11 @@ static void initialize(void *ptr, size_t n) {
  * shadow */
 static void printbyte(unsigned char c, char buf[]) {
   if (c >> 2 < LONG_BLOCK_INDEX_START) {
-    sprintf(buf, "SHORT: I{%u} RO{%u} OF{%2u} => %u[%u]",
+    sprintf(buf, "PRIMARY: I{%u} RO{%u} OF{%2u} => %u[%u]",
       checkbit(INIT_BIT,c), checkbit(READONLY_BIT,c), c >> 2,
       short_lengths[c >> 2], short_offsets[c >> 2]);
   } else {
-    sprintf(buf, "LONG:  I{%u} RO{%u} OF{%u} => %4u",
+    sprintf(buf, "SECONDARY:  I{%u} RO{%u} OF{%u} => %4u",
       checkbit(INIT_BIT,c), checkbit(READONLY_BIT,c),
       (c >> 2), (c >> 2) - LONG_BLOCK_INDEX_START);
   }
@@ -1097,27 +1097,27 @@ static void printbyte(unsigned char c, char buf[]) {
 /*! \brief Print human-readable (well, ish) representation of a memory block
  * using primary and secondary shadows. */
 static void print_static_shadows(uintptr_t addr, size_t size, int global) {
-  char short_buf[256];
-  char long_buf[256];
+  char prim_buf[256];
+  char sec_buf[256];
 
-  unsigned char *short_shadowed = (unsigned char*)PRIMARY_SHADOW(addr, global);
-  unsigned int *long_shadowed = (unsigned int*)SECONDARY_SHADOW(addr, global);
+  unsigned char *prim_shadow = (unsigned char*)PRIMARY_SHADOW(addr, global);
+  unsigned int *sec_shadow = (unsigned int*)SECONDARY_SHADOW(addr, global);
 
   int i, j = 0;
   for (i = 0; i < size; i++) {
-    long_buf[0] = '\0';
-    printbyte(short_shadowed[i], short_buf);
+    sec_buf[0] = '\0';
+    printbyte(prim_shadow[i], prim_buf);
     if (IS_LONG_BLOCK(size) && (i%LONG_BLOCK) == 0) {
       j += 2;
       if (i < LONG_BLOCK_BOUNDARY(size)) {
-        sprintf(long_buf, " %a  SZ{%u} OF{%u}",
-          &long_shadowed[j], long_shadowed[j-2], long_shadowed[j-1]);
+        sprintf(sec_buf, " %a  SZ{%u} OF{%u}",
+          &sec_shadow[j], sec_shadow[j-2], sec_shadow[j-1]);
       }
       if (i) {
         DLOG("---------------------------------------------\n");
       }
     }
-    DLOG("| [%2d] %a | %s || %s\n", i, &short_shadowed[i], short_buf, long_buf);
+    DLOG("| [%2d] %a | %s || %s\n", i, &prim_shadow[i], prim_buf, sec_buf);
   }
 }
 
@@ -1184,6 +1184,8 @@ static void which_segment(uintptr_t addr) {
     loc = "heap";
   else if (IS_ON_GLOBAL(addr))
     loc = "global";
+  else if (IS_ON_TLS(addr))
+    loc = "TLS";
   else
     loc = "untracked";
   DLOG("Address: %a -> %s\n", addr, loc);
