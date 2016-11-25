@@ -253,19 +253,19 @@ NOTE: With mmap allocations heap does not necessarily grows from program break
  * shadow spaces. */
 struct memory_segment {
   uintptr_t start; //!< Least address in application segment
-  uintptr_t end;   //!< Greatest address in application segment
+  uintptr_t end; //!< Greatest address in application segment
 
   size_t shadow_size; //!< Byte-size of shadow area
 
-  uintptr_t prim_start;  //!< Least address in primary shadow
-  uintptr_t prim_end;    //!< Greatest address in primary shadow
+  uintptr_t prim_start; //!< Least address in primary shadow
+  uintptr_t prim_end; //!< Greatest address in primary shadow
   uintptr_t prim_offset; //!< Primary shadow offset
 
-  uintptr_t sec_start;  //!< Least address secondary shadow
-  uintptr_t sec_end;    //!< Greatest address secondary shadow
+  uintptr_t sec_start; //!< Least address secondary shadow
+  uintptr_t sec_end; //!< Greatest address secondary shadow
   uintptr_t sec_offset; //!< Secondary shadow offset
 
-  int initialized;
+  int initialized; //! Notion on whether the layout is initialized
 };
 
 /*! \brief Full program memory layout. */
@@ -283,18 +283,18 @@ struct memory_layout {
 static void set_shadow_segment(struct memory_segment *seg, uintptr_t start,
     uintptr_t size, int secondary) {
   seg->start = start;
-  seg->end = seg->start + size;
+  seg->end = seg->start + size - 1;
   seg->shadow_size = size;
 
   void *prim_shadow = do_mmap(seg->shadow_size);
   seg->prim_start = (uintptr_t)prim_shadow;
-  seg->prim_end = seg->prim_start + seg->shadow_size;
+  seg->prim_end = seg->prim_start + seg->shadow_size - 1;
   seg->prim_offset = shadow_offset(prim_shadow, start);
 
   if (secondary) {
     void *sec_shadow = do_mmap(seg->shadow_size);
     seg->sec_start = (uintptr_t)sec_shadow;
-    seg->sec_end = seg->sec_start + seg->shadow_size;
+    seg->sec_end = seg->sec_start + seg->shadow_size - 1;
     seg->sec_offset = shadow_offset(sec_shadow, seg->start);
   } else {
     seg->sec_start = seg->sec_end = seg->sec_offset = 0;

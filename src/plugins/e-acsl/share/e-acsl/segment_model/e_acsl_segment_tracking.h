@@ -194,6 +194,90 @@ const uint64_t static_readonly_masks [] = {
 };
 /* }}} */
 
+/* Runtime assertions (debug mode) {{{ */
+#ifdef E_ACSL_DEBUG
+#define DVALIDATE_ALIGNMENT(_addr) \
+  DVASSERT(((uintptr_t)_addr) % HEAP_SEGMENT == 0,  \
+      "Heap base address %a is unaligned", _addr)
+
+/* Debug function making sure that the order of program segments is as expected
+ * and that the program and the shadow segments used do not overlap. */
+static void validate_memory_layout() {
+  /* Check that the struct holding memory layout is marked as initialized. */
+  DVASSERT(mem_layout.initialized != 0, "Un-initialized shadow layout", NULL);
+  /* Make sure the order of program segments is as expected, i.e.,
+   * top to bittom: stack -> tls -> heap -> global*/
+
+  #define NO_MEM_SEGMENTS 11
+  uintptr_t segments[NO_MEM_SEGMENTS][2] = {
+     {mem_layout.stack.start, mem_layout.stack.end},
+     {mem_layout.stack.prim_start, mem_layout.stack.prim_end},
+     {mem_layout.stack.sec_start, mem_layout.stack.sec_end},
+     {mem_layout.tls.start, mem_layout.tls.end},
+     {mem_layout.tls.prim_start, mem_layout.tls.prim_end},
+     {mem_layout.tls.sec_start, mem_layout.tls.sec_end},
+     {mem_layout.global.start, mem_layout.global.end},
+     {mem_layout.global.prim_start, mem_layout.global.prim_end},
+     {mem_layout.global.sec_start, mem_layout.global.sec_end},
+     {mem_layout.heap.start, mem_layout.heap.end},
+     {mem_layout.heap.prim_start, mem_layout.heap.prim_end}
+  };
+
+  /* Make sure all segments (shadow or otherwise) are disjoint */
+  size_t i, j;
+  for (int i = 0; i < NO_MEM_SEGMENTS; i++) {
+    uintptr_t *src = segments[i];
+    DVASSERT(src[0] < src[1],
+      "Segment start is greater than segment end %lu < %lu\n", src[0], src[1]);
+    for (int j = 0; j < NO_MEM_SEGMENTS; j++) {
+      if (i != j) {
+        uintptr_t *dest = segments[j];
+        DVASSERT(src[1] < dest[0] || src[0] > dest[1],
+          "Segment [%lu, %lu] overlaps with segment [%lu, %lu]",
+          src[0], src[1], dest[0], dest[1]);
+      }
+    }
+  }
+
+  DVASSERT(mem_layout.stack.end > mem_layout.tls.end,
+      "Unexpected location of stack (above tls)", NULL);
+  DVASSERT(mem_layout.tls.end > mem_layout.heap.end,
+      "Unexpected location of tls (above heap)", NULL);
+  DVASSERT(mem_layout.heap.end > mem_layout.global.end,
+      "Unexpected location of heap (above global)", NULL);
+}
+
+#  define DVALIDATE_SHADOW_LAYOUT validate_memory_layout()
+#  define DVALIDATE_HEAP_ACCESS(_addr, _size) \
+     DVASSERT(IS_ON_HEAP(_addr), \
+       "Expected heap location: %a\n   ", _addr); \
+     DVASSERT(heap_allocated((uintptr_t)_addr, _size), \
+       "Operation on unallocated heap block [%a + %lu]\n   ",  _addr, _size)
+
+#  define segstr(_global)  ((_global) ? "global" : "stack")
+#  define DVALIDATE_STATIC_ACCESS(_addr, _size, _global) \
+     DVASSERT(IS_ON_STATIC(_addr, _global), \
+       "Expected %s location: %a\n   ", segstr(_global), _addr); \
+     DVASSERT(static_allocated((uintptr_t)_addr, _size, _global), \
+       "Operation on unallocated %s block [%a + %lu]\n   ", \
+        segstr(_global),  _addr, _size)
+
+#  define DVALIDATE_STATIC_LOCATION(_addr, _global) \
+     DVASSERT(IS_ON_STATIC(_addr, _global), \
+       "Expected %s location: %a\n   ", segstr(_global), _addr); \
+     DVASSERT(static_allocated_one((uintptr_t)_addr, _global), \
+       "Operation on unallocated %s block [%a]\n   ", segstr(_global),  _addr)
+#else
+/*! \cond exclude from doxygen */
+#  define DVALIDATE_SHADOW_LAYOUT
+#  define DVALIDATE_HEAP_ACCESS
+#  define DVALIDATE_STATIC_ACCESS
+#  define DVALIDATE_STATIC_LOCATION
+#  define DVALIDATE_ALIGNMENT
+/*! \endcond */
+#endif
+/* }}} */
+
 /* E-ACSL predicates {{{ */
 /* See definitions for documentation */
 static uintptr_t heap_info(uintptr_t addr, char type);
@@ -212,47 +296,6 @@ static int freeable(void *ptr);
  * since it is used across this whole file it needs to be defined here. */
 #define static_allocated_one(addr, global) \
   ((int)PRIMARY_SHADOW(addr, global))
-
-/* Runtime assertions */
-#define VALIDATE_ALIGNMENT(_addr) \
-  vassert(((uintptr_t)_addr) % HEAP_SEGMENT == 0,  \
-      "Heap base address %a is unaligned", _addr)
-
-/* Debug-level macros for validating memory accesses and allocation */
-#ifdef E_ACSL_DEBUG
-#  define DVALIDATE_SHADOW_LAYOUT \
-    DVASSERT(mem_layout.initialized != 0, "Un-initialized shadow layout", NULL)
-
-#  define DVALIDATE_HEAP_ACCESS(_addr, _size) \
-     DVALIDATE_SHADOW_LAYOUT; \
-     DVASSERT(IS_ON_HEAP(_addr), \
-       "Expected heap location: %a\n   ", _addr); \
-     DVASSERT(heap_allocated((uintptr_t)_addr, _size), \
-       "Operation on unallocated heap block [%a + %lu]\n   ",  _addr, _size)
-
-#  define segstr(_global)  ((_global) ? "global" : "stack")
-#  define DVALIDATE_STATIC_ACCESS(_addr, _size, _global) \
-     DVALIDATE_SHADOW_LAYOUT; \
-     DVASSERT(IS_ON_STATIC(_addr, _global), \
-       "Expected %s location: %a\n   ", segstr(_global), _addr); \
-     DVASSERT(static_allocated((uintptr_t)_addr, _size, _global), \
-       "Operation on unallocated %s block [%a + %lu]\n   ", \
-        segstr(_global),  _addr, _size)
-
-#  define DVALIDATE_STATIC_LOCATION(_addr, _global) \
-     DVALIDATE_SHADOW_LAYOUT; \
-     DVASSERT(IS_ON_STATIC(_addr, _global), \
-       "Expected %s location: %a\n   ", segstr(_global), _addr); \
-     DVASSERT(static_allocated_one((uintptr_t)_addr, _global), \
-       "Operation on unallocated %s block [%a]\n   ", segstr(_global),  _addr)
-#else
-/*! \cond exclude from doxygen */
-#  define DVALIDATE_SHADOW_LAYOUT
-#  define DVALIDATE_HEAP_ACCESS
-#  define DVALIDATE_STATIC_ACCESS
-#  define DVALIDATE_STATIC_LOCATION
-/*! \endcond */
-#endif
 
 /*! \brief Shortcut for executing statements based on the segment a given
  * address belongs to.
@@ -334,8 +377,6 @@ static const char short_offsets_base [] = { 0, 1, 2, 4, 7, 11, 16, 22, 29 };
  * \param global - if evaluates to a non-zero value then global region is used,
  * otherwise program stack is used. */
 static void shadow_alloca(void *ptr, size_t size, int global) {
-  DVALIDATE_SHADOW_LAYOUT;
-
   unsigned char *prim_shadow =
     (unsigned char*)PRIMARY_SHADOW(ptr, global);
   uint64_t *prim_shadow_alt =
@@ -408,7 +449,6 @@ static void static_shadow_freea(void *ptr, int global) {
  * global memory block and 0 otherwise. Note, this function is only safe if
  * applied to a stack or global address. */
 static int static_allocated(uintptr_t addr, long size, int global) {
-  DVALIDATE_SHADOW_LAYOUT;
   unsigned char *prim_shadow = (unsigned char*)PRIMARY_SHADOW(addr, global);
   /* Unless the address belongs to tracked allocation 0 is returned */
   if (prim_shadow[0]) {
@@ -594,7 +634,6 @@ static void initialize_static_region(uintptr_t addr, long size, int global) {
 static void mark_readonly (uintptr_t addr, long size) {
   /* Since read-only blocks can only be stored in the globals  segments (e.g.,
    * TEXT), this function required ptr carry a global address. */
-  DVALIDATE_SHADOW_LAYOUT;
   DASSERT(IS_ON_GLOBAL(addr));
   DASSERT(global_allocated(addr, 1));
   DVASSERT(!(addr - base_addr(addr) + size > block_length(addr)),
@@ -643,7 +682,7 @@ static void set_heap_segment(void *ptr, size_t size, size_t init) {
   if (!ptr)
     return;
 
-  VALIDATE_ALIGNMENT(ptr); /* Make sure alignment is right */
+  DVALIDATE_ALIGNMENT(ptr); /* Make sure alignment is right */
   heap_allocation_size += size; /* Adjuct tracked allocation size */
 
   /* Get aligned size of the block, i.e., an actual size of the
@@ -736,7 +775,6 @@ static void* shadow_calloc(size_t nmemb, size_t size) {
 /* Heap deallocation (free) {{{ */
 static void shadow_free(void *res) {
   char *ptr = (char *)res;
-  DVALIDATE_SHADOW_LAYOUT;
   if (ptr != NULL) { /* NULL is a valid behaviour */
     if (freeable(ptr)) {
       size_t size = block_length(ptr);
@@ -754,7 +792,6 @@ static void shadow_free(void *res) {
 
 /* Heap reallocation (realloc) {{{ */
 static void* shadow_realloc(void *p, size_t size) {
-  DVALIDATE_SHADOW_LAYOUT;
   char *ptr = (char*)p;
   char *res = NULL; /* Resulting pointer */
   /* If the pointer is NULL then realloc is equivalent to malloc(size) */
@@ -768,7 +805,7 @@ static void* shadow_realloc(void *p, size_t size) {
     if (freeable(ptr)) { /* ... and valid for free  */
       size_t alloc_size = ALLOC_SIZE(size);
       res = native_realloc(ptr - HEAP_SEGMENT, alloc_size);
-      VALIDATE_ALIGNMENT(res);
+      DVALIDATE_ALIGNMENT(res);
 
       /* realloc succeeds, otherwise nothing needs to be done */
       if (res != NULL) {
@@ -892,7 +929,6 @@ static int shadow_posix_memalign(void **memptr, size_t alignment, size_t size) {
  * block and a 0 otherwise. Note, this function is only safe if applied to a
  * heap address. */
 static int heap_allocated(uintptr_t addr, size_t size) {
-  DVALIDATE_SHADOW_LAYOUT;
   /* Offset within the segment */
   size_t block_offset = addr%HEAP_SEGMENT;
   /* Address of the shadow segment the address belongs to */
@@ -925,7 +961,6 @@ static int heap_allocated(uintptr_t addr, size_t size) {
  * implementation is preferred for performance reasons. */
 static int freeable(void *ptr) {
   uintptr_t addr = (uintptr_t)ptr;
-  DVALIDATE_SHADOW_LAYOUT;
   if (!IS_ON_HEAP(addr))
     return 0;
   /* Offset within the segment */
@@ -942,7 +977,6 @@ static int freeable(void *ptr) {
  * memory. NB: If `addr` does not belong to a valid heap region this function
  * returns 0. */
 static int heap_initialized(uintptr_t addr, long len) {
-  DVALIDATE_SHADOW_LAYOUT;
   /* Unallocated heap address */
   if (!heap_allocated(addr, len))
     return 0;
@@ -1068,7 +1102,6 @@ static void initialize_heap_region(uintptr_t addr, long len) {
 /*! \brief Initialize a chunk of memory given by its start address (`addr`)
  * and byte length (`n`). */
 static void initialize(void *ptr, size_t n) {
-  DVALIDATE_SHADOW_LAYOUT;
   TRY_SEGMENT(
     (uintptr_t)ptr,
     initialize_heap_region((uintptr_t)ptr, n),
@@ -1078,7 +1111,7 @@ static void initialize(void *ptr, size_t n) {
 }
 /* }}} */
 
-/* Internal state print {{{ */
+/* Internal state print (debug mode) {{{ */
 #ifdef E_ACSL_DEBUG
 /* ! \brief Print human-readable representation of a byte in a primary
  * shadow */

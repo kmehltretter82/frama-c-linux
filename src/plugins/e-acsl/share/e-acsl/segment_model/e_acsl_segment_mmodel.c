@@ -151,7 +151,9 @@ static void memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
   increase_stack_limit(get_stack_size()*2);
   /* Allocate and log shadow memory layout of the execution. */
   init_memory_layout(argc_ref, argv_ref);
+  /* Make sure the layout holds and output it (only in debug mode) */
   DEBUG_PRINT_LAYOUT;
+  DVALIDATE_SHADOW_LAYOUT;
   /* Track program arguments. */
   if (argc_ref && argv_ref)
     argv_alloca(*argc_ref, *argv_ref);
