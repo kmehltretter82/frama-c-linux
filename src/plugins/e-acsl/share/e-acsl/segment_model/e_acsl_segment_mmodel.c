@@ -46,18 +46,14 @@ static void * store_block(void * ptr, size_t size) {
   /* Only stack-global memory blocks are recorded explicitly via this function.
    * Heap blocks should be tracked internally using memory allocation functions
    * such as malloc or calloc. */
-  shadow_alloca(ptr, size, IS_ON_GLOBAL(ptr));
+  shadow_alloca(ptr, size);
   return ptr;
 }
 
 static void delete_block(void * ptr) {
   /* Block deletion should be performed on stack/global addresses only,
    * heap blocks should be deallocated manually via free/cfree/realloc. */
-  if (IS_ON_STACK(ptr)) {
-    stack_shadow_freea(ptr);
-  } else if (IS_ON_GLOBAL(ptr)) {
-    global_shadow_freea(ptr);
-  }
+  shadow_freea(ptr);
 }
 
 static void full_init(void * ptr) {
@@ -74,23 +70,24 @@ static void readonly(void * ptr) {
 
 static int valid(void * ptr, size_t size) {
   uintptr_t addr = (uintptr_t)ptr;
-  if (!IS_ON_VALID(addr))
+  if (IS_ON_HEAP(addr))
+    return heap_allocated(addr, size);
+  else if (IS_ON_STACK(addr))
+    return static_allocated(addr, size);
+  else if (IS_ON_GLOBAL(addr))
+    return static_allocated(addr, size) && !global_readonly(addr);
+  else if (!IS_ON_VALID(addr))
     return 0;
-  TRY_SEGMENT(addr,
-    return heap_allocated(addr, size),
-    return stack_allocated(addr, size),
-    return global_allocated(addr, size) && !global_readonly(addr));
   return 0;
 }
 
 static int valid_read(void * ptr, size_t size) {
   uintptr_t addr = (uintptr_t)ptr;
-  if (!IS_ON_VALID(addr))
-    return 0;
   TRY_SEGMENT(addr,
     return heap_allocated(addr, size),
-    return stack_allocated(addr, size),
-    return global_allocated(addr, size));
+    return static_allocated(addr, size));
+  if (!IS_ON_VALID(addr))
+    return 0;
   return 0;
 }
 
@@ -100,8 +97,7 @@ static int valid_read(void * ptr, size_t size) {
 static void * segment_base_addr(void * ptr) {
   TRY_SEGMENT(ptr,
     return (void*)heap_info((uintptr_t)ptr, 'B'),
-    return (void*)stack_info((uintptr_t)ptr, 'B'),
-    return (void*)global_info((uintptr_t)ptr, 'B'));
+    return (void*)static_info((uintptr_t)ptr, 'B'));
   return NULL;
 }
 
@@ -111,8 +107,7 @@ static void * segment_base_addr(void * ptr) {
 static size_t segment_block_length(void * ptr) {
   TRY_SEGMENT(ptr,
     return heap_info((uintptr_t)ptr, 'L'),
-    return stack_info((uintptr_t)ptr, 'L'),
-    return global_info((uintptr_t)ptr, 'L'))
+    return static_info((uintptr_t)ptr, 'L'))
   return 0;
 }
 
@@ -122,8 +117,7 @@ static size_t segment_block_length(void * ptr) {
 static int segment_offset(void *ptr) {
   TRY_SEGMENT(ptr,
     return heap_info((uintptr_t)ptr, 'O'),
-    return stack_info((uintptr_t)ptr, 'O'),
-    return global_info((uintptr_t)ptr, 'O'));
+    return static_info((uintptr_t)ptr, 'O'));
   return 0;
 }
 
@@ -131,8 +125,7 @@ static int initialized(void * ptr, size_t size) {
   uintptr_t addr = (uintptr_t)ptr;
   TRY_SEGMENT_WEAK(addr,
     return heap_initialized(addr, size),
-    return stack_initialized(addr, size),
-    return global_initialized(addr, size));
+    return static_initialized(addr, size));
   return 0;
 }
 

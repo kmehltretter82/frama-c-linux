@@ -398,16 +398,15 @@ static void clean_memory_layout() {
 #define SECONDARY_TLS_SHADOW(_addr) \
   HIGHER_SHADOW_ACCESS(_addr, mem_layout.tls.sec_offset)
 
-/*! \brief Select stack or global shadow based on the value of `_global`
- *
- * - PRIMARY_SHADOW(_addr, 0) is equivalent to PRIMARY_STACK_SHADOW(_addr)
- * - PRIMARY_SHADOW(_addr, 1) is equivalent to PRIMARY_GLOBAL_SHADOW(_addr) */
-#define PRIMARY_SHADOW(_addr, _global) \
-  (_global ? PRIMARY_GLOBAL_SHADOW(_addr) : PRIMARY_STACK_SHADOW(_addr))
+#define SHADOW_REGION_ADDRESS(_addr, _region) \
+  (IS_ON_STACK(_addr) ? _region##_STACK_SHADOW(_addr) : \
+    IS_ON_GLOBAL(_addr) ? _region##_GLOBAL_SHADOW(_addr) : \
+      IS_ON_TLS(_addr) ? _region##_TLS_SHADOW(_addr) : 0)
 
-/*! \brief Same as above but for secondary stack/global shadows */
-#define SECONDARY_SHADOW(_addr, _global) \
-  (_global ? SECONDARY_GLOBAL_SHADOW(_addr) : SECONDARY_STACK_SHADOW(_addr))
+/*! \brief Primary shadow address of a non-dynamic region */
+#define PRIMARY_SHADOW(_addr) SHADOW_REGION_ADDRESS(_addr, PRIMARY)
+/*! \brief Secondary shadow address of a non-dynamic region */
+#define SECONDARY_SHADOW(_addr) SHADOW_REGION_ADDRESS(_addr, SECONDARY)
 
 /*! \brief Convert a heap address into its shadow counterpart */
 #define HEAP_SHADOW(_addr) \
@@ -436,11 +435,11 @@ static void clean_memory_layout() {
 
 /*! \brief Shortcut for evaluating an address via ::IS_ON_STACK or
  * ::IS_ON_GLOBAL based on the value of the second parameter */
-#define IS_ON_STATIC(_addr, _global) \
-  (_global ? IS_ON_GLOBAL(_addr) : IS_ON_STACK(_addr))
+#define IS_ON_STATIC(_addr) \
+  (IS_ON_STACK(_addr) || IS_ON_GLOBAL(_addr) || IS_ON_TLS(_addr))
 
 /*! \brief Evaluate to a true value if a given address belongs to tracked
  * allocation (i.e., found within stack, heap or globally) */
 #define IS_ON_VALID(_addr) \
-  (IS_ON_STACK(_addr) || IS_ON_HEAP(_addr) || IS_ON_GLOBAL(_addr))
+  (IS_ON_STACK(_addr) || IS_ON_HEAP(_addr) || IS_ON_GLOBAL(_addr) || IS_ON_TLS(_addr))
 /* }}} */

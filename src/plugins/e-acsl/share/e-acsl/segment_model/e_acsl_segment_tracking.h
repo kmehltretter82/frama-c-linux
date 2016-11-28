@@ -254,19 +254,16 @@ static void validate_memory_layout() {
      DVASSERT(heap_allocated((uintptr_t)_addr, _size), \
        "Operation on unallocated heap block [%a + %lu]\n   ",  _addr, _size)
 
-#  define segstr(_global)  ((_global) ? "global" : "stack")
-#  define DVALIDATE_STATIC_ACCESS(_addr, _size, _global) \
-     DVASSERT(IS_ON_STATIC(_addr, _global), \
-       "Expected %s location: %a\n   ", segstr(_global), _addr); \
-     DVASSERT(static_allocated((uintptr_t)_addr, _size, _global), \
-       "Operation on unallocated %s block [%a + %lu]\n   ", \
-        segstr(_global),  _addr, _size)
+#  define DVALIDATE_STATIC_ACCESS(_addr, _size) \
+     DVASSERT(IS_ON_STATIC(_addr), \
+       "Expected location: %a\n   ", _addr); \
+     DVASSERT(static_allocated((uintptr_t)_addr, _size), \
+       "Operation on unallocated block [%a + %lu]\n   ", _addr, _size)
 
-#  define DVALIDATE_STATIC_LOCATION(_addr, _global) \
-     DVASSERT(IS_ON_STATIC(_addr, _global), \
-       "Expected %s location: %a\n   ", segstr(_global), _addr); \
-     DVASSERT(static_allocated_one((uintptr_t)_addr, _global), \
-       "Operation on unallocated %s block [%a]\n   ", segstr(_global),  _addr)
+#  define DVALIDATE_STATIC_LOCATION(_addr) \
+     DVASSERT(IS_ON_STATIC(_addr), "Expected location: %a\n   ", _addr); \
+     DVASSERT(static_allocated_one((uintptr_t)_addr), \
+       "Operation on unallocated block [%a]\n   ", _addr)
 #else
 /*! \cond exclude from doxygen */
 #  define DVALIDATE_SHADOW_LAYOUT
@@ -281,35 +278,39 @@ static void validate_memory_layout() {
 /* E-ACSL predicates {{{ */
 /* See definitions for documentation */
 static uintptr_t heap_info(uintptr_t addr, char type);
-static uintptr_t static_info(uintptr_t addr, char type, int global);
+static uintptr_t static_info(uintptr_t addr, char type);
 static int heap_allocated(uintptr_t addr, size_t size);
-static int static_allocated(uintptr_t addr, long size, int global);
+static int static_allocated(uintptr_t addr, long size);
 static int freeable(void *ptr);
-
-/*! \brief Wrapper around ::static_allocated for stack addresses. */
-#define stack_allocated(_addr, _size)  static_allocated(_addr, _size, 0)
-/*! \brief Wrapper around ::static_allocated for global addresses. */
-#define global_allocated(_addr, _size) static_allocated(_addr, _size, 1)
 
 /*! \brief Quick test to check if a static location belongs to allocation.
  * This macro really belongs where static_allocated is defined, but
  * since it is used across this whole file it needs to be defined here. */
-#define static_allocated_one(addr, global) \
-  ((int)PRIMARY_SHADOW(addr, global))
+#define static_allocated_one(addr) \
+  ((int)PRIMARY_SHADOW(addr))
 
 /*! \brief Shortcut for executing statements based on the segment a given
  * address belongs to.
  * \param intptr_t _addr - a memory address
  * \param code_block _heap_stmt - code executed if `_addr` is a heap address
- * \param code_block _stack_stmt - code executed if `_addr` is a stack address
- * \param code_block _glob_stmt - code executed if `_addr` is a global address */
-#define TRY_SEGMENT_WEAK(_addr, _heap_stmt, _stack_stmt, _glob_stmt)  \
+ * \param code_block _static_stmt - code executed if `_addr` is a static address */
+#define TRY_SEGMENT_WEAK(_addr, _heap_stmt, _static_stmt)  \
   if (IS_ON_HEAP(_addr)) { \
     _heap_stmt; \
-  } else if (IS_ON_STACK(_addr)) { \
-    _stack_stmt; \
-  } else if (IS_ON_GLOBAL(_addr)) { \
-    _glob_stmt; \
+  } else if (IS_ON_STATIC(_addr)) { \
+    _static_stmt; \
+  } \
+
+/*! \brief Shortcut for executing statements based on the segment a given
+ * address belongs to.
+ * \param intptr_t _addr - a memory address
+ * \param code_block _heap_stmt - code executed if `_addr` is a heap address
+ * \param code_block _static_stmt - code executed if `_addr` is a static address */
+#define TRY_SEGMENT_WEAK(_addr, _heap_stmt, _static_stmt)  \
+  if (IS_ON_HEAP(_addr)) { \
+    _heap_stmt; \
+  } else if (IS_ON_STATIC(_addr)) { \
+    _static_stmt; \
   } \
 
 /*! \brief Same as TRY_SEGMENT but performs additional checks aborting the
@@ -319,8 +320,8 @@ static int freeable(void *ptr);
  *
  * The \b WEAK notion refers to the behaviour where no action is performed if
  * the given address does not belong to any of the known segments. */
-#define TRY_SEGMENT(_addr, _heap_stmt, _stack_stmt, _glob_stmt) { \
-  TRY_SEGMENT_WEAK(_addr, _heap_stmt, _stack_stmt, _glob_stmt) \
+#define TRY_SEGMENT(_addr, _heap_stmt, _static_stmt) { \
+  TRY_SEGMENT_WEAK(_addr, _heap_stmt, _static_stmt) \
   else if (_addr == 0) { \
     vassert(0, "Unexpected null pointer\n", NULL); \
   } else { \
@@ -330,8 +331,8 @@ static int freeable(void *ptr);
 
 /*! \brief Wrapper around ::heap_info and ::static_info functions that
  * dispatches one of the above functions based on the type of supplied memory
- * address (`addr`) (static, global or heap). For the case when the supplied
- * address does not belong to the track segments 0 is returned.
+ * address (`addr`) (static, global, tls or heap). For the case when the
+ * supplied address does not belong to the track segments 0 is returned.
  *
  * \param uintptr_t addr - a memory address
  * \param char p - predicate type. See ::static_info for further details. */
@@ -339,8 +340,7 @@ static uintptr_t predicate(uintptr_t addr, char p) {
   TRY_SEGMENT(
     addr,
     return heap_info((uintptr_t)addr, p),
-    return static_info((uintptr_t)addr, p, 0),
-    return static_info((uintptr_t)addr, p, 1));
+    return static_info((uintptr_t)addr, p));
   return 0;
 }
 
@@ -369,20 +369,15 @@ static uintptr_t predicate(uintptr_t addr, char p) {
  * and then for a block of 5 bytes its base offset if 11 etc. */
 static const char short_offsets_base [] = { 0, 1, 2, 4, 7, 11, 16, 22, 29 };
 
-/*! \brief Stack or global memory-allocation. Record allocation of a
- * given memory block and update shadows.
+/*! \brief Record allocation of a given memory block and update shadows
+ *  using offset-based encoding.
  *
  * \param ptr - pointer to a base memory address of the stack memory block.
- * \param size - size of the stack memory block.
- * \param global - if evaluates to a non-zero value then global region is used,
- * otherwise program stack is used. */
-static void shadow_alloca(void *ptr, size_t size, int global) {
-  unsigned char *prim_shadow =
-    (unsigned char*)PRIMARY_SHADOW(ptr, global);
-  uint64_t *prim_shadow_alt =
-    (uint64_t *)PRIMARY_SHADOW(ptr, global);
-  unsigned int *sec_shadow =
-    (unsigned int*)SECONDARY_SHADOW(ptr, global);
+ * \param size - size of the stack memory block. */
+static void shadow_alloca(void *ptr, size_t size) {
+  unsigned char *prim_shadow = (unsigned char*)PRIMARY_SHADOW(ptr);
+  uint64_t *prim_shadow_alt = (uint64_t *)PRIMARY_SHADOW(ptr);
+  unsigned int *sec_shadow = (unsigned int*)SECONDARY_SHADOW(ptr);
 
   /* Flip read-only bit for zero-size blocks. That is, physically it exists
    * but one cannot write to it. Further, the flipped read-only bit will also
@@ -413,43 +408,29 @@ static void shadow_alloca(void *ptr, size_t size, int global) {
     }
   }
 }
-
-/*! \brief  Wrapper around ::shadow_alloca for stack blocks */
-#define stack_shadow_alloca(_ptr, _size) shadow_alloca(_ptr, _size, 0)
-/*! \brief  Wrapper around ::shadow_alloca for global blocks */
-#define global_shadow_alloca(_ptr, _size) shadow_alloca(_ptr, _size, 1)
 /* }}} */
 
 /* Deletion of static blocks {{{ */
 
 /*! \brief Nullifies shadow regions of a memory block given by its address.
- * \param ptr - base memory address of the stack memory block.
- * \param global - if non-zero them `ptr` is assumed to carry a global address
- *  and a stack address otherwise */
-static void static_shadow_freea(void *ptr, int global) {
-  DVALIDATE_STATIC_LOCATION(ptr, global);
+ * \param ptr - base memory address of the stack memory block. */
+static void shadow_freea(void *ptr) {
+  DVALIDATE_STATIC_LOCATION(ptr);
   DASSERT(ptr == (void*)base_addr(ptr));
-
   size_t size = block_length(ptr);
-
-  memset((void*)PRIMARY_SHADOW(ptr, global), 0, size);
-  memset((void*)SECONDARY_SHADOW(ptr, global), 0, size);
+  memset((void*)PRIMARY_SHADOW(ptr), 0, size);
+  memset((void*)SECONDARY_SHADOW(ptr), 0, size);
 }
-
-/*! \brief Wrapper around ::static_shadow_freea for stack addresses */
-#define global_shadow_freea(_addr) static_shadow_freea(_addr, 1)
-/*! \brief Wrapper around ::static_shadow_freea for global addresses */
-#define stack_shadow_freea(_addr) static_shadow_freea(_addr, 0)
 /* }}} */
 
 /* Static querying {{{ */
 
 /*! \brief Return a non-zero value if a memory region of length `size`
- * starting at address `addr` belongs to an allocated (tracked) stack or
- * global memory block and 0 otherwise. Note, this function is only safe if
- * applied to a stack or global address. */
-static int static_allocated(uintptr_t addr, long size, int global) {
-  unsigned char *prim_shadow = (unsigned char*)PRIMARY_SHADOW(addr, global);
+ * starting at address `addr` belongs to a tracked stack, tls or
+ * global memory block and 0 otherwise.
+ * This function is only safe if applied to a tls, stack or global address. */
+static int static_allocated(uintptr_t addr, long size) {
+  unsigned char *prim_shadow = (unsigned char*)PRIMARY_SHADOW(addr);
   /* Unless the address belongs to tracked allocation 0 is returned */
   if (prim_shadow[0]) {
     unsigned int code = (prim_shadow[0] >> 2);
@@ -458,7 +439,7 @@ static int static_allocated(uintptr_t addr, long size, int global) {
     if (long_block) {
       offset = code - LONG_BLOCK_INDEX_START;
       unsigned int *sec_shadow =
-        (unsigned int*)SECONDARY_SHADOW(addr - offset, global) ;
+        (unsigned int*)SECONDARY_SHADOW(addr - offset) ;
       length = sec_shadow[0];
       offset = sec_shadow[1] + offset;
     } else {
@@ -470,21 +451,18 @@ static int static_allocated(uintptr_t addr, long size, int global) {
   return 0;
 }
 
-/*! \brief Return a non-zero value if a statically allocated memory block starting
- * at `addr` of length `size` is fully initialized (i.e., each of its cells
- * is initialized). If the third argument (`global`) evaluates to a non-zero
- * value then the memory block is assumed to belong to the global allocation
- * and to the stack allocation otherwise. A 0  is returned if the given address
- * does not belong to static allocation */
-static int static_initialized(uintptr_t addr, long size, int global) {
+/*! \brief Return a non-zero value if a statically allocated memory block
+ * starting at `addr` of length `size` is fully initialized (i.e., each of
+ * its cells is initialized). */
+static int static_initialized(uintptr_t addr, long size) {
   /* Return 0 right away if the address does not belong to
    * static allocation */
-  if (!static_allocated(addr, size, global))
+  if (!static_allocated(addr, size))
     return 0;
-  DVALIDATE_STATIC_ACCESS(addr, size, global);
+  DVALIDATE_STATIC_ACCESS(addr, size);
 
   int result = 1;
-  uint64_t *shadow = (uint64_t*)PRIMARY_SHADOW(addr, global);
+  uint64_t *shadow = (uint64_t*)PRIMARY_SHADOW(addr);
   while (size > 0) {
     int rem = (size >= ULONG_BYTES) ? ULONG_BYTES : size;
     uint64_t mask = static_init_masks[rem];
@@ -497,13 +475,6 @@ static int static_initialized(uintptr_t addr, long size, int global) {
   }
   return result;
 }
-
-/*! \brief Wrapper around ::static_initialized for checking initialization of
- * stack blocks */
-#define stack_initialized(_addr, _size)  static_initialized(_addr, _size, 0)
-/*! \brief Wrapper around ::static_initialized for checking initialization of
- * global blocks */
-#define global_initialized(_addr, _size) static_initialized(_addr, _size, 1)
 
 /*! \brief Checking whether a globally allocated memory block containing an
  * address _addr has read-only access. Note, this is light checking that
@@ -528,9 +499,9 @@ static int static_initialized(uintptr_t addr, long size, int global) {
  * That is, for the cases when addr does not refer to a valid memory address
  * belonging to static allocation the return value for this function is
  * unspecified. */
-static uintptr_t static_info(uintptr_t addr, char type, int global) {
-  DVALIDATE_STATIC_LOCATION(addr, global);
-  unsigned char *prim_shadow = (unsigned char*)PRIMARY_SHADOW(addr, global);
+static uintptr_t static_info(uintptr_t addr, char type) {
+  DVALIDATE_STATIC_LOCATION(addr);
+  unsigned char *prim_shadow = (unsigned char*)PRIMARY_SHADOW(addr);
 
   /* Unless the address belongs to tracked allocation 0 is returned */
   if (prim_shadow[0]) {
@@ -539,7 +510,7 @@ static uintptr_t static_info(uintptr_t addr, char type, int global) {
     if (long_block) {
       unsigned int offset = code - LONG_BLOCK_INDEX_START;
       unsigned int *sec_shadow =
-        (unsigned int*)SECONDARY_SHADOW(addr - offset, global) ;
+        (unsigned int*)SECONDARY_SHADOW(addr - offset) ;
       switch(type) {
         case 'B': /* Base address */
           return addr - offset - sec_shadow[1];
@@ -565,21 +536,14 @@ static uintptr_t static_info(uintptr_t addr, char type, int global) {
   }
   return 0;
 }
-
-/*! \brief Wrapper around ::static_info for stack addresses */
-#define stack_info(_addr, _pred)  static_info(_addr, _pred, 0)
-/*! \brief Wrapper around ::static_info for global addresses */
-#define global_info(_addr, _pred)  static_info(_addr, _pred, 1)
 /* }}} */
 
 /* Static initialization {{{ */
 /*! \brief The following function marks n bytes starting from the address
  * given by addr as initialized. `size` equating to zero indicates that the
- * whole block should be marked as initialized. Parameter global indicates
- * the shadow  region addr can be found in, such that 0 indicates stack
- * allocation and a non-zero value indicates global allocation. */
-static void initialize_static_region(uintptr_t addr, long size, int global) {
-  DVALIDATE_STATIC_ACCESS(addr, size, global);
+ * whole block should be marked as initialized.  */
+static void initialize_static_region(uintptr_t addr, long size) {
+  DVALIDATE_STATIC_ACCESS(addr, size);
   DVASSERT(!(addr - base_addr(addr) + size > block_length(addr)),
     "Attempt to initialize %lu bytes past block boundaries\n"
     "starting at %a with block length %lu at base address %a\n",
@@ -607,7 +571,7 @@ static void initialize_static_region(uintptr_t addr, long size, int global) {
    * That is, `*shadow |= static_init_masks[1]` will set only the least
    * significant bit in *shadow. */
 
-  uint64_t *shadow = (uint64_t*)PRIMARY_SHADOW(addr, global);
+  uint64_t *shadow = (uint64_t*)PRIMARY_SHADOW(addr);
   while (size > 0) {
     int rem = (size >= ULONG_BYTES) ? ULONG_BYTES : size;
     size -= ULONG_BYTES;
@@ -615,15 +579,6 @@ static void initialize_static_region(uintptr_t addr, long size, int global) {
     shadow++;
   }
 }
-
-/*! \brief Wrapper around ::initialize_static_region for stack regions */
-#define initialize_stack_region(_addr, _n) \
-  initialize_static_region(_addr, _n, 0)
-
-/*! \brief Wrapper around ::initialize_static_region for global regions */
-#define initialize_global_region(_addr, _n) \
-  initialize_static_region(_addr, _n, 1)
-
 /* }}} */
 
 /* Read-only {{{ */
@@ -635,7 +590,7 @@ static void mark_readonly (uintptr_t addr, long size) {
   /* Since read-only blocks can only be stored in the globals  segments (e.g.,
    * TEXT), this function required ptr carry a global address. */
   DASSERT(IS_ON_GLOBAL(addr));
-  DASSERT(global_allocated(addr, 1));
+  DASSERT(static_allocated(addr, 1));
   DVASSERT(!(addr - base_addr(addr) + size > block_length(addr)),
     "Attempt to mark read-only %lu bytes past block boundaries\n"
     "starting at %a with block length %lu at base address %a\n",
@@ -655,13 +610,13 @@ static void mark_readonly (uintptr_t addr, long size) {
 /* Track program arguments (ARGC/ARGV) {{{ */
 static void argv_alloca(int argc,  char ** argv) {
   /* Track a top-level container (i.e., `*argv`) */
-  stack_shadow_alloca(argv, (argc + 1)*sizeof(char*));
-  initialize_stack_region((uintptr_t)argv, (argc + 1)*sizeof(char*));
+  shadow_alloca(argv, (argc + 1)*sizeof(char*));
+  initialize_static_region((uintptr_t)argv, (argc + 1)*sizeof(char*));
   /* Track argument strings */
   while (*argv) {
     size_t arglen = strlen(*argv) + 1;
-    stack_shadow_alloca(*argv, arglen);
-    initialize_stack_region((uintptr_t)*argv, arglen);
+    shadow_alloca(*argv, arglen);
+    initialize_static_region((uintptr_t)*argv, arglen);
     argv++;
   }
 }
@@ -1105,8 +1060,7 @@ static void initialize(void *ptr, size_t n) {
   TRY_SEGMENT(
     (uintptr_t)ptr,
     initialize_heap_region((uintptr_t)ptr, n),
-    initialize_stack_region((uintptr_t)ptr, n),
-    initialize_global_region((uintptr_t)ptr, n)
+    initialize_static_region((uintptr_t)ptr, n)
   )
 }
 /* }}} */
@@ -1129,12 +1083,12 @@ static void printbyte(unsigned char c, char buf[]) {
 
 /*! \brief Print human-readable (well, ish) representation of a memory block
  * using primary and secondary shadows. */
-static void print_static_shadows(uintptr_t addr, size_t size, int global) {
+static void print_static_shadows(uintptr_t addr, size_t size) {
   char prim_buf[256];
   char sec_buf[256];
 
-  unsigned char *prim_shadow = (unsigned char*)PRIMARY_SHADOW(addr, global);
-  unsigned int *sec_shadow = (unsigned int*)SECONDARY_SHADOW(addr, global);
+  unsigned char *prim_shadow = (unsigned char*)PRIMARY_SHADOW(addr);
+  unsigned int *sec_shadow = (unsigned int*)SECONDARY_SHADOW(addr);
 
   int i, j = 0;
   for (i = 0; i < size; i++) {
@@ -1153,9 +1107,6 @@ static void print_static_shadows(uintptr_t addr, size_t size, int global) {
     DLOG("| [%2d] %a | %s || %s\n", i, &prim_shadow[i], prim_buf, sec_buf);
   }
 }
-
-#define print_stack_shadows(addr, size) print_static_shadows(addr, size, 0)
-#define print_global_shadows(addr, size) print_static_shadows(addr, size, 1)
 
 /*! \brief Print human-readable representation of a heap shadow region for a
  * memory block of length `size` starting at address `addr`.  */
@@ -1177,10 +1128,8 @@ static void print_heap_shadows(uintptr_t addr, size_t size) {
 }
 
 static void print_shadows(uintptr_t addr, size_t size) {
-  if (IS_ON_STACK(addr))
-    print_stack_shadows(addr, size);
-  if (IS_ON_GLOBAL(addr))
-    print_global_shadows(addr, size);
+  if (IS_ON_STATIC(addr))
+    print_static_shadows(addr, size);
   else if (IS_ON_HEAP(addr))
     print_heap_shadows(addr, size);
 }
