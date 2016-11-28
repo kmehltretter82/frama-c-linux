@@ -34,10 +34,10 @@
  * \b FIXME: in the current implementation there might be issues with segment
  * size greater than 64 bytes. This is because presently some initialization
  * functionality relies on the fact that initialization per segment can be set
- * and/or evaluated using 8-byte bitmask. */
+ * and/or evaluated using an 8-byte bitmask. */
 #define HEAP_SEGMENT 16
 
-/*! \brief Number of required to represent initialization of a segment. */
+/*! \brief Number of bytes required to represent initialization of a segment. */
 #define INIT_BYTES (HEAP_SEGMENT/8)
 
 /*! \brief Size (in bytes) of a long block on the stack. */
@@ -1158,8 +1158,8 @@ static void print_memory_layout() {
 }
 
 /*! \brief Output the shadow segment the address belongs to */
-static void which_segment(uintptr_t addr) {
-  char *loc = NULL;
+static const char* which_segment(uintptr_t addr) {
+  const char *loc = NULL;
   if (IS_ON_STACK(addr))
     loc = "stack";
   else if (IS_ON_HEAP(addr))
@@ -1170,7 +1170,7 @@ static void which_segment(uintptr_t addr) {
     loc = "TLS";
   else
     loc = "untracked";
-  DLOG("Address: %a -> %s\n", addr, loc);
+  return loc;
 }
 
 /* NOTE: Above functions are designed to be used only through the following

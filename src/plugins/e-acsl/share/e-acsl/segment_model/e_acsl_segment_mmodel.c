@@ -39,6 +39,7 @@ static int valid(void * ptr, size_t size);
 #include "e_acsl_debug.h"
 #include "e_acsl_malloc.h"
 #include "e_acsl_shadow_layout.h"
+#include "e_acsl_safe_locations.h"
 #include "e_acsl_segment_tracking.h"
 #include "e_acsl_mmodel_api.h"
 
@@ -72,7 +73,7 @@ static int valid(void * ptr, size_t size) {
   uintptr_t addr = (uintptr_t)ptr;
   if (IS_ON_HEAP(addr))
     return heap_allocated(addr, size);
-  else if (IS_ON_STACK(addr))
+  else if (IS_ON_STACK(addr) || IS_ON_TLS(addr))
     return static_allocated(addr, size);
   else if (IS_ON_GLOBAL(addr))
     return static_allocated(addr, size) && !global_readonly(addr);
@@ -150,6 +151,16 @@ static void memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
   /* Track program arguments. */
   if (argc_ref && argv_ref)
     argv_alloca(*argc_ref, *argv_ref);
+  /* Tracking safe locations */
+  collect_safe_locations();
+  int i;
+  for (i = 0; i < safe_location_counter; i++) {
+    void *addr = (void*)safe_locations[i].address;
+    uintptr_t len = safe_locations[i].length;
+    shadow_alloca(addr, len);
+    if (safe_locations[i].initialized)
+      initialize(addr, len);
+  }
 }
 
 static void memory_clean(void) {

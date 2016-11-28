@@ -396,11 +396,11 @@ static void clean_memory_layout() {
 
 /*! \brief Convert a TLS address into its primary shadow counterpart */
 #define PRIMARY_TLS_SHADOW(_addr)  \
-  HIGHER_SHADOW_ACCESS(_addr, mem_layout.tls.prim_offset)
+  LOWER_SHADOW_ACCESS(_addr, mem_layout.tls.prim_offset)
 
 /*! \brief Convert a TLS address into its secondary shadow counterpart */
 #define SECONDARY_TLS_SHADOW(_addr) \
-  HIGHER_SHADOW_ACCESS(_addr, mem_layout.tls.sec_offset)
+  LOWER_SHADOW_ACCESS(_addr, mem_layout.tls.sec_offset)
 
 /* \brief Compute a primary or a secondary shadow address (based on the value of
  * parameter `_region`) of an address tracked via an offset-based encoding.
