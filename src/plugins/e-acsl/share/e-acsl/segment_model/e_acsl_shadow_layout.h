@@ -48,25 +48,25 @@ char *strerror(int errnum);
 #define MB_SZ(_s) (_s/MB) //!< Convert bytes to megabytes
 #define GB_SZ(_s) (_s/GB) //!< Convert bytes to gigabytes
 
-/*! \brief Pointer size (in bytes) for a given system */
+/*! \brief Byte-width of a pointer */
 #define PTR_SZ sizeof(uintptr_t)
 
-/*! \brief Bit and byte sizes of a unsigned long type, i.e., the largest
- * integer type that can be used with bit-level operators.
- * NB: Some architectures allow 128-bit (i.e., 16 byte integers),
- * but the availability of such integer types is implementation specific. */
+/*! \brief Byte-width of the largest integer type usable with bitwise
+ * operators */
 #define ULONG_BYTES 8
+/*! \brief Bit-width of the largest integer type usable with bitwise
+ * operators */
 #define ULONG_BITS 64
 
 /** Hardcoded sizes of tracked program segments {{{ */
-/*! \brief Size of the heap segment */
+/*! \brief Size of a program's heap */
 #define PGM_HEAP_SIZE (256 * MB)
 
-/*! \brief Size of the TLS segment */
+/*! \brief Size of a program's Thread-local storage (TLS) */
 #define PGM_TLS_SIZE (8 * MB)
 /* }}} */
 
-/** Thread-local storage information {{{ */
+/* Thread-local storage information {{{ */
 
 /*! Thread-local storage (TLS) keeps track of copies of per-thread variables.
  * Even though at the present stage RTL of E-ACSL is not thread-safe, some
@@ -88,7 +88,7 @@ char *strerror(int errnum);
  *   start TLS address (&id_bss - TLS_SHADOW_SIZE/2)
  */
 
-/*! Get byte-size of TLS segment */
+/*! \brief Return byte-size of the TLS segment */
 static size_t get_tls_size() {
   return PGM_TLS_SIZE;
 }
@@ -96,7 +96,7 @@ static size_t get_tls_size() {
 static __thread int id_tdata = 1;
 static __thread int id_tbss;
 
-/*! Set TLS size and its end and start addresses. */
+/*! \brief Return start address of a program's TLS */
 static uintptr_t get_tls_start() {
   size_t tls_size = get_tls_size();
   uintptr_t data = (uintptr_t)&id_tdata,
@@ -106,12 +106,11 @@ static uintptr_t get_tls_start() {
 
 /* }}} */
 
-/** Program stack information {{{ */
+/* Program stack information {{{ */
 extern char ** environ;
 
-/*! \brief Get the stack size (in bytes) as used by the program. The return
- * value is the soft stack limit, i.e., it can be programmatically increased
- * at runtime */
+/*! \brief Return byte-size of a program's stack. The return value is the soft
+ * stack limit, i.e., it can be programmatically increased at runtime. */
 static size_t get_stack_size() {
   struct rlimit rlim;
   assert(!getrlimit(RLIMIT_STACK, &rlim));
@@ -121,9 +120,8 @@ static size_t get_stack_size() {
 /*! \brief Return greatest (known) address on a program's stack.
  * This function presently determines the address using the address of the
  * last string in `environ`. That is, it assumes that argc and argv are
- * stored below environ, which holds for GCC/GLIBC but is not necessarily
- * true. In general, a reliable way of detecting the upper bound of a stack
- * segment is needed. */
+ * stored below environ, which holds for GCC/Glibc but is not necessarily
+ * true for some other compilers/libraries. */
 static uintptr_t get_stack_start(int *argc_ref,  char *** argv_ref) {
   char **env = environ;
   while (env[1])
@@ -140,7 +138,7 @@ static uintptr_t get_stack_start(int *argc_ref,  char *** argv_ref) {
   return stack_start;
 }
 
-/*! \brief Set a new stack limit
+/*! \brief Set a new soft stack limit
  * \param size - new stack size in bytes */
 static void increase_stack_limit(const size_t size) {
   const rlim_t stacksz = (rlim_t)size;
@@ -159,21 +157,26 @@ static void increase_stack_limit(const size_t size) {
 /* }}} */
 
 /** Program heap information {{{ */
+/*! \brief Return the start address of a program's heap. In this implementation
+ * the start address on a program's heap is its initial breakpoint. */
 static uintptr_t get_heap_start() {
   return (uintptr_t)sbrk(0);
 }
 
+/*! \brief Return the tracked size of a program's heap. */
 static size_t get_heap_size() {
   return PGM_HEAP_SIZE;
 }
 /** }}} */
 
 /** Program global information {{{ */
+/*! \brief Return the start address of a segment holding globals (generally
+ * BSS and Data segments). */
 static uintptr_t get_global_start() {
   return (uintptr_t)(PTR_SZ*2);
 }
 
-/*! \brief Get byte-size of global segment */
+/*! \brief Return byte-size of global segment */
 static size_t get_global_size() {
 /* In all likelihood it is reasonably safe to assume that first
   * 2x*pointer-size bytes of the memory space will not be used. */
@@ -196,9 +199,9 @@ static void *do_mmap(size_t size) {
 }
 /* }}} */
 
-/** Shadow Offset {{{ */
-/*! Compute shadow offset between the start address of a shadow area and a
- * start address of a segment */
+/* Shadow Offset {{{ */
+/*! \brief Compute shadow offset between the start address of a shadow area
+ * and a start address of a segment */
 static uintptr_t shadow_offset(void *shadow, uintptr_t start_addr) {
   uintptr_t start_shadow = (uintptr_t)shadow;
   return (start_shadow > start_addr) ?
@@ -206,7 +209,7 @@ static uintptr_t shadow_offset(void *shadow, uintptr_t start_addr) {
 }
 /* }}} */
 
-/** Program Layout {{{ */
+/* Program Layout {{{ */
 /*****************************************************************************
  * Memory Layout *************************************************************
  *****************************************************************************
@@ -343,7 +346,7 @@ static void clean_memory_layout() {
 }
 /* }}} */
 
-/** Shadow access {{{
+/* Shadow access {{{
  *
  * In a typical case shadow regions reside in the high memory but below
  * stack. Provided that shadow displacement offsets are stored using
@@ -359,18 +362,19 @@ static void clean_memory_layout() {
  * are given using the following macros.
 */
 
-/*! \brief General macro for computing shadow address
- * @param _addr - an address in application space
+/*! \brief Compute a shadow address using displacement offset
+ * @param _addr - an application space address
  * @param _offset - a shadow displacement offset
- * @param _direction - plus or minus sign */
+ * @param _direction - while displacement offsets are stored as unsigned
+ * integers, _direction (`+` or `-`) indicates the sign of the offset. */
 #define SHADOW_ACCESS(_addr,_offset,_direction)  \
   ((uintptr_t)((uintptr_t)_addr _direction _offset))
 
-/*! \brief Access to shadow area situated lower than an application segment */
+/*! \brief Access to a shadow space below an application's segment */
 #define LOWER_SHADOW_ACCESS(_addr,_offset) \
   SHADOW_ACCESS(_addr,_offset,-)
 
-/*! \brief Access to shadow area situated higher than an application segment */
+/*! \brief Access to a shadow space above an application's segment */
 #define HIGHER_SHADOW_ACCESS(_addr,_offset) \
   SHADOW_ACCESS(_addr,_offset,+)
 
@@ -398,6 +402,9 @@ static void clean_memory_layout() {
 #define SECONDARY_TLS_SHADOW(_addr) \
   HIGHER_SHADOW_ACCESS(_addr, mem_layout.tls.sec_offset)
 
+/* \brief Compute a primary or a secondary shadow address (based on the value of
+ * parameter `_region`) of an address tracked via an offset-based encoding.
+ * For an untracked address `0` is returned. */
 #define SHADOW_REGION_ADDRESS(_addr, _region) \
   (IS_ON_STACK(_addr) ? _region##_STACK_SHADOW(_addr) : \
     IS_ON_GLOBAL(_addr) ? _region##_GLOBAL_SHADOW(_addr) : \
@@ -413,33 +420,37 @@ static void clean_memory_layout() {
   HIGHER_SHADOW_ACCESS(_addr, mem_layout.heap.prim_offset)
 /* }}} */
 
-/** Memory segment ranges {{{ */
-/*! \brief Evaluate to a true value if a given address resides within a given
- * memory segment. */
+/* Memory segment ranges {{{ */
+/*! \brief Evaluate to a true value if address _addr resides within a given
+ * memory segment.
+ * \param _addr - a memory address
+ * \param _seg - a memory segment (one of the structs within ::mem_layout)
+*/
 #define IS_ON(_addr,_seg) ( \
   ((uintptr_t)_addr) >= _seg.start && \
   ((uintptr_t)_addr) <= _seg.end \
 )
 
-/*! \brief Evaluate to true if _addr is a heap address */
+/*! \brief Evaluate to true if `_addr` is a heap address */
 #define IS_ON_HEAP(_addr) IS_ON(_addr, mem_layout.heap)
 
-/*! \brief Evaluate to true if _addr is a stack address */
+/*! \brief Evaluate to true if `_addr` is a stack address */
 #define IS_ON_STACK(_addr) IS_ON(_addr, mem_layout.stack)
 
-/*! \brief Evaluate to true if _addr is a global address */
+/*! \brief Evaluate to true if `_addr` is a global address */
 #define IS_ON_GLOBAL(_addr) IS_ON(_addr, mem_layout.global)
 
 /*! \brief Evaluate to true if _addr is a TLS address */
 #define IS_ON_TLS(_addr) IS_ON(_addr, mem_layout.tls)
 
-/*! \brief Shortcut for evaluating an address via ::IS_ON_STACK or
- * ::IS_ON_GLOBAL based on the value of the second parameter */
+/*! \brief Shortcut for evaluating an address via ::IS_ON_STACK,
+ * ::IS_ON_GLOBAL or ::IS_ON_TLS  */
 #define IS_ON_STATIC(_addr) \
   (IS_ON_STACK(_addr) || IS_ON_GLOBAL(_addr) || IS_ON_TLS(_addr))
 
 /*! \brief Evaluate to a true value if a given address belongs to tracked
- * allocation (i.e., found within stack, heap or globally) */
+ * allocation (i.e., found within tls, stack, heap or globally) */
 #define IS_ON_VALID(_addr) \
-  (IS_ON_STACK(_addr) || IS_ON_HEAP(_addr) || IS_ON_GLOBAL(_addr) || IS_ON_TLS(_addr))
+  (IS_ON_STACK(_addr) || IS_ON_HEAP(_addr) || \
+   IS_ON_GLOBAL(_addr) || IS_ON_TLS(_addr))
 /* }}} */
