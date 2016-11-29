@@ -247,23 +247,35 @@ static void validate_memory_layout() {
       "Unexpected location of heap (above global)", NULL);
 }
 
-#  define DVALIDATE_SHADOW_LAYOUT validate_memory_layout()
-#  define DVALIDATE_HEAP_ACCESS(_addr, _size) \
-     DVASSERT(IS_ON_HEAP(_addr), \
-       "Expected heap location: %a\n   ", _addr); \
-     DVASSERT(heap_allocated((uintptr_t)_addr, _size), \
+/* Assert that memory layout has been initialized and all segments appear
+ * in the expected order */
+# define DVALIDATE_SHADOW_LAYOUT validate_memory_layout()
+
+/* Assert that a memory block [_addr, _addr + _size] is allocated on a
+ * program's heap */
+# define DVALIDATE_HEAP_ACCESS(_addr, _size) \
+    DVASSERT(IS_ON_HEAP(_addr), "Expected heap location: %a\n   ", _addr); \
+    DVASSERT(heap_allocated((uintptr_t)_addr, _size), \
        "Operation on unallocated heap block [%a + %lu]\n   ",  _addr, _size)
 
-#  define DVALIDATE_STATIC_ACCESS(_addr, _size) \
-     DVASSERT(IS_ON_STATIC(_addr), \
-       "Expected location: %a\n   ", _addr); \
-     DVASSERT(static_allocated((uintptr_t)_addr, _size), \
+/* Assert that memory block [_addr, _addr + _size] is allocated on stack, TLS
+ * or globally */
+# define DVALIDATE_STATIC_ACCESS(_addr, _size) \
+    DVASSERT(IS_ON_STATIC(_addr), "Expected location: %a\n   ", _addr); \
+    DVASSERT(static_allocated((uintptr_t)_addr, _size), \
        "Operation on unallocated block [%a + %lu]\n   ", _addr, _size)
 
-#  define DVALIDATE_STATIC_LOCATION(_addr) \
-     DVASSERT(IS_ON_STATIC(_addr), "Expected location: %a\n   ", _addr); \
-     DVASSERT(static_allocated_one((uintptr_t)_addr), \
+/* Same as ::DVALIDATE_STATIC_LOCATION but for a single memory location */
+# define DVALIDATE_STATIC_LOCATION(_addr) \
+    DVASSERT(IS_ON_STATIC(_addr), "Expected location: %a\n   ", _addr); \
+    DVASSERT(static_allocated_one((uintptr_t)_addr), \
        "Operation on unallocated block [%a]\n   ", _addr)
+
+/* Assert that a memory block [_addr, _adddr + _size] is nullified */
+# define DVALIDATE_NULLIFIED(_addr, _size) \
+  DVASSERT(zeroed_out((void *)_addr, _size), \
+    "Block [%a, %a+%lu] not nullified", _addr, _addr, _size)
+
 #else
 /*! \cond exclude from doxygen */
 #  define DVALIDATE_SHADOW_LAYOUT
@@ -271,6 +283,7 @@ static void validate_memory_layout() {
 #  define DVALIDATE_STATIC_ACCESS
 #  define DVALIDATE_STATIC_LOCATION
 #  define DVALIDATE_ALIGNMENT
+#  define DVALIDATE_NULLIFIED
 /*! \endcond */
 #endif
 /* }}} */
@@ -650,6 +663,7 @@ static void set_heap_segment(void *ptr, size_t size, size_t init) {
    * system) bytes of the segment are nullified to indicate that this segment
    * does not correspond to an allocated memory block. The following block (at
    * index 1) captures the size of the segment in bytes. */
+  DVALIDATE_NULLIFIED(shadow_meta, aligned_size + HEAP_SEGMENT);
   shadow_meta[0] = ZERO;
   shadow_meta[1] = size;
 
