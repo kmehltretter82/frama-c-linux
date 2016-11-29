@@ -678,9 +678,8 @@ static size_t heap_allocation_size = 0;
  * \b WARNING: Current implementation assumes that the size of a heap segment
  * does not exceed 64 bytes. */
 static void set_heap_segment(void *ptr, size_t size, size_t init) {
-  if (!ptr)
-    return;
-
+  /* Ensure the shadowed block in on the tracked heap portion */
+  DVALIDATE_IS_ON_HEAP(((uintptr_t)ptr) - HEAP_SEGMENT, size);
   DVALIDATE_ALIGNMENT(ptr); /* Make sure alignment is right */
   heap_allocation_size += size; /* Adjuct tracked allocation size */
 
@@ -690,12 +689,13 @@ static void set_heap_segment(void *ptr, size_t size, size_t init) {
   unsigned char *shadowed = (unsigned char*)HEAP_SHADOW(ptr);
   uintptr_t *shadow_meta = (uintptr_t*)(shadowed - HEAP_SEGMENT);
 
+  /* Make sure shadow is nullified before setting it */
+  DVALIDATE_NULLIFIED(shadow_meta, aligned_size + HEAP_SEGMENT);
+
   /* Write the actual length to the meta-segment. First 8 (or 4 in a 32-bit
    * system) bytes of the segment are nullified to indicate that this segment
    * does not correspond to an allocated memory block. The following block (at
    * index 1) captures the size of the segment in bytes. */
-  DVALIDATE_NULLIFIED(shadow_meta, aligned_size + HEAP_SEGMENT);
-  shadow_meta[0] = ZERO;
   shadow_meta[1] = size;
 
   /* The overall number of block segments in a tracked memory block  */
