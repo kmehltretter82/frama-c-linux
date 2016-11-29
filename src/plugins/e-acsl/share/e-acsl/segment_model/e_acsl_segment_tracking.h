@@ -251,6 +251,28 @@ static void validate_memory_layout() {
  * in the expected order */
 # define DVALIDATE_SHADOW_LAYOUT validate_memory_layout()
 
+/* Assert that boundaries of a block [_addr, _addr+_size] are within a segment
+ * given by `_s`. `_s` is either HEAP, STACK, TLS, GLOBAL or STATIC. */
+#define DVALIDATE_IS_ON(_addr, _size, _s) \
+  DVASSERT(IS_ON_##_s(_addr), "Address %a not on %s", _addr, #_s); \
+  DVASSERT(IS_ON_##_s(_addr+_size), "Address %a not on %s", _addr+_size, #_s)
+
+/* Assert that [_addr, _addr+_size] are within heap segment */
+#define DVALIDATE_IS_ON_HEAP(_addr, _size) \
+  DVALIDATE_IS_ON(_addr, _size, HEAP)
+/* Assert that [_addr, _addr+_size] are within stack segment */
+#define DVALIDATE_IS_ON_STACK(_addr, _size) \
+  DVALIDATE_IS_ON(_addr, _size, STACK)
+/* Assert that [_addr, _addr+_size] are within global segment */
+#define DVALIDATE_IS_ON_GLOBAL(_addr, _size) \
+  DVALIDATE_IS_ON(_addr, _size, GLOBAL)
+/* Assert that [_addr, _addr+_size] are within TLS segment */
+#define DVALIDATE_IS_ON_TLS(_addr, _size) \
+  DVALIDATE_IS_ON(_addr, _size, TLS)
+/* Assert that [_addr, _addr+_size] are within stack, global or TLS segments */
+#define DVALIDATE_IS_ON_STATIC(_addr, _size) \
+  DVALIDATE_IS_ON(_addr, _size, STATIC)
+
 /* Assert that a memory block [_addr, _addr + _size] is allocated on a
  * program's heap */
 # define DVALIDATE_HEAP_ACCESS(_addr, _size) \
@@ -284,6 +306,12 @@ static void validate_memory_layout() {
 #  define DVALIDATE_STATIC_LOCATION
 #  define DVALIDATE_ALIGNMENT
 #  define DVALIDATE_NULLIFIED
+#  define DVALIDATE_IS_ON
+#  define DVALIDATE_IS_ON_HEAP
+#  define DVALIDATE_IS_ON_STACK
+#  define DVALIDATE_IS_ON_GLOBAL
+#  define DVALIDATE_IS_ON_TLS
+#  define DVALIDATE_IS_ON_STATIC
 /*! \endcond */
 #endif
 /* }}} */
@@ -644,6 +672,9 @@ static size_t heap_allocation_size = 0;
 /*! \brief Create a heap shadow for an allocated memory block starting at `ptr`
  * and of length `size`. Optionally mark it as initialized if `init`
  * evaluates to a non-zero value.
+ * \b NOTE: This function assumes that `ptr` is a valid base address of a
+ * heap-allocated memory block, such that HEAP_SEGMENT bytes preceding `ptr`
+ * correspond to `unusable space`.
  * \b WARNING: Current implementation assumes that the size of a heap segment
  * does not exceed 64 bytes. */
 static void set_heap_segment(void *ptr, size_t size, size_t init) {
