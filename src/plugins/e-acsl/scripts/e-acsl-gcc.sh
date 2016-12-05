@@ -68,54 +68,97 @@ realpath() {
   fi
 }
 
-# Process option string for RTE plugin
-rte_options() {
-  local optstring="$1"
-  local start="-rte -rte-warn"
-  local opts="-rte-no-all"
-  # RTE integer overflow options coming from Frama-C, presently
-  # they are enabled by default, so they should be negated
-  local intopts="-no-warn-signed-overflow -no-warn-unsigned-overflow"
-  local vopts="mem,int,float,div,ret,precond,shift,all"
-  local all=""
+# Split a comma-separated string into a whitespace-separated string, remove
+# all duplicates and trailing, leading or multiple spaces
+tokenize() {
+  echo -n "$@" \
+    | sed -e 's/\s//g' -e 's/,/ /g' -e 's/\s\+/\n/g' \
+    | sort -u \
+    | tr '\n' ' ' \
+    | sed 's/\s*$//'
+}
 
-  for opt in $(echo $optstring | tr ',' ' '); do
-    case $opt in
-      mem) # valid pointer or array access
-        opts="$opts -rte-mem"
-      ;;
-      int) # integer overflows
-        intopts="-warn-signed-overflow -warn-unsigned-overflow"
-      ;;
-      float) # casts from floating-point to integer
-        opts="$opts -rte-float-to-int"
-      ;;
-      div) # division by zero
-        opts="$opts -rte-div"
-      ;;
-      ret) # return
-      ;;
-      precond) # function calls based on contracts
-        opts="$opts -rte-precond"
-      ;;
-      shift) # left and right shifts by a value out of bounds
-        opts="$opts -rte-shift"
-      ;;
-      all) # all assertions
-        all=1
-      ;;
-      *)
-        return 1;
-      ;;
-    esac
+# Given a token (first argument) and a list (remaining arguments)
+# evaluate to true if the token is in the list, and to false otherwise
+has_token() {
+  local token="$1"
+  shift
+  for opt in $@; do
+    [ "$opt" = "$token" ] && return 0
+  done
+  return 1
+}
+
+# Given a token (first argument) and a list (remaining arguments)
+# print all elements of the list as long as they differ from the token
+fetch_token() {
+  local token="$1"
+  shift
+  for opt in $@; do
+    [ "$opt" = "$token" ] || echo $opt
+  done
+}
+
+# Generate option string for RTE plugin based on the value given via --rte flag
+rte_options() {
+  # RTE options
+  local rte_opts="int-overflow,mem,float-to-int,div,precond,shift,pointer-call"
+  local inp_opts="$1" # Comma-separated string of input RTE options
+  local generated_fc="" # Generated Frama-C options
+  local geterated_rte="" # Generated RTE options
+
+  # Clean-up option strings
+  local ropts="$(tokenize $rte_opts)"
+  local sopts="$(tokenize $inp_opts)"
+
+  # If there is 'all' keyword found enable all assertions
+  if has_token all "$sopts"; then
+    sopts="$ropts"
+  fi
+
+  # Check that all rte options provided at input are valid, i.e., a subset of
+  # the options given via $rte_opts
+  for sopt in $sopts; do
+    if ! has_token $sopt "$ropts"; then
+      echo "$sopt"
+      return 1
+    fi
   done
 
-  if [ -n "$all" ]; then
-    echo $start -rte-all -then
+  # RTE integer overflow options coming from Frama-C
+  if has_token int-overflow "$sopts"; then
+    generated_fc="-warn-signed-overflow -warn-unsigned-overflow"
   else
-    echo $start $opts $intopts -then
+    generated_fc="-no-warn-signed-overflow -no-warn-unsigned-overflow"
   fi
-  return 0;
+
+  # Remove 'int-overflow' (which is relevant for Frama-C), remaining option
+  # keywords belong to RTE, i.e., for each keyword KW in $ropts there exists
+  # either -rte-<KW> and -rte-no-<KW>
+  sopts="$(fetch_token int-overflow "$sopts")"
+  ropts="$(fetch_token int-overflow "$ropts")"
+
+  if [ -n "$sopts" ]; then
+    while test -n "$ropts"; do
+      local rem="$(echo $ropts | sed 's/[a-z\-]\+//')"
+      local fst="$(echo $ropts | sed "s/$rem$//")"
+      ropts="$rem"
+
+      local prefix="-rte-no"
+      if has_token "$fst" "$sopts"; then
+        prefix="-rte"
+      fi
+      geterated_rte="$geterated_rte $prefix-$fst"
+    done
+  fi
+
+  local rte="-no-rte"
+  if [ -n "$geterated_rte" ]; then
+    rte="-rte"
+  fi
+
+  echo $generated_fc $rte $geterated_rte -then
+  return 0
 }
 
 # Locate available E-ACSL memory models
@@ -390,7 +433,7 @@ do
     # Runtime assertion generation
     --rte|-a)
       shift;
-      OPTION_RTE=`rte_options $1`
+      OPTION_RTE="`rte_options $1`"
       error "Invalid argument $1 to --rte|-a option" $?
       shift;
     ;;
