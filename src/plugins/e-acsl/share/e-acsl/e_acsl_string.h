@@ -42,6 +42,7 @@
 #define E_ACSL_STD_STRING
 #  if defined(__GNUC__) && defined(E_ACSL_BUILTINS)
 #    define memset __builtin_memset
+#    define memcmp __builtin_memcmp
 #    define memcpy __builtin_memcpy
 #    define memmove __builtin_memmove
 #    define strlen __builtin_strlen
@@ -58,6 +59,7 @@
 #    include "glibc/memcpy.c"
 #    include "glibc/memmove.c"
 #    include "glibc/memset.c"
+#    include "glibc/memcmp.c"
 #    include "glibc/strlen.c"
 #    include "glibc/strcmp.c"
 #    include "glibc/strncmp.c"
@@ -117,5 +119,24 @@ static int endswith(char *str, char *pat) {
     }
   }
   return 1;
+}
+
+#define ZERO_BLOCK_SIZE 1024
+static unsigned char zeroblock [ZERO_BLOCK_SIZE];
+
+/** \brief Return a non-zero value if `size` bytes past address `p` are
+ * nullified and zero otherwise. */
+static int zeroed_out(const void *p, size_t size) {
+  size_t lim = size/ZERO_BLOCK_SIZE,
+         rem = size%ZERO_BLOCK_SIZE;
+  unsigned char *pc = (unsigned char *)p;
+
+  size_t i;
+  for (i = 0; i < lim; i++) {
+    if (memcmp(pc, &zeroblock, ZERO_BLOCK_SIZE))
+      return 0;
+    pc += ZERO_BLOCK_SIZE;
+  }
+  return !memcmp(pc, &zeroblock, rem);
 }
 #endif
