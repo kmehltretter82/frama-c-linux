@@ -61,10 +61,10 @@ static const int nbr_bits_to_1[256] = {
 /**************************/
 /* HEAP USAGE         {{{ */
 /**************************/
-static size_t heap_size = 0;
+static size_t heap_allocation_size = 0;
 
-static size_t get_heap_size(void) {
-  return heap_size;
+static size_t get_heap_allocation_size(void) {
+  return heap_allocation_size;
 }
 /* }}} */
 
@@ -325,7 +325,7 @@ static void* bittree_malloc(size_t size) {
   void *res = native_malloc(size);
   if (res) {
     bt_block * new_block = store_block(res, size);
-    heap_size += size;
+    heap_allocation_size += size;
     new_block->freeable = true;
   }
   return res;
@@ -341,7 +341,7 @@ static void* bittree_calloc(size_t nbr_block, size_t size_block) {
   void *res = native_calloc(nbr_block, size_block);
   if (res) {
     bt_block * new_block = store_block(res, size);
-    heap_size += size;
+    heap_allocation_size += size;
     new_block->freeable = 1;
     /* Mark allocated block as freeable and initialized */
     new_block->init_bytes = size;
@@ -362,7 +362,7 @@ static void *bittree_aligned_alloc(size_t alignment, size_t size) {
   if (res) {
     bt_block * new_block = store_block(res, size);
     new_block->freeable = 1;
-    heap_size += size;
+    heap_allocation_size += size;
   }
   return res;
 }
@@ -383,7 +383,7 @@ static int bittree_posix_memalign(void **memptr, size_t alignment, size_t size) 
   if (!res) {
     bt_block * new_block = store_block(*memptr, size);
     new_block->freeable = 1;
-    heap_size += size;
+    heap_allocation_size += size;
   }
   return res;
 }
@@ -405,7 +405,7 @@ static void* bittree_realloc(void* ptr, size_t size) {
   new_ptr = native_realloc((void*)tmp->ptr, size);
   if(new_ptr == NULL)
     return NULL;
-  heap_size -= tmp->size;
+  heap_allocation_size -= tmp->size;
   /* realloc changes start address -- re-enter the element */
   if (tmp->ptr != (uintptr_t)new_ptr) {
     bt_remove(tmp);
@@ -448,7 +448,7 @@ static void* bittree_realloc(void* ptr, size_t size) {
   }
   tmp->size = size;
   tmp->freeable = true;
-  heap_size += size;
+  heap_allocation_size += size;
   return (void*)tmp->ptr;
 }
 
@@ -460,7 +460,7 @@ static void bittree_free(void* ptr) {
   if (!res) {
     vabort("Not a start of block (%a) in free\n", ptr);
   } else {
-    heap_size -= res->size;
+    heap_allocation_size -= res->size;
     native_free(ptr);
     bt_clean_block_init(res);
     bt_remove(res);
@@ -582,8 +582,8 @@ public_alias(full_init)
 public_alias(memory_clean)
 public_alias(memory_init)
 /* Heap size */
-public_alias(get_heap_size)
-public_alias(heap_size)
+public_alias(get_heap_allocation_size)
+public_alias(heap_allocation_size)
 #ifdef E_ACSL_DEBUG /* Debug */
 public_alias(bt_print_block)
 public_alias(bt_print_tree)
