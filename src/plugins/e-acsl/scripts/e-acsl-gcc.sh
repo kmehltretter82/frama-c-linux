@@ -68,7 +68,7 @@ realpath() {
   fi
 }
 
-# Split a comma-separated string into a whitespace-separated string, remove
+# Split a comma-separated string into a space-separated string, remove
 # all duplicates and trailing, leading or multiple spaces
 tokenize() {
   echo -n "$@" \
@@ -82,6 +82,7 @@ tokenize() {
 # evaluate to true if the token is in the list, and to false otherwise
 has_token() {
   local token="$1"
+  local opt
   shift
   for opt in $@; do
     [ "$opt" = "$token" ] && return 0
@@ -89,75 +90,59 @@ has_token() {
   return 1
 }
 
-# Given a token (first argument) and a list (remaining arguments)
-# print all elements of the list as long as they differ from the token
-fetch_token() {
-  local token="$1"
-  shift
-  for opt in $@; do
-    [ "$opt" = "$token" ] || echo $opt
-  done
-}
-
-# Generate option string for RTE plugin based on the value given via --rte flag
+# Generate option string for RTE plugin based on the value given via --rte
+# and --rte-select flags
 rte_options() {
-  # RTE options
-  local rte_opts="int-overflow,mem,float-to-int,div,precond,shift,pointer-call"
-  local inp_opts="$1" # Comma-separated string of input RTE options
-  local generated_fc="" # Generated Frama-C options
-  local geterated_rte="" # Generated RTE options
+  # Frama-C assertions
+  local fc_options="signed-overflow unsigned-overflow \
+    signed-downcast unsigned-downcast"
+  # RTE assertions
+  local rte_options="div float-to-int mem pointer-call precond shift  \
+    trivial-annotations"
+  local generated="-rte" # Generated Frama-C options
 
   # Clean-up option strings
-  local ropts="$(tokenize $rte_opts)"
-  local sopts="$(tokenize $inp_opts)"
+  local full_options="$fc_options $rte_options"
+  local asserts="$(tokenize "$1")"
+  local fselect="$2"
 
   # If there is 'all' keyword found enable all assertions
-  if has_token all "$sopts"; then
-    sopts="$ropts"
+  if has_token all $asserts; then
+    asserts="$full_options"
   fi
 
-  # Check that all rte options provided at input are valid, i.e., a subset of
-  # the options given via $rte_opts
-  for sopt in $sopts; do
-    if ! has_token $sopt "$ropts"; then
-      echo "$sopt"
-      return 1
-    fi
-  done
-
-  # RTE integer overflow options coming from Frama-C
-  if has_token int-overflow "$sopts"; then
-    generated_fc="-warn-signed-overflow -warn-unsigned-overflow"
-  else
-    generated_fc="-no-warn-signed-overflow -no-warn-unsigned-overflow"
-  fi
-
-  # Remove 'int-overflow' (which is relevant for Frama-C), remaining option
-  # keywords belong to RTE, i.e., for each keyword KW in $ropts there exists
-  # either -rte-<KW> and -rte-no-<KW>
-  sopts="$(fetch_token int-overflow "$sopts")"
-  ropts="$(fetch_token int-overflow "$ropts")"
-
-  if [ -n "$sopts" ]; then
-    while test -n "$ropts"; do
-      local rem="$(echo $ropts | sed 's/[a-z\-]\+//')"
-      local fst="$(echo $ropts | sed "s/$rem$//")"
-      ropts="$rem"
-
-      local prefix="-rte-no"
-      if has_token "$fst" "$sopts"; then
-        prefix="-rte"
+  if [ -n "$asserts" ]; then
+    # Check input options
+    local opt
+    for opt in $asserts; do
+      # Check whether a given input option exists, i.e., found in $full_options
+      if ! has_token $opt $full_options; then
+        echo "$opt"
+        return 1
       fi
-      geterated_rte="$geterated_rte $prefix-$fst"
     done
-  fi
 
-  local rte="-no-rte"
-  if [ -n "$geterated_rte" ]; then
-    rte="-rte"
-  fi
+    local prefix
+    # Generate assertion options for Frama-C (i.e., -warn-* or -no-warn-*)
+    for opt in $fc_options; do
+      has_token $opt $asserts && prefix="-warn" || prefix="-no-warn"
+      generated="$generated $prefix-$opt"
+    done
 
-  echo $generated_fc $rte $geterated_rte -then
+    # Generate assertion options for RTE (i.e., -rte-* or -rte-no-*)
+    for opt in $rte_options; do
+      has_token $opt $asserts && prefix="-rte" || prefix="-rte-no"
+      generated="$generated $prefix-$opt"
+    done
+
+    # Pass -rte-select option of RTE
+    if [ -n "$fselect" ]; then
+      fselect="$(echo $fselect | sed 's/\s//g')"
+      generated="$generated -rte-select=$fselect"
+    fi
+
+    echo $generated -then
+  fi
   return 0
 }
 
@@ -202,7 +187,7 @@ LONGOPTIONS="help,compile,compile-only,print,debug:,ocode:,oexec:,verbose:,
   frama-c-only,extra-cpp-args:,frama-c-stdlib,full-mmodel,gmp,quiet,logfile:,
   ld-flags:,cpp-flags:,frama-c-extra:,memory-model:,
   frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:,
-  print-mmodels,rt-debug"
+  print-mmodels,rt-debug,rte-select:"
 SHORTOPTIONS="h,c,C,p,d:,D,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,I:,G:,X,a:"
 # Prefix for an error message due to wrong arguments
 ERROR="ERROR parsing arguments:"
@@ -232,6 +217,7 @@ OPTION_EACSL_MMODELS="bittree"           # Memory model used
 OPTION_EACSL_SHARE=                      # Custom E-ACSL share directory
 OPTION_INSTRUMENTED_ONLY=                # Do not compile original code
 OPTION_RTE=                              # Enable assertion generation
+OPTION_RTE_SELECT=               # Generate assertions for these functions only
 
 manpage() {
   printf "e-acsl-gcc.sh - instrument and compile C files with E-ACSL
@@ -433,8 +419,13 @@ do
     # Runtime assertion generation
     --rte|-a)
       shift;
-      OPTION_RTE="`rte_options $1`"
-      error "Invalid argument $1 to --rte|-a option" $?
+      OPTION_RTE="$1"
+      shift;
+    ;;
+    # Runtime assertion generation for given functions only
+    --rte-select|-A)
+      shift;
+      OPTION_RTE_SELECT="$1"
       shift;
     ;;
     # A memory model  (or models) to link against
@@ -498,6 +489,10 @@ MACHDEP="-machdep gcc_x86_$MACHDEPFLAGS"
 CPPMACHDEP="-D__FC_MACHDEP_X86_$MACHDEPFLAGS"
 # GCC machine option
 GCCMACHDEP="-m$MACHDEPFLAGS"
+
+# RTE flags
+RTE_FLAGS="$(rte_options "$OPTION_RTE" "$OPTION_RTE_SELECT")"
+error "Invalid argument $1 to --rte|-a option" $?
 
 # Frama-C and related flags
 FRAMAC_CPP_EXTRA="$OPTION_FRAMAC_CPP_EXTRA $CPPMACHDEP"
@@ -588,7 +583,7 @@ if [ -n "$OPTION_INSTRUMENT" ]; then
     $OPTION_VERBOSE \
     $OPTION_DEBUG \
     "$@" \
-    $OPTION_RTE \
+    $RTE_FLAGS \
     $OPTION_EACSL \
     -print -ocode "$OPTION_OUTPUT_CODE");
     error "aborted by Frama-C" $?;
