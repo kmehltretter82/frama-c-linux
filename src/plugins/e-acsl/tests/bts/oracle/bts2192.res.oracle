@@ -2,6 +2,5 @@
 [e-acsl] warning: annotating undefined function `atoi':
                   the generated program may miss memory instrumentation
                   if there are memory-related annotations.
-FRAMAC_SHARE/libc/stdlib.h:276:[kernel] warning: No code nor implicit assigns clause for function calloc, generating default assigns from the prototype
+FRAMAC_SHARE/libc/stdlib.h:160:[kernel] warning: No code nor implicit assigns clause for function calloc, generating default assigns from the prototype
 [e-acsl] translation done in project "e-acsl".
-FRAMAC_SHARE/e-acsl/e_acsl.h:43:[value] warning: function __e_acsl_assert: precondition got status unknown.

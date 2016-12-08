@@ -30,12 +30,6 @@ void f(void)
 
 void __e_acsl_globals_init(void)
 {
-  __e_acsl_store_block((void *)(& __fc_wctomb_state),4UL);
-  __e_acsl_full_init((void *)(& __fc_wctomb_state));
-  __e_acsl_store_block((void *)(& __fc_mbtowc_state),4UL);
-  __e_acsl_full_init((void *)(& __fc_mbtowc_state));
-  __e_acsl_store_block((void *)(& __fc_mblen_state),4UL);
-  __e_acsl_full_init((void *)(& __fc_mblen_state));
   __e_acsl_store_block((void *)(& __fc_rand_max),8UL);
   __e_acsl_full_init((void *)(& __fc_rand_max));
   __e_acsl_store_block((void *)(& __fc_random_counter),4UL);
@@ -59,9 +53,6 @@ int main(void)
                   (char *)"&x == &x",16);
   __e_acsl_full_init((void *)(& __retres));
   __retres = 0;
-  __e_acsl_delete_block((void *)(& __fc_wctomb_state));
-  __e_acsl_delete_block((void *)(& __fc_mbtowc_state));
-  __e_acsl_delete_block((void *)(& __fc_mblen_state));
   __e_acsl_delete_block((void *)(& __fc_rand_max));
   __e_acsl_delete_block((void *)(& __fc_random_counter));
   __e_acsl_delete_block((void *)(& x));
