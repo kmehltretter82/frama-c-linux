@@ -124,14 +124,22 @@ annotate a source program with assertions using a run of an RTE plugin prior to
 E-ACSL. \fIOPTSTRING\fP is a comma-separated string that specifies the types of
 generated assertions.
 Valid arguments are:
-  \fImem\fP \- valid pointer or array accesses.
-  \fIint\fP \- integer overflows.
-  \fIfloat\fP \- casts from floating-point to integer.
-  \fIdiv\fP \- division by zero.
-  \fIret\fP \- return value in non-void functions.
-  \fIprecond\fP \- function calls based on contracts.
-  \fIshift\fP \- left and right shifts by a value out of bounds.
-  \fIall\fP \- all of the above.
+
+  \fIsigned-overflow\fP   \- signed integer overflows.
+  \fIunsigned-overflow\fP \- unsigned integer overflows.
+  \fIsigned-downcast\fP   \- signed downcast exceeding destination range.
+  \fIunsigned-downcast\fP \- unsigned downcast exceeding destination range.
+  \fImem\fP               \- pointer or array accesses.
+  \fIfloat-to-int\fP      \- casts from floating-point to integer.
+  \fIdiv\fP               \- division by zero.
+  \fIprecond\fP           \- function calls based on contracts.
+  \fIshift\fP             \- left and right shifts by a value out of bounds.
+  \fpointer-call\fP       \- annotate functions calls through pointers.
+  \fIall\fP               \- all of the above.
+.TP
+.B -A, --rte-select=\fI<OPTSTRING>
+Restrict annotations to a given list of functions.
+\fIOPTSTRING\fP is a comma-separated string comprising function names.
 .TP
 .B -m, --memory-model=\fI<model>
 memory model (i.e., a runtime library for checking memory related annotations)
