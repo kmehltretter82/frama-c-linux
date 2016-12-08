@@ -184,7 +184,7 @@ EACSL_SHARE := $(EACSL_PLUGIN_DIR)/share/e-acsl
 EACSL_RTL_SRC = $(wildcard $(EACSL_SHARE)/*.[ch] $(EACSL_SHARE)/*/*.[ch])
 
 RTLFLAGS = -std=c99 -Wall -Wno-unused -Wno-attributes -I$(EACSL_SHARE) \
-  -fno-omit-frame-pointer -DE_ACSL_BUILTINS
+  -fno-omit-frame-pointer -DE_ACSL_BUILTINS -Wno-nonnull
 
 RTLOPT 	 = $(RTLFLAGS) -O2
 RTLDEBUG = $(RTLFLAGS) -DE_ACSL_DEBUG -g3 -O0
