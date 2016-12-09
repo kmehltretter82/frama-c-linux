@@ -25,8 +25,16 @@
  * \brief Setup for memory tracking using shadowing
 ***************************************************************************/
 
-/*! \brief The first address past the end of BSS segment */
+/* Symbols exported by the linker script */
+
+/*!\brief The first address past the end of the text segment. */
+extern char etext;
+/*!\brief The first address past the end of the initialized data segment. */
+extern char edata;
+/*!\brief The first address past the end of the uninitialized data segment. */
 extern char end;
+/*!\brief The first address of a program. */
+extern char __executable_start;
 
 /* \cond */
 void *sbrk(intptr_t increment);
@@ -66,7 +74,7 @@ char *strerror(int errnum);
 #define PGM_TLS_SIZE (8 * MB)
 /* }}} */
 
-/* Thread-local storage information {{{ */
+/** Thread-local storage information {{{ */
 
 /*! Thread-local storage (TLS) keeps track of copies of per-thread variables.
  * Even though at the present stage RTL of E-ACSL is not thread-safe, some
@@ -106,7 +114,7 @@ static uintptr_t get_tls_start() {
 
 /* }}} */
 
-/* Program stack information {{{ */
+/** Program stack information {{{ */
 extern char ** environ;
 
 /*! \brief Return byte-size of a program's stack. The return value is the soft
@@ -173,13 +181,11 @@ static size_t get_heap_size() {
 /*! \brief Return the start address of a segment holding globals (generally
  * BSS and Data segments). */
 static uintptr_t get_global_start() {
-  return (uintptr_t)(PTR_SZ*2);
+  return (uintptr_t)&__executable_start;
 }
 
 /*! \brief Return byte-size of global segment */
 static size_t get_global_size() {
-/* In all likelihood it is reasonably safe to assume that first
-  * 2x*pointer-size bytes of the memory space will not be used. */
   return ((uintptr_t)&end - get_global_start());
 }
 /** }}} */
@@ -189,17 +195,19 @@ static size_t get_global_size() {
  * pointer to its base address. Since this function is used to set-up shadowing
  * the program is aborted if `mmap` fails to allocate a new memory block. */
 static void *do_mmap(size_t size) {
+  DLOG("<<< Request to allocate %lu bytes with mmap >>>\n", size);
   void *res = mmap(0, size, PROT_READ|PROT_WRITE,
     MAP_ANONYMOUS|MAP_PRIVATE, -1, (size_t)0);
   if (res == MAP_FAILED)
-      vabort("mmap error: %s\n", strerror(errno));
-  else
-      memset(res, 0, size);
+    vabort("mmap error: %s\n", strerror(errno));
+  /* Make sure that mmap returned a fully nullified mapping */
+  DVASSERT(zeroed_out(res, size),
+    "Memory mapping of size %lu at address %a not fully nullified", size, res);
   return res;
 }
 /* }}} */
 
-/* Shadow Offset {{{ */
+/** Shadow Offset {{{ */
 /*! \brief Compute shadow offset between the start address of a shadow area
  * and a start address of a segment */
 static uintptr_t shadow_offset(void *shadow, uintptr_t start_addr) {
@@ -209,7 +217,7 @@ static uintptr_t shadow_offset(void *shadow, uintptr_t start_addr) {
 }
 /* }}} */
 
-/* Program Layout {{{ */
+/** Program Layout {{{ */
 /*****************************************************************************
  * Memory Layout *************************************************************
  *****************************************************************************
@@ -255,6 +263,7 @@ NOTE: With mmap allocations heap does not necessarily grows from program break
 /* Struct representing a memory segment along with information about its
  * shadow spaces. */
 struct memory_segment {
+  const char *name;
   uintptr_t start; //!< Least address in application segment
   uintptr_t end; //!< Greatest address in application segment
 
@@ -284,7 +293,9 @@ struct memory_layout {
 
 /*! \brief Set a given memory segment and its shadow spaces. */
 static void set_shadow_segment(struct memory_segment *seg, uintptr_t start,
-    uintptr_t size, int secondary) {
+    size_t size, int secondary, const char *name) {
+  DLOG("<<< Initialize %s segment of %lu MB >>>\n", name, size/MB);
+  seg -> name = name;
   seg->start = start;
   seg->end = seg->start + size - 1;
   seg->shadow_size = size;
@@ -308,22 +319,14 @@ static void set_shadow_segment(struct memory_segment *seg, uintptr_t start,
  * allocate shadow memory spaces and compute offsets. This function populates
  * global struct ::mem_layout holding that information with data. */
 static void init_memory_layout(int *argc_ref, char ***argv_ref) {
-  DLOG("<<< Initialize heap shadow >>>\n");
-  struct memory_segment *heap = &mem_layout.heap;
-  set_shadow_segment(heap, get_heap_start(), get_heap_size(), 0);
-
-  DLOG("<<< Initialize stack shadow >>>\n");
-  struct memory_segment *stack = &mem_layout.stack;
-  set_shadow_segment(stack, get_stack_start(argc_ref, argv_ref), get_stack_size(), 1);
-
-  DLOG("<<< Initialize global shadow >>>\n");
-  struct memory_segment *global = &mem_layout.global;
-  set_shadow_segment(global, get_global_start(), get_global_size(), 1);
-
-  DLOG("<<< Initialize TLS shadow >>>\n");
-  struct memory_segment *tls = &mem_layout.tls;
-  set_shadow_segment(tls, get_tls_start(), get_tls_size(), 1);
-
+  set_shadow_segment(&mem_layout.heap,
+    get_heap_start(), get_heap_size(), 0, "heap");
+  set_shadow_segment(&mem_layout.stack,
+    get_stack_start(argc_ref, argv_ref), get_stack_size(), 1, "stack");
+  set_shadow_segment(&mem_layout.global,
+    get_global_start(), get_global_size(), 1, "global");
+  set_shadow_segment(&mem_layout.tls,
+    get_tls_start(), get_tls_size(), 1, "tls");
   mem_layout.initialized = 1;
 }
 
@@ -346,7 +349,7 @@ static void clean_memory_layout() {
 }
 /* }}} */
 
-/* Shadow access {{{
+/** Shadow access {{{
  *
  * In a typical case shadow regions reside in the high memory but below
  * stack. Provided that shadow displacement offsets are stored using
@@ -420,7 +423,7 @@ static void clean_memory_layout() {
   HIGHER_SHADOW_ACCESS(_addr, mem_layout.heap.prim_offset)
 /* }}} */
 
-/* Memory segment ranges {{{ */
+/** Memory segment ranges {{{ */
 /*! \brief Evaluate to a true value if address _addr resides within a given
  * memory segment.
  * \param _addr - a memory address

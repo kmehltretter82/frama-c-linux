@@ -38,13 +38,15 @@ int main(void)
   }
   /*@ assert \initialized((union msg *)((unsigned char *)buf)); */
   {
-    int __gen_e_acsl_initialized;
-    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(buf),
-                                                    sizeof(union msg));
-    __e_acsl_assert(__gen_e_acsl_initialized,(char *)"Assertion",
-                    (char *)"main",
-                    (char *)"\\initialized((union msg *)((unsigned char *)buf))",
-                    23);
+    {
+      int __gen_e_acsl_initialized;
+      __gen_e_acsl_initialized = __e_acsl_initialized((void *)(buf),
+                                                      sizeof(union msg));
+      __e_acsl_assert(__gen_e_acsl_initialized,(char *)"Assertion",
+                      (char *)"main",
+                      (char *)"\\initialized((union msg *)((unsigned char *)buf))",
+                      23);
+    }
   }
   __retres = 0;
   __e_acsl_delete_block((void *)(buf));
