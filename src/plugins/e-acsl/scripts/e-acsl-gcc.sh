@@ -51,6 +51,17 @@ check_tool() {
    { has_tool "$1" || test -e "$1"; } || error "No executable $1 found";
 }
 
+# Evaluate to a true value if the file name (given via the first argument) has
+# one of the extensions given by the remaining arguments
+has_extension() {
+  local file=$1
+  shift
+  for ext in $@; do
+    echo $file | grep "\.$ext$" >/dev/null && return 0
+  done
+  return 1
+}
+
 # Portable realpath using pwd
 realpath() {
   if [ -e "$1" ]; then
@@ -177,7 +188,6 @@ mmodel_lib() {
     if [ -z "$modelpath" ]; then
       error "Library '$modelpath' not found"
     fi
-
     echo $modelpath
   else
     echo $models
@@ -451,6 +461,11 @@ do
 done
 shift;
 
+# Check if the output file has the right (i.e., C) extension, otherwise GCC
+# will not be happy
+has_extension "$OPTION_OUTPUT_CODE" i c
+error "Output file '$OPTION_OUTPUT_CODE' has neither .i nor .c extension" $?;
+
 # Check Frama-C and GCC executable names
 check_tool "$OPTION_FRAMAC"
 check_tool "$OPTION_CC"
@@ -511,13 +526,14 @@ fi
 
 # Once EACSL_SHARE is defined check the memory models provided at inputs
 for mod in $OPTION_EACSL_MMODELS; do
-  mmodel_lib $mod
+  mmodel_lib $mod >/dev/null
 done
 
 # Gcc and related flags
 CC="$OPTION_CC"
 CFLAGS="$OPTION_CFLAGS
-  -std=c99 $GCCMACHDEP -g3 -fno-builtin -fno-merge-constants
+  -std=c99 $GCCMACHDEP -g3
+  -fno-builtin -fno-merge-constants
   -Wall \
   -Wno-long-long \
   -Wno-attributes \
@@ -624,7 +640,7 @@ if [ -n "$OPTION_COMPILE" ]; then
       OUTPUT_EXEC="$EACSL_OUTPUT_EXEC"
     fi
     # Sources of the selected memory model
-    EACSL_RTL=`mmodel_lib "$mod"`
+    EACSL_RTL=$(mmodel_lib "$mod")
     ($OPTION_ECHO;
      $CC \
        $CFLAGS $CPPFLAGS \
@@ -638,4 +654,3 @@ if [ -n "$OPTION_COMPILE" ]; then
   done
 fi
 exit 0;
-
