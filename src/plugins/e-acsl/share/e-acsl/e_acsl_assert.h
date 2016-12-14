@@ -52,7 +52,9 @@ static void vabort(char *fmt, ...);
   vassert_fail(expr, __LINE__, __FILE__, fmt, __VA_ARGS__)
 
 static void exec_abort(int line, const char *file) {
+#ifdef E_ACSL_DEBUG
   trace();
+#endif
   kill(getpid(), SIGABRT);
 }
 
