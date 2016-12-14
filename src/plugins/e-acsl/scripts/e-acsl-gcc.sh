@@ -461,8 +461,20 @@ do
 done
 shift;
 
-# Check if the output file has the right (i.e., C) extension, otherwise GCC
-# will not be happy
+# Bail if no files to translate are given
+if [ -z "$1" ]; then
+  error "no input files";
+fi
+
+# Make sure every input file exists and has the right extension (i.e., .i or .c)
+for f in $@; do
+  test -f "$f"
+  error "input file '$f' does not exist or not a file" "$?";
+  has_extension $f i c
+  error "Input file '$f' has neither .i nor .c extension" $?;
+done
+
+# Check if the output file has has the right extension (i.e., .i or .c)
 has_extension "$OPTION_OUTPUT_CODE" i c
 error "Output file '$OPTION_OUTPUT_CODE' has neither .i nor .c extension" $?;
 
@@ -583,11 +595,6 @@ if [ -n "$OPTION_EACSL" ]; then
     $OPTION_GMP
     $OPTION_FULL_MMODEL
     -then-last"
-fi
-
-# Bail if no files to translate are given
-if [ -z "$1" ]; then
-  error "no input files";
 fi
 
 # Instrument
