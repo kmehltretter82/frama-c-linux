@@ -153,26 +153,32 @@ rte_options() {
 #    model. In this case the following function prints the full path to a static
 #    library representing this memory model.
 mmodel_lib() {
-  local rt_feature="opt"
+  local rtfeature=""
   if [ -n "$OPTION_RT_DEBUG" ]; then
-    rt_feature="debug"
+    rtfeature="-dbg"
     OPTION_CFLAGS="$OPTION_CFLAGS -O0 -fno-omit-frame-pointer"
   else
     OPTION_CFLAGS="$OPTION_CFLAGS -O2"
   fi
 
-  local models="$(find $LIBDIR/ -name 'libeacsl-*-rtl-opt.a' -exec basename {} \; \
-    | sed 's/^libeacsl-\(.*\)-rtl-opt.a/\1/')"
+  # Supported models
+  local models="segment bittree"
 
   if [ -n "$1" ]; then
     local modelname="$(echo $models | tr ' ' '\n' | grep "^$1$")"
-    local modelpath="$(realpath $LIBDIR/libeacsl-$modelname-rtl-$rt_feature.a 2>/dev/null)"
+    local modelpath="$(realpath $LIBDIR/libeacsl-rtl-$modelname$rtfeature.a 2>/dev/null)"
 
-    if [ -n "$modelpath" ]; then
-      echo $modelpath
-    else
-      error "Memory model '$1'-$rt_feature is not available in this distribution"
+    # Bail if the name of the specified memory model does not match any of the
+    # supported ones
+    if [ -z "$modelname" ]; then
+      error "Memory model '$1' is not available in this distribution"
     fi
+    # Bail if the library for a specified memory model is not found
+    if [ -z "$modelpath" ]; then
+      error "Library '$modelpath' not found"
+    fi
+
+    echo $modelpath
   else
     echo $models
   fi
@@ -538,13 +544,10 @@ fi
 CPPFLAGS="$OPTION_CPPFLAGS"
 LDFLAGS="$OPTION_LDFLAGS"
 
-LIBGMP="$(realpath $LIBDIR/libeacsl-jemalloc.a)"
-LIBJEMALLOC="$(realpath $LIBDIR/libeacsl-gmp.a)"
-
 # C, CPP and LD flags for compilation of E-ACSL-generated sources
 EACSL_CFLAGS=""
 EACSL_CPPFLAGS="-I$EACSL_SHARE"
-EACSL_LDFLAGS="-lm $LIBGMP $LIBJEMALLOC -lpthread"
+EACSL_LDFLAGS="-lm -lpthread"
 
 # Output file names
 OUTPUT_CODE="$OPTION_OUTPUT_CODE" # E-ACSL instrumented source
