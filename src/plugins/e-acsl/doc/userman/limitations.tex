@@ -27,14 +27,12 @@ may get no runtime error depending on your \C compiler, but the behavior is
 actually uninitialized and should be caught by the \eacsl plug-in. That is not
 the case yet.
 \begin{shell}
-\$ frama-c -e-acsl uninitialized.i -then-on e-acsl -print \
-          -ocode monitored_uninitialized.i
-\$ gcc -Wuninitialized -o pointer `frama-c -print-share-path`/e-acsl/e_acsl.c` \
-      monitored_uninitialized.i
+
+\$ e-acsl-gcc.sh uninitialized.i -c -Omonitored_uninitialized
 monitored_uninitialized.i: In function 'main':
-monitored_uninitialized.i:44:16: warning: 'x' is used uninitialized in this function\
+monitored_uninitialized.i:44:16: warning: 'x' is used uninitialized in this function
 [-Wuninitialized]
-\$ ./monitored_uninitialized
+\$ ./monitored_uninitialized.e-acsl
 \end{shell}
 
 This is more a design choice than a limitation: should the \eacsl plug-in
@@ -61,9 +59,10 @@ plug-in is running (see examples of Sections~\ref{sec:no-main} and
 \label{sec:limits:no-main}
 
 The instrumentation in the generated program is partial for every program
-without main containing a memory-related annotations, except if the option
-\optionuse{-}{e-acsl-full-mmodel} is provided. In that case, violations of such
-annotations are undetected.
+without main containing memory-related annotations, except if the option
+\optionuse{-}{e-acsl-full-mmodel} or the \eacsl plug-in (of \shortopt{M} option
+of \eacslgcc) is provided. In that case, violations of such annotations are
+undetected.
 
 Consider the following example.
 
@@ -72,24 +71,27 @@ Consider the following example.
 
 You can generate the instrumented program as follows.
 \begin{shell}
-\$ frama-c -e-acsl-full-mmodel -machdep x86_64 -e-acsl valid_no_main.c \
-          -then-on e-acsl -print -ocode monitored_valid_no_main.i
+\$ e-acsl-gcc.sh -ML -omonitored_valid_no_main.i valid_no_main.c
 <skip preprocessing commands>
 [e-acsl] beginning translation.
-<skip warnings about annotations from the Frama-C libc 
-      which cannot be translated>
+<skip warnings about annotations from the Frama-C libc
+  which cannot be translated>
 [kernel] warning: no entry point specified:
-                  you must call function `__e_acsl_memory_init' and `__e_acsl_memeory_clean' by yourself.
+  you must call function `__e_acsl_memory_init' and `__e_acsl_memeory_clean'
+  by yourself.
 [e-acsl] translation done in project "e-acsl".
 \end{shell}
 
 The last warning states an important point: if this program is linked against
-another file containing a \texttt{main} function, then this main function must
+another file containing \texttt{main} function, then this main function must
 be modified to insert a call to the function \texttt{\_\_e\_acsl\_memory\_init}
 \index{e\_acsl\_memory\_init@\texttt{\_\_e\_acsl\_memory\_init}} at the very
-beginning and a call to the function \texttt{\_\_e\_acsl\_memory\_clean}
-\index{e\_acsl\_memory\_clean@\texttt{\_\_e\_acsl\_memory\_clean}} at the very
-end like in the following example.
+beginning. This function plays a very important role: it initializes metadata
+storage used for tracking of memory blocks. Unless this call is inserted the
+run of a modified program is likely to fail.
+
+While it possible to add such intrumentation manually we recommend using
+\eacslgcc. Consider the following incomplete program containing \T{main}:
 
 \listingname{modified\_main.c}
 \cinput{examples/modified_main.c}
@@ -97,14 +99,13 @@ end like in the following example.
 Then just compile and run it as explained in Section~\ref{sec:memory}.
 
 \begin{shell}
-\$ DIR=`frama-c -print-share-path`/e-acsl
-\$ MDIR=\$DIR/memory_model
-\$ gcc -o valid_no_main \$DIR/e_acsl.c \$MDIR/e_acsl_bittree.c \
-      \$MDIR/e_acsl_mmodel.c monitored_valid_no_main.i modified_main.c
-\$ ./valid_no_main
+\$ e-acsl-gcc.sh -M  -omonitored_modified_main.i modified_main.c
+\$ e-acsl-gcc.sh -C -Ovalid_no_main monitored_modified_main.i monitored_valid_no_main.i
+\$ ./valid_no_main.e-acsl
 Assertion failed at line 11 in function f.
 The failing predicate is:
 freed: \valid(x).
+Aborted
 \end{shell}
 
 Also, if the unprovided main initializes some variables, running the
@@ -123,7 +124,7 @@ $f$ such that:
 \item either $f$ has an (even indirect) effect on a left-value occurring in $a$;
 \item or $a$ is one of the post-conditions of $f$.
 \end{itemize}
-A Violation of such an annotation $a$ is undetected. There is no workaround yet.
+A violation of such an annotation $a$ is undetected. There is no workaround yet.
 
 Also, the option \optionuse{-}{e-acsl-check} does not verify the annotations of
 undefined functions. There is also no workaround yet.
@@ -142,12 +143,42 @@ unspecifed. The generated code is however easy to fix by hand.
 \section{Variadic Functions}
 \index{Function!Variadic}
 
-Programs containing variadic undefined functions but with a function contract
+Programs containing undefined variadic functions with contracts
 are not yet supported. There is no workaround yet.
 
 \section{Function Pointers}
 \index{Function!Pointer}
 
 Programs containing function pointers have the same limitations on
-memory-related annotations as the ones containing undefined function or
-recursive functions.
+memory-related annotations as the ones containing undefined or recursive
+functions.
+
+\section{Requirements to Input Programs}
+\index{Function!Input}
+
+\subsection{\eacsl Namespace}
+While \eacsl uses source-to-source transformations and not binary
+instrumentations it is important that the source code provided at input does
+not contain any variables or functions prefixed \T{\_\_e\_acsl\_}.  \eacsl
+reserves this namespace for its transformations, and therefore an input program
+containing such symbols beforehand may fail to be instrumented or compiled.
+
+\subsection{Memory Management Functions}
+Programs programs providing custom definitions of \T{syscall}, \T{mmap} or
+\T{sbrk} should be rejected. Also, an input programs should not modify
+memory-management functions namely \T{malloc}, \T{calloc}, \T{realloc},
+\T{free}, \T{cfree}, \T{posix\_memalign} and \T{aligned\_alloc}.  \eacsl relies
+on these functions in order to track heap memory. Further, for heap memory
+monitoring to function correctly input programs should be limited to allocating
+and deallocating heap memory with POSIX-compliant memory management functions
+listed above. Monitoring of programs that allocate memory using non-standard or
+obsolete functions (e.g., \T{valloc}, \T{memalign}, \T{pvalloc}) may not work
+correctly.
+
+\section{Limitations of E-ACSL Monitoring Libraries}
+\index{Function!Libraries}
+
+\eacsl monitoring library implementing segment-based memory model is fairly
+recent and presently has very limited support for 32-bit architectures.  When
+using a 32-bit machine we recommend using the bittree-based memory model
+instead.

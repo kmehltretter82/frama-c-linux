@@ -1,37 +1,40 @@
 \chapter{Introduction}
 
 \framac~\cite{userman,sefm12,fac15} is a modular analysis framework for the C
-language which supports the ACSL specification language~\cite{acsl}. This manual
-documents the \eacsl plug-in of \framac, version \eacslversion. The \eacsl
-version you are using is indicated by the command \texttt{frama-c
-  -e-acsl-version}\optionidx{-}{e-acsl-version}. This plug-in automatically
-translates an annotated C program into another program that fails at runtime if
-an annotation is violated. If no annotation is violated, the behavior of the new
-program is exactly the same as the one of the original program.
+programming language which supports the ACSL specification
+language~\cite{acsl}. This manual documents the \eacsl plug-in of \framac,
+version \eacslversion. The \eacsl version you are using is indicated by the
+command \texttt{frama-c -e-acsl-version}\optionidx{-}{e-acsl-version}. \eacsl
+automatically translates an annotated C program into another program that fails
+at runtime if an annotation is violated. If no annotation is violated, the
+behavior of the new program is exactly the same as the one of the original
+program.
 
-Such a translation brings several benefits. First it allows the user to monitor
-a \C code, in particular to perform what is usually called ``runtime assertion
+\eacsl translation brings several benefits. First, it allows a user to monitor
+\C code and perform what is usually referred to as ``runtime assertion
 checking''~\cite{runtime-assertion-checking}\footnote{In our context, ``runtime
-  annotation checking'' would be a better more-general expression.}. This is the
-primary goal of \eacsl. Second it allows the combination of \framac and its
-existing analyzers, with other analyzers for \C like
-\pathcrawler~\cite{pathcrawler} that do not natively understand the \acsl
+  annotation checking'' would be more precise.}. This is the
+primary goal of \eacsl. Second, it allows to combine \framac and its
+existing analyzers with other \C analyzers
+such as \pathcrawler~\cite{pathcrawler} that do not natively understand the \acsl
 specification language. Third, the possibility to detect invalid annotations
 during a concrete execution may be very helpful while writing a correct
 specification of a given program, \emph{e.g.} for later program proving.
 Finally, an executable specification makes it possible to check assertions that
-cannot be verified statically at runtime and thus to establish a link between
-monitoring tools and static analysis tools like
+cannot be verified statically and thus to establish a link between
+runtime monitoring and static analysis tools such as
 \valueplugin~\cite{value}\index{Value} or \wpplugin~\cite{wp}\index{Wp}.
 
-Annotations must be written in the \eacsl specification
-language~\cite{eacsl,sac13} which is a subset of \acsl. This plug-in is still in
-a preliminary state: some parts of \eacsl are not yet supported. \eacsl
-annotations currently handled by the \eacsl plug-in are documented in a
-separated document~\cite{eacsl-implem}.
+Annotations used by the plug-in must be written in the \eacsl specification
+language~\cite{eacsl,sac13} -- a subset of \acsl. \eacsl plug-in is still in a
+preliminary state: some parts of the \eacsl specification language are not yet
+supported. Annotation supported by the plugin are described in a separate
+document~\cite{eacsl-implem}.
 
-This manual does \emph{not} explain how to install the plug-in. Please
-have a look at file \texttt{INSTALL} of the \eacsl tarball for this
-purpose.\index{Installation} Also this manual is \emph{not} a full tutorial
-about \framac and \eacsl, even if it provides some examples. You can still refer
-to any external tutorial~\cite{rv13tutorial} for additional examples.
+This manual does \emph{not} explain how to install the \eacsl plug-in.  For
+installation instructions please refer to the \texttt{INSTALL} file in the
+\eacsl distribution. \index{Installation} Furthermore, even though this manual
+provides examples, it is not a \emph{not} a full comprehensive tutorial on
+\framac or \eacsl.
+% You can still refer to any external
+% tutorial~\cite{rv13tutorial} for additional examples.

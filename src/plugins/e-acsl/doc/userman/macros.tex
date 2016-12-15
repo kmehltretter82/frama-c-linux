@@ -16,6 +16,7 @@
 \newcommand{\pathcrawler}{\textsc{PathCrawler}\xspace}
 \newcommand{\gcc}{\textsc{Gcc}\xspace}
 \newcommand{\gmp}{\textsc{GMP}\xspace}
+\newcommand{\jemalloc}{\textsc{Jemalloc}\xspace}
 
 \newcommand{\nodiff}{\emph{No difference with \acsl.}}
 \newcommand{\except}[1]{\emph{No difference with \acsl, but #1.}}
@@ -276,6 +277,12 @@
 
 \newcommand{\optionuse}[2]{\texttt{#1#2}\optionidx{#1}{#2}}
 \newcommand{\textttuse}[1]{\texttt{#1}\codeidx{#1}}
+\newcommand{\shortopt}[1]{\optionuse{-}{#1}}
+\newcommand{\longopt}[1]{\optionuse{{-}{-}}{#1}}
+% Shortcuts for truetype, italic and bold
+\newcommand{\T}[1]{\texttt{#1}}
+\newcommand{\I}[1]{\textit{#1}}
+\newcommand{\B}[1]{\textbf{#1}}
 
 \definecolor{gris}{gray}{0.85}
 \makeatletter

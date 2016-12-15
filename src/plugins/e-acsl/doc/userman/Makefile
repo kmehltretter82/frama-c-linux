@@ -2,8 +2,7 @@ MAIN=main
 
 C_CODE=$(wildcard examples/*.[ci])
 VERSION_FILE=../../VERSION
-FC_VERSION= Magnesium
-
+FC_VERSION= Silicon
 EACSL_VERSION= $(shell cat $(VERSION_FILE))
 
 DEPS_MODERN=eacslversion.tex biblio.bib macros.tex \
@@ -11,7 +10,6 @@ DEPS_MODERN=eacslversion.tex biblio.bib macros.tex \
 	provides.tex \
 	limitations.tex \
 	changes.tex \
-	eacslgcc.tex \
 	$(C_CODE) \
 	$(VERSION_FILE)
 
@@ -30,8 +28,8 @@ include $(EACSL_DIR)/doc/support/MakeLaTeXModern
 
 eacslversion.tex: Makefile
 	rm -f $@
-	echo '\\newcommand{\\eacslversion}{$(EACSL_VERSION)\\xspace}' > $@
-	echo '\\newcommand{\\fcversion}{$(FC_VERSION)\\xspace}' >> $@
+	echo '\newcommand{\eacslversion}{$(EACSL_VERSION)\xspace}' > $@
+	echo '\newcommand{\fcversion}{$(FC_VERSION)\xspace}' >> $@
 	chmod a-w $@
 
 %.1: %.mp
