@@ -28,8 +28,8 @@ include $(EACSL_DIR)/doc/support/MakeLaTeXModern
 
 eacslversion.tex: Makefile
 	rm -f $@
-	echo '\newcommand{\eacslversion}{$(EACSL_VERSION)\xspace}' > $@
-	echo '\newcommand{\fcversion}{$(FC_VERSION)\xspace}' >> $@
+	printf '\\newcommand{\\eacslversion}{$(EACSL_VERSION)\\xspace}\n' > $@
+	printf '\\newcommand{\\fcversion}{$(FC_VERSION)\\xspace}\n' >> $@
 	chmod a-w $@
 
 %.1: %.mp
