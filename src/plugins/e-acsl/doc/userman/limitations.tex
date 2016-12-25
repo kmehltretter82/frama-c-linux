@@ -1,11 +1,12 @@
 \chapter{Known Limitations}
 
 The development of the \eacsl plug-in is still ongoing. First, the \eacsl
-reference manual~\cite{eacsl} is not yet fully supported. Which annotations are
-already translated into \C code and which are not is defined in a separated
+reference manual~\cite{eacsl} is not yet fully supported. Which annotations can
+already be translated into \C code and which cannot is defined in a separate
 document~\cite{eacsl-implem}. Second, even though we do our best to avoid them,
 bugs may exist. If you find a new one, please report it on the bug tracking
-system (see Chapter 10 of the \framac User Manual~\cite{userman}). Third, there
+system\footnote{\url{http://bts.frama-c.com}} (see Chapter 10 of the \framac
+User Manual~\cite{userman}). Third, there
 are some additional known limitations, which could be annoying for the user in
 some cases, but are tedious to lift. Please contact us if you are interested in
 lifting these limitations\footnote{Read \url{http://frama-c.com/support.html}
@@ -24,7 +25,8 @@ been written.
 
 If you generate the instrumented code, compile it, and finally execute it, you
 may get no runtime error depending on your \C compiler, but the behavior is
-actually uninitialized and should be caught by the \eacsl plug-in. That is not
+actually undefined because the assertion reads the uninitialized variable
+\lstinline|x|. You should be caught by the \eacsl plug-in, but that is not
 the case yet.
 \begin{shell}
 
@@ -77,7 +79,7 @@ You can generate the instrumented program as follows.
 <skip warnings about annotations from the Frama-C libc
   which cannot be translated>
 [kernel] warning: no entry point specified:
-  you must call function `__e_acsl_memory_init' and `__e_acsl_memeory_clean'
+  you must call function `__e_acsl_memory_init' and `__e_acsl_memory_clean'
   by yourself.
 [e-acsl] translation done in project "e-acsl".
 \end{shell}
@@ -90,7 +92,7 @@ beginning. This function plays a very important role: it initializes metadata
 storage used for tracking of memory blocks. Unless this call is inserted the
 run of a modified program is likely to fail.
 
-While it possible to add such intrumentation manually we recommend using
+While it is possible to add such intrumentation manually we recommend using
 \eacslgcc. Consider the following incomplete program containing \T{main}:
 
 \listingname{modified\_main.c}
@@ -136,15 +138,17 @@ Programs containing recursive functions have the same limitations as the ones
 containing undefined functions (Section~\ref{sec:limits:no-code}) and
 memory-related annotations.
 
-Also, even though there is no such annotations, the generated code may call a
-function before it is declared. When this behavior appears remains
-unspecifed. The generated code is however easy to fix by hand.
+%% JS: this issue should have been fixed:
+%% Also, even though there is no such annotations, the generated code may call a
+%% function before it is declared. When this behavior appears remains
+%% unspecifed. The generated code is however easy to fix by hand.
 
 \section{Variadic Functions}
 \index{Function!Variadic}
 
 Programs containing undefined variadic functions with contracts
-are not yet supported. There is no workaround yet.
+are not yet supported. Using the \variadic plug-in of \framac could be a
+solution in some cases, but its generated code cannot always be compiled.
 
 \section{Function Pointers}
 \index{Function!Pointer}
@@ -164,13 +168,13 @@ reserves this namespace for its transformations, and therefore an input program
 containing such symbols beforehand may fail to be instrumented or compiled.
 
 \subsection{Memory Management Functions}
-Programs programs providing custom definitions of \T{syscall}, \T{mmap} or
+Programs providing custom definitions of \T{syscall}, \T{mmap} or
 \T{sbrk} should be rejected. Also, an input programs should not modify
 memory-management functions namely \T{malloc}, \T{calloc}, \T{realloc},
 \T{free}, \T{cfree}, \T{posix\_memalign} and \T{aligned\_alloc}.  \eacsl relies
-on these functions in order to track heap memory. Further, for heap memory
-monitoring to function correctly input programs should be limited to allocating
-and deallocating heap memory with POSIX-compliant memory management functions
+on these functions in order to track heap memory. Further, correct heap memory
+monitoring requires to limit allocation and deallocation of heap memory to
+POSIX-compliant memory management functions 
 listed above. Monitoring of programs that allocate memory using non-standard or
 obsolete functions (e.g., \T{valloc}, \T{memalign}, \T{pvalloc}) may not work
 correctly.

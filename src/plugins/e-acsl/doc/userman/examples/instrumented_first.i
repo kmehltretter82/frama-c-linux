@@ -1,5 +1,5 @@
 \begin{shell}
-\$ frama-c -e-acsl first.i -then-last -print -ocode first-instrumented.i
+\$ frama-c -e-acsl first.i -then-last -print
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_builtin_for_normalization.i (no preprocessing)
 [kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl_gmp.h (with preprocessing)
