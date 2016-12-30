@@ -470,8 +470,8 @@ fi
 for f in $@; do
   test -f "$f"
   error "input file '$f' does not exist or not a file" "$?";
-  has_extension $f i c
-  error "Input file '$f' has neither .i nor .c extension" $?;
+  has_extension $f i c cpp c++ C cxx cc ii
+  error "Input file '$f' has non-C extension" $?;
 done
 
 # Check if the output file has has the right extension (i.e., .i or .c)
