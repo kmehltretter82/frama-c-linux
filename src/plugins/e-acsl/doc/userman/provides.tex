@@ -607,7 +607,7 @@ feature can be enabled using the \shortopt{M} switch of \eacslgcc or
 \eacsl runtime libraries mentioned in Section~\ref{sec:memory} (i.e.,
 \T{libeacsl-rtl-bittree.a} and \T{libeacsl-rtl-segment.a}) are optimized for
 performance (via \shortopt{-O2} compiler flag).  An \eacsl installation also
-provides unoptimized versions of these libraries (siffixed \T{-dbg.a}) aimed at
+provides unoptimized versions of these libraries (suffixed \T{-dbg.a}) aimed at
 being used during debugging.
 
 The main difference between unoptimized (debug) and optimized (production)
@@ -656,7 +656,7 @@ It should be noted that because debug versions of \eacsl RTL are compiled
 without compile-time optimizations and execute additional assertions the
 runtime overheads of the instrumented programs linked against the debug
 versions of \eacsl RTL can be up to 10 times greater than those linked against
-the producton versions.
+the production versions.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
