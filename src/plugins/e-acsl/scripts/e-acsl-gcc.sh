@@ -51,17 +51,6 @@ check_tool() {
    { has_tool "$1" || test -e "$1"; } || error "No executable $1 found";
 }
 
-# Evaluate to a true value if the file name (given via the first argument) has
-# one of the extensions given by the remaining arguments
-has_extension() {
-  local file=$1
-  shift
-  for ext in $@; do
-    echo $file | grep "\.$ext$" >/dev/null && return 0
-  done
-  return 1
-}
-
 # Portable realpath using pwd
 realpath() {
   if [ -e "$1" ]; then
@@ -465,18 +454,6 @@ shift;
 if [ -z "$1" ]; then
   error "no input files";
 fi
-
-# Make sure every input file exists and has the right extension (i.e., .i or .c)
-for f in $@; do
-  test -f "$f"
-  error "input file '$f' does not exist or not a file" "$?";
-  has_extension $f i c cpp c++ C cxx cc ii
-  error "Input file '$f' has non-C extension" $?;
-done
-
-# Check if the output file has has the right extension (i.e., .i or .c)
-has_extension "$OPTION_OUTPUT_CODE" i c
-error "Output file '$OPTION_OUTPUT_CODE' has neither .i nor .c extension" $?;
 
 # Check Frama-C and GCC executable names
 check_tool "$OPTION_FRAMAC"
