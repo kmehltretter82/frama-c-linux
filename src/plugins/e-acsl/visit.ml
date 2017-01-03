@@ -246,7 +246,7 @@ class e_acsl_visitor prj generate = object (self)
                   f.globals <- new_globals
                 | None ->
                   Kernel.warning "@[no entry point specified:@ \
-you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
+you must call function `__e_acsl_memory_init' by yourself.@]"
                     fname;
                   f.globals <- f.globals @ [ cil_fct ]
             in

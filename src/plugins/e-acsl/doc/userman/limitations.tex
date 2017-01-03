@@ -79,8 +79,7 @@ You can generate the instrumented program as follows.
 <skip warnings about annotations from the Frama-C libc
   which cannot be translated>
 [kernel] warning: no entry point specified:
-  you must call function `__e_acsl_memory_init' and `__e_acsl_memory_clean'
-  by yourself.
+  you must call function `__e_acsl_memory_init' by yourself.
 [e-acsl] translation done in project "e-acsl".
 \end{shell}
 
@@ -174,7 +173,7 @@ memory-management functions namely \T{malloc}, \T{calloc}, \T{realloc},
 \T{free}, \T{cfree}, \T{posix\_memalign} and \T{aligned\_alloc}.  \eacsl relies
 on these functions in order to track heap memory. Further, correct heap memory
 monitoring requires to limit allocation and deallocation of heap memory to
-POSIX-compliant memory management functions 
+POSIX-compliant memory management functions
 listed above. Monitoring of programs that allocate memory using non-standard or
 obsolete functions (e.g., \T{valloc}, \T{memalign}, \T{pvalloc}) may not work
 correctly.
