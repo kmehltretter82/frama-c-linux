@@ -601,6 +601,64 @@ feature can be enabled using the \shortopt{M} switch of \eacslgcc or
 \shortopt{e-acsl-full-mmodel} option of the \eacsl plug-in.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Debug Libraries}
+\label{sec:runtime-debug}
+
+\eacsl runtime libraries mentioned in Section~\ref{sec:memory} (i.e.,
+\T{libeacsl-rtl-bittree.a} and \T{libeacsl-rtl-segment.a}) are optimized for
+performance (via \shortopt{-O2} compiler flag).  An \eacsl installation also
+provides unoptimized versions of these libraries (siffixed \T{-dbg.a}) aimed at
+being used during debugging.
+
+The main difference between unoptimized (debug) and optimized (production)
+libraries is that debug libraries include assertions validating the correctness
+of the RTL itself. For instance, during memory tracking such assertions ensure
+that during a run of a program all tracked memory blocks are disjoint.
+
+Consider the following program that violates an annotation
+in function \T{foo} via a call \T{bar(p+1)} in the main function:
+
+\listingname{rte\_debug.i}
+\cinput{examples/rte_debug.i}
+
+A monitored executable linked against a debug version of \eacsl RTL
+can ge generated using
+\longopt{rt-debug} flag of \eacslgcc as follows:
+
+\begin{shell}
+\$ e-acsl-gcc.sh --rt-debug -c -omonitored_rte_debug.c -Orte_debug rte_debug.i
+\end{shell}
+
+A run of the monitored executable shows violation of the \eacsl annotation.
+\begin{shell}
+\$ rte_debug.e-acsl
+Assertion failed at line 2 in function foo.
+The failing predicate is:
+\valid(p).
+/** Backtrace **************************/
+trace at e_acsl_trace.h:45
+ - exec_abort at e_acsl_assert.h:58
+ - runtime_assert at e_acsl_assert.h:93
+ - foo at monitored_rte_debug.c:92
+ - bar at monitored_rte_debug.c:102
+ - main at monitored_rte_debug.c:119
+/***************************************/
+Aborted
+\end{shell}
+
+A run of an executable linked against an unoptimized RTL shows a stack trace on
+the instrumented program saved to \T{monitored\_rte\_debug.c}.  In the example
+above calls to \T{exec\_abort} and \T{runtime\_assert} belong to the \eacsl
+RTL, whereas calls to \T{foo}, \T{bar} and \T{main} belong to the input
+program.
+
+It should be noted that because debug versions of \eacsl RTL are compiled
+without compile-time optimizations and execute additional assertions the
+runtime overheads of the instrumented programs linked against the debug
+versions of \eacsl RTL can be up to 10 times greater than those linked against
+the producton versions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Runtime Monitor Behavior}
 
