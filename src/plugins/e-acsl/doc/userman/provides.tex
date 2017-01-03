@@ -245,7 +245,7 @@ considered to be instrumented code and thus no original program is provided.
 By default \eacslgcc uses \T{frama-c} and \T{gcc} executables by looking them
 up in a system's path. If either of the tools are not found the script fails
 with an appropriate error message. Paths to \framac and \gcc executables can
-also be passed using \shortopt{I} and \shortopt{G} options 
+also be passed using \shortopt{I} and \shortopt{G} options
 respectively, for instance as follows:
 
 \begin{shell}
@@ -269,7 +269,7 @@ are output using the UTF-8 character set. Further, during the compilation of
 It is worth mentioning that \eacslgcc implements several convenience flags for
 setting some of the \framac options. For instance, \shortopt{E} can be used to
 pass additional arguments to the \framac pre-processor (see
-Section~\ref{sec:eacsl-gcc:doc}). 
+Section~\ref{sec:eacsl-gcc:doc}).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Verbosity Levels and Output Redirection}
@@ -329,7 +329,14 @@ executables with ABI different to the default one.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Documentation}\label{sec:eacsl-gcc:doc}
 
-A list of \eacslgcc options can be retrieved using the following command:
+For full up-to-date documentation of \eacslgcc see its man page:
+
+\begin{shell}
+    \$ man e-acsl-gcc.sh
+\end{shell}
+
+A brief listing of the basic options of \eacslgcc
+can be viewed using its \shortopt{h} option:
 
 \begin{shell}
  \$ e-acsl-gcc.sh -h
@@ -352,13 +359,6 @@ A list of \eacslgcc options can be retrieved using the following command:
    -G <file>  specify C compiler executable [gcc]
 \end{shell}
 
-Note that the \shortopt{h} option lists only the most basic options.
-For full up-to-date documentation of \eacslgcc see its man page:
-
-\begin{shell}
-    \$ man e-acsl-gcc.sh
-\end{shell}
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%>>>
@@ -379,7 +379,7 @@ plug-in offers a few possibilities of customization.
 The major difference between \acsl~\cite{acsl} and \eacsl~\cite{eacsl}
 specification languages is that the logic is total in the former while it is
 partial in the latter one: the semantics of a logic construct $c$ denoting a \C
-expression $e$ 
+expression $e$
 is undefined if $e$ leads to a runtime error and, consequently, the semantics of
 any term $t$ (resp. predicate $p$) containing such a construct $c$ is
 undefined as soon as $e$ has to be evaluated in order to evaluate $t$
@@ -593,7 +593,7 @@ model~\cite{pldi16}.
 
 By default \eacsl uses static analysis to reduce instrumentation and therefore
 runtime and memory overheads~\cite{scp16}. With respect to memory tracking this
-means that 
+means that
 \eacsl may omit recording memory blocks irrelevant for runtime analysis.  It
 is, however, still possible to systematically instrument the code for handling
 potential memory-related annotations even when it is not required.  This
@@ -779,7 +779,7 @@ the following command:
 
 Note the use of \eacslgcc \longopt{rte} option which asks \framac to combine
 \eacsl with \rte plug-in. This plug-in automatically instruments the input
-program with runtime 
+program with runtime
 assertions before running the \eacsl plug-in on it.  \longopt{rte} option of
 \eacslgcc also accepts a comma-separated list of arguments indicating the types
 of assertions to generate. Consult the \eacslgcc man page for a detailed
