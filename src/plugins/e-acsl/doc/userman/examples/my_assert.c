@@ -1,12 +1,8 @@
 #include "stdio.h"
 
-void e_acsl_assert(int predicate, 
-		   char *kind, 
-		   char *fct, 
-		   char *pred_txt, 
-		   int line) 
-{
+void __e_acsl_assert(int pred, char *kind,
+                     char *func_name, char *pred_text, int line) {
   printf("%s at line %d in function %s is %s.\n\
 The verified predicate was: `%s'.\n",
-	 kind, line, fct, predicate ? "valid" : "invalid", pred_txt);
+  kind, line, func_name, pred ? "valid" : "invalid", pred_text);
 }
