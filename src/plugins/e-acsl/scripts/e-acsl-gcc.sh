@@ -552,7 +552,7 @@ LDFLAGS="$OPTION_LDFLAGS"
 # C, CPP and LD flags for compilation of E-ACSL-generated sources
 EACSL_CFLAGS=""
 EACSL_CPPFLAGS="-I$EACSL_SHARE"
-EACSL_LDFLAGS="-lm -lpthread"
+EACSL_LDFLAGS="$LIBDIR/libeacsl-jemalloc.a $LIBDIR/libeacsl-gmp.a -lm -lpthread"
 
 # Output file names
 OUTPUT_CODE="$OPTION_OUTPUT_CODE" # E-ACSL instrumented source

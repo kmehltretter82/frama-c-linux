@@ -198,11 +198,9 @@ MKRTL = \
   object=$$(basename -s .a $2).o && \
   echo ' CC $3' && \
   $(CC) $1 -c -o$$object $3 && \
-  (cd $(EACSL_LIBDIR) && $(AR) -x $(EACSL_GMP_LIBNAME)) && \
-  (cd $(EACSL_LIBDIR) && $(AR) -x $(EACSL_JEMALLOC_LIBNAME)) && \
   echo ' AR $2' && \
-  $(AR) crus $2 $$object $(EACSL_LIBDIR)/*.o && \
-  $(RM) -f $$object $(EACSL_LIBDIR)/*.o && \
+  $(AR) crus $2 $$object && \
+  $(RM) -f $$object && \
   ranlib $2
 
 $(EACSL_LIBDIR)/libeacsl-rtl-%.a: $(EACSL_SHARE)/%_model/e_acsl_*_mmodel.c $(EACSL_RTL_SRC) $(EACSL_JEMALLOC_LIB) $(EACSL_GMP_LIB)

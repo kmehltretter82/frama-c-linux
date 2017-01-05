@@ -126,7 +126,8 @@ runtime can be generated using a \C compiler (for instance \gcc), as follows:
 
 \lstset{escapechar=£}
 \begin{shell}
-\$ gcc monitored_first.i -omonitored_first -leacsl-rtl-bittree -lpthread -lm
+\$ gcc monitored_first.i -omonitored_first \
+  -leacsl-rtl-bittree -leacsl-gmp -leacsl-jemalloc -lpthread -lm
 monitored_first.i:9:1: warning: '__FC_BUILTIN__' attribute directive ignored [-Wattributes]
  typedef __e_acsl_mpz_struct ( __attribute__((__FC_BUILTIN__)) __e_acsl_mpz_t)[1];
  ^
@@ -142,9 +143,15 @@ The displayed warnings can be safely ignored as they refer to the attribute
 using \shortopt{Wno-attributes} \gcc option. You may also notice that the
 generated executable (\texttt{monitored\_first}) is linked against the \eacsl
 static library (i.e., via \texttt{-leacsl-rtl-bittree}) installed alongside the
-\eacsl plug-in. This library provides definitions of the functions used by
-\eacsl during its runtime analysis.
-We describe libraries used by \eacsl later on in Section~\ref{sec:memory}.
+\eacsl plug-in.  This library provides definitions of the functions used by
+\eacsl during its runtime analysis.  The monitored executable is also linked
+against the customized versions of the \jemalloc memory allocator
+(\T{-leacsl-jemalloc}) and the \gmp library (\T{-leacsl-gmp}) used by \eacsl.
+Even though in this example they are not strictly needed (since the transformed
+executable neither tracks memory nor reasons about arbitrary precision
+integers) we show all libraries potentially used by a transformed executable
+for completeness purposes.  We describe the libraries used by \eacsl later on
+in Section~\ref{sec:memory}.
 
 Finally you can execute the generated binary.
 \begin{shell}
@@ -543,14 +550,21 @@ The functionality of the provided memory models (and therefore libraries
 implementing them) is equivalent, however they differ in performance. We
 further discuss performance considerations.
 
-Additionally to memory tracking both libraries include customized version of
-the \gmp library, \jemalloc\footnote{\url{http://jemalloc.net/}} memory
-allocator replacing system-wide malloc and other utilities including \eacsl
-assertions.  It is therefore safe to link an \eacsl-instrumented program
-against any of these libraries.  For instance, in Section~\ref{sec:exec} we
-have linked the instrumented program in \texttt{monitored\_first.i} against
-\T{libeacsl-rtl-bittree.a}, but you can also link it against the library
-implementing the segment-based memory model via \T{-leacsl-rtl-segment}.
+Both libraries use the same API and differ only in implementation, therefore it
+is safe to link an \eacsl-instrumented program against any of these libraries.
+For instance, in Section~\ref{sec:exec} we have linked the instrumented program
+in \texttt{monitored\_first.i} against \T{libeacsl-rtl-bittree.a}, but you can
+also link it against the library implementing the segment-based memory model
+via \T{-leacsl-rtl-segment}.
+
+The \eacsl libraries allocate heap memory using a customized version of the
+\jemalloc\footnote{\url{http://jemalloc.net/}} memory allocator replacing
+system-wide \T{malloc} and similar functions (e.g., \T{calloc} or \T{free}).
+Mathematical integers used by \eacsl are implemented using a customized version
+of the \gmp library. Both, \jemalloc and \gmp should be added at link time as
+shown in Section~\ref{sec:exec}.  We, however, recommend using \eacslgcc who
+adds necessary compile- and link-time dependencies and allows for easy
+switching between different memory models as discussed  below.
 
 At the level of \eacslgcc you can choose between different memory models using
 the \shortopt{m} switch followed by the name of the memory model to link
