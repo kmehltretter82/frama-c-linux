@@ -59,6 +59,7 @@ PLUGIN_CMO:= local_config \
 	literal_strings \
 	mmodel_analysis \
 	dup_functions \
+	exit_points \
 	label \
 	env \
 	interval \
