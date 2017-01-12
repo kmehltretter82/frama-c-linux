@@ -36,3 +36,12 @@ val delete_vars: Cil_types.stmt -> Cil_types.varinfo list
    goto, break or continue) return the list of local variables which
    need to be removed from tracking before that statement is executed.
    Before calling this function [generate] need to be executed. *)
+
+val is_bypassed_by: Cil_types.varinfo -> Cil_types.stmt option
+(** Given a variable [vi] returns a [goto] statement which bypasses the
+   declaration of [vi] and as a consequence misses the execution of
+   [store_block] instrumented immediately after the declaration. *)
+
+val bypass_warning: Cil_types.stmt -> Cil_types.varinfo -> unit
+(** Emit a warning if a given variable is bypassed by a given goto statement *)
+

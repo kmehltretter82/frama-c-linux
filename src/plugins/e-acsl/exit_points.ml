@@ -42,32 +42,70 @@ let exit_context:
    capture references to labelled statements they jumps to). Nevertheless it is
    done for consistency, so all required information is stored uniformly. *)
 
+let labelled_jumps:
+  Cil_types.stmt Stmt.Hashtbl.t = Stmt.Hashtbl.create 17
+(* Map labelled statements back to gotos which lead to them *)
+
+let bypassed_variables:
+  Cil_types.stmt Varinfo.Hashtbl.t = Varinfo.Hashtbl.create 5
+(* Map variables that are bypasssed by goto jumps to the goto statements
+   which bypass them *)
+
 let clear () =
   Stmt.Hashtbl.clear statement_locals;
-  Stmt.Hashtbl.clear exit_context
+  Stmt.Hashtbl.clear exit_context;
+  Stmt.Hashtbl.clear labelled_jumps;
+  Varinfo.Hashtbl.clear bypassed_variables
 
 let filter_vars varlst1 varlst2 =
-  List.filter
-    (fun var1 -> not
-      (List.exists (fun var2 -> var1.vname = var2.vname) varlst2))
-    varlst1
-    (* Given that lists [varlist1] and [varlist2] represent two sets of
-       variables, substract [varlist2] from [varlist2]. *)
+  let s1 = Varinfo.Set.of_list varlst1 in
+  let s2 = Varinfo.Set.of_list varlst2 in
+  Varinfo.Set.elements (Varinfo.Set.diff s1 s2)
+
+let find_locals stmt =
+  Stmt.Hashtbl.find statement_locals stmt
+
+let find_exit stmt =
+  Stmt.Hashtbl.find exit_context stmt
 
 let delete_vars stmt =
-  let find_locals stmt = Stmt.Hashtbl.find statement_locals stmt in
-  let find_exit stmt = Stmt.Hashtbl.find exit_context stmt in
   match stmt.skind with
   | Goto(_) | Break(_) | Continue(_) ->
     filter_vars (find_locals stmt) (find_locals (find_exit stmt))
   | _ -> []
+
+let bypass_warning goto var =
+  let loc = match goto.skind with
+    | Goto(_, l) -> l
+    | _ -> assert false
+  in
+  Options.warning "Declaration of variable %s at %a is bypassed by '%a' at %a. \
+Execution of a monitored program will fail"
+  var.vname
+  Printer.pp_location var.vdecl
+  Printer.pp_stmt goto
+  Printer.pp_location loc
+
+let is_bypassed_by vi =
+  if Varinfo.Hashtbl.mem bypassed_variables vi then
+    Some (Varinfo.Hashtbl.find bypassed_variables vi)
+  else
+    None
+
+let bypassed_by_stmt stmt =
+  let gotos = Stmt.Hashtbl.find_all labelled_jumps stmt in
+  List.iter (fun goto ->
+    List.iter
+      (fun v -> Varinfo.Hashtbl.replace bypassed_variables v goto)
+      (filter_vars (find_locals stmt) (find_locals goto))
+  ) gotos
 
 class jump_context = object (self)
   inherit Visitor.frama_c_inplace
 
   val mutable locals = [[]]
   (* Maintained list of local variables within a scope of a visitor,
-   * variables within a single scope are given by a single list *)
+     variables within a single scope are given by a single list *)
 
   val mutable jumps = []
   (* Stack of entered switches and loops  *)
@@ -77,6 +115,15 @@ class jump_context = object (self)
 
   method private add_exit stmt from =
     Stmt.Hashtbl.replace exit_context stmt from
+
+  method private add_labelled label goto =
+    Stmt.Hashtbl.add labelled_jumps label goto
+
+  method !vfunc _ =
+    Cil.DoChildrenPost
+    (fun fn ->
+      Stmt.Hashtbl.iter (fun vi _ -> bypassed_by_stmt vi) labelled_jumps;
+      fn)
 
   method !vblock blk =
     locals <- [blk.blocals] @ locals;
@@ -96,6 +143,7 @@ class jump_context = object (self)
     | Goto(sref, _)  ->
       self#add_locals stmt;
       self#add_exit stmt !sref;
+      self#add_labelled !sref stmt;
       Cil.DoChildren
     | _ when (List.length stmt.labels) > 0 ->
       self#add_locals stmt;
