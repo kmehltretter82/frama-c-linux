@@ -79,12 +79,24 @@ let bypass_warning goto var =
     | Goto(_, l) -> l
     | _ -> assert false
   in
-  Options.warning "Declaration of variable %s at %a is bypassed by '%a' at %a. \
-Execution of a monitored program will fail"
+  Options.warning "Declaration of variable %s at %a is bypassed by a goto at \
+%a. Execution of a monitored program will fail"
   var.vname
   Printer.pp_location var.vdecl
-  Printer.pp_stmt goto
   Printer.pp_location loc
+
+let store_vars stmt =
+  if Stmt.Hashtbl.mem labelled_jumps stmt then
+    let gotos = Stmt.Hashtbl.find_all labelled_jumps stmt in
+    let acc = List.fold_left
+      (fun acc goto ->
+        acc @ filter_vars (find_locals stmt) (find_locals goto))
+      []
+      gotos
+    in
+    Varinfo.Set.elements (Varinfo.Set.of_list acc)
+  else
+    []
 
 let is_bypassed_by vi =
   if Varinfo.Hashtbl.mem bypassed_variables vi then
