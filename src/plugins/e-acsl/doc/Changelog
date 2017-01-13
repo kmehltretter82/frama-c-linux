@@ -15,6 +15,10 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
+#########################
+Plugin E-ACSL 0.8 Silicon
+#########################
+
 -* E-ACSL       [2016/11/07] Added --rte-select feature to e-acsl-gcc.sh.
 -* E-ACSL       [2016/08/02] Added --rt-debug feature to e-acsl-gcc.sh.
 	        --enable-optimized-rtl configure option removed
