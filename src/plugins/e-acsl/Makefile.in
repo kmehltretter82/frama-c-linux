@@ -149,6 +149,7 @@ CPPGMPFLAGS += -Drealloc=__e_acsl_native_realloc
 CPPGMPFLAGS += -Dfree=__e_acsl_native_free
 
 $(EACSL_GMP_LIB): $(EACSL_GMP_DIR)/mini-gmp/mini-gmp.c
+	$(MKDIR) $(EACSL_LIBDIR)
 	echo 'CC          $< '
 	$(CC) $< $(CPPGMPFLAGS) -c -O2 -g3 -o$(EACSL_GMP_MINI)
 	echo 'AR          $@'
