@@ -1,0 +1,6 @@
+[e-acsl] beginning translation.
+FRAMAC_SHARE/libc/stdlib.h:276:[kernel] warning: No code nor implicit assigns clause for function calloc, generating default assigns from the prototype
+[e-acsl] warning: Declaration of local variable p at tests/runtime/bypassed_var.c:11 is bypassed by agoto statement at tests/runtime/bypassed_var.c:8
+[e-acsl] translation done in project "e-acsl".
+FRAMAC_SHARE/e-acsl/e_acsl.h:43:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/bypassed_var.c:16:[value] warning: accessing uninitialized left-value. assert \initialized(&p);
