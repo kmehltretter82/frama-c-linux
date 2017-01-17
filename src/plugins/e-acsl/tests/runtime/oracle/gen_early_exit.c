@@ -88,8 +88,8 @@ int goto_valid(void)
         a3 = 0;
         __e_acsl_full_init((void *)(& r));
         r = & a3;
-        __e_acsl_delete_block((void *)(& a3));
         __e_acsl_delete_block((void *)(& a2));
+        __e_acsl_delete_block((void *)(& a3));
         goto FIRST;
         __e_acsl_full_init((void *)(& p));
         p = (int *)0;
@@ -313,8 +313,8 @@ int switch_valid(void)
                             (char *)"switch_valid",(char *)"\\valid(s)",78);
           }
         }
-        __e_acsl_delete_block((void *)(& a2));
         __e_acsl_delete_block((void *)(& a1));
+        __e_acsl_delete_block((void *)(& a2));
         break;
         __e_acsl_delete_block((void *)(& a2));
       }
@@ -477,8 +477,8 @@ int while_valid(void)
             }
           }
           if (! i) {
-            __e_acsl_delete_block((void *)(& a2));
             __e_acsl_delete_block((void *)(& a1));
+            __e_acsl_delete_block((void *)(& a2));
             break;
           }
           __e_acsl_delete_block((void *)(& a2));
@@ -684,8 +684,8 @@ void continue_valid(void)
                             142);
           }
         }
-        __e_acsl_delete_block((void *)(& a2));
         __e_acsl_delete_block((void *)(& a1));
+        __e_acsl_delete_block((void *)(& a2));
         continue;
         __e_acsl_delete_block((void *)(& a2));
       }
