@@ -46,16 +46,10 @@ let labelled_jumps:
   Cil_types.stmt Stmt.Hashtbl.t = Stmt.Hashtbl.create 17
 (* Map labelled statements back to gotos which lead to them *)
 
-let bypassed_variables:
-  Cil_types.stmt Varinfo.Hashtbl.t = Varinfo.Hashtbl.create 5
-(* Map variables that are bypasssed by goto jumps to the goto statements
-   which bypass them *)
-
 let clear () =
   Stmt.Hashtbl.clear statement_locals;
   Stmt.Hashtbl.clear exit_context;
-  Stmt.Hashtbl.clear labelled_jumps;
-  Varinfo.Hashtbl.clear bypassed_variables
+  Stmt.Hashtbl.clear labelled_jumps
 
 let filter_vars varlst1 varlst2 =
   let s1 = Varinfo.Set.of_list varlst1 in
@@ -74,17 +68,6 @@ let delete_vars stmt =
     filter_vars (find_locals stmt) (find_locals (find_exit stmt))
   | _ -> []
 
-let bypass_warning goto var =
-  let loc = match goto.skind with
-    | Goto(_, l) -> l
-    | _ -> assert false
-  in
-  Options.warning "Declaration of local variable %s at %a is bypassed by a\
-goto statement at %a"
-  var.vname
-  Printer.pp_location var.vdecl
-  Printer.pp_location loc
-
 let store_vars stmt =
   if Stmt.Hashtbl.mem labelled_jumps stmt then
     let gotos = Stmt.Hashtbl.find_all labelled_jumps stmt in
@@ -97,20 +80,6 @@ let store_vars stmt =
     Varinfo.Set.elements (Varinfo.Set.of_list acc)
   else
     []
-
-let is_bypassed_by vi =
-  if Varinfo.Hashtbl.mem bypassed_variables vi then
-    Some (Varinfo.Hashtbl.find bypassed_variables vi)
-  else
-    None
-
-let bypassed_by_stmt stmt =
-  let gotos = Stmt.Hashtbl.find_all labelled_jumps stmt in
-  List.iter (fun goto ->
-    List.iter
-      (fun v -> Varinfo.Hashtbl.replace bypassed_variables v goto)
-      (filter_vars (find_locals stmt) (find_locals goto))
-  ) gotos
 
 class jump_context = object (self)
   inherit Visitor.frama_c_inplace
@@ -130,12 +99,6 @@ class jump_context = object (self)
 
   method private add_labelled label goto =
     Stmt.Hashtbl.add labelled_jumps label goto
-
-  method !vfunc _ =
-    Cil.DoChildrenPost
-    (fun fn ->
-      Stmt.Hashtbl.iter (fun vi _ -> bypassed_by_stmt vi) labelled_jumps;
-      fn)
 
   method !vblock blk =
     locals <- [blk.blocals] @ locals;

@@ -37,13 +37,6 @@ val delete_vars: Cil_types.stmt -> Cil_types.varinfo list
    need to be removed from tracking before that statement is executed.
    Before calling this function [generate] need to be executed. *)
 
-val is_bypassed_by: Cil_types.varinfo -> Cil_types.stmt option
-(** Given a variable [vi] returns a [goto] statement which bypasses the
-   declaration of [vi]. *)
-
-val bypass_warning: Cil_types.stmt -> Cil_types.varinfo -> unit
-(** Emit a warning if a given variable is bypassed by a given goto statement *)
-
 val store_vars: Cil_types.stmt -> Cil_types.varinfo list
 (** Compute variables that should be re-recorded before a labelled statement to
    which some goto jumps *)

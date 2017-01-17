@@ -751,10 +751,6 @@ such variables of use -simplify-cfg flag of Frama-C to bypass them."
           List.fold_left
           (fun acc vi ->
             if Mmodel_analysis.must_model_vi vi then
-              let _ = match Exit_points.is_bypassed_by vi with
-                | None -> ()
-                | Some goto -> Exit_points.bypass_warning goto vi
-              in
               let vi = Cil.get_varinfo self#behavior vi in
               Misc.mk_store_stmt vi :: acc
             else acc)
