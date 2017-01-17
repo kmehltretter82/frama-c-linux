@@ -79,8 +79,8 @@ let bypass_warning goto var =
     | Goto(_, l) -> l
     | _ -> assert false
   in
-  Options.warning "Declaration of variable %s at %a is bypassed by a goto at \
-%a. Execution of a monitored program will fail"
+  Options.warning "Declaration of local variable %s at %a is bypassed by a\
+goto statement at %a"
   var.vname
   Printer.pp_location var.vdecl
   Printer.pp_location loc

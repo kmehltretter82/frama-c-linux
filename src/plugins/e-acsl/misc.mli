@@ -38,15 +38,15 @@ val mk_call: loc:Location.t -> ?result:lval -> string -> exp list -> stmt
 
 val mk_debug_mmodel_stmt: stmt -> stmt
 
-type annotation_kind = 
+type annotation_kind =
   | Assertion
   | Precondition
   | Postcondition
   | Invariant
   | RTE
 
-val mk_e_acsl_guard: 
-  ?reverse:bool -> annotation_kind -> kernel_function -> exp -> predicate 
+val mk_e_acsl_guard:
+  ?reverse:bool -> annotation_kind -> kernel_function -> exp -> predicate
   -> stmt
 
 val mk_block: Project.t -> stmt -> block -> stmt
@@ -71,6 +71,7 @@ val register_library_function: varinfo -> unit
 val reset: unit -> unit
 
 val mk_store_stmt: ?str_size:exp -> varinfo -> stmt
+val mk_duplicate_store_stmt: ?str_size:exp -> varinfo -> stmt
 val mk_delete_stmt: varinfo -> stmt
 val mk_full_init_stmt: ?addr:bool -> varinfo -> stmt
 val mk_initialize: loc:location -> lval -> stmt
