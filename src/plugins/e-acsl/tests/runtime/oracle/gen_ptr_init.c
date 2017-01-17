@@ -10,11 +10,9 @@ void f(void)
 void g(int *C, int *D)
 {
   /*@ assert \initialized(&C); */
-  {
-    __e_acsl_store_block((void *)(& C),8UL);
-    __e_acsl_assert(1,(char *)"Assertion",(char *)"g",
-                    (char *)"\\initialized(&C)",16);
-  }
+  __e_acsl_store_block((void *)(& C),8UL);
+  __e_acsl_assert(1,(char *)"Assertion",(char *)"g",
+                  (char *)"\\initialized(&C)",16);
   __e_acsl_delete_block((void *)(& C));
   return;
 }
@@ -48,13 +46,11 @@ int main(void)
                   (char *)"\\initialized(&A)",25);
   /*@ assert \initialized(&x); */
   {
-    {
-      int __gen_e_acsl_initialized;
-      __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& x),
-                                                      sizeof(int *));
-      __e_acsl_assert(__gen_e_acsl_initialized,(char *)"Assertion",
-                      (char *)"main",(char *)"\\initialized(&x)",26);
-    }
+    int __gen_e_acsl_initialized;
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& x),
+                                                    sizeof(int *));
+    __e_acsl_assert(__gen_e_acsl_initialized,(char *)"Assertion",
+                    (char *)"main",(char *)"\\initialized(&x)",26);
   }
   g(x,y);
   __retres = 0;

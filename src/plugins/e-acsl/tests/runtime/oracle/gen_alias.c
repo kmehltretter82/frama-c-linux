@@ -22,13 +22,11 @@ int main(void)
   f(& i,255);
   /*@ assert \initialized(&i); */
   {
-    {
-      int __gen_e_acsl_initialized;
-      __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& i),
-                                                      sizeof(int));
-      __e_acsl_assert(__gen_e_acsl_initialized,(char *)"Assertion",
-                      (char *)"main",(char *)"\\initialized(&i)",14);
-    }
+    int __gen_e_acsl_initialized;
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& i),
+                                                    sizeof(int));
+    __e_acsl_assert(__gen_e_acsl_initialized,(char *)"Assertion",
+                    (char *)"main",(char *)"\\initialized(&i)",14);
   }
   __retres = 0;
   __e_acsl_delete_block((void *)(& i));
