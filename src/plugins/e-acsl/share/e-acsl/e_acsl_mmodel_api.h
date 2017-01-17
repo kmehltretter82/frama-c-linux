@@ -82,6 +82,16 @@ int posix_memalign(void **memptr, size_t alignment, size_t size)
 void * __e_acsl_store_block(void * ptr, size_t size)
   __attribute__((FC_BUILTIN));
 
+/*! \brief Same as `__e_acsl_store_block`, but first check
+ * checks whether a block with a base address given by `ptr` exists in the
+ * tracked allocation and remove it before storing a new block.
+ *
+ * \param ptr base address of the tracked memory block
+ * \param size size of the tracked block in bytes */
+/*@ assigns \result \from *(((char*)ptr)+(0..size-1)); */
+void * __e_acsl_store_block_duplicate(void * ptr, size_t size)
+  __attribute__((FC_BUILTIN));
+
 /*! \brief Remove a memory block which base address is \p ptr from tracking. */
 /*@ assigns \nothing; */
 void __e_acsl_delete_block(void * ptr)

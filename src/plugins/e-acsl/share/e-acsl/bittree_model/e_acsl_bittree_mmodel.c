@@ -314,6 +314,17 @@ static void delete_block(void* ptr) {
     }
   }
 }
+
+static void* store_block_duplicate(void* ptr, size_t size) {
+  if (ptr != NULL) {
+    bt_block * tmp = bt_lookup(ptr);
+    if (tmp)
+      delete_block(tmp);
+    store_block(ptr, size);
+  }
+  return ptr;
+}
+
 /* }}} */
 
 /* HEAP ALLOCATION {{{ */
@@ -566,6 +577,7 @@ strong_alias(bittree_aligned_alloc, aligned_alloc)
 /* Explicit tracking */
 public_alias(delete_block)
 public_alias(store_block)
+public_alias(store_block_duplicate)
 /* Predicates */
 public_alias(offset)
 public_alias(base_addr)
