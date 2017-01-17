@@ -468,6 +468,28 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
   method private add_delete_stmt ?before env kf vars =
     self#add_tracking_fn Misc.mk_delete_stmt ?before env kf vars
 
+  (* Abort the execution if E-ACSL is required to monitor a variable
+     declared within a body of a switch statement. In the present setup
+     [store_block] will be added after the definition of such variable
+     and ignored by the executing program, which in turn will lead to
+     inconsistent tracking state. *)
+  method private check_switch_declarations stmt kf =
+    match stmt with
+    | { skind = Switch(_,blk,_,_) } when List.length blk.blocals > 0 ->
+      List.iter
+      (fun vi ->
+        if Mmodel_analysis.must_model_vi ~kf vi; then begin
+          Options.error "Variable %s at %a declared in the body of a switch \
+statement.\nExecition of a monitored program will fail.\nConsider removing \
+such variables of use -simplify-cfg flag of Frama-C to bypass them."
+          vi.vname
+          Printer.pp_location vi.vdecl;
+          assert false
+        end else
+          ())
+      blk.blocals
+    | _ -> ()
+
   method !vstmt_aux stmt =
     Options.debug ~level:4 "proceeding stmt (sid %d) %a@."
       stmt.sid Stmt.pretty stmt;
@@ -521,6 +543,9 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     let duplicates = (Exit_points.store_vars stmt) in
     let env = self#add_duplicate_store_stmt ~before:stmt env kf duplicates in
     function_env := env;
+
+    (* Make there are no variables to monitor declared in switches *)
+    self#check_switch_declarations stmt kf;
 
     let mk_block stmt =
       (* be careful: since this function is called in a post action, [env] has
