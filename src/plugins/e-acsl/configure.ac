@@ -68,8 +68,10 @@ case $FRAMAC_VERSION in
       AC_MSG_ERROR(Frama-C version must be at least \
 $REQUIRED_NAME-$REQUIRED_NUMBER.)
     else
-      AC_MSG_WARN(Frama-C version is more recent than $REQUIRED_NAME: \
+      if test $VERSION_NUMBER -gt $REQUIRED_NUMBER; then
+        AC_MSG_WARN(Frama-C version is more recent than $REQUIRED_NAME: \
 use it at your own risk)
+      fi
     fi;;
 esac
 
