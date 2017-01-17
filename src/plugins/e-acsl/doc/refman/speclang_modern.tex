@@ -694,9 +694,23 @@ evolve in the future.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Sets as first-class values}
+\section{Sets and lists}
 \index{location}
+
+\subsection{Finite sets}
 \nodiff
+
+\subsection{Finite lists}
+\nodiff
+
+Figure~\ref{fig:gram:list} shows the notations for built-in lists.
+\begin{figure}[t]
+  \begin{cadre}
+      \input{list-gram.bnf}
+    \end{cadre}
+  \caption{Notations for built-in list datatype}
+\label{fig:gram:list}
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -792,3 +806,11 @@ same than the one of \acsl.
 \difficultswhy{\lstinline|\\initialized| and
   \notimplemented{\lstinline|\\dangling|}}{the implementation of a memory
   model}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Well-typed pointers}
+\label{sec:typedpointers}
+\absentexperimental
