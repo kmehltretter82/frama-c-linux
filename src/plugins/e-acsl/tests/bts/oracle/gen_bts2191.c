@@ -32,19 +32,21 @@ int main(int argc, char **argv)
   __e_acsl_globals_init();
   /*@ assert \valid_read(_G[0].str); */
   {
-    int __gen_e_acsl_initialized;
-    int __gen_e_acsl_and;
-    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& _G[0L].str),
-                                                    sizeof(char *));
-    if (__gen_e_acsl_initialized) {
-      int __gen_e_acsl_valid_read;
-      __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)_G[0L].str,
-                                                    sizeof(char));
-      __gen_e_acsl_and = __gen_e_acsl_valid_read;
+    {
+      int __gen_e_acsl_initialized;
+      int __gen_e_acsl_and;
+      __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& _G[0L].str),
+                                                      sizeof(char *));
+      if (__gen_e_acsl_initialized) {
+        int __gen_e_acsl_valid_read;
+        __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)_G[0L].str,
+                                                      sizeof(char));
+        __gen_e_acsl_and = __gen_e_acsl_valid_read;
+      }
+      else __gen_e_acsl_and = 0;
+      __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
+                      (char *)"\\valid_read(_G[0].str)",22);
     }
-    else __gen_e_acsl_and = 0;
-    __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
-                    (char *)"\\valid_read(_G[0].str)",22);
   }
   __retres = 0;
   __e_acsl_delete_block((void *)(_G));

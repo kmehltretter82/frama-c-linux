@@ -18,20 +18,24 @@ int main(void)
   i = -1;
   /*@ assert ¬\valid_read(&t[i]); */
   {
-    int __gen_e_acsl_valid_read;
-    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(& t[i]),
-                                                  sizeof(int));
-    __e_acsl_assert(! __gen_e_acsl_valid_read,(char *)"Assertion",
-                    (char *)"main",(char *)"!\\valid_read(&t[i])",9);
+    {
+      int __gen_e_acsl_valid_read;
+      __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(& t[i]),
+                                                    sizeof(int));
+      __e_acsl_assert(! __gen_e_acsl_valid_read,(char *)"Assertion",
+                      (char *)"main",(char *)"!\\valid_read(&t[i])",9);
+    }
   }
   p = t;
   /*@ assert ¬\valid_read(p + i); */
   {
-    int __gen_e_acsl_valid_read_2;
-    __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(p + i),
-                                                    sizeof(int));
-    __e_acsl_assert(! __gen_e_acsl_valid_read_2,(char *)"Assertion",
-                    (char *)"main",(char *)"!\\valid_read(p + i)",11);
+    {
+      int __gen_e_acsl_valid_read_2;
+      __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(p + i),
+                                                      sizeof(int));
+      __e_acsl_assert(! __gen_e_acsl_valid_read_2,(char *)"Assertion",
+                      (char *)"main",(char *)"!\\valid_read(p + i)",11);
+    }
   }
   __retres = 0;
   __e_acsl_delete_block((void *)(& p));

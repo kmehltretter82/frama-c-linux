@@ -15,10 +15,12 @@ void f(void)
   m = 123;
   /*@ assert \initialized(p); */
   {
-    int __gen_e_acsl_initialized;
-    __gen_e_acsl_initialized = __e_acsl_initialized((void *)p,sizeof(int));
-    __e_acsl_assert(__gen_e_acsl_initialized,(char *)"Assertion",(char *)"f",
-                    (char *)"\\initialized(p)",10);
+    {
+      int __gen_e_acsl_initialized;
+      __gen_e_acsl_initialized = __e_acsl_initialized((void *)p,sizeof(int));
+      __e_acsl_assert(__gen_e_acsl_initialized,(char *)"Assertion",
+                      (char *)"f",(char *)"\\initialized(p)",10);
+    }
   }
   __e_acsl_delete_block((void *)(& p));
   __e_acsl_delete_block((void *)(& u));

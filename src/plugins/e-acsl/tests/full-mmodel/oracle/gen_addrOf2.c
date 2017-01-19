@@ -15,10 +15,12 @@ void f(void)
   m = 123;
   /*@ assert \initialized(p); */
   {
-    int __gen_e_acsl_initialized;
-    __gen_e_acsl_initialized = __e_acsl_initialized((void *)p,sizeof(int));
-    __e_acsl_assert(__gen_e_acsl_initialized,(char *)"Assertion",(char *)"f",
-                    (char *)"\\initialized(p)",10);
+    {
+      int __gen_e_acsl_initialized;
+      __gen_e_acsl_initialized = __e_acsl_initialized((void *)p,sizeof(int));
+      __e_acsl_assert(__gen_e_acsl_initialized,(char *)"Assertion",
+                      (char *)"f",(char *)"\\initialized(p)",10);
+    }
   }
   __e_acsl_delete_block((void *)(& p));
   __e_acsl_delete_block((void *)(& u));
@@ -28,6 +30,12 @@ void f(void)
 
 void __e_acsl_globals_init(void)
 {
+  __e_acsl_store_block((void *)(& __fc_wctomb_state),4UL);
+  __e_acsl_full_init((void *)(& __fc_wctomb_state));
+  __e_acsl_store_block((void *)(& __fc_mbtowc_state),4UL);
+  __e_acsl_full_init((void *)(& __fc_mbtowc_state));
+  __e_acsl_store_block((void *)(& __fc_mblen_state),4UL);
+  __e_acsl_full_init((void *)(& __fc_mblen_state));
   __e_acsl_store_block((void *)(& __fc_rand_max),8UL);
   __e_acsl_full_init((void *)(& __fc_rand_max));
   __e_acsl_store_block((void *)(& __fc_random_counter),4UL);
@@ -51,6 +59,9 @@ int main(void)
                   (char *)"&x == &x",16);
   __e_acsl_full_init((void *)(& __retres));
   __retres = 0;
+  __e_acsl_delete_block((void *)(& __fc_wctomb_state));
+  __e_acsl_delete_block((void *)(& __fc_mbtowc_state));
+  __e_acsl_delete_block((void *)(& __fc_mblen_state));
   __e_acsl_delete_block((void *)(& __fc_rand_max));
   __e_acsl_delete_block((void *)(& __fc_random_counter));
   __e_acsl_delete_block((void *)(& x));
