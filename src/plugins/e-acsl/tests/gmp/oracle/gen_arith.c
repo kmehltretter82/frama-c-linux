@@ -69,7 +69,7 @@ int main(void)
   __e_acsl_assert(3 % -2 == 1,(char *)"Assertion",(char *)"main",
                   (char *)"3 % -2 == 1",21);
   /*@ assert ((x * 2 + (3 + y)) - 4) + (x - y) ≡ -10; */
-  __e_acsl_assert(((x * 2L + (3L + y)) - 4L) + (x - y) == -10,
+  __e_acsl_assert(((x * 2L + (3L + y)) - 4L) + (x - (long)y) == -10,
                   (char *)"Assertion",(char *)"main",
                   (char *)"((x * 2 + (3 + y)) - 4) + (x - y) == -10",23);
   /*@ assert (0 ≡ 1) ≡ !(0 ≡ 0); */
@@ -140,6 +140,9 @@ int main(void)
       __gmpz_clear(__gen_e_acsl_div_2);
     }
   }
+  /*@ assert 1 - x ≡ -x + 1; */
+  __e_acsl_assert(1L - x == - ((long)x) + 1L,(char *)"Assertion",
+                  (char *)"main",(char *)"1 - x == -x + 1",36);
   __retres = 0;
   return __retres;
 }

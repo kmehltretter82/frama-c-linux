@@ -233,11 +233,11 @@ void __gen_e_acsl_n(void)
  */
 void __gen_e_acsl_m(void)
 {
-  int __gen_e_acsl_at_4;
+  long __gen_e_acsl_at_4;
   int __gen_e_acsl_at_3;
   int __gen_e_acsl_at_2;
   int __gen_e_acsl_at;
-  __gen_e_acsl_at_4 = X;
+  __gen_e_acsl_at_4 = (long)X;
   {
     int __gen_e_acsl_and_2;
     if (X == 5) __gen_e_acsl_and_2 = Y == 2; else __gen_e_acsl_and_2 = 0;
@@ -312,7 +312,7 @@ void __gen_e_acsl_k(void)
                     (char *)"k",(char *)"X == 3 && Y == 2 ==> X == 3",42);
     if (X == 3) __gen_e_acsl_and_2 = Y == 2; else __gen_e_acsl_and_2 = 0;
     if (! __gen_e_acsl_and_2) __gen_e_acsl_implies_3 = 1;
-    else __gen_e_acsl_implies_3 = X + Y == 5L;
+    else __gen_e_acsl_implies_3 = X + (long)Y == 5L;
     __e_acsl_assert(__gen_e_acsl_implies_3,(char *)"Precondition",
                     (char *)"k",(char *)"X == 3 && Y == 2 ==> X + Y == 5",43);
     k();

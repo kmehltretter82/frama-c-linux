@@ -33,5 +33,7 @@ int main(void) {
   // example from the JFLA'15 paper (but for a 64-bit architecture)
   /*@ assert 1 + ((z+1) / (y-123456789123456789)) == 1; */
 
+  /*@ assert 1 - x == -x + 1; */ // test GIT issue #37
+
   return 0;
 }
