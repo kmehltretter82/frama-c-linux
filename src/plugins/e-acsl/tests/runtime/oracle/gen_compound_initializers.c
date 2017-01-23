@@ -81,7 +81,7 @@ int main(int argc, char **argv)
                                                       sizeof(char *));
       if (__gen_e_acsl_initialized) {
         int __gen_e_acsl_valid_read;
-        __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)_A[0L],
+        __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)_A[0],
                                                       sizeof(char));
         __gen_e_acsl_and = __gen_e_acsl_valid_read;
       }
@@ -95,11 +95,11 @@ int main(int argc, char **argv)
     {
       int __gen_e_acsl_initialized_2;
       int __gen_e_acsl_and_2;
-      __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& _A[1L]),
+      __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& _A[1]),
                                                         sizeof(char *));
       if (__gen_e_acsl_initialized_2) {
         int __gen_e_acsl_valid_read_2;
-        __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)_A[1L],
+        __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)_A[1],
                                                         sizeof(char));
         __gen_e_acsl_and_2 = __gen_e_acsl_valid_read_2;
       }
@@ -168,7 +168,7 @@ int main(int argc, char **argv)
     }
   }
   /*@ assert _G[0].num ≡ 99; */
-  __e_acsl_assert(_G[0L].num == 99,(char *)"Assertion",(char *)"main",
+  __e_acsl_assert(_G[0].num == 99,(char *)"Assertion",(char *)"main",
                   (char *)"_G[0].num == 99",43);
   __retres = 0;
   __e_acsl_delete_block((void *)(_G));

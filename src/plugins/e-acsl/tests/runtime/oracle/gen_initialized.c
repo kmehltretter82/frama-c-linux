@@ -170,7 +170,7 @@ int main(void)
   {
     {
       int __gen_e_acsl_initialized_12;
-      __gen_e_acsl_initialized_12 = __e_acsl_initialized((void *)(& d[1L]),
+      __gen_e_acsl_initialized_12 = __e_acsl_initialized((void *)(& d[1]),
                                                          sizeof(long));
       __e_acsl_assert(! __gen_e_acsl_initialized_12,(char *)"Assertion",
                       (char *)"main",(char *)"!\\initialized(&d[1])",44);
@@ -200,7 +200,7 @@ int main(void)
   {
     {
       int __gen_e_acsl_initialized_15;
-      __gen_e_acsl_initialized_15 = __e_acsl_initialized((void *)(r + 1L),
+      __gen_e_acsl_initialized_15 = __e_acsl_initialized((void *)(r + 1),
                                                          sizeof(long));
       __e_acsl_assert(! __gen_e_acsl_initialized_15,(char *)"Assertion",
                       (char *)"main",(char *)"!\\initialized(r + 1)",47);
@@ -222,7 +222,7 @@ int main(void)
   {
     {
       int __gen_e_acsl_initialized_17;
-      __gen_e_acsl_initialized_17 = __e_acsl_initialized((void *)(& d[1L]),
+      __gen_e_acsl_initialized_17 = __e_acsl_initialized((void *)(& d[1]),
                                                          sizeof(long));
       __e_acsl_assert(! __gen_e_acsl_initialized_17,(char *)"Assertion",
                       (char *)"main",(char *)"!\\initialized(&d[1])",51);
@@ -252,7 +252,7 @@ int main(void)
   {
     {
       int __gen_e_acsl_initialized_20;
-      __gen_e_acsl_initialized_20 = __e_acsl_initialized((void *)(r + 1L),
+      __gen_e_acsl_initialized_20 = __e_acsl_initialized((void *)(r + 1),
                                                          sizeof(long));
       __e_acsl_assert(! __gen_e_acsl_initialized_20,(char *)"Assertion",
                       (char *)"main",(char *)"!\\initialized(r + 1)",54);
@@ -274,7 +274,7 @@ int main(void)
   {
     {
       int __gen_e_acsl_initialized_22;
-      __gen_e_acsl_initialized_22 = __e_acsl_initialized((void *)(& d[1L]),
+      __gen_e_acsl_initialized_22 = __e_acsl_initialized((void *)(& d[1]),
                                                          sizeof(long));
       __e_acsl_assert(__gen_e_acsl_initialized_22,(char *)"Assertion",
                       (char *)"main",(char *)"\\initialized(&d[1])",58);
@@ -304,7 +304,7 @@ int main(void)
   {
     {
       int __gen_e_acsl_initialized_25;
-      __gen_e_acsl_initialized_25 = __e_acsl_initialized((void *)(r + 1L),
+      __gen_e_acsl_initialized_25 = __e_acsl_initialized((void *)(r + 1),
                                                          sizeof(long));
       __e_acsl_assert(__gen_e_acsl_initialized_25,(char *)"Assertion",
                       (char *)"main",(char *)"\\initialized(r + 1)",61);

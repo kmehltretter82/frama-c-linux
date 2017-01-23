@@ -23,6 +23,8 @@ int main(void) {
   p = t+2;
   t[2] = 5;
   /*@ assert *p == 5; */
+  int k = -1;
+  /*@ assert *(p+k) == 3; */ // bts #2252
 
   return 0;
 }

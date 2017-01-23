@@ -46,9 +46,6 @@ let c_int = C_type IInt
 let ikind ik = C_type ik
 let other = Other
 
-(* the integer_ty corresponding to the largest possible offset. *)
-let offset_ty () = C_type Cil.theMachine.Cil.ptrdiffKind
-
 include Datatype.Make
 (struct
   type t = integer_ty
@@ -210,6 +207,18 @@ let coerce ~arith_operand ~ctx ~op ty =
     if (ctx = Gmp && ty <> Gmp) || arith_operand
     then { ty; op; cast = Some ctx }
     else { ty; op; cast = None }
+
+(* the integer_ty corresponding to [t] whenever use as an offset.
+   In that case, it cannot be a GMP, so it must be coerced to an integral type
+   in that case *)
+let offset_ty t =
+  try
+    let i = Interval.infer t in
+    match ty_of_interv i with
+    | Gmp -> C_type ILongLong (* largest possible type *)
+    | ty -> ty
+  with Interval.Not_an_integer ->
+    Options.fatal "expected an integral type for %a" Printer.pp_term t
 
 (******************************************************************************)
 (** {2 Type system} *)
@@ -432,10 +441,10 @@ let rec type_term ~force ?(arith_operand=false) ?ctx t =
       dup Other
 
     | TBinOp ((PlusPI | IndexPI | MinusPI), t1, t2) ->
-      (* it is a pointer, while [t2] is a size_t. But both [t1] and [t2] must
-         be typed. *)
+      (* both [t1] and [t2] must be typed. *)
       ignore (type_term ~force:false ~ctx:Other t1);
-      ignore (type_term ~force:true ~ctx:(offset_ty ()) t2);
+      let ctx = offset_ty t2 in
+      ignore (type_term ~force:true ~ctx t2);
       dup Other
 
     | Tapp(li, _, args) ->
@@ -485,8 +494,8 @@ and type_term_offset = function
   | TField(_, toff)
   | TModel(_, toff) -> type_term_offset toff
   | TIndex(t, toff) ->
-    (* [t] is an array index which must fit into offset_ty *)
-    ignore (type_term ~force:true ~ctx:(offset_ty ()) t);
+    let ctx = offset_ty t in
+    ignore (type_term ~force:true ~ctx t);
     type_term_offset toff
 
 let rec type_predicate p =

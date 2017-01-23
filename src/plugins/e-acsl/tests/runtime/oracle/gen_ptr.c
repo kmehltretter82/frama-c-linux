@@ -5,6 +5,7 @@ int main(void)
   int x;
   int t[3];
   int *p;
+  int k;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_store_block((void *)(& p),8UL);
   __e_acsl_store_block((void *)(t),12UL);
@@ -39,10 +40,10 @@ int main(void)
     }
   }
   /*@ assert t[0] ≡ 2; */
-  __e_acsl_assert(t[0L] == 2,(char *)"Assertion",(char *)"main",
+  __e_acsl_assert(t[0] == 2,(char *)"Assertion",(char *)"main",
                   (char *)"t[0] == 2",12);
   /*@ assert t[2] ≡ 4; */
-  __e_acsl_assert(t[2L] == 4,(char *)"Assertion",(char *)"main",
+  __e_acsl_assert(t[2] == 4,(char *)"Assertion",(char *)"main",
                   (char *)"t[2] == 4",13);
   /*@ assert t[(2 * sizeof(int)) / sizeof((int)0x0)] ≡ 4; */
   __e_acsl_assert(t[(2 * 4) / 4] == 4,(char *)"Assertion",(char *)"main",
@@ -73,12 +74,12 @@ int main(void)
       {
         {
           int __gen_e_acsl_valid_read_2;
-          __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(& t[2L] - i),
+          __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(& t[2] - i),
                                                           sizeof(int));
           __e_acsl_assert(__gen_e_acsl_valid_read_2,(char *)"RTE",
                           (char *)"main",
                           (char *)"mem_access: \\valid_read(&t[2] - i)",19);
-          __e_acsl_assert(*(& t[2L] - i) == 4L - i,(char *)"Assertion",
+          __e_acsl_assert(*(& t[2] - i) == 4L - i,(char *)"Assertion",
                           (char *)"main",(char *)"*(&t[2] - i) == 4 - i",19);
         }
       }
@@ -107,6 +108,19 @@ int main(void)
                       (char *)"mem_access: \\valid_read(p)",25);
       __e_acsl_assert(*p == 5,(char *)"Assertion",(char *)"main",
                       (char *)"*p == 5",25);
+    }
+  }
+  k = -1;
+  /*@ assert *(p + k) ≡ 3; */
+  {
+    {
+      int __gen_e_acsl_valid_read_4;
+      __gen_e_acsl_valid_read_4 = __e_acsl_valid_read((void *)(p + k),
+                                                      sizeof(int));
+      __e_acsl_assert(__gen_e_acsl_valid_read_4,(char *)"RTE",(char *)"main",
+                      (char *)"mem_access: \\valid_read(p + k)",27);
+      __e_acsl_assert(*(p + k) == 3,(char *)"Assertion",(char *)"main",
+                      (char *)"*(p + k) == 3",27);
     }
   }
   __retres = 0;
