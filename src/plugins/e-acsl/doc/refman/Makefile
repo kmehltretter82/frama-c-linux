@@ -1,4 +1,9 @@
+##########
+# Inputs #
+##########
+
 VERSION_FILE=../../VERSION
+EACSL_VERSION=$(shell cat $(VERSION_FILE))
 
 MAIN=main
 DEPS_MODERN=macros_modern.tex eacslversion.tex biblio.bib \
@@ -12,25 +17,35 @@ DEPS_MODERN=macros_modern.tex eacslversion.tex biblio.bib \
 	ghost_modern.bnf generalinvariants_modern.bnf iterator_modern.bnf \
 	bsearch.c bsearch2.c link.c
 
+##############
+# Main rules #
+##############
+
 .PHONY: all e-acsl default
-
 default: e-acsl.pdf
-
 e-acsl: e-acsl-implementation.pdf e-acsl.pdf main.pdf
-
 all: e-acsl
 
-LANGUAGE_VERSION=1.9
-EACSL_VERSION=$(shell cat $(VERSION_FILE))
+e-acsl-implementation.pdf: $(DEPS_MODERN)
+e-acsl-implementation.tex: $(MAIN).tex Makefile
+	rm -f $@
+	sed -e '/PrintRemarks/s/%--//' $^ > $@
+	chmod a-w $@
+
+e-acsl.pdf: $(DEPS_MODERN)
+e-acsl.tex: e-acsl-implementation.tex Makefile
+	rm -f $@
+	sed -e '/PrintImplementationRq/s/%--//' \
+	    -e '/ColorImplementationRq/s/%--//' \
+	    $^ > $@
+	chmod a-w $@
+
+$(MAIN).pdf: $(DEPS_MODERN)
 
 EACSL_DIR=../..
 DISTRIB_DIR=$(HOME)/frama-c/doc/www/distrib
 install: e-acsl-implementation.pdf e-acsl.pdf
 	cp -f $^ $(EACSL_DIR)/doc/manuals
-	# cp -f e-acsl.pdf \
-	#   $(DISTRIB_DIR)/download/e-acsl/e-acsl-$(LANGUAGE_VERSION).pdf
-	# cp -f e-acsl-implementation.pdf \
-	#   $(DISTRIB_DIR)/download/e-acsl/e-acsl-implementation-$(EACSL_VERSION).pdf
 
 include $(EACSL_DIR)/doc/support/MakeLaTeXModern
 
@@ -38,6 +53,29 @@ eacslversion.tex: Makefile $(VERSION_FILE)
 	rm -f $@
 	echo '\\newcommand{\\eacslversion}{$(EACSL_VERSION)}' > $@
 	chmod a-w $@
+
+.PHONY: clean
+clean:
+	rm -rf *~ *.aux *.log *.nav *.out *.snm *.toc *.lof *.pp *.bnf \
+		*.haux  *.hbbl *.htoc \
+                *.cb *.cm? *.bbl *.blg *.idx *.ind *.ilg \
+		transf trans.ml pp.ml pp
+
+#########
+# Tools #
+#########
+
+pp: pp.ml
+	ocamlopt -o $@ str.cmxa $^
+
+transf: transf.cmo transfmain.cmo
+	ocamlc -o $@ $^
+
+transfmain.cmo: transf.cmo
+
+#################
+# Generic rules #
+#################
 
 %.1: %.mp
 	mpost -interaction=batchmode $<
@@ -78,40 +116,3 @@ eacslversion.tex: Makefile $(VERSION_FILE)
 
 %.cmo: %.ml
 	ocamlc -c $<
-
-pp: pp.ml
-	ocamlopt -o $@ str.cmxa $^
-
-transf: transf.cmo transfmain.cmo
-	ocamlc -o $@ $^
-
-transfmain.cmo: transf.cmo
-
-.PHONY: clean
-
-clean:
-	rm -rf *~ *.aux *.log *.nav *.out *.snm *.toc *.lof *.pp *.bnf \
-		*.haux  *.hbbl *.htoc \
-                *.cb *.cm? *.bbl *.blg *.idx *.ind *.ilg \
-		transf trans.ml pp.ml pp
-
-# version WEB liée à ce qui est implementé
-e-acsl-implementation.pdf: $(DEPS_MODERN)
-
-e-acsl-implementation.tex: $(MAIN).tex Makefile
-	rm -f $@
-	sed -e '/PrintRemarks/s/%--//' $^ > $@
-	chmod a-w $@
-
-# version WEB du langage E-ACSL
-e-acsl.pdf: $(DEPS_MODERN)
-
-e-acsl.tex: e-acsl-implementation.tex Makefile
-	rm -f $@
-	sed -e '/PrintImplementationRq/s/%--//' \
-	    -e '/ColorImplementationRq/s/%--//' \
-	    $^ > $@
-	chmod a-w $@
-
-# version pour le goupe de travail E-ACSL
-$(MAIN).pdf: $(DEPS_MODERN)
