@@ -35,11 +35,11 @@ int main(int argc, char **argv)
     {
       int __gen_e_acsl_initialized;
       int __gen_e_acsl_and;
-      __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& _G[0L].str),
+      __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& _G[0].str),
                                                       sizeof(char *));
       if (__gen_e_acsl_initialized) {
         int __gen_e_acsl_valid_read;
-        __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)_G[0L].str,
+        __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)_G[0].str,
                                                       sizeof(char));
         __gen_e_acsl_and = __gen_e_acsl_valid_read;
       }

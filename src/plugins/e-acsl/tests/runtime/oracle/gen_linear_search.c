@@ -153,13 +153,13 @@ int __gen_e_acsl_search(int elt)
     __gen_e_acsl_i = 0;
     while (1) {
       if (__gen_e_acsl_i < 9) ; else break;
-      __e_acsl_assert(__gen_e_acsl_i + 1L < 10L,(char *)"RTE",
+      __e_acsl_assert((int)(__gen_e_acsl_i + 1L) < 10,(char *)"RTE",
                       (char *)"search",
-                      (char *)"index_bound: (long)(__gen_e_acsl_i + 1) < 10",
+                      (char *)"index_bound: (int)(__gen_e_acsl_i + 1) < 10",
                       7);
-      __e_acsl_assert(0L <= __gen_e_acsl_i + 1L,(char *)"RTE",
+      __e_acsl_assert(0 <= (int)(__gen_e_acsl_i + 1L),(char *)"RTE",
                       (char *)"search",
-                      (char *)"index_bound: 0 <= (long)(__gen_e_acsl_i + 1)",
+                      (char *)"index_bound: 0 <= (int)(__gen_e_acsl_i + 1)",
                       7);
       __e_acsl_assert(__gen_e_acsl_i < 10,(char *)"RTE",(char *)"search",
                       (char *)"index_bound: __gen_e_acsl_i < 10",7);

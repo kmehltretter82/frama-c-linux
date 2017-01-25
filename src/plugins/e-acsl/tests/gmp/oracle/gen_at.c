@@ -113,7 +113,7 @@ int h(int x)
 
 int main(void)
 {
-  int __gen_e_acsl_at_3;
+  long __gen_e_acsl_at_3;
   long __gen_e_acsl_at_2;
   int __gen_e_acsl_at;
   int __retres;
@@ -125,7 +125,7 @@ int main(void)
   __e_acsl_full_init((void *)(& x));
   x = __gen_e_acsl_h(0);
   L:
-    __gen_e_acsl_at_3 = x;
+    __gen_e_acsl_at_3 = (long)x;
     __gen_e_acsl_at_2 = x + 1L;
     __gen_e_acsl_at = x;
     /*@ assert x ≡ 0; */

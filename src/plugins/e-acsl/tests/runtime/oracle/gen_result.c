@@ -64,10 +64,10 @@ int __gen_e_acsl_g(int x)
 int __gen_e_acsl_f(int x)
 {
   int __gen_e_acsl_at_2;
-  int __gen_e_acsl_at;
+  long __gen_e_acsl_at;
   int __retres;
   __gen_e_acsl_at_2 = x;
-  __gen_e_acsl_at = x;
+  __gen_e_acsl_at = (long)x;
   __retres = f(x);
   __e_acsl_assert(__retres == (int)(__gen_e_acsl_at - __gen_e_acsl_at_2),
                   (char *)"Postcondition",(char *)"f",

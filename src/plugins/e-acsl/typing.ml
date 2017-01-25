@@ -46,9 +46,6 @@ let c_int = C_type IInt
 let ikind ik = C_type ik
 let other = Other
 
-(* the integer_ty corresponding to the largest possible offset. *)
-let offset_ty () = C_type Cil.theMachine.Cil.ptrdiffKind
-
 include Datatype.Make
 (struct
   type t = integer_ty
@@ -197,15 +194,31 @@ let ty_of_interv ?ctx i =
 
 (* compute a new {!computed_info} by coercing the given type [ty] to the given
    context [ctx]. [op] is the type for the operator. *)
-let coerce ~ctx ~op ty =
+let coerce ~arith_operand ~ctx ~op ty =
   if compare ty ctx = 1 then begin
     (* type larger than the expected context,
        so we must introduce an explicit cast *)
     { ty; op; cast = Some ctx }
   end else
-    (* only add an explicit cast if the context is [Gmp] and [ty] is not *)
-    if ctx = Gmp && ty <> Gmp then { ty; op; cast = Some Gmp }
+    (* only add an explicit cast if the context is [Gmp] and [ty] is not;
+       or if the term corresponding to [ty] is an operand of an arithmetic
+       operation which must be explicitely coerced in order to force the
+       operation to be of the expected type. *)
+    if (ctx = Gmp && ty <> Gmp) || arith_operand
+    then { ty; op; cast = Some ctx }
     else { ty; op; cast = None }
+
+(* the integer_ty corresponding to [t] whenever use as an offset.
+   In that case, it cannot be a GMP, so it must be coerced to an integral type
+   in that case *)
+let offset_ty t =
+  try
+    let i = Interval.infer t in
+    match ty_of_interv i with
+    | Gmp -> C_type ILongLong (* largest possible type *)
+    | ty -> ty
+  with Interval.Not_an_integer ->
+    Options.fatal "expected an integral type for %a" Printer.pp_term t
 
 (******************************************************************************)
 (** {2 Type system} *)
@@ -221,7 +234,7 @@ let mk_ctx ~force c =
 
 (* type the term [t] in a context [ctx]. Take --e-acsl-gmp-only into account iff
    not [force]. *)
-let rec type_term ~force ?ctx t =
+let rec type_term ~force ?(arith_operand=false) ?ctx t =
   let ctx = Extlib.opt_map (mk_ctx ~force) ctx in
   let dup ty = ty, ty in
   let compute_ctx ?ctx i =
@@ -302,7 +315,7 @@ let rec type_term ~force ?ctx t =
         with Interval.Not_an_integer ->
           dup Other (* real *)
       in
-      ignore (type_term ~force:false ~ctx t');
+      ignore (type_term ~force ~arith_operand:true ~ctx t');
       (match unop with
       | LNot -> c_int, ctx_res (* converted into [t == 0] in case of GMP *)
       | Neg | BNot -> dup ctx_res)
@@ -317,8 +330,18 @@ let rec type_term ~force ?ctx t =
         with Interval.Not_an_integer ->
           dup Other (* real *)
       in
-      ignore (type_term ~force ~ctx t1);
-      ignore (type_term ~force ~ctx t2);
+      (* it is enough to explicitely coerce when required one operand to [ctx]
+         (through [arith_operand]) in order to force the type of the operation.
+         Heuristic: coerce the operand which is not a lval in order to lower
+         the number of explicit casts *)
+      let rec cast_first t1 t2 = match t1.term_node with
+        | TLval _ -> false
+        | TLogic_coerce(_, t) -> cast_first t t2
+        | _ -> true
+      in
+      let cast_first = cast_first t1 t2 in
+      ignore (type_term ~force ~arith_operand:cast_first ~ctx t1);
+      ignore (type_term ~force ~arith_operand:(not cast_first) ~ctx t2);
       dup ctx_res
 
     | TBinOp ((Lt | Gt | Le | Ge | Eq | Ne), t1, t2) ->
@@ -390,7 +413,7 @@ let rec type_term ~force ?ctx t =
       dup ctx
 
     | Tat (t, _)
-    | TLogic_coerce (_, t) -> dup (type_term ~force ?ctx t).ty
+    | TLogic_coerce (_, t) -> dup (type_term ~force ~arith_operand ?ctx t).ty
 
     | TCoerceE (t1, t2) ->
       let ctx =
@@ -418,10 +441,10 @@ let rec type_term ~force ?ctx t =
       dup Other
 
     | TBinOp ((PlusPI | IndexPI | MinusPI), t1, t2) ->
-      (* it is a pointer, while [t2] is a size_t. But both [t1] and [t2] must
-         be typed. *)
+      (* both [t1] and [t2] must be typed. *)
       ignore (type_term ~force:false ~ctx:Other t1);
-      ignore (type_term ~force:true ~ctx:(offset_ty ()) t2);
+      let ctx = offset_ty t2 in
+      ignore (type_term ~force:true ~ctx t2);
       dup Other
 
     | Tapp(li, _, args) ->
@@ -454,7 +477,7 @@ let rec type_term ~force ?ctx t =
       let ty, op = infer t in
       match ctx with
       | None -> { ty; op; cast = None }
-      | Some ctx -> coerce ~ctx ~op ty)
+      | Some ctx -> coerce ~arith_operand ~ctx ~op ty)
     t
 
 and type_term_lval (host, offset) =
@@ -471,8 +494,8 @@ and type_term_offset = function
   | TField(_, toff)
   | TModel(_, toff) -> type_term_offset toff
   | TIndex(t, toff) ->
-    (* [t] is an array index which must fit into offset_ty *)
-    ignore (type_term ~force:true ~ctx:(offset_ty ()) t);
+    let ctx = offset_ty t in
+    ignore (type_term ~force:true ~ctx t);
     type_term_offset toff
 
 let rec type_predicate p =
@@ -574,7 +597,7 @@ let rec type_predicate p =
     | Pfresh _ -> Error.not_yet "\\fresh"
     | Psubtype _ -> Error.not_yet "subtyping relation" (* Jessie specific *)
   in
-  coerce ~ctx:c_int ~op c_int
+  coerce ~arith_operand:false ~ctx:c_int ~op c_int
 
 let type_term ~force ?ctx t =
   Options.feedback ~dkey ~level:4 "typing term '%a' in ctx '%a'."

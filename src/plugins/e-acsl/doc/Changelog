@@ -15,6 +15,12 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
+-* E-ACSL       [2017/01/23] Fix bug #2252 about pointer arithmetic with
+	        negative offsets.
+-* E-ACSL       [2017/01/23] Fix bug with typing of unary and binary
+	        operations in a few cases: the generated code might have
+	        overflowed.
+
 #########################
 Plugin E-ACSL 0.8 Silicon
 #########################

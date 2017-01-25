@@ -87,7 +87,7 @@ int main(void)
                       37);
       if (x == 3) __gen_e_acsl_and_2 = y == 2; else __gen_e_acsl_and_2 = 0;
       if (! __gen_e_acsl_and_2) __gen_e_acsl_implies_3 = 1;
-      else __gen_e_acsl_implies_3 = x + y == 5L;
+      else __gen_e_acsl_implies_3 = x + (long)y == 5L;
       __e_acsl_assert(__gen_e_acsl_implies_3,(char *)"Precondition",
                       (char *)"main",
                       (char *)"x == 3 && y == 2 ==> x + y == 5",38);
