@@ -25,7 +25,7 @@ let check () =
   let t = Error.nb_untypable () in
   let n = Error.nb_not_yet () in
   let print msg n =
-    Options.result "@[%d annotation%s %s ignored,@ being %s.@]" 
+    Options.result "@[%d annotation%s %s ignored,@ being %s.@]"
       n
       (if n > 1 then "s" else "")
       (if n > 1 then "were" else "was")
@@ -75,26 +75,26 @@ let unmemoized_extend_ast () =
     Options.feedback ~level:2 "AST already computed: \
 E-ACSL is going to work on a copy.";
     let name = Project.get_name (Project.current ()) in
-    let tmpfile = 
+    let tmpfile =
       Extlib.temp_file_cleanup_at_exit ("e_acsl_" ^ name) ".i" in
     let cout = open_out tmpfile in
     let fmt = Format.formatter_of_out_channel cout in
     File.pretty_ast ~fmt ();
-    let selection = 
+    let selection =
       State_selection.diff
-	State_selection.full
-	(State_selection.with_dependencies Ast.self)
+        State_selection.full
+        (State_selection.with_dependencies Ast.self)
     in
     let prj =
       Project.create_by_copy
         ~last:false
-	~selection
-	(Format.asprintf "%s for E-ACSL" name)
+        ~selection
+        (Format.asprintf "%s for E-ACSL" name)
     in
     Project.on prj
       (fun () ->
-	Kernel.Files.set [ tmpfile ];
-	extend ())
+        Kernel.Files.set [ tmpfile ];
+        extend ())
       ();
     Some prj
   end else begin
@@ -103,7 +103,7 @@ E-ACSL is going to work on a copy.";
   end
 
 let extend_ast () = match !extended_ast_project with
-  | To_be_extended -> 
+  | To_be_extended ->
     let prj = unmemoized_extend_ast () in
     extended_ast_project := Already_extended prj;
     (match prj with
@@ -147,6 +147,8 @@ let generate_code =
       apply_on_e_acsl_ast
         (fun () ->
           Options.feedback "beginning translation.";
+          let prepared_prj = Prepare_ast.prepare () in
+          Project.set_current prepared_prj;
           let dup_prj = Dup_functions.dup () in
           let res =
             Project.on
@@ -157,9 +159,9 @@ let generate_code =
                 let visit prj = Visit.do_visit ~prj true in
                 let prj = File.create_project_from_visitor name visit in
                 Loops.apply_after_transformation prj;
-(* remove the RTE's results computed from E-ACSL: their are
-   partial and associated with the wrong kernel function (the
-   one of the old project). *)
+                (* remove the RTE's results computed from E-ACSL: their are
+                   partial and associated with the wrong kernel function (the
+                   one of the old project). *)
                 Project.clear
                   ~selection:(State_selection.with_dependencies !Db.RteGen.self)
                   ~project:prj
@@ -171,7 +173,10 @@ let generate_code =
                 prj)
               ()
           in
-          if Options.Debug.get () = 0 then Project.remove ~project:dup_prj ();
+          if Options.Debug.get () = 0 then begin
+            Project.remove ~project:prepared_prj ();
+            Project.remove ~project:dup_prj ()
+          end;
           Options.feedback "translation done in project \"%s\"."
             (Options.Project_name.get ());
           res)
@@ -194,7 +199,7 @@ let predicate_to_exp =
        Kernel_function.ty Cil_datatype.Predicate.ty Cil_datatype.Exp.ty)
     Translate.predicate_to_exp
 
-let add_e_acsl_library _files = 
+let add_e_acsl_library _files =
   if Options.must_visit () || Options.Prepare.get () then ignore (extend_ast ())
 
 (* extending the AST as soon as possible reduce the amount of time the AST is
