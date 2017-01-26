@@ -1,14 +1,14 @@
 [e-acsl] beginning translation.
-FRAMAC_SHARE/libc/stdlib.h:276:[kernel] warning: No code nor implicit assigns clause for function calloc, generating default assigns from the prototype
+FRAMAC_SHARE/libc/stdlib.h:277:[kernel] warning: No code nor implicit assigns clause for function calloc, generating default assigns from the prototype
 [e-acsl] translation done in project "e-acsl".
 FRAMAC_SHARE/e-acsl/e_acsl.h:43:[value] warning: function __e_acsl_assert: precondition got status unknown.
 tests/runtime/initialized.c:65:[value] warning: assertion got status unknown.
 tests/runtime/initialized.c:69:[value] warning: assertion got status unknown.
-FRAMAC_SHARE/libc/stdlib.h:321:[value] warning: function realloc: precondition got status unknown.
-FRAMAC_SHARE/libc/stdlib.h:336:[value] warning: function realloc, behavior dealloc: precondition got status unknown.
+FRAMAC_SHARE/libc/stdlib.h:322:[value] warning: function realloc: precondition got status unknown.
+FRAMAC_SHARE/libc/stdlib.h:337:[value] warning: function realloc, behavior dealloc: precondition got status unknown.
 tests/runtime/initialized.c:74:[value] warning: assertion got status unknown.
 tests/runtime/initialized.c:76:[value] warning: assertion got status unknown.
-FRAMAC_SHARE/libc/stdlib.h:308:[value] warning: function free, behavior deallocation: precondition 'freeable' got status unknown.
+FRAMAC_SHARE/libc/stdlib.h:309:[value] warning: function free, behavior deallocation: precondition 'freeable' got status unknown.
 tests/runtime/initialized.c:84:[value] warning: assertion got status unknown.
 tests/runtime/initialized.c:85:[value] warning: assertion got status unknown.
 tests/runtime/initialized.c:93:[value] warning: assertion got status unknown.
