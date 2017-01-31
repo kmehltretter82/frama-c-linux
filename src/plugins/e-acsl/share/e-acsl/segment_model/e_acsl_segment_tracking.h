@@ -27,6 +27,28 @@
 
 /* Segment settings and shadow values interpretation {{{ */
 
+/* This file implements segment-based and offset-based shadow memory models
+ * (shadow encodings) (see draft of the PLDI'17 paper).
+ *
+ * IMPORTANT: While the implementation of the offset-based encoding mostly
+ * follows the description given by the paper, there are differences in the
+ * segment-based encoding for tracking heap memory. Some of these differences
+ * are as follows:
+ *  1) Size of a heap segment is increased to 32 bytes
+ *  2) Heap meta-segments are no longer used, segment-based representation of
+ *    a heap block considers only block segments, such that:
+ *    - Lowest `intptr_t` bytes of each shadow segment tracking an application
+ *      block store the base address of that block;
+ *    - `intptr_t` bytes of the first segment following the initial `intptr_t`
+ *      bytes store the length of the block. Note, the length is only stored
+ *      by the first segment.
+ *  3) Per-byte initialization of application bytes is tracked via a disjoint
+ *    shadow region, which maps one bit of shadow memory to a byte of
+ *    application memory. Comments within this file often refer to a shadow
+ *    region tracking application blocks by segments as to `block shadow`,
+ *    and to the region tracking initialization as to `init shadow`.
+*/
+
 /*! @brief Byte size of a heap segment.
  * This size is potentially used as an argument to `memalign`.
  * It SHOULD be a multiple of 2 and a multiple of a pointer size.
@@ -35,7 +57,7 @@
  * size greater than 64 bytes. This is because presently some initialization
  * functionality relies on the fact that initialization per segment can be set
  * and/or evaluated using an 8-byte bitmask. */
-#define HEAP_SEGMENT 16
+#define HEAP_SEGMENT 32
 
 /*! \brief Number of bytes required to represent initialization of a segment. */
 #define INIT_BYTES (HEAP_SEGMENT/8)
@@ -91,14 +113,11 @@
  * when segment size is added. */
 const size_t max_allocated = SIZE_MAX - HEAP_SEGMENT;
 
-/* \brief Return actual allocation size which takes into account meta-block.
- * In the present implementation it is the requested size of a heap block +
- * the size if a segment */
-#define ALLOC_SIZE(_s) (_s > 0 && _s < max_allocated ? _s + HEAP_SEGMENT : 0)
-
-/*! \brief The number of bytes used to represent a heap block in its shadow.
- * In the current implementation it aligned size + meta-segment size */
-#define HEAP_SHADOW_BLOCK_SIZE(_s) ((BLOCK_SEGMENTS(_s) + 1)*HEAP_SEGMENT)
+/* \brief Return actual allocation size which takes into account aligned
+ * allocation. In the present implementation it is the requested size of
+ * a heap block aligned at a segment boundary */
+#define ALLOC_SIZE(_s) \
+  (_s > 0 && _s < max_allocated ? ALIGNED_SIZE(_s) : 0)
 
 /*! \brief For short blocks numbers 1 to 36 represent lengths and offsets,
  * such that:
@@ -206,7 +225,7 @@ static void validate_memory_layout() {
   /* Check that the struct holding memory layout is marked as initialized. */
   DVASSERT(mem_layout.initialized != 0, "Un-initialized shadow layout", NULL);
   /* Make sure the order of program segments is as expected, i.e.,
-   * top to bittom: stack -> tls -> heap -> global*/
+   * top to bottom: stack -> tls -> heap -> global*/
 
   #define NO_MEM_SEGMENTS 11
   uintptr_t segments[NO_MEM_SEGMENTS][2] = {
@@ -293,7 +312,7 @@ static void validate_memory_layout() {
     DVASSERT(static_allocated_one((uintptr_t)_addr), \
        "Operation on unallocated block [%a]\n   ", _addr)
 
-/* Assert that a memory block [_addr, _adddr + _size] is nullified */
+/* Assert that a memory block [_addr, _addr + _size] is nullified */
 # define DVALIDATE_NULLIFIED(_addr, _size) \
   DVASSERT(zeroed_out((void *)_addr, _size), \
     "Block [%a, %a+%lu] not nullified", _addr, _addr, _size)
@@ -696,51 +715,34 @@ static size_t heap_allocation_size = 0;
  * correspond to `unusable space`.
  * \b WARNING: Current implementation assumes that the size of a heap segment
  * does not exceed 64 bytes. */
-static void set_heap_segment(void *ptr, size_t size, size_t init) {
+static void set_heap_segment(void *ptr, size_t size, size_t alloc_size, size_t init) {
   /* Ensure the shadowed block in on the tracked heap portion */
   DVALIDATE_IS_ON_HEAP(((uintptr_t)ptr) - HEAP_SEGMENT, size);
   DVALIDATE_ALIGNMENT(ptr); /* Make sure alignment is right */
-  heap_allocation_size += size; /* Adjuct tracked allocation size */
+  heap_allocation_size += size; /* Adjust tracked allocation size */
 
   /* Get aligned size of the block, i.e., an actual size of the
    * allocated block */
-  size_t aligned_size = ALIGNED_SIZE(size);
-  unsigned char *shadowed = (unsigned char*)HEAP_SHADOW(ptr);
-  uintptr_t *shadow_meta = (uintptr_t*)(shadowed - HEAP_SEGMENT);
+  unsigned char *shadow = (unsigned char*)HEAP_SHADOW(ptr);
 
   /* Make sure shadow is nullified before setting it */
-  DVALIDATE_NULLIFIED(shadow_meta, aligned_size + HEAP_SEGMENT);
-
-  /* Write the actual length to the meta-segment. First 8 (or 4 in a 32-bit
-   * system) bytes of the segment are nullified to indicate that this segment
-   * does not correspond to an allocated memory block. The following block (at
-   * index 1) captures the size of the segment in bytes. */
-  shadow_meta[1] = size;
+  DVALIDATE_NULLIFIED(shadow, alloc_size);
 
   /* The overall number of block segments in a tracked memory block  */
-  size_t block_segments = aligned_size/HEAP_SEGMENT;
-  uintptr_t *block_segment = NULL;
-  int i;
+  size_t segments = alloc_size/HEAP_SEGMENT;
+  uintptr_t *segment = (uintptr_t*)(shadow);
+  segment[1] = size;
 
+  int i;
   /* Write the offsets per segment */
-  for (i = 0; i < block_segments; i++) {
-    block_segment = (uintptr_t*)(shadowed + i*HEAP_SEGMENT);
-    /* Write down the segment offset to the first 8 (or 4) bytes of the segment.
-     * Here it is necessary to increment the offset by one. If there is no
-     * increment, then the offset of the first segment is 0, which is the same
-     * as for a segment that does not belong to a program's allocation. */
-    *block_segment = i*HEAP_SEGMENT + 1;
+  for (i = 0; i < segments; i++) {
+    segment = (uintptr_t*)(shadow + i*HEAP_SEGMENT);
+    *segment = (uintptr_t)ptr;
   }
 
   /* If init is a non-zero value then mark all allocated bytes as initialized */
   if (init) {
-    for (i = 0; i < block_segments; i++) {
-      block_segment = (uintptr_t*)(shadowed + i*HEAP_SEGMENT);
-      block_segment[1] |= heap_init_mask;
-    }
-    /* If the last segment is partially allocated, nullify the unallocated
-     * bits back. */
-    block_segment[1] &= ~(ONE << size%HEAP_SEGMENT);
+    memset(HEAP_INIT_SHADOW(ptr), (unsigned int)ONE, alloc_size/8);
   }
 }
 
@@ -758,13 +760,13 @@ static void set_heap_segment(void *ptr, size_t size, size_t init) {
  *    returned pointer shall not be used to access an object." */
 static void* shadow_malloc(size_t size) {
   size_t alloc_size = ALLOC_SIZE(size);
-  /* Return NULL if the size is too large to be aligned */
-  char* res = alloc_size ? (char*)native_malloc(alloc_size) : NULL;
 
-  if (res) {
-    res += HEAP_SEGMENT;
-    set_heap_segment(res, size, 0);
-  }
+  /* Return NULL if the size is too large to be aligned */
+  char* res = alloc_size ?
+    (char*)native_aligned_alloc(HEAP_SEGMENT, alloc_size) : NULL;
+
+  if (res)
+    set_heap_segment(res, size, alloc_size, 0);
 
   return res;
 }
@@ -774,17 +776,18 @@ static void* shadow_calloc(size_t nmemb, size_t size) {
   /* Since both `nmemb` and `size` are both of size `size_t` the multiplication
    * of the arguments (which gives the actual allocation size) might lead to an
    * integer overflow. The below code checks for an overflow and sets the
-   * `alloc_size` (agrument a memory allocation function) to zero. */
+   * `alloc_size` (argument a memory allocation function) to zero. */
   size = (size && nmemb > SIZE_MAX/size) ? 0 : nmemb*size;
+
+  size_t alloc_size = ALLOC_SIZE(size);
 
   /* Since aligned size is required by the model do the allocation through
    * `malloc` and nullify the memory space by hand */
-  char* res = size ? (char*)native_malloc(ALLOC_SIZE(size)) : NULL;
+  char* res = size ? (char*)native_malloc(alloc_size) : NULL;
 
   if (res) {
-    res += HEAP_SEGMENT;
     memset(res, 0, size);
-    set_heap_segment(res, size, 1);
+    set_heap_segment(res, size, alloc_size, 1);
   }
 
   return res;
@@ -792,16 +795,35 @@ static void* shadow_calloc(size_t nmemb, size_t size) {
 /* }}} */
 
 /* Heap deallocation (free) {{{ */
-static void shadow_free(void *res) {
-  char *ptr = (char *)res;
+
+/*! \brief Remove a memory block with base address given by `ptr` from tracking.
+ * This function effectively nullifies block shadow tracking an application
+ * block and optionally nullifies an init shadow associated with the block. */
+static void unset_heap_segment(void *ptr, int init) {
+  /* Base address of block shadow segment */
+  uintptr_t *shadow = (uintptr_t*)HEAP_SHADOW(ptr);
+  /* Base address of shadow block */
+  uintptr_t *block_shadow = (uintptr_t*)HEAP_SHADOW(*shadow);
+  /* Physical allocation size */
+  size_t alloc_size = ALLOC_SIZE(block_shadow[1]);
+  /* Actual block length */
+  size_t length = block_shadow[1];
+  /* Nullify shadow block */
+  memset(block_shadow, ZERO, alloc_size);
+  /* Adjust tracked allocation size */
+  heap_allocation_size -= length;
+
+  /* Nullify init shadow */
+  if (init) {
+    memset(HEAP_INIT_SHADOW(ptr), 0, alloc_size/8);
+  }
+}
+
+/*! \brief Replacement for `free` with memory tracking  */
+static void shadow_free(void *ptr) {
   if (ptr != NULL) { /* NULL is a valid behaviour */
     if (freeable(ptr)) {
-      size_t size = block_length(ptr);
-      void *meta_shadow = (void*)(HEAP_SHADOW(ptr) - HEAP_SEGMENT);
-      memset(meta_shadow, 0, HEAP_SHADOW_BLOCK_SIZE(size));
-      native_free(ptr - HEAP_SEGMENT);
-      /* Adjuct tracked allocation size carried via `__e_acsl_heap_allocation_size` */
-      heap_allocation_size -= size;
+      unset_heap_segment(ptr, 1);
     } else {
       vabort("Not a start of block (%a) in free\n", ptr);
     }
@@ -810,8 +832,7 @@ static void shadow_free(void *res) {
 /* }}} */
 
 /* Heap reallocation (realloc) {{{ */
-static void* shadow_realloc(void *p, size_t size) {
-  char *ptr = (char*)p;
+static void* shadow_realloc(void *ptr, size_t size) {
   char *res = NULL; /* Resulting pointer */
   /* If the pointer is NULL then realloc is equivalent to malloc(size) */
   if (ptr == NULL)
@@ -823,74 +844,43 @@ static void* shadow_realloc(void *p, size_t size) {
   } else {
     if (freeable(ptr)) { /* ... and valid for free  */
       size_t alloc_size = ALLOC_SIZE(size);
-      res = native_realloc(ptr - HEAP_SEGMENT, alloc_size);
+      res = native_realloc(ptr, alloc_size);
       DVALIDATE_ALIGNMENT(res);
 
       /* realloc succeeds, otherwise nothing needs to be done */
       if (res != NULL) {
-        res += HEAP_SEGMENT;
-        /* Tracked size of the old allocation */
-        size_t old_size = block_length((uintptr_t)ptr);
-        /* Number of block segments in the old allocation */
-        size_t old_segments = BLOCK_SEGMENTS(old_size);
-        /* Number of block segments in the new allocation */
-        size_t new_segments = BLOCK_SEGMENTS(size);
-        /* Adjuct tracked allocation size */
-        heap_allocation_size += -old_size + size;
+        size_t alloc_size = ALLOC_SIZE(size);
+        size_t old_size = block_length(ptr);
+        size_t old_alloc_size = ALLOC_SIZE(old_size);
 
-        /* Address of the meta-block in old allocation */
-        uintptr_t *meta_shadow = (uintptr_t*)(HEAP_SHADOW(ptr) - HEAP_SEGMENT);
+        /* Nullify old representation */
+        unset_heap_segment(ptr, 0);
 
-        /* The case when realloc displaces the base address of a pointer */
-        if (ptr != res) {
-          /* Address of the new shadow meta-block */
-          uintptr_t *new_meta_shadow =
-            (uintptr_t*)(HEAP_SHADOW(res) - HEAP_SEGMENT);
-          size_t inflen = HEAP_SEGMENT*(old_segments + 1);
-          /* Copy information over to the new shadow ... */
-          memcpy(new_meta_shadow, meta_shadow, inflen);
-          /* ... and nuke the old shadow */
-          memset(meta_shadow, 0, inflen);
-          meta_shadow = new_meta_shadow;
+        /* Set up new block shadow */
+        set_heap_segment(res, size, alloc_size, 0);
+
+        /* Move init shadow */
+        unsigned char* old_init_shadow  = (unsigned char*)HEAP_INIT_SHADOW(ptr);
+        unsigned char* new_init_shadow  = (unsigned char*)HEAP_INIT_SHADOW(res);
+
+        /* If realloc truncates allocation in the old init shadow it is first
+         * needed to clear the old init shadow from the boundary of the old
+         * shadow block to the size of the new allocation */
+        if (old_size > size) {
+          clearbits_right(
+              old_alloc_size - size,
+              old_init_shadow + old_alloc_size/8);
         }
 
-        /* Set new size */
-        meta_shadow[1] = size;
-
-        /* Realloc truncates allocation, need to truncate the shadow as well:
-         *  1. Get the last segment in the new allocation and clear all init
-         *    bits from the old allocation that do not belong in the new.
-         *  2. Nullify segments tracking old allocation but which do not
-         *    belong to the new one. These will be past the last segment
-         *    (as above). */
-        if (old_segments > new_segments) {
-          /* Last segment in the new allocation and the number of bits to
-           * clear out */
-          size_t last_index = new_segments - 1;
-          size_t clear_bits = HEAP_SEGMENT - (size - last_index*HEAP_SEGMENT);
-
-          /* Reset initialization in shadow past the new allocation (1). */
-          void *seg_last = (void*)
-            (HEAP_SHADOW(res) +
-            last_index*HEAP_SEGMENT + INIT_BYTES + PTR_SZ);
-          clearbits_right(seg_last, clear_bits);
-
-          /* Clear out remaining shadow data from old allocation that is
-           * not used in the new allocation (2) */
-          int diff = old_segments - new_segments;
-          char *seg_next = (char*)(HEAP_SHADOW(res)
-            + (last_index+1)*HEAP_SEGMENT);
-          memset(seg_next, 0, diff*HEAP_SEGMENT);
-       /* Realloc increases allocation, only segment indices need to be added */
-        } else if (old_segments < new_segments) {
-          /* Just add indices to shadow. Realloc does not initialize
-           * allocated data past the old allocation. */
-          int i;
-          for (i = old_segments; i < new_segments; i++) {
-            uintptr_t *seg_next = (uintptr_t*)(HEAP_SHADOW(res)
-              + i*HEAP_SEGMENT);
-            seg_next[0] = HEAP_SEGMENT*i + 1;
-          }
+        /* Now init shadow can be moved (if needed), keep in mind that
+         * segment base addresses are aligned at a boundary of something
+         * divisible by 8, so instead of moving actual bits here the
+         * segments are moved to avoid dealing with bit-level operations
+         * on incomplete bytes. */
+        if (res != ptr) {
+          size_t copy_size = (old_size > size) ? alloc_size : old_alloc_size;
+          memcpy(new_init_shadow, old_init_shadow, copy_size);
+          memset(old_init_shadow, 0, copy_size);
         }
       }
     } else {
@@ -912,10 +902,9 @@ static void *shadow_aligned_alloc(size_t alignment, size_t size) {
     return NULL;
 
   char *res = native_aligned_alloc(alignment, size);
-  if (res) {
-    res += HEAP_SEGMENT;
-    set_heap_segment(res, size, 0);
-  }
+  if (res)
+    set_heap_segment(res, size, ALLOC_SIZE(size), 0);
+
   return (void*)res;
 }
 /* }}} */
@@ -935,8 +924,7 @@ static int shadow_posix_memalign(void **memptr, size_t alignment, size_t size) {
 
   int res = native_posix_memalign(memptr, alignment, size);
   if (!res) {
-    *memptr += HEAP_SEGMENT;
-    set_heap_segment(*memptr, size, 0);
+    set_heap_segment(*memptr, size, ALLOC_SIZE(size), 0);
   }
   return res;
 }
@@ -947,27 +935,20 @@ static int shadow_posix_memalign(void **memptr, size_t alignment, size_t size) {
  * starting at address `addr` belongs to an allocated (tracked) heap memory
  * block and a 0 otherwise. Note, this function is only safe if applied to a
  * heap address. */
-static int heap_allocated(uintptr_t addr, size_t size) {
-  /* Offset within the segment */
-  size_t block_offset = addr%HEAP_SEGMENT;
-  /* Address of the shadow segment the address belongs to */
-  uintptr_t *aligned_shadow =
-    (uintptr_t*)HEAP_SHADOW(addr - block_offset);
+static int heap_allocated(uintptr_t addr, size_t size) { /* + */
+  /* Base address of the shadow segment the address belongs to */
+  uintptr_t *shadow = (uintptr_t*)HEAP_SHADOW(addr - addr%HEAP_SEGMENT);
 
   /* Non-zero if the segment belongs to heap allocation */
-  if (aligned_shadow[0]) {
-    /* Offset stored by the segment (real offset from base incremented by 1) */
-    size_t segment_offset = aligned_shadow[0];
-    /* Base address */
-    uintptr_t base_addr = addr - block_offset - segment_offset + 1;
-    /* Pointer to the meta-segment */
-    uintptr_t *meta_segment =
-      (uintptr_t*)HEAP_SHADOW(base_addr - HEAP_SEGMENT);
-    /* Size of the block stored by meta-segment */
-    size_t length = meta_segment[1];
-    /* Offset of a given address within its block */
-    size_t offset = segment_offset - 1 + block_offset;
-    return offset + size <= length;
+  if (shadow[0]) {
+    uintptr_t *first_segment = (uintptr_t*)HEAP_SHADOW(shadow[0]);
+    /* shadow[0] - base address of the tracked block
+     * fist_segment[1] - length (i.e., location in the first segment
+     *  after base address)
+     * offset is the difference between the address and base address (shadow[0])
+     * Then an address belongs to heap allocation if
+     *  offset + size <= length */
+    return (addr - shadow[0]) + size <= first_segment[1];
   }
   return 0;
 }
@@ -978,102 +959,76 @@ static int heap_allocated(uintptr_t addr, size_t size) {
  * As some of the other functions, \b \\freeable can be expressed using
  * ::IS_ON_HEAP, ::heap_allocated and ::base_addr. Here direct
  * implementation is preferred for performance reasons. */
-static int freeable(void *ptr) {
+static int freeable(void *ptr) { /* + */
   uintptr_t addr = (uintptr_t)ptr;
   if (!IS_ON_HEAP(addr))
     return 0;
-  /* Offset within the segment */
-  size_t block_offset = addr%HEAP_SEGMENT;
+
   /* Address of the shadow segment the address belongs to */
-  uintptr_t *aligned_shadow = (uintptr_t*)HEAP_SHADOW(addr - block_offset);
+  uintptr_t *shadow = (uintptr_t*)HEAP_SHADOW(addr - addr%HEAP_SEGMENT);
   /* Non-zero if the segment belongs to heap allocation */
-  if (aligned_shadow[0])
-    return addr == addr - block_offset - aligned_shadow[0] + 1;
-  return 0;
-}
-
-/*! \brief Implementation of the \b \\initialized predicate for heap-allocated
- * memory. NB: If `addr` does not belong to a valid heap region this function
- * returns 0. */
-static int heap_initialized(uintptr_t addr, long len) {
-  /* Unallocated heap address */
-  if (!heap_allocated(addr, len))
-    return 0;
-
-  /* Do validate a block in debug mode otherwise */
-  DVALIDATE_HEAP_ACCESS(addr, len);
-  int result = 1;
-
-  /* Offset within the segment. Also the number of bits
-   * that needs to be skipped when evaluating init */
-  int skipbits = addr%HEAP_SEGMENT;
-
-  /* Base address of a shadow segment ptr belongs to */
-  uintptr_t shadow_init = (uintptr_t)(HEAP_SHADOW(addr) + PTR_SZ - skipbits);
-
-  int rem = HEAP_SEGMENT - skipbits;
-  /* The number of bits that need to be checked in the `first' segment */
-  int setbits = (len >= rem) ? rem : len;
-
-  len -= setbits;
-
-  /* Bit-mask for setting values. Tested bits are set to ones, the rest
-   * are zeroes. */
-  uint64_t mask = (ONE >> (ULONG_BITS - setbits)) << skipbits;
-
-  uint64_t *init = (uint64_t*)shadow_init;
-  result = result && ((mask & *init) == mask);
-  shadow_init += HEAP_SEGMENT;
-
-  while (len > 0) {
-    /* Recompute the number of bits to be set */
-    setbits = (len > HEAP_SEGMENT) ? HEAP_SEGMENT : len;
-    /* Reset the mask */
-    mask = ONE >> (ULONG_BITS - setbits);
-    /* Current position of shadow initialization */
-    init = (uint64_t*)shadow_init;
-
-    result = result && ((mask & *init) == mask);
-    len -= setbits;
-    shadow_init += HEAP_SEGMENT;
+  if (*shadow) {
+    /* Block is freeable if `addr` is the base address of its block  */
+    return (uintptr_t)*shadow == addr;
   }
-  return result;
+  return 0;
 }
 
 /*! \brief Querying information about a specific heap memory address.
  * This function is similar to ::static_info except it returns data
  * associated with heap-allocated memory.
  * See in-line documentation for ::static_info for further details. */
-static uintptr_t heap_info(uintptr_t addr, char type) {
+static uintptr_t heap_info(uintptr_t addr, char type) { /* + */
   DVALIDATE_HEAP_ACCESS(addr, 1);
-  /* Offset within the segment */
-  size_t block_offset = addr%HEAP_SEGMENT;
-  /* Address of the shadow segment the address belongs to */
-  uintptr_t *aligned_shadow =
-    (uintptr_t*)HEAP_SHADOW(addr - block_offset);
-  /* Offset stored by the segment (real offset from base incremented by 1) */
-  size_t segment_offset = aligned_shadow[0];
-  /* Base address */
-  uintptr_t base_addr = addr - block_offset - segment_offset + 1;
+  /* Base address of the shadow segment the address belongs to.
+   * First `sizeof(void*)` bytes of each segment store application-level
+   * base address of the tracked block */
+  uintptr_t *shadow = (uintptr_t*)HEAP_SHADOW(addr - addr%HEAP_SEGMENT);
 
   switch(type) {
     case 'B': /* Base address */
-      return base_addr;
+      return *shadow;
     case 'L': { /* Block length */
-      /* Pointer to meta-segment */
-      uintptr_t *meta_segment =
-        (uintptr_t*)HEAP_SHADOW(base_addr - HEAP_SEGMENT);
-      /* Size of the block stored by meta-segment */
-      return meta_segment[1];
+      /* Pointer to the first-segment in the shadow block */
+      uintptr_t *segment = (uintptr_t*)HEAP_SHADOW(*shadow);
+      /* Length of the stored block is stored in `sizeof(void*)` bytes
+       * following the base address */
+      return segment[1];
     }
     case 'O':
-      /* Offset of a given address within its block */
-      return segment_offset - 1 + block_offset;
+      /* Offset of a given address within its block. Difference between
+       * input address and the base address of the block. */
+      return addr - *shadow;
     default:
       DASSERT(0 && "Unknown heap query type");
   }
   return 0;
 }
+/*! \brief Implementation of the \b \\initialized predicate for heap-allocated
+ * memory. NB: If `addr` does not belong to a valid heap region this function
+ * returns 0. */
+static int heap_initialized(uintptr_t addr, long len) {
+  /* Base address of a shadow segment addr belongs to */
+  unsigned char *shadow = (unsigned char*)(HEAP_INIT_SHADOW(addr));
+
+  /* See comments in the `initialize_heap_region` function for more details */
+  unsigned skip = (addr - HEAP_START)%8;
+  unsigned set;
+  if (skip) {
+    set = 8 - skip;
+    set = (len > set) ? set : len;
+    len -= set;
+    unsigned char mask = 0;
+    setbits64_skip(set,mask,skip);
+
+    if (*shadow != mask)
+      return 0;
+  }
+  if (len > 0)
+    return checkbits(len,shadow);
+  return 1;
+}
+
 /* }}} */
 
 /* Heap initialization {{{ */
@@ -1085,34 +1040,31 @@ static void initialize_heap_region(uintptr_t addr, long len) {
     "starting at %a with block length %lu at base address %a\n",
     len, addr, block_length(addr), base_addr(addr));
 
-  /* Offset within the segment. Also the number of bits
-   * that needs to be skipped when evaluating init */
-  int skipbits = (addr)%HEAP_SEGMENT;
+  /* Address within init shadow tracking initialization  */
+  unsigned char *shadow = (unsigned char*)(HEAP_INIT_SHADOW(addr));
 
-  /* Base address of a shadow segment addr belongs to */
-  uintptr_t shadow_init = (uintptr_t)(HEAP_SHADOW(addr) + PTR_SZ - skipbits);
+  /* First check whether the address in the init shadow is divisible by 8
+   * (i.e., located on a byte boundary) */
+  /* Leading bits in `*shadow` byte which do not need to be set
+   * (i.e., skipped) */
+  short skip = (addr - HEAP_START)%8;
+  if (skip) {
+    /* The remaining bits in the shadow byte */
+    short set = 8 - skip;
+    /* The length of initialized region can be short (shorter then the
+     * above remainder). Adjust the number of bits to set accordingly. */
+    set = (len > set) ? set : len;
+    len -= set;
+    setbits64_skip(set, *shadow, skip);
+    /* Move to the next location if there are more bits to set */
+    shadow++;
+  }
 
-  int rem = HEAP_SEGMENT - skipbits;
-  /* The number of bits that need to be checked in the `first' segment */
-  int setbits = (len >= rem) ? rem : len;
-
-  len -= setbits;
-
-  /* Bit-mask for setting values. Bits that are tested are set to ones, the
-   * rest are zeroes */
-  uint64_t mask = (ONE >> (ULONG_BITS - setbits)) << skipbits;
-
-  *(uint64_t*)shadow_init = *(uint64_t*)shadow_init | mask;
-  shadow_init += HEAP_SEGMENT;
-
-  while (len > 0) {
-    /* Recompute the number of bits to be set */
-    setbits = (len > HEAP_SEGMENT) ? HEAP_SEGMENT : len;
-    /* Reset the mask */
-    mask = ONE >> (ULONG_BITS - setbits);
-    *(uint64_t*)shadow_init = *(uint64_t*)shadow_init | mask;
-    len -= setbits;
-    shadow_init += HEAP_SEGMENT;
+  if (len > 0) {
+    /* Set the remaining bits. Note `shadow` is now aligned at a byte
+     * boundary, thus one can set `len` bits starting with address given by
+     * `shadow` */
+    setbits(len, shadow);
   }
 }
 /* }}} */
@@ -1175,18 +1127,40 @@ static void print_static_shadows(uintptr_t addr, size_t size) {
 /*! \brief Print human-readable representation of a heap shadow region for a
  * memory block of length `size` starting at address `addr`.  */
 static void print_heap_shadows(uintptr_t addr, size_t size) {
-  unsigned char *shadowed = (unsigned char*)HEAP_SHADOW(addr);
-  uintptr_t *shadow_meta = (uintptr_t*)(shadowed - HEAP_SEGMENT);
+  unsigned char *block_shadow = (unsigned char*)HEAP_SHADOW(addr);
+  unsigned char *init_shadow =  (unsigned char*)HEAP_INIT_SHADOW(addr);
 
-  size_t block_segments = (ALIGNED_SIZE(size))/HEAP_SEGMENT;
-  DLOG("Meta: %3lu", shadow_meta[1]);
+  size_t alloc_size = ALLOC_SIZE(size);
+  size_t segments = alloc_size/HEAP_SEGMENT;
+  uintptr_t *segment = (uintptr_t*)(block_shadow);
+
+  DLOG(" | === Block Shadow ======================================\n");
+  DLOG(" | Access addr:  %a\n", addr);
+  DLOG(" | Block Shadow: %a\n",	 block_shadow);
+  DLOG(" | Init	 Shadow: %a\n",	 init_shadow);
+  DLOG(" | Segments:     %lu\n", segments);
+  DLOG(" | Aligned size: %lu bytes\n", alloc_size);
+
+  if (zeroed_out(block_shadow, alloc_size))
+    DLOG(" | << Nullified >>  \n");
+
+  DLOG(" | Actual size:  %lu bytes\n", segment[1]);
 
   size_t i;
-  for (i = 0; i < block_segments; i++) {
-    uintptr_t *block_segment = (uintptr_t*)(shadowed + i*HEAP_SEGMENT);
-    DLOG("%s | Block %2lu, Offset %3lu, Init: %"
-      TOSTRING(HEAP_SEGMENT) "b\t\t || %a \n", i ? "         "  : "", i,
-      block_segment[0], block_segment[1],  block_segment);
+  for (i = 0; i < segments; i++) {
+    segment = (uintptr_t*)(block_shadow + i*HEAP_SEGMENT);
+    DLOG(" |   Segment: %lu, Base: %a \n", i, *segment);
+  }
+
+  if (zeroed_out(init_shadow, alloc_size/8))
+    DLOG(" | << Nullified >>  \n");
+
+  DLOG(" | Initialization: \n |   ");
+  for (i = 0; i < alloc_size/8 + 8; i++) {
+    if (i > 0 && (i*8)%HEAP_SEGMENT == 0)
+      DLOG("\n |   ");
+
+    DLOG("%8b ", init_shadow[i], init_shadow[i]);
   }
   DLOG("\n");
 }
@@ -1200,17 +1174,19 @@ static void print_shadows(uintptr_t addr, size_t size) {
 
 static void print_memory_segment(struct memory_segment *seg, const char *name) {
   DLOG(" --- %s ------------------------------------------\n", name);
-  DLOG("%s Shadow Size:               %16lu MB\n", name, MB_SZ(seg->shadow_size));
+  DLOG("%s Size:                      %16lu MB\n", name, MB_SZ(seg->size));
   DLOG("%s Start:                     %19lu\n", name, seg->start);
   DLOG("%s End:                       %19lu\n", name, seg->end);
+
   DLOG("%s Primary Shadow Offset:     %19lu\n", name, seg->prim_offset);
+  DLOG("%s Primary Shadow Size:       %16lu MB\n", name, MB_SZ(seg->prim_size));
   DLOG("%s Primary Shadow Start:      %19lu\n", name, seg->prim_start);
   DLOG("%s Primary Shadow End:        %19lu\n", name, seg->prim_end);
-  if (seg->sec_start) {
-    DLOG("%s Secondary Shadow Offset:   %19lu\n", name, seg->sec_offset);
-    DLOG("%s Secondary Shadow Start:    %19lu\n", name, seg->sec_start);
-    DLOG("%s Secondary Shadow End:      %19lu\n", name, seg->sec_end);
-  }
+
+  DLOG("%s Secondary Shadow Offset:   %19lu\n", name, seg->sec_offset);
+  DLOG("%s Secondary Shadow Size:     %16lu MB\n", name, MB_SZ(seg->sec_size));
+  DLOG("%s Secondary Shadow Start:    %19lu\n", name, seg->sec_start);
+  DLOG("%s Secondary Shadow End:      %19lu\n", name, seg->sec_end);
 }
 
 static void print_memory_layout() {

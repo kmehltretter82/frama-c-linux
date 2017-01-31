@@ -112,7 +112,7 @@ static void * segment_base_addr(void * ptr) {
 
 /*! NB: Implementation of the following function can also be specified
  * via \p block_length macro. A more direct approach via ::TRY_SEGMENT
- * is preffered for performance reasons. */
+ * is preferred for performance reasons. */
 static size_t segment_block_length(void * ptr) {
   TRY_SEGMENT(ptr,
     return heap_info((uintptr_t)ptr, 'L'),
@@ -122,7 +122,7 @@ static size_t segment_block_length(void * ptr) {
 
 /*! NB: Implementation of the following function can also be specified
  * via \p offset macro. A more direct approach via ::TRY_SEGMENT
- * is preffered for performance reasons. */
+ * is preferred for performance reasons. */
 static int segment_offset(void *ptr) {
   TRY_SEGMENT(ptr,
     return heap_info((uintptr_t)ptr, 'O'),
