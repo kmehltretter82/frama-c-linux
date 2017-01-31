@@ -447,7 +447,7 @@ static void* bittree_realloc(void* ptr, size_t size) {
       /* allocate memory to store partial initialization */
       tmp->init_ptr = native_calloc(1, nb);
       /* carry out initialization of the old block */
-      setbits(tmp->init_ptr, tmp->size);
+      setbits(tmp->size, tmp->init_ptr);
     }
   } else { /* contains initialized and uninitialized parts */
     int nb = needed_bytes(size);
