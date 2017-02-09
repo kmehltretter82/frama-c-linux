@@ -35,7 +35,7 @@ let handle_error f env =
   Env.Context.restore env
 
 (* internal to [named_predicate_to_exp] but put it outside in order to not add
-   extra tedious parameter. 
+   extra tedious parameter.
    It is [true] iff we are currently visiting \valid. *)
 let is_visiting_valid = ref false
 
@@ -163,8 +163,8 @@ let constant_to_exp ~loc t = function
   | LStr s -> Cil.new_exp ~loc (Const (CStr s)), false
   | LWStr s -> Cil.new_exp ~loc (Const (CWStr s)), false
   | LChr c -> Cil.new_exp ~loc (Const (CChr c)), false
-  | LReal {r_literal=s; r_nearest=f; r_lower=l; r_upper=u} -> 
-    if l <> u then 
+  | LReal {r_literal=s; r_nearest=f; r_lower=l; r_upper=u} ->
+    if l <> u then
       Options.warning ~current:true ~once:true
 	"approximating a real number by a float";
     Cil.new_exp ~loc (Const (CReal (f, FLongDouble, Some s))), false
@@ -225,11 +225,11 @@ let cast_integer_to_float lty lty_t e =
     e
 
 let rec thost_to_host kf env = function
-  | TVar { lv_origin = Some v } -> 
+  | TVar { lv_origin = Some v } ->
     Var (Cil.get_varinfo (Env.get_behavior env) v), env, v.vname
-  | TVar ({ lv_origin = None } as logic_v) -> 
+  | TVar ({ lv_origin = None } as logic_v) ->
     Var (Env.Logic_binding.get env logic_v), env, logic_v.lv_name
-  | TResult _typ -> 
+  | TResult _typ ->
     let vis = Env.get_visitor env in
     let kf = Extlib.the vis#current_kf in
     let lhost = Misc.result_lhost kf in
@@ -242,16 +242,16 @@ let rec thost_to_host kf env = function
 
 and toffset_to_offset ?loc kf env = function
   | TNoOffset -> NoOffset, env
-  | TField(f, offset) -> 
+  | TField(f, offset) ->
     let offset, env = toffset_to_offset ?loc kf env offset in
     Field(f, offset), env
-  | TIndex(t, offset) -> 
+  | TIndex(t, offset) ->
     let e, env = term_to_exp kf env t in
     let offset, env = toffset_to_offset kf env offset in
     Index(e, offset), env
   | TModel _ -> not_yet env "model"
 
-and tlval_to_lval kf env (host, offset) = 
+and tlval_to_lval kf env (host, offset) =
   let host, env, name = thost_to_host kf env host in
   let offset, env = toffset_to_offset kf env offset in
   let name = match offset with NoOffset -> name | Field _ | Index _ -> "" in
@@ -260,13 +260,13 @@ and tlval_to_lval kf env (host, offset) =
 (* the returned boolean says that the expression is an mpz_string;
    the returned string is the name of the generated variable corresponding to
    the term. *)
-and context_insensitive_term_to_exp kf env t = 
+and context_insensitive_term_to_exp kf env t =
   let loc = t.term_loc in
   match t.term_node with
   | TConst c ->
     let c, is_mpz_string = constant_to_exp ~loc t c in
     c, env, is_mpz_string, ""
-  | TLval lv -> 
+  | TLval lv ->
     let lv, env, name = tlval_to_lval kf env lv in
     Cil.new_exp ~loc (Lval lv), env, false, name
   | TSizeOf ty -> Cil.sizeOf ~loc ty, env, false, "sizeof"
@@ -287,7 +287,7 @@ and context_insensitive_term_to_exp kf env t =
 	| BNot -> "__gmpz_com", "bnot"
 	| LNot -> assert false
       in
-      let _, e, env = 
+      let _, e, env =
 	Env.new_var_and_mpz_init
 	  ~loc
 	  env
@@ -322,8 +322,8 @@ and context_insensitive_term_to_exp kf env t =
       let name = name_of_mpz_arith_bop bop in
       let mk_stmts _ e = [ Misc.mk_call ~loc name [ e; e1; e2 ] ] in
       let name = name_of_binop bop in
-      let _, e, env = 
-	Env.new_var_and_mpz_init ~loc ~name env (Some t) mk_stmts 
+      let _, e, env =
+	Env.new_var_and_mpz_init ~loc ~name env (Some t) mk_stmts
       in
       e, env, false, ""
     else
@@ -354,16 +354,16 @@ and context_insensitive_term_to_exp kf env t =
         let name = name_of_binop bop ^ "_guard" in
         comparison_to_exp ~loc kf env Typing.gmp ~e1:e2 ~name Eq t2 zero t
       in
-      let mk_stmts _v e = 
+      let mk_stmts _v e =
 	assert (Gmpz.is_t ty);
 	let vis = Env.get_visitor env in
 	let kf = Extlib.the vis#current_kf in
-	let cond = 
-	  Misc.mk_e_acsl_guard 
-	    (Env.annotation_kind env) 
+	let cond =
+	  Misc.mk_e_acsl_guard
+	    (Env.annotation_kind env)
 	    kf
 	    guard
-	    (Logic_const.prel ~loc (Req, t2, zero)) 
+	    (Logic_const.prel ~loc (Req, t2, zero))
 	in
 	Env.add_assert env cond (Logic_const.prel (Rneq, t2, zero));
 	let instr = Misc.mk_call ~loc name [ e; e1; e2 ] in
@@ -424,10 +424,10 @@ and context_insensitive_term_to_exp kf env t =
     let e, env = add_cast ~loc ~name:"cast" env (Some ty) false (Some t) e in
     e, env, false, ""
   | TLogic_coerce _ -> assert false (* handle in [term_to_exp] *)
-  | TAddrOf lv -> 
+  | TAddrOf lv ->
     let lv, env, _ = tlval_to_lval kf env lv in
     Cil.mkAddrOf ~loc lv, env, false, "addrof"
-  | TStartOf lv -> 
+  | TStartOf lv ->
     let lv, env, _ = tlval_to_lval kf env lv in
     Cil.mkAddrOrStartOf ~loc lv, env, false, "startof"
   | Tapp(li, [], args) when Builtins.mem li.l_var_info.lv_name ->
@@ -468,7 +468,7 @@ and context_insensitive_term_to_exp kf env t =
     let res3 = term_to_exp kf (Env.push env2) t3 in
     let e, env = conditional_to_exp loc (Some t) e1 res2 res3 in
     e, env, false, ""
-  | Tat(t, LogicLabel(_, label)) when label = "Here" -> 
+  | Tat(t, LogicLabel(_, label)) when label = "Here" ->
     let e, env = term_to_exp kf env t in
     e, env, false, ""
   | Tat(t', label) ->
@@ -503,7 +503,7 @@ and context_insensitive_term_to_exp kf env t =
    constructs. *)
 and term_to_exp kf env t =
   let generate_rte = Env.generate_rte env in
-  Options.feedback ~dkey ~level:4 "translating term %a (rte? %b)" 
+  Options.feedback ~dkey ~level:4 "translating term %a (rte? %b)"
     Printer.pp_term t generate_rte;
   let env = Env.rte env false in
   let t = match t.term_node with TLogic_coerce(_, t) -> t | _ -> t in
@@ -550,17 +550,26 @@ and comparison_to_exp
 (* \base_addr, \block_length and \freeable annotations *)
 and mmodel_call ~loc kf name ctx env t =
   let e, env = term_to_exp kf (Env.rte env true) t in
-  let _, res, env = 
+  let _, res, env =
     Env.new_var
       ~loc
       ~name
       env
       None
-      ctx 
-      (fun v _ -> 
+      ctx
+      (fun v _ ->
 	[ Misc.mk_call ~loc ~result:(Cil.var v) (Misc.mk_api_name name) [ e ] ])
   in
   res, env, false, name
+
+and get_c_term_type = function
+  | Ctype ty -> ty
+  | _ -> assert false
+
+and mk_ptr_sizeof typ loc =
+  match Cil.unrollType typ with
+  | TPtr (t', _) -> Cil.new_exp ~loc (SizeOf t')
+  | _ -> assert false
 
 (* \valid, \offset and \initialized annotations *)
 and mmodel_call_with_size ~loc kf name ctx env t =
@@ -573,50 +582,63 @@ and mmodel_call_with_size ~loc kf name ctx env t =
       None
       ctx
       (fun v _ ->
-        let ty = match t.term_type with
-          | Ctype ty -> ty
-          | _ -> assert false
-        in
-        let sizeof = match Cil.unrollType ty with
-          | TPtr (t', _) -> Cil.new_exp ~loc (SizeOf t')
-          | _ -> assert false
-        in
-        [ Misc.mk_call
-            ~loc ~result:(Cil.var v) (Misc.mk_api_name name) [ e; sizeof ] ])
+        let ty = get_c_term_type t.term_type in
+        let sizeof = mk_ptr_sizeof ty loc in
+        let fname = (Misc.mk_api_name name) in
+        [ Misc.mk_call ~loc ~result:(Cil.var v) fname [ e; sizeof ] ])
+  in
+  res, env
+
+and mmodel_call_valid ~loc kf name ctx env t =
+  let e, env = term_to_exp kf (Env.rte env true) t in
+  let base, _ = Misc.ptr_index e in
+  let _, res, env =
+    Env.new_var
+      ~loc
+      ~name
+      env
+      None
+      ctx
+      (fun v _ ->
+        let ty = get_c_term_type t.term_type in
+        let sizeof = mk_ptr_sizeof ty loc in
+        let fname = Misc.mk_api_name name in
+        let args = [ e; sizeof; base ] in
+        [ Misc.mk_call ~loc ~result:(Cil.var v) fname args ])
   in
   res, env
 
 and at_to_exp env t_opt label e =
   let stmt = E_acsl_label.get_stmt (Env.get_visitor env) label in
   (* generate a new variable denoting [\at(t',label)].
-     That is this variable which is the resulting expression. 
+     That is this variable which is the resulting expression.
      ACSL typing rule ensures that the type of this variable is the same as
      the one of [e]. *)
   let loc = Stmt.loc stmt in
   let res_v, res, new_env =
     Env.new_var
       ~loc
-      ~name:"at" 
+      ~name:"at"
       ~scope:Env.Function
       env
       t_opt
-      (Cil.typeOf e) 
+      (Cil.typeOf e)
       (fun _ _ -> [])
   in
   let env_ref = ref new_env in
   (* visitor modifying in place the labeled statement in order to store [e]
      in the resulting variable at this location (which is the only correct
      one). *)
-  let o = object 
+  let o = object
     inherit Visitor.frama_c_inplace
-    method !vstmt_aux stmt = 
+    method !vstmt_aux stmt =
       (* either a standard C affectation or an mpz one according to type of
-	 [e] *) 
+	 [e] *)
       let new_stmt = Gmpz.init_set ~loc (Cil.var res_v) res e in
       assert (!env_ref == new_env);
       (* generate the new block of code for the labeled statement and the
 	 corresponding environment *)
-      let block, new_env = 
+      let block, new_env =
 	Env.pop_and_get new_env new_stmt ~global_clear:false Env.Middle
       in
       let pre = match label with
@@ -654,7 +676,7 @@ and named_predicate_content_to_exp ?name kf env p =
     let env3 = Env.push env2 in
     let name = match name with None -> "and" | Some n -> n in
     conditional_to_exp ~name loc None e1 res2 (Cil.zero loc, env3)
-  | Por(p1, p2) -> 
+  | Por(p1, p2) ->
     (* p1 || p2 <==> if p1 then true else p2 *)
     let e1, env1 = named_predicate_to_exp kf (Env.rte env true) p1 in
     let env' = Env.push env1 in
@@ -662,21 +684,21 @@ and named_predicate_content_to_exp ?name kf env p =
     let name = match name with None -> "or" | Some n -> n in
     conditional_to_exp ~name loc None e1 (Cil.one loc, env') res2
   | Pxor _ -> not_yet env "xor"
-  | Pimplies(p1, p2) -> 
+  | Pimplies(p1, p2) ->
     (* (p1 ==> p2) <==> !p1 || p2 *)
-    named_predicate_to_exp 
+    named_predicate_to_exp
       ~name:"implies"
       kf
       env
       (Logic_const.por ~loc ((Logic_const.pnot ~loc p1), p2))
-  | Piff(p1, p2) -> 
+  | Piff(p1, p2) ->
     (* (p1 <==> p2) <==> (p1 ==> p2 && p2 ==> p1) *)
-    named_predicate_to_exp 
+    named_predicate_to_exp
       ~name:"equiv"
       kf
       env
       (Logic_const.pand ~loc
-	 (Logic_const.pimplies ~loc (p1, p2), 
+	 (Logic_const.pimplies ~loc (p1, p2),
 	  Logic_const.pimplies ~loc (p2, p1)))
   | Pnot p ->
     let e, env = named_predicate_to_exp kf env p in
@@ -688,9 +710,9 @@ and named_predicate_content_to_exp ?name kf env p =
     conditional_to_exp loc None e1 res2 res3
   | Plet _ -> not_yet env "let _ = _ in _"
   | Pforall _ | Pexists _ -> Quantif.quantif_to_exp kf env p
-  | Pat(p, LogicLabel(_, label)) when label = "Here" -> 
+  | Pat(p, LogicLabel(_, label)) when label = "Here" ->
     named_predicate_to_exp kf env p
-  | Pat(p', label) -> 
+  | Pat(p', label) ->
     (* convert [t'] to [e] in a separated local env *)
     let e, env = named_predicate_to_exp kf (Env.push env) p' in
     let e, env, is_string = at_to_exp env None label e in
@@ -698,13 +720,13 @@ and named_predicate_content_to_exp ?name kf env p =
     e, env
   | Pvalid_read(LogicLabel(_, label) as llabel, t) as pc
   | (Pvalid(LogicLabel(_, label) as llabel, t) as pc) when label = "Here" ->
-    let call_valid t = 
+    let call_valid t =
       let name = match pc with
 	| Pvalid _ -> "valid"
 	| Pvalid_read _ -> "valid_read"
 	| _ -> assert false
       in
-      mmodel_call_with_size ~loc kf name Cil.intType env t 
+      mmodel_call_valid ~loc kf name Cil.intType env t
     in
     if !is_visiting_valid then begin
       (* we already transformed \valid(t) into \initialized(&t) && \valid(t):
@@ -729,7 +751,7 @@ and named_predicate_content_to_exp ?name kf env p =
     (match t.term_node with
     (* optimisation when we know that the initialisation is ok *)
     | TAddrOf (TResult _, TNoOffset) -> Cil.one ~loc, env
-    | TAddrOf (TVar { lv_origin = Some vi }, TNoOffset) 
+    | TAddrOf (TVar { lv_origin = Some vi }, TNoOffset)
 	when vi.vformal || vi.vglob || Misc.is_generated_varinfo vi ->
       Cil.one ~loc, env
     | _ -> mmodel_call_with_size ~loc kf "initialized" Cil.intType env t)
@@ -757,7 +779,7 @@ and named_predicate_to_exp ?name kf ?rte env p =
     None
     e
 
-and translate_rte_annots: 
+and translate_rte_annots:
     'a. (Format.formatter -> 'a -> unit) -> 'a ->
   kernel_function -> Env.t -> code_annotation list -> Env.t =
   fun pp elt kf env l ->
@@ -767,9 +789,9 @@ and translate_rte_annots:
     let env =
       List.fold_left
         (fun env a -> match a.annot_content with
-        | AAssert(_, p) -> 
+        | AAssert(_, p) ->
 	  handle_error
-	    (fun env -> 
+	    (fun env ->
 	      Options.feedback ~dkey ~level:4 "prevent RTE from %a" pp elt;
 	      translate_named_predicate kf (Env.rte env false) p)
 	    env
@@ -786,20 +808,20 @@ and translate_rte kf env e =
   translate_rte_annots Printer.pp_exp e kf env l
 
 and translate_named_predicate kf env p =
-  Options.feedback ~dkey ~level:3 "translating predicate %a" 
+  Options.feedback ~dkey ~level:3 "translating predicate %a"
     Printer.pp_predicate p;
   let rte = Env.generate_rte env in
   Typing.type_named_predicate ~must_clear:rte p;
   let e, env = named_predicate_to_exp kf ~rte env p in
   assert (Typ.equal (Cil.typeOf e) Cil.intType);
   Env.add_stmt
-    env 
+    env
     (Misc.mk_e_acsl_guard ~reverse:true (Env.annotation_kind env) kf e p)
 
-let named_predicate_to_exp ?name kf env p = 
+let named_predicate_to_exp ?name kf env p =
   named_predicate_to_exp ?name kf env p (* forget optional argument ?rte *)
 
-let () = 
+let () =
   Quantif.term_to_exp_ref := term_to_exp;
   Quantif.predicate_to_exp_ref := named_predicate_to_exp
 
@@ -853,11 +875,11 @@ let assumes_predicate bhv =
 let original_project_ref = ref Project_skeleton.dummy
 let set_original_project p = original_project_ref := p
 
-let must_translate ppt = 
+let must_translate ppt =
   let selection =
     State_selection.of_list [ Property_status.self; Options.Valid.self ]
   in
-  Project.on ~selection 
+  Project.on ~selection
     !original_project_ref
     (fun ppt ->
       match Property_status.get ppt with
@@ -867,14 +889,14 @@ let must_translate ppt =
 
 let translate_preconditions kf kinstr env behaviors =
   let env = Env.set_annotation_kind env Misc.Precondition in
-  let do_behavior env b = 
+  let do_behavior env b =
     let assumes_pred = assumes_predicate b in
     List.fold_left
       (fun env p ->
          let do_it env =
            if must_translate (Property.ip_of_requires kf kinstr b p) then
              let loc = p.ip_content.pred_loc in
-             let p = 
+             let p =
                Logic_const.pimplies
                  ~loc
                  (assumes_pred,
@@ -887,13 +909,13 @@ let translate_preconditions kf kinstr env behaviors =
 	handle_error do_it env)
       env
       b.b_requires
-  in 
+  in
   List.fold_left do_behavior env behaviors
 
 let translate_postconditions kf kinstr env behaviors =
   let env = Env.set_annotation_kind env Misc.Postcondition in
       (* generate one guard by postcondition of each behavior *)
-  let do_behavior env b = 
+  let do_behavior env b =
     let assumes_pred = assumes_predicate b in
     List.fold_left
       (fun env (t, p as post) ->
@@ -901,23 +923,23 @@ let translate_postconditions kf kinstr env behaviors =
 	  let env =
 	    handle_error
 	      (fun env ->
-		if b.b_assigns <> WritesAny then 
+		if b.b_assigns <> WritesAny then
 		  not_yet env "assigns clause in behavior";
-		if b.b_extended <> [] then 
+		if b.b_extended <> [] then
 		  not_yet env "grammar extensions in behavior";
 		env)
 	      env
 	  in
 	  let do_it env =
 	    match t with
-	    | Normal -> 
+	    | Normal ->
 	      let loc = p.ip_content.pred_loc in
 	      let p = p.ip_content in
-	      let p = 
-		Logic_const.pimplies 
+	      let p =
+		Logic_const.pimplies
 		  ~loc
-		  (Logic_const.pold ~loc assumes_pred, 
-		   Logic_const.unamed ~loc p.pred_content) 
+		  (Logic_const.pold ~loc assumes_pred,
+		   Logic_const.unamed ~loc p.pred_content)
 	      in
 	      translate_named_predicate kf env p
 	    | Exits | Breaks | Continues | Returns ->
@@ -927,7 +949,7 @@ let translate_postconditions kf kinstr env behaviors =
 	else env)
       env
       b.b_post_cond
-  in 
+  in
   List.fold_left do_behavior env behaviors
 
 let translate_pre_spec kf kinstr env spec =
@@ -967,32 +989,32 @@ let translate_pre_spec kf kinstr env spec =
   in
   let env = convert_unsupported_clauses env in
   handle_error
-    (fun env -> translate_preconditions kf kinstr env spec.spec_behavior) 
+    (fun env -> translate_preconditions kf kinstr env spec.spec_behavior)
     env
 
-let translate_post_spec kf kinstr env spec = 
+let translate_post_spec kf kinstr env spec =
   handle_error
-    (fun env -> translate_postconditions kf kinstr env spec.spec_behavior) 
+    (fun env -> translate_postconditions kf kinstr env spec.spec_behavior)
     env
 
 let translate_pre_code_annotation kf stmt env annot =
   let convert env = match annot.annot_content with
-    | AAssert(l, p) -> 
+    | AAssert(l, p) ->
       if must_translate (Property.ip_of_code_annot_single kf stmt annot) then
 	let env = Env.set_annotation_kind env Misc.Assertion in
-	if l <> [] then 
+	if l <> [] then
 	  not_yet env "@[assertion applied only on some behaviors@]";
 	translate_named_predicate kf env p
       else
 	env
     | AStmtSpec(l, spec) ->
-      if l <> [] then 
+      if l <> [] then
         not_yet env "@[statement contract applied only on some behaviors@]";
       translate_pre_spec kf (Kstmt stmt) env spec ;
     | AInvariant(l, loop_invariant, p) ->
       if must_translate (Property.ip_of_code_annot_single kf stmt annot) then
 	let env = Env.set_annotation_kind env Misc.Invariant in
-	if l <> [] then 
+	if l <> [] then
 	  not_yet env "@[invariant applied only on some behaviors@]";
 	let env = translate_named_predicate kf env p in
 	if loop_invariant then Env.add_loop_invariant env p else env
@@ -1018,8 +1040,8 @@ let translate_pre_code_annotation kf stmt env annot =
 let translate_post_code_annotation kf stmt env annot =
   let convert env = match annot.annot_content with
     | AStmtSpec(_, spec) -> translate_post_spec kf (Kstmt stmt) env spec
-    | AAssert _ 
-    | AInvariant _ 
+    | AAssert _
+    | AInvariant _
     | AVariant _
     | AAssigns _
     | AAllocation _

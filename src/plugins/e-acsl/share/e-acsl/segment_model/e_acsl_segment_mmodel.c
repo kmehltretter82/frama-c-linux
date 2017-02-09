@@ -30,8 +30,8 @@
 #include <errno.h>
 #include <sys/resource.h>
 
-static int valid(void * ptr, size_t size);
-static int valid_read(void * ptr, size_t size);
+static int valid(void * ptr, size_t size, void *ptr_base);
+static int valid_read(void * ptr, size_t size, void *ptr_base);
 
 #include "e_acsl_string.h"
 #include "e_acsl_bits.h"
@@ -77,24 +77,26 @@ static void readonly(void * ptr) {
 /* E-ACSL annotations */
 /* ****************** */
 
-static int valid(void * ptr, size_t size) {
+static int valid(void * ptr, size_t size, void *ptr_base) {
   uintptr_t addr = (uintptr_t)ptr;
+  uintptr_t base = (uintptr_t)ptr_base;
   if (IS_ON_HEAP(addr))
-    return heap_allocated(addr, size);
+    return heap_allocated(addr, size, base);
   else if (IS_ON_STACK(addr) || IS_ON_TLS(addr))
-    return static_allocated(addr, size);
+    return static_allocated(addr, size, base);
   else if (IS_ON_GLOBAL(addr))
-    return static_allocated(addr, size) && !global_readonly(addr);
+    return static_allocated(addr, size, base) && !global_readonly(addr);
   else if (!IS_ON_VALID(addr))
     return 0;
   return 0;
 }
 
-static int valid_read(void * ptr, size_t size) {
+static int valid_read(void * ptr, size_t size, void *ptr_base) {
   uintptr_t addr = (uintptr_t)ptr;
+  uintptr_t base = (uintptr_t)ptr_base;
   TRY_SEGMENT(addr,
-    return heap_allocated(addr, size),
-    return static_allocated(addr, size));
+    return heap_allocated(addr, size, base),
+    return static_allocated(addr, size, base));
   if (!IS_ON_VALID(addr))
     return 0;
   return 0;

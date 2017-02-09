@@ -213,21 +213,23 @@ static size_t block_length(void* ptr) {
 }
 
 /* return whether the size bytes of ptr are readable/writable */
-static int valid(void* ptr, size_t size) {
-  if(ptr == NULL)
+static int valid(void* ptr, size_t size, void *ptr_base) {
+  bt_block * blk = bt_find(ptr);
+  bt_block * blk_base = bt_find(ptr_base);
+
+  if (blk == NULL || blk_base == NULL || blk->ptr != blk_base->ptr)
     return false;
-  bt_block * tmp = bt_find(ptr);
-  return (tmp == NULL) ? false :
-    (tmp->size - ((size_t)ptr - tmp->ptr ) >= size && !tmp->is_readonly);
+  return (blk->size - ((size_t)ptr - blk->ptr) >= size && !blk->is_readonly);
 }
 
 /* return whether the size bytes of ptr are readable */
-static int valid_read(void* ptr, size_t size) {
-  if(ptr == NULL)
+static int valid_read(void* ptr, size_t size, void *ptr_base) {
+  bt_block * blk = bt_find(ptr);
+  bt_block * blk_base = bt_find(ptr_base);
+
+  if (blk == NULL || blk_base == NULL || blk->ptr != blk_base->ptr)
     return false;
-  bt_block * tmp = bt_find(ptr);
-  return (tmp == NULL) ?
-    false : (tmp->size - ((size_t)ptr - tmp->ptr) >= size);
+  return (blk->size - ((size_t)ptr - blk->ptr) >= size);
 }
 
 /* return the base address of the block containing ptr */
@@ -394,7 +396,7 @@ static int bittree_posix_memalign(void **memptr, size_t alignment, size_t size) 
     return -1;
 
   /* Make sure that the first argument to posix memalign is indeed allocated */
-  vassert(valid(memptr, sizeof(void*)),
+  vassert(valid(memptr, sizeof(void*), memptr),
       "\\invalid memptr in posix_memalign", NULL);
 
   int res = native_posix_memalign(memptr, alignment, size);

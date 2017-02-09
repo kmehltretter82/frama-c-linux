@@ -279,6 +279,34 @@ let cty = function
   | Ctype ty -> ty
   | lty -> Options.fatal "Expecting a C type. Got %a" Printer.pp_logic_type lty
 
+let arith_op = function
+  | MinusPI -> MinusA
+  | PlusPI -> PlusA
+  | IndexPI -> PlusA
+  | _ -> assert false
+
+let rec ptr_index ?(index=(Cil.zero Location.unknown)) exp =
+  (* ****************************************************************** *)
+  match exp.enode with
+  | BinOp(op, lhs, rhs, _) ->
+    (match op with
+    (* Pointer arithmetic: split pointer and integer parts *)
+    | MinusPI | PlusPI | IndexPI ->
+      let index = Cil.mkBinOp Location.unknown (arith_op op) index rhs
+      in ptr_index ~index lhs
+    (* Other arithmetic: treat the whole expression as pointer address *)
+    | MinusPP | PlusA | MinusA | Mult | Div | Mod ->
+      (exp, index)
+    | _ -> assert false)
+  (* ****************************************************************** *)
+  | CastE(_) -> ptr_index ~index (Cil.stripCasts exp)
+  (* ****************************************************************** *)
+  | Const(_)
+  | StartOf(_)
+  | AddrOf(_)
+  | Lval(_) -> (exp, index)
+  | _ -> assert false
+
 (*
 Local Variables:
 compile-command: "make"

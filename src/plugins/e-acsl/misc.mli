@@ -91,6 +91,11 @@ val reorder_ast: unit -> unit
 val cty: logic_type -> typ
 (* Assume that the logic type is indeed a C type. Just return it. *)
 
+val ptr_index: ?index:Cil_types.exp -> Cil_types.exp 
+  -> Cil_types.exp * Cil_types.exp
+(** Split pointer-arithmetic expression of the type `p + i` into its
+pointer and integer parts. *)
+
 (* ************************************************************************** *)
 (** {2 Handling prefixes of generated library functions and variables} *)
 (* ************************************************************************** *)

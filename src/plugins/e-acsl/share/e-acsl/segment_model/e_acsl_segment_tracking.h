@@ -119,6 +119,11 @@ const size_t max_allocated = SIZE_MAX - HEAP_SEGMENT;
 #define ALLOC_SIZE(_s) \
   (_s > 0 && _s < max_allocated ? ALIGNED_SIZE(_s) : 0)
 
+/** \brief Evaluate to `true` if address _addr belongs to a memory block
+ * with base address _base and length _length */
+#define BELONGS(_addr, _base, _length) \
+  (_addr >= _base && _addr < _base + _length)
+
 /*! \brief For short blocks numbers 1 to 36 represent lengths and offsets,
  * such that:
  * - 0 -> length 0, offset 0
@@ -296,14 +301,14 @@ static void validate_memory_layout() {
  * program's heap */
 # define DVALIDATE_HEAP_ACCESS(_addr, _size) \
     DVASSERT(IS_ON_HEAP(_addr), "Expected heap location: %a\n   ", _addr); \
-    DVASSERT(heap_allocated((uintptr_t)_addr, _size), \
+    DVASSERT(heap_allocated((uintptr_t)_addr, _size, (uintptr_t)_addr), \
        "Operation on unallocated heap block [%a + %lu]\n   ",  _addr, _size)
 
 /* Assert that memory block [_addr, _addr + _size] is allocated on stack, TLS
  * or globally */
 # define DVALIDATE_STATIC_ACCESS(_addr, _size) \
     DVASSERT(IS_ON_STATIC(_addr), "Expected location: %a\n   ", _addr); \
-    DVASSERT(static_allocated((uintptr_t)_addr, _size), \
+    DVASSERT(static_allocated((uintptr_t)_addr, _size,(uintptr_t)_addr), \
        "Operation on unallocated block [%a + %lu]\n   ", _addr, _size)
 
 /* Same as ::DVALIDATE_STATIC_LOCATION but for a single memory location */
@@ -339,8 +344,8 @@ static void validate_memory_layout() {
 /* See definitions for documentation */
 static uintptr_t heap_info(uintptr_t addr, char type);
 static uintptr_t static_info(uintptr_t addr, char type);
-static int heap_allocated(uintptr_t addr, size_t size);
-static int static_allocated(uintptr_t addr, long size);
+static int heap_allocated(uintptr_t addr, size_t size, uintptr_t base_ptr);
+static int static_allocated(uintptr_t addr, long size, uintptr_t base_ptr);
 static int freeable(void *ptr);
 
 /*! \brief Quick test to check if a static location belongs to allocation.
@@ -507,8 +512,10 @@ static void shadow_freea(void *ptr) {
 /*! \brief Return a non-zero value if a memory region of length `size`
  * starting at address `addr` belongs to a tracked stack, tls or
  * global memory block and 0 otherwise.
- * This function is only safe if applied to a tls, stack or global address. */
-static int static_allocated(uintptr_t addr, long size) {
+ * This function is only safe if applied to a tls, stack or global address. 
+ * Explanations regarding the third argument - `base_ptr` - are given
+ * via inline documentation of function ::heap_allocated */
+static int static_allocated(uintptr_t addr, long size, uintptr_t base_ptr) {
   unsigned char *prim_shadow = (unsigned char*)PRIMARY_SHADOW(addr);
   /* Unless the address belongs to tracked allocation 0 is returned */
   if (prim_shadow[0]) {
@@ -525,7 +532,14 @@ static int static_allocated(uintptr_t addr, long size) {
       offset = short_offsets[code];
       length = short_lengths[code];
     }
-    return offset + size <= length;
+
+    if (addr != base_ptr) {
+      uintptr_t base_addr = addr - offset;
+      return BELONGS(base_ptr, base_addr, length)
+        && offset + size <= length;
+    } else {
+      return offset + size <= length;
+    }
   }
   return 0;
 }
@@ -536,7 +550,7 @@ static int static_allocated(uintptr_t addr, long size) {
 static int static_initialized(uintptr_t addr, long size) {
   /* Return 0 right away if the address does not belong to
    * static allocation */
-  if (!static_allocated(addr, size))
+  if (!static_allocated(addr, size, addr))
     return 0;
   DVALIDATE_STATIC_ACCESS(addr, size);
 
@@ -669,7 +683,7 @@ static void mark_readonly (uintptr_t addr, long size) {
   /* Since read-only blocks can only be stored in the globals  segments (e.g.,
    * TEXT), this function required ptr carry a global address. */
   DASSERT(IS_ON_GLOBAL(addr));
-  DASSERT(static_allocated(addr, 1));
+  DASSERT(static_allocated_one(addr));
   DVASSERT(!(addr - base_addr(addr) + size > block_length(addr)),
     "Attempt to mark read-only %lu bytes past block boundaries\n"
     "starting at %a with block length %lu at base address %a\n",
@@ -919,7 +933,7 @@ static int shadow_posix_memalign(void **memptr, size_t alignment, size_t size) {
     return -1;
 
   /* Make sure that the first argument to posix memalign is indeed allocated */
-  vassert(valid(memptr, sizeof(void*)),
+  vassert(valid(memptr, sizeof(void*), memptr),
       "\\invalid memptr in  posix_memalign", NULL);
 
   int res = native_posix_memalign(memptr, alignment, size);
@@ -934,13 +948,27 @@ static int shadow_posix_memalign(void **memptr, size_t alignment, size_t size) {
 /*! \brief Return a non-zero value if a memory region of length `size`
  * starting at address `addr` belongs to an allocated (tracked) heap memory
  * block and a 0 otherwise. Note, this function is only safe if applied to a
- * heap address. */
-static int heap_allocated(uintptr_t addr, size_t size) { /* + */
+ * heap address.
+ *
+ * Note the third argument `base_ptr` that represents the base of a pointer, i.e.,
+ * `addr` of the form `base_ptr + i`, where `i` is some integer index.
+ * ::heap_allocated also returns zero if `base_ptr` and `addr` belong to different
+ * memory blocks, or if `base_ptr` lies within unallocated region. The intention 
+ * here is to be able to detect dereferencing of a valid memory block through 
+ * a pointer to a different block. Consider, for instance, some pointer `p` that 
+ * points to a memory block `B`, and an index `i`, such that `p+i` references a 
+ * memory location belonging to a different memory block (say `C`). From a 
+ * low-level viewpoint, dereferencing `p+i` is safe (since it belongs to a properly
+ * allocated block). From our perspective, however, dereference of `p+i` is
+ * only legal if both `p` and `p+i` point to the same block. */
+static int heap_allocated(uintptr_t addr, size_t size, uintptr_t base_ptr) {
   /* Base address of the shadow segment the address belongs to */
   uintptr_t *shadow = (uintptr_t*)HEAP_SHADOW(addr - addr%HEAP_SEGMENT);
 
   /* Non-zero if the segment belongs to heap allocation */
   if (shadow[0]) {
+    uintptr_t *base_shadow =
+      (uintptr_t*)HEAP_SHADOW(base_ptr - base_ptr%HEAP_SEGMENT);
     uintptr_t *first_segment = (uintptr_t*)HEAP_SHADOW(shadow[0]);
     /* shadow[0] - base address of the tracked block
      * fist_segment[1] - length (i.e., location in the first segment
@@ -948,7 +976,8 @@ static int heap_allocated(uintptr_t addr, size_t size) { /* + */
      * offset is the difference between the address and base address (shadow[0])
      * Then an address belongs to heap allocation if
      *  offset + size <= length */
-    return (addr - shadow[0]) + size <= first_segment[1];
+    return base_shadow[0] == shadow[0] &&
+      (addr - shadow[0]) + size <= first_segment[1];
   }
   return 0;
 }
