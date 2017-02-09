@@ -29,7 +29,8 @@ void __gen_e_acsl_loop(void)
     int __gen_e_acsl_valid;
     __e_acsl_assert(global_i == 0,(char *)"Precondition",(char *)"loop",
                     (char *)"global_i == 0",9);
-    __gen_e_acsl_valid = __e_acsl_valid((void *)global_i_ptr,sizeof(int));
+    __gen_e_acsl_valid = __e_acsl_valid((void *)global_i_ptr,sizeof(int),
+                                        (void *)global_i_ptr);
     __e_acsl_assert(__gen_e_acsl_valid,(char *)"Precondition",(char *)"loop",
                     (char *)"\\valid(global_i_ptr)",10);
     __e_acsl_assert(global_i_ptr == & global_i,(char *)"Precondition",
