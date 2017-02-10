@@ -725,6 +725,14 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         | _ -> assert false)
     else
       Cil.DoChildren
+  | Local_init(old_v, _, _) ->
+    if generate then
+      Cil.DoChildrenPost
+        (function
+          | [ Local_init (new_v, _, loc) ] as l ->
+            self#add_initializer loc (Cil.var old_v) (Cil.var new_v); l
+          | _ -> assert false)
+    else Cil.DoChildren
   | Call(Some old_ret, _, _, _) ->
     if not generate || Misc.is_generated_kf (Extlib.the self#current_kf) then
       Cil.DoChildren
