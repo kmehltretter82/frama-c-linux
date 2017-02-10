@@ -197,23 +197,12 @@ let result_vi kf = match result_lhost kf with
 (** {2 Handling the E-ACSL's C-libraries, part II} *)
 (* ************************************************************************** *)
 
-let mk_debug_mmodel_stmt stmt =
-  if Options.debug_atleast 1
-    && Options.is_debug_key_enabled Options.dkey_analysis
-  then
-    let debug = mk_call ~loc:(Stmt.loc stmt) (mk_api_name "memory_debug") [] in
-    Cil.mkStmt ~valid_sid:true (Block (Cil.mkBlock [ stmt; debug]))
-  else
-    stmt
-
 let mk_full_init_stmt ?(addr=true) vi =
   let loc = vi.vdecl in
-  let stmt = match addr, Cil.unrollType vi.vtype with
+  match addr, Cil.unrollType vi.vtype with
     | _, TArray(_,Some _, _, _) | false, _ ->
       mk_call ~loc (mk_api_name "full_init") [ Cil.evar ~loc vi ]
     | _ -> mk_call ~loc (mk_api_name "full_init") [ Cil.mkAddrOfVi vi ]
-  in
-  mk_debug_mmodel_stmt stmt
 
 let mk_initialize ~loc (host, offset as lv) = match host, offset with
   | Var _, NoOffset -> mk_call ~loc
@@ -229,14 +218,12 @@ let mk_named_store_stmt name ?str_size vi =
   let ty = Cil.unrollType vi.vtype in
   let loc = vi.vdecl in
   let store = mk_call ~loc (mk_api_name name) in
-  let stmt = match ty, str_size with
+  match ty, str_size with
     | TArray(_, Some _,_,_), None ->
       store [ Cil.evar ~loc vi ; Cil.sizeOf ~loc ty ]
     | TPtr(TInt(IChar, _), _), Some size -> store [ Cil.evar ~loc vi ; size ]
     | _, None -> store [ Cil.mkAddrOfVi vi ; Cil.sizeOf ~loc ty ]
     | _, Some _ -> assert false
-  in
-  mk_debug_mmodel_stmt stmt
 
 let mk_store_stmt ?str_size vi =
   mk_named_store_stmt "store_block" ?str_size vi
@@ -246,17 +233,14 @@ let mk_duplicate_store_stmt ?str_size vi =
 
 let mk_delete_stmt vi =
   let loc = vi.vdecl in
-  let stmt = match Cil.unrollType vi.vtype with
+  match Cil.unrollType vi.vtype with
     | TArray(_, Some _, _, _) ->
       mk_call ~loc (mk_api_name "delete_block") [ Cil.evar ~loc vi ]
     | _ -> mk_call ~loc (mk_api_name "delete_block") [ Cil.mkAddrOfVi vi ]
-  in
-  mk_debug_mmodel_stmt stmt
 
 let mk_readonly vi =
   let loc = vi.vdecl in
-  let stmt = mk_call ~loc (mk_api_name "readonly") [ Cil.evar ~loc vi ] in
-  mk_debug_mmodel_stmt stmt
+  mk_call ~loc (mk_api_name "readonly") [ Cil.evar ~loc vi ]
 
 (* ************************************************************************** *)
 (** {2 Other stuff} *)

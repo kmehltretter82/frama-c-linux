@@ -36,8 +36,6 @@ val mk_call: loc:Location.t -> ?result:lval -> string -> exp list -> stmt
     such a function or if these functions were never registered (only possible
     when using E-ACSL through its API. *)
 
-val mk_debug_mmodel_stmt: stmt -> stmt
-
 type annotation_kind =
   | Assertion
   | Precondition
@@ -91,7 +89,7 @@ val reorder_ast: unit -> unit
 val cty: logic_type -> typ
 (* Assume that the logic type is indeed a C type. Just return it. *)
 
-val ptr_index: ?index:Cil_types.exp -> Cil_types.exp 
+val ptr_index: ?index:Cil_types.exp -> Cil_types.exp
   -> Cil_types.exp * Cil_types.exp
 (** Split pointer-arithmetic expression of the type `p + i` into its
 pointer and integer parts. *)
