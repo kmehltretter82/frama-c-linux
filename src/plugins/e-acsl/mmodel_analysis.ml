@@ -497,7 +497,7 @@ let register_predicate kf pred state =
                 params
                 l
             with Invalid_argument _ -> 
-              Options.warning
+              Options.warning ~current:true
                 "ignoring effect of variadic function %a" 
                 Kernel_function.pretty
                 kf;
@@ -522,8 +522,8 @@ let register_predicate kf pred state =
         in
         Dataflow.Done (Some state)
       | _ ->
-        Options.warning "function pointers may introduce too limited \
-instrumentation.";
+        Options.warning ~current:true
+          "function pointers may introduce too limited instrumentation.";
 (* imprecise function call: keep each argument *)
         Dataflow.Done 
           (Some
