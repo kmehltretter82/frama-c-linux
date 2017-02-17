@@ -3,8 +3,7 @@
 int main(void)
 {
   int __retres;
-  int x;
-  x = 0;
+  int x = 0;
   /*@ assert x ≡ 0; */
   {
     {

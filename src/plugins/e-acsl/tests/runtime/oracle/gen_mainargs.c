@@ -115,10 +115,9 @@ int main(int argc, char **argv)
   i = 0;
   while (i < argc) {
     {
-      int len;
       size_t tmp;
       tmp = __gen_e_acsl_strlen((char const *)*(argv + i));
-      len = (int)tmp;
+      int len = (int)tmp;
       /*@ assert \valid(*(argv + i)); */
       {
         {

@@ -113,8 +113,7 @@ int main(void)
   int __retres;
   int found;
   {
-    int i;
-    i = 0;
+    int i = 0;
     while (i < 10) {
       A[i] = i * i;
       i ++;

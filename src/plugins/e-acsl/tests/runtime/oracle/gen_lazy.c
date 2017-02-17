@@ -3,10 +3,8 @@
 int main(void)
 {
   int __retres;
-  int x;
-  int y;
-  x = 0;
-  y = 1;
+  int x = 0;
+  int y = 1;
   /*@ assert x ≡ 0 ∧ y ≡ 1; */
   {
     {

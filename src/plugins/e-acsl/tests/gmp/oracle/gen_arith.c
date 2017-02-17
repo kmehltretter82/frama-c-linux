@@ -3,12 +3,9 @@
 int main(void)
 {
   int __retres;
-  int x;
-  int y;
-  long z;
-  x = -3;
-  y = 2;
-  z = 2L;
+  int x = -3;
+  int y = 2;
+  long z = 2L;
   /*@ assert -3 ≡ x; */
   __e_acsl_assert(-3 == x,(char *)"Assertion",(char *)"main",
                   (char *)"-3 == x",10);
