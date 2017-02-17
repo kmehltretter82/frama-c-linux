@@ -46,11 +46,26 @@ let move (vis:Visitor.generic_frama_c_visitor) ~old new_stmt =
     new_stmt.labels <- labels @ new_stmt.labels;
     Labeled_stmts.add old new_stmt;
     (* update the gotos of the function jumping to one of the labels *)
-    let o = object
+    let o orig_stmt = object
       inherit Visitor.frama_c_inplace
-      method !vstmt_aux s = match s.skind with
-      | Goto(s_ref, _) ->
-        if Cil_datatype.Stmt.equal !s_ref old then s_ref := new_stmt;
+      (* invariant of this method: [s = Cil.memo_stmt vis#behavior orig_stmt] *)
+      method !vstmt_aux s = match s.skind, orig_stmt.skind with
+      | Goto(s_ref, loc), Goto(orig_ref, _) ->
+        if Cil_datatype.Stmt.equal !s_ref old then
+          if s_ref == orig_ref then
+            (* The memo_stmt and its origin [orig_stmt] contain a shared
+               reference because [orig_stmt] has not yet been visited by [vis]
+               (forward goto). Consequently, do not modify the ref directly but
+               replace the corresponding stmt in the memoisation table. When
+               [orig_stmt] will be visited, the visitor will automatically
+               substitute it with the updated stmt. *)
+            Cil.set_stmt vis#behavior
+              orig_stmt
+              { s with skind = Goto(ref new_stmt, loc) }
+          else
+            (* Backward goto: it has already been visited and there is no more
+               sharing. Directly update the reference. *)
+            s_ref := new_stmt;
         Cil.SkipChildren
       | _ -> Cil.DoChildren
       (* improve efficiency: skip childrens which cannot contain any label *)
@@ -60,7 +75,7 @@ let move (vis:Visitor.generic_frama_c_visitor) ~old new_stmt =
     end in
     let f = Extlib.the vis#current_func in
     let mv_labels s =
-      ignore (Visitor.visitFramacStmt o (Cil.memo_stmt vis#behavior s))
+      ignore (Visitor.visitFramacStmt (o s) (Cil.memo_stmt vis#behavior s))
     in
     List.iter mv_labels f.sallstmts
 

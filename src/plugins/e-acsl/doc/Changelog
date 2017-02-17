@@ -15,6 +15,8 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
+-* E-ACSL       [2017/02/17] Fix bug with goto which points to a labeled
+	        statement which must be instrumented.
 -* E-ACSL       [2017/01/23] Fix bug #2252 about pointer arithmetic with
 	        negative offsets.
 -* E-ACSL       [2017/01/23] Fix bug with typing of unary and binary
