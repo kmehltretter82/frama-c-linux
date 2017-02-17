@@ -635,17 +635,16 @@ you must call function `__e_acsl_memory_init` by yourself.@]";
     if not (may_safely_ignore assigned_lv) &&
       Mmodel_analysis.must_model_lval ~kf ~stmt checked_lv
     then
-      (* must be in the new project to build a new stmt *)
-      Project.on
-        prj
-        (fun () ->
-          let new_stmt =
-            Misc.mk_debug_mmodel_stmt (Misc.mk_initialize loc assigned_lv)
-          in
-          let before = Cil.memo_stmt self#behavior stmt in
-          let new_stmt = Cil.memo_stmt self#behavior new_stmt in
-          function_env := Env.add_stmt ~before !function_env new_stmt)
-        ()
+      let new_stmt =
+        (* must be in the new project to build a new stmt *)
+        Project.on
+          prj
+          Misc.mk_debug_mmodel_stmt
+          (Misc.mk_initialize loc assigned_lv)
+      in
+      let before = Cil.memo_stmt self#behavior stmt in
+      let new_stmt = Cil.memo_stmt self#behavior new_stmt in
+      function_env := Env.add_stmt ~before !function_env new_stmt
 
   method !vinst = function
   | Set(old_lv, _, _) ->
