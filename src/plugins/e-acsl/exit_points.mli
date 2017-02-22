@@ -31,6 +31,9 @@
 val generate: Cil_types.fundec -> unit
 (** Visit a function and populate data structures used to compute exit points *)
 
+val reset: unit -> unit
+(** Clear all gathered data *)
+
 val delete_vars: Cil_types.stmt -> Cil_types.varinfo list
 (** Given a statement which potentially leads to an early scope exit (such as
    goto, break or continue) return the list of local variables which

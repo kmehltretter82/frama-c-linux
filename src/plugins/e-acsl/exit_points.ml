@@ -46,10 +46,15 @@ let labelled_jumps:
   stmt Stmt.Hashtbl.t = Stmt.Hashtbl.create 17
 (* Map labelled statements back to gotos which lead to them *)
 
-let clear () =
-  Stmt.Hashtbl.clear statement_locals;
-  Stmt.Hashtbl.clear exit_context;
-  Stmt.Hashtbl.clear labelled_jumps
+let reset () =
+  Stmt.Hashtbl.reset statement_locals;
+  Stmt.Hashtbl.reset exit_context;
+  Stmt.Hashtbl.reset labelled_jumps
+
+let empty () =
+  Stmt.Hashtbl.length statement_locals = 0 &&
+    Stmt.Hashtbl.length exit_context = 0 &&
+    Stmt.Hashtbl.length labelled_jumps = 0
 
 let filter_vars varlst1 varlst2 =
   let s1 = Varinfo.Set.of_list varlst1 in
@@ -127,5 +132,5 @@ class jump_context = object (self)
 end
 
 let generate fct =
-  clear ();
+  assert (empty ());
   let _ = Cil.visitCilFunction (new jump_context :> Cil.cilVisitor) fct in ()

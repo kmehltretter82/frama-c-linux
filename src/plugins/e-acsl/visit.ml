@@ -370,19 +370,20 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     f.sbody.blocals <- blocks
 
   method !vfunc f =
-    Exit_points.generate f;
-    if generate then
+    if generate then begin
+      Exit_points.generate f;
       let kf = Extlib.the self#current_kf in
       Options.feedback ~dkey ~level:2 "entering in function %a."
         Kernel_function.pretty kf;
       List.iter (fun vi -> vi.vghost <- false) f.slocals;
       Cil.DoChildrenPost
         (fun f ->
+          Exit_points.reset ();
           self#add_generated_variables_in_function f;
           Options.feedback ~dkey ~level:2 "function %a done."
             Kernel_function.pretty kf;
           f)
-    else
+    end else
       Cil.DoChildren
 
   method private is_return old_kf stmt =
