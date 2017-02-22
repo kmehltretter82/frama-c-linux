@@ -21,12 +21,12 @@
 (**************************************************************************)
 
 (** E-ACSL tracks a local variable by injecting:
- * - a call to [__e_acsl_store_block] at the beginning of its scope, and
- * - a call to [__e_acsl_delete_block] at the end of the scope.
- * This is not always sufficient to track variables because execution
- * may exit a scope early (for instance via a goto or a break statement).
- * This module computes program points at which extra `delete_block` statements
- * need to be added to handle such early scope exits. *)
+   - a call to [__e_acsl_store_block] at the beginning of its scope, and
+   - a call to [__e_acsl_delete_block] at the end of the scope.
+   This is not always sufficient to track variables because execution
+   may exit a scope early (for instance via a goto or a break statement).
+   This module computes program points at which extra `delete_block` statements
+   need to be added to handle such early scope exits. *)
 
 val generate: Cil_types.fundec -> unit
 (** Visit a function and populate data structures used to compute exit points *)
