@@ -24,7 +24,7 @@ open Cil_types
 open Cil_datatype
 
 let statement_locals:
-  Cil_types.varinfo list Stmt.Hashtbl.t = Stmt.Hashtbl.create 17
+  varinfo list Stmt.Hashtbl.t = Stmt.Hashtbl.create 17
 (* Mapping of statements to local variables available within that statement's
    scope. The mappings of this structure are used to determine variables which
    need to be removed before goto jumps. Generally, if some goto (with
@@ -34,7 +34,7 @@ let statement_locals:
    tracked, they need to be removed from tracking. *)
 
 let exit_context:
-  Cil_types.stmt Stmt.Hashtbl.t = Stmt.Hashtbl.create 17
+  stmt Stmt.Hashtbl.t = Stmt.Hashtbl.create 17
 (* Statement to statement mapping indicating source/destination of a jump.
    For instance, break statements are mapped to switches or loops they jump
    out from and goto statements are mapped to their labeled statements. Notably,
@@ -43,7 +43,7 @@ let exit_context:
    done for consistency, so all required information is stored uniformly. *)
 
 let labelled_jumps:
-  Cil_types.stmt Stmt.Hashtbl.t = Stmt.Hashtbl.create 17
+  stmt Stmt.Hashtbl.t = Stmt.Hashtbl.create 17
 (* Map labelled statements back to gotos which lead to them *)
 
 let clear () =
