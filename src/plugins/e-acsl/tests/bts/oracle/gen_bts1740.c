@@ -7,10 +7,9 @@ int main(void)
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   __e_acsl_store_block((void *)(& p),(size_t)8);
   {
-    int a;
+    int a = 0;
     __e_acsl_store_block((void *)(& a),(size_t)4);
     __e_acsl_full_init((void *)(& a));
-    a = 0;
     __e_acsl_full_init((void *)(& p));
     p = & a;
     /*@ assert \valid(p); */

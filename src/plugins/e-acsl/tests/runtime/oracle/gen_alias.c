@@ -2,11 +2,10 @@
 #include "stdlib.h"
 void f(int *dest, int val)
 {
-  int *ptr;
-  __e_acsl_store_block((void *)(& ptr),(size_t)8);
   __e_acsl_store_block((void *)(& dest),(size_t)8);
+  int *ptr = dest;
+  __e_acsl_store_block((void *)(& ptr),(size_t)8);
   __e_acsl_full_init((void *)(& ptr));
-  ptr = dest;
   __e_acsl_initialize((void *)ptr,sizeof(int));
   *ptr = val;
   __e_acsl_delete_block((void *)(& dest));

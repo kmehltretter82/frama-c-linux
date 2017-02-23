@@ -14,26 +14,10 @@ void __e_acsl_globals_init(void)
 int main(void)
 {
   int __retres;
-  int a[4];
   int *pa;
-  long l;
-  char *pl;
-  short *pi;
-  char *p;
-  char *pd;
-  long *q;
-  long *qd;
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   __e_acsl_globals_init();
-  __e_acsl_store_block((void *)(& qd),(size_t)8);
-  __e_acsl_store_block((void *)(& q),(size_t)8);
-  __e_acsl_store_block((void *)(& pd),(size_t)8);
-  __e_acsl_store_block((void *)(& p),(size_t)8);
-  __e_acsl_store_block((void *)(& pi),(size_t)8);
-  __e_acsl_store_block((void *)(& pl),(size_t)8);
-  __e_acsl_store_block((void *)(& l),(size_t)8);
   __e_acsl_store_block((void *)(& pa),(size_t)8);
-  __e_acsl_store_block((void *)(a),(size_t)16);
   PA = (int *)(& A);
   /*@ assert \base_addr((int *)A) ≡ \base_addr(PA); */
   {
@@ -84,14 +68,9 @@ int main(void)
                       (char *)"\\base_addr(PA + 2) == \\base_addr(&A[3])",17);
     }
   }
-  __e_acsl_initialize((void *)(a),sizeof(int));
-  a[0] = 1;
-  __e_acsl_initialize((void *)(& a[1]),sizeof(int));
-  a[1] = 2;
-  __e_acsl_initialize((void *)(& a[2]),sizeof(int));
-  a[2] = 3;
-  __e_acsl_initialize((void *)(& a[3]),sizeof(int));
-  a[3] = 4;
+  int a[4] = {1, 2, 3, 4};
+  __e_acsl_store_block((void *)(a),(size_t)16);
+  __e_acsl_full_init((void *)(a));
   __e_acsl_full_init((void *)(& pa));
   pa = (int *)(& a);
   /*@ assert \base_addr((int *)a) ≡ \base_addr(pa); */
@@ -145,10 +124,12 @@ int main(void)
                       28);
     }
   }
+  long l = (long)4;
+  __e_acsl_store_block((void *)(& l),(size_t)8);
   __e_acsl_full_init((void *)(& l));
-  l = (long)4;
+  char *pl = (char *)(& l);
+  __e_acsl_store_block((void *)(& pl),(size_t)8);
   __e_acsl_full_init((void *)(& pl));
-  pl = (char *)(& l);
   /*@ assert \base_addr(&l) ≡ \base_addr(pl); */
   {
     {
@@ -173,8 +154,9 @@ int main(void)
                       (char *)"\\base_addr(pl + 2) == \\base_addr(&l)",34);
     }
   }
+  short *pi = (short *)(& l);
+  __e_acsl_store_block((void *)(& pi),(size_t)8);
   __e_acsl_full_init((void *)(& pi));
-  pi = (short *)(& l);
   __e_acsl_full_init((void *)(& pi));
   pi ++;
   __e_acsl_full_init((void *)(& pl));
@@ -203,10 +185,12 @@ int main(void)
                       (char *)"\\base_addr(pl) == \\base_addr(&l)",39);
     }
   }
+  char *p = malloc((unsigned long)12);;
+  __e_acsl_store_block((void *)(& p),(size_t)8);
   __e_acsl_full_init((void *)(& p));
-  p = (char *)malloc((unsigned long)12);
+  char *pd = p;
+  __e_acsl_store_block((void *)(& pd),(size_t)8);
   __e_acsl_full_init((void *)(& pd));
-  pd = p;
   /*@ assert \base_addr(p) ≡ \base_addr(pd); */
   {
     {
@@ -270,10 +254,12 @@ int main(void)
                       (char *)"\\base_addr(p - 5) == \\base_addr(pd)",49);
     }
   }
+  long *q = malloc((unsigned long)30 * sizeof(long));;
+  __e_acsl_store_block((void *)(& q),(size_t)8);
   __e_acsl_full_init((void *)(& q));
-  q = (long *)malloc((unsigned long)30 * sizeof(long));
+  long *qd = q;
+  __e_acsl_store_block((void *)(& qd),(size_t)8);
   __e_acsl_full_init((void *)(& qd));
-  qd = q;
   /*@ assert \base_addr(q) ≡ \base_addr(qd); */
   {
     {

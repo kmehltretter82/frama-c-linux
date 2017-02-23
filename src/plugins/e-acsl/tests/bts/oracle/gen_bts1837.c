@@ -7,14 +7,12 @@ char *S = (char *)"foo";
 int f(void)
 {
   int __retres;
-  char *s1;
-  char *s2;
-  __e_acsl_store_block((void *)(& s2),(size_t)8);
+  char *s1 = (char *)__gen_e_acsl_literal_string;
   __e_acsl_store_block((void *)(& s1),(size_t)8);
   __e_acsl_full_init((void *)(& s1));
-  s1 = (char *)__gen_e_acsl_literal_string;
+  char *s2 = (char *)__gen_e_acsl_literal_string_2;
+  __e_acsl_store_block((void *)(& s2),(size_t)8);
   __e_acsl_full_init((void *)(& s2));
-  s2 = (char *)__gen_e_acsl_literal_string_2;
   /*@ assert \valid_read(S); */
   {
     {
@@ -88,10 +86,9 @@ void __e_acsl_globals_init(void)
 int main(void)
 {
   int __retres;
-  int i;
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   __e_acsl_globals_init();
-  i = 4;
+  int i = 4;
   while (1) {
     int tmp;
     { /* sequence */
@@ -102,10 +99,9 @@ int main(void)
     }
     if (! tmp) break;
     {
-      char *s;
+      char *s = (char *)__gen_e_acsl_literal_string_3;
       __e_acsl_store_block((void *)(& s),(size_t)8);
       __e_acsl_full_init((void *)(& s));
-      s = (char *)__gen_e_acsl_literal_string_3;
       /*@ assert \valid_read(s); */
       {
         {

@@ -47,13 +47,12 @@ void __e_acsl_globals_init(void)
 int main(void)
 {
   int __retres;
-  int x;
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   __e_acsl_globals_init();
-  __e_acsl_store_block((void *)(& x),(size_t)4);
   __e_acsl_store_block((void *)(& __retres),(size_t)4);
+  int x = 0;
+  __e_acsl_store_block((void *)(& x),(size_t)4);
   __e_acsl_full_init((void *)(& x));
-  x = 0;
   f();
   /*@ assert &x ≡ &x; */
   __e_acsl_assert(& x == & x,(char *)"Assertion",(char *)"main",

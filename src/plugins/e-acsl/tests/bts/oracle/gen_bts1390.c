@@ -30,12 +30,11 @@ void *memchr(void const *buf, int c, size_t n)
 {
   void *__retres;
   int i;
-  char *s;
-  __e_acsl_store_block((void *)(& s),(size_t)8);
   __e_acsl_store_block((void *)(& __retres),(size_t)8);
   __e_acsl_store_block((void *)(& buf),(size_t)8);
+  char *s = (char *)buf;
+  __e_acsl_store_block((void *)(& s),(size_t)8);
   __e_acsl_full_init((void *)(& s));
-  s = (char *)buf;
   i = 0;
   while ((size_t)i < n) {
     /*@ assert Value: mem_access: \valid_read(s); */

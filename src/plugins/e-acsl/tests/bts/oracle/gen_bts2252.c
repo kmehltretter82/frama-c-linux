@@ -21,19 +21,15 @@ void __e_acsl_globals_init(void)
 int main(void)
 {
   int __retres;
-  char *srcbuf;
   int i;
-  int loc;
-  char *destbuf;
-  char ch;
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   __e_acsl_globals_init();
+  char *srcbuf = (char *)__gen_e_acsl_literal_string;
   __e_acsl_store_block((void *)(& srcbuf),(size_t)8);
   __e_acsl_full_init((void *)(& srcbuf));
-  srcbuf = (char *)__gen_e_acsl_literal_string;
-  loc = 1;
-  destbuf = (char *)malloc((unsigned long)10 * sizeof(char));
-  ch = (char)'o';
+  int loc = 1;
+  char *destbuf = malloc((unsigned long)10 * sizeof(char));;
+  char ch = (char)'o';
   if (destbuf != (char *)0) {
     i = -1;
     while (i < 0) {

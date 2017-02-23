@@ -14,16 +14,14 @@ void __e_acsl_globals_init(void)
 int main(void)
 {
   int __retres;
-  int *p;
-  int *q;
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   __e_acsl_globals_init();
-  __e_acsl_store_block((void *)(& q),(size_t)8);
+  int *p = & a;
   __e_acsl_store_block((void *)(& p),(size_t)8);
   __e_acsl_full_init((void *)(& p));
-  p = & a;
+  int *q = & b;
+  __e_acsl_store_block((void *)(& q),(size_t)8);
   __e_acsl_full_init((void *)(& q));
-  q = & b;
   /*@ assert \initialized(&b); */
   __e_acsl_assert(1,(char *)"Assertion",(char *)"main",
                   (char *)"\\initialized(&b)",9);

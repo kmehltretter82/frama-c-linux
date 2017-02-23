@@ -79,12 +79,11 @@ void __e_acsl_globals_init(void)
 int main(void)
 {
   int __retres;
-  char *SS;
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   __e_acsl_globals_init();
+  char *SS = (char *)__gen_e_acsl_literal_string;
   __e_acsl_store_block((void *)(& SS),(size_t)8);
   __e_acsl_full_init((void *)(& SS));
-  SS = (char *)__gen_e_acsl_literal_string;
   /*@ assert *(S + G2) ≡ 'o'; */
   {
     {
