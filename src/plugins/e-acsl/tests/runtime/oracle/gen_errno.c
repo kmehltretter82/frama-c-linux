@@ -4,8 +4,8 @@
 #include "stdlib.h"
 void __e_acsl_globals_init(void)
 {
-  __e_acsl_store_block((void *)(& __FC_errno),(size_t)4);
-  __e_acsl_full_init((void *)(& __FC_errno));
+  __e_acsl_store_block((void *)(& errno),(size_t)4);
+  __e_acsl_full_init((void *)(& errno));
   return;
 }
 
@@ -17,7 +17,7 @@ int main(int argc, char const **argv)
   __e_acsl_globals_init();
   __e_acsl_store_block((void *)(& p),(size_t)8);
   __e_acsl_full_init((void *)(& p));
-  p = & __FC_errno;
+  p = & errno;
   /*@ assert \valid(p); */
   {
     {
@@ -36,7 +36,7 @@ int main(int argc, char const **argv)
     }
   }
   __retres = 0;
-  __e_acsl_delete_block((void *)(& __FC_errno));
+  __e_acsl_delete_block((void *)(& errno));
   __e_acsl_delete_block((void *)(& p));
   __e_acsl_memory_clean();
   return __retres;
