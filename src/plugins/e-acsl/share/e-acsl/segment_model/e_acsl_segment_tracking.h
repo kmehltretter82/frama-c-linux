@@ -446,7 +446,7 @@ static void shadow_alloca(void *ptr, size_t size) {
 
   unsigned int i, j = 0, k = 0;
   if (IS_LONG_BLOCK(size)) { /* Long blocks */
-	  unsigned int i, j = 0, k = 0;
+    unsigned int i, j = 0, k = 0;
     int boundary = LONG_BLOCK_BOUNDARY(size);
     for (i = 0; i < boundary; i += LONG_BLOCK) {
       /* Set-up a secondary shadow segment */
