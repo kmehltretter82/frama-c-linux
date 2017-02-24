@@ -139,7 +139,7 @@ static const char short_offsets[] = {
  * For instance, let `uintptr_t *p' point to the start of a heap segment
  * in the heap shadow, then 'p[1] | heap_init_mask` sets initialization bits.
  * NOTE: This approach cannot deal with segments larger than 64 bits. */
-const uint64_t heap_init_mask = ~(ONE << HEAP_SEGMENT);
+static const uint64_t heap_init_mask = ~(ONE << HEAP_SEGMENT);
 
 /*! \brief Masks for checking of initialization of global/stack allocated blocks.
  * A byte allocated globally or on stack is deemed initialized if its
@@ -156,16 +156,16 @@ const uint64_t heap_init_mask = ~(ONE << HEAP_SEGMENT);
  *
  * For instance, mark first X bytes of a number N as initialised:
  *    N |= static_init_masks[X] */
-const uint64_t static_init_masks [] = {
-  0, /* 0 bytes */
-  1,  /* 1 byte */
-  257,  /* 2 bytes */
-  65793,  /* 3 bytes */
-  16843009,  /* 4 bytes */
-  4311810305,  /* 5 bytes */
-  1103823438081,  /* 6 bytes */
-  282578800148737,	/* 7 bytes */
-  72340172838076673		/* 8 bytes */
+static const uint64_t static_init_masks [] = {
+  0UL, /* 0 bytes */
+  1UL,  /* 1 byte */
+  257UL,  /* 2 bytes */
+  65793UL,  /* 3 bytes */
+  16843009UL,  /* 4 bytes */
+  4311810305UL,  /* 5 bytes */
+  1103823438081UL,  /* 6 bytes */
+  282578800148737UL,	/* 7 bytes */
+  72340172838076673UL		/* 8 bytes */
 };
 
 /*! \brief Bit masks for setting read-only (second least significant) bits.
@@ -181,16 +181,16 @@ const uint64_t static_init_masks [] = {
  *
  *  For instance, mark first X bytes of a number N as read-only:
  *    N |= static_readonly_masks[X] */
-const uint64_t static_readonly_masks [] = {
-  0, /* 0 bytes */
-  2, /* 1 byte */
-  514, /* 2 bytes */
-  131586, /* 3 bytes */
-  33686018, /* 4 bytes */
-  8623620610, /* 5 bytes */
-  2207646876162, /* 6 bytes */
-  565157600297474, /* 7 bytes */
-  144680345676153346 /* 8 bytes */
+static const uint64_t static_readonly_masks [] = {
+  0UL, /* 0 bytes */
+  2UL, /* 1 byte */
+  514UL, /* 2 bytes */
+  131586UL, /* 3 bytes */
+  33686018UL, /* 4 bytes */
+  8623620610UL, /* 5 bytes */
+  2207646876162UL, /* 6 bytes */
+  565157600297474UL, /* 7 bytes */
+  144680345676153346UL /* 8 bytes */
 };
 /* }}} */
 
@@ -410,15 +410,33 @@ static uintptr_t predicate(uintptr_t addr, char p) {
  * and then for a block of 5 bytes its base offset if 11 etc. */
 static const char short_offsets_base [] = { 0, 1, 2, 4, 7, 11, 16, 22, 29 };
 
+/** Shadow masks for setting values of short blocks */
+static const uint64_t short_shadow_masks[] = {
+  0UL,
+  4UL,
+  3080UL,
+  1578000UL,
+  673456156UL,
+  258640982060UL,
+  92703853921344UL,
+  31644393008028760UL,
+  10415850140873816180UL
+};
+
 /*! \brief Record allocation of a given memory block and update shadows
  *  using offset-based encoding.
  *
  * \param ptr - pointer to a base memory address of the stack memory block.
  * \param size - size of the stack memory block. */
 static void shadow_alloca(void *ptr, size_t size) {
+  DVALIDATE_IS_ON_STATIC(ptr, size);
   unsigned char *prim_shadow = (unsigned char*)PRIMARY_SHADOW(ptr);
   uint64_t *prim_shadow_alt = (uint64_t *)PRIMARY_SHADOW(ptr);
   unsigned int *sec_shadow = (unsigned int*)SECONDARY_SHADOW(ptr);
+
+  /* Make sure static region is nullified */
+  DVALIDATE_NULLIFIED(prim_shadow, size);
+  DVALIDATE_NULLIFIED(sec_shadow, size);
 
   /* Flip read-only bit for zero-size blocks. That is, physically it exists
    * but one cannot write to it. Further, the flipped read-only bit will also
@@ -428,6 +446,7 @@ static void shadow_alloca(void *ptr, size_t size) {
 
   unsigned int i, j = 0, k = 0;
   if (IS_LONG_BLOCK(size)) { /* Long blocks */
+    unsigned int i, j = 0, k = 0;
     int boundary = LONG_BLOCK_BOUNDARY(size);
     for (i = 0; i < boundary; i += LONG_BLOCK) {
       /* Set-up a secondary shadow segment */
