@@ -36,6 +36,7 @@ tests/gmp/quantif.i:26:[value] entering loop for the first time
 tests/gmp/quantif.i:30:[value] warning: assertion got status unknown.
 tests/gmp/quantif.i:30:[value] entering loop for the first time
 [value] using specification for function __e_acsl_valid
+tests/gmp/quantif.i:31:[value] entering loop for the first time
 [value] using specification for function __e_acsl_delete_block
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main

@@ -234,6 +234,34 @@ int main(void)
                         (char *)"main",
                         (char *)"\\forall integer i; 0 <= i < 10 ==> \\valid(&buf[i])",
                         30);
+      }
+    }
+    /*@ assert ∀ char i; 0 ≤ i < 10 ⇒ \valid(&buf[i]); */
+    {
+      {
+        int __gen_e_acsl_forall_8;
+        int __gen_e_acsl_i_2;
+        __gen_e_acsl_forall_8 = 1;
+        __gen_e_acsl_i_2 = (char)0;
+        while (1) {
+          if (__gen_e_acsl_i_2 < 10) ; else break;
+          {
+            int __gen_e_acsl_valid_2;
+            __gen_e_acsl_valid_2 = __e_acsl_valid((void *)(& buf[__gen_e_acsl_i_2]),
+                                                  sizeof(int));
+            if (__gen_e_acsl_valid_2) ;
+            else {
+              __gen_e_acsl_forall_8 = 0;
+              goto e_acsl_end_loop10;
+            }
+          }
+          __gen_e_acsl_i_2 ++;
+        }
+        e_acsl_end_loop10: ;
+        __e_acsl_assert(__gen_e_acsl_forall_8,(char *)"Assertion",
+                        (char *)"main",
+                        (char *)"\\forall char i; 0 <= i < 10 ==> \\valid(&buf[i])",
+                        31);
         __e_acsl_delete_block((void *)(buf));
       }
     }
