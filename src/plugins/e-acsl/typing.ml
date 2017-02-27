@@ -73,15 +73,14 @@ include Datatype.Make
 (** Basic operations *)
 (******************************************************************************)
 
-let join ty1 ty2 =
-  if Options.Gmp_only.get () then Gmp
-  else
-    match ty1, ty2 with
-    | Other, Other -> Other
-    | Other, (Gmp | C_type _) | (Gmp | C_type _), Other ->
-      Options.fatal "[typing] join failure: integer and non integer type"
-    | Gmp, _ | _, Gmp -> Gmp
-    | C_type i1, C_type i2 ->
+let join ty1 ty2 = match ty1, ty2 with
+  | Other, Other -> Other
+  | Other, (Gmp | C_type _) | (Gmp | C_type _), Other ->
+    Options.fatal "[typing] join failure: integer and non integer type"
+  | Gmp, _ | _, Gmp -> Gmp
+  | C_type i1, C_type i2 ->
+    if Options.Gmp_only.get () then Gmp
+    else
       let ty = Cil.arithmeticConversion (TInt(i1, [])) (TInt(i2, [])) in
       match ty with
       | TInt(i, _) -> C_type i
