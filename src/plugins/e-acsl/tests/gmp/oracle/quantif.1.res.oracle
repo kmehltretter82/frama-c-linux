@@ -14,6 +14,7 @@ FRAMAC_SHARE/libc/stdlib.h:277:[kernel] warning: No code nor implicit assigns cl
   __e_acsl_init ∈ [--..--]
   __e_acsl_internal_heap ∈ [--..--]
   __e_acsl_heap_allocation_size ∈ [--..--]
+[value] using specification for function __e_acsl_memory_init
 tests/gmp/quantif.i:9:[value] warning: assertion got status unknown.
 [value] using specification for function __gmpz_init
 [value] using specification for function __gmpz_init_set_si
@@ -41,4 +42,11 @@ tests/gmp/quantif.i:25:[value] entering loop for the first time
 tests/gmp/quantif.i:26:[value] entering loop for the first time
 [value] using specification for function __gmpz_tdiv_q
 [value] using specification for function __gmpz_mul
+[value] using specification for function __e_acsl_store_block
+tests/gmp/quantif.i:30:[value] warning: assertion got status unknown.
+tests/gmp/quantif.i:30:[value] entering loop for the first time
+[value] using specification for function __gmpz_get_si
+[value] using specification for function __e_acsl_valid
+[value] using specification for function __e_acsl_delete_block
+[value] using specification for function __e_acsl_memory_clean
 [value] done for function main

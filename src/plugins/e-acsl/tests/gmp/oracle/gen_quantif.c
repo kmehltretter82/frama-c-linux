@@ -3,6 +3,7 @@
 int main(void)
 {
   int __retres;
+  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   /*@ assert ∀ ℤ x; 0 ≤ x ≤ 1 ⇒ x ≡ 0 ∨ x ≡ 1; */
   {
     {
@@ -204,7 +205,41 @@ int main(void)
                       25);
     }
   }
+  {
+    int buf[10];
+    __e_acsl_store_block((void *)(buf),(size_t)40);
+    /*@ assert ∀ ℤ i; 0 ≤ i < 10 ⇒ \valid(&buf[i]); */
+    {
+      {
+        int __gen_e_acsl_forall_7;
+        int __gen_e_acsl_i;
+        __gen_e_acsl_forall_7 = 1;
+        __gen_e_acsl_i = 0;
+        while (1) {
+          if (__gen_e_acsl_i < 10) ; else break;
+          {
+            int __gen_e_acsl_valid;
+            __gen_e_acsl_valid = __e_acsl_valid((void *)(& buf[__gen_e_acsl_i]),
+                                                sizeof(int));
+            if (__gen_e_acsl_valid) ;
+            else {
+              __gen_e_acsl_forall_7 = 0;
+              goto e_acsl_end_loop9;
+            }
+          }
+          __gen_e_acsl_i ++;
+        }
+        e_acsl_end_loop9: ;
+        __e_acsl_assert(__gen_e_acsl_forall_7,(char *)"Assertion",
+                        (char *)"main",
+                        (char *)"\\forall integer i; 0 <= i < 10 ==> \\valid(&buf[i])",
+                        30);
+        __e_acsl_delete_block((void *)(buf));
+      }
+    }
+  }
   __retres = 0;
+  __e_acsl_memory_clean();
   return __retres;
 }
 

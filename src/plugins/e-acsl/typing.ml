@@ -178,7 +178,9 @@ let ty_of_interv ?ctx i =
           let ukind = Cil.intKindForValue u is_pos in
           (* kind corresponding to the interval *)
           if Cil.intTypeIncluded lkind ukind then ukind else lkind
-        | _, _ -> Kernel.fatal ~current:true "ival: %a" Ival.pretty i
+        | None, None -> raise Cil.Not_representable (* GMP *)
+        | None, Some _ | Some _, None ->
+          Kernel.fatal ~current:true "ival: %a" Ival.pretty i
     in
     (* convert the kind to [IInt] whenever smaller. *)
     let kind = if Cil.intTypeIncluded itv_kind IInt then IInt else itv_kind in
@@ -553,8 +555,8 @@ let rec type_predicate p =
             | _ -> assert false
           in
           let i2 = Interval.infer t2 in
-            (* add one to [i2], since we increment the loop counter one more
-               time before going outside the loop. *)
+          (* add one to [i2], since we increment the loop counter one more
+             time before going outside the loop. *)
           let i2 = match r2 with
             | Rlt -> i2
             | Rle -> Ival.add_singleton_int Integer.one i2
@@ -579,6 +581,13 @@ let rec type_predicate p =
              GMP variable when --e-acsl-gmp-only *)
           ignore (type_term ~use_gmp_opt:false ~ctx t1);
           ignore (type_term ~use_gmp_opt:false ~ctx t2);
+          (* if we must generate GMP code, degrade the interval in order to
+             guarantee that [x] will be a GMP when typing the goal *)
+          let i = match ctx with
+            | C_type _ -> i
+            | Gmp -> Ival.inject_range None None (* [ -\infty; +\infty ] *)
+            | Other -> assert false
+          in
           Interval.Env.add x i)
         guards;
       (type_predicate goal).ty
@@ -589,7 +598,7 @@ let rec type_predicate p =
     | Pvalid(_, t)
     | Pvalid_read(_, t)
     | Pvalid_function t ->
-      ignore (type_term ~use_gmp_opt:true ~ctx:Other t);
+      ignore (type_term ~use_gmp_opt:false ~ctx:Other t);
       c_int
 
     | Pforall _ -> Error.not_yet "unguarded \\forall quantification"

@@ -56,6 +56,8 @@ type integer_ty = private
   | C_type of ikind
   | Other (** Any non-integral type *)
 
+val pretty: Format.formatter -> integer_ty -> unit
+
 (** {3 Smart constructors} *)
 
 val gmp: integer_ty

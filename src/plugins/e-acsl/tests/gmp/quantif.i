@@ -25,5 +25,10 @@ int main(void) {
   /*@ assert \forall int x; 0 <= x < 10
     ==> x % 2 == 0 ==> \exists integer y; 0 <= y <= x/2 && x == 2 * y; */
 
+  { // Gitlab issue #42
+    int buf[10];
+    /*@ assert \forall integer i; 0 <= i < 10 ==> \valid(buf+i); */
+  }
+
   return 0;
 }
