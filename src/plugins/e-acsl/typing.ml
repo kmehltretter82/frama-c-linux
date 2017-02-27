@@ -567,7 +567,7 @@ let rec type_predicate p =
             | Linteger -> mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx:Gmp i)
             | Ctype ty ->
               (match Cil.unrollType ty with
-              | TInt(ik, _) -> C_type ik
+              | TInt(ik, _) -> mk_ctx ~use_gmp_opt:true (C_type ik)
               | ty ->
                 Options.fatal "unexpected type %a for quantified variable %a"
                   Printer.pp_typ ty

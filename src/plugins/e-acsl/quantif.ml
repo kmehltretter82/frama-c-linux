@@ -243,6 +243,8 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
       in
       let guard = stmts_block guard_blk in
       (* increment the loop counter [x++] *)
+      (* TODO: should check that it does not overflow in the case of the type
+         of the loop variable is __declared__ too small. *)
       let tlv_one = t_plus_one tlv in
       (* previous typing ensures that [x++] fits type [ty] *)
       Typing.type_term ~use_gmp_opt:false ~ctx:ctx_one tlv_one;
