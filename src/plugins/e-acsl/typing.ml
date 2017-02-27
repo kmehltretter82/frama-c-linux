@@ -229,8 +229,8 @@ let mk_ctx ~use_gmp_opt = function
   | Other | Gmp as c -> c
   | C_type _ as c -> if use_gmp_opt && Options.Gmp_only.get () then Gmp else c
 
-(* type the term [t] in a context [ctx]. Take --e-acsl-gmp-only into account iff
-   [use_gmp_opt] is true. *)
+(* type the term [t] in a context [ctx] by taking --e-acsl-gmp-only into account
+   iff [use_gmp_opt] is true. *)
 let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
   let ctx = Extlib.opt_map (mk_ctx ~use_gmp_opt) ctx in
   let dup ty = ty, ty in
@@ -312,7 +312,7 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
         with Interval.Not_an_integer ->
           dup Other (* real *)
       in
-      ignore (type_term ~use_gmp_opt ~arith_operand:true ~ctx t');
+      ignore (type_term ~use_gmp_opt:true ~arith_operand:true ~ctx t');
       (match unop with
       | LNot -> c_int, ctx_res (* converted into [t == 0] in case of GMP *)
       | Neg | BNot -> dup ctx_res)
@@ -337,8 +337,9 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
         | _ -> true
       in
       let cast_first = cast_first t1 t2 in
-      ignore (type_term ~use_gmp_opt ~arith_operand:cast_first ~ctx t1);
-      ignore (type_term ~use_gmp_opt ~arith_operand:(not cast_first) ~ctx t2);
+      ignore (type_term ~use_gmp_opt:true ~arith_operand:cast_first ~ctx t1);
+      ignore
+        (type_term ~use_gmp_opt:true ~arith_operand:(not cast_first) ~ctx t2);
       dup ctx_res
 
     | TBinOp ((Lt | Gt | Le | Ge | Eq | Ne), t1, t2) ->
@@ -487,7 +488,7 @@ and type_term_lval (host, offset) =
 and type_term_lhost = function
   | TVar _
   | TResult _ -> ()
-  | TMem t -> ignore (type_term ~use_gmp_opt:true ~ctx:Other t)
+  | TMem t -> ignore (type_term ~use_gmp_opt:false ~ctx:Other t)
 
 and type_term_offset = function
   | TNoOffset -> ()
