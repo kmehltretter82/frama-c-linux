@@ -12,11 +12,15 @@ int main(void) {
 
   /*@ assert y == (int)0; */ ; // cast from integer to int
   /*@ assert (unsigned int) y == (unsigned int)0; */ ; /* cast from integer
-  						          to unsigned int */
+                                                          to unsigned int */
 
   /*@ assert y != (int)0xfffffffffffffff; */ ; // cast from integer to int
   /*@ assert (unsigned int) y != (unsigned int)0xfffffffffffffff; */ ;
   /* cast from integer to unsigned int */
+
+  /* heterogeneous casts from/to integers */
+  int t[2] = { 0, 1 };
+  /*@ assert (float)x == t[(int)0.1]; */
 
   return 0;
 }
