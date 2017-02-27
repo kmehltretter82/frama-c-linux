@@ -55,9 +55,16 @@ static void trace() {
     char *prefix = (counter) ? " - " : "";
     if (ipr) {
       char *outs = (char*)ipr->stdouts;
-      outs[strlen(outs)-1] = '\0';
-      if (strlen(outs) && endswith(outs, "??:0") && endswith(outs, "??:?")) {
-        printf("%s%s\n", prefix, outs);
+      if (outs) {
+        outs[strlen(outs)-1] = '\0';
+        if (strlen(outs) && endswith(outs, "??:0") && endswith(outs, "??:?")) {
+          printf("%s%s\n", prefix, outs);
+        }
+      } else {
+        char *errs = (char*)ipr->stderrs;
+        if (errs) {
+          printf("%s\n", errs);
+        }
       }
     }
     bb++;
