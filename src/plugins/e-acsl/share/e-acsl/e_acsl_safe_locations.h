@@ -67,8 +67,19 @@ extern __thread int errno;
 # error "Unknown convention for errno definition"
 #endif
 
+/* TODO: May not be utterly portable */
+#include <libio.h>
+
+extern struct _IO_FILE *stdin;		/* Standard input stream.  */
+extern struct _IO_FILE *stdout;		/* Standard output stream.  */
+extern struct _IO_FILE *stderr;		/* Standard error output stream. */
+
 void collect_safe_locations() {
   /* Tracking of errno */
   add_safe_location((uintptr_t)&errno, sizeof(int), "errno");
+  /* Tracking standard streams */
+  add_safe_location((uintptr_t)stdout, sizeof(struct _IO_FILE), "stdout");
+  add_safe_location((uintptr_t)stderr, sizeof(struct _IO_FILE), "stderr");
+  add_safe_location((uintptr_t)stdin, sizeof(struct _IO_FILE), "stdin");
 }
 #endif
