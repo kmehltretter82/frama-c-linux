@@ -176,7 +176,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
       let t1 = match rel1 with
         | Rlt ->
           let t = t_plus_one t1 in
-          Typing.type_term ~force:true ~ctx t;
+          Typing.type_term ~use_gmp_opt:false ~ctx t;
           t
         | Rle -> t1
         | Rgt | Rge | Req | Rneq -> assert false
@@ -190,7 +190,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
           t_plus_one t2, Le
         | Rgt | Rge | Req | Rneq -> assert false
       in
-      Typing.type_term ~force:true ~ctx t2_one;
+      Typing.type_term ~use_gmp_opt:false ~ctx t2_one;
       let ctx_one =
         let ty1 = Typing.get_integer_ty t1 in
         let ty2 = Typing.get_integer_ty t2_one in
@@ -227,7 +227,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
         Logic_const.term ~loc
           (TBinOp(bop2, tlv, { t2 with term_node = t2.term_node } )) Linteger
       in
-      Typing.type_term ~force:true ~ctx:Typing.c_int guard;
+      Typing.type_term ~use_gmp_opt:false ~ctx:Typing.c_int guard;
       let guard_exp, env = term_to_exp kf (Env.push env) guard in
       let break_stmt = mkStmt ~valid_sid:true (Break guard_exp.eloc) in
       let guard_blk, env =
@@ -245,7 +245,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
       (* increment the loop counter [x++] *)
       let tlv_one = t_plus_one tlv in
       (* previous typing ensures that [x++] fits type [ty] *)
-      Typing.type_term ~force:true ~ctx:ctx_one tlv_one;
+      Typing.type_term ~use_gmp_opt:false ~ctx:ctx_one tlv_one;
       let incr, env = term_to_exp kf (Env.push env) tlv_one in
       let next_blk, env = 
 	Env.pop_and_get
