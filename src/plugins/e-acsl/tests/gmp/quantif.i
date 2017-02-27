@@ -27,8 +27,11 @@ int main(void) {
 
   { // Gitlab issue #42
     int buf[10];
+    unsigned long len = 9;
     /*@ assert \forall integer i; 0 <= i < 10 ==> \valid(buf+i); */
     /*@ assert \forall char i; 0 <= i < 10 ==> \valid(buf+i); */
+    /*@ assert \forall integer i; 0 <= i < len ==> \valid(buf+i); */
+    /*@ assert \forall integer i; 0 <= i <= len ==> \valid(buf+i); */
   }
 
   return 0;

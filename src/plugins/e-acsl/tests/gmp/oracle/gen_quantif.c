@@ -207,7 +207,9 @@ int main(void)
   }
   {
     int buf[10];
+    unsigned long len;
     __e_acsl_store_block((void *)(buf),(size_t)40);
+    len = (unsigned long)9;
     /*@ assert ∀ ℤ i; 0 ≤ i < 10 ⇒ \valid(&buf[i]); */
     {
       {
@@ -233,7 +235,7 @@ int main(void)
         __e_acsl_assert(__gen_e_acsl_forall_7,(char *)"Assertion",
                         (char *)"main",
                         (char *)"\\forall integer i; 0 <= i < 10 ==> \\valid(&buf[i])",
-                        30);
+                        31);
       }
     }
     /*@ assert ∀ char i; 0 ≤ i < 10 ⇒ \valid(&buf[i]); */
@@ -261,7 +263,93 @@ int main(void)
         __e_acsl_assert(__gen_e_acsl_forall_8,(char *)"Assertion",
                         (char *)"main",
                         (char *)"\\forall char i; 0 <= i < 10 ==> \\valid(&buf[i])",
-                        31);
+                        32);
+      }
+    }
+    /*@ assert ∀ ℤ i; 0 ≤ i < len ⇒ \valid(&buf[i]); */
+    {
+      {
+        int __gen_e_acsl_forall_9;
+        unsigned long __gen_e_acsl_i_3;
+        __gen_e_acsl_forall_9 = 1;
+        __gen_e_acsl_i_3 = 0UL;
+        while (1) {
+          if (__gen_e_acsl_i_3 < len) ; else break;
+          {
+            int __gen_e_acsl_valid_3;
+            __gen_e_acsl_valid_3 = __e_acsl_valid((void *)(& buf[__gen_e_acsl_i_3]),
+                                                  sizeof(int));
+            if (__gen_e_acsl_valid_3) ;
+            else {
+              __gen_e_acsl_forall_9 = 0;
+              goto e_acsl_end_loop11;
+            }
+          }
+          __gen_e_acsl_i_3 ++;
+        }
+        e_acsl_end_loop11: ;
+        __e_acsl_assert(__gen_e_acsl_forall_9,(char *)"Assertion",
+                        (char *)"main",
+                        (char *)"\\forall integer i; 0 <= i < len ==> \\valid(&buf[i])",
+                        33);
+      }
+    }
+    /*@ assert ∀ ℤ i; 0 ≤ i ≤ len ⇒ \valid(&buf[i]); */
+    {
+      {
+        int __gen_e_acsl_forall_10;
+        __e_acsl_mpz_t __gen_e_acsl_i_4;
+        __gen_e_acsl_forall_10 = 1;
+        __gmpz_init(__gen_e_acsl_i_4);
+        {
+          __e_acsl_mpz_t __gen_e_acsl_;
+          __gmpz_init_set_si(__gen_e_acsl_,0L);
+          __gmpz_set(__gen_e_acsl_i_4,
+                     (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
+          __gmpz_clear(__gen_e_acsl_);
+        }
+        while (1) {
+          {
+            __e_acsl_mpz_t __gen_e_acsl_len;
+            int __gen_e_acsl_le;
+            __gmpz_init_set_ui(__gen_e_acsl_len,len);
+            __gen_e_acsl_le = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_i_4),
+                                         (__e_acsl_mpz_struct const *)(__gen_e_acsl_len));
+            if (__gen_e_acsl_le <= 0) ; else break;
+            __gmpz_clear(__gen_e_acsl_len);
+          }
+          {
+            long __gen_e_acsl_i_5;
+            int __gen_e_acsl_valid_4;
+            __gen_e_acsl_i_5 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_i_4));
+            __gen_e_acsl_valid_4 = __e_acsl_valid((void *)(& buf[__gen_e_acsl_i_5]),
+                                                  sizeof(int));
+            if (__gen_e_acsl_valid_4) ;
+            else {
+              __gen_e_acsl_forall_10 = 0;
+              goto e_acsl_end_loop12;
+            }
+          }
+          {
+            __e_acsl_mpz_t __gen_e_acsl__2;
+            __e_acsl_mpz_t __gen_e_acsl_add;
+            __gmpz_init_set_ui(__gen_e_acsl__2,1UL);
+            __gmpz_init(__gen_e_acsl_add);
+            __gmpz_add(__gen_e_acsl_add,
+                       (__e_acsl_mpz_struct const *)(__gen_e_acsl_i_4),
+                       (__e_acsl_mpz_struct const *)(__gen_e_acsl__2));
+            __gmpz_set(__gen_e_acsl_i_4,
+                       (__e_acsl_mpz_struct const *)(__gen_e_acsl_add));
+            __gmpz_clear(__gen_e_acsl__2);
+            __gmpz_clear(__gen_e_acsl_add);
+          }
+        }
+        e_acsl_end_loop12: ;
+        __e_acsl_assert(__gen_e_acsl_forall_10,(char *)"Assertion",
+                        (char *)"main",
+                        (char *)"\\forall integer i; 0 <= i <= len ==> \\valid(&buf[i])",
+                        34);
+        __gmpz_clear(__gen_e_acsl_i_4);
         __e_acsl_delete_block((void *)(buf));
       }
     }

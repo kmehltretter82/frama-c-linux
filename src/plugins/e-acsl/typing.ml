@@ -623,6 +623,11 @@ let type_named_predicate ?(must_clear=true) p =
   end;
   ignore (type_predicate p)
 
+let unsafe_set t ?ctx ty =
+  let ctx = match ctx with None -> ty | Some ctx -> ctx in
+  let mk _ = coerce ~arith_operand:false ~ctx ~op:ty ty in
+  ignore (Memo.memo mk t)
+
 (******************************************************************************)
 (** {2 Getters} *)
 (******************************************************************************)

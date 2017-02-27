@@ -22,6 +22,7 @@ tests/gmp/quantif.i:9:[value] warning: assertion got status unknown.
 [value] using specification for function __gmpz_clear
 tests/gmp/quantif.i:9:[value] entering loop for the first time
 [value] using specification for function __gmpz_cmp
+[value] using specification for function __gmpz_init_set_str
 [value] using specification for function __gmpz_add
 [value] using specification for function __e_acsl_assert
 FRAMAC_SHARE/e-acsl/e_acsl.h:43:[value] warning: function __e_acsl_assert: precondition got status unknown.
@@ -42,11 +43,16 @@ tests/gmp/quantif.i:26:[value] entering loop for the first time
 [value] using specification for function __gmpz_tdiv_q
 [value] using specification for function __gmpz_mul
 [value] using specification for function __e_acsl_store_block
-tests/gmp/quantif.i:30:[value] warning: assertion got status unknown.
-tests/gmp/quantif.i:30:[value] entering loop for the first time
+tests/gmp/quantif.i:31:[value] warning: assertion got status unknown.
+tests/gmp/quantif.i:31:[value] entering loop for the first time
 [value] using specification for function __gmpz_get_si
 [value] using specification for function __e_acsl_valid
-tests/gmp/quantif.i:31:[value] entering loop for the first time
+tests/gmp/quantif.i:32:[value] entering loop for the first time
+tests/gmp/quantif.i:33:[value] warning: assertion got status unknown.
+tests/gmp/quantif.i:33:[value] entering loop for the first time
+[value] using specification for function __gmpz_init_set_ui
+tests/gmp/quantif.i:34:[value] warning: assertion got status unknown.
+tests/gmp/quantif.i:34:[value] entering loop for the first time
 [value] using specification for function __e_acsl_delete_block
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main

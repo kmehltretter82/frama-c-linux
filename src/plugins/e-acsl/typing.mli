@@ -125,6 +125,10 @@ val get_cast: term -> typ option
 val get_cast_of_predicate: predicate -> typ option
 (** Like {!get_cast}, but for predicates. *)
 
+val unsafe_set: term -> ?ctx:integer_ty -> integer_ty -> unit
+(** Register that the given term has the given type in the given context (if
+    any). No verification is done. *)
+
 (******************************************************************************)
 (** {2 Internal stuff} *)
 (******************************************************************************)

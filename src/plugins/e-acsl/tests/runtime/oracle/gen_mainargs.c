@@ -45,7 +45,7 @@ int main(int argc, char **argv)
             goto e_acsl_end_loop1;
           }
         }
-        __gen_e_acsl_k = (int)(__gen_e_acsl_k + 1L);
+        __gen_e_acsl_k ++;
       }
       e_acsl_end_loop1: ;
       __e_acsl_assert(__gen_e_acsl_forall,(char *)"Assertion",(char *)"main",

@@ -100,7 +100,7 @@ int __gen_e_acsl_sorted(int *t, int n)
           goto e_acsl_end_loop1;
         }
       }
-      __gen_e_acsl_i = (int)(__gen_e_acsl_i + 1L);
+      __gen_e_acsl_i ++;
     }
     e_acsl_end_loop1: ;
     __gen_e_acsl_at = __gen_e_acsl_forall;
