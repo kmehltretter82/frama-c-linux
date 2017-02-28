@@ -524,13 +524,11 @@ let register_predicate kf pred state =
     | Local_init(v,AssignInit i,_) ->
       let state = do_init v i state in
       Dataflow.Done (Some state)
-    | Local_init(v,ConsInit(f,args,has_addr_arg),_) ->
-      let res, args =
-        if has_addr_arg then None, Cil.mkAddrOfVi v :: args
-        else Some(Cil.var v),args
-      in
-      do_call res f args state
-    | Call(result, f_exp, l, _) -> 
+    | Local_init(v,ConsInit(f,args,Constructor),_) ->
+      do_call None f (Cil.mkAddrOfVi v :: args) state
+    | Local_init(v,ConsInit(f,args,Plain_func),_) ->
+      do_call (Some (Cil.var v)) f args state
+    | Call(result, f_exp, l, _) ->
       (match f_exp.enode with
       | Lval(Var vi, NoOffset) -> do_call result vi l state
       | _ ->
