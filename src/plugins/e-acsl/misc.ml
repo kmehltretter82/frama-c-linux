@@ -232,7 +232,7 @@ let mk_initialize ~loc (host, offset as lv) = match host, offset with
       (mk_api_name "initialize")
       [ Cil.mkAddrOf ~loc lv; Cil.new_exp loc (SizeOf typ) ]
 
-let mk_store_stmt_aux name ?str_size vi =
+let mk_named_store_stmt name ?str_size vi =
   let ty = Cil.unrollType vi.vtype in
   let loc = vi.vdecl in
   let store = mk_call ~loc (mk_api_name name) in
@@ -246,10 +246,10 @@ let mk_store_stmt_aux name ?str_size vi =
   mk_debug_mmodel_stmt stmt
 
 let mk_store_stmt ?str_size vi =
-  mk_store_stmt_aux "store_block" ?str_size vi
+  mk_named_store_stmt "store_block" ?str_size vi
 
 let mk_duplicate_store_stmt ?str_size vi =
-  mk_store_stmt_aux "store_block_duplicate" ?str_size vi
+  mk_named_store_stmt "store_block_duplicate" ?str_size vi
 
 let mk_delete_stmt vi =
   let loc = vi.vdecl in
