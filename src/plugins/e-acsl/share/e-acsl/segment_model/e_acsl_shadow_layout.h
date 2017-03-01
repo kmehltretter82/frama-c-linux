@@ -71,7 +71,7 @@ char *strerror(int errnum);
 #define PGM_HEAP_SIZE (256 * MB)
 
 /*! \brief Size of a program's Thread-local storage (TLS) */
-#define PGM_TLS_SIZE (8 * MB)
+#define PGM_TLS_SIZE (16 * MB)
 /* }}} */
 
 /** Thread-local storage information {{{ */

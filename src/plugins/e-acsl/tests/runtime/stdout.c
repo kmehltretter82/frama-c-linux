@@ -1,11 +1,12 @@
 /* run.config
-   COMMENT: __fc_stdout et __fc_fopen
+   COMMENT: ensure that standard streams are properly tracked
 */
 
-#include<stdio.h>
+#include <stdio.h>
 
-int main(){
-  FILE *f = stdout;
-  FILE *f2 = fopen("/tmp/foo","wb");
-  //@ assert f == stdout;
+int main(void) {
+  /*@assert \valid(stderr); */
+  /*@assert \valid(stdin); */
+  /*@assert \valid(stdout); */
+  return 0;
 }

@@ -155,6 +155,7 @@ static void memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
   collect_safe_locations();
   int i;
   for (i = 0; i < safe_location_counter; i++) {
+    DLOG("Safe location %lu\n", safe_locations[i].address, safe_locations[i].address + safe_locations[i].length);
     void *addr = (void*)safe_locations[i].address;
     uintptr_t len = safe_locations[i].length;
     shadow_alloca(addr, len);
