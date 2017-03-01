@@ -51,7 +51,7 @@ let reset () =
   Stmt.Hashtbl.reset exit_context;
   Stmt.Hashtbl.reset labelled_jumps
 
-let empty () =
+let is_empty () =
   Stmt.Hashtbl.length statement_locals = 0 &&
     Stmt.Hashtbl.length exit_context = 0 &&
     Stmt.Hashtbl.length labelled_jumps = 0
@@ -132,5 +132,5 @@ class jump_context = object (self)
 end
 
 let generate fct =
-  assert (empty ());
+  assert (is_empty ());
   let _ = Cil.visitCilFunction (new jump_context :> Cil.cilVisitor) fct in ()
