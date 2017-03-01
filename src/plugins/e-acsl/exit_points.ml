@@ -23,8 +23,6 @@
 open Cil_types
 open Cil_datatype
 
-let statement_locals:
-  varinfo list Stmt.Hashtbl.t = Stmt.Hashtbl.create 17
 (* Mapping of statements to local variables available within that statement's
    scope. The mappings of this structure are used to determine variables which
    need to be removed before goto jumps. Generally, if some goto (with
@@ -32,68 +30,89 @@ let statement_locals:
    scope variables given by set L', then the goto exists the scopes of
    variables given via set G' \ L'. Consequently, if those variables are
    tracked, they need to be removed from tracking. *)
+module SLocals: sig
+  val add: stmt -> varinfo list -> unit
+  val find: stmt -> varinfo list
+  val is_empty: unit -> bool
+  val reset: unit -> unit
+end = struct
+  let statement_locals = Stmt.Hashtbl.create 17
+  let add stmt locals =
+    Stmt.Hashtbl.replace statement_locals stmt locals
+  let find stmt =
+    Stmt.Hashtbl.find statement_locals stmt
+  let is_empty () =
+    Stmt.Hashtbl.length statement_locals = 0
+  let reset () = Stmt.Hashtbl.reset statement_locals
+end
 
-let exit_context:
-  stmt Stmt.Hashtbl.t = Stmt.Hashtbl.create 17
 (* Statement to statement mapping indicating source/destination of a jump.
    For instance, break statements are mapped to switches or loops they jump
    out from and goto statements are mapped to their labeled statements. Notably,
    such information does not really be computed for gotos (since they already
    capture references to labelled statements they jumps to). Nevertheless it is
    done for consistency, so all required information is stored uniformly. *)
+module Exits: sig
+  val add: stmt -> stmt -> unit
+  val find: stmt -> stmt
+  val is_empty: unit -> bool
+  val reset: unit -> unit
+end = struct
+  let exit_context = Stmt.Hashtbl.create 17
+  let add stmt from =
+    Stmt.Hashtbl.replace exit_context stmt from
+  let find stmt =
+    Stmt.Hashtbl.find exit_context stmt
+  let is_empty () =
+    Stmt.Hashtbl.length exit_context = 0
+  let reset () = Stmt.Hashtbl.reset exit_context
+end
 
-let labelled_jumps:
-  stmt Stmt.Hashtbl.t = Stmt.Hashtbl.create 17
 (* Map labelled statements back to gotos which lead to them *)
+module LJumps: sig
+  val add: stmt -> stmt -> unit
+  val find_all: stmt -> stmt list
+  val is_empty: unit -> bool
+  val reset: unit -> unit
+end = struct
+  let labelled_jumps = Stmt.Hashtbl.create 17
+  let find_all stmt =
+    Stmt.Hashtbl.find_all labelled_jumps stmt
+  let add label goto =
+    Stmt.Hashtbl.add labelled_jumps label goto
+  let is_empty () =
+    Stmt.Hashtbl.length labelled_jumps = 0
+  let reset () = Stmt.Hashtbl.reset labelled_jumps
+end
 
 let reset () =
-  Stmt.Hashtbl.reset statement_locals;
-  Stmt.Hashtbl.reset exit_context;
-  Stmt.Hashtbl.reset labelled_jumps
+  SLocals.reset ();
+  Exits.reset ();
+  LJumps.reset ()
 
 let is_empty () =
-  Stmt.Hashtbl.length statement_locals = 0 &&
-    Stmt.Hashtbl.length exit_context = 0 &&
-    Stmt.Hashtbl.length labelled_jumps = 0
+    SLocals.is_empty () && Exits.is_empty () && LJumps.is_empty ()
 
 let filter_vars varlst1 varlst2 =
   let s1 = Varinfo.Set.of_list varlst1 in
   let s2 = Varinfo.Set.of_list varlst2 in
   Varinfo.Set.elements (Varinfo.Set.diff s1 s2)
 
-let find_locals stmt =
-  Stmt.Hashtbl.find statement_locals stmt
-
-let add_locals stmt locals =
-  Stmt.Hashtbl.replace statement_locals stmt locals
-
-let add_exit stmt from =
-  Stmt.Hashtbl.replace exit_context stmt from
-
-let find_exit stmt =
-  Stmt.Hashtbl.find exit_context stmt
-
-let add_labelled label goto =
-  Stmt.Hashtbl.add labelled_jumps label goto
-
 let delete_vars stmt =
   match stmt.skind with
   | Goto(_) | Break(_) | Continue(_) ->
-    filter_vars (find_locals stmt) (find_locals (find_exit stmt))
+    filter_vars (SLocals.find stmt) (SLocals.find (Exits.find stmt))
   | _ -> []
 
 let store_vars stmt =
-  if Stmt.Hashtbl.mem labelled_jumps stmt then
-    let gotos = Stmt.Hashtbl.find_all labelled_jumps stmt in
-    let acc = List.fold_left
-      (fun acc goto ->
-        acc @ filter_vars (find_locals stmt) (find_locals goto))
-      []
-      gotos
-    in
-    Varinfo.Set.elements (Varinfo.Set.of_list acc)
-  else
+  let gotos = LJumps.find_all stmt in
+  let acc = List.fold_left
+    (fun acc goto ->
+      acc @ filter_vars (SLocals.find stmt) (SLocals.find goto))
     []
+    gotos
+  in
+  Varinfo.Set.elements (Varinfo.Set.of_list acc)
 
 class jump_context = object (_)
   inherit Visitor.frama_c_inplace
@@ -114,23 +133,23 @@ class jump_context = object (_)
   method !vstmt stmt =
     match stmt.skind with
     | Loop(_) | Switch(_) ->
-      add_locals stmt (List.flatten locals);
+      SLocals.add stmt (List.flatten locals);
       Stack.push stmt jumps;
       Cil.DoChildrenPost (fun st -> ignore(Stack.pop jumps); st)
     | Break(_) | Continue(_) ->
-      add_exit stmt (Stack.top jumps);
-      add_locals stmt (List.flatten locals);
+      Exits.add stmt (Stack.top jumps);
+      SLocals.add stmt (List.flatten locals);
       Cil.DoChildren
     | Goto(sref, _)  ->
-      add_locals stmt (List.flatten locals);
-      add_exit stmt !sref;
-      add_labelled !sref stmt;
+      SLocals.add stmt (List.flatten locals);
+      Exits.add stmt !sref;
+      LJumps.add !sref stmt;
       Cil.DoChildren
     | Instr(_) | Return(_) | If(_) | Block(_) | UnspecifiedSequence(_)
     | Throw(_) | TryCatch(_) | TryFinally(_) | TryExcept(_) ->
       (match stmt.labels with
       | [] -> ()
-      | _ :: _ -> add_locals stmt (List.flatten locals));
+      | _ :: _ -> SLocals.add stmt (List.flatten locals));
       Cil.DoChildren
 end
 
