@@ -64,8 +64,17 @@ let filter_vars varlst1 varlst2 =
 let find_locals stmt =
   Stmt.Hashtbl.find statement_locals stmt
 
+let add_locals stmt locals =
+  Stmt.Hashtbl.replace statement_locals stmt locals
+
+let add_exit stmt from =
+  Stmt.Hashtbl.replace exit_context stmt from
+
 let find_exit stmt =
   Stmt.Hashtbl.find exit_context stmt
+
+let add_labelled label goto =
+  Stmt.Hashtbl.add labelled_jumps label goto
 
 let delete_vars stmt =
   match stmt.skind with
@@ -86,24 +95,16 @@ let store_vars stmt =
   else
     []
 
-class jump_context = object (self)
+class jump_context = object (_)
   inherit Visitor.frama_c_inplace
 
   val mutable locals = [[]]
-  (* Maintained list of local variables within a scope of a visitor,
-     variables within a single scope are given by a single list *)
+  (* Maintained list of local variables within the scope of a currently
+     visited statement. Variables within a single scope are given by a
+     single list *)
 
-  val mutable jumps = []
-  (* Stack of entered switches and loops  *)
-
-  method private add_locals stmt =
-    Stmt.Hashtbl.replace statement_locals stmt (List.flatten locals)
-
-  method private add_exit stmt from =
-    Stmt.Hashtbl.replace exit_context stmt from
-
-  method private add_labelled label goto =
-    Stmt.Hashtbl.add labelled_jumps label goto
+  val jumps = Stack.create ()
+  (* Stack of entered switches and loops *)
 
   method !vblock blk =
     locals <- [blk.blocals] @ locals;
@@ -113,20 +114,20 @@ class jump_context = object (self)
   method !vstmt stmt =
     match stmt.skind with
     | Loop(_) | Switch(_) ->
-      self#add_locals stmt;
-      jumps <- stmt :: jumps;
-      Cil.DoChildrenPost (fun st -> jumps <- List.tl jumps; st)
+      add_locals stmt (List.flatten locals);
+      Stack.push stmt jumps;
+      Cil.DoChildrenPost (fun st -> let _ = Stack.pop jumps in st)
     | Break(_) | Continue(_) ->
-      self#add_exit stmt (List.hd jumps);
-      self#add_locals stmt;
+      add_exit stmt (Stack.top jumps);
+      add_locals stmt (List.flatten locals);
       Cil.DoChildren
     | Goto(sref, _)  ->
-      self#add_locals stmt;
-      self#add_exit stmt !sref;
-      self#add_labelled !sref stmt;
+      add_locals stmt (List.flatten locals);
+      add_exit stmt !sref;
+      add_labelled !sref stmt;
       Cil.DoChildren
     | _ when (List.length stmt.labels) > 0 ->
-      self#add_locals stmt;
+      add_locals stmt (List.flatten locals);
       Cil.DoChildren
     | _ -> Cil.DoChildren
 end
