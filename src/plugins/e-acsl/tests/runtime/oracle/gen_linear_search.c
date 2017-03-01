@@ -46,7 +46,7 @@ int search(int elt)
           __gen_e_acsl_forall = 0;
           goto e_acsl_end_loop1;
         }
-        __gen_e_acsl_i = (int)(__gen_e_acsl_i + 1L);
+        __gen_e_acsl_i ++;
       }
       e_acsl_end_loop1: ;
       __e_acsl_assert(__gen_e_acsl_forall,(char *)"Invariant",
@@ -93,7 +93,7 @@ int search(int elt)
               __gen_e_acsl_forall_2 = 0;
               goto e_acsl_end_loop2;
             }
-            __gen_e_acsl_i_2 = (int)(__gen_e_acsl_i_2 + 1L);
+            __gen_e_acsl_i_2 ++;
           }
           e_acsl_end_loop2: ;
           __e_acsl_assert(__gen_e_acsl_forall_2,(char *)"Invariant",

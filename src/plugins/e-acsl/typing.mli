@@ -56,6 +56,8 @@ type integer_ty = private
   | C_type of ikind
   | Other (** Any non-integral type *)
 
+val pretty: Format.formatter -> integer_ty -> unit
+
 (** {3 Smart constructors} *)
 
 val gmp: integer_ty
@@ -81,9 +83,9 @@ val join: integer_ty -> integer_ty -> integer_ty
 (** {2 Typing} *)
 (******************************************************************************)
 
-val type_term: force:bool -> ?ctx:integer_ty -> term -> unit
+val type_term: use_gmp_opt:bool -> ?ctx:integer_ty -> term -> unit
 (** Compute the type of each subterm of the given term in the given context. If
-    [force] is true, then the conversion to the given context is done even if
+    [use_gmp_opt] is false, then the conversion to the given context is done even if
     -e-acsl-gmp-only is set. *)
 
 val type_named_predicate: ?must_clear:bool -> predicate -> unit
@@ -122,6 +124,10 @@ val get_cast: term -> typ option
 
 val get_cast_of_predicate: predicate -> typ option
 (** Like {!get_cast}, but for predicates. *)
+
+val unsafe_set: term -> ?ctx:integer_ty -> integer_ty -> unit
+(** Register that the given term has the given type in the given context (if
+    any). No verification is done. *)
 
 (******************************************************************************)
 (** {2 Internal stuff} *)

@@ -168,15 +168,22 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
         let ty2 = Typing.get_integer_ty t2 in
         Typing.join ty1 ty2
       in
-      let t_plus_one t =
-        Logic_const.term ~loc
-          (TBinOp(PlusA, t, Logic_const.tinteger ~loc 1))
-          Linteger
+      let t_plus_one ?ty t =
+        (* whenever provided, [ty] is known to be the type of the result *)
+        let tone = Logic_const.tinteger ~loc 1 in
+        let res = Logic_const.term ~loc (TBinOp(PlusA, t, tone)) Linteger in
+        Extlib.may
+          (fun ty ->
+            Typing.unsafe_set tone ~ctx:ty ctx;
+            Typing.unsafe_set t ~ctx:ty ctx;
+            Typing.unsafe_set res ty)
+          ty;
+        res
       in
       let t1 = match rel1 with
         | Rlt ->
           let t = t_plus_one t1 in
-          Typing.type_term ~force:true ~ctx t;
+          Typing.type_term ~use_gmp_opt:false ~ctx t;
           t
         | Rle -> t1
         | Rgt | Rge | Req | Rneq -> assert false
@@ -190,7 +197,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
           t_plus_one t2, Le
         | Rgt | Rge | Req | Rneq -> assert false
       in
-      Typing.type_term ~force:true ~ctx t2_one;
+      Typing.type_term ~use_gmp_opt:false ~ctx t2_one;
       let ctx_one =
         let ty1 = Typing.get_integer_ty t1 in
         let ty2 = Typing.get_integer_ty t2_one in
@@ -227,7 +234,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
         Logic_const.term ~loc
           (TBinOp(bop2, tlv, { t2 with term_node = t2.term_node } )) Linteger
       in
-      Typing.type_term ~force:true ~ctx:Typing.c_int guard;
+      Typing.type_term ~use_gmp_opt:false ~ctx:Typing.c_int guard;
       let guard_exp, env = term_to_exp kf (Env.push env) guard in
       let break_stmt = mkStmt ~valid_sid:true (Break guard_exp.eloc) in
       let guard_blk, env =
@@ -242,10 +249,11 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
 	  Env.Middle
       in
       let guard = stmts_block guard_blk in
-      (* increment the loop counter [x++] *)
-      let tlv_one = t_plus_one tlv in
-      (* previous typing ensures that [x++] fits type [ty] *)
-      Typing.type_term ~force:true ~ctx:ctx_one tlv_one;
+      (* increment the loop counter [x++];
+         previous typing ensures that [x++] fits type [ty] *)
+      (* TODO: should check that it does not overflow in the case of the type
+         of the loop variable is __declared__ too small. *)
+      let tlv_one = t_plus_one ~ty:ctx_one tlv in
       let incr, env = term_to_exp kf (Env.push env) tlv_one in
       let next_blk, env = 
 	Env.pop_and_get

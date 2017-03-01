@@ -304,7 +304,7 @@ and context_insensitive_term_to_exp kf env t =
       (* [!t] is converted into [t == 0] *)
       let zero = Logic_const.tinteger 0 in
       let ctx = Typing.get_integer_ty t in
-      Typing.type_term ~force:false ~ctx zero;
+      Typing.type_term ~use_gmp_opt:true ~ctx zero;
       let e, env =
         comparison_to_exp kf ~loc ~name:"not" env Typing.gmp Eq t zero (Some t)
       in
@@ -348,7 +348,7 @@ and context_insensitive_term_to_exp kf env t =
          possible values of [t2] *)
       (* guarding divisions and modulos *)
       let zero = Logic_const.tinteger 0 in
-      Typing.type_term ~force:false ~ctx zero;
+      Typing.type_term ~use_gmp_opt:true ~ctx zero;
       (* do not generate [e2] from [t2] twice *)
       let guard, env =
         let name = name_of_binop bop ^ "_guard" in
@@ -825,7 +825,7 @@ let term_to_exp typ t =
       | _ -> Typing.other
   in
   let ctx = Extlib.opt_map ctx_of_typ typ in
-  Typing.type_term ~force:false ?ctx t;
+  Typing.type_term ~use_gmp_opt:true ?ctx t;
   let env = Env.empty (new Visitor.frama_c_copy Project_skeleton.dummy) in
   let env = Env.push env in
   let env = Env.rte env false in

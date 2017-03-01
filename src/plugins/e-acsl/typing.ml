@@ -73,15 +73,14 @@ include Datatype.Make
 (** Basic operations *)
 (******************************************************************************)
 
-let join ty1 ty2 =
-  if Options.Gmp_only.get () then Gmp
-  else
-    match ty1, ty2 with
-    | Other, Other -> Other
-    | Other, (Gmp | C_type _) | (Gmp | C_type _), Other ->
-      Options.fatal "[typing] join failure: integer and non integer type"
-    | Gmp, _ | _, Gmp -> Gmp
-    | C_type i1, C_type i2 ->
+let join ty1 ty2 = match ty1, ty2 with
+  | Other, Other -> Other
+  | Other, (Gmp | C_type _) | (Gmp | C_type _), Other ->
+    Options.fatal "[typing] join failure: integer and non integer type"
+  | Gmp, _ | _, Gmp -> Gmp
+  | C_type i1, C_type i2 ->
+    if Options.Gmp_only.get () then Gmp
+    else
       let ty = Cil.arithmeticConversion (TInt(i1, [])) (TInt(i2, [])) in
       match ty with
       | TInt(i, _) -> C_type i
@@ -179,7 +178,9 @@ let ty_of_interv ?ctx i =
           let ukind = Cil.intKindForValue u is_pos in
           (* kind corresponding to the interval *)
           if Cil.intTypeIncluded lkind ukind then ukind else lkind
-        | _, _ -> Kernel.fatal ~current:true "ival: %a" Ival.pretty i
+        | None, None -> raise Cil.Not_representable (* GMP *)
+        | None, Some _ | Some _, None ->
+          Kernel.fatal ~current:true "ival: %a" Ival.pretty i
     in
     (* convert the kind to [IInt] whenever smaller. *)
     let kind = if Cil.intTypeIncluded itv_kind IInt then IInt else itv_kind in
@@ -224,18 +225,16 @@ let offset_ty t =
 (** {2 Type system} *)
 (******************************************************************************)
 
-(* generate a context [c]. Take --e-acsl-gmp-only into account iff not
-   [force]. *)
-let mk_ctx ~force c =
-  if force then c
-  else match c with
-  | Other -> Other
-  | Gmp | C_type _ -> if Options.Gmp_only.get () then Gmp else c
+(* generate a context [c]. Take --e-acsl-gmp-only into account iff [use_gmp_opt]
+   is true. *)
+let mk_ctx ~use_gmp_opt = function
+  | Other | Gmp as c -> c
+  | C_type _ as c -> if use_gmp_opt && Options.Gmp_only.get () then Gmp else c
 
-(* type the term [t] in a context [ctx]. Take --e-acsl-gmp-only into account iff
-   not [force]. *)
-let rec type_term ~force ?(arith_operand=false) ?ctx t =
-  let ctx = Extlib.opt_map (mk_ctx ~force) ctx in
+(* type the term [t] in a context [ctx] by taking --e-acsl-gmp-only into account
+   iff [use_gmp_opt] is true. *)
+let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
+  let ctx = Extlib.opt_map (mk_ctx ~use_gmp_opt) ctx in
   let dup ty = ty, ty in
   let compute_ctx ?ctx i =
     (* in order to get a minimal amount of generated casts for operators, the
@@ -244,10 +243,10 @@ let rec type_term ~force ?(arith_operand=false) ?ctx t =
     match ctx with
     | None ->
       (* no context: factorize *)
-      dup (mk_ctx ~force:false (ty_of_interv i))
+      dup (mk_ctx ~use_gmp_opt:true (ty_of_interv i))
     | Some ctx ->
-      mk_ctx ~force:false (ty_of_interv ~ctx i),
-      mk_ctx ~force:false (ty_of_interv i)
+      mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx i),
+      mk_ctx ~use_gmp_opt:true (ty_of_interv i)
   in
   let infer t =
     Cil.CurrentLoc.set t.term_loc;
@@ -286,7 +285,7 @@ let rec type_term ~force ?(arith_operand=false) ?ctx t =
         try
           let i = Interval.infer t in
           (* [t'] must be typed, but it is a pointer *)
-          ignore (type_term ~force:false ~ctx:Other t');
+          ignore (type_term ~use_gmp_opt:true ~ctx:Other t');
           ty_of_interv ?ctx i
         with Interval.Not_an_integer ->
           assert false (* this term is an integer *)
@@ -298,8 +297,8 @@ let rec type_term ~force ?(arith_operand=false) ?ctx t =
         try
           let i = Interval.infer t in
           (* [t1] and [t2] must be typed, but they are pointers *)
-          ignore (type_term ~force:false ~ctx:Other t1);
-          ignore (type_term ~force:false ~ctx:Other t2);
+          ignore (type_term ~use_gmp_opt:true ~ctx:Other t1);
+          ignore (type_term ~use_gmp_opt:true ~ctx:Other t2);
           ty_of_interv ?ctx i
         with Interval.Not_an_integer ->
           assert false (* this term is an integer *)
@@ -315,7 +314,7 @@ let rec type_term ~force ?(arith_operand=false) ?ctx t =
         with Interval.Not_an_integer ->
           dup Other (* real *)
       in
-      ignore (type_term ~force ~arith_operand:true ~ctx t');
+      ignore (type_term ~use_gmp_opt:true ~arith_operand:true ~ctx t');
       (match unop with
       | LNot -> c_int, ctx_res (* converted into [t == 0] in case of GMP *)
       | Neg | BNot -> dup ctx_res)
@@ -340,8 +339,9 @@ let rec type_term ~force ?(arith_operand=false) ?ctx t =
         | _ -> true
       in
       let cast_first = cast_first t1 t2 in
-      ignore (type_term ~force ~arith_operand:cast_first ~ctx t1);
-      ignore (type_term ~force ~arith_operand:(not cast_first) ~ctx t2);
+      ignore (type_term ~use_gmp_opt:true ~arith_operand:cast_first ~ctx t1);
+      ignore
+        (type_term ~use_gmp_opt:true ~arith_operand:(not cast_first) ~ctx t2);
       dup ctx_res
 
     | TBinOp ((Lt | Gt | Le | Ge | Eq | Ne), t1, t2) ->
@@ -350,12 +350,12 @@ let rec type_term ~force ?(arith_operand=false) ?ctx t =
         try
           let i1 = Interval.infer t1 in
           let i2 = Interval.infer t2 in
-          mk_ctx ~force:false (ty_of_interv ?ctx (Ival.join i1 i2))
+          mk_ctx ~use_gmp_opt:true (ty_of_interv ?ctx (Ival.join i1 i2))
         with Interval.Not_an_integer ->
           Other
       in
-      ignore (type_term ~force:false ~ctx t1);
-      ignore (type_term ~force:false ~ctx t2);
+      ignore (type_term ~use_gmp_opt:true ~ctx t1);
+      ignore (type_term ~use_gmp_opt:true ~ctx t2);
       let ty = match ctx with
         | Other -> c_int
         | Gmp | C_type _ -> ctx
@@ -372,8 +372,8 @@ let rec type_term ~force ?(arith_operand=false) ?ctx t =
           Other
       in
       (* both operands fit in an int. *)
-      ignore (type_term ~force:false ~ctx:c_int t1);
-      ignore (type_term ~force:false ~ctx:c_int t2);
+      ignore (type_term ~use_gmp_opt:true ~ctx:c_int t1);
+      ignore (type_term ~use_gmp_opt:true ~ctx:c_int t2);
       dup ty
 
     | TBinOp (BAnd, _, _) -> Error.not_yet "bitwise and"
@@ -392,28 +392,31 @@ let rec type_term ~force ?(arith_operand=false) ?ctx t =
         with Interval.Not_an_integer ->
           Other
       in
-      ignore (type_term ~force:false ~ctx t');
+      ignore (type_term ~use_gmp_opt:true ~ctx t');
       dup ctx
 
     | Tif (t1, t2, t3) ->
-      let ctx1 = mk_ctx ~force:true c_int (* an int must be generated *) in
-      ignore (type_term ~force:true ~ctx:ctx1 t1);
+      let ctx1 =
+        mk_ctx ~use_gmp_opt:false c_int (* an int must be generated *)
+      in
+      ignore (type_term ~use_gmp_opt:false ~ctx:ctx1 t1);
       let i = Interval.infer t in
       let ctx =
         try
           let i2 = Interval.infer t2 in
           let i3 = Interval.infer t3 in
           let ctx = ty_of_interv ?ctx (Ival.join i (Ival.join i2 i3)) in
-          mk_ctx ~force:false ctx
+          mk_ctx ~use_gmp_opt:true ctx
         with Interval.Not_an_integer ->
           Other
       in
-      ignore (type_term ~force:false ~ctx t2);
-      ignore (type_term ~force:false ~ctx t3);
+      ignore (type_term ~use_gmp_opt:true ~ctx t2);
+      ignore (type_term ~use_gmp_opt:true ~ctx t3);
       dup ctx
 
     | Tat (t, _)
-    | TLogic_coerce (_, t) -> dup (type_term ~force ~arith_operand ?ctx t).ty
+    | TLogic_coerce (_, t) ->
+      dup (type_term ~use_gmp_opt ~arith_operand ?ctx t).ty
 
     | TCoerceE (t1, t2) ->
       let ctx =
@@ -425,8 +428,8 @@ let rec type_term ~force ?(arith_operand=false) ?ctx t =
         with Interval.Not_an_integer ->
           Other
       in
-      ignore (type_term ~force:false ~ctx t1);
-      ignore (type_term ~force:false ~ctx t2);
+      ignore (type_term ~use_gmp_opt:true ~ctx t1);
+      ignore (type_term ~use_gmp_opt:true ~ctx t2);
       dup ctx
 
     | TAddrOf tlv
@@ -437,20 +440,20 @@ let rec type_term ~force ?(arith_operand=false) ?ctx t =
 
     | Tbase_addr (_, t) ->
       (* it is a pointer, but subterms must be typed. *)
-      ignore (type_term ~force:false ~ctx:Other t);
+      ignore (type_term ~use_gmp_opt:true ~ctx:Other t);
       dup Other
 
     | TBinOp ((PlusPI | IndexPI | MinusPI), t1, t2) ->
       (* both [t1] and [t2] must be typed. *)
-      ignore (type_term ~force:false ~ctx:Other t1);
+      ignore (type_term ~use_gmp_opt:true ~ctx:Other t1);
       let ctx = offset_ty t2 in
-      ignore (type_term ~force:true ~ctx t2);
+      ignore (type_term ~use_gmp_opt:false ~ctx t2);
       dup Other
 
     | Tapp(li, _, args) ->
       let typ_arg lvi arg =
         let ctx = ty_of_logic_ty lvi.lv_type in
-        ignore (type_term ~force:true ~ctx arg)
+        ignore (type_term ~use_gmp_opt:false ~ctx arg)
       in
       List.iter2 typ_arg li.l_profile args;
       (* [li.l_type is [None] for predicate only: not possible here.
@@ -487,7 +490,7 @@ and type_term_lval (host, offset) =
 and type_term_lhost = function
   | TVar _
   | TResult _ -> ()
-  | TMem t -> ignore (type_term ~force:false ~ctx:Other t)
+  | TMem t -> ignore (type_term ~use_gmp_opt:false ~ctx:Other t)
 
 and type_term_offset = function
   | TNoOffset -> ()
@@ -495,7 +498,7 @@ and type_term_offset = function
   | TModel(_, toff) -> type_term_offset toff
   | TIndex(t, toff) ->
     let ctx = offset_ty t in
-    ignore (type_term ~force:true ~ctx t);
+    ignore (type_term ~use_gmp_opt:false ~ctx t);
     type_term_offset toff
 
 let rec type_predicate p =
@@ -512,12 +515,12 @@ let rec type_predicate p =
           let i1 = Interval.infer t1 in
           let i2 = Interval.infer t2 in
           let i = Ival.join i1 i2 in
-          mk_ctx ~force:false (ty_of_interv ~ctx:c_int i)
+          mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx:c_int i)
         with Interval.Not_an_integer ->
           Other
       in
-      ignore (type_term ~force:false ~ctx t1);
-      ignore (type_term ~force:false ~ctx t2);
+      ignore (type_term ~use_gmp_opt:true ~ctx t1);
+      ignore (type_term ~use_gmp_opt:true ~ctx t2);
       (match ctx with
       | Other -> c_int
       | Gmp | C_type _ -> ctx)
@@ -533,8 +536,8 @@ let rec type_predicate p =
       ignore (type_predicate p);
       c_int
     | Pif(t, p1, p2) ->
-      let ctx = mk_ctx ~force:true c_int in
-      ignore (type_term ~force:true ~ctx t);
+      let ctx = mk_ctx ~use_gmp_opt:false c_int in
+      ignore (type_term ~use_gmp_opt:false ~ctx t);
       ignore (type_predicate p1);
       ignore (type_predicate p2);
       c_int
@@ -552,8 +555,8 @@ let rec type_predicate p =
             | _ -> assert false
           in
           let i2 = Interval.infer t2 in
-            (* add one to [i2], since we increment the loop counter one more
-               time before going outside the loop. *)
+          (* add one to [i2], since we increment the loop counter one more
+             time before going outside the loop. *)
           let i2 = match r2 with
             | Rlt -> i2
             | Rle -> Ival.add_singleton_int Integer.one i2
@@ -561,10 +564,10 @@ let rec type_predicate p =
           in
           let i = Ival.join i1 i2 in
           let ctx = match x.lv_type with
-            | Linteger -> mk_ctx ~force:false (ty_of_interv ~ctx:Gmp i)
+            | Linteger -> mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx:Gmp i)
             | Ctype ty ->
               (match Cil.unrollType ty with
-              | TInt(ik, _) -> C_type ik
+              | TInt(ik, _) -> mk_ctx ~use_gmp_opt:true (C_type ik)
               | ty ->
                 Options.fatal "unexpected type %a for quantified variable %a"
                   Printer.pp_typ ty
@@ -576,8 +579,15 @@ let rec type_predicate p =
           in
           (* forcing when typing bounds prevents to generate an extra useless
              GMP variable when --e-acsl-gmp-only *)
-          ignore (type_term ~force:true ~ctx t1);
-          ignore (type_term ~force:true ~ctx t2);
+          ignore (type_term ~use_gmp_opt:false ~ctx t1);
+          ignore (type_term ~use_gmp_opt:false ~ctx t2);
+          (* if we must generate GMP code, degrade the interval in order to
+             guarantee that [x] will be a GMP when typing the goal *)
+          let i = match ctx with
+            | C_type _ -> i
+            | Gmp -> Ival.inject_range None None (* [ -\infty; +\infty ] *)
+            | Other -> assert false
+          in
           Interval.Env.add x i)
         guards;
       (type_predicate goal).ty
@@ -588,7 +598,7 @@ let rec type_predicate p =
     | Pvalid(_, t)
     | Pvalid_read(_, t)
     | Pvalid_function t ->
-      ignore (type_term ~force:false ~ctx:Other t);
+      ignore (type_term ~use_gmp_opt:false ~ctx:Other t);
       c_int
 
     | Pforall _ -> Error.not_yet "unguarded \\forall quantification"
@@ -599,10 +609,10 @@ let rec type_predicate p =
   in
   coerce ~arith_operand:false ~ctx:c_int ~op c_int
 
-let type_term ~force ?ctx t =
+let type_term ~use_gmp_opt ?ctx t =
   Options.feedback ~dkey ~level:4 "typing term '%a' in ctx '%a'."
     Printer.pp_term t (Pretty_utils.pp_opt pretty) ctx;
-  ignore (type_term ~force ?ctx t)
+  ignore (type_term ~use_gmp_opt ?ctx t)
 
 let type_named_predicate ?(must_clear=true) p =
   Options.feedback ~dkey ~level:3 "typing predicate '%a'."
@@ -612,6 +622,11 @@ let type_named_predicate ?(must_clear=true) p =
     Memo.clear ()
   end;
   ignore (type_predicate p)
+
+let unsafe_set t ?ctx ty =
+  let ctx = match ctx with None -> ty | Some ctx -> ctx in
+  let mk _ = coerce ~arith_operand:false ~ctx ~op:ty ty in
+  ignore (Memo.memo mk t)
 
 (******************************************************************************)
 (** {2 Getters} *)
