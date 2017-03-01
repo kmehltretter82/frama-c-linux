@@ -35,25 +35,25 @@ let function_env = ref Env.dummy
 let dft_funspec = Cil.empty_funspec ()
 let funspec = ref dft_funspec
 
-let add_tracking_fn fn ?before env kf vars generate =
+let add_tracking_stmt ?before mk_stmt env kf vars generate =
   List.fold_left
     (fun env vi ->
       if generate && Mmodel_analysis.must_model_vi ~kf vi then
         let vi = Cil.get_varinfo (Env.get_behavior env) vi in
-        Env.add_stmt ?before env (fn vi)
+        Env.add_stmt ?before env (mk_stmt vi)
       else
         env)
     env
     vars
 
 let add_store_stmt ?before env kf vars generate =
-  add_tracking_fn Misc.mk_store_stmt ?before env kf vars generate
+  add_tracking_stmt ?before Misc.mk_store_stmt env kf vars generate
 
 let add_duplicate_store_stmt ?before env kf vars generate =
-  add_tracking_fn Misc.mk_duplicate_store_stmt ?before env kf vars generate
+  add_tracking_stmt ?before Misc.mk_duplicate_store_stmt env kf vars generate
 
 let add_delete_stmt ?before env kf vars generate =
-  add_tracking_fn Misc.mk_delete_stmt ?before env kf vars generate
+  add_tracking_stmt ?before Misc.mk_delete_stmt env kf vars generate
 
 (* the main visitor performing e-acsl checking and C code generator *)
 class e_acsl_visitor prj generate = object (self)
