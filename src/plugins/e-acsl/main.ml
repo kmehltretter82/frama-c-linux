@@ -148,34 +148,35 @@ let generate_code =
         (fun () ->
           Options.feedback "beginning translation.";
           let prepared_prj = Prepare_ast.prepare () in
-          Project.set_current prepared_prj;
-          let dup_prj = Dup_functions.dup () in
           let res =
-            Project.on
-              dup_prj
-              (fun () ->
-                Gmpz.init_t ();
-                Mmodel_analysis.reset ();
-                let visit prj = Visit.do_visit ~prj true in
-                let prj = File.create_project_from_visitor name visit in
-                Loops.apply_after_transformation prj;
-                (* remove the RTE's results computed from E-ACSL: their are
-                   partial and associated with the wrong kernel function (the
-                   one of the old project). *)
-                Project.clear
-                  ~selection:(State_selection.with_dependencies !Db.RteGen.self)
-                  ~project:prj
-                  ();
-                Resulting_projects.mark_as_computed ();
-                Project.copy
-                  ~selection:(State_selection.singleton Kernel.Files.self)
-                  prj;
-                prj)
+            Project.on prepared_prj
+            (fun () ->
+              let dup_prj = Dup_functions.dup () in
+              Project.on
+                dup_prj
+                (fun () ->
+                  Gmpz.init_t ();
+                  Mmodel_analysis.reset ();
+                  let visit prj = Visit.do_visit ~prj true in
+                  let prj = File.create_project_from_visitor name visit in
+                  Loops.apply_after_transformation prj;
+                  (* remove the RTE's results computed from E-ACSL: their are
+                     partial and associated with the wrong kernel function (the
+                     one of the old project). *)
+                  Project.clear
+                    ~selection:(State_selection.with_dependencies !Db.RteGen.self)
+                    ~project:prj
+                    ();
+                  Resulting_projects.mark_as_computed ();
+                  Project.copy
+                    ~selection:(State_selection.singleton Kernel.Files.self)
+                    prj;
+                  prj)
+                ())
               ()
           in
           if Options.Debug.get () = 0 then begin
             Project.remove ~project:prepared_prj ();
-            Project.remove ~project:dup_prj ()
           end;
           Options.feedback "translation done in project \"%s\"."
             (Options.Project_name.get ());
