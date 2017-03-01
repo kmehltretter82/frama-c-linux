@@ -573,7 +573,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
           (* JS: should be done in the new project? *)
           if generate then
             (* Remove recorded function arguments *)
-            let fargs = (Kernel_function.get_formals kf) in
+            let fargs = Kernel_function.get_formals kf in
             let env = add_delete_stmt env kf fargs generate in
             let b, env =
               Env.pop_and_get env new_stmt ~global_clear:true Env.After
