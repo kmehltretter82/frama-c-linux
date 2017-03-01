@@ -35,6 +35,26 @@ let function_env = ref Env.dummy
 let dft_funspec = Cil.empty_funspec ()
 let funspec = ref dft_funspec
 
+let add_tracking_fn fn ?before env kf vars generate =
+  List.fold_left
+    (fun env vi ->
+      if generate && Mmodel_analysis.must_model_vi ~kf vi then
+        let vi = Cil.get_varinfo (Env.get_behavior env) vi in
+        Env.add_stmt ?before env (fn vi)
+      else
+        env)
+    env
+    vars
+
+let add_store_stmt ?before env kf vars generate =
+  add_tracking_fn Misc.mk_store_stmt ?before env kf vars generate
+
+let add_duplicate_store_stmt ?before env kf vars generate =
+  add_tracking_fn Misc.mk_duplicate_store_stmt ?before env kf vars generate
+
+let add_delete_stmt ?before env kf vars generate =
+  add_tracking_fn Misc.mk_delete_stmt ?before env kf vars generate
+
 (* the main visitor performing e-acsl checking and C code generator *)
 class e_acsl_visitor prj generate = object (self)
 
@@ -449,26 +469,6 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     let e = Cil.visitCilExpr o e in
     e, !env_ref
 
-  method private add_tracking_fn fn ?before env kf vars =
-    List.fold_left
-      (fun env vi ->
-        if generate && Mmodel_analysis.must_model_vi ~kf vi then
-          let vi = Cil.get_varinfo (Env.get_behavior env) vi in
-          Env.add_stmt ?before env (fn vi)
-        else
-          env)
-      env
-      vars
-
-  method private add_store_stmt ?before env kf vars =
-    self#add_tracking_fn Misc.mk_store_stmt ?before env kf vars
-
-  method private add_duplicate_store_stmt ?before env kf vars =
-    self#add_tracking_fn Misc.mk_duplicate_store_stmt ?before env kf vars
-
-  method private add_delete_stmt ?before env kf vars =
-    self#add_tracking_fn Misc.mk_delete_stmt ?before env kf vars
-
   method !vstmt_aux stmt =
     Options.debug ~level:4 "proceeding stmt (sid %d) %a@."
       stmt.sid Stmt.pretty stmt;
@@ -483,7 +483,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       if self#is_first_stmt kf stmt then
         (* JS: should be done in the new project? *)
         let env = if generate then
-          self#add_store_stmt env kf (Kernel_function.get_formals kf)
+          add_store_stmt env kf (Kernel_function.get_formals kf) generate
         else
           env
         in
@@ -520,7 +520,8 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
      * [vinst] method (which adds initializers) is executed, otherwise
      * init calls appear before store calls. *)
     let duplicates = (Exit_points.store_vars stmt) in
-    let env = self#add_duplicate_store_stmt ~before:stmt env kf duplicates in
+    let env =
+      add_duplicate_store_stmt ~before:stmt env kf duplicates generate in
     function_env := env;
 
     let mk_block stmt =
@@ -552,7 +553,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       let new_stmt, env =
         (* Remove local variables which scopes ended via goto/break/continue. *)
         let del_vars = Exit_points.delete_vars stmt in
-        let env = self#add_delete_stmt ~before:stmt env kf del_vars in
+        let env = add_delete_stmt ~before:stmt env kf del_vars generate in
         if self#is_return kf stmt then
           (* must generate the post_block before including [stmt] (the 'return')
              since no code is executed after it. However, since this statement
@@ -573,7 +574,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
           if generate then
             (* Remove recorded function arguments *)
             let fargs = (Kernel_function.get_formals kf) in
-            let env = self#add_delete_stmt env kf fargs in
+            let env = add_delete_stmt env kf fargs generate in
             let b, env =
               Env.pop_and_get env new_stmt ~global_clear:true Env.After
             in
