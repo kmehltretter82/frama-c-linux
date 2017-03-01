@@ -126,10 +126,12 @@ class jump_context = object (_)
       add_exit stmt !sref;
       add_labelled !sref stmt;
       Cil.DoChildren
-    | _ when (List.length stmt.labels) > 0 ->
-      add_locals stmt (List.flatten locals);
+    | Instr(_) | Return(_) | If(_) | Block(_) | UnspecifiedSequence(_)
+    | Throw(_) | TryCatch(_) | TryFinally(_) | TryExcept(_) ->
+      (match stmt.labels with
+      | [] -> ()
+      | _ :: _ -> add_locals stmt (List.flatten locals));
       Cil.DoChildren
-    | _ -> Cil.DoChildren
 end
 
 let generate fct =
