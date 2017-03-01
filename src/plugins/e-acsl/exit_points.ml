@@ -116,7 +116,7 @@ class jump_context = object (_)
     | Loop(_) | Switch(_) ->
       add_locals stmt (List.flatten locals);
       Stack.push stmt jumps;
-      Cil.DoChildrenPost (fun st -> let _ = Stack.pop jumps in st)
+      Cil.DoChildrenPost (fun st -> ignore(Stack.pop jumps); st)
     | Break(_) | Continue(_) ->
       add_exit stmt (Stack.top jumps);
       add_locals stmt (List.flatten locals);
@@ -136,4 +136,4 @@ end
 
 let generate fct =
   assert (is_empty ());
-  let _ = Cil.visitCilFunction (new jump_context :> Cil.cilVisitor) fct in ()
+  ignore (Cil.visitCilFunction (new jump_context :> Cil.cilVisitor) fct)
