@@ -519,7 +519,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
      * declarations are bypassed by gotos. Note: should be done before
      * [vinst] method (which adds initializers) is executed, otherwise
      * init calls appear before store calls. *)
-    let duplicates = (Exit_points.store_vars stmt) in
+    let duplicates = Exit_points.store_vars stmt in
     let env =
       add_duplicate_store_stmt ~before:stmt env kf duplicates generate in
     function_env := env;
