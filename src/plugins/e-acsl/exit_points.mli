@@ -34,7 +34,7 @@ open Cil_datatype
 val generate: fundec -> unit
 (** Visit a function and populate data structures used to compute exit points *)
 
-val reset: unit -> unit
+val clear: unit -> unit
 (** Clear all gathered data *)
 
 val delete_vars: stmt -> Varinfo.Set.t

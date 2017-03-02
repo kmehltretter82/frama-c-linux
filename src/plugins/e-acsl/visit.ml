@@ -439,7 +439,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       List.iter (fun vi -> vi.vghost <- false) f.slocals;
       Cil.DoChildrenPost
         (fun f ->
-          Exit_points.reset ();
+          Exit_points.clear ();
           self#add_generated_variables_in_function f;
           Options.feedback ~dkey ~level:2 "function %a done."
             Kernel_function.pretty kf;
