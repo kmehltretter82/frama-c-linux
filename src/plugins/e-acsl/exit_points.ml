@@ -32,13 +32,13 @@ open Cil_datatype
    tracked, they need to be removed from tracking. *)
 module SLocals: sig
   val add: stmt -> varinfo list -> unit
-  val find: stmt -> varinfo list
+  val find: stmt -> Varinfo.Set.t
   val is_empty: unit -> bool
   val reset: unit -> unit
 end = struct
   let statement_locals = Stmt.Hashtbl.create 17
   let add stmt locals =
-    Stmt.Hashtbl.replace statement_locals stmt locals
+    Stmt.Hashtbl.replace statement_locals stmt (Varinfo.Set.of_list locals)
   let find stmt =
     Stmt.Hashtbl.find statement_locals stmt
   let is_empty () =
@@ -91,11 +91,9 @@ let reset () =
   LJumps.reset ()
 
 let is_empty () =
-    SLocals.is_empty () && Exits.is_empty () && LJumps.is_empty ()
+  SLocals.is_empty () && Exits.is_empty () && LJumps.is_empty ()
 
-let filter_vars varlst1 varlst2 =
-  let s1 = Varinfo.Set.of_list varlst1 in
-  let s2 = Varinfo.Set.of_list varlst2 in
+let filter_vars s1 s2 =
   Varinfo.Set.elements (Varinfo.Set.diff s1 s2)
 
 let delete_vars stmt =
