@@ -263,13 +263,12 @@ let cty = function
   | Ctype ty -> ty
   | lty -> Options.fatal "Expecting a C type. Got %a" Printer.pp_logic_type lty
 
-let arith_op = function
-  | MinusPI -> MinusA
-  | PlusPI -> PlusA
-  | IndexPI -> PlusA
-  | _ -> assert false
-
 let rec ptr_index ?(loc=Location.unknown) ?(index=(Cil.zero loc)) exp =
+  let arith_op = function
+    | MinusPI -> MinusA
+    | PlusPI -> PlusA
+    | IndexPI -> PlusA
+    | _ -> assert false in
   match exp.enode with
   | BinOp(op, lhs, rhs, _) ->
     (match op with
