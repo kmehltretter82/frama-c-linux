@@ -10,8 +10,8 @@ int main(int argc, char **argv)
   {
     {
       int __gen_e_acsl_valid;
-      __e_acsl_store_block((void *)(& argc),(size_t)4);
       __e_acsl_store_block((void *)(& argv),(size_t)8);
+      __e_acsl_store_block((void *)(& argc),(size_t)4);
       __gen_e_acsl_valid = __e_acsl_valid((void *)(& argc),sizeof(int));
       __e_acsl_assert(__gen_e_acsl_valid,(char *)"Assertion",(char *)"main",
                       (char *)"\\valid(&argc)",10);
@@ -185,8 +185,8 @@ int main(int argc, char **argv)
     i ++;
   }
   __retres = 0;
-  __e_acsl_delete_block((void *)(& argc));
   __e_acsl_delete_block((void *)(& argv));
+  __e_acsl_delete_block((void *)(& argc));
   __e_acsl_memory_clean();
   return __retres;
 }

@@ -93,24 +93,22 @@ let reset () =
 let is_empty () =
   SLocals.is_empty () && Exits.is_empty () && LJumps.is_empty ()
 
-let filter_vars s1 s2 =
-  Varinfo.Set.elements (Varinfo.Set.diff s1 s2)
-
 let delete_vars stmt =
   match stmt.skind with
-  | Goto(_) | Break(_) | Continue(_) ->
-    filter_vars (SLocals.find stmt) (SLocals.find (Exits.find stmt))
-  | _ -> []
+  | Goto _ | Break _ | Continue _ ->
+    Varinfo.Set.diff (SLocals.find stmt) (SLocals.find (Exits.find stmt))
+  | _ ->
+    Varinfo.Set.empty
 
 let store_vars stmt =
   let gotos = LJumps.find_all stmt in
-  let acc = List.fold_left
+  List.fold_left
     (fun acc goto ->
-      acc @ filter_vars (SLocals.find stmt) (SLocals.find goto))
-    []
+      Varinfo.Set.union
+        acc
+        (Varinfo.Set.diff (SLocals.find stmt) (SLocals.find goto)))
+    Varinfo.Set.empty
     gotos
-  in
-  Varinfo.Set.elements (Varinfo.Set.of_list acc)
 
 class jump_context = object (_)
   inherit Visitor.frama_c_inplace

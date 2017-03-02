@@ -35,25 +35,66 @@ let function_env = ref Env.dummy
 let dft_funspec = Cil.empty_funspec ()
 let funspec = ref dft_funspec
 
-let add_tracking_stmt ?before mk_stmt env kf vars generate =
-  List.fold_left
-    (fun env vi ->
-      if generate && Mmodel_analysis.must_model_vi ~kf vi then
-        let vi = Cil.get_varinfo (Env.get_behavior env) vi in
-        Env.add_stmt ?before env (mk_stmt vi)
-      else
-        env)
-    env
-    vars
+(* extend the environment with statements which allocate/deallocate memory
+   blocks *)
+module Memory: sig
+  val store: ?before:stmt -> Env.t -> kernel_function -> varinfo list -> Env.t
+  val duplicate_store:
+    ?before:stmt -> Env.t -> kernel_function -> Varinfo.Set.t -> Env.t
+  val delete_from_list:
+    ?before:stmt -> Env.t -> kernel_function -> varinfo list -> Env.t
+  val delete_from_set:
+    ?before:stmt -> Env.t -> kernel_function -> Varinfo.Set.t -> Env.t
+end = struct
 
-let add_store_stmt ?before env kf vars generate =
-  add_tracking_stmt ?before Misc.mk_store_stmt env kf vars generate
+  let tracking_stmt ?before fold mk_stmt env kf vars =
+    fold
+      (fun vi env ->
+        if Mmodel_analysis.must_model_vi ~kf vi then
+          let vi = Cil.get_varinfo (Env.get_behavior env) vi in
+          Env.add_stmt ?before env (mk_stmt vi)
+        else
+          env)
+      vars
+      env
 
-let add_duplicate_store_stmt ?before env kf vars generate =
-  add_tracking_stmt ?before Misc.mk_duplicate_store_stmt env kf vars generate
+  let store ?before env kf vars =
+    tracking_stmt
+      ?before
+      List.fold_right (* small list *)
+      Misc.mk_store_stmt
+      env
+      kf
+      vars
 
-let add_delete_stmt ?before env kf vars generate =
-  add_tracking_stmt ?before Misc.mk_delete_stmt env kf vars generate
+  let duplicate_store ?before env kf vars =
+    tracking_stmt
+      ?before
+      Varinfo.Set.fold
+      Misc.mk_duplicate_store_stmt
+      env
+      kf
+      vars
+
+  let delete_from_list ?before env kf vars =
+    tracking_stmt
+      ?before
+      List.fold_right (* small list *)
+      Misc.mk_delete_stmt
+      env
+      kf
+      vars
+
+  let delete_from_set ?before env kf vars =
+    tracking_stmt
+      ?before
+      Varinfo.Set.fold
+      Misc.mk_delete_stmt
+      env
+      kf
+      vars
+
+end
 
 (* the main visitor performing e-acsl checking and C code generator *)
 class e_acsl_visitor prj generate = object (self)
@@ -482,10 +523,9 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     let env =
       if self#is_first_stmt kf stmt then
         (* JS: should be done in the new project? *)
-        let env = if generate then
-          add_store_stmt env kf (Kernel_function.get_formals kf) generate
-        else
-          env
+        let env =
+          if generate then Memory.store env kf (Kernel_function.get_formals kf)
+          else env
         in
         (* translate the precondition of the function *)
         if Dup_functions.is_generated (Extlib.the self#current_kf) then
@@ -521,7 +561,9 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
      * init calls appear before store calls. *)
     let duplicates = Exit_points.store_vars stmt in
     let env =
-      add_duplicate_store_stmt ~before:stmt env kf duplicates generate in
+      if generate then Memory.duplicate_store ~before:stmt env kf duplicates
+      else env
+    in
     function_env := env;
 
     let mk_block stmt =
@@ -553,7 +595,10 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       let new_stmt, env =
         (* Remove local variables which scopes ended via goto/break/continue. *)
         let del_vars = Exit_points.delete_vars stmt in
-        let env = add_delete_stmt ~before:stmt env kf del_vars generate in
+        let env =
+          if generate then Memory.delete_from_set ~before:stmt env kf del_vars
+          else env
+        in
         if self#is_return kf stmt then
           (* must generate the post_block before including [stmt] (the 'return')
              since no code is executed after it. However, since this statement
@@ -574,7 +619,10 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
           if generate then
             (* Remove recorded function arguments *)
             let fargs = Kernel_function.get_formals kf in
-            let env = add_delete_stmt env kf fargs generate in
+            let env =
+              if generate then Memory.delete_from_list env kf fargs
+              else env
+            in
             let b, env =
               Env.pop_and_get env new_stmt ~global_clear:true Env.After
             in

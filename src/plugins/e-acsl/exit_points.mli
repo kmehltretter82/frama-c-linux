@@ -28,18 +28,21 @@
    This module computes program points at which extra `delete_block` statements
    need to be added to handle such early scope exits. *)
 
-val generate: Cil_types.fundec -> unit
+open Cil_types
+open Cil_datatype
+
+val generate: fundec -> unit
 (** Visit a function and populate data structures used to compute exit points *)
 
 val reset: unit -> unit
 (** Clear all gathered data *)
 
-val delete_vars: Cil_types.stmt -> Cil_types.varinfo list
+val delete_vars: stmt -> Varinfo.Set.t
 (** Given a statement which potentially leads to an early scope exit (such as
    goto, break or continue) return the list of local variables which
    need to be removed from tracking before that statement is executed.
    Before calling this function [generate] need to be executed. *)
 
-val store_vars: Cil_types.stmt -> Cil_types.varinfo list
+val store_vars: stmt -> Varinfo.Set.t
 (** Compute variables that should be re-recorded before a labelled statement to
    which some goto jumps *)

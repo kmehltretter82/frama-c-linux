@@ -38,8 +38,8 @@ void g(int *p, int *q)
   int __gen_e_acsl_at_3;
   int __gen_e_acsl_at_2;
   int __gen_e_acsl_at;
-  __e_acsl_store_block((void *)(& p),(size_t)8);
   __e_acsl_store_block((void *)(& q),(size_t)8);
+  __e_acsl_store_block((void *)(& p),(size_t)8);
   __e_acsl_initialize((void *)p,sizeof(int));
   *p = 0;
   __e_acsl_initialize((void *)(p + 1),sizeof(int));
@@ -96,8 +96,8 @@ void g(int *p, int *q)
                         (char *)"\\at(*(p + \\at(*q,L1)),Here) == 2",28);
       }
     }
-    __e_acsl_delete_block((void *)(& p));
     __e_acsl_delete_block((void *)(& q));
+    __e_acsl_delete_block((void *)(& p));
     return;
 }
 
