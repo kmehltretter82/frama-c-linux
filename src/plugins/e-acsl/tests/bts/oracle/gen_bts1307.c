@@ -24,15 +24,15 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out);
  */
 void foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
 {
-  __e_acsl_store_block((void *)(& Mtmax_in),(size_t)8);
-  __e_acsl_store_block((void *)(& Mwmax),(size_t)8);
   __e_acsl_store_block((void *)(& Mtmax_out),(size_t)8);
+  __e_acsl_store_block((void *)(& Mwmax),(size_t)8);
+  __e_acsl_store_block((void *)(& Mtmax_in),(size_t)8);
   __e_acsl_initialize((void *)Mtmax_out,sizeof(float));
   *Mtmax_out = (float)((double)*Mtmax_in + ((double)5 - (double)((float)(
                                                                  5 / 80) * *Mwmax) * 0.4));
-  __e_acsl_delete_block((void *)(& Mtmax_in));
-  __e_acsl_delete_block((void *)(& Mwmax));
   __e_acsl_delete_block((void *)(& Mtmax_out));
+  __e_acsl_delete_block((void *)(& Mwmax));
+  __e_acsl_delete_block((void *)(& Mtmax_in));
   return;
 }
 
@@ -62,14 +62,14 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out);
  */
 void bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
 {
-  __e_acsl_store_block((void *)(& Mtmin_in),(size_t)8);
-  __e_acsl_store_block((void *)(& Mwmin),(size_t)8);
   __e_acsl_store_block((void *)(& Mtmin_out),(size_t)8);
+  __e_acsl_store_block((void *)(& Mwmin),(size_t)8);
+  __e_acsl_store_block((void *)(& Mtmin_in),(size_t)8);
   __e_acsl_initialize((void *)Mtmin_out,sizeof(float));
   *Mtmin_out = (float)(0.85 * (double)*Mwmin);
-  __e_acsl_delete_block((void *)(& Mtmin_in));
-  __e_acsl_delete_block((void *)(& Mwmin));
   __e_acsl_delete_block((void *)(& Mtmin_out));
+  __e_acsl_delete_block((void *)(& Mwmin));
+  __e_acsl_delete_block((void *)(& Mtmin_in));
   return;
 }
 
@@ -120,9 +120,9 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     int __gen_e_acsl_valid;
     int __gen_e_acsl_valid_2;
     int __gen_e_acsl_valid_3;
-    __e_acsl_store_block((void *)(& Mtmin_in),(size_t)8);
-    __e_acsl_store_block((void *)(& Mwmin),(size_t)8);
     __e_acsl_store_block((void *)(& Mtmin_out),(size_t)8);
+    __e_acsl_store_block((void *)(& Mwmin),(size_t)8);
+    __e_acsl_store_block((void *)(& Mtmin_in),(size_t)8);
     __gen_e_acsl_valid = __e_acsl_valid((void *)Mtmin_in,sizeof(float));
     __e_acsl_assert(__gen_e_acsl_valid,(char *)"Precondition",(char *)"bar",
                     (char *)"\\valid(Mtmin_in)",17);
@@ -190,9 +190,9 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     __e_acsl_assert(__gen_e_acsl_if,(char *)"Postcondition",(char *)"bar",
                     (char *)"*\\old(Mtmin_out) == *\\old(Mtmin_in) < 0.85 * *\\old(Mwmin)?\n  *\\old(Mtmin_in) != 0.:\n  0.85 * *\\old(Mwmin) != 0.",
                     23);
-    __e_acsl_delete_block((void *)(& Mtmin_in));
-    __e_acsl_delete_block((void *)(& Mwmin));
     __e_acsl_delete_block((void *)(& Mtmin_out));
+    __e_acsl_delete_block((void *)(& Mwmin));
+    __e_acsl_delete_block((void *)(& Mtmin_in));
     return;
   }
 }
@@ -216,9 +216,9 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     int __gen_e_acsl_valid;
     int __gen_e_acsl_valid_2;
     int __gen_e_acsl_valid_3;
-    __e_acsl_store_block((void *)(& Mtmax_in),(size_t)8);
-    __e_acsl_store_block((void *)(& Mwmax),(size_t)8);
     __e_acsl_store_block((void *)(& Mtmax_out),(size_t)8);
+    __e_acsl_store_block((void *)(& Mwmax),(size_t)8);
+    __e_acsl_store_block((void *)(& Mtmax_in),(size_t)8);
     __gen_e_acsl_valid = __e_acsl_valid((void *)Mtmax_in,sizeof(float));
     __e_acsl_assert(__gen_e_acsl_valid,(char *)"Precondition",(char *)"foo",
                     (char *)"\\valid(Mtmax_in)",5);
@@ -255,9 +255,9 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
                     (char *)"Postcondition",(char *)"foo",
                     (char *)"*\\old(Mtmax_out) == *\\old(Mtmax_in) + (5 - ((5 / 80) * *\\old(Mwmax)) * 0.4)",
                     11);
-    __e_acsl_delete_block((void *)(& Mtmax_in));
-    __e_acsl_delete_block((void *)(& Mwmax));
     __e_acsl_delete_block((void *)(& Mtmax_out));
+    __e_acsl_delete_block((void *)(& Mwmax));
+    __e_acsl_delete_block((void *)(& Mtmax_in));
     return;
   }
 }

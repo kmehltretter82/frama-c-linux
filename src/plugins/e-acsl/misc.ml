@@ -34,14 +34,14 @@ let library_files () =
       "e_acsl_gmp.h";
       "e_acsl_mmodel_api.h" ]
 
-let normalized_library_files = 
+let normalized_library_files =
   lazy (List.map Filepath.normalize (library_files ()))
 
-let is_library_loc (loc, _) = 
+let is_library_loc (loc, _) =
   List.mem loc.Lexing.pos_fname (Lazy.force normalized_library_files)
 
 let library_functions = Datatype.String.Hashtbl.create 17
-let register_library_function vi = 
+let register_library_function vi =
   Datatype.String.Hashtbl.add library_functions vi.vname vi
 
 let reset () = Datatype.String.Hashtbl.clear library_functions
@@ -69,7 +69,7 @@ let mk_call ~loc ?result fname args =
   in
   let args =
     List.map2
-      (fun (_, ty, _) arg -> 
+      (fun (_, ty, _) arg ->
 	let e =
 	  match ty, Cil.unrollType (Cil.typeOf arg), arg.enode with
 	  | TPtr _, TArray _, Lval lv -> Cil.new_exp ~loc (StartOf lv)
@@ -82,15 +82,15 @@ let mk_call ~loc ?result fname args =
   in
   Cil.mkStmtOneInstr ~valid_sid:true (Call(result, f, args, loc))
 
-type annotation_kind = 
+type annotation_kind =
   | Assertion
   | Precondition
   | Postcondition
   | Invariant
   | RTE
 
-let kind_to_string loc k = 
-  Cil.mkString 
+let kind_to_string loc k =
+  Cil.mkString
     ~loc
     (match k with
     | Assertion -> "Assertion"
@@ -143,44 +143,44 @@ let mk_api_name fname =
   e_acsl_api_prefix ^ fname
 
 let mk_gen_name name =
-  e_acsl_gen_prefix ^ name 
+  e_acsl_gen_prefix ^ name
 
 (* Build a C conditional doing a runtime assertion check. *)
 let mk_e_acsl_guard ?(reverse=false) kind kf e p =
   let loc = p.pred_loc in
-  let msg = 
+  let msg =
     Kernel.Unicode.without_unicode
-      (Format.asprintf "%a@?" Printer.pp_predicate) p 
+      (Format.asprintf "%a@?" Printer.pp_predicate) p
   in
   let line = (fst loc).Lexing.pos_lnum in
-  let e = 
-    if reverse then e else Cil.new_exp ~loc:e.eloc (UnOp(LNot, e, Cil.intType)) 
+  let e =
+    if reverse then e else Cil.new_exp ~loc:e.eloc (UnOp(LNot, e, Cil.intType))
   in
-  mk_call 
-    ~loc 
+  mk_call
+    ~loc
     (mk_api_name "assert")
-    [ e; 
-      kind_to_string loc kind; 
-      Cil.mkString ~loc (get_orig_name kf); 
-      Cil.mkString ~loc msg; 
-      Cil.integer loc line ] 
+    [ e;
+      kind_to_string loc kind;
+      Cil.mkString ~loc (get_orig_name kf);
+      Cil.mkString ~loc msg;
+      Cil.integer loc line ]
 
-let mk_block prj stmt b = 
+let mk_block prj stmt b =
   let mk b = match b.bstmts with
-    | [] -> 
+    | [] ->
       (match stmt.skind with
       | Instr(Skip _) -> stmt
       | _ -> assert false)
-    | [ s ] -> 
-      if Stmt.equal stmt s then s 
-      else 
+    | [ s ] ->
+      if Stmt.equal stmt s then s
+      else
 	(* [JS 2012/10/19] this case exactly corresponds to
 	   __e_acsl_assert(...) when the annotation is associated to a
 	   statement <skip>. Creating a block prevents the printer to add
 	   a stupid unintuitive block *)
 	Cil.mkStmt ~valid_sid:true (Block b)
     |  _ :: _ -> Cil.mkStmt ~valid_sid:true (Block b)
-  in	    
+  in
   Project.on prj mk b
 
 (* ************************************************************************** *)
@@ -188,8 +188,8 @@ let mk_block prj stmt b =
 (* ************************************************************************** *)
 
 let result_lhost kf =
-  let stmt = 
-    try Kernel_function.find_return kf 
+  let stmt =
+    try Kernel_function.find_return kf
     with Kernel_function.No_Statement -> assert false
   in
   match stmt.skind with
@@ -206,11 +206,11 @@ let result_vi kf = match result_lhost kf with
 
 let mk_debug_mmodel_stmt stmt =
   if Options.debug_atleast 1
-    && Options.is_debug_key_enabled Options.dkey_analysis 
+    && Options.is_debug_key_enabled Options.dkey_analysis
   then
     let debug = mk_call ~loc:(Stmt.loc stmt) (mk_api_name "memory_debug") [] in
     Cil.mkStmt ~valid_sid:true (Block (Cil.mkBlock [ stmt; debug]))
-  else 
+  else
     stmt
 
 let mk_full_init_stmt ?(addr=true) vi =
@@ -223,21 +223,21 @@ let mk_full_init_stmt ?(addr=true) vi =
   mk_debug_mmodel_stmt stmt
 
 let mk_initialize ~loc (host, offset as lv) = match host, offset with
-  | Var _, NoOffset -> mk_call ~loc 
+  | Var _, NoOffset -> mk_call ~loc
     (mk_api_name "full_init")
     [ Cil.mkAddrOf ~loc lv ]
-  | _ -> 
+  | _ ->
     let typ = Cil.typeOfLval lv in
-    mk_call ~loc 
+    mk_call ~loc
       (mk_api_name "initialize")
       [ Cil.mkAddrOf ~loc lv; Cil.new_exp loc (SizeOf typ) ]
 
-let mk_store_stmt ?str_size vi =
+let mk_named_store_stmt name ?str_size vi =
   let ty = Cil.unrollType vi.vtype in
   let loc = vi.vdecl in
-  let store = mk_call ~loc (mk_api_name "store_block") in
+  let store = mk_call ~loc (mk_api_name name) in
   let stmt = match ty, str_size with
-    | TArray(_, Some _,_,_), None -> 
+    | TArray(_, Some _,_,_), None ->
       store [ Cil.evar ~loc vi ; Cil.sizeOf ~loc ty ]
     | TPtr(TInt(IChar, _), _), Some size -> store [ Cil.evar ~loc vi ; size ]
     | _, None -> store [ Cil.mkAddrOfVi vi ; Cil.sizeOf ~loc ty ]
@@ -245,12 +245,17 @@ let mk_store_stmt ?str_size vi =
   in
   mk_debug_mmodel_stmt stmt
 
+let mk_store_stmt ?str_size vi =
+  mk_named_store_stmt "store_block" ?str_size vi
+
+let mk_duplicate_store_stmt ?str_size vi =
+  mk_named_store_stmt "store_block_duplicate" ?str_size vi
+
 let mk_delete_stmt vi =
   let loc = vi.vdecl in
   let stmt = match Cil.unrollType vi.vtype with
     | TArray(_, Some _, _, _) ->
       mk_call ~loc (mk_api_name "delete_block") [ Cil.evar ~loc vi ]
-      (*      | Tarray(_, None, _, _)*)
     | _ -> mk_call ~loc (mk_api_name "delete_block") [ Cil.mkAddrOfVi vi ]
   in
   mk_debug_mmodel_stmt stmt

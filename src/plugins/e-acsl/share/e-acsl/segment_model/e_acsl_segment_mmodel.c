@@ -31,6 +31,7 @@
 #include <sys/resource.h>
 
 static int valid(void * ptr, size_t size);
+static int valid_read(void * ptr, size_t size);
 
 #include "e_acsl_string.h"
 #include "e_acsl_bits.h"
@@ -55,6 +56,13 @@ static void delete_block(void * ptr) {
   /* Block deletion should be performed on stack/global addresses only,
    * heap blocks should be deallocated manually via free/cfree/realloc. */
   shadow_freea(ptr);
+}
+
+static void * store_block_duplicate(void * ptr, size_t size) {
+  if (valid_read(ptr, size))
+    delete_block(ptr);
+  shadow_alloca(ptr, size);
+  return ptr;
 }
 
 static void full_init(void * ptr) {
@@ -180,6 +188,7 @@ strong_alias(shadow_posix_memalign, posix_memalign)
 /* Explicit tracking */
 public_alias(delete_block)
 public_alias(store_block)
+public_alias(store_block_duplicate)
 /* Predicates */
 public_alias2(segment_offset, offset)
 public_alias2(segment_base_addr, base_addr)

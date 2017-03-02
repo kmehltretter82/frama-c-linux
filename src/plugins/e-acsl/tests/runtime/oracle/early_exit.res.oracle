@@ -1,0 +1,35 @@
+[e-acsl] beginning translation.
+FRAMAC_SHARE/libc/stdlib.h:277:[kernel] warning: No code nor implicit assigns clause for function calloc, generating default assigns from the prototype
+[e-acsl] translation done in project "e-acsl".
+FRAMAC_SHARE/e-acsl/e_acsl.h:43:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/early_exit.c:14:[value] warning: locals {a} escaping the scope of a block of goto_bts through p
+tests/runtime/early_exit.c:18:[value] warning: accessing left-value that contains escaping addresses.
+                 assert ¬\dangling(&p);
+tests/runtime/early_exit.c:37:[value] warning: locals {a2} escaping the scope of a block of goto_valid through q
+tests/runtime/early_exit.c:37:[value] warning: locals {a3} escaping the scope of a block of goto_valid through r
+tests/runtime/early_exit.c:47:[value] warning: accessing left-value that contains escaping addresses.
+                 assert ¬\dangling(&q);
+tests/runtime/early_exit.c:48:[value] warning: accessing left-value that contains escaping addresses.
+                 assert ¬\dangling(&r);
+tests/runtime/early_exit.c:50:[value] warning: locals {a1} escaping the scope of a block of goto_valid through p
+tests/runtime/early_exit.c:56:[value] warning: accessing left-value that contains escaping addresses.
+                 assert ¬\dangling(&p);
+tests/runtime/early_exit.c:57:[value] warning: accessing left-value that contains escaping addresses.
+                 assert ¬\dangling(&q);
+tests/runtime/early_exit.c:58:[value] warning: accessing left-value that contains escaping addresses.
+                 assert ¬\dangling(&r);
+tests/runtime/early_exit.c:79:[value] warning: locals {a1} escaping the scope of a block of switch_valid through p
+tests/runtime/early_exit.c:79:[value] warning: locals {a2} escaping the scope of a block of switch_valid through q
+tests/runtime/early_exit.c:87:[value] warning: accessing left-value that contains escaping addresses.
+                 assert ¬\dangling(&q);
+tests/runtime/early_exit.c:88:[value] warning: accessing left-value that contains escaping addresses.
+                 assert ¬\dangling(&p);
+tests/runtime/early_exit.c:103:[value] warning: locals {a1} escaping the scope of a block of while_valid through p
+tests/runtime/early_exit.c:103:[value] warning: locals {a2} escaping the scope of a block of while_valid through q
+tests/runtime/early_exit.c:116:[value] warning: accessing uninitialized left-value. assert \initialized(&p);
+tests/runtime/early_exit.c:116:[value] warning: accessing left-value that contains escaping addresses.
+                 assert ¬\dangling(&p);
+tests/runtime/early_exit.c:117:[value] warning: accessing uninitialized left-value. assert \initialized(&q);
+tests/runtime/early_exit.c:117:[value] warning: accessing left-value that contains escaping addresses.
+                 assert ¬\dangling(&q);
+tests/runtime/early_exit.c:99:[value] warning: locals {a0} escaping the scope of a block of while_valid through r

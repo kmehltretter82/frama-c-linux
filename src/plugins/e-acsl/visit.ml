@@ -26,28 +26,6 @@ open Cil_datatype
 
 let dkey = Options.dkey_translation
 
-let allocate_function env kf =
-  List.fold_left
-    (fun env vi -> 
-      if Mmodel_analysis.must_model_vi ~kf vi then
-        let vi = Cil.get_varinfo (Env.get_behavior env) vi in
-        Env.add_stmt env (Misc.mk_store_stmt vi)
-      else
-        env)
-    env
-    (Kernel_function.get_formals kf)
-
-let deallocate_function env kf  = 
-  List.fold_left
-    (fun env vi -> 
-      if Mmodel_analysis.must_model_vi ~kf vi then 
-        let vi = Cil.get_varinfo (Env.get_behavior env) vi in
-        Env.add_stmt env (Misc.mk_delete_stmt vi)
-      else
-        env)
-    env
-    (Kernel_function.get_formals kf)
-
 (* ************************************************************************** *)
 (* Visitor *)
 (* ************************************************************************** *)
@@ -57,10 +35,71 @@ let function_env = ref Env.dummy
 let dft_funspec = Cil.empty_funspec ()
 let funspec = ref dft_funspec
 
+(* extend the environment with statements which allocate/deallocate memory
+   blocks *)
+module Memory: sig
+  val store: ?before:stmt -> Env.t -> kernel_function -> varinfo list -> Env.t
+  val duplicate_store:
+    ?before:stmt -> Env.t -> kernel_function -> Varinfo.Set.t -> Env.t
+  val delete_from_list:
+    ?before:stmt -> Env.t -> kernel_function -> varinfo list -> Env.t
+  val delete_from_set:
+    ?before:stmt -> Env.t -> kernel_function -> Varinfo.Set.t -> Env.t
+end = struct
+
+  let tracking_stmt ?before fold mk_stmt env kf vars =
+    fold
+      (fun vi env ->
+        if Mmodel_analysis.must_model_vi ~kf vi then
+          let vi = Cil.get_varinfo (Env.get_behavior env) vi in
+          Env.add_stmt ?before env (mk_stmt vi)
+        else
+          env)
+      vars
+      env
+
+  let store ?before env kf vars =
+    tracking_stmt
+      ?before
+      List.fold_right (* small list *)
+      Misc.mk_store_stmt
+      env
+      kf
+      vars
+
+  let duplicate_store ?before env kf vars =
+    tracking_stmt
+      ?before
+      Varinfo.Set.fold
+      Misc.mk_duplicate_store_stmt
+      env
+      kf
+      vars
+
+  let delete_from_list ?before env kf vars =
+    tracking_stmt
+      ?before
+      List.fold_right (* small list *)
+      Misc.mk_delete_stmt
+      env
+      kf
+      vars
+
+  let delete_from_set ?before env kf vars =
+    tracking_stmt
+      ?before
+      Varinfo.Set.fold
+      Misc.mk_delete_stmt
+      env
+      kf
+      vars
+
+end
+
 (* the main visitor performing e-acsl checking and C code generator *)
 class e_acsl_visitor prj generate = object (self)
 
-  inherit Visitor.generic_frama_c_visitor 
+  inherit Visitor.generic_frama_c_visitor
     (if generate then Cil.copy_visit prj else Cil.inplace_visit ())
 
   val mutable main_fct = None
@@ -246,7 +285,8 @@ class e_acsl_visitor prj generate = object (self)
                   f.globals <- new_globals
                 | None ->
                   Kernel.warning "@[no entry point specified:@ \
-you must call function `__e_acsl_memory_init` by yourself.@]";
+you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
+                    fname;
                   f.globals <- f.globals @ [ cil_fct ]
             in
             Project.on prj build_initializer ()
@@ -327,7 +367,7 @@ you must call function `__e_acsl_memory_init` by yourself.@]";
            see bts #1392 *)
         if vi.vstorage <> Extern then
           vi.vghost <- false
-      | _ -> 
+      | _ ->
         ()
     in
     (match g with
@@ -391,33 +431,35 @@ you must call function `__e_acsl_memory_init` by yourself.@]";
     f.sbody.blocals <- blocks
 
   method !vfunc f =
-    if generate then
+    if generate then begin
+      Exit_points.generate f;
       let kf = Extlib.the self#current_kf in
-      Options.feedback ~dkey ~level:2 "entering in function %a." 
+      Options.feedback ~dkey ~level:2 "entering in function %a."
         Kernel_function.pretty kf;
       List.iter (fun vi -> vi.vghost <- false) f.slocals;
-      Cil.DoChildrenPost 
-        (fun f -> 
-          self#add_generated_variables_in_function f; 
+      Cil.DoChildrenPost
+        (fun f ->
+          Exit_points.clear ();
+          self#add_generated_variables_in_function f;
           Options.feedback ~dkey ~level:2 "function %a done."
             Kernel_function.pretty kf;
           f)
-    else
+    end else
       Cil.DoChildren
 
-  method private is_return old_kf stmt = 
-    let old_ret = 
+  method private is_return old_kf stmt =
+    let old_ret =
       try Kernel_function.find_return old_kf
       with Kernel_function.No_Statement -> assert false
     in
     Stmt.equal stmt (Cil.get_stmt self#behavior old_ret)
 
   method private is_first_stmt old_kf stmt =
-    try 
+    try
       Stmt.equal
-        (Cil.get_original_stmt self#behavior stmt) 
+        (Cil.get_original_stmt self#behavior stmt)
         (Kernel_function.find_first_stmt old_kf)
-    with Kernel_function.No_Statement -> 
+    with Kernel_function.No_Statement ->
       assert false
 
   method private is_main old_kf =
@@ -427,7 +469,7 @@ you must call function `__e_acsl_memory_init` by yourself.@]";
     with Globals.No_such_entry_point _s ->
       (* [JS 2013/05/21] already a warning in pre-analysis *)
       (*      Options.warning ~once:true "%s@ \
-              @[The generated program may be incomplete.@]" 
+              @[The generated program may be incomplete.@]"
               s;*)
       false
 
@@ -462,14 +504,14 @@ you must call function `__e_acsl_memory_init` by yourself.@]";
            Literal_strings.add s vi;
            env_ref := env;
            Cil.ChangeTo exp)
-      | _ -> 
+      | _ ->
         Cil.DoChildren
     end in
     let e = Cil.visitCilExpr o e in
     e, !env_ref
 
   method !vstmt_aux stmt =
-    Options.debug ~level:4 "proceeding stmt (sid %d) %a@." 
+    Options.debug ~level:4 "proceeding stmt (sid %d) %a@."
       stmt.sid Stmt.pretty stmt;
     let kf = Extlib.the self#current_kf in
     let is_main = self#is_main kf in
@@ -478,10 +520,13 @@ you must call function `__e_acsl_memory_init` by yourself.@]";
       | Loop _ -> Env.push_loop env
       | _ -> env
     in
-    let env = 
+    let env =
       if self#is_first_stmt kf stmt then
         (* JS: should be done in the new project? *)
-        let env = if generate then allocate_function env kf else env in
+        let env =
+          if generate then Memory.store env kf (Kernel_function.get_formals kf)
+          else env
+        in
         (* translate the precondition of the function *)
         if Dup_functions.is_generated (Extlib.the self#current_kf) then
           Project.on prj (Translate.translate_pre_spec kf Kglobal env) !funspec
@@ -490,25 +535,37 @@ you must call function `__e_acsl_memory_init` by yourself.@]";
       else
         env
     in
+
     let env, new_annots =
       Annotations.fold_code_annot
-        (fun _ old_a (env, new_annots) -> 
+        (fun _ old_a (env, new_annots) ->
           let a =
             (* [VP] Don't use Visitor here, as it will fill the queue in the
                middle of the computation... *)
             Cil.visitCilCodeAnnotation (self :> Cil.cilVisitor) old_a
           in
-          let env = 
+          let env =
             Project.on
               prj
               (Translate.translate_pre_code_annotation kf stmt env)
-              a 
+              a
           in
           env, a :: new_annots)
         (Cil.get_original_stmt self#behavior stmt)
         (env, [])
     in
+
+    (* Add [__e_acsl_store_duplicate] calls for local variables which
+     * declarations are bypassed by gotos. Note: should be done before
+     * [vinst] method (which adds initializers) is executed, otherwise
+     * init calls appear before store calls. *)
+    let duplicates = Exit_points.store_vars stmt in
+    let env =
+      if generate then Memory.duplicate_store ~before:stmt env kf duplicates
+      else env
+    in
     function_env := env;
+
     let mk_block stmt =
       (* be careful: since this function is called in a post action, [env] has
          been modified from the time where pre actions have been executed.
@@ -524,39 +581,50 @@ you must call function `__e_acsl_memory_init` by yourself.@]";
           env
       in
       let mk_post_env env =
-        (* [fold_right] to preserve order of generation of pre_conditions *) 
+        (* [fold_right] to preserve order of generation of pre_conditions *)
         Project.on
           prj
           (List.fold_right
-             (fun a env -> 
+             (fun a env ->
                Translate.translate_post_code_annotation kf stmt env a)
              new_annots)
           env
       in
       (* handle loop invariants *)
       let new_stmt, env, must_mv = Loops.preserve_invariant prj env kf stmt in
-      let new_stmt, env = 
-        if self#is_return kf stmt then 
+      let new_stmt, env =
+        (* Remove local variables which scopes ended via goto/break/continue. *)
+        let del_vars = Exit_points.delete_vars stmt in
+        let env =
+          if generate then Memory.delete_from_set ~before:stmt env kf del_vars
+          else env
+        in
+        if self#is_return kf stmt then
           (* must generate the post_block before including [stmt] (the 'return')
              since no code is executed after it. However, since this statement
              is pure (Cil invariant), that is semantically correct. *)
           let env = mk_post_env env in
           (* also handle the postcondition of the function and clear the env *)
-          let env = 
+          let env =
             if Dup_functions.is_generated (Extlib.the self#current_kf) then
               Project.on
                 prj
-                (Translate.translate_post_spec kf Kglobal env) 
-                !funspec 
+                (Translate.translate_post_spec kf Kglobal env)
+                !funspec
             else
               env
           in
           (* de-allocating memory previously allocating by the kf *)
           (* JS: should be done in the new project? *)
           if generate then
-            let env = deallocate_function env kf in
-            let b, env = 
-              Env.pop_and_get env new_stmt ~global_clear:true Env.After 
+            (* Remove recorded function arguments *)
+            let fargs = Kernel_function.get_formals kf in
+            let env =
+              if generate then Memory.delete_from_list env kf fargs
+              else env
+            in
+            let b, env =
+              Env.pop_and_get env new_stmt ~global_clear:true Env.After
             in
             if is_main && Mmodel_analysis.use_model () then begin
               let stmts = b.bstmts in
@@ -627,8 +695,8 @@ you must call function `__e_acsl_memory_init` by yourself.@]";
       | Var vi, NoOffset -> vi.vglob || vi.vformal
       | _ -> false
     in
-(*    Options.feedback "%a? %a (%b && %b)" 
-      Printer.pp_lval assigned_lv 
+(*    Options.feedback "%a? %a (%b && %b)"
+      Printer.pp_lval assigned_lv
       Printer.pp_lval checked_lv
       (not (may_safely_ignore assigned_lv))
       (Pre_analysis.must_model_lval ~kf ~stmt checked_lv);*)
@@ -649,10 +717,10 @@ you must call function `__e_acsl_memory_init` by yourself.@]";
   method !vinst = function
   | Set(old_lv, _, _) ->
     if generate then
-      Cil.DoChildrenPost 
-        (function 
-        | [ Set(new_lv, _, loc) ] as l -> 
-          self#add_initializer loc old_lv new_lv; 
+      Cil.DoChildrenPost
+        (function
+        | [ Set(new_lv, _, loc) ] as l ->
+          self#add_initializer loc old_lv new_lv;
           l
         | _ -> assert false)
     else
@@ -661,9 +729,9 @@ you must call function `__e_acsl_memory_init` by yourself.@]";
     if not generate || Misc.is_generated_kf (Extlib.the self#current_kf) then
       Cil.DoChildren
     else
-      Cil.DoChildrenPost 
-        (function 
-        | [ Call(Some new_ret, _, _, loc) ] as l -> 
+      Cil.DoChildrenPost
+        (function
+        | [ Call(Some new_ret, _, _, loc) ] as l ->
           self#add_initializer loc old_ret new_ret;
           l
         | _ -> assert false)
@@ -671,7 +739,7 @@ you must call function `__e_acsl_memory_init` by yourself.@]";
     Cil.DoChildren
 
   method !vblock blk =
-    let handle_memory new_blk = 
+    let handle_memory new_blk =
       match new_blk.blocals with
       | [] -> new_blk
       | _ :: _ ->
@@ -690,7 +758,7 @@ you must call function `__e_acsl_memory_init` by yourself.@]";
           | { skind = Return _ } as ret :: ((potential_clean :: tl) as l) ->
             (* keep the return (enclosed in a generated block) at the end;
                preceded by clean if any *)
-            let init, tl = 
+            let init, tl =
               if self#is_main kf && Mmodel_analysis.use_model () then
                 [ potential_clean; ret ], tl
               else
@@ -698,15 +766,15 @@ you must call function `__e_acsl_memory_init` by yourself.@]";
             in
             blk.bstmts <-
               List.fold_left (fun acc v -> v :: acc) (add_locals init) tl
-          | { skind = Block b } :: _ -> 
+          | { skind = Block b } :: _ ->
             insert_in_innermost_last_block b (List.rev b.bstmts)
-          | l -> blk.bstmts <- 
+          | l -> blk.bstmts <-
             List.fold_left (fun acc v -> v :: acc) (add_locals []) l
         in
         insert_in_innermost_last_block new_blk (List.rev new_blk.bstmts);
         new_blk.bstmts <-
           List.fold_left
-          (fun acc vi -> 
+          (fun acc vi ->
             if Mmodel_analysis.must_model_vi vi then
               let vi = Cil.get_varinfo self#behavior vi in
               Misc.mk_store_stmt vi :: acc
@@ -764,11 +832,11 @@ end
 let do_visit ?(prj=Project.current ()) generate =
   (* The main visitor proceeds by tracking declarations belonging to the
      E-ACSL runtime library and then using these declarations to generate
-     statements used in instrumentation. The following code reorders AST 
-     so declarations belonging to E-ACSL library appear atop of any location 
+     statements used in instrumentation. The following code reorders AST
+     so declarations belonging to E-ACSL library appear atop of any location
      requiring instrumentation. *)
-  Misc.reorder_ast ();  
-  Options.feedback ~level:2 "%s annotations in %a." 
+  Misc.reorder_ast ();
+  Options.feedback ~level:2 "%s annotations in %a."
     (if generate then "translating" else "checking")
     Project.pretty prj;
   let vis =

@@ -20,12 +20,12 @@ void __gen_e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
  */
 void atp_NORMAL_computeAverageAccel(ArrayInt *Accel, int *AverageAccel)
 {
-  __e_acsl_store_block((void *)(& Accel),(size_t)8);
   __e_acsl_store_block((void *)(& AverageAccel),(size_t)8);
+  __e_acsl_store_block((void *)(& Accel),(size_t)8);
   __e_acsl_initialize((void *)AverageAccel,sizeof(int));
   *AverageAccel = (((((*Accel)[4] + (*Accel)[3]) + (*Accel)[2]) + (*Accel)[1]) + (*Accel)[0]) / 5;
-  __e_acsl_delete_block((void *)(& Accel));
   __e_acsl_delete_block((void *)(& AverageAccel));
+  __e_acsl_delete_block((void *)(& Accel));
   return;
 }
 
@@ -71,8 +71,8 @@ void __gen_e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
   ArrayInt *__gen_e_acsl_at_3;
   ArrayInt *__gen_e_acsl_at_2;
   int *__gen_e_acsl_at;
-  __e_acsl_store_block((void *)(& Accel),(size_t)8);
   __e_acsl_store_block((void *)(& AverageAccel),(size_t)8);
+  __e_acsl_store_block((void *)(& Accel),(size_t)8);
   __gen_e_acsl_at_6 = Accel;
   __gen_e_acsl_at_5 = Accel;
   __gen_e_acsl_at_4 = Accel;
@@ -127,8 +127,8 @@ void __gen_e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
                     (char *)"atp_NORMAL_computeAverageAccel",
                     (char *)"*\\old(AverageAccel) ==\n(((((*\\old(Accel))[4] + (*\\old(Accel))[3]) + (*\\old(Accel))[2]) +\n  (*\\old(Accel))[1])\n + (*\\old(Accel))[0])\n/ 5",
                     8);
-    __e_acsl_delete_block((void *)(& Accel));
     __e_acsl_delete_block((void *)(& AverageAccel));
+    __e_acsl_delete_block((void *)(& Accel));
     return;
   }
 }

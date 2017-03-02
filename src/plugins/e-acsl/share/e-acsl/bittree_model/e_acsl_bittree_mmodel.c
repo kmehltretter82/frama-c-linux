@@ -314,6 +314,24 @@ static void delete_block(void* ptr) {
     }
   }
 }
+
+static void* store_block_duplicate(void* ptr, size_t size) {
+  bt_block * tmp = NULL;
+  if (ptr != NULL) {
+    bt_block * tmp = bt_lookup(ptr);
+    if (tmp) {
+#ifdef E_ACSL_DEBUG
+    /* Make sure that duplicate block, if so is of the same length */
+    if (tmp->size != size)
+      vabort("Attempt to store duplicate block of different length");
+#endif
+      delete_block(ptr);
+    }
+    store_block(ptr, size);
+  }
+  return tmp;
+}
+
 /* }}} */
 
 /* HEAP ALLOCATION {{{ */
@@ -566,6 +584,7 @@ strong_alias(bittree_aligned_alloc, aligned_alloc)
 /* Explicit tracking */
 public_alias(delete_block)
 public_alias(store_block)
+public_alias(store_block_duplicate)
 /* Predicates */
 public_alias(offset)
 public_alias(base_addr)
