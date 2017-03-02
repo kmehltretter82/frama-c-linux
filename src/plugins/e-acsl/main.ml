@@ -58,6 +58,7 @@ let unmemoized_extend_ast () =
          (Kernel.Machdep.get ())
          share);
     Kernel.Keep_unused_specified_functions.off ();
+    if Plugin.is_present "va" then Dynamic.Parameter.Bool.off "-va" ();
     let ppc, ppk = File.get_preprocessor_command () in
     let register s =
       File.pre_register
