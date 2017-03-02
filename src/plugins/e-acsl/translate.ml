@@ -584,14 +584,14 @@ and mmodel_call_with_size ~loc kf name ctx env t =
       (fun v _ ->
         let ty = get_c_term_type t.term_type in
         let sizeof = mk_ptr_sizeof ty loc in
-        let fname = (Misc.mk_api_name name) in
+        let fname = Misc.mk_api_name name in
         [ Misc.mk_call ~loc ~result:(Cil.var v) fname [ e; sizeof ] ])
   in
   res, env
 
 and mmodel_call_valid ~loc kf name ctx env t =
   let e, env = term_to_exp kf (Env.rte env true) t in
-  let base, _ = Misc.ptr_index e in
+  let base, _ = Misc.ptr_index ~loc e in
   let _, res, env =
     Env.new_var
       ~loc

@@ -269,27 +269,22 @@ let arith_op = function
   | IndexPI -> PlusA
   | _ -> assert false
 
-let rec ptr_index ?(index=(Cil.zero Location.unknown)) exp =
-  (* ****************************************************************** *)
+let rec ptr_index ?(loc=Location.unknown) ?(index=(Cil.zero loc)) exp =
   match exp.enode with
   | BinOp(op, lhs, rhs, _) ->
     (match op with
     (* Pointer arithmetic: split pointer and integer parts *)
     | MinusPI | PlusPI | IndexPI ->
-      let index = Cil.mkBinOp Location.unknown (arith_op op) index rhs
-      in ptr_index ~index lhs
+      let index = Cil.mkBinOp loc (arith_op op) index rhs in
+      ptr_index ~index lhs
     (* Other arithmetic: treat the whole expression as pointer address *)
     | MinusPP | PlusA | MinusA | Mult | Div | Mod ->
       (exp, index)
     | _ -> assert false)
-  (* ****************************************************************** *)
-  | CastE(_) -> ptr_index ~index (Cil.stripCasts exp)
-  (* ****************************************************************** *)
-  | Const(_)
-  | StartOf(_)
-  | AddrOf(_)
-  | Lval(_) -> (exp, index)
-  | _ -> assert false
+  | CastE _ -> ptr_index ~index (Cil.stripCasts exp)
+  | Const _ | StartOf _ | AddrOf _ | Lval _  -> (exp, index)
+  | SizeOf _| SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ | UnOp _
+  | Info _ -> assert false
 
 (*
 Local Variables:
