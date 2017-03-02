@@ -96,7 +96,7 @@
  * Example:
  *  int x = 0;          // x => 00000000 00000000 ...
  *  setbits64(11, x, 2) //   => 00111111 11111000 ...
- *  setbits64(64, x)    //   => behaviour undefined */
+ *  setbits64(64, x, 2) //   => behaviour undefined */
 #define setbits64_skip(_bits, _number, _skip) \
   (_number |= ~(ONE << _bits) << _skip)
 

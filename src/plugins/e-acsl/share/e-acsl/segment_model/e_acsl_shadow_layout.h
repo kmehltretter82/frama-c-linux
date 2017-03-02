@@ -271,20 +271,20 @@ NOTE: With mmap allocations heap does not necessarily grows from program break
  * shadow spaces. */
 struct memory_segment {
   const char *name;
-  uintptr_t start; //!< Least address in application segment
-  uintptr_t end; //!< Greatest address in application segment
+  uintptr_t start; //!< Least address in the application segment
+  uintptr_t end; //!< Greatest address in the application segment
   uintptr_t size; //!< Size of the tracked segment in application memory
-
-  size_t    prim_size; //!< Byte-size of shadow area
+  /* Primary shadow space */
+  size_t    prim_size; //!< Byte-size of the primary shadow
   size_t    prim_ratio; //! Ratio of shadow to application memory
-  uintptr_t prim_start; //!< Least address in primary shadow
-  uintptr_t prim_end; //!< Greatest address in primary shadow
+  uintptr_t prim_start; //!< Least address in the primary shadow
+  uintptr_t prim_end; //!< Greatest address in the primary shadow
   uintptr_t prim_offset; //!< Primary shadow offset
-
+  /* Secondary shadow space */
   size_t    sec_size; //!< Byte-size of shadow area
   size_t    sec_ratio; //! Ratio of shadow to application memory
-  uintptr_t sec_start; //!< Least address secondary shadow
-  uintptr_t sec_end; //!< Greatest address secondary shadow
+  uintptr_t sec_start; //!< Least address in the secondary shadow
+  uintptr_t sec_end; //!< Greatest address in the secondary shadow
   uintptr_t sec_offset; //!< Secondary shadow offset
 
   int initialized; //! Notion on whether the layout is initialized
