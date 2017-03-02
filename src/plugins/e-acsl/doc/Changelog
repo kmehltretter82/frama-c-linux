@@ -15,6 +15,9 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
+-* E-ACSL       [2017/03/02] Fix bts #1740 about incorrect monitoring of
+	        memory properties when early exiting a block through
+	        goto, break or continue.
 -* E-ACSL       [2017/03/01] Correct support of stdin, stdout and stderr
 	        in annotations.
 -* E-ACSL       [2017/02/24] Fix crash with casts from non-integral terms to
