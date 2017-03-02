@@ -152,7 +152,7 @@ let generate_code =
             Project.on prepared_prj
             (fun () ->
               let dup_prj = Dup_functions.dup () in
-              Project.on
+              let res = Project.on
                 dup_prj
                 (fun () ->
                   Gmpz.init_t ();
@@ -172,7 +172,12 @@ let generate_code =
                     ~selection:(State_selection.singleton Kernel.Files.self)
                     prj;
                   prj)
-                ())
+                ()
+                in
+                if Options.Debug.get () = 0 then begin
+                  Project.remove ~project:dup_prj ();
+                end;
+                res)
               ()
           in
           if Options.Debug.get () = 0 then begin
