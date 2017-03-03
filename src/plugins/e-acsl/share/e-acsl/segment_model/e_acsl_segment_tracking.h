@@ -296,8 +296,8 @@ static void validate_memory_layout() {
 #define DVALIDATE_IS_ON_STATIC(_addr, _size) \
   DVALIDATE_IS_ON(_addr, _size, STATIC)
 
-/* Assert that `_addr` is on heap and it is the base address of a valid heap
- * memory block */
+/* Assert that `_addr` is on heap and it is the base address of an allocated
+ * heap memory block */
 #define DVALIATE_FREEABLE(_addr) \
   DVASSERT(IS_ON_HEAP(_addr), "Expected heap location: %a\n   ", _addr); \
   DVASSERT(_addr == base_addr(_addr), \
@@ -617,9 +617,9 @@ static int static_initialized(uintptr_t addr, long size) {
  * - 'L' - return the size in bytes of the memory block `addr` belongs to or `0`
  *     if `addr` lies outside of tracked allocation.
  *
- * NB: One should make sure that a given address if valid before querying.
- * That is, for the cases when addr does not refer to a valid memory address
- * belonging to static allocation the return value for this function is
+ * NB: One should make sure that a given address is allocated before querying.
+ * That is, for the cases when addr does not refer to an allocated memory
+ * address belonging to static allocation the return value for this function is
  * unspecified. */
 static uintptr_t static_info(uintptr_t addr, char type) {
   DVALIDATE_STATIC_LOCATION(addr);
@@ -753,7 +753,7 @@ static size_t heap_allocation_size = 0;
 /*! \brief Create a heap shadow for an allocated memory block starting at `ptr`
  * and of length `size`. Optionally mark it as initialized if `init`
  * evaluates to a non-zero value.
- * \b NOTE: This function assumes that `ptr` is a valid base address of a
+ * \b NOTE: This function assumes that `ptr` is a base address of a
  * heap-allocated memory block, such that HEAP_SEGMENT bytes preceding `ptr`
  * correspond to `unusable space`.
  * \b WARNING: Current implementation assumes that the size of a heap segment
@@ -843,8 +843,8 @@ static void* shadow_calloc(size_t nmemb, size_t size) {
  * This function effectively nullifies block shadow tracking an application
  * block and optionally nullifies an init shadow associated with the block.
  *
- * NOTE: ::unset_heap_segment assumes that `ptr` is a base address of a valid
- * heap memory block, i.e., `freeable(ptr)` evaluates to true. */
+ * NOTE: ::unset_heap_segment assumes that `ptr` is a base address of an
+ * allocated heap memory block, i.e., `freeable(ptr)` evaluates to true. */
 static void unset_heap_segment(void *ptr, int init) {
   DVALIATE_FREEABLE(((uintptr_t)ptr));
   /* Base address of shadow block */
@@ -887,7 +887,7 @@ static void* shadow_realloc(void *ptr, size_t size) {
   else if (ptr != NULL && size == 0) {
     shadow_free(ptr);
   } else {
-    if (freeable(ptr)) { /* ... and valid for free  */
+    if (freeable(ptr)) { /* ... and can be used as an input to `free` */
       size_t alloc_size = ALLOC_SIZE(size);
       res = native_realloc(ptr, alloc_size);
       DVALIDATE_ALIGNMENT(res);
@@ -964,7 +964,7 @@ static int shadow_posix_memalign(void **memptr, size_t alignment, size_t size) {
     return -1;
 
   /* Make sure that the first argument to posix memalign is indeed allocated */
-  vassert(valid(memptr, sizeof(void*), memptr),
+  vassert(allocated((uintptr_t)memptr, sizeof(void*), (uintptr_t)memptr),
       "\\invalid memptr in  posix_memalign", NULL);
 
   int res = native_posix_memalign(memptr, alignment, size);
@@ -985,7 +985,7 @@ static int shadow_posix_memalign(void **memptr, size_t alignment, size_t size) {
  * `addr` of the form `base_ptr + i`, where `i` is some integer index.
  * ::heap_allocated also returns zero if `base_ptr` and `addr` belong to different
  * memory blocks, or if `base_ptr` lies within unallocated region. The intention
- * here is to be able to detect dereferencing of a valid memory block through
+ * here is to be able to detect dereferencing of an allocated memory block through
  * a pointer to a different block. Consider, for instance, some pointer `p` that
  * points to a memory block `B`, and an index `i`, such that `p+i` references a
  * memory location belonging to a different memory block (say `C`). From a
@@ -1069,8 +1069,8 @@ static uintptr_t heap_info(uintptr_t addr, char type) {
 }
 
 /*! \brief Implementation of the \b \\initialized predicate for heap-allocated
- * memory. NB: If `addr` does not belong to a valid heap region this function
- * returns 0. */
+ * memory. NB: If `addr` does not belong to an allocated heap block this
+ * function returns 0. */
 static int heap_initialized(uintptr_t addr, long len) {
   /* Base address of a shadow segment addr belongs to */
   unsigned char *shadow = (unsigned char*)(HEAP_INIT_SHADOW(addr));
