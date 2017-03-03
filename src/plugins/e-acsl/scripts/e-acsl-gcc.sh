@@ -97,8 +97,11 @@ rte_options() {
   local fc_options="signed-overflow unsigned-overflow \
     signed-downcast unsigned-downcast"
   # RTE assertions
-  local rte_options="div float-to-int mem pointer-call precond shift  \
+  local rte_options="div float-to-int mem pointer-call shift \
     trivial-annotations"
+  # Option supported by RTE but unsupported in E-ACSL, should
+  # always be negated
+  local rte_options_unsupported="precond"
   local generated="-rte" # Generated Frama-C options
 
   # Clean-up option strings
@@ -130,7 +133,7 @@ rte_options() {
     done
 
     # Generate assertion options for RTE (i.e., -rte-* or -rte-no-*)
-    for opt in $rte_options; do
+    for opt in $rte_options $rte_options_unsupported; do
       has_token $opt $asserts && prefix="-rte" || prefix="-rte-no"
       generated="$generated $prefix-$opt"
     done
