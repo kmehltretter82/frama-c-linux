@@ -14,18 +14,21 @@ int main(void)
     p = & a;
     /*@ assert \valid(p); */
     {
-      int __gen_e_acsl_initialized;
-      int __gen_e_acsl_and;
-      __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& p),
-                                                      sizeof(int *));
-      if (__gen_e_acsl_initialized) {
-        int __gen_e_acsl_valid;
-        __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(int));
-        __gen_e_acsl_and = __gen_e_acsl_valid;
+      {
+        int __gen_e_acsl_initialized;
+        int __gen_e_acsl_and;
+        __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& p),
+                                                        sizeof(int *));
+        if (__gen_e_acsl_initialized) {
+          int __gen_e_acsl_valid;
+          __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(int),
+                                              (void *)p);
+          __gen_e_acsl_and = __gen_e_acsl_valid;
+        }
+        else __gen_e_acsl_and = 0;
+        __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
+                        (char *)"\\valid(p)",11);
       }
-      else __gen_e_acsl_and = 0;
-      __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
-                      (char *)"\\valid(p)",11);
     }
     __e_acsl_delete_block((void *)(& a));
     goto L;
@@ -34,19 +37,22 @@ int main(void)
   L:
     /*@ assert ¬\valid(p); */
     {
-      int __gen_e_acsl_initialized_2;
-      int __gen_e_acsl_and_2;
-      __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& p),
-                                                        sizeof(int *));
-      if (__gen_e_acsl_initialized_2) {
-        int __gen_e_acsl_valid_2;
-        /*@ assert Value: dangling_pointer: ¬\dangling(&p); */
-        __gen_e_acsl_valid_2 = __e_acsl_valid((void *)p,sizeof(int));
-        __gen_e_acsl_and_2 = __gen_e_acsl_valid_2;
+      {
+        int __gen_e_acsl_initialized_2;
+        int __gen_e_acsl_and_2;
+        __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& p),
+                                                          sizeof(int *));
+        if (__gen_e_acsl_initialized_2) {
+          int __gen_e_acsl_valid_2;
+          /*@ assert Value: dangling_pointer: ¬\dangling(&p); */
+          __gen_e_acsl_valid_2 = __e_acsl_valid((void *)p,sizeof(int),
+                                                (void *)p);
+          __gen_e_acsl_and_2 = __gen_e_acsl_valid_2;
+        }
+        else __gen_e_acsl_and_2 = 0;
+        __e_acsl_assert(! __gen_e_acsl_and_2,(char *)"Assertion",
+                        (char *)"main",(char *)"!\\valid(p)",16);
       }
-      else __gen_e_acsl_and_2 = 0;
-      __e_acsl_assert(! __gen_e_acsl_and_2,(char *)"Assertion",
-                      (char *)"main",(char *)"!\\valid(p)",16);
     }
     __retres = 0;
     __e_acsl_delete_block((void *)(& p));

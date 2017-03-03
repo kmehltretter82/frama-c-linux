@@ -192,11 +192,11 @@ void __e_acsl_globals_init(void)
   __gen_e_acsl_literal_string = "toto";
   __e_acsl_store_block((void *)__gen_e_acsl_literal_string,sizeof("toto"));
   __e_acsl_full_init((void *)__gen_e_acsl_literal_string);
-  __e_acsl_readonly((void *)__gen_e_acsl_literal_string);
+  __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string);
   __gen_e_acsl_literal_string_2 = "tata";
   __e_acsl_store_block((void *)__gen_e_acsl_literal_string_2,sizeof("tata"));
   __e_acsl_full_init((void *)__gen_e_acsl_literal_string_2);
-  __e_acsl_readonly((void *)__gen_e_acsl_literal_string_2);
+  __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_2);
   return;
 }
 

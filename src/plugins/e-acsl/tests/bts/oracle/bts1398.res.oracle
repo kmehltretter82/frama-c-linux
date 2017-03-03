@@ -1,3 +1,3 @@
 [e-acsl] beginning translation.
-FRAMAC_SHARE/libc/stdio.h:141:[kernel] warning: Neither code nor specification for function printf, generating default assigns from the prototype
+FRAMAC_SHARE/libc/stdlib.h:277:[kernel] warning: No code nor implicit assigns clause for function calloc, generating default assigns from the prototype
 [e-acsl] translation done in project "e-acsl".

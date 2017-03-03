@@ -59,7 +59,7 @@ static void delete_block(void * ptr) {
 }
 
 static void * store_block_duplicate(void * ptr, size_t size) {
-  if (valid_read(ptr, size))
+  if (allocated((uintptr_t)ptr, size, (uintptr_t)ptr))
     delete_block(ptr);
   shadow_alloca(ptr, size);
   return ptr;
@@ -172,7 +172,6 @@ static void memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
   collect_safe_locations();
   int i;
   for (i = 0; i < safe_location_counter; i++) {
-    DLOG("Safe location %lu\n", safe_locations[i].address, safe_locations[i].address + safe_locations[i].length);
     void *addr = (void*)safe_locations[i].address;
     uintptr_t len = safe_locations[i].length;
     shadow_alloca(addr, len);

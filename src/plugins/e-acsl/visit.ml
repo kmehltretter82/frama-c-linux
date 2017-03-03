@@ -718,8 +718,8 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         (* must be in the new project to build a new stmt *)
         Project.on
           prj
-          Misc.mk_initialize
-          (loc assigned_lv)
+          (Misc.mk_initialize ~loc)
+          assigned_lv
       in
       let before = Cil.memo_stmt self#behavior stmt in
       let new_stmt = Cil.memo_stmt self#behavior new_stmt in
