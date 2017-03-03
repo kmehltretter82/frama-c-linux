@@ -63,22 +63,23 @@ let mk_call ~loc ?result fname args =
   in
   let f = Cil.evar ~loc vi in
   vi.vreferenced <- true;
-  let ty_params = match vi.vtype with
-    | TFun(_, Some l, _, _) -> l
-    | _ -> assert false
-  in
-  let args =
+  let make_args args ty_params =
     List.map2
       (fun (_, ty, _) arg ->
-	let e =
-	  match ty, Cil.unrollType (Cil.typeOf arg), arg.enode with
-	  | TPtr _, TArray _, Lval lv -> Cil.new_exp ~loc (StartOf lv)
-	  | TPtr _, TArray _, _ -> assert false
-	  | _, _, _ -> arg
-	in
-	Cil.mkCast ~force:false ~newt:ty ~e)
+        let e =
+          match ty, Cil.unrollType (Cil.typeOf arg), arg.enode with
+          | TPtr _, TArray _, Lval lv -> Cil.new_exp ~loc (StartOf lv)
+          | TPtr _, TArray _, _ -> assert false
+          | _, _, _ -> arg
+        in
+        Cil.mkCast ~force:false ~newt:ty ~e)
       ty_params
       args
+  in
+  let args = match vi.vtype with
+    | TFun(_, Some params, _, _) -> make_args args params
+    | TFun(_, None, _, _) -> []
+    | _ -> assert false
   in
   Cil.mkStmtOneInstr ~valid_sid:true (Call(result, f, args, loc))
 
