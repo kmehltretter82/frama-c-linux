@@ -157,7 +157,7 @@ static void increase_stack_limit(const size_t size) {
       rl.rlim_cur = stacksz;
       result = setrlimit(RLIMIT_STACK, &rl);
       if (result != 0) {
-        vabort("setrlimit returned result = %d\n", result);
+        vabort("setrlimit: %s \n", strerror(errno));
       }
     }
   }
@@ -202,11 +202,12 @@ static size_t get_global_size() {
  * pointer to its base address. Since this function is used to set-up shadowing
  * the program is aborted if `mmap` fails to allocate a new memory block. */
 static void *do_mmap(size_t size) {
-  DLOG("<<< Request to allocate %lu bytes with mmap >>>\n", size);
   void *res = mmap(0, size, PROT_READ|PROT_WRITE,
     MAP_ANONYMOUS|MAP_PRIVATE, -1, (size_t)0);
-  if (res == MAP_FAILED)
+  if (res == MAP_FAILED) {
+    DLOG("<<< Request to allocate %lu MB with mmap failed >>>\n", MB_SZ(size));
     vabort("mmap error: %s\n", strerror(errno));
+  }
   /* Make sure that mmap returned a fully nullified mapping */
   DVASSERT(zeroed_out(res, size),
     "Memory mapping of size %lu at address %a not fully nullified", size, res);
@@ -317,21 +318,27 @@ static void set_shadow_segment(struct memory_segment *seg, uintptr_t start,
   seg->size = size;
   seg->end = seg->start + seg->size - 1;
 
-  seg->prim_ratio = prim_ratio;
-  seg->prim_size = seg->size/seg->prim_ratio;
-  DLOG("<<< Initialize %s primary segment of %lu MB >>>\n", name, MB_SZ(seg->prim_size));
-  void *prim_shadow = do_mmap(seg->prim_size);
-  seg->prim_start = (uintptr_t)prim_shadow;
-  seg->prim_end = seg->prim_start + seg->prim_size - 1;
-  seg->prim_offset = shadow_offset(prim_shadow, start);
+  if (prim_ratio) {
+    seg->prim_ratio = prim_ratio;
+    seg->prim_size = seg->size/seg->prim_ratio;
+    void *prim_shadow = do_mmap(seg->prim_size);
+    seg->prim_start = (uintptr_t)prim_shadow;
+    seg->prim_end = seg->prim_start + seg->prim_size - 1;
+    seg->prim_offset = shadow_offset(prim_shadow, start);
+  } else {
+    seg->prim_start = seg->prim_end = seg->prim_offset = 0;
+  }
 
-  seg->sec_ratio = sec_ratio;
-  seg->sec_size = seg->size/seg->sec_ratio;
-  DLOG("<<< Initialize %s secondary segment of %lu MB >>>\n", name, MB_SZ(seg->sec_size));
-  void *sec_shadow = do_mmap(seg->sec_size);
-  seg->sec_start = (uintptr_t)sec_shadow;
-  seg->sec_end = seg->sec_start + seg->sec_size - 1;
-  seg->sec_offset = shadow_offset(sec_shadow, seg->start);
+  if (sec_ratio) {
+    seg->sec_ratio = sec_ratio;
+    seg->sec_size = seg->size/seg->sec_ratio;
+    void *sec_shadow = do_mmap(seg->sec_size);
+    seg->sec_start = (uintptr_t)sec_shadow;
+    seg->sec_end = seg->sec_start + seg->sec_size - 1;
+    seg->sec_offset = shadow_offset(sec_shadow, seg->start);
+  } else {
+    seg->sec_start = seg->sec_end = seg->sec_offset = 0;
+  }
 }
 
 /*! \brief Initialize memory layout, i.e., determine bounds of program segments,
@@ -351,8 +358,10 @@ static void init_memory_layout(int *argc_ref, char ***argv_ref) {
 
 /*! \brief Deallocate a shadow segment */
 void clean_memory_segment(struct memory_segment *seg) {
-  munmap((void*)seg->prim_start, seg->prim_size);
-  munmap((void*)seg->sec_start, seg->prim_size);
+  if (seg->prim_start)
+    munmap((void*)seg->prim_start, seg->prim_size);
+  if (seg->sec_start)
+    munmap((void*)seg->sec_start, seg->prim_size);
 }
 
 /*! \brief Deallocate shadow regions used by runtime analysis */

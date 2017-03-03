@@ -30,8 +30,8 @@
 #include <errno.h>
 #include <sys/resource.h>
 
-static int valid(void * ptr, size_t size, void *ptr_base);
-static int valid_read(void * ptr, size_t size, void *ptr_base);
+static int valid(void*, size_t, void*);
+static int valid_read(void*, size_t, void*);
 
 #include "e_acsl_string.h"
 #include "e_acsl_bits.h"
@@ -94,7 +94,7 @@ static int valid(void * ptr, size_t size, void *ptr_base) {
 static int valid_read(void * ptr, size_t size, void *ptr_base) {
   uintptr_t addr = (uintptr_t)ptr;
   uintptr_t base = (uintptr_t)ptr_base;
-  TRY_SEGMENT(addr,
+  TRY_SEGMENT_WEAK(addr,
     return heap_allocated(addr, size, base),
     return static_allocated(addr, size, base));
   if (!IS_ON_VALID(addr))
