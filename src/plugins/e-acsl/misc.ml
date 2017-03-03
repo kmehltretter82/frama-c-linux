@@ -274,7 +274,7 @@ let rec ptr_index ?(loc=Location.unknown) ?(index=(Cil.zero loc)) exp =
     (match op with
     (* Pointer arithmetic: split pointer and integer parts *)
     | MinusPI | PlusPI | IndexPI ->
-      let index = Cil.mkBinOp loc (arith_op op) index rhs in
+      let index = Cil.mkBinOp exp.eloc (arith_op op) index rhs in
       ptr_index ~index lhs
     (* Other arithmetic: treat the whole expression as pointer address *)
     | MinusPP | PlusA | MinusA | Mult | Div | Mod ->
