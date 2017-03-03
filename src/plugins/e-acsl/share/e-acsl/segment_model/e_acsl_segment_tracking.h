@@ -392,6 +392,7 @@ static uintptr_t heap_info(uintptr_t addr, char type);
 static uintptr_t static_info(uintptr_t addr, char type);
 static int heap_allocated(uintptr_t addr, size_t size, uintptr_t base_ptr);
 static int static_allocated(uintptr_t addr, long size, uintptr_t base_ptr);
+static int allocated(uintptr_t addr, long size, uintptr_t base_ptr);
 static int freeable(void *ptr);
 
 /*! \brief Quick test to check if a static location belongs to allocation.
@@ -1129,6 +1130,18 @@ static void initialize_heap_region(uintptr_t addr, long len) {
      * `shadow` */
     setbits(len, shadow);
   }
+}
+/* }}} */
+
+/* Any allocation {{{ */
+/*! \brief Amalgamation of ::heap_allocated and ::static_allocated */
+static int allocated(uintptr_t addr, long size, uintptr_t base) {
+  TRY_SEGMENT_WEAK(addr,
+    return heap_allocated(addr, size, base),
+    return static_allocated(addr, size, base));
+  if (!IS_ON_VALID(addr))
+    return 0;
+  return 0;
 }
 /* }}} */
 
