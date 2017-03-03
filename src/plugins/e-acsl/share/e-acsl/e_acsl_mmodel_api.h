@@ -134,7 +134,7 @@ int __e_acsl_freeable(void * ptr)
 /*@ ensures \result == 0 || \result == 1;
   @ ensures \result == 1 ==> \valid(((char *)ptr)+(0..size-1));
   @ assigns \result \from *(((char*)ptr)+(0..size-1)); */
-int __e_acsl_valid(void * ptr, size_t size, void *ptr_base)
+int __e_acsl_valid(void * ptr, size_t size, void *ptr_base, void *addr_of_base)
   __attribute__((FC_BUILTIN));
 
 /*! \brief Implementation of the \b \\valid_read predicate of E-ACSL.
@@ -144,7 +144,7 @@ int __e_acsl_valid(void * ptr, size_t size, void *ptr_base)
 /*@ ensures \result == 0 || \result == 1;
   @ ensures \result == 1 ==> \valid_read(((char *)ptr)+(0..size-1));
   @ assigns \result \from *(((char*)ptr)+(0..size-1)); */
-int __e_acsl_valid_read(void * ptr, size_t size, void *ptr_base)
+int __e_acsl_valid_read(void * ptr, size_t size, void *ptr_base, void *addr_of_base)
   __attribute__((FC_BUILTIN));
 
 /*! \brief Implementation of the \b \\base_addr predicate of E-ACSL.

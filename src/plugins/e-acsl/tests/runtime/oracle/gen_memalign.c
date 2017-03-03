@@ -24,7 +24,8 @@ int main(int argc, char const **argv)
                                                       sizeof(char *));
       if (__gen_e_acsl_initialized) {
         int __gen_e_acsl_valid;
-        __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(char),(void *)p);
+        __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(char),(void *)p,
+                                            (void *)(& p));
         __gen_e_acsl_and = __gen_e_acsl_valid;
       }
       else __gen_e_acsl_and = 0;
@@ -61,7 +62,7 @@ int main(int argc, char const **argv)
       if (__gen_e_acsl_initialized_2) {
         int __gen_e_acsl_valid_2;
         __gen_e_acsl_valid_2 = __e_acsl_valid((void *)p,sizeof(char),
-                                              (void *)p);
+                                              (void *)p,(void *)(& p));
         __gen_e_acsl_and_2 = __gen_e_acsl_valid_2;
       }
       else __gen_e_acsl_and_2 = 0;
@@ -99,7 +100,7 @@ int main(int argc, char const **argv)
       if (__gen_e_acsl_initialized_3) {
         int __gen_e_acsl_valid_3;
         __gen_e_acsl_valid_3 = __e_acsl_valid((void *)a,sizeof(char),
-                                              (void *)a);
+                                              (void *)a,(void *)(& a));
         __gen_e_acsl_and_3 = __gen_e_acsl_valid_3;
       }
       else __gen_e_acsl_and_3 = 0;
@@ -137,7 +138,7 @@ int main(int argc, char const **argv)
       if (__gen_e_acsl_initialized_4) {
         int __gen_e_acsl_valid_4;
         __gen_e_acsl_valid_4 = __e_acsl_valid((void *)a,sizeof(char),
-                                              (void *)a);
+                                              (void *)a,(void *)(& a));
         __gen_e_acsl_and_4 = __gen_e_acsl_valid_4;
       }
       else __gen_e_acsl_and_4 = 0;

@@ -30,8 +30,8 @@
 #include <errno.h>
 #include <sys/resource.h>
 
-static int valid(void*, size_t, void*);
-static int valid_read(void*, size_t, void*);
+static int valid(void*, size_t, void*, void*);
+static int valid_read(void*, size_t, void*, void*);
 
 #include "e_acsl_string.h"
 #include "e_acsl_bits.h"
@@ -77,7 +77,7 @@ static void mark_readonly(void * ptr) {
 /* E-ACSL annotations */
 /* ****************** */
 
-static int valid(void * ptr, size_t size, void *ptr_base) {
+static int valid(void * ptr, size_t size, void *ptr_base, void *addr_of_base) {
   uintptr_t addr = (uintptr_t)ptr;
   uintptr_t base = (uintptr_t)ptr_base;
   if (IS_ON_HEAP(addr))
@@ -91,7 +91,7 @@ static int valid(void * ptr, size_t size, void *ptr_base) {
   return 0;
 }
 
-static int valid_read(void * ptr, size_t size, void *ptr_base) {
+static int valid_read(void * ptr, size_t size, void *ptr_base, void *addr_of_base) {
   uintptr_t addr = (uintptr_t)ptr;
   uintptr_t base = (uintptr_t)ptr_base;
   TRY_SEGMENT_WEAK(addr,

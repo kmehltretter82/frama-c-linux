@@ -16,7 +16,7 @@ int main(void)
     {
       int __gen_e_acsl_valid;
       __gen_e_acsl_valid = __e_acsl_valid((void *)(& s),sizeof(struct toto),
-                                          (void *)(& s));
+                                          (void *)(& s),(void *)(& s));
       __e_acsl_assert(__gen_e_acsl_valid,(char *)"Assertion",(char *)"main",
                       (char *)"\\valid(&s)",9);
     }
@@ -33,7 +33,7 @@ int main(void)
       if (__gen_e_acsl_initialized) {
         int __gen_e_acsl_valid_2;
         __gen_e_acsl_valid_2 = __e_acsl_valid((void *)p,sizeof(struct toto),
-                                              (void *)p);
+                                              (void *)p,(void *)(& p));
         __gen_e_acsl_and = __gen_e_acsl_valid_2;
       }
       else __gen_e_acsl_and = 0;

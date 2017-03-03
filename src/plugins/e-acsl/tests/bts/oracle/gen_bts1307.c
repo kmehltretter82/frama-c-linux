@@ -122,15 +122,17 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     __e_acsl_store_block((void *)(& Mwmin),(size_t)8);
     __e_acsl_store_block((void *)(& Mtmin_in),(size_t)8);
     __gen_e_acsl_valid = __e_acsl_valid((void *)Mtmin_in,sizeof(float),
-                                        (void *)Mtmin_in);
+                                        (void *)Mtmin_in,
+                                        (void *)(& Mtmin_in));
     __e_acsl_assert(__gen_e_acsl_valid,(char *)"Precondition",(char *)"bar",
                     (char *)"\\valid(Mtmin_in)",17);
     __gen_e_acsl_valid_2 = __e_acsl_valid((void *)Mwmin,sizeof(float),
-                                          (void *)Mwmin);
+                                          (void *)Mwmin,(void *)(& Mwmin));
     __e_acsl_assert(__gen_e_acsl_valid_2,(char *)"Precondition",
                     (char *)"bar",(char *)"\\valid(Mwmin)",18);
     __gen_e_acsl_valid_3 = __e_acsl_valid((void *)Mtmin_out,sizeof(float),
-                                          (void *)Mtmin_out);
+                                          (void *)Mtmin_out,
+                                          (void *)(& Mtmin_out));
     __e_acsl_assert(__gen_e_acsl_valid_3,(char *)"Precondition",
                     (char *)"bar",(char *)"\\valid(Mtmin_out)",19);
     __gen_e_acsl_at_6 = Mwmin;
@@ -148,12 +150,14 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     int __gen_e_acsl_if;
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)__gen_e_acsl_at_2,
                                                   sizeof(float),
-                                                  (void *)__gen_e_acsl_at_2);
+                                                  (void *)__gen_e_acsl_at_2,
+                                                  (void *)(& __gen_e_acsl_at_2));
     __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"bar",
                     (char *)"mem_access: \\valid_read(__gen_e_acsl_at_2)",23);
     __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)__gen_e_acsl_at,
                                                     sizeof(float),
-                                                    (void *)__gen_e_acsl_at);
+                                                    (void *)__gen_e_acsl_at,
+                                                    (void *)(& __gen_e_acsl_at));
     __e_acsl_assert(__gen_e_acsl_valid_read_2,(char *)"RTE",(char *)"bar",
                     (char *)"mem_access: \\valid_read(__gen_e_acsl_at)",23);
     if (*__gen_e_acsl_at == *__gen_e_acsl_at_2) {
@@ -161,13 +165,15 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
       int __gen_e_acsl_valid_read_4;
       __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)__gen_e_acsl_at_4,
                                                       sizeof(float),
-                                                      (void *)__gen_e_acsl_at_4);
+                                                      (void *)__gen_e_acsl_at_4,
+                                                      (void *)(& __gen_e_acsl_at_4));
       __e_acsl_assert(__gen_e_acsl_valid_read_3,(char *)"RTE",(char *)"bar",
                       (char *)"mem_access: \\valid_read(__gen_e_acsl_at_4)",
                       23);
       __gen_e_acsl_valid_read_4 = __e_acsl_valid_read((void *)__gen_e_acsl_at_3,
                                                       sizeof(float),
-                                                      (void *)__gen_e_acsl_at_3);
+                                                      (void *)__gen_e_acsl_at_3,
+                                                      (void *)(& __gen_e_acsl_at_3));
       __e_acsl_assert(__gen_e_acsl_valid_read_4,(char *)"RTE",(char *)"bar",
                       (char *)"mem_access: \\valid_read(__gen_e_acsl_at_3)",
                       23);
@@ -178,7 +184,8 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
       int __gen_e_acsl_valid_read_5;
       __gen_e_acsl_valid_read_5 = __e_acsl_valid_read((void *)__gen_e_acsl_at_5,
                                                       sizeof(float),
-                                                      (void *)__gen_e_acsl_at_5);
+                                                      (void *)__gen_e_acsl_at_5,
+                                                      (void *)(& __gen_e_acsl_at_5));
       __e_acsl_assert(__gen_e_acsl_valid_read_5,(char *)"RTE",(char *)"bar",
                       (char *)"mem_access: \\valid_read(__gen_e_acsl_at_5)",
                       23);
@@ -188,7 +195,8 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
       int __gen_e_acsl_valid_read_6;
       __gen_e_acsl_valid_read_6 = __e_acsl_valid_read((void *)__gen_e_acsl_at_6,
                                                       sizeof(float),
-                                                      (void *)__gen_e_acsl_at_6);
+                                                      (void *)__gen_e_acsl_at_6,
+                                                      (void *)(& __gen_e_acsl_at_6));
       __e_acsl_assert(__gen_e_acsl_valid_read_6,(char *)"RTE",(char *)"bar",
                       (char *)"mem_access: \\valid_read(__gen_e_acsl_at_6)",
                       23);
@@ -227,15 +235,17 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     __e_acsl_store_block((void *)(& Mwmax),(size_t)8);
     __e_acsl_store_block((void *)(& Mtmax_in),(size_t)8);
     __gen_e_acsl_valid = __e_acsl_valid((void *)Mtmax_in,sizeof(float),
-                                        (void *)Mtmax_in);
+                                        (void *)Mtmax_in,
+                                        (void *)(& Mtmax_in));
     __e_acsl_assert(__gen_e_acsl_valid,(char *)"Precondition",(char *)"foo",
                     (char *)"\\valid(Mtmax_in)",5);
     __gen_e_acsl_valid_2 = __e_acsl_valid((void *)Mwmax,sizeof(float),
-                                          (void *)Mwmax);
+                                          (void *)Mwmax,(void *)(& Mwmax));
     __e_acsl_assert(__gen_e_acsl_valid_2,(char *)"Precondition",
                     (char *)"foo",(char *)"\\valid(Mwmax)",6);
     __gen_e_acsl_valid_3 = __e_acsl_valid((void *)Mtmax_out,sizeof(float),
-                                          (void *)Mtmax_out);
+                                          (void *)Mtmax_out,
+                                          (void *)(& Mtmax_out));
     __e_acsl_assert(__gen_e_acsl_valid_3,(char *)"Precondition",
                     (char *)"foo",(char *)"\\valid(Mtmax_out)",7);
     __gen_e_acsl_at_3 = Mwmax;
@@ -249,17 +259,20 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     int __gen_e_acsl_valid_read_3;
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)__gen_e_acsl_at_3,
                                                   sizeof(float),
-                                                  (void *)__gen_e_acsl_at_3);
+                                                  (void *)__gen_e_acsl_at_3,
+                                                  (void *)(& __gen_e_acsl_at_3));
     __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"foo",
                     (char *)"mem_access: \\valid_read(__gen_e_acsl_at_3)",11);
     __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)__gen_e_acsl_at_2,
                                                     sizeof(float),
-                                                    (void *)__gen_e_acsl_at_2);
+                                                    (void *)__gen_e_acsl_at_2,
+                                                    (void *)(& __gen_e_acsl_at_2));
     __e_acsl_assert(__gen_e_acsl_valid_read_2,(char *)"RTE",(char *)"foo",
                     (char *)"mem_access: \\valid_read(__gen_e_acsl_at_2)",11);
     __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)__gen_e_acsl_at,
                                                     sizeof(float),
-                                                    (void *)__gen_e_acsl_at);
+                                                    (void *)__gen_e_acsl_at,
+                                                    (void *)(& __gen_e_acsl_at));
     __e_acsl_assert(__gen_e_acsl_valid_read_3,(char *)"RTE",(char *)"foo",
                     (char *)"mem_access: \\valid_read(__gen_e_acsl_at)",11);
     __e_acsl_assert(*__gen_e_acsl_at == *__gen_e_acsl_at_2 + ((long double)5 - 

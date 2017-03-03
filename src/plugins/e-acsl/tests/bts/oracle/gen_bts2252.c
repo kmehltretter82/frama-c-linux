@@ -39,7 +39,8 @@ int main(void)
           int __gen_e_acsl_valid_read;
           __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(srcbuf + i),
                                                         sizeof(char),
-                                                        (void *)srcbuf);
+                                                        (void *)srcbuf,
+                                                        (void *)(& srcbuf));
           __e_acsl_assert(! __gen_e_acsl_valid_read,(char *)"Assertion",
                           (char *)"main",(char *)"!\\valid_read(srcbuf + i)",
                           16);

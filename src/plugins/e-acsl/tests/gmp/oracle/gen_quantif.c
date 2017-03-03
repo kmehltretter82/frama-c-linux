@@ -222,6 +222,7 @@ int main(void)
             int __gen_e_acsl_valid;
             __gen_e_acsl_valid = __e_acsl_valid((void *)(& buf[__gen_e_acsl_i]),
                                                 sizeof(int),
+                                                (void *)(& buf[__gen_e_acsl_i]),
                                                 (void *)(& buf[__gen_e_acsl_i]));
             if (__gen_e_acsl_valid) ;
             else {
@@ -251,6 +252,7 @@ int main(void)
             int __gen_e_acsl_valid_2;
             __gen_e_acsl_valid_2 = __e_acsl_valid((void *)(& buf[__gen_e_acsl_i_2]),
                                                   sizeof(int),
+                                                  (void *)(& buf[__gen_e_acsl_i_2]),
                                                   (void *)(& buf[__gen_e_acsl_i_2]));
             if (__gen_e_acsl_valid_2) ;
             else {
@@ -280,6 +282,7 @@ int main(void)
             int __gen_e_acsl_valid_3;
             __gen_e_acsl_valid_3 = __e_acsl_valid((void *)(& buf[__gen_e_acsl_i_3]),
                                                   sizeof(int),
+                                                  (void *)(& buf[__gen_e_acsl_i_3]),
                                                   (void *)(& buf[__gen_e_acsl_i_3]));
             if (__gen_e_acsl_valid_3) ;
             else {
@@ -326,6 +329,7 @@ int main(void)
             __gen_e_acsl_i_5 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_i_4));
             __gen_e_acsl_valid_4 = __e_acsl_valid((void *)(& buf[__gen_e_acsl_i_5]),
                                                   sizeof(int),
+                                                  (void *)(& buf[__gen_e_acsl_i_5]),
                                                   (void *)(& buf[__gen_e_acsl_i_5]));
             if (__gen_e_acsl_valid_4) ;
             else {

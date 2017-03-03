@@ -17,7 +17,8 @@ void f(void)
     {
       int __gen_e_acsl_valid_read;
       __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(T + G),
-                                                    sizeof(char),(void *)T);
+                                                    sizeof(char),(void *)T,
+                                                    (void *)(& T));
       __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"f",
                       (char *)"mem_access: \\valid_read(T + G)",11);
       __e_acsl_assert(*(T + G) == 'b',(char *)"Assertion",(char *)"f",
@@ -89,7 +90,8 @@ int main(void)
     {
       int __gen_e_acsl_valid_read;
       __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(S + G2),
-                                                    sizeof(char),(void *)S);
+                                                    sizeof(char),(void *)S,
+                                                    (void *)(& S));
       __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"main",
                       (char *)"mem_access: \\valid_read(S + G2)",25);
       __e_acsl_assert(*(S + G2) == 'o',(char *)"Assertion",(char *)"main",
@@ -111,7 +113,8 @@ int main(void)
       int __gen_e_acsl_valid_read_2;
       __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)S2,
                                                       sizeof(char),
-                                                      (void *)S2);
+                                                      (void *)S2,
+                                                      (void *)(& S2));
       __e_acsl_assert(__gen_e_acsl_valid_read_2,(char *)"Assertion",
                       (char *)"main",(char *)"\\valid_read(S2)",27);
     }
@@ -126,7 +129,7 @@ int main(void)
       if (__gen_e_acsl_initialized_2) {
         int __gen_e_acsl_valid;
         __gen_e_acsl_valid = __e_acsl_valid((void *)SS,sizeof(char),
-                                            (void *)SS);
+                                            (void *)SS,(void *)(& SS));
         __gen_e_acsl_and = __gen_e_acsl_valid;
       }
       else __gen_e_acsl_and = 0;

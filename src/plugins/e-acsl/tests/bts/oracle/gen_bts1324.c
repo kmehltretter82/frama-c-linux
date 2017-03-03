@@ -67,7 +67,8 @@ int __gen_e_acsl_sorted(int *t, int n)
         int __gen_e_acsl_valid_read;
         int __gen_e_acsl_valid_read_2;
         __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(t + __gen_e_acsl_i),
-                                                      sizeof(int),(void *)t);
+                                                      sizeof(int),(void *)t,
+                                                      (void *)(& t));
         __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",
                         (char *)"sorted",
                         (char *)"mem_access: \\valid_read(t + __gen_e_acsl_i)",
@@ -75,7 +76,8 @@ int __gen_e_acsl_sorted(int *t, int n)
         __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(t + (
                                                                  __gen_e_acsl_i - 1L)),
                                                         sizeof(int),
-                                                        (void *)t);
+                                                        (void *)t,
+                                                        (void *)(& t));
         __e_acsl_assert(__gen_e_acsl_valid_read_2,(char *)"RTE",
                         (char *)"sorted",
                         (char *)"mem_access: \\valid_read(t + (long)(__gen_e_acsl_i - 1))",

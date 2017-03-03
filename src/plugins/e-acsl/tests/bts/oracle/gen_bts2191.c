@@ -42,7 +42,8 @@ int main(int argc, char **argv)
         int __gen_e_acsl_valid_read;
         __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)_G[0].str,
                                                       sizeof(char),
-                                                      (void *)_G[0].str);
+                                                      (void *)_G[0].str,
+                                                      (void *)(& _G[0].str));
         __gen_e_acsl_and = __gen_e_acsl_valid_read;
       }
       else __gen_e_acsl_and = 0;

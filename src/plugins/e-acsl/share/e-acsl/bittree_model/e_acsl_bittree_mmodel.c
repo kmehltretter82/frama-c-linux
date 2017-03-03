@@ -221,7 +221,7 @@ static int allocated(void* ptr, size_t size, void *ptr_base) {
 }
 
 /* return whether the size bytes of ptr are readable/writable */
-static int valid(void* ptr, size_t size, void *ptr_base) {
+static int valid(void* ptr, size_t size, void *ptr_base, void *addr_of_base) {
   /* Many similarities with allocated (so far at least), but it is better
    * to use this tandalone definition, otherwise the block needs to be looked
    * up twice */
@@ -233,7 +233,7 @@ static int valid(void* ptr, size_t size, void *ptr_base) {
 }
 
 /* return whether the size bytes of ptr are readable */
-static int valid_read(void* ptr, size_t size, void *ptr_base) {
+static int valid_read(void* ptr, size_t size, void *ptr_base, void *addr_of_base) {
   return allocated(ptr, size, ptr_base);
 }
 
