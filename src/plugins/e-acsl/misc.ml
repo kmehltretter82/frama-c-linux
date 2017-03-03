@@ -238,9 +238,9 @@ let mk_delete_stmt vi =
       mk_call ~loc (mk_api_name "delete_block") [ Cil.evar ~loc vi ]
     | _ -> mk_call ~loc (mk_api_name "delete_block") [ Cil.mkAddrOfVi vi ]
 
-let mk_readonly vi =
+let mk_mark_readonly vi =
   let loc = vi.vdecl in
-  mk_call ~loc (mk_api_name "readonly") [ Cil.evar ~loc vi ]
+  mk_call ~loc (mk_api_name "mark_readonly") [ Cil.evar ~loc vi ]
 
 (* ************************************************************************** *)
 (** {2 Other stuff} *)

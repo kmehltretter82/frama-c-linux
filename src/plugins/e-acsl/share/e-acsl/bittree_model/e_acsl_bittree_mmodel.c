@@ -154,7 +154,7 @@ static void full_init (void * ptr) {
 }
 
 /* mark a block as read-only */
-static void readonly(void * ptr) {
+static void mark_readonly(void * ptr) {
   bt_block * tmp;
   if (ptr == NULL)
     return;
@@ -212,11 +212,21 @@ static size_t block_length(void* ptr) {
   return tmp->size;
 }
 
-/* return whether the size bytes of ptr are readable/writable */
-static int valid(void* ptr, size_t size, void *ptr_base) {
+static int allocated(void* ptr, size_t size, void *ptr_base) {
   bt_block * blk = bt_find(ptr);
   bt_block * blk_base = bt_find(ptr_base);
+  if (blk == NULL || blk_base == NULL || blk->ptr != blk_base->ptr)
+    return false;
+  return (blk->size - ((size_t)ptr - blk->ptr) >= size);
+}
 
+/* return whether the size bytes of ptr are readable/writable */
+static int valid(void* ptr, size_t size, void *ptr_base) {
+  /* Many similarities with allocated (so far at least), but it is better
+   * to use this tandalone definition, otherwise the block needs to be looked
+   * up twice */
+  bt_block * blk = bt_find(ptr);
+  bt_block * blk_base = bt_find(ptr_base);
   if (blk == NULL || blk_base == NULL || blk->ptr != blk_base->ptr)
     return false;
   return (blk->size - ((size_t)ptr - blk->ptr) >= size && !blk->is_readonly);
@@ -224,12 +234,7 @@ static int valid(void* ptr, size_t size, void *ptr_base) {
 
 /* return whether the size bytes of ptr are readable */
 static int valid_read(void* ptr, size_t size, void *ptr_base) {
-  bt_block * blk = bt_find(ptr);
-  bt_block * blk_base = bt_find(ptr_base);
-
-  if (blk == NULL || blk_base == NULL || blk->ptr != blk_base->ptr)
-    return false;
-  return (blk->size - ((size_t)ptr - blk->ptr) >= size);
+  return allocated(ptr, size, ptr_base);
 }
 
 /* return the base address of the block containing ptr */
@@ -396,7 +401,7 @@ static int bittree_posix_memalign(void **memptr, size_t alignment, size_t size) 
     return -1;
 
   /* Make sure that the first argument to posix memalign is indeed allocated */
-  vassert(valid(memptr, sizeof(void*), memptr),
+  vassert(allocated((void*)memptr, sizeof(void*), (void*)memptr),
       "\\invalid memptr in posix_memalign", NULL);
 
   int res = native_posix_memalign(memptr, alignment, size);
@@ -595,7 +600,7 @@ public_alias(valid)
 public_alias(block_length)
 public_alias(initialized)
 public_alias(freeable)
-public_alias(readonly)
+public_alias(mark_readonly)
 /* Block initialization */
 public_alias(initialize)
 public_alias(full_init)

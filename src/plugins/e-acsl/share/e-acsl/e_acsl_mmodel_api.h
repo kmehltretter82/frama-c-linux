@@ -112,7 +112,7 @@ void __e_acsl_full_init(void * ptr)
 /*! \brief Mark a memory block which start address is given by \p ptr as
  * read-only. */
 /*@ assigns \nothing; */
-void __e_acsl_readonly(void * ptr)
+void __e_acsl_mark_readonly(void * ptr)
   __attribute__((FC_BUILTIN));
 
 /* ****************** */

@@ -352,16 +352,23 @@ static void validate_memory_layout() {
   DVASSERT(zeroed_out((void *)_addr, _size), \
     "Block [%a, %a+%lu] not nullified", _addr, _addr, _size)
 
+/* Assert that memory block [_addr, _addr + _size] is allocated */
+# define DVALIDATE_ALLOCATED(_addr, _size, _base) \
+  DVASSERT(allocated((uintptr_t)_addr, _size, (uintptr_t)_base), \
+    "Operation on unallocated block [%a + %lu] with base %lu\n   ", \
+    _addr, _size, _base)
+
 /* Assert that memory block [_addr, _addr + _size] is allocated
  * and can be written to */
-# define DVALIDATE_RW_ACCESS(_addr, _size) \
-  DVASSERT(valid((void*)_addr, _size,(void*)_addr), \
-       "Operation on unallocated block [%a + %lu]\n   ", _addr, _size)
+# define DVALIDATE_RW_ACCESS(_addr, _size) { \
+  DVALIDATE_ALLOCATED((uintptr_t)_addr, _size, (uintptr_t)_addr); \
+  DVASSERT(!readonly((void*)_addr), \
+    "Unexpected readonly address: %lu\n", _addr) \
+}
 
 /* Assert that memory block [_addr, _addr + _size] is allocated */
 # define DVALIDATE_RO_ACCESS(_addr, _size) \
-  DVASSERT(valid_read((void*)_addr, _size, (void*)_addr), \
-       "Operation on unallocated block [%a + %lu]\n   ", _addr, _size)
+  DVALIDATE_ALLOCATED((uintptr_t)_addr, _size, (uintptr_t)_addr)
 
 #else
 /*! \cond exclude from doxygen */
@@ -382,6 +389,7 @@ static void validate_memory_layout() {
 #  define DVALIDATE_HEAP_FREE
 #  define DVALIDATE_RO_ACCESS
 #  define DVALIDATE_RW_ACCESS
+#	 define DVALIDATE_ALLOCATED
 /*! \endcond */
 #endif
 /* }}} */
@@ -708,7 +716,7 @@ static void initialize_static_region(uintptr_t addr, long size) {
  * NOTE: This function has many similarities with ::initialize_static_region
  * The functionality, however is preferred to be kept separate
  * because the ::mark_readonly should operate only on the global shadow. */
-static void mark_readonly (uintptr_t addr, long size) {
+static void mark_readonly_region (uintptr_t addr, long size) {
   /* Since read-only blocks can only be stored in the globals  segments (e.g.,
    * TEXT), this function required ptr carry a global address. */
   DASSERT(IS_ON_GLOBAL(addr));

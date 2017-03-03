@@ -73,7 +73,7 @@ val mk_duplicate_store_stmt: ?str_size:exp -> varinfo -> stmt
 val mk_delete_stmt: varinfo -> stmt
 val mk_full_init_stmt: ?addr:bool -> varinfo -> stmt
 val mk_initialize: loc:location -> lval -> stmt
-val mk_readonly: varinfo -> stmt
+val mk_mark_readonly: varinfo -> stmt
 
 (* ************************************************************************** *)
 (** {2 Other stuff} *)

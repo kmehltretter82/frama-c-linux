@@ -69,8 +69,8 @@ static void full_init(void * ptr) {
   initialize(ptr, block_length(ptr));
 }
 
-static void readonly(void * ptr) {
-  mark_readonly((uintptr_t)ptr, block_length(ptr));
+static void mark_readonly(void * ptr) {
+  mark_readonly_region((uintptr_t)ptr, block_length(ptr));
 }
 
 /* ****************** */
@@ -100,6 +100,13 @@ static int valid_read(void * ptr, size_t size, void *ptr_base) {
   if (!IS_ON_VALID(addr))
     return 0;
   return 0;
+}
+
+/** \brief Return 1 if a given memory location is read-only and 0 otherwise */
+static int readonly (void *ptr) {
+  uintptr_t addr = (uintptr_t)ptr;
+  DVALIDATE_ALLOCATED(addr, 1, addr);
+  return IS_ON_GLOBAL(addr) && global_readonly(addr) ? 1 : 0;
 }
 
 /*! NB: The implementation for this function can also be specified via
@@ -199,8 +206,8 @@ public_alias(valid_read)
 public_alias(valid)
 public_alias(initialized)
 public_alias(freeable)
-public_alias(readonly)
 /* Block initialization  */
+public_alias(mark_readonly)
 public_alias(initialize)
 public_alias(full_init)
 /* Memory state initialization */
