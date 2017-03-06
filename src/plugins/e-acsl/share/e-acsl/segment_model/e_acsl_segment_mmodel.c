@@ -77,36 +77,19 @@ static void mark_readonly(void * ptr) {
 /* E-ACSL annotations */
 /* ****************** */
 
-static int valid(void * ptr, size_t size, void *ptr_base, void *addr_of_base) {
-  uintptr_t addr = (uintptr_t)ptr;
-  uintptr_t base = (uintptr_t)ptr_base;
-  if (IS_ON_HEAP(addr))
-    return heap_allocated(addr, size, base);
-  else if (IS_ON_STACK(addr) || IS_ON_TLS(addr))
-    return static_allocated(addr, size, base);
-  else if (IS_ON_GLOBAL(addr))
-    return static_allocated(addr, size, base) && !global_readonly(addr);
-  else if (!IS_ON_VALID(addr))
-    return 0;
-  return 0;
-}
-
-static int valid_read(void * ptr, size_t size, void *ptr_base, void *addr_of_base) {
-  uintptr_t addr = (uintptr_t)ptr;
-  uintptr_t base = (uintptr_t)ptr_base;
-  TRY_SEGMENT_WEAK(addr,
-    return heap_allocated(addr, size, base),
-    return static_allocated(addr, size, base));
-  if (!IS_ON_VALID(addr))
-    return 0;
-  return 0;
-}
-
 /** \brief Return 1 if a given memory location is read-only and 0 otherwise */
 static int readonly (void *ptr) {
   uintptr_t addr = (uintptr_t)ptr;
   DVALIDATE_ALLOCATED(addr, 1, addr);
   return IS_ON_GLOBAL(addr) && global_readonly(addr) ? 1 : 0;
+}
+
+static int valid(void * ptr, size_t size, void *ptr_base, void *addr_of_base) {
+  return allocated((uintptr_t)ptr, size, (uintptr_t)ptr_base) && !readonly(ptr);
+}
+
+static int valid_read(void * ptr, size_t size, void *ptr_base, void *addr_of_base) {
+  return allocated((uintptr_t)ptr, size, (uintptr_t)ptr_base);
 }
 
 /*! NB: The implementation for this function can also be specified via
