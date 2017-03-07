@@ -14,11 +14,9 @@ FRAMAC_SHARE/libc/stdlib.h:277:[kernel] warning: No code nor implicit assigns cl
   __e_acsl_init ∈ [--..--]
   __e_acsl_internal_heap ∈ [--..--]
   __e_acsl_heap_allocation_size ∈ [--..--]
-tests/gmp/longlong.i:9:[value] warning: recursive call during value analysis
-                 of my_pow (my_pow <- my_pow :: tests/gmp/longlong.i:16 <- main).
-                 Using specification of my_pow.
-[value] user error: Recursive call on an unspecified function. Using potentially invalid
-                    inferred assigns 'assigns \result \from x, n;'
+tests/gmp/longlong.i:9:[value] user error: recursive call during value analysis
+                    of my_pow (my_pow <- my_pow :: tests/gmp/longlong.i:16 <- main). Assuming
+                    the call has no effect. The analysis will be unsound.]
 [value] using specification for function my_pow
 tests/gmp/longlong.i:10:[value] warning: signed overflow. assert -2147483648 ≤ tmp * tmp;
 tests/gmp/longlong.i:10:[value] warning: signed overflow. assert tmp * tmp ≤ 2147483647;
@@ -32,6 +30,8 @@ FRAMAC_SHARE/e-acsl/e_acsl_gmp.h:99:[value] warning: function __gmpz_import: pre
 [value] using specification for function __e_acsl_assert
 FRAMAC_SHARE/e-acsl/e_acsl.h:43:[value] warning: function __e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_tdiv_r
+tests/gmp/longlong.i:17:[value] Assigning imprecise value to __gen_e_acsl_eq.
+        The imprecision originates from Library function
 tests/gmp/longlong.i:17:[value] warning: pointer comparison.
                  assert \pointer_comparable((void *)__gen_e_acsl_eq, (void *)0);
 [value] using specification for function __gmpz_clear
