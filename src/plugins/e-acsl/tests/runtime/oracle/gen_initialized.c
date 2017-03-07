@@ -401,8 +401,8 @@ int main(void)
     }
   }
   int size = 100;
-  char *partsc = malloc((unsigned long)size * sizeof(char));;
-  char *partsi = malloc((unsigned long)size * sizeof(int));;
+  char *partsc = malloc((unsigned long)size * sizeof(char));
+  char *partsi = malloc((unsigned long)size * sizeof(int));
   {
     int i = 0;
     while (i < size) {

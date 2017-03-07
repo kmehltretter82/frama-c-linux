@@ -28,7 +28,7 @@ int main(void)
   __e_acsl_store_block((void *)(& srcbuf),(size_t)8);
   __e_acsl_full_init((void *)(& srcbuf));
   int loc = 1;
-  char *destbuf = malloc((unsigned long)10 * sizeof(char));;
+  char *destbuf = malloc((unsigned long)10 * sizeof(char));
   char ch = (char)'o';
   if (destbuf != (char *)0) {
     i = -1;

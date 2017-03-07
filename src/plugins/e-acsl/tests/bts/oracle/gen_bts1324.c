@@ -37,7 +37,7 @@ int main(void)
   int t[7] = {1, 4, 4, 5, 5, 5, 7};
   __e_acsl_store_block((void *)(t),(size_t)28);
   __e_acsl_full_init((void *)(t));
-  int n = __gen_e_acsl_sorted(t,7);;
+  int n = __gen_e_acsl_sorted(t,7);
   /*@ assert n ≡ 1; */
   __e_acsl_assert(n == 1,(char *)"Assertion",(char *)"main",(char *)"n == 1",
                   23);

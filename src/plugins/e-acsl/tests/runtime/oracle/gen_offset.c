@@ -149,7 +149,7 @@ int main(void)
                       (char *)"main",(char *)"\\offset(pi) == 4",35);
     }
   }
-  char *p = malloc((unsigned long)12);;
+  char *p = malloc((unsigned long)12);
   __e_acsl_store_block((void *)(& p),(size_t)8);
   __e_acsl_full_init((void *)(& p));
   /*@ assert \offset(p) ≡ 0; */
@@ -199,7 +199,7 @@ int main(void)
                       (char *)"main",(char *)"\\offset(p - 5) == 0",44);
     }
   }
-  long *q = malloc((unsigned long)30 * sizeof(long));;
+  long *q = malloc((unsigned long)30 * sizeof(long));
   __e_acsl_store_block((void *)(& q),(size_t)8);
   __e_acsl_full_init((void *)(& q));
   /*@ assert \offset(q) ≡ 0; */

@@ -5,12 +5,12 @@ int main(int argc, char **argv)
 {
   int __retres;
   __e_acsl_memory_init(& argc,& argv,(size_t)8);
-  char *a = malloc((unsigned long)7);;
+  char *a = malloc((unsigned long)7);
   /*@ assert __e_acsl_heap_allocation_size ≡ 7; */
   __e_acsl_assert(__e_acsl_heap_allocation_size == 7UL,(char *)"Assertion",
                   (char *)"main",
                   (char *)"__e_acsl_heap_allocation_size == 7",14);
-  char *b = malloc((unsigned long)14);;
+  char *b = malloc((unsigned long)14);
   /*@ assert __e_acsl_heap_allocation_size ≡ 21; */
   __e_acsl_assert(__e_acsl_heap_allocation_size == 21UL,(char *)"Assertion",
                   (char *)"main",

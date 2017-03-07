@@ -6,11 +6,11 @@ int main(int argc, char const **argv)
   char *a;
   __e_acsl_memory_init(& argc,(char ***)(& argv),(size_t)8);
   __e_acsl_store_block((void *)(& a),(size_t)8);
-  char **memptr = malloc(sizeof(void *));;
+  char **memptr = malloc(sizeof(void *));
   __e_acsl_store_block((void *)(& memptr),(size_t)8);
   __e_acsl_full_init((void *)(& memptr));
   int res2 =
-    posix_memalign((void **)memptr,(unsigned long)256,(unsigned long)15);;
+    posix_memalign((void **)memptr,(unsigned long)256,(unsigned long)15);
   /*@ assert Value: mem_access: \valid_read(memptr); */
   char *p = *memptr;
   __e_acsl_store_block((void *)(& p),(size_t)8);

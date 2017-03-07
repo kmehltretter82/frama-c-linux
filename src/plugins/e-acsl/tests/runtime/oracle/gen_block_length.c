@@ -204,7 +204,7 @@ int main(void)
     }
   }
   size_t size = (unsigned long)12;
-  char *p = malloc(size);;
+  char *p = malloc(size);
   __e_acsl_store_block((void *)(& p),(size_t)8);
   __e_acsl_full_init((void *)(& p));
   /*@ assert \block_length(p) ≡ size; */
@@ -243,7 +243,7 @@ int main(void)
     }
   }
   size = (unsigned long)30 * sizeof(long);
-  long *q = malloc(size);;
+  long *q = malloc(size);
   __e_acsl_store_block((void *)(& q),(size_t)8);
   __e_acsl_full_init((void *)(& q));
   /*@ assert \block_length(q) ≡ size; */

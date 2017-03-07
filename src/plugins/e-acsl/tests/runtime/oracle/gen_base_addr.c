@@ -185,7 +185,7 @@ int main(void)
                       (char *)"\\base_addr(pl) == \\base_addr(&l)",39);
     }
   }
-  char *p = malloc((unsigned long)12);;
+  char *p = malloc((unsigned long)12);
   __e_acsl_store_block((void *)(& p),(size_t)8);
   __e_acsl_full_init((void *)(& p));
   char *pd = p;
@@ -254,7 +254,7 @@ int main(void)
                       (char *)"\\base_addr(p - 5) == \\base_addr(pd)",49);
     }
   }
-  long *q = malloc((unsigned long)30 * sizeof(long));;
+  long *q = malloc((unsigned long)30 * sizeof(long));
   __e_acsl_store_block((void *)(& q),(size_t)8);
   __e_acsl_full_init((void *)(& q));
   long *qd = q;
