@@ -584,7 +584,7 @@ if [ -n "$OPTION_INSTRUMENT" ]; then
     $FRAMAC_FLAGS \
     $MACHDEP \
     -cpp-extra-args="$FRAMAC_CPP_EXTRA" \
-    -no-va \
+    -variadic-no-translation \
     -e-acsl-share=$EACSL_SHARE \
     $OPTION_FRAMA_STDLIB \
     $OPTION_VERBOSE \
