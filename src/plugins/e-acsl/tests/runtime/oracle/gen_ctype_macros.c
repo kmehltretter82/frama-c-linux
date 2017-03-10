@@ -4,17 +4,15 @@
 int main(int argc, char const **argv)
 {
   int __retres;
-  char c;
   int tmp;
-  char *d;
   __e_acsl_memory_init(& argc,(char ***)(& argv),(size_t)8);
-  __e_acsl_store_block((void *)(& d),(size_t)8);
-  __e_acsl_store_block((void *)(& c),(size_t)1);
   tmp = __gen_e_acsl_isupper(argc);
+  char c = (char)tmp;
+  __e_acsl_store_block((void *)(& c),(size_t)1);
   __e_acsl_full_init((void *)(& c));
-  c = (char)tmp;
+  char *d = & c;
+  __e_acsl_store_block((void *)(& d),(size_t)8);
   __e_acsl_full_init((void *)(& d));
-  d = & c;
   /*@ assert \valid(d); */
   {
     {

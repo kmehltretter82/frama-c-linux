@@ -365,12 +365,12 @@ let register_predicate kf pred state =
       ();
     !state_ref
 
-  let register_initializers state =
     let rec do_init vi init state = match init with
       | SingleInit e -> handle_assignment state (Var vi, NoOffset) e
-      | CompoundInit(_, l) -> 
+      | CompoundInit(_, l) ->
         List.fold_left (fun state (_, init) -> do_init vi init state) state l
-    in
+
+  let register_initializers state =
     let do_one vi init state = match init.init with 
       | None -> state
       | Some init -> do_init vi init state
@@ -442,21 +442,9 @@ let register_predicate kf pred state =
         in
         Some state)
 
-  (** The (backwards) transfer function for an instruction. The
-      [(Cil.CurrentLoc.get ())] is set before calling this. If it returns
-      None, then we have some default handling. Otherwise, the returned data is
-      the data before the branch (not considering the exception handlers) *)
-  let doInstr _stmt instr state = 
-    let state = Env.default_varinfos state in
-    match instr with
-    | Set(lv, e, _) -> 
-      let state = handle_assignment state lv e in
-      Dataflow.Done (Some state)
-    | Call(result, f_exp, l, _) -> 
-      (match f_exp.enode with
-      | Lval(Var vi, NoOffset) ->
-        Env.check_heap_allocations vi.vname;
-        let kf = Globals.Functions.get vi in
+  let do_call res f args state =
+    Env.check_heap_allocations f.vname;
+    let kf = Globals.Functions.get f in
         let params = Globals.Functions.get_params kf in
         let state =
           if Kernel_function.is_definition kf then
@@ -466,21 +454,21 @@ let register_predicate kf pred state =
                 List.fold_left2
                   (fun acc p a -> match base_addr a with
                   | None -> acc
-                  | Some vi -> 
-                    if Varinfo.Hptset.mem vi state 
+                 | Some vi ->
+                   if Varinfo.Hptset.mem vi state
                     then Varinfo.Hptset.add p acc
                     else acc)
                   state
                   params
-                  l
+              args
               in
-              let init = match result with
+          let init = match res with
                 | None -> init
                 | Some lv ->
                   match base_addr_node (Lval lv) with
                   | None -> init
                   | Some vi ->
-                    if Varinfo.Hptset.mem vi state 
+                if Varinfo.Hptset.mem vi state
                     then Varinfo.Hptset.add (Misc.result_vi kf) init
                     else init
               in
@@ -491,29 +479,29 @@ let register_predicate kf pred state =
                 (fun acc p a -> match base_addr a with
                 | None -> acc
                 | Some vi ->
-                  if  Varinfo.Hptset.mem p state then Varinfo.Hptset.add vi acc
+                 if Varinfo.Hptset.mem p state then Varinfo.Hptset.add vi acc
                   else acc)
                 state
                 params
-                l
-            with Invalid_argument _ -> 
+            args
+        with Invalid_argument _ ->
               Options.warning ~current:true
-                "ignoring effect of variadic function %a" 
+            "ignoring effect of variadic function %a"
                 Kernel_function.pretty
                 kf;
               state
           else
             state
         in
-        let state = match result, Kernel_function.is_definition kf with
+    let state = match res, Kernel_function.is_definition kf with
           | None, _ | _, false -> state
           | Some (lhost, _), true ->
     (* add the result if \result must be kept after calling the kf *)
             let vi = Misc.result_vi kf in
-            if  Varinfo.Hptset.mem vi state then 
+        if  Varinfo.Hptset.mem vi state then
               match lhost with
               | Var vi -> Varinfo.Hptset.add vi state
-              | Mem e -> 
+          | Mem e ->
                 match base_addr e with
                 | None -> state
                 | Some vi -> Varinfo.Hptset.add vi state
@@ -521,6 +509,28 @@ let register_predicate kf pred state =
               state
         in
         Dataflow.Done (Some state)
+
+
+  (** The (backwards) transfer function for an instruction. The
+      [(Cil.CurrentLoc.get ())] is set before calling this. If it returns
+      None, then we have some default handling. Otherwise, the returned data is
+      the data before the branch (not considering the exception handlers) *)
+  let doInstr _stmt instr state = 
+    let state = Env.default_varinfos state in
+    match instr with
+    | Set(lv, e, _) -> 
+      let state = handle_assignment state lv e in
+      Dataflow.Done (Some state)
+    | Local_init(v,AssignInit i,_) ->
+      let state = do_init v i state in
+      Dataflow.Done (Some state)
+    | Local_init(v,ConsInit(f,args,Constructor),_) ->
+      do_call None f (Cil.mkAddrOfVi v :: args) state
+    | Local_init(v,ConsInit(f,args,Plain_func),_) ->
+      do_call (Some (Cil.var v)) f args state
+    | Call(result, f_exp, l, _) ->
+      (match f_exp.enode with
+      | Lval(Var vi, NoOffset) -> do_call result vi l state
       | _ ->
         Options.warning ~current:true
           "function pointers may introduce too limited instrumentation.";

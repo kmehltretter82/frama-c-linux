@@ -6,10 +6,9 @@ int goto_bts(void)
   int *p;
   __e_acsl_store_block((void *)(& p),(size_t)8);
   {
-    int a;
+    int a = 0;
     __e_acsl_store_block((void *)(& a),(size_t)4);
     __e_acsl_full_init((void *)(& a));
-    a = 0;
     __e_acsl_full_init((void *)(& p));
     p = & a;
     /*@ assert \valid(p); */
@@ -60,33 +59,29 @@ int goto_bts(void)
 int goto_valid(void)
 {
   int __retres;
-  int a;
   int *p;
   int *q;
   int *r;
   __e_acsl_store_block((void *)(& r),(size_t)8);
   __e_acsl_store_block((void *)(& q),(size_t)8);
   __e_acsl_store_block((void *)(& p),(size_t)8);
-  a = 9;
+  int a = 9;
   {
-    int a1;
+    int a1 = 0;
     __e_acsl_store_block((void *)(& a1),(size_t)4);
     __e_acsl_full_init((void *)(& a1));
-    a1 = 0;
     __e_acsl_full_init((void *)(& p));
     p = & a1;
     {
-      int a2;
+      int a2 = 0;
       __e_acsl_store_block((void *)(& a2),(size_t)4);
       __e_acsl_full_init((void *)(& a2));
-      a2 = 0;
       __e_acsl_full_init((void *)(& q));
       q = & a2;
       {
-        int a3;
+        int a3 = 0;
         __e_acsl_store_block((void *)(& a3),(size_t)4);
         __e_acsl_full_init((void *)(& a3));
-        a3 = 0;
         __e_acsl_full_init((void *)(& r));
         r = & a3;
         __e_acsl_delete_block((void *)(& a2));
@@ -235,32 +230,29 @@ int goto_valid(void)
 int switch_valid(void)
 {
   int __retres;
-  int i;
   int *p;
   int *q;
   int *s;
   __e_acsl_store_block((void *)(& s),(size_t)8);
   __e_acsl_store_block((void *)(& q),(size_t)8);
   __e_acsl_store_block((void *)(& p),(size_t)8);
+  int i = 1;
   __e_acsl_store_block((void *)(& i),(size_t)4);
   __e_acsl_full_init((void *)(& i));
-  i = 1;
   __e_acsl_full_init((void *)(& s));
   s = & i;
   switch (i) {
     default: ;
     {
-      int a1;
+      int a1 = 0;
       __e_acsl_store_block((void *)(& a1),(size_t)4);
       __e_acsl_full_init((void *)(& a1));
-      a1 = 0;
       __e_acsl_full_init((void *)(& p));
       p = & a1;
       {
-        int a2;
+        int a2 = 0;
         __e_acsl_store_block((void *)(& a2),(size_t)4);
         __e_acsl_full_init((void *)(& a2));
-        a2 = 0;
         __e_acsl_full_init((void *)(& q));
         q = & a2;
         /*@ assert \valid(p); */
@@ -397,33 +389,29 @@ int while_valid(void)
   int *p;
   int *q;
   int *r;
-  int i;
   __e_acsl_store_block((void *)(& r),(size_t)8);
   __e_acsl_store_block((void *)(& q),(size_t)8);
   __e_acsl_store_block((void *)(& p),(size_t)8);
-  i = 5;
+  int i = 5;
   {
-    int a0;
+    int a0 = 0;
     __e_acsl_store_block((void *)(& a0),(size_t)4);
     __e_acsl_full_init((void *)(& a0));
-    a0 = 0;
     __e_acsl_full_init((void *)(& r));
     r = & a0;
     while (1) {
       i --;
       if (! i) break;
       {
-        int a1;
+        int a1 = 0;
         __e_acsl_store_block((void *)(& a1),(size_t)4);
         __e_acsl_full_init((void *)(& a1));
-        a1 = 0;
         __e_acsl_full_init((void *)(& p));
         p = & a1;
         {
-          int a2;
+          int a2 = 0;
           __e_acsl_store_block((void *)(& a2),(size_t)4);
           __e_acsl_full_init((void *)(& a2));
-          a2 = 0;
           __e_acsl_full_init((void *)(& q));
           q = & a2;
           /*@ assert \valid(p); */
@@ -553,12 +541,11 @@ int while_valid(void)
 
 void continue_valid(void)
 {
-  int i;
   int *p;
   int *q;
   __e_acsl_store_block((void *)(& q),(size_t)8);
   __e_acsl_store_block((void *)(& p),(size_t)8);
-  i = 0;
+  int i = 0;
   while (1) {
     int tmp;
     { /* sequence */
@@ -568,8 +555,6 @@ void continue_valid(void)
     }
     if (! tmp) break;
     {
-      int a1;
-      __e_acsl_store_block((void *)(& a1),(size_t)4);
       /*@ assert ¬\valid(p); */
       {
         {
@@ -604,8 +589,9 @@ void continue_valid(void)
                           (char *)"continue_valid",(char *)"!\\valid(q)",131);
         }
       }
+      int a1 = 1;
+      __e_acsl_store_block((void *)(& a1),(size_t)4);
       __e_acsl_full_init((void *)(& a1));
-      a1 = 1;
       __e_acsl_full_init((void *)(& p));
       p = & a1;
       /*@ assert \valid(p); */
@@ -643,10 +629,9 @@ void continue_valid(void)
         }
       }
       {
-        int a2;
+        int a2 = 1;
         __e_acsl_store_block((void *)(& a2),(size_t)4);
         __e_acsl_full_init((void *)(& a2));
-        a2 = 1;
         __e_acsl_full_init((void *)(& q));
         q = & a2;
         /*@ assert \valid(p); */

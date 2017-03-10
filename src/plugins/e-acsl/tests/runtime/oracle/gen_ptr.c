@@ -3,24 +3,16 @@
 int main(void)
 {
   int __retres;
-  int x;
-  int t[3];
-  int *p;
-  int k;
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
-  __e_acsl_store_block((void *)(& p),(size_t)8);
-  __e_acsl_store_block((void *)(t),(size_t)12);
+  int x = 1;
   __e_acsl_store_block((void *)(& x),(size_t)4);
   __e_acsl_full_init((void *)(& x));
-  x = 1;
-  __e_acsl_initialize((void *)(t),sizeof(int));
-  t[0] = 2;
-  __e_acsl_initialize((void *)(& t[1]),sizeof(int));
-  t[1] = 3;
-  __e_acsl_initialize((void *)(& t[2]),sizeof(int));
-  t[2] = 4;
+  int t[3] = {2, 3, 4};
+  __e_acsl_store_block((void *)(t),(size_t)12);
+  __e_acsl_full_init((void *)(t));
+  int *p = & x;
+  __e_acsl_store_block((void *)(& p),(size_t)8);
   __e_acsl_full_init((void *)(& p));
-  p = & x;
   /*@ assert *p ≡ 1; */
   {
     {
@@ -50,8 +42,7 @@ int main(void)
   __e_acsl_assert(t[(2 * 4) / 4] == 4,(char *)"Assertion",(char *)"main",
                   (char *)"t[(2 * sizeof(int)) / sizeof((int)0x0)] == 4",14);
   {
-    int i;
-    i = 0;
+    int i = 0;
     while (i < 2) {
       /*@ assert t[i] ≡ i + 2; */
       {
@@ -111,7 +102,7 @@ int main(void)
                       (char *)"*p == 5",25);
     }
   }
-  k = -1;
+  int k = -1;
   /*@ assert *(p + k) ≡ 3; */
   {
     {

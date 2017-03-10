@@ -14,30 +14,21 @@ void __e_acsl_globals_init(void)
 int main(void)
 {
   int __retres;
-  int *p;
-  int *q;
-  int a;
   int b;
   long *r;
-  long c[2];
   long d[2];
-  int size;
-  char *partsc;
-  char *partsi;
   int dup[2];
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   __e_acsl_globals_init();
   __e_acsl_store_block((void *)(d),(size_t)16);
-  __e_acsl_store_block((void *)(c),(size_t)16);
   __e_acsl_store_block((void *)(& r),(size_t)8);
   __e_acsl_store_block((void *)(& b),(size_t)4);
-  __e_acsl_store_block((void *)(& a),(size_t)4);
-  __e_acsl_store_block((void *)(& q),(size_t)8);
+  int *p = & A;
   __e_acsl_store_block((void *)(& p),(size_t)8);
   __e_acsl_full_init((void *)(& p));
-  p = & A;
+  int *q = & B;
+  __e_acsl_store_block((void *)(& q),(size_t)8);
   __e_acsl_full_init((void *)(& q));
-  q = & B;
   /*@ assert \initialized(&A); */
   __e_acsl_assert(1,(char *)"Assertion",(char *)"main",
                   (char *)"\\initialized(&A)",16);
@@ -63,12 +54,12 @@ int main(void)
                       (char *)"main",(char *)"\\initialized(q)",19);
     }
   }
+  int a = 0;
+  __e_acsl_store_block((void *)(& a),(size_t)4);
   __e_acsl_full_init((void *)(& a));
-  a = 0;
-  __e_acsl_initialize((void *)(c),sizeof(long));
-  c[0] = (long)1;
-  __e_acsl_initialize((void *)(& c[1]),sizeof(long));
-  c[1] = (long)1;
+  long c[2] = {(long)1, (long)1};
+  __e_acsl_store_block((void *)(c),(size_t)16);
+  __e_acsl_full_init((void *)(c));
   __e_acsl_full_init((void *)(& p));
   p = & a;
   __e_acsl_full_init((void *)(& q));
@@ -409,12 +400,11 @@ int main(void)
                       (char *)"main",(char *)"!\\initialized(p)",96);
     }
   }
-  size = 100;
-  partsc = (char *)malloc((unsigned long)size * sizeof(char));
-  partsi = (char *)malloc((unsigned long)size * sizeof(int));
+  int size = 100;
+  char *partsc = malloc((unsigned long)size * sizeof(char));
+  char *partsi = malloc((unsigned long)size * sizeof(int));
   {
-    int i;
-    i = 0;
+    int i = 0;
     while (i < size) {
       if (i % 2 != 0) 
         /*@ assert Value: mem_access: \valid(partsc + i); */
@@ -426,8 +416,7 @@ int main(void)
     }
   }
   {
-    int i_0;
-    i_0 = 0;
+    int i_0 = 0;
     while (i_0 < size) {
       if (i_0 % 2 != 0) ;
       i_0 ++;

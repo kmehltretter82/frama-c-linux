@@ -23,8 +23,7 @@ int fact(int n)
 int main(void)
 {
   int __retres;
-  int x;
-  x = __gen_e_acsl_fact(5);
+  int x = __gen_e_acsl_fact(5);
   /*@ assert x ≡ 120; */
   __e_acsl_assert(x == 120,(char *)"Assertion",(char *)"main",
                   (char *)"x == 120",13);

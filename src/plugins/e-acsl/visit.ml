@@ -50,20 +50,20 @@ end = struct
   let tracking_stmt ?before fold mk_stmt env kf vars =
     fold
       (fun vi env ->
-        if Mmodel_analysis.must_model_vi ~kf vi then
-          let vi = Cil.get_varinfo (Env.get_behavior env) vi in
+      if Mmodel_analysis.must_model_vi ~kf vi then
+        let vi = Cil.get_varinfo (Env.get_behavior env) vi in
           Env.add_stmt ?before env (mk_stmt vi)
-        else
-          env)
+      else
+        env)
       vars
-      env
+    env
 
   let store ?before env kf vars =
     tracking_stmt
       ?before
       List.fold_right (* small list *)
       Misc.mk_store_stmt
-      env
+    env
       kf
       vars
 
@@ -386,7 +386,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
   method !vinit vi _off _i =
     if generate then
       if Mmodel_analysis.must_model_vi vi then begin
-        is_initializer <- true;
+        is_initializer <- vi.vglob;
         Cil.DoChildrenPost
           (fun i ->
             (match is_initializer with
@@ -660,7 +660,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
           else
             stmt, env
         else (* i.e. not (is_return stmt) *)
-          if generate then
+          if generate then begin
             (* must generate [pre_block] which includes [stmt] before generating
                [post_block] *)
             let pre_block, env =
@@ -674,9 +674,17 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
                 ~global_clear:false
                 Env.Before
             in
+            (match stmt.skind with
+             | Instr (Local_init (vi, _, _)) when
+                 Mmodel_analysis.old_must_model_vi self#behavior ~kf vi ->
+               let vi = Cil.get_varinfo self#behavior vi in
+               post_block.bstmts <-
+                 post_block.bstmts @
+                 [Misc.mk_store_stmt vi; Misc.mk_full_init_stmt vi]
+             | _ -> ());
             (* TODO: must clear the local block anytime (?) *)
             Misc.mk_block prj new_stmt post_block, env
-          else
+          end else
             stmt, env
       in
       if must_mv then Loops.mv_invariants env ~old:new_stmt stmt;
@@ -725,6 +733,9 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         | _ -> assert false)
     else
       Cil.DoChildren
+  | Local_init _ ->
+    (* initialization is registered in vstmt. *)
+    Cil.DoChildren
   | Call(Some old_ret, _, _, _) ->
     if not generate || Misc.is_generated_kf (Extlib.the self#current_kf) then
       Cil.DoChildren
@@ -775,7 +786,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         new_blk.bstmts <-
           List.fold_left
           (fun acc vi ->
-            if Mmodel_analysis.must_model_vi vi then
+            if Mmodel_analysis.must_model_vi vi && not vi.vdefined then
               let vi = Cil.get_varinfo self#behavior vi in
               Misc.mk_store_stmt vi :: acc
             else acc)

@@ -3,8 +3,7 @@
 int main(void)
 {
   int __retres;
-  int x;
-  x = 0;
+  int x = 0;
   x ++;
   /*@ assert sizeof(int) ≡ sizeof(x); */
   __e_acsl_assert(4 == 4,(char *)"Assertion",(char *)"main",

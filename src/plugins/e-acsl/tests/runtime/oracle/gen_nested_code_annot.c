@@ -3,10 +3,8 @@
 int main(void)
 {
   int __retres;
-  int x;
-  int y;
-  x = 0;
-  y = 1;
+  int x = 0;
+  int y = 1;
   /*@ assert x < y; */
   __e_acsl_assert(x < y,(char *)"Assertion",(char *)"main",(char *)"x < y",7);
   /*@ requires x ≡ 0;

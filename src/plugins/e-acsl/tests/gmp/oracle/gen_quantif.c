@@ -207,9 +207,8 @@ int main(void)
   }
   {
     int buf[10];
-    unsigned long len;
     __e_acsl_store_block((void *)(buf),(size_t)40);
-    len = (unsigned long)9;
+    unsigned long len = (unsigned long)9;
     /*@ assert ∀ ℤ i; 0 ≤ i < 10 ⇒ \valid(&buf[i]); */
     {
       {

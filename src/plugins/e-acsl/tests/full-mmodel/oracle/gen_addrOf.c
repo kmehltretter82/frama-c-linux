@@ -32,9 +32,8 @@ void f(void)
 int main(void)
 {
   int __retres;
-  int x;
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
-  x = 0;
+  int x = 0;
   f();
   /*@ assert &x ≡ &x; */
   __e_acsl_assert(& x == & x,(char *)"Assertion",(char *)"main",

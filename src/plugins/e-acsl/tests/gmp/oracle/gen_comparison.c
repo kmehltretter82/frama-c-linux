@@ -3,11 +3,8 @@
 int main(void)
 {
   int __retres;
-  int x;
-  int y;
-  char *s;
-  x = 0;
-  y = 1;
+  int x = 0;
+  int y = 1;
   /*@ assert x < y; */
   __e_acsl_assert(x < y,(char *)"Assertion",(char *)"main",(char *)"x < y",7);
   /*@ assert y > x; */
@@ -18,7 +15,7 @@ int main(void)
   /*@ assert y ≥ 1; */
   __e_acsl_assert(y >= 1,(char *)"Assertion",(char *)"main",(char *)"y >= 1",
                   10);
-  s = (char *)"toto";
+  char *s = (char *)"toto";
   /*@ assert s ≡ s; */
   __e_acsl_assert(s == s,(char *)"Assertion",(char *)"main",(char *)"s == s",
                   12);

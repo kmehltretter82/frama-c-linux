@@ -76,17 +76,15 @@ void bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
 int main(void)
 {
   int __retres;
-  float f;
-  float g;
   float h;
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   __e_acsl_store_block((void *)(& h),(size_t)4);
-  __e_acsl_store_block((void *)(& g),(size_t)4);
+  float f = (float)1.0;
   __e_acsl_store_block((void *)(& f),(size_t)4);
   __e_acsl_full_init((void *)(& f));
-  f = (float)1.0;
+  float g = (float)1.0;
+  __e_acsl_store_block((void *)(& g),(size_t)4);
   __e_acsl_full_init((void *)(& g));
-  g = (float)1.0;
   __gen_e_acsl_foo(& f,& g,& h);
   __gen_e_acsl_bar(& f,& g,& h);
   __retres = 0;

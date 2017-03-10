@@ -13,8 +13,7 @@ int __gen_e_acsl_sorted(int *t, int n);
 int sorted(int *t, int n)
 {
   int __retres;
-  int b;
-  b = 1;
+  int b = 1;
   if (n <= 1) {
     __retres = 1;
     goto return_label;
@@ -34,25 +33,11 @@ int sorted(int *t, int n)
 int main(void)
 {
   int __retres;
-  int t[7];
-  int n;
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  int t[7] = {1, 4, 4, 5, 5, 5, 7};
   __e_acsl_store_block((void *)(t),(size_t)28);
-  __e_acsl_initialize((void *)(t),sizeof(int));
-  t[0] = 1;
-  __e_acsl_initialize((void *)(& t[1]),sizeof(int));
-  t[1] = 4;
-  __e_acsl_initialize((void *)(& t[2]),sizeof(int));
-  t[2] = 4;
-  __e_acsl_initialize((void *)(& t[3]),sizeof(int));
-  t[3] = 5;
-  __e_acsl_initialize((void *)(& t[4]),sizeof(int));
-  t[4] = 5;
-  __e_acsl_initialize((void *)(& t[5]),sizeof(int));
-  t[5] = 5;
-  __e_acsl_initialize((void *)(& t[6]),sizeof(int));
-  t[6] = 7;
-  n = __gen_e_acsl_sorted(t,7);
+  __e_acsl_full_init((void *)(t));
+  int n = __gen_e_acsl_sorted(t,7);
   /*@ assert n ≡ 1; */
   __e_acsl_assert(n == 1,(char *)"Assertion",(char *)"main",(char *)"n == 1",
                   23);

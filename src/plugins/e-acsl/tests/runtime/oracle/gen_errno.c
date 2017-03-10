@@ -12,12 +12,11 @@ void __e_acsl_globals_init(void)
 int main(int argc, char const **argv)
 {
   int __retres;
-  int *p;
   __e_acsl_memory_init(& argc,(char ***)(& argv),(size_t)8);
   __e_acsl_globals_init();
+  int *p = & errno;
   __e_acsl_store_block((void *)(& p),(size_t)8);
   __e_acsl_full_init((void *)(& p));
-  p = & errno;
   /*@ assert \valid(p); */
   {
     {

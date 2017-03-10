@@ -3,11 +3,8 @@
 int main(void)
 {
   int __retres;
-  int x;
-  int y;
-  char *s;
-  x = 0;
-  y = 1;
+  int x = 0;
+  int y = 1;
   /*@ assert x < y; */
   {
     {
@@ -72,7 +69,7 @@ int main(void)
       __gmpz_clear(__gen_e_acsl__2);
     }
   }
-  s = (char *)"toto";
+  char *s = (char *)"toto";
   /*@ assert s ≡ s; */
   __e_acsl_assert(s == s,(char *)"Assertion",(char *)"main",(char *)"s == s",
                   12);
