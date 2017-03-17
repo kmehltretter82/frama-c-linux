@@ -68,30 +68,27 @@ int main(void)
         requires x + y ≡ 5;
   */
   {
-    {
-      int __gen_e_acsl_implies;
-      int __gen_e_acsl_and;
-      int __gen_e_acsl_implies_2;
-      int __gen_e_acsl_and_2;
-      int __gen_e_acsl_implies_3;
-      if (! (x == 1)) __gen_e_acsl_implies = 1;
-      else __gen_e_acsl_implies = x == 0;
-      __e_acsl_assert(__gen_e_acsl_implies,(char *)"Precondition",
-                      (char *)"main",(char *)"x == 1 ==> x == 0",33);
-      if (x == 3) __gen_e_acsl_and = y == 2; else __gen_e_acsl_and = 0;
-      if (! __gen_e_acsl_and) __gen_e_acsl_implies_2 = 1;
-      else __gen_e_acsl_implies_2 = x == 3;
-      __e_acsl_assert(__gen_e_acsl_implies_2,(char *)"Precondition",
-                      (char *)"main",(char *)"x == 3 && y == 2 ==> x == 3",
-                      37);
-      if (x == 3) __gen_e_acsl_and_2 = y == 2; else __gen_e_acsl_and_2 = 0;
-      if (! __gen_e_acsl_and_2) __gen_e_acsl_implies_3 = 1;
-      else __gen_e_acsl_implies_3 = x + (long)y == 5L;
-      __e_acsl_assert(__gen_e_acsl_implies_3,(char *)"Precondition",
-                      (char *)"main",
-                      (char *)"x == 3 && y == 2 ==> x + y == 5",38);
-      x += y;
-    }
+    int __gen_e_acsl_implies;
+    int __gen_e_acsl_and;
+    int __gen_e_acsl_implies_2;
+    int __gen_e_acsl_and_2;
+    int __gen_e_acsl_implies_3;
+    if (! (x == 1)) __gen_e_acsl_implies = 1;
+    else __gen_e_acsl_implies = x == 0;
+    __e_acsl_assert(__gen_e_acsl_implies,(char *)"Precondition",
+                    (char *)"main",(char *)"x == 1 ==> x == 0",33);
+    if (x == 3) __gen_e_acsl_and = y == 2; else __gen_e_acsl_and = 0;
+    if (! __gen_e_acsl_and) __gen_e_acsl_implies_2 = 1;
+    else __gen_e_acsl_implies_2 = x == 3;
+    __e_acsl_assert(__gen_e_acsl_implies_2,(char *)"Precondition",
+                    (char *)"main",(char *)"x == 3 && y == 2 ==> x == 3",37);
+    if (x == 3) __gen_e_acsl_and_2 = y == 2; else __gen_e_acsl_and_2 = 0;
+    if (! __gen_e_acsl_and_2) __gen_e_acsl_implies_3 = 1;
+    else __gen_e_acsl_implies_3 = x + (long)y == 5L;
+    __e_acsl_assert(__gen_e_acsl_implies_3,(char *)"Precondition",
+                    (char *)"main",(char *)"x == 3 && y == 2 ==> x + y == 5",
+                    38);
+    x += y;
   }
   /*@ requires x ≡ 5; */
   {
