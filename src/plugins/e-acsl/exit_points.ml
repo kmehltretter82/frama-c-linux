@@ -93,47 +93,54 @@ let store_vars stmt =
     Varinfo.Set.empty
     gotos
 
-let list_flatten_to_set =
-  List.fold_left
-    (List.fold_left (fun acc v -> Varinfo.Set.add v acc))
-    Varinfo.Set.empty
+let unify_sets =
+  List.fold_left (fun acc v -> Varinfo.Set.union v acc) Varinfo.Set.empty
 
 class jump_context = object (_)
   inherit Visitor.frama_c_inplace
 
-  val mutable locals = [[]]
+  val mutable locals = []
   (* Maintained list of local variables within the scope of a currently
-     visited statement. Variables within a single scope are given by a
-     single list *)
+     visited statement. Variables within a single scope are given by 
+     single set *)
 
   val jumps = Stack.create ()
   (* Stack of entered switches and loops *)
 
   method !vblock blk =
-    locals <- [blk.blocals] @ locals;
+    (* Filter out variables which definitions appear later in the code *)
+    let vardefs = List.filter (fun vi -> not vi.vdefined) blk.blocals in
+    locals <- [ Varinfo.Set.of_list vardefs ] @ locals;
     Cil.DoChildrenPost
-    (fun blk -> locals <- List.tl locals; blk)
+      (fun blk -> locals <- List.tl locals; blk)
 
   method !vstmt stmt =
+    let add_labels stmt =
+      match stmt.labels with
+      | [] -> ()
+      | _ :: _ -> SLocals.add stmt (unify_sets locals)
+    in
     match stmt.skind with
     | Loop _ | Switch _ ->
-      SLocals.add stmt (list_flatten_to_set locals);
+      SLocals.add stmt (unify_sets locals);
       Stack.push stmt jumps;
       Cil.DoChildrenPost (fun st -> ignore(Stack.pop jumps); st)
     | Break _ | Continue _ ->
       Exits.add stmt (Stack.top jumps);
-      SLocals.add stmt (list_flatten_to_set locals);
+      SLocals.add stmt (unify_sets locals);
       Cil.DoChildren
     | Goto(sref, _)  ->
-      SLocals.add stmt (list_flatten_to_set locals);
+      SLocals.add stmt (unify_sets locals);
       Exits.add stmt !sref;
       LJumps.add !sref stmt;
       Cil.DoChildren
+    | Instr(Local_init (vi, _, _)) ->
+      locals <- (Varinfo.Set.add vi (List.hd locals)) :: List.tl locals;
+      add_labels stmt;
+      Cil.DoChildren
     | Instr _ | Return _ | If _ | Block _ | UnspecifiedSequence _
     | Throw _ | TryCatch _ | TryFinally _ | TryExcept _ ->
-      (match stmt.labels with
-      | [] -> ()
-      | _ :: _ -> SLocals.add stmt (list_flatten_to_set locals));
+      add_labels stmt;
       Cil.DoChildren
 end
 

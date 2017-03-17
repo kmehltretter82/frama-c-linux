@@ -1,0 +1,20 @@
+[variadic] warning: Unable to locate global __fc_stdout which should be in the Frama-C LibC. Correct specifications can't be generated.
+[e-acsl] beginning translation.
+[e-acsl] warning: annotating undefined function `printf_va_1':
+                  the generated program may miss memory instrumentation
+                  if there are memory-related annotations.
+[e-acsl] warning: annotating undefined function `printf_va_2':
+                  the generated program may miss memory instrumentation
+                  if there are memory-related annotations.
+[e-acsl] warning: annotating undefined function `printf_va_3':
+                  the generated program may miss memory instrumentation
+                  if there are memory-related annotations.
+FRAMAC_SHARE/libc/stdlib.h:277:[kernel] warning: No code nor implicit assigns clause for function calloc, generating default assigns from the prototype
+tests/runtime/local_goto.c:37:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+                  Ignoring annotation.
+tests/runtime/local_goto.c:28:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+                  Ignoring annotation.
+tests/runtime/local_goto.c:16:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+                  Ignoring annotation.
+[e-acsl] translation done in project "e-acsl".
+FRAMAC_SHARE/e-acsl/e_acsl.h:43:[value] warning: function __e_acsl_assert: precondition got status unknown.
