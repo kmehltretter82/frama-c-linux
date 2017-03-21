@@ -297,6 +297,7 @@ do
     --rt-debug|-D)
       shift
       OPTION_RT_DEBUG=1
+      OPTION_CHECK=1
     ;;
     # Pass an option to a Frama-C invocation
     --frama-c-extra|-F)
