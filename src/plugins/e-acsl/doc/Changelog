@@ -15,7 +15,7 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
--! E-ACSL       [2017/03/03] Remove precond rte option from e-acsl-gss.sh
+-! E-ACSL       [2017/03/03] Remove precond rte option from e-acsl-gcc.sh
 -* E-ACSL       [2017/03/02] Fix bts #1740 about incorrect monitoring of
 	        memory properties when early exiting a block through
 	        goto, break or continue.
