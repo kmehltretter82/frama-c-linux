@@ -169,7 +169,7 @@ mmodel_lib() {
 
   if [ -n "$1" ]; then
     local modelname="$(echo $models | tr ' ' '\n' | grep "^$1$")"
-    local modelpath="$(realpath $LIBDIR/libeacsl-rtl-$modelname$rtfeature.a 2>/dev/null)"
+    local modelpath="$(realpath "$LIBDIR/libeacsl-rtl-$modelname$rtfeature.a" 2>/dev/null)"
 
     # Bail if the name of the specified memory model does not match any of the
     # supported ones
@@ -191,12 +191,12 @@ required_tool getopt "util-linux"
 required_tool find "GNU findutils"
 
 # Getopt options
-LONGOPTIONS="help,compile,compile-only,print,debug:,ocode:,oexec:,verbose:,
+LONGOPTIONS="help,compile,compile-only,debug:,ocode:,oexec:,verbose:,
   frama-c-only,extra-cpp-args:,frama-c-stdlib,full-mmodel,gmp,quiet,logfile:,
   ld-flags:,cpp-flags:,frama-c-extra:,memory-model:,
-  frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:,
+  frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:,check
   print-mmodels,rt-debug,rte-select:"
-SHORTOPTIONS="h,c,C,p,d:,D,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,I:,G:,X,a:"
+SHORTOPTIONS="h,c,C,d:,D,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,I:,G:,X,a:,V"
 # Prefix for an error message due to wrong arguments
 ERROR="ERROR parsing arguments:"
 
@@ -208,7 +208,6 @@ OPTION_FRAMAC="frama-c"                  # Frama-C executable name
 OPTION_CC="gcc"                          # GCC executable name
 OPTION_ECHO="set -x"                     # Echo executed commands to STDOUT
 OPTION_INSTRUMENT=1                      # Perform E-ACSL instrumentation
-OPTION_PRINT=                            # Output instrumented code
 OPTION_DEBUG=                            # Set Frama-C debug flag
 OPTION_VERBOSE=                          # Set Frama-C verbose flag
 OPTION_COMPILE=                          # Compile instrumented program
@@ -225,6 +224,7 @@ OPTION_EACSL_MMODELS="bittree"           # Memory model used
 OPTION_EACSL_SHARE=                      # Custom E-ACSL share directory
 OPTION_INSTRUMENTED_ONLY=                # Do not compile original code
 OPTION_RTE=                              # Enable assertion generation
+OPTION_CHECK=                            # Check AST integrity
 OPTION_RTE_SELECT=               # Generate assertions for these functions only
 
 manpage() {
@@ -282,8 +282,8 @@ do
     --quiet|-q)
       shift;
       OPTION_ECHO=
-      OPTION_DEBUG="-debug 0"
-      OPTION_VERBOSE="-verbose 0"
+      OPTION_DEBUG="-e-acsl-debug 0"
+      OPTION_VERBOSE="-e-acsl-verbose 0"
     ;;
     # Redirect all output to a given file
     --logfile|-s)
@@ -297,6 +297,7 @@ do
     --rt-debug|-D)
       shift
       OPTION_RT_DEBUG=1
+      OPTION_CHECK=1
     ;;
     # Pass an option to a Frama-C invocation
     --frama-c-extra|-F)
@@ -309,16 +310,11 @@ do
       shift;
       OPTION_COMPILE=1
     ;;
-    # Print the result of instrumenation
-    --print|-p)
-      shift;
-      OPTION_PRINT=1
-    ;;
     # Set Frama-C debug flag
     --debug|-d)
       shift;
       if [ "$1" -eq "$1" ] 2>/dev/null; then
-        OPTION_DEBUG="-debug $1"
+        OPTION_DEBUG="-e-acsl-debug $1"
       else
         error "-d|--debug option requires integer argument"
       fi
@@ -328,7 +324,7 @@ do
     --verbose|-v)
       shift;
       if [ "$1" -eq "$1" ] 2>/dev/null; then
-        OPTION_VERBOSE="-verbose $1"
+        OPTION_VERBOSE="-e-acsl-verbose $1"
       else
         error "-v|--verbose option requires integer argument"
       fi
@@ -434,6 +430,12 @@ do
     --rte-select|-A)
       shift;
       OPTION_RTE_SELECT="$1"
+      shift;
+    ;;
+    # Check AST integrity (mostly for developers of E-ACSL)
+    --check|-V)
+      OPTION_CHECK=1
+      FRAMAC_FLAGS="-check $FRAMAC_FLAGS"
       shift;
     ;;
     # A memory model  (or models) to link against
@@ -552,6 +554,9 @@ fi
 CPPFLAGS="$OPTION_CPPFLAGS"
 LDFLAGS="$OPTION_LDFLAGS"
 
+# Extra Frama-C Flags E-ACSL needs
+FRAMAC_FLAGS="$FRAMAC_FLAGS -variadic-no-translation"
+
 # C, CPP and LD flags for compilation of E-ACSL-generated sources
 EACSL_CFLAGS=""
 EACSL_CPPFLAGS="-I$EACSL_SHARE"
@@ -560,8 +565,8 @@ EACSL_LDFLAGS="$LIBDIR/libeacsl-jemalloc.a $LIBDIR/libeacsl-gmp.a -lm -lpthread"
 # Output file names
 OUTPUT_CODE="$OPTION_OUTPUT_CODE" # E-ACSL instrumented source
 OUTPUT_EXEC="$OPTION_OUTPUT_EXEC" # Output name of the original executable
-# Output name of E-ACSL-modified executable
 
+# Output name of E-ACSL-modified executable
 if [ -z "$OPTION_EACSL_OUTPUT_EXEC" ]; then
     EACSL_OUTPUT_EXEC="$OPTION_OUTPUT_EXEC.e-acsl"
 else
@@ -570,10 +575,13 @@ fi
 
 # Build E-ACSL plugin argument string
 if [ -n "$OPTION_EACSL" ]; then
-  OPTION_EACSL="
+  EACSL_FLAGS="
     $OPTION_EACSL
     $OPTION_GMP
     $OPTION_FULL_MMODEL
+    $OPTION_VERBOSE
+    $OPTION_DEBUG
+    -e-acsl-share="$EACSL_SHARE"
     -then-last"
 fi
 
@@ -584,20 +592,12 @@ if [ -n "$OPTION_INSTRUMENT" ]; then
     $FRAMAC_FLAGS \
     $MACHDEP \
     -cpp-extra-args="$FRAMAC_CPP_EXTRA" \
-    -variadic-no-translation \
-    -e-acsl-share=$EACSL_SHARE \
     $OPTION_FRAMA_STDLIB \
-    $OPTION_VERBOSE \
-    $OPTION_DEBUG \
     "$@" \
     $RTE_FLAGS \
-    $OPTION_EACSL \
+    $EACSL_FLAGS \
     -print -ocode "$OPTION_OUTPUT_CODE");
     error "aborted by Frama-C" $?;
-  # Print translated code
-  if [ -n "$OPTION_PRINT" ]; then
-    cat $OPTION_OUTPUT_CODE
-  fi
 fi
 
 # Compile
