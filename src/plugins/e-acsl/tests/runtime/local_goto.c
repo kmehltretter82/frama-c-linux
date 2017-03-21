@@ -26,7 +26,7 @@ AGAIN:
 
     if (t == 2) {
       describe(UP);
-      /* When jumping to UP label we need to make sure that [b] the
+      /* When jumping to UP label we need to make sure that the
          program transformation does not insert a call deleting [b]. */
       goto UP;
     } else

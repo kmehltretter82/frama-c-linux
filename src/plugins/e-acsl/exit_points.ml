@@ -101,7 +101,7 @@ class jump_context = object (_)
 
   val mutable locals = []
   (* Maintained list of local variables within the scope of a currently
-     visited statement. Variables within a single scope are given by 
+     visited statement. Variables within a single scope are given by a
      single set *)
 
   val jumps = Stack.create ()
@@ -110,7 +110,7 @@ class jump_context = object (_)
   method !vblock blk =
     (* Filter out variables which definitions appear later in the code *)
     let vardefs = List.filter (fun vi -> not vi.vdefined) blk.blocals in
-    locals <- [ Varinfo.Set.of_list vardefs ] @ locals;
+    locals <- Varinfo.Set.of_list vardefs :: locals;
     Cil.DoChildrenPost
       (fun blk -> locals <- List.tl locals; blk)
 
