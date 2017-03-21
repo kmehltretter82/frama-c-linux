@@ -668,7 +668,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
             in
             let pre_block =
               if pre_block.blocals = [] then
-                Cil.cleanable_block pre_block
+                Cil.transient_block pre_block
               else
                 pre_block
             in
@@ -688,8 +688,8 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
                  post_block.bstmts @
                  [Misc.mk_store_stmt vi; Misc.mk_full_init_stmt vi]
              | _ -> ());
-            let post_block = Cil.remove_cleanable_sub_blocks post_block in
-            let post_block = Cil.cleanable_block post_block in
+            let post_block = Cil.flatten_transient_sub_blocks post_block in
+            let post_block = Cil.transient_block post_block in
             Misc.mk_block prj new_stmt post_block, env
           end else
             stmt, env
