@@ -2,3 +2,4 @@
 [e-acsl] translation done in project "e-acsl".
 tests/runtime/memsize.c:14:[value] warning: assertion got status unknown.
 tests/runtime/memsize.c:16:[value] warning: assertion got status invalid (stopping propagation).
+[scope:rm_asserts] removing 6 assertion(s)
