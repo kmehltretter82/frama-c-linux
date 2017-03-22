@@ -593,7 +593,7 @@ and mmodel_call_valid ~loc kf name ctx env t =
   let e, env = term_to_exp kf (Env.rte env true) t in
   let base, _ = Misc.ptr_index ~loc e in
   let base_addr = match base.enode with
-    | AddrOf _ -> e
+    | AddrOf _ | Const _ -> base
     | Lval(lv) | StartOf(lv) -> Cil.mkAddrOf ~loc lv
     | _ -> assert false
   in
