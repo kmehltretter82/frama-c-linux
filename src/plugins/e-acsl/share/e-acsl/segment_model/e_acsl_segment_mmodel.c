@@ -26,21 +26,10 @@
  *   model. See e_acsl_mmodel_api.h for details.
 ***************************************************************************/
 
-#include <sys/mman.h>
-#include <errno.h>
-#include <sys/resource.h>
-
 static int valid(void*, size_t, void*, void*);
 static int valid_read(void*, size_t, void*, void*);
 
-#include "e_acsl_string.h"
-#include "e_acsl_bits.h"
-#include "e_acsl_printf.h"
-#include "e_acsl_assert.h"
-#include "e_acsl_debug.h"
-#include "e_acsl_malloc.h"
 #include "e_acsl_shadow_layout.h"
-#include "e_acsl_safe_locations.h"
 #include "e_acsl_segment_tracking.h"
 #include "e_acsl_mmodel_api.h"
 
@@ -142,10 +131,9 @@ static void memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
   initialize_report_file(argc_ref, argv_ref);
   /* Lift stack limit to account for extra stack memory overhead.  */
   increase_stack_limit(get_stack_size()*2);
-  /* Allocate and log shadow memory layout of the execution. */
+  /* Allocate and log shadow memory layout of the execution */
   init_memory_layout(argc_ref, argv_ref);
-  /* Make sure the layout holds and output it (only in debug mode) */
-  DEBUG_PRINT_LAYOUT;
+  /* Make sure the layout holds */
   DVALIDATE_SHADOW_LAYOUT;
   /* Track program arguments. */
   if (argc_ref && argv_ref)

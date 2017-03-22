@@ -25,6 +25,8 @@
  * \brief  Debug-level functions and macros
 ***************************************************************************/
 
+static void vabort(char *fmt, ...);
+
 /* Stringification macros {{{ */
 #ifndef E_ACSL_STRINGIFICATION
 #define E_ACSL_STRINGIFICATION
@@ -40,7 +42,7 @@
 
 /* Default location of the E_ACSL log file */
 #ifndef E_ACSL_DEBUG_LOG
-#  define E_ACSL_DEBUG_LOG /tmp/e-acsl.log
+#  define E_ACSL_DEBUG_LOG -
 #endif
 
 /*! \brief Name of the debug log file */
@@ -62,14 +64,13 @@ static int dlog_fd = -1;
  *  - open file descriptor
  *  - add program arguments to the log */
 static void initialize_report_file(int *argc, char ***argv) {
-  // Redirect the log to stderr is just set to be defined or set to '-'
+  /* Redirect the log to stderr is just set to be defined or set to '-' */
   if (!strcmp(dlog_name, "-") || !strcmp(dlog_name, "1")) {
     dlog_fd = 2;
   } else {
     dlog_fd = open(dlog_name, O_WRONLY | O_CREAT | O_TRUNC  |O_NONBLOCK
       | O_NOCTTY, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
   }
-
   if (dlog_fd == -1)
     vabort("Cannot open file descriptor for %s\n", dlog_name);
   else {
@@ -89,13 +90,14 @@ static void initialize_report_file(int *argc, char ***argv) {
 static int debug_stop_number = 0;
 int getchar(void);
 
-#define STOP { \
-  DLOG(" << ==================== " "Debug Stop Point %d in '%s' at %s:%d" \
-    " ==================== >> ", \
+#define DSTOP { \
+  printf(" << ***** " "Debug Stop %d in '%s' at %s:%d" " ***** >> ", \
     ++debug_stop_number, __func__, __FILE__, __LINE__); \
-    getchar(); \
+  getchar(); \
 }
+
 #else
+#  define DSTOP
 #  define initialize_report_file(...)
 #  define DLOG(...)
 #  define DASSERT(_e)

@@ -26,17 +26,6 @@
  * on Patricia Trie. See e_acsl_mmodel_api.h for details.
 ***************************************************************************/
 
-#ifndef E_ACSL_BITTREE_MMODEL
-#define E_ACSL_BITTREE_MMODEL
-
-#include "e_acsl_string.h"
-#include "e_acsl_printf.h"
-#include "e_acsl_bits.h"
-#include "e_acsl_assert.h"
-#include "e_acsl_debug.h"
-#include "e_acsl_malloc.h"
-#include "e_acsl_safe_locations.h"
-#include "e_acsl_mmodel_api.h"
 #include "e_acsl_bittree.h"
 
 /**************************/
@@ -517,6 +506,7 @@ static void init_argv(int argc, char **argv) {
 }
 
 static void memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
+  identify_run();
   arch_assert(ptr_size);
   /* Tracking program arguments */
   if (argc_ref)
@@ -618,4 +608,3 @@ public_alias(store_block_debug)
 public_alias(delete_block_debug)
 #endif
 /* }}} */
-#endif

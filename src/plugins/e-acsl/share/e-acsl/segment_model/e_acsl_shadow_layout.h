@@ -68,7 +68,7 @@ char *strerror(int errnum);
 
 /** Hardcoded sizes of tracked program segments {{{ */
 /*! \brief Size of a program's heap */
-#define PGM_HEAP_SIZE (256 * MB)
+#define PGM_HEAP_SIZE (512 * MB)
 
 /*! \brief Size of a program's Thread-local storage (TLS) */
 #define PGM_TLS_SIZE (16 * MB)
@@ -345,6 +345,7 @@ static void set_shadow_segment(struct memory_segment *seg, uintptr_t start,
  * allocate shadow memory spaces and compute offsets. This function populates
  * global struct ::mem_layout holding that information with data. */
 static void init_memory_layout(int *argc_ref, char ***argv_ref) {
+  /* Use DEBUG_PRINT_LAYOUT to output the details (if they are needed) */
   set_shadow_segment(&mem_layout.heap,
     get_heap_start(), get_heap_size(), 1, 8, "heap");
   set_shadow_segment(&mem_layout.stack,

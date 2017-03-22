@@ -206,8 +206,7 @@ void __e_acsl_memory_init(int *argc_ref, char ***argv, size_t ptr_size)
 size_t __e_acsl_get_heap_allocation_size(void)
   __attribute__((FC_BUILTIN));
 
-/*! \brief A variable holding a cumulative size (in bytes) of tracked
- * heap allocation. */
+/*! \brief A variable holding a byte size of tracked heap allocation. */
 extern size_t __e_acsl_heap_allocation_size;
 
 /*@ predicate diffSize{L1,L2}(integer i) =

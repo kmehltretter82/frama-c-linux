@@ -42,7 +42,8 @@
 #       * $ROOT/test/runtime/addrOf.c
 #   $3 - if specified, re-run test sequence with -e-acsl-gmp-only flag
 #   $4 - extra flags for a `e-acsl-gcc.sh` run
-#   $5 - if specified print extra messages and retain log files (DEBUG option)
+#   $5 - names of memory models to use
+#   $6 - if specified print extra messages and retain log files (DEBUG option)
 
 set -e
 
@@ -50,9 +51,11 @@ TEST="$1"   # Base name of the test file
 PREFIX="$2" # Test suite directory (e.g., runtime)
 GMP="$3"    # Whether to issue an additional run with -e-acsl-gmp-only
 EXTRA="$4"  # Extra e-acsl-gcc.sh flags
-DEBUG="$5"  # Debug option
+MODELS="$5" # Specify models
+DEBUG="$6"  # Debug option
 
 EACSLGCC="$(dirname $0)/e-acsl-gcc.sh $EXTRA" # E-ACSL wrapper script
+MODELS=${5-"segment bittree"} # Memory models to use (unless specified)
 
 ROOTDIR="`readlink -f $(dirname $0)/../`" # Root directory of the repository
 TESTDIR="$ROOTDIR/tests/$PREFIX" # Test suite directory
@@ -90,6 +93,8 @@ error() {
   exit 1
 }
 
+debug "Test: $PREFIX/$TEST with $MODELS"
+
 # Do a clean-up on exit
 trap "clean" EXIT HUP INT QUIT TERM
 
@@ -118,11 +123,6 @@ run_test() {
   local oexec=$OUT.$RUNS.out # Generated executable name
   local oexeclog=$LOG.$RUNS.rlog # Log for executable output
   local extra="$1" # Additional arguments to e-acsl-gcc.sh
-  MODELS="$($EACSLGCC $extra --print-mmodels)" # Supported memory models
-
-  # e-acsl-gcc.sh reports models as space-separated string. Make a
-  # comma-separated one otherwise the following does not work
-  MODELSTR="$(echo $MODELS | tr ' ' ',')"
 
   # Command for instrumenting the source file
   COMMAND="$EACSLGCC $TESTFILE --ocode=$ocode --logfile=$logfile $extra"

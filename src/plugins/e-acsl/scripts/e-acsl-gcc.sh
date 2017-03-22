@@ -149,41 +149,20 @@ rte_options() {
   return 0
 }
 
-# Locate available E-ACSL memory models
-# - If no arguments are given then print the names of all memory models
-#    available in this distribution of E-ACSL.
-# - If an argument is specified then it is assumed to be the name of a memory
-#    model. In this case the following function prints the full path to a static
-#    library representing this memory model.
-mmodel_lib() {
-  local rtfeature=""
+# Output -D flags enabling a given E_ACSL memory model
+eacsl_mmodel() {
+  local model="$1"
+
+  case $model in
+    bittree) flags="-DE_ACSL_BITTREE_MMODEL" ;;
+    segment) flags="-DE_ACSL_SEGMENT_MMODEL" ;;
+    *) error "Memory model '$model' is not available in this distribution" ;;
+  esac
   if [ -n "$OPTION_RT_DEBUG" ]; then
-    rtfeature="-dbg"
-    OPTION_CFLAGS="$OPTION_CFLAGS -O0 -fno-omit-frame-pointer"
-  else
-    OPTION_CFLAGS="$OPTION_CFLAGS -O2"
+    flags="$flags -DE_ACSL_DEBUG"
   fi
-
-  # Supported models
-  local models="segment bittree"
-
-  if [ -n "$1" ]; then
-    local modelname="$(echo $models | tr ' ' '\n' | grep "^$1$")"
-    local modelpath="$(realpath "$LIBDIR/libeacsl-rtl-$modelname$rtfeature.a" 2>/dev/null)"
-
-    # Bail if the name of the specified memory model does not match any of the
-    # supported ones
-    if [ -z "$modelname" ]; then
-      error "Memory model '$1' is not available in this distribution"
-    fi
-    # Bail if the library for a specified memory model is not found
-    if [ -z "$modelpath" ]; then
-      error "Library '$modelpath' not found"
-    fi
-    echo $modelpath
-  else
-    echo $models
-  fi
+  local extra="-DE_ACSL_IDENTIFY"
+  echo $flags $extra
 }
 
 # Check if the following tools are GNU and abort otherwise
@@ -226,6 +205,9 @@ OPTION_INSTRUMENTED_ONLY=                # Do not compile original code
 OPTION_RTE=                              # Enable assertion generation
 OPTION_CHECK=                            # Check AST integrity
 OPTION_RTE_SELECT=               # Generate assertions for these functions only
+
+# Supported memory model names
+SUPPORTED_MMODELS="bittree,segment"
 
 manpage() {
   printf "e-acsl-gcc.sh - instrument and compile C files with E-ACSL
@@ -448,7 +430,7 @@ do
     # Print names of the supported memody models.
     --print-mmodels)
       shift;
-      mmodel_lib
+      echo $SUPPORTED_MMODELS
       exit 0
     ;;
   esac
@@ -518,15 +500,18 @@ if [ -n "$OPTION_EACSL_SHARE" ]; then
   EACSL_SHARE="$OPTION_EACSL_SHARE"
 fi
 
-# Once EACSL_SHARE is defined check the memory models provided at inputs
-for mod in $OPTION_EACSL_MMODELS; do
-  mmodel_lib $mod >/dev/null
-done
+# Select optimization flags for both instrumented and noon-instrumented code
+# compilation
+if [ -n "$OPTION_RT_DEBUG" ]; then
+  OPT_CFLAGS="-g3 -O0 -fno-omit-frame-pointer"
+else
+  OPT_CFLAGS="-g -O2"
+fi
 
 # Gcc and related flags
 CC="$OPTION_CC"
 CFLAGS="$OPTION_CFLAGS
-  -std=c99 $GCCMACHDEP -g3
+  -std=c99 $GCCMACHDEP $OPT_CFLAGS
   -fno-builtin -fno-merge-constants
   -Wall \
   -Wno-long-long \
@@ -618,19 +603,21 @@ if [ -n "$OPTION_COMPILE" ]; then
   fi
 
   # Compile and link E-ACSL-instrumented file with all models specified
-  for mod in $OPTION_EACSL_MMODELS; do
+  for model in $OPTION_EACSL_MMODELS; do
     # If multiple models are specified then the generated executable
     # is appended a '-MODEL' suffix, where MODEL is the name of the memory
     # model used
     if ! [ "`echo $OPTION_EACSL_MMODELS | wc -w`" = 1 ]; then
-      OUTPUT_EXEC="$EACSL_OUTPUT_EXEC-$mod"
+      OUTPUT_EXEC="$EACSL_OUTPUT_EXEC-$model"
     else
       OUTPUT_EXEC="$EACSL_OUTPUT_EXEC"
     fi
     # Sources of the selected memory model
-    EACSL_RTL=$(mmodel_lib "$mod")
+    EACSL_RTL="$EACSL_SHARE/e_acsl_mmodel.c"
+    EACSL_MMODEL="$(eacsl_mmodel $model)"
     ($OPTION_ECHO;
      $CC \
+       $EACSL_MMODEL \
        $CFLAGS $CPPFLAGS \
        $EACSL_CFLAGS $EACSL_CPPFLAGS \
        -o "$OUTPUT_EXEC" \
