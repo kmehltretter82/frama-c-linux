@@ -354,7 +354,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
   | g ->
     let do_it = function
       | GVar(vi, _, _) ->
-        vi.vghost <- false; ()
+        vi.vghost <- false
       | GFun({ svar = vi } as fundec, _) ->
         vi.vghost <- false;
         Builtins.update vi.vname vi;

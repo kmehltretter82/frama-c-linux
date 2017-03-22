@@ -83,6 +83,9 @@ let mk_call ~loc ?result fname args =
   in
   Cil.mkStmtOneInstr ~valid_sid:true (Call(result, f, args, loc))
 
+let mk_deref ~loc lv =
+  Cil.new_exp ~loc (Lval(Mem(lv), NoOffset))
+
 type annotation_kind =
   | Assertion
   | Precondition
@@ -125,6 +128,9 @@ let strip_prefix p s =
 
 let is_generated_varinfo vi =
   startswith e_acsl_gen_prefix vi.vname
+
+let is_generated_literal_string_varinfo vi =
+  startswith (e_acsl_gen_prefix ^ "literal_string") vi.vname
 
 let is_library_name name =
   startswith e_acsl_api_prefix name
@@ -278,13 +284,30 @@ let rec ptr_index ?(loc=Location.unknown) ?(index=(Cil.zero loc)) exp =
       let index = Cil.mkBinOp exp.eloc (arith_op op) index rhs in
       ptr_index ~index lhs
     (* Other arithmetic: treat the whole expression as pointer address *)
-    | MinusPP | PlusA | MinusA | Mult | Div | Mod ->
-      (exp, index)
-    | _ -> assert false)
-  | CastE _ -> ptr_index ~index (Cil.stripCasts exp)
-  | Const _ | StartOf _ | AddrOf _ | Lval _  -> (exp, index)
-  | SizeOf _| SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ | UnOp _
-  | Info _ -> assert false
+    | MinusPP | PlusA | MinusA | Mult | Div | Mod
+    | BAnd | BXor | BOr | Shiftlt | Shiftrt
+    | Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr -> (exp, index))
+  | CastE _ -> ptr_index ~loc ~index (Cil.stripCasts exp)
+  | Info (exp, _) -> ptr_index ~loc ~index exp
+  | Const _ | StartOf _ | AddrOf _ | Lval _ | UnOp _ -> (exp, index)
+  | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _
+    -> assert false
+
+(* ************************************************************************** *)
+(** {2 Debug} *)
+(* ************************************************************************** *)
+let stringify_type  = function
+  | TVoid(_) -> "TVoid"   | TInt(_) -> "TInt"     | TFloat(_) -> "TFloat"
+  | TPtr(_) -> "TPtr"     | TArray(_) -> "TArray" | TFun(_) -> "TFun"
+  | TNamed(_) -> "TNamed" | TComp(_) -> "TComp"   | TEnum(_) -> "TEnum"
+  | TBuiltin_va_list(_) -> "TBuiltin_va_list"
+
+let stringify_enode = function
+  | Const(_) -> "Const" | Lval(_) -> "Lval" | SizeOf(_) -> "SizeOf"
+  | SizeOfE(_) -> "SizeOfE" | SizeOfStr(_) -> "SizeOfStr"
+  | AlignOf(_) -> "AlignOf" | AlignOfE(_) -> "AlignOfE" | UnOp(_) -> "UnOp"
+  | BinOp(_) -> "BinOp" | CastE(_) -> "CastE" | AddrOf(_) -> "AddrOf"
+  | StartOf(_) -> "StartOf" | Info(_) -> "Info"
 
 (*
 Local Variables:
