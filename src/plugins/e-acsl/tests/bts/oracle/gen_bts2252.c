@@ -35,14 +35,12 @@ int main(void)
     while (i < 0) {
       /*@ assert ¬\valid_read(srcbuf + i); */
       {
-        {
-          int __gen_e_acsl_valid_read;
-          __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(srcbuf + i),
-                                                        sizeof(char));
-          __e_acsl_assert(! __gen_e_acsl_valid_read,(char *)"Assertion",
-                          (char *)"main",(char *)"!\\valid_read(srcbuf + i)",
-                          16);
-        }
+        int __gen_e_acsl_valid_read;
+        __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(srcbuf + i),
+                                                      sizeof(char));
+        __e_acsl_assert(! __gen_e_acsl_valid_read,(char *)"Assertion",
+                        (char *)"main",(char *)"!\\valid_read(srcbuf + i)",
+                        16);
       }
       /*@ assert Value: mem_access: \valid_read(srcbuf + i); */
       if ((int)*(srcbuf + i) == (int)ch) loc = i;

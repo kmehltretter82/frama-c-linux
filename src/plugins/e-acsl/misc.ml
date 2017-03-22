@@ -171,14 +171,7 @@ let mk_block prj stmt b =
       (match stmt.skind with
       | Instr(Skip _) -> stmt
       | _ -> assert false)
-    | [ s ] ->
-      if Stmt.equal stmt s then s
-      else
-	(* [JS 2012/10/19] this case exactly corresponds to
-	   __e_acsl_assert(...) when the annotation is associated to a
-	   statement <skip>. Creating a block prevents the printer to add
-	   a stupid unintuitive block *)
-	Cil.mkStmt ~valid_sid:true (Block b)
+    | [ s ] -> s
     |  _ :: _ -> Cil.mkStmt ~valid_sid:true (Block b)
   in
   Project.on prj mk b

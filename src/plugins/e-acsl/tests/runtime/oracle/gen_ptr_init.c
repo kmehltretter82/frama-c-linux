@@ -49,13 +49,11 @@ int main(void)
                   (char *)"\\initialized(&A)",25);
   /*@ assert \initialized(&x); */
   {
-    {
-      int __gen_e_acsl_initialized;
-      __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& x),
-                                                      sizeof(int *));
-      __e_acsl_assert(__gen_e_acsl_initialized,(char *)"Assertion",
-                      (char *)"main",(char *)"\\initialized(&x)",26);
-    }
+    int __gen_e_acsl_initialized;
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& x),
+                                                    sizeof(int *));
+    __e_acsl_assert(__gen_e_acsl_initialized,(char *)"Assertion",
+                    (char *)"main",(char *)"\\initialized(&x)",26);
   }
   g(x,y);
   __retres = 0;
