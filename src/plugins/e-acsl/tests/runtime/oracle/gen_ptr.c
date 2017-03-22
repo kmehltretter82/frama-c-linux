@@ -71,7 +71,7 @@ int main(void)
           __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(& t[2] - i),
                                                           sizeof(int),
                                                           (void *)(& t[2]),
-                                                          (void *)(& t[2] - i));
+                                                          (void *)(& t[2]));
           __e_acsl_assert(__gen_e_acsl_valid_read_2,(char *)"RTE",
                           (char *)"main",
                           (char *)"mem_access: \\valid_read(&t[2] - i)",19);

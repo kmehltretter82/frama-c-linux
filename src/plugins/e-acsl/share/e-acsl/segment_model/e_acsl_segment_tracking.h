@@ -327,13 +327,13 @@ static void validate_memory_layout() {
 # define DVALIDATE_STATIC_ACCESS(_addr, _size) \
     DVASSERT(IS_ON_STATIC(_addr), "Expected static location: %a\n   ", _addr); \
     DVASSERT(static_allocated((uintptr_t)_addr, _size,(uintptr_t)_addr), \
-       "Operation on unallocated block [%a + %lu]\n   ", _addr, _size)
+       "Operation on unallocated static block [%a + %lu]\n   ", _addr, _size)
 
 /* Same as ::DVALIDATE_STATIC_LOCATION but for a single memory location */
 # define DVALIDATE_STATIC_LOCATION(_addr) \
     DVASSERT(IS_ON_STATIC(_addr), "Expected static location: %a\n", _addr); \
     DVASSERT(static_allocated_one((uintptr_t)_addr), \
-       "Operation on unallocated block [%a]\n   ", _addr)
+       "Operation on unallocated static block [%a]\n   ", _addr)
 
 /* Assert that every location belonging to the range [_addr, _addr + _size] is
  * - belongs to a tracked static region (i.e., stack, TLS or global)
@@ -355,7 +355,7 @@ static void validate_memory_layout() {
 /* Assert that memory block [_addr, _addr + _size] is allocated */
 # define DVALIDATE_ALLOCATED(_addr, _size, _base) \
   DVASSERT(allocated((uintptr_t)_addr, _size, (uintptr_t)_base), \
-    "Operation on unallocated block [%a + %lu] with base %lu\n   ", \
+    "Operation on unallocated block [%a + %lu] with base %a\n   ", \
     _addr, _size, _base)
 
 /* Assert that memory block [_addr, _addr + _size] is allocated

@@ -80,7 +80,6 @@ static void mark_readonly(void * ptr) {
 /** \brief Return 1 if a given memory location is read-only and 0 otherwise */
 static int readonly (void *ptr) {
   uintptr_t addr = (uintptr_t)ptr;
-  DVALIDATE_ALLOCATED(addr, 1, addr);
   return IS_ON_GLOBAL(addr) && global_readonly(addr) ? 1 : 0;
 }
 
