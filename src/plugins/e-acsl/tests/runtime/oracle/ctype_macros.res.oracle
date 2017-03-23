@@ -2,7 +2,6 @@
 [e-acsl] warning: annotating undefined function `isupper':
                   the generated program may miss memory instrumentation
                   if there are memory-related annotations.
-FRAMAC_SHARE/libc/stdlib.h:277:[kernel] warning: No code nor implicit assigns clause for function calloc, generating default assigns from the prototype
 tests/runtime/ctype_macros.c:39:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
                   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
