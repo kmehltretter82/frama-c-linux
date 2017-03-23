@@ -2,7 +2,6 @@
 [e-acsl] warning: annotating undefined function `strlen':
                   the generated program may miss memory instrumentation
                   if there are memory-related annotations.
-FRAMAC_SHARE/libc/stdlib.h:277:[kernel] warning: No code nor implicit assigns clause for function calloc, generating default assigns from the prototype
 FRAMAC_SHARE/libc/string.h:92:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
                   Ignoring annotation.
 FRAMAC_SHARE/libc/string.h:92:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
