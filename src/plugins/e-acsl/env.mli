@@ -84,12 +84,15 @@ val push: t -> t
 (** Push a new local context in the environment *)
 
 type where = Before | Middle | After
-val pop_and_get: t -> stmt -> global_clear:bool -> where -> block * t
+val pop_and_get:
+  ?split:bool -> t -> stmt -> global_clear:bool -> where -> block * t
 (** Pop the last local context and get back the corresponding new block
     containing the given [stmt] at the given place ([Before] is before the code
     corresponding to annotations, [After] is after this code and [Middle] is
     between the stmt corresponding to annotations and the ones for freeing the
-    memory. *)
+    memory. When [where] is [After], set [split] to true in order to generate
+    one block which contains exactly 2 stmt: one for [stmt] and one sub-block
+    for the generated stmts. *)
 
 val pop: t -> t
 (** Pop the last local context (ignore the corresponding new block if any *)

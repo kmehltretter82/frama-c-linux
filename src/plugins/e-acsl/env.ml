@@ -367,29 +367,29 @@ let transfer ~from env = match from.env_stack, env.env_stack with
     { env with env_stack = { local with block_info = new_blk } :: tl }
   | _, _ ->
     assert false
-      
+
 type where = Before | Middle | After
-let pop_and_get env stmt ~global_clear where =
-(*  Options.feedback "pop_and_get (%d)" (List.length env.env_stack);*)
+let pop_and_get ?(split=false) env stmt ~global_clear where =
+(*  Options.feedback "pop_and_get from %a" Printer.pp_stmt stmt;*)
   let local_env, tl = top false env in
-  let clear = 
+  let clear =
     if global_clear then begin
       Varname.clear ();
       env.global_mpz_tbl.clear_stmts @ local_env.mpz_tbl.clear_stmts
     end else
       local_env.mpz_tbl.clear_stmts
   in
-(*  Options.feedback "clearing %d mpz (global_clear: %b)" 
+(*  Options.feedback "clearing %d mpz (global_clear: %b)"
     (List.length clear) global_clear;*)
   let block = local_env.block_info in
-  let b = 
-    let pre_stmts, stmt = 
+  let b =
+    let pre_stmts, stmt =
       let rec extract stmt acc = function
-	| [] -> acc, stmt
-	| _ :: tl ->
-	  match stmt.skind with
-	  | Block { bstmts = [ fst; snd ] } -> extract snd (fst :: acc) tl
-	  | _ ->
+        | [] -> acc, stmt
+        | _ :: tl ->
+          match stmt.skind with
+          | Block { bstmts = [ fst; snd ] } -> extract snd (fst :: acc) tl
+          | _ ->
             Kernel.fatal
               "experting a block containing 2 statements instead of %a"
               Printer.pp_stmt stmt
@@ -401,15 +401,29 @@ let pop_and_get env stmt ~global_clear where =
       | Instr(Skip _) -> l
       | _ -> stmt :: l
     in
-    let stmts = match where with
+    let stmts =
+      match where with
       | Before -> cat stmt (acc_list_rev (List.rev clear) new_s)
       | Middle -> acc_list_rev (cat stmt (List.rev clear)) new_s
-      | After -> acc_list_rev (acc_list_rev (cat stmt []) clear) new_s
+      | After ->
+        (* if [split], do not put the given [stmt] in the generated block *)
+        let stmts = if split then [] else cat stmt [] in
+        acc_list_rev (acc_list_rev stmts clear) new_s
     in
     Cil.mkBlock (acc_list_rev stmts pre_stmts)
   in
   b.blocals <- acc_list_rev b.blocals block.new_block_vars;
-  b, { env with env_stack = tl }
+  let b = if b.blocals = [] then Cil.transient_block b else b in
+  let final_blk =
+    (* if [split], put the generated code in a distinct sub-block and
+       add the given [stmt] afterwards. This way, we have the guarantee that
+       the final block does not contain any local, so may be transient. *)
+    if split then
+      Cil.transient_block
+        (Cil.mkBlock [ Cil.mkStmt ~valid_sid:true (Block b); stmt ])
+    else b
+  in
+  final_blk, { env with env_stack = tl }
 
 let get_generated_variables env = List.rev env.new_global_vars
 
