@@ -370,7 +370,8 @@ let transfer ~from env = match from.env_stack, env.env_stack with
 
 type where = Before | Middle | After
 let pop_and_get ?(split=false) env stmt ~global_clear where =
-(*  Options.feedback "pop_and_get from %a" Printer.pp_stmt stmt;*)
+  let split = split && stmt.labels = [] in
+(*  Options.feedback "pop_and_get from %a (%b)" Printer.pp_stmt stmt split;*)
   let local_env, tl = top false env in
   let clear =
     if global_clear then begin
@@ -413,16 +414,30 @@ let pop_and_get ?(split=false) env stmt ~global_clear where =
     Cil.mkBlock (acc_list_rev stmts pre_stmts)
   in
   b.blocals <- acc_list_rev b.blocals block.new_block_vars;
-  let b = if b.blocals = [] then Cil.transient_block b else b in
+  let b =
+    (* blocks with local cannot be transient (see doc in cil.ml),
+       while transient blocks prevent the E-ACSL labeling strategy from working
+       properly: no transient block in that cases. *)
+    if b.blocals = [] && stmt.labels = [] then Cil.transient_block b
+    else b
+  in
   let final_blk =
     (* if [split], put the generated code in a distinct sub-block and
        add the given [stmt] afterwards. This way, we have the guarantee that
        the final block does not contain any local, so may be transient. *)
     if split then
-      Cil.transient_block
-        (Cil.mkBlock [ Cil.mkStmt ~valid_sid:true (Block b); stmt ])
-    else b
+      match stmt.skind with
+      | Instr (Skip _) -> b
+      | _ ->
+        let sblock = Cil.mkStmt ~valid_sid:true (Block b) in
+        Cil.transient_block (Cil.mkBlock [ sblock; stmt ])
+    else
+      b
   in
+  (* remove superflous brackets inside the generated block *)
+  let final_blk = Cil.flatten_transient_sub_blocks final_blk in
+  (* remove the non-scoping mark of the outermost block *)
+  let final_blk = Cil.block_of_transient final_blk in
   final_blk, { env with env_stack = tl }
 
 let get_generated_variables env = List.rev env.new_global_vars

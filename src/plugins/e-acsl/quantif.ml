@@ -159,8 +159,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
 	  ~global_clear:false
 	  Env.After
       in
-      (* TODO: could be optimised if [pop_and_get] would return a list of
-	 stmts *)
+      let blk = Cil.flatten_transient_sub_blocks blk in
       [ mkStmt ~valid_sid:true (Block blk) ], env
     | (t1, rel1, logic_x, rel2, t2) :: tl ->
       let ctx =

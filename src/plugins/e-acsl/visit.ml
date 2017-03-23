@@ -672,12 +672,6 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
                 ~global_clear:false
                 Env.After
             in
-(*            let pre_block =
-              if pre_block.blocals = [] then
-                Cil.transient_block pre_block
-              else
-                pre_block
-            in*)
             let env = mk_post_env (Env.push env) in
             let post_block, env =
               Env.pop_and_get
@@ -695,7 +689,6 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
                 post_block.bstmts @
                 [Misc.mk_store_stmt vi; Misc.mk_full_init_stmt vi]
             | _ -> ());
-            let post_block = Cil.flatten_transient_sub_blocks post_block in
             let post_block = Cil.transient_block post_block in
             Misc.mk_block prj new_stmt post_block, env
           end else
