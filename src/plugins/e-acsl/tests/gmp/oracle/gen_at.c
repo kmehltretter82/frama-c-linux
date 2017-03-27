@@ -88,19 +88,16 @@ void g(int *p, int *q)
   L3:
     /*@ assert \at(*(p + \at(*q,L1)),Here) ≡ 2; */
     {
-      {
-        int __gen_e_acsl_valid_read_4;
-        __gen_e_acsl_valid_read_4 = __e_acsl_valid_read((void *)(p + __gen_e_acsl_at_3),
-                                                        sizeof(int),
-                                                        (void *)p,
-                                                        (void *)(& p));
-        __e_acsl_assert(__gen_e_acsl_valid_read_4,(char *)"RTE",(char *)"g",
-                        (char *)"mem_access: \\valid_read(p + __gen_e_acsl_at_3)",
-                        28);
-        __e_acsl_assert(*(p + __gen_e_acsl_at_3) == 2,(char *)"Assertion",
-                        (char *)"g",
-                        (char *)"\\at(*(p + \\at(*q,L1)),Here) == 2",28);
-      }
+      int __gen_e_acsl_valid_read_4;
+      __gen_e_acsl_valid_read_4 = __e_acsl_valid_read((void *)(p + __gen_e_acsl_at_3),
+                                                      sizeof(int),(void *)p,
+                                                      (void *)(& p));
+      __e_acsl_assert(__gen_e_acsl_valid_read_4,(char *)"RTE",(char *)"g",
+                      (char *)"mem_access: \\valid_read(p + __gen_e_acsl_at_3)",
+                      28);
+      __e_acsl_assert(*(p + __gen_e_acsl_at_3) == 2,(char *)"Assertion",
+                      (char *)"g",
+                      (char *)"\\at(*(p + \\at(*q,L1)),Here) == 2",28);
     }
     __e_acsl_delete_block((void *)(& q));
     __e_acsl_delete_block((void *)(& p));

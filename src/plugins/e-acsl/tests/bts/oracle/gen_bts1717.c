@@ -13,21 +13,19 @@ int main(void)
   lbl_2:
     /*@ assert \valid(p); */
     {
-      {
-        int __gen_e_acsl_initialized;
-        int __gen_e_acsl_and;
-        __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& p),
-                                                        sizeof(int *));
-        if (__gen_e_acsl_initialized) {
-          int __gen_e_acsl_valid;
-          __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(int),
-                                              (void *)p,(void *)(& p));
-          __gen_e_acsl_and = __gen_e_acsl_valid;
-        }
-        else __gen_e_acsl_and = 0;
-        __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
-                        (char *)"\\valid(p)",10);
+      int __gen_e_acsl_initialized;
+      int __gen_e_acsl_and;
+      __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& p),
+                                                      sizeof(int *));
+      if (__gen_e_acsl_initialized) {
+        int __gen_e_acsl_valid;
+        __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(int),(void *)p,
+                                            (void *)(& p));
+        __gen_e_acsl_and = __gen_e_acsl_valid;
       }
+      else __gen_e_acsl_and = 0;
+      __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
+                      (char *)"\\valid(p)",10);
     }
     __retres = 0;
     goto return_label;

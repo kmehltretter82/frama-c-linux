@@ -19,21 +19,19 @@ int main(int argc, char const **argv)
   __e_acsl_full_init((void *)(& p));
   /*@ assert \valid(p); */
   {
-    {
-      int __gen_e_acsl_initialized;
-      int __gen_e_acsl_and;
-      __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& p),
-                                                      sizeof(int *));
-      if (__gen_e_acsl_initialized) {
-        int __gen_e_acsl_valid;
-        __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(int),(void *)p,
-                                            (void *)(& p));
-        __gen_e_acsl_and = __gen_e_acsl_valid;
-      }
-      else __gen_e_acsl_and = 0;
-      __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
-                      (char *)"\\valid(p)",11);
+    int __gen_e_acsl_initialized;
+    int __gen_e_acsl_and;
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& p),
+                                                    sizeof(int *));
+    if (__gen_e_acsl_initialized) {
+      int __gen_e_acsl_valid;
+      __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(int),(void *)p,
+                                          (void *)(& p));
+      __gen_e_acsl_and = __gen_e_acsl_valid;
     }
+    else __gen_e_acsl_and = 0;
+    __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
+                    (char *)"\\valid(p)",11);
   }
   __retres = 0;
   __e_acsl_delete_block((void *)(& errno));
