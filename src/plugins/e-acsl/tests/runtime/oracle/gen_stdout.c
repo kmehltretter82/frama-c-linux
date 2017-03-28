@@ -20,21 +20,24 @@ int main(void)
   /*@ assert \valid(__fc_stderr); */
   {
     int __gen_e_acsl_valid;
-    __gen_e_acsl_valid = __e_acsl_valid((void *)stderr,sizeof(FILE));
+    __gen_e_acsl_valid = __e_acsl_valid((void *)stderr,sizeof(FILE),
+                                        (void *)stderr,(void *)(& stderr));
     __e_acsl_assert(__gen_e_acsl_valid,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid(__fc_stderr)",8);
   }
   /*@ assert \valid(__fc_stdin); */
   {
     int __gen_e_acsl_valid_2;
-    __gen_e_acsl_valid_2 = __e_acsl_valid((void *)stdin,sizeof(FILE));
+    __gen_e_acsl_valid_2 = __e_acsl_valid((void *)stdin,sizeof(FILE),
+                                          (void *)stdin,(void *)(& stdin));
     __e_acsl_assert(__gen_e_acsl_valid_2,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid(__fc_stdin)",9);
   }
   /*@ assert \valid(__fc_stdout); */
   {
     int __gen_e_acsl_valid_3;
-    __gen_e_acsl_valid_3 = __e_acsl_valid((void *)stdout,sizeof(FILE));
+    __gen_e_acsl_valid_3 = __e_acsl_valid((void *)stdout,sizeof(FILE),
+                                          (void *)stdout,(void *)(& stdout));
     __e_acsl_assert(__gen_e_acsl_valid_3,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid(__fc_stdout)",10);
   }

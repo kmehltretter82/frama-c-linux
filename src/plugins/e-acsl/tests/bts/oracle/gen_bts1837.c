@@ -16,7 +16,8 @@ int f(void)
   /*@ assert \valid_read(S); */
   {
     int __gen_e_acsl_valid_read;
-    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)S,sizeof(char));
+    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)S,sizeof(char),
+                                                  (void *)S,(void *)(& S));
     __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"Assertion",(char *)"f",
                     (char *)"\\valid_read(S)",10);
   }
@@ -29,7 +30,9 @@ int f(void)
     if (__gen_e_acsl_initialized) {
       int __gen_e_acsl_valid_read_2;
       __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)s1,
-                                                      sizeof(char));
+                                                      sizeof(char),
+                                                      (void *)s1,
+                                                      (void *)(& s1));
       __gen_e_acsl_and = __gen_e_acsl_valid_read_2;
     }
     else __gen_e_acsl_and = 0;
@@ -45,7 +48,9 @@ int f(void)
     if (__gen_e_acsl_initialized_2) {
       int __gen_e_acsl_valid_read_3;
       __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)s2,
-                                                      sizeof(char));
+                                                      sizeof(char),
+                                                      (void *)s2,
+                                                      (void *)(& s2));
       __gen_e_acsl_and_2 = __gen_e_acsl_valid_read_3;
     }
     else __gen_e_acsl_and_2 = 0;
@@ -63,15 +68,15 @@ void __e_acsl_globals_init(void)
   __gen_e_acsl_literal_string_3 = "toto";
   __e_acsl_store_block((void *)__gen_e_acsl_literal_string_3,sizeof("toto"));
   __e_acsl_full_init((void *)__gen_e_acsl_literal_string_3);
-  __e_acsl_readonly((void *)__gen_e_acsl_literal_string_3);
+  __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_3);
   __gen_e_acsl_literal_string = "foo";
   __e_acsl_store_block((void *)__gen_e_acsl_literal_string,sizeof("foo"));
   __e_acsl_full_init((void *)__gen_e_acsl_literal_string);
-  __e_acsl_readonly((void *)__gen_e_acsl_literal_string);
+  __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string);
   __gen_e_acsl_literal_string_2 = "bar";
   __e_acsl_store_block((void *)__gen_e_acsl_literal_string_2,sizeof("bar"));
   __e_acsl_full_init((void *)__gen_e_acsl_literal_string_2);
-  __e_acsl_readonly((void *)__gen_e_acsl_literal_string_2);
+  __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_2);
   __e_acsl_store_block((void *)(& S),(size_t)8);
   __e_acsl_full_init((void *)(& S));
   return;
@@ -105,7 +110,9 @@ int main(void)
         if (__gen_e_acsl_initialized) {
           int __gen_e_acsl_valid_read;
           __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)s,
-                                                        sizeof(char));
+                                                        sizeof(char),
+                                                        (void *)s,
+                                                        (void *)(& s));
           __gen_e_acsl_and = __gen_e_acsl_valid_read;
         }
         else __gen_e_acsl_and = 0;
@@ -120,7 +127,8 @@ int main(void)
                                                           sizeof(char *));
         if (__gen_e_acsl_initialized_2) {
           int __gen_e_acsl_valid;
-          __gen_e_acsl_valid = __e_acsl_valid((void *)s,sizeof(char));
+          __gen_e_acsl_valid = __e_acsl_valid((void *)s,sizeof(char),
+                                              (void *)s,(void *)(& s));
           __gen_e_acsl_and_2 = __gen_e_acsl_valid;
         }
         else __gen_e_acsl_and_2 = 0;

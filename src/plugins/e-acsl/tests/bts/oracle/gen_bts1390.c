@@ -86,7 +86,9 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
       {
         int __gen_e_acsl_valid_read_3;
         __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)((char *)buf + __gen_e_acsl_k),
-                                                        sizeof(char));
+                                                        sizeof(char),
+                                                        (void *)buf,
+                                                        (void *)(& buf));
         __e_acsl_assert(__gen_e_acsl_valid_read_3,(char *)"RTE",
                         (char *)"memchr",
                         (char *)"mem_access: \\valid_read((char *)buf + __gen_e_acsl_k)",
@@ -114,7 +116,9 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
       {
         int __gen_e_acsl_valid_read;
         __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)((char *)buf + __gen_e_acsl_i),
-                                                      sizeof(char));
+                                                      sizeof(char),
+                                                      (void *)buf,
+                                                      (void *)(& buf));
         __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",
                         (char *)"memchr",
                         (char *)"mem_access: \\valid_read((char *)buf + __gen_e_acsl_i)",
@@ -151,7 +155,9 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
         {
           int __gen_e_acsl_valid_read_2;
           __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)((char *)__gen_e_acsl_at_2 + __gen_e_acsl_j),
-                                                          sizeof(char));
+                                                          sizeof(char),
+                                                          (void *)__gen_e_acsl_at_2,
+                                                          (void *)(& __gen_e_acsl_at_2));
           __e_acsl_assert(__gen_e_acsl_valid_read_2,(char *)"RTE",
                           (char *)"memchr",
                           (char *)"mem_access: \\valid_read((char *)__gen_e_acsl_at_2 + __gen_e_acsl_j)",
@@ -189,11 +195,11 @@ void __e_acsl_globals_init(void)
   __gen_e_acsl_literal_string = "toto";
   __e_acsl_store_block((void *)__gen_e_acsl_literal_string,sizeof("toto"));
   __e_acsl_full_init((void *)__gen_e_acsl_literal_string);
-  __e_acsl_readonly((void *)__gen_e_acsl_literal_string);
+  __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string);
   __gen_e_acsl_literal_string_2 = "tata";
   __e_acsl_store_block((void *)__gen_e_acsl_literal_string_2,sizeof("tata"));
   __e_acsl_full_init((void *)__gen_e_acsl_literal_string_2);
-  __e_acsl_readonly((void *)__gen_e_acsl_literal_string_2);
+  __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_2);
   return;
 }
 

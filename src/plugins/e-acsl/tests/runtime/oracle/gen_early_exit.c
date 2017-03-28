@@ -19,7 +19,8 @@ int goto_bts(void)
                                                       sizeof(int *));
       if (__gen_e_acsl_initialized) {
         int __gen_e_acsl_valid;
-        __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(int));
+        __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(int),(void *)p,
+                                            (void *)(& p));
         __gen_e_acsl_and = __gen_e_acsl_valid;
       }
       else __gen_e_acsl_and = 0;
@@ -40,7 +41,8 @@ int goto_bts(void)
       if (__gen_e_acsl_initialized_2) {
         int __gen_e_acsl_valid_2;
         /*@ assert Value: dangling_pointer: ¬\dangling(&p); */
-        __gen_e_acsl_valid_2 = __e_acsl_valid((void *)p,sizeof(int));
+        __gen_e_acsl_valid_2 = __e_acsl_valid((void *)p,sizeof(int),
+                                              (void *)p,(void *)(& p));
         __gen_e_acsl_and_2 = __gen_e_acsl_valid_2;
       }
       else __gen_e_acsl_and_2 = 0;
@@ -104,7 +106,8 @@ int goto_valid(void)
                                                         sizeof(int *));
         if (__gen_e_acsl_initialized) {
           int __gen_e_acsl_valid;
-          __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(int));
+          __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(int),
+                                              (void *)p,(void *)(& p));
           __gen_e_acsl_and = __gen_e_acsl_valid;
         }
         else __gen_e_acsl_and = 0;
@@ -120,7 +123,8 @@ int goto_valid(void)
         if (__gen_e_acsl_initialized_2) {
           int __gen_e_acsl_valid_2;
           /*@ assert Value: dangling_pointer: ¬\dangling(&q); */
-          __gen_e_acsl_valid_2 = __e_acsl_valid((void *)q,sizeof(int));
+          __gen_e_acsl_valid_2 = __e_acsl_valid((void *)q,sizeof(int),
+                                                (void *)q,(void *)(& q));
           __gen_e_acsl_and_2 = __gen_e_acsl_valid_2;
         }
         else __gen_e_acsl_and_2 = 0;
@@ -136,7 +140,8 @@ int goto_valid(void)
         if (__gen_e_acsl_initialized_3) {
           int __gen_e_acsl_valid_3;
           /*@ assert Value: dangling_pointer: ¬\dangling(&r); */
-          __gen_e_acsl_valid_3 = __e_acsl_valid((void *)r,sizeof(int));
+          __gen_e_acsl_valid_3 = __e_acsl_valid((void *)r,sizeof(int),
+                                                (void *)r,(void *)(& r));
           __gen_e_acsl_and_3 = __gen_e_acsl_valid_3;
         }
         else __gen_e_acsl_and_3 = 0;
@@ -165,7 +170,8 @@ int goto_valid(void)
       if (__gen_e_acsl_initialized_4) {
         int __gen_e_acsl_valid_4;
         /*@ assert Value: dangling_pointer: ¬\dangling(&p); */
-        __gen_e_acsl_valid_4 = __e_acsl_valid((void *)p,sizeof(int));
+        __gen_e_acsl_valid_4 = __e_acsl_valid((void *)p,sizeof(int),
+                                              (void *)p,(void *)(& p));
         __gen_e_acsl_and_4 = __gen_e_acsl_valid_4;
       }
       else __gen_e_acsl_and_4 = 0;
@@ -181,7 +187,8 @@ int goto_valid(void)
       if (__gen_e_acsl_initialized_5) {
         int __gen_e_acsl_valid_5;
         /*@ assert Value: dangling_pointer: ¬\dangling(&q); */
-        __gen_e_acsl_valid_5 = __e_acsl_valid((void *)q,sizeof(int));
+        __gen_e_acsl_valid_5 = __e_acsl_valid((void *)q,sizeof(int),
+                                              (void *)q,(void *)(& q));
         __gen_e_acsl_and_5 = __gen_e_acsl_valid_5;
       }
       else __gen_e_acsl_and_5 = 0;
@@ -197,7 +204,8 @@ int goto_valid(void)
       if (__gen_e_acsl_initialized_6) {
         int __gen_e_acsl_valid_6;
         /*@ assert Value: dangling_pointer: ¬\dangling(&r); */
-        __gen_e_acsl_valid_6 = __e_acsl_valid((void *)r,sizeof(int));
+        __gen_e_acsl_valid_6 = __e_acsl_valid((void *)r,sizeof(int),
+                                              (void *)r,(void *)(& r));
         __gen_e_acsl_and_6 = __gen_e_acsl_valid_6;
       }
       else __gen_e_acsl_and_6 = 0;
@@ -247,7 +255,8 @@ int switch_valid(void)
                                                           sizeof(int *));
           if (__gen_e_acsl_initialized) {
             int __gen_e_acsl_valid;
-            __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(int));
+            __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(int),
+                                                (void *)p,(void *)(& p));
             __gen_e_acsl_and = __gen_e_acsl_valid;
           }
           else __gen_e_acsl_and = 0;
@@ -262,7 +271,8 @@ int switch_valid(void)
                                                             sizeof(int *));
           if (__gen_e_acsl_initialized_2) {
             int __gen_e_acsl_valid_2;
-            __gen_e_acsl_valid_2 = __e_acsl_valid((void *)q,sizeof(int));
+            __gen_e_acsl_valid_2 = __e_acsl_valid((void *)q,sizeof(int),
+                                                  (void *)q,(void *)(& q));
             __gen_e_acsl_and_2 = __gen_e_acsl_valid_2;
           }
           else __gen_e_acsl_and_2 = 0;
@@ -277,7 +287,8 @@ int switch_valid(void)
                                                             sizeof(int *));
           if (__gen_e_acsl_initialized_3) {
             int __gen_e_acsl_valid_3;
-            __gen_e_acsl_valid_3 = __e_acsl_valid((void *)s,sizeof(int));
+            __gen_e_acsl_valid_3 = __e_acsl_valid((void *)s,sizeof(int),
+                                                  (void *)s,(void *)(& s));
             __gen_e_acsl_and_3 = __gen_e_acsl_valid_3;
           }
           else __gen_e_acsl_and_3 = 0;
@@ -309,7 +320,8 @@ int switch_valid(void)
     if (__gen_e_acsl_initialized_4) {
       int __gen_e_acsl_valid_4;
       /*@ assert Value: dangling_pointer: ¬\dangling(&q); */
-      __gen_e_acsl_valid_4 = __e_acsl_valid((void *)q,sizeof(int));
+      __gen_e_acsl_valid_4 = __e_acsl_valid((void *)q,sizeof(int),(void *)q,
+                                            (void *)(& q));
       __gen_e_acsl_and_4 = __gen_e_acsl_valid_4;
     }
     else __gen_e_acsl_and_4 = 0;
@@ -325,7 +337,8 @@ int switch_valid(void)
     if (__gen_e_acsl_initialized_5) {
       int __gen_e_acsl_valid_5;
       /*@ assert Value: dangling_pointer: ¬\dangling(&p); */
-      __gen_e_acsl_valid_5 = __e_acsl_valid((void *)p,sizeof(int));
+      __gen_e_acsl_valid_5 = __e_acsl_valid((void *)p,sizeof(int),(void *)p,
+                                            (void *)(& p));
       __gen_e_acsl_and_5 = __gen_e_acsl_valid_5;
     }
     else __gen_e_acsl_and_5 = 0;
@@ -340,7 +353,8 @@ int switch_valid(void)
                                                       sizeof(int *));
     if (__gen_e_acsl_initialized_6) {
       int __gen_e_acsl_valid_6;
-      __gen_e_acsl_valid_6 = __e_acsl_valid((void *)s,sizeof(int));
+      __gen_e_acsl_valid_6 = __e_acsl_valid((void *)s,sizeof(int),(void *)s,
+                                            (void *)(& s));
       __gen_e_acsl_and_6 = __gen_e_acsl_valid_6;
     }
     else __gen_e_acsl_and_6 = 0;
@@ -394,7 +408,8 @@ int while_valid(void)
                                                             sizeof(int *));
             if (__gen_e_acsl_initialized) {
               int __gen_e_acsl_valid;
-              __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(int));
+              __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(int),
+                                                  (void *)p,(void *)(& p));
               __gen_e_acsl_and = __gen_e_acsl_valid;
             }
             else __gen_e_acsl_and = 0;
@@ -409,7 +424,8 @@ int while_valid(void)
                                                               sizeof(int *));
             if (__gen_e_acsl_initialized_2) {
               int __gen_e_acsl_valid_2;
-              __gen_e_acsl_valid_2 = __e_acsl_valid((void *)q,sizeof(int));
+              __gen_e_acsl_valid_2 = __e_acsl_valid((void *)q,sizeof(int),
+                                                    (void *)q,(void *)(& q));
               __gen_e_acsl_and_2 = __gen_e_acsl_valid_2;
             }
             else __gen_e_acsl_and_2 = 0;
@@ -424,7 +440,8 @@ int while_valid(void)
                                                               sizeof(int *));
             if (__gen_e_acsl_initialized_3) {
               int __gen_e_acsl_valid_3;
-              __gen_e_acsl_valid_3 = __e_acsl_valid((void *)r,sizeof(int));
+              __gen_e_acsl_valid_3 = __e_acsl_valid((void *)r,sizeof(int),
+                                                    (void *)r,(void *)(& r));
               __gen_e_acsl_and_3 = __gen_e_acsl_valid_3;
             }
             else __gen_e_acsl_and_3 = 0;
@@ -451,7 +468,8 @@ int while_valid(void)
         int __gen_e_acsl_valid_4;
         /*@ assert Value: initialisation: \initialized(&p); */
         /*@ assert Value: dangling_pointer: ¬\dangling(&p); */
-        __gen_e_acsl_valid_4 = __e_acsl_valid((void *)p,sizeof(int));
+        __gen_e_acsl_valid_4 = __e_acsl_valid((void *)p,sizeof(int),
+                                              (void *)p,(void *)(& p));
         __gen_e_acsl_and_4 = __gen_e_acsl_valid_4;
       }
       else __gen_e_acsl_and_4 = 0;
@@ -468,7 +486,8 @@ int while_valid(void)
         int __gen_e_acsl_valid_5;
         /*@ assert Value: initialisation: \initialized(&q); */
         /*@ assert Value: dangling_pointer: ¬\dangling(&q); */
-        __gen_e_acsl_valid_5 = __e_acsl_valid((void *)q,sizeof(int));
+        __gen_e_acsl_valid_5 = __e_acsl_valid((void *)q,sizeof(int),
+                                              (void *)q,(void *)(& q));
         __gen_e_acsl_and_5 = __gen_e_acsl_valid_5;
       }
       else __gen_e_acsl_and_5 = 0;
@@ -483,7 +502,8 @@ int while_valid(void)
                                                         sizeof(int *));
       if (__gen_e_acsl_initialized_6) {
         int __gen_e_acsl_valid_6;
-        __gen_e_acsl_valid_6 = __e_acsl_valid((void *)r,sizeof(int));
+        __gen_e_acsl_valid_6 = __e_acsl_valid((void *)r,sizeof(int),
+                                              (void *)r,(void *)(& r));
         __gen_e_acsl_and_6 = __gen_e_acsl_valid_6;
       }
       else __gen_e_acsl_and_6 = 0;
@@ -523,7 +543,8 @@ void continue_valid(void)
                                                         sizeof(int *));
         if (__gen_e_acsl_initialized) {
           int __gen_e_acsl_valid;
-          __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(int));
+          __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(int),
+                                              (void *)p,(void *)(& p));
           __gen_e_acsl_and = __gen_e_acsl_valid;
         }
         else __gen_e_acsl_and = 0;
@@ -538,7 +559,8 @@ void continue_valid(void)
                                                           sizeof(int *));
         if (__gen_e_acsl_initialized_2) {
           int __gen_e_acsl_valid_2;
-          __gen_e_acsl_valid_2 = __e_acsl_valid((void *)q,sizeof(int));
+          __gen_e_acsl_valid_2 = __e_acsl_valid((void *)q,sizeof(int),
+                                                (void *)q,(void *)(& q));
           __gen_e_acsl_and_2 = __gen_e_acsl_valid_2;
         }
         else __gen_e_acsl_and_2 = 0;
@@ -558,7 +580,8 @@ void continue_valid(void)
                                                           sizeof(int *));
         if (__gen_e_acsl_initialized_3) {
           int __gen_e_acsl_valid_3;
-          __gen_e_acsl_valid_3 = __e_acsl_valid((void *)p,sizeof(int));
+          __gen_e_acsl_valid_3 = __e_acsl_valid((void *)p,sizeof(int),
+                                                (void *)p,(void *)(& p));
           __gen_e_acsl_and_3 = __gen_e_acsl_valid_3;
         }
         else __gen_e_acsl_and_3 = 0;
@@ -573,7 +596,8 @@ void continue_valid(void)
                                                           sizeof(int *));
         if (__gen_e_acsl_initialized_4) {
           int __gen_e_acsl_valid_4;
-          __gen_e_acsl_valid_4 = __e_acsl_valid((void *)q,sizeof(int));
+          __gen_e_acsl_valid_4 = __e_acsl_valid((void *)q,sizeof(int),
+                                                (void *)q,(void *)(& q));
           __gen_e_acsl_and_4 = __gen_e_acsl_valid_4;
         }
         else __gen_e_acsl_and_4 = 0;
@@ -594,7 +618,8 @@ void continue_valid(void)
                                                             sizeof(int *));
           if (__gen_e_acsl_initialized_5) {
             int __gen_e_acsl_valid_5;
-            __gen_e_acsl_valid_5 = __e_acsl_valid((void *)p,sizeof(int));
+            __gen_e_acsl_valid_5 = __e_acsl_valid((void *)p,sizeof(int),
+                                                  (void *)p,(void *)(& p));
             __gen_e_acsl_and_5 = __gen_e_acsl_valid_5;
           }
           else __gen_e_acsl_and_5 = 0;
@@ -609,7 +634,8 @@ void continue_valid(void)
                                                             sizeof(int *));
           if (__gen_e_acsl_initialized_6) {
             int __gen_e_acsl_valid_6;
-            __gen_e_acsl_valid_6 = __e_acsl_valid((void *)q,sizeof(int));
+            __gen_e_acsl_valid_6 = __e_acsl_valid((void *)q,sizeof(int),
+                                                  (void *)q,(void *)(& q));
             __gen_e_acsl_and_6 = __gen_e_acsl_valid_6;
           }
           else __gen_e_acsl_and_6 = 0;
@@ -636,7 +662,8 @@ void continue_valid(void)
                                                       sizeof(int *));
     if (__gen_e_acsl_initialized_7) {
       int __gen_e_acsl_valid_7;
-      __gen_e_acsl_valid_7 = __e_acsl_valid((void *)p,sizeof(int));
+      __gen_e_acsl_valid_7 = __e_acsl_valid((void *)p,sizeof(int),(void *)p,
+                                            (void *)(& p));
       __gen_e_acsl_and_7 = __gen_e_acsl_valid_7;
     }
     else __gen_e_acsl_and_7 = 0;
@@ -651,7 +678,8 @@ void continue_valid(void)
                                                       sizeof(int *));
     if (__gen_e_acsl_initialized_8) {
       int __gen_e_acsl_valid_8;
-      __gen_e_acsl_valid_8 = __e_acsl_valid((void *)q,sizeof(int));
+      __gen_e_acsl_valid_8 = __e_acsl_valid((void *)q,sizeof(int),(void *)q,
+                                            (void *)(& q));
       __gen_e_acsl_and_8 = __gen_e_acsl_valid_8;
     }
     else __gen_e_acsl_and_8 = 0;

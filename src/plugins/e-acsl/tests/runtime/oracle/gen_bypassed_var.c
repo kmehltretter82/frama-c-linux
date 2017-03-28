@@ -15,7 +15,8 @@ int main(int argc, char const **argv)
     /*@ assert \valid(&p); */
     {
       int __gen_e_acsl_valid;
-      __gen_e_acsl_valid = __e_acsl_valid((void *)(& p),sizeof(int *));
+      __gen_e_acsl_valid = __e_acsl_valid((void *)(& p),sizeof(int *),
+                                          (void *)(& p),(void *)(& p));
       __e_acsl_assert(__gen_e_acsl_valid,(char *)"Assertion",(char *)"main",
                       (char *)"\\valid(&p)",13);
       __e_acsl_delete_block((void *)(& p));

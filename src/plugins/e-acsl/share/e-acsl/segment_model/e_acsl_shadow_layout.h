@@ -68,7 +68,7 @@ char *strerror(int errnum);
 
 /** Hardcoded sizes of tracked program segments {{{ */
 /*! \brief Size of a program's heap */
-#define PGM_HEAP_SIZE (256 * MB)
+#define PGM_HEAP_SIZE (512 * MB)
 
 /*! \brief Size of a program's Thread-local storage (TLS) */
 #define PGM_TLS_SIZE (16 * MB)
@@ -136,8 +136,8 @@ static uintptr_t get_stack_start(int *argc_ref,  char *** argv_ref) {
     env++;
   uintptr_t addr = (uintptr_t)*env + strlen(*env);
 
-  /* When returning the end stack addess we need to make sure that
-   * ::ULONG_BITS past that address are actually writable. This is
+  /* When returning the end stack address we need to make sure that
+   * ::ULONG_BITS past that address are actually writeable. This is
    * to be able to set initialization and read-only bits ::ULONG_BITS
    * at a time. If not respected, this may cause a segfault in
    * ::argv_alloca. */
@@ -157,7 +157,7 @@ static void increase_stack_limit(const size_t size) {
       rl.rlim_cur = stacksz;
       result = setrlimit(RLIMIT_STACK, &rl);
       if (result != 0) {
-        vabort("setrlimit returned result = %d\n", result);
+        vabort("setrlimit: %s \n", strerror(errno));
       }
     }
   }
@@ -175,6 +175,13 @@ static uintptr_t get_heap_start() {
 static size_t get_heap_size() {
   return PGM_HEAP_SIZE;
 }
+
+/*! \brief Return the size of a secondary shadow region tracking
+ * initialization (i.e., init shadow). */
+static size_t get_heap_init_size() {
+  return get_heap_size()/8;
+}
+
 /** }}} */
 
 /** Program global information {{{ */
@@ -195,11 +202,12 @@ static size_t get_global_size() {
  * pointer to its base address. Since this function is used to set-up shadowing
  * the program is aborted if `mmap` fails to allocate a new memory block. */
 static void *do_mmap(size_t size) {
-  DLOG("<<< Request to allocate %lu bytes with mmap >>>\n", size);
   void *res = mmap(0, size, PROT_READ|PROT_WRITE,
     MAP_ANONYMOUS|MAP_PRIVATE, -1, (size_t)0);
-  if (res == MAP_FAILED)
+  if (res == MAP_FAILED) {
+    DLOG("<<< Request to allocate %lu MB with mmap failed >>>\n", MB_SZ(size));
     vabort("mmap error: %s\n", strerror(errno));
+  }
   /* Make sure that mmap returned a fully nullified mapping */
   DVASSERT(zeroed_out(res, size),
     "Memory mapping of size %lu at address %a not fully nullified", size, res);
@@ -264,17 +272,20 @@ NOTE: With mmap allocations heap does not necessarily grows from program break
  * shadow spaces. */
 struct memory_segment {
   const char *name;
-  uintptr_t start; //!< Least address in application segment
-  uintptr_t end; //!< Greatest address in application segment
-
-  size_t shadow_size; //!< Byte-size of shadow area
-
-  uintptr_t prim_start; //!< Least address in primary shadow
-  uintptr_t prim_end; //!< Greatest address in primary shadow
+  uintptr_t start; //!< Least address in the application segment
+  uintptr_t end; //!< Greatest address in the application segment
+  uintptr_t size; //!< Size of the tracked segment in application memory
+  /* Primary shadow space */
+  size_t    prim_size; //!< Byte-size of the primary shadow
+  size_t    prim_ratio; //! Ratio of shadow to application memory
+  uintptr_t prim_start; //!< Least address in the primary shadow
+  uintptr_t prim_end; //!< Greatest address in the primary shadow
   uintptr_t prim_offset; //!< Primary shadow offset
-
-  uintptr_t sec_start; //!< Least address secondary shadow
-  uintptr_t sec_end; //!< Greatest address secondary shadow
+  /* Secondary shadow space */
+  size_t    sec_size; //!< Byte-size of shadow area
+  size_t    sec_ratio; //! Ratio of shadow to application memory
+  uintptr_t sec_start; //!< Least address in the secondary shadow
+  uintptr_t sec_end; //!< Greatest address in the secondary shadow
   uintptr_t sec_offset; //!< Secondary shadow offset
 
   int initialized; //! Notion on whether the layout is initialized
@@ -291,24 +302,39 @@ struct memory_layout {
   int initialized;
 };
 
-/*! \brief Set a given memory segment and its shadow spaces. */
+/*! \brief Set a given memory segment and its shadow spaces.
+ *
+ * \param start - least address in an application's segment
+ * \param size - byte size of a tracked application's segment
+ * \param prim_ratio - compression ratio of the primary shadow segment
+ * \param sec_ratio - compression ratio of the secondary shadow segment
+ * \param name - segment name
+*/
 static void set_shadow_segment(struct memory_segment *seg, uintptr_t start,
-    size_t size, int secondary, const char *name) {
-  DLOG("<<< Initialize %s segment of %lu MB >>>\n", name, size/MB);
-  seg -> name = name;
+    size_t size, size_t prim_ratio, size_t sec_ratio, const char *name) {
+
+  seg->name = name;
   seg->start = start;
-  seg->end = seg->start + size - 1;
-  seg->shadow_size = size;
+  seg->size = size;
+  seg->end = seg->start + seg->size - 1;
 
-  void *prim_shadow = do_mmap(seg->shadow_size);
-  seg->prim_start = (uintptr_t)prim_shadow;
-  seg->prim_end = seg->prim_start + seg->shadow_size - 1;
-  seg->prim_offset = shadow_offset(prim_shadow, start);
+  if (prim_ratio) {
+    seg->prim_ratio = prim_ratio;
+    seg->prim_size = seg->size/seg->prim_ratio;
+    void *prim_shadow = do_mmap(seg->prim_size);
+    seg->prim_start = (uintptr_t)prim_shadow;
+    seg->prim_end = seg->prim_start + seg->prim_size - 1;
+    seg->prim_offset = shadow_offset(prim_shadow, start);
+  } else {
+    seg->prim_start = seg->prim_end = seg->prim_offset = 0;
+  }
 
-  if (secondary) {
-    void *sec_shadow = do_mmap(seg->shadow_size);
+  if (sec_ratio) {
+    seg->sec_ratio = sec_ratio;
+    seg->sec_size = seg->size/seg->sec_ratio;
+    void *sec_shadow = do_mmap(seg->sec_size);
     seg->sec_start = (uintptr_t)sec_shadow;
-    seg->sec_end = seg->sec_start + seg->shadow_size - 1;
+    seg->sec_end = seg->sec_start + seg->sec_size - 1;
     seg->sec_offset = shadow_offset(sec_shadow, seg->start);
   } else {
     seg->sec_start = seg->sec_end = seg->sec_offset = 0;
@@ -319,32 +345,34 @@ static void set_shadow_segment(struct memory_segment *seg, uintptr_t start,
  * allocate shadow memory spaces and compute offsets. This function populates
  * global struct ::mem_layout holding that information with data. */
 static void init_memory_layout(int *argc_ref, char ***argv_ref) {
+  /* Use DEBUG_PRINT_LAYOUT to output the details (if they are needed) */
   set_shadow_segment(&mem_layout.heap,
-    get_heap_start(), get_heap_size(), 0, "heap");
+    get_heap_start(), get_heap_size(), 1, 8, "heap");
   set_shadow_segment(&mem_layout.stack,
-    get_stack_start(argc_ref, argv_ref), get_stack_size(), 1, "stack");
+    get_stack_start(argc_ref, argv_ref), get_stack_size(), 1, 1, "stack");
   set_shadow_segment(&mem_layout.global,
-    get_global_start(), get_global_size(), 1, "global");
+    get_global_start(), get_global_size(), 1, 1, "global");
   set_shadow_segment(&mem_layout.tls,
-    get_tls_start(), get_tls_size(), 1, "tls");
+    get_tls_start(), get_tls_size(), 1, 1, "tls");
   mem_layout.initialized = 1;
 }
 
 /*! \brief Deallocate a shadow segment */
-void clean_memory_segment(struct memory_segment *seg, int secondary) {
-  munmap((void*)seg->prim_start, seg->shadow_size);
-  if (secondary)
-    munmap((void*)seg->sec_start, seg->shadow_size);
+void clean_memory_segment(struct memory_segment *seg) {
+  if (seg->prim_start)
+    munmap((void*)seg->prim_start, seg->prim_size);
+  if (seg->sec_start)
+    munmap((void*)seg->sec_start, seg->prim_size);
 }
 
 /*! \brief Deallocate shadow regions used by runtime analysis */
 static void clean_memory_layout() {
   DLOG("<<< Clean shadow layout >>>\n");
   if (mem_layout.initialized) {
-    clean_memory_segment(&mem_layout.heap, 0);
-    clean_memory_segment(&mem_layout.stack, 1);
-    clean_memory_segment(&mem_layout.global, 1);
-    clean_memory_segment(&mem_layout.tls, 1);
+    clean_memory_segment(&mem_layout.heap);
+    clean_memory_segment(&mem_layout.stack);
+    clean_memory_segment(&mem_layout.global);
+    clean_memory_segment(&mem_layout.tls);
   }
 }
 /* }}} */
@@ -380,6 +408,24 @@ static void clean_memory_layout() {
 /*! \brief Access to a shadow space above an application's segment */
 #define HIGHER_SHADOW_ACCESS(_addr,_offset) \
   SHADOW_ACCESS(_addr,_offset,+)
+
+/*! \brief Same as SHADOW_ACCESS but with an additional scale factor given via
+ * _scale argument. Scale factor describes ratio of application to shadow bytes,
+ * for instance if one bit shadow memory is used to track one byte of
+ * application memory then the scale factor is 8. */
+#define SCALED_SHADOW_ACCESS(_addr,_start,_offset,_scale,_direction)  \
+  (_addr _direction \
+    (_offset - \
+      ((uintptr_t)_addr - _start) + \
+      ((uintptr_t)_addr - _start)/_scale))
+
+/*! \brief Same as `LOWER_SHADOW_ACCESS` but with an additional scale factor */
+#define LOWER_SCALED_SHADOW_ACCESS(_addr,_start,_offset,_scale)  \
+  SCALED_SHADOW_ACCESS(_addr,_start,_offset,_scale, -)
+
+/*! \brief Same as `HIGHER_SHADOW_ACCESS` but with an additional scale factor */
+#define HIGHER_SCALED_SHADOW_ACCESS(_addr,_start,_offset,_scale)  \
+  SCALED_SHADOW_ACCESS(_addr,_start,_offset,_scale, +)
 
 /*! \brief Convert a stack address into its primary shadow counterpart */
 #define PRIMARY_STACK_SHADOW(_addr) \
@@ -421,6 +467,16 @@ static void clean_memory_layout() {
 /*! \brief Convert a heap address into its shadow counterpart */
 #define HEAP_SHADOW(_addr) \
   HIGHER_SHADOW_ACCESS(_addr, mem_layout.heap.prim_offset)
+
+#define HEAP_START mem_layout.heap.start
+
+/*! \brief Convert a heap address into its init shadow counterpart */
+#define HEAP_INIT_SHADOW(_addr) \
+  HIGHER_SCALED_SHADOW_ACCESS(_addr, \
+      mem_layout.heap.start, \
+      mem_layout.heap.sec_offset, \
+      mem_layout.heap.sec_ratio)
+
 /* }}} */
 
 /** Memory segment ranges {{{ */

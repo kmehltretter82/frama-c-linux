@@ -21,7 +21,8 @@ int main(void)
                                                     sizeof(int *));
     if (__gen_e_acsl_initialized) {
       int __gen_e_acsl_valid_read;
-      __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)p,sizeof(int));
+      __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)p,sizeof(int),
+                                                    (void *)p,(void *)(& p));
       __gen_e_acsl_and = __gen_e_acsl_valid_read;
     }
     else __gen_e_acsl_and = 0;
@@ -64,7 +65,9 @@ int main(void)
       {
         int __gen_e_acsl_valid_read_2;
         __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(& t[2] - i),
-                                                        sizeof(int));
+                                                        sizeof(int),
+                                                        (void *)(& t[2]),
+                                                        (void *)(& t[2]));
         __e_acsl_assert(__gen_e_acsl_valid_read_2,(char *)"RTE",
                         (char *)"main",
                         (char *)"mem_access: \\valid_read(&t[2] - i)",19);
@@ -86,7 +89,9 @@ int main(void)
                                                       sizeof(int *));
     if (__gen_e_acsl_initialized_2) {
       int __gen_e_acsl_valid_read_3;
-      __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)p,sizeof(int));
+      __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)p,sizeof(int),
+                                                      (void *)p,
+                                                      (void *)(& p));
       __gen_e_acsl_and_2 = __gen_e_acsl_valid_read_3;
     }
     else __gen_e_acsl_and_2 = 0;
@@ -100,7 +105,8 @@ int main(void)
   {
     int __gen_e_acsl_valid_read_4;
     __gen_e_acsl_valid_read_4 = __e_acsl_valid_read((void *)(p + k),
-                                                    sizeof(int));
+                                                    sizeof(int),(void *)p,
+                                                    (void *)(& p));
     __e_acsl_assert(__gen_e_acsl_valid_read_4,(char *)"RTE",(char *)"main",
                     (char *)"mem_access: \\valid_read(p + k)",27);
     __e_acsl_assert(*(p + k) == 3,(char *)"Assertion",(char *)"main",

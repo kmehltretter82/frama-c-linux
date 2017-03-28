@@ -26,21 +26,10 @@
  *   model. See e_acsl_mmodel_api.h for details.
 ***************************************************************************/
 
-#include <sys/mman.h>
-#include <errno.h>
-#include <sys/resource.h>
+static int valid(void*, size_t, void*, void*);
+static int valid_read(void*, size_t, void*, void*);
 
-static int valid(void * ptr, size_t size);
-static int valid_read(void * ptr, size_t size);
-
-#include "e_acsl_string.h"
-#include "e_acsl_bits.h"
-#include "e_acsl_printf.h"
-#include "e_acsl_assert.h"
-#include "e_acsl_debug.h"
-#include "e_acsl_malloc.h"
 #include "e_acsl_shadow_layout.h"
-#include "e_acsl_safe_locations.h"
 #include "e_acsl_segment_tracking.h"
 #include "e_acsl_mmodel_api.h"
 
@@ -59,7 +48,7 @@ static void delete_block(void * ptr) {
 }
 
 static void * store_block_duplicate(void * ptr, size_t size) {
-  if (valid_read(ptr, size))
+  if (allocated((uintptr_t)ptr, size, (uintptr_t)ptr))
     delete_block(ptr);
   shadow_alloca(ptr, size);
   return ptr;
@@ -69,35 +58,26 @@ static void full_init(void * ptr) {
   initialize(ptr, block_length(ptr));
 }
 
-static void readonly(void * ptr) {
-  mark_readonly((uintptr_t)ptr, block_length(ptr));
+static void mark_readonly(void * ptr) {
+  mark_readonly_region((uintptr_t)ptr, block_length(ptr));
 }
 
 /* ****************** */
 /* E-ACSL annotations */
 /* ****************** */
 
-static int valid(void * ptr, size_t size) {
+/** \brief Return 1 if a given memory location is read-only and 0 otherwise */
+static int readonly (void *ptr) {
   uintptr_t addr = (uintptr_t)ptr;
-  if (IS_ON_HEAP(addr))
-    return heap_allocated(addr, size);
-  else if (IS_ON_STACK(addr) || IS_ON_TLS(addr))
-    return static_allocated(addr, size);
-  else if (IS_ON_GLOBAL(addr))
-    return static_allocated(addr, size) && !global_readonly(addr);
-  else if (!IS_ON_VALID(addr))
-    return 0;
-  return 0;
+  return IS_ON_GLOBAL(addr) && global_readonly(addr) ? 1 : 0;
 }
 
-static int valid_read(void * ptr, size_t size) {
-  uintptr_t addr = (uintptr_t)ptr;
-  TRY_SEGMENT(addr,
-    return heap_allocated(addr, size),
-    return static_allocated(addr, size));
-  if (!IS_ON_VALID(addr))
-    return 0;
-  return 0;
+static int valid(void * ptr, size_t size, void *ptr_base, void *addr_of_base) {
+  return allocated((uintptr_t)ptr, size, (uintptr_t)ptr_base) && !readonly(ptr);
+}
+
+static int valid_read(void * ptr, size_t size, void *ptr_base, void *addr_of_base) {
+  return allocated((uintptr_t)ptr, size, (uintptr_t)ptr_base);
 }
 
 /*! NB: The implementation for this function can also be specified via
@@ -112,7 +92,7 @@ static void * segment_base_addr(void * ptr) {
 
 /*! NB: Implementation of the following function can also be specified
  * via \p block_length macro. A more direct approach via ::TRY_SEGMENT
- * is preffered for performance reasons. */
+ * is preferred for performance reasons. */
 static size_t segment_block_length(void * ptr) {
   TRY_SEGMENT(ptr,
     return heap_info((uintptr_t)ptr, 'L'),
@@ -122,7 +102,7 @@ static size_t segment_block_length(void * ptr) {
 
 /*! NB: Implementation of the following function can also be specified
  * via \p offset macro. A more direct approach via ::TRY_SEGMENT
- * is preffered for performance reasons. */
+ * is preferred for performance reasons. */
 static int segment_offset(void *ptr) {
   TRY_SEGMENT(ptr,
     return heap_info((uintptr_t)ptr, 'O'),
@@ -151,10 +131,9 @@ static void memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
   initialize_report_file(argc_ref, argv_ref);
   /* Lift stack limit to account for extra stack memory overhead.  */
   increase_stack_limit(get_stack_size()*2);
-  /* Allocate and log shadow memory layout of the execution. */
+  /* Allocate and log shadow memory layout of the execution */
   init_memory_layout(argc_ref, argv_ref);
-  /* Make sure the layout holds and output it (only in debug mode) */
-  DEBUG_PRINT_LAYOUT;
+  /* Make sure the layout holds */
   DVALIDATE_SHADOW_LAYOUT;
   /* Track program arguments. */
   if (argc_ref && argv_ref)
@@ -163,7 +142,6 @@ static void memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
   collect_safe_locations();
   int i;
   for (i = 0; i < safe_location_counter; i++) {
-    DLOG("Safe location %lu\n", safe_locations[i].address, safe_locations[i].address + safe_locations[i].length);
     void *addr = (void*)safe_locations[i].address;
     uintptr_t len = safe_locations[i].length;
     shadow_alloca(addr, len);
@@ -197,8 +175,8 @@ public_alias(valid_read)
 public_alias(valid)
 public_alias(initialized)
 public_alias(freeable)
-public_alias(readonly)
 /* Block initialization  */
+public_alias(mark_readonly)
 public_alias(initialize)
 public_alias(full_init)
 /* Memory state initialization */

@@ -112,7 +112,7 @@ void __e_acsl_full_init(void * ptr)
 /*! \brief Mark a memory block which start address is given by \p ptr as
  * read-only. */
 /*@ assigns \nothing; */
-void __e_acsl_readonly(void * ptr)
+void __e_acsl_mark_readonly(void * ptr)
   __attribute__((FC_BUILTIN));
 
 /* ****************** */
@@ -134,7 +134,7 @@ int __e_acsl_freeable(void * ptr)
 /*@ ensures \result == 0 || \result == 1;
   @ ensures \result == 1 ==> \valid(((char *)ptr)+(0..size-1));
   @ assigns \result \from *(((char*)ptr)+(0..size-1)); */
-int __e_acsl_valid(void * ptr, size_t size)
+int __e_acsl_valid(void * ptr, size_t size, void *ptr_base, void *addr_of_base)
   __attribute__((FC_BUILTIN));
 
 /*! \brief Implementation of the \b \\valid_read predicate of E-ACSL.
@@ -144,7 +144,7 @@ int __e_acsl_valid(void * ptr, size_t size)
 /*@ ensures \result == 0 || \result == 1;
   @ ensures \result == 1 ==> \valid_read(((char *)ptr)+(0..size-1));
   @ assigns \result \from *(((char*)ptr)+(0..size-1)); */
-int __e_acsl_valid_read(void * ptr, size_t size)
+int __e_acsl_valid_read(void * ptr, size_t size, void *ptr_base, void *addr_of_base)
   __attribute__((FC_BUILTIN));
 
 /*! \brief Implementation of the \b \\base_addr predicate of E-ACSL.
@@ -206,8 +206,7 @@ void __e_acsl_memory_init(int *argc_ref, char ***argv, size_t ptr_size)
 size_t __e_acsl_get_heap_allocation_size(void)
   __attribute__((FC_BUILTIN));
 
-/*! \brief A variable holding a cumulative size (in bytes) of tracked
- * heap allocation. */
+/*! \brief A variable holding a byte size of tracked heap allocation. */
 extern size_t __e_acsl_heap_allocation_size;
 
 /*@ predicate diffSize{L1,L2}(integer i) =

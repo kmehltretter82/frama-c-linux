@@ -178,53 +178,6 @@ e-acsl-distclean::
 		then $(MAKE) -s -C$(EACSL_GMP_DIR) distclean; \
 	fi
 
-################################################
-# E-ACSL Runtime Library                       #
-################################################
-
-EACSL_SHARE := $(EACSL_PLUGIN_DIR)/share/e-acsl
-
-EACSL_RTL_SRC = $(wildcard $(EACSL_SHARE)/*.[ch] $(EACSL_SHARE)/*/*.[ch])
-
-RTLFLAGS = -std=c99 -Wall -Wno-unused -Wno-attributes -I$(EACSL_SHARE) \
-  -fno-omit-frame-pointer -DE_ACSL_BUILTINS -Wno-nonnull
-
-RTLOPT 	 = $(RTLFLAGS) -O2
-RTLDEBUG = $(RTLFLAGS) -DE_ACSL_DEBUG -g3 -O0
-
-# Build a static E-ACSL library
-  # $1 Compile-time flags
-  # $2 Library path
-  # $3 Source file
-MKRTL = \
-  echo "Making $2"; \
-  object=$$(basename -s .a $2).o && \
-  echo ' CC $3' && \
-  $(CC) $1 -c -o$$object $3 && \
-  echo ' AR $2' && \
-  $(AR) crus $2 $$object && \
-  $(RM) -f $$object && \
-  ranlib $2
-
-$(EACSL_LIBDIR)/libeacsl-rtl-%.a: $(EACSL_SHARE)/%_model/e_acsl_*_mmodel.c $(EACSL_RTL_SRC) $(EACSL_JEMALLOC_LIB) $(EACSL_GMP_LIB)
-	$(call MKRTL, $(RTLOPT), $@, $<)
-
-$(EACSL_LIBDIR)/libeacsl-rtl-%-dbg.a: $(EACSL_SHARE)/%_model/e_acsl_*_mmodel.c $(EACSL_RTL_SRC) $(EACSL_JEMALLOC_LIB) $(EACSL_GMP_LIB)
-	$(call MKRTL, $(RTLDEBUG), $@, $<)
-
-EACSL_RTL = \
-	$(EACSL_LIBDIR)/libeacsl-rtl-bittree.a \
-	$(EACSL_LIBDIR)/libeacsl-rtl-segment.a \
-	$(EACSL_LIBDIR)/libeacsl-rtl-bittree-dbg.a \
-	$(EACSL_LIBDIR)/libeacsl-rtl-segment-dbg.a
-
-clean::
-	$(PRINT_RM) E-ACSL runtime library
-	$(RM) $(EACSL_RTL)
-	$(RM) $(EACSL_LIBDIR)/*.o
-
-all:: $(EACSL_RTL)
-
 ############
 # Cleaning #
 ############
@@ -371,10 +324,14 @@ install::
 	$(MKDIR) $(FRAMAC_DATADIR)/e-acsl
 	$(CP) $(E_ACSL_DIR)/share/e-acsl/*.[ch] $(FRAMAC_DATADIR)/e-acsl
 	$(MKDIR) $(FRAMAC_DATADIR)/e-acsl/bittree_model \
-		 $(FRAMAC_DATADIR)/e-acsl/glibc
+	         $(FRAMAC_DATADIR)/e-acsl/segment_model \
+	         $(FRAMAC_DATADIR)/e-acsl/glibc
 	$(CP) $(E_ACSL_DIR)/share/e-acsl/bittree_model/* \
-		$(FRAMAC_DATADIR)/e-acsl/bittree_model
-	$(CP) $(E_ACSL_DIR)/share/e-acsl/glibc/* $(FRAMAC_DATADIR)/e-acsl/glibc
+	      $(FRAMAC_DATADIR)/e-acsl/bittree_model
+	$(CP) $(E_ACSL_DIR)/share/e-acsl/segment_model/* \
+	      $(FRAMAC_DATADIR)/e-acsl/segment_model
+	$(CP) $(E_ACSL_DIR)/share/e-acsl/glibc/* \
+	      $(FRAMAC_DATADIR)/e-acsl/glibc
 	$(PRINT_INSTALL) E-ACSL manuals
 	$(MKDIR) $(FRAMAC_DATADIR)/manuals
 	$(CP) $(E_ACSL_DIR)/doc/manuals/e-acsl.pdf \

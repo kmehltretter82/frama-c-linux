@@ -114,8 +114,8 @@ class e_acsl_visitor prj generate = object (self)
   val global_vars: init option Varinfo.Hashtbl.t = Varinfo.Hashtbl.create 7
   (* Hashtable mapping global variables (as Cil_type.varinfo) to their
      initializers aiming to capture memory allocated by global variable
-     declarations and initilisation. At runtime the memory blocks corresponding
-     to space occupied by global are recorded via a call to
+     declarations and initialization. At runtime the memory blocks
+     corresponding to space occupied by global are recorded via a call to
      [__gen_e_acsl_globals_init] instrumented at the beginning of the
      [main] function. Each variable stored by [global_vars] will be handled in
      the body of [__gen_e_acsl_globals_init] as follows:
@@ -143,7 +143,7 @@ class e_acsl_visitor prj generate = object (self)
     if generate then Project.copy ~selection ~src:cur prj;
     Cil.DoChildrenPost
       (fun f ->
-        (* extend the main with forward initialization and put it at end *)
+        (* extend [main] with forward initialization and put it at end *)
         if generate then begin
           let must_init =
             not (Literal_strings.is_empty ())
@@ -204,7 +204,7 @@ class e_acsl_visitor prj generate = object (self)
                     Cil.mkStmtOneInstr ~valid_sid:true (Set(Cil.var vi, e, loc))
                     :: Misc.mk_store_stmt ~str_size vi
                     :: Misc.mk_full_init_stmt ~addr:false vi
-                    :: Misc.mk_readonly vi
+                    :: Misc.mk_mark_readonly vi
                     :: stmts)
                   stmts
               in
@@ -291,10 +291,10 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
             in
             Project.on prj build_initializer ()
           end; (* must_init *)
-          (* Add a call to "__e_acsl_memory_init" that initializes memory
+          (* Add a call to [__e_acsl_memory_init] that initializes memory
              storage and potentially records program arguments. Parameters to
-             the "__e_acsl_memory_init" are addresses of program arguments or
-             NULLs if main is declared without arguments. *)
+             [__e_acsl_memory_init] are addresses of program arguments or
+             NULLs if [main] is declared without arguments. *)
           let build_mmodel_initializer () =
             let loc = Location.unknown in
             let nulls = [ Cil.zero loc ; Cil.zero loc ] in
@@ -354,7 +354,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
   | g ->
     let do_it = function
       | GVar(vi, _, _) ->
-        vi.vghost <- false; ()
+        vi.vghost <- false
       | GFun({ svar = vi } as fundec, _) ->
         vi.vghost <- false;
         Builtins.update vi.vname vi;
@@ -380,7 +380,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     if generate then Cil.DoChildrenPost(fun g -> List.iter do_it g; g)
     else Cil.DoChildren
 
-  (* Add mappings from global variables to their initializers to [global_vars].
+  (* Add mappings from global variables to their initializers in [global_vars].
      Note that the below function captures only [SingleInit]s. All compound
      initializers (which contain single ones) are unrapped and thrown away. *)
   method !vinit vi _off _i =
@@ -390,7 +390,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         Cil.DoChildrenPost
           (fun i ->
             (match is_initializer with
-            (* Note the use of [add] instead [replace]. This is because a
+            (* Note the use of [add] instead of [replace]. This is because a
              single variable can be associated with multiple initializers
              and all of them need to be captured. *)
             | true -> Varinfo.Hashtbl.add global_vars vi (Some i)
@@ -710,11 +710,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       | Var vi, NoOffset -> vi.vglob || vi.vformal
       | _ -> false
     in
-(*    Options.feedback "%a? %a (%b && %b)"
-      Printer.pp_lval assigned_lv
-      Printer.pp_lval checked_lv
-      (not (may_safely_ignore assigned_lv))
-      (Pre_analysis.must_model_lval ~kf ~stmt checked_lv);*)
+
     if not (may_safely_ignore assigned_lv) &&
       Mmodel_analysis.must_model_lval ~kf ~stmt checked_lv
     then
@@ -722,8 +718,8 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         (* must be in the new project to build a new stmt *)
         Project.on
           prj
-          Misc.mk_debug_mmodel_stmt
-          (Misc.mk_initialize loc assigned_lv)
+          (Misc.mk_initialize ~loc)
+          assigned_lv
       in
       let before = Cil.memo_stmt self#behavior stmt in
       let new_stmt = Cil.memo_stmt self#behavior new_stmt in

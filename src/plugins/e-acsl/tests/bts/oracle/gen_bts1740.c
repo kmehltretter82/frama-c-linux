@@ -20,7 +20,8 @@ int main(void)
                                                       sizeof(int *));
       if (__gen_e_acsl_initialized) {
         int __gen_e_acsl_valid;
-        __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(int));
+        __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(int),(void *)p,
+                                            (void *)(& p));
         __gen_e_acsl_and = __gen_e_acsl_valid;
       }
       else __gen_e_acsl_and = 0;
@@ -41,7 +42,8 @@ int main(void)
       if (__gen_e_acsl_initialized_2) {
         int __gen_e_acsl_valid_2;
         /*@ assert Value: dangling_pointer: ¬\dangling(&p); */
-        __gen_e_acsl_valid_2 = __e_acsl_valid((void *)p,sizeof(int));
+        __gen_e_acsl_valid_2 = __e_acsl_valid((void *)p,sizeof(int),
+                                              (void *)p,(void *)(& p));
         __gen_e_acsl_and_2 = __gen_e_acsl_valid_2;
       }
       else __gen_e_acsl_and_2 = 0;

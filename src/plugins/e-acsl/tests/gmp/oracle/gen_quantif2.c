@@ -621,7 +621,9 @@ int main(void)
           int __gen_e_acsl_valid;
           __gen_e_acsl_i_2 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_i));
           __gen_e_acsl_valid = __e_acsl_valid((void *)(& buf[__gen_e_acsl_i_2]),
-                                              sizeof(int));
+                                              sizeof(int),
+                                              (void *)(& buf[__gen_e_acsl_i_2]),
+                                              (void *)(& buf[__gen_e_acsl_i_2]));
           if (__gen_e_acsl_valid) ;
           else {
             __gen_e_acsl_forall_7 = 0;
@@ -677,7 +679,9 @@ int main(void)
           int __gen_e_acsl_valid_2;
           __gen_e_acsl_i_4 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_i_3));
           __gen_e_acsl_valid_2 = __e_acsl_valid((void *)(& buf[__gen_e_acsl_i_4]),
-                                                sizeof(int));
+                                                sizeof(int),
+                                                (void *)(& buf[__gen_e_acsl_i_4]),
+                                                (void *)(& buf[__gen_e_acsl_i_4]));
           if (__gen_e_acsl_valid_2) ;
           else {
             __gen_e_acsl_forall_8 = 0;
@@ -733,7 +737,9 @@ int main(void)
           int __gen_e_acsl_valid_3;
           __gen_e_acsl_i_6 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_i_5));
           __gen_e_acsl_valid_3 = __e_acsl_valid((void *)(& buf[__gen_e_acsl_i_6]),
-                                                sizeof(int));
+                                                sizeof(int),
+                                                (void *)(& buf[__gen_e_acsl_i_6]),
+                                                (void *)(& buf[__gen_e_acsl_i_6]));
           if (__gen_e_acsl_valid_3) ;
           else {
             __gen_e_acsl_forall_9 = 0;
@@ -789,7 +795,9 @@ int main(void)
           int __gen_e_acsl_valid_4;
           __gen_e_acsl_i_8 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_i_7));
           __gen_e_acsl_valid_4 = __e_acsl_valid((void *)(& buf[__gen_e_acsl_i_8]),
-                                                sizeof(int));
+                                                sizeof(int),
+                                                (void *)(& buf[__gen_e_acsl_i_8]),
+                                                (void *)(& buf[__gen_e_acsl_i_8]));
           if (__gen_e_acsl_valid_4) ;
           else {
             __gen_e_acsl_forall_10 = 0;

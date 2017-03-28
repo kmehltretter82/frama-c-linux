@@ -21,7 +21,8 @@ int main(int argc, char const **argv)
                                                     sizeof(char *));
     if (__gen_e_acsl_initialized) {
       int __gen_e_acsl_valid;
-      __gen_e_acsl_valid = __e_acsl_valid((void *)d,sizeof(char));
+      __gen_e_acsl_valid = __e_acsl_valid((void *)d,sizeof(char),(void *)d,
+                                          (void *)(& d));
       __gen_e_acsl_and = __gen_e_acsl_valid;
     }
     else __gen_e_acsl_and = 0;

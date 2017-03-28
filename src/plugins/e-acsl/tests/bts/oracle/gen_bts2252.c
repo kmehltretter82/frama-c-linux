@@ -14,7 +14,7 @@ void __e_acsl_globals_init(void)
   __e_acsl_store_block((void *)__gen_e_acsl_literal_string,
                        sizeof("Test Code"));
   __e_acsl_full_init((void *)__gen_e_acsl_literal_string);
-  __e_acsl_readonly((void *)__gen_e_acsl_literal_string);
+  __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string);
   return;
 }
 
@@ -37,7 +37,9 @@ int main(void)
       {
         int __gen_e_acsl_valid_read;
         __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(srcbuf + i),
-                                                      sizeof(char));
+                                                      sizeof(char),
+                                                      (void *)srcbuf,
+                                                      (void *)(& srcbuf));
         __e_acsl_assert(! __gen_e_acsl_valid_read,(char *)"Assertion",
                         (char *)"main",(char *)"!\\valid_read(srcbuf + i)",
                         16);

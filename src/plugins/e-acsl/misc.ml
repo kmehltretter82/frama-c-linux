@@ -63,24 +63,28 @@ let mk_call ~loc ?result fname args =
   in
   let f = Cil.evar ~loc vi in
   vi.vreferenced <- true;
-  let ty_params = match vi.vtype with
-    | TFun(_, Some l, _, _) -> l
-    | _ -> assert false
-  in
-  let args =
+  let make_args args ty_params =
     List.map2
       (fun (_, ty, _) arg ->
-	let e =
-	  match ty, Cil.unrollType (Cil.typeOf arg), arg.enode with
-	  | TPtr _, TArray _, Lval lv -> Cil.new_exp ~loc (StartOf lv)
-	  | TPtr _, TArray _, _ -> assert false
-	  | _, _, _ -> arg
-	in
-	Cil.mkCast ~force:false ~newt:ty ~e)
+        let e =
+          match ty, Cil.unrollType (Cil.typeOf arg), arg.enode with
+          | TPtr _, TArray _, Lval lv -> Cil.new_exp ~loc (StartOf lv)
+          | TPtr _, TArray _, _ -> assert false
+          | _, _, _ -> arg
+        in
+        Cil.mkCast ~force:false ~newt:ty ~e)
       ty_params
       args
   in
+  let args = match vi.vtype with
+    | TFun(_, Some params, _, _) -> make_args args params
+    | TFun(_, None, _, _) -> []
+    | _ -> assert false
+  in
   Cil.mkStmtOneInstr ~valid_sid:true (Call(result, f, args, loc))
+
+let mk_deref ~loc lv =
+  Cil.new_exp ~loc (Lval(Mem(lv), NoOffset))
 
 type annotation_kind =
   | Assertion
@@ -124,6 +128,9 @@ let strip_prefix p s =
 
 let is_generated_varinfo vi =
   startswith e_acsl_gen_prefix vi.vname
+
+let is_generated_literal_string_varinfo vi =
+  startswith (e_acsl_gen_prefix ^ "literal_string") vi.vname
 
 let is_library_name name =
   startswith e_acsl_api_prefix name
@@ -197,23 +204,12 @@ let result_vi kf = match result_lhost kf with
 (** {2 Handling the E-ACSL's C-libraries, part II} *)
 (* ************************************************************************** *)
 
-let mk_debug_mmodel_stmt stmt =
-  if Options.debug_atleast 1
-    && Options.is_debug_key_enabled Options.dkey_analysis
-  then
-    let debug = mk_call ~loc:(Stmt.loc stmt) (mk_api_name "memory_debug") [] in
-    Cil.mkStmt ~valid_sid:true (Block (Cil.mkBlock [ stmt; debug]))
-  else
-    stmt
-
 let mk_full_init_stmt ?(addr=true) vi =
   let loc = vi.vdecl in
-  let stmt = match addr, Cil.unrollType vi.vtype with
+  match addr, Cil.unrollType vi.vtype with
     | _, TArray(_,Some _, _, _) | false, _ ->
       mk_call ~loc (mk_api_name "full_init") [ Cil.evar ~loc vi ]
     | _ -> mk_call ~loc (mk_api_name "full_init") [ Cil.mkAddrOfVi vi ]
-  in
-  mk_debug_mmodel_stmt stmt
 
 let mk_initialize ~loc (host, offset as lv) = match host, offset with
   | Var _, NoOffset -> mk_call ~loc
@@ -229,14 +225,12 @@ let mk_named_store_stmt name ?str_size vi =
   let ty = Cil.unrollType vi.vtype in
   let loc = vi.vdecl in
   let store = mk_call ~loc (mk_api_name name) in
-  let stmt = match ty, str_size with
+  match ty, str_size with
     | TArray(_, Some _,_,_), None ->
       store [ Cil.evar ~loc vi ; Cil.sizeOf ~loc ty ]
     | TPtr(TInt(IChar, _), _), Some size -> store [ Cil.evar ~loc vi ; size ]
     | _, None -> store [ Cil.mkAddrOfVi vi ; Cil.sizeOf ~loc ty ]
     | _, Some _ -> assert false
-  in
-  mk_debug_mmodel_stmt stmt
 
 let mk_store_stmt ?str_size vi =
   mk_named_store_stmt "store_block" ?str_size vi
@@ -246,17 +240,14 @@ let mk_duplicate_store_stmt ?str_size vi =
 
 let mk_delete_stmt vi =
   let loc = vi.vdecl in
-  let stmt = match Cil.unrollType vi.vtype with
+  match Cil.unrollType vi.vtype with
     | TArray(_, Some _, _, _) ->
       mk_call ~loc (mk_api_name "delete_block") [ Cil.evar ~loc vi ]
     | _ -> mk_call ~loc (mk_api_name "delete_block") [ Cil.mkAddrOfVi vi ]
-  in
-  mk_debug_mmodel_stmt stmt
 
-let mk_readonly vi =
+let mk_mark_readonly vi =
   let loc = vi.vdecl in
-  let stmt = mk_call ~loc (mk_api_name "readonly") [ Cil.evar ~loc vi ] in
-  mk_debug_mmodel_stmt stmt
+  mk_call ~loc (mk_api_name "mark_readonly") [ Cil.evar ~loc vi ]
 
 (* ************************************************************************** *)
 (** {2 Other stuff} *)
@@ -278,6 +269,29 @@ let reorder_ast () =
 let cty = function
   | Ctype ty -> ty
   | lty -> Options.fatal "Expecting a C type. Got %a" Printer.pp_logic_type lty
+
+let rec ptr_index ?(loc=Location.unknown) ?(index=(Cil.zero loc)) exp =
+  let arith_op = function
+    | MinusPI -> MinusA
+    | PlusPI -> PlusA
+    | IndexPI -> PlusA
+    | _ -> assert false in
+  match exp.enode with
+  | BinOp(op, lhs, rhs, _) ->
+    (match op with
+    (* Pointer arithmetic: split pointer and integer parts *)
+    | MinusPI | PlusPI | IndexPI ->
+      let index = Cil.mkBinOp exp.eloc (arith_op op) index rhs in
+      ptr_index ~index lhs
+    (* Other arithmetic: treat the whole expression as pointer address *)
+    | MinusPP | PlusA | MinusA | Mult | Div | Mod
+    | BAnd | BXor | BOr | Shiftlt | Shiftrt
+    | Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr -> (exp, index))
+  | CastE _ -> ptr_index ~loc ~index (Cil.stripCasts exp)
+  | Info (exp, _) -> ptr_index ~loc ~index exp
+  | Const _ | StartOf _ | AddrOf _ | Lval _ | UnOp _ -> (exp, index)
+  | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _
+    -> assert false
 
 (*
 Local Variables:

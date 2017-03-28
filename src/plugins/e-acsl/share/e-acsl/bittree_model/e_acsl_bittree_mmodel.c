@@ -26,17 +26,6 @@
  * on Patricia Trie. See e_acsl_mmodel_api.h for details.
 ***************************************************************************/
 
-#ifndef E_ACSL_BITTREE_MMODEL
-#define E_ACSL_BITTREE_MMODEL
-
-#include "e_acsl_string.h"
-#include "e_acsl_printf.h"
-#include "e_acsl_bits.h"
-#include "e_acsl_assert.h"
-#include "e_acsl_debug.h"
-#include "e_acsl_malloc.h"
-#include "e_acsl_safe_locations.h"
-#include "e_acsl_mmodel_api.h"
 #include "e_acsl_bittree.h"
 
 /**************************/
@@ -154,7 +143,7 @@ static void full_init (void * ptr) {
 }
 
 /* mark a block as read-only */
-static void readonly(void * ptr) {
+static void mark_readonly(void * ptr) {
   bt_block * tmp;
   if (ptr == NULL)
     return;
@@ -212,22 +201,29 @@ static size_t block_length(void* ptr) {
   return tmp->size;
 }
 
-/* return whether the size bytes of ptr are readable/writable */
-static int valid(void* ptr, size_t size) {
-  if(ptr == NULL)
+static int allocated(void* ptr, size_t size, void *ptr_base) {
+  bt_block * blk = bt_find(ptr);
+  bt_block * blk_base = bt_find(ptr_base);
+  if (blk == NULL || blk_base == NULL || blk->ptr != blk_base->ptr)
     return false;
-  bt_block * tmp = bt_find(ptr);
-  return (tmp == NULL) ? false :
-    (tmp->size - ((size_t)ptr - tmp->ptr ) >= size && !tmp->is_readonly);
+  return (blk->size - ((size_t)ptr - blk->ptr) >= size);
+}
+
+/* return whether the size bytes of ptr are readable/writable */
+static int valid(void* ptr, size_t size, void *ptr_base, void *addr_of_base) {
+  /* Many similarities with allocated (so far at least), but it is better
+   * to use this tandalone definition, otherwise the block needs to be looked
+   * up twice */
+  bt_block * blk = bt_find(ptr);
+  bt_block * blk_base = bt_find(ptr_base);
+  if (blk == NULL || blk_base == NULL || blk->ptr != blk_base->ptr)
+    return false;
+  return (blk->size - ((size_t)ptr - blk->ptr) >= size && !blk->is_readonly);
 }
 
 /* return whether the size bytes of ptr are readable */
-static int valid_read(void* ptr, size_t size) {
-  if(ptr == NULL)
-    return false;
-  bt_block * tmp = bt_find(ptr);
-  return (tmp == NULL) ?
-    false : (tmp->size - ((size_t)ptr - tmp->ptr) >= size);
+static int valid_read(void* ptr, size_t size, void *ptr_base, void *addr_of_base) {
+  return allocated(ptr, size, ptr_base);
 }
 
 /* return the base address of the block containing ptr */
@@ -394,7 +390,7 @@ static int bittree_posix_memalign(void **memptr, size_t alignment, size_t size) 
     return -1;
 
   /* Make sure that the first argument to posix memalign is indeed allocated */
-  vassert(valid(memptr, sizeof(void*)),
+  vassert(allocated((void*)memptr, sizeof(void*), (void*)memptr),
       "\\invalid memptr in posix_memalign", NULL);
 
   int res = native_posix_memalign(memptr, alignment, size);
@@ -447,7 +443,7 @@ static void* bittree_realloc(void* ptr, size_t size) {
       /* allocate memory to store partial initialization */
       tmp->init_ptr = native_calloc(1, nb);
       /* carry out initialization of the old block */
-      setbits(tmp->init_ptr, tmp->size);
+      setbits(tmp->size, tmp->init_ptr);
     }
   } else { /* contains initialized and uninitialized parts */
     int nb = needed_bytes(size);
@@ -510,6 +506,7 @@ static void init_argv(int argc, char **argv) {
 }
 
 static void memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
+  identify_run();
   arch_assert(ptr_size);
   /* Tracking program arguments */
   if (argc_ref)
@@ -593,7 +590,7 @@ public_alias(valid)
 public_alias(block_length)
 public_alias(initialized)
 public_alias(freeable)
-public_alias(readonly)
+public_alias(mark_readonly)
 /* Block initialization */
 public_alias(initialize)
 public_alias(full_init)
@@ -611,4 +608,3 @@ public_alias(store_block_debug)
 public_alias(delete_block_debug)
 #endif
 /* }}} */
-#endif
