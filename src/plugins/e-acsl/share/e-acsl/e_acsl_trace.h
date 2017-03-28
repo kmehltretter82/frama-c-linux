@@ -30,16 +30,47 @@
 
 #include "e_acsl_shexec.h"
 
-# ifdef __GLIBC__
-#  include <execinfo.h>
-# endif
+extern void  *__libc_stack_end;
+
+struct frame_layout {
+  void *next;
+  void *return_address;
+};
+
+/* The following implementation of malloc-free backtrace [native_backtrace]
+   is mostly taken from Glibc-2.22 (see file debug/backtrace.c) */
+static int native_backtrace (void **array, int size) {
+  struct frame_layout *current;
+  void *top_frame,
+       *top_stack;
+  int cnt = 0;
+
+  top_frame = __builtin_frame_address(0);
+  /* Some notion of current stack.  Need not be exactly the top of the stack,
+     just something somewhere in the current frame.  */
+  top_stack = ({ char __csf; &__csf; });
+
+  /* We skip the call to this function, it makes no sense to record it.  */
+  current = ((struct frame_layout *) top_frame);
+  while (cnt < size) {
+    /* Assume that the stack grows downwards  */
+    if ((void *) current < top_stack || !((void *) current < __libc_stack_end))
+      /* This means the address is out of range.  Note that for the
+        toplevel we see a frame pointer with value NULL which clearly is
+        out of range.  */
+      break;
+    array[cnt++] = current->return_address;
+    current = ((struct frame_layout *) (current->next));
+  }
+  return cnt;
+}
 
 static void trace() {
 # ifdef __GLIBC__
 # ifdef __linux__
   int size = 24;
   void **bb = native_malloc(sizeof(void*)*size);
-  backtrace(bb,size);
+  native_backtrace(bb, size);
 
   char executable [PATH_MAX];
   sprintf(executable, "/proc/%d/exe", getpid());
