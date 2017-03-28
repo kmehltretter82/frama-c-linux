@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
   *pmin = 'P';
   *pmax = 'L';
 
-  int diff = pmax - pmin;
+  int diff = (uintptr_t)pmax - (uintptr_t)pmin;
   /*@assert \valid(pmin); */
   /*@assert \valid(pmax); */
   /* Access `pmax` through `pmin` */
