@@ -293,22 +293,6 @@ let rec ptr_index ?(loc=Location.unknown) ?(index=(Cil.zero loc)) exp =
   | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _
     -> assert false
 
-(* ************************************************************************** *)
-(** {2 Debug} *)
-(* ************************************************************************** *)
-let stringify_type  = function
-  | TVoid(_) -> "TVoid"   | TInt(_) -> "TInt"     | TFloat(_) -> "TFloat"
-  | TPtr(_) -> "TPtr"     | TArray(_) -> "TArray" | TFun(_) -> "TFun"
-  | TNamed(_) -> "TNamed" | TComp(_) -> "TComp"   | TEnum(_) -> "TEnum"
-  | TBuiltin_va_list(_) -> "TBuiltin_va_list"
-
-let stringify_enode = function
-  | Const(_) -> "Const" | Lval(_) -> "Lval" | SizeOf(_) -> "SizeOf"
-  | SizeOfE(_) -> "SizeOfE" | SizeOfStr(_) -> "SizeOfStr"
-  | AlignOf(_) -> "AlignOf" | AlignOfE(_) -> "AlignOfE" | UnOp(_) -> "UnOp"
-  | BinOp(_) -> "BinOp" | CastE(_) -> "CastE" | AddrOf(_) -> "AddrOf"
-  | StartOf(_) -> "StartOf" | Info(_) -> "Info"
-
 (*
 Local Variables:
 compile-command: "make"

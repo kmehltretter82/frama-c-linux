@@ -298,17 +298,17 @@ static void validate_memory_layout() {
 
 /* Assert that `_addr` is on heap and it is the base address of an allocated
  * heap memory block */
-#define DVALIATE_FREEABLE(_addr) \
-  DVASSERT(IS_ON_HEAP(_addr), "Expected heap location: %a\n   ", _addr); \
+#define DVALIDATE_FREEABLE(_addr) \
+  DVASSERT(IS_ON_HEAP(_addr), "Expected heap location: %a\n", _addr); \
   DVASSERT(_addr == base_addr(_addr), \
-      "Expected base address, i.e., %a, not %a\n   ", base_addr(_addr), _addr);
+      "Expected base address, i.e., %a, not %a\n", base_addr(_addr), _addr);
 
 /* Assert that a memory block [_addr, _addr + _size] is allocated on a
  * program's heap */
 # define DVALIDATE_HEAP_ACCESS(_addr, _size) \
     DVASSERT(IS_ON_HEAP(_addr), "Expected heap location: %a\n", _addr); \
     DVASSERT(heap_allocated((uintptr_t)_addr, _size, (uintptr_t)_addr), \
-       "Operation on unallocated heap block [%a + %lu]\n   ",  _addr, _size)
+       "Operation on unallocated heap block [%a + %lu]\n",  _addr, _size)
 
 /* Assert that every location belonging to the range [_addr, _addr + _size] is
  * - belongs to a tracked static region (i.e., stack, TLS or global)
@@ -318,22 +318,24 @@ static void validate_memory_layout() {
   for (i = 0; i < _size; i++) { \
     DVASSERT(IS_ON_HEAP(a + i), "Expected heap location: %a\n", a + i); \
     DVASSERT(!heap_allocated(a + i, 1, a + i), \
-      "Expected heap unallocated location: [%a + %lu]\n   ", a, i); \
+      "Expected heap unallocated location: [%a + %lu]\n", a, i); \
   } \
 }
 
 /* Assert that memory block [_addr, _addr + _size] is allocated on stack, TLS
  * or globally */
 # define DVALIDATE_STATIC_ACCESS(_addr, _size) \
-    DVASSERT(IS_ON_STATIC(_addr), "Expected static location: %a\n   ", _addr); \
+    DVASSERT(IS_ON_STATIC(_addr), \
+        "Expected static location: [%a + %lu], \n", _addr, _size); \
     DVASSERT(static_allocated((uintptr_t)_addr, _size,(uintptr_t)_addr), \
-       "Operation on unallocated static block [%a + %lu]\n   ", _addr, _size)
+       "Operation on unallocated static block [%a + %lu]\n", _addr, _size)
 
 /* Same as ::DVALIDATE_STATIC_LOCATION but for a single memory location */
 # define DVALIDATE_STATIC_LOCATION(_addr) \
-    DVASSERT(IS_ON_STATIC(_addr), "Expected static location: %a\n", _addr); \
+    DVASSERT(IS_ON_STATIC(_addr), \
+      "Expected static location: %a\n", _addr); \
     DVASSERT(static_allocated_one((uintptr_t)_addr), \
-       "Operation on unallocated static block [%a]\n   ", _addr)
+      "Operation on unallocated static block [%a]\n", _addr)
 
 /* Assert that every location belonging to the range [_addr, _addr + _size] is
  * - belongs to a tracked static region (i.e., stack, TLS or global)
@@ -341,9 +343,10 @@ static void validate_memory_layout() {
 # define DVALIDATE_STATIC_FREE(_addr, _size) { \
   uintptr_t i, a = (uintptr_t)_addr; \
   for (i = 0; i < _size; i++) { \
-    DVASSERT(IS_ON_STATIC(a + i), "Expected static location: %a\n", a + i); \
+    DVASSERT(IS_ON_STATIC(a + i), \
+      "Expected static location in freea: %a\n", a + i); \
     DVASSERT(!static_allocated_one(a + i), \
-      "Expected static unallocated location: [%a + %lu]\n   ", a, i); \
+      "Expected static unallocated location in freea: [%a + %lu]\n", a, i); \
   } \
 }
 
@@ -355,7 +358,7 @@ static void validate_memory_layout() {
 /* Assert that memory block [_addr, _addr + _size] is allocated */
 # define DVALIDATE_ALLOCATED(_addr, _size, _base) \
   DVASSERT(allocated((uintptr_t)_addr, _size, (uintptr_t)_base), \
-    "Operation on unallocated block [%a + %lu] with base %a\n   ", \
+    "Operation on unallocated block [%a + %lu] with base %a\n", \
     _addr, _size, _base)
 
 /* Assert that memory block [_addr, _addr + _size] is allocated
@@ -384,7 +387,7 @@ static void validate_memory_layout() {
 #  define DVALIDATE_IS_ON_GLOBAL
 #  define DVALIDATE_IS_ON_TLS
 #  define DVALIDATE_IS_ON_STATIC
-#  define DVALIATE_FREEABLE
+#  define DVALIDATE_FREEABLE
 #  define DVALIDATE_STATIC_FREE
 #  define DVALIDATE_HEAP_FREE
 #  define DVALIDATE_RO_ACCESS
@@ -450,11 +453,11 @@ static uintptr_t predicate(uintptr_t addr, char p) {
   return 0;
 }
 
-/*! \brief Return a byte length of a memory block address `_addr` belongs to */
+/*! \brief Return the byte length of the memory block containing `_addr` */
 #define block_length(_addr) predicate((uintptr_t)_addr, 'L')
-/*! \brief Return a base address of a memory block address `_addr` belongs to */
+/*! \brief Return the base address of the memory block containing `_addr` */
 #define base_addr(_addr) predicate((uintptr_t)_addr, 'B')
-/*! \brief Return a byte offset of a memory address `_addr` within its block */
+/*! \brief Return the byte offset of `_addr` within its block */
 #define offset(_addr) predicate((uintptr_t)_addr, 'O')
 /* }}} */
 
@@ -854,7 +857,7 @@ static void* shadow_calloc(size_t nmemb, size_t size) {
  * NOTE: ::unset_heap_segment assumes that `ptr` is a base address of an
  * allocated heap memory block, i.e., `freeable(ptr)` evaluates to true. */
 static void unset_heap_segment(void *ptr, int init) {
-  DVALIATE_FREEABLE(((uintptr_t)ptr));
+  DVALIDATE_FREEABLE(((uintptr_t)ptr));
   /* Base address of shadow block */
   uintptr_t *base_shadow = (uintptr_t*)HEAP_SHADOW(ptr);
   /* Physical allocation size */

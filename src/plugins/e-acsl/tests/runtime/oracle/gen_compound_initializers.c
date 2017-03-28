@@ -68,7 +68,7 @@ int main(int argc, char **argv)
   {
     int __gen_e_acsl_valid;
     __gen_e_acsl_valid = __e_acsl_valid((void *)(_A),sizeof(char *),
-                                        (void *)(_A),(void *)(& _A));
+                                        (void *)(_A),(void *)(_A));
     __e_acsl_assert(__gen_e_acsl_valid,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid((char **)_A)",33);
   }
@@ -129,7 +129,7 @@ int main(int argc, char **argv)
   {
     int __gen_e_acsl_valid_3;
     __gen_e_acsl_valid_3 = __e_acsl_valid((void *)(_D),sizeof(int),
-                                          (void *)(_D),(void *)(& _D));
+                                          (void *)(_D),(void *)(_D));
     __e_acsl_assert(__gen_e_acsl_valid_3,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid((int *)_D)",38);
   }

@@ -81,7 +81,7 @@ void __gen_e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(*__gen_e_acsl_at_6),
                                                   sizeof(int),
                                                   (void *)(*__gen_e_acsl_at_6),
-                                                  (void *)__gen_e_acsl_at_6);
+                                                  (void *)(*__gen_e_acsl_at_6));
     __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",
                     (char *)"atp_NORMAL_computeAverageAccel",
                     (char *)"mem_access: \\valid_read((int *)*__gen_e_acsl_at_6)",

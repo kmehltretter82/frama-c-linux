@@ -126,16 +126,6 @@ val is_generated_literal_string_varinfo: varinfo -> bool
 val is_generated_kf: kernel_function -> bool
 (** Same as [is_generated_varinfo] but for kernel functions *)
 
-(* ************************************************************************** *)
-(** {2 Debug} *)
-(* ************************************************************************** *)
-
-val stringify_type: typ -> string
-(** Return a string coresponding to a given Cil_types.typ *)
-
-val stringify_enode: exp_node -> string
-(** Return a string coresponding to a given Cil_types.exp_enode *)
-
 (*
 Local Variables:
 compile-command: "make"

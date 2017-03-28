@@ -324,10 +324,14 @@ install::
 	$(MKDIR) $(FRAMAC_DATADIR)/e-acsl
 	$(CP) $(E_ACSL_DIR)/share/e-acsl/*.[ch] $(FRAMAC_DATADIR)/e-acsl
 	$(MKDIR) $(FRAMAC_DATADIR)/e-acsl/bittree_model \
-		 $(FRAMAC_DATADIR)/e-acsl/glibc
+	         $(FRAMAC_DATADIR)/e-acsl/segment_model \
+	         $(FRAMAC_DATADIR)/e-acsl/glibc
 	$(CP) $(E_ACSL_DIR)/share/e-acsl/bittree_model/* \
-		$(FRAMAC_DATADIR)/e-acsl/bittree_model
-	$(CP) $(E_ACSL_DIR)/share/e-acsl/glibc/* $(FRAMAC_DATADIR)/e-acsl/glibc
+	      $(FRAMAC_DATADIR)/e-acsl/bittree_model
+	$(CP) $(E_ACSL_DIR)/share/e-acsl/segment_model/* \
+	      $(FRAMAC_DATADIR)/e-acsl/segment_model
+	$(CP) $(E_ACSL_DIR)/share/e-acsl/glibc/* \
+	      $(FRAMAC_DATADIR)/e-acsl/glibc
 	$(PRINT_INSTALL) E-ACSL manuals
 	$(MKDIR) $(FRAMAC_DATADIR)/manuals
 	$(CP) $(E_ACSL_DIR)/doc/manuals/e-acsl.pdf \
