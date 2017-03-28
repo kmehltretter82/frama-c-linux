@@ -15,10 +15,13 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
+-* E-ACSL       [2017/03/28] Fix backtrace when the failed instrumented programs
+	        do not require memory model.
 -! E-ACSL       [2017/03/19] Remove --print|-p option from e-acsl-gcc.sh
 -! E-ACSL       [2017/03/16] Add --check option to e-acsl-gcc.sh which allows
-	        to check the integrity of the generated AST before instrumentation
--! E-ACSL       [2017/03/03] Remove precond rte option from e-acsl-gss.sh
+	        to check the integrity of the generated AST before
+	        instrumentation.
+-! E-ACSL       [2017/03/03] Remove precond rte option from e-acsl-gss.sh.
 -* E-ACSL       [2017/03/02] Fix bts #1740 about incorrect monitoring of
 	        memory properties when early exiting a block through
 	        goto, break or continue.
