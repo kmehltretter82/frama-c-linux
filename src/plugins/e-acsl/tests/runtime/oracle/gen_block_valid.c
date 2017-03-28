@@ -101,7 +101,7 @@ int main(int argc, char **argv)
   __e_acsl_initialize((void *)pmax,sizeof(char));
   /*@ assert Value: mem_access: \valid(pmax); */
   *pmax = (char)'L';
-  int diff = (int)(pmax - pmin);
+  int diff = (int)((unsigned long)pmax - (unsigned long)pmin);
   /*@ assert \valid(pmin); */
   {
     int __gen_e_acsl_initialized_3;
