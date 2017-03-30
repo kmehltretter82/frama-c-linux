@@ -223,11 +223,14 @@ static const uint64_t static_readonly_masks [] = {
   DVASSERT(((uintptr_t)_addr) % HEAP_SEGMENT == 0,  \
       "Heap base address %a is unaligned", _addr)
 
+#define DVALIDATE_MEMORY_INIT \
+  DVASSERT(mem_layout.initialized != 0, "Un-initialized shadow layout", NULL)
+
 /* Debug function making sure that the order of program segments is as expected
  * and that the program and the shadow segments used do not overlap. */
 static void validate_memory_layout() {
   /* Check that the struct holding memory layout is marked as initialized. */
-  DVASSERT(mem_layout.initialized != 0, "Un-initialized shadow layout", NULL);
+  DVALIDATE_MEMORY_INIT;
   /* Make sure the order of program segments is as expected, i.e.,
    * top to bottom: stack -> tls -> heap -> global */
 
@@ -375,6 +378,7 @@ static void validate_memory_layout() {
 
 #else
 /*! \cond exclude from doxygen */
+#  define DVALIDATE_MEMORY_INIT
 #  define DVALIDATE_SHADOW_LAYOUT
 #  define DVALIDATE_HEAP_ACCESS
 #  define DVALIDATE_STATIC_ACCESS
@@ -769,7 +773,9 @@ static size_t heap_allocation_size = 0;
  * correspond to `unusable space`.
  * \b WARNING: Current implementation assumes that the size of a heap segment
  * does not exceed 64 bytes. */
-static void set_heap_segment(void *ptr, size_t size, size_t alloc_size, size_t init) {
+static void set_heap_segment(void *ptr, size_t size, size_t alloc_size,
+    size_t init, const char *function) {
+  DVALIDATE_MEMORY_INIT;
   /* Ensure the shadowed block in on the tracked heap portion */
   DVALIDATE_IS_ON_HEAP(((uintptr_t)ptr) - HEAP_SEGMENT, size);
   DVALIDATE_ALIGNMENT(ptr); /* Make sure alignment is right */
@@ -820,7 +826,7 @@ static void* shadow_malloc(size_t size) {
     (char*)native_aligned_alloc(HEAP_SEGMENT, alloc_size) : NULL;
 
   if (res)
-    set_heap_segment(res, size, alloc_size, 0);
+    set_heap_segment(res, size, alloc_size, 0, "malloc");
 
   return res;
 }
@@ -841,7 +847,7 @@ static void* shadow_calloc(size_t nmemb, size_t size) {
 
   if (res) {
     memset(res, 0, size);
-    set_heap_segment(res, size, alloc_size, 1);
+    set_heap_segment(res, size, alloc_size, 1, "calloc");
   }
 
   return res;
@@ -856,7 +862,8 @@ static void* shadow_calloc(size_t nmemb, size_t size) {
  *
  * NOTE: ::unset_heap_segment assumes that `ptr` is a base address of an
  * allocated heap memory block, i.e., `freeable(ptr)` evaluates to true. */
-static void unset_heap_segment(void *ptr, int init) {
+static void unset_heap_segment(void *ptr, int init, const char *function) {
+  DVALIDATE_MEMORY_INIT;
   DVALIDATE_FREEABLE(((uintptr_t)ptr));
   /* Base address of shadow block */
   uintptr_t *base_shadow = (uintptr_t*)HEAP_SHADOW(ptr);
@@ -878,7 +885,7 @@ static void unset_heap_segment(void *ptr, int init) {
 static void shadow_free(void *ptr) {
   if (ptr != NULL) { /* NULL is a valid behaviour */
     if (freeable(ptr)) {
-      unset_heap_segment(ptr, 1);
+      unset_heap_segment(ptr, 1, "free");
       native_free(ptr);
     } else {
       vabort("Not a start of block (%a) in free\n", ptr);
@@ -910,10 +917,10 @@ static void* shadow_realloc(void *ptr, size_t size) {
         size_t old_alloc_size = ALLOC_SIZE(old_size);
 
         /* Nullify old representation */
-        unset_heap_segment(ptr, 0);
+        unset_heap_segment(ptr, 0, "realloc");
 
         /* Set up new block shadow */
-        set_heap_segment(res, size, alloc_size, 0);
+        set_heap_segment(res, size, alloc_size, 0, "realloc");
 
         /* Move init shadow */
         unsigned char* old_init_shadow  = (unsigned char*)HEAP_INIT_SHADOW(ptr);
@@ -959,7 +966,7 @@ static void *shadow_aligned_alloc(size_t alignment, size_t size) {
 
   char *res = native_aligned_alloc(alignment, size);
   if (res)
-    set_heap_segment(res, size, ALLOC_SIZE(size), 0);
+    set_heap_segment(res, size, ALLOC_SIZE(size), 0, "aligned_alloc");
 
   return (void*)res;
 }
@@ -980,7 +987,7 @@ static int shadow_posix_memalign(void **memptr, size_t alignment, size_t size) {
 
   int res = native_posix_memalign(memptr, alignment, size);
   if (!res) {
-    set_heap_segment(*memptr, size, ALLOC_SIZE(size), 0);
+    set_heap_segment(*memptr, size, ALLOC_SIZE(size), 0, "posix_memalign");
   }
   return res;
 }
