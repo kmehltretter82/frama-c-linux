@@ -31,7 +31,7 @@ open Cil_datatype
 let dkey = Options.dkey_analysis
 module Env: sig
   val has_heap_allocations: unit -> bool
-  val check_heap_allocations: string -> unit
+  val check_heap_allocations: kernel_function -> unit
   val default_varinfos: Varinfo.Hptset.t option -> Varinfo.Hptset.t
   val apply: (kernel_function -> 'a) -> kernel_function -> 'a
   val clear: unit -> unit
@@ -49,15 +49,10 @@ end = struct
 
   let heap_allocation_ref = ref false
   let has_heap_allocations () = !heap_allocation_ref
-  let check_heap_allocations fn =
-    let has_no_definition fn =
-      try
-        let _ = Globals.Functions.find_def_by_name fn in false
-      with
-        Not_found -> true
-    in
+  let check_heap_allocations kf =
     (* a function with no definition potentially allocates memory *)
-    heap_allocation_ref := !heap_allocation_ref || (has_no_definition fn)
+    heap_allocation_ref :=
+      !heap_allocation_ref || not (Kernel_function.is_definition kf)
 
   let current_kf = ref None
   let default_varinfos = function None -> Varinfo.Hptset.empty | Some s -> s
@@ -450,72 +445,72 @@ let register_predicate kf pred state =
         Some state)
 
   let do_call res f args state =
-    Env.check_heap_allocations f.vname;
     let kf = Globals.Functions.get f in
-        let params = Globals.Functions.get_params kf in
-        let state =
-          if Kernel_function.is_definition kf then
-            try
-      (* compute the initial state of the called function *)
-              let init =
-                List.fold_left2
-                  (fun acc p a -> match base_addr a with
-                  | None -> acc
-                 | Some vi ->
-                   if Varinfo.Hptset.mem vi state
-                    then Varinfo.Hptset.add p acc
-                    else acc)
-                  state
-                  params
-              args
-              in
-          let init = match res with
-                | None -> init
-                | Some lv ->
-                  match base_addr_node (Lval lv) with
-                  | None -> init
-                  | Some vi ->
+    Env.check_heap_allocations kf;
+    let params = Globals.Functions.get_params kf in
+    let state =
+      if Kernel_function.is_definition kf then
+        try
+          (* compute the initial state of the called function *)
+          let init =
+            List.fold_left2
+              (fun acc p a -> match base_addr a with
+              | None -> acc
+              | Some vi ->
                 if Varinfo.Hptset.mem vi state
-                    then Varinfo.Hptset.add (Misc.result_vi kf) init
-                    else init
-              in
-              let state = Compute.get ~init kf in
-      (* compute the resulting state by keeping arguments whenever the
-         corresponding formals must be kept *)
-              List.fold_left2
-                (fun acc p a -> match base_addr a with
-                | None -> acc
-                | Some vi ->
-                 if Varinfo.Hptset.mem p state then Varinfo.Hptset.add vi acc
-                  else acc)
-                state
-                params
+                then Varinfo.Hptset.add p acc
+                else acc)
+              state
+              params
+              args
+          in
+          let init = match res with
+            | None -> init
+            | Some lv ->
+              match base_addr_node (Lval lv) with
+              | None -> init
+              | Some vi ->
+                if Varinfo.Hptset.mem vi state
+                then Varinfo.Hptset.add (Misc.result_vi kf) init
+                else init
+          in
+          let state = Compute.get ~init kf in
+          (* compute the resulting state by keeping arguments whenever the
+             corresponding formals must be kept *)
+          List.fold_left2
+            (fun acc p a -> match base_addr a with
+            | None -> acc
+            | Some vi ->
+              if Varinfo.Hptset.mem p state then Varinfo.Hptset.add vi acc
+              else acc)
+            state
+            params
             args
         with Invalid_argument _ ->
-              Options.warning ~current:true
+          Options.warning ~current:true
             "ignoring effect of variadic function %a"
-                Kernel_function.pretty
-                kf;
-              state
-          else
-            state
-        in
+            Kernel_function.pretty
+            kf;
+          state
+      else
+        state
+    in
     let state = match res, Kernel_function.is_definition kf with
-          | None, _ | _, false -> state
-          | Some (lhost, _), true ->
-    (* add the result if \result must be kept after calling the kf *)
-            let vi = Misc.result_vi kf in
+      | None, _ | _, false -> state
+      | Some (lhost, _), true ->
+        (* add the result if \result must be kept after calling the kf *)
+        let vi = Misc.result_vi kf in
         if  Varinfo.Hptset.mem vi state then
-              match lhost with
-              | Var vi -> Varinfo.Hptset.add vi state
+          match lhost with
+          | Var vi -> Varinfo.Hptset.add vi state
           | Mem e ->
-                match base_addr e with
-                | None -> state
-                | Some vi -> Varinfo.Hptset.add vi state
-            else
-              state
-        in
-        Dataflow.Done (Some state)
+            match base_addr e with
+            | None -> state
+            | Some vi -> Varinfo.Hptset.add vi state
+        else
+          state
+    in
+    Dataflow.Done (Some state)
 
 
   (** The (backwards) transfer function for an instruction. The
