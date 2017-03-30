@@ -38,8 +38,8 @@ module Env: sig
   val add: kernel_function -> Varinfo.Hptset.t option Stmt.Hashtbl.t -> unit
   val add_init: kernel_function -> Varinfo.Hptset.t option -> unit
   val mem_init: kernel_function -> Varinfo.Hptset.t option -> bool
-  val find: kernel_function -> Varinfo.Hptset.t option Stmt.Hashtbl.t 
-  module StartData: 
+  val find: kernel_function -> Varinfo.Hptset.t option Stmt.Hashtbl.t
+  module StartData:
     Dataflow.StmtStartData with type data = Varinfo.Hptset.t option
   val is_consolidated: unit -> bool
   val consolidate: Varinfo.Hptset.t -> unit
@@ -50,10 +50,17 @@ end = struct
   let heap_allocation_ref = ref false
   let has_heap_allocations () = !heap_allocation_ref
   let check_heap_allocations fn =
-    heap_allocation_ref := !heap_allocation_ref || Misc.is_alloc_name fn
+    let has_no_definition fn =
+      try
+        let _ = Globals.Functions.find_def_by_name fn in false
+      with
+        Not_found -> true
+    in
+    (* a function with no definition potentially allocates memory *)
+    heap_allocation_ref := !heap_allocation_ref || (has_no_definition fn)
 
   let current_kf = ref None
-  let default_varinfos = function None -> Varinfo.Hptset.empty | Some s -> s 
+  let default_varinfos = function None -> Varinfo.Hptset.empty | Some s -> s
 
   let apply f kf =
     let old = !current_kf in
@@ -69,7 +76,7 @@ end = struct
   module S = Set.Make(Datatype.Option(Varinfo.Hptset))
 
   let tbl_init = Kernel_function.Hashtbl.create 7
-  let add_init kf init = 
+  let add_init kf init =
     let set =
       try Kernel_function.Hashtbl.find tbl_init kf
       with Not_found -> S.empty
@@ -77,21 +84,21 @@ end = struct
     let set = S.add init set in
     Kernel_function.Hashtbl.replace tbl_init kf set
 
-  let mem_init kf init = 
-    try 
+  let mem_init kf init =
+    try
       let set = Kernel_function.Hashtbl.find tbl_init kf in
       S.mem init set
-    with Not_found -> 
+    with Not_found ->
       false
 
   module StartData = struct
     type data = Varinfo.Hptset.t option
-    let apply f = 
+    let apply f =
       try
         let kf = Extlib.opt_conv (Kernel_function.dummy()) !current_kf in
         let h = Kernel_function.Hashtbl.find tbl kf in
         f h
-      with Not_found -> 
+      with Not_found ->
         assert false
     let clear () = apply Stmt.Hashtbl.clear
     let mem k = apply Stmt.Hashtbl.mem k
@@ -108,11 +115,11 @@ end = struct
   let consolidated_set = ref Varinfo.Hptset.empty
   let is_consolidated_ref = ref false
 
-  let consolidate set = 
+  let consolidate set =
     let set = Varinfo.Hptset.union set !consolidated_set in
     consolidated_set := set
 
-  let consolidated_mem v = 
+  let consolidated_mem v =
     is_consolidated_ref := true;
     Varinfo.Hptset.mem v !consolidated_set
 
@@ -121,7 +128,7 @@ end = struct
   let is_empty () =
     try
       Kernel_function.Hashtbl.iter
-        (fun _ h -> 
+        (fun _ h ->
           Stmt.Hashtbl.iter
             (fun _ set -> match set with
             | None -> ()
@@ -132,7 +139,7 @@ end = struct
     with Exit ->
       false
 
-  let clear () = 
+  let clear () =
     Kernel_function.Hashtbl.clear tbl;
     consolidated_set := Varinfo.Hptset.empty;
     is_consolidated_ref := false;
@@ -140,7 +147,7 @@ end = struct
 
 end
 
-let reset () = 
+let reset () =
   Options.feedback ~dkey ~level:2 "clearing environment.";
   Env.clear ()
 
@@ -172,17 +179,17 @@ module rec Transfer
   let combineStmtStartData stmt ~old state = match stmt.skind, old, state with
     | _, _, None -> assert false
     | _, None, Some _ -> Some state (* [old] already included in [state] *)
-    | Return _, Some old, Some new_ -> 
+    | Return _, Some old, Some new_ ->
       Some (Some (Varinfo.Hptset.union old new_))
-    | _, Some old, Some new_ -> 
+    | _, Some old, Some new_ ->
       if Varinfo.Hptset.equal old new_ then
         None
       else
         Some (Some (Varinfo.Hptset.union old new_))
 
   (** Take the data from two successors and combine it *)
-  let combineSuccessors s1 s2 = 
-    Some 
+  let combineSuccessors s1 s2 =
+    Some
       (Varinfo.Hptset.union (Env.default_varinfos s1) (Env.default_varinfos s2))
 
   let is_ptr_or_array ty = Cil.isPointerType ty || Cil.isArrayType ty
@@ -192,43 +199,43 @@ module rec Transfer
     is_ptr_or_array ty
 
   let rec base_addr_node = function
-    | Lval lv | AddrOf lv | StartOf lv -> 
+    | Lval lv | AddrOf lv | StartOf lv ->
       (match lv with
       | Var vi, _ -> Some vi
       | Mem e, _ -> base_addr e)
-    | BinOp((PlusPI | IndexPI | MinusPI), e1, e2, _) -> 
+    | BinOp((PlusPI | IndexPI | MinusPI), e1, e2, _) ->
       if is_ptr_or_array_exp e1 then base_addr e1
       else begin
         assert (is_ptr_or_array_exp e2);
         base_addr e2
       end
     | Info(e, _) | CastE(_, e) -> base_addr e
-    | BinOp((MinusPP | PlusA | MinusA | Mult | Div | Mod |Shiftlt | Shiftrt 
+    | BinOp((MinusPP | PlusA | MinusA | Mult | Div | Mod |Shiftlt | Shiftrt
                 | Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr),
             _, _, _)
-    | UnOp _ | Const _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ 
-    | AlignOfE _ -> 
+    | UnOp _ | Const _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _
+    | AlignOfE _ ->
       None
 
   and base_addr e = base_addr_node e.enode
 
   let extend_to_expr always state lhost e =
     let add_vi state vi =
-      if is_ptr_or_array_exp e && (always || Varinfo.Hptset.mem vi state) then 
+      if is_ptr_or_array_exp e && (always || Varinfo.Hptset.mem vi state) then
         match base_addr e with
         | None -> state
-        | Some vi_e -> 
+        | Some vi_e ->
           Options.feedback ~level:4 ~dkey
             "monitoring %a from %a."
             Printer.pp_varinfo vi_e
             Printer.pp_lval (lhost, NoOffset);
           Varinfo.Hptset.add vi_e state
-      else 
+      else
         state
     in
     match lhost with
     | Var vi -> add_vi state vi
-    | Mem e -> 
+    | Mem e ->
       match base_addr e with
       | None -> state
       | Some vi -> add_vi state vi
@@ -241,10 +248,10 @@ module rec Transfer
         true
       else
         state, false
-    | AddrOf(lhost, _) -> 
+    | AddrOf(lhost, _) ->
       extend_to_expr true state lhost (Cil.new_exp ~loc:e.eloc (Lval lv)),
       true
-    | BinOp((PlusPI | IndexPI | MinusPI), e1, e2, _) -> 
+    | BinOp((PlusPI | IndexPI | MinusPI), e1, e2, _) ->
       if is_ptr_or_array_exp e1 then extend_from_addr state lv e1
       else begin
         assert (is_ptr_or_array_exp e2);
@@ -258,10 +265,10 @@ module rec Transfer
     let state, always = extend_from_addr state lv e in
     extend_to_expr always state lhost e
 
-  let rec register_term_lval kf varinfos (thost, _) = 
+  let rec register_term_lval kf varinfos (thost, _) =
     let add_vi kf vi =
-      Options.feedback ~level:4 ~dkey "monitoring %a from annotation of %a." 
-        Printer.pp_varinfo vi 
+      Options.feedback ~level:4 ~dkey "monitoring %a from annotation of %a."
+        Printer.pp_varinfo vi
         Kernel_function.pretty kf;
       Varinfo.Hptset.add vi varinfos
     in
@@ -272,7 +279,7 @@ module rec Transfer
     | TMem t -> register_term kf varinfos t
 
   and register_term kf varinfos term = match term.term_node with
-    | TLval tlv | TAddrOf tlv | TStartOf tlv -> 
+    | TLval tlv | TAddrOf tlv | TStartOf tlv ->
       register_term_lval kf varinfos tlv
     | TCastE(_, t) | Tat(t, _) | Tlet(_, t) ->
       register_term kf varinfos t
@@ -282,7 +289,7 @@ module rec Transfer
     | TBinOp((PlusPI | IndexPI | MinusPI), t1, t2) ->
       (match t1.term_type with
       | Ctype ty when is_ptr_or_array ty -> register_term kf varinfos t1
-      | _ -> 
+      | _ ->
         match t2.term_type with
         | Ctype ty when is_ptr_or_array ty -> register_term kf varinfos t2
         | _ -> assert false)
@@ -319,22 +326,22 @@ module rec Transfer
     | Pseparated _ -> Error.not_yet "\\separated"
     | Pdangling _ -> Error.not_yet "\\dangling"
     | Ptrue | Pfalse | Papp _ | Prel _
-    | Pand _ | Por _ | Pxor _ | Pimplies _ | Piff _ | Pnot _ | Pif _ 
+    | Pand _ | Por _ | Pxor _ | Pimplies _ | Piff _ | Pnot _ | Pif _
     | Plet _ | Pforall _ | Pexists _ | Pat _ | Psubtype _ ->
       Cil.DoChildren
     method !vterm term = match term.term_node with
     | Tbase_addr(_, t) | Toffset(_, t) | Tblock_length(_, t) ->
       state_ref := register_term kf !state_ref t;
       Cil.DoChildren
-    | TConst _ | TSizeOf _ | TSizeOfStr _ | TAlignOf _  | Tnull | Ttype _ 
-    | Tempty_set -> 
+    | TConst _ | TSizeOf _ | TSizeOfStr _ | TAlignOf _  | Tnull | Ttype _
+    | Tempty_set ->
       (* no left-value inside inside: skip for efficiency *)
       Cil.SkipChildren
     | TUnOp _ | TBinOp _ | Ttypeof _ | TSizeOfE _
     | TLval _ | TAlignOfE _ | TCastE _ | TAddrOf _
     | TStartOf _ | Tapp _ | Tlambda _ | TDataCons _ | Tif _ | Tat _
     | TCoerce _ | TCoerceE _ | TUpdate _ | Tunion _ | Tinter _
-    | Tcomprehension _ | Trange _ | Tlet _ | TLogic_coerce _ -> 
+    | Tcomprehension _ | Trange _ | Tlet _ | TLogic_coerce _ ->
       (* potential sub-term inside *)
       Cil.DoChildren
     method !vlogic_label _ = Cil.SkipChildren
@@ -343,11 +350,11 @@ module rec Transfer
       (* potential RTE *)
       state_ref := register_term kf !state_ref t;
       Cil.DoChildren
-    | TVar _ | TResult _ -> 
+    | TVar _ | TResult _ ->
       Cil.SkipChildren
   end
 
-let register_predicate kf pred state = 
+let register_predicate kf pred state =
   let state_ref = ref state in
   Error.handle
     (fun () ->
@@ -356,11 +363,11 @@ let register_predicate kf pred state =
     ();
   !state_ref
 
-  let register_code_annot kf a state = 
+  let register_code_annot kf a state =
     let state_ref = ref state in
     Error.handle
       (fun () ->
-        ignore 
+        ignore
           (Visitor.visitFramacCodeAnnotation (register_object kf state_ref) a))
       ();
     !state_ref
@@ -371,7 +378,7 @@ let register_predicate kf pred state =
         List.fold_left (fun state (_, init) -> do_init vi init state) state l
 
   let register_initializers state =
-    let do_one vi init state = match init.init with 
+    let do_one vi init state = match init.init with
       | None -> state
       | Some init -> do_init vi init state
     in
@@ -387,37 +394,37 @@ let register_predicate kf pred state =
   let doStmt stmt =
     let _, kf = Kernel_function.find_from_sid stmt.sid in
     let is_first =
-      try Stmt.equal stmt (Kernel_function.find_first_stmt kf) 
+      try Stmt.equal stmt (Kernel_function.find_first_stmt kf)
       with Kernel_function.No_Statement -> assert false
     in
     let is_last =
-      try Stmt.equal stmt (Kernel_function.find_return kf) 
+      try Stmt.equal stmt (Kernel_function.find_return kf)
       with Kernel_function.No_Statement -> assert false
     in
-    Dataflow.Post 
+    Dataflow.Post
       (fun state ->
         let state = Env.default_varinfos state in
-        let state = 
-          if (is_first || is_last) && Misc.is_generated_kf kf then 
+        let state =
+          if (is_first || is_last) && Misc.is_generated_kf kf then
             Annotations.fold_behaviors
-              (fun _ bhv s -> 
+              (fun _ bhv s ->
                 let handle_annot test f s =
-                  if test then 
+                  if test then
                     f (fun _ p s -> register_predicate kf p s) kf bhv.b_name s
                   else
                     s
                 in
                 let s = handle_annot is_first Annotations.fold_requires s in
                 let s = handle_annot is_first Annotations.fold_assumes s in
-                handle_annot 
-                  is_last 
+                handle_annot
+                  is_last
                   (fun f -> Annotations.fold_ensures (fun e (_, p) -> f e p)) s)
               kf
               state
           else
             state
         in
-        let state = 
+        let state =
           Annotations.fold_code_annot
             (fun _ -> register_code_annot kf) stmt state
         in
@@ -426,14 +433,14 @@ let register_predicate kf pred state =
             let rtes = Rte.stmt kf stmt in
             List.fold_left
               (fun state a -> register_code_annot kf a state) state rtes
-          else 
+          else
             state
         in
         let state =
         (* take initializers into account *)
           if is_first then
             let main, lib = Globals.entry_point () in
-            if Kernel_function.equal kf main && not lib then 
+            if Kernel_function.equal kf main && not lib then
               register_initializers state
             else
               state
@@ -515,10 +522,10 @@ let register_predicate kf pred state =
       [(Cil.CurrentLoc.get ())] is set before calling this. If it returns
       None, then we have some default handling. Otherwise, the returned data is
       the data before the branch (not considering the exception handlers) *)
-  let doInstr _stmt instr state = 
+  let doInstr _stmt instr state =
     let state = Env.default_varinfos state in
     match instr with
-    | Set(lv, e, _) -> 
+    | Set(lv, e, _) ->
       let state = handle_assignment state lv e in
       Dataflow.Done (Some state)
     | Local_init(v,AssignInit i,_) ->
@@ -535,13 +542,13 @@ let register_predicate kf pred state =
         Options.warning ~current:true
           "function pointers may introduce too limited instrumentation.";
 (* imprecise function call: keep each argument *)
-        Dataflow.Done 
+        Dataflow.Done
           (Some
              (List.fold_left
                 (fun acc e -> match base_addr e with
                 | None -> acc
                 | Some vi -> Varinfo.Hptset.add vi acc)
-                state 
+                state
                 l)))
     | Asm _ -> Error.not_yet "asm"
     | Skip _ | Code_annot _ -> Dataflow.Default
@@ -556,20 +563,20 @@ let register_predicate kf pred state =
       Stmts_graph.stmt_can_reach kf], where [kf] is the kernel_function
       being analyzed; [let stmt_can_reach _ _ = true] is also correct,
       albeit less efficient *)
-  let stmt_can_reach stmt = 
+  let stmt_can_reach stmt =
     let _, kf = Kernel_function.find_from_sid stmt.sid in
     Stmts_graph.stmt_can_reach kf stmt
 
 end
 
-and Compute: sig 
-  val get: ?init:Varinfo.Hptset.t -> kernel_function -> Varinfo.Hptset.t 
+and Compute: sig
+  val get: ?init:Varinfo.Hptset.t -> kernel_function -> Varinfo.Hptset.t
 end = struct
 
   module D = Dataflow.Backwards(Transfer)
 
-  let compute init_set kf = 
-    Options.feedback ~dkey ~level:2 "entering in function %a." 
+  let compute init_set kf =
+    Options.feedback ~dkey ~level:2 "entering in function %a."
       Kernel_function.pretty kf;
     assert (not (Misc.is_library_loc (Kernel_function.get_location kf)));
     let tbl, is_init =
@@ -581,16 +588,16 @@ end = struct
     (try
        let fundec = Kernel_function.get_definition kf in
        let stmts, returns = Dataflow.find_stmts fundec in
-       if is_init then 
+       if is_init then
          Extlib.may
-           (fun set -> 
-             List.iter 
-               (fun s -> 
-                 let old = 
-                   try Extlib.the (Stmt.Hashtbl.find tbl s) 
+           (fun set ->
+             List.iter
+               (fun s ->
+                 let old =
+                   try Extlib.the (Stmt.Hashtbl.find tbl s)
                    with Not_found -> assert false
                  in
-                 Stmt.Hashtbl.replace 
+                 Stmt.Hashtbl.replace
                    tbl
                    s
                    (Some (Varinfo.Hptset.union set old)))
@@ -599,14 +606,14 @@ end = struct
        else begin
          List.iter (fun s -> Stmt.Hashtbl.add tbl s None) stmts;
          Extlib.may
-           (fun set -> 
+           (fun set ->
              List.iter (fun s -> Stmt.Hashtbl.replace tbl s (Some set)) returns)
            init_set
        end;
        D.compute stmts
-     with Kernel_function.No_Definition | Kernel_function.No_Statement -> 
+     with Kernel_function.No_Definition | Kernel_function.No_Statement ->
        ());
-    Options.feedback ~dkey ~level:2 "function %a done." 
+    Options.feedback ~dkey ~level:2 "function %a done."
       Kernel_function.pretty kf;
     tbl
 
@@ -617,22 +624,22 @@ end = struct
       try
         let stmt = Kernel_function.find_first_stmt kf in
 (*      Options.feedback "GETTING %a" Kernel_function.pretty kf;*)
-        let tbl = 
+        let tbl =
           if Env.mem_init kf init then
             try Env.find kf with Not_found -> assert false
           else begin
     (* WARN: potentially incorrect in case of recursive call *)
             Env.add_init kf init;
-            Env.apply (compute init) kf 
+            Env.apply (compute init) kf
           end
         in
         try
           let set = Stmt.Hashtbl.find tbl stmt in
           Env.default_varinfos set
         with Not_found ->
-          Options.fatal "[pre_analysis] stmt never analyzed: %a" 
+          Options.fatal "[pre_analysis] stmt never analyzed: %a"
             Printer.pp_stmt stmt
-      with Kernel_function.No_Statement -> 
+      with Kernel_function.No_Statement ->
         Varinfo.Hptset.empty
 
 end
@@ -671,17 +678,17 @@ let must_model_vi ?kf ?stmt vi =
   | Some _, None ->
     assert false
   | Some stmt, Some kf  ->
-    if not (Env.is_consolidated ()) then 
+    if not (Env.is_consolidated ()) then
       ignore (consolidated_must_model_vi vi);
     try
       let tbl = Env.find kf in
       try
 let set = Stmt.Hashtbl.find tbl stmt in
 Varinfo.Hptset.mem vi (Env.default_varinfos set)
-      with Not_found -> 
+      with Not_found ->
 (* new statement *)
 consolidated_must_model_vi vi
-    with Not_found -> 
+    with Not_found ->
       (* [kf] is dead code *)
       false
  *)
@@ -692,15 +699,15 @@ let rec must_model_lval ?kf ?stmt = function
 and must_model_exp ?kf ?stmt e = match e.enode with
   | Lval lv | AddrOf lv | StartOf lv -> must_model_lval ?kf ?stmt lv
   | BinOp((PlusPI | IndexPI | MinusPI), e1, _, _) -> must_model_exp ?kf ?stmt e1
-  | BinOp(MinusPP, e1, e2, _) -> 
+  | BinOp(MinusPP, e1, e2, _) ->
     must_model_exp ?kf ?stmt e1 || must_model_exp ?kf ?stmt e2
   | Info(e, _) | CastE(_, e) -> must_model_exp ?kf ?stmt e
-  | BinOp((PlusA | MinusA | Mult | Div | Mod |Shiftlt | Shiftrt 
+  | BinOp((PlusA | MinusA | Mult | Div | Mod |Shiftlt | Shiftrt
               | Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr),
           _, _, _)
   | Const _ -> (* possible in case of static address *) false
-  | UnOp _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ 
-  | AlignOfE _ -> 
+  | UnOp _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _
+  | AlignOfE _ ->
     Options.fatal "[pre_analysis] unexpected expression %a" Exp.pretty e
 
 let must_model_vi ?kf ?stmt vi =
@@ -709,7 +716,7 @@ let must_model_vi ?kf ?stmt vi =
     (Options.Full_mmodel.get ()
      || Error.generic_handle (must_model_vi ?kf ?stmt) false vi)
 
-let must_model_lval ?kf ?stmt lv = 
+let must_model_lval ?kf ?stmt lv =
   Options.Full_mmodel.get ()
   || Error.generic_handle (must_model_lval ?kf ?stmt) false lv
 

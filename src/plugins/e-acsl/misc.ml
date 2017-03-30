@@ -143,9 +143,6 @@ let get_orig_name kf =
   let name = Kernel_function.get_name kf in
   strip_prefix e_acsl_gen_prefix name
 
-let is_alloc_name fn =
-  fn = "malloc" || fn = "free" || fn = "realloc" || fn = "calloc"
-
 let mk_api_name fname =
   e_acsl_api_prefix ^ fname
 

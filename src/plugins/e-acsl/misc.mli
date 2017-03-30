@@ -101,10 +101,6 @@ pointer and integer parts. *)
 (** {2 Handling prefixes of generated library functions and variables} *)
 (* ************************************************************************** *)
 
-val is_alloc_name: string -> bool
-(** @return true if a given string matches the name of a
-   memory-allocation function recognized by E-ACSL. *)
-
 val mk_api_name: string -> string
 (** @return given some base name append it with a prefix used
     by functions and variables in the public API of E-ACSL runtime library.
