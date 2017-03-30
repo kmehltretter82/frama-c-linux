@@ -234,82 +234,82 @@ int switch_valid(void)
   __e_acsl_full_init((void *)(& s));
   s = & i;
   switch (i) {
-    default: ;
-    {
-      int a1 = 0;
-      __e_acsl_store_block((void *)(& a1),(size_t)4);
-      __e_acsl_full_init((void *)(& a1));
-      __e_acsl_full_init((void *)(& p));
-      p = & a1;
+    default:
       {
-        int a2 = 0;
-        __e_acsl_store_block((void *)(& a2),(size_t)4);
-        __e_acsl_full_init((void *)(& a2));
-        __e_acsl_full_init((void *)(& q));
-        q = & a2;
-        /*@ assert \valid(p); */
-        {
-          int __gen_e_acsl_initialized;
-          int __gen_e_acsl_and;
-          __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& p),
-                                                          sizeof(int *));
-          if (__gen_e_acsl_initialized) {
-            int __gen_e_acsl_valid;
-            __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(int),
-                                                (void *)p,(void *)(& p));
-            __gen_e_acsl_and = __gen_e_acsl_valid;
-          }
-          else __gen_e_acsl_and = 0;
-          __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",
-                          (char *)"switch_valid",(char *)"\\valid(p)",76);
-        }
-        /*@ assert \valid(q); */
-        {
-          int __gen_e_acsl_initialized_2;
-          int __gen_e_acsl_and_2;
-          __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& q),
-                                                            sizeof(int *));
-          if (__gen_e_acsl_initialized_2) {
-            int __gen_e_acsl_valid_2;
-            __gen_e_acsl_valid_2 = __e_acsl_valid((void *)q,sizeof(int),
-                                                  (void *)q,(void *)(& q));
-            __gen_e_acsl_and_2 = __gen_e_acsl_valid_2;
-          }
-          else __gen_e_acsl_and_2 = 0;
-          __e_acsl_assert(__gen_e_acsl_and_2,(char *)"Assertion",
-                          (char *)"switch_valid",(char *)"\\valid(q)",77);
-        }
-        /*@ assert \valid(s); */
-        {
-          int __gen_e_acsl_initialized_3;
-          int __gen_e_acsl_and_3;
-          __gen_e_acsl_initialized_3 = __e_acsl_initialized((void *)(& s),
-                                                            sizeof(int *));
-          if (__gen_e_acsl_initialized_3) {
-            int __gen_e_acsl_valid_3;
-            __gen_e_acsl_valid_3 = __e_acsl_valid((void *)s,sizeof(int),
-                                                  (void *)s,(void *)(& s));
-            __gen_e_acsl_and_3 = __gen_e_acsl_valid_3;
-          }
-          else __gen_e_acsl_and_3 = 0;
-          __e_acsl_assert(__gen_e_acsl_and_3,(char *)"Assertion",
-                          (char *)"switch_valid",(char *)"\\valid(s)",78);
-        }
-        __e_acsl_delete_block((void *)(& a1));
-        __e_acsl_delete_block((void *)(& a2));
-        break;
-        __e_acsl_delete_block((void *)(& a2));
-      }
-      { /* sequence */
-        __e_acsl_full_init((void *)(& q));
-        q = & i;
+        int a1 = 0;
+        __e_acsl_store_block((void *)(& a1),(size_t)4);
+        __e_acsl_full_init((void *)(& a1));
         __e_acsl_full_init((void *)(& p));
-        p = q;
+        p = & a1;
+        {
+          int a2 = 0;
+          __e_acsl_store_block((void *)(& a2),(size_t)4);
+          __e_acsl_full_init((void *)(& a2));
+          __e_acsl_full_init((void *)(& q));
+          q = & a2;
+          /*@ assert \valid(p); */
+          {
+            int __gen_e_acsl_initialized;
+            int __gen_e_acsl_and;
+            __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& p),
+                                                            sizeof(int *));
+            if (__gen_e_acsl_initialized) {
+              int __gen_e_acsl_valid;
+              __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(int),
+                                                  (void *)p,(void *)(& p));
+              __gen_e_acsl_and = __gen_e_acsl_valid;
+            }
+            else __gen_e_acsl_and = 0;
+            __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",
+                            (char *)"switch_valid",(char *)"\\valid(p)",76);
+          }
+          /*@ assert \valid(q); */
+          {
+            int __gen_e_acsl_initialized_2;
+            int __gen_e_acsl_and_2;
+            __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& q),
+                                                              sizeof(int *));
+            if (__gen_e_acsl_initialized_2) {
+              int __gen_e_acsl_valid_2;
+              __gen_e_acsl_valid_2 = __e_acsl_valid((void *)q,sizeof(int),
+                                                    (void *)q,(void *)(& q));
+              __gen_e_acsl_and_2 = __gen_e_acsl_valid_2;
+            }
+            else __gen_e_acsl_and_2 = 0;
+            __e_acsl_assert(__gen_e_acsl_and_2,(char *)"Assertion",
+                            (char *)"switch_valid",(char *)"\\valid(q)",77);
+          }
+          /*@ assert \valid(s); */
+          {
+            int __gen_e_acsl_initialized_3;
+            int __gen_e_acsl_and_3;
+            __gen_e_acsl_initialized_3 = __e_acsl_initialized((void *)(& s),
+                                                              sizeof(int *));
+            if (__gen_e_acsl_initialized_3) {
+              int __gen_e_acsl_valid_3;
+              __gen_e_acsl_valid_3 = __e_acsl_valid((void *)s,sizeof(int),
+                                                    (void *)s,(void *)(& s));
+              __gen_e_acsl_and_3 = __gen_e_acsl_valid_3;
+            }
+            else __gen_e_acsl_and_3 = 0;
+            __e_acsl_assert(__gen_e_acsl_and_3,(char *)"Assertion",
+                            (char *)"switch_valid",(char *)"\\valid(s)",78);
+          }
+          __e_acsl_delete_block((void *)(& a1));
+          __e_acsl_delete_block((void *)(& a2));
+          break;
+          __e_acsl_delete_block((void *)(& a2));
+        }
+        { /* sequence */
+          __e_acsl_full_init((void *)(& q));
+          q = & i;
+          __e_acsl_full_init((void *)(& p));
+          p = q;
+        }
+        __e_acsl_full_init((void *)(& s));
+        s = (int *)0;
+        __e_acsl_delete_block((void *)(& a1));
       }
-      __e_acsl_full_init((void *)(& s));
-      s = (int *)0;
-      __e_acsl_delete_block((void *)(& a1));
-    }
   }
   /*@ assert ¬\valid(q); */
   {
