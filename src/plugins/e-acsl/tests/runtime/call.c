@@ -1,6 +1,6 @@
 /* run.config
    COMMENT: function call
-   STDOPT: +"-val-builtin malloc:Frama_C_alloc_size,free:Frama_C_free -no-val-malloc-returns-null"
+   STDOPT: +"-val-builtin malloc:Frama_C_malloc_fresh,free:Frama_C_free -no-val-malloc-returns-null"
 */
 
 #include <stdlib.h>

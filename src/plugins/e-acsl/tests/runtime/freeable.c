@@ -1,6 +1,6 @@
 /* run.config
    COMMENT: \freeable
-   STDOPT: +"-val-builtin malloc:Frama_C_alloc_size -val-builtin free:Frama_C_free"
+   STDOPT: +"-val-builtin malloc:Frama_C_malloc_fresh -val-builtin free:Frama_C_free"
 */
 
 #include <stdlib.h>
