@@ -6,3 +6,4 @@ tests/runtime/block_valid.c:45:[value] warning: out of bounds write. assert \val
 tests/runtime/block_valid.c:46:[value] warning: out of bounds write. assert \valid(pmax);
 tests/runtime/block_valid.c:52:[value] warning: assertion got status unknown.
 tests/runtime/block_valid.c:54:[value] warning: assertion got status unknown.
+[scope:rm_asserts] removing 2 assertion(s)

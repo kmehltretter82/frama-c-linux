@@ -22,3 +22,4 @@ FRAMAC_SHARE/libc/string.h:92:[value] warning: builtin Frama_C_strlen: possibly 
 FRAMAC_SHARE/libc/string.h:94:[value] warning: function __gen_e_acsl_strlen: postcondition got status unknown.
 tests/runtime/mainargs.c:19:[value] warning: assertion got status unknown.
 tests/runtime/mainargs.c:20:[value] warning: assertion got status unknown.
+[scope:rm_asserts] removing 1 assertion(s)

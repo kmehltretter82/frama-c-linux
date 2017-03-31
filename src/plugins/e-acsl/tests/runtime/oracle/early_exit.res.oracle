@@ -32,3 +32,4 @@ tests/runtime/early_exit.c:117:[value] warning: accessing uninitialized left-val
 tests/runtime/early_exit.c:117:[value] warning: accessing left-value that contains escaping addresses.
                  assert ¬\dangling(&q);
 tests/runtime/early_exit.c:99:[value] warning: locals {a0} escaping the scope of a block of while_valid through r
+[scope:rm_asserts] removing 5 assertion(s)

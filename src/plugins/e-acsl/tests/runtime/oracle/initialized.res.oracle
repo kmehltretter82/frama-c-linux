@@ -14,3 +14,4 @@ tests/runtime/initialized.c:94:[value] warning: assertion got status unknown.
 tests/runtime/initialized.c:97:[value] warning: assertion got status unknown.
 tests/runtime/initialized.c:108:[value] warning: out of bounds write. assert \valid(partsi + i);
 tests/runtime/initialized.c:106:[value] warning: out of bounds write. assert \valid(partsc + i);
+[scope:rm_asserts] removing 6 assertion(s)
