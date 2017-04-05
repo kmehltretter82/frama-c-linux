@@ -90,6 +90,16 @@ has_token() {
   return 1
 }
 
+# Filter out a token given by the first argument from the list of tokens
+# given by the remaining arguments
+shift_token() {
+  local token="$1"
+  shift
+  for opt in $@; do
+    [ "$opt" = "$token" ] && true || echo $opt
+  done
+}
+
 # Generate option string for RTE plugin based on the value given via --rte
 # and --rte-select flags
 rte_options() {
@@ -99,19 +109,29 @@ rte_options() {
   # RTE assertions
   local rte_options="div float-to-int mem pointer-call shift \
     trivial-annotations"
+  # RTE assertions which are negated in all cases except when
+  # explicitly specified
   # Option supported by RTE but unsupported in E-ACSL, should
   # always be negated
   local rte_options_unsupported="precond"
+  local rte_options_explicit="trivial-annotations"
   local generated="-rte" # Generated Frama-C options
 
   # Clean-up option strings
   local full_options="$fc_options $rte_options"
-  local asserts="$(tokenize "$1")"
+  local input_asserts="$(tokenize "$1")"
   local fselect="$2"
 
   # If there is 'all' keyword found enable all assertions
-  if has_token all $asserts; then
+  if has_token all $input_asserts; then
     asserts="$full_options"
+    for opt in $rte_options_explicit; do
+      if ! has_token $opt $input_asserts; then
+        asserts="$(shift_token $opt $asserts)"
+      fi
+    done
+  else
+    asserts="$input_asserts"
   fi
 
   if [ -n "$asserts" ]; then
