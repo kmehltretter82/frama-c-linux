@@ -7,7 +7,8 @@ int f(void)
   /*@ assert Value: mem_access: \valid_read(p); */
   {
     int __gen_e_acsl_valid_read;
-    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)p,sizeof(int));
+    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)p,sizeof(int),
+                                                  (void *)p,(void *)(& p));
     __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"Assertion",(char *)"f",
                     (char *)"Value: mem_access: \\valid_read(p)",12);
   }
