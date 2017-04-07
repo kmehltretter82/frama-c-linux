@@ -72,7 +72,7 @@ PLUGIN_CMO:= local_config \
 	main
 
 PLUGIN_HAS_MLI:=yes
-PLUGIN_DISTRIBUTED:=no
+PLUGIN_DISTRIBUTED:=yes
 
 # Suppress a spurious warning in ocaml 4.04.0
 mmodel_analysis.cmo mmodel_analysis.cmi: E_ACSL_BFLAGS+= -w -60
