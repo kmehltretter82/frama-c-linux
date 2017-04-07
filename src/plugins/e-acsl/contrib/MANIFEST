@@ -1810,3 +1810,4 @@ libjemalloc/test/unit/tsd.c
 libjemalloc/test/unit/util.c
 libjemalloc/test/unit/witness.c
 libjemalloc/test/unit/zero.c
+MANIFEST

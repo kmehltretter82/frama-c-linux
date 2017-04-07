@@ -78,9 +78,6 @@ PLUGIN_DISTRIBUTED:=yes
 mmodel_analysis.cmo mmodel_analysis.cmi: E_ACSL_BFLAGS+= -w -60
 mmodel_analysis.cmx: E_ACSL_OFLAGS+= -w -60
 
-PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure
-PLUGIN_DISTRIB_BIN:=no
-
 # We "save" this variable so that it can be used once PLUGIN_DIR has been reset
 EACSL_PLUGIN_DIR:=$(PLUGIN_DIR)
 
@@ -96,7 +93,19 @@ IS_DISTRIBUTED:=no
 
 PLUGIN_GENERATED:= $(EACSL_PLUGIN_DIR)/local_config.ml
 
-$(EACSL_PLUGIN_DIR)/local_config.ml: $(EACSL_PLUGIN_DIR)/Makefile.in $(EACSL_PLUGIN_DIR)/VERSION
+ifeq ("$(FRAMAC_INTERNAL)","yes")
+VERSION_FILE=$(FRAMAC_ROOT_SRCDIR)/VERSION
+else
+VERSION_FILE=$(EACSL_PLUGIN_DIR)/VERSION
+endif
+
+################
+# Version      #
+################
+
+EACSL_VERSION:=$(shell sed -e 's/\\(.*\\)/\\1/' $(VERSION_FILE))
+
+$(EACSL_PLUGIN_DIR)/local_config.ml: $(EACSL_PLUGIN_DIR)/Makefile.in $(VERSION_FILE)
 	$(PRINT_MAKING) $@
 	$(RM) $@
 	$(ECHO) "(* This file was automatically generated from $<. Don't edit it. *)" >> $@
@@ -206,7 +215,7 @@ EACSL_OCAML_FILES = $(wildcard *.mli) \
 	$(filter-out $(wildcard *local_config.ml), $(wildcard *.ml))
 
 EACSL_CONTRIB_FILES = \
-  $(shell $(CAT) contrib/MANIFEST | $(SED) 's/^/contrib\//g')
+  $(shell $(CAT) $(EACSL_PLUGIN_DIR)/contrib/MANIFEST | $(SED) 's/^/contrib\//g')
 
 EACSL_DOC_FILES = \
 	doc/manuals/e-acsl-manual.pdf  \
@@ -237,15 +246,16 @@ EACSL_LICENSE_FILES = \
 EACSL_MISC_FILES = \
   configure.ac Makefile.in INSTALL README VERSION .depend
 
-EACSL_DISTRIB_FILES = \
+PLUGIN_DISTRIB_EXTERNAL:=\
   $(EACSL_MISC_FILES) \
-  $(EACSL_OCAML_FILES) \
   $(EACSL_DOC_FILES) \
   $(EACSL_TEST_FILES) \
   $(EACSL_RTL_FILES) \
   $(EACSL_SCRIPT_FILES) \
   $(EACSL_LICENSE_FILES) \
   $(EACSL_CONTRIB_FILES)
+
+EACSL_DISTRIB_FILES:= $(PLUGIN_DISTRIB_FILES) $(EACSL_OCAML_FILES)
 
 # BE CAREFUL: manually remove all *.ml* files which should not be released!
 e-acsl-distrib: .depend
@@ -312,12 +322,6 @@ headers::
 ################
 
 include $(FRAMAC_SHARE)/Makefile.dynamic
-
-################
-# Version      #
-################
-
-EACSL_VERSION:=$(shell sed -e 's/\\(.*\\)/\\1/' $(EACSL_PLUGIN_DIR)/VERSION)
 
 ###########
 # Install #
