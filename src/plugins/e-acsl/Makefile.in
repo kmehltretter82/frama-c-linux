@@ -246,7 +246,10 @@ EACSL_LICENSE_FILES = \
 EACSL_MISC_FILES = \
   configure.ac Makefile.in INSTALL README VERSION .depend
 
+EACSL_SHARE_FILES = share/e-acsl/*.[ch] share/e-acsl/*/*.[ch]
+
 PLUGIN_DISTRIB_EXTERNAL:=\
+  $(EACSL_SHARE_FILES) \
   $(EACSL_MISC_FILES) \
   $(EACSL_DOC_FILES) \
   $(EACSL_TEST_FILES) \
