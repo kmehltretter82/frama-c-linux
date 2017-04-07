@@ -11,32 +11,32 @@ int main(void)
   __e_acsl_full_init((void *)(& a));
   goto lbl_1;
   lbl_2:
-    /*@ assert \valid(p); */
-    {
-      int __gen_e_acsl_initialized;
-      int __gen_e_acsl_and;
-      __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& p),
-                                                      sizeof(int *));
-      if (__gen_e_acsl_initialized) {
-        int __gen_e_acsl_valid;
-        __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(int),(void *)p,
-                                            (void *)(& p));
-        __gen_e_acsl_and = __gen_e_acsl_valid;
-      }
-      else __gen_e_acsl_and = 0;
-      __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
-                      (char *)"\\valid(p)",13);
+  /*@ assert \valid(p); */
+  {
+    int __gen_e_acsl_initialized;
+    int __gen_e_acsl_and;
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& p),
+                                                    sizeof(int *));
+    if (__gen_e_acsl_initialized) {
+      int __gen_e_acsl_valid;
+      __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(int),(void *)p,
+                                          (void *)(& p));
+      __gen_e_acsl_and = __gen_e_acsl_valid;
     }
-    __retres = 0;
-    goto return_label;
+    else __gen_e_acsl_and = 0;
+    __e_acsl_assert(__gen_e_acsl_and,(char *)"Assertion",(char *)"main",
+                    (char *)"\\valid(p)",13);
+  }
+  __retres = 0;
+  goto return_label;
   lbl_1: __e_acsl_full_init((void *)(& p));
   p = & a;
   goto lbl_2;
   return_label:
-    __e_acsl_delete_block((void *)(& p));
-    __e_acsl_delete_block((void *)(& a));
-    __e_acsl_memory_clean();
-    return __retres;
+  __e_acsl_delete_block((void *)(& p));
+  __e_acsl_delete_block((void *)(& a));
+  __e_acsl_memory_clean();
+  return __retres;
 }
 
 

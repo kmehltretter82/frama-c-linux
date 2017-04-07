@@ -19,10 +19,8 @@ int main(int argc, char **argv)
   int __retres;
   __e_acsl_memory_init(& argc,& argv,(size_t)8);
   __e_acsl_globals_init();
-  { /* sequence */
-    argc = __gen_e_acsl_atoi((char const *)n);
-    a = argc;
-  }
+  argc = __gen_e_acsl_atoi((char const *)n);
+  a = argc;
   __retres = 0;
   __e_acsl_delete_block((void *)(& n));
   __e_acsl_memory_clean();
