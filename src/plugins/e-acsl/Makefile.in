@@ -1,9 +1,9 @@
 ##########################################################################
 #                                                                        #
-#  This file is part of the Frama-C's E-ACSL plug-in.                    #
+#  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2012-2016                                               #
-#    CEA (Commissariat à l'énergie atomique et aux énergies              #
+#  Copyright (C) 2007-2017                                               #
+#    CEA (Commissariat Ã  l'Ã©nergie atomique et aux Ã©nergies              #
 #         alternatives)                                                  #
 #                                                                        #
 #  you can redistribute it and/or modify it under the terms of the GNU   #
@@ -16,7 +16,7 @@
 #  GNU Lesser General Public License for more details.                   #
 #                                                                        #
 #  See the GNU Lesser General Public License version 2.1                 #
-#  for more details (enclosed in the file license/LGPLv2.1).             #
+#  for more details (enclosed in the file licenses/LGPLv2.1).            #
 #                                                                        #
 ##########################################################################
 
