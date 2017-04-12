@@ -40,45 +40,45 @@ int main(int argc, char const **argv)
     goto RET;
   }
   AGAIN:
+  {
+    int a;
+    __e_acsl_store_block((void *)(& a),(size_t)4);
+    __e_acsl_full_init((void *)(& a));
+    a = 1;
+    /*@ assert \valid(&a); */
     {
-      int a;
-      __e_acsl_store_block((void *)(& a),(size_t)4);
-      __e_acsl_full_init((void *)(& a));
-      a = 1;
-      /*@ assert \valid(&a); */
-      {
-        int __gen_e_acsl_valid;
-        __gen_e_acsl_valid = __e_acsl_valid((void *)(& a),sizeof(int),
-                                            (void *)(& a),(void *)(& a));
-        __e_acsl_assert(__gen_e_acsl_valid,(char *)"Assertion",
-                        (char *)"main",(char *)"\\valid(&a)",25);
-      }
-      if (t == 2) {
-        __gen_e_acsl_printf_va_2(__gen_e_acsl_literal_string,t,
-                                 (char *)__gen_e_acsl_literal_string_3);
-        __e_acsl_delete_block((void *)(& a));
-        goto UP;
-      }
-      else t ++;
-      int b = 15;
-      __e_acsl_store_block((void *)(& b),(size_t)4);
-      __e_acsl_full_init((void *)(& b));
-      /*@ assert \valid(&b); */
-      {
-        int __gen_e_acsl_valid_2;
-        __gen_e_acsl_valid_2 = __e_acsl_valid((void *)(& b),sizeof(int),
-                                              (void *)(& b),(void *)(& b));
-        __e_acsl_assert(__gen_e_acsl_valid_2,(char *)"Assertion",
-                        (char *)"main",(char *)"\\valid(&b)",36);
-      }
-      __gen_e_acsl_printf_va_3(__gen_e_acsl_literal_string,t,
-                               (char *)__gen_e_acsl_literal_string_4);
-      __e_acsl_delete_block((void *)(& a));
-      __e_acsl_delete_block((void *)(& b));
-      goto AGAIN;
-      __e_acsl_delete_block((void *)(& b));
-      __e_acsl_delete_block((void *)(& a));
+      int __gen_e_acsl_valid;
+      __gen_e_acsl_valid = __e_acsl_valid((void *)(& a),sizeof(int),
+                                          (void *)(& a),(void *)(& a));
+      __e_acsl_assert(__gen_e_acsl_valid,(char *)"Assertion",(char *)"main",
+                      (char *)"\\valid(&a)",25);
     }
+    if (t == 2) {
+      __gen_e_acsl_printf_va_2(__gen_e_acsl_literal_string,t,
+                               (char *)__gen_e_acsl_literal_string_3);
+      __e_acsl_delete_block((void *)(& a));
+      goto UP;
+    }
+    else t ++;
+    int b = 15;
+    __e_acsl_store_block((void *)(& b),(size_t)4);
+    __e_acsl_full_init((void *)(& b));
+    /*@ assert \valid(&b); */
+    {
+      int __gen_e_acsl_valid_2;
+      __gen_e_acsl_valid_2 = __e_acsl_valid((void *)(& b),sizeof(int),
+                                            (void *)(& b),(void *)(& b));
+      __e_acsl_assert(__gen_e_acsl_valid_2,(char *)"Assertion",
+                      (char *)"main",(char *)"\\valid(&b)",36);
+    }
+    __gen_e_acsl_printf_va_3(__gen_e_acsl_literal_string,t,
+                             (char *)__gen_e_acsl_literal_string_4);
+    __e_acsl_delete_block((void *)(& a));
+    __e_acsl_delete_block((void *)(& b));
+    goto AGAIN;
+    __e_acsl_delete_block((void *)(& b));
+    __e_acsl_delete_block((void *)(& a));
+  }
   RET: __retres = 0;
   __e_acsl_memory_clean();
   return __retres;

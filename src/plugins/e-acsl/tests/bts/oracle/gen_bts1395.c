@@ -12,10 +12,8 @@ int fact(int n)
     __retres = 1;
     goto return_label;
   }
-  { /* sequence */
-    tmp = __gen_e_acsl_fact(n - 1);
-    ;
-  }
+  tmp = __gen_e_acsl_fact(n - 1);
+  ;
   __retres = n * tmp;
   return_label: return __retres;
 }
