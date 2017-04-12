@@ -298,10 +298,16 @@ e-acsl-distrib-check:
 # Header #
 ##########
 
+ifeq ("$(FRAMAC_INTERNAL)","yes")
+CEA_LGPL_HEADER=$(FRAMAC_ROOT_SRCDIR)/headers/open-source/CEA_LGPL
+else
+CEA_LGPL_HEADER=$(EACSL_PLUGIN_DIR)/license/CEA_LGPL
+endif
+
 headers::
 	@echo "Applying Headers..."
 	headache -c $(EACSL_PLUGIN_DIR)/license/headache_config.txt \
-                 -h $(EACSL_PLUGIN_DIR)/license/CEA_LGPL \
+                 -h $(CEA_LGPL_HEADER) \
 	         $(EACSL_PLUGIN_DIR)/*.ml \
                  $(EACSL_PLUGIN_DIR)/*.mli \
 	         $(EACSL_PLUGIN_DIR)/Makefile.in \
