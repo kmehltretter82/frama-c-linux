@@ -90,12 +90,10 @@ int main(void)
   int i = 4;
   while (1) {
     int tmp;
-    { /* sequence */
-      tmp = i;
-      /*@ assert Value: signed_overflow: -2147483648 ≤ i - 1; */
-      i --;
-      ;
-    }
+    tmp = i;
+    /*@ assert Value: signed_overflow: -2147483648 ≤ i - 1; */
+    i --;
+    ;
     if (! tmp) break;
     {
       char *s = (char *)__gen_e_acsl_literal_string_3;

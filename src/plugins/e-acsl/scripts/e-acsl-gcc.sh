@@ -194,7 +194,7 @@ LONGOPTIONS="help,compile,compile-only,debug:,ocode:,oexec:,verbose:,
   frama-c-only,extra-cpp-args:,frama-c-stdlib,full-mmodel,gmp,quiet,logfile:,
   ld-flags:,cpp-flags:,frama-c-extra:,memory-model:,
   frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:,check
-  print-mmodels,rt-debug,rte-select:"
+  print-mmodels,rt-debug,rte-select:,then,e-acsl-extra:"
 SHORTOPTIONS="h,c,C,d:,D,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,I:,G:,X,a:,V"
 # Prefix for an error message due to wrong arguments
 ERROR="ERROR parsing arguments:"
@@ -225,6 +225,7 @@ OPTION_INSTRUMENTED_ONLY=                # Do not compile original code
 OPTION_RTE=                              # Enable assertion generation
 OPTION_CHECK=                            # Check AST integrity
 OPTION_RTE_SELECT=               # Generate assertions for these functions only
+OPTION_THEN=                     # Adds -then in front of -e-acsl in FC command.
 
 # Supported memory model names
 SUPPORTED_MMODELS="bittree,segment"
@@ -453,6 +454,17 @@ do
       echo $SUPPORTED_MMODELS
       exit 0
     ;;
+    #Separate extra Frama-C flags from e-acsl launch with -then.
+    --then)
+      shift;
+      OPTION_THEN=-then
+      FRAMAC_FLAGS="-e-acsl-prepare $FRAMAC_FLAGS"
+    ;;
+    --e-acsl-extra)
+      shift;
+      OPTION_EACSL="$1 $OPTION_EACSL"
+      shift;
+    ;;
   esac
 done
 shift;
@@ -520,6 +532,10 @@ if [ -n "$OPTION_EACSL_SHARE" ]; then
   EACSL_SHARE="$OPTION_EACSL_SHARE"
 fi
 
+if [ -n "$OPTION_THEN" ]; then
+  FRAMAC_FLAGS="-e-acsl-share=$EACSL_SHARE $FRAMAC_FLAGS";
+fi
+
 # Select optimization flags for both instrumented and noon-instrumented code
 # compilation
 if [ -n "$OPTION_RT_DEBUG" ]; then
@@ -581,6 +597,7 @@ fi
 # Build E-ACSL plugin argument string
 if [ -n "$OPTION_EACSL" ]; then
   EACSL_FLAGS="
+    $OPTION_THEN
     $OPTION_EACSL
     $OPTION_GMP
     $OPTION_FULL_MMODEL

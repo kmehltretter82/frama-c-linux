@@ -316,8 +316,8 @@ void __gen_e_acsl_k(void)
     else __gen_e_acsl_implies_3 = X + (long)Y == 5L;
     __e_acsl_assert(__gen_e_acsl_implies_3,(char *)"Precondition",
                     (char *)"k",(char *)"X == 3 && Y == 2 ==> X + Y == 5",43);
-    k();
   }
+  k();
   return;
 }
 

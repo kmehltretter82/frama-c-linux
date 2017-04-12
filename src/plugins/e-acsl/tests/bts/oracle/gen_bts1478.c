@@ -36,8 +36,8 @@ void __gen_e_acsl_loop(void)
                     (char *)"\\valid(global_i_ptr)",10);
     __e_acsl_assert(global_i_ptr == & global_i,(char *)"Precondition",
                     (char *)"loop",(char *)"global_i_ptr == &global_i",11);
-    loop();
   }
+  loop();
   return;
 }
 
