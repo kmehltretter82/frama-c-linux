@@ -1,9 +1,9 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
+(*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2016                                               *)
-(*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
+(*  Copyright (C) 2007-2017                                               *)
+(*    CEA (Commissariat Ã  l'Ã©nergie atomique et aux Ã©nergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
 (*  you can redistribute it and/or modify it under the terms of the GNU   *)
@@ -16,7 +16,7 @@
 (*  GNU Lesser General Public License for more details.                   *)
 (*                                                                        *)
 (*  See the GNU Lesser General Public License version 2.1                 *)
-(*  for more details (enclosed in the file license/LGPLv2.1).             *)
+(*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
 (*                                                                        *)
 (**************************************************************************)
 
@@ -159,8 +159,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
 	  ~global_clear:false
 	  Env.After
       in
-      (* TODO: could be optimised if [pop_and_get] would return a list of
-	 stmts *)
+      let blk = Cil.flatten_transient_sub_blocks blk in
       [ mkStmt ~valid_sid:true (Block blk) ], env
     | (t1, rel1, logic_x, rel2, t2) :: tl ->
       let ctx =

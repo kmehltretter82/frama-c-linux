@@ -1,8 +1,8 @@
 ##########################################################################
 #                                                                        #
-#  This file is part of the Frama-C's E-ACSL plug-in.                    #
+#  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2012-2016                                               #
+#  Copyright (C) 2007-2017                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -16,7 +16,7 @@
 #  GNU Lesser General Public License for more details.                   #
 #                                                                        #
 #  See the GNU Lesser General Public License version 2.1                 #
-#  for more details (enclosed in the file license/LGPLv2.1).             #
+#  for more details (enclosed in the file licenses/LGPLv2.1).            #
 #                                                                        #
 ##########################################################################
 
@@ -319,14 +319,26 @@ e-acsl-distrib-check:
 # Header #
 ##########
 
+ifeq ("$(FRAMAC_INTERNAL)","yes")
+CEA_LGPL_HEADER=$(FRAMAC_ROOT_SRCDIR)/headers/open-source/CEA_LGPL
+else
+CEA_LGPL_HEADER=$(EACSL_PLUGIN_DIR)/license/CEA_LGPL
+endif
+
 headers::
 	@echo "Applying Headers..."
-	headache -c license/headache_config.txt -h license/CEA_LGPL \
-		*.ml *.mli \
-		Makefile.in configure.ac \
-		share/e-acsl/*.[ch] share/e-acsl/*/*.[ch] scripts/*.sh
-	headache -c license/headache_config.txt -h license/SPARETIMELABS \
-		share/e-acsl/e_acsl_printf.h
+	headache -c $(EACSL_PLUGIN_DIR)/license/headache_config.txt \
+                 -h $(CEA_LGPL_HEADER) \
+	         $(EACSL_PLUGIN_DIR)/*.ml \
+                 $(EACSL_PLUGIN_DIR)/*.mli \
+	         $(EACSL_PLUGIN_DIR)/Makefile.in \
+                 $(EACSL_PLUGIN_DIR)/configure.ac \
+	         $(EACSL_PLUGIN_DIR)/share/e-acsl/*.[ch] \
+                 $(EACSL_PLUGIN_DIR)/share/e-acsl/*/*.[ch] \
+                 $(EACSL_PLUGIN_DIR)/scripts/*.sh
+	headache -c $(EACSL_PLUGIN_DIR)/license/headache_config.txt \
+                 -h $(EACSL_PLUGIN_DIR)/license/SPARETIMELABS \
+		  $(EACSL_PLUGIN_DIR)/share/e-acsl/e_acsl_printf.h
 
 ################
 # Generic part #
@@ -351,12 +363,16 @@ install::
 	      $(FRAMAC_DATADIR)/e-acsl/segment_model
 	$(CP) $(E_ACSL_DIR)/share/e-acsl/glibc/* \
 	      $(FRAMAC_DATADIR)/e-acsl/glibc
-	$(PRINT_INSTALL) E-ACSL manuals
-	$(MKDIR) $(FRAMAC_DATADIR)/manuals
+        # manuals are not present in standard distribution.
+        # Don't fail because of that.
+	if test -f $(E_ACSL_DIR)/doc/manuals/e-acsl.pdf; then \
+	$(PRINT_INSTALL) E-ACSL manuals \
+	$(MKDIR) $(FRAMAC_DATADIR)/manuals \
 	$(CP) $(E_ACSL_DIR)/doc/manuals/e-acsl.pdf \
 	      $(E_ACSL_DIR)/doc/manuals/e-acsl-implementation.pdf \
 	      $(E_ACSL_DIR)/doc/manuals/e-acsl-manual.pdf \
-	$(FRAMAC_DATADIR)/manuals
+	$(FRAMAC_DATADIR)/manuals; \
+        fi
 	$(PRINT_INSTALL) E-ACSL libraries
 	$(MKDIR) $(LIBDIR)
 	$(CP) $(EACSL_LIBDIR)/libeacsl-*.a $(LIBDIR)

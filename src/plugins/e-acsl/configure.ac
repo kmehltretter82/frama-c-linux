@@ -1,9 +1,9 @@
 ##########################################################################
 #                                                                        #
-#  This file is part of the Frama-C's E-ACSL plug-in.                    #
+#  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2012-2016                                               #
-#    CEA (Commissariat à l'énergie atomique et aux énergies              #
+#  Copyright (C) 2007-2017                                               #
+#    CEA (Commissariat Ã  l'Ã©nergie atomique et aux Ã©nergies              #
 #         alternatives)                                                  #
 #                                                                        #
 #  you can redistribute it and/or modify it under the terms of the GNU   #
@@ -16,7 +16,7 @@
 #  GNU Lesser General Public License for more details.                   #
 #                                                                        #
 #  See the GNU Lesser General Public License version 2.1                 #
-#  for more details (enclosed in the file license/LGPLv2.1).             #
+#  for more details (enclosed in the file licenses/LGPLv2.1).            #
 #                                                                        #
 ##########################################################################
 
@@ -40,8 +40,29 @@ check_plugin(e_acsl,PLUGIN_RELATIVE_PATH(plugin_file),
 
 plugin_require(e_acsl,rtegen)
 
-# restrict the plug-in dependency checking to external plug-in configuration
-m4_ifndef([FRAMAC_MAIN_AUTOCONF],[check_plugin_dependencies],[])
+# E-ACSL only works on Linux as of now. Disable it on Mac OS and Windows
+AC_CHECK_PROG(UNAME,uname,uname,no)
+
+if test "$UNAME" = "no"; then
+  plugin_disable(e_acsl,[Not on a POSIX platform.])
+fi
+
+HOST_OS=$($UNAME -s)
+case $HOST_OS in
+Linux | DragonFly | FreeBSD | NetBSD | OpenBSD)
+# BSDs haven't really be tested, but it should at least compile fine
+;;
+*)
+  plugin_disable(e_acsl,[unsupported system $HOST_OS])
+;;
+esac
+
+# perform additional checks when not compiled
+# directly with main Frama-C distribution
+m4_ifndef([FRAMAC_MAIN_AUTOCONF],
+[
+
+check_plugin_dependencies
 
 # Check Frama-C version
 #######################
@@ -74,11 +95,11 @@ use it at your own risk)
       fi
     fi;;
 esac
+],
+[]) # end of configuration specific to external compilation mode
 
-# OCaml version
-###############
-
-OCAMLVERSION=`ocamlc -v | sed -n -e 's|.*version *\(.*\)$|\1|p' `
+# no need to continue checking other features if E-ACSL is disabled
+if test "$ENABLE_E_ACSL" != "no"; then
 
 ###############################
 # C specific stuff for E-ACSL #
@@ -142,3 +163,5 @@ AC_MSG_NOTICE([Configure libjemalloc])
 (cd plugin_dir/contrib/libjemalloc && ./autogen.sh \
   --with-jemalloc-prefix="__e_acsl_native_" \
   --with-private-namespace="__e_acsl_hidden_")
+
+fi

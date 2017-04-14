@@ -1,9 +1,9 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
+(*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2012-2016                                               *)
-(*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
+(*  Copyright (C) 2007-2017                                               *)
+(*    CEA (Commissariat Ã  l'Ã©nergie atomique et aux Ã©nergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
 (*  you can redistribute it and/or modify it under the terms of the GNU   *)
@@ -16,7 +16,7 @@
 (*  GNU Lesser General Public License for more details.                   *)
 (*                                                                        *)
 (*  See the GNU Lesser General Public License version 2.1                 *)
-(*  for more details (enclosed in the file license/LGPLv2.1).             *)
+(*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
 (*                                                                        *)
 (**************************************************************************)
 
@@ -647,7 +647,8 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
                       else
                         acc)
                     global_vars
-                    [ Misc.mk_call ~loc (Misc.mk_api_name "memory_clean") []; ret ]
+                    [ Misc.mk_call ~loc (Misc.mk_api_name "memory_clean") [];
+                      ret ]
                 in
                 b.bstmts <- List.rev l @ delete_stmts
             end;
@@ -664,13 +665,12 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
             (* must generate [pre_block] which includes [stmt] before generating
                [post_block] *)
             let pre_block, env =
-              Env.pop_and_get env new_stmt ~global_clear:false Env.After
-            in
-            let pre_block =
-              if pre_block.blocals = [] then
-                Cil.transient_block pre_block
-              else
-                pre_block
+              Env.pop_and_get
+                ~split:true
+                env
+                new_stmt
+                ~global_clear:false
+                Env.After
             in
             let env = mk_post_env (Env.push env) in
             let post_block, env =
@@ -681,14 +681,14 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
                 Env.Before
             in
             (match stmt.skind with
-             | Instr (Local_init (vi, _, _)) when
-                 Mmodel_analysis.old_must_model_vi self#behavior ~kf vi ->
-               let vi = Cil.get_varinfo self#behavior vi in
-               post_block.bstmts <-
-                 post_block.bstmts @
-                 [Misc.mk_store_stmt vi; Misc.mk_full_init_stmt vi]
-             | _ -> ());
-            let post_block = Cil.flatten_transient_sub_blocks post_block in
+            | Instr (Local_init (vi, _, _)) when
+                Mmodel_analysis.old_must_model_vi self#behavior ~kf vi ->
+              let vi = Cil.get_varinfo self#behavior vi in
+              (* must generate the new stmts after the declaration of [vi] *)
+              post_block.bstmts <-
+                post_block.bstmts @
+                [Misc.mk_store_stmt vi; Misc.mk_full_init_stmt vi]
+            | _ -> ());
             let post_block = Cil.transient_block post_block in
             Misc.mk_block prj new_stmt post_block, env
           end else
