@@ -355,12 +355,16 @@ install::
 	      $(FRAMAC_DATADIR)/e-acsl/segment_model
 	$(CP) $(E_ACSL_DIR)/share/e-acsl/glibc/* \
 	      $(FRAMAC_DATADIR)/e-acsl/glibc
-	$(PRINT_INSTALL) E-ACSL manuals
-	$(MKDIR) $(FRAMAC_DATADIR)/manuals
+        # manuals are not present in standard distribution.
+        # Don't fail because of that.
+	if test -f $(E_ACSL_DIR)/doc/manuals/e-acsl.pdf; then \
+	$(PRINT_INSTALL) E-ACSL manuals \
+	$(MKDIR) $(FRAMAC_DATADIR)/manuals \
 	$(CP) $(E_ACSL_DIR)/doc/manuals/e-acsl.pdf \
 	      $(E_ACSL_DIR)/doc/manuals/e-acsl-implementation.pdf \
 	      $(E_ACSL_DIR)/doc/manuals/e-acsl-manual.pdf \
-	$(FRAMAC_DATADIR)/manuals
+	$(FRAMAC_DATADIR)/manuals; \
+        fi
 	$(PRINT_INSTALL) E-ACSL libraries
 	$(MKDIR) $(LIBDIR)
 	$(CP) $(EACSL_LIBDIR)/libeacsl-*.a $(LIBDIR)
