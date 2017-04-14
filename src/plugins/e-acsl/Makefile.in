@@ -41,6 +41,14 @@ else
 EACSL_HAS_OCAML312 = yes
 endif
 
+# Utilities used to create the list of contrib/ files to be included in the
+# distribution. In external mode, we can't rely on these variables to be
+# set, as we have to build the list before including Makefile.dynamic.
+# There is no real alternative to cat and sed anyways, which are both part of
+# POSIX, so that the usefulness of the variables is questionable.
+CAT?=cat
+SED?=sed
+
 #########################
 # Plug-in configuration #
 #########################
@@ -258,7 +266,7 @@ PLUGIN_DISTRIB_EXTERNAL:=\
   $(EACSL_LICENSE_FILES) \
   $(EACSL_CONTRIB_FILES)
 
-EACSL_DISTRIB_FILES:= $(PLUGIN_DISTRIB_FILES) $(EACSL_OCAML_FILES)
+EACSL_DISTRIB_FILES:= $(PLUGIN_DISTRIB_EXTERNAL) $(EACSL_OCAML_FILES)
 
 # BE CAREFUL: manually remove all *.ml* files which should not be released!
 e-acsl-distrib: .depend
@@ -355,12 +363,16 @@ install::
 	      $(FRAMAC_DATADIR)/e-acsl/segment_model
 	$(CP) $(E_ACSL_DIR)/share/e-acsl/glibc/* \
 	      $(FRAMAC_DATADIR)/e-acsl/glibc
-	$(PRINT_INSTALL) E-ACSL manuals
-	$(MKDIR) $(FRAMAC_DATADIR)/manuals
+        # manuals are not present in standard distribution.
+        # Don't fail because of that.
+	if test -f $(E_ACSL_DIR)/doc/manuals/e-acsl.pdf; then \
+	$(PRINT_INSTALL) E-ACSL manuals \
+	$(MKDIR) $(FRAMAC_DATADIR)/manuals \
 	$(CP) $(E_ACSL_DIR)/doc/manuals/e-acsl.pdf \
 	      $(E_ACSL_DIR)/doc/manuals/e-acsl-implementation.pdf \
 	      $(E_ACSL_DIR)/doc/manuals/e-acsl-manual.pdf \
-	$(FRAMAC_DATADIR)/manuals
+	$(FRAMAC_DATADIR)/manuals; \
+        fi
 	$(PRINT_INSTALL) E-ACSL libraries
 	$(MKDIR) $(LIBDIR)
 	$(CP) $(EACSL_LIBDIR)/libeacsl-*.a $(LIBDIR)
