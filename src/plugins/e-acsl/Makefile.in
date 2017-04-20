@@ -352,6 +352,8 @@ include $(FRAMAC_SHARE)/Makefile.dynamic
 # Install #
 ###########
 
+MANUALS=$(wildcard $(E_ACSL_DIR)/doc/manuals/*.pdf)
+
 install::
 	$(PRINT_INSTALL) E-ACSL share files
 	$(MKDIR) $(FRAMAC_DATADIR)/e-acsl
@@ -367,14 +369,11 @@ install::
 	      $(FRAMAC_DATADIR)/e-acsl/glibc
         # manuals are not present in standard distribution.
         # Don't fail because of that.
-	if test -f $(E_ACSL_DIR)/doc/manuals/e-acsl.pdf; then \
-	$(PRINT_INSTALL) E-ACSL manuals \
-	$(MKDIR) $(FRAMAC_DATADIR)/manuals \
-	$(CP) $(E_ACSL_DIR)/doc/manuals/e-acsl.pdf \
-	      $(E_ACSL_DIR)/doc/manuals/e-acsl-implementation.pdf \
-	      $(E_ACSL_DIR)/doc/manuals/e-acsl-manual.pdf \
-	$(FRAMAC_DATADIR)/manuals; \
-        fi
+ifneq ("$(MANUALS)","")
+	$(PRINT_INSTALL) E-ACSL manuals
+	$(MKDIR) $(FRAMAC_DATADIR)/manuals
+	$(CP) $(MANUALS) $(FRAMAC_DATADIR)/manuals;
+endif
 	$(PRINT_INSTALL) E-ACSL libraries
 	$(MKDIR) $(LIBDIR)
 	$(CP) $(EACSL_LIBDIR)/libeacsl-*.a $(LIBDIR)
