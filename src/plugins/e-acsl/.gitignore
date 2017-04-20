@@ -18,6 +18,7 @@
 /share/e-acsl/*.cm*
 /share/e-acsl/*.annot
 /share/e-acsl/*_DEP
+/doc/manuals
 /doc/code
 /doc/refman/*.out
 /doc/refman/*.bbl

@@ -45,6 +45,7 @@ $(MAIN).pdf: $(DEPS_MODERN)
 EACSL_DIR=../..
 DISTRIB_DIR=$(HOME)/frama-c/doc/www/distrib
 install: e-acsl-implementation.pdf e-acsl.pdf
+	mkdir -p $(EACSL_DIR)/doc/manuals
 	cp -f $^ $(EACSL_DIR)/doc/manuals
 
 include $(EACSL_DIR)/doc/support/MakeLaTeXModern

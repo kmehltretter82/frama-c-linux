@@ -20,6 +20,7 @@ main.pdf: $(DEPS_MODERN)
 EACSL_DIR=../..
 DISTRIB_DIR=$(HOME)/frama-c/doc/www/distrib
 install:
+	mkdir -p $(EACSL_DIR)/doc/manuals/
 	cp -f main.pdf $(EACSL_DIR)/doc/manuals/e-acsl-manual.pdf
 #	cp -f main.pdf \
 	  $(DISTRIB_DIR)/download/e-acsl/e-acsl-manual-$(EACSL_VERSION).pdf
