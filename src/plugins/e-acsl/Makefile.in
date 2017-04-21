@@ -82,12 +82,14 @@ PLUGIN_CMO:= local_config \
 PLUGIN_HAS_MLI:=yes
 PLUGIN_DISTRIBUTED:=yes
 
-# Suppress a spurious warning in ocaml 4.04.0
-mmodel_analysis.cmo mmodel_analysis.cmi: E_ACSL_BFLAGS+= -w -60
-mmodel_analysis.cmx: E_ACSL_OFLAGS+= -w -60
 
 # We "save" this variable so that it can be used once PLUGIN_DIR has been reset
 EACSL_PLUGIN_DIR:=$(PLUGIN_DIR)
+
+# Suppress a spurious warning in ocaml 4.04.0
+$(EACSL_PLUGIN_DIR)/mmodel_analysis.cmo \
+$(EACSL_PLUGIN_DIR)/mmodel_analysis.cmi: E_ACSL_BFLAGS+= -w -60
+$(EACSL_PLUGIN_DIR)/mmodel_analysis.cmx: E_ACSL_OFLAGS+= -w -60
 
 ###############
 # Local Flags #
@@ -350,6 +352,8 @@ include $(FRAMAC_SHARE)/Makefile.dynamic
 # Install #
 ###########
 
+MANUALS=$(wildcard $(E_ACSL_DIR)/doc/manuals/*.pdf)
+
 install::
 	$(PRINT_INSTALL) E-ACSL share files
 	$(MKDIR) $(FRAMAC_DATADIR)/e-acsl
@@ -365,14 +369,11 @@ install::
 	      $(FRAMAC_DATADIR)/e-acsl/glibc
         # manuals are not present in standard distribution.
         # Don't fail because of that.
-	if test -f $(E_ACSL_DIR)/doc/manuals/e-acsl.pdf; then \
-	$(PRINT_INSTALL) E-ACSL manuals \
-	$(MKDIR) $(FRAMAC_DATADIR)/manuals \
-	$(CP) $(E_ACSL_DIR)/doc/manuals/e-acsl.pdf \
-	      $(E_ACSL_DIR)/doc/manuals/e-acsl-implementation.pdf \
-	      $(E_ACSL_DIR)/doc/manuals/e-acsl-manual.pdf \
-	$(FRAMAC_DATADIR)/manuals; \
-        fi
+ifneq ("$(MANUALS)","")
+	$(PRINT_INSTALL) E-ACSL manuals
+	$(MKDIR) $(FRAMAC_DATADIR)/manuals
+	$(CP) $(MANUALS) $(FRAMAC_DATADIR)/manuals;
+endif
 	$(PRINT_INSTALL) E-ACSL libraries
 	$(MKDIR) $(LIBDIR)
 	$(CP) $(EACSL_LIBDIR)/libeacsl-*.a $(LIBDIR)
