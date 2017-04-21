@@ -2,7 +2,11 @@
 # Inputs #
 ##########
 
+# If in internal mode, use Frama-C's VERSION
+VERSION_FILE=$(wildcard ../../../../../VERSION)
+ifeq ("$(VERSION_FILE)","")
 VERSION_FILE=../../VERSION
+endif
 EACSL_VERSION=$(shell cat $(VERSION_FILE))
 
 MAIN=main
@@ -22,8 +26,8 @@ DEPS_MODERN=macros_modern.tex eacslversion.tex biblio.bib \
 ##############
 
 .PHONY: all e-acsl default
-default: e-acsl.pdf
-e-acsl: e-acsl-implementation.pdf e-acsl.pdf main.pdf
+default: all
+e-acsl: e-acsl-implementation.pdf e-acsl.pdf
 all: e-acsl
 
 e-acsl-implementation.pdf: $(DEPS_MODERN)
