@@ -56,7 +56,7 @@ include $(EACSL_DIR)/doc/support/MakeLaTeXModern
 
 eacslversion.tex: Makefile $(VERSION_FILE)
 	rm -f $@
-	echo '\\newcommand{\\eacslversion}{$(EACSL_VERSION)}' > $@
+	printf '\\newcommand{\\eacslversion}{$(EACSL_VERSION)}' > $@
 	chmod a-w $@
 
 .PHONY: clean
