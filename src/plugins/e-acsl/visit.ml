@@ -111,7 +111,8 @@ class e_acsl_visitor prj generate = object (self)
   (* Global flag set to [true] if a currently visited node
      belongs to a global initializer and set to [false] otherwise *)
 
-  val global_vars: init option Varinfo.Hashtbl.t = Varinfo.Hashtbl.create 7
+  val global_vars: (offset * init option) Varinfo.Hashtbl.t =
+    Varinfo.Hashtbl.create 7
   (* Hashtable mapping global variables (as Cil_type.varinfo) to their
      initializers aiming to capture memory allocated by global variable
      declarations and initialization. At runtime the memory blocks
@@ -150,7 +151,7 @@ class e_acsl_visitor prj generate = object (self)
             ||
               try
                 Varinfo.Hashtbl.iter
-                  (fun old_vi i -> match i with None | Some _ ->
+                  (fun old_vi (_, i) -> match i with None | Some _ ->
                     if Mmodel_analysis.must_model_vi old_vi then raise Exit)
                   global_vars;
                 false
@@ -166,7 +167,7 @@ class e_acsl_visitor prj generate = object (self)
               let env = Env.push !function_env in
               let stmts, env =
                 Varinfo.Hashtbl.fold_sorted
-                  (fun old_vi i (stmts, env) ->
+                  (fun old_vi (_, i) (stmts, env) ->
                     let new_vi = Cil.get_varinfo self#behavior old_vi in
                     (* [model] creates an initialization statement
                        of the form [__e_acsl_full_init(...)] for every global
@@ -375,15 +376,16 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       (* Make a unique mapping for each global variable omitting initializers.
        Initializers (used to capture literal strings) are added to
        [global_vars] via the [vinit] visitor method (see comments below). *)
-      Varinfo.Hashtbl.replace global_vars vi None
+      Varinfo.Hashtbl.replace global_vars vi (NoOffset, None)
     | _ -> ());
     if generate then Cil.DoChildrenPost(fun g -> List.iter do_it g; g)
     else Cil.DoChildren
 
   (* Add mappings from global variables to their initializers in [global_vars].
      Note that the below function captures only [SingleInit]s. All compound
-     initializers (which contain single ones) are unrapped and thrown away. *)
-  method !vinit vi _off _i =
+     initializers containing SingleInits (except for empty compound
+     initializers) are unrapped and thrown away. *)
+  method !vinit vi off _ =
     if generate then
       if Mmodel_analysis.must_model_vi vi then begin
         is_initializer <- vi.vglob;
@@ -393,7 +395,12 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
             (* Note the use of [add] instead of [replace]. This is because a
              single variable can be associated with multiple initializers
              and all of them need to be captured. *)
-            | true -> Varinfo.Hashtbl.add global_vars vi (Some i)
+            | true ->
+              (match i with
+              (* Case of an empty CompoundInit, treat it as if there were
+               * no initializer at all *)
+              | CompoundInit(_,[]) -> ()
+              | _ -> Varinfo.Hashtbl.add global_vars vi (off, (Some i)))
             | false-> ());
             is_initializer <- false;
           i)
@@ -637,7 +644,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
                 let loc = Stmt.loc stmt in
                 let delete_stmts =
                   Varinfo.Hashtbl.fold_sorted
-                    (fun old_vi i acc ->
+                    (fun old_vi (_, i) acc ->
                       if Mmodel_analysis.must_model_vi old_vi then
                         let new_vi = Cil.get_varinfo self#behavior old_vi in
                         (* Since there are multiple entries for same variables
