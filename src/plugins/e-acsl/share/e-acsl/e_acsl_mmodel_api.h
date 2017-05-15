@@ -32,6 +32,10 @@
 
 #include <stddef.h>
 
+/***********************************************/
+/************ Basic API ************************/
+/***********************************************/
+
 /*! \brief Drop-in replacement for \p malloc with memory tracking enabled.
  *
  * For further information, see \p malloc(3). */
@@ -129,22 +133,41 @@ int __e_acsl_freeable(void * ptr)
 
 /*! \brief Implementation of the \b \\valid predicate of E-ACSL.
  *
- * Return a non-zero value if the first \p size bytes starting at an address
- * given by \p ptr are readable and writable and 0 otherwise. */
+ * \\valid evaluates an expression of the form `p+i`, where `p` is a pointer
+ * and `i` is an integer offset and returns `true` of both `p` and `p+i` belong
+ * to the same allocated memory block.
+ *
+ * @param ptr - memory address under question
+ * @param size - the byte-length (starting from `ptr`) of the memory area which
+ *  needs to be valid
+ * @param base - if `ptr` can be represented by the expression `p+i` then
+ *  `base` refers to `p`
+ *  @param addrof_base - if `ptr` can be represented by the expression `p+i`
+ *  then `addrof_base` refers to `&p`. For the cases when the address of `p`
+ *  cannot be taked (e.g., address of s static array or a constant value
+ *  casted to a pointer) then `addrof_base` is zero.
+ *
+ * @returns
+ *  `true` if regions `[ptr, ptr + size]` and `[base, base + size]` are
+ *  writable and lie within the same memory block and `false` otherwise.
+ *  If `weak validity` is used (see macro `E_ACSL_WEAK_VALIDITY`)
+ *  then only region `[ptr, ptr + size]` should lie within the same block
+ *  and be writable.
+ */
 /*@ ensures \result == 0 || \result == 1;
   @ ensures \result == 1 ==> \valid(((char *)ptr)+(0..size-1));
   @ assigns \result \from *(((char*)ptr)+(0..size-1)); */
-int __e_acsl_valid(void * ptr, size_t size, void *ptr_base, void *addr_of_base)
+int __e_acsl_valid(void * ptr, size_t size, void *base, void *addrof_base)
   __attribute__((FC_BUILTIN));
 
 /*! \brief Implementation of the \b \\valid_read predicate of E-ACSL.
  *
- * Return a non-zero value if the first \p size bytes starting at an address
- * given by \p ptr are readable and 0 otherwise. */
+ * Same as ::__e_acsl_valid except the checked memory locations are only
+ * required to be allocated.  */
 /*@ ensures \result == 0 || \result == 1;
   @ ensures \result == 1 ==> \valid_read(((char *)ptr)+(0..size-1));
   @ assigns \result \from *(((char*)ptr)+(0..size-1)); */
-int __e_acsl_valid_read(void * ptr, size_t size, void *ptr_base, void *addr_of_base)
+int __e_acsl_valid_read(void * ptr, size_t size, void *ptr_base, void *addrof_base)
   __attribute__((FC_BUILTIN));
 
 /*! \brief Implementation of the \b \\base_addr predicate of E-ACSL.
@@ -195,7 +218,6 @@ void __e_acsl_memory_clean(void)
   __attribute__((FC_BUILTIN));
 
 /*! \brief Initialize memory tracking state.
- *
  * Called before any other statement in \p main */
 /*@ assigns \nothing; */
 void __e_acsl_memory_init(int *argc_ref, char ***argv, size_t ptr_size)
