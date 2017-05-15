@@ -51,6 +51,26 @@ check_tool() {
    { has_tool "$1" || test -e "$1"; } || error "No executable $1 found";
 }
 
+# Check if $1 is positive integer and whether $1 is greater than $2
+# Returns $1 is the above holds, otherwise return
+#  '-' if $1 is not a positive integer
+#  '<' if $1 is a positive integer but it is less than $2
+# NB: No checking is done for $2
+is_number() {
+  local n="$1"
+  local lim="$2"
+
+  if [ "$n" -eq "$n" ] 2>/dev/null; then
+    if [ "$n" -lt "$lim" ]; then
+      echo '<'
+    else
+      echo $n
+    fi
+  else
+    echo '-'
+  fi
+}
+
 # Portable realpath using pwd
 realpath() {
   if [ -e "$1" ]; then
@@ -170,19 +190,50 @@ rte_options() {
 }
 
 # Output -D flags enabling a given E_ACSL memory model
-eacsl_mmodel() {
+mmodel_features() {
   local model="$1"
 
+  # Memory model
   case $model in
     bittree) flags="-DE_ACSL_BITTREE_MMODEL" ;;
     segment) flags="-DE_ACSL_SEGMENT_MMODEL" ;;
     *) error "Memory model '$model' is not available in this distribution" ;;
   esac
+
+  # Temporal analysis
+  if [ -n "$OPTION_TEMPORAL" ]; then
+    flags="$flags -DE_ACSL_TEMPORAL"
+  fi
+
+  # Trigger failures in assertions
+  if [ -n "$OPTION_KEEP_GOING" ]; then
+    flags="$flags -DE_ACSL_NO_ASSERT_FAIL"
+  fi
+
+  # Enable debug mode
   if [ -n "$OPTION_RT_DEBUG" ]; then
     flags="$flags -DE_ACSL_DEBUG"
   fi
-  local extra="-DE_ACSL_IDENTIFY"
-  echo $flags $extra
+
+  # Set stack shadow size
+  if [ -n "$OPTION_STACK_SIZE" ]; then
+    flags="$flags -DE_ACSL_STACK_SIZE=$OPTION_STACK_SIZE"
+  fi
+
+  # Set heap shadow size
+  if [ -n "$OPTION_HEAP_SIZE" ]; then
+    flags="$flags -DE_ACSL_HEAP_SIZE=$OPTION_HEAP_SIZE"
+  fi
+
+  # Set runtime verosity flags
+  if [ -n "$OPTION_RT_VERBOSE" ]; then
+    flags="$flags -DE_ACSL_VERBOSE -DE_ACSL_DEBUG_VERBOSE"
+  fi
+
+  if [ -n "$OPTION_WEAK_VALIDITY" ]; then
+    flags="$flags -DE_ACSL_WEAK_VALIDITY"
+  fi
+  echo $flags
 }
 
 # Check if the following tools are GNU and abort otherwise
@@ -192,10 +243,11 @@ required_tool find "GNU findutils"
 # Getopt options
 LONGOPTIONS="help,compile,compile-only,debug:,ocode:,oexec:,verbose:,
   frama-c-only,extra-cpp-args:,frama-c-stdlib,full-mmodel,gmp,quiet,logfile:,
-  ld-flags:,cpp-flags:,frama-c-extra:,memory-model:,
-  frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:,check
-  print-mmodels,rt-debug,rte-select:,then,e-acsl-extra:"
-SHORTOPTIONS="h,c,C,d:,D,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,I:,G:,X,a:,V"
+  ld-flags:,cpp-flags:,frama-c-extra:,memory-model:,keep-going,
+  frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:
+  print-mmodels,rt-debug,rte-select:,then,e-acsl-extra:,check,
+  weak-validity,stack-size:,heap-size:,rt-verbose"
+SHORTOPTIONS="h,c,C,d:,D,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,I:,G:,X,a:,k,V"
 # Prefix for an error message due to wrong arguments
 ERROR="ERROR parsing arguments:"
 
@@ -211,6 +263,7 @@ OPTION_DEBUG=                            # Set Frama-C debug flag
 OPTION_VERBOSE=                          # Set Frama-C verbose flag
 OPTION_COMPILE=                          # Compile instrumented program
 OPTION_RT_DEBUG=                         # Enable runtime debug features
+OPTION_RT_VERBOSE=                       # Set runtime verbosity level
 OPTION_OUTPUT_CODE="a.out.frama.c"       # Name of the translated file
 OPTION_OUTPUT_EXEC="a.out"               # Generated executable name
 OPTION_EACSL_OUTPUT_EXEC=""              # Name of E-ACSL executable
@@ -222,13 +275,18 @@ OPTION_FRAMAC_CPP_EXTRA="-D__NO_CTYPE"   # Extra CPP flags for Frama-C*
 OPTION_EACSL_MMODELS="segment"           # Memory model used
 OPTION_EACSL_SHARE=                      # Custom E-ACSL share directory
 OPTION_INSTRUMENTED_ONLY=                # Do not compile original code
+OPTION_WEAK_VALIDITY=                       # Use notion of weak validity
 OPTION_RTE=                              # Enable assertion generation
 OPTION_CHECK=                            # Check AST integrity
-OPTION_RTE_SELECT=               # Generate assertions for these functions only
-OPTION_THEN=                     # Adds -then in front of -e-acsl in FC command.
+OPTION_RTE_SELECT=       # Generate assertions for these functions only
+OPTION_THEN=             # Adds -then in front of -e-acsl in FC command.
+OPTION_STACK_SIZE=32     # Size of a heap shadow space (in MB)
+OPTION_HEAP_SIZE=128     # Size of a stack shadow space (in MB)
+OPTION_KEEP_GOING=       # Report failing assertions but do not abort execution
 
-# Supported memory model names
-SUPPORTED_MMODELS="bittree,segment"
+SUPPORTED_MMODELS="bittree,segment" # Supported memory model names
+MIN_STACK=16 # Minimal size of a tracked program stack
+MIN_HEAP=64 # Minimal size of a tracked program heap
 
 manpage() {
   printf "e-acsl-gcc.sh - instrument and compile C files with E-ACSL
@@ -301,6 +359,10 @@ do
       shift
       OPTION_RT_DEBUG=1
       OPTION_CHECK=1
+    ;;
+    --rt-verbose|-V)
+      shift;
+      OPTION_RT_VERBOSE=1
     ;;
     # Pass an option to a Frama-C invocation
     --frama-c-extra|-F)
@@ -436,12 +498,12 @@ do
       shift;
     ;;
     # Check AST integrity (mostly for developers of E-ACSL)
-    --check|-V)
+    --check)
       OPTION_CHECK=1
       FRAMAC_FLAGS="-check $FRAMAC_FLAGS"
       shift;
     ;;
-    # A memory model  (or models) to link against
+     # A memory model  (or models) to link against
     -m|--memory-model)
       shift;
       # Convert comma-separated string into white-space separated string
@@ -454,17 +516,50 @@ do
       echo $SUPPORTED_MMODELS
       exit 0
     ;;
-    #Separate extra Frama-C flags from e-acsl launch with -then.
+    # Separate extra Frama-C flags from e-acsl launch with -then.
     --then)
       shift;
       OPTION_THEN=-then
       FRAMAC_FLAGS="-e-acsl-prepare $FRAMAC_FLAGS"
     ;;
+    # Extra E-ACSL options
     --e-acsl-extra)
       shift;
       OPTION_EACSL="$1 $OPTION_EACSL"
       shift;
     ;;
+    # Report failing assertions but do not abort execution
+    -k|--keep-going)
+      shift;
+      OPTION_KEEP_GOING=1
+    ;;
+    # Use notion of weak validity
+    --weak-validity)
+      shift;
+      OPTION_WEAK_VALIDITY=1
+    ;;
+    # Set heap shadow size
+    --heap-size)
+      shift;
+      zone_size="$(is_number "$1" $MIN_HEAP)"
+      case $zone_size in
+        '-') error "invalid number: '$1'" ;;
+        '<') error "heap limit less than minimal size [$MIN_HEAP"]
+          ;;
+        *) OPTION_HEAP_SIZE=$zone_size ;;
+      esac;
+      shift;
+    ;;
+    # Set stack shadow size
+    --stack-size)
+      shift;
+      zone_size="$(is_number "$1" $MIN_STACK)"
+      case $zone_size in
+        '-') error "invalid number: '$1'" ;;
+        '<') error "stack limit less than minimal size [$MIN_STACK"] ;;
+        *) OPTION_STACK_SIZE=$zone_size ;;
+      esac;
+      shift;
   esac
 done
 shift;
@@ -601,6 +696,7 @@ if [ -n "$OPTION_EACSL" ]; then
     $OPTION_EACSL
     $OPTION_GMP
     $OPTION_FULL_MMODEL
+    $OPTION_TEMPORAL
     $OPTION_VERBOSE
     $OPTION_DEBUG
     -e-acsl-share="$EACSL_SHARE"
@@ -651,10 +747,10 @@ if [ -n "$OPTION_COMPILE" ]; then
     fi
     # Sources of the selected memory model
     EACSL_RTL="$EACSL_SHARE/e_acsl_mmodel.c"
-    EACSL_MMODEL="$(eacsl_mmodel $model)"
+    EACSL_MMODEL_FEATURES="$(mmodel_features $model)"
     ($OPTION_ECHO;
      $CC \
-       $EACSL_MMODEL \
+       $EACSL_MMODEL_FEATURES \
        $CFLAGS $CPPFLAGS \
        $EACSL_CFLAGS $EACSL_CPPFLAGS \
        -o "$OUTPUT_EXEC" \
