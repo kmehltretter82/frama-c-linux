@@ -604,13 +604,13 @@ static int static_allocated(uintptr_t addr, long size, uintptr_t base_ptr) {
       length = short_lengths[code];
     }
 
+#ifndef E_ACSL_WEAK_VALIDITY
     if (addr != base_ptr) {
-      uintptr_t base_addr = addr - offset;
-      return BELONGS(base_ptr, base_addr, length)
+      return BELONGS(base_ptr, addr - offset, length)
         && offset + size <= length;
-    } else {
-      return offset + size <= length;
     }
+#endif
+    return offset + size <= length;
   }
   return 0;
 }
@@ -1053,8 +1053,12 @@ static int heap_allocated(uintptr_t addr, size_t size, uintptr_t base_ptr) {
      * offset is the difference between the address and base address (shadow[0])
      * Then an address belongs to heap allocation if
      *  offset + size <= length */
+#ifndef E_ACSL_WEAK_VALIDITY
     return base_shadow[0] == shadow[0] &&
       (addr - shadow[0]) + size <= first_segment[1];
+#else
+    return (addr - shadow[0]) + size <= first_segment[1];
+#endif
   }
   return 0;
 }
