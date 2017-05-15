@@ -26,12 +26,15 @@
  *   model. See e_acsl_mmodel_api.h for details.
 ***************************************************************************/
 
-static int valid(void*, size_t, void*, void*);
-static int valid_read(void*, size_t, void*, void*);
-
 #include "e_acsl_shadow_layout.h"
 #include "e_acsl_segment_tracking.h"
 #include "e_acsl_mmodel_api.h"
+
+/* Forward declarations */
+static int valid(void*, size_t, void*, void*);
+static int valid_read(void*, size_t, void*, void*);
+
+#define ALLOCATED(_ptr,_size) allocated((uintptr_t)_ptr, _size, (uintptr_t)_ptr)
 
 static void * store_block(void * ptr, size_t size) {
   /* Only stack-global memory blocks are recorded explicitly via this function.
@@ -62,9 +65,9 @@ static void mark_readonly(void * ptr) {
   mark_readonly_region((uintptr_t)ptr, block_length(ptr));
 }
 
-/* ****************** */
-/* E-ACSL annotations */
-/* ****************** */
+/* ********************** */
+/* E-ACSL annotations {{{ */
+/* ********************** */
 
 /** \brief Return 1 if a given memory location is read-only and 0 otherwise */
 static int readonly (void *ptr) {
@@ -72,11 +75,13 @@ static int readonly (void *ptr) {
   return IS_ON_GLOBAL(addr) && global_readonly(addr) ? 1 : 0;
 }
 
-static int valid(void * ptr, size_t size, void *ptr_base, void *addr_of_base) {
-  return allocated((uintptr_t)ptr, size, (uintptr_t)ptr_base) && !readonly(ptr);
+static int valid(void * ptr, size_t size, void *ptr_base, void *addrof_base) {
+  return
+    allocated((uintptr_t)ptr, size, (uintptr_t)ptr_base) &&
+    !readonly(ptr);
 }
 
-static int valid_read(void * ptr, size_t size, void *ptr_base, void *addr_of_base) {
+static int valid_read(void * ptr, size_t size, void *ptr_base, void *addrof_base) {
   return allocated((uintptr_t)ptr, size, (uintptr_t)ptr_base);
 }
 

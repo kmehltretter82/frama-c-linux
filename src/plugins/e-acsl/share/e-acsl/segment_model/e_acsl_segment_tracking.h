@@ -353,6 +353,25 @@ static void validate_memory_layout() {
   } \
 }
 
+/* Assert neither of `_len` addresses immediately preceding `_addr` are
+ * base addresses of some other block and that `_len` addresses past
+ * `_addr` are free */
+#define DVALIDATE_STATIC_SUFFICIENTLY_ALIGNED(_addr, _len) { \
+  int _i; \
+  for (_i = 0; _i < _len; _i++) { \
+    uintptr_t _prev = _addr - _i; \
+    if (static_allocated_one(_prev)) { \
+      vassert(base_addr(_prev) != _prev, \
+        "Potential backward overlap of: \n  previous block       [%a]\n" \
+        "  with allocated block [%a]\n", _prev, _addr); \
+    } \
+    uintptr_t _next = _addr + _i; \
+    vassert(!static_allocated_one(_next), \
+      "Potential forward overlap of:\n  following block location [%a]\n" \
+      "  with allocated block [%a]\n", _next, _addr); \
+  } \
+}
+
 /* Assert that a memory block [_addr, _addr + _size] is nullified */
 # define DVALIDATE_NULLIFIED(_addr, _size) \
   DVASSERT(zeroed_out((void *)_addr, _size), \
@@ -369,7 +388,7 @@ static void validate_memory_layout() {
 # define DVALIDATE_RW_ACCESS(_addr, _size) { \
   DVALIDATE_ALLOCATED((uintptr_t)_addr, _size, (uintptr_t)_addr); \
   DVASSERT(!readonly((void*)_addr), \
-    "Unexpected readonly address: %lu\n", _addr) \
+    "Unexpected readonly address: %lu\n", _addr); \
 }
 
 /* Assert that memory block [_addr, _addr + _size] is allocated */
@@ -396,13 +415,21 @@ static void validate_memory_layout() {
 #  define DVALIDATE_HEAP_FREE
 #  define DVALIDATE_RO_ACCESS
 #  define DVALIDATE_RW_ACCESS
-#	 define DVALIDATE_ALLOCATED
+#  define DVALIDATE_ALLOCATED
+#  define DVALIDATE_STATIC_SUFFICIENTLY_ALIGNED
 /*! \endcond */
 #endif
 /* }}} */
 
+/* Runtime assertions  {{{ */
+#define VALIDATE_HEAP_ALLOCATION(_res, _size) \
+  vassert(mem_layout.heap.end > (uintptr_t)_res + _size, \
+    "e-acsl error: Insufficient heap size %lu\n", E_ACSL_HEAP_SIZE);
+/* }}} */
+
 /* E-ACSL predicates {{{ */
 /* See definitions for documentation */
+static void *shadow_copy(const void *ptr, size_t size, int init);
 static uintptr_t heap_info(uintptr_t addr, char type);
 static uintptr_t static_info(uintptr_t addr, char type);
 static int heap_allocated(uintptr_t addr, size_t size, uintptr_t base_ptr);
@@ -825,8 +852,11 @@ static void* shadow_malloc(size_t size) {
   char* res = alloc_size ?
     (char*)native_aligned_alloc(HEAP_SEGMENT, alloc_size) : NULL;
 
-  if (res)
+  if (res) {
+    /* Make sure there is sufficient room in shadow */
+    VALIDATE_HEAP_ALLOCATION(res, alloc_size);
     set_heap_segment(res, size, alloc_size, 0, "malloc");
+  }
 
   return res;
 }
@@ -843,14 +873,22 @@ static void* shadow_calloc(size_t nmemb, size_t size) {
 
   /* Since aligned size is required by the model do the allocation through
    * `malloc` and nullify the memory space by hand */
-  char* res = size ? (char*)native_malloc(alloc_size) : NULL;
+  char* res =
+    size ? (char*)native_aligned_alloc(HEAP_SEGMENT, alloc_size) : NULL;
 
   if (res) {
+    /* Make sure there is sufficient room in shadow */
+    VALIDATE_HEAP_ALLOCATION(res, alloc_size);
     memset(res, 0, size);
     set_heap_segment(res, size, alloc_size, 1, "calloc");
   }
-
   return res;
+}
+
+/** \brief Return shadowed copy of a memory chunk on a program's heap */
+static void *shadow_copy(const void *ptr, size_t size, int init) {
+  char *ret = (init) ?	shadow_calloc(1, size) : shadow_malloc(size);
+  return memcpy(ret, ptr, size);
 }
 /* }}} */
 
@@ -908,6 +946,7 @@ static void* shadow_realloc(void *ptr, size_t size) {
     if (freeable(ptr)) { /* ... and can be used as an input to `free` */
       size_t alloc_size = ALLOC_SIZE(size);
       res = native_realloc(ptr, alloc_size);
+      VALIDATE_HEAP_ALLOCATION(res, alloc_size);
       DVALIDATE_ALIGNMENT(res);
 
       /* realloc succeeds, otherwise nothing needs to be done */
@@ -965,8 +1004,11 @@ static void *shadow_aligned_alloc(size_t alignment, size_t size) {
     return NULL;
 
   char *res = native_aligned_alloc(alignment, size);
-  if (res)
+
+  if (res) {
+    VALIDATE_HEAP_ALLOCATION(res, ALLOC_SIZE(size));
     set_heap_segment(res, size, ALLOC_SIZE(size), 0, "aligned_alloc");
+  }
 
   return (void*)res;
 }
@@ -987,6 +1029,7 @@ static int shadow_posix_memalign(void **memptr, size_t alignment, size_t size) {
 
   int res = native_posix_memalign(memptr, alignment, size);
   if (!res) {
+    VALIDATE_HEAP_ALLOCATION(*memptr, ALLOC_SIZE(size));
     set_heap_segment(*memptr, size, ALLOC_SIZE(size), 0, "posix_memalign");
   }
   return res;

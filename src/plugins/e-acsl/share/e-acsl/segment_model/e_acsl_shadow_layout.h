@@ -25,6 +25,16 @@
  * \brief Setup for memory tracking using shadowing
 ***************************************************************************/
 
+/* Default size of a program's heap tracked via shadow memory */
+#ifndef E_ACSL_HEAP_SIZE
+#define E_ACSL_HEAP_SIZE 512
+#endif
+
+/* Default size of a program's stack tracked via shadow memory */
+#ifndef E_ACSL_STACK_SIZE
+#define E_ACSL_STACK_SIZE 64
+#endif
+
 /* Symbols exported by the linker script */
 
 /*!\brief The first address past the end of the text segment. */
@@ -68,7 +78,7 @@ char *strerror(int errnum);
 
 /** Hardcoded sizes of tracked program segments {{{ */
 /*! \brief Size of a program's heap */
-#define PGM_HEAP_SIZE (512 * MB)
+#define PGM_HEAP_SIZE (E_ACSL_HEAP_SIZE * MB)
 
 /*! \brief Size of a program's Thread-local storage (TLS) */
 #define PGM_TLS_SIZE (16 * MB)
@@ -117,12 +127,38 @@ static uintptr_t get_tls_start() {
 /** Program stack information {{{ */
 extern char ** environ;
 
+/*! \brief Set a new soft stack limit
+ * \param size - new stack size in bytes */
+static size_t increase_stack_limit(const size_t size) {
+  const rlim_t stacksz = (rlim_t)size;
+  struct rlimit rl;
+  int result = getrlimit(RLIMIT_STACK, &rl);
+  if (result == 0) {
+    if (rl.rlim_cur < stacksz) {
+      rl.rlim_cur = stacksz;
+      result = setrlimit(RLIMIT_STACK, &rl);
+      if (result != 0) {
+        vabort("setrlimit: %s \n", strerror(errno));
+      }
+    }
+  }
+  return size;
+}
+
 /*! \brief Return byte-size of a program's stack. The return value is the soft
  * stack limit, i.e., it can be programmatically increased at runtime. */
-static size_t get_stack_size() {
+static size_t get_default_stack_size() {
   struct rlimit rlim;
   assert(!getrlimit(RLIMIT_STACK, &rlim));
   return rlim.rlim_cur;
+}
+
+static size_t get_stack_size() {
+#ifndef E_ACSL_STACK_SIZE
+  return get_default_stack_size();
+#else
+  return increase_stack_limit(E_ACSL_STACK_SIZE*MB);
+#endif
 }
 
 /*! \brief Return greatest (known) address on a program's stack.
@@ -144,23 +180,6 @@ static uintptr_t get_stack_start(int *argc_ref,  char *** argv_ref) {
   uintptr_t stack_end = addr + ULONG_BITS;
   uintptr_t stack_start = stack_end - get_stack_size();
   return stack_start;
-}
-
-/*! \brief Set a new soft stack limit
- * \param size - new stack size in bytes */
-static void increase_stack_limit(const size_t size) {
-  const rlim_t stacksz = (rlim_t)size;
-  struct rlimit rl;
-  int result = getrlimit(RLIMIT_STACK, &rl);
-  if (result == 0) {
-    if (rl.rlim_cur < stacksz) {
-      rl.rlim_cur = stacksz;
-      result = setrlimit(RLIMIT_STACK, &rl);
-      if (result != 0) {
-        vabort("setrlimit: %s \n", strerror(errno));
-      }
-    }
-  }
 }
 /* }}} */
 
@@ -345,7 +364,7 @@ static void set_shadow_segment(struct memory_segment *seg, uintptr_t start,
  * allocate shadow memory spaces and compute offsets. This function populates
  * global struct ::mem_layout holding that information with data. */
 static void init_memory_layout(int *argc_ref, char ***argv_ref) {
-  /* Use DEBUG_PRINT_LAYOUT to output the details (if they are needed) */
+  /* Use DEBUG_PRINT_LAYOUT to output the details */
   set_shadow_segment(&mem_layout.heap,
     get_heap_start(), get_heap_size(), 1, 8, "heap");
   set_shadow_segment(&mem_layout.stack,
@@ -367,7 +386,6 @@ void clean_memory_segment(struct memory_segment *seg) {
 
 /*! \brief Deallocate shadow regions used by runtime analysis */
 static void clean_memory_layout() {
-  DLOG("<<< Clean shadow layout >>>\n");
   if (mem_layout.initialized) {
     clean_memory_segment(&mem_layout.heap);
     clean_memory_segment(&mem_layout.stack);
