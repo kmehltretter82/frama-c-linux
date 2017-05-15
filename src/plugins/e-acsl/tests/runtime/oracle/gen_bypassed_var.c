@@ -4,7 +4,6 @@ int main(int argc, char const **argv)
 {
   int __retres;
   __e_acsl_memory_init(& argc,(char ***)(& argv),(size_t)8);
-  __e_acsl_store_block((void *)(& argc),(size_t)4);
   goto L;
   {
     int *p;

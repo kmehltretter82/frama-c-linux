@@ -9,8 +9,6 @@ int main(int argc, char **argv)
   /*@ assert \valid(&argc); */
   {
     int __gen_e_acsl_valid;
-    __e_acsl_store_block((void *)(& argv),(size_t)8);
-    __e_acsl_store_block((void *)(& argc),(size_t)4);
     __gen_e_acsl_valid = __e_acsl_valid((void *)(& argc),sizeof(int),
                                         (void *)(& argc),(void *)(& argc));
     __e_acsl_assert(__gen_e_acsl_valid,(char *)"Assertion",(char *)"main",

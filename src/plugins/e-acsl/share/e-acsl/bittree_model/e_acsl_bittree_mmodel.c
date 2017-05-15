@@ -516,16 +516,33 @@ static void memory_clean() {
   bt_clean();
 }
 
+extern char **environ;
+
 /* add `argv` to the memory model */
-static void init_argv(int argc, char **argv) {
-  int i;
+static void argv_alloca(int *argc_ref,  char *** argv_ref) {
+  /* Track a top-level containers */
+  store_block((void*)argc_ref, sizeof(int));
+  store_block((void*)argv_ref, sizeof(char**));
+  int argc = *argc_ref;
+  char** argv = *argv_ref;
+  /* Track argv */
 
-  store_block(argv, (argc+1)*sizeof(char*));
-  full_init(argv);
+  size_t argvlen = (argc + 1)*sizeof(char*);
+  store_block(argv, argvlen);
+  initialize(argv, (argc + 1)*sizeof(char*));
 
-  for (i = 0; i < argc; i++) {
-    store_block(argv[i], strlen(argv[i])+1);
-    full_init(argv[i]);
+  while (*argv) {
+    size_t arglen = strlen(*argv) + 1;
+    store_block(*argv, arglen);
+    initialize(*argv, arglen);
+    argv++;
+  }
+
+  while (*environ) {
+    size_t envlen = strlen(*environ) + 1;
+    store_block(*environ, envlen);
+    initialize(*environ, envlen);
+    environ++;
   }
 }
 
@@ -535,7 +552,7 @@ static void memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
   initialize_report_file(argc_ref, argv_ref);
   /* Tracking program arguments */
   if (argc_ref)
-    init_argv(*argc_ref, *argv_ref);
+    argv_alloca(argc_ref, argv_ref);
   /* Tracking safe locations */
   collect_safe_locations();
   int i;

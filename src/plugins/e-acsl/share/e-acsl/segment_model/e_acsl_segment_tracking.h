@@ -771,21 +771,6 @@ static void mark_readonly_region (uintptr_t addr, long size) {
 }
 /* }}} */
 
-/* Track program arguments (ARGC/ARGV) {{{ */
-static void argv_alloca(int argc,  char ** argv) {
-  /* Track a top-level container (i.e., `*argv`) */
-  shadow_alloca(argv, (argc + 1)*sizeof(char*));
-  initialize_static_region((uintptr_t)argv, (argc + 1)*sizeof(char*));
-  /* Track argument strings */
-  while (*argv) {
-    size_t arglen = strlen(*argv) + 1;
-    shadow_alloca(*argv, arglen);
-    initialize_static_region((uintptr_t)*argv, arglen);
-    argv++;
-  }
-}
-/* }}} */
-
 /* Heap allocation {{{ (malloc/calloc) */
 
 /*! \brief Amount of heap memory allocated by the program.

@@ -128,6 +128,38 @@ static size_t get_heap_allocation_size(void) {
 }
 /* }}} */
 
+/* Track program arguments (ARGC/ARGV) {{{ */
+extern char ** environ;
+
+static void argv_alloca(int *argc_ref,  char *** argv_ref) {
+  /* Track a top-level containers */
+  shadow_alloca((void*)argc_ref, sizeof(int));
+  shadow_alloca((void*)argv_ref, sizeof(char**));
+  int argc = *argc_ref;
+  char** argv = *argv_ref;
+  /* Track argv */
+  size_t argvlen = (argc + 1)*sizeof(char*);
+  shadow_alloca(argv, argvlen);
+  initialize_static_region((uintptr_t)argv, (argc + 1)*sizeof(char*));
+
+  /* Track argument strings */
+  while (*argv) {
+    size_t arglen = strlen(*argv) + 1;
+    shadow_alloca(*argv, arglen);
+    initialize_static_region((uintptr_t)*argv, arglen);
+    argv++;
+  }
+
+  while (*environ) {
+    size_t envlen = strlen(*environ) + 1;
+    shadow_alloca(*environ, envlen);
+    initialize_static_region((uintptr_t)*environ, envlen);
+    environ++;
+  }
+}
+/* }}} */
+
+/* Program initialization {{{ */
 static void memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
   describe_run();
   /** Verify that the given size of a pointer matches the one in the present
@@ -144,7 +176,7 @@ static void memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
   DVALIDATE_SHADOW_LAYOUT;
   /* Track program arguments. */
   if (argc_ref && argv_ref)
-    argv_alloca(*argc_ref, *argv_ref);
+    argv_alloca(argc_ref, argv_ref);
   /* Tracking safe locations */
   collect_safe_locations();
   int i;

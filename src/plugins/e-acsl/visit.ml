@@ -524,8 +524,10 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       if self#is_first_stmt kf stmt then
         (* JS: should be done in the new project? *)
         let env =
-          if generate then Memory.store env kf (Kernel_function.get_formals kf)
-          else env
+          if generate && not is_main then
+            Memory.store env kf (Kernel_function.get_formals kf)
+          else
+            env
         in
         (* translate the precondition of the function *)
         if Dup_functions.is_generated (Extlib.the self#current_kf) then
