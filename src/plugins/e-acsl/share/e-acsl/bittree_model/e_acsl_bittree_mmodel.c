@@ -530,8 +530,9 @@ static void init_argv(int argc, char **argv) {
 }
 
 static void memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
-  identify_run();
+  describe_run();
   arch_assert(ptr_size);
+  initialize_report_file(argc_ref, argv_ref);
   /* Tracking program arguments */
   if (argc_ref)
     init_argv(*argc_ref, *argv_ref);
@@ -630,5 +631,37 @@ public_alias(bt_print_tree)
 public_alias(block_info)
 public_alias(store_block_debug)
 public_alias(delete_block_debug)
+#endif
+/* }}} */
+
+/* Local operations on temporal timestamps {{{ */
+/* Remaining functionality (shared between all models) is located in e_acsl_temporal.h */
+#ifdef E_ACSL_TEMPORAL
+static uint32_t origin_timestamp(void *ptr) {
+  bt_block * blk = bt_find(ptr);
+  return blk != NULL ? blk->timestamp : INVALID_TEMPORAL_TIMESTAMP;
+}
+
+static uintptr_t temporal_referent_shadow(void *ptr) {
+  bt_block * blk = bt_find(ptr);
+  vassert(blk != NULL,
+    "referent timestamp on unallocated memory address %a", (uintptr_t)ptr);
+  vassert(blk->temporal_shadow != NULL,
+    "no temporal shadow of block with base address", (uintptr_t)blk->ptr);
+  return (uintptr_t)blk->temporal_shadow + offset(ptr);
+}
+
+static uint32_t referent_timestamp(void *ptr) {
+  bt_block * blk = bt_find(ptr);
+  if (blk != NULL)
+    return *((uint32_t*)temporal_referent_shadow(ptr));
+  else
+    return INVALID_TEMPORAL_TIMESTAMP;
+}
+
+static void store_temporal_referent(void *ptr, uint32_t ref) {
+  uint32_t *shadow = (uint32_t*)temporal_referent_shadow(ptr);
+  *shadow = ref;
+}
 #endif
 /* }}} */

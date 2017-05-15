@@ -126,8 +126,10 @@ static int initialized(void * ptr, size_t size) {
 static size_t get_heap_allocation_size(void) {
   return heap_allocation_size;
 }
+/* }}} */
 
 static void memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
+  describe_run();
   /** Verify that the given size of a pointer matches the one in the present
    * architecture. This is a guard against Frama-C instrumentations using
    * architectures different to the given one. */
@@ -159,7 +161,9 @@ static void memory_clean(void) {
   clean_memory_layout();
 }
 
-/* API BINDINGS {{{ */
+/* }}} */
+
+/* Public API Bindings {{{ */
 /* Heap allocation (native) */
 strong_alias(shadow_malloc, malloc)
 strong_alias(shadow_calloc, calloc)

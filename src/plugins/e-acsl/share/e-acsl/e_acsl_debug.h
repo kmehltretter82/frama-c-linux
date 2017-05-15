@@ -40,6 +40,8 @@ static void vabort(char *fmt, ...);
  * Enabled in the presence of the E_ACSL_DEBUG macro */
 #ifdef E_ACSL_DEBUG
 
+#define E_ACSL_DEBUG_DESC "debug"
+
 /* Default location of the E_ACSL log file */
 #ifndef E_ACSL_DEBUG_LOG
 #  define E_ACSL_DEBUG_LOG -
@@ -53,6 +55,12 @@ static int dlog_fd = -1;
 
 /*! \brief Output a message to a log file */
 #define DLOG(...) dprintf(dlog_fd, __VA_ARGS__)
+
+#ifdef E_ACSL_DEBUG_VERBOSE
+# define DVLOG(...) dprintf(dlog_fd, __VA_ARGS__)
+#else
+# define DVLOG(...)
+#endif
 
 /*! \brief Debug-time assertion based on assert (see e_acsl.print.h) */
 #define DASSERT(_e) assert(_e)
@@ -73,18 +81,6 @@ static void initialize_report_file(int *argc, char ***argv) {
   }
   if (dlog_fd == -1)
     vabort("Cannot open file descriptor for %s\n", dlog_name);
-  else {
-    DLOG("<<< E-ACSL instrumented run >>>\n");
-    DLOG("<<< Program arguments: ");
-    if (argc && argv) {
-      int i;
-      for (i = 0; i < *argc; i++)
-        DLOG("%s ", (*argv)[i]);
-      DLOG(">>>\n");
-    } else {
-      DLOG("unknown >>>\n");
-    }
-  }
 }
 
 static int debug_stop_number = 0;
@@ -97,9 +93,11 @@ int getchar(void);
 }
 
 #else
+#  define E_ACSL_DEBUG_DESC "production"
 #  define DSTOP
 #  define initialize_report_file(...)
 #  define DLOG(...)
+#  define DVLOG(...)
 #  define DASSERT(_e)
 #  define DVASSERT(_expr, _fmt, ...)
 #endif

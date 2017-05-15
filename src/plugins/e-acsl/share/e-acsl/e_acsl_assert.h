@@ -51,6 +51,7 @@ static void vabort(char *fmt, ...);
 #define vassert(expr, fmt, ...) \
   vassert_fail(expr, __LINE__, __FILE__, fmt, __VA_ARGS__)
 
+/* This gets replaced by `abort` */
 static void exec_abort(int line, const char *file) {
 #ifdef E_ACSL_DEBUG
   trace();
@@ -82,13 +83,20 @@ static void vassert_fail(int expr, int line, char *file, char *fmt,  ...) {
   }
 }
 
+#ifdef E_ACSL_NO_ASSERT_FAIL
+# define E_ACSL_ASSERT_NO_FAIL_DESC "pass through"
+#else
+# define E_ACSL_ASSERT_NO_FAIL_DESC "abort"
+#endif
+
 /*! \brief Default implementation of E-ACSL runtime assertions */
-static void runtime_assert(int predicate, char *kind,
-  char *fct, char *pred_txt, int line) {
+static void runtime_assert(int predicate, char *kind, char *fct, char *pred_txt, int line) {
   if (!predicate) {
-    eprintf("%s failed at line %d in function %s.\n"
-      "The failing predicate is:\n%s.\n", kind, line, fct, pred_txt);
+      eprintf("%s failed at line %d in function %s.\n"
+        "The failing predicate is:\n%s.\n", kind, line, fct, pred_txt);
+#ifndef E_ACSL_NO_ASSERT_FAIL
     abort();
+#endif
   }
 }
 
