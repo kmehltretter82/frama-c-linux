@@ -28,6 +28,23 @@
 
 #include "e_acsl_bittree.h"
 
+/* Assertions in debug mode */
+#define ALLOCATED(_ptr,_size) \
+  ((allocated(_ptr, _size, _ptr) == NULL) ? 0 : 1)
+
+#ifdef E_ACSL_DEBUG
+#define DVALIDATE_RO_ACCESS(_ptr, _size) \
+  vassert(ALLOCATED(_ptr, _size), \
+  "Not allocated [%a, %a + %lu]", (uintptr_t)_ptr, _size)
+#define DVALIDATE_RW_ACCESS(_ptr, _size) { \
+  DVALIDATE_RO_ACCESS(_ptr, _size); \
+  vassert(!readonly(_ptr), "Location %a is read-only", (uintptr_t)_ptr); \
+}
+#else
+#define DVALIDATE_RO_ACCESS(_ptr, _size)
+#define DVALIDATE_RW_ACCESS(_ptr, _size)
+#endif
+
 /**************************/
 /* SUPPORT            {{{ */
 /**************************/
