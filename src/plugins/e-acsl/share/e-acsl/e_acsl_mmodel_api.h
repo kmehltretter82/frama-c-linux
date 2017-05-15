@@ -231,7 +231,7 @@ size_t __e_acsl_get_heap_allocation_size(void)
 /*! \brief A variable holding a byte size of tracked heap allocation. */
 extern size_t __e_acsl_heap_allocation_size;
 
-/*@ predicate diffSize{L1,L2}(integer i) =
-  \at(__e_acsl_heap_allocation_size, L1) - \at(__e_acsl_heap_allocation_size, L2) == i;
-*/
+/*@predicate diffSize{L1,L2}(integer i) =
+  \at(__e_acsl_heap_allocation_size, L1)
+    - \at(__e_acsl_heap_allocation_size, L2) == i; */
 #endif
