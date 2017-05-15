@@ -212,35 +212,43 @@ static int initialized(void * ptr, size_t size) {
 
 /* return the length (in bytes) of the block containing ptr */
 static size_t block_length(void* ptr) {
-  bt_block * tmp = bt_find(ptr);
+  bt_block * blk = bt_find(ptr);
   /* Hard failure when un-allocated memory is used */
-  vassert(tmp != NULL, "\\block_length of unallocated memory", NULL);
-  return tmp->size;
+  vassert(blk != NULL, "\\block_length of unallocated memory", NULL);
+  return blk->size;
 }
 
-static int allocated(void* ptr, size_t size, void *ptr_base) {
+static bt_block* allocated(void* ptr, size_t size, void *ptr_base) {
   bt_block * blk = bt_find(ptr);
+  if (blk == NULL)
+    return NULL;
+#ifndef E_ACSL_WEAK_VALIDITY
   bt_block * blk_base = bt_find(ptr_base);
-  if (blk == NULL || blk_base == NULL || blk->ptr != blk_base->ptr)
-    return false;
-  return (blk->size - ((size_t)ptr - blk->ptr) >= size);
+  if (blk_base == NULL || blk->ptr != blk_base->ptr)
+    return NULL;
+#endif
+  return (blk->size - ((size_t)ptr - blk->ptr) >= size) ? blk : NULL;
+}
+
+/** \brief Return 1 if a given memory location is read-only and 0 otherwise */
+static int readonly (void *ptr) {
+  bt_block * blk = bt_find(ptr);
+  vassert(blk != NULL, "Readonly on unallocated memory", NULL);
+  return blk->is_readonly;
 }
 
 /* return whether the size bytes of ptr are readable/writable */
-static int valid(void* ptr, size_t size, void *ptr_base, void *addr_of_base) {
-  /* Many similarities with allocated (so far at least), but it is better
-   * to use this tandalone definition, otherwise the block needs to be looked
-   * up twice */
-  bt_block * blk = bt_find(ptr);
-  bt_block * blk_base = bt_find(ptr_base);
-  if (blk == NULL || blk_base == NULL || blk->ptr != blk_base->ptr)
-    return false;
-  return (blk->size - ((size_t)ptr - blk->ptr) >= size && !blk->is_readonly);
+static int valid(void* ptr, size_t size, void *ptr_base, void *addrof_base) {
+  bt_block * blk = allocated(ptr, size, ptr_base);
+  if (blk != NULL)
+    return !blk->is_readonly;
+  return 0;
 }
 
 /* return whether the size bytes of ptr are readable */
-static int valid_read(void* ptr, size_t size, void *ptr_base, void *addr_of_base) {
-  return allocated(ptr, size, ptr_base);
+static int valid_read(void* ptr, size_t size, void *ptr_base, void *addrof_base) {
+  bt_block * blk = allocated(ptr, size, ptr_base);
+  return blk != NULL;
 }
 
 /* return the base address of the block containing ptr */
@@ -407,8 +415,7 @@ static int bittree_posix_memalign(void **memptr, size_t alignment, size_t size) 
     return -1;
 
   /* Make sure that the first argument to posix memalign is indeed allocated */
-  vassert(allocated((void*)memptr, sizeof(void*), (void*)memptr),
-      "\\invalid memptr in posix_memalign", NULL);
+  DVALIDATE_RW_ACCESS((void*)memptr, sizeof(void*));
 
   int res = native_posix_memalign(memptr, alignment, size);
   if (!res) {
