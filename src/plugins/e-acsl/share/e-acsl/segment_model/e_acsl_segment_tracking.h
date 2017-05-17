@@ -1295,7 +1295,7 @@ static void print_shadows(uintptr_t addr, size_t size) {
     print_heap_shadows(addr);
 }
 
-static void print_memory_segment(struct memory_segment *seg, const char *name) {
+static void print_shadow_segment(struct shadow_segment *seg, const char *name) {
   DLOG(" --- %s ------------------------------------------\n", name);
   DLOG("Segment:   %lu MB [%a, %a]\n", MB_SZ(seg->size), seg->start, seg->end);
   DLOG("Primary:   %lu MB [%a, %a] {Offset: %lu}\n",
@@ -1305,10 +1305,10 @@ static void print_memory_segment(struct memory_segment *seg, const char *name) {
 }
 
 static void print_shadow_layout() {
-  print_memory_segment(&shd_layout.heap, "Heap");
-  print_memory_segment(&shd_layout.stack, "Stack");
-  print_memory_segment(&shd_layout.global, "Global");
-  print_memory_segment(&shd_layout.tls, "TLS");
+  print_shadow_segment(&shd_layout.heap, "Heap");
+  print_shadow_segment(&shd_layout.stack, "Stack");
+  print_shadow_segment(&shd_layout.global, "Global");
+  print_shadow_segment(&shd_layout.tls, "TLS");
   DLOG("-----------------------------------------------------\n");
 }
 

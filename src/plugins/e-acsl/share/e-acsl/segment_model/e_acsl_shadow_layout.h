@@ -289,7 +289,7 @@ NOTE: With mmap allocations heap does not necessarily grows from program break
 
 /* Struct representing a memory segment along with information about its
  * shadow spaces. */
-struct memory_segment {
+struct shadow_segment {
   const char *name;
   uintptr_t start; //!< Least address in the application segment
   uintptr_t end; //!< Greatest address in the application segment
@@ -312,10 +312,10 @@ struct memory_segment {
 static struct shadow_layout shd_layout;
 
 struct shadow_layout {
-  struct memory_segment heap;
-  struct memory_segment stack;
-  struct memory_segment global;
-  struct memory_segment tls;
+  struct shadow_segment heap;
+  struct shadow_segment stack;
+  struct shadow_segment global;
+  struct shadow_segment tls;
   int initialized;
 };
 
@@ -327,7 +327,7 @@ struct shadow_layout {
  * \param sec_ratio - compression ratio of the secondary shadow segment
  * \param name - segment name
 */
-static void set_shadow_segment(struct memory_segment *seg, uintptr_t start,
+static void set_shadow_segment(struct shadow_segment *seg, uintptr_t start,
     size_t size, size_t prim_ratio, size_t sec_ratio, const char *name) {
 
   seg->name = name;
@@ -375,7 +375,7 @@ static void init_shadow_layout(int *argc_ref, char ***argv_ref) {
 }
 
 /*! \brief Deallocate a shadow segment */
-void clean_memory_segment(struct memory_segment *seg) {
+void clean_shadow_segment(struct shadow_segment *seg) {
   if (seg->prim_start)
     munmap((void*)seg->prim_start, seg->prim_size);
   if (seg->sec_start)
@@ -385,10 +385,10 @@ void clean_memory_segment(struct memory_segment *seg) {
 /*! \brief Deallocate shadow regions used by runtime analysis */
 static void clean_shadow_layout() {
   if (shd_layout.initialized) {
-    clean_memory_segment(&shd_layout.heap);
-    clean_memory_segment(&shd_layout.stack);
-    clean_memory_segment(&shd_layout.global);
-    clean_memory_segment(&shd_layout.tls);
+    clean_shadow_segment(&shd_layout.heap);
+    clean_shadow_segment(&shd_layout.stack);
+    clean_shadow_segment(&shd_layout.global);
+    clean_shadow_segment(&shd_layout.tls);
   }
 }
 /* }}} */
