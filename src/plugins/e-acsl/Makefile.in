@@ -152,19 +152,6 @@ endif
 EACSL_LIBDIR := $(EACSL_PLUGIN_DIR)/lib
 
 ############
-# JEMALLOC #
-############
-
-EACSL_JEMALLOC_DIR := $(EACSL_PLUGIN_DIR)/contrib/libjemalloc
-EACSL_JEMALLOC_LIBNAME = libeacsl-jemalloc.a
-EACSL_JEMALLOC_LIB = $(EACSL_LIBDIR)/$(EACSL_JEMALLOC_LIBNAME)
-
-$(EACSL_JEMALLOC_LIB):
-	cd $(EACSL_JEMALLOC_DIR) && $(MAKE) $(MAKEOPTS)
-	$(MKDIR) $(EACSL_LIBDIR)
-	$(CP) $(EACSL_JEMALLOC_DIR)/lib/libjemalloc.a $@
-
-############
 # DLMALLOC #
 ############
 
@@ -181,15 +168,15 @@ EACSL_DLMALLOC_FLAGS = \
   -DMSPACES=1 \
   -DONLY_MSPACES \
   -DMALLOC_ALIGNMENT=32 \
-  -DUSE_PREFIX="__e_acsl_mspace_"
+  -DMSPACE_PREFIX="__e_acsl_"
 
 $(EACSL_DLMALLOC_LIB): $(EACSL_DLMALLOC_SRC)
 	$(MKDIR) $(EACSL_LIBDIR)
-	echo 'CC $<'
+	echo 'CC           $<'
 	$(CC) $< -c -O2 -g3 -o$(EACSL_DLMALLOC_OBJ) $(EACSL_DLMALLOC_FLAGS)
-	echo 'AR $@'
+	echo 'AR           $@'
 	$(AR) crus $@ $(EACSL_DLMALLOC_OBJ)
-	echo 'RANLIB $@'
+	echo 'RANLIB       $@'
 	ranlib $@
 
 ############
@@ -202,37 +189,29 @@ EACSL_GMP_LIB = $(EACSL_LIBDIR)/$(EACSL_GMP_LIBNAME)
 EACSL_GMP_OBJ = mini-gmp.o
 EACSL_GMP_SRC = $(EACSL_GMP_DIR)/mini-gmp.c
 EACSL_GMP_FLAGS = \
-	-Dmalloc=__e_acsl_native_malloc \
-	-Drealloc=__e_acsl_native_realloc \
-	-Dfree=__e_acsl_native_free
+	-Dmalloc=__e_acsl_private_malloc \
+	-Drealloc=__e_acsl_private_realloc \
+	-Dfree=__e_acsl_private_free
 
 $(EACSL_GMP_LIB): $(EACSL_GMP_SRC)
 	$(MKDIR) $(EACSL_LIBDIR)
-	echo 'CC          $< '
+	echo 'CC           $< '
 	$(CC) $< $(EACSL_GMP_FLAGS) -c -O2 -g3 -o$(EACSL_GMP_OBJ)
-	echo 'AR          $@'
+	echo 'AR           $@'
 	$(AR) crus $(EACSL_GMP_LIB) $(EACSL_GMP_OBJ)
-	echo 'RANLIB $@'
+	echo 'RANLIB       $@'
 	ranlib $(EACSL_GMP_LIB)
 
-all:: $(EACSL_DLMALLOC_LIB) $(EACSL_JEMALLOC_LIB) $(EACSL_GMP_LIB)
+all:: $(EACSL_DLMALLOC_LIB) $(EACSL_GMP_LIB)
 
-e-acsl-distclean::
-	$(PRINT_RM) e-acsl contrib libraries
-	if test -f $(EACSL_JEMALLOC_DIR)/Makefile; \
-		then $(MAKE) -s -C$(EACSL_JEMALLOC_DIR) relclean; \
-	fi
-	if test -f $(EACSL_GMP_DIR)/Makefile; \
-		then $(MAKE) -s -C$(EACSL_GMP_DIR) distclean; \
-	fi
+clean::
+	$(RM) $(EACSL_DLMALLOC_LIB) $(EACSL_GMP_LIB)
 
 ############
 # Cleaning #
 ############
 
-EACSL_CLEANFILES = $(wildcard \
-	$(EACSL_JEMALLOC_LIB) $(EACSL_GMP_LIB) \
-	doc/doxygen/doxygen.cfg \
+EACSL_CLEANFILES = $(wildcard doc/doxygen/doxygen.cfg \
 	Makefile config.log config.status configure .depend autom4te.cache/* \
 	META.frama-c-e_acsl Makefile.plugin.generated local_config.ml top/*)
 

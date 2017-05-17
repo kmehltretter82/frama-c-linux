@@ -567,6 +567,8 @@ static void shadow_alloca(void *ptr, size_t size) {
 
 /* Deletion of static blocks {{{ */
 
+void *__builtin_memset(void *s, int c, size_t n);
+
 /*! \brief Nullifies shadow regions of a memory block given by its address.
  * \param ptr - base memory address of the stack memory block. */
 static void shadow_freea(void *ptr) {
@@ -835,7 +837,7 @@ static void* shadow_malloc(size_t size) {
 
   /* Return NULL if the size is too large to be aligned */
   char* res = alloc_size ?
-    (char*)native_aligned_alloc(HEAP_SEGMENT, alloc_size) : NULL;
+    (char*)public_malloc(alloc_size) : NULL;
 
   if (res) {
     /* Make sure there is sufficient room in shadow */
@@ -859,7 +861,7 @@ static void* shadow_calloc(size_t nmemb, size_t size) {
   /* Since aligned size is required by the model do the allocation through
    * `malloc` and nullify the memory space by hand */
   char* res =
-    size ? (char*)native_aligned_alloc(HEAP_SEGMENT, alloc_size) : NULL;
+    size ? (char*)public_malloc(alloc_size) : NULL;
 
   if (res) {
     /* Make sure there is sufficient room in shadow */
@@ -909,7 +911,7 @@ static void shadow_free(void *ptr) {
   if (ptr != NULL) { /* NULL is a valid behaviour */
     if (freeable(ptr)) {
       unset_heap_segment(ptr, 1, "free");
-      native_free(ptr);
+      public_free(ptr);
     } else {
       vabort("Not a start of block (%a) in free\n", ptr);
     }
@@ -930,7 +932,7 @@ static void* shadow_realloc(void *ptr, size_t size) {
   } else {
     if (freeable(ptr)) { /* ... and can be used as an input to `free` */
       size_t alloc_size = ALLOC_SIZE(size);
-      res = native_realloc(ptr, alloc_size);
+      res = public_realloc(ptr, alloc_size);
       VALIDATE_HEAP_ALLOCATION(res, alloc_size);
       DVALIDATE_ALIGNMENT(res);
 
@@ -988,7 +990,7 @@ static void *shadow_aligned_alloc(size_t alignment, size_t size) {
   if (!size || !alignment || !powof2(alignment) || (size%alignment))
     return NULL;
 
-  char *res = native_aligned_alloc(alignment, size);
+  char *res = public_aligned_alloc(alignment, size);
 
   if (res) {
     VALIDATE_HEAP_ALLOCATION(res, ALLOC_SIZE(size));
@@ -1012,7 +1014,7 @@ static int shadow_posix_memalign(void **memptr, size_t alignment, size_t size) {
   vassert(allocated((uintptr_t)memptr, sizeof(void*), (uintptr_t)memptr),
       "\\invalid memptr in  posix_memalign", NULL);
 
-  int res = native_posix_memalign(memptr, alignment, size);
+  int res = public_posix_memalign(memptr, alignment, size);
   if (!res) {
     VALIDATE_HEAP_ALLOCATION(*memptr, ALLOC_SIZE(size));
     set_heap_segment(*memptr, size, ALLOC_SIZE(size), 0, "posix_memalign");

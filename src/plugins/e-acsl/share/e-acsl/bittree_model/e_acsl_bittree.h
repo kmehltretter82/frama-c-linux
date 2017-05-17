@@ -202,7 +202,7 @@ static void bt_remove (bt_block * ptr) {
       sibling->left->parent = parent;
       sibling->right->parent = parent;
     }
-    native_free(sibling);
+    private_free(sibling);
     /* necessary ? -- begin */
     if(parent->parent != NULL) {
       parent->parent->mask = mask(parent->parent->left->addr
@@ -212,7 +212,7 @@ static void bt_remove (bt_block * ptr) {
     }
     /* necessary ? -- end */
   }
-  native_free(leaf_to_delete);
+  private_free(leaf_to_delete);
 }
 
 
@@ -251,7 +251,7 @@ static void bt_insert (bt_block * ptr) {
   bt_node * new_leaf;
   DASSERT(ptr != NULL);
 
-  new_leaf = native_malloc(sizeof(bt_node));
+  new_leaf = private_malloc(sizeof(bt_node));
   DASSERT(new_leaf != NULL);
   new_leaf->is_leaf = true;
   new_leaf->addr = ptr->ptr;
@@ -267,7 +267,7 @@ static void bt_insert (bt_block * ptr) {
     bt_node * sibling = bt_most_similar_node (ptr), * parent, * aux;
 
     DASSERT(sibling != NULL);
-    parent = native_malloc(sizeof(bt_node));
+    parent = private_malloc(sizeof(bt_node));
     DASSERT(parent != NULL);
     parent->is_leaf = false;
     parent->addr = sibling->addr & new_leaf->addr;
@@ -399,7 +399,7 @@ static bt_block * bt_find (void * ptr) {
 /* erase information about initialization of a block */
 static void bt_clean_block_init (bt_block * ptr) {
   if(ptr->init_ptr != NULL) {
-    native_free(ptr->init_ptr);
+    private_free(ptr->init_ptr);
     ptr->init_ptr = NULL;
   }
   ptr->init_bytes = 0;
@@ -409,7 +409,7 @@ static void bt_clean_block_init (bt_block * ptr) {
 static void bt_clean_block (bt_block * ptr) {
   if(ptr) {
     bt_clean_block_init(ptr);
-    native_free(ptr);
+    private_free(ptr);
   }
 }
 
@@ -426,7 +426,7 @@ static void bt_clean_rec (bt_node * ptr) {
     bt_clean_rec(ptr->right);
     ptr->left = ptr->right = NULL;
   }
-  native_free(ptr);
+  private_free(ptr);
 }
 
 /* erase the content of the structure */

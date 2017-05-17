@@ -24,18 +24,21 @@
  * \file  e_acsl_memory_mmodel.c
  * \brief Configuration macros and RTL assembly
 ***************************************************************************/
-
+#include <stddef.h>
 #include <sys/mman.h>
 #include <errno.h>
 #include <sys/resource.h>
+#include <sys/wait.h>
 
+#include "e_acsl_alias.h"
+#include "e_acsl_malloc.h"
 #include "e_acsl_string.h"
 #include "e_acsl_bits.h"
 #include "e_acsl_printf.h"
 #include "e_acsl_debug.h"
+#include "e_acsl_shexec.h"
+#include "e_acsl_trace.h"
 #include "e_acsl_assert.h"
-#include "e_acsl_alias.h"
-#include "e_acsl_malloc.h"
 #include "e_acsl_safe_locations.h"
 
 /* Memory model settings

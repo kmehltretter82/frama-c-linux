@@ -36,17 +36,15 @@
  *    of string.h functions use GLIBC-based implementations.
 ***************************************************************************/
 
-#include "e_acsl_malloc.h"
-
 #ifndef E_ACSL_STD_STRING
 #define E_ACSL_STD_STRING
-#  if defined(__GNUC__) && defined(E_ACSL_BUILTINS)
-#    define memset __builtin_memset
-#    define memcmp __builtin_memcmp
-#    define memcpy __builtin_memcpy
+#  if defined(__GNUC__)
+#    define memset  __builtin_memset
+#    define memcmp  __builtin_memcmp
+#    define memcpy  __builtin_memcpy
 #    define memmove __builtin_memmove
-#    define strlen __builtin_strlen
-#    define strcmp __builtin_strcmp
+#    define strlen  __builtin_strlen
+#    define strcmp  __builtin_strcmp
 #    define strncmp __builtin_strncmp
 #  elif defined(E_ACSL_BUILTINS)
 #    include <string.h>
@@ -75,7 +73,7 @@ static char *nstrcat(char *dest, const char *src) {
 static char *nstrdup(const char *s) {
   if (s) {
     size_t len = strlen(s) + 1;
-    void *n = native_malloc(len);
+    void *n = private_malloc(len);
     return (n == NULL) ? NULL : (char*)memcpy(n, s, len);
   }
   return NULL;
@@ -97,7 +95,7 @@ static char *sappend(char *dest, const char *src, const char *delim) {
     size_t len = strlen(src) + strlen(dest) + 1;
     if (ldelim)
       len += ldelim;
-    dest = native_realloc(dest, len);
+    dest = private_realloc(dest, len);
     if (ldelim)
       dest = nstrcat(dest, delim);
     dest = nstrcat(dest, src);

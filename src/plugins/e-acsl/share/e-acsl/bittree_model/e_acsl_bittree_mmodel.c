@@ -109,7 +109,7 @@ static void initialize (void * ptr, size_t size) {
   /* fully uninitialized */
   if(tmp->init_bytes == 0) {
     int nb = needed_bytes(tmp->size);
-    tmp->init_ptr = native_malloc(nb);
+    tmp->init_ptr = private_malloc(nb);
     memset(tmp->init_ptr, 0, nb);
   }
 
@@ -137,7 +137,7 @@ static void initialize (void * ptr, size_t size) {
 
   /* now fully initialized */
   if(tmp->init_bytes == tmp->size) {
-    native_free(tmp->init_ptr);
+    private_free(tmp->init_ptr);
     tmp->init_ptr = NULL;
   }
 }
@@ -153,7 +153,7 @@ static void full_init (void * ptr) {
     return;
 
   if (tmp->init_ptr != NULL) {
-    native_free(tmp->init_ptr);
+    private_free(tmp->init_ptr);
     tmp->init_ptr = NULL;
   }
   tmp->init_bytes = tmp->size;
@@ -298,7 +298,7 @@ static void* store_block(void* ptr, size_t size) {
 #endif
   bt_block * tmp = NULL;
   if (ptr) {
-    tmp = native_malloc(sizeof(bt_block));
+    tmp = private_malloc(sizeof(bt_block));
     tmp->ptr = (uintptr_t)ptr;
     tmp->size = size;
     tmp->init_ptr = NULL;
@@ -331,7 +331,7 @@ static void delete_block(void* ptr) {
     if (tmp) {
       bt_clean_block_init(tmp);
       bt_remove(tmp);
-      native_free(tmp);
+      private_free(tmp);
     }
   }
 }
@@ -361,7 +361,7 @@ static void* bittree_malloc(size_t size) {
   if(size == 0)
     return NULL;
 
-  void *res = native_malloc(size);
+  void *res = public_malloc(size);
   if (res) {
     bt_block * new_block = store_block(res, size);
     heap_allocation_size += size;
@@ -377,7 +377,7 @@ static void* bittree_calloc(size_t nbr_block, size_t size_block) {
   if (size == 0)
     return NULL;
 
-  void *res = native_calloc(nbr_block, size_block);
+  void *res = public_calloc(nbr_block, size_block);
   if (res) {
     bt_block * new_block = store_block(res, size);
     heap_allocation_size += size;
@@ -397,7 +397,7 @@ static void *bittree_aligned_alloc(size_t alignment, size_t size) {
   if (!size || !alignment || !powof2(alignment) || (size%alignment))
     return NULL;
 
-  void *res = native_aligned_alloc(alignment, size);
+  void *res = public_aligned_alloc(alignment, size);
   if (res) {
     bt_block * new_block = store_block(res, size);
     new_block->freeable = 1;
@@ -417,7 +417,7 @@ static int bittree_posix_memalign(void **memptr, size_t alignment, size_t size) 
   /* Make sure that the first argument to posix memalign is indeed allocated */
   DVALIDATE_RW_ACCESS((void*)memptr, sizeof(void*));
 
-  int res = native_posix_memalign(memptr, alignment, size);
+  int res = public_posix_memalign(memptr, alignment, size);
   if (!res) {
     bt_block * new_block = store_block(*memptr, size);
     new_block->freeable = 1;
@@ -440,7 +440,7 @@ static void* bittree_realloc(void* ptr, size_t size) {
   }
   tmp = bt_lookup(ptr);
   DASSERT(tmp != NULL);
-  new_ptr = native_realloc((void*)tmp->ptr, size);
+  new_ptr = public_realloc((void*)tmp->ptr, size);
   if(new_ptr == NULL)
     return NULL;
   heap_allocation_size -= tmp->size;
@@ -465,7 +465,7 @@ static void* bittree_realloc(void* ptr, size_t size) {
       /* number of bits that need to be set in tmp->init_ptr */
       int nb_old = needed_bytes(tmp->size);
       /* allocate memory to store partial initialization */
-      tmp->init_ptr = native_calloc(1, nb);
+      tmp->init_ptr = private_calloc(1, nb);
       /* carry out initialization of the old block */
       setbits(tmp->size, tmp->init_ptr);
     }
@@ -473,14 +473,15 @@ static void* bittree_realloc(void* ptr, size_t size) {
     int nb = needed_bytes(size);
     int nb_old = needed_bytes(tmp->size);
     int i;
-    tmp->init_ptr = native_realloc(tmp->init_ptr, nb);
+    /* increase container with init data */
+    tmp->init_ptr = private_realloc(tmp->init_ptr, nb);
     for (i = nb_old; i < nb; i++)
       tmp->init_ptr[i] = 0;
     tmp->init_bytes = 0;
     for (i = 0; i < nb; i++)
       tmp->init_bytes += nbr_bits_to_1[tmp->init_ptr[i]];
     if (tmp->init_bytes == size || tmp->init_bytes == 0) {
-      native_free(tmp->init_ptr);
+      private_free(tmp->init_ptr);
       tmp->init_ptr = NULL;
     }
   }
@@ -499,7 +500,7 @@ static void bittree_free(void* ptr) {
     vabort("Not a start of block (%a) in free\n", ptr);
   } else {
     heap_allocation_size -= res->size;
-    native_free(ptr);
+    public_free(ptr);
     bt_clean_block_init(res);
     bt_remove(res);
   }

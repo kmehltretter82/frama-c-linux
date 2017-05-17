@@ -28,12 +28,6 @@
 #ifndef E_ACSL_SHEXEC
 #define E_ACSL_SHEXEC
 
-#include "e_acsl_malloc.h"
-#include "e_acsl_printf.h"
-#include "e_acsl_string.h"
-#include <errno.h>
-#include <sys/wait.h>
-
 /*! \class ipr_t
  *  \brief Result struct for `shexec` function -- execute a command in the
  *  shell via fork/exec and return results */
@@ -78,7 +72,7 @@ char* fd_read (int fd, short bufsize) {
   /* Size of the fetched string */
   int size = buffer_size;
   /* Buffer where for read data */
-  char *buffer = (char*)native_malloc(size);
+  char *buffer = (char*)private_malloc(size);
   /* The number of read bytes  */
   short fetched = 0;
   int rd = 0; /* Count of fetched characters */
@@ -89,7 +83,7 @@ char* fd_read (int fd, short bufsize) {
     rd += fetched;
     if (fetched != -1) {
       size += fetched*sizeof(char);
-      buffer = native_realloc(buffer, size + 1);
+      buffer = private_realloc(buffer, size + 1);
     } else {
       return NULL;
     }
@@ -188,14 +182,14 @@ ipr_t* __shexec (ipr_t *data) {
 void free_ipr (ipr_t* ipr) {
   if (ipr) {
     if (ipr->stdouts)
-      native_free(ipr->stdouts);
+      private_free(ipr->stdouts);
     if (ipr->stderrs)
-      native_free(ipr->stderrs);
+      private_free(ipr->stderrs);
     if (ipr->error)
-      native_free(ipr->error);
+      private_free(ipr->error);
     if (ipr->stdins)
-      native_free(ipr->stdins);
-    native_free(ipr);
+      private_free(ipr->stdins);
+    private_free(ipr);
   }
 }
 
@@ -213,7 +207,7 @@ void free_ipr (ipr_t* ipr) {
 static ipr_t* shexec (char **data, const char *sin) {
   /* Allocate and initialise the `ipr_t` struct to store the results
    * of the command execution */
-  ipr_t  *ipr = (ipr_t*)native_malloc(sizeof(ipr_t));
+  ipr_t  *ipr = (ipr_t*)private_malloc(sizeof(ipr_t));
   ipr->stderrs = NULL;
   ipr->stdouts = NULL;
   ipr->stdins = nstrdup(sin);

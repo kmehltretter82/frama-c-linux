@@ -29,6 +29,10 @@
 #ifndef E_ACSL_ALIAS
 #define E_ACSL_ALIAS
 
+/* Concatenation of 2 tokens */
+# define preconcat(x,y) x ## y
+# define concat(x,y) preconcat(x,y)
+
 /** Define `aliasname` as a strong alias for `name`. */
 # define strong_alias(name, aliasname) _strong_alias(name, aliasname)
 # define _strong_alias(name, aliasname) \
@@ -38,5 +42,12 @@
 # define weak_alias(name, aliasname) _weak_alias (name, aliasname)
 # define _weak_alias(name, aliasname) \
   extern __typeof (name) aliasname __attribute__ ((weak, alias (#name)));
+
+/** Prefix added to public functions of E-ACSL public API */
+# define public_prefix __e_acsl_
+/** Make a strong alias from some function named `f` to __e_acsl_f */
+# define public_alias(f) strong_alias(f, concat(public_prefix,f))
+/** Make a strong alias from some function named `f1` to __e_acsl_f2 */
+# define public_alias2(f1,f2) strong_alias(f1, concat(public_prefix,f2))
 
 #endif

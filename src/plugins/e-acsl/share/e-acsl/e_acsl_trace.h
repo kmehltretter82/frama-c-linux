@@ -28,8 +28,6 @@
 #ifndef E_ACSL_TRACE
 #define E_ACSL_TRACE
 
-#include "e_acsl_shexec.h"
-
 extern void  *__libc_stack_end;
 
 struct frame_layout {
@@ -69,7 +67,7 @@ static void trace() {
 # ifdef __GLIBC__
 # ifdef __linux__
   int size = 24;
-  void **bb = native_malloc(sizeof(void*)*size);
+  void **bb = private_malloc(sizeof(void*)*size);
   native_backtrace(bb, size);
 
   char executable [PATH_MAX];
@@ -78,7 +76,7 @@ static void trace() {
   printf("/** Backtrace **************************/\n");
   int counter = 0;
   while (*bb) {
-    char *addr = (char*)native_malloc(21);
+    char *addr = (char*)private_malloc(21);
     sprintf(addr,"%p", *bb);
     char *ar[] = { "addr2line", "-f", "-p", "-C", "-s", "-e",
       executable, addr, NULL};

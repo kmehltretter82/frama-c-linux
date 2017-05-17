@@ -28,11 +28,6 @@
 #ifndef E_ACSL_ASSERT
 #define E_ACSL_ASSERT
 
-#include "e_acsl_string.h"
-#include "e_acsl_printf.h"
-#include "e_acsl_syscall.h"
-#include "e_acsl_trace.h"
-
 /*! \brief Drop-in replacement for abort function */
 #define abort() exec_abort(__LINE__, __FILE__)
 
