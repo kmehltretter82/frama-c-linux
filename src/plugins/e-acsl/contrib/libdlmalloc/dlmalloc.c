@@ -808,6 +808,36 @@ extern "C" {
  #define FORCEINLINE
 #endif
 
+# define preconcat(x,y) x ## y
+# define concat(x,y) preconcat(x,y)
+
+#ifdef MSPACE_PREFIX
+#define mspace_prefix(f) concat(MSPACE_PREFIX,f)
+#define mspace_malloc                 mspace_prefix(mspace_malloc)
+#define mspace_free                   mspace_prefix(mspace_free)
+#define mspace_calloc                 mspace_prefix(mspace_calloc)
+#define mspace_realloc                mspace_prefix(mspace_realloc)
+#define mspace_realloc_in_place       mspace_prefix(mspace_realloc_in_place)
+#define mspace_memalign               mspace_prefix(mspace_memalign)
+#define mspace_independent_calloc     mspace_prefix(mspace_independent_calloc)
+#define mspace_independent_comalloc   mspace_prefix(mspace_independent_comalloc)
+#define mspace_bulk_free              mspace_prefix(mspace_bulk_free)
+#define mspace_usable_size            mspace_prefix(mspace_usable_size)
+#define mspace_malloc_stats           mspace_prefix(mspace_malloc_stats)
+#define mspace_trim                   mspace_prefix(mspace_trim)
+#define mspace_footprint              mspace_prefix(mspace_footprint)
+#define mspace_max_footprint          mspace_prefix(mspace_max_footprint)
+#define mspace_footprint_limit        mspace_prefix(mspace_footprint_limit)
+#define mspace_set_footprint_limit    mspace_prefix(mspace_set_footprint_limit)
+#define mspace_inspect_all            mspace_prefix(mspace_inspect_all)
+#define create_mspace                 mspace_prefix(create_mspace)
+#define create_mspace_with_base       mspace_prefix(create_mspace_with_base)
+#define destroy_mspace                mspace_prefix(destroy_mspace)
+#define mspace_least_addr             mspace_prefix(mspace_least_addr)
+#define mspace_mallopt                mspace_prefix(mspace_mallopt)
+#define mspace_track_large_chunks     mspace_prefix(mspace_track_large_chunks)
+#endif
+
 #if !ONLY_MSPACES
 
 /* ------------------- Declarations of public routines ------------------- */
@@ -1379,6 +1409,11 @@ DLMALLOC_EXPORT size_t mspace_footprint(mspace msp);
   system for this space.
 */
 DLMALLOC_EXPORT size_t mspace_max_footprint(mspace msp);
+
+/*
+  Return least address of this mspace
+*/
+DLMALLOC_EXPORT void* mspace_least_addr(mspace);
 
 
 #if !NO_MALLINFO
@@ -5886,6 +5921,11 @@ void mspace_malloc_stats(mspace msp) {
   }
 }
 #endif /* NO_MALLOC_STATS */
+
+void* mspace_least_addr(mspace msp) {
+  mstate ms = (mstate)msp;
+  return (void*)ms->least_addr;
+}
 
 size_t mspace_footprint(mspace msp) {
   size_t result = 0;
