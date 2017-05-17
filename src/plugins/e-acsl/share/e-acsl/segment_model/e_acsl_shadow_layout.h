@@ -306,14 +306,12 @@ struct memory_segment {
   uintptr_t sec_start; //!< Least address in the secondary shadow
   uintptr_t sec_end; //!< Greatest address in the secondary shadow
   uintptr_t sec_offset; //!< Secondary shadow offset
-
-  int initialized; //! Notion on whether the layout is initialized
 };
 
 /*! \brief Full program memory layout. */
-static struct memory_layout mem_layout;
+static struct shadow_layout shd_layout;
 
-struct memory_layout {
+struct shadow_layout {
   struct memory_segment heap;
   struct memory_segment stack;
   struct memory_segment global;
@@ -362,18 +360,18 @@ static void set_shadow_segment(struct memory_segment *seg, uintptr_t start,
 
 /*! \brief Initialize memory layout, i.e., determine bounds of program segments,
  * allocate shadow memory spaces and compute offsets. This function populates
- * global struct ::mem_layout holding that information with data. */
-static void init_memory_layout(int *argc_ref, char ***argv_ref) {
+ * global struct ::shd_layout holding that information with data. */
+static void init_shadow_layout(int *argc_ref, char ***argv_ref) {
   /* Use DEBUG_PRINT_LAYOUT to output the details */
-  set_shadow_segment(&mem_layout.heap,
+  set_shadow_segment(&shd_layout.heap,
     get_heap_start(), get_heap_size(), 1, 8, "heap");
-  set_shadow_segment(&mem_layout.stack,
+  set_shadow_segment(&shd_layout.stack,
     get_stack_start(argc_ref, argv_ref), get_stack_size(), 1, 1, "stack");
-  set_shadow_segment(&mem_layout.global,
+  set_shadow_segment(&shd_layout.global,
     get_global_start(), get_global_size(), 1, 1, "global");
-  set_shadow_segment(&mem_layout.tls,
+  set_shadow_segment(&shd_layout.tls,
     get_tls_start(), get_tls_size(), 1, 1, "tls");
-  mem_layout.initialized = 1;
+  shd_layout.initialized = 1;
 }
 
 /*! \brief Deallocate a shadow segment */
@@ -385,12 +383,12 @@ void clean_memory_segment(struct memory_segment *seg) {
 }
 
 /*! \brief Deallocate shadow regions used by runtime analysis */
-static void clean_memory_layout() {
-  if (mem_layout.initialized) {
-    clean_memory_segment(&mem_layout.heap);
-    clean_memory_segment(&mem_layout.stack);
-    clean_memory_segment(&mem_layout.global);
-    clean_memory_segment(&mem_layout.tls);
+static void clean_shadow_layout() {
+  if (shd_layout.initialized) {
+    clean_memory_segment(&shd_layout.heap);
+    clean_memory_segment(&shd_layout.stack);
+    clean_memory_segment(&shd_layout.global);
+    clean_memory_segment(&shd_layout.tls);
   }
 }
 /* }}} */
@@ -447,27 +445,27 @@ static void clean_memory_layout() {
 
 /*! \brief Convert a stack address into its primary shadow counterpart */
 #define PRIMARY_STACK_SHADOW(_addr) \
-  LOWER_SHADOW_ACCESS(_addr, mem_layout.stack.prim_offset)
+  LOWER_SHADOW_ACCESS(_addr, shd_layout.stack.prim_offset)
 
 /*! \brief Convert a stack address into its secondary shadow counterpart */
 #define SECONDARY_STACK_SHADOW(_addr) \
-  LOWER_SHADOW_ACCESS(_addr, mem_layout.stack.sec_offset)
+  LOWER_SHADOW_ACCESS(_addr, shd_layout.stack.sec_offset)
 
 /*! \brief Convert a global address into its primary shadow counterpart */
 #define PRIMARY_GLOBAL_SHADOW(_addr)  \
-  HIGHER_SHADOW_ACCESS(_addr, mem_layout.global.prim_offset)
+  HIGHER_SHADOW_ACCESS(_addr, shd_layout.global.prim_offset)
 
 /*! \brief Convert a global address into its secondary shadow counterpart */
 #define SECONDARY_GLOBAL_SHADOW(_addr) \
-  HIGHER_SHADOW_ACCESS(_addr, mem_layout.global.sec_offset)
+  HIGHER_SHADOW_ACCESS(_addr, shd_layout.global.sec_offset)
 
 /*! \brief Convert a TLS address into its primary shadow counterpart */
 #define PRIMARY_TLS_SHADOW(_addr)  \
-  LOWER_SHADOW_ACCESS(_addr, mem_layout.tls.prim_offset)
+  LOWER_SHADOW_ACCESS(_addr, shd_layout.tls.prim_offset)
 
 /*! \brief Convert a TLS address into its secondary shadow counterpart */
 #define SECONDARY_TLS_SHADOW(_addr) \
-  LOWER_SHADOW_ACCESS(_addr, mem_layout.tls.sec_offset)
+  LOWER_SHADOW_ACCESS(_addr, shd_layout.tls.sec_offset)
 
 /* \brief Compute a primary or a secondary shadow address (based on the value of
  * parameter `_region`) of an address tracked via an offset-based encoding.
@@ -484,16 +482,16 @@ static void clean_memory_layout() {
 
 /*! \brief Convert a heap address into its shadow counterpart */
 #define HEAP_SHADOW(_addr) \
-  HIGHER_SHADOW_ACCESS(_addr, mem_layout.heap.prim_offset)
+  HIGHER_SHADOW_ACCESS(_addr, shd_layout.heap.prim_offset)
 
-#define HEAP_START mem_layout.heap.start
+#define HEAP_START shd_layout.heap.start
 
 /*! \brief Convert a heap address into its init shadow counterpart */
 #define HEAP_INIT_SHADOW(_addr) \
   HIGHER_SCALED_SHADOW_ACCESS(_addr, \
-      mem_layout.heap.start, \
-      mem_layout.heap.sec_offset, \
-      mem_layout.heap.sec_ratio)
+      shd_layout.heap.start, \
+      shd_layout.heap.sec_offset, \
+      shd_layout.heap.sec_ratio)
 
 /* }}} */
 
@@ -501,7 +499,7 @@ static void clean_memory_layout() {
 /*! \brief Evaluate to a true value if address _addr resides within a given
  * memory segment.
  * \param _addr - a memory address
- * \param _seg - a memory segment (one of the structs within ::mem_layout)
+ * \param _seg - a memory segment (one of the structs within ::shd_layout)
 */
 #define IS_ON(_addr,_seg) ( \
   ((uintptr_t)_addr) >= _seg.start && \
@@ -509,16 +507,16 @@ static void clean_memory_layout() {
 )
 
 /*! \brief Evaluate to true if `_addr` is a heap address */
-#define IS_ON_HEAP(_addr) IS_ON(_addr, mem_layout.heap)
+#define IS_ON_HEAP(_addr) IS_ON(_addr, shd_layout.heap)
 
 /*! \brief Evaluate to true if `_addr` is a stack address */
-#define IS_ON_STACK(_addr) IS_ON(_addr, mem_layout.stack)
+#define IS_ON_STACK(_addr) IS_ON(_addr, shd_layout.stack)
 
 /*! \brief Evaluate to true if `_addr` is a global address */
-#define IS_ON_GLOBAL(_addr) IS_ON(_addr, mem_layout.global)
+#define IS_ON_GLOBAL(_addr) IS_ON(_addr, shd_layout.global)
 
 /*! \brief Evaluate to true if _addr is a TLS address */
-#define IS_ON_TLS(_addr) IS_ON(_addr, mem_layout.tls)
+#define IS_ON_TLS(_addr) IS_ON(_addr, shd_layout.tls)
 
 /*! \brief Shortcut for evaluating an address via ::IS_ON_STACK,
  * ::IS_ON_GLOBAL or ::IS_ON_TLS  */

@@ -224,11 +224,11 @@ static const uint64_t static_readonly_masks [] = {
       "Heap base address %a is unaligned", _addr)
 
 #define DVALIDATE_MEMORY_INIT \
-  DVASSERT(mem_layout.initialized != 0, "Un-initialized shadow layout", NULL)
+  DVASSERT(shd_layout.initialized != 0, "Un-initialized shadow layout", NULL)
 
 /* Debug function making sure that the order of program segments is as expected
  * and that the program and the shadow segments used do not overlap. */
-static void validate_memory_layout() {
+static void validate_shadow_layout() {
   /* Check that the struct holding memory layout is marked as initialized. */
   DVALIDATE_MEMORY_INIT;
   /* Make sure the order of program segments is as expected, i.e.,
@@ -236,17 +236,17 @@ static void validate_memory_layout() {
 
   #define NO_MEM_SEGMENTS 11
   uintptr_t segments[NO_MEM_SEGMENTS][2] = {
-     {mem_layout.stack.start, mem_layout.stack.end},
-     {mem_layout.stack.prim_start, mem_layout.stack.prim_end},
-     {mem_layout.stack.sec_start, mem_layout.stack.sec_end},
-     {mem_layout.tls.start, mem_layout.tls.end},
-     {mem_layout.tls.prim_start, mem_layout.tls.prim_end},
-     {mem_layout.tls.sec_start, mem_layout.tls.sec_end},
-     {mem_layout.global.start, mem_layout.global.end},
-     {mem_layout.global.prim_start, mem_layout.global.prim_end},
-     {mem_layout.global.sec_start, mem_layout.global.sec_end},
-     {mem_layout.heap.start, mem_layout.heap.end},
-     {mem_layout.heap.prim_start, mem_layout.heap.prim_end}
+     {shd_layout.stack.start, shd_layout.stack.end},
+     {shd_layout.stack.prim_start, shd_layout.stack.prim_end},
+     {shd_layout.stack.sec_start, shd_layout.stack.sec_end},
+     {shd_layout.tls.start, shd_layout.tls.end},
+     {shd_layout.tls.prim_start, shd_layout.tls.prim_end},
+     {shd_layout.tls.sec_start, shd_layout.tls.sec_end},
+     {shd_layout.global.start, shd_layout.global.end},
+     {shd_layout.global.prim_start, shd_layout.global.prim_end},
+     {shd_layout.global.sec_start, shd_layout.global.sec_end},
+     {shd_layout.heap.start, shd_layout.heap.end},
+     {shd_layout.heap.prim_start, shd_layout.heap.prim_end}
   };
 
   /* Make sure all segments (shadow or otherwise) are disjoint */
@@ -265,17 +265,17 @@ static void validate_memory_layout() {
     }
   }
 
-  DVASSERT(mem_layout.stack.end > mem_layout.tls.end,
+  DVASSERT(shd_layout.stack.end > shd_layout.tls.end,
       "Unexpected location of stack (above tls)", NULL);
-  DVASSERT(mem_layout.tls.end > mem_layout.heap.end,
+  DVASSERT(shd_layout.tls.end > shd_layout.heap.end,
       "Unexpected location of tls (above heap)", NULL);
-  DVASSERT(mem_layout.heap.end > mem_layout.global.end,
+  DVASSERT(shd_layout.heap.end > shd_layout.global.end,
       "Unexpected location of heap (above global)", NULL);
 }
 
 /* Assert that memory layout has been initialized and all segments appear
  * in the expected order */
-# define DVALIDATE_SHADOW_LAYOUT validate_memory_layout()
+# define DVALIDATE_SHADOW_LAYOUT validate_shadow_layout()
 
 /* Assert that boundaries of a block [_addr, _addr+_size] are within a segment
  * given by `_s`. `_s` is either HEAP, STACK, TLS, GLOBAL or STATIC. */
@@ -423,7 +423,7 @@ static void validate_memory_layout() {
 
 /* Runtime assertions  {{{ */
 #define VALIDATE_HEAP_ALLOCATION(_res, _size) \
-  vassert(mem_layout.heap.end > (uintptr_t)_res + _size, \
+  vassert(shd_layout.heap.end > (uintptr_t)_res + _size, \
     "e-acsl error: Insufficient heap size %lu\n", E_ACSL_HEAP_SIZE);
 /* }}} */
 
@@ -1304,11 +1304,11 @@ static void print_memory_segment(struct memory_segment *seg, const char *name) {
     MB_SZ(seg->sec_size), seg->sec_start, seg->sec_end, seg->sec_offset);
 }
 
-static void print_memory_layout() {
-  print_memory_segment(&mem_layout.heap, "Heap");
-  print_memory_segment(&mem_layout.stack, "Stack");
-  print_memory_segment(&mem_layout.global, "Global");
-  print_memory_segment(&mem_layout.tls, "TLS");
+static void print_shadow_layout() {
+  print_memory_segment(&shd_layout.heap, "Heap");
+  print_memory_segment(&shd_layout.stack, "Stack");
+  print_memory_segment(&shd_layout.global, "Global");
+  print_memory_segment(&shd_layout.tls, "TLS");
   DLOG("-----------------------------------------------------\n");
 }
 
@@ -1335,7 +1335,7 @@ static const char* which_segment(uintptr_t addr) {
 /*! \brief Print program layout. This function outputs start/end addresses of
  * various program segments, their shadow counterparts and sizes of shadow
  * regions used. */
-#define DEBUG_PRINT_LAYOUT print_memory_layout()
+#define DEBUG_PRINT_LAYOUT print_shadow_layout()
 void ___e_acsl_debug_print_layout() { DEBUG_PRINT_LAYOUT; }
 
 /*! \brief Print the shadow segment address addr belongs to */

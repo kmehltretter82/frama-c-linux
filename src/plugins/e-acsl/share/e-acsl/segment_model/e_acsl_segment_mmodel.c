@@ -171,7 +171,7 @@ static void memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
   /* Lift stack limit to account for extra stack memory overhead.  */
   increase_stack_limit(get_stack_size()*2);
   /* Allocate and log shadow memory layout of the execution */
-  init_memory_layout(argc_ref, argv_ref);
+  init_shadow_layout(argc_ref, argv_ref);
   /* Make sure the layout holds */
   DVALIDATE_SHADOW_LAYOUT;
   /* Track program arguments. */
@@ -190,7 +190,7 @@ static void memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
 }
 
 static void memory_clean(void) {
-  clean_memory_layout();
+  clean_shadow_layout();
 }
 
 /* }}} */
