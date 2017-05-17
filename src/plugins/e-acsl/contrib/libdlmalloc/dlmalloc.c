@@ -819,6 +819,7 @@ extern "C" {
 #define mspace_realloc                mspace_prefix(mspace_realloc)
 #define mspace_realloc_in_place       mspace_prefix(mspace_realloc_in_place)
 #define mspace_memalign               mspace_prefix(mspace_memalign)
+#define mspace_aligned_alloc          mspace_prefix(mspace_aligned_alloc)
 #define mspace_independent_calloc     mspace_prefix(mspace_independent_calloc)
 #define mspace_independent_comalloc   mspace_prefix(mspace_independent_comalloc)
 #define mspace_bulk_free              mspace_prefix(mspace_bulk_free)
@@ -848,6 +849,7 @@ extern "C" {
 #define dlmalloc               malloc
 #define dlmemalign             memalign
 #define dlposix_memalign       posix_memalign
+#define dlaligned_alloc        aligned_alloc
 #define dlrealloc              realloc
 #define dlrealloc_in_place     realloc_in_place
 #define dlvalloc               valloc
@@ -961,6 +963,13 @@ DLMALLOC_EXPORT void* dlmemalign(size_t, size_t);
   returns ENOMEM if memory cannot be allocated.
 */
 DLMALLOC_EXPORT int dlposix_memalign(void**, size_t, size_t);
+
+/*
+  aligned_alloc(size_t alignment, size_t size);
+  The function aligned_alloc() is the same as memalign(), except for the added
+  restriction that size should be a multiple of alignment.
+*/
+DLMALLOC_EXPORT void *dlaligned_alloc(size_t alignment, size_t size);
 
 /*
   valloc(size_t n);
@@ -1383,6 +1392,12 @@ DLMALLOC_EXPORT void* mspace_calloc(mspace msp, size_t n_elements, size_t elem_s
   the given space.
 */
 DLMALLOC_EXPORT void* mspace_memalign(mspace msp, size_t alignment, size_t bytes);
+
+/*
+  mspace_aligned_alloc behaves as aligned_alloc, but operates within
+  the given space.
+*/
+DLMALLOC_EXPORT void* mspace_aligned_alloc(mspace msp, size_t alignment, size_t bytes);
 
 /*
   mspace_independent_calloc behaves as independent_calloc, but
@@ -5295,6 +5310,12 @@ void* dlmemalign(size_t alignment, size_t bytes) {
   return internal_memalign(gm, alignment, bytes);
 }
 
+void* dlaligned_alloc(size_t alignment, size_t size) {
+  if (size % alignment)
+    return NULL;
+  return dlmemalign(alignment, size);
+}
+
 int dlposix_memalign(void** pp, size_t alignment, size_t bytes) {
   void* mem = 0;
   if (alignment == MALLOC_ALIGNMENT)
@@ -5848,6 +5869,12 @@ void* mspace_memalign(mspace msp, size_t alignment, size_t bytes) {
   if (alignment <= MALLOC_ALIGNMENT)
     return mspace_malloc(msp, bytes);
   return internal_memalign(ms, alignment, bytes);
+}
+
+void* mspace_aligned_alloc(mspace msp, size_t alignment, size_t bytes) {
+  if (bytes % alignment)
+    return NULL;
+  return mspace_aligned_alloc(msp, alignment, bytes);
 }
 
 void** mspace_independent_calloc(mspace msp, size_t n_elements,
