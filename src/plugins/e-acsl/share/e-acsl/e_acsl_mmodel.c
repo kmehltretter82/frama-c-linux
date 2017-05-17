@@ -34,6 +34,7 @@
 #include "e_acsl_printf.h"
 #include "e_acsl_debug.h"
 #include "e_acsl_assert.h"
+#include "e_acsl_alias.h"
 #include "e_acsl_malloc.h"
 #include "e_acsl_safe_locations.h"
 
