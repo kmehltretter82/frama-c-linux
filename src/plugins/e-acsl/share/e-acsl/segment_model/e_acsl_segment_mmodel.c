@@ -160,6 +160,8 @@ static void argv_alloca(int *argc_ref,  char *** argv_ref) {
 /* }}} */
 
 /* Program initialization {{{ */
+extern int main(void);
+
 static void memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
   describe_run();
   /** Verify that the given size of a pointer matches the one in the present
@@ -178,6 +180,9 @@ static void memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
   /* Track program arguments. */
   if (argc_ref && argv_ref)
     argv_alloca(argc_ref, argv_ref);
+  /* Track main function */
+  shadow_alloca(&main, sizeof(&main));
+  initialize_static_region((uintptr_t)&main, sizeof(&main));
   /* Tracking safe locations */
   collect_safe_locations();
   int i;
