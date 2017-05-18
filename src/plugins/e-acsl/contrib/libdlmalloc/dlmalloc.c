@@ -5881,7 +5881,7 @@ void* mspace_memalign(mspace msp, size_t alignment, size_t bytes) {
 void* mspace_aligned_alloc(mspace msp, size_t alignment, size_t bytes) {
   if (bytes % alignment)
     return NULL;
-  return mspace_aligned_alloc(msp, alignment, bytes);
+  return mspace_memalign(msp, alignment, bytes);
 }
 
 int mspace_posix_memalign(mspace msp, void **memptr, size_t alignment, size_t bytes) {
@@ -5889,7 +5889,7 @@ int mspace_posix_memalign(mspace msp, void **memptr, size_t alignment, size_t by
     *memptr = NULL;
     return 0;
   }
-  void *res = mspace_aligned_alloc(msp, alignment, bytes);
+  void *res = mspace_memalign(msp, alignment, bytes);
   if (res) {
     *memptr = res;
     return 0;

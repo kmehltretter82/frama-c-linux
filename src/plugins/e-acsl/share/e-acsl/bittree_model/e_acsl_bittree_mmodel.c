@@ -549,6 +549,9 @@ static void argv_alloca(int *argc_ref,  char *** argv_ref) {
 
 static void memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
   describe_run();
+  /* Mspace sizes here are not that relevant as there is no shadowing and
+     mspaces will grow automatically */
+  make_memory_spaces(MB_SZ(64), MB_SZ(64));
   arch_assert(ptr_size);
   initialize_report_file(argc_ref, argv_ref);
   /* Tracking program arguments */

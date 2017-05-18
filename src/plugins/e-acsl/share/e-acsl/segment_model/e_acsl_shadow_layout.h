@@ -58,14 +58,6 @@ char *strerror(int errnum);
 #endif
 /* \endcond */
 
-/* Block size units in bytes */
-#define KB (1024) //!< Bytes in a kilobyte
-#define MB (1024*KB) //!< Bytes in a megabyte
-#define GB (1024*MB) //!< Bytes in a gigabyte
-#define KB_SZ(_s) (_s/KB) //!< Convert bytes to kilobytes
-#define MB_SZ(_s) (_s/MB) //!< Convert bytes to megabytes
-#define GB_SZ(_s) (_s/GB) //!< Convert bytes to gigabytes
-
 /*! \brief Byte-width of a pointer */
 #define PTR_SZ sizeof(uintptr_t)
 

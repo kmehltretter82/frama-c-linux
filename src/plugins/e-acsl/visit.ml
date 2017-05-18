@@ -324,10 +324,9 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
             in
             Extlib.may handle_main main_fct
           in
-          if Mmodel_analysis.use_model () then
-            Project.on prj build_mmodel_initializer ();
-            (* reset copied states at the end to be observationally
-               equivalent to a standard visitor. *)
+          Project.on prj build_mmodel_initializer ();
+          (* reset copied states at the end to be observationally
+              equivalent to a standard visitor. *)
           Project.clear ~selection ~project:prj ();
         end; (* generate *)
         f)
