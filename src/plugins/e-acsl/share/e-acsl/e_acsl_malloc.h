@@ -57,6 +57,7 @@ static struct memory_spaces {
 
 /* Mspace allocators {{{ */
 extern mspace __e_acsl_create_mspace(size_t, int);
+extern size_t __e_acsl_destroy_mspace(mspace);
 extern void*  __e_acsl_mspace_malloc(mspace, size_t);
 extern void   __e_acsl_mspace_free(mspace, void*);
 extern void*  __e_acsl_mspace_calloc(mspace msp, size_t, size_t);
@@ -69,6 +70,7 @@ extern size_t __e_acsl_mspace_footprint_limit(mspace);
 extern void*  __e_acsl_mspace_least_addr(mspace);
 
 #define create_mspace          __e_acsl_create_mspace
+#define destroy_mspace         __e_acsl_destroy_mspace
 #define mspace_malloc          __e_acsl_mspace_malloc
 #define mspace_free            __e_acsl_mspace_free
 #define mspace_calloc          __e_acsl_mspace_calloc

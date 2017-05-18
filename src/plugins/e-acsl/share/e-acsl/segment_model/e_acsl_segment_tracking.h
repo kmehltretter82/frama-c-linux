@@ -232,20 +232,13 @@ static void validate_shadow_layout() {
   /* Check that the struct holding memory layout is marked as initialized. */
   DVALIDATE_MEMORY_INIT;
 
-  memory_partition *partitions [] = {
-    &mem_layout.heap,
-    &mem_layout.stack,
-    &mem_layout.global,
-    &mem_layout.tls
-  };
-
-  int mem_partitions = 4;
-  int mem_segments = mem_partitions*3;
-  uintptr_t segments[mem_segments][2];
+  int num_partitions = sizeof(mem_partitions)/sizeof(memory_partition*);
+  int num_segments = num_partitions*3;
+  uintptr_t segments[num_segments][2];
 
   size_t i;
-  for (i = 0; i < mem_partitions; i++) {
-    memory_partition *p = partitions[i];
+  for (i = 0; i < num_partitions; i++) {
+    memory_partition *p = mem_partitions[i];
     segments[3*i][0] = p->application.start;
     segments[3*i][1] = p->application.end;
     segments[3*i+1][0] = p->primary.start;
@@ -256,11 +249,11 @@ static void validate_shadow_layout() {
 
   /* Make sure all segments (shadow or otherwise) are disjoint */
   size_t j;
-  for (int i = 0; i < mem_segments; i++) {
+  for (int i = 0; i < num_segments; i++) {
     uintptr_t *src = segments[i];
     DVASSERT(src[0] < src[1],
       "Segment start is greater than segment end %lu < %lu\n", src[0], src[1]);
-    for (int j = 0; j < mem_segments; j++) {
+    for (j = 0; j < num_segments; j++) {
       if (i != j) {
         uintptr_t *dest = segments[j];
         DVASSERT(src[1] < dest[0] || src[0] > dest[1],

@@ -290,6 +290,14 @@ struct memory_layout {
 /*! \brief Full program memory layout. */
 static struct memory_layout mem_layout;
 
+/*! \brief Array of used partitions */
+static memory_partition *mem_partitions [] = {
+  &mem_layout.heap,
+  &mem_layout.stack,
+  &mem_layout.global,
+  &mem_layout.tls
+};
+
 /*! \brief Initialize an application memory segment.
  *
  * \param seg - pointer to a segment to initialize
@@ -359,15 +367,14 @@ static void init_shadow_layout(int *argc_ref, char ***argv_ref) {
   mem_layout.initialized = 1;
 }
 
-/*! \brief Deallocate a shadow segment */
-void clean_memory_segment(struct memory_segment *seg) {
-  /* TODO */
-}
-
 /*! \brief Deallocate shadow regions used by runtime analysis */
 static void clean_shadow_layout() {
   if (mem_layout.initialized) {
-    /* TODO */
+    int i;
+    for (i = 0; i < sizeof(mem_partitions)/sizeof(memory_partition*); i++) {
+      destroy_mspace(mem_partitions[i]->primary.mspace);
+      destroy_mspace(mem_partitions[i]->secondary.mspace);
+    }
   }
 }
 /* }}} */
