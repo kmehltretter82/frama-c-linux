@@ -165,6 +165,7 @@ static void memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
   /** Verify that the given size of a pointer matches the one in the present
    * architecture. This is a guard against Frama-C instrumentations using
    * architectures different to the given one. */
+  make_memory_spaces(64*MB, get_heap_size());
   arch_assert(ptr_size);
   /* Initialize report file with debug logs (only in debug mode). */
   initialize_report_file(argc_ref, argv_ref);
@@ -192,7 +193,6 @@ static void memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
 static void memory_clean(void) {
   clean_shadow_layout();
 }
-
 /* }}} */
 
 /* Public API Bindings {{{ */

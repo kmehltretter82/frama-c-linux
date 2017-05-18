@@ -74,6 +74,8 @@ char *strerror(int errnum);
 
 /*! \brief Size of a program's Thread-local storage (TLS) */
 #define PGM_TLS_SIZE (16 * MB)
+
+#define SHADOW_SEGMENT_PADDING (512*KB)
 /* }}} */
 
 /** Thread-local storage information {{{ */
@@ -176,10 +178,9 @@ static uintptr_t get_stack_start(int *argc_ref,  char *** argv_ref) {
 /* }}} */
 
 /** Program heap information {{{ */
-/*! \brief Return the start address of a program's heap. In this implementation
- * the start address on a program's heap is its initial breakpoint. */
+/*! \brief Return the start address of a program's heap. */
 static uintptr_t get_heap_start() {
-  return (uintptr_t)sbrk(0);
+  return (uintptr_t)mspace_least_addr(mem_spaces.application);
 }
 
 /*! \brief Return the tracked size of a program's heap. */
@@ -208,35 +209,7 @@ static size_t get_global_size() {
 }
 /** }}} */
 
-/** MMAP allocation {{{ */
-/*! \brief Allocate a memory block of `size` bytes with `mmap` and return a
- * pointer to its base address. Since this function is used to set-up shadowing
- * the program is aborted if `mmap` fails to allocate a new memory block. */
-static void *do_mmap(size_t size) {
-  void *res = mmap(0, size, PROT_READ|PROT_WRITE,
-    MAP_ANONYMOUS|MAP_PRIVATE, -1, (size_t)0);
-  if (res == MAP_FAILED) {
-    DLOG("<<< Request to allocate %lu MB with mmap failed >>>\n", MB_SZ(size));
-    vabort("mmap error: %s\n", strerror(errno));
-  }
-  /* Make sure that mmap returned a fully nullified mapping */
-  DVASSERT(zeroed_out(res, size),
-    "Memory mapping of size %lu at address %a not fully nullified", size, res);
-  return res;
-}
-/* }}} */
-
-/** Shadow Offset {{{ */
-/*! \brief Compute shadow offset between the start address of a shadow area
- * and a start address of a segment */
-static uintptr_t shadow_offset(void *shadow, uintptr_t start_addr) {
-  uintptr_t start_shadow = (uintptr_t)shadow;
-  return (start_shadow > start_addr) ?
-    start_shadow - start_addr : start_addr - start_shadow;
-}
-/* }}} */
-
-/** Program Layout {{{ */
+/** Shadow Layout {{{ */
 /*****************************************************************************
  * Memory Layout *************************************************************
  *****************************************************************************
@@ -271,193 +244,211 @@ static uintptr_t shadow_offset(void *shadow, uintptr_t start_addr) {
  *****************************************************************************
 NOTE: Above memory layout scheme generally applies to Linux Kernel/gcc/glibc.
   It is also an approximation slanted towards 64-bit virtual process layout.
-  In reality layouts may vary.
+  In reality layouts may vary. Also, With mmap allocations heap does not
+  necessarily grows from program break upwards. Typically mmap will allocate
+  memory somewhere closer to stack. */
 
-NOTE: With mmap allocations heap does not necessarily grows from program break
-  upwards. Typically mmap will allocate memory somewhere closer to stack. This
-  implementation, however, uses brk allocations, thus forcing stack to grow
-  upwards from program break.
-*/
+/* Struct representing a contigous memory region. Effectively this describes
+ * a memory segment, such as heap, stack or segments in the shadow memory
+ * used to track them. */
+struct memory_segment {
+  const char *name; //!< Symbolic name
+  size_t    size; //!< Byte-size
+  uintptr_t start; //!< Least address
+  uintptr_t end; //!< Greatest address
+  mspace    mspace; // !< Mspace used for the partition
+  /* The following are only set if the segment is a shadow segment */
+  struct memory_segment *parent; //!< Pointer to the tracked segment
+  size_t shadow_ratio; //!< Ratio of shadow to application memory
+  /*!< Offset between the start of the tracked segment and the start of this
+     segment */
+  intptr_t shadow_offset;
+};
+
+typedef struct memory_segment memory_segment;
 
 /* Struct representing a memory segment along with information about its
  * shadow spaces. */
-struct shadow_segment {
-  const char *name;
-  uintptr_t start; //!< Least address in the application segment
-  uintptr_t end; //!< Greatest address in the application segment
-  uintptr_t size; //!< Size of the tracked segment in application memory
-  /* Primary shadow space */
-  size_t    prim_size; //!< Byte-size of the primary shadow
-  size_t    prim_ratio; //! Ratio of shadow to application memory
-  uintptr_t prim_start; //!< Least address in the primary shadow
-  uintptr_t prim_end; //!< Greatest address in the primary shadow
-  uintptr_t prim_offset; //!< Primary shadow offset
-  /* Secondary shadow space */
-  size_t    sec_size; //!< Byte-size of shadow area
-  size_t    sec_ratio; //! Ratio of shadow to application memory
-  uintptr_t sec_start; //!< Least address in the secondary shadow
-  uintptr_t sec_end; //!< Greatest address in the secondary shadow
-  uintptr_t sec_offset; //!< Secondary shadow offset
+struct memory_partition {
+  memory_segment application; /* Application memory segment */
+  memory_segment primary; /* Primary shadow segment */
+  memory_segment secondary; /* Secondary shadow segment */
 };
 
-/*! \brief Full program memory layout. */
-static struct shadow_layout shd_layout;
+typedef struct memory_partition memory_partition;
 
-struct shadow_layout {
-  struct shadow_segment heap;
-  struct shadow_segment stack;
-  struct shadow_segment global;
-  struct shadow_segment tls;
+/* Struct representing memory layout of a program consisting of heap, stack,
+   global and tls segments */
+struct memory_layout {
+  memory_partition heap;
+  memory_partition stack;
+  memory_partition global;
+  memory_partition tls;
   int initialized;
 };
 
-/*! \brief Set a given memory segment and its shadow spaces.
- *
- * \param start - least address in an application's segment
- * \param size - byte size of a tracked application's segment
- * \param prim_ratio - compression ratio of the primary shadow segment
- * \param sec_ratio - compression ratio of the secondary shadow segment
- * \param name - segment name
-*/
-static void set_shadow_segment(struct shadow_segment *seg, uintptr_t start,
-    size_t size, size_t prim_ratio, size_t sec_ratio, const char *name) {
+/*! \brief Full program memory layout. */
+static struct memory_layout mem_layout;
 
+/*! \brief Initialize an application memory segment.
+ *
+ * \param seg - pointer to a segment to initialize
+ * \param start - least address in an application's segment
+ * \param size - size in bytes
+ * \param name - segment name
+ * \param msp - mspace used for this segment (defined only for heap) */
+static void set_application_segment(memory_segment *seg, uintptr_t start,
+    size_t size, const char *name, mspace msp) {
   seg->name = name;
   seg->start = start;
   seg->size = size;
+  seg->end = seg->start + seg->size;
+  seg->mspace = msp;
+  seg->parent = NULL;
+  seg->shadow_ratio = 0;
+  seg->shadow_offset = 0;
+}
+
+/*! \brief Set a shadow memory segment
+ *
+ * \param seg - pointer to a segment to initialize
+ * \param parent - pointer to the segment ::seg tracks. Should be initialized
+ * \param ratio - ratio of shadow to application memory
+ * \param name - symbolic name of the segment
+ */
+static void set_shadow_segment(memory_segment *seg, memory_segment *parent,
+    size_t ratio, const char *name) {
+  seg->parent = parent;
+  seg->name = name;
+  seg->shadow_ratio = ratio;
+  seg->size = parent->size/seg->shadow_ratio;
+  seg->mspace = create_mspace(seg->size + SHADOW_SEGMENT_PADDING, 0);
+  seg->start = (uintptr_t)mspace_least_addr(seg->mspace);
   seg->end = seg->start + seg->size - 1;
-
-  if (prim_ratio) {
-    seg->prim_ratio = prim_ratio;
-    seg->prim_size = seg->size/seg->prim_ratio;
-    void *prim_shadow = do_mmap(seg->prim_size);
-    seg->prim_start = (uintptr_t)prim_shadow;
-    seg->prim_end = seg->prim_start + seg->prim_size - 1;
-    seg->prim_offset = shadow_offset(prim_shadow, start);
-  } else {
-    seg->prim_start = seg->prim_end = seg->prim_offset = 0;
-  }
-
-  if (sec_ratio) {
-    seg->sec_ratio = sec_ratio;
-    seg->sec_size = seg->size/seg->sec_ratio;
-    void *sec_shadow = do_mmap(seg->sec_size);
-    seg->sec_start = (uintptr_t)sec_shadow;
-    seg->sec_end = seg->sec_start + seg->sec_size - 1;
-    seg->sec_offset = shadow_offset(sec_shadow, seg->start);
-  } else {
-    seg->sec_start = seg->sec_end = seg->sec_offset = 0;
-  }
+  seg->shadow_offset = parent->start - seg->start;
 }
 
 /*! \brief Initialize memory layout, i.e., determine bounds of program segments,
  * allocate shadow memory spaces and compute offsets. This function populates
- * global struct ::shd_layout holding that information with data. */
+ * global struct ::memory_layout holding that information with data. */
 static void init_shadow_layout(int *argc_ref, char ***argv_ref) {
-  /* Use DEBUG_PRINT_LAYOUT to output the details */
-  set_shadow_segment(&shd_layout.heap,
-    get_heap_start(), get_heap_size(), 1, 8, "heap");
-  set_shadow_segment(&shd_layout.stack,
-    get_stack_start(argc_ref, argv_ref), get_stack_size(), 1, 1, "stack");
-  set_shadow_segment(&shd_layout.global,
-    get_global_start(), get_global_size(), 1, 1, "global");
-  set_shadow_segment(&shd_layout.tls,
-    get_tls_start(), get_tls_size(), 1, 1, "tls");
-  shd_layout.initialized = 1;
+  memory_partition *pheap = &mem_layout.heap;
+  set_application_segment(&pheap->application, get_heap_start(),
+    get_heap_size(), "heap", mem_spaces.application);
+  set_shadow_segment(&pheap->primary, &pheap->application, 1, "heap_primary");
+  set_shadow_segment(&pheap->secondary, &pheap->application, 8, "heap_secondary");
+
+  memory_partition *pstack = &mem_layout.stack;
+  set_application_segment(&pstack->application, get_stack_start(argc_ref, argv_ref),
+    get_stack_size(), "stack", NULL);
+  set_shadow_segment(&pstack->primary, &pstack->application, 1, "stack_primary");
+  set_shadow_segment(&pstack->secondary, &pstack->application, 1, "stack_secondary");
+
+  memory_partition *pglobal = &mem_layout.global;
+  set_application_segment(&pglobal->application, get_global_start(),
+    get_global_size(), "global", NULL);
+  set_shadow_segment(&pglobal->primary, &pglobal->application, 1, "global_primary");
+  set_shadow_segment(&pglobal->secondary, &pglobal->application, 1, "global_secondary");
+
+  memory_partition *ptls = &mem_layout.tls;
+  set_application_segment(&ptls->application, get_tls_start(),
+    get_tls_size(), "tls", NULL);
+  set_shadow_segment(&ptls->primary, &ptls->application, 1, "tls_primary");
+  set_shadow_segment(&ptls->secondary, &ptls->application, 1, "tls_secondary");
+
+  mem_layout.initialized = 1;
 }
 
 /*! \brief Deallocate a shadow segment */
-void clean_shadow_segment(struct shadow_segment *seg) {
-  if (seg->prim_start)
-    munmap((void*)seg->prim_start, seg->prim_size);
-  if (seg->sec_start)
-    munmap((void*)seg->sec_start, seg->prim_size);
+void clean_memory_segment(struct memory_segment *seg) {
+  /* TODO */
 }
 
 /*! \brief Deallocate shadow regions used by runtime analysis */
 static void clean_shadow_layout() {
-  if (shd_layout.initialized) {
-    clean_shadow_segment(&shd_layout.heap);
-    clean_shadow_segment(&shd_layout.stack);
-    clean_shadow_segment(&shd_layout.global);
-    clean_shadow_segment(&shd_layout.tls);
+  if (mem_layout.initialized) {
+    /* TODO */
   }
 }
 /* }}} */
 
 /** Shadow access {{{
  *
- * In a typical case shadow regions reside in the high memory but below
- * stack. Provided that shadow displacement offsets are stored using
- * unsigned, integers computing some shadow address `S` of an application-space
- * address `A` using a shadow displacement offset `OFF` is as follows:
+ * Shadow displacement offsets are stored using signed integers.
+ * Displacement offset between an application memory space Ma and a shadow
+ * memory space Ms is computed by [min(Ma) - min(Ms)], where min(Ma) and min(Ms)
+ * denote least addresses in application and shadow spaces Ma and Ms respectively.
  *
- *  Stack address:
+ * Correspondense between a shadow address S and an application address A
+ * using a displacement offset OFF is therefore as follows:
+ *    OFF = A - S
  *    S = A - OFF
- *  Global, heap of RTL address:
- *    S = A + OFF
+ *    A = S + OFF
  *
  * Conversions between application-space and shadow memory addresses
- * are given using the following macros.
+ * are given by following macros.
 */
+
+#define heap_primary_offset     mem_layout.heap.primary.shadow_offset
+#define heap_secondary_offset   mem_layout.heap.secondary.shadow_offset
+#define stack_primary_offset    mem_layout.stack.primary.shadow_offset
+#define stack_secondary_offset  mem_layout.stack.secondary.shadow_offset
+#define global_primary_offset   mem_layout.global.primary.shadow_offset
+#define global_secondary_offset mem_layout.global.secondary.shadow_offset
+#define tls_primary_offset      mem_layout.tls.primary.shadow_offset
+#define tls_secondary_offset    mem_layout.tls.secondary.shadow_offset
 
 /*! \brief Compute a shadow address using displacement offset
  * @param _addr - an application space address
- * @param _offset - a shadow displacement offset
- * @param _direction - while displacement offsets are stored as unsigned
- * integers, _direction (`+` or `-`) indicates the sign of the offset. */
-#define SHADOW_ACCESS(_addr,_offset,_direction)  \
-  ((uintptr_t)((uintptr_t)_addr _direction _offset))
-
-/*! \brief Access to a shadow space below an application's segment */
-#define LOWER_SHADOW_ACCESS(_addr,_offset) \
-  SHADOW_ACCESS(_addr,_offset,-)
-
-/*! \brief Access to a shadow space above an application's segment */
-#define HIGHER_SHADOW_ACCESS(_addr,_offset) \
-  SHADOW_ACCESS(_addr,_offset,+)
+ * @param _offset - a shadow displacement offset */
+#define SHADOW_ACCESS(_addr,_offset)  \
+  ((intptr_t)((intptr_t)_addr - (intptr_t)_offset))
 
 /*! \brief Same as SHADOW_ACCESS but with an additional scale factor given via
  * _scale argument. Scale factor describes ratio of application to shadow bytes,
  * for instance if one bit shadow memory is used to track one byte of
- * application memory then the scale factor is 8. */
-#define SCALED_SHADOW_ACCESS(_addr,_start,_offset,_scale,_direction)  \
-  (_addr _direction \
-    (_offset - \
-      ((uintptr_t)_addr - _start) + \
-      ((uintptr_t)_addr - _start)/_scale))
+ * application memory then the scale factor is 8.
+ * Here, scale factor is the ration of application to shadow memory. */
+#define SCALED_SHADOW_ACCESS(_addr, _start, _offset, _scale)  \
+  (((uintptr_t)_start - _offset) + \
+   ((uintptr_t)_addr - (uintptr_t)_start)/_scale)
 
-/*! \brief Same as `LOWER_SHADOW_ACCESS` but with an additional scale factor */
-#define LOWER_SCALED_SHADOW_ACCESS(_addr,_start,_offset,_scale)  \
-  SCALED_SHADOW_ACCESS(_addr,_start,_offset,_scale, -)
+/*! \brief Convert a heap address into its shadow counterpart */
+#define HEAP_SHADOW(_addr) \
+  SHADOW_ACCESS(_addr, heap_primary_offset)
 
-/*! \brief Same as `HIGHER_SHADOW_ACCESS` but with an additional scale factor */
-#define HIGHER_SCALED_SHADOW_ACCESS(_addr,_start,_offset,_scale)  \
-  SCALED_SHADOW_ACCESS(_addr,_start,_offset,_scale, +)
+/*! \brief Convert a heap address into its init shadow counterpart */
+#define HEAP_INIT_SHADOW(_addr) \
+  SCALED_SHADOW_ACCESS(_addr, \
+      mem_layout.heap.application.start, \
+      mem_layout.heap.secondary.shadow_offset, \
+      mem_layout.heap.secondary.shadow_ratio)
+
+#define HEAP_START mem_layout.heap.application.start
 
 /*! \brief Convert a stack address into its primary shadow counterpart */
 #define PRIMARY_STACK_SHADOW(_addr) \
-  LOWER_SHADOW_ACCESS(_addr, shd_layout.stack.prim_offset)
+  SHADOW_ACCESS(_addr, stack_primary_offset)
 
 /*! \brief Convert a stack address into its secondary shadow counterpart */
 #define SECONDARY_STACK_SHADOW(_addr) \
-  LOWER_SHADOW_ACCESS(_addr, shd_layout.stack.sec_offset)
+  SHADOW_ACCESS(_addr, stack_secondary_offset)
 
 /*! \brief Convert a global address into its primary shadow counterpart */
 #define PRIMARY_GLOBAL_SHADOW(_addr)  \
-  HIGHER_SHADOW_ACCESS(_addr, shd_layout.global.prim_offset)
+  SHADOW_ACCESS(_addr, global_primary_offset)
 
 /*! \brief Convert a global address into its secondary shadow counterpart */
 #define SECONDARY_GLOBAL_SHADOW(_addr) \
-  HIGHER_SHADOW_ACCESS(_addr, shd_layout.global.sec_offset)
+  SHADOW_ACCESS(_addr, global_secondary_offset)
 
 /*! \brief Convert a TLS address into its primary shadow counterpart */
 #define PRIMARY_TLS_SHADOW(_addr)  \
-  LOWER_SHADOW_ACCESS(_addr, shd_layout.tls.prim_offset)
+  SHADOW_ACCESS(_addr, tls_primary_offset)
 
 /*! \brief Convert a TLS address into its secondary shadow counterpart */
 #define SECONDARY_TLS_SHADOW(_addr) \
-  LOWER_SHADOW_ACCESS(_addr, shd_layout.tls.sec_offset)
+  SHADOW_ACCESS(_addr, tls_secondary_offset)
 
 /* \brief Compute a primary or a secondary shadow address (based on the value of
  * parameter `_region`) of an address tracked via an offset-based encoding.
@@ -472,26 +463,13 @@ static void clean_shadow_layout() {
 /*! \brief Secondary shadow address of a non-dynamic region */
 #define SECONDARY_SHADOW(_addr) SHADOW_REGION_ADDRESS(_addr, SECONDARY)
 
-/*! \brief Convert a heap address into its shadow counterpart */
-#define HEAP_SHADOW(_addr) \
-  HIGHER_SHADOW_ACCESS(_addr, shd_layout.heap.prim_offset)
-
-#define HEAP_START shd_layout.heap.start
-
-/*! \brief Convert a heap address into its init shadow counterpart */
-#define HEAP_INIT_SHADOW(_addr) \
-  HIGHER_SCALED_SHADOW_ACCESS(_addr, \
-      shd_layout.heap.start, \
-      shd_layout.heap.sec_offset, \
-      shd_layout.heap.sec_ratio)
-
 /* }}} */
 
 /** Memory segment ranges {{{ */
 /*! \brief Evaluate to a true value if address _addr resides within a given
  * memory segment.
  * \param _addr - a memory address
- * \param _seg - a memory segment (one of the structs within ::shd_layout)
+ * \param _seg - a memory segment (one of the structs within ::mem_layout)
 */
 #define IS_ON(_addr,_seg) ( \
   ((uintptr_t)_addr) >= _seg.start && \
@@ -499,16 +477,16 @@ static void clean_shadow_layout() {
 )
 
 /*! \brief Evaluate to true if `_addr` is a heap address */
-#define IS_ON_HEAP(_addr) IS_ON(_addr, shd_layout.heap)
+#define IS_ON_HEAP(_addr) IS_ON(_addr, mem_layout.heap.application)
 
 /*! \brief Evaluate to true if `_addr` is a stack address */
-#define IS_ON_STACK(_addr) IS_ON(_addr, shd_layout.stack)
+#define IS_ON_STACK(_addr) IS_ON(_addr, mem_layout.stack.application)
 
 /*! \brief Evaluate to true if `_addr` is a global address */
-#define IS_ON_GLOBAL(_addr) IS_ON(_addr, shd_layout.global)
+#define IS_ON_GLOBAL(_addr) IS_ON(_addr, mem_layout.global.application)
 
 /*! \brief Evaluate to true if _addr is a TLS address */
-#define IS_ON_TLS(_addr) IS_ON(_addr, shd_layout.tls)
+#define IS_ON_TLS(_addr) IS_ON(_addr, mem_layout.tls.application)
 
 /*! \brief Shortcut for evaluating an address via ::IS_ON_STACK,
  * ::IS_ON_GLOBAL or ::IS_ON_TLS  */

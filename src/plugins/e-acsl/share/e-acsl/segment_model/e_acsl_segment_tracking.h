@@ -224,38 +224,43 @@ static const uint64_t static_readonly_masks [] = {
       "Heap base address %a is unaligned", _addr)
 
 #define DVALIDATE_MEMORY_INIT \
-  DVASSERT(shd_layout.initialized != 0, "Un-initialized shadow layout", NULL)
+  DVASSERT(mem_layout.initialized != 0, "Un-initialized shadow layout", NULL)
 
 /* Debug function making sure that the order of program segments is as expected
  * and that the program and the shadow segments used do not overlap. */
 static void validate_shadow_layout() {
   /* Check that the struct holding memory layout is marked as initialized. */
   DVALIDATE_MEMORY_INIT;
-  /* Make sure the order of program segments is as expected, i.e.,
-   * top to bottom: stack -> tls -> heap -> global */
 
-  #define NO_MEM_SEGMENTS 11
-  uintptr_t segments[NO_MEM_SEGMENTS][2] = {
-     {shd_layout.stack.start, shd_layout.stack.end},
-     {shd_layout.stack.prim_start, shd_layout.stack.prim_end},
-     {shd_layout.stack.sec_start, shd_layout.stack.sec_end},
-     {shd_layout.tls.start, shd_layout.tls.end},
-     {shd_layout.tls.prim_start, shd_layout.tls.prim_end},
-     {shd_layout.tls.sec_start, shd_layout.tls.sec_end},
-     {shd_layout.global.start, shd_layout.global.end},
-     {shd_layout.global.prim_start, shd_layout.global.prim_end},
-     {shd_layout.global.sec_start, shd_layout.global.sec_end},
-     {shd_layout.heap.start, shd_layout.heap.end},
-     {shd_layout.heap.prim_start, shd_layout.heap.prim_end}
+  memory_partition *partitions [] = {
+    &mem_layout.heap,
+    &mem_layout.stack,
+    &mem_layout.global,
+    &mem_layout.tls
   };
 
+  int mem_partitions = 4;
+  int mem_segments = mem_partitions*3;
+  uintptr_t segments[mem_segments][2];
+
+  size_t i;
+  for (i = 0; i < mem_partitions; i++) {
+    memory_partition *p = partitions[i];
+    segments[3*i][0] = p->application.start;
+    segments[3*i][1] = p->application.end;
+    segments[3*i+1][0] = p->primary.start;
+    segments[3*i+1][1] = p->primary.end;
+    segments[3*i+2][0] = p->secondary.start;
+    segments[3*i+2][1] = p->secondary.end;
+  }
+
   /* Make sure all segments (shadow or otherwise) are disjoint */
-  size_t i, j;
-  for (int i = 0; i < NO_MEM_SEGMENTS; i++) {
+  size_t j;
+  for (int i = 0; i < mem_segments; i++) {
     uintptr_t *src = segments[i];
     DVASSERT(src[0] < src[1],
       "Segment start is greater than segment end %lu < %lu\n", src[0], src[1]);
-    for (int j = 0; j < NO_MEM_SEGMENTS; j++) {
+    for (int j = 0; j < mem_segments; j++) {
       if (i != j) {
         uintptr_t *dest = segments[j];
         DVASSERT(src[1] < dest[0] || src[0] > dest[1],
@@ -264,13 +269,6 @@ static void validate_shadow_layout() {
       }
     }
   }
-
-  DVASSERT(shd_layout.stack.end > shd_layout.tls.end,
-      "Unexpected location of stack (above tls)", NULL);
-  DVASSERT(shd_layout.tls.end > shd_layout.heap.end,
-      "Unexpected location of tls (above heap)", NULL);
-  DVASSERT(shd_layout.heap.end > shd_layout.global.end,
-      "Unexpected location of heap (above global)", NULL);
 }
 
 /* Assert that memory layout has been initialized and all segments appear
@@ -421,12 +419,6 @@ static void validate_shadow_layout() {
 #endif
 /* }}} */
 
-/* Runtime assertions  {{{ */
-#define VALIDATE_HEAP_ALLOCATION(_res, _size) \
-  vassert(shd_layout.heap.end > (uintptr_t)_res + _size, \
-    "e-acsl error: Insufficient heap size %lu\n", E_ACSL_HEAP_SIZE);
-/* }}} */
-
 /* E-ACSL predicates {{{ */
 /* See definitions for documentation */
 static void *shadow_copy(const void *ptr, size_t size, int init);
@@ -566,8 +558,6 @@ static void shadow_alloca(void *ptr, size_t size) {
 /* }}} */
 
 /* Deletion of static blocks {{{ */
-
-void *__builtin_memset(void *s, int c, size_t n);
 
 /*! \brief Nullifies shadow regions of a memory block given by its address.
  * \param ptr - base memory address of the stack memory block. */
@@ -816,7 +806,7 @@ static void set_heap_segment(void *ptr, size_t size, size_t alloc_size,
 
   /* If init is a non-zero value then mark all allocated bytes as initialized */
   if (init) {
-    memset(HEAP_INIT_SHADOW(ptr), (unsigned int)ONE, alloc_size/8);
+    memset((void*)HEAP_INIT_SHADOW(ptr), (unsigned int)ONE, alloc_size/8);
   }
 }
 
@@ -841,7 +831,6 @@ static void* shadow_malloc(size_t size) {
 
   if (res) {
     /* Make sure there is sufficient room in shadow */
-    VALIDATE_HEAP_ALLOCATION(res, alloc_size);
     set_heap_segment(res, size, alloc_size, 0, "malloc");
   }
 
@@ -865,7 +854,6 @@ static void* shadow_calloc(size_t nmemb, size_t size) {
 
   if (res) {
     /* Make sure there is sufficient room in shadow */
-    VALIDATE_HEAP_ALLOCATION(res, alloc_size);
     memset(res, 0, size);
     set_heap_segment(res, size, alloc_size, 1, "calloc");
   }
@@ -902,7 +890,7 @@ static void unset_heap_segment(void *ptr, int init, const char *function) {
   heap_allocation_size -= length;
   /* Nullify init shadow */
   if (init) {
-    memset(HEAP_INIT_SHADOW(ptr), 0, alloc_size/8);
+    memset((void*)HEAP_INIT_SHADOW(ptr), 0, alloc_size/8);
   }
 }
 
@@ -933,7 +921,6 @@ static void* shadow_realloc(void *ptr, size_t size) {
     if (freeable(ptr)) { /* ... and can be used as an input to `free` */
       size_t alloc_size = ALLOC_SIZE(size);
       res = public_realloc(ptr, alloc_size);
-      VALIDATE_HEAP_ALLOCATION(res, alloc_size);
       DVALIDATE_ALIGNMENT(res);
 
       /* realloc succeeds, otherwise nothing needs to be done */
@@ -993,7 +980,6 @@ static void *shadow_aligned_alloc(size_t alignment, size_t size) {
   char *res = public_aligned_alloc(alignment, size);
 
   if (res) {
-    VALIDATE_HEAP_ALLOCATION(res, ALLOC_SIZE(size));
     set_heap_segment(res, size, ALLOC_SIZE(size), 0, "aligned_alloc");
   }
 
@@ -1016,7 +1002,6 @@ static int shadow_posix_memalign(void **memptr, size_t alignment, size_t size) {
 
   int res = public_posix_memalign(memptr, alignment, size);
   if (!res) {
-    VALIDATE_HEAP_ALLOCATION(*memptr, ALLOC_SIZE(size));
     set_heap_segment(*memptr, size, ALLOC_SIZE(size), 0, "posix_memalign");
   }
   return res;
@@ -1297,21 +1282,29 @@ static void print_shadows(uintptr_t addr, size_t size) {
     print_heap_shadows(addr);
 }
 
-static void print_shadow_segment(struct shadow_segment *seg, const char *name) {
-  DLOG(" --- %s ------------------------------------------\n", name);
-  DLOG("Segment:   %lu MB [%a, %a]\n", MB_SZ(seg->size), seg->start, seg->end);
-  DLOG("Primary:   %lu MB [%a, %a] {Offset: %lu}\n",
-    MB_SZ(seg->prim_size), seg->prim_start, seg->prim_end, seg->prim_offset);
-  DLOG("Secondary: %lu MB [%a, %a] {Offset: %lu}\n",
-    MB_SZ(seg->sec_size), seg->sec_start, seg->sec_end, seg->sec_offset);
+static void print_memory_segment(struct memory_segment *p, char *lab, int off) {
+  DLOG("   %s: %lu MB [%a, %a]", lab, MB_SZ(p->size), p->start, p->end);
+  if (off)
+    DLOG("{ Offset: %ld }", p->shadow_offset);
+  DLOG("\n");
+}
+
+static void print_memory_partition(struct memory_partition *p) {
+  print_memory_segment(&p->application, "Application", 0);
+  print_memory_segment(&p->primary, "Primary    ", 1);
+  print_memory_segment(&p->secondary, "Secondary  ", 1);
 }
 
 static void print_shadow_layout() {
-  print_shadow_segment(&shd_layout.heap, "Heap");
-  print_shadow_segment(&shd_layout.stack, "Stack");
-  print_shadow_segment(&shd_layout.global, "Global");
-  print_shadow_segment(&shd_layout.tls, "TLS");
-  DLOG("-----------------------------------------------------\n");
+  DLOG(">>> HEAP ------------\n");
+  print_memory_partition(&mem_layout.heap);
+  DLOG(">>> STACK -----------\n");
+  print_memory_partition(&mem_layout.stack);
+  DLOG(">>> GLOBAL ----------\n");
+  print_memory_partition(&mem_layout.global);
+  DLOG(">>> TLS -------------\n");
+  print_memory_partition(&mem_layout.tls);
+  DLOG(">>> -----------------\n");
 }
 
 /*! \brief Output the shadow segment the address belongs to */

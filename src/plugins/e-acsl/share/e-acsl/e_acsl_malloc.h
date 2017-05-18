@@ -56,16 +56,17 @@ static struct memory_spaces {
  * becomes barely readable ...*/
 
 /* Mspace allocators {{{ */
-extern mspace __e_acsl_create_mspace(size_t capacity, int locked);
-extern void*  __e_acsl_mspace_malloc(mspace msp, size_t bytes);
-extern void   __e_acsl_mspace_free(mspace msp, void* mem);
-extern void*  __e_acsl_mspace_calloc(mspace msp, size_t n_elements, size_t elem_size);
-extern void*  __e_acsl_mspace_realloc(mspace msp, void* mem, size_t newsize);
-extern void*  __e_acsl_mspace_aligned_alloc(mspace msp, size_t alignment, size_t bytes);
-extern int    __e_acsl_mspace_posix_memalign(mspace msp, void **memptr, size_t alignment, size_t bytes);
-extern size_t __e_acsl_mspace_footprint(mspace msp);
-extern size_t __e_acsl_mspace_max_footprint(mspace msp);
-extern size_t __e_acsl_mspace_footprint_limit(mspace msp);
+extern mspace __e_acsl_create_mspace(size_t, int);
+extern void*  __e_acsl_mspace_malloc(mspace, size_t);
+extern void   __e_acsl_mspace_free(mspace, void*);
+extern void*  __e_acsl_mspace_calloc(mspace msp, size_t, size_t);
+extern void*  __e_acsl_mspace_realloc(mspace msp, void*, size_t);
+extern void*  __e_acsl_mspace_aligned_alloc(mspace, size_t, size_t);
+extern int    __e_acsl_mspace_posix_memalign(mspace, void **, size_t, size_t);
+extern size_t __e_acsl_mspace_footprint(mspace);
+extern size_t __e_acsl_mspace_max_footprint(mspace);
+extern size_t __e_acsl_mspace_footprint_limit(mspace);
+extern void*  __e_acsl_mspace_least_addr(mspace);
 
 #define create_mspace          __e_acsl_create_mspace
 #define mspace_malloc          __e_acsl_mspace_malloc
@@ -77,6 +78,7 @@ extern size_t __e_acsl_mspace_footprint_limit(mspace msp);
 #define mspace_footprint       __e_acsl_mspace_footprint
 #define mspace_max_footprint   __e_acsl_mspace_max_footprint
 #define mspace_footprint_limit __e_acsl_mspace_footprint_limit
+#define mspace_least_addr      __e_acsl_mspace_least_addr
 /* }}} */
 
 /* Public allocators used within RTL to override standard allocation {{{ */
