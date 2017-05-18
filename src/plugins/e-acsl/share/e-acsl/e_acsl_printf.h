@@ -69,19 +69,6 @@
 #ifndef E_ACSL_PRINTF
 #define E_ACSL_PRINTF
 
-#include "e_acsl_syscall.h"
-#include <stdarg.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <unistd.h>
-#include <limits.h>
-#include <sys/stat.h>
-
-// For PATH_MAX in Linux
-#ifdef __linux__
-#  include <linux/limits.h>
-#endif
-
 /* ****************** */
 /* Public API         */
 /* ****************** */

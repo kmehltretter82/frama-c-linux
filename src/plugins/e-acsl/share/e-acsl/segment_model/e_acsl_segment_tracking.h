@@ -772,6 +772,11 @@ static size_t heap_allocation_size = 0;
  * does not exceed 64 bytes. */
 static void set_heap_segment(void *ptr, size_t size, size_t alloc_size,
     size_t init, const char *function) {
+
+  uintptr_t max_addr = (uintptr_t)ptr + alloc_size;
+  vassert(mem_spaces.end > max_addr,
+    "Exceeded heap allocation limit of %luMB\n", E_ACSL_HEAP_SIZE);
+
   DVALIDATE_MEMORY_INIT;
   /* Ensure the shadowed block in on the tracked heap portion */
   DVALIDATE_IS_ON_HEAP(((uintptr_t)ptr) - HEAP_SEGMENT, size);
@@ -819,8 +824,7 @@ static void* shadow_malloc(size_t size) {
   size_t alloc_size = ALLOC_SIZE(size);
 
   /* Return NULL if the size is too large to be aligned */
-  char* res = alloc_size ?
-    (char*)public_malloc(alloc_size) : NULL;
+  char* res = alloc_size ? (char*)public_malloc(alloc_size) : NULL;
 
   if (res) {
     /* Make sure there is sufficient room in shadow */

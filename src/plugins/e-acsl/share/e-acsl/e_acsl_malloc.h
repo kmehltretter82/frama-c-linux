@@ -49,6 +49,8 @@ typedef void* mspace;
 static struct memory_spaces {
   mspace rtl; /* `private` (RTL) mspace */
   mspace application;  /* `public` (application) mspace */
+  uintptr_t start; /* least address in application mspace */
+  uintptr_t end; /* greatest address in application mspace */
 } mem_spaces;
 
 /* While it is possible to generate prefixes using an extra level of
@@ -122,6 +124,8 @@ void __e_acsl_private_free(void *p) {
 void make_memory_spaces(size_t rtl_size, size_t application_size) {
   mem_spaces.rtl = create_mspace(rtl_size, 0);
   mem_spaces.application = create_mspace(application_size, 0);
+  mem_spaces.start = (uintptr_t)mspace_least_addr(mem_spaces.application);
+  mem_spaces.end = mem_spaces.start + application_size;
 }
 
 /* \return a true value if x is a power of 2 and false otherwise */

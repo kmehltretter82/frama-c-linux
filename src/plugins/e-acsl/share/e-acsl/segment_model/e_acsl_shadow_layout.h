@@ -75,6 +75,10 @@ char *strerror(int errnum);
 /*! \brief Size of a program's Thread-local storage (TLS) */
 #define PGM_TLS_SIZE (16 * MB)
 
+/*! \brief Mspace padding used by shadow segments. This is to make sure that
+ * some allocation which exceeds the size of an initial memspace does not
+ * move the mspace somewhere else. 512KB is a bit of an overkill, but should
+ * not hurt too much in general unless memory space is really a constraint */
 #define SHADOW_SEGMENT_PADDING (512*KB)
 /* }}} */
 

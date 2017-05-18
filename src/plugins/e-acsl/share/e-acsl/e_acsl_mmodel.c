@@ -25,12 +25,23 @@
  * \brief Configuration macros and RTL assembly
 ***************************************************************************/
 #include <stddef.h>
+#include <stdint.h>
 #include <sys/mman.h>
 #include <errno.h>
 #include <sys/resource.h>
 #include <sys/wait.h>
+#include <stdarg.h>
+#include <unistd.h>
+#include <limits.h>
+#include <sys/stat.h>
+
+/* For PATH_MAX in Linux */
+#ifdef __linux__
+#  include <linux/limits.h>
+#endif
 
 #include "e_acsl_alias.h"
+#include "e_acsl_syscall.h"
 #include "e_acsl_malloc.h"
 #include "e_acsl_string.h"
 #include "e_acsl_bits.h"
