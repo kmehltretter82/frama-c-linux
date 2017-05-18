@@ -15,6 +15,7 @@
   __e_acsl_heap_allocation_size ∈ [--..--]
   T1[0..2] ∈ {0}
   T2[0..3] ∈ {0}
+[value] using specification for function __e_acsl_memory_init
 tests/gmp/array.i:10:[value] entering loop for the first time
 tests/gmp/array.i:11:[value] entering loop for the first time
 tests/gmp/array.i:13:[value] warning: assertion got status unknown.

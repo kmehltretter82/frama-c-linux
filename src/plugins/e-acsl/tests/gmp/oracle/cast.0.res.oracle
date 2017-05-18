@@ -15,6 +15,7 @@ tests/gmp/cast.i:23:[e-acsl] warning: approximating a real number by a float
   __e_acsl_init ∈ [--..--]
   __e_acsl_internal_heap ∈ [--..--]
   __e_acsl_heap_allocation_size ∈ [--..--]
+[value] using specification for function __e_acsl_memory_init
 [value] using specification for function __e_acsl_assert
 [value] user error: type long double not implemented. Using double instead
 [value] done for function main

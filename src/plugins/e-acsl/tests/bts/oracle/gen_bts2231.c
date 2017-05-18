@@ -4,6 +4,7 @@ long A = (long)0;
 int main(void)
 {
   int __retres;
+  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   /*@ assert A + (long)((long)(3 * A) - 1) ≡ -1; */
   {
     __e_acsl_mpz_t __gen_e_acsl_A;

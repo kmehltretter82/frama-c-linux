@@ -8,6 +8,7 @@ int main(void);
 int __gen_e_acsl_main(void)
 {
   int __retres;
+  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   goto L1;
   L1:
   /*@ assert X ≡ 0; */

@@ -4,6 +4,7 @@ int main(void)
 {
   int __retres;
   int x;
+  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   /*@ assert 0 ≡ 0; */
   {
     __e_acsl_mpz_t __gen_e_acsl_;
