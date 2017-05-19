@@ -47,10 +47,10 @@
 typedef void* mspace;
 
 static struct memory_spaces {
-  mspace rtl; /* `private` (RTL) mspace */
-  mspace application;  /* `public` (application) mspace */
-  uintptr_t start; /* least address in application mspace */
-  uintptr_t end; /* greatest address in application mspace */
+  mspace rtl_mspace; /* `private` (RTL) mspace */
+  mspace heap_mspace;  /* `public` (application) mspace */
+  uintptr_t heap_start; /* least address in application mspace */
+  uintptr_t heap_end; /* greatest address in application mspace */
 } mem_spaces;
 
 /* While it is possible to generate prefixes using an extra level of
@@ -66,10 +66,6 @@ extern void*  __e_acsl_mspace_calloc(mspace msp, size_t, size_t);
 extern void*  __e_acsl_mspace_realloc(mspace msp, void*, size_t);
 extern void*  __e_acsl_mspace_aligned_alloc(mspace, size_t, size_t);
 extern int    __e_acsl_mspace_posix_memalign(mspace, void **, size_t, size_t);
-extern size_t __e_acsl_mspace_footprint(mspace);
-extern size_t __e_acsl_mspace_max_footprint(mspace);
-extern size_t __e_acsl_mspace_footprint_limit(mspace);
-extern void*  __e_acsl_mspace_least_addr(mspace);
 
 #define create_mspace          __e_acsl_create_mspace
 #define destroy_mspace         __e_acsl_destroy_mspace
@@ -79,37 +75,33 @@ extern void*  __e_acsl_mspace_least_addr(mspace);
 #define mspace_realloc         __e_acsl_mspace_realloc
 #define mspace_posix_memalign  __e_acsl_mspace_posix_memalign
 #define mspace_aligned_alloc   __e_acsl_mspace_aligned_alloc
-#define mspace_footprint       __e_acsl_mspace_footprint
-#define mspace_max_footprint   __e_acsl_mspace_max_footprint
-#define mspace_footprint_limit __e_acsl_mspace_footprint_limit
-#define mspace_least_addr      __e_acsl_mspace_least_addr
 /* }}} */
 
 /* Public allocators used within RTL to override standard allocation {{{ */
 /* Shortcuts for public allocation functions */
-# define public_malloc(...)         mspace_malloc(mem_spaces.application, __VA_ARGS__)
-# define public_realloc(...)        mspace_realloc(mem_spaces.application, __VA_ARGS__)
-# define public_calloc(...)         mspace_calloc(mem_spaces.application, __VA_ARGS__)
-# define public_free(...)           mspace_free(mem_spaces.application, __VA_ARGS__)
-# define public_aligned_alloc(...)  mspace_aligned_alloc(mem_spaces.application, __VA_ARGS__)
-# define public_posix_memalign(...) mspace_posix_memalign(mem_spaces.application, __VA_ARGS__)
+# define public_malloc(...)         mspace_malloc(mem_spaces.heap_mspace, __VA_ARGS__)
+# define public_realloc(...)        mspace_realloc(mem_spaces.heap_mspace, __VA_ARGS__)
+# define public_calloc(...)         mspace_calloc(mem_spaces.heap_mspace, __VA_ARGS__)
+# define public_free(...)           mspace_free(mem_spaces.heap_mspace, __VA_ARGS__)
+# define public_aligned_alloc(...)  mspace_aligned_alloc(mem_spaces.heap_mspace, __VA_ARGS__)
+# define public_posix_memalign(...) mspace_posix_memalign(mem_spaces.heap_mspace, __VA_ARGS__)
 /* }}} */
 
 /* Private allocators usable within RTL and GMP {{{ */
 void * __e_acsl_private_malloc(size_t sz) {
-  return mspace_malloc(mem_spaces.rtl, sz);
+  return mspace_malloc(mem_spaces.rtl_mspace, sz);
 }
 
 void *__e_acsl_private_calloc(size_t nmemb, size_t sz) {
-  return mspace_calloc(mem_spaces.rtl, nmemb, sz);
+  return mspace_calloc(mem_spaces.rtl_mspace, nmemb, sz);
 }
 
 void *__e_acsl_private_realloc(void *p, size_t sz) {
-  return mspace_realloc(mem_spaces.rtl, p, sz);
+  return mspace_realloc(mem_spaces.rtl_mspace, p, sz);
 }
 
 void __e_acsl_private_free(void *p) {
-  mspace_free(mem_spaces.rtl, p);
+  mspace_free(mem_spaces.rtl_mspace, p);
 }
 
 #define private_malloc  __e_acsl_private_malloc
@@ -121,11 +113,18 @@ void __e_acsl_private_free(void *p) {
 /* \brief Create two memory spaces, one for RTL and the other for application
    memory. This function *SHOULD* be called before any allocations are made
    otherwise execution fails */
-void make_memory_spaces(size_t rtl_size, size_t application_size) {
-  mem_spaces.rtl = create_mspace(rtl_size, 0);
-  mem_spaces.application = create_mspace(application_size, 0);
-  mem_spaces.start = (uintptr_t)mspace_least_addr(mem_spaces.application);
-  mem_spaces.end = mem_spaces.start + application_size;
+static void make_memory_spaces(size_t rtl_size, size_t heap_size) {
+  mem_spaces.rtl_mspace = create_mspace(rtl_size, 0);
+  mem_spaces.heap_mspace = create_mspace(heap_size, 0);
+  /* Do not use `mspace_least_addr` here, as it returns the address of the
+     mspace header. */
+  mem_spaces.heap_start = (uintptr_t)mspace_malloc(mem_spaces.heap_mspace,1);
+  mem_spaces.heap_end = mem_spaces.heap_start + heap_size;
+}
+
+static void destroy_memory_spaces() {
+  destroy_mspace(mem_spaces.rtl_mspace);
+  destroy_mspace(mem_spaces.heap_mspace);
 }
 
 /* \return a true value if x is a power of 2 and false otherwise */

@@ -66,7 +66,7 @@ typedef struct {
  *
  * \return NUL-terminated C string on success
  * \return NULL on failure */
-char* fd_read (int fd, short bufsize) {
+static char* fd_read (int fd, short bufsize) {
   /* Read `buffer_size` chars at a time */
   short buffer_size = bufsize*sizeof(char);
   /* Size of the fetched string */
@@ -93,7 +93,7 @@ char* fd_read (int fd, short bufsize) {
 }
 
 /* Execute a command in the shell and place results to data */
-ipr_t* __shexec (ipr_t *data) {
+static ipr_t* __shexec (ipr_t *data) {
   int outfd[2], errfd[2], infd[2];
   int oldstdout, oldstderr, oldstdin;
 
@@ -179,7 +179,7 @@ ipr_t* __shexec (ipr_t *data) {
 }
 
 /* \brief Deallocate an `ipr_t` structure returned by `shexec` */
-void free_ipr (ipr_t* ipr) {
+static void free_ipr (ipr_t* ipr) {
   if (ipr) {
     if (ipr->stdouts)
       private_free(ipr->stdouts);

@@ -184,7 +184,7 @@ static uintptr_t get_stack_start(int *argc_ref,  char *** argv_ref) {
 /** Program heap information {{{ */
 /*! \brief Return the start address of a program's heap. */
 static uintptr_t get_heap_start() {
-  return (uintptr_t)mspace_least_addr(mem_spaces.application);
+  return mem_spaces.heap_start;
 }
 
 /*! \brief Return the tracked size of a program's heap. */
@@ -248,7 +248,7 @@ static size_t get_global_size() {
  *****************************************************************************
 NOTE: Above memory layout scheme generally applies to Linux Kernel/gcc/glibc.
   It is also an approximation slanted towards 64-bit virtual process layout.
-  In reality layouts may vary. Also, With mmap allocations heap does not
+  In reality layouts may vary. Also, with mmap allocations heap does not
   necessarily grows from program break upwards. Typically mmap will allocate
   memory somewhere closer to stack. */
 
@@ -335,7 +335,7 @@ static void set_shadow_segment(memory_segment *seg, memory_segment *parent,
   seg->shadow_ratio = ratio;
   seg->size = parent->size/seg->shadow_ratio;
   seg->mspace = create_mspace(seg->size + SHADOW_SEGMENT_PADDING, 0);
-  seg->start = (uintptr_t)mspace_least_addr(seg->mspace);
+  seg->start = (uintptr_t)mspace_malloc(seg->mspace,1);
   seg->end = seg->start + seg->size - 1;
   seg->shadow_offset = parent->start - seg->start;
 }
@@ -346,7 +346,7 @@ static void set_shadow_segment(memory_segment *seg, memory_segment *parent,
 static void init_shadow_layout(int *argc_ref, char ***argv_ref) {
   memory_partition *pheap = &mem_layout.heap;
   set_application_segment(&pheap->application, get_heap_start(),
-    get_heap_size(), "heap", mem_spaces.application);
+    get_heap_size(), "heap", mem_spaces.heap_mspace);
   set_shadow_segment(&pheap->primary, &pheap->application, 1, "heap_primary");
   set_shadow_segment(&pheap->secondary, &pheap->application, 8, "heap_secondary");
 

@@ -774,7 +774,7 @@ static void set_heap_segment(void *ptr, size_t size, size_t alloc_size,
     size_t init, const char *function) {
 
   uintptr_t max_addr = (uintptr_t)ptr + alloc_size;
-  vassert(mem_spaces.end > max_addr,
+  vassert(mem_spaces.heap_end > max_addr,
     "Exceeded heap allocation limit of %luMB\n", E_ACSL_HEAP_SIZE);
 
   DVALIDATE_MEMORY_INIT;
@@ -1123,7 +1123,7 @@ static int heap_initialized(uintptr_t addr, long len) {
       return 0;
   }
   if (len > 0)
-    return checkbits(len,shadow);
+    return checkbits(len, shadow);
   return 1;
 }
 
