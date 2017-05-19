@@ -29,6 +29,8 @@ void f(void)
 
 void __e_acsl_globals_init(void)
 {
+  __e_acsl_store_block((void *)(& f),(size_t)1);
+  __e_acsl_full_init((void *)(& f));
   __e_acsl_store_block((void *)(& __fc_wctomb_state),(size_t)4);
   __e_acsl_full_init((void *)(& __fc_wctomb_state));
   __e_acsl_store_block((void *)(& __fc_mbtowc_state),(size_t)4);
@@ -57,6 +59,7 @@ int main(void)
                   (char *)"&x == &x",16);
   __e_acsl_full_init((void *)(& __retres));
   __retres = 0;
+  __e_acsl_delete_block((void *)(& f));
   __e_acsl_delete_block((void *)(& __fc_wctomb_state));
   __e_acsl_delete_block((void *)(& __fc_mbtowc_state));
   __e_acsl_delete_block((void *)(& __fc_mblen_state));

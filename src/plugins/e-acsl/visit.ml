@@ -161,9 +161,6 @@ class e_acsl_visitor prj generate = object (self)
           if must_init then begin
             let build_initializer () =
               Options.feedback ~dkey ~level:2 "building global initializer.";
-              let return =
-                Cil.mkStmt ~valid_sid:true (Return(None, Location.unknown))
-              in
               let env = Env.push !function_env in
               let stmts, env =
                 Varinfo.Hashtbl.fold_sorted
@@ -193,7 +190,7 @@ class e_acsl_visitor prj generate = object (self)
                     | Some (SingleInit e) ->
                       let _, env = self#literal_string env e in stmts, env)
                   global_vars
-                  ([ return ], env)
+                  ([ ], env)
               in
               let stmts =
                 (* literal strings initialization *)
@@ -209,6 +206,20 @@ class e_acsl_visitor prj generate = object (self)
                     :: stmts)
                   stmts
               in
+              (* Generate init statements for temporal analysis *)
+              let tinit_stmts = Varinfo.Hashtbl.fold
+                (fun vi (off, init) acc ->
+                  match init with
+                  | Some init ->
+                    let stmt = Temporal.handle_global_init vi off init env in
+                      (match stmt with | Some stmt -> stmt :: acc | None -> acc)
+                  | None -> acc)
+                global_vars
+                []
+              in
+              let return =
+                Cil.mkStmt ~valid_sid:true (Return(None, Location.unknown)) in
+              let stmts = stmts @ tinit_stmts @ [return] in
               (* Create a new code block with generated statements *)
               let (b, env), stmts = match stmts with
                 | [] -> assert false
@@ -371,7 +382,10 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         ()
     in
     (match g with
-    | GVar(vi, _, _) | GVarDecl(vi, _) ->
+    | GVar(vi, _, _) | GVarDecl(vi, _) | GFun({ svar = vi }, _)
+      (* Track function addresses but the main function that is tracked
+         internally via RTL *)
+        when vi.vorig_name <> Kernel.MainFunction.get () ->
       (* Make a unique mapping for each global variable omitting initializers.
        Initializers (used to capture literal strings) are added to
        [global_vars] via the [vinit] visitor method (see comments below). *)
@@ -531,7 +545,8 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         (* JS: should be done in the new project? *)
         let env =
           if generate && not is_main then
-            Memory.store env kf (Kernel_function.get_formals kf)
+            let env = Memory.store env kf (Kernel_function.get_formals kf) in
+            Temporal.handle_arguments kf env
           else
             env
         in
@@ -581,6 +596,8 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       let env = !function_env in
       let env =
         if generate then
+          (* Add temporal analysis instrumentations *)
+          let env = Temporal.handle_stmt stmt env in
           (* Add initialization statements and store_block statements stemming
              from Local_init *)
             self#add_initializers stmt env kf

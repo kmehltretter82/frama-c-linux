@@ -66,8 +66,6 @@ PLUGIN_CMO:= local_config \
 	gmpz \
 	literal_strings \
 	mmodel_analysis \
-	temporal \
-	prepare_ast \
 	dup_functions \
 	exit_points \
 	label \
@@ -76,6 +74,8 @@ PLUGIN_CMO:= local_config \
 	typing \
 	quantif \
 	translate \
+	temporal \
+	prepare_ast \
 	loops \
 	visit \
 	main
