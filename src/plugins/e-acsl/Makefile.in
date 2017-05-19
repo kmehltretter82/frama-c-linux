@@ -66,6 +66,7 @@ PLUGIN_CMO:= local_config \
 	gmpz \
 	literal_strings \
 	mmodel_analysis \
+	temporal \
 	prepare_ast \
 	dup_functions \
 	exit_points \
