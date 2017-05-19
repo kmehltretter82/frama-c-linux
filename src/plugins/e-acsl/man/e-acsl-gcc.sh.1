@@ -99,6 +99,9 @@ use the \fBFrama-C\fP standard library instead of a system-wide one.
 .B -M, --full-mmodel
 maximize memory-related instrumentation.
 .TP
+.B --temporal
+enable checking for temporal memory errors in \\\fBvalid\fP and \\\fBvalid_read\fP predicates.
+.TP
 .B --weak-validity
 enable notion of weak validity. By default expression \fB(p+i)\fP, where \fBp\fP
 is a pointer and \fBi\fP is an integer offset is deemed valid if both addresses
