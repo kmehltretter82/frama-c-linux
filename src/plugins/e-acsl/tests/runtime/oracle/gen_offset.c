@@ -48,7 +48,7 @@ int main(void)
   }
   int a[4] = {1, 2, 3, 4};
   __e_acsl_store_block((void *)(a),(size_t)16);
-  __e_acsl_full_init((void *)(a));
+  __e_acsl_full_init((void *)(& a));
   /*@ assert \offset((int *)a) ≡ 0; */
   {
     int __gen_e_acsl_offset_5;

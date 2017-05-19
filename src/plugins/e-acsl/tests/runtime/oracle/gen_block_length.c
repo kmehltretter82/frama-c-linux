@@ -77,7 +77,7 @@ int main(void)
   }
   int a[4] = {1, 2, 3, 4};
   __e_acsl_store_block((void *)(a),(size_t)16);
-  __e_acsl_full_init((void *)(a));
+  __e_acsl_full_init((void *)(& a));
   int *pa = (int *)(& a);
   __e_acsl_store_block((void *)(& pa),(size_t)8);
   __e_acsl_full_init((void *)(& pa));

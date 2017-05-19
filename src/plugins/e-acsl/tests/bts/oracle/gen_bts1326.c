@@ -37,7 +37,7 @@ int main(void)
   __e_acsl_store_block((void *)(& av),(size_t)4);
   ArrayInt Accel = {1, 2, 3, 4, 5};
   __e_acsl_store_block((void *)(Accel),(size_t)20);
-  __e_acsl_full_init((void *)(Accel));
+  __e_acsl_full_init((void *)(& Accel));
   __gen_e_acsl_atp_NORMAL_computeAverageAccel(& Accel,& av);
   __retres = 0;
   __e_acsl_delete_block((void *)(& av));

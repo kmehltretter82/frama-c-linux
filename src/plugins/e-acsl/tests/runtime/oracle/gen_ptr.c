@@ -9,7 +9,7 @@ int main(void)
   __e_acsl_full_init((void *)(& x));
   int t[3] = {2, 3, 4};
   __e_acsl_store_block((void *)(t),(size_t)12);
-  __e_acsl_full_init((void *)(t));
+  __e_acsl_full_init((void *)(& t));
   int *p = & x;
   __e_acsl_store_block((void *)(& p),(size_t)8);
   __e_acsl_full_init((void *)(& p));
