@@ -690,7 +690,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
             in
             (match stmt.skind with
             | Instr (Local_init (vi, _, _)) when
-                Mmodel_analysis.old_must_model_vi self#behavior ~kf vi ->
+                Mmodel_analysis.must_model_vi ~bhv:self#behavior ~kf vi ->
               let vi = Cil.get_varinfo self#behavior vi in
               (* must generate the new stmts after the declaration of [vi] *)
               post_block.bstmts <-
@@ -769,7 +769,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         let add_locals stmts =
           List.fold_left
             (fun acc vi ->
-              if Mmodel_analysis.old_must_model_vi self#behavior ~kf vi then
+              if Mmodel_analysis.must_model_vi ~bhv:self#behavior ~kf vi then
                 Misc.mk_delete_stmt vi :: acc
               else
                 acc)
