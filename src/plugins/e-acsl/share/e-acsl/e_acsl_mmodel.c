@@ -51,6 +51,7 @@
 #include "e_acsl_trace.h"
 #include "e_acsl_assert.h"
 #include "e_acsl_safe_locations.h"
+#include "e_acsl_temporal_timestamp.h"
 
 /* Memory model settings
  *    Memory model:
@@ -95,6 +96,10 @@ static void describe_run();
 #  error "No E-ACSL memory model defined. Aborting compilation"
 #endif
 
+/* This header contains temporal analysis shared by both models.
+   It should be here as it uses macros differently defined macros */
+#include "e_acsl_temporal.h"
+
 #ifdef E_ACSL_WEAK_VALIDITY
 # define E_ACSL_VALIDITY_DESC "weak"
 #else
@@ -113,6 +118,7 @@ static void describe_run() {
 #else
   printf(" * Memory tracking: patricia trie\n" );
 #endif
+  printf(" * Temporal checks: %s\n", E_ACSL_TEMPORAL_DESC);
   printf(" * Execution mode:  %s\n", E_ACSL_DEBUG_DESC);
   printf(" * Assertions mode: %s\n", E_ACSL_ASSERT_NO_FAIL_DESC);
   printf(" * Validity notion: %s\n", E_ACSL_VALIDITY_DESC);

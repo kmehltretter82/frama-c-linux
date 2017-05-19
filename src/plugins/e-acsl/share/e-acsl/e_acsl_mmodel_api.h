@@ -234,4 +234,79 @@ extern size_t __e_acsl_heap_allocation_size;
 /*@predicate diffSize{L1,L2}(integer i) =
   \at(__e_acsl_heap_allocation_size, L1)
     - \at(__e_acsl_heap_allocation_size, L2) == i; */
+
+/***********************************************/
+/************ Temporal analysis API ************/
+/***********************************************/
+
+/*! \brief Take origin number of a memory block containing `block_addr` and
+ * store it as a referent number of a pointer given by `ptr_addr`. */
+/*@ assigns \nothing; */
+void __e_acsl_temporal_store_nblock(void *ptr_addr, void *block_addr)
+  __attribute__((FC_BUILTIN));
+
+/*! \brief Same as `__e_acsl_temporal_store_nblock` but take a referent
+ * number of `block_addr` instead */
+/*@ assigns \nothing; */
+void __e_acsl_temporal_store_nreferent(void *ptr_addr, void *block_addr)
+  __attribute__((FC_BUILTIN));
+
+/*! \brief store struct { .ptr = ptr, .temporal_flow = TReferentN }
+ *  in the global parameter array. */
+/*@ assigns \nothing; */
+void __e_acsl_temporal_save_nreferent_parameter(void *ptr, unsigned int param)
+  __attribute__((FC_BUILTIN));
+
+/*! \brief store struct { .ptr = ptr, .temporal_flow = TBlockN }
+ *  in the global parameter array. */
+/*@ assigns \nothing; */
+void __e_acsl_temporal_save_nblock_parameter(void *ptr, unsigned int param)
+  __attribute__((FC_BUILTIN));
+
+/*! \brief store struct { .ptr = ptr, .temporal_flow = TCopy } in the global
+ *  parameter array. */
+/*@ assigns \nothing; */
+void __e_acsl_temporal_save_copy_parameter(void *ptr, unsigned int param)
+  __attribute__((FC_BUILTIN));
+
+/*! \brief Assign a referent number of `ptr` based on the record in the global
+ * parameter array at index `param`. */
+/*@ assigns \nothing; */
+void __e_acsl_temporal_pull_parameter(void *ptr, unsigned int param, size_t size)
+  __attribute__((FC_BUILTIN));
+
+/*! \brief Nullify global parameter array  */
+/*@ assigns \nothing; */
+void __e_acsl_temporal_reset_parameters()
+  __attribute__((FC_BUILTIN));
+
+/*! \brief Save temporal referent number of `ptr` in a placeholder variable
+ * tracking the referent number of a function's return. */
+/*@ assigns \nothing; */
+void __e_acsl_temporal_save_return(void *ptr)
+  __attribute__((FC_BUILTIN));
+
+/*! \brief Take a temporal referent stored in the placeholder tracking return
+ * values  as a temporal referent number of `ptr`. */
+/*@ assigns \nothing; */
+void __e_acsl_temporal_pull_return(void *ptr)
+  __attribute__((FC_BUILTIN));
+
+/*! \brief Nullify a placeholder variable tracking the referent number of a
+ * function's return. */
+/*@ assigns \nothing; */
+void __e_acsl_temporal_reset_return()
+  __attribute__((FC_BUILTIN));
+
+/*! \brief Copy temporal shadow data from [src, src + size] to
+ * [dest, dest + size]. Counterpart of the memcpy function */
+/*@ assigns \nothing; */
+void __e_acsl_temporal_memcpy(void *dest, void *src, size_t size)
+  __attribute__((FC_BUILTIN));
+
+/*! \brief Set temporal shadow data from [src, src + size] to 0.
+ * Counterpart of memset the function */
+/*@ assigns \nothing; */
+void __e_acsl_temporal_memset(void *dest, int n, size_t size)
+  __attribute__((FC_BUILTIN));
 #endif

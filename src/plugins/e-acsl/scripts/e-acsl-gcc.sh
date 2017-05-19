@@ -246,8 +246,8 @@ LONGOPTIONS="help,compile,compile-only,debug:,ocode:,oexec:,verbose:,
   ld-flags:,cpp-flags:,frama-c-extra:,memory-model:,keep-going,
   frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:
   print-mmodels,rt-debug,rte-select:,then,e-acsl-extra:,check,
-  weak-validity,stack-size:,heap-size:,rt-verbose"
-SHORTOPTIONS="h,c,C,d:,D,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,I:,G:,X,a:,k,V"
+  temporal,weak-validity,stack-size:,heap-size:,rt-verbose"
+SHORTOPTIONS="h,c,C,d:,D,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,I:,G:,X,a:,T,k,V"
 # Prefix for an error message due to wrong arguments
 ERROR="ERROR parsing arguments:"
 
@@ -275,6 +275,7 @@ OPTION_FRAMAC_CPP_EXTRA="-D__NO_CTYPE"   # Extra CPP flags for Frama-C*
 OPTION_EACSL_MMODELS="segment"           # Memory model used
 OPTION_EACSL_SHARE=                      # Custom E-ACSL share directory
 OPTION_INSTRUMENTED_ONLY=                # Do not compile original code
+OPTION_TEMPORAL=                         # Enable temporal analysis
 OPTION_WEAK_VALIDITY=                       # Use notion of weak validity
 OPTION_RTE=                              # Enable assertion generation
 OPTION_CHECK=                            # Check AST integrity
@@ -503,7 +504,12 @@ do
       FRAMAC_FLAGS="-check $FRAMAC_FLAGS"
       shift;
     ;;
-     # A memory model  (or models) to link against
+    # Enable instrumentations of temporal validity analysis
+    -T|--temporal)
+      shift;
+      OPTION_TEMPORAL=-e-acsl-temporal-validity
+    ;;
+    # A memory model  (or models) to link against
     -m|--memory-model)
       shift;
       # Convert comma-separated string into white-space separated string

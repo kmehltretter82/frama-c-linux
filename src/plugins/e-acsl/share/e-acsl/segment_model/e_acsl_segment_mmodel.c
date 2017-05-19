@@ -77,12 +77,21 @@ static int readonly (void *ptr) {
 
 static int valid(void * ptr, size_t size, void *ptr_base, void *addrof_base) {
   return
-    allocated((uintptr_t)ptr, size, (uintptr_t)ptr_base) &&
-    !readonly(ptr);
+    allocated((uintptr_t)ptr, size, (uintptr_t)ptr_base)
+    && !readonly(ptr)
+#ifdef E_ACSL_TEMPORAL
+    && temporal_valid(ptr_base, addrof_base)
+#endif
+  ;
 }
 
 static int valid_read(void * ptr, size_t size, void *ptr_base, void *addrof_base) {
-  return allocated((uintptr_t)ptr, size, (uintptr_t)ptr_base);
+  return allocated((uintptr_t)ptr, size, (uintptr_t)ptr_base)
+#ifdef E_ACSL_TEMPORAL
+    && temporal_valid(ptr_base, addrof_base)
+#endif
+  ;
+
 }
 
 /*! NB: The implementation for this function can also be specified via
@@ -145,15 +154,41 @@ static void argv_alloca(int *argc_ref,  char *** argv_ref) {
   /* Track argument strings */
   while (*argv) {
     size_t arglen = strlen(*argv) + 1;
+#ifdef E_ACSL_TEMPORAL
+    /* Move `argv` strings to heap. This is because they are allocated
+       sparcely and there is no way to align they (if they are small), so there
+       may no be sufficient space for storing origin time stamps.
+       Generally speaking, this is not the best of ideas, more of a temporary
+       fix to avoid various range comparisons. A different approach is
+       therefore more than welcome. */
+    *argv = shadow_copy(*argv, arglen, 1);
+    /* TODO: These heap allocations are never freed in fact. Not super
+     * important, but for completeness purposes it may be feasible to define
+     * a buffer of implicitly allocated memory locations which need to be
+     * freed before a program exists. */
+#else
     shadow_alloca(*argv, arglen);
     initialize_static_region((uintptr_t)*argv, arglen);
+#endif
     argv++;
   }
+#ifdef E_ACSL_TEMPORAL
+  /* Fill temporal shadow */
+  int i;
+  argv = *argv_ref;
+  temporal_store_nblock(argv_ref, *argv_ref);
+  for (i = 0; i < argc; i++)
+    temporal_store_nblock(argv + i, *(argv+i));
+#endif
 
   while (*environ) {
     size_t envlen = strlen(*environ) + 1;
+#ifdef E_ACSL_TEMPORAL
+    *environ = shadow_copy(*environ, envlen, 1);
+#else
     shadow_alloca(*environ, envlen);
     initialize_static_region((uintptr_t)*environ, envlen);
+#endif
     environ++;
   }
 }
@@ -175,7 +210,7 @@ static void memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
   increase_stack_limit(get_stack_size()*2);
   /* Allocate and log shadow memory layout of the execution */
   init_shadow_layout(argc_ref, argv_ref);
-  // DEBUG_PRINT_LAYOUT;
+  //DEBUG_PRINT_LAYOUT;
   /* Make sure the layout holds */
   DVALIDATE_SHADOW_LAYOUT;
   /* Track program arguments. */
@@ -232,4 +267,36 @@ public_alias(memory_init)
 /* Heap size */
 public_alias(get_heap_allocation_size)
 public_alias(heap_allocation_size)
+/* }}} */
+
+/* Local operations on temporal timestamps {{{ */
+/* Remaining functionality (shared between all models) is located in e_acsl_temporal.h */
+#ifdef E_ACSL_TEMPORAL
+static uintptr_t temporal_referent_shadow(void *addr) {
+  TRY_SEGMENT(addr,
+    return TEMPORAL_HEAP_SHADOW(addr),
+    return TEMPORAL_SECONDARY_STATIC_SHADOW(addr));
+  return 0;
+}
+
+static uint32_t origin_timestamp(void *ptr) {
+  TRY_SEGMENT_WEAK(ptr,
+    return heap_origin_timestamp((uintptr_t)ptr),
+    return static_origin_timestamp((uintptr_t)ptr));
+  return INVALID_TEMPORAL_TIMESTAMP;
+}
+
+static uint32_t referent_timestamp(void *ptr) {
+  TRY_SEGMENT(ptr,
+    return heap_referent_timestamp((uintptr_t)ptr),
+    return static_referent_timestamp((uintptr_t)ptr));
+  return INVALID_TEMPORAL_TIMESTAMP;
+}
+
+static void store_temporal_referent(void *ptr, uint32_t ref) {
+  TRY_SEGMENT(ptr,
+    heap_store_temporal_referent((uintptr_t)ptr, ref),
+    static_store_temporal_referent((uintptr_t)ptr,ref));
+}
+#endif
 /* }}} */

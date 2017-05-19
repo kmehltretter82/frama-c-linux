@@ -43,6 +43,10 @@ struct bt_block {
   size_t line; //!< Line number where this block was recorded
   char* file; //!< File name where this block was recorded
 #endif
+#ifdef E_ACSL_TEMPORAL
+  uint32_t timestamp; //!< Temporal timestamp of a block's creation
+  void *temporal_shadow; //!< Temporal shadow for storing referent numbers
+#endif
 };
 
 typedef struct bt_block bt_block;

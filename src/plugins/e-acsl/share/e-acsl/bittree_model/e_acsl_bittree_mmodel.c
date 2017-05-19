@@ -240,15 +240,21 @@ static int readonly (void *ptr) {
 /* return whether the size bytes of ptr are readable/writable */
 static int valid(void* ptr, size_t size, void *ptr_base, void *addrof_base) {
   bt_block * blk = allocated(ptr, size, ptr_base);
-  if (blk != NULL)
-    return !blk->is_readonly;
-  return 0;
+  return blk != NULL && !blk->is_readonly
+#ifdef E_ACSL_TEMPORAL
+    && temporal_valid(ptr_base, addrof_base)
+#endif
+  ;
 }
 
 /* return whether the size bytes of ptr are readable */
 static int valid_read(void* ptr, size_t size, void *ptr_base, void *addrof_base) {
   bt_block * blk = allocated(ptr, size, ptr_base);
-  return blk != NULL;
+  return blk != NULL
+#ifdef E_ACSL_TEMPORAL
+    && temporal_valid(ptr_base, addrof_base)
+#endif
+  ;
 }
 
 /* return the base address of the block containing ptr */
@@ -310,6 +316,11 @@ static void* store_block(void* ptr, size_t size) {
     tmp->line = 0;
     tmp->file = "undefined";
 #endif
+#ifdef E_ACSL_TEMPORAL
+    tmp->timestamp = NEW_TEMPORAL_TIMESTAMP();
+    tmp->temporal_shadow = (size >= sizeof(void*)) ?
+      private_malloc(size) : NULL;
+#endif
   }
   return tmp;
 }
@@ -330,6 +341,9 @@ static void delete_block(void* ptr) {
 #endif
     if (tmp) {
       bt_clean_block_init(tmp);
+#ifdef E_ACSL_TEMPORAL
+      private_free(tmp->temporal_shadow);
+#endif
       bt_remove(tmp);
       private_free(tmp);
     }
@@ -538,6 +552,14 @@ static void argv_alloca(int *argc_ref,  char *** argv_ref) {
     initialize(*argv, arglen);
     argv++;
   }
+
+#ifdef E_ACSL_TEMPORAL /* Fill temporal shadow */
+  int i;
+  argv = *argv_ref;
+  temporal_store_nblock(argv_ref, *argv_ref);
+  for (i = 0; i < argc; i++)
+    temporal_store_nblock(argv + i, *(argv+i));
+#endif
 
   while (*environ) {
     size_t envlen = strlen(*environ) + 1;

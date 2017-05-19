@@ -233,18 +233,28 @@ static void validate_shadow_layout() {
   DVALIDATE_MEMORY_INIT;
 
   int num_partitions = sizeof(mem_partitions)/sizeof(memory_partition*);
-  int num_segments = num_partitions*3;
+  int num_seg_in_part = 3;
+#ifdef E_ACSL_TEMPORAL
+  num_seg_in_part = 5;
+#endif
+  int num_segments = num_partitions*num_seg_in_part;
   uintptr_t segments[num_segments][2];
 
   size_t i;
   for (i = 0; i < num_partitions; i++) {
     memory_partition *p = mem_partitions[i];
-    segments[3*i][0] = p->application.start;
-    segments[3*i][1] = p->application.end;
-    segments[3*i+1][0] = p->primary.start;
-    segments[3*i+1][1] = p->primary.end;
-    segments[3*i+2][0] = p->secondary.start;
-    segments[3*i+2][1] = p->secondary.end;
+    segments[num_seg_in_part*i][0] = p->application.start;
+    segments[num_seg_in_part*i][1] = p->application.end;
+    segments[num_seg_in_part*i+1][0] = p->primary.start;
+    segments[num_seg_in_part*i+1][1] = p->primary.end;
+    segments[num_seg_in_part*i+2][0] = p->secondary.start;
+    segments[num_seg_in_part*i+2][1] = p->secondary.end;
+#ifdef E_ACSL_TEMPORAL
+    segments[num_seg_in_part*i+3][0] = p->temporal_primary.start;
+    segments[num_seg_in_part*i+3][1] = p->temporal_primary.end;
+    segments[num_seg_in_part*i+4][0] = p->temporal_secondary.start;
+    segments[num_seg_in_part*i+4][1] = p->temporal_secondary.end;
+#endif
   }
 
   /* Make sure all segments (shadow or otherwise) are disjoint */
@@ -510,6 +520,16 @@ static const uint64_t short_shadow_masks[] = {
  * \param size - size of the stack memory block. */
 static void shadow_alloca(void *ptr, size_t size) {
   DVALIDATE_IS_ON_STATIC(ptr, size);
+#ifdef E_ACSL_TEMPORAL
+  /* Make sure that during temporal analysis there is
+   * sufficient space to store an origin timestamp.
+   * NOTE: This does not apply to globals, because all the globals
+   * have the timestamp of `1`. */
+  if (!IS_ON_GLOBAL(ptr)) {
+    DVALIDATE_STATIC_SUFFICIENTLY_ALIGNED((uintptr_t)ptr, 4);
+  }
+#endif
+
   unsigned char *prim_shadow = (unsigned char*)PRIMARY_SHADOW(ptr);
   uint64_t *prim_shadow_alt = (uint64_t *)PRIMARY_SHADOW(ptr);
   unsigned int *sec_shadow = (unsigned int*)SECONDARY_SHADOW(ptr);
@@ -547,6 +567,16 @@ static void shadow_alloca(void *ptr, size_t size) {
       prim_shadow[i] = (code << 2);
     }
   }
+#ifdef E_ACSL_TEMPORAL /*{{{*/
+  /* Store a temporal origin timestamp in the first 4 bytes of a temporal
+   * shadow. This, however applies only to TLS of stack blocks. Global blocks
+   * are never deallocated, an origin time stamp of any global block is given
+   * via `GLOBAL_TEMPORAL_TIMESTAMP` */
+  if (!IS_ON_GLOBAL(ptr)) {
+    uint32_t* temporal_shadow = (uint32_t*)TEMPORAL_PRIMARY_STATIC_SHADOW(ptr);
+    *temporal_shadow = NEW_TEMPORAL_TIMESTAMP();
+  }
+#endif /*}}} E_ACSL_TEMPORAL*/
 }
 /* }}} */
 
@@ -560,6 +590,10 @@ static void shadow_freea(void *ptr) {
   size_t size = block_length(ptr);
   memset((void*)PRIMARY_SHADOW(ptr), 0, size);
   memset((void*)SECONDARY_SHADOW(ptr), 0, size);
+#ifdef E_ACSL_TEMPORAL /*{{{*/
+  memset((void*)TEMPORAL_PRIMARY_STATIC_SHADOW(ptr), 0, size);
+  memset((void*)TEMPORAL_SECONDARY_STATIC_SHADOW(ptr), 0, size);
+#endif  /*}}} E_ACSL_TEMPORAL*/
 }
 /* }}} */
 
@@ -685,6 +719,39 @@ static uintptr_t static_info(uintptr_t addr, char type) {
   }
   return 0;
 }
+
+#ifdef E_ACSL_TEMPORAL /*{{{*/
+/*! Return either an origin (if `origin` is non-zero) or referent timestamp
+ *  associated with a static address `addr` */
+static uint32_t static_temporal_info(uintptr_t addr, int origin) {
+  /* NOTE: No checking for allocated blocks, since an invalid
+   timestamp is zero and ununsed memory is nullified then an invalid
+   timestamp is also returned for allocated memory */
+  if (origin) {
+    int allocated = static_allocated_one(addr);
+    if (allocated && !IS_ON_GLOBAL(addr)) {
+      uintptr_t base_addr = static_info(addr, 'B');
+      return *((uint32_t*)TEMPORAL_PRIMARY_STATIC_SHADOW(base_addr));
+    } else if (allocated && IS_ON_GLOBAL(addr)) {
+      return GLOBAL_TEMPORAL_TIMESTAMP;
+    } else {
+      return INVALID_TEMPORAL_TIMESTAMP;
+    }
+  } else {
+    return *((uint32_t*)TEMPORAL_SECONDARY_STATIC_SHADOW(addr));
+  }
+}
+
+#define static_origin_timestamp(_ptr) static_temporal_info((uintptr_t)(_ptr),1)
+#define static_referent_timestamp(_ptr) static_temporal_info((uintptr_t)(_ptr),0)
+
+/*! Store a referent time stamp associated with a static pointer.
+ *  Origin timestamps are generated via `shadow_alloca` */
+static void static_store_temporal_referent(uintptr_t addr, uint32_t ref) {
+  DVALIDATE_STATIC_ACCESS(addr, PTR_SZ);
+  *((uint32_t*)TEMPORAL_SECONDARY_STATIC_SHADOW(addr)) = ref;
+}
+#endif/*}}} E_ACSL_TEMPORAL*/
 /* }}} */
 
 /* Static initialization {{{ */
@@ -795,6 +862,11 @@ static void set_heap_segment(void *ptr, size_t size, size_t alloc_size,
   uintptr_t *segment = (uintptr_t*)(shadow);
   segment[1] = size;
 
+#ifdef E_ACSL_TEMPORAL /*{{{*/
+  /* 4 bytes following a block's length store an origin timestamp */
+  segment[2] = NEW_TEMPORAL_TIMESTAMP();
+#endif /*}}} E_ACSL_TEMPORAL*/
+
   int i;
   /* Write the offsets per segment */
   for (i = 0; i < segments; i++) {
@@ -885,6 +957,11 @@ static void unset_heap_segment(void *ptr, int init, const char *function) {
   memset(base_shadow, ZERO, alloc_size);
   /* Adjust tracked allocation size */
   heap_allocation_size -= length;
+#ifdef E_ACSL_TEMPORAL /*{{{*/
+  /* Nullify temporal shadow */
+  uintptr_t *t_base_shadow = (uintptr_t*)TEMPORAL_HEAP_SHADOW(ptr);
+  memset(t_base_shadow, ZERO, alloc_size);
+#endif /*}}} E_ACSL_TEMPORAL*/
   /* Nullify init shadow */
   if (init) {
     memset((void*)HEAP_INIT_SHADOW(ptr), 0, alloc_size/8);
@@ -1129,6 +1206,31 @@ static int heap_initialized(uintptr_t addr, long len) {
 
 /* }}} */
 
+/* Heap temporal querying {{{*/
+#ifdef E_ACSL_TEMPORAL
+static uint32_t heap_temporal_info(uintptr_t addr, int origin) {
+  /* NOTE: No checking for allocated blocks, since an invalid
+     timestamp is zero and ununsed memory is nullified then an invalid
+     timestamp is also returned for allocated memory */
+  if (origin) {
+    uintptr_t *aligned_shadow = (uintptr_t*)ALIGNED_HEAP_SHADOW(addr);
+    uintptr_t *base_shadow = (uintptr_t*)HEAP_SHADOW(*aligned_shadow);
+    return (uint32_t)base_shadow[2];
+  } else {
+    return *((uint32_t*)TEMPORAL_HEAP_SHADOW(addr));
+  }
+}
+
+#define heap_origin_timestamp(_ptr)   heap_temporal_info((uintptr_t)(_ptr),1)
+#define heap_referent_timestamp(_ptr) heap_temporal_info((uintptr_t)(_ptr),0)
+
+static void heap_store_temporal_referent(uintptr_t addr, uint32_t ref) {
+  DVALIDATE_HEAP_ACCESS(addr, PTR_SZ);
+  uint32_t *temporal_shadow = (uint32_t*)TEMPORAL_HEAP_SHADOW(addr);
+  *temporal_shadow = ref;
+}
+#endif/*}}} E_ACSL_TEMPORAL*/
+
 /* Heap initialization {{{ */
 /*! \brief Mark n bytes on the heap starting from address addr as initialized */
 static void initialize_heap_region(uintptr_t addr, long len) {
@@ -1232,6 +1334,13 @@ static void print_static_shadows(uintptr_t addr, size_t size) {
     }
     DLOG("| [%2d] %a | %s || %s\n", i, &prim_shadow[i], prim_buf, sec_buf);
   }
+#ifdef E_ACSL_TEMPORAL /* {{{ */
+  uint32_t* origin_shadow = (uint32_t*)TEMPORAL_PRIMARY_STATIC_SHADOW(addr);
+  uint32_t* ref_shadow = (uint32_t*)TEMPORAL_SECONDARY_STATIC_SHADOW(addr);
+  DLOG(" | > Blk ID: %u\n", i, *origin_shadow);
+  for (i = 0; i < size; i+=PTR_SZ)
+    DLOG(" | >   Ref ID[%u]: %u\n", i/8, *(ref_shadow + 1));
+#endif /*}}} E_ACSL_TEMPORAL*/
 }
 
 /*! \brief Print human-readable representation of a heap shadow region for a
@@ -1257,6 +1366,10 @@ static void print_heap_shadows(uintptr_t addr) {
   if (zeroed_out(block_shadow, alloc_size))
     DLOG(" | << Nullified >>  \n");
 
+#ifdef E_ACSL_TEMPORAL /*{{{*/
+  DLOG(" | Origin TS:       %u\n", (uint32_t)segment[2]);
+#endif	/*}}}*/
+
   size_t i;
   for (i = 0; i < segments; i++) {
     segment = (uintptr_t*)(block_shadow + i*HEAP_SEGMENT);
@@ -1280,7 +1393,7 @@ static void print_shadows(uintptr_t addr, size_t size) {
 }
 
 static void print_memory_segment(struct memory_segment *p, char *lab, int off) {
-  DLOG("   %s: %lu MB [%a, %a]", lab, MB_SZ(p->size), p->start, p->end);
+  DLOG("   %s: %lu MB [%lu, %lu]", lab, MB_SZ(p->size), p->start, p->end);
   if (off)
     DLOG("{ Offset: %ld }", p->shadow_offset);
   DLOG("\n");
@@ -1290,18 +1403,22 @@ static void print_memory_partition(struct memory_partition *p) {
   print_memory_segment(&p->application, "Application", 0);
   print_memory_segment(&p->primary, "Primary    ", 1);
   print_memory_segment(&p->secondary, "Secondary  ", 1);
+#ifdef E_ACSL_TEMPORAL
+  print_memory_segment(&p->temporal_primary, "Temporal Primary    ", 1);
+  print_memory_segment(&p->temporal_secondary, "Temporal Secondary  ", 1);
+#endif
 }
 
 static void print_shadow_layout() {
-  DLOG(">>> HEAP ------------\n");
+  DLOG(">>> HEAP ---------------------\n");
   print_memory_partition(&mem_layout.heap);
-  DLOG(">>> STACK -----------\n");
+  DLOG(">>> STACK --------------------\n");
   print_memory_partition(&mem_layout.stack);
-  DLOG(">>> GLOBAL ----------\n");
+  DLOG(">>> GLOBAL -------------------\n");
   print_memory_partition(&mem_layout.global);
-  DLOG(">>> TLS -------------\n");
+  DLOG(">>> TLS ----------------------\n");
   print_memory_partition(&mem_layout.tls);
-  DLOG(">>> -----------------\n");
+  DLOG(">>> --------------------------\n");
 }
 
 /*! \brief Output the shadow segment the address belongs to */

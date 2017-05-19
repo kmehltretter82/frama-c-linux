@@ -277,6 +277,10 @@ struct memory_partition {
   memory_segment application; /* Application memory segment */
   memory_segment primary; /* Primary shadow segment */
   memory_segment secondary; /* Secondary shadow segment */
+#ifdef E_ACSL_TEMPORAL
+  memory_segment temporal_primary; /* Primary temporal shadow segment */
+  memory_segment temporal_secondary; /* Secondary temporal shadow segment */
+#endif
 };
 
 typedef struct memory_partition memory_partition;
@@ -336,7 +340,7 @@ static void set_shadow_segment(memory_segment *seg, memory_segment *parent,
   seg->size = parent->size/seg->shadow_ratio;
   seg->mspace = create_mspace(seg->size + SHADOW_SEGMENT_PADDING, 0);
   seg->start = (uintptr_t)mspace_malloc(seg->mspace,1);
-  seg->end = seg->start + seg->size - 1;
+  seg->end = seg->start + seg->size;
   seg->shadow_offset = parent->start - seg->start;
 }
 
@@ -349,24 +353,40 @@ static void init_shadow_layout(int *argc_ref, char ***argv_ref) {
     get_heap_size(), "heap", mem_spaces.heap_mspace);
   set_shadow_segment(&pheap->primary, &pheap->application, 1, "heap_primary");
   set_shadow_segment(&pheap->secondary, &pheap->application, 8, "heap_secondary");
+#ifdef E_ACSL_TEMPORAL
+  set_shadow_segment(&pheap->temporal_primary, &pheap->application, 1, "temporal_heap_primary");
+  set_shadow_segment(&pheap->temporal_secondary, &pheap->application, 1, "temporal_heap_secondary");
+#endif
 
   memory_partition *pstack = &mem_layout.stack;
   set_application_segment(&pstack->application, get_stack_start(argc_ref, argv_ref),
     get_stack_size(), "stack", NULL);
   set_shadow_segment(&pstack->primary, &pstack->application, 1, "stack_primary");
   set_shadow_segment(&pstack->secondary, &pstack->application, 1, "stack_secondary");
+#ifdef E_ACSL_TEMPORAL
+  set_shadow_segment(&pstack->temporal_primary, &pstack->application, 1, "temporal_stack_primary");
+  set_shadow_segment(&pstack->temporal_secondary, &pstack->application, 1, "temporal_stack_secondary");
+#endif
 
   memory_partition *pglobal = &mem_layout.global;
   set_application_segment(&pglobal->application, get_global_start(),
     get_global_size(), "global", NULL);
   set_shadow_segment(&pglobal->primary, &pglobal->application, 1, "global_primary");
   set_shadow_segment(&pglobal->secondary, &pglobal->application, 1, "global_secondary");
+#ifdef E_ACSL_TEMPORAL
+  set_shadow_segment(&pglobal->temporal_primary, &pglobal->application, 1, "temporal_global_primary");
+  set_shadow_segment(&pglobal->temporal_secondary, &pglobal->application, 1, "temporal_global_secondary");
+#endif
 
   memory_partition *ptls = &mem_layout.tls;
   set_application_segment(&ptls->application, get_tls_start(),
     get_tls_size(), "tls", NULL);
   set_shadow_segment(&ptls->primary, &ptls->application, 1, "tls_primary");
   set_shadow_segment(&ptls->secondary, &ptls->application, 1, "tls_secondary");
+#ifdef E_ACSL_TEMPORAL
+  set_shadow_segment(&ptls->temporal_primary, &ptls->application, 1, "temporal_tls_primary");
+  set_shadow_segment(&ptls->temporal_secondary, &ptls->application, 1, "temporal_tls_secondary");
+#endif
 
   mem_layout.initialized = 1;
 }
@@ -376,8 +396,10 @@ static void clean_shadow_layout() {
   if (mem_layout.initialized) {
     int i;
     for (i = 0; i < sizeof(mem_partitions)/sizeof(memory_partition*); i++) {
-      destroy_mspace(mem_partitions[i]->primary.mspace);
-      destroy_mspace(mem_partitions[i]->secondary.mspace);
+      if (mem_partitions[i]->primary.mspace)
+        destroy_mspace(mem_partitions[i]->primary.mspace);
+      if (mem_partitions[i]->secondary.mspace)
+        destroy_mspace(mem_partitions[i]->secondary.mspace);
     }
   }
 }
@@ -510,3 +532,41 @@ static void clean_shadow_layout() {
   (IS_ON_STACK(_addr) || IS_ON_HEAP(_addr) || \
    IS_ON_GLOBAL(_addr) || IS_ON_TLS(_addr))
 /* }}} */
+
+#ifdef E_ACSL_TEMPORAL /* {{{ */
+/*! \brief Convert a heap address into its shadow counterpart */
+#define TEMPORAL_HEAP_SHADOW(_addr) \
+  SHADOW_ACCESS(_addr, mem_layout.heap.temporal_primary.shadow_offset)
+
+/*! \brief Convert a stack address into its primary temporal shadow counterpart */
+#define TEMPORAL_PRIMARY_STACK_SHADOW(_addr) \
+  SHADOW_ACCESS(_addr, mem_layout.stack.temporal_primary.shadow_offset)
+
+/*! \brief Convert a stack address into its secondary temporal shadow counterpart */
+#define TEMPORAL_SECONDARY_STACK_SHADOW(_addr) \
+  SHADOW_ACCESS(_addr, mem_layout.stack.temporal_secondary.shadow_offset)
+
+/*! \brief Convert a global address into its primary temporal shadow counterpart */
+#define TEMPORAL_PRIMARY_GLOBAL_SHADOW(_addr)  \
+  SHADOW_ACCESS(_addr, mem_layout.global.temporal_primary.shadow_offset)
+
+/*! \brief Convert a global address into its primary temporal shadow counterpart */
+#define TEMPORAL_SECONDARY_GLOBAL_SHADOW(_addr)  \
+  SHADOW_ACCESS(_addr, mem_layout.global.temporal_secondary.shadow_offset)
+
+/*! \brief Convert a TLS address into its primary temporal shadow counterpart */
+#define TEMPORAL_PRIMARY_TLS_SHADOW(_addr)  \
+  SHADOW_ACCESS(_addr, mem_layout.tls.temporal_primary.shadow_offset)
+
+/*! \brief Convert a TLS address into its secondary temporal shadow counterpart */
+#define TEMPORAL_SECONDARY_TLS_SHADOW(_addr)  \
+  SHADOW_ACCESS(_addr, mem_layout.tls.temporal_secondary.shadow_offset)
+
+/*! \brief Temporal primary shadow address of a non-dynamic region */
+#define TEMPORAL_PRIMARY_STATIC_SHADOW(_addr) \
+  SHADOW_REGION_ADDRESS(_addr, TEMPORAL_PRIMARY)
+
+/*! \brief Temporal secondary shadow address of a non-dynamic region */
+#define TEMPORAL_SECONDARY_STATIC_SHADOW(_addr) \
+  SHADOW_REGION_ADDRESS(_addr, TEMPORAL_SECONDARY)
+#endif /* }}} */
