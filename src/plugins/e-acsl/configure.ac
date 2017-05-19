@@ -152,16 +152,4 @@ m4_ifndef([plugin_dir], [
   m4_define([plugin_dir],[./])
 ])
 
-# Configure libgmp
-if test "$FULL_GMP" = yes; then
-  AC_MSG_NOTICE([Configure libgmp])
-  (cd plugin_dir/contrib/libgmp && ./configure)
-fi
-
-# Configure libjemalloc
-AC_MSG_NOTICE([Configure libjemalloc])
-(cd plugin_dir/contrib/libjemalloc && ./autogen.sh \
-  --with-jemalloc-prefix="__e_acsl_native_" \
-  --with-private-namespace="__e_acsl_hidden_")
-
 fi
