@@ -1,0 +1,32 @@
+let pred_opt_from_expr_state state e =
+  try
+    Value2acsl.lval_to_predicate state e
+  with
+  | Cvalue.V.Not_based_on_null ->
+    Misc.not_implemented ~what:"Value not based on null";
+    None
+  | Misc.Not_implemented what ->
+    Misc.not_implemented ~what;
+    None
+
+class hypotheses_visitor (env: Collect.env) = object(self)
+  inherit Visitor.generic_frama_c_visitor (Visitor_behavior.inplace ())
+
+  method! vstmt_aux stmt =
+    let kf = Extlib.the (self#current_kf) in
+    let state = Db.Value.get_stmt_state stmt in
+    if Collect.should_annotate_stmt env stmt then begin
+      let vars = Collect.get_relevant_vars_stmt env kf stmt in
+      List.iter
+        (fun e ->
+           let p_opt = pred_opt_from_expr_state state e in
+           Extlib.may (Misc.assert_and_validate ~kf stmt) p_opt)
+        vars
+    end;
+    Cil.DoChildren
+end
+
+
+let generate_hypotheses env =
+  let visitor = new hypotheses_visitor env in
+  Cil.visitCilFileSameGlobals (visitor :> Cil.cilVisitor) (Ast.get ())

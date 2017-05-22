@@ -24,7 +24,7 @@
 (* --- Model Factory                                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
-type mheap = Hoare | ZeroAlias | Region | Typed of MemTyped.pointer
+type mheap = Hoare | ZeroAlias | Region | Typed of MemTyped.pointer | Value
 type mvar = Raw | Var | Ref | Caveat
 
 type setup = {
@@ -68,6 +68,7 @@ let descr_mheap d = function
   | ZeroAlias -> main d "zeroalias"
   | Hoare -> main d "hoare"
   | Typed p -> main d "typed" ; descr_mtyped d p
+  | Value -> main d "value"
 
 let descr_mvar d = function
   | Var -> ()
@@ -247,6 +248,7 @@ module Comp_MemTyped = MakeCompiler(MemTyped)
 module Comp_Typed_Var = MakeCompiler(Model_Typed_Var)
 module Comp_Typed_Ref = MakeCompiler(Model_Typed_Ref)
 module Comp_Caveat = MakeCompiler(Model_Caveat)
+module Comp_MemValue = MakeCompiler(MemValue)
 
 
 let compiler mheap mvar : (module Sigs.Compiler) =
@@ -259,6 +261,7 @@ let compiler mheap mvar : (module Sigs.Compiler) =
   | Typed _ , Raw     -> (module Comp_MemTyped)
   | Typed _ , Var     -> (module Comp_Typed_Var)
   | Typed _ , Ref     -> (module Comp_Typed_Ref)
+  | Value, _          -> (module Comp_MemValue)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Tuning                                                             --- *)
@@ -276,6 +279,7 @@ let configure_mheap = function
         Context.pop MemTyped.pointer orig_memtyped_pointer
       in
       rollback
+  | Value -> MemValue.configure ()
 
 let configure_driver setup driver () =
   let rollback_mheap = configure_mheap setup.mheap in

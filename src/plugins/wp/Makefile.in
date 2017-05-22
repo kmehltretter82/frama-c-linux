@@ -80,7 +80,7 @@ PLUGIN_CMO:= \
 	LogicSemantics LogicAssigns  \
 	Sigma MemLoader \
 	MemEmpty MemZeroAlias MemVar \
-	MemMemory MemTyped MemRegion \
+	MemMemory MemTyped MemValue MemRegion \
 	wpReached wpRTE wpAnnot \
 	CfgCompiler StmtSemantics \
 	VCS script proof wpo wpReport \
@@ -242,7 +242,7 @@ WP_API_BASE= \
 	Plang.mli Pcfg.mli Pcond.mli \
 	CodeSemantics.mli \
 	LogicCompiler.mli LogicSemantics.mli \
-	Sigma.mli MemVar.mli MemTyped.mli \
+	Sigma.mli MemVar.mli MemTyped.mli MemValue.mli \
 	CfgCompiler.mli StmtSemantics.mli \
 	Factory.mli driver.mli VCS.mli Tactical.mli Strategy.mli Auto.mli \
 	VC.mli wpo.mli ProverTask.mli prover.mli

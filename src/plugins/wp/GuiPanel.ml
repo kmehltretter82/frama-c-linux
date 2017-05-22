@@ -139,7 +139,8 @@ class model_selector (main : Design.main_window_extension_points) =
          | ZeroAlias -> memory#set TREE
          | Region -> memory#set REGION
          | Hoare -> memory#set HOARE
-         | Typed m -> memory#set TYPED ; c_casts#set (m = MemTyped.Unsafe)) ;
+         | Typed m -> memory#set TYPED ; c_casts#set (m = MemTyped.Unsafe)
+         | Value -> ()) ;
         c_byref#set (s.mvar = Ref) ;
         c_ctxt#set (s.mvar = Caveat) ;
         c_cint#set (s.cint = Cint.Machine) ;
