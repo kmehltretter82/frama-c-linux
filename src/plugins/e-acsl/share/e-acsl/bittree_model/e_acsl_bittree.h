@@ -28,8 +28,6 @@
 #ifndef E_ACSL_BITTREE
 #define E_ACSL_BITTREE
 
-#include <stdbool.h>
-
 #include "e_acsl_malloc.h"
 #include "e_acsl_syscall.h"
 #include "e_acsl_printf.h"
@@ -253,7 +251,7 @@ static void bt_insert (bt_block * ptr) {
 
   new_leaf = private_malloc(sizeof(bt_node));
   DASSERT(new_leaf != NULL);
-  new_leaf->is_leaf = true;
+  new_leaf->is_leaf = 1;
   new_leaf->addr = ptr->ptr;
   new_leaf->mask = Tmasks[WORDBITS]; /* ~0ul */
   new_leaf->left = NULL;
@@ -269,7 +267,7 @@ static void bt_insert (bt_block * ptr) {
     DASSERT(sibling != NULL);
     parent = private_malloc(sizeof(bt_node));
     DASSERT(parent != NULL);
-    parent->is_leaf = false;
+    parent->is_leaf = 0;
     parent->addr = sibling->addr & new_leaf->addr;
     /*parent->mask = mask(sibling->addr & sibling->mask, ptr->ptr);*/
     parent->leaf = NULL;

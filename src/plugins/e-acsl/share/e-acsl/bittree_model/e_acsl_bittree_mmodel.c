@@ -206,7 +206,7 @@ void mark_readonly(void * ptr) {
   tmp = bt_lookup(ptr);
   if (tmp == NULL)
     return;
-  tmp->is_readonly = true;
+  tmp->is_readonly = 1;
 }
 /* }}} */
 
@@ -217,10 +217,10 @@ void mark_readonly(void * ptr) {
 int freeable(void* ptr) {
   bt_block * tmp;
   if(ptr == NULL)
-    return false;
+    return 0;
   tmp = bt_lookup(ptr);
   if(tmp == NULL)
-    return false;
+    return 0;
   return tmp->is_freeable;
 }
 
@@ -229,14 +229,14 @@ int initialized(void * ptr, size_t size) {
   unsigned i;
   bt_block * tmp = bt_find(ptr);
   if(tmp == NULL)
-    return false;
+    return 0;
 
   /* fully uninitialized */
   if(tmp->init_bytes == 0)
-    return false;
+    return 0;
   /* fully initialized */
   if(tmp->init_bytes == tmp->size)
-    return true;
+    return 1;
 
   /* see implementation of function `initialize` for details */
   for(i = 0; i < size; i++) {
@@ -244,9 +244,9 @@ int initialized(void * ptr, size_t size) {
     int byte = offset/8;
     int bit = offset%8;
     if (!checkbit(bit, tmp->init_ptr[byte]))
-      return false;
+      return 0;
   }
-  return true;
+  return 1;
 }
 
 /* return the length (in bytes) of the block containing ptr */
@@ -348,8 +348,8 @@ void* store_block(void* ptr, size_t size) {
     tmp->size = size;
     tmp->init_ptr = NULL;
     tmp->init_bytes = 0;
-    tmp->is_readonly = false;
-    tmp->is_freeable = false;
+    tmp->is_readonly = 0;
+    tmp->is_freeable = 0;
     bt_insert(tmp);
 #ifdef E_ACSL_DEBUG
     tmp->line = 0;
@@ -418,7 +418,7 @@ void* bittree_malloc(size_t size) {
   if (res) {
     bt_block * new_block = store_block(res, size);
     heap_allocation_size += size;
-    new_block->is_freeable = true;
+    new_block->is_freeable = 1;
   }
   return res;
 }
@@ -539,7 +539,7 @@ void* bittree_realloc(void* ptr, size_t size) {
     }
   }
   tmp->size = size;
-  tmp->is_freeable = true;
+  tmp->is_freeable = 1;
   heap_allocation_size += size;
   return (void*)tmp->ptr;
 }
