@@ -28,6 +28,45 @@
 
 #include "e_acsl_bittree.h"
 
+/* API BINDINGS {{{ */
+/* Heap allocation */
+#define bittree_malloc          malloc
+#define bittree_calloc          calloc
+#define bittree_realloc         realloc
+#define bittree_free            free
+#define bittree_posix_memalign  posix_memalign
+#define bittree_aligned_alloc   aligned_alloc
+/* Explicit tracking */
+#define delete_block          export_alias(delete_block)
+#define store_block           export_alias(store_block)
+#define store_block_duplicate export_alias(store_block_duplicate)
+/* Predicates */
+#define offset        export_alias(offset)
+#define base_addr     export_alias(base_addr)
+#define valid_read    export_alias(valid_read)
+#define valid         export_alias(valid)
+#define block_length  export_alias(block_length)
+#define initialized   export_alias(initialized)
+#define freeable      export_alias(freeable)
+#define mark_readonly export_alias(mark_readonly)
+/* Block initialization */
+#define initialize    export_alias(initialize)
+#define full_init     export_alias(full_init)
+/* Memory state initialization */
+#define memory_clean  export_alias(memory_clean)
+#define memory_init   export_alias(memory_init)
+/* Heap size */
+#define get_heap_allocation_size  export_alias(get_heap_allocation_size)
+#define heap_allocation_size      export_alias(heap_allocation_size)
+#ifdef E_ACSL_DEBUG /* Debug */
+# define bt_print_block     export_alias(bt_print_block)
+# define bt_print_tree      export_alias(bt_print_tree)
+# define block_info         export_alias(block_info)
+# define store_block_debug  export_alias(store_block_debug)
+# define delete_block_debug export_alias(delete_block_debug)
+#endif
+/* }}} */
+
 /* Assertions in debug mode */
 #define ALLOCATED(_ptr,_size) \
   ((allocated(_ptr, _size, _ptr) == NULL) ? 0 : 1)
@@ -67,7 +106,7 @@ static const int nbr_bits_to_1[256] = {
 /**************************/
 /* HEAP USAGE         {{{ */
 /**************************/
-static size_t heap_allocation_size = 0;
+size_t heap_allocation_size = 0;
 
 static size_t get_heap_allocation_size(void) {
   return heap_allocation_size;
@@ -93,7 +132,7 @@ static struct current_location {
 /**************************/
 
 /* mark the size bytes of ptr as initialized */
-static void initialize (void * ptr, size_t size) {
+void initialize (void * ptr, size_t size) {
   bt_block * tmp;
   if(!ptr)
     return;
@@ -143,7 +182,7 @@ static void initialize (void * ptr, size_t size) {
 }
 
 /* mark all bytes of ptr as initialized */
-static void full_init (void * ptr) {
+void full_init (void * ptr) {
   bt_block * tmp;
   if (ptr == NULL)
     return;
@@ -160,7 +199,7 @@ static void full_init (void * ptr) {
 }
 
 /* mark a block as read-only */
-static void mark_readonly(void * ptr) {
+void mark_readonly(void * ptr) {
   bt_block * tmp;
   if (ptr == NULL)
     return;
@@ -175,18 +214,18 @@ static void mark_readonly(void * ptr) {
 /* PREDICATES        {{{  */
 /**************************/
 
-static int freeable(void* ptr) {
+int freeable(void* ptr) {
   bt_block * tmp;
   if(ptr == NULL)
     return false;
   tmp = bt_lookup(ptr);
   if(tmp == NULL)
     return false;
-  return tmp->freeable;
+  return tmp->is_freeable;
 }
 
 /* return whether the size bytes of ptr are initialized */
-static int initialized(void * ptr, size_t size) {
+int initialized(void * ptr, size_t size) {
   unsigned i;
   bt_block * tmp = bt_find(ptr);
   if(tmp == NULL)
@@ -211,7 +250,7 @@ static int initialized(void * ptr, size_t size) {
 }
 
 /* return the length (in bytes) of the block containing ptr */
-static size_t block_length(void* ptr) {
+size_t block_length(void* ptr) {
   bt_block * blk = bt_find(ptr);
   /* Hard failure when un-allocated memory is used */
   vassert(blk != NULL, "\\block_length of unallocated memory", NULL);
@@ -238,7 +277,7 @@ static int readonly (void *ptr) {
 }
 
 /* return whether the size bytes of ptr are readable/writable */
-static int valid(void* ptr, size_t size, void *ptr_base, void *addrof_base) {
+int valid(void* ptr, size_t size, void *ptr_base, void *addrof_base) {
   bt_block * blk = allocated(ptr, size, ptr_base);
   return blk != NULL && !blk->is_readonly
 #ifdef E_ACSL_TEMPORAL
@@ -248,7 +287,7 @@ static int valid(void* ptr, size_t size, void *ptr_base, void *addrof_base) {
 }
 
 /* return whether the size bytes of ptr are readable */
-static int valid_read(void* ptr, size_t size, void *ptr_base, void *addrof_base) {
+int valid_read(void* ptr, size_t size, void *ptr_base, void *addrof_base) {
   bt_block * blk = allocated(ptr, size, ptr_base);
   return blk != NULL
 #ifdef E_ACSL_TEMPORAL
@@ -258,14 +297,14 @@ static int valid_read(void* ptr, size_t size, void *ptr_base, void *addrof_base)
 }
 
 /* return the base address of the block containing ptr */
-static void* base_addr(void* ptr) {
+void* base_addr(void* ptr) {
   bt_block * tmp = bt_find(ptr);
   vassert(tmp != NULL, "\\base_addr of unallocated memory", NULL);
   return (void*)tmp->ptr;
 }
 
 /* return the offset of `ptr` within its block */
-static int offset(void* ptr) {
+int offset(void* ptr) {
   bt_block * tmp = bt_find(ptr);
   vassert(tmp != NULL, "\\offset of unallocated memory", NULL);
   return ((uintptr_t)ptr - tmp->ptr);
@@ -279,7 +318,7 @@ static int offset(void* ptr) {
 /* STACK ALLOCATION {{{ */
 /* store the block of size bytes starting at ptr, the new block is returned.
  * Warning: the return type is implicitly (bt_block*). */
-static void* store_block(void* ptr, size_t size) {
+void* store_block(void* ptr, size_t size) {
 #ifdef E_ACSL_DEBUG
   if (ptr == NULL)
     vabort("Attempt to record NULL block");
@@ -310,7 +349,7 @@ static void* store_block(void* ptr, size_t size) {
     tmp->init_ptr = NULL;
     tmp->init_bytes = 0;
     tmp->is_readonly = false;
-    tmp->freeable = false;
+    tmp->is_freeable = false;
     bt_insert(tmp);
 #ifdef E_ACSL_DEBUG
     tmp->line = 0;
@@ -326,7 +365,7 @@ static void* store_block(void* ptr, size_t size) {
 }
 
 /* remove the block starting at ptr */
-static void delete_block(void* ptr) {
+void delete_block(void* ptr) {
 #ifdef E_ACSL_DEBUG
   /* Make sure the recorded block is not NULL */
   if (!ptr)
@@ -350,7 +389,7 @@ static void delete_block(void* ptr) {
   }
 }
 
-static void* store_block_duplicate(void* ptr, size_t size) {
+void* store_block_duplicate(void* ptr, size_t size) {
   bt_block * tmp = NULL;
   if (ptr != NULL) {
     bt_block * tmp = bt_lookup(ptr);
@@ -371,7 +410,7 @@ static void* store_block_duplicate(void* ptr, size_t size) {
 
 /* HEAP ALLOCATION {{{ */
 /*! \brief Replacement for `malloc` with memory tracking */
-static void* bittree_malloc(size_t size) {
+void* bittree_malloc(size_t size) {
   if(size == 0)
     return NULL;
 
@@ -379,13 +418,13 @@ static void* bittree_malloc(size_t size) {
   if (res) {
     bt_block * new_block = store_block(res, size);
     heap_allocation_size += size;
-    new_block->freeable = true;
+    new_block->is_freeable = true;
   }
   return res;
 }
 
 /*! \brief Replacement for `calloc` with memory tracking */
-static void* bittree_calloc(size_t nbr_block, size_t size_block) {
+void* bittree_calloc(size_t nbr_block, size_t size_block) {
   /* FIXME: Need an integer overflow check here */
   size_t size = nbr_block * size_block;
   if (size == 0)
@@ -395,7 +434,7 @@ static void* bittree_calloc(size_t nbr_block, size_t size_block) {
   if (res) {
     bt_block * new_block = store_block(res, size);
     heap_allocation_size += size;
-    new_block->freeable = 1;
+    new_block->is_freeable = 1;
     /* Mark allocated block as freeable and initialized */
     new_block->init_bytes = size;
   }
@@ -403,7 +442,7 @@ static void* bittree_calloc(size_t nbr_block, size_t size_block) {
 }
 
 /*! \brief Replacement for `aligned_alloc` with memory tracking */
-static void *bittree_aligned_alloc(size_t alignment, size_t size) {
+void *bittree_aligned_alloc(size_t alignment, size_t size) {
   /* Check if:
    *  - size and alignment are greater than zero
    *  - alignment is a power of 2
@@ -414,14 +453,14 @@ static void *bittree_aligned_alloc(size_t alignment, size_t size) {
   void *res = public_aligned_alloc(alignment, size);
   if (res) {
     bt_block * new_block = store_block(res, size);
-    new_block->freeable = 1;
+    new_block->is_freeable = 1;
     heap_allocation_size += size;
   }
   return res;
 }
 
 /*! \brief Replacement for `posix_memalign` with memory tracking */
-static int bittree_posix_memalign(void **memptr, size_t alignment, size_t size) {
+int bittree_posix_memalign(void **memptr, size_t alignment, size_t size) {
  /* Check if:
    *  - size and alignment are greater than zero
    *  - alignment is a power of 2 and a multiple of sizeof(void*) */
@@ -434,14 +473,14 @@ static int bittree_posix_memalign(void **memptr, size_t alignment, size_t size) 
   int res = public_posix_memalign(memptr, alignment, size);
   if (!res) {
     bt_block * new_block = store_block(*memptr, size);
-    new_block->freeable = 1;
+    new_block->is_freeable = 1;
     heap_allocation_size += size;
   }
   return res;
 }
 
 /*! \brief Replacement for `realloc` with memory tracking */
-static void* bittree_realloc(void* ptr, size_t size) {
+void* bittree_realloc(void* ptr, size_t size) {
   bt_block * tmp;
   void * new_ptr;
   /* ptr is NULL - malloc */
@@ -500,13 +539,13 @@ static void* bittree_realloc(void* ptr, size_t size) {
     }
   }
   tmp->size = size;
-  tmp->freeable = true;
+  tmp->is_freeable = true;
   heap_allocation_size += size;
   return (void*)tmp->ptr;
 }
 
 /*! \brief Replacement for `free` with memory tracking */
-static void bittree_free(void* ptr) {
+void bittree_free(void* ptr) {
   if (!ptr)
     return;
   bt_block * res = bt_lookup(ptr);
@@ -527,7 +566,7 @@ static void bittree_free(void* ptr) {
 /******************************/
 
 /* erase the content of the abstract structure */
-static void memory_clean() {
+void memory_clean() {
   bt_clean();
 }
 
@@ -569,7 +608,7 @@ static void argv_alloca(int *argc_ref,  char *** argv_ref) {
   }
 }
 
-static void memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
+void memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
   describe_run();
   /* Mspace sizes here are not that relevant as there is no shadowing and
      mspaces will grow automatically */
@@ -586,7 +625,7 @@ static void memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
     void *addr = (void*)safe_locations[i].address;
     uintptr_t len = safe_locations[i].length;
     store_block(addr, len);
-    if (safe_locations[i].initialized)
+    if (safe_locations[i].is_initialized)
       initialize(addr, len);
   }
 }
@@ -605,7 +644,7 @@ static void memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
  * The above macros with rewrite of instances of __e_acsl_store_block generating
  * origin information of tracked memory blocks.
 */
-static void* store_block_debug(char *file, int line, void* ptr, size_t size) {
+void* store_block_debug(char *file, int line, void* ptr, size_t size) {
   update_cloc(file, line);
   bt_block * res = store_block(ptr, size);
   if (res) {
@@ -615,7 +654,7 @@ static void* store_block_debug(char *file, int line, void* ptr, size_t size) {
   return res;
 }
 
-static void delete_block_debug(char *file, int line, void* ptr) {
+void delete_block_debug(char *file, int line, void* ptr) {
   update_cloc(file, line);
   bt_block * tmp = bt_lookup(ptr);
   if (!tmp) {
@@ -626,7 +665,7 @@ static void delete_block_debug(char *file, int line, void* ptr) {
 }
 
 /* Debug print of block information */
-static void block_info(char *p) {
+void block_info(char *p) {
   bt_block * res = bt_find(p);
   if (res) {
     printf(" << %a >> %a [%lu] => %lu \n",
@@ -636,46 +675,6 @@ static void block_info(char *p) {
   }
 }
 #endif
-
-/* API BINDINGS {{{ */
-/* Heap allocation (native) */
-strong_alias(bittree_malloc,	malloc)
-strong_alias(bittree_calloc, calloc)
-strong_alias(bittree_realloc, realloc)
-strong_alias(bittree_free, free)
-strong_alias(bittree_free, cfree)
-strong_alias(bittree_posix_memalign, posix_memalign)
-strong_alias(bittree_aligned_alloc, aligned_alloc)
-/* Explicit tracking */
-public_alias(delete_block)
-public_alias(store_block)
-public_alias(store_block_duplicate)
-/* Predicates */
-public_alias(offset)
-public_alias(base_addr)
-public_alias(valid_read)
-public_alias(valid)
-public_alias(block_length)
-public_alias(initialized)
-public_alias(freeable)
-public_alias(mark_readonly)
-/* Block initialization */
-public_alias(initialize)
-public_alias(full_init)
-/* Memory state initialization */
-public_alias(memory_clean)
-public_alias(memory_init)
-/* Heap size */
-public_alias(get_heap_allocation_size)
-public_alias(heap_allocation_size)
-#ifdef E_ACSL_DEBUG /* Debug */
-public_alias(bt_print_block)
-public_alias(bt_print_tree)
-public_alias(block_info)
-public_alias(store_block_debug)
-public_alias(delete_block_debug)
-#endif
-/* }}} */
 
 /* Local operations on temporal timestamps {{{ */
 /* Remaining functionality (shared between all models) is located in e_acsl_temporal.h */

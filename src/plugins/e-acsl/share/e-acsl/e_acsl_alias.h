@@ -32,6 +32,8 @@
 /* Concatenation of 2 tokens */
 # define preconcat(x,y) x ## y
 # define concat(x,y) preconcat(x,y)
+# define ext_prefix __e_acsl_
+# define export_alias(_n) concat(public_prefix, _n)
 
 /** Define `aliasname` as a strong alias for `name`. */
 # define strong_alias(name, aliasname) _strong_alias(name, aliasname)

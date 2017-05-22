@@ -40,7 +40,7 @@
 struct memory_location {
   uintptr_t address; /* Address */
   uintptr_t length; /* Byte-length */
-  int initialized; /* Notion of initialization */
+  int is_initialized; /* Notion of initialization */
 };
 
 typedef struct memory_location memory_location;

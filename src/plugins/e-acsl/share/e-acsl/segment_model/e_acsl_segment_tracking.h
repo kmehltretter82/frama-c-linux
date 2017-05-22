@@ -224,7 +224,7 @@ static const uint64_t static_readonly_masks [] = {
       "Heap base address %a is unaligned", _addr)
 
 #define DVALIDATE_MEMORY_INIT \
-  DVASSERT(mem_layout.initialized != 0, "Un-initialized shadow layout", NULL)
+  DVASSERT(mem_layout.is_initialized != 0, "Un-initialized shadow layout", NULL)
 
 /* Debug function making sure that the order of program segments is as expected
  * and that the program and the shadow segments used do not overlap. */

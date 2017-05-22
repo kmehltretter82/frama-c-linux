@@ -292,7 +292,7 @@ struct memory_layout {
   memory_partition stack;
   memory_partition global;
   memory_partition tls;
-  int initialized;
+  int is_initialized;
 };
 
 /*! \brief Full program memory layout. */
@@ -388,12 +388,12 @@ static void init_shadow_layout(int *argc_ref, char ***argv_ref) {
   set_shadow_segment(&ptls->temporal_secondary, &ptls->application, 1, "temporal_tls_secondary");
 #endif
 
-  mem_layout.initialized = 1;
+  mem_layout.is_initialized = 1;
 }
 
 /*! \brief Deallocate shadow regions used by runtime analysis */
 static void clean_shadow_layout() {
-  if (mem_layout.initialized) {
+    if (mem_layout.is_initialized) {
     int i;
     for (i = 0; i < sizeof(mem_partitions)/sizeof(memory_partition*); i++) {
       if (mem_partitions[i]->primary.mspace)
