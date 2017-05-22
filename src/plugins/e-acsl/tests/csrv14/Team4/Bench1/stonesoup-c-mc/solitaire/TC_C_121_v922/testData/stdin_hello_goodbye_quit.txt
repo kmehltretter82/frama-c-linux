@@ -1,4 +1,0 @@
-hello
-goodbye
-/quit
-# End of file

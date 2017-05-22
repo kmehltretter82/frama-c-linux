@@ -1,3 +1,0 @@
-librairie:
-
-mingw32
