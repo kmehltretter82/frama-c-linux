@@ -146,7 +146,7 @@ clean::
 endif
 
 ################################################
-# E-ACSL C Libs: libjemalloc, libgmp           #
+# Third-party C libraries                      #
 ################################################
 
 EACSL_LIBDIR := $(EACSL_PLUGIN_DIR)/lib
@@ -229,12 +229,14 @@ EACSL_OCAML_FILES = $(wildcard *.mli) \
 	$(filter-out $(wildcard *local_config.ml), $(wildcard *.ml))
 
 EACSL_CONTRIB_FILES = \
-  $(shell $(CAT) $(EACSL_PLUGIN_DIR)/contrib/MANIFEST | $(SED) 's/^/contrib\//g')
+  $(EACSL_GMP_DIR)/mini-gmp.c \
+  $(EACSL_GMP_DIR)/mini-gmp.h \
+  $(EACSL_DLMALLOC_DIR)/dlmalloc.c
+
+EACSL_MANUAL_FILES = $(wildcard $(E_ACSL_DIR)/doc/manuals/*.pdf)
 
 EACSL_DOC_FILES = \
-	doc/manuals/e-acsl-manual.pdf  \
-	doc/manuals/e-acsl.pdf \
-	doc/manuals/e-acsl-implementation.pdf \
+	$(EACSL_MANUAL_FILES) \
 	doc/doxygen/doxygen.cfg.in \
 	doc/Changelog \
 	man/e-acsl-gcc.sh.1
@@ -298,12 +300,14 @@ e-acsl-install-distrib: e-acsl-distrib
 	$(PRINT) Copying to website
 	$(CP) $(EXPORT).tar.gz $(WWW)/distrib/download/e-acsl
 	$(CP) $(EACSL_DOC_FILES) $(WWW)/distrib/download/e-acsl
+ifneq ("$(EACSL_MANUAL_FILES)","")
 	$(CP) doc/manuals/e-acsl-manual.pdf \
 	      $(WWW)/distrib/download/e-acsl/e-acsl-manual-$(EACSL_VERSION).pdf
 	$(CP) doc/manuals/e-acsl.pdf \
 	      $(WWW)/distrib/download/e-acsl/e-acsl-1.7.pdf
 	$(CP) doc/manuals/e-acsl-implementation.pdf \
 	      $(WWW)/distrib/download/e-acsl/e-acsl-implementation-$(EACSL_VERSION).pdf
+endif
 
 ##############################
 # Check source distribution  #
@@ -366,8 +370,6 @@ include $(FRAMAC_SHARE)/Makefile.dynamic
 # Install #
 ###########
 
-MANUALS=$(wildcard $(E_ACSL_DIR)/doc/manuals/*.pdf)
-
 install::
 	$(PRINT_INSTALL) E-ACSL share files
 	$(MKDIR) $(FRAMAC_DATADIR)/e-acsl
@@ -383,10 +385,10 @@ install::
 	      $(FRAMAC_DATADIR)/e-acsl/glibc
         # manuals are not present in standard distribution.
         # Don't fail because of that.
-ifneq ("$(MANUALS)","")
+ifneq ("$(EACSL_MANUAL_FILES)","")
 	$(PRINT_INSTALL) E-ACSL manuals
 	$(MKDIR) $(FRAMAC_DATADIR)/manuals
-	$(CP) $(MANUALS) $(FRAMAC_DATADIR)/manuals;
+	$(CP) $(EACSL_MANUAL_FILES) $(FRAMAC_DATADIR)/manuals;
 endif
 	$(PRINT_INSTALL) E-ACSL libraries
 	$(MKDIR) $(LIBDIR)
@@ -402,9 +404,7 @@ uninstall::
 	$(PRINT_RM) E-ACSL share files
 	$(RM) -r $(FRAMAC_DATADIR)/e-acsl
 	$(PRINT_RM) E-ACSL manuals
-	$(RM) $(FRAMAC_DATADIR)/manuals/e-acsl.pdf \
-	      $(FRAMAC_DATADIR)/manuals/e-acsl-implementation.pdf \
-	      $(FRAMAC_DATADIR)/manuals/e-acsl-manual.pdf
+	$(RM) $(FRAMAC_DATADIR)/manuals/*.pdf
 	$(PRINT_RM) E-ACSL libraries
 	$(RM) $(LIBDIR)/libeacsl-*.a
 	$(PRINT_RM) E-ACSL scripts
