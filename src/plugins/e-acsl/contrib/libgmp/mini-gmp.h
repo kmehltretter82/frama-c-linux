@@ -38,12 +38,61 @@ see https://www.gnu.org/licenses/.  */
 #ifndef __MINI_GMP_H__
 #define __MINI_GMP_H__
 
+#define preconcat(x,y) x ## y
+#define concat(x,y) preconcat(x,y)
+#define public_prefix __g
+#define export_alias(n) concat(public_prefix,n)
+
+/****************/
+/* Initializers */
+/****************/
+#define mpz_init export_alias(mpz_init)
+#define mpz_init_set export_alias(mpz_init_set)
+#define mpz_init_set_ui export_alias(mpz_init_set_ui)
+#define mpz_init_set_si export_alias(mpz_init_set_si)
+#define mpz_init_set_str export_alias(mpz_init_set_str)
+#define mpz_import export_alias(mpz_import)
+
+/***************/
+/* Assignments */
+/***************/
+#define mpz_set export_alias(mpz_set)
+#define mpz_set_ui export_alias(mpz_set_ui)
+#define mpz_set_si export_alias(mpz_set_si)
+
+/*************/
+/* Finalizer */
+/*************/
+#define mpz_clear export_alias(mpz_clear)
+
+/********************/
+/* Logical operator */
+/********************/
+#define mpz_cmp export_alias(mpz_cmp)
+
+/************************/
+/* Arithmetic operators */
+/************************/
+#define mpz_neg export_alias(mpz_neg)
+#define mpz_add export_alias(mpz_add)
+#define mpz_sub export_alias(mpz_sub)
+#define mpz_mul export_alias(mpz_mul)
+#define mpz_tdiv_q export_alias(mpz_tdiv_q)
+#define mpz_tdiv_r export_alias(mpz_tdiv_r)
+
+/*********************/
+/* Bitwise operators */
+/*********************/
+#define mpz_com export_alias(mpz_com)
+
+/************************/
+/* Coercions to C types */
+/************************/
+#define mpz_get_si export_alias(mpz_get_si)
+#define mpz_get_ui export_alias(mpz_get_ui)
+
 /* For size_t */
 #include <stddef.h>
-
-#if defined (__cplusplus)
-extern "C" {
-#endif
 
 static void mp_set_memory_functions (void *(*) (size_t),
 			      void *(*) (void *, size_t, size_t),
@@ -116,9 +165,9 @@ static mp_limb_t mpn_invert_3by2 (mp_limb_t, mp_limb_t);
 static size_t mpn_get_str (unsigned char *, int, mp_ptr, mp_size_t);
 static mp_size_t mpn_set_str (mp_ptr, const unsigned char *, size_t, int);
 
-static void mpz_init (mpz_t);
+       void mpz_init (mpz_t);
 static void mpz_init2 (mpz_t, mp_bitcnt_t);
-static void mpz_clear (mpz_t);
+       void mpz_clear (mpz_t);
 
 #define mpz_odd_p(z)   (((z)->_mp_size != 0) & (int) (z)->_mp_d[0])
 #define mpz_even_p(z)  (! mpz_odd_p (z))
@@ -126,25 +175,25 @@ static void mpz_clear (mpz_t);
 static int mpz_sgn (const mpz_t);
 static int mpz_cmp_si (const mpz_t, long);
 static int mpz_cmp_ui (const mpz_t, unsigned long);
-static int mpz_cmp (const mpz_t, const mpz_t);
+       int mpz_cmp (const mpz_t, const mpz_t);
 static int mpz_cmpabs_ui (const mpz_t, unsigned long);
 static int mpz_cmpabs (const mpz_t, const mpz_t);
 static int mpz_cmp_d (const mpz_t, double);
 static int mpz_cmpabs_d (const mpz_t, double);
 
 static void mpz_abs (mpz_t, const mpz_t);
-static void mpz_neg (mpz_t, const mpz_t);
+       void mpz_neg (mpz_t, const mpz_t);
 static void mpz_swap (mpz_t, mpz_t);
 
 static void mpz_add_ui (mpz_t, const mpz_t, unsigned long);
-static void mpz_add (mpz_t, const mpz_t, const mpz_t);
+       void mpz_add (mpz_t, const mpz_t, const mpz_t);
 static void mpz_sub_ui (mpz_t, const mpz_t, unsigned long);
 static void mpz_ui_sub (mpz_t, unsigned long, const mpz_t);
-static void mpz_sub (mpz_t, const mpz_t, const mpz_t);
+       void mpz_sub (mpz_t, const mpz_t, const mpz_t);
 
 static void mpz_mul_si (mpz_t, const mpz_t, long int);
 static void mpz_mul_ui (mpz_t, const mpz_t, unsigned long int);
-static void mpz_mul (mpz_t, const mpz_t, const mpz_t);
+void mpz_mul (mpz_t, const mpz_t, const mpz_t);
 static void mpz_mul_2exp (mpz_t, const mpz_t, mp_bitcnt_t);
 static void mpz_addmul_ui (mpz_t, const mpz_t, unsigned long int);
 static void mpz_addmul (mpz_t, const mpz_t, const mpz_t);
@@ -156,10 +205,10 @@ static void mpz_fdiv_qr (mpz_t, mpz_t, const mpz_t, const mpz_t);
 static void mpz_tdiv_qr (mpz_t, mpz_t, const mpz_t, const mpz_t);
 static void mpz_cdiv_q (mpz_t, const mpz_t, const mpz_t);
 static void mpz_fdiv_q (mpz_t, const mpz_t, const mpz_t);
-static void mpz_tdiv_q (mpz_t, const mpz_t, const mpz_t);
+       void mpz_tdiv_q (mpz_t, const mpz_t, const mpz_t);
 static void mpz_cdiv_r (mpz_t, const mpz_t, const mpz_t);
 static void mpz_fdiv_r (mpz_t, const mpz_t, const mpz_t);
-static void mpz_tdiv_r (mpz_t, const mpz_t, const mpz_t);
+       void mpz_tdiv_r (mpz_t, const mpz_t, const mpz_t);
 
 static void mpz_cdiv_q_2exp (mpz_t, const mpz_t, mp_bitcnt_t);
 static void mpz_fdiv_q_2exp (mpz_t, const mpz_t, mp_bitcnt_t);
@@ -223,7 +272,7 @@ static void mpz_setbit (mpz_t, mp_bitcnt_t);
 static void mpz_clrbit (mpz_t, mp_bitcnt_t);
 static void mpz_combit (mpz_t, mp_bitcnt_t);
 
-static void mpz_com (mpz_t, const mpz_t);
+       void mpz_com (mpz_t, const mpz_t);
 static void mpz_and (mpz_t, const mpz_t, const mpz_t);
 static void mpz_ior (mpz_t, const mpz_t, const mpz_t);
 static void mpz_xor (mpz_t, const mpz_t, const mpz_t);
@@ -235,8 +284,8 @@ static mp_bitcnt_t mpz_scan1 (const mpz_t, mp_bitcnt_t);
 
 static int mpz_fits_slong_p (const mpz_t);
 static int mpz_fits_ulong_p (const mpz_t);
-static long int mpz_get_si (const mpz_t);
-static unsigned long int mpz_get_ui (const mpz_t);
+       long int mpz_get_si (const mpz_t);
+       unsigned long int mpz_get_ui (const mpz_t);
 static double mpz_get_d (const mpz_t);
 static size_t mpz_size (const mpz_t);
 static mp_limb_t mpz_getlimbn (const mpz_t, mp_size_t);
@@ -250,20 +299,20 @@ static mpz_srcptr mpz_roinit_n (mpz_t, mp_srcptr, mp_size_t);
 
 #define MPZ_ROINIT_N(xp, xs) {{0, (xs),(xp) }}
 
-static void mpz_set_si (mpz_t, signed long int);
-static void mpz_set_ui (mpz_t, unsigned long int);
-static void mpz_set (mpz_t, const mpz_t);
+       void mpz_set_si (mpz_t, signed long int);
+       void mpz_set_ui (mpz_t, unsigned long int);
+       void mpz_set (mpz_t, const mpz_t);
 static void mpz_set_d (mpz_t, double);
 
-static void mpz_init_set_si (mpz_t, signed long int);
-static void mpz_init_set_ui (mpz_t, unsigned long int);
-static void mpz_init_set (mpz_t, const mpz_t);
+       void mpz_init_set_si (mpz_t, signed long int);
+       void mpz_init_set_ui (mpz_t, unsigned long int);
+       void mpz_init_set (mpz_t, const mpz_t);
 static void mpz_init_set_d (mpz_t, double);
 
 static size_t mpz_sizeinbase (const mpz_t, int);
 static char *mpz_get_str (char *, int, const mpz_t);
 static int mpz_set_str (mpz_t, const char *, int);
-static int mpz_init_set_str (mpz_t, const char *, int);
+       int mpz_init_set_str (mpz_t, const char *, int);
 
 /* This long list taken from gmp.h. */
 /* For reference, "defined(EOF)" cannot be used here.  In g++ 2.95.4,
@@ -286,10 +335,7 @@ static int mpz_init_set_str (mpz_t, const char *, int);
 static size_t mpz_out_str (FILE *, int, const mpz_t);
 #endif
 
-static void mpz_import (mpz_t, size_t, int, size_t, int, size_t, const void *);
+       void mpz_import (mpz_t, size_t, int, size_t, int, size_t, const void *);
 static void *mpz_export (void *, size_t *, int, size_t, int, size_t, const mpz_t);
 
-#if defined (__cplusplus)
-}
-#endif
 #endif /* __MINI_GMP_H__ */
