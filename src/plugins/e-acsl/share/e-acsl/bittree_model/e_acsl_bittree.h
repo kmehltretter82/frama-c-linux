@@ -99,7 +99,7 @@ static const int Tneq[] =
 #endif
 
 /*! \brief Root node of the bitree */
-bt_node * bt_root = NULL;
+static bt_node * bt_root = NULL;
 
 /* common prefix of two addresses */
 /*@ assigns \nothing;

@@ -583,7 +583,7 @@ static void memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
  * The above macros with rewrite of instances of __e_acsl_store_block generating
  * origin information of tracked memory blocks.
 */
-void* store_block_debug(char *file, int line, void* ptr, size_t size) {
+static void* store_block_debug(char *file, int line, void* ptr, size_t size) {
   update_cloc(file, line);
   bt_block * res = store_block(ptr, size);
   if (res) {
@@ -593,7 +593,7 @@ void* store_block_debug(char *file, int line, void* ptr, size_t size) {
   return res;
 }
 
-void delete_block_debug(char *file, int line, void* ptr) {
+static void delete_block_debug(char *file, int line, void* ptr) {
   update_cloc(file, line);
   bt_block * tmp = bt_lookup(ptr);
   if (!tmp) {
@@ -604,7 +604,7 @@ void delete_block_debug(char *file, int line, void* ptr) {
 }
 
 /* Debug print of block information */
-void block_info(char *p) {
+static void block_info(char *p) {
   bt_block * res = bt_find(p);
   if (res) {
     printf(" << %a >> %a [%lu] => %lu \n",
