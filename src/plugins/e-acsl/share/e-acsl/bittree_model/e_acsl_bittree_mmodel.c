@@ -108,7 +108,7 @@ static const int nbr_bits_to_1[256] = {
 /**************************/
 size_t heap_allocation_size = 0;
 
-static size_t get_heap_allocation_size(void) {
+size_t get_heap_allocation_size(void) {
   return heap_allocation_size;
 }
 /* }}} */

@@ -26,17 +26,46 @@
  *   model. See e_acsl_mmodel_api.h for details.
 ***************************************************************************/
 
-#include "e_acsl_shadow_layout.h"
-#include "e_acsl_segment_tracking.h"
 #include "e_acsl_mmodel_api.h"
 
-/* Forward declarations */
-static int valid(void*, size_t, void*, void*);
-static int valid_read(void*, size_t, void*, void*);
+/* Public API Bindings {{{ */
+/* Heap allocation (native) */
+#define shadow_malloc         malloc
+#define shadow_calloc         calloc
+#define shadow_realloc        realloc
+#define shadow_free           free
+#define shadow_aligned_alloc  aligned_alloc
+#define shadow_posix_memalign posix_memalign
+/* Explicit tracking */
+#define delete_block          export_alias(delete_block)
+#define store_block           export_alias(store_block)
+#define store_block_duplicate export_alias(store_block_duplicate)
+/* Predicates */
+#define segment_offset        export_alias(offset)
+#define segment_base_addr     export_alias(base_addr)
+#define segment_block_length  export_alias(block_length)
+#define valid_read            export_alias(valid_read)
+#define valid                 export_alias(valid)
+#define initialized           export_alias(initialized)
+#define freeable              export_alias(freeable)
+/* Block initialization  */
+#define mark_readonly         export_alias(mark_readonly)
+#define initialize            export_alias(initialize)
+#define full_init             export_alias(full_init)
+/* Memory state initialization */
+#define memory_clean          export_alias(memory_clean)
+#define memory_init           export_alias(memory_init)
+/* Heap size */
+#define heap_allocation_size      export_alias(heap_allocation_size)
+#define get_heap_allocation_size  export_alias(get_heap_allocation_size)
+/* }}} */
+
+#include "e_acsl_shadow_layout.h"
+#include "e_acsl_segment_tracking.h"
 
 #define ALLOCATED(_ptr,_size) allocated((uintptr_t)_ptr, _size, (uintptr_t)_ptr)
 
-static void * store_block(void * ptr, size_t size) {
+void * store_block(void * ptr, size_t size) {
   /* Only stack-global memory blocks are recorded explicitly via this function.
    * Heap blocks should be tracked internally using memory allocation functions
    * such as malloc or calloc. */
@@ -44,24 +73,34 @@ static void * store_block(void * ptr, size_t size) {
   return ptr;
 }
 
-static void delete_block(void * ptr) {
+void delete_block(void * ptr) {
   /* Block deletion should be performed on stack/global addresses only,
    * heap blocks should be deallocated manually via free/cfree/realloc. */
   shadow_freea(ptr);
 }
 
-static void * store_block_duplicate(void * ptr, size_t size) {
+void * store_block_duplicate(void * ptr, size_t size) {
   if (allocated((uintptr_t)ptr, size, (uintptr_t)ptr))
     delete_block(ptr);
   shadow_alloca(ptr, size);
   return ptr;
 }
 
-static void full_init(void * ptr) {
+/*! \brief Initialize a chunk of memory given by its start address (`addr`)
+ * and byte length (`n`). */
+void initialize(void *ptr, size_t n) {
+  TRY_SEGMENT(
+    (uintptr_t)ptr,
+    initialize_heap_region((uintptr_t)ptr, n),
+    initialize_static_region((uintptr_t)ptr, n)
+  )
+}
+
+void full_init(void * ptr) {
   initialize(ptr, block_length(ptr));
 }
 
-static void mark_readonly(void * ptr) {
+void mark_readonly(void * ptr) {
   mark_readonly_region((uintptr_t)ptr, block_length(ptr));
 }
 
@@ -75,7 +114,7 @@ static int readonly (void *ptr) {
   return IS_ON_GLOBAL(addr) && global_readonly(addr) ? 1 : 0;
 }
 
-static int valid(void * ptr, size_t size, void *ptr_base, void *addrof_base) {
+int valid(void * ptr, size_t size, void *ptr_base, void *addrof_base) {
   return
     allocated((uintptr_t)ptr, size, (uintptr_t)ptr_base)
     && !readonly(ptr)
@@ -85,7 +124,7 @@ static int valid(void * ptr, size_t size, void *ptr_base, void *addrof_base) {
   ;
 }
 
-static int valid_read(void * ptr, size_t size, void *ptr_base, void *addrof_base) {
+int valid_read(void * ptr, size_t size, void *ptr_base, void *addrof_base) {
   return allocated((uintptr_t)ptr, size, (uintptr_t)ptr_base)
 #ifdef E_ACSL_TEMPORAL
     && temporal_valid(ptr_base, addrof_base)
@@ -97,7 +136,7 @@ static int valid_read(void * ptr, size_t size, void *ptr_base, void *addrof_base
 /*! NB: The implementation for this function can also be specified via
  * \p base_addr macro that will eventually call ::TRY_SEGMENT. The following
  * implementation is preferred for performance reasons. */
-static void * segment_base_addr(void * ptr) {
+void * segment_base_addr(void * ptr) {
   TRY_SEGMENT(ptr,
     return (void*)heap_info((uintptr_t)ptr, 'B'),
     return (void*)static_info((uintptr_t)ptr, 'B'));
@@ -107,7 +146,7 @@ static void * segment_base_addr(void * ptr) {
 /*! NB: Implementation of the following function can also be specified
  * via \p block_length macro. A more direct approach via ::TRY_SEGMENT
  * is preferred for performance reasons. */
-static size_t segment_block_length(void * ptr) {
+size_t segment_block_length(void * ptr) {
   TRY_SEGMENT(ptr,
     return heap_info((uintptr_t)ptr, 'L'),
     return static_info((uintptr_t)ptr, 'L'))
@@ -117,14 +156,14 @@ static size_t segment_block_length(void * ptr) {
 /*! NB: Implementation of the following function can also be specified
  * via \p offset macro. A more direct approach via ::TRY_SEGMENT
  * is preferred for performance reasons. */
-static int segment_offset(void *ptr) {
+int segment_offset(void *ptr) {
   TRY_SEGMENT(ptr,
     return heap_info((uintptr_t)ptr, 'O'),
     return static_info((uintptr_t)ptr, 'O'));
   return 0;
 }
 
-static int initialized(void * ptr, size_t size) {
+int initialized(void * ptr, size_t size) {
   uintptr_t addr = (uintptr_t)ptr;
   TRY_SEGMENT_WEAK(addr,
     return heap_initialized(addr, size),
@@ -132,7 +171,7 @@ static int initialized(void * ptr, size_t size) {
   return 0;
 }
 
-static size_t get_heap_allocation_size(void) {
+size_t get_heap_allocation_size(void) {
   return heap_allocation_size;
 }
 /* }}} */
@@ -197,7 +236,7 @@ static void argv_alloca(int *argc_ref,  char *** argv_ref) {
 /* Program initialization {{{ */
 extern int main(void);
 
-static void memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
+void memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
   describe_run();
   /** Verify that the given size of a pointer matches the one in the present
    * architecture. This is a guard against Frama-C instrumentations using
@@ -231,42 +270,9 @@ static void memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
   }
 }
 
-static void memory_clean(void) {
+void memory_clean(void) {
   clean_shadow_layout();
 }
-/* }}} */
-
-/* Public API Bindings {{{ */
-/* Heap allocation (native) */
-strong_alias(shadow_malloc, malloc)
-strong_alias(shadow_calloc, calloc)
-strong_alias(shadow_realloc, realloc)
-strong_alias(shadow_free, free)
-strong_alias(shadow_free, cfree)
-strong_alias(shadow_aligned_alloc, aligned_alloc)
-strong_alias(shadow_posix_memalign, posix_memalign)
-/* Explicit tracking */
-public_alias(delete_block)
-public_alias(store_block)
-public_alias(store_block_duplicate)
-/* Predicates */
-public_alias2(segment_offset, offset)
-public_alias2(segment_base_addr, base_addr)
-public_alias2(segment_block_length, block_length)
-public_alias(valid_read)
-public_alias(valid)
-public_alias(initialized)
-public_alias(freeable)
-/* Block initialization  */
-public_alias(mark_readonly)
-public_alias(initialize)
-public_alias(full_init)
-/* Memory state initialization */
-public_alias(memory_clean)
-public_alias(memory_init)
-/* Heap size */
-public_alias(get_heap_allocation_size)
-public_alias(heap_allocation_size)
 /* }}} */
 
 /* Local operations on temporal timestamps {{{ */

@@ -430,7 +430,6 @@ static uintptr_t static_info(uintptr_t addr, char type);
 static int heap_allocated(uintptr_t addr, size_t size, uintptr_t base_ptr);
 static int static_allocated(uintptr_t addr, long size, uintptr_t base_ptr);
 static int allocated(uintptr_t addr, long size, uintptr_t base_ptr);
-static int freeable(void *ptr);
 
 /*! \brief Quick test to check if a static location belongs to allocation.
  * This macro really belongs where static_allocated is defined, but
@@ -584,7 +583,7 @@ static void shadow_alloca(void *ptr, size_t size) {
 
 /*! \brief Nullifies shadow regions of a memory block given by its address.
  * \param ptr - base memory address of the stack memory block. */
-static void shadow_freea(void *ptr) {
+void shadow_freea(void *ptr) {
   DVALIDATE_STATIC_LOCATION(ptr);
   DASSERT(ptr == (void*)base_addr(ptr));
   size_t size = block_length(ptr);
@@ -827,7 +826,7 @@ static void mark_readonly_region (uintptr_t addr, long size) {
 
 /*! \brief Amount of heap memory allocated by the program.
  * Variable visible externally. */
-static size_t heap_allocation_size = 0;
+size_t heap_allocation_size = 0;
 
 /*! \brief Create a heap shadow for an allocated memory block starting at `ptr`
  * and of length `size`. Optionally mark it as initialized if `init`
@@ -892,7 +891,7 @@ static void set_heap_segment(void *ptr, size_t size, size_t alloc_size,
  *    implementation-defined: either a null pointer is returned, or the
  *    behaviour is as if the size were some non-zero value, except that the
  *    returned pointer shall not be used to access an object." */
-static void* shadow_malloc(size_t size) {
+void* shadow_malloc(size_t size) {
   size_t alloc_size = ALLOC_SIZE(size);
 
   /* Return NULL if the size is too large to be aligned */
@@ -907,7 +906,7 @@ static void* shadow_malloc(size_t size) {
 }
 
 /*! \brief  Replacement for `calloc` that enables memory tracking */
-static void* shadow_calloc(size_t nmemb, size_t size) {
+void* shadow_calloc(size_t nmemb, size_t size) {
   /* Since both `nmemb` and `size` are both of size `size_t` the multiplication
    * of the arguments (which gives the actual allocation size) might lead to an
    * integer overflow. The below code checks for an overflow and sets the
@@ -969,7 +968,7 @@ static void unset_heap_segment(void *ptr, int init, const char *function) {
 }
 
 /*! \brief Replacement for `free` with memory tracking  */
-static void shadow_free(void *ptr) {
+void shadow_free(void *ptr) {
   if (ptr != NULL) { /* NULL is a valid behaviour */
     if (freeable(ptr)) {
       unset_heap_segment(ptr, 1, "free");
@@ -982,7 +981,7 @@ static void shadow_free(void *ptr) {
 /* }}} */
 
 /* Heap reallocation (realloc) {{{ */
-static void* shadow_realloc(void *ptr, size_t size) {
+void* shadow_realloc(void *ptr, size_t size) {
   char *res = NULL; /* Resulting pointer */
   /* If the pointer is NULL then realloc is equivalent to malloc(size) */
   if (ptr == NULL)
@@ -1043,7 +1042,7 @@ static void* shadow_realloc(void *ptr, size_t size) {
 
 /* Heap aligned allocation (aligned_alloc) {{{ */
 /*! \brief Replacement for `aligned_alloc` with memory tracking */
-static void *shadow_aligned_alloc(size_t alignment, size_t size) {
+void *shadow_aligned_alloc(size_t alignment, size_t size) {
   /* Check if:
    *  - size and alignment are greater than zero
    *  - alignment is a power of 2
@@ -1063,7 +1062,7 @@ static void *shadow_aligned_alloc(size_t alignment, size_t size) {
 
 /* Heap aligned allocation (posix_memalign) {{{ */
 /*! \brief Replacement for `posix_memalign` with memory tracking */
-static int shadow_posix_memalign(void **memptr, size_t alignment, size_t size) {
+int shadow_posix_memalign(void **memptr, size_t alignment, size_t size) {
  /* Check if:
    *  - size and alignment are greater than zero
    *  - alignment is a power of 2 and a multiple of sizeof(void*) */
@@ -1130,7 +1129,7 @@ static int heap_allocated(uintptr_t addr, size_t size, uintptr_t base_ptr) {
  * As some of the other functions, \b \\freeable can be expressed using
  * ::IS_ON_HEAP, ::heap_allocated and ::base_addr. Here direct
  * implementation is preferred for performance reasons. */
-static int freeable(void *ptr) { /* + */
+int freeable(void *ptr) { /* + */
   uintptr_t addr = (uintptr_t)ptr;
   /* Address is not on the program's heap, so cannot be freed */
   if (!IS_ON_HEAP(addr))
@@ -1278,18 +1277,6 @@ static int allocated(uintptr_t addr, long size, uintptr_t base) {
   if (!IS_ON_VALID(addr))
     return 0;
   return 0;
-}
-/* }}} */
-
-/* Any initialization {{{ */
-/*! \brief Initialize a chunk of memory given by its start address (`addr`)
- * and byte length (`n`). */
-static void initialize(void *ptr, size_t n) {
-  TRY_SEGMENT(
-    (uintptr_t)ptr,
-    initialize_heap_region((uintptr_t)ptr, n),
-    initialize_static_region((uintptr_t)ptr, n)
-  )
 }
 /* }}} */
 

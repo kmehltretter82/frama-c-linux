@@ -35,6 +35,8 @@
 # define ext_prefix __e_acsl_
 # define export_alias(_n) concat(public_prefix, _n)
 
+/* 'strong' and 'weak' aliases are not portable */
+
 /** Define `aliasname` as a strong alias for `name`. */
 # define strong_alias(name, aliasname) _strong_alias(name, aliasname)
 # define _strong_alias(name, aliasname) \
