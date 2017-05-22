@@ -20,8 +20,8 @@ int main() {
     p = &j;
     /*@assert \valid(p); */
     *p = 1;
+    /* `q` now may point to `j`, bit not necessarily */
     /*@assert ! \valid(q); */
-    *q = 1;
     /*@assert \valid(&j); */
   }
 

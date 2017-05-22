@@ -56,6 +56,7 @@
 /tests/test_config
 /tests/runtime/*.cm*
 /tests/runtime/result/*
+/tests/temporal/result/*
 /tests/no-main/result/*
 /tests/full-mmodel/result/*
 /tests/bts/result/*
@@ -79,3 +80,4 @@ lib/libeacsl-rtl-bittree.a
 lib/libeacsl-rtl-segment.a
 lib/libeacsl-rtl-bittree-dbg.a
 lib/libeacsl-rtl-segment-dbg.a
+tests/csrv14/*
