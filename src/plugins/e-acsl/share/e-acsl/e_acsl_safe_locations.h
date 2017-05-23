@@ -30,9 +30,6 @@
  * Most of these should be declared somewhere in start procedures of c
  * and gcc libraries. One example of a safe location is errno. */
 
-#include <stddef.h>
-#include <errno.h>
-
 #ifndef E_ACSL_SAFE_LOCATIONS
 #define E_ACSL_SAFE_LOCATIONS
 
@@ -67,19 +64,15 @@ extern __thread int errno;
 # error "Unknown convention for errno definition"
 #endif
 
-/* TODO: May not be utterly portable */
-#include <libio.h>
-
-extern struct _IO_FILE *stdin;		/* Standard input stream.  */
-extern struct _IO_FILE *stdout;		/* Standard output stream.  */
-extern struct _IO_FILE *stderr;		/* Standard error output stream. */
+extern FILE *stdin;		/* Standard input stream.  */
+extern FILE *stdout;		/* Standard output stream.  */
+extern FILE *stderr;		/* Standard error output stream. */
 
 static void collect_safe_locations() {
-  /* Tracking of errno */
+  /* Tracking of errno and standard streams */
   add_safe_location((uintptr_t)&errno, sizeof(int), "errno");
-  /* Tracking standard streams */
-  add_safe_location((uintptr_t)stdout, sizeof(struct _IO_FILE), "stdout");
-  add_safe_location((uintptr_t)stderr, sizeof(struct _IO_FILE), "stderr");
-  add_safe_location((uintptr_t)stdin, sizeof(struct _IO_FILE), "stdin");
+  add_safe_location((uintptr_t)stdout, sizeof(FILE), "stdout");
+  add_safe_location((uintptr_t)stderr, sizeof(FILE), "stderr");
+  add_safe_location((uintptr_t)stdin, sizeof(FILE), "stdin");
 }
 #endif

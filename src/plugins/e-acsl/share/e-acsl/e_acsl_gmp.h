@@ -34,9 +34,10 @@
 #define E_ACSL_GMP
 
 #include "stdlib.h"
+#include "e_acsl_alias.h"
 
-#define mpz_struct __e_acsl_mpz_struct
-#define mpz_t      __e_acsl_mpz_t
+#define mpz_struct export_alias(mpz_struct)
+#define mpz_t      export_alias(mpz_t)
 
 struct mpz_struct {
   int _mp_alloc;

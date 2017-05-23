@@ -73,6 +73,11 @@
 /* Public API         */
 /* ****************** */
 
+#define printf  export_alias(printf)
+#define sprintf export_alias(sprintf)
+#define eprintf export_alias(eprintf)
+#define dprintf export_alias(dprintf)
+
 /* Replacement for printf with support for the above specifiers */
 static int printf(char *fmt, ...);
 

@@ -34,6 +34,7 @@
 #include <unistd.h>
 #include <limits.h>
 #include <sys/stat.h>
+#include <stdio.h>
 
 /* For PATH_MAX in Linux */
 #ifdef __linux__
