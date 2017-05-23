@@ -36,28 +36,6 @@
 #define shadow_free           free
 #define shadow_aligned_alloc  aligned_alloc
 #define shadow_posix_memalign posix_memalign
-/* Explicit tracking */
-#define delete_block          export_alias(delete_block)
-#define store_block           export_alias(store_block)
-#define store_block_duplicate export_alias(store_block_duplicate)
-/* Predicates */
-#define offset                export_alias(offset)
-#define base_addr             export_alias(base_addr)
-#define block_length          export_alias(block_length)
-#define valid_read            export_alias(valid_read)
-#define valid                 export_alias(valid)
-#define initialized           export_alias(initialized)
-#define freeable              export_alias(freeable)
-/* Block initialization  */
-#define mark_readonly         export_alias(mark_readonly)
-#define initialize            export_alias(initialize)
-#define full_init             export_alias(full_init)
-/* Memory state initialization */
-#define memory_clean          export_alias(memory_clean)
-#define memory_init           export_alias(memory_init)
-/* Heap size */
-#define heap_allocation_size      export_alias(heap_allocation_size)
-#define get_heap_allocation_size  export_alias(get_heap_allocation_size)
 /* }}} */
 
 #include "e_acsl_shadow_layout.h"

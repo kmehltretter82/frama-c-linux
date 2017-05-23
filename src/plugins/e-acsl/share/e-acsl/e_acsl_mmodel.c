@@ -54,6 +54,7 @@
 #include "e_acsl_assert.h"
 #include "e_acsl_safe_locations.h"
 #include "e_acsl_temporal_timestamp.h"
+#include "e_acsl_mmodel_api.h"
 
 /* Memory model settings
  *    Memory model:

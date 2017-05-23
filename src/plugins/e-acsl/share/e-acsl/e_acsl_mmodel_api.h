@@ -31,6 +31,33 @@
 #define E_ACSL_MMODEL
 
 #include <stddef.h>
+#include "e_acsl_alias.h"
+
+/***********************************************/
+/************ API prefixes *********************/
+/***********************************************/
+/* Tracking */
+#define delete_block          export_alias(delete_block)
+#define store_block           export_alias(store_block)
+#define store_block_duplicate export_alias(store_block_duplicate)
+/* Predicates */
+#define offset                export_alias(offset)
+#define base_addr             export_alias(base_addr)
+#define block_length          export_alias(block_length)
+#define valid_read            export_alias(valid_read)
+#define valid                 export_alias(valid)
+#define initialized           export_alias(initialized)
+#define freeable              export_alias(freeable)
+/* Block initialization  */
+#define mark_readonly         export_alias(mark_readonly)
+#define initialize            export_alias(initialize)
+#define full_init             export_alias(full_init)
+/* Memory state initialization */
+#define memory_clean          export_alias(memory_clean)
+#define memory_init           export_alias(memory_init)
+/* Heap size */
+#define heap_allocation_size      export_alias(heap_allocation_size)
+#define get_heap_allocation_size  export_alias(get_heap_allocation_size)
 
 /***********************************************/
 /************ Basic API ************************/
@@ -83,40 +110,40 @@ int posix_memalign(void **memptr, size_t alignment, size_t size)
  * \param ptr base address of the tracked memory block
  * \param size size of the tracked block in bytes */
 /*@ assigns \result \from *(((char*)ptr)+(0..size-1)); */
-void * __e_acsl_store_block(void * ptr, size_t size)
+void * store_block(void * ptr, size_t size)
   __attribute__((FC_BUILTIN));
 
-/*! \brief Same as `__e_acsl_store_block`, but first check
+/*! \brief Same as `store_block`, but first check
  * checks whether a block with a base address given by `ptr` exists in the
  * tracked allocation and remove it before storing a new block.
  *
  * \param ptr base address of the tracked memory block
  * \param size size of the tracked block in bytes */
 /*@ assigns \result \from *(((char*)ptr)+(0..size-1)); */
-void * __e_acsl_store_block_duplicate(void * ptr, size_t size)
+void * store_block_duplicate(void * ptr, size_t size)
   __attribute__((FC_BUILTIN));
 
 /*! \brief Remove a memory block which base address is \p ptr from tracking. */
 /*@ assigns \nothing; */
-void __e_acsl_delete_block(void * ptr)
+void delete_block(void * ptr)
   __attribute__((FC_BUILTIN));
 
 /*! \brief Mark the \p size bytes starting at an address given by \p ptr as
  * initialized. */
 /*@ assigns \nothing; */
-void __e_acsl_initialize(void * ptr, size_t size)
+void initialize(void * ptr, size_t size)
   __attribute__((FC_BUILTIN));
 
 /*! \brief Mark all bytes belonging to a memory block which start address is
  * given by \p ptr as initialized. */
 /*@ assigns \nothing; */
-void __e_acsl_full_init(void * ptr)
+void full_init(void * ptr)
   __attribute__((FC_BUILTIN));
 
 /*! \brief Mark a memory block which start address is given by \p ptr as
  * read-only. */
 /*@ assigns \nothing; */
-void __e_acsl_mark_readonly(void * ptr)
+void mark_readonly(void * ptr)
   __attribute__((FC_BUILTIN));
 
 /* ****************** */
@@ -128,7 +155,7 @@ void __e_acsl_mark_readonly(void * ptr)
  * Evaluate to a non-zero value if \p ptr points to a start address of
  * a block allocated via \p malloc, \p calloc or \p realloc. */
 /*@ assigns \result \from ptr; */
-int __e_acsl_freeable(void * ptr)
+int freeable(void * ptr)
   __attribute__((FC_BUILTIN));
 
 /*! \brief Implementation of the \b \\valid predicate of E-ACSL.
@@ -157,17 +184,17 @@ int __e_acsl_freeable(void * ptr)
 /*@ ensures \result == 0 || \result == 1;
   @ ensures \result == 1 ==> \valid(((char *)ptr)+(0..size-1));
   @ assigns \result \from *(((char*)ptr)+(0..size-1)); */
-int __e_acsl_valid(void * ptr, size_t size, void *base, void *addrof_base)
+int valid(void * ptr, size_t size, void *base, void *addrof_base)
   __attribute__((FC_BUILTIN));
 
 /*! \brief Implementation of the \b \\valid_read predicate of E-ACSL.
  *
- * Same as ::__e_acsl_valid except the checked memory locations are only
+ * Same as ::valid except the checked memory locations are only
  * required to be allocated.  */
 /*@ ensures \result == 0 || \result == 1;
   @ ensures \result == 1 ==> \valid_read(((char *)ptr)+(0..size-1));
   @ assigns \result \from *(((char*)ptr)+(0..size-1)); */
-int __e_acsl_valid_read(void * ptr, size_t size, void *ptr_base, void *addrof_base)
+int valid_read(void * ptr, size_t size, void *ptr_base, void *addrof_base)
   __attribute__((FC_BUILTIN));
 
 /*! \brief Implementation of the \b \\base_addr predicate of E-ACSL.
@@ -176,7 +203,7 @@ int __e_acsl_valid_read(void * ptr, size_t size, void *ptr_base, void *addrof_ba
  * by \p ptr */
 /*@ ensures \result == \base_addr(ptr);
   @ assigns \result \from ptr; */
-void * __e_acsl_base_addr(void * ptr)
+void * base_addr(void * ptr)
   __attribute__((FC_BUILTIN));
 
 /*! \brief Implementation of the \b \\block_length predicate of E-ACSL.
@@ -185,19 +212,19 @@ void * __e_acsl_base_addr(void * ptr)
  * address given by \p ptr */
 /*@ ensures \result == \block_length(ptr);
   @ assigns \result \from ptr; */
-size_t __e_acsl_block_length(void * ptr)
+size_t block_length(void * ptr)
   __attribute__((FC_BUILTIN));
 
 /*! \brief Implementation of the \b \\offset predicate of E-ACSL.
  *
  * Return the byte offset of address given by \p ptr within a memory blocks
  * it belongs to */
-/* FIXME: The return type of __e_acsl_offset should be changed to size_t.
+/* FIXME: The return type of offset should be changed to size_t.
  * In the current E-ACSL/Frama-C implementation, however, this change
  * leads to a Frama-C failure. */
 /*@ ensures \result == \offset(ptr);
   @ assigns \result \from ptr; */
-int __e_acsl_offset(void * ptr)
+int offset(void * ptr)
   __attribute__((FC_BUILTIN));
 
 /*! \brief Implementation of the \b \\initialized predicate of E-ACSL.
@@ -207,33 +234,33 @@ int __e_acsl_offset(void * ptr)
 /*@ ensures \result == 0 || \result == 1;
   @ ensures \result == 1 ==> \initialized(((char *)ptr)+(0..size-1));
   @ assigns \result \from *(((char*)ptr)+(0..size-1)); */
-int __e_acsl_initialized(void * ptr, size_t size)
+int initialized(void * ptr, size_t size)
   __attribute__((FC_BUILTIN));
 
 /*@ ghost int extern __e_acsl_internal_heap; */
 
 /*! \brief Clean-up memory tracking state before a program's termination. */
 /*@ assigns \nothing; */
-void __e_acsl_memory_clean(void)
+void memory_clean(void)
   __attribute__((FC_BUILTIN));
 
 /*! \brief Initialize memory tracking state.
  * Called before any other statement in \p main */
 /*@ assigns \nothing; */
-void __e_acsl_memory_init(int *argc_ref, char ***argv, size_t ptr_size)
+void memory_init(int *argc_ref, char ***argv, size_t ptr_size)
   __attribute__((FC_BUILTIN));
 
 /*! \brief Return the cumulative size (in bytes) of tracked heap allocation. */
 /*@ assigns \result \from __e_acsl_internal_heap; */
-size_t __e_acsl_get_heap_allocation_size(void)
+size_t get_heap_allocation_size(void)
   __attribute__((FC_BUILTIN));
 
 /*! \brief A variable holding a byte size of tracked heap allocation. */
-extern size_t __e_acsl_heap_allocation_size;
+extern size_t heap_allocation_size;
 
 /*@predicate diffSize{L1,L2}(integer i) =
-  \at(__e_acsl_heap_allocation_size, L1)
-    - \at(__e_acsl_heap_allocation_size, L2) == i; */
+  \at(heap_allocation_size, L1)
+    - \at(heap_allocation_size, L2) == i; */
 
 /***********************************************/
 /************ Temporal analysis API ************/

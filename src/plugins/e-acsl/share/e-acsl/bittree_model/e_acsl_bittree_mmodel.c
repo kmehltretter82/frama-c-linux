@@ -28,7 +28,7 @@
 
 #include "e_acsl_bittree.h"
 
-/* API BINDINGS {{{ */
+/* Public API {{{ */
 /* Heap allocation */
 #define bittree_malloc          malloc
 #define bittree_calloc          calloc
@@ -36,29 +36,8 @@
 #define bittree_free            free
 #define bittree_posix_memalign  posix_memalign
 #define bittree_aligned_alloc   aligned_alloc
-/* Explicit tracking */
-#define delete_block          export_alias(delete_block)
-#define store_block           export_alias(store_block)
-#define store_block_duplicate export_alias(store_block_duplicate)
-/* Predicates */
-#define offset        export_alias(offset)
-#define base_addr     export_alias(base_addr)
-#define valid_read    export_alias(valid_read)
-#define valid         export_alias(valid)
-#define block_length  export_alias(block_length)
-#define initialized   export_alias(initialized)
-#define freeable      export_alias(freeable)
-#define mark_readonly export_alias(mark_readonly)
-/* Block initialization */
-#define initialize    export_alias(initialize)
-#define full_init     export_alias(full_init)
-/* Memory state initialization */
-#define memory_clean  export_alias(memory_clean)
-#define memory_init   export_alias(memory_init)
-/* Heap size */
-#define get_heap_allocation_size  export_alias(get_heap_allocation_size)
-#define heap_allocation_size      export_alias(heap_allocation_size)
-#ifdef E_ACSL_DEBUG /* Debug */
+/* Debug */
+#ifdef E_ACSL_DEBUG
 # define bt_print_block     export_alias(bt_print_block)
 # define bt_print_tree      export_alias(bt_print_tree)
 # define block_info         export_alias(block_info)
