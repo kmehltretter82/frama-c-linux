@@ -33,13 +33,6 @@ error () {
   fi
 }
 
-# Check whether the first line reported by running command $1 has an identifier
-# specified by $2.
-required_tool() {
-  "$1" --version 2>&1 | head -1 | grep "$2" > /dev/null
-  error "$1 is not $2" $?
-}
-
 # Check if a given executable name can be found by in the PATH
 has_tool() {
   which "$@" >/dev/null 2>&1 && return 0 || return 1
@@ -49,6 +42,16 @@ has_tool() {
 # in the $PATH. Abort the execution if not.
 check_tool() {
    { has_tool "$1" || test -e "$1"; } || error "No executable $1 found";
+}
+
+# Check whether getopt utility supports long options
+check_getopt() {
+  local out="$(getopt -l "ab:,cd" -o "x:,y" -- --ab 1 -x 1 --cd  -y \
+    | sed "s/[ \']//g")"
+  error "system getopt has no support for long option processing" $?
+  if ! [ "$out" = "--ab1-x1--cd-y--" ]; then
+    error "system getopt has no support for long option processing" 1
+  fi
 }
 
 # Check if $1 is positive integer and whether $1 is greater than $2
@@ -236,9 +239,8 @@ mmodel_features() {
   echo $flags
 }
 
-# Check if the following tools are GNU and abort otherwise
-required_tool getopt "util-linux"
-required_tool find "GNU findutils"
+# Check if system getopt supports long option processing
+check_getopt;
 
 # Getopt options
 LONGOPTIONS="help,compile,compile-only,debug:,ocode:,oexec:,verbose:,
