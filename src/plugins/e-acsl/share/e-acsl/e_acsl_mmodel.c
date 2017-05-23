@@ -92,11 +92,15 @@ static void describe_run();
 /* Select memory model, either segment-based or bittree-based model should
    be defined */
 #if defined E_ACSL_SEGMENT_MMODEL
-#  include "segment_model/e_acsl_segment_mmodel.c"
+# include "segment_model/e_acsl_shadow_layout.h"
+# include "segment_model/e_acsl_segment_tracking.h"
+# include "segment_model/e_acsl_segment_mmodel.c"
 #elif defined E_ACSL_BITTREE_MMODEL
-#  include "bittree_model/e_acsl_bittree_mmodel.c"
+# include "bittree_model/e_acsl_bittree_api.h"
+# include "bittree_model/e_acsl_bittree.h"
+# include "bittree_model/e_acsl_bittree_mmodel.c"
 #else
-#  error "No E-ACSL memory model defined. Aborting compilation"
+# error "No E-ACSL memory model defined. Aborting compilation"
 #endif
 
 /* Temporal analysis shared by both models.

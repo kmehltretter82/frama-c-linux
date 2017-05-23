@@ -28,11 +28,6 @@
 #ifndef E_ACSL_BITTREE
 #define E_ACSL_BITTREE
 
-#include "e_acsl_malloc.h"
-#include "e_acsl_printf.h"
-#include "e_acsl_assert.h"
-#include "e_acsl_bittree_api.h"
-
 #define WORDBITS __WORDSIZE
 
 static size_t mask(size_t, size_t);

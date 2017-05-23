@@ -28,8 +28,6 @@
 #ifndef E_ACSL_BITTREE_API
 #define E_ACSL_BITTREE_API
 
-#include "stdlib.h"
-
 /*! \brief Structure representing an allocated memory block */
 struct bt_block {
   size_t ptr;  //!< Base address

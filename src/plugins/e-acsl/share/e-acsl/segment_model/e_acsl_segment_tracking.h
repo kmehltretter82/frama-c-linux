@@ -889,7 +889,7 @@ static void set_heap_segment(void *ptr, size_t size, size_t alloc_size,
  *    implementation-defined: either a null pointer is returned, or the
  *    behaviour is as if the size were some non-zero value, except that the
  *    returned pointer shall not be used to access an object." */
-void* shadow_malloc(size_t size) {
+void* malloc(size_t size) {
   size_t alloc_size = ALLOC_SIZE(size);
 
   /* Return NULL if the size is too large to be aligned */
@@ -904,7 +904,7 @@ void* shadow_malloc(size_t size) {
 }
 
 /*! \brief  Replacement for `calloc` that enables memory tracking */
-void* shadow_calloc(size_t nmemb, size_t size) {
+void* calloc(size_t nmemb, size_t size) {
   /* Since both `nmemb` and `size` are both of size `size_t` the multiplication
    * of the arguments (which gives the actual allocation size) might lead to an
    * integer overflow. The below code checks for an overflow and sets the
@@ -928,7 +928,7 @@ void* shadow_calloc(size_t nmemb, size_t size) {
 
 /** \brief Return shadowed copy of a memory chunk on a program's heap */
 static void *shadow_copy(const void *ptr, size_t size, int init) {
-  char *ret = (init) ?	shadow_calloc(1, size) : shadow_malloc(size);
+  char *ret = (init) ?	calloc(1, size) : malloc(size);
   return memcpy(ret, ptr, size);
 }
 /* }}} */
@@ -966,7 +966,7 @@ static void unset_heap_segment(void *ptr, int init, const char *function) {
 }
 
 /*! \brief Replacement for `free` with memory tracking  */
-void shadow_free(void *ptr) {
+void free(void *ptr) {
   if (ptr != NULL) { /* NULL is a valid behaviour */
     if (freeable(ptr)) {
       unset_heap_segment(ptr, 1, "free");
@@ -979,15 +979,15 @@ void shadow_free(void *ptr) {
 /* }}} */
 
 /* Heap reallocation (realloc) {{{ */
-void* shadow_realloc(void *ptr, size_t size) {
+void* realloc(void *ptr, size_t size) {
   char *res = NULL; /* Resulting pointer */
   /* If the pointer is NULL then realloc is equivalent to malloc(size) */
   if (ptr == NULL)
-    return shadow_malloc(size);
+    return malloc(size);
   /* If the pointer is not NULL and the size is zero then realloc is
    * equivalent to free(ptr) */
   else if (ptr != NULL && size == 0) {
-    shadow_free(ptr);
+    free(ptr);
   } else {
     if (freeable(ptr)) { /* ... and can be used as an input to `free` */
       size_t alloc_size = ALLOC_SIZE(size);
@@ -1040,7 +1040,7 @@ void* shadow_realloc(void *ptr, size_t size) {
 
 /* Heap aligned allocation (aligned_alloc) {{{ */
 /*! \brief Replacement for `aligned_alloc` with memory tracking */
-void *shadow_aligned_alloc(size_t alignment, size_t size) {
+void *aligned_alloc(size_t alignment, size_t size) {
   /* Check if:
    *  - size and alignment are greater than zero
    *  - alignment is a power of 2
@@ -1060,7 +1060,7 @@ void *shadow_aligned_alloc(size_t alignment, size_t size) {
 
 /* Heap aligned allocation (posix_memalign) {{{ */
 /*! \brief Replacement for `posix_memalign` with memory tracking */
-int shadow_posix_memalign(void **memptr, size_t alignment, size_t size) {
+int posix_memalign(void **memptr, size_t alignment, size_t size) {
  /* Check if:
    *  - size and alignment are greater than zero
    *  - alignment is a power of 2 and a multiple of sizeof(void*) */

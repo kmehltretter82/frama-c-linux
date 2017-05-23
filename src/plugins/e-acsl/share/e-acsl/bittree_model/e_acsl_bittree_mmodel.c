@@ -26,16 +26,7 @@
  * on Patricia Trie. See e_acsl_mmodel_api.h for details.
 ***************************************************************************/
 
-#include "e_acsl_bittree.h"
-
 /* Public API {{{ */
-/* Heap allocation */
-#define bittree_malloc          malloc
-#define bittree_calloc          calloc
-#define bittree_realloc         realloc
-#define bittree_free            free
-#define bittree_posix_memalign  posix_memalign
-#define bittree_aligned_alloc   aligned_alloc
 /* Debug */
 #ifdef E_ACSL_DEBUG
 # define bt_print_block     export_alias(bt_print_block)
@@ -389,7 +380,7 @@ void* store_block_duplicate(void* ptr, size_t size) {
 
 /* HEAP ALLOCATION {{{ */
 /*! \brief Replacement for `malloc` with memory tracking */
-void* bittree_malloc(size_t size) {
+void* malloc(size_t size) {
   if(size == 0)
     return NULL;
 
@@ -403,7 +394,7 @@ void* bittree_malloc(size_t size) {
 }
 
 /*! \brief Replacement for `calloc` with memory tracking */
-void* bittree_calloc(size_t nbr_block, size_t size_block) {
+void* calloc(size_t nbr_block, size_t size_block) {
   /* FIXME: Need an integer overflow check here */
   size_t size = nbr_block * size_block;
   if (size == 0)
@@ -421,7 +412,7 @@ void* bittree_calloc(size_t nbr_block, size_t size_block) {
 }
 
 /*! \brief Replacement for `aligned_alloc` with memory tracking */
-void *bittree_aligned_alloc(size_t alignment, size_t size) {
+void *aligned_alloc(size_t alignment, size_t size) {
   /* Check if:
    *  - size and alignment are greater than zero
    *  - alignment is a power of 2
@@ -439,7 +430,7 @@ void *bittree_aligned_alloc(size_t alignment, size_t size) {
 }
 
 /*! \brief Replacement for `posix_memalign` with memory tracking */
-int bittree_posix_memalign(void **memptr, size_t alignment, size_t size) {
+int posix_memalign(void **memptr, size_t alignment, size_t size) {
  /* Check if:
    *  - size and alignment are greater than zero
    *  - alignment is a power of 2 and a multiple of sizeof(void*) */
@@ -459,7 +450,7 @@ int bittree_posix_memalign(void **memptr, size_t alignment, size_t size) {
 }
 
 /*! \brief Replacement for `realloc` with memory tracking */
-void* bittree_realloc(void* ptr, size_t size) {
+void* realloc(void* ptr, size_t size) {
   bt_block * tmp;
   void * new_ptr;
   /* ptr is NULL - malloc */
@@ -524,7 +515,7 @@ void* bittree_realloc(void* ptr, size_t size) {
 }
 
 /*! \brief Replacement for `free` with memory tracking */
-void bittree_free(void* ptr) {
+void free(void* ptr) {
   if (!ptr)
     return;
   bt_block * res = bt_lookup(ptr);

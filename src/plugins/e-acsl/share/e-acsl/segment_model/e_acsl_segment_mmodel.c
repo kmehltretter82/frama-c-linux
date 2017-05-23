@@ -26,21 +26,6 @@
  *   model. See e_acsl_mmodel_api.h for details.
 ***************************************************************************/
 
-#include "e_acsl_mmodel_api.h"
-
-/* Public API {{{ */
-/* Heap allocation */
-#define shadow_malloc         malloc
-#define shadow_calloc         calloc
-#define shadow_realloc        realloc
-#define shadow_free           free
-#define shadow_aligned_alloc  aligned_alloc
-#define shadow_posix_memalign posix_memalign
-/* }}} */
-
-#include "e_acsl_shadow_layout.h"
-#include "e_acsl_segment_tracking.h"
-
 #define ALLOCATED(_ptr,_size) allocated((uintptr_t)_ptr, _size, (uintptr_t)_ptr)
 
 void * store_block(void * ptr, size_t size) {
