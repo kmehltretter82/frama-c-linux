@@ -321,8 +321,24 @@ e-acsl-distrib-check:
 # Header #
 ##########
 
+EACSL_CEA_LGPL_BARE= *.ml *.mli Makefile.in configure.ac share/e-acsl/*.[ch] \
+  share/e-acsl/*/*.[ch] scripts/*.sh
+EACSL_CEA_LGPL=$(addprefix $(EACSL_PLUGIN_DIR)/, $(EACSL_CEA_LGPL_BARE))
+
+EACSL_SPARETIMELABS=$(EACSL_PLUGIN_DIR)/share/e-acsl/e_acsl_printf.h
+
+# Files without header. contrib files keep their own header.
+EACSL_NOHEADER_BARE=INSTALL README VERSION license/* \
+  doc/Changelog doc/doxygen/doxygen.cfg.in .depend tests/test_config.in \
+  $(EACSL_CONTRIB_FILES)
+
+EACSL_NOHEADER=$(addprefix $(EACSL_PLUGIN_DIR)/, $(EACSL_NOHEADER_BARE))
+
 ifeq ("$(FRAMAC_INTERNAL)","yes")
 CEA_LGPL_HEADER=$(FRAMAC_ROOT_SRCDIR)/headers/open-source/CEA_LGPL
+# EACSL does not use hdrck mechanism
+HEADER_EXCEPTIONS+=\
+  $(wildcard $(EACSL_CEA_LGPL) $(EACSL_SPARETIMELABS) $(EACSL_NOHEADER))
 else
 CEA_LGPL_HEADER=$(EACSL_PLUGIN_DIR)/license/CEA_LGPL
 endif
@@ -330,17 +346,11 @@ endif
 headers::
 	@echo "Applying Headers..."
 	headache -c $(EACSL_PLUGIN_DIR)/license/headache_config.txt \
-                 -h $(CEA_LGPL_HEADER) \
-	         $(EACSL_PLUGIN_DIR)/*.ml \
-                 $(EACSL_PLUGIN_DIR)/*.mli \
-	         $(EACSL_PLUGIN_DIR)/Makefile.in \
-                 $(EACSL_PLUGIN_DIR)/configure.ac \
-	         $(EACSL_PLUGIN_DIR)/share/e-acsl/*.[ch] \
-                 $(EACSL_PLUGIN_DIR)/share/e-acsl/*/*.[ch] \
-                 $(EACSL_PLUGIN_DIR)/scripts/*.sh
+                 -h $(CEA_LGPL_HEADER) $(EACSL_CEA_LGPL)
 	headache -c $(EACSL_PLUGIN_DIR)/license/headache_config.txt \
                  -h $(EACSL_PLUGIN_DIR)/license/SPARETIMELABS \
-		  $(EACSL_PLUGIN_DIR)/share/e-acsl/e_acsl_printf.h
+                 $(EACSL_SPARETIMELABS)
+
 
 ################
 # Generic part #
