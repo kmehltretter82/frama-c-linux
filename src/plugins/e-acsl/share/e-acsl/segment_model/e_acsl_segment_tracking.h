@@ -304,8 +304,8 @@ static void validate_shadow_layout() {
  * heap memory block */
 #define DVALIDATE_FREEABLE(_addr) \
   DVASSERT(IS_ON_HEAP(_addr), "Expected heap location: %a\n", _addr); \
-  DVASSERT(_addr == base_addr(_addr), \
-      "Expected base address, i.e., %a, not %a\n", base_addr(_addr), _addr);
+  DVASSERT(_addr == _base_addr(_addr), \
+      "Expected base address, i.e., %a, not %a\n", _base_addr(_addr), _addr);
 
 /* Assert that a memory block [_addr, _addr + _size] is allocated on a
  * program's heap */
@@ -362,7 +362,7 @@ static void validate_shadow_layout() {
   for (_i = 0; _i < _len; _i++) { \
     uintptr_t _prev = _addr - _i; \
     if (static_allocated_one(_prev)) { \
-      vassert(base_addr(_prev) != _prev, \
+      vassert(_base_addr(_prev) != _prev, \
         "Potential backward overlap of: \n  previous block       [%a]\n" \
         "  with allocated block [%a]\n", _prev, _addr); \
     } \
@@ -479,11 +479,9 @@ static uintptr_t predicate(uintptr_t addr, char p) {
 }
 
 /*! \brief Return the byte length of the memory block containing `_addr` */
-#define block_length(_addr) predicate((uintptr_t)_addr, 'L')
+#define _block_length(_addr) predicate((uintptr_t)_addr, 'L')
 /*! \brief Return the base address of the memory block containing `_addr` */
-#define base_addr(_addr) predicate((uintptr_t)_addr, 'B')
-/*! \brief Return the byte offset of `_addr` within its block */
-#define offset(_addr) predicate((uintptr_t)_addr, 'O')
+#define _base_addr(_addr) predicate((uintptr_t)_addr, 'B')
 /* }}} */
 
 /* Static allocation {{{ */
@@ -585,8 +583,8 @@ static void shadow_alloca(void *ptr, size_t size) {
  * \param ptr - base memory address of the stack memory block. */
 void shadow_freea(void *ptr) {
   DVALIDATE_STATIC_LOCATION(ptr);
-  DASSERT(ptr == (void*)base_addr(ptr));
-  size_t size = block_length(ptr);
+  DASSERT(ptr == (void*)_base_addr(ptr));
+  size_t size = _block_length(ptr);
   memset((void*)PRIMARY_SHADOW(ptr), 0, size);
   memset((void*)SECONDARY_SHADOW(ptr), 0, size);
 #ifdef E_ACSL_TEMPORAL /*{{{*/
@@ -729,8 +727,8 @@ static uint32_t static_temporal_info(uintptr_t addr, int origin) {
   if (origin) {
     int allocated = static_allocated_one(addr);
     if (allocated && !IS_ON_GLOBAL(addr)) {
-      uintptr_t base_addr = static_info(addr, 'B');
-      return *((uint32_t*)TEMPORAL_PRIMARY_STATIC_SHADOW(base_addr));
+      uintptr_t base = static_info(addr, 'B');
+      return *((uint32_t*)TEMPORAL_PRIMARY_STATIC_SHADOW(base));
     } else if (allocated && IS_ON_GLOBAL(addr)) {
       return GLOBAL_TEMPORAL_TIMESTAMP;
     } else {
@@ -759,10 +757,10 @@ static void static_store_temporal_referent(uintptr_t addr, uint32_t ref) {
  * whole block should be marked as initialized.  */
 static void initialize_static_region(uintptr_t addr, long size) {
   DVALIDATE_STATIC_ACCESS(addr, size);
-  DVASSERT(!(addr - base_addr(addr) + size > block_length(addr)),
+  DVASSERT(!(addr - _base_addr(addr) + size > _block_length(addr)),
     "Attempt to initialize %lu bytes past block boundaries\n"
     "starting at %a with block length %lu at base address %a\n",
-    size, addr, block_length(addr), base_addr(addr));
+    size, addr, _block_length(addr), _base_addr(addr));
 
   /* Below code marks `size` bytes following `addr` in the stack shadow as
    * initialized. That is, least significant bits of all 9 bytes following
@@ -806,10 +804,10 @@ static void mark_readonly_region (uintptr_t addr, long size) {
    * TEXT), this function required ptr carry a global address. */
   DASSERT(IS_ON_GLOBAL(addr));
   DASSERT(static_allocated_one(addr));
-  DVASSERT(!(addr - base_addr(addr) + size > block_length(addr)),
+  DVASSERT(!(addr - _base_addr(addr) + size > _block_length(addr)),
     "Attempt to mark read-only %lu bytes past block boundaries\n"
     "starting at %a with block length %lu at base address %a\n",
-    size, addr, block_length(addr), base_addr(addr));
+    size, addr, _block_length(addr), _base_addr(addr));
 
   /* See comments in ::initialize_static_region for details */
   uint64_t *shadow = (uint64_t*)PRIMARY_GLOBAL_SHADOW(addr);
@@ -999,7 +997,7 @@ void* shadow_realloc(void *ptr, size_t size) {
       /* realloc succeeds, otherwise nothing needs to be done */
       if (res != NULL) {
         size_t alloc_size = ALLOC_SIZE(size);
-        size_t old_size = block_length(ptr);
+        size_t old_size = _block_length(ptr);
         size_t old_alloc_size = ALLOC_SIZE(old_size);
 
         /* Nullify old representation */
@@ -1127,7 +1125,7 @@ static int heap_allocated(uintptr_t addr, size_t size, uintptr_t base_ptr) {
  * heap-allocated memory block that `addr` belongs to.
  *
  * As some of the other functions, \b \\freeable can be expressed using
- * ::IS_ON_HEAP, ::heap_allocated and ::base_addr. Here direct
+ * ::IS_ON_HEAP, ::heap_allocated and ::_base_addr. Here direct
  * implementation is preferred for performance reasons. */
 int freeable(void *ptr) { /* + */
   uintptr_t addr = (uintptr_t)ptr;
@@ -1234,10 +1232,10 @@ static void heap_store_temporal_referent(uintptr_t addr, uint32_t ref) {
 /*! \brief Mark n bytes on the heap starting from address addr as initialized */
 static void initialize_heap_region(uintptr_t addr, long len) {
   DVALIDATE_HEAP_ACCESS(addr, len);
-  DVASSERT(!(addr - base_addr(addr) + len > block_length(addr)),
+  DVASSERT(!(addr - _base_addr(addr) + len > _block_length(addr)),
     "Attempt to initialize %lu bytes past block boundaries\n"
     "starting at %a with block length %lu at base address %a\n",
-    len, addr, block_length(addr), base_addr(addr));
+    len, addr, _block_length(addr), _base_addr(addr));
 
   /* Address within init shadow tracking initialization  */
   unsigned char *shadow = (unsigned char*)(HEAP_INIT_SHADOW(addr));

@@ -28,8 +28,8 @@
 
 #include "e_acsl_mmodel_api.h"
 
-/* Public API Bindings {{{ */
-/* Heap allocation (native) */
+/* Public API {{{ */
+/* Heap allocation */
 #define shadow_malloc         malloc
 #define shadow_calloc         calloc
 #define shadow_realloc        realloc
@@ -41,9 +41,9 @@
 #define store_block           export_alias(store_block)
 #define store_block_duplicate export_alias(store_block_duplicate)
 /* Predicates */
-#define segment_offset        export_alias(offset)
-#define segment_base_addr     export_alias(base_addr)
-#define segment_block_length  export_alias(block_length)
+#define offset                export_alias(offset)
+#define base_addr             export_alias(base_addr)
+#define block_length          export_alias(block_length)
 #define valid_read            export_alias(valid_read)
 #define valid                 export_alias(valid)
 #define initialized           export_alias(initialized)
@@ -97,11 +97,11 @@ void initialize(void *ptr, size_t n) {
 }
 
 void full_init(void * ptr) {
-  initialize(ptr, block_length(ptr));
+  initialize(ptr, _block_length(ptr));
 }
 
 void mark_readonly(void * ptr) {
-  mark_readonly_region((uintptr_t)ptr, block_length(ptr));
+  mark_readonly_region((uintptr_t)ptr, _block_length(ptr));
 }
 
 /* ********************** */
@@ -134,9 +134,9 @@ int valid_read(void * ptr, size_t size, void *ptr_base, void *addrof_base) {
 }
 
 /*! NB: The implementation for this function can also be specified via
- * \p base_addr macro that will eventually call ::TRY_SEGMENT. The following
+ * \p _base_addr macro that will eventually call ::TRY_SEGMENT. The following
  * implementation is preferred for performance reasons. */
-void * segment_base_addr(void * ptr) {
+void * base_addr(void * ptr) {
   TRY_SEGMENT(ptr,
     return (void*)heap_info((uintptr_t)ptr, 'B'),
     return (void*)static_info((uintptr_t)ptr, 'B'));
@@ -144,19 +144,16 @@ void * segment_base_addr(void * ptr) {
 }
 
 /*! NB: Implementation of the following function can also be specified
- * via \p block_length macro. A more direct approach via ::TRY_SEGMENT
+ * via \p _block_length macro. A more direct approach via ::TRY_SEGMENT
  * is preferred for performance reasons. */
-size_t segment_block_length(void * ptr) {
+size_t block_length(void * ptr) {
   TRY_SEGMENT(ptr,
     return heap_info((uintptr_t)ptr, 'L'),
     return static_info((uintptr_t)ptr, 'L'))
   return 0;
 }
 
-/*! NB: Implementation of the following function can also be specified
- * via \p offset macro. A more direct approach via ::TRY_SEGMENT
- * is preferred for performance reasons. */
-int segment_offset(void *ptr) {
+int offset(void *ptr) {
   TRY_SEGMENT(ptr,
     return heap_info((uintptr_t)ptr, 'O'),
     return static_info((uintptr_t)ptr, 'O'));
