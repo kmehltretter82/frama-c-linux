@@ -35,6 +35,8 @@
 #include <limits.h>
 #include <sys/stat.h>
 #include <stdio.h>
+#include <sys/types.h>
+#include <fcntl.h>
 
 /* For PATH_MAX in Linux */
 #ifdef __linux__
@@ -42,7 +44,6 @@
 #endif
 
 #include "e_acsl_alias.h"
-#include "e_acsl_syscall.h"
 #include "e_acsl_malloc.h"
 #include "e_acsl_string.h"
 #include "e_acsl_bits.h"

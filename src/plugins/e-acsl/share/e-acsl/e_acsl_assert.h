@@ -28,8 +28,10 @@
 #ifndef E_ACSL_ASSERT
 #define E_ACSL_ASSERT
 
+#define runtime_assert export_alias(assert)
+
 /*! \brief Drop-in replacement for abort function */
-#define abort() exec_abort(__LINE__, __FILE__)
+#define runtime_abort() exec_abort(__LINE__, __FILE__)
 
 /*! \brief Output a message to error stream using printf-like format string
  * and abort the execution.
@@ -60,7 +62,7 @@ static void vabort(char *fmt, ...) {
   va_start(va,fmt);
   _format(NULL,_charc_stderr,fmt,va);
   va_end(va);
-  abort();
+  runtime_abort();
 }
 
 static void vassert_fail(int expr, int line, char *file, char *fmt,  ...) {
@@ -74,7 +76,7 @@ static void vassert_fail(int expr, int line, char *file, char *fmt,  ...) {
     va_start(va,fmt);
     _format(NULL,_charc_stderr,fmt,va);
     va_end(va);
-    abort();
+    runtime_abort();
   }
 }
 
@@ -85,22 +87,15 @@ static void vassert_fail(int expr, int line, char *file, char *fmt,  ...) {
 #endif
 
 /*! \brief Default implementation of E-ACSL runtime assertions */
-static void runtime_assert(int predicate, char *kind, char *fct, char *pred_txt, int line) {
+void runtime_assert(int predicate, char *kind, char *fct, char *pred_txt, int line) {
   if (!predicate) {
       eprintf("%s failed at line %d in function %s.\n"
         "The failing predicate is:\n%s.\n", kind, line, fct, pred_txt);
 #ifndef E_ACSL_NO_ASSERT_FAIL
-    abort();
+    runtime_abort();
 #endif
   }
 }
-
-/*! \brief Alias for runtime assertions.
- *
- * Since \p __e_acsl_assert is added as a weak alias user-defined implementation
- * of the \p __e_acsl_assert function will be preferred at link time. */
-void __e_acsl_assert(int pred, char *kind, char *fct, char *pred_txt, int line)
-  __attribute__ ((weak, alias ("runtime_assert")));
 
 /* Instances of assertions shared accross different memory models */
 

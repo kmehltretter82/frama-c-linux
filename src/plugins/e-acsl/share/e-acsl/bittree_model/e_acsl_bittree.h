@@ -29,7 +29,6 @@
 #define E_ACSL_BITTREE
 
 #include "e_acsl_malloc.h"
-#include "e_acsl_syscall.h"
 #include "e_acsl_printf.h"
 #include "e_acsl_assert.h"
 #include "e_acsl_bittree_api.h"
