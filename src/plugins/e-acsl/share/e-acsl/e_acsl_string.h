@@ -38,30 +38,16 @@
 
 #ifndef E_ACSL_STD_STRING
 #define E_ACSL_STD_STRING
-#  if defined(__GNUC__)
-#    define memset  __builtin_memset
-#    define memcmp  __builtin_memcmp
-#    define memcpy  __builtin_memcpy
-#    define memmove __builtin_memmove
-#    define strlen  __builtin_strlen
-#    define strcmp  __builtin_strcmp
-#    define strncmp __builtin_strncmp
-#  elif defined(E_ACSL_BUILTINS)
-#    include <string.h>
-#  else
-#    include <stdlib.h>
-#    include <endian.h>
-#    include "glibc/pagecopy.h"
-#    include "glibc/memcopy.h"
-#    include "glibc/wordcopy.c"
-#    include "glibc/memcpy.c"
-#    include "glibc/memmove.c"
-#    include "glibc/memset.c"
-#    include "glibc/memcmp.c"
-#    include "glibc/strlen.c"
-#    include "glibc/strcmp.c"
-#    include "glibc/strncmp.c"
-#  endif
+
+#ifndef E_ACSL_NO_COMPILER_BUILTINS
+# define memset  __builtin_memset
+# define memcmp  __builtin_memcmp
+# define memcpy  __builtin_memcpy
+# define memmove __builtin_memmove
+# define strlen  __builtin_strlen
+# define strcmp  __builtin_strcmp
+# define strncmp __builtin_strncmp
+#endif
 
 /* \brief Local version of `strcat` */
 static char *nstrcat(char *dest, const char *src) {

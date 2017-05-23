@@ -84,6 +84,9 @@
  *    Shadow spaces (only for segment model):
  *      E_ACSL_STACK_SIZE - size (in MB) of the tracked program stack
  *      E_ACSL_HEAP_SIZE - size (in MB) of the tracked program heap
+ *    String functions:
+ *      E_ACSL_NO_COMPILER_BUILTINS - if undefined (default) then use
+ *      compiler builtin string functions (e.g., memset -> __builtin_memset)
 */
 
 /* Print a header indicating current configuration of a run to STDIN. */
