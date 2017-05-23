@@ -58,6 +58,21 @@
 /* Heap size */
 #define heap_allocation_size      export_alias(heap_allocation_size)
 #define get_heap_allocation_size  export_alias(get_heap_allocation_size)
+/* Temporal analysis */
+/* No need to encapsulate using macro: using these extra definitions does
+ * not hurt, otherwise need to pass additional parameters to frama-c */
+#define temporal_store_nblock             export_alias(temporal_store_nblock)
+#define temporal_store_nreferent          export_alias(temporal_store_nreferent)
+#define temporal_save_nblock_parameter    export_alias(temporal_save_nblock_parameter)
+#define temporal_save_nreferent_parameter export_alias(temporal_save_nreferent_parameter)
+#define temporal_save_copy_parameter      export_alias(temporal_save_copy_parameter)
+#define temporal_pull_parameter           export_alias(temporal_pull_parameter)
+#define temporal_save_return              export_alias(temporal_save_return)
+#define temporal_reset_parameters         export_alias(temporal_reset_parameters)
+#define temporal_pull_return              export_alias(temporal_pull_return)
+#define temporal_reset_return             export_alias(temporal_reset_return)
+#define temporal_memcpy                   export_alias(temporal_memcpy)
+#define temporal_memset                   export_alias(temporal_memset)
 
 /***********************************************/
 /************ Basic API ************************/
@@ -269,71 +284,71 @@ extern size_t heap_allocation_size;
 /*! \brief Take origin number of a memory block containing `block_addr` and
  * store it as a referent number of a pointer given by `ptr_addr`. */
 /*@ assigns \nothing; */
-void __e_acsl_temporal_store_nblock(void *ptr_addr, void *block_addr)
+void temporal_store_nblock(void *ptr_addr, void *block_addr)
   __attribute__((FC_BUILTIN));
 
-/*! \brief Same as `__e_acsl_temporal_store_nblock` but take a referent
+/*! \brief Same as `temporal_store_nblock` but take a referent
  * number of `block_addr` instead */
 /*@ assigns \nothing; */
-void __e_acsl_temporal_store_nreferent(void *ptr_addr, void *block_addr)
+void temporal_store_nreferent(void *ptr_addr, void *block_addr)
   __attribute__((FC_BUILTIN));
 
 /*! \brief store struct { .ptr = ptr, .temporal_flow = TReferentN }
  *  in the global parameter array. */
 /*@ assigns \nothing; */
-void __e_acsl_temporal_save_nreferent_parameter(void *ptr, unsigned int param)
+void temporal_save_nreferent_parameter(void *ptr, unsigned int param)
   __attribute__((FC_BUILTIN));
 
 /*! \brief store struct { .ptr = ptr, .temporal_flow = TBlockN }
  *  in the global parameter array. */
 /*@ assigns \nothing; */
-void __e_acsl_temporal_save_nblock_parameter(void *ptr, unsigned int param)
+void temporal_save_nblock_parameter(void *ptr, unsigned int param)
   __attribute__((FC_BUILTIN));
 
 /*! \brief store struct { .ptr = ptr, .temporal_flow = TCopy } in the global
  *  parameter array. */
 /*@ assigns \nothing; */
-void __e_acsl_temporal_save_copy_parameter(void *ptr, unsigned int param)
+void temporal_save_copy_parameter(void *ptr, unsigned int param)
   __attribute__((FC_BUILTIN));
 
 /*! \brief Assign a referent number of `ptr` based on the record in the global
  * parameter array at index `param`. */
 /*@ assigns \nothing; */
-void __e_acsl_temporal_pull_parameter(void *ptr, unsigned int param, size_t size)
+void temporal_pull_parameter(void *ptr, unsigned int param, size_t size)
   __attribute__((FC_BUILTIN));
 
 /*! \brief Nullify global parameter array  */
 /*@ assigns \nothing; */
-void __e_acsl_temporal_reset_parameters()
+void temporal_reset_parameters()
   __attribute__((FC_BUILTIN));
 
 /*! \brief Save temporal referent number of `ptr` in a placeholder variable
  * tracking the referent number of a function's return. */
 /*@ assigns \nothing; */
-void __e_acsl_temporal_save_return(void *ptr)
+void temporal_save_return(void *ptr)
   __attribute__((FC_BUILTIN));
 
 /*! \brief Take a temporal referent stored in the placeholder tracking return
  * values  as a temporal referent number of `ptr`. */
 /*@ assigns \nothing; */
-void __e_acsl_temporal_pull_return(void *ptr)
+void temporal_pull_return(void *ptr)
   __attribute__((FC_BUILTIN));
 
 /*! \brief Nullify a placeholder variable tracking the referent number of a
  * function's return. */
 /*@ assigns \nothing; */
-void __e_acsl_temporal_reset_return()
+void temporal_reset_return()
   __attribute__((FC_BUILTIN));
 
 /*! \brief Copy temporal shadow data from [src, src + size] to
  * [dest, dest + size]. Counterpart of the memcpy function */
 /*@ assigns \nothing; */
-void __e_acsl_temporal_memcpy(void *dest, void *src, size_t size)
+void temporal_memcpy(void *dest, void *src, size_t size)
   __attribute__((FC_BUILTIN));
 
 /*! \brief Set temporal shadow data from [src, src + size] to 0.
  * Counterpart of memset the function */
 /*@ assigns \nothing; */
-void __e_acsl_temporal_memset(void *dest, int n, size_t size)
+void temporal_memset(void *dest, int n, size_t size)
   __attribute__((FC_BUILTIN));
 #endif

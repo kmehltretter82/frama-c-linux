@@ -99,8 +99,8 @@ static void describe_run();
 #  error "No E-ACSL memory model defined. Aborting compilation"
 #endif
 
-/* This header contains temporal analysis shared by both models.
-   It should be here as it uses macros differently defined macros */
+/* Temporal analysis shared by both models.
+ * Uses macros differently defined macros */
 #include "e_acsl_temporal.h"
 
 #ifdef E_ACSL_WEAK_VALIDITY

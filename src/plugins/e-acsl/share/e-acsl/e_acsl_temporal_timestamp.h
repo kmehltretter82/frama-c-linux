@@ -69,11 +69,5 @@ static uint32_t return_referent;
 #define reset_parameter_referents() \
   memset(parameter_referents, 0, sizeof(parameter_referents))
 
-/* Forward declarations used by all models */
-static int temporal_valid(void*, void*);
-static void temporal_store_nblock(void *lhs, void *rhs);
-static void temporal_store_nreferent(void *lhs, void *rhs);
-static uint32_t origin_timestamp(void *ptr);
-static uint32_t referent_timestamp(void *ptr);
 #endif /*}}} E_ACSL_TEMPORAL */
 #endif /*}}} E_ACSL_TEMPORAL_TIMESTAMP */

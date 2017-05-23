@@ -42,25 +42,25 @@ static uintptr_t temporal_referent_shadow(void *addr);
 /*! \brief Return referent time stamp associated with a pointer which address
  * is given by `ptr`. This function expects that `ptr` is allocated and at
  * least `sizeof(uintptr_t)` bytes long */
-static uint32_t referent_timestamp(void *ptr);
+uint32_t referent_timestamp(void *ptr);
 
 /*! \brief Store a referent number `ref` in the shadow of `ptr` */
-static void store_temporal_referent(void *ptr, uint32_t ref);
+void store_temporal_referent(void *ptr, uint32_t ref);
 /* }}} */
 
 /* Temporal store {{{ */
-static void temporal_store_nblock(void *lhs, void *rhs) {
+void temporal_store_nblock(void *lhs, void *rhs) {
   store_temporal_referent(lhs, origin_timestamp(rhs));
 }
 
-static void temporal_store_nreferent(void *lhs, void *rhs) {
+void temporal_store_nreferent(void *lhs, void *rhs) {
   store_temporal_referent(lhs, referent_timestamp(rhs));
 }
 
 /* }}} */
 
 /* Memcpy/memset {{{ */
-static void temporal_memcpy(void *dest, void *src, size_t size) {
+void temporal_memcpy(void *dest, void *src, size_t size) {
   /* Memcpy is only relevant for pointers here, so if there is a
    * copy under a pointer's size then there no point in copying memory*/
   if (size >= sizeof(void*)) {
@@ -72,7 +72,7 @@ static void temporal_memcpy(void *dest, void *src, size_t size) {
   }
 }
 
-static void temporal_memset(void *dest, int c, size_t size) {
+void temporal_memset(void *dest, int c, size_t size) {
   DVALIDATE_RW_ACCESS(dest, size);
   void *dest_shadow = (void *)temporal_referent_shadow(dest);
   memset(dest_shadow, 0, size);
@@ -80,22 +80,22 @@ static void temporal_memset(void *dest, int c, size_t size) {
 /* }}} */
 
 /* Function parameters {{{ */
-static void temporal_save_nblock_parameter(void *ptr, unsigned int param) {
+void temporal_save_nblock_parameter(void *ptr, unsigned int param) {
   parameter_referents[param].ptr = ptr;
   parameter_referents[param].temporal_flow = TBlockN;
 }
 
-static void temporal_save_nreferent_parameter(void *ptr, unsigned int param) {
+void temporal_save_nreferent_parameter(void *ptr, unsigned int param) {
   parameter_referents[param].ptr = ptr;
   parameter_referents[param].temporal_flow = TReferentN;
 }
 
-static void temporal_save_copy_parameter(void *ptr, unsigned int param) {
+void temporal_save_copy_parameter(void *ptr, unsigned int param) {
   parameter_referents[param].ptr = ptr;
   parameter_referents[param].temporal_flow = TCopy;
 }
 
-static void temporal_pull_parameter(void *ptr, unsigned int param, size_t size) {
+void temporal_pull_parameter(void *ptr, unsigned int param, size_t size) {
   struct temporal_parameter *tpar = &parameter_referents[param];
   switch(tpar->temporal_flow) {
     case TBlockN:
@@ -112,27 +112,27 @@ static void temporal_pull_parameter(void *ptr, unsigned int param, size_t size) 
   }
 }
 
-static void temporal_reset_parameters() {
+void temporal_reset_parameters() {
   reset_parameter_referents();
 }
 /* }}} */
 
 /* Return values {{{ */
-static void temporal_save_return(void *ptr) {
+void temporal_save_return(void *ptr) {
   return_referent = (ptr, sizeof(void*)) ? referent_timestamp(ptr) : 0;
 }
 
-static void temporal_pull_return(void *ptr) {
+void temporal_pull_return(void *ptr) {
   store_temporal_referent(ptr, return_referent);
 }
 
-static void temporal_reset_return() {
+void temporal_reset_return() {
   return_referent = 0;
 }
 /* }}} */
 
 /* Temporal valid {{{ */
-static int temporal_valid(void *ptr, void *addr_of_ptr) {
+int temporal_valid(void *ptr, void *addr_of_ptr) {
   /* Could check for NULL, but since temporal_valid if ran by `valid`, this
    * has been already checked.
    * FIXME: If the address of pointer and the pointer itself reference the same
@@ -155,21 +155,6 @@ static int temporal_valid(void *ptr, void *addr_of_ptr) {
   return 1;
 }
 /* }}} */
-
-/* Public API Bindings {{{*/
-public_alias(temporal_store_nblock)
-public_alias(temporal_store_nreferent)
-public_alias(temporal_save_nblock_parameter)
-public_alias(temporal_save_nreferent_parameter)
-public_alias(temporal_save_copy_parameter)
-public_alias(temporal_pull_parameter)
-public_alias(temporal_save_return)
-public_alias(temporal_reset_parameters)
-public_alias(temporal_pull_return)
-public_alias(temporal_reset_return)
-public_alias(temporal_memcpy)
-public_alias(temporal_memset)
-/*}}}*/
 #else
 #  define E_ACSL_TEMPORAL_DESC "disabled"
 #endif
