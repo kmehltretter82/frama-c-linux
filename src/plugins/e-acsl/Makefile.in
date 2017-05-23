@@ -322,7 +322,7 @@ e-acsl-distrib-check:
 ##########
 
 EACSL_CEA_LGPL_BARE= *.ml *.mli Makefile.in configure.ac share/e-acsl/*.[ch] \
-  share/e-acsl/*/*.[ch] scripts/*.sh
+  share/e-acsl/*/*.[ch] scripts/*.sh tests/print.ml man/e-acsl-gcc.sh.1
 EACSL_CEA_LGPL=$(addprefix $(EACSL_PLUGIN_DIR)/, $(EACSL_CEA_LGPL_BARE))
 
 EACSL_SPARETIMELABS=$(EACSL_PLUGIN_DIR)/share/e-acsl/e_acsl_printf.h
