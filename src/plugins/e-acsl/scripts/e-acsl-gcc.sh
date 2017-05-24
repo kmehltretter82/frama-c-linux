@@ -273,14 +273,14 @@ OPTION_EACSL="-e-acsl"                   # Specifies E-ACSL run
 OPTION_FRAMA_STDLIB="-no-frama-c-stdlib" # Use Frama-C stdlib
 OPTION_FULL_MMODEL=                      # Instrument as much as possible
 OPTION_GMP=                              # Use GMP integers everywhere
-OPTION_FRAMAC_CPP_EXTRA="-D__NO_CTYPE"   # Extra CPP flags for Frama-C*
 OPTION_EACSL_MMODELS="segment"           # Memory model used
 OPTION_EACSL_SHARE=                      # Custom E-ACSL share directory
 OPTION_INSTRUMENTED_ONLY=                # Do not compile original code
 OPTION_TEMPORAL=                         # Enable temporal analysis
-OPTION_WEAK_VALIDITY=                       # Use notion of weak validity
+OPTION_WEAK_VALIDITY=                    # Use notion of weak validity
 OPTION_RTE=                              # Enable assertion generation
 OPTION_CHECK=                            # Check AST integrity
+OPTION_FRAMAC_CPP_EXTRA="-std=c99 -D__NO_CTYPE" # Extra CPP flags for Frama-C
 OPTION_RTE_SELECT=       # Generate assertions for these functions only
 OPTION_THEN=             # Adds -then in front of -e-acsl in FC command.
 OPTION_STACK_SIZE=32     # Size of a heap shadow space (in MB)
