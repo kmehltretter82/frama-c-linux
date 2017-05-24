@@ -33,9 +33,9 @@
 #ifndef E_ACSL_SAFE_LOCATIONS
 #define E_ACSL_SAFE_LOCATIONS
 
-#include <features.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <errno.h>
 
 /* Simple representation of a safe location */
 struct memory_location {
@@ -58,13 +58,9 @@ static int safe_location_counter = 0;
   safe_location_counter++; \
 }
 
-/* Errno */
-#ifdef __GNUC__
-/* In GLIBC errno is defined per-thread in thread-local storage. */
-# undef errno
+#ifdef errno
+#undef errno
 extern __thread int errno;
-#else
-# error "Unknown convention for errno definition"
 #endif
 
 extern FILE *stdin;		  /* Standard input stream.  */

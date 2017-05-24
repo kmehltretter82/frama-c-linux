@@ -30,14 +30,11 @@
 
 #include <sys/types.h>
 #include <signal.h>
+#include <limits.h>
 #include "e_acsl_alias.h"
 #include "e_acsl_printf.h"
 #include "e_acsl_string.h"
 #include "e_acsl_trace.h"
-
-#ifdef __linux__
-# include <linux/limits.h>
-#endif 
 
 #define runtime_assert export_alias(assert)
 

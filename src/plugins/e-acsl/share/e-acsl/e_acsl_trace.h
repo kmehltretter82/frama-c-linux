@@ -28,8 +28,8 @@
 #ifndef E_ACSL_TRACE
 #define E_ACSL_TRACE
 
-#include <features.h>
 #include <stddef.h>
+#include <limits.h>
 #include "e_acsl_printf.h"
 #include "e_acsl_shexec.h"
 
@@ -69,9 +69,7 @@ static int native_backtrace (void **array, int size) {
 }
 
 static void trace() {
-# ifdef __GLIBC__
 # ifdef __linux__
-# include <linux/limits.h>
 
   int size = 24;
   void **bb = private_malloc(sizeof(void*)*size);
@@ -108,6 +106,5 @@ static void trace() {
   }
   STDOUT("/***************************************/\n");
 # endif /* __linux__ */
-# endif /* __GLIBC__ */
 }
 #endif
