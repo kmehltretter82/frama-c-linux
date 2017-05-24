@@ -21,8 +21,8 @@
 /**************************************************************************/
 
 /*! ***********************************************************************
- * \file  e_acsl_memory_mmodel.c
- * \brief Configuration macros and RTL assembly
+ * \file  e_acsl_rtl.c
+ * \brief RTL configuration and assembly
 ***************************************************************************/
 #include "e_acsl_alias.h"
 #include "e_acsl_malloc.h"
@@ -78,8 +78,6 @@ static void describe_run();
 #if defined E_ACSL_SEGMENT_MMODEL
 # include "segment_model/e_acsl_segment_mmodel.c"
 #elif defined E_ACSL_BITTREE_MMODEL
-# include "bittree_model/e_acsl_bittree_api.h"
-# include "bittree_model/e_acsl_bittree.h"
 # include "bittree_model/e_acsl_bittree_mmodel.c"
 #else
 # error "No E-ACSL memory model defined. Aborting compilation"

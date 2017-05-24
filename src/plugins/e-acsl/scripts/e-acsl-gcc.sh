@@ -754,8 +754,8 @@ if [ -n "$OPTION_COMPILE" ]; then
     else
       OUTPUT_EXEC="$EACSL_OUTPUT_EXEC"
     fi
-    # Sources of the selected memory model
-    EACSL_RTL="$EACSL_SHARE/e_acsl_mmodel.c"
+    # RTL sources
+    EACSL_RTL="$EACSL_SHARE/e_acsl_rtl.c"
     EACSL_MMODEL_FEATURES="$(mmodel_features $model)"
     ($OPTION_ECHO;
      $CC \

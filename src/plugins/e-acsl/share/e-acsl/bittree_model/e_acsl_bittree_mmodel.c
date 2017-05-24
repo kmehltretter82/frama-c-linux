@@ -26,6 +26,9 @@
  * on Patricia Trie. See e_acsl_mmodel_api.h for details.
 ***************************************************************************/
 
+# include "e_acsl_bittree_api.h"
+# include "e_acsl_bittree.h"
+
 /* Public API {{{ */
 /* Debug */
 #ifdef E_ACSL_DEBUG
