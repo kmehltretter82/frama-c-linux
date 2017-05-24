@@ -280,7 +280,7 @@ OPTION_TEMPORAL=                         # Enable temporal analysis
 OPTION_WEAK_VALIDITY=                    # Use notion of weak validity
 OPTION_RTE=                              # Enable assertion generation
 OPTION_CHECK=                            # Check AST integrity
-OPTION_FRAMAC_CPP_EXTRA="-std=c99 -D__NO_CTYPE" # Extra CPP flags for Frama-C
+OPTION_FRAMAC_CPP_EXTRA=""               # Extra CPP flags for Frama-C
 OPTION_RTE_SELECT=       # Generate assertions for these functions only
 OPTION_THEN=             # Adds -then in front of -e-acsl in FC command.
 OPTION_STACK_SIZE=32     # Size of a heap shadow space (in MB)
@@ -627,7 +627,14 @@ RTE_FLAGS="$(rte_options "$OPTION_RTE" "$OPTION_RTE_SELECT")"
 error "Invalid argument $1 to --rte|-a option" $?
 
 # Frama-C and related flags
-FRAMAC_CPP_EXTRA="$OPTION_FRAMAC_CPP_EXTRA $CPPMACHDEP"
+# Additional flags passed to Frama-C preprocessor via `-cpp-extra-args`
+#  -std=c99 -D_DEFAULT_SOURCE: use C99 + default features. This is important
+#    in OSX which by default enables `blocks` unsupported by Frama-C
+#  -D__NO_CTYPE: prevent `isupper` (and similar functions) from being used as
+#    macros, otherwise E-ACSL cannot track them at runtime
+FRAMAC_CPP_EXTRA="\
+ -std=c99 -D_DEFAULT_SOURCE -D__NO_CTYPE $CPPMACHDEP\
+ $OPTION_FRAMAC_CPP_EXTRA"
 EACSL_MMODEL="$OPTION_EACSL_MMODEL"
 
 # Re-set EACSL_SHARE  directory is it has been given by the user

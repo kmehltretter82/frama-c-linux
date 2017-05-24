@@ -25,9 +25,9 @@
  * \brief RTL configuration and assembly
 ***************************************************************************/
 
-/* Make functionality from the POSIX.1 standard available */
-#ifndef _POSIX_SOURCE
-# define _POSIX_SOURCE 1
+/* Get default definitions and macros e.g., PATH_MAX */
+#ifndef _DEFAULT_SOURCE
+# define _DEFAULT_SOURCE 1
 #endif
 
 #include "e_acsl_alias.h"
