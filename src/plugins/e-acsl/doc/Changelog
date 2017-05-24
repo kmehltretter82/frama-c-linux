@@ -15,6 +15,10 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
+#################################
+Plugin E-ACSL Phosphorus-20170515
+#################################
+
 -  E-ACSL       [2017/03/29] The (much more efficient) shadow memory model is
 	        now used by default.
 -* E-ACSL       [2017/03/28] Fix backtrace when the failed instrumented programs
