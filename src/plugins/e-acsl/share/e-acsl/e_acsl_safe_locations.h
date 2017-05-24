@@ -33,6 +33,10 @@
 #ifndef E_ACSL_SAFE_LOCATIONS
 #define E_ACSL_SAFE_LOCATIONS
 
+#include <features.h>
+#include <stdio.h>
+#include <stdint.h>
+
 /* Simple representation of a safe location */
 struct memory_location {
   uintptr_t address; /* Address */
@@ -56,15 +60,14 @@ static int safe_location_counter = 0;
 
 /* Errno */
 #ifdef __GNUC__
-/* Declaration of errno by GLIBC. Errno is a per-threaded variable which lives
- * in thread-local storage. */
+/* In GLIBC errno is defined per-thread in thread-local storage. */
 # undef errno
 extern __thread int errno;
 #else
 # error "Unknown convention for errno definition"
 #endif
 
-extern FILE *stdin;		/* Standard input stream.  */
+extern FILE *stdin;		  /* Standard input stream.  */
 extern FILE *stdout;		/* Standard output stream.  */
 extern FILE *stderr;		/* Standard error output stream. */
 

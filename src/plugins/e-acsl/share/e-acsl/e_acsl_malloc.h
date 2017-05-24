@@ -29,6 +29,9 @@
 #ifndef E_ACSL_MALLOC
 #define E_ACSL_MALLOC
 
+#include <stdint.h>
+#include <stddef.h>
+
 /* Memory allocated for internal use of RTL and for the use by the application
  * is split into to mspaces (memory spaces). Memory allocation itself is
  * delegated to a slightly cusomised version of dlmalloc shipped with the

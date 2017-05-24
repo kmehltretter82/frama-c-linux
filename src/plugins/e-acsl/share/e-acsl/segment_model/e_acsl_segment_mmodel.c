@@ -26,6 +26,11 @@
  *   model. See e_acsl_mmodel_api.h for details.
 ***************************************************************************/
 
+#include <sys/time.h>
+#include <sys/resource.h>
+#include "e_acsl_shadow_layout.h"
+#include "e_acsl_segment_tracking.h"
+
 #define ALLOCATED(_ptr,_size) allocated((uintptr_t)_ptr, _size, (uintptr_t)_ptr)
 
 void * store_block(void * ptr, size_t size) {

@@ -36,6 +36,8 @@
 /***********************************************/
 /************ API prefixes *********************/
 /***********************************************/
+/* Assert */
+#define assert                export_alias(assert)
 /* Tracking */
 #define delete_block          export_alias(delete_block)
 #define store_block           export_alias(store_block)
@@ -73,6 +75,22 @@
 #define temporal_reset_return             export_alias(temporal_reset_return)
 #define temporal_memcpy                   export_alias(temporal_memcpy)
 #define temporal_memset                   export_alias(temporal_memset)
+
+/******************************/
+/* Dedicated E-ACSL assertion */
+/******************************/
+
+/*! \brief Runtime assertion verifying a given predicate
+ *  \param pred  integer code of a predicate
+ *  \param kind  C string representing a kind an annotation (e.g., "Assertion")
+ *  \param fct
+ *  \param pred_txt  stringified predicate
+ *  \param line  line number of the predicate placement in the
+ *    un-instrumented file */
+/*@ requires pred != 0;
+  @ assigns \nothing; */
+void assert(int pred, char *kind, char *fct, char *pred_txt, int line)
+  __attribute__((FC_BUILTIN));
 
 /***********************************************/
 /************ Basic API ************************/

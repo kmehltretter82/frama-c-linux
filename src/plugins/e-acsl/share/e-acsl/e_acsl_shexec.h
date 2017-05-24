@@ -28,6 +28,13 @@
 #ifndef E_ACSL_SHEXEC
 #define E_ACSL_SHEXEC
 
+#include <stddef.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <errno.h>
+#include "e_acsl_string.h"
+
 /*! \class ipr_t
  *  \brief Result struct for `shexec` function -- execute a command in the
  *  shell via fork/exec and return results */

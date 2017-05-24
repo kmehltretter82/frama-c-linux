@@ -147,7 +147,8 @@ static size_t increase_stack_limit(const size_t size) {
  * stack limit, i.e., it can be programmatically increased at runtime. */
 static size_t get_default_stack_size() {
   struct rlimit rlim;
-  assert(!getrlimit(RLIMIT_STACK, &rlim));
+  vassert(!getrlimit(RLIMIT_STACK, &rlim),
+    "Cannot detect program's stack size", NULL);
   return rlim.rlim_cur;
 }
 

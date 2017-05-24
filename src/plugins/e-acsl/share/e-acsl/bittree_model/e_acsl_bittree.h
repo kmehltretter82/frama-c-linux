@@ -159,7 +159,7 @@ static bt_node * bt_get_leaf_from_block (bt_block * ptr) {
 	    == (ptr->ptr & curr->left->mask))
       curr = curr->left;
     else
-      assert(0);
+      vassert(0, "Unreachable", NULL);
   }
   DASSERT(curr->is_leaf);
   DASSERT(curr->leaf == ptr);

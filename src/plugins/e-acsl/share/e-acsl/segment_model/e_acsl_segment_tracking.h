@@ -1284,11 +1284,11 @@ static int allocated(uintptr_t addr, long size, uintptr_t base) {
  * shadow */
 static void printbyte(unsigned char c, char buf[]) {
   if (c >> 2 < LONG_BLOCK_INDEX_START) {
-    sprintf(buf, "PRIMARY: I{%u} RO{%u} OF{%2u} => %u[%u]",
+    rtl_sprintf(buf, "PRIMARY: I{%u} RO{%u} OF{%2u} => %u[%u]",
       checkbit(INIT_BIT,c), checkbit(READONLY_BIT,c), c >> 2,
       short_lengths[c >> 2], short_offsets[c >> 2]);
   } else {
-    sprintf(buf, "SECONDARY:  I{%u} RO{%u} OF{%u} => %4u",
+    rtl_sprintf(buf, "SECONDARY:  I{%u} RO{%u} OF{%u} => %4u",
       checkbit(INIT_BIT,c), checkbit(READONLY_BIT,c),
       (c >> 2), (c >> 2) - LONG_BLOCK_INDEX_START);
   }
@@ -1310,7 +1310,7 @@ static void print_static_shadows(uintptr_t addr, size_t size) {
     if (IS_LONG_BLOCK(size) && (i%LONG_BLOCK) == 0) {
       j += 2;
       if (i < LONG_BLOCK_BOUNDARY(size)) {
-        sprintf(sec_buf, " %a  SZ{%u} OF{%u}",
+        rtl_sprintf(sec_buf, " %a  SZ{%u} OF{%u}",
           &sec_shadow[j], sec_shadow[j-2], sec_shadow[j-1]);
       }
       if (i) {

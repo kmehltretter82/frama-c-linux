@@ -47,7 +47,12 @@
 # define strlen  __builtin_strlen
 # define strcmp  __builtin_strcmp
 # define strncmp __builtin_strncmp
+#else
+# include <string.h>
 #endif
+
+#include <stddef.h>
+#include "e_acsl_malloc.h"
 
 /* \brief Local version of `strcat` */
 static char *nstrcat(char *dest, const char *src) {

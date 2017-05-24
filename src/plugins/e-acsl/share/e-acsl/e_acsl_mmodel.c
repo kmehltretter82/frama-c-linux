@@ -24,25 +24,6 @@
  * \file  e_acsl_memory_mmodel.c
  * \brief Configuration macros and RTL assembly
 ***************************************************************************/
-#include <stddef.h>
-#include <stdint.h>
-#include <sys/mman.h>
-#include <errno.h>
-#include <sys/resource.h>
-#include <sys/wait.h>
-#include <stdarg.h>
-#include <unistd.h>
-#include <limits.h>
-#include <sys/stat.h>
-#include <stdio.h>
-#include <sys/types.h>
-#include <fcntl.h>
-
-/* For PATH_MAX in Linux */
-#ifdef __linux__
-#  include <linux/limits.h>
-#endif
-
 #include "e_acsl_alias.h"
 #include "e_acsl_malloc.h"
 #include "e_acsl_string.h"
@@ -95,8 +76,6 @@ static void describe_run();
 /* Select memory model, either segment-based or bittree-based model should
    be defined */
 #if defined E_ACSL_SEGMENT_MMODEL
-# include "segment_model/e_acsl_shadow_layout.h"
-# include "segment_model/e_acsl_segment_tracking.h"
 # include "segment_model/e_acsl_segment_mmodel.c"
 #elif defined E_ACSL_BITTREE_MMODEL
 # include "bittree_model/e_acsl_bittree_api.h"
@@ -119,19 +98,19 @@ static void describe_run();
 /* Print basic configuration before each run */
 static void describe_run() {
 #if defined(E_ACSL_VERBOSE) || defined(E_ACSL_DEBUG)
-  printf("/* ========================================================= */\n");
-  printf(" * E-ACSL instrumented run\n" );
+  rtl_printf("/* ========================================================= */\n");
+  rtl_printf(" * E-ACSL instrumented run\n" );
 #ifdef E_ACSL_SEGMENT_MMODEL
-  printf(" * Memory tracking: shadow memory with\n" );
-  printf(" *   Heap  %d MB\n", E_ACSL_HEAP_SIZE);
-  printf(" *   Stack %d MB\n", E_ACSL_STACK_SIZE);
+  rtl_printf(" * Memory tracking: shadow memory with\n" );
+  rtl_printf(" *   Heap  %d MB\n", E_ACSL_HEAP_SIZE);
+  rtl_printf(" *   Stack %d MB\n", E_ACSL_STACK_SIZE);
 #else
-  printf(" * Memory tracking: patricia trie\n" );
+  rtl_printf(" * Memory tracking: patricia trie\n" );
 #endif
-  printf(" * Temporal checks: %s\n", E_ACSL_TEMPORAL_DESC);
-  printf(" * Execution mode:  %s\n", E_ACSL_DEBUG_DESC);
-  printf(" * Assertions mode: %s\n", E_ACSL_ASSERT_NO_FAIL_DESC);
-  printf(" * Validity notion: %s\n", E_ACSL_VALIDITY_DESC);
-  printf("/* ========================================================= */\n");
+  rtl_printf(" * Temporal checks: %s\n", E_ACSL_TEMPORAL_DESC);
+  rtl_printf(" * Execution mode:  %s\n", E_ACSL_DEBUG_DESC);
+  rtl_printf(" * Assertions mode: %s\n", E_ACSL_ASSERT_NO_FAIL_DESC);
+  rtl_printf(" * Validity notion: %s\n", E_ACSL_VALIDITY_DESC);
+  rtl_printf("/* ========================================================= */\n");
 #endif
 }

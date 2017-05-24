@@ -25,7 +25,7 @@ tests/gmp/quantif.i:12:[value] warning: assertion got status unknown.
 tests/gmp/quantif.i:12:[value] entering loop for the first time
 tests/gmp/quantif.i:16:[value] warning: assertion got status unknown.
 tests/gmp/quantif.i:16:[value] entering loop for the first time
-FRAMAC_SHARE/e-acsl/e_acsl.h:43:[value] warning: function __e_acsl_assert: precondition got status unknown.
+FRAMAC_SHARE/e-acsl/e_acsl_mmodel_api.h:90:[value] warning: function __e_acsl_assert: precondition got status unknown.
 tests/gmp/quantif.i:21:[value] warning: assertion got status unknown.
 tests/gmp/quantif.i:21:[value] entering loop for the first time
 tests/gmp/quantif.i:25:[value] warning: assertion got status unknown.

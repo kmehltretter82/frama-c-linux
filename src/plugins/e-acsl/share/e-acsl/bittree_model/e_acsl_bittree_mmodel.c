@@ -638,10 +638,10 @@ void delete_block_debug(char *file, int line, void* ptr) {
 void block_info(char *p) {
   bt_block * res = bt_find(p);
   if (res) {
-    printf(" << %a >> %a [%lu] => %lu \n",
+    DLOG(" << %a >> %a [%lu] => %lu \n",
       p, base_addr(p), offset(p), block_length(p));
   } else {
-    printf(" << %a >> not allocated\n", p);
+    DLOG(" << %a >> not allocated\n", p);
   }
 }
 #endif

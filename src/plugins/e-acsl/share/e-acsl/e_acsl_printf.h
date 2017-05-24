@@ -69,26 +69,26 @@
 #ifndef E_ACSL_PRINTF
 #define E_ACSL_PRINTF
 
+#include <unistd.h>
+#include <stdint.h>
+#include <stdarg.h>
+#include "e_acsl_alias.h"
+
 /* ****************** */
 /* Public API         */
 /* ****************** */
 
-#define printf  export_alias(printf)
-#define sprintf export_alias(sprintf)
-#define eprintf export_alias(eprintf)
-#define dprintf export_alias(dprintf)
-
 /* Replacement for printf with support for the above specifiers */
-static int printf(char *fmt, ...);
+static int rtl_printf(char *fmt, ...);
 
 /* Same as printf but write to a string buffer */
-static int sprintf(char* s, char *fmt, ...);
+static int rtl_sprintf(char* s, char *fmt, ...);
 
 /* Same as printf but write to the error stream. */
-static int eprintf(char *fmt, ...);
+static int rtl_eprintf(char *fmt, ...);
 
 /* Same as printf but write to a file descriptor. */
-static int dprintf(int fd, char *fmt, ...);
+static int rtl_dprintf(int fd, char *fmt, ...);
 
 /* ****************** */
 /* Implementation     */
@@ -399,7 +399,7 @@ static void _charc_literal  (void* p, char c) {
   }
 }
 
-static int printf(char *fmt, ...) {
+static int rtl_printf(char *fmt, ...) {
   va_list va;
   va_start(va,fmt);
   _format(NULL,_charc_stdout,fmt,va);
@@ -407,7 +407,7 @@ static int printf(char *fmt, ...) {
   return 1;
 }
 
-static int eprintf(char *fmt, ...) {
+static int rtl_eprintf(char *fmt, ...) {
   va_list va;
   va_start(va,fmt);
   _format(NULL,_charc_stderr,fmt,va);
@@ -415,7 +415,7 @@ static int eprintf(char *fmt, ...) {
   return 1;
 }
 
-static int dprintf(int fd, char *fmt, ...) {
+static int rtl_dprintf(int fd, char *fmt, ...) {
   va_list va;
   va_start(va,fmt);
   intptr_t fd_long = fd;
@@ -424,7 +424,7 @@ static int dprintf(int fd, char *fmt, ...) {
   return 1;
 }
 
-static int sprintf(char* s, char *fmt, ...) {
+static int rtl_sprintf(char* s, char *fmt, ...) {
   va_list va;
   va_start(va,fmt);
   _format(&s,putcp,fmt,va);
@@ -432,4 +432,8 @@ static int sprintf(char* s, char *fmt, ...) {
   va_end(va);
   return 1;
 }
+
+#define STDOUT(...) rtl_printf(__VA_ARGS__)
+#define STDERR(...) rtl_eprintf(__VA_ARGS__)
+
 #endif

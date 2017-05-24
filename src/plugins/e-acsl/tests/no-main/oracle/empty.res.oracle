@@ -1,4 +1,3 @@
-[kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl_gmp.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl_mmodel_api.h (with preprocessing)
 [kernel] Parsing tests/no-main/empty.i (no preprocessing)
