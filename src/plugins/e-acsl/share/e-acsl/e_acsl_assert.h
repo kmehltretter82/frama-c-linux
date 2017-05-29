@@ -94,8 +94,12 @@ void runtime_assert(int predicate, char *kind, char *fct, char *pred_txt, int li
   if (!predicate) {
       STDERR("%s failed at line %d in function %s.\n"
         "The failing predicate is:\n%s.\n", kind, line, fct, pred_txt);
-#ifndef E_ACSL_NO_ASSERT_FAIL
-    runtime_abort();
+#ifndef E_ACSL_NO_ASSERT_FAIL /* Do fail on assertions */
+#ifdef E_ACSL_FAIL_EXITCODE /* Fail by exit with a given code */
+    exit(E_ACSL_FAIL_EXITCODE);
+#else
+    runtime_abort(); /* Raise abort signal */
+#endif
 #endif
   }
 }

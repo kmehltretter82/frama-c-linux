@@ -159,6 +159,10 @@ Set the size (in MB) of the heap shadow space
 .B -k, --keep-going
 Continue execution after an assertion failure
 .TP
+.B --fail-with-code=\fI<NUMBER>
+On assertion failure exit with the given integer code intead of raising an abort
+signal
+.TP
 .B -m, --memory-model=\fI<model>
 memory model (i.e., a runtime library for checking memory related annotations)
 to be linked against the instrumented file.

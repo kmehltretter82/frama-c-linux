@@ -233,6 +233,10 @@ mmodel_features() {
     flags="$flags -DE_ACSL_VERBOSE -DE_ACSL_DEBUG_VERBOSE"
   fi
 
+  if [ -n "$OPTION_FAIL_WITH_CODE" ]; then
+    flags="$flags -DE_ACSL_FAIL_EXITCODE=$OPTION_FAIL_WITH_CODE "
+  fi
+
   if [ -n "$OPTION_WEAK_VALIDITY" ]; then
     flags="$flags -DE_ACSL_WEAK_VALIDITY"
   fi
@@ -246,8 +250,8 @@ check_getopt;
 LONGOPTIONS="help,compile,compile-only,debug:,ocode:,oexec:,verbose:,
   frama-c-only,extra-cpp-args:,frama-c-stdlib,full-mmodel,gmp,quiet,logfile:,
   ld-flags:,cpp-flags:,frama-c-extra:,memory-model:,keep-going,
-  frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:
-  print-mmodels,rt-debug,rte-select:,then,e-acsl-extra:,check,
+  frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:,
+  print-mmodels,rt-debug,rte-select:,then,e-acsl-extra:,check,fail-with-code:,
   temporal,weak-validity,stack-size:,heap-size:,rt-verbose"
 SHORTOPTIONS="h,c,C,d:,D,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,I:,G:,X,a:,T,k,V"
 # Prefix for an error message due to wrong arguments
@@ -279,6 +283,7 @@ OPTION_INSTRUMENTED_ONLY=                # Do not compile original code
 OPTION_TEMPORAL=                         # Enable temporal analysis
 OPTION_WEAK_VALIDITY=                    # Use notion of weak validity
 OPTION_RTE=                              # Enable assertion generation
+OPTION_FAIL_WITH_CODE=                   # Exit status code for failures
 OPTION_CHECK=                            # Check AST integrity
 OPTION_FRAMAC_CPP_EXTRA=""               # Extra CPP flags for Frama-C
 OPTION_RTE_SELECT=       # Generate assertions for these functions only
@@ -540,6 +545,16 @@ do
     -k|--keep-going)
       shift;
       OPTION_KEEP_GOING=1
+    ;;
+    # Exit with a given code on assertion failure instead of raising abort
+    --fail-with-code)
+      shift;
+      if [ "$1" -eq "$1" ] 2>/dev/null; then
+        OPTION_FAIL_WITH_CODE="$1"
+      else
+        error "--fail-with-code option requires integer argument"
+      fi
+      shift;
     ;;
     # Use notion of weak validity
     --weak-validity)

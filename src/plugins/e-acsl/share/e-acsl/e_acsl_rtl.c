@@ -68,6 +68,8 @@
  *    Assertions:
  *      E_ACSL_NO_ASSERT_FAIL - do not issue abort signal of E-ACSL
  *        assertion failure
+ *      E_ACSL_FAIL_EXITCODE - do not issue abort signal but exit with a
+ *        given code
  *    Shadow spaces (only for segment model):
  *      E_ACSL_STACK_SIZE - size (in MB) of the tracked program stack
  *      E_ACSL_HEAP_SIZE - size (in MB) of the tracked program heap
