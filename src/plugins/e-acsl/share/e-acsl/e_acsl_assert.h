@@ -25,8 +25,8 @@
  * \brief E-ACSL assertions and abort statements.
 ***************************************************************************/
 
-#ifndef E_ACSL_ASSERT
-#define E_ACSL_ASSERT
+#ifndef E_ACSL_ASSERT_H
+#define E_ACSL_ASSERT_H
 
 #include <sys/types.h>
 #include <signal.h>

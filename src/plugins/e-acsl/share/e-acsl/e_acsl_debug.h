@@ -24,6 +24,8 @@
  * \file   e_acsl_debug.h
  * \brief  Debug-level functions and macros
 ***************************************************************************/
+#ifndef E_ACSL_DEBUG_H
+#define E_ACSL_DEBUG_H
 
 static void vabort(char *fmt, ...);
 
@@ -108,5 +110,6 @@ int getchar(void);
 #  define DVLOG(...)
 #  define DASSERT(_e)
 #  define DVASSERT(_expr, _fmt, ...)
+#endif
 #endif
 // }}}

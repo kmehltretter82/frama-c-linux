@@ -66,8 +66,8 @@
  *      field-width of 8 is used.
 ***************************************************************************/
 
-#ifndef E_ACSL_PRINTF
-#define E_ACSL_PRINTF
+#ifndef E_ACSL_PRINTF_H
+#define E_ACSL_PRINTF_H
 
 #include <unistd.h>
 #include <stdint.h>

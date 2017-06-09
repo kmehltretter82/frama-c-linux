@@ -27,8 +27,8 @@
  * Functions and variables with non-static linkage used for instrumentation.
 ***************************************************************************/
 
-#ifndef E_ACSL_MMODEL
-#define E_ACSL_MMODEL
+#ifndef E_ACSL_MMODEL_H
+#define E_ACSL_MMODEL_H
 
 #include <stddef.h>
 #include "e_acsl_alias.h"

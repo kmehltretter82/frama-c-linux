@@ -30,8 +30,8 @@
  * Most of these should be declared somewhere in start procedures of c
  * and gcc libraries. One example of a safe location is errno. */
 
-#ifndef E_ACSL_SAFE_LOCATIONS
-#define E_ACSL_SAFE_LOCATIONS
+#ifndef E_ACSL_SAFE_LOCATIONS_H
+#define E_ACSL_SAFE_LOCATIONS_H
 
 #include <stdio.h>
 #include <stdint.h>

@@ -25,8 +25,8 @@
  * \brief Interface for running shell commands
 ***************************************************************************/
 
-#ifndef E_ACSL_SHEXEC
-#define E_ACSL_SHEXEC
+#ifndef E_ACSL_SHEXEC_H
+#define E_ACSL_SHEXEC_H
 
 #include <stddef.h>
 #include <sys/types.h>

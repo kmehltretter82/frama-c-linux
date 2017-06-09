@@ -25,8 +25,8 @@
  * \brief Generating temporal timestamps
 ***************************************************************************/
 
-#ifndef E_ACSL_TEMPORAL_TIMESTAMP /*{{{*/
-#define E_ACSL_TEMPORAL_TIMESTAMP
+#ifndef E_ACSL_TEMPORAL_TIMESTAMP_H /*{{{*/
+#define E_ACSL_TEMPORAL_TIMESTAMP_H
 
 #include <stdint.h>
 

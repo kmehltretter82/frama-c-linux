@@ -26,8 +26,8 @@
  * \brief Functionality to report/track memory leaks. Shared between models
 ***************************************************************************/
 
-#ifndef E_ACSL_HEAP_LEAK
-#define E_ACSL_HEAP_LEAK
+#ifndef E_ACSL_HEAP_LEAK_H
+#define E_ACSL_HEAP_LEAK_H
 
 #include "e_acsl_mmodel_api.h"
 

@@ -25,8 +25,8 @@
  * \brief Interface for producing backtrace. Requires GLIBC.
 ***************************************************************************/
 
-#ifndef E_ACSL_TRACE
-#define E_ACSL_TRACE
+#ifndef E_ACSL_TRACE_H
+#define E_ACSL_TRACE_H
 
 #include <stddef.h>
 #include <limits.h>

@@ -26,8 +26,8 @@
  * \brief Function aliasing
 ***************************************************************************/
 
-#ifndef E_ACSL_ALIAS
-#define E_ACSL_ALIAS
+#ifndef E_ACSL_ALIAS_H
+#define E_ACSL_ALIAS_H
 
 /* Concatenation of 2 tokens */
 # define preconcat(x,y) x ## y

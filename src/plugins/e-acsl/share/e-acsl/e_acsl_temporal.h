@@ -24,6 +24,8 @@
  * \file  e_acsl_temporal.h
  * \brief Implementation of the tenporal API shared by all models
 ***************************************************************************/
+#ifndef E_ACSL_TEMPORAL_H
+#define E_ACSL_TEMPORAL_H
 
 #include "e_acsl_temporal_timestamp.h"
 
@@ -157,4 +159,5 @@ int temporal_valid(void *ptr, void *addr_of_ptr) {
 /* }}} */
 #else
 #  define E_ACSL_TEMPORAL_DESC "disabled"
+#endif
 #endif

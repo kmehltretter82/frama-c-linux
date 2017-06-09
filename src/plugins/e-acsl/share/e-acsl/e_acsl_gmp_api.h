@@ -30,8 +30,8 @@
 /* GMP prototypes */
 /******************/
 
-#ifndef E_ACSL_GMP_API
-#define E_ACSL_GMP_API
+#ifndef E_ACSL_GMP_API_H
+#define E_ACSL_GMP_API_H
 
 #include "stdlib.h"
 #include "e_acsl_alias.h"

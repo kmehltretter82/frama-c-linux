@@ -36,8 +36,8 @@
  *    of string.h functions use GLIBC-based implementations.
 ***************************************************************************/
 
-#ifndef E_ACSL_STD_STRING
-#define E_ACSL_STD_STRING
+#ifndef E_ACSL_STD_STRING_H
+#define E_ACSL_STD_STRING_H
 
 #ifndef E_ACSL_NO_COMPILER_BUILTINS
 # define memset  __builtin_memset

@@ -26,8 +26,8 @@
  * \brief E-ACSL memory allocation bindings.
 ***************************************************************************/
 
-#ifndef E_ACSL_MALLOC
-#define E_ACSL_MALLOC
+#ifndef E_ACSL_MALLOC_H
+#define E_ACSL_MALLOC_H
 
 #include <stdint.h>
 #include <stddef.h>
