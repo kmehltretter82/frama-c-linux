@@ -290,17 +290,17 @@ void* store_block(void* ptr, size_t size) {
     bt_block * exitsing_block = bt_find(ptr);
     if (exitsing_block) {
       vabort("\nRecording %a [%lu] at %s:%d failed."
-          " Overlapping block %a [%lu] found at %s:%d\n",
-          ptr, size, cloc.file, cloc.line, base_addr(check),
-          block_length(check), exitsing_block->file, exitsing_block->line);
+        " Overlapping block %a [%lu] found at %s:%d\n",
+        ptr, size, cloc.file, cloc.line, base_addr(check),
+        block_length(check), exitsing_block->file, exitsing_block->line);
     }
     check += size - 1;
     exitsing_block = bt_find(check);
     if (exitsing_block) {
       vabort("\nRecording %a [%lu] at %d failed."
-          " Overlapping block %a [%lu] found at %s:%d\n",
-          ptr, size, cloc.file, cloc.line, base_addr(check),
-          block_length(check), exitsing_block->file, exitsing_block->line);
+        " Overlapping block %a [%lu] found at %s:%d\n",
+        ptr, size, cloc.file, cloc.line, base_addr(check),
+        block_length(check), exitsing_block->file, exitsing_block->line);
     }
   }
 #endif
@@ -325,6 +325,19 @@ void* store_block(void* ptr, size_t size) {
 #endif
   }
   return tmp;
+}
+
+/* Track a heap block */
+static void* store_freeable_block(void* ptr, size_t size, int init_bytes) {
+  bt_block *blk = NULL;
+  if (ptr) {
+    blk = store_block(ptr, size);
+    blk->is_freeable = 1;
+    update_heap_allocation(size);
+    if (init_bytes)
+      blk->init_bytes = size;
+  }
+  return blk;
 }
 
 /* remove the block starting at ptr */
@@ -374,15 +387,11 @@ void* store_block_duplicate(void* ptr, size_t size) {
 /* HEAP ALLOCATION {{{ */
 /*! \brief Replacement for `malloc` with memory tracking */
 void* malloc(size_t size) {
-  if(size == 0)
+  if (size == 0)
     return NULL;
 
   void *res = public_malloc(size);
-  if (res) {
-    bt_block * new_block = store_block(res, size);
-    update_heap_allocation(size);
-    new_block->is_freeable = 1;
-  }
+  store_freeable_block(res, size, 0);
   return res;
 }
 
@@ -394,13 +403,7 @@ void* calloc(size_t nbr_block, size_t size_block) {
     return NULL;
 
   void *res = public_calloc(nbr_block, size_block);
-  if (res) {
-    bt_block * new_block = store_block(res, size);
-    update_heap_allocation(size);
-    new_block->is_freeable = 1;
-    /* Mark allocated block as freeable and initialized */
-    new_block->init_bytes = size;
-  }
+  store_freeable_block(res, size, 1);
   return res;
 }
 
@@ -414,11 +417,7 @@ void *aligned_alloc(size_t alignment, size_t size) {
     return NULL;
 
   void *res = public_aligned_alloc(alignment, size);
-  if (res) {
-    bt_block * new_block = store_block(res, size);
-    new_block->is_freeable = 1;
-    update_heap_allocation(size);
-  }
+  store_freeable_block(res, size, 0);
   return res;
 }
 
@@ -434,11 +433,8 @@ int posix_memalign(void **memptr, size_t alignment, size_t size) {
   DVALIDATE_RW_ACCESS((void*)memptr, sizeof(void*));
 
   int res = public_posix_memalign(memptr, alignment, size);
-  if (!res) {
-    bt_block * new_block = store_block(*memptr, size);
-    new_block->is_freeable = 1;
-    update_heap_allocation(size);
-  }
+  if (!res)
+    store_freeable_block(*memptr, size, 0);
   return res;
 }
 
