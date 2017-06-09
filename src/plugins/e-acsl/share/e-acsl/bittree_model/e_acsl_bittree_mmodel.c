@@ -327,7 +327,9 @@ void* store_block(void* ptr, size_t size) {
   return tmp;
 }
 
-/* Track a heap block */
+/* Track a heap block. This is a wrapper for all memory allocation functions
+  that create new bittree nodes. It applies to all memory allocating functions
+  but realloc that modifies nodes rather than create them */
 static void* store_freeable_block(void* ptr, size_t size, int init_bytes) {
   bt_block *blk = NULL;
   if (ptr) {
@@ -473,7 +475,7 @@ void* realloc(void* ptr, size_t size) {
     if (size <= tmp->size) {
       /* adjust new size, allocation not necessary */
       tmp->init_bytes = size;
-    /* realloc bigger larger block */
+    /* realloc larger block */
     } else {
       /* size of tmp->init_ptr in the new block */
       int nb = needed_bytes(size);
