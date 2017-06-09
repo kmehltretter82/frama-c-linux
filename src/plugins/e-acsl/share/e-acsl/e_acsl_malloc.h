@@ -69,9 +69,11 @@ extern void*  __e_acsl_mspace_calloc(mspace msp, size_t, size_t);
 extern void*  __e_acsl_mspace_realloc(mspace msp, void*, size_t);
 extern void*  __e_acsl_mspace_aligned_alloc(mspace, size_t, size_t);
 extern int    __e_acsl_mspace_posix_memalign(mspace, void **, size_t, size_t);
+extern void*  __e_acsl_mspace_least_addr(mspace);
 
 #define create_mspace          __e_acsl_create_mspace
 #define destroy_mspace         __e_acsl_destroy_mspace
+#define mspace_least_addr      __e_acsl_mspace_least_addr
 #define mspace_malloc          __e_acsl_mspace_malloc
 #define mspace_free            __e_acsl_mspace_free
 #define mspace_calloc          __e_acsl_mspace_calloc
