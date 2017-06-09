@@ -76,6 +76,16 @@
  *    String functions:
  *      E_ACSL_NO_COMPILER_BUILTINS - if undefined (default) then use
  *      compiler builtin string functions (e.g., memset -> __builtin_memset)
+ *    Memory deallocation:
+ *      E_ACSL_FREE_VALID_ADDRESS -- Clause 7.20.3.2 of C99 standard states
+ *      that NULL is a valid input to free:
+ *        "The free function causes the space pointed to by ptr [its argument]
+ *         to be deallocated, that is, made available for further allocation.
+ *         If ptr is a null pointer, no action occurs."
+ *      Yet, some tools insist that it is a bug. For instance, there is a
+ *      bunch of test cases in Toyota ITC Benchmarks. To make such tools
+ *      happy the following option is introduced. By default it should be
+ *      undefined (disabled) though.
 */
 
 /* Functionality tracking leaks is shared between models */

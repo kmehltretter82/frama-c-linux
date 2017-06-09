@@ -159,6 +159,9 @@ Set the size (in MB) of the heap shadow space
 .B -k, --keep-going
 Continue execution after an assertion failure
 .TP
+.B --free-valid-address
+Trigger failure if a NULL-pointer is used as an input to free function
+.TP
 .B --fail-with-code=\fI<NUMBER>
 On assertion failure exit with the given integer code intead of raising an abort
 signal

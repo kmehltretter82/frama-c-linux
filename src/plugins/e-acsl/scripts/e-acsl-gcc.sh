@@ -240,6 +240,10 @@ mmodel_features() {
   if [ -n "$OPTION_WEAK_VALIDITY" ]; then
     flags="$flags -DE_ACSL_WEAK_VALIDITY"
   fi
+
+  if [ -n "$OPTION_FREE_VALID_ADDRESS" ]; then
+    flags="$flags -DE_ACSL_FREE_VALID_ADDRESS"
+  fi
   echo $flags
 }
 
@@ -252,7 +256,7 @@ LONGOPTIONS="help,compile,compile-only,debug:,ocode:,oexec:,verbose:,
   ld-flags:,cpp-flags:,frama-c-extra:,memory-model:,keep-going,
   frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:,
   print-mmodels,rt-debug,rte-select:,then,e-acsl-extra:,check,fail-with-code:,
-  temporal,weak-validity,stack-size:,heap-size:,rt-verbose"
+  temporal,weak-validity,stack-size:,heap-size:,rt-verbose,free-valid-address"
 SHORTOPTIONS="h,c,C,d:,D,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,I:,G:,X,a:,T,k,V"
 # Prefix for an error message due to wrong arguments
 ERROR="ERROR parsing arguments:"
@@ -286,6 +290,7 @@ OPTION_RTE=                              # Enable assertion generation
 OPTION_FAIL_WITH_CODE=                   # Exit status code for failures
 OPTION_CHECK=                            # Check AST integrity
 OPTION_FRAMAC_CPP_EXTRA=""               # Extra CPP flags for Frama-C
+OPTION_FREE_VALID_ADDRESS="" # Fail if NULL is used as input to free function
 OPTION_RTE_SELECT=       # Generate assertions for these functions only
 OPTION_THEN=             # Adds -then in front of -e-acsl in FC command.
 OPTION_STACK_SIZE=32     # Size of a heap shadow space (in MB)
@@ -555,6 +560,11 @@ do
         error "--fail-with-code option requires integer argument"
       fi
       shift;
+    ;;
+    # Use notion of weak validity
+    --free-valid-address)
+      shift;
+      OPTION_FREE_VALID_ADDRESS=1
     ;;
     # Use notion of weak validity
     --weak-validity)

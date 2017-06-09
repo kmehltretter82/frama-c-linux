@@ -967,6 +967,14 @@ static void unset_heap_segment(void *ptr, int init, const char *function) {
 
 /*! \brief Replacement for `free` with memory tracking  */
 void free(void *ptr) {
+  if (ptr == NULL) {
+/* Fail if instructed to treat NULL input to free as invalid. */
+#ifdef E_ACSL_FREE_VALID_ADDRESS
+    vabort("NULL pointer in free\n");
+#endif
+    return;
+  }
+
   if (ptr != NULL) { /* NULL is a valid behaviour */
     if (freeable(ptr)) {
       unset_heap_segment(ptr, 1, "free");

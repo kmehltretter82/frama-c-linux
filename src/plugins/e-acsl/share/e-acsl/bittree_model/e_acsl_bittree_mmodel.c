@@ -511,8 +511,13 @@ void* realloc(void* ptr, size_t size) {
 
 /*! \brief Replacement for `free` with memory tracking */
 void free(void* ptr) {
-  if (!ptr)
+  if (ptr == NULL) {
+/* Fail if instructed to treat NULL input to free as invalid. */
+#ifdef E_ACSL_FREE_VALID_ADDRESS
+    vabort("NULL pointer in free\n");
+#endif
     return;
+  }
   bt_block * res = bt_lookup(ptr);
   if (!res) {
     vabort("Not a start of block (%a) in free\n", ptr);
