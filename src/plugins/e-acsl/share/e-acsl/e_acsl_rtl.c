@@ -78,6 +78,9 @@
  *      compiler builtin string functions (e.g., memset -> __builtin_memset)
 */
 
+/* Functionality tracking leaks is shared between models */
+#include "e_acsl_leak.h"
+
 /* Print a header indicating current configuration of a run to STDIN. */
 static void describe_run();
 

@@ -77,16 +77,6 @@ static const int nbr_bits_to_1[256] = {
 /* }}} */
 
 /**************************/
-/* HEAP USAGE         {{{ */
-/**************************/
-size_t heap_allocation_size = 0;
-
-size_t get_heap_allocation_size(void) {
-  return heap_allocation_size;
-}
-/* }}} */
-
-/**************************/
 /* DEBUG              {{{ */
 /**************************/
 #ifdef E_ACSL_DEBUG
@@ -390,7 +380,7 @@ void* malloc(size_t size) {
   void *res = public_malloc(size);
   if (res) {
     bt_block * new_block = store_block(res, size);
-    heap_allocation_size += size;
+    update_heap_allocation(size);
     new_block->is_freeable = 1;
   }
   return res;
@@ -406,7 +396,7 @@ void* calloc(size_t nbr_block, size_t size_block) {
   void *res = public_calloc(nbr_block, size_block);
   if (res) {
     bt_block * new_block = store_block(res, size);
-    heap_allocation_size += size;
+    update_heap_allocation(size);
     new_block->is_freeable = 1;
     /* Mark allocated block as freeable and initialized */
     new_block->init_bytes = size;
@@ -427,7 +417,7 @@ void *aligned_alloc(size_t alignment, size_t size) {
   if (res) {
     bt_block * new_block = store_block(res, size);
     new_block->is_freeable = 1;
-    heap_allocation_size += size;
+    update_heap_allocation(size);
   }
   return res;
 }
@@ -447,7 +437,7 @@ int posix_memalign(void **memptr, size_t alignment, size_t size) {
   if (!res) {
     bt_block * new_block = store_block(*memptr, size);
     new_block->is_freeable = 1;
-    heap_allocation_size += size;
+    update_heap_allocation(size);
   }
   return res;
 }
@@ -467,9 +457,12 @@ void* realloc(void* ptr, size_t size) {
   tmp = bt_lookup(ptr);
   DASSERT(tmp != NULL);
   new_ptr = public_realloc((void*)tmp->ptr, size);
-  if(new_ptr == NULL)
+  if (new_ptr == NULL)
     return NULL;
-  heap_allocation_size -= tmp->size;
+
+  /* Update heap allocation stats */
+  update_heap_allocation(size);
+  update_heap_allocation(-(long)tmp->size);
   /* realloc changes start address -- re-enter the element */
   if (tmp->ptr != (uintptr_t)new_ptr) {
     bt_remove(tmp);
@@ -513,7 +506,6 @@ void* realloc(void* ptr, size_t size) {
   }
   tmp->size = size;
   tmp->is_freeable = 1;
-  heap_allocation_size += size;
   return (void*)tmp->ptr;
 }
 
@@ -525,7 +517,7 @@ void free(void* ptr) {
   if (!res) {
     vabort("Not a start of block (%a) in free\n", ptr);
   } else {
-    heap_allocation_size -= res->size;
+    update_heap_allocation(-res->size);
     public_free(ptr);
     bt_clean_block_init(res);
     bt_remove(res);
@@ -541,6 +533,7 @@ void free(void* ptr) {
 /* erase the content of the abstract structure */
 void memory_clean() {
   bt_clean();
+  report_heap_leaks();
 }
 
 extern char **environ;

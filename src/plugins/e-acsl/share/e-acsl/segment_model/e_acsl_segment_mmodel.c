@@ -135,10 +135,6 @@ int initialized(void * ptr, size_t size) {
     return static_initialized(addr, size));
   return 0;
 }
-
-size_t get_heap_allocation_size(void) {
-  return heap_allocation_size;
-}
 /* }}} */
 
 /* Track program arguments (ARGC/ARGV) {{{ */
@@ -237,6 +233,7 @@ void memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
 
 void memory_clean(void) {
   clean_shadow_layout();
+  report_heap_leaks();
 }
 /* }}} */
 

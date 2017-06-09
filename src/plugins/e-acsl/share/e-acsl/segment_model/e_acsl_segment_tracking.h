@@ -822,10 +822,6 @@ static void mark_readonly_region (uintptr_t addr, long size) {
 
 /* Heap allocation {{{ (malloc/calloc) */
 
-/*! \brief Amount of heap memory allocated by the program.
- * Variable visible externally. */
-size_t heap_allocation_size = 0;
-
 /*! \brief Create a heap shadow for an allocated memory block starting at `ptr`
  * and of length `size`. Optionally mark it as initialized if `init`
  * evaluates to a non-zero value.
@@ -845,7 +841,7 @@ static void set_heap_segment(void *ptr, size_t size, size_t alloc_size,
   /* Ensure the shadowed block in on the tracked heap portion */
   DVALIDATE_IS_ON_HEAP(((uintptr_t)ptr) - HEAP_SEGMENT, size);
   DVALIDATE_ALIGNMENT(ptr); /* Make sure alignment is right */
-  heap_allocation_size += size; /* Adjust tracked allocation size */
+  update_heap_allocation(size); /* Adjust tracked allocation size */
 
   /* Get aligned size of the block, i.e., an actual size of the
    * allocated block */
@@ -929,6 +925,10 @@ void* calloc(size_t nmemb, size_t size) {
 /** \brief Return shadowed copy of a memory chunk on a program's heap */
 static void *shadow_copy(const void *ptr, size_t size, int init) {
   char *ret = (init) ?	calloc(1, size) : malloc(size);
+  vassert(ret != NULL, "Shadow copy failed\n", NULL);
+  /* Shadow copy is internal, therefore heap status should not be updated.
+     Since it is set via `set_heap_segment`, it needs to be reverted back. */
+  update_heap_allocation(-size);
   return memcpy(ret, ptr, size);
 }
 /* }}} */
