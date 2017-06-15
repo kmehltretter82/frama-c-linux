@@ -14,6 +14,9 @@
   __e_acsl_init ∈ [--..--]
   __e_acsl_internal_heap ∈ [--..--]
   __e_acsl_heap_allocation_size ∈ [--..--]
+  __e_acsl_math_HUGE_VAL ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  __e_acsl_math_HUGE_VALF ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
+  __e_acsl_math_INFINITY ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
   X ∈ [--..--]
   p ∈ {{ NULL ; &S_p[0] }}
   S_p[0..1] ∈ [--..--]

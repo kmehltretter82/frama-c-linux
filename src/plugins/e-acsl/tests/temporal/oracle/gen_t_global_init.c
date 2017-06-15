@@ -82,10 +82,6 @@ void __e_acsl_globals_init(void)
   __e_acsl_full_init((void *)(& extra_lbits));
   __e_acsl_store_block((void *)(strings),(size_t)32);
   __e_acsl_full_init((void *)(& strings));
-  __e_acsl_temporal_store_nblock((void *)(& descs2[0].desc.extra_bits),
-                                 (void *)(extra_lbits));
-  __e_acsl_temporal_store_nblock((void *)(& descs2[1].desc.extra_bits),
-                                 (void *)(extra_lbits));
   __e_acsl_temporal_store_nblock((void *)(& l_desc2.desc.extra_bits),
                                  (void *)(extra_lbits));
   __e_acsl_temporal_store_nblock((void *)(& descs[0].extra_bits),
@@ -102,6 +98,10 @@ void __e_acsl_globals_init(void)
                                  (void *)__gen_e_acsl_literal_string_2);
   __e_acsl_temporal_store_nblock((void *)(& strings[1][1]),
                                  (void *)__gen_e_acsl_literal_string);
+  __e_acsl_temporal_store_nblock((void *)(& descs2[0].desc.extra_bits),
+                                 (void *)(extra_lbits));
+  __e_acsl_temporal_store_nblock((void *)(& descs2[1].desc.extra_bits),
+                                 (void *)(extra_lbits));
   return;
 }
 

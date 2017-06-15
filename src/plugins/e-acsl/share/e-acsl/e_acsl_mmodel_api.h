@@ -78,7 +78,6 @@
 /* Infinity values for floating point types */
 #define math_HUGE_VAL                   export_alias(math_HUGE_VAL)
 #define math_HUGE_VALF                  export_alias(math_HUGE_VALF)
-#define math_HUGE_VALL                  export_alias(math_HUGE_VALL)
 #define math_INFINITY                   export_alias(math_INFINITY)
 
 /******************************/
@@ -309,9 +308,6 @@ extern double math_HUGE_VAL
   __attribute__((FC_BUILTIN));
 /* Positive infinity for floats: same as HUGE_VALF */
 extern float  math_HUGE_VALF
-  __attribute__((FC_BUILTIN));
-/* Positive infinity for long doubles: same as HUGE_VALL */
-extern long double math_HUGE_VALL
   __attribute__((FC_BUILTIN));
 /* Representation of infinity value for doubles: same as INFINITY */
 extern double math_INFINITY

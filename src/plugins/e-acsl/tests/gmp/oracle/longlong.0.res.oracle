@@ -13,6 +13,9 @@
   __e_acsl_init ∈ [--..--]
   __e_acsl_internal_heap ∈ [--..--]
   __e_acsl_heap_allocation_size ∈ [--..--]
+  __e_acsl_math_HUGE_VAL ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  __e_acsl_math_HUGE_VALF ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
+  __e_acsl_math_INFINITY ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
 [value] using specification for function __e_acsl_memory_init
 tests/gmp/longlong.i:9:[value] user error: recursive call during value analysis
                     of my_pow (my_pow <- my_pow :: tests/gmp/longlong.i:16 <- main). Assuming
@@ -28,7 +31,7 @@ FRAMAC_SHARE/e-acsl/e_acsl_gmp_api.h:100:[value] warning: function __gmpz_import
 [value] using specification for function __gmpz_add
 [value] using specification for function __gmpz_cmp
 [value] using specification for function __e_acsl_assert
-FRAMAC_SHARE/e-acsl/e_acsl_mmodel_api.h:90:[value] warning: function __e_acsl_assert: precondition got status unknown.
+FRAMAC_SHARE/e-acsl/e_acsl_mmodel_api.h:94:[value] warning: function __e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_tdiv_r
 [value] using specification for function __gmpz_get_si
 tests/gmp/longlong.i:17:[value] Assigning imprecise value to __gen_e_acsl__4.

@@ -52,8 +52,6 @@
 double math_HUGE_VAL = 0.0;
 /** \brief Positive infinity for floats: same as HUGE_VALF */
 float  math_HUGE_VALF = 0.0;
-/** \brief Positive infinity for long doubles: same as HUGE_VALL */
-long double math_HUGE_VALL = 0.0;
 /** \brief Representation of infinity value for doubles: same as INFINITY */
 double math_INFINITY = 0.0;
 
@@ -61,7 +59,6 @@ double math_INFINITY = 0.0;
 static void init_infinity_values() {
   math_HUGE_VAL = HUGE_VAL;
   math_HUGE_VALF = HUGE_VALF;
-  math_HUGE_VALL = HUGE_VALL;
   math_INFINITY = INFINITY;
 }
 
