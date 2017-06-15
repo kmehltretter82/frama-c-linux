@@ -229,6 +229,7 @@ void memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
     if (safe_locations[i].is_initialized)
       initialize(addr, len);
   }
+  init_infinity_values();
 }
 
 void memory_clean(void) {

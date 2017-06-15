@@ -39,6 +39,7 @@
 #include "e_acsl_shexec.h"
 #include "e_acsl_trace.h"
 #include "e_acsl_assert.h"
+#include "e_acsl_floating_point.h"
 #include "e_acsl_safe_locations.h"
 #include "e_acsl_temporal_timestamp.h"
 #include "e_acsl_mmodel_api.h"
