@@ -833,6 +833,15 @@ static void mark_readonly_region (uintptr_t addr, long size) {
 static void set_heap_segment(void *ptr, size_t size, size_t alloc_size,
     size_t init, const char *function) {
 
+  /* Make sure that heap memspace has not been moved. This is likely if
+     a really large chunk has been requested to be allocated. */
+  vassert(mem_spaces.heap_mspace_least ==
+    (uintptr_t)mspace_least_addr(mem_spaces.heap_mspace),
+    "Exceeded heap allocation limit of %luMB -- heap memory space moved. \n",
+    E_ACSL_HEAP_SIZE);
+
+  /* Similar check, make sure that allocated space does not exceed given
+     allocation limit for mspace */
   uintptr_t max_addr = (uintptr_t)ptr + alloc_size;
   vassert(mem_spaces.heap_end > max_addr,
     "Exceeded heap allocation limit of %luMB\n", E_ACSL_HEAP_SIZE);

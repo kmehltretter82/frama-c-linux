@@ -54,6 +54,7 @@ static struct memory_spaces {
   mspace heap_mspace;  /* `public` (application) mspace */
   uintptr_t heap_start; /* least address in application mspace */
   uintptr_t heap_end; /* greatest address in application mspace */
+  uintptr_t heap_mspace_least; /* Initial least address in heap mspace */
 } mem_spaces;
 
 /* While it is possible to generate prefixes using an extra level of
@@ -125,6 +126,9 @@ static void make_memory_spaces(size_t rtl_size, size_t heap_size) {
      mspace header. */
   mem_spaces.heap_start = (uintptr_t)mspace_malloc(mem_spaces.heap_mspace,1);
   mem_spaces.heap_end = mem_spaces.heap_start + heap_size;
+  /* Save initial least address of heap memspace. This address is used later
+     to check whether memspace has been moved. */
+  mem_spaces.heap_mspace_least = (uintptr_t)mspace_least_addr(mem_spaces.heap_mspace);
 }
 
 static void destroy_memory_spaces() {
