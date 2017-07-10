@@ -1,20 +1,20 @@
 Tests:
   script:
-  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --rootfs 1 --E-ACSL $CI_BUILD_REF --branch $CI_BUILD_REF_NAME E-ACSL
+  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --E-ACSL $CI_BUILD_REF --branch $CI_BUILD_REF_NAME E-ACSL
   tags:
   except:
   - tags
 
 context-from-precondition:
   script:
-  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --rootfs 1 --E-ACSL $CI_BUILD_REF --branch $CI_BUILD_REF_NAME context-from-precondition
+  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --E-ACSL $CI_BUILD_REF --branch $CI_BUILD_REF_NAME context-from-precondition
   tags:
   except:
   - tags
 
 Security:
   script:
-  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --rootfs 1 --E-ACSL $CI_BUILD_REF --branch $CI_BUILD_REF_NAME Security
+  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --E-ACSL $CI_BUILD_REF --branch $CI_BUILD_REF_NAME Security
   tags:
   except:
   - tags
