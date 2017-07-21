@@ -81,17 +81,17 @@ let move (vis:Visitor.generic_frama_c_visitor) ~old new_stmt =
 
 let get_stmt vis = function
   | StmtLabel { contents = stmt } -> stmt
-  | LogicLabel(_, Here) ->
+  | BuiltinLabel(_, Here) ->
     (match vis#current_stmt with
     | None -> Error.not_yet "label \"Here\" in function contract"
     | Some s -> s)
-  | LogicLabel(_, (Old | Pre)) ->
+  | BuiltinLabel(_, (Old | Pre)) ->
     (try Kernel_function.find_first_stmt (Extlib.the vis#current_kf)
      with Kernel_function.No_Statement -> assert false)
-  | LogicLabel(_, Post) ->
+  | BuiltinLabel(_, Post) ->
     (try Kernel_function.find_return (Extlib.the vis#current_kf)
      with Kernel_function.No_Statement -> assert false)
-  | LogicLabel(_, (LoopEntry | LoopCurrent | Init | AbsLabel _)) -> assert false
+  | BuiltinLabel _ | FormalLabel _ -> assert false
 
 (*
 Local Variables:
