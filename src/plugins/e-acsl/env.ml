@@ -330,16 +330,15 @@ let add_assert env stmt annot = match current_kf env with
       env.visitor#get_filling_actions
 
 let add_stmt ?(post=false) ?(init=false) ?before env stmt =
-  if post = false then begin
-    Extlib.may (fun old -> E_acsl_label.move env.visitor ~old stmt) before
-  end;
+  if not post then
+    Extlib.may (fun old -> E_acsl_label.move env.visitor ~old stmt) before;
   let local_env, tl = top init env in
   let block = local_env.block_info in
   let block =
-    if post = false then
-      { block with new_stmts = stmt :: block.new_stmts }
-    else
+    if post then
       { block with post_stmts = stmt :: block.post_stmts }
+    else
+      { block with new_stmts = stmt :: block.new_stmts }
   in
   let local_env = { local_env with block_info = block } in
   { env with

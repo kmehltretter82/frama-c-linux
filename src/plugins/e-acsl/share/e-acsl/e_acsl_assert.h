@@ -51,7 +51,7 @@ static void vabort(char *fmt, ...);
 #define vassert(expr, fmt, ...) \
   vassert_fail(expr, __LINE__, __FILE__, fmt, __VA_ARGS__)
 
-/* This gets replaced by `abort` */
+/* This ::exec_abort replaces `abort` via a macro at the top of this file */
 static void exec_abort(int line, const char *file) {
 #ifdef E_ACSL_DEBUG
   trace();

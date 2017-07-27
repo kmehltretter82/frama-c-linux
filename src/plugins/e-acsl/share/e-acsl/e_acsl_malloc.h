@@ -33,8 +33,8 @@
 #include <stddef.h>
 
 /* Memory allocated for internal use of RTL and for the use by the application
- * is split into to mspaces (memory spaces). Memory allocation itself is
- * delegated to a slightly cusomised version of dlmalloc shipped with the
+ * is split into two mspaces (memory spaces). Memory allocation itself is
+ * delegated to a slightly customised version of dlmalloc shipped with the
  * RTL. The overall pattern is as follows:
  *    mspace space = create_mspace(capacity, locks);
  *    char *p = mspace_malloc(space, size); */

@@ -198,7 +198,7 @@ int freeable(void * ptr)
 /*! \brief Implementation of the \b \\valid predicate of E-ACSL.
  *
  * \\valid evaluates an expression of the form `p+i`, where `p` is a pointer
- * and `i` is an integer offset and returns `true` of both `p` and `p+i` belong
+ * and `i` is an integer offset and returns `true` if both `p` and `p+i` belong
  * to the same allocated memory block.
  *
  * @param ptr - memory address under question
@@ -208,7 +208,7 @@ int freeable(void * ptr)
  *  `base` refers to `p`
  *  @param addrof_base - if `ptr` can be represented by the expression `p+i`
  *  then `addrof_base` refers to `&p`. For the cases when the address of `p`
- *  cannot be taked (e.g., address of s static array or a constant value
+ *  cannot be taken (e.g., address of a static array or a constant value
  *  casted to a pointer) then `addrof_base` is zero.
  *
  * @returns
@@ -218,6 +218,9 @@ int freeable(void * ptr)
  *  then only region `[ptr, ptr + size]` should lie within the same block
  *  and be writable.
  */
+
+/* FIXME: The following E-ACSL contract is obsolete and needs to be
+   synchronized with the above description. */
 /*@ ensures \result == 0 || \result == 1;
   @ ensures \result == 1 ==> \valid(((char *)ptr)+(0..size-1));
   @ assigns \result \from *(((char*)ptr)+(0..size-1)); */
@@ -228,6 +231,9 @@ int valid(void * ptr, size_t size, void *base, void *addrof_base)
  *
  * Same as ::valid except the checked memory locations are only
  * required to be allocated.  */
+
+/* FIXME: The following E-ACSL contract is obsolete and needs to be
+   synchronized with the above description. */
 /*@ ensures \result == 0 || \result == 1;
   @ ensures \result == 1 ==> \valid_read(((char *)ptr)+(0..size-1));
   @ assigns \result \from *(((char*)ptr)+(0..size-1)); */
@@ -295,7 +301,7 @@ size_t get_heap_allocation_size(void)
 /*! \brief A variable holding a byte size of tracked heap allocation. */
 extern size_t heap_allocation_size;
 
-/*@predicate diffSize{L1,L2}(integer i) =
+/*@ predicate diffSize{L1,L2}(integer i) =
   \at(heap_allocation_size, L1)
     - \at(heap_allocation_size, L2) == i; */
 

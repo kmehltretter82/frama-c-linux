@@ -139,6 +139,8 @@ static size_t increase_stack_limit(const size_t size) {
         vabort("setrlimit: %s \n", strerror(errno));
       }
     }
+  } else {
+    vabort("getrlimit: %s \n", strerror(errno));
   }
   return size;
 }

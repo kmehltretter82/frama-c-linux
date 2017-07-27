@@ -9,6 +9,12 @@
            ftp://gee.cs.oswego.edu/pub/misc/malloc.c
          Check before installing!
 
+* This file has been modified by CEA for use together with Runtime Library
+  of the E-ACSL plugin of Frama-C.
+  The changes introduced by CEA are limited to the following modifications:
+    * Added declaration/definition of mspace_least_addr function
+    * Added functionality to modify prefix of `mspace_...` functions
+
 * Quickstart
 
   This library is all in one file to simplify the most common usage:

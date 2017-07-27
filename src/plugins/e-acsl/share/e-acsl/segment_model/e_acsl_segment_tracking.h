@@ -232,6 +232,9 @@ static void validate_shadow_layout() {
   /* Check that the struct holding memory layout is marked as initialized. */
   DVALIDATE_MEMORY_INIT;
 
+  /* Each segment has 3 partitions:
+	 - application memory
+     - primary/secondary shadows */
   int num_partitions = sizeof(mem_partitions)/sizeof(memory_partition*);
   int num_seg_in_part = 3;
 #ifdef E_ACSL_TEMPORAL
@@ -354,13 +357,13 @@ static void validate_shadow_layout() {
   } \
 }
 
-/* Assert neither of `_len` addresses immediately preceding `_addr` are
+/* Assert that neither of `_len` addresses immediately preceding `_addr` are
  * base addresses of some other block and that `_len` addresses past
  * `_addr` are free */
 #define DVALIDATE_STATIC_SUFFICIENTLY_ALIGNED(_addr, _len) { \
   int _i; \
   for (_i = 0; _i < _len; _i++) { \
-    uintptr_t _prev = _addr - _i; \
+    uintptr_t _prev = _addr - _i - 1; \
     if (static_allocated_one(_prev)) { \
       vassert(_base_addr(_prev) != _prev, \
         "Potential backward overlap of: \n  previous block       [%a]\n" \
@@ -386,15 +389,11 @@ static void validate_shadow_layout() {
 
 /* Assert that memory block [_addr, _addr + _size] is allocated
  * and can be written to */
-# define DVALIDATE_RW_ACCESS(_addr, _size) { \
+# define DVALIDATE_WRITEABLE(_addr, _size) { \
   DVALIDATE_ALLOCATED((uintptr_t)_addr, _size, (uintptr_t)_addr); \
   DVASSERT(!readonly((void*)_addr), \
     "Unexpected readonly address: %lu\n", _addr); \
 }
-
-/* Assert that memory block [_addr, _addr + _size] is allocated */
-# define DVALIDATE_RO_ACCESS(_addr, _size) \
-  DVALIDATE_ALLOCATED((uintptr_t)_addr, _size, (uintptr_t)_addr)
 
 #else
 /*! \cond exclude from doxygen */
@@ -414,9 +413,8 @@ static void validate_shadow_layout() {
 #  define DVALIDATE_FREEABLE
 #  define DVALIDATE_STATIC_FREE
 #  define DVALIDATE_HEAP_FREE
-#  define DVALIDATE_RO_ACCESS
-#  define DVALIDATE_RW_ACCESS
 #  define DVALIDATE_ALLOCATED
+#  define DVALIDATE_WRITEABLE
 #  define DVALIDATE_STATIC_SUFFICIENTLY_ALIGNED
 /*! \endcond */
 #endif
@@ -931,7 +929,9 @@ void* calloc(size_t nmemb, size_t size) {
   return res;
 }
 
-/** \brief Return shadowed copy of a memory chunk on a program's heap */
+/** \brief Return shadowed copy of a memory chunk on a program's heap using.
+ * If `init` parameter is set to a non-zero value the memory occupied by the
+ * resulting block is set to be initialized and uninitialized otherwise. */
 static void *shadow_copy(const void *ptr, size_t size, int init) {
   char *ret = (init) ?	calloc(1, size) : malloc(size);
   vassert(ret != NULL, "Shadow copy failed\n", NULL);
@@ -946,10 +946,16 @@ static void *shadow_copy(const void *ptr, size_t size, int init) {
 
 /*! \brief Remove a memory block with base address given by `ptr` from tracking.
  * This function effectively nullifies block shadow tracking an application
- * block and optionally nullifies an init shadow associated with the block.
+ * block.
  *
  * NOTE: ::unset_heap_segment assumes that `ptr` is a base address of an
- * allocated heap memory block, i.e., `freeable(ptr)` evaluates to true. */
+ * allocated heap memory block, i.e., `freeable(ptr)` evaluates to true.
+ *
+ * \param ptr - base address of the memory block to be removed from tracking
+ * \param init - if evaluated to a non-zero value then initialization shadow
+ *  of the memory block with base address `ptr` is nullified as well.
+ * \param function - name of the de-allocation function (e.g., `free` or `cfree`)
+*/
 static void unset_heap_segment(void *ptr, int init, const char *function) {
   DVALIDATE_MEMORY_INIT;
   DVALIDATE_FREEABLE(((uintptr_t)ptr));
@@ -1127,7 +1133,11 @@ static int heap_allocated(uintptr_t addr, size_t size, uintptr_t base_ptr) {
      *  after base address)
      * offset is the difference between the address and base address (shadow[0])
      * Then an address belongs to heap allocation if
-     *  offset + size <= length */
+     *  offset + size <= length
+     *
+     * Additionally, if strong validity is enforced
+     * (i.e., E_ACSL_WEAK_VALIDITY macro undefined) make sure that both
+     * `addr` and `base_ptr` belong to the same block. */
 #ifndef E_ACSL_WEAK_VALIDITY
     return base_shadow[0] == shadow[0] &&
       (addr - shadow[0]) + size <= first_segment[1];

@@ -413,7 +413,8 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
               (* Case of an empty CompoundInit, treat it as if there were
                * no initializer at all *)
               | CompoundInit(_,[]) -> ()
-              | _ -> Varinfo.Hashtbl.add global_vars vi (off, (Some i)))
+              | CompoundInit(_,_) | SingleInit _ ->
+                Varinfo.Hashtbl.add global_vars vi (off, (Some i)))
             | false-> ());
             is_initializer <- false;
           i)

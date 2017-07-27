@@ -49,10 +49,10 @@
  *      E_ACSL_BITTREE_MMODEL - use Patricia-trie (tree-based) memory model, or
  *      E_ACSL_SEGMENT_MMODEL - use segment-based (shadow) memory model
  *    Verbosity level:
- *      E_ACSL_VERBOSE - is set puts an executable in verbose mode (which
- *        may print some extra messages
+ *      E_ACSL_VERBOSE - put an executable in verbose mode that
+ *        prints extra messages (unset by default)
  *    Debug Features:
- *      E_ACSL_DEBUG - enable debug features in RTL
+ *      E_ACSL_DEBUG - enable debug features in RTL (unset by default)
  *      E_ACSL_DEBUG_VERBOSE - verbose debug output (via DVLOG macro)
  *      E_ACSL_DEBUG_LOG - name of the log file where debug messages are
  *        output. The file name should be unquoted string with '-'
@@ -62,7 +62,7 @@
  *        Given an expression `(p+i)`, where `p` is a pointer and `i` is an
  *        integer offset weak validity indicates that `(p+i)` is valid if it
  *        belongs to memory allocation. In strong validity `(p+i)` is valid
- *        iff both `p` and `(p+i)` belong to memory allocation and to one
+ *        iff both `p` and `(p+i)` belong to memory allocation and to the same
  *        memory block.
  *    Temporal analysis:
  *      E_ACSL_TEMPORAL - enable temporal analysis in RTL
@@ -120,12 +120,10 @@ static void describe_run() {
 #if defined(E_ACSL_VERBOSE) || defined(E_ACSL_DEBUG)
   rtl_printf("/* ========================================================= */\n");
   rtl_printf(" * E-ACSL instrumented run\n" );
+  rtl_printf(" * Memory tracking: %s\n", E_ACSL_MMODEL_DESC);
 #ifdef E_ACSL_SEGMENT_MMODEL
-  rtl_printf(" * Memory tracking: shadow memory with\n" );
   rtl_printf(" *   Heap  %d MB\n", E_ACSL_HEAP_SIZE);
   rtl_printf(" *   Stack %d MB\n", E_ACSL_STACK_SIZE);
-#else
-  rtl_printf(" * Memory tracking: patricia trie\n" );
 #endif
   rtl_printf(" * Temporal checks: %s\n", E_ACSL_TEMPORAL_DESC);
   rtl_printf(" * Execution mode:  %s\n", E_ACSL_DEBUG_DESC);

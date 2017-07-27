@@ -40,21 +40,24 @@
 #endif
 /* }}} */
 
+#define E_ACSL_MMODEL_DESC "patricia trie"
+
 /* Assertions in debug mode */
 #define ALLOCATED(_ptr,_size) \
   ((allocated(_ptr, _size, _ptr) == NULL) ? 0 : 1)
 
 #ifdef E_ACSL_DEBUG
-#define DVALIDATE_RO_ACCESS(_ptr, _size) \
+#define DVALIDATE_ALLOCATED(_ptr, _size) \
   vassert(ALLOCATED(_ptr, _size), \
   "Not allocated [%a, %a + %lu]", (uintptr_t)_ptr, _size)
-#define DVALIDATE_RW_ACCESS(_ptr, _size) { \
-  DVALIDATE_RO_ACCESS(_ptr, _size); \
+
+#define DVALIDATE_WRITEABLE(_ptr, _size) { \
+  DVALIDATE_ALLOCATED(_ptr, _size); \
   vassert(!readonly(_ptr), "Location %a is read-only", (uintptr_t)_ptr); \
 }
 #else
-#define DVALIDATE_RO_ACCESS(_ptr, _size)
-#define DVALIDATE_RW_ACCESS(_ptr, _size)
+#define DVALIDATE_ALLOCATED(_ptr, _size)
+#define DVALIDATE_WRITEABLE(_ptr, _size)
 #endif
 
 /**************************/
@@ -71,7 +74,7 @@ static const int nbr_bits_to_1[256] = {
 };
 
 /* given the size of the memory block (_size) return (or rather evaluate to)
- * size in bytes requred to represent its partial initialization */
+ * size in bytes required to represent its partial initialization */
 #define needed_bytes(_size) \
   ((_size % 8) == 0 ? (_size/8) : (_size/8 + 1))
 /* }}} */
@@ -432,7 +435,7 @@ int posix_memalign(void **memptr, size_t alignment, size_t size) {
     return -1;
 
   /* Make sure that the first argument to posix memalign is indeed allocated */
-  DVALIDATE_RW_ACCESS((void*)memptr, sizeof(void*));
+  DVALIDATE_WRITEABLE((void*)memptr, sizeof(void*));
 
   int res = public_posix_memalign(memptr, alignment, size);
   if (!res)
@@ -539,6 +542,7 @@ void memory_clean() {
   report_heap_leaks();
 }
 
+/* POSIX-compliant array of character pointers to the environment strings. */
 extern char **environ;
 
 /* add `argv` to the memory model */

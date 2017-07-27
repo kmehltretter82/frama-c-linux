@@ -31,6 +31,8 @@
 #include "e_acsl_shadow_layout.h"
 #include "e_acsl_segment_tracking.h"
 
+#define E_ACSL_MMODEL_DESC "shadow memory"
+
 #define ALLOCATED(_ptr,_size) allocated((uintptr_t)_ptr, _size, (uintptr_t)_ptr)
 
 void * store_block(void * ptr, size_t size) {
@@ -138,6 +140,8 @@ int initialized(void * ptr, size_t size) {
 /* }}} */
 
 /* Track program arguments (ARGC/ARGV) {{{ */
+
+/* POSIX-compliant array of character pointers to the environment strings. */
 extern char ** environ;
 
 static void argv_alloca(int *argc_ref,  char *** argv_ref) {
@@ -153,6 +157,7 @@ static void argv_alloca(int *argc_ref,  char *** argv_ref) {
 
   /* Track argument strings */
   while (*argv) {
+    /* Account for `\0` when copying C strings */
     size_t arglen = strlen(*argv) + 1;
 #ifdef E_ACSL_TEMPORAL
     /* Move `argv` strings to heap. This is because they are allocated
