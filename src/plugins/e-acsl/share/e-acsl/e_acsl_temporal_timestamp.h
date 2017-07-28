@@ -51,9 +51,11 @@ static uint32_t temporal_timestamp = 2;
 
 struct temporal_parameter {
   void *ptr;
+  /* Number all members such that there is no `0` which potentially
+     corresponds to an invalid number */
   enum {
     TBlockN = 10,
-    TReferentN = 20,
+    TReferentN  = 20,
     TCopy = 30
   } temporal_flow;
 };

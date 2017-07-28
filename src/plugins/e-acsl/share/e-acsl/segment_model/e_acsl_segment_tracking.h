@@ -1234,7 +1234,7 @@ static int heap_initialized(uintptr_t addr, long len) {
 #ifdef E_ACSL_TEMPORAL
 static uint32_t heap_temporal_info(uintptr_t addr, int origin) {
   /* NOTE: No checking for allocated blocks, since an invalid
-     timestamp is zero and ununsed memory is nullified then an invalid
+     timestamp is zero and unused memory is nullified then an invalid
      timestamp is also returned for allocated memory */
   if (origin) {
     uintptr_t *aligned_shadow = (uintptr_t*)ALIGNED_HEAP_SHADOW(addr);

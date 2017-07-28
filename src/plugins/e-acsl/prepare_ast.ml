@@ -50,28 +50,26 @@ let sufficiently_aligned attrs algn =
       should not happen really *)
       assert false
     | _ -> acc
-  ) 0 attrs in
-  if alignment > 0 then true else false
+  ) 0 attrs in alignment > 0
 
 (* Given the type and the list of attributes of [varinfo] ([fieldinfo]) return
  * true if that [varinfo] ([fieldinfo]) requires to be aligned at the boundary
  * of [algn] (i.e., less than [algn] bytes and has no alignment attribute *)
 let require_alignment typ attrs algn =
-  if (Cil.bitsSizeOf typ) < algn*8 && not (sufficiently_aligned attrs algn) then
-    true
-  else
-    false
+  Cil.bitsSizeOf typ < algn*8 && not (sufficiently_aligned attrs algn)
 
 class prepare_visitor prj = object (_)
   inherit Visitor.frama_c_copy prj
 
   (* Add align attributes to local variables (required by temporal analysis) *)
   method !vblock _ =
-    if (Temporal.is_enabled ()) then
+    if Temporal.is_enabled () then
       Cil.DoChildrenPost (fun blk ->
         List.iter (fun vi ->
+        (* 4 bytes alignment is required to allow sufficient space for storage
+           of 32-bit timestamps in a 1:1 shadow. *)
           if require_alignment vi.vtype vi.vattr 4; then begin
-            vi.vattr <- Attr("aligned",[AInt(Integer.four)]) :: vi.vattr
+            vi.vattr <- Attr("aligned",[AInt Integer.four]) :: vi.vattr
           end)
         blk.blocals;
       blk)

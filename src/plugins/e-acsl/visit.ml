@@ -206,6 +206,8 @@ class e_acsl_visitor prj generate = object (self)
                     :: stmts)
                   stmts
               in
+              let return =
+                Cil.mkStmt ~valid_sid:true (Return(None, Location.unknown)) in
               (* Generate init statements for temporal analysis *)
               let tinit_stmts = Varinfo.Hashtbl.fold
                 (fun vi (off, init) acc ->
@@ -215,11 +217,9 @@ class e_acsl_visitor prj generate = object (self)
                       (match stmt with | Some stmt -> stmt :: acc | None -> acc)
                   | None -> acc)
                 global_vars
-                []
+                [return]
               in
-              let return =
-                Cil.mkStmt ~valid_sid:true (Return(None, Location.unknown)) in
-              let stmts = stmts @ tinit_stmts @ [return] in
+              let stmts = stmts @ tinit_stmts in
               (* Create a new code block with generated statements *)
               let (b, env), stmts = match stmts with
                 | [] -> assert false
@@ -601,7 +601,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
           let env = Temporal.handle_stmt stmt env in
           (* Add initialization statements and store_block statements stemming
              from Local_init *)
-            self#add_initializers stmt env kf
+            self#handle_instructions stmt env kf
         else
           env
       in
@@ -727,46 +727,39 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     in
     Cil.ChangeDoChildrenPost(stmt, mk_block)
 
-  method private add_initializer loc ?vi lv ?(post=false) stmt env kf =
-    assert generate;
-    let may_safely_ignore = function
-      | Var vi, NoOffset -> vi.vglob || vi.vformal
-      | _ -> false
-    in
-    if not (may_safely_ignore lv) && Mmodel_analysis.must_model_lval ~kf lv then
-      let before = Cil.memo_stmt self#behavior stmt in
-      let new_stmt = Project.on prj (Misc.mk_initialize ~loc) lv in
-      let new_stmt = Cil.memo_stmt self#behavior new_stmt in
-      let env = Env.add_stmt ~post ~before env new_stmt in
-      let env = match vi with
-        | None -> env
-        | Some vi ->
-          let new_stmt = Project.on prj Misc.mk_store_stmt vi in
-          let new_stmt = Cil.memo_stmt self#behavior new_stmt in
-          Env.add_stmt ~post ~before env new_stmt
+  method private handle_instructions stmt env kf =
+    let add_initializer loc ?vi lv ?(post=false) stmt env kf =
+      assert generate;
+      let may_safely_ignore = function
+        | Var vi, NoOffset -> vi.vglob || vi.vformal
+        | _ -> false
       in
-      env
-    else
-      env
-
-  method private add_initializers stmt env kf =
-    let do_instr instr =
-      match instr with
-      | Set(lv, _, loc) ->
-        self#add_initializer loc lv stmt env kf
-      | Local_init(vi, _, loc) ->
-        let lv = (Var(vi), NoOffset) in
-        self#add_initializer loc ~vi lv ~post:true stmt env kf
-      | Call (Some lv, _, _, loc) ->
-        if not (Misc.is_generated_kf kf) then
-          self#add_initializer loc lv ~post:false stmt env kf
-        else env
-      | _ -> env
+      if not (may_safely_ignore lv) && Mmodel_analysis.must_model_lval ~stmt ~kf lv then
+        let before = Cil.memo_stmt self#behavior stmt in
+        let new_stmt = Project.on prj (Misc.mk_initialize ~loc) lv in
+        let new_stmt = Cil.memo_stmt self#behavior new_stmt in
+        let env = Env.add_stmt ~post ~before env new_stmt in
+        let env = match vi with
+          | None -> env
+          | Some vi ->
+            let new_stmt = Project.on prj Misc.mk_store_stmt vi in
+            let new_stmt = Cil.memo_stmt self#behavior new_stmt in
+            Env.add_stmt ~post ~before env new_stmt
+        in
+        env
+      else
+        env
     in
     match stmt.skind with
-    | Instr(i) -> do_instr i
+    | Instr(Set(lv, _, loc)) -> add_initializer loc lv stmt env kf
+    | Instr(Local_init(vi, _, loc)) ->
+      let lv = (Var(vi), NoOffset) in
+      add_initializer loc ~vi lv ~post:true stmt env kf
+    | Instr(Call (Some lv, _, _, loc)) ->
+      if not (Misc.is_generated_kf kf) then
+        add_initializer loc lv ~post:false stmt env kf
+      else env
     | _ -> env
-
 
   method !vblock blk =
     let handle_memory new_blk =

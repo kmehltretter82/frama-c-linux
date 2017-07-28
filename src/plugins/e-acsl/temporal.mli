@@ -20,6 +20,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Transformations to detect temporal memory errors (e.g., derererence of
+    stale pointers). Detailed description of the transformations is presented
+    in Sections 2 and 3 of the RV'17 paper "Runtime Detection of Temporal Memory
+    Errors" by K. Vorobyov, N. Kosmatov, J Signoles and A. Jakobsson.
+*)
+
 val enable: bool -> unit
 (** Enable/disable temporal transformations *)
 
@@ -28,7 +34,10 @@ val is_enabled: unit -> bool
 
 val handle_arguments: Cil_types.kernel_function -> Env.t -> Env.t
 (** Update local environment ([Env.t]) with statements allowing to track
-    referent numbers across function calls *)
+    referent numbers across calls function whose definitions are available.
+    This is such that whenever a function [f] is called (and a new stack
+    frame is created) [handle_arguments] generates statements that transfer
+    referent numbers stored in RTL to the new stack frame. *)
 
 val handle_stmt: Cil_types.stmt -> Env.t -> Env.t
 (** Update local environment ([Env.t]) with statements tracking temporal
