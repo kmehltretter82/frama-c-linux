@@ -50,7 +50,8 @@ type flow =
    NOTE: Further on, all analysis function names are used without prefix *)
 let mk_api_name name = Misc.mk_api_name ("temporal_" ^ name)
 
-let is_alloc_name fn = fn = "malloc" || fn = "free" || fn = "realloc" || fn = "calloc"
+let is_alloc_name fn =
+  fn = "malloc" || fn = "free" || fn = "realloc" || fn = "calloc"
 
 let is_memcpy_name fn = fn = "memcpy"
 
@@ -307,7 +308,7 @@ end = struct
        Library functions (i.e., with no source code available) that return
        values are considered to be functions that allocate memory. They are
        considered so because they need to be handled exactly as memory
-       allocating functions, that is the referent of the returned pointer is
+       allocating functions, that is, the referent of the returned pointer is
        assigned the origin number associated with the return value. For
        instance, for some [p = call();] [store_nblock( *p,..)] is appended.
        Note that for this we need [Direct] flow and also dereference the
