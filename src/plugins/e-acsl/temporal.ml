@@ -257,19 +257,20 @@ let mk_stmt_from_assign loc lhs rhs =
 (* Handle Set instructions {{{ *)
 (* ************************************************************************** *)
 
-(* Update local environment with a statement tracking temporal metadata
+(* Return updated local environment with a statement tracking temporal metadata
   associated with assignment [lhs] = [rhs] *)
-let set_instr ?(post=false) loc lhs rhs fenv =
-  let stmt = mk_stmt_from_assign loc lhs rhs in
-  Extlib.may
-    (fun stmt ->
-      fenv := Env.add_stmt ~before:!current_stmt ~post !fenv stmt)
-    stmt
+let set_instr ?(post=false) loc lhs rhs env =
+  Extlib.may_map
+    (fun stmt -> Env.add_stmt ~before:!current_stmt ~post env stmt)
+    ~dft:env
+    (mk_stmt_from_assign loc lhs rhs)
 
 (* Top-level handler for Set instructions *)
-let set_instr ?(post=false) loc lhs rhs fenv =
-  if must_model_lval lhs !fenv then
-    set_instr ~post loc lhs rhs fenv
+let set_instr ?(post=false) loc lhs rhs env =
+  if must_model_lval lhs env then
+    set_instr ~post loc lhs rhs env
+  else
+    env
 (* }}} *)
 
 (* ************************************************************************** *)
@@ -278,29 +279,35 @@ let set_instr ?(post=false) loc lhs rhs fenv =
 
 module Function_call: sig
   (* Top-level handler for Call instructions *)
-  val instr: lval option -> exp -> exp list -> location -> Env.t ref -> unit
+  val instr: lval option -> exp -> exp list -> location -> Env.t -> Env.t
 end = struct
 
   (* Track function arguments: export referents of arguments to a global
      structure so they can be retrieved once that function is called *)
-  let save_params loc args fenv =
-    List.iteri
-      (fun index param ->
+  let save_params loc args env =
+    let (env, _) = List.fold_left
+      (fun (env, index) param ->
         let lv = Mem(param), NoOffset in
         let ltype = Cil.typeOf param in
         let vals = assign ~ltype lv param loc in
-        Extlib.may
+        Extlib.may_map
           (fun (_, rhs, flow) ->
-            if must_model_exp param !fenv then begin
-              let stmt = Mk.save_param ~loc flow rhs index in
-              fenv := Env.add_stmt ~before:!current_stmt ~post:false !fenv stmt
-            end)
+            let env =
+              if must_model_exp param env then
+                let stmt = Mk.save_param ~loc flow rhs index in
+                Env.add_stmt ~before:!current_stmt ~post:false env stmt
+              else env
+            in
+            (env, index+1))
+          ~dft:(env, index+1)
           vals)
+      (env, 0)
       args
+    in env
 
   (* Update local environment with a statement tracking temporal metadata
      associated with assignment [ret] = [func(args)]. *)
-  let call_with_ret ?(alloc=false) loc ret fenv =
+  let call_with_ret ?(alloc=false) loc ret env =
     let rhs = Cil.new_exp ~loc (Lval ret) in
     let vals = assign ret rhs loc in
     (* Track referent numbers of assignments via function calls.
@@ -319,7 +326,7 @@ end = struct
        been instrumented, then information about referent numbers should be
        stored in the internal data structure and it is retrieved using
        [pull_return] added via a call to [Mk.handle_return_referent] *)
-    Extlib.may
+    Extlib.may_map
       (fun (lhs, rhs, flow) ->
         let flow, rhs = match flow with
           | Indirect when alloc -> Direct, (Misc.mk_deref ~loc rhs)
@@ -331,18 +338,20 @@ end = struct
           else
             Mk.handle_return_referent ~save:false ~loc (Cil.mkAddrOf ~loc lhs)
         in
-        fenv := Env.add_stmt ~before:!current_stmt ~post:true !fenv stmt)
+        Env.add_stmt ~before:!current_stmt ~post:true env stmt)
+      ~dft:env
       vals
 
   (* Update local environment with a statement tracking temporal metadata
      associated with memcpy/memset call *)
-  let call_memxxx loc args fname fenv =
-    if is_memcpy fname || is_memset fname then begin
+  let call_memxxx loc args fname env =
+    if is_memcpy fname || is_memset fname then
       let stmt = Misc.mk_call ~loc (mk_api_name (get_fname fname)) args in
-      fenv := Env.add_stmt ~before:!current_stmt ~post:false !fenv stmt;
-    end
+      Env.add_stmt ~before:!current_stmt ~post:false env stmt
+    else
+      env
 
-  let instr ret fname args loc fenv =
+  let instr ret fname args loc env =
     (* Add function calls to reset_parameters and reset_return before each
        function call regardless. They are not really required, as if the
        instrumentation is correct then the right parameters will be saved
@@ -351,20 +360,26 @@ end = struct
        the implementation of the function should be empty and compiler should
        be able to optimize that code out. *)
     let stmt = Misc.mk_call ~loc (mk_api_name "reset_parameters") [] in
-    fenv := Env.add_stmt ~before:!current_stmt ~post:false !fenv stmt;
+    let env = Env.add_stmt ~before:!current_stmt ~post:false env stmt in
     let stmt = Mk.reset_return_referent ~loc in
-    fenv := Env.add_stmt ~before:!current_stmt ~post:false !fenv stmt;
+    let env = Env.add_stmt ~before:!current_stmt ~post:false env stmt in
     (* Push parameters with either a call to a function pointer or a function
         definition otherwise there is no point. *)
-    if Cil.isFunctionType (Cil.typeOf fname) || has_fundef fname then begin
-      save_params loc args fenv
-    end;
+    let env =
+      if Cil.isFunctionType (Cil.typeOf fname) || has_fundef fname then
+        save_params loc args env
+      else
+        env
+    in
     (* Handle special cases of memcpy/memset *)
-    call_memxxx loc args fname fenv;
+    let env = call_memxxx loc args fname env in
     let alloc = is_alloc fname || not (has_fundef fname) in
-    Extlib.may
+    Extlib.may_map
       (fun lhs ->
-        if must_model_lval lhs !fenv then call_with_ret ~alloc loc lhs fenv)
+        if must_model_lval lhs env then
+          call_with_ret ~alloc loc lhs env
+        else env)
+      ~dft:env
       ret
 end
 (* }}} *)
@@ -374,32 +389,34 @@ end
 (* ************************************************************************** *)
 module Local_init: sig
   (* Top-level handler for Local_init instructions *)
-  val instr: varinfo -> local_init -> location -> Env.t ref -> unit
+  val instr: varinfo -> local_init -> location -> Env.t -> Env.t
 end = struct
 
-  let rec handle_init offset loc vi init fenv =
+  let rec handle_init offset loc vi init env =
     match init with
     | SingleInit exp ->
-      set_instr ~post:true loc (Var vi, offset) exp fenv
+      set_instr ~post:true loc (Var vi, offset) exp env
     | CompoundInit(_, inits) ->
-      List.iter
-        (fun (off, init) ->
-          let offset = Cil.addOffset off offset in
-          handle_init offset loc vi init fenv)
+      List.fold_left
+        (fun acc (off, init) ->
+          handle_init (Cil.addOffset off offset) loc vi init acc)
+        env
         inits
 
-  let instr vi li loc fenv =
+  let instr vi li loc env =
     match li with
     | AssignInit init ->
-      handle_init NoOffset loc vi init fenv
+      handle_init NoOffset loc vi init env
     | ConsInit(fname, args, _) ->
       let ret = Some (Cil.var vi) in
       let fname = Cil.evar ~loc fname in
-      Function_call.instr ret fname args loc fenv
+      Function_call.instr ret fname args loc env
 
-  let instr vi li loc fenv =
-    if must_model_vi vi !fenv then
-      instr vi li loc fenv
+  let instr vi li loc env =
+    if must_model_vi vi env then
+      instr vi li loc env
+    else
+      env
 end
 (* }}} *)
 
@@ -426,41 +443,40 @@ let track_argument ?(typ) param index env =
 (* Handle return statements {{{ *)
 (* ************************************************************************** *)
 
-(* Update local environment [fenv] with statements tracking return value
+(* Update local environment [env] with statements tracking return value
    of a function. *)
-let handle_return_stmt loc ret fenv =
+let handle_return_stmt loc ret env =
   match ret.enode with
   | Lval lv ->
-    if Cil.isPointerType (Cil.typeOfLval lv) then begin
+    if Cil.isPointerType (Cil.typeOfLval lv) then
       let exp = Cil.mkAddrOf ~loc lv in
       let stmt = Mk.handle_return_referent ~loc ~save:true exp in
-      fenv := Env.add_stmt ~post:false !fenv stmt
-    end
+      Env.add_stmt ~post:false env stmt
+    else
+      env
   | _ -> Options.fatal "Something other than Lval in return"
 
-let handle_return_stmt loc ret fenv =
-  if must_model_exp ret !fenv then
-    handle_return_stmt loc ret fenv
+let handle_return_stmt loc ret env =
+  if must_model_exp ret env then
+    handle_return_stmt loc ret env
+  else
+    env
 (* }}} *)
 
 (* ************************************************************************** *)
 (* Handle instructions {{{ *)
 (* ************************************************************************** *)
 
-(* Update local environment [fenv] with statements tracking
+(* Update local environment [env] with statements tracking
    instruction [instr] *)
-let handle_instruction instr fenv =
+let handle_instruction instr env =
   match instr with
-  | Set(lv, exp, loc) ->
-    set_instr loc lv exp fenv
-  | Call(ret, fname, args, loc) ->
-    Function_call.instr ret fname args loc fenv
-  | Local_init(vi, li, loc) ->
-    Local_init.instr vi li loc fenv
+  | Set(lv, exp, loc) -> set_instr loc lv exp env
+  | Call(ret, fname, args, loc) -> Function_call.instr ret fname args loc env
+  | Local_init(vi, li, loc) -> Local_init.instr vi li loc env
   | Asm _ -> Options.warning ~once:true ~current:true "@[Analysis is\
-potentially incorrect in presence of assembly code.@]";
-  | Skip _ -> ()
-  | Code_annot _ -> ()
+potentially incorrect in presence of assembly code.@]"; env
+  | Skip _ | Code_annot _ -> env
 (* }}} *)
 
 (* ************************************************************************** *)
@@ -525,17 +541,13 @@ let handle_arguments kf env =
 let handle_stmt stmt env =
   if is_enabled () then begin
     current_stmt := stmt;
-    let fenv = ref env in
-    (match stmt.skind with
-    | Instr instr ->
-      handle_instruction instr fenv
-    | Return(ret, loc) ->
-      Extlib.may (fun ret -> handle_return_stmt loc ret fenv) ret
+    match stmt.skind with
+    | Instr instr -> handle_instruction instr env
+    | Return(ret, loc) -> Extlib.may_map
+      (fun ret -> handle_return_stmt loc ret env) ~dft:env ret
     | Goto _ | Break _ | Continue _ | If _ | Switch _ | Loop _ | Block _
     | UnspecifiedSequence _ | Throw _ | TryCatch _ | TryFinally _
-    | TryExcept _ -> ());
-    current_stmt := Cil.dummyStmt;
-    !fenv
+    | TryExcept _ -> env
   end else
     env
 
