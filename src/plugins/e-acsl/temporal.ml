@@ -38,7 +38,7 @@ let generate = ref false
 
 (* Type of identifier tracked by a LHS referent number *)
 type flow =
-  | Direct (* take origin number of RHS  *)
+  | Direct (* take origin number of RHS *)
   | Indirect (* take referent number of RHS *)
   | Copy (* Copy shadow from RHS to LHS *)
 (* }}} *)
@@ -143,7 +143,7 @@ end = struct
     let exp = Cil.mkAddrOfVi vi in
     let fname = mk_api_name "pull_parameter" in
     let sz = Cil.kinteger ~loc IULong (Cil.bytesSizeOf vi.vtype) in
-    Misc.mk_call ~loc fname [ exp ; Cil.integer ~loc pos ; sz  ]
+    Misc.mk_call ~loc fname [ exp ; Cil.integer ~loc pos ; sz ]
 
   let handle_return_referent ~save ~loc lhs =
     let fname = match save with
@@ -162,7 +162,7 @@ end = struct
   let temporal_memcpy_struct ~loc lhs rhs =
     let fname  = mk_api_name "memcpy" in
     let size = Cil.sizeOf ~loc (Cil.typeOfLval lhs) in
-    Misc.mk_call ~loc fname [ Cil.mkAddrOf ~loc lhs; rhs;  size ]
+    Misc.mk_call ~loc fname [ Cil.mkAddrOf ~loc lhs; rhs; size ]
 end
 (* }}} *)
 
@@ -187,17 +187,17 @@ let assign ?(ltype) lhs rhs loc =
     | None -> (Cil.typeOfLval lhs)
   in
   match Cil.unrollType ltype with
-  | TPtr _  ->
+  | TPtr _ ->
     let base, _ = Misc.ptr_index rhs in
     let rhs, flow =
       (match base.enode with
       | AddrOf _
-      | StartOf _  -> rhs, Direct
+      | StartOf _ -> rhs, Direct
       (* Unary operator describes !, ~ or -: treat it same as Const since
          it implies integer or logical operations. This case is rare but
          happens: for instance in Gap SPEC CPU benchmark the returned pointer
          is assigned -1 (for whatever bizarre reason) *)
-      | Const _  | UnOp _ -> base, Direct
+      | Const _ | UnOp _ -> base, Direct
       (* Special case for literal strings which E-ACSL rewrites into
          global variables: take the origin number of a string *)
       | Lval(Var vi, _) when Misc.is_generated_varinfo vi -> base, Direct
@@ -226,10 +226,10 @@ let assign ?(ltype) lhs rhs loc =
     in Some (lhs, rhs, flow)
   | TNamed _ ->
     assert false
-  | TInt _  | TFloat _  | TEnum _  -> None
+  | TInt _ | TFloat _ | TEnum _ -> None
   | TComp _ ->
     let rhs = match rhs.enode with
-    | AddrOf _  -> rhs
+    | AddrOf _ -> rhs
     | Lval lv -> Cil.mkAddrOf ~loc lv
     | Const _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _
     | UnOp _ | BinOp _ | CastE _ | StartOf _ | Info _ ->
@@ -246,13 +246,11 @@ let assign ?(ltype) lhs rhs loc =
 (* Generate a statement tracking temporal metadata associated with assignment
    [lhs] = [rhs], where lhs is a left value and [rhs] is an expression. *)
 let mk_stmt_from_assign loc lhs rhs =
-  match assign lhs rhs loc with
-  | Some (lhs, rhs, flow) ->
-    let stmt = (match flow with
-      | Direct | Indirect -> Mk.store_reference ~loc flow lhs rhs
-      | Copy -> Mk.temporal_memcpy_struct ~loc lhs rhs)
-    in Some stmt
-  | None -> None
+  let fn (lhs, rhs, flow) = match flow with
+    | Direct | Indirect -> Mk.store_reference ~loc flow lhs rhs
+    | Copy -> Mk.temporal_memcpy_struct ~loc lhs rhs
+  in
+  Extlib.opt_map fn (assign lhs rhs loc)
 (* }}} *)
 
 (* ************************************************************************** *)
