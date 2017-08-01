@@ -213,7 +213,7 @@ class e_acsl_visitor prj generate = object (self)
                 (fun vi (off, init) acc ->
                   match init with
                   | Some init ->
-                    let stmt = Temporal.handle_global_init vi off init env in
+                    let stmt = Temporal.generate_global_init vi off init env in
                       (match stmt with | Some stmt -> stmt :: acc | None -> acc)
                   | None -> acc)
                 global_vars
@@ -547,7 +547,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         let env =
           if generate && not is_main then
             let env = Memory.store env kf (Kernel_function.get_formals kf) in
-            Temporal.handle_arguments kf env
+            Temporal.handle_function_parameters kf env
           else
             env
         in

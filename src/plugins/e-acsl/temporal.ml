@@ -20,6 +20,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* Detailed description of transformations implemented in this file is
+   presented in Sections 2 and 3 of the RV'17 paper "Runtime Detection of
+   Temporal Memory Errors" by K. Vorobyov, N. Kosmatov, J Signoles and
+   A. Jakobsson. *)
+
 open Cil_types
 open Cil_datatype
 
@@ -216,15 +221,16 @@ let assign ?(ltype) lhs rhs loc =
          expression computes to an address for which there is no
          outer container, so the only thing to do is to take origin number *)
       | BinOp(op, _, _, _) ->
-        (* Make sure there are no pointer operations here *)
+        (* At this point [ptr_index] should have split pointer arithmetic into
+           base pointer and index so there should be no pointer arithmetic
+           operations there. The following bit is to make sure of it. *)
         (match op with
           | MinusPI | PlusPI | IndexPI -> assert false
           | _ -> ());
         base, Direct
       | _ -> assert false)
     in Some (lhs, rhs, flow)
-  | TNamed _ ->
-    assert false
+  | TNamed _ -> assert false
   | TInt _ | TFloat _ | TEnum _ -> None
   | TComp _ ->
     let rhs = match rhs.enode with
@@ -513,7 +519,7 @@ let enable param = generate := param
 
 let is_enabled () = !generate
 
-let handle_arguments kf env =
+let handle_function_parameters kf env =
   if is_enabled () then
     let env, _ = List.fold_left
       (fun (env, index) param ->
@@ -541,7 +547,7 @@ let handle_stmt stmt env =
   end else
     env
 
-let handle_global_init vi off init env =
+let generate_global_init vi off init env =
   if is_enabled () then
     mk_global_init ~loc:vi.vdecl vi off init env
   else
