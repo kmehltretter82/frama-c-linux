@@ -396,7 +396,7 @@ static void init_shadow_layout(int *argc_ref, char ***argv_ref) {
 
 /*! \brief Deallocate shadow regions used by runtime analysis */
 static void clean_shadow_layout() {
-    if (mem_layout.is_initialized) {
+  if (mem_layout.is_initialized) {
     int i;
     for (i = 0; i < sizeof(mem_partitions)/sizeof(memory_partition*); i++) {
       if (mem_partitions[i]->primary.mspace)

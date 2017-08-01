@@ -21,7 +21,7 @@
 /**************************************************************************/
 
 /*! ***********************************************************************
- * \file   e_acsl_mmodel_api.h
+ * \file   e_acsl.h
  * \brief  Public C API of E-ACSL Runtime Library
  *
  * Functions and variables with non-static linkage used for instrumentation.
@@ -79,6 +79,7 @@
 #define math_HUGE_VAL                   export_alias(math_HUGE_VAL)
 #define math_HUGE_VALF                  export_alias(math_HUGE_VALF)
 #define math_INFINITY                   export_alias(math_INFINITY)
+#define floating_point_exception        export_alias(floating_point_exception)
 
 /******************************/
 /* Dedicated E-ACSL assertion */
@@ -89,8 +90,7 @@
  *  \param kind  C string representing a kind an annotation (e.g., "Assertion")
  *  \param fct
  *  \param pred_txt  stringified predicate
- *  \param line  line number of the predicate placement in the
- *    un-instrumented file */
+ *  \param line line of predicate placement in the un-instrumented file */
 /*@ requires pred != 0;
   @ assigns \nothing; */
 void assert(int pred, char *kind, char *fct, char *pred_txt, int line)
@@ -317,6 +317,9 @@ extern float  math_HUGE_VALF
   __attribute__((FC_BUILTIN));
 /* Representation of infinity value for doubles: same as INFINITY */
 extern double math_INFINITY
+  __attribute__((FC_BUILTIN));
+/* Check for floating point exception at a given execution point */
+extern void floating_point_exception(const char *s)
   __attribute__((FC_BUILTIN));
 
 /***********************************************/

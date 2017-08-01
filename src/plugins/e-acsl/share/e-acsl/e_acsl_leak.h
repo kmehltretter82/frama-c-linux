@@ -29,7 +29,7 @@
 #ifndef E_ACSL_HEAP_LEAK_H
 #define E_ACSL_HEAP_LEAK_H
 
-#include "e_acsl_mmodel_api.h"
+#include "e_acsl.h"
 
 /* Variable tracking byte-count of user-allocated heap memory.
    Visible externally via __e_acsl_ prefix */

@@ -42,7 +42,7 @@
 #include "e_acsl_floating_point.h"
 #include "e_acsl_safe_locations.h"
 #include "e_acsl_temporal_timestamp.h"
-#include "e_acsl_mmodel_api.h"
+#include "e_acsl.h"
 
 /* Memory model settings
  *    Memory model:
@@ -77,6 +77,10 @@
  *    String functions:
  *      E_ACSL_NO_COMPILER_BUILTINS - if undefined (default) then use
  *      compiler builtin string functions (e.g., memset -> __builtin_memset)
+ *    Behaviour of assert:
+ *      E_ACSL_EXTERNAL_ASSERT - if this macro is defined then function
+ *      `__e_acsl_assert` is excluded from compilation. This is to allow
+ *      providing alternative definitions of assertions by users.
  *    Memory deallocation:
  *      E_ACSL_FREE_VALID_ADDRESS -- Clause 7.20.3.2 of C99 standard states
  *      that NULL is a valid input to free:

@@ -28,24 +28,23 @@
 #ifndef E_ACSL_FLOATING_POINT_H
 #define E_ACSL_FLOATING_POINT_H
 
-#include "e_acsl_mmodel_api.h"
+#include "e_acsl.h"
 #include <math.h>
 #include <float.h>
+#include <fenv.h>
 
-/* Below variables hold infinity values for floaing points defined in math.h.
+/* Below variables hold infinity values for floating points defined in math.h.
    Most of them are defined as macros that expand to built-in function calls.
    As such, they cannot be used in E-ACSL specifications directly. To solve
    the issue this header provides alternative definitions prefixed
    __e_acsl_math_. For instance, if a call to `pow` overflows it
    returns `HUGE_VAL`. To make sure that the result of pow does not overflow
-   one can use the following assertion
+   one can use the following contract:
 
-     extern double __e_acsl_math_HUGE_VAL;
-     ...
-     double x = 500000000.0;
-     double y = 500000000.0;
-     double z = pow(x,y);
-     //@assert z != 0.0 && z != __e_acsl_math_HUGE_VAL;
+   extern double __e_acsl_math_HUGE_VAL;
+
+   //@ ensures \result != __e_acsl_math_HUGE_VAL;
+   double pow(double, double);
 */
 
 /** \brief Positive infinity for doubles: same as HUGE_VAL */
@@ -55,11 +54,41 @@ float  math_HUGE_VALF = 0.0;
 /** \brief Representation of infinity value for doubles: same as INFINITY */
 double math_INFINITY = 0.0;
 
-/* Initialize E-ACSL infinity values */
+/* FIXME: An additional variable that should be added to this list is
+     long double math_HUGE_VALL;
+   That represents positive infinity for long doubles. However, long doubles
+   are unsupported Value plug-in analysis who start throwing errors once
+   test suite is ran. */
+
 static void init_infinity_values() {
-  math_HUGE_VAL = HUGE_VAL;
+  /* Initialize E-ACSL infinity values */
+  math_HUGE_VAL  = HUGE_VAL;
   math_HUGE_VALF = HUGE_VALF;
-  math_INFINITY = INFINITY;
+  math_INFINITY  = INFINITY;
+  /* Clear exceptions buffers */
+  feclearexcept(FE_ALL_EXCEPT);
+}
+
+void floating_point_exception(const char *exp) {
+  int except = fetestexcept(FE_ALL_EXCEPT);
+  char *resp = NULL;
+  if (except) {
+    if (fetestexcept(FE_DIVBYZERO))
+      resp = "Division by zero";
+    else if (fetestexcept(FE_INEXACT))
+      resp = "Rounded result of an operation is not equal to the infinite precision result";
+    else if (fetestexcept(FE_INVALID))
+      resp = "Result of a floating-point operation is not well-defined";
+    else if (fetestexcept(FE_OVERFLOW))
+      resp = "Floating-point overflow";
+    else if (fetestexcept(FE_UNDERFLOW))
+      resp = "Floating-point underflow";
+  }
+  if (resp) {
+    rtl_printf("Execution of the statement `%s` leads to a floating point exception\n", exp);
+    rtl_printf("Exception:  %s\n", resp);
+  }
+  feclearexcept(FE_ALL_EXCEPT);
 }
 
 #endif

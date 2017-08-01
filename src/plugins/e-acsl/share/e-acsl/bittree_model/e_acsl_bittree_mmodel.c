@@ -23,7 +23,7 @@
 /*! ***********************************************************************
  * \file e_acsl_bittree_mmodel.c
  * \brief Implementation of E-ACSL public API using a memory model based
- * on Patricia Trie. See e_acsl_mmodel_api.h for details.
+ * on Patricia Trie. See e_acsl.h for details.
 ***************************************************************************/
 
 # include "e_acsl_bittree_api.h"
@@ -461,9 +461,10 @@ void* realloc(void* ptr, size_t size) {
   if (new_ptr == NULL)
     return NULL;
 
-  /* Update heap allocation stats */
+  /* update the heap allocation size to `size - tmp->size` while keeping
+     constant the number of allocated blocks */
   update_heap_allocation(size);
-  update_heap_allocation(-(long)tmp->size);
+  update_heap_allocation(-tmp->size);
   /* realloc changes start address -- re-enter the element */
   if (tmp->ptr != (uintptr_t)new_ptr) {
     bt_remove(tmp);

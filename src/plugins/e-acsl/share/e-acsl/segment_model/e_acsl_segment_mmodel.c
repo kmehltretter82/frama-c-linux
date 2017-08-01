@@ -23,7 +23,7 @@
 /*! ***********************************************************************
  * \file   e_acsl_segment_mmodel.c
  * \brief  Implementation of E-ACSL public API for a segment (shadow) memory
- *   model. See e_acsl_mmodel_api.h for details.
+ *   model. See e_acsl.h for details.
 ***************************************************************************/
 
 #include <sys/time.h>

@@ -89,6 +89,7 @@ static void vassert_fail(int expr, int line, char *file, char *fmt,  ...) {
 # define E_ACSL_ASSERT_NO_FAIL_DESC "abort"
 #endif
 
+#ifndef E_ACSL_EXTERNAL_ASSERT
 /*! \brief Default implementation of E-ACSL runtime assertions */
 void runtime_assert(int predicate, char *kind, char *fct, char *pred_txt, int line) {
   if (!predicate) {
@@ -103,6 +104,7 @@ void runtime_assert(int predicate, char *kind, char *fct, char *pred_txt, int li
 #endif
   }
 }
+#endif
 
 /* Instances of assertions shared accross different memory models */
 

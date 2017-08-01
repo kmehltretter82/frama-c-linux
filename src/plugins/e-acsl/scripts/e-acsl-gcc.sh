@@ -50,7 +50,7 @@ check_getopt() {
     | sed "s/[ \']//g")"
   error "system getopt has no support for long option processing" $?
   if ! [ "$out" = "--ab1-x1--cd-y--" ]; then
-    error "system getopt has no support for long option processing" 1
+    error "unexpected output of system getopt" 1
   fi
 }
 
@@ -244,6 +244,10 @@ mmodel_features() {
   if [ -n "$OPTION_FREE_VALID_ADDRESS" ]; then
     flags="$flags -DE_ACSL_FREE_VALID_ADDRESS"
   fi
+
+  if [ -n "$OPTION_EXTERNAL_ASSERT" ]; then
+    flags="$flags -DE_ACSL_EXTERNAL_ASSERT"
+  fi
   echo $flags
 }
 
@@ -256,7 +260,8 @@ LONGOPTIONS="help,compile,compile-only,debug:,ocode:,oexec:,verbose:,
   ld-flags:,cpp-flags:,frama-c-extra:,memory-model:,keep-going,
   frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:,
   print-mmodels,rt-debug,rte-select:,then,e-acsl-extra:,check,fail-with-code:,
-  temporal,weak-validity,stack-size:,heap-size:,rt-verbose,free-valid-address"
+  temporal,weak-validity,stack-size:,heap-size:,rt-verbose,free-valid-address,
+  external-assert:"
 SHORTOPTIONS="h,c,C,d:,D,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,I:,G:,X,a:,T,k,V"
 # Prefix for an error message due to wrong arguments
 ERROR="ERROR parsing arguments:"
@@ -296,6 +301,7 @@ OPTION_THEN=             # Adds -then in front of -e-acsl in FC command.
 OPTION_STACK_SIZE=32     # Size of a heap shadow space (in MB)
 OPTION_HEAP_SIZE=128     # Size of a stack shadow space (in MB)
 OPTION_KEEP_GOING=       # Report failing assertions but do not abort execution
+OPTION_EXTERNAL_ASSERT="" # Use custom definition of assert function
 
 SUPPORTED_MMODELS="bittree,segment" # Supported memory model names
 MIN_STACK=16 # Minimal size of a tracked program stack
@@ -593,6 +599,13 @@ do
         *) OPTION_STACK_SIZE=$zone_size ;;
       esac;
       shift;
+    ;;
+    # Custom runtime assert function
+    --external-assert)
+      shift;
+      OPTION_EXTERNAL_ASSERT="$1"
+      shift;
+    ;;
   esac
 done
 shift;
@@ -715,7 +728,7 @@ LDFLAGS="$OPTION_LDFLAGS"
 FRAMAC_FLAGS="$FRAMAC_FLAGS -variadic-no-translation"
 
 # C, CPP and LD flags for compilation of E-ACSL-generated sources
-EACSL_CFLAGS=""
+EACSL_CFLAGS="$OPTION_EXTERNAL_ASSERT"
 EACSL_CPPFLAGS="-I$EACSL_SHARE"
 EACSL_LDFLAGS="$LIBDIR/libeacsl-dlmalloc.a $LIBDIR/libeacsl-gmp.a -lm"
 
@@ -725,9 +738,9 @@ OUTPUT_EXEC="$OPTION_OUTPUT_EXEC" # Output name of the original executable
 
 # Output name of E-ACSL-modified executable
 if [ -z "$OPTION_EACSL_OUTPUT_EXEC" ]; then
-    EACSL_OUTPUT_EXEC="$OPTION_OUTPUT_EXEC.e-acsl"
+  EACSL_OUTPUT_EXEC="$OPTION_OUTPUT_EXEC.e-acsl"
 else
-    EACSL_OUTPUT_EXEC="$OPTION_EACSL_OUTPUT_EXEC"
+  EACSL_OUTPUT_EXEC="$OPTION_EACSL_OUTPUT_EXEC"
 fi
 
 # Build E-ACSL plugin argument string
