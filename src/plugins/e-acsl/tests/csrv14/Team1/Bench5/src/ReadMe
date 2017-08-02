@@ -1,6 +1,0 @@
-The program reads a STRACE file/ Online Strace
-
-Property 1 - For all processes, for all files/sockets, [] ((open(file)/accept(Socket) -> <> (close(file)/close(socket))))
-
-./CaseStudy3 -f test10.txt -o -l 524288 -r 1 //OPENMP
-./CaseStudy3 -f test10.txt -c -l 524288 -r 1 //CPU

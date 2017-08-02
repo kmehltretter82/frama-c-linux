@@ -676,15 +676,34 @@ the production versions.
 
 \subsection{Runtime Monitor Behavior}
 
-When a predicate is checked at runtime, the function
+When a predicate is checked at runtime function
 \texttt{\_\_e\_acsl\_assert}\codeidxdef{e\_acsl\_assert} is called.  By
-default, it does nothing if the predicate is valid, and prints an error message
-and aborts the execution if the predicate is invalid.
+default this function does nothing if the predicate is valid, and prints
+an error message and aborts the execution (by raising an \texttt{ABORT}
+signal via a call to the \C function \texttt{abort}) if the predicate is invalid.
 
-\texttt{\_\_e\_acsl\_assert}\codeidxdef{e\_acsl\_assert} function is defined as
-a weak symbol in the \eacsl library, therefore it is possible to modify this
-behavior by providing an alternative definition of \texttt{\_\_e\_acsl\_assert}.
-You must only respect the following signature:
+The default behavior of \texttt{\_\_e\_acsl\_assert}\codeidxdef{e\_acsl\_assert}
+can be altered using \longopt{fail-with-code=CODE} option of \eacslgcc
+that uses \texttt{exit(CODE)} instead of \texttt{abort}.
+
+For instance, the program generated using the following command
+exits with code \texttt{5} on a predicate violation.
+\begin{shell}
+ \$ e-acsl-gcc.sh -c --fail-with-code=5 foo.c
+\end{shell}
+
+Forceful termination of a monitored program can be disabled using
+\longopt{keep-going} option. If specified, \eacslgcc generates code that
+reports each property violated at runtime but allows the monitored program to
+continue execution. \longopt{keep-going} should be used with caution:
+such unterminated executions may lead to incorrect verification results.
+
+\eacslgcc also provides a way to use an alternative definition of
+\texttt{\_\_e\_acsl\_assert}\codeidxdef{e\_acsl\_assert}.
+
+Custom implementation of \texttt{\_\_e\_acsl\_assert}\codeidxdef{e\_acsl\_assert}
+should be provided in a separate \C (or object file) and respect the
+following signature:
 
 \cinput{examples/assert_sign.c}
 
@@ -694,12 +713,15 @@ exits.
 \listingname{my\_assert.c}
 \cinput{examples/my_assert.c}
 
-Then you can generate the program as usual, (we reuse the initial example
-\texttt{first.i} of this manual).
+A monitored program that uses custom definition of
+\texttt{\_\_e\_acsl\_assert}\codeidxdef{e\_acsl\_assert} can then be generated
+as follows using \longopt{external-assert} option of \eacslgcc to replace the
+default implementation of \texttt{\_\_e\_acsl\_assert}\codeidxdef{e\_acsl\_assert}
+with the customized one specified in \texttt{my\_assert.c}
 
 \begin{shell}
-\$ e-acsl-gcc.sh -c first.i my_assert.c -Ocustomized_first
-\$ ./customized_first.e-acsl
+\$ e-acsl-gcc.sh -c first.i my_assert.c -Ofirst --external-assert=my\_assert.c
+\$ ./first.e-acsl
 Assertion at line 3 in function main is valid.
 The verified predicate was: `x == 0'.
 Assertion at line 4 in function main is invalid.

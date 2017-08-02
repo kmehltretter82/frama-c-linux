@@ -19,6 +19,17 @@
 Plugin E-ACSL Phosphorus-20170515
 #################################
 
+-! E-ACSL       [2017/06/10] Add --free-valid-address option to e-acsl.gcc.sh
+-! E-ACSL       [2017/05/29] Add --fail-with-code option to e-acsl.gcc.sh
+-! E-ACSL       [2017/05/19] Add --temporal option to e-acsl.gcc.sh
+-! E-ACSL       [2017/05/19] Enable analysis for temporal errors in E-ACSL
+-! E-ACSL       [2017/03/26] Add --weak-validity option to e-acsl.gcc.sh
+-! E-ACSL       [2017/03/26] Add --rt-verbose option to e-acsl.gcc.sh
+-! E-ACSL       [2017/03/26] Add --keep-going option to e-acsl.gcc.sh allowing
+	        a program to continue execution after an assertion failure
+-! E-ACSL       [2017/03/26] Add --stack-size and --heap-size options to
+	        e-acsl-gcc.sh allowing to change the default sizes of the
+	        respective shadow spaces
 -  E-ACSL       [2017/03/29] The (much more efficient) shadow memory model is
 	        now used by default.
 -* E-ACSL       [2017/03/28] Fix backtrace when the failed instrumented programs

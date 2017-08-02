@@ -1,6 +1,0 @@
-The program simulates a trace of summary report of connections of Dropbox using real dataset -  http://www.simpleweb.org/wiki/Dropbox_Traces
-
-Property 1 - For all Connections, [] (Connection.Chunksize <= 999999)
-
-./CaseStudy2 -f home1_dropbox.log -o -l 131072 -r 1 //OPENMP
-./CaseStudy2 -f home1_dropbox.log -c -l 131072 -r 1 //CPU

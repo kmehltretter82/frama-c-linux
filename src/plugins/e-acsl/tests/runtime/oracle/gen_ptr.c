@@ -9,7 +9,7 @@ int main(void)
   __e_acsl_full_init((void *)(& x));
   int t[3] = {2, 3, 4};
   __e_acsl_store_block((void *)(t),(size_t)12);
-  __e_acsl_full_init((void *)(t));
+  __e_acsl_full_init((void *)(& t));
   int *p = & x;
   __e_acsl_store_block((void *)(& p),(size_t)8);
   __e_acsl_full_init((void *)(& p));
@@ -67,7 +67,7 @@ int main(void)
         __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(& t[2] - i),
                                                         sizeof(int),
                                                         (void *)(& t[2]),
-                                                        (void *)(& t[2]));
+                                                        (void *)0);
         __e_acsl_assert(__gen_e_acsl_valid_read_2,(char *)"RTE",
                         (char *)"main",
                         (char *)"mem_access: \\valid_read(&t[2] - i)",19);

@@ -15,7 +15,7 @@ int main(void)
   {
     int __gen_e_acsl_valid;
     __gen_e_acsl_valid = __e_acsl_valid((void *)(& s),sizeof(struct toto),
-                                        (void *)(& s),(void *)(& s));
+                                        (void *)(& s),(void *)0);
     __e_acsl_assert(__gen_e_acsl_valid,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid(&s)",9);
   }
