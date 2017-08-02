@@ -32,7 +32,7 @@ tests/gmp/at.i:50:[value] cannot evaluate ACSL term, \at() on a C label is unsup
 tests/gmp/at.i:50:[value] warning: assertion got status unknown.
 [value] using specification for function __e_acsl_initialize
 [value] using specification for function __e_acsl_valid_read
-FRAMAC_SHARE/e-acsl/e_acsl_mmodel_api.h:94:[value] warning: function __e_acsl_assert: precondition got status unknown.
+FRAMAC_SHARE/e-acsl/e_acsl.h:94:[value] warning: function __e_acsl_assert: precondition got status unknown.
 tests/gmp/at.i:26:[value] cannot evaluate ACSL term, \at() on a C label is unsupported
 tests/gmp/at.i:26:[value] warning: assertion got status unknown.
 tests/gmp/at.i:28:[value] cannot evaluate ACSL term, \at() on a C label is unsupported
