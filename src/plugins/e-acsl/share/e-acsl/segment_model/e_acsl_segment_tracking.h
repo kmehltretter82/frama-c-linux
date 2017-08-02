@@ -357,16 +357,16 @@ static void validate_shadow_layout() {
   } \
 }
 
-/* Assert that neither of `_len` addresses immediately preceding `_addr` are
- * base addresses of some other block and that `_len` addresses past
+/* Assert that neither of `_len - 1` addresses immediately preceding `_addr`
+ * are base addresses of some other block and that `_len` addresses past
  * `_addr` are free */
 #define DVALIDATE_STATIC_SUFFICIENTLY_ALIGNED(_addr, _len) { \
   int _i; \
   for (_i = 0; _i < _len; _i++) { \
-    uintptr_t _prev = _addr - _i - 1; \
+    uintptr_t _prev = _addr - _i; \
     if (static_allocated_one(_prev)) { \
       vassert(_base_addr(_prev) != _prev, \
-        "Potential backward overlap of: \n  previous block       [%a]\n" \
+        "Potential backward overlap of: \n  previous block [%a]\n" \
         "  with allocated block [%a]\n", _prev, _addr); \
     } \
     uintptr_t _next = _addr + _i; \
@@ -389,8 +389,8 @@ static void validate_shadow_layout() {
 
 /* Assert that memory block [_addr, _addr + _size] is allocated
  * and can be written to */
-# define DVALIDATE_WRITEABLE(_addr, _size) { \
-  DVALIDATE_ALLOCATED((uintptr_t)_addr, _size, (uintptr_t)_addr); \
+# define DVALIDATE_WRITEABLE(_addr, _size, _base) { \
+  DVALIDATE_ALLOCATED((uintptr_t)_addr, _size, (uintptr_t)_base); \
   DVASSERT(!readonly((void*)_addr), \
     "Unexpected readonly address: %lu\n", _addr); \
 }

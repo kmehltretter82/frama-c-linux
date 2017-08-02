@@ -43,21 +43,21 @@
 #define E_ACSL_MMODEL_DESC "patricia trie"
 
 /* Assertions in debug mode */
-#define ALLOCATED(_ptr,_size) \
-  ((allocated(_ptr, _size, _ptr) == NULL) ? 0 : 1)
+#define ALLOCATED(_ptr,_size, _base) \
+  ((allocated(_ptr, _size, _base) == NULL) ? 0 : 1)
 
 #ifdef E_ACSL_DEBUG
-#define DVALIDATE_ALLOCATED(_ptr, _size) \
-  vassert(ALLOCATED(_ptr, _size), \
+#define DVALIDATE_ALLOCATED(_ptr, _size, _base) \
+  vassert(ALLOCATED(_ptr, _size, _base), \
   "Not allocated [%a, %a + %lu]", (uintptr_t)_ptr, _size)
 
-#define DVALIDATE_WRITEABLE(_ptr, _size) { \
-  DVALIDATE_ALLOCATED(_ptr, _size); \
+#define DVALIDATE_WRITEABLE(_ptr, _size, _base) { \
+  DVALIDATE_ALLOCATED(_ptr, _size, _base); \
   vassert(!readonly(_ptr), "Location %a is read-only", (uintptr_t)_ptr); \
 }
 #else
-#define DVALIDATE_ALLOCATED(_ptr, _size)
-#define DVALIDATE_WRITEABLE(_ptr, _size)
+#define DVALIDATE_ALLOCATED(_ptr, _size, _base)
+#define DVALIDATE_WRITEABLE(_ptr, _size, _base)
 #endif
 
 /**************************/
@@ -435,7 +435,7 @@ int posix_memalign(void **memptr, size_t alignment, size_t size) {
     return -1;
 
   /* Make sure that the first argument to posix memalign is indeed allocated */
-  DVALIDATE_WRITEABLE((void*)memptr, sizeof(void*));
+  DVALIDATE_WRITEABLE((void*)memptr, sizeof(void*), (void*)memptr);
 
   int res = public_posix_memalign(memptr, alignment, size);
   if (!res)

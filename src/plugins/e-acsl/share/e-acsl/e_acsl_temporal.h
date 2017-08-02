@@ -66,8 +66,8 @@ void temporal_memcpy(void *dest, void *src, size_t size) {
   /* Memcpy is only relevant for pointers here, so if there is a
    * copy under a pointer's size then there no point in copying memory*/
   if (size >= sizeof(void*)) {
-    DVALIDATE_RO_ACCESS(src, size);
-    DVALIDATE_RW_ACCESS(dest, size);
+    DVALIDATE_ALLOCATED(src, size, src);
+    DVALIDATE_WRITEABLE(dest, size, dest);
     void *dest_shadow = (void *)temporal_referent_shadow(dest);
     void *src_shadow = (void *)temporal_referent_shadow(src);
     memcpy(dest_shadow, src_shadow, size);
@@ -75,7 +75,7 @@ void temporal_memcpy(void *dest, void *src, size_t size) {
 }
 
 void temporal_memset(void *dest, int c, size_t size) {
-  DVALIDATE_RW_ACCESS(dest, size);
+  DVALIDATE_WRITEABLE(dest, size, dest);
   void *dest_shadow = (void *)temporal_referent_shadow(dest);
   memset(dest_shadow, 0, size);
 }
