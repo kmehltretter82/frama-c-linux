@@ -747,13 +747,37 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     in
     match stmt.skind with
     | Instr(Set(lv, _, loc)) -> add_initializer loc lv stmt env kf
-    | Instr(Local_init(vi, _, loc)) ->
-      let lv = (Var(vi), NoOffset) in
-      add_initializer loc ~vi lv ~post:true stmt env kf
+    | Instr(Local_init(vi, init, loc)) ->
+      let lv = (Var vi, NoOffset) in
+      let env = add_initializer loc ~vi lv ~post:true stmt env kf in
+      (* Handle variable-length array allocation via [__fc_vla_alloc].
+         Here each instance of [__fc_vla_alloc] is rewritten to [alloca]
+         (that is used to implement VLA) and further a custom call to
+         [store_block] tracking VLA allocation is issued. *)
+      (* KV NOTE: Do not add handling [alloca] allocation here (or anywhere
+         else for that matter). Handling of [alloca] should be implemented
+         in Frama-C (eventually). This is such that each call to [alloca]
+         becomes [__fc_vla_alloc]. It is already handled using the code below.
+      *)
+      (match init with
+      | ConsInit (fvi, sz :: _, _) when Libc.is_vla_alloc_name fvi.vname ->
+        fvi.vname <- Libc.actual_alloca;
+        (* since we need to pass vi by value cannot use [Misc.mk_store_stmt]
+           here. Do it manually. *)
+        let sname = RTL.mk_api_name "store_block" in
+        let store = Misc.mk_call ~loc sname [ Cil.evar vi ; sz ] in
+        Env.add_stmt ~post:true env store
+      | _ -> env)
     | Instr(Call (Some lv, _, _, loc)) ->
       if not (RTL.is_generated_kf kf) then
         add_initializer loc lv ~post:false stmt env kf
       else env
+    (* Handle variable-length array allocation via [__fc_vla_free].
+       Rewrite its name to [delete_block]. The rest is in place. *)
+    | Instr(Call (_, { enode = Lval(Var(vi), _) }, _, _))
+      when Libc.is_vla_free_name vi.vname ->
+        vi.vname <- RTL.mk_api_name "delete_block";
+      env
     | _ -> env
 
   method !vblock blk =
