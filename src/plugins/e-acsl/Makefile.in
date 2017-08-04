@@ -62,6 +62,7 @@ PLUGIN_CMO:= local_config \
 	rte \
 	error \
 	builtins \
+	functions \
 	misc \
 	gmpz \
 	literal_strings \
@@ -83,7 +84,6 @@ PLUGIN_CMO:= local_config \
 
 PLUGIN_HAS_MLI:=yes
 PLUGIN_DISTRIBUTED:=yes
-
 
 # We "save" this variable so that it can be used once PLUGIN_DIR has been reset
 EACSL_PLUGIN_DIR:=$(PLUGIN_DIR)

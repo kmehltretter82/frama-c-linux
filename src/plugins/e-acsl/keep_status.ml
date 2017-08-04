@@ -130,7 +130,7 @@ let must_translate kf kind =
     (* function contracts have been moved from the original function to its
        duplicate by [Dup_function] but they are still associated to the original
        function here *)
-    let name = Misc.get_original_name kf in
+    let name = Functions.RTL.get_original_name kf in
     let info =
       try Datatype.String.Hashtbl.find keep_status name
       with Not_found ->

@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module Libc = Functions.Libc
+module RTL = Functions.RTL
 module E_acsl_label = Label
 open Cil_types
 open Cil_datatype
@@ -231,7 +233,7 @@ class e_acsl_visitor prj generate = object (self)
               let blk = Cil.mkBlock stmts in
               (* Create [__e_acsl_globals_init] function with definition
                for initialization of global variables *)
-              let fname = (Misc.mk_api_name "globals_init") in
+              let fname = (RTL.mk_api_name "globals_init") in
               let vi =
                 Cil.makeGlobalVar ~source:true
                   fname
@@ -330,7 +332,8 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
               in
               let ptr_size = Cil.sizeOf loc Cil.voidPtrType in
               let args = args @ [ ptr_size ] in
-              let init = Misc.mk_call loc (Misc.mk_api_name "memory_init") args in
+              let name = RTL.mk_api_name "memory_init" in
+              let init = Misc.mk_call loc name args in
               main.sbody.bstmts <- init :: main.sbody.bstmts
             in
             Extlib.may handle_main main_fct
@@ -651,6 +654,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
             if is_main && Mmodel_analysis.use_model () then begin
               let stmts = b.bstmts in
               let l = List.rev stmts in
+              let mclean = (RTL.mk_api_name "memory_clean") in
               match l with
               | [] -> assert false (* at least the 'return' stmt *)
               | ret :: l ->
@@ -669,8 +673,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
                       else
                         acc)
                     global_vars
-                    [ Misc.mk_call ~loc (Misc.mk_api_name "memory_clean") [];
-                      ret ]
+                    [ Misc.mk_call ~loc mclean []; ret ]
                 in
                 b.bstmts <- List.rev l @ delete_stmts
             end;
@@ -725,7 +728,8 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         | Var vi, NoOffset -> vi.vglob || vi.vformal
         | _ -> false
       in
-      if not (may_safely_ignore lv) && Mmodel_analysis.must_model_lval ~stmt ~kf lv then
+      let must_model = Mmodel_analysis.must_model_lval ~stmt ~kf lv in
+      if not (may_safely_ignore lv) && must_model then
         let before = Cil.memo_stmt self#behavior stmt in
         let new_stmt = Project.on prj (Misc.mk_initialize ~loc) lv in
         let new_stmt = Cil.memo_stmt self#behavior new_stmt in
@@ -747,7 +751,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       let lv = (Var(vi), NoOffset) in
       add_initializer loc ~vi lv ~post:true stmt env kf
     | Instr(Call (Some lv, _, _, loc)) ->
-      if not (Misc.is_generated_kf kf) then
+      if not (RTL.is_generated_kf kf) then
         add_initializer loc lv ~post:false stmt env kf
       else env
     | _ -> env
