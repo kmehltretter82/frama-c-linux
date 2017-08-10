@@ -20,5 +20,6 @@ tests/gmp/cast.i:23:[e-acsl] warning: approximating a real number by a float
   __e_acsl_math_INFINITY ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
 [value] using specification for function __e_acsl_memory_init
 [value] using specification for function __e_acsl_assert
-[value] user error: type long double not implemented. Using double instead
+[value] user error: type long double wider than 64 bits not supported.
+                    Using double instead for the remainder of the analysis.
 [value] done for function main
