@@ -5,4 +5,5 @@ tests/bts/bts1307.i:23:[e-acsl] warning: approximating a real number by a float
 tests/bts/bts1307.i:11:[e-acsl] warning: approximating a real number by a float
 [e-acsl] translation done in project "e-acsl".
 FRAMAC_SHARE/e-acsl/e_acsl.h:94:[value] warning: function __e_acsl_assert: precondition got status unknown.
-[value] user error: type long double not implemented. Using double instead
+[value] user error: type long double wider than 64 bits not supported.
+                    Using double instead for the remainder of the analysis.
