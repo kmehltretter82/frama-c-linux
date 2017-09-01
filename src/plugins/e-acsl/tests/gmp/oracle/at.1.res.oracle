@@ -32,6 +32,8 @@ FRAMAC_SHARE/e-acsl/e_acsl.h:94:[value] warning: function __e_acsl_assert: preco
 FRAMAC_SHARE/e-acsl/e_acsl_gmp_api.h:65:[value] warning: function __gmpz_init_set: precondition got status unknown.
 tests/gmp/at.i:12:[value] cannot evaluate ACSL term, \at() on a C label is unsupported
 tests/gmp/at.i:12:[value] warning: assertion got status unknown.
+tests/gmp/at.i:14:[value] cannot evaluate ACSL term, \at() on a C label is unsupported
+tests/gmp/at.i:14:[value] warning: assertion got status unknown.
 tests/gmp/at.i:48:[value] cannot evaluate ACSL term, \at() on a C label is unsupported
 tests/gmp/at.i:48:[value] warning: assertion got status unknown.
 tests/gmp/at.i:49:[value] cannot evaluate ACSL term, \at() on a C label is unsupported
