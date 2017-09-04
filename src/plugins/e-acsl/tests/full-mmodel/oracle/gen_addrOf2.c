@@ -31,16 +31,8 @@ void __e_acsl_globals_init(void)
 {
   __e_acsl_store_block((void *)(& f),(size_t)1);
   __e_acsl_full_init((void *)(& f));
-  __e_acsl_store_block((void *)(& __fc_wctomb_state),(size_t)4);
-  __e_acsl_full_init((void *)(& __fc_wctomb_state));
-  __e_acsl_store_block((void *)(& __fc_mbtowc_state),(size_t)4);
-  __e_acsl_full_init((void *)(& __fc_mbtowc_state));
-  __e_acsl_store_block((void *)(& __fc_mblen_state),(size_t)4);
-  __e_acsl_full_init((void *)(& __fc_mblen_state));
   __e_acsl_store_block((void *)(& __fc_rand_max),(size_t)8);
   __e_acsl_full_init((void *)(& __fc_rand_max));
-  __e_acsl_store_block((void *)(& __fc_random_counter),(size_t)4);
-  __e_acsl_full_init((void *)(& __fc_random_counter));
   return;
 }
 
@@ -60,11 +52,7 @@ int main(void)
   __e_acsl_full_init((void *)(& __retres));
   __retres = 0;
   __e_acsl_delete_block((void *)(& f));
-  __e_acsl_delete_block((void *)(& __fc_wctomb_state));
-  __e_acsl_delete_block((void *)(& __fc_mbtowc_state));
-  __e_acsl_delete_block((void *)(& __fc_mblen_state));
   __e_acsl_delete_block((void *)(& __fc_rand_max));
-  __e_acsl_delete_block((void *)(& __fc_random_counter));
   __e_acsl_delete_block((void *)(& x));
   __e_acsl_delete_block((void *)(& __retres));
   __e_acsl_memory_clean();
