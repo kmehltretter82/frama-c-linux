@@ -32,7 +32,7 @@ int main(int argc, const char **argv) {
   abe_matrix(vertices3);
   abe_matrix(Vertices);
   abe_matrix(Vertices2);
-  abe_matrix(&triple_vertices[0]);
-  abe_matrix(&triple_vertices2[0]);
+  abe_matrix(triple_vertices[0]);
+  abe_matrix(triple_vertices2[0]);
   return 0;
 }

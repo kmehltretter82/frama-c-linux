@@ -95,12 +95,12 @@ int main(int argc, char const **argv)
   abe_matrix(Vertices2);
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
-  __e_acsl_temporal_save_nblock_parameter((void *)(triple_vertices),0U);
-  abe_matrix((double (*)[4])(triple_vertices));
+  __e_acsl_temporal_save_nblock_parameter((void *)(triple_vertices[0]),0U);
+  abe_matrix(triple_vertices[0]);
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
-  __e_acsl_temporal_save_nblock_parameter((void *)(triple_vertices2),0U);
-  abe_matrix((double (*)[4])(triple_vertices2));
+  __e_acsl_temporal_save_nblock_parameter((void *)(triple_vertices2[0]),0U);
+  abe_matrix(triple_vertices2[0]);
   __retres = 0;
   __e_acsl_delete_block((void *)(Vertices2));
   __e_acsl_delete_block((void *)(Vertices));
