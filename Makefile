@@ -815,7 +815,7 @@ PLUGIN_NAME:=Eva
 PLUGIN_DIR:=src/plugins/value
 PLUGIN_EXTRA_DIRS:=engine values domains domains/cvalue domains/apron \
 	domains/gauges domains/equality legacy slevel utils gui_files \
-	values/numerors domains/numerors
+	values/numerors domains/numerors domains/traces
 
 # Files for the binding to Apron domains. Only available if Apron is available.
 ifeq ($(HAS_APRON),yes)
@@ -888,6 +888,7 @@ PLUGIN_CMO:= slevel/split_strategy value_parameters \
 	domains/printer_domain \
 	domains/simple_memory \
 	domains/gauges/gauges_domain \
+	domains/traces/traces_domain \
 	domains/apron/apron_domain \
 	domains/hcexprs \
 	domains/equality/equality domains/equality/equality_domain \

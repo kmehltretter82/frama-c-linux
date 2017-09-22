@@ -1,0 +1,73 @@
+[kernel] Parsing tests/value/traces/test1.i (no preprocessing)
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value:initial-state] Values of globals at initialization
+  
+tests/value/traces/test1.i:14:[value] Frama_C_dump_each:
+        # Cvalue domain:
+        c ∈ [--..--]
+        tmp ∈ {4; 5}
+        # Value.Traces_domain.Traces.t:
+        start: 0
+        {[ 0 -> ([ EnterScope: tmp -> 1 ])
+           1 -> ([ Assign: tmp = 0; -> 2 ])
+           2 -> ([ Assume: c false -> 3; Assume: c true -> 4 ])
+           3 -> ([ Assign: tmp = 2; -> 7 ])
+           4 -> ([ Assign: tmp = 1; -> 6 ])
+           6 -> ([ EnterScope: i -> 11 ])
+           7 -> ([ EnterScope: i -> 9 ])
+           9 -> ([ Assign: int i = 0; -> 10 ])
+           10 -> ([ enter_loop -> 15 ])
+           11 -> ([ Assign: int i = 0; -> 12 ])
+           12 -> ([ enter_loop -> 14 ])
+           14 -> ([ Assume: i < 3 true -> 17 ])
+           15 -> ([ Assume: i < 3 true -> 18 ])
+           17 -> ([ Assign: tmp ++; -> 20 ])
+           18 -> ([ Assign: tmp ++; -> 19 ])
+           19 -> ([ Assign: i ++; -> 21 ])
+           20 -> ([ Assign: i ++; -> 22 ])
+           21 -> ([ incr_loop_counter -> 25 ])
+           22 -> ([ incr_loop_counter -> 24 ])
+           24 -> ([ Assume: i < 3 true -> 28 ])
+           25 -> ([ Assume: i < 3 true -> 29 ])
+           28 -> ([ Assign: tmp ++; -> 31 ])
+           29 -> ([ Assign: tmp ++; -> 30 ])
+           30 -> ([ Assign: i ++; -> 33 ])
+           31 -> ([ Assign: i ++; -> 32 ])
+           32 -> ([ incr_loop_counter -> 37 ])
+           33 -> ([ incr_loop_counter -> 36 ])
+           36 -> ([ Assume: i < 3 true -> 40 ])
+           37 -> ([ Assume: i < 3 true -> 41 ])
+           40 -> ([ Assign: tmp ++; -> 43 ])
+           41 -> ([ Assign: tmp ++; -> 42 ])
+           42 -> ([ Assign: i ++; -> 45 ])
+           43 -> ([ Assign: i ++; -> 44 ])
+           44 -> ([ incr_loop_counter -> 49 ])
+           45 -> ([ incr_loop_counter -> 48 ])
+           48 -> ([ Assume: i < 3 false -> 52 ])
+           49 -> ([ Assume: i < 3 false -> 53 ])
+           52 -> ([ leave_loop -> 55 ])
+           53 -> ([ leave_loop -> 54 ])
+           54 -> ([ LeaveScope: i -> 57 ])
+           55 -> ([ LeaveScope: i -> 56 ])
+           56 -> ([ join -> 58 ])
+           57 -> ([ join -> 58 ]) ]}
+        current: 58]
+        ==END OF DUMP==
+[value] Recording results for main
+[value] done for function main
+[value] ====== VALUES COMPUTED ======
+[value:final-states] Values at end of function main:
+  tmp ∈ {4; 5}
+[from] Computing for function main
+[from] Done for function main
+[from] ====== DEPENDENCIES COMPUTED ======
+       These dependencies hold at termination for the executions that terminate:
+[from] Function main:
+  \result FROM c
+[from] ====== END OF DEPENDENCIES ======
+[inout] Out (internal) for function main:
+          tmp; i
+[inout] Inputs for function main:
+          \nothing

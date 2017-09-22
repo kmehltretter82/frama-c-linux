@@ -37,6 +37,7 @@ module InoutDomain: Parameter_sig.Bool
 module SignDomain: Parameter_sig.Bool
 module PrinterDomain: Parameter_sig.Bool
 module NumerorsDomain: Parameter_sig.Bool
+module TracesDomain: Parameter_sig.Bool
 
 module ApronOctagon: Parameter_sig.Bool
 module ApronBox: Parameter_sig.Bool

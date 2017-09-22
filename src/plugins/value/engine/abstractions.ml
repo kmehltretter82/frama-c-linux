@@ -37,6 +37,7 @@ type config = {
   signs: bool;
   printer: bool;
   numerors: bool;
+  traces: bool;
 }
 
 let configure () = {
@@ -54,6 +55,7 @@ let configure () = {
   signs = Value_parameters.SignDomain.get ();
   printer = Value_parameters.PrinterDomain.get ();
   numerors = Value_parameters.NumerorsDomain.get ();
+  traces = Value_parameters.TracesDomain.get ();
 }
 
 let default_config = configure ()
@@ -73,6 +75,7 @@ let legacy_config = {
   signs = false;
   printer = false;
   numerors = false;
+  traces = false;
 }
 
 module type Value = sig
@@ -413,6 +416,13 @@ let add_errors abstract =
   end : Abstract)
 
 (* -------------------------------------------------------------------------- *)
+(*                            Gauges                                          *)
+(* -------------------------------------------------------------------------- *)
+
+let add_traces =
+  add_standard_domain (module Traces_domain.D)
+
+(* -------------------------------------------------------------------------- *)
 (*                                 Printer                                    *)
 (* -------------------------------------------------------------------------- *)
 
@@ -497,6 +507,11 @@ let build_abstractions config =
   let abstractions =
     if config.printer
     then add_printer abstractions
+    else abstractions
+  in
+  let abstractions =
+    if config.traces
+    then add_traces abstractions
     else abstractions
   in
   let abstractions = add_dynamic_abstractions abstractions in

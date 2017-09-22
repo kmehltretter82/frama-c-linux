@@ -275,6 +275,13 @@ module EqualityCallFunction =
     end)
 let () = add_precision_dep EqualityCallFunction.parameter
 
+module TracesDomain = Domain_Parameter
+    (struct
+      let option_name = "-eva-traces-domain"
+      let help = "Use a domain to record traces of Eva. Experimental."
+      let default = false
+    end)
+
 let () = Parameter_customize.set_group domains
 module Numerors_Real_Size =
   Int
