@@ -207,10 +207,56 @@ module Traces = struct
     let g = join_graph m c.graph in
     { start = c.start; current = n; graph = g}
 
+
+  let is_included c1 c2 =
+    (* start is the same *)
+    c1.start = c2.start &&
+    (* there are epsilons transition (Msg) between c1.current and
+        c2.current *)
+    let rec epsilon_path current stop g =
+      Node.equal current stop ||
+      begin
+        Node.compare current stop <= 0 &&
+        match Graph.find current g with
+        | exception Not_found -> false
+        | l ->
+          let exists = function
+            | Msg (n,_) -> epsilon_path n stop g
+            | _ -> false
+          in
+          List.exists exists l
+      end
+    in
+    epsilon_path c1.current c2.current c2.graph
+    &&
+    (* The graph is c1.graph is included into c2.graph *)
+    let rec decide_both k l1 l2 =
+      match l1, l2 with
+      | [], _ -> true
+      | _, [] -> false
+      | h1 :: t1, h2 :: t2 ->
+        let c = Edge.compare h1 h2 in
+        if c = 0
+        then decide_both k t1 t2
+        else if c < 0
+        then false
+        else decide_both k l1 t2
+    in
+    Graph.binary_predicate
+      Hptmap_sig.NoCache
+      Graph.UniversalPredicate
+      ~decide_fast:Graph.decide_fast_inclusion
+      ~decide_fst:(fun _ _ -> false)
+      ~decide_snd:(fun _ _ -> true)
+      ~decide_both
+       c1.graph c2.graph
+
   let join c1 c2 =
     match view c1, view c2 with
     | `Top, _ -> c1
     | _, `Top -> c2
+    | `Other c1, `Other c2 when is_included c1 c2 -> c2
+    | `Other c1, `Other c2 when is_included c2 c1 -> c1
     | `Other c1, `Other c2 ->
       if c1.start <> c2.start then assert false
       else
@@ -235,30 +281,6 @@ module Traces = struct
         {start = c1.start; current = n; graph = g}
 
   let narrow _c1 c2 = `Value c2
-
-  let is_included c1 c2 =
-    c1.start = c2.start &&
-    (* don't compare current we are at the same place *)
-    let rec decide_both k l1 l2 =
-      match l1, l2 with
-      | [], _ -> true
-      | _, [] -> false
-      | h1 :: t1, h2 :: t2 ->
-        let c = Edge.compare h1 h2 in
-        if c = 0
-        then decide_both k t1 t2
-        else if c < 0
-        then false
-        else decide_both k l1 t2
-    in
-    Graph.binary_predicate
-      Hptmap_sig.NoCache
-      Graph.UniversalPredicate
-      ~decide_fast:Graph.decide_fast_inclusion
-      ~decide_fst:(fun _ _ -> false)
-      ~decide_snd:(fun _ _ -> true)
-      ~decide_both
-       c1.graph c2.graph
 end
 
 let key = Structure.Key_Domain.create_key "traces domain"
@@ -299,9 +321,17 @@ module Internal = struct
     let assume _stmt e pos _valuation state =
       `Value(Traces.add_edge state (Assume(0,e,pos)))
 
-    let start_call _stmt _call _valuation state = `Value state
+    let start_call _stmt call _valuation state =
+      let msg =
+        Format.asprintf "start_call: %a" (Pretty_utils.pp_list ~sep:",@ "
+                                               (fun fmt v -> Cil_datatype.Varinfo.pretty fmt v.Eval.formal))
+          call.Eval.arguments in
+      let state = Traces.add_edge state (Msg(0,msg)) in
+      `Value state
 
-    let finalize_call _stmt _call ~pre:_ ~post = `Value post
+    let finalize_call _stmt call ~pre:_ ~post =
+      `Value (Traces.add_edge post (Msg(0,Format.asprintf "finalize_call: %a"
+                                          (Pretty_utils.pp_opt Cil_datatype.Varinfo.pretty) call.Eval.return)))
 
     let update _valuation state = `Value state
 
@@ -320,9 +350,10 @@ module Internal = struct
   let reuse _kf _bases ~current_input:_ ~previous_output:state = state
 
   let empty () = Traces.empty
-  let introduce_globals _vars state = state
-  let initialize_variable _ _ ~initialized:_ _ state = state
-  let initialize_variable_using_type _ _ state  = state
+  let introduce_globals _vars state = Traces.add_edge state (Msg(0,"introduce globals"))
+  let initialize_variable lv _ ~initialized:_ _ state =
+    Traces.add_edge state (Msg(0,Format.asprintf "initialize variable: %a" Printer.pp_lval lv ))
+  let initialize_variable_using_type _ _ state  = Traces.add_edge state (Msg(0,"initialize variable using type"))
 
   (* TODO *)
   let logic_assign _assign _location ~pre:_ _state = top

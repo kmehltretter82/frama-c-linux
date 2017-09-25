@@ -1,0 +1,108 @@
+[kernel] Parsing tests/value/traces/test2.i (no preprocessing)
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value:initial-state] Values of globals at initialization
+  
+[value] computing for function loop <- main.
+        Called from tests/value/traces/test2.i:18.
+[value] Recording results for loop
+[value] Done for function loop
+[value] computing for function loop <- main.
+        Called from tests/value/traces/test2.i:18.
+[value] Recording results for loop
+[value] Done for function loop
+tests/value/traces/test2.i:20:[value] Frama_C_dump_each:
+        # Cvalue domain:
+        c ∈ [--..--]
+        tmp ∈ {4; 5}
+        # Value.Traces_domain.Traces.t:
+        start: 0
+        {[ 0 -> ([ initialize variable using type -> 1 ])
+           1 -> ([ EnterScope: tmp -> 2 ])
+           2 -> ([ Assign: tmp = 0; -> 3 ])
+           3 -> ([ Assume: c false -> 4; Assume: c true -> 5 ])
+           4 -> ([ Assign: tmp = 2; -> 8 ])
+           5 -> ([ Assign: tmp = 1; -> 7 ])
+           7 -> ([ start_call: j -> 9 ])
+           8 -> ([ start_call: j -> 53 ])
+           9 -> ([ EnterScope: i -> 10 ])
+           10 -> ([ initialize variable: i -> 11 ])
+           11 -> ([ Assign: int i = 0; -> 12 ])
+           12 -> ([ enter_loop -> 13 ])
+           13 -> ([ Assume: i < 3 true -> 14 ])
+           14 -> ([ Assign: j ++; -> 15 ])
+           15 -> ([ Assign: i ++; -> 16 ])
+           16 -> ([ incr_loop_counter -> 17 ])
+           17 -> ([ Assume: i < 3 true -> 19 ])
+           19 -> ([ Assign: j ++; -> 20 ])
+           20 -> ([ Assign: i ++; -> 21 ])
+           21 -> ([ incr_loop_counter -> 23 ])
+           23 -> ([ Assume: i < 3 true -> 25 ])
+           25 -> ([ Assign: j ++; -> 26 ])
+           26 -> ([ Assign: i ++; -> 27 ])
+           27 -> ([ incr_loop_counter -> 29 ])
+           29 -> ([ Assume: i < 3 false -> 31 ])
+           31 -> ([ leave_loop -> 32 ])
+           32 -> ([ LeaveScope: i -> 33 ])
+           33 -> ([ EnterScope: \result<loop> -> 34 ])
+           34 -> ([ Assign: return j; -> 35 ])
+           35 -> ([ LeaveScope: j -> 49 ])
+           49 -> ([ finalize_call: \result<loop> -> 50 ])
+           50 -> ([ Assign: tmp = loop(tmp); -> 51 ])
+           51 -> ([ LeaveScope: \result<loop> -> 52 ])
+           52 -> ([ join -> 116 ])
+           53 -> ([ EnterScope: i -> 55 ])
+           55 -> ([ initialize variable: i -> 56 ])
+           56 -> ([ Assign: int i = 0; -> 57 ])
+           57 -> ([ enter_loop -> 58 ])
+           58 -> ([ Assume: i < 3 true -> 59 ])
+           59 -> ([ Assign: j ++; -> 60 ])
+           60 -> ([ Assign: i ++; -> 61 ])
+           61 -> ([ incr_loop_counter -> 62 ])
+           62 -> ([ Assume: i < 3 true -> 64 ])
+           64 -> ([ Assign: j ++; -> 65 ])
+           65 -> ([ Assign: i ++; -> 66 ])
+           66 -> ([ incr_loop_counter -> 68 ])
+           68 -> ([ Assume: i < 3 true -> 70 ])
+           70 -> ([ Assign: j ++; -> 71 ])
+           71 -> ([ Assign: i ++; -> 72 ])
+           72 -> ([ incr_loop_counter -> 74 ])
+           74 -> ([ Assume: i < 3 false -> 76 ])
+           76 -> ([ leave_loop -> 77 ])
+           77 -> ([ LeaveScope: i -> 78 ])
+           78 -> ([ EnterScope: \result<loop> -> 79 ])
+           79 -> ([ Assign: return j; -> 80 ])
+           80 -> ([ LeaveScope: j -> 112 ])
+           112 -> ([ finalize_call: \result<loop> -> 113 ])
+           113 -> ([ Assign: tmp = loop(tmp); -> 114 ])
+           114 -> ([ LeaveScope: \result<loop> -> 115 ])
+           115 -> ([ join -> 116 ]) ]}
+        current: 116]
+        ==END OF DUMP==
+[value] Recording results for main
+[value] done for function main
+[value] ====== VALUES COMPUTED ======
+[value:final-states] Values at end of function loop:
+  j ∈ {4; 5}
+[value:final-states] Values at end of function main:
+  tmp ∈ {4; 5}
+[from] Computing for function loop
+[from] Done for function loop
+[from] Computing for function main
+[from] Done for function main
+[from] ====== DEPENDENCIES COMPUTED ======
+       These dependencies hold at termination for the executions that terminate:
+[from] Function loop:
+  \result FROM j
+[from] Function main:
+  \result FROM c
+[from] ====== END OF DEPENDENCIES ======
+[inout] Out (internal) for function loop:
+          j; i
+[inout] Inputs for function loop:
+          \nothing
+[inout] Out (internal) for function main:
+          tmp
+[inout] Inputs for function main:
+          \nothing
