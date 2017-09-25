@@ -240,8 +240,8 @@ type ('loc, 'value) call = {
   arguments: ('loc, 'value) argument list;
   rest: (exp * ('loc, 'value) assigned) list;
   return: varinfo option;
-  (** Special variable (Fresh? same for all calls?) that makes the
-      link between the result of the function and the assignment of in
+  (** Special variable (same for all calls) that makes the
+      link between the result of the function and the assignment in
       the caller. *)
   recursive: bool;
 }
