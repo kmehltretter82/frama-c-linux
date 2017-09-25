@@ -330,16 +330,24 @@ module Internal = struct
       `Value(Traces.add_edge state (Assume(0,e,pos)))
 
     let start_call _stmt call _valuation state =
-      let msg =
-        Format.asprintf "start_call: %a" (Pretty_utils.pp_list ~sep:",@ "
-                                               (fun fmt v -> Cil_datatype.Varinfo.pretty fmt v.Eval.formal))
-          call.Eval.arguments in
+      let msg = Format.asprintf "start_call: %s" (Kernel_function.get_name call.Eval.kf) in
       let state = Traces.add_edge state (Msg(0,msg)) in
+      let formals = List.map (fun arg -> arg.Eval.formal) call.Eval.arguments in
+      let state = Traces.add_edge state (EnterScope(0,formals)) in
+      let state = List.fold_left (fun state arg ->
+          Traces.add_edge state (Assign(0,
+                                        Cil.var arg.Eval.formal,
+                                        arg.Eval.formal.Cil_types.vtype,
+                                        arg.Eval.concrete))) state call.Eval.arguments in
       `Value state
 
     let finalize_call _stmt call ~pre:_ ~post =
-      `Value (Traces.add_edge post (Msg(0,Format.asprintf "finalize_call: %a"
-                                          (Pretty_utils.pp_opt Cil_datatype.Varinfo.pretty) call.Eval.return)))
+      let state = post in
+      let msg = Format.asprintf "finalize_call: %s" (Kernel_function.get_name call.Eval.kf) in
+      let state = Traces.add_edge state (Msg(0,msg)) in
+      (* let formals = List.map (fun arg -> arg.Eval.formal) call.Eval.arguments in *)
+      (* let state = Traces.add_edge state (LeaveScope(0,formals)) in *)
+      `Value state
 
     let update _valuation state = `Value state
 
