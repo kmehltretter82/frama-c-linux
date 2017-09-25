@@ -199,7 +199,11 @@ module type Transfer = sig
         location if the right expression [expr] is a lvalue.
       - [valuation] is a cache of all sub-expressions and locations computed
         for the evaluation of [lval] and [expr]; it can also be used to reduce
-        the state. *)
+        the state.
+
+      A special case must be noted when the kinstr is a function call,
+      the exp in this case is the special variable in [!Eval.call.return].
+  *)
   val assign :
     kinstr -> location left_value -> exp -> (location, value) assigned ->
     valuation -> state -> state or_bottom

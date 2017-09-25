@@ -23,7 +23,7 @@
 module Node = struct include Datatype.Int let id x = x end
 
 type edge =
-  | Assign of Node.t * Cil_types.kinstr
+  | Assign of Node.t * Cil_types.lval * Cil_types.typ * Cil_types.exp
   | Assume of Node.t * Cil_types.exp * bool
   | EnterScope of Node.t * Cil_types.varinfo list
   | LeaveScope of Node.t * Cil_types.varinfo list
@@ -47,10 +47,14 @@ module Edge = struct
       let compare (m1:t) (m2:t) =
         match m1, m2 with
         | Top, Top -> 0
-        | Assign (n1,s1), Assign (n2,s2) ->
+        | Assign (n1,loc1,typ1,exp1), Assign (n2,loc2,typ2,exp2) ->
           let c = Node.compare n1 n2 in
           if c <> 0 then c else
-          Cil_datatype.Kinstr.compare s1 s2
+            let c = Cil_datatype.Lval.compare loc1 loc2 in
+            if c <> 0 then c else
+              let c = Cil_datatype.Typ.compare typ1 typ2 in
+              if c <> 0 then c else
+                Cil_datatype.Exp.compare exp1 exp2
         | Assume(n1,e1,b1), Assume(n2,e2,b2) ->
           let c = Node.compare n1 n2 in
           if c <> 0 then c else
@@ -87,7 +91,8 @@ module Edge = struct
 
       let pretty fmt = function
         | Top -> Format.fprintf fmt "@[Top@]"
-        | Assign(n,s) -> Format.fprintf fmt "@[Assign:@ %a -> %a@]" Cil_datatype.Kinstr.pretty s Node.pretty n
+        | Assign(n,loc,_typ,exp) -> Format.fprintf fmt "@[Assign:@ %a = %a -> %a@]"
+                                      Cil_datatype.Lval.pretty loc Cil_datatype.Exp.pretty exp Node.pretty n
         | Assume(n,e,b) -> Format.fprintf fmt "@[Assume:@ %a %b -> %a@]" Cil_datatype.Exp.pretty e b Node.pretty n
         | EnterScope(n,vs) -> Format.fprintf fmt "@[EnterScope:@ %a -> %a@]"
                               (Pretty_utils.pp_list ~sep:"@ " Cil_datatype.Varinfo.pretty) vs Node.pretty n
@@ -98,7 +103,10 @@ module Edge = struct
       let hash = function
         | Top -> Hashtbl.hash 0
         | Assume(n,e,b) -> Hashtbl.seeded_hash n (Hashtbl.seeded_hash (Hashtbl.hash b) (Cil_datatype.Exp.hash e))
-        | Assign(n,s) -> Hashtbl.seeded_hash n (Hashtbl.seeded_hash 2 (Cil_datatype.Kinstr.hash s))
+        | Assign(n,loc,typ,exp) ->
+          (Hashtbl.seeded_hash (Cil_datatype.Exp.hash exp)
+             (Hashtbl.seeded_hash (Cil_datatype.Typ.hash typ)
+                (Hashtbl.seeded_hash n (Hashtbl.seeded_hash 2 (Cil_datatype.Lval.hash loc)))))
         | EnterScope(n,vs) ->
           let x = List.fold_left (fun acc e -> Hashtbl.seeded_hash acc (Cil_datatype.Varinfo.hash e)) 3 vs in
           Hashtbl.seeded_hash n x
@@ -196,7 +204,7 @@ module Traces = struct
   let add_edge c edge =
     let n = Edge.Counter.next () in
     let e = match edge with
-      | Assign (_,e) -> Assign(n,e)
+      | Assign (_,loc,typ,exp) -> Assign(n,loc,typ,exp)
       | Assume (_,a,b) -> Assume(n,a,b)
       | EnterScope (_,vs) -> EnterScope(n,vs)
       | LeaveScope (_,vs) -> LeaveScope(n,vs)
@@ -315,8 +323,8 @@ module Internal = struct
     type location = Precise_locs.precise_location
     type valuation = Valuation.t
 
-    let assign ki _lv _e _v _valuation state =
-      `Value(Traces.add_edge state (Assign(0,ki)))
+    let assign _ki lv e _v _valuation state =
+      `Value(Traces.add_edge state (Assign(0,lv.Eval.lval,lv.Eval.ltyp,e)))
 
     let assume _stmt e pos _valuation state =
       `Value(Traces.add_edge state (Assume(0,e,pos)))
@@ -353,7 +361,8 @@ module Internal = struct
   let introduce_globals _vars state = Traces.add_edge state (Msg(0,"introduce globals"))
   let initialize_variable lv _ ~initialized:_ _ state =
     Traces.add_edge state (Msg(0,Format.asprintf "initialize variable: %a" Printer.pp_lval lv ))
-  let initialize_variable_using_type _ _ state  = Traces.add_edge state (Msg(0,"initialize variable using type"))
+  let initialize_variable_using_type _ _ state  =
+    Traces.add_edge state (Msg(0,"initialize variable using type"))
 
   (* TODO *)
   let logic_assign _assign _location ~pre:_ _state = top
