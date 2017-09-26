@@ -1,76 +1,104 @@
 [kernel] Parsing tests/value/traces/test1.i (no preprocessing)
+tests/value/traces/test1.i:8:[kernel] warning: Calling undeclared function Frama_C_interval. Old style K&R code?
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed
 [value:initial-state] Values of globals at initialization
-  
-tests/value/traces/test1.i:14:[value] Frama_C_dump_each:
+  g ∈ {42}
+[value] computing for function Frama_C_interval <- main.
+        Called from tests/value/traces/test1.i:8.
+tests/value/traces/test1.i:8:[kernel] warning: Neither code nor specification for function Frama_C_interval, generating default assigns from the prototype
+[value] using specification for function Frama_C_interval
+[value] Done for function Frama_C_interval
+tests/value/traces/test1.i:17:[value] Frama_C_dump_each:
         # Cvalue domain:
+        g ∈ {42}
         c ∈ [--..--]
-        tmp ∈ {4; 5}
+        tmp ∈ {5; 45}
         # Value.Traces_domain.Traces.t:
         start: 0
-        {[ 0 -> ([ initialize variable using type -> 1 ])
-           1 -> ([ EnterScope: tmp -> 2 ])
-           2 -> ([ Assign: tmp = 0 -> 3 ])
-           3 -> ([ Assume: c false -> 4; Assume: c true -> 5 ])
-           4 -> ([ Assign: tmp = 2 -> 8 ])
-           5 -> ([ Assign: tmp = 1 -> 7 ])
-           7 -> ([ EnterScope: i -> 13 ])
-           8 -> ([ EnterScope: i -> 10 ])
-           10 -> ([ initialize variable: i -> 11 ])
-           11 -> ([ Assign: i = 0 -> 12 ])
-           12 -> ([ enter_loop -> 18 ])
-           13 -> ([ initialize variable: i -> 14 ])
-           14 -> ([ Assign: i = 0 -> 15 ])
-           15 -> ([ enter_loop -> 17 ])
-           17 -> ([ Assume: i < 3 true -> 20 ])
-           18 -> ([ Assume: i < 3 true -> 21 ])
-           20 -> ([ Assign: tmp = tmp + 1 -> 23 ])
-           21 -> ([ Assign: tmp = tmp + 1 -> 22 ])
-           22 -> ([ Assign: i = i + 1 -> 24 ])
-           23 -> ([ Assign: i = i + 1 -> 25 ])
-           24 -> ([ incr_loop_counter -> 28 ])
-           25 -> ([ incr_loop_counter -> 27 ])
-           27 -> ([ Assume: i < 3 true -> 31 ])
-           28 -> ([ Assume: i < 3 true -> 32 ])
-           31 -> ([ Assign: tmp = tmp + 1 -> 34 ])
-           32 -> ([ Assign: tmp = tmp + 1 -> 33 ])
-           33 -> ([ Assign: i = i + 1 -> 36 ])
-           34 -> ([ Assign: i = i + 1 -> 35 ])
-           35 -> ([ incr_loop_counter -> 40 ])
-           36 -> ([ incr_loop_counter -> 39 ])
-           39 -> ([ Assume: i < 3 true -> 43 ])
-           40 -> ([ Assume: i < 3 true -> 44 ])
-           43 -> ([ Assign: tmp = tmp + 1 -> 46 ])
-           44 -> ([ Assign: tmp = tmp + 1 -> 45 ])
-           45 -> ([ Assign: i = i + 1 -> 48 ])
-           46 -> ([ Assign: i = i + 1 -> 47 ])
-           47 -> ([ incr_loop_counter -> 52 ])
-           48 -> ([ incr_loop_counter -> 51 ])
-           51 -> ([ Assume: i < 3 false -> 55 ])
-           52 -> ([ Assume: i < 3 false -> 56 ])
-           55 -> ([ leave_loop -> 58 ])
-           56 -> ([ leave_loop -> 57 ])
-           57 -> ([ LeaveScope: i -> 60 ])
-           58 -> ([ LeaveScope: i -> 59 ])
-           59 -> ([ join -> 61 ])
-           60 -> ([ join -> 61 ]) ]}
-        current: 61]
+        {[ 0 -> ([ introduce globals -> 1 ])
+           1 -> ([ initialize variable: g -> 2 ])
+           2 -> ([ Assign: g = 42 -> 3 ])
+           3 -> ([ initialize variable using type Main_Formal
+        c -> 4 ])
+           4 -> ([ EnterScope: tmp -> 5 ])
+           5 -> ([ start_call: Frama_C_interval (false) -> 6 ])
+           6 -> ([ EnterScope: x_0 x_1 -> 7 ])
+           7 -> ([ Assign: x_0 = 0 -> 8 ])
+           8 -> ([ Assign: x_1 = 1 -> 9 ])
+           9 -> ([ EnterScope: \result<Frama_C_interval> -> 10 ])
+           10 -> ([ initialize variable using type Spec_Return(Frama_C_interval)
+        \result<Frama_C_interval> -> 11 ])
+           11 -> ([ logic assign -> 12 ])
+           12 -> ([ LeaveScope: x_0 x_1 -> 13 ])
+           13 -> ([ finalize_call: Frama_C_interval -> 14 ])
+           14 -> ([ Assign: c = \result<Frama_C_interval> -> 15 ])
+           15 -> ([ LeaveScope: \result<Frama_C_interval> -> 16 ])
+           16 -> ([ Assign: tmp = 0 -> 17 ])
+           17 -> ([ Assume: c false -> 18; Assume: c true -> 19 ])
+           18 -> ([ Assign: tmp = 2 -> 22 ])
+           19 -> ([ Assign: tmp = g -> 21 ])
+           21 -> ([ EnterScope: i -> 27 ])
+           22 -> ([ EnterScope: i -> 24 ])
+           24 -> ([ initialize variable: i -> 25 ])
+           25 -> ([ Assign: i = 0 -> 26 ])
+           26 -> ([ enter_loop -> 32 ])
+           27 -> ([ initialize variable: i -> 28 ])
+           28 -> ([ Assign: i = 0 -> 29 ])
+           29 -> ([ enter_loop -> 31 ])
+           31 -> ([ Assume: i < 3 true -> 34 ])
+           32 -> ([ Assume: i < 3 true -> 35 ])
+           34 -> ([ Assign: tmp = tmp + 1 -> 37 ])
+           35 -> ([ Assign: tmp = tmp + 1 -> 36 ])
+           36 -> ([ Assign: i = i + 1 -> 38 ])
+           37 -> ([ Assign: i = i + 1 -> 39 ])
+           38 -> ([ incr_loop_counter -> 42 ])
+           39 -> ([ incr_loop_counter -> 41 ])
+           41 -> ([ Assume: i < 3 true -> 45 ])
+           42 -> ([ Assume: i < 3 true -> 46 ])
+           45 -> ([ Assign: tmp = tmp + 1 -> 48 ])
+           46 -> ([ Assign: tmp = tmp + 1 -> 47 ])
+           47 -> ([ Assign: i = i + 1 -> 50 ])
+           48 -> ([ Assign: i = i + 1 -> 49 ])
+           49 -> ([ incr_loop_counter -> 54 ])
+           50 -> ([ incr_loop_counter -> 53 ])
+           53 -> ([ Assume: i < 3 true -> 57 ])
+           54 -> ([ Assume: i < 3 true -> 58 ])
+           57 -> ([ Assign: tmp = tmp + 1 -> 60 ])
+           58 -> ([ Assign: tmp = tmp + 1 -> 59 ])
+           59 -> ([ Assign: i = i + 1 -> 62 ])
+           60 -> ([ Assign: i = i + 1 -> 61 ])
+           61 -> ([ incr_loop_counter -> 66 ])
+           62 -> ([ incr_loop_counter -> 65 ])
+           65 -> ([ Assume: i < 3 false -> 69 ])
+           66 -> ([ Assume: i < 3 false -> 70 ])
+           69 -> ([ leave_loop -> 72 ])
+           70 -> ([ leave_loop -> 71 ])
+           71 -> ([ LeaveScope: i -> 74 ])
+           72 -> ([ LeaveScope: i -> 73 ])
+           73 -> ([ join -> 75 ])
+           74 -> ([ join -> 75 ]) ]}
+        current: 75]
         ==END OF DUMP==
 [value] Recording results for main
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value:final-states] Values at end of function main:
-  tmp ∈ {4; 5}
+  c ∈ [--..--]
+  tmp ∈ {5; 45}
 [from] Computing for function main
+[from] Computing for function Frama_C_interval <-main
+[from] Done for function Frama_C_interval
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
        These dependencies hold at termination for the executions that terminate:
+[from] Function Frama_C_interval:
+  \result FROM x_0; x_1
 [from] Function main:
-  \result FROM c
+  \result FROM \nothing
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function main:
-          tmp; i
+          c; tmp; i
 [inout] Inputs for function main:
-          \nothing
+          g

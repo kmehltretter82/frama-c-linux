@@ -135,6 +135,10 @@ type t = { start : int; current : int; graph : Graph.t}
 (* Lattice structure for the abstract state above *)
 module Traces = struct
 
+  (** impossible for normal values start must be bigger than current *)
+  let empty = { start = 0; current = 0; graph = Graph.empty }
+  let top = { start = 0; current = -1; graph = Graph.empty }
+
   (* Frama-C "datatype" for type [inout] *)
   include Datatype.Make_with_collections(struct
       include Datatype.Serializable_undefined
@@ -161,7 +165,9 @@ module Traces = struct
       let equal = Datatype.from_compare
 
       let pretty fmt m =
-        Format.fprintf fmt "@[<hv>@[start: %i@]@ %a@ @[current: %i]" m.start Graph.pretty m.graph m.current
+        if m == top then Format.fprintf fmt "TOP"
+        else
+          Format.fprintf fmt "@[<hv>@[start: %i@]@ %a@ @[current: %i]" m.start Graph.pretty m.graph m.current
 
       let hash m =
         Hashtbl.seeded_hash m.start (Hashtbl.seeded_hash m.current (Graph.hash m.graph))
@@ -169,10 +175,6 @@ module Traces = struct
       let copy c = c
 
     end)
-
-  (** impossible for normal values start must be bigger than current *)
-  let empty = { start = 0; current = 0; graph = Graph.empty }
-  let top = { start = 0; current = -1; graph = Graph.empty }
 
   let view m =
     if m == top then `Top
@@ -202,18 +204,20 @@ module Traces = struct
       ~decide:merge_edge g1 g2
 
   let add_edge c edge =
-    let n = Edge.Counter.next () in
-    let e = match edge with
-      | Assign (_,loc,typ,exp) -> Assign(n,loc,typ,exp)
-      | Assume (_,a,b) -> Assume(n,a,b)
-      | EnterScope (_,vs) -> EnterScope(n,vs)
-      | LeaveScope (_,vs) -> LeaveScope(n,vs)
-      | Msg (_,s) -> Msg(n,s)
-      | Top -> Top
-    in
-    let m = Graph.singleton c.current [e] in
-    let g = join_graph m c.graph in
-    { start = c.start; current = n; graph = g}
+    if c == top then c
+    else
+      let n = Edge.Counter.next () in
+      let e = match edge with
+        | Assign (_,loc,typ,exp) -> Assign(n,loc,typ,exp)
+        | Assume (_,a,b) -> Assume(n,a,b)
+        | EnterScope (_,vs) -> EnterScope(n,vs)
+        | LeaveScope (_,vs) -> LeaveScope(n,vs)
+        | Msg (_,s) -> Msg(n,s)
+        | Top -> Top
+      in
+      let m = Graph.singleton c.current [e] in
+      let g = join_graph m c.graph in
+      { start = c.start; current = n; graph = g}
 
 
   let is_included c1 c2 =
@@ -330,7 +334,8 @@ module Internal = struct
       `Value(Traces.add_edge state (Assume(0,e,pos)))
 
     let start_call _stmt call _valuation state =
-      let msg = Format.asprintf "start_call: %s" (Kernel_function.get_name call.Eval.kf) in
+      let msg = Format.asprintf "start_call: %s (%b)" (Kernel_function.get_name call.Eval.kf)
+          (Kernel_function.is_definition call.Eval.kf) in
       let state = Traces.add_edge state (Msg(0,msg)) in
       let formals = List.map (fun arg -> arg.Eval.formal) call.Eval.arguments in
       let state = Traces.add_edge state (EnterScope(0,formals)) in
@@ -369,11 +374,21 @@ module Internal = struct
   let introduce_globals _vars state = Traces.add_edge state (Msg(0,"introduce globals"))
   let initialize_variable lv _ ~initialized:_ _ state =
     Traces.add_edge state (Msg(0,Format.asprintf "initialize variable: %a" Printer.pp_lval lv ))
-  let initialize_variable_using_type _ _ state  =
-    Traces.add_edge state (Msg(0,"initialize variable using type"))
+  let initialize_variable_using_type init_kind varinfo state =
+    let msg = Format.asprintf "initialize@ variable@ using@ type@ %a@ %a"
+        (fun fmt init_kind ->
+           match init_kind with
+           | Abstract_domain.Main_Formal -> Format.pp_print_string fmt "Main_Formal"
+           | Abstract_domain.Library_Global -> Format.pp_print_string fmt "Library_Global"
+           | Abstract_domain.Spec_Return kf -> Format.fprintf fmt "Spec_Return(%s)" (Kernel_function.get_name kf))
+        init_kind
+        Cil_datatype.Varinfo.pretty varinfo
+    in
+    Traces.add_edge state (Msg(0,msg))
 
   (* TODO *)
-  let logic_assign _assign _location ~pre:_ _state = top
+  let logic_assign _assign _location ~pre:_ state =
+    Traces.add_edge state (Msg(0,"logic assign"))
 
   (* Logic *)
   let evaluate_predicate _ _ _ = Alarmset.Unknown
