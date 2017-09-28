@@ -1,51 +1,53 @@
 tests/format/printf.c:88:[kernel] warning: Floating-point constant 0.2 is not represented exactly. Will use 0x1.999999999999ap-3. See documentation for option -warn-decimal-float
 [e-acsl] beginning translation.
 [e-acsl] warning: annotating undefined function `abort':
-                  the generated program may miss memory instrumentation
-                  if there are memory-related annotations.
+    the generated program may miss memory instrumentation
+    if there are memory-related annotations.
 [e-acsl] warning: annotating undefined function `exit':
-                  the generated program may miss memory instrumentation
-                  if there are memory-related annotations.
+    the generated program may miss memory instrumentation
+    if there are memory-related annotations.
 [e-acsl] warning: annotating undefined function `strlen':
-                  the generated program may miss memory instrumentation
-                  if there are memory-related annotations.
+    the generated program may miss memory instrumentation
+    if there are memory-related annotations.
 [e-acsl] warning: annotating undefined function `strchr':
-                  the generated program may miss memory instrumentation
-                  if there are memory-related annotations.
+    the generated program may miss memory instrumentation
+    if there are memory-related annotations.
 [e-acsl] warning: annotating undefined function `strcpy':
-                  the generated program may miss memory instrumentation
-                  if there are memory-related annotations.
+    the generated program may miss memory instrumentation
+    if there are memory-related annotations.
 FRAMAC_SHARE/libc/stdio.h:150:[kernel] warning: Neither code nor specification for function printf, generating default assigns from the prototype
 FRAMAC_SHARE/libc/unistd.h:785:[kernel] warning: Neither code nor specification for function fork, generating default assigns from the prototype
-FRAMAC_SHARE/libc/sys/wait.h:57:[kernel] warning: Neither code nor specification for function waitpid, generating default assigns from the prototype
+FRAMAC_SHARE/libc/sys/wait.h:60:[kernel] warning: Neither code nor specification for function waitpid, generating default assigns from the prototype
 :0:[kernel] warning: Neither code nor specification for function __fc_vla_free, generating default assigns from the prototype
 :0:[kernel] warning: Neither code nor specification for function __fc_vla_alloc, generating default assigns from the prototype
-FRAMAC_SHARE/libc/string.h:221:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:222:[e-acsl] warning: E-ACSL construct `trange' is not yet supported. Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:224:[e-acsl] warning: E-ACSL construct `\separated' is not yet supported. Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:224:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:227:[e-acsl] warning: E-ACSL construct `logic function returning an integer' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:227:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:124:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:127:[e-acsl] warning: E-ACSL construct `user-defined logic type' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:134:[e-acsl] warning: E-ACSL construct `user-defined logic type' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:92:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:92:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:94:[e-acsl] warning: E-ACSL construct `logic function returning an integer' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:94:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:396:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-                  Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:309:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:310:[e-acsl] warning: E-ACSL construct `trange' is not yet supported. Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:312:[e-acsl] warning: E-ACSL construct `\separated' is not yet supported. Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:312:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:315:[e-acsl] warning: E-ACSL construct `logic function returning an integer' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:140:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:153:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:143:[e-acsl] warning: E-ACSL construct `user-defined logic type' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:143:[e-acsl] warning: E-ACSL construct `user-defined logic type' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:150:[e-acsl] warning: E-ACSL construct `user-defined logic type' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:108:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:108:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:110:[e-acsl] warning: E-ACSL construct `logic function returning an integer' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:110:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:415:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+    Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
@@ -54,13 +56,14 @@ FRAMAC_SHARE/libc/stdlib.h:396:[e-acsl] warning: E-ACSL construct `assigns claus
   __fc_rand_max ∈ {32767}
   __fc_heap_status ∈ [--..--]
   __e_acsl_init ∈ [--..--]
-  __fc_fopen[0..511] ∈ {0}
+  __fc_fopen[0..15] ∈ {0}
   __fc_p_fopen ∈ {{ &__fc_fopen[0] }}
   __e_acsl_internal_heap ∈ [--..--]
   __e_acsl_heap_allocation_size ∈ [--..--]
   __e_acsl_math_HUGE_VAL ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
   __e_acsl_math_HUGE_VALF ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
   __e_acsl_math_INFINITY ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  __fc_strtok_ptr ∈ {0}
   __fc_time ∈ [--..--]
   __fc_fds_state ∈ [--..--]
   __fc_fds[0..1023] ∈ {0}
@@ -410,8 +413,6 @@ FRAMAC_SHARE/libc/stdlib.h:396:[e-acsl] warning: E-ACSL construct `assigns claus
 [value] using specification for function __e_acsl_store_block
 [value] using specification for function __e_acsl_full_init
 [value] using specification for function __e_acsl_mark_readonly
-[value] user error: type long double wider than 64 bits not supported.
-                    Using double instead for the remainder of the analysis.
 [value] using specification for function fork
 tests/format/printf.c:179:[kernel] warning: Neither code nor specification for function __e_acsl_builtin_printf, generating default assigns from the prototype
 [value] using specification for function __e_acsl_builtin_printf
@@ -434,287 +435,7 @@ tests/format/printf.c:205:[value] warning: accessing uninitialized left-value. a
 [value] using specification for function __gmpz_cmp
 [value] using specification for function __gmpz_clear
 [value] using specification for function __e_acsl_assert
-FRAMAC_SHARE/e-acsl/e_acsl.h:115:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/format/printf.c:50:[value] warning: function __e_acsl_assert: precondition got status unknown.
 [value] using specification for function __builtin_alloca
-FRAMAC_SHARE/libc/string.h:222:[value] warning: function __gen_e_acsl_strcpy: precondition 'room_string' got status unknown.
-[value] using specification for function strcpy
-FRAMAC_SHARE/libc/string.h:227:[value] cannot evaluate ACSL term, unsupported ACSL construct: logic functions or predicates
-FRAMAC_SHARE/libc/string.h:227:[value] warning: function __gen_e_acsl_strcpy: postcondition got status unknown.
-FRAMAC_SHARE/libc/string.h:228:[value] warning: function __gen_e_acsl_strcpy: postcondition got status unknown.
-tests/format/printf.c:53:[value] entering loop for the first time
-tests/format/printf.c:55:[value] warning: out of bounds write. assert \valid(format + (int)(len - 1));
-FRAMAC_SHARE/libc/string.h:127:[value] cannot evaluate ACSL term, unsupported ACSL construct: logic functions or predicates
-FRAMAC_SHARE/libc/string.h:134:[value] cannot evaluate ACSL term, unsupported ACSL construct: logic functions or predicates
-[value] using specification for function __e_acsl_base_addr
-FRAMAC_SHARE/libc/string.h:132:[value] warning: function __gen_e_acsl_strchr, behavior found: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
-FRAMAC_SHARE/libc/string.h:135:[value] warning: function __gen_e_acsl_strchr, behavior not_found: postcondition got status invalid. (Behavior may be inactive, no reduction performed.)
-FRAMAC_SHARE/libc/string.h:124:[value] warning: builtin Frama_C_strchr: reading indeterminate data
-FRAMAC_SHARE/libc/string.h:128:[value] warning: function __gen_e_acsl_strchr, behavior found: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
-FRAMAC_SHARE/libc/string.h:129:[value] warning: function __gen_e_acsl_strchr, behavior found: postcondition got status invalid. (Behavior may be inactive, no reduction performed.)
-FRAMAC_SHARE/libc/string.h:130:[value] warning: function __gen_e_acsl_strchr, behavior found: postcondition got status invalid. (Behavior may be inactive, no reduction performed.)
-FRAMAC_SHARE/libc/string.h:131:[value] warning: function __gen_e_acsl_strchr, behavior found: postcondition got status invalid. (Behavior may be inactive, no reduction performed.)
-tests/format/printf.c:58:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status);
-FRAMAC_SHARE/libc/string.h:129:[value] warning: function __gen_e_acsl_strchr, behavior found: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
-FRAMAC_SHARE/libc/string.h:130:[value] warning: function __gen_e_acsl_strchr, behavior found: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
-FRAMAC_SHARE/libc/string.h:131:[value] warning: function __gen_e_acsl_strchr, behavior found: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
-FRAMAC_SHARE/libc/string.h:135:[value] warning: function __gen_e_acsl_strchr, behavior not_found: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
-[value] using specification for function abort
-tests/format/printf.c:61:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_0);
-tests/format/signalled.h:12:[value] warning: signed overflow. assert testno + 1 ≤ 2147483647;
-tests/format/printf.c:223:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_9);
-tests/format/printf.c:224:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_10);
-tests/format/printf.c:225:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_11);
-tests/format/printf.c:232:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_12);
-tests/format/printf.c:232:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_13);
-tests/format/printf.c:233:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_14);
-tests/format/printf.c:233:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_15);
-tests/format/printf.c:234:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_16);
-tests/format/printf.c:234:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_17);
-tests/format/printf.c:234:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_18);
-tests/format/printf.c:238:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_19);
-tests/format/printf.c:238:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_20);
-tests/format/printf.c:239:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_21);
-tests/format/printf.c:239:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_22);
-tests/format/printf.c:240:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_23);
-tests/format/printf.c:240:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_24);
-tests/format/printf.c:240:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_25);
-tests/format/printf.c:244:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_26);
-tests/format/printf.c:244:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_27);
-tests/format/printf.c:245:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_28);
-tests/format/printf.c:245:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_29);
-tests/format/printf.c:246:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_30);
-tests/format/printf.c:246:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_31);
-tests/format/printf.c:248:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_32);
-tests/format/printf.c:248:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_33);
-tests/format/printf.c:249:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_34);
-tests/format/printf.c:249:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_35);
-tests/format/printf.c:250:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_36);
-tests/format/printf.c:250:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_37);
-tests/format/printf.c:251:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_38);
-tests/format/printf.c:251:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_39);
-tests/format/printf.c:253:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_40);
-tests/format/printf.c:256:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_41);
-tests/format/printf.c:260:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_42);
-tests/format/printf.c:260:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_43);
-tests/format/printf.c:261:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_44);
-tests/format/printf.c:261:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_45);
-tests/format/printf.c:262:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_46);
-tests/format/printf.c:262:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_47);
-tests/format/printf.c:262:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_48);
-tests/format/printf.c:266:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_49);
-tests/format/printf.c:266:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_50);
-tests/format/printf.c:267:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_51);
-tests/format/printf.c:267:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_52);
-tests/format/printf.c:268:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_53);
-tests/format/printf.c:268:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_54);
-tests/format/printf.c:268:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_55);
-tests/format/printf.c:276:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_56);
-tests/format/printf.c:276:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_57);
-tests/format/printf.c:280:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_58);
-tests/format/printf.c:280:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_59);
-tests/format/printf.c:281:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_60);
-tests/format/printf.c:281:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_61);
-tests/format/printf.c:281:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_62);
-tests/format/printf.c:288:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_63);
-tests/format/printf.c:288:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_64);
-tests/format/printf.c:289:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_65);
-tests/format/printf.c:289:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_66);
-tests/format/printf.c:294:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_67);
-tests/format/printf.c:294:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_68);
-tests/format/printf.c:295:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_69);
-tests/format/printf.c:299:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_70);
-tests/format/printf.c:299:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_71);
-tests/format/printf.c:300:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_72);
-tests/format/printf.c:300:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_73);
-tests/format/printf.c:301:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_74);
-tests/format/printf.c:301:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_75);
-tests/format/printf.c:302:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_76);
-tests/format/printf.c:302:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_77);
-tests/format/printf.c:306:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_78);
-tests/format/printf.c:307:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_79);
-tests/format/printf.c:308:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_80);
-tests/format/printf.c:311:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_81);
-tests/format/printf.c:311:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_82);
-tests/format/printf.c:312:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_83);
-tests/format/printf.c:312:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_84);
-tests/format/printf.c:313:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_85);
-tests/format/printf.c:313:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_86);
-tests/format/printf.c:314:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_87);
-tests/format/printf.c:314:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_88);
-tests/format/printf.c:315:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_89);
-tests/format/printf.c:315:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_90);
-tests/format/printf.c:316:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_91);
-tests/format/printf.c:316:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_92);
-tests/format/printf.c:317:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_93);
-tests/format/printf.c:317:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_94);
-tests/format/printf.c:320:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_95);
-tests/format/printf.c:320:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_96);
-tests/format/printf.c:321:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_97);
-tests/format/printf.c:321:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_98);
-tests/format/printf.c:322:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_99);
-tests/format/printf.c:322:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_100);
-tests/format/printf.c:323:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_101);
-tests/format/printf.c:323:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_102);
-tests/format/printf.c:325:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_103);
-tests/format/printf.c:325:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_104);
-tests/format/printf.c:329:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_105);
-tests/format/printf.c:329:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_106);
-tests/format/printf.c:332:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_107);
-tests/format/printf.c:332:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_108);
-tests/format/printf.c:332:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_109);
-tests/format/printf.c:332:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_110);
-tests/format/printf.c:333:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_111);
-tests/format/printf.c:333:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_112);
-tests/format/printf.c:333:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_113);
-tests/format/printf.c:333:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_114);
-tests/format/printf.c:334:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_115);
-tests/format/printf.c:334:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_116);
-tests/format/printf.c:334:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_117);
-tests/format/printf.c:334:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_118);
-tests/format/printf.c:335:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_119);
-tests/format/printf.c:335:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_120);
-tests/format/printf.c:335:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_121);
-tests/format/printf.c:335:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_122);
-tests/format/printf.c:336:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_123);
-tests/format/printf.c:336:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_124);
-tests/format/printf.c:336:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_125);
-tests/format/printf.c:336:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_126);
-tests/format/printf.c:337:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_127);
-tests/format/printf.c:337:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_128);
-tests/format/printf.c:337:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_129);
-tests/format/printf.c:337:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_130);
-tests/format/printf.c:340:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_131);
-tests/format/printf.c:340:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_132);
-tests/format/printf.c:340:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_133);
-tests/format/printf.c:340:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_134);
-tests/format/printf.c:341:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_135);
-tests/format/printf.c:341:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_136);
-tests/format/printf.c:341:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_137);
-tests/format/printf.c:341:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_138);
-tests/format/printf.c:343:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_139);
-tests/format/printf.c:343:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_140);
-tests/format/printf.c:343:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_141);
-tests/format/printf.c:343:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_142);
-tests/format/printf.c:345:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_143);
-tests/format/printf.c:345:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_144);
-tests/format/printf.c:345:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_145);
-tests/format/printf.c:345:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_146);
-tests/format/printf.c:346:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_147);
-tests/format/printf.c:346:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_148);
-tests/format/printf.c:346:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_149);
-tests/format/printf.c:346:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_150);
-tests/format/printf.c:347:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_151);
-tests/format/printf.c:347:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_152);
-tests/format/printf.c:347:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_153);
-tests/format/printf.c:347:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_154);
-tests/format/printf.c:349:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_155);
-tests/format/printf.c:349:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_156);
-tests/format/printf.c:349:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_157);
-tests/format/printf.c:349:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_158);
-tests/format/printf.c:353:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_159);
-tests/format/printf.c:353:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_160);
-tests/format/printf.c:354:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_161);
-tests/format/printf.c:354:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_162);
-tests/format/printf.c:355:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_163);
-tests/format/printf.c:355:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_164);
-tests/format/printf.c:356:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_165);
-tests/format/printf.c:356:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_166);
-tests/format/printf.c:357:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_167);
-tests/format/printf.c:357:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_168);
-tests/format/printf.c:358:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_169);
-tests/format/printf.c:358:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_170);
-tests/format/printf.c:359:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_171);
-tests/format/printf.c:359:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_172);
-tests/format/printf.c:360:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_173);
-tests/format/printf.c:360:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_174);
-tests/format/printf.c:361:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_175);
-tests/format/printf.c:361:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_176);
-tests/format/printf.c:362:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_177);
-tests/format/printf.c:362:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_178);
-tests/format/printf.c:363:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_179);
-tests/format/printf.c:363:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_180);
-tests/format/printf.c:364:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_181);
-tests/format/printf.c:364:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_182);
-tests/format/printf.c:365:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_183);
-tests/format/printf.c:365:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_184);
-tests/format/printf.c:366:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_185);
-tests/format/printf.c:366:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_186);
-tests/format/printf.c:367:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_187);
-tests/format/printf.c:367:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_188);
-tests/format/printf.c:368:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_189);
-tests/format/printf.c:368:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_190);
-tests/format/printf.c:371:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_191);
-tests/format/printf.c:371:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_192);
-tests/format/printf.c:372:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_193);
-tests/format/printf.c:372:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_194);
-tests/format/printf.c:373:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_195);
-tests/format/printf.c:373:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_196);
-tests/format/printf.c:374:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_197);
-tests/format/printf.c:374:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_198);
-tests/format/printf.c:375:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_199);
-tests/format/printf.c:375:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_200);
-tests/format/printf.c:376:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_201);
-tests/format/printf.c:376:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_202);
-tests/format/printf.c:377:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_203);
-tests/format/printf.c:377:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_204);
-tests/format/printf.c:378:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_205);
-tests/format/printf.c:378:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_206);
-tests/format/printf.c:379:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_207);
-tests/format/printf.c:379:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_208);
-tests/format/printf.c:380:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_209);
-tests/format/printf.c:380:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_210);
-tests/format/printf.c:381:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_211);
-tests/format/printf.c:381:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_212);
-tests/format/printf.c:382:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_213);
-tests/format/printf.c:382:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_214);
-tests/format/printf.c:383:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_215);
-tests/format/printf.c:383:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_216);
-tests/format/printf.c:384:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_217);
-tests/format/printf.c:384:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_218);
-tests/format/printf.c:385:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_219);
-tests/format/printf.c:385:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_220);
-tests/format/printf.c:386:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_221);
-tests/format/printf.c:386:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_222);
-tests/format/printf.c:389:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_223);
-tests/format/printf.c:390:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_224);
-tests/format/printf.c:391:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_225);
-tests/format/printf.c:392:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_226);
-tests/format/printf.c:393:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_227);
-tests/format/printf.c:394:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_228);
-tests/format/printf.c:395:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_229);
-tests/format/printf.c:398:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_230);
-tests/format/printf.c:399:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_231);
-tests/format/printf.c:406:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_232);
-tests/format/printf.c:407:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_233);
-tests/format/printf.c:408:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_234);
-tests/format/printf.c:409:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_235);
-tests/format/printf.c:414:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_236);
-tests/format/printf.c:415:[value] warning: accessing uninitialized left-value. assert \initialized(&s2);
-tests/format/printf.c:415:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_237);
-tests/format/printf.c:418:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_238);
-tests/format/printf.c:420:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_239);
-tests/format/printf.c:423:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_240);
-tests/format/printf.c:424:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_241);
-tests/format/printf.c:425:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_242);
-tests/format/printf.c:426:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_243);
-tests/format/printf.c:427:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_244);
-tests/format/printf.c:452:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_245);
-tests/format/printf.c:453:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_246);
-tests/format/printf.c:454:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_247);
-tests/format/printf.c:457:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_248);
-tests/format/printf.c:458:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_249);
-tests/format/printf.c:459:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_250);
-tests/format/printf.c:460:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_251);
-tests/format/printf.c:463:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_252);
-tests/format/printf.c:464:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_253);
-tests/format/printf.c:465:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_254);
-tests/format/printf.c:466:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_255);
-tests/format/printf.c:467:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_256);
-tests/format/printf.c:468:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_257);
-tests/format/printf.c:469:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_258);
-tests/format/printf.c:470:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_259);
-tests/format/printf.c:471:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_260);
-tests/format/printf.c:472:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_261);
-tests/format/printf.c:475:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_262);
-[value] using specification for function __e_acsl_memory_clean
+tests/format/printf.c:51:[value] warning: function __gen_e_acsl_strcpy: precondition 'room_string' got status invalid.
 [value] done for function main

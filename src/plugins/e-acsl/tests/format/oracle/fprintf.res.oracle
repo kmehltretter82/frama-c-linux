@@ -3,34 +3,34 @@ tests/format/fprintf.c:13:[kernel] warning: Calling undeclared function mktemp. 
 tests/format/fprintf.c:17:[kernel] warning: Calling undeclared function fork. Old style K&R code?
 [e-acsl] beginning translation.
 [e-acsl] warning: annotating undefined function `exit':
-                  the generated program may miss memory instrumentation
-                  if there are memory-related annotations.
+    the generated program may miss memory instrumentation
+    if there are memory-related annotations.
 [e-acsl] warning: annotating undefined function `remove':
-                  the generated program may miss memory instrumentation
-                  if there are memory-related annotations.
+    the generated program may miss memory instrumentation
+    if there are memory-related annotations.
 [e-acsl] warning: annotating undefined function `fclose':
-                  the generated program may miss memory instrumentation
-                  if there are memory-related annotations.
+    the generated program may miss memory instrumentation
+    if there are memory-related annotations.
 [e-acsl] warning: annotating undefined function `fopen':
-                  the generated program may miss memory instrumentation
-                  if there are memory-related annotations.
+    the generated program may miss memory instrumentation
+    if there are memory-related annotations.
 FRAMAC_SHARE/libc/stdio.h:146:[kernel] warning: Neither code nor specification for function fprintf, generating default assigns from the prototype
 FRAMAC_SHARE/libc/stdio.h:150:[kernel] warning: Neither code nor specification for function printf, generating default assigns from the prototype
 FRAMAC_SHARE/libc/stdio.h:152:[kernel] warning: Neither code nor specification for function snprintf, generating default assigns from the prototype
 FRAMAC_SHARE/libc/stdio.h:154:[kernel] warning: Neither code nor specification for function sprintf, generating default assigns from the prototype
 FRAMAC_SHARE/libc/stdio.h:335:[kernel] warning: Neither code nor specification for function dprintf, generating default assigns from the prototype
-FRAMAC_SHARE/libc/sys/wait.h:57:[kernel] warning: Neither code nor specification for function waitpid, generating default assigns from the prototype
+FRAMAC_SHARE/libc/sys/wait.h:60:[kernel] warning: Neither code nor specification for function waitpid, generating default assigns from the prototype
 tests/format/fprintf.c:12:[kernel] warning: Neither code nor specification for function strcpy, generating default assigns from the prototype
 tests/format/fprintf.c:13:[kernel] warning: Neither code nor specification for function mktemp, generating default assigns from the prototype
 tests/format/fprintf.c:17:[kernel] warning: Neither code nor specification for function fork, generating default assigns from the prototype
-FRAMAC_SHARE/libc/stdlib.h:394:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-                  Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:413:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+    Ignoring annotation.
 FRAMAC_SHARE/libc/stdio.h:109:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-                  Ignoring annotation.
+    Ignoring annotation.
 FRAMAC_SHARE/libc/stdio.h:87:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-                  Ignoring annotation.
+    Ignoring annotation.
 FRAMAC_SHARE/libc/stdio.h:89:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-                  Ignoring annotation.
+    Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
@@ -40,7 +40,7 @@ FRAMAC_SHARE/libc/stdio.h:89:[e-acsl] warning: E-ACSL construct `assigns clause 
   __fc_heap_status ∈ [--..--]
   __e_acsl_init ∈ [--..--]
   stdout ∈ {{ NULL ; &S___fc_stdout[0] }}
-  __fc_fopen[0..511] ∈ {0}
+  __fc_fopen[0..15] ∈ {0}
   __fc_p_fopen ∈ {{ &__fc_fopen[0] }}
   __e_acsl_internal_heap ∈ [--..--]
   __e_acsl_heap_allocation_size ∈ [--..--]
@@ -104,7 +104,7 @@ tests/format/fprintf.c:18:[value] warning: accessing uninitialized left-value. a
 tests/format/fprintf.c:21:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_1);
 [value] using specification for function __e_acsl_valid
 [value] using specification for function __e_acsl_assert
-FRAMAC_SHARE/e-acsl/e_acsl.h:115:[value] warning: function __e_acsl_assert: precondition got status unknown.
+FRAMAC_SHARE/libc/stdio.h:87:[value] warning: function __e_acsl_assert: precondition got status unknown.
 [value] using specification for function fclose
 tests/format/fprintf.c:23:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_2);
 tests/format/fprintf.c:24:[value] warning: Completely invalid destination for assigns clause *stream. Ignoring.

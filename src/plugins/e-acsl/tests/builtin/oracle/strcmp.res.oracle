@@ -1,49 +1,49 @@
 tests/builtin/strcmp.c:32:[kernel] warning: Calling undeclared function fork. Old style K&R code?
 [e-acsl] beginning translation.
 [e-acsl] warning: annotating undefined function `abort':
-                  the generated program may miss memory instrumentation
-                  if there are memory-related annotations.
+    the generated program may miss memory instrumentation
+    if there are memory-related annotations.
 [e-acsl] warning: annotating undefined function `exit':
-                  the generated program may miss memory instrumentation
-                  if there are memory-related annotations.
+    the generated program may miss memory instrumentation
+    if there are memory-related annotations.
 [e-acsl] warning: annotating undefined function `strcmp':
-                  the generated program may miss memory instrumentation
-                  if there are memory-related annotations.
+    the generated program may miss memory instrumentation
+    if there are memory-related annotations.
 [e-acsl] warning: annotating undefined function `strncmp':
-                  the generated program may miss memory instrumentation
-                  if there are memory-related annotations.
+    the generated program may miss memory instrumentation
+    if there are memory-related annotations.
 [e-acsl] warning: annotating undefined function `strdup':
-                  the generated program may miss memory instrumentation
-                  if there are memory-related annotations.
+    the generated program may miss memory instrumentation
+    if there are memory-related annotations.
 FRAMAC_SHARE/libc/stdio.h:146:[kernel] warning: Neither code nor specification for function fprintf, generating default assigns from the prototype
 FRAMAC_SHARE/libc/stdio.h:150:[kernel] warning: Neither code nor specification for function printf, generating default assigns from the prototype
-FRAMAC_SHARE/libc/sys/wait.h:57:[kernel] warning: Neither code nor specification for function waitpid, generating default assigns from the prototype
+FRAMAC_SHARE/libc/sys/wait.h:60:[kernel] warning: Neither code nor specification for function waitpid, generating default assigns from the prototype
 tests/builtin/strcmp.c:32:[kernel] warning: Neither code nor specification for function fork, generating default assigns from the prototype
-FRAMAC_SHARE/libc/string.h:308:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:308:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:310:[e-acsl] warning: E-ACSL construct `trange' is not yet supported. Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:111:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:112:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:112:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:114:[e-acsl] warning: E-ACSL construct `logic function returning an integer' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:104:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:105:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:105:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:107:[e-acsl] warning: E-ACSL construct `logic function returning an integer' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:107:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-                  Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:396:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-                  Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:396:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:396:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:399:[e-acsl] warning: E-ACSL construct `trange' is not yet supported. Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:127:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:128:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:128:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:130:[e-acsl] warning: E-ACSL construct `logic function returning an integer' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:120:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:121:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:121:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:123:[e-acsl] warning: E-ACSL construct `logic function returning an integer' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:123:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/stdlib.h:415:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+    Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
@@ -52,16 +52,17 @@ FRAMAC_SHARE/libc/stdlib.h:396:[e-acsl] warning: E-ACSL construct `assigns claus
   __fc_rand_max ∈ {32767}
   __fc_heap_status ∈ [--..--]
   __e_acsl_init ∈ [--..--]
-  __fc_fopen[0..511] ∈ {0}
+  stderr ∈ {{ NULL ; &S___fc_stderr[0] }}
+  __fc_fopen[0..15] ∈ {0}
   __fc_p_fopen ∈ {{ &__fc_fopen[0] }}
   __e_acsl_internal_heap ∈ [--..--]
   __e_acsl_heap_allocation_size ∈ [--..--]
   __e_acsl_math_HUGE_VAL ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
   __e_acsl_math_HUGE_VALF ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
   __e_acsl_math_INFINITY ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
-  stderr ∈ {{ NULL ; &S___fc_stderr[0] }}
   __fc_time ∈ [--..--]
   testno ∈ {0}
+  __fc_strtok_ptr ∈ {0}
   __gen_e_acsl_literal_string ∈ {0}
   __gen_e_acsl_literal_string_2 ∈ {0}
   __gen_e_acsl_literal_string_3 ∈ {0}
@@ -100,34 +101,9 @@ FRAMAC_SHARE/libc/stdlib.h:396:[e-acsl] warning: E-ACSL construct `assigns claus
 [value] using specification for function __e_acsl_full_init
 [value] using specification for function __e_acsl_mark_readonly
 [value] using specification for function strdup
-FRAMAC_SHARE/libc/string.h:312:[value] warning: no 'assigns \result \from ...' clause specified for function strdup
-FRAMAC_SHARE/libc/string.h:310:[value] cannot evaluate ACSL term, unsupported ACSL construct: logic functions or predicates
-[value] using specification for function __e_acsl_delete_block
-FRAMAC_SHARE/libc/string.h:310:[value] warning: function __gen_e_acsl_strdup: postcondition got status unknown.
-[value] using specification for function fork
-[value] using specification for function __e_acsl_builtin_strcmp
-FRAMAC_SHARE/libc/string.h:107:[value] cannot evaluate ACSL term, unsupported ACSL construct: logic functions or predicates
-FRAMAC_SHARE/libc/string.h:107:[value] warning: function __gen_e_acsl_strcmp: postcondition got status unknown.
-[value] using specification for function fprintf
-[value] using specification for function abort
-[value] using specification for function exit
-[value] using specification for function waitpid
-tests/builtin/strcmp.c:32:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status);
-[value] using specification for function printf
-tests/builtin/strcmp.c:33:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_0);
-FRAMAC_SHARE/libc/string.h:104:[value] warning: function __gen_e_acsl_strcmp: precondition 'valid_string_s1' got status unknown.
-FRAMAC_SHARE/libc/string.h:105:[value] warning: function __gen_e_acsl_strcmp: precondition 'valid_string_s2' got status unknown.
-FRAMAC_SHARE/libc/string.h:104:[value] warning: function __e_acsl_builtin_strcmp: precondition 'valid_string_s1' got status unknown.
-FRAMAC_SHARE/libc/string.h:105:[value] warning: function __e_acsl_builtin_strcmp: precondition 'valid_string_s2' got status unknown.
-tests/builtin/strcmp.c:34:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_1);
-[value] using specification for function __e_acsl_initialize
-FRAMAC_SHARE/libc/string.h:104:[value] warning: function __gen_e_acsl_strcmp: precondition 'valid_string_s1' got status invalid.
-tests/builtin/strcmp.c:36:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_2);
-FRAMAC_SHARE/libc/string.h:105:[value] warning: function __gen_e_acsl_strcmp: precondition 'valid_string_s2' got status invalid.
-tests/builtin/strcmp.c:37:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_3);
-tests/builtin/strcmp.c:38:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_4);
-tests/builtin/strcmp.c:39:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_5);
-tests/builtin/strcmp.c:41:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_6);
-tests/builtin/strcmp.c:42:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_7);
-tests/builtin/strcmp.c:44:[value] warning: Wrong free: assert(pass a freeable address)
+FRAMAC_SHARE/libc/string.h:401:[value] warning: no 'assigns \result \from ...' clause specified for function strdup
+FRAMAC_SHARE/libc/string.h:396:[value] warning: ignoring unsupported \allocates clause
+FRAMAC_SHARE/libc/string.h:399:[value] warning: function strdup: this postcondition evaluates to false in this context.
+    If it is valid, either a precondition was not verified for this call,
+    or some assigns/from clauses are incomplete (or incorrect).
 [value] done for function main

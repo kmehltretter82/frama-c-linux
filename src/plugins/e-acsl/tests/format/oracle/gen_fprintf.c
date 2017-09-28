@@ -230,7 +230,7 @@ void __e_acsl_globals_init(void)
   __e_acsl_full_init((void *)(& __fc_time));
   __e_acsl_store_block((void *)(& __fc_p_fopen),(size_t)8);
   __e_acsl_full_init((void *)(& __fc_p_fopen));
-  __e_acsl_store_block((void *)(__fc_fopen),(size_t)4096);
+  __e_acsl_store_block((void *)(__fc_fopen),(size_t)128);
   __e_acsl_full_init((void *)(& __fc_fopen));
   __e_acsl_store_block((void *)(& stdout),(size_t)8);
   __e_acsl_full_init((void *)(& stdout));
@@ -276,7 +276,7 @@ int main(int argc, char const **argv)
       int process_status;
       __e_acsl_store_block((void *)(& process_status),(size_t)4);
       waitpid(pid,& process_status,0);
-      /*@ assert Value: initialisation: \initialized(&process_status); */
+      /*@ assert Value: initialization: \initialized(&process_status); */
       signal_eval(process_status,0,__gen_e_acsl_literal_string_9);
       __e_acsl_delete_block((void *)(& process_status));
     }
@@ -299,7 +299,7 @@ int main(int argc, char const **argv)
       int process_status_0;
       __e_acsl_store_block((void *)(& process_status_0),(size_t)4);
       waitpid(pid_0,& process_status_0,0);
-      /*@ assert Value: initialisation: \initialized(&process_status_0); */
+      /*@ assert Value: initialization: \initialized(&process_status_0); */
       signal_eval(process_status_0,1,__gen_e_acsl_literal_string_10);
       __e_acsl_delete_block((void *)(& process_status_0));
     }
@@ -328,7 +328,7 @@ int main(int argc, char const **argv)
         int process_status_1;
         __e_acsl_store_block((void *)(& process_status_1),(size_t)4);
         waitpid(pid_1,& process_status_1,0);
-        /*@ assert Value: initialisation: \initialized(&process_status_1); */
+        /*@ assert Value: initialization: \initialized(&process_status_1); */
         signal_eval(process_status_1,0,__gen_e_acsl_literal_string_14);
         __e_acsl_delete_block((void *)(& process_status_1));
       }
@@ -353,7 +353,7 @@ int main(int argc, char const **argv)
         int process_status_2;
         __e_acsl_store_block((void *)(& process_status_2),(size_t)4);
         waitpid(pid_2,& process_status_2,0);
-        /*@ assert Value: initialisation: \initialized(&process_status_2); */
+        /*@ assert Value: initialization: \initialized(&process_status_2); */
         signal_eval(process_status_2,1,__gen_e_acsl_literal_string_15);
         __e_acsl_delete_block((void *)(& process_status_2));
       }
@@ -378,7 +378,7 @@ int main(int argc, char const **argv)
         int process_status_3;
         __e_acsl_store_block((void *)(& process_status_3),(size_t)4);
         waitpid(pid_3,& process_status_3,0);
-        /*@ assert Value: initialisation: \initialized(&process_status_3); */
+        /*@ assert Value: initialization: \initialized(&process_status_3); */
         signal_eval(process_status_3,1,__gen_e_acsl_literal_string_16);
         __e_acsl_delete_block((void *)(& process_status_3));
       }
@@ -403,7 +403,7 @@ int main(int argc, char const **argv)
       int process_status_4;
       __e_acsl_store_block((void *)(& process_status_4),(size_t)4);
       waitpid(pid_4,& process_status_4,0);
-      /*@ assert Value: initialisation: \initialized(&process_status_4); */
+      /*@ assert Value: initialization: \initialized(&process_status_4); */
       signal_eval(process_status_4,0,__gen_e_acsl_literal_string_17);
       __e_acsl_delete_block((void *)(& process_status_4));
     }
@@ -426,7 +426,7 @@ int main(int argc, char const **argv)
       int process_status_5;
       __e_acsl_store_block((void *)(& process_status_5),(size_t)4);
       waitpid(pid_5,& process_status_5,0);
-      /*@ assert Value: initialisation: \initialized(&process_status_5); */
+      /*@ assert Value: initialization: \initialized(&process_status_5); */
       signal_eval(process_status_5,1,__gen_e_acsl_literal_string_18);
       __e_acsl_delete_block((void *)(& process_status_5));
     }
@@ -450,7 +450,7 @@ int main(int argc, char const **argv)
       int process_status_6;
       __e_acsl_store_block((void *)(& process_status_6),(size_t)4);
       waitpid(pid_6,& process_status_6,0);
-      /*@ assert Value: initialisation: \initialized(&process_status_6); */
+      /*@ assert Value: initialization: \initialized(&process_status_6); */
       signal_eval(process_status_6,0,__gen_e_acsl_literal_string_21);
       __e_acsl_delete_block((void *)(& process_status_6));
     }
@@ -474,7 +474,7 @@ int main(int argc, char const **argv)
       int process_status_7;
       __e_acsl_store_block((void *)(& process_status_7),(size_t)4);
       waitpid(pid_7,& process_status_7,0);
-      /*@ assert Value: initialisation: \initialized(&process_status_7); */
+      /*@ assert Value: initialization: \initialized(&process_status_7); */
       signal_eval(process_status_7,0,__gen_e_acsl_literal_string_23);
       __e_acsl_delete_block((void *)(& process_status_7));
     }
@@ -498,7 +498,7 @@ int main(int argc, char const **argv)
       int process_status_8;
       __e_acsl_store_block((void *)(& process_status_8),(size_t)4);
       waitpid(pid_8,& process_status_8,0);
-      /*@ assert Value: initialisation: \initialized(&process_status_8); */
+      /*@ assert Value: initialization: \initialized(&process_status_8); */
       signal_eval(process_status_8,1,__gen_e_acsl_literal_string_25);
       __e_acsl_delete_block((void *)(& process_status_8));
     }
@@ -522,7 +522,7 @@ int main(int argc, char const **argv)
       int process_status_9;
       __e_acsl_store_block((void *)(& process_status_9),(size_t)4);
       waitpid(pid_9,& process_status_9,0);
-      /*@ assert Value: initialisation: \initialized(&process_status_9); */
+      /*@ assert Value: initialization: \initialized(&process_status_9); */
       signal_eval(process_status_9,1,__gen_e_acsl_literal_string_26);
       __e_acsl_delete_block((void *)(& process_status_9));
     }
@@ -546,7 +546,7 @@ int main(int argc, char const **argv)
       int process_status_10;
       __e_acsl_store_block((void *)(& process_status_10),(size_t)4);
       waitpid(pid_10,& process_status_10,0);
-      /*@ assert Value: initialisation: \initialized(&process_status_10); */
+      /*@ assert Value: initialization: \initialized(&process_status_10); */
       signal_eval(process_status_10,1,__gen_e_acsl_literal_string_27);
       __e_acsl_delete_block((void *)(& process_status_10));
     }
@@ -571,7 +571,7 @@ int main(int argc, char const **argv)
       int process_status_11;
       __e_acsl_store_block((void *)(& process_status_11),(size_t)4);
       waitpid(pid_11,& process_status_11,0);
-      /*@ assert Value: initialisation: \initialized(&process_status_11); */
+      /*@ assert Value: initialization: \initialized(&process_status_11); */
       signal_eval(process_status_11,0,__gen_e_acsl_literal_string_28);
       __e_acsl_delete_block((void *)(& process_status_11));
     }
@@ -596,7 +596,7 @@ int main(int argc, char const **argv)
       int process_status_12;
       __e_acsl_store_block((void *)(& process_status_12),(size_t)4);
       waitpid(pid_12,& process_status_12,0);
-      /*@ assert Value: initialisation: \initialized(&process_status_12); */
+      /*@ assert Value: initialization: \initialized(&process_status_12); */
       signal_eval(process_status_12,0,__gen_e_acsl_literal_string_29);
       __e_acsl_delete_block((void *)(& process_status_12));
     }
@@ -621,7 +621,7 @@ int main(int argc, char const **argv)
       int process_status_13;
       __e_acsl_store_block((void *)(& process_status_13),(size_t)4);
       waitpid(pid_13,& process_status_13,0);
-      /*@ assert Value: initialisation: \initialized(&process_status_13); */
+      /*@ assert Value: initialization: \initialized(&process_status_13); */
       signal_eval(process_status_13,1,__gen_e_acsl_literal_string_30);
       __e_acsl_delete_block((void *)(& process_status_13));
     }
@@ -646,7 +646,7 @@ int main(int argc, char const **argv)
       int process_status_14;
       __e_acsl_store_block((void *)(& process_status_14),(size_t)4);
       waitpid(pid_14,& process_status_14,0);
-      /*@ assert Value: initialisation: \initialized(&process_status_14); */
+      /*@ assert Value: initialization: \initialized(&process_status_14); */
       signal_eval(process_status_14,1,__gen_e_acsl_literal_string_31);
       __e_acsl_delete_block((void *)(& process_status_14));
     }
@@ -671,7 +671,7 @@ int main(int argc, char const **argv)
       int process_status_15;
       __e_acsl_store_block((void *)(& process_status_15),(size_t)4);
       waitpid(pid_15,& process_status_15,0);
-      /*@ assert Value: initialisation: \initialized(&process_status_15); */
+      /*@ assert Value: initialization: \initialized(&process_status_15); */
       signal_eval(process_status_15,1,__gen_e_acsl_literal_string_32);
       __e_acsl_delete_block((void *)(& process_status_15));
     }
@@ -696,7 +696,7 @@ int main(int argc, char const **argv)
       int process_status_16;
       __e_acsl_store_block((void *)(& process_status_16),(size_t)4);
       waitpid(pid_16,& process_status_16,0);
-      /*@ assert Value: initialisation: \initialized(&process_status_16); */
+      /*@ assert Value: initialization: \initialized(&process_status_16); */
       signal_eval(process_status_16,0,__gen_e_acsl_literal_string_33);
       __e_acsl_delete_block((void *)(& process_status_16));
     }
