@@ -30,6 +30,9 @@ open Cil_datatype
 (* ************************************************************************** *)
 
 exception Unregistered_library_function of string
+val get_lib_fun_vi: string -> varinfo
+(** Return varinfo corresponding to a name of a given library function *)
+
 val mk_call: loc:Location.t -> ?result:lval -> string -> exp list -> stmt
 (** Call an E-ACSL library function or an E-ACSL built-in.
     @raise Unregistered_library_function if the given string does not represent
