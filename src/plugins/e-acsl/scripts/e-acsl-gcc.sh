@@ -252,6 +252,10 @@ mmodel_features() {
     flags="$flags -DE_ACSL_NO_TRACE"
   fi
 
+  if [ -n "$OPTION_VALIDATE_FORMAT_STRINGS" ]; then
+    flags="$flags -DE_ACSL_VALIDATE_FORMAT_STRINGS"
+  fi
+
   echo $flags
 }
 
@@ -265,7 +269,7 @@ LONGOPTIONS="help,compile,compile-only,debug:,ocode:,oexec:,verbose:,
   frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:,
   print-mmodels,rt-debug,rte-select:,then,e-acsl-extra:,check,fail-with-code:,
   temporal,weak-validity,stack-size:,heap-size:,rt-verbose,free-valid-address,
-  external-assert:,no-trace"
+  external-assert:,validate-format-strings,no-trace,libc-replacements"
 SHORTOPTIONS="h,c,C,d:,D,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,I:,G:,X,a:,T,k,V"
 # Prefix for an error message due to wrong arguments
 ERROR="ERROR parsing arguments:"
@@ -299,13 +303,15 @@ OPTION_RTE=                              # Enable assertion generation
 OPTION_FAIL_WITH_CODE=                   # Exit status code for failures
 OPTION_CHECK=                            # Check AST integrity
 OPTION_NO_TRACE=                         # Disable trace in debug mode
-OPTION_FRAMAC_CPP_EXTRA=""               # Extra CPP flags for Frama-C
-OPTION_FREE_VALID_ADDRESS="" # Fail if NULL is used as input to free function
-OPTION_RTE_SELECT=       # Generate assertions for these functions only
-OPTION_THEN=             # Adds -then in front of -e-acsl in FC command.
-OPTION_STACK_SIZE=32     # Size of a heap shadow space (in MB)
-OPTION_HEAP_SIZE=128     # Size of a stack shadow space (in MB)
-OPTION_KEEP_GOING=       # Report failing assertions but do not abort execution
+OPTION_FRAMAC_CPP_EXTRA=                 # Extra CPP flags for Frama-C
+OPTION_FREE_VALID_ADDRESS=  # Fail if NULL is used as input to free
+OPTION_VALIDATE_FORMAT_STRINGS= # Runtime format string validation
+OPTION_LIBC_REPLACEMENTS= # Replace libc functions with RTL definitions
+OPTION_RTE_SELECT=        # Generate assertions for these functions only
+OPTION_THEN=              # Adds -then in front of -e-acsl in FC command.
+OPTION_STACK_SIZE=32      # Size of a heap shadow space (in MB)
+OPTION_HEAP_SIZE=128      # Size of a stack shadow space (in MB)
+OPTION_KEEP_GOING=        # Report failing assertions but do not abort execution
 OPTION_EXTERNAL_ASSERT="" # Use custom definition of assert function
 
 SUPPORTED_MMODELS="bittree,segment" # Supported memory model names
@@ -611,6 +617,17 @@ do
       OPTION_EXTERNAL_ASSERT="$1"
       shift;
     ;;
+    # Check output format functions
+    --validate-format-strings)
+      shift;
+      OPTION_VALIDATE_FORMAT_STRINGS="-e-acsl-validate-format-strings"
+    ;;
+    # Replace some unsafe libc functions (such as strcpy, strcat) with
+    # RTL definitions and internal error checking
+    --libc-replacements)
+      shift;
+      OPTION_LIBC_REPLACEMENTS="-e-acsl-replace-libc-functions"
+    ;;
     # Disable trace in debug mode
     --no-trace)
       shift
@@ -759,10 +776,12 @@ if [ -n "$OPTION_EACSL" ]; then
     $OPTION_THEN
     $OPTION_EACSL
     $OPTION_GMP
+    $OPTION_LIBC_REPLACEMENTS
     $OPTION_FULL_MMODEL
     $OPTION_TEMPORAL
     $OPTION_VERBOSE
     $OPTION_DEBUG
+    $OPTION_VALIDATE_FORMAT_STRINGS
     -e-acsl-share="$EACSL_SHARE"
     -then-last"
 fi
