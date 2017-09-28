@@ -31,11 +31,12 @@
 #define E_ACSL_MMODEL_H
 
 #include <stddef.h>
+#include <stdio.h>
 #include "e_acsl_alias.h"
 
-/***********************************************/
-/************ API prefixes *********************/
-/***********************************************/
+/************************************************************************/
+/*** API Prefixes {{{ ***/
+/************************************************************************/
 /* Assert */
 #define assert                export_alias(assert)
 /* Tracking */
@@ -54,6 +55,26 @@
 #define mark_readonly         export_alias(mark_readonly)
 #define initialize            export_alias(initialize)
 #define full_init             export_alias(full_init)
+/* Libc drop-in replacements */
+#define builtin_strlen   export_alias(builtin_strlen)
+#define builtin_strcpy   export_alias(builtin_strcpy)
+#define builtin_strncpy  export_alias(builtin_strncpy)
+#define builtin_strcat   export_alias(builtin_strcat)
+#define builtin_strncat  export_alias(builtin_strncat)
+#define builtin_strncat  export_alias(builtin_strncat)
+#define builtin_strcmp   export_alias(builtin_strcmp)
+#define builtin_strncmp  export_alias(builtin_strncmp)
+#define builtin_memcpy   export_alias(builtin_memcpy)
+#define builtin_memset   export_alias(builtin_memset)
+#define builtin_memcmp   export_alias(builtin_memcmp)
+#define builtin_memmove  export_alias(builtin_memmove)
+/* stdio.h replacement functions */
+#define builtin_printf   export_alias(builtin_printf)
+#define builtin_fprintf  export_alias(builtin_fprintf)
+#define builtin_dprintf  export_alias(builtin_dprintf)
+#define builtin_sprintf  export_alias(builtin_sprintf)
+#define builtin_snprintf export_alias(builtin_snprintf)
+#define builtin_syslog   export_alias(builtin_syslog)
 /* Memory state initialization */
 #define memory_clean          export_alias(memory_clean)
 #define memory_init           export_alias(memory_init)
@@ -61,8 +82,8 @@
 #define heap_allocation_size      export_alias(heap_allocation_size)
 #define get_heap_allocation_size  export_alias(get_heap_allocation_size)
 /* Temporal analysis */
-/* No need to encapsulate using macro: using these extra definitions does
- * not hurt, otherwise need to pass additional parameters to frama-c */
+/* No need to encapsulate via ifdef: using these extra definitions does
+   not hurt, otherwise need to pass additional parameters to frama-c */
 #define temporal_store_nblock             export_alias(temporal_store_nblock)
 #define temporal_store_nreferent          export_alias(temporal_store_nreferent)
 #define temporal_save_nblock_parameter    export_alias(temporal_save_nblock_parameter)
@@ -80,11 +101,11 @@
 #define math_HUGE_VALF                  export_alias(math_HUGE_VALF)
 #define math_INFINITY                   export_alias(math_INFINITY)
 #define floating_point_exception        export_alias(floating_point_exception)
+/* }}} */
 
-/******************************/
-/* Dedicated E-ACSL assertion */
-/******************************/
-
+/************************************************************************/
+/*** Assertion {{{ ***/
+/************************************************************************/
 /*! \brief Runtime assertion verifying a given predicate
  *  \param pred  integer code of a predicate
  *  \param kind  C string representing a kind an annotation (e.g., "Assertion")
@@ -95,11 +116,11 @@
   @ assigns \nothing; */
 void assert(int pred, char *kind, char *fct, char *pred_txt, int line)
   __attribute__((FC_BUILTIN));
+/* }}} */
 
-/***********************************************/
-/************ Basic API ************************/
-/***********************************************/
-
+/************************************************************************/
+/*** Dynamic memory allocation {{{ ***/
+/************************************************************************/
 /*! \brief Drop-in replacement for \p malloc with memory tracking enabled.
  *
  * For further information, see \p malloc(3). */
@@ -139,6 +160,21 @@ void *aligned_alloc(size_t alignment, size_t size)
  * `alignment`, which must be a power of two and a multiple of `sizeof(void*)`.
  * If size  is  0, then the value placed in *memptr is NULL. */
 int posix_memalign(void **memptr, size_t alignment, size_t size)
+  __attribute__((FC_BUILTIN));
+/* }}} */
+
+/************************************************************************/
+/*** Memory tracking {{{ ***/
+/************************************************************************/
+/*! \brief Initialize memory tracking state.
+ * Called before any other statement in \p main */
+/*@ assigns \nothing; */
+void memory_init(int *argc_ref, char ***argv, size_t ptr_size)
+  __attribute__((FC_BUILTIN));
+
+/*! \brief Clean-up memory tracking state before a program's termination. */
+/*@ assigns \nothing; */
+void memory_clean(void)
   __attribute__((FC_BUILTIN));
 
 /*! \brief Store stack or globally-allocated memory block
@@ -183,9 +219,24 @@ void full_init(void * ptr)
 void mark_readonly(void * ptr)
   __attribute__((FC_BUILTIN));
 
-/* ****************** */
-/* E-ACSL annotations */
-/* ****************** */
+/*@ ghost int extern __e_acsl_internal_heap; */
+
+/*! \brief Return the cumulative size (in bytes) of tracked heap allocation. */
+/*@ assigns \result \from __e_acsl_internal_heap; */
+size_t get_heap_allocation_size(void)
+  __attribute__((FC_BUILTIN));
+
+/*! \brief A variable holding a byte size of tracked heap allocation. */
+extern size_t heap_allocation_size;
+
+/*@ predicate diffSize{L1,L2}(integer i) =
+  \at(heap_allocation_size, L1)
+    - \at(heap_allocation_size, L2) == i; */
+/* }}} */
+
+/************************************************************************/
+/*** E-ACSL predicates {{{ ***/
+/************************************************************************/
 
 /*!\brief Implementation of the \b \\freeable predicate of E-ACSL.
  *
@@ -276,34 +327,75 @@ size_t offset(void * ptr)
   @ assigns \result \from *(((char*)ptr)+(0..size-1)); */
 int initialized(void * ptr, size_t size)
   __attribute__((FC_BUILTIN));
-
-/*@ ghost int extern __e_acsl_internal_heap; */
-
-/*! \brief Clean-up memory tracking state before a program's termination. */
-/*@ assigns \nothing; */
-void memory_clean(void)
-  __attribute__((FC_BUILTIN));
-
-/*! \brief Initialize memory tracking state.
- * Called before any other statement in \p main */
-/*@ assigns \nothing; */
-void memory_init(int *argc_ref, char ***argv, size_t ptr_size)
-  __attribute__((FC_BUILTIN));
-
-/*! \brief Return the cumulative size (in bytes) of tracked heap allocation. */
-/*@ assigns \result \from __e_acsl_internal_heap; */
-size_t get_heap_allocation_size(void)
-  __attribute__((FC_BUILTIN));
-
-/*! \brief A variable holding a byte size of tracked heap allocation. */
-extern size_t heap_allocation_size;
-
-/*@ predicate diffSize{L1,L2}(integer i) =
-  \at(heap_allocation_size, L1)
-    - \at(heap_allocation_size, L2) == i; */
+/* }}} */
 
 /************************************************************************/
-/************ Machine-dependent infinity values for flating points ******/
+/*** Drop-in replacement functions {{{ ***/
+/************************************************************************/
+char *builtin_strcpy(char *dest, const char *src)
+  __attribute__((FC_BUILTIN));
+
+char *builtin_strncpy(char *dest, const char *src, size_t n)
+  __attribute__((FC_BUILTIN));
+
+size_t builtin_strlen(const char *s)
+  __attribute__((FC_BUILTIN));
+
+char *builtin_strcat(char *dest, const char *src)
+  __attribute__((FC_BUILTIN));
+
+char *builtin_strncat(char *dest, const char *src, size_t n)
+  __attribute__((FC_BUILTIN));
+
+int builtin_strcmp(const char *s1, const char *s2)
+  __attribute__((FC_BUILTIN));
+
+int builtin_strncmp(const char *s1, const char *s2, size_t n)
+  __attribute__((FC_BUILTIN));
+
+void *builtin_memcpy(void *dest, const void *src, size_t n)
+  __attribute__((FC_BUILTIN));
+
+void *builtin_memset(void *s, int c, size_t n)
+  __attribute__((FC_BUILTIN));
+
+void *builtin_memmove(void *dest, const void *src, size_t n)
+  __attribute__((FC_BUILTIN));
+
+int builtin_memcmp(const void *s1, const void *s2, size_t n)
+  __attribute__((FC_BUILTIN));
+/* }}} */
+
+/************************************************************************/
+/*** Format functions {{{ ***/
+/************************************************************************/
+/** \brief `printf` with error checking. */
+int builtin_printf(const char *fmtdesc, const char *fmt, ...)
+  __attribute__((FC_BUILTIN));
+
+/** \brief `fprintf` with error checking. */
+int builtin_fprintf(const char *fmtdesc, FILE *stream, const char *fmt, ...)
+ __attribute__((FC_BUILTIN));
+
+/** \brief `dprintf` with error checking. */
+int builtin_dprintf(const char *fmtdesc, int fd, const char *fmt, ...)
+ __attribute__((FC_BUILTIN));
+
+/** \brief `sprintf` with error checking. */
+int builtin_sprintf(const char *fmtdesc, char *str, const char *fmt, ...)
+ __attribute__((FC_BUILTIN));
+
+/** \brief `snprintf` with error checking. */
+int builtin_snprintf(const char *fmtdesc, char *str, size_t size, const char *fmt, ...)
+ __attribute__((FC_BUILTIN));
+
+/** \brief `syslog` with error checking. */
+int builtin_syslog(const char *fmtdesc, int priority, const char *fmt, ...)
+ __attribute__((FC_BUILTIN));
+/* }}} */
+
+/************************************************************************/
+/*** Machine-dependent infinity values for flating points {{{ ***/
 /************************************************************************/
 
 /* Positive infinity for doubles: same as HUGE_VAL */
@@ -318,10 +410,11 @@ extern double math_INFINITY
 /* Check for floating point exception at a given execution point */
 extern void floating_point_exception(const char *s)
   __attribute__((FC_BUILTIN));
+/* }}} */
 
-/***********************************************/
-/************ Temporal analysis API ************/
-/***********************************************/
+/************************************************************************/
+/*** Temporal analysis {{{ ***/
+/************************************************************************/
 
 /*! \brief Take origin number of a memory block containing `block_addr` and
  * store it as a referent number of a pointer given by `ptr_addr`. */
@@ -393,4 +486,5 @@ void temporal_memcpy(void *dest, void *src, size_t size)
 /*@ assigns \nothing; */
 void temporal_memset(void *dest, int n, size_t size)
   __attribute__((FC_BUILTIN));
+/* }}} */
 #endif
