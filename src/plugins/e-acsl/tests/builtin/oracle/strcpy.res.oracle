@@ -1,0 +1,151 @@
+tests/builtin/strcpy.c:21:[kernel] warning: Calling undeclared function fork. Old style K&R code?
+[e-acsl] beginning translation.
+[e-acsl] warning: annotating undefined function `exit':
+                  the generated program may miss memory instrumentation
+                  if there are memory-related annotations.
+[e-acsl] warning: annotating undefined function `strcpy':
+                  the generated program may miss memory instrumentation
+                  if there are memory-related annotations.
+[e-acsl] warning: annotating undefined function `strncpy':
+                  the generated program may miss memory instrumentation
+                  if there are memory-related annotations.
+[e-acsl] warning: annotating undefined function `strdup':
+                  the generated program may miss memory instrumentation
+                  if there are memory-related annotations.
+FRAMAC_SHARE/libc/stdio.h:150:[kernel] warning: Neither code nor specification for function printf, generating default assigns from the prototype
+FRAMAC_SHARE/libc/sys/wait.h:57:[kernel] warning: Neither code nor specification for function waitpid, generating default assigns from the prototype
+tests/builtin/strcpy.c:21:[kernel] warning: Neither code nor specification for function fork, generating default assigns from the prototype
+FRAMAC_SHARE/libc/string.h:308:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:308:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:310:[e-acsl] warning: E-ACSL construct `trange' is not yet supported. Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:233:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:234:[e-acsl] warning: E-ACSL construct `trange' is not yet supported. Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:234:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:237:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:238:[e-acsl] warning: E-ACSL construct `trange' is not yet supported. Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:240:[e-acsl] warning: E-ACSL construct `logic function returning an integer' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:243:[e-acsl] warning: E-ACSL construct `logic function returning an integer' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:221:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:222:[e-acsl] warning: E-ACSL construct `trange' is not yet supported. Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:224:[e-acsl] warning: E-ACSL construct `\separated' is not yet supported. Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:224:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:227:[e-acsl] warning: E-ACSL construct `logic function returning an integer' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:227:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+                  Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:228:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+                  Ignoring annotation.
+[e-acsl] translation done in project "e-acsl".
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value:initial-state] Values of globals at initialization
+  __fc_rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __e_acsl_init ∈ [--..--]
+  __fc_fopen[0..511] ∈ {0}
+  __fc_p_fopen ∈ {{ &__fc_fopen[0] }}
+  __e_acsl_internal_heap ∈ [--..--]
+  __e_acsl_heap_allocation_size ∈ [--..--]
+  __e_acsl_math_HUGE_VAL ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  __e_acsl_math_HUGE_VALF ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
+  __e_acsl_math_INFINITY ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  __fc_time ∈ [--..--]
+  testno ∈ {0}
+  __gen_e_acsl_literal_string ∈ {0}
+  __gen_e_acsl_literal_string_2 ∈ {0}
+  __gen_e_acsl_literal_string_3 ∈ {0}
+  __gen_e_acsl_literal_string_4 ∈ {0}
+  __gen_e_acsl_literal_string_5 ∈ {0}
+  __gen_e_acsl_literal_string_6 ∈ {0}
+  __gen_e_acsl_literal_string_7 ∈ {0}
+  __gen_e_acsl_literal_string_8 ∈ {0}
+  __gen_e_acsl_literal_string_9 ∈ {0}
+  __gen_e_acsl_literal_string_10 ∈ {0}
+  __gen_e_acsl_literal_string_11 ∈ {0}
+  __gen_e_acsl_literal_string_12 ∈ {0}
+  __gen_e_acsl_literal_string_13 ∈ {0}
+  __gen_e_acsl_literal_string_14 ∈ {0}
+  __gen_e_acsl_literal_string_15 ∈ {0}
+  __gen_e_acsl_literal_string_16 ∈ {0}
+  __gen_e_acsl_literal_string_17 ∈ {0}
+  __gen_e_acsl_literal_string_18 ∈ {0}
+  __gen_e_acsl_literal_string_19 ∈ {0}
+  __gen_e_acsl_literal_string_20 ∈ {0}
+  __gen_e_acsl_literal_string_21 ∈ {0}
+  __gen_e_acsl_literal_string_22 ∈ {0}
+  __gen_e_acsl_literal_string_23 ∈ {0}
+  __gen_e_acsl_literal_string_24 ∈ {0}
+[value] using specification for function __e_acsl_memory_init
+[value] using specification for function __e_acsl_store_block
+[value] using specification for function __e_acsl_full_init
+[value] using specification for function __e_acsl_mark_readonly
+[value] using specification for function strdup
+FRAMAC_SHARE/libc/string.h:312:[value] warning: no 'assigns \result \from ...' clause specified for function strdup
+FRAMAC_SHARE/libc/string.h:310:[value] cannot evaluate ACSL term, unsupported ACSL construct: logic functions or predicates
+[value] using specification for function __e_acsl_delete_block
+FRAMAC_SHARE/libc/string.h:310:[value] warning: function __gen_e_acsl_strdup: postcondition got status unknown.
+tests/builtin/strcpy.c:13:[value] allocating variable __malloc_main_l13
+tests/builtin/strcpy.c:14:[value] allocating variable __malloc_main_l14
+tests/builtin/strcpy.c:18:[value] allocating variable __malloc_main_l18
+[value] using specification for function fork
+FRAMAC_SHARE/libc/string.h:221:[value] warning: function __gen_e_acsl_strcpy: precondition 'valid_string_src' got status unknown.
+FRAMAC_SHARE/libc/string.h:222:[value] warning: function __gen_e_acsl_strcpy: precondition 'room_string' got status unknown.
+[value] using specification for function __e_acsl_builtin_strcpy
+FRAMAC_SHARE/libc/string.h:221:[value] warning: function __e_acsl_builtin_strcpy: precondition 'valid_string_src' got status unknown.
+FRAMAC_SHARE/libc/string.h:222:[value] warning: function __e_acsl_builtin_strcpy: precondition 'room_string' got status unknown.
+FRAMAC_SHARE/libc/string.h:227:[value] cannot evaluate ACSL term, unsupported ACSL construct: logic functions or predicates
+[value] using specification for function __e_acsl_assert
+FRAMAC_SHARE/e-acsl/e_acsl.h:115:[value] warning: function __e_acsl_assert: precondition got status unknown.
+FRAMAC_SHARE/libc/string.h:227:[value] warning: function __gen_e_acsl_strcpy: postcondition got status unknown.
+FRAMAC_SHARE/libc/string.h:228:[value] warning: function __gen_e_acsl_strcpy: postcondition got status unknown.
+[value] using specification for function exit
+[value] using specification for function waitpid
+tests/builtin/strcpy.c:21:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status);
+[value] using specification for function printf
+tests/builtin/strcpy.c:22:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_0);
+tests/builtin/strcpy.c:23:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_1);
+tests/builtin/strcpy.c:24:[value] warning: accessing left-value that contains escaping addresses.
+                 assert ¬\dangling(&unalloc_str);
+tests/builtin/strcpy.c:24:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_2);
+FRAMAC_SHARE/libc/string.h:222:[value] warning: function __gen_e_acsl_strcpy: precondition 'room_string' got status invalid.
+tests/builtin/strcpy.c:25:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_3);
+tests/builtin/strcpy.c:26:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_4);
+FRAMAC_SHARE/libc/string.h:224:[value] warning: function __gen_e_acsl_strcpy: precondition 'separated_strings' got status unknown.
+FRAMAC_SHARE/libc/string.h:224:[value] warning: function __e_acsl_builtin_strcpy: precondition 'separated_strings' got status unknown.
+tests/builtin/strcpy.c:27:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_5);
+tests/builtin/strcpy.c:28:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_6);
+FRAMAC_SHARE/libc/string.h:224:[value] warning: function __gen_e_acsl_strcpy: precondition 'separated_strings' got status invalid.
+tests/builtin/strcpy.c:29:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_7);
+FRAMAC_SHARE/libc/string.h:233:[value] warning: function __gen_e_acsl_strncpy: precondition 'valid_string_src' got status unknown.
+FRAMAC_SHARE/libc/string.h:234:[value] warning: function __gen_e_acsl_strncpy: precondition 'room_nstring' got status unknown.
+[value] using specification for function __e_acsl_builtin_strncpy
+FRAMAC_SHARE/libc/string.h:233:[value] warning: function __e_acsl_builtin_strncpy: precondition 'valid_string_src' got status unknown.
+FRAMAC_SHARE/libc/string.h:241:[value] cannot evaluate ACSL term, unsupported ACSL construct: logic functions or predicates
+FRAMAC_SHARE/libc/string.h:241:[value] warning: function __gen_e_acsl_strncpy, behavior complete: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
+FRAMAC_SHARE/libc/string.h:244:[value] cannot evaluate ACSL term, unsupported ACSL construct: logic functions or predicates
+FRAMAC_SHARE/libc/string.h:244:[value] warning: function __gen_e_acsl_strncpy, behavior partial: postcondition got status unknown. (Behavior may be inactive, no reduction performed.)
+tests/builtin/strcpy.c:32:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_8);
+tests/builtin/strcpy.c:33:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_9);
+tests/builtin/strcpy.c:34:[value] warning: accessing left-value that contains escaping addresses.
+                 assert ¬\dangling(&unalloc_str);
+tests/builtin/strcpy.c:34:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_10);
+FRAMAC_SHARE/libc/string.h:234:[value] warning: function __gen_e_acsl_strncpy: precondition 'room_nstring' got status invalid.
+tests/builtin/strcpy.c:35:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_11);
+FRAMAC_SHARE/libc/string.h:237:[value] warning: function __gen_e_acsl_strncpy: postcondition got status unknown.
+FRAMAC_SHARE/libc/string.h:241:[value] warning: function __gen_e_acsl_strncpy, behavior complete: postcondition got status unknown.
+tests/builtin/strcpy.c:36:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_12);
+tests/builtin/strcpy.c:37:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_13);
+tests/builtin/strcpy.c:38:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_14);
+tests/builtin/strcpy.c:39:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_15);
+tests/builtin/strcpy.c:41:[value] warning: Wrong free: assert(pass a freeable address)
+[value] done for function main
