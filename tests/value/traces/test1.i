@@ -13,7 +13,5 @@ int main(int c){
   for(int i = 0; i < 3; i++){
     tmp ++;
   }
-  //@ slevel merge;
-  Frama_C_dump_each();
   return c;
 }

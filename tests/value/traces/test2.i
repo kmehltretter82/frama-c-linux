@@ -16,7 +16,5 @@ int main(int c){
   if (c) tmp = 1;
   else tmp = 2;
   tmp = loop(tmp);
-  //@ slevel merge;
-  Frama_C_dump_each();
   return c;
 }

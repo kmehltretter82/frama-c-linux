@@ -37,7 +37,10 @@ let () = Value_parameters.ForceValues.set_output_dependencies [Db.Value.self]
 let main () =
   (* Value computations *)
   if Value_parameters.ForceValues.get () then !Db.Value.compute ();
-  if Db.Value.is_computed () then Red_statuses.report ()
+  if Db.Value.is_computed () then Red_statuses.report ();
+  if Value_parameters.TracesDomain.get () then begin
+    Traces_domain.print_last_traces ()
+  end
 
 let () = Db.Main.extend main
 

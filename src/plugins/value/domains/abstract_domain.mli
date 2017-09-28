@@ -474,6 +474,8 @@ module type Store = sig
   val register_state_before_stmt: Value_types.callstack -> stmt -> state -> unit
   val register_state_after_stmt: Value_types.callstack -> stmt -> state -> unit
 
+  (** Allows to access state information after value analysis have
+      been computed with the domain *)
   val get_global_state: unit -> state or_bottom
   val get_initial_state: kernel_function -> state or_bottom
   val get_initial_state_by_callstack:

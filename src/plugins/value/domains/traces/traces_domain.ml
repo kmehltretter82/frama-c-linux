@@ -130,7 +130,7 @@ module Graph =
     (Hptmap.Comp_unused)(struct let v = [[]] end)
     (struct let l = [Ast.self] end)
 
-type t = { start : int; current : int; graph : Graph.t}
+type state = { start : int; current : int; graph : Graph.t}
 
 (* Lattice structure for the abstract state above *)
 module Traces = struct
@@ -143,8 +143,8 @@ module Traces = struct
   include Datatype.Make_with_collections(struct
       include Datatype.Serializable_undefined
 
-      type nonrec t = t
-      let name = "Value.Traces_domain.Traces.t"
+      type t = state
+      let name = "Value.Traces_domain.Traces.state"
 
       let reprs = [{start = 0; current = 0; graph = Graph.empty }]
 
@@ -298,7 +298,7 @@ end
 let key = Structure.Key_Domain.create_key "traces domain"
 
 module Internal = struct
-  type state = t
+  type nonrec state = state
   type value = Cvalue.V.t
   type location = Precise_locs.precise_location
 
@@ -416,6 +416,12 @@ module Internal = struct
 end
 
 module D = Domain_builder.Complete (Internal)
+
+let print_last_traces () =
+  let state = D.Store.get_stmt_state (Kernel_function.find_return (fst (Globals.entry_point ())))  in
+  let header fmt = Format.fprintf fmt "Trace domains:" in
+  let body = Bottom.pretty Traces.pretty in
+  Value_parameters.printf ~dkey:Internal.log_category ~header " @[%a@]" body state
 
 
 (*
