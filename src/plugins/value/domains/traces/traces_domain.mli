@@ -29,6 +29,8 @@ type edge =
   | Assume of Node.t * Cil_types.exp * bool
   | EnterScope of Node.t * Cil_types.varinfo list
   | LeaveScope of Node.t * Cil_types.varinfo list
+  (** For call of functions without definition *)
+  | CallDeclared of Node.t * Cil_types.kernel_function * Cil_types.exp list * Cil_types.lval option
   | Msg of Node.t * string
   | Top
 
@@ -36,7 +38,11 @@ module Edge : Datatype.S with type t = edge
 
 module Graph : Hptmap_sig.S with type key = Node.t and type v = edge list
 
-type state = { start : int; current : int; graph : Graph.t}
+type state = { start : int; current : int; graph : Graph.t;
+               call_declared_function: bool;
+               globals : Cil_types.varinfo list;
+               main_formals : Cil_types.varinfo list;
+             }
 
 (* Lattice structure for the abstract state above *)
 module Traces : sig

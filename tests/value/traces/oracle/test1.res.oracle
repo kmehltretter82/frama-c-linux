@@ -1,86 +1,86 @@
-[kernel] Parsing tests/value/traces/test1.i (no preprocessing)
-tests/value/traces/test1.i:8:[kernel] warning: Calling undeclared function Frama_C_interval. Old style K&R code?
+[kernel] Parsing tests/value/traces/test1.c (with preprocessing)
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed
 [value:initial-state] Values of globals at initialization
+  Frama_C_entropy_source ∈ [--..--]
   g ∈ {42}
 [value] computing for function Frama_C_interval <- main.
-        Called from tests/value/traces/test1.i:8.
-tests/value/traces/test1.i:8:[kernel] warning: Neither code nor specification for function Frama_C_interval, generating default assigns from the prototype
+        Called from tests/value/traces/test1.c:10.
 [value] using specification for function Frama_C_interval
+share/libc/__fc_builtin.h:52:[value] function Frama_C_interval: precondition got status valid.
 [value] Done for function Frama_C_interval
 [value] Recording results for main
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value:final-states] Values at end of function main:
-  c ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  g ∈ {5; 45}
+  c ∈ {0; 1}
   tmp ∈ {5; 45}
 [value:d-traces] Trace domains:
- start: 0
- {[ 0 -> ([ introduce globals -> 1 ])
-    1 -> ([ initialize variable: g -> 2 ])
-    2 -> ([ Assign: g = 42 -> 3 ])
-    3 -> ([ initialize variable using type Main_Formal
-c -> 4 ])
-    4 -> ([ EnterScope: tmp -> 5 ])
-    5 -> ([ start_call: Frama_C_interval (false) -> 6 ])
-    6 -> ([ EnterScope: x_0 x_1 -> 7 ])
-    7 -> ([ Assign: x_0 = 0 -> 8 ])
-    8 -> ([ Assign: x_1 = 1 -> 9 ])
-    9 -> ([ EnterScope: \result<Frama_C_interval> -> 10 ])
-    10 -> ([ initialize variable using type Spec_Return(Frama_C_interval)
-\result<Frama_C_interval> -> 11 ])
-    11 -> ([ logic assign -> 12 ])
-    12 -> ([ LeaveScope: x_0 x_1 -> 13 ])
-    13 -> ([ finalize_call: Frama_C_interval -> 14 ])
-    14 -> ([ Assign: c = \result<Frama_C_interval> -> 15 ])
-    15 -> ([ LeaveScope: \result<Frama_C_interval> -> 16 ])
-    16 -> ([ Assign: tmp = 0 -> 17 ])
-    17 -> ([ Assume: c false -> 18; Assume: c true -> 19 ])
-    18 -> ([ Assign: tmp = 2 -> 22 ])
-    19 -> ([ Assign: tmp = g -> 21 ])
-    21 -> ([ EnterScope: i -> 27 ])
-    22 -> ([ EnterScope: i -> 24 ])
-    24 -> ([ initialize variable: i -> 25 ])
-    25 -> ([ Assign: i = 0 -> 26 ])
-    26 -> ([ enter_loop -> 32 ])
-    27 -> ([ initialize variable: i -> 28 ])
-    28 -> ([ Assign: i = 0 -> 29 ])
-    29 -> ([ enter_loop -> 31 ])
-    31 -> ([ Assume: i < 3 true -> 34 ])
-    32 -> ([ Assume: i < 3 true -> 35 ])
-    34 -> ([ Assign: tmp = tmp + 1 -> 37 ])
-    35 -> ([ Assign: tmp = tmp + 1 -> 36 ])
-    36 -> ([ Assign: i = i + 1 -> 38 ])
-    37 -> ([ Assign: i = i + 1 -> 39 ])
-    38 -> ([ incr_loop_counter -> 42 ])
-    39 -> ([ incr_loop_counter -> 41 ])
-    41 -> ([ Assume: i < 3 true -> 45 ])
-    42 -> ([ Assume: i < 3 true -> 46 ])
-    45 -> ([ Assign: tmp = tmp + 1 -> 48 ])
-    46 -> ([ Assign: tmp = tmp + 1 -> 47 ])
-    47 -> ([ Assign: i = i + 1 -> 50 ])
-    48 -> ([ Assign: i = i + 1 -> 49 ])
-    49 -> ([ incr_loop_counter -> 54 ])
-    50 -> ([ incr_loop_counter -> 53 ])
-    53 -> ([ Assume: i < 3 true -> 57 ])
-    54 -> ([ Assume: i < 3 true -> 58 ])
-    57 -> ([ Assign: tmp = tmp + 1 -> 60 ])
-    58 -> ([ Assign: tmp = tmp + 1 -> 59 ])
-    59 -> ([ Assign: i = i + 1 -> 62 ])
-    60 -> ([ Assign: i = i + 1 -> 61 ])
-    61 -> ([ incr_loop_counter -> 66 ])
-    62 -> ([ incr_loop_counter -> 65 ])
-    65 -> ([ Assume: i < 3 false -> 69 ])
-    66 -> ([ Assume: i < 3 false -> 70 ])
-    69 -> ([ leave_loop -> 72 ])
-    70 -> ([ leave_loop -> 71 ])
-    71 -> ([ LeaveScope: i -> 74 ])
-    72 -> ([ LeaveScope: i -> 73 ])
-    73 -> ([ join -> 110 ])
-    74 -> ([ join -> 110 ]) ]}
- current: 110]
+ start: 0; globals = g, Frama_C_entropy_source; main_formals = c 
+ {[ 0 -> ([ initialize variable: Frama_C_entropy_source -> 1 ])
+    1 -> ([ initialize variable using type Library_Global
+Frama_C_entropy_source -> 2 ])
+    2 -> ([ initialize variable: g -> 3 ])
+    3 -> ([ Assign: g = 42 -> 4 ])
+    4 -> ([ initialize variable using type Main_Formal
+c -> 5 ])
+    5 -> ([ EnterScope: tmp -> 6 ])
+    6 -> ([ EnterScope: \result<Frama_C_interval> -> 7 ])
+    7 -> ([ CallDeclared: \result<Frama_C_interval> =
+            Frama_C_interval(0, 1) -> 8 ])
+    8 -> ([ Assign: c = \result<Frama_C_interval> -> 9 ])
+    9 -> ([ LeaveScope: \result<Frama_C_interval> -> 10 ])
+    10 -> ([ Assign: tmp = 0 -> 11 ])
+    11 -> ([ Assume: c false -> 12; Assume: c true -> 13 ])
+    12 -> ([ Assign: tmp = 2 -> 16 ])
+    13 -> ([ Assign: tmp = g -> 15 ])
+    15 -> ([ EnterScope: i -> 21 ])
+    16 -> ([ EnterScope: i -> 18 ])
+    18 -> ([ initialize variable: i -> 19 ])
+    19 -> ([ Assign: i = 0 -> 20 ])
+    20 -> ([ enter_loop -> 26 ])
+    21 -> ([ initialize variable: i -> 22 ])
+    22 -> ([ Assign: i = 0 -> 23 ])
+    23 -> ([ enter_loop -> 25 ])
+    25 -> ([ Assume: i < 3 true -> 28 ])
+    26 -> ([ Assume: i < 3 true -> 29 ])
+    28 -> ([ Assign: tmp = tmp + 1 -> 31 ])
+    29 -> ([ Assign: tmp = tmp + 1 -> 30 ])
+    30 -> ([ Assign: i = i + 1 -> 32 ])
+    31 -> ([ Assign: i = i + 1 -> 33 ])
+    32 -> ([ incr_loop_counter -> 36 ])
+    33 -> ([ incr_loop_counter -> 35 ])
+    35 -> ([ Assume: i < 3 true -> 39 ])
+    36 -> ([ Assume: i < 3 true -> 40 ])
+    39 -> ([ Assign: tmp = tmp + 1 -> 42 ])
+    40 -> ([ Assign: tmp = tmp + 1 -> 41 ])
+    41 -> ([ Assign: i = i + 1 -> 44 ])
+    42 -> ([ Assign: i = i + 1 -> 43 ])
+    43 -> ([ incr_loop_counter -> 48 ])
+    44 -> ([ incr_loop_counter -> 47 ])
+    47 -> ([ Assume: i < 3 true -> 51 ])
+    48 -> ([ Assume: i < 3 true -> 52 ])
+    51 -> ([ Assign: tmp = tmp + 1 -> 54 ])
+    52 -> ([ Assign: tmp = tmp + 1 -> 53 ])
+    53 -> ([ Assign: i = i + 1 -> 56 ])
+    54 -> ([ Assign: i = i + 1 -> 55 ])
+    55 -> ([ incr_loop_counter -> 60 ])
+    56 -> ([ incr_loop_counter -> 59 ])
+    59 -> ([ Assume: i < 3 false -> 63 ])
+    60 -> ([ Assume: i < 3 false -> 64 ])
+    63 -> ([ leave_loop -> 66 ])
+    64 -> ([ leave_loop -> 65 ])
+    65 -> ([ LeaveScope: i -> 68 ])
+    66 -> ([ LeaveScope: i -> 67 ])
+    67 -> ([ Assign: g = tmp -> 70 ])
+    68 -> ([ Assign: g = tmp -> 69 ])
+    69 -> ([ join -> 105 ])
+    70 -> ([ join -> 105 ]) ]}
+ current: 105]
+[kernel] warning: no input file.
 [from] Computing for function main
 [from] Computing for function Frama_C_interval <-main
 [from] Done for function Frama_C_interval
@@ -88,11 +88,13 @@ c -> 4 ])
 [from] ====== DEPENDENCIES COMPUTED ======
        These dependencies hold at termination for the executions that terminate:
 [from] Function Frama_C_interval:
-  \result FROM x_0; x_1
+  Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
+  \result FROM Frama_C_entropy_source; min; max
 [from] Function main:
-  \result FROM \nothing
+  Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
+  g FROM Frama_C_entropy_source; g
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function main:
-          c; tmp; i
+          Frama_C_entropy_source; g; c; tmp; i
 [inout] Inputs for function main:
-          g
+          Frama_C_entropy_source; g

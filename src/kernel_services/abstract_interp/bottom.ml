@@ -163,3 +163,7 @@ module Top = struct
       (narrow vnarrow x y :> _ or_top_bottom)
 
 end
+
+let iter f = function
+  | `Bottom -> ()
+  | `Value v -> f v

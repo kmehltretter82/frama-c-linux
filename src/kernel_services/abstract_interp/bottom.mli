@@ -50,6 +50,7 @@ val pretty :
   (Format.formatter -> 'a -> unit) ->
   Format.formatter -> 'a or_bottom -> unit
 
+val iter: ('a -> unit) -> 'a or_bottom -> unit
 
 (** Datatype constructor. *)
 module Make_Datatype

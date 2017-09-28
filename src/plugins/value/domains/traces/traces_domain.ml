@@ -27,6 +27,8 @@ type edge =
   | Assume of Node.t * Cil_types.exp * bool
   | EnterScope of Node.t * Cil_types.varinfo list
   | LeaveScope of Node.t * Cil_types.varinfo list
+  (** For call of functions without definition *)
+  | CallDeclared of Node.t * Cil_types.kernel_function * Cil_types.exp list * Cil_types.lval option
   | Msg of Node.t * string
   | Top
 
@@ -71,6 +73,15 @@ module Edge = struct
           if c <> 0 then c else
           let c = Extlib.list_compare Cil_datatype.Varinfo.compare vs1 vs2 in
           c
+        | CallDeclared(n1,kf1,exp1,lval1), CallDeclared(n2,kf2,exp2,lval2) ->
+          let c = Node.compare n1 n2 in
+          if c <> 0 then c else
+          let c = Kernel_function.compare kf1 kf2 in
+          if c <> 0 then c else
+            let c = Extlib.list_compare Cil_datatype.Exp.compare exp1 exp2 in
+            if c <> 0 then c else
+              let c = Extlib.opt_compare Cil_datatype.Lval.compare lval1 lval2 in
+              c
         | Msg(n1,s1), Msg(n2,s2) ->
           let c = Node.compare n1 n2 in
           if c <> 0 then c else
@@ -84,6 +95,8 @@ module Edge = struct
         | _ , EnterScope _ -> 1
         | LeaveScope _, _ -> -1
         | _ , LeaveScope _ -> 1
+        | CallDeclared _, _ -> -1
+        | _ , CallDeclared _ -> 1
         | Msg _, _ -> -1
         | _, Msg _ -> 1
 
@@ -98,6 +111,12 @@ module Edge = struct
                               (Pretty_utils.pp_list ~sep:"@ " Cil_datatype.Varinfo.pretty) vs Node.pretty n
         | LeaveScope(n,vs) -> Format.fprintf fmt "@[LeaveScope:@ %a -> %a@]"
                               (Pretty_utils.pp_list ~sep:"@ " Cil_datatype.Varinfo.pretty) vs Node.pretty n
+        | CallDeclared(n,kf1,exp1,lval1) ->
+          Format.fprintf fmt "@[CallDeclared:@ %a%s(%a) -> %a@]"
+            (Pretty_utils.pp_opt ~pre:"" ~suf:" =@ " Cil_datatype.Lval.pretty) lval1
+            (Kernel_function.get_name kf1)
+            (Pretty_utils.pp_list ~sep:",@ " Cil_datatype.Exp.pretty) exp1
+             Node.pretty n
         | Msg(n,s) -> Format.fprintf fmt "@[%s -> %a@]" s Node.pretty n
 
       let hash = function
@@ -112,6 +131,11 @@ module Edge = struct
           Hashtbl.seeded_hash n x
         | LeaveScope(n,vs) ->
           let x = List.fold_left (fun acc e -> Hashtbl.seeded_hash acc (Cil_datatype.Varinfo.hash e)) 4 vs in
+          Hashtbl.seeded_hash n x
+        | CallDeclared(n,kf,exps,lval) ->
+          let x = Kernel_function.hash kf in
+          let x = Hashtbl.seeded_hash x (Extlib.opt_hash Cil_datatype.Lval.hash lval) in
+          let x = List.fold_left (fun acc e -> Hashtbl.seeded_hash acc (Cil_datatype.Exp.hash e)) x exps in
           Hashtbl.seeded_hash n x
         | Msg(n,s) -> Hashtbl.seeded_hash n (Hashtbl.seeded_hash 5 s)
 
@@ -130,14 +154,20 @@ module Graph =
     (Hptmap.Comp_unused)(struct let v = [[]] end)
     (struct let l = [Ast.self] end)
 
-type state = { start : int; current : int; graph : Graph.t}
+type state = { start : int; current : int; graph : Graph.t;
+               call_declared_function: bool;
+               globals : Cil_types.varinfo list;
+               main_formals : Cil_types.varinfo list;
+             }
 
 (* Lattice structure for the abstract state above *)
 module Traces = struct
 
   (** impossible for normal values start must be bigger than current *)
-  let empty = { start = 0; current = 0; graph = Graph.empty }
-  let top = { start = 0; current = -1; graph = Graph.empty }
+  let empty = { start = 0; current = 0; graph = Graph.empty; call_declared_function = false;
+                globals = []; main_formals = []}
+  let top = { start = 0; current = -1; graph = Graph.empty; call_declared_function = false;
+              globals = []; main_formals = []}
 
   (* Frama-C "datatype" for type [inout] *)
   include Datatype.Make_with_collections(struct
@@ -146,12 +176,16 @@ module Traces = struct
       type t = state
       let name = "Value.Traces_domain.Traces.state"
 
-      let reprs = [{start = 0; current = 0; graph = Graph.empty }]
+      let reprs = [empty]
 
       let structural_descr = Structural_descr.t_record
           [| Descr.pack Datatype.Int.descr;
              Descr.pack Datatype.Int.descr;
-             Descr.pack Graph.descr |]
+             Descr.pack Graph.descr;
+             Descr.pack Datatype.Bool.descr;
+             Structural_descr.pack Structural_descr.t_abstract;
+             Structural_descr.pack Structural_descr.t_abstract;
+          |]
 
       let compare m1 m2 =
         let c = Datatype.Int.compare m1.start m2.start in
@@ -160,14 +194,20 @@ module Traces = struct
           if c <> 0 then c else
             let c = Graph.compare m1.graph m2.graph in
             if c <> 0 then c else
-              0
+              let c = Datatype.Bool.compare m1.call_declared_function m2.call_declared_function in
+              if c <> 0 then c else
+                0
 
       let equal = Datatype.from_compare
 
       let pretty fmt m =
         if m == top then Format.fprintf fmt "TOP"
         else
-          Format.fprintf fmt "@[<hv>@[start: %i@]@ %a@ @[current: %i]" m.start Graph.pretty m.graph m.current
+          Format.fprintf fmt "@[<hv>@[start: %i; globals = %a; main_formals = %a @]@ %a@ @[current: %i]"
+            m.start
+            (Pretty_utils.pp_list ~sep:",@ " Cil_datatype.Varinfo.pretty) m.globals
+            (Pretty_utils.pp_list ~sep:",@ " Cil_datatype.Varinfo.pretty) m.main_formals
+            Graph.pretty m.graph m.current
 
       let hash m =
         Hashtbl.seeded_hash m.start (Hashtbl.seeded_hash m.current (Graph.hash m.graph))
@@ -205,6 +245,7 @@ module Traces = struct
 
   let add_edge c edge =
     if c == top then c
+    else if c.call_declared_function then c (** forget intermediary state *)
     else
       let n = Edge.Counter.next () in
       let e = match edge with
@@ -212,12 +253,14 @@ module Traces = struct
         | Assume (_,a,b) -> Assume(n,a,b)
         | EnterScope (_,vs) -> EnterScope(n,vs)
         | LeaveScope (_,vs) -> LeaveScope(n,vs)
+        | CallDeclared (_,kf,exps,lval) -> CallDeclared(n,kf,exps,lval)
         | Msg (_,s) -> Msg(n,s)
         | Top -> Top
       in
       let m = Graph.singleton c.current [e] in
       let g = join_graph m c.graph in
-      { start = c.start; current = n; graph = g}
+      { start = c.start; current = n; graph = g; call_declared_function = false;
+        globals = c.globals; main_formals = c.main_formals}
 
 
   let is_included c1 c2 =
@@ -263,34 +306,47 @@ module Traces = struct
       ~decide_both
        c1.graph c2.graph
 
+  let not_same_origin c1 c2 =
+    c1.start != c2.start ||
+    c1.globals != c2.globals ||
+    c1.main_formals != c2.main_formals
+
   let join c1 c2 =
+    if c1.call_declared_function || c2.call_declared_function
+    then assert false (* should not appended, since nothing append during a call to a not defined function *);
     match view c1, view c2 with
     | `Top, _ -> c1
     | _, `Top -> c2
     | `Other c1, `Other c2 when is_included c1 c2 -> c2
     | `Other c1, `Other c2 when is_included c2 c1 -> c1
     | `Other c1, `Other c2 ->
-      if c1.start <> c2.start then assert false
+      if not_same_origin c1 c2 then assert false
       else
         let n = Edge.Counter.next () in
         let m = Msg(n,"join") in
         let m1 = Graph.singleton c1.current [m] in
         let m2 = Graph.singleton c2.current [m] in
         let g = join_graph (join_graph m1 c1.graph) (join_graph m2 c2.graph) in
-        {start = c1.start; current = n; graph = g}
+        {start = c1.start; current = n; graph = g; call_declared_function = false;
+         globals = c1.globals; main_formals = c1.main_formals;
+        }
 
   let widen _ _ c1 c2 =
+    if c1.call_declared_function || c2.call_declared_function
+    then assert false (* should not appended, since nothing append during a call to a not defined function *);
     match view c1, view c2 with
     | `Top, _ -> c1
     | _, `Top -> c2
     | `Other c1, `Other c2 ->
-      if c1.start <> c2.start then assert false
+      if not_same_origin c1 c2 then assert false
       else
         let n = Edge.Counter.next () in
         let m = Msg(n,"widen") in
         let m1 = Graph.add n [Top] (Graph.singleton c1.current [m]) in
         let g = join_graph m1 c1.graph in
-        {start = c1.start; current = n; graph = g}
+        {start = c1.start; current = n; graph = g; call_declared_function = false;
+         globals = c1.globals; main_formals = c1.main_formals;
+        }
 
   let narrow _c1 c2 = `Value c2
 end
@@ -334,25 +390,37 @@ module Internal = struct
       `Value(Traces.add_edge state (Assume(0,e,pos)))
 
     let start_call _stmt call _valuation state =
-      let msg = Format.asprintf "start_call: %s (%b)" (Kernel_function.get_name call.Eval.kf)
-          (Kernel_function.is_definition call.Eval.kf) in
-      let state = Traces.add_edge state (Msg(0,msg)) in
-      let formals = List.map (fun arg -> arg.Eval.formal) call.Eval.arguments in
-      let state = Traces.add_edge state (EnterScope(0,formals)) in
-      let state = List.fold_left (fun state arg ->
-          Traces.add_edge state (Assign(0,
-                                        Cil.var arg.Eval.formal,
-                                        arg.Eval.formal.Cil_types.vtype,
-                                        arg.Eval.concrete))) state call.Eval.arguments in
-      `Value state
+      if Kernel_function.is_definition call.Eval.kf
+      then
+        let msg = Format.asprintf "start_call: %s (%b)" (Kernel_function.get_name call.Eval.kf)
+            (Kernel_function.is_definition call.Eval.kf) in
+        let state = Traces.add_edge state (Msg(0,msg)) in
+        let formals = List.map (fun arg -> arg.Eval.formal) call.Eval.arguments in
+        let state = Traces.add_edge state (EnterScope(0,formals)) in
+        let state = List.fold_left (fun state arg ->
+            Traces.add_edge state (Assign(0,
+                                          Cil.var arg.Eval.formal,
+                                          arg.Eval.formal.Cil_types.vtype,
+                                          arg.Eval.concrete))) state call.Eval.arguments in
+        `Value state
+      else
+        (** enter the scope of the dumb result variable *)
+        let var = call.Eval.return in
+        let state = match var with
+          | Some var -> Traces.add_edge state (EnterScope(0,[var]))
+          | None -> state in
+        let exps = List.map (fun arg -> arg.Eval.concrete) call.Eval.arguments in
+        let state = Traces.add_edge state (CallDeclared(0, call.Eval.kf, exps,
+                                                        Extlib.opt_map Cil.var var)) in
+        `Value {state with call_declared_function = true}
 
     let finalize_call _stmt call ~pre:_ ~post =
-      let state = post in
-      let msg = Format.asprintf "finalize_call: %s" (Kernel_function.get_name call.Eval.kf) in
-      let state = Traces.add_edge state (Msg(0,msg)) in
-      (* let formals = List.map (fun arg -> arg.Eval.formal) call.Eval.arguments in *)
-      (* let state = Traces.add_edge state (LeaveScope(0,formals)) in *)
-      `Value state
+      if post.call_declared_function
+      then `Value {post with call_declared_function = false}
+      else
+        let msg = Format.asprintf "finalize_call: %s" (Kernel_function.get_name call.Eval.kf) in
+        let state = Traces.add_edge post (Msg(0,msg)) in
+        `Value state
 
     let update _valuation state = `Value state
 
@@ -371,10 +439,16 @@ module Internal = struct
   let reuse _kf _bases ~current_input:_ ~previous_output:state = state
 
   let empty () = Traces.empty
-  let introduce_globals _vars state = Traces.add_edge state (Msg(0,"introduce globals"))
+  let introduce_globals vars state =
+    {state with globals = vars @ state.globals}
   let initialize_variable lv _ ~initialized:_ _ state =
     Traces.add_edge state (Msg(0,Format.asprintf "initialize variable: %a" Printer.pp_lval lv ))
   let initialize_variable_using_type init_kind varinfo state =
+    let state =
+      match init_kind with
+      | Abstract_domain.Main_Formal -> {state with main_formals = varinfo::state.main_formals}
+      | _ -> state
+    in
     let msg = Format.asprintf "initialize@ variable@ using@ type@ %a@ %a"
         (fun fmt init_kind ->
            match init_kind with
@@ -417,11 +491,93 @@ end
 
 module D = Domain_builder.Complete (Internal)
 
+let dummy_loc = Cil_datatype.Location.unknown
+
+let rec stmts_of_cfg cfg current acc =
+  match Graph.find current cfg with
+  | exception Not_found -> List.rev acc
+  | [] -> assert false
+  | [a] ->
+    (match a with
+     | Assign (n,lval,_typ,exp) ->
+       let stmt = Cil.mkStmtOneInstr (Cil_types.Set(lval,exp,dummy_loc)) in
+       stmts_of_cfg cfg n (stmt::acc)
+     | Assume (n,exp,b) ->
+       let predicate = (Logic_utils.expr_to_predicate ~cast:true exp).Cil_types.ip_content in
+       let predicate = if b then predicate else Logic_const.pnot predicate in
+       let code_annot = Logic_const.new_code_annotation(Cil_types.AAssert([],predicate)) in
+       let stmt = Cil.mkStmtOneInstr (Cil_types.Code_annot(code_annot,dummy_loc)) in
+       stmts_of_cfg cfg n (stmt::acc)
+     | EnterScope (n,vs) ->
+       let block = { Cil_types.battrs = [];
+                     bscoping = true;
+                     blocals = vs;
+                     bstatics = [];
+                     bstmts = stmts_of_cfg cfg n [] } in
+       let stmt = Cil.mkStmt (Cil_types.Block(block)) in
+       List.rev (stmt::acc)
+     | LeaveScope (n,_) -> stmts_of_cfg cfg n acc
+     | CallDeclared (n,kf,exps,lval) ->
+       let call = Cil.new_exp ~loc:dummy_loc (Cil_types.Lval (Cil.var (Kernel_function.get_vi kf))) in
+       let stmt = Cil.mkStmtOneInstr (Cil_types.Call(lval,call,exps,dummy_loc)) in
+       stmts_of_cfg cfg n (stmt::acc)
+     | Msg (n,_) -> stmts_of_cfg cfg n acc
+     | Top -> invalid_arg "top in the middle")
+  | l ->
+    let is_if = match l with
+      | [] | [_] -> assert false
+      | [Assume(n1',exp1,b1) ; Assume(n2',exp2,b2)]
+        when Cil_datatype.Exp.equal exp1 exp2 && b1 != b2 ->
+        if b1 then Some (exp1, n1', n2') else Some (exp1,n2',n1')
+      | _ -> None in
+    let stmt =
+      match is_if with
+      | None -> assert false (* todo *)
+      | Some(exp,n1,n2) ->
+        let block1 = Cil.mkBlock (stmts_of_cfg cfg n1 []) in
+        let block2 = Cil.mkBlock (stmts_of_cfg cfg n2 []) in
+        Cil.mkStmt (Cil_types.If(exp,block1,block2,dummy_loc)) in
+    List.rev (stmt::acc)
+
+let _ = Cil.stmt_of_instr_list
+
+let _ = File.from_filename
+
+let project_of_cfg s =
+  let project = Project.create_by_copy ~selection:State_selection.empty ~last:true "Eva.Traces_domain" in
+  let main = fst (Globals.entry_point ()) in
+  let fundecls =
+    let l = ref [] in
+    Globals.Functions.iter (fun kf ->
+        if not (Kernel_function.is_definition kf) then
+          l := (kf.Cil_types.spec, Kernel_function.get_vi kf)::!l
+      );
+    !l in
+  let file = Project.on project (fun () ->
+      let file = Ast.get () in
+      file.Cil_types.globals <-
+        List.map (fun v -> Cil_types.GVarDecl(v,dummy_loc)) s.globals;
+      let fundec = Cil.emptyFunctionFromVI (Kernel_function.get_vi main) in
+      fundec.Cil_types.sformals <- s.main_formals;
+      let stmts = stmts_of_cfg s.graph s.start [] in
+      fundec.Cil_types.sbody <- Cil.mkBlock stmts;
+      (* Kernel_function.register_stmt *)
+      let fundecls = List.map (fun (fundecl,v) -> Cil_types.GFunDecl(fundecl,v,dummy_loc)) fundecls in
+      file.Cil_types.globals <- fundecls @ file.Cil_types.globals;
+      file.Cil_types.globals <- Cil_types.GFun(fundec,dummy_loc) :: file.Cil_types.globals;
+      file
+    ) () in
+  ignore (Cil.refresh_visit project);
+  Project.on project (fun file -> File.prepare_cil_file file) file
+
+
+
 let print_last_traces () =
   let state = D.Store.get_stmt_state (Kernel_function.find_return (fst (Globals.entry_point ())))  in
   let header fmt = Format.fprintf fmt "Trace domains:" in
   let body = Bottom.pretty Traces.pretty in
-  Value_parameters.printf ~dkey:Internal.log_category ~header " @[%a@]" body state
+  Value_parameters.printf ~dkey:Internal.log_category ~header " @[%a@]" body state;
+  Bottom.iter project_of_cfg state
 
 
 (*
