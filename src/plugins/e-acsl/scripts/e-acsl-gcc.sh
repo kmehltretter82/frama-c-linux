@@ -247,6 +247,11 @@ mmodel_features() {
   if [ -n "$OPTION_EXTERNAL_ASSERT" ]; then
     flags="$flags -DE_ACSL_EXTERNAL_ASSERT"
   fi
+
+  if [ -n "$OPTION_NO_TRACE" ]; then
+    flags="$flags -DE_ACSL_NO_TRACE"
+  fi
+
   echo $flags
 }
 
@@ -260,7 +265,7 @@ LONGOPTIONS="help,compile,compile-only,debug:,ocode:,oexec:,verbose:,
   frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:,
   print-mmodels,rt-debug,rte-select:,then,e-acsl-extra:,check,fail-with-code:,
   temporal,weak-validity,stack-size:,heap-size:,rt-verbose,free-valid-address,
-  external-assert:"
+  external-assert:,no-trace"
 SHORTOPTIONS="h,c,C,d:,D,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,I:,G:,X,a:,T,k,V"
 # Prefix for an error message due to wrong arguments
 ERROR="ERROR parsing arguments:"
@@ -293,6 +298,7 @@ OPTION_WEAK_VALIDITY=                    # Use notion of weak validity
 OPTION_RTE=                              # Enable assertion generation
 OPTION_FAIL_WITH_CODE=                   # Exit status code for failures
 OPTION_CHECK=                            # Check AST integrity
+OPTION_NO_TRACE=                         # Disable trace in debug mode
 OPTION_FRAMAC_CPP_EXTRA=""               # Extra CPP flags for Frama-C
 OPTION_FREE_VALID_ADDRESS="" # Fail if NULL is used as input to free function
 OPTION_RTE_SELECT=       # Generate assertions for these functions only
@@ -604,6 +610,11 @@ do
       shift;
       OPTION_EXTERNAL_ASSERT="$1"
       shift;
+    ;;
+    # Disable trace in debug mode
+    --no-trace)
+      shift
+      OPTION_NO_TRACE=1
     ;;
   esac
 done

@@ -54,7 +54,9 @@ static void vabort(char *fmt, ...);
 /* This ::exec_abort replaces `abort` via a macro at the top of this file */
 static void exec_abort(int line, const char *file) {
 #ifdef E_ACSL_DEBUG
+#ifndef E_ACSL_NO_TRACE
   trace();
+#endif
 #endif
   kill(getpid(), SIGABRT);
 }
