@@ -493,38 +493,78 @@ module D = Domain_builder.Complete (Internal)
 
 let dummy_loc = Cil_datatype.Location.unknown
 
-let rec stmts_of_cfg cfg current return_exp acc =
+let subst_in var_mapping = object
+  inherit Visitor.frama_c_copy (Project.current ())
+  method! vvrbl vi =
+    match Cil_datatype.Varinfo.Map.find vi var_mapping with
+    | exception Not_found -> Cil.DoChildren
+    | v -> Cil.ChangeTo v
+end
+
+let sanitize_name s =
+  String.map
+    (fun c ->
+       if
+         ('0' <= c && c <= '9') ||
+         ('a' <= c && c <= 'z') ||
+         ('A' <= c && c <= 'Z')
+       then c else '_') s
+
+let subst_in_exp var_mapping exp = Visitor.visitFramacExpr (subst_in var_mapping) exp
+let subst_in_lval var_mapping exp = Visitor.visitFramacLval (subst_in var_mapping) exp
+
+let rec stmts_of_cfg cfg current var_mapping return_exp acc =
   match Graph.find current cfg with
   | exception Not_found ->
+    let return_exp = Extlib.opt_map (subst_in_exp var_mapping) return_exp in
     let return_stmt = Cil.mkStmt (Cil_types.Return(return_exp,dummy_loc)) in
     List.rev (return_stmt::acc)
   | [] -> assert false
-  | [a] ->
-    (match a with
-     | Assign (n,lval,_typ,exp) ->
-       let stmt = Cil.mkStmtOneInstr (Cil_types.Set(lval,exp,dummy_loc)) in
-       stmts_of_cfg cfg n return_exp (stmt::acc)
-     | Assume (n,exp,b) ->
-       let predicate = (Logic_utils.expr_to_predicate ~cast:true exp).Cil_types.ip_content in
-       let predicate = if b then predicate else Logic_const.pnot predicate in
-       let code_annot = Logic_const.new_code_annotation(Cil_types.AAssert([],predicate)) in
-       let stmt = Cil.mkStmtOneInstr (Cil_types.Code_annot(code_annot,dummy_loc)) in
-       stmts_of_cfg cfg n return_exp (stmt::acc)
-     | EnterScope (n,vs) ->
-       let block = { Cil_types.battrs = [];
-                     bscoping = true;
-                     blocals = vs;
-                     bstatics = [];
-                     bstmts = stmts_of_cfg cfg n return_exp [] } in
-       let stmt = Cil.mkStmt (Cil_types.Block(block)) in
-       List.rev (stmt::acc)
-     | LeaveScope (n,_) -> stmts_of_cfg cfg n return_exp acc
-     | CallDeclared (n,kf,exps,lval) ->
-       let call = Cil.new_exp ~loc:dummy_loc (Cil_types.Lval (Cil.var (Kernel_function.get_vi kf))) in
-       let stmt = Cil.mkStmtOneInstr (Cil_types.Call(lval,call,exps,dummy_loc)) in
-       stmts_of_cfg cfg n return_exp (stmt::acc)
-     | Msg (n,_) -> stmts_of_cfg cfg n return_exp acc
-     | Top -> invalid_arg "top in the middle")
+  | [a] -> begin
+      match a with
+
+      | Assign (n,lval,_typ,exp) ->
+        let exp = subst_in_exp var_mapping exp in
+        let lval = subst_in_lval var_mapping lval in
+        let stmt = Cil.mkStmtOneInstr (Cil_types.Set(lval,exp,dummy_loc)) in
+        stmts_of_cfg cfg n var_mapping return_exp (stmt::acc)
+
+      | Assume (n,exp,b) ->
+        let exp = subst_in_exp var_mapping exp in
+        let predicate = (Logic_utils.expr_to_predicate ~cast:true exp).Cil_types.ip_content in
+        let predicate = if b then predicate else Logic_const.pnot predicate in
+        let code_annot = Logic_const.new_code_annotation(Cil_types.AAssert([],predicate)) in
+        let stmt = Cil.mkStmtOneInstr (Cil_types.Code_annot(code_annot,dummy_loc)) in
+        stmts_of_cfg cfg n var_mapping return_exp (stmt::acc)
+
+      | EnterScope (n,vs) ->
+        (** all our variables are assigned, not defined *)
+        let vs, var_mapping = List.fold_left (fun (vs,vm) v ->
+            let v' = Cil.copyVarinfo v (sanitize_name v.Cil_types.vname) in
+            v'.Cil_types.vdefined <- false;
+            (v'::vs, Cil_datatype.Varinfo.Map.add v v' vm))
+            ([],Cil_datatype.Varinfo.Map.empty) vs in
+        let block = { Cil_types.battrs = [];
+                      bscoping = true;
+                      blocals = vs;
+                      bstatics = [];
+                      bstmts = stmts_of_cfg cfg n var_mapping return_exp [] } in
+        let stmt = Cil.mkStmt (Cil_types.Block(block)) in
+        List.rev (stmt::acc)
+
+      | LeaveScope (n,_) -> stmts_of_cfg cfg n var_mapping return_exp acc
+
+      | CallDeclared (n,kf,exps,lval) ->
+        let exps = List.map (subst_in_exp var_mapping) exps in
+        let lval = Extlib.opt_map (subst_in_lval var_mapping) lval in
+        let call = Cil.new_exp ~loc:dummy_loc (Cil_types.Lval (Cil.var (Kernel_function.get_vi kf))) in
+        let stmt = Cil.mkStmtOneInstr (Cil_types.Call(lval,call,exps,dummy_loc)) in
+        stmts_of_cfg cfg n var_mapping return_exp (stmt::acc)
+
+      | Msg (n,_) -> stmts_of_cfg cfg n var_mapping return_exp acc
+
+      | Top -> invalid_arg "top in the middle"
+    end
   | l ->
     let is_if = match l with
       | [] | [_] -> assert false
@@ -536,8 +576,9 @@ let rec stmts_of_cfg cfg current return_exp acc =
       match is_if with
       | None -> assert false (* todo *)
       | Some(exp,n1,n2) ->
-        let block1 = Cil.mkBlock (stmts_of_cfg cfg n1 return_exp []) in
-        let block2 = Cil.mkBlock (stmts_of_cfg cfg n2 return_exp []) in
+        let exp = subst_in_exp var_mapping exp in
+        let block1 = Cil.mkBlock (stmts_of_cfg cfg n1 var_mapping return_exp []) in
+        let block2 = Cil.mkBlock (stmts_of_cfg cfg n2 var_mapping return_exp []) in
         Cil.mkStmt (Cil_types.If(exp,block1,block2,dummy_loc)) in
     List.rev (stmt::acc)
 
@@ -560,7 +601,7 @@ let project_of_cfg vreturn s =
       (** main function *)
       let fundec = Cil.emptyFunctionFromVI (Kernel_function.get_vi main) in
       fundec.Cil_types.sformals <- s.main_formals;
-      let stmts = Cil.mkBlock (stmts_of_cfg s.graph s.start vreturn []) in
+      let stmts = Cil.mkBlock (stmts_of_cfg s.graph s.start Cil_datatype.Varinfo.Map.empty vreturn []) in
       (* Format.printf "@[<2>@[stmts:@] %a@]@." Printer.pp_block stmts; *)
       fundec.Cil_types.sbody <- stmts;
       file.Cil_types.globals <- Cil_types.GFun(fundec,dummy_loc) :: file.Cil_types.globals;
