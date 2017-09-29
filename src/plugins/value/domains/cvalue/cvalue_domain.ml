@@ -473,7 +473,7 @@ module State = struct
         | None -> `Bottom
       else `Top
 
-    let get_stmt_state stmt = return (Db.Value.get_stmt_state stmt)
+    let get_stmt_state ?(after=false) stmt = assert (not after); return (Db.Value.get_stmt_state stmt)
     let get_stmt_state_by_callstack ~after stmt =
       if Storage.get ()
       then

@@ -481,7 +481,7 @@ module type Store = sig
   val get_initial_state_by_callstack:
     kernel_function -> state Value_types.Callstack.Hashtbl.t or_top_or_bottom
 
-  val get_stmt_state: stmt -> state or_bottom
+  val get_stmt_state: ?after:bool -> stmt -> state or_bottom
   val get_stmt_state_by_callstack:
     after:bool -> stmt -> state Value_types.Callstack.Hashtbl.t or_top_or_bottom
 end
