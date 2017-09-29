@@ -493,35 +493,37 @@ module D = Domain_builder.Complete (Internal)
 
 let dummy_loc = Cil_datatype.Location.unknown
 
-let rec stmts_of_cfg cfg current acc =
+let rec stmts_of_cfg cfg current return_exp acc =
   match Graph.find current cfg with
-  | exception Not_found -> List.rev acc
+  | exception Not_found ->
+    let return_stmt = Cil.mkStmt (Cil_types.Return(return_exp,dummy_loc)) in
+    List.rev (return_stmt::acc)
   | [] -> assert false
   | [a] ->
     (match a with
      | Assign (n,lval,_typ,exp) ->
        let stmt = Cil.mkStmtOneInstr (Cil_types.Set(lval,exp,dummy_loc)) in
-       stmts_of_cfg cfg n (stmt::acc)
+       stmts_of_cfg cfg n return_exp (stmt::acc)
      | Assume (n,exp,b) ->
        let predicate = (Logic_utils.expr_to_predicate ~cast:true exp).Cil_types.ip_content in
        let predicate = if b then predicate else Logic_const.pnot predicate in
        let code_annot = Logic_const.new_code_annotation(Cil_types.AAssert([],predicate)) in
        let stmt = Cil.mkStmtOneInstr (Cil_types.Code_annot(code_annot,dummy_loc)) in
-       stmts_of_cfg cfg n (stmt::acc)
+       stmts_of_cfg cfg n return_exp (stmt::acc)
      | EnterScope (n,vs) ->
        let block = { Cil_types.battrs = [];
                      bscoping = true;
                      blocals = vs;
                      bstatics = [];
-                     bstmts = stmts_of_cfg cfg n [] } in
+                     bstmts = stmts_of_cfg cfg n return_exp [] } in
        let stmt = Cil.mkStmt (Cil_types.Block(block)) in
        List.rev (stmt::acc)
-     | LeaveScope (n,_) -> stmts_of_cfg cfg n acc
+     | LeaveScope (n,_) -> stmts_of_cfg cfg n return_exp acc
      | CallDeclared (n,kf,exps,lval) ->
        let call = Cil.new_exp ~loc:dummy_loc (Cil_types.Lval (Cil.var (Kernel_function.get_vi kf))) in
        let stmt = Cil.mkStmtOneInstr (Cil_types.Call(lval,call,exps,dummy_loc)) in
-       stmts_of_cfg cfg n (stmt::acc)
-     | Msg (n,_) -> stmts_of_cfg cfg n acc
+       stmts_of_cfg cfg n return_exp (stmt::acc)
+     | Msg (n,_) -> stmts_of_cfg cfg n return_exp acc
      | Top -> invalid_arg "top in the middle")
   | l ->
     let is_if = match l with
@@ -534,8 +536,8 @@ let rec stmts_of_cfg cfg current acc =
       match is_if with
       | None -> assert false (* todo *)
       | Some(exp,n1,n2) ->
-        let block1 = Cil.mkBlock (stmts_of_cfg cfg n1 []) in
-        let block2 = Cil.mkBlock (stmts_of_cfg cfg n2 []) in
+        let block1 = Cil.mkBlock (stmts_of_cfg cfg n1 return_exp []) in
+        let block2 = Cil.mkBlock (stmts_of_cfg cfg n2 return_exp []) in
         Cil.mkStmt (Cil_types.If(exp,block1,block2,dummy_loc)) in
     List.rev (stmt::acc)
 
@@ -543,7 +545,7 @@ let _ = Cil.stmt_of_instr_list
 
 let _ = File.from_filename
 
-let project_of_cfg s =
+let project_of_cfg vreturn s =
   let project = Project.create_by_copy ~selection:State_selection.empty ~last:true "Eva.Traces_domain" in
   let main = fst (Globals.entry_point ()) in
   let fundecls =
@@ -555,16 +557,20 @@ let project_of_cfg s =
     !l in
   let file = Project.on project (fun () ->
       let file = Ast.get () in
-      file.Cil_types.globals <-
-        List.map (fun v -> Cil_types.GVarDecl(v,dummy_loc)) s.globals;
+      (** main function *)
       let fundec = Cil.emptyFunctionFromVI (Kernel_function.get_vi main) in
       fundec.Cil_types.sformals <- s.main_formals;
-      let stmts = stmts_of_cfg s.graph s.start [] in
-      fundec.Cil_types.sbody <- Cil.mkBlock stmts;
-      (* Kernel_function.register_stmt *)
+      let stmts = Cil.mkBlock (stmts_of_cfg s.graph s.start vreturn []) in
+      (* Format.printf "@[<2>@[stmts:@] %a@]@." Printer.pp_block stmts; *)
+      fundec.Cil_types.sbody <- stmts;
+      file.Cil_types.globals <- Cil_types.GFun(fundec,dummy_loc) :: file.Cil_types.globals;
+      (* declared functions *)
       let fundecls = List.map (fun (fundecl,v) -> Cil_types.GFunDecl(fundecl,v,dummy_loc)) fundecls in
       file.Cil_types.globals <- fundecls @ file.Cil_types.globals;
-      file.Cil_types.globals <- Cil_types.GFun(fundec,dummy_loc) :: file.Cil_types.globals;
+      (* globals *)
+      file.Cil_types.globals <-
+        (List.map (fun v -> Cil_types.GVarDecl(v,dummy_loc)) s.globals)
+        @ file.Cil_types.globals;
       file
     ) () in
   ignore (Cil.refresh_visit project);
@@ -573,11 +579,15 @@ let project_of_cfg s =
 
 
 let print_last_traces () =
-  let state = D.Store.get_stmt_state (Kernel_function.find_return (fst (Globals.entry_point ())))  in
+  let return_stmt = Kernel_function.find_return (fst (Globals.entry_point ())) in
+  let return_exp = match return_stmt.Cil_types.skind with
+    | Cil_types.Return (oexp,_) -> oexp
+    | _ -> assert false in
+  let state = D.Store.get_stmt_state ~after:true return_stmt  in
   let header fmt = Format.fprintf fmt "Trace domains:" in
   let body = Bottom.pretty Traces.pretty in
   Value_parameters.printf ~dkey:Internal.log_category ~header " @[%a@]" body state;
-  Bottom.iter project_of_cfg state
+  Bottom.iter (project_of_cfg return_exp) state
 
 
 (*

@@ -1,0 +1,48 @@
+[kernel] Parsing tests/value/traces/test3.i (no preprocessing)
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value:initial-state] Values of globals at initialization
+  g ∈ {0}
+[value] Recording results for main
+[value] done for function main
+[value] ====== VALUES COMPUTED ======
+[value:final-states] Values at end of function main:
+  g ∈ {4}
+  tmp ∈ {4}
+  __retres ∈ {5}
+[value:d-traces] Trace domains:
+ start: 0; globals = g; main_formals = c 
+ {[ 0 -> ([ initialize variable: g -> 1 ])
+    1 -> ([ initialize variable using type Main_Formal
+c -> 2 ])
+    2 -> ([ EnterScope: __retres -> 3 ])
+    3 -> ([ EnterScope: tmp -> 4 ])
+    4 -> ([ initialize variable: tmp -> 5 ])
+    5 -> ([ Assign: tmp = 4 -> 6 ])
+    6 -> ([ Assume: tmp true -> 7 ])
+    7 -> ([ Assign: g = tmp -> 8 ])
+    8 -> ([ Assign: __retres = g + 1 -> 9 ]) ]}
+ current: 9]
+[kernel] warning: no input file.
+[from] Computing for function main
+[from] Done for function main
+[from] ====== DEPENDENCIES COMPUTED ======
+       These dependencies hold at termination for the executions that terminate:
+[from] Function main:
+  g FROM \nothing
+  \result FROM \nothing
+[from] ====== END OF DEPENDENCIES ======
+[inout] Out (internal) for function main:
+          g; tmp; __retres
+[inout] Inputs for function main:
+          g
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value:initial-state] Values of globals at initialization
+  
+[value] done for function main
+[value] ====== VALUES COMPUTED ======
+[value:final-states] Values at end of function main:
+  g ∈ {4}
