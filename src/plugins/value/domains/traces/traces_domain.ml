@@ -712,7 +712,7 @@ let project_of_cfg vreturn s =
 
 
 
-let print_last_traces () =
+let finish_computation () =
   let return_stmt = Kernel_function.find_return (fst (Globals.entry_point ())) in
   let return_exp = match return_stmt.Cil_types.skind with
     | Cil_types.Return (oexp,_) -> oexp

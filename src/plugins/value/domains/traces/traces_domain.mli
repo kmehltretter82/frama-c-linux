@@ -55,4 +55,4 @@ module D: Abstract_domain.Internal
    and type location = Precise_locs.precise_location
    and type state = state
 
-val print_last_traces: unit -> unit
+val finish_computation: unit -> unit
