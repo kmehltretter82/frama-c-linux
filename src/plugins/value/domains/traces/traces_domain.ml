@@ -20,6 +20,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module Frama_c_File = File
+open Cil_datatype
+
+[@@@ warning "-40-42"]
+
 module Node = struct include Datatype.Int let id x = x end
 
 type edge =
@@ -52,35 +57,35 @@ module Edge = struct
         | Assign (n1,loc1,typ1,exp1), Assign (n2,loc2,typ2,exp2) ->
           let c = Node.compare n1 n2 in
           if c <> 0 then c else
-            let c = Cil_datatype.Lval.compare loc1 loc2 in
+            let c = Lval.compare loc1 loc2 in
             if c <> 0 then c else
-              let c = Cil_datatype.Typ.compare typ1 typ2 in
+              let c = Typ.compare typ1 typ2 in
               if c <> 0 then c else
-                Cil_datatype.Exp.compare exp1 exp2
+                Exp.compare exp1 exp2
         | Assume(n1,e1,b1), Assume(n2,e2,b2) ->
           let c = Node.compare n1 n2 in
           if c <> 0 then c else
-          let c = Cil_datatype.Exp.compare e1 e2 in
+          let c = Exp.compare e1 e2 in
           if c <> 0 then c else
             Pervasives.compare b1 b2
         | EnterScope(n1,vs1),EnterScope(n2,vs2) ->
           let c = Node.compare n1 n2 in
           if c <> 0 then c else
-          let c = Extlib.list_compare Cil_datatype.Varinfo.compare vs1 vs2 in
+          let c = Extlib.list_compare Varinfo.compare vs1 vs2 in
           c
         | LeaveScope(n1,vs1), LeaveScope(n2,vs2) ->
           let c = Node.compare n1 n2 in
           if c <> 0 then c else
-          let c = Extlib.list_compare Cil_datatype.Varinfo.compare vs1 vs2 in
+          let c = Extlib.list_compare Varinfo.compare vs1 vs2 in
           c
         | CallDeclared(n1,kf1,exp1,lval1), CallDeclared(n2,kf2,exp2,lval2) ->
           let c = Node.compare n1 n2 in
           if c <> 0 then c else
           let c = Kernel_function.compare kf1 kf2 in
           if c <> 0 then c else
-            let c = Extlib.list_compare Cil_datatype.Exp.compare exp1 exp2 in
+            let c = Extlib.list_compare Exp.compare exp1 exp2 in
             if c <> 0 then c else
-              let c = Extlib.opt_compare Cil_datatype.Lval.compare lval1 lval2 in
+              let c = Extlib.opt_compare Lval.compare lval1 lval2 in
               c
         | Msg(n1,s1), Msg(n2,s2) ->
           let c = Node.compare n1 n2 in
@@ -105,37 +110,37 @@ module Edge = struct
       let pretty fmt = function
         | Top -> Format.fprintf fmt "@[Top@]"
         | Assign(n,loc,_typ,exp) -> Format.fprintf fmt "@[Assign:@ %a = %a -> %a@]"
-                                      Cil_datatype.Lval.pretty loc Cil_datatype.Exp.pretty exp Node.pretty n
-        | Assume(n,e,b) -> Format.fprintf fmt "@[Assume:@ %a %b -> %a@]" Cil_datatype.Exp.pretty e b Node.pretty n
+                                      Lval.pretty loc Exp.pretty exp Node.pretty n
+        | Assume(n,e,b) -> Format.fprintf fmt "@[Assume:@ %a %b -> %a@]" Exp.pretty e b Node.pretty n
         | EnterScope(n,vs) -> Format.fprintf fmt "@[EnterScope:@ %a -> %a@]"
-                              (Pretty_utils.pp_list ~sep:"@ " Cil_datatype.Varinfo.pretty) vs Node.pretty n
+                              (Pretty_utils.pp_list ~sep:"@ " Varinfo.pretty) vs Node.pretty n
         | LeaveScope(n,vs) -> Format.fprintf fmt "@[LeaveScope:@ %a -> %a@]"
-                              (Pretty_utils.pp_list ~sep:"@ " Cil_datatype.Varinfo.pretty) vs Node.pretty n
+                              (Pretty_utils.pp_list ~sep:"@ " Varinfo.pretty) vs Node.pretty n
         | CallDeclared(n,kf1,exp1,lval1) ->
           Format.fprintf fmt "@[CallDeclared:@ %a%s(%a) -> %a@]"
-            (Pretty_utils.pp_opt ~pre:"" ~suf:" =@ " Cil_datatype.Lval.pretty) lval1
+            (Pretty_utils.pp_opt ~pre:"" ~suf:" =@ " Lval.pretty) lval1
             (Kernel_function.get_name kf1)
-            (Pretty_utils.pp_list ~sep:",@ " Cil_datatype.Exp.pretty) exp1
+            (Pretty_utils.pp_list ~sep:",@ " Exp.pretty) exp1
              Node.pretty n
         | Msg(n,s) -> Format.fprintf fmt "@[%s -> %a@]" s Node.pretty n
 
       let hash = function
         | Top -> Hashtbl.hash 0
-        | Assume(n,e,b) -> Hashtbl.seeded_hash n (Hashtbl.seeded_hash (Hashtbl.hash b) (Cil_datatype.Exp.hash e))
+        | Assume(n,e,b) -> Hashtbl.seeded_hash n (Hashtbl.seeded_hash (Hashtbl.hash b) (Exp.hash e))
         | Assign(n,loc,typ,exp) ->
-          (Hashtbl.seeded_hash (Cil_datatype.Exp.hash exp)
-             (Hashtbl.seeded_hash (Cil_datatype.Typ.hash typ)
-                (Hashtbl.seeded_hash n (Hashtbl.seeded_hash 2 (Cil_datatype.Lval.hash loc)))))
+          (Hashtbl.seeded_hash (Exp.hash exp)
+             (Hashtbl.seeded_hash (Typ.hash typ)
+                (Hashtbl.seeded_hash n (Hashtbl.seeded_hash 2 (Lval.hash loc)))))
         | EnterScope(n,vs) ->
-          let x = List.fold_left (fun acc e -> Hashtbl.seeded_hash acc (Cil_datatype.Varinfo.hash e)) 3 vs in
+          let x = List.fold_left (fun acc e -> Hashtbl.seeded_hash acc (Varinfo.hash e)) 3 vs in
           Hashtbl.seeded_hash n x
         | LeaveScope(n,vs) ->
-          let x = List.fold_left (fun acc e -> Hashtbl.seeded_hash acc (Cil_datatype.Varinfo.hash e)) 4 vs in
+          let x = List.fold_left (fun acc e -> Hashtbl.seeded_hash acc (Varinfo.hash e)) 4 vs in
           Hashtbl.seeded_hash n x
         | CallDeclared(n,kf,exps,lval) ->
           let x = Kernel_function.hash kf in
-          let x = Hashtbl.seeded_hash x (Extlib.opt_hash Cil_datatype.Lval.hash lval) in
-          let x = List.fold_left (fun acc e -> Hashtbl.seeded_hash acc (Cil_datatype.Exp.hash e)) x exps in
+          let x = Hashtbl.seeded_hash x (Extlib.opt_hash Lval.hash lval) in
+          let x = List.fold_left (fun acc e -> Hashtbl.seeded_hash acc (Exp.hash e)) x exps in
           Hashtbl.seeded_hash n x
         | Msg(n,s) -> Hashtbl.seeded_hash n (Hashtbl.seeded_hash 5 s)
 
@@ -205,8 +210,8 @@ module Traces = struct
         else
           Format.fprintf fmt "@[<hv>@[start: %i; globals = %a; main_formals = %a @]@ %a@ @[current: %i]"
             m.start
-            (Pretty_utils.pp_list ~sep:",@ " Cil_datatype.Varinfo.pretty) m.globals
-            (Pretty_utils.pp_list ~sep:",@ " Cil_datatype.Varinfo.pretty) m.main_formals
+            (Pretty_utils.pp_list ~sep:",@ " Varinfo.pretty) m.globals
+            (Pretty_utils.pp_list ~sep:",@ " Varinfo.pretty) m.main_formals
             Graph.pretty m.graph m.current
 
       let hash m =
@@ -456,7 +461,7 @@ module Internal = struct
            | Abstract_domain.Library_Global -> Format.pp_print_string fmt "Library_Global"
            | Abstract_domain.Spec_Return kf -> Format.fprintf fmt "Spec_Return(%s)" (Kernel_function.get_name kf))
         init_kind
-        Cil_datatype.Varinfo.pretty varinfo
+        Varinfo.pretty varinfo
     in
     Traces.add_edge state (Msg(0,msg))
 
@@ -491,15 +496,26 @@ end
 
 module D = Domain_builder.Complete (Internal)
 
-let dummy_loc = Cil_datatype.Location.unknown
+let dummy_loc = Location.unknown
 
-let subst_in var_mapping = object
-  inherit Visitor.frama_c_copy (Project.current ())
+let subst_in_full var_mapping =
+  let visit = Cil.copy_visit (Project.current ()) in
+  visit, object
+  inherit Cil.genericCilVisitor (visit)
   method! vvrbl vi =
-    match Cil_datatype.Varinfo.Map.find vi var_mapping with
+    match Varinfo.Map.find vi var_mapping with
     | exception Not_found -> Cil.DoChildren
     | v -> Cil.ChangeTo v
+  method! vlogic_var_use lv =
+    match lv.Cil_types.lv_origin with
+    | None -> Cil.DoChildren
+    | Some vi ->
+      match Varinfo.Map.find vi var_mapping with
+      | exception Not_found -> Cil.DoChildren
+      | v -> Cil.ChangeTo (Cil.cvar_to_lvar v)
 end
+
+let subst_in var_mapping = (snd (subst_in_full var_mapping))
 
 let sanitize_name s =
   String.map
@@ -510,58 +526,71 @@ let sanitize_name s =
          ('A' <= c && c <= 'Z')
        then c else '_') s
 
-let subst_in_exp var_mapping exp = Visitor.visitFramacExpr (subst_in var_mapping) exp
-let subst_in_lval var_mapping exp = Visitor.visitFramacLval (subst_in var_mapping) exp
+let subst_in_exp var_map exp = Cil.visitCilExpr (subst_in var_map) exp
+let subst_in_lval var_map exp = Cil.visitCilLval (subst_in var_map) exp
+let subst_in_varinfo var_map v =
+  match Varinfo.Map.find v var_map with
+  | exception Not_found -> v
+  | v -> v
 
-let rec stmts_of_cfg cfg current var_mapping return_exp acc =
+let fresh_varinfo var_map v =
+  let v' = Cil.copyVarinfo v (sanitize_name v.Cil_types.vname) in
+  v'.Cil_types.vdefined <- false;
+  Varinfo.Map.add v v' var_map
+
+let valid_sid = true
+
+let rec stmts_of_cfg cfg current var_map locals return_exp acc =
   match Graph.find current cfg with
   | exception Not_found ->
-    let return_exp = Extlib.opt_map (subst_in_exp var_mapping) return_exp in
-    let return_stmt = Cil.mkStmt (Cil_types.Return(return_exp,dummy_loc)) in
-    List.rev (return_stmt::acc)
+    begin match return_exp with
+    | None -> List.rev acc
+    | Some (var,exp) ->
+      let exp = subst_in_exp var_map exp in
+      let return_stmt = Cil.mkStmtOneInstr ~valid_sid (Cil_types.Set(Cil.var var,exp,dummy_loc)) in
+      List.rev (return_stmt::acc)
+    end
   | [] -> assert false
   | [a] -> begin
       match a with
 
       | Assign (n,lval,_typ,exp) ->
-        let exp = subst_in_exp var_mapping exp in
-        let lval = subst_in_lval var_mapping lval in
-        let stmt = Cil.mkStmtOneInstr (Cil_types.Set(lval,exp,dummy_loc)) in
-        stmts_of_cfg cfg n var_mapping return_exp (stmt::acc)
+        let exp = subst_in_exp var_map exp in
+        let lval = subst_in_lval var_map lval in
+        let stmt = Cil.mkStmtOneInstr ~valid_sid (Cil_types.Set(lval,exp,dummy_loc)) in
+        stmts_of_cfg cfg n var_map locals return_exp (stmt::acc)
 
       | Assume (n,exp,b) ->
-        let exp = subst_in_exp var_mapping exp in
+        let exp = subst_in_exp var_map exp in
         let predicate = (Logic_utils.expr_to_predicate ~cast:true exp).Cil_types.ip_content in
         let predicate = if b then predicate else Logic_const.pnot predicate in
         let code_annot = Logic_const.new_code_annotation(Cil_types.AAssert([],predicate)) in
-        let stmt = Cil.mkStmtOneInstr (Cil_types.Code_annot(code_annot,dummy_loc)) in
-        stmts_of_cfg cfg n var_mapping return_exp (stmt::acc)
+        let stmt = Cil.mkStmtOneInstr ~valid_sid (Cil_types.Code_annot(code_annot,dummy_loc)) in
+        stmts_of_cfg cfg n var_map locals return_exp (stmt::acc)
 
       | EnterScope (n,vs) ->
         (** all our variables are assigned, not defined *)
-        let vs, var_mapping = List.fold_left (fun (vs,vm) v ->
-            let v' = Cil.copyVarinfo v (sanitize_name v.Cil_types.vname) in
-            v'.Cil_types.vdefined <- false;
-            (v'::vs, Cil_datatype.Varinfo.Map.add v v' vm))
-            ([],Cil_datatype.Varinfo.Map.empty) vs in
+        let var_map = List.fold_left fresh_varinfo var_map vs in
+        let vs = List.map (subst_in_varinfo var_map) vs in
+        locals := vs @ !locals;
         let block = { Cil_types.battrs = [];
                       bscoping = true;
                       blocals = vs;
                       bstatics = [];
-                      bstmts = stmts_of_cfg cfg n var_mapping return_exp [] } in
-        let stmt = Cil.mkStmt (Cil_types.Block(block)) in
+                      bstmts = stmts_of_cfg cfg n var_map locals return_exp [] } in
+        let stmt = Cil.mkStmt ~valid_sid (Cil_types.Block(block)) in
         List.rev (stmt::acc)
 
-      | LeaveScope (n,_) -> stmts_of_cfg cfg n var_mapping return_exp acc
+      | LeaveScope (n,_) -> stmts_of_cfg cfg n var_map locals return_exp acc
 
       | CallDeclared (n,kf,exps,lval) ->
-        let exps = List.map (subst_in_exp var_mapping) exps in
-        let lval = Extlib.opt_map (subst_in_lval var_mapping) lval in
-        let call = Cil.new_exp ~loc:dummy_loc (Cil_types.Lval (Cil.var (Kernel_function.get_vi kf))) in
-        let stmt = Cil.mkStmtOneInstr (Cil_types.Call(lval,call,exps,dummy_loc)) in
-        stmts_of_cfg cfg n var_mapping return_exp (stmt::acc)
+        let exps = List.map (subst_in_exp var_map) exps in
+        let lval = Extlib.opt_map (subst_in_lval var_map) lval in
+        let call = Cil.evar ~loc:dummy_loc (subst_in_varinfo var_map (Kernel_function.get_vi kf)) in
+        let stmt = Cil.mkStmtOneInstr ~valid_sid (Cil_types.Call(lval,call,exps,dummy_loc)) in
+        stmts_of_cfg cfg n var_map locals return_exp (stmt::acc)
 
-      | Msg (n,_) -> stmts_of_cfg cfg n var_mapping return_exp acc
+      | Msg (n,_) -> stmts_of_cfg cfg n var_map locals return_exp acc
 
       | Top -> invalid_arg "top in the middle"
     end
@@ -569,53 +598,117 @@ let rec stmts_of_cfg cfg current var_mapping return_exp acc =
     let is_if = match l with
       | [] | [_] -> assert false
       | [Assume(n1',exp1,b1) ; Assume(n2',exp2,b2)]
-        when Cil_datatype.Exp.equal exp1 exp2 && b1 != b2 ->
+        when Exp.equal exp1 exp2 && b1 != b2 ->
         if b1 then Some (exp1, n1', n2') else Some (exp1,n2',n1')
       | _ -> None in
     let stmt =
       match is_if with
       | None -> assert false (* todo *)
       | Some(exp,n1,n2) ->
-        let exp = subst_in_exp var_mapping exp in
-        let block1 = Cil.mkBlock (stmts_of_cfg cfg n1 var_mapping return_exp []) in
-        let block2 = Cil.mkBlock (stmts_of_cfg cfg n2 var_mapping return_exp []) in
-        Cil.mkStmt (Cil_types.If(exp,block1,block2,dummy_loc)) in
+        let exp = subst_in_exp var_map exp in
+        let block1 = Cil.mkBlock (stmts_of_cfg cfg n1 var_map locals return_exp []) in
+        let block2 = Cil.mkBlock (stmts_of_cfg cfg n2 var_map locals return_exp []) in
+        Cil.mkStmt ~valid_sid (Cil_types.If(exp,block1,block2,dummy_loc)) in
     List.rev (stmt::acc)
 
-let _ = Cil.stmt_of_instr_list
-
-let _ = File.from_filename
-
 let project_of_cfg vreturn s =
-  let project = Project.create_by_copy ~selection:State_selection.empty ~last:true "Eva.Traces_domain" in
-  let main = fst (Globals.entry_point ()) in
-  let fundecls =
-    let l = ref [] in
-    Globals.Functions.iter (fun kf ->
-        if not (Kernel_function.is_definition kf) then
-          l := (kf.Cil_types.spec, Kernel_function.get_vi kf)::!l
-      );
-    !l in
-  let file = Project.on project (fun () ->
-      let file = Ast.get () in
-      (** main function *)
-      let fundec = Cil.emptyFunctionFromVI (Kernel_function.get_vi main) in
-      fundec.Cil_types.sformals <- s.main_formals;
-      let stmts = Cil.mkBlock (stmts_of_cfg s.graph s.start Cil_datatype.Varinfo.Map.empty vreturn []) in
-      (* Format.printf "@[<2>@[stmts:@] %a@]@." Printer.pp_block stmts; *)
-      fundec.Cil_types.sbody <- stmts;
-      file.Cil_types.globals <- Cil_types.GFun(fundec,dummy_loc) :: file.Cil_types.globals;
-      (* declared functions *)
-      let fundecls = List.map (fun (fundecl,v) -> Cil_types.GFunDecl(fundecl,v,dummy_loc)) fundecls in
-      file.Cil_types.globals <- fundecls @ file.Cil_types.globals;
-      (* globals *)
-      file.Cil_types.globals <-
-        (List.map (fun v -> Cil_types.GVarDecl(v,dummy_loc)) s.globals)
-        @ file.Cil_types.globals;
-      file
-    ) () in
-  ignore (Cil.refresh_visit project);
-  Project.on project (fun file -> File.prepare_cil_file file) file
+  let main = Kernel_function.get_vi (fst (Globals.entry_point ())) in
+
+  let visit project =
+    let visitor =
+      object (self)
+        inherit Visitor.frama_c_copy project
+        method! vglob_aux global =
+          match global with
+          | Cil_types.GFun(fundec,_) when Varinfo.equal fundec.svar main ->
+            Cil.DoChildren
+          | Cil_types.GFun _ -> Cil.ChangeTo([])
+          | _ -> Cil.JustCopy
+        method! vfunc fundec =
+          if Varinfo.equal (Cil.get_original_varinfo self#behavior fundec.Cil_types.svar) main then begin
+            (** copy of the fundec structure has already been done *)
+            fundec.slocals <- [];
+            let var_map = Varinfo.Map.empty in
+            let return_stmt, return_equal, blocals = match vreturn with
+              | None -> Cil.mkStmt ~valid_sid (Cil_types.Return(None,dummy_loc)), None, []
+              | Some exp ->
+                let var = Cil.makeVarinfo false false "__traces_domain_return" (Cil.typeOf exp) in
+                Cil.mkStmt ~valid_sid (Cil_types.Return(Some (Cil.evar var),dummy_loc)),
+                Some (var,exp), [var]
+            in
+            let locals = ref [] in
+            let stmts = stmts_of_cfg s.graph s.start var_map locals return_equal [] in
+            let sbody = Cil.mkBlock (stmts@[return_stmt])  in
+            sbody.Cil_types.blocals <- blocals;
+            fundec.sbody <- sbody;
+            fundec.slocals <- blocals @ !locals @ fundec.slocals;
+            Cil.setMaxId fundec;
+            let fundec = {fundec with sbody} in
+            Cil.ChangeDoChildrenPost(fundec,(fun x -> x))
+          end
+          else
+            Cil.JustCopy
+      end
+    in
+    visitor
+  in
+
+  let _project = Frama_c_File.create_project_from_visitor "Eva.Traces_domain" visit in
+  ()
+  (* let selection = *)
+  (*   State_selection.diff *)
+  (*     State_selection.full *)
+  (*     (State_selection.list_union *)
+  (*        (List.map State_selection.with_dependencies *)
+  (*           [Cil.Builtin_functions.self; *)
+  (*            Ast.self; *)
+  (*            Frama_c_File.files_pre_register_state])) *)
+  (* in *)
+  (* let project = Project.create_by_copy ~selection ~last:true "Eva.Traces_domain" in *)
+  (* let fundecls = *)
+  (*   let l = ref [] in *)
+  (*   Globals.Functions.iter (fun kf -> *)
+  (*       if not (Kernel_function.is_definition kf) then *)
+  (*         l := (kf.Cil_types.spec, Kernel_function.get_vi kf)::!l *)
+  (*     ); *)
+  (*   !l in *)
+  (* Project.on project (fun () -> *)
+
+  (*     let var_map = Varinfo.Map.empty in *)
+  (*     let var_map = List.fold_left fresh_varinfo var_map s.globals in *)
+  (*     let var_map = List.fold_left fresh_varinfo var_map s.main_formals in *)
+  (*     let fundecls, var_map = List.fold_left (fun (fundecls,var_map) (funspec,v) -> *)
+  (*         let fundecl = Cil_types.GFunDecl(funspec,v,dummy_loc) in *)
+  (*         let behavior,visitor = subst_in_full var_map in *)
+  (*         let fundecl = Cil.visitCilGlobal visitor fundecl in *)
+  (*         let v' = Cil.get_varinfo behavior v in *)
+  (*         (fundecl @ fundecls), Varinfo.Map.add v v' var_map *)
+  (*         (\* (fundecl :: fundecls, var_map) *\) *)
+  (*       ) ([],var_map) fundecls in *)
+  (*     let globals = [] in *)
+  (*     (\** main function *\) *)
+  (*     let var_map = fresh_varinfo var_map main in *)
+  (*     let main = subst_in_varinfo var_map main in *)
+  (*     let fundec = Cil.emptyFunctionFromVI main in *)
+  (*     fundec.Cil_types.sformals <- List.map (subst_in_varinfo var_map) s.main_formals; *)
+  (*     let stmts = Cil.mkBlock (stmts_of_cfg s.graph s.start var_map vreturn []) in *)
+  (*     fundec.Cil_types.sbody <- stmts; *)
+  (*     let globals = Cil_types.GFun(fundec,dummy_loc) :: globals in *)
+  (*     (\* declared functions *\) *)
+  (*     let globals = fundecls @ globals in *)
+  (*     (\* globals *\) *)
+  (*     let globals = (List.map (fun v -> Cil_types.GVarDecl(subst_in_varinfo var_map v,dummy_loc)) s.globals) @ globals in *)
+  (*     let file = { Cil_types.fileName = "Traces_domain"; *)
+  (*                  globals; *)
+  (*                  globinit = None; *)
+  (*                  globinitcalled = false; } in *)
+  (*     Globals.set_entry_point (main.Cil_types.vname) false; *)
+  (*     Format.printf "@[<2>@[file1:@] %a@]@." Printer.pp_file file; *)
+  (*     (\* let file = Cil.visitCilFileCopy (new Cil.genericCilVisitor (Cil.refresh_visit project)) file in *\) *)
+  (*     Format.printf "@[<2>@[file2:@] %a@]@." Printer.pp_file file; *)
+  (*     Ast.set_file file; *)
+  (*     Format.printf "@[<2>@[file3:@] %a@]@." Printer.pp_file file; *)
+  (*   ) () *)
 
 
 

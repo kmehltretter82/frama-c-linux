@@ -220,6 +220,7 @@ val create_rebuilt_project_from_visitor:
 *)
 
 val prepare_cil_file: Cil_types.file -> unit
+val files_pre_register_state: State.t
 
 val init_from_cmdline: unit -> unit
 (** Initialize the cil file representation with the file given on the
