@@ -3,172 +3,147 @@
 [value] Computing initial state
 [value] Initial state computed
 [value:initial-state] Values of globals at initialization
-  Frama_C_entropy_source ∈ [--..--]
+  entropy_source ∈ [--..--]
   g ∈ {42}
-[value] computing for function Frama_C_interval <- main.
-        Called from tests/value/traces/test1.c:10.
-[value] using specification for function Frama_C_interval
-share/libc/__fc_builtin.h:52:[value] function Frama_C_interval: precondition got status valid.
-[value] Done for function Frama_C_interval
 [value] Recording results for main
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value:final-states] Values at end of function main:
-  Frama_C_entropy_source ∈ [--..--]
   g ∈ {5; 45}
-  c ∈ {0; 1}
   tmp ∈ {5; 45}
 [value:d-traces] Trace domains:
- start: 0; globals = g, Frama_C_entropy_source; main_formals = c 
- {[ 0 -> ([ initialize variable: Frama_C_entropy_source -> 1 ])
+ start: 0; globals = g, entropy_source; main_formals = c;
+ {[ 0 -> ([ initialize variable: entropy_source -> 1 ])
     1 -> ([ initialize variable using type Library_Global
-Frama_C_entropy_source -> 2 ])
+entropy_source -> 2 ])
     2 -> ([ initialize variable: g -> 3 ])
     3 -> ([ Assign: g = 42 -> 4 ])
     4 -> ([ initialize variable using type Main_Formal
 c -> 5 ])
     5 -> ([ EnterScope: tmp -> 6 ])
-    6 -> ([ EnterScope: \result<Frama_C_interval> -> 7 ])
-    7 -> ([ CallDeclared: \result<Frama_C_interval> =
-            Frama_C_interval(0, 1) -> 8 ])
-    8 -> ([ Assign: c = \result<Frama_C_interval> -> 9 ])
-    9 -> ([ LeaveScope: \result<Frama_C_interval> -> 10 ])
-    10 -> ([ Assign: tmp = 0 -> 11 ])
-    11 -> ([ Assume: c false -> 12; Assume: c true -> 13 ])
-    12 -> ([ Assign: tmp = 2 -> 16 ])
-    13 -> ([ Assign: tmp = g -> 15 ])
-    15 -> ([ EnterScope: i -> 21 ])
-    16 -> ([ EnterScope: i -> 18 ])
-    18 -> ([ initialize variable: i -> 19 ])
-    19 -> ([ Assign: i = 0 -> 20 ])
-    20 -> ([ enter_loop -> 26 ])
-    21 -> ([ initialize variable: i -> 22 ])
-    22 -> ([ Assign: i = 0 -> 23 ])
-    23 -> ([ enter_loop -> 25 ])
-    25 -> ([ Assume: i < 3 true -> 28 ])
-    26 -> ([ Assume: i < 3 true -> 29 ])
-    28 -> ([ Assign: tmp = tmp + 1 -> 31 ])
-    29 -> ([ Assign: tmp = tmp + 1 -> 30 ])
-    30 -> ([ Assign: i = i + 1 -> 32 ])
-    31 -> ([ Assign: i = i + 1 -> 33 ])
-    32 -> ([ incr_loop_counter -> 36 ])
-    33 -> ([ incr_loop_counter -> 35 ])
-    35 -> ([ Assume: i < 3 true -> 39 ])
-    36 -> ([ Assume: i < 3 true -> 40 ])
-    39 -> ([ Assign: tmp = tmp + 1 -> 42 ])
-    40 -> ([ Assign: tmp = tmp + 1 -> 41 ])
-    41 -> ([ Assign: i = i + 1 -> 44 ])
-    42 -> ([ Assign: i = i + 1 -> 43 ])
-    43 -> ([ incr_loop_counter -> 48 ])
-    44 -> ([ incr_loop_counter -> 47 ])
-    47 -> ([ Assume: i < 3 true -> 51 ])
-    48 -> ([ Assume: i < 3 true -> 52 ])
-    51 -> ([ Assign: tmp = tmp + 1 -> 54 ])
-    52 -> ([ Assign: tmp = tmp + 1 -> 53 ])
-    53 -> ([ Assign: i = i + 1 -> 56 ])
-    54 -> ([ Assign: i = i + 1 -> 55 ])
-    55 -> ([ incr_loop_counter -> 60 ])
-    56 -> ([ incr_loop_counter -> 59 ])
-    59 -> ([ Assume: i < 3 false -> 63 ])
-    60 -> ([ Assume: i < 3 false -> 64 ])
-    63 -> ([ leave_loop -> 66 ])
-    64 -> ([ leave_loop -> 65 ])
-    65 -> ([ LeaveScope: i -> 68 ])
-    66 -> ([ LeaveScope: i -> 67 ])
-    67 -> ([ Assign: g = tmp -> 70 ])
-    68 -> ([ Assign: g = tmp -> 69 ])
-    69 -> ([ join -> 107 ])
-    70 -> ([ join -> 107 ]) ]}
- current: 107]
-[kernel] warning: no input file.
+    6 -> ([ Assign: tmp = 0 -> 7 ])
+    7 -> ([ Assume: c false -> 8; Assume: c true -> 9 ])
+    8 -> ([ Assign: tmp = 2 -> 12 ])
+    9 -> ([ Assign: tmp = g -> 11 ])
+    11 -> ([ EnterScope: i -> 17 ])
+    12 -> ([ EnterScope: i -> 14 ])
+    14 -> ([ initialize variable: i -> 15 ])
+    15 -> ([ Assign: i = 0 -> 16 ])
+    16 -> ([ enter_loop -> 22 ])
+    17 -> ([ initialize variable: i -> 18 ])
+    18 -> ([ Assign: i = 0 -> 19 ])
+    19 -> ([ enter_loop -> 21 ])
+    21 -> ([ Assume: i < 3 true -> 24 ])
+    22 -> ([ Assume: i < 3 true -> 25 ])
+    24 -> ([ Assign: tmp = tmp + 1 -> 27 ])
+    25 -> ([ Assign: tmp = tmp + 1 -> 26 ])
+    26 -> ([ Assign: i = i + 1 -> 28 ])
+    27 -> ([ Assign: i = i + 1 -> 29 ])
+    28 -> ([ Assume: i < 3 true -> 34 ])
+    29 -> ([ Assume: i < 3 true -> 33 ])
+    33 -> ([ Assign: tmp = tmp + 1 -> 36 ])
+    34 -> ([ Assign: tmp = tmp + 1 -> 35 ])
+    35 -> ([ Assign: i = i + 1 -> 38 ])
+    36 -> ([ Assign: i = i + 1 -> 37 ])
+    37 -> ([ Assume: i < 3 true -> 44 ])
+    38 -> ([ Assume: i < 3 true -> 43 ])
+    43 -> ([ Assign: tmp = tmp + 1 -> 46 ])
+    44 -> ([ Assign: tmp = tmp + 1 -> 45 ])
+    45 -> ([ Assign: i = i + 1 -> 48 ])
+    46 -> ([ Assign: i = i + 1 -> 47 ])
+    47 -> ([ Assume: i < 3 false -> 54 ])
+    48 -> ([ Assume: i < 3 false -> 53 ])
+    53 -> ([ LeaveScope: i -> 55 ])
+    54 -> ([ LeaveScope: i -> 56 ])
+    55 -> ([ Assign: g = tmp -> 58 ])
+    56 -> ([ Assign: g = tmp -> 57 ])
+    57 -> ([ join -> 95 ])
+    58 -> ([ join -> 95 ]) ]} at 95
 [from] Computing for function main
-[from] Computing for function Frama_C_interval <-main
-[from] Done for function Frama_C_interval
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
        These dependencies hold at termination for the executions that terminate:
-[from] Function Frama_C_interval:
-  Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
-  \result FROM Frama_C_entropy_source; min; max
 [from] Function main:
-  Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
-  g FROM Frama_C_entropy_source; g
-  \result FROM Frama_C_entropy_source; g
+  g FROM g; c
+  \result FROM g; c
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function main:
-          Frama_C_entropy_source; g; c; tmp; i
+          g; tmp; i
 [inout] Inputs for function main:
-          Frama_C_entropy_source; g
+          g
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed
 [value:initial-state] Values of globals at initialization
-  Frama_C_entropy_source ∈ [--..--]
-[value] using specification for function Frama_C_interval
-share/libc/__fc_builtin.h:52:[value] warning: function Frama_C_interval: precondition got status unknown.
+  entropy_source ∈ [--..--]
+  g ∈ {42}
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value:final-states] Values at end of function main:
-  Frama_C_entropy_source ∈ [--..--]
   g ∈ {5; 45}
-  c ∈ [--..--]
-  __retres ∈ {5; 45}
+  __traces_domain_return ∈ {5; 45}
+[value:d-traces] Trace domains:
+ TOP
+[value] failure: The trace is TOP can't generate code
 /* Generated by Frama-C */
-#include "__fc_builtin.h"
-int g;
+extern int volatile entropy_source;
 
+/*@ requires min ≤ max;
+    ensures \old(min) ≤ \result ≤ \old(max);
+    assigns \result, entropy_source;
+    assigns \result \from min, max, entropy_source;
+    assigns entropy_source \from entropy_source;
+ */
+extern int interval(int min, int max);
+
+int g = 42;
 int main(int c)
 {
-  int __retres;
+  int __traces_domain_return;
   g = 42;
   {
     int tmp;
-    {
-      int \result<Frama_C_interval>;
-      \result<Frama_C_interval> = Frama_C_interval(0,1);
-      c = \result<Frama_C_interval>;
-      tmp = 0;
-      if (c) {
-        tmp = g;
-        {
-          i = 0;
-          /*@ assert i < 3; */ ;
-          tmp ++;
-          i ++;
-          /*@ assert i < 3; */ ;
-          tmp ++;
-          i ++;
-          /*@ assert i < 3; */ ;
-          tmp ++;
-          i ++;
-          /*@ assert ¬(i < 3); */ ;
-          g = tmp;
-          __retres = tmp;
-          goto return_label;
-        }
+    tmp = 0;
+    if (c) {
+      tmp = g;
+      {
+        int i;
+        i = 0;
+        /*@ assert i < 3;  */
+        tmp ++;
+        i ++;
+        /*@ assert i < 3;  */
+        tmp ++;
+        i ++;
+        /*@ assert i < 3;  */
+        tmp ++;
+        i ++;
+        /*@ assert ¬(i < 3);  */
+        g = tmp;
+        __traces_domain_return = tmp;
       }
-      else {
-        tmp = 2;
-        {
-          i = 0;
-          /*@ assert i < 3; */ ;
-          tmp ++;
-          i ++;
-          /*@ assert i < 3; */ ;
-          tmp ++;
-          i ++;
-          /*@ assert i < 3; */ ;
-          tmp ++;
-          i ++;
-          /*@ assert ¬(i < 3); */ ;
-          g = tmp;
-          __retres = tmp;
-          goto return_label;
-        }
+    }
+    else {
+      tmp = 2;
+      {
+        int i;
+        i = 0;
+        /*@ assert i < 3;  */
+        tmp ++;
+        i ++;
+        /*@ assert i < 3;  */
+        tmp ++;
+        i ++;
+        /*@ assert i < 3;  */
+        tmp ++;
+        i ++;
+        /*@ assert ¬(i < 3);  */
+        g = tmp;
+        __traces_domain_return = tmp;
       }
-      return_label: return __retres;
     }
   }
+  return __traces_domain_return;
 }
 
 

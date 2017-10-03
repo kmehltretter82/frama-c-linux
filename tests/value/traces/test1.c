@@ -18,12 +18,10 @@ int main(int c){
   /* c = interval(0,1); */
   int tmp;
   tmp = 0;
-  /* if (c) tmp = g; */
-  /* else */ tmp = 2;
+  if (c) tmp = g;
+  else tmp = 2;
   for(int i = 0; i < 3; i++){
     tmp ++;
-    if (tmp > 43) break;
-    if (c == 4) return 2;
   }
   g = tmp;
   return tmp;

@@ -23,6 +23,8 @@
 module Frama_c_File = File
 open Cil_datatype
 
+let loop_mode_at_enter_loop = false
+
 [@@@ warning "-40-42"]
 
 module Node : sig
@@ -144,7 +146,7 @@ module Edge = struct
             (Pretty_utils.pp_list ~sep:",@ " Exp.pretty) exp1
              Node.pretty n
         | Msg(n,s) -> Format.fprintf fmt "@[%s -> %a@]" s Node.pretty n
-        | Loop(n,_,s,g) -> Format.fprintf fmt "@[<hv 2>@[Loop(%a)@] %a @[-> %a@]"
+        | Loop(n,_,s,g) -> Format.fprintf fmt "@[<hv 2>@[Loop(%a)@] %a @[-> %a@]@]"
                            Node.pretty s
                            (GraphShape.pretty (Pretty_utils.pp_list pretty)) g Node.pretty n
 
@@ -197,6 +199,7 @@ module Graph =
 type loops =
   | Base of Node.t * Graph.t (* current last *)
   | OpenLoop of Cil_types.stmt * Node.t (* start node *) * Graph.t (* last iteration *) * Node.t (** current *) * Graph.t * loops
+  | UnrollLoop of Cil_types.stmt * loops
 
 type state = { start : Node.t; current : loops;
                call_declared_function: bool;
@@ -233,8 +236,25 @@ module Traces = struct
               let c = Graph.compare g1 g2 in
               if c <> 0 then c else
                 compare_loops l1 l2
+    | UnrollLoop(stmt1,l1), UnrollLoop(stmt2,l2) ->
+      let c = Stmt.compare stmt1 stmt2 in
+      if c <> 0 then c else
+        compare_loops l1 l2
     | Base _, _ -> -1
     | _, Base _ -> 1
+    | OpenLoop _, _ -> -1
+    | _, OpenLoop _ -> 1
+
+  let rec pretty_loops fmt = function
+    | Base (c,g) ->
+      Format.fprintf fmt "@[<hv>%a @[at %a@]@]"
+        Graph.pretty g Node.pretty c
+    | OpenLoop(_,s,_,c,g,l) ->
+      Format.fprintf fmt "@[<hv>@[start %a@]@ %a @[at %a@]@]@ %a"
+        Node.pretty s Graph.pretty g Node.pretty c pretty_loops l
+    | UnrollLoop(_,l) ->
+      Format.fprintf fmt "@[<hv>@[unroll@]@ %a"
+        pretty_loops l
 
   (* Frama-C "datatype" for type [inout] *)
   include Datatype.Make_with_collections(struct
@@ -265,14 +285,6 @@ module Traces = struct
 
       let equal = Datatype.from_compare
 
-      let rec pretty_loops fmt = function
-        | Base (c,g) ->
-          Format.fprintf fmt "@[<hv>%a @[at %a@]@]"
-            Graph.pretty g Node.pretty c
-        | OpenLoop(_,s,_,c,g,l) ->
-          Format.fprintf fmt "@[<hv>@[start %a@]@ %a @[at %a@]@]@ %a"
-            Node.pretty s Graph.pretty g Node.pretty c pretty_loops l
-
       let pretty fmt m =
         if m == top then Format.fprintf fmt "TOP"
         else
@@ -287,6 +299,9 @@ module Traces = struct
         | OpenLoop(stmt,s,last,c,g,l) ->
           Hashtbl.seeded_hash 2
             (Stmt.hash stmt, Node.hash s, Graph.hash last, Node.hash c, Graph.hash g, hash_loops l)
+        | UnrollLoop(stmt,l) ->
+          Hashtbl.seeded_hash 2
+            (Stmt.hash stmt, hash_loops l)
 
       let hash m =
         Hashtbl.seeded_hash (Node.hash m.start) (hash_loops m.current)
@@ -328,28 +343,39 @@ module Traces = struct
       | Loop(n,_,_,_) -> n
 
   let move_to c g state =
-    let current = match state.current with
+    let rec aux = function
       | Base (_,_) -> Base (c,g)
       | OpenLoop(stmt,s,last,_,_,l) ->
-        OpenLoop(stmt,s,last,c,g,l) in
+        OpenLoop(stmt,s,last,c,g,l)
+      | UnrollLoop(stmt,l) ->
+        UnrollLoop(stmt,aux l)
+    in
+    let current = aux state.current in
     {state with current}
 
   let replace_to c state =
-    let current = match state.current with
+    let rec aux = function
       | Base (_,g) -> Base (c,g)
       | OpenLoop(stmt,s,last,_,g,l) ->
-        OpenLoop(stmt,s,last,c,g,l) in
+        OpenLoop(stmt,s,last,c,g,l)
+      | UnrollLoop(stmt,l) -> UnrollLoop(stmt,aux l) in
+    let current = aux state.current in
     {state with current}
 
   let get_current state =
-    match state.current with
+    let rec aux = function
     | Base (c,g) -> (c,g)
     | OpenLoop(_,_,_,c,g,_) -> (c,g)
+    | UnrollLoop(_,l) ->
+      aux l in
+    aux state.current
 
   let get_last state =
-    match state.current with
+    let rec aux = function
     | Base (_,_) -> None
     | OpenLoop(_,_,last,_,_,_) -> Some last
+    | UnrollLoop(_,l) -> aux l in
+    aux state.current
 
   let find_succs current g =
     match Graph.find current g with
@@ -370,43 +396,43 @@ module Traces = struct
     else if c.call_declared_function then c (** forget intermediary state *)
     else
       let (current,graph) = get_current c in
+      let same edge' =
+        match edge, edge' with
+        | Assign (_,loc1,typ1,exp1), Assign (_,loc2,typ2,exp2) ->
+          let c = Lval.compare loc1 loc2 in
+          if c <> 0 then false else
+            let c = Typ.compare typ1 typ2 in
+            if c <> 0 then false else
+              Exp.compare exp1 exp2 = 0
+        | Assume(_,e1,b1), Assume(_,e2,b2) ->
+          let c = Exp.compare e1 e2 in
+          if c <> 0 then false else
+            Pervasives.compare b1 b2 = 0
+        | EnterScope(_,vs1),EnterScope(_,vs2) ->
+          let c = Extlib.list_compare Varinfo.compare vs1 vs2 in
+          c = 0
+        | LeaveScope(_,vs1), LeaveScope(_,vs2) ->
+          let c = Extlib.list_compare Varinfo.compare vs1 vs2 in
+          c = 0
+        | CallDeclared(_,kf1,exp1,lval1), CallDeclared(_,kf2,exp2,lval2) ->
+          let c = Kernel_function.compare kf1 kf2 in
+          if c <> 0 then false else
+            let c = Extlib.list_compare Exp.compare exp1 exp2 in
+            if c <> 0 then false else
+              let c = Extlib.opt_compare Lval.compare lval1 lval2 in
+              c = 0
+        | Msg(_,s1), Msg(_,s2) ->
+          let c = String.compare s1 s2 in
+          c = 0
+        | Loop(_,stmt1,s1,g1), Loop(_,stmt2,s2,g2) ->
+          Stmt.equal stmt1 stmt2 &&
+          Node.equal s1 s2 && GraphShape.equal g1 g2
+        | _ -> false
+      in
       let reusable = match get_last c with
         | None -> None
         | Some last ->
           let succs = find_succs current last in
-          let same edge' =
-            match edge, edge' with
-            | Assign (_,loc1,typ1,exp1), Assign (_,loc2,typ2,exp2) ->
-              let c = Lval.compare loc1 loc2 in
-              if c <> 0 then false else
-                let c = Typ.compare typ1 typ2 in
-                if c <> 0 then false else
-                  Exp.compare exp1 exp2 = 0
-            | Assume(_,e1,b1), Assume(_,e2,b2) ->
-              let c = Exp.compare e1 e2 in
-              if c <> 0 then false else
-                Pervasives.compare b1 b2 = 0
-            | EnterScope(_,vs1),EnterScope(_,vs2) ->
-              let c = Extlib.list_compare Varinfo.compare vs1 vs2 in
-              c = 0
-            | LeaveScope(_,vs1), LeaveScope(_,vs2) ->
-              let c = Extlib.list_compare Varinfo.compare vs1 vs2 in
-              c = 0
-            | CallDeclared(_,kf1,exp1,lval1), CallDeclared(_,kf2,exp2,lval2) ->
-              let c = Kernel_function.compare kf1 kf2 in
-              if c <> 0 then false else
-                let c = Extlib.list_compare Exp.compare exp1 exp2 in
-                if c <> 0 then false else
-                  let c = Extlib.opt_compare Lval.compare lval1 lval2 in
-                  c = 0
-            | Msg(_,s1), Msg(_,s2) ->
-              let c = String.compare s1 s2 in
-              c = 0
-            | Loop(_,stmt1,s1,g1), Loop(_,stmt2,s2,g2) ->
-              Stmt.equal stmt1 stmt2 &&
-              Node.equal s1 s2 && GraphShape.equal g1 g2
-            | _ -> false
-          in
           List.find_opt same succs
       in
       match reusable with
@@ -492,12 +518,13 @@ module Traces = struct
 
   let rec is_included_loops l1 l2 =
     match l1, l2 with
-    | Base _, OpenLoop _ | OpenLoop _, Base _ ->
+    | Base _, (OpenLoop _ | UnrollLoop _) | (OpenLoop _ | UnrollLoop _), Base _ ->
       (* not in the same number of loops *)
       false
     | Base (c1,_), Base (c2,g2) ->
       epsilon_path c1 c2 g2
-    | OpenLoop(stmt1,_,_,_,_,_), OpenLoop(stmt2,_,_,_,_,_) when not (Stmt.equal stmt1 stmt2) ->
+    | (OpenLoop(stmt1,_,_,_,_,_) | UnrollLoop(stmt1,_)),
+      (OpenLoop(stmt2,_,_,_,_,_) | UnrollLoop(stmt2,_)) when not (Stmt.equal stmt1 stmt2) ->
       (* not same loop *)
       false
     | OpenLoop(_,s1,_,_,_,_), OpenLoop(_,s2,_,_,_,_) when not (Node.equal s1 s2) ->
@@ -509,6 +536,12 @@ module Traces = struct
       is_included_graph last1 last2 &&
       is_included_graph g1 g2' &&
       epsilon_path c1 c2 g2'
+    | UnrollLoop(_,l1), UnrollLoop(_,l2) ->
+      is_included_loops l1 l2
+    | OpenLoop(_,_,_,_,_,_), UnrollLoop(_,_) ->
+      false
+    | UnrollLoop(_,l1), OpenLoop(_,_,_,_,_,l2) ->
+      is_included_loops l1 l2
 
   let is_included c1 c2 =
     (* start is the same *)
@@ -535,14 +568,15 @@ module Traces = struct
 
   let rec join_loops l1 l2 =
     match l1, l2 with
-    | Base _, OpenLoop _ | OpenLoop _, Base _ ->
+    | Base _, (OpenLoop _ | UnrollLoop _) | (OpenLoop _ | UnrollLoop _), Base _ ->
       (* not in the same number of loops *)
       `Top
     | Base (c1,g1), Base (c2,g2) ->
       let g = join_graph g1 g2 in
       let (n,g) = join_path g c1 c2 in
       `Value( Base (n, g))
-    | OpenLoop(stmt1,_,_,_,_,_), OpenLoop(stmt2,_,_,_,_,_) when not (Stmt.equal stmt1 stmt2) ->
+    | (OpenLoop(stmt1,_,_,_,_,_) | UnrollLoop(stmt1,_)),
+      (OpenLoop(stmt2,_,_,_,_,_) | UnrollLoop(stmt2,_)) when not (Stmt.equal stmt1 stmt2) ->
       (* not same loop *)
       `Top
     | OpenLoop(stmt1,s1,last1,c1,g1,l1), OpenLoop(_,s2,_,_,_,l2) when not (Node.equal s1 s2) ->
@@ -559,6 +593,17 @@ module Traces = struct
           let g = join_graph g1 g2 in
           let (n,g) = join_path g c1 c2 in
           `Value(OpenLoop(stmt,s,last,n,g,l))
+      end
+    | UnrollLoop(stmt,l1), UnrollLoop(_,l2) ->
+      begin match join_loops l1 l2 with
+        | `Top -> `Top
+        | `Value l -> `Value (UnrollLoop(stmt,l))
+      end
+    | (OpenLoop(stmt,s,last,c,g,l1), UnrollLoop(_,l2))
+    | (UnrollLoop(_,l2), OpenLoop(stmt,s,last,c,g,l1)) ->
+      begin match join_loops l1 l2 with
+        | `Top -> `Top
+        | `Value l -> `Value (OpenLoop(stmt,s,last,c,g,l))
       end
 
   let join c1 c2 =
@@ -579,15 +624,33 @@ module Traces = struct
             globals = c1.globals; main_formals = c1.main_formals;
           }
 
-  let widen _ _ c1 c2 =
-    if c1.call_declared_function || c2.call_declared_function
-    then assert false (* should not appended, since nothing append during a call to a not defined function *);
-    match view c1, view c2 with
-    | `Top, _ -> c1
-    | _, `Top -> c2
-    | `Other c1, `Other c2 ->
-      if not_same_origin c1 c2 then assert false
-      else c2
+  let add_loop stmt state =
+    let (n,g) = get_current state in
+    let succs = find_succs n g in
+    let same_loop = function
+        | Loop(_,stmt',s,last) when Stmt.equal stmt' stmt ->
+          Some (s,last)
+        | _ -> None in
+    let s,last = match Extlib.find_opt same_loop succs with
+      | (s,last) -> s,(Graph.from_shape (fun _ v -> v) last)
+      | exception Not_found -> Node.next (), Graph.empty in
+    let current = OpenLoop(stmt,s,last,s,Graph.empty,state.current) in
+    { state with current }
+
+  let widen _ stmt' _ c2 =
+    if loop_mode_at_enter_loop
+    then c2
+    else begin
+        match c2.current with
+          | Base _ -> assert false (** must be in a loop *)
+          | OpenLoop(stmt,_,_,_,_,_) ->
+            assert (Stmt.equal stmt' stmt);
+            c2
+          | UnrollLoop(stmt,l) ->
+            assert (Stmt.equal stmt' stmt);
+            add_loop stmt' {c2 with current = l}
+      end
+
 
   let narrow _c1 c2 = `Value c2
 end
@@ -721,22 +784,14 @@ module Internal = struct
 
   let enter_loop stmt state =
     let state = Traces.add_edge state (Msg(Node.dumb,"enter_loop")) in
-    let (n,g) = Traces.get_current state in
-    let succs = Traces.find_succs n g in
-    let same_loop = function
-        | Loop(_,stmt',s,last) when Stmt.equal stmt' stmt ->
-          Some (s,last)
-        | _ -> None in
-    let s,last = match Extlib.find_opt same_loop succs with
-      | (s,last) -> s,(Graph.from_shape (fun _ v -> v) last)
-      | exception Not_found -> Node.next (), Graph.empty in
-    let current = OpenLoop(stmt,s,last,s,Graph.empty,state.current) in
-    { state with current }
+    let state = if loop_mode_at_enter_loop then Traces.add_loop stmt state else
+        { state with current = UnrollLoop(stmt,state.current) } in
+    state
 
   let incr_loop_counter _ state =
-    Format.printf "@[<hv>@[incr_loop_counter:@] %a@]@." Traces.pretty state;
     match state.current with
-    | Base _ -> assert false (* absurd: we are in at least a loop *)
+    | Base _ -> assert false
+    | UnrollLoop(_,_) -> state
     | OpenLoop(stmt,s,last,_,g,l) ->
       let last = Traces.join_graph last g in
       let current = OpenLoop(stmt,s,last,s,Graph.empty,l) in
@@ -745,14 +800,17 @@ module Internal = struct
       state
 
   let leave_loop stmt' state =
-    match state.current with
-    | Base _ -> assert false (* absurd: we are in at least a loop *)
-    | OpenLoop(stmt,s,last,old_current_node,g,current) ->
-      assert (Stmt.equal stmt stmt');
-      let state = { state with current } in
-      let state = Traces.add_edge state (Loop(Node.dumb,stmt,s,Graph.shape last)) in
-      let state = Traces.copy_edges s old_current_node g state in
-      Traces.add_edge state (Msg(Node.dumb,"leave_loop"))
+      match state.current with
+      | Base _ -> assert false (* absurd: we are in at least a loop *)
+      | UnrollLoop(_,l) -> { state with current = l }
+      | OpenLoop(stmt,s,last,old_current_node,g,current) ->
+        assert (Stmt.equal stmt stmt');
+        let state = { state with current } in
+        let state = if Graph.is_empty last then state
+              else Traces.add_edge state (Loop(Node.dumb,stmt,s,Graph.shape last)) in
+        let state = Traces.copy_edges s old_current_node g state in
+        Traces.add_edge state (Msg(Node.dumb,"leave_loop"))
+
 
   let enter_scope _kf vars state = Traces.add_edge state (EnterScope(Node.dumb,vars))
   let leave_scope _kf vars state = Traces.add_edge state (LeaveScope(Node.dumb,vars))
@@ -1004,7 +1062,12 @@ let finish_computation () =
   let header fmt = Format.fprintf fmt "Trace domains:" in
   let body = Bottom.pretty Traces.pretty in
   Value_parameters.printf ~dkey:Internal.log_category ~header " @[%a@]" body state;
-  Bottom.iter (project_of_cfg return_exp) state
+  match state with
+  | `Bottom ->
+    Value_parameters.failure "The trace is Bottom can't generate code"
+  | `Value state when state == Traces.top ->
+    Value_parameters.failure "The trace is TOP can't generate code"
+  | `Value state -> project_of_cfg return_exp state
 
 
 (*

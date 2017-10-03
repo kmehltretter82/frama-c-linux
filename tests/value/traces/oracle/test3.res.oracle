@@ -12,7 +12,7 @@
   tmp ∈ {4}
   __retres ∈ {5}
 [value:d-traces] Trace domains:
- start: 0; globals = g; main_formals = c 
+ start: 0; globals = g; main_formals = c;
  {[ 0 -> ([ initialize variable: g -> 1 ])
     1 -> ([ initialize variable using type Main_Formal
 c -> 2 ])
@@ -22,9 +22,7 @@ c -> 2 ])
     5 -> ([ Assign: tmp = 4 -> 6 ])
     6 -> ([ Assume: tmp true -> 7 ])
     7 -> ([ Assign: g = tmp -> 8 ])
-    8 -> ([ Assign: __retres = g + 1 -> 9 ]) ]}
- current: 9]
-[kernel] warning: no input file.
+    8 -> ([ Assign: __retres = g + 1 -> 9 ]) ]} at 9
 [from] Computing for function main
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
@@ -41,8 +39,12 @@ c -> 2 ])
 [value] Computing initial state
 [value] Initial state computed
 [value:initial-state] Values of globals at initialization
-  
+  g ∈ {0}
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value:final-states] Values at end of function main:
   g ∈ {4}
+  __traces_domain_return ∈ {5}
+[value:d-traces] Trace domains:
+ TOP
+[value] failure: The trace is TOP can't generate code
