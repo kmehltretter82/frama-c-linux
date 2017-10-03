@@ -1,0 +1,109 @@
+[kernel] Parsing tests/value/traces/test4.i (no preprocessing)
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value:initial-state] Values of globals at initialization
+  
+incr_loop_counter: start: 0; globals = ; main_formals = c;
+                   start 9
+                   {[ 9 -> ([ Assume: i < 3 true -> 10 ])
+                      10 -> ([ Assign: tmp = tmp + 1 -> 11 ])
+                      11 -> ([ Assign: i = i + 1 -> 12 ]) ]} at 12
+                   {[ 0 -> ([ initialize variable using type Main_Formal
+c -> 1 ])
+                      1 -> ([ EnterScope: tmp -> 2 ])
+                      2 -> ([ initialize variable: tmp -> 3 ])
+                      3 -> ([ Assign: tmp = 0 -> 4 ])
+                      4 -> ([ EnterScope: i -> 5 ])
+                      5 -> ([ initialize variable: i -> 6 ])
+                      6 -> ([ Assign: i = 0 -> 7 ])
+                      7 -> ([ enter_loop -> 8 ]) ]} at 8
+incr_loop_counter: start: 0; globals = ; main_formals = c;
+                   start 9
+                   {[ 9 -> ([ Assume: i < 3 true -> 10 ])
+                      10 -> ([ Assign: tmp = tmp + 1 -> 11 ])
+                      11 -> ([ Assign: i = i + 1 -> 12 ]) ]} at 12
+                   {[ 0 -> ([ initialize variable using type Main_Formal
+c -> 1 ])
+                      1 -> ([ EnterScope: tmp -> 2 ])
+                      2 -> ([ initialize variable: tmp -> 3 ])
+                      3 -> ([ Assign: tmp = 0 -> 4 ])
+                      4 -> ([ EnterScope: i -> 5 ])
+                      5 -> ([ initialize variable: i -> 6 ])
+                      6 -> ([ Assign: i = 0 -> 7 ])
+                      7 -> ([ enter_loop -> 8 ]) ]} at 8
+incr_loop_counter: start: 0; globals = ; main_formals = c;
+                   start 9
+                   {[ 9 -> ([ Assume: i < 3 true -> 10 ])
+                      10 -> ([ Assign: tmp = tmp + 1 -> 11 ])
+                      11 -> ([ Assign: i = i + 1 -> 12 ]) ]} at 12
+                   {[ 0 -> ([ initialize variable using type Main_Formal
+c -> 1 ])
+                      1 -> ([ EnterScope: tmp -> 2 ])
+                      2 -> ([ initialize variable: tmp -> 3 ])
+                      3 -> ([ Assign: tmp = 0 -> 4 ])
+                      4 -> ([ EnterScope: i -> 5 ])
+                      5 -> ([ initialize variable: i -> 6 ])
+                      6 -> ([ Assign: i = 0 -> 7 ])
+                      7 -> ([ enter_loop -> 8 ]) ]} at 8
+[value] Recording results for main
+[value] done for function main
+[value] ====== VALUES COMPUTED ======
+[value:final-states] Values at end of function main:
+  tmp ∈ {3}
+[value:d-traces] Trace domains:
+ start: 0; globals = ; main_formals = c;
+ {[ 0 -> ([ initialize variable using type Main_Formal
+c -> 1 ])
+    1 -> ([ EnterScope: tmp -> 2 ])
+    2 -> ([ initialize variable: tmp -> 3 ])
+    3 -> ([ Assign: tmp = 0 -> 4 ])
+    4 -> ([ EnterScope: i -> 5 ])
+    5 -> ([ initialize variable: i -> 6 ])
+    6 -> ([ Assign: i = 0 -> 7 ])
+    7 -> ([ enter_loop -> 8 ])
+    8 -> ([ Loop(9) {[ 9 -> Assume: i < 3 true -> 10
+                       10 -> Assign: tmp = tmp + 1 -> 11
+                       11 -> Assign: i = i + 1 -> 12 ]} -> 14 ])
+         14 -> ([ Assume: i < 3 false -> 15 ]) 15 -> ([ leave_loop -> 16 ])
+         16 -> ([ LeaveScope: i -> 17 ]) ]} at 17
+[from] Computing for function main
+[from] Done for function main
+[from] ====== DEPENDENCIES COMPUTED ======
+       These dependencies hold at termination for the executions that terminate:
+[from] Function main:
+  \result FROM \nothing
+[from] ====== END OF DEPENDENCIES ======
+[inout] Out (internal) for function main:
+          tmp; i
+[inout] Inputs for function main:
+          \nothing
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value:initial-state] Values of globals at initialization
+  
+tests/value/traces/test4.i:7:[value] entering loop for the first time
+:0:[value] warning: signed overflow. assert tmp + 1 ≤ 2147483647;
+[value] done for function main
+[value] ====== VALUES COMPUTED ======
+[value:final-states] Values at end of function main:
+  __traces_domain_return ∈ [0..2147483647]
+[value:d-traces] Trace domains:
+ TOP
+:0:[kernel] failure: [AST Integrity Check] AST of Eva.Traces_domain
+                  variable __traces_domain_return(26) is not declared
+[kernel] Current source was: tests/value/traces/test4.i:5
+         The full backtrace is:
+         Raised at file "src/libraries/project/project.ml", line 402, characters 50-57
+         Called from file "src/kernel_internals/runtime/boot.ml", line 51, characters 6-53
+         Called from file "src/kernel_services/cmdline_parameters/cmdline.ml", line 799, characters 8-101
+         Called from file "src/kernel_services/cmdline_parameters/cmdline.ml", line 808, characters 22-39
+         Called from file "src/kernel_services/cmdline_parameters/cmdline.ml", line 228, characters 4-8
+         
+         Frama-C aborted: internal error.
+         Please report as 'crash' at http://bts.frama-c.com/.
+         Your Frama-C version is Phosphorus-20170501+dev.
+         Note that a version and a backtrace alone often do not contain enough
+         information to understand the bug. Guidelines for reporting bugs are at:
+         http://bts.frama-c.com/dokuwiki/doku.php?id=mantis:frama-c:bug_reporting_guidelines
