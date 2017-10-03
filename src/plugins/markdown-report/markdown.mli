@@ -24,6 +24,7 @@ and block = block_element list
 and element =
   | Block of block
   | Raw of string (** non-markdown element, printed as-is. *)
+  | Comment of string (** markdown comment, printed <!-- like this --> *)
   | H1 of text * string option (** optional label. *)
   | H2 of text * string option
   | H3 of text * string option
@@ -41,6 +42,8 @@ type pandoc_markdown =
   }
 
 val plain: string -> text
+
+val plain_format: ('a, Format.formatter, unit, text) format4 -> 'a
 
 (** gives a link whose text is the URL itself. *)
 val plain_link: string -> inline

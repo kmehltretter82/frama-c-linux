@@ -24,6 +24,7 @@ and block = block_element list
 and element =
   | Block of block
   | Raw of string (** non-markdown element, printed as-is. *)
+  | Comment of string (** markdown comment, printed <!-- like this --> *)
   | H1 of text * string option (** optional label. *)
   | H2 of text * string option
   | H3 of text * string option
@@ -41,6 +42,8 @@ type pandoc_markdown =
   }
 
 let plain s = [ Plain s]
+
+let plain_format txt = Format.kasprintf plain txt
 
 let plain_link s = Link ([Inline_code s],s)
 
@@ -168,6 +171,9 @@ and pp_quote fmt l =
 and pp_element fmt = function
   | Block b -> Format.fprintf fmt "@[<v>%a@]@\n" pp_block b
   | Raw s -> Format.pp_print_string fmt s
+  | Comment s ->
+    Format.fprintf fmt
+      "@[<hv>@[<hv 5><!-- %a@]@ -->@]@\n" Format.pp_print_text s
   | H1(t,lab) -> Format.fprintf fmt "@[<h># %a%a@]@\n" pp_text t pp_lab lab
   | H2(t,lab) -> Format.fprintf fmt "@[<h>## %a%a@]@\n" pp_text t pp_lab lab
   | H3(t,lab) -> Format.fprintf fmt "@[<h>### %a%a@]@\n" pp_text t pp_lab lab
