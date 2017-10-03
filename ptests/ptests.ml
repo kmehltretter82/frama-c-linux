@@ -291,8 +291,8 @@ let rec argspec =
   " Start the tests in Frama-C's gui.";
   "-update", Arg.Unit (fun () -> behavior := Update) ,
   " Take the current logs as oracles.";
-  "-show", Arg.Unit (fun () -> behavior := Show; use_byte := true) ,
-  " Show the results of the tests. Sets -byte.";
+  "-show", Arg.Unit (fun () -> behavior := Show) ,
+  " Show the results of the tests.";
   "-run", Arg.Unit (fun () -> behavior := Run) ,
   " (default) Delete logs, run tests, then examine logs different from \
   oracles.";

@@ -24,31 +24,13 @@
 
 module Node : Datatype.S
 
-type edge =
-  | Assign of Node.t * Cil_types.lval * Cil_types.typ * Cil_types.exp
-  | Assume of Node.t * Cil_types.exp * bool
-  | EnterScope of Node.t * Cil_types.varinfo list
-  | LeaveScope of Node.t * Cil_types.varinfo list
-  (** For call of functions without definition *)
-  | CallDeclared of Node.t * Cil_types.kernel_function * Cil_types.exp list * Cil_types.lval option
-  | Msg of Node.t * string
-  | Top
+type edge
 
 module Edge : Datatype.S with type t = edge
 
 module Graph : Hptmap_sig.S with type key = Node.t and type v = edge list
 
-type state = { start : int; current : int; graph : Graph.t;
-               call_declared_function: bool;
-               globals : Cil_types.varinfo list;
-               main_formals : Cil_types.varinfo list;
-             }
-
-(* Lattice structure for the abstract state above *)
-module Traces : sig
-  include Datatype.S_with_collections with type t = state
-  include Abstract_domain.Lattice with type state := state
-end
+type state
 
 module D: Abstract_domain.Internal
   with type value = Cvalue.V.t
