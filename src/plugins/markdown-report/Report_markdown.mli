@@ -1,3 +1,24 @@
+module Mdr_params: sig
+include Plugin.S
+
+(** Value of [-mdr-out]. *)
+module Output: Parameter_sig.String
+
+(** Value of [-mdr-gen]. *)
+module Generate: Parameter_sig.Bool
+
+(** Value of [-mdr-gen-draft]. *)
+module Gen_draft: Parameter_sig.Bool
+
+(** Value of [-mdr-remarks]. *)
+module Remarks: Parameter_sig.String
+
+(** Value of [-mdr-authors]. *)
+module Authors: Parameter_sig.String_list
+
+(** Value of [-mdr-stubs]. *)
+module Stubs: Parameter_sig.String_list
+end
 module Markdown: sig
 type align = Left | Center | Right
 
@@ -62,17 +83,6 @@ val pp_element: Format.formatter -> element -> unit
 val pp_pandoc: Format.formatter -> pandoc_markdown -> unit
 end
 module Md_gen: sig
-module Self: Plugin.S
-
-(** state of [-mdr-out] option *)
-module Output: Parameter_sig.String
-
-(** state of [-mdr-generate] option *)
-module Generate: Parameter_sig.Bool
-
-(** state of [-mdr-authors] option *)
-module Authors: Parameter_sig.String_list
-
 (** generates the report. *)
 val main: unit -> unit
 end

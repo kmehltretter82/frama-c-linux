@@ -1,61 +1,4 @@
 open Cil_types
-
-module Self =
-  Plugin.Register(
-  struct
-    let name = "Markdown report"
-    let shortname = "mdr"
-    let help = "generates a report in markdown format"
-  end)
-
-module Output = Self.String(
-struct
-  let option_name = "-mdr-out"
-  let arg_name = "f"
-  let default = "report.md"
-  let help = "sets the name of the output file to <f>"
-end)
-
-module Generate = Self.False(
-struct
-  let option_name = "-mdr-gen"
-  let help = "generates an analysis report on the current project"
-end)
-
-module Gen_draft = Self.False(
-  struct
-    let option_name = "-mdr-gen-draft"
-    let help =
-      "instead of a full report, generates an empty draft \
-       in a format suitable for -mdr-add-remarks"
-  end)
-
-module Remarks = Self.Empty_string(
-struct
-  let option_name = "-mdr-remarks"
-  let arg_name = "f"
-  let help =
-    "reads <f> to add additional remarks to various sections of the report. \
-     must be in a format compatible with the file produced by -mdr-gen-draft. \
-     Remarks themselves must be written in pandoc's markdown, although this is \
-     not enforced by the plug-in."
-end
-)
-
-module Authors = Self.String_list(
-struct
-  let option_name = "-mdr-authors"
-  let arg_name = "l"
-  let help = "list of authors of the report"
-end)
-
-module Stubs = Self.String_list(
-  struct
-    let option_name = "-mdr-stubs"
-    let arg_name = "f1,...,fn"
-    let help = "list of C files containing stub functions"
-  end)
-
 open Markdown
 
 let all_eva_domains =
@@ -127,7 +70,7 @@ let section_stubs is_draft =
       (List.map
          (fun filename ->
             Globals.FileIndex.get_functions ~declarations:false ~filename)
-         (Stubs.get ())
+         (Mdr_params.Stubs.get ())
       )
   in
   let opt = Dynamic.Parameter.String.get "-val-use-spec" () in
@@ -489,10 +432,18 @@ let gen_section_callgraph is_draft =
   in
   H1 (plain "Flamegraph", Some "flamegraph") :: content
 
+let gen_section_postlude is_draft =
+  if is_draft then
+    [ H1 (plain "Postlude", Some "postlude");
+      Comment "You can put here some concluding remarks" ]
+    @ insert_marks
+  else []
+
 let gen_alarms is_draft =
   gen_section_warnings is_draft @
   gen_section_alarms is_draft @
-  gen_section_callgraph is_draft
+  gen_section_callgraph is_draft @
+  gen_section_postlude is_draft
 
 let mk_date () =
   let tm = Unix.gmtime (Unix.time()) in
@@ -501,7 +452,7 @@ let mk_date () =
        (1900 + tm.Unix.tm_year) (1 + tm.Unix.tm_mon) tm.Unix.tm_mday)
 
 let mk_remarks () =
-  let f = Remarks.get () in
+  let f = Mdr_params.Remarks.get () in
   if f <> "" then failwith "writeme"
   else Datatype.String.Map.empty
 
@@ -512,7 +463,7 @@ let gen_report is_draft =
   let title =
     if is_draft then plain "Frama-C Analysis Report" else plain "Draft report"
   in
-  let authors = List.map (fun x -> plain x) (Authors.get ()) in
+  let authors = List.map (fun x -> plain x) (Mdr_params.Authors.get ()) in
   let date = mk_date () in
   let elements = context @ alarms in
   let elements =
@@ -520,8 +471,11 @@ let gen_report is_draft =
       Comment
         "This file contains additional remarks that will be added to \
          automatically generated content by Frama-C's Markdown-report plugin. \
-         For any section of the document, you can write markdown content \
-         between the BEGIN and END comments. Please don't alter the structure \
+         For any section of the document, you can write pandoc markdown \
+         content between the BEGIN and END comments. In addition, the plug-in \
+         will consider any <!-- INCLUDE file.md --> comment as a directive to \
+         include the content of file.md in the corresponding section. \
+         Please don't alter the structure \
          of the document as it is used by the plugin to associate content to \
          the relevant section."
       :: elements
@@ -529,23 +483,23 @@ let gen_report is_draft =
   in
   let doc = { title; authors; date; elements;} in
   try
-    let out = open_out (Output.get()) in
+    let out = open_out (Mdr_params.Output.get()) in
     let fmt = Format.formatter_of_out_channel out in
     Markdown.pp_pandoc fmt doc;
     close_out out
   with Sys_error s ->
-    Self.warning
+    Mdr_params.warning
       "Unable to open %s for writing (%s). No report will be generated"
-      (Output.get()) s
+      (Mdr_params.Output.get()) s
 
 let main () =
-  if Gen_draft.get () then begin
-    if Generate.get () then
-      Self.warning
+  if Mdr_params.Gen_draft.get () then begin
+    if Mdr_params.Generate.get () then
+      Mdr_params.warning
         "-mdr-gen and -mdr-gen-draft can be activated at the \
          same time. Only draft will be generated";
     gen_report true
   end
-  else if Generate.get () then gen_report false
+  else if Mdr_params.Generate.get () then gen_report false
 
 let () = Db.Main.extend main
