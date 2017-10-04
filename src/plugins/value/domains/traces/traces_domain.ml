@@ -20,10 +20,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module OCamlGraph = Graph
 module Frama_c_File = File
 open Cil_datatype
 
-let loop_mode_at_enter_loop = false
+let loop_mode_at_enter_loop = true
 
 [@@@ warning "-40-42"]
 
@@ -55,8 +56,29 @@ type edge =
   | Loop of Node.t * Stmt.t * Node.t (** start *) * edge list GraphShape.t
   | Msg of Node.t * string
 
+
 (* Frama-C "datatype" for type [inout] *)
 module Edge = struct
+
+  let rec pretty fmt = function
+    | Assign(n,loc,_typ,exp) -> Format.fprintf fmt "@[Assign:@ %a = %a -> %a@]"
+                                  Lval.pretty loc Exp.pretty exp Node.pretty n
+    | Assume(n,e,b) -> Format.fprintf fmt "@[Assume:@ %a %b -> %a@]" Exp.pretty e b Node.pretty n
+    | EnterScope(n,vs) -> Format.fprintf fmt "@[EnterScope:@ %a -> %a@]"
+                            (Pretty_utils.pp_list ~sep:"@ " Varinfo.pretty) vs Node.pretty n
+    | LeaveScope(n,vs) -> Format.fprintf fmt "@[LeaveScope:@ %a -> %a@]"
+                            (Pretty_utils.pp_list ~sep:"@ " Varinfo.pretty) vs Node.pretty n
+    | CallDeclared(n,kf1,exp1,lval1) ->
+      Format.fprintf fmt "@[CallDeclared:@ %a%s(%a) -> %a@]"
+        (Pretty_utils.pp_opt ~pre:"" ~suf:" =@ " Lval.pretty) lval1
+        (Kernel_function.get_name kf1)
+        (Pretty_utils.pp_list ~sep:",@ " Exp.pretty) exp1
+        Node.pretty n
+    | Msg(n,s) -> Format.fprintf fmt "@[%s -> %a@]" s Node.pretty n
+    | Loop(n,_,s,g) -> Format.fprintf fmt "@[<hv 2>@[Loop(%a)@] %a @[-> %a@]@]"
+                         Node.pretty s
+                         (GraphShape.pretty pretty_list) g Node.pretty n
+  and pretty_list fmt l = Pretty_utils.pp_list ~sep:";@ " pretty fmt l
 
   include Datatype.Make_with_collections(struct
       type nonrec t = edge
@@ -131,24 +153,7 @@ module Edge = struct
 
       let equal = Datatype.from_compare
 
-      let rec pretty fmt = function
-        | Assign(n,loc,_typ,exp) -> Format.fprintf fmt "@[Assign:@ %a = %a -> %a@]"
-                                      Lval.pretty loc Exp.pretty exp Node.pretty n
-        | Assume(n,e,b) -> Format.fprintf fmt "@[Assume:@ %a %b -> %a@]" Exp.pretty e b Node.pretty n
-        | EnterScope(n,vs) -> Format.fprintf fmt "@[EnterScope:@ %a -> %a@]"
-                              (Pretty_utils.pp_list ~sep:"@ " Varinfo.pretty) vs Node.pretty n
-        | LeaveScope(n,vs) -> Format.fprintf fmt "@[LeaveScope:@ %a -> %a@]"
-                              (Pretty_utils.pp_list ~sep:"@ " Varinfo.pretty) vs Node.pretty n
-        | CallDeclared(n,kf1,exp1,lval1) ->
-          Format.fprintf fmt "@[CallDeclared:@ %a%s(%a) -> %a@]"
-            (Pretty_utils.pp_opt ~pre:"" ~suf:" =@ " Lval.pretty) lval1
-            (Kernel_function.get_name kf1)
-            (Pretty_utils.pp_list ~sep:",@ " Exp.pretty) exp1
-             Node.pretty n
-        | Msg(n,s) -> Format.fprintf fmt "@[%s -> %a@]" s Node.pretty n
-        | Loop(n,_,s,g) -> Format.fprintf fmt "@[<hv 2>@[Loop(%a)@] %a @[-> %a@]@]"
-                           Node.pretty s
-                           (GraphShape.pretty (Pretty_utils.pp_list pretty)) g Node.pretty n
+      let pretty = pretty
 
       let hash = function
         | Assume(n,e,b) ->
@@ -188,6 +193,7 @@ end
 
 module EdgeList = struct
   include Datatype.List_with_collections(Edge)(struct let module_name = "Traces_domain.EdgeList" end)
+  let pretty = Edge.pretty_list
   let pretty_debug = pretty
 end
 
@@ -391,64 +397,66 @@ module Traces = struct
     | Msg (_,s) -> Msg(n,s)
     | Loop(_,stmt,s,g) -> Loop(n,stmt,s,g)
 
-  let add_edge c edge =
-    if c == top then c
-    else if c.call_declared_function then c (** forget intermediary state *)
-    else
-      let (current,graph) = get_current c in
-      let same edge' =
-        match edge, edge' with
-        | Assign (_,loc1,typ1,exp1), Assign (_,loc2,typ2,exp2) ->
-          let c = Lval.compare loc1 loc2 in
-          if c <> 0 then false else
-            let c = Typ.compare typ1 typ2 in
-            if c <> 0 then false else
-              Exp.compare exp1 exp2 = 0
-        | Assume(_,e1,b1), Assume(_,e2,b2) ->
-          let c = Exp.compare e1 e2 in
-          if c <> 0 then false else
-            Pervasives.compare b1 b2 = 0
-        | EnterScope(_,vs1),EnterScope(_,vs2) ->
-          let c = Extlib.list_compare Varinfo.compare vs1 vs2 in
+  let same_edge edge edge' =
+    match edge, edge' with
+    | Assign (_,loc1,typ1,exp1), Assign (_,loc2,typ2,exp2) ->
+      let c = Lval.compare loc1 loc2 in
+      if c <> 0 then false else
+        let c = Typ.compare typ1 typ2 in
+        if c <> 0 then false else
+          Exp.compare exp1 exp2 = 0
+    | Assume(_,e1,b1), Assume(_,e2,b2) ->
+      let c = Exp.compare e1 e2 in
+      if c <> 0 then false else
+        Pervasives.compare b1 b2 = 0
+    | EnterScope(_,vs1),EnterScope(_,vs2) ->
+      let c = Extlib.list_compare Varinfo.compare vs1 vs2 in
+      c = 0
+    | LeaveScope(_,vs1), LeaveScope(_,vs2) ->
+      let c = Extlib.list_compare Varinfo.compare vs1 vs2 in
+      c = 0
+    | CallDeclared(_,kf1,exp1,lval1), CallDeclared(_,kf2,exp2,lval2) ->
+      let c = Kernel_function.compare kf1 kf2 in
+      if c <> 0 then false else
+        let c = Extlib.list_compare Exp.compare exp1 exp2 in
+        if c <> 0 then false else
+          let c = Extlib.opt_compare Lval.compare lval1 lval2 in
           c = 0
-        | LeaveScope(_,vs1), LeaveScope(_,vs2) ->
-          let c = Extlib.list_compare Varinfo.compare vs1 vs2 in
-          c = 0
-        | CallDeclared(_,kf1,exp1,lval1), CallDeclared(_,kf2,exp2,lval2) ->
-          let c = Kernel_function.compare kf1 kf2 in
-          if c <> 0 then false else
-            let c = Extlib.list_compare Exp.compare exp1 exp2 in
-            if c <> 0 then false else
-              let c = Extlib.opt_compare Lval.compare lval1 lval2 in
-              c = 0
-        | Msg(_,s1), Msg(_,s2) ->
-          let c = String.compare s1 s2 in
-          c = 0
-        | Loop(_,stmt1,s1,g1), Loop(_,stmt2,s2,g2) ->
-          Stmt.equal stmt1 stmt2 &&
-          Node.equal s1 s2 && GraphShape.equal g1 g2
-        | _ -> false
-      in
-      let reusable = match get_last c with
-        | None -> None
-        | Some last ->
-          let succs = find_succs current last in
-          List.find_opt same succs
-      in
-      match reusable with
+    | Msg(_,s1), Msg(_,s2) ->
+      let c = String.compare s1 s2 in
+      c = 0
+    | Loop(_,stmt1,s1,g1), Loop(_,stmt2,s2,g2) ->
+      Stmt.equal stmt1 stmt2 &&
+      Node.equal s1 s2 && GraphShape.equal g1 g2
+    | _ -> false
+
+  let add_edge_aux c edge =
+    let (current,graph) = get_current c in
+    let reusable = match get_last c with
+      | None -> None
+      | Some last ->
+        let succs = find_succs current last in
+        List.find_opt (same_edge edge) succs
+    in
+    let (n,e) = match reusable with
       | Some e ->
         (** reuse an edge from last *)
         let n = get_node e in
-        let m = Graph.singleton current [e] in
-        let graph = join_graph m graph in
-        move_to n graph c
-      | None ->
-        (** create a new edge *)
-        let n = Node.next () in
-        let e = change_next n edge in
-        let m = Graph.singleton current [e] in
-        let graph = join_graph m graph in
-        move_to n graph c
+        (n,e)
+    | None ->
+      (** create a new edge *)
+      let n = Node.next () in
+      let e = change_next n edge in
+      (n,e)
+    in
+    let m = Graph.singleton current [e] in
+    let graph = join_graph m graph in
+    move_to n graph c
+
+  let add_edge c e =
+    if c == top then c
+    else if c.call_declared_function then c (** forget intermediary state *)
+      else add_edge_aux c e
 
   let copy_edges s old_current_node g state =
     let cache = Node.Hashtbl.create 10 in
@@ -553,14 +561,32 @@ module Traces = struct
     c1.globals != c2.globals ||
     c1.main_formals != c2.main_formals
 
-  let join_path graph c1 c2 =
+  let join_path ?last graph c1 c2 =
     if epsilon_path c1 c2 graph
     then (c2, graph)
     else if epsilon_path c2 c1 graph
     then (c1, graph)
     else
-      let n = Node.next () in
-      let m = Msg(n,"join") in
+      let m = Msg(Node.dumb,"join") in
+      let reusable = match last with
+        | None -> None
+        | Some last ->
+          let succs1 = find_succs c1 last in
+          let succs1 = List.filter (same_edge m) succs1 in
+          let succs2 = find_succs c2 last in
+          let find s1 = List.exists (Edge.equal s1) succs2 in
+          List.find_opt find succs1
+      in
+      let (n,m) = match reusable with
+        | None ->
+          let n = Node.next () in
+          let m = change_next n m in
+          (n,m)
+        | Some m ->
+          (** reuse an edge from last *)
+          let n = get_node m in
+          (n,m)
+      in
       let m1 = Graph.singleton c1 [m] in
       let m2 = Graph.singleton c2 [m] in
       let g = join_graph (join_graph m1 graph) m2 in
@@ -591,7 +617,7 @@ module Traces = struct
         | `Value(l) ->
           let last = join_graph last1 last2 in
           let g = join_graph g1 g2 in
-          let (n,g) = join_path g c1 c2 in
+          let (n,g) = join_path ~last g c1 c2 in
           `Value(OpenLoop(stmt,s,last,n,g,l))
       end
     | UnrollLoop(stmt,l1), UnrollLoop(_,l2) ->
@@ -607,22 +633,25 @@ module Traces = struct
       end
 
   let join c1 c2 =
-    if c1.call_declared_function || c2.call_declared_function
-    then assert false (* should not appended, since nothing append during a call to a not defined function *);
-    match view c1, view c2 with
-    | `Top, _ -> c1
-    | _, `Top -> c2
-    | `Other c1, `Other c2 when is_included c1 c2 -> c2
-    | `Other c1, `Other c2 when is_included c2 c1 -> c1
-    | `Other c1, `Other c2 ->
-      if not_same_origin c1 c2 then assert false
-      else
-        match join_loops c1.current c2.current with
-        | `Top -> top
-        | `Value(current) -> {
-            start = c1.start; current; call_declared_function = false;
-            globals = c1.globals; main_formals = c1.main_formals;
-          }
+    if c1.call_declared_function <> c2.call_declared_function
+    then
+      Value_parameters.fatal "@[<hv>@[At the same time inside and outside a function call:@]@ %a@ %a@]"
+        pretty c1 pretty c2
+    else
+      match view c1, view c2 with
+      | `Top, _ -> c1
+      | _, `Top -> c2
+      | `Other c1, `Other c2 when is_included c1 c2 -> c2
+      | `Other c1, `Other c2 when is_included c2 c1 -> c1
+      | `Other c1, `Other c2 ->
+        if not_same_origin c1 c2 then assert false
+        else
+          match join_loops c1.current c2.current with
+          | `Top -> top
+          | `Value(current) -> {
+              start = c1.start; current; call_declared_function = c1.call_declared_function;
+              globals = c1.globals; main_formals = c1.main_formals;
+            }
 
   let add_loop stmt state =
     let (n,g) = get_current state in
@@ -638,6 +667,7 @@ module Traces = struct
     { state with current }
 
   let widen _ stmt' _ c2 =
+    Format.printf "@[widen@]@.";
     if loop_mode_at_enter_loop
     then c2
     else begin
@@ -1052,6 +1082,65 @@ let project_of_cfg vreturn s =
   (*   ) () *)
 
 
+module GraphDot = OCamlGraph.Graphviz.Dot(struct
+    module V = struct type t = {node : Node.t; loops : Node.t list} end
+    module E = struct
+      open V
+      type t =
+        | Usual of Node.t * Edge.t * Node.t list
+        | Head of Node.t * Node.t list * Node.t * Node.t list
+      let src = function
+        | Usual (src,_,loops) -> {node=src;loops}
+        | Head (src,loops,_,_) -> {node=src;loops}
+      let dst = function
+        | Usual (_,edge,loops) -> {node=Traces.get_node edge;loops}
+        | Head (_,_,s,loops) -> {node=s;loops}
+    end
+    open V
+    open E
+    type t = Graph.t
+    let iter_vertex f g =
+      let rec iter_edge k (l: Node.t list) = function
+        | Loop(_,_,_,g) -> iter_vertex (k::l) g
+        | _ -> ()
+      and iter_vertex l g =
+        GraphShape.iter (fun k e -> f {node=k;loops=l}; List.iter (iter_edge k l) e) g
+      in
+      iter_vertex [] (Graph.shape g)
+    let iter_edges_e f g =
+      let rec iter_edge k l e =
+        f (Usual(k,e,l));
+        match e with
+        | Loop(_,_,s,g) ->
+          let l' = (k::l) in
+          f (Head(k,l,s,l'));
+          iter_vertex l' g
+        | _ -> ()
+      and iter_vertex l g =
+        GraphShape.iter (fun k e -> List.iter (iter_edge k l) e) g
+      in
+      iter_vertex [] (Graph.shape g)
+
+    let graph_attributes _ = []
+    let default_vertex_attributes :
+      t -> OCamlGraph.Graphviz.DotAttributes.vertex list = fun _ -> []
+    let vertex_name v = Format.asprintf "n%a%t" Node.pretty v.node
+        (fun fmt -> List.iter (fun s -> Format.fprintf fmt "L%a" Node.pretty s) v.loops)
+    let vertex_attributes :
+      V.t -> OCamlGraph.Graphviz.DotAttributes.vertex list =
+      fun n -> [`Label (Format.asprintf "%a" Node.pretty n.node)]
+    let get_subgraph :
+      V.t -> OCamlGraph.Graphviz.DotAttributes.subgraph option = fun _ -> None
+    let default_edge_attributes :
+      t -> OCamlGraph.Graphviz.DotAttributes.edge list = fun _ -> []
+    let edge_attributes : E.t -> OCamlGraph.Graphviz.DotAttributes.edge list =
+      function
+      | Usual(_,Loop _,_) -> [`Label (Format.asprintf "leave_loop")]
+      | Usual(_,e,_) -> [`Label (Format.asprintf "%a" Edge.pretty e)]
+      | Head _ -> []
+end)
+
+
 
 let finish_computation () =
   let return_stmt = Kernel_function.find_return (fst (Globals.entry_point ())) in
@@ -1067,7 +1156,11 @@ let finish_computation () =
     Value_parameters.failure "The trace is Bottom can't generate code"
   | `Value state when state == Traces.top ->
     Value_parameters.failure "The trace is TOP can't generate code"
-  | `Value state -> project_of_cfg return_exp state
+  | `Value state ->
+    let out = open_out "traces_domain.dot" in
+    GraphDot.output_graph out (snd (Traces.get_current state));
+    close_out out;
+    project_of_cfg return_exp state
 
 
 (*
