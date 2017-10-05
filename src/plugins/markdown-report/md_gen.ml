@@ -411,26 +411,30 @@ let gen_section_alarms is_draft =
     H1 (plain "Results of the analysis", Some "alarms") :: text_content
 
 let gen_section_callgraph is_draft =
-  let content =
-    if is_draft then
-      Comment
-        "flamegraph allow to visualize the functions and callstacks \
-         whose analysis is the most costly."
-      :: insert_marks
-    else
-      [
-        Block [
-          Text [
-            Plain "The image below shows the flamegraph (";
-            plain_link "http://www.brendangregg.com/flamegraphs.html";
-            Plain ") for the chosen entry point."
-          ]
-        ];
-        Block
-          [ Text [Image ("flamegraph", "../server.flamegraph.svg")] ]
-      ]
-  in
-  H1 (plain "Flamegraph", Some "flamegraph") :: content
+  let f = Mdr_params.FlameGraph.get () in
+  if f = "" then []
+  else begin
+    let content =
+      if is_draft then
+        Comment
+          "A flamegraph provides a visualization of the functions and callstacks \
+           whose analysis is the most costly."
+        :: insert_marks
+      else
+        [
+          Block [
+            Text [
+              Plain "The image below shows the flamegraph (";
+              plain_link "http://www.brendangregg.com/flamegraphs.html";
+              Plain ") for the chosen entry point."
+            ]
+          ];
+          Block
+            [ Text [Image ("flamegraph", f)] ]
+        ]
+    in
+    H1 (plain "Flamegraph", Some "flamegraph") :: content
+  end
 
 let gen_section_postlude is_draft =
   if is_draft then

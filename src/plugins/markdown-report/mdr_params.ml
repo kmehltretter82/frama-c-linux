@@ -39,6 +39,17 @@ struct
 end
 )
 
+module FlameGraph = Empty_string(
+struct
+  let option_name = "-mdr-flamegraph"
+  let arg_name = "f"
+  let help =
+    "reads file <f> to include a FlameGraph (https://github.com/brendangregg/FlameGraph.git),\
+     allowing the most analysis-intensive callstacks to be identified\
+     quickly and accurately"
+end
+)
+
 module Authors = String_list(
 struct
   let option_name = "-mdr-authors"

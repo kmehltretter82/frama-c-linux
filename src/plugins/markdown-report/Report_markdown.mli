@@ -13,6 +13,9 @@ module Gen_draft: Parameter_sig.Bool
 (** Value of [-mdr-remarks]. *)
 module Remarks: Parameter_sig.String
 
+(** Value of [-mdr-flamegraph]. *)
+module FlameGraph: Parameter_sig.String
+
 (** Value of [-mdr-authors]. *)
 module Authors: Parameter_sig.String_list
 
