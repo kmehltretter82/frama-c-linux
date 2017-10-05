@@ -172,7 +172,7 @@ and pp_element fmt = function
   | Raw s -> Format.pp_print_string fmt s
   | Comment s ->
     Format.fprintf fmt
-      "@[<hv>@[<hv 5><!-- %a@]@ -->@]@\n" Format.pp_print_text s
+      "@[<hv>@[<hov 5><!-- %a@]@ -->@]@\n" Format.pp_print_text s
   | H1(t,lab) -> Format.fprintf fmt "@[<h># %a%a@]@\n" pp_text t pp_lab lab
   | H2(t,lab) -> Format.fprintf fmt "@[<h>## %a%a@]@\n" pp_text t pp_lab lab
   | H3(t,lab) -> Format.fprintf fmt "@[<h>### %a%a@]@\n" pp_text t pp_lab lab
@@ -200,6 +200,7 @@ let pp_pandoc fmt { title; authors; date; elements } =
     Format.fprintf fmt "@[<h>author:@]@\n%a" pp_authors authors;
     Format.fprintf fmt "@[<h>date: %a@]@\n" pp_text date;
     Format.fprintf fmt "@[<h>...@]@\n";
+    Format.pp_print_newline fmt ();
   end;
-  List.iter (pp_element fmt) elements;
+  List.iter (fun e -> pp_element fmt e ; Format.pp_print_newline fmt ()) elements;
   Format.fprintf fmt "@]%!"

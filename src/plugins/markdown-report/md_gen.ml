@@ -473,8 +473,9 @@ let gen_report is_draft =
          automatically generated content by Frama-C's Markdown-report plugin. \
          For any section of the document, you can write pandoc markdown \
          content between the BEGIN and END comments. In addition, the plug-in \
-         will consider any <!-- INCLUDE file.md --> comment as a directive to \
-         include the content of file.md in the corresponding section. \
+         will consider any \\<!-- INCLUDE file.md --\\> comment (without backslashes) \
+         as a directive to include the content of file.md in the corresponding \
+         section. \
          Please don't alter the structure \
          of the document as it is used by the plugin to associate content to \
          the relevant section."
