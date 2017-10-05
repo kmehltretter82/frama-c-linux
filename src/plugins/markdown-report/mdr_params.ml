@@ -24,7 +24,7 @@ module Gen_draft = False(
     let option_name = "-mdr-gen-draft"
     let help =
       "instead of a full report, generates an empty draft \
-       in a format suitable for -mdr-add-remarks"
+       in a format suitable for -mdr-remarks"
   end)
 
 module Remarks = Empty_string(
@@ -32,10 +32,10 @@ struct
   let option_name = "-mdr-remarks"
   let arg_name = "f"
   let help =
-    "reads <f> to add additional remarks to various sections of the report. \
-     must be in a format compatible with the file produced by -mdr-gen-draft. \
+    "reads file <f> to add additional remarks to various sections of the report. \
+     Must be in a format compatible with the file produced by -mdr-gen-draft. \
      Remarks themselves must be written in pandoc's markdown, although this is \
-     not enforced by the plug-in."
+     not enforced by the plug-in"
 end
 )
 
