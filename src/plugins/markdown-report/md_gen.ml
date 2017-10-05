@@ -212,7 +212,7 @@ let make_events_table print_kind caption events =
     in
     let line =
       [ plain (string_of_pos_opt evt_source);
-        [ Plain evt_message;
+        [ Inline_code evt_message;
           Plain "(emitted by";
           Inline_code evt_plugin;
           Plain ")"
@@ -430,7 +430,7 @@ let gen_section_callgraph is_draft =
             ]
           ];
           Block
-            [ Text [Image ("flamegraph", f)] ]
+            [ Text [Image ("Flamegraph visualization.", f)] ]
         ]
     in
     H1 (plain "Flamegraph", Some "flamegraph") :: content
