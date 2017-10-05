@@ -89,9 +89,8 @@ let pp_headers fmt l sizes =
 
 let compute_sizes headers contents =
   let check_line i m line =
-    match List.nth_opt line i with
-    | Some t -> max m (test_size t + 2)
-    | None -> m
+    try max m (test_size (List.nth line i) + 2)
+    with Failure _ -> m
   in
   let column_size (i,l) (h,_) =
     let max = List.fold_left (check_line i) (test_size h) contents in
