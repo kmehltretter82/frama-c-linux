@@ -38,7 +38,8 @@ let main () =
   (* Value computations *)
   if Value_parameters.ForceValues.get () then begin
     !Db.Value.compute ();
-    Traces_domain.finish_computation ()
+    if Value_parameters.TracesDomain.get () then
+      Traces_domain.finish_computation ()
   end;
   if Db.Value.is_computed () then Red_statuses.report ()
 
