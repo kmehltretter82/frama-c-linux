@@ -38,6 +38,8 @@ module SignDomain: Parameter_sig.Bool
 module PrinterDomain: Parameter_sig.Bool
 module NumerorsDomain: Parameter_sig.Bool
 module TracesDomain: Parameter_sig.Bool
+module TracesUnrollLoop: Parameter_sig.Bool
+module TracesUnifyLoop: Parameter_sig.Bool
 
 module ApronOctagon: Parameter_sig.Bool
 module ApronBox: Parameter_sig.Bool
@@ -55,6 +57,7 @@ module SymbolicLocsStorage: Parameter_sig.Bool
 module GaugesStorage: Parameter_sig.Bool
 module ApronStorage: Parameter_sig.Bool
 module BitwiseOffsmStorage: Parameter_sig.Bool
+module TracesStorage: Parameter_sig.Bool
 
 
 module AutomaticContextMaxDepth: Parameter_sig.Int

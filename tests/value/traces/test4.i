@@ -2,6 +2,8 @@
    STDOPT: #"-eva-traces-domain -value-msg-key d-traces -slevel 10" +"-then-last -val -slevel 10 -print -no-eva-traces-domain"
 */
 
+/* Test of join inside a loop */
+
 int main(c){
   int tmp = 0;
   for(int i = 0; i < 100; i++){
