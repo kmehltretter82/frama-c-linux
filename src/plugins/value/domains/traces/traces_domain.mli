@@ -21,16 +21,40 @@
 (**************************************************************************)
 
 (** Traces domain *)
+open Cil_datatype
 
 module Node : Datatype.S
 
-type edge
+module GraphShape : sig type 'value t end
+
+type edge =
+  | Assign of Node.t * Cil_types.lval * Cil_types.typ * Cil_types.exp
+  | Assume of Node.t * Cil_types.exp * bool
+  | EnterScope of Node.t * Cil_types.varinfo list
+  | LeaveScope of Node.t * Cil_types.varinfo list
+  (** For call of functions without definition *)
+  | CallDeclared of Node.t * Cil_types.kernel_function * Cil_types.exp list * Cil_types.lval option
+  | Loop of Node.t * Stmt.t * Node.t (** start *) * edge list GraphShape.t (** cfg of the loop **)
+  | Msg of Node.t * string
 
 module Edge : Datatype.S with type t = edge
 
-module Graph : Hptmap_sig.S with type key = Node.t and type v = edge list
+module Graph : Hptmap_sig.S with type key = Node.t
+                             and type v = edge list
+                             and type 'a shape = 'a GraphShape.t
+
+(** stack of open loops *)
+type loops =
+  | Base of Node.t * Graph.t (* current last *)
+  | OpenLoop of Cil_types.stmt * Node.t (* start node *) * Graph.t (* last iteration *) * Node.t (** current *) * Graph.t * loops
+  | UnrollLoop of Cil_types.stmt * loops
 
 type state
+
+val start: state -> Node.t
+val current: state -> loops
+val globals: state -> Cil_types.varinfo list
+val entry_formals: state -> Cil_types.varinfo list
 
 module D: Abstract_domain.Internal
   with type value = Cvalue.V.t

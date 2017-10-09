@@ -20,6 +20,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** traces domain *)
+
+(** This domain build an over-approximation of all the traces that leads to a statement.
+    These sets of traces is represented using CFGs.
+*)
+
 module OCamlGraph = Graph
 module Frama_c_File = File
 open Cil_datatype
@@ -226,6 +232,11 @@ type state = { start : Node.t; current : loops;
                all_edges_ever_created : Graph.t ref;
                all_loop_start : (Node.t * Graph.t) Stmt.Hashtbl.t;
              }
+
+let start s = s.start
+let current s = s.current
+let globals s = s.globals
+let entry_formals s = s.main_formals
 
 (* Lattice structure for the abstract state above *)
 module Traces = struct
