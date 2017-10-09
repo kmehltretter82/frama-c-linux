@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: #"-eva-traces-domain -value-msg-key d-traces -slevel 10" +"-then-last -val -slevel 10 -print -no-eva-traces-domain"
+   STDOPT: #"-eva-traces-domain -value-msg-key d-traces -slevel 10"
 */
 
 /* Test of join inside a loop */
@@ -10,7 +10,6 @@ int main(c){
     if(i % 2){
       tmp ++;
     };
-    //@ slevel merge;
     if(i % 3){
       tmp ++;
     };

@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: #"-eva-traces-domain -value-msg-key d-traces -slevel 10" +"-then-last -check -print -val"
+   STDOPT: #"-eva-traces-domain -value-msg-key d-traces -slevel 10 -eva-traces-project" +"-then-last -val -print -value-msg-key=-d-traces"
 */
 
 

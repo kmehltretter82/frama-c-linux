@@ -58,6 +58,8 @@ module GaugesStorage: Parameter_sig.Bool
 module ApronStorage: Parameter_sig.Bool
 module BitwiseOffsmStorage: Parameter_sig.Bool
 module TracesStorage: Parameter_sig.Bool
+module TracesDot: Parameter_sig.String
+module TracesProject: Parameter_sig.Bool
 
 
 module AutomaticContextMaxDepth: Parameter_sig.Int

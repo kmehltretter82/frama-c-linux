@@ -339,6 +339,24 @@ module TracesStorage =
     end)
 let () = add_precision_dep TracesStorage.parameter
 
+let () = Parameter_customize.set_group domains
+module TracesDot = Empty_string
+    (struct
+      let option_name = "-eva-traces-dot"
+      let help = "Output to the given filename the Cfg in dot format."
+      let arg_name = "FILENAME"
+    end)
+
+
+let () = Parameter_customize.set_group domains
+module TracesProject = Bool
+    (struct
+      let option_name = "-eva-traces-project"
+      let help = "Try to convert the Cfg into a program in a new project."
+      let default = false
+    end)
+let () = add_precision_dep TracesProject.parameter
+
 
 (* -------------------------------------------------------------------------- *)
 (* --- Performance options                                                --- *)

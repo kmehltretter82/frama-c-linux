@@ -856,11 +856,6 @@ struct
           else if tree1' == Empty then tree0'
           else wrap_Branch p m tree0' tree1'
 
-    (* The comment below is outdated: [map] and [endo_map] do not have the
-       same signature for [f] *)
-    (** [endo_map] is similar to [map], but attempts to physically share its
-	result with its input. This saves memory when [f] is the identity
-	function. *)
     let rec endo_map f tree =
       match tree with
       | Empty ->
@@ -884,6 +879,16 @@ struct
         | Leaf (key, value, _) -> wrap_Leaf key (f key value)
         | Branch (p, m, t1, t2, _) ->
           wrap_Branch p m (from_shape f t1) (from_shape f t2)
+
+      let rec from_shape_id = function
+        | Empty -> Empty
+        | Leaf (key, value, _) -> wrap_Leaf key value
+        | Branch (p, m, t1, t2, _) as t ->
+          let t1' = from_shape_id t1 in
+          let t2' = from_shape_id t2 in
+          if (t1' == t1) && (t2' == t2)
+          then t
+          else wrap_Branch p m t1' t2'
 
 
   module Cacheable = struct

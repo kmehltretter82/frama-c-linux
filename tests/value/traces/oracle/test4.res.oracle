@@ -4,33 +4,256 @@
 [value] Initial state computed
 [value:initial-state] Values of globals at initialization
   
+tests/value/traces/test4.i:9:[value] entering loop for the first time
+tests/value/traces/test4.i:11:[value] warning: signed overflow. assert tmp + 1 ≤ 2147483647;
+tests/value/traces/test4.i:14:[value] warning: signed overflow. assert tmp + 1 ≤ 2147483647;
+tests/value/traces/test4.i:17:[value] warning: signed overflow. assert tmp + 1 ≤ 2147483647;
+tests/value/traces/test4.i:20:[value] warning: signed overflow. assert tmp + 1 ≤ 2147483647;
+tests/value/traces/test4.i:23:[value] warning: signed overflow. assert tmp + 1 ≤ 2147483647;
+tests/value/traces/test4.i:25:[value] warning: signed overflow. assert tmp + 1 ≤ 2147483647;
 [value] Recording results for main
 [value] done for function main
 [value] ====== VALUES COMPUTED ======
 [value:final-states] Values at end of function main:
-  tmp ∈ {3}
+  tmp ∈ [46..2147483647]
 [value:d-traces] Trace domains:
  start: 0; globals = ; main_formals = c;
- {[ 0 -> ([ initialize variable using type Main_Formal
-c -> 1 ])
-    1 -> ([ EnterScope: tmp -> 2 ])
-    2 -> ([ initialize variable: tmp -> 3 ])
-    3 -> ([ Assign: tmp = 0 -> 4 ])
-    4 -> ([ EnterScope: i -> 5 ])
-    5 -> ([ initialize variable: i -> 6 ])
-    6 -> ([ Assign: i = 0 -> 7 ])
-    7 -> ([ enter_loop -> 8 ])
-    8 -> ([ Assume: i < 3 true -> 9 ])
-    9 -> ([ Assign: tmp = tmp + 1 -> 10 ])
-    10 -> ([ Assign: i = i + 1 -> 11 ])
-    11 -> ([ Assume: i < 3 true -> 13 ])
-    13 -> ([ Assign: tmp = tmp + 1 -> 14 ])
-    14 -> ([ Assign: i = i + 1 -> 15 ])
-    15 -> ([ Assume: i < 3 true -> 18 ])
-    18 -> ([ Assign: tmp = tmp + 1 -> 19 ])
-    19 -> ([ Assign: i = i + 1 -> 20 ])
-    20 -> ([ Assume: i < 3 false -> 23 ])
-    23 -> ([ LeaveScope: i -> 24 ]) ]} at 24
+ {[ 0 -> initialize variable using type Main_Formal
+c -> 1
+    1 -> EnterScope: tmp -> 2
+    2 -> initialize variable: tmp -> 3
+    3 -> Assign: tmp = 0 -> 4
+    4 -> EnterScope: i -> 5
+    5 -> initialize variable: i -> 6
+    6 -> Assign: i = 0 -> 7
+    7 -> enter_loop -> 8
+    8 -> Assume: i < 100 true -> 9
+    9 -> Assume: i % 2 false -> 10
+    10 -> Assume: i % 3 false -> 11
+    11 -> Assume: i % 5 false -> 12
+    12 -> Assume: i % 7 false -> 13
+    13 -> Assume: i % 11 false -> 14
+    14 -> Assign: tmp = tmp + 1 -> 15
+    15 -> Assign: i = i + 1 -> 16
+    16 -> Assume: i < 100 true -> 18
+    18 -> Assume: i % 2 true -> 19
+    19 -> Assign: tmp = tmp + 1 -> 20
+    20 -> Assume: i % 3 true -> 21
+    21 -> Assign: tmp = tmp + 1 -> 22
+    22 -> Assume: i % 5 true -> 23
+    23 -> Assign: tmp = tmp + 1 -> 24
+    24 -> Assume: i % 7 true -> 25
+    25 -> Assign: tmp = tmp + 1 -> 26
+    26 -> Assume: i % 11 true -> 27
+    27 -> Assign: tmp = tmp + 1 -> 28
+    28 -> Assign: tmp = tmp + 1 -> 29
+    29 -> Assign: i = i + 1 -> 30
+    30 -> Assume: i < 100 true -> 33
+    33 -> Assume: i % 2 false -> 34
+    34 -> Assume: i % 3 true -> 35
+    35 -> Assign: tmp = tmp + 1 -> 36
+    36 -> Assume: i % 5 true -> 38
+    38 -> Assign: tmp = tmp + 1 -> 39
+    39 -> Assume: i % 7 true -> 41
+    41 -> Assign: tmp = tmp + 1 -> 42
+    42 -> Assume: i % 11 true -> 44
+    44 -> Assign: tmp = tmp + 1 -> 45
+    45 -> Assign: tmp = tmp + 1 -> 47
+    47 -> Assign: i = i + 1 -> 48
+    48 -> Assume: i < 100 true -> 51
+    51 -> Assume: i % 2 true -> 52
+    52 -> Assign: tmp = tmp + 1 -> 53
+    53 -> Assume: i % 3 false -> 55
+    55 -> Assume: i % 5 true -> 56
+    56 -> Assign: tmp = tmp + 1 -> 57
+    57 -> Assume: i % 7 true -> 59
+    59 -> Assign: tmp = tmp + 1 -> 60
+    60 -> Assume: i % 11 true -> 62
+    62 -> Assign: tmp = tmp + 1 -> 63
+    63 -> Assign: tmp = tmp + 1 -> 65
+    65 -> Assign: i = i + 1 -> 66
+    66 -> Assume: i < 100 true -> 69
+    69 -> Assume: i % 2 false -> 70
+    70 -> Assume: i % 3 true -> 71
+    71 -> Assign: tmp = tmp + 1 -> 72
+    72 -> Assume: i % 5 true -> 74
+    74 -> Assign: tmp = tmp + 1 -> 75
+    75 -> Assume: i % 7 true -> 77
+    77 -> Assign: tmp = tmp + 1 -> 78
+    78 -> Assume: i % 11 true -> 80
+    80 -> Assign: tmp = tmp + 1 -> 81
+    81 -> Assign: tmp = tmp + 1 -> 83
+    83 -> Assign: i = i + 1 -> 84
+    84 -> Assume: i < 100 true -> 87
+    87 -> Assume: i % 2 true -> 88
+    88 -> Assign: tmp = tmp + 1 -> 89
+    89 -> Assume: i % 3 true -> 91
+    91 -> Assign: tmp = tmp + 1 -> 92
+    92 -> Assume: i % 5 false -> 94
+    94 -> Assume: i % 7 true -> 95
+    95 -> Assign: tmp = tmp + 1 -> 96
+    96 -> Assume: i % 11 true -> 98
+    98 -> Assign: tmp = tmp + 1 -> 99
+    99 -> Assign: tmp = tmp + 1 -> 101
+    101 -> Assign: i = i + 1 -> 102
+    102 -> Assume: i < 100 true -> 105
+    105 -> Assume: i % 2 false -> 106
+    106 -> Assume: i % 3 false -> 107
+    107 -> Assume: i % 5 true -> 108
+    108 -> Assign: tmp = tmp + 1 -> 109
+    109 -> Assume: i % 7 true -> 111
+    111 -> Assign: tmp = tmp + 1 -> 112
+    112 -> Assume: i % 11 true -> 114
+    114 -> Assign: tmp = tmp + 1 -> 115
+    115 -> Assign: tmp = tmp + 1 -> 117
+    117 -> Assign: i = i + 1 -> 118
+    118 -> Assume: i < 100 true -> 121
+    121 -> Assume: i % 2 true -> 122
+    122 -> Assign: tmp = tmp + 1 -> 123
+    123 -> Assume: i % 3 true -> 125
+    125 -> Assign: tmp = tmp + 1 -> 126
+    126 -> Assume: i % 5 true -> 128
+    128 -> Assign: tmp = tmp + 1 -> 129
+    129 -> Assume: i % 7 false -> 131
+    131 -> Assume: i % 11 true -> 132
+    132 -> Assign: tmp = tmp + 1 -> 133
+    133 -> Assign: tmp = tmp + 1 -> 135
+    135 -> Assign: i = i + 1 -> 136
+    136 -> Assume: i < 100 true -> 139
+    139 -> Assume: i % 2 false -> 140
+    140 -> Assume: i % 3 true -> 141
+    141 -> Assign: tmp = tmp + 1 -> 142
+    142 -> Assume: i % 5 true -> 144
+    144 -> Assign: tmp = tmp + 1 -> 145
+    145 -> Assume: i % 7 true -> 147
+    147 -> Assign: tmp = tmp + 1 -> 148
+    148 -> Assume: i % 11 true -> 150
+    150 -> Assign: tmp = tmp + 1 -> 151
+    151 -> Assign: tmp = tmp + 1 -> 153
+    153 -> Assign: i = i + 1 -> 154
+    154 -> Assume: i < 100 true -> 157
+    157 -> Assume: i % 2 true -> 158
+    158 -> Assign: tmp = tmp + 1 -> 159
+    159 -> Assume: i % 3 false -> 161
+    161 -> Assume: i % 5 true -> 162
+    162 -> Assign: tmp = tmp + 1 -> 163
+    163 -> Assume: i % 7 true -> 165
+    165 -> Assign: tmp = tmp + 1 -> 166
+    166 -> Assume: i % 11 true -> 168
+    168 -> Assign: tmp = tmp + 1 -> 169
+    169 -> Assign: tmp = tmp + 1 -> 171
+    171 -> Assign: i = i + 1 -> 172
+    172 -> Assume: i < 100 true -> 175; join -> 190
+    175 -> Assume: i % 2 false -> 176; join -> 193
+    176 -> Assume: i % 3 true -> 177; join -> 199
+    177 -> Assign: tmp = tmp + 1 -> 178
+    178 -> Assume: i % 5 false -> 180; join -> 203
+    180 -> Assume: i % 7 true -> 181; join -> 209
+    181 -> Assign: tmp = tmp + 1 -> 182
+    182 -> Assume: i % 11 true -> 184; join -> 213
+    184 -> Assign: tmp = tmp + 1 -> 185
+    185 -> Assign: tmp = tmp + 1 -> 187; join -> 219
+    187 -> Assign: i = i + 1 -> 188; join -> 221
+    188 -> join -> 190
+    190 -> Assume: i < 100 true -> 192; join -> 224
+    192 -> join -> 193
+    193 -> Assume: i % 2 false -> 194; Assume: i % 2 true -> 195; join -> 227
+    194 -> join -> 198
+    195 -> Assign: tmp = tmp + 1 -> 196
+    196 -> join -> 198
+    198 -> join -> 199
+    199 -> Assume: i % 3 true -> 200; join -> 233
+    200 -> Assign: tmp = tmp + 1 -> 201
+    201 -> join -> 203
+    203 -> Assume: i % 5 false -> 204; Assume: i % 5 true -> 205; join -> 239
+    204 -> join -> 208
+    205 -> Assign: tmp = tmp + 1 -> 206
+    206 -> join -> 208
+    208 -> join -> 209
+    209 -> Assume: i % 7 true -> 210; join -> 245
+    210 -> Assign: tmp = tmp + 1 -> 211
+    211 -> join -> 213
+    213 -> Assume: i % 11 false -> 214; Assume: i % 11 true -> 215;
+           join -> 249
+    214 -> join -> 218
+    215 -> Assign: tmp = tmp + 1 -> 216; join -> 252
+    216 -> join -> 218
+    218 -> join -> 219
+    219 -> Assign: tmp = tmp + 1 -> 220; join -> 256
+    220 -> join -> 221
+    221 -> Assign: i = i + 1 -> 222; join -> 258
+    222 -> join -> 224
+    224 -> Assume: i < 100 true -> 226; join -> 261
+    226 -> join -> 227
+    227 -> Assume: i % 2 false -> 228; Assume: i % 2 true -> 229; join -> 265
+    228 -> join -> 232
+    229 -> Assign: tmp = tmp + 1 -> 230
+    230 -> join -> 232
+    232 -> join -> 233
+    233 -> Assume: i % 3 false -> 234; Assume: i % 3 true -> 235; join -> 271
+    234 -> join -> 238
+    235 -> Assign: tmp = tmp + 1 -> 236
+    236 -> join -> 238
+    238 -> join -> 239
+    239 -> Assume: i % 5 false -> 240; Assume: i % 5 true -> 241; join -> 277
+    240 -> join -> 244
+    241 -> Assign: tmp = tmp + 1 -> 242
+    242 -> join -> 244
+    244 -> join -> 245
+    245 -> Assume: i % 7 true -> 246; join -> 283
+    246 -> Assign: tmp = tmp + 1 -> 247; join -> 286
+    247 -> join -> 249
+    249 -> Assume: i % 11 false -> 250; Assume: i % 11 true -> 251;
+           join -> 290
+    250 -> join -> 255
+    251 -> join -> 252
+    252 -> Assign: tmp = tmp + 1 -> 253; join -> 293
+    253 -> join -> 255
+    255 -> join -> 256
+    256 -> Assign: tmp = tmp + 1 -> 257; join -> 297
+    257 -> join -> 258
+    258 -> Assign: i = i + 1 -> 259; join -> 299
+    259 -> join -> 261
+    261 -> join -> 265
+    265 -> join -> 271
+    271 -> join -> 277
+    277 -> join -> 283
+    283 -> join -> 286
+    286 -> join -> 290
+    290 -> join -> 293
+    293 -> join -> 297
+    297 -> join -> 299
+    299 -> Loop(4) 262 {[ 262 -> Assume: i < 100 true -> 264
+                          264 -> Assume: i % 2 false -> 266;
+                                 Assume: i % 2 true -> 267
+                          266 -> join -> 270
+                          267 -> Assign: tmp = tmp + 1 -> 268
+                          268 -> join -> 270
+                          270 -> Assume: i % 3 false -> 272;
+                                 Assume: i % 3 true -> 273
+                          272 -> join -> 276
+                          273 -> Assign: tmp = tmp + 1 -> 274
+                          274 -> join -> 276
+                          276 -> Assume: i % 5 false -> 278;
+                                 Assume: i % 5 true -> 279
+                          278 -> join -> 282
+                          279 -> Assign: tmp = tmp + 1 -> 280
+                          280 -> join -> 282
+                          282 -> Assume: i % 7 false -> 284;
+                                 Assume: i % 7 true -> 285
+                          284 -> join -> 289
+                          285 -> Assign: tmp = tmp + 1 -> 287
+                          287 -> join -> 289
+                          289 -> Assume: i % 11 false -> 291;
+                                 Assume: i % 11 true -> 292
+                          291 -> join -> 296
+                          292 -> Assign: tmp = tmp + 1 -> 294
+                          294 -> join -> 296
+                          296 -> Assign: tmp = tmp + 1 -> 298
+                          298 -> Assign: i = i + 1 -> 300 ]} -> 304
+    304 -> Assume: i < 100 false -> 305
+    305 -> leave_loop -> 306
+    306 -> LeaveScope: i -> 312 ]} at 312
 [from] Computing for function main
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
@@ -42,42 +265,3 @@ c -> 1 ])
           tmp; i
 [inout] Inputs for function main:
           \nothing
-[value] Analyzing a complete application starting at main
-[value] Computing initial state
-[value] Initial state computed
-[value:initial-state] Values of globals at initialization
-  
-[value] done for function main
-[value] ====== VALUES COMPUTED ======
-[value:final-states] Values at end of function main:
-  __traces_domain_return ∈ {3}
-[value:d-traces] Trace domains:
- TOP
-[value] failure: The trace is TOP can't generate code
-/* Generated by Frama-C */
-int main(int c)
-{
-  int __traces_domain_return;
-  {
-    int tmp;
-    tmp = 0;
-    {
-      int i;
-      i = 0;
-      /*@ assert i < 3;  */
-      tmp ++;
-      i ++;
-      /*@ assert i < 3;  */
-      tmp ++;
-      i ++;
-      /*@ assert i < 3;  */
-      tmp ++;
-      i ++;
-      /*@ assert ¬(i < 3);  */
-      __traces_domain_return = tmp;
-    }
-  }
-  return __traces_domain_return;
-}
-
-

@@ -58,25 +58,37 @@ type edge =
 (* Frama-C "datatype" for type [inout] *)
 module Edge = struct
 
-  let rec pretty fmt = function
-    | Assign(n,loc,_typ,exp) -> Format.fprintf fmt "@[Assign:@ %a = %a -> %a@]"
-                                  Lval.pretty loc ExpStructEq.pretty exp Node.pretty n
-    | Assume(n,e,b) -> Format.fprintf fmt "@[Assume:@ %a %b -> %a@]" ExpStructEq.pretty e b Node.pretty n
-    | EnterScope(n,vs) -> Format.fprintf fmt "@[EnterScope:@ %a -> %a@]"
-                            (Pretty_utils.pp_list ~sep:"@ " Varinfo.pretty) vs Node.pretty n
-    | LeaveScope(n,vs) -> Format.fprintf fmt "@[LeaveScope:@ %a -> %a@]"
-                            (Pretty_utils.pp_list ~sep:"@ " Varinfo.pretty) vs Node.pretty n
-    | CallDeclared(n,kf1,exp1,lval1) ->
-      Format.fprintf fmt "@[CallDeclared:@ %a%s(%a) -> %a@]"
+  let succ = function
+      | Assign (n,_,_,_)
+      | Assume (n,_,_)
+      | EnterScope (n,_)
+      | LeaveScope (n,_)
+      | CallDeclared (n,_,_,_)
+      | Msg (n,_)
+      | Loop(n,_,_,_) -> n
+
+
+  let rec pretty_edge fmt = function
+    | Assign(_,loc,_typ,exp) -> Format.fprintf fmt "Assign:@ %a = %a"
+                                  Lval.pretty loc ExpStructEq.pretty exp
+    | Assume(_,e,b) -> Format.fprintf fmt "Assume:@ %a %b" ExpStructEq.pretty e b
+    | EnterScope(_,vs) -> Format.fprintf fmt "EnterScope:@ %a"
+                            (Pretty_utils.pp_list ~sep:"@ " Varinfo.pretty) vs
+    | LeaveScope(_,vs) -> Format.fprintf fmt "LeaveScope:@ %a"
+                            (Pretty_utils.pp_list ~sep:"@ " Varinfo.pretty) vs
+    | CallDeclared(_,kf1,exp1,lval1) ->
+      Format.fprintf fmt "CallDeclared:@ %a%s(%a)"
         (Pretty_utils.pp_opt ~pre:"" ~suf:" =@ " Lval.pretty) lval1
         (Kernel_function.get_name kf1)
         (Pretty_utils.pp_list ~sep:",@ " ExpStructEq.pretty) exp1
-        Node.pretty n
-    | Msg(n,s) -> Format.fprintf fmt "@[%s -> %a@]" s Node.pretty n
-    | Loop(n,stmt,s,g) -> Format.fprintf fmt "@[<hv 2>@[Loop(%a) %a@] %a @[-> %a@]@]"
+
+    | Msg(_,s) -> Format.fprintf fmt "%s" s
+    | Loop(_,stmt,s,g) -> Format.fprintf fmt "@[Loop(%a) %a@] %a"
                          Stmt.pretty_sid stmt
                          Node.pretty s
-                         (GraphShape.pretty pretty_list) g Node.pretty n
+                         (GraphShape.pretty pretty_list) g
+  and pretty fmt e =
+    Format.fprintf fmt "@[<hv 2>%a @[-> %a@]@]" pretty_edge e Node.pretty (succ e)
   and pretty_list fmt l = Pretty_utils.pp_list ~sep:";@ " pretty fmt l
 
   include Datatype.Make_with_collections(struct
@@ -366,15 +378,6 @@ module Traces = struct
       ~decide_right:Absorbing
       g1 g2
 
-  let get_node = function
-      | Assign (n,_,_,_)
-      | Assume (n,_,_)
-      | EnterScope (n,_)
-      | LeaveScope (n,_)
-      | CallDeclared (n,_,_,_)
-      | Msg (n,_)
-      | Loop(n,_,_,_) -> n
-
   let move_to c g state =
     let rec aux = function
       | Base (_,_) -> Base (c,g)
@@ -459,6 +462,8 @@ module Traces = struct
     (*     Node.pretty current Edge.pretty e; *)
     all_edges_ever_created := new_;
     m
+
+  let get_node = Edge.succ
 
   let add_edge_aux c edge =
     let (current,graph) = get_current c in
@@ -692,7 +697,7 @@ module Traces = struct
           Some (s,last)
         | _ -> None in
     let s,last = match Extlib.find_opt same_loop succs with
-      | (s,last) -> s,(Graph.from_shape (fun _ v -> v) last)
+      | (s,last) -> s,(Graph.from_shape_id last)
       | exception Not_found ->
         Stmt.Hashtbl.memo state.all_loop_start stmt (fun _ -> Node.next (),Graph.empty)
     in
@@ -799,12 +804,15 @@ module GraphDot = OCamlGraph.Graphviz.Dot(struct
       type t =
         | Usual of Node.t * Edge.t * Node.t list
         | Head of Node.t * Node.t list * Node.t * Node.t list
+        | Back of Node.t * Node.t list * Node.t
       let src = function
         | Usual (src,_,loops) -> {node=src;loops}
         | Head (src,loops,_,_) -> {node=src;loops}
+        | Back (_,loops,src) -> {node=src;loops}
       let dst = function
         | Usual (_,edge,loops) -> {node=Traces.get_node edge;loops}
         | Head (_,_,s,loops) -> {node=s;loops}
+        | Back (dst,loops,_) -> {node=dst;loops}
     end
     open V
     open E
@@ -824,12 +832,15 @@ module GraphDot = OCamlGraph.Graphviz.Dot(struct
         | Loop(_,_,s,g) ->
           let l' = (k::l) in
           f (Head(k,l,s,l'));
-          iter_vertex l' g
+          iter_vertex (Some s) l' g
         | _ -> ()
-      and iter_vertex l g =
-        GraphShape.iter (fun k e -> List.iter (iter_edge k l) e) g
+      and iter_vertex back l g =
+        GraphShape.iter (fun k e ->
+            match e, back with
+            | [], Some back -> f (Back(back,l,k))
+            | e, _ -> List.iter (iter_edge k l) e) g
       in
-      iter_vertex [] (Graph.shape g)
+      iter_vertex None [] (Graph.shape g)
 
     let graph_attributes _ = []
     let default_vertex_attributes :
@@ -855,9 +866,34 @@ module GraphDot = OCamlGraph.Graphviz.Dot(struct
     let edge_attributes : E.t -> OCamlGraph.Graphviz.DotAttributes.edge list =
       function
       | Usual(_,Loop _,_) -> [`Label (Format.asprintf "leave_loop")]
-      | Usual(_,e,_) -> [`Label (Format.asprintf "%a" Edge.pretty e)]
+      | Usual(_,e,_) -> [`Label (Format.asprintf "@[<h>%a@]" Edge.pretty_edge e)]
       | Head _ -> []
+      | Back(_,_,_) -> [`Constraint false]
 end)
+
+(** adds n -> [] for leaves *)
+let rec complete_graph (graph:Graph.t) =
+  Graph.fold (fun k l graph ->
+      let graph, l =
+        Extlib.fold_map (fun graph e ->
+            let m = Graph.singleton (Traces.get_node e) [] in
+            let e = match e with
+              | Assign (_,_,_,_)
+              | Assume (_,_,_)
+              | EnterScope (_,_)
+              | LeaveScope (_,_)
+              | CallDeclared (_,_,_,_)
+              | Msg (_,_) -> e
+              | Loop (n,stmt,s,g) ->
+                let g = Graph.shape (complete_graph (Graph.from_shape_id g)) in
+                Loop(n,stmt,s,g)
+            in
+            Traces.join_graph graph m, e)
+          graph l
+      in
+      Traces.join_graph graph (Graph.singleton k l)
+    ) graph Graph.empty
+
 
 let key = Structure.Key_Domain.create_key "traces domain"
 
@@ -1272,6 +1308,15 @@ let project_of_cfg vreturn s =
   (*     Format.printf "@[<2>@[file3:@] %a@]@." Printer.pp_file file; *)
   (*   ) () *)
 
+
+let output_dot filename state =
+  let out = open_out filename in
+  Value_parameters.feedback ~dkey:Internal.log_category "@[Output dot produced to %s.@]" filename;
+  (** *)
+  GraphDot.output_graph out (complete_graph (snd (Traces.get_current state)));
+  close_out out
+
+
 let finish_computation () =
   let return_stmt = Kernel_function.find_return (fst (Globals.entry_point ())) in
   let return_exp = match return_stmt.Cil_types.skind with
@@ -1281,18 +1326,18 @@ let finish_computation () =
   let header fmt = Format.fprintf fmt "Trace domains:" in
   let body = Bottom.pretty Traces.pretty in
   Value_parameters.printf ~dkey:Internal.log_category ~header " @[%a@]" body state;
-  match state with
-  | `Bottom ->
-    Value_parameters.failure "The trace is Bottom can't generate code"
-  | `Value state when state ==Traces.top ->
-    Value_parameters.failure "The trace is TOP can't generate code"
-  | `Value state ->
-    if false then begin
-      let out = open_out "traces_domain.dot" in
-      GraphDot.output_graph out (snd (Traces.get_current state));
-      close_out out;
-    end;
-    project_of_cfg return_exp state
+  if Value_parameters.TracesProject.get () ||
+     not (Value_parameters.TracesDot.is_default ()) then
+    match state with
+    | `Bottom ->
+      Value_parameters.failure "The trace is Bottom can't generate code"
+    | `Value state when state ==Traces.top ->
+      Value_parameters.failure "The trace is TOP can't generate code"
+    | `Value state ->
+      if not (Value_parameters.TracesDot.is_default ())
+      then output_dot (Value_parameters.TracesDot.get ()) state;
+      if Value_parameters.TracesProject.get ()
+      then project_of_cfg return_exp state
 
 
 (*
