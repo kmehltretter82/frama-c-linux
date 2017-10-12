@@ -1,6 +1,15 @@
 open Cil_types
 open Markdown
 
+type env =
+  { is_draft: bool;
+    remarks: Markdown.element list Datatype.String.Map.t; }
+
+let insert_remark_opt env anchor placeholder =
+  try Datatype.String.Map.find anchor env.remarks with Not_found -> placeholder
+
+let insert_remark env anchor = insert_remark_opt env anchor []
+
 let all_eva_domains =
   [ "-eva-apron-box", "box domain of the Apron library";
     "-eva-apron-oct", "octagon domain of the Apron library";
@@ -41,14 +50,17 @@ let codelines lang pp code =
   let lines = String.split_on_char '\n' s in
   Code_block (lang, lines)
 
-let section_domains is_draft =
-  if is_draft then
-    Comment
-      "You can give more information about the choice of EVA domains"
+let section_domains env =
+  let anchor = "domains" in
+  let head = H3 (plain "EVA Domains", Some anchor) in
+  if env.is_draft then
+    head
+    :: Comment "You can give more information about the choice of EVA domains"
     :: insert_marks
   else begin
     let l = get_eva_domains () in
-    [ Block
+    head
+    :: Block
         (match l with
          | [] ->
            [Text
@@ -61,10 +73,11 @@ let section_domains is_draft =
                  "In addition to the base domain (`Cvalue`), additional \
                   domains have been used by EVA");
             DL l]
-        )]
+        )
+    :: insert_remark env anchor
   end
 
-let section_stubs is_draft =
+let section_stubs env =
   let stubbed_kf =
     List.concat
       (List.map
@@ -88,7 +101,7 @@ let section_stubs is_draft =
       (fun s ->
          let kf = Globals.Functions.find_by_name s in
          let content =
-           if is_draft then insert_marks
+           if env.is_draft then insert_marks
              else
                [ Block
                    [ Text
@@ -103,7 +116,7 @@ let section_stubs is_draft =
     let name = Kernel_function.get_name kf in
     let loc = Kernel_function.get_location kf in
     let content =
-      if is_draft then insert_marks
+      if env.is_draft then insert_marks
       else
         [ Block
             [ Text
@@ -126,30 +139,26 @@ let section_stubs is_draft =
   let content = content @ use_spec in
   let content = List.concat content in
   if content = [] then
-    if is_draft then
+    if env.is_draft then
       Comment "No stubs have been used" :: insert_marks
     else
       [ Block [Text (plain "No stubs have been used for this analysis")]]
   else
     content
 
-let gen_context is_draft =
-  let context =
-    if is_draft then
-      Comment "You can add here some overall introduction to the analysis"
+let gen_inputs env =
+  let anchor = "c-input" in
+  let prelude =
+    if env.is_draft then
+      Comment
+        "You can add here some remarks about the set of files \
+         that is considered by Frama-C"
       :: insert_marks
-    else []
+   else
+     insert_remark env anchor
   in
-  context @ [
-    H1 (plain "Context of the analysis", Some "context");
-    H2 (plain "Input files", Some "c-input")
-  ] @
-  (if is_draft then
-     Comment
-       "You can add here some remarks about the set of files \
-        that is considered by Frama-C"
-     :: insert_marks
-   else [])
+  H2 (plain "Input files", Some anchor)
+  :: prelude
   @ [
     Block [
       Text
@@ -158,23 +167,48 @@ let gen_context is_draft =
                 are the following:"
         );
       UL (List.map (fun x -> [Text [ Inline_code x ]]) (Kernel.Files.get ()));
-    ];
-    H2 (plain "Configuration", Some "options");
-    Block [
-      Text
-        (plain "The options that have been used for this analysis \
-                are the following.")]
-  ] @
-  (if is_draft then
-     Comment
-       "You can add here some remarks about the options used for the analysis"
-     :: insert_marks
-   else [])
-  @
-  H3 (plain "EVA Domains", Some "domains")
-  :: section_domains is_draft
+    ]]
+
+let gen_config env =
+  let anchor = "options" in
+  let header = H2 (plain "Configuration", Some anchor) in
+  let content =
+    if env.is_draft then
+      Comment
+        "You can add here some remarks about the options used for the analysis"
+      :: insert_marks
+    else begin
+      let placeholder = [
+        Block [
+          Text
+            (plain "The options that have been used for this analysis \
+                    are the following.")]]
+      in insert_remark_opt env anchor placeholder
+    end
+  in
+  header :: content
+
+let gen_context env =
+  let context =
+    let anchor = "intro" in
+    let header = H1 (plain "Introduction", Some anchor) in
+    if env.is_draft then
+      header
+      :: Comment "You can add here some overall introduction to the analysis"
+      :: insert_marks
+    else begin
+      match insert_remark env anchor with
+      | [] -> []
+      | (_::_) as l -> header :: l
+    end
+  in
+  context @
+  H1 (plain "Context of the analysis", Some "context")
+  :: gen_inputs env
+  @ gen_config env
+  @ section_domains env
   @ H3 (plain "Stubbed Functions", Some "stubs")
-    :: section_stubs is_draft
+    :: section_stubs env
 
 let string_of_pos pos =
   Format.asprintf
@@ -233,7 +267,7 @@ let make_warnings_table warnings =
   make_events_table
     false (plain (plural warnings "Warning" ^ " reported by Frama-C")) warnings
 
-let section_event is_err nb event =
+let section_event is_err env nb event =
   let open Log in
   let title =
     Format.asprintf "@[<h>%s %d (%s)@]"
@@ -242,21 +276,25 @@ let section_event is_err nb event =
       (string_of_pos_opt event.evt_source)
   in
   let lab =
-    Some
-      (Format.asprintf "@[<h>%s-%d@]" (if is_err then "err" else "warn") nb)
+    Format.asprintf "@[<h>%s-%d@]" (if is_err then "err" else "warn") nb
   in
-  [ H2 (plain title, lab);
-    Block [ Text (plain "message text is"); Text (plain event.evt_message) ]]
-  @ insert_marks
+  let content =
+    if env.is_draft then
+      insert_marks
+    else insert_remark env lab
+  in
+  H2 (plain title, Some lab)
+  :: Block [ Text (plain "message text is"); Text (plain event.evt_message) ]
+  :: content
 
-let make_events_list is_err l =
-  List.concat (List.mapi (section_event is_err) l)
+let make_events_list is_err env l =
+  List.concat (List.mapi (section_event is_err env) l)
 
 let make_errors_list = make_events_list true
 
 let make_warnings_list = make_events_list false
 
-let gen_section_warnings is_draft =
+let gen_section_warnings env =
   let open Log in
   Messages.reset_once_flag ();
   let errs = ref [] in
@@ -277,10 +315,9 @@ let gen_section_warnings is_draft =
          triggered without stopping everything. Applying the same treatment
          to a Failure catched by an evil plugin cannot hurt.
       *)
-      let content =
-        if is_draft then
-          Comment "you can comment on each individual error" ::
-          make_errors_list errs
+      let prelude =
+        if env.is_draft then
+          [ Comment "you can comment on each individual error" ]
         else
           [
             Block [
@@ -295,14 +332,15 @@ let gen_section_warnings is_draft =
             make_errors_table errs
           ]
       in
-      H1 (plain "Errors in the analyzer", Some "errors") :: content
+      H1 (plain "Errors in the analyzer", Some "errors")
+      :: prelude
+      @ make_errors_list env errs
     end else []
   in
   if Messages.nb_warnings () <> 0 then begin
-    let content =
-      if is_draft then
-        Comment "you can comment on each individual error" ::
-        make_warnings_list warnings
+    let prelude =
+      if env.is_draft then
+        [Comment "you can comment on each individual error"]
       else
         [
           Block [
@@ -322,10 +360,12 @@ let gen_section_warnings is_draft =
         ]
     in
     error_section @
-    H1 (plain "Warnings", Some "warnings") :: content
+    H1 (plain "Warnings", Some "warnings")
+    :: prelude
+    @ make_warnings_list env warnings
   end else error_section
 
-let gen_section_alarms is_draft =
+let gen_section_alarms env =
   let treat_alarm e kf s ~rank:_ alarm annot (i, sec, content) =
     let kind = plain (Alarms.get_name alarm) in
     let label = "Alarm-" ^ string_of_int i in
@@ -337,45 +377,45 @@ let gen_section_alarms is_draft =
     let descr = codelines "acsl" Printer.pp_code_annotation annot in
     let sec_title = plain_format "Alarm %d at %s" i loc in
     let sec_content =
-      if is_draft then
+      if env.is_draft then
         Block [ descr ] :: insert_marks
       else
-        [
-          Block
-            [
-              Text
-                (plain
-                   "The following ACSL assertion must hold to avoid \
-                    and undefined behavior ("
-                 @ kind @ plain ")");
-              descr
-            ]
-        ]
+        Block
+          [
+            Text
+              (plain
+                 "The following ACSL assertion must hold to avoid \
+                  and undefined behavior ("
+               @ kind @ plain ")");
+            descr
+          ]
+        :: insert_remark env label
     in
     (i+1,
      sec @ H2 (sec_title, Some label) :: sec_content,
     [ link; kind; emitter; func; loc_text ] :: content)
   in
   let _,sections, content = Alarms.fold treat_alarm (0,[],[]) in
+  let content = List.rev content in
   match content with
   | [] ->
+    let anchor = "alarms" in
     let text_content =
-      if is_draft then
+      if env.is_draft then
         Comment "No alarm!" :: insert_marks
       else
-        [
-          Block [
-            Text
-              [ Bold "No alarm"; Plain "was found during the analysis";
-                Plain "Any execution starting from";
-                Inline_code (Kernel.MainFunction.get_function_name ());
-                Plain "in a context matching the one used for the analysis";
-                Plain "will be immune from any undefined behavior."
-              ]
+        Block [
+          Text
+            [ Bold "No alarm"; Plain "was found during the analysis";
+              Plain "Any execution starting from";
+              Inline_code (Kernel.MainFunction.get_function_name ());
+              Plain "in a context matching the one used for the analysis";
+              Plain "will be immune from any undefined behavior."
+            ]
           ]
-        ]
+        :: insert_remark env anchor
     in
-    H1 (plain "Results of the analysis", Some "alarms") :: text_content
+    H1 (plain "Results of the analysis", Some anchor) :: text_content
   | _ :: l ->
     let alarm = if l = [] then "alarm" else "alarms" in
     let caption =
@@ -390,65 +430,69 @@ let gen_section_alarms is_draft =
       ]
     in
     let text_content =
-      if is_draft then begin
+      if env.is_draft then begin
         sections
-      end else
-        [
-          Block [
-            Text
-              [ Plain ("The table below lists the " ^ alarm);
-                Plain "that have been emitted during the analysis.";
-                Plain "Any execution starting from";
-                Inline_code (Kernel.MainFunction.get_function_name());
-                Plain "in a context matching the one used for the analysis";
-                Plain "will be immune from any other undefined behavior.";
-                Plain "More information on each individual alarm is";
-                Plain "given in the remainder of this section"
-              ]
-          ];
-          Table { content; caption; header }
-        ]
+      end else begin
+        Block [
+          Text
+            [ Plain ("The table below lists the " ^ alarm);
+              Plain "that have been emitted during the analysis.";
+              Plain "Any execution starting from";
+              Inline_code (Kernel.MainFunction.get_function_name());
+              Plain "in a context matching the one used for the analysis";
+              Plain "will be immune from any other undefined behavior.";
+              Plain "More information on each individual alarm is";
+              Plain "given in the remainder of this section"
+            ]
+        ] ::
+        Table { content; caption; header } ::
+        sections
+      end
     in
     H1 (plain "Results of the analysis", Some "alarms") :: text_content
 
-let gen_section_callgraph is_draft =
+let gen_section_callgraph env =
   let f = Mdr_params.FlameGraph.get () in
   if f = "" then []
   else begin
+    let anchor = "flamegraph" in
     let content =
-      if is_draft then
+      if env.is_draft then
         Comment
-          "A flamegraph provides a visualization of the functions and callstacks \
-           whose analysis is the most costly."
+          "A flamegraph provides a visualization of the functions and \
+           callstacks whose analysis is the most costly."
         :: insert_marks
       else
-        [
-          Block [
-            Text [
-              Plain "The image below shows the flamegraph (";
-              plain_link "http://www.brendangregg.com/flamegraphs.html";
-              Plain ") for the chosen entry point."
-            ]
-          ];
-          Block
-            [ Text [Image ("Flamegraph visualization.", f)] ]
-        ]
+        Block [
+          Text [
+            Plain "The image below shows the flamegraph (";
+            plain_link "http://www.brendangregg.com/flamegraphs.html";
+            Plain ") for the chosen entry point."
+          ]]
+        :: Block [ Text [Image ("Flamegraph visualization.", f)] ]
+        :: insert_remark env anchor
     in
-    H1 (plain "Flamegraph", Some "flamegraph") :: content
+    H1 (plain "Flamegraph", Some anchor) :: content
   end
 
-let gen_section_postlude is_draft =
-  if is_draft then
-    [ H1 (plain "Postlude", Some "postlude");
-      Comment "You can put here some concluding remarks" ]
-    @ insert_marks
-  else []
+let gen_section_postlude env =
+  let anchor = "conclusion" in
+  let header = H1 (plain "Conclusion", Some anchor) in
+  if env.is_draft then
+    header ::
+    Comment "You can put here some concluding remarks"
+    :: insert_marks
+  else begin
+    match insert_remark env anchor with
+    | [] -> []
+    | (_::_) as l -> header :: l
+  end
 
-let gen_alarms is_draft =
-  gen_section_warnings is_draft @
-  gen_section_alarms is_draft @
-  gen_section_callgraph is_draft @
-  gen_section_postlude is_draft
+let gen_alarms env =
+  gen_section_warnings env @
+  gen_section_alarms env @
+  gen_section_callgraph env @
+  gen_section_postlude env
 
 let mk_date () =
   let tm = Unix.gmtime (Unix.time()) in
@@ -462,11 +506,15 @@ let mk_remarks () =
   else Datatype.String.Map.empty
 
 let gen_report is_draft =
-  let _remarks = mk_remarks () in
-  let context = gen_context is_draft in
-  let alarms = gen_alarms is_draft in
+  let remarks = mk_remarks () in
+  let env = { remarks; is_draft } in
+  let context = gen_context env in
+  let alarms = gen_alarms env in
   let title =
-    if is_draft then plain "Frama-C Analysis Report" else plain "Draft report"
+    if is_draft then
+      plain "Frama-C Analysis Report"
+    else
+      plain "Draft report"
   in
   let authors = List.map (fun x -> plain x) (Mdr_params.Authors.get ()) in
   let date = mk_date () in
