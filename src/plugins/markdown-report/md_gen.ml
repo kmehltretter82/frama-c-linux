@@ -457,7 +457,7 @@ let mk_date () =
 
 let mk_remarks () =
   let f = Mdr_params.Remarks.get () in
-  if f <> "" then failwith "writeme"
+  if f <> "" then Parse_remarks.get_remarks f
   else Datatype.String.Map.empty
 
 let gen_report is_draft =
