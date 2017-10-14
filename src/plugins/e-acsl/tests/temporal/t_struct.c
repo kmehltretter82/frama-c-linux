@@ -32,6 +32,9 @@ int main(void) {
   temporal t1, t2, *tp, tarr[2];
   larger l, *lp, larr[2];
 
+  s1.c = 'a';
+  s2 = s1;
+
   t1.p = &a;
   t1.q = t1.p;
   /*@assert \valid(t1.p) && \valid(t1.q);  */
