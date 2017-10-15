@@ -6,7 +6,7 @@ Generation of pandoc reports.
 # Requirements
 
 - OCaml >= 4.04;
-- Frama-C 16 (Phosphorus)
+- Frama-C 15 (Phosphorus)
 - FlameGraph ([`https://github.com/brendangregg/FlameGraph`](https://github.com/brendangregg/FlameGraph))
 
 # Example
