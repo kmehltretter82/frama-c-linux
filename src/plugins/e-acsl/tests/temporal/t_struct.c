@@ -16,24 +16,15 @@ struct larger_t {
   struct temporal_t t;
 };
 
-struct smaller_t {
-  char c;
-};
-
 typedef struct temporal_t temporal;
 typedef struct larger_t larger;
-typedef struct smaller_t smaller;
 /* }}} */
 
 int main(void) {
   int  a = 1,
        b = 2;
-  smaller s1, s2;
   temporal t1, t2, *tp, tarr[2];
   larger l, *lp, larr[2];
-
-  s1.c = 'a';
-  s2 = s1;
 
   t1.p = &a;
   t1.q = t1.p;

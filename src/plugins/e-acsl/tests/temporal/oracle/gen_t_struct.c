@@ -9,17 +9,11 @@ struct larger_t {
    char *q ;
    struct temporal_t t ;
 };
-struct smaller_t {
-   char c ;
-};
 typedef struct temporal_t temporal;
 typedef struct larger_t larger;
-typedef struct smaller_t smaller;
 int main(void)
 {
   int __retres;
-  smaller s1 __attribute__((__aligned__(4)));
-  smaller s2 __attribute__((__aligned__(4)));
   temporal t1;
   temporal t2;
   temporal *tp;
@@ -38,8 +32,6 @@ int main(void)
   __e_acsl_store_block((void *)(& a),(size_t)4);
   __e_acsl_full_init((void *)(& a));
   int b = 2;
-  s1.c = (char)'a';
-  s2 = s1;
   __e_acsl_temporal_store_nblock((void *)(& t1.p),(void *)(& a));
   __e_acsl_initialize((void *)(& t1.p),sizeof(char *));
   t1.p = (char *)(& a);
@@ -76,7 +68,7 @@ int main(void)
     }
     else __gen_e_acsl_and_3 = 0;
     __e_acsl_assert(__gen_e_acsl_and_3,(char *)"Assertion",(char *)"main",
-                    (char *)"\\valid(t1.p) && \\valid(t1.q)",40);
+                    (char *)"\\valid(t1.p) && \\valid(t1.q)",31);
   }
   /*@ assert ¬\valid(t2.p) ∧ ¬\valid(t2.q); */
   {
@@ -108,7 +100,7 @@ int main(void)
     }
     else __gen_e_acsl_and_6 = 0;
     __e_acsl_assert(__gen_e_acsl_and_6,(char *)"Assertion",(char *)"main",
-                    (char *)"!\\valid(t2.p) && !\\valid(t2.q)",41);
+                    (char *)"!\\valid(t2.p) && !\\valid(t2.q)",32);
   }
   __e_acsl_temporal_memcpy((void *)(& t2),(void *)(& t1),(size_t)16);
   __e_acsl_full_init((void *)(& t2));
@@ -143,7 +135,7 @@ int main(void)
     }
     else __gen_e_acsl_and_9 = 0;
     __e_acsl_assert(__gen_e_acsl_and_9,(char *)"Assertion",(char *)"main",
-                    (char *)"\\valid(t2.p) && \\valid(t2.q)",44);
+                    (char *)"\\valid(t2.p) && \\valid(t2.q)",35);
   }
   __e_acsl_temporal_store_nblock((void *)(& t2.p),(void *)0);
   __e_acsl_initialize((void *)(& t2.p),sizeof(char *));
@@ -183,7 +175,7 @@ int main(void)
     }
     else __gen_e_acsl_and_12 = 0;
     __e_acsl_assert(__gen_e_acsl_and_12,(char *)"Assertion",(char *)"main",
-                    (char *)"!\\valid(t2.p) && \\valid(t2.q)",48);
+                    (char *)"!\\valid(t2.p) && \\valid(t2.q)",39);
   }
   __e_acsl_temporal_memcpy((void *)(& l.t),(void *)(& t2),(size_t)16);
   __e_acsl_initialize((void *)(& l.t),sizeof(struct temporal_t));
@@ -219,7 +211,7 @@ int main(void)
     }
     else __gen_e_acsl_and_15 = 0;
     __e_acsl_assert(__gen_e_acsl_and_15,(char *)"Assertion",(char *)"main",
-                    (char *)"!\\valid(l.t.p) && \\valid(l.t.q)",51);
+                    (char *)"!\\valid(l.t.p) && \\valid(l.t.q)",42);
   }
   __e_acsl_temporal_store_nblock((void *)(& lp),(void *)(& l));
   __e_acsl_full_init((void *)(& lp));
@@ -238,7 +230,7 @@ int main(void)
                                                     (void *)(& lp->t.p),
                                                     (void *)0);
       __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"main",
-                      (char *)"mem_access: \\valid_read(&lp->t.p)",54);
+                      (char *)"mem_access: \\valid_read(&lp->t.p)",45);
       __gen_e_acsl_valid_11 = __e_acsl_valid((void *)lp->t.p,sizeof(char),
                                              (void *)lp->t.p,
                                              (void *)(& lp->t.p));
@@ -246,7 +238,7 @@ int main(void)
     }
     else __gen_e_acsl_and_16 = 0;
     __e_acsl_assert(! __gen_e_acsl_and_16,(char *)"Assertion",(char *)"main",
-                    (char *)"!\\valid(lp->t.p)",54);
+                    (char *)"!\\valid(lp->t.p)",45);
   }
   __e_acsl_temporal_memcpy((void *)(tarr),(void *)(& t2),(size_t)16);
   __e_acsl_initialize((void *)(tarr),sizeof(temporal));
@@ -284,7 +276,7 @@ int main(void)
     }
     else __gen_e_acsl_and_19 = 0;
     __e_acsl_assert(__gen_e_acsl_and_19,(char *)"Assertion",(char *)"main",
-                    (char *)"!\\valid(tarr[0].p) && \\valid(tarr[0].q)",57);
+                    (char *)"!\\valid(tarr[0].p) && \\valid(tarr[0].q)",48);
   }
   __e_acsl_temporal_memcpy((void *)(larr),(void *)(& l),(size_t)32);
   __e_acsl_initialize((void *)(larr),sizeof(larger));
@@ -324,7 +316,7 @@ int main(void)
     else __gen_e_acsl_and_22 = 0;
     __e_acsl_assert(__gen_e_acsl_and_22,(char *)"Assertion",(char *)"main",
                     (char *)"!\\valid(larr[0].t.p) && \\valid(larr[0].t.q)",
-                    60);
+                    51);
   }
   __retres = 0;
   __e_acsl_delete_block((void *)(larr));
