@@ -124,7 +124,7 @@ int while_valid() {
  * are not recorded twice. */
 void continue_valid() {
   int i = 0;
-  int *p, *q, *r;
+  int *p, *q;
 
   while (i++) {
     /*@ assert ! \valid(p); */

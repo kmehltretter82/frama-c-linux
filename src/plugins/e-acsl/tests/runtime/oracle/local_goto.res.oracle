@@ -1,4 +1,3 @@
-[variadic] warning: Unable to locate global __fc_stdout which should be in the Frama-C LibC. Correct specifications can't be generated.
 [e-acsl] beginning translation.
 [e-acsl] warning: annotating undefined function `printf_va_1':
                   the generated program may miss memory instrumentation
