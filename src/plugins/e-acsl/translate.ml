@@ -468,7 +468,7 @@ and context_insensitive_term_to_exp kf env t =
     let res3 = term_to_exp kf (Env.push env2) t3 in
     let e, env = conditional_to_exp loc (Some t) e1 res2 res3 in
     e, env, false, ""
-  | Tat(t, BuiltinLabel(_, Here)) ->
+  | Tat(t, BuiltinLabel Here) ->
     let e, env = term_to_exp kf env t in
     e, env, false, ""
   | Tat(t', label) ->
@@ -476,13 +476,13 @@ and context_insensitive_term_to_exp kf env t =
     let e, env = term_to_exp kf (Env.push env) t' in
     let e, env, is_mpz_string = at_to_exp env (Some t) label e in
     e, env, is_mpz_string, ""
-  | Tbase_addr(BuiltinLabel(_, Here), t) ->
+  | Tbase_addr(BuiltinLabel Here, t) ->
     mmodel_call ~loc kf "base_addr" Cil.voidPtrType env t
   | Tbase_addr _ -> not_yet env "labeled \\base_addr"
-  | Toffset(BuiltinLabel(_, Here), t) ->
+  | Toffset(BuiltinLabel Here, t) ->
     mmodel_call ~loc kf "offset" Cil.intType env t
   | Toffset _ -> not_yet env "labeled \\offset"
-  | Tblock_length(BuiltinLabel(_, Here), t) ->
+  | Tblock_length(BuiltinLabel Here, t) ->
     mmodel_call ~loc kf "block_length" Cil.ulongType env t
   | Tblock_length _ -> not_yet env "labeled \\block_length"
   | Tnull -> Cil.mkCast (Cil.zero ~loc) (TPtr(TVoid [], [])), env, false, "null"
@@ -647,8 +647,8 @@ and at_to_exp env t_opt label e =
 	Env.pop_and_get new_env new_stmt ~global_clear:false Env.Middle
       in
       let pre = match label with
-        | BuiltinLabel(_, (Here | Post)) -> true
-        | BuiltinLabel (_, (Old | Pre | LoopEntry | LoopCurrent | Init))
+        | BuiltinLabel(Here | Post) -> true
+        | BuiltinLabel(Old | Pre | LoopEntry | LoopCurrent | Init)
         | FormalLabel _ | StmtLabel _ -> false
       in
       env_ref := Env.extend_stmt_in_place new_env stmt ~pre block;
@@ -716,7 +716,7 @@ and named_predicate_content_to_exp ?name kf env p =
     conditional_to_exp loc None e1 res2 res3
   | Plet _ -> not_yet env "let _ = _ in _"
   | Pforall _ | Pexists _ -> Quantif.quantif_to_exp kf env p
-  | Pat(p, BuiltinLabel(_, Here)) ->
+  | Pat(p, BuiltinLabel Here) ->
     named_predicate_to_exp kf env p
   | Pat(p', label) ->
     (* convert [t'] to [e] in a separated local env *)
@@ -724,8 +724,8 @@ and named_predicate_content_to_exp ?name kf env p =
     let e, env, is_string = at_to_exp env None label e in
     assert (not is_string);
     e, env
-  | Pvalid_read(BuiltinLabel(_, Here) as llabel, t) as pc
-  | (Pvalid(BuiltinLabel(_, Here) as llabel, t) as pc) ->
+  | Pvalid_read(BuiltinLabel Here as llabel, t) as pc
+  | (Pvalid(BuiltinLabel Here as llabel, t) as pc) ->
     let call_valid t =
       let name = match pc with
 	| Pvalid _ -> "valid"
@@ -753,7 +753,7 @@ and named_predicate_content_to_exp ?name kf env p =
     end
   | Pvalid _ -> not_yet env "labeled \\valid"
   | Pvalid_read _ -> not_yet env "labeled \\valid_read"
-  | Pinitialized(BuiltinLabel(_, Here), t) ->
+  | Pinitialized(BuiltinLabel Here, t) ->
     (match t.term_node with
     (* optimisation when we know that the initialisation is ok *)
     | TAddrOf (TResult _, TNoOffset) -> Cil.one ~loc, env
@@ -763,7 +763,7 @@ and named_predicate_content_to_exp ?name kf env p =
     | _ -> mmodel_call_with_size ~loc kf "initialized" Cil.intType env t)
   | Pinitialized _ -> not_yet env "labeled \\initialized"
   | Pallocable _ -> not_yet env "\\allocate"
-  | Pfreeable(BuiltinLabel(_, Here), t) ->
+  | Pfreeable(BuiltinLabel Here, t) ->
     let res, env, _, _ = mmodel_call ~loc kf "freeable" Cil.intType env t in
     res, env
   | Pfreeable _ -> not_yet env "labeled \\freeable"
