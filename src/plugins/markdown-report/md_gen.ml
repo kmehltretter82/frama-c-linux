@@ -210,6 +210,20 @@ let gen_context env =
   @ H3 (plain "Stubbed Functions", Some "stubs")
     :: section_stubs env
 
+let gen_coverage env =
+  let anchor = "coverage" in
+  let header = H1 (plain "Coverage", Some anchor) in
+  let content = Eva_coverage.md_gen () in
+  let content =
+    if env.is_draft then
+      content @
+      Comment "You can comment on the coverage obtained by EVA"
+      :: insert_marks
+    else
+      content @ insert_remark env anchor
+  in
+  header :: content
+
 let string_of_pos pos =
   Format.asprintf
     "%s:%d" (Filename.basename pos.Lexing.pos_fname) pos.Lexing.pos_lnum
@@ -509,6 +523,7 @@ let gen_report is_draft =
   let remarks = mk_remarks () in
   let env = { remarks; is_draft } in
   let context = gen_context env in
+  let coverage = gen_coverage env in
   let alarms = gen_alarms env in
   let title =
     if is_draft then
@@ -518,7 +533,7 @@ let gen_report is_draft =
   in
   let authors = List.map (fun x -> plain x) (Mdr_params.Authors.get ()) in
   let date = mk_date () in
-  let elements = context @ alarms in
+  let elements = context @ coverage @ alarms in
   let elements =
     if is_draft then
       Comment

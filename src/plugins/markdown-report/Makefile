@@ -1,7 +1,7 @@
 FRAMAC_SHARE:=$(shell frama-c -print-share-path)
 
 PLUGIN_NAME:=Report_markdown
-PLUGIN_CMO:=markdown mdr_params parse_remarks md_gen
+PLUGIN_CMO:=markdown mdr_params parse_remarks eva_coverage md_gen
 PLUGIN_NO_TEST:=true
 
 include $(FRAMAC_SHARE)/Makefile.dynamic
