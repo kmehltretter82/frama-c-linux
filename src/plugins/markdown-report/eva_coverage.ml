@@ -8,7 +8,7 @@ let empty_stats =
   { total_stmts = 0;
     covered_stmts = 0 }
 
-class eva_coverage_vis _syntactic_calls = object(self)
+class eva_coverage_vis syntactic_calls = object(self)
   inherit Visitor.frama_c_inplace
   val mutable stats = empty_stats
   val indirect_calls = Cil_datatype.Varinfo.Hashtbl.create 17
@@ -43,8 +43,23 @@ class eva_coverage_vis _syntactic_calls = object(self)
     | _ -> Cil.SkipChildren (* No need to go further. *)
 
   method compute () =
-    (* WRITEME: start from direct calls and iter
-       if there are some indirect calls not visited yet. *)
+    let treat_vi vi already_seen =
+      if not already_seen then begin
+        let kf = Globals.Functions.get vi in
+        ignore (Visitor.visitFramacKf (self:>Visitor.frama_c_visitor) kf)
+      end
+    in
+    let treat_indirect_call vi already_seen reached =
+      Cil_datatype.Varinfo.Hashtbl.replace indirect_calls vi true;
+      treat_vi vi already_seen;
+      reached && not already_seen
+    in
+    let check_fixpoint () =
+      Cil_datatype.Varinfo.Hashtbl.fold treat_indirect_call indirect_calls true
+    in
+    let direct_call vi = treat_vi vi false in
+    Cil_datatype.Varinfo.Set.iter direct_call syntactic_calls;
+    while not (check_fixpoint ()) do () done;
     (Cil_datatype.Varinfo.Hashtbl.fold
        (fun k _ s -> Cil_datatype.Varinfo.Set.add k s)
        indirect_calls Cil_datatype.Varinfo.Set.empty,
