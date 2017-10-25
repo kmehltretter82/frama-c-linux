@@ -41,6 +41,10 @@ type scope =
   | Function
   | Local_block
 
+module Varname: sig
+  val get: scope:scope -> string -> string
+end
+
 val new_var:
   loc:location -> ?init:bool -> ?scope:scope -> ?name:string ->
   t -> term option -> typ -> 
