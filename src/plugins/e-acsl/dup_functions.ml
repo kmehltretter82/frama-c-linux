@@ -163,6 +163,8 @@ let dup_fundec loc spec bhv kf vi new_vi =
   let mk_formal vi =
     let name =
       if vi.vname = "" then
+        (* unamed formal parameter: must generate a fresh name since a fundec
+           cannot have unnamed formals (see bts #2303). *)
         Env.Varname.get ~scope:Env.Function
           (Misc.mk_gen_name "unamed_formal")
       else
