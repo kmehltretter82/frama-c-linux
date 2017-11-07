@@ -396,7 +396,7 @@ let gen_section_warnings env =
       in
       H1 (plain "Errors in the analyzer", Some "errors")
       :: prelude
-      @ make_errors_list env errs
+      @ make_errors_list env (List.rev errs)
     end else []
   in
   if Messages.nb_warnings () <> 0 then begin
@@ -424,7 +424,7 @@ let gen_section_warnings env =
     error_section @
     H1 (plain "Warnings", Some "warnings")
     :: prelude
-    @ make_warnings_list env warnings
+    @ make_warnings_list env (List.rev warnings)
   end else error_section
 
 let gen_section_alarms env =
