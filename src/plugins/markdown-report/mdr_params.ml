@@ -57,6 +57,14 @@ struct
   let help = "list of authors of the report"
 end)
 
+module Title = Empty_string(
+struct
+  let option_name = "-mdr-title"
+  let arg_name = "t"
+  let help = "title of the generated document"
+end
+)
+
 module Stubs = String_list(
   struct
     let option_name = "-mdr-stubs"

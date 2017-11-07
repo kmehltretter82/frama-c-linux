@@ -525,11 +525,14 @@ let gen_report is_draft =
   let context = gen_context env in
   let coverage = gen_coverage env in
   let alarms = gen_alarms env in
+  let title = Mdr_params.Title.get () in
   let title =
-    if is_draft then
-      plain "Frama-C Analysis Report"
-    else
-      plain "Draft report"
+    if title = "" then begin
+      if is_draft then
+        plain "Draft report"
+      else
+        plain "Frama-C Analysis Report"
+    end else plain title
   in
   let authors = List.map (fun x -> plain x) (Mdr_params.Authors.get ()) in
   let date = mk_date () in
