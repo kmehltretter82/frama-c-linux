@@ -146,6 +146,54 @@ let section_stubs env =
   else
     content
 
+let get_files () =
+  let dir_table = Datatype.String.Hashtbl.create 17 in
+  let add_entry f =
+    let dir = Filename.dirname f in
+    let base = Filename.basename f in
+    let suf =
+      try
+        let i = String.rindex base '.' in
+        String.sub base i (String.length base - i)
+      with Not_found -> ""
+    in
+    let entries =
+      try Datatype.String.Hashtbl.find dir_table dir
+      with Not_found -> Datatype.String.Map.empty
+    in
+    let subentries =
+      try Datatype.String.Map.find suf entries
+      with Not_found -> Datatype.String.Set.empty
+    in
+    Datatype.String.(
+      Hashtbl.replace
+        dir_table dir (Map.add suf (Set.add base subentries) entries))
+  in
+  List.iter add_entry (Kernel.Files.get());
+  let treat_subentry dir dir_files suf files l =
+    let dir_files =
+      List.fold_left
+        (fun acc s ->
+           if Filename.check_suffix s suf then Datatype.String.Set.add s acc
+           else acc)
+        Datatype.String.Set.empty dir_files
+    in
+    if Datatype.String.Set.subset dir_files files then
+      (dir ^ "/*" ^ suf) :: l
+    else
+      Datatype.String.Set.elements files @ l
+  in
+  let treat_entry dir map l =
+    try
+      let dir_files = Array.to_list (Sys.readdir dir) in
+      Datatype.String.Map.fold (treat_subentry dir dir_files) map l
+    with Sys_error s ->
+      Mdr_params.warning "Unable to find directory %s: %s" dir s;
+      Datatype.String.Map.fold
+        (fun _ s l -> Datatype.String.Set.elements s @ l) map l
+  in
+  Datatype.String.Hashtbl.fold treat_entry dir_table []
+
 let gen_inputs env =
   let anchor = "c-input" in
   let prelude =
@@ -166,7 +214,7 @@ let gen_inputs env =
          plain "that have been considered during the analysis \
                 are the following:"
         );
-      UL (List.map (fun x -> [Text [ Inline_code x ]]) (Kernel.Files.get ()));
+      UL (List.map (fun x -> [Text [ Inline_code x ]]) (get_files()));
     ]]
 
 let gen_config env =
