@@ -601,6 +601,11 @@ let gen_report is_draft =
       :: elements
     else elements
   in
+  let elements =
+   Raw "\\let\\underscore\\_" ::
+   Raw "\\renewcommand{\\_}{\\discretionary{\\underscore}{}{\\underscore}}" ::
+   elements
+  in
   let doc = { title; authors; date; elements;} in
   try
     let out = open_out (Mdr_params.Output.get()) in
