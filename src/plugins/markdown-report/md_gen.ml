@@ -447,7 +447,7 @@ let gen_section_alarms env =
             Text
               (plain
                  "The following ACSL assertion must hold to avoid \
-                  and undefined behavior ("
+                  an undefined behavior ("
                @ kind @ plain ")");
             descr
           ]
