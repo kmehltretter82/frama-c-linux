@@ -23,8 +23,6 @@ FRAMAC_SHARE/e-acsl/e_acsl.h:94:[value] warning: function __e_acsl_assert: preco
 [value] using specification for function __gmpz_clear
 [value] using specification for function __gmpz_get_ui
 [value] using specification for function __gmpz_init_set_ui
-[value] user error: type long double wider than 64 bits not supported.
-                    Using double instead for the remainder of the analysis.
 tests/gmp/cast.i:23:[value] warning: accessing out of bounds index. assert 0 ≤ __gen_e_acsl_cast_9;
 tests/gmp/cast.i:23:[value] warning: accessing out of bounds index. assert __gen_e_acsl_cast_9 < 2;
 [value] done for function main

@@ -20,7 +20,7 @@ int main(void) {
 
   /* heterogeneous casts from/to integers */
   int t[2] = { 0, 1 };
-  /*@ assert (float)x == t[(int)0.1]; */
+  /*@ assert (float)x == (float)t[(int)0.1]; */
 
   return 0;
 }
