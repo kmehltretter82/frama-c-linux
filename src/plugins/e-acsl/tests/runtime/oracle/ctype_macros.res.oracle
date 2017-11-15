@@ -1,9 +1,9 @@
 [e-acsl] beginning translation.
 [e-acsl] warning: annotating undefined function `isupper':
-                  the generated program may miss memory instrumentation
-                  if there are memory-related annotations.
+    the generated program may miss memory instrumentation
+    if there are memory-related annotations.
 tests/runtime/ctype_macros.c:39:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
-                  Ignoring annotation.
+    Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 FRAMAC_SHARE/libc/ctype.h:164:[value] warning: function __gen_e_acsl_isupper: precondition got status unknown.
 FRAMAC_SHARE/e-acsl/e_acsl.h:94:[value] warning: function __e_acsl_assert: precondition got status unknown.

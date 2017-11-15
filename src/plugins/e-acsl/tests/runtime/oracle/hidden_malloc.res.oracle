@@ -3,4 +3,4 @@ tests/runtime/hidden_malloc.c:11:[kernel] warning: Calling undeclared function r
 tests/runtime/hidden_malloc.c:11:[kernel] warning: Neither code nor specification for function realpath, generating default assigns from the prototype
 [e-acsl] translation done in project "e-acsl".
 tests/runtime/hidden_malloc.c:11:[value] warning: Completely invalid destination for assigns clause *((char *)x_1 + (0 ..)).
-                 Ignoring.
+    Ignoring.
