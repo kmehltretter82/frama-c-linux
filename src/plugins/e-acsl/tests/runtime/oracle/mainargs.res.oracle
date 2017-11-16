@@ -1,13 +1,13 @@
 [e-acsl] beginning translation.
 [e-acsl] warning: annotating undefined function `strlen':
-                  the generated program may miss memory instrumentation
-                  if there are memory-related annotations.
+    the generated program may miss memory instrumentation
+    if there are memory-related annotations.
 FRAMAC_SHARE/libc/string.h:92:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-                  Ignoring annotation.
+    Ignoring annotation.
 FRAMAC_SHARE/libc/string.h:92:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-                  Ignoring annotation.
+    Ignoring annotation.
 FRAMAC_SHARE/libc/string.h:94:[e-acsl] warning: E-ACSL construct `logic function returning an integer' is not yet supported.
-                  Ignoring annotation.
+    Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 FRAMAC_SHARE/e-acsl/e_acsl.h:94:[value] warning: function __e_acsl_assert: precondition got status unknown.
 tests/runtime/mainargs.c:12:[value] warning: assertion got status unknown.
@@ -18,7 +18,7 @@ tests/runtime/mainargs.c:16:[value] warning: assertion got status unknown.
 tests/runtime/mainargs.c:16:[value] warning: out of bounds read. assert \valid_read(argv + argc);
 FRAMAC_SHARE/libc/string.h:92:[value] warning: function __gen_e_acsl_strlen: precondition 'valid_string_src' got status unknown.
 FRAMAC_SHARE/libc/string.h:92:[value] warning: builtin Frama_C_strlen: possibly reading indeterminate data
-                                         invalid base: NULL
+                            invalid base: NULL
 FRAMAC_SHARE/libc/string.h:94:[value] warning: function __gen_e_acsl_strlen: postcondition got status unknown.
 tests/runtime/mainargs.c:19:[value] warning: assertion got status unknown.
 tests/runtime/mainargs.c:20:[value] warning: assertion got status unknown.

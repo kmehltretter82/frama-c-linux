@@ -14,8 +14,8 @@
   __e_acsl_math_INFINITY ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
 [value] using specification for function __e_acsl_memory_init
 tests/gmp/longlong.i:9:[value] user error: recursive call during value analysis
-                    of my_pow (my_pow <- my_pow :: tests/gmp/longlong.i:16 <- main). Assuming
-                    the call has no effect. The analysis will be unsound.]
+    of my_pow (my_pow <- my_pow :: tests/gmp/longlong.i:16 <- main). Assuming
+    the call has no effect. The analysis will be unsound.]
 [value] using specification for function my_pow
 tests/gmp/longlong.i:10:[value] warning: signed overflow. assert -2147483648 ≤ tmp * tmp;
 tests/gmp/longlong.i:10:[value] warning: signed overflow. assert tmp * tmp ≤ 2147483647;
@@ -31,8 +31,8 @@ FRAMAC_SHARE/e-acsl/e_acsl.h:94:[value] warning: function __e_acsl_assert: preco
 [value] using specification for function __gmpz_tdiv_r
 [value] using specification for function __gmpz_get_si
 tests/gmp/longlong.i:17:[value] Assigning imprecise value to __gen_e_acsl__4.
-        The imprecision originates from Library function
+    The imprecision originates from Library function
 tests/gmp/longlong.i:17:[value] warning: pointer comparison.
-                 assert \pointer_comparable((void *)__gen_e_acsl__4, (void *)1);
+    assert \pointer_comparable((void *)__gen_e_acsl__4, (void *)1);
 [value] using specification for function __gmpz_clear
 [value] done for function main
