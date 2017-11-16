@@ -156,7 +156,8 @@ EACSL_LIBDIR := $(EACSL_PLUGIN_DIR)/lib
 # DLMALLOC #
 ############
 
-EACSL_DLMALLOC_DIR := $(EACSL_PLUGIN_DIR)/contrib/libdlmalloc
+EACSL_DLMALLOC_REL_DIR := contrib/libdlmalloc
+EACSL_DLMALLOC_DIR := $(EACSL_PLUGIN_DIR)/$(EACSL_DLMALLOC_REL_DIR)
 EACSL_DLMALLOC_LIBNAME = libeacsl-dlmalloc.a
 EACSL_DLMALLOC_LIB = $(EACSL_LIBDIR)/$(EACSL_DLMALLOC_LIBNAME)
 EACSL_DLMALLOC_SRC = $(EACSL_DLMALLOC_DIR)/dlmalloc.c
@@ -184,7 +185,8 @@ $(EACSL_DLMALLOC_LIB): $(EACSL_DLMALLOC_SRC)
 # GMP 	   #
 ############
 
-EACSL_GMP_DIR := $(EACSL_PLUGIN_DIR)/contrib/libgmp
+EACSL_GMP_REL_DIR:=contrib/libgmp
+EACSL_GMP_DIR := $(EACSL_PLUGIN_DIR)/$(EACSL_GMP_REL_DIR)
 EACSL_GMP_LIBNAME = libeacsl-gmp.a
 EACSL_GMP_LIB = $(EACSL_LIBDIR)/$(EACSL_GMP_LIBNAME)
 EACSL_GMP_OBJ = mini-gmp.o
@@ -230,9 +232,9 @@ EACSL_OCAML_FILES = $(wildcard *.mli) \
 	$(filter-out $(wildcard *local_config.ml), $(wildcard *.ml))
 
 EACSL_CONTRIB_FILES = \
-  $(EACSL_GMP_DIR)/mini-gmp.c \
-  $(EACSL_GMP_DIR)/mini-gmp.h \
-  $(EACSL_DLMALLOC_DIR)/dlmalloc.c
+  $(EACSL_GMP_REL_DIR)/mini-gmp.c \
+  $(EACSL_GMP_REL_DIR)/mini-gmp.h \
+  $(EACSL_DLMALLOC_REL_DIR)/dlmalloc.c
 
 EACSL_MANUAL_FILES = $(wildcard $(E_ACSL_DIR)/doc/manuals/*.pdf)
 

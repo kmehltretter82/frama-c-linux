@@ -1,7 +1,7 @@
 [e-acsl] beginning translation.
 [e-acsl] warning: annotating undefined function `getenv':
-                  the generated program may miss memory instrumentation
-                  if there are memory-related annotations.
+    the generated program may miss memory instrumentation
+    if there are memory-related annotations.
 FRAMAC_SHARE/libc/stdlib.h:417:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-                  Ignoring annotation.
+    Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
