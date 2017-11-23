@@ -312,32 +312,19 @@ let tand t1 t2 =
   | TFalse,_ | _,TFalse -> TFalse
   | _,_ -> TAnd(t1,t2)
 
-let has_result t =
-  let module M = struct exception Has_result end in
-  let vis = object
-    inherit Visitor.frama_c_inplace
-    method! vterm_lhost = function
-      | TResult _ -> raise M.Has_result
-      | _ -> Cil.DoChildren
-  end
-  in
-  try ignore (Visitor.visitFramacTerm vis t); false
-  with M.Has_result -> true
-
 let rec tnot t =
   match t with
-  | TTrue -> TFalse
-  | TFalse -> TTrue
-  | TNot t -> t
-  (* If relation uses \result, keep information about which function
-     is returning close to it. *)
-  | TAnd ((TReturn _ as t1), (TRel (_,op1,op2) as t2))
-    when has_result op1 || has_result op2 ->
-    TOr (tnot t1, TAnd (t1, tnot t2))
-  | TAnd (t1,t2) -> TOr(tnot t1, tnot t2)
-  | TOr (t1,t2) -> TAnd(tnot t1, tnot t2)
-  | TRel(rel,t1,t2) -> TRel(opposite_rel rel, t1, t2)
-  | TCall _ | TReturn _ -> TNot t
+    | TTrue -> TFalse
+    | TFalse -> TTrue
+    | TNot t -> t
+    | TAnd (TCall (c,b), t) ->
+      TOr (TNot (TCall (c,b)), TAnd(TCall (c,b), tnot t))
+    | TAnd (TReturn c, t) ->
+      TOr (TNot (TReturn c), TAnd(TReturn c, tnot t))
+    | TAnd (t1,t2) -> TOr(tnot t1, tnot t2)
+    | TOr (t1,t2) -> TAnd(tnot t1, tnot t2)
+    | TRel(rel,t1,t2) -> TRel(opposite_rel rel, t1, t2)
+    | TCall _ | TReturn _ -> TNot t
 
 let tands l = List.fold_right tand l TTrue
 
