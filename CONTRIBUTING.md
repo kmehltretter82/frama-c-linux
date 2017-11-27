@@ -47,18 +47,9 @@ To fit this workflow, we recommend to:
 2. [Fork the Frama-C snapshot repository](https://github.com/Frama-C/Frama-C-snapshot/fork)
   (choosing your Github account as a destination);
 
-3. Clone the forked Frama-C snapshot repository on your computer by typing
-  ```shell
-  git clone https://github.com/username/Frama-C-snapshot.git
-  ```
-  in your terminal (change `username` by your Github username);
+3. Clone the forked Frama-C snapshot repository on your computer;
 
-4. Create and switch in a dedicated branch by typing 
-  ```shell
-  git checkout -b branch-name
-  ```
-  in your terminal (change `branch-name` by your chosen branch name). The chosen
-  branch name should follow the following convention:
+4. Create and switch in a dedicated branch which should follow the following convention:
   - `bugfix/username/short-description` for bug fixes (correcting an incorrect
   behaviour);
   - `improv/username/short-description` for improvements (making even better a
@@ -76,11 +67,7 @@ To fit this workflow, we recommend to:
   You can also provide the non-regression test case in the Github issue
   discussion and we will integrate it).
 
-7. Check for unexpected changes (in particular spaces and tabulations) by typing
-  ```shell
-  git diff --check
-  ```
-  in your terminal.
+7. Check for unexpected changes (in particular spaces and tabulations);
 
 8. Locally run the test framework of Frama-C by typing
   ```shell
@@ -88,27 +75,34 @@ To fit this workflow, we recommend to:
   ```
   in your terminal (you should be in the Frama-C root directory);
 
-9. Locally add (if needed) and commit your contribution by typing
-  ```shell
-  git add -A
-  git commit -m "Commit message (GH #XXX)"
-  ```
-  in your terminal (this adds all the new files to the commit, you can pick the
-  relevant files as described in the
-  [`Git` documentation](https://git-scm.com/docs/git-add)). The end of the
-  commit message should refer the Github issue to which this commit is linked
-  and thus #XXX replaced by the corresponding number;
+9. Locally add (if needed) and commit your contribution. The end of the
+  commit message should refer to the Github issue to which this commit is
+  linked by mentioning its issue identifier preceded by `GH #` (we use the
+  `GH` part to track the provenance as we use several issue trackers);
 
-10. Push your contribution to Github by typing
-  ```shell
-  git push origin branch-name
-  ```
-  in your terminal (change `branch-name` by the right branch name);
+10. Push your contribution to Github;
 
 11. [Make a Github pull request](https://github.com/Frama-C/Frama-C-snapshot/compare)
   (toggling the `compare across forks` view). The base fork should remain as
   `Frama-C/Frama-C-snapshot` and the base as `master` while the head fork
   should be yours and the compare should be your chosen branch name.
+
+For convenience, we recall the typical `git` commands to be used through these steps:
+```shell
+git clone https://github.com/<username>/Frama-C-snapshot.git
+git checkout -b <branch-name>
+git diff --check
+git add <file1 file 2>
+git commit -m "<Commit message> (GH #<XXX>)"
+git push origin <branch-name>
+```
+where:
+
+- `<username>` is your Github username;
+- `<branch-name>` is your chosen branch name;
+- `<file1 file2>` are the files to add to the commit;
+- `<Commit message>` is your commit message;
+- `<XXX>` is the Github issue identifier.
 
 Coding conventions
 ==================
