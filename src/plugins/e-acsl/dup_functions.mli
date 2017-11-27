@@ -20,10 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
-
 val dup: unit -> Project.t
-val is_generated: kernel_function -> bool
 
 (*
 Local Variables:

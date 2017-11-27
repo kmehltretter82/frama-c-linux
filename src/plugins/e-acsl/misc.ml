@@ -138,7 +138,7 @@ let is_generated_kf kf =
   let name = Kernel_function.get_vi kf in
   is_generated_varinfo name
 
-let get_orig_name kf =
+let get_original_name kf =
   let name = Kernel_function.get_name kf in
   strip_prefix e_acsl_gen_prefix name
 
@@ -164,7 +164,7 @@ let mk_e_acsl_guard ?(reverse=false) kind kf e p =
     (mk_api_name "assert")
     [ e;
       kind_to_string loc kind;
-      Cil.mkString ~loc (get_orig_name kf);
+      Cil.mkString ~loc (get_original_name kf);
       Cil.mkString ~loc msg;
       Cil.integer loc line ]
 

@@ -12,16 +12,6 @@
  */
 void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out);
 
-/*@ requires \valid(Mtmax_in);
-    requires \valid(Mwmax);
-    requires \valid(Mtmax_out);
-    
-    behavior OverEstimate_Motoring:
-      assumes \true;
-      ensures
-        *\old(Mtmax_out) ≡
-        *\old(Mtmax_in) + (5 - ((5 / 80) * *\old(Mwmax)) * 0.4);
- */
 void foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
 {
   __e_acsl_store_block((void *)(& Mtmax_out),(size_t)8);
@@ -49,17 +39,6 @@ void foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
  */
 void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out);
 
-/*@ requires \valid(Mtmin_in);
-    requires \valid(Mwmin);
-    requires \valid(Mtmin_out);
-    
-    behavior UnderEstimate_Motoring:
-      assumes \true;
-      ensures
-        *\old(Mtmin_out) ≡ *\old(Mtmin_in) < 0.85 * *\old(Mwmin)?
-          *\old(Mtmin_in) ≢ 0.:
-          0.85 * *\old(Mwmin) ≢ 0.;
- */
 void bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
 {
   __e_acsl_store_block((void *)(& Mtmin_out),(size_t)8);

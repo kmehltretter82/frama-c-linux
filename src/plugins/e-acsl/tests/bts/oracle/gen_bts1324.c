@@ -6,10 +6,6 @@
  */
 int __gen_e_acsl_sorted(int *t, int n);
 
-/*@ behavior yes:
-      assumes ∀ int i; 0 < i < n ⇒ *(t + (i - 1)) ≤ *(t + i);
-      ensures \result ≡ 1;
- */
 int sorted(int *t, int n)
 {
   int __retres;

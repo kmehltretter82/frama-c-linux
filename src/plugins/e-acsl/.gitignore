@@ -57,6 +57,7 @@
 /tests/runtime/*.cm*
 /tests/runtime/result/*
 /tests/temporal/result/*
+/tests/special/result/*
 /tests/no-main/result/*
 /tests/full-mmodel/result/*
 /tests/bts/result/*

@@ -119,6 +119,13 @@ let version () =
   end
 let () = Cmdline.run_after_configuring_stage version
 
+let parameter_states =
+  [ Valid.self;
+    Gmp_only.self;
+    Full_mmodel.self;
+    Builtins.self;
+    Temporal_validity.self]
+
 let must_visit () = Run.get () || Check.get ()
 
 let dkey_analysis = register_category "analysis"

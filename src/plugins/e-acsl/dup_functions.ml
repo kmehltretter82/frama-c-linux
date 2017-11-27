@@ -29,7 +29,6 @@ let dkey = Options.dkey_dup
 (* ********************************************************************** *)
 
 let fct_tbl: unit Kernel_function.Hashtbl.t = Kernel_function.Hashtbl.create 7
-let is_generated kf = Kernel_function.Hashtbl.mem fct_tbl kf
 
 let actions = Queue.create ()
 
@@ -52,49 +51,8 @@ let reset () =
   Queue.clear actions
 
 (* ********************************************************************** *)
-(* Duplicating property statuses *)
-(* ********************************************************************** *)
-
-let reemit = function
-  | Property.IPBehavior _ | Property.IPAxiom _ | Property.IPAxiomatic _
-  | Property.IPPredicate (Property.PKAssumes _, _, _, _) -> false
-  | _ -> true
-
-let copy_ppt old_prj new_prj old_ppt new_ppt =
-  let module P = Property_status in
-  let selection = State_selection.of_list [ P.self; Emitter.self ] in
-  let emit s l =
-    Project.on ~selection new_prj 
-      (fun s ->
-	let e = match l with [] -> assert false | e :: _ -> e in
-	let emitter = Emitter.Usable_emitter.get e.P.emitter in
-	match s with 
-	| P.True | P.False_and_reachable | P.Dont_know ->
-	  P.emit emitter ~hyps:e.P.properties new_ppt s
-	| P.False_if_reachable -> 
-	  (* in that case, the only hypothesis is "Reachable new_ppt" which must
-	     be automatically added by the kernel *)
-	  P.emit emitter ~hyps:[] new_ppt P.False_if_reachable)
-      s
-  in
-  let copy () =
-    match Project.on ~selection old_prj P.get old_ppt with
-    | P.Never_tried -> ()
-    | P.Best(s, l) -> emit s l
-    | P.Inconsistent i ->
-      emit P.True i.P.valid;
-      emit P.False_and_reachable i.P.invalid
-  in
-  if reemit old_ppt && not (Options.Valid.get ()) then Queue.add copy actions
-
-(* ********************************************************************** *)
 (* Duplicating functions *)
 (* ********************************************************************** *)
-
-let dup_spec_status old_prj kf new_kf old_spec new_spec =
-  let old_ppts = Property.ip_of_spec kf Kglobal ~active:[] old_spec in
-  let new_ppts = Property.ip_of_spec new_kf Kglobal ~active:[] new_spec in
-  List.iter2 (copy_ppt old_prj (Project.current ())) old_ppts new_ppts
 
 let dup_funspec tbl bhv spec =
   (*  Options.feedback "DUP SPEC %a" Cil.d_funspec spec;*)
@@ -205,7 +163,7 @@ let dup_fundec loc spec bhv kf vi new_vi =
     sallstmts = [];
     sspec = new_spec }
 
-let dup_global loc old_prj spec bhv kf vi new_vi = 
+let dup_global loc actions spec bhv kf vi new_vi =
   let name = vi.vname in
   Options.feedback ~dkey ~level:2 "entering in function %s" name;
   let fundec = dup_fundec loc spec bhv kf vi new_vi  in
@@ -216,8 +174,34 @@ let dup_global loc old_prj spec bhv kf vi new_vi =
   Globals.Functions.register new_kf;
   Globals.Functions.replace_by_definition new_spec fundec loc;
   Annotations.register_funspec new_kf;
-  dup_spec_status old_prj kf new_kf spec new_spec;
   Options.feedback ~dkey ~level:2 "function %s" name;
+  (* remove the specs attached to the previous kf iff it is a definition:
+     it is necessary to keep stable the number of annotations in order to get
+     [Keep_status] working fine. *)
+  let kf = Cil.get_kernel_function bhv kf in
+  if Kernel_function.is_definition kf then begin
+    Queue.add
+      (fun () ->
+        let bhvs =
+          Annotations.fold_behaviors (fun e b acc -> (e, b) :: acc) kf []
+        in
+        List.iter
+          (fun (e, b) -> Annotations.remove_behavior ~force:true e kf b)
+          bhvs;
+        Annotations.iter_decreases
+          (fun e _ -> Annotations.remove_decreases e kf)
+          kf;
+        Annotations.iter_terminates
+          (fun e _ -> Annotations.remove_terminates e kf)
+          kf;
+        Annotations.iter_complete
+          (fun e l -> Annotations.remove_complete e kf l)
+          kf;
+        Annotations.iter_disjoint
+          (fun e l -> Annotations.remove_disjoint e kf l)
+          kf)
+      actions
+  end;
   GFun(fundec, loc), GFunDecl(new_spec, new_vi, loc)
 
 (* ********************************************************************** *)
@@ -258,22 +242,7 @@ class dup_functions_visitor prj = object (self)
     | Memory_model -> before_memory_model <- Code
     | Code -> ()
 
-  method !vcode_annot a =
-    Cil.JustCopyPost
-      (fun a' ->
-	let get_ppt kf stmt a = Property.ip_of_code_annot kf stmt a in
-	let kf = Extlib.the self#current_kf in
-	let stmt = Extlib.the self#current_stmt in
-	List.iter2
-	  (fun p p' -> copy_ppt (Project.current ()) prj p p')
-	  (get_ppt kf stmt a)
-	  (get_ppt
-	     (Cil.get_kernel_function self#behavior kf) 
-	     (Cil.get_stmt self#behavior stmt)
-	     a');
-	a')
-
-  method !vlogic_info_decl li = 
+  method !vlogic_info_decl li =
     Global.add_logic_info li;
     Cil.JustCopy
 
@@ -338,8 +307,15 @@ if there are memory-related annotations.@]"
 	let spec = Annotations.funspec ~populate:false kf in
 	let vi_bhv = Cil.get_varinfo self#behavior vi in
         let new_g, new_decl =
-          Project.on prj
-            (dup_global loc (Project.current ()) spec self#behavior kf vi_bhv)
+          Project.on
+            prj
+            (dup_global
+               loc
+               self#get_filling_actions
+               spec
+               self#behavior
+               kf
+               vi_bhv)
             new_vi
         in
         (* postpone the introduction of the new function definition to the
