@@ -121,13 +121,6 @@ Coding conventions
 
 - Strive to keep within 80 characters per line.
 
-Note that many files are not normalized, since they were written before these
-conventions were established. However, modified code that touches lines that
-are not normalized should be normalized (e.g., if you modify a line containing
-a trailing whitespace, remove it in your commit). Avoid commits that only
-re-indent/prettify code.
-
-
 External plug-ins
 =================
 
