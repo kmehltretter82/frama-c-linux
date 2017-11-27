@@ -26,7 +26,7 @@ Before submitting the issue, please confirm (by adding a X in the [ ]):
 
 *Please explain here what is the expected behaviour.*
 
-# Actual behabiour
+# Actual behaviour
 
 *Please explain here what is the actual (faulty) behaviour.*
 
