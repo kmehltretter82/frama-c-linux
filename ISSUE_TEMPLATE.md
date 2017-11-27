@@ -6,7 +6,7 @@ Before submitting the issue, please confirm (by adding a X in the [ ]):
 
 - [ ] the issue has not yet been reported on [Github](https://github.com/Frama-C/Frama-C-snapshot/issues);
 - [ ] the issue has not yet been reported on our [BTS](https://bts.frama-c.com);
-- [ ] your install Frama-C as prescribed in the [instructions](https://github.com/Frama-C/Frama-C-snapshot/blob/master/INSTALL.md).
+- [ ] you installed Frama-C as prescribed in the [instructions](https://github.com/Frama-C/Frama-C-snapshot/blob/master/INSTALL.md).
 
 # Contextual information
 
