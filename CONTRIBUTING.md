@@ -14,10 +14,10 @@ There are several ways to participate in the Frama-C project:
   [Github issues](https://github.com/Frama-C/Frama-C-snapshot/issues)) or the
   [Mantis BTS](https://bts.frama-c.com);
 
-- [Submitting bug fixes, improvements, and features](#submitted-bug-fixes-improvements-and-features)
+- [Submitting bug fixes, improvements, and features](#submitting-bug-fixes-improvements-and-features)
   via Github pull requests;
 
-- [Developing your own plug-in](#external-plug-ins)
+- [Developing external plug-ins](#developing-external-plug-ins)
   and sharing it with us through a Github pull request;
 
 - Joining the [Frama-C team](http://frama-c.com/about.html) (as an intern, a PhD
@@ -27,8 +27,8 @@ We give below some guidelines in order to ease the submission of a pull request
 and optimize its integration with the Frama-C existing codebase.
 
 
-Submitted bug fixes, improvements, and features
-===============================================
+Submitting bug fixes, improvements, and features
+================================================
 
 Main Frama-C development happens outside Github. By default, patches and
 improvements are applied upstream and only release candidates and stable
@@ -104,19 +104,8 @@ where:
 - `<Commit message>` is your commit message;
 - `<XXX>` is the Github issue identifier.
 
-Coding conventions
-==================
-
-- Use [ocp-indent](https://github.com/OCamlPro/ocp-indent) to indent files;
-
-- Avoid trailing whitespaces;
-
-- Avoid using tabs;
-
-- Strive to keep within 80 characters per line.
-
-External plug-ins
-=================
+Developing external plug-ins
+============================
 
 Frama-C is a modular platform for which it is possible to develop external
 plug-ins as documented in the
@@ -175,3 +164,14 @@ This will ensure that (1) the version of Frama-C that is available with your
 plug-in is guaranteed to compile and work, independently of API changes;
 (2) updating your plug-in will only require synchronizing with the
 Frama-C snapshot repository.
+
+Coding conventions
+==================
+
+- Use [ocp-indent](https://github.com/OCamlPro/ocp-indent) to indent files;
+
+- Avoid trailing whitespaces;
+
+- Avoid using tabs;
+
+- Strive to keep within 80 characters per line.
