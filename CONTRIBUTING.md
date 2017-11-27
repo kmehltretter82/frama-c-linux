@@ -91,7 +91,7 @@ To fit this workflow, we recommend to:
 9. Locally add (if needed) and commit your contribution by typing
   ```shell
   git add -A
-  git commit -m "Commit message (GH#XXX)"
+  git commit -m "Commit message (GH #XXX)"
   ```
   in your terminal (this adds all the new files to the commit, you can pick the
   relevant files as described in the
