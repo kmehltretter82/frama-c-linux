@@ -110,61 +110,34 @@ Developing external plug-ins
 
 Frama-C is a modular platform for which it is possible to develop external
 plug-ins as documented in the
-[Plug-in Development Guide](http://frama-c.com/download/frama-c-plugin-development-guide.pdf).
+[Plug-In development guide](http://frama-c.com/download/frama-c-plugin-development-guide.pdf).
 Such plug-ins normally do not require changes to the Frama-C source code and can
 be developed completely independently, for instance in a separate Git
-repository.
+repository as exemplified by the [Hello plug-in](https://github.com/Frama-C/frama-c-hello).
 
 However, to make it easier for your users to compile and use your plug-in, even
 as newer releases are made available, we recommend the following workflow:
 
-1. [Fork the Frama-C snapshot repository](https://github.com/Frama-C/Frama-C-snapshot/fork)
-  (choosing your Github account as a destination);
+1. Write your external plug-in as indicated in the
+  [Plug-In development guide](http://frama-c.com/download/frama-c-plugin-development-guide.pdf);
 
-2. Clone the forked Frama-C snapshot repository on your computer by typing
-  ```shell
-  git clone https://github.com/username/Frama-C-snapshot.git
-  ```
-  in your terminal (change `username` by your Github username);
+2. Create an `opam` package by
+  [pinning your local plug-in](http://opam.ocaml.org/doc/Packaging.html#Opam-pin) and
+  [editing the `opam` file](http://opam.ocaml.org/doc/Packaging.html#The-quot-opam-quot-file).
+  You can have a look at the
+  [`opam` file of the Hello plug-in](https://github.com/Frama-C/frama-c-hello/blob/master/opam)
+  if necessary.
 
-3. Locally make your contribution by adding/editing/deleting files in the
-  `./src/plugins/` directory, along with appropriate
-   `configure.ac` and `Makefile.in` files, and following
-  the [coding conventions](#coding-conventions);
+3. Optionnally
+  [publish your plug-in](http://opam.ocaml.org/doc/Packaging.html#Publishing)
+  in the official OPAM packages repository.
 
-4. Optionnally locally add non-regression test cases to the appropriate
-  subdirectory in `./tests/`. The
-  [plug-in developer manual](http://frama-c.com/download/frama-c-plugin-development-guide.pdf)
-  exemplifies the use of the dedicated `ptests` tool used by Frama-C developers
-  in its `hello` tutorial and provides a documentation of it in a full section.
-  You can also provide the non-regression test case in the Github issue
-  discussion and we will integrate it).
+4. Let know the
+  [Frama-C-discuss mailing list](https://lists.gforge.inria.fr/mailman/listinfo/frama-c-discuss)
+  about your contribution to the Frama-C ecosystem. Well done!
 
-5. Locally run the test framework of Frama-C by typing
-  ```shell
-  make tests
-  ```
-  in your terminal (you should be in the Frama-C root directory);
-
-6. Locally add (if needed) and commit your contribution by typing
-  ```shell
-  git add -A
-  git commit -m "Commit message"
-  ```
-  in your terminal (this adds all the new files to the commit, you can pick the
-  relevant files as described in the
-  [`Git` documentation](https://git-scm.com/docs/git-add));
-
-7. Push your contribution to Github by typing
-  ```shell
-  git push -u origin branch-name
-  ```
-  in your terminal (change `branch-name` by the right branch name).
-
-This will ensure that (1) the version of Frama-C that is available with your
-plug-in is guaranteed to compile and work, independently of API changes;
-(2) updating your plug-in will only require synchronizing with the
-Frama-C snapshot repository.
+The main advantage of this way to proceed is the delegation to OPAM of the task
+of keeping consistent Frama-C versions and dependencies.
 
 
 Coding conventions
