@@ -41,23 +41,19 @@ them.
 
 To fit this workflow, we recommend to:
 
-1. [Prepare to sign the CLA (Contributor License Agreement)](#contributor-license-agreement-cla)
-  if your contribution does not fall under the
-  [TCE (Trivial Contribution Exemption)](#trivial-contribution-exemption-tce).
-
-2. [Open an issue](https://github.com/Frama-C/Frama-C-snapshot/issues/new)
+1. [Open an issue](https://github.com/Frama-C/Frama-C-snapshot/issues/new)
   describing your contribution.
 
-3. [Fork the Frama-C snapshot repository](https://github.com/Frama-C/Frama-C-snapshot/fork)
+2. [Fork the Frama-C snapshot repository](https://github.com/Frama-C/Frama-C-snapshot/fork)
   (choosing your Github account as a destination);
 
-4. Clone the forked Frama-C snapshot repository on your computer by typing
+3. Clone the forked Frama-C snapshot repository on your computer by typing
   ```shell
   git clone https://github.com/username/Frama-C-snapshot.git
   ```
   in your terminal (change `username` by your Github username);
 
-5. Create and switch in a dedicated branch by typing 
+4. Create and switch in a dedicated branch by typing 
   ```shell
   git checkout -b branch-name
   ```
@@ -69,10 +65,10 @@ To fit this workflow, we recommend to:
   functionnally correct behaviour);
   - `feature/username/short-description` for features (adding a new behaviour).
 
-6. Locally make your contribution by adding/editing/deleting files and following
+5. Locally make your contribution by adding/editing/deleting files and following
   the [coding conventions](#coding-conventions);
 
-7. Optionnally locally add non-regression test cases to the appropriate
+6. Optionally locally add non-regression test cases to the appropriate
   subdirectory in `./tests/`. The
   [plug-in developer manual](http://frama-c.com/download/frama-c-plugin-development-guide.pdf)
   exemplifies the use of the dedicated `ptests` tool used by Frama-C developers
@@ -80,19 +76,19 @@ To fit this workflow, we recommend to:
   You can also provide the non-regression test case in the Github issue
   discussion and we will integrate it).
 
-8. Check for unexpected changes (in particular spaces and tabulations) by typing
+7. Check for unexpected changes (in particular spaces and tabulations) by typing
   ```shell
   git diff --check
   ```
   in your terminal.
 
-9. Locally run the test framework of Frama-C by typing
+8. Locally run the test framework of Frama-C by typing
   ```shell
   make tests
   ```
   in your terminal (you should be in the Frama-C root directory);
 
-10. Locally add (if needed) and commit your contribution by typing
+9. Locally add (if needed) and commit your contribution by typing
   ```shell
   git add -A
   git commit -m "Commit message (GH#XXX)"
@@ -103,13 +99,13 @@ To fit this workflow, we recommend to:
   commit message should refer the Github issue to which this commit is linked
   and thus #XXX replaced by the corresponding number;
 
-11. Push your contribution to Github by typing
+10. Push your contribution to Github by typing
   ```shell
   git push origin branch-name
   ```
   in your terminal (change `branch-name` by the right branch name);
 
-12. [Make a Github pull request](https://github.com/Frama-C/Frama-C-snapshot/compare)
+11. [Make a Github pull request](https://github.com/Frama-C/Frama-C-snapshot/compare)
   (toggling the `compare across forks` view). The base fork should remain as
   `Frama-C/Frama-C-snapshot` and the base as `master` while the head fork
   should be yours and the compare should be your chosen branch name.
@@ -192,14 +188,3 @@ This will ensure that (1) the version of Frama-C that is available with your
 plug-in is guaranteed to compile and work, independently of API changes;
 (2) updating your plug-in will only require synchronizing with the
 Frama-C snapshot repository.
-
-
-Contributor License Agreement (CLA)
-===================================
-
-TODO
-
-Trivial Contribution Exemption (TCE)
-====================================
-
-TODO
