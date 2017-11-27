@@ -104,6 +104,7 @@ where:
 - `<Commit message>` is your commit message;
 - `<XXX>` is the Github issue identifier.
 
+
 Developing external plug-ins
 ============================
 
@@ -164,6 +165,7 @@ This will ensure that (1) the version of Frama-C that is available with your
 plug-in is guaranteed to compile and work, independently of API changes;
 (2) updating your plug-in will only require synchronizing with the
 Frama-C snapshot repository.
+
 
 Coding conventions
 ==================
