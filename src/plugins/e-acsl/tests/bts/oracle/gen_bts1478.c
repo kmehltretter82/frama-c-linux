@@ -10,10 +10,6 @@ int global_i = 0;
  */
 void __gen_e_acsl_loop(void);
 
-/*@ requires global_i ≡ 0;
-    requires \valid(global_i_ptr);
-    requires global_i_ptr ≡ &global_i;
- */
 void loop(void)
 {
   return;

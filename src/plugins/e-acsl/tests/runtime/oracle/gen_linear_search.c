@@ -13,16 +13,6 @@ int A[10];
  */
 int __gen_e_acsl_search(int elt);
 
-/*@ requires ∀ ℤ i; 0 ≤ i < 9 ⇒ A[i] ≤ A[i + 1];
-    
-    behavior exists:
-      assumes ∃ ℤ j; 0 ≤ j < 10 ∧ A[j] ≡ elt;
-      ensures \result ≡ 1;
-    
-    behavior not_exists:
-      assumes ∀ ℤ j; 0 ≤ j < 10 ⇒ A[j] ≢ elt;
-      ensures \result ≡ 0;
- */
 int search(int elt)
 {
   int __retres;

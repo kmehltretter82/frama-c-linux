@@ -552,10 +552,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
             env
         in
         (* translate the precondition of the function *)
-        if Dup_functions.is_generated (Extlib.the self#current_kf) then
-          Project.on prj (Translate.translate_pre_spec kf Kglobal env) !funspec
-        else
-          env
+        Project.on prj (Translate.translate_pre_spec kf env) !funspec
       else
         env
     in
@@ -569,10 +566,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
             Cil.visitCilCodeAnnotation (self :> Cil.cilVisitor) old_a
           in
           let env =
-            Project.on
-              prj
-              (Translate.translate_pre_code_annotation kf stmt env)
-              a
+            Project.on prj (Translate.translate_pre_code_annotation kf env) a
           in
           env, a :: new_annots)
         (Cil.get_original_stmt self#behavior stmt)
@@ -619,8 +613,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         Project.on
           prj
           (List.fold_right
-             (fun a env ->
-               Translate.translate_post_code_annotation kf stmt env a)
+             (fun a env -> Translate.translate_post_code_annotation kf env a)
              new_annots)
           env
       in
@@ -640,13 +633,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
           let env = mk_post_env env in
           (* also handle the postcondition of the function and clear the env *)
           let env =
-            if Dup_functions.is_generated (Extlib.the self#current_kf) then
-              Project.on
-                prj
-                (Translate.translate_post_spec kf Kglobal env)
-                !funspec
-            else
-              env
+            Project.on prj (Translate.translate_post_spec kf env) !funspec
           in
           (* de-allocating memory previously allocating by the kf *)
           (* JS: should be done in the new project? *)
@@ -848,8 +835,10 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
   initializer
     Misc.reset ();
     Literal_strings.reset ();
+    Keep_status.before_translation ();
     self#reset_env ();
     Translate.set_original_project (Project.current ())
+
 end
 
 let do_visit ?(prj=Project.current ()) generate =

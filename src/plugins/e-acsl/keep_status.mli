@@ -20,29 +20,35 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include Plugin.S (** implementation of Log.S for E-ACSL *)
+(** Make the property statuses of the initial project accessible when
+    doing the main translation *)
 
-module Check: Parameter_sig.Bool
-module Run: Parameter_sig.Bool
-module Valid: Parameter_sig.Bool
-module Prepare: Parameter_sig.Bool
-module Gmp_only: Parameter_sig.Bool
-module Full_mmodel: Parameter_sig.Bool
-module Project_name: Parameter_sig.String
-module Builtins: Parameter_sig.String_set
-module Temporal_validity: Parameter_sig.Bool
+type kind =
+  | K_Assert
+  | K_Invariant
+  | K_Variant
+  | K_StmtSpec
+  | K_Allocation
+  | K_Assigns
+  | K_Decreases
+  | K_Terminates (* TODO: should be removed: not part of the E-ACSL subset *)
+  | K_Complete
+  | K_Disjoint
+  | K_Requires
+  | K_Ensures
 
-val parameter_states: State.t list
+val clear: unit -> unit
+(** to be called before any program transformation *)
 
-val must_visit: unit -> bool
+val push: Kernel_function.t -> kind -> Property.t -> unit
+(** store the given property of the given kind for the given function *)
 
-val dkey_analysis: Log.category
-val dkey_dup: Log.category
-val dkey_translation: Log.category
-val dkey_typing: Log.category
+val before_translation: unit -> unit
+(** to be called just before the main translation *)
 
-(*
-Local Variables:
-compile-command: "make"
-End:
-*)
+val must_translate: Kernel_function.t -> kind -> bool
+(** To be called just before transforming a property of the given kind for the
+    given function.
+    VERY IMPORTANT: the property of the n-th call to this function exactly
+    correspond to the n-th pushed property (see {!push}).
+    @return true if and only if the translation must occur. *)

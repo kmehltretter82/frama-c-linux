@@ -15,6 +15,8 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
+-* E-ACSL       [2017/11/27] Restore behavior of option -e-acsl-valid broken
+	        since Phosphorus (included).
 -* E-ACSL       [2017/10/25] Fix bug #2303 about unnamed formals in
 	        annotated functions.
 -  E-ACSL       [2017/06/10] Add --free-valid-address option to e-acsl.gcc.sh

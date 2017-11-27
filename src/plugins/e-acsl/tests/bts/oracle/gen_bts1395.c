@@ -3,7 +3,6 @@
 /*@ requires n > 0; */
 int __gen_e_acsl_fact(int n);
 
-/*@ requires n > 0; */
 int fact(int n)
 {
   int __retres;

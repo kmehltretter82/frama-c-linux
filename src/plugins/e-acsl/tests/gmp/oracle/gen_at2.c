@@ -4,7 +4,6 @@ int A = 0;
 /*@ ensures \at(A,Post) ≡ 3; */
 void __gen_e_acsl_f(void);
 
-/*@ ensures \at(A,Post) ≡ 3; */
 void f(void)
 {
   __e_acsl_mpz_t __gen_e_acsl_at_3;
@@ -177,7 +176,6 @@ void g(int *p, int *q)
 /*@ ensures \result ≡ \old(x); */
 int __gen_e_acsl_h(int x);
 
-/*@ ensures \result ≡ \old(x); */
 int h(int x)
 {
   __e_acsl_store_block((void *)(& x),(size_t)4);

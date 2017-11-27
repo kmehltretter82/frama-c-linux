@@ -3,7 +3,6 @@
 /*@ ensures \result ≡ (int)(\old(x) - \old(x)); */
 int __gen_e_acsl_f(int x);
 
-/*@ ensures \result ≡ (int)(\old(x) - \old(x)); */
 int f(int x)
 {
   x = 0;
@@ -14,7 +13,6 @@ int Y = 1;
 /*@ ensures \result ≡ Y; */
 int __gen_e_acsl_g(int x);
 
-/*@ ensures \result ≡ Y; */
 int g(int x)
 {
   return x;
@@ -23,7 +21,6 @@ int g(int x)
 /*@ ensures \result ≡ 0; */
 int __gen_e_acsl_h(void);
 
-/*@ ensures \result ≡ 0; */
 int h(void)
 {
   int __retres;

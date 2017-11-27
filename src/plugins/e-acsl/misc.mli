@@ -122,6 +122,10 @@ val is_generated_literal_string_varinfo: varinfo -> bool
 val is_generated_kf: kernel_function -> bool
 (** Same as [is_generated_varinfo] but for kernel functions *)
 
+val get_original_name: kernel_function -> string
+(** @return the original basename of a function for generated functions, or the
+    identify for ungenerated ones. *)
+
 (*
 Local Variables:
 compile-command: "make"

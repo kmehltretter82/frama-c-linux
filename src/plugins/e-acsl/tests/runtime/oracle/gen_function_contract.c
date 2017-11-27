@@ -5,7 +5,6 @@ int Y = 2;
 /*@ ensures X ≡ 1; */
 void __gen_e_acsl_f(void);
 
-/*@ ensures X ≡ 1; */
 void f(void)
 {
   X = 1;
@@ -16,8 +15,6 @@ void f(void)
     ensures Y ≡ 2; */
 void __gen_e_acsl_g(void);
 
-/*@ ensures X ≡ 2;
-    ensures Y ≡ 2; */
 void g(void)
 {
   X = 2;
@@ -27,7 +24,6 @@ void g(void)
 /*@ requires X ≡ 2; */
 void __gen_e_acsl_h(void);
 
-/*@ requires X ≡ 2; */
 void h(void)
 {
   X ++;
@@ -38,8 +34,6 @@ void h(void)
     requires Y ≡ 2; */
 void __gen_e_acsl_i(void);
 
-/*@ requires X ≡ 3;
-    requires Y ≡ 2; */
 void i(void)
 {
   X += Y;
@@ -57,15 +51,6 @@ void i(void)
  */
 void __gen_e_acsl_j(void);
 
-/*@ behavior b1:
-      requires X ≡ 5;
-      ensures X ≡ 3;
-    
-    behavior b2:
-      requires X ≡ 3 + Y;
-      requires Y ≡ 2;
-      ensures X ≡ Y + 1;
- */
 void j(void)
 {
   X = 3;
@@ -84,16 +69,6 @@ void j(void)
  */
 void __gen_e_acsl_k(void);
 
-/*@ behavior b1:
-      assumes X ≡ 1;
-      requires X ≡ 0;
-    
-    behavior b2:
-      assumes X ≡ 3;
-      assumes Y ≡ 2;
-      requires X ≡ 3;
-      requires X + Y ≡ 5;
- */
 void k(void)
 {
   X += Y;
@@ -103,7 +78,6 @@ void k(void)
 /*@ ensures X ≡ 5; */
 int __gen_e_acsl_l(void);
 
-/*@ ensures X ≡ 5; */
 int l(void)
 {
   /*@ assert Y ≡ 2; */
@@ -123,16 +97,6 @@ int l(void)
  */
 void __gen_e_acsl_m(void);
 
-/*@ behavior b1:
-      assumes X ≡ 7;
-      ensures X ≡ 95;
-    
-    behavior b2:
-      assumes X ≡ 5;
-      assumes Y ≡ 2;
-      ensures X ≡ 7;
-      ensures X ≡ \old(X) + Y;
- */
 void m(void)
 {
   X += Y;
@@ -152,17 +116,6 @@ void m(void)
  */
 void __gen_e_acsl_n(void);
 
-/*@ requires X > 0;
-    requires X < 10;
-    
-    behavior b1:
-      assumes X ≡ 7;
-      ensures X ≡ 8;
-    
-    behavior b2:
-      assumes X ≡ 5;
-      ensures X ≡ 98;
- */
 void n(void)
 {
   X ++;
