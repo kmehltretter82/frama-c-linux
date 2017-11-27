@@ -4,11 +4,11 @@
 
 #include <string.h>
 
+/*@ requires \valid(&argc);
+  @ requires \valid(&argv); */
 int main(int argc, char **argv) {
   int i;
 
-  /*@ assert \valid(&argc) ; */
-  /*@ assert \valid(&argv) ; */
   /*@ assert \forall int k; 0 <= k && k < argc ==> \valid(argv + k) ; */
   /*@ assert \block_length(argv) == (argc+1)*sizeof(char*) ; */
 

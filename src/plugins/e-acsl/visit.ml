@@ -370,8 +370,9 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         vi.vghost <- false;
         Builtins.update vi.vname vi;
         (* remember that we have to remove the main later (see method
-           [vfile]) *)
-        if vi.vorig_name = Kernel.MainFunction.get () then
+           [vfile]); do not use the [vorig_name] since both [main] and
+           [__e_acsl_main] have the same [vorig_name]. *)
+        if vi.vname = Kernel.MainFunction.get () then
           main_fct <- Some fundec
       | GVarDecl(vi, _) | GFunDecl(_, vi, _) ->
         (* do not convert extern ghost variables, because they can't be linked,
