@@ -808,7 +808,7 @@ if [ -n "$OPTION_COMPILE" ]; then
        $CFLAGS $CPPFLAGS \
        $EACSL_CFLAGS $EACSL_CPPFLAGS \
        -o "$OUTPUT_EXEC" \
-       "$OUTPUT_CODE" \
+       $OUTPUT_CODE \
        $EACSL_RTL \
        $LDFLAGS \
        $EACSL_LDFLAGS)

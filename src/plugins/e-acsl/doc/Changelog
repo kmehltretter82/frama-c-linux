@@ -15,6 +15,7 @@
 #   E-ACSL: the Whole E-ACSL plug-in
 ###############################################################################
 
+-* E-ACSL       [2017/11/28] Several files may be given to e-acsl-gcc.sh
 -* E-ACSL       [2017/11/27] Fix 'segmentation fault' of the generated monitor
 	        whenever the main as a precondition depending on the memory
 	        model.
