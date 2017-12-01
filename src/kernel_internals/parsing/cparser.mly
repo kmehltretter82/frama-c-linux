@@ -1022,6 +1022,18 @@ for_clause:
 |   declaration                  { FC_DECL $1 }
 ;
 
+/* 01/12/2017: ghost_parameter_opt and ghost_parameter are parsed
+   then thrown
+*/
+ghost_parameter_opt:
+     /* empty */        { }
+|   ghost_parameter     { }
+;
+
+ghost_parameter:
+  LGHOST parameter_list_startscope rest_par_list RPAREN RGHOST { }
+;
+
 declaration:                                /* ISO 6.7.*/
     decl_spec_list init_declarator_list SEMICOLON
       { doDeclaration None ((snd $1)) (fst $1) $2 }
@@ -1382,7 +1394,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
                               (snd $1, fst $1, $2)
                             }
 /* (* New-style function that does not have a return type *) */
-| IDENT parameter_list_startscope rest_par_list RPAREN
+| IDENT parameter_list_startscope rest_par_list RPAREN ghost_parameter_opt
     { let (params, isva) = $3 in
       let loc = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 1, Parsing.rhs_end_pos 1) in
       let fdec =
@@ -1403,7 +1415,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
       (* Default is int type *)
       (loc, [SpecType Tint], fdec)
     }
-| IDENT LPAREN RPAREN
+| IDENT LPAREN RPAREN ghost_parameter_opt
   {
     let loc = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 1, Parsing.rhs_start_pos 1) in
     let fdec = ($1, PROTO(JUSTBASE,[],false),[],loc) in
