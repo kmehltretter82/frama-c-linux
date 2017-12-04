@@ -1,5 +1,21 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
-FRAMAC_SHARE/e-acsl/e_acsl.h:94:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/valid.c:33:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/valid.c:35:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/valid.c:37:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/valid.c:13:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/valid.c:19:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/valid.c:14:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/valid.c:39:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/valid.c:41:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/valid.c:44:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/valid.c:44:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/valid.c:45:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/valid.c:45:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/valid.c:45:[value] warning: function __e_acsl_assert: precondition got status unknown.
 tests/runtime/valid.c:47:[value] warning: accessing left-value that contains escaping addresses.
     assert ¬\dangling(&a);
+tests/runtime/valid.c:47:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/valid.c:48:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/valid.c:28:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/valid.c:28:[value] warning: function __e_acsl_assert: precondition got status unknown.

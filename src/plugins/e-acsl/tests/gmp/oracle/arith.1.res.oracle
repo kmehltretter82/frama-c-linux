@@ -18,14 +18,34 @@
 [value] using specification for function __gmpz_neg
 [value] using specification for function __gmpz_cmp
 [value] using specification for function __e_acsl_assert
-FRAMAC_SHARE/e-acsl/e_acsl.h:94:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/arith.i:10:[value] warning: function __e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_clear
+tests/gmp/arith.i:11:[value] warning: function __e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_com
+tests/gmp/arith.i:12:[value] warning: function __e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_add
+tests/gmp/arith.i:14:[value] warning: function __e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_sub
+tests/gmp/arith.i:15:[value] warning: function __e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_mul
+tests/gmp/arith.i:16:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/arith.i:17:[value] warning: function __e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_tdiv_q
 [value] using specification for function __gmpz_init_set_str
+tests/gmp/arith.i:18:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/arith.i:19:[value] warning: function __e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_tdiv_r
+tests/gmp/arith.i:20:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/arith.i:21:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/arith.i:23:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/arith.i:25:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/arith.i:26:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/arith.i:27:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/arith.i:28:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/arith.i:30:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/arith.i:31:[value] warning: function __e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_init_set_ui
+tests/gmp/arith.i:34:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/arith.i:34:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/arith.i:36:[value] warning: function __e_acsl_assert: precondition got status unknown.
 [value] done for function main

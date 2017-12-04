@@ -16,8 +16,11 @@
 [value] using specification for function __gmpz_init_set_si
 [value] using specification for function __gmpz_cmp
 [value] using specification for function __e_acsl_assert
-FRAMAC_SHARE/e-acsl/e_acsl.h:94:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/integer_constant.i:6:[value] warning: function __e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_clear
+tests/gmp/integer_constant.i:8:[value] warning: function __e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_init_set_ui
+tests/gmp/integer_constant.i:9:[value] warning: function __e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_init_set_str
+tests/gmp/integer_constant.i:11:[value] warning: function __e_acsl_assert: precondition got status unknown.
 [value] done for function main

@@ -84,6 +84,13 @@ void __e_acsl_globals_init(void)
   __e_acsl_full_init((void *)(& Str));
   __e_acsl_store_block((void *)(Strings),(size_t)32);
   __e_acsl_full_init((void *)(& Strings));
+  __e_acsl_temporal_store_nblock((void *)(Str),
+                                 (void *)__gen_e_acsl_literal_string_5);
+  __e_acsl_temporal_store_nblock((void *)(& Str[1]),
+                                 (void *)__gen_e_acsl_literal_string_6);
+  __e_acsl_temporal_store_nblock((void *)(& Str[2]),
+                                 (void *)__gen_e_acsl_literal_string_7);
+  __e_acsl_temporal_store_nblock((void *)(& Str[3]),(void *)0);
   __e_acsl_temporal_store_nblock((void *)(& Strings[0][0]),
                                  (void *)__gen_e_acsl_literal_string);
   __e_acsl_temporal_store_nblock((void *)(& Strings[0][1]),
@@ -92,13 +99,6 @@ void __e_acsl_globals_init(void)
                                  (void *)__gen_e_acsl_literal_string_3);
   __e_acsl_temporal_store_nblock((void *)(& Strings[1][1]),
                                  (void *)__gen_e_acsl_literal_string_4);
-  __e_acsl_temporal_store_nblock((void *)(Str),
-                                 (void *)__gen_e_acsl_literal_string_5);
-  __e_acsl_temporal_store_nblock((void *)(& Str[1]),
-                                 (void *)__gen_e_acsl_literal_string_6);
-  __e_acsl_temporal_store_nblock((void *)(& Str[2]),
-                                 (void *)__gen_e_acsl_literal_string_7);
-  __e_acsl_temporal_store_nblock((void *)(& Str[3]),(void *)0);
   return;
 }
 
