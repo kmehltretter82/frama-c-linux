@@ -30,12 +30,12 @@ struct ST _G[] = {
 };
 
 int main(int argc, char **argv) {
-    /*@ assert \valid(_A); */
+    /*@ assert \valid(&_A[0]); */
     /*@ assert \valid_read(_A[0]); */
     /*@ assert \valid_read(_A[1]); */
     /*@ assert \valid_read(_B); */
     /*@ assert \valid(&_C); */
-    /*@ assert \valid(_D); */
+    /*@ assert \valid(&_D[0]); */
     /*@ assert \valid(&_E); */
     /*@ assert \valid(&_F); */
     /*@ assert _E == 44; */

@@ -21,6 +21,6 @@ int main(void) {
   /*@ assert ! \freeable(p); */
 
   // test cases for BTS #1830
-  /*@ assert ! \freeable(array); */
+  /*@ assert ! \freeable(&(array[0])); */
   /*@ assert ! \freeable(&(array[5])); */
 }

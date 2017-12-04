@@ -10,10 +10,10 @@ int *PA;
 int main(void) {
   /* Global memory */
   PA = (int*)&A;
-  /*@ assert \base_addr(A) == \base_addr(PA); */
+  /*@ assert \base_addr(&A[0]) == \base_addr(PA); */
   /*@ assert \base_addr(A+3) == \base_addr(PA); */
   PA++;
-  /*@ assert \base_addr(PA) == \base_addr(A); */
+  /*@ assert \base_addr(PA) == \base_addr(&A[0]); */
   /*@ assert \base_addr(PA+2) == \base_addr(A+3); */
 
   /* Stack memory [long blocks] */
@@ -21,11 +21,11 @@ int main(void) {
   int *pa;
   pa = (int*)&a;
 
-  /*@ assert \base_addr(a) == \base_addr(pa); */
+  /*@ assert \base_addr(&a[0]) == \base_addr(pa); */
   /*@ assert \base_addr(a+3) == \base_addr(pa); */
   pa++;
-  /*@ assert \base_addr(pa) == \base_addr(a); */
-  /*@ assert \base_addr(pa+2) == \base_addr(a); */
+  /*@ assert \base_addr(pa) == \base_addr(&a[0]); */
+  /*@ assert \base_addr(pa+2) == \base_addr(&a[0]); */
 
   /* Stack memory [Short blocks] */
   long l = 4;
