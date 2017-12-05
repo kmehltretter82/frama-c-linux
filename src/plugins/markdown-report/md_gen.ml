@@ -602,9 +602,9 @@ let gen_report is_draft =
     else elements
   in
   let elements =
-   Raw "\\let\\underscore\\_" ::
-   Raw "\\renewcommand{\\_}{\\discretionary{\\underscore}{}{\\underscore}}" ::
-   elements
+   Raw [ "\\let\\underscore\\_" ;
+         "\\renewcommand{\\_}{\\discretionary{\\underscore}{}{\\underscore}}"]
+   :: elements
   in
   let doc = { title; authors; date; elements;} in
   try
@@ -621,7 +621,7 @@ let main () =
   if Mdr_params.Gen_draft.get () then begin
     if Mdr_params.Generate.get () then
       Mdr_params.warning
-        "-mdr-gen and -mdr-gen-draft can be activated at the \
+        "-mdr-gen and -mdr-gen-draft cannot be activated at the \
          same time. Only draft will be generated";
     gen_report true
   end

@@ -23,7 +23,9 @@ and block = block_element list
 
 and element =
   | Block of block
-  | Raw of string (** non-markdown element, printed as-is. *)
+  | Raw of string list
+   (** non-markdown. Each element of the list is printed as-is on its own line.
+       A blank line separates the [Raw] node from the next one. *)
   | Comment of string (** markdown comment, printed <!-- like this --> *)
   | H1 of text * string option (** optional label. *)
   | H2 of text * string option
@@ -169,7 +171,10 @@ and pp_quote fmt l =
 
 and pp_element fmt = function
   | Block b -> Format.fprintf fmt "@[<v>%a@]@\n" pp_block b
-  | Raw s -> Format.pp_print_string fmt s
+  | Raw l ->
+    Format.(
+      fprintf fmt "%a@\n"
+        (pp_print_list ~pp_sep:pp_force_newline pp_print_string) l)
   | Comment s ->
     Format.fprintf fmt
       "@[<hv>@[<hov 5><!-- %a@]@ -->@]@\n" Format.pp_print_text s

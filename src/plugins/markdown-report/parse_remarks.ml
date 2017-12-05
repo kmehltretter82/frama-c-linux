@@ -1,21 +1,21 @@
 type env =
   { mutable current_section: string;
     mutable is_markdown: bool;
-    current_markdown: Buffer.t;
+    mutable current_markdown: string list;
+    (* markdown lines of current element, in reverse order. *)
     mutable remarks: Markdown.element list Datatype.String.Map.t }
 
 let empty_env () =
   { current_section = "";
     is_markdown = false;
-    current_markdown = Buffer.create 40;
+    current_markdown = [];
     remarks = Datatype.String.Map.empty }
 
-let add_channel buf chan =
+let add_channel env chan =
   try
     while true do
       let s = input_line chan in
-      Buffer.add_string buf s;
-      Buffer.add_char buf '\n'
+      env.current_markdown <- s :: env.current_markdown;
     done;
   with End_of_file -> ()
 
@@ -33,20 +33,20 @@ let parse_line env line =
       env.remarks <-
         Datatype.String.Map.add
           env.current_section
-          [ Markdown.Raw (Buffer.contents env.current_markdown)]
-          env.remarks
+          [ Markdown.Raw (List.rev env.current_markdown)]
+          env.remarks;
+      env.current_markdown <- []
     end else if Str.string_match include_markdown line 0 then begin
       let f = Str.matched_group 1 line in
       try
         let chan = open_in f in
-        add_channel env.current_markdown chan;
+        add_channel env chan;
         close_in chan
       with Sys_error err ->
         Mdr_params.error
           "Unable to open included remarks file %s (%s), Ignoring." f err
     end else begin
-      Buffer.add_string env.current_markdown line;
-      Buffer.add_char env.current_markdown '\n'
+      env.current_markdown <- line :: env.current_markdown;
     end
   end else if Str.string_match beg_markdown line 0 then begin
     env.is_markdown <- true
