@@ -264,7 +264,7 @@ EACSL_LICENSE_FILES = \
   license/headache_config.txt license/LGPLv2.1
 
 EACSL_MISC_FILES = \
-  configure.ac Makefile.in INSTALL README VERSION .depend
+  configure.ac Makefile.in INSTALL README VERSION
 
 EACSL_SHARE_FILES = share/e-acsl/*.[ch] share/e-acsl/*/*.[ch]
 
@@ -281,7 +281,7 @@ PLUGIN_DISTRIB_EXTERNAL:=\
 EACSL_DISTRIB_FILES:= $(PLUGIN_DISTRIB_EXTERNAL) $(EACSL_OCAML_FILES)
 
 # BE CAREFUL: manually remove all *.ml* files which should not be released!
-e-acsl-distrib: .depend
+e-acsl-distrib:
 	$(PRINT_TAR) tmp-distrib
 	$(TAR) cf tmp.tar $(EACSL_DISTRIB_FILES)
 	$(PRINT_MAKING) export directories
