@@ -5,6 +5,8 @@ type env =
     (* markdown lines of current element, in reverse order. *)
     mutable remarks: Markdown.element list Datatype.String.Map.t }
 
+let dkey = Mdr_params.register_category "remarks"
+
 let empty_env () =
   { current_section = "";
     is_markdown = false;
@@ -30,14 +32,17 @@ let is_section = Str.regexp "^#[^{]{\\([^}]*\\)}"
 let parse_line env line =
   if env.is_markdown then begin
     if Str.string_match end_markdown line 0 then begin
+      let remark = Markdown.Raw (List.rev env.current_markdown) in
+      Mdr_params.debug ~dkey
+        "Remark for section %s:@\n%a"
+        env.current_section Markdown.pp_element remark;
       env.remarks <-
-        Datatype.String.Map.add
-          env.current_section
-          [ Markdown.Raw (List.rev env.current_markdown)]
-          env.remarks;
+        Datatype.String.Map.add env.current_section [remark] env.remarks;
       env.current_markdown <- []
     end else if Str.string_match include_markdown line 0 then begin
       let f = Str.matched_group 1 line in
+      Mdr_params.debug ~dkey
+        "Remark for section %s in file %s" env.current_section f;
       try
         let chan = open_in f in
         add_channel env chan;
@@ -49,9 +54,12 @@ let parse_line env line =
       env.current_markdown <- line :: env.current_markdown;
     end
   end else if Str.string_match beg_markdown line 0 then begin
+    Mdr_params.debug ~dkey
+      "Checking remarks for section %s" env.current_section;
     env.is_markdown <- true
   end else if Str.string_match is_section line 0 then begin
     let sec = Str.matched_group 1 line in
+    Mdr_params.debug ~dkey "Entering section %s" env.current_section;
     env.current_section <- sec
   end
 
@@ -67,6 +75,7 @@ let parse_remarks env chan =
     env
 
 let get_remarks f =
+  Mdr_params.debug ~dkey "Using remarks file %s" f;
   try
     let chan = open_in f in
     let { remarks } = parse_remarks (empty_env ()) chan in
