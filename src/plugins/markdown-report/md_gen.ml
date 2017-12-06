@@ -102,12 +102,15 @@ let section_stubs env =
          let kf = Globals.Functions.find_by_name s in
          let content =
            if env.is_draft then insert_marks
-             else
-               [ Block
-                   [ Text
-                       [Inline_code s; Plain "has the following specification"];
-                     codelines
-                       "acsl" Printer.pp_funspec (Annotations.funspec kf)]]
+           else begin
+             let comment = insert_remark env s in
+             Block
+               [ Text
+                   [Inline_code s; Plain "has the following specification"];
+                 codelines
+                   "acsl" Printer.pp_funspec (Annotations.funspec kf)]
+             :: comment
+           end
          in
          H4 ([Inline_code s], Some s) :: content)
       l
