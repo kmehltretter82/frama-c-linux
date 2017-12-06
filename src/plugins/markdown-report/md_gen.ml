@@ -415,7 +415,7 @@ let gen_section_warnings env =
             Text [
               Plain "Note that this does not take into account emitted alarms:";
               Plain "they are reported in";
-              Link (plain "in the next section", "#alarms")
+              Link (plain "the next section", "#alarms")
             ]
           ];
           make_warnings_table warnings
