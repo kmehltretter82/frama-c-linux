@@ -21,13 +21,13 @@ let add_channel env chan =
     done;
   with End_of_file -> ()
 
-let end_markdown = Str.regexp_string "<!-- BEGIN_REMARK -->"
+let beg_markdown = Str.regexp_string "<!-- BEGIN_REMARK -->"
 
-let beg_markdown = Str.regexp_string "<!-- END_REMARK -->"
+let end_markdown = Str.regexp_string "<!-- END_REMARK -->"
 
 let include_markdown = Str.regexp "<!-- INCLUDE \\(.*\\) -->"
 
-let is_section = Str.regexp "^#[^{]{\\([^}]*\\)}"
+let is_section = Str.regexp "^#[^{]*{#+\\([^}]*\\)}"
 
 let parse_line env line =
   if env.is_markdown then begin
@@ -38,7 +38,8 @@ let parse_line env line =
         env.current_section Markdown.pp_element remark;
       env.remarks <-
         Datatype.String.Map.add env.current_section [remark] env.remarks;
-      env.current_markdown <- []
+      env.current_markdown <- [];
+      env.is_markdown <- false
     end else if Str.string_match include_markdown line 0 then begin
       let f = Str.matched_group 1 line in
       Mdr_params.debug ~dkey
@@ -59,7 +60,7 @@ let parse_line env line =
     env.is_markdown <- true
   end else if Str.string_match is_section line 0 then begin
     let sec = Str.matched_group 1 line in
-    Mdr_params.debug ~dkey "Entering section %s" env.current_section;
+    Mdr_params.debug ~dkey "Entering section %s" sec;
     env.current_section <- sec
   end
 
