@@ -18,12 +18,18 @@ let empty_stats =
     total_stmts = 0;
     covered_stmts = 0 }
 
-type callee_info = { has_direct_call: bool; is_analyzed: bool; visited: bool; }
+type call_kind = No_call | Only_indirect | Direct
 
-let indirect_call =
-  { has_direct_call = false; is_analyzed = false; visited = false; }
+type callee_info = { call: call_kind;
+                     is_analyzed: bool;
+                     visited: bool; }
 
-let direct_call = { indirect_call with has_direct_call = true }
+let no_call =
+  { call = No_call; is_analyzed = false; visited = false; }
+
+let indirect_call = { no_call with call = Only_indirect }
+
+let direct_call = { indirect_call with call = Direct }
 
 let visit info = { info with visited = true; }
 
@@ -42,7 +48,7 @@ let is_analyzed_function vi =
 let is_analyzed_info vi info = {info with is_analyzed=is_analyzed_function vi; }
 
 
-class eva_coverage_vis = object(self)
+class eva_coverage_vis ~from_entry_point = object(self)
   inherit Visitor.frama_c_inplace
   val mutable stats = empty_stats
   val calls = Cil_datatype.Varinfo.Hashtbl.create 17
@@ -63,11 +69,12 @@ class eva_coverage_vis = object(self)
 
   method! vinst i =
     match i with
-    | Call(_, { enode = Lval (Var vi, NoOffset)},_,_) ->
+    | Call(_, { enode = Lval (Var vi, NoOffset)},_,_)
+    | Local_init(_,ConsInit (vi,_,_),_) ->
       if Cil_datatype.Varinfo.Hashtbl.mem calls vi then begin
         let info = Cil_datatype.Varinfo.Hashtbl.find calls vi in
         Cil_datatype.Varinfo.Hashtbl.replace
-          calls vi { info with has_direct_call = true }
+          calls vi { info with call = Direct }
       end else begin
         Cil_datatype.Varinfo.Hashtbl.add
           calls vi (is_analyzed_info vi direct_call)
@@ -82,6 +89,12 @@ class eva_coverage_vis = object(self)
         then begin
           Cil_datatype.Varinfo.Hashtbl.add
             calls vi (is_analyzed_info vi indirect_call)
+        end else begin
+          let info = Cil_datatype.Varinfo.Hashtbl.find calls vi in
+          if info.call = No_call then begin
+            Cil_datatype.Varinfo.Hashtbl.replace
+              calls vi { info with call = Only_indirect }
+          end
         end
       in
       Kernel_function.Hptset.iter handle_one kfs;
@@ -94,32 +107,62 @@ class eva_coverage_vis = object(self)
       Cil_datatype.Varinfo.Hashtbl.replace calls vi (visit info);
       if must_visit then begin
         let kf = Globals.Functions.get vi in
-        ignore (Visitor.visitFramacKf (self:>Visitor.frama_c_inplace) kf)
+        ignore (Visitor.visitFramacKf (self:>Visitor.frama_c_inplace) kf);
       end;
       reached && not must_visit
     in
     let check_fixpoint () =
       Cil_datatype.Varinfo.Hashtbl.fold treat_call calls true
     in
+    if not from_entry_point then begin
+      Globals.Functions.iter_on_fundecs
+        (fun { svar } ->
+             Cil_datatype.Varinfo.Hashtbl.add
+               calls svar (is_analyzed_info svar no_call))
+    end;
     let vi =
       Globals.Functions.get_vi
         (Globals.Functions.find_by_name (Kernel.MainFunction.get()))
     in
-    Cil_datatype.Varinfo.Hashtbl.add calls vi (is_analyzed_info vi direct_call);
+    Cil_datatype.Varinfo.Hashtbl.replace
+      calls vi (is_analyzed_info vi direct_call);
     while not (check_fixpoint ()) do () done;
     Cil_datatype.Varinfo.Hashtbl.fold
       (fun _ info stats ->
-         if info.has_direct_call then add_syntactic_call stats
-         else add_indirect_call stats)
+         match info.call with
+         | Direct -> add_syntactic_call stats
+         | Only_indirect -> add_indirect_call stats
+         | No_call -> stats
+      )
       calls
       stats
 
 end
 
+let nb_fundefs () =
+  Globals.Functions.fold
+    (fun kf nb ->
+       if Kernel_function.is_definition kf &&
+          is_analyzed_function (Kernel_function.get_vi kf)
+       then nb + 1 else nb) 0
+
 let md_gen () =
   let main = Kernel.MainFunction.get () in
   !Db.Value.compute ();
-  let vis = new eva_coverage_vis in
+  let vis = new eva_coverage_vis ~from_entry_point:false in
+  let stats = vis#compute () in
+  let summary_whole =
+    Markdown.plain_format
+      "There are %d function definitions that are not stubbed. They represent \
+       %d statements, of which %d are potentially reachable through EVA, \
+      resulting in a **statement coverage of %.1f%%** with respect to the \
+      entire application."
+      (nb_fundefs())
+       stats.total_stmts stats.covered_stmts
+      (float_of_int stats.covered_stmts *. 100. /.
+       float_of_int stats.total_stmts)
+  in
+  let vis = new eva_coverage_vis ~from_entry_point:true in
   let stats = vis#compute () in
   let summary =
     Markdown.plain_format
@@ -141,9 +184,9 @@ let md_gen () =
       "These functions contain %d statements, \
        of which %d are potentially reachable according to EVA, resulting in \
        a **statement coverage of %.1f%%** with respect to the perimeter set \
-       by syntactic calls."
+       by this entry point."
       stats.total_stmts stats.covered_stmts
       (float_of_int stats.covered_stmts *. 100. /.
        float_of_int stats.total_stmts)
   in
-  Markdown.([ Block [ Text summary ]])
+  Markdown.([ Block [Text summary_whole]; Block [Text summary ]])
