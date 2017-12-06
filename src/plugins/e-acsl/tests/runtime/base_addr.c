@@ -10,6 +10,7 @@ int *PA;
 int main(void) {
   /* Global memory */
   PA = (int*)&A;
+  /*@ assert \base_addr(&A[0]) == \base_addr(&A); */
   /*@ assert \base_addr(&A[0]) == \base_addr(PA); */
   /*@ assert \base_addr(A+3) == \base_addr(PA); */
   PA++;
@@ -21,6 +22,7 @@ int main(void) {
   int *pa;
   pa = (int*)&a;
 
+  /*@ assert \base_addr(&a[0]) == \base_addr(&a); */
   /*@ assert \base_addr(&a[0]) == \base_addr(pa); */
   /*@ assert \base_addr(a+3) == \base_addr(pa); */
   pa++;
