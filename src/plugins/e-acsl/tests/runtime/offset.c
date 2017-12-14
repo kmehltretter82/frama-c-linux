@@ -10,7 +10,7 @@ int *PA;
 int main(void) {
   /* Global memory */
   PA = (int*)&A;
-  /*@ assert \offset(A) == 0; */
+  /*@ assert \offset(&A[0]) == 0; */
   /*@ assert \offset(A+3) == 12; */
   /*@ assert \offset(PA) == 0; */
   PA++;
@@ -18,7 +18,7 @@ int main(void) {
 
   /* Stack memory [long blocks] */
   int a[] = { 1, 2, 3, 4};
-  /*@ assert \offset(a)   == 0; */
+  /*@ assert \offset(&a[0])   == 0; */
   /*@ assert \offset(a+1) == 4; */
   /*@ assert \offset(a+3) == 12; */
 

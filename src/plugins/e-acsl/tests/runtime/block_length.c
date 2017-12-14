@@ -17,7 +17,7 @@ int main(void) {
 
   /* Global memory */
   PA = (int*)&A;
-  /*@ assert \block_length(A) == sizeof(A); */
+  /*@ assert \block_length(&A[0]) == sizeof(A); */
   /*@ assert \block_length(A+3) == sizeof(A); */
   /*@ assert \block_length(PA) == sizeof(A); */
   PA++;
@@ -26,7 +26,7 @@ int main(void) {
   /* Stack memory [long blocks] */
   int a[] = { 1, 2, 3, 4};
   int *pa = (int*)&a;
-  /*@ assert \block_length(a) == sizeof(a); */
+  /*@ assert \block_length(&a[0]) == sizeof(a); */
   /*@ assert \block_length(a+3) == sizeof(a); */
   /*@ assert \block_length(pa) == sizeof(a); */
   pa++;
