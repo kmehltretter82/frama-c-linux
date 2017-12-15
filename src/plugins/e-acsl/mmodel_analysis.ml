@@ -710,7 +710,7 @@ and must_model_exp bhv ?kf ?stmt e = match e.enode with
     Options.fatal "[pre_analysis] unexpected expression %a" Exp.pretty e
 
 (* ************************************************************************** *)
-(** {Public API} {{{ *)
+(** {1 Public API} *)
 (* ************************************************************************** *)
 
 let must_model_vi ?bhv ?kf ?stmt vi =
