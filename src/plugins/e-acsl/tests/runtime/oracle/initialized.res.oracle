@@ -3,11 +3,11 @@
 FRAMAC_SHARE/e-acsl/e_acsl.h:94:[value] warning: function __e_acsl_assert: precondition got status unknown.
 tests/runtime/initialized.c:66:[value] warning: assertion got status unknown.
 tests/runtime/initialized.c:70:[value] warning: assertion got status unknown.
-FRAMAC_SHARE/libc/stdlib.h:358:[value] warning: function realloc: precondition got status unknown.
-FRAMAC_SHARE/libc/stdlib.h:373:[value] warning: function realloc, behavior dealloc: precondition got status unknown.
+FRAMAC_SHARE/libc/stdlib.h:368:[value] warning: function realloc: precondition got status unknown.
+FRAMAC_SHARE/libc/stdlib.h:383:[value] warning: function realloc, behavior dealloc: precondition got status unknown.
 tests/runtime/initialized.c:75:[value] warning: assertion got status unknown.
 tests/runtime/initialized.c:77:[value] warning: assertion got status unknown.
-FRAMAC_SHARE/libc/stdlib.h:345:[value] warning: function free, behavior deallocation: precondition 'freeable' got status unknown.
+FRAMAC_SHARE/libc/stdlib.h:355:[value] warning: function free, behavior deallocation: precondition 'freeable' got status unknown.
 tests/runtime/initialized.c:85:[value] warning: assertion got status unknown.
 tests/runtime/initialized.c:86:[value] warning: assertion got status unknown.
 tests/runtime/initialized.c:94:[value] warning: assertion got status unknown.
