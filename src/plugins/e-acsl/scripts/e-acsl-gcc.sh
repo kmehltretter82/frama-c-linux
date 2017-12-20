@@ -1,3 +1,4 @@
+#!/bin/sh -e
 ##########################################################################
 #                                                                        #
 #  This file is part of Frama-C.                                         #
@@ -19,8 +20,6 @@
 #  for more details (enclosed in the file licenses/LGPLv2.1).            #
 #                                                                        #
 ##########################################################################
-
-#!/bin/sh -e
 
 # Convenience wrapper for small runs of E-ACSL Frama-C plugin
 
