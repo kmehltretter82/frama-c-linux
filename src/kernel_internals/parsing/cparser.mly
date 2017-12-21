@@ -1030,6 +1030,11 @@ ghost_parameter_opt:
 |   ghost_parameter     { }
 ;
 
+(* For functions, the case where there is no parameter is treated in isolation,
+   because then we do not need the "lexer hack". Must we do the same here ?
+   It seems it does not make sense to add 0 ghost parameters, but with this
+   rule it is authorized by the grammar (but can be thrown afterwards by frama-c)
+*)
 ghost_parameter:
   LGHOST parameter_list_startscope rest_par_list RPAREN RGHOST { }
 ;
@@ -1230,10 +1235,10 @@ direct_decl: /* (* ISO 6.7.5 *) */
                                    { let (n, decl) = $1 in
                                      let (attrs, size) = $3 in
                                      (n, ARRAY(decl, attrs, size)) }
-|   direct_decl LPAREN RPAREN {
+|   direct_decl LPAREN RPAREN ghost_parameter_opt {
    let (n,decl) = $1 in (n, PROTO(decl,[],false))
   }
-|   direct_decl parameter_list_startscope rest_par_list RPAREN
+|   direct_decl parameter_list_startscope rest_par_list RPAREN ghost_parameter_opt
                                    { let (n, decl) = $1 in
                                      let (params, isva) = $3 in
                                      !Lexerhack.pop_context ();
