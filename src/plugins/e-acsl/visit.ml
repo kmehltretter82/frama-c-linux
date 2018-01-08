@@ -702,7 +702,10 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
                 ~global_clear:false
                 Env.Before
             in
-            let post_block = Cil.transient_block post_block in
+            let post_block =
+              if post_block.blocals = [] then Cil.transient_block post_block
+              else post_block
+            in
             Misc.mk_block prj new_stmt post_block, env
           end else
             stmt, env

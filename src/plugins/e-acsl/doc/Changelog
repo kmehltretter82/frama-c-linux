@@ -19,10 +19,12 @@
 #   configure	configure
 ###############################################################################
 
+-* E-ACSL       [2018/01/08] Fix a crash when translating a postcondition
+	        that should generate a local variable (bts #2339).
 -* e-acsl-gcc   [2017/11/28] Several files may be given to e-acsl-gcc.sh
                 (as specified).
 -* E-ACSL       [2017/11/27] Fix 'segmentation fault' of the generated monitor
-                whenever the main as a precondition depending on the memory
+                whenever the main has a precondition depending on the memory
                 model.
 -* E-ACSL       [2017/11/27] Restore behavior of option -e-acsl-valid broken
                 since Phosphorus (included).
