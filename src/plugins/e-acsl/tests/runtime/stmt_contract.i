@@ -9,7 +9,9 @@ int main(void) {
   x = 1;
   // several ensures
   /*@ ensures x == 2;
-    @ ensures y == 2; */
+    @ ensures y == 2;
+    @ ensures x == 2 && y == 2; // generate local variables: see BTS #2339
+    @*/
   x = 2;
   // one requires
   /*@ requires x == 2; */
