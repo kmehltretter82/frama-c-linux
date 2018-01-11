@@ -16,4 +16,12 @@ tests/bts/bts1307.i:11:[e-acsl] warning: E-ACSL construct `logic function applic
 tests/bts/bts1307.i:11:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
     Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-FRAMAC_SHARE/e-acsl/e_acsl.h:94:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/bts/bts1307.i:5:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/bts/bts1307.i:6:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/bts/bts1307.i:7:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/bts/bts1307.i:11:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/bts/bts1307.i:17:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/bts/bts1307.i:18:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/bts/bts1307.i:19:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/bts/bts1307.i:23:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/bts/bts1307.i:23:[value] warning: function __e_acsl_assert: precondition got status unknown.

@@ -1,17 +1,38 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
-FRAMAC_SHARE/e-acsl/e_acsl.h:94:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/initialized.c:19:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/initialized.c:20:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/initialized.c:31:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/initialized.c:33:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/initialized.c:35:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/initialized.c:40:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/initialized.c:41:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/initialized.c:51:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/initialized.c:54:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/initialized.c:58:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/initialized.c:59:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/initialized.c:60:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/initialized.c:61:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/initialized.c:62:[value] warning: function __e_acsl_assert: precondition got status unknown.
 tests/runtime/initialized.c:66:[value] warning: assertion got status unknown.
+tests/runtime/initialized.c:66:[value] warning: function __e_acsl_assert: precondition got status unknown.
 tests/runtime/initialized.c:70:[value] warning: assertion got status unknown.
-FRAMAC_SHARE/libc/stdlib.h:368:[value] warning: function realloc: precondition got status unknown.
-FRAMAC_SHARE/libc/stdlib.h:383:[value] warning: function realloc, behavior dealloc: precondition got status unknown.
+tests/runtime/initialized.c:70:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/initialized.c:74:[value] warning: function realloc: precondition got status unknown.
 tests/runtime/initialized.c:75:[value] warning: assertion got status unknown.
+tests/runtime/initialized.c:75:[value] warning: function __e_acsl_assert: precondition got status unknown.
 tests/runtime/initialized.c:77:[value] warning: assertion got status unknown.
-FRAMAC_SHARE/libc/stdlib.h:355:[value] warning: function free, behavior deallocation: precondition 'freeable' got status unknown.
+tests/runtime/initialized.c:77:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/initialized.c:83:[value] warning: function free: precondition 'freeable' got status unknown.
+tests/runtime/initialized.c:84:[value] warning: function free: precondition 'freeable' got status unknown.
 tests/runtime/initialized.c:85:[value] warning: assertion got status unknown.
+tests/runtime/initialized.c:85:[value] warning: function __e_acsl_assert: precondition got status unknown.
 tests/runtime/initialized.c:86:[value] warning: assertion got status unknown.
+tests/runtime/initialized.c:86:[value] warning: function __e_acsl_assert: precondition got status unknown.
 tests/runtime/initialized.c:94:[value] warning: assertion got status unknown.
+tests/runtime/initialized.c:94:[value] warning: function __e_acsl_assert: precondition got status unknown.
 tests/runtime/initialized.c:97:[value] warning: assertion got status unknown.
+tests/runtime/initialized.c:97:[value] warning: function __e_acsl_assert: precondition got status unknown.
 tests/runtime/initialized.c:108:[value] warning: out of bounds write. assert \valid(partsi + i);
 tests/runtime/initialized.c:106:[value] warning: out of bounds write. assert \valid(partsc + i);
 [scope:rm_asserts] removing 6 assertion(s)

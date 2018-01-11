@@ -1,9 +1,16 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
-FRAMAC_SHARE/e-acsl/e_acsl.h:94:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/block_valid.c:24:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/block_valid.c:26:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/block_valid.c:29:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/block_valid.c:31:[value] warning: function __e_acsl_assert: precondition got status unknown.
 tests/runtime/block_valid.c:39:[value] warning: pointer comparison. assert \pointer_comparable((void *)pmin, (void *)pmax);
 tests/runtime/block_valid.c:45:[value] warning: out of bounds write. assert \valid(pmin);
 tests/runtime/block_valid.c:46:[value] warning: out of bounds write. assert \valid(pmax);
+tests/runtime/block_valid.c:49:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/block_valid.c:50:[value] warning: function __e_acsl_assert: precondition got status unknown.
 tests/runtime/block_valid.c:52:[value] warning: assertion got status unknown.
+tests/runtime/block_valid.c:52:[value] warning: function __e_acsl_assert: precondition got status unknown.
 tests/runtime/block_valid.c:54:[value] warning: assertion got status unknown.
+tests/runtime/block_valid.c:54:[value] warning: function __e_acsl_assert: precondition got status unknown.
 [scope:rm_asserts] removing 2 assertion(s)

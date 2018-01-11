@@ -17,7 +17,7 @@
 [value] using specification for function __e_acsl_full_init
 [value] using specification for function __e_acsl_initialized
 [value] using specification for function __e_acsl_assert
-FRAMAC_SHARE/e-acsl/e_acsl.h:94:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/full-mmodel/addrOf.i:10:[value] warning: function __e_acsl_assert: precondition got status unknown.
 [value] using specification for function __e_acsl_delete_block
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main
