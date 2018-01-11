@@ -1,6 +1,6 @@
 /* run.config
    COMMENT: ghost code
-   STDOPT: +"-val-builtin malloc:Frama_C_malloc_fresh -val-builtin free:Frama_C_free"
+   STDOPT:
 */
 
 /*@ ghost int G = 0; */
