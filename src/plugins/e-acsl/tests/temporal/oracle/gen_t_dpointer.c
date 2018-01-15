@@ -25,7 +25,7 @@ int main(void)
     __e_acsl_initialize((void *)(p + i),sizeof(int *));
     /*@ assert Value: mem_access: \valid(p + i); */
     *(p + i) = (int *)malloc(sizeof(int));
-    /*@ assert Value: initialisation: \initialized(p + i); */
+    /*@ assert Value: initialization: \initialized(p + i); */
     __e_acsl_temporal_store_nblock((void *)(p + i),(void *)*(p + i));
     /*@ assert \valid(*(p + i)); */
     {
@@ -42,7 +42,7 @@ int main(void)
                                                       (void *)(& p));
         __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"main",
                         (char *)"mem_access: \\valid_read(p + i)",14);
-        /*@ assert Value: initialisation: \initialized(p + i); */
+        /*@ assert Value: initialization: \initialized(p + i); */
         __gen_e_acsl_valid_2 = __e_acsl_valid((void *)*(p + i),sizeof(int),
                                               (void *)*(p + i),
                                               (void *)(p + i));
@@ -57,7 +57,7 @@ int main(void)
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
   __e_acsl_temporal_save_nreferent_parameter((void *)(p + 2),0U);
-  /*@ assert Value: initialisation: \initialized(p + 2); */
+  /*@ assert Value: initialization: \initialized(p + 2); */
   /*@ assert Value: mem_access: \valid_read(p + 2); */
   free((void *)*(p + 2));
   __e_acsl_temporal_reset_parameters();

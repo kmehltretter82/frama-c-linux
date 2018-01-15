@@ -236,7 +236,7 @@ int main(void)
       else __gen_e_acsl_and_10 = 0;
       __e_acsl_assert(__gen_e_acsl_and_10,(char *)"RTE",(char *)"main",
                       (char *)"mem_access: \\valid_read(q)",44);
-      /*@ assert Value: initialisation: \initialized(q); */
+      /*@ assert Value: initialization: \initialized(q); */
       /*@ assert Value: mem_access: \valid_read(q); */
       __gen_e_acsl_valid_9 = __e_acsl_valid((void *)*q,sizeof(int),
                                             (void *)*q,(void *)q);
@@ -261,7 +261,7 @@ int main(void)
                                                       (void *)(& q));
       __e_acsl_assert(__gen_e_acsl_valid_read_4,(char *)"RTE",(char *)"main",
                       (char *)"mem_access: \\valid_read(q + 1)",45);
-      /*@ assert Value: initialisation: \initialized(q + 1); */
+      /*@ assert Value: initialization: \initialized(q + 1); */
       /*@ assert Value: mem_access: \valid_read(q + 1); */
       __gen_e_acsl_valid_10 = __e_acsl_valid((void *)*(q + 1),sizeof(int),
                                              (void *)*(q + 1),
