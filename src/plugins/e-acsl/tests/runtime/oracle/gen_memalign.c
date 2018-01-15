@@ -11,7 +11,7 @@ int main(int argc, char const **argv)
   __e_acsl_full_init((void *)(& memptr));
   int res2 =
     posix_memalign((void **)memptr,(unsigned long)256,(unsigned long)15);
-  /*@ assert Value: initialisation: \initialized(memptr); */
+  /*@ assert Value: initialization: \initialized(memptr); */
   /*@ assert Value: mem_access: \valid_read(memptr); */
   char *p = *memptr;
   __e_acsl_store_block((void *)(& p),(size_t)8);

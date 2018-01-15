@@ -460,7 +460,7 @@ int while_valid(void)
                                                         sizeof(int *));
       if (__gen_e_acsl_initialized_4) {
         int __gen_e_acsl_valid_4;
-        /*@ assert Value: initialisation: \initialized(&p); */
+        /*@ assert Value: initialization: \initialized(&p); */
         /*@ assert Value: dangling_pointer: ¬\dangling(&p); */
         __gen_e_acsl_valid_4 = __e_acsl_valid((void *)p,sizeof(int),
                                               (void *)p,(void *)(& p));
@@ -478,7 +478,7 @@ int while_valid(void)
                                                         sizeof(int *));
       if (__gen_e_acsl_initialized_5) {
         int __gen_e_acsl_valid_5;
-        /*@ assert Value: initialisation: \initialized(&q); */
+        /*@ assert Value: initialization: \initialized(&q); */
         /*@ assert Value: dangling_pointer: ¬\dangling(&q); */
         __gen_e_acsl_valid_5 = __e_acsl_valid((void *)q,sizeof(int),
                                               (void *)q,(void *)(& q));
