@@ -42,7 +42,7 @@ let plural l s =
 let get_eva_domains () =
   Extlib.filter_map
     (fun (x,_) -> Dynamic.Parameter.Bool.get x ())
-    (fun (x,y) -> ([Plain "option"; Inline_code x], plain y))
+    (fun (x,y) -> ([Plain "option"; Bold x], plain y))
     all_eva_domains
 
 let codelines lang pp code =
