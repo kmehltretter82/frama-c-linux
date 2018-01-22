@@ -36,6 +36,16 @@ let visit info = { info with visited = true; }
 let is_analyzed_function vi =
   not (Cil.hasAttribute "fc_stdlib" vi.vattr) &&
   not (Cil.hasAttribute "fc_stdlib_generated" vi.vattr) &&
+  Kernel_function.is_definition (Globals.Functions.get vi) &&
+  not (List.exists
+         (fun s ->
+            List.exists
+              (fun kf ->
+                 Cil_datatype.Varinfo.equal
+                   (Kernel_function.get_vi kf)
+                   vi)
+              (Globals.FileIndex.get_functions s))
+         (Mdr_params.Stubs.get())) &&
   not (List.mem vi.vname
          (String.split_on_char ','
             (Dynamic.Parameter.String.get "-val-use-spec" ()))) &&
@@ -124,16 +134,21 @@ class eva_coverage_vis ~from_entry_point = object(self)
       Globals.Functions.get_vi
         (Globals.Functions.find_by_name (Kernel.MainFunction.get()))
     in
+    (* main entry point might be a stub, but we still would like
+       to collect non-stubs calls from it.
+    *)
+    let info = is_analyzed_info vi direct_call in
     Cil_datatype.Varinfo.Hashtbl.replace
-      calls vi (is_analyzed_info vi direct_call);
+      calls vi { info with is_analyzed = true };
     while not (check_fixpoint ()) do () done;
     Cil_datatype.Varinfo.Hashtbl.fold
       (fun _ info stats ->
-         match info.call with
-         | Direct -> add_syntactic_call stats
-         | Only_indirect -> add_indirect_call stats
-         | No_call -> stats
-      )
+         if info.is_analyzed then begin
+           match info.call with
+           | Direct -> add_syntactic_call stats
+           | Only_indirect -> add_indirect_call stats
+           | No_call -> stats
+         end else stats)
       calls
       stats
 
