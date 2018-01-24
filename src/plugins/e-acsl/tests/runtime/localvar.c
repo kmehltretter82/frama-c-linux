@@ -1,6 +1,6 @@
 /* run.config
    COMMENT: allocation and de-allocation of local variables
-   STDOPT: +"-no-val-malloc-returns-null"
+   STDOPT: +"-no-val-alloc-returns-null"
 */
 
 #include <stdlib.h>

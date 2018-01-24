@@ -1,6 +1,6 @@
 /* run.config
    COMMENT: complex fields and indexes + potential RTE in \initialized
-   STDOPT: +"-no-val-malloc-returns-null"
+   STDOPT: +"-no-val-alloc-returns-null"
 */
 
 #include "stdlib.h"

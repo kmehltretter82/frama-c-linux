@@ -1,6 +1,6 @@
 /* run.config
    COMMENT: \valid
-   STDOPT: +"-no-val-malloc-returns-null"
+   STDOPT: +"-no-val-alloc-returns-null"
 */
 
 #include "stdlib.h"
