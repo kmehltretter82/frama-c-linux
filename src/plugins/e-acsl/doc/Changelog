@@ -19,6 +19,8 @@
 #   configure	configure
 ###############################################################################
 
+-* runtime      [2018/01/30] E-ACSL aborted when run on a machine with a
+	        low hard limit on the stack size.
 -* E-ACSL       [2018/01/08] Fix a crash when translating a postcondition
 	        that should generate a local variable (bts #2339).
 -* e-acsl-gcc   [2017/11/28] Several files may be given to e-acsl-gcc.sh
