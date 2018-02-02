@@ -83,7 +83,7 @@ let find_typedef : Format_typer.typdef_finder =
 let check_f_specification spec =
   (* Check the correctness of precision and field width fields *)
   check_cs_compatibility spec.f_conversion_specifier spec.f_capitalize
-    (spec.f_precision <> None) (spec.f_field_width <> None);
+    (spec.f_field_width <> None) (spec.f_precision <> None);
   (* Check the combination of conversion specifier and length modifier *)
   begin
     try ignore (Format_typer.type_f_specifier ~find_typedef spec)
@@ -102,7 +102,7 @@ let check_f_specification spec =
 let check_s_specification spec =
   (* Check the correctness of field width *)
   check_cs_compatibility spec.s_conversion_specifier false
-    false (spec.s_field_width <> None);
+    (spec.s_field_width <> None) false;
   (* Check the combination of conversion specifier and length modifier *)
   begin
     try ignore (Format_typer.type_s_specifier ~find_typedef spec)

@@ -13,6 +13,8 @@ int main(){
 
   wchar_t wc;
   scanf("%lc", &wc);
+
+  scanf("%1c", c);
 }
 
 #ifdef INCLUDE_STDINT

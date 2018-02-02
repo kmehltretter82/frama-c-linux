@@ -20,16 +20,19 @@
   Translating call to scanf to a call to the specialized version scanf_va_1.
 [variadic] scanf.c:15: 
   Translating call to scanf to a call to the specialized version scanf_va_2.
-[variadic] scanf.c:23: Warning: 
+[variadic] scanf.c:17: 
+  Translating call to scanf to a call to the specialized version scanf_va_3.
+[variadic] scanf.c:25: Warning: 
   Unable to find type intmax_t in the source code which should be used in this call:
   no specification will be generated.
   Note that due to cleanup, the type may have been defined in the original code but not used anywhere.
   Did you include <stdint.h> ?
-[variadic] scanf.c:23: 
+[variadic] scanf.c:25: 
   Fallback translation of call scanf to a call to the specialized version scanf_fallback_1.
 [eva] Analyzing a complete application starting at main
 [eva] using specification for function scanf_va_1
 [eva] using specification for function scanf_va_2
+[eva] using specification for function scanf_va_3
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   c[0] ∈ [--..--]
@@ -87,6 +90,23 @@ int scanf_va_1(char const * restrict format, char *param0, char *param1,
  */
 int scanf_va_2(char const * restrict format, wchar_t *param0);
 
+/*@ requires \valid(param0);
+    requires valid_read_string(format);
+    ensures \initialized(param0);
+    assigns \result, __fc_stdin->__fc_FILE_data, *param0;
+    assigns \result
+      \from (indirect: __fc_stdin->__fc_FILE_id),
+            (indirect: __fc_stdin->__fc_FILE_data),
+            (indirect: *(format + (0 ..)));
+    assigns __fc_stdin->__fc_FILE_data
+      \from (indirect: __fc_stdin->__fc_FILE_id), __fc_stdin->__fc_FILE_data,
+            (indirect: *(format + (0 ..)));
+    assigns *param0
+      \from (indirect: __fc_stdin->__fc_FILE_id), __fc_stdin->__fc_FILE_data,
+            (indirect: *(format + (0 ..)));
+ */
+int scanf_va_3(char const * restrict format, char *param0);
+
 int main(void)
 {
   int __retres;
@@ -95,6 +115,7 @@ int main(void)
   wchar_t wc;
   scanf("Hello %*10le %% %10s %[^]world] %d !",c,c,& i); /* scanf_va_1 */
   scanf("%lc",& wc); /* scanf_va_2 */
+  scanf("%1c",c); /* scanf_va_3 */
   __retres = 0;
   return __retres;
 }
