@@ -9,12 +9,6 @@ int main(void)
   __e_acsl_store_block((void *)(arr),(size_t)16);
   __e_acsl_full_init((void *)(& arr));
   int arr2[4] = {1, 2, 3, 4};
-  /*@ assert
-      Value: ptr_comparison:
-        \pointer_comparable((void *)((unsigned long)((unsigned long)(&arr) +
-                                                     sizeof(arr))),
-                           (void *)(&arr2));
-  */
   if (! ((unsigned long)(& arr) + sizeof(arr) == (unsigned long)(& arr2))) {
     __retres = 0;
     goto return_label;

@@ -32,7 +32,5 @@ tests/gmp/longlong.i:17:[value] warning: function __e_acsl_assert: precondition 
 [value] using specification for function __gmpz_get_si
 tests/gmp/longlong.i:17:[value] Assigning imprecise value to __gen_e_acsl__4.
     The imprecision originates from Library function
-tests/gmp/longlong.i:17:[value] warning: pointer comparison.
-    assert \pointer_comparable((void *)__gen_e_acsl__4, (void *)1);
 [value] using specification for function __gmpz_clear
 [value] done for function main

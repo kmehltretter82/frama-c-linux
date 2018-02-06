@@ -82,9 +82,6 @@ int main(int argc, char **argv)
   char *pmax = malloc(sizeof(int));
   __e_acsl_store_block((void *)(& pmax),(size_t)8);
   __e_acsl_full_init((void *)(& pmax));
-  /*@ assert
-      Value: ptr_comparison: \pointer_comparable((void *)pmin, (void *)pmax);
-  */
   if ((unsigned long)pmin > (unsigned long)pmax) {
     char *t = pmin;
     __e_acsl_store_block((void *)(& t),(size_t)8);
