@@ -39,8 +39,8 @@ void f(int *x, int *y)
     }
     __e_acsl_initialize((void *)x,sizeof(int));
     (*x) ++;
-    __e_acsl_assert(2 >= 1,(char *)"Postcondition",(char *)"f",
-                    (char *)"2 >= 1",28);
+    __e_acsl_assert(1,(char *)"Postcondition",(char *)"f",(char *)"2 >= 1",
+                    28);
   }
   {
     int i = 0;
@@ -55,8 +55,8 @@ void f(int *x, int *y)
       /*@ loop invariant 0 ≤ i ≤ 1; */
       while (i < 1) {
         /*@ assert 1 ≡ 1; */
-        __e_acsl_assert(1 == 1,(char *)"Assertion",(char *)"f",
-                        (char *)"1 == 1",33);
+        __e_acsl_assert(1,(char *)"Assertion",(char *)"f",(char *)"1 == 1",
+                        33);
         /*@ assert \valid(y); */
         {
           int __gen_e_acsl_valid;
@@ -196,7 +196,7 @@ void __gen_e_acsl_f(int *x, int *y)
     __e_acsl_assert(__gen_e_acsl_implies_2,(char *)"Postcondition",
                     (char *)"f",(char *)"\\old(*x == 0) ==> *\\old(x) == 1",
                     22);
-    __e_acsl_assert(*__gen_e_acsl_at_5 == __gen_e_acsl_at_6 + 1L,
+    __e_acsl_assert((long)*__gen_e_acsl_at_5 == __gen_e_acsl_at_6 + 1L,
                     (char *)"Postcondition",(char *)"f",
                     (char *)"*\\old(x) == \\old(*x) + 1",14);
     __e_acsl_delete_block((void *)(& y));

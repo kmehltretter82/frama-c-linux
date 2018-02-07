@@ -63,7 +63,7 @@ int __gen_e_acsl_main(int argc, char **argv)
     __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"main",
                     (char *)"mem_access: \\valid_read(argv + argc)",15);
     /*@ assert Value: mem_access: \valid_read(argv + argc); */
-    __e_acsl_assert(*(argv + argc) == (void *)0,(char *)"Assertion",
+    __e_acsl_assert(*(argv + argc) == (char *)0,(char *)"Assertion",
                     (char *)"main",(char *)"*(argv + argc) == \\null",15);
   }
   /*@ assert ¬\valid(*(argv + argc)); */
@@ -131,7 +131,7 @@ int __gen_e_acsl_main(int argc, char **argv)
         __gen_e_acsl_forall_2 = 1;
         __gen_e_acsl_k_2 = 0;
         while (1) {
-          if (__gen_e_acsl_k_2 <= len) ; else break;
+          if (__gen_e_acsl_k_2 <= (long)len) ; else break;
           {
             int __gen_e_acsl_valid_read_4;
             int __gen_e_acsl_valid_4;

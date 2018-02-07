@@ -66,22 +66,22 @@ int main(int argc, char const **argv)
   __e_acsl_full_init((void *)(& a));
   a = (char *)aligned_alloc((unsigned long)256,(unsigned long)12);
   /*@ assert a ≡ \null; */
-  __e_acsl_assert(a == (void *)0,(char *)"Assertion",(char *)"main",
+  __e_acsl_assert(a == (char *)0,(char *)"Assertion",(char *)"main",
                   (char *)"a == \\null",23);
   __e_acsl_full_init((void *)(& a));
   a = (char *)aligned_alloc((unsigned long)255,(unsigned long)512);
   /*@ assert a ≡ \null; */
-  __e_acsl_assert(a == (void *)0,(char *)"Assertion",(char *)"main",
+  __e_acsl_assert(a == (char *)0,(char *)"Assertion",(char *)"main",
                   (char *)"a == \\null",26);
   __e_acsl_full_init((void *)(& a));
   a = (char *)aligned_alloc((unsigned long)0,(unsigned long)512);
   /*@ assert a ≡ \null; */
-  __e_acsl_assert(a == (void *)0,(char *)"Assertion",(char *)"main",
+  __e_acsl_assert(a == (char *)0,(char *)"Assertion",(char *)"main",
                   (char *)"a == \\null",29);
   __e_acsl_full_init((void *)(& a));
   a = (char *)aligned_alloc((unsigned long)256,(unsigned long)512);
   /*@ assert a ≢ \null; */
-  __e_acsl_assert(a != (void *)0,(char *)"Assertion",(char *)"main",
+  __e_acsl_assert(a != (char *)0,(char *)"Assertion",(char *)"main",
                   (char *)"a != \\null",32);
   /*@ assert \valid(a); */
   {

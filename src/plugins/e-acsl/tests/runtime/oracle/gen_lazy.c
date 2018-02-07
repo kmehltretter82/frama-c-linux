@@ -17,7 +17,7 @@ int main(void)
   {
     int __gen_e_acsl_and_2;
     if (x != 0) {
-      __e_acsl_assert(0 != 0,(char *)"RTE",(char *)"main",
+      __e_acsl_assert(0,(char *)"RTE",(char *)"main",
                       (char *)"division_by_zero: 0 != 0",10);
       __gen_e_acsl_and_2 = y == 1 / 0;
     }
@@ -37,7 +37,7 @@ int main(void)
     int __gen_e_acsl_or_2;
     if (x == 0) __gen_e_acsl_or_2 = 1;
     else {
-      __e_acsl_assert(0 != 0,(char *)"RTE",(char *)"main",
+      __e_acsl_assert(0,(char *)"RTE",(char *)"main",
                       (char *)"division_by_zero: 0 != 0",12);
       __gen_e_acsl_or_2 = y == 1 / 0;
     }
@@ -57,7 +57,7 @@ int main(void)
     int __gen_e_acsl_implies_2;
     if (! (x == 1)) __gen_e_acsl_implies_2 = 1;
     else {
-      __e_acsl_assert(0 != 0,(char *)"RTE",(char *)"main",
+      __e_acsl_assert(0,(char *)"RTE",(char *)"main",
                       (char *)"division_by_zero: 0 != 0",14);
       __gen_e_acsl_implies_2 = y == 1 / 0;
     }

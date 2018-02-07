@@ -21,41 +21,34 @@ int main(void)
   __e_acsl_assert(s == s,(char *)"Assertion",(char *)"main",(char *)"s == s",
                   12);
   /*@ assert 5 < 18; */
-  __e_acsl_assert(5 < 18,(char *)"Assertion",(char *)"main",(char *)"5 < 18",
-                  15);
+  __e_acsl_assert(1,(char *)"Assertion",(char *)"main",(char *)"5 < 18",15);
   /*@ assert 32 > 3; */
-  __e_acsl_assert(32 > 3,(char *)"Assertion",(char *)"main",(char *)"32 > 3",
-                  16);
+  __e_acsl_assert(1,(char *)"Assertion",(char *)"main",(char *)"32 > 3",16);
   /*@ assert 12 ≤ 13; */
-  __e_acsl_assert(12 <= 13,(char *)"Assertion",(char *)"main",
-                  (char *)"12 <= 13",17);
+  __e_acsl_assert(1,(char *)"Assertion",(char *)"main",(char *)"12 <= 13",17);
   /*@ assert 123 ≥ 12; */
-  __e_acsl_assert(123 >= 12,(char *)"Assertion",(char *)"main",
-                  (char *)"123 >= 12",18);
+  __e_acsl_assert(1,(char *)"Assertion",(char *)"main",(char *)"123 >= 12",
+                  18);
   /*@ assert 0xff ≡ 0xff; */
-  __e_acsl_assert(255 == 255,(char *)"Assertion",(char *)"main",
+  __e_acsl_assert(1,(char *)"Assertion",(char *)"main",
                   (char *)"0xff == 0xff",19);
   /*@ assert 1 ≢ 2; */
-  __e_acsl_assert(1 != 2,(char *)"Assertion",(char *)"main",(char *)"1 != 2",
-                  20);
+  __e_acsl_assert(1,(char *)"Assertion",(char *)"main",(char *)"1 != 2",20);
   /*@ assert -5 < 18; */
-  __e_acsl_assert(-5 < 18,(char *)"Assertion",(char *)"main",
-                  (char *)"-5 < 18",22);
+  __e_acsl_assert(1,(char *)"Assertion",(char *)"main",(char *)"-5 < 18",22);
   /*@ assert 32 > -3; */
-  __e_acsl_assert(32 > -3,(char *)"Assertion",(char *)"main",
-                  (char *)"32 > -3",23);
+  __e_acsl_assert(1,(char *)"Assertion",(char *)"main",(char *)"32 > -3",23);
   /*@ assert -12 ≤ 13; */
-  __e_acsl_assert(-12 <= 13,(char *)"Assertion",(char *)"main",
-                  (char *)"-12 <= 13",24);
+  __e_acsl_assert(1,(char *)"Assertion",(char *)"main",(char *)"-12 <= 13",
+                  24);
   /*@ assert 123 ≥ -12; */
-  __e_acsl_assert(123 >= -12,(char *)"Assertion",(char *)"main",
-                  (char *)"123 >= -12",25);
+  __e_acsl_assert(1,(char *)"Assertion",(char *)"main",(char *)"123 >= -12",
+                  25);
   /*@ assert -0xff ≡ -0xff; */
-  __e_acsl_assert(-255 == -255,(char *)"Assertion",(char *)"main",
+  __e_acsl_assert(1,(char *)"Assertion",(char *)"main",
                   (char *)"-0xff == -0xff",26);
   /*@ assert 1 ≢ -2; */
-  __e_acsl_assert(1 != -2,(char *)"Assertion",(char *)"main",
-                  (char *)"1 != -2",27);
+  __e_acsl_assert(1,(char *)"Assertion",(char *)"main",(char *)"1 != -2",27);
   __retres = 0;
   return __retres;
 }

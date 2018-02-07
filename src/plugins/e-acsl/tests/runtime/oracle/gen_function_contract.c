@@ -219,7 +219,7 @@ void __gen_e_acsl_m(void)
                     (char *)"m",(char *)"\\old(X == 5 && Y == 2) ==> X == 7",
                     60);
     if (! __gen_e_acsl_at_3) __gen_e_acsl_implies_3 = 1;
-    else __gen_e_acsl_implies_3 = X == __gen_e_acsl_at_4 + Y;
+    else __gen_e_acsl_implies_3 = (long)X == __gen_e_acsl_at_4 + Y;
     __e_acsl_assert(__gen_e_acsl_implies_3,(char *)"Postcondition",
                     (char *)"m",
                     (char *)"\\old(X == 5 && Y == 2) ==> X == \\old(X) + Y",
@@ -288,14 +288,14 @@ void __gen_e_acsl_j(void)
 {
   __e_acsl_assert(X == 5,(char *)"Precondition",(char *)"j",(char *)"X == 5",
                   27);
-  __e_acsl_assert(X == 3L + Y,(char *)"Precondition",(char *)"j",
+  __e_acsl_assert((long)X == 3L + Y,(char *)"Precondition",(char *)"j",
                   (char *)"X == 3 + Y",30);
   __e_acsl_assert(Y == 2,(char *)"Precondition",(char *)"j",(char *)"Y == 2",
                   31);
   j();
   __e_acsl_assert(X == 3,(char *)"Postcondition",(char *)"j",
                   (char *)"X == 3",28);
-  __e_acsl_assert(X == Y + 1L,(char *)"Postcondition",(char *)"j",
+  __e_acsl_assert((long)X == Y + 1L,(char *)"Postcondition",(char *)"j",
                   (char *)"X == Y + 1",32);
   return;
 }

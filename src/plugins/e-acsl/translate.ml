@@ -545,7 +545,7 @@ and comparison_to_exp
     in
     Cil.new_exp ~loc (BinOp(bop, e, Cil.zero ~loc, Cil.intType)), env
   | Typing.C_type _ | Typing.Other ->
-    Cil.new_exp ~loc (BinOp(bop, e1, e2, Cil.intType)), env
+    Cil.mkBinOp ~loc bop e1 e2, env
 
 (* \base_addr, \block_length and \freeable annotations *)
 and mmodel_call ~loc kf name ctx env t =
