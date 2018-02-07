@@ -19,6 +19,10 @@
 #   configure	configure
 ###############################################################################
 
+-* E-ACSL       [2018/02/07] Fix incorrect typing in presence of
+	        comparison operators (may only be visible when directly
+	        analyzing the E-ACSL's generated code with Frama-C without
+	        pretty-printing it).
 -* runtime      [2018/01/30] E-ACSL aborted when run on a machine with a
 	        low hard limit on the stack size.
 -* E-ACSL       [2018/01/08] Fix a crash when translating a postcondition

@@ -156,7 +156,7 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
       __e_acsl_assert(__gen_e_acsl_valid_read_4,(char *)"RTE",(char *)"bar",
                       (char *)"mem_access: \\valid_read(__gen_e_acsl_at_3)",
                       23);
-      __gen_e_acsl_and = *__gen_e_acsl_at_3 < 0.85 * *__gen_e_acsl_at_4;
+      __gen_e_acsl_and = (long double)*__gen_e_acsl_at_3 < 0.85 * *__gen_e_acsl_at_4;
     }
     else __gen_e_acsl_and = 0;
     if (__gen_e_acsl_and) {
@@ -168,7 +168,7 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
       __e_acsl_assert(__gen_e_acsl_valid_read_5,(char *)"RTE",(char *)"bar",
                       (char *)"mem_access: \\valid_read(__gen_e_acsl_at_5)",
                       23);
-      __gen_e_acsl_if = *__gen_e_acsl_at_5 != 0.;
+      __gen_e_acsl_if = (long double)*__gen_e_acsl_at_5 != 0.;
     }
     else {
       int __gen_e_acsl_valid_read_6;
@@ -254,9 +254,9 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
                                                     (void *)(& __gen_e_acsl_at));
     __e_acsl_assert(__gen_e_acsl_valid_read_3,(char *)"RTE",(char *)"foo",
                     (char *)"mem_access: \\valid_read(__gen_e_acsl_at)",11);
-    __e_acsl_assert(*__gen_e_acsl_at == *__gen_e_acsl_at_2 + ((long double)5 - 
-                                                              ((long double)(
-                                                               5 / 80) * *__gen_e_acsl_at_3) * 0.4),
+    __e_acsl_assert((long double)*__gen_e_acsl_at == *__gen_e_acsl_at_2 + (
+                                                     (long double)5 - 
+                                                     ((long double)0 * *__gen_e_acsl_at_3) * 0.4),
                     (char *)"Postcondition",(char *)"foo",
                     (char *)"*\\old(Mtmax_out) == *\\old(Mtmax_in) + (5 - ((5 / 80) * *\\old(Mwmax)) * 0.4)",
                     11);

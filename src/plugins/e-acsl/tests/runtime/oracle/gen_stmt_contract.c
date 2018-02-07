@@ -53,14 +53,14 @@ int main(void)
   {
     __e_acsl_assert(x == 5,(char *)"Precondition",(char *)"main",
                     (char *)"x == 5",25);
-    __e_acsl_assert(x == 3L + y,(char *)"Precondition",(char *)"main",
+    __e_acsl_assert((long)x == 3L + y,(char *)"Precondition",(char *)"main",
                     (char *)"x == 3 + y",28);
     __e_acsl_assert(y == 2,(char *)"Precondition",(char *)"main",
                     (char *)"y == 2",29);
     x = 3;
     __e_acsl_assert(x == 3,(char *)"Postcondition",(char *)"main",
                     (char *)"x == 3",26);
-    __e_acsl_assert(x == y + 1L,(char *)"Postcondition",(char *)"main",
+    __e_acsl_assert((long)x == y + 1L,(char *)"Postcondition",(char *)"main",
                     (char *)"x == y + 1",30);
   }
   /*@ behavior b1:

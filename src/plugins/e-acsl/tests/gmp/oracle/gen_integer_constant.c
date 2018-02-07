@@ -6,16 +6,13 @@ int main(void)
   int x;
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   /*@ assert 0 ≡ 0; */
-  __e_acsl_assert(0 == 0,(char *)"Assertion",(char *)"main",(char *)"0 == 0",
-                  6);
+  __e_acsl_assert(1,(char *)"Assertion",(char *)"main",(char *)"0 == 0",6);
   x = 0;
   x ++;
   /*@ assert 0 ≢ 1; */
-  __e_acsl_assert(0 != 1,(char *)"Assertion",(char *)"main",(char *)"0 != 1",
-                  8);
+  __e_acsl_assert(1,(char *)"Assertion",(char *)"main",(char *)"0 != 1",8);
   /*@ assert 1152921504606846975 ≡ 0xfffffffffffffff; */
-  __e_acsl_assert(1152921504606846975UL == 1152921504606846975UL,
-                  (char *)"Assertion",(char *)"main",
+  __e_acsl_assert(1,(char *)"Assertion",(char *)"main",
                   (char *)"1152921504606846975 == 0xfffffffffffffff",9);
   /*@ assert
       0xffffffffffffffffffffffffffffffff ≡

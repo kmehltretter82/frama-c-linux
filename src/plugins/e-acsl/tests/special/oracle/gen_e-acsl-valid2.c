@@ -39,8 +39,8 @@ void f(int *x, int *y)
     }
     __e_acsl_initialize((void *)x,sizeof(int));
     (*x) ++;
-    __e_acsl_assert(2 >= 1,(char *)"Postcondition",(char *)"f",
-                    (char *)"2 >= 1",28);
+    __e_acsl_assert(1,(char *)"Postcondition",(char *)"f",(char *)"2 >= 1",
+                    28);
   }
   {
     int i = 0;
