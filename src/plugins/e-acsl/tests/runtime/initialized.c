@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"-no-val-builtins-auto"
+   STDOPT:
    COMMENT: Behaviours of the \initialized E-ACSL predicate
 */
 
