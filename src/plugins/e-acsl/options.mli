@@ -38,10 +38,10 @@ val parameter_states: State.t list
 
 val must_visit: unit -> bool
 
-val dkey_analysis: Log.category
-val dkey_dup: Log.category
-val dkey_translation: Log.category
-val dkey_typing: Log.category
+val dkey_analysis: category
+val dkey_dup: category
+val dkey_translation: category
+val dkey_typing: category
 
 (*
 Local Variables:
