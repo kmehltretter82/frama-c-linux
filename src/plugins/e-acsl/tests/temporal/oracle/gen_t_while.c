@@ -58,6 +58,7 @@ int main(void)
                     (char *)"!\\valid(q)",36);
   }
   __e_acsl_initialize((void *)q,sizeof(int));
+  /*@ assert Value: mem_access: \valid(q); */
   *q = 1;
   __retres = 0;
   return_label: __e_acsl_store_block_duplicate((void *)(& q),(size_t)8);
