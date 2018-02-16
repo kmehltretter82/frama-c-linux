@@ -480,10 +480,12 @@ and context_insensitive_term_to_exp kf env t =
     mmodel_call ~loc kf "base_addr" Cil.voidPtrType env t
   | Tbase_addr _ -> not_yet env "labeled \\base_addr"
   | Toffset(BuiltinLabel Here, t) ->
-    mmodel_call ~loc kf "offset" Cil.intType env t
+    let size_t = Cil.theMachine.Cil.typeOfSizeOf in
+    mmodel_call ~loc kf "offset" size_t env t
   | Toffset _ -> not_yet env "labeled \\offset"
   | Tblock_length(BuiltinLabel Here, t) ->
-    mmodel_call ~loc kf "block_length" Cil.ulongType env t
+    let size_t = Cil.theMachine.Cil.typeOfSizeOf in
+    mmodel_call ~loc kf "block_length" size_t env t
   | Tblock_length _ -> not_yet env "labeled \\block_length"
   | Tnull -> Cil.mkCast (Cil.zero ~loc) (TPtr(TVoid [], [])), env, false, "null"
   | TCoerce _ -> Error.untypable "coercion" (* Jessie specific *)

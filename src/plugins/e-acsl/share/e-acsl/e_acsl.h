@@ -262,12 +262,9 @@ size_t block_length(void * ptr)
  *
  * Return the byte offset of address given by \p ptr within a memory blocks
  * it belongs to */
-/* FIXME: The return type of offset should be changed to size_t.
- * In the current E-ACSL/Frama-C implementation, however, this change
- * leads to a Frama-C failure. */
 /*@ ensures \result == \offset(ptr);
   @ assigns \result \from ptr; */
-int offset(void * ptr)
+size_t offset(void * ptr)
   __attribute__((FC_BUILTIN));
 
 /*! \brief Implementation of the \b \\initialized predicate of E-ACSL.

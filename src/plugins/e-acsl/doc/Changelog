@@ -19,6 +19,7 @@
 #   configure	configure
 ###############################################################################
 
+-* runtime      [2018/02/16] Function __e_acsl_offset now returns size_t.
 -* E-ACSL       [2018/02/07] Fix incorrect typing in presence of
 	        comparison operators (may only be visible when directly
 	        analyzing the E-ACSL's generated code with Frama-C without

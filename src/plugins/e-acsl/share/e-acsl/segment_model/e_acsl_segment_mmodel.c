@@ -123,7 +123,7 @@ size_t block_length(void * ptr) {
   return 0;
 }
 
-int offset(void *ptr) {
+size_t offset(void *ptr) {
   TRY_SEGMENT(ptr,
     return heap_info((uintptr_t)ptr, 'O'),
     return static_info((uintptr_t)ptr, 'O'));
