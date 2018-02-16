@@ -417,24 +417,24 @@ tests/format/printf.c:179:[kernel] warning: Neither code nor specification for f
 [value] using specification for function __e_acsl_builtin_printf
 [value] using specification for function exit
 [value] using specification for function waitpid
-tests/format/printf.c:179:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status);
+tests/format/printf.c:179:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status);
 [value] using specification for function __e_acsl_delete_block
-tests/format/printf.c:182:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_0);
-tests/format/printf.c:185:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_1);
-tests/format/printf.c:188:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_2);
+tests/format/printf.c:182:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_0);
+tests/format/printf.c:185:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_1);
+tests/format/printf.c:188:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_2);
 [value] using specification for function __e_acsl_initialize
-tests/format/printf.c:193:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_3);
-tests/format/printf.c:196:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_4);
-tests/format/printf.c:198:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_5);
-tests/format/printf.c:200:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_6);
-tests/format/printf.c:203:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_7);
-tests/format/printf.c:205:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_8);
+tests/format/printf.c:193:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_3);
+tests/format/printf.c:196:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_4);
+tests/format/printf.c:198:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_5);
+tests/format/printf.c:200:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_6);
+tests/format/printf.c:203:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_7);
+tests/format/printf.c:205:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_8);
 [value] using specification for function __gmpz_init_set_si
 [value] using specification for function __gmpz_init_set_ui
 [value] using specification for function __gmpz_cmp
 [value] using specification for function __gmpz_clear
 [value] using specification for function __e_acsl_assert
-tests/format/printf.c:50:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/format/printf.c:50:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
 [value] using specification for function __builtin_alloca
-tests/format/printf.c:51:[value] warning: function __gen_e_acsl_strcpy: precondition 'room_string' got status invalid.
+tests/format/printf.c:51:[value:alarm] warning: function __gen_e_acsl_strcpy: precondition 'room_string' got status invalid.
 [value] done for function main

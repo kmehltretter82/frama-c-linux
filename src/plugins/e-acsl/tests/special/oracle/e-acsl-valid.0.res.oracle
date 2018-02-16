@@ -1,5 +1,5 @@
-tests/special/e-acsl-valid.c:39:[value] warning: function f: precondition \valid(y) got status unknown.
-tests/special/e-acsl-valid.c:19:[value] warning: function f, behavior b1: postcondition got status invalid. (Behavior may be inactive, no reduction performed.)
+tests/special/e-acsl-valid.c:39:[value:alarm] warning: function f: precondition \valid(y) got status unknown.
+tests/special/e-acsl-valid.c:19:[value:alarm] warning: function f, behavior b1: postcondition got status invalid. (Behavior may be inactive, no reduction performed.)
 [e-acsl] beginning translation.
 tests/special/e-acsl-valid.c:27:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
     Ignoring annotation.

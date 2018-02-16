@@ -17,6 +17,6 @@
 [value] using specification for function __e_acsl_assert
 [value] using specification for function __gmpz_init_set_str
 [value] using specification for function __gmpz_cmp
-tests/gmp/integer_constant.i:11:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/integer_constant.i:11:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_clear
 [value] done for function main

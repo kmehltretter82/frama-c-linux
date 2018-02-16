@@ -1,11 +1,11 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
-tests/runtime/block_valid.c:45:[value] warning: out of bounds write. assert \valid(pmin);
-tests/runtime/block_valid.c:46:[value] warning: out of bounds write. assert \valid(pmax);
-tests/runtime/block_valid.c:49:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/block_valid.c:50:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/block_valid.c:52:[value] warning: assertion got status unknown.
-tests/runtime/block_valid.c:52:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/block_valid.c:54:[value] warning: assertion got status unknown.
-tests/runtime/block_valid.c:54:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/block_valid.c:45:[value:alarm] warning: out of bounds write. assert \valid(pmin);
+tests/runtime/block_valid.c:46:[value:alarm] warning: out of bounds write. assert \valid(pmax);
+tests/runtime/block_valid.c:49:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/block_valid.c:50:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/block_valid.c:52:[value:alarm] warning: assertion got status unknown.
+tests/runtime/block_valid.c:52:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
+tests/runtime/block_valid.c:54:[value:alarm] warning: assertion got status unknown.
+tests/runtime/block_valid.c:54:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
 [scope:rm_asserts] removing 2 assertion(s)
