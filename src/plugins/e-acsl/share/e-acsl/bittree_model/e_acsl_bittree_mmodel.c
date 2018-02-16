@@ -270,7 +270,7 @@ void* base_addr(void* ptr) {
 }
 
 /* return the offset of `ptr` within its block */
-int offset(void* ptr) {
+size_t offset(void* ptr) {
   bt_block * tmp = bt_find(ptr);
   vassert(tmp != NULL, "\\offset of unallocated memory", NULL);
   return ((uintptr_t)ptr - tmp->ptr);
