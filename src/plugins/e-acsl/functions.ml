@@ -23,8 +23,9 @@
 open Cil_types
 
 (* ************************************************************************** *)
-(* Misc functions {{{ *)
+(* Misc functions *)
 (* ************************************************************************** *)
+
 (* return true if the string s starts with prefix p and false otherwise *)
 let startswith p s =
   let lp = String.length p in
@@ -42,23 +43,21 @@ let strip_prefix p s =
   else
     s
 
-let get_fname_exp = function
-  | { enode = Lval(Var(vi), _) } -> vi.vname
-  | _ -> ""
-
-let is_fn f exp = f (get_fname_exp exp)
-
 (* True if a named function has a definition and false otherwise *)
-let has_fundef exp =
-  let recognize fname =
-    try let _ = Globals.Functions.find_def_by_name fname in true
-    with Not_found -> false
-  in
-  is_fn recognize exp
-(* }}} *)
+let has_fundef exp = match exp.enode with
+  | Lval(Var vi, _) ->
+    let kf =
+      try Globals.Functions.get vi
+      with Not_found -> Options.fatal "[has_fundef] not a function"
+    in
+    Kernel_function.is_definition kf
+  | Lval _ (* function pointer *) ->
+    false
+  | _ ->
+    Options.fatal "[has_fundef] not a left-value: '%a'" Printer.pp_exp exp
 
 (* ************************************************************************** *)
-(* RTL functions {{{ *)
+(* RTL functions *)
 (* ************************************************************************** *)
 
 module RTL: sig
@@ -116,10 +115,9 @@ end = struct
     | "strncmp" | "memcpy"  | "memset" | "memcmp" | "memmove" -> true
     | _ -> false
 end
-(* }}} *)
 
 (* ************************************************************************** *)
-(* Libc functions {{{ *)
+(* Libc functions *)
 (* ************************************************************************** *)
 
 module Libc: sig
@@ -143,36 +141,33 @@ module Libc: sig
   val get_printf_argument_str: loc:location -> string -> exp list -> exp
   val actual_alloca: string
 end = struct
+
   let is_dyn_alloc_name name =
     name = "malloc" || name = "realloc" || name = "calloc"
 
   let is_dyn_free_name name = name = "free" || name = "cfree"
 
   let is_vla_alloc_name name = name = "__fc_vla_alloc"
-
   let is_vla_free_name name = name = "__fc_vla_free"
 
-  let is_alloca_name name = name = "alloca" || name = "__builtin_alloca"
-
   let actual_alloca = "__builtin_alloca"
+  let is_alloca_name name = name = "alloca" || name = actual_alloca
 
   let is_memcpy_name name = name = "memcpy"
-
   let is_memset_name name = name = "memset"
 
-  let is_dyn_alloc exp = is_fn is_dyn_alloc_name exp
+  let apply_fn f exp = match exp.enode with
+    | Lval(Var vi, _) -> f vi.vname
+    | Lval _  (* function pointer *) -> false
+    | _ -> Options.fatal "[Functions.Rtl.apply_fn] not a left-value"
 
-  let is_dyn_free exp = is_fn is_dyn_free_name exp
-
-  let is_vla_alloc exp = is_fn is_vla_alloc_name exp
-
-  let is_vla_free exp = is_fn is_vla_free_name exp
-
-  let is_alloca exp = is_fn is_alloca_name exp
-
-  let is_memcpy exp = is_fn is_memcpy_name exp
-
-  let is_memset exp = is_fn is_memset_name exp
+  let is_dyn_alloc exp = apply_fn is_dyn_alloc_name exp
+  let is_dyn_free exp = apply_fn is_dyn_free_name exp
+  let is_vla_alloc exp = apply_fn is_vla_alloc_name exp
+  let is_vla_free exp = apply_fn is_vla_free_name exp
+  let is_alloca exp = apply_fn is_alloca_name exp
+  let is_memcpy exp = apply_fn is_memcpy_name exp
+  let is_memset exp = apply_fn is_memset_name exp
 
   let printf_fmt_position = function
     | "printf" -> 1
@@ -181,8 +176,7 @@ end = struct
     | _ -> 0
 
   let is_printf_name name = printf_fmt_position name <> 0
-
-  let is_printf exp = is_fn is_printf_name exp
+  let is_printf exp = apply_fn is_printf_name exp
 
   let get_printf_argument_str ~loc fn args =
     assert (is_printf_name fn);
@@ -200,7 +194,8 @@ end = struct
       | IULong -> "L" (* [unsigned long] *)
       | ILongLong -> "r" (* [long long] *)
       | IULongLong -> "R" (* [unsigned long long] *)
-      (* _Bool, char and short (either signed or unsigned are promoted to int) *)
+      (* _Bool, char and short (either signed or unsigned are promoted to
+         int) *)
       | IBool | IChar | ISChar | IUChar | IShort | IUShort -> "d"
     in
     (* get a character representing an floating point type *)
@@ -241,4 +236,3 @@ end = struct
       exps
     in Cil.mkString ~loc param_str
 end
-(* }}} *)

@@ -317,15 +317,18 @@ end = struct
 
   (* Update local environment with a statement tracking temporal metadata
      associated with memcpy/memset call *)
-  let call_memxxx current_stmt loc args fname env =
-    if Libc.is_memcpy fname || Libc.is_memset fname then
-      let name = Functions.get_fname_exp fname in
+  let call_memxxx current_stmt loc args fexp env =
+    if Libc.is_memcpy fexp || Libc.is_memset fexp then
+      let name = match fexp.enode with
+        | Lval(Var vi, _) -> vi.vname
+        | _ -> Options.fatal "[Temporal.call_memxxx] not a left-value"
+      in
       let stmt = Misc.mk_call ~loc (RTL.mk_temporal_name name) args in
       Env.add_stmt ~before:current_stmt ~post:false env stmt
     else
       env
 
-  let instr current_stmt ret fname args loc env =
+  let instr current_stmt ret fexp args loc env =
     (* Add function calls to reset_parameters and reset_return before each
        function call regardless. They are not really required, as if the
        instrumentation is correct then the right parameters will be saved
@@ -340,15 +343,15 @@ end = struct
     let env = Env.add_stmt ~before:current_stmt ~post:false env stmt in
     (* Push parameters with either a call to a function pointer or a function
         definition otherwise there is no point. *)
-    let has_def = Functions.has_fundef fname in
+    let has_def = Functions.has_fundef fexp in
     let env =
-      if Cil.isFunctionType (Cil.typeOf fname) || has_def then
+      if Cil.isFunctionType (Cil.typeOf fexp) || has_def then
         save_params current_stmt loc args env
       else
         env
     in
     (* Handle special cases of memcpy/memset *)
-    let env = call_memxxx current_stmt loc args fname env in
+    let env = call_memxxx current_stmt loc args fexp env in
     (* Memory allocating functions have no definitions so below expression
        should capture them *)
     let alloc = not has_def in
@@ -386,10 +389,10 @@ end = struct
       match li with
       | AssignInit init ->
         handle_init current_stmt NoOffset loc vi init env
-      | ConsInit(fname, args, _) ->
+      | ConsInit(fexp, args, _) ->
         let ret = Some (Cil.var vi) in
-        let fname = Cil.evar ~loc fname in
-        Function_call.instr current_stmt ret fname args loc env
+        let fexp = Cil.evar ~loc fexp in
+        Function_call.instr current_stmt ret fexp args loc env
     else env
 end
 (* }}} *)
@@ -446,8 +449,8 @@ let handle_return_stmt loc ret env =
 let handle_instruction current_stmt instr env =
   match instr with
   | Set(lv, exp, loc) -> set_instr current_stmt loc lv exp env
-  | Call(ret, fname, args, loc) ->
-    Function_call.instr current_stmt ret fname args loc env
+  | Call(ret, fexp, args, loc) ->
+    Function_call.instr current_stmt ret fexp args loc env
   | Local_init(vi, li, loc) -> Local_init.instr current_stmt vi li loc env
   | Asm _ -> Options.warning ~once:true ~current:true "@[Analysis is\
 potentially incorrect in presence of assembly code.@]"; env
