@@ -60,18 +60,7 @@ let has_fundef exp = match exp.enode with
 (* RTL functions *)
 (* ************************************************************************** *)
 
-module RTL: sig
-  val mk_api_name: string -> string
-  val mk_temporal_name: string -> string
-  val mk_gen_name: string -> string
-  val is_generated_name: string -> bool
-  val is_rtl_name: string -> bool
-  val is_generated_literal_string_name: string -> bool
-  val is_generated_kf: kernel_function -> bool
-  val get_original_name: kernel_function -> string
-  val get_rtl_replacement_name: string -> string
-  val has_rtl_replacement: string -> bool
-end = struct
+module RTL = struct
 
   (* prefix of all functions/variables from the public E-ACSL API *)
   let e_acsl_api_prefix = "__e_acsl_"
@@ -114,33 +103,14 @@ end = struct
     | "strcpy"  | "strncpy" | "strlen" | "strcat" | "strncat" | "strcmp"
     | "strncmp" | "memcpy"  | "memset" | "memcmp" | "memmove" -> true
     | _ -> false
+
 end
 
 (* ************************************************************************** *)
 (* Libc functions *)
 (* ************************************************************************** *)
 
-module Libc: sig
-  val is_memcpy: exp -> bool
-  val is_memcpy_name: string -> bool
-  val is_memset: exp -> bool
-  val is_memset_name: string -> bool
-  val is_dyn_alloc: exp -> bool
-  val is_dyn_alloc_name: string -> bool
-  val is_dyn_free: exp -> bool
-  val is_dyn_free_name: string -> bool
-  val is_vla_free: exp -> bool
-  val is_vla_free_name: string -> bool
-  val is_vla_alloc: exp -> bool
-  val is_vla_alloc_name: string -> bool
-  val is_alloca: exp -> bool
-  val is_alloca_name: string -> bool
-  val is_printf: exp -> bool
-  val is_printf_name: string -> bool
-  val printf_fmt_position: string -> int
-  val get_printf_argument_str: loc:location -> string -> exp list -> exp
-  val actual_alloca: string
-end = struct
+module Libc = struct
 
   let is_dyn_alloc_name name =
     name = "malloc" || name = "realloc" || name = "calloc"
@@ -183,8 +153,11 @@ end = struct
     (* drop first n elements from a list *)
     let rec drop n l =
       assert (n >= 0);
-      if n > 0 then drop (n-1) (match l with _::e -> e | [] -> [])
-      else l
+      if n > 0 then
+        let l = match l with _ :: e -> e | [] -> [] in
+        drop (n-1) l
+      else
+        l
     in
     (* get a character representing an integer type *)
     let get_ikind_str = function
@@ -198,12 +171,12 @@ end = struct
          int) *)
       | IBool | IChar | ISChar | IUChar | IShort | IUShort -> "d"
     in
-    (* get a character representing an floating point type *)
+    (* get a character representing a floating point type *)
     let get_fkind_str = function
       (* Format-based functions expect only double-precision floats.
          Single-precision floating points are promoted to doubles so
          this case should never happen in fact. *)
-      | FFloat -> "f" (* [float] *)
+      | FFloat -> assert false (* "f" *) (* [float] *)
       | FDouble  -> "e" (* [float/double] *)
       | FLongDouble -> "E" (* [long double] *)
     in
@@ -220,19 +193,22 @@ end = struct
       | TInt(ILongLong,_) -> "w" (* [long int*] *)
       | TInt(IULongLong,_) -> "W" (* [unsigned long int*] *)
       | TVoid _ -> "p" (* [void*] *)
-      | _ -> Options.fatal "Unexpected argument type in printf: %a @."
-        Printer.pp_typ ty
+      | _ ->
+        Options.fatal "Unexpected argument type in printf: %a @."
+          Printer.pp_typ ty
     in
     let exps = drop (printf_fmt_position fn) args in
-    let param_str = List.fold_left
-      (fun acc exp ->
-        match Cil.unrollTypeDeep (Cil.typeOf exp) with
-        | TInt(k,_) -> acc ^ get_ikind_str k
-        | TFloat(k,_) -> acc ^ get_fkind_str k
-        | TPtr(ty,_) -> acc ^ get_pkind_str ty
+    let param_str =
+      List.fold_right
+        (fun exp acc -> match Cil.unrollType (Cil.typeOf exp) with
+        | TInt(k, _) -> get_ikind_str k ^ acc
+        | TFloat(k, _) -> get_fkind_str k ^ acc
+        | TPtr(ty, _) -> get_pkind_str (Cil.unrollType ty) ^ acc
         | TVoid _ | TArray _ | TFun _ | TNamed _ | TComp _ | TEnum _
         | TBuiltin_va_list _ -> assert false)
-      ""
-      exps
-    in Cil.mkString ~loc param_str
+        exps
+        ""
+    in
+    Cil.mkString ~loc param_str
+
 end
