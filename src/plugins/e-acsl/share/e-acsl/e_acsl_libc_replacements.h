@@ -41,14 +41,13 @@
        the block `s` points to.
        - `n` is positive and there is `\0` at index `i` (`i` < `n`)
        and `s+i` belongs to the same block as `s`.
-    @return `n` if there is no `\0` between `s` and `s+n` but both
-       `s` and `s+n` belong to the same block.
-    @return 0 if n is zero.
+    @return `n` if there is no `\0` between `s` and `s+n-1` but both
+       `s` and `s+n-1` belong to the same block.
 
    @return -1 if `s` does not belong to tracked allocation
-   @return -2 if `wrtbl` is set to a non-zero value and `s` is a read-only
+   @return -2 if `wrtbl` is set to a non-zero value and `s` is read-only
    @return -3 if there is no `\0` between `s` and the end of its block and
-    `s+n` is unallocated or belongs to a different block.
+    `s+n-1` is unallocated or belongs to a different block.
    @return -4 if `n` is negative and `s` is not NUL-terminated */
 static long valid_nstring(char *s, long n, int wrtbl) {
   if (n == 0)
@@ -61,11 +60,11 @@ static long valid_nstring(char *s, long n, int wrtbl) {
     long size = block_length(s) - offset(s);
     long i;
     for (i = 0; i < size; i++) {
-      if (s[i] == '\0')
+      if (s[i] == '\0' || n == i)
         return i;
-      if (n == i + 1)
-        return n;
     }
+    if (n == size)
+      return n;
     if (n > size)
       return -3; /* Insufficient length */
     return -4; /* Not NUL-terminated */
@@ -89,11 +88,11 @@ static long valid_nwstring(wchar_t *s, long n, int wrtbl) {
     long size = (block_length(s) - offset(s))/sizeof(wchar_t);
     long i;
     for (i = 0; i < size; i++) {
-      if (s[i] == L'\0')
+      if (s[i] == L'\0' || n == i)
         return i;
-      if (n == i + 1)
-        return n;
     }
+    if (n == size)
+      return n;
     if (n > size)
       return -3; /* Insufficient length */
     return -4; /* Not NUL-terminated */
