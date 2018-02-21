@@ -45,13 +45,13 @@
  *  - format string is a NUL-terminated C string
  *  - all directives in the format string are well-formed (as per C99 standard)
  *  - each formatting directive has a corresponding variadic argument.
- *    Excessive arguments (for which there are no directives) are allowed,
- *    they are allowed but otherwise ignored.
+ *    Excessive arguments (for which there are no directives) are allowed
+ *    but otherwise ignored.
  *  - the types of variadic arguments provided via a call match the types
  *    expected by the respective format directives. This check includes checking
  *    for signedness. For instance,
  *      __e_acsl_builtin_printf("d", "%u", n);
- *    will abort because the formatting directive expects its argument be an
+ *    will abort because the formatting directive expects its argument to be an
  *    unsigned integer, whereas `n` is a signed integer (indicated by "d") in
  *    the first argument to `__e_acsl_builtin_printf`. Bear in mind though that
  *    char, short, and float types are the subjects to default promotions. That
@@ -169,7 +169,7 @@ static int abbr2size(abbrev_t type) {
     For instance '%jd' expects `intmax_t`. The instrumentation engine "unrolls"
     types, that is,  we will be given an actual primitive type instead (say
     long). While we cannot reason about typedefs dynamically we infer types
-    corresponding to typdefs based on their size and sign. The following
+    corresponding to typedefs based on their size and sign. The following
     function establishes some loose correspondence between sizes and signs and
     abbreviated integer types corresponding to these sizes and signs */
 static abbrev_t size2abbri(int size, int sign) {
@@ -191,7 +191,8 @@ static abbrev_t size2abbrf(int size) {
     return FDouble;
   else if (size == sizeof(long double))
     return FLongDouble;
-  vabort(INT_ERROR "floating point type corresponding to size %d unknown", size);
+  vabort
+    (INT_ERROR "floating point type corresponding to size %d unknown", size);
   return '\0';
 }
 
@@ -213,12 +214,16 @@ static char abbr2ptr(char c) {
 /* }}} */
 
 /* Format string character classes {{{ */
+
 /* Length modifier characters */
 const char *length_chars = "hljztL";
+
 /* Flag characters */
 const char *flag_chars = "-+ #0'";
+
 /* Conversion specifier characters. '%' is treated specially */
 const char *specifier_chars = "diouxXfFeEgGaAcspn";
+
 /* Period character */
 const char *period_chars = ".";
 
@@ -313,8 +318,8 @@ static void print_directive(format_directive *dir, char *rem) {
 /* Fetch format argument number {{{
    Most format specifications allow for argument numbers to be specified. E.g.,
      printf("%2$*1$d", width, num);
-   The above will first print num and then width. Even though this is not in C99
-   C99 we allow that as many `printf` implementations have this extension.
+   The above will first print num and then width. Even though this is not in
+   C99, we allow that as many `printf` implementations have this extension.
    The feature comes from the Single UNIX Specification.
 
    This function assumes that *(fmt-1) is '%' */
@@ -327,7 +332,7 @@ static char *fetch_format_argno(char *fmt, format_directive *dir,
      (if followed by '$') or a field width. */
   if (*ret != '0') {
     while (isdigit(*ret)) {
-      argno = argno*10 + (*ret - '0');
+      argno = argno * 10 + (*ret - '0');
       ret++;
     }
   } else {
@@ -400,18 +405,19 @@ static char *fetch_format_flags(char *fmt, format_directive *dir) {
 /* Assumes that `fmt` is a format string returned by ::fetch_format_flags */
 static char *fetch_format_field_width(char *fmt, format_directive *dir) {
   dir->field_width = INT_MIN;
-  /* Field width is either and asterisk ... */
+  /* Field width is either an asterisk ... */
   int len = 0;
   if (*fmt == '*') {
     dir->field_width = -1;
     fmt++;
   } else { /* ... or a positive decimal integer */
-    if (*fmt == '0') {
-      vabort(FMT_ERROR
-        "field width in format cannot start with zero (%s)\n", dir->format);
-    } else if (isdigit(*fmt)) {
+    if (isdigit(*fmt)) {
+      if (*fmt == '0') {
+        vabort(FMT_ERROR
+          "field width in format cannot start with zero (%s)\n", dir->format);
+      };
       while (isdigit(*fmt)) {
-        len = len*10 + (*fmt - '0');
+        len = len * 10 + (*fmt - '0');
         fmt++;
       }
       dir->field_width = len;
@@ -421,7 +427,8 @@ static char *fetch_format_field_width(char *fmt, format_directive *dir) {
 } /* }}} */
 
 /* Fetch format precision {{{ */
-/* Assumes that `fmt` is a format string returned by ::fetch_format_field_width */
+/* Assumes that `fmt` is a format string returned by
+   ::fetch_format_field_width */
 static char *fetch_format_precision(char *fmt, format_directive *dir) {
   /* Precision is given in the form '.' optionally followed by either
     '*' or a digit string. */
@@ -434,7 +441,7 @@ static char *fetch_format_precision(char *fmt, format_directive *dir) {
     } else {
       dir->precision = 0;
       while (isdigit(*fmt)) {
-        dir->precision = dir->precision*10 + (*fmt - '0');
+        dir->precision = dir->precision * 10 + (*fmt - '0');
         fmt++;
       }
     }
@@ -509,20 +516,21 @@ static char *fetch_format_length(char *fmt, format_directive *dir) {
     else
       vabort(FMT_ERROR "illegal format specifier '%c'\n", dir->specifier);
   }
-  return  ++fmt;
+  return ++fmt;
 } /* }}} */
 
 /* Parse format string {{{ */
 /* Parse format string into a NULL-terminated array of directives */
 static format_directive ** get_format_directives(char *fmt) {
   /* Count the number of formatting directives in the format string
-     by counting '%' occurrences. Yes, it may give more specifications then
+     by counting '%' occurrences. Yes, it may give more specifications than
      needed (e.g., "%%") but allocating space for a few extra pointers does not
      hurt considering that in order to do that properly we need to parse format
      string twice. */
 
   int sz = charcount(fmt, '%') + 1;
-  format_directive ** directives = private_malloc(sizeof(format_directive*) * (sz));
+  format_directive ** directives =
+    private_malloc(sizeof(format_directive *) * sz);
   char *format_string = fmt;
 
   /* Nullify all pointers to make sure there is no leftover rubbish */
@@ -544,7 +552,7 @@ static format_directive ** get_format_directives(char *fmt) {
         continue;
       }
       /* Allocate space for `format_directive` to hold the result of parsing */
-      format_directive *dir = private_calloc(1,sizeof(format_directive));
+      format_directive *dir = private_calloc(1, sizeof(format_directive));
       /* Parse format string */
       dir->format = format_string;
       char *fmt_start  = fmt - 1;
@@ -556,8 +564,8 @@ static format_directive ** get_format_directives(char *fmt) {
       /* Save format string in the dir struct. Rather ugly but the RTL
         printf library has no `snprintf` or extensions allowing to print
         `N` characters. */
-      ptrdiff_t fmt_len =	fmt - fmt_start;
-      ptrdiff_t max_len =	sizeof (dir->directive) - 1;
+      ptrdiff_t fmt_len = fmt - fmt_start;
+      ptrdiff_t max_len = sizeof(dir->directive) - 1;
       int len = max_len > fmt_len ? fmt_len : max_len;
       strncpy(dir->directive, fmt_start, len);
       dir->directive[len+1] = '\0';
@@ -587,8 +595,8 @@ static inline void validate_application(format_directive *dir, char *allowed,
     desc, kind, dir->specifier);
 }
 
-/** \brief Check that format a given format specifier are used with right flags,
-   precision, field width, and length modifier. */
+/** \brief Check that a given format specifier are used with right flags,
+    precision, field width, and length modifier. */
 static void validate_applications(format_directive *dir) {
   /* ==== Flags ==== */
   char *desc = "flag";
@@ -696,7 +704,7 @@ static abbrev_t infer_integral_abbr(format_directive *dir, int sgn) {
     case '\0':
       return (sgn ? IInt : IUInt);
   }
-  vabort(INT_ERROR "unexpected length modifier: '%c'\n",	dir->length.mod);
+  vabort(INT_ERROR "unexpected length modifier: '%c'\n", dir->length.mod);
   return '\0';
 }
 
@@ -732,9 +740,11 @@ static abbrev_t infer_n_abbr(format_directive *dir) {
    This function expects that the index given via the format directive
    `dir` is less than or equal to the length of `fmtdesc`, i.e., there is an
    actual argument that corresponds to `dir`. */
-static void validate_format_type(abbrev_t expected_t, const char *fmtdesc,
-  format_directive *dir, const char *func) {
-  abbrev_t actual_t =	fmtdesc[dir->arg.index];
+static void validate_format_type
+  (abbrev_t expected_t, const char *fmtdesc,
+   format_directive *dir, const char *func)
+{
+  abbrev_t actual_t = fmtdesc[dir->arg.index];
   if (actual_t != expected_t) {
     vabort("%s: directive %d ('%s') expects argument of type '%s'"
       " but the corresponding argument has type '%s'\n",
@@ -751,14 +761,16 @@ static void validate_format_type(abbrev_t expected_t, const char *fmtdesc,
    @param func - name of the function (e.g., printf)
    @param wide - if set to a true value then the string should be treated as
     a wide string (wchar_t*)  */
-static long validate_format_string_argument(char *s, format_directive *dir,
-  const char *func, int wide) {
+static long validate_format_string_argument
+  (char *s, format_directive *dir, const char *func, int wide)
+{
   int limit = (dir->precision >= 0) ? dir->precision : -1;
-  long size = (wide) ?
-    valid_nwstring((wchar_t*)s, limit, 0) : valid_nstring(s, limit, 0);
+  long size =
+    (wide) ? valid_nwstring((wchar_t*)s, limit, 0) : valid_nstring(s, limit, 0);
   switch(size) {
     case -1:
-      vabort("%s: attempt to access unallocated memory via directive %d ('%s')\n",
+      vabort
+        ("%s: attempt to access unallocated memory via directive %d ('%s')\n",
         func, dir->arg.index + 1, dir->directive);
     case -2:
       vabort(INT_ERROR
@@ -798,8 +810,10 @@ static void validate_overlapping_buffer(char *buffer, size_t buf_sz, void *arg,
    @param func - symbolic name of a formatting function used
    @param buffer - buffer to write (in case of sprintf/snprintf, NULL otherwise)
    @param buffer - buffer limit */
-static void validate_format(const char *fmtdesc, const char *fmt,
-  va_list ap, const char *func, char *buffer, size_t buf_size) {
+static void validate_format
+  (const char *fmtdesc, const char *fmt,
+  va_list ap, const char *func, char *buffer, size_t buf_size)
+{
 
   /* Check that format string is valid first */
   if (valid_string((char*)fmt, 0) < 0)
@@ -817,7 +831,8 @@ static void validate_format(const char *fmtdesc, const char *fmt,
     args[i] = va_arg(ap, void*);
   va_end(ap);
 
-  while (*dirs) { /* Validate each generated directive */
+  /* Validate each generated directive */
+  while (*dirs) {
     format_directive *dir = *dirs;
     validate_applications(dir); /* Check that the directive is well formed */
     int argno = dir->arg.index;
@@ -884,7 +899,8 @@ static void validate_format(const char *fmtdesc, const char *fmt,
         validate_type(expected_t);
         /* Check that a string is valid */
         int asz = validate_format_string_argument((char*)addr, dir, func, wide);
-        validate_overlapping_buffer(buffer, buf_size, (void*)addr, asz, func, dir);
+        validate_overlapping_buffer
+          (buffer, buf_size, (void*)addr, asz, func, dir);
         break;
       }
       case 'p':
@@ -892,19 +908,21 @@ static void validate_format(const char *fmtdesc, const char *fmt,
         if (!allocated(addr, 1, addr))
           vabort("%s: argument %d of directive %s not allocated\n", func,
             argno + 1, dir->directive);
-        validate_overlapping_buffer(buffer, buf_size, (void*)addr, 1, func, dir);
+        validate_overlapping_buffer
+          (buffer, buf_size, (void*)addr, 1, func, dir);
         break;
       case 'n': {
         expected_t = infer_n_abbr(dir);
         validate_type(expected_t);
         /* 'n' modifier writes the number of bytes corresponding to characters
-           writted by a function so far to a pointer of an integral type. Make
-           sure that the pointer provided corresponds to writeable memory. */
+           written by a function so far to a pointer of an integral type. Make
+           sure that the provided pointer corresponds to writeable memory. */
         int size = dir->length.bytes == 0 ?  sizeof(int) : dir->length.bytes;
         if (!writeable(addr, size, addr))
           vabort("%s: argument %d of directive %s not allocated or writeable\n",
             func, argno, dir->directive);
-        validate_overlapping_buffer(buffer, buf_size, (void*)addr, size, func, dir);
+        validate_overlapping_buffer
+          (buffer, buf_size, (void*)addr, size, func, dir);
         break;
       }
       default:
@@ -964,10 +982,10 @@ int builtin_sprintf(const char *fmtdesc, char *buffer, const char *fmt, ...) {
   va_list ap;
   /* Make sure that the buffer has sufficient space to store the result of the
      function. Luckily this can be accomplished via `snprintf(buf, n, mfmt,...)`
-     that can take `NULL` and `0` as its first two argument (nothing is printed)
-     but still return the number of characters that would have been printed if
-     both `buf` and `n` were sufficiently large. This behaviour is C99-compliant
-     and described in par. 7.19.6.5 of the C99 standard */
+     that can take `NULL` and `0` as its first two arguments (nothing is
+     printed) but still returns the number of characters that would have been
+     printed if both `buf` and `n` were sufficiently large. This behaviour is
+     C99-compliant and described in par. 7.19.6.5 of the C99 standard */
   va_start(ap, fmt);
   int len = vsnprintf(NULL, 0, fmt, ap);
   if (!writeable((uintptr_t)buffer, len + 1, (uintptr_t)buffer))
@@ -985,7 +1003,7 @@ int builtin_snprintf(const char *fmtdesc, char *buffer, size_t size,
   va_start(ap, fmt);
   validate_format(fmtdesc, fmt, ap, "snprintf", buffer, size);
   /* Check that the input buffer is large enough. However, if there are zero
-     characters to write it does not matter */
+     characters to write, it does not matter */
   if (size > 0 && !writeable((uintptr_t)buffer, size, (uintptr_t)buffer))
     vabort("sprintf: output buffer is unallocated or has insufficient length "
       "to store %d characters and \0 terminator or not writeable\n", size);
