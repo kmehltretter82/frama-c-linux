@@ -178,11 +178,11 @@ let mk_named_store_stmt name ?str_size vi =
   let loc = vi.vdecl in
   let store = mk_call ~loc (RTL.mk_api_name name) in
   match ty, str_size with
-    | TArray(_, Some _,_,_), None ->
-      store [ Cil.evar ~loc vi ; Cil.sizeOf ~loc ty ]
-    | TPtr(TInt(IChar, _), _), Some size -> store [ Cil.evar ~loc vi ; size ]
-    | _, None -> store [ Cil.mkAddrOfVi vi ; Cil.sizeOf ~loc ty ]
-    | _, Some _ -> assert false
+  | TArray(_, Some _,_,_), None ->
+    store [ Cil.evar ~loc vi ; Cil.sizeOf ~loc ty ]
+  | TPtr(TInt(IChar, _), _), Some size -> store [ Cil.evar ~loc vi ; size ]
+  | _, None -> store [ Cil.mkAddrOfVi vi ; Cil.sizeOf ~loc ty ]
+  | _, Some _ -> assert false
 
 let mk_store_stmt ?str_size vi =
   mk_named_store_stmt "store_block" ?str_size vi

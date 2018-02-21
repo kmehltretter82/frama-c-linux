@@ -785,29 +785,29 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         env
       | _ -> env)
     | Instr(Call (result, exp, args, loc)) ->
+      (* Rewrite names of functions for which we have alternative
+         definitions in the RTL. *)
       (match exp.enode with
-        (* Rewrite names of functions for which we have alternative
-           definitions in the RTL. *)
-        | Lval(Var(vi), _) when replace_libc_fn &&
+      | Lval(Var vi, _) when replace_libc_fn &&
           RTL.has_rtl_replacement vi.vname ->
-          vi.vname <- RTL.get_rtl_replacement_name vi.vname
+        vi.vname <- RTL.get_rtl_replacement_name vi.vname
+      | Lval(Var vi , _) when Libc.is_vla_free_name vi.vname ->
         (* Handle variable-length array allocation via [__fc_vla_free].
            Rewrite its name to [delete_block]. The rest is in place. *)
-        | Lval(Var(vi), _) when Libc.is_vla_free_name vi.vname ->
-          vi.vname <- RTL.mk_api_name "delete_block"
-        (* Rewrite names of format functions (such as printf). This case differs
-           from the above because argument list of format functions is extended
-           with an argument describing actual variadic arguments *)
-        | Lval(Var(vi), _) when check_formats && Libc.is_printf_name vi.vname ->
-          (* Replacement name, e.g., [printf] -> [__e_acsl_builtin_printf] *)
-          let name = RTL.get_rtl_replacement_name vi.vname in
-          (* Variadic arguments descriptor *)
-          let fmt = Libc.get_printf_argument_str ~loc vi.vname args in
-          (* get the name of the library function we need. Cannot just rewrite
-             the name as AST check will then fail *)
-          let vi = Misc.get_lib_fun_vi name in
-          stmt.skind <- Instr(Call (result, Cil.evar vi, fmt :: args, loc))
-        | _ -> ());
+        vi.vname <- RTL.mk_api_name "delete_block"
+      | Lval(Var vi, _) when check_formats && Libc.is_printf_name vi.vname ->
+        (* Rewrite names of format functions (such as printf). This case
+           differs from the above because argument list of format functions is
+           extended with an argument describing actual variadic arguments *)
+        (* Replacement name, e.g., [printf] -> [__e_acsl_builtin_printf] *)
+        let name = RTL.get_rtl_replacement_name vi.vname in
+        (* Variadic arguments descriptor *)
+        let fmt = Libc.get_printf_argument_str ~loc vi.vname args in
+        (* get the name of the library function we need. Cannot just rewrite
+           the name as AST check will then fail *)
+        let vi = Misc.get_lib_fun_vi name in
+        stmt.skind <- Instr(Call (result, Cil.evar vi, fmt :: args, loc))
+      | _ -> ());
       (* Add statement tracking initialization of return values of function
          calls *)
       (match result with
