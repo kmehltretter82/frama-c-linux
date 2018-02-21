@@ -21,5 +21,3 @@ tests/runtime/local_goto.c:16:[e-acsl] warning: E-ACSL construct `logic function
 tests/runtime/local_goto.c:16:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
     Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-tests/runtime/local_goto.c:25:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/local_goto.c:36:[value] warning: function __e_acsl_assert: precondition got status unknown.

@@ -1,8 +1,4 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
-tests/runtime/valid_alias.c:14:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/valid_alias.c:15:[value] warning: function __e_acsl_assert: precondition got status unknown.
 tests/runtime/valid_alias.c:17:[value] warning: accessing left-value that contains escaping addresses.
     assert ¬\dangling(&a);
-tests/runtime/valid_alias.c:17:[value] warning: accessing left-value that contains escaping addresses.
-    assert ¬\dangling(&b);

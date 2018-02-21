@@ -1,19 +1,5 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
-tests/runtime/initialized.c:19:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/initialized.c:20:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/initialized.c:31:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/initialized.c:33:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/initialized.c:35:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/initialized.c:40:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/initialized.c:41:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/initialized.c:51:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/initialized.c:54:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/initialized.c:58:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/initialized.c:59:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/initialized.c:60:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/initialized.c:61:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/initialized.c:62:[value] warning: function __e_acsl_assert: precondition got status unknown.
 tests/runtime/initialized.c:66:[value] warning: assertion got status unknown.
 tests/runtime/initialized.c:66:[value] warning: function __e_acsl_assert: precondition got status unknown.
 tests/runtime/initialized.c:70:[value] warning: assertion got status unknown.

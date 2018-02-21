@@ -110,7 +110,6 @@ int main(void)
                                                       sizeof(int *));
     if (__gen_e_acsl_initialized_6) {
       int __gen_e_acsl_valid_6;
-      /*@ assert Value: dangling_pointer: ¬\dangling(&q); */
       __gen_e_acsl_valid_6 = __e_acsl_valid((void *)q,sizeof(int),(void *)q,
                                             (void *)(& q));
       __gen_e_acsl_and_6 = __gen_e_acsl_valid_6;
@@ -148,7 +147,6 @@ int main(void)
                                                       sizeof(int *));
     if (__gen_e_acsl_initialized_8) {
       int __gen_e_acsl_valid_8;
-      /*@ assert Value: dangling_pointer: ¬\dangling(&q); */
       __gen_e_acsl_valid_8 = __e_acsl_valid((void *)q,sizeof(int),(void *)q,
                                             (void *)(& q));
       __gen_e_acsl_and_8 = __gen_e_acsl_valid_8;
@@ -157,7 +155,6 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_and_8,(char *)"Assertion",(char *)"main",
                     (char *)"!\\valid(q)",29);
   }
-  /*@ assert Value: dangling_pointer: ¬\dangling(&q); */
   __e_acsl_initialize((void *)q,sizeof(int));
   *q = 1;
   __e_acsl_initialize((void *)p,sizeof(int));

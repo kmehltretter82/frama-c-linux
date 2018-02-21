@@ -15,8 +15,7 @@ struct list {
   @  assumes l == \null;
   @  ensures \result == l;
   @ behavior B2:
-  @  assumes ! \valid(l);
-  @  assumes ! \valid(l->next);
+  @  assumes ! \valid(l) || ! \valid(l->next);
   @  ensures \result == l;
 */
 struct list * f(struct list * l) {

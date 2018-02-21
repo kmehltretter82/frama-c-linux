@@ -5,4 +5,3 @@
 FRAMAC_SHARE/libc/stdlib.h:76:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
     Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-FRAMAC_SHARE/libc/stdlib.h:76:[value] warning: function __e_acsl_assert: precondition got status unknown.
