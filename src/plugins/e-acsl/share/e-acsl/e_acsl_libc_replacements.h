@@ -31,6 +31,7 @@
 /************************************************************************/
 /*** Support functionality {{{ ***/
 /************************************************************************/
+
 /* *** String validation {{{ */
 
 /*! \brief Determine if `s` describes a C string up to length `n`.
@@ -110,7 +111,9 @@ static long inline valid_wstring(wchar_t *s, int wrtbl) {
   return valid_nwstring(s, -1, wrtbl);
 }
 
-static long validate_string(char *s, long n, int wrtbl, const char *fun, const char *desc) {
+static long validate_string
+  (char *s, long n, int wrtbl, const char *fun, const char *desc)
+{
   long size = valid_nstring(s, n, wrtbl);
 
   switch(size) {
@@ -128,13 +131,15 @@ static long validate_string(char *s, long n, int wrtbl, const char *fun, const c
   return size;
 }
 
-static inline long validate_writeable_string(char *s, long n,
-    const char *fun, const char *desc) {
+static inline long validate_writeable_string
+  (char *s, long n, const char *fun, const char *desc)
+{
   return validate_string(s, n, 1, fun, desc);
 }
 
-static inline long validate_allocated_string (char *s, long n,
-    const char *fun, const char *desc) {
+static inline long validate_allocated_string
+   (char *s, long n, const char *fun, const char *desc)
+{
   return validate_string(s, n, 0, fun, desc);
 }
 /* }}} */
@@ -142,13 +147,15 @@ static inline long validate_allocated_string (char *s, long n,
 /* *** Memory spaces {{{ */
 /** \brief Return a true value if memory spaces given by intervals
     [s1, s1 + s1_sz] and [s2, s2 + s2_sz] are disjoint */
-static inline int disjoint_spaces(uintptr_t s1, size_t s1_sz,
-    uintptr_t s2, size_t s2_sz) {
+static inline int disjoint_spaces
+  (uintptr_t s1, size_t s1_sz, uintptr_t s2, size_t s2_sz)
+{
   return s1 + s1_sz <= s2 || s2 + s2_sz <= s1;
 }
 
-static inline void validate_allocated_space(void *p, size_t sz,
-    const char *func, const char *space) {
+static inline void validate_allocated_space
+  (void *p, size_t sz, const char *func, const char *space)
+{
   if (!allocated((uintptr_t)p, sz, (uintptr_t)p)) {
     vabort("%s: unallocated (or insufficient) space in %s\n", func, space);
   }
@@ -166,8 +173,9 @@ static inline void validate_writeable_space(void *p, size_t sz,
   }
 }
 
-static inline void validate_overlapping_spaces(uintptr_t s1, size_t s1_sz,
-    uintptr_t s2, size_t s2_sz, const char *func) {
+static inline void validate_overlapping_spaces
+  (uintptr_t s1, size_t s1_sz, uintptr_t s2, size_t s2_sz, const char *func)
+{
   if (!disjoint_spaces(s1, s1_sz, s2, s2_sz))
     vabort("%s: overlapping memory areas\n", func);
 }
@@ -177,6 +185,7 @@ static inline void validate_overlapping_spaces(uintptr_t s1, size_t s1_sz,
 /************************************************************************/
 /*** strlen/strcpy/strcat/strcmp {{{ ***/
 /************************************************************************/
+
 /* drop-in replacement for `strlen` */
 size_t builtin_strlen(const char *s) {
   return validate_allocated_string((char*)s, -1, "strlen", "input ");
@@ -185,7 +194,8 @@ size_t builtin_strlen(const char *s) {
 /* drop-in replacement for `strcpy` */
 char *builtin_strcpy(char *dest, const char *src) {
   // `src` string should be a valid NUL-terminated C string
-  size_t size = validate_allocated_string((char*)src, -1, "strlen", "source string ");
+  size_t size =
+    validate_allocated_string((char*)src, -1, "strlen", "source string ");
   /* `dest` should be writable and at least `size + 1` bytes long to
      accommodate the NUL-terminator */
   validate_writeable_space(dest, size + 1, "strlen", "destination string");
@@ -224,29 +234,34 @@ int builtin_strncmp(const char *s1, const char *s2, size_t n) {
 
 /* drop-in replacement for `strcat` */
 char *builtin_strcat(char *dest, const char *src) {
-  long src_sz = validate_allocated_string((char*)src, -1, "strcat", "source string ");
-  long dest_sz = validate_writeable_string((char*)dest, -1, "strcat", "destination string ");
+  long src_sz =
+    validate_allocated_string((char*)src, -1, "strcat", "source string ");
+  long dest_sz =
+    validate_writeable_string((char*)dest, -1, "strcat", "destination string ");
   size_t avail_sz = block_length(dest) - offset(dest);
   if (!(avail_sz >= src_sz + dest_sz + 1)) {
     vabort("strcat: insufficient space in destination string, "
       "available: %lu bytes, requires at least %lu bytes\n",
       avail_sz, src_sz + dest_sz + 1);
   }
-  validate_overlapping_spaces((uintptr_t)src, src_sz + 1, (uintptr_t)dest, dest_sz + 1, "strcat");
+  validate_overlapping_spaces
+    ((uintptr_t)src, src_sz + 1, (uintptr_t)dest, dest_sz + 1, "strcat");
   return strcat(dest, src);
 }
 
 /* drop-in replacement for `strncat` */
 char *builtin_strncat(char *dest, const char *src, size_t n) {
   validate_allocated_string((char*)src, n, "strncat", "source string ");
-  long dest_sz = validate_writeable_string((char*)dest, -1, "strcat", "destination string ");
+  long dest_sz =
+    validate_writeable_string((char*)dest, -1, "strcat", "destination string ");
   size_t avail_sz = block_length(dest) - offset(dest);
   if (!(avail_sz >= n + dest_sz + 1)) {
     vabort("strncat: insufficient space in destination string, "
       "available: %lu bytes, requires at least %lu bytes\n",
       avail_sz, n + dest_sz + 1);
   }
-  validate_overlapping_spaces((uintptr_t)src, n, (uintptr_t)dest, dest_sz, "strcat");
+  validate_overlapping_spaces
+    ((uintptr_t)src, n, (uintptr_t)dest, dest_sz, "strcat");
   return strncat(dest, src, n);
 }
 /* }}} */
@@ -254,6 +269,7 @@ char *builtin_strncat(char *dest, const char *src, size_t n) {
 /************************************************************************/
 /*** memcpy/memcmp/memset/memmove {{{ ***/
 /************************************************************************/
+
 /* drop-in replacement for `memcpy` */
 void *builtin_memcpy(void *dest, const void *src, size_t n) {
   validate_allocated_space((void*)src, n, "memcpy", "source space ");
@@ -282,5 +298,6 @@ void *builtin_memmove(void *dest, const void *src, size_t n) {
   validate_writeable_space((void*)dest, n, "memcmp", "destination space ");
   return memmove(dest, src, n);
 }
+
 /* }}} */
 #endif
