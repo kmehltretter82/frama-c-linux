@@ -1,9 +1,5 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
-tests/runtime/block_valid.c:24:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/block_valid.c:26:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/block_valid.c:29:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/block_valid.c:31:[value] warning: function __e_acsl_assert: precondition got status unknown.
 tests/runtime/block_valid.c:45:[value] warning: out of bounds write. assert \valid(pmin);
 tests/runtime/block_valid.c:46:[value] warning: out of bounds write. assert \valid(pmax);
 tests/runtime/block_valid.c:49:[value] warning: function __e_acsl_assert: precondition got status unknown.

@@ -84,6 +84,21 @@ module Temporal_validity =
       let help = "enable temporal analysis in valid annotations"
      end)
 
+module Validate_format_strings =
+  False
+    (struct
+      let option_name = "-e-acsl-validate-format-strings"
+      let help = "enable runtime validation of stdio.h format functions"
+     end)
+
+module Replace_libc_functions =
+  False
+    (struct
+      let option_name = "-e-acsl-replace-libc-functions"
+      let help = "replace some libc functions (such as strcpy) with built-in\
+ RTL alternatives"
+     end)
+
 module Full_mmodel =
   False
     (struct

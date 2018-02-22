@@ -1,11 +1,2 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
-tests/runtime/compound_initializers.c:33:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/compound_initializers.c:34:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/compound_initializers.c:35:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/compound_initializers.c:36:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/compound_initializers.c:37:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/compound_initializers.c:38:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/compound_initializers.c:39:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/compound_initializers.c:40:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/compound_initializers.c:42:[value] warning: function __e_acsl_assert: precondition got status unknown.

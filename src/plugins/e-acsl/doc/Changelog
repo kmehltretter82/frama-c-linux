@@ -19,6 +19,13 @@
 #   configure	configure
 ###############################################################################
 
+-  E-ACSL       [2018/02/21] New option -e-acsl-replace-libc-functions to
+	        replace a few libc functions by built-ins that efficiently
+	        detects when they are incorrectly called.
+-  E-ACSL       [2018/02/21] New option -e-acsl-validate-format-strings to
+	        detect format string errors in printf-like functions.
+-* E-ACSL       [2018/02/21] Correct support of variable-length array
+	        (fix bug #1834).
 -* runtime      [2018/02/16] Function __e_acsl_offset now returns size_t.
 -* E-ACSL       [2018/02/07] Fix incorrect typing in presence of
 	        comparison operators (may only be visible when directly

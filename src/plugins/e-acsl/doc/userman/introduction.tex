@@ -13,17 +13,17 @@ program.
 \eacsl translation brings several benefits. First, it allows a user to monitor
 \C code and perform what is usually referred to as ``runtime assertion
 checking''~\cite{runtime-assertion-checking}\footnote{In our context, ``runtime
-  annotation checking'' would be more precise.}. This is the
-primary goal of \eacsl. Second, it allows to combine \framac and its
-existing analyzers with other \C analyzers that do not natively understand the
-\acsl 
-specification language. Third, the possibility to detect invalid annotations
-during a concrete execution may be very helpful while writing a correct
-specification of a given program, \emph{e.g.} for later program proving.
-Finally, an executable specification makes it possible to check assertions that
-cannot be verified statically and thus to establish a link between
-runtime monitoring and static analysis tools such as
-\valueplugin~\cite{value}\index{Value} or \wpplugin~\cite{wp}\index{Wp}.
+  annotation checking'' would be more precise.}. This is the primary goal of
+\eacsl. Indirectly, in combination with the \rte~\cite{rte}, this usage
+allows the user to detect undefined behaviors in its \C code. Second, it allows
+to combine \framac and its existing analyzers with other \C analyzers that do
+not natively understand the \acsl specification language. Third, the possibility
+to detect invalid annotations during a concrete execution may be very helpful
+while writing a correct specification of a given program, \emph{e.g.} for later
+program proving.  Finally, an executable specification makes it possible to
+check assertions that cannot be verified statically and thus to establish a link
+between runtime monitoring and static analysis tools such as
+\Eva~\cite{eva}\index{Eva} or \wpplugin~\cite{wp}\index{Wp}.
 
 Annotations used by the plug-in must be written in the \eacsl specification
 language~\cite{eacsl,sac13} -- a subset of \acsl. \eacsl plug-in is still in a

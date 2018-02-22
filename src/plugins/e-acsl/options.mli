@@ -31,6 +31,8 @@ module Full_mmodel: Parameter_sig.Bool
 module Project_name: Parameter_sig.String
 module Builtins: Parameter_sig.String_set
 module Temporal_validity: Parameter_sig.Bool
+module Validate_format_strings: Parameter_sig.Bool
+module Replace_libc_functions: Parameter_sig.Bool
 
 val parameter_states: State.t list
 

@@ -1,0 +1,147 @@
+tests/builtin/strcat.c:26:[kernel] warning: Calling undeclared function fork. Old style K&R code?
+[e-acsl] beginning translation.
+[e-acsl] warning: annotating undefined function `exit':
+    the generated program may miss memory instrumentation
+    if there are memory-related annotations.
+[e-acsl] warning: annotating undefined function `strcat':
+    the generated program may miss memory instrumentation
+    if there are memory-related annotations.
+[e-acsl] warning: annotating undefined function `strncat':
+    the generated program may miss memory instrumentation
+    if there are memory-related annotations.
+FRAMAC_SHARE/libc/stdio.h:150:[kernel] warning: Neither code nor specification for function printf, generating default assigns from the prototype
+FRAMAC_SHARE/libc/sys/wait.h:60:[kernel] warning: Neither code nor specification for function waitpid, generating default assigns from the prototype
+tests/builtin/strcat.c:26:[kernel] warning: Neither code nor specification for function fork, generating default assigns from the prototype
+FRAMAC_SHARE/libc/string.h:364:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:365:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:370:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:377:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:377:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:370:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:368:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:352:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:353:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:354:[e-acsl] warning: E-ACSL construct `trange' is not yet supported. Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:354:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:357:[e-acsl] warning: E-ACSL construct `logic function returning an integer' is not yet supported.
+    Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:359:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+    Ignoring annotation.
+[e-acsl] translation done in project "e-acsl".
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value:initial-state] Values of globals at initialization
+  __fc_rand_max ∈ {32767}
+  __fc_heap_status ∈ [--..--]
+  __e_acsl_init ∈ [--..--]
+  __fc_fopen[0..15] ∈ {0}
+  __fc_p_fopen ∈ {{ &__fc_fopen[0] }}
+  __e_acsl_heap_allocation_size ∈ [--..--]
+  __e_acsl_math_HUGE_VAL ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  __e_acsl_math_HUGE_VALF ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
+  __e_acsl_math_INFINITY ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  __fc_time ∈ [--..--]
+  testno ∈ {0}
+  __fc_strtok_ptr ∈ {0}
+  __gen_e_acsl_literal_string ∈ {0}
+  __gen_e_acsl_literal_string_2 ∈ {0}
+  __gen_e_acsl_literal_string_3 ∈ {0}
+  __gen_e_acsl_literal_string_4 ∈ {0}
+  __gen_e_acsl_literal_string_5 ∈ {0}
+  __gen_e_acsl_literal_string_6 ∈ {0}
+  __gen_e_acsl_literal_string_7 ∈ {0}
+  __gen_e_acsl_literal_string_8 ∈ {0}
+  __gen_e_acsl_literal_string_9 ∈ {0}
+  __gen_e_acsl_literal_string_10 ∈ {0}
+  __gen_e_acsl_literal_string_11 ∈ {0}
+  __gen_e_acsl_literal_string_12 ∈ {0}
+  __gen_e_acsl_literal_string_13 ∈ {0}
+  __gen_e_acsl_literal_string_14 ∈ {0}
+  __gen_e_acsl_literal_string_15 ∈ {0}
+  __gen_e_acsl_literal_string_16 ∈ {0}
+  __gen_e_acsl_literal_string_17 ∈ {0}
+  __gen_e_acsl_literal_string_18 ∈ {0}
+  __gen_e_acsl_literal_string_19 ∈ {0}
+  __gen_e_acsl_literal_string_20 ∈ {0}
+  __gen_e_acsl_literal_string_21 ∈ {0}
+  __gen_e_acsl_literal_string_22 ∈ {0}
+  __gen_e_acsl_literal_string_23 ∈ {0}
+  __gen_e_acsl_literal_string_24 ∈ {0}
+  __gen_e_acsl_literal_string_25 ∈ {0}
+  __gen_e_acsl_literal_string_26 ∈ {0}
+  __gen_e_acsl_literal_string_27 ∈ {0}
+  __gen_e_acsl_literal_string_28 ∈ {0}
+  __gen_e_acsl_literal_string_29 ∈ {0}
+[value] using specification for function __e_acsl_memory_init
+[value] using specification for function __e_acsl_store_block
+[value] using specification for function __e_acsl_full_init
+[value] using specification for function __e_acsl_mark_readonly
+tests/builtin/strcat.c:11:[value] allocating variable __malloc_main_l11
+[value] using specification for function fork
+[value] using specification for function __e_acsl_builtin_strcat
+[value] using specification for function __e_acsl_assert
+[value] using specification for function __e_acsl_delete_block
+FRAMAC_SHARE/libc/string.h:357:[value] warning: function __gen_e_acsl_strcat: postcondition got status unknown.
+[value] using specification for function exit
+[value] using specification for function waitpid
+tests/builtin/strcat.c:26:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status);
+[value] using specification for function printf
+tests/builtin/strcat.c:27:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_0);
+tests/builtin/strcat.c:28:[value] warning: function __gen_e_acsl_strcat: precondition 'room_string' got status invalid.
+tests/builtin/strcat.c:28:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_1);
+tests/builtin/strcat.c:29:[value] warning: accessing left-value that contains escaping addresses.
+    assert ¬\dangling(&unalloc_str);
+tests/builtin/strcat.c:29:[value] warning: function __gen_e_acsl_strcat: precondition 'valid_string_dst' got status invalid.
+tests/builtin/strcat.c:29:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_2);
+tests/builtin/strcat.c:30:[value] warning: accessing left-value that contains escaping addresses.
+    assert ¬\dangling(&unalloc_str);
+tests/builtin/strcat.c:30:[value] warning: function __gen_e_acsl_strcat: precondition 'valid_string_src' got status invalid.
+tests/builtin/strcat.c:30:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_3);
+tests/builtin/strcat.c:31:[value] warning: function __gen_e_acsl_strcat: precondition 'valid_string_dst' got status invalid.
+tests/builtin/strcat.c:31:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_4);
+tests/builtin/strcat.c:32:[value] warning: function __gen_e_acsl_strcat: precondition 'valid_string_src' got status invalid.
+tests/builtin/strcat.c:32:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_5);
+tests/builtin/strcat.c:33:[value] warning: function __gen_e_acsl_strcat: precondition 'valid_string_dst' got status invalid.
+tests/builtin/strcat.c:33:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_6);
+tests/builtin/strcat.c:34:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_7);
+tests/builtin/strcat.c:35:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_8);
+tests/builtin/strcat.c:36:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_9);
+[value] using specification for function __e_acsl_initialize
+tests/builtin/strcat.c:37:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_10);
+[value] using specification for function __e_acsl_builtin_strncat
+FRAMAC_SHARE/libc/string.h:375:[value] warning: function __gen_e_acsl_strncat, behavior complete: postcondition got status unknown.
+tests/builtin/strcat.c:40:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_11);
+tests/builtin/strcat.c:41:[value] warning: function __gen_e_acsl_strncat, behavior complete: precondition 'room_string' got status invalid.
+tests/builtin/strcat.c:41:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_12);
+tests/builtin/strcat.c:42:[value] warning: accessing left-value that contains escaping addresses.
+    assert ¬\dangling(&unalloc_str);
+tests/builtin/strcat.c:42:[value] warning: function __gen_e_acsl_strncat: precondition 'valid_string_dst' got status invalid.
+tests/builtin/strcat.c:42:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_13);
+tests/builtin/strcat.c:43:[value] warning: accessing left-value that contains escaping addresses.
+    assert ¬\dangling(&unalloc_str);
+tests/builtin/strcat.c:43:[value] warning: function __gen_e_acsl_strncat: precondition 'valid_string_src' got status unknown.
+FRAMAC_SHARE/libc/string.h:363:[value] warning: function __e_acsl_builtin_strncat: precondition 'valid_string_src' got status unknown.
+FRAMAC_SHARE/libc/string.h:382:[value] warning: function __gen_e_acsl_strncat, behavior partial: postcondition got status unknown.
+tests/builtin/strcat.c:43:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_14);
+tests/builtin/strcat.c:44:[value] warning: function __gen_e_acsl_strncat: precondition 'valid_string_dst' got status invalid.
+tests/builtin/strcat.c:44:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_15);
+tests/builtin/strcat.c:45:[value] warning: function __gen_e_acsl_strncat: precondition 'valid_string_src' got status invalid.
+tests/builtin/strcat.c:45:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_16);
+tests/builtin/strcat.c:46:[value] warning: function __gen_e_acsl_strncat: precondition 'valid_string_dst' got status invalid.
+tests/builtin/strcat.c:46:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_17);
+tests/builtin/strcat.c:48:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_18);
+tests/builtin/strcat.c:49:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_19);
+tests/builtin/strcat.c:50:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_20);
+[value] using specification for function __e_acsl_memory_clean
+[value] done for function main

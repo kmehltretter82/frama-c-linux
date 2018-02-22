@@ -1,7 +1,2 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
-tests/runtime/literal_string.i:25:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/literal_string.i:26:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/literal_string.i:27:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/literal_string.i:28:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/literal_string.i:11:[value] warning: function __e_acsl_assert: precondition got status unknown.

@@ -560,7 +560,8 @@ and mmodel_call ~loc kf name ctx env t =
       None
       ctx
       (fun v _ ->
-	[ Misc.mk_call ~loc ~result:(Cil.var v) (Misc.mk_api_name name) [ e ] ])
+        let name = Functions.RTL.mk_api_name name in
+        [ Misc.mk_call ~loc ~result:(Cil.var v) name [ e ] ])
   in
   res, env, false, name
 
@@ -586,7 +587,7 @@ and mmodel_call_with_size ~loc kf name ctx env t =
       (fun v _ ->
         let ty = get_c_term_type t.term_type in
         let sizeof = mk_ptr_sizeof ty loc in
-        let fname = Misc.mk_api_name name in
+        let fname = Functions.RTL.mk_api_name name in
         [ Misc.mk_call ~loc ~result:(Cil.var v) fname [ e; sizeof ] ])
   in
   res, env
@@ -609,7 +610,7 @@ and mmodel_call_valid ~loc kf name ctx env t =
       (fun v _ ->
         let ty = get_c_term_type t.term_type in
         let sizeof = mk_ptr_sizeof ty loc in
-        let fname = Misc.mk_api_name name in
+        let fname = Functions.RTL.mk_api_name name in
         let args = [ e; sizeof; base; base_addr ] in
         [ Misc.mk_call ~loc ~result:(Cil.var v) fname args ])
   in
@@ -760,7 +761,7 @@ and named_predicate_content_to_exp ?name kf env p =
     (* optimisation when we know that the initialisation is ok *)
     | TAddrOf (TResult _, TNoOffset) -> Cil.one ~loc, env
     | TAddrOf (TVar { lv_origin = Some vi }, TNoOffset)
-	when vi.vformal || vi.vglob || Misc.is_generated_varinfo vi ->
+	when vi.vformal || vi.vglob || Functions.RTL.is_generated_name vi.vname ->
       Cil.one ~loc, env
     | _ -> mmodel_call_with_size ~loc kf "initialized" Cil.intType env t)
   | Pinitialized _ -> not_yet env "labeled \\initialized"

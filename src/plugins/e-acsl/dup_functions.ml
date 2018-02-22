@@ -124,7 +124,7 @@ let dup_fundec loc spec bhv kf vi new_vi =
         (* unamed formal parameter: must generate a fresh name since a fundec
            cannot have unnamed formals (see bts #2303). *)
         Env.Varname.get ~scope:Env.Function
-          (Misc.mk_gen_name "unamed_formal")
+          (Functions.RTL.mk_gen_name "unamed_formal")
       else
         vi.vname
     in
@@ -269,7 +269,7 @@ class dup_functions_visitor prj = object (self)
 		     (Extlib.the self#current_kf)))
 	-> 
     self#next ();
-    let name = Misc.mk_gen_name vi.vname in
+    let name = Functions.RTL.mk_gen_name vi.vname in
     let new_vi = 
       Project.on prj (Cil.makeGlobalVar name) vi.vtype
     in
