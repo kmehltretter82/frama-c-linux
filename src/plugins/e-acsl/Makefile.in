@@ -131,7 +131,6 @@ $(EACSL_PLUGIN_DIR)/local_config.ml: $(EACSL_PLUGIN_DIR)/Makefile.in $(VERSION_F
 ifeq (@MAY_RUN_TESTS@,yes)
 
 PLUGIN_TESTS_DIRS := \
-	builtin \
 	format \
 	reject \
 	runtime \
@@ -140,6 +139,11 @@ PLUGIN_TESTS_DIRS := \
 	no-main \
 	full-mmodel \
 	temporal
+
+# the following test suite is deactivated for the time being:
+# uncompatible with OCI
+#	builtin
+
 PLUGIN_TESTS_LIB := $(EACSL_PLUGIN_DIR)/tests/print.ml
 E_ACSL_TESTS: $(EACSL_PLUGIN_DIR)/tests/test_config
 
