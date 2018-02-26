@@ -1,5 +1,5 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
 tests/runtime/early_exit.c:14:[value] warning: locals {a} escaping the scope of a block of goto_bts through p
-tests/runtime/early_exit.c:18:[value] warning: accessing left-value that contains escaping addresses.
+tests/runtime/early_exit.c:18:[value:alarm] warning: accessing left-value that contains escaping addresses.
     assert ¬\dangling(&p);

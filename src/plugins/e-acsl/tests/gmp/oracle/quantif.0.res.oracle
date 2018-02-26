@@ -14,35 +14,35 @@
   __e_acsl_math_HUGE_VALF ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
   __e_acsl_math_INFINITY ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
 [value] using specification for function __e_acsl_memory_init
-tests/gmp/quantif.i:9:[value] warning: assertion got status unknown.
+tests/gmp/quantif.i:9:[value:alarm] warning: assertion got status unknown.
 tests/gmp/quantif.i:9:[value] entering loop for the first time
 [value] using specification for function __e_acsl_assert
-tests/gmp/quantif.i:10:[value] warning: assertion got status unknown.
+tests/gmp/quantif.i:10:[value:alarm] warning: assertion got status unknown.
 tests/gmp/quantif.i:10:[value] entering loop for the first time
-tests/gmp/quantif.i:11:[value] warning: assertion got status unknown.
+tests/gmp/quantif.i:11:[value:alarm] warning: assertion got status unknown.
 tests/gmp/quantif.i:11:[value] entering loop for the first time
-tests/gmp/quantif.i:12:[value] warning: assertion got status unknown.
+tests/gmp/quantif.i:12:[value:alarm] warning: assertion got status unknown.
 tests/gmp/quantif.i:12:[value] entering loop for the first time
-tests/gmp/quantif.i:16:[value] warning: assertion got status unknown.
+tests/gmp/quantif.i:16:[value:alarm] warning: assertion got status unknown.
 tests/gmp/quantif.i:16:[value] entering loop for the first time
-tests/gmp/quantif.i:16:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/gmp/quantif.i:21:[value] warning: assertion got status unknown.
+tests/gmp/quantif.i:16:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/quantif.i:21:[value:alarm] warning: assertion got status unknown.
 tests/gmp/quantif.i:21:[value] entering loop for the first time
-tests/gmp/quantif.i:25:[value] warning: assertion got status unknown.
+tests/gmp/quantif.i:25:[value:alarm] warning: assertion got status unknown.
 tests/gmp/quantif.i:25:[value] entering loop for the first time
 tests/gmp/quantif.i:26:[value] entering loop for the first time
-tests/gmp/quantif.i:25:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/quantif.i:25:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
 [value] using specification for function __e_acsl_store_block
-tests/gmp/quantif.i:31:[value] warning: assertion got status unknown.
+tests/gmp/quantif.i:31:[value:alarm] warning: assertion got status unknown.
 tests/gmp/quantif.i:31:[value] entering loop for the first time
 [value] using specification for function __e_acsl_valid
-tests/gmp/quantif.i:31:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/quantif.i:31:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
 tests/gmp/quantif.i:32:[value] entering loop for the first time
-tests/gmp/quantif.i:32:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/gmp/quantif.i:33:[value] warning: assertion got status unknown.
+tests/gmp/quantif.i:32:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/quantif.i:33:[value:alarm] warning: assertion got status unknown.
 tests/gmp/quantif.i:33:[value] entering loop for the first time
-tests/gmp/quantif.i:33:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/gmp/quantif.i:34:[value] warning: assertion got status unknown.
+tests/gmp/quantif.i:33:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/quantif.i:34:[value:alarm] warning: assertion got status unknown.
 [value] using specification for function __gmpz_init
 [value] using specification for function __gmpz_init_set_si
 [value] using specification for function __gmpz_set
@@ -52,7 +52,7 @@ tests/gmp/quantif.i:34:[value] entering loop for the first time
 [value] using specification for function __gmpz_cmp
 [value] using specification for function __gmpz_get_si
 [value] using specification for function __gmpz_add
-tests/gmp/quantif.i:34:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/quantif.i:34:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
 [value] using specification for function __e_acsl_delete_block
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main

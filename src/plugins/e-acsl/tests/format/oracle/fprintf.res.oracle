@@ -1,6 +1,7 @@
 tests/format/fprintf.c:12:[kernel] warning: Calling undeclared function strcpy. Old style K&R code?
 tests/format/fprintf.c:13:[kernel] warning: Calling undeclared function mktemp. Old style K&R code?
 tests/format/fprintf.c:17:[kernel] warning: Calling undeclared function fork. Old style K&R code?
+tests/format/fprintf.c:24:[kernel:typing:incompatible-types-call] warning: expected 'FILE *' but got argument of type 'int *': & argc
 [e-acsl] beginning translation.
 [e-acsl] warning: annotating undefined function `exit':
     the generated program may miss memory instrumentation
@@ -93,46 +94,46 @@ tests/format/fprintf.c:17:[kernel] warning: Neither code nor specification for f
 [value] using specification for function __e_acsl_builtin_fprintf
 [value] using specification for function exit
 [value] using specification for function waitpid
-tests/format/fprintf.c:17:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status);
+tests/format/fprintf.c:17:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status);
 tests/format/signalled.h:12:[kernel] warning: Neither code nor specification for function __e_acsl_builtin_printf, generating default assigns from the prototype
 [value] using specification for function __e_acsl_builtin_printf
 [value] using specification for function __e_acsl_delete_block
 tests/format/fprintf.c:18:[value] warning: Completely invalid destination for assigns clause *stream. Ignoring.
-tests/format/fprintf.c:18:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_0);
+tests/format/fprintf.c:18:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_0);
 [value] using specification for function fopen
-tests/format/fprintf.c:21:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_1);
+tests/format/fprintf.c:21:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_1);
 [value] using specification for function __e_acsl_valid
 [value] using specification for function __e_acsl_assert
-FRAMAC_SHARE/libc/stdio.h:87:[value] warning: function __e_acsl_assert: precondition got status unknown.
+FRAMAC_SHARE/libc/stdio.h:87:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
 [value] using specification for function fclose
-tests/format/fprintf.c:23:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_2);
+tests/format/fprintf.c:23:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_2);
 tests/format/fprintf.c:24:[value] warning: Completely invalid destination for assigns clause *stream. Ignoring.
-tests/format/fprintf.c:24:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_3);
+tests/format/fprintf.c:24:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_3);
 [value] using specification for function remove
 FRAMAC_SHARE/libc/stdio.h:70:[value] warning: no 'assigns \result \from ...' clause specified for function remove
 tests/format/fprintf.c:31:[kernel] warning: Neither code nor specification for function __e_acsl_builtin_dprintf, generating default assigns from the prototype
 [value] using specification for function __e_acsl_builtin_dprintf
-tests/format/fprintf.c:31:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_4);
-tests/format/fprintf.c:32:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_5);
+tests/format/fprintf.c:31:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_4);
+tests/format/fprintf.c:32:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_5);
 tests/format/fprintf.c:38:[kernel] warning: Neither code nor specification for function __e_acsl_builtin_sprintf, generating default assigns from the prototype
 [value] using specification for function __e_acsl_builtin_sprintf
-tests/format/fprintf.c:38:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_6);
-tests/format/fprintf.c:39:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_7);
-tests/format/fprintf.c:40:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_8);
+tests/format/fprintf.c:38:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_6);
+tests/format/fprintf.c:39:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_7);
+tests/format/fprintf.c:40:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_8);
 tests/format/fprintf.c:41:[value] warning: Completely invalid destination for assigns clause *(str + (0 ..)). Ignoring.
-tests/format/fprintf.c:41:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_9);
+tests/format/fprintf.c:41:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_9);
 tests/format/fprintf.c:42:[value] warning: Completely invalid destination for assigns clause *(str + (0 ..)). Ignoring.
-tests/format/fprintf.c:42:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_10);
+tests/format/fprintf.c:42:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_10);
 tests/format/fprintf.c:45:[kernel] warning: Neither code nor specification for function __e_acsl_builtin_snprintf, generating default assigns from the prototype
 [value] using specification for function __e_acsl_builtin_snprintf
-tests/format/fprintf.c:45:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_11);
-tests/format/fprintf.c:46:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_12);
+tests/format/fprintf.c:45:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_11);
+tests/format/fprintf.c:46:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_12);
 tests/format/fprintf.c:47:[value] warning: Completely invalid destination for assigns clause *(str + (0 ..)). Ignoring.
-tests/format/fprintf.c:47:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_13);
-tests/format/fprintf.c:48:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_14);
+tests/format/fprintf.c:47:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_13);
+tests/format/fprintf.c:48:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_14);
 tests/format/fprintf.c:49:[value] warning: Completely invalid destination for assigns clause *(str + (0 ..)). Ignoring.
-tests/format/fprintf.c:49:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_15);
+tests/format/fprintf.c:49:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_15);
 tests/format/fprintf.c:50:[value] warning: Completely invalid destination for assigns clause *(str + (0 ..)). Ignoring.
-tests/format/fprintf.c:50:[value] warning: accessing uninitialized left-value. assert \initialized(&process_status_16);
+tests/format/fprintf.c:50:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_16);
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main

@@ -17,23 +17,23 @@
 [value] using specification for function __gmpz_init_set_si
 [value] using specification for function __gmpz_cmp
 [value] using specification for function __e_acsl_assert
-tests/gmp/comparison.i:7:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/comparison.i:7:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_clear
-tests/gmp/comparison.i:8:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/gmp/comparison.i:9:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/gmp/comparison.i:10:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/gmp/comparison.i:15:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/gmp/comparison.i:16:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/gmp/comparison.i:17:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/gmp/comparison.i:18:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/gmp/comparison.i:19:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/gmp/comparison.i:20:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/comparison.i:8:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/comparison.i:9:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/comparison.i:10:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/comparison.i:15:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/comparison.i:16:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/comparison.i:17:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/comparison.i:18:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/comparison.i:19:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/comparison.i:20:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_init
 [value] using specification for function __gmpz_neg
-tests/gmp/comparison.i:22:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/gmp/comparison.i:23:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/gmp/comparison.i:24:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/gmp/comparison.i:25:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/gmp/comparison.i:26:[value] warning: function __e_acsl_assert: precondition got status unknown.
-tests/gmp/comparison.i:27:[value] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/comparison.i:22:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/comparison.i:23:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/comparison.i:24:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/comparison.i:25:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/comparison.i:26:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/comparison.i:27:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
 [value] done for function main
