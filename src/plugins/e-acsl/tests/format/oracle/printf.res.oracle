@@ -15,46 +15,46 @@ tests/format/printf.c:88:[kernel] warning: Floating-point constant 0.2 is not re
 [e-acsl] warning: annotating undefined function `strcpy':
     the generated program may miss memory instrumentation
     if there are memory-related annotations.
-FRAMAC_SHARE/libc/stdio.h:150:[kernel] warning: Neither code nor specification for function printf, generating default assigns from the prototype
-FRAMAC_SHARE/libc/unistd.h:785:[kernel] warning: Neither code nor specification for function fork, generating default assigns from the prototype
+FRAMAC_SHARE/libc/stdio.h:156:[kernel] warning: Neither code nor specification for function printf, generating default assigns from the prototype
+FRAMAC_SHARE/libc/unistd.h:780:[kernel] warning: Neither code nor specification for function fork, generating default assigns from the prototype
 FRAMAC_SHARE/libc/sys/wait.h:60:[kernel] warning: Neither code nor specification for function waitpid, generating default assigns from the prototype
 :0:[kernel] warning: Neither code nor specification for function __fc_vla_free, generating default assigns from the prototype
 :0:[kernel] warning: Neither code nor specification for function __fc_vla_alloc, generating default assigns from the prototype
-FRAMAC_SHARE/libc/string.h:309:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+FRAMAC_SHARE/libc/string.h:317:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
     Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:310:[e-acsl] warning: E-ACSL construct `trange' is not yet supported. Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:312:[e-acsl] warning: E-ACSL construct `\separated' is not yet supported. Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:312:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+FRAMAC_SHARE/libc/string.h:318:[e-acsl] warning: E-ACSL construct `trange' is not yet supported. Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:320:[e-acsl] warning: E-ACSL construct `\separated' is not yet supported. Ignoring annotation.
+FRAMAC_SHARE/libc/string.h:320:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
     Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:315:[e-acsl] warning: E-ACSL construct `logic function returning an integer' is not yet supported.
+FRAMAC_SHARE/libc/string.h:323:[e-acsl] warning: E-ACSL construct `logic function returning an integer' is not yet supported.
     Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:140:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+FRAMAC_SHARE/libc/string.h:143:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
     Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:153:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+FRAMAC_SHARE/libc/string.h:157:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
     Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:143:[e-acsl] warning: E-ACSL construct `user-defined logic type' is not yet supported.
+FRAMAC_SHARE/libc/string.h:146:[e-acsl] warning: E-ACSL construct `user-defined logic type' is not yet supported.
     Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:143:[e-acsl] warning: E-ACSL construct `user-defined logic type' is not yet supported.
+FRAMAC_SHARE/libc/string.h:146:[e-acsl] warning: E-ACSL construct `user-defined logic type' is not yet supported.
     Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:150:[e-acsl] warning: E-ACSL construct `user-defined logic type' is not yet supported.
+FRAMAC_SHARE/libc/string.h:153:[e-acsl] warning: E-ACSL construct `user-defined logic type' is not yet supported.
     Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:108:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
+FRAMAC_SHARE/libc/string.h:111:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
     Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:108:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+FRAMAC_SHARE/libc/string.h:111:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
     Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:110:[e-acsl] warning: E-ACSL construct `logic function returning an integer' is not yet supported.
+FRAMAC_SHARE/libc/string.h:113:[e-acsl] warning: E-ACSL construct `logic function returning an integer' is not yet supported.
     Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:110:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+FRAMAC_SHARE/libc/string.h:113:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
     Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:415:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
+FRAMAC_SHARE/libc/stdlib.h:406:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
     Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
 [value] Initial state computed
 [value:initial-state] Values of globals at initialization
-  __fc_rand_max ∈ {32767}
   __fc_heap_status ∈ [--..--]
+  __fc_rand_max ∈ {32767}
   __e_acsl_init ∈ [--..--]
   __fc_fopen[0..15] ∈ {0}
   __fc_p_fopen ∈ {{ &__fc_fopen[0] }}

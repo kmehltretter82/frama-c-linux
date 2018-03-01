@@ -4,8 +4,8 @@
 [value] Computing initial state
 [value] Initial state computed
 [value:initial-state] Values of globals at initialization
-  __fc_rand_max ∈ {32767}
   __fc_heap_status ∈ [--..--]
+  __fc_rand_max ∈ {32767}
   __e_acsl_init ∈ [--..--]
   __fc_fopen[0..15] ∈ {0}
   __fc_p_fopen ∈ {{ &__fc_fopen[0] }}
