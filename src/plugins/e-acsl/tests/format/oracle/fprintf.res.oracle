@@ -19,7 +19,7 @@ FRAMAC_SHARE/libc/stdio.h:146:[kernel] warning: Neither code nor specification f
 FRAMAC_SHARE/libc/stdio.h:150:[kernel] warning: Neither code nor specification for function printf, generating default assigns from the prototype
 FRAMAC_SHARE/libc/stdio.h:152:[kernel] warning: Neither code nor specification for function snprintf, generating default assigns from the prototype
 FRAMAC_SHARE/libc/stdio.h:154:[kernel] warning: Neither code nor specification for function sprintf, generating default assigns from the prototype
-FRAMAC_SHARE/libc/stdio.h:335:[kernel] warning: Neither code nor specification for function dprintf, generating default assigns from the prototype
+FRAMAC_SHARE/libc/stdio.h:340:[kernel] warning: Neither code nor specification for function dprintf, generating default assigns from the prototype
 FRAMAC_SHARE/libc/sys/wait.h:60:[kernel] warning: Neither code nor specification for function waitpid, generating default assigns from the prototype
 tests/format/fprintf.c:12:[kernel] warning: Neither code nor specification for function strcpy, generating default assigns from the prototype
 tests/format/fprintf.c:13:[kernel] warning: Neither code nor specification for function mktemp, generating default assigns from the prototype
