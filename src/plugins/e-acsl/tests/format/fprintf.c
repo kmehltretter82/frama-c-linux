@@ -9,22 +9,18 @@
 int main(int argc, const char **argv) {
   char *pstr = "Hello world!";
   char template [256];
-  strcpy(template, "/tmp/eacsl-tmp.XXXXXX");
-  char *tfname = mktemp(template);
 
   /* *** fprintf *** */
   // The first argument to printf should be allocated valid FILE
   OK(fprintf(stdout, "foobar\n"));
   ABRT(fprintf(NULL, "foobar\n"));
-  FILE *fh = fopen(tfname, "w");
+  FILE *fh = tmpfile();
   if (fh) {
     OK(fprintf(fh, "foobar %s\n", "foobar"));
     fclose(fh);
     ABRT(fprintf(fh, "foobar %s\n", "foobar"));
     ABRT(fprintf(&argc, "foobar %s\n", "foobar"));
   }
-
-  remove(tfname);
 
   /* *** dprintf *** */
   // The first argument to dprintf should be opened file descriptor
