@@ -1,4 +1,4 @@
-tests/runtime/hidden_malloc.c:11:[kernel] warning: Calling undeclared function realpath. Old style K&R code?
+tests/runtime/hidden_malloc.c:11:[kernel:typing:implicit-function-declaration] warning: Calling undeclared function realpath. Old style K&R code?
 [e-acsl] beginning translation.
 tests/runtime/hidden_malloc.c:11:[kernel] warning: Neither code nor specification for function realpath, generating default assigns from the prototype
 [e-acsl] translation done in project "e-acsl".
