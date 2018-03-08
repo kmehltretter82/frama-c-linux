@@ -10,11 +10,11 @@ tests/format/fprintf.c:22:[kernel:typing:incompatible-types-call] warning: expec
 [e-acsl] warning: annotating undefined function `fclose':
     the generated program may miss memory instrumentation
     if there are memory-related annotations.
-FRAMAC_SHARE/libc/stdio.h:152:[kernel] warning: Neither code nor specification for function fprintf, generating default assigns from the prototype
-FRAMAC_SHARE/libc/stdio.h:156:[kernel] warning: Neither code nor specification for function printf, generating default assigns from the prototype
-FRAMAC_SHARE/libc/stdio.h:158:[kernel] warning: Neither code nor specification for function snprintf, generating default assigns from the prototype
-FRAMAC_SHARE/libc/stdio.h:160:[kernel] warning: Neither code nor specification for function sprintf, generating default assigns from the prototype
-FRAMAC_SHARE/libc/stdio.h:349:[kernel] warning: Neither code nor specification for function dprintf, generating default assigns from the prototype
+FRAMAC_SHARE/libc/stdio.h:153:[kernel] warning: Neither code nor specification for function fprintf, generating default assigns from the prototype
+FRAMAC_SHARE/libc/stdio.h:157:[kernel] warning: Neither code nor specification for function printf, generating default assigns from the prototype
+FRAMAC_SHARE/libc/stdio.h:159:[kernel] warning: Neither code nor specification for function snprintf, generating default assigns from the prototype
+FRAMAC_SHARE/libc/stdio.h:161:[kernel] warning: Neither code nor specification for function sprintf, generating default assigns from the prototype
+FRAMAC_SHARE/libc/stdio.h:353:[kernel] warning: Neither code nor specification for function dprintf, generating default assigns from the prototype
 FRAMAC_SHARE/libc/sys/wait.h:60:[kernel] warning: Neither code nor specification for function waitpid, generating default assigns from the prototype
 tests/format/fprintf.c:15:[kernel] warning: Neither code nor specification for function fork, generating default assigns from the prototype
 FRAMAC_SHARE/libc/stdio.h:93:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
