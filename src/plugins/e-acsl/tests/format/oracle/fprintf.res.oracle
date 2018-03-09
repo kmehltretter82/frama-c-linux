@@ -1,4 +1,4 @@
-tests/format/fprintf.c:15:[kernel] warning: Calling undeclared function fork. Old style K&R code?
+tests/format/fprintf.c:15:[kernel:typing:implicit-function-declaration] warning: Calling undeclared function fork. Old style K&R code?
 tests/format/fprintf.c:22:[kernel:typing:incompatible-types-call] warning: expected 'FILE *' but got argument of type 'int *': & argc
 [e-acsl] beginning translation.
 [e-acsl] warning: annotating undefined function `exit':
