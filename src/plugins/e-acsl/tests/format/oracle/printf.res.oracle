@@ -18,8 +18,6 @@ tests/format/printf.c:88:[kernel] warning: Floating-point constant 0.2 is not re
 FRAMAC_SHARE/libc/stdio.h:157:[kernel:annot:missing-spec] warning: Neither code nor specification for function printf, generating default assigns from the prototype
 FRAMAC_SHARE/libc/unistd.h:781:[kernel:annot:missing-spec] warning: Neither code nor specification for function fork, generating default assigns from the prototype
 FRAMAC_SHARE/libc/sys/wait.h:60:[kernel:annot:missing-spec] warning: Neither code nor specification for function waitpid, generating default assigns from the prototype
-:0:[kernel:annot:missing-spec] warning: Neither code nor specification for function __fc_vla_free, generating default assigns from the prototype
-:0:[kernel:annot:missing-spec] warning: Neither code nor specification for function __fc_vla_alloc, generating default assigns from the prototype
 FRAMAC_SHARE/libc/string.h:319:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
     Ignoring annotation.
 FRAMAC_SHARE/libc/string.h:320:[e-acsl] warning: E-ACSL construct `trange' is not yet supported. Ignoring annotation.
