@@ -1,0 +1,57 @@
+[e-acsl] beginning translation.
+tests/gmp/let.c:29:[e-acsl] warning: E-ACSL construct `let-binding on array or pointer' is not yet supported.
+    Ignoring annotation.
+tests/gmp/let.c:27:[e-acsl] warning: E-ACSL construct `let-binding on array or pointer' is not yet supported.
+    Ignoring annotation.
+[e-acsl] translation done in project "e-acsl".
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value:initial-state] Values of globals at initialization
+  __fc_heap_status ∈ [--..--]
+  __fc_rand_max ∈ {32767}
+  __e_acsl_init ∈ [--..--]
+  __fc_fopen[0..15] ∈ {0}
+  __fc_p_fopen ∈ {{ &__fc_fopen[0] }}
+  __e_acsl_heap_allocation_size ∈ [--..--]
+  __e_acsl_math_HUGE_VAL ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  __e_acsl_math_HUGE_VALF ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
+  __e_acsl_math_INFINITY ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+[value] using specification for function __e_acsl_memory_init
+[value] using specification for function __e_acsl_store_block
+tests/gmp/let.c:7:[value:alarm] warning: assertion got status unknown.
+[value] using specification for function __gmpz_init_set_si
+[value] using specification for function __gmpz_init
+[value] using specification for function __gmpz_mul
+[value] using specification for function __gmpz_init_set
+[value] using specification for function __gmpz_cmp
+[value] using specification for function __e_acsl_assert
+tests/gmp/let.c:7:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
+[value] using specification for function __gmpz_clear
+tests/gmp/let.c:9:[value:alarm] warning: assertion got status unknown.
+[value] using specification for function __gmpz_add
+tests/gmp/let.c:9:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/let.c:12:[value] cannot evaluate ACSL term, unsupported ACSL construct: \let bindings
+tests/gmp/let.c:12:[value:alarm] warning: assertion got status unknown.
+tests/gmp/let.c:12:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/let.c:14:[value:alarm] warning: assertion got status unknown.
+tests/gmp/let.c:14:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
+[value] using specification for function __e_acsl_full_init
+tests/gmp/let.c:18:[value] cannot evaluate ACSL term, unsupported ACSL construct: \let bindings
+tests/gmp/let.c:18:[value:alarm] warning: assertion got status unknown.
+tests/gmp/let.c:18:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/let.c:21:[value:alarm] warning: assertion got status unknown.
+tests/gmp/let.c:21:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/let.c:24:[value:alarm] warning: assertion got status unknown.
+tests/gmp/let.c:27:[value:alarm] warning: assertion got status unknown.
+tests/gmp/let.c:27:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
+tests/gmp/let.c:29:[value] cannot evaluate ACSL term, unsupported ACSL construct: \let bindings
+tests/gmp/let.c:29:[value:alarm] warning: assertion got status unknown.
+tests/gmp/let.c:32:[value:alarm] warning: assertion got status unknown.
+tests/gmp/let.c:32:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
+[value] using specification for function __e_acsl_initialize
+tests/gmp/let.c:36:[value] cannot evaluate ACSL term, unsupported ACSL construct: \let bindings
+tests/gmp/let.c:36:[value:alarm] warning: assertion got status unknown.
+[value] using specification for function __e_acsl_delete_block
+[value] using specification for function __e_acsl_memory_clean
+[value] done for function main
