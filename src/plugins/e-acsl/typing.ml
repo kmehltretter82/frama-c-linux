@@ -477,7 +477,7 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
       infer_if_integer li;
       let li_t = Misc.term_of_li li in
       ignore (type_term ~use_gmp_opt:true li_t);
-      dup (type_term ~use_gmp_opt:true t).ty
+      dup (type_term ~use_gmp_opt:true ?ctx t).ty
     | Tlambda (_,_) -> Error.not_yet "lambda"
     | TDataCons (_,_) -> Error.not_yet "datacons"
     | TUpdate (_,_,_) -> Error.not_yet "update"
