@@ -14,7 +14,6 @@ int main(void)
   int __retres;
   union __anonunion_s_2 s;
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
-  __e_acsl_store_block((void *)(& s),(size_t)8);
   int n = -2;
   /*@ assert \let u = n * n; u ≥ 0; */
   {
@@ -132,121 +131,146 @@ int main(void)
     __gmpz_clear(__gen_e_acsl_add_3);
     __gmpz_clear(__gen_e_acsl__8);
   }
+  /*@ assert \let u = 1; (\let u = u + 1; u) ≡ 2; */
+  {
+    int __gen_e_acsl_u_6;
+    __e_acsl_mpz_t __gen_e_acsl_u_7;
+    __e_acsl_mpz_t __gen_e_acsl_u_8;
+    __e_acsl_mpz_t __gen_e_acsl__9;
+    __e_acsl_mpz_t __gen_e_acsl_add_4;
+    __e_acsl_mpz_t __gen_e_acsl__10;
+    int __gen_e_acsl_eq_3;
+    __gen_e_acsl_u_6 = 1;
+    __gmpz_init_set_si(__gen_e_acsl_u_8,(long)__gen_e_acsl_u_6);
+    __gmpz_init_set_si(__gen_e_acsl__9,1L);
+    __gmpz_init(__gen_e_acsl_add_4);
+    __gmpz_add(__gen_e_acsl_add_4,
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl_u_8),
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl__9));
+    __gmpz_init_set(__gen_e_acsl_u_7,
+                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_add_4));
+    __gmpz_init_set_si(__gen_e_acsl__10,2L);
+    __gen_e_acsl_eq_3 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_u_7),
+                                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__10));
+    __e_acsl_assert(__gen_e_acsl_eq_3 == 0,(char *)"Assertion",
+                    (char *)"main",
+                    (char *)"\\let u = 1; (\\let u = u + 1; u) == 2",17);
+    __gmpz_clear(__gen_e_acsl_u_7);
+    __gmpz_clear(__gen_e_acsl_u_8);
+    __gmpz_clear(__gen_e_acsl__9);
+    __gmpz_clear(__gen_e_acsl_add_4);
+    __gmpz_clear(__gen_e_acsl__10);
+  }
   long m = 0x7fffffffffffffffL;
-  __e_acsl_store_block((void *)(& m),(size_t)8);
-  __e_acsl_full_init((void *)(& m));
   /*@ assert (\let u = m; u * u) > m; */
   {
-    long __gen_e_acsl_u_6;
-    __e_acsl_mpz_t __gen_e_acsl_u_7;
+    long __gen_e_acsl_u_9;
+    __e_acsl_mpz_t __gen_e_acsl_u_10;
     __e_acsl_mpz_t __gen_e_acsl_mul_3;
     __e_acsl_mpz_t __gen_e_acsl_m;
     int __gen_e_acsl_gt_2;
-    __gen_e_acsl_u_6 = m;
-    __gmpz_init_set_si(__gen_e_acsl_u_7,__gen_e_acsl_u_6);
+    __gen_e_acsl_u_9 = m;
+    __gmpz_init_set_si(__gen_e_acsl_u_10,__gen_e_acsl_u_9);
     __gmpz_init(__gen_e_acsl_mul_3);
     __gmpz_mul(__gen_e_acsl_mul_3,
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl_u_7),
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl_u_7));
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl_u_10),
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl_u_10));
     __gmpz_init_set_si(__gen_e_acsl_m,m);
     __gen_e_acsl_gt_2 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_mul_3),
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_m));
     __e_acsl_assert(__gen_e_acsl_gt_2 > 0,(char *)"Assertion",(char *)"main",
-                    (char *)"(\\let u = m; u * u) > m",18);
-    __gmpz_clear(__gen_e_acsl_u_7);
+                    (char *)"(\\let u = m; u * u) > m",21);
+    __gmpz_clear(__gen_e_acsl_u_10);
     __gmpz_clear(__gen_e_acsl_mul_3);
     __gmpz_clear(__gen_e_acsl_m);
   }
   char c = (char)'a';
   /*@ assert \let u = 'b'; c < u; */
   {
-    int __gen_e_acsl_u_8;
+    int __gen_e_acsl_u_11;
     __e_acsl_mpz_t __gen_e_acsl_c;
-    __e_acsl_mpz_t __gen_e_acsl_u_9;
+    __e_acsl_mpz_t __gen_e_acsl_u_12;
     int __gen_e_acsl_lt;
-    __gen_e_acsl_u_8 = 'b';
+    __gen_e_acsl_u_11 = 'b';
     __gmpz_init_set_si(__gen_e_acsl_c,(long)c);
-    __gmpz_init_set_si(__gen_e_acsl_u_9,(long)__gen_e_acsl_u_8);
+    __gmpz_init_set_si(__gen_e_acsl_u_12,(long)__gen_e_acsl_u_11);
     __gen_e_acsl_lt = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_c),
-                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_u_9));
+                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_u_12));
     __e_acsl_assert(__gen_e_acsl_lt < 0,(char *)"Assertion",(char *)"main",
-                    (char *)"\\let u = \'b\'; c < u",21);
+                    (char *)"\\let u = \'b\'; c < u",24);
     __gmpz_clear(__gen_e_acsl_c);
-    __gmpz_clear(__gen_e_acsl_u_9);
+    __gmpz_clear(__gen_e_acsl_u_12);
   }
   float f = 1.0f;
   __e_acsl_store_block((void *)(& f),(size_t)4);
   __e_acsl_full_init((void *)(& f));
   /*@ assert \let u = f; u ≡ f; */
   {
-    float __gen_e_acsl_u_10;
-    __gen_e_acsl_u_10 = f;
-    __e_acsl_assert(__gen_e_acsl_u_10 == f,(char *)"Assertion",
-                    (char *)"main",(char *)"\\let u = f; u == f",24);
+    float __gen_e_acsl_u_13;
+    __gen_e_acsl_u_13 = f;
+    __e_acsl_assert(__gen_e_acsl_u_13 == f,(char *)"Assertion",
+                    (char *)"main",(char *)"\\let u = f; u == f",27);
   }
   int t[4] = {1, 2, 3, 4};
   /*@ assert \let u = &t[1]; 1 ≡ 1; */
   {
-    int * /*[4]*/ __gen_e_acsl_u_11;
-    __e_acsl_mpz_t __gen_e_acsl__9;
-    int __gen_e_acsl_eq_3;
-    __gen_e_acsl_u_11 = & t[1];
-    __gmpz_init_set_si(__gen_e_acsl__9,1L);
-    __gen_e_acsl_eq_3 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__9),
-                                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__9));
-    __e_acsl_assert(__gen_e_acsl_eq_3 == 0,(char *)"Assertion",
-                    (char *)"main",(char *)"\\let u = &t[1]; 1 == 1",27);
-    __gmpz_clear(__gen_e_acsl__9);
+    int * /*[4]*/ __gen_e_acsl_u_14;
+    __e_acsl_mpz_t __gen_e_acsl__11;
+    int __gen_e_acsl_eq_4;
+    __gen_e_acsl_u_14 = & t[1];
+    __gmpz_init_set_si(__gen_e_acsl__11,1L);
+    __gen_e_acsl_eq_4 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__11),
+                                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__11));
+    __e_acsl_assert(__gen_e_acsl_eq_4 == 0,(char *)"Assertion",
+                    (char *)"main",(char *)"\\let u = &t[1]; 1 == 1",30);
+    __gmpz_clear(__gen_e_acsl__11);
   }
   /*@ assert (\let u = &t[1]; 1) ≡ 1; */
   {
-    int * /*[4]*/ __gen_e_acsl_u_12;
-    __gen_e_acsl_u_12 = & t[1];
+    int * /*[4]*/ __gen_e_acsl_u_15;
+    __gen_e_acsl_u_15 = & t[1];
     __e_acsl_assert(1,(char *)"Assertion",(char *)"main",
-                    (char *)"(\\let u = &t[1]; 1) == 1",29);
+                    (char *)"(\\let u = &t[1]; 1) == 1",32);
   }
   struct __anonstruct_r_1 r = {.x = 1, .y = 2};
   __e_acsl_store_block((void *)(& r),(size_t)8);
   __e_acsl_full_init((void *)(& r));
   /*@ assert \let u = r; u.x + u.y ≡ 3; */
   {
-    struct __anonstruct_r_1 __gen_e_acsl_u_13;
-    __e_acsl_mpz_t __gen_e_acsl__10;
-    __e_acsl_mpz_t __gen_e_acsl__11;
-    __e_acsl_mpz_t __gen_e_acsl_add_4;
+    struct __anonstruct_r_1 __gen_e_acsl_u_16;
     __e_acsl_mpz_t __gen_e_acsl__12;
-    int __gen_e_acsl_eq_4;
-    __gen_e_acsl_u_13 = r;
-    __gmpz_init_set_si(__gen_e_acsl__10,(long)__gen_e_acsl_u_13.x);
-    __gmpz_init_set_si(__gen_e_acsl__11,(long)__gen_e_acsl_u_13.y);
-    __gmpz_init(__gen_e_acsl_add_4);
-    __gmpz_add(__gen_e_acsl_add_4,
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl__10),
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl__11));
-    __gmpz_init_set_si(__gen_e_acsl__12,3L);
-    __gen_e_acsl_eq_4 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_add_4),
-                                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__12));
-    __e_acsl_assert(__gen_e_acsl_eq_4 == 0,(char *)"Assertion",
-                    (char *)"main",(char *)"\\let u = r; u.x + u.y == 3",32);
-    __gmpz_clear(__gen_e_acsl__10);
-    __gmpz_clear(__gen_e_acsl__11);
-    __gmpz_clear(__gen_e_acsl_add_4);
+    __e_acsl_mpz_t __gen_e_acsl__13;
+    __e_acsl_mpz_t __gen_e_acsl_add_5;
+    __e_acsl_mpz_t __gen_e_acsl__14;
+    int __gen_e_acsl_eq_5;
+    __gen_e_acsl_u_16 = r;
+    __gmpz_init_set_si(__gen_e_acsl__12,(long)__gen_e_acsl_u_16.x);
+    __gmpz_init_set_si(__gen_e_acsl__13,(long)__gen_e_acsl_u_16.y);
+    __gmpz_init(__gen_e_acsl_add_5);
+    __gmpz_add(__gen_e_acsl_add_5,
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl__12),
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl__13));
+    __gmpz_init_set_si(__gen_e_acsl__14,3L);
+    __gen_e_acsl_eq_5 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_add_5),
+                                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__14));
+    __e_acsl_assert(__gen_e_acsl_eq_5 == 0,(char *)"Assertion",
+                    (char *)"main",(char *)"\\let u = r; u.x + u.y == 3",35);
     __gmpz_clear(__gen_e_acsl__12);
+    __gmpz_clear(__gen_e_acsl__13);
+    __gmpz_clear(__gen_e_acsl_add_5);
+    __gmpz_clear(__gen_e_acsl__14);
   }
-  __e_acsl_initialize((void *)(& s.x),sizeof(int));
   s.x = 5;
   /*@ assert (\let u = s; u.x) > 0; */
   {
-    union __anonunion_s_2 __gen_e_acsl_u_14;
-    __gen_e_acsl_u_14 = s;
-    __e_acsl_assert(__gen_e_acsl_u_14.x > 0,(char *)"Assertion",
-                    (char *)"main",(char *)"(\\let u = s; u.x) > 0",36);
+    union __anonunion_s_2 __gen_e_acsl_u_17;
+    __gen_e_acsl_u_17 = s;
+    __e_acsl_assert(__gen_e_acsl_u_17.x > 0,(char *)"Assertion",
+                    (char *)"main",(char *)"(\\let u = s; u.x) > 0",39);
   }
   __retres = 0;
-  __e_acsl_delete_block((void *)(& s));
   __e_acsl_delete_block((void *)(& r));
   __e_acsl_delete_block((void *)(& f));
-  __e_acsl_delete_block((void *)(& m));
   __e_acsl_memory_clean();
   return __retres;
 }

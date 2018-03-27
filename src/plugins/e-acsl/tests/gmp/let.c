@@ -13,6 +13,9 @@ int main(void) {
   /*@ assert
       \let u = 1;
       (\let v = u + 1; v) == 2; */ ;
+  /*@ assert
+      \let u = 1;
+      (\let u = u + 1; u) == 2; */ ;
 
   long m = 0x7fffffffffffffffL;
   /*@ assert (\let u = m; u*u) > m; */ ;
