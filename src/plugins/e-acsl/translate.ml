@@ -501,6 +501,7 @@ and context_insensitive_term_to_exp kf env t =
   | Tlet(li, t) ->
     let env = env_of_li li kf env loc in
     let e, env = term_to_exp kf env t in
+    Interval.Env.remove li.l_var_info;
     e, env, false, ""
 
 (* Convert an ACSL term into a corresponding C expression (if any) in the given
@@ -735,7 +736,9 @@ and named_predicate_content_to_exp ?name kf env p =
     conditional_to_exp loc None e1 res2 res3
   | Plet(li, p) ->
     let env = env_of_li li kf env loc in
-    named_predicate_to_exp kf env p
+    let e, env = named_predicate_to_exp kf env p in
+    Interval.Env.remove li.l_var_info;
+    e, env
   | Pforall _ | Pexists _ -> Quantif.quantif_to_exp kf env p
   | Pat(p, BuiltinLabel Here) ->
     named_predicate_to_exp kf env p

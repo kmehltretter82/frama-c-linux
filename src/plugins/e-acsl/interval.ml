@@ -60,6 +60,7 @@ module Env = struct
   let tbl: Ival.t Logic_var.Hashtbl.t = Logic_var.Hashtbl.create 7
   let clear () = Logic_var.Hashtbl.clear tbl
   let add = Logic_var.Hashtbl.add tbl
+  let remove = Logic_var.Hashtbl.remove tbl
   let find = Logic_var.Hashtbl.find tbl
 end
 
@@ -193,9 +194,12 @@ let rec infer t =
 
   | Tlet (li,t) ->
     let li_t = Misc.term_of_li li in
+    let li_v = li.l_var_info in
     let i = infer li_t in
-    Env.add li.l_var_info i;
-    infer t
+    Env.add li_v i;
+    let i = infer t in
+    Env.remove li_v;
+    i
   | TConst (LStr _ | LWStr _ | LReal _)
   | TBinOp (PlusPI,_,_)
   | TBinOp (IndexPI,_,_)
