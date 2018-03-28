@@ -190,8 +190,12 @@ let rec infer t =
   | Tinter _ -> Error.not_yet "tset intersection"
   | Tcomprehension (_,_,_) -> Error.not_yet "tset comprehension"
   | Trange (_,_) -> Error.not_yet "trange"
-  | Tlet (_,_) -> Error.not_yet "let binding"
 
+  | Tlet (li,t) ->
+    let li_t = Misc.term_of_li li in
+    let i = infer li_t in
+    Env.add li.l_var_info i;
+    infer t
   | TConst (LStr _ | LWStr _ | LReal _)
   | TBinOp (PlusPI,_,_)
   | TBinOp (IndexPI,_,_)

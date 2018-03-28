@@ -246,6 +246,10 @@ let rec ptr_index ?(loc=Location.unknown) ?(index=(Cil.zero loc)) exp =
   | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _
     -> assert false
 
+let term_of_li li =  match li.l_body with
+| LBterm t -> t
+| LBnone | LBreads _ | LBpred _ | LBinductive _ ->
+  Options.fatal "li.l_body does not match LBterm(t) in Misc.term_of_li"
 (*
 Local Variables:
 compile-command: "make"
