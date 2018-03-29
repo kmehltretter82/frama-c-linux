@@ -2,11 +2,12 @@
 #include "stdio.h"
 #include "stdlib.h"
 int LEN = 10;
-/*@ assigns \nothing; */
- __attribute__((__FC_BUILTIN__)) void __e_acsl_delete_block(void *);
+/*@ assigns \nothing;
+    frees p; */
+ __attribute__((__FC_BUILTIN__)) void __e_acsl_delete_block(void *p);
 
 /* compiler builtin: 
-   void *__builtin_alloca(unsigned long);   */
+    __attribute__((__FC_BUILTIN__)) void *__builtin_alloca(unsigned long size);   */
 int main(int argc, char **argv)
 {
   int __retres;

@@ -400,11 +400,12 @@ void apply_specifier(char *format, int spec)
   return;
 }
 
-/*@ assigns \nothing; */
- __attribute__((__FC_BUILTIN__)) void __e_acsl_delete_block(void *);
+/*@ assigns \nothing;
+    frees p; */
+ __attribute__((__FC_BUILTIN__)) void __e_acsl_delete_block(void *p);
 
 /* compiler builtin: 
-   void *__builtin_alloca(unsigned long);   */
+    __attribute__((__FC_BUILTIN__)) void *__builtin_alloca(unsigned long size);   */
 void test_specifier_application(char const *allowed, char const *fmt,
                                 int only_negative, char *at)
 {
