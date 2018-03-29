@@ -15,11 +15,11 @@ tests/format/printf.c:88:[kernel] warning: Floating-point constant 0.2 is not re
 [e-acsl] warning: annotating undefined function `strcpy':
     the generated program may miss memory instrumentation
     if there are memory-related annotations.
-FRAMAC_SHARE/libc/stdio.h:157:[kernel] warning: Neither code nor specification for function printf, generating default assigns from the prototype
-FRAMAC_SHARE/libc/unistd.h:781:[kernel] warning: Neither code nor specification for function fork, generating default assigns from the prototype
-FRAMAC_SHARE/libc/sys/wait.h:60:[kernel] warning: Neither code nor specification for function waitpid, generating default assigns from the prototype
-:0:[kernel] warning: Neither code nor specification for function __fc_vla_free, generating default assigns from the prototype
-:0:[kernel] warning: Neither code nor specification for function __fc_vla_alloc, generating default assigns from the prototype
+FRAMAC_SHARE/libc/stdio.h:157:[kernel:annot:missing-spec] warning: Neither code nor specification for function printf, generating default assigns from the prototype
+FRAMAC_SHARE/libc/unistd.h:781:[kernel:annot:missing-spec] warning: Neither code nor specification for function fork, generating default assigns from the prototype
+FRAMAC_SHARE/libc/sys/wait.h:60:[kernel:annot:missing-spec] warning: Neither code nor specification for function waitpid, generating default assigns from the prototype
+:0:[kernel:annot:missing-spec] warning: Neither code nor specification for function __fc_vla_free, generating default assigns from the prototype
+:0:[kernel:annot:missing-spec] warning: Neither code nor specification for function __fc_vla_alloc, generating default assigns from the prototype
 FRAMAC_SHARE/libc/string.h:319:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
     Ignoring annotation.
 FRAMAC_SHARE/libc/string.h:320:[e-acsl] warning: E-ACSL construct `trange' is not yet supported. Ignoring annotation.
@@ -413,7 +413,7 @@ FRAMAC_SHARE/libc/stdlib.h:406:[e-acsl] warning: E-ACSL construct `assigns claus
 [value] using specification for function __e_acsl_full_init
 [value] using specification for function __e_acsl_mark_readonly
 [value] using specification for function fork
-tests/format/printf.c:179:[kernel] warning: Neither code nor specification for function __e_acsl_builtin_printf, generating default assigns from the prototype
+tests/format/printf.c:179:[kernel:annot:missing-spec] warning: Neither code nor specification for function __e_acsl_builtin_printf, generating default assigns from the prototype
 [value] using specification for function __e_acsl_builtin_printf
 [value] using specification for function exit
 [value] using specification for function waitpid
