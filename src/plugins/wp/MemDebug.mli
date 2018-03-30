@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2017                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -21,32 +21,18 @@
 (**************************************************************************)
 
 (* -------------------------------------------------------------------------- *)
-(* --- Model Factory                                                      --- *)
+(* --- Debug Memory Model                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
-type mheap = Hoare | ZeroAlias | Region | Typed of MemTyped.pointer | Value
-type mvar = Raw | Var | Ref | Caveat
+val pp_sequence : 'a Pretty_utils.formatter -> Format.formatter ->
+  'a Sigs.sequence -> unit
+val pp_equation : Format.formatter -> Sigs.equation -> unit
+val pp_acs : Format.formatter -> Sigs.acs -> unit
+val pp_value : 'a Pretty_utils.formatter -> Format.formatter ->
+  'a Sigs.value -> unit
+val pp_rloc : 'a Pretty_utils.formatter -> Format.formatter ->
+  'a Sigs.rloc -> unit
+val pp_sloc : 'a Pretty_utils.formatter -> Format.formatter ->
+  'a Sigs.sloc -> unit
 
-type setup = {
-  mvar : mvar ;
-  mheap : mheap ;
-  cint : Cint.model ;
-  cfloat : Cfloat.model ;
-}
-
-type driver = LogicBuiltins.driver
-
-val ident : setup -> string
-val descr : setup -> string
-val compiler : mheap -> mvar -> (module Sigs.Compiler)
-val configure_driver : setup -> driver -> unit -> WpContext.rollback
-val instance : setup -> driver -> WpContext.model
-val default : setup (** ["Var,Typed,Nat,Real"] memory model. *)
-val parse :
-  ?default:setup ->
-  ?warning:(string -> unit) ->
-  string list -> setup
-(**
-   Apply specifications to default setup.
-   Default setup is [Factory.default].
-   Default warning is [Wp_parameters.abort]. *)
+module Make(M : Sigs.Model) : Sigs.Model
