@@ -13,7 +13,7 @@
        | [ { pred "^^" pred } ] ; exclusive or
        | [ term "?" pred ":" pred ] ; ternary condition
        | [ pred "?" pred ":" pred ];
-       | { "\let" id "=" term ";" pred }; local binding
+       | "\let" id "=" term ";" pred ; local binding
        | { "\let" id "=" pred ";" pred };
        | [ "\forall" binders ";" ] ; 
            [ integer-guards "==>" pred ]; univ. integer quantification
