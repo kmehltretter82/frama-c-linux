@@ -693,29 +693,38 @@ let is_loop_preservation p =
       end
   | _ -> None
 
-let select_by_name asked_names pid =
+let user_prop_pid pid =
   let p_prop = match pid.p_kind with
     | PKPre (_,_,p_prop) -> p_prop
-    | _ -> property_of_id pid
-  in
-  let names = user_prop_names p_prop in
-  let is_minus s = try s.[0] = '-' with _ -> false in
-  let is_plus s = try s.[0] = '+' with _ -> false in
-  let remove_first s = String.sub s 1 ((String.length s) -1) in
-  let eval acc asked =
-    let is_minus,a = match acc with
-      | None -> if is_minus asked then true,true else false,false
-      | Some a -> (is_minus asked),a
-    in let eval () =
-         let asked = if is_minus || (is_plus asked) then remove_first asked else asked
-         in List.mem asked names
-    in Some (if is_minus
-             then a && (not (eval ()))
-             else a || (eval ()))
-  in
-  match List.fold_left eval None asked_names with
-  | Some false -> false
-  | _ -> true
+    | _ -> property_of_id pid in
+  user_prop_names p_prop
+
+let select_default pid =
+  let names = user_prop_pid pid in
+  not (List.mem "no_wp" names)
+
+let select_by_name asked_names pid =
+  let names = user_prop_pid pid in
+  if List.mem "no_wp" names then false
+  else
+    let is_minus s = try s.[0] = '-' with _ -> false in
+    let is_plus s = try s.[0] = '+' with _ -> false in
+    let remove_first s = String.sub s 1 ((String.length s) -1) in
+    let eval acc asked =
+      let is_minus,a = match acc with
+        | None -> if is_minus asked then true,true else false,false
+        | Some a -> (is_minus asked),a
+      in let eval () =
+           let asked = if is_minus || (is_plus asked)
+             then remove_first asked else asked
+           in List.mem asked names
+      in Some (if is_minus
+               then a && (not (eval ()))
+               else a || (eval ()))
+    in
+    match List.fold_left eval None asked_names with
+    | Some false -> false
+    | _ -> true
 
 let select_call_pre s_call asked_pre pid =
   match pid.p_kind with
