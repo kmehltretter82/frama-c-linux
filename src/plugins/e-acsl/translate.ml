@@ -498,7 +498,11 @@ and context_insensitive_term_to_exp kf env t =
   | Tinter _ -> not_yet env "intersection of tsets"
   | Tcomprehension _ -> not_yet env "tset comprehension"
   | Trange _ -> not_yet env "range"
-  | Tlet _ -> not_yet env "let binding"
+  | Tlet(li, t) ->
+    let env = env_of_li li kf env loc in
+    let e, env = term_to_exp kf env t in
+    Interval.Env.remove li.l_var_info;
+    e, env, false, ""
 
 (* Convert an ACSL term into a corresponding C expression (if any) in the given
    environment. Also extend this environment in order to include the generating
@@ -663,6 +667,19 @@ and at_to_exp env t_opt label e =
   Cil.set_stmt bhv stmt new_stmt;
   res, !env_ref, false
 
+and env_of_li li kf env loc =
+  let li_t = Misc.term_of_li li in
+  let ty = Typing.get_typ li_t in
+  let vi, vi_e, env = Env.Logic_binding.add ~ty env li.l_var_info in
+  let li_e, env = term_to_exp kf env li_t in
+  let stmt = match Typing.get_integer_ty li_t with
+  | Typing.C_type _ | Typing.Other ->
+    Cil.mkStmtOneInstr (Set (Cil.var vi, li_e, loc))
+  | Typing.Gmp ->
+    Gmpz.init_set ~loc (Cil.var vi) vi_e li_e
+  in
+  Env.add_stmt env stmt
+
 (* Convert an ACSL named predicate into a corresponding C expression (if
    any) in the given environment. Also extend this environment which includes
    the generating constructs. *)
@@ -717,7 +734,11 @@ and named_predicate_content_to_exp ?name kf env p =
     let (_, env2 as res2) = named_predicate_to_exp kf (Env.push env1) p2 in
     let res3 = named_predicate_to_exp kf (Env.push env2) p3 in
     conditional_to_exp loc None e1 res2 res3
-  | Plet _ -> not_yet env "let _ = _ in _"
+  | Plet(li, p) ->
+    let env = env_of_li li kf env loc in
+    let e, env = named_predicate_to_exp kf env p in
+    Interval.Env.remove li.l_var_info;
+    e, env
   | Pforall _ | Pexists _ -> Quantif.quantif_to_exp kf env p
   | Pat(p, BuiltinLabel Here) ->
     named_predicate_to_exp kf env p

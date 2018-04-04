@@ -65,6 +65,7 @@ val interv_of_typ: Cil_types.typ -> Ival.t
 module Env: sig
   val clear: unit -> unit
   val add: Cil_types.logic_var -> Ival.t -> unit
+  val remove: Cil_types.logic_var -> unit
 end
 
 (* ************************************************************************** *)

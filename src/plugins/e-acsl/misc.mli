@@ -100,6 +100,10 @@ val ptr_index: ?loc:location -> ?index:exp -> exp
 (** Split pointer-arithmetic expression of the type `p + i` into its
 pointer and integer parts. *)
 
+val term_of_li: logic_info -> term
+(* [term_of_li li] assumes that [li.l_body] matches [LBterm t]
+   and returns [t]. *)
+
 (*
 Local Variables:
 compile-command: "make"
