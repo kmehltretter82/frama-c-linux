@@ -29,6 +29,7 @@ type prec = Float_sig.prec
 
 module type S = sig
   type float (** Type of the interval bounds. *)
+  type widen_hints (** Type of the widen hints. *)
   type t     (** Type of intervals. *)
 
   val packed_descr : Structural_descr.pack
@@ -64,7 +65,7 @@ module type S = sig
 
   val is_included: t -> t -> bool
   val join: t -> t -> t
-  val widen: t -> t -> t
+  val widen: widen_hints -> prec -> t -> t -> t
   val narrow: t -> t -> t or_bottom
 
   val contains_a_zero: t -> bool

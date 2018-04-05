@@ -109,24 +109,60 @@ let prev_float prec f =
     then Down >>% fun () -> Floating_point.round_to_single_precision_float f
     else f
 
-let m_pi = 3.1415929794311523 (* single-precision *)
-let m_pi_2 = 1.5707964897155761 (* single-precision *)
-let max_single_precision_float = Floating_point.max_single_precision_float
-
 let le f1 f2 = compare f1 f2 <= 0
 
-let widen_up f =
-  if le f (-0.) then -0.
-  else if le f 0. then 0.
-  else if le f 1. then 1.
-  else if le f m_pi_2 then m_pi_2
-  else if le f m_pi then m_pi
-  else if le f 10. then 10.
-  else if le f 1e10 then 1e10
-  else if le f max_single_precision_float then max_single_precision_float
-  else if le f 1e80 then 1e80
-  else if le f max_float then max_float
-  else infinity
+
+(* --------------------------------------------------------------------------
+                                 Widen hints
+   -------------------------------------------------------------------------- *)
+
+module Widen_Hints = struct
+
+  include Datatype.Float.Set
+
+  let pretty fmt s =
+    if not (is_empty s) then
+      Pretty_utils.pp_iter
+        ~pre:"@[<hov 1>{"
+        ~suf:"}@]"
+        ~sep:";@ "
+        iter Floating_point.pretty fmt s
+
+  let of_list l =
+    match l with
+    | [] -> empty
+    | [e] -> singleton e
+    | e :: q ->
+      List.fold_left (fun acc x -> add x acc) (singleton e) q
+
+  let m_pi = 3.1415929794311523 (* single-precision *)
+  let m_pi_2 = 1.5707964897155761 (* single-precision *)
+  let max_single_float = Floating_point.max_single_precision_float
+
+  let default_widen_hints =
+    let l = [0.0;1.0;m_pi_2;m_pi;10.;1e10;max_single_float;1e80] in
+    union (of_list l) (of_list (List.map (fun x -> -. x) l))
+
+end
+
+type widen_hints = Widen_Hints.t
+
+let widen_up wh prec f =
+  let r = try Widen_Hints.nearest_elt_ge f wh
+    with Not_found ->
+      if le f max_float then max_float
+      else infinity
+  in
+  round_to_precision Up prec r
+
+let widen_down wh prec f =
+  let r = try Widen_Hints.nearest_elt_le f wh
+    with Not_found ->
+      if le (-. max_float) f then (-. max_float)
+      else neg_infinity
+  in
+  round_to_precision Down prec r
+
 
 let neg = (~-.)
 let abs = abs_float

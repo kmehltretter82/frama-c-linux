@@ -744,7 +744,7 @@ module V_Or_Uninitialized = struct
 (* let (==>) = (fun x y -> (not x) || y) *)
 
   type size_widen_hint = V.size_widen_hint
-  type generic_widen_hint = V.generic_widen_hint
+  type numerical_widen_hint = V.numerical_widen_hint
   type widen_hint = V.widen_hint
   let widen wh t1 t2 =
     create (get_flags t2) (V.widen wh (get_v t1) (get_v t2))

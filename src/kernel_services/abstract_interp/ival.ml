@@ -52,8 +52,7 @@ module Widen_Arithmetic_Value_Set = struct
   include Datatype.Integer.Set
 
   let pretty fmt s =
-    if is_empty s then Format.fprintf fmt "{}"
-    else
+    if not (is_empty s) then
       Pretty_utils.pp_iter
         ~pre:"@[<hov 1>{"
         ~suf:"}@]"
@@ -102,8 +101,8 @@ type t =
 
 module Widen_Hints = Widen_Arithmetic_Value_Set
 type size_widen_hint = Integer.t
-type generic_widen_hint = Widen_Hints.t
-type widen_hint = size_widen_hint * generic_widen_hint
+type numerical_widen_hint = Widen_Hints.t * Fc_float.Widen_Hints.t
+type widen_hint = size_widen_hint * numerical_widen_hint
 
 let some_zero = Some Int.zero
 
@@ -619,13 +618,22 @@ let has_smaller_max_bound t1 t2 =
     | Some _, None -> 1
     | Some m1, Some m2 -> Int.compare m2 m1
 
-let widen (bitsize,wh) t1 t2 =
+let widen (bitsize,(wh,fh)) t1 t2 =
   if equal t1 t2 || cardinal_zero_or_one t1 then t2
   else
     match t2 with
     | Float f2 ->
       let f1 = project_float t1 in
-      Float (Fval.widen f1 f2)
+      let prec =
+        if Integer.equal bitsize (Integer.of_int 32)
+        then Float_sig.Single
+        else if Integer.equal bitsize (Integer.of_int 64)
+        then Float_sig.Double
+        else if Integer.equal bitsize (Integer.of_int 128)
+        then Float_sig.Long_Double
+        else Float_sig.Single
+      in
+      Float (Fval.widen fh prec f1 f2)
     | Top _ | Set _ ->
       (* Add possible interval limits deducted from the bitsize *)
       let wh =

@@ -291,7 +291,7 @@ module G = struct
       let decide _ _ _ = assert false in
       join ~cache ~symmetric:true ~idempotent:false ~decide
 
-    let empty_wh = Integer.zero, (fun _ -> Ival.Widen_Hints.empty)
+    let empty_wh = Integer.zero, (fun _ -> Ival.Widen_Hints.empty, Fc_float.Widen_Hints.empty)
 
     let widen =
       let cache = cache_name "MV.widen" in

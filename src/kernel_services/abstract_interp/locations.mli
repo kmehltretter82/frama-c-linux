@@ -46,8 +46,8 @@ module Location_Bytes : sig
     | Map of M.t (** Precise set of addresses+offsets *)
 
   type size_widen_hint = Ival.size_widen_hint
-  type generic_widen_hint = Base.t -> Ival.generic_widen_hint
-  type widen_hint = size_widen_hint * generic_widen_hint
+  type numerical_widen_hint = Base.t -> Ival.numerical_widen_hint
+  type widen_hint = size_widen_hint * numerical_widen_hint
 
   (** Those locations have a lattice structure, including standard operations
       such as [join], [narrow], etc. *)
