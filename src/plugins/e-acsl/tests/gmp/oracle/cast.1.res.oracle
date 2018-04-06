@@ -1,5 +1,5 @@
 [e-acsl] beginning translation.
-[e-acsl] Warning: possibly unsafe cast from term '0.1' to typ 'int'.
+[e-acsl] Warning: possibly unsafe cast from term '0.1' to type 'int'.
 [e-acsl] tests/gmp/cast.i:23: Warning: approximating a real number by a float
 [e-acsl] translation done in project "e-acsl".
 [value] Analyzing a complete application starting at main
