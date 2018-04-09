@@ -1,20 +1,20 @@
 Tests:
   script:
-  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --E-ACSL $CI_BUILD_REF --branch $CI_BUILD_REF_NAME E-ACSL --cppo 07d2bcee50670aecae7e094d92f68fd18314073a
+  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --E-ACSL $CI_BUILD_REF --branch $CI_BUILD_REF_NAME E-ACSL --cppo 07d2bcee50670aecae7e094d92f68fd18314073a --url ocamlfind,git@git.frama-c.com:bobot/ocamlfind.git
   tags:
   except:
   - tags
 
 context-from-precondition:
   script:
-  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --E-ACSL $CI_BUILD_REF --branch $CI_BUILD_REF_NAME context-from-precondition --cppo 07d2bcee50670aecae7e094d92f68fd18314073a
+  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --E-ACSL $CI_BUILD_REF --branch $CI_BUILD_REF_NAME context-from-precondition --cppo 07d2bcee50670aecae7e094d92f68fd18314073a --url ocamlfind,git@git.frama-c.com:bobot/ocamlfind.git
   tags:
   except:
   - tags
 
 Security:
   script:
-  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --E-ACSL $CI_BUILD_REF --branch $CI_BUILD_REF_NAME Security --cppo 07d2bcee50670aecae7e094d92f68fd18314073a
+  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --E-ACSL $CI_BUILD_REF --branch $CI_BUILD_REF_NAME Security --cppo 07d2bcee50670aecae7e094d92f68fd18314073a --url ocamlfind,git@git.frama-c.com:bobot/ocamlfind.git
   tags:
   except:
   - tags
