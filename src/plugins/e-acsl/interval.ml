@@ -146,7 +146,7 @@ let rec infer t =
             consider that one eventually gets an integral type even if it is
             not sure. *)
          Options.warning
-           ~once:true "possibly unsafe cast from term '%a' to typ '%a'."
+           ~once:true "possibly unsafe cast from term '%a' to type '%a'."
            Printer.pp_term t
            Printer.pp_typ ty;
          interv_of_typ ty
