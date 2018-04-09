@@ -1,4 +1,5 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
-tests/runtime/valid_alias.c:17:[value:alarm] warning: accessing left-value that contains escaping addresses.
-    assert ¬\dangling(&a);
+[value:alarm] tests/runtime/valid_alias.c:17: Warning: 
+  accessing left-value that contains escaping addresses.
+  assert ¬\dangling(&a);

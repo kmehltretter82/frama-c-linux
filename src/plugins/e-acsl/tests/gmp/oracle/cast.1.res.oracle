@@ -1,6 +1,6 @@
 [e-acsl] beginning translation.
-[e-acsl] warning: possibly unsafe cast from term '0.1' to typ 'int'.
-tests/gmp/cast.i:23:[e-acsl] warning: approximating a real number by a float
+[e-acsl] Warning: possibly unsafe cast from term '0.1' to typ 'int'.
+[e-acsl] tests/gmp/cast.i:23: Warning: approximating a real number by a float
 [e-acsl] translation done in project "e-acsl".
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
@@ -20,16 +20,25 @@ tests/gmp/cast.i:23:[e-acsl] warning: approximating a real number by a float
 [value] using specification for function __gmpz_get_si
 [value] using specification for function __gmpz_cmp
 [value] using specification for function __e_acsl_assert
-tests/gmp/cast.i:10:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
+[value:alarm] tests/gmp/cast.i:10: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_clear
-tests/gmp/cast.i:11:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
-tests/gmp/cast.i:13:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
+[value:alarm] tests/gmp/cast.i:11: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[value:alarm] tests/gmp/cast.i:13: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
 [value] using specification for function __gmpz_get_ui
 [value] using specification for function __gmpz_init_set_ui
-tests/gmp/cast.i:14:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
-tests/gmp/cast.i:17:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
-tests/gmp/cast.i:18:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
-tests/gmp/cast.i:23:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
-tests/gmp/cast.i:23:[value:alarm] warning: accessing out of bounds index. assert 0 ≤ __gen_e_acsl_cast_9;
-tests/gmp/cast.i:23:[value:alarm] warning: accessing out of bounds index. assert __gen_e_acsl_cast_9 < 2;
+[value:alarm] tests/gmp/cast.i:14: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[value:alarm] tests/gmp/cast.i:17: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[value:alarm] tests/gmp/cast.i:18: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[value:alarm] tests/gmp/cast.i:23: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[value:alarm] tests/gmp/cast.i:23: Warning: 
+  accessing out of bounds index. assert 0 ≤ __gen_e_acsl_cast_9;
+[value:alarm] tests/gmp/cast.i:23: Warning: 
+  accessing out of bounds index. assert __gen_e_acsl_cast_9 < 2;
 [value] done for function main

@@ -1,51 +1,70 @@
-tests/format/printf.c:88:[kernel] warning: Floating-point constant 0.2 is not represented exactly. Will use 0x1.999999999999ap-3. See documentation for option -warn-decimal-float
+[kernel] tests/format/printf.c:88: Warning: 
+  Floating-point constant 0.2 is not represented exactly. Will use 0x1.999999999999ap-3. See documentation for option -warn-decimal-float
 [e-acsl] beginning translation.
-[e-acsl] warning: annotating undefined function `abort':
-    the generated program may miss memory instrumentation
-    if there are memory-related annotations.
-[e-acsl] warning: annotating undefined function `exit':
-    the generated program may miss memory instrumentation
-    if there are memory-related annotations.
-[e-acsl] warning: annotating undefined function `strlen':
-    the generated program may miss memory instrumentation
-    if there are memory-related annotations.
-[e-acsl] warning: annotating undefined function `strchr':
-    the generated program may miss memory instrumentation
-    if there are memory-related annotations.
-[e-acsl] warning: annotating undefined function `strcpy':
-    the generated program may miss memory instrumentation
-    if there are memory-related annotations.
-FRAMAC_SHARE/libc/stdio.h:157:[kernel:annot:missing-spec] warning: Neither code nor specification for function printf, generating default assigns from the prototype
-FRAMAC_SHARE/libc/unistd.h:781:[kernel:annot:missing-spec] warning: Neither code nor specification for function fork, generating default assigns from the prototype
-FRAMAC_SHARE/libc/sys/wait.h:60:[kernel:annot:missing-spec] warning: Neither code nor specification for function waitpid, generating default assigns from the prototype
-FRAMAC_SHARE/libc/string.h:319:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-    Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:320:[e-acsl] warning: E-ACSL construct `trange' is not yet supported. Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:322:[e-acsl] warning: E-ACSL construct `\separated' is not yet supported. Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:322:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-    Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:325:[e-acsl] warning: E-ACSL construct `logic function returning an integer' is not yet supported.
-    Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:143:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-    Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:157:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-    Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:146:[e-acsl] warning: E-ACSL construct `user-defined logic type' is not yet supported.
-    Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:146:[e-acsl] warning: E-ACSL construct `user-defined logic type' is not yet supported.
-    Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:153:[e-acsl] warning: E-ACSL construct `user-defined logic type' is not yet supported.
-    Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:111:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-    Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:111:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-    Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:113:[e-acsl] warning: E-ACSL construct `logic function returning an integer' is not yet supported.
-    Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:113:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-    Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:406:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-    Ignoring annotation.
+[e-acsl] Warning: annotating undefined function `abort':
+  the generated program may miss memory instrumentation
+  if there are memory-related annotations.
+[e-acsl] Warning: annotating undefined function `exit':
+  the generated program may miss memory instrumentation
+  if there are memory-related annotations.
+[e-acsl] Warning: annotating undefined function `strlen':
+  the generated program may miss memory instrumentation
+  if there are memory-related annotations.
+[e-acsl] Warning: annotating undefined function `strchr':
+  the generated program may miss memory instrumentation
+  if there are memory-related annotations.
+[e-acsl] Warning: annotating undefined function `strcpy':
+  the generated program may miss memory instrumentation
+  if there are memory-related annotations.
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/stdio.h:157: Warning: 
+  Neither code nor specification for function printf, generating default assigns from the prototype
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/unistd.h:781: Warning: 
+  Neither code nor specification for function fork, generating default assigns from the prototype
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/sys/wait.h:60: Warning: 
+  Neither code nor specification for function waitpid, generating default assigns from the prototype
+[e-acsl] FRAMAC_SHARE/libc/string.h:319: Warning: 
+  E-ACSL construct `logic function application' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:320: Warning: 
+  E-ACSL construct `trange' is not yet supported. Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:322: Warning: 
+  E-ACSL construct `\separated' is not yet supported. Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:322: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:325: Warning: 
+  E-ACSL construct `logic function returning an integer' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:143: Warning: 
+  E-ACSL construct `logic function application' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:157: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:146: Warning: 
+  E-ACSL construct `user-defined logic type' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:146: Warning: 
+  E-ACSL construct `user-defined logic type' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:153: Warning: 
+  E-ACSL construct `user-defined logic type' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:111: Warning: 
+  E-ACSL construct `logic function application' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:111: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:113: Warning: 
+  E-ACSL construct `logic function returning an integer' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:113: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:406: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
@@ -411,28 +430,41 @@ FRAMAC_SHARE/libc/stdlib.h:406:[e-acsl] warning: E-ACSL construct `assigns claus
 [value] using specification for function __e_acsl_full_init
 [value] using specification for function __e_acsl_mark_readonly
 [value] using specification for function fork
-tests/format/printf.c:179:[kernel:annot:missing-spec] warning: Neither code nor specification for function __e_acsl_builtin_printf, generating default assigns from the prototype
+[kernel:annot:missing-spec] tests/format/printf.c:179: Warning: 
+  Neither code nor specification for function __e_acsl_builtin_printf, generating default assigns from the prototype
 [value] using specification for function __e_acsl_builtin_printf
 [value] using specification for function exit
 [value] using specification for function waitpid
-tests/format/printf.c:179:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status);
+[value:alarm] tests/format/printf.c:179: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status);
 [value] using specification for function __e_acsl_delete_block
-tests/format/printf.c:182:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_0);
-tests/format/printf.c:185:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_1);
-tests/format/printf.c:188:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_2);
+[value:alarm] tests/format/printf.c:182: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_0);
+[value:alarm] tests/format/printf.c:185: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_1);
+[value:alarm] tests/format/printf.c:188: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_2);
 [value] using specification for function __e_acsl_initialize
-tests/format/printf.c:193:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_3);
-tests/format/printf.c:196:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_4);
-tests/format/printf.c:198:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_5);
-tests/format/printf.c:200:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_6);
-tests/format/printf.c:203:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_7);
-tests/format/printf.c:205:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_8);
+[value:alarm] tests/format/printf.c:193: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_3);
+[value:alarm] tests/format/printf.c:196: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_4);
+[value:alarm] tests/format/printf.c:198: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_5);
+[value:alarm] tests/format/printf.c:200: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_6);
+[value:alarm] tests/format/printf.c:203: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_7);
+[value:alarm] tests/format/printf.c:205: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_8);
 [value] using specification for function __gmpz_init_set_si
 [value] using specification for function __gmpz_init_set_ui
 [value] using specification for function __gmpz_cmp
 [value] using specification for function __gmpz_clear
 [value] using specification for function __e_acsl_assert
-tests/format/printf.c:50:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
+[value:alarm] tests/format/printf.c:50: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
 [value] using specification for function __builtin_alloca
-tests/format/printf.c:51:[value:alarm] warning: function __gen_e_acsl_strcpy: precondition 'room_string' got status invalid.
+[value:alarm] tests/format/printf.c:51: Warning: 
+  function __gen_e_acsl_strcpy: precondition 'room_string' got status invalid.
 [value] done for function main

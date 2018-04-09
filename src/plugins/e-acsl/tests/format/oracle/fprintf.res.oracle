@@ -1,30 +1,43 @@
-tests/format/fprintf.c:15:[kernel:typing:implicit-function-declaration] warning: Calling undeclared function fork. Old style K&R code?
-tests/format/fprintf.c:22:[kernel:typing:incompatible-types-call] warning: expected 'FILE *' but got argument of type 'int *': & argc
+[kernel:typing:implicit-function-declaration] tests/format/fprintf.c:15: Warning: 
+  Calling undeclared function fork. Old style K&R code?
+[kernel:typing:incompatible-types-call] tests/format/fprintf.c:22: Warning: 
+  expected 'FILE *' but got argument of type 'int *': & argc
 [e-acsl] beginning translation.
-[e-acsl] warning: annotating undefined function `exit':
-    the generated program may miss memory instrumentation
-    if there are memory-related annotations.
-[e-acsl] warning: annotating undefined function `tmpfile':
-    the generated program may miss memory instrumentation
-    if there are memory-related annotations.
-[e-acsl] warning: annotating undefined function `fclose':
-    the generated program may miss memory instrumentation
-    if there are memory-related annotations.
-FRAMAC_SHARE/libc/stdio.h:153:[kernel:annot:missing-spec] warning: Neither code nor specification for function fprintf, generating default assigns from the prototype
-FRAMAC_SHARE/libc/stdio.h:157:[kernel:annot:missing-spec] warning: Neither code nor specification for function printf, generating default assigns from the prototype
-FRAMAC_SHARE/libc/stdio.h:159:[kernel:annot:missing-spec] warning: Neither code nor specification for function snprintf, generating default assigns from the prototype
-FRAMAC_SHARE/libc/stdio.h:161:[kernel:annot:missing-spec] warning: Neither code nor specification for function sprintf, generating default assigns from the prototype
-FRAMAC_SHARE/libc/stdio.h:353:[kernel:annot:missing-spec] warning: Neither code nor specification for function dprintf, generating default assigns from the prototype
-FRAMAC_SHARE/libc/sys/wait.h:60:[kernel:annot:missing-spec] warning: Neither code nor specification for function waitpid, generating default assigns from the prototype
-tests/format/fprintf.c:15:[kernel:annot:missing-spec] warning: Neither code nor specification for function fork, generating default assigns from the prototype
-FRAMAC_SHARE/libc/stdio.h:93:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-    Ignoring annotation.
-FRAMAC_SHARE/libc/stdio.h:95:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-    Ignoring annotation.
-FRAMAC_SHARE/libc/stdio.h:81:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-    Ignoring annotation.
-FRAMAC_SHARE/libc/stdio.h:81:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-    Ignoring annotation.
+[e-acsl] Warning: annotating undefined function `exit':
+  the generated program may miss memory instrumentation
+  if there are memory-related annotations.
+[e-acsl] Warning: annotating undefined function `tmpfile':
+  the generated program may miss memory instrumentation
+  if there are memory-related annotations.
+[e-acsl] Warning: annotating undefined function `fclose':
+  the generated program may miss memory instrumentation
+  if there are memory-related annotations.
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/stdio.h:153: Warning: 
+  Neither code nor specification for function fprintf, generating default assigns from the prototype
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/stdio.h:157: Warning: 
+  Neither code nor specification for function printf, generating default assigns from the prototype
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/stdio.h:159: Warning: 
+  Neither code nor specification for function snprintf, generating default assigns from the prototype
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/stdio.h:161: Warning: 
+  Neither code nor specification for function sprintf, generating default assigns from the prototype
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/stdio.h:353: Warning: 
+  Neither code nor specification for function dprintf, generating default assigns from the prototype
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/sys/wait.h:60: Warning: 
+  Neither code nor specification for function waitpid, generating default assigns from the prototype
+[kernel:annot:missing-spec] tests/format/fprintf.c:15: Warning: 
+  Neither code nor specification for function fork, generating default assigns from the prototype
+[e-acsl] FRAMAC_SHARE/libc/stdio.h:93: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/stdio.h:95: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/stdio.h:81: Warning: 
+  E-ACSL construct `logic function application' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/stdio.h:81: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 [value] Analyzing a complete application starting at main
 [value] Computing initial state
@@ -79,48 +92,79 @@ FRAMAC_SHARE/libc/stdio.h:81:[e-acsl] warning: E-ACSL construct `assigns clause 
 [value] using specification for function __e_acsl_full_init
 [value] using specification for function __e_acsl_mark_readonly
 [value] using specification for function fork
-tests/format/fprintf.c:15:[kernel:annot:missing-spec] warning: Neither code nor specification for function __e_acsl_builtin_fprintf, generating default assigns from the prototype
+[kernel:annot:missing-spec] tests/format/fprintf.c:15: Warning: 
+  Neither code nor specification for function __e_acsl_builtin_fprintf, generating default assigns from the prototype
 [value] using specification for function __e_acsl_builtin_fprintf
 [value] using specification for function exit
 [value] using specification for function waitpid
-tests/format/fprintf.c:15:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status);
-tests/format/signalled.h:12:[kernel:annot:missing-spec] warning: Neither code nor specification for function __e_acsl_builtin_printf, generating default assigns from the prototype
+[value:alarm] tests/format/fprintf.c:15: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status);
+[kernel:annot:missing-spec] tests/format/signalled.h:12: Warning: 
+  Neither code nor specification for function __e_acsl_builtin_printf, generating default assigns from the prototype
 [value] using specification for function __e_acsl_builtin_printf
 [value] using specification for function __e_acsl_delete_block
-tests/format/fprintf.c:16:[value] warning: Completely invalid destination for assigns clause *stream. Ignoring.
-tests/format/fprintf.c:16:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_0);
+[value] tests/format/fprintf.c:16: Warning: 
+  Completely invalid destination for assigns clause *stream. Ignoring.
+[value:alarm] tests/format/fprintf.c:16: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_0);
 [value] using specification for function tmpfile
-tests/format/fprintf.c:19:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_1);
+[value:alarm] tests/format/fprintf.c:19: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_1);
 [value] using specification for function __e_acsl_valid
 [value] using specification for function __e_acsl_assert
-FRAMAC_SHARE/libc/stdio.h:93:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
+[value:alarm] FRAMAC_SHARE/libc/stdio.h:93: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
 [value] using specification for function fclose
-tests/format/fprintf.c:21:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_2);
-tests/format/fprintf.c:22:[value] warning: Completely invalid destination for assigns clause *stream. Ignoring.
-tests/format/fprintf.c:22:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_3);
-tests/format/fprintf.c:27:[kernel:annot:missing-spec] warning: Neither code nor specification for function __e_acsl_builtin_dprintf, generating default assigns from the prototype
+[value:alarm] tests/format/fprintf.c:21: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_2);
+[value] tests/format/fprintf.c:22: Warning: 
+  Completely invalid destination for assigns clause *stream. Ignoring.
+[value:alarm] tests/format/fprintf.c:22: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_3);
+[kernel:annot:missing-spec] tests/format/fprintf.c:27: Warning: 
+  Neither code nor specification for function __e_acsl_builtin_dprintf, generating default assigns from the prototype
 [value] using specification for function __e_acsl_builtin_dprintf
-tests/format/fprintf.c:27:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_4);
-tests/format/fprintf.c:28:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_5);
-tests/format/fprintf.c:34:[kernel:annot:missing-spec] warning: Neither code nor specification for function __e_acsl_builtin_sprintf, generating default assigns from the prototype
+[value:alarm] tests/format/fprintf.c:27: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_4);
+[value:alarm] tests/format/fprintf.c:28: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_5);
+[kernel:annot:missing-spec] tests/format/fprintf.c:34: Warning: 
+  Neither code nor specification for function __e_acsl_builtin_sprintf, generating default assigns from the prototype
 [value] using specification for function __e_acsl_builtin_sprintf
-tests/format/fprintf.c:34:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_6);
-tests/format/fprintf.c:35:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_7);
-tests/format/fprintf.c:36:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_8);
-tests/format/fprintf.c:37:[value] warning: Completely invalid destination for assigns clause *(str + (0 ..)). Ignoring.
-tests/format/fprintf.c:37:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_9);
-tests/format/fprintf.c:38:[value] warning: Completely invalid destination for assigns clause *(str + (0 ..)). Ignoring.
-tests/format/fprintf.c:38:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_10);
-tests/format/fprintf.c:41:[kernel:annot:missing-spec] warning: Neither code nor specification for function __e_acsl_builtin_snprintf, generating default assigns from the prototype
+[value:alarm] tests/format/fprintf.c:34: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_6);
+[value:alarm] tests/format/fprintf.c:35: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_7);
+[value:alarm] tests/format/fprintf.c:36: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_8);
+[value] tests/format/fprintf.c:37: Warning: 
+  Completely invalid destination for assigns clause *(str + (0 ..)). Ignoring.
+[value:alarm] tests/format/fprintf.c:37: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_9);
+[value] tests/format/fprintf.c:38: Warning: 
+  Completely invalid destination for assigns clause *(str + (0 ..)). Ignoring.
+[value:alarm] tests/format/fprintf.c:38: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_10);
+[kernel:annot:missing-spec] tests/format/fprintf.c:41: Warning: 
+  Neither code nor specification for function __e_acsl_builtin_snprintf, generating default assigns from the prototype
 [value] using specification for function __e_acsl_builtin_snprintf
-tests/format/fprintf.c:41:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_11);
-tests/format/fprintf.c:42:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_12);
-tests/format/fprintf.c:43:[value] warning: Completely invalid destination for assigns clause *(str + (0 ..)). Ignoring.
-tests/format/fprintf.c:43:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_13);
-tests/format/fprintf.c:44:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_14);
-tests/format/fprintf.c:45:[value] warning: Completely invalid destination for assigns clause *(str + (0 ..)). Ignoring.
-tests/format/fprintf.c:45:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_15);
-tests/format/fprintf.c:46:[value] warning: Completely invalid destination for assigns clause *(str + (0 ..)). Ignoring.
-tests/format/fprintf.c:46:[value:alarm] warning: accessing uninitialized left-value. assert \initialized(&process_status_16);
+[value:alarm] tests/format/fprintf.c:41: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_11);
+[value:alarm] tests/format/fprintf.c:42: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_12);
+[value] tests/format/fprintf.c:43: Warning: 
+  Completely invalid destination for assigns clause *(str + (0 ..)). Ignoring.
+[value:alarm] tests/format/fprintf.c:43: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_13);
+[value:alarm] tests/format/fprintf.c:44: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_14);
+[value] tests/format/fprintf.c:45: Warning: 
+  Completely invalid destination for assigns clause *(str + (0 ..)). Ignoring.
+[value:alarm] tests/format/fprintf.c:45: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_15);
+[value] tests/format/fprintf.c:46: Warning: 
+  Completely invalid destination for assigns clause *(str + (0 ..)). Ignoring.
+[value:alarm] tests/format/fprintf.c:46: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_16);
 [value] using specification for function __e_acsl_memory_clean
 [value] done for function main

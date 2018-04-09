@@ -1,6 +1,9 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
-tests/runtime/loop.i:19:[value:alarm] warning: loop invariant got status unknown.
-tests/runtime/loop.i:19:[value:alarm] warning: function __e_acsl_assert: precondition got status invalid.
-tests/runtime/loop.i:19:[value:alarm] warning: accessing uninitialized left-value.
-    assert \initialized(&t[__gen_e_acsl_k_2][__gen_e_acsl_l_2]);
+[value:alarm] tests/runtime/loop.i:19: Warning: 
+  loop invariant got status unknown.
+[value:alarm] tests/runtime/loop.i:19: Warning: 
+  function __e_acsl_assert: precondition got status invalid.
+[value:alarm] tests/runtime/loop.i:19: Warning: 
+  accessing uninitialized left-value.
+  assert \initialized(&t[__gen_e_acsl_k_2][__gen_e_acsl_l_2]);

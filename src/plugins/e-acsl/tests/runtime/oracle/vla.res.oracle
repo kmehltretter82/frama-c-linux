@@ -1,4 +1,6 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
-tests/runtime/vla.c:8:[value:alarm] warning: function __e_acsl_assert: precondition got status unknown.
-tests/runtime/vla.c:12:[value:alarm] warning: assertion got status invalid (stopping propagation).
+[value:alarm] tests/runtime/vla.c:8: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[value:alarm] tests/runtime/vla.c:12: Warning: 
+  assertion got status invalid (stopping propagation).

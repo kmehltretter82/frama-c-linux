@@ -1,18 +1,25 @@
-tests/bts/bts1307.i:14:[kernel] warning: Floating-point constant 0.4 is not represented exactly. Will use 0x1.999999999999ap-2. See documentation for option -warn-decimal-float
+[kernel] tests/bts/bts1307.i:14: Warning: 
+  Floating-point constant 0.4 is not represented exactly. Will use 0x1.999999999999ap-2. See documentation for option -warn-decimal-float
 [e-acsl] beginning translation.
-tests/bts/bts1307.i:23:[e-acsl] warning: approximating a real number by a float
-tests/bts/bts1307.i:23:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-    Ignoring annotation.
-tests/bts/bts1307.i:23:[e-acsl] warning: approximating a real number by a float
-tests/bts/bts1307.i:23:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-    Ignoring annotation.
-tests/bts/bts1307.i:11:[e-acsl] warning: approximating a real number by a float
-tests/bts/bts1307.i:11:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-    Ignoring annotation.
-tests/bts/bts1307.i:11:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-    Ignoring annotation.
-tests/bts/bts1307.i:11:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-    Ignoring annotation.
-tests/bts/bts1307.i:11:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-    Ignoring annotation.
+[e-acsl] tests/bts/bts1307.i:23: Warning: approximating a real number by a float
+[e-acsl] tests/bts/bts1307.i:23: Warning: 
+  E-ACSL construct `logic function application' is not yet supported.
+  Ignoring annotation.
+[e-acsl] tests/bts/bts1307.i:23: Warning: approximating a real number by a float
+[e-acsl] tests/bts/bts1307.i:23: Warning: 
+  E-ACSL construct `logic function application' is not yet supported.
+  Ignoring annotation.
+[e-acsl] tests/bts/bts1307.i:11: Warning: approximating a real number by a float
+[e-acsl] tests/bts/bts1307.i:11: Warning: 
+  E-ACSL construct `logic function application' is not yet supported.
+  Ignoring annotation.
+[e-acsl] tests/bts/bts1307.i:11: Warning: 
+  E-ACSL construct `logic function application' is not yet supported.
+  Ignoring annotation.
+[e-acsl] tests/bts/bts1307.i:11: Warning: 
+  E-ACSL construct `logic function application' is not yet supported.
+  Ignoring annotation.
+[e-acsl] tests/bts/bts1307.i:11: Warning: 
+  E-ACSL construct `logic function application' is not yet supported.
+  Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".

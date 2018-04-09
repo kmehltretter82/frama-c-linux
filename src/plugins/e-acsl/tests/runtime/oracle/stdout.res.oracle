@@ -1,5 +1,5 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
-tests/runtime/stdout.c:8:[value:alarm] warning: assertion got status unknown.
-tests/runtime/stdout.c:9:[value:alarm] warning: assertion got status unknown.
-tests/runtime/stdout.c:10:[value:alarm] warning: assertion got status unknown.
+[value:alarm] tests/runtime/stdout.c:8: Warning: assertion got status unknown.
+[value:alarm] tests/runtime/stdout.c:9: Warning: assertion got status unknown.
+[value:alarm] tests/runtime/stdout.c:10: Warning: assertion got status unknown.
