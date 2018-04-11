@@ -57,7 +57,7 @@ let reset () =
 let dup_funspec tbl bhv spec =
   (*  Options.feedback "DUP SPEC %a" Cil.d_funspec spec;*)
   let o = object
-    inherit Cil.genericCilVisitor (Cil.copy_visit (Project.current ()))
+    inherit Cil.genericCilVisitor bhv
 
     val already_visited = Cil_datatype.Logic_var.Hashtbl.create 7
 
@@ -170,10 +170,12 @@ let dup_global loc actions spec bhv kf vi new_vi =
   let fct = Definition(fundec, loc) in
   let new_spec = fundec.sspec in
   let new_kf = { fundec = fct; spec = new_spec } in
-  Kernel_function.Hashtbl.add fct_tbl new_kf ();
-  Globals.Functions.register new_kf;
-  Globals.Functions.replace_by_definition new_spec fundec loc;
-  Annotations.register_funspec new_kf;
+  Queue.add (fun () ->
+      Kernel_function.Hashtbl.add fct_tbl new_kf ();
+      Globals.Functions.register new_kf;
+      Globals.Functions.replace_by_definition new_spec fundec loc;
+      Annotations.register_funspec new_kf)
+  actions;
   Options.feedback ~dkey ~level:2 "function %s" name;
   (* remove the specs attached to the previous kf iff it is a definition:
      it is necessary to keep stable the number of annotations in order to get
@@ -307,15 +309,13 @@ if there are memory-related annotations.@]"
 	let spec = Annotations.funspec ~populate:false kf in
 	let vi_bhv = Cil.get_varinfo self#behavior vi in
         let new_g, new_decl =
-          Project.on
-            prj
-            (dup_global
+          dup_global
                loc
                self#get_filling_actions
                spec
                self#behavior
                kf
-               vi_bhv)
+               vi_bhv
             new_vi
         in
         (* postpone the introduction of the new function definition to the
