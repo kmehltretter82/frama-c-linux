@@ -18,7 +18,7 @@
   if there are memory-related annotations.
 [kernel:annot:missing-spec] FRAMAC_SHARE/libc/stdio.h:157: Warning: 
   Neither code nor specification for function printf, generating default assigns from the prototype
-[kernel:annot:missing-spec] FRAMAC_SHARE/libc/unistd.h:781: Warning: 
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/unistd.h:791: Warning: 
   Neither code nor specification for function fork, generating default assigns from the prototype
 [kernel:annot:missing-spec] FRAMAC_SHARE/libc/sys/wait.h:60: Warning: 
   Neither code nor specification for function waitpid, generating default assigns from the prototype
