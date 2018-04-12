@@ -36,7 +36,7 @@ char *__gen_e_acsl_literal_string_18;
 char *__gen_e_acsl_literal_string_17;
 /*@ assigns \result;
     assigns \result \from \nothing; */
-extern int ( /* missing proto */ fork)();
+extern int ( /* missing proto */ fork)(void);
 
 void __e_acsl_globals_init(void)
 {
