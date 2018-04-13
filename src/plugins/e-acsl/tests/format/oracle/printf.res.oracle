@@ -1,5 +1,6 @@
-[kernel] tests/format/printf.c:88: Warning: 
-  Floating-point constant 0.2 is not represented exactly. Will use 0x1.999999999999ap-3. See documentation for option -warn-decimal-float
+[kernel:parser:decimal-float] tests/format/printf.c:88: Warning: 
+  Floating-point constant 0.2 is not represented exactly. Will use 0x1.999999999999ap-3.
+  (warn-once: no further messages from category 'parser:decimal-float' will be emitted)
 [e-acsl] beginning translation.
 [e-acsl] Warning: annotating undefined function `abort':
   the generated program may miss memory instrumentation
