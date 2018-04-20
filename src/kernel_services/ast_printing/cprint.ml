@@ -366,7 +366,7 @@ and print_expression_level (lvl: int) fmt (exp : expression) =
       fprintf fmt "(@[%a@])@;%a"
         print_onlytype typ print_cast_expression iexp
     | CALL ({ expr_node = VARIABLE "__builtin_va_arg"},
-            [arg; { expr_node = TYPE_SIZEOF (bt, dt) } ]) ->
+            [arg; { expr_node = TYPE_SIZEOF (bt, dt) } ], _) ->
       fprintf fmt "__builtin_va_arg(@[%a,@ %a@])"
         (print_expression_level 0) arg print_onlytype (bt, dt)
     | CALL (exp, args) ->

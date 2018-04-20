@@ -4783,9 +4783,9 @@ and doAttr ghost (a: A.attribute) : attribute list =
         end
       | A.CONSTANT (A.CONST_FLOAT str) ->
         ACons ("__fc_float", [AStr str])
-      | A.CALL({expr_node = A.VARIABLE n}, args) -> begin
+      | A.CALL({expr_node = A.VARIABLE n}, args,ghost) -> begin
           let n' = if strip then stripUnderscore n else n in
-          let ae' = List.map ae args in
+          let ae' = List.map ae (args@ghost) in
           ACons(n', ae')
         end
       | A.EXPR_SIZEOF e -> ASizeOfE (ae e)
@@ -5026,7 +5026,7 @@ and doType (ghost:bool) isFuncArg
            function argument";
       doDeclType (TArray(bt, lo, empty_size_cache (), al')) acc d
 
-    | A.PROTO (d, args, isva) ->
+    | A.PROTO (d, args, _,isva) ->
       (* Start a scope for the parameter names *)
       enterScope ();
       (* Intercept the old-style use of varargs.h. On GCC this means that
@@ -5180,7 +5180,7 @@ and isVariableSizedArray ghost (dt: A.decl_type)
     | PTR (al, dt) -> PTR (al, findArray dt)
     | JUSTBASE -> JUSTBASE
     | PARENTYPE (prea, dt, posta) -> PARENTYPE (prea, findArray dt, posta)
-    | PROTO (dt, f, a) -> PROTO (findArray dt, f, a)
+    | PROTO (dt, f,g, a) -> PROTO (findArray dt, f,g, a)
   in
   let dt' = findArray dt in
   match !res with
@@ -6034,7 +6034,7 @@ and doExp local_env
             doExp local_env asconst
               (cabs_exp loc
                  (A.CALL (cabs_exp loc (A.VARIABLE "__builtin_next_arg"),
-                          [cabs_exp loc (A.CONSTANT (A.CONST_INT "0"))])))
+                          [cabs_exp loc (A.CONSTANT (A.CONST_INT "0"))],[])))
               what
           end
 
@@ -6362,8 +6362,10 @@ and doExp local_env
             intType
       end
 
-    | A.CALL(f, args) ->
-      let (rf,sf, f', ft') =
+    | A.CALL(f, args,args_ghost) ->
+      Format.printf "Length param %i@." (List.length args);
+      Format.printf "Length param %i@." (List.length args_ghost);
+     let (rf,sf, f', ft') =
         match (stripParen f).expr_node with
         (* Treat the VARIABLE case separate because we might be calling a
          * function that does not have a prototype. In that case assume it
@@ -8530,8 +8532,8 @@ and createLocal ghost ((_, sto, _, _) as specs)
   (* Check if we are declaring a function *)
   let rec isProto (dt: decl_type) : bool =
     match dt with
-    | PROTO (JUSTBASE, _, _) -> true
-    | PROTO (x, _, _) -> isProto x
+    | PROTO (JUSTBASE, _,_, _) -> true
+    | PROTO (x, _,_, _) -> isProto x
     | PARENTYPE (_, x, _) -> isProto x
     | ARRAY (x, _, _) -> isProto x
     | PTR (_, x) -> isProto x
@@ -8763,7 +8765,7 @@ and doAliasFun vtype (thisname:string) (othername:string)
   let args = List.map
       (fun (n,_,_) -> { expr_loc = loc; expr_node = A.VARIABLE n})
       (argsToList formals) in
-  let call = A.CALL ({expr_loc = loc; expr_node = A.VARIABLE othername}, args)
+  let call = A.CALL ({expr_loc = loc; expr_node = A.VARIABLE othername}, args,[])
   in
   let stmt = {stmt_ghost = false;
               stmt_node = if isVoidType rt then
@@ -8992,7 +8994,7 @@ and doDecl local_env (isglobal: bool) : A.definition -> chunk = function
               f' :: fl'
           end
         in
-        let fmlocs = (match dt with PROTO(_, fml, _) -> fml | _ -> []) in
+        let fmlocs = (match dt with PROTO(_, fml,_, _) -> fml | _ -> []) in
         let formals = doFormals (argsToList formals_t) fmlocs in
         (* in case of formals referred to in types of others, doType has
            put dummy varinfos. We need to fix them now that we have proper

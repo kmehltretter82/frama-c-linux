@@ -79,9 +79,9 @@ exception NoProto
 
 (* Go through all the parameter names and mark them as identifiers *)
 let rec findProto = function
-    PROTO (d, args, _) when isJUSTBASE d ->
+    PROTO (d, args, _,_) when isJUSTBASE d ->
       List.iter (fun (_, (an, _, _, _)) -> !Lexerhack.add_identifier an) args
-  | PROTO (d, _, _) -> findProto d
+  | PROTO (d, _,_, _) -> findProto d
   | PARENTYPE (_, d, _) -> findProto d
   | PTR (_, d) -> findProto d
   | ARRAY (d, _, _) -> findProto d
@@ -251,8 +251,8 @@ let transformOffsetOf (speclist, dtype) member =
 	ARRAY (addPointer dtype, attrs, expr)
     | PTR (attrs, dtype) ->
 	PTR (attrs, addPointer dtype)
-    | PROTO (dtype, names, variadic) ->
-	PROTO (addPointer dtype, names, variadic)
+    | PROTO (dtype, names, gnames, variadic) ->
+	PROTO (addPointer dtype, names, gnames,variadic)
   in
   let nullType = (speclist, addPointer dtype) in
   let nullExpr = mk_expr (CONSTANT (CONST_INT "0")) in
@@ -484,13 +484,13 @@ global:
       let pardecl, isva = doOldParDecl $3 $5 in
       (* Make the function declarator *)
       doDeclaration None loc []
-        [(($1, PROTO(JUSTBASE, pardecl,isva), 
+        [(($1, PROTO(JUSTBASE, pardecl,[],isva),
            ["FC_OLDSTYLEPROTO",[]], loc), NO_INIT)]
     }
 | IDENT LPAREN RPAREN SEMICOLON {
   let loc = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 1, Parsing.rhs_end_pos 1) in
   doDeclaration None loc []
-    [(($1, PROTO(JUSTBASE,[],false),
+    [(($1, PROTO(JUSTBASE,[],[],false),
        ["FC_OLDSTYLEPROTO",[]], loc), NO_INIT)]
 }
 ;
@@ -524,7 +524,7 @@ postfix_expression:                     /*(* 6.5.2 *)*/
 | primary_expression { $1 }
 | postfix_expression bracket_comma_expression
       {make_expr (INDEX ($1, smooth_expression $2))}
-| postfix_expression LPAREN arguments RPAREN {make_expr (CALL ($1, $3))}
+| postfix_expression LPAREN arguments RPAREN LGHOST LPAREN arguments RPAREN RGHOST {make_expr (CALL ($1, $3, $7))}
 | BUILTIN_VA_ARG LPAREN expression COMMA type_name RPAREN
       { let b, d = $5 in
         let loc = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 5, Parsing.rhs_end_pos 5) in
@@ -534,7 +534,7 @@ postfix_expression:                     /*(* 6.5.2 *)*/
              ({ expr_loc = loc_f;
                 expr_node = VARIABLE "__builtin_va_arg"},
               [$3; { expr_loc = loc;
-                     expr_node = TYPE_SIZEOF (b, d)}]))
+                     expr_node = TYPE_SIZEOF (b, d)}],[]))
       }
 | BUILTIN_TYPES_COMPAT LPAREN type_name COMMA type_name RPAREN
       { let b1,d1 = $3 in
@@ -547,7 +547,7 @@ postfix_expression:                     /*(* 6.5.2 *)*/
              ({expr_loc = loc_f;
                expr_node = VARIABLE "__builtin_types_compatible_p"},
               [ { expr_loc = loc1; expr_node = TYPE_SIZEOF(b1,d1)};
-                { expr_loc = loc2; expr_node = TYPE_SIZEOF(b2,d2)}]))
+                { expr_loc = loc2; expr_node = TYPE_SIZEOF(b2,d2)}],[]))
       }
 | BUILTIN_OFFSETOF LPAREN type_name COMMA offsetof_member_designator RPAREN
       { transformOffsetOf $3 $5 }
@@ -1026,17 +1026,12 @@ for_clause:
    then thrown
 */
 ghost_parameter_opt:
-     /* empty */        { }
-|   ghost_parameter     { }
+     /* empty */        {[]}
+ |   ghost_parameter    {$1}
 ;
 
-(* For functions, the case where there is no parameter is treated in isolation,
-   because then we do not need the "lexer hack". Must we do the same here ?
-   It seems it does not make sense to add 0 ghost parameters, but with this
-   rule it is authorized by the grammar (but can be thrown afterwards by frama-c)
-*)
 ghost_parameter:
-  LGHOST parameter_list_startscope rest_par_list RPAREN RGHOST { }
+  LGHOST parameter_list_startscope rest_par_list RPAREN RGHOST {$3}
 ;
 
 declaration:                                /* ISO 6.7.*/
@@ -1236,13 +1231,14 @@ direct_decl: /* (* ISO 6.7.5 *) */
                                      let (attrs, size) = $3 in
                                      (n, ARRAY(decl, attrs, size)) }
 |   direct_decl LPAREN RPAREN ghost_parameter_opt {
-   let (n,decl) = $1 in (n, PROTO(decl,[],false))
+   let (n,decl) = $1 in (n, PROTO(decl,[],[],false))
   }
 |   direct_decl parameter_list_startscope rest_par_list RPAREN ghost_parameter_opt
                                    { let (n, decl) = $1 in
                                      let (params, isva) = $3 in
+                                     let (ghost,_) = $5 in
                                      !Lexerhack.pop_context ();
-                                     (n, PROTO(decl, params, isva))
+                                     (n, PROTO(decl, params, [], isva))
                                    }
 ;
 parameter_list_startscope:
@@ -1283,14 +1279,14 @@ direct_old_proto_decl:
 | direct_decl LPAREN old_parameter_list_ne RPAREN old_pardef_list {
     let par_decl, isva = doOldParDecl $3 $5 in
     let n, decl = $1 in
-    (n, PROTO(decl, par_decl, isva), ["FC_OLDSTYLEPROTO",[]])
+    (n, PROTO(decl, par_decl, [],isva), ["FC_OLDSTYLEPROTO",[]])
   }
 
 /* (* appears sometimesm but generates a shift-reduce conflict. *)
 | LPAREN STAR direct_decl LPAREN old_parameter_list_ne RPAREN RPAREN
     LPAREN RPAREN old_pardef_list {
       let par_decl, isva = doOldParDecl $5 $10 in
-      let n, decl = $3 in (n, PROTO(decl, par_decl, isva), [])
+      let n, decl = $3 in (n, PROTO(decl, par_decl,[], isva), [])
     }
 */
 ;
@@ -1353,9 +1349,9 @@ abs_direct_decl: /* (* ISO 6.7.6. We do not support optional declarator for
 |   abs_direct_decl  parameter_list_startscope rest_par_list RPAREN
                                    { let (params, isva) = $3 in
                                      !Lexerhack.pop_context ();
-                                     PROTO ($1, params, isva)
+                                     PROTO ($1, params,[], isva)
                                    }
-| abs_direct_decl LPAREN RPAREN { PROTO ($1, [], false) }
+| abs_direct_decl LPAREN RPAREN { PROTO ($1, [],[], false) }
 ;
 
 abs_direct_decl_opt:
@@ -1401,9 +1397,10 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 /* (* New-style function that does not have a return type *) */
 | IDENT parameter_list_startscope rest_par_list RPAREN ghost_parameter_opt
     { let (params, isva) = $3 in
+      (* let (ghost,_) = $5 in *)
       let loc = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 1, Parsing.rhs_end_pos 1) in
       let fdec =
-        ($1, PROTO(JUSTBASE, params, isva), [], loc) in
+        ($1, PROTO(JUSTBASE, params,[], isva), [], loc) in
       announceFunctionName fdec;
       (* Default is int type *)
       let defSpec = [SpecType Tint] in (loc, defSpec, fdec)
@@ -1415,7 +1412,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
       let pardecl, isva = doOldParDecl $3 $5 in
       let loc = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 1, Parsing.rhs_end_pos 1) in
       (* Make the function declarator *)
-      let fdec = ($1, PROTO(JUSTBASE, pardecl,isva), [], loc) in
+      let fdec = ($1, PROTO(JUSTBASE, pardecl,[],isva), [], loc) in
       announceFunctionName fdec;
       (* Default is int type *)
       (loc, [SpecType Tint], fdec)
@@ -1423,7 +1420,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 | IDENT LPAREN RPAREN ghost_parameter_opt
   {
     let loc = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 1, Parsing.rhs_start_pos 1) in
-    let fdec = ($1, PROTO(JUSTBASE,[],false),[],loc) in
+    let fdec = ($1, PROTO(JUSTBASE,[],[],false),[],loc) in
     announceFunctionName fdec;
     (loc, [SpecType Tint], fdec)
   }
@@ -1555,20 +1552,20 @@ postfix_attr:
     primary_attr { $1 }
 |   id_or_typename_as_id paren_attr_list_ne {
         let loc = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 1, Parsing.rhs_end_pos 1) in
-        make_expr (CALL({ expr_loc = loc; expr_node = VARIABLE $1}, $2)) }
+        make_expr (CALL({ expr_loc = loc; expr_node = VARIABLE $1}, $2,[])) }
       /* (* use a VARIABLE "" so that the parentheses are printed *) */
 |   id_or_typename_as_id LPAREN  RPAREN {
       let loc1 = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 1, Parsing.rhs_end_pos 1) in
       let loc2 = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 2, Parsing.rhs_end_pos 3) in
       let f = { expr_node = VARIABLE $1; expr_loc = loc1 } in
       let arg = { expr_node = VARIABLE ""; expr_loc = loc2 } in
-      make_expr (CALL(f, [arg]))
+      make_expr (CALL(f, [arg],[]))
     }
       /* (* use a VARIABLE "" so that the parameters are printed without
           * parentheses nor comma *) */
 |   basic_attr param_attr_list_ne  {
       let loc = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 1, Parsing.rhs_end_pos 1) in
-      make_expr (CALL({ expr_node = VARIABLE ""; expr_loc = loc}, $1::$2)) }
+      make_expr (CALL({ expr_node = VARIABLE ""; expr_loc = loc}, $1::$2,[])) }
 
 |   postfix_attr ARROW id_or_typename   { make_expr (MEMBEROFPTR ($1, $3))}
 |   postfix_attr DOT id_or_typename     { make_expr (MEMBEROF ($1, $3)) }
