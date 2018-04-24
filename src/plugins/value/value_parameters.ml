@@ -589,6 +589,8 @@ let () = InitializationPaddingGlobals.add_aliases ["-val-initialization-padding-
 (* --- Tuning                                                            --- *)
 (* ------------------------------------------------------------------------- *)
 
+(* --- Iteration strategy --- *)
+
 let () = Parameter_customize.set_group precision_tuning
 let () = Parameter_customize.is_invisible ()
 module DescendingIteration =
@@ -645,22 +647,7 @@ module WideningPeriod =
 let () = WideningDelay.set_range ~min:1 ~max:max_int
 let () = add_precision_dep WideningPeriod.parameter
 
-let () = Parameter_customize.set_group precision_tuning
-module ILevel =
-  Int
-    (struct
-      let option_name = "-eva-ilevel"
-      let default = 8
-      let arg_name = "n"
-      let help =
-        "Sets of integers are represented as sets up to <n> elements. \
-         Above, intervals with congruence information are used \
-         (defaults to 8, must be between 4 and 128)"
-    end)
-let () = add_precision_dep ILevel.parameter
-let () = ILevel.add_aliases ["-val-ilevel"]
-let () = ILevel.add_update_hook (fun _ i -> Ival.set_small_cardinal i)
-let () = ILevel.set_range 4 256
+(* --- Partitioning --- *)
 
 let () = Parameter_customize.set_group precision_tuning
 module SemanticUnrollingLevel =
@@ -728,6 +715,31 @@ let () = add_precision_dep MinLoopUnroll.parameter
 let () = MinLoopUnroll.set_range 0 max_int
 
 let () = Parameter_customize.set_group precision_tuning
+module HistoryPartitioning =
+  Int
+    (struct
+       let option_name = "-eva-partition-history"
+       let arg_name = "n"
+       let default = 0
+       let help =
+         "keep states distincts as long as the <n> last branching in their\
+          traces are also distinct. (A value of 0 deactivate this feature)"
+     end)
+let () = add_precision_dep HistoryPartitioning.parameter
+let () = HistoryPartitioning.set_range 0 max_int
+
+let () = Parameter_customize.set_group precision_tuning
+module ValuePartitioning =
+  String_set
+    (struct
+      let option_name = "-eva-partition-value"
+      let help = "partition the space of reachable states according to the \
+                  possible values of the global(s) variable(s) V."
+      let arg_name = "V"
+    end)
+let () = add_precision_dep ValuePartitioning.parameter
+
+let () = Parameter_customize.set_group precision_tuning
 let () = Parameter_customize.argument_may_be_fundecl ()
 module SplitReturnFunction =
   Kernel_function_map
@@ -779,6 +791,25 @@ let () =
              SplitReturn.name s))
 let () = add_precision_dep SplitReturn.parameter
 let () = SplitReturn.add_aliases ["-val-split-return"]
+
+(* --- Misc --- *)
+
+let () = Parameter_customize.set_group precision_tuning
+module ILevel =
+  Int
+    (struct
+      let option_name = "-eva-ilevel"
+      let default = 8
+      let arg_name = "n"
+      let help =
+        "Sets of integers are represented as sets up to <n> elements. \
+         Above, intervals with congruence information are used \
+         (defaults to 8, must be between 4 and 128)"
+    end)
+let () = add_precision_dep ILevel.parameter
+let () = ILevel.add_aliases ["-val-ilevel"]
+let () = ILevel.add_update_hook (fun _ i -> Ival.set_small_cardinal i)
+let () = ILevel.set_range 4 256
 
 let () = Parameter_customize.set_group precision_tuning
 let () = Parameter_customize.argument_may_be_fundecl ()

@@ -1,0 +1,26 @@
+[kernel] Parsing tests/value/partitioning-annots.c (with preprocessing)
+[eva] Analyzing a complete application starting at test_unroll
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
+  k ∈ {0}
+[eva] tests/value/partitioning-annots.c:25: starting to merge loop iterations
+[eva] tests/value/partitioning-annots.c:33: starting to merge loop iterations
+[eva] tests/value/partitioning-annots.c:35: starting to merge loop iterations
+[eva] Recording results for test_unroll
+[eva] done for function test_unroll
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function test_unroll:
+  a[0..9] ∈ {42}
+  b[0..9] ∈ {42}
+[from] Computing for function test_unroll
+[from] Done for function test_unroll
+[from] ====== DEPENDENCIES COMPUTED ======
+  These dependencies hold at termination for the executions that terminate:
+[from] Function test_unroll:
+  NO EFFECTS
+[from] ====== END OF DEPENDENCIES ======
+[inout] Out (internal) for function test_unroll:
+    a[0..9]; b[0..9]; i; j; i_0; j_0
+[inout] Inputs for function test_unroll:
+    \nothing

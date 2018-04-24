@@ -34,6 +34,7 @@ module type S = sig
 
   val empty: unit -> t
 
+  val add : state -> t -> bool
   val merge_set_return_new: state list -> t -> state list
   val join: t -> state or_bottom
 

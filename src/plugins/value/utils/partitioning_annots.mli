@@ -20,4 +20,17 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Make : State_partitioning.Partitioning
+type slevel_annotation =
+  | SlevelMerge
+  | SlevelDefault
+  | SlevelLocal of int
+
+type unroll_annotation = Cil_types.term
+
+type flow_annotation =
+  | FlowSplit of Cil_types.term
+  | FlowMerge of Cil_types.term
+
+val get_slevel_annot : Cil_types.stmt -> slevel_annotation option
+val get_unroll_annot : Cil_types.stmt -> unroll_annotation list
+val get_flow_annot : Cil_types.stmt -> flow_annotation list

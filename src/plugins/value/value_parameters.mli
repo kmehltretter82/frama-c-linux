@@ -72,6 +72,11 @@ module WarnCopyIndeterminate: Parameter_sig.Kernel_function_set
 
 module IgnoreRecursiveCalls: Parameter_sig.Bool
 
+module DescendingIteration: Parameter_sig.String
+module HierarchicalConvergence: Parameter_sig.Bool
+module WideningDelay: Parameter_sig.Int
+module WideningPeriod: Parameter_sig.Int
+
 module SemanticUnrollingLevel: Parameter_sig.Int
 module SlevelFunction:
   Parameter_sig.Map with type key = Cil_types.kernel_function
@@ -80,11 +85,9 @@ module SlevelFunction:
 module SlevelMergeAfterLoop: Parameter_sig.Kernel_function_set
 
 module MinLoopUnroll : Parameter_sig.Int
+module HistoryPartitioning : Parameter_sig.Int
+module ValuePartitioning : Parameter_sig.String_set
 
-module DescendingIteration: Parameter_sig.String
-module HierarchicalConvergence: Parameter_sig.Bool
-module WideningDelay: Parameter_sig.Int
-module WideningPeriod: Parameter_sig.Int
 module ArrayPrecisionLevel: Parameter_sig.Int
 
 module AllocatedContextValid: Parameter_sig.Bool

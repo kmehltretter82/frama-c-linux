@@ -33,6 +33,7 @@ module type S = sig
   type t
 
   val empty: unit -> t
+  val add : state -> t -> bool
   val merge_set_return_new: state list -> t -> state list
   val join: t -> state or_bottom
   val to_list: t -> state list

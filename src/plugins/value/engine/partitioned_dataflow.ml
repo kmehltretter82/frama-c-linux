@@ -39,9 +39,6 @@ let check_signals, signal_abort =
 let dkey = Value_parameters.dkey_iterator
 let dkey_callbacks = Value_parameters.dkey_callbacks
 
-let is_return s = match s.skind with Return _ -> true | _ -> false
-let is_loop s =   match s.skind with Loop _ -> true | _ -> false
-
 let blocks_share_locals b1 b2 =
   match b1.blocals, b2.blocals with
   | [], [] -> true
@@ -88,108 +85,27 @@ module Make_Dataflow
   let interpreter_mode =
     Value_parameters.InterpreterMode.get ()
 
-  let slevel (stmt : stmt) : int =
-    if is_return stmt || interpreter_mode then
-      max_int
-    else match Per_stmt_slevel.local kf with
-      | Per_stmt_slevel.Global i -> i
-      | Per_stmt_slevel.PerStmt f -> f stmt
-
-  let merge_after_loop : bool =
-    Kernel_function.Set.mem kf
-      (Value_parameters.SlevelMergeAfterLoop.get ())
-
-  let merge (stmt : stmt) : bool  =
-    is_loop stmt && merge_after_loop
-    ||
-    match Per_stmt_slevel.merge kf with
-    | Per_stmt_slevel.NoMerge -> false
-    | Per_stmt_slevel.Merge f -> f stmt
-
-  let default_loop_unroll : int = Value_parameters.MinLoopUnroll.get ()
-
-  let unroll (stmt : stmt) : int =
-    let local_unroll = match Unroll_annots.get_unroll_terms stmt with
-      | [] ->
-        let is_attribute a = Cil.hasAttribute a stmt.sattr in
-        begin
-          match List.filter is_attribute ["for" ; "while" ; "dowhile"] with
-          | [] -> ()
-          | loop_kind :: _ ->
-            let wkey =
-              if loop_kind = "for"
-              then Value_parameters.wkey_missing_loop_unroll_for
-              else Value_parameters.wkey_missing_loop_unroll
-            in
-            Value_parameters.warning
-              ~wkey ~source:(fst (Cil_datatype.Stmt.loc stmt)) ~once:true
-              "%s loop without unroll annotation" loop_kind
-        end;
-        None
-      | [t] ->
-        (* Inlines the value of const variables in [t]. *)
-        let global_init vi =
-          try (Globals.Vars.find vi).init with Not_found -> None
-        in
-        let t =
-          Cil.visitCilTerm (new Logic_utils.simplify_const_lval global_init) t
-        in
-        begin match Logic_utils.constFoldTermToInt t with
-          | Some n -> Some (Integer.to_int n)
-          | None ->
-            Kernel.warning ~once:true ~current:true
-              "invalid term, not integer: %a"
-              Printer.pp_term t;
-            None
-        end
-      | _ ->
-        Kernel.warning ~once:true ~current:true
-          "ignoring invalid unroll annotation";
-        None
-    in match local_unroll with
-    | Some n -> n
-    | None -> default_loop_unroll
-
   let slevel_display_step : int =
     Value_parameters.ShowSlevel.get ()
+
+  (* Ideally, the slevel parameter should not be used anymore in this file
+     but it is still required for logic interpretation *)
+  let slevel =
+    let module P = Partitioning_parameters.Make (AnalysisParam) in
+    P.slevel
 
 
   (* --- Abstract values storage --- *)
 
-  module Domain = struct
-    include Domain
-
-    let join_list ?(into : t or_bottom = `Bottom) (l : t list) : t or_bottom =
-      List.fold_left
-        (fun acc v -> Bottom.join join acc (`Value v))
-        into l
-  end
-
-  module PartitioningParam = struct
-    type loop = stmt
-    let kf = kf
-    let widening_delay = Value_parameters.WideningDelay.get ()
-    let widening_period = Value_parameters.WideningPeriod.get ()
-    let slevel = slevel
-    let merge = merge
-    let unroll = unroll
-  end
-
-  module type P =
-    State_partitioning.Partition with type state = Domain.t
-                                  and type loop = PartitioningParam.loop
-
-  let partition_module =
-    if descending_iteration = NoIteration
-    then (module Loop_partitioning.Make (Domain) (PartitioningParam) : P)
-    else (module Basic_partitioning.Make (Domain) (PartitioningParam) : P)
-
-  module Partition = (val partition_module: P)
+  module Partition = Trace_partitioning.Make (Domain) (AnalysisParam)
 
   type store = Partition.store
   type widening = Partition.widening
   type propagation = Partition.propagation
-  type shadow = Partition.shadow
+
+  type edge_info = {
+    mutable fireable : bool (* Does any states survive the transition ? *)
+  }
 
 
   (* --- Interpreted automata --- *)
@@ -226,8 +142,8 @@ module Make_Dataflow
     | `Value state -> state
 
   let initial_propagation =
-    Partition.initial_propagation (States.to_list initial_states),
-    Partition.empty_shadow ()
+    -1, (* dummy edge identifier *)
+    Partition.initial_propagation (States.to_list initial_states)
 
   let post_conditions = ref false
 
@@ -259,7 +175,7 @@ module Make_Dataflow
     VertexTable.create control_point_count
   let w_table : widening VertexTable.t =
     VertexTable.create 7
-  let e_table : (propagation * shadow) EdgeTable.t =
+  let e_table : (propagation * edge_info) EdgeTable.t =
     EdgeTable.create transition_count
 
   (* Default (Initial) stores on vertex and edges *)
@@ -267,18 +183,21 @@ module Make_Dataflow
     Partition.empty_store ~stmt:v.vertex_start_of
   let default_vertex_widening (v : vertex) () : widening =
     Partition.empty_widening ~stmt:v.vertex_start_of
-  let default_edge_store () : propagation * shadow =
-    Partition.empty_propagation (), Partition.empty_shadow ()
+  let default_edge_propagation () : propagation * edge_info =
+    Partition.empty_propagation (), { fireable = false }
 
   (* Get the stores associated to a control point or edge *)
   let get_vertex_store (v : vertex) : store =
     VertexTable.find_or_add v_table v ~default:(default_vertex_store v)
   let get_vertex_widening (v : vertex) : widening =
     VertexTable.find_or_add w_table v ~default:(default_vertex_widening v)
-  let get_edge_propagation (e : vertex edge) : propagation * shadow =
-    EdgeTable.find_or_add e_table e ~default:default_edge_store
-  let get_pred_propagations (v : vertex) : (propagation * shadow) list =
-    List.map (fun (_,e,_) -> get_edge_propagation e) (G.pred_e graph v)
+  let get_edge_propagation (e : vertex edge) : propagation * edge_info =
+    EdgeTable.find_or_add e_table e ~default:default_edge_propagation
+  let get_pred_propagations (v : vertex) : ('branch * propagation) list =
+    let get (_,e,_) =
+      e.edge_key, fst (get_edge_propagation e)
+    in
+    List.map get (G.pred_e graph v)
   let get_succ_propagations (v : vertex) : propagation list =
     List.map (fun (_,e,_) -> fst (get_edge_propagation e)) (G.succ_e graph v)
 
@@ -304,6 +223,12 @@ module Make_Dataflow
   (* --- Transfer functions application --- *)
 
   type state = Domain.t
+
+  (** Join every state in the list *)
+  let smash (l : state list) : state or_bottom =
+    match l with
+    | [] -> `Bottom
+    | v1 :: l -> `Value (List.fold_left Domain.join v1 l)
 
   (* Thse lifting function helps to uniformize the transfer functions to a
      common signature *)
@@ -382,10 +307,6 @@ module Make_Dataflow
 
   let transfer_return (stmt : stmt) (return_exp : exp option)
       (states : state list) : state list =
-    (** Join every state in the list and put the result in a singleton. *)
-    let smash (l : state list) : state list =
-      Bottom.to_list (Domain.join_list l)
-    in
     (* Deconstruct return statement *)
     let return_var = match return_exp with
       | Some {enode = Lval (Var v, NoOffset)} -> Some v
@@ -411,12 +332,12 @@ module Make_Dataflow
         begin match return_exp with
           | Some return_exp ->
             let split_states = Transfer.split_final_states kf return_exp i states in
-            let states' = List.map Domain.join_list split_states in
+            let states' = List.map smash split_states in
             Bottom.all states'
           | None ->
-            smash states
+            Bottom.to_list (smash states)
         end
-      | Split_strategy.NoSplit   -> smash states
+      | Split_strategy.NoSplit   -> Bottom.to_list (smash states)
       | Split_strategy.FullSplit -> states
       (* Last case not possible : already transformed into SplitEqList *)
       | Split_strategy.SplitAuto -> assert false
@@ -529,13 +450,15 @@ module Make_Dataflow
 
   let process_edge (v1,e,v2 : G.edge) : unit =
     let {edge_transition=transition; edge_kinstr=kinstr} = e in
-    let propagation,_shadow = get_edge_propagation e in
+    let propagation,edge_info = get_edge_propagation e in
     !Db.progress ();
     check_signals ();
     current_ki := kinstr;
     Cil.CurrentLoc.set e.edge_loc;
     Partition.transfer (transfer_transition transition) propagation;
-    process_loop_transitions v1 v2 propagation
+    process_loop_transitions v1 v2 propagation;
+    if not (Partition.is_empty_propagation propagation) then
+      edge_info.fireable <- true
 
   let update_vertex ?(widening : bool = false) (v : vertex) : bool =
     (* Set location if possible *)
@@ -586,7 +509,7 @@ module Make_Dataflow
         false
     in
     (* Reset sources *)
-    List.iter (fun (p,_) -> Partition.clear_propagation p) sources;
+    List.iter (fun (_,p) -> Partition.clear_propagation p) sources;
     (* Dispatch to successors *)
     List.iter (fun p2 -> Partition.merge p ~into:p2) (get_succ_propagations v);
     (* Return wether the iterator should stop or not *)
@@ -619,21 +542,6 @@ module Make_Dataflow
     | _ -> (* Several successors - failure *)
       Value_parameters.abort "Do not know which branch to take. Stopping."
 
-  let reset_component (vertex_list : vertex list) : unit =
-    let reset_edge (_,e,_) =
-      let p,s = get_edge_propagation e in
-      Partition.reset_propagation p;
-      Partition.reset_shadow s;
-    in
-    let reset_vertex v =
-      let s = get_vertex_store v
-      and w = get_vertex_widening v in
-      Partition.reset_store s;
-      Partition.reset_widening w;
-      List.iter reset_edge (G.succ_e graph v)
-    in
-    List.iter reset_vertex vertex_list
-
   let rec iterate_list (l : wto) =
     List.iter iterate_element l
   and iterate_element = function
@@ -644,7 +552,7 @@ module Make_Dataflow
          Otherwise, only resets the widening counter for this component. This
          is especially useful for nested loops. *)
       if hierachical_convergence
-      then reset_component (v :: Wto.flatten w)
+      then () (* reset_component (v :: Wto.flatten w) *)
       else Partition.reset_widening_counter (get_vertex_widening v);
       (* Iterate until convergence *)
       let iteration_count = ref 0 in
@@ -715,12 +623,12 @@ module Make_Dataflow
           | Then -> Db.Value.mask_then
           | Else -> Db.Value.mask_else
         in
-        let shadow = snd (get_edge_propagation e) in
+        let edge_info = snd (get_edge_propagation e) in
         let old_status =
           try StmtTable.find table stmt
           with Not_found -> 0
         and status =
-          if Partition.is_empty_shadow shadow then 0 else mask
+          if edge_info.fireable then mask else 0
         in
         let new_status = old_status lor status in
         StmtTable.replace table stmt new_status;

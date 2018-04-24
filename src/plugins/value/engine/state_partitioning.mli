@@ -22,34 +22,32 @@
 
 open Bottom.Type
 
-module type Param =
+type branch = Partition.branch
+type loop = Cil_types.stmt
+
+module type Kf =
 sig
-  type loop
-  val kf : Cil_types.kernel_function
+  val kf : Cil_types.kernel_function  
+end
+
+module type Parameters =
+sig
   val widening_delay : int
   val widening_period : int
   val slevel : Cil_types.stmt -> int
   val merge : Cil_types.stmt -> bool
   val unroll : loop -> int
-end
-
-module type Domain =
-sig
-  include Partitioning.Domain
-  val join_list : ?into:t or_bottom -> t list -> t or_bottom
+  val history_size : int
+  val universal_splits : Cil_types.lval list
+  val flow_actions : Cil_types.stmt -> Partition.action list
 end
 
 module type Partition =
 sig
-  type loop        (** Loops identifiers *)
   type state       (** The states being partitioned *)
   type store       (** The storage of a partition *)
   type propagation (** Only contains states which needs to be propagated, i.e.
                        states which have not been propagated yet *)
-  type shadow      (** The shadow of a propagation remembers all the previous
-                       propagations ; shadows are useful before joins during
-                       descending sequences or to find if a transition is
-                       fireable *)
   type widening    (** Widening informations *)
 
 
@@ -57,7 +55,6 @@ sig
 
   val empty_store : stmt:Cil_types.stmt option -> store
   val empty_propagation : unit -> propagation
-  val empty_shadow : unit -> shadow
   val empty_widening : stmt:Cil_types.stmt option -> widening
 
   (** Build the initial propagation for the entry point of a function. *)
@@ -76,7 +73,6 @@ sig
   val smashed : store -> state or_bottom
   val is_empty_store : store -> bool
   val is_empty_propagation : propagation -> bool
-  val is_empty_shadow : shadow -> bool
   val store_size : store -> int
   val propagation_size : propagation -> int
 
@@ -88,7 +84,6 @@ sig
 
   val reset_store : store -> unit
   val reset_propagation : propagation -> unit
-  val reset_shadow : shadow -> unit
   val reset_widening : widening -> unit
 
   (** Resets (or just delays) the widening counter. Used on nested loops, to
@@ -120,10 +115,8 @@ sig
       together inside the propagation is allowed. *)
   val merge : into:propagation -> propagation -> unit
 
-  (** Join all incoming propagations into the given store. Each propagation is
-      paired with a shadow of the previous propagations on the same edge. This
-      function returns a set of states which still need to be propagated past
-      the store.
+  (** Join all incoming propagations into the given store. This function returns
+      a set of states which still need to be propagated past the store.
 
       If a state from the propagations is included in another state which has
       already been propagated, it may be removed from the output propagation.
@@ -134,7 +127,7 @@ sig
       This function also interprets partitioning annotations at the store
       vertex (slevel, splits, merges, ...) which will generally change the
       current partitioning. *)
-  val join : (propagation * shadow) list -> store -> propagation
+  val join : (branch * propagation) list -> store -> propagation
 
   (** Widen a propagation at the position of the given store. The widening
       object keeps track of the previous widenings to ensure termination. The
@@ -148,7 +141,8 @@ sig
 
 end
 
+module type Domain = Partitioning.Domain
+
 module type Partitioning =
-  functor (Domain : Domain) (Param : Param) ->
+  functor (Domain : Domain) (Kf : Kf) ->
     Partition with type state = Domain.t
-               and type loop = Param.loop
