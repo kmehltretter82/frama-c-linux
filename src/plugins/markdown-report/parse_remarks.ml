@@ -29,15 +29,28 @@ let include_markdown = Str.regexp "<!-- INCLUDE \\(.*\\) -->"
 
 let is_section = Str.regexp "^#[^{]*{#+\\([^}]*\\)}"
 
+let cleanup_blanks l =
+  let rec aux = function "" :: l -> aux l | l -> l in aux (List.rev (aux l))
+
 let parse_line env line =
   if env.is_markdown then begin
     if Str.string_match end_markdown line 0 then begin
-      let remark = Markdown.Raw (List.rev env.current_markdown) in
-      Mdr_params.debug ~dkey
-        "Remark for section %s:@\n%a"
-        env.current_section Markdown.pp_element remark;
+      let remark = cleanup_blanks env.current_markdown in
+      let remark =
+        match remark with
+        | [] ->
+          Mdr_params.debug ~dkey
+            "Empty remark for section %s" env.current_section;
+          []
+        | _ ->
+          let res = Markdown.Raw remark in
+          Mdr_params.debug ~dkey
+            "Remark for section %s:@\n%a"
+            env.current_section Markdown.pp_element res;
+          [res]
+      in
       env.remarks <-
-        Datatype.String.Map.add env.current_section [remark] env.remarks;
+        Datatype.String.Map.add env.current_section remark env.remarks;
       env.current_markdown <- [];
       env.is_markdown <- false
     end else if Str.string_match include_markdown line 0 then begin
