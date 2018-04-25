@@ -10,6 +10,13 @@ let insert_remark_opt env anchor placeholder =
 
 let insert_remark env anchor = insert_remark_opt env anchor []
 
+(* apparently, pandoc, or at least its latex output,
+   does not like anchors beginning with _ *)
+let sanitize_anchor s =
+  if s = "" then "a"
+  else if s.[0] = '_' then "a" ^ s
+  else s
+
 let all_eva_domains =
   [ "-eva-apron-box", "box domain of the Apron library";
     "-eva-apron-oct", "octagon domain of the Apron library";
@@ -104,10 +111,11 @@ let section_stubs env =
       (fun s -> String.length s <> 0 && s.[0] <> '@' && s.[0] <> '-')
       (fun s ->
          let kf = Globals.Functions.find_by_name s in
+         let anchor = sanitize_anchor s in
          let content =
-           if env.is_draft then insert_marks env s
+           if env.is_draft then insert_marks env anchor
            else begin
-             let comment = insert_remark env s in
+             let comment = insert_remark env anchor in
              Block
                [ Text
                    [Inline_code s; Plain "has the following specification"];
@@ -116,14 +124,15 @@ let section_stubs env =
              :: comment
            end
          in
-         H4 ([Inline_code s], Some s) :: content)
+         H4 ([Inline_code s], Some anchor) :: content)
       l
   in
   let describe_func kf =
     let name = Kernel_function.get_name kf in
+    let anchor = sanitize_anchor name in
     let loc = Kernel_function.get_location kf in
     let content =
-      if env.is_draft then insert_marks env name
+      if env.is_draft then insert_marks env anchor
       else
         (Block
             [ Text
@@ -134,9 +143,9 @@ let section_stubs env =
                 Printer.pp_global
                 (GFun (Kernel_function.get_definition kf,loc))
             ])
-        :: insert_remark env name
+        :: insert_remark env anchor
     in
-    H4 ([Inline_code name], Some name) :: content
+    H4 ([Inline_code name], Some anchor) :: content
   in
   let content =
     if stubbed_kf <> [] then begin
