@@ -81,7 +81,8 @@ let section_stubs env =
   let stubbed_kf =
     List.concat
       (List.map
-         (fun filename ->
+         (fun f ->
+            let filename = Filepath.normalize f in
             Globals.FileIndex.get_functions ~declarations:false ~filename)
          (Mdr_params.Stubs.get ())
       )
