@@ -16,8 +16,8 @@
   T1[0..2] ∈ {0}
   T2[0..3] ∈ {0}
 [value] using specification for function __e_acsl_memory_init
-[value] tests/gmp/array.i:10: entering loop for the first time
-[value] tests/gmp/array.i:11: entering loop for the first time
+[value] tests/gmp/array.i:10: starting to merge loop iterations
+[value] tests/gmp/array.i:11: starting to merge loop iterations
 [value:alarm] tests/gmp/array.i:13: Warning: assertion got status unknown.
 [value] using specification for function __gmpz_init_set_si
 [value] using specification for function __gmpz_cmp
