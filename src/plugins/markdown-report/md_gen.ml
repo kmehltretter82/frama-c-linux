@@ -32,7 +32,10 @@ let all_eva_domains =
      (e.g. `a[i]` when `i` is not precisely known by `Cvalue`)"
 ]
 
-let insert_marks = [ Comment "BEGIN_REMARK"; Comment "END_REMARK" ]
+let insert_marks env anchor =
+  Comment "BEGIN_REMARK"
+  :: insert_remark env anchor
+  @ [Comment "END_REMARK"]
 
 let plural l s =
   match l with
@@ -56,7 +59,7 @@ let section_domains env =
   if env.is_draft then
     head
     :: Comment "You can give more information about the choice of EVA domains"
-    :: insert_marks
+    :: insert_marks env anchor
   else begin
     let l = get_eva_domains () in
     head
@@ -102,7 +105,7 @@ let section_stubs env =
       (fun s ->
          let kf = Globals.Functions.find_by_name s in
          let content =
-           if env.is_draft then insert_marks
+           if env.is_draft then insert_marks env s
            else begin
              let comment = insert_remark env s in
              Block
@@ -120,9 +123,9 @@ let section_stubs env =
     let name = Kernel_function.get_name kf in
     let loc = Kernel_function.get_location kf in
     let content =
-      if env.is_draft then insert_marks
+      if env.is_draft then insert_marks env name
       else
-        [ Block
+        (Block
             [ Text
                 (Inline_code name ::
                  plain_format
@@ -130,8 +133,8 @@ let section_stubs env =
               codelines "c"
                 Printer.pp_global
                 (GFun (Kernel_function.get_definition kf,loc))
-            ]
-        ]
+            ])
+        :: insert_remark env name
     in
     H4 ([Inline_code name], Some name) :: content
   in
@@ -144,7 +147,7 @@ let section_stubs env =
   let content = List.concat content in
   if content = [] then
     if env.is_draft then
-      Comment "No stubs have been used" :: insert_marks
+      [ Comment "No stubs have been used" ]
     else
       [ Block [Text (plain "No stubs have been used for this analysis")]]
   else
@@ -205,7 +208,7 @@ let gen_inputs env =
       Comment
         "You can add here some remarks about the set of files \
          that is considered by Frama-C"
-      :: insert_marks
+      :: insert_marks env anchor
    else
      insert_remark env anchor
   in
@@ -228,7 +231,7 @@ let gen_config env =
     if env.is_draft then
       Comment
         "You can add here some remarks about the options used for the analysis"
-      :: insert_marks
+      :: insert_marks env anchor
     else begin
       let placeholder = [
         Block [
@@ -247,7 +250,7 @@ let gen_context env =
     if env.is_draft then
       header
       :: Comment "You can add here some overall introduction to the analysis"
-      :: insert_marks
+      :: insert_marks env anchor
     else begin
       match insert_remark env anchor with
       | [] -> []
@@ -260,7 +263,13 @@ let gen_context env =
   @ gen_config env
   @ section_domains env
   @ H3 (plain "Stubbed Functions", Some "stubs")
-    :: section_stubs env
+    :: (
+    if env.is_draft then
+      Comment
+        "You can add here general comments about the stubs that have been used"
+      :: insert_marks env "stubs"
+    else insert_remark env "stubs")
+  @ section_stubs env
 
 let gen_coverage env =
   let anchor = "coverage" in
@@ -270,7 +279,7 @@ let gen_coverage env =
     if env.is_draft then
       content @
       Comment "You can comment on the coverage obtained by EVA"
-      :: insert_marks
+      :: insert_marks env anchor
     else
       content @ insert_remark env anchor
   in
@@ -346,7 +355,7 @@ let section_event is_err env nb event =
   in
   let content =
     if env.is_draft then
-      insert_marks
+      insert_marks env lab
     else insert_remark env lab
   in
   H2 (plain title, Some lab)
@@ -444,7 +453,7 @@ let gen_section_alarms env =
     let sec_title = plain_format "Alarm %d at %s" i loc in
     let sec_content =
       if env.is_draft then
-        Block [ descr ] :: insert_marks
+        Block [ descr ] :: insert_marks env label
       else
         Block
           [
@@ -468,7 +477,7 @@ let gen_section_alarms env =
     let anchor = "alarms" in
     let text_content =
       if env.is_draft then
-        Comment "No alarm!" :: insert_marks
+        Comment "No alarm!" :: insert_marks env anchor
       else
         Block [
           Text
@@ -527,7 +536,7 @@ let gen_section_callgraph env =
         Comment
           "A flamegraph provides a visualization of the functions and \
            callstacks whose analysis is the most costly."
-        :: insert_marks
+        :: insert_marks env anchor
       else
         Block [
           Text [
@@ -547,7 +556,7 @@ let gen_section_postlude env =
   if env.is_draft then
     header ::
     Comment "You can put here some concluding remarks"
-    :: insert_marks
+    :: insert_marks env anchor
   else begin
     match insert_remark env anchor with
     | [] -> []
@@ -569,7 +578,14 @@ let mk_date () =
 let mk_remarks () =
   let f = Mdr_params.Remarks.get () in
   if f <> "" then Parse_remarks.get_remarks f
-  else Datatype.String.Map.empty
+  else if Mdr_params.Gen_draft.get () then begin
+    let f = Mdr_params.Output.get() in
+    if Sys.file_exists f then begin
+      Mdr_params.feedback
+        "Re-using pre-existing remarks in draft file %s" f;
+      Parse_remarks.get_remarks f
+    end else Datatype.String.Map.empty
+  end else  Datatype.String.Map.empty
 
 let gen_report is_draft =
   let remarks = mk_remarks () in
