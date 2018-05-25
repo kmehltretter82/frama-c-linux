@@ -228,11 +228,7 @@ int main(int argc, char const **argv)
   __e_acsl_store_block((void *)(& pstr),(size_t)8);
   __e_acsl_full_init((void *)(& pstr));
   {
-    int tmp;
-    __e_acsl_store_block((void *)(& tmp),(size_t)4);
-    __e_acsl_full_init((void *)(& tmp));
-    tmp = fork();
-    pid_t pid = (unsigned int)tmp;
+    pid_t pid = fork();
     __e_acsl_store_block((void *)(& pid),(size_t)4);
     __e_acsl_full_init((void *)(& pid));
     if (! pid) {
@@ -247,15 +243,10 @@ int main(int argc, char const **argv)
       signal_eval(process_status,0,__gen_e_acsl_literal_string_8);
       __e_acsl_delete_block((void *)(& process_status));
     }
-    __e_acsl_delete_block((void *)(& tmp));
     __e_acsl_delete_block((void *)(& pid));
   }
   {
-    int tmp_0;
-    __e_acsl_store_block((void *)(& tmp_0),(size_t)4);
-    __e_acsl_full_init((void *)(& tmp_0));
-    tmp_0 = fork();
-    pid_t pid_0 = (unsigned int)tmp_0;
+    pid_t pid_0 = fork();
     __e_acsl_store_block((void *)(& pid_0),(size_t)4);
     __e_acsl_full_init((void *)(& pid_0));
     if (! pid_0) {
@@ -270,7 +261,6 @@ int main(int argc, char const **argv)
       signal_eval(process_status_0,1,__gen_e_acsl_literal_string_9);
       __e_acsl_delete_block((void *)(& process_status_0));
     }
-    __e_acsl_delete_block((void *)(& tmp_0));
     __e_acsl_delete_block((void *)(& pid_0));
   }
   FILE *fh = __gen_e_acsl_tmpfile();
@@ -278,11 +268,7 @@ int main(int argc, char const **argv)
   __e_acsl_full_init((void *)(& fh));
   if (fh) {
     {
-      int tmp_2;
-      __e_acsl_store_block((void *)(& tmp_2),(size_t)4);
-      __e_acsl_full_init((void *)(& tmp_2));
-      tmp_2 = fork();
-      pid_t pid_1 = (unsigned int)tmp_2;
+      pid_t pid_1 = fork();
       __e_acsl_store_block((void *)(& pid_1),(size_t)4);
       __e_acsl_full_init((void *)(& pid_1));
       if (! pid_1) {
@@ -298,16 +284,11 @@ int main(int argc, char const **argv)
         signal_eval(process_status_1,0,__gen_e_acsl_literal_string_12);
         __e_acsl_delete_block((void *)(& process_status_1));
       }
-      __e_acsl_delete_block((void *)(& tmp_2));
       __e_acsl_delete_block((void *)(& pid_1));
     }
     __gen_e_acsl_fclose(fh);
     {
-      int tmp_3;
-      __e_acsl_store_block((void *)(& tmp_3),(size_t)4);
-      __e_acsl_full_init((void *)(& tmp_3));
-      tmp_3 = fork();
-      pid_t pid_2 = (unsigned int)tmp_3;
+      pid_t pid_2 = fork();
       __e_acsl_store_block((void *)(& pid_2),(size_t)4);
       __e_acsl_full_init((void *)(& pid_2));
       if (! pid_2) {
@@ -323,15 +304,10 @@ int main(int argc, char const **argv)
         signal_eval(process_status_2,1,__gen_e_acsl_literal_string_13);
         __e_acsl_delete_block((void *)(& process_status_2));
       }
-      __e_acsl_delete_block((void *)(& tmp_3));
       __e_acsl_delete_block((void *)(& pid_2));
     }
     {
-      int tmp_4;
-      __e_acsl_store_block((void *)(& tmp_4),(size_t)4);
-      __e_acsl_full_init((void *)(& tmp_4));
-      tmp_4 = fork();
-      pid_t pid_3 = (unsigned int)tmp_4;
+      pid_t pid_3 = fork();
       __e_acsl_store_block((void *)(& pid_3),(size_t)4);
       __e_acsl_full_init((void *)(& pid_3));
       if (! pid_3) {
@@ -348,16 +324,11 @@ int main(int argc, char const **argv)
         signal_eval(process_status_3,1,__gen_e_acsl_literal_string_14);
         __e_acsl_delete_block((void *)(& process_status_3));
       }
-      __e_acsl_delete_block((void *)(& tmp_4));
       __e_acsl_delete_block((void *)(& pid_3));
     }
   }
   {
-    int tmp_5;
-    __e_acsl_store_block((void *)(& tmp_5),(size_t)4);
-    __e_acsl_full_init((void *)(& tmp_5));
-    tmp_5 = fork();
-    pid_t pid_4 = (unsigned int)tmp_5;
+    pid_t pid_4 = fork();
     __e_acsl_store_block((void *)(& pid_4),(size_t)4);
     __e_acsl_full_init((void *)(& pid_4));
     if (! pid_4) {
@@ -372,15 +343,10 @@ int main(int argc, char const **argv)
       signal_eval(process_status_4,0,__gen_e_acsl_literal_string_15);
       __e_acsl_delete_block((void *)(& process_status_4));
     }
-    __e_acsl_delete_block((void *)(& tmp_5));
     __e_acsl_delete_block((void *)(& pid_4));
   }
   {
-    int tmp_6;
-    __e_acsl_store_block((void *)(& tmp_6),(size_t)4);
-    __e_acsl_full_init((void *)(& tmp_6));
-    tmp_6 = fork();
-    pid_t pid_5 = (unsigned int)tmp_6;
+    pid_t pid_5 = fork();
     __e_acsl_store_block((void *)(& pid_5),(size_t)4);
     __e_acsl_full_init((void *)(& pid_5));
     if (! pid_5) {
@@ -395,15 +361,10 @@ int main(int argc, char const **argv)
       signal_eval(process_status_5,1,__gen_e_acsl_literal_string_16);
       __e_acsl_delete_block((void *)(& process_status_5));
     }
-    __e_acsl_delete_block((void *)(& tmp_6));
     __e_acsl_delete_block((void *)(& pid_5));
   }
   {
-    int tmp_7;
-    __e_acsl_store_block((void *)(& tmp_7),(size_t)4);
-    __e_acsl_full_init((void *)(& tmp_7));
-    tmp_7 = fork();
-    pid_t pid_6 = (unsigned int)tmp_7;
+    pid_t pid_6 = fork();
     __e_acsl_store_block((void *)(& pid_6),(size_t)4);
     __e_acsl_full_init((void *)(& pid_6));
     if (! pid_6) {
@@ -419,15 +380,10 @@ int main(int argc, char const **argv)
       signal_eval(process_status_6,0,__gen_e_acsl_literal_string_19);
       __e_acsl_delete_block((void *)(& process_status_6));
     }
-    __e_acsl_delete_block((void *)(& tmp_7));
     __e_acsl_delete_block((void *)(& pid_6));
   }
   {
-    int tmp_8;
-    __e_acsl_store_block((void *)(& tmp_8),(size_t)4);
-    __e_acsl_full_init((void *)(& tmp_8));
-    tmp_8 = fork();
-    pid_t pid_7 = (unsigned int)tmp_8;
+    pid_t pid_7 = fork();
     __e_acsl_store_block((void *)(& pid_7),(size_t)4);
     __e_acsl_full_init((void *)(& pid_7));
     if (! pid_7) {
@@ -443,15 +399,10 @@ int main(int argc, char const **argv)
       signal_eval(process_status_7,0,__gen_e_acsl_literal_string_21);
       __e_acsl_delete_block((void *)(& process_status_7));
     }
-    __e_acsl_delete_block((void *)(& tmp_8));
     __e_acsl_delete_block((void *)(& pid_7));
   }
   {
-    int tmp_9;
-    __e_acsl_store_block((void *)(& tmp_9),(size_t)4);
-    __e_acsl_full_init((void *)(& tmp_9));
-    tmp_9 = fork();
-    pid_t pid_8 = (unsigned int)tmp_9;
+    pid_t pid_8 = fork();
     __e_acsl_store_block((void *)(& pid_8),(size_t)4);
     __e_acsl_full_init((void *)(& pid_8));
     if (! pid_8) {
@@ -467,15 +418,10 @@ int main(int argc, char const **argv)
       signal_eval(process_status_8,1,__gen_e_acsl_literal_string_23);
       __e_acsl_delete_block((void *)(& process_status_8));
     }
-    __e_acsl_delete_block((void *)(& tmp_9));
     __e_acsl_delete_block((void *)(& pid_8));
   }
   {
-    int tmp_10;
-    __e_acsl_store_block((void *)(& tmp_10),(size_t)4);
-    __e_acsl_full_init((void *)(& tmp_10));
-    tmp_10 = fork();
-    pid_t pid_9 = (unsigned int)tmp_10;
+    pid_t pid_9 = fork();
     __e_acsl_store_block((void *)(& pid_9),(size_t)4);
     __e_acsl_full_init((void *)(& pid_9));
     if (! pid_9) {
@@ -491,15 +437,10 @@ int main(int argc, char const **argv)
       signal_eval(process_status_9,1,__gen_e_acsl_literal_string_24);
       __e_acsl_delete_block((void *)(& process_status_9));
     }
-    __e_acsl_delete_block((void *)(& tmp_10));
     __e_acsl_delete_block((void *)(& pid_9));
   }
   {
-    int tmp_11;
-    __e_acsl_store_block((void *)(& tmp_11),(size_t)4);
-    __e_acsl_full_init((void *)(& tmp_11));
-    tmp_11 = fork();
-    pid_t pid_10 = (unsigned int)tmp_11;
+    pid_t pid_10 = fork();
     __e_acsl_store_block((void *)(& pid_10),(size_t)4);
     __e_acsl_full_init((void *)(& pid_10));
     if (! pid_10) {
@@ -515,15 +456,10 @@ int main(int argc, char const **argv)
       signal_eval(process_status_10,1,__gen_e_acsl_literal_string_25);
       __e_acsl_delete_block((void *)(& process_status_10));
     }
-    __e_acsl_delete_block((void *)(& tmp_11));
     __e_acsl_delete_block((void *)(& pid_10));
   }
   {
-    int tmp_12;
-    __e_acsl_store_block((void *)(& tmp_12),(size_t)4);
-    __e_acsl_full_init((void *)(& tmp_12));
-    tmp_12 = fork();
-    pid_t pid_11 = (unsigned int)tmp_12;
+    pid_t pid_11 = fork();
     __e_acsl_store_block((void *)(& pid_11),(size_t)4);
     __e_acsl_full_init((void *)(& pid_11));
     if (! pid_11) {
@@ -540,15 +476,10 @@ int main(int argc, char const **argv)
       signal_eval(process_status_11,0,__gen_e_acsl_literal_string_26);
       __e_acsl_delete_block((void *)(& process_status_11));
     }
-    __e_acsl_delete_block((void *)(& tmp_12));
     __e_acsl_delete_block((void *)(& pid_11));
   }
   {
-    int tmp_13;
-    __e_acsl_store_block((void *)(& tmp_13),(size_t)4);
-    __e_acsl_full_init((void *)(& tmp_13));
-    tmp_13 = fork();
-    pid_t pid_12 = (unsigned int)tmp_13;
+    pid_t pid_12 = fork();
     __e_acsl_store_block((void *)(& pid_12),(size_t)4);
     __e_acsl_full_init((void *)(& pid_12));
     if (! pid_12) {
@@ -565,15 +496,10 @@ int main(int argc, char const **argv)
       signal_eval(process_status_12,0,__gen_e_acsl_literal_string_27);
       __e_acsl_delete_block((void *)(& process_status_12));
     }
-    __e_acsl_delete_block((void *)(& tmp_13));
     __e_acsl_delete_block((void *)(& pid_12));
   }
   {
-    int tmp_14;
-    __e_acsl_store_block((void *)(& tmp_14),(size_t)4);
-    __e_acsl_full_init((void *)(& tmp_14));
-    tmp_14 = fork();
-    pid_t pid_13 = (unsigned int)tmp_14;
+    pid_t pid_13 = fork();
     __e_acsl_store_block((void *)(& pid_13),(size_t)4);
     __e_acsl_full_init((void *)(& pid_13));
     if (! pid_13) {
@@ -590,15 +516,10 @@ int main(int argc, char const **argv)
       signal_eval(process_status_13,1,__gen_e_acsl_literal_string_28);
       __e_acsl_delete_block((void *)(& process_status_13));
     }
-    __e_acsl_delete_block((void *)(& tmp_14));
     __e_acsl_delete_block((void *)(& pid_13));
   }
   {
-    int tmp_15;
-    __e_acsl_store_block((void *)(& tmp_15),(size_t)4);
-    __e_acsl_full_init((void *)(& tmp_15));
-    tmp_15 = fork();
-    pid_t pid_14 = (unsigned int)tmp_15;
+    pid_t pid_14 = fork();
     __e_acsl_store_block((void *)(& pid_14),(size_t)4);
     __e_acsl_full_init((void *)(& pid_14));
     if (! pid_14) {
@@ -615,15 +536,10 @@ int main(int argc, char const **argv)
       signal_eval(process_status_14,1,__gen_e_acsl_literal_string_29);
       __e_acsl_delete_block((void *)(& process_status_14));
     }
-    __e_acsl_delete_block((void *)(& tmp_15));
     __e_acsl_delete_block((void *)(& pid_14));
   }
   {
-    int tmp_16;
-    __e_acsl_store_block((void *)(& tmp_16),(size_t)4);
-    __e_acsl_full_init((void *)(& tmp_16));
-    tmp_16 = fork();
-    pid_t pid_15 = (unsigned int)tmp_16;
+    pid_t pid_15 = fork();
     __e_acsl_store_block((void *)(& pid_15),(size_t)4);
     __e_acsl_full_init((void *)(& pid_15));
     if (! pid_15) {
@@ -640,15 +556,10 @@ int main(int argc, char const **argv)
       signal_eval(process_status_15,1,__gen_e_acsl_literal_string_30);
       __e_acsl_delete_block((void *)(& process_status_15));
     }
-    __e_acsl_delete_block((void *)(& tmp_16));
     __e_acsl_delete_block((void *)(& pid_15));
   }
   {
-    int tmp_17;
-    __e_acsl_store_block((void *)(& tmp_17),(size_t)4);
-    __e_acsl_full_init((void *)(& tmp_17));
-    tmp_17 = fork();
-    pid_t pid_16 = (unsigned int)tmp_17;
+    pid_t pid_16 = fork();
     __e_acsl_store_block((void *)(& pid_16),(size_t)4);
     __e_acsl_full_init((void *)(& pid_16));
     if (! pid_16) {
@@ -665,7 +576,6 @@ int main(int argc, char const **argv)
       signal_eval(process_status_16,0,__gen_e_acsl_literal_string_31);
       __e_acsl_delete_block((void *)(& process_status_16));
     }
-    __e_acsl_delete_block((void *)(& tmp_17));
     __e_acsl_delete_block((void *)(& pid_16));
   }
   __e_acsl_full_init((void *)(& __retres));

@@ -19,6 +19,10 @@
 #   configure	configure
 ###############################################################################
 
+###############################
+Plugin E-ACSL Chlorine-20180501
+###############################
+
 -  E-ACSL       [2018/03/30] Support for let binding.
 -  E-ACSL       [2018/02/21] New option -e-acsl-replace-libc-functions to
 	        replace a few libc functions by built-ins that efficiently
