@@ -102,7 +102,7 @@ struct
     let add name l =
       try
         let vi = Globals.Vars.find_from_astinfo name VGlobal in
-        Cil.var vi :: l
+        Cil.evar vi :: l
       with Not_found ->
         warn ~current:false "cannot find the global variable %s for value \
                             partitioning" name;
@@ -111,19 +111,18 @@ struct
     ValuePartitioning.fold add []
 
   let flow_actions stmt =
-    let term_to_lval = function
-      | {term_node = TLval tlv} ->
-        !Db.Properties.Interp.term_lval_to_lval ~result:None tlv
-      | _ ->
-        warn "split/merge expressions must be lvalues";
-        raise Exit
+    let term_to_exp term =
+      !Db.Properties.Interp.term_to_exp ~result:None term
     in
     let map_annot acc t =
       try
         match t with
-        | FlowSplit t -> Partition.Static_split (term_to_lval t) :: acc
-        | FlowMerge t -> Partition.Static_merge (term_to_lval t) :: acc
-      with Exit -> acc (* Impossible to convert term to lval *)
+        | FlowSplit t -> Partition.Static_split (term_to_exp t) :: acc
+        | FlowMerge t -> Partition.Static_merge (term_to_exp t) :: acc
+      with 
+        Db.Properties.Interp.No_conversion ->
+        warn "split/merge expressions must be valid expressions";
+        acc (* Impossible to convert term to lval *)
     in
     List.fold_left map_annot [] (get_flow_annot stmt)
 end

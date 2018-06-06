@@ -51,6 +51,11 @@ module type S = sig
 
   val enter_scope: kernel_function -> varinfo list -> state -> state
 
+  exception Cant_split
+
+  val split_by_value: state -> exp -> (Integer.t * state) list
+
+
   type call_result = {
     states: state list or_bottom;
     cacheable: Value_types.cacheable;

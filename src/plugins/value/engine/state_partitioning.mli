@@ -38,7 +38,7 @@ sig
   val merge : Cil_types.stmt -> bool
   val unroll : loop -> int
   val history_size : int
-  val universal_splits : Cil_types.lval list
+  val universal_splits : Cil_types.exp list
   val flow_actions : Cil_types.stmt -> Partition.action list
 end
 
@@ -143,6 +143,8 @@ end
 
 module type Domain = Partitioning.Domain
 
-module type Partitioning =
-  functor (Domain : Domain) (Kf : Kf) ->
+module type Partitioning = functor
+  (Domain : Abstract_domain.External)
+  (Transfer : Transfer_stmt.S with type state = Domain.t)
+  (Kf : Kf) ->
     Partition with type state = Domain.t

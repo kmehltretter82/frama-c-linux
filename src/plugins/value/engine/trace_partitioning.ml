@@ -26,7 +26,10 @@ open State_partitioning
 open Partition
 
 
-module Make (Domain : Domain) (Kf : Kf) =
+module Make
+    (Domain : Abstract_domain.External)
+    (Transfer : Transfer_stmt.S with type state = Domain.t)
+    (Kf : Kf) =
 struct
   module Parameters = Partitioning_parameters.Make (Kf)
 
@@ -36,63 +39,10 @@ struct
   (* Add the split function to the domain *)
   module Domain =
   struct
+    exception Cant_split = Transfer.Cant_split
+    let split = Transfer.split_by_value
+
     include Domain
-
-    module Val = struct
-      include Main_values.CVal
-      include Structure.Open (Structure.Key_Value) (Main_values.CVal)
-      let reduce t = t
-    end
-
-    module Eva =
-      Evaluation.Make
-        (Val)
-        (Main_locations.PLoc)
-        (Cvalue_domain.State)
-
-    exception Cant_split
-
-    (* TODO: size of split limit *)
-    let split state lval =
-      (* Whenever the split fail, warn the user and exit with an exception *)
-      let fail message =
-        Value_parameters.warning ~once:true message;
-        raise Cant_split
-      in
-      (* Get the cvalue *)
-      let cvalue = match get Cvalue_domain.key with
-        | Some get_cvalue -> get_cvalue state
-        | None -> fail "cannot partition by value when the CValue domain is not\
-                        active"
-      in
-      (* Retrieve the location of the lval *)
-      let cstate = Cvalue_domain.inject cvalue in
-      let location = match Eva.lvaluate ~for_writing:true cstate lval with
-      | `Value (_valuation, loc, _typ), _alarmset ->
-        Precise_locs.imprecise_location loc
-      | `Bottom, _alarmset ->
-        fail "cannot partition by value on an imprecise lvalue"
-      in
-      (* Extract the ival *)
-      let ival =
-        try
-          let v = Cvalue.Model.find cvalue location in
-          Cvalue.V.project_ival v
-        with Cvalue.V.Not_based_on_null ->
-          fail "cannot partition by value on pointers"
-      in
-      (* Build a state with the lvalue set to a singleton *)
-      let build i acc =
-        let v = Cvalue.V.inject_int i in
-        let cvalue = Cvalue.Model.add_binding ~exact:true cvalue location v in
-        let new_state = set Cvalue_domain.key cvalue state in
-        (i,new_state) :: acc
-      in
-      (* For each integer of the ival, build a new state *)
-      try
-        Ival.fold_int build ival []
-      with Abstract_interp.Error_Top ->
-        fail "too many values to partition by value on"
   end
 
   module Index = Partitioning.Make (Domain)

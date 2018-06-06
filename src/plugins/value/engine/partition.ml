@@ -24,7 +24,7 @@
 let opt_flatten (type a) (o : a option option) : a option =
   Extlib.opt_conv None o
 
-module LvalMap = Cil_datatype.LvalStructEq.Map
+module ExpMap = Cil_datatype.ExpStructEq.Map
 module IList = Datatype.List (Datatype.Int)
 
 type branch = int
@@ -34,8 +34,8 @@ type key = {
   transfer_stamp : int option;
   branches : branch list;
   loops : int list;
-  static_split : Integer.t LvalMap.t;
-  dynamic_split : Integer.t LvalMap.t;
+  static_split : Integer.t ExpMap.t;
+  dynamic_split : Integer.t ExpMap.t;
 }
 
 module Key =
@@ -49,8 +49,8 @@ struct
     Extlib.opt_compare (-) k1.ration_stamp k2.ration_stamp
     <?> (Extlib.opt_compare (-), k1.transfer_stamp, k2.transfer_stamp)
     <?> (IList.compare, k1.loops, k2.loops)
-    <?> (LvalMap.compare Integer.compare, k1.static_split, k2.static_split)
-    <?> (LvalMap.compare Integer.compare, k1.dynamic_split, k2.dynamic_split)
+    <?> (ExpMap.compare Integer.compare, k1.static_split, k2.static_split)
+    <?> (ExpMap.compare Integer.compare, k1.dynamic_split, k2.dynamic_split)
     <?> (IList.compare, k1.branches, k2.branches)
 end
 
@@ -67,10 +67,10 @@ type action =
   | Ration of int
   | Ration_merge of int option
   | Transfer_merge
-  | Static_split of Cil_types.lval
-  | Dynamic_split of Cil_types.lval
-  | Static_merge of Cil_types.lval
-  | Dynamic_merge of Cil_types.lval
+  | Static_split of Cil_types.exp
+  | Dynamic_split of Cil_types.exp
+  | Static_merge of Cil_types.exp
+  | Dynamic_merge of Cil_types.exp
   | Update_dynamic_splits
 
 exception InvalidAction
@@ -83,7 +83,7 @@ sig
   exception Cant_split
 
   val join : t -> t -> t
-  val split : t -> Cil_types.lval -> (Integer.t * t) list
+  val split : t -> Cil_types.exp -> (Integer.t * t) list
 end
 
 
@@ -100,8 +100,8 @@ struct
     transfer_stamp = None;
     branches = [];
     loops = [];
-    static_split = LvalMap.empty;
-    dynamic_split = LvalMap.empty;
+    static_split = ExpMap.empty;
+    dynamic_split = ExpMap.empty;
   }
 
   let is_empty (p : 'a partition) : bool =
@@ -128,38 +128,38 @@ struct
   let add_list (p : t) (l : (key * state) list) : t =
     List.fold_left (fun p (k,x) -> add p k x) p l
 
-  let split_state ~(static : bool) (lval : Cil_types.lval)
+  let split_state ~(static : bool) (exp : Cil_types.exp)
       (key : key) (state : state) : (key * state) list =
     try
       let update_key (v,x) =
         let k =
           if static then
-            { key with static_split = LvalMap.add lval v key.static_split }
+            { key with static_split = ExpMap.add exp v key.static_split }
           else
-            { key with dynamic_split = LvalMap.add lval v key.dynamic_split }
+            { key with dynamic_split = ExpMap.add exp v key.dynamic_split }
         in
         (k,x)
       in
-      List.map update_key (Domain.split state lval)
+      List.map update_key (Domain.split state exp)
     with Domain.Cant_split ->
       [(key,state)]
 
-  let split ~(static : bool) (p : t) (lval : Cil_types.lval) =
+  let split ~(static : bool) (p : t) (exp : Cil_types.exp) =
     let add_split key state p =
-      add_list p (split_state ~static lval key state)
+      add_list p (split_state ~static exp key state)
     in
     KMap.fold add_split p KMap.empty
 
   let update_dynamic_splits p =
     (* Update one state *)
     let update_state key state p =
-      (* Split the states in the list l for the given lval *)
-      let update_lval lval _ l =
+      (* Split the states in the list l for the given exp *)
+      let update_exp exp _ l =
         let static = false in
-        List.fold_left (fun l (k,s) -> split_state ~static lval k s @ l) [] l
+        List.fold_left (fun l (k,s) -> split_state ~static exp k s @ l) [] l
       in
-      (* Foreach lval in original state: split *)
-      let l = LvalMap.fold update_lval key.dynamic_split [(key,state)] in
+      (* Foreach exp in original state: split *)
+      let l = ExpMap.fold update_exp key.dynamic_split [(key,state)] in
       add_list p l
     in
     KMap.fold update_state p KMap.empty
@@ -168,11 +168,11 @@ struct
     KMap.fold (fun k x acc -> add acc (f k) x) p empty
 
   let transfer_keys p = function
-    | Static_split lval ->
-      split ~static:true p lval
+    | Static_split exp ->
+      split ~static:true p exp
 
-    | Dynamic_split lval ->
-      split ~static:false p lval
+    | Dynamic_split exp ->
+      split ~static:false p exp
 
     | Update_dynamic_splits ->
       update_dynamic_splits p
@@ -230,11 +230,11 @@ struct
         | Transfer_merge -> fun k ->
           { k with transfer_stamp = None }
 
-        | Static_merge lval -> fun k ->
-          { k with static_split = LvalMap.remove lval k.static_split }
+        | Static_merge exp -> fun k ->
+          { k with static_split = ExpMap.remove exp k.static_split }
 
-        | Dynamic_merge lval -> fun k ->
-          { k with dynamic_split = LvalMap.remove lval k.dynamic_split }
+        | Dynamic_merge exp -> fun k ->
+          { k with dynamic_split = ExpMap.remove exp k.dynamic_split }
       in
       map_keys transfer p
 
@@ -247,6 +247,7 @@ struct
       let add p y =
         let k' = { k with transfer_stamp = Some !t } in
         incr t;
+        assert (not (KMap.mem k' p));
         KMap.add k' y p
       in
       match f x with

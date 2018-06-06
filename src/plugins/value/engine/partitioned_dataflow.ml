@@ -97,7 +97,7 @@ module Make_Dataflow
 
   (* --- Abstract values storage --- *)
 
-  module Partition = Trace_partitioning.Make (Domain) (AnalysisParam)
+  module Partition = Trace_partitioning.Make (Domain) (Transfer) (AnalysisParam)
 
   type store = Partition.store
   type widening = Partition.widening

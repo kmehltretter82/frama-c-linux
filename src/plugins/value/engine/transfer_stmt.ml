@@ -40,6 +40,8 @@ module type S = sig
     state -> (stmt * lval list * lval list * lval list * stmt ref list) list ->
     unit or_bottom
   val enter_scope: kernel_function -> varinfo list -> state -> state
+  exception Cant_split
+  val split_by_value: state -> exp -> (Integer.t * state) list
   type call_result = {
     states: state list or_bottom;
     cacheable: Value_types.cacheable;
@@ -872,6 +874,55 @@ module Make (Abstract: Abstractions.Eva) = struct
     in
     List.fold_left initialize_volatile state vars
 
+
+  (* ------------------------------------------------------------------------ *)
+  (*                               Split by value                             *)
+  (* ------------------------------------------------------------------------ *)
+
+  exception Cant_split
+
+  let split_by_value state exp =
+    (* Whenever the split fails, warn the user and raise an exception *)
+    let fail message =
+      Value_parameters.warning ~once:true message;
+      raise Cant_split
+    in
+    (* Evaluate the expression *)
+    let valuation, value = match Eval.evaluate ~reduction:false state exp with
+      | `Value (valuation, value), alarms when Alarmset.is_empty alarms ->
+        valuation, value
+      | _ ->
+        fail "the split expression cannot be evaluated safely on all states";
+    in
+    (* Get the cvalue *)
+    let cvalue = match Value.get Main_values.cvalue_key with
+      | Some get_cvalue -> get_cvalue value
+      | None -> fail "cannot partition by value when the CValue domain is not\
+                      active"
+    in
+    (* Extract the ival *)
+    let ival =
+      try
+        Cvalue.V.project_ival cvalue
+      with Cvalue.V.Not_based_on_null ->
+        fail "cannot partition by value on pointers"
+    in
+    (* Build a state with the lvalue set to a singleton *)
+    let build i acc =
+      let value = Value.inject_int (Cil.typeOf exp) i in
+      match Eval.assume ~valuation state exp value with
+      | `Value valuation ->
+        (i, TF.update valuation state) :: acc
+      | _ -> (* This value cannot be set in the state ; the evaluation of
+                expr was unprecise *)
+        acc
+    in
+    (* For each integer of the ival, build a new state *)
+    begin try
+      Ival.fold_int build ival []
+    with Abstract_interp.Error_Top ->
+      fail "too many values to partition by value on"
+    end
 end
 
 

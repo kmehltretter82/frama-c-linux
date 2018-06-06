@@ -52,15 +52,15 @@
 
 type branch = int
 
-module LvalMap = Cil_datatype.LvalStructEq.Map
+module ExpMap = Cil_datatype.ExpStructEq.Map
 
 type key = private {
   ration_stamp : int option;
   transfer_stamp : int option;
   branches : branch list;
   loops : int list;
-  static_split : Integer.t LvalMap.t;
-  dynamic_split : Integer.t LvalMap.t;
+  static_split : Integer.t ExpMap.t;
+  dynamic_split : Integer.t ExpMap.t;
 }
 
 type 'a partition
@@ -73,10 +73,10 @@ type action =
   | Ration of int (* starting ration stamp *)
   | Ration_merge of int option (* new ration stamp for the merge state *)
   | Transfer_merge
-  | Static_split of Cil_types.lval
-  | Dynamic_split of Cil_types.lval
-  | Static_merge of Cil_types.lval
-  | Dynamic_merge of Cil_types.lval
+  | Static_split of Cil_types.exp
+  | Dynamic_split of Cil_types.exp
+  | Static_merge of Cil_types.exp
+  | Dynamic_merge of Cil_types.exp
   | Update_dynamic_splits
 
 exception InvalidAction
@@ -89,7 +89,7 @@ sig
   exception Cant_split
 
   val join : t -> t -> t
-  val split : t -> Cil_types.lval -> (Integer.t * t) list
+  val split : t -> Cil_types.exp -> (Integer.t * t) list
 end
 
 
