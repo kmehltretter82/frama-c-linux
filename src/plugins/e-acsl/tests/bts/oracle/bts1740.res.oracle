@@ -1,6 +1,6 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
-[value] tests/bts/bts1740.i:12: Warning: 
+[value:locals-escaping] tests/bts/bts1740.i:12: Warning: 
   locals {a} escaping the scope of a block of main through p
 [value:alarm] tests/bts/bts1740.i:16: Warning: 
   accessing left-value that contains escaping addresses.
