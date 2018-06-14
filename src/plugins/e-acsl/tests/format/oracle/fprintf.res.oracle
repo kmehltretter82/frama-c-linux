@@ -43,17 +43,11 @@
 [value] Computing initial state
 [value] Initial state computed
 [value:initial-state] Values of globals at initialization
-  __fc_heap_status ∈ [--..--]
-  __fc_rand_max ∈ {32767}
   __e_acsl_init ∈ [--..--]
-  stdout ∈ {{ NULL ; &S___fc_stdout[0] }}
-  __fc_fopen[0..15] ∈ {0}
-  __fc_p_fopen ∈ {{ &__fc_fopen[0] }}
   __e_acsl_heap_allocation_size ∈ [--..--]
   __e_acsl_math_HUGE_VAL ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
   __e_acsl_math_HUGE_VALF ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
   __e_acsl_math_INFINITY ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
-  __fc_time ∈ [--..--]
   testno ∈ {0}
   __gen_e_acsl_literal_string ∈ {0}
   __gen_e_acsl_literal_string_2 ∈ {0}
@@ -86,7 +80,6 @@
   __gen_e_acsl_literal_string_29 ∈ {0}
   __gen_e_acsl_literal_string_30 ∈ {0}
   __gen_e_acsl_literal_string_31 ∈ {0}
-  S___fc_stdout[0..1] ∈ [--..--]
 [value] using specification for function __e_acsl_memory_init
 [value] using specification for function __e_acsl_store_block
 [value] using specification for function __e_acsl_full_init
