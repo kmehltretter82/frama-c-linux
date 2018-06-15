@@ -23,17 +23,17 @@
   Neither code nor specification for function fork, generating default assigns from the prototype
 [kernel:annot:missing-spec] FRAMAC_SHARE/libc/sys/wait.h:60: Warning: 
   Neither code nor specification for function waitpid, generating default assigns from the prototype
-[e-acsl] FRAMAC_SHARE/libc/string.h:319: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:327: Warning: 
   E-ACSL construct `logic function application' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:320: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:328: Warning: 
   E-ACSL construct `trange' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:322: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:330: Warning: 
   E-ACSL construct `\separated' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:322: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:330: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:325: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:333: Warning: 
   E-ACSL construct `logic function returning an integer' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:143: Warning: 
