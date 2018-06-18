@@ -17,12 +17,6 @@
 [e-acsl] Warning: annotating undefined function `strcpy':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
-[kernel:annot:missing-spec] FRAMAC_SHARE/libc/stdio.h:158: Warning: 
-  Neither code nor specification for function printf, generating default assigns from the prototype
-[kernel:annot:missing-spec] FRAMAC_SHARE/libc/unistd.h:791: Warning: 
-  Neither code nor specification for function fork, generating default assigns from the prototype
-[kernel:annot:missing-spec] FRAMAC_SHARE/libc/sys/wait.h:60: Warning: 
-  Neither code nor specification for function waitpid, generating default assigns from the prototype
 [e-acsl] FRAMAC_SHARE/libc/string.h:327: Warning: 
   E-ACSL construct `logic function application' is not yet supported.
   Ignoring annotation.
@@ -421,8 +415,6 @@
 [value] using specification for function __e_acsl_full_init
 [value] using specification for function __e_acsl_mark_readonly
 [value] using specification for function fork
-[kernel:annot:missing-spec] tests/format/printf.c:179: Warning: 
-  Neither code nor specification for function __e_acsl_builtin_printf, generating default assigns from the prototype
 [value] using specification for function __e_acsl_builtin_printf
 [value] using specification for function exit
 [value] using specification for function waitpid
