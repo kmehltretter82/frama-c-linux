@@ -165,6 +165,8 @@ let ty_of_logic_ty = function
   | Ltype _ -> Error.not_yet "user-defined logic type"
   | Lvar _ -> Error.not_yet "type variable"
 
+let integer_ty_of_typ ty = ty_of_logic_ty (Ctype ty)
+
 (* Compute the smallest type (bigger than [int]) which can contain the whole
    interval. It is the \theta operator of the JFLA's paper. *)
 let ty_of_interv ?ctx i =
@@ -472,7 +474,7 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
     | Tunion _ -> Error.not_yet "tset union"
     | Tinter _ -> Error.not_yet "tset intersection"
     | Tcomprehension (_,_,_) -> Error.not_yet "tset comprehension"
-    | Trange (_,_) -> Error.not_yet "trange"
+    | Trange (_,_) -> dup Gmp
     | Tlet(li, t) ->
       infer_if_integer li;
       let li_t = Misc.term_of_li li in

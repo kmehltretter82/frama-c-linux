@@ -73,6 +73,9 @@ val typ_of_integer_ty: integer_ty -> typ
     for [Gmp] and [TInt(ik, [[]])] for [Ctype ik].
     @raise Not_an_integer in case of {!Other}. *)
 
+val integer_ty_of_typ: typ -> integer_ty
+(** Reverse of [typ_of_integer_ty] *)
+
 val join: integer_ty -> integer_ty -> integer_ty
 (** {!integer_ty} is a join-semi-lattice if you do not consider [Other]. If
     there is no [Other] in argument, this function computes the join of this

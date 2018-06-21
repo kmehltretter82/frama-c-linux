@@ -597,6 +597,68 @@ and mmodel_call_with_size ~loc kf name ctx env t =
   res, env
 
 and mmodel_call_valid ~loc kf name ctx env t =
+  match t.term_node with
+  | TBinOp(PlusPI, p, r) when Logic_utils.isLogicPointer p && is_trange r ->
+    let n1, n2 = match r.term_node with
+      | Trange(Some n1, Some n2) ->
+        n1, n2
+      | Trange(None, _) | Trange(_, None) ->
+        Options.fatal "unbounded ranges are not part of E-ACSL"
+      | _ ->
+        assert false
+    in
+    (* s *)
+    let ty = match Cil.unrollType (get_c_term_type p.term_type) with
+      | TPtr(ty, _) -> ty
+      | _ -> assert false
+    in
+    let s = Logic_const.term ~loc (TSizeOf ty) Linteger in
+    (* ptr *)
+    let typ_charptr = TPtr(TInt(IChar, []), []) in
+    let ptr = Logic_const.term
+      ~loc
+      (TBinOp(
+        PlusPI,
+        Logic_const.term ~loc (TCastE(typ_charptr, p)) (Ctype typ_charptr),
+        Logic_const.term ~loc (TBinOp(Mult, s, n1)) Linteger))
+      (Ctype typ_charptr)
+    in
+    Typing.type_term ~use_gmp_opt:false ~ctx:Typing.other ptr;
+    let ptr, env = term_to_exp kf (Env.rte env true) ptr in
+    (* size *)
+    let size = Logic_const.term
+      ~loc
+      (TBinOp(
+        Mult,
+        s,
+        Logic_const.term ~loc (TBinOp(MinusA, n2, n1)) Linteger))
+      Linteger
+    in
+    let ctx_ity = Typing.integer_ty_of_typ ctx in
+    Typing.type_term ~use_gmp_opt:true ~ctx:ctx_ity size;
+    let size, env = term_to_exp kf env size in
+    (* base and base_addr *)
+    let base, _ = Misc.ptr_index ~loc ptr in
+    let base_addr  = match base.enode with
+      | AddrOf _ | Const _ -> Cil.zero ~loc
+      | Lval(lv) | StartOf(lv) -> Cil.mkAddrOrStartOf ~loc lv
+      | _ -> assert false
+    in
+    (* generating env *)
+    let _, res, env =
+      Env.new_var
+        ~loc
+        ~name
+        env
+        None
+        ctx
+        (fun v _ ->
+          let fname = Functions.RTL.mk_api_name name in
+          let args = [ ptr; size; base; base_addr ] in
+          [ Misc.mk_call ~loc ~result:(Cil.var v) fname args ])
+    in
+    res, env
+  | _ ->
   let e, env = term_to_exp kf (Env.rte env true) t in
   let base, _ = Misc.ptr_index ~loc e in
   let base_addr  = match base.enode with
@@ -619,6 +681,10 @@ and mmodel_call_valid ~loc kf name ctx env t =
         [ Misc.mk_call ~loc ~result:(Cil.var v) fname args ])
   in
   res, env
+
+and is_trange t = match t.term_node with
+  | Trange _ -> true
+  | _ -> false
 
 and at_to_exp env t_opt label e =
   let stmt = E_acsl_label.get_stmt (Env.get_visitor env) label in

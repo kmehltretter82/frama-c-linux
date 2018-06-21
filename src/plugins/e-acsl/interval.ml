@@ -190,7 +190,7 @@ let rec infer t =
   | Tunion _ -> Error.not_yet "tset union"
   | Tinter _ -> Error.not_yet "tset intersection"
   | Tcomprehension (_,_,_) -> Error.not_yet "tset comprehension"
-  | Trange (_,_) -> Error.not_yet "trange"
+  | Trange (_,_) -> Ival.inject_range None None
 
   | Tlet (li,t) ->
     let li_t = Misc.term_of_li li in
