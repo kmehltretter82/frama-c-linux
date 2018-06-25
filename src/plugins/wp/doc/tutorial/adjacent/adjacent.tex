@@ -1,0 +1,23 @@
+\section{The \textsf{adjacent-find} Algorithm}
+\label{adjacent-find}
+
+This algorithm looks for the first two consecutive equal elements in a sequence.
+The formal definition of equal neighbors is:
+
+\listingname{adjacent.h}
+\cinput{adjacent/neighbors.spec}
+
+The specification of the algorithm is:
+
+\listingname{adjacent.h}
+\cinput{adjacent/adjacent.spec}
+
+The implementation of the algorithm is:
+
+\listingname{adjacent.c}
+\cinput{adjacent/adjacent.impl}
+
+The implementation is proved correct against its specification by
+simply running the \textsf{WP} plug-in:
+\fclogs{nonmutating}{adjacent}
+

@@ -1,0 +1,5 @@
+@SUFFIX "_report.tex"
+@ZERO "-"
+@HEAD
+\textit{partial orders} & %total & %wp & %ergo & %success\% (%time) \\
+@END

@@ -1,0 +1,32 @@
+\clearpage
+\section{The \textsf{search} Algorithm}
+\label{search}
+
+We study now the \texttt{search} algorithm from ``ACSL By Example''.
+This algorithm looks for a subsequence inside a sequence.
+We use the same definition as in the original specification:
+
+\listingname{search.h}
+\cinput{search/hasrange.spec}
+
+Then follows the specification of the \texttt{search} algorithm:
+
+\listingname{search.h}
+\cinput{search/search.spec}
+
+The implementation of the algorithm is:
+
+\listingname{search.c}
+\cinput{search/search.impl}
+
+Remark that \texttt{search} is defined in terms of \texttt{equal}, and
+its specification should be included from the \texttt{equal.h} header
+file.
+
+\clearpage
+From the original specification from ``ACSL By Example'', we only add
+the \emph{loop assigns} clause.
+The implementation is proved correct against its specification by
+simply running the \textsf{WP} plug-in: 
+\fclogs{nonmutating}{search}
+

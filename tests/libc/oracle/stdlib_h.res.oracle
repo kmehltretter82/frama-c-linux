@@ -1,0 +1,264 @@
+[kernel] Parsing tests/libc/stdlib_h.c (with preprocessing)
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
+  nondet ∈ [--..--]
+[eva] computing for function strtol <- main.
+  Called from tests/libc/stdlib_h.c:20.
+[eva] using specification for function strtol
+[eva] tests/libc/stdlib_h.c:20: 
+  function strtol: precondition 'valid_nptr' got status valid.
+[eva] tests/libc/stdlib_h.c:20: 
+  function strtol: precondition 'separation' got status valid.
+[eva] tests/libc/stdlib_h.c:20: 
+  function strtol: precondition 'base_range' got status valid.
+[eva] tests/libc/stdlib_h.c:20: 
+  function strtol, behavior store_position: precondition 'valid_endptr' got status valid.
+[eva] Done for function strtol
+[eva] computing for function strtol <- main.
+  Called from tests/libc/stdlib_h.c:21.
+[eva:alarm] tests/libc/stdlib_h.c:21: Warning: 
+  function strtol: precondition 'valid_nptr' got status unknown.
+[eva] tests/libc/stdlib_h.c:21: 
+  function strtol: precondition 'separation' got status valid.
+[eva] tests/libc/stdlib_h.c:21: 
+  function strtol: precondition 'base_range' got status valid.
+[eva] tests/libc/stdlib_h.c:21: 
+  function strtol, behavior store_position: precondition 'valid_endptr' got status valid.
+[eva] Done for function strtol
+[eva] computing for function strtol <- main.
+  Called from tests/libc/stdlib_h.c:22.
+[eva:alarm] tests/libc/stdlib_h.c:22: Warning: 
+  function strtol: precondition 'valid_nptr' got status unknown.
+[eva] tests/libc/stdlib_h.c:22: 
+  function strtol: precondition 'separation' got status valid.
+[eva] tests/libc/stdlib_h.c:22: 
+  function strtol: precondition 'base_range' got status valid.
+[eva] Done for function strtol
+[eva] computing for function strtol <- main.
+  Called from tests/libc/stdlib_h.c:23.
+[eva] tests/libc/stdlib_h.c:23: 
+  function strtol: precondition 'valid_nptr' got status valid.
+[eva] tests/libc/stdlib_h.c:23: 
+  function strtol: precondition 'separation' got status valid.
+[eva] tests/libc/stdlib_h.c:23: 
+  function strtol: precondition 'base_range' got status valid.
+[eva] Done for function strtol
+[eva] computing for function strtoll <- main.
+  Called from tests/libc/stdlib_h.c:27.
+[eva] using specification for function strtoll
+[eva] tests/libc/stdlib_h.c:27: 
+  function strtoll: precondition 'valid_nptr' got status valid.
+[eva] tests/libc/stdlib_h.c:27: 
+  function strtoll: precondition 'separation' got status valid.
+[eva] tests/libc/stdlib_h.c:27: 
+  function strtoll: precondition 'base_range' got status valid.
+[eva] tests/libc/stdlib_h.c:27: 
+  function strtoll, behavior store_position: precondition 'valid_endptr' got status valid.
+[eva] Done for function strtoll
+[eva] computing for function strtoll <- main.
+  Called from tests/libc/stdlib_h.c:28.
+[eva:alarm] tests/libc/stdlib_h.c:28: Warning: 
+  function strtoll: precondition 'valid_nptr' got status unknown.
+[eva] tests/libc/stdlib_h.c:28: 
+  function strtoll: precondition 'separation' got status valid.
+[eva] tests/libc/stdlib_h.c:28: 
+  function strtoll: precondition 'base_range' got status valid.
+[eva] tests/libc/stdlib_h.c:28: 
+  function strtoll, behavior store_position: precondition 'valid_endptr' got status valid.
+[eva] Done for function strtoll
+[eva] computing for function strtoll <- main.
+  Called from tests/libc/stdlib_h.c:29.
+[eva:alarm] tests/libc/stdlib_h.c:29: Warning: 
+  function strtoll: precondition 'valid_nptr' got status unknown.
+[eva] tests/libc/stdlib_h.c:29: 
+  function strtoll: precondition 'separation' got status valid.
+[eva] tests/libc/stdlib_h.c:29: 
+  function strtoll: precondition 'base_range' got status valid.
+[eva] Done for function strtoll
+[eva] computing for function strtoul <- main.
+  Called from tests/libc/stdlib_h.c:33.
+[eva] using specification for function strtoul
+[eva] tests/libc/stdlib_h.c:33: 
+  function strtoul: precondition 'valid_nptr' got status valid.
+[eva] tests/libc/stdlib_h.c:33: 
+  function strtoul: precondition 'separation' got status valid.
+[eva] tests/libc/stdlib_h.c:33: 
+  function strtoul: precondition 'base_range' got status valid.
+[eva] tests/libc/stdlib_h.c:33: 
+  function strtoul, behavior store_position: precondition 'valid_endptr' got status valid.
+[eva] Done for function strtoul
+[eva] computing for function strtoul <- main.
+  Called from tests/libc/stdlib_h.c:34.
+[eva:alarm] tests/libc/stdlib_h.c:34: Warning: 
+  function strtoul: precondition 'valid_nptr' got status unknown.
+[eva] tests/libc/stdlib_h.c:34: 
+  function strtoul: precondition 'separation' got status valid.
+[eva] tests/libc/stdlib_h.c:34: 
+  function strtoul: precondition 'base_range' got status valid.
+[eva] tests/libc/stdlib_h.c:34: 
+  function strtoul, behavior store_position: precondition 'valid_endptr' got status valid.
+[eva] Done for function strtoul
+[eva] computing for function strtoul <- main.
+  Called from tests/libc/stdlib_h.c:35.
+[eva:alarm] tests/libc/stdlib_h.c:35: Warning: 
+  function strtoul: precondition 'valid_nptr' got status unknown.
+[eva] tests/libc/stdlib_h.c:35: 
+  function strtoul: precondition 'separation' got status valid.
+[eva] tests/libc/stdlib_h.c:35: 
+  function strtoul: precondition 'base_range' got status valid.
+[eva] Done for function strtoul
+[eva] computing for function strtoull <- main.
+  Called from tests/libc/stdlib_h.c:39.
+[eva] using specification for function strtoull
+[eva] tests/libc/stdlib_h.c:39: 
+  function strtoull: precondition 'valid_nptr' got status valid.
+[eva] tests/libc/stdlib_h.c:39: 
+  function strtoull: precondition 'separation' got status valid.
+[eva] tests/libc/stdlib_h.c:39: 
+  function strtoull: precondition 'base_range' got status valid.
+[eva] tests/libc/stdlib_h.c:39: 
+  function strtoull, behavior store_position: precondition 'valid_endptr' got status valid.
+[eva] Done for function strtoull
+[eva] computing for function strtoull <- main.
+  Called from tests/libc/stdlib_h.c:40.
+[eva:alarm] tests/libc/stdlib_h.c:40: Warning: 
+  function strtoull: precondition 'valid_nptr' got status unknown.
+[eva] tests/libc/stdlib_h.c:40: 
+  function strtoull: precondition 'separation' got status valid.
+[eva] tests/libc/stdlib_h.c:40: 
+  function strtoull: precondition 'base_range' got status valid.
+[eva] tests/libc/stdlib_h.c:40: 
+  function strtoull, behavior store_position: precondition 'valid_endptr' got status valid.
+[eva] Done for function strtoull
+[eva] computing for function strtoull <- main.
+  Called from tests/libc/stdlib_h.c:41.
+[eva:alarm] tests/libc/stdlib_h.c:41: Warning: 
+  function strtoull: precondition 'valid_nptr' got status unknown.
+[eva] tests/libc/stdlib_h.c:41: 
+  function strtoull: precondition 'separation' got status valid.
+[eva] tests/libc/stdlib_h.c:41: 
+  function strtoull: precondition 'base_range' got status valid.
+[eva] Done for function strtoull
+[eva] computing for function strtod <- main.
+  Called from tests/libc/stdlib_h.c:46.
+[eva] using specification for function strtod
+[eva] tests/libc/stdlib_h.c:46: 
+  function strtod: precondition 'valid_nptr' got status valid.
+[eva] tests/libc/stdlib_h.c:46: 
+  function strtod: precondition 'separation' got status valid.
+[eva] tests/libc/stdlib_h.c:46: 
+  function strtod, behavior store_position: precondition 'valid_endptr' got status valid.
+[eva] Done for function strtod
+[eva] computing for function strtod <- main.
+  Called from tests/libc/stdlib_h.c:47.
+[eva:alarm] tests/libc/stdlib_h.c:47: Warning: 
+  function strtod: precondition 'valid_nptr' got status unknown.
+[eva] tests/libc/stdlib_h.c:47: 
+  function strtod: precondition 'separation' got status valid.
+[eva] tests/libc/stdlib_h.c:47: 
+  function strtod, behavior store_position: precondition 'valid_endptr' got status valid.
+[eva] Done for function strtod
+[eva] computing for function strtod <- main.
+  Called from tests/libc/stdlib_h.c:48.
+[eva:alarm] tests/libc/stdlib_h.c:48: Warning: 
+  function strtod: precondition 'valid_nptr' got status unknown.
+[eva] tests/libc/stdlib_h.c:48: 
+  function strtod: precondition 'separation' got status valid.
+[eva] Done for function strtod
+[eva] computing for function strtold <- main.
+  Called from tests/libc/stdlib_h.c:52.
+[eva] using specification for function strtold
+[eva] tests/libc/stdlib_h.c:52: 
+  function strtold: precondition 'valid_nptr' got status valid.
+[eva] tests/libc/stdlib_h.c:52: 
+  function strtold: precondition 'separation' got status valid.
+[eva] tests/libc/stdlib_h.c:52: 
+  function strtold, behavior store_position: precondition 'valid_endptr' got status valid.
+[eva] Done for function strtold
+[eva] computing for function strtold <- main.
+  Called from tests/libc/stdlib_h.c:53.
+[eva:alarm] tests/libc/stdlib_h.c:53: Warning: 
+  function strtold: precondition 'valid_nptr' got status unknown.
+[eva] tests/libc/stdlib_h.c:53: 
+  function strtold: precondition 'separation' got status valid.
+[eva] tests/libc/stdlib_h.c:53: 
+  function strtold, behavior store_position: precondition 'valid_endptr' got status valid.
+[eva] Done for function strtold
+[eva] computing for function strtold <- main.
+  Called from tests/libc/stdlib_h.c:54.
+[eva:alarm] tests/libc/stdlib_h.c:54: Warning: 
+  function strtold: precondition 'valid_nptr' got status unknown.
+[eva] tests/libc/stdlib_h.c:54: 
+  function strtold: precondition 'separation' got status valid.
+[eva] Done for function strtold
+[eva] computing for function strtof <- main.
+  Called from tests/libc/stdlib_h.c:58.
+[eva] using specification for function strtof
+[eva] tests/libc/stdlib_h.c:58: 
+  function strtof: precondition 'valid_nptr' got status valid.
+[eva] tests/libc/stdlib_h.c:58: 
+  function strtof: precondition 'separation' got status valid.
+[eva] tests/libc/stdlib_h.c:58: 
+  function strtof, behavior store_position: precondition 'valid_endptr' got status valid.
+[eva] Done for function strtof
+[eva] computing for function strtof <- main.
+  Called from tests/libc/stdlib_h.c:59.
+[eva:alarm] tests/libc/stdlib_h.c:59: Warning: 
+  function strtof: precondition 'valid_nptr' got status unknown.
+[eva] tests/libc/stdlib_h.c:59: 
+  function strtof: precondition 'separation' got status valid.
+[eva] tests/libc/stdlib_h.c:59: 
+  function strtof, behavior store_position: precondition 'valid_endptr' got status valid.
+[eva] Done for function strtof
+[eva] computing for function strtof <- main.
+  Called from tests/libc/stdlib_h.c:60.
+[eva:alarm] tests/libc/stdlib_h.c:60: Warning: 
+  function strtof: precondition 'valid_nptr' got status unknown.
+[eva] tests/libc/stdlib_h.c:60: 
+  function strtof: precondition 'separation' got status valid.
+[eva] Done for function strtof
+[eva] computing for function bsearch <- main.
+  Called from tests/libc/stdlib_h.c:64.
+[eva] using specification for function bsearch
+[eva] tests/libc/stdlib_h.c:64: 
+  function bsearch: precondition 'valid_function_compar' got status valid.
+[eva] Done for function bsearch
+[eva:alarm] tests/libc/stdlib_h.c:65: Warning: assertion got status unknown.
+[eva] computing for function bsearch <- main.
+  Called from tests/libc/stdlib_h.c:67.
+[eva] tests/libc/stdlib_h.c:67: 
+  function bsearch: precondition 'valid_function_compar' got status valid.
+[eva] Done for function bsearch
+[eva:alarm] tests/libc/stdlib_h.c:68: Warning: assertion got status unknown.
+[eva] Recording results for main
+[eva] done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function main:
+  base ∈ {0; 2; 36}
+  sl ∈ {{ "12 34 -56" }}
+  s ∈ {{ " 3.14 0x1.2p2" }}
+  pl ∈ {{ "12 34 -56" + [0..--] }}
+  q ∈ {{ " 3.14 0x1.2p2" + [0..--] }}
+  l ∈ [--..--]
+  pll ∈ {{ "12 34 -56" + [0..--] }}
+  ll ∈ [--..--]
+  pul ∈ {{ "12 34 -56" + [0..--] }}
+  ul ∈ [--..--]
+  pull ∈ {{ "12 34 -56" + [0..--] }}
+  ull ∈ [--..--]
+  sd ∈ {{ " 3.14 0x1.2p2" }}
+  pd ∈ {{ " 3.14 0x1.2p2" + [0..--] }}
+  d ∈ [-inf .. inf] ∪ {NaN}
+  pld ∈ {{ " 3.14 0x1.2p2" + [0..--] }}
+  ld ∈ [-inf .. inf] ∪ {NaN}
+  pf ∈ {{ " 3.14 0x1.2p2" + [0..--] }}
+  f ∈ [-inf .. inf] ∪ {NaN}
+  ai[0] ∈ {1}
+    [1] ∈ {-1}
+    [2] ∈ {50000}
+    [3] ∈ {20}
+  key ∈ {-1}
+  p ∈ {{ &ai[1] }}
+  __retres ∈ {0}

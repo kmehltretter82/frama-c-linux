@@ -1,0 +1,82 @@
+\chapter{The Branch Stage}
+
+That is the procedure for forking the release from \texttt{master}.
+
+\section{``Freezing'' master}
+
+When the ``freeze'' period arrives (usually a few weeks before the beta
+release), the release manager may decide to prevent direct merges to the
+\texttt{master} branch, until the \texttt{stable} branch is created.
+If so, then the branch should be protected such that Developers can no
+longer push and merge to it, without asking for a Master to do it.
+
+In Gitlab, this is done via: Frama-C project $\rightarrow$ Settings
+$\rightarrow$ Repository $\rightarrow$ Protected Branches.
+
+\textbf{The \texttt{master} branch must be protected \emph{at all times}.
+  Parameters
+  \texttt{Allowed to merge} and \texttt{Allowed to push} must be set to
+  \texttt{Developers + Masters} during non-freeze times, and to
+  \texttt{Masters} during freeze time.}
+
+\section{Creating the branch}
+
+Create the branch \texttt{stable/release} where \texttt{release} is the
+element name.
+
+What can be committed in this branch must follow the release schedule,
+and go through Merge-requests. Everything else should go in \texttt{master},
+which can then be reset to standard-level protection (Developers + Masters
+allowed to push/merge).
+
+\section{Creating the milestones}
+
+Create the milestones for the next release on \textsf{Mantis}
+\expertise{Julien, Boris} and \textsf{Gitlab}
+\expertise{François, Julien, Boris}
+
+
+\section{BTS}
+
+Check both \textsf{BTS}. All issues should have been at least acknowledged:  no more issues with status 'New' or only 'Assigned' should remain.
+
+Send a mail on the frama-c-commits mailing list: each user/developer should have a
+look at their own assigned/monitored/reported issues. Depending on their severity,
+the issues should be tagged with the current release, or with the next one.
+
+
+\section{Changelog}
+
+Create headers in the Changelog(s). This is to avoid some merge conflicts,
+but also so that merge requests add information in the proper part of
+the Changelog.   
+
+\begin{itemize}
+\item Add the following in the Changelog, in \texttt{stable/element}
+\begin{verbatim}
+ #############################
+ Open Source Release <element>
+ #############################
+\end{verbatim}
+
+This should go directly below
+\begin{verbatim}
+ ##################################
+ Open Source Release <next-release>
+ ##################################
+\end{verbatim}
+
+\item Merge this branch in \texttt{master}
+\end{itemize}
+
+From now on, Changelog items corresponding to MR merged into \texttt{master}
+must be placed between these two banners. This should minimize conflicts when
+merging back \texttt{stable/element} into \texttt{master}
+
+\todo{Do the same thing in the manuals that contain a Changelog?}
+
+\todo{Can we simplify this?}
+
+%%%Local Variables:
+%%%TeX-master: "release"
+%%%End:
