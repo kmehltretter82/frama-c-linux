@@ -61,7 +61,29 @@ int main(void)
                     (char *)"main",(char *)"!\\valid(b + (11 .. 15))",22);
   }
   free((void *)b);
+  long t[3] = {7l, 8l, 9l};
+  __e_acsl_store_block((void *)(t),(size_t)24);
+  __e_acsl_full_init((void *)(& t));
+  /*@ assert \valid(&t[0 .. 2]); */
+  {
+    int __gen_e_acsl_valid_6;
+    __gen_e_acsl_valid_6 = __e_acsl_valid((void *)((char *)(t) + 8 * 0),
+                                          (size_t)(8 * (2 - 0)),(void *)(t),
+                                          (void *)(t));
+    __e_acsl_assert(__gen_e_acsl_valid_6,(char *)"Assertion",(char *)"main",
+                    (char *)"\\valid(&t[0 .. 2])",26);
+  }
+  /*@ assert ¬\valid(&t[3 .. 5]); */
+  {
+    int __gen_e_acsl_valid_7;
+    __gen_e_acsl_valid_7 = __e_acsl_valid((void *)((char *)(t) + 8 * 3),
+                                          (size_t)(8 * (5 - 3)),(void *)(t),
+                                          (void *)(t));
+    __e_acsl_assert(! __gen_e_acsl_valid_7,(char *)"Assertion",
+                    (char *)"main",(char *)"!\\valid(&t[3 .. 5])",27);
+  }
   __retres = 0;
+  __e_acsl_delete_block((void *)(t));
   __e_acsl_delete_block((void *)(& b));
   __e_acsl_delete_block((void *)(& a));
   __e_acsl_memory_clean();
