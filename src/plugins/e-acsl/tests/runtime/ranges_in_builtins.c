@@ -1,5 +1,5 @@
 /* run.config
-   COMMENT: ranges in builtins
+   COMMENT: ranges in a few builtins
 */
 
 #include "stdlib.h"
@@ -20,9 +20,18 @@ int main(void) {
   b  = malloc(10*sizeof(char));
  /*@ assert \valid(b + (0 .. 10)); */ ;
  /*@ assert !\valid(b + (11 .. 15)); */ ;
-  free(b);
 
   long t[3] = {7l, 8l, 9l};
   /*@ assert \valid(&t[0..2]); */ ;
   /*@ assert !\valid(&t[3..5]); */ ;
+
+  double t2[4];
+  t2[0] = 0.5;
+  t2[1] = 1.5;
+  /*@ assert \initialized(&t2[0..1]); */ ;
+  /*@ assert !\initialized(&t2[2..3]); */ ;
+
+  /*@ assert !\initialized(b + (0 .. 10));*/
+  free(b);
+
 }

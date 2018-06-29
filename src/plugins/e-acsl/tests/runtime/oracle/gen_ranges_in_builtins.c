@@ -6,7 +6,9 @@ int main(void)
   int __retres;
   int *a;
   char *b;
+  double t2[4];
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_store_block((void *)(t2),(size_t)32);
   __e_acsl_store_block((void *)(& b),(size_t)8);
   __e_acsl_store_block((void *)(& a),(size_t)8);
   __e_acsl_full_init((void *)(& a));
@@ -60,7 +62,6 @@ int main(void)
     __e_acsl_assert(! __gen_e_acsl_valid_5,(char *)"Assertion",
                     (char *)"main",(char *)"!\\valid(b + (11 .. 15))",22);
   }
-  free((void *)b);
   long t[3] = {7l, 8l, 9l};
   __e_acsl_store_block((void *)(t),(size_t)24);
   __e_acsl_full_init((void *)(& t));
@@ -71,7 +72,7 @@ int main(void)
                                           (size_t)(8 * (2 - 0)),(void *)(t),
                                           (void *)(t));
     __e_acsl_assert(__gen_e_acsl_valid_6,(char *)"Assertion",(char *)"main",
-                    (char *)"\\valid(&t[0 .. 2])",26);
+                    (char *)"\\valid(&t[0 .. 2])",25);
   }
   /*@ assert ¬\valid(&t[3 .. 5]); */
   {
@@ -80,9 +81,42 @@ int main(void)
                                           (size_t)(8 * (5 - 3)),(void *)(t),
                                           (void *)(t));
     __e_acsl_assert(! __gen_e_acsl_valid_7,(char *)"Assertion",
-                    (char *)"main",(char *)"!\\valid(&t[3 .. 5])",27);
+                    (char *)"main",(char *)"!\\valid(&t[3 .. 5])",26);
   }
+  __e_acsl_initialize((void *)(t2),sizeof(double));
+  t2[0] = 0.5;
+  __e_acsl_initialize((void *)(& t2[1]),sizeof(double));
+  t2[1] = 1.5;
+  /*@ assert \initialized(&t2[0 .. 1]); */
+  {
+    int __gen_e_acsl_initialized;
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)((char *)(t2) + 
+                                                             8 * 0),
+                                                    (size_t)(8 * (1 - 0)));
+    __e_acsl_assert(__gen_e_acsl_initialized,(char *)"Assertion",
+                    (char *)"main",(char *)"\\initialized(&t2[0 .. 1])",31);
+  }
+  /*@ assert ¬\initialized(&t2[2 .. 3]); */
+  {
+    int __gen_e_acsl_initialized_2;
+    __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)((char *)(t2) + 
+                                                               8 * 2),
+                                                      (size_t)(8 * (3 - 2)));
+    __e_acsl_assert(! __gen_e_acsl_initialized_2,(char *)"Assertion",
+                    (char *)"main",(char *)"!\\initialized(&t2[2 .. 3])",32);
+  }
+  /*@ assert ¬\initialized(b + (0 .. 10)); */
+  {
+    int __gen_e_acsl_initialized_3;
+    __gen_e_acsl_initialized_3 = __e_acsl_initialized((void *)(b + 1 * 0),
+                                                      (size_t)(1 * (10 - 0)));
+    __e_acsl_assert(! __gen_e_acsl_initialized_3,(char *)"Assertion",
+                    (char *)"main",(char *)"!\\initialized(b + (0 .. 10))",
+                    34);
+  }
+  free((void *)b);
   __retres = 0;
+  __e_acsl_delete_block((void *)(t2));
   __e_acsl_delete_block((void *)(t));
   __e_acsl_delete_block((void *)(& b));
   __e_acsl_delete_block((void *)(& a));

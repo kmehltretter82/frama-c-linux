@@ -580,6 +580,8 @@ and mk_ptr_sizeof typ loc =
 
 (* \valid, \offset and \initialized annotations *)
 and mmodel_call_with_size ~loc kf name ctx env t =
+  mmodel_call_with_ranges ~loc kf name ctx env t
+  begin fun ~loc kf name ctx env t ->
   let e, env = term_to_exp kf (Env.rte env true) t in
   let _, res, env =
     Env.new_var
@@ -595,19 +597,11 @@ and mmodel_call_with_size ~loc kf name ctx env t =
         [ Misc.mk_call ~loc ~result:(Cil.var v) fname [ e; sizeof ] ])
   in
   res, env
+  end
 
 and mmodel_call_valid ~loc kf name ctx env t =
-  match t.term_node with
-  | TAddrOf(TVar lv, TIndex(r, TNoOffset)) when is_trange r ->
-    let p = Logic_const.term
-      ~loc
-      (TAddrOf(TVar lv, TIndex(Logic_const.tinteger ~loc 0, TNoOffset)))
-      lv.lv_type
-    in
-    mmodel_call_builtin_for_ranges ~loc kf name ctx env p r
-  | TBinOp(PlusPI, p, r) when Logic_utils.isLogicPointer p && is_trange r ->
-    mmodel_call_builtin_for_ranges ~loc kf name ctx env p r
-  | _ ->
+  mmodel_call_with_ranges ~loc kf name ctx env t
+  begin fun ~loc kf name ctx env t ->
   let e, env = term_to_exp kf (Env.rte env true) t in
   let base, _ = Misc.ptr_index ~loc e in
   let base_addr  = match base.enode with
@@ -630,8 +624,23 @@ and mmodel_call_valid ~loc kf name ctx env t =
         [ Misc.mk_call ~loc ~result:(Cil.var v) fname args ])
   in
   res, env
+  end
 
-and mmodel_call_builtin_for_ranges ~loc kf name ctx env p r =
+and mmodel_call_with_ranges ~loc kf name ctx env t mmodel_call_default =
+  match t.term_node with
+  | TAddrOf(TVar lv, TIndex(r, TNoOffset)) when is_trange r ->
+    let p = Logic_const.term
+      ~loc
+      (TAddrOf(TVar lv, TIndex(Logic_const.tinteger ~loc 0, TNoOffset)))
+      lv.lv_type
+    in
+    mmodel_call_memory_block ~loc kf name ctx env p r
+  | TBinOp(PlusPI, p, r) when Logic_utils.isLogicPointer p && is_trange r ->
+    mmodel_call_memory_block ~loc kf name ctx env p r
+  | _ ->
+    mmodel_call_default ~loc kf name ctx env t
+
+and mmodel_call_memory_block ~loc kf name ctx env p r =
   (* Call to [__e_acsl_<name>] for term of the form [p + r]
      when [<name> = valid] (TODO: other builtins) and
      where [p] is an address, [r] a range offset *)
@@ -690,7 +699,11 @@ and mmodel_call_builtin_for_ranges ~loc kf name ctx env p r =
       ctx
       (fun v _ ->
         let fname = Functions.RTL.mk_api_name name in
-        let args = [ ptr; size; base; base_addr ] in
+        let args = match name with
+        | "valid" | "valid_read" -> [ ptr; size; base; base_addr ]
+        | "initialized" -> [ ptr; size ]
+        | _ -> not_yet env ("builtin" ^ name)
+        in
         [ Misc.mk_call ~loc ~result:(Cil.var v) fname args ])
   in
   res, env
