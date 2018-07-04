@@ -23,6 +23,8 @@
 open Cil_types
 open Cil_datatype
 
+module Dataflow = Dataflow2
+
 (* ********************************************************************** *)
 (* Backward dataflow analysis to compute a sound over-approximation of what
    left-values must be tracked by the memory model library *)
@@ -152,7 +154,7 @@ module rec Transfer
 
   let name = "E_ACSL.Pre_analysis"
 
-  let debug = ref false
+  let debug = false
 
   type t = Varinfo.Hptset.t option
 
@@ -576,16 +578,6 @@ let register_predicate kf pred state =
   (** Whether to put this statement in the worklist. This is called when a
       block would normally be put in the worklist. *)
   let filterStmt _predecessor _block = true
-
-  (** Must return [true] if there is a path in the control-flow graph of the
-      function from the first statement to the second. Used to choose a "good"
-      node in the worklist. Suggested use is [let stmt_can_reach =
-      Stmts_graph.stmt_can_reach kf], where [kf] is the kernel_function
-      being analyzed; [let stmt_can_reach _ _ = true] is also correct,
-      albeit less efficient *)
-  let stmt_can_reach stmt =
-    let _, kf = Kernel_function.find_from_sid stmt.sid in
-    Stmts_graph.stmt_can_reach kf stmt
 
 end
 
