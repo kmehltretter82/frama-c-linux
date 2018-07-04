@@ -678,10 +678,12 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
                 b.bstmts <- List.rev l @ delete_stmts
             end;
             let new_stmt = Misc.mk_block prj stmt b in
-            (* move the labels of the return to the new block in order to
-               evaluate the postcondition when jumping to them. *)
-            E_acsl_label.move
-              (self :> Visitor.generic_frama_c_visitor) stmt new_stmt;
+            if not (Cil_datatype.Stmt.equal stmt new_stmt) then begin
+              (* move the labels of the return to the new block in order to
+                 evaluate the postcondition when jumping to them. *)
+              E_acsl_label.move
+                (self :> Visitor.generic_frama_c_visitor) stmt new_stmt
+            end;
             new_stmt, env
           else
             stmt, env

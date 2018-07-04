@@ -44,6 +44,7 @@ let move (vis:Visitor.generic_frama_c_visitor) ~old new_stmt =
   | _ :: _ ->
     old.labels <- [];
     new_stmt.labels <- labels @ new_stmt.labels;
+    let old = Cil.get_original_stmt vis#behavior old in
     Labeled_stmts.add old new_stmt;
     (* update the gotos of the function jumping to one of the labels *)
     let o orig_stmt = object
