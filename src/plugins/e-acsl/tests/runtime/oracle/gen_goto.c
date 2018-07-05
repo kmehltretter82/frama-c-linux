@@ -18,7 +18,7 @@ int main(void)
   __e_acsl_store_block((void *)(& b),(size_t)8);
   goto _LOR;
   _LOR: __e_acsl_full_init((void *)(& b));
-  b = & a;
+        b = & a;
   if (a) goto _LOR;
   /*@ assert \initialized(b); */
   {

@@ -127,12 +127,14 @@ int main(void)
   __e_acsl_full_init((void *)(& x));
   x = __gen_e_acsl_h(0);
   L:
-  __gen_e_acsl_at_3 = (long)x;
-  __gen_e_acsl_at_2 = x + 1L;
-  __gen_e_acsl_at = x;
   /*@ assert x ≡ 0; */
-  __e_acsl_assert(x == 0,(char *)"Assertion",(char *)"main",(char *)"x == 0",
-                  43);
+  {
+    __gen_e_acsl_at_3 = (long)x;
+    __gen_e_acsl_at_2 = x + 1L;
+    __gen_e_acsl_at = x;
+    __e_acsl_assert(x == 0,(char *)"Assertion",(char *)"main",
+                    (char *)"x == 0",43);
+  }
   __e_acsl_full_init((void *)(& x));
   x = 1;
   __e_acsl_full_init((void *)(& x));
@@ -161,8 +163,8 @@ int __gen_e_acsl_h(int x)
   int __gen_e_acsl_at;
   int __retres;
   __e_acsl_store_block((void *)(& __retres),(size_t)4);
-  __e_acsl_store_block((void *)(& x),(size_t)4);
   __gen_e_acsl_at = x;
+  __e_acsl_store_block((void *)(& x),(size_t)4);
   __retres = h(x);
   __e_acsl_assert(__retres == __gen_e_acsl_at,(char *)"Postcondition",
                   (char *)"h",(char *)"\\result == \\old(x)",35);

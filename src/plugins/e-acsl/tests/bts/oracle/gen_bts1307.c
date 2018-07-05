@@ -94,6 +94,12 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
   float *__gen_e_acsl_at_3;
   float *__gen_e_acsl_at_2;
   float *__gen_e_acsl_at;
+  __gen_e_acsl_at_6 = Mwmin;
+  __gen_e_acsl_at_5 = Mtmin_in;
+  __gen_e_acsl_at_4 = Mwmin;
+  __gen_e_acsl_at_3 = Mtmin_in;
+  __gen_e_acsl_at_2 = Mtmin_in;
+  __gen_e_acsl_at = Mtmin_out;
   {
     int __gen_e_acsl_valid;
     int __gen_e_acsl_valid_2;
@@ -116,12 +122,6 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
     __e_acsl_assert(__gen_e_acsl_valid_3,(char *)"Precondition",
                     (char *)"bar",(char *)"\\valid(Mtmin_out)",19);
   }
-  __gen_e_acsl_at_6 = Mwmin;
-  __gen_e_acsl_at_5 = Mtmin_in;
-  __gen_e_acsl_at_4 = Mwmin;
-  __gen_e_acsl_at_3 = Mtmin_in;
-  __gen_e_acsl_at_2 = Mtmin_in;
-  __gen_e_acsl_at = Mtmin_out;
   bar(Mtmin_in,Mwmin,Mtmin_out);
   {
     int __gen_e_acsl_valid_read;
@@ -207,6 +207,9 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
   float *__gen_e_acsl_at_3;
   float *__gen_e_acsl_at_2;
   float *__gen_e_acsl_at;
+  __gen_e_acsl_at_3 = Mwmax;
+  __gen_e_acsl_at_2 = Mtmax_in;
+  __gen_e_acsl_at = Mtmax_out;
   {
     int __gen_e_acsl_valid;
     int __gen_e_acsl_valid_2;
@@ -229,9 +232,6 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     __e_acsl_assert(__gen_e_acsl_valid_3,(char *)"Precondition",
                     (char *)"foo",(char *)"\\valid(Mtmax_out)",7);
   }
-  __gen_e_acsl_at_3 = Mwmax;
-  __gen_e_acsl_at_2 = Mtmax_in;
-  __gen_e_acsl_at = Mtmax_out;
   foo(Mtmax_in,Mwmax,Mtmax_out);
   {
     int __gen_e_acsl_valid_read;

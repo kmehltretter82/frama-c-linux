@@ -52,7 +52,6 @@ int __gen_e_acsl_sorted(int *t, int n)
 {
   int __gen_e_acsl_at;
   int __retres;
-  __e_acsl_store_block((void *)(& t),(size_t)8);
   {
     int __gen_e_acsl_forall;
     int __gen_e_acsl_i;
@@ -90,6 +89,7 @@ int __gen_e_acsl_sorted(int *t, int n)
     e_acsl_end_loop1: ;
     __gen_e_acsl_at = __gen_e_acsl_forall;
   }
+  __e_acsl_store_block((void *)(& t),(size_t)8);
   __retres = sorted(t,n);
   {
     int __gen_e_acsl_implies;

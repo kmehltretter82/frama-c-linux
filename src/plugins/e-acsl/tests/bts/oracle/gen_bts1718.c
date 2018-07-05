@@ -31,7 +31,7 @@ int main(void)
   __retres = 0;
   goto return_label;
   lbl_1: __e_acsl_full_init((void *)(& p));
-  p = & a;
+         p = & a;
   goto lbl_2;
   return_label:
   __e_acsl_delete_block((void *)(& p));
