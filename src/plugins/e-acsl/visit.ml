@@ -742,15 +742,13 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       in
       let must_model = Mmodel_analysis.must_model_lval ~stmt ~kf lv in
       if not (may_safely_ignore lv) && must_model then
-        let before = Cil.memo_stmt self#behavior stmt in
+        let before = Cil.mkStmt stmt.skind in
         let new_stmt = Project.on prj (Misc.mk_initialize ~loc) lv in
-        let new_stmt = Cil.memo_stmt self#behavior new_stmt in
         let env = Env.add_stmt ~post ~before env new_stmt in
         let env = match vi with
           | None -> env
           | Some vi ->
             let new_stmt = Project.on prj Misc.mk_store_stmt vi in
-            let new_stmt = Cil.memo_stmt self#behavior new_stmt in
             Env.add_stmt ~post ~before env new_stmt
         in
         env
@@ -890,27 +888,6 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
           e)
     end else
       Cil.SkipChildren
-
-  method !vterm _ =
-    Cil.DoChildrenPost
-      (fun t ->
-        (match t.term_node with
-        | Tat(_, StmtLabel s_ref) ->
-          (* the label may have been moved,
-             so move the corresponding reference *)
-          s_ref := E_acsl_label.new_labeled_stmt !s_ref
-        | _ -> ());
-        t)
-
-  method !vpredicate_node _ =
-    Cil.DoChildrenPost
-      (function
-      | Pat(_, StmtLabel s_ref) as p ->
-          (* the label may have been moved,
-             so move the corresponding reference *)
-        s_ref := E_acsl_label.new_labeled_stmt !s_ref;
-        p
-      | p -> p);
 
   initializer
     Misc.reset ();

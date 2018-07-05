@@ -52,9 +52,9 @@ let move (vis:Visitor.generic_frama_c_visitor) ~old new_stmt =
       (* invariant of this method: [s = Cil.memo_stmt vis#behavior orig_stmt] *)
       method !vstmt_aux s = match s.skind, orig_stmt.skind with
       | Goto(s_ref, _), Goto(orig_ref, _) ->
-        if Cil_datatype.Stmt.equal !s_ref old && s_ref != orig_ref then
-          (* Forward goto: it has already been visited and there is no more
-             sharing. Must update the reference. *)
+        if Cil_datatype.Stmt.equal !orig_ref old && s_ref != orig_ref then
+          (* Forward goto: it has already been visited.
+             We must update the reference. *)
           s_ref := new_stmt;
         Cil.SkipChildren
       | _ -> Cil.DoChildren
