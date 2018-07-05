@@ -623,6 +623,9 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       in
       (* handle loop invariants *)
       let new_stmt, env, must_mv = Loops.preserve_invariant prj env kf stmt in
+      let orig = Cil.get_original_stmt self#behavior stmt in
+      Cil.set_orig_stmt self#behavior new_stmt orig;
+      Cil.set_stmt self#behavior orig new_stmt;
       let new_stmt, env =
         (* Remove local variables which scopes ended via goto/break/continue. *)
         let del_vars = Exit_points.delete_vars stmt in
@@ -708,13 +711,16 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
                 Env.Before
             in
             let post_block =
-              if post_block.blocals = [] then Cil.transient_block post_block
+              if post_block.blocals = [] && new_stmt.labels = []
+              then Cil.transient_block post_block
               else post_block
             in
             let res = Misc.mk_block prj new_stmt post_block in
             if not (Cil_datatype.Stmt.equal new_stmt res) then
               E_acsl_label.move (self :> Visitor.generic_frama_c_visitor)
                 new_stmt res;
+            Cil.set_stmt self#behavior orig res;
+            Cil.set_orig_stmt self#behavior res orig;
             res, env
           end else
             stmt, env
