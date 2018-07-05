@@ -711,7 +711,11 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
               if post_block.blocals = [] then Cil.transient_block post_block
               else post_block
             in
-            Misc.mk_block prj new_stmt post_block, env
+            let res = Misc.mk_block prj new_stmt post_block in
+            if not (Cil_datatype.Stmt.equal new_stmt res) then
+              E_acsl_label.move (self :> Visitor.generic_frama_c_visitor)
+                new_stmt res;
+            res, env
           end else
             stmt, env
       in
