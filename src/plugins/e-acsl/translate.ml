@@ -663,8 +663,7 @@ and at_to_exp env t_opt label e =
   end
   in
   let bhv = Env.get_behavior new_env in
-  let new_stmt = Visitor.visitFramacStmt o (Cil.get_stmt bhv stmt) in
-  Cil.set_stmt bhv stmt new_stmt;
+  ignore( Visitor.visitFramacStmt o (Cil.get_stmt bhv stmt));
   res, !env_ref, false
 
 and env_of_li li kf env loc =

@@ -139,38 +139,6 @@ int __gen_e_acsl_search(int elt)
   int __gen_e_acsl_at;
   int __retres;
   {
-    int __gen_e_acsl_forall;
-    int __gen_e_acsl_i;
-    __gen_e_acsl_forall = 1;
-    __gen_e_acsl_i = 0;
-    while (1) {
-      if (__gen_e_acsl_i < 9) ; else break;
-      __e_acsl_assert((int)(__gen_e_acsl_i + 1L) < 10,(char *)"RTE",
-                      (char *)"search",
-                      (char *)"index_bound: (int)(__gen_e_acsl_i + 1) < 10",
-                      7);
-      __e_acsl_assert(0 <= (int)(__gen_e_acsl_i + 1L),(char *)"RTE",
-                      (char *)"search",
-                      (char *)"index_bound: 0 <= (int)(__gen_e_acsl_i + 1)",
-                      7);
-      __e_acsl_assert(__gen_e_acsl_i < 10,(char *)"RTE",(char *)"search",
-                      (char *)"index_bound: __gen_e_acsl_i < 10",7);
-      __e_acsl_assert(0 <= __gen_e_acsl_i,(char *)"RTE",(char *)"search",
-                      (char *)"index_bound: 0 <= __gen_e_acsl_i",7);
-      if (A[__gen_e_acsl_i] <= A[__gen_e_acsl_i + 1]) ;
-      else {
-        __gen_e_acsl_forall = 0;
-        goto e_acsl_end_loop3;
-      }
-      __gen_e_acsl_i ++;
-    }
-    e_acsl_end_loop3: ;
-    __e_acsl_assert(__gen_e_acsl_forall,(char *)"Precondition",
-                    (char *)"search",
-                    (char *)"\\forall integer i; 0 <= i < 9 ==> A[i] <= A[i + 1]",
-                    7);
-  }
-  {
     int __gen_e_acsl_forall_2;
     int __gen_e_acsl_j_2;
     __gen_e_acsl_forall_2 = 1;
@@ -211,6 +179,38 @@ int __gen_e_acsl_search(int elt)
     }
     e_acsl_end_loop4: ;
     __gen_e_acsl_at = __gen_e_acsl_exists;
+  }
+  {
+    int __gen_e_acsl_forall;
+    int __gen_e_acsl_i;
+    __gen_e_acsl_forall = 1;
+    __gen_e_acsl_i = 0;
+    while (1) {
+      if (__gen_e_acsl_i < 9) ; else break;
+      __e_acsl_assert((int)(__gen_e_acsl_i + 1L) < 10,(char *)"RTE",
+                      (char *)"search",
+                      (char *)"index_bound: (int)(__gen_e_acsl_i + 1) < 10",
+                      7);
+      __e_acsl_assert(0 <= (int)(__gen_e_acsl_i + 1L),(char *)"RTE",
+                      (char *)"search",
+                      (char *)"index_bound: 0 <= (int)(__gen_e_acsl_i + 1)",
+                      7);
+      __e_acsl_assert(__gen_e_acsl_i < 10,(char *)"RTE",(char *)"search",
+                      (char *)"index_bound: __gen_e_acsl_i < 10",7);
+      __e_acsl_assert(0 <= __gen_e_acsl_i,(char *)"RTE",(char *)"search",
+                      (char *)"index_bound: 0 <= __gen_e_acsl_i",7);
+      if (A[__gen_e_acsl_i] <= A[__gen_e_acsl_i + 1]) ;
+      else {
+        __gen_e_acsl_forall = 0;
+        goto e_acsl_end_loop3;
+      }
+      __gen_e_acsl_i ++;
+    }
+    e_acsl_end_loop3: ;
+    __e_acsl_assert(__gen_e_acsl_forall,(char *)"Precondition",
+                    (char *)"search",
+                    (char *)"\\forall integer i; 0 <= i < 9 ==> A[i] <= A[i + 1]",
+                    7);
   }
   __retres = search(elt);
   {
