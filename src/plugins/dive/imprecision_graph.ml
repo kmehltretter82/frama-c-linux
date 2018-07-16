@@ -20,12 +20,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Dependency_types
+
 type vertex_label = {
   vertex_key : int;
   vertex_lval : Cil_types.lval
 }
-
-type dependency_kind = Callee | Data | Adress | Control
 
 type edge_label = {
   edge_key : int;
@@ -56,6 +56,29 @@ end
 
 module G = Graph.Imperative.Digraph.ConcreteBidirectionalLabeled (Vertex) (Edge)
 include G
+
+let vertex_count = ref 0
+let edge_count = ref 0
+
+let create_vertex g vertex_lval =
+  let v = {
+    vertex_key = !vertex_count;
+    vertex_lval;
+  }
+  in
+  incr vertex_count;
+  add_vertex g v;
+  v
+
+let create_edge g v1 edge_kind v2 =
+  let e = {
+    edge_key = !edge_count;
+    edge_kind;
+  }
+  in
+  incr edge_count;
+  add_edge_e g (v1,e,v2)
+
 
 let lval_proprietary_kf lval =
   match lval with

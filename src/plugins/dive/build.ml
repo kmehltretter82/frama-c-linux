@@ -21,60 +21,51 @@
 (**************************************************************************)
 
 open Cil_types
+open Dependency_types
 
 module G = Imprecision_graph
-open G
 
-let location_to_lval location =
+
+let singleton_location l =
   let open Locations in
-  match location.loc with
-  | Location_Bits.Top _ -> None
-  | Location_Bits.Map _m -> None  (* 
+  match l.loc with
+  | Location_Bits.Map m when Location_Bits.cardinal_zero_or_one l.loc ->
     let to_lval base ival acc =
-      if Extlib.has_somme acc then raise Exit;
-
+      if Extlib.has_some acc then raise Exit;
+      Some (base, Ival.project_int ival)
     in
-    try
-      Locations_Bits.fold to_lval m None
-    with Exit -> None *)
+    begin
+      try Location_Bits.M.fold to_lval m None
+      with Exit | Ival.Not_Singleton_Int ->  None
+    end
+  | _ -> None
+
+let location_to_lval ~typ location =
+  match singleton_location location with
+  | Some (Base.Var (vi,_), offset) ->
+    let base' = Var vi in
+    let offset', _typ =
+      Bit_utils.find_offset vi.vtype ~offset (Bit_utils.MatchType typ)
+    in
+    Some (base', offset')
+  | _ -> None
+
 
 
 let compute kinstr lval =
-  let module Table = Cil_datatype.LvalStructEq.Hashtbl in
+  let module Table = FCHashtbl.Make (Locations.Location) in
   !Db.Value.compute ();
   let graph = G.create () in
-  let vertex_count = ref 0 in
-  let edge_count = ref 0 in
   let table = Table.create 13 in
-
-  let add_vertex vertex_lval =
-    let v = {
-      vertex_key = !vertex_count;
-      vertex_lval;
-    }
-    in
-    incr vertex_count;
-    G.add_vertex graph v;
-    v
-
-  and add_edge v1 edge_kind v2 =
-    let e = {
-      edge_key = !edge_count;
-      edge_kind;
-    }
-    in
-    incr edge_count;
-    G.add_edge_e graph (v1,e,v2)
-  in
-
   let rec build_lval kinstr lval = (* TODO: derecursify if necessary *)
     let location = !Db.Value.lval_to_loc kinstr lval in
-    let lval = Extlib.opt_conv lval (location_to_lval location) in
+    let typ = Cil.typeOfLval lval in
+    let lval = Extlib.opt_conv lval (location_to_lval ~typ location) in
     try
-      Table.find table lval
+      Table.find table location
     with Not_found ->
-      let v = add_vertex lval in
-      Table.add table lval v;
+      let v = G.create_vertex graph lval in
+      Table.add table location v;
       begin match lval with
         | Var vi, NoOffset when vi.vformal ->
           let kf = Extlib.the (Kernel_function.find_defining_kf vi) in
@@ -135,12 +126,8 @@ let compute kinstr lval =
 
   and build_lval_deps src kinstr kind lval =
     let dst = build_lval kinstr lval in
-    add_edge src kind dst
+    G.create_edge graph src kind dst
   in
   ignore (build_lval kinstr lval);
   graph
 
-  (* 
-  Self.result "%a -> %t"
-    Locations.Zone.pretty_debug zone
-    (fun fmt -> List.iter (fun (s,_) -> Cil_printer.pp_stmt fmt s) l) *)
