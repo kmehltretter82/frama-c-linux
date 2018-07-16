@@ -1,0 +1,76 @@
+##########################################################################
+#                                                                        #
+#  This file is part of the Frama-C plug-in `IIG'.                       #
+#                                                                        #
+#  Copyright (C) 2018                                                    #
+#    CEA (Commissariat à l'énergie atomique et aux énergies              #
+#         alternatives)                                                  #
+#                                                                        #
+#  you can redistribute it and/or modify it under the terms of the GNU   #
+#  Lesser General Public License as published by the Free Software       #
+#  Foundation, version 2.1.                                              #
+#                                                                        #
+#  It is distributed in the hope that it will be useful,                 #
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of        #
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         #
+#  GNU Lesser General Public License for more details.                   #
+#                                                                        #
+#  See the GNU Lesser General Public License version 2.1                 #
+#  for more details (enclosed in the file licenses/LGPLv2.1).            #
+#                                                                        #
+##########################################################################
+
+#######################
+# Frama-C Environment #
+#######################
+
+ifndef FRAMAC_SHARE
+FRAMAC_SHARE	:= $(shell frama-c-config -print-share-path)
+endif
+
+ifndef FRAMAC_LIBDIR
+FRAMAC_LIBDIR	:= $(shell frama-c-config -print-libpath)
+endif
+
+#########################
+# Plug-in configuration #
+#########################
+
+PLUGIN_DIR ?=.
+PLUGIN_NAME := Iig
+PLUGIN_CMO := self imprecision_graph build main
+PLUGIN_DEPENDENCIES:= Value Studia
+PLUGIN_HAS_MLI:= yes
+PLUGIN_TESTS_DIRS:=iig
+PLUGIN_GENERATED:=
+
+################
+# Generic part #
+################
+
+include $(FRAMAC_SHARE)/Makefile.dynamic
+
+##########
+# Header #
+##########
+
+headers::
+	@echo "Applying Headers..."
+	headache -c licence/headache_config.txt -h licence/LGPL_HEADER \
+		*.ml *.mli \
+		Makefile.in configure.ac
+
+#####################################
+# Regenerating the Makefile on need #
+#####################################
+
+ifeq ("$(FRAMAC_INTERNAL)","yes")
+CONFIG_STATUS_DIR:=$(FRAMAC_SRC)
+CONFIG_STATUS_DIR_DEP:=
+else
+CONFIG_STATUS_DIR:=$(Iig_DIR)
+CONFIG_STATUS_DIR_DEP:=$(CONFIG_STATUS_DIR)/config.status
+endif
+
+$(Iig_DIR)/Makefile: $(Iig_DIR)/Makefile.in $(CONFIG_STATUS_DIR_DEP)
+	cd $(CONFIG_STATUS_DIR) && ./config.status --file $@

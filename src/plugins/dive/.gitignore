@@ -1,0 +1,17 @@
+*~
+*.cm*
+*.annot
+*.o
+*.check_mli_exists
+*.generated
+autom4te.cache
+Makefile
+config.status
+config.log
+configure
+*_DEP
+local_config.ml
+.depend
+ptests_local_config.ml
+result
+ptests_config
