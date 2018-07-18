@@ -23,8 +23,8 @@
 open Cil_types
 open Dependency_types
 
-module G = Imprecision_graph
 
+(* --- Locations handling --- *)
 
 let singleton_location l =
   let open Locations in
@@ -50,19 +50,51 @@ let location_to_lval ~typ location =
     Some (base', offset')
   | _ -> None
 
+let is_precise_location location =
+  Locations.valid_cardinal_zero_or_one ~for_writing:false location
 
 
-let compute kinstr lval =
-  let module Table = FCHashtbl.Make (Locations.Location) in
+(* --- Precision evaluation --- *)
+
+let is_imprecise_data kinstr lval =
+  let typ = Cil.typeOfLval lval in
+  let state = Db.Value.get_state kinstr in
+  let _,cvalue = !Db.Value.eval_lval None state lval in
+  match Cvalue.V.project_ival cvalue, typ with
+  | Ival.Float fval, TFloat (fkind,_) ->
+    (* Is one of the float bound the top one ? *)
+    let top = Fval.top_finite (Fval.kind fkind) in
+    Fval.has_greater_min_bound top fval >= 0 ||
+    Fval.has_smaller_max_bound top fval >= 0
+  | _ -> false
+  | exception Cvalue.V.Not_based_on_null -> false
+
+
+(* --- Graph building --- *)
+
+module Graph = Imprecision_graph
+module Table = FCHashtbl.Make (Locations.Location)
+
+type t = {
+  graph: Graph.t;
+  table: Graph.vertex Table.t;
+}
+
+let create () =
   !Db.Value.compute ();
-  let graph = G.create () in
-  let table = Table.create 13 in
-  let rec build_lval kinstr lval = (* TODO: derecursify if necessary *)
+  {
+    graph = Graph.create ();
+    table = Table.create 13;
+  }
+
+
+let add_lval {graph; table} kinstr lval =
+  (* TODO: derecursify if necessary *)
+  let rec build_vertex kinstr lval =
     let location = !Db.Value.lval_to_loc kinstr lval in
-    let precise_location =
-      Locations.valid_cardinal_zero_or_one ~for_writing:false location
-    in
+    let precise_location = is_precise_location location in
     let typ = Cil.typeOfLval lval in
+    (* If possible, refine the lval to a non-symbolic one *)
     let lval = Extlib.opt_conv lval (location_to_lval ~typ location) in
     let v = try
       Table.find table location
@@ -72,7 +104,7 @@ let compute kinstr lval =
         node_imprecise_data = false;
         node_imprecise_location = not precise_location;
       } in
-      let v = G.create_vertex graph properties in
+      let v = Graph.create_vertex graph properties in
       Table.add table location v;
       begin match lval with
         | Var vi, NoOffset when vi.vformal ->
@@ -86,8 +118,7 @@ let compute kinstr lval =
               let exp = List.nth args pos in
               build_exp_deps v (Kstmt stmt) Data exp
             | _ ->
-              Self.abort "%a" Cil_printer.pp_stmt stmt;
-              assert false (* TODO: comment *)
+              assert false (* Callsites can only be Call or ConsInit *)
           in
           List.iter add_argument_dependencies callsites
         | _ -> ()
@@ -105,19 +136,10 @@ let compute kinstr lval =
         List.iter add_write_dependencies writes;
       end;
       v
-    in
-    let state = Db.Value.get_state kinstr in
-    let _,cvalue = !Db.Value.eval_lval None state lval in
-    begin match Cvalue.V.project_ival cvalue, typ with
-    | Ival.Float fval, TFloat (fkind,_) ->
-      let top = Fval.top_finite (Fval.kind fkind) in
-      if Fval.has_greater_min_bound top fval >= 0 ||
-         Fval.has_smaller_max_bound top fval >= 0 then
-        v.G.vertex_properties.node_imprecise_data <- true
-    | _ -> ()
-    | exception Cvalue.V.Not_based_on_null -> ()
-    end;
-    v
+  in
+  if is_imprecise_data kinstr lval then
+    v.Graph.vertex_properties.node_imprecise_data <- true;
+  v
 
   and build_instr_deps src kinstr = function
     | Set (_, exp, _) ->
@@ -153,9 +175,8 @@ let compute kinstr lval =
       build_exp_deps  src kinstr kind e2
 
   and build_lval_deps src kinstr kind lval =
-    let dst = build_lval kinstr lval in
-    G.create_edge graph src kind dst
+    let dst = build_vertex kinstr lval in
+    Graph.create_edge graph src kind dst
   in
-  ignore (build_lval kinstr lval);
-  graph
+  ignore (build_vertex kinstr lval)
 

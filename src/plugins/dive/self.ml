@@ -21,30 +21,26 @@
 (**************************************************************************)
 
 include Plugin.Register
-  (struct
-     let name = "iig"
-     let shortname = "iig"
-     let help = "An interactive imprecision graph generator."
-     end)
+    (struct
+      let name = "iig"
+      let shortname = "iig"
+      let help = "An interactive imprecision graph generator."
+    end)
 
-module Run = False
-  (struct
-    let option_name = "-iig"
-    let help = "Generates an interactive imprecision graph from Eva results."
-   end)
-
-module Lval = String
-  (struct
-    let option_name = "-iig-lval"
-    let help = "The lval for which the dependency graph must be generated"
-    let default = ""
-    let arg_name = "lval"
-  end)
-
-module StatementId = Int
-  (struct
-    let option_name = "-iig-sid"
-    let help = "The statement id in which the lval must be evaluated"
-    let default = -1
-    let arg_name = "sid"
-  end)
+module Targets = String_multiple_map
+    (struct
+      include Datatype.Integer
+      type key = string
+      let of_string ~key:_ ~prev:_ arg =
+        try
+          Extlib.opt_map Integer.of_string arg
+        with Failure _ ->
+          raise (Cannot_build "expecting an integer")
+      let to_string ~key:_ = Extlib.opt_map Integer.to_string
+    end)
+    (struct
+      let option_name = "-iig"
+      let help = "Defines the lvalues for which the dependency graph must be generated"
+      let default = Datatype.String.Map.empty
+      let arg_name = "lval:sid"
+    end)

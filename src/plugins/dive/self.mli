@@ -22,7 +22,7 @@
 
 include Plugin.S
 
-module Run: Parameter_sig.Bool
-module Lval: Parameter_sig.String
-module StatementId: Parameter_sig.Int
-
+module Targets : Parameter_sig.Multiple_map
+  with type key = string
+  and type value = Integer.t
+  and type t = Integer.t list Datatype.String.Map.t
