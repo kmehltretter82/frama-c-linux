@@ -99,16 +99,23 @@ let compute kinstr lval =
       v
 
   and build_instr_deps src kinstr = function
-    | Set (_, exp, _) | Local_init (_,AssignInit (SingleInit exp),_) ->
-      build_exp_deps  src kinstr Data exp
+    | Set (_, exp, _) ->
+      build_exp_deps src kinstr Data exp
     | Call (_, _callee, args, _) ->
       (* build_exp_deps src kinstr Callee callee; *)
       List.iter (build_exp_deps src kinstr Data) args
     | Local_init (_, ConsInit (_, args, _), _) ->
       List.iter (build_exp_deps src kinstr Data) args
-    | Local_init _ -> () (* TODO *)
+    | Local_init (_, AssignInit init, _)  ->
+      build_init_deps src kinstr init
     | Asm _ -> () (* TODO : tell the user it's not supported *)
     | Skip _ | Code_annot _ -> ()
+
+  and build_init_deps src kinstr = function
+    | SingleInit exp ->
+      build_exp_deps src kinstr Data exp
+    | CompoundInit (_typ, initl) ->
+      List.iter (fun (_offset, init) -> build_init_deps src kinstr init) initl
 
   and build_exp_deps src kinstr kind exp =
     match exp.enode with
