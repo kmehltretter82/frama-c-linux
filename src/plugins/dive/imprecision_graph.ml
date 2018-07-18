@@ -24,7 +24,7 @@ open Dependency_types
 
 type vertex_label = {
   vertex_key : int;
-  vertex_lval : Cil_types.lval
+  vertex_properties : node_properties;
 }
 
 type edge_label = {
@@ -60,10 +60,10 @@ include G
 let vertex_count = ref 0
 let edge_count = ref 0
 
-let create_vertex g vertex_lval =
+let create_vertex g vertex_properties =
   let v = {
     vertex_key = !vertex_count;
-    vertex_lval;
+    vertex_properties;
   }
   in
   incr vertex_count;
@@ -107,10 +107,16 @@ let ouptput_to_dot out_channel g =
       let default_vertex_attributes _g = [`Shape `Box]
       let vertex_name v = "cp" ^ (string_of_int v.vertex_key)
       let vertex_label v =
-        Pretty_utils.to_string Cil_printer.pp_lval v.vertex_lval
-      let vertex_attributes v = [ label (vertex_label v) ]
+        Pretty_utils.to_string Cil_printer.pp_lval v.vertex_properties.node_lval
+      let vertex_attributes v =
+        let l = ref [ label (vertex_label v) ] in
+        if v.vertex_properties.node_imprecise_data then
+          l := [ `Color 0xff0000 ; `Style `Bold ] @ !l;
+        if v.vertex_properties.node_imprecise_location then
+          l := [ `Shape `Parallelogram ] @ !l;
+        !l
       let get_subgraph v =
-        let kf = lval_proprietary_kf v.vertex_lval in
+        let kf = lval_proprietary_kf v.vertex_properties.node_lval in
         Extlib.opt_map (fun kf -> Table.memo table kf build_subgraph) kf
       let default_edge_attributes _g = []
       let edge_attributes (_v1,e,_v2) =

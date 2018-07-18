@@ -59,12 +59,20 @@ let compute kinstr lval =
   let table = Table.create 13 in
   let rec build_lval kinstr lval = (* TODO: derecursify if necessary *)
     let location = !Db.Value.lval_to_loc kinstr lval in
+    let precise_location =
+      Locations.valid_cardinal_zero_or_one ~for_writing:false location
+    in
     let typ = Cil.typeOfLval lval in
     let lval = Extlib.opt_conv lval (location_to_lval ~typ location) in
-    try
+    let v = try
       Table.find table location
     with Not_found ->
-      let v = G.create_vertex graph lval in
+      let properties = {
+        node_lval = lval;
+        node_imprecise_data = false;
+        node_imprecise_location = not precise_location;
+      } in
+      let v = G.create_vertex graph properties in
       Table.add table location v;
       begin match lval with
         | Var vi, NoOffset when vi.vformal ->
@@ -85,7 +93,7 @@ let compute kinstr lval =
         | _ -> ()
       end;
 
-      if Locations.valid_cardinal_zero_or_one ~for_writing:false location then begin
+      if precise_location then begin
         let zone = !Db.Value.lval_to_zone kinstr lval in
         let writes = Studia.Writes.compute zone
         and add_write_dependencies (stmt,effects) =
@@ -97,6 +105,19 @@ let compute kinstr lval =
         List.iter add_write_dependencies writes;
       end;
       v
+    in
+    let state = Db.Value.get_state kinstr in
+    let _,cvalue = !Db.Value.eval_lval None state lval in
+    begin match Cvalue.V.project_ival cvalue, typ with
+    | Ival.Float fval, TFloat (fkind,_) ->
+      let top = Fval.top_finite (Fval.kind fkind) in
+      if Fval.has_greater_min_bound top fval >= 0 ||
+         Fval.has_smaller_max_bound top fval >= 0 then
+        v.G.vertex_properties.node_imprecise_data <- true
+    | _ -> ()
+    | exception Cvalue.V.Not_based_on_null -> ()
+    end;
+    v
 
   and build_instr_deps src kinstr = function
     | Set (_, exp, _) ->

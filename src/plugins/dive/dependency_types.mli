@@ -22,3 +22,8 @@
 
 type dependency_kind = Callee | Data | Adress | Control
 
+type node_properties = {
+  mutable node_lval : Cil_types.lval;
+  mutable node_imprecise_location : bool;
+  mutable node_imprecise_data : bool;
+}
