@@ -56,16 +56,39 @@ let is_precise_location location =
 
 (* --- Precision evaluation --- *)
 
+let _fval_contains_maximal_bounds fkind fval =
+  let top = Fval.top_finite (Fval.kind fkind) in
+  Fval.has_greater_min_bound top fval >= 0 ||
+  Fval.has_smaller_max_bound top fval >= 0
+
+
+let precision_limits =
+  let single = float_of_string "0x1p+120"
+  and double = float_of_string "0x1p+960"
+  and long_double = float_of_string "0x1p+15360"
+  in function 
+  | FFloat      -> single
+  | FDouble     -> double
+  | FLongDouble -> long_double
+
+let fval_has_large_range fkind fval =
+  let limit = precision_limits fkind in
+  match Fval.min_and_max fval with
+  | None, _ -> false
+  | Some (min,max), _ ->
+    let min' = Fval.F.to_float min and max' = Fval.F.to_float max in
+    if (min' < 0.0) = (max' < 0.0) then
+      max' -. min' >= limit
+    else
+      min' <= -.limit || max' >= limit
+
 let is_imprecise_data kinstr lval =
   let typ = Cil.typeOfLval lval in
   let state = Db.Value.get_state kinstr in
   let _,cvalue = !Db.Value.eval_lval None state lval in
   match Cvalue.V.project_ival cvalue, typ with
   | Ival.Float fval, TFloat (fkind,_) ->
-    (* Is one of the float bound the top one ? *)
-    let top = Fval.top_finite (Fval.kind fkind) in
-    Fval.has_greater_min_bound top fval >= 0 ||
-    Fval.has_smaller_max_bound top fval >= 0
+    fval_has_large_range fkind fval
   | _ -> false
   | exception Cvalue.V.Not_based_on_null -> false
 
