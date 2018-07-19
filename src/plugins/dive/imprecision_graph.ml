@@ -111,7 +111,8 @@ let ouptput_to_dot out_channel g =
       let vertex_attributes v =
         let l = ref [ label (vertex_label v) ] in
         if v.vertex_properties.node_imprecise_data then
-          l := [ `Color 0xff0000 ; `Style `Bold ] @ !l;
+          l := [ `Color 0xff0000 ; `Style `Bold ;
+                 `Style `Filled ; `Fillcolor 0xffbbbb ] @ !l;
         if v.vertex_properties.node_imprecise_location then
           l := [ `Shape `Parallelogram ] @ !l;
         !l
