@@ -67,6 +67,13 @@ let is_imprecise_data kinstr lval =
 
 exception Not_simple_location
 
+let is_foldable_type typ =
+  match Cil.unrollType typ with
+  | TArray _ | TComp _ -> true
+  | TVoid _ | TInt _ | TEnum _ | TFloat _ | TPtr _ | TFun _
+  | TBuiltin_va_list _ -> false
+  | TNamed _ -> assert false (* the type have been unrolled *)
+
 let to_simple_location (l : Locations.location) : Base.t * Ival.t =
   let open Locations in
   match l.loc with
@@ -88,7 +95,7 @@ let to_symbolic_location ~is_folded_base kinstr lval =
       let sl_kind, sl_lval, sl_location =
         try
           let kind, offset' =
-            if is_folded_base vi then
+            if is_foldable_type vi.vtype && is_folded_base vi then
               Folded, NoOffset
             else
               let offset = Ival.project_int ival
@@ -112,10 +119,6 @@ let to_symbolic_location ~is_folded_base kinstr lval =
       sl_owner = None;
       sl_kind = Imprecise;
     }
-
-let is_precise_location location =
-  Locations.valid_cardinal_zero_or_one ~for_writing:false location
-
 
 
 (* --- Graph building --- *)

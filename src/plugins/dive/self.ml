@@ -46,10 +46,10 @@ module Targets = String_multiple_map
       let arg_name = "lval:sid"
     end)
 
-module FoldedBases = String_set
+module UnfoldedBases = String_set
     (struct
-      let option_name = "-iig-fold"
-      let help = "Defines the name of the composite variables which should be \
-                  considered as a single location"
+      let option_name = "-iig-unfold"
+      let help = "Defines the names of the composite variables which should be \
+                  unfolded into each individual cell"
       let arg_name = "lval:sid"
     end)

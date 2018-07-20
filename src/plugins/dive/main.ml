@@ -45,7 +45,7 @@ let add_target graph lval_text sid =
   Build.add_lval graph kinstr lval
 
 let is_folded_base vi =
-  Self.FoldedBases.mem vi.Cil_types.vname
+  not (Self.UnfoldedBases.mem vi.Cil_types.vname)
 
 let main () =
   if not (Self.Targets.is_empty ()) then begin
