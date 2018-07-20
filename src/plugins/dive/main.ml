@@ -44,10 +44,13 @@ let add_target graph lval_text sid =
   let kinstr = Cil_types.Kstmt stmt in
   Build.add_lval graph kinstr lval
 
+let is_folded_base vi =
+  Self.FoldedBases.mem vi.Cil_types.vname
+
 let main () =
   if not (Self.Targets.is_empty ()) then begin
     (* Create the initial graph  *)
-    let graph = Build.create () in
+    let graph = Build.create ~is_folded_base () in
     (* Add targets to it *)
     let add_target' (lval,sids) =
       List.iter (add_target graph lval) sids

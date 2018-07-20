@@ -24,7 +24,8 @@ open Dependency_types
 
 type vertex_label = {
   vertex_key : int;
-  vertex_properties : node_properties;
+  vertex_location : symbolic_location;
+  mutable vertex_imprecise_data : bool;
 }
 
 type edge_label = {
@@ -60,10 +61,11 @@ include G
 let vertex_count = ref 0
 let edge_count = ref 0
 
-let create_vertex g vertex_properties =
+let create_vertex g vertex_location =
   let v = {
     vertex_key = !vertex_count;
-    vertex_properties;
+    vertex_location;
+    vertex_imprecise_data = false;
   }
   in
   incr vertex_count;
@@ -80,11 +82,6 @@ let create_edge g v1 edge_kind v2 =
   add_edge_e g (v1,e,v2)
 
 
-let lval_proprietary_kf lval =
-  match lval with
-  | Cil_types.Var vi, Cil_types.NoOffset ->
-    Kernel_function.find_defining_kf vi
-  | _ -> None
 
 let ouptput_to_dot out_channel g =
   let open Graph.Graphviz.DotAttributes in
@@ -104,20 +101,23 @@ let ouptput_to_dot out_channel g =
     struct
       include G
       let graph_attributes _g = []
-      let default_vertex_attributes _g = [`Shape `Box]
+      let default_vertex_attributes _g = []
       let vertex_name v = "cp" ^ (string_of_int v.vertex_key)
       let vertex_label v =
-        Pretty_utils.to_string Cil_printer.pp_lval v.vertex_properties.node_lval
+        Pretty_utils.to_string Cil_printer.pp_lval v.vertex_location.sl_lval
       let vertex_attributes v =
-        let l = ref [ label (vertex_label v) ] in
-        if v.vertex_properties.node_imprecise_data then
+        let shape = match v.vertex_location.sl_kind with
+        | Precise -> [`Shape `Box]
+        | Imprecise -> [ `Shape `Parallelogram ]
+        | Folded -> [ `Shape `Box3d ]
+        in
+        let l = ref ([ label (vertex_label v) ] @ shape) in
+        if v.vertex_imprecise_data then
           l := [ `Color 0xff0000 ; `Style `Bold ;
                  `Style `Filled ; `Fillcolor 0xffbbbb ] @ !l;
-        if v.vertex_properties.node_imprecise_location then
-          l := [ `Shape `Parallelogram ] @ !l;
         !l
       let get_subgraph v =
-        let kf = lval_proprietary_kf v.vertex_properties.node_lval in
+        let kf = v.vertex_location.sl_owner in
         Extlib.opt_map (fun kf -> Table.memo table kf build_subgraph) kf
       let default_edge_attributes _g = []
       let edge_attributes (_v1,e,_v2) =

@@ -22,8 +22,12 @@
 
 type dependency_kind = Callee | Data | Adress | Control
 
-type node_properties = {
-  mutable node_lval : Cil_types.lval;
-  mutable node_imprecise_location : bool;
-  mutable node_imprecise_data : bool;
+type location_kind = Precise | Imprecise | Folded
+
+type symbolic_location = {
+  sl_lval : Cil_types.lval;
+  sl_location : Locations.location;
+  sl_owner : Cil_types.kernel_function option;
+  sl_kind : location_kind;
 }
+

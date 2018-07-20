@@ -26,3 +26,5 @@ module Targets : Parameter_sig.Multiple_map
   with type key = string
   and type value = Integer.t
   and type t = Integer.t list Datatype.String.Map.t
+
+module FoldedBases : Parameter_sig.String_set

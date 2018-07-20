@@ -24,36 +24,6 @@ open Cil_types
 open Dependency_types
 
 
-(* --- Locations handling --- *)
-
-let singleton_location l =
-  let open Locations in
-  match l.loc with
-  | Location_Bits.Map m when Location_Bits.cardinal_zero_or_one l.loc ->
-    let to_lval base ival acc =
-      if Extlib.has_some acc then raise Exit;
-      Some (base, Ival.project_int ival)
-    in
-    begin
-      try Location_Bits.M.fold to_lval m None
-      with Exit | Ival.Not_Singleton_Int ->  None
-    end
-  | _ -> None
-
-let location_to_lval ~typ location =
-  match singleton_location location with
-  | Some (Base.Var (vi,_), offset) ->
-    let base' = Var vi in
-    let offset', _typ =
-      Bit_utils.find_offset vi.vtype ~offset (Bit_utils.MatchType typ)
-    in
-    Some (base', offset')
-  | _ -> None
-
-let is_precise_location location =
-  Locations.valid_cardinal_zero_or_one ~for_writing:false location
-
-
 (* --- Precision evaluation --- *)
 
 let _fval_contains_maximal_bounds fkind fval =
@@ -67,9 +37,9 @@ let precision_limits =
   and double = float_of_string "0x1p+960"
   and long_double = float_of_string "0x1p+15360"
   in function 
-  | FFloat      -> single
-  | FDouble     -> double
-  | FLongDouble -> long_double
+    | FFloat      -> single
+    | FDouble     -> double
+    | FLongDouble -> long_double
 
 let fval_has_large_range fkind fval =
   let limit = precision_limits fkind in
@@ -93,76 +63,138 @@ let is_imprecise_data kinstr lval =
   | exception Cvalue.V.Not_based_on_null -> false
 
 
+(* --- Locations handling --- *)
+
+exception Not_simple_location
+
+let to_simple_location (l : Locations.location) : Base.t * Ival.t =
+  let open Locations in
+  match l.loc with
+  | Location_Bits.Map m ->
+    let one_couple base ival acc =
+      if Extlib.has_some acc then raise Not_simple_location;
+      Some (base, ival)
+    in
+    Extlib.the (Location_Bits.M.fold one_couple m None)
+  | _ -> raise Not_simple_location
+
+let to_symbolic_location ~is_folded_base kinstr lval =
+  let location = !Db.Value.lval_to_loc kinstr lval in
+  let typ = Cil.typeOfLval lval in
+  try match to_simple_location location with
+    | Base.Var (vi,_), ival ->
+      let sl_owner = Kernel_function.find_defining_kf vi in
+      let base' = Var vi in
+      let sl_kind, sl_lval, sl_location =
+        try
+          let kind, offset' =
+            if is_folded_base vi then
+              Folded, NoOffset
+            else
+              let offset = Ival.project_int ival
+              and matching = Bit_utils.MatchType typ in
+              let offset', _ = Bit_utils.find_offset vi.vtype ~offset matching in
+              Precise, offset'
+          in
+          let lval' = (base',offset') in
+          let location' = !Db.Value.lval_to_loc kinstr lval' in
+          kind, lval', location'
+        with Ival.Not_Singleton_Int ->
+          Imprecise, lval, location
+      in
+      { sl_lval; sl_location; sl_owner; sl_kind}
+  | _ -> raise Not_simple_location
+  with
+  | Not_simple_location ->
+    {
+      sl_lval = lval;
+      sl_location = location;
+      sl_owner = None;
+      sl_kind = Imprecise;
+    }
+
+let is_precise_location location =
+  Locations.valid_cardinal_zero_or_one ~for_writing:false location
+
+
+
 (* --- Graph building --- *)
 
 module Graph = Imprecision_graph
-module Table = FCHashtbl.Make (Locations.Location)
+module Table = FCHashtbl.Make
+    (struct
+      module L = Locations.Location
+      type t = symbolic_location
+      let equal a b = L.equal a.sl_location b.sl_location
+      let hash a = L.hash a.sl_location
+    end)
 
 type t = {
   graph: Graph.t;
   table: Graph.vertex Table.t;
+  is_folded_base: Cil_types.varinfo -> bool;
 }
 
-let create () =
+let no_folded_base _vi = false
+
+let create ?(is_folded_base=no_folded_base) () =
   !Db.Value.compute ();
   {
     graph = Graph.create ();
     table = Table.create 13;
+    is_folded_base
   }
 
 
-let add_lval {graph; table} kinstr lval =
+let add_lval {graph; table; is_folded_base} kinstr lval =
   (* TODO: derecursify if necessary *)
-  let rec build_vertex kinstr lval =
-    let location = !Db.Value.lval_to_loc kinstr lval in
-    let precise_location = is_precise_location location in
-    let typ = Cil.typeOfLval lval in
+  let rec update_vertex kinstr lval =
     (* If possible, refine the lval to a non-symbolic one *)
-    let lval = Extlib.opt_conv lval (location_to_lval ~typ location) in
+    let symbolic_location = to_symbolic_location ~is_folded_base kinstr lval in
+    (* Not exactly as Table.memo as Table.add is done before recursive calls *)
     let v = try
-      Table.find table location
-    with Not_found ->
-      let properties = {
-        node_lval = lval;
-        node_imprecise_data = false;
-        node_imprecise_location = not precise_location;
-      } in
-      let v = Graph.create_vertex graph properties in
-      Table.add table location v;
-      begin match lval with
-        | Var vi, NoOffset when vi.vformal ->
-          let kf = Extlib.the (Kernel_function.find_defining_kf vi) in
-          let pos = Kernel_function.get_formal_position vi kf in
-          let callsites = Kernel_function.find_syntactic_callsites kf
-          and add_argument_dependencies (_caller_kf, stmt) =
-            match stmt.skind with
-            | Instr (Call (_,_,args,_))
-            | Instr (Local_init (_, ConsInit (_, args, _), _)) ->
-              let exp = List.nth args pos in
-              build_exp_deps v (Kstmt stmt) Data exp
-            | _ ->
-              assert false (* Callsites can only be Call or ConsInit *)
-          in
-          List.iter add_argument_dependencies callsites
-        | _ -> ()
-      end;
+        Table.find table symbolic_location
+      with Not_found ->
+        create_vertex symbolic_location
+    in
+    if is_imprecise_data kinstr lval then
+      v.Graph.vertex_imprecise_data <- true;
+    v
 
-      if precise_location then begin
-        let zone = !Db.Value.lval_to_zone kinstr lval in
-        let writes = Studia.Writes.compute zone
-        and add_write_dependencies (stmt,effects) =
+  and create_vertex symbolic_location =
+    let v = Graph.create_vertex graph symbolic_location in
+    Table.add table symbolic_location v;
+    let lval = symbolic_location.sl_lval in
+    begin match lval with
+      | Var vi, NoOffset when vi.vformal ->
+        let kf = Extlib.the (Kernel_function.find_defining_kf vi) in
+        let pos = Kernel_function.get_formal_position vi kf in
+        let callsites = Kernel_function.find_syntactic_callsites kf
+        and add_argument_dependencies (_caller_kf, stmt) =
           match stmt.skind with
-          | Instr instr when effects.Studia.Writes.direct ->
-            build_instr_deps v (Kstmt stmt) instr
-          | _ -> ()
+          | Instr (Call (_,_,args,_))
+          | Instr (Local_init (_, ConsInit (_, args, _), _)) ->
+            let exp = List.nth args pos in
+            build_exp_deps v (Kstmt stmt) Data exp
+          | _ ->
+            assert false (* Callsites can only be Call or ConsInit *)
         in
-        List.iter add_write_dependencies writes;
-      end;
-      v
-  in
-  if is_imprecise_data kinstr lval then
-    v.Graph.vertex_properties.node_imprecise_data <- true;
-  v
+        List.iter add_argument_dependencies callsites
+      | _ -> ()
+    end;
+
+    if symbolic_location.sl_kind != Imprecise then begin
+      let zone = !Db.Value.lval_to_zone kinstr lval in
+      let writes = Studia.Writes.compute zone
+      and add_write_dependencies (stmt,effects) =
+        match stmt.skind with
+        | Instr instr when effects.Studia.Writes.direct ->
+          build_instr_deps v (Kstmt stmt) instr
+        | _ -> ()
+      in
+      List.iter add_write_dependencies writes;
+    end;
+    v
 
   and build_instr_deps src kinstr = function
     | Set (_, exp, _) ->
@@ -198,8 +230,8 @@ let add_lval {graph; table} kinstr lval =
       build_exp_deps  src kinstr kind e2
 
   and build_lval_deps src kinstr kind lval =
-    let dst = build_vertex kinstr lval in
+    let dst = update_vertex kinstr lval in
     Graph.create_edge graph src kind dst
   in
-  ignore (build_vertex kinstr lval)
+  ignore (update_vertex kinstr lval)
 

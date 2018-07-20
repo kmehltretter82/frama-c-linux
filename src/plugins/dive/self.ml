@@ -40,7 +40,16 @@ module Targets = String_multiple_map
     end)
     (struct
       let option_name = "-iig"
-      let help = "Defines the lvalues for which the dependency graph must be generated"
+      let help = "Defines the lvalues for which the dependency graph must be \
+                  generated"
       let default = Datatype.String.Map.empty
+      let arg_name = "lval:sid"
+    end)
+
+module FoldedBases = String_set
+    (struct
+      let option_name = "-iig-fold"
+      let help = "Defines the name of the composite variables which should be \
+                  considered as a single location"
       let arg_name = "lval:sid"
     end)
