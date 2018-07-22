@@ -1,6 +1,6 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  This file is part of the Frama-C plug-in `IIG'.                       *)
+(*  This file is part of the Frama-C plug-in `Dive'.                      *)
 (*                                                                        *)
 (*  Copyright (C) 2018                                                    *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
@@ -22,8 +22,8 @@
 
 include Plugin.Register
     (struct
-      let name = "iig"
-      let shortname = "iig"
+      let name = "dive"
+      let shortname = "dive"
       let help = "An interactive imprecision graph generator."
     end)
 
@@ -39,7 +39,7 @@ module Targets = String_multiple_map
       let to_string ~key:_ = Extlib.opt_map Integer.to_string
     end)
     (struct
-      let option_name = "-iig"
+      let option_name = "-dive"
       let help = "Defines the lvalues for which the dependency graph must be \
                   generated"
       let default = Datatype.String.Map.empty
@@ -48,7 +48,7 @@ module Targets = String_multiple_map
 
 module UnfoldedBases = String_set
     (struct
-      let option_name = "-iig-unfold"
+      let option_name = "-dive-unfold"
       let help = "Defines the names of the composite variables which should be \
                   unfolded into each individual cell"
       let arg_name = "lval:sid"

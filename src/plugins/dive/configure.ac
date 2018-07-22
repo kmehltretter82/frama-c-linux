@@ -1,6 +1,6 @@
 ##########################################################################
 #                                                                        #
-#  This file is part of the Frama-C plug-in `IIG'.                       #
+#  This file is part of the Frama-C plug-in `Dive'.                      #
 #                                                                        #
 #  Copyright (C) 2018                                                    #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
@@ -31,8 +31,8 @@ m4_define([FRAMAC_SHARE],
 
 m4_ifndef([FRAMAC_M4_MACROS], [m4_include(FRAMAC_SHARE/configure.ac)])
 
-check_plugin(iig,PLUGIN_RELATIVE_PATH(plugin_file),
-             [support for IIG plug-in],yes)
+check_plugin(dive,PLUGIN_RELATIVE_PATH(plugin_file),
+             [support for Dive plug-in],yes)
 
 # Check Frama-C version
 #######################
@@ -67,8 +67,8 @@ fi
 # Plug-in dependencies
 ######################
 
-plugin_require(iig,value,studia)
-#plugin_use(iig,usable_plugin_but_not_mandatory)
+plugin_require(dive,value,studia)
+#plugin_use(dive,usable_plugin_but_not_mandatory)
 
 check_plugin_dependencies
 

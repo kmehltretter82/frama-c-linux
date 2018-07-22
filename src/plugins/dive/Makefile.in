@@ -1,6 +1,6 @@
 ##########################################################################
 #                                                                        #
-#  This file is part of the Frama-C plug-in `IIG'.                       #
+#  This file is part of the Frama-C plug-in `Dive'.                      #
 #                                                                        #
 #  Copyright (C) 2018                                                    #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
@@ -37,11 +37,11 @@ endif
 #########################
 
 PLUGIN_DIR ?=.
-PLUGIN_NAME := Iig
+PLUGIN_NAME := Dive
 PLUGIN_CMO := self imprecision_graph build main
 PLUGIN_DEPENDENCIES:= Value Studia
 PLUGIN_HAS_MLI:= yes
-PLUGIN_TESTS_DIRS:=iig
+PLUGIN_TESTS_DIRS:=dive
 PLUGIN_GENERATED:=
 
 ################
@@ -68,9 +68,9 @@ ifeq ("$(FRAMAC_INTERNAL)","yes")
 CONFIG_STATUS_DIR:=$(FRAMAC_SRC)
 CONFIG_STATUS_DIR_DEP:=
 else
-CONFIG_STATUS_DIR:=$(Iig_DIR)
+CONFIG_STATUS_DIR:=$(Dive_DIR)
 CONFIG_STATUS_DIR_DEP:=$(CONFIG_STATUS_DIR)/config.status
 endif
 
-$(Iig_DIR)/Makefile: $(Iig_DIR)/Makefile.in $(CONFIG_STATUS_DIR_DEP)
+$(Dive_DIR)/Makefile: $(Dive_DIR)/Makefile.in $(CONFIG_STATUS_DIR_DEP)
 	cd $(CONFIG_STATUS_DIR) && ./config.status --file $@
