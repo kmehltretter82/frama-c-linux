@@ -234,7 +234,7 @@ let add_lval {graph; table; is_folded_base} kinstr lval =
 
   and build_lval_deps src kinstr kind lval =
     let dst = update_vertex kinstr lval in
-    Graph.create_edge graph src kind dst
+    Graph.create_edge ~allow_folding:true graph src kind dst
   in
   ignore (update_vertex kinstr lval)
 

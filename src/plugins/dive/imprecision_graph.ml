@@ -31,11 +31,13 @@ type vertex_label = {
 type edge_label = {
   edge_key : int;
   edge_kind : dependency_kind;
+  mutable edge_folded : bool;
 }
 
 let dummy_edge = {
   edge_key = -1;
   edge_kind = Data;
+  edge_folded = false;
 }
 
 module Vertex =
@@ -72,15 +74,25 @@ let create_vertex g vertex_location =
   add_vertex g v;
   v
 
-let create_edge g v1 edge_kind v2 =
-  let e = {
-    edge_key = !edge_count;
-    edge_kind;
-  }
-  in
-  incr edge_count;
-  add_edge_e g (v1,e,v2)
-
+let create_edge ~allow_folding g v1 edge_kind v2 =
+  try
+    try
+      if allow_folding then
+        let _,e,_ = G.find_edge g v1 v2 in
+        if e.edge_kind = edge_kind then begin
+          e.edge_folded <- true;
+          raise Exit;
+        end;
+    with Not_found -> ();
+    let e = {
+      edge_key = !edge_count;
+      edge_kind;
+      edge_folded = false;
+    }
+    in
+    incr edge_count;
+    add_edge_e g (v1,e,v2)
+  with Exit -> ()
 
 
 let ouptput_to_dot out_channel g =
@@ -121,9 +133,13 @@ let ouptput_to_dot out_channel g =
         Extlib.opt_map (fun kf -> Table.memo table kf build_subgraph) kf
       let default_edge_attributes _g = []
       let edge_attributes (_v1,e,_v2) =
-        match e.edge_kind with
-        | Callee -> [`Color 0xff0000 ]
-        | _ -> []
+        let kind_attribute = match e.edge_kind with
+          | Callee -> [`Color 0xff0000 ]
+          | _ -> []
+        and folding_attribute = match e.edge_folded with
+          | true -> [ `Style `Bold ]
+          | false -> []
+        in kind_attribute @ folding_attribute 
     end)
   in
   Dot.output_graph out_channel g
