@@ -93,6 +93,8 @@ rule token = parse
   | '?'               { QUESTION }
   | eof               { EOF }
   | _                 { raise_located (loc lexbuf) "Unknown token" }
+  | '$'               { VAR }
+  | ":="              { AFF }
 
 {
   let parse c =

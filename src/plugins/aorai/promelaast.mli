@@ -23,10 +23,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** The abstract tree of promela representation. Such tree is used by promela 
+(** The abstract tree of promela representation. Such tree is used by promela
     parser/lexer before its translation into Data_for_aorai module. *)
 
 type expression =
+  | AVar of string (*TODO, Variable local d'Aorai*)
   | PVar of string
   | PPrm of string * string (* f().N *)
   | PCst of Logic_ptree.constant
@@ -43,9 +44,10 @@ type condition =
   | POr of condition * condition
   | PAnd of condition * condition
   | PNot of condition
-  | PCall of string * string option 
+  | PCall of string * string option
       (** Call might be done in a given behavior *)
   | PReturn of string
+  | AfVar of string * expression (*TODO, affectation à AfVar *)
 
 and seq_elt =
     { condition: condition option;
@@ -57,7 +59,7 @@ and seq_elt =
 and sequence = seq_elt list
 
 (** Promela parsed abstract syntax trees. Either a sequence of event or the
-    otherwise keyword. A single condition is expressed with a singleton 
+    otherwise keyword. A single condition is expressed with a singleton
     having an empty nested sequence and min_rep and max_rep being equal to one.
 *)
 type parsed_condition = Seq of sequence | Otherwise
@@ -73,7 +75,7 @@ type typed_condition =
     | TTrue                         (** Logical constant TRUE *)
     | TFalse                        (** Logical constant FALSE *)
     | TRel of Cil_types.relation * Cil_types.term * Cil_types.term
-       (** Condition. If one of the terms contains TResult, TRel is in 
+       (** Condition. If one of the terms contains TResult, TRel is in
            conjunction with exactly one TReturn event, and the TResult is
            tied to the corresponding value.
         *)
@@ -88,9 +90,9 @@ type single_action =
           variable [aux].
        *)
   | Pebble_move of
-      Cil_types.logic_info * 
+      Cil_types.logic_info *
         Cil_types.logic_var * Cil_types.logic_info * Cil_types.logic_var
-        (** [Pebble_move(new_set,new_aux,old_set,old_aux)] 
+        (** [Pebble_move(new_set,new_aux,old_set,old_aux)]
             moves pebbles from [old_set] to [new_set], governed by the
             corresponding aux variables. *)
   | Copy_value of Cil_types.term_lval * Cil_types.term
@@ -110,20 +112,20 @@ type state =
       (** True iff state is an acceptation state *);
       mutable init : Bool3.t   (** True iff state is an initial state *);
       mutable nums : int;       (** Numerical ID of the state *)
-      mutable multi_state: 
+      mutable multi_state:
         (Cil_types.logic_info * Cil_types.logic_var) option
         (** Translation of some sequences might lead to some kind of pebble
             automaton, where we need to distinguish various branches. This is
             done by having a set of pebbles instead of just a zero/one switch
             to know if we are in the given state. The guards apply to each
-            active pebble and are thus of the form 
+            active pebble and are thus of the form
             \forall integer x; in(x,multi_state) ==> guard.
             multi_state is the first lvar of the pair, x is the second
          *)
     }
 
 (** Internal representation of a transition from the Buchi automata. *)
-type 'condition trans = 
+type 'condition trans =
     { start : state ;     (** Starting state of the transition *)
       stop : state ;      (** Ending state of the transition *)
       mutable cross : 'condition ; (** Cross condition of the transition *)
