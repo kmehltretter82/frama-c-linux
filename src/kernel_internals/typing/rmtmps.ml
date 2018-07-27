@@ -46,7 +46,30 @@ let dkey = Kernel.dkey_rmtmps
 open Extlib
 open Cil_types
 open Cil
-module H = Hashtbl
+
+(* Reachability of used data is stored in a table mapping [info] to [bool].
+   Note that due to mutability, we need to use our own Hashtbl module which
+   uses [Cil_datatype] equality functions. *)
+type info =
+  | Type of typeinfo
+  | Enum of enuminfo
+  | Comp of compinfo
+  | Var of varinfo
+
+module InfoHashtbl = Hashtbl.Make(struct
+    type t = info
+    let equal i1 i2 = match i1, i2 with
+      | Type t1, Type t2 -> Cil_datatype.Typeinfo.equal t1 t2
+      | Enum e1, Enum e2 -> Cil_datatype.Enuminfo.equal e1 e2
+      | Comp c1, Comp c2 -> Cil_datatype.Compinfo.equal c1 c2
+      | Var v1, Var v2 -> Cil_datatype.Varinfo.equal v1 v2
+      | _, _ -> false
+    let hash = function
+      | Type t -> Cil_datatype.Typeinfo.hash t
+      | Enum e -> Cil_datatype.Enuminfo.hash e
+      | Comp c -> Cil_datatype.Compinfo.hash c
+      | Var v -> Cil_datatype.Varinfo.hash v
+  end)
 
 (* Used by external plug-ins: *)
 let keepUnused = ref false
@@ -55,44 +78,7 @@ let keepUnused = ref false
 let rmUnusedInlines = ref false
 let rmUnusedStatic = ref false
 
-(***********************************************************************
- *
- *  Clearing of "referenced" bits
- *
-*)
-
-
-let clearReferencedBits file =
-  let considerGlobal global =
-    match global with
-    | GType (info, _) ->
-      info.treferenced <- false
-
-    | GEnumTag (info, _)
-    | GEnumTagDecl (info, _) ->
-      Kernel.debug ~dkey "clearing mark: %a" Cil_printer.pp_global global;
-      info.ereferenced <- false
-
-    | GCompTag (info, _)
-    | GCompTagDecl (info, _) ->
-      info.creferenced <- false
-
-    | GVar (vi, _, _)
-    | GFunDecl (_, vi, _)
-    | GVarDecl (vi, _) ->
-      vi.vreferenced <- false
-
-    | GFun ({svar = info} as func, _) ->
-      info.vreferenced <- false;
-      let clearMark local =
-        local.vreferenced <- false
-      in
-      List.iter clearMark func.slocals
-
-    | _ ->
-      ()
-  in
-  iterGlobals file considerGlobal
+let is_reachable t r = try InfoHashtbl.find t r with Not_found -> false
 
 
 (***********************************************************************
@@ -103,7 +89,7 @@ let clearReferencedBits file =
 
 
 (* collections of names of things to keep *)
-type collection = (string, unit) H.t
+type collection = (string, unit) Hashtbl.t
 type keepers = {
   typedefs : collection;
   enums : collection;
@@ -121,15 +107,15 @@ exception Bad_pragma
  * up collections of the corresponding varinfos' names.
 *)
 
-let categorizePragmas file =
+let categorizePragmas ast =
 
   (* names of things which should be retained *)
   let keepers = {
-    typedefs = H.create 1;
-    enums = H.create 1;
-    structs = H.create 1;
-    unions = H.create 1;
-    defines = H.create 1
+    typedefs = Hashtbl.create 1;
+    enums = Hashtbl.create 1;
+    structs = Hashtbl.create 1;
+    unions = Hashtbl.create 1;
+    defines = Hashtbl.create 1
   } in
 
   (* populate these name collections in light of each pragma *)
@@ -170,7 +156,7 @@ let categorizePragmas file =
                 | _ ->
                   raise Bad_pragma
               in
-              H.add collection name ()
+              Hashtbl.add collection name ()
             | _ ->
               raise Bad_pragma
           with Bad_pragma ->
@@ -183,7 +169,7 @@ let categorizePragmas file =
         match filterAttributes "alias" v.vattr with
         | [] -> ()  (* ordinary prototype. *)
         | [ Attr("alias", [AStr othername]) ] ->
-          H.add keepers.defines othername ()
+          Hashtbl.add keepers.defines othername ()
         | _ ->
           Kernel.fatal ~current:true
             "Bad alias attribute at %a"
@@ -192,7 +178,7 @@ let categorizePragmas file =
     | _ ->
       ()
   in
-  iterGlobals file considerPragma;
+  iterGlobals ast considerPragma;
   keepers
 
 
@@ -206,19 +192,19 @@ let categorizePragmas file =
 
 let isPragmaRoot keepers = function
   | GType ({tname = name}, _) ->
-    H.mem keepers.typedefs name
+    Hashtbl.mem keepers.typedefs name
   | GEnumTag ({ename = name}, _)
   | GEnumTagDecl ({ename = name}, _) ->
-    H.mem keepers.enums name
+    Hashtbl.mem keepers.enums name
   | GCompTag ({cname = name; cstruct = structure}, _)
   | GCompTagDecl ({cname = name; cstruct = structure}, _) ->
     let collection = if structure then keepers.structs else keepers.unions in
-    H.mem collection name
+    Hashtbl.mem collection name
   | GVar ({vname = name; vattr = attrs}, _, _)
   | GVarDecl ({vname = name; vattr = attrs}, _)
   | GFunDecl (_,{vname = name; vattr = attrs}, _)
   | GFun ({svar = {vname = name; vattr = attrs}}, _) ->
-    H.mem keepers.defines name ||
+    Hashtbl.mem keepers.defines name ||
     hasAttribute "used" attrs
   | _ ->
     false
@@ -230,15 +216,6 @@ let isPragmaRoot keepers = function
  *  Common root collecting utilities
  *
 *)
-(*TODO:remove
-  let traceRoot _reason _global =
-  (*  trace (dprintf "root (%s): %a@!" reason d_shortglobal global);*)
-  true
-
-  let traceNonRoot _reason _global =
-  (*  trace (dprintf "non-root (%s): %a@!" reason d_shortglobal global);*)
-  false
-*)
 let hasExportingAttribute funvar =
   let isExportingAttribute = function
     | Attr ("constructor", []) -> true
@@ -246,8 +223,6 @@ let hasExportingAttribute funvar =
     | _ -> false
   in
   List.exists isExportingAttribute funvar.vattr
-
-
 
 (***********************************************************************
  *
@@ -345,166 +320,168 @@ let isCompleteProgramRoot global =
 
 (* This visitor recursively marks all reachable types and variables as used. *)
 class markReachableVisitor
-    ((globalMap: (string, Cil_types.global) H.t),
-     (currentFunc: Cil_types.fundec option ref)) = object (self)
-  inherit nopCilVisitor
+    (globalMap: (string, Cil_types.global) Hashtbl.t)
+    (currentFunc: Cil_types.fundec option ref)
+    (reachable_tbl: bool InfoHashtbl.t)
+  = object (self)
+    inherit nopCilVisitor
 
-  method! vglob = function
-    | GType (typeinfo, _) ->
-      typeinfo.treferenced <- true;
-      DoChildren
-    | GCompTag (compinfo, _)
-    | GCompTagDecl (compinfo, _) ->
-      compinfo.creferenced <- true;
-      DoChildren
-    | GEnumTag (enuminfo, _)
-    | GEnumTagDecl (enuminfo, _) ->
-      enuminfo.ereferenced <- true;
-      DoChildren
-    | GVar (varinfo, _, _)
-    | GVarDecl (varinfo, _)
-    | GFunDecl (_,varinfo, _)
-    | GFun ({svar = varinfo}, _) ->
-      if not (hasAttribute "FC_BUILTIN" varinfo.vattr) then
-        varinfo.vreferenced <- true;
-      DoChildren
-    | GAnnot _ -> DoChildren
-    | _ ->
+    method! vglob = function
+      | GType (typeinfo, _) ->
+        InfoHashtbl.replace reachable_tbl (Type typeinfo) true;
+        DoChildren
+      | GCompTag (compinfo, _)
+      | GCompTagDecl (compinfo, _) ->
+        InfoHashtbl.replace reachable_tbl (Comp compinfo) true;
+        DoChildren
+      | GEnumTag (enuminfo, _)
+      | GEnumTagDecl (enuminfo, _) ->
+        InfoHashtbl.replace reachable_tbl (Enum enuminfo) true;
+        DoChildren
+      | GVar (varinfo, _, _)
+      | GVarDecl (varinfo, _)
+      | GFunDecl (_,varinfo, _)
+      | GFun ({svar = varinfo}, _) ->
+        if not (hasAttribute "FC_BUILTIN" varinfo.vattr) then
+          InfoHashtbl.replace reachable_tbl (Var varinfo) true;
+        DoChildren
+      | GAnnot _ -> DoChildren
+      | _ ->
+        SkipChildren
+
+    method! vstmt s =
+      match s.skind with
+      | TryCatch(_,c,_) ->
+        List.iter
+          (fun (decl,_) ->
+             match decl with
+             | Catch_exn(v,l) ->
+               (* treat all variables declared in exn clause as used. *)
+               ignore (self#vvrbl v);
+               List.iter (fun (v,_) -> ignore (self#vvrbl v)) l
+             | Catch_all -> ())
+          c;
+        DoChildren
+      | _ -> DoChildren
+
+    method! vinst = function
+      | Asm (_, tmpls, _, _) when Cil.msvcMode () ->
+        (* If we have inline assembly on MSVC, we cannot tell which locals
+         * are referenced. Keep them all *)
+        (match !currentFunc with
+           Some fd ->
+           List.iter (fun v ->
+               let vre = Str.regexp_string (Str.quote v.vname) in
+               if List.exists (fun tmp ->
+                   try ignore (Str.search_forward vre tmp 0); true
+                   with Not_found -> false)
+                   tmpls
+               then
+                 InfoHashtbl.replace reachable_tbl (Var v) true
+             ) fd.slocals
+         | _ -> assert false);
+        DoChildren
+      | _ -> DoChildren
+
+    method! vvrbl v =
+      if not (is_reachable reachable_tbl (Var v)) then
+        begin
+          let name = v.vname in
+          if v.vglob then
+            Kernel.debug ~dkey "marking transitive use: global %s" name
+          else
+            Kernel.debug ~dkey "marking transitive use: local %s" name;
+
+          (* If this is a global, we need to keep everything used in its
+           * definition and declarations. *)
+          InfoHashtbl.replace reachable_tbl (Var v) true;
+          if v.vglob then
+            begin
+              Kernel.debug ~dkey "descending: global %s" name;
+              let descend global =
+                ignore (visitCilGlobal (self :> cilVisitor) global)
+              in
+              let globals = Hashtbl.find_all globalMap name in
+              List.iter descend globals
+            end
+        end;
       SkipChildren
 
-  method! vstmt s =
-    match s.skind with
-    | TryCatch(_,c,_) ->
-      List.iter
-        (fun (decl,_) ->
-           match decl with
-           | Catch_exn(v,l) ->
-             (* treat all variables declared in exn clause as used. *)
-             ignore (self#vvrbl v);
-             List.iter (fun (v,_) -> ignore (self#vvrbl v)) l
-           | Catch_all -> ())
-        c;
-      DoChildren
-    | _ -> DoChildren
+    method private mark_enum e =
+      if not (is_reachable reachable_tbl (Enum e)) then
+        begin
+          Kernel.debug ~dkey "marking transitive use: enum %s\n" e.ename;
+          InfoHashtbl.replace reachable_tbl (Enum e) true;
+          self#visitAttrs e.eattr;
+          (* Must visit the value attributed to the enum constants *)
+          ignore (visitCilEnumInfo (self:>cilVisitor) e);
+        end
+      else
+        Kernel.debug ~dkey "not marking transitive use: enum %s\n" e.ename;
 
-  method! vinst = function
-    | Asm (_, tmpls, _, _) when Cil.msvcMode () ->
-      (* If we have inline assembly on MSVC, we cannot tell which locals
-       * are referenced. Keep them all *)
-      (match !currentFunc with
-         Some fd ->
-         List.iter (fun v ->
-             let vre = Str.regexp_string (Str.quote v.vname) in
-             if List.exists (fun tmp ->
-                 try ignore (Str.search_forward vre tmp 0); true
-                 with Not_found -> false)
-                 tmpls
-             then
-               v.vreferenced <- true) fd.slocals
-       | _ -> assert false);
-      DoChildren
-    | _ -> DoChildren
+    method! vexpr e =
+      match e.enode with
+        Const (CEnum {eihost = ei}) -> self#mark_enum ei; DoChildren
+      | _ -> DoChildren
 
-  method! vvrbl v =
-    if not v.vreferenced then
-      begin
-        let name = v.vname in
-        if v.vglob then
-          Kernel.debug ~dkey "marking transitive use: global %s" name
-        else
-          Kernel.debug ~dkey "marking transitive use: local %s" name;
+    method! vterm_node t =
+      match t with
+        TConst (LEnum {eihost = ei}) -> self#mark_enum ei; DoChildren
+      | _ -> DoChildren
 
-        (* If this is a global, we need to keep everything used in its
-         * definition and declarations. *)
-        v.vreferenced <- true;
-        if v.vglob then
-          begin
-            Kernel.debug ~dkey "descending: global %s" name;
-            let descend global =
-              ignore (visitCilGlobal (self :> cilVisitor) global)
-            in
-            let globals = Hashtbl.find_all globalMap name in
-            List.iter descend globals
-          end
-      end;
-    SkipChildren
+    method private visitAttrs attrs =
+      ignore (visitCilAttributes (self :> cilVisitor) attrs)
 
-  method private mark_enum e =
-    if not e.ereferenced then
-      begin
-        Kernel.debug ~dkey "marking transitive use: enum %s\n" e.ename;
-        e.ereferenced <- true;
-        self#visitAttrs e.eattr;
-        (* Must visit the value attributed to the enum constants *)
-        ignore (visitCilEnumInfo (self:>cilVisitor) e);
-      end
-    else
-      Kernel.debug ~dkey "not marking transitive use: enum %s\n" e.ename;
+    method! vtype typ =
+      (match typ with
+       | TEnum(e, attrs) ->
+         self#visitAttrs attrs;
+         self#mark_enum e
 
-  method! vexpr e =
-    match e.enode with
-      Const (CEnum {eihost = ei}) -> self#mark_enum ei; DoChildren
-    | _ -> DoChildren
+       | TComp(c, _, attrs) ->
+         let old = is_reachable reachable_tbl (Comp c) in
+         if not old then
+           begin
+             Kernel.debug ~dkey "marking transitive use: compound %s\n"
+               c.cname;
+             InfoHashtbl.replace reachable_tbl (Comp c) true;
 
-  method! vterm_node t =
-    match t with
-      TConst (LEnum {eihost = ei}) -> self#mark_enum ei; DoChildren
-    | _ -> DoChildren
+             (* to recurse, we must ask explicitly *)
+             let recurse f = ignore (self#vtype f.ftype) in
+             List.iter recurse c.cfields;
+             self#visitAttrs attrs;
+             self#visitAttrs c.cattr
+           end;
 
-  method private visitAttrs attrs =
-    ignore (visitCilAttributes (self :> cilVisitor) attrs)
+       | TNamed(ti, attrs) ->
+         let old = (is_reachable reachable_tbl (Type ti)) in
+         if not old then
+           begin
+             Kernel.debug ~dkey "marking transitive use: typedef %s\n"
+               ti.tname;
+             InfoHashtbl.replace reachable_tbl (Type ti) true;
+             (* recurse deeper into the type referred-to by the typedef *)
+             (* to recurse, we must ask explicitly *)
+             ignore (self#vtype ti.ttype);
+             self#visitAttrs attrs
+           end;
 
-  method! vtype typ =
-    (match typ with
-     | TEnum(e, attrs) ->
-       self#visitAttrs attrs;
-       self#mark_enum e
-
-     | TComp(c, _, attrs) ->
-       let old = c.creferenced in
-       if not old then
-         begin
-           Kernel.debug ~dkey "marking transitive use: compound %s\n"
-             c.cname;
-           c.creferenced <- true;
-
-           (* to recurse, we must ask explicitly *)
-           let recurse f = ignore (self#vtype f.ftype) in
-           List.iter recurse c.cfields;
-           self#visitAttrs attrs;
-           self#visitAttrs c.cattr
-         end;
-
-     | TNamed(ti, attrs) ->
-       let old = ti.treferenced in
-       if not old then
-         begin
-           Kernel.debug ~dkey "marking transitive use: typedef %s\n"
-             ti.tname;
-           ti.treferenced <- true;
-
-           (* recurse deeper into the type referred-to by the typedef *)
-           (* to recurse, we must ask explicitly *)
-           ignore (self#vtype ti.ttype);
-           self#visitAttrs attrs
-         end;
-
-     | TVoid a | TInt (_,a) | TFloat (_,a) | TBuiltin_va_list a ->
-       self#visitAttrs a
-     | TPtr(ty,a) -> ignore (self#vtype ty); self#visitAttrs a
-     | TArray(ty,sz, _, a) ->
-       ignore (self#vtype ty); self#visitAttrs a;
-       Extlib.may (ignore $ (visitCilExpr (self:>cilVisitor))) sz
-     | TFun (ty, args,_,a) ->
-       ignore (self#vtype ty);
-       Extlib.may (List.iter (fun (_,ty,_) -> ignore (self#vtype ty))) args;
-       self#visitAttrs a
-    );
-    SkipChildren
-end
+       | TVoid a | TInt (_,a) | TFloat (_,a) | TBuiltin_va_list a ->
+         self#visitAttrs a
+       | TPtr(ty,a) -> ignore (self#vtype ty); self#visitAttrs a
+       | TArray(ty,sz, _, a) ->
+         ignore (self#vtype ty); self#visitAttrs a;
+         Extlib.may (ignore $ (visitCilExpr (self:>cilVisitor))) sz
+       | TFun (ty, args,_,a) ->
+         ignore (self#vtype ty);
+         Extlib.may (List.iter (fun (_,ty,_) -> ignore (self#vtype ty))) args;
+         self#visitAttrs a
+      );
+      SkipChildren
+  end
 
 
-let markReachable file isRoot =
+let markReachable isRoot ast reachable_tbl =
   (* build a mapping from global names back to their definitions &
    * declarations *)
   let globalMap = Hashtbl.create 137 in
@@ -518,12 +495,12 @@ let markReachable file isRoot =
     | _ ->
       ()
   in
-  iterGlobals file considerGlobal;
+  iterGlobals ast considerGlobal;
 
   let currentFunc = ref None in
 
   (* mark everything reachable from the global roots *)
-  let visitor = new markReachableVisitor (globalMap, currentFunc) in
+  let visitor = new markReachableVisitor globalMap currentFunc reachable_tbl in
   let visitIfRoot global =
     if isRoot global then
       begin
@@ -537,8 +514,85 @@ let markReachable file isRoot =
       (*      trace (dprintf "skipping non-root global: %a\n" d_shortglobal global)*)
       ()
   in
-  iterGlobals file visitIfRoot
+  iterGlobals ast visitIfRoot
 
+(**********************************************************************
+ *
+ * Marking of referenced infos
+ *
+ **********************************************************************)
+
+class markReferencedVisitor = object
+  inherit nopCilVisitor
+
+  val inside_exp : exp Stack.t = Stack.create ()
+  val inside_typ : typ Stack.t = Stack.create ()
+
+  method! vglob = function
+    | GType (typeinfo, _loc) ->
+      typeinfo.treferenced <- true;
+      DoChildren
+    | GCompTag (compinfo, _loc)
+    | GCompTagDecl (compinfo, _loc) ->
+      compinfo.creferenced <- true;
+      DoChildren
+    | GEnumTag (enuminfo, _loc)
+    | GEnumTagDecl (enuminfo, _loc) ->
+      enuminfo.ereferenced <- true;
+      DoChildren
+    | GVar (varinfo, _, _loc)
+    | GVarDecl (varinfo, _loc)
+    | GFunDecl (_,varinfo, _loc)
+    | GFun ({svar = varinfo}, _loc) ->
+      varinfo.vreferenced <- true;
+      DoChildren
+    | GAnnot _ -> DoChildren
+    | _ ->
+      SkipChildren
+
+  method! vtype = function
+    | TNamed (ti, _) ->
+      if not (Stack.is_empty inside_typ) then begin
+        ti.treferenced <- true;
+      end;
+      DoChildren
+    | TComp (ci, _, _) ->
+      if not (Stack.is_empty inside_typ) then begin
+        ci.creferenced <- true;
+      end;
+      DoChildren
+    | TEnum (ei, _) ->
+      if not (Stack.is_empty inside_typ) then begin
+        ei.ereferenced <- true;
+      end;
+      DoChildren
+    | TVoid _
+    | TInt _
+    | TFloat _
+    | TPtr _
+    | TArray _
+    | TFun _
+    | TBuiltin_va_list _ -> DoChildren
+
+  method! vexpr e =
+    match e.enode with
+    | SizeOf t | AlignOf t | UnOp (_, _, t) | BinOp (_, _, _, t) ->
+      Stack.push t inside_typ;
+      DoChildrenPost (fun e -> ignore (Stack.pop inside_typ); e)
+    | _ ->
+      Stack.push e inside_exp;
+      DoChildrenPost (fun e -> ignore (Stack.pop inside_exp); e)
+
+  method! vvrbl v =
+    if not (Stack.is_empty inside_exp) then begin
+      v.vreferenced <- true;
+    end;
+    SkipChildren
+
+end
+
+let markReferenced ast =
+  visitCilFileSameGlobals (new markReferencedVisitor) ast
 
 (**********************************************************************
  *
@@ -574,13 +628,13 @@ let labelsToKeep is_removable ll =
   in
   loop ("", Label("", Cil_datatype.Location.unknown, false)) ll
 
-class markUsedLabels is_removable (labelMap: (string, unit) H.t) =
+class markUsedLabels is_removable (labelMap: (string, unit) Hashtbl.t) =
   let keep_label dest =
     let (ln, _), _ = labelsToKeep is_removable !dest.labels in
     if ln = "" then
       Kernel.fatal "Statement has no label:@\n%a" Cil_printer.pp_stmt !dest ;
     (* Mark it as used *)
-    H.replace labelMap ln ()
+    Hashtbl.replace labelMap ln ()
   in
   let keep_label_logic = function
     | FormalLabel _ | BuiltinLabel _ -> ()
@@ -619,14 +673,14 @@ class markUsedLabels is_removable (labelMap: (string, unit) H.t) =
     method! vtype _ = SkipChildren
   end
 
-class removeUnusedLabels is_removable (labelMap: (string, unit) H.t) = object
+class removeUnusedLabels is_removable (labelMap: (string, unit) Hashtbl.t) = object
   inherit nopCilVisitor
 
   method! vstmt (s: stmt) =
     let (ln, lab), lrest = labelsToKeep is_removable s.labels in
     s.labels <-
       (if ln <> "" &&
-          (H.mem labelMap ln || not (is_removable lab))
+          (Hashtbl.mem labelMap ln || not (is_removable lab))
           (* keep user-provided labels *)
        then (* We had labels *)
          (lab :: lrest)
@@ -682,37 +736,37 @@ let label_removable = function
 let remove_unused_labels ?(is_removable=label_removable) func =
   (* We also want to remove unused labels. We do it all here, including
    * marking the used labels *)
-  let usedLabels:(string, unit) H.t = H.create 13 in
+  let usedLabels:(string, unit) Hashtbl.t = Hashtbl.create 13 in
   ignore
     (visitCilBlock (new markUsedLabels is_removable usedLabels) func.sbody);
   (* And now we scan again and we remove them *)
   ignore
     (visitCilBlock (new removeUnusedLabels is_removable usedLabels) func.sbody)
 
-let removeUnmarked isRoot file =
+let removeUnmarked isRoot ast reachable_tbl =
   let removedLocals = ref [] in
 
   let filterGlobal global =
     match global with
     (* unused global types, variables, and functions are simply removed *)
     | GType (t, _) ->
-      t.treferenced ||
+      is_reachable reachable_tbl (Type t) ||
       Cil.hasAttribute "FC_BUILTIN" (Cil.typeAttr t.ttype)
       || isRoot global
     | GCompTag (c,_) | GCompTagDecl (c,_) ->
-      c.creferenced ||
+      is_reachable reachable_tbl (Comp c) ||
       Cil.hasAttribute "FC_BUILTIN" c.cattr || isRoot global
     | GEnumTag (e, _) | GEnumTagDecl (e,_) ->
-      e.ereferenced ||
+      is_reachable reachable_tbl (Enum e) ||
       Cil.hasAttribute "FC_BUILTIN" e.eattr || isRoot global
     | GVar (v, _, _) ->
-      v.vreferenced ||
+      is_reachable reachable_tbl (Var v) ||
       Cil.hasAttribute "FC_BUILTIN" v.vattr || isRoot global
     | GVarDecl (v, _)
     | GFunDecl (_,v, _)->
-      v.vreferenced ||
+      is_reachable reachable_tbl (Var v) ||
       Cil.hasAttribute "FC_BUILTIN" v.vattr ||
-      (Cil.removeFormalsDecl v; isRoot global)
+      (if isRoot global then true else (Cil.removeFormalsDecl v; false))
     (* keep FC_BUILTIN, as some plug-ins might want to use them later
        for semi-legitimate reasons. *)
     | GFun (func, _) ->
@@ -720,7 +774,7 @@ let removeUnmarked isRoot file =
          Keep variables that were already present in the code.
       *)
       let filterLocal local =
-        if local.vtemp && not local.vreferenced then
+        if local.vtemp && not (is_reachable reachable_tbl (Var local)) then
           begin
             (* along the way, record the interesting locals that were removed *)
             let name = local.vname in
@@ -739,7 +793,7 @@ let removeUnmarked isRoot file =
           DoChildren
       end
       in
-      (func.svar.vreferenced
+      ((is_reachable reachable_tbl (Var func.svar))
        || Cil.hasAttribute "FC_BUILTIN" func.svar.vattr
        || isRoot global) &&
       (ignore (visitCilBlock remove_blocals func.sbody);
@@ -749,7 +803,8 @@ let removeUnmarked isRoot file =
     (* all other globals are retained *)
     | _ -> true
   in
-  file.globals <- List.filter filterGlobal file.globals;
+  let keptGlobals, _removedGlobals = List.partition filterGlobal ast.globals in
+  ast.globals <- keptGlobals;
   !removedLocals
 
 
@@ -762,14 +817,15 @@ let removeUnmarked isRoot file =
 
 type rootsFilter = global -> bool
 
-let removeUnusedTemps ?(isRoot : rootsFilter = isExportedRoot) file =
+let removeUnusedTemps ?(isRoot : rootsFilter = isExportedRoot) ast =
   if not !keepUnused then
     begin
       Kernel.debug ~dkey "Removing unused temporaries" ;
 
       (* digest any pragmas that would create additional roots *)
-      let keepers = categorizePragmas file in
+      let keepers = categorizePragmas ast in
 
+      let reachable_tbl = InfoHashtbl.create 43 in
       (* build up the root set *)
       let isRoot global =
         isPragmaRoot keepers global ||
@@ -777,20 +833,12 @@ let removeUnusedTemps ?(isRoot : rootsFilter = isExportedRoot) file =
       in
 
       (* mark everything reachable from the global roots *)
-      clearReferencedBits file;
-      markReachable file isRoot;
+      markReachable isRoot ast reachable_tbl;
+
+      markReferenced ast;
 
       (* take out the trash *)
-      let removedLocals = removeUnmarked isRoot file in
-
-      (* print which original source variables were removed *)
-      if false && removedLocals != [] then
-        let count = List.length removedLocals in
-        if count > 2000 then
-          (Kernel.warning "%d unused local variables removed" count)
-        else
-          (Kernel.warning "%d unused local variables removed:@!%a"
-             count (Pretty_utils.pp_list ~sep:",@," Format.pp_print_string) removedLocals)
+      ignore (removeUnmarked isRoot ast reachable_tbl)
     end
 
 (*
