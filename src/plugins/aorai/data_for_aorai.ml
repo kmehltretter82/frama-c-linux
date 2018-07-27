@@ -428,10 +428,11 @@ type current_event =
               this particular event. *)
 
 (*TODO*)
-module StringMap = Map.Make(String)
+module StringMap = Datatype.String.Map
 
 type table = expression StringMap.t
 
+(*Faire un record avec des noms de champ*)
 type env = (current_event list * table)
 
 let add_current_event event env cond =
@@ -579,7 +580,7 @@ let check_one top info counter s =
       Some (Logic_const.term (TLval (TResult rt,TNoOffset)) (Ctype rt))
     | ECOR _ | EReturn _ | EMulti | ENone -> None
 
-(*TODO add_in_env*)
+(*TODO Faire une fonction de recherche pour les $var*)
 
 let find_in_env env counter s =
   let current, stack =
@@ -702,7 +703,7 @@ let type_expr env ?tr ?current e =
         PVar s ->
           let var = find_in_env env current s in
           env, var, cond
-          (*TODO*)
+          (*TODO Changer fonction de recherche*)
       | AVar s ->
         let var = find_in_env env current s in
         env, var, cond
@@ -890,7 +891,16 @@ let type_cond needs_pebble env tr cond =
   let current = if needs_pebble then Some tr.stop else None in
   let rec aux pos env =
     function
-      | AfVar (s, e) -> (fst env, StringMap.add s e (snd env)), cond
+    (*TODO changement de type lors de réaffectation, attention, (typed_automaton), stocker dans l'env le varinfo de la variable auxiliaire, vérifier cohérence type avec l'env quand on tombe sur une Avar*)
+      | AfVar (s, e) -> if pos then
+      begin
+        let env, term_tmp, c1 = type_expr env ~tr ?current e in
+        let v = Cil.makeGlobalVar (get_fresh ("aorai_" ^ s)) term_tmp.term_type in
+        (*Cil.Cvar_to_lvar v pour en faire une logic var puis il faut le transformer en term_lval*)
+        (fst env, StringMap.add s v (snd env)), (c1, [Copy_value((Tvar(Cil.cvar_to_lvar v), TNoOffset), term_tmp )])
+      end
+      else
+        Aorai_option.abort "Not corresponding to program"
       | PRel(rel,e1,e2) ->
         let env, e1, c1 = type_expr env ~tr ?current e1 in
         let env, e2, c2 = type_expr env ~tr ?current e2 in
@@ -939,7 +949,7 @@ let type_cond needs_pebble env tr cond =
         if pos then add_current_event (EReturn kf) env (TReturn kf)
         else env, TReturn kf
   in
-  aux true (ENone::(fst env), snd env) (*cond*)
+  aux true (ENone::(fst env), snd env) cond
 
 module Reject_state =
   State_builder.Option_ref(Aorai_state)
@@ -1071,7 +1081,7 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
                   Aorai_option.fatal
                     "Transition guard translated as epsilon transition");
             let states = add_if_needed states seq_start in
-            (match env with
+            (match (fst env) with
               | [] | (ENone | ECall _) :: _ ->
                 (env, states, transitions, curr_start, seq_end)
               | EReturn kf1 :: ECall (kf2,_,_) :: tl

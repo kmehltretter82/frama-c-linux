@@ -304,7 +304,7 @@ single_cond:
   | RETURN_OF  LPAREN IDENTIFIER RPAREN { PReturn $3 }
   | TRUE { PTrue }
   | FALSE { PFalse }
-  /*TODO*/
+  /*TODO ajouter le cas du Not (... and ...) entre autre*/
   | NOT single_cond { match $2 with
       | AfVar(_, _) -> Aorai_option.error Parsing.symbol_end_pos "Not corresponding to program"
       | _ -> PNot $2 }
