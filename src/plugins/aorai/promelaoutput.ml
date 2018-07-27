@@ -53,7 +53,8 @@ let rec print_parsed_expression fmt = function
   | PArrget(e1,e2) -> Format.fprintf fmt "%a@;[@(%a@]]"
     print_parsed_expression e1 print_parsed_expression e2
   | PField(e,s) -> Format.fprintf fmt "%a.%s" print_parsed_expression e s
-  | PArrow(e,s) -> Format.fprintf fmt "%a->%s" print_parsed_expression e s 
+  | PArrow(e,s) -> Format.fprintf fmt "%a->%s" print_parsed_expression e s
+  | AVar s -> Format.fprintf fmt "%s" s
 
 let rec print_parsed_condition fmt = function
   | PRel(rel,e1,e2) ->
@@ -72,6 +73,7 @@ let rec print_parsed_condition fmt = function
   | PCall (s,None) -> Format.fprintf fmt "CALL(%s)" s
   | PCall (s, Some b) -> Format.fprintf fmt "CALL(%s::%s)" s b
   | PReturn s -> Format.fprintf fmt "RETURN(%s)" s
+  | AfVar (s, e) -> Format.fprintf fmt " %s := %a " s print_parsed_expression e
 
 let rec print_seq_elt fmt elt =
   Format.fprintf fmt "(%a%a){@[%a,%a@]}"
@@ -105,25 +107,25 @@ let rec print_condition fmt = function
     Format.fprintf fmt "@[<hov 4>@[<hov 5>not(%a@])@]" print_condition c
   | TTrue            -> Format.pp_print_string fmt "True"
   | TFalse           -> Format.pp_print_string fmt "False"
-  | TRel(rel,exp1,exp2) -> 
+  | TRel(rel,exp1,exp2) ->
     (* \result will be printed as such, not as f().return *)
     Format.fprintf fmt "@[(%a)@]@ %a@ @[(%a)@]"
       Printer.pp_term exp1
-      Printer.pp_relation rel 
+      Printer.pp_relation rel
       Printer.pp_term exp2
 
 let print_one_action fmt = function
   | Counter_init lv ->
     Format.fprintf fmt "@[%a <- 1@]" Printer.pp_term_lval lv
   | Counter_incr lv ->
-    Format.fprintf fmt "@[%a <- @[%a@ +@ 1@]@]" 
+    Format.fprintf fmt "@[%a <- @[%a@ +@ 1@]@]"
       Printer.pp_term_lval lv Printer.pp_term_lval lv
   | Pebble_init (set,_,v) ->
     Format.fprintf fmt "@[%a <- {@[ %a @]}@]"
       Printer.pp_logic_var set.l_var_info Printer.pp_logic_var v
   | Pebble_move(s1,_,s2,_) ->
     Format.fprintf fmt "@[%a <- %a@]"
-      Printer.pp_logic_var s1.l_var_info  
+      Printer.pp_logic_var s1.l_var_info
       Printer.pp_logic_var s2.l_var_info
   | Copy_value(lv,v) ->
     Format.fprintf fmt "@[%a <- %a@]" Printer.pp_term_lval lv Printer.pp_term v
@@ -155,15 +157,15 @@ let trans_label num = "tr"^string_of_int(num)
 
 let print_trans fmt trans =
   Format.fprintf fmt
-    "@[<2>%s:@ %a@]" 
+    "@[<2>%s:@ %a@]"
     (trans_label trans.numt) print_full_transition trans.cross
 
 let state_label num = "st"^string_of_int(num)
-let print_state_label fmt st = 
+let print_state_label fmt st =
   Format.fprintf fmt "@[<2>%s:@ %s@]" (state_label st.nums) st.name
 
 let print_bool3 fmt b =
-  Format.pp_print_string fmt 
+  Format.pp_print_string fmt
     (match b with
       | True -> "True"
       | False -> "False"
@@ -199,9 +201,9 @@ let dot_state out st =
   Format.fprintf out "\"%a\" [shape = %s];@\n" print_state_label st shape
 
 let dot_trans out tr =
-  let print_label fmt tr = 
-    if DotSeparatedLabels.get () then 
-      Format.pp_print_int fmt tr.numt 
+  let print_label fmt tr =
+    if DotSeparatedLabels.get () then
+      Format.pp_print_int fmt tr.numt
     else print_trans fmt tr
   in
   Format.fprintf
@@ -217,7 +219,7 @@ let output_dot_automata (states_l,trans_l) fichier =
   let output_functions = escape_newline fmt in
   let one_line_comment s =
     let l = String.length s in
-    let fill = if l >= 75 then 0 else 75 - l in 
+    let fill = if l >= 75 then 0 else 75 - l in
     let spaces = String.make fill ' ' in
     Format.fprintf fmt "@[/* %s%s*/@\n@]" s spaces
   in
@@ -238,7 +240,7 @@ let output_dot_automata (states_l,trans_l) fichier =
     (Pretty_utils.pp_list dot_trans) trans_l
     (fun fmt ->
       if DotSeparatedLabels.get () then
-        (Format.fprintf fmt 
+        (Format.fprintf fmt
            "/* guards of transitions */@\ncomment=\"%a\";@\n"
            (Pretty_utils.pp_list ~sep:"@\n" print_trans) trans_l));
   Format.pp_set_formatter_out_functions fmt output_functions;

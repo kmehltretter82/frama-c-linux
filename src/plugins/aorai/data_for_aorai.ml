@@ -28,6 +28,7 @@ open Cil
 open Cil_types
 open Promelaast
 open Logic_simplification
+open Map
 
 exception Empty_automaton
 
@@ -129,6 +130,9 @@ let pnot t =
 
 let rec is_same_expression e1 e2 =
   match e1,e2 with
+  (*TODO*)
+    | AVar x, AVar y -> x = y
+    | AVar _,_ | _,AVar _ -> false
     | PVar x, PVar y -> x = y
     | PVar _,_ | _,PVar _ -> false
     | PCst cst1, PCst cst2 -> Logic_utils.is_same_pconstant cst1 cst2
@@ -158,7 +162,7 @@ let get_logic name =
 
 let declared_predicates = Hashtbl.create 97
 
-let add_predicate name pred_info = 
+let add_predicate name pred_info =
   Hashtbl.replace declared_predicates name pred_info
 
 let get_predicate name =
@@ -354,7 +358,7 @@ let check_states s =
     states;
   List.iter
     (fun x ->
-      try 
+      try
         let y = List.find (fun y -> x.nums = y.nums && not (x==y)) states in
         Aorai_option.fatal "%s: State %s and %s share same id %d"
           s x.name y.name x.nums
@@ -423,14 +427,21 @@ type current_event =
               repr of the stack does not take into account
               this particular event. *)
 
+(*TODO*)
+module StringMap = Map.Make(String)
+
+type table = expression StringMap.t
+
+type env = (current_event list * table)
+
 let add_current_event event env cond =
   let is_empty tbl = Cil_datatype.Varinfo.Hashtbl.length tbl = 0 in
-  match env with
+  match (fst env) with
       [] -> assert false
     | old_event :: tl ->
       match event, old_event with
         | ENone, _ -> env, cond
-        | _, ENone -> event::tl, cond
+        | _, ENone -> (event::tl, snd env), cond
         | ECall (kf1,_,_), ECall (kf2,_,_)
           when Kernel_function.equal kf1 kf2 -> env, cond
         | ECall (kf1,tbl1,_), ECall (kf2,tbl2,_)->
@@ -439,15 +450,15 @@ let add_current_event event env cond =
              an empty event. If this situation occurs in an handwritten
              automaton that uses formals we simply reject it.
            *)
-          if is_empty tbl1 && is_empty tbl2 then ENone::tl, TFalse
+          if is_empty tbl1 && is_empty tbl2 then (ENone::tl, snd env), TFalse
           else
             Aorai_option.abort
               "specification is inconsistent: two call events for distinct \
                functions %a and %a at the same time."
               Kernel_function.pretty kf1 Kernel_function.pretty kf2
-        | ECall (_,_,_), EMulti -> event::tl, cond
+        | ECall (_,_,_), EMulti -> (event::tl, snd env), cond
         | ECall (kf1,tbl1,_), EReturn kf2 ->
-          if is_empty tbl1 then ENone::tl, TFalse
+          if is_empty tbl1 then (ENone::tl, snd env), TFalse
           else
             Aorai_option.abort
               "specification is inconsistent: trying to call %a and \
@@ -455,62 +466,62 @@ let add_current_event event env cond =
               Kernel_function.pretty kf1 Kernel_function.pretty kf2
         | ECall(kf1,_,_), ECOR kf2
           when Kernel_function.equal kf1 kf2 ->
-          event::tl, cond
+          (event::tl, snd env), cond
         | ECall (kf1,tbl1,_), ECOR kf2 ->
-          if is_empty tbl1 then ENone::tl, TFalse
+          if is_empty tbl1 then (ENone::tl, snd env), TFalse
           else
             Aorai_option.abort
               "specification is inconsistent: trying to call %a and \
                call or return from %a at the same time."
               Kernel_function.pretty kf1 Kernel_function.pretty kf2
         | EReturn kf1, ECall(kf2,tbl2,_) ->
-          if is_empty tbl2 then ENone::tl, TFalse
+          if is_empty tbl2 then (ENone::tl, snd env), TFalse
           else
             Aorai_option.abort
               "specification is inconsistent: trying to call %a and \
                return from %a at the same time."
             Kernel_function.pretty kf2 Kernel_function.pretty kf1
         | EReturn kf1, (ECOR kf2 | EReturn kf2)
-          when Kernel_function.equal kf1 kf2 -> event::tl, cond
-        | EReturn _, EReturn _ -> ENone::tl, TFalse
-        | EReturn _, ECOR _ -> ENone::tl, TFalse
-        | EReturn _, EMulti -> ENone::tl, TFalse
+          when Kernel_function.equal kf1 kf2 -> (event::tl, snd env), cond
+        | EReturn _, EReturn _ -> (ENone::tl, snd env), TFalse
+        | EReturn _, ECOR _ -> (ENone::tl, snd env), TFalse
+        | EReturn _, EMulti -> (ENone::tl, snd env), TFalse
         | (EMulti | ECOR _), _ -> assert false
           (* These are compound event. They cannot be found as individual ones*)
 
 let merge_current_event env1 env2 cond1 cond2 =
-  assert (List.tl env1 == List.tl env2);
-  let old_env = List.tl env2 in
-  match (List.hd env1, List.hd env2) with
+  assert (List.tl (fst env1) == List.tl (fst env2));
+  let old_env = List.tl (fst env2) in
+  match (List.hd (fst env1), List.hd (fst env2)) with
       | ENone, _ -> env2, tor cond1 cond2
       | _, ENone -> env1, tor cond1 cond2
       | ECall(kf1,_,_), ECall(kf2,_,_)
         when Kernel_function.equal kf1 kf2 -> env2,  tor cond1 cond2
-      | ECall _, ECall _ -> EMulti::old_env, tor cond1 cond2
+      | ECall _, ECall _ -> (EMulti::old_env, snd env2), tor cond1 cond2
       | ECall _, EMulti -> env2, tor cond1 cond2
       | ECall (kf1,_,_), ECOR kf2 when Kernel_function.equal kf1 kf2 ->
         env2, tor cond1 cond2
       | ECall (kf1,_,_), EReturn kf2 when Kernel_function.equal kf1 kf2 ->
-        ECOR kf1 :: old_env, tor cond1 cond2
-      | ECall _, (ECOR _ | EReturn _) -> EMulti :: old_env, tor cond1 cond2
+        (ECOR kf1 :: old_env, snd env2), tor cond1 cond2
+      | ECall _, (ECOR _ | EReturn _) -> (EMulti :: old_env, snd env2), tor cond1 cond2
       | EReturn kf1, ECall (kf2,_,_) when Kernel_function.equal kf1 kf2 ->
-        ECOR kf1 :: old_env, tor cond1 cond2
-      | EReturn _, ECall _  -> EMulti :: old_env, tor cond1 cond2
+        (ECOR kf1 :: old_env, snd env2), tor cond1 cond2
+      | EReturn _, ECall _  -> (EMulti :: old_env, snd env2), tor cond1 cond2
       | EReturn kf1, EReturn kf2 when Kernel_function.equal kf1 kf2 ->
         env2, tor cond1 cond2
-      | EReturn _, EReturn _ -> EMulti :: old_env, tor cond1 cond2
+      | EReturn _, EReturn _ -> (EMulti :: old_env, snd env2), tor cond1 cond2
       | EReturn _, EMulti -> env2, tor cond1 cond2
       | EReturn kf1, ECOR kf2 when Kernel_function.equal kf1 kf2 ->
         env2, tor cond1 cond2
       | EReturn _, ECOR _ ->
-        EMulti :: old_env, tor cond1 cond2
+        (EMulti :: old_env, snd env2), tor cond1 cond2
       | ECOR kf1, (ECall(kf2,_,_) | EReturn kf2 | ECOR kf2)
         when Kernel_function.equal kf1 kf2 -> env1, tor cond1 cond2
       | ECOR _, (ECall _ | EReturn _ | ECOR _) ->
-        EMulti :: old_env, tor cond1 cond2
+        (EMulti :: old_env, snd env2), tor cond1 cond2
       | ECOR _, EMulti -> env2, tor cond1 cond2
       | EMulti, (ECall _ | EReturn _ | ECOR _) -> env1, tor cond1 cond2
-      | EMulti, EMulti -> EMulti::old_env, tor cond1 cond2
+      | EMulti, EMulti -> (EMulti::old_env, snd env2), tor cond1 cond2
 
 let get_bindings st my_var =
   let my_lval = TVar my_var, TNoOffset in
@@ -568,9 +579,11 @@ let check_one top info counter s =
       Some (Logic_const.term (TLval (TResult rt,TNoOffset)) (Ctype rt))
     | ECOR _ | EReturn _ | EMulti | ENone -> None
 
+(*TODO add_in_env*)
+
 let find_in_env env counter s =
   let current, stack =
-    match env with
+    match (fst env) with
       | current::stack -> current, stack
       | [] -> Aorai_option.fatal "Empty type-checking environment"
   in
@@ -643,7 +656,7 @@ let find_prm_in_env env ?tr counter f x =
              it in an aux variable or array here.
            *)
           env, Logic_const.tvar (Cil.cvar_to_lvar vi), cond
-    in treat_env true env
+    in treat_env true (fst env)
   end
 
 module C_logic_env =
@@ -689,6 +702,10 @@ let type_expr env ?tr ?current e =
         PVar s ->
           let var = find_in_env env current s in
           env, var, cond
+          (*TODO*)
+      | AVar s ->
+        let var = find_in_env env current s in
+        env, var, cond
       | PPrm(f,x) -> find_prm_in_env env ?tr current f x
       | PCst (Logic_ptree.IntConstant s) ->
         let e = Cil.parseIntLogic ~loc s in
@@ -873,6 +890,7 @@ let type_cond needs_pebble env tr cond =
   let current = if needs_pebble then Some tr.stop else None in
   let rec aux pos env =
     function
+      | AfVar (s, e) -> (fst env, StringMap.add s e (snd env)), cond
       | PRel(rel,e1,e2) ->
         let env, e1, c1 = type_expr env ~tr ?current e1 in
         let env, e2, c2 = type_expr env ~tr ?current e2 in
@@ -921,7 +939,7 @@ let type_cond needs_pebble env tr cond =
         if pos then add_current_event (EReturn kf) env (TReturn kf)
         else env, TReturn kf
   in
-  aux true (ENone::env) cond
+  aux true (ENone::(fst env), snd env) (*cond*)
 
 module Reject_state =
   State_builder.Option_ref(Aorai_state)
@@ -1436,8 +1454,8 @@ let type_cond_auto (st,tr as auto) =
       trans;
     let add_reject =
       if needs_reject then
-        (List.filter 
-           (fun x -> not (Aorai_state.equal tr.start x || 
+        (List.filter
+           (fun x -> not (Aorai_state.equal tr.start x ||
                             Aorai_state.equal tr.stop x))
            intermediate_states) @ add_reject
       else add_reject
@@ -1458,7 +1476,7 @@ let type_cond_auto (st,tr as auto) =
    *)
   let (states, transitions as auto) =
     match Reject_state.get_option () with
-      | Some state -> 
+      | Some state ->
           (states, (new_trans state state (TTrue,[])):: transitions)
       | None -> auto
   in
@@ -1776,14 +1794,14 @@ let merge_bindings tbl1 tbl2 =
         | None, None -> None
         | Some tbl, None | None, Some tbl ->
             Some
-              (Cil_datatype.Term.Map.merge 
+              (Cil_datatype.Term.Map.merge
                  (merge_range loc) tbl (unchanged loc))
         | Some tbl1, Some tbl2 ->
           Some (Cil_datatype.Term.Map.merge (merge_range loc) tbl1 tbl2)
   in
   Cil_datatype.Term.Map.merge merge_vals tbl1 tbl2
 
-module End_state = 
+module End_state =
   Aorai_state.Map.Make(Datatype.Triple(Aorai_state.Set)(Aorai_state.Set)(Vals))
 
 type end_state = End_state.t
@@ -1805,7 +1823,7 @@ let pretty_end_state start fmt tbl =
         start.Promelaast.name stop.Promelaast.name;
       Aorai_state.Set.iter
         (fun state ->
-          Format.fprintf fmt "    %s -> %s@\n" 
+          Format.fprintf fmt "    %s -> %s@\n"
             start.Promelaast.name
             state.Promelaast.name)
         fst;
@@ -1850,7 +1868,7 @@ let included_state tbl1 tbl2 =
                 Cil_datatype.Term.Map.iter
                   (fun loc range1 ->
                     let range2 = Cil_datatype.Term.Map.find loc bindings2 in
-                    if not 
+                    if not
                       (included_range range1 range2) then raise Not_found)
                   bindings1)
               tbl1)
@@ -1860,7 +1878,7 @@ let included_state tbl1 tbl2 =
   with Not_found -> false
 
 let merge_end_state tbl1 tbl2 =
-  let merge_stop_state _ (fst1, last1, tbl1) (fst2, last2, tbl2) = 
+  let merge_stop_state _ (fst1, last1, tbl1) (fst2, last2, tbl2) =
     let fst = Aorai_state.Set.union fst1 fst2 in
     let last = Aorai_state.Set.union last1 last2 in
     let tbl = merge_bindings tbl1 tbl2 in
@@ -1872,12 +1890,12 @@ let merge_state tbl1 tbl2 =
   let merge_state _ = merge_end_state in
   Aorai_state.Map.merge (Extlib.merge_opt merge_state) tbl1 tbl2
 
-module Pre_state = 
+module Pre_state =
   Kernel_function.Make_Table
     (Case_state)
     (struct
         let name = "Data_for_aorai.Pre_state"
-        let dependencies = 
+        let dependencies =
           [ Ast.self; Aorai_option.Ya.self; Aorai_option.Ltl_File.self;
             Aorai_option.To_Buchi.self; Aorai_option.Deterministic.self ]
         let size = 17
@@ -1890,7 +1908,7 @@ let set_kf_init_state kf state =
 
 let dkey = Aorai_option.register_category "dataflow"
 
-let replace_kf_init_state kf state = 
+let replace_kf_init_state kf state =
   Aorai_option.debug ~dkey
     "Replacing pre-state of %a:@\n  @[%a@]"
     Kernel_function.pretty kf pretty_state state;
@@ -1901,12 +1919,12 @@ let get_kf_init_state kf =
     Pre_state.find kf
   with Not_found -> Aorai_state.Map.empty
 
-module Post_state = 
+module Post_state =
   Kernel_function.Make_Table
     (Case_state)
     (struct
         let name = "Data_for_aorai.Post_state"
-        let dependencies = 
+        let dependencies =
           [ Ast.self; Aorai_option.Ya.self; Aorai_option.Ltl_File.self;
             Aorai_option.To_Buchi.self; Aorai_option.Deterministic.self ]
         let size = 17
@@ -1973,26 +1991,26 @@ let get_loop_invariant_state stmt =
 
 let pretty_pre_state fmt =
   Pre_state.iter
-    (fun kf state -> 
+    (fun kf state ->
       Format.fprintf fmt "Function %a:@\n  @[%a@]@\n"
         Kernel_function.pretty kf pretty_state state)
 
 let pretty_post_state fmt =
   Post_state.iter
-    (fun kf state -> 
+    (fun kf state ->
       Format.fprintf fmt "Function %a:@\n  @[%a@]@\n"
         Kernel_function.pretty kf pretty_state state)
 
 let pretty_loop_init fmt =
   Loop_init_state.iter
-    (fun stmt state -> 
+    (fun stmt state ->
       let kf = Kernel_function.find_englobing_kf stmt in
       Format.fprintf fmt "Function %a, sid %d:@\n  @[%a@]@\n"
         Kernel_function.pretty kf stmt.sid pretty_state state)
 
 let pretty_loop_invariant fmt =
   Loop_invariant_state.iter
-    (fun stmt state -> 
+    (fun stmt state ->
       let kf = Kernel_function.find_englobing_kf stmt in
       Format.fprintf fmt "Function %a, sid %d:@\n  @[%a@]@\n"
         Kernel_function.pretty kf stmt.sid pretty_state state)
@@ -2009,8 +2027,8 @@ let removeUnusedTransitionsAndStates () =
   (* Step 1 : computation of reached states and crossed transitions *)
   let treat_one_state state map set =
     Aorai_state.Map.fold
-      (fun state (fst, last, _) set -> 
-          Aorai_state.Set.add state 
+      (fun state (fst, last, _) set ->
+          Aorai_state.Set.add state
             (Aorai_state.Set.union last
                (Aorai_state.Set.union fst set)))
       map
@@ -2026,7 +2044,7 @@ let removeUnusedTransitionsAndStates () =
     raise Empty_automaton;
   (* Step 2 : computation of translation tables *)
   let state_list =
-    List.sort 
+    List.sort
       (fun x y -> Datatype.String.compare x.Promelaast.name y.Promelaast.name)
       (Aorai_state.Set.elements reached_states)
   in
@@ -2061,8 +2079,8 @@ let removeUnusedTransitionsAndStates () =
 
   let rewrite_state state =
     let rewrite_set set =
-      Aorai_state.Set.fold 
-        (fun s set -> Aorai_state.Set.add (new_state s) set) 
+      Aorai_state.Set.fold
+        (fun s set -> Aorai_state.Set.add (new_state s) set)
         set Aorai_state.Set.empty
     in
     let rewrite_bindings (fst_states, last_states, bindings) =
@@ -2084,7 +2102,7 @@ let removeUnusedTransitionsAndStates () =
   in
   Pre_state.iter (fun kf state -> Pre_state.replace kf (rewrite_state state));
   Post_state.iter (fun kf state -> Post_state.replace kf (rewrite_state state));
-  Loop_init_state.iter 
+  Loop_init_state.iter
     (fun s state -> Loop_init_state.replace s (rewrite_state state));
   Loop_invariant_state.iter
     (fun s state -> Loop_invariant_state.replace s (rewrite_state state))

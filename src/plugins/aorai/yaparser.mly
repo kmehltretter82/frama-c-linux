@@ -306,7 +306,7 @@ single_cond:
   | FALSE { PFalse }
   /*TODO*/
   | NOT single_cond { match $2 with
-      | VAR IDENTIFIER AFF logic_relation -> failwith "Not corresponding to program"
+      | AfVar(_, _) -> Aorai_option.error Parsing.symbol_end_pos "Not corresponding to program"
       | _ -> PNot $2 }
   | single_cond AND single_cond { PAnd ($1,$3) }
   | single_cond OR single_cond { POr ($1,$3) }
