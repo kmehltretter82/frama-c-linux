@@ -48,8 +48,10 @@ open Cil_types
 open Cil
 module H = Hashtbl
 
-(* Set on the command-line: *)
+(* Used by external plug-ins: *)
 let keepUnused = ref false
+
+(* Possibly no longer used: *)
 let rmUnusedInlines = ref false
 let rmUnusedStatic = ref false
 
@@ -760,9 +762,7 @@ let removeUnmarked isRoot file =
 
 type rootsFilter = global -> bool
 
-let isDefaultRoot = isExportedRoot
-
-let removeUnusedTemps ?(isRoot : rootsFilter = isDefaultRoot) file =
+let removeUnusedTemps ?(isRoot : rootsFilter = isExportedRoot) file =
   if not !keepUnused then
     begin
       Kernel.debug ~dkey "Removing unused temporaries" ;
@@ -772,8 +772,8 @@ let removeUnusedTemps ?(isRoot : rootsFilter = isDefaultRoot) file =
 
       (* build up the root set *)
       let isRoot global =
-	isPragmaRoot keepers global ||
-	isRoot global
+        isPragmaRoot keepers global ||
+        isRoot global
       in
 
       (* mark everything reachable from the global roots *)
@@ -785,12 +785,12 @@ let removeUnusedTemps ?(isRoot : rootsFilter = isDefaultRoot) file =
 
       (* print which original source variables were removed *)
       if false && removedLocals != [] then
-	let count = List.length removedLocals in
-	if count > 2000 then
-	  (Kernel.warning "%d unused local variables removed" count)
-	else
-	  (Kernel.warning "%d unused local variables removed:@!%a"
-	     count (Pretty_utils.pp_list ~sep:",@," Format.pp_print_string) removedLocals)
+        let count = List.length removedLocals in
+        if count > 2000 then
+          (Kernel.warning "%d unused local variables removed" count)
+        else
+          (Kernel.warning "%d unused local variables removed:@!%a"
+             count (Pretty_utils.pp_list ~sep:",@," Format.pp_print_string) removedLocals)
     end
 
 (*

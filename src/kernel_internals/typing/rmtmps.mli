@@ -76,7 +76,6 @@
 
 
 type rootsFilter = Cil_types.global -> bool
-val isDefaultRoot : rootsFilter
 val isExportedRoot : rootsFilter
 val isCompleteProgramRoot : rootsFilter
 
