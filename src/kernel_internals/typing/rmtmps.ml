@@ -59,38 +59,38 @@ let rmUnusedStatic = ref false
  *
  *  Clearing of "referenced" bits
  *
- *)
+*)
 
 
 let clearReferencedBits file =
   let considerGlobal global =
     match global with
     | GType (info, _) ->
-	info.treferenced <- false
+      info.treferenced <- false
 
     | GEnumTag (info, _)
     | GEnumTagDecl (info, _) ->
-	Kernel.debug ~dkey "clearing mark: %a" Cil_printer.pp_global global;
-	info.ereferenced <- false
+      Kernel.debug ~dkey "clearing mark: %a" Cil_printer.pp_global global;
+      info.ereferenced <- false
 
     | GCompTag (info, _)
     | GCompTagDecl (info, _) ->
-	info.creferenced <- false
+      info.creferenced <- false
 
     | GVar (vi, _, _)
     | GFunDecl (_, vi, _)
     | GVarDecl (vi, _) ->
-	vi.vreferenced <- false
+      vi.vreferenced <- false
 
     | GFun ({svar = info} as func, _) ->
-	info.vreferenced <- false;
-	let clearMark local =
-	  local.vreferenced <- false
-	in
-	List.iter clearMark func.slocals
+      info.vreferenced <- false;
+      let clearMark local =
+        local.vreferenced <- false
+      in
+      List.iter clearMark func.slocals
 
     | _ ->
-	()
+      ()
   in
   iterGlobals file considerGlobal
 
@@ -99,18 +99,18 @@ let clearReferencedBits file =
  *
  *  Scanning and categorization of pragmas
  *
- *)
+*)
 
 
 (* collections of names of things to keep *)
 type collection = (string, unit) H.t
 type keepers = {
-    typedefs : collection;
-    enums : collection;
-    structs : collection;
-    unions : collection;
-    defines : collection;
-  }
+  typedefs : collection;
+  enums : collection;
+  structs : collection;
+  unions : collection;
+  defines : collection;
+}
 
 
 (* rapid transfer of control when we find a malformed pragma *)
@@ -119,7 +119,7 @@ exception Bad_pragma
 (* CIL and CCured define several pragmas which prevent removal of
  * various global varinfos.  Here we scan for those pragmas and build
  * up collections of the corresponding varinfos' names.
- *)
+*)
 
 let categorizePragmas file =
 
@@ -140,57 +140,57 @@ let categorizePragmas file =
     in
 
     function
-      | GPragma (Attr ("cilnoremove" as directive, args), (location,_)) ->
-	  (* a very flexible pragma: can retain typedefs, enums,
-	   * structs, unions, or globals (functions or variables) *)
-	  begin
-	    let processArg arg =
-	      try
-		match arg with
-		| AStr specifier ->
-		    (* isolate and categorize one varinfo name *)
-		    let collection, name =
-		      (* Two words denotes a typedef, enum, struct, or
-		       * union, as in "type foo" or "enum bar".  A
-		       * single word denotes a global function or
-		       * variable. *)
-		      let whitespace = Str.regexp "[ \t]+" in
-		      let words = Str.split whitespace specifier in
-		      match words with
-		      | ["type"; name] ->
-			  keepers.typedefs, name
-		      | ["enum"; name] ->
-			  keepers.enums, name
-		      | ["struct"; name] ->
-			  keepers.structs, name
-		      | ["union"; name] ->
-			  keepers.unions, name
-		      | [name] ->
-			  keepers.defines, name
-		      | _ ->
-			  raise Bad_pragma
-		    in
-		    H.add collection name ()
-		| _ ->
-		    raise Bad_pragma
-	      with Bad_pragma ->
-		badPragma location directive
-	    in
-	    List.iter processArg args
-	  end
-      | GFunDecl (_,v, _) -> begin
-          (* Look for alias attributes, e.g. Linux modules *)
-          match filterAttributes "alias" v.vattr with
-          | [] -> ()  (* ordinary prototype. *)
-          | [ Attr("alias", [AStr othername]) ] ->
-            H.add keepers.defines othername ()
-          | _ ->
-	    Kernel.fatal ~current:true
-	      "Bad alias attribute at %a"
-	      Cil_printer.pp_location (CurrentLoc.get ())
-        end
-      |	_ ->
-	  ()
+    | GPragma (Attr ("cilnoremove" as directive, args), (location,_)) ->
+      (* a very flexible pragma: can retain typedefs, enums,
+       * structs, unions, or globals (functions or variables) *)
+      begin
+        let processArg arg =
+          try
+            match arg with
+            | AStr specifier ->
+              (* isolate and categorize one varinfo name *)
+              let collection, name =
+                (* Two words denotes a typedef, enum, struct, or
+                 * union, as in "type foo" or "enum bar".  A
+                 * single word denotes a global function or
+                 * variable. *)
+                let whitespace = Str.regexp "[ \t]+" in
+                let words = Str.split whitespace specifier in
+                match words with
+                | ["type"; name] ->
+                  keepers.typedefs, name
+                | ["enum"; name] ->
+                  keepers.enums, name
+                | ["struct"; name] ->
+                  keepers.structs, name
+                | ["union"; name] ->
+                  keepers.unions, name
+                | [name] ->
+                  keepers.defines, name
+                | _ ->
+                  raise Bad_pragma
+              in
+              H.add collection name ()
+            | _ ->
+              raise Bad_pragma
+          with Bad_pragma ->
+            badPragma location directive
+        in
+        List.iter processArg args
+      end
+    | GFunDecl (_,v, _) -> begin
+        (* Look for alias attributes, e.g. Linux modules *)
+        match filterAttributes "alias" v.vattr with
+        | [] -> ()  (* ordinary prototype. *)
+        | [ Attr("alias", [AStr othername]) ] ->
+          H.add keepers.defines othername ()
+        | _ ->
+          Kernel.fatal ~current:true
+            "Bad alias attribute at %a"
+            Cil_printer.pp_location (CurrentLoc.get ())
+      end
+    | _ ->
+      ()
   in
   iterGlobals file considerPragma;
   keepers
@@ -201,27 +201,27 @@ let categorizePragmas file =
  *
  *  Root collection from pragmas
  *
- *)
+*)
 
 
 let isPragmaRoot keepers = function
   | GType ({tname = name}, _) ->
-      H.mem keepers.typedefs name
+    H.mem keepers.typedefs name
   | GEnumTag ({ename = name}, _)
   | GEnumTagDecl ({ename = name}, _) ->
-      H.mem keepers.enums name
+    H.mem keepers.enums name
   | GCompTag ({cname = name; cstruct = structure}, _)
   | GCompTagDecl ({cname = name; cstruct = structure}, _) ->
-      let collection = if structure then keepers.structs else keepers.unions in
-      H.mem collection name
+    let collection = if structure then keepers.structs else keepers.unions in
+    H.mem collection name
   | GVar ({vname = name; vattr = attrs}, _, _)
   | GVarDecl ({vname = name; vattr = attrs}, _)
   | GFunDecl (_,{vname = name; vattr = attrs}, _)
   | GFun ({svar = {vname = name; vattr = attrs}}, _) ->
-      H.mem keepers.defines name ||
-      hasAttribute "used" attrs
+    H.mem keepers.defines name ||
+    hasAttribute "used" attrs
   | _ ->
-      false
+    false
 
 
 
@@ -229,14 +229,14 @@ let isPragmaRoot keepers = function
  *
  *  Common root collecting utilities
  *
- *)
+*)
 (*TODO:remove
-let traceRoot _reason _global =
-(*  trace (dprintf "root (%s): %a@!" reason d_shortglobal global);*)
+  let traceRoot _reason _global =
+  (*  trace (dprintf "root (%s): %a@!" reason d_shortglobal global);*)
   true
 
-let traceNonRoot _reason _global =
-(*  trace (dprintf "non-root (%s): %a@!" reason d_shortglobal global);*)
+  let traceNonRoot _reason _global =
+  (*  trace (dprintf "non-root (%s): %a@!" reason d_shortglobal global);*)
   false
 *)
 let hasExportingAttribute funvar =
@@ -253,7 +253,7 @@ let hasExportingAttribute funvar =
  *
  *  Root collection from external linkage
  *
- *)
+*)
 
 
 (* Exported roots are those global varinfos which are visible to the
@@ -266,43 +266,43 @@ let hasExportingAttribute funvar =
  * - the function named "main"
  * gcc incorrectly (according to C99) makes inline functions visible to
  * the linker.  So we can only remove inline functions on MSVC.
- *)
+*)
 
 let isExportedRoot global =
   let name, result, reason = match global with
-  | GVar ({vstorage = Static} as v, _, _) when
-      Cil.hasAttribute "FC_BUILTIN" v.vattr ->
-    v.vname, true, "FC_BUILTIN attribute"
-  | GVar ({vstorage = Static; vname}, _, _) -> vname, false, "static variable"
-  | GVar (v,_,_) ->
-    v.vname, true, "non-static variable"
-  | GFun ({svar = v}, _) -> begin
-    if hasExportingAttribute v then
-      v.vname,true, "constructor or destructor function"
-    else if v.vstorage = Static then
-      v.vname, not !rmUnusedStatic, "static function"
-    else if v.vinline && v.vstorage != Extern
-         && (Cil.msvcMode () || !rmUnusedInlines) then
-      v.vname, false, "inline function"
-    else
-      v.vname, true, "other function"
-  end
-  | GFunDecl(_,v,_) when hasAttribute "alias" v.vattr ->
-    v.vname, true, "has GCC alias attribute"
-  | GFunDecl(_,v,_) | GVarDecl(v,_) when hasAttribute "FC_BUILTIN" v.vattr ->
-    v.vname, true, "has FC_BUILTIN attribute"
-  | GAnnot _ -> "", true, "global annotation"
-  | GType (t, _) when
-    Cil.hasAttribute "FC_BUILTIN" (Cil.typeAttr t.ttype) ->
-    t.tname, true, "has FC_BUILTIN attribute"
-  | GCompTag (c,_) | GCompTagDecl (c,_) when
-      Cil.hasAttribute "FC_BUILTIN" c.cattr ->
-    c.cname, true, "has FC_BUILTIN attribute"
-  | GEnumTag (e, _) | GEnumTagDecl (e,_) when
-      Cil.hasAttribute "FC_BUILTIN" e.eattr ->
-    e.ename, true, "has FC_BUILTIN attribute"
-  | _ ->
-    "", false, "neither function nor variable nor annotation"
+    | GVar ({vstorage = Static} as v, _, _) when
+        Cil.hasAttribute "FC_BUILTIN" v.vattr ->
+      v.vname, true, "FC_BUILTIN attribute"
+    | GVar ({vstorage = Static; vname}, _, _) -> vname, false, "static variable"
+    | GVar (v,_,_) ->
+      v.vname, true, "non-static variable"
+    | GFun ({svar = v}, _) -> begin
+        if hasExportingAttribute v then
+          v.vname,true, "constructor or destructor function"
+        else if v.vstorage = Static then
+          v.vname, not !rmUnusedStatic, "static function"
+        else if v.vinline && v.vstorage != Extern
+                && (Cil.msvcMode () || !rmUnusedInlines) then
+          v.vname, false, "inline function"
+        else
+          v.vname, true, "other function"
+      end
+    | GFunDecl(_,v,_) when hasAttribute "alias" v.vattr ->
+      v.vname, true, "has GCC alias attribute"
+    | GFunDecl(_,v,_) | GVarDecl(v,_) when hasAttribute "FC_BUILTIN" v.vattr ->
+      v.vname, true, "has FC_BUILTIN attribute"
+    | GAnnot _ -> "", true, "global annotation"
+    | GType (t, _) when
+        Cil.hasAttribute "FC_BUILTIN" (Cil.typeAttr t.ttype) ->
+      t.tname, true, "has FC_BUILTIN attribute"
+    | GCompTag (c,_) | GCompTagDecl (c,_) when
+        Cil.hasAttribute "FC_BUILTIN" c.cattr ->
+      c.cname, true, "has FC_BUILTIN attribute"
+    | GEnumTag (e, _) | GEnumTagDecl (e,_) when
+        Cil.hasAttribute "FC_BUILTIN" e.eattr ->
+      e.ename, true, "has FC_BUILTIN attribute"
+    | _ ->
+      "", false, "neither function nor variable nor annotation"
   in
   Kernel.debug
     ~dkey "isExportedRoot %s -> %B, %s"  name result reason;
@@ -314,25 +314,25 @@ let isExportedRoot global =
  *
  *  Root collection for complete programs
  *
- *)
+*)
 
 
 (* Exported roots are "main()" and functions bearing a "constructor"
  * or "destructor" attribute.  These are the only things which must be
  * retained in a complete program.
- *)
+*)
 
 let isCompleteProgramRoot global =
   let result = match global with
-  | GFun ({svar = {vname = "main"; vstorage = vstorage}}, _) ->
+    | GFun ({svar = {vname = "main"; vstorage = vstorage}}, _) ->
       vstorage <> Static
-  | GFun (fundec, _)
-    when hasExportingAttribute fundec.svar ->
+    | GFun (fundec, _)
+      when hasExportingAttribute fundec.svar ->
       true
-  | _ ->
+    | _ ->
       false
   in
-(*  trace (dprintf "complete program root -> %b for %a@!" result d_shortglobal global);*)
+  (*  trace (dprintf "complete program root -> %b for %a@!" result d_shortglobal global);*)
   result
 
 
@@ -340,7 +340,7 @@ let isCompleteProgramRoot global =
  *
  *  Transitive reachability closure from roots
  *
- *)
+*)
 
 
 (* This visitor recursively marks all reachable types and variables as used. *)
@@ -351,26 +351,26 @@ class markReachableVisitor
 
   method! vglob = function
     | GType (typeinfo, _) ->
-	typeinfo.treferenced <- true;
-	DoChildren
+      typeinfo.treferenced <- true;
+      DoChildren
     | GCompTag (compinfo, _)
     | GCompTagDecl (compinfo, _) ->
-	compinfo.creferenced <- true;
-	DoChildren
+      compinfo.creferenced <- true;
+      DoChildren
     | GEnumTag (enuminfo, _)
     | GEnumTagDecl (enuminfo, _) ->
-	enuminfo.ereferenced <- true;
-	DoChildren
+      enuminfo.ereferenced <- true;
+      DoChildren
     | GVar (varinfo, _, _)
     | GVarDecl (varinfo, _)
     | GFunDecl (_,varinfo, _)
     | GFun ({svar = varinfo}, _) ->
-	if not (hasAttribute "FC_BUILTIN" varinfo.vattr) then
-          varinfo.vreferenced <- true;
-	DoChildren
+      if not (hasAttribute "FC_BUILTIN" varinfo.vattr) then
+        varinfo.vreferenced <- true;
+      DoChildren
     | GAnnot _ -> DoChildren
     | _ ->
-	SkipChildren
+      SkipChildren
 
   method! vstmt s =
     match s.skind with
@@ -389,116 +389,116 @@ class markReachableVisitor
 
   method! vinst = function
     | Asm (_, tmpls, _, _) when Cil.msvcMode () ->
-          (* If we have inline assembly on MSVC, we cannot tell which locals
-           * are referenced. Keep them all *)
-        (match !currentFunc with
-          Some fd ->
-            List.iter (fun v ->
-              let vre = Str.regexp_string (Str.quote v.vname) in
-              if List.exists (fun tmp ->
-                try ignore (Str.search_forward vre tmp 0); true
-                with Not_found -> false)
-                  tmpls
-              then
-                v.vreferenced <- true) fd.slocals
-        | _ -> assert false);
-        DoChildren
+      (* If we have inline assembly on MSVC, we cannot tell which locals
+       * are referenced. Keep them all *)
+      (match !currentFunc with
+         Some fd ->
+         List.iter (fun v ->
+             let vre = Str.regexp_string (Str.quote v.vname) in
+             if List.exists (fun tmp ->
+                 try ignore (Str.search_forward vre tmp 0); true
+                 with Not_found -> false)
+                 tmpls
+             then
+               v.vreferenced <- true) fd.slocals
+       | _ -> assert false);
+      DoChildren
     | _ -> DoChildren
 
   method! vvrbl v =
     if not v.vreferenced then
       begin
-	let name = v.vname in
-	if v.vglob then
-	  Kernel.debug ~dkey "marking transitive use: global %s" name
-	else
-	  Kernel.debug ~dkey "marking transitive use: local %s" name;
+        let name = v.vname in
+        if v.vglob then
+          Kernel.debug ~dkey "marking transitive use: global %s" name
+        else
+          Kernel.debug ~dkey "marking transitive use: local %s" name;
 
         (* If this is a global, we need to keep everything used in its
-	 * definition and declarations. *)
+         * definition and declarations. *)
         v.vreferenced <- true;
-	if v.vglob then
-	  begin
-	    Kernel.debug ~dkey "descending: global %s" name;
-	    let descend global =
-	      ignore (visitCilGlobal (self :> cilVisitor) global)
-	    in
-	    let globals = Hashtbl.find_all globalMap name in
-	    List.iter descend globals
-	  end
+        if v.vglob then
+          begin
+            Kernel.debug ~dkey "descending: global %s" name;
+            let descend global =
+              ignore (visitCilGlobal (self :> cilVisitor) global)
+            in
+            let globals = Hashtbl.find_all globalMap name in
+            List.iter descend globals
+          end
       end;
     SkipChildren
 
   method private mark_enum e =
     if not e.ereferenced then
       begin
-	Kernel.debug ~dkey "marking transitive use: enum %s\n" e.ename;
-	e.ereferenced <- true;
-	self#visitAttrs e.eattr;
+        Kernel.debug ~dkey "marking transitive use: enum %s\n" e.ename;
+        e.ereferenced <- true;
+        self#visitAttrs e.eattr;
         (* Must visit the value attributed to the enum constants *)
         ignore (visitCilEnumInfo (self:>cilVisitor) e);
       end
-    else 
+    else
       Kernel.debug ~dkey "not marking transitive use: enum %s\n" e.ename;
 
   method! vexpr e =
     match e.enode with
       Const (CEnum {eihost = ei}) -> self#mark_enum ei; DoChildren
     | _ -> DoChildren
-      
+
   method! vterm_node t =
     match t with
       TConst (LEnum {eihost = ei}) -> self#mark_enum ei; DoChildren
     | _ -> DoChildren
-      
+
   method private visitAttrs attrs =
     ignore (visitCilAttributes (self :> cilVisitor) attrs)
-      
+
   method! vtype typ =
     (match typ with
-      | TEnum(e, attrs) ->
-	  self#visitAttrs attrs;
-          self#mark_enum e
-            
-      | TComp(c, _, attrs) ->
-	  let old = c.creferenced in
-          if not old then
-            begin
-	      Kernel.debug ~dkey "marking transitive use: compound %s\n" 
-                c.cname;
-	      c.creferenced <- true;
+     | TEnum(e, attrs) ->
+       self#visitAttrs attrs;
+       self#mark_enum e
 
-              (* to recurse, we must ask explicitly *)
-	      let recurse f = ignore (self#vtype f.ftype) in
-	      List.iter recurse c.cfields;
-	      self#visitAttrs attrs;
-	      self#visitAttrs c.cattr
-	    end;
+     | TComp(c, _, attrs) ->
+       let old = c.creferenced in
+       if not old then
+         begin
+           Kernel.debug ~dkey "marking transitive use: compound %s\n"
+             c.cname;
+           c.creferenced <- true;
 
-      | TNamed(ti, attrs) ->
-	  let old = ti.treferenced in
-          if not old then
-	    begin
-	      Kernel.debug ~dkey "marking transitive use: typedef %s\n" 
-                ti.tname;
-	      ti.treferenced <- true;
+           (* to recurse, we must ask explicitly *)
+           let recurse f = ignore (self#vtype f.ftype) in
+           List.iter recurse c.cfields;
+           self#visitAttrs attrs;
+           self#visitAttrs c.cattr
+         end;
 
-	      (* recurse deeper into the type referred-to by the typedef *)
-	      (* to recurse, we must ask explicitly *)
-	      ignore (self#vtype ti.ttype);
-	      self#visitAttrs attrs
-	    end;
+     | TNamed(ti, attrs) ->
+       let old = ti.treferenced in
+       if not old then
+         begin
+           Kernel.debug ~dkey "marking transitive use: typedef %s\n"
+             ti.tname;
+           ti.treferenced <- true;
 
-      | TVoid a | TInt (_,a) | TFloat (_,a) | TBuiltin_va_list a ->
-         self#visitAttrs a
-      | TPtr(ty,a) -> ignore (self#vtype ty); self#visitAttrs a
-      | TArray(ty,sz, _, a) ->
-          ignore (self#vtype ty); self#visitAttrs a;
-          Extlib.may (ignore $ (visitCilExpr (self:>cilVisitor))) sz
-      | TFun (ty, args,_,a) ->
-          ignore (self#vtype ty);
-          Extlib.may (List.iter (fun (_,ty,_) -> ignore (self#vtype ty))) args;
-          self#visitAttrs a
+           (* recurse deeper into the type referred-to by the typedef *)
+           (* to recurse, we must ask explicitly *)
+           ignore (self#vtype ti.ttype);
+           self#visitAttrs attrs
+         end;
+
+     | TVoid a | TInt (_,a) | TFloat (_,a) | TBuiltin_va_list a ->
+       self#visitAttrs a
+     | TPtr(ty,a) -> ignore (self#vtype ty); self#visitAttrs a
+     | TArray(ty,sz, _, a) ->
+       ignore (self#vtype ty); self#visitAttrs a;
+       Extlib.may (ignore $ (visitCilExpr (self:>cilVisitor))) sz
+     | TFun (ty, args,_,a) ->
+       ignore (self#vtype ty);
+       Extlib.may (List.iter (fun (_,ty,_) -> ignore (self#vtype ty))) args;
+       self#visitAttrs a
     );
     SkipChildren
 end
@@ -514,9 +514,9 @@ let markReachable file isRoot =
     | GVar (info, _, _)
     | GFunDecl (_,info, _)
     | GVarDecl (info, _) ->
-	Hashtbl.add globalMap info.vname global
+      Hashtbl.add globalMap info.vname global
     | _ ->
-	()
+      ()
   in
   iterGlobals file considerGlobal;
 
@@ -527,14 +527,14 @@ let markReachable file isRoot =
   let visitIfRoot global =
     if isRoot global then
       begin
-(*	trace (dprintf "traversing root global: %a\n" d_shortglobal global);*)
+        (* trace (dprintf "traversing root global: %a\n" d_shortglobal global);*)
         (match global with
-          GFun(fd, _) -> currentFunc := Some fd
-        | _ -> currentFunc := None);
-	ignore (visitCilGlobal visitor global)
+           GFun(fd, _) -> currentFunc := Some fd
+         | _ -> currentFunc := None);
+        ignore (visitCilGlobal visitor global)
       end
     else
-(*      trace (dprintf "skipping non-root global: %a\n" d_shortglobal global)*)
+      (*      trace (dprintf "skipping non-root global: %a\n" d_shortglobal global)*)
       ()
   in
   iterGlobals file visitIfRoot
@@ -553,71 +553,71 @@ let labelsToKeep is_removable ll =
   let rec loop sofar = function
       [] -> sofar, []
     | l :: rest ->
-        let newlabel, keepl =
-          match l with
-          | Case _ | Default _ -> sofar, true
-          | Label (ln, _, _) as lab -> begin
-              match is_removable lab, sofar with
-              | true, ("", _) ->
-                  (* keep this one only if we have no label so far *)
-                  (ln, lab), false
-              | true, _ -> sofar, false
-              | false, (_, lab') when is_removable lab' ->
-                  (* this is an original label; prefer it to temporary or
-                   * missing labels *)
-                  (ln, lab), false
-              | false, _ -> sofar, false
+      let newlabel, keepl =
+        match l with
+        | Case _ | Default _ -> sofar, true
+        | Label (ln, _, _) as lab -> begin
+            match is_removable lab, sofar with
+            | true, ("", _) ->
+              (* keep this one only if we have no label so far *)
+              (ln, lab), false
+            | true, _ -> sofar, false
+            | false, (_, lab') when is_removable lab' ->
+              (* this is an original label; prefer it to temporary or
+               * missing labels *)
+              (ln, lab), false
+            | false, _ -> sofar, false
           end
-        in
-        let newlabel', rest' = loop newlabel rest in
-        newlabel', (if keepl then l :: rest' else rest')
+      in
+      let newlabel', rest' = loop newlabel rest in
+      newlabel', (if keepl then l :: rest' else rest')
   in
   loop ("", Label("", Cil_datatype.Location.unknown, false)) ll
 
 class markUsedLabels is_removable (labelMap: (string, unit) H.t) =
   let keep_label dest =
-  let (ln, _), _ = labelsToKeep is_removable !dest.labels in
-  if ln = "" then
-    Kernel.fatal "Statement has no label:@\n%a" Cil_printer.pp_stmt !dest ;
-  (* Mark it as used *)
-  H.replace labelMap ln ()
-in
-let keep_label_logic = function
-  | FormalLabel _ | BuiltinLabel _ -> ()
-  | StmtLabel dest -> keep_label dest
-in
-object
-  inherit nopCilVisitor
+    let (ln, _), _ = labelsToKeep is_removable !dest.labels in
+    if ln = "" then
+      Kernel.fatal "Statement has no label:@\n%a" Cil_printer.pp_stmt !dest ;
+    (* Mark it as used *)
+    H.replace labelMap ln ()
+  in
+  let keep_label_logic = function
+    | FormalLabel _ | BuiltinLabel _ -> ()
+    | StmtLabel dest -> keep_label dest
+  in
+  object
+    inherit nopCilVisitor
 
-  method! vstmt (s: stmt) =
-    match s.skind with
-      Goto (dest, _) -> keep_label dest; DoChildren
-    | _ -> DoChildren
+    method! vstmt (s: stmt) =
+      match s.skind with
+        Goto (dest, _) -> keep_label dest; DoChildren
+      | _ -> DoChildren
 
-  method! vterm_node t =
-    begin
-      match t with
-      | Tat (_,lab) -> keep_label_logic lab
-      | Tapp(_,labs,_) ->
+    method! vterm_node t =
+      begin
+        match t with
+        | Tat (_,lab) -> keep_label_logic lab
+        | Tapp(_,labs,_) ->
           List.iter keep_label_logic labs
-      | _ -> ()
-    end;
-    DoChildren
+        | _ -> ()
+      end;
+      DoChildren
 
-  method! vpredicate_node t =
-    begin
-      match t with
-      | Pat (_,lab) -> keep_label_logic lab
-      | Papp(_,labs,_) ->
+    method! vpredicate_node t =
+      begin
+        match t with
+        | Pat (_,lab) -> keep_label_logic lab
+        | Papp(_,labs,_) ->
           List.iter keep_label_logic labs
-      | _ -> ()
-    end;
-    DoChildren
+        | _ -> ()
+      end;
+      DoChildren
 
-   (* No need to go into expressions or types *)
-  method! vexpr _ = SkipChildren
-  method! vtype _ = SkipChildren
-                                                        end
+    (* No need to go into expressions or types *)
+    method! vexpr _ = SkipChildren
+    method! vtype _ = SkipChildren
+  end
 
 class removeUnusedLabels is_removable (labelMap: (string, unit) H.t) = object
   inherit nopCilVisitor
@@ -625,16 +625,16 @@ class removeUnusedLabels is_removable (labelMap: (string, unit) H.t) = object
   method! vstmt (s: stmt) =
     let (ln, lab), lrest = labelsToKeep is_removable s.labels in
     s.labels <-
-       (if ln <> "" &&
+      (if ln <> "" &&
           (H.mem labelMap ln || not (is_removable lab))
           (* keep user-provided labels *)
-        then (* We had labels *)
+       then (* We had labels *)
          (lab :: lrest)
        else
          lrest);
     DoChildren
 
-   (* No need to go into expressions or instructions *)
+  (* No need to go into expressions or instructions *)
   method! vexpr _ = SkipChildren
   method! vinst _ = SkipChildren
   method! vtype _ = SkipChildren
@@ -644,7 +644,7 @@ end
  *
  *  Removal of unused varinfos
  *
- *)
+*)
 
 
 (* regular expression matching names of uninteresting locals *)
@@ -694,60 +694,60 @@ let removeUnmarked isRoot file =
 
   let filterGlobal global =
     match global with
-      (* unused global types, variables, and functions are simply removed *)
-      | GType (t, _) ->
-          t.treferenced ||
-          Cil.hasAttribute "FC_BUILTIN" (Cil.typeAttr t.ttype) 
-          || isRoot global
-      | GCompTag (c,_) | GCompTagDecl (c,_) ->
-          c.creferenced ||
-            Cil.hasAttribute "FC_BUILTIN" c.cattr || isRoot global
-      | GEnumTag (e, _) | GEnumTagDecl (e,_) ->
-          e.ereferenced ||
-            Cil.hasAttribute "FC_BUILTIN" e.eattr || isRoot global
-      | GVar (v, _, _) ->
-          v.vreferenced || 
-            Cil.hasAttribute "FC_BUILTIN" v.vattr || isRoot global
-      | GVarDecl (v, _)
-      | GFunDecl (_,v, _)->
-          v.vreferenced ||
-            Cil.hasAttribute "FC_BUILTIN" v.vattr ||
-            (Cil.removeFormalsDecl v; isRoot global)
-       (* keep FC_BUILTIN, as some plug-ins might want to use them later
-          for semi-legitimate reasons. *)
-      | GFun (func, _) ->
-           (* if some generated temp variables are useless, remove them.
-              Keep variables that were already present in the code.
-           *)
-	   let filterLocal local =
-	     if local.vtemp && not local.vreferenced then
-	       begin
-	         (* along the way, record the interesting locals that were removed *)
-	         let name = local.vname in
-	         (Kernel.debug ~dkey "removing local: %s\n" name);
-	         if not (Str.string_match uninteresting name 0) then
-	          removedLocals :=
-                    (func.svar.vname ^ "::" ^ name) :: !removedLocals;
-                 false
-	       end else true
-	   in
-	   func.slocals <- List.filter filterLocal func.slocals;
-           let remove_blocals = object
-             inherit Cil.nopCilVisitor
-             method! vblock b =
-               b.blocals <- List.filter filterLocal b.blocals;
-               DoChildren
-           end
-           in
-           (func.svar.vreferenced 
-            || Cil.hasAttribute "FC_BUILTIN" func.svar.vattr
-            || isRoot global) &&
-             (ignore (visitCilBlock remove_blocals func.sbody);
-              remove_unused_labels func;
-	      true)
+    (* unused global types, variables, and functions are simply removed *)
+    | GType (t, _) ->
+      t.treferenced ||
+      Cil.hasAttribute "FC_BUILTIN" (Cil.typeAttr t.ttype)
+      || isRoot global
+    | GCompTag (c,_) | GCompTagDecl (c,_) ->
+      c.creferenced ||
+      Cil.hasAttribute "FC_BUILTIN" c.cattr || isRoot global
+    | GEnumTag (e, _) | GEnumTagDecl (e,_) ->
+      e.ereferenced ||
+      Cil.hasAttribute "FC_BUILTIN" e.eattr || isRoot global
+    | GVar (v, _, _) ->
+      v.vreferenced ||
+      Cil.hasAttribute "FC_BUILTIN" v.vattr || isRoot global
+    | GVarDecl (v, _)
+    | GFunDecl (_,v, _)->
+      v.vreferenced ||
+      Cil.hasAttribute "FC_BUILTIN" v.vattr ||
+      (Cil.removeFormalsDecl v; isRoot global)
+    (* keep FC_BUILTIN, as some plug-ins might want to use them later
+       for semi-legitimate reasons. *)
+    | GFun (func, _) ->
+      (* if some generated temp variables are useless, remove them.
+         Keep variables that were already present in the code.
+      *)
+      let filterLocal local =
+        if local.vtemp && not local.vreferenced then
+          begin
+            (* along the way, record the interesting locals that were removed *)
+            let name = local.vname in
+            (Kernel.debug ~dkey "removing local: %s\n" name);
+            if not (Str.string_match uninteresting name 0) then
+              removedLocals :=
+                (func.svar.vname ^ "::" ^ name) :: !removedLocals;
+            false
+          end else true
+      in
+      func.slocals <- List.filter filterLocal func.slocals;
+      let remove_blocals = object
+        inherit Cil.nopCilVisitor
+        method! vblock b =
+          b.blocals <- List.filter filterLocal b.blocals;
+          DoChildren
+      end
+      in
+      (func.svar.vreferenced
+       || Cil.hasAttribute "FC_BUILTIN" func.svar.vattr
+       || isRoot global) &&
+      (ignore (visitCilBlock remove_blocals func.sbody);
+       remove_unused_labels func;
+       true)
 
-      (* all other globals are retained *)
-      | _ -> true
+    (* all other globals are retained *)
+    | _ -> true
   in
   file.globals <- List.filter filterGlobal file.globals;
   !removedLocals
@@ -757,7 +757,7 @@ let removeUnmarked isRoot file =
  *
  *  Exported interface
  *
- *)
+*)
 
 
 type rootsFilter = global -> bool
