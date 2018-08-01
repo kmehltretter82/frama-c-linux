@@ -14,9 +14,11 @@ void f(void)
   __gen_e_acsl_at_3 = A;
   __gen_e_acsl_at = A;
   A = 1;
-  F: __gen_e_acsl_at_4 = __gen_e_acsl_at_3;
-     __gen_e_acsl_at_2 = A;
-     A = 2;
+  F: {
+       __gen_e_acsl_at_4 = __gen_e_acsl_at_3;
+       __gen_e_acsl_at_2 = A;
+       A = 2;
+     }
   /*@ assert \at(A,Pre) ≡ 0; */
   __e_acsl_assert(__gen_e_acsl_at == 0,(char *)"Assertion",(char *)"f",
                   (char *)"\\at(A,Pre) == 0",11);
@@ -48,39 +50,44 @@ void g(int *p, int *q)
   *q = 0;
   L1:
   {
-    int __gen_e_acsl_valid_read_3;
-    __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)q,sizeof(int),
+    {
+      int __gen_e_acsl_valid_read_3;
+      __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)q,sizeof(int),
+                                                      (void *)q,
+                                                      (void *)(& q));
+      __e_acsl_assert(__gen_e_acsl_valid_read_3,(char *)"RTE",(char *)"g",
+                      (char *)"mem_access: \\valid_read(q)",28);
+      __gen_e_acsl_at_3 = *q;
+    }
+    {
+      int __gen_e_acsl_valid_read;
+      __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)q,sizeof(int),
                                                     (void *)q,(void *)(& q));
-    __e_acsl_assert(__gen_e_acsl_valid_read_3,(char *)"RTE",(char *)"g",
-                    (char *)"mem_access: \\valid_read(q)",28);
-    __gen_e_acsl_at_3 = *q;
+      __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"g",
+                      (char *)"mem_access: \\valid_read(q)",26);
+      __gen_e_acsl_at = *q;
+    }
+    __e_acsl_initialize((void *)p,sizeof(int));
+    *p = 2;
   }
-  {
-    int __gen_e_acsl_valid_read;
-    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)q,sizeof(int),
-                                                  (void *)q,(void *)(& q));
-    __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"g",
-                    (char *)"mem_access: \\valid_read(q)",26);
-    __gen_e_acsl_at = *q;
-  }
-  __e_acsl_initialize((void *)p,sizeof(int));
-  *p = 2;
   __e_acsl_initialize((void *)(p + 1),sizeof(int));
   *(p + 1) = 3;
   __e_acsl_initialize((void *)q,sizeof(int));
   *q = 1;
   L2:
   {
-    int __gen_e_acsl_valid_read_2;
-    __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(p + __gen_e_acsl_at),
-                                                    sizeof(int),(void *)p,
-                                                    (void *)(& p));
-    __e_acsl_assert(__gen_e_acsl_valid_read_2,(char *)"RTE",(char *)"g",
-                    (char *)"mem_access: \\valid_read(p + __gen_e_acsl_at)",
-                    26);
-    __gen_e_acsl_at_2 = *(p + __gen_e_acsl_at);
+    {
+      int __gen_e_acsl_valid_read_2;
+      __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(p + __gen_e_acsl_at),
+                                                      sizeof(int),(void *)p,
+                                                      (void *)(& p));
+      __e_acsl_assert(__gen_e_acsl_valid_read_2,(char *)"RTE",(char *)"g",
+                      (char *)"mem_access: \\valid_read(p + __gen_e_acsl_at)",
+                      26);
+      __gen_e_acsl_at_2 = *(p + __gen_e_acsl_at);
+    }
+    A = 4;
   }
-  A = 4;
   /*@ assert \at(*(p + \at(*q,L1)),L2) ≡ 2; */
   __e_acsl_assert(__gen_e_acsl_at_2 == 2,(char *)"Assertion",(char *)"g",
                   (char *)"\\at(*(p + \\at(*q,L1)),L2) == 2",26);
