@@ -23,13 +23,14 @@
 open Cil_types
 open Cil
 open Cil_datatype
+open Lscope
 
 let predicate_to_exp_ref
-    : (kernel_function -> Env.t -> predicate -> exp * Env.t) ref
+    : (kernel_function -> Env.t -> predicate -> lscope -> exp * Env.t) ref
     = Extlib.mk_fun "named_predicate_to_exp_ref"
 
 let term_to_exp_ref
-    : (kernel_function -> Env.t -> term -> exp * Env.t) ref
+    : (kernel_function -> Env.t -> term -> lscope -> exp * Env.t) ref
     = Extlib.mk_fun "term_to_exp_ref"
 
 let compute_quantif_guards quantif bounded_vars hyps =
@@ -110,7 +111,7 @@ let () = Typing.compute_quantif_guards_ref := compute_quantif_guards
 module Label_ids = 
   State_builder.Counter(struct let name = "E_ACSL.Label_ids" end)
 
-let convert kf env loc is_forall p bounded_vars hyps goal =
+let convert kf env loc is_forall p bounded_vars hyps goal lscope =
   (* part depending on the kind of quantifications 
      (either universal or existential) *)
   let init_val, found_val, mk_guard = 
@@ -141,7 +142,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
     | [] -> 
       (* innermost loop body: store the result in [res] and go out according
 	 to evaluation of the goal *)
-      let test, env = named_predicate_to_exp kf (Env.push env) goal in
+      let test, env = named_predicate_to_exp kf (Env.push env) goal lscope in
       let then_block = mkBlock [ mkEmptyStmt ~loc () ] in
       let else_block = 
 	(* use a 'goto', not a simple 'break' in order to handle 'forall' with
@@ -217,7 +218,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
       (* build the inner loops and loop body *)
       let body, env = mk_for_loop env tl in
       (* initialize the loop counter to [t1] *)
-      let e1, env = term_to_exp kf (Env.push env) t1 in
+      let e1, env = term_to_exp kf (Env.push env) t1 lscope in
       let init_blk, env =
         Env.pop_and_get
           env
@@ -234,7 +235,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
           (TBinOp(bop2, tlv, { t2 with term_node = t2.term_node } )) Linteger
       in
       Typing.type_term ~use_gmp_opt:false ~ctx:Typing.c_int guard;
-      let guard_exp, env = term_to_exp kf (Env.push env) guard in
+      let guard_exp, env = term_to_exp kf (Env.push env) guard lscope in
       let break_stmt = mkStmt ~valid_sid:true (Break guard_exp.eloc) in
       let guard_blk, env =
 	Env.pop_and_get
@@ -253,7 +254,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
       (* TODO: should check that it does not overflow in the case of the type
          of the loop variable is __declared__ too small. *)
       let tlv_one = t_plus_one ~ty:ctx_one tlv in
-      let incr, env = term_to_exp kf (Env.push env) tlv_one in
+      let incr, env = term_to_exp kf (Env.push env) tlv_one lscope in
       let next_blk, env = 
 	Env.pop_and_get
 	  env
@@ -287,14 +288,16 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
   let env = List.fold_left Env.Logic_binding.remove env bounded_vars in
   res, env
 
-let quantif_to_exp kf env p = 
+let quantif_to_exp kf env p lscope =
+  (* TODO: handle the logical scope *)
+  ignore lscope;
   let loc = p.pred_loc in
   match p.pred_content with
   | Pforall(bounded_vars, { pred_content = Pimplies(hyps, goal) }) -> 
-    convert kf env loc true p bounded_vars hyps goal
+    convert kf env loc true p bounded_vars hyps goal lscope
   | Pforall _ -> Error.not_yet "unguarded \\forall quantification"
   | Pexists(bounded_vars, { pred_content = Pand(hyps, goal) }) -> 
-    convert kf env loc false p bounded_vars hyps goal
+    convert kf env loc false p bounded_vars hyps goal lscope
   | Pexists _ -> Error.not_yet "unguarded \\exists quantification"
   | _ -> assert false
 

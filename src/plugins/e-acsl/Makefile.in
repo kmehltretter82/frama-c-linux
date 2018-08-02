@@ -74,6 +74,7 @@ PLUGIN_CMO:= local_config \
 	dup_functions \
 	interval \
 	typing \
+	lscope \
 	quantif \
 	translate \
 	temporal \
