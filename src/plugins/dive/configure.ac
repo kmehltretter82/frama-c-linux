@@ -67,7 +67,8 @@ fi
 # Plug-in dependencies
 ######################
 
-plugin_require(dive,value,studia)
+plugin_require(dive,value_analysis)
+plugin_require(dive,studia)
 #plugin_use(dive,usable_plugin_but_not_mandatory)
 
 check_plugin_dependencies
