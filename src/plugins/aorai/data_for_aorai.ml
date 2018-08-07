@@ -494,35 +494,35 @@ let merge_current_event env1 env2 cond1 cond2 =
   assert (List.tl (fst env1) == List.tl (fst env2));
   let old_env = List.tl (fst env2) in
   match (List.hd (fst env1), List.hd (fst env2)) with
-      | ENone, _ -> env2, tor cond1 cond2
-      | _, ENone -> env1, tor cond1 cond2
+      | ENone, _ -> env2, (tor cond1 cond2, [])
+      | _, ENone -> env1, (tor cond1 cond2, [])
       | ECall(kf1,_,_), ECall(kf2,_,_)
-        when Kernel_function.equal kf1 kf2 -> env2,  tor cond1 cond2
-      | ECall _, ECall _ -> (EMulti::old_env, snd env2), tor cond1 cond2
-      | ECall _, EMulti -> env2, tor cond1 cond2
+        when Kernel_function.equal kf1 kf2 -> env2,  (tor cond1 cond2, [])
+      | ECall _, ECall _ -> (EMulti::old_env, snd env2), (tor cond1 cond2, [])
+      | ECall _, EMulti -> env2, (tor cond1 cond2, [])
       | ECall (kf1,_,_), ECOR kf2 when Kernel_function.equal kf1 kf2 ->
-        env2, tor cond1 cond2
+        env2, (tor cond1 cond2, [])
       | ECall (kf1,_,_), EReturn kf2 when Kernel_function.equal kf1 kf2 ->
-        (ECOR kf1 :: old_env, snd env2), tor cond1 cond2
-      | ECall _, (ECOR _ | EReturn _) -> (EMulti :: old_env, snd env2), tor cond1 cond2
+        (ECOR kf1 :: old_env, snd env2), (tor cond1 cond2, [])
+      | ECall _, (ECOR _ | EReturn _) -> (EMulti :: old_env, snd env2), (tor cond1 cond2, [])
       | EReturn kf1, ECall (kf2,_,_) when Kernel_function.equal kf1 kf2 ->
-        (ECOR kf1 :: old_env, snd env2), tor cond1 cond2
-      | EReturn _, ECall _  -> (EMulti :: old_env, snd env2), tor cond1 cond2
+        (ECOR kf1 :: old_env, snd env2), (tor cond1 cond2, [])
+      | EReturn _, ECall _  -> (EMulti :: old_env, snd env2), (tor cond1 cond2, [])
       | EReturn kf1, EReturn kf2 when Kernel_function.equal kf1 kf2 ->
-        env2, tor cond1 cond2
-      | EReturn _, EReturn _ -> (EMulti :: old_env, snd env2), tor cond1 cond2
-      | EReturn _, EMulti -> env2, tor cond1 cond2
+        env2, (tor cond1 cond2, [])
+      | EReturn _, EReturn _ -> (EMulti :: old_env, snd env2), (tor cond1 cond2, [])
+      | EReturn _, EMulti -> env2, (tor cond1 cond2, [])
       | EReturn kf1, ECOR kf2 when Kernel_function.equal kf1 kf2 ->
-        env2, tor cond1 cond2
+        env2, (tor cond1 cond2, [])
       | EReturn _, ECOR _ ->
-        (EMulti :: old_env, snd env2), tor cond1 cond2
+        (EMulti :: old_env, snd env2), (tor cond1 cond2, [])
       | ECOR kf1, (ECall(kf2,_,_) | EReturn kf2 | ECOR kf2)
-        when Kernel_function.equal kf1 kf2 -> env1, tor cond1 cond2
+        when Kernel_function.equal kf1 kf2 -> env1, (tor cond1 cond2, [])
       | ECOR _, (ECall _ | EReturn _ | ECOR _) ->
-        (EMulti :: old_env, snd env2), tor cond1 cond2
-      | ECOR _, EMulti -> env2, tor cond1 cond2
-      | EMulti, (ECall _ | EReturn _ | ECOR _) -> env1, tor cond1 cond2
-      | EMulti, EMulti -> (EMulti::old_env, snd env2), tor cond1 cond2
+        (EMulti :: old_env, snd env2), (tor cond1 cond2, [])
+      | ECOR _, EMulti -> env2, (tor cond1 cond2, [])
+      | EMulti, (ECall _ | EReturn _ | ECOR _) -> env1, (tor cond1 cond2, [])
+      | EMulti, EMulti -> (EMulti::old_env, snd env2), (tor cond1 cond2, [])
 
 let get_bindings st my_var =
   let my_lval = TVar my_var, TNoOffset in
@@ -895,9 +895,10 @@ let type_cond needs_pebble env tr cond =
       | AfVar (s, e) -> if pos then
       begin
         let env, term_tmp, c1 = type_expr env ~tr ?current e in
-        let v = Cil.makeGlobalVar (get_fresh ("aorai_" ^ s)) term_tmp.term_type in
+        match term_tmp.term_type with
+          | Ctype(t) -> let v = Cil.makeGlobalVar (get_fresh ("aorai_" ^ s)) t in (fst env, StringMap.add s v (snd env)), (c1, [Copy_value((TVar(Cil.cvar_to_lvar v), TNoOffset), term_tmp )])
         (*Cil.Cvar_to_lvar v pour en faire une logic var puis il faut le transformer en term_lval*)
-        (fst env, StringMap.add s v (snd env)), (c1, [Copy_value((Tvar(Cil.cvar_to_lvar v), TNoOffset), term_tmp )])
+          | _ ->  Aorai_option.abort "Not the right type"
       end
       else
         Aorai_option.abort "Not corresponding to program"
@@ -906,20 +907,20 @@ let type_cond needs_pebble env tr cond =
         let env, e2, c2 = type_expr env ~tr ?current e2 in
         let call_cond = if pos then tand c1 c2 else tor (tnot c1) (tnot c2) in
         let rel = TRel(Logic_typing.type_rel rel,e1,e2) in
-        let cond = if pos then tand call_cond rel else tor call_cond rel in
+        let cond = if pos then (tand call_cond rel, [])  else (tor call_cond rel, []) in
         env, cond
-      | PTrue -> env, TTrue
-      | PFalse -> env, TFalse
+      | PTrue -> env, (TTrue, [])
+      | PFalse -> env, (TFalse, [])
       | POr(c1,c2) ->
         let env1, c1 = aux pos env c1 in
         let env2, c2 = aux pos env c2 in
-        merge_current_event env1 env2 c1 c2
+        merge_current_event env1 env2 (fst c1) (fst c2)
       | PAnd(c1,c2) ->
         let env, c1 = aux pos env c1 in
         let env, c2 = aux pos env c2 in
-        env, TAnd(c1,c2)
+        env, (TAnd(fst c1, fst c2), [])
       | PNot c ->
-        let env, c = aux (not pos) env c in env, TNot c
+        let env, c = aux (not pos) env c in env, (TNot(fst c), [])
       | PCall (s,b) ->
         let kf =
           try Globals.Functions.find_by_name s
@@ -936,18 +937,18 @@ let type_cond needs_pebble env tr cond =
             b
         in
         if pos then
-          add_current_event
+          let env1, cond = add_current_event
             (ECall (kf, Cil_datatype.Varinfo.Hashtbl.create 3, tr)) env
-            (TCall (kf,b))
-          else env, TCall (kf,b)
+            (TCall (kf,b)) in env1, (cond, [])
+          else env, (TCall (kf,b), [])
       | PReturn s ->
         let kf =
           try
             Globals.Functions.find_by_name s
           with Not_found -> Aorai_option.abort "No such function %s" s
         in
-        if pos then add_current_event (EReturn kf) env (TReturn kf)
-        else env, TReturn kf
+        if pos then let env1, cond = add_current_event (EReturn kf) env (TReturn kf) in env1, (cond, [])
+        else env, (TReturn kf, [])
   in
   aux true (ENone::(fst env), snd env) cond
 
@@ -1076,7 +1077,7 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
             let transitions = trans_start :: seq_transitions in
             (match trans_start.cross with
                 | Normal (conds,action) ->
-                  trans_start.cross <- Normal(tand cond conds,action)
+                  trans_start.cross <- Normal(tand (fst cond) conds,action)
                 | Epsilon _ ->
                   Aorai_option.fatal
                     "Transition guard translated as epsilon transition");
@@ -1086,7 +1087,7 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
                 (env, states, transitions, curr_start, seq_end)
               | EReturn kf1 :: ECall (kf2,_,_) :: tl
                   when Kernel_function.equal kf1 kf2 ->
-                (tl, states, transitions, curr_start, seq_end)
+                ( (tl, snd env), states, transitions, curr_start, seq_end)
               | (EReturn _ | ECOR _ ) :: _ ->
                     (* If there is as mismatch (e.g. Call f; Return g), it will
                        be caught later. There are legitimate situations for
@@ -1094,8 +1095,8 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
                        in a non-empty context in particular)
                      *)
                 (env, states, transitions, curr_start, seq_end)
-              | EMulti :: env ->
-                (env, states, transitions, curr_start, seq_end))
+              | EMulti :: env_tmp ->
+                ( (env_tmp, snd env), states, transitions, curr_start, seq_end))
       in
       let loop_end = if has_loop then new_intermediate_state () else inner_end
       in
@@ -1452,7 +1453,7 @@ let type_cond_auto (st,tr as auto) =
     if List.memq st acc then acc else st::acc
   in
   let type_trans (states,transitions,add_reject) tr =
-    let (intermediate_states, trans, needs_reject) = type_trans auto [] tr in
+    let (intermediate_states, trans, needs_reject) = type_trans auto ([], StringMap.empty ) tr in
     Aorai_option.debug
       "Considering parsed transition %s -> %s" tr.start.name tr.stop.name;
     Aorai_option.debug

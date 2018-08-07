@@ -50,13 +50,14 @@ let convert_ltl_exprs t =
       | PNot c -> PNot (convert_cond c)
       | PCall _ | PReturn _ | PTrue | PFalse -> cond
       | PRel(Neq,PVar x,PCst _) ->
-        (try 
+        (try
            let (rel,t1,t2) = Hashtbl.find ltl_to_promela x in PRel(rel,t1,t2)
          with Not_found -> cond)
       | PRel _ -> cond
+      | AfVar (_, _) -> cond (*TODO*)
   in
   let rec convert_seq_elt e =
-    { e with 
+    { e with
       condition = Extlib.opt_map convert_cond e.condition;
       nested = convert_seq e.nested; }
   and convert_seq s = List.map convert_seq_elt s in
@@ -255,7 +256,7 @@ let output () =
           printverb "C file generation      : done\n";
         ) ()
     end;
-  
+
   printverb "Finished.\n";
   (* Some test traces. *)
   Data_for_aorai.debug_computed_state ();
@@ -302,7 +303,7 @@ let work () =
       let root = fst (Globals.entry_point ()) in
       if (Aorai_option.Axiomatization.get()) then
         begin
-            (* Step 5 : incrementing pre/post 
+            (* Step 5 : incrementing pre/post
                conditions with states and transitions information *)
           printverb "Refining pre/post      : \n";
           Aorai_dataflow.compute ();
@@ -339,7 +340,7 @@ let work () =
             (* Step 4': Computing the set of possible pre-states and post-states of each function *)
             (*          And so for pre/post transitions *)
           printverb "Abstracting pre/post   : skipped\n";
-          
+
             (* Step 5': incrementing pre/post conditions with states and transitions information *)
           printverb "Refining pre/post      : skipped\n";
 
@@ -353,7 +354,7 @@ let work () =
           Aorai_visitors.add_sync_with_buch file;
           printverb "Annotation of Cil      : partial\n"
         end;
-      
+
       (* Step 8 : clearing tables whose information has been
          invalidated by our transformations.
       *)

@@ -306,14 +306,14 @@ single_cond:
   | FALSE { PFalse }
   /*TODO ajouter le cas du Not (... and ...) entre autre*/
   | NOT single_cond { match $2 with
-      | AfVar(_, _) -> Aorai_option.error Parsing.symbol_end_pos "Not corresponding to program"
-      | _ -> PNot $2 }
+    | AfVar(_, _) -> Aorai_option.abort "Not corresponding to program" (*Parsing.symbol_end_pos*)
+    | _ -> PNot $2 }
   | single_cond AND single_cond { PAnd ($1,$3) }
   | single_cond OR single_cond { POr ($1,$3) }
   | LPAREN single_cond RPAREN { $2 }
   | logic_relation { $1 }
 /*TODO*/
-  | VAR IDENTIFIER AFF logic_relation { AfVar($2, $4) }
+  | VAR IDENTIFIER AFF arith_relation { AfVar($2, $4) }
 ;
 
 logic_relation
