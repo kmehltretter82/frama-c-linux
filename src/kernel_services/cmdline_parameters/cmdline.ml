@@ -1072,6 +1072,53 @@ let list_all_plugin_options ~print_invisible =
     end;
   raise Exit
 
+(* ************************************************************************* *)
+(** {3 Explain}
+
+    Special processing for option "-explain" *)
+(* ************************************************************************* *)
+
+let print_help_for_options option_names =
+  let messages_to_print = Hashtbl.create 5 in
+  let option_names =
+    List.filter (fun o -> o <> "-explain") option_names
+  in
+  Log.print_on_output
+    begin fun fmt ->
+      List.iter (fun plugin ->
+          Hashtbl.iter
+            (fun _gname opts ->
+               List.iter (fun o ->
+                   if List.mem o.oname option_names then
+                     Hashtbl.replace messages_to_print o.oname (o.argname, o.ohelp)
+                 ) !opts
+            ) plugin.Plugin.groups
+        ) (Plugin.all_plugins ());
+      Format.fprintf fmt
+        "[kernel] Explaining command-line options:@.";
+      List.iter (fun opt_name ->
+          let (helparg, help) = Hashtbl.find messages_to_print opt_name in
+          Format.fprintf fmt "@[<v>%s%s@\n        %s@]@." opt_name
+            (if helparg <> "" then " " ^ helparg else helparg) help
+        ) option_names;
+    end;
+  raise Exit
+
+(* [option_re] allows matching an option and extracting its name,
+   even when there is a '=', e.g. "-kernel-msg-key=-typing".
+   It also prevents matching negative numbers, as in "-ulevel -1". *)
+let option_re = Str.regexp "-\\([a-zA-Z-][a-zA-Z0-9-]*\\)"
+let explain_cmdline () =
+  let option_names =
+    List.fold_left (fun acc opt ->
+        if Str.string_match option_re opt 0 then
+          let opt_name = Str.matched_string opt in
+          opt_name :: acc
+        else acc
+      ) [] all_options
+  in
+  print_help_for_options (List.rev option_names)
+
 (*
   Local Variables:
   compile-command: "make -C ../../.."
