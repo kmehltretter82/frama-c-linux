@@ -672,10 +672,13 @@ val splitFunctionTypeVI:
   [vtemp] field in type {!Cil_types.varinfo}.
   The [source] argument defaults to [true], and corresponds to the field
   [vsource] .
+  The [referenced] argument defaults to [false], and corresponds to the field
+  [vreferenced] .
   The first unnamed argument specifies whether the varinfo is for a global and
   the second is for formals. *)
 val makeVarinfo:
-  ?source:bool -> ?temp:bool -> bool -> bool -> string -> typ -> varinfo
+  ?source:bool -> ?temp:bool -> ?referenced:bool -> bool -> bool -> string ->
+  typ -> varinfo
 
 (** Make a formal variable for a function declaration. Insert it in both the
     sformals and the type of the function. You can optionally specify where to
@@ -696,7 +699,7 @@ val makeFormalVar: fundec -> ?where:string -> string -> typ -> varinfo
     @modify Chlorine-20180501 the name of the variable is guaranteed to be fresh.
 *)
 val makeLocalVar:
-  fundec -> ?scope:block -> ?temp:bool -> ?insert:bool
+  fundec -> ?scope:block -> ?temp:bool -> ?referenced:bool -> ?insert:bool
   -> string -> typ -> varinfo
 
 (** if needed, rename the given varinfo so that its [vname] does not
@@ -720,7 +723,8 @@ val makeTempVar: fundec -> ?insert:bool -> ?name:string -> ?descr:string ->
 
 (** Make a global variable. Your responsibility to make sure that the name
     is unique. [source] defaults to [true]. [temp] defaults to [false].*)
-val makeGlobalVar: ?source:bool -> ?temp:bool -> string -> typ -> varinfo
+val makeGlobalVar: ?source:bool -> ?temp:bool -> ?referenced:bool -> string ->
+  typ -> varinfo
 
 (** Make a shallow copy of a [varinfo] and assign a new identifier.
     If the original varinfo has an associated logic var, it is copied too and

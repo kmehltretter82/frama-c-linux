@@ -80,6 +80,12 @@ let rmUnusedStatic = ref false
 
 let is_reachable t r = try InfoHashtbl.find t r with Not_found -> false
 
+let pp_info fmt = function
+  | Type ti -> Format.fprintf fmt "%s" ti.tname
+  | Enum ei -> Format.fprintf fmt "%s" ei.ename
+  | Comp ci -> Format.fprintf fmt "%s" ci.cname
+  | Var vi -> Format.fprintf fmt "%s" vi.vname
+
 
 (***********************************************************************
  *
@@ -277,7 +283,8 @@ let isExportedRoot global =
         Cil.hasAttribute "FC_BUILTIN" e.eattr ->
       e.ename, true, "has FC_BUILTIN attribute"
     | _ ->
-      "", false, "neither function nor variable nor annotation"
+      (Format.asprintf "%a" Cil_types_debug.pp_global global), false,
+      "neither fundef nor vardef nor annotation"
   in
   Kernel.debug
     ~dkey "isExportedRoot %s -> %B, %s"  name result reason;
@@ -328,14 +335,17 @@ class markReachableVisitor
 
     method! vglob = function
       | GType (typeinfo, _) ->
+        Kernel.debug ~dkey "marking reachable: type %s" typeinfo.tname;
         InfoHashtbl.replace reachable_tbl (Type typeinfo) true;
         DoChildren
       | GCompTag (compinfo, _)
       | GCompTagDecl (compinfo, _) ->
+        Kernel.debug ~dkey "marking reachable: comp decl %s" compinfo.cname;
         InfoHashtbl.replace reachable_tbl (Comp compinfo) true;
         DoChildren
       | GEnumTag (enuminfo, _)
       | GEnumTagDecl (enuminfo, _) ->
+        Kernel.debug ~dkey "marking reachable: enum decl %s" enuminfo.ename;
         InfoHashtbl.replace reachable_tbl (Enum enuminfo) true;
         DoChildren
       | GVar (varinfo, _, _)
@@ -343,7 +353,10 @@ class markReachableVisitor
       | GFunDecl (_,varinfo, _)
       | GFun ({svar = varinfo}, _) ->
         if not (hasAttribute "FC_BUILTIN" varinfo.vattr) then
-          InfoHashtbl.replace reachable_tbl (Var varinfo) true;
+          begin
+            Kernel.debug ~dkey "marking reachable: function %s" varinfo.vname;
+            InfoHashtbl.replace reachable_tbl (Var varinfo) true;
+          end;
         DoChildren
       | GAnnot _ -> DoChildren
       | _ ->
@@ -388,16 +401,16 @@ class markReachableVisitor
         begin
           let name = v.vname in
           if v.vglob then
-            Kernel.debug ~dkey "marking transitive use: global %s" name
+            Kernel.debug ~dkey "marking transitive use: global %s (%d)" name v.vid
           else
-            Kernel.debug ~dkey "marking transitive use: local %s" name;
+            Kernel.debug ~dkey "marking transitive use: local %s (%d)" name v.vid;
 
           (* If this is a global, we need to keep everything used in its
            * definition and declarations. *)
           InfoHashtbl.replace reachable_tbl (Var v) true;
           if v.vglob then
             begin
-              Kernel.debug ~dkey "descending: global %s" name;
+              Kernel.debug ~dkey "descending: global %s (%d)" name v.vid;
               let descend global =
                 ignore (visitCilGlobal (self :> cilVisitor) global)
               in
@@ -410,14 +423,14 @@ class markReachableVisitor
     method private mark_enum e =
       if not (is_reachable reachable_tbl (Enum e)) then
         begin
-          Kernel.debug ~dkey "marking transitive use: enum %s\n" e.ename;
+          Kernel.debug ~dkey "marking transitive use: enum %s" e.ename;
           InfoHashtbl.replace reachable_tbl (Enum e) true;
           self#visitAttrs e.eattr;
           (* Must visit the value attributed to the enum constants *)
           ignore (visitCilEnumInfo (self:>cilVisitor) e);
         end
       else
-        Kernel.debug ~dkey "not marking transitive use: enum %s\n" e.ename;
+        Kernel.debug ~dkey "not marking transitive use: enum %s" e.ename;
 
     method! vexpr e =
       match e.enode with
@@ -442,7 +455,7 @@ class markReachableVisitor
          let old = is_reachable reachable_tbl (Comp c) in
          if not old then
            begin
-             Kernel.debug ~dkey "marking transitive use: compound %s\n"
+             Kernel.debug ~dkey "marking transitive use: compound %s"
                c.cname;
              InfoHashtbl.replace reachable_tbl (Comp c) true;
 
@@ -457,7 +470,7 @@ class markReachableVisitor
          let old = (is_reachable reachable_tbl (Type ti)) in
          if not old then
            begin
-             Kernel.debug ~dkey "marking transitive use: typedef %s\n"
+             Kernel.debug ~dkey "marking transitive use: typedef %s"
                ti.tname;
              InfoHashtbl.replace reachable_tbl (Type ti) true;
              (* recurse deeper into the type referred-to by the typedef *)
@@ -478,6 +491,38 @@ class markReachableVisitor
          self#visitAttrs a
       );
       SkipChildren
+
+    method! vlogic_var_decl lv =
+      Kernel.debug ~dkey "markReachable: found LOGIC VAR DECL for: %s (%d)\n" lv.lv_name lv.lv_id;
+      DoChildren
+
+    method! vlogic_var_use lv =
+      Kernel.debug ~dkey "markReachable: found LOGIC VAR USE for: %s (%d)\n" lv.lv_name lv.lv_id;
+      match lv.lv_origin with
+      | None -> SkipChildren
+      | Some v ->
+        if not (is_reachable reachable_tbl (Var v)) then
+          begin
+            let name = v.vname in
+            if v.vglob then
+              Kernel.debug ~dkey "marking transitive use for logic var: global %s (%d)" name v.vid
+            else
+              Kernel.debug ~dkey "marking transitive use for logic var: local %s (%d)" name v.vid;
+
+            (* If this is a global, we need to keep everything used in its
+             * definition and declarations. *)
+            InfoHashtbl.replace reachable_tbl (Var v) true;
+            if v.vglob then
+              begin
+                Kernel.debug ~dkey "descending: global %s (%d)" name v.vid;
+                let descend global =
+                  ignore (visitCilGlobal (self :> cilVisitor) global)
+                in
+                let globals = Hashtbl.find_all globalMap name in
+                List.iter descend globals
+              end
+          end;
+        SkipChildren
   end
 
 
@@ -522,28 +567,50 @@ let markReachable isRoot ast reachable_tbl =
  *
  **********************************************************************)
 
+let global_type_and_name = function
+  | GType (t, _) -> "type " ^ t.tname
+  | GCompTag (c,_) -> "comp " ^ c.cname
+  | GCompTagDecl (c,_) -> "comp decl " ^ c.cname
+  | GEnumTag (e, _) -> "enum " ^ e.ename
+  | GEnumTagDecl (e,_) -> "enum decl " ^ e.ename
+  | GVarDecl(v,_) -> "var decl " ^ v.vname
+  | GFunDecl(_,v,_) -> "fun decl " ^ v.vname
+  | GVar (v, _, _) -> "var " ^ v.vname
+  | GFun ({svar = v}, _) -> "fun " ^ v.vname
+  | GAsm _ -> "<asm>"
+  | GPragma _ -> "<pragma>"
+  | GText _ -> "<text>"
+  | GAnnot _ -> "<annot>"
+
 class markReferencedVisitor = object
   inherit nopCilVisitor
+
+  val dkey = Kernel.dkey_referenced
 
   val inside_exp : exp Stack.t = Stack.create ()
   val inside_typ : typ Stack.t = Stack.create ()
 
   method! vglob = function
-    | GType (typeinfo, _loc) ->
+    | GType (typeinfo, loc) ->
+      Kernel.debug ~source:(fst loc) ~dkey "referenced: type %s" typeinfo.tname;
       typeinfo.treferenced <- true;
       DoChildren
-    | GCompTag (compinfo, _loc)
-    | GCompTagDecl (compinfo, _loc) ->
+    | GCompTag (compinfo, loc)
+    | GCompTagDecl (compinfo, loc) ->
+      Kernel.debug ~source:(fst loc) ~dkey "referenced: comp %s" compinfo.cname;
       compinfo.creferenced <- true;
       DoChildren
-    | GEnumTag (enuminfo, _loc)
-    | GEnumTagDecl (enuminfo, _loc) ->
+    | GEnumTag (enuminfo, loc)
+    | GEnumTagDecl (enuminfo, loc) ->
+      Kernel.debug ~source:(fst loc) ~dkey "referenced: enum %s" enuminfo.ename;
       enuminfo.ereferenced <- true;
       DoChildren
-    | GVar (varinfo, _, _loc)
-    | GVarDecl (varinfo, _loc)
-    | GFunDecl (_,varinfo, _loc)
-    | GFun ({svar = varinfo}, _loc) ->
+    | GVar (varinfo, _, loc)
+    | GVarDecl (varinfo, loc)
+    | GFunDecl (_,varinfo, loc)
+    | GFun ({svar = varinfo}, loc) ->
+      Kernel.debug ~dkey "referenced: var/fun %s@." varinfo.vname;
+      Kernel.debug ~source:(fst loc) ~dkey "referenced: fun %s" varinfo.vname;
       varinfo.vreferenced <- true;
       DoChildren
     | GAnnot _ -> DoChildren
@@ -553,16 +620,19 @@ class markReferencedVisitor = object
   method! vtype = function
     | TNamed (ti, _) ->
       if not (Stack.is_empty inside_typ) then begin
+        Kernel.debug ~current:true ~dkey "referenced: type %s" ti.tname;
         ti.treferenced <- true;
       end;
       DoChildren
     | TComp (ci, _, _) ->
       if not (Stack.is_empty inside_typ) then begin
+        Kernel.debug ~current:true ~dkey "referenced: comp %s" ci.cname;
         ci.creferenced <- true;
       end;
       DoChildren
     | TEnum (ei, _) ->
       if not (Stack.is_empty inside_typ) then begin
+        Kernel.debug ~current:true ~dkey "referenced: enum %s" ei.ename;
         ei.ereferenced <- true;
       end;
       DoChildren
@@ -585,6 +655,7 @@ class markReferencedVisitor = object
 
   method! vvrbl v =
     if not (Stack.is_empty inside_exp) then begin
+      Kernel.debug ~current:true ~dkey "referenced: var %s" v.vname;
       v.vreferenced <- true;
     end;
     SkipChildren
@@ -592,7 +663,10 @@ class markReferencedVisitor = object
 end
 
 let markReferenced ast =
-  visitCilFileSameGlobals (new markReferencedVisitor) ast
+  Kernel.debug ~dkey "starting markReferenced (AST has %d globals)"
+    (List.length ast.globals);
+  visitCilFileSameGlobals (new markReferencedVisitor) ast;
+  Kernel.debug ~dkey "finished markReferenced"
 
 (**********************************************************************
  *
@@ -778,7 +852,7 @@ let removeUnmarked isRoot ast reachable_tbl =
           begin
             (* along the way, record the interesting locals that were removed *)
             let name = local.vname in
-            (Kernel.debug ~dkey "removing local: %s\n" name);
+            (Kernel.debug ~dkey "removing local: %s" name);
             if not (Str.string_match uninteresting name 0) then
               removedLocals :=
                 (func.svar.vname ^ "::" ^ name) :: !removedLocals;
@@ -803,8 +877,28 @@ let removeUnmarked isRoot ast reachable_tbl =
     (* all other globals are retained *)
     | _ -> true
   in
-  let keptGlobals, _removedGlobals = List.partition filterGlobal ast.globals in
+  let keptGlobals, removedGlobals = List.partition filterGlobal ast.globals in
   ast.globals <- keptGlobals;
+  if Kernel.is_debug_key_enabled dkey then
+    List.iter (fun rg ->
+        Kernel.debug ~dkey "removing global: %s" (global_type_and_name rg)
+      ) removedGlobals;
+  if Kernel.is_debug_key_enabled dkey then
+    List.iter (fun rg ->
+        begin
+          match rg with
+          | GFunDecl (_s, vi, _) ->
+            begin
+              try
+                let kf = Globals.Functions.get vi in
+                Kernel.debug ~dkey "GFunDecl: %a@." Kernel_function.pretty_code kf
+              with Not_found ->
+                Kernel.debug ~dkey "GFunDecl: not found for %a@." Printer.pp_varinfo vi;
+            end
+          | _ -> ()
+        end;
+        Kernel.debug ~dkey "kept global %s (%a)" (global_type_and_name rg) Printer.pp_global rg
+      ) keptGlobals;
   !removedLocals
 
 
@@ -834,6 +928,13 @@ let removeUnusedTemps ?(isRoot : rootsFilter = isExportedRoot) ast =
 
       (* mark everything reachable from the global roots *)
       markReachable isRoot ast reachable_tbl;
+
+      let elements =
+        InfoHashtbl.fold (fun k v acc -> Format.asprintf "%a:%B" pp_info k v :: acc)
+          reachable_tbl []
+      in
+      Kernel.debug ~dkey "reachable_tbl: %a"
+        (Pretty_utils.pp_list ~sep:"@\n" Format.pp_print_string) elements;
 
       markReferenced ast;
 
