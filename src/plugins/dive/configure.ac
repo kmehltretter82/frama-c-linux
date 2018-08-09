@@ -34,36 +34,6 @@ m4_ifndef([FRAMAC_M4_MACROS], [m4_include(FRAMAC_SHARE/configure.ac)])
 check_plugin(dive,PLUGIN_RELATIVE_PATH(plugin_file),
              [support for Dive plug-in],yes)
 
-# Check Frama-C version
-#######################
-
-if test -n "$FRAMAC_VERSION"; then
-
-AC_MSG_CHECKING(for Frama-C version)
-
-DEV_VERSION_NUMBER=`echo $FRAMAC_VERSION | sed -e 's/.*-\(.*\)/\1/' `
-VERSION_NUMBER=`echo $DEV_VERSION_NUMBER | sed -e 's/\(.*\)+dev/\1/' `
-DEV=`echo $DEV_VERSION_NUMBER | sed -e 's/.*\(+dev\)/\1/' `
-
-REQUIRED_VERSION=20140301
-VERSION_NAME=Neon
-
-if test $VERSION_NUMBER -lt $REQUIRED_VERSION; then
-  AC_MSG_ERROR(Frama-C version must be $VERSION_NAME-$REQUIRED_VERSION.)
-else if test $VERSION_NUMBER -gt $REQUIRED_VERSION; then
-  AC_MSG_WARN(Frama-C version higher than $VERSION_NAME-$REQUIRED_VERSION not tested: use it at your own risk.)
-else
-  AC_MSG_RESULT($VERSION_NAME-$REQUIRED_VERSION$DEV: good!)
-fi
-fi
-
-# at the time being, must use the Frama-C development version
-if test "$DEV" != "+dev"; then
-  AC_MSG_ERROR(Frama-C version must be the current SVN version.);
-fi
-
-fi
-
 # Plug-in dependencies
 ######################
 
