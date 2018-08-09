@@ -136,6 +136,7 @@ type t = {
   graph: Graph.t;
   table: Graph.vertex Table.t;
   is_folded_base: Cil_types.varinfo -> bool;
+  mutable roots: Graph.vertex list;
 }
 
 let no_folded_base _vi = false
@@ -145,11 +146,12 @@ let create ?(is_folded_base=no_folded_base) () =
   {
     graph = Graph.create ();
     table = Table.create 13;
-    is_folded_base
+    is_folded_base;
+    roots = [];
   }
 
 
-let add_lval {graph; table; is_folded_base} kinstr lval =
+let add_lval ({graph; table; is_folded_base} as context)  kinstr lval =
   (* TODO: derecursify if necessary *)
   let rec update_vertex kinstr lval =
     (* If possible, refine the lval to a non-symbolic one *)
@@ -236,5 +238,5 @@ let add_lval {graph; table; is_folded_base} kinstr lval =
     let dst = update_vertex kinstr lval in
     Graph.create_edge ~allow_folding:true graph src kind dst
   in
-  ignore (update_vertex kinstr lval)
+  context.roots <- (update_vertex kinstr lval) :: context.roots
 

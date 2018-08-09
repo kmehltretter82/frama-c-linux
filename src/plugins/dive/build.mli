@@ -26,6 +26,7 @@ type t = private {
   graph: Imprecision_graph.t;
   table: Imprecision_graph.vertex Table.t;
   is_folded_base: Cil_types.varinfo -> bool;
+  mutable roots: Imprecision_graph.vertex list;
 }
 
 val create : ?is_folded_base:(Cil_types.varinfo -> bool) -> unit -> t
