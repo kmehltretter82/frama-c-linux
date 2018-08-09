@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type dependency_kind = Callee | Data | Adress | Control
+type dependency_kind = Callee | Data | Address | Control
 
 type location_kind = Precise | Imprecise | Folded
 
