@@ -92,10 +92,10 @@ rule token = parse
   | '^'               { CARET }
   | '?'               { QUESTION }
   | eof               { EOF }
-  | _                 { raise_located (loc lexbuf) "Unknown token" }
   | '$'               { VAR }
   | ":="              { AFF }
-
+  | _                 { raise_located (loc lexbuf) "Unknown token" }
+  
 {
   let parse c =
     let lb = from_channel c in

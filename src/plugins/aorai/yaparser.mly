@@ -76,6 +76,7 @@ type pre_cond = Behavior of string | Pre of Promelaast.condition
 %token <string> IDENTIFIER
 %token <string> INT
 %token VAR
+%token AFF
 %token LCURLY RCURLY LPAREN RPAREN LSQUARE RSQUARE LBRACELBRACE RBRACERBRACE
 %token RARROW
 %token TRUE FALSE
@@ -84,7 +85,6 @@ type pre_cond = Behavior of string | Pre of Promelaast.condition
 %token EQ LT GT LE GE NEQ PLUS MINUS SLASH STAR PERCENT OR AND
 %token OTHERWISE
 %token EOF
-%token AFF
 
 %nonassoc highest
 %left LPAREN RPAREN

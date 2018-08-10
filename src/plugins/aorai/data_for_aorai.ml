@@ -582,6 +582,13 @@ let check_one top info counter s =
 
 (*TODO Faire une fonction de recherche pour les $var*)
 
+(*let find_var env counter s = 
+  StringMap.find s (snd env) *)
+
+let find_avar s env =
+try Some (StringMap.find s (snd env))
+with Not_found -> Aorai_option.abort "Aorai var not found" 
+
 let find_in_env env counter s =
   let current, stack =
     match (fst env) with
@@ -705,8 +712,8 @@ let type_expr env ?tr ?current e =
           env, var, cond
           (*TODO Changer fonction de recherche*)
       | AVar s ->
-        let var = find_in_env env current s in
-        env, var, cond
+        let var = Logic_const.tvar (Cil.cvar_to_lvar (find_avar s env)) in
+        env, var, cond 
       | PPrm(f,x) -> find_prm_in_env env ?tr current f x
       | PCst (Logic_ptree.IntConstant s) ->
         let e = Cil.parseIntLogic ~loc s in
