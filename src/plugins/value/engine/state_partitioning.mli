@@ -27,7 +27,7 @@ type loop = Cil_types.stmt
 
 module type Kf =
 sig
-  val kf : Cil_types.kernel_function  
+  val kf : Cil_types.kernel_function
 end
 
 module type Parameters =
@@ -36,7 +36,7 @@ sig
   val widening_period : int
   val slevel : Cil_types.stmt -> int
   val merge : Cil_types.stmt -> bool
-  val unroll : loop -> int
+  val unroll : loop -> Partition.unroll_limit
   val history_size : int
   val universal_splits : Cil_types.exp list
   val flow_actions : Cil_types.stmt -> Partition.action list
@@ -147,4 +147,4 @@ module type Partitioning = functor
   (Domain : Abstract_domain.External)
   (Transfer : Transfer_stmt.S with type state = Domain.t)
   (Kf : Kf) ->
-    Partition with type state = Domain.t
+  Partition with type state = Domain.t

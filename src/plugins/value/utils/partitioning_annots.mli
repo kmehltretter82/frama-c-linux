@@ -25,7 +25,7 @@ type slevel_annotation =
   | SlevelDefault
   | SlevelLocal of int
 
-type unroll_annotation = Cil_types.term
+type unroll_annotation = Cil_types.term option
 
 type flow_annotation =
   | FlowSplit of Cil_types.term

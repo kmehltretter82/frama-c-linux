@@ -1,6 +1,6 @@
 /* run.config*
    GCC:
-   STDOPT: #"-main test_unroll"
+   STDOPT: #"-main test_unroll -eva-default-loop-unrolling 10"
    STDOPT: #"-main test_split"
    STDOPT: +"-main test_split -eva-partition-value k"
    STDOPT: #"-main test_loop_split -eva-partition-history 1"
@@ -12,9 +12,10 @@
 
 #define N 10
 
+
 void test_unroll()
 {
-  int a[N], b[N];
+  int a[N], b[N], c[N], d[2*N], e[N];
 
   // The inner loop needs to be unrolled to allow strong updates
   // The outer loops doesn't need to be unrolled
@@ -38,6 +39,27 @@ void test_unroll()
   }
 
   // At the end, we must have both arrays a and b to be fully initialized at 42
+
+  // Small loops can be unrolled without giving an unroll parameter
+  //@ loop unroll N;
+  for (int i = 0 ; i < N ; i++)
+    c[i] = 0;
+
+  // Longer loops won't be completely unrolled when not giving a parameter
+  //@ loop unroll N;
+  for (int i = 0 ; i < 2*N ; i++)
+    d[i] = 0;
+
+  // Variable unroll limits can be specified as long as they evaluate as
+  // a singleton in each state
+  //@ loop unroll N;
+  for (int i = 0 ; i < N ; i++) {
+    e[i] = 1;
+    //@ loop unroll i-1;
+    for (int j = i - 1 ; j > 0 ; j--) {
+      e[j] += e[j-1];
+    }
+  }
 }
 
 int k;

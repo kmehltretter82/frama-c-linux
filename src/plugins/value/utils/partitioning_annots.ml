@@ -30,7 +30,7 @@ type slevel_annotation =
   | SlevelDefault
   | SlevelLocal of int
 
-type unroll_annotation = term
+type unroll_annotation = term option
 
 type flow_annotation =
   | FlowSplit of term
@@ -110,12 +110,12 @@ module Slevel = Register (struct
     let import = function
       | Ext_terms [{term_node}] ->
         begin match term_node with
-        | TConst (LStr "default") -> SlevelDefault
-        | TConst (LStr "merge") -> SlevelMerge
-        | TConst (Integer (i, _)) -> SlevelLocal (Integer.to_int i)
-        | _ -> SlevelDefault (* be kind. Someone is bound to write a visitor that
-                                will simplify our term into something
-                                unrecognizable... *)
+          | TConst (LStr "default") -> SlevelDefault
+          | TConst (LStr "merge") -> SlevelMerge
+          | TConst (Integer (i, _)) -> SlevelLocal (Integer.to_int i)
+          | _ -> SlevelDefault (* be kind. Someone is bound to write a visitor that
+                                  will simplify our term into something
+                                  unrecognizable... *)
         end
       | _ -> assert false
 
@@ -145,8 +145,29 @@ struct
   let print = Printer.pp_term
 end
 
+module OptionalTermAnnotation =
+struct
+  type t = term option
+
+  let parse ~typing_context = function
+    | [] -> None
+    | [t] ->
+      let open Logic_typing in
+      Some (typing_context.type_term typing_context typing_context.pre_state t)
+    | _ -> raise Parse_error
+
+  let export t =
+    Ext_terms (Extlib.list_of_opt t)
+
+  let import = function
+    | Ext_terms l -> Extlib.opt_of_list l
+    | _ -> assert false
+
+  let print = Pretty_utils.pp_opt Printer.pp_term
+end
+
 module Unroll = Register (struct
-    include SimpleTermAnnotation
+    include OptionalTermAnnotation
     let name = "unroll"
     let is_loop_annot = true
   end)

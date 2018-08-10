@@ -715,16 +715,30 @@ let () = add_precision_dep MinLoopUnroll.parameter
 let () = MinLoopUnroll.set_range 0 max_int
 
 let () = Parameter_customize.set_group precision_tuning
+module DefaultLoopUnroll =
+  Int
+    (struct
+      let option_name = "-eva-default-loop-unrolling"
+      let arg_name = "n"
+      let default = 100
+      let help =
+        "defines the default limit for loop unrolling annotations which does\
+         not explicitely provide a limit."
+    end)
+let () = add_precision_dep DefaultLoopUnroll.parameter
+let () = DefaultLoopUnroll.set_range 0 max_int
+
+let () = Parameter_customize.set_group precision_tuning
 module HistoryPartitioning =
   Int
     (struct
-       let option_name = "-eva-partition-history"
-       let arg_name = "n"
-       let default = 0
-       let help =
-         "keep states distincts as long as the <n> last branching in their\
-          traces are also distinct. (A value of 0 deactivate this feature)"
-     end)
+      let option_name = "-eva-partition-history"
+      let arg_name = "n"
+      let default = 0
+      let help =
+        "keep states distincts as long as the <n> last branching in their\
+         traces are also distinct. (A value of 0 deactivate this feature)"
+    end)
 let () = add_precision_dep HistoryPartitioning.parameter
 let () = HistoryPartitioning.set_range 0 max_int
 

@@ -25,7 +25,8 @@ let opt_flatten (type a) (o : a option option) : a option =
   Extlib.opt_conv None o
 
 module ExpMap = Cil_datatype.ExpStructEq.Map
-module IList = Datatype.List (Datatype.Int)
+module LoopList = Datatype.List (Datatype.Pair (Datatype.Int) (Datatype.Int))
+module BranchList = Datatype.List (Datatype.Int)
 
 type branch = int
 
@@ -33,7 +34,7 @@ type key = {
   ration_stamp : int option;
   transfer_stamp : int option;
   branches : branch list;
-  loops : int list;
+  loops : (int * int) list;
   static_split : Integer.t ExpMap.t;
   dynamic_split : Integer.t ExpMap.t;
 }
@@ -48,21 +49,40 @@ struct
     in
     Extlib.opt_compare (-) k1.ration_stamp k2.ration_stamp
     <?> (Extlib.opt_compare (-), k1.transfer_stamp, k2.transfer_stamp)
-    <?> (IList.compare, k1.loops, k2.loops)
+    <?> (LoopList.compare, k1.loops, k2.loops)
     <?> (ExpMap.compare Integer.compare, k1.static_split, k2.static_split)
     <?> (ExpMap.compare Integer.compare, k1.dynamic_split, k2.dynamic_split)
-    <?> (IList.compare, k1.branches, k2.branches)
+    <?> (BranchList.compare, k1.branches, k2.branches)
 end
 
 module KMap = Map.Make (Key)
 
 
 type 'a partition = 'a KMap.t
+type 'a transfer_function = (key * 'a) list -> (key * 'a) list
+
+let stamp_after_transfer k = function
+  | [x] -> [(k,x)]
+  | l ->
+    let t = ref 0 in
+    let add acc x  =
+      let k' = { k with transfer_stamp = Some !t } in
+      incr t;
+      (k',x) :: acc
+    in
+    List.fold_left add [] l
+
+let update_after_call k l =
+  List.map (fun x -> k,x) l
+
+type unroll_limit =
+  | ExpLimit of Cil_types.exp
+  | IntLimit of int
 
 type action =
-  | Enter_loop
+  | Enter_loop of unroll_limit
   | Leave_loop
-  | Incr_loop of int
+  | Incr_loop
   | Branch of branch * int
   | Ration of int
   | Ration_merge of int option
@@ -80,10 +100,11 @@ module type InputDomain =
 sig
   type t
 
-  exception Cant_split
+  exception Operation_failed
 
   val join : t -> t -> t
   val split : t -> Cil_types.exp -> (Integer.t * t) list
+  val eval_exp_to_int : t -> Cil_types.exp -> int
 end
 
 
@@ -141,7 +162,7 @@ struct
         (k,x)
       in
       List.map update_key (Domain.split state exp)
-    with Domain.Cant_split ->
+    with Domain.Operation_failed ->
       [(key,state)]
 
   let split ~(static : bool) (p : t) (exp : Cil_types.exp) =
@@ -164,8 +185,13 @@ struct
     in
     KMap.fold update_state p KMap.empty
 
-  let map_keys (f : key -> key) (p : t) =
-    KMap.fold (fun k x acc -> add acc (f k) x) p empty
+  let map_keys (f : key -> state -> key) (p : t) =
+    KMap.fold (fun k x acc -> add acc (f k x) x) p empty
+
+  let transfer (f : state transfer_function)  (p : t) : t =
+    let l = KMap.fold (fun k x l -> (k,x) :: l) p [] in
+    let l' = f l in
+    add_list empty (l')
 
   let transfer_keys p = function
     | Static_split exp ->
@@ -182,26 +208,32 @@ struct
         | Static_split _ | Dynamic_split _ | Update_dynamic_splits ->
           assert false (* Handled above *)
 
-        | Enter_loop -> fun k ->
-          { k with loops = 0 :: k.loops }
+        | Enter_loop limit_kind -> fun k x ->
+          let limit = try match limit_kind with
+            | ExpLimit exp -> Domain.eval_exp_to_int x exp
+            | IntLimit i -> i
+            with
+            | Domain.Operation_failed -> 0
+          in
+          { k with loops = (0,limit) :: k.loops }
 
-        | Leave_loop -> fun k ->
+        | Leave_loop -> fun k _x ->
           begin match k.loops with
-          | [] -> raise InvalidAction
-          | _ :: tl -> { k with loops = tl }
+            | [] -> raise InvalidAction
+            | _ :: tl -> { k with loops = tl }
           end
 
-        | Incr_loop limit -> fun k ->
+        | Incr_loop -> fun k _x ->
           begin match k.loops with
-          | [] -> raise InvalidAction
-          | h :: tl ->
-            if h >= limit then
-              k
-            else
-              { k with loops = h + 1 :: tl }
+            | [] -> raise InvalidAction
+            | (h, limit) :: tl ->
+              if h >= limit then
+                k
+              else
+                { k with loops = (h + 1, limit) :: tl }
           end
 
-        | Branch (b,max) -> fun k ->
+        | Branch (b,max) -> fun k _x ->
           let list_start l i =
             let rec aux acc i = function
               | [] -> acc
@@ -219,21 +251,21 @@ struct
 
         | Ration (min) ->
           let r = ref min in
-          fun k ->
+          fun k _x ->
             let ration_stamp = Some !r in
             incr r;
             { k with ration_stamp }
 
-        | Ration_merge ration_stamp -> fun k ->
+        | Ration_merge ration_stamp -> fun k _x ->
           { k with ration_stamp }
 
-        | Transfer_merge -> fun k ->
+        | Transfer_merge -> fun k _x ->
           { k with transfer_stamp = None }
 
-        | Static_merge exp -> fun k ->
+        | Static_merge exp -> fun k _x ->
           { k with static_split = ExpMap.remove exp k.static_split }
 
-        | Dynamic_merge exp -> fun k ->
+        | Dynamic_merge exp -> fun k _x ->
           { k with dynamic_split = ExpMap.remove exp k.dynamic_split }
       in
       map_keys transfer p
@@ -243,16 +275,8 @@ struct
 
   let transfer_states (f : 'a -> 'a list) (p : 'a partition) : 'a partition =
     let transfer_one k x p =
-      let t = ref 0 in
-      let add p y =
-        let k' = { k with transfer_stamp = Some !t } in
-        incr t;
-        assert (not (KMap.mem k' p));
-        KMap.add k' y p
-      in
-      match f x with
-      | [y] -> KMap.add k y p
-      | l -> List.fold_left add p l
+      let l = stamp_after_transfer k (f x) in
+      List.fold_left (fun p (k,x) -> KMap.add k x p) p l
     in
     KMap.fold transfer_one p KMap.empty
 
@@ -321,6 +345,6 @@ struct
     KMap.filter (fun k _x -> f k) p
 
   let map_filter (f : key -> 'a -> 'b option) (p : 'a partition)
-      : 'b partition =
+    : 'b partition =
     KMap.merge (fun k o _ -> opt_flatten (Extlib.opt_map (f k) o)) p KMap.empty
 end

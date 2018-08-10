@@ -51,10 +51,10 @@ module type S = sig
 
   val enter_scope: kernel_function -> varinfo list -> state -> state
 
-  exception Cant_split
+  exception Operation_failed
 
   val split_by_value: state -> exp -> (Integer.t * state) list
-
+  val eval_exp_to_int: state -> exp -> int
 
   type call_result = {
     states: state list or_bottom;

@@ -21,4 +21,3 @@
 (**************************************************************************)
 
 module Make (Kf : State_partitioning.Kf) : State_partitioning.Parameters
-

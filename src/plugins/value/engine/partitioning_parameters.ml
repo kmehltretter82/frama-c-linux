@@ -55,46 +55,41 @@ struct
     | Per_stmt_slevel.NoMerge -> false
     | Per_stmt_slevel.Merge f -> f stmt
 
-  let default_loop_unroll = MinLoopUnroll.get ()
+  let term_to_exp term =
+    !Db.Properties.Interp.term_to_exp ~result:None term
 
-  let unroll stmt = 
-    let local_unroll = match get_unroll_annot stmt with
-      | [] ->
-        let is_attribute a = Cil.hasAttribute a stmt.sattr in
-        begin
-          match List.filter is_attribute ["for" ; "while" ; "dowhile"] with
-          | [] -> ()
-          | loop_kind :: _ ->
-            let wkey =
-              if loop_kind = "for"
-              then Value_parameters.wkey_missing_loop_unroll_for
-              else Value_parameters.wkey_missing_loop_unroll
-            in
-            Value_parameters.warning
-              ~wkey ~source:(fst (Cil_datatype.Stmt.loc stmt)) ~once:true
-              "%s loop without unroll annotation" loop_kind
-        end;
-        None
-      | [t] ->
-        (* Inlines the value of const variables in [t]. *)
-        let global_init vi =
-          try (Globals.Vars.find vi).init with Not_found -> None
-        in
-        let t =
-          Cil.visitCilTerm (new Logic_utils.simplify_const_lval global_init) t
-        in
-        begin match Logic_utils.constFoldTermToInt t with
-          | Some n -> Some (Integer.to_int n)
-          | None ->
-            warn "invalid term, not integer: %a" Printer.pp_term t;
-            None
-        end
+  let min_loop_unroll = MinLoopUnroll.get ()
+
+  let default_loop_unroll = DefaultLoopUnroll.get ()
+
+  let warn_no_loop_unroll stmt =
+    let is_attribute a = Cil.hasAttribute a stmt.sattr in
+    match List.filter is_attribute ["for" ; "while" ; "dowhile"] with
+    | [] -> ()
+    | loop_kind :: _ ->
+      let wkey =
+        if loop_kind = "for"
+        then Value_parameters.wkey_missing_loop_unroll_for
+        else Value_parameters.wkey_missing_loop_unroll
+      in
+      Value_parameters.warning
+        ~wkey ~source:(fst (Cil_datatype.Stmt.loc stmt)) ~once:true
+        "%s loop without unroll annotation" loop_kind
+
+  let unroll stmt =
+    let default = Partition.IntLimit min_loop_unroll in
+    try match get_unroll_annot stmt with
+      | [] -> warn_no_loop_unroll stmt; default
+      | [None] -> Partition.IntLimit default_loop_unroll
+      | [(Some t)] -> Partition.ExpLimit (term_to_exp t)
       | _ ->
         warn "ignoring invalid unroll annotation";
-        None
-    in match local_unroll with
-    | Some n -> n
-    | None -> default_loop_unroll
+        raise Exit
+    with
+    | Exit -> default
+    | Db.Properties.Interp.No_conversion ->
+      warn "loop unrolling parameters must be valid expressions";
+      default
 
   let history_size = HistoryPartitioning.get ()
 
@@ -105,21 +100,18 @@ struct
         Cil.evar vi :: l
       with Not_found ->
         warn ~current:false "cannot find the global variable %s for value \
-                            partitioning" name;
+                             partitioning" name;
         l
     in
     ValuePartitioning.fold add []
 
   let flow_actions stmt =
-    let term_to_exp term =
-      !Db.Properties.Interp.term_to_exp ~result:None term
-    in
     let map_annot acc t =
       try
         match t with
         | FlowSplit t -> Partition.Static_split (term_to_exp t) :: acc
         | FlowMerge t -> Partition.Static_merge (term_to_exp t) :: acc
-      with 
+      with
         Db.Properties.Interp.No_conversion ->
         warn "split/merge expressions must be valid expressions";
         acc (* Impossible to convert term to lval *)

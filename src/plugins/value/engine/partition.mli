@@ -58,17 +58,25 @@ type key = private {
   ration_stamp : int option;
   transfer_stamp : int option;
   branches : branch list;
-  loops : int list;
+  loops : (int * int) list;
   static_split : Integer.t ExpMap.t;
   dynamic_split : Integer.t ExpMap.t;
 }
 
 type 'a partition
+type 'a transfer_function = (key * 'a) list -> (key * 'a) list
+
+val stamp_after_transfer : key -> 'a list -> (key * 'a)  list
+val update_after_call : key -> 'a list -> (key * 'a)  list
+
+type unroll_limit =
+  | ExpLimit of Cil_types.exp
+  | IntLimit of int
 
 type action =
-  | Enter_loop
+  | Enter_loop of unroll_limit
   | Leave_loop
-  | Incr_loop of int (* the parameter is the unroll limit *)
+  | Incr_loop
   | Branch of branch * int (* branch taken, max branches in history *)
   | Ration of int (* starting ration stamp *)
   | Ration_merge of int option (* new ration stamp for the merge state *)
@@ -86,10 +94,11 @@ module type InputDomain =
 sig
   type t
 
-  exception Cant_split
+  exception Operation_failed
 
   val join : t -> t -> t
   val split : t -> Cil_types.exp -> (Integer.t * t) list
+  val eval_exp_to_int : t -> Cil_types.exp -> int
 end
 
 
@@ -111,6 +120,7 @@ sig
   val union : ('a -> 'a -> 'a) -> 'a partition -> 'a partition -> 'a partition
 
   val iter : ('a -> unit) -> 'a partition -> unit
+  val transfer : state transfer_function -> t -> t
   val transfer_keys : t -> action -> t
   val filter_keys : (key -> bool) -> 'a partition -> 'a partition
   val map_states : ('a  -> 'a) -> 'a partition -> 'a partition

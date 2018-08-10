@@ -39,8 +39,9 @@ struct
   (* Add the split function to the domain *)
   module Domain =
   struct
-    exception Cant_split = Transfer.Cant_split
+    exception Operation_failed = Transfer.Operation_failed
     let split = Transfer.split_by_value
+    let eval_exp_to_int = Transfer.eval_exp_to_int
 
     include Domain
   end
@@ -143,15 +144,14 @@ struct
 
   (* Partition transfer functions *)
 
-  let enter_loop (p : propagation) (_i : loop) =
-    p.partition <- Partition.transfer_keys p.partition Enter_loop
+  let enter_loop (p : propagation) (i : loop) =
+    p.partition <- Partition.transfer_keys p.partition (Enter_loop (unroll i))
 
   let leave_loop (p : propagation) (_i : loop) =
     p.partition <- Partition.transfer_keys p.partition Leave_loop
 
-  let next_loop_iteration (p : propagation) (i : loop) =
-    let limit = unroll i in
-    p.partition <- Partition.transfer_keys p.partition (Incr_loop limit)
+  let next_loop_iteration (p : propagation) (_i : loop) =
+    p.partition <- Partition.transfer_keys p.partition Incr_loop
 
 
   (* Reset state (for hierchical convergence) *)
@@ -193,7 +193,7 @@ struct
     into.partition <- Partition.merge merge_two into.partition source.partition
 
   let join (sources : (branch*propagation) list) (dest : store)
-      : propagation =
+    : propagation =
     let is_loop_head =
       match dest.store_stmt with
       | Some {skind=Cil_types.Loop _} -> true
@@ -261,7 +261,7 @@ struct
             Some (Domain.join previous_state current_state)
           end
         with
-          (* There is no previous state, propagate normally *)
+        (* There is no previous state, propagate normally *)
           Not_found -> Some current_state
       in
       (* Add the propagated state to the store *)
@@ -297,10 +297,10 @@ struct
         (* Propagated state decreases, stop to propagate *)
         if Domain.is_included curr wstate.previous_state then
           None
-        (* Widening is delayed *)
+          (* Widening is delayed *)
         else if wstate.widening_counter > 0 then begin
           Some curr
-        (* Apply widening *)
+          (* Apply widening *)
         end else begin
           Value_parameters.feedback ~level:1 ~once:true ~current:true
             ~dkey:Value_parameters.dkey_widening
@@ -309,8 +309,8 @@ struct
              state so as to allow the intermediate(s) iteration(s) (between
              two widenings) to stabilize at least a part of the state. *)
           let prev = match wstate.widened_state with
-          | Some v -> Domain.join wstate.previous_state v
-          | None -> wstate.previous_state
+            | Some v -> Domain.join wstate.previous_state v
+            | None -> wstate.previous_state
           in
           let next = Domain.widen kf stmt prev (Domain.join prev curr) in
           update key {
@@ -325,9 +325,9 @@ struct
            exceeded *)
         if key.ration_stamp = None then
           update key {
-              widened_state = None;
-              previous_state = curr;
-              widening_counter = widening_delay - 1;
+            widened_state = None;
+            previous_state = curr;
+            widening_counter = widening_delay - 1;
           };
         Some curr
     in

@@ -40,8 +40,9 @@ module type S = sig
     state -> (stmt * lval list * lval list * lval list * stmt ref list) list ->
     unit or_bottom
   val enter_scope: kernel_function -> varinfo list -> state -> state
-  exception Cant_split
+  exception Operation_failed
   val split_by_value: state -> exp -> (Integer.t * state) list
+  val eval_exp_to_int: state -> exp -> int
   type call_result = {
     states: state list or_bottom;
     cacheable: Value_types.cacheable;
@@ -876,37 +877,39 @@ module Make (Abstract: Abstractions.Eva) = struct
 
 
   (* ------------------------------------------------------------------------ *)
-  (*                               Split by value                             *)
+  (*                               Partitioning                               *)
   (* ------------------------------------------------------------------------ *)
 
-  exception Cant_split
+  exception Operation_failed
 
-  let split_by_value state exp =
-    (* Whenever the split fails, warn the user and raise an exception *)
-    let fail message =
-      Value_parameters.warning ~once:true message;
-      raise Cant_split
-    in
+  let fail ~exp message =
+    Value_parameters.warning ~source:(fst exp.eloc) ~once:true message;
+    raise Operation_failed
+
+  let evaluate_exp_to_ival state exp =
     (* Evaluate the expression *)
     let valuation, value = match Eval.evaluate ~reduction:false state exp with
       | `Value (valuation, value), alarms when Alarmset.is_empty alarms ->
         valuation, value
       | _ ->
-        fail "the split expression cannot be evaluated safely on all states";
+        fail ~exp "this partitioning parameter cannot be evaluated safely on all states"
     in
     (* Get the cvalue *)
     let cvalue = match Value.get Main_values.cvalue_key with
       | Some get_cvalue -> get_cvalue value
-      | None -> fail "cannot partition by value when the CValue domain is not\
-                      active"
+      | None -> fail ~exp "partitioning is disabled when the CValue domain is not active"
     in
     (* Extract the ival *)
     let ival =
       try
         Cvalue.V.project_ival cvalue
       with Cvalue.V.Not_based_on_null ->
-        fail "cannot partition by value on pointers"
+        fail ~exp "this partitioning parameter must evaluate to an integer"
     in
+    valuation, ival
+
+  let split_by_value state exp =
+    let valuation, ival = evaluate_exp_to_ival state exp in
     (* Build a state with the lvalue set to a singleton *)
     let build i acc =
       let value = Value.inject_int (Cil.typeOf exp) i in
@@ -919,10 +922,20 @@ module Make (Abstract: Abstractions.Eva) = struct
     in
     (* For each integer of the ival, build a new state *)
     begin try
-      Ival.fold_int build ival []
-    with Abstract_interp.Error_Top ->
-      fail "too many values to partition by value on"
+        Ival.fold_int build ival []
+      with Abstract_interp.Error_Top ->
+        fail ~exp "too many values to partition by value on"
     end
+
+  let eval_exp_to_int state exp =
+    let _valuation, ival = evaluate_exp_to_ival state exp in
+    try
+      Integer.to_int (Ival.project_int ival)
+    with
+    | Ival.Not_Singleton_Int ->
+      fail ~exp "this partitioning parameter must evaluate to a singleton"
+    | Failure _ ->
+      fail ~exp "this partitioning parameter is too big"
 end
 
 
