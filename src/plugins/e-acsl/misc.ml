@@ -35,10 +35,10 @@ let library_files () =
       "e_acsl.h" ]
 
 let normalized_library_files =
-  lazy (List.map Filepath.normalize (library_files ()))
+  lazy (List.map Datatype.Filepath.of_string (library_files ()))
 
 let is_library_loc (loc, _) =
-  List.mem loc.Lexing.pos_fname (Lazy.force normalized_library_files)
+  List.mem loc.Filepath.pos_path (Lazy.force normalized_library_files)
 
 let library_functions = Datatype.String.Hashtbl.create 17
 let register_library_function vi =
@@ -111,7 +111,7 @@ let mk_e_acsl_guard ?(reverse=false) kind kf e p =
     Kernel.Unicode.without_unicode
       (Format.asprintf "%a@?" Printer.pp_predicate) p
   in
-  let line = (fst loc).Lexing.pos_lnum in
+  let line = (fst loc).Filepath.pos_lnum in
   let e =
     if reverse then e else Cil.new_exp ~loc:e.eloc (UnOp(LNot, e, Cil.intType))
   in
