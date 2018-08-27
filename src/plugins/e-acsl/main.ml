@@ -64,7 +64,7 @@ let unmemoized_extend_ast () =
     let register s =
       File.pre_register
         (File.NeedCPP
-           (Datatype.Filepath.of_string s,
+           (s,
             ppc
             ^ Format.asprintf " -I%s" share,
             ppk))
