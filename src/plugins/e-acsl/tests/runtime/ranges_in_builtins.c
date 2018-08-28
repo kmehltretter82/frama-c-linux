@@ -34,4 +34,7 @@ int main(void) {
   /*@ assert !\initialized(b + (0 .. 10));*/
   free(b);
 
+  int n = 2;
+  float t3[7][2][4];
+  /*@ assert !\initialized(&t3[(n-1)..(n+2)][1][0..1]); */ ;
 }

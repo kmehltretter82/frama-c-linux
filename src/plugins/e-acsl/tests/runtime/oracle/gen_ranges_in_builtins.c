@@ -7,7 +7,9 @@ int main(void)
   int *a;
   char *b;
   double t2[4];
+  float t3[7][2][4];
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_store_block((void *)(t3),(size_t)224);
   __e_acsl_store_block((void *)(t2),(size_t)32);
   __e_acsl_store_block((void *)(& b),(size_t)8);
   __e_acsl_store_block((void *)(& a),(size_t)8);
@@ -115,7 +117,50 @@ int main(void)
                     34);
   }
   free((void *)b);
+  int n = 2;
+  /*@ assert ¬\initialized(&t3[n - 1 .. n + 2][1][0 .. 1]); */
+  {
+    int __gen_e_acsl_forall;
+    int __gen_e_acsl_range_5429;
+    __gen_e_acsl_forall = 1;
+    __gen_e_acsl_range_5429 = 0;
+    while (1) {
+      if (__gen_e_acsl_range_5429 <= 1) ; else break;
+      {
+        int __gen_e_acsl_forall_2;
+        long __gen_e_acsl_range_5428;
+        __gen_e_acsl_forall_2 = 1;
+        __gen_e_acsl_range_5428 = n - 1L;
+        while (1) {
+          if (__gen_e_acsl_range_5428 <= n + 2L) ; else break;
+          {
+            int __gen_e_acsl_initialized_4;
+            __gen_e_acsl_initialized_4 = __e_acsl_initialized((void *)(& t3[__gen_e_acsl_range_5428][1][__gen_e_acsl_range_5429]),
+                                                              sizeof(float));
+            if (__gen_e_acsl_initialized_4) ;
+            else {
+              __gen_e_acsl_forall_2 = 0;
+              goto e_acsl_end_loop1;
+            }
+          }
+          __gen_e_acsl_range_5428 ++;
+        }
+        e_acsl_end_loop1: ;
+        if (__gen_e_acsl_forall_2) ;
+        else {
+          __gen_e_acsl_forall = 0;
+          goto e_acsl_end_loop2;
+        }
+      }
+      __gen_e_acsl_range_5429 ++;
+    }
+    e_acsl_end_loop2: ;
+    __e_acsl_assert(! __gen_e_acsl_forall,(char *)"Assertion",(char *)"main",
+                    (char *)"!\\initialized(&t3[n - 1 .. n + 2][1][0 .. 1])",
+                    39);
+  }
   __retres = 0;
+  __e_acsl_delete_block((void *)(t3));
   __e_acsl_delete_block((void *)(t2));
   __e_acsl_delete_block((void *)(t));
   __e_acsl_delete_block((void *)(& b));

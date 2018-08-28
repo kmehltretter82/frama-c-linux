@@ -224,6 +224,8 @@ let cast_integer_to_float lty lty_t e =
   else
     e
 
+exception RangeEliminationException
+
 let rec thost_to_host kf env = function
   | TVar { lv_origin = Some v } ->
     Var (Cil.get_varinfo (Env.get_behavior env) v), env, v.vname
@@ -637,12 +639,56 @@ and mmodel_call_with_ranges ~loc kf name ctx env t mmodel_call_default =
     mmodel_call_memory_block ~loc kf name ctx env p r
   | TBinOp(PlusPI, p, r) when Logic_utils.isLogicPointer p && is_trange r ->
     mmodel_call_memory_block ~loc kf name ctx env p r
+  | TAddrOf(TVar lv, toffset)
+    when is_offset_of_array toffset && has_range t ->
+    begin try
+      let toffset', quantifiers =
+        eliminate_ranges_from_offset_of_array ~loc toffset []
+      in
+      let lty_noset = match t.term_type with
+      (* Now that ranges are eliminated, the type of the term is changed
+         from set<lty> to lty *)
+      | Ltype(lti, [lty]) when lti.lt_name = "set" ->
+        lty
+      | Ltype _ | Ctype _ | Linteger | Lreal | Larrow _ | Lvar _  ->
+        assert false
+      in
+      let t' = Logic_const.term
+        ~loc
+        (TAddrOf(TVar lv, toffset'))
+        lty_noset
+      in
+      let p_quantified = match name with
+      | "valid" ->
+        Logic_const.pvalid ~loc (Logic_const.here_label, t')
+      | "initialized" ->
+        Logic_const.pinitialized ~loc (Logic_const.here_label, t')
+      | _ ->
+        assert false
+      in
+      let p_quantified = List.fold_left
+        (fun p (tmin, lv, tmax) ->
+          let tlv = Logic_const.tvar ~loc lv in
+          let bound1 = Logic_const.prel ~loc (Rle, tmin, tlv) in
+          let bound2 = Logic_const.prel ~loc (Rle, tlv, tmax) in
+          let bound = Logic_const.pand ~loc (bound1, bound2) in
+          let bound_imp_p = Logic_const.pimplies ~loc (bound, p) in
+          Logic_const.pforall ~loc ([lv], bound_imp_p))
+        p_quantified
+        quantifiers
+      in
+      Typing.type_named_predicate ~must_clear:true p_quantified;
+      let e, env = named_predicate_to_exp kf env p_quantified in
+      e, env
+    with RangeEliminationException ->
+      mmodel_call_default ~loc kf name ctx env t
+    end
   | _ ->
     mmodel_call_default ~loc kf name ctx env t
 
 and mmodel_call_memory_block ~loc kf name ctx env p r =
   (* Call to [__e_acsl_<name>] for term of the form [p + r]
-     when [<name> = valid] (TODO: other builtins) and
+     when [<name> = valid or initialized] (TODO: valid_read) and
      where [p] is an address, [r] a range offset *)
   let n1, n2 = match r.term_node with
     | Trange(Some n1, Some n2) ->
@@ -711,6 +757,81 @@ and mmodel_call_memory_block ~loc kf name ctx env p r =
 and is_trange t = match t.term_node with
   | Trange _ -> true
   | _ -> false
+
+and is_offset_of_array toffset = match toffset with
+  (* [true] if multi-dimensional array, false otherwise *)
+  | TIndex(_, TNoOffset) -> true
+  | TIndex(_, toffset) -> is_offset_of_array toffset
+  | _ -> false
+
+and eliminate_ranges_from_offset_of_array ~loc toffset quantifiers =
+  assert(is_offset_of_array toffset);
+  match toffset with
+  | TIndex(t, TNoOffset) when not (has_range t) ->
+    toffset, quantifiers
+  | TIndex(t, toffset') when not (has_range t) ->
+    let toffset', quantifiers' =
+      eliminate_ranges_from_offset_of_array ~loc toffset' quantifiers
+    in
+    TIndex(t, toffset'), quantifiers'
+  | TIndex(t, TNoOffset) when has_range t ->
+    let t', q = eliminate_ranges_from_term ~loc t in
+    TIndex(t', TNoOffset), q :: quantifiers
+  | TIndex(t, toffset') when has_range t ->
+    let t1, quantifiers1 = eliminate_ranges_from_term ~loc t in
+    let toffset2, quantifiers2 =
+      eliminate_ranges_from_offset_of_array ~loc toffset' quantifiers
+    in
+    let toffset3 = TIndex(t1, toffset2) in
+    toffset3, [quantifiers1] @ quantifiers2
+  | _ ->
+    assert false
+
+and has_range t =
+  let has_range_visitor = object(self) inherit Visitor.frama_c_inplace
+    val mutable has_range = false
+    method !vterm t = match t.term_node with
+      | Trange _ ->
+        has_range <- true;
+        Cil.SkipChildren
+      | _ ->
+        Cil.DoChildren
+    method visit t =
+      ignore (Visitor.visitFramacTerm (self :> Visitor.frama_c_inplace) t);
+      has_range
+  end
+  in
+  has_range_visitor#visit t
+
+and eliminate_ranges_from_term ~loc t: term * (term * logic_var * term) =
+  match t.term_node with
+  | Trange(Some _, Some _) ->
+    let n1, lv, n2 = bounded_lv_of_range t in
+    let tlv = Logic_const.tvar ~loc lv in
+    tlv, (n1, lv, n2)
+  | TBinOp(PlusA, _, r) when is_trange r ->
+    (* t[n + (0..3)] results in a typing error:
+      arithmetic conversion between non arithmetic types int and set<ℤ> *)
+    assert false
+  | _ ->
+    raise RangeEliminationException
+
+and bounded_lv_of_range t =
+  match t.term_node with
+  | Trange(Some n1, Some n2) ->
+    let id = Cil_const.new_raw_id () in
+    let lv = {
+        lv_name = "range_" ^ (string_of_int id);
+        lv_id = id;
+        lv_type = Linteger;
+        lv_kind = LVQuant;
+        lv_origin = None;
+        lv_attr = []
+      }
+    in
+    n1, lv, n2
+  | _ ->
+    assert false
 
 and at_to_exp env t_opt label e =
   let stmt = E_acsl_label.get_stmt (Env.get_visitor env) label in
