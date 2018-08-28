@@ -4,5 +4,5 @@
 [kernel:annot:missing-spec] tests/bts/bts2252.c:22: Warning: 
   Neither code nor specification for function strncpy, generating default assigns from the prototype
 [e-acsl] translation done in project "e-acsl".
-[value:alarm] tests/bts/bts2252.c:17: Warning: 
+[eva:alarm] tests/bts/bts2252.c:17: Warning: 
   out of bounds read. assert \valid_read(srcbuf + i);
