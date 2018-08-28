@@ -3,46 +3,46 @@
   E-ACSL construct `let-binding on array or pointer' is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[value] Analyzing a complete application starting at main
-[value] Computing initial state
-[value] Initial state computed
-[value:initial-state] Values of globals at initialization
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
   __e_acsl_init ∈ [--..--]
   __e_acsl_heap_allocation_size ∈ [--..--]
   __e_acsl_math_HUGE_VAL ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
   __e_acsl_math_HUGE_VALF ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
   __e_acsl_math_INFINITY ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
-[value] using specification for function __e_acsl_memory_init
-[value:alarm] tests/gmp/let.c:7: Warning: assertion got status unknown.
-[value] using specification for function __e_acsl_assert
-[value:alarm] tests/gmp/let.c:9: Warning: assertion got status unknown.
-[value] tests/gmp/let.c:12: 
+[eva] using specification for function __e_acsl_memory_init
+[eva:alarm] tests/gmp/let.c:7: Warning: assertion got status unknown.
+[eva] using specification for function __e_acsl_assert
+[eva:alarm] tests/gmp/let.c:9: Warning: assertion got status unknown.
+[eva] tests/gmp/let.c:12: 
   cannot evaluate ACSL term, unsupported ACSL construct: \let bindings
-[value:alarm] tests/gmp/let.c:12: Warning: assertion got status unknown.
-[value:alarm] tests/gmp/let.c:14: Warning: assertion got status unknown.
-[value:alarm] tests/gmp/let.c:17: Warning: assertion got status unknown.
-[value] tests/gmp/let.c:21: 
+[eva:alarm] tests/gmp/let.c:12: Warning: assertion got status unknown.
+[eva:alarm] tests/gmp/let.c:14: Warning: assertion got status unknown.
+[eva:alarm] tests/gmp/let.c:17: Warning: assertion got status unknown.
+[eva] tests/gmp/let.c:21: 
   cannot evaluate ACSL term, unsupported ACSL construct: \let bindings
-[value:alarm] tests/gmp/let.c:21: Warning: assertion got status unknown.
-[value] using specification for function __gmpz_init_set_si
-[value] using specification for function __gmpz_init
-[value] using specification for function __gmpz_mul
-[value] using specification for function __gmpz_cmp
-[value:alarm] tests/gmp/let.c:21: Warning: 
+[eva:alarm] tests/gmp/let.c:21: Warning: assertion got status unknown.
+[eva] using specification for function __gmpz_init_set_si
+[eva] using specification for function __gmpz_init
+[eva] using specification for function __gmpz_mul
+[eva] using specification for function __gmpz_cmp
+[eva:alarm] tests/gmp/let.c:21: Warning: 
   function __e_acsl_assert: precondition got status unknown.
-[value] using specification for function __gmpz_clear
-[value:alarm] tests/gmp/let.c:24: Warning: assertion got status unknown.
-[value] using specification for function __e_acsl_store_block
-[value] using specification for function __e_acsl_full_init
-[value:alarm] tests/gmp/let.c:27: Warning: assertion got status unknown.
-[value:alarm] tests/gmp/let.c:30: Warning: assertion got status unknown.
-[value] tests/gmp/let.c:32: 
+[eva] using specification for function __gmpz_clear
+[eva:alarm] tests/gmp/let.c:24: Warning: assertion got status unknown.
+[eva] using specification for function __e_acsl_store_block
+[eva] using specification for function __e_acsl_full_init
+[eva:alarm] tests/gmp/let.c:27: Warning: assertion got status unknown.
+[eva:alarm] tests/gmp/let.c:30: Warning: assertion got status unknown.
+[eva] tests/gmp/let.c:32: 
   cannot evaluate ACSL term, unsupported ACSL construct: \let bindings
-[value:alarm] tests/gmp/let.c:32: Warning: assertion got status unknown.
-[value:alarm] tests/gmp/let.c:35: Warning: assertion got status unknown.
-[value] tests/gmp/let.c:39: 
+[eva:alarm] tests/gmp/let.c:32: Warning: assertion got status unknown.
+[eva:alarm] tests/gmp/let.c:35: Warning: assertion got status unknown.
+[eva] tests/gmp/let.c:39: 
   cannot evaluate ACSL term, unsupported ACSL construct: \let bindings
-[value:alarm] tests/gmp/let.c:39: Warning: assertion got status unknown.
-[value] using specification for function __e_acsl_delete_block
-[value] using specification for function __e_acsl_memory_clean
-[value] done for function main
+[eva:alarm] tests/gmp/let.c:39: Warning: assertion got status unknown.
+[eva] using specification for function __e_acsl_delete_block
+[eva] using specification for function __e_acsl_memory_clean
+[eva] done for function main

@@ -1,38 +1,38 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
-[value] Analyzing a complete application starting at main
-[value] Computing initial state
-[value] Initial state computed
-[value:initial-state] Values of globals at initialization
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
   __e_acsl_init ∈ [--..--]
   __e_acsl_heap_allocation_size ∈ [--..--]
   __e_acsl_math_HUGE_VAL ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
   __e_acsl_math_HUGE_VALF ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
   __e_acsl_math_INFINITY ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
-[value] using specification for function __e_acsl_memory_init
-[value] tests/gmp/longlong.i:9: User Error: 
+[eva] using specification for function __e_acsl_memory_init
+[eva] tests/gmp/longlong.i:9: User Error: 
   recursive call during value analysis
   of my_pow (my_pow <- my_pow :: tests/gmp/longlong.i:16 <- main). Assuming
   the call has no effect. The analysis will be unsound.]
-[value] using specification for function my_pow
-[value:alarm] tests/gmp/longlong.i:10: Warning: 
+[eva] using specification for function my_pow
+[eva:alarm] tests/gmp/longlong.i:10: Warning: 
   signed overflow. assert -2147483648 ≤ tmp * tmp;
-[value:alarm] tests/gmp/longlong.i:10: Warning: 
+[eva:alarm] tests/gmp/longlong.i:10: Warning: 
   signed overflow. assert tmp * tmp ≤ 2147483647;
-[value] using specification for function __gmpz_init_set_si
-[value] using specification for function __gmpz_init
-[value] using specification for function __gmpz_import
-[value:alarm] tests/gmp/longlong.i:17: Warning: 
+[eva] using specification for function __gmpz_init_set_si
+[eva] using specification for function __gmpz_init
+[eva] using specification for function __gmpz_import
+[eva:alarm] tests/gmp/longlong.i:17: Warning: 
   function __gmpz_import: precondition got status unknown.
-[value] using specification for function __gmpz_mul
-[value] using specification for function __gmpz_add
-[value] using specification for function __gmpz_cmp
-[value] using specification for function __e_acsl_assert
-[value:alarm] tests/gmp/longlong.i:17: Warning: 
+[eva] using specification for function __gmpz_mul
+[eva] using specification for function __gmpz_add
+[eva] using specification for function __gmpz_cmp
+[eva] using specification for function __e_acsl_assert
+[eva:alarm] tests/gmp/longlong.i:17: Warning: 
   function __e_acsl_assert: precondition got status unknown.
-[value] using specification for function __gmpz_tdiv_r
-[value] tests/gmp/longlong.i:17: 
+[eva] using specification for function __gmpz_tdiv_r
+[eva] tests/gmp/longlong.i:17: 
   Assigning imprecise value to __gen_e_acsl_eq.
   The imprecision originates from Library function
-[value] using specification for function __gmpz_clear
-[value] done for function main
+[eva] using specification for function __gmpz_clear
+[eva] done for function main

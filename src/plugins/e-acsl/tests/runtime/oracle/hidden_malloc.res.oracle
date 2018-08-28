@@ -4,6 +4,6 @@
 [kernel:annot:missing-spec] tests/runtime/hidden_malloc.c:11: Warning: 
   Neither code nor specification for function realpath, generating default assigns from the prototype
 [e-acsl] translation done in project "e-acsl".
-[value] tests/runtime/hidden_malloc.c:11: Warning: 
+[eva] tests/runtime/hidden_malloc.c:11: Warning: 
   Completely invalid destination for assigns clause *((char *)x_1 + (0 ..)).
   Ignoring.
