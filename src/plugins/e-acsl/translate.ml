@@ -650,8 +650,8 @@ and mmodel_call_with_ranges ~loc kf name ctx env t mmodel_call_default =
          from set<lty> to lty *)
       | Ltype(lti, [lty]) when lti.lt_name = "set" ->
         lty
-      | Ltype _ | Ctype _ | Linteger | Lreal | Larrow _ | Lvar _  ->
-        assert false
+      | Ltype _ | Ctype _ | Linteger | Lreal | Larrow _ | Lvar _ as lty  ->
+        lty
       in
       let t' = Logic_const.term
         ~loc
@@ -663,8 +663,10 @@ and mmodel_call_with_ranges ~loc kf name ctx env t mmodel_call_default =
         Logic_const.pvalid ~loc (Logic_const.here_label, t')
       | "initialized" ->
         Logic_const.pinitialized ~loc (Logic_const.here_label, t')
-      | _ ->
-        assert false
+      | "valid_read" ->
+        Logic_const.pvalid_read ~loc (Logic_const.here_label, t')
+      | _  as s ->
+        Options.fatal "unexpected builtin %s during range elimination" s;
       in
       let p_quantified = List.fold_left
         (fun p (tmin, lv, tmax) ->
@@ -688,7 +690,7 @@ and mmodel_call_with_ranges ~loc kf name ctx env t mmodel_call_default =
 
 and mmodel_call_memory_block ~loc kf name ctx env p r =
   (* Call to [__e_acsl_<name>] for term of the form [p + r]
-     when [<name> = valid or initialized] (TODO: valid_read) and
+     when [<name> = valid or initialized or valid_read] and
      where [p] is an address, [r] a range offset *)
   let n1, n2 = match r.term_node with
     | Trange(Some n1, Some n2) ->
@@ -728,6 +730,7 @@ and mmodel_call_memory_block ~loc kf name ctx env p r =
   let ctx_ity = Typing.integer_ty_of_typ ctx in
   Typing.type_term ~use_gmp_opt:true ~ctx:ctx_ity size;
   let size, env = term_to_exp kf env size in
+  let size = Cil.constFold false size in
   (* base and base_addr *)
   let base, _ = Misc.ptr_index ~loc ptr in
   let base_addr  = match base.enode with
@@ -748,7 +751,7 @@ and mmodel_call_memory_block ~loc kf name ctx env p r =
         let args = match name with
         | "valid" | "valid_read" -> [ ptr; size; base; base_addr ]
         | "initialized" -> [ ptr; size ]
-        | _ -> not_yet env ("builtin" ^ name)
+        | _ -> not_yet env ("builtin " ^ name)
         in
         [ Misc.mk_call ~loc ~result:(Cil.var v) fname args ])
   in
@@ -820,8 +823,9 @@ and bounded_lv_of_range t =
   match t.term_node with
   | Trange(Some n1, Some n2) ->
     let id = Cil_const.new_raw_id () in
+    let name = Env.Varname.get ~scope:Env.Local_block "range" in
     let lv = {
-        lv_name = "range_" ^ (string_of_int id);
+        lv_name = name;
         lv_id = id;
         lv_type = Linteger;
         lv_kind = LVQuant;

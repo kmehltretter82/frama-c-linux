@@ -19,8 +19,7 @@ int main(void)
   {
     int __gen_e_acsl_valid;
     __gen_e_acsl_valid = __e_acsl_valid((void *)((char *)a + 4 * 0),
-                                        (size_t)(4 * (4 - 0)),(void *)a,
-                                        (void *)(& a));
+                                        (size_t)16,(void *)a,(void *)(& a));
     __e_acsl_assert(__gen_e_acsl_valid,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid(a + (0 .. 4))",13);
   }
@@ -38,8 +37,7 @@ int main(void)
   {
     int __gen_e_acsl_valid_3;
     __gen_e_acsl_valid_3 = __e_acsl_valid((void *)((char *)a + 4 * 10),
-                                          (size_t)(4 * (11 - 10)),(void *)a,
-                                          (void *)(& a));
+                                          (size_t)4,(void *)a,(void *)(& a));
     __e_acsl_assert(! __gen_e_acsl_valid_3,(char *)"Assertion",
                     (char *)"main",(char *)"!\\valid(a + (10 .. 11))",16);
   }
@@ -49,18 +47,16 @@ int main(void)
   /*@ assert \valid(b + (0 .. 10)); */
   {
     int __gen_e_acsl_valid_4;
-    __gen_e_acsl_valid_4 = __e_acsl_valid((void *)(b + 1 * 0),
-                                          (size_t)(1 * (10 - 0)),(void *)b,
-                                          (void *)(& b));
+    __gen_e_acsl_valid_4 = __e_acsl_valid((void *)(b + 1 * 0),(size_t)10,
+                                          (void *)b,(void *)(& b));
     __e_acsl_assert(__gen_e_acsl_valid_4,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid(b + (0 .. 10))",21);
   }
   /*@ assert ¬\valid(b + (11 .. 15)); */
   {
     int __gen_e_acsl_valid_5;
-    __gen_e_acsl_valid_5 = __e_acsl_valid((void *)(b + 1 * 11),
-                                          (size_t)(1 * (15 - 11)),(void *)b,
-                                          (void *)(& b));
+    __gen_e_acsl_valid_5 = __e_acsl_valid((void *)(b + 1 * 11),(size_t)4,
+                                          (void *)b,(void *)(& b));
     __e_acsl_assert(! __gen_e_acsl_valid_5,(char *)"Assertion",
                     (char *)"main",(char *)"!\\valid(b + (11 .. 15))",22);
   }
@@ -71,8 +67,7 @@ int main(void)
   {
     int __gen_e_acsl_valid_6;
     __gen_e_acsl_valid_6 = __e_acsl_valid((void *)((char *)(t) + 8 * 0),
-                                          (size_t)(8 * (2 - 0)),(void *)(t),
-                                          (void *)(t));
+                                          (size_t)16,(void *)(t),(void *)(t));
     __e_acsl_assert(__gen_e_acsl_valid_6,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid(&t[0 .. 2])",25);
   }
@@ -80,8 +75,7 @@ int main(void)
   {
     int __gen_e_acsl_valid_7;
     __gen_e_acsl_valid_7 = __e_acsl_valid((void *)((char *)(t) + 8 * 3),
-                                          (size_t)(8 * (5 - 3)),(void *)(t),
-                                          (void *)(t));
+                                          (size_t)16,(void *)(t),(void *)(t));
     __e_acsl_assert(! __gen_e_acsl_valid_7,(char *)"Assertion",
                     (char *)"main",(char *)"!\\valid(&t[3 .. 5])",26);
   }
@@ -94,7 +88,7 @@ int main(void)
     int __gen_e_acsl_initialized;
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)((char *)(t2) + 
                                                              8 * 0),
-                                                    (size_t)(8 * (1 - 0)));
+                                                    (size_t)8);
     __e_acsl_assert(__gen_e_acsl_initialized,(char *)"Assertion",
                     (char *)"main",(char *)"\\initialized(&t2[0 .. 1])",31);
   }
@@ -103,7 +97,7 @@ int main(void)
     int __gen_e_acsl_initialized_2;
     __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)((char *)(t2) + 
                                                                8 * 2),
-                                                      (size_t)(8 * (3 - 2)));
+                                                      (size_t)8);
     __e_acsl_assert(! __gen_e_acsl_initialized_2,(char *)"Assertion",
                     (char *)"main",(char *)"!\\initialized(&t2[2 .. 3])",32);
   }
@@ -111,7 +105,7 @@ int main(void)
   {
     int __gen_e_acsl_initialized_3;
     __gen_e_acsl_initialized_3 = __e_acsl_initialized((void *)(b + 1 * 0),
-                                                      (size_t)(1 * (10 - 0)));
+                                                      (size_t)10);
     __e_acsl_assert(! __gen_e_acsl_initialized_3,(char *)"Assertion",
                     (char *)"main",(char *)"!\\initialized(b + (0 .. 10))",
                     34);
@@ -121,21 +115,21 @@ int main(void)
   /*@ assert ¬\initialized(&t3[n - 1 .. n + 2][1][0 .. 1]); */
   {
     int __gen_e_acsl_forall;
-    int __gen_e_acsl_range_5429;
+    int __gen_e_acsl_range_2;
     __gen_e_acsl_forall = 1;
-    __gen_e_acsl_range_5429 = 0;
+    __gen_e_acsl_range_2 = 0;
     while (1) {
-      if (__gen_e_acsl_range_5429 <= 1) ; else break;
+      if (__gen_e_acsl_range_2 <= 1) ; else break;
       {
         int __gen_e_acsl_forall_2;
-        long __gen_e_acsl_range_5428;
+        long __gen_e_acsl_range;
         __gen_e_acsl_forall_2 = 1;
-        __gen_e_acsl_range_5428 = n - 1L;
+        __gen_e_acsl_range = n - 1L;
         while (1) {
-          if (__gen_e_acsl_range_5428 <= n + 2L) ; else break;
+          if (__gen_e_acsl_range <= n + 2L) ; else break;
           {
             int __gen_e_acsl_initialized_4;
-            __gen_e_acsl_initialized_4 = __e_acsl_initialized((void *)(& t3[__gen_e_acsl_range_5428][1][__gen_e_acsl_range_5429]),
+            __gen_e_acsl_initialized_4 = __e_acsl_initialized((void *)(& t3[__gen_e_acsl_range][1][__gen_e_acsl_range_2]),
                                                               sizeof(float));
             if (__gen_e_acsl_initialized_4) ;
             else {
@@ -143,7 +137,7 @@ int main(void)
               goto e_acsl_end_loop1;
             }
           }
-          __gen_e_acsl_range_5428 ++;
+          __gen_e_acsl_range ++;
         }
         e_acsl_end_loop1: ;
         if (__gen_e_acsl_forall_2) ;
@@ -152,12 +146,49 @@ int main(void)
           goto e_acsl_end_loop2;
         }
       }
-      __gen_e_acsl_range_5429 ++;
+      __gen_e_acsl_range_2 ++;
     }
     e_acsl_end_loop2: ;
     __e_acsl_assert(! __gen_e_acsl_forall,(char *)"Assertion",(char *)"main",
                     (char *)"!\\initialized(&t3[n - 1 .. n + 2][1][0 .. 1])",
                     39);
+  }
+  /*@ assert ¬\valid_read(&t3[6][1][0] + (2 .. 10)); */
+  {
+    int __gen_e_acsl_valid_read;
+    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)((char *)(& t3[6][1][0]) + 
+                                                           4 * 2),(size_t)32,
+                                                  (void *)(& t3[6][1][0]),
+                                                  (void *)0);
+    __e_acsl_assert(! __gen_e_acsl_valid_read,(char *)"Assertion",
+                    (char *)"main",
+                    (char *)"!\\valid_read(&t3[6][1][0] + (2 .. 10))",41);
+  }
+  /*@ assert \valid_read(&t3[n - 1 .. n + 2][1]); */
+  {
+    int __gen_e_acsl_forall_3;
+    long __gen_e_acsl_range_3;
+    __gen_e_acsl_forall_3 = 1;
+    __gen_e_acsl_range_3 = n - 1L;
+    while (1) {
+      if (__gen_e_acsl_range_3 <= n + 2L) ; else break;
+      {
+        int __gen_e_acsl_valid_read_2;
+        __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(& t3[__gen_e_acsl_range_3][1]),
+                                                        sizeof(float [4]),
+                                                        (void *)(& t3[__gen_e_acsl_range_3][1]),
+                                                        (void *)0);
+        if (__gen_e_acsl_valid_read_2) ;
+        else {
+          __gen_e_acsl_forall_3 = 0;
+          goto e_acsl_end_loop3;
+        }
+      }
+      __gen_e_acsl_range_3 ++;
+    }
+    e_acsl_end_loop3: ;
+    __e_acsl_assert(__gen_e_acsl_forall_3,(char *)"Assertion",(char *)"main",
+                    (char *)"\\valid_read(&t3[n - 1 .. n + 2][1])",42);
   }
   __retres = 0;
   __e_acsl_delete_block((void *)(t3));

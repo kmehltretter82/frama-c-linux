@@ -37,4 +37,7 @@ int main(void) {
   int n = 2;
   float t3[7][2][4];
   /*@ assert !\initialized(&t3[(n-1)..(n+2)][1][0..1]); */ ;
+
+  /*@ assert !\valid_read(&t3[6][1][0] + (2..10)); */
+  /*@ assert \valid_read(&t3[(n-1)..(n+2)][1]); */
 }
