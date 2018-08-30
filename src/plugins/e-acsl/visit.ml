@@ -211,7 +211,7 @@ class e_acsl_visitor prj generate = object (self)
               let return =
                 Cil.mkStmt ~valid_sid:true (Return(None, Location.unknown)) in
               (* Generate init statements for temporal analysis *)
-              let tinit_stmts = Varinfo.Hashtbl.fold
+              let tinit_stmts = Varinfo.Hashtbl.fold_sorted
                 (fun vi (off, init) acc ->
                   match init with
                   | Some init ->
