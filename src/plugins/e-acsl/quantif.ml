@@ -124,6 +124,31 @@ let convert kf env loc is_forall p bounded_vars hyps goal lscope =
   let term_to_exp = !term_to_exp_ref in
   (* universal quantification over integers (or a subtype of integer) *)
   let guards = compute_quantif_guards p bounded_vars hyps in
+  (* Update logic scope *)
+  let lscope = lscope @ List.map
+    (fun (t1, rel1, lv, rel2, t2) ->
+      let tone =
+        Logic_const.term ~loc (TConst(Integer(Integer.one, None))) Linteger
+      in
+      let t1 = match rel1 with
+      | Rle -> t1
+      | Rlt -> Logic_const.term
+          ~loc
+          (TBinOp(PlusA, t1, tone))
+          Linteger
+      | Rgt | Rge | Req | Rneq -> assert false
+      in
+      let t2 = match rel2 with
+      | Rle -> t2
+      | Rlt -> Logic_const.term
+          ~loc
+          (TBinOp(MinusA, t2, tone))
+          Linteger
+      | Rgt | Rge | Req | Rneq -> assert false
+      in
+      LvsQuantif(t1, lv, t2))
+    guards
+  in
   let var_res, res, env =
     (* variable storing the result of the quantifier *)
     let name = if is_forall then "forall" else "exists" in
@@ -289,8 +314,6 @@ let convert kf env loc is_forall p bounded_vars hyps goal lscope =
   res, env
 
 let quantif_to_exp kf env p lscope =
-  (* TODO: handle the logical scope *)
-  ignore lscope;
   let loc = p.pred_loc in
   match p.pred_content with
   | Pforall(bounded_vars, { pred_content = Pimplies(hyps, goal) }) -> 

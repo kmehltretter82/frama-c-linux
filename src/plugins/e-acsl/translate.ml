@@ -112,6 +112,35 @@ let rec eliminate_ranges_from_index_of_toffset ~loc toffset quantifiers =
   | TField _ ->
     Error.not_yet "range elimination on TField"
 
+(* ************************************************************************ *)
+(* Managing \at with non-void logic scope *)
+(* ************************************************************************ *)
+
+type pred_or_term = PoTPred of predicate | PoTTerm of term
+
+let effective_lscope_from_pred_or_term pot potential_lscope =
+  let o = object(self) inherit Visitor.frama_c_inplace
+    val mutable effective_lscope = ([] : lscope)
+    method !vlogic_var_use lv =
+      begin match Lscope.get_lscope_var lv potential_lscope with
+      | None -> ()
+      | Some lvs -> effective_lscope <- lvs :: effective_lscope
+      end;
+      Cil.DoChildren
+    method visit pot =
+      match pot with
+      | PoTPred p ->
+        ignore
+          (Visitor.visitFramacPredicate (self :> Visitor.frama_c_inplace) p);
+        effective_lscope
+      | PoTTerm t ->
+        ignore
+          (Visitor.visitFramacTerm (self :> Visitor.frama_c_inplace) t);
+        effective_lscope
+  end
+  in
+  o#visit pot
+
 (* ************************************************************************** *)
 (* Transforming terms and predicates into C expressions (if any) *)
 (* ************************************************************************** *)
@@ -553,10 +582,19 @@ and context_insensitive_term_to_exp kf env t (lscope: lscope) =
     let e, env = term_to_exp kf env t lscope in
     e, env, false, ""
   | Tat(t', label) ->
-    (* convert [t'] to [e] in a separated local env *)
+    let effective_lscope =
+      effective_lscope_from_pred_or_term (PoTTerm t') lscope
+    in
+    begin match effective_lscope with
+    | [] ->
     let e, env = term_to_exp kf (Env.push env) t' lscope in
-    let e, env, is_mpz_string = at_to_exp env (Some t) label e lscope in
+    let e, env, is_mpz_string = at_to_exp_no_lscope env (Some t) label e in
     e, env, is_mpz_string, ""
+    | _ :: _ ->
+      let pot = PoTTerm t' in
+      let e, env = at_to_exp_with_lscope ~loc env kf pot lscope label in
+      e, env, false, "" (* TODO: GMP not supported yet *)
+    end
   | Tbase_addr(BuiltinLabel Here, t) ->
     mmodel_call ~loc kf "base_addr" Cil.voidPtrType env t lscope
   | Tbase_addr _ -> not_yet env "labeled \\base_addr"
@@ -580,8 +618,8 @@ and context_insensitive_term_to_exp kf env t (lscope: lscope) =
   | Tcomprehension _ -> not_yet env "tset comprehension"
   | Trange _ -> not_yet env "range"
   | Tlet(li, t) ->
-    let lvs = LvsLet (li.l_var_info) in
-    let lscope = lvs :: lscope in
+    let lvs = LvsLet(li.l_var_info, Misc.term_of_li li) in
+    let lscope = Lscope.add lscope lvs in
     let env = env_of_li li kf env loc lscope in
     let e, env = term_to_exp kf env t lscope in
     Interval.Env.remove li.l_var_info;
@@ -879,9 +917,7 @@ and mmodel_call_memory_block ~loc kf name ctx env p r =
   in
   e, env
 
-and at_to_exp env t_opt label e lscope =
-  (* TODO: handle the logical scope *)
-  ignore lscope;
+and at_to_exp_no_lscope env t_opt label e =
   let stmt = E_acsl_label.get_stmt (Env.get_visitor env) label in
   (* generate a new variable denoting [\at(t',label)].
      That is this variable which is the resulting expression.
@@ -906,13 +942,13 @@ and at_to_exp env t_opt label e lscope =
     inherit Visitor.frama_c_inplace
     method !vstmt_aux stmt =
       (* either a standard C affectation or an mpz one according to type of
-	 [e] *)
+        [e] *)
       let new_stmt = Gmpz.init_set ~loc (Cil.var res_v) res e in
       assert (!env_ref == new_env);
       (* generate the new block of code for the labeled statement and the
-	 corresponding environment *)
+        corresponding environment *)
       let block, new_env =
-	Env.pop_and_get new_env new_stmt ~global_clear:false Env.Middle
+       Env.pop_and_get new_env new_stmt ~global_clear:false Env.Middle
       in
       let pre = match label with
         | BuiltinLabel(Here | Post) -> true
@@ -926,6 +962,26 @@ and at_to_exp env t_opt label e lscope =
   let bhv = Env.get_behavior new_env in
   ignore( Visitor.visitFramacStmt o (Cil.get_stmt bhv stmt));
   res, !env_ref, false
+
+and put_block_at_label env block label =
+  let stmt = E_acsl_label.get_stmt (Env.get_visitor env) label in
+  let env_ref = ref env in
+  let o = object
+    inherit Visitor.frama_c_inplace
+    method !vstmt_aux stmt =
+      assert (!env_ref == env);
+      let pre = match label with
+        | BuiltinLabel(Here | Post) -> true
+        | BuiltinLabel(Old | Pre | LoopEntry | LoopCurrent | Init)
+        | FormalLabel _ | StmtLabel _ -> false
+      in
+      env_ref := Env.extend_stmt_in_place env stmt ~pre block;
+      Cil.ChangeTo stmt
+  end
+  in
+  let bhv = Env.get_behavior env in
+  ignore( Visitor.visitFramacStmt o (Cil.get_stmt bhv stmt));
+  !env_ref
 
 and env_of_li li kf env loc lscope =
   let li_t = Misc.term_of_li li in
@@ -999,23 +1055,31 @@ and named_predicate_content_to_exp ?name kf env p lscope =
     let res3 = named_predicate_to_exp kf (Env.push env2) p3 lscope in
     conditional_to_exp loc None e1 res2 res3
   | Plet(li, p) ->
-    let lvs = LvsLet (li.l_var_info) in
-    let lscope = lvs :: lscope in
+    let lvs = LvsLet(li.l_var_info, Misc.term_of_li li) in
+    let lscope = Lscope.add lscope lvs in
     let env = env_of_li li kf env loc lscope in
     let e, env = named_predicate_to_exp kf env p lscope in
     Interval.Env.remove li.l_var_info;
     e, env
-  | Pforall _ | Pexists _ ->
-    (* TODO: discard everything in Quantif *)
-    Quantif.quantif_to_exp kf env p lscope
+  | Pforall _ | Pexists _ -> Quantif.quantif_to_exp kf env p lscope
   | Pat(p, BuiltinLabel Here) ->
     named_predicate_to_exp kf env p lscope
   | Pat(p', label) ->
+    let effective_lscope =
+      effective_lscope_from_pred_or_term (PoTPred p') lscope
+    in
+    begin match effective_lscope with
+    | [] ->
     (* convert [t'] to [e] in a separated local env *)
     let e, env = named_predicate_to_exp kf (Env.push env) p' lscope in
-    let e, env, is_string = at_to_exp env None label e lscope in
+    let e, env, is_string = at_to_exp_no_lscope env None label e in
     assert (not is_string);
     e, env
+    | _ :: _ ->
+      let pot = PoTPred p' in
+      let e, env = at_to_exp_with_lscope ~loc env kf pot lscope label in
+      e, env
+    end
   | Pvalid_read(BuiltinLabel Here as llabel, t) as pc
   | (Pvalid(BuiltinLabel Here as llabel, t) as pc) ->
     let call_valid t =
@@ -1064,6 +1128,334 @@ and named_predicate_content_to_exp ?name kf env p lscope =
   | Pfreeable _ -> not_yet env "labeled \\freeable"
   | Pfresh _ -> not_yet env "\\fresh"
   | Psubtype _ -> Error.untypable "subtyping relation" (* Jessie specific *)
+
+and at_to_exp_with_lscope ~loc env kf pot lscope label =
+  (* TODO: move this function and everything related to it in a new file
+    so that Translate does not become to long *)
+  if not(Options.Full_mmodel.get ()) then
+    not_yet env "\\at with non-void logic scope but without full memory model";
+  if Options.Gmp_only.get () then
+    not_yet env "\\at with non-void logic scope and with gmp only";
+  let mem_infos, env =
+    mem_infos_from_quantifs ~loc kf lscope [] env
+  in
+  (* Creating the pointer *)
+  let ty = match pot with
+  | PoTPred _ ->
+    Cil.intType
+  | PoTTerm t ->
+    begin match Typing.get_integer_ty t with
+    | Typing.C_type _ | Typing.Other ->
+      Typing.get_typ t
+    | Typing.Gmp ->
+      not_yet env "\\at with non-void logic scope and over gmp type"
+    end
+  in
+  let ty_array = TPtr(ty, []) in
+  let name = Env.Varname.get ~scope:Env.Global "at" in
+  let vi_at, at_e, env = Env.new_var
+    ~loc
+    ~name
+    ~scope:Env.Function
+    env
+    None
+    ty_array
+    (fun _ _ -> [])
+  in
+  (* Size *)
+  let t_sizeof = Logic_const.term ~loc (TSizeOf ty) (Ctype Cil.intType) in
+  let t_size = size_from_mem_infos ~loc mem_infos in
+  let t_size = Logic_const.term
+    ~loc (TBinOp(Mult, t_sizeof, t_size)) Linteger
+  in
+  let i = Interval.infer t_size in
+  begin match Typing.ty_of_interv i with
+  | Typing.C_type IInt ->
+    Typing.type_term ~use_gmp_opt:false ~ctx:Typing.c_int t_size;
+  | Typing.C_type _ | Typing.Gmp ->
+    not_yet
+      env
+      ("\\at with non-void logic scope that needs to allocate too much memory "
+        ^ "(bigger than int_max bytes)")
+  | Typing.Other ->
+    Options.fatal "quantification over non-integer type is not part of E-ACSL"
+  end;
+  let e_size, env = term_to_exp kf (Env.push env) t_size lscope in
+  let e_size = Cil.constFold false e_size in
+  let name = Env.Varname.get ~scope:Env.Global "size" in
+  let _, e_size, env = Env.new_var
+    ~loc
+    ~name
+    ~scope:Env.Function
+    env
+    None
+    Cil.intType
+    (fun vi _ ->
+      let instr = Set(Cil.var vi, e_size, loc) in
+      let stmt = Cil.mkStmtOneInstr instr in
+      [stmt])
+  in
+  let block_size, env = Env.pop_and_get
+    env (Cil.mkEmptyStmt ~loc ()) ~global_clear:true Env.After
+  in
+  let malloc_block = Cil.mkBlock [
+      Cil.mkStmt ~valid_sid:true (Block block_size);
+      Misc.mk_call ~loc ~result:(Cil.var vi_at) "malloc" [e_size]
+    ]
+  in
+  let malloc_stmt = Cil.mkStmt ~valid_sid:true (Block malloc_block) in
+  let free_stmt = Misc.mk_call ~loc "free" [at_e] in
+  begin match kf.fundec with
+  | Definition(fundec, _) ->
+    Lscope.add_malloc_and_free_stmt fundec (malloc_stmt, free_stmt)
+  | Declaration _ ->
+    assert false
+  end;
+  (* Index *)
+  let t_index = index_from_mem_infos ~loc mem_infos in
+  Typing.type_term ~use_gmp_opt:false ~ctx:Typing.c_int t_index;
+  let e_index, env = term_to_exp kf env t_index lscope in
+  let e_index = Cil.constFold false e_index in
+  (* Storing loops *)
+  let e_addr =
+    Cil.new_exp ~loc (BinOp(PlusPI, at_e, e_index, vi_at.vtype))
+  in
+  let lval_at_index = Mem e_addr, NoOffset in
+  let storing_loops, env =
+    mk_storing_loops ~loc kf env lscope lval_at_index pot
+  in
+  (* Put at label *)
+  let block =
+    Cil.mkBlock [ Cil.mkStmt ~valid_sid:true (Block storing_loops) ]
+  in
+  let env = put_block_at_label env block label in
+  (* Returning *)
+  let e = Cil.new_exp ~loc (Lval lval_at_index) in
+  e, env
+
+and mem_infos_from_quantifs ~loc kf lscope res env =
+  (* To LvsQuantif(tmin, lv, tmax) correponds (t_size, t_shifted)
+    where t_size = tmax - tmin + 1 (+1 because the inequalities are large
+                                    due to previous normalization)
+    and t_shifted = lv - tmin (so that we start indexing at 0) *)
+  match lscope with
+  | [] ->
+    res, env
+  | lscope_var :: lscope' ->
+    match lscope_var with
+    | LvsQuantif(tmin, _, tmax)
+      when (term_has_lv_from_vi tmin) || (term_has_lv_from_vi tmax) ->
+      not_yet  env "\\at with logic variable linked to C variable"
+    | LvsQuantif(tmin, lv, tmax) ->
+      let t_size = Logic_const.term
+        ~loc (TBinOp(MinusA, tmax, tmin)) Linteger
+      in
+      let t_size = Logic_const.term
+        ~loc (TBinOp(PlusA, t_size, Logic_const.tinteger ~loc 1)) Linteger
+      in
+      let i = Interval.infer t_size in
+      let t_size = match Ival.min_and_max i with
+      | Some _, Some max ->
+        (* We need to get an over-approx of the amount of memory needed.
+          We may not write to/read from all of if *)
+        Logic_const.tint ~loc max
+      | _ ->
+        not_yet
+          env
+          ("\\at with non-void logic scope and with quantifier that uses too "
+            ^ "complex bound (e-acsl cannot infer a finite upper bound to it)")
+      in
+      (* Index *)
+      let t_lv = Logic_const.tvar ~loc lv in
+      let t_shifted = Logic_const.term
+        ~loc (TBinOp(MinusA, t_lv, tmin)) Linteger
+      in
+      (* Returning *)
+      let res = (t_size, t_shifted) :: res in
+      mem_infos_from_quantifs ~loc kf lscope' res env
+    | LvsLet(_, t) | LvsGlobal(_, t) when (term_has_lv_from_vi t) ->
+      not_yet env "\\at with logic variable linked to C variable"
+    | LvsLet _ ->
+      mem_infos_from_quantifs ~loc kf lscope' res env
+    | LvsFormal _ ->
+      not_yet env "\\at using formal variable of a logic function"
+    | LvsGlobal _ ->
+      not_yet env "\\at using global logic variable"
+
+and size_from_mem_infos ~loc mem_infos =
+  List.fold_left
+    (fun t_size (t_s, _) ->
+      Logic_const.term ~loc (TBinOp(Mult, t_size, t_s)) Linteger)
+    ( Logic_const.tinteger ~loc 1)
+    mem_infos
+
+and index_from_mem_infos ~loc mem_infos =
+  (* We want to associate to each possible tuple of quantifiers
+    a unique index from the set (n | 0 <= n < n_max).
+    That index will serve to identify the memory location where the evaluation
+    of the term/predicate is stored for the given tuple of quantifier.
+    The following gives the smallest set of such indexes (hence we use the
+    smallest amount of memory in some respect):
+    To (t_shifted_n, t_shifted_n-1, ..., t_shifted_1)
+    where 0 <= t_shifted_i < beta_i
+    corresponds:
+      sum_from_i_eq_1_to_n(
+        t_shifted_i *
+        mult_from_j_eq_1_to_i-1(beta_j)
+      )
+  *)
+  match mem_infos with
+  | [] ->
+    Logic_const.tinteger ~loc 0
+  | [(_, t_shifted)] ->
+    t_shifted
+  | (_, t_shifted) :: mem_infos' ->
+    let index' = index_from_mem_infos ~loc mem_infos' in
+    let bi = t_shifted in
+    let rec pi_beta_j mem_infos = match mem_infos with
+      | [] ->
+        Logic_const.tinteger ~loc 1
+      | (t_size, _) :: mem_infos' ->
+        let pi_beta_j' = pi_beta_j mem_infos' in
+        Logic_const.term ~loc (TBinOp(Mult, t_size, pi_beta_j')) Linteger
+    in
+    let pi_beta_j = pi_beta_j mem_infos' in
+    let bi_mult_pi_beta_j = Logic_const.term ~loc
+      (TBinOp(Mult, bi, pi_beta_j)) Linteger
+    in
+    Logic_const.term ~loc (TBinOp(PlusA, bi_mult_pi_beta_j, index')) Linteger
+
+and mk_storing_loops ~loc kf env lscope lval pot =
+  match lscope with
+  | [] ->
+    begin match pot with
+    | PoTPred p ->
+      let e, env = named_predicate_to_exp kf (Env.push env) p lscope in
+      let storing_stmt =
+        Cil.mkStmtOneInstr ~valid_sid:true (Set(lval, e, loc))
+      in
+      let block, env = Env.pop_and_get
+        env storing_stmt ~global_clear:true Env.After
+      in
+      block, env
+    | PoTTerm t ->
+      begin match Typing.get_integer_ty t with
+      | Typing.C_type _ | Typing.Other ->
+        let e, env = term_to_exp kf (Env.push env) t lscope in
+        let storing_stmt =
+          Cil.mkStmtOneInstr ~valid_sid:true (Set(lval, e, loc))
+        in
+        let block, env = Env.pop_and_get
+          env storing_stmt ~global_clear:true Env.After
+        in
+        block, env
+      | Typing.Gmp ->
+        not_yet env "\\at with non-void logic scope and over gmp type"
+      end
+    end
+  | LvsQuantif(tmin, lv, tmax) :: lscope' ->
+    let vi_of_lv = Env.Logic_binding.get env lv in
+    let env = Env.push env in
+    let vi_of_lv, _, env = Env.Logic_binding.add ~ty:vi_of_lv.vtype env lv in
+    let t_lv = Logic_const.tvar ~loc lv in
+    (* Guard *)
+    let guard = Logic_const.term
+      ~loc
+      (TBinOp(Le, t_lv, tmax))
+      (Ctype Cil.intType)
+    in
+    Typing.type_term ~use_gmp_opt:false ~ctx:Typing.c_int guard;
+    let guard_exp, env =
+      term_to_exp kf env guard lscope
+    in
+    (* Break *)
+    let break_stmt = Cil.mkStmt ~valid_sid:true (Break guard_exp.eloc) in
+    (* Inner loop *)
+    let loop', env = mk_storing_loops ~loc kf env lscope' lval pot in
+    let loop' = Cil.mkStmt ~valid_sid:true (Block loop') in
+    (* Loop counter *)
+    let plus_one_term = Logic_const.term
+      ~loc
+      (TBinOp(PlusA, t_lv, Logic_const.tinteger ~loc 1))
+      Linteger
+    in
+    Typing.type_term ~use_gmp_opt:true plus_one_term;
+    let plus_one_exp, env = term_to_exp kf env plus_one_term lscope in
+    let plus_one_stmt = match Typing.get_integer_ty plus_one_term with
+      | Typing.C_type _ | Typing.Gmp->
+        Gmpz.init_set ~loc (Cil.var vi_of_lv) (Cil.evar vi_of_lv) plus_one_exp
+      | Typing.Other ->
+        assert false
+    in
+    (* If guard is satisfiable then inner loop, else break *)
+    let if_stmt = Cil.mkStmt
+      ~valid_sid:true
+      (If(guard_exp,
+        Cil.mkBlock [loop'; plus_one_stmt],
+        Cil.mkBlock [ break_stmt ],
+        guard_exp.eloc))
+    in
+    let loop = Cil.mkStmt
+      ~valid_sid:true
+      (Loop ([],
+        Cil.mkBlock [ if_stmt ],
+        loc,
+        None,
+        Some break_stmt))
+    in
+    (* Init lv *)
+    let tmin_exp, env = term_to_exp kf env tmin lscope in
+    let set_tmin = match Typing.get_integer_ty plus_one_term with
+      | Typing.C_type _ | Typing.Gmp->
+        Gmpz.init_set ~loc (Cil.var vi_of_lv) (Cil.evar vi_of_lv) tmin_exp
+      | Typing.Other ->
+        assert false
+    in
+    (* The whole block *)
+    let block, env = Env.pop_and_get
+      env (Cil.mkEmptyStmt ~loc ()) ~global_clear:true Env.After
+    in
+    block.bstmts <- block.bstmts @ [set_tmin; loop];
+    block, env
+  | LvsLet(lv, t) :: lscope' ->
+    let vi_of_lv = Env.Logic_binding.get env lv in
+    let env = Env.push env in
+    let vi_of_lv, exp_of_lv, env =
+        Env.Logic_binding.add ~ty:vi_of_lv.vtype env lv
+    in
+    let e, env = term_to_exp kf env t lscope in
+    let let_stmt = Gmpz.init_set
+      ~loc (Cil.var vi_of_lv) exp_of_lv  e
+    in
+    let block', env = mk_storing_loops ~loc kf env lscope' lval pot in
+    (* The whole block *)
+    let block, env = Env.pop_and_get
+      env (Cil.mkEmptyStmt ~loc ()) ~global_clear:true Env.After
+    in
+    block.bstmts <-
+      block.bstmts @ [let_stmt; Cil.mkStmt ~valid_sid:true (Block block')];
+    block, env
+    | LvsFormal _ :: _ ->
+      not_yet env "\\at using formal variable of a logic function"
+    | LvsGlobal _ :: _ ->
+      not_yet env "\\at using global logic variable"
+
+and term_has_lv_from_vi t =
+  let o = object(self) inherit Visitor.frama_c_inplace
+    val mutable has_vi = false
+    method !vlogic_var_use lv =
+      match lv.lv_origin with
+      | None ->
+        Cil.DoChildren
+      | Some _ ->
+        has_vi <- true;
+        Cil.SkipChildren
+    method visit t =
+      ignore (Visitor.visitFramacTerm (self :> Visitor.frama_c_inplace) t);
+      has_vi
+  end
+  in
+  o#visit t
 
 and named_predicate_to_exp ?name kf ?rte env p lscope =
   let rte = match rte with None -> Env.generate_rte env | Some b -> b in

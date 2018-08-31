@@ -467,6 +467,49 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         (fun f ->
           Exit_points.clear ();
           self#add_generated_variables_in_function f;
+          (* Memory management for \at with non-void logic scope:
+            Put [malloc] and [free] stmts at proper locations *)
+          let malloc_stmts, free_stmts = Lscope.get_malloc_and_free_stmts f in
+          let fstmts = malloc_stmts @ f.sbody.bstmts in
+          let fstmts =
+            if f.svar.vname = "main" then begin
+              (* [main] is a special case:
+                [main]'s stmts will be wrapped by things like
+                [memory_clean] and [memory_init afterwards] *)
+              match List.rev fstmts with
+              | [] ->
+                (* Cil normalization: there is always a [return] stmt *)
+                assert false
+              | [return] ->
+                free_stmts @ [return]
+              | return :: (stmt :: fstmts) ->
+                (List.rev fstmts) @ [stmt] @ free_stmts @ [return]
+            end
+            else begin
+              (* The last stmt might not be a [return] but a block ending with
+                a [return] (eg: functions with contract)
+                This could potentially (?) happen in a nested manner: that is
+                a block (ending with a block)^n ending with a [return] *)
+              let rec insert_free_stmts stmts free_stmts =
+                match List.rev stmts with
+                | [] ->
+                  assert false
+                | stmt :: stmts' ->
+                  begin match stmt.skind with
+                  | Return _ ->
+                    (List.rev stmts') @ free_stmts @ [stmt]
+                  | Block b ->
+                    b.bstmts <- insert_free_stmts b.bstmts free_stmts;
+                    stmts
+                  | _ ->
+                    assert false
+                  end
+              in
+              insert_free_stmts fstmts free_stmts
+            end
+          in
+          f.sbody.bstmts <- fstmts;
+          (* Return *)
           Options.feedback ~dkey ~level:2 "function %a done."
             Kernel_function.pretty kf;
           f)
