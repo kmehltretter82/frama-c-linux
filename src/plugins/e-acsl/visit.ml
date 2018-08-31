@@ -393,7 +393,8 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       (* Make a unique mapping for each global variable omitting initializers.
        Initializers (used to capture literal strings) are added to
        [global_vars] via the [vinit] visitor method (see comments below). *)
-      Varinfo.Hashtbl.replace global_vars vi (NoOffset, None)
+        Varinfo.Hashtbl.replace global_vars
+          (Cil.get_original_varinfo self#behavior vi) (NoOffset, None)
     | _ -> ());
     if generate then Cil.DoChildrenPost(fun g -> List.iter do_it g; g)
     else Cil.DoChildren
