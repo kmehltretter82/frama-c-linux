@@ -215,7 +215,7 @@ type ('loc, 'value) call = {
   rest: (exp * ('loc, 'value) assigned) list; (** Extra-arguments. *)
   return: varinfo option;                     (** Fake varinfo to store the
                                                   return value of the call.
-                                                  Same varinfo for every 
+                                                  Same varinfo for every
                                                   call to a function. *)
   recursive: bool;
 }

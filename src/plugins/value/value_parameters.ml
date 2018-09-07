@@ -334,7 +334,7 @@ module TracesStorage =
     (struct
       let option_name = "-eva-traces-storage"
       let help = "Stores the states of the traces domain during the \
-                 analysis."
+                  analysis."
       let default = true
     end)
 let () = add_precision_dep TracesStorage.parameter

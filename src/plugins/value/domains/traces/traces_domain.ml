@@ -65,13 +65,13 @@ type edge =
 module Edge = struct
 
   let succ = function
-      | Assign (n,_,_,_)
-      | Assume (n,_,_)
-      | EnterScope (n,_)
-      | LeaveScope (n,_)
-      | CallDeclared (n,_,_,_)
-      | Msg (n,_)
-      | Loop(n,_,_,_) -> n
+    | Assign (n,_,_,_)
+    | Assume (n,_,_)
+    | EnterScope (n,_)
+    | LeaveScope (n,_)
+    | CallDeclared (n,_,_,_)
+    | Msg (n,_)
+    | Loop(n,_,_,_) -> n
 
 
   let rec pretty_edge fmt = function
@@ -90,9 +90,9 @@ module Edge = struct
 
     | Msg(_,s) -> Format.fprintf fmt "%s" s
     | Loop(_,stmt,s,g) -> Format.fprintf fmt "@[Loop(%a) %a@] %a"
-                         Stmt.pretty_sid stmt
-                         Node.pretty s
-                         (GraphShape.pretty pretty_list) g
+                            Stmt.pretty_sid stmt
+                            Node.pretty s
+                            (GraphShape.pretty pretty_list) g
   and pretty fmt e =
     Format.fprintf fmt "@[<hv 2>%a @[-> %a@]@]" pretty_edge e Node.pretty (succ e)
   and pretty_list fmt l = Pretty_utils.pp_list ~sep:";@ " pretty fmt l
@@ -118,43 +118,43 @@ module Edge = struct
         | Assume(n1,e1,b1), Assume(n2,e2,b2) ->
           let c = Node.compare n1 n2 in
           if c <> 0 then c else
-          let c = ExpStructEq.compare e1 e2 in
-          if c <> 0 then c else
-            Pervasives.compare b1 b2
+            let c = ExpStructEq.compare e1 e2 in
+            if c <> 0 then c else
+              Pervasives.compare b1 b2
         | EnterScope(n1,vs1),EnterScope(n2,vs2) ->
           let c = Node.compare n1 n2 in
           if c <> 0 then c else
-          let c = Extlib.list_compare Varinfo.compare vs1 vs2 in
-          c
+            let c = Extlib.list_compare Varinfo.compare vs1 vs2 in
+            c
         | LeaveScope(n1,vs1), LeaveScope(n2,vs2) ->
           let c = Node.compare n1 n2 in
           if c <> 0 then c else
-          let c = Extlib.list_compare Varinfo.compare vs1 vs2 in
-          c
+            let c = Extlib.list_compare Varinfo.compare vs1 vs2 in
+            c
         | CallDeclared(n1,kf1,exp1,lval1), CallDeclared(n2,kf2,exp2,lval2) ->
           let c = Node.compare n1 n2 in
           if c <> 0 then c else
-          let c = Kernel_function.compare kf1 kf2 in
-          if c <> 0 then c else
-            let c = Extlib.list_compare ExpStructEq.compare exp1 exp2 in
+            let c = Kernel_function.compare kf1 kf2 in
             if c <> 0 then c else
-              let c = Extlib.opt_compare Lval.compare lval1 lval2 in
-              c
+              let c = Extlib.list_compare ExpStructEq.compare exp1 exp2 in
+              if c <> 0 then c else
+                let c = Extlib.opt_compare Lval.compare lval1 lval2 in
+                c
         | Msg(n1,s1), Msg(n2,s2) ->
           let c = Node.compare n1 n2 in
           if c <> 0 then c else
-          let c = String.compare s1 s2 in
-          c
+            let c = String.compare s1 s2 in
+            c
         | Loop(n1,stmt1,s1,g1), Loop(n2,stmt2,s2,g2) ->
           let c = Node.compare n1 n2 in
           if c <> 0 then c else
-          let c = Stmt.compare stmt1 stmt2 in
-          if c <> 0 then c else
-          let c = Node.compare s1 s2 in
-          if c <> 0 then c else
-          let c = GraphShape.compare (Extlib.list_compare compare) g1 g2 in
-          if c <> 0 then c else
-            0
+            let c = Stmt.compare stmt1 stmt2 in
+            if c <> 0 then c else
+              let c = Node.compare s1 s2 in
+              if c <> 0 then c else
+                let c = GraphShape.compare (Extlib.list_compare compare) g1 g2 in
+                if c <> 0 then c else
+                  0
         | Assign _, _ -> -1
         | _ , Assign _ -> 1
         | Assume _, _ -> -1
@@ -314,9 +314,9 @@ module Traces = struct
         if c <> 0 then c else
           let c = compare_loops m1.current m2.current in
           if c <> 0 then c else
-              let c = Datatype.Bool.compare m1.call_declared_function m2.call_declared_function in
-              if c <> 0 then c else
-                  0
+            let c = Datatype.Bool.compare m1.call_declared_function m2.call_declared_function in
+            if c <> 0 then c else
+              0
 
       let equal = Datatype.from_compare
 
@@ -411,10 +411,10 @@ module Traces = struct
 
   let get_current state =
     let rec aux = function
-    | Base (c,g) -> (c,g)
-    | OpenLoop(_,_,_,c,g,_) -> (c,g)
-    | UnrollLoop(_,l) ->
-      aux l in
+      | Base (c,g) -> (c,g)
+      | OpenLoop(_,_,_,c,g,_) -> (c,g)
+      | UnrollLoop(_,l) ->
+        aux l in
     aux state.current
 
   let find_succs current g =
@@ -487,11 +487,11 @@ module Traces = struct
         (** reuse an edge from last *)
         let n = get_node e in
         (n,e)
-    | None ->
-      (** create a new edge *)
-      let n = Node.next () in
-      let e = change_next n edge in
-      (n,e)
+      | None ->
+        (** create a new edge *)
+        let n = Node.next () in
+        let e = change_next n edge in
+        (n,e)
     in
     let m = create_edge c.all_edges_ever_created current e in
     let graph = join_graph m graph in
@@ -512,17 +512,17 @@ module Traces = struct
       let fold state e =
         let next_old = get_node e in
         let state = match Node.Hashtbl.find cache next_old with
-        | exception Not_found ->
-          let state = add_edge state e in
-          Node.Hashtbl.add cache next_old (fst (get_current state));
-          let state = aux next_old state in
-          replace_to current_node state
-        | next ->
-          let (_,g) = get_current state in
-          let e = change_next next e in
-          let m = create_edge state.all_edges_ever_created current_node e in
-          let g = join_graph m g in
-          move_to next g state
+          | exception Not_found ->
+            let state = add_edge state e in
+            Node.Hashtbl.add cache next_old (fst (get_current state));
+            let state = aux next_old state in
+            replace_to current_node state
+          | next ->
+            let (_,g) = get_current state in
+            let e = change_next next e in
+            let m = create_edge state.all_edges_ever_created current_node e in
+            let g = join_graph m g in
+            move_to next g state
         in
         replace_to current_node state
       in
@@ -704,9 +704,9 @@ module Traces = struct
     let (n,g) = get_current state in
     let succs = find_succs n g in
     let same_loop = function
-        | Loop(_,stmt',s,last) when Stmt.equal stmt' stmt ->
-          Some (s,last)
-        | _ -> None in
+      | Loop(_,stmt',s,last) when Stmt.equal stmt' stmt ->
+        Some (s,last)
+      | _ -> None in
     let s,last = match Extlib.find_opt same_loop succs with
       | (s,last) -> s,(Graph.from_shape_id last)
       | exception Not_found ->
@@ -723,7 +723,7 @@ module Traces = struct
       `Bottom
     | Base (c1,g1), Base (_,g2) ->
       let g = diff_graph g1 g2 in
-     `Value (Base (c1, g))
+      `Value (Base (c1, g))
     | (OpenLoop(stmt1,_,_,_,_,_) | UnrollLoop(stmt1,_)),
       (OpenLoop(stmt2,_,_,_,_,_) | UnrollLoop(stmt2,_)) when not (Stmt.equal stmt1 stmt2) ->
       (* not same loop *)
@@ -788,7 +788,7 @@ module Traces = struct
           Format.printf "@[<hv 2>@[widen %a: same loops, states are%s equal @]@]@."
             Stmt.pretty_sid stmt' (if compare c1 c2 = 0 then "" else " not")
         else
-            Format.printf "@[<hv 2>@[widen %a@]@]@." Stmt.pretty_sid stmt'
+          Format.printf "@[<hv 2>@[widen %a@]@]@." Stmt.pretty_sid stmt'
       end;
     if not (Value_parameters.TracesUnrollLoop.get ())
     then c2
@@ -880,7 +880,7 @@ module GraphDot = OCamlGraph.Graphviz.Dot(struct
       | Usual(_,e,_) -> [`Label (Format.asprintf "@[<h>%a@]" Edge.pretty_edge e)]
       | Head _ -> []
       | Back(_,_,_) -> [`Constraint false]
-end)
+  end)
 
 (** adds n -> [] for leaves *)
 let rec complete_graph (graph:Graph.t) =
@@ -1047,12 +1047,12 @@ module Internal = struct
     | OpenLoop(stmt,s,last,_,g,l) ->
       let last = Traces.join_graph last g in
       let last = if Value_parameters.TracesUnifyLoop.get () then
-        let s',old_last = Stmt.Hashtbl.find state.all_loop_start stmt in
-        let last = Traces.join_graph last old_last in
-        assert (Node.equal s s');
-        Stmt.Hashtbl.add state.all_loop_start stmt (s,last);
-        last
-      else last
+          let s',old_last = Stmt.Hashtbl.find state.all_loop_start stmt in
+          let last = Traces.join_graph last old_last in
+          assert (Node.equal s s');
+          Stmt.Hashtbl.add state.all_loop_start stmt (s,last);
+          last
+        else last
       in
       let current = OpenLoop(stmt,s,last,s,Graph.empty,l) in
       let state = { state with current } in
@@ -1094,19 +1094,19 @@ let dummy_loc = Location.unknown
 let subst_in_full var_mapping =
   let visit = Cil.copy_visit (Project.current ()) in
   visit, object
-  inherit Cil.genericCilVisitor (visit)
-  method! vvrbl vi =
-    match Varinfo.Map.find vi var_mapping with
-    | exception Not_found -> Cil.DoChildren
-    | v -> Cil.ChangeTo v
-  method! vlogic_var_use lv =
-    match lv.Cil_types.lv_origin with
-    | None -> Cil.DoChildren
-    | Some vi ->
+    inherit Cil.genericCilVisitor (visit)
+    method! vvrbl vi =
       match Varinfo.Map.find vi var_mapping with
       | exception Not_found -> Cil.DoChildren
-      | v -> Cil.ChangeTo (Cil.cvar_to_lvar v)
-end
+      | v -> Cil.ChangeTo v
+    method! vlogic_var_use lv =
+      match lv.Cil_types.lv_origin with
+      | None -> Cil.DoChildren
+      | Some vi ->
+        match Varinfo.Map.find vi var_mapping with
+        | exception Not_found -> Cil.DoChildren
+        | v -> Cil.ChangeTo (Cil.cvar_to_lvar v)
+  end
 
 let subst_in var_mapping = (snd (subst_in_full var_mapping))
 
@@ -1137,11 +1137,11 @@ let rec stmts_of_cfg cfg current var_map locals return_exp acc =
   match Graph.find current cfg with
   | exception Not_found ->
     begin match return_exp with
-    | None -> List.rev acc
-    | Some (var,exp) ->
-      let exp = subst_in_exp var_map exp in
-      let return_stmt = Cil.mkStmtOneInstr ~valid_sid (Cil_types.Set(Cil.var var,exp,dummy_loc)) in
-      List.rev (return_stmt::acc)
+      | None -> List.rev acc
+      | Some (var,exp) ->
+        let exp = subst_in_exp var_map exp in
+        let return_stmt = Cil.mkStmtOneInstr ~valid_sid (Cil_types.Set(Cil.var var,exp,dummy_loc)) in
+        List.rev (return_stmt::acc)
     end
   | [] -> assert false
   | [a] -> begin
@@ -1264,60 +1264,60 @@ let project_of_cfg vreturn s =
 
   let _project = Frama_c_File.create_project_from_visitor "Eva.Traces_domain" visit in
   ()
-  (* let selection = *)
-  (*   State_selection.diff *)
-  (*     State_selection.full *)
-  (*     (State_selection.list_union *)
-  (*        (List.map State_selection.with_dependencies *)
-  (*           [Cil.Builtin_functions.self; *)
-  (*            Ast.self; *)
-  (*            Frama_c_File.files_pre_register_state])) *)
-  (* in *)
-  (* let project = Project.create_by_copy ~selection ~last:true "Eva.Traces_domain" in *)
-  (* let fundecls = *)
-  (*   let l = ref [] in *)
-  (*   Globals.Functions.iter (fun kf -> *)
-  (*       if not (Kernel_function.is_definition kf) then *)
-  (*         l := (kf.Cil_types.spec, Kernel_function.get_vi kf)::!l *)
-  (*     ); *)
-  (*   !l in *)
-  (* Project.on project (fun () -> *)
+(* let selection = *)
+(*   State_selection.diff *)
+(*     State_selection.full *)
+(*     (State_selection.list_union *)
+(*        (List.map State_selection.with_dependencies *)
+(*           [Cil.Builtin_functions.self; *)
+(*            Ast.self; *)
+(*            Frama_c_File.files_pre_register_state])) *)
+(* in *)
+(* let project = Project.create_by_copy ~selection ~last:true "Eva.Traces_domain" in *)
+(* let fundecls = *)
+(*   let l = ref [] in *)
+(*   Globals.Functions.iter (fun kf -> *)
+(*       if not (Kernel_function.is_definition kf) then *)
+(*         l := (kf.Cil_types.spec, Kernel_function.get_vi kf)::!l *)
+(*     ); *)
+(*   !l in *)
+(* Project.on project (fun () -> *)
 
-  (*     let var_map = Varinfo.Map.empty in *)
-  (*     let var_map = List.fold_left fresh_varinfo var_map s.globals in *)
-  (*     let var_map = List.fold_left fresh_varinfo var_map s.main_formals in *)
-  (*     let fundecls, var_map = List.fold_left (fun (fundecls,var_map) (funspec,v) -> *)
-  (*         let fundecl = Cil_types.GFunDecl(funspec,v,dummy_loc) in *)
-  (*         let behavior,visitor = subst_in_full var_map in *)
-  (*         let fundecl = Cil.visitCilGlobal visitor fundecl in *)
-  (*         let v' = Cil.get_varinfo behavior v in *)
-  (*         (fundecl @ fundecls), Varinfo.Map.add v v' var_map *)
-  (*         (\* (fundecl :: fundecls, var_map) *\) *)
-  (*       ) ([],var_map) fundecls in *)
-  (*     let globals = [] in *)
-  (*     (\** main function *\) *)
-  (*     let var_map = fresh_varinfo var_map main in *)
-  (*     let main = subst_in_varinfo var_map main in *)
-  (*     let fundec = Cil.emptyFunctionFromVI main in *)
-  (*     fundec.Cil_types.sformals <- List.map (subst_in_varinfo var_map) s.main_formals; *)
-  (*     let stmts = Cil.mkBlock (stmts_of_cfg s.graph s.start var_map vreturn []) in *)
-  (*     fundec.Cil_types.sbody <- stmts; *)
-  (*     let globals = Cil_types.GFun(fundec,dummy_loc) :: globals in *)
-  (*     (\* declared functions *\) *)
-  (*     let globals = fundecls @ globals in *)
-  (*     (\* globals *\) *)
-  (*     let globals = (List.map (fun v -> Cil_types.GVarDecl(subst_in_varinfo var_map v,dummy_loc)) s.globals) @ globals in *)
-  (*     let file = { Cil_types.fileName = "Traces_domain"; *)
-  (*                  globals; *)
-  (*                  globinit = None; *)
-  (*                  globinitcalled = false; } in *)
-  (*     Globals.set_entry_point (main.Cil_types.vname) false; *)
-  (*     Format.printf "@[<2>@[file1:@] %a@]@." Printer.pp_file file; *)
-  (*     (\* let file = Cil.visitCilFileCopy (new Cil.genericCilVisitor (Cil.refresh_visit project)) file in *\) *)
-  (*     Format.printf "@[<2>@[file2:@] %a@]@." Printer.pp_file file; *)
-  (*     Ast.set_file file; *)
-  (*     Format.printf "@[<2>@[file3:@] %a@]@." Printer.pp_file file; *)
-  (*   ) () *)
+(*     let var_map = Varinfo.Map.empty in *)
+(*     let var_map = List.fold_left fresh_varinfo var_map s.globals in *)
+(*     let var_map = List.fold_left fresh_varinfo var_map s.main_formals in *)
+(*     let fundecls, var_map = List.fold_left (fun (fundecls,var_map) (funspec,v) -> *)
+(*         let fundecl = Cil_types.GFunDecl(funspec,v,dummy_loc) in *)
+(*         let behavior,visitor = subst_in_full var_map in *)
+(*         let fundecl = Cil.visitCilGlobal visitor fundecl in *)
+(*         let v' = Cil.get_varinfo behavior v in *)
+(*         (fundecl @ fundecls), Varinfo.Map.add v v' var_map *)
+(*         (\* (fundecl :: fundecls, var_map) *\) *)
+(*       ) ([],var_map) fundecls in *)
+(*     let globals = [] in *)
+(*     (\** main function *\) *)
+(*     let var_map = fresh_varinfo var_map main in *)
+(*     let main = subst_in_varinfo var_map main in *)
+(*     let fundec = Cil.emptyFunctionFromVI main in *)
+(*     fundec.Cil_types.sformals <- List.map (subst_in_varinfo var_map) s.main_formals; *)
+(*     let stmts = Cil.mkBlock (stmts_of_cfg s.graph s.start var_map vreturn []) in *)
+(*     fundec.Cil_types.sbody <- stmts; *)
+(*     let globals = Cil_types.GFun(fundec,dummy_loc) :: globals in *)
+(*     (\* declared functions *\) *)
+(*     let globals = fundecls @ globals in *)
+(*     (\* globals *\) *)
+(*     let globals = (List.map (fun v -> Cil_types.GVarDecl(subst_in_varinfo var_map v,dummy_loc)) s.globals) @ globals in *)
+(*     let file = { Cil_types.fileName = "Traces_domain"; *)
+(*                  globals; *)
+(*                  globinit = None; *)
+(*                  globinitcalled = false; } in *)
+(*     Globals.set_entry_point (main.Cil_types.vname) false; *)
+(*     Format.printf "@[<2>@[file1:@] %a@]@." Printer.pp_file file; *)
+(*     (\* let file = Cil.visitCilFileCopy (new Cil.genericCilVisitor (Cil.refresh_visit project)) file in *\) *)
+(*     Format.printf "@[<2>@[file2:@] %a@]@." Printer.pp_file file; *)
+(*     Ast.set_file file; *)
+(*     Format.printf "@[<2>@[file3:@] %a@]@." Printer.pp_file file; *)
+(*   ) () *)
 
 
 let output_dot filename state =
