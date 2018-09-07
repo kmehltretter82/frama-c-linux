@@ -302,7 +302,15 @@ module rec Transfer
       | _ ->
         match t2.term_type with
         | Ctype ty when is_ptr_or_array ty -> register_term kf varinfos t2
-        | _ -> assert false)
+        | _ ->
+          if (Misc.is_set_of_ptr_or_array t1.term_type) ||
+            (Misc.is_set_of_ptr_or_array t2.term_type) then
+            (* Occurs for example from:
+               \valid(&multi_dynamic[2..4][1..7])
+               where multi_dynamic has been dynamically allocated *)
+            Error.not_yet "arithmetic over set of pointers or arrays"
+          else
+            assert false)
     | TConst _ | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ | TAlignOf _
     | TAlignOfE _ | Tnull | Ttype _ | TUnOp _ | TBinOp _ ->
       varinfos

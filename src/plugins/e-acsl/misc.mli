@@ -104,6 +104,12 @@ val term_of_li: logic_info -> term
 (* [term_of_li li] assumes that [li.l_body] matches [LBterm t]
    and returns [t]. *)
 
+val is_set_of_ptr_or_array: logic_type -> bool
+(* Checks whehter the given logic type is a set of pointers. *)
+
+val is_range_free: term -> bool
+(* Returns [true] iff the given term does not contain any range. *)
+
 (*
 Local Variables:
 compile-command: "make"

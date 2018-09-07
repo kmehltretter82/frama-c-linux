@@ -250,6 +250,28 @@ let term_of_li li =  match li.l_body with
 | LBterm t -> t
 | LBnone | LBreads _ | LBpred _ | LBinductive _ ->
   Options.fatal "li.l_body does not match LBterm(t) in Misc.term_of_li"
+
+let is_set_of_ptr_or_array lty =
+  try
+    let lty = Logic_const.type_of_element lty in
+    (Logic_utils.isLogicPointerType lty) || (Logic_utils.isLogicArrayType lty)
+  with Failure _ ->
+    false
+
+let is_range_free t =
+  let res_ref = ref true in
+  let has_range_visitor = object inherit Visitor.frama_c_inplace
+    method !vterm t = match t.term_node with
+    | Trange _ ->
+      res_ref := false;
+      Cil.SkipChildren
+    | _ ->
+      Cil.DoChildren
+  end
+  in
+  ignore (Visitor.visitFramacTerm has_range_visitor t);
+  !res_ref
+
 (*
 Local Variables:
 compile-command: "make"

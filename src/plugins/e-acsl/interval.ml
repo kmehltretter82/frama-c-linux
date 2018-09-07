@@ -190,7 +190,12 @@ let rec infer t =
   | Tunion _ -> Error.not_yet "tset union"
   | Tinter _ -> Error.not_yet "tset intersection"
   | Tcomprehension (_,_,_) -> Error.not_yet "tset comprehension"
-  | Trange (_,_) -> Ival.inject_range None None
+  | Trange(Some n1, Some n2) ->
+    let i1 = infer n1 in
+    let i2 = infer n2 in
+    Ival.join i1 i2
+  | Trange(None, _) | Trange(_, None) ->
+    Options.abort "unbounded ranges are not part of E-ACSl"
 
   | Tlet (li,t) ->
     let li_t = Misc.term_of_li li in

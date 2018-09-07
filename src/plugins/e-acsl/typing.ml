@@ -474,7 +474,14 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
     | Tunion _ -> Error.not_yet "tset union"
     | Tinter _ -> Error.not_yet "tset intersection"
     | Tcomprehension (_,_,_) -> Error.not_yet "tset comprehension"
-    | Trange (_,_) -> dup Gmp
+    | Trange(Some n1, Some n2) ->
+      ignore (type_term ~use_gmp_opt:true n1);
+      ignore (type_term ~use_gmp_opt:true n2);
+      let i = Interval.infer t in
+      let ty = ty_of_interv ?ctx i in
+      dup ty
+    | Trange(None, _) | Trange(_, None) ->
+      Options.abort "unbounded ranges are not part of E-ACSl"
     | Tlet(li, t) ->
       infer_if_integer li;
       let li_t = Misc.term_of_li li in

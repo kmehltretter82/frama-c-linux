@@ -6,7 +6,7 @@
 
 extern void *malloc(size_t p);
 extern void free(void* p);
-
+struct S { int a[2]; float *b; float *c;};
 int main(void) {
   int *a;
   a  = malloc(10*sizeof(int));
@@ -40,4 +40,24 @@ int main(void) {
 
   /*@ assert !\valid_read(&t3[6][1][0] + (2..10)); */
   /*@ assert \valid_read(&t3[(n-1)..(n+2)][1]); */
+
+  struct S s;
+  s.a[0] = 7; s.a[1] = 8;
+  /*@ assert \initialized(&s.a[0] + (1..2)); */ ;
+  /*@ assert !\initialized(s.b + (0..1)); */ ;
+
+  int **multi_dynamic;
+  int size1 = 5, size2 = 9;
+  multi_dynamic = malloc(size1 * sizeof(*multi_dynamic));
+  int i;
+  for(i = 0; i < size1; i++) {
+    multi_dynamic[i] = malloc(size2 * sizeof(*(multi_dynamic[i])));
+  }
+  /*@ assert \valid(&multi_dynamic[4][1..7]); */ // single call to builtin
+  /*@ assert \valid(&multi_dynamic[2..4][1..7]); */ // need to modify Mmodel
+                                                    // => not_yet
+  for(i = i-1 ; i >= 0 ; i--) {
+    free(multi_dynamic[i]);
+  }
+  free(multi_dynamic);
 }
