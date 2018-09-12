@@ -290,6 +290,23 @@ let is_bitfield_pointers lty =
   else
     is_bitfield_pointer lty
 
+let term_has_lv_from_vi t =
+  let res_ref = ref false in
+  let o = object inherit Visitor.frama_c_inplace
+    method !vlogic_var_use lv =
+      match lv.lv_origin with
+      | None ->
+        Cil.DoChildren
+      | Some _ ->
+        res_ref := true;
+        Cil.SkipChildren
+  end
+  in
+  ignore (Visitor.visitFramacTerm o t);
+  !res_ref
+
+type pred_or_term = PoT_pred of predicate | PoT_term of term
+
 (*
 Local Variables:
 compile-command: "make"

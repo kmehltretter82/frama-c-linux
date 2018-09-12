@@ -51,7 +51,8 @@ type local_env =
       rte: bool }
 
 type t = 
-    { visitor: Visitor.frama_c_visitor; 
+    { visitor: Visitor.frama_c_visitor;
+      lscope: Lscope.t;
       annotation_kind: Misc.annotation_kind;
       new_global_vars: (varinfo * scope) list;
       (* generated variables. The scope indicates the level where the variable
@@ -108,7 +109,8 @@ let empty_local_env =
     rte = true }
 
 let dummy = 
-  { visitor = new Visitor.generic_frama_c_visitor (Cil.inplace_visit ()); 
+  { visitor = new Visitor.generic_frama_c_visitor (Cil.inplace_visit ());
+    lscope = Lscope.empty ();
     annotation_kind = Misc.Assertion;
     new_global_vars = [];
     global_mpz_tbl = empty_mpz_tbl; 
@@ -119,7 +121,8 @@ let dummy =
     cpt = 0; }
 
 let empty v =
-  { visitor = v; 
+  { visitor = v;
+    lscope = Lscope.empty ();
     annotation_kind = Misc.Assertion;
     new_global_vars = [];
     global_mpz_tbl = empty_mpz_tbl; 
@@ -314,6 +317,10 @@ let current_kf env =
 
 let get_visitor env = env.visitor
 let get_behavior env = env.visitor#behavior
+
+let get_lscope env = env.lscope
+let add_to_lscope env lvs = { env with lscope = Lscope.add env.lscope lvs }
+let reset_lscope env = { env with lscope = Lscope.empty () }
 
 let emitter = 
   Emitter.create

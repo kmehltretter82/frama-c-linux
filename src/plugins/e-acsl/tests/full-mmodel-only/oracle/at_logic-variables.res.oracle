@@ -1,7 +1,7 @@
 [e-acsl] beginning translation.
 [e-acsl] tests/full-mmodel-only/at_logic-variables.c:45: Warning: 
   E-ACSL construct
-  `\at with non-void logic scope that needs to allocate too much memory (bigger than int_max bytes)'
+  `\at on purely logical variables that needs to allocate too much memory (bigger than int_max bytes)'
   is not yet supported.
   Ignoring annotation.
 [e-acsl] tests/full-mmodel-only/at_logic-variables.c:47: Warning: 

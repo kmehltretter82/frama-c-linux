@@ -22,46 +22,55 @@
 
 open Cil_types
 
-
 type lscope_var =
-  | LvsLet of logic_var * term
-  | LvsQuantif of term * logic_var * term
-  | LvsFormal of logic_var * logic_info
-  | LvsGlobal of logic_var * term
+  | Lvs_let of logic_var * term
+  | Lvs_quantif of term * logic_var * term
+  | Lvs_formal of logic_var * logic_info
+  | Lvs_global of logic_var * term
 
-type lscope = lscope_var list
+type t = lscope_var list
+(* The logic scope is usually small, so a list is fine instead of a Map *)
 
-let add lscope lvs = lvs :: lscope
+let empty () = []
 
-let rec get_lscope_var lv lscope =
-  match lscope with
+let is_empty = function [] -> true | _ :: _ -> false
+
+let add t lvs = t @ [lvs]
+(* We need to append [lvs], and not prepend it.
+  This is so that the first element of the list is
+  the first that should be translated,
+  the 2nd element the 2nd to be translated and so on. *)
+
+let top = function
+  | [] -> None
+  | lvs :: lscope -> Some(lvs, lscope)
+
+let rec get_lscope_var lv t =
+  match t with
   | [] ->
     None
-  | lvs :: lscope' ->
+  | lvs :: t' ->
     match lvs with
-    | LvsLet(lv', _) | LvsQuantif(_, lv', _)
-    | LvsFormal(lv', _) | LvsGlobal(lv', _) ->
-      if lv.lv_name = lv'.lv_name then Some lvs
-      else get_lscope_var lv lscope'
+    | Lvs_let(lv', _) | Lvs_quantif(_, lv', _)
+    | Lvs_formal(lv', _) | Lvs_global(lv', _) ->
+      if Cil_datatype.Logic_var.equal lv lv' then Some lvs
+      else get_lscope_var lv t'
 
-module H_malloc_free = Hashtbl.Make(struct
-  type t = fundec
-  let equal (f1:fundec) f2 = Cil_datatype.Fundec.equal f1 f2
-  let hash = Cil_datatype.Fundec.hash
-end)
-let tbl_malloc_free : (stmt list * stmt list) H_malloc_free.t =
-  (* The first (resp.second) list is for malloc (resp. free) stmts *)
-  H_malloc_free.create 7
-
-let add_malloc_and_free_stmt fundec (malloc_stmt, free_stmt) =
-  try
-    let malloc_stmts, free_stmts = H_malloc_free.find tbl_malloc_free fundec in
-    H_malloc_free.add
-      tbl_malloc_free
-      fundec (malloc_stmt :: malloc_stmts, free_stmt :: free_stmts)
-  with Not_found ->
-    H_malloc_free.add tbl_malloc_free fundec  ([malloc_stmt], [free_stmt])
-
-let get_malloc_and_free_stmts fundec =
-  try H_malloc_free.find tbl_malloc_free fundec
-  with Not_found -> [], []
+let effective_lscope_from_pred_or_term pot potential_lscope =
+  let effective_lscope = ref (empty ()) in
+  let o = object inherit Visitor.frama_c_inplace
+    method !vlogic_var_use lv =
+      begin match get_lscope_var lv potential_lscope with
+      | None -> ()
+      | Some lvs -> effective_lscope := add !effective_lscope lvs
+      end;
+      Cil.DoChildren
+  end
+  in
+  match pot with
+  | Misc.PoT_pred p ->
+    ignore (Visitor.visitFramacPredicate o p);
+    !effective_lscope
+  | Misc.PoT_term t ->
+    ignore (Visitor.visitFramacTerm o t);
+    !effective_lscope

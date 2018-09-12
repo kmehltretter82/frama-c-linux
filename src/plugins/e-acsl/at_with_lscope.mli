@@ -20,26 +20,48 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Convert quantifiers. *)
-
 open Cil_types
+open Cil_datatype
 
-val quantif_to_exp:
-  kernel_function -> Env.t -> predicate -> exp * Env.t
-(** The given predicate must be a quantification. *)
+(* Convert \at on terms or predicates in which we can find purely
+  logical variable. *)
 
-(* ***********************************************************************)
-(** {2 Forward references} *)
-(* ***********************************************************************)
+(**************************************************************************)
+(********************** Forward references ********************************)
+(**************************************************************************)
 
-val predicate_to_exp_ref: 
+val predicate_to_exp_ref:
   (kernel_function -> Env.t -> predicate -> exp * Env.t) ref
 
-val term_to_exp_ref: 
-  (kernel_function -> Env.t -> term  -> exp * Env.t) ref
+val term_to_exp_ref:
+  (kernel_function -> Env.t -> term -> exp * Env.t) ref
 
-(*
-Local Variables:
-compile-command: "make"
-End:
-*)
+(**************************************************************************)
+(*************************** Translation **********************************)
+(**************************************************************************)
+
+val to_exp:
+  loc:Location.t -> kernel_function -> Env.t ->
+  Misc.pred_or_term -> logic_label -> exp * Env.t
+
+(*****************************************************************************)
+(**************************** Handling memory ********************************)
+(*****************************************************************************)
+
+(* The different possible evaluations of the [\at] under study are
+  stored on a memory location that needs to be alloted then freed.
+  This part is designed for that purpose. *)
+
+type malloc_and_free_stmts = {
+  mf_malloc : stmt;
+  mf_free : stmt
+}
+(* A malloc stmt and its associated free stmt. *)
+
+val add_malloc_and_free_stmts:
+  kernel_function -> malloc_and_free_stmts -> unit
+(* Add a [malloc] and [free] stmts that need to be added to [kf] *)
+
+val get_malloc_and_free_stmts: fundec -> stmt list * stmt list
+(* Get the list of [malloc] and [free] stmts that need to be added
+  to [fundec] *)

@@ -39,11 +39,11 @@ int main(void) {
   int t[5] = {9, 12, 12, 12, -4};
   f(t);
 
-  // Not yets:
+  // Not yet:
   /*@ assert
         \exists integer j; 2 <= j < 10000000000000000 // too big => not_yet
         && \at(n + j == 11, L); */ ;
-  /*@ assert \let i = n; // TODO: lv defined with C var => not_yet
+  /*@ assert \let i = n; // lv defined with C var => not_yet
         \at(n + i == 10, L); */ ;
 
   return 0;

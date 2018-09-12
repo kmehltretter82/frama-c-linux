@@ -14,10 +14,8 @@ void f(int *t)
 /*@ ensures ∀ ℤ n; 1 < n ≤ 3 ⇒ \old(*(t + n) ≡ 12); */
 void __gen_e_acsl_f(int *t)
 {
-  int __gen_e_acsl_size_7;
   int *__gen_e_acsl_at_8;
-  __gen_e_acsl_size_7 = 8;
-  __gen_e_acsl_at_8 = (int *)malloc((size_t)__gen_e_acsl_size_7);
+  __gen_e_acsl_at_8 = (int *)malloc((size_t)8);
   {
     int __gen_e_acsl_n;
     __gen_e_acsl_n = 1 + 1;
@@ -92,35 +90,22 @@ void __e_acsl_globals_init(void)
 
 int main(void)
 {
-  int *__gen_e_acsl_at_7;
-  int __gen_e_acsl_size_6;
   int *__gen_e_acsl_at_6;
-  int __gen_e_acsl_size_5;
   long *__gen_e_acsl_at_5;
-  int __gen_e_acsl_size_4;
   long *__gen_e_acsl_at_4;
-  int __gen_e_acsl_size_3;
   int *__gen_e_acsl_at_3;
-  int __gen_e_acsl_size_2;
   int *__gen_e_acsl_at_2;
-  int __gen_e_acsl_size;
   int *__gen_e_acsl_at;
   int __retres;
   int n;
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   __e_acsl_globals_init();
-  __gen_e_acsl_size_6 = 1536;
-  __gen_e_acsl_at_6 = (int *)malloc((size_t)__gen_e_acsl_size_6);
-  __gen_e_acsl_size_5 = 64;
-  __gen_e_acsl_at_5 = (long *)malloc((size_t)__gen_e_acsl_size_5);
-  __gen_e_acsl_size_4 = 8;
-  __gen_e_acsl_at_4 = (long *)malloc((size_t)__gen_e_acsl_size_4);
-  __gen_e_acsl_size_3 = 528;
-  __gen_e_acsl_at_3 = (int *)malloc((size_t)__gen_e_acsl_size_3);
-  __gen_e_acsl_size_2 = 12;
-  __gen_e_acsl_at_2 = (int *)malloc((size_t)__gen_e_acsl_size_2);
-  __gen_e_acsl_size = 4;
-  __gen_e_acsl_at = (int *)malloc((size_t)__gen_e_acsl_size);
+  __gen_e_acsl_at_6 = (int *)malloc((size_t)1536);
+  __gen_e_acsl_at_5 = (long *)malloc((size_t)64);
+  __gen_e_acsl_at_4 = (long *)malloc((size_t)8);
+  __gen_e_acsl_at_3 = (int *)malloc((size_t)528);
+  __gen_e_acsl_at_2 = (int *)malloc((size_t)12);
+  __gen_e_acsl_at = (int *)malloc((size_t)4);
   __e_acsl_store_block((void *)(& n),(size_t)4);
   __e_acsl_store_block((void *)(& __retres),(size_t)4);
   __e_acsl_full_init((void *)(& n));
@@ -180,9 +165,9 @@ int main(void)
     }
     {
       int __gen_e_acsl_k;
-      __gen_e_acsl_k = -7;
       {
         int __gen_e_acsl_u;
+        __gen_e_acsl_k = -7;
         __gen_e_acsl_u = 9;
         while (1) 
           if (__gen_e_acsl_u <= 20) {
@@ -453,12 +438,12 @@ int main(void)
   /*@ assert \let i = n; \at(n + i ≡ 10,L); */ ;
   __e_acsl_full_init((void *)(& __retres));
   __retres = 0;
-  free((void *)__gen_e_acsl_at_6);
-  free((void *)__gen_e_acsl_at_5);
-  free((void *)__gen_e_acsl_at_4);
-  free((void *)__gen_e_acsl_at_3);
-  free((void *)__gen_e_acsl_at_2);
   free((void *)__gen_e_acsl_at);
+  free((void *)__gen_e_acsl_at_2);
+  free((void *)__gen_e_acsl_at_3);
+  free((void *)__gen_e_acsl_at_4);
+  free((void *)__gen_e_acsl_at_5);
+  free((void *)__gen_e_acsl_at_6);
   __e_acsl_delete_block((void *)(& f));
   __e_acsl_delete_block((void *)(& __fc_p_fopen));
   __e_acsl_delete_block((void *)(__fc_fopen));

@@ -22,18 +22,35 @@
 
 open Cil_types
 
+(* Handle the logic scope of a term.
+  We define the logic scope of a term [t] to be the set of PURELY logical
+  variables that are visible by [t]. *)
 
 type lscope_var =
-  | LvsLet of logic_var * term
-  | LvsQuantif of term * logic_var * term
-  | LvsFormal of logic_var * logic_info
-  | LvsGlobal of logic_var * term
+  | Lvs_let of logic_var * term (* the expression to which the lv is binded *)
+  | Lvs_quantif of term (* min *) * logic_var * term (* max *)
+  | Lvs_formal of logic_var * logic_info (* the logic definition *)
+  | Lvs_global of logic_var * term (* same as Lvs_let *)
 
-type lscope = lscope_var list (* TODO: maybe a Map is better *)
+type t
 
-val add: lscope -> lscope_var -> lscope
+val empty: unit -> t
+(* Create an empty logic scope. *)
 
-val get_lscope_var: logic_var -> lscope -> lscope_var option
+val is_empty: t -> bool
+(* Check whether the given logic scope is empty. *)
 
-val add_malloc_and_free_stmt:  fundec -> stmt * stmt -> unit
-val get_malloc_and_free_stmts: fundec -> stmt list * stmt list
+val add: t -> lscope_var -> t
+(* Return a new logic scope in which the given [lscope_var] has been added. *)
+
+val get_lscope_var: logic_var -> t -> lscope_var option
+(* Return the [lscope_var] associated to the given logic var, if it exists. *)
+
+val top: t -> (lscope_var * t) option
+(* Return the outermost [lscope_var]. *)
+
+val effective_lscope_from_pred_or_term: Misc.pred_or_term -> t -> t
+(* We define the EFFECTIVE logical scope of a predicate or term [pot],
+  for a given POTENTIAL logical [potential_lscope] scope, to be the set [S] of
+  logical variables from [potential_lscope] that appear in [pot].
+  [effective_lscope_from_pred_or_term pot potential_lscope] computes [S]. *)
