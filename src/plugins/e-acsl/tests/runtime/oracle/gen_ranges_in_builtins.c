@@ -6,6 +6,14 @@ struct S {
    float *b ;
    float *c ;
 };
+/*@ requires ¬\valid(s + (3 .. n + 1000)); */
+void __gen_e_acsl_f(char *s, long n);
+
+void f(char *s, long n)
+{
+  return;
+}
+
 int main(void)
 {
   int __retres;
@@ -76,16 +84,16 @@ int main(void)
   /*@ assert \valid(&t[0 .. 2]); */
   {
     int __gen_e_acsl_valid_6;
-    __gen_e_acsl_valid_6 = __e_acsl_valid((void *)((char *)(t) + 8 * 0),
-                                          (size_t)16,(void *)(t),(void *)(t));
+    __gen_e_acsl_valid_6 = __e_acsl_valid((void *)((char *)(& t) + 8 * 0),
+                                          (size_t)16,(void *)(& t),(void *)0);
     __e_acsl_assert(__gen_e_acsl_valid_6,(char *)"Assertion",(char *)"main",
                     (char *)"\\valid(&t[0 .. 2])",25);
   }
   /*@ assert ¬\valid(&t[3 .. 5]); */
   {
     int __gen_e_acsl_valid_7;
-    __gen_e_acsl_valid_7 = __e_acsl_valid((void *)((char *)(t) + 8 * 3),
-                                          (size_t)16,(void *)(t),(void *)(t));
+    __gen_e_acsl_valid_7 = __e_acsl_valid((void *)((char *)(& t) + 8 * 3),
+                                          (size_t)16,(void *)(& t),(void *)0);
     __e_acsl_assert(! __gen_e_acsl_valid_7,(char *)"Assertion",
                     (char *)"main",(char *)"!\\valid(&t[3 .. 5])",26);
   }
@@ -96,7 +104,7 @@ int main(void)
   /*@ assert \initialized(&t2[0 .. 1]); */
   {
     int __gen_e_acsl_initialized;
-    __gen_e_acsl_initialized = __e_acsl_initialized((void *)((char *)(t2) + 
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)((char *)(& t2) + 
                                                              8 * 0),
                                                     (size_t)8);
     __e_acsl_assert(__gen_e_acsl_initialized,(char *)"Assertion",
@@ -105,7 +113,7 @@ int main(void)
   /*@ assert ¬\initialized(&t2[2 .. 3]); */
   {
     int __gen_e_acsl_initialized_2;
-    __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)((char *)(t2) + 
+    __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)((char *)(& t2) + 
                                                                8 * 2),
                                                       (size_t)8);
     __e_acsl_assert(! __gen_e_acsl_initialized_2,(char *)"Assertion",
@@ -259,7 +267,12 @@ int main(void)
     i --;
   }
   free((void *)multi_dynamic);
+  char c = (char)'w';
+  __e_acsl_store_block((void *)(& c),(size_t)1);
+  __e_acsl_full_init((void *)(& c));
+  __gen_e_acsl_f(& c,(long)5);
   __retres = 0;
+  __e_acsl_delete_block((void *)(& c));
   __e_acsl_delete_block((void *)(& multi_dynamic));
   __e_acsl_delete_block((void *)(& s));
   __e_acsl_delete_block((void *)(t3));
@@ -269,6 +282,15 @@ int main(void)
   __e_acsl_delete_block((void *)(& a));
   __e_acsl_memory_clean();
   return __retres;
+}
+
+/*@ requires ¬\valid(s + (3 .. n + 1000)); */
+void __gen_e_acsl_f(char *s, long n)
+{
+  __e_acsl_store_block((void *)(& s),(size_t)8);
+  f(s,n);
+  __e_acsl_delete_block((void *)(& s));
+  return;
 }
 
 

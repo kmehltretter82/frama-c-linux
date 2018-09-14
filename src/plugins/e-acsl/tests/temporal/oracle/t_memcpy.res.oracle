@@ -8,10 +8,19 @@
 [e-acsl] FRAMAC_SHARE/libc/string.h:78: Warning: 
   E-ACSL construct `\separated' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:101: Warning: 
+  E-ACSL construct `size of memory area in GMP' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:101: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:104: Warning: 
   E-ACSL construct `user-defined logic type' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:78: Warning: 
+  E-ACSL construct `size of memory area in GMP' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:79: Warning: 
+  E-ACSL construct `size of memory area in GMP' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:81: Warning: 
   E-ACSL construct `\separated' is not yet supported. Ignoring annotation.

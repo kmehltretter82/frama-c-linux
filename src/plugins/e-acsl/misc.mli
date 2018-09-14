@@ -105,7 +105,7 @@ val term_of_li: logic_info -> term
    and returns [t]. *)
 
 val is_set_of_ptr_or_array: logic_type -> bool
-(* Checks whehter the given logic type is a set of pointers. *)
+(* Checks whether the given logic type is a set of pointers. *)
 
 val is_range_free: term -> bool
 (* Returns [true] iff the given term does not contain any range. *)

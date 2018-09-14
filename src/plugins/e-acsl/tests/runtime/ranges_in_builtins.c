@@ -1,9 +1,9 @@
 /* run.config
    COMMENT: ranges in a few builtins
 */
-
 #include "stdlib.h"
-
+/*@ requires !\valid(s + (3..n+1000)); */
+void f(char *s, long n){}
 extern void *malloc(size_t p);
 extern void free(void* p);
 struct S { int a[2]; float *b; float *c;};
@@ -60,4 +60,7 @@ int main(void) {
     free(multi_dynamic[i]);
   }
   free(multi_dynamic);
+
+  char c = 'w';
+  f(&c, 5);
 }

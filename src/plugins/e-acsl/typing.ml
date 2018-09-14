@@ -475,8 +475,8 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
     | Tinter _ -> Error.not_yet "tset intersection"
     | Tcomprehension (_,_,_) -> Error.not_yet "tset comprehension"
     | Trange(Some n1, Some n2) ->
-      ignore (type_term ~use_gmp_opt:true n1);
-      ignore (type_term ~use_gmp_opt:true n2);
+      ignore (type_term ~use_gmp_opt n1);
+      ignore (type_term ~use_gmp_opt n2);
       let i = Interval.infer t in
       let ty = ty_of_interv ?ctx i in
       dup ty

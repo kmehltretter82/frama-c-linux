@@ -303,12 +303,13 @@ module rec Transfer
         match t2.term_type with
         | Ctype ty when is_ptr_or_array ty -> register_term kf varinfos t2
         | _ ->
-          if (Misc.is_set_of_ptr_or_array t1.term_type) ||
-            (Misc.is_set_of_ptr_or_array t2.term_type) then
+          if Misc.is_set_of_ptr_or_array t1.term_type ||
+             Misc.is_set_of_ptr_or_array t2.term_type then
             (* Occurs for example from:
-               \valid(&multi_dynamic[2..4][1..7])
-               where multi_dynamic has been dynamically allocated *)
-            Error.not_yet "arithmetic over set of pointers or arrays"
+              \valid(&multi_dynamic[2..4][1..7])
+              where multi_dynamic has been dynamically allocated *)
+            let varinfos = register_term kf varinfos t1 in
+            register_term kf varinfos t2
           else
             assert false)
     | TConst _ | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ | TAlignOf _
@@ -329,7 +330,11 @@ module rec Transfer
     | Tunion _ -> Error.not_yet "set union"
     | Tinter _ -> Error.not_yet "set intersection"
     | Tcomprehension _ -> Error.not_yet "set comprehension"
-    | Trange _ -> Error.not_yet "\\range"
+    | Trange(Some t1, Some t2) ->
+      let varinfos = register_term kf varinfos t1 in
+      register_term kf varinfos t2
+    | Trange(None, _) | Trange(_, None) ->
+      Options.abort "unbounded ranges are not part of E-ACSL"
 
   and register_body kf varinfos = function
     | LBnone | LBreads _ -> varinfos

@@ -154,6 +154,7 @@ int main(void)
   __e_acsl_temporal_store_nblock((void *)(& q),(void *)*(& q));
   __e_acsl_temporal_store_nblock((void *)p,(void *)(& a));
   __e_acsl_initialize((void *)p,sizeof(int *));
+  /*@ assert Value: mem_access: \valid(p); */
   *p = & a;
   __e_acsl_temporal_store_nblock((void *)(p + 1),(void *)(& a));
   __e_acsl_initialize((void *)(p + 1),sizeof(int *));
@@ -236,6 +237,8 @@ int main(void)
       else __gen_e_acsl_and_10 = 0;
       __e_acsl_assert(__gen_e_acsl_and_10,(char *)"RTE",(char *)"main",
                       (char *)"mem_access: \\valid_read(q)",44);
+      /*@ assert Value: initialization: \initialized(q); */
+      /*@ assert Value: mem_access: \valid_read(q); */
       __gen_e_acsl_valid_9 = __e_acsl_valid((void *)*q,sizeof(int),
                                             (void *)*q,(void *)q);
       __gen_e_acsl_and_11 = __gen_e_acsl_valid_9;
@@ -259,6 +262,8 @@ int main(void)
                                                       (void *)(& q));
       __e_acsl_assert(__gen_e_acsl_valid_read_4,(char *)"RTE",(char *)"main",
                       (char *)"mem_access: \\valid_read(q + 1)",45);
+      /*@ assert Value: initialization: \initialized(q + 1); */
+      /*@ assert Value: mem_access: \valid_read(q + 1); */
       __gen_e_acsl_valid_10 = __e_acsl_valid((void *)*(q + 1),sizeof(int),
                                              (void *)*(q + 1),
                                              (void *)(q + 1));
@@ -273,6 +278,7 @@ int main(void)
   tmp_1 = (int *)0;
   __e_acsl_temporal_store_nreferent((void *)(q + 1),(void *)(& tmp_1));
   __e_acsl_initialize((void *)(q + 1),sizeof(int *));
+  /*@ assert Value: mem_access: \valid(q + 1); */
   *(q + 1) = tmp_1;
   __e_acsl_temporal_store_nreferent((void *)q,(void *)(& tmp_1));
   __e_acsl_initialize((void *)q,sizeof(int *));
