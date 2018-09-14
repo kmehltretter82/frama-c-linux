@@ -762,7 +762,8 @@ and mmodel_call_with_ranges ~loc kf name ctx env t mmodel_call_default =
       in
       let t' = Logic_const.taddrof ~loc (TVar lv, toffset') lty_noset in
       let p_quantified =
-        let loc = Some (loc :> Cil_types.location) in
+        (* [loc] prevents a type error with eta-expansion and label *)
+        let loc = Some loc in
         let call f = f ?loc (Logic_const.here_label, t') in
         match name with
         | "valid" -> call Logic_const.pvalid
