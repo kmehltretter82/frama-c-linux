@@ -19,6 +19,9 @@
 #   configure	configure
 ###############################################################################
 
+-  E-ACSL       [2018/18/09] Support for ranges in memory builtins
+	        (\valid, \initialized, etc).
+
 ###############################
 Plugin E-ACSL Chlorine-20180501
 ###############################

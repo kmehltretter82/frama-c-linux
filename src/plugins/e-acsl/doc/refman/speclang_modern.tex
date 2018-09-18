@@ -351,7 +351,7 @@ Figure~\ref{fig:gram:oldandresult} summarizes grammar extension of terms with
 \subsection{Memory locations and sets of terms}
 \label{sec:locations}
 
-\except{\notimplemented{ranges and set comprehensions} are limited in order to
+\except{ranges and \notimplemented{set comprehensions} are limited in order to
   be finite}
 
 Figure~\ref{fig:gram:locations} describes grammar of sets of terms. The only
@@ -371,6 +371,17 @@ members easily identifiable.
 \begin{example}\label{ex:tset}
 The set \lstinlineµ{ x | integer x; 0 <= x <= 9 || 20 <= x <= 29 }µ denotes the
 set of all integers between 0 and 9 and between 20 and 29.
+\end{example}
+\end{notimplementedenv}
+
+\begin{notimplementedenv}
+  Ranges are currently only supported in memory built-ins described in
+  Section~\ref{subsec:memory} and~\ref{sec:dangling}.
+
+\begin{example}
+The predicate \lstinline|\valid(&t[0 .. 9])| is supported and denotes that
+the ten first cells of the array \lstinline|t| are valid. Writing the term
+\lstinline|&t[0 .. 9]| alone, outside any memory built-in, is not yet supported.
 \end{example}
 \end{notimplementedenv}
 
@@ -665,7 +676,8 @@ predicates which are related to memory location.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Memory blocks and pointer dereferencing}
-\label{subsec:memory}\label{sec:memory}
+\label{subsec:memory}
+\label{sec:memory} % for correctness of \changeinsection in Changes
 \nodiff
 
 \difficultswhy{\lstinline|\\base\_addr|,
