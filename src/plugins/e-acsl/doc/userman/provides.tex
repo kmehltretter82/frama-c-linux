@@ -894,8 +894,14 @@ library in order to generate the \framac internal representation of the \C
 program (\emph{aka} AST), as explained in Section~\ref{sec:run}. Consequently,
 even if the \eacsl plug-in keeps the maximum amount of information, the results
 of already executed analyzers (such as validity status of annotations) are not
-known in this new project. If you want to keep them, you have to set the option
-\shortopt{e-acsl-prepare} when the first analysis is asked for.
+known in this new project.
+
+\begin{important}
+If you want to keep results of former analysis, you have to set the option
+\shortopt{e-acsl-prepare} when the first analysis is asked for. The standard
+example is running \eacsl after \Eva: in such a case, \shortopt{e-acsl-prepare}
+must be provided together with the \Eva's \shortopt{-val} option.
+\end{important}
 
 In this context, the \eacsl plug-in does not generate code for annotations
 proven valid by another plug-in, except if you explicitly set the option
