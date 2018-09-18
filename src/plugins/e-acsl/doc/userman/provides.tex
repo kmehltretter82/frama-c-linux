@@ -552,6 +552,12 @@ potential memory-related annotations even when it is not required.  This
 feature can be enabled using the \shortopt{M} switch of \eacslgcc or
 \shortopt{e-acsl-full-mmodel} option of the \eacsl plug-in.
 
+\begin{important}
+The above-mentioned static analysis is probably the less robust part of \eacsl
+for the time being. When handling a large piece of code, it might be necessary
+to deactivate it and systematically instrument the code as explained above.
+\end{important}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% \subsection{Debug Libraries}
 %% \label{sec:runtime-debug}
