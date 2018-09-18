@@ -79,10 +79,6 @@ let eliminate_ranges_from_index_of_term ~loc t =
     let lv = Cil_const.make_logic_var_kind name LVQuant Linteger in
     let tlv = Logic_const.tvar ~loc lv in
     tlv, (n1, lv, n2)
-  | TBinOp(PlusA, _, {term_node = Trange _}) ->
-    (* t[n + (0..3)] results in a typing error:
-      arithmetic conversion between non arithmetic types int and set<ℤ> *)
-    assert false
   | _ ->
     raise Range_elimination_exception
 
@@ -92,13 +88,6 @@ let eliminate_ranges_from_index_of_term ~loc t =
   if we don't support the construction yet. *)
 let rec eliminate_ranges_from_index_of_toffset ~loc toffset quantifiers =
   match toffset with
-  | TIndex(t, TNoOffset) ->
-    if Misc.is_range_free t then
-      toffset, quantifiers
-    else
-      (* Attempt Range Elimination on [t] *)
-      let t', q = eliminate_ranges_from_index_of_term ~loc t in
-      TIndex(t', TNoOffset), q :: quantifiers
   | TIndex(t, toffset') ->
     if Misc.is_range_free t then
       let toffset', quantifiers' =
@@ -668,8 +657,7 @@ and mk_ptr_sizeof typ loc =
 
 (* \valid, \offset and \initialized annotations *)
 and mmodel_call_with_size ~loc kf name ctx env t =
-  mmodel_call_with_ranges ~loc kf name ctx env t
-  begin fun ~loc kf name ctx env t ->
+  let call_for_unsupported_constructs ~loc kf name ctx env t =
     let e, env = term_to_exp kf (Env.rte env true) t in
     let _, res, env =
       Env.new_var
@@ -685,16 +673,17 @@ and mmodel_call_with_size ~loc kf name ctx env t =
           [ Misc.mk_call ~loc ~result:(Cil.var v) fname [ e; sizeof ] ])
     in
     res, env
-  end
+  in
+  mmodel_call_with_ranges
+    ~loc kf name ctx env t call_for_unsupported_constructs
 
 and mmodel_call_valid ~loc kf name ctx env t =
-  mmodel_call_with_ranges ~loc kf name ctx env t
-  begin fun ~loc kf name ctx env t ->
+  let call_for_unsupported_constructs ~loc kf name ctx env t =
     let e, env = term_to_exp kf (Env.rte env true) t in
     let base, _ = Misc.ptr_index ~loc e in
     let base_addr  = match base.enode with
       | AddrOf _ | Const _ -> Cil.zero ~loc
-      | Lval(lv) | StartOf(lv) -> Cil.mkAddrOrStartOf ~loc lv
+      | Lval lv | StartOf lv -> Cil.mkAddrOrStartOf ~loc lv
       | _ -> assert false
     in
     let _, res, env =
@@ -712,7 +701,9 @@ and mmodel_call_valid ~loc kf name ctx env t =
           [ Misc.mk_call ~loc ~result:(Cil.var v) fname args ])
     in
     res, env
-  end
+  in
+  mmodel_call_with_ranges
+    ~loc kf name ctx env t call_for_unsupported_constructs
 
 (* [mmodel_call_with_ranges] handles ranges in [t] when calling builtin [name].
   It only supports the following cases for the time being:
@@ -735,7 +726,7 @@ and mmodel_call_valid ~loc kf name ctx env t =
        NON-contiguous locations -> multiple calls (3) to [__e_acsl_valid] *)
 and mmodel_call_with_ranges ~loc kf name ctx env t mmodel_call_default =
   match t.term_node with
-  | TBinOp((PlusPI | IndexPI), p, ({term_node = Trange _} as r)) ->
+  | TBinOp((PlusPI | IndexPI), p, ({ term_node = Trange _ } as r)) ->
     if Misc.is_set_of_ptr_or_array p.term_type then
       not_yet env "arithmetic over set of pointers or arrays"
     else
@@ -747,48 +738,47 @@ and mmodel_call_with_ranges ~loc kf name ctx env t mmodel_call_default =
     let lty_noset = Logic_const.type_of_element t.term_type in
     let p = Logic_const.taddrof ~loc (TVar lv, TNoOffset) lty_noset in
     mmodel_call_memory_block ~loc kf name ctx env p r
-  | TAddrOf(TVar ({lv_type = Ctype (TArray _)} as lv), toffset) ->
+  | TAddrOf(TVar ({ lv_type = Ctype (TArray _) } as lv), toffset) ->
     if has_set_as_index toffset then
-    (* Case B *)
-    begin try
-      let toffset', quantifiers =
-        eliminate_ranges_from_index_of_toffset ~loc toffset []
-      in
-      let lty_noset =
-        if Logic_const.is_set_type t.term_type then
-          Logic_const.type_of_element t.term_type
-        else
-          t.term_type
-      in
-      let t' = Logic_const.taddrof ~loc (TVar lv, toffset') lty_noset in
-      let p_quantified =
-        (* [loc] prevents a type error with eta-expansion and label *)
-        let loc = Some loc in
-        let call f = f ?loc (Logic_const.here_label, t') in
-        match name with
-        | "valid" -> call Logic_const.pvalid
-        | "initialized" -> call Logic_const.pinitialized
-        | "valid_read" -> call Logic_const.pvalid_read
-        | _ -> Options.fatal "[mmodel_call_with_ranges] unexpected builtin"
+      (* Case B *)
+      try
+        let toffset', quantifiers =
+          eliminate_ranges_from_index_of_toffset ~loc toffset []
         in
-        let p_quantified = List.fold_left
-          (fun p (tmin, lv, tmax) ->
-            (* \forall integer tlv; tmin <= tlv <= tmax ==> p *)
-            let tlv = Logic_const.tvar ~loc lv in
-            let lower_bound = Logic_const.prel ~loc (Rle, tmin, tlv) in
-            let upper_bound = Logic_const.prel ~loc (Rle, tlv, tmax) in
-            let bound = Logic_const.pand ~loc (lower_bound, upper_bound) in
-            let bound_imp_p = Logic_const.pimplies ~loc (bound, p) in
-            Logic_const.pforall ~loc ([lv], bound_imp_p))
-          p_quantified
-          quantifiers
-      in
-      Typing.type_named_predicate ~must_clear:true p_quantified;
-      named_predicate_to_exp kf env p_quantified
-    with Range_elimination_exception ->
-      (* Case C *)
-      mmodel_call_default ~loc kf name ctx env t
-    end
+        let lty_noset =
+          if Logic_const.is_set_type t.term_type then
+            Logic_const.type_of_element t.term_type
+          else
+            t.term_type
+        in
+        let t' = Logic_const.taddrof ~loc (TVar lv, toffset') lty_noset in
+        let p_quantified =
+          (* [loc] prevents a type error with eta-expansion and label *)
+          let loc = Some loc in
+          let call f = f ?loc (Logic_const.here_label, t') in
+          match name with
+          | "valid" -> call Logic_const.pvalid
+          | "initialized" -> call Logic_const.pinitialized
+          | "valid_read" -> call Logic_const.pvalid_read
+          | _ -> Options.fatal "[mmodel_call_with_ranges] unexpected builtin"
+          in
+          let p_quantified = List.fold_left
+            (fun p (tmin, lv, tmax) ->
+              (* \forall integer tlv; tmin <= tlv <= tmax ==> p *)
+              let tlv = Logic_const.tvar ~loc lv in
+              let lower_bound = Logic_const.prel ~loc (Rle, tmin, tlv) in
+              let upper_bound = Logic_const.prel ~loc (Rle, tlv, tmax) in
+              let bound = Logic_const.pand ~loc (lower_bound, upper_bound) in
+              let bound_imp_p = Logic_const.pimplies ~loc (bound, p) in
+              Logic_const.pforall ~loc ([lv], bound_imp_p))
+            p_quantified
+            quantifiers
+        in
+        Typing.type_named_predicate ~must_clear:true p_quantified;
+        named_predicate_to_exp kf env p_quantified
+      with Range_elimination_exception ->
+        (* Case C *)
+        mmodel_call_default ~loc kf name ctx env t
     else
       (* Case C *)
       mmodel_call_default ~loc kf name ctx env t
@@ -815,7 +805,7 @@ and mmodel_call_memory_block ~loc kf name ctx env p r =
   in
   let s = Logic_const.term ~loc (TSizeOf ty) Linteger in
   (* ptr *)
-  let typ_charptr = TPtr(TInt(IChar, []), []) in
+  let typ_charptr = Cil.charPtrType in
   let ptr = Logic_const.term
     ~loc
     (TBinOp(
@@ -845,7 +835,7 @@ and mmodel_call_memory_block ~loc kf name ctx env p r =
   let base, _ = Misc.ptr_index ~loc ptr in
   let base_addr  = match base.enode with
     | AddrOf _ | Const _ -> Cil.zero ~loc
-    | Lval(lv) | StartOf(lv) -> Cil.mkAddrOrStartOf ~loc lv
+    | Lval lv | StartOf lv -> Cil.mkAddrOrStartOf ~loc lv
     | _ -> assert false
   in
   (* generating env *)
