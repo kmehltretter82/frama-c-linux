@@ -12,6 +12,27 @@ some cases, but are tedious to lift. Please contact us if you are interested in
 lifting these limitations\footnote{Read \url{http://frama-c.com/support.html}
   for additional details.}.
 
+\section{Supported Systems}
+
+\begin{important}
+The only well-supported system is a Linux distribution on a 64-bit architecture.
+\end{important}
+
+\subsection{Operating Systems}
+
+Not-Linux systems are almost not yet experimented. It might work but there are
+most probably issues, in particular if using a non-standard
+libc\index{Libc}. For instance, there are known bugs under Mac OS
+X\index{Mac OS X}\footnote{See for instance at
+  \url{https://bts.frama-c.com/view.php?id=2369}}.
+
+\subsection{Architectures and Runtime Library}
+
+The segment-based memory model (used by default for monitoring memory properties
+such as \lstinline|\valid|) assumes little-endian architecture and has very
+limited support for 32-bit architectures. When using a 32-bit machine or
+big-endians, we recomend using the bittree-based memory model instead.
+
 \section{Uninitialized Values}
 \index{Uninitialized value}
 
@@ -177,13 +198,3 @@ POSIX-compliant memory management functions
 listed above. Monitoring of programs that allocate memory using non-standard or
 obsolete functions (e.g., \T{valloc}, \T{memalign}, \T{pvalloc}) may not work
 correctly.
-
-\section{Limitations of E-ACSL Monitoring Libraries}
-\index{Function!Libraries}
-
-\eacsl monitoring library implementing segment-based memory model is fairly
-recent and presently has very limited support for 32-bit architectures.  When
-using a 32-bit machine we recommend using the bittree-based memory model
-instead.
-
-This library also assumes a little-endian architecture.
