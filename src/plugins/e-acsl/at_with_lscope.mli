@@ -24,17 +24,7 @@ open Cil_types
 open Cil_datatype
 
 (* Convert \at on terms or predicates in which we can find purely
-  logical variable. *)
-
-(**************************************************************************)
-(********************** Forward references ********************************)
-(**************************************************************************)
-
-val predicate_to_exp_ref:
-  (kernel_function -> Env.t -> predicate -> exp * Env.t) ref
-
-val term_to_exp_ref:
-  (kernel_function -> Env.t -> term -> exp * Env.t) ref
+  logic variable. *)
 
 (**************************************************************************)
 (*************************** Translation **********************************)
@@ -49,19 +39,24 @@ val to_exp:
 (*****************************************************************************)
 
 (* The different possible evaluations of the [\at] under study are
-  stored on a memory location that needs to be alloted then freed.
+  stored in a memory location that needs to be alloted then freed.
   This part is designed for that purpose. *)
 
-type malloc_and_free_stmts = {
-  mf_malloc : stmt;
-  mf_free : stmt
-}
-(* A malloc stmt and its associated free stmt. *)
+val get_mallocs: kernel_function -> stmt list
+(* Get the list of [malloc] stmts that need to be inserted into [kf]. *)
 
-val add_malloc_and_free_stmts:
-  kernel_function -> malloc_and_free_stmts -> unit
-(* Add a [malloc] and [free] stmts that need to be added to [kf] *)
+val get_frees: kernel_function -> stmt list
+(* Get the list of [malloc] stmts that need to be inserted into [kf]. *)
 
-val get_malloc_and_free_stmts: fundec -> stmt list * stmt list
-(* Get the list of [malloc] and [free] stmts that need to be added
-  to [fundec] *)
+val remove_mallocs_and_frees: kernel_function -> unit
+(* Remove all [malloc] and [free] stmts for [kf] from the internal table. *)
+
+(**************************************************************************)
+(********************** Forward references ********************************)
+(**************************************************************************)
+
+val predicate_to_exp_ref:
+  (kernel_function -> Env.t -> predicate -> exp * Env.t) ref
+
+val term_to_exp_ref:
+  (kernel_function -> Env.t -> term -> exp * Env.t) ref

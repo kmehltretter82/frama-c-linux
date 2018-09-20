@@ -53,6 +53,7 @@ type local_env =
 type t = 
     { visitor: Visitor.frama_c_visitor;
       lscope: Lscope.t;
+      lscope_reset: bool;
       annotation_kind: Misc.annotation_kind;
       new_global_vars: (varinfo * scope) list;
       (* generated variables. The scope indicates the level where the variable
@@ -110,7 +111,8 @@ let empty_local_env =
 
 let dummy = 
   { visitor = new Visitor.generic_frama_c_visitor (Cil.inplace_visit ());
-    lscope = Lscope.empty ();
+    lscope = Lscope.empty;
+    lscope_reset = true;
     annotation_kind = Misc.Assertion;
     new_global_vars = [];
     global_mpz_tbl = empty_mpz_tbl; 
@@ -122,7 +124,8 @@ let dummy =
 
 let empty v =
   { visitor = v;
-    lscope = Lscope.empty ();
+    lscope = Lscope.empty;
+    lscope_reset = true;
     annotation_kind = Misc.Assertion;
     new_global_vars = [];
     global_mpz_tbl = empty_mpz_tbl; 
@@ -302,6 +305,9 @@ module Logic_binding = struct
     try Logic_var.Map.find logic_v env.var_mapping
     with Not_found -> assert false
 
+  let set env lv vi =
+    { env with var_mapping = Logic_var.Map.add lv vi env.var_mapping }
+
   let remove env v = 
     let map = env.var_mapping in
     assert (Logic_var.Map.mem v map);
@@ -318,9 +324,15 @@ let current_kf env =
 let get_visitor env = env.visitor
 let get_behavior env = env.visitor#behavior
 
-let get_lscope env = env.lscope
-let add_to_lscope env lvs = { env with lscope = Lscope.add env.lscope lvs }
-let reset_lscope env = { env with lscope = Lscope.empty () }
+module Logic_scope = struct
+  let get env = env.lscope
+  let extend env lvs = { env with lscope = Lscope.add lvs env.lscope }
+  let set_reset env bool = { env with lscope_reset = bool }
+  let get_reset env = env.lscope_reset
+  let reset env =
+    if env.lscope_reset then { env with lscope = Lscope.empty }
+    else env
+end
 
 let emitter = 
   Emitter.create
@@ -364,6 +376,11 @@ let extend_stmt_in_place env stmt ~pre block =
     { env with env_stack = { local_env with block_info = b_info } :: tl_env }
   else
     env
+
+let pre_from_label = function
+  | BuiltinLabel(Here | Post) -> true
+  | BuiltinLabel(Old | Pre | LoopEntry | LoopCurrent | Init)
+  | FormalLabel _ | StmtLabel _ -> false
 
 let push env = 
 (*  Options.feedback "push (was %d)" (List.length env.env_stack);*)

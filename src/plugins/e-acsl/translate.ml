@@ -312,7 +312,7 @@ let rec thost_to_host kf env th = match th with
     let e, env = term_to_exp kf env t in
     Mem e, env, ""
 
-and toffset_to_offset ?loc kf env toff = match toff with
+and toffset_to_offset ?loc kf env = function
   | TNoOffset -> NoOffset, env
   | TField(f, offset) ->
     let offset, env = toffset_to_offset ?loc kf env offset in
@@ -378,8 +378,7 @@ and context_insensitive_term_to_exp kf env t =
       let ctx = Typing.get_integer_ty t in
       Typing.type_term ~use_gmp_opt:true ~ctx zero;
       let e, env =
-        comparison_to_exp
-          kf ~loc ~name:"not" env Typing.gmp Eq t zero (Some t)
+        comparison_to_exp kf ~loc ~name:"not" env Typing.gmp Eq t zero (Some t)
       in
       e, env, false, ""
     else begin
@@ -469,8 +468,7 @@ and context_insensitive_term_to_exp kf env t =
     let env' = Env.push env1 in
     let res2 = term_to_exp kf (Env.push env') t2 in
     let e, env =
-      conditional_to_exp
-        ~name:"or" loc (Some t) e1 (Cil.one loc, env') res2
+      conditional_to_exp ~name:"or" loc (Some t) e1 (Cil.one loc, env') res2
     in
     e, env, false, ""
   | TBinOp(LAnd, t1, t2) ->
@@ -552,7 +550,7 @@ and context_insensitive_term_to_exp kf env t =
     let e, env = term_to_exp kf env t in
     e, env, false, ""
   | Tat(t', label) ->
-    let potential_lscope = Env.get_lscope env in
+    let potential_lscope = Env.Logic_scope.get env in
     let effective_lscope = Lscope.effective_lscope_from_pred_or_term
       (Misc.PoT_term t') potential_lscope
     in
@@ -589,7 +587,7 @@ and context_insensitive_term_to_exp kf env t =
   | Trange _ -> not_yet env "range"
   | Tlet(li, t) ->
     let lvs = Lscope.Lvs_let(li.l_var_info, Misc.term_of_li li) in
-    let env = Env.add_to_lscope env lvs in
+    let env = Env.Logic_scope.extend env lvs in
     let env = env_of_li li kf env loc in
     let e, env = term_to_exp kf env t in
     Interval.Env.remove li.l_var_info;
@@ -920,11 +918,7 @@ and at_to_exp_no_lscope env t_opt label e =
       let block, new_env =
        Env.pop_and_get new_env new_stmt ~global_clear:false Env.Middle
       in
-      let pre = match label with
-        | BuiltinLabel(Here | Post) -> true
-        | BuiltinLabel(Old | Pre | LoopEntry | LoopCurrent | Init)
-        | FormalLabel _ | StmtLabel _ -> false
-      in
+      let pre = Env.pre_from_label label in
       env_ref := Env.extend_stmt_in_place new_env stmt ~pre block;
       Cil.ChangeTo stmt
   end
@@ -1004,7 +998,7 @@ and named_predicate_content_to_exp ?name kf env p =
     conditional_to_exp loc None e1 res2 res3
   | Plet(li, p) ->
     let lvs = Lscope.Lvs_let(li.l_var_info, Misc.term_of_li li) in
-    let env = Env.add_to_lscope env lvs in
+    let env = Env.Logic_scope.extend env lvs in
     let env = env_of_li li kf env loc in
     let e, env = named_predicate_to_exp kf env p in
     Interval.Env.remove li.l_var_info;
@@ -1013,7 +1007,7 @@ and named_predicate_content_to_exp ?name kf env p =
   | Pat(p, BuiltinLabel Here) ->
     named_predicate_to_exp kf env p
   | Pat(p', label) ->
-    let potential_lscope = Env.get_lscope env in
+    let potential_lscope = Env.Logic_scope.get env in
     let effective_lscope = Lscope.effective_lscope_from_pred_or_term
       (Misc.PoT_pred p') potential_lscope
     in
@@ -1069,9 +1063,7 @@ and named_predicate_content_to_exp ?name kf env p =
   | Pinitialized _ -> not_yet env "labeled \\initialized"
   | Pallocable _ -> not_yet env "\\allocate"
   | Pfreeable(BuiltinLabel Here, t) ->
-    let res, env, _, _ =
-      mmodel_call ~loc kf "freeable" Cil.intType env t
-    in
+    let res, env, _, _ = mmodel_call ~loc kf "freeable" Cil.intType env t in
     res, env
   | Pfreeable _ -> not_yet env "labeled \\freeable"
   | Pfresh _ -> not_yet env "\\fresh"
@@ -1106,7 +1098,13 @@ and translate_rte_annots:
 	  handle_error
 	    (fun env ->
 	      Options.feedback ~dkey ~level:4 "prevent RTE from %a" pp elt;
-	      translate_named_predicate kf (Env.rte env false) p)
+        (* The logic scope MUST NOT be reset here since we still might be
+          in the middle of the translation of the original predicate. *)
+        let lscope_reset_old = Env.Logic_scope.get_reset env in
+        let env = Env.Logic_scope.set_reset env false in
+        let env = translate_named_predicate kf (Env.rte env false) p in
+        let env = Env.Logic_scope.set_reset env lscope_reset_old in
+        env)
 	    env
         | _ -> assert false)
         env
@@ -1127,8 +1125,7 @@ and translate_named_predicate kf env p =
   Typing.type_named_predicate ~must_clear:rte p;
   let e, env = named_predicate_to_exp kf ~rte env p in
   assert (Typ.equal (Cil.typeOf e) Cil.intType);
-  (* We need to reset the logical scope before translating next predicate *)
-  let env = Env.reset_lscope env in
+  let env = Env.Logic_scope.reset env in
   Env.add_stmt
     env
     (Misc.mk_e_acsl_guard ~reverse:true (Env.annotation_kind env) kf e p)

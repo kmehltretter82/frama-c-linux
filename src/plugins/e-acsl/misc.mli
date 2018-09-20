@@ -116,9 +116,19 @@ val is_bitfield_pointers: logic_type -> bool
 
 val term_has_lv_from_vi: term -> bool
 (* Return [true] iff the given term contains a variables that originated from
-  a C varinfo, that is a non-purely logical variable. *)
+  a C varinfo, that is a non-purely logic variable. *)
 
 type pred_or_term = PoT_pred of predicate | PoT_term of term
+
+val insert_before_element_under_condition:
+  'a list -> 'a list -> ('a -> bool) -> 'a list
+(* [insert_before_element_under_condition elements to_insert condition]
+  returns [elements] in which [to_insert] have been inserted before each
+  element of [elements] satisfying [condition].
+  Its complexity is such that if [N1] is the size of [elements], [N2] that of
+  [to_insert] and [M] the number of elements satisfying [condition] then
+  [insert_before_element_under_condition] performs [T=2*(N1+M*N2)] prepends.
+  Since [T] is also the size of the resulting list, it cannot be lowered. *)
 
 (*
 Local Variables:

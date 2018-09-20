@@ -456,50 +456,68 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     f.slocals <- locals;
     f.sbody.blocals <- blocks
 
-  (* Memory management for \at on purely logical variables:
+  (* Memory management for \at on purely logic variables:
     Put [malloc] and [free] stmts at proper locations *)
   method private insert_malloc_and_free_stmts kf f =
-    let malloc_stmts, free_stmts =
-      At_with_lscope.get_malloc_and_free_stmts f
-    in
+    let malloc_stmts = At_with_lscope.get_mallocs kf in
+    let free_stmts = At_with_lscope.get_frees kf in
     let fstmts = malloc_stmts @ f.sbody.bstmts in
     let fstmts =
-      if Kernel_function.is_entry_point kf then begin
-        (* [main] is a special case:
-          [main]'s stmts will be wrapped by things like
-          [memory_clean] and [memory_init afterwards] *)
-        match List.rev fstmts with
-        | [] ->
-          (* Cil normalization: there is always a [return] stmt *)
-          assert false
-        | return :: fsmts' ->
-          let fsmts = return :: free_stmts @ fsmts' in
-          List.rev fsmts
-      end
-      else begin
-        (* The last stmt might not be a [return] but a block ending with
-          a [return] (eg: functions with contract)
-          This could potentially (?) happen in a nested manner: that is
-          a block (ending with a block)^n ending with a [return] *)
-        let rec insert_free_stmts stmts free_stmts =
-          match List.rev stmts with
-          | [] ->
-            assert false
-          | stmt :: stmts' ->
-            begin match stmt.skind with
-            | Return _ ->
-              (List.rev stmts') @ free_stmts @ [stmt]
-            | Block b ->
-              b.bstmts <- insert_free_stmts b.bstmts free_stmts;
-              stmts
-            | _ ->
-              assert false
-            end
+      (* The last stmt might not be a [Return] but a block ending with
+        a [Return]. This could happen in a nested manner: that is
+        a block (ending with a block)^n ending with a [Return].
+        [last_innermost_block] finds the inner-most block of the last block.
+        It returns [None] if last stmt is directly a [Return]. *)
+      let rec last_innermost_block stmts = match List.rev stmts with
+      | { skind = Block b } :: _ ->
+        begin match List.rev b.bstmts with
+        | { skind = Return _ } :: _ -> Some b
+        | { skind = Block b } :: _ -> last_innermost_block b.bstmts
+        | _ -> assert false
+        end
+      | { skind = Return _ } :: _ -> None
+      | _ -> assert false
+      in
+      let b_opt = last_innermost_block fstmts in
+      let condition_for_main stmt =
+        (* [main] is a special case because [free] stmts MUST be called
+          prior to [memory_clean] *)
+        match stmt.skind with
+      | Instr(Call(None, { enode = Lval(Var vi, _) }, [], _))
+        when vi.vname = RTL.mk_api_name "memory_clean" ->
+        true
+      | _ ->
+        false
+      in
+      let condition_for_non_main stmt = match stmt.skind with
+      | Return _ -> true
+      | _ -> false
+      in
+      match Kernel_function.is_entry_point kf, b_opt with
+      | true, None ->
+        Misc.insert_before_element_under_condition
+          fstmts free_stmts condition_for_main
+      | true, Some b ->
+        let stmts = Misc.insert_before_element_under_condition
+          b.bstmts free_stmts condition_for_main
         in
-        insert_free_stmts fstmts free_stmts
-      end
+        b.bstmts <- stmts;
+        fstmts
+      | false, None ->
+        Misc.insert_before_element_under_condition
+          fstmts free_stmts condition_for_non_main
+      | false, Some b ->
+        let stmts = Misc.insert_before_element_under_condition
+          b.bstmts free_stmts condition_for_non_main
+        in
+        b.bstmts <- stmts;
+        fstmts
     in
-    f.sbody.bstmts <- fstmts
+    f.sbody.bstmts <- fstmts;
+    (* Now that [malloc] and [free] stmts of [kf] have been inserted,
+      there is no more need to keep the corresponding entries in the
+      tables managing them. *)
+    At_with_lscope.remove_mallocs_and_frees kf
 
   method !vfunc f =
     if generate then begin

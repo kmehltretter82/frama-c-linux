@@ -307,6 +307,22 @@ let term_has_lv_from_vi t =
 
 type pred_or_term = PoT_pred of predicate | PoT_term of term
 
+let insert_before_element_under_condition elements to_insert condition =
+  let elements_with_insertions_rev = List.fold_left
+    (fun elements element ->
+      if condition element then
+        element :: List.fold_left
+          (fun elements_with_insertions element_to_insert ->
+            element_to_insert :: elements_with_insertions)
+          elements
+          to_insert
+      else
+        element :: elements)
+    []
+    elements
+  in
+  List.rev elements_with_insertions_rev
+
 (*
 Local Variables:
 compile-command: "make"

@@ -4,7 +4,9 @@
             and without --gmp-only
 */
 
-/*@ ensures \forall integer n; 1 < n <= 3 ==> \old(t[n] == 12); */
+/*@ ensures \forall integer n; 1 < n <= 3 ==>
+      \old(t[n] == 12) && \old(t[n - 1] > 5);
+    ensures \let m = 4; \old(t[m] == -4) && \old(t[m - 4]) == 9; */
 void f(int *t) {}
 
 int main(void) {

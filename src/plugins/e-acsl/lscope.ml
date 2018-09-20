@@ -31,38 +31,34 @@ type lscope_var =
 type t = lscope_var list
 (* The logic scope is usually small, so a list is fine instead of a Map *)
 
-let empty () = []
+let empty = []
 
 let is_empty = function [] -> true | _ :: _ -> false
 
-let add t lvs = t @ [lvs]
-(* We need to append [lvs], and not prepend it.
-  This is so that the first element of the list is
-  the first that should be translated,
-  the 2nd element the 2nd to be translated and so on. *)
+let add lscope_var t = lscope_var :: t
 
-let top = function
-  | [] -> None
-  | lvs :: lscope -> Some(lvs, lscope)
+let get_all t = List.rev t
 
-let rec get_lscope_var lv t =
-  match t with
-  | [] ->
-    None
-  | lvs :: t' ->
-    match lvs with
-    | Lvs_let(lv', _) | Lvs_quantif(_, lv', _)
-    | Lvs_formal(lv', _) | Lvs_global(lv', _) ->
-      if Cil_datatype.Logic_var.equal lv lv' then Some lvs
-      else get_lscope_var lv t'
+let get_lscope_var lv t =
+  let is_lv = function
+  | Lvs_let(lv', _) | Lvs_quantif(_, lv', _) | Lvs_formal(lv', _)
+  | Lvs_global(lv', _) ->
+    Cil_datatype.Logic_var.equal lv lv'
+  in
+  try List.find is_lv t with Not_found -> assert false
 
 let effective_lscope_from_pred_or_term pot potential_lscope =
-  let effective_lscope = ref (empty ()) in
+  let effective_lscope = ref empty in
   let o = object inherit Visitor.frama_c_inplace
     method !vlogic_var_use lv =
-      begin match get_lscope_var lv potential_lscope with
-      | None -> ()
-      | Some lvs -> effective_lscope := add !effective_lscope lvs
+      begin match lv.lv_origin with
+      | Some _ ->
+        (* [lv] is not purely logic. Thus it is not to be put inside
+          [effective_lscope] which only tracks purely logic variables. *)
+        ()
+      | None ->
+        let lscope_var = get_lscope_var lv potential_lscope in
+        effective_lscope := add lscope_var !effective_lscope
       end;
       Cil.DoChildren
   end

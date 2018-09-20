@@ -146,7 +146,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
       | Rgt | Rge | Req | Rneq -> assert false
       in
       let lvs = Lscope.Lvs_quantif(t1, lv, t2) in
-      Env.add_to_lscope env lvs)
+      Env.Logic_scope.extend env lvs)
     env
     guards
   in

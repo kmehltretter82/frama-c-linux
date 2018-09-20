@@ -67,6 +67,7 @@ val new_var_and_mpz_init:
 module Logic_binding: sig
   val add: ?ty:typ -> t -> logic_var -> varinfo * exp * t
   val get: t -> logic_var -> varinfo
+  val set: t -> logic_var -> varinfo -> t
   val remove: t -> logic_var -> t
 end
 
@@ -85,6 +86,10 @@ val extend_stmt_in_place: t -> stmt -> pre:bool -> block -> t
      add the given [block]. If [pre] is [true], then this block is guaranteed
      to be at the first place of the resulting [stmt] whatever modification
      will be done by the visitor later. *)
+
+val pre_from_label: logic_label -> bool
+(** Computes the value of [pre] to provide to [extend_stmt_in_place] from
+    the given logic label. *)
 
 val push: t -> t
 (** Push a new local context in the environment *)
@@ -116,15 +121,26 @@ val get_behavior: t -> Cil.visitor_behavior
 val current_kf: t -> kernel_function option
 (** Kernel function currently visited in the new project. *)
 
-val get_lscope: t -> Lscope.t
-(* Return the logical scope associated to the environment. *)
+module Logic_scope: sig
+  val get: t -> Lscope.t
+  (** Return the logic scope associated to the environment. *)
 
-val add_to_lscope: t -> Lscope.lscope_var -> t
-(* Add a new logical variable with its associated information in the
-  logical scope of the environment. *)
+  val extend: t -> Lscope.lscope_var -> t
+  (** Add a new logic variable with its associated information in the
+    logic scope of the environment. *)
 
-val reset_lscope: t -> t
-(* Return a new environment in which the logical scope has been reset. *)
+  val reset: t -> t
+  (** Return a new environment in which the logic scope is reset
+    iff [set_reset _ true] has been called beforehand. Do nothing otherwise. *)
+
+  val set_reset: t -> bool -> t
+  (** Setter of the information indicating whether the logic scope should be
+    reset at next call to [reset]. *)
+
+  val get_reset: t -> bool
+  (** Getter of the information indicating whether the logic scope should be
+    reset at next call to [reset]. *)
+end
 
 (* ************************************************************************** *)
 (** {2 Current annotation kind} *)
