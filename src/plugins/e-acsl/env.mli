@@ -81,15 +81,11 @@ val add_stmt: ?post:bool -> ?init:bool -> ?before:stmt -> t -> stmt -> t
     say that any labels attached to [before] are moved to [stmt]. [post]
     indicates that [stmt] should be added after the target statement. *)
 
-val extend_stmt_in_place: t -> stmt -> pre:bool -> block -> t
-(**  [extend_stmt_in_place env stmt ~pre b] modifies [stmt] in place in order to
-     add the given [block]. If [pre] is [true], then this block is guaranteed
-     to be at the first place of the resulting [stmt] whatever modification
-     will be done by the visitor later. *)
-
-val pre_from_label: logic_label -> bool
-(** Computes the value of [pre] to provide to [extend_stmt_in_place] from
-    the given logic label. *)
+val extend_stmt_in_place: t -> stmt -> label:logic_label -> block -> t
+(** [extend_stmt_in_place env stmt ~label b] modifies [stmt] in place in
+    order to add the given [block]. If [pre] is [Here] or [Post],
+    then this block is guaranteed to be at the first place of the resulting
+    [stmt] whatever modification will be done by the visitor later. *)
 
 val push: t -> t
 (** Push a new local context in the environment *)

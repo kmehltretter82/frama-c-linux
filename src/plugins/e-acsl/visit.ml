@@ -457,67 +457,15 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     f.sbody.blocals <- blocks
 
   (* Memory management for \at on purely logic variables:
-    Put [malloc] and [free] stmts at proper locations *)
+    Put [malloc] stmts at proper locations *)
   method private insert_malloc_and_free_stmts kf f =
-    let malloc_stmts = At_with_lscope.get_mallocs kf in
-    let free_stmts = At_with_lscope.get_frees kf in
+    let malloc_stmts = At_with_lscope.Malloc.find_all kf in
     let fstmts = malloc_stmts @ f.sbody.bstmts in
-    let fstmts =
-      (* The last stmt might not be a [Return] but a block ending with
-        a [Return]. This could happen in a nested manner: that is
-        a block (ending with a block)^n ending with a [Return].
-        [last_innermost_block] finds the inner-most block of the last block.
-        It returns [None] if last stmt is directly a [Return]. *)
-      let rec last_innermost_block stmts = match List.rev stmts with
-      | { skind = Block b } :: _ ->
-        begin match List.rev b.bstmts with
-        | { skind = Return _ } :: _ -> Some b
-        | { skind = Block b } :: _ -> last_innermost_block b.bstmts
-        | _ -> assert false
-        end
-      | { skind = Return _ } :: _ -> None
-      | _ -> assert false
-      in
-      let b_opt = last_innermost_block fstmts in
-      let condition_for_main stmt =
-        (* [main] is a special case because [free] stmts MUST be called
-          prior to [memory_clean] *)
-        match stmt.skind with
-      | Instr(Call(None, { enode = Lval(Var vi, _) }, [], _))
-        when vi.vname = RTL.mk_api_name "memory_clean" ->
-        true
-      | _ ->
-        false
-      in
-      let condition_for_non_main stmt = match stmt.skind with
-      | Return _ -> true
-      | _ -> false
-      in
-      match Kernel_function.is_entry_point kf, b_opt with
-      | true, None ->
-        Misc.insert_before_element_under_condition
-          fstmts free_stmts condition_for_main
-      | true, Some b ->
-        let stmts = Misc.insert_before_element_under_condition
-          b.bstmts free_stmts condition_for_main
-        in
-        b.bstmts <- stmts;
-        fstmts
-      | false, None ->
-        Misc.insert_before_element_under_condition
-          fstmts free_stmts condition_for_non_main
-      | false, Some b ->
-        let stmts = Misc.insert_before_element_under_condition
-          b.bstmts free_stmts condition_for_non_main
-        in
-        b.bstmts <- stmts;
-        fstmts
-    in
     f.sbody.bstmts <- fstmts;
-    (* Now that [malloc] and [free] stmts of [kf] have been inserted,
+    (* Now that [malloc] stmts for [kf] have been inserted,
       there is no more need to keep the corresponding entries in the
-      tables managing them. *)
-    At_with_lscope.remove_mallocs_and_frees kf
+      table managing them. *)
+    At_with_lscope.Malloc.remove_all kf
 
   method !vfunc f =
     if generate then begin
@@ -898,10 +846,12 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
 
   method !vblock blk =
     let handle_memory new_blk =
-      match new_blk.blocals with
-      | [] -> new_blk
-      | _ :: _ ->
-        let kf = Extlib.the self#current_kf in
+      let kf = Extlib.the self#current_kf in
+      let free_stmts = At_with_lscope.Free.find_all kf in
+      match new_blk.blocals, free_stmts with
+      | [], [] ->
+        new_blk
+      | _ ->
         let add_locals stmts =
           List.fold_left
             (fun acc vi ->
@@ -918,10 +868,14 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
                preceded by clean if any *)
             let init, tl =
               if self#is_main kf && Mmodel_analysis.use_model () then
-                [ potential_clean; ret ], tl
+                free_stmts @ [ potential_clean; ret ], tl
               else
-                [ ret ], l
+                free_stmts @ [ ret ], l
             in
+            (* Now that [free] stmts for [kf] have been inserted,
+              there is no more need to keep the corresponding entries in the
+              table managing them. *)
+            At_with_lscope.Free.remove_all kf;
             blk.bstmts <-
               List.fold_left (fun acc v -> v :: acc) (add_locals init) tl
           | { skind = Block b } :: _ ->

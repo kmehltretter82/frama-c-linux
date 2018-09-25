@@ -38,32 +38,30 @@ let term_to_exp_ref
 (**************************** Handling memory ********************************)
 (*****************************************************************************)
 
-let tbl_malloc: stmt Cil_datatype.Kf.Hashtbl.t =
-  Cil_datatype.Kf.Hashtbl.create 7
-
-let tbl_free: stmt Cil_datatype.Kf.Hashtbl.t =
-  Cil_datatype.Kf.Hashtbl.create 7
-
-let add_malloc kf stmt = Cil_datatype.Kf.Hashtbl.add tbl_malloc kf stmt
-
-let add_free kf stmt = Cil_datatype.Kf.Hashtbl.add tbl_free kf stmt
-
-let get_mallocs kf = Cil_datatype.Kf.Hashtbl.find_all tbl_malloc kf
-
-let get_frees kf = Cil_datatype.Kf.Hashtbl.find_all tbl_free kf
-
 (* Remove all the bindings for [kf]. [Cil_datatype.Kf.Hashtbl] does not
   provide the [remove_all] function. Thus we need to keep calling [remove]
   until all entries are removed. *)
-let rec remove_mallocs_and_frees kf =
+let rec remove_all tbl kf =
   try
-    ignore
-      (Cil_datatype.Kf.Hashtbl.find tbl_malloc kf); (* [tbl_free] is also ok *)
-    Cil_datatype.Kf.Hashtbl.remove tbl_malloc kf;
-    Cil_datatype.Kf.Hashtbl.remove tbl_free kf;
-    remove_mallocs_and_frees kf;
+    ignore(Cil_datatype.Kf.Hashtbl.find tbl kf);
+    Cil_datatype.Kf.Hashtbl.remove tbl kf;
+    remove_all tbl kf;
   with Not_found ->
     ()
+
+module Malloc = struct
+  let tbl = Cil_datatype.Kf.Hashtbl.create 7
+  let add kf stmt = Cil_datatype.Kf.Hashtbl.add tbl kf stmt
+  let find_all kf = Cil_datatype.Kf.Hashtbl.find_all tbl kf
+  let remove_all kf = remove_all tbl kf
+end
+
+module Free = struct
+  let tbl = Cil_datatype.Kf.Hashtbl.create 7
+  let add kf stmt = Cil_datatype.Kf.Hashtbl.add tbl kf stmt
+  let find_all kf = Cil_datatype.Kf.Hashtbl.find_all tbl kf
+  let remove_all kf = remove_all tbl kf
+end
 
 (**************************************************************************)
 (*************************** Translation **********************************)
@@ -83,8 +81,8 @@ let rec sizes_and_shifts_from_quantifs ~loc kf lscope sizes_and_shifts =
     Error.not_yet "\\at with logic variable linked to C variable"
   | Lscope.Lvs_quantif(tmin, lv, tmax) :: lscope' ->
     let t_size = Logic_const.term ~loc (TBinOp(MinusA, tmax, tmin)) Linteger in
-    let t_size = Logic_const.term
-      ~loc (TBinOp(PlusA, t_size, Cil.lone ~loc ())) Linteger
+    let t_size =
+      Logic_const.term ~loc (TBinOp(PlusA, t_size, Cil.lone ~loc ())) Linteger
     in
     let i = Interval.infer t_size in
     (* The EXACT amount of memory that is needed can be known at runtime. This
@@ -115,8 +113,8 @@ let rec sizes_and_shifts_from_quantifs ~loc kf lscope sizes_and_shifts =
     in
     (* Index *)
     let t_lv = Logic_const.tvar ~loc lv in
-    let t_shifted = Logic_const.term
-      ~loc (TBinOp(MinusA, t_lv, tmin)) Linteger
+    let t_shifted =
+      Logic_const.term ~loc (TBinOp(MinusA, t_lv, tmin)) Linteger
     in
     (* Returning *)
     let sizes_and_shifts = (t_size, t_shifted) :: sizes_and_shifts in
@@ -146,8 +144,8 @@ let size_from_sizes_and_shifts ~loc = function
 
 let append_block_of_env_to_block env block =
   let block_stmt = Cil.mkStmt ~valid_sid:true (Block block) in
-  let block, env = Env.pop_and_get
-    env block_stmt ~global_clear:false Env.After
+  let block, env =
+    Env.pop_and_get env block_stmt ~global_clear:false Env.After
   in
   block, env
 
@@ -179,8 +177,8 @@ let rec mk_storing_loops ~loc kf env lscope (e_at, vi_at, t_index) pot =
     let storing_stmt =
       Cil.mkStmtOneInstr ~valid_sid:true (Set(lval, e, loc))
     in
-    let block, env = Env.pop_and_get
-      env storing_stmt ~global_clear:false Env.After
+    let block, env =
+      Env.pop_and_get env storing_stmt ~global_clear:false Env.After
     in
     block, env
   | [], Misc.PoT_term t ->
@@ -192,8 +190,8 @@ let rec mk_storing_loops ~loc kf env lscope (e_at, vi_at, t_index) pot =
       let storing_stmt =
         Cil.mkStmtOneInstr ~valid_sid:true (Set(lval, e, loc))
       in
-      let block, env = Env.pop_and_get
-        env storing_stmt ~global_clear:false Env.After
+      let block, env =
+        Env.pop_and_get env storing_stmt ~global_clear:false Env.After
       in
       block, env
     | Typing.Gmp ->
@@ -209,8 +207,8 @@ let rec mk_storing_loops ~loc kf env lscope (e_at, vi_at, t_index) pot =
     in
     let t_lv = Logic_const.tvar ~loc lv in
     (* Guard *)
-    let guard = Logic_const.term
-      ~loc (TBinOp(Le, t_lv, tmax)) (Ctype Cil.intType)
+    let guard =
+      Logic_const.term ~loc (TBinOp(Le, t_lv, tmax)) (Ctype Cil.intType)
     in
     Typing.type_term ~use_gmp_opt:false ~ctx:Typing.c_int guard;
     let guard_exp, env = term_to_exp kf env guard in
@@ -230,16 +228,16 @@ let rec mk_storing_loops ~loc kf env lscope (e_at, vi_at, t_index) pot =
     Typing.type_term ~use_gmp_opt:true plus_one_term;
     let plus_one_exp, env = term_to_exp kf env plus_one_term in
     let plus_one_stmt = match Typing.get_integer_ty plus_one_term with
-      | Typing.C_type _ | Typing.Gmp->
-        Gmpz.init_set ~loc (Cil.var vi_of_lv) (Cil.evar vi_of_lv) plus_one_exp
-      | Typing.Other ->
-        assert false
+    | Typing.C_type _ | Typing.Gmp ->
+      Gmpz.init_set ~loc (Cil.var vi_of_lv) (Cil.evar vi_of_lv) plus_one_exp
+    | Typing.Other ->
+      assert false
     in
     (* If guard is satisfiable then inner loop, else break *)
     let if_stmt = Cil.mkStmt
       ~valid_sid:true
       (If(guard_exp,
-        Cil.mkBlock [loop'; plus_one_stmt],
+        Cil.mkBlock [ loop'; plus_one_stmt ],
         Cil.mkBlock [ break_stmt ],
         guard_exp.eloc))
     in
@@ -254,10 +252,10 @@ let rec mk_storing_loops ~loc kf env lscope (e_at, vi_at, t_index) pot =
     (* Init lv *)
     let tmin_exp, env = term_to_exp kf env tmin in
     let set_tmin = match Typing.get_integer_ty plus_one_term with
-      | Typing.C_type _ | Typing.Gmp ->
-        Gmpz.init_set ~loc (Cil.var vi_of_lv) (Cil.evar vi_of_lv) tmin_exp
-      | Typing.Other ->
-        assert false
+    | Typing.C_type _ | Typing.Gmp ->
+      Gmpz.init_set ~loc (Cil.var vi_of_lv) (Cil.evar vi_of_lv) tmin_exp
+    | Typing.Other ->
+      assert false
     in
     (* The whole block *)
     let block = Cil.mkBlock [set_tmin; loop] in
@@ -272,9 +270,7 @@ let rec mk_storing_loops ~loc kf env lscope (e_at, vi_at, t_index) pot =
       Env.Logic_binding.add ~ty:vi_of_lv_old.vtype env lv
     in
     let e, env = term_to_exp kf env t in
-    let let_stmt = Gmpz.init_set
-      ~loc (Cil.var vi_of_lv) exp_of_lv  e
-    in
+    let let_stmt = Gmpz.init_set ~loc (Cil.var vi_of_lv) exp_of_lv  e in
     let block, env =
       mk_storing_loops ~loc kf env lscope' (e_at, vi_at, t_index) pot
     in
@@ -297,23 +293,29 @@ let rec mk_storing_loops ~loc kf env lscope (e_at, vi_at, t_index) pot =
   To (t_shifted_n, t_shifted_n-1, ..., t_shifted_1)
   where 0 <= t_shifted_i < beta_i
   corresponds: \sum_{i=1}^n( t_shifted_i * \pi_{j=1}^{i-1}(beta_j) ) *)
-let rec index_from_sizes_and_shifts ~loc sizes_and_shifts =
-  match sizes_and_shifts with
-  | [] ->
-    Cil.lzero ~loc ()
-  | (_, t_shifted) :: sizes_and_shifts' ->
-    let index' = index_from_sizes_and_shifts ~loc sizes_and_shifts' in
-    let pi_beta_j sizes_and_shifts = List.fold_left
-      (fun pi_beta_j (t_size, _) ->
-        Logic_const.term ~loc (TBinOp(Mult, pi_beta_j, t_size)) Linteger)
-      (Cil.lone ~loc ())
-      sizes_and_shifts
-    in
-    let pi_beta_j = pi_beta_j sizes_and_shifts' in
-    let bi_mult_pi_beta_j = Logic_const.term ~loc
-      (TBinOp(Mult, t_shifted, pi_beta_j)) Linteger
-    in
-    Logic_const.term ~loc (TBinOp(PlusA, bi_mult_pi_beta_j, index')) Linteger
+let index_from_sizes_and_shifts ~loc sizes_and_shifts =
+  let sum, _ = List.fold_left
+    (fun (index, sizes) (t_size, t_shifted) ->
+      let pi_beta_j sizes = List.fold_left
+        (fun pi_beta_j t_size ->
+          Logic_const.term ~loc (TBinOp(Mult, pi_beta_j, t_size)) Linteger)
+        (Cil.lone ~loc ())
+        sizes
+      in
+      let pi_beta_j = pi_beta_j sizes in
+      let bi_mult_pi_beta_j =
+        Logic_const.term ~loc (TBinOp(Mult, t_shifted, pi_beta_j)) Linteger
+      in
+      let sum = Logic_const.term
+        ~loc
+        (TBinOp(PlusA, bi_mult_pi_beta_j, index))
+        Linteger
+      in
+      sum, t_size :: sizes)
+    (Cil.lzero ~loc (), [])
+    sizes_and_shifts
+  in
+  sum
 
 let put_block_at_label env block label =
   let stmt = Label.get_stmt (Env.get_visitor env) label in
@@ -322,21 +324,15 @@ let put_block_at_label env block label =
     inherit Visitor.frama_c_inplace
     method !vstmt_aux stmt =
       assert (!env_ref == env);
-      let pre = Env.pre_from_label label in
-      env_ref := Env.extend_stmt_in_place env stmt ~pre block;
+      env_ref := Env.extend_stmt_in_place env stmt ~label block;
       Cil.ChangeTo stmt
   end
   in
   let bhv = Env.get_behavior env in
-  ignore( Visitor.visitFramacStmt o (Cil.get_stmt bhv stmt));
+  ignore(Visitor.visitFramacStmt o (Cil.get_stmt bhv stmt));
   !env_ref
 
 let to_exp ~loc kf env pot label =
-  if not (Options.Full_mmodel.get ()) then
-    Error.not_yet
-      "\\at on purely logic variables but without full memory model";
-  if Options.Gmp_only.get () then
-    Error.not_yet "\\at on purely logic variables and with gmp only";
   let term_to_exp = !term_to_exp_ref in
   let lscope_vars = Lscope.get_all (Env.Logic_scope.get env) in
   let sizes_and_shifts =
@@ -355,10 +351,9 @@ let to_exp ~loc kf env pot label =
     end
   in
   let ty_ptr = TPtr(ty, []) in
-  let name = Env.Varname.get ~scope:Env.Function "at" in
   let vi_at, e_at, env = Env.new_var
     ~loc
-    ~name
+    ~name:"at"
     ~scope:Env.Function
     env
     None
@@ -368,10 +363,10 @@ let to_exp ~loc kf env pot label =
       let lty_sizeof = Ctype Cil.(theMachine.typeOfSizeOf) in
       let t_sizeof = Logic_const.term ~loc (TSizeOf ty) lty_sizeof in
       let t_size = size_from_sizes_and_shifts ~loc sizes_and_shifts in
-      let t_size = Logic_const.term
-        ~loc (TBinOp(Mult, t_sizeof, t_size)) lty_sizeof
+      let t_size =
+        Logic_const.term ~loc (TBinOp(Mult, t_sizeof, t_size)) lty_sizeof
       in
-      Typing.type_term ~use_gmp_opt:true t_size;
+      Typing.type_term ~use_gmp_opt:false t_size;
       let malloc_stmt = match Typing.get_integer_ty t_size with
       | Typing.C_type IInt ->
         let e_size, _ = term_to_exp kf env t_size in
@@ -385,15 +380,16 @@ let to_exp ~loc kf env pot label =
           ("\\at on purely logic variables that needs to allocate "
             ^ "too much memory (bigger than int_max bytes)")
       | Typing.Other ->
-        Options.fatal "quantification over non-integer type is not part of E-ACSL"
+        Options.fatal
+          "quantification over non-integer type is not part of E-ACSL"
       in
       let free_stmt = Misc.mk_call ~loc "free" [e] in
       (* The list of stmts returned by the current closure are inserted
         LOCALLY to the block where the new var is FIRST used, whatever scope
         is indicated to [Env.new_var].
         Thus we need to add [malloc] and [free] through dedicated functions. *)
-      add_malloc kf malloc_stmt;
-      add_free kf free_stmt;
+      Malloc.add kf malloc_stmt;
+      Free.add kf free_stmt;
       [])
   in
   (* Index *)

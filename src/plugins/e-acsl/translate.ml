@@ -918,8 +918,7 @@ and at_to_exp_no_lscope env t_opt label e =
       let block, new_env =
        Env.pop_and_get new_env new_stmt ~global_clear:false Env.Middle
       in
-      let pre = Env.pre_from_label label in
-      env_ref := Env.extend_stmt_in_place new_env stmt ~pre block;
+      env_ref := Env.extend_stmt_in_place new_env stmt ~label block;
       Cil.ChangeTo stmt
   end
   in

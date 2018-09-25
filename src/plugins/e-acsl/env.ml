@@ -364,23 +364,23 @@ let add_stmt ?(post=false) ?(init=false) ?before env stmt =
     init_env = if init then local_env else env.init_env;
     env_stack = if init then env.env_stack else local_env :: tl }
 
-let extend_stmt_in_place env stmt ~pre block =
+let extend_stmt_in_place env stmt ~label block =
   let new_stmt = Cil.mkStmt ~valid_sid:true (Block block) in
   let sk = stmt.skind in
-  stmt.skind <- 
+  stmt.skind <-
     Block (Cil.mkBlock [ new_stmt; Cil.mkStmt ~valid_sid:true sk ]);
-  if pre then 
+    let pre = match label with
+    | BuiltinLabel(Here | Post) -> true
+    | BuiltinLabel(Old | Pre | LoopEntry | LoopCurrent | Init)
+    | FormalLabel _ | StmtLabel _ -> false
+    in
+    if pre then
     let local_env, tl_env = top false env in
     let b_info = local_env.block_info in
     let b_info = { b_info with pre_stmts = new_stmt :: b_info.pre_stmts } in
     { env with env_stack = { local_env with block_info = b_info } :: tl_env }
   else
     env
-
-let pre_from_label = function
-  | BuiltinLabel(Here | Post) -> true
-  | BuiltinLabel(Old | Pre | LoopEntry | LoopCurrent | Init)
-  | FormalLabel _ | StmtLabel _ -> false
 
 let push env = 
 (*  Options.feedback "push (was %d)" (List.length env.env_stack);*)

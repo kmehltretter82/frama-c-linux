@@ -15,6 +15,506 @@ void f(int *t)
   return;
 }
 
+void g(void)
+{
+  int *__gen_e_acsl_at;
+  int m;
+  __gen_e_acsl_at = (int *)malloc((size_t)12);
+  m = 8;
+  Q:
+  {
+    {
+      int __gen_e_acsl_w_2;
+      __gen_e_acsl_w_2 = 3;
+      while (1) 
+        if (__gen_e_acsl_w_2 <= 5) {
+          /*@ assert
+              Value: mem_access:
+                \valid(__gen_e_acsl_at + (int)(__gen_e_acsl_w_2 - 3));
+          */
+          *(__gen_e_acsl_at + (__gen_e_acsl_w_2 - 3)) = m + (long)__gen_e_acsl_w_2 == 12L;
+          __gen_e_acsl_w_2 ++;
+        }
+        else break;
+    }
+    ;
+  }
+  m = 10;
+  /*@ assert ∃ ℤ w; 3 ≤ w < 6 ∧ \at(m + w ≡ 12,Q); */
+  {
+    int __gen_e_acsl_exists;
+    int __gen_e_acsl_w;
+    __gen_e_acsl_exists = 0;
+    __gen_e_acsl_w = 3;
+    while (1) {
+      if (__gen_e_acsl_w < 6) ; else break;
+      {
+        int __gen_e_acsl_valid_read;
+        __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(__gen_e_acsl_at + (int)(
+                                                               __gen_e_acsl_w - 3L)),
+                                                      sizeof(int),
+                                                      (void *)__gen_e_acsl_at,
+                                                      (void *)(& __gen_e_acsl_at));
+        __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"g",
+                        (char *)"mem_access: \\valid_read(__gen_e_acsl_at + (int)(__gen_e_acsl_w - 3))",
+                        16);
+        /*@ assert
+            Value: initialization:
+              \initialized(__gen_e_acsl_at + (__gen_e_acsl_w - 3));
+        */
+        /*@ assert
+            Value: mem_access:
+              \valid_read(__gen_e_acsl_at + (int)(__gen_e_acsl_w - 3));
+        */
+        if (! *(__gen_e_acsl_at + (__gen_e_acsl_w - 3))) ;
+        else {
+          __gen_e_acsl_exists = 1;
+          goto e_acsl_end_loop1;
+        }
+      }
+      __gen_e_acsl_w ++;
+    }
+    e_acsl_end_loop1: ;
+    __e_acsl_assert(__gen_e_acsl_exists,(char *)"Assertion",(char *)"g",
+                    (char *)"\\exists integer w; 3 <= w < 6 && \\at(m + w == 12,Q)",
+                    16);
+  }
+  free((void *)__gen_e_acsl_at);
+  return;
+}
+
+int main(void)
+{
+  int *__gen_e_acsl_at_6;
+  long *__gen_e_acsl_at_5;
+  long *__gen_e_acsl_at_4;
+  int *__gen_e_acsl_at_3;
+  int *__gen_e_acsl_at_2;
+  int *__gen_e_acsl_at;
+  int __retres;
+  int n;
+  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __gen_e_acsl_at_6 = (int *)malloc((size_t)1536);
+  __gen_e_acsl_at_5 = (long *)malloc((size_t)64);
+  __gen_e_acsl_at_4 = (long *)malloc((size_t)8);
+  __gen_e_acsl_at_3 = (int *)malloc((size_t)528);
+  __gen_e_acsl_at_2 = (int *)malloc((size_t)12);
+  __gen_e_acsl_at = (int *)malloc((size_t)4);
+  __e_acsl_store_block((void *)(& n),(size_t)4);
+  __e_acsl_full_init((void *)(& n));
+  n = 7;
+  L:
+  {
+    {
+      int __gen_e_acsl_i_4;
+      __gen_e_acsl_i_4 = 3;
+      /*@ assert Value: mem_access: \valid(__gen_e_acsl_at_4 + 0); */
+      *(__gen_e_acsl_at_4 + 0) = n + (long)__gen_e_acsl_i_4;
+    }
+    {
+      int __gen_e_acsl_j_2;
+      __gen_e_acsl_j_2 = 2;
+      while (1) 
+        if (__gen_e_acsl_j_2 <= 4) {
+          /*@ assert
+              Value: mem_access:
+                \valid(__gen_e_acsl_at_2 + (int)(__gen_e_acsl_j_2 - 2));
+          */
+          *(__gen_e_acsl_at_2 + (__gen_e_acsl_j_2 - 2)) = n + (long)__gen_e_acsl_j_2 == 11L;
+          __gen_e_acsl_j_2 ++;
+        }
+        else break;
+    }
+    {
+      int __gen_e_acsl_i_2;
+      __gen_e_acsl_i_2 = 3;
+      /*@ assert Value: mem_access: \valid(__gen_e_acsl_at + 0); */
+      *(__gen_e_acsl_at + 0) = n + (long)__gen_e_acsl_i_2 == 10L;
+    }
+    ;
+  }
+  __e_acsl_full_init((void *)(& n));
+  n = 9;
+  K:
+  {
+    {
+      int __gen_e_acsl_u_4;
+      __gen_e_acsl_u_4 = 9;
+      while (1) 
+        if (__gen_e_acsl_u_4 <= 20) {
+          {
+            int __gen_e_acsl_v_4;
+            int __gen_e_acsl_if_2;
+            if (__gen_e_acsl_u_4 < 15) __gen_e_acsl_if_2 = __gen_e_acsl_u_4 + 6;
+            else __gen_e_acsl_if_2 = 3;
+            __gen_e_acsl_v_4 = -5 + 1;
+            while (1) 
+              if (__gen_e_acsl_v_4 <= __gen_e_acsl_if_2) {
+                /*@ assert
+                    Value: mem_access:
+                      \valid(__gen_e_acsl_at_6 +
+                             (int)((int)((int)(__gen_e_acsl_u_4 - 9) * 32) +
+                                   (int)(__gen_e_acsl_v_4 - -4)));
+                */
+                /*@ assert
+                    Value: signed_overflow:
+                      __gen_e_acsl_v_4 - -4 ≤ 2147483647;
+                */
+                /*@ assert
+                    Value: signed_overflow:
+                      (int)((int)(__gen_e_acsl_u_4 - 9) * 32) +
+                      (int)(__gen_e_acsl_v_4 - -4) ≤ 2147483647;
+                */
+                *(__gen_e_acsl_at_6 + ((__gen_e_acsl_u_4 - 9) * 32 + (
+                                       __gen_e_acsl_v_4 - -4))) = (n + (long)__gen_e_acsl_u_4) + n > 0L;
+                __gen_e_acsl_v_4 ++;
+              }
+              else break;
+          }
+          __gen_e_acsl_u_4 ++;
+        }
+        else break;
+    }
+    {
+      int __gen_e_acsl_k_2;
+      {
+        int __gen_e_acsl_u_2;
+        __gen_e_acsl_k_2 = -7;
+        __gen_e_acsl_u_2 = 9;
+        while (1) 
+          if (__gen_e_acsl_u_2 <= 20) {
+            {
+              int __gen_e_acsl_v_2;
+              __gen_e_acsl_v_2 = -5 + 1;
+              while (1) 
+                if (__gen_e_acsl_v_2 <= 6) {
+                  {
+                    long __gen_e_acsl_if;
+                    if (__gen_e_acsl_u_2 > 0) __gen_e_acsl_if = n + (long)__gen_e_acsl_k_2;
+                    else __gen_e_acsl_if = __gen_e_acsl_u_2 + __gen_e_acsl_v_2;
+                    /*@ assert
+                        Value: mem_access:
+                          \valid(__gen_e_acsl_at_3 +
+                                 (int)((int)((int)(__gen_e_acsl_u_2 - 9) * 11)
+                                       + (int)(__gen_e_acsl_v_2 - -4)));
+                    */
+                    *(__gen_e_acsl_at_3 + ((__gen_e_acsl_u_2 - 9) * 11 + (
+                                           __gen_e_acsl_v_2 - -4))) = 
+                    __gen_e_acsl_if > 0L;
+                  }
+                  __gen_e_acsl_v_2 ++;
+                }
+                else break;
+            }
+            __gen_e_acsl_u_2 ++;
+          }
+          else break;
+      }
+    }
+    ;
+  }
+  __e_acsl_full_init((void *)(& n));
+  n = 666;
+  /*@ assert \let i = 3; \at(n + i ≡ 10,L); */
+  {
+    int __gen_e_acsl_i;
+    int __gen_e_acsl_valid_read;
+    __gen_e_acsl_i = 3;
+    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(__gen_e_acsl_at + 0),
+                                                  sizeof(int),
+                                                  (void *)__gen_e_acsl_at,
+                                                  (void *)(& __gen_e_acsl_at));
+    __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"main",
+                    (char *)"mem_access: \\valid_read(__gen_e_acsl_at + 0)",
+                    28);
+    __e_acsl_assert(*(__gen_e_acsl_at + 0),(char *)"Assertion",
+                    (char *)"main",
+                    (char *)"\\let i = 3; \\at(n + i == 10,L)",28);
+  }
+  /*@ assert ∃ ℤ j; 2 ≤ j < 5 ∧ \at(n + j ≡ 11,L); */
+  {
+    int __gen_e_acsl_exists;
+    int __gen_e_acsl_j;
+    __gen_e_acsl_exists = 0;
+    __gen_e_acsl_j = 2;
+    while (1) {
+      if (__gen_e_acsl_j < 5) ; else break;
+      {
+        int __gen_e_acsl_valid_read_2;
+        __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(__gen_e_acsl_at_2 + (int)(
+                                                                 __gen_e_acsl_j - 2L)),
+                                                        sizeof(int),
+                                                        (void *)__gen_e_acsl_at_2,
+                                                        (void *)(& __gen_e_acsl_at_2));
+        __e_acsl_assert(__gen_e_acsl_valid_read_2,(char *)"RTE",
+                        (char *)"main",
+                        (char *)"mem_access: \\valid_read(__gen_e_acsl_at_2 + (int)(__gen_e_acsl_j - 2))",
+                        29);
+        /*@ assert
+            Value: initialization:
+              \initialized(__gen_e_acsl_at_2 + (__gen_e_acsl_j - 2));
+        */
+        /*@ assert
+            Value: mem_access:
+              \valid_read(__gen_e_acsl_at_2 + (int)(__gen_e_acsl_j - 2));
+        */
+        if (! *(__gen_e_acsl_at_2 + (__gen_e_acsl_j - 2))) ;
+        else {
+          __gen_e_acsl_exists = 1;
+          goto e_acsl_end_loop2;
+        }
+      }
+      __gen_e_acsl_j ++;
+    }
+    e_acsl_end_loop2: ;
+    __e_acsl_assert(__gen_e_acsl_exists,(char *)"Assertion",(char *)"main",
+                    (char *)"\\exists integer j; 2 <= j < 5 && \\at(n + j == 11,L)",
+                    29);
+  }
+  /*@ assert \let k = -7;
+      ∃ ℤ u;
+        9 ≤ u < 21 ∧
+        (∀ ℤ v; -5 < v ≤ 6 ⇒ \at((u > 0? n + k: u + v) > 0,K));
+  */
+  {
+    int __gen_e_acsl_k;
+    int __gen_e_acsl_exists_2;
+    int __gen_e_acsl_u;
+    __gen_e_acsl_k = -7;
+    __gen_e_acsl_exists_2 = 0;
+    __gen_e_acsl_u = 9;
+    while (1) {
+      if (__gen_e_acsl_u < 21) ; else break;
+      {
+        int __gen_e_acsl_forall;
+        int __gen_e_acsl_v;
+        __gen_e_acsl_forall = 1;
+        __gen_e_acsl_v = -5 + 1;
+        while (1) {
+          if (__gen_e_acsl_v <= 6) ; else break;
+          {
+            int __gen_e_acsl_valid_read_3;
+            __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)(
+                                                            __gen_e_acsl_at_3 + (int)(
+                                                            (long)((int)(
+                                                            (long)((int)(
+                                                            __gen_e_acsl_u - 9L)) * 11L)) + (int)(
+                                                            __gen_e_acsl_v - -4L))),
+                                                            sizeof(int),
+                                                            (void *)__gen_e_acsl_at_3,
+                                                            (void *)(& __gen_e_acsl_at_3));
+            __e_acsl_assert(__gen_e_acsl_valid_read_3,(char *)"RTE",
+                            (char *)"main",
+                            (char *)"mem_access:\n  \\valid_read(__gen_e_acsl_at_3 +\n              (int)((int)((int)(__gen_e_acsl_u - 9) * 11) +\n                    (int)(__gen_e_acsl_v - -4)))",
+                            34);
+            /*@ assert
+                Value: initialization:
+                  \initialized(__gen_e_acsl_at_3 +
+                               ((__gen_e_acsl_u - 9) * 11 +
+                                (__gen_e_acsl_v - -4)));
+            */
+            /*@ assert
+                Value: mem_access:
+                  \valid_read(__gen_e_acsl_at_3 +
+                              (int)((int)((int)(__gen_e_acsl_u - 9) * 11) +
+                                    (int)(__gen_e_acsl_v - -4)));
+            */
+            if (*(__gen_e_acsl_at_3 + ((__gen_e_acsl_u - 9) * 11 + (__gen_e_acsl_v - -4)))) 
+              ;
+            else {
+              __gen_e_acsl_forall = 0;
+              goto e_acsl_end_loop3;
+            }
+          }
+          __gen_e_acsl_v ++;
+        }
+        e_acsl_end_loop3: ;
+        if (! __gen_e_acsl_forall) ;
+        else {
+          __gen_e_acsl_exists_2 = 1;
+          goto e_acsl_end_loop4;
+        }
+      }
+      __gen_e_acsl_u ++;
+    }
+    e_acsl_end_loop4: ;
+    __e_acsl_assert(__gen_e_acsl_exists_2,(char *)"Assertion",(char *)"main",
+                    (char *)"\\let k = -7;\n\\exists integer u;\n  9 <= u < 21 &&\n  (\\forall integer v; -5 < v <= 6 ==> \\at((u > 0? n + k: u + v) > 0,K))",
+                    31);
+  }
+  /*@ assert \let i = 3; \at(n + i,L) ≡ 10; */
+  {
+    int __gen_e_acsl_i_3;
+    int __gen_e_acsl_valid_read_4;
+    __gen_e_acsl_i_3 = 3;
+    __gen_e_acsl_valid_read_4 = __e_acsl_valid_read((void *)(__gen_e_acsl_at_4 + 0),
+                                                    sizeof(long),
+                                                    (void *)__gen_e_acsl_at_4,
+                                                    (void *)(& __gen_e_acsl_at_4));
+    __e_acsl_assert(__gen_e_acsl_valid_read_4,(char *)"RTE",(char *)"main",
+                    (char *)"mem_access: \\valid_read(__gen_e_acsl_at_4 + 0)",
+                    37);
+    __e_acsl_assert(*(__gen_e_acsl_at_4 + 0) == 10L,(char *)"Assertion",
+                    (char *)"main",
+                    (char *)"\\let i = 3; \\at(n + i,L) == 10",37);
+  }
+  unsigned int m = (unsigned int)3;
+  G:
+  {
+    {
+      int __gen_e_acsl_k_4;
+      __gen_e_acsl_k_4 = -9 + 1;
+      while (1) 
+        if (__gen_e_acsl_k_4 <= -1) {
+          /*@ assert
+              Value: mem_access:
+                \valid(__gen_e_acsl_at_5 + (int)(__gen_e_acsl_k_4 - -8));
+          */
+          *(__gen_e_acsl_at_5 + (__gen_e_acsl_k_4 - -8)) = m + (long)__gen_e_acsl_k_4;
+          __gen_e_acsl_k_4 ++;
+        }
+        else break;
+    }
+    ;
+  }
+  m = (unsigned int)(-3);
+  /*@ assert ∃ ℤ k; -9 < k < 0 ∧ \at(m + k,G) ≡ 0; */
+  {
+    int __gen_e_acsl_exists_3;
+    int __gen_e_acsl_k_3;
+    __gen_e_acsl_exists_3 = 0;
+    __gen_e_acsl_k_3 = -9 + 1;
+    while (1) {
+      if (__gen_e_acsl_k_3 < 0) ; else break;
+      {
+        int __gen_e_acsl_valid_read_5;
+        __gen_e_acsl_valid_read_5 = __e_acsl_valid_read((void *)(__gen_e_acsl_at_5 + (int)(
+                                                                 __gen_e_acsl_k_3 - -8L)),
+                                                        sizeof(long),
+                                                        (void *)__gen_e_acsl_at_5,
+                                                        (void *)(& __gen_e_acsl_at_5));
+        __e_acsl_assert(__gen_e_acsl_valid_read_5,(char *)"RTE",
+                        (char *)"main",
+                        (char *)"mem_access: \\valid_read(__gen_e_acsl_at_5 + (int)(__gen_e_acsl_k_3 - -8))",
+                        41);
+        /*@ assert
+            Value: initialization:
+              \initialized(__gen_e_acsl_at_5 + (__gen_e_acsl_k_3 - -8));
+        */
+        /*@ assert
+            Value: mem_access:
+              \valid_read(__gen_e_acsl_at_5 + (int)(__gen_e_acsl_k_3 - -8));
+        */
+        if (! (*(__gen_e_acsl_at_5 + (__gen_e_acsl_k_3 - -8)) == 0L)) 
+          ;
+        else {
+          __gen_e_acsl_exists_3 = 1;
+          goto e_acsl_end_loop5;
+        }
+      }
+      __gen_e_acsl_k_3 ++;
+    }
+    e_acsl_end_loop5: ;
+    __e_acsl_assert(__gen_e_acsl_exists_3,(char *)"Assertion",(char *)"main",
+                    (char *)"\\exists integer k; -9 < k < 0 && \\at(m + k,G) == 0",
+                    41);
+  }
+  /*@ assert
+      ∃ ℤ u;
+        9 ≤ u < 21 ∧
+        (∀ ℤ v; -5 < v ≤ (u < 15? u + 6: 3) ⇒ \at((n + u) + n > 0,K));
+  */
+  {
+    int __gen_e_acsl_exists_4;
+    int __gen_e_acsl_u_3;
+    __gen_e_acsl_exists_4 = 0;
+    __gen_e_acsl_u_3 = 9;
+    while (1) {
+      if (__gen_e_acsl_u_3 < 21) ; else break;
+      {
+        int __gen_e_acsl_forall_2;
+        int __gen_e_acsl_v_3;
+        __gen_e_acsl_forall_2 = 1;
+        __gen_e_acsl_v_3 = -5 + 1;
+        while (1) {
+          {
+            int __gen_e_acsl_if_3;
+            if (__gen_e_acsl_u_3 < 15) __gen_e_acsl_if_3 = __gen_e_acsl_u_3 + 6;
+            else __gen_e_acsl_if_3 = 3;
+            if (__gen_e_acsl_v_3 <= __gen_e_acsl_if_3) ; else break;
+          }
+          {
+            int __gen_e_acsl_valid_read_6;
+            __gen_e_acsl_valid_read_6 = __e_acsl_valid_read((void *)(
+                                                            __gen_e_acsl_at_6 + (int)(
+                                                            (long)((int)(
+                                                            (long)((int)(
+                                                            __gen_e_acsl_u_3 - 9L)) * 32L)) + (int)(
+                                                            __gen_e_acsl_v_3 - -4L))),
+                                                            sizeof(int),
+                                                            (void *)__gen_e_acsl_at_6,
+                                                            (void *)(& __gen_e_acsl_at_6));
+            __e_acsl_assert(__gen_e_acsl_valid_read_6,(char *)"RTE",
+                            (char *)"main",
+                            (char *)"mem_access:\n  \\valid_read(__gen_e_acsl_at_6 +\n              (int)((int)((int)(__gen_e_acsl_u_3 - 9) * 32) +\n                    (int)(__gen_e_acsl_v_3 - -4)))",
+                            45);
+            /*@ assert
+                Value: initialization:
+                  \initialized(__gen_e_acsl_at_6 +
+                               ((__gen_e_acsl_u_3 - 9) * 32 +
+                                (__gen_e_acsl_v_3 - -4)));
+            */
+            /*@ assert
+                Value: mem_access:
+                  \valid_read(__gen_e_acsl_at_6 +
+                              (int)((int)((int)(__gen_e_acsl_u_3 - 9) * 32) +
+                                    (int)(__gen_e_acsl_v_3 - -4)));
+            */
+            if (*(__gen_e_acsl_at_6 + ((__gen_e_acsl_u_3 - 9) * 32 + (
+                                       __gen_e_acsl_v_3 - -4)))) ;
+            else {
+              __gen_e_acsl_forall_2 = 0;
+              goto e_acsl_end_loop6;
+            }
+          }
+          __gen_e_acsl_v_3 ++;
+        }
+        e_acsl_end_loop6: ;
+        if (! __gen_e_acsl_forall_2) ;
+        else {
+          __gen_e_acsl_exists_4 = 1;
+          goto e_acsl_end_loop7;
+        }
+      }
+      __gen_e_acsl_u_3 ++;
+    }
+    e_acsl_end_loop7: ;
+    __e_acsl_assert(__gen_e_acsl_exists_4,(char *)"Assertion",(char *)"main",
+                    (char *)"\\exists integer u;\n  9 <= u < 21 &&\n  (\\forall integer v; -5 < v <= (u < 15? u + 6: 3) ==> \\at((n + u) + n > 0,K))",
+                    43);
+  }
+  int t[5] = {9, 12, 12, 12, -4};
+  __e_acsl_store_block((void *)(t),(size_t)20);
+  __e_acsl_full_init((void *)(& t));
+  __gen_e_acsl_f(t);
+  g();
+  /*@ assert ∃ ℤ j; 2 ≤ j < 10000000000000000 ∧ \at(n + j ≡ 11,L);
+   */
+  ;
+  /*@ assert \let i = n; \at(n + i ≡ 10,L); */ ;
+  __retres = 0;
+  __e_acsl_delete_block((void *)(t));
+  __e_acsl_delete_block((void *)(& n));
+  free((void *)__gen_e_acsl_at_6);
+  free((void *)__gen_e_acsl_at_5);
+  free((void *)__gen_e_acsl_at_4);
+  free((void *)__gen_e_acsl_at_3);
+  free((void *)__gen_e_acsl_at_2);
+  free((void *)__gen_e_acsl_at);
+  __e_acsl_memory_clean();
+  return __retres;
+}
+
 /*@ ensures
       ∀ ℤ n;
         1 < n ≤ 3 ⇒ \old(*(t + n) ≡ 12) ∧ \old(*(t + (n - 1)) > 5);
@@ -92,7 +592,7 @@ void __gen_e_acsl_f(int *t)
                                                       (void *)(& __gen_e_acsl_at));
         __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"f",
                         (char *)"mem_access: \\valid_read(__gen_e_acsl_at + (int)(__gen_e_acsl_n - 2))",
-                        8);
+                        7);
         /*@ assert
             Value: initialization:
               \initialized(__gen_e_acsl_at + (__gen_e_acsl_n - 2));
@@ -111,7 +611,7 @@ void __gen_e_acsl_f(int *t)
           __e_acsl_assert(__gen_e_acsl_valid_read_2,(char *)"RTE",
                           (char *)"f",
                           (char *)"mem_access: \\valid_read(__gen_e_acsl_at_2 + (int)(__gen_e_acsl_n - 2))",
-                          8);
+                          7);
           /*@ assert
               Value: initialization:
                 \initialized(__gen_e_acsl_at_2 + (__gen_e_acsl_n - 2));
@@ -126,15 +626,15 @@ void __gen_e_acsl_f(int *t)
         if (__gen_e_acsl_and) ;
         else {
           __gen_e_acsl_forall = 0;
-          goto e_acsl_end_loop7;
+          goto e_acsl_end_loop8;
         }
       }
       __gen_e_acsl_n ++;
     }
-    e_acsl_end_loop7: ;
+    e_acsl_end_loop8: ;
     __e_acsl_assert(__gen_e_acsl_forall,(char *)"Postcondition",(char *)"f",
                     (char *)"\\forall integer n;\n  1 < n <= 3 ==> \\old(*(t + n) == 12) && \\old(*(t + (n - 1)) > 5)",
-                    7);
+                    6);
     __gen_e_acsl_m = 4;
     __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)(__gen_e_acsl_at_3 + 0),
                                                     sizeof(int),
@@ -142,7 +642,7 @@ void __gen_e_acsl_f(int *t)
                                                     (void *)(& __gen_e_acsl_at_3));
     __e_acsl_assert(__gen_e_acsl_valid_read_3,(char *)"RTE",(char *)"f",
                     (char *)"mem_access: \\valid_read(__gen_e_acsl_at_3 + 0)",
-                    9);
+                    8);
     if (*(__gen_e_acsl_at_3 + 0)) {
       int __gen_e_acsl_valid_read_4;
       __gen_e_acsl_valid_read_4 = __e_acsl_valid_read((void *)(__gen_e_acsl_at_4 + 0),
@@ -151,13 +651,13 @@ void __gen_e_acsl_f(int *t)
                                                       (void *)(& __gen_e_acsl_at_4));
       __e_acsl_assert(__gen_e_acsl_valid_read_4,(char *)"RTE",(char *)"f",
                       (char *)"mem_access: \\valid_read(__gen_e_acsl_at_4 + 0)",
-                      9);
+                      8);
       __gen_e_acsl_and_2 = *(__gen_e_acsl_at_4 + 0) == 9;
     }
     else __gen_e_acsl_and_2 = 0;
     __e_acsl_assert(__gen_e_acsl_and_2,(char *)"Postcondition",(char *)"f",
                     (char *)"\\let m = 4; \\old(*(t + m) == -4) && \\old(*(t + (m - 4))) == 9",
-                    9);
+                    8);
     __e_acsl_delete_block((void *)(& t));
     free((void *)__gen_e_acsl_at_4);
     free((void *)__gen_e_acsl_at_3);
@@ -165,469 +665,6 @@ void __gen_e_acsl_f(int *t)
     free((void *)__gen_e_acsl_at);
     return;
   }
-}
-
-void __e_acsl_globals_init(void)
-{
-  __e_acsl_store_block((void *)(& __gen_e_acsl_f),(size_t)1);
-  __e_acsl_full_init((void *)(& __gen_e_acsl_f));
-  __e_acsl_store_block((void *)(& f),(size_t)1);
-  __e_acsl_full_init((void *)(& f));
-  __e_acsl_store_block((void *)(& __fc_p_fopen),(size_t)8);
-  __e_acsl_full_init((void *)(& __fc_p_fopen));
-  __e_acsl_store_block((void *)(__fc_fopen),(size_t)128);
-  __e_acsl_full_init((void *)(& __fc_fopen));
-  __e_acsl_store_block((void *)(& __fc_rand_max),(size_t)8);
-  __e_acsl_full_init((void *)(& __fc_rand_max));
-  return;
-}
-
-int main(void)
-{
-  int *__gen_e_acsl_at_6;
-  long *__gen_e_acsl_at_5;
-  long *__gen_e_acsl_at_4;
-  int *__gen_e_acsl_at_3;
-  int *__gen_e_acsl_at_2;
-  int *__gen_e_acsl_at;
-  int __retres;
-  int n;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
-  __e_acsl_globals_init();
-  __gen_e_acsl_at_6 = (int *)malloc((size_t)1536);
-  __gen_e_acsl_at_5 = (long *)malloc((size_t)64);
-  __gen_e_acsl_at_4 = (long *)malloc((size_t)8);
-  __gen_e_acsl_at_3 = (int *)malloc((size_t)528);
-  __gen_e_acsl_at_2 = (int *)malloc((size_t)12);
-  __gen_e_acsl_at = (int *)malloc((size_t)4);
-  __e_acsl_store_block((void *)(& n),(size_t)4);
-  __e_acsl_store_block((void *)(& __retres),(size_t)4);
-  __e_acsl_full_init((void *)(& n));
-  n = 7;
-  L:
-  {
-    {
-      int __gen_e_acsl_i_4;
-      __gen_e_acsl_i_4 = 3;
-      /*@ assert Value: mem_access: \valid(__gen_e_acsl_at_4 + 0); */
-      *(__gen_e_acsl_at_4 + 0) = n + (long)__gen_e_acsl_i_4;
-    }
-    {
-      int __gen_e_acsl_j_2;
-      __gen_e_acsl_j_2 = 2;
-      while (1) 
-        if (__gen_e_acsl_j_2 <= 4) {
-          /*@ assert
-              Value: mem_access:
-                \valid(__gen_e_acsl_at_2 + (int)(__gen_e_acsl_j_2 - 2));
-          */
-          *(__gen_e_acsl_at_2 + (__gen_e_acsl_j_2 - 2)) = n + (long)__gen_e_acsl_j_2 == 11L;
-          __gen_e_acsl_j_2 ++;
-        }
-        else break;
-    }
-    {
-      int __gen_e_acsl_i_2;
-      __gen_e_acsl_i_2 = 3;
-      /*@ assert Value: mem_access: \valid(__gen_e_acsl_at + 0); */
-      *(__gen_e_acsl_at + 0) = n + (long)__gen_e_acsl_i_2 == 10L;
-    }
-    ;
-  }
-  __e_acsl_full_init((void *)(& n));
-  n = 9;
-  K:
-  {
-    {
-      int __gen_e_acsl_u_4;
-      __gen_e_acsl_u_4 = 9;
-      while (1) 
-        if (__gen_e_acsl_u_4 <= 20) {
-          {
-            int __gen_e_acsl_v_4;
-            int __gen_e_acsl_if_2;
-            if (__gen_e_acsl_u_4 < 15) __gen_e_acsl_if_2 = __gen_e_acsl_u_4 + 6;
-            else __gen_e_acsl_if_2 = 3;
-            __gen_e_acsl_v_4 = -5 + 1;
-            while (1) 
-              if (__gen_e_acsl_v_4 <= __gen_e_acsl_if_2) {
-                /*@ assert
-                    Value: mem_access:
-                      \valid(__gen_e_acsl_at_6 +
-                             (int)((int)((int)(__gen_e_acsl_v_4 - -4) * 12) +
-                                   (int)(__gen_e_acsl_u_4 - 9)));
-                */
-                /*@ assert
-                    Value: signed_overflow:
-                      __gen_e_acsl_v_4 - -4 ≤ 2147483647;
-                */
-                /*@ assert
-                    Value: signed_overflow:
-                      (int)(__gen_e_acsl_v_4 - -4) * 12 ≤ 2147483647;
-                */
-                /*@ assert
-                    Value: signed_overflow:
-                      (int)((int)(__gen_e_acsl_v_4 - -4) * 12) +
-                      (int)(__gen_e_acsl_u_4 - 9) ≤ 2147483647;
-                */
-                *(__gen_e_acsl_at_6 + ((__gen_e_acsl_v_4 - -4) * 12 + (
-                                       __gen_e_acsl_u_4 - 9))) = (n + (long)__gen_e_acsl_u_4) + n > 0L;
-                __gen_e_acsl_v_4 ++;
-              }
-              else break;
-          }
-          __gen_e_acsl_u_4 ++;
-        }
-        else break;
-    }
-    {
-      int __gen_e_acsl_k_2;
-      {
-        int __gen_e_acsl_u_2;
-        __gen_e_acsl_k_2 = -7;
-        __gen_e_acsl_u_2 = 9;
-        while (1) 
-          if (__gen_e_acsl_u_2 <= 20) {
-            {
-              int __gen_e_acsl_v_2;
-              __gen_e_acsl_v_2 = -5 + 1;
-              while (1) 
-                if (__gen_e_acsl_v_2 <= 6) {
-                  {
-                    long __gen_e_acsl_if;
-                    if (__gen_e_acsl_u_2 > 0) __gen_e_acsl_if = n + (long)__gen_e_acsl_k_2;
-                    else __gen_e_acsl_if = __gen_e_acsl_u_2 + __gen_e_acsl_v_2;
-                    /*@ assert
-                        Value: mem_access:
-                          \valid(__gen_e_acsl_at_3 +
-                                 (int)((int)((int)(__gen_e_acsl_v_2 - -4) *
-                                             12)
-                                       + (int)(__gen_e_acsl_u_2 - 9)));
-                    */
-                    *(__gen_e_acsl_at_3 + ((__gen_e_acsl_v_2 - -4) * 12 + (
-                                           __gen_e_acsl_u_2 - 9))) = 
-                    __gen_e_acsl_if > 0L;
-                  }
-                  __gen_e_acsl_v_2 ++;
-                }
-                else break;
-            }
-            __gen_e_acsl_u_2 ++;
-          }
-          else break;
-      }
-    }
-    ;
-  }
-  __e_acsl_full_init((void *)(& n));
-  n = 666;
-  /*@ assert \let i = 3; \at(n + i ≡ 10,L); */
-  {
-    int __gen_e_acsl_i;
-    int __gen_e_acsl_valid_read;
-    __gen_e_acsl_i = 3;
-    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(__gen_e_acsl_at + 0),
-                                                  sizeof(int),
-                                                  (void *)__gen_e_acsl_at,
-                                                  (void *)(& __gen_e_acsl_at));
-    __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"main",
-                    (char *)"mem_access: \\valid_read(__gen_e_acsl_at + 0)",
-                    21);
-    __e_acsl_assert(*(__gen_e_acsl_at + 0),(char *)"Assertion",
-                    (char *)"main",
-                    (char *)"\\let i = 3; \\at(n + i == 10,L)",21);
-  }
-  /*@ assert ∃ ℤ j; 2 ≤ j < 5 ∧ \at(n + j ≡ 11,L); */
-  {
-    int __gen_e_acsl_exists;
-    int __gen_e_acsl_j;
-    __gen_e_acsl_exists = 0;
-    __gen_e_acsl_j = 2;
-    while (1) {
-      if (__gen_e_acsl_j < 5) ; else break;
-      {
-        int __gen_e_acsl_valid_read_2;
-        __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(__gen_e_acsl_at_2 + (int)(
-                                                                 __gen_e_acsl_j - 2L)),
-                                                        sizeof(int),
-                                                        (void *)__gen_e_acsl_at_2,
-                                                        (void *)(& __gen_e_acsl_at_2));
-        __e_acsl_assert(__gen_e_acsl_valid_read_2,(char *)"RTE",
-                        (char *)"main",
-                        (char *)"mem_access: \\valid_read(__gen_e_acsl_at_2 + (int)(__gen_e_acsl_j - 2))",
-                        22);
-        /*@ assert
-            Value: initialization:
-              \initialized(__gen_e_acsl_at_2 + (__gen_e_acsl_j - 2));
-        */
-        /*@ assert
-            Value: mem_access:
-              \valid_read(__gen_e_acsl_at_2 + (int)(__gen_e_acsl_j - 2));
-        */
-        if (! *(__gen_e_acsl_at_2 + (__gen_e_acsl_j - 2))) ;
-        else {
-          __gen_e_acsl_exists = 1;
-          goto e_acsl_end_loop1;
-        }
-      }
-      __gen_e_acsl_j ++;
-    }
-    e_acsl_end_loop1: ;
-    __e_acsl_assert(__gen_e_acsl_exists,(char *)"Assertion",(char *)"main",
-                    (char *)"\\exists integer j; 2 <= j < 5 && \\at(n + j == 11,L)",
-                    22);
-  }
-  /*@ assert \let k = -7;
-      ∃ ℤ u;
-        9 ≤ u < 21 ∧
-        (∀ ℤ v; -5 < v ≤ 6 ⇒ \at((u > 0? n + k: u + v) > 0,K));
-  */
-  {
-    int __gen_e_acsl_k;
-    int __gen_e_acsl_exists_2;
-    int __gen_e_acsl_u;
-    __gen_e_acsl_k = -7;
-    __gen_e_acsl_exists_2 = 0;
-    __gen_e_acsl_u = 9;
-    while (1) {
-      if (__gen_e_acsl_u < 21) ; else break;
-      {
-        int __gen_e_acsl_forall;
-        int __gen_e_acsl_v;
-        __gen_e_acsl_forall = 1;
-        __gen_e_acsl_v = -5 + 1;
-        while (1) {
-          if (__gen_e_acsl_v <= 6) ; else break;
-          {
-            int __gen_e_acsl_valid_read_3;
-            __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)(
-                                                            __gen_e_acsl_at_3 + (int)(
-                                                            (long)((int)(
-                                                            (long)((int)(
-                                                            __gen_e_acsl_v - -4L)) * 12L)) + (int)(
-                                                            __gen_e_acsl_u - 9L))),
-                                                            sizeof(int),
-                                                            (void *)__gen_e_acsl_at_3,
-                                                            (void *)(& __gen_e_acsl_at_3));
-            __e_acsl_assert(__gen_e_acsl_valid_read_3,(char *)"RTE",
-                            (char *)"main",
-                            (char *)"mem_access:\n  \\valid_read(__gen_e_acsl_at_3 +\n              (int)((int)((int)(__gen_e_acsl_v - -4) * 12) +\n                    (int)(__gen_e_acsl_u - 9)))",
-                            27);
-            /*@ assert
-                Value: initialization:
-                  \initialized(__gen_e_acsl_at_3 +
-                               ((__gen_e_acsl_v - -4) * 12 +
-                                (__gen_e_acsl_u - 9)));
-            */
-            /*@ assert
-                Value: mem_access:
-                  \valid_read(__gen_e_acsl_at_3 +
-                              (int)((int)((int)(__gen_e_acsl_v - -4) * 12) +
-                                    (int)(__gen_e_acsl_u - 9)));
-            */
-            if (*(__gen_e_acsl_at_3 + ((__gen_e_acsl_v - -4) * 12 + (
-                                       __gen_e_acsl_u - 9)))) ;
-            else {
-              __gen_e_acsl_forall = 0;
-              goto e_acsl_end_loop2;
-            }
-          }
-          __gen_e_acsl_v ++;
-        }
-        e_acsl_end_loop2: ;
-        if (! __gen_e_acsl_forall) ;
-        else {
-          __gen_e_acsl_exists_2 = 1;
-          goto e_acsl_end_loop3;
-        }
-      }
-      __gen_e_acsl_u ++;
-    }
-    e_acsl_end_loop3: ;
-    __e_acsl_assert(__gen_e_acsl_exists_2,(char *)"Assertion",(char *)"main",
-                    (char *)"\\let k = -7;\n\\exists integer u;\n  9 <= u < 21 &&\n  (\\forall integer v; -5 < v <= 6 ==> \\at((u > 0? n + k: u + v) > 0,K))",
-                    24);
-  }
-  /*@ assert \let i = 3; \at(n + i,L) ≡ 10; */
-  {
-    int __gen_e_acsl_i_3;
-    int __gen_e_acsl_valid_read_4;
-    __gen_e_acsl_i_3 = 3;
-    __gen_e_acsl_valid_read_4 = __e_acsl_valid_read((void *)(__gen_e_acsl_at_4 + 0),
-                                                    sizeof(long),
-                                                    (void *)__gen_e_acsl_at_4,
-                                                    (void *)(& __gen_e_acsl_at_4));
-    __e_acsl_assert(__gen_e_acsl_valid_read_4,(char *)"RTE",(char *)"main",
-                    (char *)"mem_access: \\valid_read(__gen_e_acsl_at_4 + 0)",
-                    30);
-    __e_acsl_assert(*(__gen_e_acsl_at_4 + 0) == 10L,(char *)"Assertion",
-                    (char *)"main",
-                    (char *)"\\let i = 3; \\at(n + i,L) == 10",30);
-  }
-  unsigned int m = (unsigned int)3;
-  __e_acsl_store_block((void *)(& m),(size_t)4);
-  __e_acsl_full_init((void *)(& m));
-  G:
-  {
-    {
-      int __gen_e_acsl_k_4;
-      __gen_e_acsl_k_4 = -9 + 1;
-      while (1) 
-        if (__gen_e_acsl_k_4 <= -1) {
-          /*@ assert
-              Value: mem_access:
-                \valid(__gen_e_acsl_at_5 + (int)(__gen_e_acsl_k_4 - -8));
-          */
-          *(__gen_e_acsl_at_5 + (__gen_e_acsl_k_4 - -8)) = m + (long)__gen_e_acsl_k_4;
-          __gen_e_acsl_k_4 ++;
-        }
-        else break;
-    }
-    ;
-  }
-  __e_acsl_full_init((void *)(& m));
-  m = (unsigned int)(-3);
-  /*@ assert ∃ ℤ k; -9 < k < 0 ∧ \at(m + k,G) ≡ 0; */
-  {
-    int __gen_e_acsl_exists_3;
-    int __gen_e_acsl_k_3;
-    __gen_e_acsl_exists_3 = 0;
-    __gen_e_acsl_k_3 = -9 + 1;
-    while (1) {
-      if (__gen_e_acsl_k_3 < 0) ; else break;
-      {
-        int __gen_e_acsl_valid_read_5;
-        __gen_e_acsl_valid_read_5 = __e_acsl_valid_read((void *)(__gen_e_acsl_at_5 + (int)(
-                                                                 __gen_e_acsl_k_3 - -8L)),
-                                                        sizeof(long),
-                                                        (void *)__gen_e_acsl_at_5,
-                                                        (void *)(& __gen_e_acsl_at_5));
-        __e_acsl_assert(__gen_e_acsl_valid_read_5,(char *)"RTE",
-                        (char *)"main",
-                        (char *)"mem_access: \\valid_read(__gen_e_acsl_at_5 + (int)(__gen_e_acsl_k_3 - -8))",
-                        34);
-        /*@ assert
-            Value: initialization:
-              \initialized(__gen_e_acsl_at_5 + (__gen_e_acsl_k_3 - -8));
-        */
-        /*@ assert
-            Value: mem_access:
-              \valid_read(__gen_e_acsl_at_5 + (int)(__gen_e_acsl_k_3 - -8));
-        */
-        if (! (*(__gen_e_acsl_at_5 + (__gen_e_acsl_k_3 - -8)) == 0L)) 
-          ;
-        else {
-          __gen_e_acsl_exists_3 = 1;
-          goto e_acsl_end_loop4;
-        }
-      }
-      __gen_e_acsl_k_3 ++;
-    }
-    e_acsl_end_loop4: ;
-    __e_acsl_assert(__gen_e_acsl_exists_3,(char *)"Assertion",(char *)"main",
-                    (char *)"\\exists integer k; -9 < k < 0 && \\at(m + k,G) == 0",
-                    34);
-  }
-  /*@ assert
-      ∃ ℤ u;
-        9 ≤ u < 21 ∧
-        (∀ ℤ v; -5 < v ≤ (u < 15? u + 6: 3) ⇒ \at((n + u) + n > 0,K));
-  */
-  {
-    int __gen_e_acsl_exists_4;
-    int __gen_e_acsl_u_3;
-    __gen_e_acsl_exists_4 = 0;
-    __gen_e_acsl_u_3 = 9;
-    while (1) {
-      if (__gen_e_acsl_u_3 < 21) ; else break;
-      {
-        int __gen_e_acsl_forall_2;
-        int __gen_e_acsl_v_3;
-        __gen_e_acsl_forall_2 = 1;
-        __gen_e_acsl_v_3 = -5 + 1;
-        while (1) {
-          {
-            int __gen_e_acsl_if_3;
-            if (__gen_e_acsl_u_3 < 15) __gen_e_acsl_if_3 = __gen_e_acsl_u_3 + 6;
-            else __gen_e_acsl_if_3 = 3;
-            if (__gen_e_acsl_v_3 <= __gen_e_acsl_if_3) ; else break;
-          }
-          {
-            int __gen_e_acsl_valid_read_6;
-            __gen_e_acsl_valid_read_6 = __e_acsl_valid_read((void *)(
-                                                            __gen_e_acsl_at_6 + (int)(
-                                                            (long)((int)(
-                                                            (long)((int)(
-                                                            __gen_e_acsl_v_3 - -4L)) * 12L)) + (int)(
-                                                            __gen_e_acsl_u_3 - 9L))),
-                                                            sizeof(int),
-                                                            (void *)__gen_e_acsl_at_6,
-                                                            (void *)(& __gen_e_acsl_at_6));
-            __e_acsl_assert(__gen_e_acsl_valid_read_6,(char *)"RTE",
-                            (char *)"main",
-                            (char *)"mem_access:\n  \\valid_read(__gen_e_acsl_at_6 +\n              (int)((int)((int)(__gen_e_acsl_v_3 - -4) * 12) +\n                    (int)(__gen_e_acsl_u_3 - 9)))",
-                            38);
-            /*@ assert
-                Value: initialization:
-                  \initialized(__gen_e_acsl_at_6 +
-                               ((__gen_e_acsl_v_3 - -4) * 12 +
-                                (__gen_e_acsl_u_3 - 9)));
-            */
-            /*@ assert
-                Value: mem_access:
-                  \valid_read(__gen_e_acsl_at_6 +
-                              (int)((int)((int)(__gen_e_acsl_v_3 - -4) * 12)
-                                    + (int)(__gen_e_acsl_u_3 - 9)));
-            */
-            if (*(__gen_e_acsl_at_6 + ((__gen_e_acsl_v_3 - -4) * 12 + (
-                                       __gen_e_acsl_u_3 - 9)))) ;
-            else {
-              __gen_e_acsl_forall_2 = 0;
-              goto e_acsl_end_loop5;
-            }
-          }
-          __gen_e_acsl_v_3 ++;
-        }
-        e_acsl_end_loop5: ;
-        if (! __gen_e_acsl_forall_2) ;
-        else {
-          __gen_e_acsl_exists_4 = 1;
-          goto e_acsl_end_loop6;
-        }
-      }
-      __gen_e_acsl_u_3 ++;
-    }
-    e_acsl_end_loop6: ;
-    __e_acsl_assert(__gen_e_acsl_exists_4,(char *)"Assertion",(char *)"main",
-                    (char *)"\\exists integer u;\n  9 <= u < 21 &&\n  (\\forall integer v; -5 < v <= (u < 15? u + 6: 3) ==> \\at((n + u) + n > 0,K))",
-                    36);
-  }
-  int t[5] = {9, 12, 12, 12, -4};
-  __e_acsl_store_block((void *)(t),(size_t)20);
-  __e_acsl_full_init((void *)(& t));
-  __gen_e_acsl_f(t);
-  /*@ assert ∃ ℤ j; 2 ≤ j < 10000000000000000 ∧ \at(n + j ≡ 11,L);
-   */
-  ;
-  /*@ assert \let i = n; \at(n + i ≡ 10,L); */ ;
-  __e_acsl_full_init((void *)(& __retres));
-  __retres = 0;
-  __e_acsl_delete_block((void *)(& f));
-  __e_acsl_delete_block((void *)(& __fc_p_fopen));
-  __e_acsl_delete_block((void *)(__fc_fopen));
-  __e_acsl_delete_block((void *)(& __fc_rand_max));
-  __e_acsl_delete_block((void *)(t));
-  __e_acsl_delete_block((void *)(& m));
-  __e_acsl_delete_block((void *)(& n));
-  __e_acsl_delete_block((void *)(& __retres));
-  free((void *)__gen_e_acsl_at_6);
-  free((void *)__gen_e_acsl_at_5);
-  free((void *)__gen_e_acsl_at_4);
-  free((void *)__gen_e_acsl_at_3);
-  free((void *)__gen_e_acsl_at_2);
-  free((void *)__gen_e_acsl_at);
-  __e_acsl_memory_clean();
-  return __retres;
 }
 
 

@@ -290,38 +290,21 @@ let is_bitfield_pointers lty =
   else
     is_bitfield_pointer lty
 
+exception Lv_from_vi_found
 let term_has_lv_from_vi t =
-  let res_ref = ref false in
-  let o = object inherit Visitor.frama_c_inplace
-    method !vlogic_var_use lv =
-      match lv.lv_origin with
-      | None ->
-        Cil.DoChildren
-      | Some _ ->
-        res_ref := true;
-        Cil.SkipChildren
-  end
-  in
-  ignore (Visitor.visitFramacTerm o t);
-  !res_ref
+  try
+    let o = object inherit Visitor.frama_c_inplace
+      method !vlogic_var_use lv = match lv.lv_origin with
+      | None -> Cil.DoChildren
+      | Some _ -> raise Lv_from_vi_found
+    end
+    in
+    ignore (Visitor.visitFramacTerm o t);
+    false
+  with Lv_from_vi_found ->
+    true
 
 type pred_or_term = PoT_pred of predicate | PoT_term of term
-
-let insert_before_element_under_condition elements to_insert condition =
-  let elements_with_insertions_rev = List.fold_left
-    (fun elements element ->
-      if condition element then
-        element :: List.fold_left
-          (fun elements_with_insertions element_to_insert ->
-            element_to_insert :: elements_with_insertions)
-          elements
-          to_insert
-      else
-        element :: elements)
-    []
-    elements
-  in
-  List.rev elements_with_insertions_rev
 
 (*
 Local Variables:

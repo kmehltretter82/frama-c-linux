@@ -39,13 +39,13 @@ let add lscope_var t = lscope_var :: t
 
 let get_all t = List.rev t
 
-let get_lscope_var lv t =
+let find lv t =
   let is_lv = function
   | Lvs_let(lv', _) | Lvs_quantif(_, lv', _) | Lvs_formal(lv', _)
   | Lvs_global(lv', _) ->
     Cil_datatype.Logic_var.equal lv lv'
   in
-  try List.find is_lv t with Not_found -> assert false
+  List.find is_lv t
 
 let effective_lscope_from_pred_or_term pot potential_lscope =
   let effective_lscope = ref empty in
@@ -57,8 +57,11 @@ let effective_lscope_from_pred_or_term pot potential_lscope =
           [effective_lscope] which only tracks purely logic variables. *)
         ()
       | None ->
-        let lscope_var = get_lscope_var lv potential_lscope in
-        effective_lscope := add lscope_var !effective_lscope
+        try
+          let lscope_var = find lv potential_lscope in
+          effective_lscope := add lscope_var !effective_lscope
+        with Not_found ->
+          ()
       end;
       Cil.DoChildren
   end

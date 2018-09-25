@@ -1,13 +1,20 @@
 /* run.config
-   COMMENT: \at with logic variables
-   COMMENT: For now, only works with full memory model,
-            and without --gmp-only
+  COMMENT: \at on purely logic variables
+  COMMENT:
 */
 
 /*@ ensures \forall integer n; 1 < n <= 3 ==>
       \old(t[n] == 12) && \old(t[n - 1] > 5);
     ensures \let m = 4; \old(t[m] == -4) && \old(t[m - 4]) == 9; */
 void f(int *t) {}
+
+void g() {
+  int m;
+  m = 8;
+  Q: ;
+  m = 10;
+  /*@ assert \exists integer w; 3 <= w < 6 && \at(m + w == 12, Q); */ ;
+}
 
 int main(void) {
   int n;
@@ -37,9 +44,10 @@ int main(void) {
       \forall integer v; -5 < v <= (u < 15 ? u + 6 : 3) ==>
         \at(n +  u + n > 0, K); */ ;
 
-  // Function contracts:
+  // Function calls:
   int t[5] = {9, 12, 12, 12, -4};
   f(t);
+  g();
 
   // Not yet:
   /*@ assert

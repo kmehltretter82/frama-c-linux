@@ -42,14 +42,21 @@ val to_exp:
   stored in a memory location that needs to be alloted then freed.
   This part is designed for that purpose. *)
 
-val get_mallocs: kernel_function -> stmt list
-(* Get the list of [malloc] stmts that need to be inserted into [kf]. *)
+module Malloc: sig
+  val find_all: kernel_function -> stmt list
+  (* Return the list of [malloc] stmts that need to be inserted into [kf]. *)
 
-val get_frees: kernel_function -> stmt list
-(* Get the list of [malloc] stmts that need to be inserted into [kf]. *)
+  val remove_all: kernel_function -> unit
+  (* Remove all [malloc] stmts for [kf] from the internal table. *)
+end
 
-val remove_mallocs_and_frees: kernel_function -> unit
-(* Remove all [malloc] and [free] stmts for [kf] from the internal table. *)
+module Free: sig
+  val find_all: kernel_function -> stmt list
+  (* Return the list of [free] stmts that need to be inserted into [kf]. *)
+
+  val remove_all: kernel_function -> unit
+  (* Remove all [free] stmts for [kf] from the internal table. *)
+end
 
 (**************************************************************************)
 (********************** Forward references ********************************)
