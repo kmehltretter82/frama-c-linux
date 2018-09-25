@@ -33,6 +33,10 @@ such as \lstinline|\valid|) assumes little-endian architecture and has very
 limited support for 32-bit architectures. When using a 32-bit machine or
 big-endians, we recomend using the bittree-based memory model instead.
 
+\begin{important}
+The runtime library is also \emph{not} thread-safe.
+\end{important}
+
 \section{Uninitialized Values}
 \index{Uninitialized value}
 
