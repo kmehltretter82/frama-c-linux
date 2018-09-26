@@ -27,7 +27,7 @@
   E-ACSL construct `\at on purely logic variables and over gmp type'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] tests/gmp/at_on-purely-logic-variables.c:44: Warning: 
+[e-acsl] tests/gmp/at_on-purely-logic-variables.c:45: Warning: 
   E-ACSL construct
   `\at on purely logic variables and with quantifier that uses too complex bound (E-ACSL cannot infer a finite upper bound to it)'
   is not yet supported.

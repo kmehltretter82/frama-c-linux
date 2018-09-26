@@ -83,7 +83,7 @@ val add_stmt: ?post:bool -> ?init:bool -> ?before:stmt -> t -> stmt -> t
 
 val extend_stmt_in_place: t -> stmt -> label:logic_label -> block -> t
 (** [extend_stmt_in_place env stmt ~label b] modifies [stmt] in place in
-    order to add the given [block]. If [pre] is [Here] or [Post],
+    order to add the given [block]. If [label] is [Here] or [Post],
     then this block is guaranteed to be at the first place of the resulting
     [stmt] whatever modification will be done by the visitor later. *)
 

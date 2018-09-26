@@ -42,12 +42,9 @@ let term_to_exp_ref
   provide the [remove_all] function. Thus we need to keep calling [remove]
   until all entries are removed. *)
 let rec remove_all tbl kf =
-  try
-    ignore(Cil_datatype.Kf.Hashtbl.find tbl kf);
-    Cil_datatype.Kf.Hashtbl.remove tbl kf;
-    remove_all tbl kf;
-  with Not_found ->
-    ()
+  if Cil_datatype.Kf.Hashtbl.mem tbl kf then
+    (Cil_datatype.Kf.Hashtbl.remove tbl kf;
+    remove_all tbl kf)
 
 module Malloc = struct
   let tbl = Cil_datatype.Kf.Hashtbl.create 7
@@ -107,9 +104,8 @@ let rec sizes_and_shifts_from_quantifs ~loc kf lscope sizes_and_shifts =
       Logic_const.tint ~loc max
     | _, None ->
       Error.not_yet
-        ("\\at on purely logic variables and with quantifier that uses " ^
-          "too complex bound " ^
-          "(E-ACSL cannot infer a finite upper bound to it)")
+        "\\at on purely logic variables and with quantifier that uses \
+          too complex bound (E-ACSL cannot infer a finite upper bound to it)"
     in
     (* Index *)
     let t_lv = Logic_const.tvar ~loc lv in
@@ -294,15 +290,15 @@ let rec mk_storing_loops ~loc kf env lscope (e_at, vi_at, t_index) pot =
   where 0 <= t_shifted_i < beta_i
   corresponds: \sum_{i=1}^n( t_shifted_i * \pi_{j=1}^{i-1}(beta_j) ) *)
 let index_from_sizes_and_shifts ~loc sizes_and_shifts =
+  let product terms = List.fold_left
+    (fun product t ->
+      Logic_const.term ~loc (TBinOp(Mult, product, t)) Linteger)
+    (Cil.lone ~loc ())
+    terms
+  in
   let sum, _ = List.fold_left
     (fun (index, sizes) (t_size, t_shifted) ->
-      let pi_beta_j sizes = List.fold_left
-        (fun pi_beta_j t_size ->
-          Logic_const.term ~loc (TBinOp(Mult, pi_beta_j, t_size)) Linteger)
-        (Cil.lone ~loc ())
-        sizes
-      in
-      let pi_beta_j = pi_beta_j sizes in
+      let pi_beta_j = product sizes in
       let bi_mult_pi_beta_j =
         Logic_const.term ~loc (TBinOp(Mult, t_shifted, pi_beta_j)) Linteger
       in
@@ -377,8 +373,8 @@ let to_exp ~loc kf env pot label =
         malloc_stmt
       | Typing.C_type _ | Typing.Gmp ->
         Error.not_yet
-          ("\\at on purely logic variables that needs to allocate "
-            ^ "too much memory (bigger than int_max bytes)")
+          "\\at on purely logic variables that needs to allocate \
+            too much memory (bigger than int_max bytes)"
       | Typing.Other ->
         Options.fatal
           "quantification over non-integer type is not part of E-ACSL"

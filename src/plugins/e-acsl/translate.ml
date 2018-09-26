@@ -550,16 +550,13 @@ and context_insensitive_term_to_exp kf env t =
     let e, env = term_to_exp kf env t in
     e, env, false, ""
   | Tat(t', label) ->
-    let potential_lscope = Env.Logic_scope.get env in
-    let effective_lscope = Lscope.effective_lscope_from_pred_or_term
-      (Misc.PoT_term t') potential_lscope
-    in
-    if Lscope.is_empty effective_lscope then begin
+    let lscope = Env.Logic_scope.get env in
+    let pot = Misc.PoT_term t' in
+    if not (Lscope.is_used lscope pot) then begin
       let e, env = term_to_exp kf (Env.push env) t' in
       let e, env, is_mpz_string = at_to_exp_no_lscope env (Some t) label e in
       e, env, is_mpz_string, ""
     end else begin
-      let pot = Misc.PoT_term t' in
       let e, env = At_with_lscope.to_exp ~loc kf env pot label in
       e, env, false, ""
     end
@@ -1006,21 +1003,16 @@ and named_predicate_content_to_exp ?name kf env p =
   | Pat(p, BuiltinLabel Here) ->
     named_predicate_to_exp kf env p
   | Pat(p', label) ->
-    let potential_lscope = Env.Logic_scope.get env in
-    let effective_lscope = Lscope.effective_lscope_from_pred_or_term
-      (Misc.PoT_pred p') potential_lscope
-    in
-    if Lscope.is_empty effective_lscope then begin
+    let lscope = Env.Logic_scope.get env in
+    let pot = Misc.PoT_pred p' in
+    if not (Lscope.is_used lscope pot) then begin
       (* convert [t'] to [e] in a separated local env *)
       let e, env = named_predicate_to_exp kf (Env.push env) p' in
       let e, env, is_string = at_to_exp_no_lscope env None label e in
       assert (not is_string);
       e, env
-    end else begin
-      let pot = Misc.PoT_pred p' in
-      let e, env = At_with_lscope.to_exp ~loc kf env pot label in
-      e, env
-    end
+    end else
+      At_with_lscope.to_exp ~loc kf env pot label
   | Pvalid_read(BuiltinLabel Here as llabel, t) as pc
   | (Pvalid(BuiltinLabel Here as llabel, t) as pc) ->
     let call_valid t =

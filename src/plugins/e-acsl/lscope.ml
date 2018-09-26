@@ -39,37 +39,26 @@ let add lscope_var t = lscope_var :: t
 
 let get_all t = List.rev t
 
-let find lv t =
+let exists lv t =
   let is_lv = function
   | Lvs_let(lv', _) | Lvs_quantif(_, lv', _) | Lvs_formal(lv', _)
   | Lvs_global(lv', _) ->
     Cil_datatype.Logic_var.equal lv lv'
   in
-  List.find is_lv t
+  List.exists is_lv t
 
-let effective_lscope_from_pred_or_term pot potential_lscope =
-  let effective_lscope = ref empty in
+exception Lscope_used
+let is_used lscope pot =
   let o = object inherit Visitor.frama_c_inplace
-    method !vlogic_var_use lv =
-      begin match lv.lv_origin with
-      | Some _ ->
-        (* [lv] is not purely logic. Thus it is not to be put inside
-          [effective_lscope] which only tracks purely logic variables. *)
-        ()
-      | None ->
-        try
-          let lscope_var = find lv potential_lscope in
-          effective_lscope := add lscope_var !effective_lscope
-        with Not_found ->
-          ()
-      end;
-      Cil.DoChildren
+    method !vlogic_var_use lv = match lv.lv_origin with
+    | Some _ -> Cil.DoChildren
+    | None -> if exists lv lscope then raise Lscope_used else Cil.DoChildren
   end
   in
-  match pot with
-  | Misc.PoT_pred p ->
-    ignore (Visitor.visitFramacPredicate o p);
-    !effective_lscope
-  | Misc.PoT_term t ->
-    ignore (Visitor.visitFramacTerm o t);
-    !effective_lscope
+  try
+    (match pot with
+    | Misc.PoT_pred p -> ignore (Visitor.visitFramacPredicate o p)
+    | Misc.PoT_term t -> ignore (Visitor.visitFramacTerm o t));
+    false
+  with Lscope_used ->
+    true

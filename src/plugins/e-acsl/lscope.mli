@@ -48,8 +48,6 @@ val get_all: t -> lscope_var list
   The first element is the first [lscope_var] that was added to [t], the
   second element is the second [lscope_var] that was added to [t], an so on. *)
 
-val effective_lscope_from_pred_or_term: Misc.pred_or_term -> t -> t
-(* We define the EFFECTIVE logic scope of a predicate or term [pot],
-  for a given POTENTIAL logical [potential_lscope] scope, to be the set [S] of
-  logic variables from [potential_lscope] that appear in [pot].
-  [effective_lscope_from_pred_or_term pot potential_lscope] computes [S]. *)
+val is_used: t -> Misc.pred_or_term -> bool
+(* [is_used lscope pot] returns [true] iff [pot] uses a variable from
+  [lscope]. *)

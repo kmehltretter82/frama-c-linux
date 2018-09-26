@@ -851,7 +851,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       match new_blk.blocals, free_stmts with
       | [], [] ->
         new_blk
-      | _ ->
+      | [], _ :: _ | _ :: _, [] | _ :: _, _ :: _ ->
         let add_locals stmts =
           List.fold_left
             (fun acc vi ->
