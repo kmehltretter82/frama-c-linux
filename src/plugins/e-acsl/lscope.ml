@@ -24,7 +24,7 @@ open Cil_types
 
 type lscope_var =
   | Lvs_let of logic_var * term
-  | Lvs_quantif of term * logic_var * term
+  | Lvs_quantif of term * relation * logic_var * relation * term
   | Lvs_formal of logic_var * logic_info
   | Lvs_global of logic_var * term
 
@@ -41,7 +41,7 @@ let get_all t = List.rev t
 
 let exists lv t =
   let is_lv = function
-  | Lvs_let(lv', _) | Lvs_quantif(_, lv', _) | Lvs_formal(lv', _)
+  | Lvs_let(lv', _) | Lvs_quantif(_, _, lv', _, _) | Lvs_formal(lv', _)
   | Lvs_global(lv', _) ->
     Cil_datatype.Logic_var.equal lv lv'
   in

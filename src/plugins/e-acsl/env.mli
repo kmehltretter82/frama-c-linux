@@ -66,9 +66,13 @@ val new_var_and_mpz_init:
 
 module Logic_binding: sig
   val add: ?ty:typ -> t -> logic_var -> varinfo * exp * t
+  (* Add a new C binding to the list of bindings for the logic variable. *)
+
   val get: t -> logic_var -> varinfo
-  val set: t -> logic_var -> varinfo -> t
+  (* Return the latest C binding. *)
+
   val remove: t -> logic_var -> t
+  (* Remove the latest C binding. *)
 end
 
 val add_assert: t -> stmt -> predicate -> unit

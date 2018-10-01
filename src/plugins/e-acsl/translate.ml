@@ -1125,7 +1125,8 @@ let named_predicate_to_exp ?name kf env p =
   named_predicate_to_exp ?name kf env p (* forget optional argument ?rte *)
 
 let () =
-  Quantif.term_to_exp_ref := term_to_exp;
+  Loops.term_to_exp_ref := term_to_exp;
+  Loops.translate_named_predicate_ref := translate_named_predicate;
   Quantif.predicate_to_exp_ref := named_predicate_to_exp;
   At_with_lscope.term_to_exp_ref := term_to_exp;
   At_with_lscope.predicate_to_exp_ref := named_predicate_to_exp

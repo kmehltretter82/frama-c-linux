@@ -28,7 +28,8 @@ open Cil_types
 
 type lscope_var =
   | Lvs_let of logic_var * term (* the expression to which the lv is binded *)
-  | Lvs_quantif of term (* min *) * logic_var * term (* max *)
+  | Lvs_quantif of term * relation * logic_var * relation * term
+    (* Take good note  *)
   | Lvs_formal of logic_var * logic_info (* the logic definition *)
   | Lvs_global of logic_var * term (* same as Lvs_let *)
 

@@ -65,6 +65,17 @@ int main(void)
   __e_acsl_full_init((void *)(& t));
   __gen_e_acsl_f(t);
   g();
+  /*@
+  assert
+  ∃ ℤ u;
+    10 ≤ u < 20 ∧
+    (∃ ℤ v;
+       -10 < v ≤ -5 + (\let u = -2; u) ∧
+       (∃ ℤ w;
+          100 < w ≤ 200 ∧
+          \at((((n - u) + (\let u = 42; u)) + v) + w > 0,K)));
+   */
+  ;
   /*@ assert ∃ ℤ j; 2 ≤ j < 10000000000000000 ∧ \at(n + j ≡ 11,L);
    */
   ;

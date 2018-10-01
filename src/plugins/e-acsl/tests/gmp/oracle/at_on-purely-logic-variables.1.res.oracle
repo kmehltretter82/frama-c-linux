@@ -32,12 +32,17 @@
   `\at on purely logic variables and with quantifier that uses too complex bound (E-ACSL cannot infer a finite upper bound to it)'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] tests/gmp/at_on-purely-logic-variables.c:55: Warning: 
+[e-acsl] tests/gmp/at_on-purely-logic-variables.c:57: Warning: 
   E-ACSL construct
   `\at on purely logic variables that needs to allocate too much memory (bigger than int_max bytes)'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] tests/gmp/at_on-purely-logic-variables.c:56: Warning: 
+[e-acsl] tests/gmp/at_on-purely-logic-variables.c:64: Warning: 
+  E-ACSL construct
+  `\at on purely logic variables that needs to allocate too much memory (bigger than int_max bytes)'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] tests/gmp/at_on-purely-logic-variables.c:65: Warning: 
   E-ACSL construct `\at with logic variable linked to C variable'
   is not yet supported.
   Ignoring annotation.
@@ -85,7 +90,9 @@
   assertion got status unknown.
 [eva:alarm] tests/gmp/at_on-purely-logic-variables.c:54: Warning: 
   assertion got status unknown.
-[eva:alarm] tests/gmp/at_on-purely-logic-variables.c:56: Warning: 
+[eva:alarm] tests/gmp/at_on-purely-logic-variables.c:63: Warning: 
+  assertion got status unknown.
+[eva:alarm] tests/gmp/at_on-purely-logic-variables.c:65: Warning: 
   assertion got status unknown.
 [eva] using specification for function __e_acsl_memory_clean
 [eva] done for function main

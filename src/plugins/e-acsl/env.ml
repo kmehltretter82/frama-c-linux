@@ -61,7 +61,8 @@ type t =
       global_mpz_tbl: mpz_tbl;
       env_stack: local_env list;
       init_env: local_env;
-      var_mapping: Varinfo.t Logic_var.Map.t; (* bind logic var to C var *)
+      var_mapping: (Varinfo.t list) Logic_var.Map.t;
+      (* records of C bindings for logic vars *)
       loop_invariants: predicate list list;
       (* list of loop invariants for each currently visited loops *) 
       cpt: int; (* counter used when generating variables *) }
@@ -286,32 +287,50 @@ module Logic_binding = struct
 	| Ctype ty -> ty
 	| Linteger -> Gmpz.t ()
 	| Ltype _ as ty when Logic_const.is_boolean_type ty -> Cil.charType
-	| Ltype _ | Lvar _ | Lreal | Larrow _ as lty -> 
-	  let msg = 
+	| Ltype _ | Lvar _ | Lreal | Larrow _ as lty ->
+	  let msg =
 	    Format.asprintf
 	      "logic variable of type %a" Logic_type.pretty lty
 	  in
 	  Error.not_yet msg
     in
-    let v, e, env = 
-      new_var
-	~loc:Location.unknown env ~name:logic_v.lv_name None ty (fun _ _ -> []) 
+    let v, e, env = new_var
+      ~loc:Location.unknown
+      env
+      ~name:logic_v.lv_name
+      None
+      ty
+      (fun _ _ -> [])
+    in
+    let bindings =
+      try v :: (Logic_var.Map.find logic_v env.var_mapping)
+      with Not_found -> [ v ]
     in
     v,
-    e, 
-    { env with var_mapping = Logic_var.Map.add logic_v v env.var_mapping }
+    e,
+    { env with var_mapping =
+      Logic_var.Map.add logic_v bindings env.var_mapping }
 
-  let get env logic_v = 
-    try Logic_var.Map.find logic_v env.var_mapping
+  let get env logic_v =
+    try
+      match Logic_var.Map.find logic_v env.var_mapping with
+      | [] -> assert false
+      | vi :: _ -> vi
     with Not_found -> assert false
 
-  let set env lv vi =
-    { env with var_mapping = Logic_var.Map.add lv vi env.var_mapping }
-
-  let remove env v = 
+  let remove env v =
     let map = env.var_mapping in
-    assert (Logic_var.Map.mem v map);
-    { env with var_mapping = Logic_var.Map.remove v map }
+    let bindings =
+      try Logic_var.Map.find v env.var_mapping
+      with Not_found -> assert false
+    in
+    match bindings with
+    | [] ->
+      assert false
+    | [ _ ] ->
+      { env with var_mapping = Logic_var.Map.remove v map }
+    | _ :: bindings ->
+      { env with var_mapping = Logic_var.Map.add v bindings env.var_mapping }
 
 end
 
