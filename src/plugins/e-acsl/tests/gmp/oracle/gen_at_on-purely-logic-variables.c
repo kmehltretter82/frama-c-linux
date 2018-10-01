@@ -28,10 +28,6 @@ void g(void)
       __gen_e_acsl_w_2 = 3;
       while (1) {
         if (__gen_e_acsl_w_2 < 6) ; else break;
-        /*@ assert
-            Value: mem_access:
-              \valid(__gen_e_acsl_at + (int)(__gen_e_acsl_w_2 - 3));
-        */
         *(__gen_e_acsl_at + (__gen_e_acsl_w_2 - 3)) = m + (long)__gen_e_acsl_w_2 == 12L;
         __gen_e_acsl_w_2 ++;
       }
@@ -60,10 +56,6 @@ void g(void)
         /*@ assert
             Value: initialization:
               \initialized(__gen_e_acsl_at + (__gen_e_acsl_w - 3));
-        */
-        /*@ assert
-            Value: mem_access:
-              \valid_read(__gen_e_acsl_at + (int)(__gen_e_acsl_w - 3));
         */
         if (! *(__gen_e_acsl_at + (__gen_e_acsl_w - 3))) ;
         else {
@@ -109,7 +101,6 @@ int main(void)
     {
       int __gen_e_acsl_i_4;
       __gen_e_acsl_i_4 = 3;
-      /*@ assert Value: mem_access: \valid(__gen_e_acsl_at_4 + 0); */
       *(__gen_e_acsl_at_4 + 0) = n + (long)__gen_e_acsl_i_4;
     }
     {
@@ -117,10 +108,6 @@ int main(void)
       __gen_e_acsl_j_2 = 2;
       while (1) {
         if (__gen_e_acsl_j_2 < 5) ; else break;
-        /*@ assert
-            Value: mem_access:
-              \valid(__gen_e_acsl_at_2 + (int)(__gen_e_acsl_j_2 - 2));
-        */
         *(__gen_e_acsl_at_2 + (__gen_e_acsl_j_2 - 2)) = n + (long)__gen_e_acsl_j_2 == 11L;
         __gen_e_acsl_j_2 ++;
       }
@@ -128,7 +115,6 @@ int main(void)
     {
       int __gen_e_acsl_i_2;
       __gen_e_acsl_i_2 = 3;
-      /*@ assert Value: mem_access: \valid(__gen_e_acsl_at + 0); */
       *(__gen_e_acsl_at + 0) = n + (long)__gen_e_acsl_i_2 == 10L;
     }
     ;
@@ -195,12 +181,6 @@ int main(void)
             else __gen_e_acsl_if_2 = 3;
             if (__gen_e_acsl_v_4 <= __gen_e_acsl_if_2) ; else break;
           }
-          /*@ assert
-              Value: mem_access:
-                \valid(__gen_e_acsl_at_6 +
-                       (int)((int)((int)(__gen_e_acsl_u_4 - 9) * 32) +
-                             (int)((int)(__gen_e_acsl_v_4 - -5) - 1)));
-          */
           *(__gen_e_acsl_at_6 + ((__gen_e_acsl_u_4 - 9) * 32 + ((__gen_e_acsl_v_4 - -5) - 1))) = 
           (n + (long)__gen_e_acsl_u_4) + n > 0L;
           __gen_e_acsl_v_4 ++;
@@ -223,12 +203,6 @@ int main(void)
             long __gen_e_acsl_if;
             if (__gen_e_acsl_u_2 > 0) __gen_e_acsl_if = n + (long)__gen_e_acsl_k_2;
             else __gen_e_acsl_if = __gen_e_acsl_u_2 + __gen_e_acsl_v_2;
-            /*@ assert
-                Value: mem_access:
-                  \valid(__gen_e_acsl_at_3 +
-                         (int)((int)((int)(__gen_e_acsl_u_2 - 9) * 11) +
-                               (int)((int)(__gen_e_acsl_v_2 - -5) - 1)));
-            */
             *(__gen_e_acsl_at_3 + ((__gen_e_acsl_u_2 - 9) * 11 + ((__gen_e_acsl_v_2 - -5) - 1))) = 
             __gen_e_acsl_if > 0L;
           }
@@ -279,10 +253,6 @@ int main(void)
         /*@ assert
             Value: initialization:
               \initialized(__gen_e_acsl_at_2 + (__gen_e_acsl_j - 2));
-        */
-        /*@ assert
-            Value: mem_access:
-              \valid_read(__gen_e_acsl_at_2 + (int)(__gen_e_acsl_j - 2));
         */
         if (! *(__gen_e_acsl_at_2 + (__gen_e_acsl_j - 2))) ;
         else {
@@ -339,12 +309,6 @@ int main(void)
                                ((__gen_e_acsl_u - 9) * 11 +
                                 ((__gen_e_acsl_v - -5) - 1)));
             */
-            /*@ assert
-                Value: mem_access:
-                  \valid_read(__gen_e_acsl_at_3 +
-                              (int)((int)((int)(__gen_e_acsl_u - 9) * 11) +
-                                    (int)((int)(__gen_e_acsl_v - -5) - 1)));
-            */
             if (*(__gen_e_acsl_at_3 + ((__gen_e_acsl_u - 9) * 11 + ((
                                                                     __gen_e_acsl_v - -5) - 1)))) 
               ;
@@ -393,11 +357,6 @@ int main(void)
       __gen_e_acsl_k_4 = -9 + 1;
       while (1) {
         if (__gen_e_acsl_k_4 < 0) ; else break;
-        /*@ assert
-            Value: mem_access:
-              \valid(__gen_e_acsl_at_5 +
-                     (int)((int)(__gen_e_acsl_k_4 - -9) - 1));
-        */
         *(__gen_e_acsl_at_5 + ((__gen_e_acsl_k_4 - -9) - 1)) = m + (long)__gen_e_acsl_k_4;
         __gen_e_acsl_k_4 ++;
       }
@@ -428,11 +387,6 @@ int main(void)
         /*@ assert
             Value: initialization:
               \initialized(__gen_e_acsl_at_5 + ((__gen_e_acsl_k_3 - -9) - 1));
-        */
-        /*@ assert
-            Value: mem_access:
-              \valid_read(__gen_e_acsl_at_5 +
-                          (int)((int)(__gen_e_acsl_k_3 - -9) - 1));
         */
         if (! (*(__gen_e_acsl_at_5 + ((__gen_e_acsl_k_3 - -9) - 1)) == 0L)) 
           ;
@@ -492,12 +446,6 @@ int main(void)
                   \initialized(__gen_e_acsl_at_6 +
                                ((__gen_e_acsl_u_3 - 9) * 32 +
                                 ((__gen_e_acsl_v_3 - -5) - 1)));
-            */
-            /*@ assert
-                Value: mem_access:
-                  \valid_read(__gen_e_acsl_at_6 +
-                              (int)((int)((int)(__gen_e_acsl_u_3 - 9) * 32) +
-                                    (int)((int)(__gen_e_acsl_v_3 - -5) - 1)));
             */
             if (*(__gen_e_acsl_at_6 + ((__gen_e_acsl_u_3 - 9) * 32 + (
                                        (__gen_e_acsl_v_3 - -5) - 1)))) 
@@ -589,21 +537,6 @@ int main(void)
                                     (((__gen_e_acsl_v_5 - -10) - 1) * 100 +
                                      ((__gen_e_acsl_w - 100) - 1))));
                 */
-                /*@ assert
-                    Value: mem_access:
-                      \valid_read(__gen_e_acsl_at_7 +
-                                  (int)((int)((int)(__gen_e_acsl_u_5 - 10) *
-                                              300)
-                                        +
-                                        (int)((int)((int)((int)(__gen_e_acsl_v_5
-                                                                - -10)
-                                                          - 1)
-                                                    * 100)
-                                              +
-                                              (int)((int)(__gen_e_acsl_w -
-                                                          100)
-                                                    - 1))));
-                */
                 if (! *(__gen_e_acsl_at_7 + ((__gen_e_acsl_u_5 - 10) * 300 + (
                                              ((__gen_e_acsl_v_5 - -10) - 1) * 100 + (
                                              (__gen_e_acsl_w - 100) - 1))))) 
@@ -674,13 +607,11 @@ void __gen_e_acsl_f(int *t)
   {
     int __gen_e_acsl_m_3;
     __gen_e_acsl_m_3 = 4;
-    /*@ assert Value: mem_access: \valid(__gen_e_acsl_at_4 + 0); */
     *(__gen_e_acsl_at_4 + 0) = *(t + (__gen_e_acsl_m_3 - 4));
   }
   {
     int __gen_e_acsl_m_2;
     __gen_e_acsl_m_2 = 4;
-    /*@ assert Value: mem_access: \valid(__gen_e_acsl_at_3 + 0); */
     *(__gen_e_acsl_at_3 + 0) = *(t + __gen_e_acsl_m_2) == -4;
   }
   {
@@ -688,10 +619,6 @@ void __gen_e_acsl_f(int *t)
     __gen_e_acsl_n_3 = 1 + 1;
     while (1) {
       if (__gen_e_acsl_n_3 <= 3) ; else break;
-      /*@ assert
-          Value: mem_access:
-            \valid(__gen_e_acsl_at_2 + (int)((int)(__gen_e_acsl_n_3 - 1) - 1));
-      */
       *(__gen_e_acsl_at_2 + ((__gen_e_acsl_n_3 - 1) - 1)) = *(t + (__gen_e_acsl_n_3 - 1)) > 5;
       __gen_e_acsl_n_3 ++;
     }
@@ -701,10 +628,6 @@ void __gen_e_acsl_f(int *t)
     __gen_e_acsl_n_2 = 1 + 1;
     while (1) {
       if (__gen_e_acsl_n_2 <= 3) ; else break;
-      /*@ assert
-          Value: mem_access:
-            \valid(__gen_e_acsl_at + (int)((int)(__gen_e_acsl_n_2 - 1) - 1));
-      */
       *(__gen_e_acsl_at + ((__gen_e_acsl_n_2 - 1) - 1)) = *(t + __gen_e_acsl_n_2) == 12;
       __gen_e_acsl_n_2 ++;
     }
@@ -737,11 +660,6 @@ void __gen_e_acsl_f(int *t)
             Value: initialization:
               \initialized(__gen_e_acsl_at + ((__gen_e_acsl_n - 1) - 1));
         */
-        /*@ assert
-            Value: mem_access:
-              \valid_read(__gen_e_acsl_at +
-                          (int)((int)(__gen_e_acsl_n - 1) - 1));
-        */
         if (*(__gen_e_acsl_at + ((__gen_e_acsl_n - 1) - 1))) {
           int __gen_e_acsl_valid_read_2;
           __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(__gen_e_acsl_at_2 + (int)(
@@ -757,11 +675,6 @@ void __gen_e_acsl_f(int *t)
           /*@ assert
               Value: initialization:
                 \initialized(__gen_e_acsl_at_2 + ((__gen_e_acsl_n - 1) - 1));
-          */
-          /*@ assert
-              Value: mem_access:
-                \valid_read(__gen_e_acsl_at_2 +
-                            (int)((int)(__gen_e_acsl_n - 1) - 1));
           */
           __gen_e_acsl_and = *(__gen_e_acsl_at_2 + ((__gen_e_acsl_n - 1) - 1));
         }
