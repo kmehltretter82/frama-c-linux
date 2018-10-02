@@ -61,7 +61,7 @@ type t =
       global_mpz_tbl: mpz_tbl;
       env_stack: local_env list;
       init_env: local_env;
-      var_mapping: (Varinfo.t list) Logic_var.Map.t;
+      var_mapping: Varinfo.t Stack.t Logic_var.Map.t;
       (* records of C bindings for logic vars *)
       loop_invariants: predicate list list;
       (* list of loop invariants for each currently visited loops *) 
@@ -302,35 +302,33 @@ module Logic_binding = struct
       ty
       (fun _ _ -> [])
     in
-    let bindings =
-      try v :: (Logic_var.Map.find logic_v env.var_mapping)
-      with Not_found -> [ v ]
+    let env =
+      try
+        let varinfos = Logic_var.Map.find logic_v env.var_mapping in
+        Stack.push v varinfos;
+        env
+      with Not_found ->
+        let varinfos = Stack.create () in
+        Stack.push v varinfos;
+        let var_mapping = Logic_var.Map.add logic_v varinfos env.var_mapping in
+        { env with var_mapping = var_mapping }
     in
-    v,
-    e,
-    { env with var_mapping =
-      Logic_var.Map.add logic_v bindings env.var_mapping }
+    v, e, env
 
   let get env logic_v =
     try
-      match Logic_var.Map.find logic_v env.var_mapping with
-      | [] -> assert false
-      | vi :: _ -> vi
-    with Not_found -> assert false
-
-  let remove env v =
-    let map = env.var_mapping in
-    let bindings =
-      try Logic_var.Map.find v env.var_mapping
-      with Not_found -> assert false
-    in
-    match bindings with
-    | [] ->
+      let varinfos = Logic_var.Map.find logic_v env.var_mapping in
+      Stack.top varinfos
+    with Not_found | Stack.Empty ->
       assert false
-    | [ _ ] ->
-      { env with var_mapping = Logic_var.Map.remove v map }
-    | _ :: bindings ->
-      { env with var_mapping = Logic_var.Map.add v bindings env.var_mapping }
+
+  let remove env logic_v =
+    try
+      let varinfos = Logic_var.Map.find logic_v env.var_mapping in
+      ignore (Stack.pop varinfos);
+      env
+    with Not_found | Stack.Empty ->
+      assert false
 
 end
 

@@ -49,7 +49,7 @@ val mk_nested_loops:
   loc:location -> (Env.t -> stmt list * Env.t) -> kernel_function -> Env.t ->
   Lscope.lscope_var list -> stmt list * Env.t
 (** [mk_nested_loops ~loc mk_innermost_block kf env lvars] creates nested
-    loops (with the proper statements for the initializing the loop counters)
+    loops (with the proper statements for initializing the loop counters)
     from the list of logic variables [lvars]. Quantified variables create
     loops while let-bindings simply create new variables.
     The [mk_innermost_block] closure creates the statements of the innermost

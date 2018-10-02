@@ -173,7 +173,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       Env.Middle
     in
     (* generate the guard [x bop t2] *)
-    let stmts_block b = [ mkStmt ~valid_sid:true (Block b) ] in
+    let block_to_stmt b = mkStmt ~valid_sid:true (Block b) in
     let tlv = Logic_const.tvar ~loc logic_x in
     let guard =
       (* must copy [t2] to force being typed again *)
@@ -195,7 +195,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       ~global_clear:false
       Env.Middle
     in
-    let guard = stmts_block guard_blk in
+    let guard = block_to_stmt guard_blk in
     (* increment the loop counter [x++];
        previous typing ensures that [x++] fits type [ty] *)
     (* TODO: should check that it does not overflow in the case of the type
@@ -211,18 +211,18 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     (* remove logic binding now that the block is constructed *)
     let env = Env.Logic_binding.remove env logic_x in
     (* generate the whole loop *)
-    let start = stmts_block init_blk in
-    let next = stmts_block next_blk in
+    let start = block_to_stmt init_blk in
+    let next = block_to_stmt next_blk in
     let stmt = mkStmt
       ~valid_sid:true
       (Loop(
         [],
-        mkBlock (guard @ body @ next),
+        mkBlock (guard :: body @ [ next ]),
         loc,
         None,
         Some break_stmt))
     in
-    start @ [ stmt ], env
+    [ start ;  stmt ], env
   | Lscope.Lvs_let(lv, t) :: lscope_vars' ->
     let ty = Typing.get_typ t in
     let vi_of_lv, exp_of_lv, env = Env.Logic_binding.add ~ty env lv in

@@ -119,15 +119,14 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
   let guards = compute_quantif_guards p bounded_vars hyps in
   (* transform [guards] into [lscope_var list],
      and update logic scope in the process *)
-  let env_ref = ref env in
-  let lvs_guards = List.map
-    (fun (t1, rel1, lv, rel2, t2) ->
+  let lvs_guards, env = List.fold_right
+    (fun (t1, rel1, lv, rel2, t2) (lvs_guards, env) ->
       let lvs = Lscope.Lvs_quantif(t1, rel1, lv, rel2, t2) in
-      env_ref := Env.Logic_scope.extend !env_ref lvs;
-      lvs)
+      let env = Env.Logic_scope.extend env lvs in
+      lvs :: lvs_guards, env)
     guards
+    ([], env)
   in
-  let env = !env_ref in
   let var_res, res, env =
     (* variable storing the result of the quantifier *)
     let name = if is_forall then "forall" else "exists" in
@@ -138,8 +137,8 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
       None
       intType
       (fun v _ ->
-	      let lv = var v in
-	      [ mkStmtOneInstr ~valid_sid:true (Set(lv, init_val, loc)) ])
+        let lv = var v in
+        [ mkStmtOneInstr ~valid_sid:true (Set(lv, init_val, loc)) ])
   in
   let end_loop_ref = ref dummyStmt in
   (* innermost block *)

@@ -42,9 +42,10 @@ let term_to_exp_ref
   provide the [remove_all] function. Thus we need to keep calling [remove]
   until all entries are removed. *)
 let rec remove_all tbl kf =
-  if Cil_datatype.Kf.Hashtbl.mem tbl kf then
-    (Cil_datatype.Kf.Hashtbl.remove tbl kf;
-    remove_all tbl kf)
+  if Cil_datatype.Kf.Hashtbl.mem tbl kf then begin
+    Cil_datatype.Kf.Hashtbl.remove tbl kf;
+    remove_all tbl kf
+  end
 
 module Malloc = struct
   let tbl = Cil_datatype.Kf.Hashtbl.create 7

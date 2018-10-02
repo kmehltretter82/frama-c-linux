@@ -51,8 +51,8 @@ exception Lscope_used
 let is_used lscope pot =
   let o = object inherit Visitor.frama_c_inplace
     method !vlogic_var_use lv = match lv.lv_origin with
-    | Some _ -> Cil.DoChildren
-    | None -> if exists lv lscope then raise Lscope_used else Cil.DoChildren
+    | Some _ -> Cil.SkipChildren
+    | None -> if exists lv lscope then raise Lscope_used else Cil.SkipChildren
   end
   in
   try

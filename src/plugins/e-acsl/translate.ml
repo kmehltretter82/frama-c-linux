@@ -552,14 +552,13 @@ and context_insensitive_term_to_exp kf env t =
   | Tat(t', label) ->
     let lscope = Env.Logic_scope.get env in
     let pot = Misc.PoT_term t' in
-    if not (Lscope.is_used lscope pot) then begin
+    if Lscope.is_used lscope pot then
+      let e, env = At_with_lscope.to_exp ~loc kf env pot label in
+      e, env, false, ""
+    else
       let e, env = term_to_exp kf (Env.push env) t' in
       let e, env, is_mpz_string = at_to_exp_no_lscope env (Some t) label e in
       e, env, is_mpz_string, ""
-    end else begin
-      let e, env = At_with_lscope.to_exp ~loc kf env pot label in
-      e, env, false, ""
-    end
   | Tbase_addr(BuiltinLabel Here, t) ->
     mmodel_call ~loc kf "base_addr" Cil.voidPtrType env t
   | Tbase_addr _ -> not_yet env "labeled \\base_addr"
@@ -1005,14 +1004,15 @@ and named_predicate_content_to_exp ?name kf env p =
   | Pat(p', label) ->
     let lscope = Env.Logic_scope.get env in
     let pot = Misc.PoT_pred p' in
-    if not (Lscope.is_used lscope pot) then begin
+    if Lscope.is_used lscope pot then
+      At_with_lscope.to_exp ~loc kf env pot label
+    else begin
       (* convert [t'] to [e] in a separated local env *)
       let e, env = named_predicate_to_exp kf (Env.push env) p' in
       let e, env, is_string = at_to_exp_no_lscope env None label e in
       assert (not is_string);
       e, env
-    end else
-      At_with_lscope.to_exp ~loc kf env pot label
+    end
   | Pvalid_read(BuiltinLabel Here as llabel, t) as pc
   | (Pvalid(BuiltinLabel Here as llabel, t) as pc) ->
     let call_valid t =
