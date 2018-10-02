@@ -725,6 +725,8 @@ and mmodel_call_valid ~loc kf name ctx env t =
     B: [\valid(&t[4][3..5][2])]
        NON-contiguous locations -> multiple calls (3) to [__e_acsl_valid] *)
 and mmodel_call_with_ranges ~loc kf name ctx env t mmodel_call_default =
+  if Misc.is_bitfield_address_or_set t.term_type then
+    not_yet env "taking the address of a bitfield";
   match t.term_node with
   | TBinOp((PlusPI | IndexPI), p, ({ term_node = Trange _ } as r)) ->
     if Misc.is_set_of_ptr_or_array p.term_type then

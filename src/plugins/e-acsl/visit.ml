@@ -744,7 +744,12 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       let must_model = Mmodel_analysis.must_model_lval ~stmt ~kf lv in
       if not (may_safely_ignore lv) && must_model then
         let before = Cil.mkStmt stmt.skind in
-        let new_stmt = Project.on prj (Misc.mk_initialize ~loc) lv in
+        let new_stmt =
+          (* Bitfields are not yet supported ==> no initializer.
+             A not_yet will be raised in [Translate]. *)
+          if Cil.isBitfield lv then Cil.mkEmptyStmt ()
+          else Project.on prj (Misc.mk_initialize ~loc) lv
+        in
         let env = Env.add_stmt ~post ~before env new_stmt in
         let env = match vi with
           | None -> env
