@@ -19,8 +19,10 @@
 #   configure	configure
 ###############################################################################
 
--  E-ACSL       [2018/18/09] Support for ranges in memory builtins
-	        (\valid, \initialized, etc).
+*  E-ACSL       [2018/10/02] Fix bug #2305 about taking the address of a
+                bitfield.
+-  E-ACSL       [2018/09/18] Support for ranges in memory builtins
+                (\valid, \initialized, etc).
 
 ###############################
 Plugin E-ACSL Chlorine-20180501

@@ -272,6 +272,24 @@ let is_range_free t =
   with Range_found_exception ->
     false
 
+let is_bitfield_pointers lty =
+  let is_bitfield_pointer = function
+    | Ctype typ ->
+      begin match Cil.unrollType typ with
+        | TPtr(typ, _) ->
+          let attrs = Cil.typeAttrs typ in
+          Cil.hasAttribute Cil.bitfield_attribute_name attrs
+        | _ ->
+          false
+      end
+    | Ltype _ | Lvar _ | Linteger | Lreal | Larrow _ ->
+      false
+  in
+  if Logic_const.is_set_type lty then
+    is_bitfield_pointer (Logic_const.type_of_element lty)
+  else
+    is_bitfield_pointer lty
+
 (*
 Local Variables:
 compile-command: "make"
