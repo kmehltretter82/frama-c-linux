@@ -1,8 +1,8 @@
 ##########################################################################
 #                                                                        #
-#  This file is part of Frama-C.                                         #
+#  This file is part of the Frama-C's E-ACSL plug-in.                    #
 #                                                                        #
-#  Copyright (C) 2007-2018                                               #
+#  Copyright (C) 2012-2018                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -349,11 +349,18 @@ e-acsl-distrib-check:
 # Header #
 ##########
 
-EACSL_CEA_LGPL_BARE= *.ml *.mli Makefile.in configure.ac share/e-acsl/*.[ch] \
-  share/e-acsl/*/*.[ch] scripts/*.sh tests/print.ml man/e-acsl-gcc.sh.1
-EACSL_CEA_LGPL=$(addprefix $(EACSL_PLUGIN_DIR)/, $(EACSL_CEA_LGPL_BARE))
+ifneq ("$(FRAMAC_INTERNAL)","yes")
 
 EACSL_SPARETIMELABS=$(EACSL_PLUGIN_DIR)/share/e-acsl/e_acsl_printf.h
+
+EACSL_SHARE_BARE= share/e-acsl/*.[ch] share/e-acsl/*/*.[ch]
+EACSL_SHARE=$(addprefix $(EACSL_PLUGIN_DIR)/, $(EACSL_SHARE_BARE))
+EACSL_CEA_SHARE=$(filter-out $(EACSL_SPARETIMELABS), $(wildcard $(EACSL_SHARE)))
+
+EACSL_CEA_LGPL_BARE= *.ml *.mli Makefile.in configure.ac \
+  scripts/*.sh tests/print.ml man/e-acsl-gcc.sh.1
+EACSL_CEA_LGPL=$(addprefix $(EACSL_PLUGIN_DIR)/, $(EACSL_CEA_LGPL_BARE)) \
+               $(EACSL_CEA_SHARE)
 
 # Files without header. contrib files keep their own header.
 EACSL_NOHEADER_BARE=INSTALL README VERSION license/* \
@@ -362,23 +369,24 @@ EACSL_NOHEADER_BARE=INSTALL README VERSION license/* \
 
 EACSL_NOHEADER=$(addprefix $(EACSL_PLUGIN_DIR)/, $(EACSL_NOHEADER_BARE))
 
-ifeq ("$(FRAMAC_INTERNAL)","yes")
-CEA_LGPL_HEADER=$(FRAMAC_ROOT_SRCDIR)/headers/open-source/CEA_LGPL
-# EACSL does not use hdrck mechanism
-HEADER_EXCEPTIONS+=\
-  $(wildcard $(EACSL_CEA_LGPL) $(EACSL_SPARETIMELABS) $(EACSL_NOHEADER))
-else
-CEA_LGPL_HEADER=$(EACSL_PLUGIN_DIR)/license/CEA_LGPL
-endif
-
+# valid values: open-source, close-source 
+EACSL_HEADERS?=open-source
 headers::
-	@echo "Applying Headers..."
+	@echo "Applying $(EACSL_HEADERS) Headers..."
 	headache -c $(EACSL_PLUGIN_DIR)/license/headache_config.txt \
-                 -h $(CEA_LGPL_HEADER) $(EACSL_CEA_LGPL)
+                 -h $(EACSL_PLUGIN_DIR)/headers/$(EACSL_HEADERS)/CEA_LGPL_OR_PROPRIETARY.E_ACSL \
+                 $(EACSL_CEA_LGPL)
 	headache -c $(EACSL_PLUGIN_DIR)/license/headache_config.txt \
-                 -h $(EACSL_PLUGIN_DIR)/license/SPARETIMELABS \
+                 -h $(EACSL_PLUGIN_DIR)/headers/$(EACSL_HEADERS)/MODIFIED_SPARETIMELABS \
                  $(EACSL_SPARETIMELABS)
+	headache -c $(EACSL_PLUGIN_DIR)/license/headache_config.txt \
+                 -h $(EACSL_PLUGIN_DIR)/headers/$(EACSL_HEADERS)/MODIFIED_DLMALLOC \
+                 $(EACSL_PLUGIN_DIR)/contrib/libdlmalloc/dlmalloc.c
+	headache -c $(EACSL_PLUGIN_DIR)/license/headache_config.txt \
+                 -h $(EACSL_PLUGIN_DIR)/headers/$(EACSL_HEADERS)/MODIFIED_LIB_GMP \
+                 $(EACSL_PLUGIN_DIR)/contrib/libgmp/mini-gmp.[ch]
 
+endif
 
 ################
 # Generic part #
