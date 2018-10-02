@@ -272,8 +272,8 @@ let is_range_free t =
   with Range_found_exception ->
     false
 
-let is_bitfield_address_or_set lty =
-  let is_bitfield_address = function
+let is_bitfield_pointers lty =
+  let is_bitfield_pointer = function
     | Ctype typ ->
       begin match Cil.unrollType typ with
         | TPtr(typ, _) ->
@@ -286,9 +286,9 @@ let is_bitfield_address_or_set lty =
       false
   in
   if Logic_const.is_set_type lty then
-    is_bitfield_address (Logic_const.type_of_element lty)
+    is_bitfield_pointer (Logic_const.type_of_element lty)
   else
-    is_bitfield_address lty
+    is_bitfield_pointer lty
 
 (*
 Local Variables:

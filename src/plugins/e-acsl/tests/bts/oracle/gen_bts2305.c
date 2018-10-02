@@ -26,7 +26,7 @@ int main(int argc, char **argv)
   __e_acsl_memory_init(& argc,& argv,(size_t)8);
   __e_acsl_globals_init();
   /*@ assert \valid_read(&t.j); */ ;
-  /*@ assert ¬\valid_read(&t.j + (1 .. 3)); */ ;
+  /*@ assert \valid_read(&t.j + (1 .. 3)); */ ;
   ;
   t.j = (_Bool)1;
   /*@ assert \initialized(&t.j); */ ;

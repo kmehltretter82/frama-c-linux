@@ -110,9 +110,9 @@ val is_set_of_ptr_or_array: logic_type -> bool
 val is_range_free: term -> bool
 (* Returns [true] iff the given term does not contain any range. *)
 
-val is_bitfield_address_or_set: logic_type -> bool
-(* Returns [true] iff the given logic type is a bitfield address or a
-   set of bitfield addresses. *)
+val is_bitfield_pointers: logic_type -> bool
+(* Returns [true] iff the given logic type is a bitfield pointer or a
+   set of bitfield pointer. *)
 
 (*
 Local Variables:

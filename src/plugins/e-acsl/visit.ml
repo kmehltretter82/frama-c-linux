@@ -747,7 +747,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         let new_stmt =
           (* Bitfields are not yet supported ==> no initializer.
              A not_yet will be raised in [Translate]. *)
-          if Cil.isBitfield lv then Cil.mkEmptyStmt ()
+          if Cil.isBitfield lv then Project.on prj Cil.mkEmptyStmt ()
           else Project.on prj (Misc.mk_initialize ~loc) lv
         in
         let env = Env.add_stmt ~post ~before env new_stmt in
