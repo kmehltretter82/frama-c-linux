@@ -362,10 +362,8 @@ EACSL_CEA_LGPL_BARE= *.ml *.mli Makefile.in configure.ac \
 EACSL_CEA_LGPL=$(addprefix $(EACSL_PLUGIN_DIR)/, $(EACSL_CEA_LGPL_BARE)) \
                $(EACSL_CEA_SHARE)
 
-# Files without header. contrib files keep their own header.
-EACSL_NOHEADER_BARE=INSTALL README VERSION license/* \
-  doc/Changelog doc/doxygen/doxygen.cfg.in .depend tests/test_config.in \
-  $(EACSL_CONTRIB_FILES)
+# Files without header that not listed into `headers/header_specs.txt` with a `.ignore` attribute
+EACSL_NOHEADER_BARE=
 
 EACSL_NOHEADER=$(addprefix $(EACSL_PLUGIN_DIR)/, $(EACSL_NOHEADER_BARE))
 
