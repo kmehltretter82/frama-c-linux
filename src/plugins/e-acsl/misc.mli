@@ -112,7 +112,7 @@ val is_range_free: term -> bool
 
 val is_bitfield_pointers: logic_type -> bool
 (* Returns [true] iff the given logic type is a bitfield pointer or a
-   set of bitfield pointer. *)
+   set of bitfield pointers. *)
 
 (*
 Local Variables:
