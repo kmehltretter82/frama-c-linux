@@ -524,7 +524,7 @@ postfix_expression:                     /*(* 6.5.2 *)*/
 | primary_expression { $1 }
 | postfix_expression bracket_comma_expression
       {make_expr (INDEX ($1, smooth_expression $2))}
-| postfix_expression LPAREN arguments RPAREN LGHOST LPAREN arguments RPAREN RGHOST {make_expr (CALL ($1, $3, $7))}
+| postfix_expression LPAREN arguments RPAREN ghost_arguments_opt {make_expr (CALL ($1, $3, $5))}
 | BUILTIN_VA_ARG LPAREN expression COMMA type_name RPAREN
       { let b, d = $5 in
         let loc = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 5, Parsing.rhs_end_pos 5) in
@@ -795,6 +795,13 @@ gcc_init_designators:  /*(* GCC supports these strange things *)*/
    id_or_typename COLON                 { INFIELD_INIT($1, NEXT_INIT) }
 ;
 
+ghost_arguments_opt:
+                /* empty */         { [] }
+|               ghost_arguments     { $1 }
+
+ghost_arguments:
+                LGHOST LPAREN arguments RPAREN RGHOST { $3 }
+
 arguments:
                 /* empty */         { [] }
 |               comma_expression    { $1 }
@@ -1031,7 +1038,7 @@ ghost_parameter_opt:
 ;
 
 ghost_parameter:
-  LGHOST parameter_list_startscope rest_par_list RPAREN RGHOST {$3}
+  LGHOST parameter_list_startscope rest_par_list RPAREN RGHOST { let (l, _) = $3 in l }
 ;
 
 declaration:                                /* ISO 6.7.*/
@@ -1236,9 +1243,9 @@ direct_decl: /* (* ISO 6.7.5 *) */
 |   direct_decl parameter_list_startscope rest_par_list RPAREN ghost_parameter_opt
                                    { let (n, decl) = $1 in
                                      let (params, isva) = $3 in
-                                     let (ghost,_) = $5 in
+                                     let ghost = $5 in
                                      !Lexerhack.pop_context ();
-                                     (n, PROTO(decl, params, [], isva))
+                                     (n, PROTO(decl, params, ghost, isva))
                                    }
 ;
 parameter_list_startscope:
@@ -1397,10 +1404,10 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 /* (* New-style function that does not have a return type *) */
 | IDENT parameter_list_startscope rest_par_list RPAREN ghost_parameter_opt
     { let (params, isva) = $3 in
-      (* let (ghost,_) = $5 in *)
+      let ghost = $5 in
       let loc = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 1, Parsing.rhs_end_pos 1) in
       let fdec =
-        ($1, PROTO(JUSTBASE, params,[], isva), [], loc) in
+        ($1, PROTO(JUSTBASE, params, ghost, isva), [], loc) in
       announceFunctionName fdec;
       (* Default is int type *)
       let defSpec = [SpecType Tint] in (loc, defSpec, fdec)
