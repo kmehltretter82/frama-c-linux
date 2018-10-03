@@ -523,14 +523,14 @@ The \verb|\at| construct of the following example is supported.
 
 
 \begin{notimplementedenv}
-However, quantified variables and let-binded variables that use C variables in
-their definition are not yet supported. Also, uses of formal variables of
-logic functions and global logic variables are not yet supported.
+However, quantified variables that use C variables in their bounds and
+let-binded variables that use C variables in their definition
+are not yet supported.
 
 \begin{example}
 The \verb|\at| construct of the following example is \emph{not yet} supported
-since the let-binded variable \verb|w| uses C variables, namely \verb|m| and
-\verb|n|, in its definition.
+since the quantified variable \verb|i| uses the C variable \verb|n| in the
+definition of its upper bound.
 \cinput{at_on-purely-logic-variables_not-yet.c}
 
 \end{example}
