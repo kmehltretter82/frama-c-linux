@@ -512,6 +512,30 @@ only the first one is accepted and valid in \eacsl since evaluating the term
 
 \end{example}
 
+For the time being, \verb|\at| can be applied to any term or predicate that uses
+quantified variables, let-binded variables and C variables.
+
+\begin{example}
+The \verb|\at| construct of the following example is supported.
+\cinput{at_on-purely-logic-variables.c}
+
+\end{example}
+
+
+\begin{notimplementedenv}
+However, quantified variables and let-binded variables that use C variables in
+their definition are not yet supported. Also, uses of formal variables of
+logic functions and global logic variables are not yet supported.
+
+\begin{example}
+The \verb|\at| construct of the following example is \emph{not yet} supported
+since the let-binded variable \verb|w| uses C variables, namely \verb|m| and
+\verb|n|, in its definition.
+\cinput{at_on-purely-logic-variables_not-yet.c}
+
+\end{example}
+\end{notimplementedenv}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Statement contracts}

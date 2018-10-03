@@ -42,7 +42,7 @@ int main(void) {
   /*@ assert
       \exists integer u; 9 <= u < 21 &&
       \forall integer v; -5 < v <= (u < 15 ? u + 6 : 3) ==>
-        \at(n +  u + n > 0, K); */ ;
+        \at(n + u + v > 0, K); */ ;
 
   // Function calls:
   int t[5] = {9, 12, 12, 12, -4};

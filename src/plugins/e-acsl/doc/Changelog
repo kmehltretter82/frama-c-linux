@@ -19,6 +19,9 @@
 #   configure	configure
 ###############################################################################
 
+-* E-ACSL       [2018/10/04] Support for \at on purely logic variables.
+                Fix bug #2354 about undeclared variables when using \at.
+                Fix bug #1762 about out-of-scope variables when using \old.
 *  E-ACSL       [2018/10/02] Fix bug #2305 about taking the address of a
                 bitfield.
 -  E-ACSL       [2018/09/18] Support for ranges in memory builtins

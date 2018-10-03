@@ -182,7 +182,7 @@ int main(void)
             if (__gen_e_acsl_v_4 <= __gen_e_acsl_if_2) ; else break;
           }
           *(__gen_e_acsl_at_6 + ((__gen_e_acsl_u_4 - 9) * 32 + ((__gen_e_acsl_v_4 - -5) - 1))) = 
-          (n + (long)__gen_e_acsl_u_4) + n > 0L;
+          (n + (long)__gen_e_acsl_u_4) + __gen_e_acsl_v_4 > 0L;
           __gen_e_acsl_v_4 ++;
         }
         __gen_e_acsl_u_4 ++;
@@ -405,7 +405,7 @@ int main(void)
   /*@ assert
       ∃ ℤ u;
         9 ≤ u < 21 ∧
-        (∀ ℤ v; -5 < v ≤ (u < 15? u + 6: 3) ⇒ \at((n + u) + n > 0,K));
+        (∀ ℤ v; -5 < v ≤ (u < 15? u + 6: 3) ⇒ \at((n + u) + v > 0,K));
   */
   {
     int __gen_e_acsl_exists_4;
@@ -468,7 +468,7 @@ int main(void)
     }
     e_acsl_end_loop7: ;
     __e_acsl_assert(__gen_e_acsl_exists_4,(char *)"Assertion",(char *)"main",
-                    (char *)"\\exists integer u;\n  9 <= u < 21 &&\n  (\\forall integer v; -5 < v <= (u < 15? u + 6: 3) ==> \\at((n + u) + n > 0,K))",
+                    (char *)"\\exists integer u;\n  9 <= u < 21 &&\n  (\\forall integer v; -5 < v <= (u < 15? u + 6: 3) ==> \\at((n + u) + v > 0,K))",
                     43);
   }
   int t[5] = {9, 12, 12, 12, -4};
