@@ -433,7 +433,7 @@ uninstall::
 	$(RM) $(LIBDIR)/libeacsl-*.a
 	$(PRINT_RM) E-ACSL scripts
 	$(RM) $(BINDIR)/e-acsl-gcc.sh
-	$(PRINT_RM) man pages
+	$(PRINT_RM) E-ACSL man pages
 	$(RM) $(MANDIR)/man1/e-acsl-gcc.sh.1
 
 ####################
