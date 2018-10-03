@@ -349,6 +349,12 @@ e-acsl-distrib-check:
 # Header #
 ##########
 
+# Files of `DISTRIB_FILES` without header that is not listed into `headers/header_specs.txt` (with a `.ignore` attribute).
+PLUGIN_HEADER_EXCEPTIONS=
+
+# Files that are not listed by `DISTRIB_FILES` (and by the way, without header management) decicated to distributed tests
+PLUGIN_DISTRIB_TESTS=
+
 ifneq ("$(FRAMAC_INTERNAL)","yes")
 
 EACSL_SPARETIMELABS=$(EACSL_PLUGIN_DIR)/share/e-acsl/e_acsl_printf.h
@@ -361,11 +367,6 @@ EACSL_CEA_LGPL_BARE= *.ml *.mli Makefile.in configure.ac \
   scripts/*.sh tests/print.ml man/e-acsl-gcc.sh.1
 EACSL_CEA_LGPL=$(addprefix $(EACSL_PLUGIN_DIR)/, $(EACSL_CEA_LGPL_BARE)) \
                $(EACSL_CEA_SHARE)
-
-# Files without header that not listed into `headers/header_specs.txt` with a `.ignore` attribute
-EACSL_NOHEADER_BARE=
-
-EACSL_NOHEADER=$(addprefix $(EACSL_PLUGIN_DIR)/, $(EACSL_NOHEADER_BARE))
 
 # valid values: open-source, close-source 
 EACSL_HEADERS?=open-source
