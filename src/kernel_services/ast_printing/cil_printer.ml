@@ -873,6 +873,10 @@ class cil_printer () = object (self)
        | _ -> fprintf fmt "(%a)"  self#exp e);
       (* Now the arguments *)
       Pretty_utils.pp_flowlist ~left:"(" ~sep:"," ~right:")" self#exp fmt args;
+      (* Now the ghost arguments *)
+      Format.fprintf fmt "%t ghost " (fun fmt -> self#pp_open_annotation fmt);
+      Pretty_utils.pp_flowlist ~left:"(" ~sep:"," ~right:")" self#exp fmt [] ;
+      Format.fprintf fmt "@ %t" (fun fmt -> self#pp_close_annotation fmt);
       (* Now the terminator *)
       fprintf fmt "%s" instr_terminator
     in
@@ -1891,6 +1895,10 @@ class cil_printer () = object (self)
              | Some args ->
                Pretty_utils.pp_list ~sep:",@ " pp_args fmt args;
                if isvararg then fprintf fmt "@ , ...")
+        ;
+        Format.fprintf fmt "%t ghost (" (fun fmt -> self#pp_open_annotation fmt);
+        Pretty_utils.pp_list ~sep:",@ " pp_args fmt [] ;
+        Format.fprintf fmt ")@ %t" (fun fmt -> self#pp_close_annotation fmt);
       in
       let pp_params fmt = match fundecl with
         | None ->

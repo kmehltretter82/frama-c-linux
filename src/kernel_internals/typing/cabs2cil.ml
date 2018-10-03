@@ -4783,7 +4783,7 @@ and doAttr ghost (a: A.attribute) : attribute list =
         end
       | A.CONSTANT (A.CONST_FLOAT str) ->
         ACons ("__fc_float", [AStr str])
-      | A.CALL({expr_node = A.VARIABLE n}, args,ghost) -> begin
+      | A.CALL({expr_node = A.VARIABLE n}, args, ghost) -> begin
           let n' = if strip then stripUnderscore n else n in
           let ae' = List.map ae (args@ghost) in
           ACons(n', ae')
@@ -5026,7 +5026,7 @@ and doType (ghost:bool) isFuncArg
            function argument";
       doDeclType (TArray(bt, lo, empty_size_cache (), al')) acc d
 
-    | A.PROTO (d, args, _,isva) ->
+    | A.PROTO (d, args, _, isva) ->
       (* Start a scope for the parameter names *)
       enterScope ();
       (* Intercept the old-style use of varargs.h. On GCC this means that
@@ -5180,7 +5180,7 @@ and isVariableSizedArray ghost (dt: A.decl_type)
     | PTR (al, dt) -> PTR (al, findArray dt)
     | JUSTBASE -> JUSTBASE
     | PARENTYPE (prea, dt, posta) -> PARENTYPE (prea, findArray dt, posta)
-    | PROTO (dt, f,g, a) -> PROTO (findArray dt, f,g, a)
+    | PROTO (dt, f, g, a) -> PROTO (findArray dt, f, g, a)
   in
   let dt' = findArray dt in
   match !res with
@@ -6362,9 +6362,9 @@ and doExp local_env
             intType
       end
 
-    | A.CALL(f, args,args_ghost) ->
-      Format.printf "Length param %i@." (List.length args);
-      Format.printf "Length param %i@." (List.length args_ghost);
+    | A.CALL(f, args,_args_ghost) ->
+(*      Format.printf "Length param %i@." (List.length args);
+        Format.printf "Length param %i@." (List.length args_ghost);*)
      let (rf,sf, f', ft') =
         match (stripParen f).expr_node with
         (* Treat the VARIABLE case separate because we might be calling a
@@ -8994,7 +8994,7 @@ and doDecl local_env (isglobal: bool) : A.definition -> chunk = function
               f' :: fl'
           end
         in
-        let fmlocs = (match dt with PROTO(_, fml,_, _) -> fml | _ -> []) in
+        let fmlocs = (match dt with PROTO(_, fml, _, _) -> fml | _ -> []) in
         let formals = doFormals (argsToList formals_t) fmlocs in
         (* in case of formals referred to in types of others, doType has
            put dummy varinfos. We need to fix them now that we have proper
