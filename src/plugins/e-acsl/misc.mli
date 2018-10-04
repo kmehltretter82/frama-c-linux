@@ -114,6 +114,12 @@ val is_bitfield_pointers: logic_type -> bool
 (* Returns [true] iff the given logic type is a bitfield pointer or a
    set of bitfield pointers. *)
 
+val term_has_lv_from_vi: term -> bool
+(* Return [true] iff the given term contains a variables that originates from
+  a C varinfo, that is a non-purely logic variable. *)
+
+type pred_or_term = PoT_pred of predicate | PoT_term of term
+
 (*
 Local Variables:
 compile-command: "make"

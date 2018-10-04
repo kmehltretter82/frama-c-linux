@@ -24,18 +24,16 @@
 
 open Cil_types
 
-val quantif_to_exp: kernel_function -> Env.t -> predicate -> exp * Env.t
+val quantif_to_exp:
+  kernel_function -> Env.t -> predicate -> exp * Env.t
 (** The given predicate must be a quantification. *)
 
 (* ***********************************************************************)
 (** {2 Forward references} *)
 (* ***********************************************************************)
 
-val predicate_to_exp_ref: 
+val predicate_to_exp_ref:
   (kernel_function -> Env.t -> predicate -> exp * Env.t) ref
-
-val term_to_exp_ref: 
-  (kernel_function -> Env.t -> term -> exp * Env.t) ref
 
 (*
 Local Variables:

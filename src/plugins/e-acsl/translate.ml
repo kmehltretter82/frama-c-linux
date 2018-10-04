@@ -296,7 +296,7 @@ let cast_integer_to_float lty lty_t e =
   else
     e
 
-let rec thost_to_host kf env = function
+let rec thost_to_host kf env th = match th with
   | TVar { lv_origin = Some v } ->
     Var (Cil.get_varinfo (Env.get_behavior env) v), env, v.vname
   | TVar ({ lv_origin = None } as logic_v) ->
@@ -424,7 +424,8 @@ and context_insensitive_term_to_exp kf env t =
       (* do not generate [e2] from [t2] twice *)
       let guard, env =
         let name = name_of_binop bop ^ "_guard" in
-        comparison_to_exp ~loc kf env Typing.gmp ~e1:e2 ~name Eq t2 zero t
+        comparison_to_exp
+          ~loc kf env Typing.gmp ~e1:e2 ~name Eq t2 zero t
       in
       let mk_stmts _v e =
 	assert (Gmpz.is_t ty);
@@ -549,10 +550,15 @@ and context_insensitive_term_to_exp kf env t =
     let e, env = term_to_exp kf env t in
     e, env, false, ""
   | Tat(t', label) ->
-    (* convert [t'] to [e] in a separated local env *)
-    let e, env = term_to_exp kf (Env.push env) t' in
-    let e, env, is_mpz_string = at_to_exp env (Some t) label e in
-    e, env, is_mpz_string, ""
+    let lscope = Env.Logic_scope.get env in
+    let pot = Misc.PoT_term t' in
+    if Lscope.is_used lscope pot then
+      let e, env = At_with_lscope.to_exp ~loc kf env pot label in
+      e, env, false, ""
+    else
+      let e, env = term_to_exp kf (Env.push env) t' in
+      let e, env, is_mpz_string = at_to_exp_no_lscope env (Some t) label e in
+      e, env, is_mpz_string, ""
   | Tbase_addr(BuiltinLabel Here, t) ->
     mmodel_call ~loc kf "base_addr" Cil.voidPtrType env t
   | Tbase_addr _ -> not_yet env "labeled \\base_addr"
@@ -576,6 +582,8 @@ and context_insensitive_term_to_exp kf env t =
   | Tcomprehension _ -> not_yet env "tset comprehension"
   | Trange _ -> not_yet env "range"
   | Tlet(li, t) ->
+    let lvs = Lscope.Lvs_let(li.l_var_info, Misc.term_of_li li) in
+    let env = Env.Logic_scope.extend env lvs in
     let env = env_of_li li kf env loc in
     let e, env = term_to_exp kf env t in
     Interval.Env.remove li.l_var_info;
@@ -590,7 +598,9 @@ and term_to_exp kf env t =
     Printer.pp_term t generate_rte;
   let env = Env.rte env false in
   let t = match t.term_node with TLogic_coerce(_, t) -> t | _ -> t in
-  let e, env, is_mpz_string, name = context_insensitive_term_to_exp kf env t in
+  let e, env, is_mpz_string, name =
+    context_insensitive_term_to_exp kf env t
+  in
   let env = if generate_rte then translate_rte kf env e else env in
   let cast = Typing.get_cast t in
   let name = if name = "" then None else Some name in
@@ -675,7 +685,13 @@ and mmodel_call_with_size ~loc kf name ctx env t =
     res, env
   in
   mmodel_call_with_ranges
-    ~loc kf name ctx env t call_for_unsupported_constructs
+    ~loc
+    kf
+    name
+    ctx
+    env
+    t
+    call_for_unsupported_constructs
 
 and mmodel_call_valid ~loc kf name ctx env t =
   let call_for_unsupported_constructs ~loc kf name ctx env t =
@@ -703,7 +719,13 @@ and mmodel_call_valid ~loc kf name ctx env t =
     res, env
   in
   mmodel_call_with_ranges
-    ~loc kf name ctx env t call_for_unsupported_constructs
+    ~loc
+    kf
+    name
+    ctx
+    env
+    t
+    call_for_unsupported_constructs
 
 (* [mmodel_call_with_ranges] handles ranges in [t] when calling builtin [name].
   It only supports the following cases for the time being:
@@ -859,7 +881,7 @@ and mmodel_call_memory_block ~loc kf name ctx env p r =
   in
   e, env
 
-and at_to_exp env t_opt label e =
+and at_to_exp_no_lscope env t_opt label e =
   let stmt = E_acsl_label.get_stmt (Env.get_visitor env) label in
   (* generate a new variable denoting [\at(t',label)].
      That is this variable which is the resulting expression.
@@ -884,20 +906,15 @@ and at_to_exp env t_opt label e =
     inherit Visitor.frama_c_inplace
     method !vstmt_aux stmt =
       (* either a standard C affectation or an mpz one according to type of
-	 [e] *)
+        [e] *)
       let new_stmt = Gmpz.init_set ~loc (Cil.var res_v) res e in
       assert (!env_ref == new_env);
       (* generate the new block of code for the labeled statement and the
-	 corresponding environment *)
+        corresponding environment *)
       let block, new_env =
-	Env.pop_and_get new_env new_stmt ~global_clear:false Env.Middle
+       Env.pop_and_get new_env new_stmt ~global_clear:false Env.Middle
       in
-      let pre = match label with
-        | BuiltinLabel(Here | Post) -> true
-        | BuiltinLabel(Old | Pre | LoopEntry | LoopCurrent | Init)
-        | FormalLabel _ | StmtLabel _ -> false
-      in
-      env_ref := Env.extend_stmt_in_place new_env stmt ~pre block;
+      env_ref := Env.extend_stmt_in_place new_env stmt ~label block;
       Cil.ChangeTo stmt
   end
   in
@@ -936,7 +953,8 @@ and named_predicate_content_to_exp ?name kf env p =
   | Pand(p1, p2) ->
     (* p1 && p2 <==> if p1 then p2 else false *)
     let e1, env1 = named_predicate_to_exp kf (Env.rte env true) p1 in
-    let _, env2 as res2 = named_predicate_to_exp kf (Env.push env1) p2 in
+    let _, env2 as res2 =
+      named_predicate_to_exp kf (Env.push env1) p2 in
     let env3 = Env.push env2 in
     let name = match name with None -> "and" | Some n -> n in
     conditional_to_exp ~name loc None e1 res2 (Cil.zero loc, env3)
@@ -969,10 +987,13 @@ and named_predicate_content_to_exp ?name kf env p =
     Cil.new_exp ~loc (UnOp(LNot, e, Cil.intType)), env
   | Pif(t, p2, p3) ->
     let e1, env1 = term_to_exp kf (Env.rte env true) t in
-    let (_, env2 as res2) = named_predicate_to_exp kf (Env.push env1) p2 in
+    let (_, env2 as res2) =
+      named_predicate_to_exp kf (Env.push env1) p2 in
     let res3 = named_predicate_to_exp kf (Env.push env2) p3 in
     conditional_to_exp loc None e1 res2 res3
   | Plet(li, p) ->
+    let lvs = Lscope.Lvs_let(li.l_var_info, Misc.term_of_li li) in
+    let env = Env.Logic_scope.extend env lvs in
     let env = env_of_li li kf env loc in
     let e, env = named_predicate_to_exp kf env p in
     Interval.Env.remove li.l_var_info;
@@ -981,11 +1002,17 @@ and named_predicate_content_to_exp ?name kf env p =
   | Pat(p, BuiltinLabel Here) ->
     named_predicate_to_exp kf env p
   | Pat(p', label) ->
-    (* convert [t'] to [e] in a separated local env *)
-    let e, env = named_predicate_to_exp kf (Env.push env) p' in
-    let e, env, is_string = at_to_exp env None label e in
-    assert (not is_string);
-    e, env
+    let lscope = Env.Logic_scope.get env in
+    let pot = Misc.PoT_pred p' in
+    if Lscope.is_used lscope pot then
+      At_with_lscope.to_exp ~loc kf env pot label
+    else begin
+      (* convert [t'] to [e] in a separated local env *)
+      let e, env = named_predicate_to_exp kf (Env.push env) p' in
+      let e, env, is_string = at_to_exp_no_lscope env None label e in
+      assert (not is_string);
+      e, env
+    end
   | Pvalid_read(BuiltinLabel Here as llabel, t) as pc
   | (Pvalid(BuiltinLabel Here as llabel, t) as pc) ->
     let call_valid t =
@@ -1022,7 +1049,8 @@ and named_predicate_content_to_exp ?name kf env p =
     | TAddrOf (TVar { lv_origin = Some vi }, TNoOffset)
 	when vi.vformal || vi.vglob || Functions.RTL.is_generated_name vi.vname ->
       Cil.one ~loc, env
-    | _ -> mmodel_call_with_size ~loc kf "initialized" Cil.intType env t)
+    | _ ->
+      mmodel_call_with_size ~loc kf "initialized" Cil.intType env t)
   | Pinitialized _ -> not_yet env "labeled \\initialized"
   | Pallocable _ -> not_yet env "\\allocate"
   | Pfreeable(BuiltinLabel Here, t) ->
@@ -1061,7 +1089,13 @@ and translate_rte_annots:
 	  handle_error
 	    (fun env ->
 	      Options.feedback ~dkey ~level:4 "prevent RTE from %a" pp elt;
-	      translate_named_predicate kf (Env.rte env false) p)
+        (* The logic scope MUST NOT be reset here since we still might be
+          in the middle of the translation of the original predicate. *)
+        let lscope_reset_old = Env.Logic_scope.get_reset env in
+        let env = Env.Logic_scope.set_reset env false in
+        let env = translate_named_predicate kf (Env.rte env false) p in
+        let env = Env.Logic_scope.set_reset env lscope_reset_old in
+        env)
 	    env
         | _ -> assert false)
         env
@@ -1082,6 +1116,7 @@ and translate_named_predicate kf env p =
   Typing.type_named_predicate ~must_clear:rte p;
   let e, env = named_predicate_to_exp kf ~rte env p in
   assert (Typ.equal (Cil.typeOf e) Cil.intType);
+  let env = Env.Logic_scope.reset env in
   Env.add_stmt
     env
     (Misc.mk_e_acsl_guard ~reverse:true (Env.annotation_kind env) kf e p)
@@ -1090,8 +1125,11 @@ let named_predicate_to_exp ?name kf env p =
   named_predicate_to_exp ?name kf env p (* forget optional argument ?rte *)
 
 let () =
-  Quantif.term_to_exp_ref := term_to_exp;
-  Quantif.predicate_to_exp_ref := named_predicate_to_exp
+  Loops.term_to_exp_ref := term_to_exp;
+  Loops.translate_named_predicate_ref := translate_named_predicate;
+  Quantif.predicate_to_exp_ref := named_predicate_to_exp;
+  At_with_lscope.term_to_exp_ref := term_to_exp;
+  At_with_lscope.predicate_to_exp_ref := named_predicate_to_exp
 
 (* This function is used by Guillaume.
    However, it is correct to use it only in specific contexts. *)

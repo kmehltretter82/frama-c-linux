@@ -456,6 +456,17 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
     f.slocals <- locals;
     f.sbody.blocals <- blocks
 
+  (* Memory management for \at on purely logic variables:
+    Put [malloc] stmts at proper locations *)
+  method private insert_malloc_and_free_stmts kf f =
+    let malloc_stmts = At_with_lscope.Malloc.find_all kf in
+    let fstmts = malloc_stmts @ f.sbody.bstmts in
+    f.sbody.bstmts <- fstmts;
+    (* Now that [malloc] stmts for [kf] have been inserted,
+      there is no more need to keep the corresponding entries in the
+      table managing them. *)
+    At_with_lscope.Malloc.remove_all kf
+
   method !vfunc f =
     if generate then begin
       Exit_points.generate f;
@@ -467,6 +478,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         (fun f ->
           Exit_points.clear ();
           self#add_generated_variables_in_function f;
+          self#insert_malloc_and_free_stmts kf f;
           Options.feedback ~dkey ~level:2 "function %a done."
             Kernel_function.pretty kf;
           f)
@@ -834,10 +846,12 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
 
   method !vblock blk =
     let handle_memory new_blk =
-      match new_blk.blocals with
-      | [] -> new_blk
-      | _ :: _ ->
-        let kf = Extlib.the self#current_kf in
+      let kf = Extlib.the self#current_kf in
+      let free_stmts = At_with_lscope.Free.find_all kf in
+      match new_blk.blocals, free_stmts with
+      | [], [] ->
+        new_blk
+      | [], _ :: _ | _ :: _, [] | _ :: _, _ :: _ ->
         let add_locals stmts =
           List.fold_left
             (fun acc vi ->
@@ -854,10 +868,14 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
                preceded by clean if any *)
             let init, tl =
               if self#is_main kf && Mmodel_analysis.use_model () then
-                [ potential_clean; ret ], tl
+                free_stmts @ [ potential_clean; ret ], tl
               else
-                [ ret ], l
+                free_stmts @ [ ret ], l
             in
+            (* Now that [free] stmts for [kf] have been inserted,
+              there is no more need to keep the corresponding entries in the
+              table managing them. *)
+            At_with_lscope.Free.remove_all kf;
             blk.bstmts <-
               List.fold_left (fun acc v -> v :: acc) (add_locals init) tl
           | { skind = Block b } :: _ ->

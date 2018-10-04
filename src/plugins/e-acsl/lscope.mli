@@ -22,36 +22,32 @@
 
 open Cil_types
 
-(** [translate_*] translates a given ACSL annotation into the corresponding C
-    statement (if any) for runtime assertion checking. This C statements are
-    part of the resulting environment. *)
+(* Handle the logic scope of a term.
+  We define the logic scope of a term [t] to be the set of PURELY logic
+  variables that are visible by [t]. *)
 
-val translate_pre_spec: kernel_function -> Env.t -> funspec -> Env.t
-val translate_post_spec: kernel_function -> Env.t -> funspec -> Env.t
-val translate_pre_code_annotation:
-  kernel_function -> Env.t -> code_annotation -> Env.t
-val translate_post_code_annotation:
-  kernel_function -> Env.t -> code_annotation -> Env.t
-val translate_named_predicate:
-  kernel_function -> Env.t -> predicate -> Env.t
+type lscope_var =
+  | Lvs_let of logic_var * term (* the expression to which the lv is binded *)
+  | Lvs_quantif of term * relation * logic_var * relation * term
+  | Lvs_formal of logic_var * logic_info (* the logic definition *)
+  | Lvs_global of logic_var * term (* same as Lvs_let *)
 
-val translate_rte_annots:
-  (Format.formatter -> 'a -> unit) ->
-  'a ->
-  kernel_function ->
-  Env.t ->
-  code_annotation list ->
-  Env.t
+type t
 
-exception No_simple_translation of term
-val term_to_exp: typ option -> term -> exp
+val empty: t
+(* Create an empty logic scope. *)
 
-val predicate_to_exp: kernel_function -> predicate -> exp
+val is_empty: t -> bool
+(* Check whether the given logic scope is empty. *)
 
-val set_original_project: Project.t -> unit
+val add: lscope_var -> t -> t
+(* Return a new logic scope in which the given [lscope_var] has been added. *)
 
-(*
-Local Variables:
-compile-command: "make"
-End:
-*)
+val get_all: t -> lscope_var list
+(* Return the list of [lscope_var] of the given logic scope.
+  The first element is the first [lscope_var] that was added to [t], the
+  second element is the second [lscope_var] that was added to [t], an so on. *)
+
+val is_used: t -> Misc.pred_or_term -> bool
+(* [is_used lscope pot] returns [true] iff [pot] uses a variable from
+  [lscope]. *)

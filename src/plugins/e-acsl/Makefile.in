@@ -69,16 +69,18 @@ PLUGIN_CMO:= local_config \
 	mmodel_analysis \
 	exit_points \
 	label \
+	lscope \
 	env \
 	keep_status \
 	dup_functions \
 	interval \
 	typing \
+	loops \
 	quantif \
+	at_with_lscope \
 	translate \
 	temporal \
 	prepare_ast \
-	loops \
 	visit \
 	main
 

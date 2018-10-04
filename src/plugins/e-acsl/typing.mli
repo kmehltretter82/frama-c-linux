@@ -132,6 +132,15 @@ val unsafe_set: term -> ?ctx:integer_ty -> integer_ty -> unit
 (** Register that the given term has the given type in the given context (if
     any). No verification is done. *)
 
+
+(*****************************************************************************)
+(* Utils *)
+(*****************************************************************************)
+
+val ty_of_interv: ?ctx:integer_ty -> Ival.t -> integer_ty
+(* Compute the smallest type (bigger than [int]) which can contain the whole
+   interval. It is the \theta operator of the JFLA's paper. *)
+
 (******************************************************************************)
 (** {2 Internal stuff} *)
 (******************************************************************************)

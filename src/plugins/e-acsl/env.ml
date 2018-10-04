@@ -51,7 +51,9 @@ type local_env =
       rte: bool }
 
 type t = 
-    { visitor: Visitor.frama_c_visitor; 
+    { visitor: Visitor.frama_c_visitor;
+      lscope: Lscope.t;
+      lscope_reset: bool;
       annotation_kind: Misc.annotation_kind;
       new_global_vars: (varinfo * scope) list;
       (* generated variables. The scope indicates the level where the variable
@@ -59,7 +61,8 @@ type t =
       global_mpz_tbl: mpz_tbl;
       env_stack: local_env list;
       init_env: local_env;
-      var_mapping: Varinfo.t Logic_var.Map.t; (* bind logic var to C var *)
+      var_mapping: Varinfo.t Stack.t Logic_var.Map.t;
+      (* records of C bindings for logic vars *)
       loop_invariants: predicate list list;
       (* list of loop invariants for each currently visited loops *) 
       cpt: int; (* counter used when generating variables *) }
@@ -108,7 +111,9 @@ let empty_local_env =
     rte = true }
 
 let dummy = 
-  { visitor = new Visitor.generic_frama_c_visitor (Cil.inplace_visit ()); 
+  { visitor = new Visitor.generic_frama_c_visitor (Cil.inplace_visit ());
+    lscope = Lscope.empty;
+    lscope_reset = true;
     annotation_kind = Misc.Assertion;
     new_global_vars = [];
     global_mpz_tbl = empty_mpz_tbl; 
@@ -119,7 +124,9 @@ let dummy =
     cpt = 0; }
 
 let empty v =
-  { visitor = v; 
+  { visitor = v;
+    lscope = Lscope.empty;
+    lscope_reset = true;
     annotation_kind = Misc.Assertion;
     new_global_vars = [];
     global_mpz_tbl = empty_mpz_tbl; 
@@ -280,29 +287,48 @@ module Logic_binding = struct
 	| Ctype ty -> ty
 	| Linteger -> Gmpz.t ()
 	| Ltype _ as ty when Logic_const.is_boolean_type ty -> Cil.charType
-	| Ltype _ | Lvar _ | Lreal | Larrow _ as lty -> 
-	  let msg = 
+	| Ltype _ | Lvar _ | Lreal | Larrow _ as lty ->
+	  let msg =
 	    Format.asprintf
 	      "logic variable of type %a" Logic_type.pretty lty
 	  in
 	  Error.not_yet msg
     in
-    let v, e, env = 
-      new_var
-	~loc:Location.unknown env ~name:logic_v.lv_name None ty (fun _ _ -> []) 
+    let v, e, env = new_var
+      ~loc:Location.unknown
+      env
+      ~name:logic_v.lv_name
+      None
+      ty
+      (fun _ _ -> [])
     in
-    v,
-    e, 
-    { env with var_mapping = Logic_var.Map.add logic_v v env.var_mapping }
+    let env =
+      try
+        let varinfos = Logic_var.Map.find logic_v env.var_mapping in
+        Stack.push v varinfos;
+        env
+      with Not_found ->
+        let varinfos = Stack.create () in
+        Stack.push v varinfos;
+        let var_mapping = Logic_var.Map.add logic_v varinfos env.var_mapping in
+        { env with var_mapping = var_mapping }
+    in
+    v, e, env
 
-  let get env logic_v = 
-    try Logic_var.Map.find logic_v env.var_mapping
-    with Not_found -> assert false
+  let get env logic_v =
+    try
+      let varinfos = Logic_var.Map.find logic_v env.var_mapping in
+      Stack.top varinfos
+    with Not_found | Stack.Empty ->
+      assert false
 
-  let remove env v = 
-    let map = env.var_mapping in
-    assert (Logic_var.Map.mem v map);
-    { env with var_mapping = Logic_var.Map.remove v map }
+  let remove env logic_v =
+    try
+      let varinfos = Logic_var.Map.find logic_v env.var_mapping in
+      ignore (Stack.pop varinfos);
+      env
+    with Not_found | Stack.Empty ->
+      assert false
 
 end
 
@@ -314,6 +340,16 @@ let current_kf env =
 
 let get_visitor env = env.visitor
 let get_behavior env = env.visitor#behavior
+
+module Logic_scope = struct
+  let get env = env.lscope
+  let extend env lvs = { env with lscope = Lscope.add lvs env.lscope }
+  let set_reset env bool = { env with lscope_reset = bool }
+  let get_reset env = env.lscope_reset
+  let reset env =
+    if env.lscope_reset then { env with lscope = Lscope.empty }
+    else env
+end
 
 let emitter = 
   Emitter.create
@@ -345,12 +381,17 @@ let add_stmt ?(post=false) ?(init=false) ?before env stmt =
     init_env = if init then local_env else env.init_env;
     env_stack = if init then env.env_stack else local_env :: tl }
 
-let extend_stmt_in_place env stmt ~pre block =
+let extend_stmt_in_place env stmt ~label block =
   let new_stmt = Cil.mkStmt ~valid_sid:true (Block block) in
   let sk = stmt.skind in
-  stmt.skind <- 
+  stmt.skind <-
     Block (Cil.mkBlock [ new_stmt; Cil.mkStmt ~valid_sid:true sk ]);
-  if pre then 
+    let pre = match label with
+    | BuiltinLabel(Here | Post) -> true
+    | BuiltinLabel(Old | Pre | LoopEntry | LoopCurrent | Init)
+    | FormalLabel _ | StmtLabel _ -> false
+    in
+    if pre then
     let local_env, tl_env = top false env in
     let b_info = local_env.block_info in
     let b_info = { b_info with pre_stmts = new_stmt :: b_info.pre_stmts } in
