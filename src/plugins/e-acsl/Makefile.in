@@ -231,9 +231,9 @@ clean::
 # Cleaning #
 ############
 
-EACSL_CLEANFILES = $(wildcard doc/doxygen/doxygen.cfg \
+EACSL_CLEANFILES = doc/doxygen/doxygen.cfg \
 	Makefile config.log config.status configure .depend autom4te.cache/* \
-	META.frama-c-e_acsl Makefile.plugin.generated local_config.ml top/*)
+	META.frama-c-e_acsl Makefile.plugin.generated local_config.ml top/*
 
 e-acsl-distclean:: clean
 	$(PRINT_RM) generated project files
@@ -245,15 +245,12 @@ e-acsl-distclean:: clean
 
 EXPORT = e-acsl-$(EACSL_VERSION)
 
-EACSL_OCAML_FILES = $(wildcard *.mli) \
-	$(filter-out $(wildcard *local_config.ml), $(wildcard *.ml))
-
 EACSL_CONTRIB_FILES = \
   $(EACSL_GMP_REL_DIR)/mini-gmp.c \
   $(EACSL_GMP_REL_DIR)/mini-gmp.h \
   $(EACSL_DLMALLOC_REL_DIR)/dlmalloc.c
 
-EACSL_MANUAL_FILES = $(wildcard $(E_ACSL_DIR)/doc/manuals/*.pdf)
+EACSL_MANUAL_FILES = doc/manuals/*.pdf
 
 EACSL_DOC_FILES = \
 	$(EACSL_MANUAL_FILES) \
@@ -262,14 +259,16 @@ EACSL_DOC_FILES = \
 	man/e-acsl-gcc.sh.1
 
 EACSL_TEST_FILES = \
-  tests/test_config.in tests/print.ml \
+  tests/test_config.in tests/print.ml
+
+# Test files without header management 
+EACSL_DISTRIB_TESTS = \
   $(foreach dir, $(addprefix tests/,$(PLUGIN_TESTS_DIRS)), \
-    $(wildcard \
       $(dir)/*.[ic] \
       $(dir)/test_config \
       $(dir)/oracle/*.c \
       $(dir)/oracle/*.oracle \
-  ))
+  )
 
 EACSL_RTL_FILES = $(EACSL_RTL_SRC)
 
@@ -284,7 +283,7 @@ EACSL_MISC_FILES = \
 
 EACSL_SHARE_FILES = share/e-acsl/*.[ch] share/e-acsl/*/*.[ch]
 
-PLUGIN_DISTRIB_EXTERNAL:=\
+EACSL_DISTRIB_EXTERNAL =\
   $(EACSL_SHARE_FILES) \
   $(EACSL_MISC_FILES) \
   $(EACSL_DOC_FILES) \
@@ -294,38 +293,57 @@ PLUGIN_DISTRIB_EXTERNAL:=\
   $(EACSL_LICENSE_FILES) \
   $(EACSL_CONTRIB_FILES)
 
-EACSL_DISTRIB_FILES:= $(PLUGIN_DISTRIB_EXTERNAL) $(EACSL_OCAML_FILES)
+PLUGIN_DISTRIB_EXTERNAL:= $(EACSL_DISTRIB_EXTERNAL)
+
+# Files of `DISTRIB_FILES` without header that is not listed into `headers/header_specs.txt` (with a `.ignore` attribute).
+PLUGIN_HEADER_EXCEPTIONS:=
+
+# Files that are not listed by `DISTRIB_FILES` (and by the way, without header management) decicated to distributed tests
+PLUGIN_DISTRIB_TESTS:= $(EACSL_DISTRIB_TESTS)
+
+# for e-csl-distrib target:
+EACSL_OCAML_FILES = *.mli \
+	$(patsubst $(EACSL_PLUGIN_DIR)/%,%,\
+		$(filter-out $(wildcard $(EACSL_PLUGIN_DIR)/*local_config.ml), $(wildcard $(EACSL_PLUGIN_DIR)/*.ml)))
+
+EACSL_DISTRIB_FILES = \
+	$(patsubst $(EACSL_PLUGIN_DIR)/%,%,\
+		$(wildcard $(addprefix $(EACSL_PLUGIN_DIR)/, \
+			$(EACSL_OCAML_FILES) $(EACSL_DISTRIB_EXTERNAL) $(EACSL_DISTRIB_TESTS))))
 
 # BE CAREFUL: manually remove all *.ml* files which should not be released!
 e-acsl-distrib:
 	$(PRINT_TAR) tmp-distrib
-	$(TAR) cf tmp.tar $(EACSL_DISTRIB_FILES)
+	cd $(EACSL_PLUGIN_DIR); \
+		$(TAR) cf tmp.tar $(EACSL_DISTRIB_FILES)
 	$(PRINT_MAKING) export directories
-	$(MKDIR) $(EXPORT)
+	$(MKDIR) $(EACSL_PLUGIN_DIR)/$(EXPORT)
 	$(PRINT_UNTAR) tmp-distrib
-	cd $(EXPORT); \
+	cd $(EACSL_PLUGIN_DIR)/$(EXPORT); \
+		pwd && \
 		$(TAR) xf ../tmp.tar && \
 		autoconf && \
 		$(SED) -i -e 's/IS_DISTRIBUTED:=no/IS_DISTRIBUTED:=yes/' Makefile.in && \
 		$(RM) -rf autom4te.cache
 	$(PRINT_RM) tmp-distrib
-	$(RM) tmp.tar
-	$(PRINT_MAKING) archive
-	$(TAR) czf $(EXPORT).tar.gz $(EXPORT)
+	$(RM) $(EACSL_PLUGIN_DIR)/tmp.tar
+	$(PRINT_MAKING) archive $(EACSL_PLUGIN_DIR)/$(EXPORT).tar.gz
+	cd $(EACSL_PLUGIN_DIR) ; \
+		$(TAR) czf $(EXPORT).tar.gz $(EXPORT)
 	$(PRINT) Cleaning
-	$(RM) -fr $(EXPORT)
+	$(RM) -fr $(EACSL_PLUGIN_DIR)/$(EXPORT)
 
 WWW	?= /localhome/julien/frama-c/doc/www
 e-acsl-install-distrib: e-acsl-distrib
 	$(PRINT) Copying to website
-	$(CP) $(EXPORT).tar.gz $(WWW)/distrib/download/e-acsl
-	$(CP) $(EACSL_DOC_FILES) $(WWW)/distrib/download/e-acsl
+	$(CP) $(EACSL_PLUGIN_DIR)/$(EXPORT).tar.gz $(WWW)/distrib/download/e-acsl
+	$(CP) $(addprefix $(EACSL_PLUGIN_DIR)/, $(EACSL_DOC_FILES)) $(WWW)/distrib/download/e-acsl
 ifneq ("$(EACSL_MANUAL_FILES)","")
-	$(CP) doc/manuals/e-acsl-manual.pdf \
+	$(CP) $(EACSL_PLUGIN_DIR)/doc/manuals/e-acsl-manual.pdf \
 	      $(WWW)/distrib/download/e-acsl/e-acsl-manual-$(EACSL_VERSION).pdf
-	$(CP) doc/manuals/e-acsl.pdf \
+	$(CP) $(EACSL_PLUGIN_DIR)/doc/manuals/e-acsl.pdf \
 	      $(WWW)/distrib/download/e-acsl/e-acsl-1.7.pdf
-	$(CP) doc/manuals/e-acsl-implementation.pdf \
+	$(CP) $(EACSL_PLUGIN_DIR)/doc/manuals/e-acsl-implementation.pdf \
 	      $(WWW)/distrib/download/e-acsl/e-acsl-implementation-$(EACSL_VERSION).pdf
 endif
 
@@ -348,12 +366,6 @@ e-acsl-distrib-check:
 ##########
 # Header #
 ##########
-
-# Files of `DISTRIB_FILES` without header that is not listed into `headers/header_specs.txt` (with a `.ignore` attribute).
-PLUGIN_HEADER_EXCEPTIONS=
-
-# Files that are not listed by `DISTRIB_FILES` (and by the way, without header management) decicated to distributed tests
-PLUGIN_DISTRIB_TESTS=
 
 ifneq ("$(FRAMAC_INTERNAL)","yes")
 

@@ -21,8 +21,6 @@ exit_points.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 exit_points.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 functions.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 functions.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-gmpr.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-gmpr.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 gmpz.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 gmpz.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 interval.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
@@ -31,8 +29,6 @@ keep_status.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 keep_status.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 label.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 label.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-lfunctions.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-lfunctions.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 license/CEA_LGPL: .ignore
 license/LGPLv2.1: .ignore
 license/SPARETIMELABS: .ignore
@@ -78,7 +74,6 @@ share/e-acsl/e_acsl_rtl.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/e_acsl_safe_locations.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/e_acsl_shexec.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/e_acsl_string.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-share/e-acsl/e_acsl_stubs_for_real.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/e_acsl_temporal.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/e_acsl_temporal_timestamp.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/e_acsl_trace.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
@@ -91,8 +86,6 @@ tests/print.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 tests/test_config.in: .ignore
 translate.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 translate.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-translate_lfunctions.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-translate_lfunctions.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 typing.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 typing.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 visit.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
