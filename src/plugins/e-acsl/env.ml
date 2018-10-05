@@ -60,7 +60,6 @@ type t =
          should be added. *)
       global_mpz_tbl: mpz_tbl;
       env_stack: local_env list;
-      init_env: local_env;
       var_mapping: Varinfo.t Stack.t Logic_var.Map.t;
       (* records of C bindings for logic vars *)
       loop_invariants: predicate list list;
@@ -118,7 +117,6 @@ let dummy =
     new_global_vars = [];
     global_mpz_tbl = empty_mpz_tbl; 
     env_stack = []; 
-    init_env = empty_local_env;
     var_mapping = Logic_var.Map.empty;
     loop_invariants = [];
     cpt = 0; }
@@ -131,18 +129,16 @@ let empty v =
     new_global_vars = [];
     global_mpz_tbl = empty_mpz_tbl; 
     env_stack = []; 
-    init_env = empty_local_env;
     var_mapping = Logic_var.Map.empty;
     loop_invariants = [];
     cpt = 0 }
 
 
-let top init env = 
-  if init then env.init_env, []
-  else match env.env_stack with [] -> assert false | hd :: tl -> hd, tl
+let top env =
+  match env.env_stack with [] -> assert false | hd :: tl -> hd, tl
 
 let has_no_new_stmt env =
-  let local, _ = top false env in
+  let local, _ = top env in
   local.block_info = empty_block
 
 (* ************************************************************************** *)
@@ -165,11 +161,11 @@ let pop_loop env = match env.loop_invariants with
 (* ************************************************************************** *)
 
 let rte env b =
-  let local_env, tl_env = top false env in
+  let local_env, tl_env = top env in
   { env with env_stack = { local_env with rte = b } :: tl_env }
 
 let generate_rte env =
-  let local_env, _ = top false env in
+  let local_env, _ = top env in
   local_env.rte
 
 (* ************************************************************************** *)
@@ -177,8 +173,8 @@ let generate_rte env =
 (* eta-expansion required for typing generalisation *)
 let acc_list_rev acc l = List.fold_left (fun acc x -> x :: acc) acc l
 
-let do_new_var ~loc init ?(scope=Local_block) ?(name="") env t ty mk_stmts =
-  let local_env, tl_env = top init env in
+let do_new_var ~loc ?(scope=Local_block) ?(name="") env t ty mk_stmts =
+  let local_env, tl_env = top env in
   let local_block = local_env.block_info in
   let is_t = Gmpz.is_t ty in
   if is_t then Gmpz.is_now_referenced ();
@@ -210,7 +206,6 @@ let do_new_var ~loc init ?(scope=Local_block) ?(name="") env t ty mk_stmts =
   v,
   e, 
   if is_t then begin
-    assert (not init); (* only char* in initializers *)
     let extend_tbl tbl = 
 (*      Options.feedback "memoizing %a for term %a" 
 	Varinfo.pretty v (fun fmt t -> match t with None -> Format.fprintf fmt
@@ -249,33 +244,36 @@ let do_new_var ~loc init ?(scope=Local_block) ?(name="") env t ty mk_stmts =
     { env with
       new_global_vars = new_global_vars;
       cpt = n;
-      init_env = if init then local_env else env.init_env;
-      env_stack = if init then env.env_stack else local_env :: tl_env }
+      env_stack = local_env :: tl_env }
 
 exception No_term
 
-let new_var ~loc ?(init=false) ?(scope=Local_block) ?name env t ty mk_stmts =
-  let local_env, _ = top init env in
+let new_var ~loc ?(scope=Local_block) ?name env t ty mk_stmts =
+  let local_env, _ = top env in
   let memo tbl =
     try
       match t with
       | None -> raise No_term
-      | Some t -> 
-	let v, e = Term.Map.find t tbl.new_exps in
-	if Typ.equal ty v.vtype then v, e, env else raise No_term
-    with Not_found | No_term -> 
-      do_new_var ~loc ~scope init ?name env t ty mk_stmts  
+      | Some t ->
+        let v, e = Term.Map.find t tbl.new_exps in
+        if Typ.equal ty v.vtype then v, e, env else raise No_term
+    with Not_found | No_term ->
+      do_new_var ~loc ~scope ?name env t ty mk_stmts
   in
   match scope with
   | Global | Function ->
-    assert (not init);
     memo env.global_mpz_tbl
   | Local_block ->
     memo local_env.mpz_tbl
 
-let new_var_and_mpz_init ~loc ?init ?scope ?name env t mk_stmts =
-  new_var 
-    ~loc ?init ?scope ?name env t (Gmpz.t ()) 
+let new_var_and_mpz_init ~loc ?scope ?name env t mk_stmts =
+  new_var
+    ~loc
+    ?scope
+    ?name
+    env
+    t
+    (Gmpz.t ())
     (fun v e -> Gmpz.init ~loc e :: mk_stmts v e)
 
 module Logic_binding = struct
@@ -365,10 +363,10 @@ let add_assert env stmt annot = match current_kf env with
       (fun () -> Annotations.add_assert emitter ~kf stmt annot) 
       env.visitor#get_filling_actions
 
-let add_stmt ?(post=false) ?(init=false) ?before env stmt =
+let add_stmt ?(post=false) ?before env stmt =
   if not post then
     Extlib.may (fun old -> E_acsl_label.move env.visitor ~old stmt) before;
-  let local_env, tl = top init env in
+  let local_env, tl = top env in
   let block = local_env.block_info in
   let block =
     if post then
@@ -377,9 +375,7 @@ let add_stmt ?(post=false) ?(init=false) ?before env stmt =
       { block with new_stmts = stmt :: block.new_stmts }
   in
   let local_env = { local_env with block_info = block } in
-  { env with
-    init_env = if init then local_env else env.init_env;
-    env_stack = if init then env.env_stack else local_env :: tl }
+  { env with env_stack = local_env :: tl }
 
 let extend_stmt_in_place env stmt ~label block =
   let new_stmt = Cil.mkStmt ~valid_sid:true (Block block) in
@@ -392,7 +388,7 @@ let extend_stmt_in_place env stmt ~label block =
     | FormalLabel _ | StmtLabel _ -> false
     in
     if pre then
-    let local_env, tl_env = top false env in
+    let local_env, tl_env = top env in
     let b_info = local_env.block_info in
     let b_info = { b_info with pre_stmts = new_stmt :: b_info.pre_stmts } in
     { env with env_stack = { local_env with block_info = b_info } :: tl_env }
@@ -405,7 +401,7 @@ let push env =
 
 let pop env =
 (*  Options.feedback "pop";*)
-  let _, tl = top false env in
+  let _, tl = top env in
   { env with env_stack = tl }
 
 let transfer ~from env = match from.env_stack, env.env_stack with
@@ -425,7 +421,7 @@ type where = Before | Middle | After
 let pop_and_get ?(split=false) env stmt ~global_clear where =
   let split = split && stmt.labels = [] in
 (*  Options.feedback "pop_and_get from %a (%b)" Printer.pp_stmt stmt split;*)
-  let local_env, tl = top false env in
+  let local_env, tl = top env in
   let clear =
     if global_clear then begin
       Varname.clear ();
@@ -525,7 +521,7 @@ end
 
 (* debugging purpose *)
 let pretty fmt env =
-  let local_env, _ = top false env in
+  let local_env, _ = top env in
   Format.fprintf fmt "local new_stmts %t"
     (fun fmt -> 
       List.iter

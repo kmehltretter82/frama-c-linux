@@ -46,18 +46,18 @@ module Varname: sig
 end
 
 val new_var:
-  loc:location -> ?init:bool -> ?scope:scope -> ?name:string ->
+  loc:location -> ?scope:scope -> ?name:string ->
   t -> term option -> typ -> 
   (varinfo -> exp (* the var as exp *) -> stmt list) -> 
   varinfo * exp * t
 (** [new_var env t ty mk_stmts] extends [env] with a fresh variable of type
     [ty] corresponding to [t]. [scope] is the scope of the new variable (default
-    is [Block]). [init] indicates if the initial env must be used.
+    is [Block]).
     @return this variable as both a C variable and a C expression already
     initialized by applying it to [mk_stmts]. *)
 
 val new_var_and_mpz_init:
-  loc:location -> ?init:bool -> ?scope:scope -> ?name:string -> 
+  loc:location -> ?scope:scope -> ?name:string ->
   t -> term option -> 
   (varinfo -> exp (* the var as exp *) -> stmt list) -> 
   varinfo * exp * t
@@ -79,7 +79,7 @@ val add_assert: t -> stmt -> predicate -> unit
 (** [add_assert env s p] associates the assertion [p] to the statement [s] in
     the environment [env]. *)
 
-val add_stmt: ?post:bool -> ?init:bool -> ?before:stmt -> t -> stmt -> t
+val add_stmt: ?post:bool -> ?before:stmt -> t -> stmt -> t
 (** [add_stmt env s] extends [env] with the new statement [s].
     [before] may define which stmt the new one is included before. This is to
     say that any labels attached to [before] are moved to [stmt]. [post]
