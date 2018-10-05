@@ -409,6 +409,8 @@ include $(FRAMAC_SHARE)/Makefile.dynamic
 # Install #
 ###########
 
+EACSL_INSTALL_MANUAL_FILES=$(wildcard $(addprefix $(EACSL_PLUGIN_DIR)/, $(EACSL_MANUAL_FILES)))
+
 install::
 	$(PRINT_INSTALL) E-ACSL share files
 	$(MKDIR) $(FRAMAC_DATADIR)/e-acsl
@@ -421,10 +423,10 @@ install::
 	      $(FRAMAC_DATADIR)/e-acsl/segment_model
         # manuals are not present in standard distribution.
         # Don't fail because of that.
-ifneq ("$(EACSL_MANUAL_FILES)","")
+ifneq ("$(EACSL_INSTALL_MANUAL_FILES)","")
 	$(PRINT_INSTALL) E-ACSL manuals
 	$(MKDIR) $(FRAMAC_DATADIR)/manuals
-	$(CP) $(EACSL_MANUAL_FILES) $(FRAMAC_DATADIR)/manuals;
+	$(CP) $(EACSL_INSTALL_MANUAL_FILES) $(FRAMAC_DATADIR)/manuals;
 endif
 	$(PRINT_INSTALL) E-ACSL libraries
 	$(MKDIR) $(LIBDIR)
