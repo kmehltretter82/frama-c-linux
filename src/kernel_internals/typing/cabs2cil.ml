@@ -5026,7 +5026,7 @@ and doType (ghost:bool) isFuncArg
            function argument";
       doDeclType (TArray(bt, lo, empty_size_cache (), al')) acc d
 
-    | A.PROTO (d, args, _, isva) ->
+    | A.PROTO (d, args, ghost_args, isva) ->
       (* Start a scope for the parameter names *)
       enterScope ();
       (* Intercept the old-style use of varargs.h. On GCC this means that
@@ -5055,7 +5055,8 @@ and doType (ghost:bool) isFuncArg
       in
       let argl_length = List.length args' in
       (* Make the argument as for a formal *)
-      let doOneArg (s, (n, ndt, a, cloc)) : varinfo =
+      let doOneArg is_ghost (s, (n, ndt, a, cloc)) : varinfo =
+        let ghost = is_ghost || ghost in
         let s' = doSpecList ghost n s in
         let vi = makeVarInfoCabs ~ghost ~isformal:true ~isglobal:false
             (convLoc cloc) s' (n,ndt,a) in
@@ -5067,14 +5068,22 @@ and doType (ghost:bool) isFuncArg
             Kernel.error ~once:true ~current:true
               "named parameter '%s' has void type" vi.vname
         end;
+        if is_ghost then begin
+          vi.vattr <- Cil.addAttribute (Attr (Cil.frama_c_ghost, [])) vi.vattr
+        end ;
         (* Add the formal to the environment, so it can be referenced by
            other formals  (e.g. in an array type, although that will be
            changed to a pointer later, or though typeof).  *)
         addLocalToEnv vi.vname (EnvVar vi);
         vi
       in
+      let make_noopt_targs ghost args =
+        List.map (doOneArg ghost) args
+      in
+      let noopt_targs = make_noopt_targs false args' in
+      let noopt_ghost_targs = make_noopt_targs true ghost_args in
       let targs : varinfo list option =
-        match List.map doOneArg args'  with
+        match noopt_targs @ noopt_ghost_targs with
         | [] -> None (* No argument list *)
         | [t] when isVoidType t.vtype ->
           Some []
@@ -6362,10 +6371,9 @@ and doExp local_env
             intType
       end
 
-    | A.CALL(f, args,_args_ghost) ->
-(*      Format.printf "Length param %i@." (List.length args);
-        Format.printf "Length param %i@." (List.length args_ghost);*)
-     let (rf,sf, f', ft') =
+    | A.CALL(f, args, ghost_args) ->
+      let args = args @ ghost_args in
+      let (rf,sf, f', ft') =
         match (stripParen f).expr_node with
         (* Treat the VARIABLE case separate because we might be calling a
          * function that does not have a prototype. In that case assume it
@@ -8973,9 +8981,11 @@ and doDecl local_env (isglobal: bool) : A.definition -> chunk = function
         (* Create the formals and add them to the environment. *)
         (* sfg: extract tsets for the formals from dt *)
         let doFormal (loc : location) (fn, ft, fa) =
+          let ghost = Cil.hasAttribute Cil.frama_c_ghost fa in
           let f = makeVarinfo ~temp:false false true fn ft in
           (f.vdecl <- loc;
            f.vattr <- fa;
+           f.vghost <- ghost;
            alphaConvertVarAndAddToEnv true f)
         in
         let rec doFormals fl' ll' =

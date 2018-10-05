@@ -3510,6 +3510,11 @@ let typeOf_array_elem t =
   | _ -> Kernel.fatal "Not an array type %a" !pp_typ_ref t
 
 
+ let frama_c_ghost = "__fc_ghost"
+ let () = registerAttribute frama_c_ghost (AttrName false)
+ let () =
+   registerAttribute (Extlib.strip_underscore frama_c_ghost) (AttrName false)
+
 let frama_c_mutable = "__fc_mutable"
 let () = registerAttribute frama_c_mutable (AttrName false)
 let () =

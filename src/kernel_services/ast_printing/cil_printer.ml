@@ -65,6 +65,7 @@ let register_shallow_attribute s =
   reserved_attributes:=
     (Extlib.strip_underscore s)::!reserved_attributes
 
+let () = register_shallow_attribute Cil.frama_c_ghost
 let () = register_shallow_attribute Cil.frama_c_mutable
 let () = register_shallow_attribute Cil.frama_c_init_obj
 
@@ -871,12 +872,25 @@ class cil_printer () = object (self)
       (match e.enode with
        | Lval(Var _, _) -> self#exp fmt e
        | _ -> fprintf fmt "(%a)"  self#exp e);
+
+      let must_ghost_param_list =
+        let (_, param_types, _, _) = Cil.splitFunctionType (Cil.typeOf e) in
+        let attrs = List.map (fun (_,_,a) -> a) (Cil.argsToList param_types) in
+        List.map (Cil.hasAttribute Cil.frama_c_ghost) attrs
+      in
+      let args, ghost_args =
+        let p = List.combine must_ghost_param_list args in
+        let (ghost_args, args) = List.partition
+            (fun (t, _) -> t && not is_ghost)
+            p
+        in
+        snd (List.split args) , snd (List.split ghost_args)
+      in
+
       (* Now the arguments *)
       Pretty_utils.pp_flowlist ~left:"(" ~sep:"," ~right:")" self#exp fmt args;
       (* Now the ghost arguments *)
-      Format.fprintf fmt "%t ghost " (fun fmt -> self#pp_open_annotation fmt);
-      Pretty_utils.pp_flowlist ~left:"(" ~sep:"," ~right:")" self#exp fmt [] ;
-      Format.fprintf fmt "@ %t" (fun fmt -> self#pp_close_annotation fmt);
+      Pretty_utils.pp_list ~pre:"/*@@ ghost (" ~suf:") */" self#exp fmt ghost_args;
       (* Now the terminator *)
       fprintf fmt "%s" instr_terminator
     in
@@ -1885,7 +1899,14 @@ class cil_printer () = object (self)
         else if nameOpt = None then printAttributes fmt a
         else fprintf fmt "(%a%a)" printAttributes a pname (a <> [])
       in
-      let pp_params fmt args pp_args =
+      let partition_ghosts is_ghost args =
+        match args with
+        | None -> None, []
+        | Some l ->
+          let ghost_args, args = List.partition is_ghost l in
+          (match args with [] -> None | _ -> Some args), ghost_args
+      in
+      let pp_params fmt (args, ghost_args) pp_args =
         fprintf fmt "%t(@[%t@])" name'
           (fun fmt ->
              match args with
@@ -1896,9 +1917,8 @@ class cil_printer () = object (self)
                Pretty_utils.pp_list ~sep:",@ " pp_args fmt args;
                if isvararg then fprintf fmt "@ , ...")
         ;
-        Format.fprintf fmt "%t ghost (" (fun fmt -> self#pp_open_annotation fmt);
-        Pretty_utils.pp_list ~sep:",@ " pp_args fmt [] ;
-        Format.fprintf fmt ")@ %t" (fun fmt -> self#pp_close_annotation fmt);
+        Pretty_utils.pp_list ~pre:"/*@@ ghost (" ~suf:") */"
+          pp_args fmt ghost_args
       in
       let pp_params fmt = match fundecl with
         | None ->
@@ -1910,12 +1930,20 @@ class cil_printer () = object (self)
               (self#typ (Some (fun fmt -> fprintf fmt "%s" aname))) atype
               self#attributes rest
           in
-          pp_params fmt args pp_args
+          let p = partition_ghosts
+              (fun (_,_,a) -> Cil.hasAttribute Cil.frama_c_ghost a)
+              args
+          in
+          pp_params fmt p pp_args
         | Some fundecl ->
           let args =
             try Some (Cil.getFormalsDecl fundecl) with Not_found -> None
           in
-          pp_params fmt args self#vdecl
+          let p = partition_ghosts
+              (fun vi -> Cil.hasAttribute Cil.frama_c_ghost vi.vattr)
+              args
+          in
+          pp_params fmt p self#vdecl
       in
       self#typ (Some pp_params) fmt restyp
 

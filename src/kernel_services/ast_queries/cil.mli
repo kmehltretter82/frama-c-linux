@@ -1171,6 +1171,8 @@ val dropAttribute: string -> attributes -> attributes
  *  Maintains the attributes in sorted order *)
 val dropAttributes: string list -> attributes -> attributes
 
+val frama_c_ghost: string
+
 (** a field struct marked with this attribute is known to be mutable, i.e.
     it can be modified even on a const object.
 
