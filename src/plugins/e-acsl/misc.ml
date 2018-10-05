@@ -306,6 +306,11 @@ let term_has_lv_from_vi t =
 
 type pred_or_term = PoT_pred of predicate | PoT_term of term
 
+let mk_ptr_sizeof typ loc =
+  match Cil.unrollType typ with
+  | TPtr (t', _) -> Cil.new_exp ~loc (SizeOf t')
+  | _ -> assert false
+
 (*
 Local Variables:
 compile-command: "make"

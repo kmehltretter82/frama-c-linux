@@ -78,6 +78,7 @@ PLUGIN_CMO:= local_config \
 	loops \
 	quantif \
 	at_with_lscope \
+	mmodel_translate \
 	translate \
 	temporal \
 	prepare_ast \
