@@ -483,7 +483,7 @@ and context_insensitive_term_to_exp kf env t =
   | TBinOp((BOr | BXor | BAnd), _, _) ->
     (* other logic/arith operators  *)
     not_yet env "missing binary bitwise operator"
-  | TBinOp(PlusPI | IndexPI | MinusPI | MinusPP as bop, t1, t2) ->
+  | TBinOp(PlusPI | IndexPI | MinusPI as bop, t1, t2) ->
     if Misc.is_set_of_ptr_or_array t1.term_type ||
       Misc.is_set_of_ptr_or_array t2.term_type then
         (* case of arithmetic over set of pointers (due to use of ranges)
@@ -497,6 +497,18 @@ and context_insensitive_term_to_exp kf env t =
     let e1, env = term_to_exp kf env t1 in
     let e2, env = term_to_exp kf env t2 in
     Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)), env, false, ""
+  | TBinOp(MinusPP, t1, t2) ->
+    begin match Typing.get_integer_ty t with
+      | Typing.C_type _ ->
+        let e1, env = term_to_exp kf env t1 in
+        let e2, env = term_to_exp kf env t2 in
+        let ty = Typing.get_typ t in
+        Cil.new_exp ~loc (BinOp(MinusPP, e1, e2, ty)), env, false, ""
+      | Typing.Gmp ->
+        not_yet env "pointer subtraction resulting in gmp"
+      | Typing.Other ->
+        assert false
+    end
   | TCastE(ty, t') ->
     let e, env = term_to_exp kf env t' in
     let e, env = add_cast ~loc ~name:"cast" env (Some ty) false (Some t) e in
