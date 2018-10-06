@@ -6498,16 +6498,17 @@ and doExp local_env
         | Lval (Var fv, NoOffset) -> Cil.is_special_builtin fv.vname
         | _ -> false
       in
-      let init_chunk = unspecified_chunk empty in
       (* Do the arguments. In REVERSE order !!! Both GCC and MSVC do this *)
-      let rec loopArgs = function
+      let rec loopArgs
+          ?(init_chunk=unspecified_chunk empty) ?(are_ghost=false)
+        = function
         | ([], []) ->
           (match argTypes, f''.enode with
            | None, Lval (Var f,NoOffset) ->
              (* we call a function without prototype with 0 argument.
                 Hence, it really has no parameter.
              *)
-             if not isSpecialBuiltin then begin
+             if not isSpecialBuiltin && not are_ghost then begin
                warn_no_proto f;
                let typ = TFun (resType, Some [], false,attrs) in
                Cil.update_var_type f typ;
@@ -6520,11 +6521,13 @@ and doExp local_env
         | _, [] ->
           if not isSpecialBuiltin then
             Kernel.error ~once:true ~current:true
-              "Too few arguments in call to %a." Cil_printer.pp_exp f' ;
+              "Too few %s in call to %a."
+              ((if are_ghost then "ghost " else "") ^ "arguments")
+              Cil_printer.pp_exp f' ;
           (init_chunk, [])
 
         | ((_, at, _) :: atypes, a :: args) ->
-          let (ss, args') = loopArgs (atypes, args) in
+          let (ss, args') = loopArgs ~init_chunk ~are_ghost (atypes, args) in
           (* Do not cast as part of translating the argument. We let
            * the castTo do this work. This was necessary for
            * test/small1/union5, in which a transparent union is passed
@@ -6597,7 +6600,9 @@ and doExp local_env
           if not isvar && argTypes != None && not isSpecialBuiltin then
             (* Do not give a warning for functions without a prototype*)
             Kernel.error ~once:true ~current:true
-              "Too many arguments in call to %a" Cil_printer.pp_exp f';
+              "Too many %s in call to %a"
+              ((if are_ghost then "ghost " else "") ^ "arguments")
+              Cil_printer.pp_exp f';
           let rec loop = function
               [] -> (init_chunk, [])
             | a :: args ->
@@ -6646,7 +6651,15 @@ and doExp local_env
            *)
           )
       in
-      let (sargs, args') = loopArgs (argTypesList, args) in
+      let (argTypes, ghostArgTypes) = List.partition
+          (fun (_, _, a) ->
+             not (Cil.hasAttribute Cil.frama_c_ghost a) || ghost)
+          argTypesList
+      in
+      let args = if ghost then args @ ghost_args else args in
+      let (sghost, ghosts') = loopArgs ~are_ghost:true (ghostArgTypes, ghost_args) in
+      let (sargs, args') = loopArgs ~init_chunk:sghost (argTypes, args) in
+      let (sargs, args') = (sargs, args' @ ghosts') in
       (* Setup some pointer to the elements of the call. We may change
        * these below *)
       let s0 = unspecified_chunk empty in

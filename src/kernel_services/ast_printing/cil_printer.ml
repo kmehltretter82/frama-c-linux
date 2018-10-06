@@ -873,24 +873,29 @@ class cil_printer () = object (self)
        | Lval(Var _, _) -> self#exp fmt e
        | _ -> fprintf fmt "(%a)"  self#exp e);
 
-      let must_ghost_param_list =
-        let (_, param_types, _, _) = Cil.splitFunctionType (Cil.typeOf e) in
-        let attrs = List.map (fun (_,_,a) -> a) (Cil.argsToList param_types) in
-        List.map (Cil.hasAttribute Cil.frama_c_ghost) attrs
+      let (_, param_ts, _, _) = Cil.splitFunctionType (Cil.typeOf e) in
+      let param_ts = Cil.argsToList param_ts in
+      let is_ghost_type (_, _, a) = Cil.hasAttribute Cil.frama_c_ghost a in
+
+      let rec split = function
+        (* it means we have a va_list *)
+        | [], args ->
+          args, []
+        (* all remaining arguments are necessarily ghosts *)
+        | t :: _ , args when is_ghost_type t ->
+          [], args
+        | _ :: l , a :: args' ->
+          let (args, ghosts) = split (l, args') in
+          (a :: args, ghosts)
+        (* it could not typecheck *)
+        | _ :: _ , [] -> assert false
       in
-      let args, ghost_args =
-        let p = List.combine must_ghost_param_list args in
-        let (ghost_args, args) = List.partition
-            (fun (t, _) -> t && not is_ghost)
-            p
-        in
-        snd (List.split args) , snd (List.split ghost_args)
-      in
+      let args, ghosts = if is_ghost then args, [] else split (param_ts, args) in
 
       (* Now the arguments *)
       Pretty_utils.pp_flowlist ~left:"(" ~sep:"," ~right:")" self#exp fmt args;
       (* Now the ghost arguments *)
-      Pretty_utils.pp_list ~pre:"/*@@ ghost (" ~suf:") */" self#exp fmt ghost_args;
+      Pretty_utils.pp_list ~pre:"/*@@ ghost (" ~suf:") */" self#exp fmt ghosts;
       (* Now the terminator *)
       fprintf fmt "%s" instr_terminator
     in
@@ -1904,7 +1909,7 @@ class cil_printer () = object (self)
         | None -> None, []
         | Some l ->
           let ghost_args, args = List.partition is_ghost l in
-          (match args with [] -> None | _ -> Some args), ghost_args
+          Some args, ghost_args
       in
       let pp_params fmt (args, ghost_args) pp_args =
         fprintf fmt "%t(@[%t@])" name'
