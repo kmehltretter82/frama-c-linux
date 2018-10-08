@@ -28,7 +28,6 @@ open Cil
 open Cil_types
 open Promelaast
 open Logic_simplification
-open Map
 
 exception Empty_automaton
 
@@ -434,7 +433,7 @@ module StringMap = Datatype.String.Map
 *)
 type table = varinfo StringMap.t
 
-type env = {mutable event:current_event list ; mutable var:table}
+type env = { event:current_event list ; var:table}
 
 let add_current_event event env cond =
   let is_empty tbl = Cil_datatype.Varinfo.Hashtbl.length tbl = 0 in
@@ -443,7 +442,7 @@ let add_current_event event env cond =
     | old_event :: tl ->
       match event, old_event with
         | ENone, _ -> env, cond
-        | _, ENone -> (env.event <- (event::tl)); env, cond
+        | _, ENone -> {event = event::tl ; var = env.var}, cond
         | ECall (kf1,_,_), ECall (kf2,_,_)
           when Kernel_function.equal kf1 kf2 -> env, cond
         | ECall (kf1,tbl1,_), ECall (kf2,tbl2,_)->
@@ -452,15 +451,15 @@ let add_current_event event env cond =
              an empty event. If this situation occurs in an handwritten
              automaton that uses formals we simply reject it.
            *)
-          if is_empty tbl1 && is_empty tbl2 then ( (env.event <- (ENone::tl)); env, TFalse )
+          if is_empty tbl1 && is_empty tbl2 then ( {event = ENone::tl; var = env.var}, TFalse )
           else
             Aorai_option.abort
               "specification is inconsistent: two call events for distinct \
                functions %a and %a at the same time."
               Kernel_function.pretty kf1 Kernel_function.pretty kf2
-        | ECall (_,_,_), EMulti -> (env.event <- event::tl); env, cond
+        | ECall (_,_,_), EMulti -> { event = event::tl; var = env.var }, cond
         | ECall (kf1,tbl1,_), EReturn kf2 ->
-          if is_empty tbl1 then ( env.event <- (ENone::tl); env, TFalse)
+          if is_empty tbl1 then ( {event = (ENone::tl); var = env.var}, TFalse)
           else
             Aorai_option.abort
               "specification is inconsistent: trying to call %a and \
@@ -468,26 +467,26 @@ let add_current_event event env cond =
               Kernel_function.pretty kf1 Kernel_function.pretty kf2
         | ECall(kf1,_,_), ECOR kf2
           when Kernel_function.equal kf1 kf2 ->
-          env.event <- (event::tl); env, cond
+          {event = event::tl; var = env.var}, cond
         | ECall (kf1,tbl1,_), ECOR kf2 ->
-          if is_empty tbl1 then ( env.event <- (ENone::tl); env, TFalse)
+          if is_empty tbl1 then ( { event = (ENone::tl); var = env.var}, TFalse)
           else
             Aorai_option.abort
               "specification is inconsistent: trying to call %a and \
                call or return from %a at the same time."
               Kernel_function.pretty kf1 Kernel_function.pretty kf2
         | EReturn kf1, ECall(kf2,tbl2,_) ->
-          if is_empty tbl2 then ( env.event <- (ENone::tl); env, TFalse)
+          if is_empty tbl2 then ( {event = (ENone::tl); var = env.var}, TFalse)
           else
             Aorai_option.abort
               "specification is inconsistent: trying to call %a and \
                return from %a at the same time."
             Kernel_function.pretty kf2 Kernel_function.pretty kf1
         | EReturn kf1, (ECOR kf2 | EReturn kf2)
-          when Kernel_function.equal kf1 kf2 -> env.event <- (event::tl); env, cond
-        | EReturn _, EReturn _ -> env.event <- (ENone::tl); env, TFalse
-        | EReturn _, ECOR _ -> env.event <- (ENone::tl); env, TFalse
-        | EReturn _, EMulti -> env.event <- (ENone::tl); env, TFalse
+          when Kernel_function.equal kf1 kf2 -> { event = (event::tl); var = env.var}, cond
+        | EReturn _, EReturn _ -> { event = (ENone::tl); var = env.var } , TFalse
+        | EReturn _, ECOR _ -> { event = (ENone::tl); var = env.var }, TFalse
+        | EReturn _, EMulti -> { event = (ENone::tl); var =  env.var }, TFalse
         | (EMulti | ECOR _), _ -> assert false
           (* These are compound event. They cannot be found as individual ones*)
 
@@ -499,31 +498,31 @@ let merge_current_event env1 env2 cond1 cond2 =
       | _, ENone -> env1, (tor cond1 cond2, [])
       | ECall(kf1,_,_), ECall(kf2,_,_)
         when Kernel_function.equal kf1 kf2 -> env2,  (tor cond1 cond2, [])
-      | ECall _, ECall _ -> env2.event <- (EMulti::old_env); env2, (tor cond1 cond2, [])
+      | ECall _, ECall _ -> { event = (EMulti::old_env); var = env2.var}, (tor cond1 cond2, [])
       | ECall _, EMulti -> env2, (tor cond1 cond2, [])
       | ECall (kf1,_,_), ECOR kf2 when Kernel_function.equal kf1 kf2 ->
         env2, (tor cond1 cond2, [])
       | ECall (kf1,_,_), EReturn kf2 when Kernel_function.equal kf1 kf2 ->
-        env2.event <- (ECOR kf1 :: old_env); env2, (tor cond1 cond2, [])
-      | ECall _, (ECOR _ | EReturn _) -> env2.event <- (EMulti :: old_env); env2, (tor cond1 cond2, [])
+        { event =  (ECOR kf1 :: old_env); var = env2.var}, (tor cond1 cond2, [])
+      | ECall _, (ECOR _ | EReturn _) -> { event =  (EMulti :: old_env); var = env2.var}, (tor cond1 cond2, [])
       | EReturn kf1, ECall (kf2,_,_) when Kernel_function.equal kf1 kf2 ->
-        env2.event <- (ECOR kf1 :: old_env); env2, (tor cond1 cond2, [])
-      | EReturn _, ECall _  -> env2.event <- (EMulti :: old_env); env2, (tor cond1 cond2, [])
+        { event =  (ECOR kf1 :: old_env); var = env2.var}, (tor cond1 cond2, [])
+      | EReturn _, ECall _  -> { event =  (EMulti :: old_env); var = env2.var}, (tor cond1 cond2, [])
       | EReturn kf1, EReturn kf2 when Kernel_function.equal kf1 kf2 ->
         env2, (tor cond1 cond2, [])
-      | EReturn _, EReturn _ -> env2.event <- (EMulti :: old_env); env2, (tor cond1 cond2, [])
+      | EReturn _, EReturn _ -> { event =  (EMulti :: old_env); var = env2.var}, (tor cond1 cond2, [])
       | EReturn _, EMulti -> env2, (tor cond1 cond2, [])
       | EReturn kf1, ECOR kf2 when Kernel_function.equal kf1 kf2 ->
         env2, (tor cond1 cond2, [])
       | EReturn _, ECOR _ ->
-        env2.event <- (EMulti :: old_env); env2, (tor cond1 cond2, [])
+        { event =  (EMulti :: old_env); var = env2.var}, (tor cond1 cond2, [])
       | ECOR kf1, (ECall(kf2,_,_) | EReturn kf2 | ECOR kf2)
         when Kernel_function.equal kf1 kf2 -> env1, (tor cond1 cond2, [])
       | ECOR _, (ECall _ | EReturn _ | ECOR _) ->
-        env2.event <- (EMulti :: old_env); env2, (tor cond1 cond2, [])
+        { event =  (EMulti :: old_env); var = env2.var}, (tor cond1 cond2, [])
       | ECOR _, EMulti -> env2, (tor cond1 cond2, [])
       | EMulti, (ECall _ | EReturn _ | ECOR _) -> env1, (tor cond1 cond2, [])
-      | EMulti, EMulti -> env2.event <- (EMulti::old_env); env2, (tor cond1 cond2, [])
+      | EMulti, EMulti -> { event =  (EMulti::old_env); var = env2.var}, (tor cond1 cond2, [])
 
 let get_bindings st my_var =
   let my_lval = TVar my_var, TNoOffset in
@@ -904,7 +903,7 @@ let type_cond needs_pebble env tr cond =
       begin
         let env, term_tmp, c1 = type_expr env ~tr ?current e in
         match term_tmp.term_type with
-          | Ctype(t) -> let v = Cil.makeGlobalVar (get_fresh ("aorai_" ^ s)) t in env.var <- (StringMap.add s v (env.var)); env, (c1, [Copy_value((TVar(Cil.cvar_to_lvar v), TNoOffset), term_tmp )])
+          | Ctype(t) -> let v = Cil.makeGlobalVar (get_fresh ("aorai_" ^ s)) t in { event = env.event; var = (StringMap.add s v env.var)}, (c1, [Copy_value((TVar(Cil.cvar_to_lvar v), TNoOffset), term_tmp )])
         (*Cil.Cvar_to_lvar v pour en faire une logic var puis il faut le transformer en term_lval*)
           | _ ->  Aorai_option.abort "Not the right type"
       end
@@ -957,8 +956,8 @@ let type_cond needs_pebble env tr cond =
         in
         if pos then let env1, cond = add_current_event (EReturn kf) env (TReturn kf) in env1, (cond, [])
         else env, (TReturn kf, [])
-  in env.event <- (ENone::(env.event));
-  aux true env cond
+  in
+  aux true {event = (ENone::(env.event)); var = env.var} cond
 
 module Reject_state =
   State_builder.Option_ref(Aorai_state)
@@ -1095,7 +1094,7 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
                 (env, states, transitions, curr_start, seq_end)
               | EReturn kf1 :: ECall (kf2,_,_) :: tl
                   when Kernel_function.equal kf1 kf2 ->
-                env.event <- tl ; ( env, states, transitions, curr_start, seq_end)
+                ( {event = tl ; var= env.var }, states, transitions, curr_start, seq_end)
               | (EReturn _ | ECOR _ ) :: _ ->
                     (* If there is as mismatch (e.g. Call f; Return g), it will
                        be caught later. There are legitimate situations for
@@ -1104,7 +1103,7 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
                      *)
                 (env, states, transitions, curr_start, seq_end)
               | EMulti :: env_tmp ->
-                env.event <- env_tmp; (env, states, transitions, curr_start, seq_end))
+                ( { event = env_tmp; var = env.var }, states, transitions, curr_start, seq_end))
       in
       let loop_end = if has_loop then new_intermediate_state () else inner_end
       in
@@ -1461,7 +1460,7 @@ let type_cond_auto (st,tr as auto) =
     if List.memq st acc then acc else st::acc
   in
   let type_trans (states,transitions,add_reject) tr =
-    let (intermediate_states, trans, needs_reject) = type_trans auto {event = []; var = StringMap.empty } tr in
+    let (intermediate_states, trans, needs_reject) = type_trans auto {event = []; var = StringMap.empty } tr in (*TODO*)
     Aorai_option.debug
       "Considering parsed transition %s -> %s" tr.start.name tr.stop.name;
     Aorai_option.debug
