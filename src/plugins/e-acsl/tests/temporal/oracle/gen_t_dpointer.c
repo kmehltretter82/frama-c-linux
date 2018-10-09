@@ -24,9 +24,9 @@ int main(void)
     __e_acsl_temporal_reset_parameters();
     __e_acsl_temporal_reset_return();
     __e_acsl_initialize((void *)(p + i),sizeof(int *));
-    /*@ assert Value: mem_access: \valid(p + i); */
+    /*@ assert Eva: mem_access: \valid(p + i); */
     *(p + i) = (int *)malloc(sizeof(int));
-    /*@ assert Value: initialization: \initialized(p + i); */
+    /*@ assert Eva: initialization: \initialized(p + i); */
     __e_acsl_temporal_store_nblock((void *)(p + i),(void *)*(p + i));
     /*@ assert \valid(*(p + i)); */
     {
@@ -43,7 +43,7 @@ int main(void)
                                                       (void *)(& p));
         __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"main",
                         (char *)"mem_access: \\valid_read(p + i)",14);
-        /*@ assert Value: initialization: \initialized(p + i); */
+        /*@ assert Eva: initialization: \initialized(p + i); */
         __gen_e_acsl_valid_2 = __e_acsl_valid((void *)*(p + i),sizeof(int),
                                               (void *)*(p + i),
                                               (void *)(p + i));
@@ -58,8 +58,8 @@ int main(void)
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
   __e_acsl_temporal_save_nreferent_parameter((void *)(p + 2),0U);
-  /*@ assert Value: initialization: \initialized(p + 2); */
-  /*@ assert Value: mem_access: \valid_read(p + 2); */
+  /*@ assert Eva: initialization: \initialized(p + 2); */
+  /*@ assert Eva: mem_access: \valid_read(p + 2); */
   free((void *)*(p + 2));
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
@@ -79,7 +79,7 @@ int main(void)
                                                       (void *)(& p));
       __e_acsl_assert(__gen_e_acsl_valid_read_2,(char *)"RTE",(char *)"main",
                       (char *)"mem_access: \\valid_read(p + 2)",20);
-      /*@ assert Value: dangling_pointer: ¬\dangling(p + 2); */
+      /*@ assert Eva: dangling_pointer: ¬\dangling(p + 2); */
       __gen_e_acsl_valid_3 = __e_acsl_valid((void *)*(p + 2),sizeof(int),
                                             (void *)*(p + 2),(void *)(
                                             p + 2));

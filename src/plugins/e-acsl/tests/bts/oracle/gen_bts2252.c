@@ -45,7 +45,7 @@ int main(void)
                         (char *)"main",(char *)"!\\valid_read(srcbuf + i)",
                         16);
       }
-      /*@ assert Value: mem_access: \valid_read(srcbuf + i); */
+      /*@ assert Eva: mem_access: \valid_read(srcbuf + i); */
       if ((int)*(srcbuf + i) == (int)ch) loc = i;
       i ++;
     }

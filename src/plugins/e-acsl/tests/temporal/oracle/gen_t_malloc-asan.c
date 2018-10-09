@@ -42,7 +42,7 @@ int main(void)
     p = (int *)malloc((unsigned long)(1024 * 1024));
     __e_acsl_temporal_store_nblock((void *)(& p),(void *)*(& p));
     counter ++;
-    /*@ assert Value: dangling_pointer: ¬\dangling(&q); */
+    /*@ assert Eva: dangling_pointer: ¬\dangling(&q); */
     if (p != q) {
       __e_acsl_temporal_reset_parameters();
       __e_acsl_temporal_reset_return();
@@ -60,11 +60,11 @@ int main(void)
     __e_acsl_full_init((void *)(& p));
     p = (int *)0;
   }
-  /*@ assert Value: dangling_pointer: ¬\dangling(&p); */
+  /*@ assert Eva: dangling_pointer: ¬\dangling(&p); */
   if (p) {
-    /*@ assert Value: dangling_pointer: ¬\dangling(&q); */
+    /*@ assert Eva: dangling_pointer: ¬\dangling(&q); */
     __e_acsl_initialize((void *)q,sizeof(int));
-    /*@ assert Value: mem_access: \valid(q); */
+    /*@ assert Eva: mem_access: \valid(q); */
     *q = 1;
     __e_acsl_initialize((void *)p,sizeof(int));
     *p = 2;

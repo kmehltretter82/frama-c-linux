@@ -33,7 +33,7 @@ int main(void)
                                                     sizeof(int *));
     if (__gen_e_acsl_initialized) {
       int __gen_e_acsl_valid;
-      /*@ assert Value: dangling_pointer: ¬\dangling(&p); */
+      /*@ assert Eva: dangling_pointer: ¬\dangling(&p); */
       __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(int),(void *)p,
                                           (void *)(& p));
       __gen_e_acsl_and = __gen_e_acsl_valid;

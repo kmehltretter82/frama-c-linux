@@ -118,9 +118,8 @@ int main(void)
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_add),
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__5));
     __gen_e_acsl__7 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_div_2));
-    /*@ assert Value: signed_overflow: -2147483648 ≤ 1 + __gen_e_acsl__7;
-    */
-    /*@ assert Value: signed_overflow: 1 + __gen_e_acsl__7 ≤ 2147483647; */
+    /*@ assert Eva: signed_overflow: -2147483648 ≤ 1 + __gen_e_acsl__7; */
+    /*@ assert Eva: signed_overflow: 1 + __gen_e_acsl__7 ≤ 2147483647; */
     __e_acsl_assert(1 + __gen_e_acsl__7 == 1,(char *)"Assertion",
                     (char *)"main",
                     (char *)"1 + (z + 1) / (y - 123456789123456789) == 1",34);

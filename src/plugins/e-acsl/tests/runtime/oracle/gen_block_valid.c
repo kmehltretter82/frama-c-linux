@@ -94,10 +94,10 @@ int main(int argc, char **argv)
     __e_acsl_delete_block((void *)(& t));
   }
   __e_acsl_initialize((void *)pmin,sizeof(char));
-  /*@ assert Value: mem_access: \valid(pmin); */
+  /*@ assert Eva: mem_access: \valid(pmin); */
   *pmin = (char)'P';
   __e_acsl_initialize((void *)pmax,sizeof(char));
-  /*@ assert Value: mem_access: \valid(pmax); */
+  /*@ assert Eva: mem_access: \valid(pmax); */
   *pmax = (char)'L';
   int diff = (int)((unsigned long)pmax - (unsigned long)pmin);
   /*@ assert \valid(pmin); */
