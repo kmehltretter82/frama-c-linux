@@ -39,7 +39,7 @@ endif
 PLUGIN_DIR ?=.
 PLUGIN_NAME := Dive
 PLUGIN_CMO := self imprecision_graph build main
-PLUGIN_DEPENDENCIES:= Value Studia
+PLUGIN_DEPENDENCIES:= Eva Studia
 PLUGIN_HAS_MLI:= yes
 PLUGIN_TESTS_DIRS:=dive
 PLUGIN_GENERATED:=
