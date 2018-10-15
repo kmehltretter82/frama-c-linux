@@ -295,49 +295,55 @@ EACSL_DISTRIB_EXTERNAL =\
 
 PLUGIN_DISTRIB_EXTERNAL:= $(EACSL_DISTRIB_EXTERNAL)
 
-# Files of `DISTRIB_FILES` without header that is not listed into `headers/header_specs.txt` (with a `.ignore` attribute).
+# Files of `DISTRIB_FILES` without header and not listed in file
+# `headers/header_specs.txt`.
 PLUGIN_HEADER_EXCEPTIONS:=
 
-# Files that are not listed by `DISTRIB_FILES` (and by the way, without header management) decicated to distributed tests
+# Files that are not listed in `DISTRIB_FILES`
+# and decicated to distributed tests
 PLUGIN_DISTRIB_TESTS:= $(EACSL_DISTRIB_TESTS)
 
 # for e-csl-distrib target:
 EACSL_OCAML_FILES = *.mli \
-	$(patsubst $(EACSL_PLUGIN_DIR)/%,%,\
-		$(filter-out $(wildcard $(EACSL_PLUGIN_DIR)/*local_config.ml), $(wildcard $(EACSL_PLUGIN_DIR)/*.ml)))
+  $(patsubst $(EACSL_PLUGIN_DIR)/%, %, \
+    $(filter-out $(wildcard $(EACSL_PLUGIN_DIR)/*local_config.ml), \
+		 $(wildcard $(EACSL_PLUGIN_DIR)/*.ml)))
 
 EACSL_DISTRIB_FILES = \
-	$(patsubst $(EACSL_PLUGIN_DIR)/%,%,\
-		$(wildcard $(addprefix $(EACSL_PLUGIN_DIR)/, \
-			$(EACSL_OCAML_FILES) $(EACSL_DISTRIB_EXTERNAL) $(EACSL_DISTRIB_TESTS))))
+  $(patsubst $(EACSL_PLUGIN_DIR)/%,%,\
+    $(wildcard $(addprefix $(EACSL_PLUGIN_DIR)/, \
+       $(EACSL_OCAML_FILES) $(EACSL_DISTRIB_EXTERNAL) $(EACSL_DISTRIB_TESTS))))
 
 # BE CAREFUL: manually remove all *.ml* files which should not be released!
 e-acsl-distrib:
 	$(PRINT_TAR) tmp-distrib
 	cd $(EACSL_PLUGIN_DIR); \
-		$(TAR) cf tmp.tar $(EACSL_DISTRIB_FILES)
+	  $(TAR) cf tmp.tar $(EACSL_DISTRIB_FILES)
 	$(PRINT_MAKING) export directories
 	$(MKDIR) $(EACSL_PLUGIN_DIR)/$(EXPORT)
 	$(PRINT_UNTAR) tmp-distrib
 	cd $(EACSL_PLUGIN_DIR)/$(EXPORT); \
-		pwd && \
-		$(TAR) xf ../tmp.tar && \
-		autoconf && \
-		$(SED) -i -e 's/IS_DISTRIBUTED:=no/IS_DISTRIBUTED:=yes/' Makefile.in && \
-		$(RM) -rf autom4te.cache
+	  pwd && \
+	  $(TAR) xf ../tmp.tar && \
+	  autoconf && \
+	  $(SED) \
+	    -i -e 's/IS_DISTRIBUTED:=no/IS_DISTRIBUTED:=yes/' Makefile.in && \
+	  $(RM) -rf autom4te.cache
 	$(PRINT_RM) tmp-distrib
 	$(RM) $(EACSL_PLUGIN_DIR)/tmp.tar
 	$(PRINT_MAKING) archive $(EACSL_PLUGIN_DIR)/$(EXPORT).tar.gz
 	cd $(EACSL_PLUGIN_DIR) ; \
-		$(TAR) czf $(EXPORT).tar.gz $(EXPORT)
+	  $(TAR) czf $(EXPORT).tar.gz $(EXPORT)
 	$(PRINT) Cleaning
 	$(RM) -fr $(EACSL_PLUGIN_DIR)/$(EXPORT)
 
 WWW	?= /localhome/julien/frama-c/doc/www
 e-acsl-install-distrib: e-acsl-distrib
 	$(PRINT) Copying to website
-	$(CP) $(EACSL_PLUGIN_DIR)/$(EXPORT).tar.gz $(WWW)/distrib/download/e-acsl
-	$(CP) $(addprefix $(EACSL_PLUGIN_DIR)/, $(EACSL_DOC_FILES)) $(WWW)/distrib/download/e-acsl
+	$(CP) $(EACSL_PLUGIN_DIR)/$(EXPORT).tar.gz \
+	  $(WWW)/distrib/download/e-acsl
+	$(CP) $(addprefix $(EACSL_PLUGIN_DIR)/, $(EACSL_DOC_FILES)) \
+	  $(WWW)/distrib/download/e-acsl
 ifneq ("$(EACSL_MANUAL_FILES)","")
 	$(CP) $(EACSL_PLUGIN_DIR)/doc/manuals/e-acsl-manual.pdf \
 	      $(WWW)/distrib/download/e-acsl/e-acsl-manual-$(EACSL_VERSION).pdf
@@ -383,7 +389,7 @@ EACSL_CEA_LGPL=$(addprefix $(EACSL_PLUGIN_DIR)/, $(EACSL_CEA_LGPL_BARE)) \
 # valid values: open-source, close-source 
 EACSL_HEADERS?=open-source
 headers::
-	@echo "Applying $(EACSL_HEADERS) Headers..."
+	@echo "Applying $(EACSL_HEADERS) headers..."
 	headache -c $(EACSL_PLUGIN_DIR)/license/headache_config.txt \
                  -h $(EACSL_PLUGIN_DIR)/headers/$(EACSL_HEADERS)/CEA_LGPL_OR_PROPRIETARY.E_ACSL \
                  $(EACSL_CEA_LGPL)
