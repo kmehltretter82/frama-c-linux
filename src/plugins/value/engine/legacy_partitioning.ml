@@ -141,6 +141,8 @@ struct
     w.previous_state <- `Bottom;
     w.widening_counter <- widening_delay
 
+  let reset_widening_counter w = w.widening_counter <- widening_delay
+
   (* Operators *)
 
   let clear_propagation (p : propagation) : unit =

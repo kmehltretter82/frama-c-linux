@@ -90,6 +90,7 @@ sig
   val reset_propagation : propagation -> unit
   val reset_shadow : shadow -> unit
   val reset_widening : widening -> unit
+  val reset_widening_counter : widening -> unit
 
 
   (* --- Partition transfer functions --- *)

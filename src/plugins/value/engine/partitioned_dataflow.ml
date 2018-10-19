@@ -624,8 +624,9 @@ module Make_Dataflow
       ignore (process_vertex v)
     | Wto.Component (v, w) as component ->
       (* Reset the component if hierachical_convergence is set *)
-      if hierachical_convergence then
-        reset_component (v :: Wto.flatten w);
+      if hierachical_convergence
+      then reset_component (v :: Wto.flatten w)
+      else Partition.reset_widening_counter (get_vertex_widening v);
       (* Iterate until convergence *)
       let iteration_count = ref 0 in
       while
