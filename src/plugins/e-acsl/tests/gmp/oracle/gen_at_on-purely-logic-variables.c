@@ -143,18 +143,6 @@ int main(void)
             {
               int __gen_e_acsl_u_7;
               __gen_e_acsl_u_7 = 42;
-              /*@ assert
-                  Eva: mem_access:
-                    \valid(__gen_e_acsl_at_7 +
-                           (int)((int)((int)(__gen_e_acsl_u_6 - 10) * 300) +
-                                 (int)((int)((int)((int)(__gen_e_acsl_v_6 -
-                                                         -10)
-                                                   - 1)
-                                             * 100)
-                                       +
-                                       (int)((int)(__gen_e_acsl_w_2 - 100) -
-                                             1))));
-              */
               *(__gen_e_acsl_at_7 + ((__gen_e_acsl_u_6 - 10) * 300 + (
                                      ((__gen_e_acsl_v_6 - -10) - 1) * 100 + (
                                      (__gen_e_acsl_w_2 - 100) - 1)))) = 
