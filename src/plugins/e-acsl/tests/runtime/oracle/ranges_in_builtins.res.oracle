@@ -1,13 +1,10 @@
 [e-acsl] beginning translation.
-[e-acsl] tests/runtime/ranges_in_builtins.c:57: Warning: 
+[e-acsl] tests/runtime/ranges_in_builtins.c:64: Warning: 
   E-ACSL construct `arithmetic over set of pointers or arrays'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] tests/runtime/ranges_in_builtins.c:5: Warning: 
-  E-ACSL construct `size of memory area in GMP' is not yet supported.
-  Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] tests/runtime/ranges_in_builtins.c:13: Warning: 
+[eva:alarm] tests/runtime/ranges_in_builtins.c:19: Warning: 
   assertion got status unknown.
-[eva:alarm] tests/runtime/ranges_in_builtins.c:15: Warning: 
+[eva:alarm] tests/runtime/ranges_in_builtins.c:21: Warning: 
   assertion got status invalid (stopping propagation).

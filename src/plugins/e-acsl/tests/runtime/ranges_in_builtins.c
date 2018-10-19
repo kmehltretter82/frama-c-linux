@@ -4,6 +4,12 @@
 #include "stdlib.h"
 /*@ requires !\valid(s + (3..n+1000)); */
 void f(char *s, long n){}
+/*@ requires \valid(ptr + (0 .. size - 1));
+    ensures ! \valid(ptr + (0 .. size + 1));
+    // In pure ACSL, the following predicate is true;
+    // however at runtime, its evalulation results in UB ==> false.
+    // ensures  ! \valid(ptr + (0 .. SIZE_MAX*SIZE_MAX)); */
+void g(long *ptr, size_t size) { }
 extern void *malloc(size_t p);
 extern void free(void* p);
 struct S { int a[2]; float *b; float *c;};
@@ -24,6 +30,7 @@ int main(void) {
   long t[3] = {7l, 8l, 9l};
   /*@ assert \valid(&t[0..2]); */ ;
   /*@ assert !\valid(&t[3..5]); */ ;
+  g(t, 3);
 
   double t2[4];
   t2[0] = 0.5;
