@@ -44,10 +44,14 @@ struct
     let eval_exp_to_int = Transfer.eval_exp_to_int
 
     include Domain
+
+    let smash = function
+      | [] -> []
+      | v1 :: l -> [ List.fold_left join v1 l ]
   end
 
   module Index = Partitioning.Make (Domain)
-  module Partition = Partition.Make (Domain)
+  module Flow = Partition.MakeFlow (Domain)
 
   type state = Domain.t
 
@@ -61,8 +65,12 @@ struct
     mutable store_size : int;
   }
 
-  type propagation = {
-    mutable partition : state partition;
+  type flow = {
+    mutable flow_states : Flow.t;
+  }
+
+  type tank = {
+    mutable tank_states : state partition;
   }
 
   type widening_state = {
@@ -91,8 +99,11 @@ struct
       store_size = 0;
     }
 
-  let empty_propagation () : propagation =
-    { partition = Partition.empty }
+  let empty_flow () : flow =
+    { flow_states = Flow.empty }
+
+  let empty_tank () : tank =
+    { tank_states = Partition.empty }
 
   let empty_widening ~(stmt : stmt option) : widening =
     {
@@ -100,14 +111,14 @@ struct
       widening_partition = Partition.empty;
     }
 
-  let initial_propagation (states : state list) : propagation =
-    let partition = Partition.initial states in
+  let initial_tank (states : state list) : tank =
+    let propagation = Flow.initial states in
     (* Split the initial partition according to the global split seetings *)
-    let split partition lval =
-      Partition.transfer_keys partition (Dynamic_split lval)
+    let split propagation lval =
+      Flow.transfer_keys propagation (Dynamic_split lval)
     in
-    let partition = List.fold_left split partition universal_splits in
-    { partition }
+    let states = List.fold_left split propagation universal_splits in
+    { tank_states = Flow.to_partition states }
 
 
   (* Pretty printing *)
@@ -115,8 +126,8 @@ struct
   let pretty_store (fmt : Format.formatter) (s : store) : unit =
     Partition.iter (Domain.pretty fmt) s.store_partition
 
-  let pretty_propagation (fmt : Format.formatter) (p : propagation) =
-    Partition.iter (Domain.pretty fmt) p.partition
+  let pretty_flow (fmt : Format.formatter) (p : flow) =
+    Flow.iter (Domain.pretty fmt) p.flow_states
 
 
   (* Accessors *)
@@ -125,33 +136,62 @@ struct
     Partition.to_list s.store_partition
 
   let smashed (s : store) : state or_bottom =
-    match expanded s with
-    | [] -> `Bottom
-    | v1 :: l -> `Value (List.fold_left Domain.join v1 l)
+    Bottom.of_list (Domain.smash (expanded s))
+
+  let contents (f : flow) : state list =
+    Flow.to_list f.flow_states
 
   let is_empty_store (s : store) : bool =
     Partition.is_empty s.store_partition
 
-  let is_empty_propagation (p : propagation) : bool =
-    Partition.is_empty p.partition
+  let is_empty_flow (f : flow) : bool =
+    Flow.is_empty f.flow_states
+
+  let is_empty_tank (t : tank) : bool =
+    Partition.is_empty t.tank_states
 
   let store_size (s : store) : int =
     s.store_size
 
-  let propagation_size (p : propagation) : int =
-    Partition.size p.partition
+  let flow_size (f : flow) : int =
+    Flow.size f.flow_states
 
+  let tank_size (t : tank) : int =
+    Partition.size t.tank_states
 
   (* Partition transfer functions *)
 
-  let enter_loop (p : propagation) (i : loop) =
-    p.partition <- Partition.transfer_keys p.partition (Enter_loop (unroll i))
+  let loop_transfer p action =
+    p.flow_states <- Flow.transfer_keys p.flow_states action
 
-  let leave_loop (p : propagation) (_i : loop) =
-    p.partition <- Partition.transfer_keys p.partition Leave_loop
+  let enter_loop (p : flow) (i : loop) : unit =
+    loop_transfer p (Enter_loop (unroll i))
 
-  let next_loop_iteration (p : propagation) (_i : loop) =
-    p.partition <- Partition.transfer_keys p.partition Incr_loop
+  let leave_loop (p : flow) (_i : loop) : unit =
+    loop_transfer p Leave_loop
+
+  let next_loop_iteration (p : flow) (_i : loop) : unit =
+    loop_transfer p Incr_loop
+
+  let split_return (flow : flow) (return_exp : exp option) : unit =
+    (** Join every state in the list *)
+    let transfer_split states =
+      match Split_return.kf_strategy kf with
+      | Split_strategy.SplitEqList i ->
+        begin match return_exp with
+          | Some return_exp ->
+            let states = Transfer.split_final_states kf return_exp i states in
+            List.flatten (List.map Domain.smash states)
+          | None ->
+            Domain.smash states
+        end
+      | Split_strategy.NoSplit   -> Domain.smash states
+      | Split_strategy.FullSplit -> states
+      (* Last case not possible : already transformed into SplitEqList *)
+      | Split_strategy.SplitAuto -> assert false
+    in
+    flow.flow_states <-
+      Flow.legacy_transfer_states transfer_split flow.flow_states
 
 
   (* Reset state (for hierchical convergence) *)
@@ -162,8 +202,11 @@ struct
     in
     s.store_partition <- Partition.filter_keys is_eternal s.store_partition
 
-  let reset_propagation (p : propagation) : unit =
-    p.partition <- Partition.empty
+  let reset_flow (f : flow) : unit =
+    f.flow_states <- Flow.empty
+
+  let reset_tank (t : tank) : unit =
+    t.tank_states <- Partition.empty
 
   let reset_widening (w : widening) : unit =
     w.widening_partition <- Partition.empty
@@ -177,73 +220,68 @@ struct
 
   (* Operators *)
 
-  let clear_propagation (p : propagation) : unit =
-    p.partition <- Partition.empty
+  let drain (t : tank) : flow =
+    let flow_states = Flow.of_partition t.tank_states in
+    t.tank_states <- Partition.empty;
+    { flow_states }
 
-  let transfer (f : state list -> state list) (p : propagation) : unit =
-    p.partition <- Partition.transfer_states (fun s -> f [s]) p.partition
-
-  let merge ~(into : propagation) (source : propagation) : unit =
-    (* TODO: state the precondition for this to be correct *)
-    let merge_two dest src = (* Erase the destination *)
+  let fill ~(into : tank) (f : flow) : unit =
+    let erase dest src =
       if Extlib.has_some src
       then src
       else dest
     in
-    into.partition <- Partition.merge merge_two into.partition source.partition
+    let new_states = Flow.to_partition f.flow_states in
+    into.tank_states <- Partition.merge erase into.tank_states new_states
 
-  let join (sources : (branch*propagation) list) (dest : store)
-    : propagation =
+  let transfer (f : state -> state list) (p : flow) : unit =
+    p.flow_states <- Flow.transfer_states f p.flow_states
+
+  let join (sources : (branch*flow) list) (dest : store) : flow =
     let is_loop_head =
       match dest.store_stmt with
       | Some {skind=Cil_types.Loop _} -> true
       | _ -> false
     in
-    let current_ration = ref dest.store_size in
-    (* Update states counters *)
-    let count acc (_b,p) =
-      acc + Partition.size p.partition
-    in
-    dest.store_size <- List.fold_left count dest.store_size sources;
-    (* Get every source propagation *)
-    let source_partitions =
+    (* Get every source flow *)
+    let sources_states =
       match sources with
-      | [(_,p)] -> [p.partition]
+      | [(_,p)] -> [p.flow_states]
       | sources ->
         (* Several branches ; partition according to the incoming branch *)
         let get (b,p) =
-          Partition.transfer_keys p.partition (Branch (b,history_size))
+          Flow.transfer_keys p.flow_states (Branch (b,history_size))
         in
         List.map get sources
     in
+    (* Merge incomming flows *)
+    let flow_states =
+      List.fold_left Flow.union Flow.empty sources_states
+    in
     (* Handle ration stamps *)
+    let previous_store_size = dest.store_size in
+    dest.store_size <- dest.store_size + Flow.size flow_states;
     let slevel_exceeded = dest.store_size > dest.size_limit in
-    let rationing =
+    let rationing_action =
       if slevel_exceeded then
         (* No more slevel, no more ration tickets *)
-        fun p -> Partition.transfer_keys p (Ration_merge None)
+        Ration_merge None
       else if dest.merge then
         (* Merge / Merge after loop : a unique ration stamp for all *)
-        fun p -> Partition.transfer_keys p (Ration_merge (Some !current_ration))
-      else begin fun p ->
+        Ration_merge (Some (previous_store_size, 0))
+      else
         (* Attribute a ration stamp to each individual state *)
-        let p = Partition.transfer_keys p (Ration !current_ration) in
-        current_ration := !current_ration + Partition.size p;
-        p
-      end
+        Ration previous_store_size
     in
-    let source_partitions = List.map rationing source_partitions in
     (* Handle Split / Merge operations *)
-    let do_flow_actions partition =
-      let actions =
-        dest.flow_actions @ [Update_dynamic_splits ; Transfer_merge]
-      in
-      List.fold_left Partition.transfer_keys partition actions
+    let flow_actions = Update_dynamic_splits :: dest.flow_actions in
+    (* Execute actions *)
+    let actions = rationing_action :: flow_actions in
+    let flow_states =
+      List.fold_left Flow.transfer_keys flow_states actions
     in
-    let source_partitions = List.map do_flow_actions source_partitions in
-    (* Merge incomming propagations *)
-    let union = Partition.union Domain.join in
-    let partition = List.fold_left union Partition.empty source_partitions in
+    (* Join states with unique keys *)
+    let partition = Flow.to_partition flow_states in
     (* Add states to the store but filter out already propagated states *)
     let update key current_state =
       (* Inclusion test *)
@@ -272,11 +310,11 @@ struct
       (* Filter out already propagated states *)
       Extlib.opt_filter (fun s -> Index.add s dest.store_index) state
     in
-    let partition = Partition.map_filter update partition in
-    { partition }
+    let partition' = Partition.map_filter update partition in
+    { flow_states = Flow.of_partition partition' }
 
 
-  let widen (_s : store) (w : widening) (p : propagation) : bool =
+  let widen (w : widening) (f : flow) : bool =
     let stmt = w.widening_stmt in
     (* Auxiliary function to update the result *)
     let update key widening_state =
@@ -331,6 +369,8 @@ struct
           };
         Some curr
     in
-    p.partition <- Partition.map_filter widen_one p.partition;
-    Partition.is_empty p.partition
+    let p = Flow.to_partition f.flow_states in
+    let p' = Partition.map_filter widen_one p in
+    f.flow_states <- Flow.of_partition p';
+    Flow.is_empty f.flow_states
 end

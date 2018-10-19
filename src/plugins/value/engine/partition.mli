@@ -55,19 +55,18 @@ type branch = int
 module ExpMap = Cil_datatype.ExpStructEq.Map
 
 type key = private {
-  ration_stamp : int option;
-  transfer_stamp : int option;
+  ration_stamp : (int * int) option;
   branches : branch list;
   loops : (int * int) list;
   static_split : Integer.t ExpMap.t;
   dynamic_split : Integer.t ExpMap.t;
 }
 
+val pretty_key : Format.formatter -> key -> unit
+
+
 type 'a partition
 type 'a transfer_function = (key * 'a) list -> (key * 'a) list
-
-val stamp_after_transfer : key -> 'a list -> (key * 'a)  list
-val update_after_call : key -> 'a list -> (key * 'a)  list
 
 type unroll_limit =
   | ExpLimit of Cil_types.exp
@@ -79,8 +78,7 @@ type action =
   | Incr_loop
   | Branch of branch * int (* branch taken, max branches in history *)
   | Ration of int (* starting ration stamp *)
-  | Ration_merge of int option (* new ration stamp for the merge state *)
-  | Transfer_merge
+  | Ration_merge of (int * int) option (* new ration stamp for the merge state *)
   | Static_split of Cil_types.exp
   | Dynamic_split of Cil_types.exp
   | Static_merge of Cil_types.exp
@@ -88,6 +86,25 @@ type action =
   | Update_dynamic_splits
 
 exception InvalidAction
+
+
+val empty : 'a partition
+val is_empty : 'a partition -> bool
+val size : 'a partition -> int
+
+val to_list : 'a partition -> 'a list
+
+val find : key -> 'a partition -> 'a
+val replace : key -> 'a -> 'a partition -> 'a partition
+
+val merge : ('a option -> 'b option -> 'c option) -> 'a partition ->
+  'b partition -> 'c partition
+
+val iter : ('a -> unit) -> 'a partition -> unit
+val iteri : (key -> 'a -> unit) -> 'a partition -> unit
+val filter_keys : (key -> bool) -> 'a partition -> 'a partition
+val map_states : ('a  -> 'a) -> 'a partition -> 'a partition
+val map_filter : (key -> 'a -> 'b option) -> 'a partition -> 'b partition
 
 
 module type InputDomain =
@@ -101,29 +118,27 @@ sig
   val eval_exp_to_int : t -> Cil_types.exp -> int
 end
 
-
-module Make (Domain : InputDomain) :
+module MakeFlow (Domain : InputDomain) :
 sig
-  type t = Domain.t partition
   type state = Domain.t
+  type t
 
-  val empty : 'a partition
-  val is_empty : 'a partition -> bool
-  val initial : 'a list -> 'a partition
-  val size : 'a partition -> int
-  val to_list : 'a partition -> 'a list
+  val empty : t
 
-  val find : key -> 'a partition -> 'a
-  val replace : key -> 'a -> 'a partition -> 'a partition
-  val merge : ('a option -> 'b option -> 'c option) -> 'a partition
-    -> 'b partition -> 'c partition
-  val union : ('a -> 'a -> 'a) -> 'a partition -> 'a partition -> 'a partition
+  val initial : state list -> t
+  val to_list : t -> state list
+  val of_partition : state partition -> t
+  val to_partition : t -> state partition
 
-  val iter : ('a -> unit) -> 'a partition -> unit
+  val is_empty : t -> bool
+  val size : t -> int
+
+  val union : t -> t -> t
+
   val transfer : state transfer_function -> t -> t
   val transfer_keys : t -> action -> t
-  val filter_keys : (key -> bool) -> 'a partition -> 'a partition
-  val map_states : ('a  -> 'a) -> 'a partition -> 'a partition
-  val transfer_states : ('a -> 'a list) -> 'a partition -> 'a partition
-  val map_filter : (key -> 'a -> 'b option) -> 'a partition -> 'b partition
+  val transfer_states : (state -> state list) -> t -> t
+  val legacy_transfer_states : (state list -> state list) -> t -> t
+
+  val iter : (state -> unit) -> t -> unit
 end

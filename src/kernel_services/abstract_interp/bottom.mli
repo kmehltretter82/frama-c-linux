@@ -69,6 +69,7 @@ module Bound_Lattice
 
 (** Conversion functions. *)
 val to_list: 'a or_bottom -> 'a list
+val of_list: 'a list -> 'a or_bottom
 val bot_of_list: 'a list -> 'a list or_bottom
 val list_of_bot: 'a list or_bottom -> 'a list
 val all: 'a or_bottom list -> 'a list

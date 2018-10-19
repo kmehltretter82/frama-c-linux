@@ -45,36 +45,40 @@ end
 module type Partition =
 sig
   type state       (** The states being partitioned *)
-  type store       (** The storage of a partition *)
-  type propagation (** Only contains states which needs to be propagated, i.e.
-                       states which have not been propagated yet *)
+  type store       (** The storage of all states ever met at a control point *)
+  type flow        (** A set of states which are currently propagated *)
+  type tank        (** An organized temporary accumulation of flows *)
   type widening    (** Widening informations *)
 
 
   (* --- Constructors --- *)
 
   val empty_store : stmt:Cil_types.stmt option -> store
-  val empty_propagation : unit -> propagation
+  val empty_flow : unit -> flow
+  val empty_tank : unit -> tank
   val empty_widening : stmt:Cil_types.stmt option -> widening
 
-  (** Build the initial propagation for the entry point of a function. *)
-  val initial_propagation : state list -> propagation
+  (** Build the initial tank for the entry point of a function. *)
+  val initial_tank : state list -> tank
 
 
   (* --- Pretty printing --- *)
 
   val pretty_store : Format.formatter -> store -> unit
-  val pretty_propagation : Format.formatter -> propagation -> unit
+  val pretty_flow : Format.formatter -> flow -> unit
 
 
   (* --- Accessors --- *)
 
   val expanded : store -> state list
   val smashed : store -> state or_bottom
+  val contents : flow -> state list
   val is_empty_store : store -> bool
-  val is_empty_propagation : propagation -> bool
+  val is_empty_flow : flow -> bool
+  val is_empty_tank : tank -> bool
   val store_size : store -> int
-  val propagation_size : propagation -> int
+  val flow_size : flow -> int
+  val tank_size : tank -> int
 
 
   (* --- Reset state (for hierchical convergence) --- *)
@@ -83,7 +87,8 @@ sig
      been obtained after a widening. *)
 
   val reset_store : store -> unit
-  val reset_propagation : propagation -> unit
+  val reset_flow : flow -> unit
+  val reset_tank : tank -> unit
   val reset_widening : widening -> unit
 
   (** Resets (or just delays) the widening counter. Used on nested loops, to
@@ -95,25 +100,24 @@ sig
 
   (* --- Partition transfer functions --- *)
 
-  val enter_loop : propagation -> loop -> unit
-  val leave_loop : propagation -> loop -> unit
-  val next_loop_iteration : propagation -> loop -> unit
+  val enter_loop : flow -> loop -> unit
+  val leave_loop : flow -> loop -> unit
+  val next_loop_iteration : flow -> loop -> unit
+  val split_return : flow -> Cil_types.exp option -> unit
 
 
   (* --- Operators --- *)
 
-  (** Remove all states from the propagation, leaving it empty as if it was just
-      created by [empty_propagation] *)
-  val clear_propagation : propagation -> unit
+  (** Remove all states from the tank, leaving it empty as if it was just
+      created by [empty_tank] *)
+  val drain : tank -> flow
+
+  (** Fill the states of the flow into the tank, modifying [into] inplace but
+      letting the flow unchanged *)
+  val fill: into:tank -> flow -> unit
 
   (** Apply a transfer function to all the states of a propagation. *)
-  val transfer : (state list -> state list) -> propagation -> unit
-
-  (** Merge two propagations together, modifying [into] inplace. At the return
-      of the function, [into] should contain all the states of both original
-      propagations, or an overapproximation of this union: joining two states
-      together inside the propagation is allowed. *)
-  val merge : into:propagation -> propagation -> unit
+  val transfer : (state -> state list) -> flow -> unit
 
   (** Join all incoming propagations into the given store. This function returns
       a set of states which still need to be propagated past the store.
@@ -127,17 +131,13 @@ sig
       This function also interprets partitioning annotations at the store
       vertex (slevel, splits, merges, ...) which will generally change the
       current partitioning. *)
-  val join : (branch * propagation) list -> store -> propagation
+  val join : (branch * flow) list -> store -> flow
 
-  (** Widen a propagation at the position of the given store. The widening
-      object keeps track of the previous widenings to ensure termination. The
-      result is true when it is correct to end the propagation here, i.e. when
-      the current propagation is only carrying states which are included into
-      already propagated states.
-
-      Note that the propagation given to [widen] *must* have been produced by
-      the [join] on the same store. *)
-  val widen : store -> widening -> propagation -> bool
+  (** Widen a tank. The widening object keeps track of the previous widenings to
+      ensure termination. The result is true when it is correct to end the
+      propagation here, i.e. when the current tank is only containng
+      states which are included into already propagated states. *)
+  val widen : widening -> flow -> bool
 
 end
 

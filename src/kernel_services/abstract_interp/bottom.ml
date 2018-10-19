@@ -134,6 +134,11 @@ let to_list = function
   | `Bottom  -> []
   | `Value v -> [v]
 
+let of_list = function
+  | [] -> `Bottom
+  | [v] -> `Value v
+  | _ -> assert false
+
 let bot_of_list = function
   | [] -> `Bottom
   | l  -> `Value l
