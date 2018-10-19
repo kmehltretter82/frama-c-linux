@@ -732,7 +732,7 @@ and named_predicate_content_to_exp ?name kf env p =
       (* we already transformed \valid(t) into \initialized(&t) && \valid(t):
          now convert this right-most valid. *)
       is_visiting_valid := false;
-      call_valid t
+      call_valid t p
     end else begin
       match t.term_node, t.term_type with
       | TLval tlv, Ctype ty ->
@@ -744,7 +744,7 @@ and named_predicate_content_to_exp ?name kf env p =
         is_visiting_valid := true;
         named_predicate_to_exp kf env p
       | _ ->
-        call_valid t
+        call_valid t p
     end
   | Pvalid _ -> not_yet env "labeled \\valid"
   | Pvalid_read _ -> not_yet env "labeled \\valid_read"
@@ -763,7 +763,8 @@ and named_predicate_content_to_exp ?name kf env p =
         "initialized"
         Cil.intType
         env
-        t)
+        t
+        p)
   | Pinitialized _ -> not_yet env "labeled \\initialized"
   | Pallocable _ -> not_yet env "\\allocate"
   | Pfreeable(BuiltinLabel Here, t) ->

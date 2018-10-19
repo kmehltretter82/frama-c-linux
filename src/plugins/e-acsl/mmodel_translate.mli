@@ -35,19 +35,21 @@ val call:
 
 val call_with_size:
   loc:location -> kernel_function -> string -> typ -> Env.t -> term ->
-  exp * Env.t
-(* [call_with_size ~loc kf name ctx env t] creates a call to the E-ACSL memory
-   builtin identified by [name] which requires two arguments, namely
+  predicate -> exp * Env.t
+(* [call_with_size ~loc kf name ctx env t p] creates a call to the E-ACSL
+   memory builtin identified by [name] which requires two arguments, namely
    the pointer under study and a size in bytes.
    The only supported builtin is: [initialized].
-   [t] can denote ranges of memory locations. *)
+   [t] can denote ranges of memory locations.
+   [p] is the predicate under testing. *)
 
 val call_valid:
   loc:location -> kernel_function -> string -> typ -> Env.t -> term ->
-  exp * Env.t
-(* [call_valid ~loc kf name ctx env t] creates a call to the E-ACSL memory
+  predicate -> exp * Env.t
+(* [call_valid ~loc kf name ctx env t p] creates a call to the E-ACSL memory
    builtin [valid] or [valid_read] according to [name].
-   [t] can denote ranges of memory locations. *)
+   [t] can denote ranges of memory locations.
+   [p] is the predicate under testing. *)
 
 (**************************************************************************)
 (********************** Forward references ********************************)

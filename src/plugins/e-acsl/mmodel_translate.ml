@@ -115,8 +115,7 @@ let rec eliminate_ranges_from_index_of_toffset ~loc toffset quantifiers =
 let call ~loc kf name ctx env t =
   assert (name = "base_addr" || name = "block_length"
     || name = "offset" || name ="freeable");
-  let term_to_exp = !term_to_exp_ref in
-  let e, env = term_to_exp kf (Env.rte env true) t in
+  let e, env = !term_to_exp_ref kf (Env.rte env true) t in
   let _, res, env =
     Env.new_var
       ~loc
@@ -135,10 +134,38 @@ let call ~loc kf name ctx env t =
 (********************** \initialized, \valid, \valid_read ********************)
 (*****************************************************************************)
 
-(* Call to [__e_acsl_<name>] for terms of the form [p + r]
+(* Take the term [size] thas has been typed into GMP
+   and return an expression of type [size_t].
+   The case where [!(0 <= size < SIZE_MAX)] is an UB ==> guard against it. *)
+let gmp_to_sizet ~loc kf env size p =
+  let sizet = Cil.(theMachine.typeOfSizeOf) in
+  (* The guard *)
+  let sizet_max = Logic_const.tint
+    ~loc (Cil.max_unsigned_number (Cil.bitsSizeOf sizet))
+  in
+  let guard_upper = Logic_const.prel ~loc (Rlt, size, sizet_max) in
+  let guard_lower = Logic_const.prel ~loc (Rle, Cil.lzero ~loc (), size) in
+  let guard = Logic_const.pand ~loc (guard_lower, guard_upper) in
+  Typing.type_named_predicate ~must_clear:false guard;
+  let guard, env = !predicate_to_exp_ref kf env guard in
+  (* Translate term [size] into an exp of type [size_t] *)
+  let size, env = !term_to_exp_ref kf env size in
+  let  _, e, env = Env.new_var
+    ~loc
+    ~name:"size"
+    env
+    None
+    sizet
+    (fun vi _ ->
+      [ Misc.mk_e_acsl_guard ~reverse:true Misc.RTE kf guard p;
+        Misc.mk_call ~loc ~result:(Cil.var vi) "__gmpz_get_ui" [ size ] ])
+  in
+  e, env
+
+(* Call to [__e_acsl_<name>] for terms of the form [ptr + r]
   when [<name> = valid or initialized or valid_read] and
-  where [p] is an address and [r] a range offset *)
-let call_memory_block ~loc kf name ctx env p r =
+  where [ptr] is an address and [r] a range offset *)
+let call_memory_block ~loc kf name ctx env ptr r p =
   let n1, n2 = match r.term_node with
     | Trange(Some n1, Some n2) ->
       n1, n2
@@ -148,7 +175,7 @@ let call_memory_block ~loc kf name ctx env p r =
       assert false
   in
   (* s *)
-  let ty = match Cil.unrollType (Misc.cty p.term_type) with
+  let ty = match Cil.unrollType (Misc.cty ptr.term_type) with
     | TPtr(ty, _) | TArray(ty, _, _, _) -> ty
     | _ -> assert false
   in
@@ -159,7 +186,7 @@ let call_memory_block ~loc kf name ctx env p r =
     ~loc
     (TBinOp(
       PlusPI,
-      Logic_utils.mk_cast ~loc ~force:false typ_charptr p,
+      Logic_utils.mk_cast ~loc ~force:false typ_charptr ptr,
       Logic_const.term ~loc (TBinOp(Mult, s, n1)) Linteger))
     (Ctype typ_charptr)
   in
@@ -167,20 +194,29 @@ let call_memory_block ~loc kf name ctx env p r =
   let term_to_exp = !term_to_exp_ref in
   let ptr, env = term_to_exp kf (Env.rte env true) ptr in
   (* size *)
-  let size = Logic_const.term
-    ~loc
-    (TBinOp(
-      Mult,
-      s,
-      Logic_const.term ~loc (TBinOp(MinusA, n2, n1)) Linteger))
-    Linteger
+  let size_term =
+    (* Since [s] and [n1] have been typed through [ptr],
+       we need to clone them in order to force retyping *)
+    let s = { s with term_node = s.term_node } in
+    let n1 = { n1 with term_node = n1.term_node } in
+    Logic_const.term
+      ~loc
+      (TBinOp(
+        Mult,
+        s,
+        Logic_const.term ~loc (TBinOp(MinusA, n2, n1)) Linteger))
+      Linteger
   in
-  let ctx_ity = Typing.integer_ty_of_typ ctx in
-  Typing.type_term ~use_gmp_opt:false ~ctx:ctx_ity size;
-  let ity = Typing.get_integer_ty size in
-  if ity = Typing.gmp then Error.not_yet "size of memory area in GMP";
-  let size, env = term_to_exp kf env size in
-  let size = Cil.constFold false size in
+  Typing.type_term ~use_gmp_opt:false size_term;
+  let size, env = match Typing.get_integer_ty size_term with
+    | Typing.Gmp ->
+      gmp_to_sizet ~loc kf env size_term p
+    | Typing.C_type _ ->
+      let size, env = term_to_exp kf env size_term in
+      Cil.constFold false size, env
+    | Typing.Other ->
+      assert false
+  in
   (* base and base_addr *)
   let base, _ = Misc.ptr_index ~loc ptr in
   let base_addr  = match base.enode with
@@ -209,7 +245,7 @@ let call_memory_block ~loc kf name ctx env p r =
 
 (* [call_with_ranges] handles ranges in [t] when calling builtin [name].
   It only supports the following cases for the time being:
-    A: [\builtin(p+r)] where [p] is an address and [r] a range or
+    A: [\builtin(ptr+r)] where [ptr] is an address and [r] a range or
        [\builtin(t[r])] or
        [\builtin(t[i_1]...[i_n])] where [t] is dynamically allocated
                                   and all the indexes are integers,
@@ -226,22 +262,22 @@ let call_memory_block ~loc kf name ctx env p r =
        Contiguous locations -> a single call to [__e_acsl_valid]
     B: [\valid(&t[4][3..5][2])]
        NON-contiguous locations -> multiple calls (3) to [__e_acsl_valid] *)
-let call_with_ranges ~loc kf name ctx env t call_default =
+let call_with_ranges ~loc kf name ctx env t p call_default =
   if Misc.is_bitfield_pointers t.term_type then
     Error.not_yet "bitfield pointer";
   match t.term_node with
-  | TBinOp((PlusPI | IndexPI), p, ({ term_node = Trange _ } as r)) ->
-    if Misc.is_set_of_ptr_or_array p.term_type then
+  | TBinOp((PlusPI | IndexPI), ptr, ({ term_node = Trange _ } as r)) ->
+    if Misc.is_set_of_ptr_or_array ptr.term_type then
       Error.not_yet "arithmetic over set of pointers or arrays"
     else
       (* Case A *)
-      call_memory_block ~loc kf name ctx env p r
+      call_memory_block ~loc kf name ctx env ptr r p
   | TAddrOf(TVar lv, TIndex({ term_node = Trange _ } as r, TNoOffset)) ->
     (* Case A *)
     assert (Logic_const.is_set_type t.term_type);
     let lty_noset = Logic_const.type_of_element t.term_type in
-    let p = Logic_const.taddrof ~loc (TVar lv, TNoOffset) lty_noset in
-    call_memory_block ~loc kf name ctx env p r
+    let ptr = Logic_const.taddrof ~loc (TVar lv, TNoOffset) lty_noset in
+    call_memory_block ~loc kf name ctx env ptr r p
   | TAddrOf(TVar ({ lv_type = Ctype (TArray _) } as lv), toffset) ->
     if has_set_as_index toffset then
       (* Case B *)
@@ -279,8 +315,7 @@ let call_with_ranges ~loc kf name ctx env t call_default =
             quantifiers
         in
         Typing.type_named_predicate ~must_clear:true p_quantified;
-        let named_predicate_to_exp = !predicate_to_exp_ref in
-        named_predicate_to_exp kf env p_quantified
+        !predicate_to_exp_ref kf env p_quantified
       with Range_elimination_exception ->
         (* Case C *)
         call_default ~loc kf name ctx env t
@@ -292,7 +327,7 @@ let call_with_ranges ~loc kf name ctx env t call_default =
     call_default ~loc kf name ctx env t
 
 (* \initialized *)
-let call_with_size ~loc kf name ctx env t =
+let call_with_size ~loc kf name ctx env t p =
   assert (name = "initialized");
   let call_for_unsupported_constructs ~loc kf name ctx env t =
     let term_to_exp = !term_to_exp_ref in
@@ -319,10 +354,11 @@ let call_with_size ~loc kf name ctx env t =
     ctx
     env
     t
+    p
     call_for_unsupported_constructs
 
 (* \valid and \valid_read *)
-let call_valid ~loc kf name ctx env t =
+let call_valid ~loc kf name ctx env t p =
   assert (name = "valid" || name = "valid_read");
   let call_for_unsupported_constructs ~loc kf name ctx env t =
     let term_to_exp = !term_to_exp_ref in
@@ -356,4 +392,5 @@ let call_valid ~loc kf name ctx env t =
     ctx
     env
     t
+    p
     call_for_unsupported_constructs
