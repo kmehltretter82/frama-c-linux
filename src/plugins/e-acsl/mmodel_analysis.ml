@@ -25,6 +25,15 @@ open Cil_datatype
 
 module Dataflow = Dataflow2
 
+let must_never_monitor vi =
+  (* extern ghost variables are usually used (by the Frama-C libc) to
+     represent some internal invisible states in ACSL specifications. They do
+     not correspond to something concrete *)
+  (vi.vghost && vi.vstorage = Extern)
+  ||
+    (* incomplete types cannot be properly monitored. See BTS #2406. *)
+    not (Cil.isCompleteType vi.vtype)
+
 (* ********************************************************************** *)
 (* Backward dataflow analysis to compute a sound over-approximation of what
    left-values must be tracked by the memory model library *)
@@ -225,16 +234,20 @@ module rec Transfer
 
   let extend_to_expr always state lhost e =
     let add_vi state vi =
-      if is_ptr_or_array_exp e && (always || Varinfo.Hptset.mem vi state) then
+      if is_ptr_or_array_exp e && (always || Varinfo.Hptset.mem vi state)
+      then begin
         match base_addr e with
         | None -> state
         | Some vi_e ->
-          Options.feedback ~level:4 ~dkey
-            "monitoring %a from %a."
-            Printer.pp_varinfo vi_e
-            Printer.pp_lval (lhost, NoOffset);
-          Varinfo.Hptset.add vi_e state
-      else
+          if must_never_monitor vi then state
+          else begin
+            Options.feedback ~level:4 ~dkey
+              "monitoring %a from %a."
+              Printer.pp_varinfo vi_e
+              Printer.pp_lval (lhost, NoOffset);
+            Varinfo.Hptset.add vi_e state
+          end
+      end else
         state
     in
     match lhost with
@@ -721,44 +734,70 @@ consolidated_must_model_vi vi
       false
  *)
 
-let rec must_model_lval bhv ?kf ?stmt = function
-  | Var vi, _ -> must_model_vi bhv ?kf ?stmt vi
-  | Mem e, _ -> must_model_exp bhv ?kf ?stmt e
+let rec apply_on_vi_base_from_lval f bhv ?kf ?stmt = function
+  | Var vi, _ -> f bhv ?kf ?stmt vi
+  | Mem e, _ -> apply_on_vi_base_from_exp f bhv ?kf ?stmt e
 
-and must_model_exp bhv ?kf ?stmt e = match e.enode with
+and apply_on_vi_base_from_exp f bhv ?kf ?stmt e = match e.enode with
   | Lval lv | AddrOf lv | StartOf lv ->
-    must_model_lval bhv ?kf ?stmt lv
+    apply_on_vi_base_from_lval f bhv ?kf ?stmt lv
   | BinOp((PlusPI | IndexPI | MinusPI), e1, _, _) ->
-    must_model_exp bhv ?kf ?stmt e1
+    apply_on_vi_base_from_exp f bhv ?kf ?stmt e1
   | BinOp(MinusPP, e1, e2, _) ->
-    must_model_exp bhv ?kf ?stmt e1 || must_model_exp bhv ?kf ?stmt e2
-  | Info(e, _) | CastE(_, e) -> must_model_exp bhv ?kf ?stmt e
+    apply_on_vi_base_from_exp f bhv ?kf ?stmt e1
+    || apply_on_vi_base_from_exp f bhv ?kf ?stmt e2
+  | Info(e, _) | CastE(_, e) -> apply_on_vi_base_from_exp f bhv ?kf ?stmt e
   | BinOp((PlusA | MinusA | Mult | Div | Mod |Shiftlt | Shiftrt | Lt | Gt | Le
             | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr), _, _, _)
   | Const _ -> (* possible in case of static address *) false
   | UnOp _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ ->
     Options.fatal "[pre_analysis] unexpected expression %a" Exp.pretty e
 
+let must_model_lval = apply_on_vi_base_from_lval must_model_vi
+let must_model_exp = apply_on_vi_base_from_exp must_model_vi
+
+let must_never_monitor_lval bhv ?kf ?stmt lv =
+  apply_on_vi_base_from_lval
+    (fun _bhv ?kf:_ ?stmt:_ vi -> must_never_monitor vi)
+    bhv
+    ?kf
+    ?stmt
+    lv
+
+let must_never_monitor_exp bhv ?kf ?stmt lv  =
+  apply_on_vi_base_from_exp
+    (fun _bhv ?kf:_ ?stmt:_ vi -> must_never_monitor vi)
+    bhv
+    ?kf
+    ?stmt
+    lv
+
 (* ************************************************************************** *)
 (** {1 Public API} *)
 (* ************************************************************************** *)
 
 let must_model_vi ?bhv ?kf ?stmt vi =
-  not (vi.vghost && vi.vstorage = Extern)
+  not (must_never_monitor vi)
   &&
     (Options.Full_mmodel.get ()
      || Error.generic_handle (must_model_vi bhv ?kf ?stmt) false vi)
 
 let must_model_lval ?bhv ?kf ?stmt lv =
-  Options.Full_mmodel.get ()
-  || Error.generic_handle (must_model_lval bhv ?kf ?stmt) false lv
+  not (must_never_monitor_lval bhv ?kf ?stmt lv)
+  &&
+    (Options.Full_mmodel.get ()
+     || Error.generic_handle (must_model_lval bhv ?kf ?stmt) false lv)
 
 let must_model_exp ?bhv ?kf ?stmt exp =
-  Options.Full_mmodel.get ()
-  || Error.generic_handle (must_model_exp bhv ?kf ?stmt) false exp
+  not (must_never_monitor_exp bhv ?kf ?stmt exp)
+  &&
+    (Options.Full_mmodel.get ()
+     || Error.generic_handle (must_model_exp bhv ?kf ?stmt) false exp)
 
-let use_model () = not (Env.is_empty ()) || Options.Full_mmodel.get () ||
-  Env.has_heap_allocations ()
+let use_model () =
+  not (Env.is_empty ())
+  || Options.Full_mmodel.get ()
+  || Env.has_heap_allocations ()
 
 (*
 Local Variables:

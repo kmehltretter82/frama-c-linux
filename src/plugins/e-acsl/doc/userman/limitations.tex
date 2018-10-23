@@ -143,8 +143,8 @@ instrumented code (linked against this main) could print some warnings from the
 \label{sec:limits:no-code}
 \index{Function!Undefined}
 
-The instrumentation in the generated program is partial for a program $p$ if and
-only if $p$ contains a memory-related annotation $a$ and an undefined function
+The instrumentation in the generated program is partial for a program $p$ if $p$
+contains a memory-related annotation $a$ and an undefined function 
 $f$ such that:
 \begin{itemize}
 \item either $f$ has an (even indirect) effect on a left-value occurring in $a$;
@@ -154,6 +154,15 @@ A violation of such an annotation $a$ is undetected. There is no workaround yet.
 
 Also, the option \optionuse{-}{e-acsl-check} does not verify the annotations of
 undefined functions. There is also no workaround yet.
+
+\subsection{Incomplete Types}
+\index{Type!Incomplete}
+
+The instrumentation in the generated program is partial for a program $p$ if $p$
+contains a memory-related annotation $a$ and a variable $v$ with an incomplete
+type definition such that $a$ depends on $v$ (even indirectly).
+
+A violation of such an annotation $a$ is undetected. There is no workaround yet.
 
 \section{Recursive Functions}
 \index{Function!Recursive}
