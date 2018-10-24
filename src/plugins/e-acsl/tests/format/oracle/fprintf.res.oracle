@@ -15,7 +15,10 @@
 [e-acsl] Warning: annotating undefined function `waitpid':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
-[e-acsl] FRAMAC_SHARE/libc/sys/wait.h:87: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/sys/wait.h:92: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/sys/wait.h:86: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdio.h:94: Warning: 
@@ -83,11 +86,11 @@
 [eva] using specification for function __e_acsl_assert
 [eva] using specification for function waitpid
 [eva] using specification for function __e_acsl_initialized
-[eva:alarm] FRAMAC_SHARE/libc/sys/wait.h:93: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/sys/wait.h:86: Warning: 
   function __e_acsl_assert: precondition got status unknown.
 [eva] using specification for function __e_acsl_delete_block
-[eva:alarm] FRAMAC_SHARE/libc/sys/wait.h:93: Warning: 
-  function __gen_e_acsl_waitpid, behavior stat_loc_non_null: postcondition 'initialization,stat_loc_init_on_success' got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/sys/wait.h:86: Warning: 
+  function __gen_e_acsl_waitpid: postcondition 'initialization,stat_loc_init_on_success' got status unknown.
 [eva:alarm] tests/format/fprintf.c:15: Warning: 
   accessing uninitialized left-value. assert \initialized(&process_status);
 [eva] using specification for function __e_acsl_builtin_printf
