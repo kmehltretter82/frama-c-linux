@@ -13,7 +13,6 @@ E-ACSL:
    - nix/frama-ci.sh build -A e-acsl.installed
   tags:
    - nix
-  retry: 2
 
 Tests:
   stage: tests
@@ -26,7 +25,6 @@ Tests:
    - nix/frama-ci.sh build -A e-acsl.tests
   tags:
    - nix
-  retry: 2
 
 Cfp:
   stage: tests
@@ -39,7 +37,6 @@ Cfp:
    - nix/frama-ci.sh build -A context-from-precondition.tests
   tags:
    - nix
-  retry: 2
 
 Security:
   stage: tests
@@ -52,4 +49,3 @@ Security:
    - nix/frama-ci.sh build -A security.tests
   tags:
    - nix
-  retry: 2
