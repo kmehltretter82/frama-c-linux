@@ -1,7 +1,7 @@
 /* run.config*
-OPT: -val-show-progress -print -journal-disable -val -report
+OPT: -eva-show-progress -print -journal-disable -eva -report
 OPT: -load-script tests/builtins/big_local_array_script.ml -then-on prj -print -report
-OPT: -val-show-progress -print -journal-disable -no-initialized-padding-locals -val
+OPT: -eva-show-progress -print -journal-disable -no-initialized-padding-locals -eva
 */
 
 struct S {

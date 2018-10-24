@@ -1,14 +1,14 @@
 /* run.config
    GCC:
-   OPT: -lib-entry -main simple -val-show-progress -fct-pdg simple -journal-disable  -pdg-print -pdg-verbose 2
-   OPT: -lib-entry -main simple_with_break -val-show-progress -fct-pdg simple_with_break -journal-disable  -pdg-print -pdg-verbose 2
-   OPT: -lib-entry -main infinite -val-show-progress -fct-pdg infinite -journal-disable  -pdg-print -pdg-verbose 2
-   OPT: -lib-entry -main infinite2 -val-show-progress -fct-pdg infinite2 -journal-disable  -pdg-print -pdg-verbose 2
-   OPT: -lib-entry -main maybe_infinite -val-show-progress -fct-pdg maybe_infinite -journal-disable  -pdg-print -pdg-verbose 2
-   OPT: -lib-entry -main two_infinite_loops -val-show-progress -fct-pdg two_infinite_loops -journal-disable  -pdg-print -pdg-verbose 2
-   OPT: -lib-entry -main loop_with_goto -val-show-progress -fct-pdg loop_with_goto -journal-disable  -pdg-print -pdg-verbose 2
-   OPT: -lib-entry -main non_natural_loop -val-show-progress -fct-pdg non_natural_loop -journal-disable  -pdg-print -pdg-verbose 2
-   OPT: -lib-entry -main dead_code -val-show-progress -fct-pdg dead_code -journal-disable  -pdg-print -pdg-verbose 2
+   OPT: -lib-entry -main simple -eva-show-progress -fct-pdg simple -journal-disable  -pdg-print -pdg-verbose 2
+   OPT: -lib-entry -main simple_with_break -eva-show-progress -fct-pdg simple_with_break -journal-disable  -pdg-print -pdg-verbose 2
+   OPT: -lib-entry -main infinite -eva-show-progress -fct-pdg infinite -journal-disable  -pdg-print -pdg-verbose 2
+   OPT: -lib-entry -main infinite2 -eva-show-progress -fct-pdg infinite2 -journal-disable  -pdg-print -pdg-verbose 2
+   OPT: -lib-entry -main maybe_infinite -eva-show-progress -fct-pdg maybe_infinite -journal-disable  -pdg-print -pdg-verbose 2
+   OPT: -lib-entry -main two_infinite_loops -eva-show-progress -fct-pdg two_infinite_loops -journal-disable  -pdg-print -pdg-verbose 2
+   OPT: -lib-entry -main loop_with_goto -eva-show-progress -fct-pdg loop_with_goto -journal-disable  -pdg-print -pdg-verbose 2
+   OPT: -lib-entry -main non_natural_loop -eva-show-progress -fct-pdg non_natural_loop -journal-disable  -pdg-print -pdg-verbose 2
+   OPT: -lib-entry -main dead_code -eva-show-progress -fct-pdg dead_code -journal-disable  -pdg-print -pdg-verbose 2
 
 
 
@@ -24,11 +24,11 @@ bin/toplevel.opt -lib-entry -main $F -deps -verbose tests/pdg/loops.c
 zgrviewer ./$F_cfg.dot
 
 Pour voir les postdominateurs :
-bin/toplevel.opt -lib-entry -main $F -val-show-progress -fct-pdg $F -dot-postdom p tests/pdg/loops.c ;
+bin/toplevel.opt -lib-entry -main $F -eva-show-progress -fct-pdg $F -dot-postdom p tests/pdg/loops.c ;
 zgrviewer ./p.$F.dot
 
 Pour voir le PDG :
-bin/toplevel.opt -lib-entry -main $F -val-show-progress -fct-pdg $F -pdg-dot pdg tests/pdg/loops.c ;
+bin/toplevel.opt -lib-entry -main $F -eva-show-progress -fct-pdg $F -pdg-dot pdg tests/pdg/loops.c ;
 zgrviewer ./pdg.$F.dot
 
 */

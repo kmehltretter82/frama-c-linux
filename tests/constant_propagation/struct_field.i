@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -val -semantic-const-folding -val-show-progress -journal-disable
+   OPT: -eva -semantic-const-folding -eva-show-progress -journal-disable
 */
 
 struct st {

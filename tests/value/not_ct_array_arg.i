@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: #"-value-msg-key initial-state"
+   STDOPT: #"-eva-msg-key initial-state"
 */
 
 // Cf. Bts 856

@@ -1,7 +1,7 @@
 /* run.config*
    GCC:
-   STDOPT: #"-no-val-builtins-auto"
-   STDOPT: #"-no-val-builtins-auto -absolute-valid-range 0x100-0x200 -main main_abs"
+   STDOPT: #"-eva-no-builtins-auto"
+   STDOPT: #"-eva-no-builtins-auto -absolute-valid-range 0x100-0x200 -main main_abs"
 */
 
 #define malloc(n) Frama_C_malloc_fresh(n)

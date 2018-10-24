@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -no-autoload-plugins -load-module inout,eva -big-ints-hex 256 -val @VALUECONFIG@ -journal-disable
+   OPT: -no-autoload-plugins -load-module inout,eva -big-ints-hex 256 -eva @VALUECONFIG@ -journal-disable
 */
 #include "__fc_builtin.h"
 

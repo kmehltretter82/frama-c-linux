@@ -1,5 +1,5 @@
 /* run.config
-OPT: -rte -then -val-show-progress -val -then -report
+OPT: -rte -then -eva-show-progress -eva -then -report
 */
 
 #include "stdio.h"
