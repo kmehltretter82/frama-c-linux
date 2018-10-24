@@ -1,20 +1,55 @@
-Tests:
-  script:
-  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --E-ACSL $CI_BUILD_REF --branch $CI_BUILD_REF_NAME E-ACSL --cppo 07d2bcee50670aecae7e094d92f68fd18314073a --ocamlgraph 9286b375c005d1d504a1def0c5986f54c7f12251 --url ocamlfind,git@git.frama-c.com:bobot/ocamlfind.git
-  tags:
-  except:
-  - tags
+stages:
+ - build
+ - tests
 
-context-from-precondition:
+E-ACSL:
+  stage: build
+  variables:
+    CURRENT: $CI_COMMIT_REF_NAME
+    DEFAULT: "test-nix"
+    OCAML: "4_05"
+    FRAMA_CI_OPT: "--override e-acsl:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
-  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --E-ACSL $CI_BUILD_REF --branch $CI_BUILD_REF_NAME context-from-precondition --cppo 07d2bcee50670aecae7e094d92f68fd18314073a --ocamlgraph 9286b375c005d1d504a1def0c5986f54c7f12251 --url ocamlfind,git@git.frama-c.com:bobot/ocamlfind.git
+   - nix/frama-ci.sh build -A e-acsl.installed
   tags:
-  except:
-  - tags
+   - nix
+  retry: 2
+
+Tests:
+  stage: tests
+  variables:
+    CURRENT: $CI_COMMIT_REF_NAME
+    DEFAULT: "test-nix"
+    OCAML: "4_05"
+    FRAMA_CI_OPT: "--override e-acsl:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
+  script:
+   - nix/frama-ci.sh build -A e-acsl.tests
+  tags:
+   - nix
+  retry: 2
+
+Cfp:
+  stage: tests
+  variables:
+    CURRENT: $CI_COMMIT_REF_NAME
+    DEFAULT: "test-nix"
+    OCAML: "4_05"
+    FRAMA_CI_OPT: "--override e-acsl:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
+  script:
+   - nix/frama-ci.sh build -A context-from-precondition.tests
+  tags:
+   - nix
+  retry: 2
 
 Security:
+  stage: tests
+  variables:
+    CURRENT: $CI_COMMIT_REF_NAME
+    DEFAULT: "test-nix"
+    OCAML: "4_05"
+    FRAMA_CI_OPT: "--override e-acsl:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
-  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --E-ACSL $CI_BUILD_REF --branch $CI_BUILD_REF_NAME Security --cppo 07d2bcee50670aecae7e094d92f68fd18314073a --ocamlgraph 9286b375c005d1d504a1def0c5986f54c7f12251 --url ocamlfind,git@git.frama-c.com:bobot/ocamlfind.git
+   - nix/frama-ci.sh build -A security.tests
   tags:
-  except:
-  - tags
+   - nix
+  retry: 2

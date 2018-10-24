@@ -133,6 +133,16 @@ $(EACSL_PLUGIN_DIR)/local_config.ml: $(EACSL_PLUGIN_DIR)/Makefile.in $(VERSION_F
 
 ifeq (@MAY_RUN_TESTS@,yes)
 
+-include in_frama_ci
+
+ifeq ($(IN_FRAMA_CI),yes)
+
+PLUGIN_TESTS_DIRS := \
+	gmp \
+	no-main
+
+else
+
 PLUGIN_TESTS_DIRS := \
 	format \
 	reject \
@@ -141,11 +151,10 @@ PLUGIN_TESTS_DIRS := \
 	gmp \
 	no-main \
 	full-mmodel \
-	temporal
+	temporal \
+	builtin
 
-# the following test suite is deactivated for the time being:
-# uncompatible with OCI
-#	builtin
+endif
 
 PLUGIN_TESTS_LIB := $(EACSL_PLUGIN_DIR)/tests/print.ml
 E_ACSL_TESTS: $(EACSL_PLUGIN_DIR)/tests/test_config
