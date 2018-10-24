@@ -10,10 +10,10 @@
   __e_acsl_math_HUGE_VALF ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
   __e_acsl_math_INFINITY ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
 [eva] using specification for function __e_acsl_memory_init
-[eva] tests/gmp/longlong.i:9: User Error: 
+[eva] tests/gmp/longlong.i:9: Warning: 
   recursive call during value analysis
   of my_pow (my_pow <- my_pow :: tests/gmp/longlong.i:16 <- main). Assuming
-  the call has no effect. The analysis will be unsound.]
+  the call has no effect. The analysis will be unsound.
 [eva] using specification for function my_pow
 [eva:alarm] tests/gmp/longlong.i:10: Warning: 
   signed overflow. assert -2147483648 ≤ tmp * tmp;

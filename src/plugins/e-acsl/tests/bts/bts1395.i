@@ -1,5 +1,6 @@
 /* run.config
    COMMENT: recursive function
+   STDOPT: +"-eva-ignore-recursive-calls"
 */
 
 /*@ requires n > 0; */
