@@ -14,7 +14,7 @@ gcc $GCC3264 -pipe t$N.a.i $CSMITH/dump_assert_nop-$FRAMAC3264.o -o e$N
 rcexec=$?
 if [[ $rcexec != 127 && $rcexec != 152 && $rcexec != 137 ]] 
 then
-    ( ulimit -S -t 18000 -m 2500000 ; exec ~/ppc/bin/toplevel.opt -no-collapse-call-cast -slevel-function main:0 -no-results -warn-signed-overflow -val t$N.a.i -no-val-show-progress -machdep $FRAMAC3264 -precise-unions > res$N.value )
+    ( ulimit -S -t 18000 -m 2500000 ; exec ~/ppc/bin/toplevel.opt -no-collapse-call-cast -slevel-function main:0 -no-results -warn-signed-overflow -eva t$N.a.i -eva-no-show-progress -machdep $FRAMAC3264 -precise-unions > res$N.value )
     rc=$?
     if grep imprecise res$N.value
     then  
