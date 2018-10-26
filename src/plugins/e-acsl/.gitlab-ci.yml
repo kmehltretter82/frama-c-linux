@@ -14,6 +14,18 @@ E-ACSL:
   tags:
    - nix
 
+CheckHeaders:
+  stage: build
+  variables:
+    CURRENT: $CI_COMMIT_REF_NAME
+    DEFAULT: "test-nix"
+    OCAML: "4_05"
+    FRAMA_CI_OPT: "--override genassigns:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
+  script:
+   - nix/frama-ci.sh build -A genassigns.checkHeaders
+  tags:
+   - nix
+
 Tests:
   stage: tests
   variables:
