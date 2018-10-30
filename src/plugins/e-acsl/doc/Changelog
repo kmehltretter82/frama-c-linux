@@ -19,6 +19,10 @@
 #   configure	configure
 ###############################################################################
 
+##########################
+Plugin E-ACSL 18.0 (Argon)
+##########################
+
 -* E-ACSL       [2018/10/23] Fix bug #2406 about monitoring of variables
 	        with incomplete types.
 -* E-ACSL       [2018/10/04] Fix bug #2386 about incorrect typing when
