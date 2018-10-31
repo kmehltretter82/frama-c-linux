@@ -1,0 +1,21 @@
+[kernel] Parsing context-depth.c (with preprocessing)
+[value] Analyzing an incomplete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value] Values of globals at initialization
+  s.v ∈ [--..--]
+   .next ∈ {{ NULL ; &S_next_s[0] }}
+  S_next_s[0].v ∈ [--..--]
+          [0].next ∈ {{ NULL ; &S_next_0_S_next_s[0] }}
+  S_next_0_S_next_s[0].v ∈ [--..--]
+                   [0].next ∈
+                   {{ garbled mix of &{WELL_next_0_S_next_0_S_next_s}
+                    (origin: Well) }}
+  WELL_next_0_S_next_0_S_next_s[bits 0 to ..] ∈
+                           {{ garbled mix of &{WELL_next_0_S_next_0_S_next_s}
+                            (origin: Well) }}
+[value] Recording results for main
+[value] done for function main
+[value] ====== VALUES COMPUTED ======
+[value] Values at end of function main:
+  

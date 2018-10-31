@@ -1,0 +1,5 @@
+[kernel] tests/erroneous/not-enough-par.c:4: User Error: 
+  Too few arguments in call to f.
+[kernel] User Error: stopping on file "tests/erroneous/not-enough-par.c" that has errors. Add
+  '-kernel-msg-key pp' for preprocessing command.
+[kernel] Frama-C aborted: invalid user input.

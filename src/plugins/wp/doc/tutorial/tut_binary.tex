@@ -1,0 +1,30 @@
+\chapter{Binary Search Algorithms}
+\label{binary}
+
+In this chapter, we study the binary search algorithms defined in ``ACSL By Example''.
+
+\section{Specification Helpers}
+\label{binary-helpers}
+Like in the original book, we must introduce in our library the
+definition for sorted sequences:
+
+\listingname{binary.h}
+\cinput{binary/sorted.spec}
+
+We also require the introduction of an helper axiom for division:
+
+\listingname{binary.h}
+\cinput{binary/division.spec}
+
+\section{By-Reference Arguments}
+The generated proof obligations for lowerbound and upperbound functions
+are rather difficult to discharge with the \texttt{Store} memory model.
+It is better here to use the \texttt{Logic} memory model that combines \textsf{Store}
+and arrays passed by references detection, which is quite effective here.
+
+This experimental memory model is activated by \texttt{-wp-model Logic}. However,
+the proofs can be handled in \texttt{Store} model with a timeout of one minute.
+
+\input{lowerbound/lowerbound.tex}
+\input{upperbound/upperbound.tex}
+\input{binarysearch/binarysearch.tex}

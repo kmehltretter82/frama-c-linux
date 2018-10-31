@@ -1,0 +1,6 @@
+void swap_values(value_type* a, size_type n,
+                 size_type   i, size_type j) {
+  value_type tmp = a[i];
+  a[i] = a[j];
+  a[j] = tmp;
+}    

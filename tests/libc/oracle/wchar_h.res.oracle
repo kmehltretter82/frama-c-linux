@@ -1,0 +1,29 @@
+[kernel] Parsing tests/libc/wchar_h.c (with preprocessing)
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
+  
+[eva] computing for function fopen <- main.
+  Called from tests/libc/wchar_h.c:5.
+[eva] using specification for function fopen
+[eva] tests/libc/wchar_h.c:5: 
+  function fopen: precondition 'valid_filename' got status valid.
+[eva] tests/libc/wchar_h.c:5: 
+  function fopen: precondition 'valid_mode' got status valid.
+[eva] Done for function fopen
+[eva] computing for function fgetws <- main.
+  Called from tests/libc/wchar_h.c:8.
+[eva] using specification for function fgetws
+[eva] tests/libc/wchar_h.c:8: 
+  function fgetws: precondition 'valid_stream' got status valid.
+[eva] Done for function fgetws
+[eva] tests/libc/wchar_h.c:10: assertion got status valid.
+[eva] Recording results for main
+[eva] done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function main:
+  fd ∈ {{ NULL ; &__fc_fopen + [0..120],0%8 }}
+  buf[0..29] ∈ [--..--] or UNINITIALIZED
+  res ∈ {{ NULL ; &buf[0] }}
+  __retres ∈ {0; 1}

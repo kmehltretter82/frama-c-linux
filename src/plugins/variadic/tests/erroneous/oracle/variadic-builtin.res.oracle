@@ -1,0 +1,5 @@
+[variadic] tests/erroneous/variadic-builtin.c:1: 
+  Variadic builtin Frama_C_show_each_warning left untransformed.
+[kernel] Plug-in variadic aborted: unimplemented feature.
+  You may send a feature request at http://bts.frama-c.com with:
+  '[Plug-in variadic] The variadic plugin doesn't handle calls to a pointer to the variadic builtin Frama_C_show_each_warning.'.

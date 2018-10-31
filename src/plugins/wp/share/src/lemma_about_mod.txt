@@ -1,0 +1,106 @@
+Z_mod_lt: forall a b : int, b > 0 -> 0 <= a mod b < b
+Z_mod_neg: forall a b : int, b < 0 -> b < a mod b <= 0
+Z_div_mod_eq: forall a b : int, b > 0 -> a = b * (a / b) + a mod b
+Zmod_eq_full: forall a b : int, b <> 0 -> a mod b = a - a / b * b
+Zmod_eq: forall a b : int, b > 0 -> a mod b = a - a / b * b
+Zmod_unique: forall a b q r : int, 0 <= r < b -> a = b * q + r -> r = a mod b
+Zmod_0_l: forall a : int, 0 mod a = 0
+Zmod_0_r: forall a : int, a mod 0 = 0
+Zmod_1_r: forall a : int, a mod 1 = 0
+Zmod_1_l: forall a : int, 1 < a -> 1 mod a = 1
+Z_mod_same_full: forall a : int, a mod a = 0
+Z_mod_mult: forall a b : int, (a * b) mod b = 0
+Zmod_small: forall a n : int, 0 <= a < n -> a mod n = a
+Z_div_exact_full_1: forall a b : int, a = b * (a / b) -> a mod b = 0
+Z_div_exact_full_2:
+  forall a b : int, b <> 0 -> a mod b = 0 -> a = b * (a / b)
+Zmod_le: forall a b : int, 0 < b -> 0 <= a -> a mod b <= a
+Z_mod_plus_full: forall a b c : int, (a + b * c) mod c = a mod c
+Zmod_opp_opp: forall a b : int, - a mod - b = - (a mod b)
+Z_mod_zero_opp_full: forall a b : int, a mod b = 0 -> - a mod b = 0
+Z_mod_nz_opp_full: forall a b : int, a mod b <> 0 -> - a mod b = b - a mod b
+Z_mod_zero_opp_r: forall a b : int, a mod b = 0 -> a mod - b = 0
+Z_mod_nz_opp_r: forall a b : int, a mod b <> 0 -> a mod - b = a mod b - b
+Z_div_zero_opp_full: forall a b : int, a mod b = 0 -> - a / b = - (a / b)
+Z_div_nz_opp_full: forall a b : int, a mod b <> 0 -> - a / b = - (a / b) - 1
+Z_div_zero_opp_r: forall a b : int, a mod b = 0 -> a / - b = - (a / b)
+Z_div_nz_opp_r: forall a b : int, a mod b <> 0 -> a / - b = - (a / b) - 1
+Zmult_mod_distr_l: forall a b c : int, (c * a) mod (c * b) = c * (a mod b)
+Zmult_mod_distr_r: forall a b c : int, (a * c) mod (b * c) = a mod b * c
+Zmod_mod: forall a n : int, (a mod n) mod n = a mod n
+Zmult_mod: forall a b n : int, (a * b) mod n = (a mod n * (b mod n)) mod n
+Zplus_mod: forall a b n : int, (a + b) mod n = (a mod n + b mod n) mod n
+Zminus_mod: forall a b n : int, (a - b) mod n = (a mod n - b mod n) mod n
+Zplus_mod_idemp_l: forall a b n : int, (a mod n + b) mod n = (a + b) mod n
+Zplus_mod_idemp_r: forall a b n : int, (b + a mod n) mod n = (b + a) mod n
+Zminus_mod_idemp_l: forall a b n : int, (a mod n - b) mod n = (a - b) mod n
+Zminus_mod_idemp_r: forall a b n : int, (a - b mod n) mod n = (a - b) mod n
+Zmult_mod_idemp_l: forall a b n : int, (a mod n * b) mod n = (a * b) mod n
+Zmult_mod_idemp_r: forall a b n : int, (b * (a mod n)) mod n = (b * a) mod n
+Z_mod_same: forall a : int, a > 0 -> a mod a = 0
+Z_mod_plus: forall a b c : int, c > 0 -> (a + b * c) mod c = a mod c
+Z_div_exact_1: forall a b : int, b > 0 -> a = b * (a / b) -> a mod b = 0
+Z_div_exact_2: forall a b : int, b > 0 -> a mod b = 0 -> a = b * (a / b)
+Z_mod_zero_opp: forall a b : int, b > 0 -> a mod b = 0 -> - a mod b = 0
+Z.div_mod: forall a b : int, b <> 0 -> a = b * (a / b) + a mod b
+Z.mod_pos_bound: forall a b : int, 0 < b -> 0 <= a mod b < b
+Z.mod_bound_pos: forall a b : int, 0 <= a -> 0 < b -> 0 <= a mod b < b
+Z.mod_neg_bound: forall a b : int, b < 0 -> b < a mod b <= 0
+Z.mod_eq: forall a b : int, b <> 0 -> a mod b = a - b * (a / b)
+Z.mod_bound_abs: forall a b : int, b <> 0 -> Z.abs (a mod b) < Z.abs b
+Z.mod_unique:
+  forall a b q r : int,
+  0 <= r < b \/ b < r <= 0 -> a = b * q + r -> r = a mod b
+Z.mod_unique_pos:
+  forall a b q r : int, 0 <= r < b -> a = b * q + r -> r = a mod b
+Z.mod_unique_neg:
+  forall a b q r : int, b < r <= 0 -> a = b * q + r -> r = a mod b
+Z.mod_bound_or:
+  forall a b : int, b <> 0 -> 0 <= a mod b < b \/ b < a mod b <= 0
+Z.opp_mod_bound_or:
+  forall a b : int,
+  b <> 0 -> 0 <= - (a mod b) < - b \/ - b < - (a mod b) <= 0
+Z.mod_opp_opp: forall a b : int, b <> 0 -> - a mod - b = - (a mod b)
+Z.div_opp_l_z: forall a b : int, b <> 0 -> a mod b = 0 -> - a / b = - (a / b)
+Z.div_opp_l_nz:
+  forall a b : int, b <> 0 -> a mod b <> 0 -> - a / b = - (a / b) - 1
+Z.mod_opp_l_z: forall a b : int, b <> 0 -> a mod b = 0 -> - a mod b = 0
+Z.mod_opp_l_nz:
+  forall a b : int, b <> 0 -> a mod b <> 0 -> - a mod b = b - a mod b
+Z.div_opp_r_z: forall a b : int, b <> 0 -> a mod b = 0 -> a / - b = - (a / b)
+Z.div_opp_r_nz:
+  forall a b : int, b <> 0 -> a mod b <> 0 -> a / - b = - (a / b) - 1
+Z.mod_opp_r_z: forall a b : int, b <> 0 -> a mod b = 0 -> a mod - b = 0
+Z.mod_opp_r_nz:
+  forall a b : int, b <> 0 -> a mod b <> 0 -> a mod - b = a mod b - b
+Z.mod_same: forall a : int, a <> 0 -> a mod a = 0
+Z.mod_small: forall a b : int, 0 <= a < b -> a mod b = a
+Z.mod_0_l: forall a : int, a <> 0 -> 0 mod a = 0
+Z.mod_1_r: forall a : int, a mod 1 = 0
+Z.mod_1_l: forall a : int, 1 < a -> 1 mod a = 1
+Z.mod_mul: forall a b : int, b <> 0 -> (a * b) mod b = 0
+Z.mod_le: forall a b : int, 0 <= a -> 0 < b -> a mod b <= a
+Z.mod_small_iff:
+  forall a b : int, b <> 0 -> (a mod b = a <-> 0 <= a < b \/ b < a <= 0)
+Z.div_exact: forall a b : int, b <> 0 -> (a = b * (a / b) <-> a mod b = 0)
+Z.mod_add: forall a b c : int, c <> 0 -> (a + b * c) mod c = a mod c
+Z.mul_mod_distr_l:
+  forall a b c : int, b <> 0 -> c <> 0 -> (c * a) mod (c * b) = c * (a mod b)
+Z.mul_mod_distr_r:
+  forall a b c : int, b <> 0 -> c <> 0 -> (a * c) mod (b * c) = a mod b * c
+Z.mod_mod: forall a n : int, n <> 0 -> (a mod n) mod n = a mod n
+Z.mul_mod_idemp_l:
+  forall a b n : int, n <> 0 -> (a mod n * b) mod n = (a * b) mod n
+Z.mul_mod_idemp_r:
+  forall a b n : int, n <> 0 -> (a * (b mod n)) mod n = (a * b) mod n
+Z.mul_mod:
+  forall a b n : int, n <> 0 -> (a * b) mod n = (a mod n * (b mod n)) mod n
+Z.add_mod_idemp_l:
+  forall a b n : int, n <> 0 -> (a mod n + b) mod n = (a + b) mod n
+Z.add_mod_idemp_r:
+  forall a b n : int, n <> 0 -> (a + b mod n) mod n = (a + b) mod n
+Z.add_mod:
+  forall a b n : int, n <> 0 -> (a + b) mod n = (a mod n + b mod n) mod n
+Z.rem_mul_r:
+  forall a b c : int,
+  b <> 0 -> 0 < c -> a mod (b * c) = a mod b + b * ((a / b) mod c)
