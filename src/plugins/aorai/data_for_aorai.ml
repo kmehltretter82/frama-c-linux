@@ -28,6 +28,7 @@ open Cil
 open Cil_types
 open Promelaast
 open Logic_simplification
+open Graph
 
 exception Empty_automaton
 
@@ -209,6 +210,57 @@ let buch_sync   = "Aorai_Sync"                           (* Deprecated ? *)
 (* ************************************************************************* *)
 (* Buchi automata as stored after parsing *)
 let automata = ref ([],[])
+
+(*TODO*)
+module Automata_graph = Graph.Imperative.Digraph.ConcreteBidirectionalLabeled ((*state liste*)
+  struct 
+  type t = Promelaast.state
+  let compare x y = Datatype.Int.compare x.nums y.nums
+  let hash a = a.nums
+  let equal a b = (a = b)
+  end
+  )
+  
+  ((*transition condition list*)
+  struct
+  type t = (Promelaast.typed_condition * Promelaast.action) Promelaast.trans
+  let compare x y = Datatype.Int.compare x.numt y.numt
+  let default = {numt = -1; start = List.hd (Aorai_state.reprs);
+                  stop = List.hd (Aorai_state.reprs);
+                  cross = (TTrue,[]); }
+  end
+  )
+  
+(*module Automata_BellmanFord = 
+Graph.Path.BellmanFord 
+  (Automata_graph)  
+  (
+    struct
+    type edge = Automata_graph.E.t
+    type t = int
+    let weight e = match e with 
+      | (_, ed, _) -> ed.numt
+      (*| _ -> failwith "Not an edge"*)
+    let compare x y = Datatype.Int.compare x y
+    let add e1 e2 =  e1 + e2
+    let zero = 0
+    end
+  ) *)
+
+let auto_graph = Automata_graph.create()
+
+(* val setGraph t -> Promelaast.state list -> (Promelaast.typed_condition * Promelaast.action) Promelaast.trans list -> unit *)
+
+let rec setGraph g state trans = 
+  match state with
+  | h::t -> Automata_graph.add_vertex g h ; setGraph g t trans
+  | [] -> 
+  (
+    match trans with
+    | ht::tt -> Automata_graph.add_edge g ht.start ht.stop ; setGraph g [] tt
+    | [] -> failwith "Automata does not have any transition"
+  )
+
 
 (* Each transition with a parametrized cross condition (call param access or return value access) has its parametrized part stored in this array. *)
 let cond_of_parametrizedTransitions = ref (Array.make (1) [[]])
@@ -587,7 +639,8 @@ let check_one top info counter s =
 
 let find_avar s env =
 try StringMap.find s (env.var)
-with Not_found -> Aorai_option.abort "Aorai var not found" 
+(*with try*)
+  with Not_found -> Aorai_option.abort "Aorai var not found" 
 
 let find_in_env env counter s =
   let current, stack =
@@ -1538,7 +1591,7 @@ let setAutomata auto =
   then
     (* all transitions have a true parameterized guard, i.e. [[]] *)
     cond_of_parametrizedTransitions :=
-      Array.make (getNumberOfTransitions  ()) [[]]
+      Array.make (getNumberOfTransitions  ()) [[]] ; setGraph auto_graph (fst !automata) (snd !automata) (*TODO*)
 
 let getState num = List.find (fun st -> st.nums = num) (fst !automata)
 
