@@ -63,6 +63,7 @@
 /tests/no-main/result/*
 /tests/full-mmodel/result/*
 /tests/full-mmodel-only/result/*
+/tests/segment-only/result/*
 /tests/bts/result/*
 /tests/gmp/result/*
 /tests/reject/result/*
