@@ -895,7 +895,7 @@ extern int MSPACES_INIT;
  *    returned pointer shall not be used to access an object." */
 void* malloc(size_t size) {
   if(! MSPACES_INIT) {
-    mspaces_init(0, 0); // arguments of main are not (?) known at this point
+    mspaces_init();
     MSPACES_INIT = 1;
   }
   size_t alloc_size = ALLOC_SIZE(size);

@@ -177,7 +177,7 @@ int posix_memalign(void **memptr, size_t alignment, size_t size)
 /************************************************************************/
 
 /*! \brief Initialize memory locations. */
-void mspaces_init(int *argc_ref, char *** argv_ref)
+void mspaces_init()
   __attribute__((FC_BUILTIN));
 
 /*! \brief Initialize memory tracking state.

@@ -69,11 +69,9 @@ extern FILE *stderr;		/* Standard error output stream. */
 
 static void collect_safe_locations() {
   /* Tracking of errno and standard streams */
-  /* TODO: how to corrrectly add the following locations
-     in presence of contructors? */
-  // add_safe_location((uintptr_t)&errno, sizeof(int), "errno");
-  // add_safe_location((uintptr_t)stdout, sizeof(FILE), "stdout");
-  // add_safe_location((uintptr_t)stderr, sizeof(FILE), "stderr");
-  // add_safe_location((uintptr_t)stdin, sizeof(FILE), "stdin");
+  add_safe_location((uintptr_t)&errno, sizeof(int), "errno");
+  add_safe_location((uintptr_t)stdout, sizeof(FILE), "stdout");
+  add_safe_location((uintptr_t)stderr, sizeof(FILE), "stderr");
+  add_safe_location((uintptr_t)stdin, sizeof(FILE), "stdin");
 }
 #endif
