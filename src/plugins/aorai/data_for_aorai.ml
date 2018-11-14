@@ -28,7 +28,6 @@ open Cil
 open Cil_types
 open Promelaast
 open Logic_simplification
-open Graph
 
 exception Empty_automaton
 
@@ -251,16 +250,74 @@ let auto_graph = Automata_graph.create()
 
 (* val setGraph t -> Promelaast.state list -> (Promelaast.typed_condition * Promelaast.action) Promelaast.trans list -> unit *)
 
-let rec setGraph g state trans = 
-  match state with
+let rec setGraph g (*state*) trans = 
+  (*match state with
   | h::t -> Automata_graph.add_vertex g h ; setGraph g t trans
-  | [] -> 
+  | [] -> *)
   (
     match trans with
-    | ht::tt -> Automata_graph.add_edge g ht.start ht.stop ; setGraph g [] tt
+    | ht::tt -> Automata_graph.add_edge_e g (ht.start, ht, ht.stop) ; setGraph g tt
     | [] -> failwith "Automata does not have any transition"
   )
 
+(*let rec BFS g v = 
+  let l = (True, v)::l in 
+    match l with
+      | h::t -> let succ_list = Automata_graph.succ (snd h) g in
+         t::(List.filter (fun a -> List.mem (True, a) t) succ_list)
+      | [] ->
+*)
+(*      
+let parcoursProfondeur g v =
+  let tmp_graph = Automata_graph.create() in
+  Automata_graph.add_vertex tmp_graph v ;
+  let rec aux g v tmpg = 
+    let succ_list = Automata_graph.succ (snd v) g in 
+        List.iter 
+          (fun a -> 
+            if not (Automata_graph.mem_vertex a tmpg) then
+              Automata_graph.add_vertex tmpg a; aux g a tmpg
+          ) succ_list
+  in aux g v tmp_graph
+*)
+(* Version tmpgraph *)
+let rec parPro g v tmpg =
+    let succ_list = Automata_graph.succ g v in 
+        List.iter 
+          (fun a -> 
+            if not (Automata_graph.mem_vertex tmpg a) then
+              Automata_graph.add_vertex tmpg a; parPro g a tmpg
+          ) succ_list
+
+let rec delPath g a tmp = 
+   match (Automata_graph.pred g a) with 
+    | h::[] -> 
+      begin 
+        Automata_graph.remove_vertex tmp a;
+        match (Automata_graph.succ g h) with
+        | h::[] -> delPath g h tmp
+        | _ -> ()
+      end
+    | h::t -> 
+      begin 
+        Automata_graph.remove_vertex tmp a;
+        List.iter ( fun a -> 
+          match (Automata_graph.succ g a) with
+            | h::[] -> delPath g h tmp
+            | _ -> ()
+        ) (h::t)
+      end
+    | [] -> ()
+
+(*val pathVtoV Automata_graph -> vertex -> vertex -> Automata_graph*)
+(*make a sub-graph from g in tmp with only paths from v1 to v2*)
+let rec pathVtoV g v1 v2 tmp =
+    let succ_list = Automata_graph.succ g v1 in
+    if not (Automata_graph.mem_vertex tmp v1) then
+      ( match succ_list with (* looks if v1 has successors*)
+          | [] -> (*if not, looks if a is v2*) if v1 != v2 then delPath g v1 tmp
+          | h::t -> Automata_graph.add_edge_e tmp (Automata_graph.find_edge g v1 h); if v1 != v2 then List.iter (fun a -> pathVtoV g a v2 tmp) (h::t) (*applies pathVtoV to all successors of v1*)
+      )
 
 (* Each transition with a parametrized cross condition (call param access or return value access) has its parametrized part stored in this array. *)
 let cond_of_parametrizedTransitions = ref (Array.make (1) [[]])
@@ -639,8 +696,9 @@ let check_one top info counter s =
 
 let find_avar s env =
 try StringMap.find s (env.var)
-(*with try*)
-  with Not_found -> Aorai_option.abort "Aorai var not found" 
+  (*with try let tmp = Automata_graph.create() in *)
+    
+with Not_found -> Aorai_option.abort "Aorai var not found" 
 
 let find_in_env env counter s =
   let current, stack =
@@ -763,7 +821,7 @@ let type_expr env ?tr ?current e =
         PVar s ->
           let var = find_in_env env current s in
           env, var, cond
-          (*TODO Changer fonction de recherche*)
+          (*TODO *)
       | AVar s ->
         let var = Logic_const.tvar (Cil.cvar_to_lvar (find_avar s env)) in
         env, var, cond 
@@ -1591,7 +1649,7 @@ let setAutomata auto =
   then
     (* all transitions have a true parameterized guard, i.e. [[]] *)
     cond_of_parametrizedTransitions :=
-      Array.make (getNumberOfTransitions  ()) [[]] ; setGraph auto_graph (fst !automata) (snd !automata) (*TODO*)
+      Array.make (getNumberOfTransitions  ()) [[]] ; setGraph auto_graph (snd !automata) (*TODO*)
 
 let getState num = List.find (fun st -> st.nums = num) (fst !automata)
 
