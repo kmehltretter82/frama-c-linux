@@ -101,6 +101,36 @@ let compute_quantif_guards quantif bounded_vars hyps =
     Error.untypable msg);
   List.rev acc
 
+(* It could happen that the bounds provided for a quantified [lv] are empty
+  in the sense that [min <= lv <= max] but [min > max]. In such cases, \true
+  (or \false depending on the quantification) should be generated instead of
+  nested loops.
+  [has_empty_quantif_with_false_negative] partially detects such cases:
+  Case 1: an empty qunatification was detected for sure, return true.
+  Case 2: we don't know, return false. *)
+let rec has_empty_quantif_with_false_negative = function
+  | [] ->
+    (* case 2 *)
+    false
+  | (t1, rel1, _, rel2, t2) :: guards ->
+    let i1 = Interval.infer t1 in
+    let i2 = Interval.infer t2 in
+    if Ival.is_singleton_int i1 && Ival.is_singleton_int i2 then
+      (* we know the precise values of the bounds *)
+      let lower_bound, _ = Misc.finite_min_and_max i1 in
+      let upper_bound, _ = Misc.finite_min_and_max i2 in
+      let res = match rel1, rel2 with
+        | Rle, Rle -> lower_bound >  upper_bound
+        | Rle, Rlt -> lower_bound >= upper_bound
+        | Rlt, Rle -> lower_bound >= upper_bound
+        | Rlt, Rlt -> lower_bound >= Z.sub upper_bound Z.one
+        | _ -> assert false
+      in
+      if res then (* case 1 *) res
+      else has_empty_quantif_with_false_negative guards
+    else
+      has_empty_quantif_with_false_negative guards
+
 let () = Typing.compute_quantif_guards_ref := compute_quantif_guards
 
 module Label_ids =
@@ -117,6 +147,16 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
   in
   (* universal quantification over integers (or a subtype of integer) *)
   let guards = compute_quantif_guards p bounded_vars hyps in
+  let has_empty_quantif_with_false_negative =
+    has_empty_quantif_with_false_negative guards
+  in
+  match has_empty_quantif_with_false_negative, is_forall with
+  | true, true ->
+    Cil.one ~loc, env
+  | true, false ->
+    Cil.zero ~loc, env
+  | false, _ ->
+  begin
   (* transform [guards] into [lscope_var list],
      and update logic scope in the process *)
   let lvs_guards, env = List.fold_right
@@ -179,6 +219,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
   end_loop_ref := end_loop;
   let env = Env.add_stmt env end_loop in
   res, env
+  end
 
 let quantif_to_exp kf env p =
   let loc = p.pred_loc in
