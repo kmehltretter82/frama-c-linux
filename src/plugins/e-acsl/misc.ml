@@ -311,6 +311,10 @@ let mk_ptr_sizeof typ loc =
   | TPtr (t', _) -> Cil.new_exp ~loc (SizeOf t')
   | _ -> assert false
 
+let finite_min_and_max i = match Ival.min_and_max i with
+  | Some min, Some max -> min, max
+  | None, _ | _, None -> assert false
+
 (*
 Local Variables:
 compile-command: "make"

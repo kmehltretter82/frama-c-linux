@@ -23,6 +23,7 @@
 Plugin E-ACSL 18.0 (Argon)
 ##########################
 
+-* E-ACSL       [2018/11/13] Fix typing bug for quantified variables.
 -* runtime      [2018/11/13] Fix bug #!2405 about memory initialization
                 in presence of GCC constructors.
 -* E-ACSL       [2018/10/23] Fix bug #2406 about monitoring of variables
