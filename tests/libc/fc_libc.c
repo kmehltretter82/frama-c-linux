@@ -13,7 +13,7 @@
 // functions.
 #define _XOPEN_SOURCE 600
 #define _POSIX_C_SOURCE 200112L
-
+#define _GNU_SOURCE 1
 
 #include "share/libc/fc_runtime.c"
 
