@@ -62,6 +62,9 @@ val mk_nested_loops:
 val translate_named_predicate_ref:
   (kernel_function -> Env.t -> predicate -> Env.t) ref
 
+val named_predicate_ref:
+  (kernel_function -> Env.t -> predicate -> exp * Env.t) ref
+
 val term_to_exp_ref:
   (kernel_function -> Env.t -> term -> exp * Env.t) ref
 
