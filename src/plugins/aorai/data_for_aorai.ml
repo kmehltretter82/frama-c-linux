@@ -308,6 +308,12 @@ let rec delPath g a tmp =
         ) (h::t)
       end
     | [] -> ()
+    
+let getInit g = 
+  Automata_graph.fold_vertex (let aux v l = 
+    if (Automata_graph.pred g v = []) then v::l else l in aux ) g []
+    
+let getVertexFromLabel g f = Automata_graph.fold_edge_e f g [] 
 
 (*val pathVtoV Automata_graph -> vertex -> vertex -> Automata_graph*)
 (*make a sub-graph from g in tmp with only paths from v1 to v2*)
@@ -315,7 +321,7 @@ let rec pathVtoV g v1 v2 tmp =
     let succ_list = Automata_graph.succ g v1 in
     if not (Automata_graph.mem_vertex tmp v1) then
       ( match succ_list with (* looks if v1 has successors*)
-          | [] -> (*if not, looks if a is v2*) if v1 != v2 then delPath g v1 tmp
+          | [] -> if v1 != v2 then delPath g v1 tmp (*if not, looks if a is v2*)
           | h::t -> Automata_graph.add_edge_e tmp (Automata_graph.find_edge g v1 h); if v1 != v2 then List.iter (fun a -> pathVtoV g a v2 tmp) (h::t) (*applies pathVtoV to all successors of v1*)
       )
 
@@ -696,8 +702,19 @@ let check_one top info counter s =
 
 let find_avar s env =
 try StringMap.find s (env.var)
-  (*with try let tmp = Automata_graph.create() in *)
-    
+  with try let tmp = Automata_graph.create() in 
+  let v = getVertexFromLabel auto_graph (
+    fun e -> l -> match e with
+    |(_, ee, _) -> begin
+      List.fold_left (fun a -> sa -> 
+        
+        ) (snd ee.cross)
+      
+      ee.cross
+    end
+    )
+    match getInit auto_graph with 
+    | h::[] pathVtoV auto_graph g h 
 with Not_found -> Aorai_option.abort "Aorai var not found" 
 
 let find_in_env env counter s =
