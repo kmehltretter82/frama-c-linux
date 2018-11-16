@@ -313,7 +313,7 @@ let getInit g =
   Automata_graph.fold_vertex (let aux v l = 
     if (Automata_graph.pred g v = []) then v::l else l in aux ) g []
     
-let getVertexFromLabel g f = Automata_graph.fold_edge_e f g [] 
+let getVertexFromLabel g f = Automata_graph.fold_edges_e f g [] 
 
 (*val pathVtoV Automata_graph -> vertex -> vertex -> Automata_graph*)
 (*make a sub-graph from g in tmp with only paths from v1 to v2*)
@@ -702,20 +702,42 @@ let check_one top info counter s =
 
 let find_avar s env =
 try StringMap.find s (env.var)
-  with try let tmp = Automata_graph.create() in 
-  let v = getVertexFromLabel auto_graph (
-    fun e -> l -> match e with
+with Not_found -> let tmp = Automata_graph.create() in 
+  let ve = getVertexFromLabel auto_graph (
+    fun e l -> match e with
     |(_, ee, _) -> begin
-      List.fold_left (fun a -> sa -> 
-        
-        ) (snd ee.cross)
-      
-      ee.cross
-    end
-    )
-    match getInit auto_graph with 
-    | h::[] pathVtoV auto_graph g h 
-with Not_found -> Aorai_option.abort "Aorai var not found" 
+      List.fold_left (fun a sa -> 
+        match a with 
+        | TRel(_, { term_type = Lvar(t) ; _ }, _) -> if t = s then e::[] else []
+        | _ -> []
+        ) (fst ee.cross) []
+        end
+    | _ -> Aorai_option.abort "Not a transition"
+    ) in match ve with 
+    | hh::[] -> 
+      match getInit auto_graph with 
+      | h::[] -> begin pathVtoV auto_graph g h hh tmp; let res = Automata_graph.fold_edges_e 
+      (
+        fun e l -> 
+        match e with
+          |(_, ee, _) -> 
+          begin
+            List.fold_left (fun a sa -> 
+              match a with 
+                | Copy_value((Tvar(lvar),_), { term_type = Ctype(t); _}) -> 
+                  let v = Cil.makeGlobalVar (get_fresh ("aorai_" ^ s)) t in if (lvar = Cil.cvar_to_lvar v) then [v] else []
+                | _ -> []    
+            ) (snd ee.cross) []
+            end
+            | _ -> Aorai_option.abort "Not a transition"
+        ) tmp [] in 
+          match res with
+          | h::[] -> h
+          | _ -> Aorai_option.abort "Aorai var not found" 
+        end
+        | _ -> Aorai_option.abort "Not a unique beginning"
+      | _ -> Aorai_option.abort "Multiple transition corresponding"
+(*with Not_found -> Aorai_option.abort "Aorai var not found" *)
 
 let find_in_env env counter s =
   let current, stack =
