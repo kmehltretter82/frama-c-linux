@@ -265,7 +265,7 @@ let mkBlock (slst: stmt list) : block =
 
 let mkBlockNonScoping l = let b = mkBlock l in b.bscoping <- false; b
 
-let mkStmt ?(ghost=false) ?(valid_sid=false) (sk: stmtkind) : stmt =
+let mkStmt ?(ghost=false) ?(valid_sid=false) ?(sattr=[]) (sk: stmtkind) : stmt =
   { skind = sk;
     labels = [];
      (* It is better to create statements with a valid sid, so that they can
@@ -274,7 +274,8 @@ let mkStmt ?(ghost=false) ?(valid_sid=false) (sk: stmtkind) : stmt =
 	(e.g. slicing). *)
     sid = if valid_sid then Sid.next () else -1;
     succs = []; preds = [];
-    ghost = ghost}
+    ghost = ghost;
+    sattr = sattr;}
 
 let stmt_of_instr_list ?(loc=Location.unknown) = function
    | [] -> Instr (Skip loc)
@@ -4212,7 +4213,7 @@ let parseIntExp ~loc repr =
  let mkStmtCfg ~before ~(new_stmtkind:stmtkind) ~(ref_stmt:stmt) : stmt =
    let new_ = { skind = new_stmtkind;
 		labels = [];
-		sid = -1; succs = []; preds = []; ghost = false }
+		sid = -1; succs = []; preds = []; ghost = false; sattr = [] }
    in
    new_.sid <- Sid.next ();
    if before then begin
@@ -4263,10 +4264,11 @@ let parseIntExp ~loc repr =
 	   old_preds;
 	 n
 
- let mkEmptyStmt ?ghost ?valid_sid ?(loc=Location.unknown) () =
-   mkStmt ?ghost ?valid_sid (Instr (Skip loc))
+ let mkEmptyStmt ?ghost ?valid_sid ?sattr ?(loc=Location.unknown) () =
+   mkStmt ?ghost ?valid_sid ?sattr (Instr (Skip loc))
 
- let mkStmtOneInstr ?ghost ?valid_sid i = mkStmt ?ghost ?valid_sid (Instr i)
+ let mkStmtOneInstr ?ghost ?valid_sid ?sattr i =
+   mkStmt ?ghost ?valid_sid ?sattr (Instr i)
 
  let dummyInstr = Asm([], ["dummy statement!!"], None, Location.unknown)
  let dummyStmt = mkStmt (Instr dummyInstr)
@@ -4310,9 +4312,9 @@ let parseIntExp ~loc repr =
 
  let mkString ~loc s = new_exp ~loc (Const(CStr s))
 
- let mkWhile ~(guard:exp) ~(body: stmt list) : stmt list =
+ let mkLoop ?(sattr = [Attr("while", [])]) ~(guard:exp) ~(body: stmt list) : stmt list =
   (* Do it like this so that the pretty printer recognizes it *)
-  [ mkStmt ~valid_sid:true
+  [ mkStmt ~valid_sid:true ~sattr
       (Loop ([],
 	     mkBlock
 	       (mkStmt ~valid_sid:true
@@ -4324,7 +4326,7 @@ let parseIntExp ~loc repr =
  let mkFor ~(start: stmt list) ~(guard: exp) ~(next: stmt list)
 	   ~(body: stmt list) : stmt list =
    (start @
-      (mkWhile guard (body @ next)))
+      (mkLoop ~sattr:[Attr("For",[])] ~guard ~body:(body @ next)))
 
  let mkForIncr ~(iter : varinfo) ~(first: exp) ~(stopat: exp) ~(incr: exp)
      ~(body: stmt list) : stmt list =

@@ -1025,7 +1025,8 @@ val appears_in_expr: varinfo -> exp -> bool
     if [valid_sid] is false (the default),
     or to a valid sid if [valid_sid] is true,
     and [labels], [succs] and [preds] to the empty list *)
-val mkStmt: ?ghost:bool -> ?valid_sid:bool -> stmtkind -> stmt
+val mkStmt: ?ghost:bool -> ?valid_sid:bool -> ?sattr:attributes -> stmtkind ->
+  stmt
 
 (* make the [new_stmtkind] changing the CFG relatively to [ref_stmt] *)
 val mkStmtCfg: before:bool -> new_stmtkind:stmtkind -> ref_stmt:stmt -> stmt
@@ -1048,7 +1049,8 @@ val mkStmtCfgBlock: stmt list -> stmt
 (** Construct a statement consisting of just one instruction
     See {!Cil.mkStmt} for the signification of the optional args.
  *)
-val mkStmtOneInstr: ?ghost:bool -> ?valid_sid:bool -> instr -> stmt
+val mkStmtOneInstr: ?ghost:bool -> ?valid_sid:bool -> ?sattr:attributes ->
+  instr -> stmt
 
 (** Try to compress statements so as to get maximal basic blocks.
  * use this instead of List.@ because you get fewer basic blocks *)
@@ -1057,7 +1059,8 @@ val mkStmtOneInstr: ?ghost:bool -> ?valid_sid:bool -> instr -> stmt
 (** Returns an empty statement (of kind [Instr]). See [mkStmt] for [ghost] and
     [valid_sid] arguments.
     @modify Neon-20130301 adds the [valid_sid] optional argument. *)
-val mkEmptyStmt: ?ghost:bool -> ?valid_sid:bool -> ?loc:location -> unit -> stmt
+val mkEmptyStmt: ?ghost:bool -> ?valid_sid:bool -> ?sattr:attributes ->
+  ?loc:location -> unit -> stmt
 
 (** A instr to serve as a placeholder *)
 val dummyInstr: instr
@@ -1089,8 +1092,10 @@ val mkPureExpr:
   ?ghost:bool -> ?valid_sid:bool -> fundec:fundec ->
   ?loc:location -> exp -> stmt
 
-(** Make a while loop. Can contain Break or Continue *)
-val mkWhile: guard:exp -> body:stmt list -> stmt list
+(** Make a loop. Can contain Break or Continue.
+    The kind of loop (While, For, DoWhile) is given by [sattr];
+    it is a While loop if unspecified. *)
+val mkLoop: ?sattr:attributes -> guard:exp -> body:stmt list -> stmt list
 
 (** Make a for loop for(i=start; i<past; i += incr) \{ ... \}. The body
     can contain Break but not Continue. Can be used with i a pointer

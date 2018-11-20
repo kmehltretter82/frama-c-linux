@@ -190,7 +190,7 @@ class type extensible_printer_type = object
       last {!Cil_types.stmt} argument. The initial {!Cil_types.stmt} argument
       records the statement which follows the one being printed. *)
 
-  method stmtkind: stmt ->  Format.formatter -> stmtkind -> unit
+  method stmtkind: attributes -> stmt ->  Format.formatter -> stmtkind -> unit
   (** Print a statement kind. The code to be printed is given in the
       {!Cil_types.stmtkind} argument.  The initial {!Cil_types.stmt} argument
       records the statement which follows the one being printed;
