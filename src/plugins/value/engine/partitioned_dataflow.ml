@@ -110,7 +110,25 @@ module Make_Dataflow
 
   let unroll (stmt : stmt) : int =
     let local_unroll = match Unroll_annots.get_unroll_terms stmt with
-      | [] -> None
+      | [] ->
+        let loop_attr_and_wkey =
+          if Cil.hasAttribute "for" stmt.sattr then
+            Some ("for", Value_parameters.wkey_missing_loop_unroll_for)
+          else if Cil.hasAttribute "while" stmt.sattr then
+            Some ("while", Value_parameters.wkey_missing_loop_unroll)
+          else if Cil.hasAttribute "dowhile" stmt.sattr then
+            Some ("dowhile", Value_parameters.wkey_missing_loop_unroll)
+          else None
+        in
+        begin
+          match loop_attr_and_wkey with
+          | None -> ()
+          | Some (loop_kind, wkey) ->
+            Value_parameters.warning
+              ~wkey ~source:(fst (Cil_datatype.Stmt.loc stmt)) ~once:true
+              "%s loop without unroll annotation" loop_kind
+        end;
+        None
       | [t] ->
         (* Inlines the value of const variables in [t]. *)
         let global_init vi =
