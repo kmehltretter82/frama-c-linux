@@ -657,8 +657,9 @@ struct
   let fold_category = "fold"
   let unfold_category = "unfold"
 
-  let declare_markers (source:GSourceView2.source_view) =
-    source#set_mark_category_pixbuf
+(*GTK3 does not exist anymore in gsourceview3. *)
+  let declare_markers (_source:GSourceView2.source_view) = ()
+(*    source#set_mark_category_pixbuf
       ~category:fold_category (Some Gtk_helper.Icon.(get Fold));
     source#set_mark_category_pixbuf
       ~category:unfold_category (Some Gtk_helper.Icon.(get Unfold));
@@ -682,7 +683,7 @@ struct
         F.Valid_under_hyp;
         F.Invalid_under_hyp;
         F.Inconsistent ]
-
+*)
   (* tooltip marks are recreated whenever the buffer changes *)
   let tooltip_marks : (int, string) Hashtbl.t = Hashtbl.create 8
 

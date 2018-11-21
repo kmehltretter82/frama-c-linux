@@ -165,7 +165,7 @@ class menu_manager ?packing ~host:(_:Gtk_helper.host) =
            By default, add all the others just before this very first group. *)
         ref (match pos, first_tool_separator with
             | None, None -> 0
-            | None, Some sep -> max 0 (toolbar#get_item_index sep)
+            | None, Some sep -> max 0 (toolbar#get_item_index sep#as_tool_item)
             | Some p, _ -> p)
       in
       let toolbar_packing w =
@@ -213,7 +213,10 @@ class menu_manager ?packing ~host:(_:Gtk_helper.host) =
                 (fun () -> b#set_active (active ())) :: set_active_states;
               BToggle b
         in
-        (bt_type_as_skel b)#set_tooltip (GData.tooltips ()) tooltip "";
+        (*GTK3: set_tooltip does not exist anymore. *)
+        (*(bt_type_as_skel b)#set_tooltip (GData.tooltips ()) tooltip "";*)
+        (bt_type_as_skel b)#misc#set_tooltip_text tooltip;
+        (*/GTK3*)
         toolbar_buttons <- (b, sensitive) :: toolbar_buttons;
         b
       in
@@ -238,9 +241,10 @@ class menu_manager ?packing ~host:(_:Gtk_helper.host) =
         lazy (fst !!aux), lazy (snd !!aux)
       in
       let add_menu_separator =
-        fun () ->
-          if !menu_pos > 0 || (!menu_pos = -1 && container#children <> []) then
-            ignore (GMenu.separator_item ~packing:container_packing ())
+        fun () -> ()
+         (*GTK3: no GMenu.separator_item *)
+         (*if !menu_pos > 0 || (!menu_pos = -1 && container#children <> []) then
+            ignore (GMenu.separator_item ~packing:container_packing ()) *)
       in
       let add_item_menu stock_opt label callback sensitive =
         let item = match stock_opt, callback with
@@ -249,11 +253,14 @@ class menu_manager ?packing ~host:(_:Gtk_helper.host) =
               ignore (mi#connect#activate callback);
               MStandard mi
           | Some stock, Unit_callback callback ->
-              let image = GMisc.image ~stock () in
+              let _image = GMisc.image ~stock () in
               let mi =
-                (GMenu.image_menu_item
+                (*GTK3: no image_menu_item *)
+                (*(GMenu.image_menu_item
                    ~image ~packing:!!menubar_packing ~label ()
-                 :> GMenu.menu_item)
+                 :> GMenu.menu_item) *)
+                GMenu.menu_item ~label ()
+                (*/GTK3*)
               in
               ignore (mi#connect#activate callback);
               MStandard mi

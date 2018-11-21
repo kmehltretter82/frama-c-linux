@@ -7,8 +7,10 @@ module DGraphModel = struct
 end
 
 module DGraphContainer = struct
+  type status = Global | Tree | Both
+
   module Dot = struct
-    let from_dot_with_commands ?packing:_ _ =
+    let from_dot_with_commands ?packing:_ ?status:_ _ =
       raise (DGraphModel.DotError "DGraph is unsupported in GTK3")
   end
 end

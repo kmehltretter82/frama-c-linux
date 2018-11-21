@@ -7,8 +7,14 @@ module DGraphModel: sig
 end
 
 module DGraphContainer: sig
+
+  type status = Global | Tree | Both
+
   module Dot: sig
-    val from_dot_with_commands: ?packing:(GObj.widget ->unit) -> string ->
+    val from_dot_with_commands:
+      ?packing:(GObj.widget ->unit) ->
+      ?status:status ->
+      string ->
         GPack.table * <adapt_zoom: unit -> unit>
   end
 end

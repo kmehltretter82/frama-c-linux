@@ -73,7 +73,8 @@ class label ?(style=`Label) ?(align=`Left) ?width ?text () =
       | Some c0 , `NORMAL ->
           w#misc#modify_fg [ `NORMAL , `COLOR c0 ]
       | None , (#GDraw.color as c) ->
-          fg <- Some (w#misc#style#fg `NORMAL) ;
+          (*GTK3: misc#style does not exist anymore *)
+          (* fg <- Some (w#misc#style#fg `NORMAL) ; *)
           w#misc#modify_fg [ `NORMAL , c ]
       | Some _ , (#GDraw.color as c) ->
           w#misc#modify_fg [ `NORMAL , c ]
@@ -84,7 +85,8 @@ class label ?(style=`Label) ?(align=`Left) ?width ?text () =
       | Some c0 , `NORMAL ->
           w#misc#modify_bg [ `NORMAL , `COLOR c0 ]
       | None , (#GDraw.color as c) ->
-          bg <- Some (w#misc#style#bg `NORMAL) ;
+          (*GTK3: misc#style does not exist anymore *)
+          (* bg <- Some (w#misc#style#bg `NORMAL) ; *)
           w#misc#modify_bg [ `NORMAL , c ]
       | Some _ , (#GDraw.color as c) ->
           w#misc#modify_bg [ `NORMAL , c ]
@@ -427,8 +429,9 @@ class popup () =
     method add_separator = separator <- true
 
     method add_item ~label ~callback =
-      if not empty && separator then
-        ignore (GMenu.separator_item ~packing:menu#append ()) ;
+      (*GTK3: no separator_item anymore. *)
+      (* if not empty && separator then
+        ignore (GMenu.separator_item ~packing:menu#append ()) ; *)
       let item = GMenu.menu_item ~label ~packing:menu#append () in
       ignore (item#connect#activate ~callback) ;
       empty <- false ; separator <- false

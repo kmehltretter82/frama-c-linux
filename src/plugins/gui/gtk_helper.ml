@@ -357,11 +357,12 @@ type 'a chooser =
 (* --- Bundle of fields                                                 --- *)
 (* ------------------------------------------------------------------------ *)
 
-let do_tooltip ?tooltip obj = match tooltip with
+let do_tooltip ?tooltip _obj = match tooltip with
   | None -> ()
-  | Some text ->
-      let tooltip = GData.tooltips () in
-      tooltip#set_tip ~text obj#coerce
+  | Some _text -> ()
+      (*GTK3: no GData.tooltips*)
+      (* let tooltip = GData.tooltips () in
+      tooltip#set_tip ~text obj#coerce *)
 
 let on_bool ?tooltip ?use_markup (container:GPack.box) label get set =
   let result = ref (get ()) in
@@ -550,10 +551,13 @@ let trace_event (w:GObj.event_ops) =
     | `DROP_FINISHED -> "drop-finish"
     | `CLIENT_EVENT -> "client-event"
     | `VISIBILITY_NOTIFY -> "visibility-notify"
-    | `NO_EXPOSE-> "no-expose"
+    (*GTK3 Event does not exist anymore *)
+    (*    | `NO_EXPOSE-> "no-expose" *)
     | `SCROLL -> "scroll"
     | `WINDOW_STATE -> "window-state"
     | `SETTING -> "setting"
+    (*GTK3: leave room for more events. *)
+    | _ -> "unknown-gtk3-event"
   in
   ignore (w#connect#any
             ~callback:(fun e ->
