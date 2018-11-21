@@ -106,6 +106,9 @@ LABLGTK_PATH ?=@LABLGTK_PATH@
 # lablgtksourceview
 HAS_GTKSOURCEVIEW ?=@HAS_GTKSOURCEVIEW@
 
+GTKSOURCEVIEW:=\
+  $(patsubst lablgtk%,lablgtk2.%,$(basename $(notdir @GTKSOURCEVIEW@)))
+
 # lablgnomecanvas
 HAS_GNOMECANVAS	?=@HAS_GNOMECANVAS@
 
@@ -190,7 +193,10 @@ LIBRARY_NAMES += yojson
 endif
 
 ifneq ($(ENABLE_GUI),no)
-LIBRARY_NAMES_GUI = lablgtk2 lablgtk2.gnomecanvas lablgtk2.sourceview2
+  LIBRARY_NAMES_GUI = lablgtk2 $(GTKSOURCEVIEW)
+  ifeq ($(HAS_GNOMECANVAS),yes)
+    LIBRARY_NAMES_GUI+=lablgtk2.gnomecanvas
+  endif
 else
 LIBRARY_NAMES_GUI =
 endif

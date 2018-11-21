@@ -741,7 +741,7 @@ plugin_require(from_analysis,callgraph)
 check_plugin(gui,src/plugins/gui,[support for gui],yes)
 
 plugin_require_external(gui,lablgtk)
-plugin_require_external(gui,gnomecanvas)
+plugin_use_external(gui,gnomecanvas)
 plugin_require_external(gui,gtksourceview)
 plugin_use_external(gui,dot)
 
@@ -935,8 +935,9 @@ USE_LABLGTK="$USE_LABLGTK$USE_GNOMECANVAS"
   fi
 
 configure_library([GTKSOURCEVIEW],
-                  [$LABLGTKPATH_FOR_CONFIGURE/lablgtksourceview2.$LIB_SUFFIX],
-                  [lablgtksourceview2.$LIB_SUFFIX not found],
+                  [$LABLGTKPATH_FOR_CONFIGURE/lablgtksourceview2.$LIB_SUFFIX,
+                   $LABLGTKPATH_FOR_CONFIGURE/lablgtksourceview3.$LIB_SUFFIX],
+                  [lablgtksourceview not found],
                   no)
 
 configure_library([GNOMECANVAS],
