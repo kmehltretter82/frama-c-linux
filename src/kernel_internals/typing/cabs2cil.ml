@@ -6689,9 +6689,10 @@ and doExp local_env
         | _ -> e
       in
       (* Get the name of the last formal *)
-      let getNameLastFormal () : string =
+      let getNameLastNonGhostFormal () : string =
         match !currentFunctionFDEC.svar.vtype with
         | TFun(_, Some args, true, _) -> begin
+            let args, _ = Cil.argsToPairOfLists (Some args) in
             match List.rev args with
             | (last_par_name, _, _) :: _ -> last_par_name
             | _ -> ""
@@ -6740,7 +6741,7 @@ and doExp local_env
                    let isOk =
                      match (dropCasts last).enode with
                      | Lval (Var lastv, NoOffset) ->
-                       lastv.vname = getNameLastFormal ()
+                       lastv.vname = getNameLastNonGhostFormal ()
                      | _ -> false
                    in
                    if not isOk && variad then
@@ -6776,7 +6777,7 @@ and doExp local_env
                    let isOk =
                      match (dropCasts last).enode with
                      | Lval (Var lastv, NoOffset) ->
-                       lastv.vname = getNameLastFormal ()
+                       lastv.vname = getNameLastNonGhostFormal ()
                      | _ -> false
                    in
                    if not isOk then
@@ -6815,7 +6816,7 @@ and doExp local_env
                    let isOk =
                      match (dropCasts last).enode with
                      | Lval (Var lastv, NoOffset) ->
-                       lastv.vname = getNameLastFormal ()
+                       lastv.vname = getNameLastNonGhostFormal ()
                      | _ -> false
                    in
                    if not isOk then
