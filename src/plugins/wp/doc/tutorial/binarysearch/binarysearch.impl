@@ -1,0 +1,5 @@
+bool binary_search(const value_type* a, size_type n, value_type val)
+{
+  size_type lwb = lower_bound(a, n, val);
+  return lwb < n && a[lwb] <= val;
+}

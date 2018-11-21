@@ -1,0 +1,15 @@
+[kernel] Parsing context-depth.c (with preprocessing)
+[eva] Analyzing an incomplete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
+  s.v ∈ [--..--]
+   .next ∈ {{ &S_next_s[0] }}
+  S_next_s[0].v ∈ [--..--]
+          [0].next ∈ {{ &S_next_0_S_next_s[0] }}
+  S_next_0_S_next_s[0].v ∈ [--..--]
+                   [0].next ∈ {0}
+[eva] done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function main:
+  

@@ -1,0 +1,23 @@
+\clearpage
+\section{The \textsf{swap-values} Algorithm}
+\label{swap-values}
+
+We now study the \texttt{swap-values} algorithm from ``ACSL By Example''.
+This algorithm exchanges the value of two variables.
+
+The specification of the \texttt{swap-values} algorithm is as follows:
+
+\listingname{swapvalues.h}
+\cinput{swapvalues/swapvalues.spec}
+
+The implementation of the algorithm is:
+
+\listingname{swapvalues.c}
+\cinput{swapvalues/swapvalues.impl}
+
+The implementation is proved correct:
+\fclogs{mutating}{swapvalues}
+
+%With \texttt{Store} memory model, the proof obligations are not discharged by \textsf{Alt-Ergo}:
+%\fclogs{mutating}{swapvalues-withassert}
+

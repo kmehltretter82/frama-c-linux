@@ -1,0 +1,42 @@
+\documentclass[web]{frama-c-book}
+\usepackage{longtable}
+\usepackage{pifont}
+\newcommand{\fclogs}[2]{\logsinput{tests/#1/oracle/#2.res.oracle}}
+\newenvironment{feature}[1]%
+{\footnotesize\begin{description}\item[\scriptsize WP #1]\color{blue}}
+{\end{description}}
+
+\begin{document}
+\coverpage{WP Tutorial}
+\begin{titlepage}
+\includegraphics[height=14mm]{cealistlogo.jpg}
+\hfill~
+\vfill
+\title{WP Tutorial}%
+{WP 0.8 for Neon-20140201}
+\author{Patrick Baudin, Loïc Correnson, Philippe Hermann}
+\begin{center}
+CEA LIST, Software Safety Laboratory
+\end{center}
+\vfill
+\begin{flushleft}
+  \textcopyright 2010-2014 CEA LIST
+  
+  This work is based on the book ``\textsf{ACSL by Example}''
+  published by the FOKUS Team at Fraunhofer Institute.
+\end{flushleft}
+\end{titlepage}
+
+\cleardoublepage
+\markright{}
+\tableofcontents
+
+\input{tut_intro}
+\input{tut_function}
+\input{tut_maxmin}
+\input{tut_binary}
+\input{tut_mutating}
+\input{tut_rationale}
+
+\end{document}
+
