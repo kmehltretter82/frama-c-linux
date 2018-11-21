@@ -5085,8 +5085,8 @@ and doType (ghost:bool) isFuncArg
       let targs : varinfo list option =
         match noopt_targs @ noopt_ghost_targs with
         | [] -> None (* No argument list *)
-        | [t] when isVoidType t.vtype ->
-          Some []
+        | t :: l' when isVoidType t.vtype ->
+          Some l'
         | l ->
           Some l
       in

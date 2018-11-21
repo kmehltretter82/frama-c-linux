@@ -5798,6 +5798,11 @@ let splitFunctionTypeVI (fvi: varinfo)
     TFun (rt, args, isva, a) -> rt, args, isva, a
   | _ -> Kernel.abort "Function %s invoked on a non function type" fvi.vname
 
+let argsToPairOfLists args =
+  List.partition
+    (fun (_,_,a) -> not(hasAttribute frama_c_ghost a))
+    (argsToList args)
+
 let remove_attributes_for_integral_promotion a =
   dropAttributes (bitfield_attribute_name :: spare_attributes_for_c_cast) a
 

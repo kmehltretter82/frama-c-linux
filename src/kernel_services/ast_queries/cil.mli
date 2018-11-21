@@ -580,9 +580,16 @@ val isTypeTagType: logic_type -> bool
     @since Nitrogen-20111001 moved from cabs2cil *)
 val isVariadicListType: typ -> bool
 
-(** Obtain the argument list ([] if None) *)
+(** Obtain the argument list ([] if None).
+    @since Argon+dev Beware that it contains the ghost arguments. *)
 val argsToList:
   (string * typ * attributes) list option -> (string * typ * attributes) list
+
+(** @since Argon+dev
+   Obtain the argument lists (non-ghost, ghosts) ([], [] if None) *)
+val argsToPairOfLists:
+  (string * typ * attributes) list option ->
+  (string * typ * attributes) list * (string * typ * attributes) list
 
 (** True if the argument is an array type *)
 val isArrayType: typ -> bool

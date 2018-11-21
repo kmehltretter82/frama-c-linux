@@ -878,16 +878,11 @@ class cil_printer () = object (self)
       let is_ghost_type (_, _, a) = Cil.hasAttribute Cil.frama_c_ghost a in
 
       let rec split = function
-        (* it means we have a va_list *)
-        | [], args ->
-          args, []
-        (* all remaining arguments are necessarily ghosts *)
-        | t :: _ , args when is_ghost_type t ->
-          [], args
+        | [], args -> args, []
+        | t :: _ , args when is_ghost_type t -> [], args
         | _ :: l , a :: args' ->
           let (args, ghosts) = split (l, args') in
           (a :: args, ghosts)
-        (* it could not typecheck *)
         | _ :: _ , [] -> assert false
       in
       let args, ghosts = if is_ghost then args, [] else split (param_ts, args) in
@@ -895,7 +890,12 @@ class cil_printer () = object (self)
       (* Now the arguments *)
       Pretty_utils.pp_flowlist ~left:"(" ~sep:"," ~right:")" self#exp fmt args;
       (* Now the ghost arguments *)
-      Pretty_utils.pp_list ~pre:"/*@@ ghost (" ~suf:") */" self#exp fmt ghosts;
+      begin match ghosts with
+        | [] -> ()
+        | _ -> Pretty_utils.pp_flowlist
+                 ~left:"/*@@ ghost (" ~sep:"," ~right:") */"
+                 self#exp fmt ghosts
+      end ;
       (* Now the terminator *)
       fprintf fmt "%s" instr_terminator
     in
@@ -1922,7 +1922,7 @@ class cil_printer () = object (self)
                Pretty_utils.pp_list ~sep:",@ " pp_args fmt args;
                if isvararg then fprintf fmt "@ , ...")
         ;
-        Pretty_utils.pp_list ~pre:"/*@@ ghost (" ~suf:") */"
+        Pretty_utils.pp_list ~pre:"/*@@ ghost (" ~suf:") */" ~sep:", "
           pp_args fmt ghost_args
       in
       let pp_params fmt = match fundecl with
