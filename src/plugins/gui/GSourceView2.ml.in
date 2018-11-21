@@ -1,0 +1,2 @@
+(** compatibility layer between gtksourceview 2 and 3. *)
+include GSourceView3

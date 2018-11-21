@@ -1,0 +1,2 @@
+(* compatibility between gtksourceview 2 and 3. *)
+include module type of GSourceView3

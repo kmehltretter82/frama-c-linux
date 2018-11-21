@@ -197,3 +197,4 @@ hello-*.tar.gz
 #######################
 # should remain empty #
 #######################
+/src/plugins/gui/GSourceView2.mli

@@ -680,8 +680,19 @@ STARTUP_CMX=$(STARTUP_CMO:.cmo=.cmx)
 WTOOLKIT= \
 	wutil widget wbox wfile wpane wpalette wtext wtable
 
+SOURCEVIEWCOMPAT:=
+ifeq ($(strip $(GTKSOURCEVIEW)),lablgtk2.sourceview3)
+SOURCEVIEWCOMPAT:=GSourceView2
+
+src/plugins/gui/GSourceView2.ml%: src/plugins/gui/GSourceView2.ml%.in
+	$(CP) $< $@
+	$(CHMOD_RO) $@
+
+endif
+
 SINGLE_GUI_CMO:= \
 	$(WTOOLKIT) \
+	$(SOURCEVIEWCOMPAT) \
 	gui_parameters \
 	gtk_helper gtk_form \
 	source_viewer pretty_source source_manager book_manager \
