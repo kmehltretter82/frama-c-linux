@@ -684,15 +684,31 @@ SOURCEVIEWCOMPAT:=
 ifeq ($(strip $(GTKSOURCEVIEW)),lablgtk2.sourceview3)
 SOURCEVIEWCOMPAT:=GSourceView2
 
-src/plugins/gui/GSourceView2.ml%: src/plugins/gui/GSourceView2.ml%.in
+src/plugins/gui/GSourceView2.ml: src/plugins/gui/GSourceView2.ml.in
+	$(CP) $< $@
+	$(CHMOD_RO) $@
+
+src/plugins/gui/GSourceView2.mli: src/plugins/gui/GSourceView2.mli.in
 	$(CP) $< $@
 	$(CHMOD_RO) $@
 
 endif
 
+DGRAPHCOMPAT:=
+ifeq ($(HAS_GNOMECANVAS),no)
+DGRAPHCOMPAT:=dgraph
+src/plugins/gui/dgraph.ml: src/plugins/gui/dgraph.ml.in
+	$(CP) $< $@
+	$(CHMOD_RO) $@
+src/plugins/gui/dgraph.mli: src/plugins/gui/dgraph.mli.in
+	$(CP) $< $@
+	$(CHMOD_RO) $@
+endif
+
 SINGLE_GUI_CMO:= \
 	$(WTOOLKIT) \
 	$(SOURCEVIEWCOMPAT) \
+	$(DGRAPHCOMPAT) \
 	gui_parameters \
 	gtk_helper gtk_form \
 	source_viewer pretty_source source_manager book_manager \
@@ -745,7 +761,12 @@ PLUGIN_NAME:=Callgraph
 PLUGIN_DISTRIBUTED:=yes
 PLUGIN_DIR:=src/plugins/callgraph
 PLUGIN_CMO:= options journalize subgraph cg services uses register
+#GTK3: no DGraph available.
+ifeq ($(HAS_GNOMECANVAS),yes)
 PLUGIN_GUI_CMO:=cg_viewer
+else
+PLUGIN_GUI_CMO:=
+endif
 PLUGIN_CMI:= callgraph_api
 PLUGIN_INTERNAL_TEST:=yes
 PLUGIN_TESTS_DIRS:=callgraph

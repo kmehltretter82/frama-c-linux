@@ -1,0 +1,14 @@
+(* dgraph module that always generates an error: Dgraph is not available
+   with gtk3
+*)
+
+module DGraphModel: sig
+  exception DotError of string
+end
+
+module DGraphContainer: sig
+  module Dot: sig
+    val from_dot_with_commands: ?packing:(GObj.widget ->unit) -> string ->
+        GPack.table * <adapt_zoom: unit -> unit>
+  end
+end
