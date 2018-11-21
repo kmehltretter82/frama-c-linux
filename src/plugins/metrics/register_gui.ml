@@ -51,7 +51,8 @@ module HalsteadMetricsGUI = struct
       padder#add (box:>GObj.widget);
       ignore(GMisc.label ~markup:(Printf.sprintf "<b>%s</b>" name)
                ~justify:`LEFT ~packing:box#pack ());
-      ignore(GMisc.separator `HORIZONTAL ~packing:box#pack ());
+      (*GTK3: no separator *)
+      (* ignore(GMisc.separator `HORIZONTAL ~packing:box#pack ()); *)
       let metrics = Metrics_cabs.Halstead.get_metrics () in
       let table_contents = Metrics_cabs.Halstead.to_list metrics in
       Metrics_gui.display_as_table table_contents box
@@ -109,7 +110,8 @@ module CyclomaticMetricsGUI = struct
 			  true));
 	      ignore(GMisc.label ~markup:(Printf.sprintf "<b>%s</b>" fname)
 		       ~justify:`LEFT ~packing:vbox#pack ());
-	      ignore(GMisc.separator `HORIZONTAL ~packing:vbox#pack ());
+              (*GTK3: no separator *)
+	      (* ignore(GMisc.separator `HORIZONTAL ~packing:vbox#pack ()); *)
 	      let metrics_data  = [["total stmts";(string_of_int total)]; 
 				   ["stmts analyzed";(string_of_int valeur)];
 				   ["percentage of stmts covered"; (string_of_float percent)]
@@ -143,7 +145,8 @@ module CyclomaticMetricsGUI = struct
                   true));
       ignore(GMisc.label ~markup:(Printf.sprintf "<b>%s</b>" fname)
                ~justify:`LEFT ~packing:vbox#pack ());
-      ignore(GMisc.separator `HORIZONTAL ~packing:vbox#pack ());
+      (*GTK3: no separator*)
+      (* ignore(GMisc.separator `HORIZONTAL ~packing:vbox#pack ()); *)
       let metrics_data  = BasicMetrics.to_list self#get_data in
       Metrics_gui.display_as_table metrics_data vbox;
       let close_button = GButton.button ~stock:`OK ~packing:vbox#pack () in
@@ -201,7 +204,8 @@ module CyclomaticMetricsGUI = struct
     padder#add (box:>GObj.widget);
     ignore(GMisc.label ~markup:(Printf.sprintf "<b>%s</b>" name)
              ~justify:`LEFT ~packing:box#pack ());
-    ignore(GMisc.separator `HORIZONTAL ~packing:box#pack ());
+    (* GTK3: no separator. *)
+    (* ignore(GMisc.separator `HORIZONTAL ~packing:box#pack ()); *)
     let metrics = Metrics_cilast.get_global_metrics ~libc in
     let table_contents = BasicMetrics.to_list metrics in
     Metrics_gui.display_as_table table_contents box
@@ -338,7 +342,8 @@ module ValueCoverageGUI = struct
     padder#add (box:>GObj.widget);
     ignore(GMisc.label ~markup:(Printf.sprintf "<b>%s</b>" name)
              ~justify:`LEFT ~packing:box#pack ());
-    ignore(GMisc.separator `HORIZONTAL ~packing:box#pack ());
+    (* GTK3: no separator *)
+    (* ignore(GMisc.separator `HORIZONTAL ~packing:box#pack ()); *)
     let metrics = compute ~libc in
     let pcent = Metrics_coverage.percent_coverage ~libc metrics in
     let progress_bar = GRange.progress_bar ~packing:box#pack () in

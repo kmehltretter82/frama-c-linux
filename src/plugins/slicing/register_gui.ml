@@ -377,7 +377,8 @@ let slicing_selector (popup_factory:GMenu.menu GMenu.factory)
         | _  ->
             add_slice_menu None None
       end;
-      ignore (slicing_factory#add_separator ());
+      (*GTK3: no add_separator*)
+      (* ignore (slicing_factory#add_separator ()); *)
     end
 
 let slicing_highlighter(buffer:Design.reactive_buffer) localizable ~start ~stop=
