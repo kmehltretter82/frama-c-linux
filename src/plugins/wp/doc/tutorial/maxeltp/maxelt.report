@@ -1,0 +1,5 @@
+@SUFFIX "_report.tex"
+@ZERO "-"
+@FUNCTION
+\textit{max with predicates} & %total & %wp & %ergo & %success\% (%time) \\
+@END
