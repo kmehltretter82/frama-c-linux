@@ -847,8 +847,10 @@ class main_window () : main_window_extension_points =
       ~width
       ~height
       ~position:`CENTER
-      ~allow_shrink:true
-      ~allow_grow:true
+(*GTK3: arguments do not exist anymore at GTK level. *)
+(*      ~allow_shrink:true
+        ~allow_grow:true
+*)
       ~show:false
       ()
   in
@@ -867,7 +869,10 @@ class main_window () : main_window_extension_points =
   (* status bar (at bottom) *)
   (* toplevel_vbox->bottom_hbox-> *statusbar *)
   let statusbar =
-    GMisc.statusbar ~has_resize_grip:false ~packing:bottom_hbox#add ()
+    GMisc.statusbar
+      (* GTK3: argument does not exist *)
+      (* ~has_resize_grip:false *)
+      ~packing:bottom_hbox#add ()
   in
   let status_context = statusbar#new_context "messages" in
 
