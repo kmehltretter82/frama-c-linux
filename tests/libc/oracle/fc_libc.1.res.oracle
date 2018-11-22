@@ -5137,6 +5137,20 @@ extern time_t mktime(struct tm *timeptr);
  */
 extern time_t time(time_t *timer);
 
+char __fc_ctime[26];
+char * const __fc_p_ctime = (char *)(& __fc_ctime);
+/*@ requires valid_timer: \valid_read(timer);
+    requires initialization: init_timer: \initialized(timer);
+    ensures result_points_to_ctime: \result ≡ __fc_p_ctime;
+    ensures result_valid_string: valid_read_string(__fc_p_ctime);
+    assigns __fc_ctime[0 .. 25], \result;
+    assigns __fc_ctime[0 .. 25]
+      \from (indirect: *timer), (indirect: __fc_time);
+    assigns \result
+      \from (indirect: *timer), (indirect: __fc_time), __fc_p_ctime;
+ */
+extern char *ctime(time_t const *timer);
+
 struct tm __fc_time_tm;
 struct tm * const __fc_p_time_tm = & __fc_time_tm;
 /*@ ensures
