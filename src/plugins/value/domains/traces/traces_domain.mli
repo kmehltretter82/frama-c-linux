@@ -60,5 +60,3 @@ module D: Abstract_domain.Internal
   with type value = Cvalue.V.t
    and type location = Precise_locs.precise_location
    and type state = state
-
-val finish_computation: unit -> unit

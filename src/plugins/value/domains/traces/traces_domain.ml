@@ -1087,8 +1087,6 @@ module Internal = struct
 
 end
 
-module D = Domain_builder.Complete (Internal)
-
 let dummy_loc = Location.unknown
 
 let subst_in_full var_mapping =
@@ -1327,28 +1325,31 @@ let output_dot filename state =
   GraphDot.output_graph out (complete_graph (snd (Traces.get_current state)));
   close_out out
 
+module D = struct
+  include Internal
+  module Store = Domain_store.Make(Internal)
 
-let finish_computation () =
-  let return_stmt = Kernel_function.find_return (fst (Globals.entry_point ())) in
-  let return_exp = match return_stmt.Cil_types.skind with
-    | Cil_types.Return (oexp,_) -> oexp
-    | _ -> assert false in
-  let state = D.Store.get_stmt_state ~after:true return_stmt  in
-  let header fmt = Format.fprintf fmt "Trace domains:" in
-  let body = Bottom.pretty Traces.pretty in
-  Value_parameters.printf ~dkey:Internal.log_category ~header " @[%a@]" body state;
-  if Value_parameters.TracesProject.get () ||
-     not (Value_parameters.TracesDot.is_default ()) then
-    match state with
-    | `Bottom ->
-      Value_parameters.failure "The trace is Bottom can't generate code"
-    | `Value state when state ==Traces.top ->
-      Value_parameters.failure "The trace is TOP can't generate code"
-    | `Value state ->
-      if not (Value_parameters.TracesDot.is_default ())
-      then output_dot (Value_parameters.TracesDot.get ()) state;
-      if Value_parameters.TracesProject.get ()
-      then project_of_cfg return_exp state
+  let post_analysis state =
+    let return_stmt = Kernel_function.find_return (fst (Globals.entry_point ())) in
+    let return_exp = match return_stmt.Cil_types.skind with
+      | Cil_types.Return (oexp,_) -> oexp
+      | _ -> assert false in
+    let header fmt = Format.fprintf fmt "Trace domains:" in
+    let body = Bottom.pretty Traces.pretty in
+    Value_parameters.printf ~dkey:Internal.log_category ~header " @[%a@]" body state;
+    if Value_parameters.TracesProject.get () ||
+       not (Value_parameters.TracesDot.is_default ()) then
+      match state with
+      | `Bottom ->
+        Value_parameters.failure "The trace is Bottom can't generate code"
+      | `Value state when state ==Traces.top ->
+        Value_parameters.failure "The trace is TOP can't generate code"
+      | `Value state ->
+        if not (Value_parameters.TracesDot.is_default ())
+        then output_dot (Value_parameters.TracesDot.get ()) state;
+        if Value_parameters.TracesProject.get ()
+        then project_of_cfg return_exp state
+end
 
 
 (*

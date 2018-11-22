@@ -22,7 +22,9 @@ c -> 2
     5 -> Assign: tmp = 4 -> 6
     6 -> Assume: tmp true -> 7
     7 -> Assign: g = tmp -> 8
-    8 -> Assign: __retres = g + 1 -> 9 ]} at 9
+    8 -> Assign: __retres = g + 1 -> 9
+    9 -> EnterScope: \result<main> -> 10
+    10 -> Assign: \result<main> = __retres -> 11 ]} at 11
 [from] Computing for function main
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
@@ -58,7 +60,11 @@ int main(int c)
       /*@ assert tmp ≢ 0;  */
       g = tmp;
       __retres = g + 1;
-      __traces_domain_return = __retres;
+      {
+        int _result_main_;
+        _result_main_ = __retres;
+        __traces_domain_return = __retres;
+      }
     }
   }
   return __traces_domain_return;

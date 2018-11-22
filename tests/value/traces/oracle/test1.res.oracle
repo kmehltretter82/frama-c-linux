@@ -60,7 +60,9 @@ c -> 5
     42 -> Assign: g = tmp -> 45
     43 -> Assign: g = tmp -> 44
     44 -> join -> 46
-    45 -> join -> 46 ]} at 46
+    45 -> join -> 46
+    46 -> EnterScope: \result<main> -> 47
+    47 -> Assign: \result<main> = tmp -> 48 ]} at 48
 [from] Computing for function main
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
@@ -119,7 +121,11 @@ int main(int c)
         i ++;
         /*@ assert ¬(i < 3);  */
         g = tmp;
-        __traces_domain_return = tmp;
+        {
+          int _result_main_;
+          _result_main_ = tmp;
+          __traces_domain_return = tmp;
+        }
       }
     }
     else {
@@ -138,7 +144,11 @@ int main(int c)
         i ++;
         /*@ assert ¬(i < 3);  */
         g = tmp;
-        __traces_domain_return = tmp;
+        {
+          int _result_main_;
+          _result_main_ = tmp;
+          __traces_domain_return = tmp;
+        }
       }
     }
   }

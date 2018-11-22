@@ -79,7 +79,9 @@ c -> 1
     75 -> finalize_call: loop -> 76
     76 -> Assign: tmp = \result<loop> -> 77
     77 -> LeaveScope: \result<loop> -> 78
-    78 -> join -> 79 ]} at 79
+    78 -> join -> 79
+    79 -> EnterScope: \result<main> -> 80
+    80 -> Assign: \result<main> = tmp -> 81 ]} at 81
 [from] Computing for function loop
 [from] Done for function loop
 [from] Computing for function main
@@ -137,7 +139,11 @@ int main(int c)
             int _result_loop_;
             _result_loop_ = j;
             tmp = _result_loop_;
-            __traces_domain_return = tmp;
+            {
+              int _result_main_;
+              _result_main_ = tmp;
+              __traces_domain_return = tmp;
+            }
           }
         }
       }
@@ -164,7 +170,11 @@ int main(int c)
             int _result_loop_;
             _result_loop_ = j;
             tmp = _result_loop_;
-            __traces_domain_return = tmp;
+            {
+              int _result_main_;
+              _result_main_ = tmp;
+              __traces_domain_return = tmp;
+            }
           }
         }
       }

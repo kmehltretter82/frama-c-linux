@@ -563,7 +563,9 @@ c -> 1
     368 -> join -> 369
     369 -> join -> 370
     370 -> join -> 371
-    371 -> join -> 372 ]} at 372
+    371 -> join -> 372
+    372 -> EnterScope: \result<main> -> 373
+    373 -> Assign: \result<main> = tmp -> 374 ]} at 374
 [from] Computing for function main
 [from] Computing for function my_switch <-main
 [from] Done for function my_switch
