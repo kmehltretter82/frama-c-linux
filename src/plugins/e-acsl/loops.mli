@@ -37,7 +37,7 @@ val mv_invariants: Env.t -> old:stmt -> stmt -> unit
 val preserve_invariant:
   Project.t -> Env.t -> Kernel_function.t -> stmt -> stmt * Env.t * bool
 (** modify the given stmt loop to insert the code which preserves its loop
-    invarariants. Also return the modify environment and a boolean which
+    invariants. Also return the modify environment and a boolean which
     indicates whether the annotations corresponding to the loop invariant must
     be moved from the new statement to the old one. *)
 
