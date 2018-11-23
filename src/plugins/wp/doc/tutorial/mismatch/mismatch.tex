@@ -1,0 +1,34 @@
+\clearpage
+\section{The \textsf{mismatch} Algorithm}
+
+We now present the \texttt{mismatch} algorithm that returns the index
+of the first different element between two sequences, and (-1) otherwise.
+
+\listingname{mismatch.h}
+\cinput{mismatch/mismatch.spec}
+
+The implementation is simply:
+
+\listingname{mismatch.c}
+\cinput{mismatch/mismatch.impl}
+
+Once again, \textsf{WP} simply proves the algorithm:
+\fclogs{nonmutating}{mismatch}
+
+\clearpage
+\section{Alternate \textsf{equal} with \textsf{mismatch}}
+
+It is also possible to implement the \texttt{equal} algorithm in terms
+of \texttt{mismatch}. Using the same specification file given for
+\texttt{equal} in \ref{equal}, the implementation is now:
+
+\listingname{equal.c [alt]}
+\cinput{mismatch/equal.c}
+
+The entire program is proven correct by \textsf{WP} plug-in (here,
+the proofs steps for function \texttt{mismatch} are omitted):
+\fclogs{nonmutating}{eqmismatch}
+
+As the reader may observe, the \textsf{WP} has proven the precondition
+of \texttt{mismatch} from the one of \texttt{equal}, and the
+post-condition of \texttt{equal} from the one of \texttt{mismatch}.

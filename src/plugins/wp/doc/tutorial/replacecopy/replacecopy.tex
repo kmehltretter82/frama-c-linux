@@ -1,0 +1,21 @@
+\section{The \textsf{replace-copy} Algorithm}
+\label{replace-copy}
+
+We now study the \texttt{replace-copy} algorithm from ``ACSL By Example''.
+This algorithm copies a source sequence to a destination sequence whilst
+substituting every occurrence of a given value by another value.
+
+The specification of the \texttt{replace-copy} algorithm is as follows:
+
+\listingname{replacecopy.h}
+\cinput{replacecopy/replacecopy.spec}
+
+The implementation of the algorithm is:
+
+\listingname{replacecopy.c}
+\cinput{replacecopy/replacecopy.impl}
+
+A partial proof of correctness is obtained by running the \textsf{WP} plug-in: 
+\fclogs{mutating}{replacecopy}
+
+%% loop invariant preservation proven by Simplify though
