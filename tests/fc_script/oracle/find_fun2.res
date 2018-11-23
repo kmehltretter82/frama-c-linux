@@ -1,0 +1,3 @@
+Looking for 'main3' inside 4 file(s)...
+Possible definitions for function 'main3' in the following file(s):
+  tests/fc_script/for-find-fun.c
