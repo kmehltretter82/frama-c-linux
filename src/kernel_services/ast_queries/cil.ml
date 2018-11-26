@@ -277,12 +277,19 @@ let mkStmt ?(ghost=false) ?(valid_sid=false) ?(sattr=[]) (sk: stmtkind) : stmt =
     ghost = ghost;
     sattr = sattr;}
 
-let stmt_of_instr_list ?(loc=Location.unknown) = function
+(* This function is considered unsafe since the ghost parameter can only be
+   taken in account if the list contains at least two elements.
+   It should not be exposed by the API.
+*)
+let unsafe_stmt_of_instr_list ?(loc=Location.unknown) ?(ghost=false) = function
    | [] -> Instr (Skip loc)
    | [i] -> Instr i
    | il ->
-     let b = mkBlockNonScoping (List.map (fun i -> mkStmt (Instr i)) il) in
+     let b = mkBlockNonScoping (List.map (fun i -> mkStmt ~ghost (Instr i)) il) in
      Block b
+
+let stmt_of_instr_list ?(loc=Location.unknown) =
+  unsafe_stmt_of_instr_list ~loc ~ghost:false
 
  (**** Utility functions ******)
 
@@ -2218,8 +2225,8 @@ let flatten_transient_sub_blocks b =
   b.bstmts <- List.concat (List.map treat_one_stmt b.bstmts);
   b
 
-let stmt_of_instr_list_visitor ?loc l =
-  let res =  stmt_of_instr_list ?loc l in
+let stmt_of_instr_list_visitor ?loc ?ghost l =
+  let res = unsafe_stmt_of_instr_list ?loc ?ghost l in
   match res with
   | Block b -> Block (transient_block b)
   | _ -> res
@@ -3351,6 +3358,7 @@ and childrenExp (vis: cilVisitor) (e: exp) : exp =
 
  (* visit all nodes in a Cil statement tree in preorder *)
  and visitCilStmt (vis:cilVisitor) (s: stmt) : stmt =
+   let ghost = s.ghost in
    let oldloc = CurrentLoc.get () in
    CurrentLoc.set (Stmt.loc s) ;
    vis#push_stmt s; (*(vis#behavior.memo_stmt s);*)
@@ -3366,8 +3374,8 @@ and childrenExp (vis: cilVisitor) (e: exp) : exp =
    | _ ->
      let b =
        mkBlockNonScoping
-         ((List.map (fun i -> mkStmt (Instr i)) !toPrepend)
-          @ [mkStmt res.skind])
+         ((List.map (fun i -> mkStmt ~ghost (Instr i)) !toPrepend)
+          @ [mkStmt ~ghost res.skind])
      in
      b.battrs <- addAttribute (Attr (vis_tmp_attr, [])) b.battrs;
      (* Make our statement contain the instructions to prepend *)
@@ -3447,7 +3455,8 @@ and childrenExp (vis: cilVisitor) (e: exp) : exp =
      | Instr i ->
 	 begin match fInst i with
 	   | [i'] when i' == i -> s.skind
-	   | il -> stmt_of_instr_list_visitor ~loc:(Cil_datatype.Instr.loc i) il
+           | il -> stmt_of_instr_list_visitor
+                   ~ghost:s.ghost ~loc:(Cil_datatype.Instr.loc i) il
 	 end
      | Block b ->
 	 let b' = fBlock b in
@@ -6638,7 +6647,8 @@ let childrenFileSameGlobals vis f =
    List.iter
      (fun s ->
        match s.skind with
-       | Instr i -> s.skind <- stmt_of_instr_list (doInstrList [i])
+       | Instr i -> s.skind <-
+           unsafe_stmt_of_instr_list ~ghost:s.ghost (doInstrList [i])
        | If (_e, tb, eb, _) ->
 	   peepHole1 doone tb.bstmts;
 	   peepHole1 doone eb.bstmts
