@@ -6372,7 +6372,6 @@ and doExp local_env
       end
 
     | A.CALL(f, args, ghost_args) ->
-      let args = args @ ghost_args in
       let (rf,sf, f', ft') =
         match (stripParen f).expr_node with
         (* Treat the VARIABLE case separate because we might be calling a
@@ -6651,7 +6650,8 @@ and doExp local_env
            *)
           )
       in
-      let (argTypes, ghostArgTypes) = List.partition
+      let (argTypes, ghostArgTypes) =
+        List.partition
           (fun (_, _, a) ->
              not (Cil.hasAttribute Cil.frama_c_ghost a) || ghost)
           argTypesList
@@ -6659,6 +6659,7 @@ and doExp local_env
       let args = if ghost then args @ ghost_args else args in
       let (sghost, ghosts') = loopArgs ~are_ghost:true (ghostArgTypes, ghost_args) in
       let (sargs, args') = loopArgs ~init_chunk:sghost (argTypes, args) in
+
       let (sargs, args') = (sargs, args' @ ghosts') in
       (* Setup some pointer to the elements of the call. We may change
        * these below *)

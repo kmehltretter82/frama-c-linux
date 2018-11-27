@@ -555,6 +555,20 @@ let partitionAttributes
   in
   loop ([], [], []) attrs
 
+let frama_c_ghost = "__fc_ghost"
+let () = registerAttribute frama_c_ghost (AttrName false)
+let () =
+  registerAttribute (Extlib.strip_underscore frama_c_ghost) (AttrName false)
+
+let frama_c_mutable = "__fc_mutable"
+let () = registerAttribute frama_c_mutable (AttrName false)
+let () =
+  registerAttribute (Extlib.strip_underscore frama_c_mutable) (AttrName false)
+
+let frama_c_init_obj = "__fc_initialized_object"
+let () = registerAttribute frama_c_init_obj (AttrName false)
+let () =
+  registerAttribute (Extlib.strip_underscore frama_c_init_obj) (AttrName false)
 
 let unrollType (t: typ) : typ =
   let rec withAttrs (al: attributes) (t: typ) : typ =
@@ -614,6 +628,7 @@ let () = dependency_on_ast selfFormalsDecl
 
 let makeFormalsVarDecl (n,t,a) =
   let vi = makeVarinfo ~temp:false false true n t in
+  vi.vghost <- hasAttribute frama_c_ghost a ;
   vi.vattr <- a;
   vi
 
@@ -3508,22 +3523,6 @@ let typeOf_array_elem t =
   match unrollType t with
   | TArray (ty_elem, _, _, _) -> ty_elem
   | _ -> Kernel.fatal "Not an array type %a" !pp_typ_ref t
-
-
- let frama_c_ghost = "__fc_ghost"
- let () = registerAttribute frama_c_ghost (AttrName false)
- let () =
-   registerAttribute (Extlib.strip_underscore frama_c_ghost) (AttrName false)
-
-let frama_c_mutable = "__fc_mutable"
-let () = registerAttribute frama_c_mutable (AttrName false)
-let () =
-  registerAttribute (Extlib.strip_underscore frama_c_mutable) (AttrName false)
-
-let frama_c_init_obj = "__fc_initialized_object"
-let () = registerAttribute frama_c_init_obj (AttrName false)
-let () =
-  registerAttribute (Extlib.strip_underscore frama_c_init_obj) (AttrName false)
 
 let no_op_coerce typ t =
   match typ with

@@ -874,18 +874,20 @@ class cil_printer () = object (self)
        | _ -> fprintf fmt "(%a)"  self#exp e);
 
       let (_, param_ts, _, _) = Cil.splitFunctionType (Cil.typeOf e) in
-      let param_ts = Cil.argsToList param_ts in
-      let is_ghost_type (_, _, a) = Cil.hasAttribute Cil.frama_c_ghost a in
+      let _, g_params_ts = Cil.argsToPairOfLists param_ts in
 
-      let rec split = function
-        | [], args -> args, []
-        | t :: _ , args when is_ghost_type t -> [], args
-        | _ :: l , a :: args' ->
-          let (args, ghosts) = split (l, args') in
-          (a :: args, ghosts)
-        | _ :: _ , [] -> assert false
+      let rec break n l =
+        if n = 0 then [], l
+        else match l with
+          | [] -> assert false
+          | x :: l' -> let (f, s) = break (n-1) l' in x :: f, s
       in
-      let args, ghosts = if is_ghost then args, [] else split (param_ts, args) in
+      let args, ghosts = if is_ghost then
+          args, []
+        else
+          let n = List.length args - List.length g_params_ts in
+          break n args
+      in
 
       (* Now the arguments *)
       Pretty_utils.pp_flowlist ~left:"(" ~sep:"," ~right:")" self#exp fmt args;
