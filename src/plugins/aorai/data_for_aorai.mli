@@ -130,8 +130,9 @@ val curOpStatus  : string
 (** Name of curState C generated variable (Table of states that can be synchronized with the program) *)
 val curState     : string
 
-(** Name of curStateOld C generated variable (Last value of curState) *)
-val curStateOld  : string
+(** Name of the history variables (History of previous states) *)
+val history  : int -> string
+val whole_history  : unit -> string list
 
 (** Name of curTrans C generated variable (Last transitions that can be crossed) *)
 val curTrans     : string

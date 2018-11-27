@@ -1132,9 +1132,12 @@ let initGlobals root complete =
 
   mk_global_comment "//* ";
   mk_global_comment "//* States and Trans Variables";
-  if Aorai_option.Deterministic.get () then
-    mk_global_c_var_init curState (getInitialState())
-  else
+  if Aorai_option.Deterministic.get () then begin
+    mk_global_c_var_init curState (getInitialState());
+    let init = getInitialState() (* TODO a distinct initial value for history *)
+    and history = Data_for_aorai.whole_history () in
+    List.iter (fun name -> mk_global_c_var_init name init) history
+  end else
     mk_global_states_init root;
 
   if complete then begin
@@ -2120,6 +2123,20 @@ let auto_func_block generated_kf loc f st status res =
            (Const (Data_for_aorai.func_to_cenum (Kernel_function.get_name f))))
         loc
     ]
+  and stmt_history_update =
+    if Aorai_option.Deterministic.get () then
+      let history = Data_for_aorai.whole_history ()
+      and cur_state = Data_for_aorai.(get_varinfo curState) in
+      let add_stmt (src,acc) dst_name =
+        let dst = Data_for_aorai.get_varinfo dst_name in
+        let stmt = equalsStmt (Cil.var dst) (Cil.evar ~loc src) loc in
+        dst, stmt :: acc
+      in
+      snd (List.fold_left add_stmt (cur_state,[]) history)
+    else if Aorai_option.InstrumentationHistory.get () > 0 then
+      Aorai_option.fatal "history is not implemented for non-deterministic \
+                          automaton"
+    else []
   in
   let new_funcs, local_var, main_stmt =
     if Aorai_option.Deterministic.get() then
@@ -2130,7 +2147,7 @@ let auto_func_block generated_kf loc f st status res =
   let ret = [ Cil.mkStmt ~ghost:true (Cil_types.Return(None,loc)) ] in
   let res_block =
     (Cil.mkBlock
-       ( stmt_begin_list @ main_stmt @ ret))
+       ( stmt_begin_list @ stmt_history_update @ main_stmt @ ret))
   in
   res_block.blocals <- local_var;
   Aorai_option.debug ~dkey "Generated body is:@\n%a"

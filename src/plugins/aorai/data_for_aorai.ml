@@ -177,7 +177,13 @@ let loopInit    = "aorai_Loop_Init"                      (* OK *)
 
 (* C variables *)
 let curState    = "aorai_CurStates"                      (* OK *)
-let curStateOld = "aorai_CurStates_old"                  (* OK *)
+let history n   = "aorai_StatesHistory_" ^ string_of_int n (* OK *)
+let whole_history () =
+  let rec aux acc n =
+    if n > 0 then aux (history n :: acc) (n - 1) else acc
+  in
+  aux [] (Aorai_option.InstrumentationHistory.get ())
+
 let curTrans    = "aorai_CurTrans"                       (* OK *)
 (*let curTransTmp = "aorai_CurTrans_tmp"                   (* OK *)*)
 let curOp       = "aorai_CurOperation"                   (* OK *)

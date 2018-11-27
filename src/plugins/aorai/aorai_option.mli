@@ -43,6 +43,8 @@ module AddingOperationNameAndStatusInSpecification: Parameter_sig.Bool
 (** [true] if the user declares that its ya automaton is deterministic. *)
 module Deterministic: State_builder.Ref with type data = bool
 
+module InstrumentationHistory: Parameter_sig.Int
+
 val is_on : unit -> bool
 val promela_file: unit -> Filepath.Normalized.t
 val advance_abstract_interpretation: unit -> bool

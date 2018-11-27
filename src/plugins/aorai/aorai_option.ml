@@ -160,6 +160,16 @@ module Deterministic=
         let default () = false
      end)
 
+module InstrumentationHistory =
+  Int
+    (struct
+      let option_name = "-aorai-instrumentation-history"
+      let arg_name = "N"
+      let help = "the instrumentation will keep an history of the N last states"
+      let default = 0
+    end)
+
+
 let is_on () =
   not (Ltl_File.is_default () && To_Buchi.is_default () &&
        Buchi.is_default ()    && Ya.is_default () )
