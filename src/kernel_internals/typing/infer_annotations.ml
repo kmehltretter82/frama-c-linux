@@ -34,7 +34,14 @@ let assigns_from_prototype kf =
     try
       let formals = getFormalsDecl vi in
       (* Do ignore anonymous names *)
-      List.filter (fun vi -> vi.vname <> "") formals
+      let anonymous v = v.vname = "" in
+      (* Do ignore ghost if the function is not ghost *)
+      let ignorable_ghost v =
+        v.vghost && not vi.vghost in
+      let filter v =
+        not (anonymous v || ignorable_ghost v)
+      in
+      List.filter filter formals
     with Not_found -> []
     (* this may happen for function pointer used as formal parameters.*)
   in
