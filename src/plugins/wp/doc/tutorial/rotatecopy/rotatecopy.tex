@@ -1,0 +1,21 @@
+\section{The \textsf{rotate-copy} Algorithm}
+\label{rotate-copy}
+
+We now study the \texttt{rotate-copy} algorithm from ``ACSL By Example''.
+This algorithm rotates a source sequence by a certain number of positions and
+copies the result to a destination sequence of same size.
+
+The specification of the \texttt{rotate-copy} algorithm is as follows:
+
+\listingname{rotatecopy.h}
+\cinput{rotatecopy/rotatecopy.spec}
+
+The implementation of the algorithm is:
+
+\listingname{rotatecopy.c}
+\cinput{rotatecopy/rotatecopy.impl}
+
+A partial proof of correctness is obtained by running the \textsf{WP} plug-in: 
+\fclogs{mutating}{rotatecopy}
+
+%% simplify does better on the unproven post (which is symmetrical to other post btw)

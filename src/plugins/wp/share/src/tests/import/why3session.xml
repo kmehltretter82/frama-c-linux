@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.94"/>
+ <prover
+  id="1"
+  name="Coq"
+  version="8.4pl1"/>
+ <file
+  name="../import.why"
+  verified="true"
+  expanded="true">
+  <theory
+   name="T"
+   locfile="../import.why"
+   loclnum="1" loccnumb="7" loccnume="8"
+   verified="true"
+   expanded="true">
+   <goal
+    name="G"
+    locfile="../import.why"
+    loclnum="4" loccnumb="12" loccnume="13"
+    sum="bacfa28e617e2aeba3b392f178d285f2"
+    proved="true"
+    expanded="true"
+    shape="ainfix =V0V1Iainfix =azleqV0V1azleqV1V0F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="500"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="500"
+     edited="import_T_G_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.86"/>
+    </proof>
+   </goal>
+  </theory>
+ </file>
+</why3session>

@@ -1,0 +1,20 @@
+\clearpage
+\section{The \textsf{min-element} Algorithm}
+\label{min-element}
+
+We study now the first version of the \texttt{min-element}
+algorithm from ``ACSL By Example''. 
+The specification of the \texttt{min-element} algorithm:
+
+\listingname{minelt.h}
+\cinput{minelt/minelt.spec}
+
+The implementation of the algorithm is:
+
+\listingname{minelt.c}
+\cinput{minelt/minelt.impl}
+
+The implementation is proved correct against its specification by
+simply running the \textsf{WP} plug-in: 
+\fclogs{maxmin}{minelt}
+

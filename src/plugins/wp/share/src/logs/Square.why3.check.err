@@ -1,0 +1,8 @@
+File "../why3/Square.why", line 5, characters 6-15:
+warning: axiom sqrt_lin1 does not contain any local abstract symbol
+File "../why3/Square.why", line 8, characters 6-15:
+warning: axiom sqrt_lin0 does not contain any local abstract symbol
+File "../why3/Square.why", line 11, characters 6-12:
+warning: axiom sqrt_0 does not contain any local abstract symbol
+File "../why3/Square.why", line 13, characters 6-12:
+warning: axiom sqrt_1 does not contain any local abstract symbol

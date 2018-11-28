@@ -1,0 +1,15 @@
+----------------------------------------------------------
+SOURCE EXAMPLES FOR FRAMA-C WP 0.5 TUTORIAL
+
+http://frama-c.com
+----------------------------------------------------------
+LICENSE INFORMATION
+
+The example source files in the present archive are 
+inspired from the book "ACSL By Example",
+produced by the Fraunhofer FIRST Institute for 
+the Device-Soft project.
+
+"ACSL By Example" Version 7.1.0 of December 2011, 
+http://www.first.fraunhofer.de
+----------------------------------------------------------

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="1" name="Coq" version="8.5pl2" timelimit="5" steplimit="1" memlimit="1000"/>
+<file name="../filtering.why" expanded="true">
+<theory name="F" sum="620b304c71d4095efd3e876b3f0084c3" expanded="true">
+ <goal name="f_true" expanded="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="19"/></proof>
+ </goal>
+ <goal name="f_false" expanded="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="23"/></proof>
+ </goal>
+ <goal name="f_atom" expanded="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="69"/></proof>
+ </goal>
+ <goal name="f_not" expanded="true">
+ <proof prover="0"><result status="valid" time="0.05" steps="127"/></proof>
+ </goal>
+ <goal name="f_and" expanded="true">
+ <proof prover="0"><result status="valid" time="0.42" steps="675"/></proof>
+ </goal>
+ <goal name="f_or" expanded="true">
+ <proof prover="0"><result status="valid" time="0.33" steps="552"/></proof>
+ </goal>
+ <goal name="filtering" expanded="true">
+ <proof prover="1" edited="filtering_F_filtering_1.v"><result status="valid" time="0.81"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>

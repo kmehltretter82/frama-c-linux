@@ -1,0 +1,22 @@
+/*@ 
+  axiomatic Counting
+  {
+    logic integer Count{L}(value_type* a, value_type val,
+                           integer i, integer j) 
+      reads a[i..j-1];
+
+    axiom Count0{L}:
+      \forall value_type *a, v, integer i;
+         Count(a, v, i, i) == 0;
+
+    axiom Count1{L}:
+      \forall value_type* a, v, integer i, integer i, j, k;
+         i <= j <= k ==> Count(a, v, i, k) ==
+	                 Count(a, v, i, j) + Count(a, v, j, k);
+
+    axiom Count2{L}:
+      \forall value_type* a, v, integer i;
+         (a[i] != v ==> Count(a, v, i, i+1) == 0) &&
+	 (a[i] == v ==> Count(a, v, i, i+1) == 1) ;
+   }
+*/

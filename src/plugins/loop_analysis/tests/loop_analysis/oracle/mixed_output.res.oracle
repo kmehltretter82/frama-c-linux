@@ -1,0 +1,73 @@
+[kernel] Parsing tests/loop_analysis/mixed_output.i (no preprocessing)
+[loop] Functions with loops whose bounds we could not find:
+  loop_inf
+  loop_inf2
+[loop] Functions with loops whose estimated bounds were larger than -loop-max-slevel
+  (we recommend setting their slevel to 0 to avoid wasting time):
+  loop_large (estimated bounds: 4000000000000000000)
+[loop] Add this to your command line:
+  -val-slevel-merge-after-loop loop108 \
+  -val-slevel-merge-after-loop loop_inf \
+  -val-slevel-merge-after-loop loop_inf2 \
+  -val-slevel-merge-after-loop loop_large \
+  -slevel-function loop_inf:0 \
+  -slevel-function loop_inf2:0 \
+  -slevel-function loop_large:0 \
+  -slevel-function loop0:1 \
+  -slevel-function loop1:1 \
+  -slevel-function loop10:10 \
+  -slevel-function loop108:400 \
+  -slevel-function loop10init:7 \
+  -slevel-function loop10initneg:13 \
+  -slevel-function loop10initnegle:14 \
+  -slevel-function m01:7 \
+  -slevel-function m02:8 \
+  -slevel-function m03:7 \
+  -slevel-function m04:7 \
+  -slevel-function m05:7 \
+  -slevel-function m06:7 \
+  -slevel-function m07:7 \
+  -slevel-function m08:8 \
+  -slevel-function m09:7 \
+  -slevel-function m10:8 \
+  -slevel-function m11:7 \
+  -slevel-function m12:7 \
+  -slevel-function m13:7 \
+  -slevel-function m14:7 \
+  -slevel-function m15:7 \
+  -slevel-function m16:8 \
+  -slevel-function m17:1 \
+  -slevel-function m18:1 \
+  -slevel-function m19:1 \
+  -slevel-function m20:1 \
+  -slevel-function m21:1 \
+  -slevel-function m22:1 \
+  -slevel-function m23:1 \
+  -slevel-function m24:1 \
+  -slevel-function m_01:7 \
+  -slevel-function m_02:8 \
+  -slevel-function m_03:7 \
+  -slevel-function m_04:7 \
+  -slevel-function m_05:7 \
+  -slevel-function m_06:7 \
+  -slevel-function m_07:7 \
+  -slevel-function m_08:8 \
+  -slevel-function m_09:7 \
+  -slevel-function m_10:8 \
+  -slevel-function m_11:7 \
+  -slevel-function m_12:7 \
+  -slevel-function m_13:7 \
+  -slevel-function m_14:7 \
+  -slevel-function m_15:7 \
+  -slevel-function m_16:8 \
+  -slevel-function m_17:1 \
+  -slevel-function m_18:1 \
+  -slevel-function m_19:1 \
+  -slevel-function m_20:1 \
+  -slevel-function m_21:1 \
+  -slevel-function m_22:1 \
+  -slevel-function m_23:1 \
+  -slevel-function m_24:1 \
+  -slevel-function main:1 \
+  -slevel-function straight_line:1 \
+  -slevel-function with_if:2

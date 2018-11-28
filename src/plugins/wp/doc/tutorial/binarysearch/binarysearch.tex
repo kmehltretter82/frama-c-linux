@@ -1,0 +1,26 @@
+\clearpage
+\section{The \textsf{binary-search} algorithm}
+
+We study here the \texttt{binary-search}
+algorithm from ``ACSL By Example''. 
+Its specification is:
+
+\listingname{binarysearch.h}
+\cinput{binarysearch/binarysearch.spec}
+
+The implementation of the algorithm is:
+
+\listingname{binarysearch.c}
+\cinput{binarysearch/binarysearch.impl}
+
+\paragraph{Remark:} the original specification of loop-assigns in ``ACSL By Example'' 
+is \emph{wrong} since the loop \emph{do} assigns the local variables
+of the function. The original specification works with \textsf{Jessie}
+since local variables rarely live in the assignable heap, but it is
+not correct for \textsf{WP} where assigns clauses are more strictly
+verified.
+
+The implementation is proved correct against its specification by
+simply running the \textsf{WP} plug-in:
+\fclogs{binary}{binarysearch}
+

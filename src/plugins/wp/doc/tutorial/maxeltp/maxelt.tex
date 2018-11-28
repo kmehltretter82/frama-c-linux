@@ -1,0 +1,25 @@
+\section{The \textsf{max-element} Algorithm with Predicates}
+\label{max-element-pred}
+
+We study now the \emph{reconsidered} version of the \texttt{max-element}
+algorithm from ``ACSL By Example'' with predicates:
+
+\listingname{maximum.spec}
+\cinput{maxeltp/maximum.spec}
+
+Remark that we rephrased the original specification of \texttt{IsMaximum}.
+The specification of the \texttt{max-element} algorithm 
+becomes:
+
+\listingname{maxelt.h}
+\cinput{maxeltp/maxelt.spec}
+
+The implementation of the algorithm is now:
+
+\listingname{maxelt.c}
+\cinput{maxeltp/maxelt.impl}
+
+The implementation is proved correct against its specification by
+running the \textsf{WP} plug-in:
+\fclogs{maxmin}{maxeltp}
+
