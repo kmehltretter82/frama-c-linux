@@ -56,7 +56,7 @@ val add_logic : string -> Cil_types.logic_info -> unit
 (** *)
 val get_logic : string -> Cil_types.logic_info
 
-
+val global_table : varinfo Datatype.String.Map.t ref
 (** *)
 val add_predicate : string -> Cil_types.logic_info -> unit
 

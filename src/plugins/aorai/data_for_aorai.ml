@@ -245,20 +245,18 @@ Graph.Path.BellmanFord
     let zero = 0
     end
   ) *)
+type table = varinfo Datatype.String.Map.t
+
+let global_table = ref Datatype.String.Map.empty (*mettre dans .mli*)
 
 let auto_graph = Automata_graph.create()
 
-(* val setGraph t -> Promelaast.state list -> (Promelaast.typed_condition * Promelaast.action) Promelaast.trans list -> unit *)
+(* val setGraph t -> (Promelaast.typed_condition * Promelaast.action) Promelaast.trans list -> unit *)
 
-let rec setGraph g (*state*) trans = 
-  (*match state with
-  | h::t -> Automata_graph.add_vertex g h ; setGraph g t trans
-  | [] -> *)
-  (
+let setGraph (*state*) trans = 
     match trans with
-    | ht::tt -> Automata_graph.add_edge_e g (ht.start, ht, ht.stop) ; setGraph g tt
-    | [] -> failwith "Automata does not have any transition"
-  )
+    | _::_ -> List.iter (fun a -> Automata_graph.add_edge_e auto_graph (a.start, a, a.stop)) trans
+    | [] -> Aorai_option.abort "Automata does not have any transition"
 
 (*let rec BFS g v = 
   let l = (True, v)::l in 
@@ -280,7 +278,7 @@ let parcoursProfondeur g v =
           ) succ_list
   in aux g v tmp_graph
 *)
-(* Version tmpgraph *)
+(* Version tmpgraph 
 let rec parPro g v tmpg =
     let succ_list = Automata_graph.succ g v in 
         List.iter 
@@ -288,7 +286,7 @@ let rec parPro g v tmpg =
             if not (Automata_graph.mem_vertex tmpg a) then
               Automata_graph.add_vertex tmpg a; parPro g a tmpg
           ) succ_list
-
+*)
 let rec delPath g a tmp = 
    match (Automata_graph.pred g a) with 
     | h::[] -> 
@@ -313,10 +311,10 @@ let getInit g =
   Automata_graph.fold_vertex (let aux v l = 
     if (Automata_graph.pred g v = []) then v::l else l in aux ) g []
     
-let getVertexFromLabel g f = Automata_graph.fold_edges_e f g [] 
+(*let getVertexFromLabel g f = Automata_graph.fold_edges_e f g []*) 
 
 (*val pathVtoV Automata_graph -> vertex -> vertex -> Automata_graph*)
-(*make a sub-graph from g in tmp with only paths from v1 to v2*)
+(*make an imperative sub-graph from g in tmp with only paths from v1 to v2*)
 let rec pathVtoV g v1 v2 tmp =
     let succ_list = Automata_graph.succ g v1 in
     if not (Automata_graph.mem_vertex tmp v1) then
@@ -325,6 +323,49 @@ let rec pathVtoV g v1 v2 tmp =
           | h::t -> Automata_graph.add_edge_e tmp (Automata_graph.find_edge g v1 h); if v1 != v2 then List.iter (fun a -> pathVtoV g a v2 tmp) (h::t) (*applies pathVtoV to all successors of v1*)
       )
 
+let inspect_typed_condition tc = 
+  let result = ref [] in 
+  let visitor = object 
+    inherit Visitor.frama_c_inplace
+    method!vlogic_var_use lv = 
+      if Datatype.String.Map.exists (fun _ vi -> (Cil.cvar_to_lvar vi) = lv ) (!global_table) then 
+        result := (lv::!result);
+        Cil.SkipChildren
+  end in
+  let rec aux = 
+    function
+    | TAnd (tt, ttt) -> aux tt; aux ttt
+    | TOr (tt, ttt) -> aux tt; aux ttt
+    | TRel (_, tt1, tt2) -> ignore (Visitor.visitFramacTerm visitor tt1); ignore (Visitor.visitFramacTerm visitor tt2)
+    | _ -> ()
+  in aux tc; !result
+
+let checkAutomataVar g =  
+  let init = List.hd (getInit g) in
+  Automata_graph.iter_edges_e ( fun e ->
+     match e with
+     |(vert, {cross = (tc, _)}, _) -> 
+     List.iter ( fun var_inf -> 
+        let tmp = Automata_graph.create() in pathVtoV g init vert tmp; 
+        if (Automata_graph.fold_edges_e (fun l _ -> 
+            match l with 
+              | ( _,{ cross = (_, ll) ; _ }, _ ) -> begin
+                List.exists (fun a -> match a with 
+                  | Copy_value((TVar(cc),_), _) ->
+                  begin
+                    if cc = var_inf then true
+                    else false
+                  end
+                  | _ -> true ) ll
+              end
+              (*| _ -> true *)
+            ) tmp true
+          ) then ()
+        else Aorai_option.abort "Variable is not defined on any path"
+      ) (inspect_typed_condition tc)
+      (*| _ -> ()*)
+    ) g 
+  
 (* Each transition with a parametrized cross condition (call param access or return value access) has its parametrized part stored in this array. *)
 let cond_of_parametrizedTransitions = ref (Array.make (1) [[]])
 
@@ -541,13 +582,7 @@ type current_event =
               repr of the stack does not take into account
               this particular event. *)
 
-(*TODO*)
-module StringMap = Datatype.String.Map
-
-(*type table = expression StringMap.t
-*)
-type table = varinfo StringMap.t
-
+(*New definition of environment to be able to handle metavariable*)
 type env = { event:current_event list ; var:table}
 
 let add_current_event event env cond =
@@ -701,43 +736,43 @@ let check_one top info counter s =
   StringMap.find s (env.var) *)
 
 let find_avar s env =
-try StringMap.find s (env.var)
-with Not_found -> let tmp = Automata_graph.create() in 
+try Datatype.String.Map.find s (env.var)
+with Not_found -> Aorai_option.abort "Aorai var not found"
+
+(*let tmp = Automata_graph.create() in 
   let ve = getVertexFromLabel auto_graph (
     fun e l -> match e with
-    |(_, ee, _) -> begin
-      List.fold_left (fun a sa -> 
-        match a with 
-        | TRel(_, { term_type = Lvar(t) ; _ }, _) -> if t = s then e::[] else []
-        | _ -> []
-        ) (fst ee.cross) []
-        end
+    |(vert, {cross = (TRel(_, { term_type = Lvar(t) ; _ }, _), _); _}, _) ->  
+        if t = s then (vert::l) else [] (*l is empty*)
     | _ -> Aorai_option.abort "Not a transition"
-    ) in match ve with 
+    ) in 
+    match ve with 
     | hh::[] -> 
+    begin
       match getInit auto_graph with 
-      | h::[] -> begin pathVtoV auto_graph g h hh tmp; let res = Automata_graph.fold_edges_e 
+      | h::[] -> begin pathVtoV auto_graph h hh tmp; let res = Automata_graph.fold_edges_e 
       (
         fun e l -> 
         match e with
           |(_, ee, _) -> 
           begin
-            List.fold_left (fun a sa -> 
+            List.fold_left (fun sa a -> 
               match a with 
-                | Copy_value((Tvar(lvar),_), { term_type = Ctype(t); _}) -> 
-                  let v = Cil.makeGlobalVar (get_fresh ("aorai_" ^ s)) t in if (lvar = Cil.cvar_to_lvar v) then [v] else []
+                | Copy_value((TVar(lvar),_), { term_type = Ctype(t); _}) -> 
+                  let v = Cil.makeGlobalVar (get_fresh ("aorai_" ^ s)) t in if (lvar = Cil.cvar_to_lvar v) then (v::l) else sa (*l and sa are empty lists*)
                 | _ -> []    
-            ) (snd ee.cross) []
-            end
-            | _ -> Aorai_option.abort "Not a transition"
+            ) [] (snd ee.cross)
+          end
+          (*| _ -> Aorai_option.abort "Not a transition"*)
         ) tmp [] in 
           match res with
           | h::[] -> h
           | _ -> Aorai_option.abort "Aorai var not found" 
         end
-        | _ -> Aorai_option.abort "Not a unique beginning"
-      | _ -> Aorai_option.abort "Multiple transition corresponding"
-(*with Not_found -> Aorai_option.abort "Aorai var not found" *)
+      | _ -> Aorai_option.abort "Not a unique beginning"
+    end
+    | _::_::_ -> Aorai_option.abort "Multiple transition corresponding"
+    | [] -> Aorai_option.abort "No current transition" *)
 
 let find_in_env env counter s =
   let current, stack =
@@ -855,7 +890,7 @@ module LTyping = Logic_typing.Make(C_logic_env)
 
 let type_expr env ?tr ?current e =
   let loc = Cil_datatype.Location.unknown in
-  let rec aux env cond e =
+  let rec aux env cond e (*t pour le type attendu*)=
     match e with
         PVar s ->
           let var = find_in_env env current s in
@@ -1053,8 +1088,13 @@ let type_cond needs_pebble env tr cond =
       begin
         let env, term_tmp, c1 = type_expr env ~tr ?current e in
         match term_tmp.term_type with
-          | Ctype(t) -> let v = Cil.makeGlobalVar (get_fresh ("aorai_" ^ s)) t in { event = env.event; var = (StringMap.add s v env.var)}, (c1, [Copy_value((TVar(Cil.cvar_to_lvar v), TNoOffset), term_tmp )])
-        (*Cil.Cvar_to_lvar v pour en faire une logic var puis il faut le transformer en term_lval*)
+          | Ctype(t) -> begin
+            let v = Cil.makeGlobalVar (get_fresh ("aorai_" ^ s)) t in
+            match (Datatype.String.Map.find s !global_table) with
+            | { vtype = tt; _} -> if tt = t then 
+            env, (*{ event = env.event; var = (Datatype.String.Map.add s v env.var)},*) (c1, [Copy_value((TVar(Cil.cvar_to_lvar v), TNoOffset), term_tmp )])
+            else Aorai_option.abort "Metavariable %s's type is not the same as declared" s
+          end
           | _ ->  Aorai_option.abort "Not the right type"
       end
       else
@@ -1610,7 +1650,7 @@ let type_cond_auto (st,tr as auto) =
     if List.memq st acc then acc else st::acc
   in
   let type_trans (states,transitions,add_reject) tr =
-    let (intermediate_states, trans, needs_reject) = type_trans auto {event = []; var = StringMap.empty } tr in (*TODO*)
+    let (intermediate_states, trans, needs_reject) = type_trans auto {event = []; var = !global_table } tr in (*TODO*)
     Aorai_option.debug
       "Considering parsed transition %s -> %s" tr.start.name tr.stop.name;
     Aorai_option.debug
@@ -1688,7 +1728,10 @@ let setAutomata auto =
   then
     (* all transitions have a true parameterized guard, i.e. [[]] *)
     cond_of_parametrizedTransitions :=
-      Array.make (getNumberOfTransitions  ()) [[]] ; setGraph auto_graph (snd !automata) (*TODO*)
+      Array.make (getNumberOfTransitions  ()) [[]] ;
+  setGraph (snd auto); 
+  checkAutomataVar auto_graph
+   (*TODO*)
 
 let getState num = List.find (fun st -> st.nums = num) (fst !automata)
 

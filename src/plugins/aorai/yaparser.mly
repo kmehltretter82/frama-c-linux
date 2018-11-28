@@ -27,9 +27,11 @@
 
 /* Originated from http://www.ltl2dstar.de/down/ltl2dstar-0.4.2.zip  */
 %{
+open Cil_types
 open Logic_ptree
 open Promelaast
 open Bool3
+
 
 let to_seq c =
   [{ condition = Some c;
@@ -69,6 +71,15 @@ let prefetch_and_create_state name =
 ;;
 
 type pre_cond = Behavior of string | Pre of Promelaast.condition
+
+(*let type_table = StringMap.empty*)
+
+let stringToType s = 
+  match s with
+    | "int" -> TInt(IInt, [])
+    | "char" -> TInt(IChar, [])
+    | "long" -> TInt(ILong, [])
+    | _ -> Aorai_option.abort "Metavariable type does not exist"
 
 %}
 
@@ -123,6 +134,11 @@ main
                 with Not_found ->
                   Aorai_option.abort "no state '%s'\n" id) ids
          | "deterministic" -> Aorai_option.Deterministic.set true;
+         | "metavar" -> begin
+            match ids with
+            | h::[t] -> let v = Cil.makeGlobalVar (Data_for_aorai.get_fresh ("aorai_" ^ h)) (stringToType t) in Data_for_aorai.global_table := Datatype.String.Map.add h v (!Data_for_aorai.global_table)
+            | _ -> Aorai_option.abort "Missing or too many arguments in metavariable definition"
+            end
          | oth      -> Aorai_option.abort "unknown option '%s'\n" oth
     ) $1;
     let states=
@@ -168,6 +184,7 @@ option
 opt_identifiers
   : /* empty */ { [] }
   | COLON id_list { $2 }
+/*  | COLON metavar { $2 } */
   ;
 
 id_list
@@ -179,6 +196,10 @@ states
   : states state { $1@$2 }
   | state { $1 }
   ;
+
+/*metavar
+  : IDENTIFIER COMMA IDENTIFIER { $1::[$3] }
+metavar : x, int*/
 
 state
   : IDENTIFIER COLON transitions SEMI_COLON {
@@ -304,7 +325,7 @@ single_cond:
   | RETURN_OF  LPAREN IDENTIFIER RPAREN { PReturn $3 }
   | TRUE { PTrue }
   | FALSE { PFalse }
-  /*TODO ajouter le cas du Not (... and ...) entre autre*/
+  /*TODO*/
   | NOT single_cond { match $2 with
     | AfVar(_, _) -> Aorai_option.abort "Not corresponding to program" (*Parsing.symbol_end_pos*)
     | _ -> PNot $2 }
