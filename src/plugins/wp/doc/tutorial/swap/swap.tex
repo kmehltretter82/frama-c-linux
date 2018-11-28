@@ -1,0 +1,21 @@
+\clearpage
+\section{The \textsf{swap} Algorithm}
+\label{swap}
+
+We now study the \texttt{swap} algorithm from ``ACSL By Example''.
+This algorithm exchanges the value of two variables.
+
+The specification of the \texttt{swap} algorithm is as follows:
+
+\listingname{swap.h}
+\cinput{swap/swap.spec}
+
+The implementation of the algorithm is:
+
+\listingname{swap.c}
+\cinput{swap/swap.impl}
+
+The implementation is proved correct against its specification by
+simply running the \textsf{WP} plug-in: 
+\fclogs{mutating}{swap}
+

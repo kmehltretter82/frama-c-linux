@@ -1,0 +1,8 @@
+# frama-c -wp -wp-rte [...]
+[kernel] Parsing tests/mutating/reversecopy.i (no preprocessing)
+[kernel] Parsing reversecopy/reversecopy.c (with preprocessing)
+[rte] annotating function reverse_copy
+------------------------------------------------
+Module               #VC   WP   Ergo   Success
+reverse_copy          18    5    11     88.9%
+------------------------------------------------
