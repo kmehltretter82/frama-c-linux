@@ -1,0 +1,79 @@
+[kernel] Parsing context-depth.c (with preprocessing)
+[eva] Analyzing an incomplete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
+  s.v ∈ [--..--]
+   .next ∈ {{ NULL ; &S_next_s[0] }}
+  S_next_s[0].v ∈ [--..--]
+          [0].next ∈ {{ NULL ; &S_next_0_S_next_s[0] }}
+          [1].v ∈ [--..--]
+          [1].next ∈ {{ NULL ; &S_next_1_S_next_s[0] }}
+  S_next_0_S_next_s[0].v ∈ [--..--]
+                   [0].next ∈ {{ NULL ; &S_next_0_S_next_0_S_next_s[0] }}
+                   [1].v ∈ [--..--]
+                   [1].next ∈ {{ NULL ; &S_next_1_S_next_0_S_next_s[0] }}
+  S_next_0_S_next_0_S_next_s[0].v ∈ [--..--]
+                            [0].next ∈
+                            {{ garbled mix of &{WELL_next_0_S_next_0_S_next_0_S_next_s}
+                             (origin: Well) }}
+                            [1].v ∈ [--..--]
+                            [1].next ∈
+                            {{ garbled mix of &{WELL_next_1_S_next_0_S_next_0_S_next_s}
+                             (origin: Well) }}
+  WELL_next_0_S_next_0_S_next_0_S_next_s[bits 0 to ..] ∈
+                                        {{ garbled mix of &{WELL_next_0_S_next_0_S_next_0_S_next_s}
+                                         (origin: Well) }}
+  WELL_next_1_S_next_0_S_next_0_S_next_s[bits 0 to ..] ∈
+                                        {{ garbled mix of &{WELL_next_1_S_next_0_S_next_0_S_next_s}
+                                         (origin: Well) }}
+  S_next_1_S_next_0_S_next_s[0].v ∈ [--..--]
+                            [0].next ∈
+                            {{ garbled mix of &{WELL_next_0_S_next_1_S_next_0_S_next_s}
+                             (origin: Well) }}
+                            [1].v ∈ [--..--]
+                            [1].next ∈
+                            {{ garbled mix of &{WELL_next_1_S_next_1_S_next_0_S_next_s}
+                             (origin: Well) }}
+  WELL_next_0_S_next_1_S_next_0_S_next_s[bits 0 to ..] ∈
+                                        {{ garbled mix of &{WELL_next_0_S_next_1_S_next_0_S_next_s}
+                                         (origin: Well) }}
+  WELL_next_1_S_next_1_S_next_0_S_next_s[bits 0 to ..] ∈
+                                        {{ garbled mix of &{WELL_next_1_S_next_1_S_next_0_S_next_s}
+                                         (origin: Well) }}
+  S_next_1_S_next_s[0].v ∈ [--..--]
+                   [0].next ∈ {{ NULL ; &S_next_0_S_next_1_S_next_s[0] }}
+                   [1].v ∈ [--..--]
+                   [1].next ∈ {{ NULL ; &S_next_1_S_next_1_S_next_s[0] }}
+  S_next_0_S_next_1_S_next_s[0].v ∈ [--..--]
+                            [0].next ∈
+                            {{ garbled mix of &{WELL_next_0_S_next_0_S_next_1_S_next_s}
+                             (origin: Well) }}
+                            [1].v ∈ [--..--]
+                            [1].next ∈
+                            {{ garbled mix of &{WELL_next_1_S_next_0_S_next_1_S_next_s}
+                             (origin: Well) }}
+  WELL_next_0_S_next_0_S_next_1_S_next_s[bits 0 to ..] ∈
+                                        {{ garbled mix of &{WELL_next_0_S_next_0_S_next_1_S_next_s}
+                                         (origin: Well) }}
+  WELL_next_1_S_next_0_S_next_1_S_next_s[bits 0 to ..] ∈
+                                        {{ garbled mix of &{WELL_next_1_S_next_0_S_next_1_S_next_s}
+                                         (origin: Well) }}
+  S_next_1_S_next_1_S_next_s[0].v ∈ [--..--]
+                            [0].next ∈
+                            {{ garbled mix of &{WELL_next_0_S_next_1_S_next_1_S_next_s}
+                             (origin: Well) }}
+                            [1].v ∈ [--..--]
+                            [1].next ∈
+                            {{ garbled mix of &{WELL_next_1_S_next_1_S_next_1_S_next_s}
+                             (origin: Well) }}
+  WELL_next_0_S_next_1_S_next_1_S_next_s[bits 0 to ..] ∈
+                                        {{ garbled mix of &{WELL_next_0_S_next_1_S_next_1_S_next_s}
+                                         (origin: Well) }}
+  WELL_next_1_S_next_1_S_next_1_S_next_s[bits 0 to ..] ∈
+                                        {{ garbled mix of &{WELL_next_1_S_next_1_S_next_1_S_next_s}
+                                         (origin: Well) }}
+[eva] done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function main:
+  
