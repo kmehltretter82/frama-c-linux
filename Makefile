@@ -252,10 +252,13 @@ DISTRIB_FILES:=\
       VERSION VERSION_CODENAME $(wildcard licenses/*)                   \
       $(LIBC_FILES)							\
       share/analysis-scripts/cmd-dep.sh                                 \
+      share/analysis-scripts/concat-csv.sh                              \
+      $(wildcard share/analysis-scripts/examples/*)                     \
       share/analysis-scripts/flamegraph.pl                              \
       share/analysis-scripts/frama-c.mk                                 \
       share/analysis-scripts/list_files.py                              \
       share/analysis-scripts/parse-coverage.sh                          \
+      share/analysis-scripts/summary.sh                                 \
       share/analysis-scripts/README.md                                  \
       share/analysis-scripts/template.mk                                \
       $(wildcard share/emacs/*.el) share/autocomplete_frama-c           \
@@ -1800,13 +1803,18 @@ install:: install-lib
 	  $(FRAMAC_DATADIR)
 	$(MKDIR) $(FRAMAC_DATADIR)/analysis-scripts
 	$(CP) share/analysis-scripts/cmd-dep.sh \
+	  share/analysis-scripts/concat-csv.sh \
 	  share/analysis-scripts/flamegraph.pl \
 	  share/analysis-scripts/frama-c.mk \
 	  share/analysis-scripts/parse-coverage.sh \
 	  share/analysis-scripts/README.md \
 	  share/analysis-scripts/list_files.py \
+	  share/analysis-scripts/summary.sh \
 	  share/analysis-scripts/template.mk \
 	  $(FRAMAC_DATADIR)/analysis-scripts
+	$(MKDIR) $(FRAMAC_DATADIR)/analysis-scripts/examples
+	$(CP) share/analysis-scripts/examples/* \
+	  $(FRAMAC_DATADIR)/analysis-scripts/examples
 	$(MKDIR) $(FRAMAC_DATADIR)/emacs
 	$(CP) $(wildcard share/emacs/*.el) $(FRAMAC_DATADIR)/emacs
 	$(CP) share/frama-c.rc $(ICONS) $(FRAMAC_DATADIR)
