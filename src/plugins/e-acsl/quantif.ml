@@ -115,10 +115,10 @@ let rec has_empty_quantif_with_false_negative = function
   | (t1, rel1, _, rel2, t2) :: guards ->
     let i1 = Interval.infer t1 in
     let i2 = Interval.infer t2 in
-    if Ival.is_singleton_int i1 && Ival.is_singleton_int i2 then
-      (* we know the precise values of the bounds *)
-      let lower_bound, _ = Misc.finite_min_and_max i1 in
-      let upper_bound, _ = Misc.finite_min_and_max i2 in
+    let lower_bound, _ = Ival.min_and_max i1 in
+    let _, upper_bound = Ival.min_and_max i2 in
+    match lower_bound, upper_bound with
+    | Some lower_bound, Some upper_bound ->
       let res = match rel1, rel2 with
         | Rle, Rle -> lower_bound > upper_bound
         | Rle, Rlt | Rlt, Rle -> lower_bound >= upper_bound
@@ -126,7 +126,7 @@ let rec has_empty_quantif_with_false_negative = function
         | _ -> assert false
       in
       res (* case 1 *) || has_empty_quantif_with_false_negative guards
-    else
+    | None, _ | _, None ->
       has_empty_quantif_with_false_negative guards
 
 let () = Typing.compute_quantif_guards_ref := compute_quantif_guards
