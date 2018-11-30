@@ -106,7 +106,7 @@ let compute_quantif_guards quantif bounded_vars hyps =
   (or \false depending on the quantification) should be generated instead of
   nested loops.
   [has_empty_quantif_with_false_negative] partially detects such cases:
-  Case 1: an empty qunatification was detected for sure, return true.
+  Case 1: an empty quantification was detected for sure, return true.
   Case 2: we don't know, return false. *)
 let rec has_empty_quantif_with_false_negative = function
   | [] ->
@@ -120,14 +120,12 @@ let rec has_empty_quantif_with_false_negative = function
       let lower_bound, _ = Misc.finite_min_and_max i1 in
       let upper_bound, _ = Misc.finite_min_and_max i2 in
       let res = match rel1, rel2 with
-        | Rle, Rle -> lower_bound >  upper_bound
-        | Rle, Rlt -> lower_bound >= upper_bound
-        | Rlt, Rle -> lower_bound >= upper_bound
+        | Rle, Rle -> lower_bound > upper_bound
+        | Rle, Rlt | Rlt, Rle -> lower_bound >= upper_bound
         | Rlt, Rlt -> lower_bound >= Z.sub upper_bound Z.one
         | _ -> assert false
       in
-      if res then (* case 1 *) res
-      else has_empty_quantif_with_false_negative guards
+      res (* case 1 *) || has_empty_quantif_with_false_negative guards
     else
       has_empty_quantif_with_false_negative guards
 
@@ -147,79 +145,76 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
   in
   (* universal quantification over integers (or a subtype of integer) *)
   let guards = compute_quantif_guards p bounded_vars hyps in
-  let has_empty_quantif_with_false_negative =
-    has_empty_quantif_with_false_negative guards
-  in
-  match has_empty_quantif_with_false_negative, is_forall with
+  match has_empty_quantif_with_false_negative guards, is_forall with
   | true, true ->
     Cil.one ~loc, env
   | true, false ->
     Cil.zero ~loc, env
   | false, _ ->
-  begin
-  (* transform [guards] into [lscope_var list],
-     and update logic scope in the process *)
-  let lvs_guards, env = List.fold_right
-    (fun (t1, rel1, lv, rel2, t2) (lvs_guards, env) ->
-      let lvs = Lscope.Lvs_quantif(t1, rel1, lv, rel2, t2) in
-      let env = Env.Logic_scope.extend env lvs in
-      lvs :: lvs_guards, env)
-    guards
-    ([], env)
-  in
-  let var_res, res, env =
-    (* variable storing the result of the quantifier *)
-    let name = if is_forall then "forall" else "exists" in
-    Env.new_var
-      ~loc
-      ~name
-      env
-      None
-      intType
-      (fun v _ ->
-        let lv = var v in
-        [ mkStmtOneInstr ~valid_sid:true (Set(lv, init_val, loc)) ])
-  in
-  let end_loop_ref = ref dummyStmt in
-  (* innermost block *)
-  let mk_innermost_block env =
-    (* innermost loop body: store the result in [res] and go out according
-       to evaluation of the goal *)
-    let named_predicate_to_exp = !predicate_to_exp_ref in
-    let test, env = named_predicate_to_exp kf (Env.push env) goal in
-    let then_block = mkBlock [ mkEmptyStmt ~loc () ] in
-    let else_block =
-    (* use a 'goto', not a simple 'break' in order to handle 'forall' with
-       multiple binders (leading to imbricated loops) *)
-    mkBlock
-      [ mkStmtOneInstr ~valid_sid:true (Set(var var_res, found_val, loc));
-        mkStmt ~valid_sid:true (Goto(end_loop_ref, loc)) ]
-    in
-    let blk, env = Env.pop_and_get
-      env
-      (mkStmt ~valid_sid:true
-        (If(mk_guard test, then_block, else_block, loc)))
-      ~global_clear:false
-      Env.After
-    in
-    let blk = Cil.flatten_transient_sub_blocks blk in
-    [ mkStmt ~valid_sid:true (Block blk) ], env
-  in
-  let stmts, env =
-    Loops.mk_nested_loops ~loc mk_innermost_block kf env lvs_guards
-  in
-  let env =
-    Env.add_stmt env (mkStmt ~valid_sid:true (Block (mkBlock stmts)))
-  in
-  (* where to jump to go out of the loop *)
-  let end_loop = mkEmptyStmt ~loc () in
-  let label_name = "e_acsl_end_loop" ^ string_of_int (Label_ids.next ()) in
-  let label = Label(label_name, loc, false) in
-  end_loop.labels <- label :: end_loop.labels;
-  end_loop_ref := end_loop;
-  let env = Env.add_stmt env end_loop in
-  res, env
-  end
+    begin
+      (* transform [guards] into [lscope_var list],
+         and update logic scope in the process *)
+      let lvs_guards, env = List.fold_right
+        (fun (t1, rel1, lv, rel2, t2) (lvs_guards, env) ->
+          let lvs = Lscope.Lvs_quantif(t1, rel1, lv, rel2, t2) in
+          let env = Env.Logic_scope.extend env lvs in
+          lvs :: lvs_guards, env)
+        guards
+        ([], env)
+      in
+      let var_res, res, env =
+        (* variable storing the result of the quantifier *)
+        let name = if is_forall then "forall" else "exists" in
+        Env.new_var
+          ~loc
+          ~name
+          env
+          None
+          intType
+          (fun v _ ->
+            let lv = var v in
+            [ mkStmtOneInstr ~valid_sid:true (Set(lv, init_val, loc)) ])
+      in
+      let end_loop_ref = ref dummyStmt in
+      (* innermost block *)
+      let mk_innermost_block env =
+        (* innermost loop body: store the result in [res] and go out according
+           to evaluation of the goal *)
+        let named_predicate_to_exp = !predicate_to_exp_ref in
+        let test, env = named_predicate_to_exp kf (Env.push env) goal in
+        let then_block = mkBlock [ mkEmptyStmt ~loc () ] in
+        let else_block =
+        (* use a 'goto', not a simple 'break' in order to handle 'forall' with
+           multiple binders (leading to imbricated loops) *)
+        mkBlock
+          [ mkStmtOneInstr ~valid_sid:true (Set(var var_res, found_val, loc));
+            mkStmt ~valid_sid:true (Goto(end_loop_ref, loc)) ]
+        in
+        let blk, env = Env.pop_and_get
+          env
+          (mkStmt ~valid_sid:true
+            (If(mk_guard test, then_block, else_block, loc)))
+          ~global_clear:false
+          Env.After
+        in
+        let blk = Cil.flatten_transient_sub_blocks blk in
+        [ mkStmt ~valid_sid:true (Block blk) ], env
+      in
+      let stmts, env =
+        Loops.mk_nested_loops ~loc mk_innermost_block kf env lvs_guards
+      in
+      let env =
+        Env.add_stmt env (mkStmt ~valid_sid:true (Block (mkBlock stmts)))
+      in
+      (* where to jump to go out of the loop *)
+      let end_loop = mkEmptyStmt ~loc () in
+      let label_name = "e_acsl_end_loop" ^ string_of_int (Label_ids.next ()) in
+      let label = Label(label_name, loc, false) in
+      end_loop.labels <- label :: end_loop.labels;
+      end_loop_ref := end_loop;
+      let env = Env.add_stmt env end_loop in
+      res, env
+    end
 
 let quantif_to_exp kf env p =
   let loc = p.pred_loc in
