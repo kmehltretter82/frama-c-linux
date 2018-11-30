@@ -1253,6 +1253,7 @@ class check ?(is_normalized=true) what : Visitor.frama_c_visitor =
            | None -> ()
            | Some lv ->
              let tlv = Cil.typeOfLval lv in
+             let tlv = Cil.type_remove_qualifier_attributes tlv in
              if not (Cabs2cil.allow_return_collapse ~tlv ~tf:treturn) then
                check_abort "in call %a, cannot implicitly cast from \
                             function return type %a to type of %a (%a)"
