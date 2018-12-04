@@ -1,0 +1,9 @@
+# frama-c -wp [...]
+[kernel] Parsing tests/binary/binarysearch.i (no preprocessing)
+[kernel] Parsing binarysearch/binarysearch.c (with preprocessing)
+[wp] warning: Missing RTE guards
+[rte] annotating function binary_search
+------------------------------------------------
+Module               #VC   WP   Ergo   Success
+binary_search         10    8     2      100%
+------------------------------------------------

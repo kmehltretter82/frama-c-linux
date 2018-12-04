@@ -1,0 +1,8 @@
+# frama-c -wp -wp-rte [...]
+[kernel] Parsing tests/mutating/swapvalues-withassert.i (no preprocessing)
+[kernel] Parsing swapvalues/swapvalues-withassert.c (with preprocessing)
+[rte] annotating function swap_values
+------------------------------------------------
+Module               #VC   WP   Ergo   Success
+swap_values            8    3     4     87.5%
+------------------------------------------------

@@ -1,0 +1,13 @@
+*~
+*.cm*
+*.annot
+*.o
+*_DEP
+local_config.ml
+.depend
+/tests/ptests_config
+result
+/gui
+/top
+/.Makefile.plugin.generated
+/Studia.check_mli_exists
