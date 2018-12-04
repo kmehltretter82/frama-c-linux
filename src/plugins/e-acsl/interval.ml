@@ -99,7 +99,7 @@ let rec infer t =
   | TUnOp (Neg, t) ->
     Ival.neg_int (infer t)
   | TUnOp (BNot, t) ->
-    Ival.bitwise_not (infer t)
+    Ival.bitwise_signed_not (infer t)
   | TUnOp (LNot, _)
 
   | TBinOp ((Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr), _, _) ->
