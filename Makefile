@@ -188,7 +188,7 @@ THEME_ICONS_FLAT:= \
   $(addprefix share/theme/flat/,$(THEME_ICON_NAMES))
 
 ROOT_LIBC_DIR:= share/libc
-LIBC_SUBDIRS:= sys netinet linux net arpa
+LIBC_SUBDIRS:= sys netinet net arpa
 LIBC_DIR:= $(ROOT_LIBC_DIR) $(addprefix $(ROOT_LIBC_DIR)/,$(LIBC_SUBDIRS))
 LIBC_FILES:= \
 	$(wildcard share/*.h share/*.c) \
@@ -1874,7 +1874,6 @@ install:: install-lib
 	$(MKDIR) $(FRAMAC_DATADIR)/theme/flat
 	$(MKDIR) $(FRAMAC_DATADIR)/libc/sys
 	$(MKDIR) $(FRAMAC_DATADIR)/libc/netinet
-	$(MKDIR) $(FRAMAC_DATADIR)/libc/linux
 	$(MKDIR) $(FRAMAC_DATADIR)/libc/net
 	$(MKDIR) $(FRAMAC_DATADIR)/libc/arpa
 	$(PRINT_INSTALL) shared files
@@ -1917,7 +1916,6 @@ install:: install-lib
 	$(CP) share/libc/arpa/*.[ch] $(FRAMAC_DATADIR)/libc/arpa
 	$(CP) share/libc/net/*.[ch] $(FRAMAC_DATADIR)/libc/net
 	$(CP) share/libc/netinet/*.[ch] $(FRAMAC_DATADIR)/libc/netinet
-	$(CP) share/libc/linux/*.[ch] $(FRAMAC_DATADIR)/libc/linux
 	$(PRINT_INSTALL) binaries
 	$(CP) bin/toplevel.$(OCAMLBEST) $(BINDIR)/frama-c$(EXE)
 	$(CP) bin/toplevel.byte$(EXE) $(BINDIR)/frama-c.byte$(EXE)
