@@ -44,7 +44,8 @@ let is_analyzed_function vi =
                  Cil_datatype.Varinfo.equal
                    (Kernel_function.get_vi kf)
                    vi)
-              (Globals.FileIndex.get_functions s))
+              (Globals.FileIndex.get_functions
+                 (Filepath.Normalized.of_string s)))
          (Mdr_params.Stubs.get())) &&
   not (List.mem vi.vname
          (String.split_on_char ','

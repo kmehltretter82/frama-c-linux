@@ -92,8 +92,8 @@ let section_stubs env =
     List.concat
       (List.map
          (fun f ->
-            let filename = Filepath.normalize f in
-            Globals.FileIndex.get_functions ~declarations:false ~filename)
+            let filename = Filepath.Normalized.of_string f in
+            Globals.FileIndex.get_functions ~declarations:false filename)
          (Mdr_params.Stubs.get ())
       )
   in
@@ -294,9 +294,7 @@ let gen_coverage env =
   in
   header :: content
 
-let string_of_pos pos =
-  Format.asprintf
-    "%s:%d" (Filename.basename pos.Lexing.pos_fname) pos.Lexing.pos_lnum
+let string_of_pos pos = Format.asprintf "%a" Filepath.pp_pos pos
 
 let string_of_pos_opt =
   function
