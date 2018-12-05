@@ -3,8 +3,9 @@ ifndef FRAMAC_SHARE
 endif
 
 PLUGIN_NAME:=Report_markdown
-PLUGIN_CMO:=markdown mdr_params parse_remarks eva_coverage md_gen
+PLUGIN_CMO:=markdown sarif mdr_params parse_remarks eva_coverage md_gen
 PLUGIN_NO_TEST:=true
+PLUGIN_REQUIRES:=ppx_deriving ppx_deriving_yojson yojson
 PLUGIN_DISTRIB_EXTERNAL:=share/acsl.xml
 
 include $(FRAMAC_SHARE)/Makefile.dynamic
