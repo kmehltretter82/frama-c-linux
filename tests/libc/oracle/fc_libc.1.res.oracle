@@ -291,6 +291,14 @@ struct pollfd {
    short revents ;
 };
 typedef unsigned long nfds_t;
+struct passwd {
+   char *pw_name ;
+   char *pw_passwd ;
+   uid_t pw_uid ;
+   gid_t pw_gid ;
+   char *pw_dir ;
+   char *pw_shell ;
+};
 typedef int ( jmp_buf)[5];
 struct __anonstruct_sigjmp_buf_43 {
    jmp_buf buf ;
@@ -2032,7 +2040,7 @@ imaxdiv_t imaxdiv(intmax_t numer, intmax_t denom)
 
 struct lconv *__frama_c_locale;
 
-char *__frama_c_locale_names[1];
+char *__frama_c_locale_names[512];
 
 char *setlocale(int category, char const *locale);
 
@@ -2064,7 +2072,7 @@ struct lconv __C_locale =
    .int_p_sign_posn = (char)127,
    .int_n_sign_posn = (char)127};
 struct lconv *__frama_c_locale = & __C_locale;
-char *__frama_c_locale_names[1] = {(char *)"C"};
+char *__frama_c_locale_names[512] = {(char *)"C"};
 /*@ requires
       locale_null_or_valid_string:
         locale ≡ \null ∨ valid_read_string(locale);
@@ -6498,6 +6506,35 @@ extern int pthread_mutex_lock(pthread_mutex_t *mutex);
  */
 extern int pthread_mutex_unlock(pthread_mutex_t *mutex);
 
+extern char __fc_getpwuid_pw_name[64];
+
+extern char __fc_getpwuid_pw_passwd[64];
+
+extern uid_t __fc_getpwuid_pw_uid;
+
+extern gid_t __fc_getpwuid_pw_gid;
+
+extern char __fc_getpwuid_pw_dir[64];
+
+extern char __fc_getpwuid_pw_shell[64];
+
+struct passwd __fc_getpwuid =
+  {.pw_name = __fc_getpwuid_pw_name,
+   .pw_passwd = __fc_getpwuid_pw_passwd,
+   .pw_uid = __fc_getpwuid_pw_uid,
+   .pw_gid = __fc_getpwuid_pw_gid,
+   .pw_dir = __fc_getpwuid_pw_dir,
+   .pw_shell = __fc_getpwuid_pw_shell};
+struct passwd *__fc_p_getpwuid = & __fc_getpwuid;
+/*@ ensures
+      result_null_or_internal_struct:
+        \result ≡ \null ∨ \result ≡ __fc_p_getpwuid;
+    assigns \result, __fc_getpwuid;
+    assigns \result \from __fc_p_getpwuid, (indirect: uid);
+    assigns __fc_getpwuid \from (indirect: uid);
+ */
+extern struct passwd *getpwuid(uid_t uid);
+
 /*@ assigns *(env + (0 .. 4)); */
 extern int setjmp(int * /*[5]*/ env);
 
@@ -6815,6 +6852,14 @@ extern int execvp(char const *path, char * const *argv);
  */
 extern pid_t fork(void);
 
+/*@ requires valid_buf: \valid(buf + (0 .. size - 1));
+    ensures result_ok_or_error: \result ≡ \null ∨ \result ≡ \old(buf);
+    assigns *(buf + (0 .. size - 1)), \result;
+    assigns *(buf + (0 .. size - 1)) \from (indirect: buf), (indirect: size);
+    assigns \result \from buf, (indirect: size);
+ */
+extern char *getcwd(char *buf, size_t size);
+
 extern char volatile __fc_hostname[64];
 
 /*@ requires name_has_room: \valid(name + (0 .. len - 1));
@@ -6840,6 +6885,12 @@ extern int sethostname(char const *name, size_t len);
 /*@ assigns \result;
     assigns \result \from \nothing; */
 extern uid_t getuid(void);
+
+/*@ requires valid_path: valid_read_string(path);
+    assigns \result;
+    assigns \result \from (indirect: *(path + (0 ..))), (indirect: name);
+ */
+extern long pathconf(char const *path, int name);
 
 /*@ ensures initialization: pipefd: \initialized(\old(pipefd) + (0 .. 1));
     ensures valid_fd0: 0 ≤ *(\old(pipefd) + 0) < 1024;

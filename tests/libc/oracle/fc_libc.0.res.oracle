@@ -37,7 +37,7 @@
    wcslen (2 calls); wcsncat (0 call); wcsncpy (0 call); wmemcpy (0 call);
    wmemset (0 call); 
   
-  Undefined functions (338)
+  Undefined functions (341)
   =========================
    FD_CLR (0 call); FD_ISSET (0 call); FD_SET (0 call); FD_ZERO (0 call);
    Frama_C_abort (1 call); Frama_C_char_interval (0 call);
@@ -88,24 +88,25 @@
    freopen (0 call); fseek (0 call); fsetpos (0 call); ftell (0 call);
    ftrylockfile (0 call); funlockfile (0 call); fwrite (0 call);
    gai_strerror (0 call); getc (0 call); getc_unlocked (0 call);
-   getchar (0 call); getchar_unlocked (0 call); gethostname (0 call);
-   getitimer (0 call); getopt (0 call); getopt_long (0 call);
-   getopt_long_only (0 call); getpriority (0 call); getrlimit (0 call);
-   getrusage (0 call); gets (0 call); getsockopt (0 call);
-   gettimeofday (0 call); getuid (0 call); gmtime (0 call); htonl (0 call);
-   htons (0 call); iconv (0 call); iconv_close (0 call); iconv_open (0 call);
-   inet_addr (0 call); inet_ntoa (0 call); inet_ntop (0 call);
-   inet_pton (0 call); isascii (0 call); kill (0 call); labs (0 call);
-   ldiv (0 call); listen (0 call); llabs (0 call); lldiv (0 call);
-   localtime (0 call); log (0 call); log10 (0 call); log10f (0 call);
-   log10l (0 call); log2 (0 call); log2f (0 call); log2l (0 call);
-   logf (0 call); logl (0 call); longjmp (0 call); lrand48 (0 call);
-   malloc (6 calls); mblen (0 call); mbstowcs (0 call); mbtowc (0 call);
-   memoverlap (1 call); mkdir (0 call); mktime (0 call); nan (0 call);
-   nanf (0 call); nanl (0 call); nanosleep (0 call); ntohl (0 call);
-   ntohs (0 call); open (0 call); openat (0 call); opendir (0 call);
-   openlog (0 call); pclose (0 call); perror (0 call); pipe (0 call);
-   poll (0 call); popen (0 call); pow (0 call); powf (0 call);
+   getchar (0 call); getchar_unlocked (0 call); getcwd (0 call);
+   gethostname (0 call); getitimer (0 call); getopt (0 call);
+   getopt_long (0 call); getopt_long_only (0 call); getpriority (0 call);
+   getpwuid (0 call); getrlimit (0 call); getrusage (0 call); gets (0 call);
+   getsockopt (0 call); gettimeofday (0 call); getuid (0 call);
+   gmtime (0 call); htonl (0 call); htons (0 call); iconv (0 call);
+   iconv_close (0 call); iconv_open (0 call); inet_addr (0 call);
+   inet_ntoa (0 call); inet_ntop (0 call); inet_pton (0 call);
+   isascii (0 call); kill (0 call); labs (0 call); ldiv (0 call);
+   listen (0 call); llabs (0 call); lldiv (0 call); localtime (0 call);
+   log (0 call); log10 (0 call); log10f (0 call); log10l (0 call);
+   log2 (0 call); log2f (0 call); log2l (0 call); logf (0 call); logl (0 call);
+   longjmp (0 call); lrand48 (0 call); malloc (6 calls); mblen (0 call);
+   mbstowcs (0 call); mbtowc (0 call); memoverlap (1 call); mkdir (0 call);
+   mktime (0 call); nan (0 call); nanf (0 call); nanl (0 call);
+   nanosleep (0 call); ntohl (0 call); ntohs (0 call); open (0 call);
+   openat (0 call); opendir (0 call); openlog (0 call); pathconf (0 call);
+   pclose (0 call); perror (0 call); pipe (0 call); poll (0 call);
+   popen (0 call); pow (0 call); powf (0 call);
    pthread_cond_broadcast (0 call); pthread_cond_destroy (0 call);
    pthread_cond_init (0 call); pthread_cond_wait (0 call);
    pthread_create (0 call); pthread_join (0 call);
@@ -142,8 +143,10 @@
    wcsspn (0 call); wcsstr (0 call); wcstombs (0 call); wctomb (0 call);
    wmemchr (0 call); wmemcmp (0 call); wmemmove (0 call); write (0 call); 
   
-  'Extern' global variables (9)
-  =============================
+  'Extern' global variables (15)
+  ==============================
+   __fc_getpwuid_pw_dir; __fc_getpwuid_pw_gid; __fc_getpwuid_pw_name;
+   __fc_getpwuid_pw_passwd; __fc_getpwuid_pw_shell; __fc_getpwuid_pw_uid;
    __fc_hostname; __fc_mblen_state; __fc_mbtowc_state; __fc_strerror;
    __fc_wctomb_state; optarg; opterr; optopt; tzname
   
@@ -155,13 +158,13 @@
   ============== 
   Sloc = 948
   Decision point = 183
-  Global variables = 44
+  Global variables = 52
   If = 174
   Loop = 40
   Goto = 78
   Assignment = 379
   Exit point = 73
-  Function = 411
+  Function = 414
   Function call = 73
   Pointer dereferencing = 146
   Cyclomatic complexity = 256
@@ -193,6 +196,7 @@
 #include "netdb.h"
 #include "poll.h"
 #include "pthread.h"
+#include "pwd.h"
 #include "setjmp.h"
 #include "signal.h"
 #include "stdarg.h"

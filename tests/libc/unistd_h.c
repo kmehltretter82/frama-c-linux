@@ -38,5 +38,14 @@ int main() {
 
   long l = sysconf(ARG_MAX);
 
+  char cwd[64];
+  char *res_getcwd = getcwd(cwd, 64);
+  if (res_getcwd) {
+    //@ assert res_getcwd == cwd;
+    //@ assert valid_read_string((char*)cwd); // currently imprecise
+  }
+
+  long pconf = pathconf("/tmp/conf.cfg", _PC_NAME_MAX);
+
   return 0;
 }

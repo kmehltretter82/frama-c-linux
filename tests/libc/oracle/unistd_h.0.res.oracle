@@ -77,6 +77,20 @@
   Called from tests/libc/unistd_h.c:39.
 [eva] using specification for function sysconf
 [eva] Done for function sysconf
+[eva] computing for function getcwd <- main.
+  Called from tests/libc/unistd_h.c:42.
+[eva] using specification for function getcwd
+[eva] tests/libc/unistd_h.c:42: 
+  function getcwd: precondition 'valid_buf' got status valid.
+[eva] Done for function getcwd
+[eva] tests/libc/unistd_h.c:44: assertion got status valid.
+[eva:alarm] tests/libc/unistd_h.c:45: Warning: assertion got status unknown.
+[eva] computing for function pathconf <- main.
+  Called from tests/libc/unistd_h.c:48.
+[eva] using specification for function pathconf
+[eva] tests/libc/unistd_h.c:48: 
+  function pathconf: precondition 'valid_path' got status valid.
+[eva] Done for function pathconf
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -88,4 +102,7 @@
   fd2 ∈ [-1..1023]
   pid ∈ [-1..2147483647]
   l ∈ [--..--]
+  cwd[0..63] ∈ [--..--] or UNINITIALIZED
+  res_getcwd ∈ {{ NULL ; &cwd[0] }}
+  pconf ∈ [--..--]
   __retres ∈ {0; 1}

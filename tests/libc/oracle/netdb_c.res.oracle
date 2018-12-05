@@ -13,6 +13,7 @@
   \return(realloc) == 0 (auto)
   \return(getenv) == 0 (auto)
   \return(bsearch) == 0 (auto)
+  \return(getcwd) == 0 (auto)
   \return(memchr) == 0 (auto)
   \return(memcpy) == 0 (auto)
   \return(memmove) == 0 (auto)

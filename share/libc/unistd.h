@@ -828,7 +828,18 @@ extern pid_t        fork(void);
 extern long int     fpathconf(int, int);
 extern int          fsync(int);
 extern int          ftruncate(int, off_t);
-extern char        *getcwd(char *, size_t);
+
+/*@ // missing: assigns buf[0..size-1] \from 'cwd'
+    // missing: may assign to errno: EACCES, EINVAL, ENAMETOOLONG, ENOENT,
+    //                               ENOMEM, ERANGE
+  requires valid_buf: \valid(buf + (0 .. size-1));
+  assigns buf[0 .. size-1], \result;
+  assigns buf[0 .. size-1] \from indirect:buf, indirect:size;
+  assigns \result \from buf, indirect: size;
+  ensures result_ok_or_error: \result == \null || \result == buf;
+*/
+extern char        *getcwd(char *buf, size_t size);
+
 extern int          getdtablesize(void);
 extern gid_t        getegid(void);
 extern uid_t        geteuid(void);
@@ -874,7 +885,14 @@ extern int          link(const char *, const char *);
 extern int          lockf(int, int, off_t);
 extern off_t        lseek(int, off_t, int);
 extern int          nice(int);
-extern long int     pathconf(const char *, int);
+
+/*@ // missing: may assign to errno: EACCES, EINVAL, ELOOP, ENOENT, ENOTDIR
+    // missing: assigns \result \from 'file path in filesystem'
+  requires valid_path: valid_read_string(path);
+  assigns \result \from indirect:path[0 ..], indirect:name;
+*/
+extern long pathconf(char const *path, int name);
+
 extern int          pause(void);
 
 /*@
