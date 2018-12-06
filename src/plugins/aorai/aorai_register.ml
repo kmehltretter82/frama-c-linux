@@ -323,7 +323,8 @@ let work () =
 
       (*let _ = Path_analysis.test (Data_for_aorai.getAutomata())in*)
       let root = fst (Globals.entry_point ()) in
-      if (Aorai_option.Axiomatization.get()) then
+      let axiomatization = Aorai_option.Axiomatization.get() in
+      if axiomatization then
         begin
             (* Step 5 : incrementing pre/post
                conditions with states and transitions information *)
@@ -350,10 +351,11 @@ let work () =
           if automaton_has_states then begin
             (* Step 7 : Labeling abstract file *)
             (* Finally the information is added into the Cil automata. *)
-            Aorai_utils.initGlobals root (Aorai_option.Axiomatization.get());
+            Aorai_utils.initGlobals root axiomatization;
             Aorai_visitors.add_sync_with_buch file;
-            Aorai_visitors.add_pre_post_from_buch file
-              (Aorai_option.advance_abstract_interpretation ());
+            if Aorai_option.GenerateAnnotations.get () then
+              Aorai_visitors.add_pre_post_from_buch file
+                (Aorai_option.advance_abstract_interpretation ());
             printverb "Annotation of Cil      : done\n";
           end
         end
@@ -372,7 +374,7 @@ let work () =
 
             (* Step 7 : Labeling abstract file *)
             (* Finally the information is added into the Cil automata. *)
-          Aorai_utils.initGlobals root (Aorai_option.Axiomatization.get());
+          Aorai_utils.initGlobals root axiomatization;
           Aorai_visitors.add_sync_with_buch file;
           printverb "Annotation of Cil      : partial\n"
         end;

@@ -73,14 +73,6 @@ module Ya =
                    (in Ya language) from file <f>."
      end)
 
-
-module Output_Spec =
-  False(struct
-          let option_name = "-aorai-show-op-spec"
-          let help =
-            "displays computed pre and post-condition of each operation"
-        end)
-
 module Output_C_File =
   Filepath
     (struct
@@ -121,6 +113,21 @@ module Axiomatization =
          let option_name = "-aorai-spec-on"
          let help = "if set, does not axiomatize automata"
        end)
+
+module GenerateAnnotations =
+  True
+    (struct
+      let option_name = "-aorai-generate-annotations"
+      let help = "generate computed ACSL annotations for the program"
+    end)
+
+module GenerateDeterministicLemmas =
+  True
+    (struct
+      let option_name = "-aorai-generate-deterministic-lemmas"
+      let help = "generate lemmas to be proven in order to prove that an \
+                  automaton is indeed deterministic"
+    end)
 
 module ConsiderAcceptance =
   False(struct
@@ -186,11 +193,15 @@ let emitter =
     [ Emitter.Code_annot; Emitter.Funspec; Emitter.Global_annot ] 
     ~correctness:
     [ Ltl_File.parameter; To_Buchi.parameter; Buchi.parameter;
-      Ya.parameter; Axiomatization.parameter; ConsiderAcceptance.parameter;
+      Ya.parameter; Axiomatization.parameter;
+      ConsiderAcceptance.parameter;
       AutomataSimplification.parameter ]
     ~tuning:
     [ AbstractInterpretation.parameter;
-      AddingOperationNameAndStatusInSpecification.parameter ]
+      AddingOperationNameAndStatusInSpecification.parameter;
+      InstrumentationHistory.parameter;
+      GenerateAnnotations.parameter ]
+
 
 (*
   Local Variables:

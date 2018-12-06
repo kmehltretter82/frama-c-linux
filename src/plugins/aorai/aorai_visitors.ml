@@ -105,6 +105,43 @@ let mk_post_fct_block kf_post kf res =
     (Data_for_aorai.get_kf_return_state kf)
     res
 
+(* update from formals of original C function to one of the auxiliary
+   function (f_aux or f_pre)
+*)
+class change_formals old_kf new_kf =
+  let old_formals = Kernel_function.get_formals old_kf in
+  let new_formals = Kernel_function.get_formals new_kf in
+  let formals = List.combine old_formals new_formals in
+  object
+    inherit Visitor.frama_c_inplace
+    method! vlogic_var_use lv =
+      match lv.lv_origin with
+      | None -> SkipChildren
+      | Some vi ->
+        try
+          let vi'= List.assq vi formals in
+          ChangeTo (Cil.cvar_to_lvar vi')
+        with Not_found -> SkipChildren
+
+    method! vvrbl vi =
+      try
+        let vi' = List.assq vi formals in
+        ChangeTo vi'
+      with Not_found -> SkipChildren
+  end
+
+(* update \result to param of f_post when it exists. Must not be called if
+   f_post has no parameter (original f returns void). *)
+class change_result new_kf =
+  let v = List.hd (Kernel_function.get_formals new_kf) in
+  object
+    inherit Visitor.frama_c_inplace
+    method! vterm_lhost lh =
+      match lh with
+        TResult _ -> ChangeTo (TVar (Cil.cvar_to_lvar v))
+      | _ -> DoChildren
+  end
+
 (**
    This visitor adds an auxiliary function for each C function which takes
    care of setting the automaton in a correct state before calling the
@@ -171,8 +208,9 @@ class visit_adding_code_for_synchronisation =
         mk_post_fct_block
           kf_post kf (Extlib.opt_of_list fun_dec_post.sformals)
       in
+      let vis = new change_formals kf kf_pre in (* Replace original formals *)
       fun_dec_pre.slocals <- pre_locals;
-      fun_dec_pre.sbody <- pre_block;
+      fun_dec_pre.sbody <- Visitor.visitFramacBlock vis pre_block;
       fun_dec_pre.svar.vdefined <- true;
       fun_dec_post.slocals <- post_locals;
       fun_dec_post.sbody <- post_block;
@@ -244,42 +282,7 @@ class visit_adding_code_for_synchronisation =
 
 (*********************************************************************)
 
-(* update from formals of original C function to one of the auxiliary
-   function (f_aux or f_pre)
-*)
-class change_formals old_kf new_kf =
-  let old_formals = Kernel_function.get_formals old_kf in
-  let new_formals = Kernel_function.get_formals new_kf in
-  let formals = List.combine old_formals new_formals in
-  object
-    inherit Visitor.frama_c_inplace
-    method! vlogic_var_use lv =
-      match lv.lv_origin with
-      | None -> SkipChildren
-      | Some vi ->
-        try
-          let vi'= List.assq vi formals in
-          ChangeTo (Cil.cvar_to_lvar vi')
-        with Not_found -> SkipChildren
 
-    method! vvrbl vi =
-      try
-        let vi' = List.assq vi formals in
-        ChangeTo vi'
-      with Not_found -> SkipChildren
-  end
-
-(* update \result to param of f_post when it exists. Must not be called if
-   f_post has no parameter (original f returns void). *)
-class change_result new_kf =
-  let v = List.hd (Kernel_function.get_formals new_kf) in
-  object
-    inherit Visitor.frama_c_inplace
-    method! vterm_lhost lh =
-      match lh with
-        TResult _ -> ChangeTo (TVar (Cil.cvar_to_lvar v))
-      | _ -> DoChildren
-  end
 
 let post_treatment_loops = Hashtbl.create 97
 
@@ -945,7 +948,7 @@ class visit_adding_pre_post_from_buch treatloops =
 
     method! vglob_aux g =
       match g with
-      | GFun(f,_)  ->
+      | GFun _ ->
         let my_kf = Option.get self#current_kf in
         (* don't use get_spec, as we'd generate default assigns,
            while we'll fill the spec just below. *)
@@ -959,7 +962,6 @@ class visit_adding_pre_post_from_buch treatloops =
              Visitor.visitFramacBehaviors vis bhvs
            in
            Annotations.add_behaviors Aorai_option.emitter my_kf bhvs;
-           f.sbody <- Visitor.visitFramacBlock vis f.sbody;
            SkipChildren
          | Post_func kf ->
            (* must advance the automaton according to return event. *)

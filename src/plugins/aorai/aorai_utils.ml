@@ -1150,7 +1150,8 @@ let initGlobals root complete =
   mk_global_comment "//*";
   Datatype.String.Map.iter (fun _ -> add_gvar_zeroinit) auto.metavariables;
 
-  if Aorai_option.Deterministic.get () then begin
+  if Aorai_option.Deterministic.get () &&
+     Aorai_option.GenerateDeterministicLemmas.get () then begin
     (* must flush now previous globals which are used in the lemmas in order to
        be able to put these last ones in the right places in the AST. *)
     flush_globals ();

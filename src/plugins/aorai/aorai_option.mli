@@ -29,12 +29,13 @@ module Ltl_File: Parameter_sig.Filepath
 module To_Buchi: Parameter_sig.Filepath
 module Buchi: Parameter_sig.Filepath
 module Ya: Parameter_sig.Filepath
-module Output_Spec: Parameter_sig.Bool
 module Output_C_File: Parameter_sig.Filepath
 module Dot: Parameter_sig.Bool
 module DotSeparatedLabels: Parameter_sig.Bool
 module AbstractInterpretation: Parameter_sig.Bool
 module Axiomatization: Parameter_sig.Bool
+module GenerateAnnotations: Parameter_sig.Bool
+module GenerateDeterministicLemmas: Parameter_sig.Bool
 module ConsiderAcceptance: Parameter_sig.Bool
 module AutomataSimplification: Parameter_sig.Bool
 module Test: Parameter_sig.Int
