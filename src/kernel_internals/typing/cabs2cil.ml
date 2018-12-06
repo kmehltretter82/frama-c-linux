@@ -5559,8 +5559,12 @@ and makeCompType ghost (isstruct: bool)
               anonCompFieldName ^ (string_of_int !anonCompFieldNameId)
             end
           | _ -> n
-        end else
+        end else begin
+          if fbitfield = Some 0 then
+            Kernel.error ~source:(fst cloc)
+              "named bitfield (%s) with zero width" n;
           n
+        end
       in
       let rec is_circular t =
         match Cil.unrollType t with

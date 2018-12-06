@@ -60,7 +60,7 @@ void (*ff)();
 
 struct {
   short bf1: 5;
-  short bf : 0; // 0-sized bitfield: do not attemp to initialize it
+  short  : 0; // 0-sized bitfield: do not attemp to initialize it
   unsigned int control: 14, : 0;
 } s_bitfield;
 
