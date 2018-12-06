@@ -1,10 +1,10 @@
 /*run.config
-  STDOPT:
-  STDOPT: #"-variadic-no-translation"
+  STDOPT: #"-slevel 12" #"-val-split-return auto"
+  STDOPT: #"-variadic-no-translation" #"-slevel 12" #"-val-split-return auto"
 */
-#include <unistd.h>
-
+#define _GNU_SOURCE
 #define _XOPEN_SOURCE 600
+#include <unistd.h>
 
 volatile int nondet;
 
@@ -46,6 +46,32 @@ int main() {
   }
 
   long pconf = pathconf("/tmp/conf.cfg", _PC_NAME_MAX);
+
+  uid_t ruid, euid, suid;
+  r = getresuid(&ruid, &euid, &suid);
+  if (!r) {
+    r = setresuid(ruid, euid, suid);
+    //@ assert r == 0 || r == -1;
+  }
+  gid_t rgid, egid, sgid;
+  r = getresgid(&rgid, &egid, &sgid);
+  if (!r) {
+    r = setresgid(rgid, egid, sgid);
+    //@ assert r == 0 || r == -1;
+  }
+  pid_t p = getpid();
+  p = getppid();
+  p = getsid(0);
+  ruid = getuid();
+  rgid = getgid();
+  euid = geteuid();
+  egid = getegid();
+  r = setegid(egid);
+  r = seteuid(euid);
+  r = setgid(rgid);
+  r = setuid(ruid);
+  r = setregid(rgid, egid);
+  r = setreuid(ruid, euid);
 
   return 0;
 }

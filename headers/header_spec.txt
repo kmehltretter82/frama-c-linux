@@ -293,6 +293,7 @@ share/libc/syslog.h: CEA_LGPL
 share/libc/termios.h: CEA_LGPL
 share/libc/tgmath.h: CEA_LGPL
 share/libc/time.h: CEA_LGPL
+share/libc/time.c: CEA_LGPL
 share/libc/uchar.h: CEA_LGPL
 share/libc/unistd.h: CEA_LGPL
 share/libc/utime.h: CEA_LGPL

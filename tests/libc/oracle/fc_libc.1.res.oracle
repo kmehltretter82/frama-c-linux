@@ -5137,6 +5137,20 @@ extern time_t mktime(struct tm *timeptr);
  */
 extern time_t time(time_t *timer);
 
+char __fc_ctime[26];
+char * const __fc_p_ctime = (char *)(& __fc_ctime);
+/*@ requires valid_timer: \valid_read(timer);
+    requires initialization: init_timer: \initialized(timer);
+    ensures result_points_to_ctime: \result ≡ __fc_p_ctime;
+    ensures result_valid_string: valid_read_string(__fc_p_ctime);
+    assigns __fc_ctime[0 .. 25], \result;
+    assigns __fc_ctime[0 .. 25]
+      \from (indirect: *timer), (indirect: __fc_time);
+    assigns \result
+      \from (indirect: *timer), (indirect: __fc_time), __fc_p_ctime;
+ */
+extern char *ctime(time_t const *timer);
+
 struct tm __fc_time_tm;
 struct tm * const __fc_p_time_tm = & __fc_time_tm;
 /*@ ensures
@@ -6860,6 +6874,18 @@ extern pid_t fork(void);
  */
 extern char *getcwd(char *buf, size_t size);
 
+/*@ assigns \result;
+    assigns \result \from \nothing; */
+extern gid_t getegid(void);
+
+/*@ assigns \result;
+    assigns \result \from \nothing; */
+extern uid_t geteuid(void);
+
+/*@ assigns \result;
+    assigns \result \from \nothing; */
+extern gid_t getgid(void);
+
 extern char volatile __fc_hostname[64];
 
 /*@ requires name_has_room: \valid(name + (0 .. len - 1));
@@ -6881,6 +6907,18 @@ extern int gethostname(char *name, size_t len);
     assigns \result \from (indirect: __fc_hostname[0 .. len]);
  */
 extern int sethostname(char const *name, size_t len);
+
+/*@ assigns \result;
+    assigns \result \from \nothing; */
+extern pid_t getpid(void);
+
+/*@ assigns \result;
+    assigns \result \from \nothing; */
+extern pid_t getppid(void);
+
+/*@ assigns \result;
+    assigns \result \from \nothing; */
+extern pid_t getsid(pid_t);
 
 /*@ assigns \result;
     assigns \result \from \nothing; */
@@ -6918,11 +6956,47 @@ extern int pipe(int * /*[2]*/ pipefd);
  */
 extern ssize_t read(int fd, void *buf, size_t count);
 
-/*@ ensures result_new_proc_group_or_error: \result ≥ 0 ∨ \result ≡ -1;
+/*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result \from (indirect: gid);
+ */
+extern int setegid(gid_t gid);
+
+/*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result \from (indirect: uid);
+ */
+extern int seteuid(uid_t uid);
+
+/*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result \from (indirect: gid);
+ */
+extern int setgid(gid_t gid);
+
+/*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result \from (indirect: rgid), (indirect: egid);
+ */
+extern int setregid(gid_t rgid, gid_t egid);
+
+/*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result \from (indirect: ruid), (indirect: euid);
+ */
+extern int setreuid(uid_t ruid, uid_t euid);
+
+/*@ ensures result_pgid_or_error: \result ≡ -1 ∨ \result ≥ 0;
     assigns \result;
     assigns \result \from \nothing;
  */
 extern pid_t setsid(void);
+
+/*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result \from (indirect: uid);
+ */
+extern int setuid(uid_t uid);
 
 /*@ assigns \nothing; */
 extern void sync(void);
@@ -6951,6 +7025,54 @@ extern int usleep(useconds_t usec);
       \from (indirect: fd), (indirect: count), (indirect: __fc_fds[fd]);
  */
 extern ssize_t write(int fd, void const *buf, size_t count);
+
+/*@ requires valid_ruid: \valid(ruid);
+    requires valid_euid: \valid(suid);
+    requires valid_suid: \valid(euid);
+    ensures
+      initialization: result_ok_or_error:
+        (\result ≡ 0 ∧ \initialized(\old(ruid)) ∧
+         \initialized(\old(euid)) ∧ \initialized(\old(suid))) ∨
+        \result ≡ -1;
+    assigns *ruid, *euid, *suid, \result;
+    assigns *ruid \from \nothing;
+    assigns *euid \from \nothing;
+    assigns *suid \from \nothing;
+    assigns \result
+      \from (indirect: ruid), (indirect: euid), (indirect: suid);
+ */
+int getresuid(uid_t *ruid, uid_t *euid, uid_t *suid);
+
+/*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result
+      \from (indirect: ruid), (indirect: euid), (indirect: suid);
+ */
+int setresuid(uid_t ruid, uid_t euid, uid_t suid);
+
+/*@ requires valid_rgid: \valid(rgid);
+    requires valid_egid: \valid(sgid);
+    requires valid_sgid: \valid(egid);
+    ensures
+      initialization: result_ok_or_error:
+        (\result ≡ 0 ∧ \initialized(\old(rgid)) ∧
+         \initialized(\old(egid)) ∧ \initialized(\old(sgid))) ∨
+        \result ≡ -1;
+    assigns *rgid, *egid, *sgid, \result;
+    assigns *rgid \from \nothing;
+    assigns *egid \from \nothing;
+    assigns *sgid \from \nothing;
+    assigns \result
+      \from (indirect: rgid), (indirect: egid), (indirect: sgid);
+ */
+int getresgid(gid_t *rgid, gid_t *egid, gid_t *sgid);
+
+/*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result
+      \from (indirect: rgid), (indirect: egid), (indirect: sgid);
+ */
+int setresgid(gid_t rgid, gid_t egid, gid_t sgid);
 
 void main(void)
 {

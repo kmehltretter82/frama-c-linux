@@ -841,9 +841,22 @@ extern int          ftruncate(int, off_t);
 extern char        *getcwd(char *buf, size_t size);
 
 extern int          getdtablesize(void);
+
+/*@ //missing: assigns \result \from 'process effective gid'
+  assigns \result \from \nothing;
+*/
 extern gid_t        getegid(void);
+
+/*@ //missing: assigns \result \from 'process effective uid'
+  assigns \result \from \nothing;
+*/
 extern uid_t        geteuid(void);
+
+/*@ //missing: assigns \result \from 'process gid'
+  assigns \result \from \nothing;
+*/
 extern gid_t        getgid(void);
+
 extern int          getgroups(int, gid_t []);
 extern long         gethostid(void);
 
@@ -873,11 +886,27 @@ extern int          getpagesize(void);
 extern char        *getpass(const char *);
 extern pid_t        getpgid(pid_t);
 extern pid_t        getpgrp(void);
+
+/*@ //missing: assigns \result \from 'process id'
+  assigns \result \from \nothing;
+*/
 extern pid_t        getpid(void);
+
+/*@ //missing: assigns \result \from 'parent process id'
+  assigns \result \from \nothing;
+*/
 extern pid_t        getppid(void);
+
+/*@ //missing: assigns \result \from 'process sid'
+  assigns \result \from \nothing;
+*/
 extern pid_t        getsid(pid_t);
-/*@ assigns \result \from \nothing; */
+
+/*@ //missing: assigns \result \from 'process uid'
+  assigns \result \from \nothing;
+*/
 extern uid_t        getuid(void);
+
 extern char        *getwd(char *);
 extern int          isatty(int);
 extern int          lchown(const char *, uid_t, gid_t);
@@ -924,22 +953,63 @@ extern ssize_t      read(int fd, void *buf, size_t count);
 extern int          readlink(const char *, char *, size_t);
 extern int          rmdir(const char *);
 extern void        *sbrk(intptr_t);
+
+/*@ // missing: may assign errno to EINVAL or EPERM
+    // missing: assigns 'process egid' \from gid
+  assigns \result \from indirect:gid;
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+*/
 extern int setegid(gid_t gid);
+
+/*@ // missing: may assign errno to EINVAL or EPERM
+    // missing: assigns 'process euid' \from uid
+  assigns \result \from indirect:uid;
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+*/
 extern int seteuid(uid_t uid);
-extern int          setgid(gid_t);
+
+/*@ // missing: may assign errno to EINVAL or EPERM
+    // missing: assigns 'process gid' \from gid, 'process permissions'
+    // missing: assigns \result \from 'process permissions'
+  assigns \result \from indirect:gid;
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+*/
+extern int          setgid(gid_t gid);
+
 extern int          setpgid(pid_t, pid_t);
 extern pid_t        setpgrp(void);
-extern int          setregid(gid_t, gid_t);
-extern int          setreuid(uid_t, uid_t);
+
+/*@ // missing: may assign errno to EINVAL, EPERM or EAGAIN
+    // missing: assigns 'process real/effective gid' \from gid
+    // missing: assigns \result \from 'process gid and permissions'
+  assigns \result \from indirect:rgid, indirect:egid;
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+*/
+extern int          setregid(gid_t rgid, gid_t egid);
+
+/*@ // missing: may assign errno to EINVAL, EPERM or EAGAIN
+    // missing: assigns 'process real/effective uid' \from uid
+    // missing: assigns \result \from 'process uid and permissions'
+  assigns \result \from indirect:ruid, indirect:euid;
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+*/
+extern int          setreuid(uid_t ruid, uid_t euid);
 
 /*@ // missing: may assign errno to EPERM
-    // missing: assigns 'processes' \from 'processes'
+    // missing: assigns \result, 'session, process, gid' \from 'process';
   assigns \result \from \nothing;
-  ensures result_new_proc_group_or_error: \result >= 0 || \result == -1;
-*/
+  ensures result_pgid_or_error: \result == -1 || \result >= 0;
+ */
 extern pid_t        setsid(void);
 
+/*@ // missing: may assign errno to EINVAL, EPERM or EAGAIN
+    // missing: assigns 'process uid' \from uid, 'process permissions'
+    // missing: assigns \result \from 'process permissions'
+  assigns \result \from indirect:uid;
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+*/
 extern int          setuid(uid_t uid);
+
 extern unsigned int sleep(unsigned int);
 extern void         swab(const void *, void *, ssize_t);
 extern int          symlink(const char *, const char *);
@@ -989,6 +1059,59 @@ extern ssize_t      write(int fd, const void *buf, size_t count);
 
 // setgroups() is not POSIX
 extern int setgroups(size_t size, const gid_t *list);
+
+// The following functions are GNU extensions
+#ifdef _GNU_SOURCE
+
+/*@
+  // missing: assigns \result, *ruid, *euid, *suid \from 'process'
+  // missing: may assign to errno: EFAULT
+  requires valid_ruid: \valid(ruid);
+  requires valid_euid: \valid(suid);
+  requires valid_suid: \valid(euid);
+  assigns *ruid, *euid, *suid \from \nothing;
+  assigns \result \from indirect:ruid, indirect:euid, indirect:suid;
+  ensures initialization:result_ok_or_error:
+    (\result == 0 &&
+     \initialized(ruid) && \initialized(euid) && \initialized(suid))
+    || \result == -1;
+ */
+int getresuid(uid_t *ruid, uid_t *euid, uid_t *suid);
+
+/*@
+  // missing: assigns 'process uid' \from ruid, euid, suid
+  // missing: assigns \result \from 'process permissions'
+  // missing: may assign to errno: EAGAIN, EINVAL, EPERM
+  assigns \result \from indirect:ruid, indirect:euid, indirect:suid;
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+ */
+int setresuid(uid_t ruid, uid_t euid, uid_t suid);
+
+/*@
+  // missing: assigns \result, *ruid, *euid, *suid \from 'process'
+  // missing: may assign to errno: EFAULT
+  requires valid_rgid: \valid(rgid);
+  requires valid_egid: \valid(sgid);
+  requires valid_sgid: \valid(egid);
+  assigns *rgid, *egid, *sgid \from \nothing;
+  assigns \result \from indirect:rgid, indirect:egid, indirect:sgid;
+  ensures initialization:result_ok_or_error:
+    (\result == 0 &&
+     \initialized(rgid) && \initialized(egid) && \initialized(sgid))
+    || \result == -1;
+ */
+int getresgid(gid_t *rgid, gid_t *egid, gid_t *sgid);
+
+/*@
+  // missing: assigns 'process gid' \from rgid, egid, sgid
+  // missing: assigns \result \from 'process permissions'
+  // missing: may assign to errno: EAGAIN, EINVAL, EPERM
+  assigns \result \from indirect:rgid, indirect:egid, indirect:sgid;
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+ */
+int setresgid(gid_t rgid, gid_t egid, gid_t sgid);
+
+#endif
 
 __END_DECLS
 
