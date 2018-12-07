@@ -4,6 +4,35 @@
     by default: we must thus silence spurious let rec warning (39). *)
 [@@@ warning "-39"]
 
+module type Json_type = sig
+  type t
+  val of_json: Yojson.Safe.json -> t Ppx_deriving_yojson_runtime.error_or
+  val to_json: t -> Yojson.Safe.json
+end
+
+module Json_dictionary(J: Json_type):
+  Json_type with type t = (string * J.t) list =
+struct
+  type t = (string * J.t) list
+  let bind x f = match x with Ok x -> f x | Error e -> Error e
+  let bindret x f = bind x (fun x -> Ok (f x))
+  let bind_pair f (s, x) = bindret (f x) (fun x -> (s, x))
+  let one_step f acc x =
+    bind acc (fun acc -> (bindret (f x) (fun x -> (x :: acc))))
+  let bind_list l f =
+    bindret (List.fold_left (one_step (bind_pair f)) (Ok []) l) List.rev
+  let of_json = function
+    | `Assoc l ->
+      (match bind_list l J.of_json with
+       | Error e -> Error ("dict." ^ e)
+       | Ok _ as res -> res)
+    | `Null -> Ok []
+    | _ -> Error "dict"
+  let to_json l =
+    let json_l = List.map (fun (s, x) -> (s, J.to_json x)) l in
+    `Assoc json_l
+end
+
 type uri =
   | Sarif_github [@name "https://github.com/oasis-tcs/sarif-spec/blob/master/Schemata/sarif-schema.json"]
 [@@deriving yojson]
@@ -559,6 +588,6 @@ type run = {
 
 type schema = {
   schema: (uri [@default Sarif_github]) [@key "$schema"];
-  version: (version [@default V2_0_0]);
+  version: version;
   runs: run list
 } [@@deriving yojson]
