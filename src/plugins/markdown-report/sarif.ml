@@ -6,8 +6,8 @@
 
 module type Json_type = sig
   type t
-  val of_json: Yojson.Safe.json -> t Ppx_deriving_yojson_runtime.error_or
-  val to_json: t -> Yojson.Safe.json
+  val of_yojson: Yojson.Safe.json -> t Ppx_deriving_yojson_runtime.error_or
+  val to_yojson: t -> Yojson.Safe.json
 end
 
 module Json_dictionary(J: Json_type):
@@ -21,57 +21,68 @@ struct
     bind acc (fun acc -> (bindret (f x) (fun x -> (x :: acc))))
   let bind_list l f =
     bindret (List.fold_left (one_step (bind_pair f)) (Ok []) l) List.rev
-  let of_json = function
+  let of_yojson = function
     | `Assoc l ->
-      (match bind_list l J.of_json with
+      (match bind_list l J.of_yojson with
        | Error e -> Error ("dict." ^ e)
        | Ok _ as res -> res)
     | `Null -> Ok []
     | _ -> Error "dict"
-  let to_json l =
-    let json_l = List.map (fun (s, x) -> (s, J.to_json x)) l in
+  let to_yojson l =
+    let json_l = List.map (fun (s, x) -> (s, J.to_yojson x)) l in
     `Assoc json_l
 end
 
-type uri =
-  | Sarif_github [@name "https://github.com/oasis-tcs/sarif-spec/blob/master/Schemata/sarif-schema.json"]
-[@@deriving yojson]
+module Uri = struct
+  type t =
+    | Sarif_github [@name "https://github.com/oasis-tcs/sarif-spec/blob/master/Schemata/sarif-schema.json"]
+    [@@deriving yojson]
+end
 
-type version =
-  | V2_0_0 [@name "2.0.0"]
-[@@deriving yojson]
+module Version = struct
+  type t =
+    | V2_0_0 [@name "2.0.0"]
+  [@@deriving yojson]
+end
 
-(* not defined yet *)
-type message = {
- text: (string [@default ""]);
- messageId: (string [@default ""]);
- richText: (string [@default ""]);
- richMessageId: (string [@default ""]);
- arguments: (string list [@default []]);
-}[@@deriving yojson]
+module Message = struct
+  type t = {
+    text: (string [@default ""]);
+    messageId: (string [@default ""]);
+    richText: (string [@default ""]);
+    richMessageId: (string [@default ""]);
+    arguments: (string list [@default []]);
+  }[@@deriving yojson]
 
-let no_msg =
+let default =
   { text = "";
     messageId = "";
     richText = "";
     richMessageId = "";
     arguments = [];
   }
+end
 
-type fileLocation = {
-  uri: string;
-  uriBaseId: (string [@default ""])
- }[@@deriving yojson]
-let unknown_file = { uri = ""; uriBaseId = "" }
+module FileLocation = struct
+  type t = {
+    uri: string;
+    uriBaseId: (string [@default ""])
+  }[@@deriving yojson]
 
-type fileContent =
+  let default = { uri = ""; uriBaseId = "" }
+end
+
+module FileContent = struct
+type t =
   | Text of string [@name "text"]
   | Binary of string [@name "binary"]
 [@@deriving yojson]
 
-let no_file_content = Text ""
+let default = Text ""
+end
 
-type region = {
+module Region = struct
+type t = {
   startLine: (int [@default 0]);
   startColumn: (int [@default 0]);
   endLine: (int [@default 0]);
@@ -80,11 +91,11 @@ type region = {
   charLength: (int [@default 0]);
   byteOffset: (int [@default 0]);
   byteLength: (int [@default 0]);
-  snippet: (fileContent [@default no_file_content]);
-  message: (message [@default no_msg])
+  snippet: (FileContent.t [@default FileContent.default]);
+  message: (Message.t [@default Message.default])
 }[@@deriving yojson]
 
-let no_region = {
+let default = {
   startLine = 0;
   startColumn = 0;
   endLine = 0;
@@ -93,501 +104,633 @@ let no_region = {
   charLength = 0;
   byteOffset = 0;
   byteLength = 0;
-  snippet = no_file_content;
-  message = no_msg;
+  snippet = FileContent.default;
+  message = Message.default;
 }
+end
 
-type rectangle = {
-  top: (float [@default 0.]);
-  left: (float [@default 0.]);
-  bottom: (float [@default 0.]);
-  right: (float [@default 0.]);
-  message: (message [@default no_msg]);
-}
-[@@deriving yojson]
-
-type custom_properties = [ `Null | `Assoc of (string * Yojson.Safe.json) list ]
-[@@deriving yojson]
-
-type properties = {
-  tags: string list;
-  additional_properties: (custom_properties [@default `Null])
+module Rectangle = struct
+  type t = {
+    top: (float [@default 0.]);
+    left: (float [@default 0.]);
+    bottom: (float [@default 0.]);
+    right: (float [@default 0.]);
+    message: (Message.t [@default Message.default]);
 }
 [@@deriving yojson]
+end
 
-let no_prop = { tags = []; additional_properties = `Null }
+module Custom_properties =
+  Json_dictionary(struct
+    type t = Yojson.Safe.json
+    let of_yojson x = Ok x
+    let to_yojson x = x
+  end)
 
-type physicalLocation = {
-  id: (string [@default ""]);
-  fileLocation: fileLocation;
-  region: (region [@default no_region]);
-  contextRegion: (region [@default no_region]);
-}[@@deriving yojson]
-let unknown_physicalLocation = {
-  id = "";
-  fileLocation = unknown_file;
-  region = no_region;
-  contextRegion = no_region;
-}
+module Properties = struct
+  type tags = string list [@@deriving yojson]
 
-type location = {
-  physicalLocation: physicalLocation;
-  fullyQualifiedLogicalName: (string [@default ""]);
-  message: (message [@default no_msg]);
-  annotations: (region list [@default []]);
-  properties: (properties [@default no_prop]);
-}[@@deriving yojson]
-let no_loc = {
-  physicalLocation = unknown_physicalLocation;
-  fullyQualifiedLogicalName = "";
-  message = no_msg;
-  annotations = [];
-  properties = no_prop
-}
+  type t = {
+    tags: tags;
+    additional_properties: Custom_properties.t
+  }
 
-type stackFrame = {
-  location: (location [@default no_loc]);
-  stack_module: (string [@default ""])[@key "module"];
-  threadId: (int [@default 0]);
-  address: (int [@default 0]);
-  offset: (int [@default 0]);
-  parameters: (string list [@default []]);
-  properties: (properties [@default no_prop]);
-}[@@deriving yojson]
+  let default = { tags = []; additional_properties = [] }
 
-type stack = {
-  message: (message [@default no_msg]);
-  frames: stackFrame list;
-  properties: (properties [@default no_prop]);
-}[@@deriving yojson]
+  let create additional_properties =
+    let tags = List.map fst additional_properties in
+    { tags; additional_properties }
 
-let no_stack = {
-  message = no_msg;
-  frames = [];
-  properties = no_prop
-}
+  let of_yojson = function
+    | `Null -> Ok default
+    | `Assoc l ->
+      (match List.assoc_opt "tags" l with
+       | None -> Error "properties"
+       | Some json ->
+         (match tags_of_yojson json with
+          | Ok tags ->
+            let additional_properties = List.remove_assoc "tags" l in
+            Ok { tags; additional_properties }
+          | Error loc -> Error ("properties." ^ loc)))
+    | _ -> Error "properties"
 
-(* TODO: this type definition is unclear in the schema. *)
-type additional_properties =
-  { additionalProperties: string }[@@deriving yojson]
+  let to_yojson { tags; additional_properties } =
+    match tags with
+    | [] -> `Null
+    | _ -> `Assoc (("tags", tags_to_yojson tags)::additional_properties)
+end
 
-let no_additional_prop = { additionalProperties = "" }
-
-type stl_importance =
-  | Important [@name "important"]
-  | Essential [@name "essential"]
-  | Unimportant [@name "unimportant"]
-[@@deriving yojson]
-
-type threadFlowLocation = {
-  step: int;
-  location: (location [@default no_loc]);
-  stack: (stack [@default no_stack]);
-  kind: (string [@default ""]);
-  tfl_module: (string [@default ""])[@key "module"];
-  state: (additional_properties [@default no_additional_prop]);
-  nestingLevel: (int [@default 0]);
-  executionOrder: (int [@default 0]);
-  timestamp: (string [@default ""]);
-  importance: (stl_importance [@default Unimportant]);
-  properties: (properties [@default no_prop]);
-}[@@deriving yojson]
-
-type threadFlow = {
-  id: (string [@default ""]);
-  message: (message [@default no_msg]);
-  locations: threadFlowLocation list;
-  properties: (properties [@default no_prop]);
-}[@@deriving yojson]
-
-type attachment = {
- description: (message [@default no_msg ]);
- fileLocation: fileLocation;
- regions: (region list [@default []]);
- rectangles: (rectangle list [@default []])
-} [@@deriving yojson]
-
-type codeFlow = {
-  description: (message [@default no_msg]);
-  threadFlows: threadFlow list;
-  properties: (properties [@default no_prop]);
-} [@@deriving yojson]
-
-type sarif_exception = {
-  kind: (string [@default ""]);
-  message: (string [@default ""]);
-  stack: (stack [@default no_stack]);
-  innerExceptions: (sarif_exception list [@default []]);
-}[@@deriving yojson]
-let no_exn = { kind = ""; message = ""; stack = no_stack; innerExceptions = [] }
-
-type notification_kind =
-  | Note [@name "note"]
-  | Warning [@name "warning"]
-  | Error [@name "error"]
-[@@deriving yojson]
-
-type notification = {
-  id: (string [@default ""]);
-  ruleId: (string [@default ""]);
-  physicalLocation: (physicalLocation [@default unknown_physicalLocation]);
-  message: message;
-  level: (notification_kind [@default Warning]);
-  threadId: (int [@default 0]);
-  time: (string [@default ""]);
-  exn: (sarif_exception [@default no_exn]) [@key "exception"];
-  properties: (properties [@default no_prop])
-}[@@deriving yojson]
-
-type tool = {
-  name: string;
-  fullName: (string [@default ""]);
-  version: (string [@default ""]);
-  semanticVersion: (string [@default ""]);
-  fileVersion: (string [@default ""]);
-  downloadUri: (string [@default ""]);
-  sarifLoggerVersion: (string [@default ""]);
-  language: (string [@default "en-US"]);
-  properties: (properties [@default no_prop]);
-}[@@deriving yojson]
-
-let no_tool = {
-  name = "";
-  fullName = "";
-  version = "";
-  semanticVersion = "";
-  fileVersion = "";
-  downloadUri = "";
-  sarifLoggerVersion = "";
-  language = "";
-  properties = no_prop;
-}
-
-type invocation = {
- commandLine: string;
- arguments: string list;
- responseFiles: (fileLocation list [@default []]);
- attachments: (attachment list [@default []]);
- startTime: (string [@default ""]);
- endTime: (string [@default ""]);
- exitCode: int;
- toolNotifications: (notification list [@default []]);
- configurationNotifications: (notification list [@default []]);
- exitCodeDescription: (string [@default ""]);
- exitSignalName: (string [@default ""]);
- exitSignalNumber: (int [@default 0]);
- processStartFailureMessage: (string [@default ""]);
- toolExecutionSuccessful: bool;
- machine: (string [@default ""]);
- account: (string [@default ""]);
- processId: (int [@default 0]);
- executableLocation: (fileLocation [@default unknown_file]);
- workingDirectory: (fileLocation [@default unknown_file]);
- environmentVariables: (additional_properties [@default no_additional_prop]);
- stdin: (fileLocation [@default unknown_file]);
- stdout: (fileLocation [@default unknown_file]);
- stderr: (fileLocation [@default unknown_file]);
- stdoutStderr: (fileLocation [@default unknown_file]);
- properties: (properties [@default no_prop]);
-}[@@deriving yojson]
-
-let std_invocation = {
-  commandLine = "/bin/cat";
-  arguments = [];
-  responseFiles = [];
-  attachments = [];
-  startTime = "";
-  endTime = "";
-  exitCode = 0;
-  toolNotifications = [];
-  configurationNotifications = [];
-  exitCodeDescription = "";
-  exitSignalName = "";
-  exitSignalNumber = 0;
-  processStartFailureMessage = "";
-  toolExecutionSuccessful = true;
-  machine = "";
-  account = "";
-  processId = 0;
-  executableLocation = unknown_file;
-  workingDirectory = unknown_file;
-  environmentVariables = no_additional_prop;
-  stdin = unknown_file;
-  stdout = unknown_file;
-  stderr = unknown_file;
-  stdoutStderr = unknown_file;
-  properties = no_prop;
-}
-
-type conversion = {
-  tool: tool;
-  invocation: (invocation [@default std_invocation]);
-  analysisToolLogFiles: (fileLocation [@default unknown_file]);
-} [@@deriving yojson]
-
-let no_conversion = {
-  tool = no_tool;
-  invocation = std_invocation;
-  analysisToolLogFiles = unknown_file;
-}
-
-type edge = {
-  id: string;
-  label: (message [@default no_msg]);
-  sourceNodeId: string;
-  targetNodeId: string;
-  properties: (properties [@default no_prop])
-} [@@deriving yojson]
-
-type node =
-  { id: string;
-    label: (string [@default ""]);
-    location: (location [@default no_loc]);
-    children: (node list [@default []]);
-    properties: (properties [@default no_prop]);
+module PhysicalLocation = struct
+  type t = {
+    id: (string [@default ""]);
+    fileLocation: FileLocation.t;
+    region: (Region.t [@default Region.default]);
+    contextRegion: (Region.t [@default Region.default]);
   }[@@deriving yojson]
 
-type edge_traversal = {
-  edgeId: string;
-  message: (message [@default no_msg]);
-  finalState: (additional_properties [@default no_additional_prop]);
-  stepOverEdgeCount: (int [@default 0]);
-  properties: (properties [@default no_prop]);
+  let default = {
+    id = "";
+    fileLocation = FileLocation.default;
+    region = Region.default;
+    contextRegion = Region.default;
+  }
+end
+
+module Location = struct
+  type t = {
+    physicalLocation: PhysicalLocation.t;
+    fullyQualifiedLogicalName: (string [@default ""]);
+    message: (Message.t [@default Message.default]);
+    annotations: (Region.t list [@default []]);
+    properties: (Properties.t [@default Properties.default]);
+  }[@@deriving yojson]
+  let default = {
+    physicalLocation = PhysicalLocation.default;
+    fullyQualifiedLogicalName = "";
+    message = Message.default;
+    annotations = [];
+    properties = Properties.default;
+  }
+end
+
+module StackFrame = struct
+  type t = {
+    location: (Location.t [@default Location.default]);
+    stack_module: (string [@default ""])[@key "module"];
+    threadId: (int [@default 0]);
+    address: (int [@default 0]);
+    offset: (int [@default 0]);
+    parameters: (string list [@default []]);
+    properties: (Properties.t [@default Properties.default]);
+  }[@@deriving yojson]
+end
+
+module Stack = struct
+  type t = {
+    message: (Message.t [@default Message.default]);
+    frames: StackFrame.t list;
+    properties: (Properties.t [@default Properties.default]);
+  }[@@deriving yojson]
+
+  let default = {
+    message = Message.default;
+    frames = [];
+    properties = Properties.default;
+  }
+end
+
+
+module Additional_properties = struct
+  include Json_dictionary(struct type t = string[@@deriving yojson] end)
+
+  let default = []
+end
+
+module Stl_importance = struct
+  type t =
+    | Important [@name "important"]
+    | Essential [@name "essential"]
+    | Unimportant [@name "unimportant"]
+  [@@deriving yojson]
+end
+
+module ThreadFlowLocation = struct
+  type t = {
+    step: int;
+    location: (Location.t [@default Location.default]);
+    stack: (Stack.t [@default Stack.default]);
+    kind: (string [@default ""]);
+    tfl_module: (string [@default ""])[@key "module"];
+    state: (Additional_properties.t [@default Additional_properties.default]);
+    nestingLevel: (int [@default 0]);
+    executionOrder: (int [@default 0]);
+    timestamp: (string [@default ""]);
+    importance: (Stl_importance.t [@default Stl_importance.Unimportant]);
+    properties: (Properties.t [@default Properties.default]);
+  }[@@deriving yojson]
+end
+
+module ThreadFlow = struct
+  type t = {
+    id: (string [@default ""]);
+    message: (Message.t [@default Message.default]);
+    locations: ThreadFlowLocation.t list;
+    properties: (Properties.t [@default Properties.default]);
+  }[@@deriving yojson]
+end
+
+module Attachment = struct
+  type t = {
+    description: (Message.t [@default Message.default ]);
+    fileLocation: FileLocation.t;
+    regions: (Region.t list [@default []]);
+    rectangles: (Rectangle.t list [@default []])
+  } [@@deriving yojson]
+end
+
+module CodeFlow = struct
+  type t = {
+    description: (Message.t [@default Message.default]);
+    threadFlows: ThreadFlow.t list;
+    properties: (Properties.t [@default Properties.default]);
+  } [@@deriving yojson]
+end
+
+module Sarif_exception = struct
+type t = {
+  kind: (string [@default ""]);
+  message: (string [@default ""]);
+  stack: (Stack.t [@default Stack.default]);
+  innerExceptions: (t list [@default []]);
 }[@@deriving yojson]
 
-type role =
-  | AnalysisTarget [@name "analysisTarget"]
-  | Attachment [@name "attachment"]
-  | ResponseFile [@name "responseFile"]
-  | ResultFile [@name "resultFile"]
-  | StandardStrem [@name "standardStream"]
-  | TraceFile [@name "traceFile"]
-  | UnmodifiedFile [@name "unmodifiedFile"]
-  | ModifiedFile [@name "modifiedFile"]
-  | AddedFile [@name "addedFile"]
-  | DeletedFile [@name "deletedFile"]
-  | RenamedFile [@name "renamedFile"]
-  | UncontrolledFile [@name "uncontrolledFile"]
-[@@deriving yojson]
+let default =
+  {
+    kind = "";
+    message = "";
+    stack = Stack.default;
+    innerExceptions = []
+  }
+end
 
-type hash = {
-  value: string;
-  algorithm: string
-} [@@deriving yojson]
+module Notification_kind = struct
+  type t =
+    | Note [@name "note"]
+    | Warning [@name "warning"]
+    | Error [@name "error"]
+  [@@deriving yojson]
+end
 
-type graph = {
-  id : string;
-  description: (message [@default no_msg]);
-  nodes: node list;
-  edges: edge list;
-  properties: (properties [@default no_prop]);
-}[@@deriving yojson]
+module Notification = struct
+  type t = {
+    id: (string [@default ""]);
+    ruleId: (string [@default ""]);
+    physicalLocation: (PhysicalLocation.t [@default PhysicalLocation.default]);
+    message: Message.t;
+    level: (Notification_kind.t [@default Notification_kind.Warning]);
+    threadId: (int [@default 0]);
+    time: (string [@default ""]);
+    exn: (Sarif_exception.t [@default Sarif_exception.default])
+        [@key "exception"];
+    properties: (Properties.t [@default Properties.default])
+  }[@@deriving yojson]
+end
 
-type graph_dictionary =
-  [ `Null | `Assoc of (string * graph) list ][@@deriving yojson]
-let no_graph = `Null
+module Tool = struct
+  type t = {
+    name: string;
+    fullName: (string [@default ""]);
+    version: (string [@default ""]);
+    semanticVersion: (string [@default ""]);
+    fileVersion: (string [@default ""]);
+    downloadUri: (string [@default ""]);
+    sarifLoggerVersion: (string [@default ""]);
+    language: (string [@default "en-US"]);
+    properties: (Properties.t [@default Properties.default]);
+  }[@@deriving yojson]
 
-type graphTraversal = {
-  graphId: string;
-  description: (message [@default no_msg]);
-  initialState: (additional_properties [@default no_additional_prop]);
-  edgeTraversals: edge_traversal list;
-  properties: (properties [@default no_prop]);
-}[@@deriving yojson]
+  let default = {
+    name = "";
+    fullName = "";
+    version = "";
+    semanticVersion = "";
+    fileVersion = "";
+    downloadUri = "";
+    sarifLoggerVersion = "";
+    language = "";
+    properties = Properties.default;
+  }
+end
 
-type replacement = {
-  deletedRegion: region;
-  insertedContent: (fileContent [@default no_file_content])
-}[@@deriving yojson]
+module Invocation = struct
 
-type file = {
-  fileLocation: (fileLocation [@default unknown_file]);
-  parentKey: (string [@default ""]);
-  offset: (int [@default 0]);
-  length: (int [@default 0]);
-  roles: (role list [@default []]);
-  mimeType: (string [@default ""]);
-  contents: (fileContent [@default no_file_content]);
-  encoding: (string [@default ""]);
-  hashes: (hash list [@default []]);
-  lastModifiedTime: (string [@default ""]);
-  properties: (properties [@default no_prop]);
-}[@@deriving yojson]
+type t =  {
+    commandLine: string;
+    arguments: string list;
+    responseFiles: (FileLocation.t list [@default []]);
+    attachments: (Attachment.t list [@default []]);
+    startTime: (string [@default ""]);
+    endTime: (string [@default ""]);
+    exitCode: int;
+    toolNotifications: (Notification.t list [@default []]);
+    configurationNotifications: (Notification.t list [@default []]);
+    exitCodeDescription: (string [@default ""]);
+    exitSignalName: (string [@default ""]);
+    exitSignalNumber: (int [@default 0]);
+    processStartFailureMessage: (string [@default ""]);
+    toolExecutionSuccessful: bool;
+    machine: (string [@default ""]);
+    account: (string [@default ""]);
+    processId: (int [@default 0]);
+    executableLocation: (FileLocation.t [@default FileLocation.default]);
+    workingDirectory: (FileLocation.t [@default FileLocation.default]);
+    environmentVariables:
+      (Additional_properties.t [@default Additional_properties.default]);
+    stdin: (FileLocation.t [@default FileLocation.default]);
+    stdout: (FileLocation.t [@default FileLocation.default]);
+    stderr: (FileLocation.t [@default FileLocation.default]);
+    stdoutStderr: (FileLocation.t [@default FileLocation.default]);
+    properties: (Properties.t [@default Properties.default]);
+  }[@@deriving yojson]
 
-type fileChange = {
-  fileLocation: fileLocation;
-  replacements: replacement list
-}[@@deriving yojson]
+  let default = {
+    commandLine = "/bin/cat";
+    arguments = [];
+    responseFiles = [];
+    attachments = [];
+    startTime = "";
+    endTime = "";
+    exitCode = 0;
+    toolNotifications = [];
+    configurationNotifications = [];
+    exitCodeDescription = "";
+    exitSignalName = "";
+    exitSignalNumber = 0;
+    processStartFailureMessage = "";
+    toolExecutionSuccessful = true;
+    machine = "";
+    account = "";
+    processId = 0;
+    executableLocation = FileLocation.default;
+    workingDirectory = FileLocation.default;
+    environmentVariables = Additional_properties.default;
+    stdin = FileLocation.default;
+    stdout = FileLocation.default;
+    stderr = FileLocation.default;
+    stdoutStderr = FileLocation.default;
+    properties = Properties.default;
+  }
+end
 
-type fix = {
-  description: (message [@defaut no_msg]);
-  fileChanges: fileChange list;
-}[@@deriving yojson]
+module Conversion = struct
+  type t = {
+    tool: Tool.t;
+    invocation: (Invocation.t [@default Invocation.default]);
+    analysisToolLogFiles: (FileLocation.t [@default FileLocation.default]);
+  } [@@deriving yojson]
 
-type externalFiles = {
-  conversion: (fileLocation [@default unknown_file]);
-  files: (fileLocation [@default unknown_file]);
-  graphs: (fileLocation [@default unknown_file]);
-  invocations: (fileLocation list [@default []]);
-  logicalLocations: (fileLocation [@default unknown_file]);
-  resources: (fileLocation [@default unknown_file]);
-  results: (fileLocation [@default unknown_file]);
-}[@@deriving yojson]
+  let default = {
+    tool = Tool.default;
+    invocation = Invocation.default;
+    analysisToolLogFiles = FileLocation.default;
+  }
+end
 
-type logicalLocation = {
-  name: string;
-  fullyQualifiedName: string;
-  decoratedName: string;
-  parentKey: string;
-  kind: string;
-}[@@deriving yojson]
+module Edge = struct
+  type t  = {
+    id: string;
+    label: (Message.t [@default Message.default]);
+    sourceNodeId: string;
+    targetNodeId: string;
+    properties: (Properties.t [@default Properties.default])
+  } [@@deriving yojson]
+end
 
-type ruleConfigLevel =
-  | Note [@name "note"]
-  | Warning [@name "warning"]
-  | Error [@name "error"]
-  | Open [@name "open"]
-[@@deriving yojson]
+module Node = struct
+  type t = {
+    id: string;
+    label: (string [@default ""]);
+    location: (Location.t [@default Location.default]);
+    children: (t list [@default []]);
+    properties: (Properties.t [@default Properties.default]);
+  }[@@deriving yojson]
+end
 
-type ruleConfiguration = {
-  enabled: (bool [@default false]);
-  defaultLevel: (ruleConfigLevel [@default Open]);
-  parameters: (properties [@default no_prop])
-}[@@deriving yojson]
+module Edge_traversal = struct
+  type t = {
+    edgeId: string;
+    message: (Message.t [@default Message.default]);
+    finalState:
+      (Additional_properties.t [@default Additional_properties.default]);
+    stepOverEdgeCount: (int [@default 0]);
+    properties: (Properties.t [@default Properties.default]);
+  }[@@deriving yojson]
+end
 
-let std_rule_config = {
-  enabled = false;
-  defaultLevel = Open;
-  parameters = no_prop;
+module Role = struct
+  type t =
+    | AnalysisTarget [@name "analysisTarget"]
+    | Attachment [@name "attachment"]
+    | ResponseFile [@name "responseFile"]
+    | ResultFile [@name "resultFile"]
+    | StandardStrem [@name "standardStream"]
+    | TraceFile [@name "traceFile"]
+    | UnmodifiedFile [@name "unmodifiedFile"]
+    | ModifiedFile [@name "modifiedFile"]
+    | AddedFile [@name "addedFile"]
+    | DeletedFile [@name "deletedFile"]
+    | RenamedFile [@name "renamedFile"]
+    | UncontrolledFile [@name "uncontrolledFile"]
+  [@@deriving yojson]
+end
+
+module Hash = struct
+  type t = {
+    value: string;
+    algorithm: string
+  } [@@deriving yojson]
+end
+
+module Graph = struct
+  type t = {
+    id : string;
+    description: (Message.t [@default Message.default]);
+    nodes: Node.t list;
+    edges: Edge.t list;
+    properties: (Properties.t [@default Properties.default]);
+  }[@@deriving yojson]
+end
+
+module Graph_dictionary = Json_dictionary(Graph)
+
+module GraphTraversal = struct
+  type t = {
+    graphId: string;
+    description: (Message.t [@default Message.default]);
+    initialState:
+      (Additional_properties.t [@default Additional_properties.default]);
+    edgeTraversals: Edge_traversal.t list;
+    properties: (Properties.t [@default Properties.default]);
+  }[@@deriving yojson]
+end
+
+module Replacement = struct
+  type t = {
+    deletedRegion: Region.t;
+    insertedContent: (FileContent.t [@default FileContent.default])
+  }[@@deriving yojson]
+end
+
+module File = struct
+  type t = {
+    fileLocation: (FileLocation.t [@default FileLocation.default]);
+    parentKey: (string [@default ""]);
+    offset: (int [@default 0]);
+    length: (int [@default 0]);
+    roles: (Role.t list [@default []]);
+    mimeType: (string [@default ""]);
+    contents: (FileContent.t [@default FileContent.default]);
+    encoding: (string [@default ""]);
+    hashes: (Hash.t list [@default []]);
+    lastModifiedTime: (string [@default ""]);
+    properties: (Properties.t [@default Properties.default]);
+  }[@@deriving yojson]
+end
+
+module FileChange = struct
+  type t = {
+    fileLocation: FileLocation.t;
+    replacements: Replacement.t list
+  }[@@deriving yojson]
+end
+
+module Fix = struct
+  type t = {
+    description: (Message.t [@defaut Message.default]);
+    fileChanges: FileChange.t list;
+  }[@@deriving yojson]
+end
+
+module ExternalFiles = struct
+  type t = {
+    conversion: (FileLocation.t [@default FileLocation.default]);
+    files: (FileLocation.t [@default FileLocation.default]);
+    graphs: (FileLocation.t [@default FileLocation.default]);
+    invocations: (FileLocation.t list [@default []]);
+    logicalLocations: (FileLocation.t [@default FileLocation.default]);
+    resources: (FileLocation.t [@default FileLocation.default]);
+    results: (FileLocation.t [@default FileLocation.default]);
+  }[@@deriving yojson]
+end
+
+module LogicalLocation = struct
+  type t = {
+    name: string;
+    fullyQualifiedName: string;
+    decoratedName: string;
+    parentKey: string;
+    kind: string;
+  }[@@deriving yojson]
+end
+
+module RuleConfigLevel = struct
+  type t =
+    | Note [@name "note"]
+    | Warning [@name "warning"]
+    | Error [@name "error"]
+    | Open [@name "open"]
+  [@@deriving yojson]
+end
+
+module RuleConfiguration = struct
+  type t = {
+    enabled: (bool [@default false]);
+    defaultLevel: (RuleConfigLevel.t [@default RuleConfigLevel.Open]);
+    parameters: (Properties.t [@default Properties.default])
+  }[@@deriving yojson]
+
+  let default = {
+    enabled = false;
+    defaultLevel = RuleConfigLevel.Open;
+    parameters = Properties.default;
+  }
+end
+
+module Rule = struct
+  type t = {
+    id: (string [@default ""]);
+    name: (string [@default ""]);
+    shortDescription: (Message.t [@default Message.default]);
+    fullDescription: (Message.t [@default Message.default]);
+    messageStrings:
+      (Additional_properties.t [@default Additional_properties.default]);
+    richMessageStrings:
+      (Additional_properties.t [@default Additional_properties.default]);
+    configuration: (RuleConfiguration.t [@default RuleConfiguration.default]);
+    helpUri: (string [@default ""]);
+    properties: (Properties.t [@default Properties.default]);
+  }[@@deriving yojson]
+
+  let default = {
+    id = "";
+    name = "";
+    shortDescription = Message.default;
+    fullDescription = Message.default;
+    messageStrings = Additional_properties.default;
+    richMessageStrings = Additional_properties.default;
+    configuration = RuleConfiguration.default;
+    helpUri = "";
+    properties = Properties.default;
+  }
+end
+
+module Rule_dictionary = Json_dictionary(Rule)
+
+module Resources = struct
+  type t = {
+    messageStrings:
+      (Additional_properties.t [@default Additional_properties.default]);
+    rules: (Rule_dictionary.t [@default []]);
+  }[@@deriving yojson]
+
+  let default = {
+    messageStrings = Additional_properties.default;
+    rules = [] }
+end
+
+module Result_level = struct
+  type t = 
+    | NotApplicable [@name "notApplicable"]
+    | Pass [@name "pass"]
+    | Note [@name "note"]
+    | Warning [@name "warning"]
+    | Error [@name "error"]
+  [@@deriving yojson]
+end
+
+module Result_suppressionState = struct
+  type t =
+    | SuppressedInSource [@name "suppressedInSource"]
+    | SuppressedExternally [@name "suppressedExternally"]
+  [@@deriving yojson]
+end
+
+module Result_baselineState = struct
+  type t =
+    | New [@name "new"]
+    | Existing [@name "existing"]
+    | Absent [@name "absent"]
+  [@@deriving yojson]
+end
+
+(* we can't use Result here, as this would conflict with
+   Ppx_deriving_yojson_runtime.Result that is opened by the
+   code generated by Ppx_deriving_yojson. *)
+module Sarif_result: Json_type = struct
+  type t = {
+    ruleId: (string [@default ""]);
+    level: (Result_level.t [@default Result_level.NotApplicable]);
+    message: (Message.t [@default Message.default]);
+    analysisTarget: (FileLocation.t [@default FileLocation.default]);
+    locations: (Location.t list [@default []]);
+    instanceGuid: (string [@default ""]);
+    correlationGuid: (string [@default ""]);
+    occurenceCount: (int [@default 1]);
+    partialFingerprints:
+      (Additional_properties.t [@default Additional_properties.default]);
+    fingerprints:
+      (Additional_properties.t [@default Additional_properties.default]);
+    stacks: (Stack.t list [@default []]);
+    codeFlows: (CodeFlow.t list [@default []]);
+    graphs: (Graph_dictionary.t [@default []]);
+    graphTraversals: (GraphTraversal.t list [@default []]);
+    relatedLocations: (Location.t list [@default []]);
+    suppressionStates: (Result_suppressionState.t list [@default []]);
+    baselineState:
+      (Result_baselineState.t [@default Result_baselineState.Absent]);
+    attachments: (Attachment.t list [@default []]);
+    workItemsUris: (string list [@default []]);
+    conversionProvenance: (PhysicalLocation.t list [@default[]]);
+    fixes: (Fix.t list [@default []]);
+    properties: (Properties.t [@default Properties.default])
+  }[@@deriving yojson]
+end
+
+module VersionControlDetails = struct
+  type t = {
+    uri: string;
+    revisionId: (string [@default ""]);
+    branch: (string [@default ""]);
+    tag: (string [@default ""]);
+    timestamp: (string [@default ""]);
+    properties: (Properties.t [@default Properties.default]);
+  }[@@deriving yojson]
+end
+
+module File_dictionary = Json_dictionary(File)
+
+module LogicalLocation_dictionary = Json_dictionary(LogicalLocation)
+
+module ColumnKind = struct
+  type t =
+    | Utf16CodeUnits [@name "utf16CodeUnits"]
+    | UnicodeCodePoints [@name "unicodeCodePoints"]
+  [@@deriving yojson]
+end
+
+module Run = struct
+  type t = {
+    tool: Tool.t;
+    invocations: (Invocation.t list [@default []]);
+    conversion: (Conversion.t [@default Conversion.default]);
+    versionControlProvenance: (VersionControlDetails.t list [@default []]);
+    originalUriBaseIds:
+      (Additional_properties.t [@default Additional_properties.default]);
+    files: (File_dictionary.t [@default []]);
+    logicalLocations: (LogicalLocation_dictionary.t [@default []]);
+    graphs: (Graph_dictionary.t [@default []]);
+    results: (Sarif_result.t list [@default []]);
+    resources: (Resources.t [@default Resources.default]);
+    instanceGuid: (string [@default ""]);
+    correlationGuid: (string [@default ""]);
+    logicalId: (string [@default ""]);
+    description: (Message.t [@default Message.default]);
+    automationLogicalId: (string [@default ""]);
+    baselineInstanceGuid: (string [@default ""]);
+    architecture: (string [@default ""]);
+    richMessageMimeType: (string [@default "text/markdown;variant=GFM" ]);
+    redactionToken: (string [@default ""]);
+    defaultFileEncoding: (string [@default "utf-8"]);
+    columnKind: (ColumnKind.t [@default UnicodeCodePoints]);
+    properties: (Properties.t [@default Properties.default]);
 }
-
-type rule = {
-  id: (string [@default ""]);
-  name: (string [@default ""]);
-  shortDescription: (message [@default no_msg]);
-  fullDescription: (message [@default no_msg]);
-  messageStrings: (additional_properties [@default no_additional_prop]);
-  richMessageStrings: (additional_properties [@default no_additional_prop]);
-  configuration: (ruleConfiguration [@default std_rule_config]);
-  helpUri: (string [@default ""]);
-  properties: (properties [@default no_prop]);
-}[@@deriving yojson]
-
-let no_rule = {
-  id = "";
-  name = "";
-  shortDescription = no_msg;
-  fullDescription = no_msg;
-  messageStrings = no_additional_prop;
-  richMessageStrings = no_additional_prop;
-  configuration = std_rule_config;
-  helpUri = "";
-  properties = no_prop;
-}
-
-type resources = {
-  messageStrings: (additional_properties [@default no_additional_prop]);
-  rules: (rule [@default no_rule]);
-}[@@deriving yojson]
-
-let no_resources = { messageStrings = no_additional_prop; rules = no_rule }
-
-type result_level =
-  | NotApplicable [@name "notApplicable"]
-  | Pass [@name "pass"]
-  | Note [@name "note"]
-  | Warning [@name "warning"]
-  | Error [@name "error"]
 [@@deriving yojson]
+end
 
-type result_suppressionState =
-  | SuppressedInSource [@name "suppressedInSource"]
-  | SuppressedExternally [@name "suppressedExternally"]
-[@@deriving yojson]
-
-type result_baselineState =
-  | New [@name "new"]
-  | Existing [@name "existing"]
-  | Absent [@name "absent"]
-[@@deriving yojson]
-
-type result = {
-  ruleId: (string [@default ""]);
-  level: (result_level [@default NotApplicable]);
-  message: (message [@default no_msg]);
-  analysisTarget: (fileLocation [@default unknown_file]);
-  locations: (location list [@default []]);
-  instanceGuid: (string [@default ""]);
-  correlationGuid: (string [@default ""]);
-  occurenceCount: (int [@default 1]);
-  partialFingerprints: (additional_properties [@default no_additional_prop]);
-  fingerprints: (additional_properties [@default no_additional_prop]);
-  stacks: (stack list [@default []]);
-  codeFlows: (codeFlow list [@default []]);
-  graphs: (graph_dictionary [@default no_graph]);
-  graphTraversals: (graphTraversal list [@default []]);
-  relatedLocations: (location list [@default []]);
-  suppressionStates: (result_suppressionState list [@default []]);
-  baselineState: (result_baselineState [@default Absent]);
-  attachments: (attachment list [@default []]);
-  workItemsUris: (string list [@default []]);
-  conversionProvenance: (physicalLocation list [@default[]]);
-  fixes: (fix list [@default []]);
-  properties: (properties [@default no_prop])
-}[@@deriving yojson]
-
-type versionControlDetails = {
-  uri: string;
-  revisionId: (string [@default ""]);
-  branch: (string [@default ""]);
-  tag: (string [@default ""]);
-  timestamp: (string [@default ""]);
-  properties: (properties [@default no_prop]);
-}[@@deriving yojson]
-
-(** TODO: `Assoc should take as argument a json rep of a file *)
-type file_dictionary =
-  [ `Null | `Assoc of string * Yojson.Safe.json][@@deriving yojson]
-let no_file = `Null
-
-(** TODO: values are logicalLocation *)
-type logical_loc_dict =
-  [ `Null | `Assoc of string * logicalLocation][@@deriving yojson]
-let no_location = `Null
-
-type columnKind =
-  | Utf16CodeUnits [@name "utf16CodeUnits"]
-  | UnicodeCodePoints [@name "unicodeCodePoints"]
-[@@deriving yojson]
-
-type run = {
-  tool: tool;
-  invocations: (invocation list [@default []]);
-  conversion: (conversion [@default no_conversion]);
-  versionControlProvenance: (versionControlDetails list [@default []]);
-  originalUriBaseIds: (additional_properties [@default no_additional_prop]);
-  files: (file_dictionary [@default no_file]);
-  logicalLocations: (logical_loc_dict [@default no_location]);
-  graphs: (graph_dictionary [@default no_graph]);
-  results: (result list [@default []]);
-  resources: (resources [@default no_resources]);
-  instanceGuid: (string [@default ""]);
-  correlationGuid: (string [@default ""]);
-  logicalId: (string [@default ""]);
-  description: (message [@default no_msg]);
-  automationLogicalId: (string [@default ""]);
-  baselineInstanceGuid: (string [@default ""]);
-  architecture: (string [@default ""]);
-  richMessageMimeType: (string [@default "text/markdown;variant=GFM" ]);
-  redactionToken: (string [@default ""]);
-  defaultFileEncoding: (string [@default "utf-8"]);
-  columnKind: (columnKind [@default UnicodeCodePoints]);
-  properties: (properties [@default no_prop]);
-}
-[@@deriving yojson]
-
-type schema = {
-  schema: (uri [@default Sarif_github]) [@key "$schema"];
-  version: version;
-  runs: run list
-} [@@deriving yojson]
+module Schema = struct
+  type t = {
+    schema: (Uri.t [@default Uri.Sarif_github]) [@key "$schema"];
+    version: Version.t;
+    runs: Run.t list
+  } [@@deriving yojson]
+end
