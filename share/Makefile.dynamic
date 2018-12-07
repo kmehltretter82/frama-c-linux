@@ -248,13 +248,17 @@ endif # PLUGIN_ENABLE <> no
 ##########
 
 .PHONY: merlin_plugin
-merlin_plugin::
-	echo "B $(FRAMAC_LIBDIR)" > .merlin
+merlin_plugin:
+#create Merlin file for external plug-in
+	$(PRINT_MAKING) $@
+	echo "FLG -c $(FLAGS) $(FRAMAC_USER_MERLIN_FLAGS)" > .merlin
+	echo "B $(FRAMAC_LIBDIR)" >> .merlin
 	echo "B $(FRAMAC_LIBDIR)/plugins" >> .merlin
 	echo "B $(FRAMAC_LIBDIR)/plugins/gui" >> .merlin
-	echo "PKG ocamlgraph" >> .merlin
-	echo "PKG zarith" >> .merlin
-	echo "PKG lablgtk2" >> .merlin
+	for PKG in $(LIBRARY_NAMES); do echo PKG $$PKG >> .merlin; done
+	for PKG in $(LIBRARY_NAMES_GUI); do echo PKG $$PKG >> .merlin; done
+	for PKG in $(MERLIN_PACKAGES); do echo PKG $$PKG >> .merlin; done
+	for DIR in $(patsubst %/,%,$(sort $(dir $(PLUGIN_ML_SRC) $(PLUGIN_TESTS_LIB)))); do echo S $$DIR>> .merlin; echo B $$DIR >> .merlin; done
 
 ############
 # Cleaning #
