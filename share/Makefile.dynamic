@@ -248,7 +248,7 @@ endif # PLUGIN_ENABLE <> no
 ##########
 
 .PHONY: merlin_plugin
-merlin_plugin:
+merlin_plugin::
 #create Merlin file for external plug-in
 	$(PRINT_MAKING) $@
 	echo "FLG -c $(FLAGS) $(FRAMAC_USER_MERLIN_FLAGS)" > .merlin
