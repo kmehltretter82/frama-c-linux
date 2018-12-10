@@ -167,6 +167,13 @@ module SymbolicLocsDomain = Domain_Parameter
       let default = false
     end)
 
+module OctagonsDomain = Domain_Parameter
+    (struct
+      let option_name = "-eva-octagons-domain"
+      let help = "Use the octagons domain of Eva."
+      let default = false
+    end)
+
 module BitwiseOffsmDomain = Domain_Parameter
     (struct
       let option_name = "-eva-bitwise-domain"
