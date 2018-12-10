@@ -70,3 +70,5 @@ module Stubs = String_list(
     let arg_name = "f1,...,fn"
     let help = "list of C files containing stub functions"
   end)
+
+let version = "0.1~alpha"

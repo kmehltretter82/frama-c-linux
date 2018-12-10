@@ -329,17 +329,23 @@ module Tool = struct
     properties: (Properties.t [@default Properties.default]);
   }[@@deriving yojson]
 
-  let default = {
-    name = "";
-    fullName = "";
-    version = "";
-    semanticVersion = "";
-    fileVersion = "";
-    downloadUri = "";
-    sarifLoggerVersion = "";
-    language = "";
-    properties = Properties.default;
-  }
+  let create
+      ~name
+      ?(fullName="")
+      ?(version="")
+      ?(semanticVersion="")
+      ?(fileVersion="")
+      ?(downloadUri="")
+      ?(sarifLoggerVersion="")
+      ?(language="en-US")
+      ?(properties=Properties.default)
+      ()
+    =
+    { name; fullName; version; semanticVersion; fileVersion;
+      downloadUri; sarifLoggerVersion; language; properties }
+
+  let default = create ~name:"" ()
+
 end
 
 module Invocation = struct
@@ -721,10 +727,68 @@ module Run = struct
     richMessageMimeType: (string [@default "text/markdown;variant=GFM" ]);
     redactionToken: (string [@default ""]);
     defaultFileEncoding: (string [@default "utf-8"]);
-    columnKind: (ColumnKind.t [@default UnicodeCodePoints]);
+    columnKind: (ColumnKind.t [@default ColumnKind.UnicodeCodePoints]);
     properties: (Properties.t [@default Properties.default]);
 }
 [@@deriving yojson]
+
+let create
+    ~tool
+    ~invocations
+    ?(conversion=Conversion.default)
+    ?(versionControlProvenance=[])
+    ?(originalUriBaseIds=Additional_properties.default)
+    ?(files=[])
+    ?(logicalLocations=[])
+    ?(graphs=[])
+    ?(results=[])
+    ?(resources=Resources.default)
+    ?instanceGuid
+    ?correlationGuid
+    ?logicalId
+    ?(description=Message.default)
+    ?automationLogicalId
+    ?baselineInstanceGuid
+    ?(architecture="")
+    ?(richMessageMimeType="text/markdown;variant=GFM")
+    ?(redactionToken="")
+    ?(defaultFileEncoding="utf-8")
+    ?(columnKind=ColumnKind.UnicodeCodePoints)
+    ?(properties=Properties.default)
+    ()
+  =
+  let instanceGuid =
+    match instanceGuid with
+    | Some guid -> guid
+    | None -> failwith "use guid generation library"
+  in
+  let correlationGuid =
+    match correlationGuid with
+    | Some guid -> guid
+    | None -> failwith "use guid generation library"
+  in
+  let logicalId =
+    match logicalId with
+    | Some id -> id
+    | None -> failwith "use id generator"
+  in
+  let automationLogicalId =
+    match automationLogicalId with
+    | Some id -> id
+    | None -> failwith "use id generator"
+  in
+  let baselineInstanceGuid =
+    match baselineInstanceGuid with
+    | Some guid -> guid
+    | None -> failwith "use guid generation library"
+  in
+  {
+    tool; invocations; conversion; versionControlProvenance; originalUriBaseIds;
+    files; logicalLocations; graphs; results; resources; instanceGuid;
+    correlationGuid; logicalId; description; automationLogicalId;
+    baselineInstanceGuid; architecture; richMessageMimeType;
+    redactionToken; defaultFileEncoding; columnKind; properties
+  }
 end
 
 module Schema = struct
@@ -733,4 +797,7 @@ module Schema = struct
     version: Version.t;
     runs: Run.t list
   } [@@deriving yojson]
+
+  let create ?(schema=Uri.Sarif_github) ?(version=Version.V2_0_0) ~runs () =
+    { schema; version; runs }
 end
