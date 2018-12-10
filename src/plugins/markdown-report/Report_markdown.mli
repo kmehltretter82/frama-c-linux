@@ -5,10 +5,7 @@ include Plugin.S
 module Output: Parameter_sig.String
 
 (** Value of [-mdr-gen]. *)
-module Generate: Parameter_sig.Bool
-
-(** Value of [-mdr-gen-draft]. *)
-module Gen_draft: Parameter_sig.Bool
+module Generate: Parameter_sig.String
 
 (** Value of [-mdr-remarks]. *)
 module Remarks: Parameter_sig.String

@@ -582,10 +582,10 @@ let mk_date () =
     (Printf.sprintf "%d-%02d-%02d"
        (1900 + tm.Unix.tm_year) (1 + tm.Unix.tm_mon) tm.Unix.tm_mday)
 
-let mk_remarks () =
+let mk_remarks is_draft =
   let f = Mdr_params.Remarks.get () in
   if f <> "" then Parse_remarks.get_remarks f
-  else if Mdr_params.Gen_draft.get () then begin
+  else if is_draft then begin
     let f = Mdr_params.Output.get() in
     if Sys.file_exists f then begin
       Mdr_params.feedback
@@ -595,7 +595,7 @@ let mk_remarks () =
   end else  Datatype.String.Map.empty
 
 let gen_report is_draft =
-  let remarks = mk_remarks () in
+  let remarks = mk_remarks is_draft in
   let env = { remarks; is_draft } in
   let context = gen_context env in
   let coverage = gen_coverage env in
@@ -645,13 +645,13 @@ let gen_report is_draft =
       (Mdr_params.Output.get()) s
 
 let main () =
-  if Mdr_params.Gen_draft.get () then begin
-    if Mdr_params.Generate.get () then
-      Mdr_params.warning
-        "-mdr-gen and -mdr-gen-draft cannot be activated at the \
-         same time. Only draft will be generated";
-    gen_report true
-  end
-  else if Mdr_params.Generate.get () then gen_report false
+  match Mdr_params.Generate.get () with
+  | "none" -> ()
+  | "md" -> gen_report false
+  | "draft" -> gen_report true
+  | "sarif" -> Sarif_gen.generate ()
+  | s ->
+    Mdr_params.fatal "Unexpected value for option %s: %s"
+      Mdr_params.Generate.option_name s
 
 let () = Db.Main.extend main

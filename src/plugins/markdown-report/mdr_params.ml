@@ -13,19 +13,18 @@ struct
   let help = "sets the name of the output file to <f>"
 end)
 
-module Generate = False(
+module Generate = String(
 struct
   let option_name = "-mdr-gen"
-  let help = "generates an analysis report on the current project"
+  let arg_name = "kind"
+  let default = "none"
+  let help =
+    "select the <kind> of report to generate among: \
+     none (default), md, draft and sarif"
 end)
 
-module Gen_draft = False(
-  struct
-    let option_name = "-mdr-gen-draft"
-    let help =
-      "instead of a full report, generates an empty draft \
-       in a format suitable for -mdr-remarks"
-  end)
+let () =
+  Generate.set_possible_values [ "none"; "md"; "draft"; "sarif" ]
 
 module Remarks = Empty_string(
 struct
