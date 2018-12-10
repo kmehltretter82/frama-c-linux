@@ -807,6 +807,41 @@ module State = struct
       in
       VariableSet.fold aux related []
     with Not_found -> []
+
+  (* x' = ±x - delta *)
+  let sub_delta ~inverse state x delta =
+    let intervals = Intervals.remove x state.intervals in
+    let state = { state with intervals } in
+    let x_related = Relations.find x state.relations in
+    let aux y state =
+      let pair, order = Pair.make x y in
+      try
+        let diamond = Octagons.find pair state.octagons in
+        let diamond =
+          if inverse
+          then
+            let op = if order then Arith.neg else fun x -> x in
+            { add = op diamond.sub;
+              sub = op diamond.add }
+          else diamond
+        in
+        let typ = x.vtype in
+        let op = if order then Arith.sub else Arith.add in
+        let add =
+          if Ival.(equal top diamond.add)
+          then diamond.add
+          else Arith.sub typ diamond.add delta
+        and sub =
+          if Ival.(equal top diamond.sub)
+          then diamond.sub
+          else op typ diamond.sub delta
+        in
+        let diamond' = { add; sub } in
+        let octagons = Octagons.unsafe_add pair diamond' state.octagons in
+        { state with octagons }
+      with Not_found -> state
+    in
+    VariableSet.fold aux x_related state
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -962,21 +997,33 @@ module Domain = struct
           end
         | _ -> state
 
+    let assign_variable varinfo expr assigned valuation state =
+      let evaluate = evaluation_function valuation in
+      (* TODO: redundant with rewrite_binop below. *)
+      let vars = Rewriting.rewrite evaluate expr in
+      let equal_varinfo v = Variable.equal varinfo v.Rewriting.varinfo in
+      let state =
+        try
+          let var = List.find equal_varinfo vars in
+          let inverse = not var.Rewriting.sign in
+          State.sub_delta ~inverse state varinfo var.Rewriting.coeff
+        with Not_found -> State.remove state varinfo
+      in
+      let state = assign_interval varinfo assigned state in
+      let enode = Lval (Var varinfo, NoOffset) in
+      let left_expr = Cil.new_exp ~loc:expr.eloc enode in
+      (* On the assignment X = E; if X-E can be rewritten as ±(X±Y-v),
+         then the octagonal constraint [X±Y ∈ v] holds. *)
+      let octagons = Rewriting.rewrite_binop evaluate left_expr Sub expr in
+      List.fold_left
+        (fun acc (_sign, octagon) ->
+           acc >>- fun state -> State.add_octagon state octagon)
+        (`Value state) octagons
+
     let assign _kinstr left_value expr assigned valuation state =
       match left_value.lval with
       | Var varinfo, NoOffset when Cil.isArithmeticType varinfo.vtype ->
-        let state = State.remove state varinfo in
-        let state = assign_interval varinfo assigned state in
-        let evaluate = evaluation_function valuation in
-        let enode = Lval left_value.lval in
-        let left_expr = Cil.new_exp ~loc:expr.eloc enode in
-        (* On the assignment X = E; if X-E can be rewritten as ±(X±Y-v),
-           then the octagonal constraint [X±Y ∈ v] holds. *)
-        let octagons = Rewriting.rewrite_binop evaluate left_expr Sub expr in
-        List.fold_left
-          (fun acc (_sign, octagon) ->
-             acc >>- fun state -> State.add_octagon state octagon)
-          (`Value state) octagons
+        assign_variable varinfo expr assigned valuation state
       | _ ->
         let written_loc = Precise_locs.imprecise_location left_value.lloc in
         let written_zone =
