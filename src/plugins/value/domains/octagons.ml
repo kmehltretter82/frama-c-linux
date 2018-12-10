@@ -29,6 +29,12 @@ open Eval
    for a minimal drop in efficiency. *)
 let infer_intervals = true
 
+(* Whether the domain saturates the octagons: from a relation between (x, y)
+   and a relation between (y, z), infers the relation between (x, z).
+   The saturation is currently partial. Improves the domain accuracy for a
+   minimal drop in efficiency. *)
+let saturate_octagons = true
+
 (* -------------------------------------------------------------------------- *)
 (*                  Basic types: pair of variables and Ival.t                 *)
 (* -------------------------------------------------------------------------- *)
@@ -395,8 +401,10 @@ module Diamond = struct
     Arith.narrow x.add y.add >>- fun add ->
     Arith.narrow x.sub y.sub >>-: fun sub -> {add; sub}
 
-  (* Makes a diamond about (X, Y) from a diamond about (Y, X). *)
-  let reverse_variables t = { t with sub = Arith.neg t.sub }
+  (* If [swap] is true, makes a diamond about (X, Y) from a diamond
+     about (Y, X). *)
+  let reverse_variables swap t =
+    if swap then { t with sub = Arith.neg t.sub } else t
 end
 
 
@@ -643,7 +651,7 @@ module State = struct
         type t = state
         include Datatype.Serializable_undefined
 
-        let name = "Octagons.Octagons"
+        let name = "Octagons.State"
         let structural_descr =
           Structural_descr.t_record
             [| Octagons.packed_descr;
@@ -675,6 +683,8 @@ module State = struct
             "@[<hov>%a@ %a@]"
             Octagons.pretty octagons Intervals.pretty intervals
       end)
+
+  (* ------------------------------ Lattice --------------------------------- *)
 
   let top =
     { octagons = Octagons.top;
@@ -762,13 +772,89 @@ module State = struct
     let modified = Zone.narrow t1.modified t2.modified in
     `Value { octagons; intervals; relations; modified; }
 
-  let add_octagon state octagon =
+  (* -------------- Transitive closure when adding an octagon --------------- *)
+
+  type relation =
+    { vars: varinfo * varinfo;
+      diamond: diamond; }
+
+  let add_relation state rel =
+    let x, z = rel.vars in
+    let pair, swap = Pair.make x z in
+    let diamond = Diamond.reverse_variables swap rel.diamond in
+    Octagons.add pair diamond state.octagons >>-: fun octagons ->
+    let relations = Relations.relate pair state.relations in
+    { state with octagons; relations }
+
+  let inverse { vars; diamond } =
+    let var1, var2 = vars in
+    { vars = var2, var1; diamond = Diamond.reverse_variables true diamond }
+
+  let transitive_relation y rel1 rel2 =
+    let rel1 =
+      if Variable.equal y (snd rel1.vars) then rel1 else inverse rel1
+    and rel2 =
+      if Variable.equal y (fst rel2.vars) then rel2 else inverse rel2
+    in
+    (* rel1 is about X±Y, rel2 is about Y±Z. *)
+    let typ = y.vtype in
+    (* X+Z = (X+Y) - (Y-Z) and X+Y = (X-Y) + (Y+Z) *)
+    let add =
+      Ival.narrow
+        (Arith.sub typ rel1.diamond.add rel2.diamond.sub)
+        (Arith.add typ rel1.diamond.sub rel2.diamond.add)
+    (* X-Z = (X+Y) - (Y+Z) and X-Z = (X-Y) + (Y-Z) *)
+    and sub =
+      Ival.narrow
+        (Arith.sub typ rel1.diamond.add rel2.diamond.add)
+        (Arith.add typ rel1.diamond.sub rel2.diamond.sub)
+    in
+    let diamond = {add; sub} in
+    if Diamond.is_top diamond then raise Not_found else
+      let vars = fst rel1.vars, snd rel2.vars in
+      { vars; diamond }
+
+  let saturate state x y rel1 =
+    try
+      let y_related = Relations.find y state.relations in
+      let y_related = VariableSet.remove x y_related in
+      let aux z state =
+        state >>- fun state ->
+        try
+          let pair, _ = Pair.make y z in
+          let diamond = Octagons.find pair state.octagons in
+          let vars = Pair.get pair in
+          let rel2 = { vars; diamond } in
+          let new_relation = transitive_relation y rel1 rel2 in
+          add_relation state new_relation
+        with Not_found -> `Value state
+      in
+      VariableSet.fold aux y_related (`Value state)
+    with Not_found -> `Value state
+
+  let add_octagon_aux state octagon =
     if Ival.(equal top octagon.value)
     then `Value state
     else
       Octagons.add_octagon octagon state.octagons >>-: fun octagons ->
       let relations = Relations.relate octagon.variables state.relations in
       { state with octagons; relations }
+
+  let add_octagon state octagon =
+    let state =
+      if saturate_octagons
+      then
+        let x, y = Pair.get octagon.variables in
+        let diamond = match octagon.operation with
+          | Add -> { add = octagon.value; sub = Ival.top }
+          | Sub -> { add = Ival.top; sub = octagon.value }
+        in
+        let relation = { vars = x, y; diamond } in
+        saturate state y x relation >>- fun state ->
+        saturate state x y relation
+      else `Value state
+    in
+    state >>- fun state -> add_octagon_aux state octagon
 
   let remove state x =
     let intervals = Intervals.remove x state.intervals in
@@ -797,11 +883,7 @@ module State = struct
         let pair, swap = Pair.make x y in
         try
           let diamond = Octagons.find pair state.octagons in
-          let diamond =
-            if swap
-            then Diamond.reverse_variables diamond
-            else diamond
-          in
+          let diamond = Diamond.reverse_variables swap diamond in
           (y, diamond) :: acc
         with Not_found -> acc
       in
@@ -814,19 +896,19 @@ module State = struct
     let state = { state with intervals } in
     let x_related = Relations.find x state.relations in
     let aux y state =
-      let pair, order = Pair.make x y in
+      let pair, swap = Pair.make x y in
       try
         let diamond = Octagons.find pair state.octagons in
         let diamond =
           if inverse
           then
-            let op = if order then Arith.neg else fun x -> x in
+            let op = if swap then fun x -> x else Arith.neg in
             { add = op diamond.sub;
               sub = op diamond.add }
           else diamond
         in
         let typ = x.vtype in
-        let op = if order then Arith.sub else Arith.add in
+        let op = if swap then Arith.add else Arith.sub in
         let add =
           if Ival.(equal top diamond.add)
           then diamond.add
