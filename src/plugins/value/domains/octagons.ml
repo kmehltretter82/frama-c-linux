@@ -23,6 +23,12 @@
 open Cil_types
 open Eval
 
+(* Whether the domain infers non-relational intervals (ivals) to improve the
+   precision of the join operation: this avoids losing all relations that have
+   been inferred in only one side of the join. Enhances the domain accuracy
+   for a minimal drop in efficiency. *)
+let infer_intervals = true
+
 (* -------------------------------------------------------------------------- *)
 (*                  Basic types: pair of variables and Ival.t                 *)
 (* -------------------------------------------------------------------------- *)
@@ -333,6 +339,9 @@ end
 
 (* This domain infers relations between pairs of variables (X, Y), by inferring
    intervals for the mathematical operations X+Y and X-Y.
+   It also infers non-relational intervals for the separate variable X and Y
+   (they could be seen as intervals for X+X and Y+Y, but we chose to store them
+   in another way). These intervals are used to make the join more precise.
    Geometrically, in a plan, intervals for X and Y shape a straight rectangle,
    while intervals for X+Y and X-Y shape a "leaning" rectangle; the intersection
    of these rectangles shapes an octagon.
@@ -440,7 +449,7 @@ module Octagons = struct
 
   let narrow x y = try `Value (narrow_exc x y) with EBottom -> `Bottom
 
-  let join =
+  let simple_join =
     let cache = Hptmap_sig.PersistentCache "Octagons.Octagons.join" in
     let decide _pair x y =
       let r = Diamond.join x y in
@@ -448,7 +457,18 @@ module Octagons = struct
     in
     inter ~cache ~symmetric:true ~idempotent:true ~decide
 
-  let widen =
+  let join ~decide_left ~decide_right =
+    let cache = Hptmap_sig.NoCache in
+    let decide_left = Traversing decide_left
+    and decide_right = Traversing decide_right in
+    let decide_both _pair x y =
+      let r = Diamond.join x y in
+      if Diamond.is_top r then None else Some r
+    in
+    merge ~cache ~symmetric:false ~idempotent:true
+      ~decide_left ~decide_right ~decide_both
+
+  let simple_widen =
     let cache = Hptmap_sig.PersistentCache "Octagons.Octagons.widen" in
     let decide _pair x y =
       let r = Diamond.widen x y in
@@ -456,6 +476,16 @@ module Octagons = struct
     in
     inter ~cache ~symmetric:false ~idempotent:true ~decide
 
+  let widen ~decide_left ~decide_right =
+    let cache = Hptmap_sig.NoCache in
+    let decide_left = Traversing decide_left
+    and decide_right = Traversing decide_right in
+    let decide_both _pair x y =
+      let r = Diamond.widen x y in
+      if Diamond.is_top r then None else Some r
+    in
+    merge ~cache ~symmetric:false ~idempotent:true
+      ~decide_left ~decide_right ~decide_both
 
   let unsafe_add = add
 
@@ -543,6 +573,57 @@ module Relations = struct
 end
 
 (* -------------------------------------------------------------------------- *)
+(*                           Non-relational intervals                         *)
+(* -------------------------------------------------------------------------- *)
+
+module Intervals = struct
+  module Initial_Values = struct let v = [[]] end
+  module Dependencies = struct let l = [ Ast.self ] end
+
+  include Hptmap.Make (Variable) (Ival)
+      (Hptmap.Comp_unused) (Initial_Values) (Dependencies)
+
+  let top = empty
+
+  let is_included =
+    let cache = Hptmap_sig.PersistentCache "Octagons.Intervals.is_included" in
+    let decide_fst _ _ = true in
+    let decide_snd _ _ = false in
+    let decide_both _ x y = Ival.is_included x y in
+    let decide_fast t1 t2 = decide_fast_inclusion t2 t1 in
+    binary_predicate cache UniversalPredicate
+      ~decide_fast ~decide_fst ~decide_snd ~decide_both
+
+  exception EBottom
+
+  let narrow_exc =
+    let cache = Hptmap_sig.NoCache in
+    let decide _varinfo x y =
+      let ival = Ival.narrow x y in
+      if Ival.is_bottom ival then raise EBottom else ival
+    in
+    join ~cache ~symmetric:true ~idempotent:true ~decide
+
+  let narrow x y = try `Value (narrow_exc x y) with EBottom -> `Bottom
+
+  let join =
+    let cache = Hptmap_sig.PersistentCache "Octagons.Intervals.join" in
+    let decide _varinfo x y =
+      let r = Ival.join x y in
+      if Ival.(equal top r) then None else Some r
+    in
+    inter ~cache ~symmetric:true ~idempotent:true ~decide
+
+  let widen =
+    let cache = Hptmap_sig.PersistentCache "Octagons.Intervals.widen" in
+    let decide _varinfo x y =
+      let r = Arith.widen x y in
+      if Ival.(equal top r) then None else Some r
+    in
+    inter ~cache ~symmetric:false ~idempotent:true ~decide
+end
+
+(* -------------------------------------------------------------------------- *)
 (*                               Octagon states                               *)
 (* -------------------------------------------------------------------------- *)
 
@@ -551,7 +632,8 @@ module Zone = Locations.Zone
 module State = struct
 
   type state =
-    { octagons: Octagons.t;           (* The intervals for X±Y. *)
+    { octagons: Octagons.t;       (* The intervals for X±Y. *)
+      intervals: Intervals.t;     (* The intervals for the variables X,Y… *)
       relations: Relations.t;     (* The related variables in [octagons]. *)
       modified: Locations.Zone.t; (* The memory zone modified by a function. *)
     }
@@ -565,17 +647,21 @@ module State = struct
         let structural_descr =
           Structural_descr.t_record
             [| Octagons.packed_descr;
+               Intervals.packed_descr;
                Relations.packed_descr;
                Zone.packed_descr |]
         let reprs =
           [ { octagons = Octagons.top;
+              intervals = Intervals.empty;
               relations = Relations.empty;
               modified = Zone.bottom } ]
 
         let compare s1 s2 =
           let c = Octagons.compare s1.octagons s2.octagons in
           if c <> 0 then c else
-            Zone.compare s1.modified s2.modified
+            let c = Intervals.compare s1.intervals s2.intervals in
+            if c <> 0 then c else
+              Zone.compare s1.modified s2.modified
 
         let equal = Datatype.from_compare
 
@@ -584,41 +670,97 @@ module State = struct
                         Relations.hash t.relations,
                         Zone.hash t.modified)
 
-        let pretty fmt { octagons } =
+        let pretty fmt { octagons; intervals } =
           Format.fprintf fmt
-            "@[<hov>%a@]"
-            Octagons.pretty octagons
+            "@[<hov>%a@ %a@]"
+            Octagons.pretty octagons Intervals.pretty intervals
       end)
 
   let top =
     { octagons = Octagons.top;
+      intervals = Intervals.top;
       relations = Relations.empty;
       modified = Zone.top; }
 
   let empty () =
     { octagons = Octagons.top;
+      intervals = Intervals.top;
       relations = Relations.empty;
       modified = Zone.bottom; }
 
   let is_included t1 t2 =
     Octagons.is_included t1.octagons t2.octagons
+    && Intervals.is_included t1.intervals t2.intervals
     && Zone.is_included t1.modified t2.modified
 
   let join t1 t2 =
-    { octagons = Octagons.join t1.octagons t2.octagons;
-      relations = Relations.inter t1.relations t2.relations;
+    let octagons =
+      if not infer_intervals
+      then Octagons.simple_join t1.octagons t2.octagons
+      else
+        let decide_empty intervals pair diamond =
+          let v1, v2 = Pair.get pair in
+          try
+            let i1 = Intervals.find v1 intervals
+            and i2 = Intervals.find v2 intervals in
+            let add = Arith.add v1.vtype i1 i2
+            and sub = Arith.sub v1.vtype i1 i2 in
+            let diamond = Diamond.join diamond { add; sub } in
+            if Diamond.is_top diamond then None else Some diamond
+          with Not_found -> None
+        in
+        let decide_left = decide_empty t2.intervals
+        and decide_right = decide_empty t1.intervals in
+        Octagons.join ~decide_left ~decide_right t1.octagons t2.octagons
+    in
+    let relations =
+      if infer_intervals
+      then Relations.union t1.relations t2.relations
+      else Relations.inter t1.relations t2.relations
+    in
+    { octagons; relations;
+      intervals = Intervals.join t1.intervals t2.intervals;
       modified = Zone.join t1.modified t2.modified; }
 
   let widen _kf _hints t1 t2 =
-    { octagons = Octagons.widen t1.octagons t2.octagons;
-      relations = Relations.inter t1.relations t2.relations;
+    let octagons =
+      if not infer_intervals
+      then Octagons.simple_widen t1.octagons t2.octagons
+      else
+        let decide_empty b intervals pair diamond =
+          let v1, v2 = Pair.get pair in
+          try
+            let i1 = Intervals.find v1 intervals
+            and i2 = Intervals.find v2 intervals in
+            let add = Arith.add v1.vtype i1 i2
+            and sub = Arith.sub v1.vtype i1 i2 in
+            let diamond =
+              if b
+              then Diamond.widen { add; sub } diamond
+              else Diamond.widen diamond { add; sub }
+            in
+            if Diamond.is_top diamond then None else Some diamond
+          with Not_found -> None
+        in
+        let decide_left = decide_empty false t2.intervals
+        and decide_right = decide_empty true t1.intervals in
+        Octagons.widen ~decide_left ~decide_right t1.octagons t2.octagons
+    in
+    let relations =
+      if infer_intervals
+      then Relations.union t1.relations t2.relations
+      else Relations.inter t1.relations t2.relations
+    in
+    { octagons; relations;
+      intervals = Intervals.widen t1.intervals t2.intervals;
       modified = Zone.join t1.modified t2.modified; }
 
   let narrow t1 t2 =
     Octagons.narrow t1.octagons t2.octagons >>- fun octagons ->
+    Intervals.narrow t1.intervals t2.intervals >>- fun intervals ->
     let relations = Relations.union t1.relations t2.relations in
     let modified = Zone.narrow t1.modified t2.modified in
-    `Value { octagons; relations; modified; }
+    `Value { octagons; intervals; relations; modified; }
 
   let add_octagon state octagon =
     if Ival.(equal top octagon.value)
@@ -629,6 +771,8 @@ module State = struct
       { state with octagons; relations }
 
   let remove state x =
+    let intervals = Intervals.remove x state.intervals in
+    let state = { state with intervals } in
     try
       let relations = Relations.find x state.relations in
       let remove_one y state =
@@ -664,7 +808,6 @@ module State = struct
       VariableSet.fold aux related []
     with Not_found -> []
 end
-
 
 (* -------------------------------------------------------------------------- *)
 (*                               Octagon domain                               *)
@@ -765,22 +908,37 @@ module Domain = struct
 
     exception EBottom
 
+    let infer_octagons evaluate expr ival state =
+      let octagons = Rewriting.make_octagons evaluate expr ival in
+      let add_octagon state octagon =
+        match State.add_octagon state octagon with
+        | `Bottom -> raise EBottom
+        | `Value state -> state
+      in
+      List.fold_left add_octagon state octagons
+
+    let infer_interval expr ival state =
+      if not infer_intervals
+      then state
+      else
+        match expr.enode with
+        | Lval (Var varinfo, NoOffset)
+          when Cil.isArithmeticType varinfo.vtype ->
+          let intervals = Intervals.add varinfo ival state.intervals in
+          { state with intervals }
+        | _ -> state
+
     let update valuation state =
       let evaluate = evaluation_function valuation in
-      let aux e r state =
-        let value = r.Eval.value in
-        match r.reductness, value.v, value.initialized, value.escaping with
+      let aux expr record state =
+        let value = record.Eval.value in
+        match record.reductness, value.v, value.initialized, value.escaping with
         | (Created | Reduced), `Value cvalue, true, false ->
           begin
             try
               let ival = Cvalue.V.project_ival cvalue in
-              let octagons = Rewriting.make_octagons evaluate e ival in
-              let add_octagon state octagon =
-                match State.add_octagon state octagon with
-                | `Bottom -> raise EBottom
-                | `Value state -> state
-              in
-              List.fold_left add_octagon state octagons
+              let state = infer_octagons evaluate expr ival state in
+              infer_interval expr ival state
             with Cvalue.V.Not_based_on_null -> state
           end
         | _ -> state
@@ -788,10 +946,27 @@ module Domain = struct
       try `Value (Valuation.fold aux valuation state)
       with EBottom -> `Bottom
 
-    let assign _kinstr left_value expr _assigned valuation state =
+    let assign_interval varinfo assigned state =
+      if not infer_intervals
+      then state
+      else
+        match assigned with
+        | Assign v
+        | Copy (_, { v = `Value v; initialized = true; escaping = false }) ->
+          begin
+            try
+              let ival = Cvalue.V.project_ival v in
+              let intervals = Intervals.add varinfo ival state.intervals in
+              { state with intervals }
+            with Cvalue.V.Not_based_on_null -> state
+          end
+        | _ -> state
+
+    let assign _kinstr left_value expr assigned valuation state =
       match left_value.lval with
       | Var varinfo, NoOffset when Cil.isArithmeticType varinfo.vtype ->
         let state = State.remove state varinfo in
+        let state = assign_interval varinfo assigned state in
         let evaluate = evaluation_function valuation in
         let enode = Lval left_value.lval in
         let left_expr = Cil.new_exp ~loc:expr.eloc enode in
