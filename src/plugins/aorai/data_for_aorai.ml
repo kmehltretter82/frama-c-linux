@@ -210,162 +210,137 @@ let buch_sync   = "Aorai_Sync"                           (* Deprecated ? *)
 (* Buchi automata as stored after parsing *)
 let automata = ref ([],[])
 
-(*TODO*)
-module Automata_graph = Graph.Imperative.Digraph.ConcreteBidirectionalLabeled ((*state liste*)
-  struct 
-  type t = Promelaast.state
-  let compare x y = Datatype.Int.compare x.nums y.nums
-  let hash a = a.nums
-  let equal a b = (a = b)
-  end
-  )
-  
-  ((*transition condition list*)
-  struct
-  type t = (Promelaast.typed_condition * Promelaast.action) Promelaast.trans
-  let compare x y = Datatype.Int.compare x.numt y.numt
-  let default = {numt = -1; start = List.hd (Aorai_state.reprs);
-                  stop = List.hd (Aorai_state.reprs);
-                  cross = (TTrue,[]); }
-  end
-  )
-  
-(*module Automata_BellmanFord = 
-Graph.Path.BellmanFord 
-  (Automata_graph)  
-  (
-    struct
-    type edge = Automata_graph.E.t
-    type t = int
-    let weight e = match e with 
-      | (_, ed, _) -> ed.numt
-      (*| _ -> failwith "Not an edge"*)
-    let compare x y = Datatype.Int.compare x y
-    let add e1 e2 =  e1 + e2
-    let zero = 0
-    end
-  ) *)
+
 type table = varinfo Datatype.String.Map.t
 
 let global_table = ref Datatype.String.Map.empty (*mettre dans .mli*)
 
-let auto_graph = Automata_graph.create()
 
-(* val setGraph t -> (Promelaast.typed_condition * Promelaast.action) Promelaast.trans list -> unit *)
+module Automaton_graph =
+struct
+  let dummy_vertex = List.hd (Aorai_state.reprs)
 
-let setGraph (*state*) trans = 
-    match trans with
-    | _::_ -> List.iter (fun a -> Automata_graph.add_edge_e auto_graph (a.start, a, a.stop)) trans
-    | [] -> Aorai_option.abort "Automata does not have any transition"
+  module Vertex =
+  struct
+    type t = Promelaast.state
+    let compare x y = x.nums - y.nums
+    let hash x = x.nums
+    let equal x y = x.nums = y.nums
+  end
 
-(*let rec BFS g v = 
-  let l = (True, v)::l in 
-    match l with
-      | h::t -> let succ_list = Automata_graph.succ (snd h) g in
-         t::(List.filter (fun a -> List.mem (True, a) t) succ_list)
-      | [] ->
-*)
-(*      
-let parcoursProfondeur g v =
-  let tmp_graph = Automata_graph.create() in
-  Automata_graph.add_vertex tmp_graph v ;
-  let rec aux g v tmpg = 
-    let succ_list = Automata_graph.succ (snd v) g in 
-        List.iter 
-          (fun a -> 
-            if not (Automata_graph.mem_vertex a tmpg) then
-              Automata_graph.add_vertex tmpg a; aux g a tmpg
-          ) succ_list
-  in aux g v tmp_graph
-*)
-(* Version tmpgraph 
-let rec parPro g v tmpg =
-    let succ_list = Automata_graph.succ g v in 
-        List.iter 
-          (fun a -> 
-            if not (Automata_graph.mem_vertex tmpg a) then
-              Automata_graph.add_vertex tmpg a; parPro g a tmpg
-          ) succ_list
-*)
-let rec delPath g a tmp = 
-   match (Automata_graph.pred g a) with 
-    | h::[] -> 
-      begin 
-        Automata_graph.remove_vertex tmp a;
-        match (Automata_graph.succ g h) with
-        | h::[] -> delPath g h tmp
-        | _ -> ()
-      end
-    | h::t -> 
-      begin 
-        Automata_graph.remove_vertex tmp a;
-        List.iter ( fun a -> 
-          match (Automata_graph.succ g a) with
-            | h::[] -> delPath g h tmp
-            | _ -> ()
-        ) (h::t)
-      end
-    | [] -> ()
-    
-let getInit g = 
-  Automata_graph.fold_vertex (let aux v l = 
-    if (Automata_graph.pred g v = []) then v::l else l in aux ) g []
-    
-(*let getVertexFromLabel g f = Automata_graph.fold_edges_e f g []*) 
+  module Edge =
+  struct
+    type t = (Promelaast.typed_condition * Promelaast.action) Promelaast.trans
+    let compare x y = x.numt - y.numt
+    let default =
+      {numt = -1; start = dummy_vertex; stop = dummy_vertex; cross = TTrue,[]}
+  end
 
-(*val pathVtoV Automata_graph -> vertex -> vertex -> Automata_graph*)
-(*make an imperative sub-graph from g in tmp with only paths from v1 to v2*)
-let rec pathVtoV g v1 v2 tmp =
-    let succ_list = Automata_graph.succ g v1 in
-    if not (Automata_graph.mem_vertex tmp v1) then
-      ( match succ_list with (* looks if v1 has successors*)
-          | [] -> if v1 != v2 then delPath g v1 tmp (*if not, looks if a is v2*)
-          | h::t -> Automata_graph.add_edge_e tmp (Automata_graph.find_edge g v1 h); if v1 != v2 then List.iter (fun a -> pathVtoV g a v2 tmp) (h::t) (*applies pathVtoV to all successors of v1*)
-      )
+  include Graph.Imperative.Digraph.ConcreteBidirectionalLabeled (Vertex) (Edge)
 
-let inspect_typed_condition tc = 
-  let result = ref [] in 
-  let visitor = object 
-    inherit Visitor.frama_c_inplace
-    method!vlogic_var_use lv = 
-      if Datatype.String.Map.exists (fun _ vi -> (Cil.cvar_to_lvar vi) = lv ) (!global_table) then 
-        result := (lv::!result);
-        Cil.SkipChildren
-  end in
-  let rec aux = 
-    function
-    | TAnd (tt, ttt) -> aux tt; aux ttt
-    | TOr (tt, ttt) -> aux tt; aux ttt
-    | TRel (_, tt1, tt2) -> ignore (Visitor.visitFramacTerm visitor tt1); ignore (Visitor.visitFramacTerm visitor tt2)
-    | _ -> ()
-  in aux tc; !result
+  let of_automaton (_,transitions) =
+    let g = create () in
+    List.iter (fun t -> add_edge_e g (t.start,t,t.stop)) transitions;
+    g
+end
 
-let checkAutomataVar g =  
-  let init = List.hd (getInit g) in
-  Automata_graph.iter_edges_e ( fun e ->
-     match e with
-     |(vert, {cross = (tc, _)}, _) -> 
-     List.iter ( fun var_inf -> 
-        let tmp = Automata_graph.create() in pathVtoV g init vert tmp; 
-        if (Automata_graph.fold_edges_e (fun l _ -> 
-            match l with 
-              | ( _,{ cross = (_, ll) ; _ }, _ ) -> begin
-                List.exists (fun a -> match a with 
-                  | Copy_value((TVar(cc),_), _) ->
-                  begin
-                    if cc = var_inf then true
-                    else false
-                  end
-                  | _ -> true ) ll
-              end
-              (*| _ -> true *)
-            ) tmp true
-          ) then ()
-        else Aorai_option.abort "Variable is not defined on any path"
-      ) (inspect_typed_condition tc)
-      (*| _ -> ()*)
-    ) g 
-  
+
+let checkVariableInitialization auto =
+  let module A =
+  struct
+    type vertex = Automaton_graph.E.vertex
+    type edge = Automaton_graph.E.t
+    type g = Automaton_graph.t
+
+    module Set = Cil_datatype.Varinfo.Set
+    type data = Bottom | InitializedSet of Set.t
+
+    let top = InitializedSet Set.empty
+
+    let direction = Graph.Fixpoint.Forward
+
+    let equal d1 d2 =
+      match d1, d2 with
+      | Bottom, d | d, Bottom -> d = Bottom
+      | InitializedSet s1, InitializedSet s2 -> Set.equal s1 s2
+
+    let join d1 d2 =
+      match d1, d2 with
+      | Bottom, d | d, Bottom -> d
+      | InitializedSet s1, InitializedSet s2 ->
+        InitializedSet (Set.inter s1 s2)
+
+    let used_variables cond =
+      let result = ref Set.empty in
+      let visit_term =
+        let v = object
+          inherit Visitor.frama_c_inplace
+          method!vlogic_var_use lv =
+            match lv.lv_origin with
+            | None -> Cil.SkipChildren
+            | Some vi ->
+              let module Map = Datatype.String.Map in
+              if Map.exists (fun _ vi' -> (vi'.vid = vi.vid)) !global_table then
+                result := Set.add vi !result;
+              Cil.SkipChildren
+        end in
+        fun t -> ignore (Visitor.visitFramacTerm v t)
+      in
+      let rec visit_cond =
+        function
+        | TAnd (c1,c2) -> visit_cond c1; visit_cond c2
+        | TOr (c1,c2) -> visit_cond c1; visit_cond c2
+        | TNot (c) -> visit_cond c
+        | TRel (_,t1,t2) -> visit_term t1; visit_term t2
+        | TCall _ | TReturn _ | TTrue | TFalse -> ()
+      in
+      visit_cond cond;
+      !result
+
+    let alarm (src,_trans,dst) vars =
+      let pretty_state fmt st =
+        Format.pp_print_string fmt st.name
+      in
+      let pretty_set = Pretty_utils.pp_list ~sep:", " Cil_printer.pp_varinfo in
+      Aorai_option.abort
+        "The variables %a may not be initialized before the transition \
+         from %a to %a."
+        pretty_set (Set.elements vars)
+        pretty_state src
+        pretty_state dst
+
+    let analyze ((_,trans,_) as edge) = function
+      | Bottom -> Bottom
+      | InitializedSet initialized_vars ->
+        let cond,act = trans.cross in
+        (* Check that the condition uses only initialized variables *)
+        let used_vars = used_variables cond in
+        let diff = Set.diff used_vars initialized_vars in
+        if not (Set.is_empty diff) then
+          alarm edge diff;
+        (* Add variables intialized by the condition *)
+        let add_initialized_variables set = function
+          | Copy_value ((TVar({lv_origin = Some vi}),_),_) -> Set.add vi set
+          | _ -> set
+        in
+        let initialized_vars =
+          List.fold_left add_initialized_variables initialized_vars act
+        in
+        InitializedSet initialized_vars
+  end
+  in
+  let module Initialization = Graph.Fixpoint.Make (Automaton_graph) (A) in
+  let g = Automaton_graph.of_automaton auto in
+  let init_states = Path_analysis.get_init_states auto in
+  let init_data v =
+    if List.exists (fun st -> st.nums = v.nums) init_states (* TODO: use sets *)
+    then A.top
+    else A.Bottom
+  in
+  let _result = Initialization.analyze init_data g in
+  ()
+
+
 (* Each transition with a parametrized cross condition (call param access or return value access) has its parametrized part stored in this array. *)
 let cond_of_parametrizedTransitions = ref (Array.make (1) [[]])
 
@@ -1729,9 +1704,7 @@ let setAutomata auto =
     (* all transitions have a true parameterized guard, i.e. [[]] *)
     cond_of_parametrizedTransitions :=
       Array.make (getNumberOfTransitions  ()) [[]] ;
-  setGraph (snd auto); 
-  checkAutomataVar auto_graph
-   (*TODO*)
+  checkVariableInitialization auto
 
 let getState num = List.find (fun st -> st.nums = num) (fst !automata)
 
