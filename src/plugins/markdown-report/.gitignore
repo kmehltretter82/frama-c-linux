@@ -1,0 +1,10 @@
+*.cm*
+META.*
+*.o
+top/
+*.check_mli_exists
+.Makefile.plugin.generated
+.depend
+.merlin
+*~
+/mdr_version.ml

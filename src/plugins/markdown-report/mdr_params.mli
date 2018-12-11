@@ -20,6 +20,3 @@ module Title: Parameter_sig.String
 
 (** Value of [-mdr-stubs]. *)
 module Stubs: Parameter_sig.String_list
-
-(** version of mdr plugin itself *)
-val version: string
