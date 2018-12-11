@@ -70,16 +70,21 @@ let prefetch_and_create_state name =
       (fetch_and_create_state name)
 ;;
 
-type pre_cond = Behavior of string | Pre of Promelaast.condition
-
-(*let type_table = StringMap.empty*)
-
-let stringToType s = 
-  match s with
+let add_metavariable name typename =
+  let ty = match typename with
     | "int" -> TInt(IInt, [])
     | "char" -> TInt(IChar, [])
     | "long" -> TInt(ILong, [])
-    | _ -> Aorai_option.abort "Metavariable type does not exist"
+    | _ ->
+      Aorai_option.abort "Unrecognized type %s for metavariable %s"
+        typename name
+  in
+  let vi = Cil.makeGlobalVar (Data_for_aorai.get_fresh ("aorai_" ^ name)) ty in
+  Data_for_aorai.global_table := Datatype.String.Map.add name vi !Data_for_aorai.global_table
+
+
+type pre_cond = Behavior of string | Pre of Promelaast.condition
+
 
 %}
 
@@ -136,7 +141,7 @@ main
          | "deterministic" -> Aorai_option.Deterministic.set true;
          | "metavar" -> begin
             match ids with
-            | h::[t] -> let v = Cil.makeGlobalVar (Data_for_aorai.get_fresh ("aorai_" ^ h)) (stringToType t) in Data_for_aorai.global_table := Datatype.String.Map.add h v (!Data_for_aorai.global_table)
+            | [ name ; typename ] -> add_metavariable name typename
             | _ -> Aorai_option.abort "Missing or too many arguments in metavariable definition"
             end
          | oth      -> Aorai_option.abort "unknown option '%s'\n" oth

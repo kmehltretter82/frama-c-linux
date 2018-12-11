@@ -27,7 +27,7 @@
     parser/lexer before its translation into Data_for_aorai module. *)
 
 type expression =
-  | AVar of string (*TODO, Variable local d'Aorai*)
+  | AVar of string (* Metavariable *)
   | PVar of string
   | PPrm of string * string (* f().N *)
   | PCst of Logic_ptree.constant

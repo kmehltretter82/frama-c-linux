@@ -1165,6 +1165,12 @@ let initGlobals root complete =
   mk_global_comment "//*";
   List.iter mk_global_var (Data_for_aorai.aux_variables());
 
+  mk_global_comment "//* ";
+  mk_global_comment "//****************** ";
+  mk_global_comment "//* Metavariables";
+  mk_global_comment "//*";
+  Datatype.String.Map.iter (fun _ -> mk_global_var) !Data_for_aorai.global_table;
+
   if Aorai_option.Deterministic.get () then begin
     (* must flush now previous globals which are used in the lemmas in order to
        be able to put these last ones in the right places in the AST. *)

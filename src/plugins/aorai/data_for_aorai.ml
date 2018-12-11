@@ -129,7 +129,6 @@ let pnot t =
 
 let rec is_same_expression e1 e2 =
   match e1,e2 with
-  (*TODO*)
     | AVar x, AVar y -> x = y
     | AVar _,_ | _,AVar _ -> false
     | PVar x, PVar y -> x = y
@@ -244,6 +243,7 @@ struct
     g
 end
 
+let dkey_metavar_init = Aorai_option.register_category "metavar-init"
 
 let checkVariableInitialization auto =
   let module A =
@@ -270,7 +270,7 @@ let checkVariableInitialization auto =
       | InitializedSet s1, InitializedSet s2 ->
         InitializedSet (Set.inter s1 s2)
 
-    let used_variables cond =
+    let used_metavariables cond =
       let result = ref Set.empty in
       let visit_term =
         let v = object
@@ -297,36 +297,44 @@ let checkVariableInitialization auto =
       visit_cond cond;
       !result
 
+    let pretty_state fmt st =
+      Format.pp_print_string fmt st.name
+
+    let pretty_set fmt set =
+      let l = Set.elements set in
+      Pretty_utils.pp_list ~sep:", " Cil_printer.pp_varinfo fmt l
+
+    let _pretty_data fmt = function
+      | Bottom -> Format.printf "Bottom"
+      | InitializedSet set -> pretty_set fmt set
+
     let alarm (src,_trans,dst) vars =
-      let pretty_state fmt st =
-        Format.pp_print_string fmt st.name
-      in
-      let pretty_set = Pretty_utils.pp_list ~sep:", " Cil_printer.pp_varinfo in
       Aorai_option.abort
-        "The variables %a may not be initialized before the transition \
+        "The metavariables %a may not be initialized before the transition \
          from %a to %a."
-        pretty_set (Set.elements vars)
+        pretty_set vars
         pretty_state src
         pretty_state dst
 
-    let analyze ((_,trans,_) as edge) = function
+    let analyze ((src,trans,dst) as edge) = function
       | Bottom -> Bottom
-      | InitializedSet initialized_vars ->
+      | InitializedSet initialized ->
         let cond,act = trans.cross in
         (* Check that the condition uses only initialized variables *)
-        let used_vars = used_variables cond in
-        let diff = Set.diff used_vars initialized_vars in
+        let used = used_metavariables cond in
+        let diff = Set.diff used initialized in
         if not (Set.is_empty diff) then
           alarm edge diff;
         (* Add variables intialized by the condition *)
-        let add_initialized_variables set = function
+        let add_initialized set = function
           | Copy_value ((TVar({lv_origin = Some vi}),_),_) -> Set.add vi set
           | _ -> set
         in
-        let initialized_vars =
-          List.fold_left add_initialized_variables initialized_vars act
-        in
-        InitializedSet initialized_vars
+        let initialized' = List.fold_left add_initialized initialized act in
+        Aorai_option.debug ~dkey:dkey_metavar_init "%a {%a} -> %a {%a}"
+            pretty_state src pretty_set initialized
+            pretty_state dst pretty_set initialized';
+        InitializedSet initialized'
   end
   in
   let module Initialization = Graph.Fixpoint.Make (Automaton_graph) (A) in
@@ -619,35 +627,35 @@ let merge_current_event env1 env2 cond1 cond2 =
   assert (List.tl (env1.event) == List.tl (env2.event));
   let old_env = List.tl (env2.event) in
   match (List.hd (env1.event), List.hd (env2.event)) with
-      | ENone, _ -> env2, (tor cond1 cond2, [])
-      | _, ENone -> env1, (tor cond1 cond2, [])
+      | ENone, _ -> env2, tor cond1 cond2
+      | _, ENone -> env1, tor cond1 cond2
       | ECall(kf1,_,_), ECall(kf2,_,_)
-        when Kernel_function.equal kf1 kf2 -> env2,  (tor cond1 cond2, [])
-      | ECall _, ECall _ -> { event = (EMulti::old_env); var = env2.var}, (tor cond1 cond2, [])
-      | ECall _, EMulti -> env2, (tor cond1 cond2, [])
+        when Kernel_function.equal kf1 kf2 -> env2, tor cond1 cond2
+      | ECall _, ECall _ -> { env2 with event = EMulti::old_env}, tor cond1 cond2
+      | ECall _, EMulti -> env2, tor cond1 cond2
       | ECall (kf1,_,_), ECOR kf2 when Kernel_function.equal kf1 kf2 ->
-        env2, (tor cond1 cond2, [])
+        env2, tor cond1 cond2
       | ECall (kf1,_,_), EReturn kf2 when Kernel_function.equal kf1 kf2 ->
-        { event =  (ECOR kf1 :: old_env); var = env2.var}, (tor cond1 cond2, [])
-      | ECall _, (ECOR _ | EReturn _) -> { event =  (EMulti :: old_env); var = env2.var}, (tor cond1 cond2, [])
+        { env2 with event = ECOR kf1 :: old_env }, tor cond1 cond2
+      | ECall _, (ECOR _ | EReturn _) -> { env2 with event =  (EMulti :: old_env) }, tor cond1 cond2
       | EReturn kf1, ECall (kf2,_,_) when Kernel_function.equal kf1 kf2 ->
-        { event =  (ECOR kf1 :: old_env); var = env2.var}, (tor cond1 cond2, [])
-      | EReturn _, ECall _  -> { event =  (EMulti :: old_env); var = env2.var}, (tor cond1 cond2, [])
+        { env2 with event = ECOR kf1 :: old_env }, tor cond1 cond2
+      | EReturn _, ECall _  -> { env2 with event = EMulti :: old_env }, tor cond1 cond2
       | EReturn kf1, EReturn kf2 when Kernel_function.equal kf1 kf2 ->
-        env2, (tor cond1 cond2, [])
-      | EReturn _, EReturn _ -> { event =  (EMulti :: old_env); var = env2.var}, (tor cond1 cond2, [])
-      | EReturn _, EMulti -> env2, (tor cond1 cond2, [])
+        env2, tor cond1 cond2
+      | EReturn _, EReturn _ -> { env2 with event = EMulti :: old_env }, tor cond1 cond2
+      | EReturn _, EMulti -> env2, tor cond1 cond2
       | EReturn kf1, ECOR kf2 when Kernel_function.equal kf1 kf2 ->
-        env2, (tor cond1 cond2, [])
+        env2, tor cond1 cond2
       | EReturn _, ECOR _ ->
-        { event =  (EMulti :: old_env); var = env2.var}, (tor cond1 cond2, [])
+        { env2 with event = EMulti :: old_env }, tor cond1 cond2
       | ECOR kf1, (ECall(kf2,_,_) | EReturn kf2 | ECOR kf2)
-        when Kernel_function.equal kf1 kf2 -> env1, (tor cond1 cond2, [])
+        when Kernel_function.equal kf1 kf2 -> env1, tor cond1 cond2
       | ECOR _, (ECall _ | EReturn _ | ECOR _) ->
-        { event =  (EMulti :: old_env); var = env2.var}, (tor cond1 cond2, [])
-      | ECOR _, EMulti -> env2, (tor cond1 cond2, [])
-      | EMulti, (ECall _ | EReturn _ | ECOR _) -> env1, (tor cond1 cond2, [])
-      | EMulti, EMulti -> { event =  (EMulti::old_env); var = env2.var}, (tor cond1 cond2, [])
+        { env2 with event = EMulti :: old_env }, tor cond1 cond2
+      | ECOR _, EMulti -> env2, tor cond1 cond2
+      | EMulti, (ECall _ | EReturn _ | ECOR _) -> env1, tor cond1 cond2
+      | EMulti, EMulti -> { env2 with event =  EMulti::old_env }, tor cond1 cond2
 
 let get_bindings st my_var =
   let my_lval = TVar my_var, TNoOffset in
@@ -705,49 +713,12 @@ let check_one top info counter s =
       Some (Logic_const.term (TLval (TResult rt,TNoOffset)) (Ctype rt))
     | ECOR _ | EReturn _ | EMulti | ENone -> None
 
-(*TODO Faire une fonction de recherche pour les $var*)
 
-(*let find_var env counter s = 
-  StringMap.find s (env.var) *)
-
-let find_avar s env =
-try Datatype.String.Map.find s (env.var)
-with Not_found -> Aorai_option.abort "Aorai var not found"
-
-(*let tmp = Automata_graph.create() in 
-  let ve = getVertexFromLabel auto_graph (
-    fun e l -> match e with
-    |(vert, {cross = (TRel(_, { term_type = Lvar(t) ; _ }, _), _); _}, _) ->  
-        if t = s then (vert::l) else [] (*l is empty*)
-    | _ -> Aorai_option.abort "Not a transition"
-    ) in 
-    match ve with 
-    | hh::[] -> 
-    begin
-      match getInit auto_graph with 
-      | h::[] -> begin pathVtoV auto_graph h hh tmp; let res = Automata_graph.fold_edges_e 
-      (
-        fun e l -> 
-        match e with
-          |(_, ee, _) -> 
-          begin
-            List.fold_left (fun sa a -> 
-              match a with 
-                | Copy_value((TVar(lvar),_), { term_type = Ctype(t); _}) -> 
-                  let v = Cil.makeGlobalVar (get_fresh ("aorai_" ^ s)) t in if (lvar = Cil.cvar_to_lvar v) then (v::l) else sa (*l and sa are empty lists*)
-                | _ -> []    
-            ) [] (snd ee.cross)
-          end
-          (*| _ -> Aorai_option.abort "Not a transition"*)
-        ) tmp [] in 
-          match res with
-          | h::[] -> h
-          | _ -> Aorai_option.abort "Aorai var not found" 
-        end
-      | _ -> Aorai_option.abort "Not a unique beginning"
-    end
-    | _::_::_ -> Aorai_option.abort "Multiple transition corresponding"
-    | [] -> Aorai_option.abort "No current transition" *)
+let find_metavar s env =
+  try
+    Datatype.String.Map.find s (env.var)
+  with Not_found ->
+    Aorai_option.abort "Metavariable %s not declared" s
 
 let find_in_env env counter s =
   let current, stack =
@@ -867,13 +838,12 @@ let type_expr env ?tr ?current e =
   let loc = Cil_datatype.Location.unknown in
   let rec aux env cond e (*t pour le type attendu*)=
     match e with
-        PVar s ->
-          let var = find_in_env env current s in
-          env, var, cond
-          (*TODO *)
+      | PVar s ->
+        let var = find_in_env env current s in
+        env, var, cond
       | AVar s ->
-        let var = Logic_const.tvar (Cil.cvar_to_lvar (find_avar s env)) in
-        env, var, cond 
+        let var = Logic_const.tvar (Cil.cvar_to_lvar (find_metavar s env)) in
+        env, var, cond
       | PPrm(f,x) -> find_prm_in_env env ?tr current f x
       | PCst (Logic_ptree.IntConstant s) ->
         let e = Cil.parseIntLogic ~loc s in
@@ -1058,41 +1028,36 @@ let type_cond needs_pebble env tr cond =
   let current = if needs_pebble then Some tr.stop else None in
   let rec aux pos env =
     function
-    (*TODO changement de type lors de réaffectation, attention, (typed_automaton), stocker dans l'env le varinfo de la variable auxiliaire, vérifier cohérence type avec l'env quand on tombe sur une Avar*)
-      | AfVar (s, e) -> if pos then
-      begin
-        let env, term_tmp, c1 = type_expr env ~tr ?current e in
-        match term_tmp.term_type with
-          | Ctype(t) -> begin
-            let v = Cil.makeGlobalVar (get_fresh ("aorai_" ^ s)) t in
-            match (Datatype.String.Map.find s !global_table) with
-            | { vtype = tt; _} -> if tt = t then 
-            env, (*{ event = env.event; var = (Datatype.String.Map.add s v env.var)},*) (c1, [Copy_value((TVar(Cil.cvar_to_lvar v), TNoOffset), term_tmp )])
-            else Aorai_option.abort "Metavariable %s's type is not the same as declared" s
-          end
-          | _ ->  Aorai_option.abort "Not the right type"
-      end
-      else
-        Aorai_option.abort "Not corresponding to program"
+      | AfVar (s, e) ->
+        if not pos then
+          Aorai_option.abort
+            "Metavariable assignment cannot be done under a negation";
+        let vi = Datatype.String.Map.find s !global_table in
+        let env, e, c = type_expr env ~tr ?current e in
+        let assign = Copy_value ((TVar (Cil.cvar_to_lvar vi), TNoOffset), e) in
+        (* TODO: check type assignability *)
+        env, c, [assign]
       | PRel(rel,e1,e2) ->
         let env, e1, c1 = type_expr env ~tr ?current e1 in
         let env, e2, c2 = type_expr env ~tr ?current e2 in
         let call_cond = if pos then tand c1 c2 else tor (tnot c1) (tnot c2) in
         let rel = TRel(Logic_typing.type_rel rel,e1,e2) in
-        let cond = if pos then (tand call_cond rel, [])  else (tor call_cond rel, []) in
-        env, cond
-      | PTrue -> env, (TTrue, [])
-      | PFalse -> env, (TFalse, [])
+        let cond = if pos then tand call_cond rel else tor call_cond rel in
+        env, cond, []
+      | PTrue -> env, TTrue, []
+      | PFalse -> env, TFalse, []
       | POr(c1,c2) ->
-        let env1, c1 = aux pos env c1 in
-        let env2, c2 = aux pos env c2 in
-        merge_current_event env1 env2 (fst c1) (fst c2)
+        let env1, c1, a1 = aux pos env c1 in
+        let env2, c2, a2 = aux pos env c2 in
+        let env, c = merge_current_event env1 env2 c1 c2 in
+        env, c, a1 @ a2
       | PAnd(c1,c2) ->
-        let env, c1 = aux pos env c1 in
-        let env, c2 = aux pos env c2 in
-        env, (TAnd(fst c1, fst c2), [])
+        let env, c1, a1 = aux pos env c1 in
+        let env, c2, a2 = aux pos env c2 in
+        env, TAnd (c1,c2), a1 @ a2
       | PNot c ->
-        let env, c = aux (not pos) env c in env, (TNot(fst c), [])
+        let env, c, a = aux (not pos) env c in
+        env, TNot c, a
       | PCall (s,b) ->
         let kf =
           try Globals.Functions.find_by_name s
@@ -1109,18 +1074,24 @@ let type_cond needs_pebble env tr cond =
             b
         in
         if pos then
-          let env1, cond = add_current_event
+          let env, c = add_current_event
             (ECall (kf, Cil_datatype.Varinfo.Hashtbl.create 3, tr)) env
-            (TCall (kf,b)) in env1, (cond, [])
-          else env, (TCall (kf,b), [])
+            (TCall (kf,b))
+          in
+          env, c, []
+        else
+          env, TCall (kf,b), []
       | PReturn s ->
         let kf =
           try
             Globals.Functions.find_by_name s
           with Not_found -> Aorai_option.abort "No such function %s" s
         in
-        if pos then let env1, cond = add_current_event (EReturn kf) env (TReturn kf) in env1, (cond, [])
-        else env, (TReturn kf, [])
+        if pos then
+          let env,c  = add_current_event (EReturn kf) env (TReturn kf) in
+          env, c, []
+        else
+          env, TReturn kf, []
   in
   aux true {event = (ENone::(env.event)); var = env.var} cond
 
@@ -1233,7 +1204,9 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
             in
             let trans_start = new_trans curr_start seq_start (Normal (TTrue,[]))
             in
-            let inner_env, cond = type_cond needs_pebble env trans_start cond in
+            let inner_env, cond, act =
+              type_cond needs_pebble env trans_start cond
+            in
             let (env,states, seq_transitions, seq_end) =
               match elt.nested with
                 | [] -> inner_env, [], [], my_end
@@ -1249,7 +1222,7 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
             let transitions = trans_start :: seq_transitions in
             (match trans_start.cross with
                 | Normal (conds,action) ->
-                  trans_start.cross <- Normal(tand (fst cond) conds,action)
+                  trans_start.cross <- Normal (tand cond conds,action @ act)
                 | Epsilon _ ->
                   Aorai_option.fatal
                     "Transition guard translated as epsilon transition");
