@@ -60,7 +60,8 @@ int volatile nondet;
     assigns *(s + (0 ..))
       \from (indirect: n), (indirect: *(format + (0 ..))), *(param0 + (0 ..));
  */
-int snprintf_va_1(char *s, size_t n, char const *format, char *param0);
+int snprintf_va_1(char * __restrict s, size_t n,
+                  char const * __restrict format, char *param0);
 
 /*@ requires
       \valid(s + (0 .. n - 1)) ∨
@@ -73,7 +74,8 @@ int snprintf_va_1(char *s, size_t n, char const *format, char *param0);
     assigns *(s + (0 ..))
       \from (indirect: n), (indirect: *(format + (0 ..))), *(param0 + (0 ..));
  */
-int snprintf_va_2(char *s, size_t n, char const *format, char *param0);
+int snprintf_va_2(char * __restrict s, size_t n,
+                  char const * __restrict format, char *param0);
 
 int main(void)
 {

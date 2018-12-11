@@ -74,8 +74,8 @@
       \from (indirect: stream->__fc_FILE_id), stream->__fc_FILE_data,
             (indirect: *(format + (0 ..)));
  */
-int fscanf_va_1(FILE *stream, char const *format, int *param0, char *param1,
-                int *param2);
+int fscanf_va_1(FILE * __restrict stream, char const * __restrict format,
+                int *param0, char *param1, int *param2);
 
 /*@ requires valid_read_string(format);
     requires \valid(param2);
@@ -100,7 +100,8 @@ int fscanf_va_1(FILE *stream, char const *format, int *param0, char *param1,
       \from (indirect: __fc_stdin->__fc_FILE_id), __fc_stdin->__fc_FILE_data,
             (indirect: *(format + (0 ..)));
  */
-int scanf_va_1(char const *format, int *param0, char *param1, int *param2);
+int scanf_va_1(char const * __restrict format, int *param0, char *param1,
+               int *param2);
 
 /*@ requires valid_read_string(s);
     requires valid_read_string(format);
@@ -118,8 +119,8 @@ int scanf_va_1(char const *format, int *param0, char *param1, int *param2);
     assigns *param0
       \from (indirect: *(s + (0 ..))), (indirect: *(format + (0 ..)));
  */
-int sscanf_va_1(char const *s, char const *format, int *param0, char *param1,
-                int *param2);
+int sscanf_va_1(char const * __restrict s, char const * __restrict format,
+                int *param0, char *param1, int *param2);
 
 int main(void)
 {
