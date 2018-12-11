@@ -379,33 +379,64 @@ type t =  {
     properties: (Properties.t [@default Properties.default]);
   }[@@deriving yojson]
 
-  let default = {
-    commandLine = "/bin/cat";
-    arguments = [];
-    responseFiles = [];
-    attachments = [];
-    startTime = "";
-    endTime = "";
-    exitCode = 0;
-    toolNotifications = [];
-    configurationNotifications = [];
-    exitCodeDescription = "";
-    exitSignalName = "";
-    exitSignalNumber = 0;
-    processStartFailureMessage = "";
-    toolExecutionSuccessful = true;
-    machine = "";
-    account = "";
-    processId = 0;
-    executableLocation = FileLocation.default;
-    workingDirectory = FileLocation.default;
-    environmentVariables = Additional_properties.default;
-    stdin = FileLocation.default;
-    stdout = FileLocation.default;
-    stderr = FileLocation.default;
-    stdoutStderr = FileLocation.default;
-    properties = Properties.default;
-  }
+  let create
+    ~commandLine
+    ?(arguments = [])
+    ?(responseFiles = [])
+    ?(attachments = [])
+    ?(startTime = "")
+    ?(endTime = "")
+    ?(exitCode = 0)
+    ?(toolNotifications = [])
+    ?(configurationNotifications = [])
+    ?(exitCodeDescription = "")
+    ?(exitSignalName = "")
+    ?(exitSignalNumber = 0)
+    ?(processStartFailureMessage = "")
+    ?(toolExecutionSuccessful = true)
+    ?(machine = "")
+    ?(account = "")
+    ?(processId = 0)
+    ?(executableLocation = FileLocation.default)
+    ?(workingDirectory = FileLocation.default)
+    ?(environmentVariables = Additional_properties.default)
+    ?(stdin = FileLocation.default)
+    ?(stdout = FileLocation.default)
+    ?(stderr = FileLocation.default)
+    ?(stdoutStderr = FileLocation.default)
+    ?(properties = Properties.default)
+    ()
+    =
+    {
+      commandLine;
+      arguments;
+      responseFiles;
+      attachments;
+      startTime;
+      endTime;
+      exitCode;
+      toolNotifications;
+      configurationNotifications;
+      exitCodeDescription;
+      exitSignalName;
+      exitSignalNumber;
+      processStartFailureMessage;
+      toolExecutionSuccessful;
+      machine;
+      account;
+      processId;
+      executableLocation;
+      workingDirectory;
+      environmentVariables;
+      stdin;
+      stdout;
+      stderr;
+      stdoutStderr;
+      properties;
+    }
+
+  let default = create ~commandLine:"/bin/true" ()
+
 end
 
 module Conversion = struct

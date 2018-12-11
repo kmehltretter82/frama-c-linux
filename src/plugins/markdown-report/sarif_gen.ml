@@ -6,7 +6,7 @@ let frama_c_sarif =
   let semanticVersion = Config.version in
   let fullName = name ^ "-" ^ version in
   let downloadUri = "https://frama-c.com/download.html" in
-  let sarifLoggerVersion = Mdr_params.version in
+  let sarifLoggerVersion = Mdr_version.version in
   Tool.create
     ~name ~version ~semanticVersion
     ~fullName ~downloadUri ~sarifLoggerVersion ()
@@ -16,9 +16,14 @@ let get_remarks () =
   if f <> "" then Parse_remarks.get_remarks f
   else Datatype.String.Map.empty
 
+let gen_invocation () =
+  let commandLine = Array.fold_right (fun s acc -> s ^ " " ^ acc) Sys.argv "" in
+  let arguments = List.tl (Array.to_list Sys.argv) in
+  Invocation.create ~commandLine ~arguments ()
+
 let gen_run () =
   let tool = frama_c_sarif in
-  let invocations = [] in
+  let invocations = [gen_invocation ()] in
   Run.create ~tool ~invocations ()
 
 let generate () =
