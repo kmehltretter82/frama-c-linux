@@ -48,13 +48,12 @@ let convert_ltl_exprs t =
         POr(c1,c2) -> POr (convert_cond c1, convert_cond c2)
       | PAnd(c1,c2) -> PAnd(convert_cond c1, convert_cond c2)
       | PNot c -> PNot (convert_cond c)
-      | PCall _ | PReturn _ | PTrue | PFalse -> cond
+      | PCall _ | PReturn _ | PTrue | PFalse | AfVar _ -> cond
       | PRel(Neq,PVar x,PCst _) ->
         (try
            let (rel,t1,t2) = Hashtbl.find ltl_to_promela x in PRel(rel,t1,t2)
          with Not_found -> cond)
       | PRel _ -> cond
-      | AfVar (_, _) -> cond (*TODO*)
   in
   let rec convert_seq_elt e =
     { e with

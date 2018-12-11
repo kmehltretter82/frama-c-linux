@@ -570,12 +570,12 @@ type env = { event:current_event list ; var:table}
 
 let add_current_event event env cond =
   let is_empty tbl = Cil_datatype.Varinfo.Hashtbl.length tbl = 0 in
-  match (env.event) with
+  match env.event with
       [] -> assert false
     | old_event :: tl ->
       match event, old_event with
         | ENone, _ -> env, cond
-        | _, ENone -> {event = event::tl ; var = env.var}, cond
+        | _, ENone -> {env with event = event::tl}, cond
         | ECall (kf1,_,_), ECall (kf2,_,_)
           when Kernel_function.equal kf1 kf2 -> env, cond
         | ECall (kf1,tbl1,_), ECall (kf2,tbl2,_)->
@@ -584,15 +584,15 @@ let add_current_event event env cond =
              an empty event. If this situation occurs in an handwritten
              automaton that uses formals we simply reject it.
            *)
-          if is_empty tbl1 && is_empty tbl2 then ( {event = ENone::tl; var = env.var}, TFalse )
+          if is_empty tbl1 && is_empty tbl2 then {env with event = ENone::tl}, TFalse
           else
             Aorai_option.abort
               "specification is inconsistent: two call events for distinct \
                functions %a and %a at the same time."
               Kernel_function.pretty kf1 Kernel_function.pretty kf2
-        | ECall (_,_,_), EMulti -> { event = event::tl; var = env.var }, cond
+        | ECall (_,_,_), EMulti -> { env with event = event::tl }, cond
         | ECall (kf1,tbl1,_), EReturn kf2 ->
-          if is_empty tbl1 then ( {event = (ENone::tl); var = env.var}, TFalse)
+          if is_empty tbl1 then {env with event = ENone::tl}, TFalse
           else
             Aorai_option.abort
               "specification is inconsistent: trying to call %a and \
@@ -600,26 +600,26 @@ let add_current_event event env cond =
               Kernel_function.pretty kf1 Kernel_function.pretty kf2
         | ECall(kf1,_,_), ECOR kf2
           when Kernel_function.equal kf1 kf2 ->
-          {event = event::tl; var = env.var}, cond
+          {env with event = event::tl}, cond
         | ECall (kf1,tbl1,_), ECOR kf2 ->
-          if is_empty tbl1 then ( { event = (ENone::tl); var = env.var}, TFalse)
+          if is_empty tbl1 then {env with event = ENone::tl}, TFalse
           else
             Aorai_option.abort
               "specification is inconsistent: trying to call %a and \
                call or return from %a at the same time."
               Kernel_function.pretty kf1 Kernel_function.pretty kf2
         | EReturn kf1, ECall(kf2,tbl2,_) ->
-          if is_empty tbl2 then ( {event = (ENone::tl); var = env.var}, TFalse)
+          if is_empty tbl2 then {env with event = ENone::tl}, TFalse
           else
             Aorai_option.abort
               "specification is inconsistent: trying to call %a and \
                return from %a at the same time."
             Kernel_function.pretty kf2 Kernel_function.pretty kf1
         | EReturn kf1, (ECOR kf2 | EReturn kf2)
-          when Kernel_function.equal kf1 kf2 -> { event = (event::tl); var = env.var}, cond
-        | EReturn _, EReturn _ -> { event = (ENone::tl); var = env.var } , TFalse
-        | EReturn _, ECOR _ -> { event = (ENone::tl); var = env.var }, TFalse
-        | EReturn _, EMulti -> { event = (ENone::tl); var =  env.var }, TFalse
+          when Kernel_function.equal kf1 kf2 -> {env with event = event::tl}, cond
+        | EReturn _, EReturn _ -> {env with event = ENone::tl} , TFalse
+        | EReturn _, ECOR _ -> {env with event = ENone::tl}, TFalse
+        | EReturn _, EMulti -> {env with event = ENone::tl}, TFalse
         | (EMulti | ECOR _), _ -> assert false
           (* These are compound event. They cannot be found as individual ones*)
 
@@ -722,7 +722,7 @@ let find_metavar s env =
 
 let find_in_env env counter s =
   let current, stack =
-    match (env.event) with
+    match env.event with
       | current::stack -> current, stack
       | [] -> Aorai_option.fatal "Empty type-checking environment"
   in
@@ -795,7 +795,7 @@ let find_prm_in_env env ?tr counter f x =
              it in an aux variable or array here.
            *)
           env, Logic_const.tvar (Cil.cvar_to_lvar vi), cond
-    in treat_env true (env.event)
+    in treat_env true env.event
   end
 
 module C_logic_env =
@@ -836,7 +836,7 @@ module LTyping = Logic_typing.Make(C_logic_env)
 
 let type_expr env ?tr ?current e =
   let loc = Cil_datatype.Location.unknown in
-  let rec aux env cond e (*t pour le type attendu*)=
+  let rec aux env cond e =
     match e with
       | PVar s ->
         let var = find_in_env env current s in
@@ -1093,7 +1093,7 @@ let type_cond needs_pebble env tr cond =
         else
           env, TReturn kf, []
   in
-  aux true {event = (ENone::(env.event)); var = env.var} cond
+  aux true {env with event = ENone::env.event} cond
 
 module Reject_state =
   State_builder.Option_ref(Aorai_state)
@@ -1227,12 +1227,12 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
                   Aorai_option.fatal
                     "Transition guard translated as epsilon transition");
             let states = add_if_needed states seq_start in
-            (match (env.event) with
+            (match env.event with
               | [] | (ENone | ECall _) :: _ ->
                 (env, states, transitions, curr_start, seq_end)
               | EReturn kf1 :: ECall (kf2,_,_) :: tl
                   when Kernel_function.equal kf1 kf2 ->
-                ( {event = tl ; var= env.var }, states, transitions, curr_start, seq_end)
+                {env with event = tl}, states, transitions, curr_start, seq_end
               | (EReturn _ | ECOR _ ) :: _ ->
                     (* If there is as mismatch (e.g. Call f; Return g), it will
                        be caught later. There are legitimate situations for
@@ -1241,7 +1241,7 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
                      *)
                 (env, states, transitions, curr_start, seq_end)
               | EMulti :: env_tmp ->
-                ( { event = env_tmp; var = env.var }, states, transitions, curr_start, seq_end))
+                {env with event = env_tmp}, states, transitions, curr_start, seq_end)
       in
       let loop_end = if has_loop then new_intermediate_state () else inner_end
       in

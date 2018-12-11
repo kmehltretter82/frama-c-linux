@@ -47,7 +47,7 @@ type condition =
   | PCall of string * string option
       (** Call might be done in a given behavior *)
   | PReturn of string
-  | AfVar of string * expression (*TODO, affectation à AfVar *)
+  | AfVar of string * expression
 
 and seq_elt =
     { condition: condition option;
