@@ -34,6 +34,14 @@ val version_and_codename: string
 (** Frama-C version and codename.
     @since 18.0-Argon *)
 
+val major_version: int
+(** Frama-C major version number.
+    @since Frama-C+dev *)
+
+val minor_version: int
+(** Frama-C minor version number.
+    @since Frama-C+dev *)
+
 val is_gui: bool ref
   (** Is the Frama-C GUI running?
       @since Beryllium-20090601-beta1 *)

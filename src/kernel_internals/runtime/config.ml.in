@@ -26,6 +26,10 @@ let version = "@VERSION@"
 let codename = "@VERSION_CODENAME@"
 let version_and_codename = version ^ " (" ^ codename ^ ")"
 
+let major_version = @MAJOR_VERSION@
+
+let minor_version = @MINOR_VERSION@
+
 let is_gui = ref false
 
 let ocamlc = "@OCAMLC@"
