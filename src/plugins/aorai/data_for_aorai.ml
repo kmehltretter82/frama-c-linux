@@ -211,11 +211,9 @@ let automata = ref None
 (* Each transition with a parametrized cross condition (call param access or return value access) has its parametrized part stored in this array. *)
 let cond_of_parametrizedTransitions = ref (Array.make (1) [[]])
 
-(* List of variables name observed in the C file *)
-let variables_from_c = ref []
-(* List of functions name observed in the C file *)
-let functions_from_c = ref []
-(* List of functions call observed in the C file without declaration *)
+(* List of functions defined in the C file *)
+let defined_functions = ref []
+(* List of functions without declaration *)
 let ignored_functions = ref []
 
 (** Return the buchi automata as stored after parsing *)
@@ -1545,6 +1543,27 @@ let checkMetavariableCompatibility auto =
       "The use of metavariables is incompatible with non-deterministic \
        automata, such as automa using extended transitions."
 
+let check_observables auto =
+ match auto.observables with
+ | None -> () (* No observable list set, everything is observable *)
+ | Some set ->
+   let is_relevant name =
+     try
+       ignore (Globals.Functions.find_by_name name)
+     with Not_found ->
+       Aorai_option.fatal "Observable %s doesn't match any function" name
+   in
+   let rec check = function
+     | TAnd (c1,c2) | TOr (c1,c2) -> check c1; check c2
+     | TNot (c) -> check c
+     | TRel _ | TTrue | TFalse -> ()
+     | TCall (kf,_) | TReturn kf ->
+       let name = Kernel_function.get_name kf in
+       if not (Datatype.String.Set.mem name set) then
+         Aorai_option.fatal "Function %s is not observable" name
+   in
+   Datatype.String.Set.iter is_relevant set;
+   List.iter (fun tr -> check tr.cross) auto.trans
 
 (** Stores the buchi automaton and its variables and
     functions as it is returned by the parsing *)
@@ -1553,6 +1572,7 @@ let setAutomata auto =
   let auto = type_cond_auto auto in
   automata:=Some auto;
   check_states "typed automata";
+  check_observables auto;
   if Aorai_option.debug_atleast 1 then
     Promelaoutput.Typed.output_dot_automata auto "aorai_debug_reduced.dot";
   if (Array.length !cond_of_parametrizedTransitions) <
@@ -1577,41 +1597,39 @@ let setCData () =
   let (f_decl,f_def) =
     Globals.Functions.fold
       (fun f (lf_decl,lf_def) ->
-         let name = (Kernel_function.get_name f) in
          match f.fundec with
-           | Definition _ -> (lf_decl,name::lf_def)
-           | Declaration _ -> (name::lf_decl,lf_def))
+           | Definition _  -> (lf_decl, f :: lf_def)
+           | Declaration _ -> (f :: lf_decl, lf_def))
       ([],[])
   in
-  functions_from_c:=f_def;
-  ignored_functions:=f_decl;
-  variables_from_c:=
-    Globals.Vars.fold
-    (fun v _ lv ->
-      Format.asprintf "%a" Cil_datatype.Varinfo.pretty v :: lv)
-    []
+  defined_functions := f_def;
+  ignored_functions := f_decl
 
-(** Return the list of all function name observed in the C file, except ignored functions. *)
-let getFunctions_from_c () =
-  (!functions_from_c)
-
-(** Return the list of all variables name observed in the C file. *)
-let getVariables_from_c () =
-  (!variables_from_c)
-
-(** Return the list of names of all ignored functions. A function is ignored if it is used in C file and if its declaration is unavailable. *)
-let getIgnoredFunctions () =
-  (!ignored_functions)
-
-(** Return the list of names of all ignored functions. A function is ignored if it is used in C file and if its declaration is unavailable. *)
-let addIgnoredFunction fname =
-  ignored_functions:=fname::(!ignored_functions)
+let addIgnoredFunction kf =
+  ignored_functions := kf :: !ignored_functions
 
 (** Return true if and only if the given string fname denotes an ignored function. *)
-let isIgnoredFunction fname =
-  List.exists
-    (fun s -> (String.compare fname s)=0)
-    (!ignored_functions)
+let isIgnoredFunction kf =
+  List.exists (Kernel_function.equal kf) !ignored_functions
+
+let isDeclaredObservable kf =
+  let auto = getAutomata () in
+  let fname = Kernel_function.get_name kf in
+  match auto.observables with
+  | None -> true
+  | Some set ->
+    Datatype.String.Set.mem fname set
+
+let isObservableFunction kf =
+  not (isIgnoredFunction kf) && isDeclaredObservable kf
+
+(** Return the list of all function name observed in the C file, except ignored functions. *)
+let getObservablesFunctions () =
+  List.filter isDeclaredObservable !defined_functions
+
+(** Return the list of names of observable but ignored functions. A function is ignored if it is used in C file and if its declaration is unavailable. *)
+let getIgnoredFunctions () =
+  List.filter isDeclaredObservable !ignored_functions
 
 let is_reject_state state =
   match Reject_state.get_option () with

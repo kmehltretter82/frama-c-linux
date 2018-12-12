@@ -39,8 +39,8 @@ enum aorai_OpStatusList {
  */
 /*@ check lemma a_deterministic_trans{L}: \true;
  */
-/*@ ghost enum aorai_ListOper aorai_CurOperation = op_main; */
-/*@ ghost enum aorai_OpStatusList aorai_CurOpStatus = aorai_Called; */
+/*@ ghost enum aorai_ListOper aorai_CurOperation; */
+/*@ ghost enum aorai_OpStatusList aorai_CurOpStatus; */
 /*@
 check lemma b_deterministic_trans{L}:
   ¬(\at(aorai_CurOperation,L) ≡ op_g ∧

@@ -32,7 +32,11 @@ open Logic_ptree
 open Promelaast
 open Bool3
 
-type options = Deterministic | Init of string list | Accept of string list
+type options =
+  | Deterministic
+  | Init of string list
+  | Accept of string list
+  | Observables of string list
 
 let to_seq c =
   [{ condition = Some c;
@@ -104,13 +108,22 @@ let check_state st =
    Aorai_option.abort
     "Error: the state '%s' is used but never defined." st.name
 
-let interpret_option = function
+let interpret_option auto = function
   | Init states ->
-    List.iter set_init_state states
+    List.iter set_init_state states; auto
   | Accept states ->
-    List.iter set_accept_state states
+    List.iter set_accept_state states; auto
   | Deterministic ->
-    Aorai_option.Deterministic.set true
+    Aorai_option.Deterministic.set true; auto
+  | Observables names ->
+    let module Set = Datatype.String.Set in
+    let new_set = Set.of_list names in
+    let observables =
+      match auto.observables with
+      | None -> Some new_set
+      | Some set -> Some (Set.union set new_set)
+    in
+    { auto with observables }
 
 let build_automaton options metavariables trans =
   let htable_to_list table = Hashtbl.fold (fun _ st l -> st :: l) table [] in
@@ -119,15 +132,15 @@ let build_automaton options metavariables trans =
   and metavariables =
     List.fold_left add_metavariable Datatype.String.Map.empty metavariables
   in
-  List.iter interpret_option options;
+  let auto = { states; trans; metavariables; observables = None } in
+  let auto = List.fold_left interpret_option auto options in
   List.iter check_state states;
   if not (List.exists (fun st -> st.init=True) states) then
     Aorai_option.abort "Automaton does not declare an initial state";
   if undefined_states <> [] then
     Aorai_option.abort "Error: the state(s) %a are used but never defined."
       (Pretty_utils.pp_list ~sep:"," Format.pp_print_string) undefined_states;
-  { states; trans; metavariables }
-
+  auto
 
 type pre_cond = Behavior of string | Pre of Promelaast.condition
 
@@ -169,6 +182,7 @@ option
     | "init" -> Init $3
     | "accept" -> Accept $3
     | "deterministic" -> Deterministic
+    | "observables" -> Observables $3
     | _ ->  Aorai_option.abort "unknown option: '%s'" $2
   }
 

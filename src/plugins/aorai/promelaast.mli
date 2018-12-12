@@ -142,6 +142,7 @@ type ('c,'a) automaton = {
   states: state list;
   trans: (('c,'a) trans) list;
   metavariables: Cil_types.varinfo Datatype.String.Map.t;
+  observables: Datatype.String.Set.t option;
 }
 
 type parsed_automaton = (guard, action) automaton

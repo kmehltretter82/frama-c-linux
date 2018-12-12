@@ -430,7 +430,7 @@ module Computer(I: Init) = struct
 
   let do_call s f args (state,loops as d) =
     let kf = Globals.Functions.get f in
-    if Data_for_aorai.isIgnoredFunction (Kernel_function.get_name kf)
+    if Data_for_aorai.isIgnoredFunction kf
     then d (* we simply skip ignored functions. *)
     else begin
       set_call_state s state;
@@ -532,7 +532,7 @@ module Computer(I: Init) = struct
 end
 
 let compute_func_aux stack call_site kf init_state =
-  if Data_for_aorai.isIgnoredFunction (Kernel_function.get_name kf) then
+  if Data_for_aorai.isIgnoredFunction kf then
     Aorai_option.fatal "compute_func on function %a which is ignored by Aorai"
       Kernel_function.pretty kf
   else if List.mem_assq kf stack then begin
@@ -620,7 +620,7 @@ let () = compute_func := compute_func_aux
 
 let compute_forward () =
   let kf = Globals.Functions.find_by_name (Kernel.MainFunction.get()) in
-  if Data_for_aorai.isIgnoredFunction (Kernel_function.get_name kf) then
+  if Data_for_aorai.isIgnoredFunction kf then
     Aorai_option.abort "Main function %a is ignored by Aorai"
       Kernel_function.pretty kf;
   let (states,_) = Data_for_aorai.getGraph () in
@@ -757,7 +757,7 @@ struct
 
   let do_call s f state =
     let kf = Globals.Functions.get f in
-    if Data_for_aorai.isIgnoredFunction (Kernel_function.get_name kf)
+    if Data_for_aorai.isIgnoredFunction kf
     then Dataflow2.Default (* we simply skip ignored functions. *)
     else begin
       try
@@ -912,7 +912,7 @@ let filter_init_state restrict initial map acc =
   with Not_found -> acc
 
 let backward_analysis_aux stack kf ret_state =
-  if (Data_for_aorai.isIgnoredFunction (Kernel_function.get_name kf)) then
+  if Data_for_aorai.isIgnoredFunction kf then
     Aorai_option.fatal 
       "Call backward analysis on ignored function %a" Kernel_function.pretty kf
   else if List.memq kf stack then begin
@@ -1002,7 +1002,7 @@ let () = backward_analysis := backward_analysis_aux
 
 let compute_backward () =
   let kf = Globals.Functions.find_by_name (Kernel.MainFunction.get()) in
-  if Data_for_aorai.isIgnoredFunction (Kernel_function.get_name kf) then
+  if Data_for_aorai.isIgnoredFunction kf then
     Aorai_option.abort "Main function %a is ignored by Aorai"
       Kernel_function.pretty kf;
   let final_state = Data_for_aorai.get_kf_return_state kf in

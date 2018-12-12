@@ -629,6 +629,16 @@ let crosscond_to_exp generated_kf curr_f curr_status loc cond res =
 (** Local copy of the file pointer *)
 let file = ref Cil.dummyFile
 
+let initFunction kf =
+  let fname = Kernel_function.get_name kf in
+  List.iter
+    (fun vi -> set_paraminfo fname vi.vname vi)
+    (Kernel_function.get_formals kf);
+  match (Kernel_function.find_return kf).skind with
+  | Cil_types.Return (Some { enode = Lval (Var vi,NoOffset) },_) ->
+    set_returninfo fname vi (* Add the vi of return stmt *)
+  | exception Kernel_function.No_Statement | _ -> () (* function without returned value *)
+
 (** Copy the file pointer locally in the class in order to ease globals
     management and initializes some tables. *)
 let initFile f =
@@ -636,27 +646,7 @@ let initFile f =
   Data_for_aorai.setCData ();
   (* Adding C variables into our hashtable *)
   Globals.Vars.iter (fun vi _ -> set_varinfo vi.vname vi);
-  Globals.Functions.iter
-    (fun kf ->
-       let fname = Kernel_function.get_name kf in
-       List.iter
-         (fun vi -> set_paraminfo fname vi.vname vi)
-         (Kernel_function.get_formals kf);
-       if not (Data_for_aorai.isIgnoredFunction fname) then
-         begin
-           try
-             let ret  = Kernel_function.find_return kf in
-             match ret.skind with
-             | Cil_types.Return (Some e,_) ->
-               (match e.enode with
-                | Lval (Var vi,NoOffset) ->
-                  set_returninfo fname vi (* Add the vi of return stmt *)
-                | _ -> () (* function without returned value *))
-             | _ -> () (* function without returned value *)
-           with Kernel_function.No_Statement ->
-             Aorai_option.fatal
-               "Don't know what to do with a function declaration"
-         end)
+  Globals.Functions.iter initFunction
 
 (** List of globals awaiting for adding into C file globals *)
 let globals_queue = ref []
@@ -759,6 +749,11 @@ let mk_global_c_enum_type name elements =
 
 let mk_global_c_initialized_enum name name_enuminfo ini =
   mk_global_c_initialized_vars name (TEnum(get_usedinfo name_enuminfo,[])) ini
+
+let mk_global_c_enum name name_enuminfo =
+  let init = {Cil_types.init=None} in
+  mk_global_c_initialized_enum name name_enuminfo init
+
 
 (* ************************************************************************* *)
 (** {b Terms management / computation} *)
@@ -912,15 +907,6 @@ let mk_global_states_init root =
        let var = Data_for_aorai.get_state_var state in
        mk_global_var_init var { Cil_types.init = Some init})
     states
-
-let func_to_init name =
-  {Cil_types.init=
-     Some(SingleInit(
-         new_exp ~loc:(CurrentLoc.get()) (Const(func_to_cenum (name)))))}
-
-let funcStatus_to_init st =
-  {Cil_types.init=Some(SingleInit(new_exp ~loc:(CurrentLoc.get())
-                                    (Const(op_status_to_cenum (st)))))}
 
 class visit_decl_loops_init () =
   object(self)
@@ -1138,13 +1124,11 @@ let initGlobals root complete =
   mk_global_c_enum_type
     listOp
     (List.map
-       (fun e -> func_to_op_func e)
-       (getFunctions_from_c() @ getIgnoredFunctions()));
-  mk_global_c_initialized_enum curOp listOp
-    (func_to_init (Kernel_function.get_name root));
+       (fun kf -> func_to_op_func (Kernel_function.get_name kf))
+       (getObservablesFunctions() @ getIgnoredFunctions()));
+  mk_global_c_enum curOp listOp;
   mk_global_c_enum_type  listStatus (callStatus::[termStatus]);
-  mk_global_c_initialized_enum
-    curOpStatus listStatus (funcStatus_to_init Promelaast.Call);
+  mk_global_c_enum curOpStatus listStatus;
 
   mk_global_comment "//* ";
   mk_global_comment "//* States and Trans Variables";

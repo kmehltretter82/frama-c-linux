@@ -118,100 +118,106 @@ class visit_adding_code_for_synchronisation =
 
     val aux_post_table = Kernel_function.Hashtbl.create 17
 
+    method do_fundec fundec loc =
+      let kf = Extlib.the self#current_kf in
+      let vi = Kernel_function.get_vi kf in
+      let vi_pre = Cil_const.copy_with_new_vid vi in
+      vi_pre.vname <- Data_for_aorai.get_fresh (vi_pre.vname ^ "_pre_func");
+      vi_pre.vdefined <- true;
+      vi_pre.vghost <- true;
+      Cil_datatype.Varinfo.Hashtbl.add func_orig_table vi_pre (Pre_func kf);
+      (* TODO:
+         - what about protos that have no specified args
+           (NB: cannot be identified here because of implem of Kernel_function).
+         - what about varargs?
+      *)
+      let (rettype,args,varargs,_) = Cil.splitFunctionTypeVI vi_pre in
+      Cil.update_var_type vi_pre (TFun(Cil.voidType, args, varargs,[]));
+      vi_pre.vattr <- [];
+
+      (* in particular get rid of __no_return if set in vi*)
+
+      let arg =
+        if Cil.isVoidType rettype
+        then []
+        else ["res",rettype,[]]
+      in
+      let vi_post =
+        Cil.makeGlobalVar ~ghost:true
+          (Data_for_aorai.get_fresh (vi.vname ^ "_post_func"))
+          (TFun(voidType,Some arg,false,[]))
+      in
+      Kernel_function.Hashtbl.add aux_post_table kf vi_post;
+      Cil_datatype.Varinfo.Hashtbl.add func_orig_table vi_post (Post_func kf);
+      let fun_dec_pre = Cil.emptyFunctionFromVI vi_pre in
+      let fun_dec_post = Cil.emptyFunctionFromVI vi_post in
+      (* For a future analysis of function arguments,
+         we have to update the function's formals. Search
+         for LBLsformals. *)
+      Cil.setFunctionTypeMakeFormals
+        fun_dec_pre (TFun(Cil.voidType, args, varargs,[]));
+      Cil.setFunctionTypeMakeFormals
+        fun_dec_post (TFun(voidType,Some arg,false,[]));
+      (* We will now fill the function with the result
+         of the automaton's analysis. *)
+      Globals.Functions.replace_by_definition
+        (Cil.empty_funspec()) fun_dec_pre loc;
+      Globals.Functions.replace_by_definition
+        (Cil.empty_funspec()) fun_dec_post loc;
+      let kf_pre = Globals.Functions.get vi_pre in
+      let kf_post = Globals.Functions.get vi_post in
+      let aux_func_pre, pre_block,pre_locals = mk_pre_fct_block kf_pre kf in
+      let aux_func_post, post_block,post_locals =
+        mk_post_fct_block
+          kf_post kf (Extlib.opt_of_list fun_dec_post.sformals)
+      in
+      fun_dec_pre.slocals <- pre_locals;
+      fun_dec_pre.sbody <- pre_block;
+      fun_dec_pre.svar.vdefined <- true;
+      fun_dec_post.slocals <- post_locals;
+      fun_dec_post.sbody <- post_block;
+      fun_dec_post.svar.vdefined <- true;
+      let aux_funcs =
+        Cil_datatype.Varinfo.Set.union aux_func_pre aux_func_post
+      in
+      let globs =
+        Cil_datatype.Varinfo.Set.fold
+          (fun x acc ->
+             GFunDecl(Cil.empty_funspec(),x,loc) :: acc) aux_funcs
+          [ GFun(fun_dec_pre,loc); GFun(fun_dec_post,loc)]
+      in
+      Cil_datatype.Varinfo.Set.iter (add_aux_bhv kf) aux_funcs;
+      fundec.sbody.bstmts <-
+        Cil.mkStmtOneInstr ~ghost:true
+          (Call(None,Cil.evar ~loc vi_pre,
+                List.map (fun x -> Cil.evar ~loc x)
+                  (Kernel_function.get_formals kf),
+                loc))
+        :: fundec.sbody.bstmts;
+      (* Finally, we update the CFG for the new fundec *)
+      let keepSwitch = Kernel.KeepSwitch.get() in
+      Cfg.prepareCFG ~keepSwitch fun_dec_pre;
+      Cfg.cfgFun fun_dec_pre;
+      Cfg.prepareCFG ~keepSwitch fun_dec_post;
+      Cfg.cfgFun fun_dec_post;
+      globs
+
     method! vglob_aux g =
       match g with
       | GFun (fundec,loc) ->
-        let kf = Option.get self#current_kf in
-        let vi = Kernel_function.get_vi kf in
-        let vi_pre = Cil_const.copy_with_new_vid vi in
-        vi_pre.vname <- Data_for_aorai.get_fresh (vi_pre.vname ^ "_pre_func");
-        vi_pre.vdefined <- true;
-        vi_pre.vghost <- true;
-        Cil_datatype.Varinfo.Hashtbl.add func_orig_table vi_pre (Pre_func kf);
-        (* TODO:
-           - what about protos that have no specified args
-             (NB: cannot be identified here because of implem of Kernel_function).
-           - what about varargs?
-        *)
-        let (rettype,args,varargs,_) = Cil.splitFunctionTypeVI vi_pre in
-        Cil.update_var_type vi_pre (TFun(Cil.voidType, args, varargs,[]));
-        vi_pre.vattr <- [];
-
-        (* in particular get rid of __no_return if set in vi*)
-
-        let arg =
-          if Cil.isVoidType rettype
-          then []
-          else ["res",rettype,[]]
-        in
-        let vi_post =
-          Cil.makeGlobalVar ~ghost:true
-            (Data_for_aorai.get_fresh (vi.vname ^ "_post_func"))
-            (TFun(voidType,Some arg,false,[]))
-        in
-        Kernel_function.Hashtbl.add aux_post_table kf vi_post;
-        Cil_datatype.Varinfo.Hashtbl.add func_orig_table vi_post (Post_func kf);
-        let fun_dec_pre = Cil.emptyFunctionFromVI vi_pre in
-        let fun_dec_post = Cil.emptyFunctionFromVI vi_post in
-        (* For a future analysis of function arguments,
-           we have to update the function's formals. Search
-           for LBLsformals. *)
-        Cil.setFunctionTypeMakeFormals
-          fun_dec_pre (TFun(Cil.voidType, args, varargs,[]));
-        Cil.setFunctionTypeMakeFormals
-          fun_dec_post (TFun(voidType,Some arg,false,[]));
-        (* We will now fill the function with the result
-           of the automaton's analysis. *)
-        Globals.Functions.replace_by_definition
-          (Cil.empty_funspec()) fun_dec_pre loc;
-        Globals.Functions.replace_by_definition
-          (Cil.empty_funspec()) fun_dec_post loc;
-        let kf_pre = Globals.Functions.get vi_pre in
-        let kf_post = Globals.Functions.get vi_post in
-        let aux_func_pre, pre_block,pre_locals = mk_pre_fct_block kf_pre kf in
-        let aux_func_post, post_block,post_locals =
-          mk_post_fct_block
-            kf_post kf (Extlib.opt_of_list fun_dec_post.sformals)
-        in
-        fun_dec_pre.slocals <- pre_locals;
-        fun_dec_pre.sbody <- pre_block;
-        fun_dec_pre.svar.vdefined <- true;
-        fun_dec_post.slocals <- post_locals;
-        fun_dec_post.sbody <- post_block;
-        fun_dec_post.svar.vdefined <- true;
-        let aux_funcs =
-          Cil_datatype.Varinfo.Set.union aux_func_pre aux_func_post
-        in
-        let globs =
-          Cil_datatype.Varinfo.Set.fold
-            (fun x acc ->
-               GFunDecl(Cil.empty_funspec(),x,loc) :: acc) aux_funcs
-            [ GFun(fun_dec_pre,loc); GFun(fun_dec_post,loc)]
-        in
-        Cil_datatype.Varinfo.Set.iter (add_aux_bhv kf) aux_funcs;
-        fundec.sbody.bstmts <-
-          Cil.mkStmtOneInstr ~ghost:true
-            (Call(None,Cil.evar ~loc vi_pre,
-                  List.map (fun x -> Cil.evar ~loc x)
-                    (Kernel_function.get_formals kf),
-                  loc))
-          :: fundec.sbody.bstmts;
-        (* Finally, we update the CFG for the new fundec *)
-        let keepSwitch = Kernel.KeepSwitch.get() in
-        Cfg.prepareCFG ~keepSwitch fun_dec_pre;
-        Cfg.cfgFun fun_dec_pre;
-        Cfg.prepareCFG ~keepSwitch fun_dec_post;
-        Cfg.cfgFun fun_dec_post;
-        ChangeDoChildrenPost([g], fun x -> globs @ x)
+        let kf = Globals.Functions.get fundec.svar in
+        if Data_for_aorai.isObservableFunction kf then
+          let globs = self#do_fundec fundec loc in
+          ChangeDoChildrenPost([g], fun x -> globs @ x)
+        else
+          DoChildren
       | _ -> DoChildren
 
     method! vstmt_aux stmt =
       match stmt.skind with
       | Return (res,loc)  ->
         let kf = Option.get self#current_kf in
-        let vi = Kernel_function.get_vi kf in
-        let current_function = vi.vname in
-        if not (Data_for_aorai.isIgnoredFunction current_function) then begin
+        if Data_for_aorai.isObservableFunction kf then begin
           let args = match res with
             | None -> []
             | Some exp -> [Cil.copy_exp exp]

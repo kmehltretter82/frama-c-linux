@@ -21,8 +21,8 @@ enum aorai_OpStatusList {
 };
 /*@ check lemma aorai_reject_deterministic_trans{L}: \true;
  */
-/*@ ghost enum aorai_ListOper aorai_CurOperation = op_main; */
-/*@ ghost enum aorai_OpStatusList aorai_CurOpStatus = aorai_Called; */
+/*@ ghost enum aorai_ListOper aorai_CurOperation; */
+/*@ ghost enum aorai_OpStatusList aorai_CurOpStatus; */
 /*@
 check lemma aorai_intermediate_state_deterministic_trans{L}:
   ¬(\at(aorai_CurOperation,L) ≡ op_main ∧
