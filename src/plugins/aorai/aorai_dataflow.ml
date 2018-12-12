@@ -265,7 +265,7 @@ let actions_to_range l =
   in List.fold_left treat_one_action Cil_datatype.Term.Map.empty l
 
 let make_start_transition ?(is_main=false) kf init_states =
-  let auto = Data_for_aorai.getAutomata () in
+  let auto = Data_for_aorai.getGraph () in
   let is_crossable = 
     if is_main then 
       Aorai_utils.isCrossableAtInit 
@@ -303,7 +303,7 @@ let make_start_transition ?(is_main=false) kf init_states =
 let make_return_transition kf state =
   let s = Kernel_function.find_return kf in
   set_return_state s state;
-  let auto = Data_for_aorai.getAutomata () in
+  let auto = Data_for_aorai.getGraph () in
   let treat_one_state state bindings acc =
     let my_trans = Path_analysis.get_transitions_of_state state auto in
     let last = Data_for_aorai.Aorai_state.Set.singleton state in
@@ -624,7 +624,7 @@ let compute_forward () =
   if Data_for_aorai.isIgnoredFunction (Kernel_function.get_name kf) then
     Aorai_option.abort "Main function %a is ignored by Aorai"
       Kernel_function.pretty kf;
-  let (states,_) = Data_for_aorai.getAutomata () in
+  let (states,_) = Data_for_aorai.getGraph () in
   let start = 
     List.fold_left
       (fun acc s ->
@@ -833,7 +833,7 @@ let filter_possible_states kf states =
 
 let filter_return_states kf states =
   let end_state = Return_state.find (Kernel_function.find_return kf) in
-  let auto = Data_for_aorai.getAutomata () in
+  let auto = Data_for_aorai.getGraph () in
   let is_possible_state start_state state _ =
     try
       let trans = Path_analysis.get_transitions_of_state state auto in

@@ -56,7 +56,6 @@ val add_logic : string -> Cil_types.logic_info -> unit
 (** *)
 val get_logic : string -> Cil_types.logic_info
 
-val global_table : varinfo Datatype.String.Map.t ref
 (** *)
 val add_predicate : string -> Cil_types.logic_info -> unit
 
@@ -206,6 +205,9 @@ val new_trans: state -> state -> 'a -> 'a trans
 
 (** Return the buchi automata as stored after parsing *)
 val getAutomata : unit -> Promelaast.typed_automaton
+
+(** Return only the graph part of the automata *)
+val getGraph : unit -> state list * (typed_condition * action) trans list
 
 (** Type-checks the parsed automaton and stores the result.
     This might introduce new global variables in case of sequences.

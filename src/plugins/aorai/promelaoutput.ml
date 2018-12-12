@@ -39,6 +39,7 @@ let string_of_unop = function
 let rec print_parsed_expression fmt = function
   | PVar s -> Format.fprintf fmt "%s" s
   | PPrm (f,s) -> Format.fprintf fmt "%s().%s" f s
+  | PMetavar s -> Format.fprintf fmt "$%s" s
   | PCst (IntConstant s) -> Format.fprintf fmt "%s" s
   | PCst (FloatConstant s) -> Format.fprintf fmt "%s" s
   | PCst (StringConstant s) -> Format.fprintf fmt "%S" s
@@ -54,7 +55,6 @@ let rec print_parsed_expression fmt = function
     print_parsed_expression e1 print_parsed_expression e2
   | PField(e,s) -> Format.fprintf fmt "%a.%s" print_parsed_expression e s
   | PArrow(e,s) -> Format.fprintf fmt "%a->%s" print_parsed_expression e s
-  | AVar s -> Format.fprintf fmt "%s" s
 
 let rec print_parsed_condition fmt = function
   | PRel(rel,e1,e2) ->
@@ -73,7 +73,7 @@ let rec print_parsed_condition fmt = function
   | PCall (s,None) -> Format.fprintf fmt "CALL(%s)" s
   | PCall (s, Some b) -> Format.fprintf fmt "CALL(%s::%s)" s b
   | PReturn s -> Format.fprintf fmt "RETURN(%s)" s
-  | AfVar (s, e) -> Format.fprintf fmt " %s := %a " s print_parsed_expression e
+  | PAssign (s, e) -> Format.fprintf fmt " %s := %a " s print_parsed_expression e
 
 let rec print_seq_elt fmt elt =
   Format.fprintf fmt "(%a%a){@[%a,%a@]}"
@@ -187,9 +187,9 @@ let print_statel fmt stl =
   Format.fprintf fmt "@[<2>States:@\n%a@]"
     (Pretty_utils.pp_list ~sep:"@\n" ~suf:"@\n" print_state) stl
 
-let print_raw_automata fmt (stl,trl) =
+let print_raw_automata fmt auto =
   Format.fprintf fmt "@[<2>Automaton:@\n%a%a@]"
-    print_statel stl print_transitionl trl
+    print_statel auto.states print_transitionl auto.trans
 
 let dot_state out st =
   let shape =
@@ -213,7 +213,7 @@ let dot_trans out tr =
     print_state_label tr.stop
     print_label tr
 
-let output_dot_automata (states_l,trans_l) fichier =
+let output_dot_automata {states ; trans} fichier =
   let cout = open_out fichier in
   let fmt = formatter_of_out_channel cout in
   let output_functions = escape_newline fmt in
@@ -236,13 +236,13 @@ let output_dot_automata (states_l,trans_l) fichier =
   one_line_comment "    dot property.dot -Tps > property.ps";
   Format.fprintf fmt "@[<2>@\ndigraph %s {@\n@\n%a@\n%a@\n%t}@\n@]"
     (Filename.chop_extension (Filename.basename fichier))
-    (Pretty_utils.pp_list dot_state) states_l
-    (Pretty_utils.pp_list dot_trans) trans_l
+    (Pretty_utils.pp_list dot_state) states
+    (Pretty_utils.pp_list dot_trans) trans
     (fun fmt ->
       if DotSeparatedLabels.get () then
         (Format.fprintf fmt
            "/* guards of transitions */@\ncomment=\"%a\";@\n"
-           (Pretty_utils.pp_list ~sep:"@\n" print_trans) trans_l));
+           (Pretty_utils.pp_list ~sep:"@\n" print_trans) trans));
   Format.pp_set_formatter_out_functions fmt output_functions;
   close_out cout
 

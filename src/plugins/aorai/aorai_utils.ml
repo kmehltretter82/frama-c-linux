@@ -896,7 +896,7 @@ let mk_global_comment txt = mk_global (GText (txt))
 (** {b Initialization management / computation} *)
 
 let mk_global_states_init root =
-  let (states,_ as auto) = Data_for_aorai.getAutomata () in
+  let (states,_ as auto) = Data_for_aorai.getGraph () in
   let states = List.sort Data_for_aorai.Aorai_state.compare states in
   let is_possible_init state =
     state.Promelaast.init = Bool3.True &&
@@ -1049,7 +1049,7 @@ let pred_of_condition subst subst_res label cond =
   snd (aux None true cond)
 
 let mk_deterministic_lemma () =
-  let automaton = Data_for_aorai.getAutomata () in
+  let automaton = Data_for_aorai.getGraph () in
   let make_one_lemma state =
     let label = Cil_types.FormalLabel "L" in
     let disjoint_guards acc trans1 trans2 =
@@ -1092,7 +1092,7 @@ let mk_deterministic_lemma () =
   List.iter make_one_lemma (fst automaton)
 
 let make_enum_states () =
-  let state_list =fst (Data_for_aorai.getAutomata()) in
+  let state_list =fst (Data_for_aorai.getGraph()) in
   let state_list =
     List.map (fun x -> (x.Promelaast.name, x.Promelaast.nums)) state_list
   in
@@ -1122,7 +1122,7 @@ let make_enum_states () =
 
 let getInitialState () =
   let loc = Cil_datatype.Location.unknown in
-  let states = fst (Data_for_aorai.getAutomata()) in
+  let states = fst (Data_for_aorai.getGraph()) in
   let s = List.find (fun x -> x.Promelaast.init = Bool3.True) states in
   Cil.new_exp ~loc (Const (CEnum (find_enum s.nums)))
 
@@ -1165,11 +1165,12 @@ let initGlobals root complete =
   mk_global_comment "//*";
   List.iter mk_global_var (Data_for_aorai.aux_variables());
 
+  let auto = Data_for_aorai.getAutomata () in
   mk_global_comment "//* ";
   mk_global_comment "//****************** ";
   mk_global_comment "//* Metavariables";
   mk_global_comment "//*";
-  Datatype.String.Map.iter (fun _ -> mk_global_var) !Data_for_aorai.global_table;
+  Datatype.String.Map.iter (fun _ -> mk_global_var) auto.metavariables;
 
   if Aorai_option.Deterministic.get () then begin
     (* must flush now previous globals which are used in the lemmas in order to
@@ -1209,7 +1210,7 @@ let automaton_locations loc =
            Logic_const.new_identified_term
              (Logic_const.tvar
                 (Data_for_aorai.get_state_logic_var state)), FromAny)
-        (fst (Data_for_aorai.getAutomata()))
+        (fst (Data_for_aorai.getGraph()))
   in
   (Logic_const.new_identified_term
      (Logic_const.tvar ~loc
@@ -1333,7 +1334,7 @@ let get_reachable_trans_to state st auto current_state =
 (* force that we have a crossable transition for each state in which the
    automaton might be at current event. *)
 let force_transition loc f st current_state =
-  let (states, _ as auto) = Data_for_aorai.getAutomata () in
+  let (states, _ as auto) = Data_for_aorai.getGraph () in
   (* We iterate aux on all the states, to get
      - the predicate indicating in which states the automaton cannot possibly
        be before the transition (because we can't fire a transition from there).
@@ -1456,7 +1457,7 @@ forces that parent states of a state with action are mutually exclusive,
 at least at pebble level.
 *)
 let incompatible_states loc st current_state =
-  let (states,_ as auto) = Data_for_aorai.getAutomata () in
+  let (states,_ as auto) = Data_for_aorai.getGraph () in
   let aux precond state =
     let trans = get_reachable_trans_to state st auto current_state in
     let actions = partition_action trans in
@@ -1834,7 +1835,7 @@ let auto_func_behaviors loc f st state =
   in
   Aorai_option.debug
     "func behavior for %a (%s)" Kernel_function.pretty f call_or_ret;
-  let (states, _) as auto = Data_for_aorai.getAutomata() in
+  let (states, _) as auto = Data_for_aorai.getGraph() in
   let requires = auto_func_preconditions loc f st state in
   let post_cond =
     let called_pre =
@@ -1983,7 +1984,7 @@ let auto_func_block generated_kf loc f st status res =
   in
   Aorai_option.debug
     ~dkey "func code for %a (%s)" Kernel_function.pretty f call_or_ret;
-  let (states, _) as auto = Data_for_aorai.getAutomata() in
+  let (states, _) as auto = Data_for_aorai.getGraph() in
 
   (* For the following tests, we need a copy of every state. *)
 
@@ -2077,7 +2078,7 @@ let auto_func_block generated_kf loc f st status res =
   new_funcs,res_block,local_var
 
 let get_preds_wrt_params_reachable_states state f status =
-  let auto = Data_for_aorai.getAutomata () in
+  let auto = Data_for_aorai.getGraph () in
   let treat_one_trans acc tr = Logic_simplification.tor acc (fst tr.cross) in
   let find_trans state prev tr =
     Path_analysis.get_edges prev state auto @ tr

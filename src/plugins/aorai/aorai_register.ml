@@ -48,7 +48,7 @@ let convert_ltl_exprs t =
         POr(c1,c2) -> POr (convert_cond c1, convert_cond c2)
       | PAnd(c1,c2) -> PAnd(convert_cond c1, convert_cond c2)
       | PNot c -> PNot (convert_cond c)
-      | PCall _ | PReturn _ | PTrue | PFalse | AfVar _ -> cond
+      | PCall _ | PReturn _ | PTrue | PFalse | PAssign _ -> cond
       | PRel(Neq,PVar x,PCst _) ->
         (try
            let (rel,t1,t2) = Hashtbl.find ltl_to_promela x in PRel(rel,t1,t2)
@@ -109,10 +109,10 @@ let load_ya_file f =
 let load_promela_file f  =
   try
     let c = check_and_open_in f "invalid Promela file" in
-    let (s,t) = Promelalexer.parse c  in
-    let t = convert_ltl_exprs t in
+    let auto = Promelalexer.parse c  in
+    let trans = convert_ltl_exprs auto.trans in
     close_in c;
-    Data_for_aorai.setAutomata (s,t);
+    Data_for_aorai.setAutomata { auto with trans };
   with 
   | Promelalexer.Error(loc,msg) -> syntax_error loc msg
 

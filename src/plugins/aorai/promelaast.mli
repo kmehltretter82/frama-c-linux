@@ -27,9 +27,9 @@
     parser/lexer before its translation into Data_for_aorai module. *)
 
 type expression =
-  | AVar of string (* Metavariable *)
   | PVar of string
   | PPrm of string * string (* f().N *)
+  | PMetavar of string
   | PCst of Logic_ptree.constant
   | PBinop of Logic_ptree.binop * expression * expression
   | PUnop of Logic_ptree.unop * expression
@@ -47,7 +47,7 @@ type condition =
   | PCall of string * string option
       (** Call might be done in a given behavior *)
   | PReturn of string
-  | AfVar of string * expression
+  | PAssign of string * expression
 
 and seq_elt =
     { condition: condition option;
@@ -133,7 +133,11 @@ type 'condition trans =
     }
 
 (** Internal representation of a Buchi automata : a list of states and a list of transitions.*)
-type 'condition automaton = (state list) * ('condition trans list)
+type 'condition automaton = {
+  states: state list;
+  trans: ('condition trans) list;
+  metavariables: Cil_types.varinfo Datatype.String.Map.t;
+}
 
 type parsed_automaton = parsed_condition automaton
 

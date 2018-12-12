@@ -46,6 +46,7 @@ let is_no_repet (min,max) =
 
 let observed_states      = Hashtbl.create 1
 let prefetched_states    = Hashtbl.create 1
+let metavariables        = ref Datatype.String.Map.empty
 
 let fetch_and_create_state name =
   Hashtbl.remove prefetched_states name ;
@@ -80,7 +81,7 @@ let add_metavariable name typename =
         typename name
   in
   let vi = Cil.makeGlobalVar (Data_for_aorai.get_fresh ("aorai_" ^ name)) ty in
-  Data_for_aorai.global_table := Datatype.String.Map.add name vi !Data_for_aorai.global_table
+  metavariables := Datatype.String.Map.add name vi !metavariables
 
 
 type pre_cond = Behavior of string | Pre of Promelaast.condition
@@ -156,7 +157,7 @@ main
              end;
            st::l)
         observed_states []
-    in
+    and trans = $2 in
     (try
        Hashtbl.iter
          (fun _ st -> if st.init=True then raise Exit) observed_states;
@@ -172,7 +173,7 @@ main
         in
         Aorai_option.abort "%s" r
       end;
-    (states, $2)
+    { states; trans; metavariables = !metavariables }
   }
   ;
 
@@ -330,16 +331,12 @@ single_cond:
   | RETURN_OF  LPAREN IDENTIFIER RPAREN { PReturn $3 }
   | TRUE { PTrue }
   | FALSE { PFalse }
-  /*TODO*/
-  | NOT single_cond { match $2 with
-    | AfVar(_, _) -> Aorai_option.abort "Not corresponding to program" (*Parsing.symbol_end_pos*)
-    | _ -> PNot $2 }
+  | NOT single_cond { PNot $2 }
   | single_cond AND single_cond { PAnd ($1,$3) }
   | single_cond OR single_cond { POr ($1,$3) }
   | LPAREN single_cond RPAREN { $2 }
   | logic_relation { $1 }
-/*TODO*/
-  | VAR IDENTIFIER AFF arith_relation { AfVar($2, $4) }
+  | VAR IDENTIFIER AFF arith_relation { PAssign ($2, $4) }
 ;
 
 logic_relation
@@ -391,6 +388,5 @@ access_leaf
   | IDENTIFIER LPAREN RPAREN DOT IDENTIFIER { PPrm($1,$5) }
   | IDENTIFIER { PVar $1 }
   | LPAREN access RPAREN { $2 }
-/*TODO*/
-  | VAR IDENTIFIER { AVar($2) }
+  | VAR IDENTIFIER { PMetavar $2 }
   ;

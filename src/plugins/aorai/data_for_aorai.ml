@@ -129,14 +129,14 @@ let pnot t =
 
 let rec is_same_expression e1 e2 =
   match e1,e2 with
-    | AVar x, AVar y -> x = y
-    | AVar _,_ | _,AVar _ -> false
     | PVar x, PVar y -> x = y
     | PVar _,_ | _,PVar _ -> false
     | PCst cst1, PCst cst2 -> Logic_utils.is_same_pconstant cst1 cst2
     | PCst _,_ | _,PCst _ -> false
     | PPrm (f1,x1), PPrm(f2,x2) -> f1 = x1 && f2 = x2
     | PPrm _,_ | _,PPrm _ -> false
+    | PMetavar x, PMetavar y -> x = y
+    | PMetavar _,_ | _,PMetavar _ -> false
     | PBinop(b1,l1,r1), PBinop(b2,l2,r2) ->
       b1 = b2 && is_same_expression l1 l2 && is_same_expression r1 r2
     | PBinop _, _ | _, PBinop _ -> false
@@ -207,147 +207,7 @@ let buch_sync   = "Aorai_Sync"                           (* Deprecated ? *)
 
 (* ************************************************************************* *)
 (* Buchi automata as stored after parsing *)
-let automata = ref ([],[])
-
-
-type table = varinfo Datatype.String.Map.t
-
-let global_table = ref Datatype.String.Map.empty (*mettre dans .mli*)
-
-
-module Automaton_graph =
-struct
-  let dummy_vertex = List.hd (Aorai_state.reprs)
-
-  module Vertex =
-  struct
-    type t = Promelaast.state
-    let compare x y = x.nums - y.nums
-    let hash x = x.nums
-    let equal x y = x.nums = y.nums
-  end
-
-  module Edge =
-  struct
-    type t = (Promelaast.typed_condition * Promelaast.action) Promelaast.trans
-    let compare x y = x.numt - y.numt
-    let default =
-      {numt = -1; start = dummy_vertex; stop = dummy_vertex; cross = TTrue,[]}
-  end
-
-  include Graph.Imperative.Digraph.ConcreteBidirectionalLabeled (Vertex) (Edge)
-
-  let of_automaton (_,transitions) =
-    let g = create () in
-    List.iter (fun t -> add_edge_e g (t.start,t,t.stop)) transitions;
-    g
-end
-
-let dkey_metavar_init = Aorai_option.register_category "metavar-init"
-
-let checkVariableInitialization auto =
-  let module A =
-  struct
-    type vertex = Automaton_graph.E.vertex
-    type edge = Automaton_graph.E.t
-    type g = Automaton_graph.t
-
-    module Set = Cil_datatype.Varinfo.Set
-    type data = Bottom | InitializedSet of Set.t
-
-    let top = InitializedSet Set.empty
-
-    let direction = Graph.Fixpoint.Forward
-
-    let equal d1 d2 =
-      match d1, d2 with
-      | Bottom, d | d, Bottom -> d = Bottom
-      | InitializedSet s1, InitializedSet s2 -> Set.equal s1 s2
-
-    let join d1 d2 =
-      match d1, d2 with
-      | Bottom, d | d, Bottom -> d
-      | InitializedSet s1, InitializedSet s2 ->
-        InitializedSet (Set.inter s1 s2)
-
-    let used_metavariables cond =
-      let result = ref Set.empty in
-      let visit_term =
-        let v = object
-          inherit Visitor.frama_c_inplace
-          method!vlogic_var_use lv =
-            match lv.lv_origin with
-            | None -> Cil.SkipChildren
-            | Some vi ->
-              let module Map = Datatype.String.Map in
-              if Map.exists (fun _ vi' -> (vi'.vid = vi.vid)) !global_table then
-                result := Set.add vi !result;
-              Cil.SkipChildren
-        end in
-        fun t -> ignore (Visitor.visitFramacTerm v t)
-      in
-      let rec visit_cond =
-        function
-        | TAnd (c1,c2) -> visit_cond c1; visit_cond c2
-        | TOr (c1,c2) -> visit_cond c1; visit_cond c2
-        | TNot (c) -> visit_cond c
-        | TRel (_,t1,t2) -> visit_term t1; visit_term t2
-        | TCall _ | TReturn _ | TTrue | TFalse -> ()
-      in
-      visit_cond cond;
-      !result
-
-    let pretty_state fmt st =
-      Format.pp_print_string fmt st.name
-
-    let pretty_set fmt set =
-      let l = Set.elements set in
-      Pretty_utils.pp_list ~sep:", " Cil_printer.pp_varinfo fmt l
-
-    let _pretty_data fmt = function
-      | Bottom -> Format.printf "Bottom"
-      | InitializedSet set -> pretty_set fmt set
-
-    let alarm (src,_trans,dst) vars =
-      Aorai_option.abort
-        "The metavariables %a may not be initialized before the transition \
-         from %a to %a."
-        pretty_set vars
-        pretty_state src
-        pretty_state dst
-
-    let analyze ((src,trans,dst) as edge) = function
-      | Bottom -> Bottom
-      | InitializedSet initialized ->
-        let cond,act = trans.cross in
-        (* Check that the condition uses only initialized variables *)
-        let used = used_metavariables cond in
-        let diff = Set.diff used initialized in
-        if not (Set.is_empty diff) then
-          alarm edge diff;
-        (* Add variables intialized by the condition *)
-        let add_initialized set = function
-          | Copy_value ((TVar({lv_origin = Some vi}),_),_) -> Set.add vi set
-          | _ -> set
-        in
-        let initialized' = List.fold_left add_initialized initialized act in
-        Aorai_option.debug ~dkey:dkey_metavar_init "%a {%a} -> %a {%a}"
-            pretty_state src pretty_set initialized
-            pretty_state dst pretty_set initialized';
-        InitializedSet initialized'
-  end
-  in
-  let module Initialization = Graph.Fixpoint.Make (Automaton_graph) (A) in
-  let g = Automaton_graph.of_automaton auto in
-  let init_states = Path_analysis.get_init_states auto in
-  let init_data v =
-    if List.exists (fun st -> st.nums = v.nums) init_states (* TODO: use sets *)
-    then A.top
-    else A.Bottom
-  in
-  let _result = Initialization.analyze init_data g in
-  ()
-
+let automata = ref None
 
 (* Each transition with a parametrized cross condition (call param access or return value access) has its parametrized part stored in this array. *)
 let cond_of_parametrizedTransitions = ref (Array.make (1) [[]])
@@ -360,13 +220,24 @@ let functions_from_c = ref []
 let ignored_functions = ref []
 
 (** Return the buchi automata as stored after parsing *)
-let getAutomata () = !automata
+let getAutomata () =
+  match !automata with
+  | Some auto -> auto
+  | None ->
+    Aorai_option.fatal "The automaton has not been compiled yet"
+
+let getGraph () =
+  let auto = getAutomata () in
+  auto.states, auto.trans
 
 (** Return the number of transitions of the automata *)
-let getNumberOfTransitions () = List.length (snd !automata)
+let getNumberOfTransitions () =
+  List.length (getAutomata ()).trans
 
 (** Return the number of states of the automata *)
-let getNumberOfStates () = List.length (fst !automata)
+let getNumberOfStates () =
+  List.length (getAutomata ()).states
+
 
 let is_c_global name =
   try ignore (Globals.Vars.find_from_astinfo name VGlobal); true
@@ -487,7 +358,7 @@ let new_trans start stop cond =
   { start = start; stop = stop; cross = cond; numt = TransIndex.next () }
 
 let check_states s =
-  let states,trans = getAutomata() in
+  let {states;trans} = getAutomata() in
   let max = getNumberOfStates () in
   List.iter
     (fun x -> if x.nums >= max then
@@ -565,17 +436,14 @@ type current_event =
               repr of the stack does not take into account
               this particular event. *)
 
-(*New definition of environment to be able to handle metavariable*)
-type env = { event:current_event list ; var:table}
-
 let add_current_event event env cond =
   let is_empty tbl = Cil_datatype.Varinfo.Hashtbl.length tbl = 0 in
-  match env.event with
+  match env with
       [] -> assert false
     | old_event :: tl ->
       match event, old_event with
         | ENone, _ -> env, cond
-        | _, ENone -> {env with event = event::tl}, cond
+        | _, ENone -> event::tl, cond
         | ECall (kf1,_,_), ECall (kf2,_,_)
           when Kernel_function.equal kf1 kf2 -> env, cond
         | ECall (kf1,tbl1,_), ECall (kf2,tbl2,_)->
@@ -584,15 +452,15 @@ let add_current_event event env cond =
              an empty event. If this situation occurs in an handwritten
              automaton that uses formals we simply reject it.
            *)
-          if is_empty tbl1 && is_empty tbl2 then {env with event = ENone::tl}, TFalse
+          if is_empty tbl1 && is_empty tbl2 then ENone::tl, TFalse
           else
             Aorai_option.abort
               "specification is inconsistent: two call events for distinct \
                functions %a and %a at the same time."
               Kernel_function.pretty kf1 Kernel_function.pretty kf2
-        | ECall (_,_,_), EMulti -> { env with event = event::tl }, cond
+        | ECall (_,_,_), EMulti -> event::tl, cond
         | ECall (kf1,tbl1,_), EReturn kf2 ->
-          if is_empty tbl1 then {env with event = ENone::tl}, TFalse
+          if is_empty tbl1 then ENone::tl, TFalse
           else
             Aorai_option.abort
               "specification is inconsistent: trying to call %a and \
@@ -600,62 +468,62 @@ let add_current_event event env cond =
               Kernel_function.pretty kf1 Kernel_function.pretty kf2
         | ECall(kf1,_,_), ECOR kf2
           when Kernel_function.equal kf1 kf2 ->
-          {env with event = event::tl}, cond
+          event::tl, cond
         | ECall (kf1,tbl1,_), ECOR kf2 ->
-          if is_empty tbl1 then {env with event = ENone::tl}, TFalse
+          if is_empty tbl1 then ENone::tl, TFalse
           else
             Aorai_option.abort
               "specification is inconsistent: trying to call %a and \
                call or return from %a at the same time."
               Kernel_function.pretty kf1 Kernel_function.pretty kf2
         | EReturn kf1, ECall(kf2,tbl2,_) ->
-          if is_empty tbl2 then {env with event = ENone::tl}, TFalse
+          if is_empty tbl2 then ENone::tl, TFalse
           else
             Aorai_option.abort
               "specification is inconsistent: trying to call %a and \
                return from %a at the same time."
             Kernel_function.pretty kf2 Kernel_function.pretty kf1
         | EReturn kf1, (ECOR kf2 | EReturn kf2)
-          when Kernel_function.equal kf1 kf2 -> {env with event = event::tl}, cond
-        | EReturn _, EReturn _ -> {env with event = ENone::tl} , TFalse
-        | EReturn _, ECOR _ -> {env with event = ENone::tl}, TFalse
-        | EReturn _, EMulti -> {env with event = ENone::tl}, TFalse
+          when Kernel_function.equal kf1 kf2 -> event::tl, cond
+        | EReturn _, EReturn _ -> ENone::tl, TFalse
+        | EReturn _, ECOR _ -> ENone::tl, TFalse
+        | EReturn _, EMulti -> ENone::tl, TFalse
         | (EMulti | ECOR _), _ -> assert false
           (* These are compound event. They cannot be found as individual ones*)
 
 let merge_current_event env1 env2 cond1 cond2 =
-  assert (List.tl (env1.event) == List.tl (env2.event));
-  let old_env = List.tl (env2.event) in
-  match (List.hd (env1.event), List.hd (env2.event)) with
+  assert (List.tl env1 == List.tl env2);
+  let old_env = List.tl env2 in
+  match List.hd env1, List.hd env2 with
       | ENone, _ -> env2, tor cond1 cond2
       | _, ENone -> env1, tor cond1 cond2
       | ECall(kf1,_,_), ECall(kf2,_,_)
         when Kernel_function.equal kf1 kf2 -> env2, tor cond1 cond2
-      | ECall _, ECall _ -> { env2 with event = EMulti::old_env}, tor cond1 cond2
+      | ECall _, ECall _ -> EMulti::old_env, tor cond1 cond2
       | ECall _, EMulti -> env2, tor cond1 cond2
       | ECall (kf1,_,_), ECOR kf2 when Kernel_function.equal kf1 kf2 ->
         env2, tor cond1 cond2
       | ECall (kf1,_,_), EReturn kf2 when Kernel_function.equal kf1 kf2 ->
-        { env2 with event = ECOR kf1 :: old_env }, tor cond1 cond2
-      | ECall _, (ECOR _ | EReturn _) -> { env2 with event =  (EMulti :: old_env) }, tor cond1 cond2
+        ECOR kf1 :: old_env, tor cond1 cond2
+      | ECall _, (ECOR _ | EReturn _) -> EMulti :: old_env, tor cond1 cond2
       | EReturn kf1, ECall (kf2,_,_) when Kernel_function.equal kf1 kf2 ->
-        { env2 with event = ECOR kf1 :: old_env }, tor cond1 cond2
-      | EReturn _, ECall _  -> { env2 with event = EMulti :: old_env }, tor cond1 cond2
+        ECOR kf1 :: old_env, tor cond1 cond2
+      | EReturn _, ECall _  -> EMulti :: old_env, tor cond1 cond2
       | EReturn kf1, EReturn kf2 when Kernel_function.equal kf1 kf2 ->
         env2, tor cond1 cond2
-      | EReturn _, EReturn _ -> { env2 with event = EMulti :: old_env }, tor cond1 cond2
+      | EReturn _, EReturn _ -> EMulti :: old_env, tor cond1 cond2
       | EReturn _, EMulti -> env2, tor cond1 cond2
       | EReturn kf1, ECOR kf2 when Kernel_function.equal kf1 kf2 ->
         env2, tor cond1 cond2
       | EReturn _, ECOR _ ->
-        { env2 with event = EMulti :: old_env }, tor cond1 cond2
+        EMulti :: old_env, tor cond1 cond2
       | ECOR kf1, (ECall(kf2,_,_) | EReturn kf2 | ECOR kf2)
         when Kernel_function.equal kf1 kf2 -> env1, tor cond1 cond2
       | ECOR _, (ECall _ | EReturn _ | ECOR _) ->
-        { env2 with event = EMulti :: old_env }, tor cond1 cond2
+        EMulti :: old_env, tor cond1 cond2
       | ECOR _, EMulti -> env2, tor cond1 cond2
       | EMulti, (ECall _ | EReturn _ | ECOR _) -> env1, tor cond1 cond2
-      | EMulti, EMulti -> { env2 with event =  EMulti::old_env }, tor cond1 cond2
+      | EMulti, EMulti -> EMulti::old_env, tor cond1 cond2
 
 let get_bindings st my_var =
   let my_lval = TVar my_var, TNoOffset in
@@ -714,15 +582,15 @@ let check_one top info counter s =
     | ECOR _ | EReturn _ | EMulti | ENone -> None
 
 
-let find_metavar s env =
+let find_metavar s metaenv =
   try
-    Datatype.String.Map.find s (env.var)
+    Datatype.String.Map.find s metaenv
   with Not_found ->
     Aorai_option.abort "Metavariable %s not declared" s
 
 let find_in_env env counter s =
   let current, stack =
-    match env.event with
+    match env with
       | current::stack -> current, stack
       | [] -> Aorai_option.fatal "Empty type-checking environment"
   in
@@ -795,7 +663,7 @@ let find_prm_in_env env ?tr counter f x =
              it in an aux variable or array here.
            *)
           env, Logic_const.tvar (Cil.cvar_to_lvar vi), cond
-    in treat_env true env.event
+    in treat_env true env
   end
 
 module C_logic_env =
@@ -834,17 +702,17 @@ end
 
 module LTyping = Logic_typing.Make(C_logic_env)
 
-let type_expr env ?tr ?current e =
+let type_expr metaenv env ?tr ?current e =
   let loc = Cil_datatype.Location.unknown in
   let rec aux env cond e =
     match e with
       | PVar s ->
         let var = find_in_env env current s in
         env, var, cond
-      | AVar s ->
-        let var = Logic_const.tvar (Cil.cvar_to_lvar (find_metavar s env)) in
-        env, var, cond
       | PPrm(f,x) -> find_prm_in_env env ?tr current f x
+      | PMetavar s ->
+        let var = Logic_const.tvar (Cil.cvar_to_lvar (find_metavar s metaenv)) in
+        env, var, cond
       | PCst (Logic_ptree.IntConstant s) ->
         let e = Cil.parseIntLogic ~loc s in
         env, e, cond
@@ -1024,22 +892,22 @@ let type_expr env ?tr ?current e =
   in
   aux env TTrue e
 
-let type_cond needs_pebble env tr cond =
+let type_cond needs_pebble metaenv env tr cond =
   let current = if needs_pebble then Some tr.stop else None in
   let rec aux pos env =
     function
-      | AfVar (s, e) ->
+      | PAssign (s, e) ->
         if not pos then
           Aorai_option.abort
             "Metavariable assignment cannot be done under a negation";
-        let vi = Datatype.String.Map.find s !global_table in
-        let env, e, c = type_expr env ~tr ?current e in
+        let vi = find_metavar s metaenv in
+        let env, e, c = type_expr metaenv env ~tr ?current e in
         let assign = Copy_value ((TVar (Cil.cvar_to_lvar vi), TNoOffset), e) in
         (* TODO: check type assignability *)
         env, c, [assign]
       | PRel(rel,e1,e2) ->
-        let env, e1, c1 = type_expr env ~tr ?current e1 in
-        let env, e2, c2 = type_expr env ~tr ?current e2 in
+        let env, e1, c1 = type_expr metaenv env ~tr ?current e1 in
+        let env, e2, c2 = type_expr metaenv env ~tr ?current e2 in
         let call_cond = if pos then tand c1 c2 else tor (tnot c1) (tnot c2) in
         let rel = TRel(Logic_typing.type_rel rel,e1,e2) in
         let cond = if pos then tand call_cond rel else tor call_cond rel in
@@ -1093,7 +961,7 @@ let type_cond needs_pebble env tr cond =
         else
           env, TReturn kf, []
   in
-  aux true {env with event = ENone::env.event} cond
+  aux true (ENone::env) cond
 
 module Reject_state =
   State_builder.Option_ref(Aorai_state)
@@ -1113,7 +981,7 @@ let add_if_needed states st =
   then st::states
   else states
 
-let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
+let rec type_seq default_state tr metaenv env needs_pebble curr_start curr_end seq =
   let loc = Cil_datatype.Location.unknown in
   match seq with
     | [] -> (* We identify start and end. *)
@@ -1166,7 +1034,7 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
         if is_opt then TTrue
         else
           let e = Extlib.the elt.min_rep in
-          let _,e,_ = type_expr env ?current e in
+          let _,e,_ = type_expr metaenv env ?current e in
           (* If we have done at least the lower bound of cycles, we can exit
              the loop. *)
           TRel(Cil_types.Rle,e,counter)
@@ -1181,7 +1049,7 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
             let e = Logic_const.tint ~loc i in
             TRel(Cil_types.Rlt, counter, e)
           | Some e ->
-            let _,e,_ = type_expr env ?current e in
+            let _,e,_ = type_expr metaenv env ?current e in
             Max_value_counter.replace counter e;
             (* The counter is incremented after the test: it
                must be strictly less than the upper bound to enter
@@ -1195,7 +1063,7 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
             assert (elt.nested <> []);
             (* we don't have a completely empty condition. *)
             type_seq
-              default_state tr env needs_pebble curr_start my_end elt.nested
+              default_state tr metaenv env needs_pebble curr_start my_end elt.nested
           | Some cond ->
             let seq_start =
               match elt.nested with
@@ -1205,7 +1073,7 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
             let trans_start = new_trans curr_start seq_start (Normal (TTrue,[]))
             in
             let inner_env, cond, act =
-              type_cond needs_pebble env trans_start cond
+              type_cond needs_pebble metaenv env trans_start cond
             in
             let (env,states, seq_transitions, seq_end) =
               match elt.nested with
@@ -1214,7 +1082,7 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
                   let intermediate = new_intermediate_state () in
                   let (env, states, transitions, _, seq_end) =
                     type_seq
-                      default_state tr
+                      default_state tr metaenv
                       inner_env needs_pebble seq_start intermediate elt.nested
                   in env, states, transitions, seq_end
             in
@@ -1227,12 +1095,12 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
                   Aorai_option.fatal
                     "Transition guard translated as epsilon transition");
             let states = add_if_needed states seq_start in
-            (match env.event with
+            (match env with
               | [] | (ENone | ECall _) :: _ ->
                 (env, states, transitions, curr_start, seq_end)
               | EReturn kf1 :: ECall (kf2,_,_) :: tl
                   when Kernel_function.equal kf1 kf2 ->
-                {env with event = tl}, states, transitions, curr_start, seq_end
+                  tl, states, transitions, curr_start, seq_end
               | (EReturn _ | ECOR _ ) :: _ ->
                     (* If there is as mismatch (e.g. Call f; Return g), it will
                        be caught later. There are legitimate situations for
@@ -1241,12 +1109,12 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
                      *)
                 (env, states, transitions, curr_start, seq_end)
               | EMulti :: env_tmp ->
-                {env with event = env_tmp}, states, transitions, curr_start, seq_end)
+                env_tmp, states, transitions, curr_start, seq_end)
       in
       let loop_end = if has_loop then new_intermediate_state () else inner_end
       in
       let (_,oth_states,oth_trans,oth_start,_) =
-        type_seq default_state tr env needs_pebble loop_end curr_end seq
+        type_seq default_state tr metaenv env needs_pebble loop_end curr_end seq
       in
       let trans = inner_trans @ oth_trans in
       let states = List.fold_left add_if_needed oth_states inner_states in
@@ -1348,7 +1216,7 @@ let rec type_seq default_state tr env needs_pebble curr_start curr_end seq =
                       if needs_pebble then Some curr_start else None
                     in
                     let _,t,_ =
-                      type_expr env ?current (Extlib.the elt.min_rep)
+                      type_expr metaenv env ?current (Extlib.the elt.min_rep)
                     in
                     TRel (Cil_types.Req, t, Logic_const.tinteger ~loc 0)
                 in
@@ -1432,7 +1300,7 @@ let find_otherwise_trans auto st =
   try let tr = List.find (fun x -> x.cross = Otherwise) trans in Some tr.stop
   with Not_found -> None
 
-let type_trans auto env tr =
+let type_trans auto metaenv env tr =
   let needs_pebble = not (single_path auto tr) in
   let has_siblings =
     match Path_analysis.get_transitions_of_state tr.start auto with
@@ -1449,7 +1317,7 @@ let type_trans auto env tr =
       let default_state = find_otherwise_trans auto tr.start in
       let has_default_state = Extlib.has_some default_state in
       let _,states, transitions,_,_ =
-        type_seq has_default_state tr env needs_pebble tr.start tr.stop seq
+        type_seq has_default_state tr metaenv env needs_pebble tr.start tr.stop seq
       in
       let (states, transitions) =
         if List.exists (fun st -> st.multi_state <> None) states then begin
@@ -1592,13 +1460,16 @@ let add_default_trans (states, transitions as auto) otherwise =
   let transitions = List.fold_left add_one_trans transitions otherwise in
   states, transitions
 
-let type_cond_auto (st,tr as auto) =
-  let otherwise = List.filter (fun t -> t.cross = Otherwise) tr in
+let type_cond_auto auto =
+  let original_auto = auto in
+  let otherwise = List.filter (fun t -> t.cross = Otherwise) auto.trans in
   let add_if_needed acc st =
     if List.memq st acc then acc else st::acc
   in
   let type_trans (states,transitions,add_reject) tr =
-    let (intermediate_states, trans, needs_reject) = type_trans auto {event = []; var = !global_table } tr in (*TODO*)
+    let (intermediate_states, trans, needs_reject) =
+      type_trans (auto.states,auto.trans) auto.metavariables [] tr
+    in
     Aorai_option.debug
       "Considering parsed transition %s -> %s" tr.start.name tr.stop.name;
     Aorai_option.debug
@@ -1621,7 +1492,7 @@ let type_cond_auto (st,tr as auto) =
      add_reject)
   in
   let (states, trans, add_reject) =
-    List.fold_left type_trans (st,[],[]) tr
+    List.fold_left type_trans (auto.states,[],[]) auto.trans
   in
   let auto = propagate_epsilon_transitions (states, trans) in
   let auto = add_reject_trans auto add_reject in
@@ -1630,12 +1501,13 @@ let type_cond_auto (st,tr as auto) =
      must ensure that we use consecutive numbers starting from 0, or we'll
      have needlessly long arrays.
    *)
-  let (states, transitions as auto) =
+  let states, trans =
     match Reject_state.get_option () with
       | Some state ->
           (states, (new_trans state state (TTrue,[])):: transitions)
       | None -> auto
   in
+  let auto = { original_auto with states ; trans } in
   if Aorai_option.debug_atleast 1 then
     Promelaoutput.output_dot_automata auto "aorai_debug_typed.dot";
   let (_,trans) =
@@ -1646,7 +1518,7 @@ let type_cond_auto (st,tr as auto) =
         in match cond with
             TFalse -> acc
           | _ -> (i+1,{ t with cross = (cond,action); numt = i } :: l))
-      (0,[]) transitions
+      (0,[]) trans
   in
   let _, states =
     List.fold_left
@@ -1661,13 +1533,14 @@ let type_cond_auto (st,tr as auto) =
         end else acc)
       (0,[]) states
   in
-   (List.rev states, List.rev trans)
+    { original_auto with states = List.rev states; trans = List.rev trans }
+
 
 (** Stores the buchi automaton and its variables and
     functions as it is returned by the parsing *)
 let setAutomata auto =
   let auto = type_cond_auto auto in
-  automata:=auto;
+  automata:=Some auto;
   check_states "typed automata";
   if Aorai_option.debug_atleast 1 then
     Promelaoutput.output_dot_automata auto "aorai_debug_reduced.dot";
@@ -1677,14 +1550,16 @@ let setAutomata auto =
     (* all transitions have a true parameterized guard, i.e. [[]] *)
     cond_of_parametrizedTransitions :=
       Array.make (getNumberOfTransitions  ()) [[]] ;
-  checkVariableInitialization auto
+  Aorai_metavariables.checkInitialization auto
 
-let getState num = List.find (fun st -> st.nums = num) (fst !automata)
+let getState num =
+  List.find (fun st -> st.nums = num) (getAutomata ()).states
 
-let getStateName num = (getState num).name
+let getStateName num =
+  (getState num).name
 
 let getTransition num =
-  List.find (fun trans -> trans.numt = num) (snd !automata)
+  List.find (fun trans -> trans.numt = num) (getAutomata ()).trans
 
 (** Initializes some tables according to data from Cil AST. *)
 let setCData () =
@@ -2181,6 +2056,7 @@ let debug_computed_state ?(dkey=dkey) () =
 (* ************************************************************************* *)
 
 let removeUnusedTransitionsAndStates () =
+  let auto = getAutomata () in
   (* Step 1 : computation of reached states and crossed transitions *)
   let treat_one_state state map set =
     Aorai_state.Map.fold
@@ -2192,7 +2068,7 @@ let removeUnusedTransitionsAndStates () =
       (Aorai_state.Set.add state set)
   in
   let reached _ state set = Aorai_state.Map.fold treat_one_state state set in
-  let init = Path_analysis.get_init_states (getAutomata ()) in
+  let init = Path_analysis.get_init_states (getGraph ()) in
   let reached_states = Pre_state.fold reached (Aorai_state.Set.of_list init) in
   let reached_states = Post_state.fold reached reached_states in
   let reached_states = Loop_init_state.fold reached reached_states in
@@ -2221,7 +2097,7 @@ let removeUnusedTransitionsAndStates () =
           (i+1,
            { trans with start = new_start; stop = new_stop; numt = i } :: list)
         with Not_found -> acc)
-      (0,[]) (snd (getAutomata()))
+      (0,[]) auto.trans
   in
   let state_list = List.map new_state state_list in
   Reject_state.may
@@ -2231,7 +2107,7 @@ let removeUnusedTransitionsAndStates () =
         Reject_state.set new_reject
       with Not_found -> Reject_state.clear ());
   (* Step 3 : rewriting stored information *)
-  automata:= (state_list,trans_list);
+  automata := Some { auto with states =state_list; trans = trans_list };
   check_states "reduced automata";
 
   let rewrite_state state =
