@@ -190,7 +190,6 @@ option
 opt_identifiers
   : /* empty */ { [] }
   | COLON id_list { $2 }
-/*  | COLON metavar { $2 } */
   ;
 
 id_list
@@ -202,10 +201,6 @@ states
   : states state { $1@$2 }
   | state { $1 }
   ;
-
-/*metavar
-  : IDENTIFIER COMMA IDENTIFIER { $1::[$3] }
-metavar : x, int*/
 
 state
   : IDENTIFIER COLON transitions SEMI_COLON {

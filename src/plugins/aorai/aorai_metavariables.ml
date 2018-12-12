@@ -78,8 +78,7 @@ struct
       fun t -> ignore (Visitor.visitFramacTerm v t)
     in
     let rec visit_cond = function
-      | TAnd (c1,c2) -> visit_cond c1; visit_cond c2
-      | TOr (c1,c2) -> visit_cond c1; visit_cond c2
+      | TAnd (c1,c2) | TOr (c1,c2) -> visit_cond c1; visit_cond c2
       | TNot (c) -> visit_cond c
       | TRel (_,t1,t2) -> visit_term t1; visit_term t2
       | TCall _ | TReturn _ | TTrue | TFalse -> ()
