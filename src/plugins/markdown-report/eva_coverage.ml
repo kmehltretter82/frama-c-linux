@@ -49,12 +49,12 @@ let is_analyzed_function vi =
          (Mdr_params.Stubs.get())) &&
   not (List.mem vi.vname
          (String.split_on_char ','
-            (Dynamic.Parameter.String.get "-val-use-spec" ()))) &&
+            (Dynamic.Parameter.String.get "-eva-use-spec" ()))) &&
   not (List.mem vi.vname
          (List.map
             (fun s -> List.hd (String.split_on_char ':' s))
             (String.split_on_char ','
-               (Dynamic.Parameter.String.get "-val-builtin" ()))))
+               (Dynamic.Parameter.String.get "-eva-builtin" ()))))
 
 let is_analyzed_info vi info = {info with is_analyzed=is_analyzed_function vi; }
 

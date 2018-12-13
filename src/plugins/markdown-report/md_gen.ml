@@ -93,7 +93,7 @@ let section_stubs env =
       )
   in
   let stubbed_kf = List.filter Kernel_function.is_definition stubbed_kf in
-  let opt = Dynamic.Parameter.String.get "-val-use-spec" () in
+  let opt = Dynamic.Parameter.String.get "-eva-use-spec" () in
   (* NB: requires OCaml >= 4.04 *)
   let l = String.split_on_char ',' opt in
   let use_spec =
