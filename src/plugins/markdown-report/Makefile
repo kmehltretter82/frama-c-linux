@@ -8,7 +8,7 @@ PLUGIN_NAME:=Report_markdown
 PLUGIN_GENERATED:=mdr_version.ml
 PLUGIN_CMO:=\
   markdown sarif mdr_version mdr_params parse_remarks \
-  eva_coverage sarif_gen md_gen
+  eva_coverage md_gen sarif_gen mdr_register
 PLUGIN_NO_TEST:=true
 PLUGIN_REQUIRES:=ppx_deriving ppx_deriving_yojson yojson
 PLUGIN_VERSION:=$(Report_markdown_VERSION)

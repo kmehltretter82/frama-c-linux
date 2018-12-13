@@ -50,6 +50,11 @@ val plain_format: ('a, Format.formatter, unit, text) format4 -> 'a
 (** gives a link whose text is the URL itself. *)
 val plain_link: string -> inline
 
+(** [codelines lang pp code] returns a [Code_block] for [code], written
+in [lang], as pretty-printed by [pp]. *)
+val codelines:
+  string -> (Format.formatter -> 'a -> unit) -> 'a -> block_element
+
 val pp_inline: Format.formatter -> inline -> unit
 
 val pp_text: Format.formatter -> text -> unit
@@ -59,5 +64,7 @@ val pp_block_element: Format.formatter -> block_element -> unit
 val pp_block: Format.formatter -> block -> unit
 
 val pp_element: Format.formatter -> element -> unit
+
+val pp_elements: Format.formatter -> element list -> unit
 
 val pp_pandoc: Format.formatter -> pandoc_markdown -> unit

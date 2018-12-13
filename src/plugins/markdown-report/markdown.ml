@@ -49,6 +49,11 @@ let plain_format txt = Format.kasprintf plain txt
 
 let plain_link s = Link ([Inline_code s],s)
 
+let codelines lang pp code =
+  let s = Format.asprintf "@[%a@]" pp code in
+  let lines = String.split_on_char '\n' s in
+  Code_block (lang, lines)
+
 let rec pp_inline fmt =
   function
   | Plain s -> Format.pp_print_string fmt s
@@ -194,6 +199,8 @@ and pp_element fmt = function
     pp_aligns fmt header sizes;
     pp_table_content fmt content sizes
 
+let pp_elements fmt l =
+  List.iter (fun e -> pp_element fmt e ; Format.pp_print_newline fmt ()) l
 let pp_authors fmt l =
   List.iter (fun t -> Format.fprintf fmt "@[<h>- %a@]@\n" pp_text t) l
 
@@ -207,5 +214,5 @@ let pp_pandoc fmt { title; authors; date; elements } =
     Format.fprintf fmt "@[<h>...@]@\n";
     Format.pp_print_newline fmt ();
   end;
-  List.iter (fun e -> pp_element fmt e ; Format.pp_print_newline fmt ()) elements;
+  pp_elements fmt elements;
   Format.fprintf fmt "@]%!"

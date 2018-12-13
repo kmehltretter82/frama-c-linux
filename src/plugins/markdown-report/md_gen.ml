@@ -55,11 +55,6 @@ let get_eva_domains () =
     (fun (x,y) -> ([Plain "option"; Bold x], plain y))
     all_eva_domains
 
-let codelines lang pp code =
-  let s = Format.asprintf "@[%a@]" pp code in
-  let lines = String.split_on_char '\n' s in
-  Code_block (lang, lines)
-
 let section_domains env =
   let anchor = "domains" in
   let head = H3 (plain "EVA Domains", Some anchor) in
@@ -594,7 +589,7 @@ let mk_remarks is_draft =
     end else Datatype.String.Map.empty
   end else  Datatype.String.Map.empty
 
-let gen_report is_draft =
+let gen_report ~draft:is_draft () =
   let remarks = mk_remarks is_draft in
   let env = { remarks; is_draft } in
   let context = gen_context env in
@@ -643,15 +638,3 @@ let gen_report is_draft =
     Mdr_params.warning
       "Unable to open %s for writing (%s). No report will be generated"
       (Mdr_params.Output.get()) s
-
-let main () =
-  match Mdr_params.Generate.get () with
-  | "none" -> ()
-  | "md" -> gen_report false
-  | "draft" -> gen_report true
-  | "sarif" -> Sarif_gen.generate ()
-  | s ->
-    Mdr_params.fatal "Unexpected value for option %s: %s"
-      Mdr_params.Generate.option_name s
-
-let () = Db.Main.extend main
