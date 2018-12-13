@@ -1,16 +1,68 @@
-Generation of pandoc reports.
+Generation of pandoc and/or sarif reports.
 
 **Important Note:** Requires OCaml 4.04 or newer (uses a new function from
 `String`), instead of the normal 4.02.3 or newer for Frama-C kernel.
 
-# Requirements
+# Dependencies
 
+## Mandatory
 - OCaml >= 4.04;
-- Frama-C 15 (Phosphorus)
+- Frama-C 18.0 (Argon)
+- packages `ppx_deriving`, `ppx_deriving_yojson` and `yojson`
+
+**Important Note** In the current version of `ppx_deriving`, the `META` file
+provided misses a line indicating how to load the package in a dynamic manner
+(i.e. what Frama-C does when loading its plug-in), preventing the plug-in
+to be loaded by Frama-C. If Frama-C fails to load the plug-in, please add
+the line
+
+```
+plugin(native) = "ppx_deriving_runtime.cmxs"
+```
+
+to the `package "runtime"` record of the file
+`$(ocamlfind query ppx_deriving)/META`
+
+## Optional
 - FlameGraph ([`https://github.com/brendangregg/FlameGraph`](https://github.com/brendangregg/FlameGraph))
 
-# Example
+# Installation
 
+Running `make` and `make install` (possibly with admin rights depending on
+your installation of Frama-C) should compile and install the plugin in
+Frama-C's installation directory.
+
+# Usage
+
+MarkDownReport focuses on results computed by Eva. It has three output formats,
+controlled by the `-mdr-gen` option:
+
+- `draft`: produces a markdown report with placeholders for writing (markdown)
+comments on the various items (e.g. why is an alarm spurious, or why is
+a given hypothesis safe).
+- `markdown`: produces a full-fledged markdown report. It can be used in
+  conjunction with the option `-mdr-remarks <f>` which will use the
+  remarks written in the draft document `f` (which is supposed to have been
+  generated from the same analysis in `draft` mode and edited with manual
+  comments afterwards).
+- `sarif`: produces a json object in the Static Analysis Results Interchange
+  Format (SARIF), as documented [here](https://github.com/oasis-tcs/sarif-spec).
+  This output is very experimental and lacks many information contained in
+  the `markdown` format. It can also incorporate remarks from `-mdr-remarks`,
+  that will be reflected as `message`s in the `sarif` object.
+
+The output file can be controlled with `-mdr-out`. Other options are:
+
+- `-mdr-authors`: comma separated list of the authors of the document
+- `-mdr-title`: give a title to the document
+- `-mdr-flamegraph`: generate a flamegraph in the given file (see below)
+- `-mdr-stubs`: identifies a set of files as containing stubs for Eva (i.e.
+  code that is not in the scope of the analysis per se).
+
+Sarif document can be validated against the spec
+[online](https://sarifweb.azurewebsites.net/Validation)
+
+## Flamegraph
 Checking out [`https://github.com/Frama-C/open-source-case-studies`](https://github.com/Frama-C/open-source-case-studies), start with a simple analysis and generate the intermediary SVG and Markdown files.
 
 ```shell
@@ -19,7 +71,8 @@ flamegraph.pl ./flamegraph.txt > flamegraph.svg
 frama-c -load snap.sav -mdr-gen -mdr-flamegraph="./flamegraph.svg"
 ```
 
-Then generate a report in your favorite open format:
+Then generate a report in your favorite open format (requires the
+[pandoc](http://pandoc.org/) document generator
 
 ```shell
 pandoc -o report.docx report.md
