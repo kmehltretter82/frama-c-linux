@@ -32,6 +32,7 @@ open Logic_ptree
 open Promelaast
 open Bool3
 
+type options = Deterministic | Init of string list | Accept of string list
 
 let to_seq c =
   [{ condition = Some c;
@@ -46,7 +47,6 @@ let is_no_repet (min,max) =
 
 let observed_states      = Hashtbl.create 1
 let prefetched_states    = Hashtbl.create 1
-let metavariables        = ref Datatype.String.Map.empty
 
 let fetch_and_create_state name =
   Hashtbl.remove prefetched_states name ;
@@ -71,7 +71,21 @@ let prefetch_and_create_state name =
       (fetch_and_create_state name)
 ;;
 
-let add_metavariable name typename =
+let set_init_state id =
+  try
+    let state = Hashtbl.find observed_states id in
+    state.init <- True
+  with Not_found ->
+    Aorai_option.abort "no state '%s'" id
+
+let set_accept_state id =
+  try
+    let state = Hashtbl.find observed_states id in
+    state.acceptation <- True
+  with Not_found ->
+    Aorai_option.abort "no state '%s'" id
+
+let add_metavariable map (name,typename) =
   let ty = match typename with
     | "int" -> TInt(IInt, [])
     | "char" -> TInt(IChar, [])
@@ -80,8 +94,39 @@ let add_metavariable name typename =
       Aorai_option.abort "Unrecognized type %s for metavariable %s"
         typename name
   in
+  if Datatype.String.Map.mem name map then
+    Aorai_option.abort "The metavariable %s is declared twice" name;
   let vi = Cil.makeGlobalVar (Data_for_aorai.get_fresh ("aorai_" ^ name)) ty in
-  metavariables := Datatype.String.Map.add name vi !metavariables
+  Datatype.String.Map.add name vi map
+
+let check_state st =
+  if st.acceptation=Undefined || st.init=Undefined then
+   Aorai_option.abort
+    "Error: the state '%s' is used but never defined." st.name
+
+let interpret_option = function
+  | Init states ->
+    List.iter set_init_state states
+  | Accept states ->
+    List.iter set_accept_state states
+  | Deterministic ->
+    Aorai_option.Deterministic.set true
+
+let build_automaton options metavariables trans =
+  let htable_to_list table = Hashtbl.fold (fun _ st l -> st :: l) table [] in
+  let states = htable_to_list observed_states
+  and undefined_states = htable_to_list prefetched_states
+  and metavariables =
+    List.fold_left add_metavariable Datatype.String.Map.empty metavariables
+  in
+  List.iter interpret_option options;
+  List.iter check_state states;
+  if not (List.exists (fun st -> st.init=True) states) then
+    Aorai_option.abort "Automaton does not declare an initial state";
+  if undefined_states <> [] then
+    Aorai_option.abort "Error: the state(s) %a are used but never defined."
+      (Pretty_utils.pp_list ~sep:"," Format.pp_print_string) undefined_states;
+  { states; trans; metavariables }
 
 
 type pre_cond = Behavior of string | Pre of Promelaast.condition
@@ -91,15 +136,16 @@ type pre_cond = Behavior of string | Pre of Promelaast.condition
 
 %token CALL_OF  RETURN_OF  CALLORRETURN_OF
 %token <string> IDENTIFIER
+%token <string> METAVAR
 %token <string> INT
-%token VAR
 %token AFF
 %token LCURLY RCURLY LPAREN RPAREN LSQUARE RSQUARE LBRACELBRACE RBRACERBRACE
 %token RARROW
 %token TRUE FALSE
 %token NOT DOT AMP
-%token COLON SEMI_COLON COMMA PIPE CARET QUESTION COMMA COLUMNCOLUMN
+%token COLON SEMI_COLON COMMA PIPE CARET QUESTION COLUMNCOLUMN
 %token EQ LT GT LE GE NEQ PLUS MINUS SLASH STAR PERCENT OR AND
+%token INIT ACCEPT DETERMINISTIC METAVAR
 %token OTHERWISE
 %token EOF
 
@@ -119,73 +165,21 @@ type pre_cond = Behavior of string | Pre of Promelaast.condition
 %start main
 %%
 
-main
-  : options states {
-  List.iter
-    (fun(key, ids) ->
-       match key with
-           "init"   ->
-             List.iter
-               (fun id ->
-                 try
-                   (Hashtbl.find observed_states id).init <- True
-                 with
-                     Not_found ->
-                       Aorai_option.abort "Error: no state '%s'\n" id)
-               ids
-         | "accept" ->
-             List.iter
-               (fun id -> try
-                  (Hashtbl.find observed_states id).acceptation <- True
-                with Not_found ->
-                  Aorai_option.abort "no state '%s'\n" id) ids
-         | "deterministic" -> Aorai_option.Deterministic.set true;
-         | "metavar" -> begin
-            match ids with
-            | [ name ; typename ] -> add_metavariable name typename
-            | _ -> Aorai_option.abort "Missing or too many arguments in metavariable definition"
-            end
-         | oth      -> Aorai_option.abort "unknown option '%s'\n" oth
-    ) $1;
-    let states=
-      Hashtbl.fold
-        (fun _ st l ->
-           if st.acceptation=Undefined || st.init=Undefined then
-             begin
-               Aorai_option.abort
-                 "Error: the state '%s' is used but never defined.\n" st.name
-             end;
-           st::l)
-        observed_states []
-    and trans = $2 in
-    (try
-       Hashtbl.iter
-         (fun _ st -> if st.init=True then raise Exit) observed_states;
-       Aorai_option.abort "Automaton does not declare an initial state"
-     with Exit -> ());
-    if Hashtbl.length prefetched_states >0 then
-      begin
-        let r = Hashtbl.fold
-          (fun s n _ ->
-            s^"Error: the state '"^n^"' is used but never defined.\n")
-          prefetched_states
-          ""
-        in
-        Aorai_option.abort "%s" r
-      end;
-    { states; trans; metavariables = !metavariables }
-  }
-  ;
-
+main : options metavars states { build_automaton $1 $2 $3 }
 
 options
-  : options option { $1@[$2] }
+  : options option { $1 @ [$2] }
   | option         { [$1] }
   ;
 
 option
-  : PERCENT IDENTIFIER opt_identifiers SEMI_COLON { ($2, $3) }
-  ;
+  : PERCENT IDENTIFIER opt_identifiers SEMI_COLON { 
+    match $2 with
+    | "init" -> Init $3
+    | "accept" -> Accept $3
+    | "deterministic" -> Deterministic
+    | _ ->  Aorai_option.abort "unknown option: '%s'" $2
+  }
 
 opt_identifiers
   : /* empty */ { [] }
@@ -193,8 +187,21 @@ opt_identifiers
   ;
 
 id_list
-  : id_list COMMA IDENTIFIER { $1@[$3] }
+  : id_list COMMA IDENTIFIER { $1 @ [$3] }
   | IDENTIFIER               { [$1] }
+  ;
+
+metavars
+  : /* epsilon */      { [] }
+  | non_empty_metavars { $1 }
+
+non_empty_metavars
+  : non_empty_metavars metavar { $1 @ [$2] }
+  | metavar                    { [$1] }
+  ;
+
+metavar
+  : METAVAR COLON IDENTIFIER SEMI_COLON { $1,$3 }
   ;
 
 states
@@ -331,7 +338,7 @@ single_cond:
   | single_cond OR single_cond { POr ($1,$3) }
   | LPAREN single_cond RPAREN { $2 }
   | logic_relation { $1 }
-  | VAR IDENTIFIER AFF arith_relation { PAssign ($2, $4) }
+  | METAVAR AFF arith_relation { PAssign ($1, $3) }
 ;
 
 logic_relation
@@ -383,5 +390,5 @@ access_leaf
   | IDENTIFIER LPAREN RPAREN DOT IDENTIFIER { PPrm($1,$5) }
   | IDENTIFIER { PVar $1 }
   | LPAREN access RPAREN { $2 }
-  | VAR IDENTIFIER { PMetavar $2 }
+  | METAVAR { PMetavar $1 }
   ;

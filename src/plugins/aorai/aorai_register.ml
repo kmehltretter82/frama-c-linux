@@ -97,14 +97,37 @@ let ltl_to_ltlLight f_ltl (f_out : Filepath.Normalized.t) =
   with
   | Ltllexer.Error (loc,msg) -> syntax_error loc msg
 
-let load_ya_file f =
+let parse_error' lexbuf msg =
+  let open Lexing in
+  let start_p = Cil_datatype.Position.of_lexing_pos (lexeme_start_p lexbuf)
+  and end_p = Cil_datatype.Position.of_lexing_pos (lexeme_end_p lexbuf)
+  and lexeme = Lexing.lexeme lexbuf in
+  let start_line = start_p.Filepath.pos_lnum in
+  let abort str =
+    Aorai_option.feedback ~source:start_p "%s@.%a, before or at token: %s\n%a@."
+      str
+      Errorloc.pp_location (start_p, end_p)
+      lexeme
+      (Errorloc.pp_context_from_file ~start_line ~ctx:2) start_p;
+    raise (Log.AbortError "aorai")
+  in
+  Pretty_utils.ksfprintf abort msg
+
+let load_ya_file filename  =
+  let channel = check_and_open_in filename "invalid Ya file" in
+  let lexbuf = Lexing.from_channel channel in
+  Lexing.(lexbuf.lex_curr_p <-
+    { lexbuf.lex_curr_p with pos_fname = (filename :> string) });
   try
-    let c = check_and_open_in f "invalid Ya file" in
-    let automata = Yalexer.parse c  in
-    close_in c;
-    Data_for_aorai.setAutomata automata;
+    let automata = Yaparser.main Yalexer.token lexbuf in
+    close_in channel;
+    Data_for_aorai.setAutomata automata
   with
-  | Yalexer.Error (loc,msg) -> syntax_error loc msg
+  | Parsing.Parse_error | Invalid_argument _ ->
+    parse_error' lexbuf "syntax error"
+  | Yalexer.Lexing_error msg ->
+    parse_error' lexbuf "%s" msg
+
 
 let load_promela_file f  =
   try

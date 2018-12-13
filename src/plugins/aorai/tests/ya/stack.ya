@@ -1,7 +1,8 @@
 %init: init;
 %accept: accept;
 %deterministic;
-%metavar: n, int;
+
+$n : int;
 
 init:
   { CALL(main) && $n := 0 } -> empty_stack
