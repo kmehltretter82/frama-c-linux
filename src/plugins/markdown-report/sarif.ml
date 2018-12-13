@@ -33,16 +33,25 @@ struct
     `Assoc json_l
 end
 
-module Uri = struct
-  type t =
-    | Sarif_github [@name "https://github.com/oasis-tcs/sarif-spec/blob/master/Schemata/sarif-schema.json"]
-    [@@deriving yojson]
+module Uri: sig
+  include Json_type with type t = private string
+  val sarif_github:t
+end
+=
+struct
+  type t = string[@@deriving yojson]
+  let sarif_github =
+    "https://github.com/oasis-tcs/sarif-spec/blob/master/Schemata/sarif-schema.json"
 end
 
-module Version = struct
-  type t =
-    | V2_0_0 [@name "2.0.0"]
-  [@@deriving yojson]
+module Version: sig
+  include Json_type with type t = private string
+  val v2_0_0: t
+end
+=
+struct
+  type t = string[@@deriving yojson]
+  let v2_0_0 = "2.0.0"
 end
 
 module Message = struct
@@ -281,12 +290,18 @@ module Additional_properties = struct
   let default = []
 end
 
-module Stl_importance = struct
-  type t =
-    | Important [@name "important"]
-    | Essential [@name "essential"]
-    | Unimportant [@name "unimportant"]
-  [@@deriving yojson]
+module Stl_importance: sig
+  include Json_type with type t = private string
+  val important: t
+  val essential: t
+  val unimportant: t
+end
+=
+struct
+  type t = string [@@deriving yojson]
+  let important = "important"
+  let essential = "essential"
+  let unimportant = "unimportant"
 end
 
 module ThreadFlowLocation = struct
@@ -300,7 +315,7 @@ module ThreadFlowLocation = struct
     nestingLevel: (int [@default 0]);
     executionOrder: (int [@default 0]);
     timestamp: (string [@default ""]);
-    importance: (Stl_importance.t [@default Stl_importance.Unimportant]);
+    importance: (Stl_importance.t [@default Stl_importance.unimportant]);
     properties: (Properties.t [@default Properties.default]);
   }[@@deriving yojson]
 end
@@ -348,12 +363,18 @@ let default =
   }
 end
 
-module Notification_kind = struct
-  type t =
-    | Note [@name "note"]
-    | Warning [@name "warning"]
-    | Error [@name "error"]
-  [@@deriving yojson]
+module Notification_kind: sig
+  include Json_type with type t = private string
+  val note: t
+  val warning: t
+  val error: t
+end
+=
+struct
+  type t = string [@@deriving yojson]
+  let note = "note"
+  let warning = "warning"
+  let error = "error"
 end
 
 module Notification = struct
@@ -362,7 +383,7 @@ module Notification = struct
     ruleId: (string [@default ""]);
     physicalLocation: (PhysicalLocation.t [@default PhysicalLocation.default]);
     message: Message.t;
-    level: (Notification_kind.t [@default Notification_kind.Warning]);
+    level: (Notification_kind.t [@default Notification_kind.warning]);
     threadId: (int [@default 0]);
     time: (string [@default ""]);
     exn: (Sarif_exception.t [@default Sarif_exception.default])
@@ -539,21 +560,37 @@ module Edge_traversal = struct
   }[@@deriving yojson]
 end
 
-module Role = struct
-  type t =
-    | AnalysisTarget [@name "analysisTarget"]
-    | Attachment [@name "attachment"]
-    | ResponseFile [@name "responseFile"]
-    | ResultFile [@name "resultFile"]
-    | StandardStrem [@name "standardStream"]
-    | TraceFile [@name "traceFile"]
-    | UnmodifiedFile [@name "unmodifiedFile"]
-    | ModifiedFile [@name "modifiedFile"]
-    | AddedFile [@name "addedFile"]
-    | DeletedFile [@name "deletedFile"]
-    | RenamedFile [@name "renamedFile"]
-    | UncontrolledFile [@name "uncontrolledFile"]
-  [@@deriving yojson]
+module Role: sig
+  include Json_type with type t = private string
+  val analysisTarget: t
+  val attachment: t
+  val responseFile: t
+  val resultFile: t
+  val standardStream: t
+  val traceFile: t
+  val unmodifiedFile: t
+  val modifiedFile: t
+  val addedFile: t
+  val deletedFile:t
+  val renamedFile:t
+  val uncontrolledFile: t
+end
+=
+struct
+  type t = string[@@deriving yojson]
+
+  let analysisTarget = "analysisTarget"
+  let attachment = "attachment"
+  let responseFile = "responseFile"
+  let resultFile = "resultFile"
+  let standardStream = "standardStream"
+  let traceFile = "traceFile"
+  let unmodifiedFile = "unmodifiedFile"
+  let modifiedFile = "modifiedFile"
+  let addedFile = "addedFile"
+  let deletedFile = "deletedFile"
+  let renamedFile = "renamedFile"
+  let uncontrolledFile = "uncontrolledFile"
 end
 
 module Hash = struct
@@ -645,25 +682,33 @@ module LogicalLocation = struct
   }[@@deriving yojson]
 end
 
-module RuleConfigLevel = struct
-  type t =
-    | Note [@name "note"]
-    | Warning [@name "warning"]
-    | Error [@name "error"]
-    | Open [@name "open"]
-  [@@deriving yojson]
+module RuleConfigLevel:
+sig
+  include Json_type with type t = private string
+  val cl_note: t
+  val cl_warning: t
+  val cl_error: t
+  val cl_open: t
+end
+=
+struct
+  type t = string [@@deriving yojson]
+  let cl_note = "note"
+  let cl_warning = "warning"
+  let cl_error = "error"
+  let cl_open = "open"
 end
 
 module RuleConfiguration = struct
   type t = {
     enabled: (bool [@default false]);
-    defaultLevel: (RuleConfigLevel.t [@default RuleConfigLevel.Open]);
+    defaultLevel: (RuleConfigLevel.t [@default RuleConfigLevel.cl_open]);
     parameters: (Properties.t [@default Properties.default])
   }[@@deriving yojson]
 
   let default = {
     enabled = false;
-    defaultLevel = RuleConfigLevel.Open;
+    defaultLevel = RuleConfigLevel.cl_open;
     parameters = Properties.default;
   }
 end
@@ -710,29 +755,52 @@ module Resources = struct
     rules = [] }
 end
 
-module Result_level = struct
-  type t = 
-    | NotApplicable [@name "notApplicable"]
-    | Pass [@name "pass"]
-    | Note [@name "note"]
-    | Warning [@name "warning"]
-    | Error [@name "error"]
-  [@@deriving yojson]
+module Result_level:
+sig
+  type t = private string
+  val notApplicable: t
+  val pass: t
+  val note: t
+  val warning: t
+  val error: t
+
+  val to_yojson: t -> Yojson.Safe.json
+  val of_yojson: Yojson.Safe.json -> (t,string) result
+end
+=
+struct
+  type t = string[@@deriving yojson]
+  let notApplicable = "notApplicable"
+  let pass = "pass"
+  let note = "note"
+  let warning = "warning"
+  let error = "error"
 end
 
-module Result_suppressionState = struct
-  type t =
-    | SuppressedInSource [@name "suppressedInSource"]
-    | SuppressedExternally [@name "suppressedExternally"]
-  [@@deriving yojson]
+module Result_suppressionState: sig
+  include Json_type with type t = private string
+  val suppressedInSource: t
+  val suppressedExternally: t
+end
+=
+struct
+  type t = string [@@deriving yojson]
+  let suppressedInSource = "suppressedInSource"
+  let suppressedExternally = "suppressedExternally"
 end
 
-module Result_baselineState = struct
-  type t =
-    | New [@name "new"]
-    | Existing [@name "existing"]
-    | Absent [@name "absent"]
-  [@@deriving yojson]
+module Result_baselineState: sig
+  include Json_type with type t = private string
+  val bs_new: t
+  val bs_existing: t
+  val bs_absent: t
+end
+=
+struct
+  type t = string [@@deriving yojson]
+  let bs_new = "new"
+  let bs_existing = "existing"
+  let bs_absent = "absent"
 end
 
 (* we can't use Result here, as this would conflict with
@@ -741,7 +809,7 @@ end
 module Sarif_result = struct
   type t = {
     ruleId: (string [@default ""]);
-    level: (Result_level.t [@default Result_level.NotApplicable]);
+    level: (Result_level.t[@default Result_level.notApplicable]);
     message: (Message.t [@default Message.default]);
     analysisTarget: (FileLocation.t [@default FileLocation.default]);
     locations: (Location.t list [@default []]);
@@ -759,7 +827,7 @@ module Sarif_result = struct
     relatedLocations: (Location.t list [@default []]);
     suppressionStates: (Result_suppressionState.t list [@default []]);
     baselineState:
-      (Result_baselineState.t [@default Result_baselineState.Absent]);
+      (Result_baselineState.t [@default Result_baselineState.bs_absent]);
     attachments: (Attachment.t list [@default []]);
     workItemsUris: (string list [@default []]);
     conversionProvenance: (PhysicalLocation.t list [@default[]]);
@@ -769,7 +837,7 @@ module Sarif_result = struct
 
 let create
   ?(ruleId = "")
-  ?(level=Result_level.NotApplicable)
+  ?(level=Result_level.notApplicable)
   ?(message=Message.default)
   ?(analysisTarget=FileLocation.default)
   ?(locations=[])
@@ -784,7 +852,7 @@ let create
   ?(graphTraversals=[])
   ?(relatedLocations=[])
   ?(suppressionStates=[])
-  ?(baselineState=Result_baselineState.Absent)
+  ?(baselineState=Result_baselineState.bs_absent)
   ?(attachments=[])
   ?(workItemsUris=[])
   ?(conversionProvenance=[])
@@ -816,11 +884,16 @@ module File_dictionary = Json_dictionary(File)
 
 module LogicalLocation_dictionary = Json_dictionary(LogicalLocation)
 
-module ColumnKind = struct
-  type t =
-    | Utf16CodeUnits [@name "utf16CodeUnits"]
-    | UnicodeCodePoints [@name "unicodeCodePoints"]
-  [@@deriving yojson]
+module ColumnKind: sig
+  include Json_type with type t = private string
+  val utf16CodeUnits: t
+  val unicodeCodePoints: t
+end
+=
+struct
+  type t = string [@@deriving yojson]
+  let utf16CodeUnits = "utf16CodeUnits"
+  let unicodeCodePoints = "unicodeCodePoints"
 end
 
 module Run = struct
@@ -846,7 +919,7 @@ module Run = struct
     richMessageMimeType: (string [@default "text/markdown;variant=GFM" ]);
     redactionToken: (string [@default ""]);
     defaultFileEncoding: (string [@default "utf-8"]);
-    columnKind: (ColumnKind.t [@default ColumnKind.UnicodeCodePoints]);
+    columnKind: (ColumnKind.t [@default ColumnKind.unicodeCodePoints]);
     properties: (Properties.t [@default Properties.default]);
 }
 [@@deriving yojson]
@@ -872,7 +945,7 @@ let create
     ?(richMessageMimeType="text/markdown;variant=GFM")
     ?(redactionToken="")
     ?(defaultFileEncoding="utf-8")
-    ?(columnKind=ColumnKind.UnicodeCodePoints)
+    ?(columnKind=ColumnKind.unicodeCodePoints)
     ?(properties=Properties.default)
     ()
   =
@@ -887,11 +960,11 @@ end
 
 module Schema = struct
   type t = {
-    schema: (Uri.t [@default Uri.Sarif_github]) [@key "$schema"];
+    schema: (Uri.t [@default Uri.sarif_github]) [@key "$schema"];
     version: Version.t;
     runs: Run.t list
   } [@@deriving yojson]
 
-  let create ?(schema=Uri.Sarif_github) ?(version=Version.V2_0_0) ~runs () =
+  let create ?(schema=Uri.sarif_github) ?(version=Version.v2_0_0) ~runs () =
     { schema; version; runs }
 end
