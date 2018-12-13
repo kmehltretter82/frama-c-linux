@@ -132,7 +132,7 @@ let pp_table_line fmt sizes l =
 let pp_table_content fmt l sizes =
   Format.fprintf fmt "@[<v>";
   List.iter (pp_table_line fmt sizes) l;
-  Format.fprintf fmt "@]@\n"
+  Format.fprintf fmt "@]"
 
 let rec pp_block_element fmt = function
   | Text t -> Format.fprintf fmt "@[<hov>%a@]@\n" pp_text t
@@ -175,20 +175,20 @@ and pp_quote fmt l =
     (fun elt -> Format.fprintf fmt "@[<v>> %a@]" pp_element elt) l
 
 and pp_element fmt = function
-  | Block b -> Format.fprintf fmt "@[<v>%a@]@\n" pp_block b
+  | Block b -> Format.fprintf fmt "@[<v>%a@]" pp_block b
   | Raw l ->
     Format.(
-      fprintf fmt "%a@\n"
+      fprintf fmt "%a"
         (pp_print_list ~pp_sep:pp_force_newline pp_print_string) l)
   | Comment s ->
     Format.fprintf fmt
-      "@[<hv>@[<hov 5><!-- %a@]@ -->@]@\n" Format.pp_print_text s
-  | H1(t,lab) -> Format.fprintf fmt "@[<h># %a%a@]@\n" pp_text t pp_lab lab
-  | H2(t,lab) -> Format.fprintf fmt "@[<h>## %a%a@]@\n" pp_text t pp_lab lab
-  | H3(t,lab) -> Format.fprintf fmt "@[<h>### %a%a@]@\n" pp_text t pp_lab lab
-  | H4(t,lab) -> Format.fprintf fmt "@[<h>#### %a%a@]@\n" pp_text t pp_lab lab
-  | H5(t,lab) -> Format.fprintf fmt "@[<h>##### %a%a@]@\n" pp_text t pp_lab lab
-  | H6(t,lab) -> Format.fprintf fmt "@[<h>###### %a%a@]@\n" pp_text t pp_lab lab
+      "@[<hv>@[<hov 5><!-- %a@]@ -->@]" Format.pp_print_text s
+  | H1(t,lab) -> Format.fprintf fmt "@[<h># %a%a@]" pp_text t pp_lab lab
+  | H2(t,lab) -> Format.fprintf fmt "@[<h>## %a%a@]" pp_text t pp_lab lab
+  | H3(t,lab) -> Format.fprintf fmt "@[<h>### %a%a@]" pp_text t pp_lab lab
+  | H4(t,lab) -> Format.fprintf fmt "@[<h>#### %a%a@]" pp_text t pp_lab lab
+  | H5(t,lab) -> Format.fprintf fmt "@[<h>##### %a%a@]" pp_text t pp_lab lab
+  | H6(t,lab) -> Format.fprintf fmt "@[<h>###### %a%a@]" pp_text t pp_lab lab
   | Table { caption; header; content } ->
     (match caption with
      | None -> ()
@@ -200,7 +200,12 @@ and pp_element fmt = function
     pp_table_content fmt content sizes
 
 let pp_elements fmt l =
-  List.iter (fun e -> pp_element fmt e ; Format.pp_print_newline fmt ()) l
+  let pp_sep fmt () =
+    Format.pp_print_newline fmt ();
+    Format.pp_print_newline fmt ()
+  in
+  Format.pp_print_list ~pp_sep pp_element fmt l
+
 let pp_authors fmt l =
   List.iter (fun t -> Format.fprintf fmt "@[<h>- %a@]@\n" pp_text t) l
 
