@@ -40,4 +40,3 @@ val of_automaton : Promelaast.typed_automaton -> t
 val states : t -> state list
 val init_states : t -> state list
 val edges : t -> edge list
-

@@ -68,4 +68,3 @@ let init_states g =
 
 let edges g =
   fold_edges_e (fun e acc -> e :: acc) g []
-

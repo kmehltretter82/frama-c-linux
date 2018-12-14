@@ -121,8 +121,8 @@ struct
       in
       let initialized' = List.fold_left add_initialized initialized act in
       Aorai_option.debug ~dkey "%a {%a} -> %a {%a}"
-          pretty_state src pretty_set initialized
-          pretty_state dst pretty_set initialized';
+        pretty_state src pretty_set initialized
+        pretty_state dst pretty_set initialized';
       InitializedSet initialized'
 end
 
