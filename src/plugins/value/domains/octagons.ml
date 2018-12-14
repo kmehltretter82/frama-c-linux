@@ -1103,6 +1103,7 @@ module Domain = struct
         (`Value state) octagons
 
     let assign _kinstr left_value expr assigned valuation state =
+      update valuation state >>- fun state ->
       match left_value.lval with
       | Var varinfo, NoOffset when Cil.isArithmeticType varinfo.vtype ->
         assign_variable varinfo expr assigned valuation state
