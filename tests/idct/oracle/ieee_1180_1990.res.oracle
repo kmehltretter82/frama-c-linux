@@ -917,7 +917,7 @@
 [scope:rm_asserts] removing 16 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function IEEE_1180_1990_rand:
-  i ∈ [0..2147483646]
+  i ∈ [0..2147483646],0%2
   j ∈ [0..600]
   x ∈ [0.0000000000000000 .. 600.9999997201375663]
   IEEE_1180_1990_rand_randx ∈ [--..--]

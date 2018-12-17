@@ -244,8 +244,7 @@ let aux_and (b, e) (vv1: offsm_range) (vv2: offsm_range) =
       of inverse sign. extract_bits generate always positive integers, which
       is good. The good solution would be have V.bitwise_and to accept both
       signs simultaneously. *)
-    let f = V.bitwise_and ~signed:false  ~size:(Integer.to_int size) in
-    lift f size vv1 vv2
+    lift V.bitwise_and size vv1 vv2
 
 (* O is neutral for xor, and  v ^ v = 0 *)
 let aux_xor (b, e) (vv1: offsm_range) (vv2: offsm_range) =
@@ -346,7 +345,7 @@ let cast ~old_size ~new_size ~signed o =
 
 let bnot o =
   let aux itv (v, s, rel) o =
-    let v' = V_Or_Uninitialized.map V.bitwise_not v in
+    let v' = V_Or_Uninitialized.map V.bitwise_signed_not v in
     V_Offsetmap.add ~exact:true itv (v', s, rel) o
   in
   V_Offsetmap.fold aux o o

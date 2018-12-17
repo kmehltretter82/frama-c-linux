@@ -135,11 +135,11 @@ module V : sig
   val c_rem: t -> t -> t
   val shift_right: t -> t -> t
   val shift_left: t -> t -> t
-  val bitwise_and: signed:bool -> size:int -> t -> t -> t
+  val bitwise_and: t -> t -> t
   val bitwise_xor: t -> t -> t
   val bitwise_or : t -> t -> t
-  val bitwise_not: t -> t
-  val bitwise_not_size: signed:bool -> size:int -> t -> t
+  val bitwise_signed_not: t -> t
+  val bitwise_not: size:int -> signed:bool -> t -> t
 
   (** [all_values ~size v] returns true iff v contains all integer values
       representable in [size] bits. *)

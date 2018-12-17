@@ -103,35 +103,36 @@ void h4() {
 int* k(int *p);
 
 
-void main(j) {
-  if (j & 1) {
+volatile int j;
+void main() {
+  if (j) {
     f1();
   }
-  if (j & 2) {
+  if (j) {
     f2();
   }
-  if (j & 3) {
+  if (j) {
     f3();
   }
-  if (j & 4) {
+  if (j) {
     f4();
   }
-  if (j & 5) {
+  if (j) {
     g1();
   }
-  if (j & 6) {
+  if (j) {
     g2();
   }
-  if (j & 7) {
+  if (j) {
     g3();
   }
-  if (j & 8) {
+  if (j) {
     h1();
   }
-  if (j & 9) {
+  if (j) {
     h2();
   }
-  if (j & 10) {
+  if (j) {
     h3();
   }
   if (j & 11) {
@@ -143,3 +144,4 @@ void main(j) {
   }
 
 }
+
