@@ -644,6 +644,25 @@ module File = struct
     lastModifiedTime: (string [@default ""]);
     properties: (Properties.t [@default Properties.default]);
   }[@@deriving yojson]
+
+  let create
+    ?(fileLocation = FileLocation.default)
+    ?(parentKey = "")
+    ?(offset = 0)
+    ?(length = 0)
+    ?(roles = [])
+    ?(mimeType = "")
+    ?(contents = FileContent.default)
+    ?(encoding = "")
+    ?(hashes = [])
+    ?(lastModifiedTime = "")
+    ?(properties = Properties.default)
+    ()
+    =
+    {
+      fileLocation; parentKey; offset; length; roles; mimeType; contents;
+      encoding; hashes; lastModifiedTime; properties
+    }
 end
 
 module FileChange = struct

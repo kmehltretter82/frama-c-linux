@@ -50,11 +50,22 @@ let gen_results remarks =
   let _, content = Alarms.fold treat_alarm (0, []) in
   List.rev content
 
+let gen_files () =
+  let add_src_file f =
+    let key = Filename.chop_extension (Filename.basename f) in
+    let fileLocation = FileLocation.create ~uri:(Filepath.normalize f) () in
+    let roles = [ Role.analysisTarget ] in
+    let mimeType = "text/x-csrc" in
+    key, File.create ~fileLocation ~roles ~mimeType ()
+  in
+  List.map add_src_file (Kernel.Files.get ())
+
 let gen_run remarks =
   let tool = frama_c_sarif in
   let invocations = [gen_invocation ()] in
   let results = gen_results remarks in
-  Run.create ~tool ~invocations ~results ()
+  let files = gen_files () in
+  Run.create ~tool ~invocations ~results ~files ()
 
 let generate () =
   let remarks = get_remarks () in
