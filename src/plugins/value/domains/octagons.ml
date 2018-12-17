@@ -132,22 +132,26 @@ type octagon =
    Use Ival.t to evaluate expressions. *)
 module Rewriting = struct
 
-  (* Checks that the interval [ival] fits in the C type [typ].
+  (* Checks that the interval [ival] fits in the C range [range].
      This is used to ensure that an expression cannot overflow: this module
      uses the mathematical semantics of arithmetic operations, and cannot
      soundly translate overflows in the C semantics.  *)
-  let fits_in_type typ ival =
+  let fits_in_range range ival =
+    let min = Eval_typ.range_lower_bound range in
+    let max = Eval_typ.range_upper_bound range in
+    let range = Ival.inject_range (Some min) (Some max) in
+    Ival.is_included ival range
+
+  let may_overflow typ ival =
     let open Eval_typ in
     match classify_as_scalar typ with
     | None -> assert false (* This should not happen here. *)
-    | Some (TSFloat _) -> true
-    | Some (TSInt ir | TSPtr ir) ->
-      (ir.i_signed && Kernel.SignedOverflow.get ()) ||
-      (not ir.i_signed && Kernel.UnsignedOverflow.get ()) ||
-      let min = range_lower_bound ir in
-      let max = range_upper_bound ir in
-      let range = Ival.inject_range (Some min) (Some max) in
-      Ival.is_included ival range
+    | Some (TSFloat _) -> false
+    | Some (TSInt range | TSPtr range) ->
+      not
+        ((range.i_signed && Kernel.SignedOverflow.get ()) ||
+         (not range.i_signed && Kernel.UnsignedOverflow.get ()) ||
+         fits_in_range range ival)
 
   (* Simplified form [±X-coeff] for expressions,
      where X is a variable and coeff an interval. *)
@@ -176,9 +180,9 @@ module Rewriting = struct
     evaluate e2 >> fun v2 ->
     let typ_e1 = Cil.typeOf e1 in
     let result = Arith.apply op typ_e1 v1 v2 in
-    if fits_in_type typ_e1 result && fits_in_type typ result
-    then f typ_e1 v1 v2
-    else []
+    if may_overflow typ_e1 result || may_overflow typ result
+    then []
+    else f typ_e1 v1 v2
 
   (* Rewrites the Cil expression [expr] into the simplified form [±x-coeff],
      where [x] is a non-singleton variable and [coeff] is an interval. The
@@ -200,9 +204,8 @@ module Rewriting = struct
 
     | UnOp (Neg, e, typ) ->
       evaluate e >> fun v ->
-      if fits_in_type typ (Arith.neg v)
-      then List.map neg (rewrite evaluate e)
-      else []
+      if may_overflow typ (Arith.neg v)
+      then [] else List.map neg (rewrite evaluate e)
 
     | BinOp ((PlusA | MinusA as binop), e1, e2, typ) ->
       let op = if binop = PlusA then Add else Sub in
@@ -223,7 +226,7 @@ module Rewriting = struct
     | CastE (typ, e) ->
       if Cil.(isIntegralType typ && isIntegralType (typeOf e)) then
         evaluate e >> fun v ->
-        if fits_in_type typ v then rewrite evaluate e else []
+        if may_overflow typ v then [] else rewrite evaluate e
       else []
 
     | Info (e, _) -> rewrite evaluate e
@@ -295,6 +298,28 @@ module Rewriting = struct
         make_octagons_from_binop typ e1 Sub e2 range
     | _ -> []
 
+  let overflow_alarms typ expr ival =
+    match Eval_typ.classify_as_scalar typ with
+    | Some (Eval_typ.TSInt range) ->
+      let signed = range.Eval_typ.i_signed in
+      let overflow = if signed then Alarms.Signed else Alarms.Unsigned in
+      let max_bound = Eval_typ.range_upper_bound range in
+      let min_bound = Eval_typ.range_lower_bound range in
+      let ival_range = Ival.inject_range (Some min_bound) (Some max_bound) in
+      let aux has_better_bound bound bound_kind alarms =
+        if has_better_bound ival ival_range >= 0
+        then
+          let alarm = Alarms.Overflow (overflow, expr, bound, bound_kind) in
+          Alarmset.set alarm Alarmset.True alarms
+        else alarms
+      in
+      let alarms = Alarmset.all in
+      let alarms =
+        aux Ival.has_greater_min_bound min_bound Alarms.Lower_bound alarms
+      in
+      aux Ival.has_smaller_max_bound max_bound Alarms.Upper_bound alarms
+    | _ -> Alarmset.all
+
   (* Evaluates the Cil expression [expr], by rewriting it into octagonal
      constraints using [evaluate_expr] to evaluate sub-expressions, and
      then using [evaluate_octagon] to evaluate the octagons. *)
@@ -309,12 +334,13 @@ module Rewriting = struct
     let evaluate_octagons octagons =
       List.fold_left evaluate_octagon Ival.top octagons
     in
+    let default = Ival.top, Alarmset.all in
     match expr.enode with
     | BinOp ((PlusA | MinusA as binop), e1, e2, typ) ->
       let op = if binop = PlusA then Add else Sub in
       let octagons = rewrite_binop evaluate_expr e1 op e2 in
       let ival = evaluate_octagons octagons in
-      if Ival.(equal top ival) then ival else
+      if Ival.(equal top ival) then default else
         let typ_e1 = Cil.typeOf e1 in
         let ival2 =
           match evaluate_expr e1, evaluate_expr e2 with
@@ -322,9 +348,9 @@ module Rewriting = struct
           | _, _ -> Ival.top
         in
         let ival = Ival.narrow ival ival2 in
-        if fits_in_type typ ival && fits_in_type typ_e1 ival
-        then ival
-        else Ival.top
+        if may_overflow typ ival || may_overflow typ_e1 ival
+        then default
+        else ival, overflow_alarms typ expr ival
     | BinOp ((Lt | Gt | Le | Ge | Eq as binop), e1, e2, _typ)
       when Cil.isIntegralType (Cil.typeOf e1) ->
       let comp = Value_util.conv_comp binop in
@@ -333,9 +359,10 @@ module Rewriting = struct
       let range = comparison_range comp in
       let octagons = rewrite_binop evaluate_expr e1 Sub e2 in
       let ival = evaluate_octagons octagons in
-      if Ival.is_included ival range then Ival.one
-      else if not (Ival.intersects ival range) then Ival.zero else Ival.top
-    | _ -> Ival.top
+      if Ival.is_included ival range then Ival.one, Alarmset.all
+      else if not (Ival.intersects ival range)
+      then Ival.zero, Alarmset.all else default
+    | _ -> default
 
 end
 
@@ -949,14 +976,14 @@ module Domain = struct
         with Cvalue.V.Not_based_on_null -> `Top
     in
     let evaluate_octagon octagon = Octagons.evaluate octagon state.octagons in
-    let ival =
+    let ival, alarms =
       Rewriting.evaluate_through_octagons evaluate_expr evaluate_octagon expr
     in
     if Ival.(equal ival top)
     then top_value
     else if Ival.is_bottom ival
     then `Bottom, Alarmset.all
-    else `Value (Cvalue.V.inject_ival ival, ()), Alarmset.all
+    else `Value (Cvalue.V.inject_ival ival, ()), alarms
 
   let extract_lval _oracle _t _lval _typ _loc = top_value
 
