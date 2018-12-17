@@ -1593,15 +1593,15 @@ module Make
       let typ = Cil.typeOf expr in
       let eval acc state =
         match fst (evaluate state expr) with
-        | `Bottom -> acc
+        | `Bottom -> (state, `Bottom, false) :: acc
         | `Value (_cache, value) ->
           let zero_or_one = Cvalue.V.cardinal_zero_or_one (get value) in
-          (state, value, zero_or_one) :: acc
+          (state, `Value value, zero_or_one) :: acc
       in
       let eval_states = List.fold_left eval [] states in
       let match_expected_value expected_value states =
         let process_one_state (eq, mess, neq) (s, v, zero_or_one as current) =
-          if Value.is_included expected_value v then
+          if Bottom.is_included Value.is_included expected_value v then
             (* The integer on which we split is part of the result *)
             if zero_or_one then
               (s :: eq, mess, neq) (* Clean split *)
@@ -1613,7 +1613,7 @@ module Make
         List.fold_left process_one_state ([], false, []) states
       in
       let process_one_value (acc, states) i =
-        let value = Value.reduce (Value.inject_int typ i) in
+        let value = `Value (Value.reduce (Value.inject_int typ i)) in
         let eq, mess, neq = match_expected_value value states in
         (i, eq, mess) :: acc, neq
       in
