@@ -680,6 +680,7 @@ let add_global glob = globals_queue := glob :: !globals_queue
 let add_gvar ?init vi =
   let initinfo = {Cil_types.init} in
   vi.vghost <- true;
+  vi.vstorage <- NoStorage;
   add_global (GVar(vi,initinfo,vi.vdecl));
   Globals.Vars.add vi initinfo;
   set_varinfo vi.vname vi
@@ -688,7 +689,19 @@ let add_gvar_zeroinit vi =
   add_gvar ~init:(Cil.makeZeroInit ~loc:(CurrentLoc.get()) vi.vtype) vi
 
 let mk_gvar ?init ~ty name =
-  let vi = Cil.makeGlobalVar name ty in
+  (* See if the variable is already declared *)
+  let vi =
+    try
+      let ty' = typeAddAttributes [Attr ("ghost", [])] ty in
+      let vi = Globals.Vars.find_from_astinfo name VGlobal in
+      if not (Cil_datatype.Typ.equal vi.vtype ty') then
+        Aorai_option.abort "Global %s is declared with type %a instead of %a"
+          name Cil_printer.pp_typ vi.vtype Cil_printer.pp_typ ty';
+      Globals.Vars.remove vi;
+      vi
+    with Not_found ->
+      Cil.makeGlobalVar name ty
+  in
   add_gvar ?init vi
 
 let mk_gvar_scalar ~init ?(ty = Cil.typeOf init) name =

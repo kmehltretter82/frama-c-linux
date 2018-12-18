@@ -42,6 +42,7 @@ skipping share/libc/__fc_machdep_linux_shared.h
 [kernel] Parsing share/libc/__fc_select.h (with preprocessing)
 [kernel] Parsing share/libc/__fc_string_axiomatic.h (with preprocessing)
 [kernel] Parsing share/libc/alloca.h (with preprocessing)
+[kernel] Parsing share/libc/aorai/aorai.h (with preprocessing)
 [kernel] Parsing share/libc/arpa/inet.h (with preprocessing)
 [kernel] Parsing share/libc/assert.h (with preprocessing)
 [kernel] Parsing share/libc/byteswap.h (with preprocessing)

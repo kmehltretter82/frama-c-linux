@@ -191,7 +191,7 @@ THEME_ICONS_FLAT:= \
   $(addprefix share/theme/flat/,$(THEME_ICON_NAMES))
 
 ROOT_LIBC_DIR:= share/libc
-LIBC_SUBDIRS:= sys netinet net arpa
+LIBC_SUBDIRS:= sys netinet net arpa aorai
 LIBC_DIR:= $(ROOT_LIBC_DIR) $(addprefix $(ROOT_LIBC_DIR)/,$(LIBC_SUBDIRS))
 LIBC_FILES:= \
 	$(wildcard share/*.h share/*.c) \
