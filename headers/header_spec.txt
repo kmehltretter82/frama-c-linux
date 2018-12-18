@@ -493,6 +493,8 @@ src/kernel_services/analysis/undefined_sequence.ml: CEA_LGPL
 src/kernel_services/analysis/undefined_sequence.mli: CEA_LGPL
 src/kernel_services/analysis/wto_statement.ml: CEA_LGPL
 src/kernel_services/analysis/wto_statement.mli: CEA_LGPL
+src/kernel_services/ast_building/cil_builder.ml: CEA_LGPL
+src/kernel_services/ast_building/cil_builder.mli: CEA_LGPL
 src/kernel_services/ast_data/README.md: .ignore
 src/kernel_services/ast_data/alarms.ml: CEA_LGPL
 src/kernel_services/ast_data/alarms.mli: CEA_LGPL

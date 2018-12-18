@@ -302,6 +302,7 @@ DISTRIB_FILES:=\
       $(wildcard src/kernel_internals/typing/*.ml*)                     \
       $(wildcard src/kernel_services/ast_data/*.ml*)                    \
       $(wildcard src/kernel_services/ast_queries/*.ml*)                 \
+			$(wildcard src/kernel_services/ast_building/*.ml*)                \
       $(wildcard src/kernel_services/ast_printing/*.ml*)                \
       $(wildcard src/kernel_services/cmdline_parameters/*.ml*)          \
       $(wildcard src/kernel_services/analysis/*.ml*)                    \
@@ -627,7 +628,8 @@ KERNEL_CMO=\
 	src/kernel_services/ast_transformations/filter.cmo                          \
 	src/kernel_services/ast_transformations/inline.cmo              \
 	src/kernel_internals/runtime/special_hooks.cmo                  \
-	src/kernel_internals/runtime/messages.cmo
+	src/kernel_internals/runtime/messages.cmo                       \
+	src/kernel_services/ast_building/cil_builder.cmo                       \
 
 CMO	+= $(KERNEL_CMO)
 
