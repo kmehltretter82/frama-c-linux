@@ -674,46 +674,28 @@ let flush_globals () =
   Kernel_function.clear_sid_info ();
   globals_queue := []
 
-let mk_global glob = globals_queue := glob :: !globals_queue
+let add_global glob = globals_queue := glob :: !globals_queue
 
 (* Utilities for global variables *)
-let mk_global_c_initialized_vars name ty ini=
-  let vi = (Cil.makeGlobalVar name ty) in
-  vi.vghost<-true;
-  mk_global (GVar(vi,ini,vi.vdecl));
-  Globals.Vars.add vi ini;
-  set_varinfo name vi
-
-let mk_global_var_init vi ini =
-  vi.vghost<-true;
-  mk_global (GVar(vi,ini,vi.vdecl));
-  Globals.Vars.add vi ini;
+let add_gvar ?init vi =
+  let initinfo = {Cil_types.init} in
+  vi.vghost <- true;
+  add_global (GVar(vi,initinfo,vi.vdecl));
+  Globals.Vars.add vi initinfo;
   set_varinfo vi.vname vi
 
-let mk_global_var vi =
-  let ini =
-    {Cil_types.init=Some(Cil.makeZeroInit ~loc:(CurrentLoc.get()) vi.vtype)}
-  in
-  mk_global_var_init vi ini
+let add_gvar_zeroinit vi =
+  add_gvar ~init:(Cil.makeZeroInit ~loc:(CurrentLoc.get()) vi.vtype) vi
 
-let mk_global_c_var_init name init =
-  let ty = Cil.typeOf init in
+let mk_gvar ?init ~ty name =
   let vi = Cil.makeGlobalVar name ty in
-  vi.vghost <- true;
-  let ini = { Cil_types.init = Some(SingleInit init) } in
-  mk_global(GVar(vi,ini,vi.vdecl));
-  Globals.Vars.add vi ini;
-  set_varinfo name vi
+  add_gvar ?init vi
 
-let mk_int_const value =
-  new_exp
-    ~loc:(CurrentLoc.get())
-    (Const(
-        CInt64(
-          Integer.of_int (value),
-          IInt,
-          Some(string_of_int(value))
-        )))
+let mk_gvar_scalar ~init ?(ty = Cil.typeOf init) name =
+  mk_gvar ~init:(SingleInit init) ~ty name
+
+let mk_integer value =
+  Cil.integer ~loc:(CurrentLoc.get()) value
 
 (* Utilities for global enumerations *)
 let mk_global_c_enum_type_tagged name elements_l =
@@ -730,14 +712,14 @@ let mk_global_c_enum_type_tagged name elements_l =
       (fun (e,i) ->
          { eiorig_name = e;
            einame = e;
-           eival = mk_int_const i;
+           eival = mk_integer i;
            eiloc = Location.unknown;
            eihost = einfo})
       elements_l
   in
   einfo.eitems <- l;
   set_usedinfo name einfo;
-  mk_global (GEnumTag(einfo, Location.unknown));
+  add_global (GEnumTag(einfo, Location.unknown));
   einfo
 
 let mk_global_c_enum_type name elements =
@@ -747,12 +729,8 @@ let mk_global_c_enum_type name elements =
   (* no need to rev the list, as the elements got their value already *)
   ignore (mk_global_c_enum_type_tagged name elements)
 
-let mk_global_c_initialized_enum name name_enuminfo ini =
-  mk_global_c_initialized_vars name (TEnum(get_usedinfo name_enuminfo,[])) ini
-
-let mk_global_c_enum name name_enuminfo =
-  let init = {Cil_types.init=None} in
-  mk_global_c_initialized_enum name name_enuminfo init
+let mk_gvar_enum ?init name name_enuminfo =
+  mk_gvar ?init ~ty:(TEnum(get_usedinfo name_enuminfo,[])) name
 
 
 (* ************************************************************************* *)
@@ -885,7 +863,7 @@ let is_out_of_state_exp state loc =
 
 (* Utilities for other globals *)
 
-let mk_global_comment txt = mk_global (GText (txt))
+let mk_global_comment txt = add_global (GText (txt))
 
 (* ************************************************************************* *)
 (** {b Initialization management / computation} *)
@@ -905,7 +883,7 @@ let mk_global_states_init root =
        in
        let init = SingleInit init in
        let var = Data_for_aorai.get_state_var state in
-       mk_global_var_init var { Cil_types.init = Some init})
+       add_gvar ~init var)
     states
 
 class visit_decl_loops_init () =
@@ -1126,17 +1104,17 @@ let initGlobals root complete =
     (List.map
        (fun kf -> func_to_op_func (Kernel_function.get_name kf))
        (getObservablesFunctions() @ getIgnoredFunctions()));
-  mk_global_c_enum curOp listOp;
+  mk_gvar_enum curOp listOp;
   mk_global_c_enum_type  listStatus (callStatus::[termStatus]);
-  mk_global_c_enum curOpStatus listStatus;
+  mk_gvar_enum curOpStatus listStatus;
 
   mk_global_comment "//* ";
   mk_global_comment "//* States and Trans Variables";
   if Aorai_option.Deterministic.get () then begin
-    mk_global_c_var_init curState (getInitialState());
+    mk_gvar_scalar ~init:(getInitialState()) curState;
     let init = getInitialState() (* TODO a distinct initial value for history *)
     and history = Data_for_aorai.whole_history () in
-    List.iter (fun name -> mk_global_c_var_init name init) history
+    List.iter (fun name -> mk_gvar_scalar ~init name) history
   end else
     mk_global_states_init root;
 
@@ -1150,14 +1128,14 @@ let initGlobals root complete =
   mk_global_comment "//****************** ";
   mk_global_comment "//* Auxiliary variables used in transition conditions";
   mk_global_comment "//*";
-  List.iter mk_global_var (Data_for_aorai.aux_variables());
+  List.iter add_gvar_zeroinit (Data_for_aorai.aux_variables());
 
   let auto = Data_for_aorai.getAutomata () in
   mk_global_comment "//* ";
   mk_global_comment "//****************** ";
   mk_global_comment "//* Metavariables";
   mk_global_comment "//*";
-  Datatype.String.Map.iter (fun _ -> mk_global_var) auto.metavariables;
+  Datatype.String.Map.iter (fun _ -> add_gvar_zeroinit) auto.metavariables;
 
   if Aorai_option.Deterministic.get () then begin
     (* must flush now previous globals which are used in the lemmas in order to
