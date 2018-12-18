@@ -60,6 +60,7 @@ int status = 0;
     int accept_S3_tmp;
     int accept_S4_tmp;
     int accept_init_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_commit_trans;
     accept_S1_tmp = accept_S1;
@@ -118,6 +119,7 @@ int status = 0;
     int accept_S3_tmp;
     int accept_S4_tmp;
     int accept_init_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_commit_trans;
     accept_S1_tmp = accept_S1;
@@ -199,6 +201,7 @@ int commit_trans(void)
     int accept_S3_tmp;
     int accept_S4_tmp;
     int accept_init_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_init_trans;
     accept_S1_tmp = accept_S1;
@@ -263,6 +266,7 @@ int commit_trans(void)
     int accept_S3_tmp;
     int accept_S4_tmp;
     int accept_init_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_init_trans;
     accept_S1_tmp = accept_S1;
@@ -349,6 +353,7 @@ int init_trans(void)
     int accept_S3_tmp;
     int accept_S4_tmp;
     int accept_init_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
     accept_S1_tmp = accept_S1;
@@ -417,6 +422,7 @@ int init_trans(void)
     int accept_S3_tmp;
     int accept_S4_tmp;
     int accept_init_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;
     accept_S1_tmp = accept_S1;

@@ -33,6 +33,7 @@ int f(void);
    @/
   void main_pre_func(void)
   {
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
     return;
@@ -51,6 +52,7 @@ int f(void);
    @/
   void main_post_func(int res)
   {
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;
     return;

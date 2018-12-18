@@ -63,6 +63,7 @@ int rr = 1;
     int T1_S2_tmp;
     int accept_S3_tmp;
     int accept_all_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_opa;
     T0_S4_tmp = T0_S4;
@@ -126,6 +127,7 @@ int rr = 1;
     int T1_S2_tmp;
     int accept_S3_tmp;
     int accept_all_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_opa;
     T0_S4_tmp = T0_S4;
@@ -228,6 +230,7 @@ void opa(void)
     int T1_S2_tmp;
     int accept_S3_tmp;
     int accept_all_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_opb;
     T0_S4_tmp = T0_S4;
@@ -286,6 +289,7 @@ void opa(void)
     int T1_S2_tmp;
     int accept_S3_tmp;
     int accept_all_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_opb;
     T0_S4_tmp = T0_S4;
@@ -363,6 +367,7 @@ void opb(void)
     int T1_S2_tmp;
     int accept_S3_tmp;
     int accept_all_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
     T0_S4_tmp = T0_S4;
@@ -426,6 +431,7 @@ void opb(void)
     int T1_S2_tmp;
     int accept_S3_tmp;
     int accept_all_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;
     T0_S4_tmp = T0_S4;

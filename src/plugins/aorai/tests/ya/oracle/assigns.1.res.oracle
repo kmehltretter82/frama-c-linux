@@ -60,6 +60,7 @@ int X;
    @/
   void f_pre_func(void)
   {
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_f;
     if (3 == aorai_CurStates) aorai_CurStates = S_in_f;
@@ -96,6 +97,7 @@ int X;
    @/
   void f_post_func(void)
   {
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_f;
     if (2 == aorai_CurStates) aorai_CurStates = in_main;
@@ -145,6 +147,7 @@ void f(void)
    @/
   void main_pre_func(void)
   {
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
     if (0 == aorai_CurStates) aorai_CurStates = Sf;
@@ -181,6 +184,7 @@ void f(void)
    @/
   void main_post_func(int res)
   {
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;
     if (4 == aorai_CurStates) aorai_CurStates = S2;

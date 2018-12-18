@@ -130,6 +130,7 @@ check lemma aorai_intermediate_state_deterministic_trans{L}:
    @/
   void f_pre_func(int x)
   {
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_f;
     if (7 == aorai_CurStates && x == 1) {
@@ -211,6 +212,7 @@ check lemma aorai_intermediate_state_deterministic_trans{L}:
    @/
   void f_post_func(int res)
   {
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_f;
     if (4 == aorai_CurStates && aorai_x_0 == 3) aorai_CurStates = OK;
@@ -343,6 +345,7 @@ int f(int x)
    @/
   void g_pre_func(int y)
   {
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_g;
     if (0 == aorai_CurStates) aorai_CurStates = OK;
@@ -415,6 +418,7 @@ int f(int x)
    @/
   void g_post_func(int res)
   {
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_g;
     if (3 == aorai_CurStates && aorai_y == 2) aorai_CurStates = OK;
@@ -502,6 +506,7 @@ int g(int y)
    @/
   void main_pre_func(void)
   {
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
     if (6 == aorai_CurStates) aorai_CurStates = main_0;
@@ -552,6 +557,7 @@ int g(int y)
    @/
   void main_post_func(int res)
   {
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;
     if (0 == aorai_CurStates) aorai_CurStates = OK;

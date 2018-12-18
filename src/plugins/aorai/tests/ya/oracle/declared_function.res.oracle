@@ -61,6 +61,7 @@ check lemma I_deterministic_trans{L}:
    @/
   void main_pre_func(void)
   {
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
     if (0 == aorai_CurStates) aorai_CurStates = I;
@@ -85,6 +86,7 @@ check lemma I_deterministic_trans{L}:
    @/
   void main_post_func(void)
   {
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;
     if (0 == aorai_CurStates) aorai_CurStates = I;

@@ -97,6 +97,7 @@ int global_argc = 0;
     int T0_init_tmp;
     int T1_tmp;
     int accept_T2_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_count;
     S1_tmp = S1;
@@ -146,6 +147,7 @@ int global_argc = 0;
     int T0_init_tmp;
     int T1_tmp;
     int accept_T2_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_count;
     S1_tmp = S1;
@@ -223,6 +225,7 @@ int count(char *argv)
     int T0_init_tmp;
     int T1_tmp;
     int accept_T2_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_sumOne;
     S1_tmp = S1;
@@ -272,6 +275,7 @@ int count(char *argv)
     int T0_init_tmp;
     int T1_tmp;
     int accept_T2_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_sumOne;
     S1_tmp = S1;
@@ -355,6 +359,7 @@ int sumOne(char *t, int length)
     int T0_init_tmp;
     int T1_tmp;
     int accept_T2_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
     S1_tmp = S1;
@@ -409,6 +414,7 @@ int sumOne(char *t, int length)
     int T0_init_tmp;
     int T1_tmp;
     int accept_T2_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;
     S1_tmp = S1;

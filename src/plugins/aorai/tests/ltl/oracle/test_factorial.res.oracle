@@ -42,6 +42,7 @@ enum aorai_OpStatusList {
     int accept_S1_tmp;
     int accept_S2_tmp;
     int accept_init_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_decode_int;
     accept_S1_tmp = accept_S1;
@@ -89,6 +90,7 @@ enum aorai_OpStatusList {
     int accept_S1_tmp;
     int accept_S2_tmp;
     int accept_init_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_decode_int;
     accept_S1_tmp = accept_S1;
@@ -211,6 +213,7 @@ int decode_int(char *s)
     int accept_S1_tmp;
     int accept_S2_tmp;
     int accept_init_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_factorial;
     accept_S1_tmp = accept_S1;
@@ -259,6 +262,7 @@ int decode_int(char *s)
     int accept_S1_tmp;
     int accept_S2_tmp;
     int accept_init_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_factorial;
     accept_S1_tmp = accept_S1;
@@ -330,6 +334,7 @@ int factorial(int value)
     int accept_S1_tmp;
     int accept_S2_tmp;
     int accept_init_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
     accept_S1_tmp = accept_S1;
@@ -377,6 +382,7 @@ int factorial(int value)
     int accept_S1_tmp;
     int accept_S2_tmp;
     int accept_init_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;
     accept_S1_tmp = accept_S1;

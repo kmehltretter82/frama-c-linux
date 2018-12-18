@@ -84,6 +84,7 @@ enum aorai_OpStatusList {
     int aorai_intermediate_state_1_tmp;
     int aorai_intermediate_state_2_tmp;
     int aorai_intermediate_state_3_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_f;
     S0_tmp = S0;
@@ -164,6 +165,7 @@ enum aorai_OpStatusList {
     int aorai_intermediate_state_1_tmp;
     int aorai_intermediate_state_2_tmp;
     int aorai_intermediate_state_3_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_f;
     S0_tmp = S0;
@@ -274,6 +276,7 @@ void f(void)
     int aorai_intermediate_state_1_tmp;
     int aorai_intermediate_state_2_tmp;
     int aorai_intermediate_state_3_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_g;
     S0_tmp = S0;
@@ -351,6 +354,7 @@ void f(void)
     int aorai_intermediate_state_1_tmp;
     int aorai_intermediate_state_2_tmp;
     int aorai_intermediate_state_3_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_g;
     S0_tmp = S0;
@@ -447,6 +451,7 @@ void g(void)
     int aorai_intermediate_state_1_tmp;
     int aorai_intermediate_state_2_tmp;
     int aorai_intermediate_state_3_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
     S0_tmp = S0;
@@ -525,6 +530,7 @@ void g(void)
     int aorai_intermediate_state_1_tmp;
     int aorai_intermediate_state_2_tmp;
     int aorai_intermediate_state_3_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;
     S0_tmp = S0;

@@ -109,6 +109,7 @@ check lemma e_deterministic_trans{L}:
    @/
   void f_pre_func(int x)
   {
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_f;
     if (1 == aorai_CurStates) {
@@ -161,6 +162,7 @@ check lemma e_deterministic_trans{L}:
    @/
   void f_post_func(void)
   {
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_f;
     if (2 == aorai_CurStates) aorai_CurStates = e;
@@ -227,6 +229,7 @@ void f(int x)
    @/
   void g_pre_func(void)
   {
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_g;
     if (1 == aorai_CurStates) aorai_CurStates = d;
@@ -275,6 +278,7 @@ void f(int x)
    @/
   void g_post_func(void)
   {
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_g;
     if (3 == aorai_CurStates) aorai_CurStates = g_0;
@@ -336,6 +340,7 @@ void g(void)
    @/
   void h_pre_func(int x)
   {
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_h;
     if (4 == aorai_CurStates && aorai_x > 0) aorai_CurStates = f_0;
@@ -384,6 +389,7 @@ void g(void)
    @/
   void h_post_func(void)
   {
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_h;
     if (5 == aorai_CurStates) aorai_CurStates = g_0;
@@ -445,6 +451,7 @@ void h(int x)
    @/
   void i_pre_func(void)
   {
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_i;
     if (6 == aorai_CurStates) aorai_CurStates = h_0;
@@ -504,6 +511,7 @@ void h(int x)
    @/
   void i_post_func(void)
   {
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_i;
     if (7 == aorai_CurStates) {
@@ -574,6 +582,7 @@ void i(void)
    @/
   void main_pre_func(int t)
   {
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
     if (0 == aorai_CurStates) aorai_CurStates = b;
@@ -622,6 +631,7 @@ void i(void)
    @/
   void main_post_func(void)
   {
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;
     if (4 == aorai_CurStates) aorai_CurStates = i_0;

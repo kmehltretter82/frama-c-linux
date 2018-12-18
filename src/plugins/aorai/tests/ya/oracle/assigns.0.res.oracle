@@ -53,6 +53,7 @@ int X;
     int S_in_f_tmp;
     int Sf_tmp;
     int in_main_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_f;
     S1_tmp = S1;
@@ -110,6 +111,7 @@ int X;
     int S_in_f_tmp;
     int Sf_tmp;
     int in_main_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_f;
     S1_tmp = S1;
@@ -182,6 +184,7 @@ void f(void)
     int S_in_f_tmp;
     int Sf_tmp;
     int in_main_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
     S1_tmp = S1;
@@ -239,6 +242,7 @@ void f(void)
     int S_in_f_tmp;
     int Sf_tmp;
     int in_main_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;
     S1_tmp = S1;

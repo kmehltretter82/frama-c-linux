@@ -44,6 +44,7 @@ enum aorai_OpStatusList {
     int T0_S2_tmp;
     int T0_init_tmp;
     int accept_S1_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_countOne;
     T0_S2_tmp = T0_S2;
@@ -81,6 +82,7 @@ enum aorai_OpStatusList {
     int T0_S2_tmp;
     int T0_init_tmp;
     int accept_S1_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_countOne;
     T0_S2_tmp = T0_S2;
@@ -149,6 +151,7 @@ int countOne(char *argv)
     int T0_S2_tmp;
     int T0_init_tmp;
     int accept_S1_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_count;
     T0_S2_tmp = T0_S2;
@@ -191,6 +194,7 @@ int countOne(char *argv)
     int T0_S2_tmp;
     int T0_init_tmp;
     int accept_S1_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_count;
     T0_S2_tmp = T0_S2;
@@ -258,6 +262,7 @@ int count(int argc, char **argv)
     int T0_S2_tmp;
     int T0_init_tmp;
     int accept_S1_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
     T0_S2_tmp = T0_S2;
@@ -305,6 +310,7 @@ int count(int argc, char **argv)
     int T0_S2_tmp;
     int T0_init_tmp;
     int accept_S1_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;
     T0_S2_tmp = T0_S2;

@@ -47,6 +47,7 @@ extern int call_to_an_undefined_function(void);
     int T0_S2_tmp;
     int T0_init_tmp;
     int accept_S1_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_a;
     T0_S2_tmp = T0_S2;
@@ -90,6 +91,7 @@ extern int call_to_an_undefined_function(void);
     int T0_S2_tmp;
     int T0_init_tmp;
     int accept_S1_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_a;
     T0_S2_tmp = T0_S2;
@@ -151,6 +153,7 @@ int a(void)
     int T0_S2_tmp;
     int T0_init_tmp;
     int accept_S1_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_b;
     T0_S2_tmp = T0_S2;
@@ -193,6 +196,7 @@ int a(void)
     int T0_S2_tmp;
     int T0_init_tmp;
     int accept_S1_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_b;
     T0_S2_tmp = T0_S2;
@@ -255,6 +259,7 @@ int b(void)
     int T0_S2_tmp;
     int T0_init_tmp;
     int accept_S1_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
     T0_S2_tmp = T0_S2;
@@ -297,6 +302,7 @@ int b(void)
     int T0_S2_tmp;
     int T0_init_tmp;
     int accept_S1_tmp;
+    /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;
     T0_S2_tmp = T0_S2;

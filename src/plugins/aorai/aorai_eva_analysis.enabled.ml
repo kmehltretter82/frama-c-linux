@@ -23,4 +23,18 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let setup () = ()
+let add_slevel_annotation vi kind =
+  match kind with
+  | Aorai_visitors.Aux_funcs.(Pre _ | Post _) ->
+    let kf = Globals.Functions.get vi in
+    let stmt = Kernel_function.find_first_stmt kf
+    and loc = Kernel_function.get_location kf
+    and emitter = Aorai_option.emitter in
+    Eva.Eva_annotations.(add_slevel_annot ~emitter ~loc stmt SlevelFull)
+  | _ -> ()
+
+let add_slevel_annotations () =
+  Aorai_visitors.Aux_funcs.iter add_slevel_annotation
+
+let setup () =
+  add_slevel_annotations ()
