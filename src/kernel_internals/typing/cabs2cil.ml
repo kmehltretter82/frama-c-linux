@@ -6442,7 +6442,7 @@ and doExp local_env
                  (Cil.isPointerType texpected && Ast_info.is_null_expr a') ||
                  areCompatibleTypes texpected att ||
                  (let texpected_no_qualif =
-                    Cil.typeRemoveAttributesDeep ["const"] texpected
+                    Cil.typeRemoveAttributesDeep ["const"; "restrict"] texpected
                   in
                   areCompatibleTypes texpected_no_qualif att)
                in
