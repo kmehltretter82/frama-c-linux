@@ -2661,7 +2661,7 @@ let extract_sign (v : t) : bit_value =
   | Some l, _ when Int.(ge l zero) -> Off
   | _, _ -> Both
 
-let extract_bit (v : t) (i : int) : bit_value =
+let extract_bit (i : int) (v : t) : bit_value =
   let bit_value x = if Z.testbit x i then On else Off in
   match v with
   | Float _ -> Both
@@ -2695,7 +2695,7 @@ let reduce_sign (v : t) (b : bit_value) : t =
         inject_top l u r modu
     end
 
-let reduce_bit (v : t) (i : int) (b : bit_value) : t =
+let reduce_bit (i : int) (v : t) (b : bit_value) : t =
   let bit_value x = if Z.testbit x i then On else Off in
   if b = Both
   then v
@@ -2727,6 +2727,22 @@ let reduce_bit (v : t) (i : int) (b : bit_value) : t =
       in
       inject_top l' u' r modu
 
+type bit = Sign | Bit of int
+
+let extract_bit = function
+  | Sign -> extract_sign
+  | Bit i -> extract_bit i
+
+let set_bit_on ~size bit =
+  let mask = match bit with
+    | Sign -> Int.(neg (two_power_of_int size))
+    | Bit i -> Int.(two_power_of_int i)
+  in
+  fun v -> Int.logor mask v
+
+let reduce_bit = function
+  | Sign -> reduce_sign
+  | Bit i -> reduce_bit i
 
 (* --- Bit masks --- *)
 
@@ -2788,168 +2804,112 @@ module BitwiseOperator (Op : BitOperator) =
 struct
   include Op
 
-  exception Result_does_not_fit_small_sets
-
-
   let backward (b : bit_value) = function
     | On -> backward_on b
     | Off -> backward_off b
     | Both -> assert false
 
   (* The number of bits on which the result should be significant *)
-  let result_size (v1 : t) (v2 : t)
-      ?(s1 : bit_value = extract_sign v1)
-      ?(s2 : bit_value = extract_sign v2)
-      ()
-    : int option =
+  let result_size (v1 : t) (v2 : t) : int option =
     let n1 = significant_bits v1 and n2 = significant_bits v2 in
-    let n1_greater = 
+    let n1_greater =
       match n1, n2 with
+      | None, _ -> true
       | _, None -> false
-      | Some n1, Some n2 when n1 <= n2 -> false
-      | _ -> true
+      | Some n1, Some n2 -> n1 >= n2
     in
     (* whether n1 or n2 is greater, look if the sign bit oped with anything is
        not constant. If it is constant, then the highest bits are irrelevant. *)
-    if n1_greater then
-      if forward Both s2 = Both then n1 else n2
-    else
-      if forward s1 Both = Both then n2 else n1
+    if n1_greater
+    then if forward Both (extract_sign v2) = Both then n1 else n2
+    else if forward (extract_sign v1) Both = Both then n2 else n1
 
+  exception Do_not_fit_small_sets
 
   (* Try to build a small set.
      It is basically enumerating the possible results, by choosing the possible
-     bits from left to right. This function aborts if we ever exceed the small
+     bits from left to right. This function aborts if it ever exceeds the small
      set size. The algorithm is probably not complete, as it is not always
      possible to reduce the operands leading to a result (without an
      exponential cost)  meaning that sometimes small sets can be obtained but
-     the algorithm will fail to find them.
-  *)
-  let compute_small_set (v1 : t) (v2 : t) (r : Int.t) (modu : Int.t) =
-    let s1 = extract_sign v1 and s2 = extract_sign v2 in
-    match result_size v1 v2 ~s1 ~s2 () with
-    | None -> raise Result_does_not_fit_small_sets
-    | Some n ->
-      let acc = [] in (* List of possible results, with the operands leading
-                         to these results *)
-      let s = forward s1 s2 in
-      (* Either the result is positive *)
-      let acc =
-        if s <> On then
-          let v1 = reduce_sign v1 (backward_off s2)
-          and v2 = reduce_sign v2 (backward_off s1) in
-          (r, v1, v2) :: acc
-        else acc
-      in
-      (* Or negative *)
-      let acc =
-        if s <> Off then
-          let v1 = reduce_sign v1 (backward_on s2)
-          and v2 = reduce_sign v2 (backward_on s1) in
-          (Int.(logor r (neg (two_power_of_int n))), v1, v2) :: acc
-        else
-          acc
-      in
-      let rec step acc i =
-        if List.length acc > !small_cardinal then
-          raise Result_does_not_fit_small_sets;
-        if i < 0 then acc
-        else
-          let mask = Int.(two_power_of_int i) in
-          let set_one_bit acc (r,v1,v2) =
-            let b1 = extract_bit v1 i and b2 = extract_bit v2 i in
-            let b = forward b1 b2 in
-            (* Either the bit is on  *)
-            let acc =
-              if b <> Off then
-                let v1 = reduce_bit v1 i (backward_on b2)
-                and v2 = reduce_bit v2 i (backward_on b1) in
-                (Int.logor mask r, v1, v2) :: acc
-              else acc
-            in
-            (* Or off *)
-            let acc =
-              if b <> On then
-                let v1 = reduce_bit v1 i (backward_off b2)
-                and v2 = reduce_bit v2 i (backward_off b1) in
-                (r, v1, v2) :: acc
-              else acc
-            in
-            acc
-          in
-          if mask < modu
-          then acc
-          else step (List.fold_left set_one_bit [] acc) (i-1)
-      in
-      let acc = step acc (n-1) in
-      let o = List.fold_left (fun o (r,_,_) -> O.add r o) O.empty acc in
-      share_set o (O.cardinal o)
+     the algorithm will fail to find them. *)
+  let compute_small_set ~size (v1 : t) (v2 : t) (r : Int.t) (modu : Int.t) =
+    let set_bit i acc (r, v1, v2) =
+      let b1 = extract_bit i v1
+      and b2 = extract_bit i v2 in
+      match forward b1 b2 with
+      | On -> (set_bit_on ~size i r, v1, v2) :: acc
+      | Off -> (r, v1, v2) :: acc
+      | Both ->
+        let v1_off = reduce_bit i v1 (backward_off b2)
+        and v2_off = reduce_bit i v2 (backward_off b1) in
+        let v1_on = reduce_bit i v1 (backward_on b2)
+        and v2_on = reduce_bit i v2 (backward_on b1) in
+        (set_bit_on ~size i r, v1_on, v2_on) :: (r, v1_off, v2_off) :: acc
+    in
+    let acc = ref (set_bit Sign [] (r, v1, v2)) in
+    for i = size - 1 downto Z.numbits modu - 1 do
+      acc := List.fold_left (set_bit (Bit i)) [] !acc;
+      if List.length !acc > !small_cardinal then raise Do_not_fit_small_sets
+    done;
+    let o = List.fold_left (fun o (r,_,_) -> O.add r o) O.empty !acc in
+    share_set o (O.cardinal o)
 
   (* If lower is true (resp. false), compute the lower (resp. upper) bound of
-     the result interval when applying op to v1 and v2.
-     We iterate from left to right. We keep track of an ival for each operand
-     such that, by applying the operator on the two ivals, we can find the
-     actual bound of the operation.
-     This function should be exact  when the operands are small sets or tops
+     the result interval when applying the bitwise operator to [v1] and [v2].
+     [size] is the number of bits of the result.
+     This function should be exact when the operands are small sets or tops
      with modulo 1. Otherwise, it is an overapproximation of the bound. *)
-  let compute_bound (v1 : t) (v2 : t) (lower : bool) =
-    (* What is the sign of the result *)
-    let s1 = extract_sign v1 and s2 = extract_sign v2 in
-    let s,s1,v1,s2,v2 =
-      match forward s1 s2 with 
-      | (On | Off) as s -> s,s1,v1,s2,v2 (* constant sign *)
-      | Both -> (* choose the best sign *)
-        let s = if lower then On else Off in
-        let s1 = backward s2 s and s2 = backward s1 s in
-        let v1 = reduce_sign v1 s1 and v2 = reduce_sign v2 s2 in
-        s,s1,v1,s2,v2
+  let compute_bound ~size v1 v2 lower =
+    (* Sets the [i]-nth bit of the currently computed bound [r] of [v1 op v2].
+       If possible, reduces [v1] and [v2] accordingly. *)
+    let set_bit i (r, v1, v2) =
+      let b1 = extract_bit i v1
+      and b2 = extract_bit i v2 in
+      let b, v1, v2 =
+        match forward b1 b2 with
+        | On | Off as b -> b, v1, v2 (* Constant bit, no reduction. *)
+        | Both ->
+          (* Choose the best bit for the searched bound, and reduces [v1] and
+             [v2] accordingly. *)
+          let b = match i with
+            | Sign -> if lower then On else Off
+            | Bit _ -> if lower then Off else On
+          in
+          let v1 = reduce_bit i v1 (backward b2 b)
+          and v2 = reduce_bit i v2 (backward b1 b) in
+          b, v1, v2
+      in
+      (* Only sets 1 bit, as [r] is 0 at the beginning. *)
+      let r = if b = On then set_bit_on ~size i r else r in
+      r, v1, v2
     in
-    (* Is the result bounded ? *)
-    match result_size v1 v2 ~s1 ~s2 () with
-    | None ->
-      (* Unbounded result *)
-      if lower && s = Off then Some Int.zero
-      else if not lower && s = On then Some Int.minus_one else None
-    | Some n ->
-      (* The result is bounded: iterate from the rightmost significant bit *)
-      let rec step r v1 v2 i =
-        if i < 0 then r
-        else
-          let mask = Int.(two_power_of_int i) in
-          let b1 = extract_bit v1 i and b2 = extract_bit v2 i in
-          let b, v1, v2 = match forward b1 b2 with
-          | (On | Off) as b -> b,v1,v2 (* constant bit *)
-          | Both -> (* choose the best bit *)
-            let b = if lower then Off else On in
-            let b1 = backward b2 b and b2 = backward b1 b in
-            let v1 = reduce_bit v1 i b1 and v2 = reduce_bit v2 i b2 in
-             b, v1, v2
-          in
-          let r = match b with
-            | On -> Int.logor mask r
-            | Off -> r
-            | Both -> assert false
-          in
-          step r v1 v2 (i-1)
-      in
-      let r = match s with
-        | On -> Int.(neg (two_power_of_int n))
-        | Off -> Int.zero
-        | Both -> assert false
-      in
-      Some (step r v1 v2 (n - 1))
+    (* The result is 0 at the beginning, and [set_bit] turns on the 1 bits. *)
+    let r = ref (Int.zero, v1, v2) in
+    (* Sets the sign bit, and then the bits from size to 0. *)
+    r := set_bit Sign !r;
+    for i = (size - 1) downto 0 do
+      r := set_bit (Bit i) !r;
+    done;
+    let bound, _v1, _v2 = !r in
+    bound
 
   let bitwise_forward (v1 : t) (v2 : t) : t =
     try
       let mask1 = low_bit_mask v1
       and mask2 = low_bit_mask v2 in
       let r, modu = mask_to_r_modu (combine_masks forward mask1 mask2) in
-      try
-        compute_small_set v1 v2 r modu
-      with Result_does_not_fit_small_sets ->
-        let min = compute_bound v1 v2 true
-        and max = compute_bound v1 v2 false in
-        inject_interval min max r modu
+      match result_size v1 v2 with
+      | None ->
+        (* We could do better here, as one of the bound may be finite. However,
+           this case should occur rarely or not at all. *)
+        inject_interval None None r modu
+      | Some size ->
+        try compute_small_set ~size v1 v2 r modu
+        with Do_not_fit_small_sets ->
+          let min = compute_bound ~size v1 v2 true
+          and max = compute_bound ~size v1 v2 false in
+          inject_interval (Some min) (Some max) r modu
     with Error_Bottom -> bottom
 end
 
