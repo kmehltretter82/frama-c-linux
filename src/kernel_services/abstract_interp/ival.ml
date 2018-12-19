@@ -2748,11 +2748,10 @@ let reduce_bit = function
 
 module BitwiseOperator (Op : BitOperator) =
 struct
-  include Op
 
   let backward (b : bit_value) = function
-    | On -> backward_on b
-    | Off -> backward_off b
+    | On -> Op.backward_on b
+    | Off -> Op.backward_off b
     | Both -> assert false
 
   (** Bit masks are composed of an array of significant bit values where index 0
@@ -2809,8 +2808,8 @@ struct
     (* whether n1 or n2 is greater, look if the sign bit oped with anything is
        not constant. If it is constant, then the highest bits are irrelevant. *)
     if n1_greater
-    then if forward Both (extract_sign v2) = Both then n1 else n2
-    else if forward (extract_sign v1) Both = Both then n2 else n1
+    then if Op.forward Both (extract_sign v2) = Both then n1 else n2
+    else if Op.forward (extract_sign v1) Both = Both then n2 else n1
 
   exception Do_not_fit_small_sets
 
@@ -2825,14 +2824,14 @@ struct
     let set_bit i acc (r, v1, v2) =
       let b1 = extract_bit i v1
       and b2 = extract_bit i v2 in
-      match forward b1 b2 with
+      match Op.forward b1 b2 with
       | On -> (set_bit_on ~size i r, v1, v2) :: acc
       | Off -> (r, v1, v2) :: acc
       | Both ->
-        let v1_off = reduce_bit i v1 (backward_off b2)
-        and v2_off = reduce_bit i v2 (backward_off b1) in
-        let v1_on = reduce_bit i v1 (backward_on b2)
-        and v2_on = reduce_bit i v2 (backward_on b1) in
+        let v1_off = reduce_bit i v1 (Op.backward_off b2)
+        and v2_off = reduce_bit i v2 (Op.backward_off b1) in
+        let v1_on = reduce_bit i v1 (Op.backward_on b2)
+        and v2_on = reduce_bit i v2 (Op.backward_on b1) in
         (set_bit_on ~size i r, v1_on, v2_on) :: (r, v1_off, v2_off) :: acc
     in
     let acc = ref (set_bit Sign [] (r, v1, v2)) in
@@ -2855,7 +2854,7 @@ struct
       let b1 = extract_bit i v1
       and b2 = extract_bit i v2 in
       let b, v1, v2 =
-        match forward b1 b2 with
+        match Op.forward b1 b2 with
         | On | Off as b -> b, v1, v2 (* Constant bit, no reduction. *)
         | Both ->
           (* Choose the best bit for the searched bound, and reduces [v1] and
