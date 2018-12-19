@@ -804,11 +804,9 @@ let array_filter (f : Int.t -> bool) (a : Int.t array) : t =
   done;
   array_truncate r !j
 
-exception Empty
-
 let array_map_reduce (f : 'a -> 'b) (g : 'b -> 'b -> 'b) (set : 'a array) : 'b =
   if Array.length set <= 0 then
-    raise Empty
+    raise Error_Bottom
   else
     let acc = ref (f set.(0)) in
     for i = 1 to Array.length set - 1 do
@@ -2570,8 +2568,6 @@ end
 
 (* --- Bit operators --- *)
 
-exception NoBackward
-
 module type BitOperator =
 sig
   (* Printable version of the operator *)
@@ -2609,7 +2605,7 @@ struct
     | On -> Off
 
   let backward_on = function
-    | Off -> raise NoBackward
+    | Off -> assert false
     | (On | Both) -> On
 end
 
@@ -2624,7 +2620,7 @@ struct
     | Both -> if v2 = On then On else Both
 
   let backward_off = function
-    | On -> raise NoBackward
+    | On -> assert false
     | (Off | Both) -> Off
 
   let backward_on = function
