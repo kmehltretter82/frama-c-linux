@@ -795,7 +795,7 @@ let array_filter (f : Int.t -> bool) (a : Int.t array) : t =
   let l = Array.length a in
   let r = Array.make l Int.zero in
   let j = ref 0 in
-  for i = 0 to Array.length a  - 1 do
+  for i = 0 to l  - 1 do
     let x = a.(i) in
     if f x then begin
       r.(!j) <- x;
@@ -2574,7 +2574,7 @@ exception NoBackward
 
 module type BitOperator =
 sig
-  (** Printable version of the operator *)
+  (* Printable version of the operator *)
   val representation : string
   (* forward is given here as the lifted function of some bit operator op
      where op
@@ -2586,12 +2586,11 @@ sig
         we don't know unless one of the operands is negative;
      3. is not constant, otherwise nothing of all of this makes sense.
      forward is defined as
-     forward b1 b2 = { x1 op x2 | x1 \in b1, x2 \in b2 }
-  *)
+     forward b1 b2 = { x1 op x2 | x1 \in b1, x2 \in b2 } *)
   val forward : bit_value -> bit_value -> bit_value
-  (** backward_off b = { x | \exist y \in b . x op y = y op x = 1 } *)
+  (* backward_off b = { x | \exist y \in b . x op y = y op x = 1 } *)
   val backward_off : bit_value -> bit_value
-  (** backward_on b = { x | \exist y \in b . x op y = y op x = 0 } *)
+  (* backward_on b = { x | \exist y \in b . x op y = y op x = 0 } *)
   val backward_on : bit_value -> bit_value
 end
 
@@ -2651,34 +2650,10 @@ end
 
 (* --- Bit extraction and mutation --- *)
 
-module Int =
-struct
-  include Integer
-
-  let significant_bits (i : t) : int =
-    (* shift right until nothing changes *)
-    let rec count i acc =
-      let new_i = shift_right i one in
-      if equal i new_i
-      then acc
-      else count new_i (acc + 1)
-    in
-    count i 0
-
-  let biggest_power_of_two_divider (i : t) : int =
-    let rec aux p acc =
-      if equal (logand i p) zero
-      then aux (shift_left p one) (acc + 1)
-      else acc
-    in
-    aux Int.one 0
-end
-
 let significant_bits (v : t) : int option =
   match min_and_max v with
   | None, _ | _, None -> None
-  | Some l, Some u ->
-    Some (max (Int.significant_bits l) (Int.significant_bits u))
+  | Some l, Some u -> Some (max (Z.numbits l) (Z.numbits u))
 
 let extract_sign (v : t) : bit_value =
   match min_and_max v with
@@ -2687,18 +2662,14 @@ let extract_sign (v : t) : bit_value =
   | _, _ -> Both
 
 let extract_bit (v : t) (i : int) : bit_value =
-  let power = Int.(two_power_of_int i) in
-  let bit_value x =
-    if Int.(is_zero (logand power x)) then Off else On
-  in
+  let bit_value x = if Z.testbit x i then On else Off in
   match v with
   | Float _ -> Both
-  | Set s ->
-    array_map_reduce bit_value Bit.union s
+  | Set s -> array_map_reduce bit_value Bit.union s
   | Top (None, _, _r, _m) | Top (_, None, _r, _m) -> Both
   | Top (Some l, Some u, _r, _m) ->
     (* It does not take modulo into account *)
-    if Int.(ge (sub u power)) l (* u - l >= mask *)
+    if Int.(ge (sub u l) (two_power_of_int i)) (* u - l >= mask *)
     then Both
     else Bit.union (bit_value l) (bit_value u)
 
@@ -2725,24 +2696,21 @@ let reduce_sign (v : t) (b : bit_value) : t =
     end
 
 let reduce_bit (v : t) (i : int) (b : bit_value) : t =
-  let power = Int.(two_power_of_int i) in (* 001000 *)
-  let mask = Int.(pred (two_power_of_int (i+1))) in (* 001111 *)
-  let bit_value (x : Int.t) =
-    if Int.(is_zero (logand power x)) then Off else On
-  in
+  let bit_value x = if Z.testbit x i then On else Off in
   if b = Both
   then v
   else match v with
     | Float _ -> v
-    | Set s ->
-      array_filter (fun x -> bit_value x = b) s
+    | Set s -> array_filter (fun x -> bit_value x = b) s
     | Top (l, u, r, modu) ->
+      let power = Int.(two_power_of_int i) in (* 001000 *)
+      let mask = Int.(pred (two_power_of_int (i+1))) in (* 001111 *)
       (* Reduce bounds to the nearest satisfying bound *)
       let l' = match l with
         | Some l when bit_value l <> b ->
           let min = match b with
             | On ->  Int.(logor (logand l (lognot mask)) power) (* ll1000 *)
-            | Off -> Int.(succ (logor l mask)) (* ll0000 *)
+            | Off -> Int.(succ (logor l mask)) (* ll1111 + 1 *)
             | Both -> assert false
           in
           Some (Int.round_up_to_r ~min ~r ~modu)
@@ -2750,8 +2718,8 @@ let reduce_bit (v : t) (i : int) (b : bit_value) : t =
       and u' = match u with
         | Some u when bit_value u <> b ->
           let max = match b with
-            | On ->  Int.(pred (logand u (lognot mask))) (* ll1111 *)
-            | Off -> Int.(logand (logor u mask) (lognot power)) (* ll0111 *)
+            | On ->  Int.(pred (logand u (lognot mask))) (* uu0000 - 1 *)
+            | Off -> Int.(logand (logor u mask) (lognot power)) (* uu0111 *)
             | Both -> assert false
           in
           Some (Int.round_down_to_r ~max ~r ~modu)
@@ -2768,14 +2736,8 @@ let reduce_bit (v : t) (i : int) (b : bit_value) : t =
 type bit_mask = bit_value array * bit_value
 
 let int_to_bit_array n (x : Int.t) =
-  let a = Array.make n On in
-  let p = ref Int.one in
-  for i = 0 to n-1 do
-    if Int.(equal (logand x !p) zero) then
-      a.(i) <- Off;
-    p := Int.(shift_left !p one)
-  done;
-  a
+  let make i = if Z.testbit x i then On else Off in
+  Array.init n make
 
 (** Compute a mask only precise for low bits, overapproximating the high ones.
     More precisely, bit values are computed until an uncertainty appears
@@ -2784,27 +2746,23 @@ let low_bit_mask (v : t) =
   match v with
   | Set [| |] -> raise Error_Bottom
   | Set [| x |] -> (* singleton : build a full mask  *)
-    let n = Int.significant_bits x in
+    let n = Z.numbits x in
     int_to_bit_array n x, if Int.(ge x zero) then Off else On
   | _ ->
     let _,_,r,modu = min_max_r_mod v in (* requires cardinal > 1 *)
     (* Find how much modu can be divided by two *)
-    let n = Int.biggest_power_of_two_divider modu in
-    (* Recompute rest *)
-    let r = Int.(logand (sub (two_power_of_int n) one) r) in
+    let n = Z.trailing_zeros modu in
     int_to_bit_array n r, Both
 
 let combine_masks (op : bit_value -> bit_value -> bit_value)
     (b1,s1 : bit_mask) (b2,s2 : bit_mask) : bit_mask =
   let n = max (Array.length b1) (Array.length b2) in
-  let r = Array.make n Both in
-  for i = 0 to n-1 do
+  let make i =
     let b1 = try b1.(i) with _ -> s1
-    and b2 = try b2.(i) with _ -> s2
-    in
-    r.(i) <- op b1 b2
-  done;
-  r, op s1 s2
+    and b2 = try b2.(i) with _ -> s2 in
+    op b1 b2
+  in
+  Array.init n make, op s1 s2
 
 let mask_to_r_modu (b,_s : bit_mask) : Int.t * Int.t =
   let n = Array.length b in
