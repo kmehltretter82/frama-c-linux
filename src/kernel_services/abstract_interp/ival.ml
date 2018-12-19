@@ -2908,7 +2908,8 @@ struct
     match result_size v1 v2 ~s1 ~s2 () with
     | None ->
       (* Unbounded result *)
-      None
+      if lower && s = Off then Some Int.zero
+      else if not lower && s = On then Some Int.minus_one else None
     | Some n ->
       (* The result is bounded: iterate from the rightmost significant bit *)
       let rec step r v1 v2 i =
