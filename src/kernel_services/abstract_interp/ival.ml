@@ -2744,60 +2744,6 @@ let reduce_bit = function
   | Sign -> reduce_sign
   | Bit i -> reduce_bit i
 
-(* --- Bit masks --- *)
-
-(** bit masks are composed of an array of significant bit values where index 0
-    represents the lowest bit, and a single bit_value to represent the possible
-    leading bits. *)
-type bit_mask = bit_value array * bit_value
-
-let int_to_bit_array n (x : Int.t) =
-  let make i = if Z.testbit x i then On else Off in
-  Array.init n make
-
-(** Compute a mask only precise for low bits, overapproximating the high ones.
-    More precisely, bit values are computed until an uncertainty appears
-    in the mask *)
-let low_bit_mask (v : t) =
-  match v with
-  | Set [| |] -> raise Error_Bottom
-  | Set [| x |] -> (* singleton : build a full mask  *)
-    let n = Z.numbits x in
-    int_to_bit_array n x, if Int.(ge x zero) then Off else On
-  | _ ->
-    let _,_,r,modu = min_max_r_mod v in (* requires cardinal > 1 *)
-    (* Find how much modu can be divided by two *)
-    let n = Z.trailing_zeros modu in
-    int_to_bit_array n r, Both
-
-let combine_masks (op : bit_value -> bit_value -> bit_value)
-    (b1,s1 : bit_mask) (b2,s2 : bit_mask) : bit_mask =
-  let n = max (Array.length b1) (Array.length b2) in
-  let make i =
-    let b1 = try b1.(i) with _ -> s1
-    and b2 = try b2.(i) with _ -> s2 in
-    op b1 b2
-  in
-  Array.init n make, op s1 s2
-
-let mask_to_r_modu (b,_s : bit_mask) : Int.t * Int.t =
-  let n = Array.length b in
-  let r = ref Int.zero (* current rest *)
-  and p = ref Int.one (* current bit *) in
-  begin try
-      for i = 0 to n-1 do
-        begin match b.(i) with
-        | On -> r := Int.(logor !r !p)
-        | Off -> ()
-        | Both -> raise Exit
-        end;
-        p := Int.(shift_left !p one)
-      done;
-    with Exit -> ()
-  end;
-  !r, !p
-
-
 (* --- Bitwise binary operators --- *)
 
 module BitwiseOperator (Op : BitOperator) =
@@ -2808,6 +2754,48 @@ struct
     | On -> backward_on b
     | Off -> backward_off b
     | Both -> assert false
+
+  (** Bit masks are composed of an array of significant bit values where index 0
+      represents the lowest bit, and a single bit_value to represent the
+      possible leading bits. *)
+  type bit_mask = bit_value array * bit_value
+
+  (* Converts an integer [x] into a bit array of size [n]. *)
+  let int_to_bit_array n (x : Int.t) =
+    let make i = if Z.testbit x i then On else Off in
+    Array.init n make
+
+  (* Computes a bit_mask for the lowest bits of an ival, using the modulo
+     information for non singleton values. *)
+  let low_bit_mask : t -> bit_mask = function
+    | Set [| |] -> raise Error_Bottom
+    | Set [| x |] -> (* singleton : build a full mask  *)
+      let n = Z.numbits x in
+      int_to_bit_array n x, if Int.(ge x zero) then Off else On
+    | v ->
+      let _,_,r,modu = min_max_r_mod v in (* requires cardinal > 1 *)
+      (* Find how much [modu] can be divided by two. *)
+      let n = Z.trailing_zeros modu in
+      int_to_bit_array n r, Both
+
+  (* Computes a remainder and modulo for the result of [v1 op v2]. *)
+  let compute_modulo v1 v2 =
+    let b1, s1 = low_bit_mask v1
+    and b2, s2 = low_bit_mask v2 in
+    let size = max (Array.length b1) (Array.length b2) in
+    (* Sets the [i] nth bits of [rem] until an uncertainty appears. *)
+    let rec step i rem =
+      let b1 = try b1.(i) with _ -> s1
+      and b2 = try b2.(i) with _ -> s2 in
+      let b = Op.forward b1 b2 in
+      if i >= size || b = Both
+      then rem, Int.two_power_of_int i
+      else
+        (* [rem] starts at 0, so we only need to turn on the 1 bits. *)
+        let rem = if b = On then set_bit_on ~size (Bit i) rem else rem in
+        step (i+1) rem
+    in
+    step 0 Int.zero
 
   (* The number of bits on which the result should be significant *)
   let result_size (v1 : t) (v2 : t) : int option =
@@ -2896,9 +2884,7 @@ struct
 
   let bitwise_forward (v1 : t) (v2 : t) : t =
     try
-      let mask1 = low_bit_mask v1
-      and mask2 = low_bit_mask v2 in
-      let r, modu = mask_to_r_modu (combine_masks forward mask1 mask2) in
+      let r, modu = compute_modulo v1 v2 in
       match result_size v1 v2 with
       | None ->
         (* We could do better here, as one of the bound may be finite. However,
