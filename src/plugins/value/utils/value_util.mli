@@ -115,7 +115,7 @@ val height_lval: lval -> int
 
 val skip_specifications: kernel_function -> bool
 (** Should we skip the specifications of this function, according to
-    [-val-skip-stdlib-specs] *)
+    [-eva-skip-stdlib-specs] *)
 
 (*
 Local Variables:

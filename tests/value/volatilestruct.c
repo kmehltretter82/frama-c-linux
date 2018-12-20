@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-then -no-warn-signed-overflow -no-val-warn-pointer-subtraction"
+   STDOPT: +"-then -no-warn-signed-overflow -eva-no-warn-pointer-subtraction"
 */
 
 struct ss {

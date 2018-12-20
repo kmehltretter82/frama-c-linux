@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -load-script tests/misc/bts1347.ml -val-show-progress -then -report
+   OPT: -load-script tests/misc/bts1347.ml -eva-show-progress -then -report
 */
 
 int f(int *x) { return *x; }

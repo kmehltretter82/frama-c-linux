@@ -1,10 +1,10 @@
 /* run.config
-   OPT: -load-script tests/scope/zones.ml -val -val-show-progress -journal-disable
+   OPT: -load-script tests/scope/zones.ml -eva -eva-show-progress -journal-disable
 */
 
 
 
-/* bin/viewer.opt -val tests/scope/zones.c */
+/* bin/viewer.opt -eva tests/scope/zones.c */
 
 int T [10];
 struct Tstr { int a; int b; } S;

@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -load-script tests/libc/check_libc_naming_conventions.ml -print -cpp-extra-args='-nostdinc -Ishare/libc' -metrics -metrics-libc -load-script tests/libc/check_const.ml -load-module metrics -val @VALUECONFIG@ -then -lib-entry -no-print -metrics-no-libc
+   OPT: -load-script tests/libc/check_libc_naming_conventions.ml -print -cpp-extra-args='-nostdinc -Ishare/libc' -metrics -metrics-libc -load-script tests/libc/check_const.ml -load-module metrics -eva @VALUECONFIG@ -then -lib-entry -no-print -metrics-no-libc
    OPT: -print -print-libc
    OPT: -load-script tests/libc/check_parsing_individual_headers.ml
    CMD: ./tests/libc/check_full_libc.sh

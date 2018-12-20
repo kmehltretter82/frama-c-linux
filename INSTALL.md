@@ -240,8 +240,8 @@ Arch Linux: `yaourt -S frama-c`
 
 6. Optionally, test your installation by running:
 
-        frama-c -val tests/misc/CruiseControl*.c
-        frama-c-gui -val tests/misc/CruiseControl*.c # if frama-c-gui is available
+        frama-c -eva tests/misc/CruiseControl*.c
+        frama-c-gui -eva tests/misc/CruiseControl*.c # if frama-c-gui is available
 
 ### Full Compilation Guide
 
@@ -313,8 +313,8 @@ This step is optional.
 
 Test your installation by running:
 
-    frama-c -val tests/misc/CruiseControl*.c
-    frama-c-gui -val tests/misc/CruiseControl*.c (if frama-c-gui is available)
+    frama-c -eva tests/misc/CruiseControl*.c
+    frama-c-gui -eva tests/misc/CruiseControl*.c (if frama-c-gui is available)
 
 
 
