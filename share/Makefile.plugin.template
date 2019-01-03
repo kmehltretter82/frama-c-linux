@@ -268,6 +268,12 @@ endif
 
 ifneq ($(PLUGIN_DISTRIBUTED),no)
 PLUGIN_DISTRIBUTED_LIST += $(PLUGIN_SRC)
+ifeq ($(ENABLE_GUI),no)
+# Also include GUI files to be distributed, even if not currently used
+PLUGIN_DISTRIBUTED_LIST += \
+  $(patsubst %,$(PLUGIN_DIR)/%.ml*,$(PLUGIN_GUI_CMO)) \
+  $(patsubst %,$(PLUGIN_DIR)/%.mli,$(PLUGIN_GUI_CMI))
+endif
 
 # VP: this needs to be adapted for external plugins.
 ifeq ($(PLUGIN_HAS_EXT_DOC),yes)
