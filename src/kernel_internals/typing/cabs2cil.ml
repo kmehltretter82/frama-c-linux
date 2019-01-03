@@ -1424,7 +1424,7 @@ struct
   let empty_stmts l =
     let rec is_empty_stmt s =
       match s.skind with
-      | Instr (Skip _) -> s.labels = []
+      | Instr (Skip _) -> s.labels = [] && s.sattr = []
       | Block b -> b.battrs = [] && List.for_all is_empty_stmt b.bstmts
       | UnspecifiedSequence seq ->
         List.for_all is_empty_stmt (List.map (fun (x,_,_,_,_) -> x) seq)

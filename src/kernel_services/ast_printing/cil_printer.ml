@@ -495,7 +495,7 @@ class cil_printer () = object (self)
   method private current_stmt =
     try Some (Stack.top current_stmt) with Stack.Empty -> None
 
-  method private may_be_skipped s = s.labels = []
+  method private may_be_skipped s = s.labels = [] && s.sattr = []
 
   method location fmt loc =
     Format.fprintf fmt "%a" Filepath.pp_pos (fst loc)
@@ -1058,7 +1058,7 @@ class cil_printer () = object (self)
     pp_open_hvbox fmt 0;
     self#stmt_labels fmt s;
     (* print the statement. *)
-    if Cil.is_skip s.skind && not s.ghost then begin
+    if Cil.is_skip s.skind && not s.ghost && s.sattr = [] then begin
       if verbose || s.labels <> [] then fprintf fmt ";"
     end else begin
       let was_ghost = is_ghost in
