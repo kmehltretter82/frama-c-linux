@@ -280,7 +280,7 @@ let selector (popup_factory:GMenu.menu GMenu.factory)
              ~button localizable =
   if button = 3 then begin
     let submenu = popup_factory#add_submenu "Studia" in
-    let _submenu_factory = new GMenu.factory submenu in
+    let submenu_factory = new GMenu.factory submenu in
     let arg = match (Pretty_source.kf_of_localizable localizable,
                      Pretty_source.ki_of_localizable localizable)
       with
@@ -294,12 +294,10 @@ let selector (popup_factory:GMenu.menu GMenu.factory)
     in
     add_menu_item "Writes" (callback `Writes);
     add_menu_item "Reads" (callback `Reads);
-    (*GTK3: no add_separator *)
-    (* ignore (submenu_factory#add_separator ());*)
+    ignore (submenu_factory#add_separator ());
     add_item main_ui ~uses_value:false submenu "Reset All" (Some())
       (fun _ -> reset () ; main_ui#rehighlight ());
-    (*GTK3: no add_separator *)
-    (* ignore (submenu_factory#add_separator ()); *)
+    ignore (submenu_factory#add_separator ());
     add_item main_ui ~uses_value:false submenu
       "Help" (Some()) (fun _ -> help main_ui) ;
   end

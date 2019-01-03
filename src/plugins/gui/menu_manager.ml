@@ -213,10 +213,7 @@ class menu_manager ?packing ~host:(_:Gtk_helper.host) =
                 (fun () -> b#set_active (active ())) :: set_active_states;
               BToggle b
         in
-        (*GTK3: set_tooltip does not exist anymore. *)
-        (*(bt_type_as_skel b)#set_tooltip (GData.tooltips ()) tooltip "";*)
         (bt_type_as_skel b)#misc#set_tooltip_text tooltip;
-        (*/GTK3*)
         toolbar_buttons <- (b, sensitive) :: toolbar_buttons;
         b
       in
@@ -241,10 +238,9 @@ class menu_manager ?packing ~host:(_:Gtk_helper.host) =
         lazy (fst !!aux), lazy (snd !!aux)
       in
       let add_menu_separator =
-        fun () -> ()
-         (*GTK3: no GMenu.separator_item *)
-         (*if !menu_pos > 0 || (!menu_pos = -1 && container#children <> []) then
-            ignore (GMenu.separator_item ~packing:container_packing ()) *)
+        fun () ->
+          if !menu_pos > 0 || (!menu_pos = -1 && container#children <> []) then
+            ignore (GMenu.separator_item ~packing:container_packing ())
       in
       let add_item_menu stock_opt label callback sensitive =
         let item = match stock_opt, callback with
@@ -253,15 +249,10 @@ class menu_manager ?packing ~host:(_:Gtk_helper.host) =
               ignore (mi#connect#activate callback);
               MStandard mi
           | Some stock, Unit_callback callback ->
-              let _image = GMisc.image ~stock () in
-              let mi =
-                (*GTK3: no image_menu_item *)
-                (*(GMenu.image_menu_item
-                   ~image ~packing:!!menubar_packing ~label ()
-                 :> GMenu.menu_item) *)
-                GMenu.menu_item ~label ()
-                (*/GTK3*)
-              in
+              let image = (GMisc.image ~stock () :> GObj.widget) in
+              let text = label in
+              let packing = !!menubar_packing in
+              let mi = Gtk_helper.image_menu_item ~image ~text ~packing in
               ignore (mi#connect#activate callback);
               MStandard mi
           | _, Bool_callback (callback, active) ->

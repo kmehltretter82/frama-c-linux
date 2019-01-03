@@ -273,8 +273,7 @@ let () =
        let new_item = constant_items.(0) in
        new_item#add_accelerator `CONTROL 'n';
        constant_items.(3)#add_accelerator `CONTROL 'd';
-       (*GTK3: no GMenu.separator_item *)
-       (* ignore (GMenu.separator_item ~packing:menu#append ());*)
+       ignore (GMenu.separator_item ~packing:menu#append ());
        let callback () =
          let is_reset = reset menu in
          if is_reset then make_project_entries window menu

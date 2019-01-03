@@ -357,12 +357,9 @@ type 'a chooser =
 (* --- Bundle of fields                                                 --- *)
 (* ------------------------------------------------------------------------ *)
 
-let do_tooltip ?tooltip _obj = match tooltip with
+let do_tooltip ?tooltip obj = match tooltip with
   | None -> ()
-  | Some _text -> ()
-      (*GTK3: no GData.tooltips*)
-      (* let tooltip = GData.tooltips () in
-      tooltip#set_tip ~text obj#coerce *)
+  | Some text -> obj#coerce#misc#set_tooltip_text text
 
 let on_bool ?tooltip ?use_markup (container:GPack.box) label get set =
   let result = ref (get ()) in
@@ -1020,6 +1017,17 @@ let graph_window_through_dot ~parent ~title dot_formatter =
       "@[cannot display dot graph:@ %s@]"
       (Printexc.to_string exn)
 ;;
+
+let image_menu_item ~(image:GObj.widget) ~text ~packing =
+  let mi = GMenu.menu_item () in
+  let box =
+    GPack.hbox ~spacing:2 ~border_width:0 ~homogeneous:true ()
+  in
+  box#add image;
+  box#add (GMisc.label ~justify:`LEFT ~text ())#coerce;
+  mi#add box#coerce;
+  packing mi;
+  mi
 
 (*
 Local Variables:

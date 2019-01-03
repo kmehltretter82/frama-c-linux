@@ -76,9 +76,9 @@ class button ?kind ?title ?select ?tooltip ?parent () =
   let box = GPack.hbox ~homogeneous:false ~spacing:0 ~border_width:0 () in
   let fld = GMisc.label ~text:"(none)" ~xalign:0.0
       ~packing:(box#pack ~expand:true) () in
-  (*GTK3: no GMisc.separator anymore. *)
-  (*let _ = GMisc.separator `VERTICAL
-      ~packing:(box#pack ~expand:false ~padding:2) ~show:true () in *)
+  let _ = GMisc.separator `VERTICAL
+      ~packing:(box#pack ~expand:false ~padding:2) ~show:true ()
+  in
   let _ = GMisc.image  ~packing:(box#pack ~expand:false) ~stock:`OPEN () in
   let button = GButton.button () in
   let dialog = new dialog ?kind ?title ?select ?parent () in

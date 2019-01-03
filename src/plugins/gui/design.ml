@@ -867,8 +867,8 @@ class main_window () : main_window_extension_points =
   (* toplevel_vbox->bottom_hbox-> *statusbar *)
   let statusbar =
     GMisc.statusbar
-      (* GTK3: argument does not exist *)
-      (* ~has_resize_grip:false *)
+      (* GTK3: using this argument leads to a crash. *)
+      (*~has_resize_grip:false *)
       ~packing:bottom_hbox#add ()
   in
   let status_context = statusbar#new_context "messages" in

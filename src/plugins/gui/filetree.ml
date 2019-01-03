@@ -548,8 +548,7 @@ let make (tree_view:GTree.view) =
       ~label:"Hide built-ins" ~key:key_hide_builtins in
   let mhide_annotations = MenusHide.menu_item menu
       ~label:"Hide global annotations" ~key:key_hide_annotations in
-  (*GTK3: no GMenu.separator_item*)
-  (*let () = menu#add (GMenu.separator_item () :> GMenu.menu_item) in*)
+  let () = menu#add (GMenu.separator_item () :> GMenu.menu_item) in
   let mflat_mode =
     MenusHide.menu_item menu ~label:"Flat mode" ~key:key_flat_mode in
 
@@ -1013,8 +1012,7 @@ let make (tree_view:GTree.view) =
                 mhide_annotations key_hide_annotations self#reset_internal);
       ignore (MenusHide.mi_set_callback
                 mflat_mode key_flat_mode self#reset_internal);
-      (*GTK3: no GMenu.separator_item*)
-      (*menu#add (GMenu.separator_item () :> GMenu.menu_item);*)
+      menu#add (GMenu.separator_item () :> GMenu.menu_item);
 
       tree_view#set_model (Some (init_model:>GTree.model));
       self#enable_select_functions ();

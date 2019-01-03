@@ -432,6 +432,16 @@ val graph_window_through_dot:
   (Format.formatter -> unit) ->
   unit
 
+(** calls the packing function to append a new menu item
+    with an icon and a label.
+    replaces GMenu.image_menu_item that has been deprecated in GTK3
+*)
+val image_menu_item:
+  image:GObj.widget ->
+  text: string ->
+  packing: (GMenu.menu_item -> unit) ->
+  GMenu.menu_item
+
 (*
 Local Variables:
 compile-command: "make -C ../../.."

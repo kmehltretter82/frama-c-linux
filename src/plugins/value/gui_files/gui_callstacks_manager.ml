@@ -326,8 +326,6 @@ module Make (Input: Input) = struct
              list_mem equal_column_type col_type model.hidden_columns
           then
             let show = GMenu.check_menu_item ~label:txt () in
-            (*GTK3: does not exist *)
-            (* show#set_show_toggle true;*)
             show#set_active column#visible;
             (* Hide this column. Keep it alive for filters and co. *)
             let callback_show_hide () =
@@ -691,8 +689,7 @@ module Make (Input: Input) = struct
       let equal = GMenu.menu_item ~label:"Only equal" () in
       let different = GMenu.menu_item ~label:"Only different" () in
       menu#add copy;
-      (* GTK3: no separator*)
-      (* menu#add (GMenu.separator_item ()); *)
+      menu#add (GMenu.separator_item ());
       menu#add equal;
       menu#add different;
       ignore (copy#connect#activate callback_copy);

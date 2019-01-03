@@ -531,12 +531,10 @@ let selector (popup_factory:GMenu.menu GMenu.factory)
       add_zones_item "DataScope" Scope;
       add_zones_item "PropScope" Pscope;
 
-      (*GTK3: no separator. *)
-      (* ignore (submenu_factory#add_separator ()); *)
+      ignore (submenu_factory#add_separator ());
       add_item main_ui ~use_values:false submenu_factory "Reset All" (Some())
         (fun _ -> reset () ; main_ui#rehighlight ());
-      (*GTK3: no separator. *)
-      (* ignore (submenu_factory#add_separator ()); *)
+      ignore (submenu_factory#add_separator ());
       add_item main_ui ~use_values:false submenu_factory
         "Help" (Some()) (fun _ -> help main_ui) ;
     end
