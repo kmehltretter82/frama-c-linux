@@ -918,7 +918,7 @@ let cleanup file =
     method! vstmt_aux st =
       self#remove_lexical_annotations st;
       let loc = Stmt.loc st in
-      if Annotations.has_code_annot st || st.labels <> [] then
+      if Annotations.has_code_annot st || st.labels <> [] || st.sattr <> [] then
         keep_stmt <- Stmt.Set.add st keep_stmt;
       match st.skind with
       | Block b ->

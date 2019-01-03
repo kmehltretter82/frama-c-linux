@@ -1424,7 +1424,7 @@ struct
   let empty_stmts l =
     let rec is_empty_stmt s =
       match s.skind with
-      | Instr (Skip _) -> s.labels = []
+      | Instr (Skip _) -> s.labels = [] && s.sattr = []
       | Block b -> b.battrs = [] && List.for_all is_empty_stmt b.bstmts
       | UnspecifiedSequence seq ->
         List.for_all is_empty_stmt (List.map (fun (x,_,_,_,_) -> x) seq)
@@ -1865,10 +1865,10 @@ struct
   let canDrop (c: chunk) =
     List.for_all (fun (s,_,_,_,_) -> canDropStatement s) c.stmts
 
-  let loopChunk ~ghost a (body: chunk) : chunk =
+  let loopChunk ~ghost ~sattr a (body: chunk) : chunk =
     (* Make the statement *)
     let loop =
-      mkStmt ~ghost ~valid_sid
+      mkStmt ~ghost ~valid_sid ~sattr
         (Loop (a,c2block ~ghost body, CurrentLoc.get (), None, None))
     in
     { stmts = [ loop,[],[],[],[] ];
@@ -9485,7 +9485,7 @@ and doStatement local_env (s : A.statement) : chunk =
     let break_cond = breakChunk ~ghost loc' in
     exitLoop ();
     CurrentLoc.set loc';
-    loopChunk ~ghost a
+    loopChunk ~ghost ~sattr:[Attr("while",[])] a
       ((doCondition local_env false e skipChunk break_cond)
        @@ (s', ghost))
 
@@ -9520,7 +9520,7 @@ and doStatement local_env (s : A.statement) : chunk =
              false e skipChunk (breakChunk ~ghost loc'))
       in
       exitLoop ();
-      loopChunk ~ghost a (s' @@ (s'', ghost))
+      loopChunk ~ghost ~sattr:[Attr("dowhile",[])] a (s' @@ (s'', ghost))
 
   | A.FOR(a,fc1,e2,e3,s,loc) -> begin
       let loc' = convLoc loc in
@@ -9545,10 +9545,10 @@ and doStatement local_env (s : A.statement) : chunk =
       let res =
         match e2.expr_node with
         | A.NOTHING -> (* This means true *)
-          se1 @@ (loopChunk ~ghost a (s' @@ (s'', ghost)), ghost)
+          se1 @@ (loopChunk ~sattr:[Attr("for",[])] ~ghost a (s' @@ (s'', ghost)), ghost)
         | _ ->
           se1 @@
-          (loopChunk ~ghost a
+          (loopChunk ~sattr:[Attr("for",[])] ~ghost a
              (((doCondition
                   local_env false e2 skipChunk break_cond)
                @@ (s', ghost)) @@ (s'', ghost)), ghost)

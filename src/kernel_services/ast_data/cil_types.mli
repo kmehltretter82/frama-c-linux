@@ -1062,7 +1062,11 @@ and stmt = {
   mutable preds: stmt list;
   (** The inverse of the succs function. *)
 
-  mutable ghost : bool
+  mutable ghost : bool;
+
+  mutable sattr : attributes
+  (** Statement attributes.
+      @since Frama-C+dev *)
 }
 
 (** Labels *)

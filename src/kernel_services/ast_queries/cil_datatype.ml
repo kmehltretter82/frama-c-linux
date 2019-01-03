@@ -271,7 +271,8 @@ module Stmt_Id = struct
 	    sid = -1;
 	    succs = [];
 	    preds = [];
-	    ghost  = false } ]
+	    ghost  = false;
+	    sattr = [] } ]
       let compare t1 t2 = Datatype.Int.compare t1.sid t2.sid
       let hash t1 = t1.sid
       let equal t1 t2 = t1.sid = t2.sid
