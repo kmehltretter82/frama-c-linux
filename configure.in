@@ -924,14 +924,22 @@ new_section "configure tools and libraries used by some plug-ins"
 REQUIRE_LABLGTK="$REQUIRE_LABLGTK$REQUIRE_GNOMECANVAS"
 USE_LABLGTK="$USE_LABLGTK$USE_GNOMECANVAS"
 
-  LABLGTK_PATH=`ocamlfind query lablgtk2 | tr -d '\\r\\n'`
-  if test "$LABLGTK_PATH" = "" -o "$LABLGTK_PATH" -ef "$OCAMLLIB/lablgtk2" ; then
-     echo "Ocamlfind -> using +lablgtk2.($LABLGTK_PATH,$OCAMLLIB/lablgtk2)"
-     LABLGTK_PATH=+lablgtk2
-     LABLGTKPATH_FOR_CONFIGURE=$OCAMLLIB/lablgtk2
+  LABLGTK_PATH=`ocamlfind query lablgtk3 | tr -d '\\r\\n'`
+  if test "$LABLGTK_PATH" = ""; then
+    LABLGTK_VERSION=2
+    LABLGTK_PATH=`ocamlfind query lablgtk2 | tr -d '\\r\\n'`
+    if test "$LABLGTK_PATH" = "" -o "$LABLGTK_PATH" -ef "$OCAMLLIB/lablgtk2" ; then
+       echo "Ocamlfind -> using +lablgtk2.($LABLGTK_PATH,$OCAMLLIB/lablgtk2)"
+       LABLGTK_PATH=+lablgtk2
+       LABLGTKPATH_FOR_CONFIGURE=$OCAMLLIB/lablgtk2
+    else
+       echo "Ocamlfind -> using $LABLGTK_PATH"
+       LABLGTKPATH_FOR_CONFIGURE=$LABLGTK_PATH
+    fi;
   else
-     echo "Ocamlfind -> using $LABLGTK_PATH"
-     LABLGTKPATH_FOR_CONFIGURE=$LABLGTK_PATH
+    LABLGTK_VERSION=3
+    echo "ocamlfind -> using $LABLGTK_PATH"
+    LABLGTKPATH_FOR_CONFIGURE=$LABLGTK_PATH;
   fi
 
 configure_library([GTKSOURCEVIEW],
@@ -992,6 +1000,7 @@ AC_SUBST(HAS_YOJSON)
 AC_SUBST(HAS_APRON)
 AC_SUBST(HAS_MPFR)
 AC_SUBST(HAS_LANDMARKS)
+AC_SUBST(LABLGTK_VERSION)
 AC_SUBST(OCAMLBEST)
 AC_SUBST(OCAMLVERSION)
 AC_SUBST(OCAMLLIB)

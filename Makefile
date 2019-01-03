@@ -681,7 +681,7 @@ WTOOLKIT= \
 	wutil widget wbox wfile wpane wpalette wtext wtable
 
 SOURCEVIEWCOMPAT:=
-ifeq ($(strip $(GTKSOURCEVIEW)),lablgtk2.sourceview3)
+ifeq ($(strip $(GTKSOURCEVIEW)),lablgtk3.sourceview3)
 SOURCEVIEWCOMPAT:=GSourceView2
 
 src/plugins/gui/GSourceView2.ml: src/plugins/gui/GSourceView2.ml.in
