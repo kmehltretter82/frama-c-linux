@@ -165,7 +165,10 @@ class menu_manager ?packing ~host:(_:Gtk_helper.host) =
            By default, add all the others just before this very first group. *)
         ref (match pos, first_tool_separator with
             | None, None -> 0
-            | None, Some sep -> max 0 (toolbar#get_item_index sep#as_tool_item)
+            | None, Some sep ->
+              max
+                0
+                (Gtk_compat.get_toolbar_index toolbar (sep:>GButton.tool_item))
             | Some p, _ -> p)
       in
       let toolbar_packing w =

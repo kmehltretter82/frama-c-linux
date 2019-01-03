@@ -705,7 +705,19 @@ src/plugins/gui/dgraph.mli: src/plugins/gui/dgraph.mli.in
 	$(CHMOD_RO) $@
 endif
 
+ifeq ($(LABLGTK),lablgtk3)
+src/plugins/gui/gtk_compat.ml: src/plugins/gui/gtk_compat.3.ml
+	$(CP) $< $@
+	$(CHMOD_RO) $@
+else
+src/plugins/gui/gtk_compat.ml: src/plugins/gui/gtk_compat.2.ml
+	$(CP) $< $@
+	$(CHMOD_RO) $@
+endif
+GENERATED+=src/plugins/gui/gtk_compat.ml
+
 SINGLE_GUI_CMO:= \
+	gtk_compat \
 	$(WTOOLKIT) \
 	$(SOURCEVIEWCOMPAT) \
 	$(DGRAPHCOMPAT) \
