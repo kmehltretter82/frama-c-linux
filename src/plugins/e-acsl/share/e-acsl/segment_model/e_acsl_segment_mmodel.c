@@ -205,8 +205,11 @@ void mspaces_init() {
   MSPACES_INIT = 1;
 }
 
+int MEMORY_INIT = 0;
+
 void memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
-  mspaces_init(argc_ref, argv_ref);
+  if(MEMORY_INIT) return;
+  mspaces_init();
   /** Verify that the given size of a pointer matches the one in the present
    * architecture. This is a guard against Frama-C instrumentations using
    * architectures different to the given one. */
@@ -237,6 +240,7 @@ void memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
       initialize(addr, len);
   }
   init_infinity_values();
+  MEMORY_INIT = 1;
 }
 
 void memory_clean(void) {

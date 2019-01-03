@@ -208,8 +208,6 @@ class e_acsl_visitor prj generate = object (self)
                     :: stmts)
                   stmts
               in
-              let return =
-                Cil.mkStmt ~valid_sid:true (Return(None, Location.unknown)) in
               (* Generate init statements for temporal analysis *)
               let tinit_stmts = Varinfo.Hashtbl.fold_sorted
                 (fun vi (off, init) acc ->
@@ -219,7 +217,7 @@ class e_acsl_visitor prj generate = object (self)
                       (match stmt with | Some stmt -> stmt :: acc | None -> acc)
                   | None -> acc)
                 global_vars
-                [return]
+                []
               in
               let stmts = stmts @ tinit_stmts in
               (* Create a new code block with generated statements *)
@@ -230,6 +228,33 @@ class e_acsl_visitor prj generate = object (self)
               in
               function_env := env;
               let stmts = Cil.mkStmt ~valid_sid:true (Block b) :: stmts in
+              (* Prevent multiple calls to globals_init *)
+              let loc = Location.unknown in
+              let vi_globals_init =
+                Cil.makeGlobalVar ~source:true
+                  (RTL.mk_api_name "GLOBALS_INIT")
+                  (TInt(IBool, []))
+              in
+              vi_globals_init.vdefined <- true;
+              let init = { init = Some (SingleInit (Cil.zero ~loc)) } in
+              Globals.Vars.add vi_globals_init init;
+              let new_global = GVar (vi_globals_init, init, loc) in
+              f.globals <- new_global :: f.globals;
+              let set_globals_init = Cil.mkStmtOneInstr
+                ~valid_sid:true
+                (Set (Cil.var vi_globals_init, Cil.one ~loc, loc))
+              in
+              let stmts = stmts @ [ set_globals_init ] in
+              let guard = Cil.mkStmt
+                ~valid_sid:true
+                (If (
+                  Cil.evar vi_globals_init,
+                  Cil.mkBlock [],
+                  Cil.mkBlock stmts,
+                  loc))
+              in
+              let return = Cil.mkStmt ~valid_sid:true (Return (None, loc)) in
+              let stmts = guard :: [ return ] in
               let blk = Cil.mkBlock stmts in
               (* Create [__e_acsl_globals_init] function with definition
                for initialization of global variables *)

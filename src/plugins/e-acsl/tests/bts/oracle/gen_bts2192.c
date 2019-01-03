@@ -2,16 +2,20 @@
 #include "stdio.h"
 #include "stdlib.h"
 char *__gen_e_acsl_literal_string;
+_Bool __e_acsl_GLOBALS_INIT = 0;
 int a;
 char *n = (char *)"134";
 void __e_acsl_globals_init(void)
 {
-  __gen_e_acsl_literal_string = "134";
-  __e_acsl_store_block((void *)__gen_e_acsl_literal_string,sizeof("134"));
-  __e_acsl_full_init((void *)__gen_e_acsl_literal_string);
-  __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string);
-  __e_acsl_store_block((void *)(& n),(size_t)8);
-  __e_acsl_full_init((void *)(& n));
+  if (! __e_acsl_GLOBALS_INIT) {
+    __gen_e_acsl_literal_string = "134";
+    __e_acsl_store_block((void *)__gen_e_acsl_literal_string,sizeof("134"));
+    __e_acsl_full_init((void *)__gen_e_acsl_literal_string);
+    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string);
+    __e_acsl_store_block((void *)(& n),(size_t)8);
+    __e_acsl_full_init((void *)(& n));
+    __e_acsl_GLOBALS_INIT = 1;
+  }
   return;
 }
 

@@ -2,6 +2,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 char *__gen_e_acsl_literal_string;
+_Bool __e_acsl_GLOBALS_INIT = 0;
 void f(void const *s, int c, unsigned long n)
 {
   __e_acsl_store_block((void *)(& s),(size_t)8);
@@ -38,11 +39,14 @@ void f(void const *s, int c, unsigned long n)
 
 void __e_acsl_globals_init(void)
 {
-  __gen_e_acsl_literal_string = "1234567890";
-  __e_acsl_store_block((void *)__gen_e_acsl_literal_string,
-                       sizeof("1234567890"));
-  __e_acsl_full_init((void *)__gen_e_acsl_literal_string);
-  __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string);
+  if (! __e_acsl_GLOBALS_INIT) {
+    __gen_e_acsl_literal_string = "1234567890";
+    __e_acsl_store_block((void *)__gen_e_acsl_literal_string,
+                         sizeof("1234567890"));
+    __e_acsl_full_init((void *)__gen_e_acsl_literal_string);
+    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string);
+    __e_acsl_GLOBALS_INIT = 1;
+  }
   return;
 }
 

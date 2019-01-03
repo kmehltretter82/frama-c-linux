@@ -3,16 +3,20 @@
 #include "stdlib.h"
 char *__gen_e_acsl_literal_string_2;
 char *__gen_e_acsl_literal_string;
+_Bool __e_acsl_GLOBALS_INIT = 0;
 void __e_acsl_globals_init(void)
 {
-  __gen_e_acsl_literal_string_2 = "g";
-  __e_acsl_store_block((void *)__gen_e_acsl_literal_string_2,sizeof("g"));
-  __e_acsl_full_init((void *)__gen_e_acsl_literal_string_2);
-  __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_2);
-  __gen_e_acsl_literal_string = "f";
-  __e_acsl_store_block((void *)__gen_e_acsl_literal_string,sizeof("f"));
-  __e_acsl_full_init((void *)__gen_e_acsl_literal_string);
-  __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string);
+  if (! __e_acsl_GLOBALS_INIT) {
+    __gen_e_acsl_literal_string_2 = "g";
+    __e_acsl_store_block((void *)__gen_e_acsl_literal_string_2,sizeof("g"));
+    __e_acsl_full_init((void *)__gen_e_acsl_literal_string_2);
+    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_2);
+    __gen_e_acsl_literal_string = "f";
+    __e_acsl_store_block((void *)__gen_e_acsl_literal_string,sizeof("f"));
+    __e_acsl_full_init((void *)__gen_e_acsl_literal_string);
+    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string);
+    __e_acsl_GLOBALS_INIT = 1;
+  }
   return;
 }
 

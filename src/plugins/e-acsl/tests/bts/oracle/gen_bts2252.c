@@ -2,6 +2,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 char *__gen_e_acsl_literal_string;
+_Bool __e_acsl_GLOBALS_INIT = 0;
 /*@ assigns \result, *(x_0 + (0 ..)), *(x_1 + (0 ..));
     assigns \result \from *(x_0 + (0 ..)), *(x_1 + (0 ..)), x_2;
     assigns *(x_0 + (0 ..)) \from *(x_0 + (0 ..)), *(x_1 + (0 ..)), x_2;
@@ -11,11 +12,14 @@ extern int ( /* missing proto */ strncpy)(char *x_0, char *x_1, int x_2);
 
 void __e_acsl_globals_init(void)
 {
-  __gen_e_acsl_literal_string = "Test Code";
-  __e_acsl_store_block((void *)__gen_e_acsl_literal_string,
-                       sizeof("Test Code"));
-  __e_acsl_full_init((void *)__gen_e_acsl_literal_string);
-  __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string);
+  if (! __e_acsl_GLOBALS_INIT) {
+    __gen_e_acsl_literal_string = "Test Code";
+    __e_acsl_store_block((void *)__gen_e_acsl_literal_string,
+                         sizeof("Test Code"));
+    __e_acsl_full_init((void *)__gen_e_acsl_literal_string);
+    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string);
+    __e_acsl_GLOBALS_INIT = 1;
+  }
   return;
 }
 

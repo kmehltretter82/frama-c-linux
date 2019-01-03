@@ -75,6 +75,7 @@
   __gen_e_acsl_literal_string_29 ∈ {0}
   __gen_e_acsl_literal_string_30 ∈ {0}
   __gen_e_acsl_literal_string_31 ∈ {0}
+  __e_acsl_GLOBALS_INIT ∈ {0}
 [eva] using specification for function __e_acsl_memory_init
 [eva] using specification for function __e_acsl_store_block
 [eva] using specification for function __e_acsl_full_init

@@ -3,6 +3,7 @@
 #include "stdlib.h"
 char *__gen_e_acsl_literal_string;
 char *__gen_e_acsl_literal_string_2;
+_Bool __e_acsl_GLOBALS_INIT = 0;
 struct ST {
    char *str ;
    int num ;
@@ -12,18 +13,21 @@ struct ST _G[2] =
    {.str = (char *)"Struct_G[1]", .num = 147}};
 void __e_acsl_globals_init(void)
 {
-  __gen_e_acsl_literal_string = "Struct_G[1]";
-  __e_acsl_store_block((void *)__gen_e_acsl_literal_string,
-                       sizeof("Struct_G[1]"));
-  __e_acsl_full_init((void *)__gen_e_acsl_literal_string);
-  __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string);
-  __gen_e_acsl_literal_string_2 = "Struct_G[0]";
-  __e_acsl_store_block((void *)__gen_e_acsl_literal_string_2,
-                       sizeof("Struct_G[0]"));
-  __e_acsl_full_init((void *)__gen_e_acsl_literal_string_2);
-  __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_2);
-  __e_acsl_store_block((void *)(_G),(size_t)32);
-  __e_acsl_full_init((void *)(& _G));
+  if (! __e_acsl_GLOBALS_INIT) {
+    __gen_e_acsl_literal_string = "Struct_G[1]";
+    __e_acsl_store_block((void *)__gen_e_acsl_literal_string,
+                         sizeof("Struct_G[1]"));
+    __e_acsl_full_init((void *)__gen_e_acsl_literal_string);
+    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string);
+    __gen_e_acsl_literal_string_2 = "Struct_G[0]";
+    __e_acsl_store_block((void *)__gen_e_acsl_literal_string_2,
+                         sizeof("Struct_G[0]"));
+    __e_acsl_full_init((void *)__gen_e_acsl_literal_string_2);
+    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_2);
+    __e_acsl_store_block((void *)(_G),(size_t)32);
+    __e_acsl_full_init((void *)(& _G));
+    __e_acsl_GLOBALS_INIT = 1;
+  }
   return;
 }
 

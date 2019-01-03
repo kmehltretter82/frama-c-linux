@@ -3,6 +3,7 @@
 #include "stdlib.h"
 char *__gen_e_acsl_literal_string;
 char *__gen_e_acsl_literal_string_2;
+_Bool __e_acsl_GLOBALS_INIT = 0;
 /*@ behavior exists:
       assumes ∃ ℤ i; 0 ≤ i < (int)n ∧ (int)*((char *)buf + i) ≡ c;
       ensures
@@ -186,14 +187,18 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
 
 void __e_acsl_globals_init(void)
 {
-  __gen_e_acsl_literal_string = "toto";
-  __e_acsl_store_block((void *)__gen_e_acsl_literal_string,sizeof("toto"));
-  __e_acsl_full_init((void *)__gen_e_acsl_literal_string);
-  __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string);
-  __gen_e_acsl_literal_string_2 = "tata";
-  __e_acsl_store_block((void *)__gen_e_acsl_literal_string_2,sizeof("tata"));
-  __e_acsl_full_init((void *)__gen_e_acsl_literal_string_2);
-  __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_2);
+  if (! __e_acsl_GLOBALS_INIT) {
+    __gen_e_acsl_literal_string = "toto";
+    __e_acsl_store_block((void *)__gen_e_acsl_literal_string,sizeof("toto"));
+    __e_acsl_full_init((void *)__gen_e_acsl_literal_string);
+    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string);
+    __gen_e_acsl_literal_string_2 = "tata";
+    __e_acsl_store_block((void *)__gen_e_acsl_literal_string_2,
+                         sizeof("tata"));
+    __e_acsl_full_init((void *)__gen_e_acsl_literal_string_2);
+    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_2);
+    __e_acsl_GLOBALS_INIT = 1;
+  }
   return;
 }
 

@@ -2,10 +2,14 @@
 #include "errno.h"
 #include "stdio.h"
 #include "stdlib.h"
+_Bool __e_acsl_GLOBALS_INIT = 0;
 void __e_acsl_globals_init(void)
 {
-  __e_acsl_store_block((void *)(& errno),(size_t)4);
-  __e_acsl_full_init((void *)(& errno));
+  if (! __e_acsl_GLOBALS_INIT) {
+    __e_acsl_store_block((void *)(& errno),(size_t)4);
+    __e_acsl_full_init((void *)(& errno));
+    __e_acsl_GLOBALS_INIT = 1;
+  }
   return;
 }
 
