@@ -847,10 +847,7 @@ class main_window () : main_window_extension_points =
       ~width
       ~height
       ~position:`CENTER
-(*GTK3: arguments do not exist anymore at GTK level. *)
-(*      ~allow_shrink:true
-        ~allow_grow:true
-*)
+      ~resizable:true
       ~show:false
       ()
   in

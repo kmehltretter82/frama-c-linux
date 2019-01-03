@@ -988,8 +988,8 @@ let graph_window ~parent ~title make_view =
   let width = int_of_float (float parent#default_width *. 3. /. 4.) in
   let graph_window =
     GWindow.window
-      ~width ~height ~title ~allow_shrink:true ~allow_grow:true
-      ~position:`CENTER () in
+      ~width ~height ~title ~resizable:true ~position:`CENTER ()
+  in
   let view = make_view ~packing:graph_window#add () in
   graph_window#show();
   view#adapt_zoom();
