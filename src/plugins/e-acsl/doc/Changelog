@@ -19,6 +19,8 @@
 #   configure	configure
 ###############################################################################
 
+-* E-ACSL       [2019/01/02] Fix overlap of TLS with other memory
+                segments for big memory spaces
 -  E-ACSL       [2018/11/15] Predicates with empty quantifications
                 directly generate \true or \false instead of nested loops.
 
