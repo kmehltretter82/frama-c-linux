@@ -21,6 +21,8 @@ Open Source Release <next-release>
               distinguishing between for, while and dowhile loops.
 -!  Kernel    [2019/01/03] Add statement attributes (sattr) to the AST. They
               are not printed by default, use -kernel-msg-key printer:attrs
+-!  Kernel    [2019/01/03] Improved precision of integer abstract bitwise
+              operators.
 
 ################################
 Open Source Release 18.0 (Argon)
