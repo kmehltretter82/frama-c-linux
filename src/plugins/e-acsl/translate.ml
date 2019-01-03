@@ -448,8 +448,7 @@ and context_insensitive_term_to_exp kf env t =
   | TStartOf lv ->
     let lv, env, _ = tlval_to_lval kf env lv in
     Cil.mkAddrOrStartOf ~loc lv, env, false, "startof"
-  | Tapp(li, [], args) when Builtins.mem li.l_var_info.lv_name ->
-    (* E-ACSL built-in function call *)
+  | Tapp(li, [], targs) ->
     let fname = li.l_var_info.lv_name in
     let args, env = (* args computed in the reverse order *)
       try
@@ -458,7 +457,7 @@ and context_insensitive_term_to_exp kf env t =
             let e, env = term_to_exp kf env a in
             e :: l, env)
           ([], env)
-          args
+          targs
       with Invalid_argument _ ->
         Options.fatal "[Tapp] unexpected number of arguments when calling %s"
           fname
@@ -466,6 +465,8 @@ and context_insensitive_term_to_exp kf env t =
     (* build the varinfo (as an expression) which stores the result of the
        function call. *)
     let _, e, env =
+      if Builtins.mem li.l_var_info.lv_name then begin
+      (* E-ACSL built-in function call *)
       Env.new_var
         ~loc
         ~name:(fname ^ "_app")
@@ -474,10 +475,20 @@ and context_insensitive_term_to_exp kf env t =
         (Misc.cty (Extlib.the li.l_type))
         (fun vi _ ->
           [ Misc.mk_call ~loc ~result:(Cil.var vi) fname (List.rev args) ])
+      end
+      else
+        let args_lty = List.map
+          (fun targ ->
+            match Typing.get_integer_ty targ with
+            | Typing.Gmp -> Linteger
+            | Typing.C_type _ | Typing.Other -> Ctype (Typing.get_typ targ))
+          targs
+        in
+        Lfunctions.generate ~loc env t li (List.rev args) args_lty
     in
     e, env, false, "app"
-  | Tapp _ ->
-    not_yet env "applying logic function"
+  | Tapp(_, _ :: _, _) ->
+    not_yet env "logic functions with labels"
   | Tlambda _ -> not_yet env "functional"
   | TDataCons _ -> not_yet env "constructor"
   | Tif(t1, t2, t3) ->
@@ -648,7 +659,22 @@ and named_predicate_content_to_exp ?name kf env p =
   match p.pred_content with
   | Pfalse -> Cil.zero ~loc, env
   | Ptrue -> Cil.one ~loc, env
-  | Papp _ -> not_yet env "logic function application"
+  | Papp(li, labels, args) ->
+    (* Simply use the implementation of Tapp(li, labels, args).
+      To achieve this, we create a clone of [li] for which the type is
+      transformed from [None] (type of predicates) to
+      [Some int] (type as a term).
+      TODO: the approach seems dangerous. A better way would probably use a
+            version of [Lfunctions.generate] generalized to predicates. *)
+    let prj = Project.current () in
+    let o = object inherit Visitor.frama_c_copy prj end in
+    let li = Visitor.visitFramacLogicInfo o li in
+    let lty = Ctype Cil.intType in
+    li.l_type <- Some lty;
+    let tapp = Logic_const.term ~loc (Tapp(li, labels, args)) lty in
+    Typing.type_term ~use_gmp_opt:false ~ctx:Typing.c_int tapp;
+    let e, env = term_to_exp kf env tapp in
+    e, env
   | Pseparated _ -> not_yet env "\\separated"
   | Pdangling _ -> not_yet env "\\dangling"
   | Pvalid_function _ -> not_yet env "\\valid_function"
@@ -837,6 +863,9 @@ and translate_named_predicate kf env p =
 let named_predicate_to_exp ?name kf env p =
   named_predicate_to_exp ?name kf env p (* forget optional argument ?rte *)
 
+let add_cast_lfunctions loc env cty is_mpz e =
+  add_cast ~loc env cty is_mpz None e
+
 let () =
   Loops.term_to_exp_ref := term_to_exp;
   Loops.translate_named_predicate_ref := translate_named_predicate;
@@ -845,7 +874,10 @@ let () =
   At_with_lscope.term_to_exp_ref := term_to_exp;
   At_with_lscope.predicate_to_exp_ref := named_predicate_to_exp;
   Mmodel_translate.term_to_exp_ref := term_to_exp;
-  Mmodel_translate.predicate_to_exp_ref := named_predicate_to_exp
+  Mmodel_translate.predicate_to_exp_ref := named_predicate_to_exp;
+  Lfunctions.term_to_exp_ref := term_to_exp;
+  Lfunctions.predicate_to_exp_ref := named_predicate_to_exp;
+  Lfunctions.add_cast_ref := add_cast_lfunctions
 
 (* This function is used by Guillaume.
    However, it is correct to use it only in specific contexts. *)

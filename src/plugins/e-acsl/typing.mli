@@ -76,6 +76,9 @@ val typ_of_integer_ty: integer_ty -> typ
 val integer_ty_of_typ: typ -> integer_ty
 (** Reverse of [typ_of_integer_ty] *)
 
+val ty_of_logic_ty: logic_type -> integer_ty
+(** @return the {!integer_ty} that correponds to the given logic type. *)
+
 val join: integer_ty -> integer_ty -> integer_ty
 (** {!integer_ty} is a join-semi-lattice if you do not consider [Other]. If
     there is no [Other] in argument, this function computes the join of this
@@ -97,6 +100,10 @@ val type_named_predicate: ?must_clear:bool -> predicate -> unit
 
 val clear: unit -> unit
 (** Remove all the previously computed types. *)
+
+val clear_all_pred_or_term: Misc.pred_or_term -> unit
+(** Remove all the previously computed types for the given term or predicate
+    AND its subterms. *)
 
 (** {3 Getters}
 
@@ -132,14 +139,16 @@ val unsafe_set: term -> ?ctx:integer_ty -> integer_ty -> unit
 (** Register that the given term has the given type in the given context (if
     any). No verification is done. *)
 
-
 (*****************************************************************************)
-(* Utils *)
+(** {2 Typing/types-related utils} *)
 (*****************************************************************************)
 
 val ty_of_interv: ?ctx:integer_ty -> Ival.t -> integer_ty
 (* Compute the smallest type (bigger than [int]) which can contain the whole
    interval. It is the \theta operator of the JFLA's paper. *)
+
+val typ_of_lty: logic_type -> typ
+(** @return the C type that correponds to the given logic type. *)
 
 (******************************************************************************)
 (** {2 Internal stuff} *)

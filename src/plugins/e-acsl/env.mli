@@ -68,6 +68,9 @@ module Logic_binding: sig
   val add: ?ty:typ -> t -> logic_var -> varinfo * exp * t
   (* Add a new C binding to the list of bindings for the logic variable. *)
 
+  val add_existing_vi: t -> logic_var -> varinfo -> t
+  (* [add_existing_vi env lv vi] defines [vi] as latest C binding for [lv]. *)
+
   val get: t -> logic_var -> varinfo
   (* Return the latest C binding. *)
 
@@ -141,6 +144,9 @@ module Logic_scope: sig
   (** Getter of the information indicating whether the logic scope should be
     reset at next call to [reset]. *)
 end
+
+val set_current_kf: t -> kernel_function -> unit
+(* Set current kf of the environment *)
 
 (* ************************************************************************** *)
 (** {2 Current annotation kind} *)

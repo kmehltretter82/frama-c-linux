@@ -314,6 +314,17 @@ module Logic_binding = struct
     in
     v, e, env
 
+  let add_existing_vi env lv vi =
+    try
+      let varinfos = Logic_var.Map.find lv env.var_mapping in
+      Stack.push vi varinfos;
+      env
+    with Not_found | Stack.Empty ->
+      let varinfos = Stack.create () in
+      Stack.push vi varinfos;
+      let var_mapping = Logic_var.Map.add lv varinfos env.var_mapping in
+      { env with var_mapping = var_mapping }
+
   let get env logic_v =
     try
       let varinfos = Logic_var.Map.find logic_v env.var_mapping in
@@ -336,6 +347,10 @@ let current_kf env =
   match v#current_kf with
   | None -> None
   | Some kf -> Some (Cil.get_kernel_function v#behavior kf)
+
+let set_current_kf env kf =
+  let v = env.visitor in
+  v#set_current_kf kf
 
 let get_visitor env = env.visitor
 let get_behavior env = env.visitor#behavior

@@ -47,6 +47,16 @@ let rec interv_of_typ ty = match Cil.unrollType ty with
   | _ ->
     raise Not_an_integer
 
+(* Return the interval over which ranges the smallest typ containing [i]. *)
+let interv_of_typ_containing_interv i =
+  try
+    let itv_kind = Misc.itv_kind i in
+    (* convert the kind to [IInt] whenever smaller. *)
+    let kind = if Cil.intTypeIncluded itv_kind IInt then IInt else itv_kind in
+    interv_of_typ (TInt(kind, []))
+  with Cil.Not_representable ->
+    Ival.inject_range None None
+
 let interv_of_unknown_block =
   (* since we have no idea of the size of this block, we take the largest
      possible one which is unfortunately quite large *)
@@ -62,6 +72,7 @@ module Env = struct
   let add = Logic_var.Hashtbl.add tbl
   let remove = Logic_var.Hashtbl.remove tbl
   let replace = Logic_var.Hashtbl.replace tbl
+  let find_all = Logic_var.Hashtbl.find_all tbl
   let find = Logic_var.Hashtbl.find tbl
 end
 
@@ -185,7 +196,64 @@ let rec infer t =
   | Tapp (li, _, _args) ->
     (match li.l_type with
     | None -> assert false (* [None] only possible for predicates *)
-    | Some Linteger -> Error.not_yet "logic function returning an integer"
+    | Some Linteger ->
+      begin match li.l_body with
+      | LBpred _ ->
+        Ival.zero_or_one
+      | LBterm t' ->
+        let i =
+          if Misc.is_recursive li then
+            (*  1) Build a system of interval equations that
+                constrain the solution:
+                do so by returning a variable when encoutering
+                a call of a recursive function instead of
+                performing the usual interval inference
+                BEWARE: we might be tempted to memoize the
+                  solution for a given function signature
+                  HOWEVER: it cannot be done in a straightforward
+                    manner due to the cases of functions that use
+                    C (global) variables in their definition (as the values of
+                    those variables can change between two function calls). *)
+            let ieqs = Fixpoint.Ieqs.empty in
+            let ivar, ieqs, _ = build_ieqs t ieqs [] in
+            (*  2) Solve it:
+                The problem is probably undecidable in the general case.
+                Thus we just look for reasonably precise approximations
+                without being too computationally expensive:
+                simply iterate over a finite set of pre-defined intervals.
+                See [Fixpoint.solve] for details. *)
+            let chain_of_ivalmax =
+              [| Integer.one; Integer.billion_one; Integer.max_int64 |]
+              (* This set can be changed based on experimental evidences,
+                 but it works fine for now. *)
+            in
+            let i = Fixpoint.solve ieqs ivar chain_of_ivalmax in
+            i
+          else begin
+            List.iter2
+              (fun lv arg ->
+                try
+                  let i = interv_of_typ_containing_interv (infer arg) in
+                  Env.add lv i
+                with Not_an_integer -> ())
+              li.l_profile
+              _args;
+            let i =
+              try infer t'
+              with Not_an_integer -> Ival.inject_range None None
+            in
+            List.iter (fun lv -> Env.remove lv) li.l_profile;
+            i
+          end
+        in
+        i
+      | LBnone ->
+        Error.not_yet "logic functions with no definition nor reads clause"
+      | LBreads _ ->
+        Error.not_yet "logic functions performing read accesses"
+      | LBinductive _ ->
+        Error.not_yet "logic functions inductively defined"
+      end
     | Some (Ctype ty) -> interv_of_typ ty
     | Some _ -> raise Not_an_integer)
   | Tunion _ -> Error.not_yet "tset union"
@@ -227,10 +295,21 @@ and infer_term_lval (host, offset as tlv) =
     let ty = Logic_utils.logicCType (Cil.typeOfTermLval tlv) in
     interv_of_typ ty
 
-and infer_term_host = function
+and infer_term_host h = match h with
   | TVar v ->
     (try Env.find v
-     with Not_found -> interv_of_typ (Logic_utils.logicCType v.lv_type))
+    with Not_found ->
+      match v.lv_type with
+      | Linteger ->
+        Ival.inject_range None None
+      | Ctype (TFloat _) -> (* TODO: handle in MR !226 *)
+        raise Not_an_integer
+      | Lreal ->
+        Error.not_yet "real numbers"
+      | Ctype _ ->
+        interv_of_typ (Logic_utils.logicCType v.lv_type)
+      | Ltype _ | Lvar _ | Larrow _ ->
+        Options.fatal "unexpected logic type")
   | TResult ty -> interv_of_typ ty
   | TMem t ->
     let ty = Logic_utils.logicCType t.term_type in
@@ -240,6 +319,81 @@ and infer_term_host = function
       Options.fatal "unexpected type %a for term %a"
         Printer.pp_typ ty
         Printer.pp_term t
+
+(* Build the system of interval equations for the logic function called
+  through [t].
+  Example: the following function:
+  f(Z n) = n < 0 ? 1 : f(n - 1) * f(n - 2) / f(n - 3)
+  when called with f(37)
+  will generate the following system of equations:
+  X = [1; 1] U Y*Y/Y /\
+  Y = [1; 1] U Z*Z/Z /\
+  Z = [1; 1] U Z*Z/Z
+  where X is the interval for f(int) (since 37 \in int),
+  Y the one for f(long) (from int-1, int-2 and int-3)
+  and Z the for the f(Z) (from long-1, long-2 and long-3) *)
+and build_ieqs t ieqs ivars =
+  match t.term_node with
+  | Tapp(li, _, args) ->
+    if li.l_type = Some Linteger && Misc.is_recursive li then begin
+      let args_lty = List.map2
+        (fun lv arg ->
+          try
+            let i = interv_of_typ_containing_interv (infer arg) in
+            Env.add lv i;
+            Ctype (TInt(Misc.itv_kind i, []))
+          with
+            | Cil.Not_representable -> Linteger
+            | Not_an_integer -> lv.lv_type)
+        li.l_profile
+        args
+      in
+      (* x *)
+      let ivar = Fixpoint.Ivar(li.l_var_info.lv_name, args_lty) in
+      (* Adding x = g(x) if it is not yet in the system of equations.
+        Without this check, the algorithm would not terminate. *)
+      let ieqs, ivars =
+        if Fixpoint.ivars_contains_ivar ivars ivar then ieqs, ivars
+        else
+          let iexp, ieqs, ivars =
+            build_ieqs (Misc.term_of_li li) ieqs (ivar :: ivars)
+          in
+          let ieqs = Fixpoint.Ieqs.add ivar iexp ieqs in (* Adding x = g(x) *)
+          ieqs, ivars
+      in
+      List.iter (fun lv -> Env.remove lv) li.l_profile;
+      ivar, ieqs, ivars
+    end else
+      (try Fixpoint.Iconst(infer t), ieqs, ivars
+      with Not_an_integer -> Fixpoint.Iunsupported, ieqs, ivars)
+  | TConst _ ->
+    (try Fixpoint.Iconst(infer t), ieqs, ivars
+    with Not_an_integer -> Fixpoint.Iunsupported, ieqs, ivars)
+  | TLval(TVar _, _) ->
+    (try Fixpoint.Iconst(infer t), ieqs, ivars
+    with Not_an_integer -> Fixpoint.Iunsupported, ieqs, ivars)
+  | TBinOp (PlusA, t1, t2) ->
+    let iexp1, ieqs, ivars = build_ieqs t1 ieqs ivars in
+    let iexp2, ieqs, ivars = build_ieqs t2 ieqs ivars in
+    Fixpoint.Ibinop(Fixpoint.Ival_add, iexp1, iexp2), ieqs, ivars
+  | TBinOp (MinusA, t1, t2) ->
+    let iexp1, ieqs, ivars = build_ieqs t1 ieqs ivars in
+    let iexp2, ieqs, ivars = build_ieqs t2 ieqs ivars in
+    Fixpoint.Ibinop(Fixpoint.Ival_min, iexp1, iexp2), ieqs, ivars
+  | TBinOp (Mult, t1, t2) ->
+    let iexp1, ieqs, ivars = build_ieqs t1 ieqs ivars in
+    let iexp2, ieqs, ivars = build_ieqs t2 ieqs ivars in
+    Fixpoint.Ibinop(Fixpoint.Ival_mul, iexp1, iexp2), ieqs, ivars
+  | TBinOp (Div, t1, t2) ->
+    let iexp1, ieqs, ivars = build_ieqs t1 ieqs ivars in
+    let iexp2, ieqs, ivars = build_ieqs t2 ieqs ivars in
+    Fixpoint.Ibinop(Fixpoint.Ival_div, iexp1, iexp2), ieqs, ivars
+  | Tif(_, t1, t2) ->
+    let iexp1, ieqs, ivars = build_ieqs t1 ieqs ivars in
+    let iexp2, ieqs, ivars = build_ieqs t2 ieqs ivars in
+    Fixpoint.Ibinop(Fixpoint.Ival_union, iexp1, iexp2), ieqs, ivars
+  | _ ->
+    Fixpoint.Iunsupported, ieqs, ivars
 
 (*
 Local Variables:

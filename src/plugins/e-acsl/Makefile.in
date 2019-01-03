@@ -73,12 +73,14 @@ PLUGIN_CMO:= local_config \
 	env \
 	keep_status \
 	dup_functions \
+	fixpoint \
 	interval \
 	typing \
 	loops \
 	quantif \
 	at_with_lscope \
 	mmodel_translate \
+	lfunctions \
 	translate \
 	temporal \
 	prepare_ast \

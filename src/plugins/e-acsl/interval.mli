@@ -67,6 +67,7 @@ module Env: sig
   val add: Cil_types.logic_var -> Ival.t -> unit
   val remove: Cil_types.logic_var -> unit
   val replace: Cil_types.logic_var -> Ival.t -> unit
+  val find_all: Cil_types.logic_var -> Ival.t list
 end
 
 (* ************************************************************************** *)

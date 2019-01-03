@@ -369,6 +369,8 @@ class e_acsl_visitor prj generate = object (self)
     if generate then Project.copy ~selection ~src:cur prj;
     Cil.DoChildrenPost
       (fun f ->
+        (* generate the C functions that correspond to the logic ones *)
+        Lfunctions.do_visit f;
         (* extend [main] with forward initialization and put it at end *)
         if generate then begin
           if not (Global_observer.is_empty () && Literal_strings.is_empty ())

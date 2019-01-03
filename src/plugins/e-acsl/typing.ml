@@ -94,6 +94,12 @@ let typ_of_integer_ty = function
   | C_type ik -> TInt(ik, [])
   | Other -> raise Not_an_integer
 
+let typ_of_lty = function
+  | Ctype cty -> cty
+  | Linteger -> Gmpz.t ()
+  | Lreal -> Error.not_yet "real numbers"
+  | Ltype _ | Lvar _ | Larrow _ -> Options.fatal "unexpected logic type"
+
 (******************************************************************************)
 (** Memoization *)
 (******************************************************************************)
@@ -110,6 +116,7 @@ type computed_info =
 module Memo: sig
   val memo: (term -> computed_info) -> term -> computed_info
   val get: term -> computed_info
+  val remove_all: term -> unit
   val clear: unit -> unit
 end = struct
 
@@ -148,9 +155,29 @@ end = struct
       H.add tbl t x;
       x
 
+  let rec remove_all t =
+    try
+      ignore (H.find tbl t);
+      H.remove tbl t;
+      remove_all t
+    with Not_found ->
+      ()
+
   let clear () = H.clear tbl
 
 end
+
+let clear_all_pred_or_term pot =
+  let o = object inherit Visitor.frama_c_inplace
+    method !vterm t =
+      Memo.remove_all t;
+      Cil.DoChildren
+  end
+  in
+  begin match pot with
+    | Misc.PoT_term t -> ignore(Visitor.visitFramacTerm o t)
+    | Misc.PoT_pred p -> ignore(Visitor.visitFramacPredicate o p)
+  end
 
 (******************************************************************************)
 (** {2 Coercion rules} *)
@@ -171,19 +198,7 @@ let integer_ty_of_typ ty = ty_of_logic_ty (Ctype ty)
    interval. It is the \theta operator of the JFLA's paper. *)
 let ty_of_interv ?ctx i =
   try
-    let itv_kind =
-      if Ival.is_bottom i then IInt
-      else match Ival.min_and_max i with
-        | Some l, Some u ->
-          let is_pos = Integer.ge l Integer.zero in
-          let lkind = Cil.intKindForValue l is_pos in
-          let ukind = Cil.intKindForValue u is_pos in
-          (* kind corresponding to the interval *)
-          if Cil.intTypeIncluded lkind ukind then ukind else lkind
-        | None, None -> raise Cil.Not_representable (* GMP *)
-        | None, Some _ | Some _, None ->
-          Kernel.fatal ~current:true "ival: %a" Ival.pretty i
-    in
+    let itv_kind = Misc.itv_kind i in
     (* convert the kind to [IInt] whenever smaller. *)
     let kind = if Cil.intTypeIncluded itv_kind IInt then IInt else itv_kind in
     (* ctx type whenever possible to prevent superfluous casts in the generated
@@ -462,14 +477,43 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
       dup Other
 
     | Tapp(li, _, args) ->
-      let typ_arg lvi arg =
-        let ctx = ty_of_logic_ty lvi.lv_type in
-        ignore (type_term ~use_gmp_opt:false ~ctx arg)
-      in
-      List.iter2 typ_arg li.l_profile args;
-      (* [li.l_type is [None] for predicate only: not possible here.
-         Thus using [Extlib.the] is fine *)
-      dup (ty_of_logic_ty (Extlib.the li.l_type))
+      List.iter
+        (fun arg -> ignore (type_term ~use_gmp_opt:true arg))
+        args;
+      begin match li.l_body with
+      | LBpred _ ->
+        (* We can have an [LBpred] here because we transformed
+          [Papp] into [Tapp] *)
+        dup c_int
+      | LBterm _ ->
+        begin  match li.l_type with
+        | None ->
+          assert false
+        | Some lty ->
+          begin match lty with
+          | Linteger ->
+            let i = Interval.infer t in
+            if Options.Gmp_only.get () then dup Gmp
+            else dup (ty_of_interv i)
+          | Ctype TInt(ik, _ ) ->
+            dup (C_type ik)
+          | Ctype TFloat _ -> (* TODO: handle in MR !226 *)
+            dup Other
+          | Lreal ->
+            Error.not_yet "real numbers"
+          | Ctype _ ->
+            dup Other
+          | Ltype _ | Lvar _ | Larrow _ ->
+            Options.fatal "unexpected type"
+          end
+        end
+      | LBnone ->
+        Error.not_yet "logic functions with no definition nor reads clause"
+      | LBreads _ ->
+        Error.not_yet "logic functions performing read accesses"
+      | LBinductive _ ->
+        Error.not_yet "logic functions inductively defined"
+      end
 
     | Tunion _ -> Error.not_yet "tset union"
     | Tinter _ -> Error.not_yet "tset intersection"
@@ -528,7 +572,18 @@ let rec type_predicate p =
   (* this pattern matching also follows the formal rules of the JFLA's paper *)
   let op = match p.pred_content with
     | Pfalse | Ptrue -> c_int
-    | Papp _ -> Error.not_yet "logic function application"
+    | Papp(li, _, _) ->
+      begin match li.l_body with
+      | LBpred _ ->
+        (* No need to type subpredicates
+           since Papp will be transformed into Tapp in Translate:
+           a retyping is done there *)
+        c_int
+      | LBnone -> (* Eg: \is_finite *)
+        Error.not_yet "logic functions with no definition nor reads clause"
+      | LBreads _ | LBterm _ | LBinductive _ ->
+        Options.fatal "unexpected logic definition"
+      end
     | Pseparated _ -> Error.not_yet "\\separated"
     | Pdangling _ -> Error.not_yet "\\dangling"
     | Prel(_, t1, t2) ->
