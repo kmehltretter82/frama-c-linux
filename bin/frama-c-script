@@ -33,7 +33,7 @@ if [ $# -lt 1 ]; then
    echo ""
    echo "  - make-template [dir]"
    echo "      Interactively prepares a template for running analysis scripts,"
-   echo "      writing it to [dir/GNUmakefile]. [dir] is [.] if ommitted."
+   echo "      writing it to [dir/GNUmakefile]. [dir] is [.] if omitted."
    echo ""
    echo "  - make-path"
    echo "      [for Frama-C developers and advanced users without Frama-C in the path]"
