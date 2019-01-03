@@ -692,6 +692,8 @@ src/plugins/gui/GSourceView2.mli: src/plugins/gui/GSourceView2.mli.in
 	$(CP) $< $@
 	$(CHMOD_RO) $@
 
+GENERATED+=src/plugins/gui/GSourceView2.ml src/plugins/gui/GSourceView2.mli
+
 endif
 
 DGRAPHCOMPAT:=
@@ -703,6 +705,8 @@ src/plugins/gui/dgraph.ml: src/plugins/gui/dgraph.ml.in
 src/plugins/gui/dgraph.mli: src/plugins/gui/dgraph.mli.in
 	$(CP) $< $@
 	$(CHMOD_RO) $@
+
+GENERATED+=src/plugins/gui/dgraph.ml src/plugins/gui/dgraph.mli
 endif
 
 ifeq ($(LABLGTK),lablgtk3)
