@@ -1021,11 +1021,10 @@ let graph_window_through_dot ~parent ~title dot_formatter =
 let image_menu_item ~(image:GObj.widget) ~text ~packing =
   let mi = GMenu.menu_item () in
   let box =
-    GPack.hbox ~spacing:2 ~border_width:0 ~homogeneous:true ()
+    GPack.hbox ~spacing:2 ~border_width:0 ~packing:mi#add ()
   in
   box#add image;
-  box#add (GMisc.label ~justify:`LEFT ~text ())#coerce;
-  mi#add box#coerce;
+  box#add (GMisc.label ~justify:`LEFT ~xalign:0. ~xpad:0 ~text ())#coerce;
   packing mi;
   mi
 

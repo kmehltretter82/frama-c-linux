@@ -252,7 +252,7 @@ class menu_manager ?packing ~host:(_:Gtk_helper.host) =
               ignore (mi#connect#activate callback);
               MStandard mi
           | Some stock, Unit_callback callback ->
-              let image = (GMisc.image ~stock () :> GObj.widget) in
+              let image = (GMisc.image ~stock ~xalign:0. () :> GObj.widget) in
               let text = label in
               let packing = !!menubar_packing in
               let mi = Gtk_helper.image_menu_item ~image ~text ~packing in
