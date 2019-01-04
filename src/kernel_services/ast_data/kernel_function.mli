@@ -108,6 +108,14 @@ val blocks_opened_by_edge: stmt -> stmt -> block list
       @raise Invalid_argument if [s2] is not a successor of [s1] in the cfg.
       @since Magnesium-20151001 *)
 
+val common_block: stmt -> stmt -> block
+(** [common_block s1 s2] returns the innermost block that contains
+    both [s1] and [s2], provided the statements belong to the same function.
+    raises a fatal error if this is not the case.
+
+    @since Frama-C+dev
+*)
+
 val stmt_in_loop: t -> stmt -> bool
   (** [stmt_in_loop kf stmt] is [true] iff [stmt] strictly 
       occurs in a loop of [kf].

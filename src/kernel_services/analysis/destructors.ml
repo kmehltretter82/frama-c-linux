@@ -162,12 +162,7 @@ class vis flag = object(self)
     Cil.DoChildrenPost post
 
   method! vstmt_aux s =
-    let inspect_closed_blocks b =
-      (* blocks are sorted from innermost to outermost. The fold_left
-         will give us the list in appropriate order for add_destructors
-         which expects variable from oldest to newest.
-      *)
-      let vars = List.fold_left (fun acc b -> b.blocals @ acc) [] b in
+    let insert_destructors vars =
       let has_destructors, stmts = add_destructors vars in
       if has_destructors then begin
         flag:=true;
@@ -183,6 +178,29 @@ class vis flag = object(self)
         Stack.push curr_block blocks;
       end;
       Cil.SkipChildren
+    in
+    let vars_from_blocks blocks =
+      List.fold_left (fun acc b -> b.blocals @ acc) [] blocks
+    in
+    let vars_from_edge s succ =
+      let closed_blocks = Kernel_function.blocks_closed_by_edge s succ in
+      (* blocks are sorted from innermost to outermost. The fold_left
+         will give us the list in appropriate order for add_destructors
+         which expects variable from oldest to newest.
+      *)
+      let current_block = Kernel_function.common_block s succ in
+      let vars = vars_from_blocks closed_blocks in
+      (* for the common block, we have to check whether we are backjumping
+         over some definitions in the middle of the block, that is
+         definitions that dominate s but not its successor.
+      *)
+      let is_backjump_var v =
+        v.vdefined &&
+        let def = Cil.find_def_stmt current_block v in
+        Dominators.dominates def s && not (Dominators.dominates def succ)
+      in
+      let current_vars = List.filter is_backjump_var current_block.blocals in
+      current_vars @ vars
     in
     let abort_if_non_trivial_type kind v =
       if Cil.hasAttribute Cabs2cil.frama_c_destructor v.vattr then
@@ -210,8 +228,7 @@ class vis flag = object(self)
     in
     let treat_jump_close s =
       match s.succs with
-      | [ succ ] ->
-        inspect_closed_blocks (Kernel_function.blocks_closed_by_edge s succ)
+      | [ succ ] -> insert_destructors (vars_from_edge s succ)
       | _ ->
         Kernel.fatal ~current:true
           "%a in function %a is expected to have a single successor"
@@ -254,7 +271,8 @@ class vis flag = object(self)
     | Switch _ -> treat_jump_open "switch" s; Cil.DoChildren
     (* jump outside of the function: all currently opened blocks are closed. *)
     | Return _ | Throw _ ->
-      inspect_closed_blocks (Kernel_function.find_all_enclosing_blocks s)
+      insert_destructors
+        (vars_from_blocks (Kernel_function.find_all_enclosing_blocks s))
     (* no jump yet, visit children *)
     | _ -> Cil.DoChildren
 

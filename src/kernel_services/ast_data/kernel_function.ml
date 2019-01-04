@@ -211,6 +211,29 @@ let find_all_enclosing_blocks s =
    let table = compute () in
   let (_,_,b) = Datatype.Int.Hashtbl.find table s.sid in b
 
+let common_block s1 s2 =
+  let kf1 = find_englobing_kf s1 in
+  let kf2 = find_englobing_kf s2 in
+  if not (equal kf1 kf2) then
+    Kernel.fatal
+      "cannot find a common block for statements occurring \
+       in two distinct functions";
+  let b1 = find_all_enclosing_blocks s1 in
+  let b2 = find_all_enclosing_blocks s2 in
+  let rec aux last l1 l2 =
+    match l1,l2 with
+    | [], _ | _, [] -> last
+    | b1 :: l1, b2 :: l2 when b1 == b2 -> aux b1 l1 l2
+    | _ :: _, _ :: _ -> last
+  in
+  match List.rev b1, List.rev b2 with
+  | [], _ | _, [] ->
+    Kernel.fatal "Statement not contained in any block"
+  | b1 :: l1, b2 :: l2 when b1 == b2 -> aux b1 l1 l2
+  | _ :: _, _ :: _ ->
+    Kernel.fatal
+      "Statements do not share their function body as outermost common block"
+
 let () = Globals.find_all_enclosing_blocks := find_all_enclosing_blocks
 
 let stmt_in_loop kf stmt =
