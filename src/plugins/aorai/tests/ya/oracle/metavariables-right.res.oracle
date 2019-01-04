@@ -1,0 +1,14 @@
+[kernel] Parsing tests/aorai/metavariables-right.i (no preprocessing)
+[kernel] tests/aorai/metavariables-right.i:10: 
+  syntax error:
+  Location: between lines 10 and 12, before or at token: void
+  8     void i() {}
+  9     
+  
+  10    volatile int v,
+  11    
+  12    void main(void)
+  
+  13    {
+  14      if (v) {
+[kernel] Frama-C aborted: invalid user input.
