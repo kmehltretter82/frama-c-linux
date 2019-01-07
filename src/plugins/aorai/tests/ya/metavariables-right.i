@@ -25,4 +25,3 @@ void main(int t)
     x++;
   }
 }
-
