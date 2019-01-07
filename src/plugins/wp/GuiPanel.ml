@@ -167,7 +167,7 @@ class model_selector (main : Design.main_window_extension_points) =
 let wp_dir = ref (Sys.getcwd())
 
 let wp_script () =
-  let file = GToolbox.select_file
+  let file = Gtk_helper.select_file
       ~title:"Script File for Coq proofs"
       ~dir:wp_dir ~filename:"wp.script" ()
   in
