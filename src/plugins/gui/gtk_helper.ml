@@ -960,6 +960,45 @@ let source_files_chooser (main_ui: source_files_chooser_host) defaults f =
   dialog#show ();
   ()
 
+let default_dir = ref ""
+
+let select_file ?title ?(dir=default_dir) ?(filename="") () =
+  let filename =
+    if Filename.is_relative filename then
+      if !dir <> "" then !dir ^ "/" ^ filename
+      else ""
+    else begin
+      dir:= Filename.dirname filename;
+      filename
+    end
+  in
+  let dialog: GWindow.Buttons.file_selection GWindow.file_chooser_dialog =
+    GWindow.file_chooser_dialog
+      ~action:`OPEN
+      ?title
+      ~filename
+      ~modal:true
+      ()
+  in
+  let result = ref None in
+  let action r =
+    (match r with
+     | `OK ->
+       let file = dialog#filename in
+       (match file with
+        | None -> ()
+        | Some file ->
+          dir := Filename.dirname file;
+          result := Some file)
+     | _ -> ());
+    dialog#destroy ()
+  in
+  dialog#add_select_button "Open" `OK;
+  dialog#add_button "Cancel" `CANCEL;
+  dialog#show ();
+  action (dialog#run ());
+  !result
+
 let spawn_command ?(timeout=0) ?stdout ?stderr s args f =
   let check_result = Command.command_async s ?stdout ?stderr args in
   let has_timeout = timeout > 0 in

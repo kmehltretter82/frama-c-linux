@@ -321,6 +321,15 @@ val source_files_chooser:
   (string list -> unit) ->
   unit
 
+(** Launches a standard gtk file chooser window and returns the name
+    of the selected file. Replaces GToolbox.select_file that has not been
+    ported to lablgtk3.
+
+    @since Frama-C+dev
+*)
+val select_file:
+  ?title:string -> ?dir:(string ref)-> ?filename:string -> unit -> string option
+
 (* ************************************************************************** *)
 (** {2 Miscellaneous} *)
 (* ************************************************************************** *)
