@@ -658,20 +658,18 @@ struct
   let unfold_category = "unfold"
 
 (*GTK3 does not exist anymore in gsourceview3. *)
-  let declare_markers (_source:GSourceView2.source_view) = ()
-(*    source#set_mark_category_pixbuf
-      ~category:fold_category (Some Gtk_helper.Icon.(get Fold));
-    source#set_mark_category_pixbuf
-      ~category:unfold_category (Some Gtk_helper.Icon.(get Unfold));
-    (* Sets a high prioriy so that the icon for folding and unfolding are
-       printed on top of the status bullets. *)
-    source#set_mark_category_priority ~category:fold_category 2;
-    source#set_mark_category_priority ~category:unfold_category 2;
+  let declare_markers (source:GSourceView2.source_view) =
+    GSourceView2.make_marker_attributes
+      ~source ~category:fold_category ~priority:2
+      ~pixbuf:(Gtk_helper.Icon.(get Fold)) ();
+    GSourceView2.make_marker_attributes
+      ~source ~category:unfold_category ~priority:2
+      ~pixbuf:(Gtk_helper.Icon.(get Unfold)) ();
     List.iter
       (fun v ->
-         source#set_mark_category_pixbuf
-           ~category:(category v)
-           (Some (Gtk_helper.Icon.get (Gtk_helper.Icon.Feedback v))))
+         GSourceView2.make_marker_attributes
+           ~source ~category:(category v) ~priority:1
+           ~pixbuf:(Gtk_helper.Icon.get (Gtk_helper.Icon.Feedback v)) ())
       [ F.Never_tried;
         F.Considered_valid;
         F.Valid;
@@ -683,7 +681,7 @@ struct
         F.Valid_under_hyp;
         F.Invalid_under_hyp;
         F.Inconsistent ]
-*)
+
   (* tooltip marks are recreated whenever the buffer changes *)
   let tooltip_marks : (int, string) Hashtbl.t = Hashtbl.create 8
 
@@ -698,17 +696,18 @@ struct
 
   let mark (source:GSourceView2.source_buffer) ?call_site ~offset validity =
     let iter = source#get_iter_at_char offset in
+    let mark = iter#set_line_offset 0 in
     let category = category validity in
-    source#remove_source_marks iter iter () ;
-    ignore (source#create_source_mark ~category iter) ;
+    source#remove_source_marks mark mark () ;
+    ignore (source#create_source_mark ~category mark) ;
     Hashtbl.replace tooltip_marks iter#line (long_category validity);
     match call_site with
     | None -> ()
     | Some stmt ->
       Hashtbl.replace call_sites iter#line stmt;
       if Pretty_source.are_preconds_unfolded stmt
-      then ignore (source#create_source_mark ~category:fold_category iter)
-      else ignore (source#create_source_mark ~category:unfold_category iter)
+      then ignore (source#create_source_mark ~category:fold_category mark)
+      else ignore (source#create_source_mark ~category:unfold_category mark)
 
 end
 
@@ -1501,7 +1500,10 @@ class main_window () : main_window_extension_points =
               (* Relative position of the source_viewer in the main windows. *)
               let viewer_rel_x = get_x source_viewer in
               (* Width of the bullet column in the source viewer. *)
-              if abs_x - (window_abs_x + viewer_rel_x) < 20 then
+              Format.printf "viewer_rel_x: %d@." viewer_rel_x;
+              Format.printf "window_abs_x: %d@." window_abs_x;
+              Format.printf "abs_x:        %d@." abs_x;
+             if abs_x - (window_abs_x + viewer_rel_x) < 20 then
                 begin
                   let x, y = GdkEvent.Button.(x ev, y ev) in
                   let (xbuf, ybuf) = source_viewer#window_to_buffer_coords
@@ -1509,13 +1511,15 @@ class main_window () : main_window_extension_points =
                   in
                   let iterpos = source_viewer#get_iter_at_location xbuf ybuf in
                   let line = iterpos#line in
+                  Format.printf "line is %d@." line;
                   try
                     let stmt = Hashtbl.find Feedback.call_sites line in
+                    Format.printf "stmt found@.";
                     let kf = Kernel_function.find_englobing_kf stmt in
                     Pretty_source.fold_preconds_at_callsite stmt;
                     self#reactive_buffer#redisplay;
                     self#scroll (PStmt (kf, stmt))
-                  with Not_found -> ()
+                  with Not_found -> Format.printf "call not found@."
                 end;
               false)
       in

@@ -1,2 +1,12 @@
 (* compatibility between gtksourceview 2 and 3. *)
 include module type of GSourceView3
+
+val make_marker_attributes:
+  source:source_view ->
+  category:string ->
+  priority: int ->
+  ?background: Gdk.rgba ->
+  ?pixbuf:GdkPixbuf.pixbuf ->
+  ?icon_name:string ->
+  unit ->
+  unit
