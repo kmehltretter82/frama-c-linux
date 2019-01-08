@@ -202,3 +202,5 @@ hello-*.tar.gz
 /src/plugins/gui/dgraph.ml
 /src/plugins/gui/dgraph.mli
 /src/plugins/gui/gtk_compat.ml
+/src/plugins/gui/GSourceView.ml
+/src/plugins/gui/GSourceView.mli

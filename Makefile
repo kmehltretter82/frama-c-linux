@@ -680,21 +680,29 @@ STARTUP_CMX=$(STARTUP_CMO:.cmo=.cmx)
 WTOOLKIT= \
 	wutil widget wbox wfile wpane wpalette wtext wtable
 
-SOURCEVIEWCOMPAT:=
 ifeq ($(strip $(GTKSOURCEVIEW)),lablgtk3.sourceview3)
-SOURCEVIEWCOMPAT:=GSourceView2
 
-src/plugins/gui/GSourceView2.ml: src/plugins/gui/GSourceView2.ml.in
+src/plugins/gui/GSourceView.ml: src/plugins/gui/GSourceView3.ml.in
 	$(CP) $< $@
 	$(CHMOD_RO) $@
 
-src/plugins/gui/GSourceView2.mli: src/plugins/gui/GSourceView2.mli.in
+src/plugins/gui/GSourceView.mli: src/plugins/gui/GSourceView3.mli.in
 	$(CP) $< $@
 	$(CHMOD_RO) $@
 
-GENERATED+=src/plugins/gui/GSourceView2.ml src/plugins/gui/GSourceView2.mli
+else
+src/plugins/gui/GSourceView.ml: src/plugins/gui/GSourceView2.ml.in
+	$(CP) $< $@
+	$(CHMOD_RO) $@
+
+src/plugins/gui/GSourceView.mli: src/plugins/gui/GSourceView2.mli.in
+	$(CP) $< $@
+	$(CHMOD_RO) $@
 
 endif
+
+SOURCEVIEWCOMPAT:=GSourceView
+GENERATED+=src/plugins/gui/GSourceView.ml src/plugins/gui/GSourceView.mli
 
 DGRAPHCOMPAT:=
 ifeq ($(HAS_GNOMECANVAS),no)

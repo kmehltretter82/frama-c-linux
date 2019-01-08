@@ -34,7 +34,7 @@ let use_external_viewer = false
 
 class type reactive_buffer = object
   inherit error_manager
-  method buffer : GSourceView2.source_buffer
+  method buffer : GSourceView.source_buffer
   method locs : Pretty_source.Locs.state
   method rehighlight: unit
   method redisplay: unit
@@ -61,7 +61,7 @@ class type main_window_extension_points = object
   (** Pretty print a message in the [annot_window]. *)
 
   method launcher : unit -> unit
-  method source_viewer : GSourceView2.source_view
+  method source_viewer : GSourceView.source_view
   method source_viewer_scroll : GBin.scrolled_window
   method display_globals : global list -> unit
   method register_source_selector :
@@ -658,16 +658,16 @@ struct
   let unfold_category = "unfold"
 
 (*GTK3 does not exist anymore in gsourceview3. *)
-  let declare_markers (source:GSourceView2.source_view) =
-    GSourceView2.make_marker_attributes
+  let declare_markers (source:GSourceView.source_view) =
+    GSourceView.make_marker_attributes
       ~source ~category:fold_category ~priority:2
       ~pixbuf:(Gtk_helper.Icon.(get Fold)) ();
-    GSourceView2.make_marker_attributes
+    GSourceView.make_marker_attributes
       ~source ~category:unfold_category ~priority:2
       ~pixbuf:(Gtk_helper.Icon.(get Unfold)) ();
     List.iter
       (fun v ->
-         GSourceView2.make_marker_attributes
+         GSourceView.make_marker_attributes
            ~source ~category:(category v) ~priority:1
            ~pixbuf:(Gtk_helper.Icon.get (Gtk_helper.Icon.Feedback v)) ())
       [ F.Never_tried;
@@ -694,7 +694,7 @@ struct
     Hashtbl.clear tooltip_marks;
     Hashtbl.clear call_sites
 
-  let mark (source:GSourceView2.source_buffer) ?call_site ~offset validity =
+  let mark (source:GSourceView.source_buffer) ?call_site ~offset validity =
     let iter = source#get_iter_at_char offset in
     let mark = iter#set_line_offset 0 in
     let category = category validity in
@@ -1364,7 +1364,7 @@ class main_window () : main_window_extension_points =
        to be found (e.g. Ctrl+F). Otherwise, uses the last searched
        text (e.g. F3). *)
     method private focused_find_text use_dialog =
-      let find_text_in_viewer ~where (viewer : [`GTextViewer of GText.view |`GSourceViewer of GSourceView2.source_view]) text =
+      let find_text_in_viewer ~where (viewer : [`GTextViewer of GText.view |`GSourceViewer of GSourceView.source_view]) text =
         let buffer, scroll_to_iter =
           match viewer with
           | `GTextViewer v -> v#buffer,v#scroll_to_iter

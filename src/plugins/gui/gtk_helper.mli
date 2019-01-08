@@ -162,11 +162,11 @@ val make_tag :
     create_tag : ?name:string -> GText.tag_property list -> GText.tag ; .. >
   -> name:string -> GText.tag_property list -> GText.tag
 
-val apply_tag : GSourceView2.source_buffer -> GText.tag -> int -> int -> unit
-val remove_tag : GSourceView2.source_buffer -> GText.tag -> int -> int -> unit
-val cleanup_tag : GSourceView2.source_buffer -> GText.tag -> unit
+val apply_tag : GSourceView.source_buffer -> GText.tag -> int -> int -> unit
+val remove_tag : GSourceView.source_buffer -> GText.tag -> int -> int -> unit
+val cleanup_tag : GSourceView.source_buffer -> GText.tag -> unit
 
-val cleanup_all_tags : GSourceView2.source_buffer -> unit
+val cleanup_all_tags : GSourceView.source_buffer -> unit
 
 (* ************************************************************************** *)
 (** {2 Channels} *)

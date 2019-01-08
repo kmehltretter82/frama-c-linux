@@ -45,7 +45,7 @@ val load_file:
 
 val select_file: t -> Datatype.Filepath.t -> unit (** Selection by page filename *)
 val select_name: t -> string -> unit (** Selection by page title *)
-val get_current_source_view : t -> GSourceView2.source_view
+val get_current_source_view : t -> GSourceView.source_view
 (** Returns the source viewer for the currently displayed tab *)
 
 val clear : t -> unit
