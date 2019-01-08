@@ -51,27 +51,6 @@ let relation_to_binop = function
   | Req -> Eq
   | Rneq -> Ne
 
-let name_of_binop = function
-  | Lt -> "lt"
-  | Gt -> "gt"
-  | Le -> "le"
-  | Ge -> "ge"
-  | Eq -> "eq"
-  | Ne -> "ne"
-  | LOr -> "or"
-  | LAnd -> "and"
-  | BOr -> "bor"
-  | BXor -> "bxor"
-  | BAnd -> "band"
-  | Shiftrt -> "shiftr"
-  | Shiftlt -> "shiftl"
-  | Mod -> "mod"
-  | Div -> "div"
-  | Mult -> "mul"
-  | PlusA -> "add"
-  | MinusA -> "sub"
-  | MinusPP | MinusPI | IndexPI | PlusPI -> assert false
-
 let name_of_mpz_arith_bop = function
   | PlusA -> "__gmpz_add"
   | MinusA -> "__gmpz_sub"
@@ -81,42 +60,60 @@ let name_of_mpz_arith_bop = function
   | Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr
   | Shiftlt | Shiftrt | PlusPI | IndexPI | MinusPI | MinusPP -> assert false
 
+type strnum_ty = (* TYpe of a STRing that represents a NUMber *)
+  | StrZ
+  | StrR
+  | Not_a_strnum (* C numbers (integers AND floats) included *)
+
 (* convert [e] in a way that it is compatible with the given typing context. *)
-let add_cast ~loc ?name env ctx is_mpz_string t_opt e =
+let add_cast ~loc ?name env ctx sty t_opt e =
   let mk_mpz e =
-    let _, e, env =
-      Env.new_var
-        ~loc
-        ?name
-        env
-        t_opt
-        (Gmpz.t ())
-        (fun lv v -> [ Gmpz.init_set ~loc (Cil.var lv) v e ])
+    let _, e, env = Env.new_var
+      ~loc
+      ?name
+      env
+      t_opt
+      (Gmp.z_t ())
+      (fun lv v -> [ Gmp.init_set ~loc (Cil.var lv) v e ])
     in
     e, env
   in
-  let e, env = if is_mpz_string then mk_mpz e else e, env in
+  let e, env = match sty with
+    | StrZ -> mk_mpz e
+    | StrR -> Libr.mk_real ~loc ?name e env t_opt
+    | Not_a_strnum -> e, env
+  in
   match ctx with
-  | None -> e, env
+  | None ->
+    e, env
   | Some ctx ->
     let ty = Cil.typeOf e in
-    if Gmpz.is_t ctx then
-      if Gmpz.is_t ty then
+    if Gmp.is_z_t ctx then
+      if Gmp.is_z_t ty then
         e, env
+      else if Libr.is_t ty then
+        Libr.cast_to_z ~loc ?name e env
       else
         (* Convert the C integer into a mpz.
            Remember: very long integer constants have been temporary converted
            into strings;
-           also possible to get a non integralType (or Gmpz.t) with a non-one in
+           also possible to get a non integralType (or Gmp.z_t) with a non-one in
            the case of \null *)
         let e =
-          if Cil.isIntegralType ty || is_mpz_string then e
-          else Cil.mkCast e Cil.longType (* \null *)
+          if Cil.isIntegralType ty || sty = StrZ then
+            e
+          else if not (Cil.isIntegralType ty) && sty = Not_a_strnum then
+            Cil.mkCast e Cil.longType (* \null *)
+          else (* Remaining: not (Cil.isIntegralType ty) && sty = StrR *)
+            assert false
         in
         mk_mpz e
+    else if Libr.is_t ctx then
+      if Libr.is_t (Cil.typeOf e) then e, env
+      else Libr.mk_real ~loc ?name e env t_opt
     else
       (* handle a C-integer context *)
-      if (Gmpz.is_t ty || is_mpz_string) then
+      if Gmp.is_z_t ty || sty = StrZ then
         (* we get an mpz, but it fits into a C integer: convert it *)
         let fname, new_ty =
           if Cil.isSignedInteger ctx then
@@ -134,21 +131,34 @@ let add_cast ~loc ?name env ctx is_mpz_string t_opt e =
             (fun v _ -> [ Misc.mk_call ~loc ~result:(Cil.var v) fname [ e ] ])
         in
         e, env
+      else if Libr.is_t ty || sty = StrR then
+        Libr.add_cast ~loc ?name e env ctx
       else
         Cil.mkCastT ~force:false ~e ~oldt:ty ~newt:ctx, env
 
-let constant_to_exp ~loc t = function
+let constant_to_exp ~loc t c =
+  let mk_real s =
+    let s = Libr.normalize_str s in
+    Cil.mkString ~loc s, StrR
+  in
+  match c with
   | Integer(n, _repr) ->
     (try
-       let ity = Typing.get_integer_ty t in
+       let ity = Typing.get_number_ty t in
        match ity with
-       | Typing.Other -> assert false
-       | Typing.Gmp -> raise Cil.Not_representable
+       | Typing.Nan ->
+         assert false
+       | Typing.Libr ->
+         mk_real (Integer.to_string n)
+       | Typing.Gmpz ->
+         raise Cil.Not_representable
        | Typing.C_type kind ->
          let cast = Typing.get_cast t in
          match cast, kind with
-         | Some ty, (ILongLong | IULongLong) when Gmpz.is_t ty ->
+         | Some ty, (ILongLong | IULongLong) when Gmp.is_z_t ty ->
            raise Cil.Not_representable
+         | Some ty, (ILongLong | IULongLong) when Libr.is_t ty ->
+           mk_real (Integer.to_string n)
          | (None | Some _), _ ->
            (* do not keep the initial string representation because the
               generated constant must reflect its type computed by the type
@@ -156,19 +166,16 @@ let constant_to_exp ~loc t = function
               generate a [long long] addition and so [1LL]. If we keep the
               initial string representation, the kind would be ignored in the
               generated code and so [1] would be generated. *)
-           Cil.kinteger64 ~loc ~kind n, false
+           Cil.kinteger64 ~loc ~kind n, Not_a_strnum
      with Cil.Not_representable ->
        (* too big integer *)
-       Cil.mkString ~loc (Integer.to_string n), true)
-  | LStr s -> Cil.new_exp ~loc (Const (CStr s)), false
-  | LWStr s -> Cil.new_exp ~loc (Const (CWStr s)), false
-  | LChr c -> Cil.new_exp ~loc (Const (CChr c)), false
-  | LReal {r_literal=s; r_nearest=f; r_lower=l; r_upper=u} ->
-    if l <> u then
-      Options.warning ~current:true ~once:true
-	"approximating a real number by a float";
-    Cil.new_exp ~loc (Const (CReal (f, FLongDouble, Some s))), false
-  | LEnum e -> Cil.new_exp ~loc (Const (CEnum e)), false
+       Cil.mkString ~loc (Integer.to_string n), StrZ)
+  | LStr s -> Cil.new_exp ~loc (Const (CStr s)), Not_a_strnum
+  | LWStr s -> Cil.new_exp ~loc (Const (CWStr s)), Not_a_strnum
+  | LChr c -> Cil.new_exp ~loc (Const (CChr c)), Not_a_strnum
+  | LReal {r_literal=s; r_nearest=_; r_lower=_; r_upper=_} ->
+    mk_real s
+  | LEnum e -> Cil.new_exp ~loc (Const (CEnum e)), Not_a_strnum
 
 let conditional_to_exp ?(name="if") loc t_opt e1 (e2, env2) (e3, env3) =
   let env = Env.pop (Env.pop env3) in
@@ -191,7 +198,11 @@ let conditional_to_exp ?(name="if") loc t_opt e1 (e2, env2) (e3, env3) =
         ty
         (fun v ev ->
           let lv = Cil.var v in
-          let affect e = Gmpz.init_set ~loc lv ev e in
+          let ty = Cil.typeOf ev in
+          let init_set =
+            if Libr.is_t ty then Libr.init_set else Gmp.init_set
+          in
+          let affect e = init_set ~loc lv ev e in
           let then_block, _ =
             let s = affect e2 in
             Env.pop_and_get env2 s ~global_clear:false Env.Middle
@@ -203,26 +214,6 @@ let conditional_to_exp ?(name="if") loc t_opt e1 (e2, env2) (e3, env3) =
           [ Cil.mkStmt ~valid_sid:true (If(e1, then_block, else_block, loc)) ])
     in
     e, env
-
-(* If [e] is inserted in a context of type [float] or equivalent, then an
-   explicit cast must be introduced (an explicit coercion is required in C, but
-   it is implicit in the logic world).
-   [lty] is the type of the logic context, while [lty_t] is the logic type of
-   the term which [e] comes from. *)
-let cast_integer_to_float lty lty_t e =
-  if Cil.isIntegralType (Cil.typeOf e) then
-    let ty, correct = match lty, lty_t with
-      | Ctype ty, _ -> ty, true
-      | Lreal, Linteger -> Cil.longDoubleType, false
-      | Lreal, _ -> Cil.longDoubleType, true
-      | (Ltype _ | Lvar _ | Linteger | Larrow _), _ -> assert false
-    in
-    if not correct  then
-      Options.warning
-        "casting an integer to a long double without verification";
-    Cil.mkCast ~force:false ~e ~newt:ty
-  else
-    e
 
 let rec thost_to_host kf env th = match th with
   | TVar { lv_origin = Some v } ->
@@ -264,24 +255,25 @@ and context_insensitive_term_to_exp kf env t =
   let loc = t.term_loc in
   match t.term_node with
   | TConst c ->
-    let c, is_mpz_string = constant_to_exp ~loc t c in
-    c, env, is_mpz_string, ""
+    let c, strnum = constant_to_exp ~loc t c in
+    c, env, strnum, ""
   | TLval lv ->
     let lv, env, name = tlval_to_lval kf env lv in
-    Cil.new_exp ~loc (Lval lv), env, false, name
-  | TSizeOf ty -> Cil.sizeOf ~loc ty, env, false, "sizeof"
+    Cil.new_exp ~loc (Lval lv), env, Not_a_strnum, name
+  | TSizeOf ty -> Cil.sizeOf ~loc ty, env, Not_a_strnum, "sizeof"
   | TSizeOfE t ->
     let e, env = term_to_exp kf env t in
-    Cil.sizeOf ~loc (Cil.typeOf e), env, false, "sizeof"
-  | TSizeOfStr s -> Cil.new_exp ~loc (SizeOfStr s), env, false, "sizeofstr"
-  | TAlignOf ty -> Cil.new_exp ~loc (AlignOf ty), env, false, "alignof"
+    Cil.sizeOf ~loc (Cil.typeOf e), env, Not_a_strnum, "sizeof"
+  | TSizeOfStr s ->
+    Cil.new_exp ~loc (SizeOfStr s), env, Not_a_strnum, "sizeofstr"
+  | TAlignOf ty -> Cil.new_exp ~loc (AlignOf ty), env, Not_a_strnum, "alignof"
   | TAlignOfE t ->
     let e, env = term_to_exp kf env t in
-    Cil.new_exp ~loc (AlignOfE e), env, false, "alignof"
+    Cil.new_exp ~loc (AlignOfE e), env, Not_a_strnum, "alignof"
   | TUnOp(Neg | BNot as op, t') ->
     let ty = Typing.get_typ t in
     let e, env = term_to_exp kf env t' in
-    if Gmpz.is_t ty then
+    if Gmp.is_z_t ty then
       let name, vname = match op with
 	| Neg -> "__gmpz_neg", "neg"
 	| BNot -> "__gmpz_com", "bnot"
@@ -295,53 +287,57 @@ and context_insensitive_term_to_exp kf env t =
 	  (Some t)
 	  (fun _ ev -> [ Misc.mk_call ~loc name [ ev; e ] ])
       in
-      e, env, false, ""
+      e, env, Not_a_strnum, ""
+    else if Libr.is_t ty then
+      not_yet env "reals: Neg | BNot"
     else
-      Cil.new_exp ~loc (UnOp(op, e, ty)), env, false, ""
+      Cil.new_exp ~loc (UnOp(op, e, ty)), env, Not_a_strnum, ""
   | TUnOp(LNot, t) ->
     let ty = Typing.get_op t in
-    if Gmpz.is_t ty then
+    if Gmp.is_z_t ty then
       (* [!t] is converted into [t == 0] *)
       let zero = Logic_const.tinteger 0 in
-      let ctx = Typing.get_integer_ty t in
+      let ctx = Typing.get_number_ty t in
       Typing.type_term ~use_gmp_opt:true ~ctx zero;
-      let e, env =
-        comparison_to_exp kf ~loc ~name:"not" env Typing.gmp Eq t zero (Some t)
+      let e, env = comparison_to_exp
+        kf ~loc ~name:"not" env Typing.gmpz Eq t zero (Some t)
       in
-      e, env, false, ""
+      e, env, Not_a_strnum, ""
+    else if Libr.is_t ty then
+      not_yet env "reals: LNot"
     else begin
       assert (Cil.isIntegralType ty);
       let e, env = term_to_exp kf env t in
-      Cil.new_exp ~loc (UnOp(LNot, e, Cil.intType)), env, false, ""
+      Cil.new_exp ~loc (UnOp(LNot, e, Cil.intType)), env, Not_a_strnum, ""
     end
   | TBinOp(PlusA | MinusA | Mult as bop, t1, t2) ->
     let ty = Typing.get_typ t in
     let e1, env = term_to_exp kf env t1 in
     let e2, env = term_to_exp kf env t2 in
-    if Gmpz.is_t ty then
+    if Gmp.is_z_t ty then
       let name = name_of_mpz_arith_bop bop in
       let mk_stmts _ e = [ Misc.mk_call ~loc name [ e; e1; e2 ] ] in
-      let name = name_of_binop bop in
+      let name = Misc.name_of_binop bop in
       let _, e, env =
 	Env.new_var_and_mpz_init ~loc ~name env (Some t) mk_stmts
       in
-      e, env, false, ""
+      e, env, Not_a_strnum, ""
+    else if Libr.is_t ty then
+      let e, env = Libr.mk_binop ~loc bop e1 e2 env (Some t) in
+      e, env, Not_a_strnum, ""
     else
       if Logic_typing.is_integral_type t.term_type then
-        Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)), env, false, ""
+        Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)), env, Not_a_strnum, ""
       else
-        (* floating point context: casting the arguments potentially required *)
-        let e1 = cast_integer_to_float t.term_type t1.term_type e1 in
-        let e2 = cast_integer_to_float t.term_type t2.term_type e2 in
-        Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)),  env, false, ""
+        not_yet env "floating-point context (?)"
   | TBinOp(Div | Mod as bop, t1, t2) ->
     let ty = Typing.get_typ t in
     let e1, env = term_to_exp kf env t1 in
     let e2, env = term_to_exp kf env t2 in
-    if Gmpz.is_t ty then
+    if Gmp.is_z_t ty then
       (* TODO: preventing division by zero should not be required anymore.
          RTE should do this automatically. *)
-      let ctx = Typing.get_integer_ty t in
+      let ctx = Typing.get_number_ty t in
       let t = Some t in
       let name = name_of_mpz_arith_bop bop in
       (* [TODO] can now do better since the type system got some info about
@@ -351,12 +347,12 @@ and context_insensitive_term_to_exp kf env t =
       Typing.type_term ~use_gmp_opt:true ~ctx zero;
       (* do not generate [e2] from [t2] twice *)
       let guard, env =
-        let name = name_of_binop bop ^ "_guard" in
+        let name = Misc.name_of_binop bop ^ "_guard" in
         comparison_to_exp
-          ~loc kf env Typing.gmp ~e1:e2 ~name Eq t2 zero t
+          ~loc kf env Typing.gmpz ~e1:e2 ~name Eq t2 zero t
       in
       let mk_stmts _v e =
-	assert (Gmpz.is_t ty);
+	assert (Gmp.is_z_t ty);
 	let vis = Env.get_visitor env in
 	let kf = Extlib.the vis#current_kf in
 	let cond =
@@ -370,23 +366,23 @@ and context_insensitive_term_to_exp kf env t =
 	let instr = Misc.mk_call ~loc name [ e; e1; e2 ] in
 	[ cond; instr ]
       in
-      let name = name_of_binop bop in
+      let name = Misc.name_of_binop bop in
       let _, e, env = Env.new_var_and_mpz_init ~loc ~name env t mk_stmts in
-      e, env, false, ""
+      e, env, Not_a_strnum, ""
+    else if Libr.is_t ty then
+      let e, env = Libr.mk_binop ~loc bop e1 e2 env (Some t) in
+      e, env, Not_a_strnum, ""
     else
       (* no guard required since RTEs are generated separately *)
       if Logic_typing.is_integral_type t.term_type then
-        Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)), env, false, ""
+        Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)), env, Not_a_strnum, ""
       else
-        (* floating point context: casting the arguments potentially required *)
-        let e1 = cast_integer_to_float t.term_type t1.term_type e1 in
-        let e2 = cast_integer_to_float t.term_type t2.term_type e2 in
-        Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)),  env, false, ""
+        not_yet env "floating-point context (?)"
   | TBinOp(Lt | Gt | Le | Ge | Eq | Ne as bop, t1, t2) ->
     (* comparison operators *)
     let ity = Typing.get_integer_op t in
     let e, env = comparison_to_exp ~loc kf env ity bop t1 t2 (Some t) in
-    e, env, false, ""
+    e, env, Not_a_strnum, ""
   | TBinOp((Shiftlt | Shiftrt), _, _) ->
     (* left/right shift *)
     not_yet env "left/right shift"
@@ -398,7 +394,7 @@ and context_insensitive_term_to_exp kf env t =
     let e, env =
       conditional_to_exp ~name:"or" loc (Some t) e1 (Cil.one loc, env') res2
     in
-    e, env, false, ""
+    e, env, Not_a_strnum, ""
   | TBinOp(LAnd, t1, t2) ->
     (* t1 && t2 <==> if t1 then t2 else false *)
     let e1, env1 = term_to_exp kf (Env.rte env true) t1 in
@@ -407,7 +403,7 @@ and context_insensitive_term_to_exp kf env t =
     let e, env =
       conditional_to_exp ~name:"and" loc (Some t) e1 res2 (Cil.zero loc, env3)
     in
-    e, env, false, ""
+    e, env, Not_a_strnum, ""
   | TBinOp((BOr | BXor | BAnd), _, _) ->
     (* other logic/arith operators  *)
     not_yet env "missing binary bitwise operator"
@@ -424,30 +420,32 @@ and context_insensitive_term_to_exp kf env t =
     in
     let e1, env = term_to_exp kf env t1 in
     let e2, env = term_to_exp kf env t2 in
-    Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)), env, false, ""
+    Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)), env, Not_a_strnum, ""
   | TBinOp(MinusPP, t1, t2) ->
-    begin match Typing.get_integer_ty t with
+    begin match Typing.get_number_ty t with
       | Typing.C_type _ ->
         let e1, env = term_to_exp kf env t1 in
         let e2, env = term_to_exp kf env t2 in
         let ty = Typing.get_typ t in
-        Cil.new_exp ~loc (BinOp(MinusPP, e1, e2, ty)), env, false, ""
-      | Typing.Gmp ->
+        Cil.new_exp ~loc (BinOp(MinusPP, e1, e2, ty)), env, Not_a_strnum, ""
+      | Typing.Gmpz ->
         not_yet env "pointer subtraction resulting in gmp"
-      | Typing.Other ->
+      | Typing.Libr | Typing.Nan ->
         assert false
     end
   | TCastE(ty, t') ->
     let e, env = term_to_exp kf env t' in
-    let e, env = add_cast ~loc ~name:"cast" env (Some ty) false (Some t) e in
-    e, env, false, ""
+    let e, env =
+      add_cast ~loc ~name:"cast" env (Some ty) Not_a_strnum (Some t) e
+    in
+    e, env, Not_a_strnum, ""
   | TLogic_coerce _ -> assert false (* handle in [term_to_exp] *)
   | TAddrOf lv ->
     let lv, env, _ = tlval_to_lval kf env lv in
-    Cil.mkAddrOf ~loc lv, env, false, "addrof"
+    Cil.mkAddrOf ~loc lv, env, Not_a_strnum, "addrof"
   | TStartOf lv ->
     let lv, env, _ = tlval_to_lval kf env lv in
-    Cil.mkAddrOrStartOf ~loc lv, env, false, "startof"
+    Cil.mkAddrOrStartOf ~loc lv, env, Not_a_strnum, "startof"
   | Tapp(li, [], targs) ->
     let fname = li.l_var_info.lv_name in
     (* build the varinfo (as an expression) which stores the result of the
@@ -482,12 +480,13 @@ and context_insensitive_term_to_exp kf env t =
           List.fold_right
             (fun targ (params_ty, args, env) ->
                let e, env = term_to_exp kf env targ in
-               let param_ty = Typing.get_integer_ty targ in
+               let param_ty = Typing.get_number_ty targ in
                let e, env =
                  try
-                   let ty = Typing.typ_of_integer_ty param_ty in
-                   add_cast loc env (Some ty) false (Some targ) e
-                 with Typing.Not_an_integer ->
+                   let ty = Typing.typ_of_number_ty param_ty in
+                   (* TODO RATIONAL: check [Not_a_strnum] *)
+                   add_cast loc env (Some ty) Not_a_strnum (Some targ) e
+                 with Typing.Not_a_number ->
                    e, env
                in
                param_ty :: params_ty, e :: args, env)
@@ -499,7 +498,7 @@ and context_insensitive_term_to_exp kf env t =
         in
         Logic_functions.tapp_to_exp ~loc gen_fname env t li params_ty args
     in
-    e, env, false, "app"
+    e, env, Not_a_strnum, "app"
   | Tapp(_, _ :: _, _) ->
     not_yet env "logic functions with labels"
   | Tlambda _ -> not_yet env "functional"
@@ -509,38 +508,39 @@ and context_insensitive_term_to_exp kf env t =
     let (_, env2 as res2) = term_to_exp kf (Env.push env1) t2 in
     let res3 = term_to_exp kf (Env.push env2) t3 in
     let e, env = conditional_to_exp loc (Some t) e1 res2 res3 in
-    e, env, false, ""
+    e, env, Not_a_strnum, ""
   | Tat(t, BuiltinLabel Here) ->
     let e, env = term_to_exp kf env t in
-    e, env, false, ""
+    e, env, Not_a_strnum, ""
   | Tat(t', label) ->
     let lscope = Env.Logic_scope.get env in
     let pot = Misc.PoT_term t' in
     if Lscope.is_used lscope pot then
       let e, env = At_with_lscope.to_exp ~loc kf env pot label in
-      e, env, false, ""
+      e, env, Not_a_strnum, ""
     else
       let e, env = term_to_exp kf (Env.push env) t' in
-      let e, env, is_mpz_string = at_to_exp_no_lscope env (Some t) label e in
-      e, env, is_mpz_string, ""
+      let e, env, sty = at_to_exp_no_lscope env (Some t) label e in
+      e, env, sty, ""
   | Tbase_addr(BuiltinLabel Here, t) ->
     let name = "base_addr" in
     let e, env = Mmodel_translate.call ~loc kf name Cil.voidPtrType env t in
-    e, env, false, name
+    e, env, Not_a_strnum, name
   | Tbase_addr _ -> not_yet env "labeled \\base_addr"
   | Toffset(BuiltinLabel Here, t) ->
     let size_t = Cil.theMachine.Cil.typeOfSizeOf in
     let name = "offset" in
     let e, env = Mmodel_translate.call ~loc kf name size_t env t in
-    e, env, false, name
+    e, env, Not_a_strnum, name
   | Toffset _ -> not_yet env "labeled \\offset"
   | Tblock_length(BuiltinLabel Here, t) ->
     let size_t = Cil.theMachine.Cil.typeOfSizeOf in
     let name = "block_length" in
     let e, env = Mmodel_translate.call ~loc kf name size_t env t in
-    e, env, false, name
+    e, env, Not_a_strnum, name
   | Tblock_length _ -> not_yet env "labeled \\block_length"
-  | Tnull -> Cil.mkCast (Cil.zero ~loc) (TPtr(TVoid [], [])), env, false, "null"
+  | Tnull ->
+    Cil.mkCast (Cil.zero ~loc) (TPtr(TVoid [], [])), env, Not_a_strnum, "null"
   | TUpdate _ -> not_yet env "functional update"
   | Ttypeof _ -> not_yet env "typeof"
   | Ttype _ -> not_yet env "C type"
@@ -555,7 +555,7 @@ and context_insensitive_term_to_exp kf env t =
     let env = env_of_li li kf env loc in
     let e, env = term_to_exp kf env t in
     Interval.Env.remove li.l_var_info;
-    e, env, false, ""
+    e, env, Not_a_strnum, ""
 
 (* Convert an ACSL term into a corresponding C expression (if any) in the given
    environment. Also extend this environment in order to include the generating
@@ -566,9 +566,7 @@ and term_to_exp kf env t =
     Printer.pp_term t generate_rte;
   let env = Env.rte env false in
   let t = match t.term_node with TLogic_coerce(_, t) -> t | _ -> t in
-  let e, env, is_mpz_string, name =
-    context_insensitive_term_to_exp kf env t
-  in
+  let e, env, sty, name = context_insensitive_term_to_exp kf env t in
   let env = if generate_rte then translate_rte kf env e else env in
   let cast = Typing.get_cast t in
   let name = if name = "" then None else Some name in
@@ -577,13 +575,13 @@ and term_to_exp kf env t =
     ?name
     env
     cast
-    is_mpz_string
+    sty
     (Some t)
     e
 
 (* generate the C code equivalent to [t1 bop t2]. *)
 and comparison_to_exp
-    ~loc ?e1 kf env ity bop ?(name=name_of_binop bop) t1 t2 t_opt =
+    ~loc ?e1 kf env ity bop ?(name=Misc.name_of_binop bop) t1 t2 t_opt =
   let e1, env = match e1 with
     | None ->
       let e1, env = term_to_exp kf env t1 in
@@ -593,20 +591,21 @@ and comparison_to_exp
   in
   let e2, env = term_to_exp kf env t2 in
   match ity with
-  | Typing.Gmp ->
-    let _, e, env =
-      Env.new_var
-        ~loc
-        env
-        t_opt
-        ~name
-        Cil.intType
-        (fun v _ ->
-          [ Misc.mk_call ~loc ~result:(Cil.var v) "__gmpz_cmp" [ e1; e2 ] ])
+  | Typing.C_type _ | Typing.Nan ->
+    Cil.mkBinOp ~loc bop e1 e2, env
+  | Typing.Gmpz ->
+    let _, e, env = Env.new_var
+      ~loc
+      env
+      t_opt
+      ~name
+      Cil.intType
+      (fun v _ ->
+        [ Misc.mk_call ~loc ~result:(Cil.var v) "__gmpz_cmp" [ e1; e2 ] ])
     in
     Cil.new_exp ~loc (BinOp(bop, e, Cil.zero ~loc, Cil.intType)), env
-  | Typing.C_type _ | Typing.Other ->
-    Cil.mkBinOp ~loc bop e1 e2, env
+  | Typing.Libr ->
+    Libr.cmp ~loc bop e1 e2 env t_opt
 
 and at_to_exp_no_lscope env t_opt label e =
   let stmt = E_acsl_label.get_stmt (Env.get_visitor env) label in
@@ -632,9 +631,11 @@ and at_to_exp_no_lscope env t_opt label e =
   let o = object
     inherit Visitor.frama_c_inplace
     method !vstmt_aux stmt =
-      (* either a standard C affectation or an mpz one according to type of
+      (* either a standard C affectation or something else according to type of
         [e] *)
-      let new_stmt = Gmpz.init_set ~loc (Cil.var res_v) res e in
+      let ty = Cil.typeOf e in
+      let init_set = if Libr.is_t ty then Libr.init_set else Gmp.init_set in
+      let new_stmt = init_set ~loc (Cil.var res_v) res e in
       assert (!env_ref == new_env);
       (* generate the new block of code for the labeled statement and the
         corresponding environment *)
@@ -646,19 +647,24 @@ and at_to_exp_no_lscope env t_opt label e =
   end
   in
   let bhv = Env.get_behavior new_env in
-  ignore( Visitor.visitFramacStmt o (Visitor_behavior.Get.stmt bhv stmt));
-  res, !env_ref, false
+  let new_stmt =
+    Visitor.visitFramacStmt o (Visitor_behavior.Get.stmt bhv stmt)
+  in
+  Visitor_behavior.Set.stmt bhv stmt new_stmt;
+  res, !env_ref, Not_a_strnum
 
 and env_of_li li kf env loc =
-  let li_t = Misc.term_of_li li in
-  let ty = Typing.get_typ li_t in
+  let t = Misc.term_of_li li in
+  let ty = Typing.get_typ t in
   let vi, vi_e, env = Env.Logic_binding.add ~ty env li.l_var_info in
-  let li_e, env = term_to_exp kf env li_t in
-  let stmt = match Typing.get_integer_ty li_t with
-  | Typing.C_type _ | Typing.Other ->
-    Cil.mkStmtOneInstr (Set (Cil.var vi, li_e, loc))
-  | Typing.Gmp ->
-    Gmpz.init_set ~loc (Cil.var vi) vi_e li_e
+  let e, env = term_to_exp kf env t in
+  let stmt = match Typing.get_number_ty t with
+    | Typing.C_type _ | Typing.Nan ->
+      Cil.mkStmtOneInstr (Set (Cil.var vi, e, loc))
+    | Typing.Gmpz ->
+      Gmp.init_set ~loc (Cil.var vi) vi_e e
+    | Typing.Libr ->
+      Libr.init_set ~loc (Cil.var vi) vi_e e
   in
   Env.add_stmt env stmt
 
@@ -749,8 +755,8 @@ and named_predicate_content_to_exp ?name kf env p =
     else begin
       (* convert [t'] to [e] in a separated local env *)
       let e, env = named_predicate_to_exp kf (Env.push env) p' in
-      let e, env, is_string = at_to_exp_no_lscope env None label e in
-      assert (not is_string);
+      let e, env, sty = at_to_exp_no_lscope env None label e in
+      assert (sty = Not_a_strnum);
       e, env
     end
   | Pvalid_read(BuiltinLabel Here as llabel, t) as pc
@@ -818,7 +824,7 @@ and named_predicate_to_exp ?name kf ?rte env p =
     ?name
     env
     cast
-    false
+    Not_a_strnum
     None
     e
 
@@ -898,11 +904,13 @@ exception No_simple_translation of term
 let term_to_exp typ t =
   (* infer a context from the given [typ] whenever possible *)
   let ctx_of_typ ty =
-    if Gmpz.is_t ty then Typing.gmp
+    if Gmp.is_z_t ty then Typing.gmpz
+    else if Libr.is_t ty then Typing.libr
     else
       match ty with
       | TInt(ik, _) -> Typing.ikind ik
-      | _ -> Typing.other
+      | TFloat _ -> Typing.libr
+      | _ -> Typing.nan
   in
   let ctx = Extlib.opt_map ctx_of_typ typ in
   Typing.type_term ~use_gmp_opt:true ?ctx t;

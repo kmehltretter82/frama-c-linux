@@ -757,7 +757,7 @@ FRAMAC_FLAGS="$FRAMAC_FLAGS -variadic-no-translation"
 # C, CPP and LD flags for compilation of E-ACSL-generated sources
 EACSL_CFLAGS="$OPTION_EXTERNAL_ASSERT"
 EACSL_CPPFLAGS="-I$EACSL_SHARE"
-EACSL_LDFLAGS="$LIBDIR/libeacsl-dlmalloc.a $LIBDIR/libeacsl-gmp.a -lm"
+EACSL_LDFLAGS="$LIBDIR/libeacsl-dlmalloc.a -lgmp -lm"
 
 # Output file names
 OUTPUT_CODE="$OPTION_OUTPUT_CODE" # E-ACSL instrumented source

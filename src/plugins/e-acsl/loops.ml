@@ -142,7 +142,7 @@ let bounds_for_small_type ~loc (t1, lv, t2) =
       let min, max = Misc.finite_min_and_max i in
       let t1 = Logic_const.tint ~loc min in
       let t2 = Logic_const.tint ~loc max in
-      let ctx = Typing.integer_ty_of_typ ty in
+      let ctx = Typing.number_ty_of_typ ty in
       (* we are assured that we will not have a GMP,
         once again because we intersected with [ity] *)
       Typing.type_term ~use_gmp_opt:false ~ctx t1;
@@ -171,8 +171,8 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       bounds_for_small_type ~loc (t1, logic_x, t2)
     in
     let ctx =
-      let ty1 = Typing.get_integer_ty t1 in
-      let ty2 = Typing.get_integer_ty t2 in
+      let ty1 = Typing.get_number_ty t1 in
+      let ty2 = Typing.get_number_ty t2 in
       Typing.join ty1 ty2
     in
     let t_plus_one ?ty t =
@@ -210,21 +210,21 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     in
     Typing.type_term ~use_gmp_opt:false ~ctx t2_one;
     let ctx_one =
-      let ty1 = Typing.get_integer_ty t1 in
-      let ty2 = Typing.get_integer_ty t2_one in
+      let ty1 = Typing.get_number_ty t1 in
+      let ty2 = Typing.get_number_ty t2_one in
       Typing.join ty1 ty2
     in
     let ty =
-      try Typing.typ_of_integer_ty ctx_one
-      with Typing.Not_an_integer -> assert false
+      try Typing.typ_of_number_ty ctx_one
+      with Typing.Not_a_number -> assert false
     in
     (* loop counter corresponding to the quantified variable *)
     let var_x, x, env = Env.Logic_binding.add ~ty env logic_x in
     let lv_x = var var_x in
     let env = match ctx_one with
       | Typing.C_type _ -> env
-      | Typing.Gmp -> Env.add_stmt env (Gmpz.init ~loc x)
-      | Typing.Other -> assert false
+      | Typing.Gmpz -> Env.add_stmt env (Gmp.init ~loc x)
+      | Typing.Libr | Typing.Nan -> assert false
     in
     (* build the inner loops and loop body *)
     let body, env =
@@ -234,7 +234,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     let e1, env = term_to_exp kf (Env.push env) t1 in
     let init_blk, env = Env.pop_and_get
       env
-      (Gmpz.affect ~loc:e1.eloc lv_x x e1)
+      (Gmp.affect ~loc:e1.eloc lv_x x e1)
       ~global_clear:false
       Env.Middle
     in
@@ -268,7 +268,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     let incr, env = term_to_exp kf (Env.push env) tlv_one in
     let next_blk, env = Env.pop_and_get
       env
-      (Gmpz.affect ~loc:incr.eloc lv_x x incr)
+      (Gmp.affect ~loc:incr.eloc lv_x x incr)
       ~global_clear:false
       Env.Middle
     in
@@ -303,7 +303,9 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     let ty = Typing.get_typ t in
     let vi_of_lv, exp_of_lv, env = Env.Logic_binding.add ~ty env lv in
     let e, env = term_to_exp kf env t in
-    let let_stmt = Gmpz.init_set ~loc (Cil.var vi_of_lv) exp_of_lv  e in
+    let ty = Cil.typeOf e in
+    let init_set = if Libr.is_t ty then Libr.init_set else Gmp.init_set in
+    let let_stmt = init_set ~loc (Cil.var vi_of_lv) exp_of_lv  e in
     let stmts, env =
       mk_nested_loops ~loc mk_innermost_block kf env lscope_vars'
     in

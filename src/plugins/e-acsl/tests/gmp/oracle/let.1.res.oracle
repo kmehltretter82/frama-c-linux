@@ -49,6 +49,12 @@
 [eva] using specification for function __e_acsl_store_block
 [eva] using specification for function __e_acsl_full_init
 [eva:alarm] tests/gmp/let.c:27: Warning: assertion got status unknown.
+[eva] using specification for function __gmpq_init
+[eva] using specification for function __gmpq_set_d
+[eva] using specification for function __gmpq_cmp
+[eva:alarm] tests/gmp/let.c:27: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[eva] using specification for function __gmpq_clear
 [eva:alarm] tests/gmp/let.c:30: Warning: assertion got status unknown.
 [eva:alarm] tests/gmp/let.c:30: Warning: 
   function __e_acsl_assert: precondition got status unknown.

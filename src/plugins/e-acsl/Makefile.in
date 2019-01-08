@@ -64,13 +64,14 @@ PLUGIN_CMO:= local_config \
 	builtins \
 	functions \
 	misc \
-	gmpz \
+	gmp \
 	literal_strings \
 	mmodel_analysis \
 	exit_points \
 	label \
 	lscope \
 	env \
+	libr \
 	keep_status \
 	dup_functions \
 	interval \
@@ -213,34 +214,10 @@ $(EACSL_DLMALLOC_LIB): $(EACSL_DLMALLOC_SRC)
 	echo 'RANLIB       $@'
 	ranlib $@
 
-############
-# GMP 	   #
-############
-
-EACSL_GMP_REL_DIR:=contrib/libgmp
-EACSL_GMP_DIR := $(EACSL_PLUGIN_DIR)/$(EACSL_GMP_REL_DIR)
-EACSL_GMP_LIBNAME = libeacsl-gmp.a
-EACSL_GMP_LIB = $(EACSL_LIBDIR)/$(EACSL_GMP_LIBNAME)
-EACSL_GMP_OBJ = mini-gmp.o
-EACSL_GMP_SRC = $(EACSL_GMP_DIR)/mini-gmp.c
-EACSL_GMP_FLAGS = \
-	-Dmalloc=__e_acsl_private_malloc \
-	-Drealloc=__e_acsl_private_realloc \
-	-Dfree=__e_acsl_private_free
-
-$(EACSL_GMP_LIB): $(EACSL_GMP_SRC)
-	$(MKDIR) $(EACSL_LIBDIR)
-	echo 'CC           $< '
-	$(CC) $< $(EACSL_GMP_FLAGS) -c -O2 -g3 -o$(EACSL_GMP_OBJ)
-	echo 'AR           $@'
-	$(AR) crus $(EACSL_GMP_LIB) $(EACSL_GMP_OBJ)
-	echo 'RANLIB       $@'
-	ranlib $(EACSL_GMP_LIB)
-
-all:: $(EACSL_DLMALLOC_LIB) $(EACSL_GMP_LIB)
+all:: $(EACSL_DLMALLOC_LIB)
 
 clean::
-	$(RM) $(EACSL_DLMALLOC_LIB) $(EACSL_GMP_LIB)
+	$(RM) $(EACSL_DLMALLOC_LIB)
 
 ############
 # Cleaning #
@@ -261,8 +238,6 @@ e-acsl-distclean:: clean
 EXPORT = e-acsl-$(EACSL_VERSION)
 
 EACSL_CONTRIB_FILES = \
-  $(EACSL_GMP_REL_DIR)/mini-gmp.c \
-  $(EACSL_GMP_REL_DIR)/mini-gmp.h \
   $(EACSL_DLMALLOC_REL_DIR)/dlmalloc.c
 
 EACSL_MANUAL_FILES = doc/manuals/*.pdf
@@ -276,7 +251,7 @@ EACSL_DOC_FILES = \
 EACSL_TEST_FILES = \
   tests/test_config.in tests/print.ml
 
-# Test files without header management 
+# Test files without header management
 EACSL_DISTRIB_TESTS = \
   $(foreach dir, $(addprefix tests/,$(PLUGIN_TESTS_DIRS)), \
       $(dir)/*.[ich] \
@@ -401,7 +376,7 @@ EACSL_CEA_LGPL_BARE= *.ml *.mli Makefile.in configure.ac \
 EACSL_CEA_LGPL=$(addprefix $(EACSL_PLUGIN_DIR)/, $(EACSL_CEA_LGPL_BARE)) \
                $(EACSL_CEA_SHARE)
 
-# valid values: open-source, close-source 
+# valid values: open-source, close-source
 EACSL_HEADERS?=open-source
 headers::
 	@echo "Applying $(EACSL_HEADERS) headers..."
@@ -414,9 +389,6 @@ headers::
 	headache -c $(EACSL_PLUGIN_DIR)/license/headache_config.txt \
                  -h $(EACSL_PLUGIN_DIR)/headers/$(EACSL_HEADERS)/MODIFIED_DLMALLOC \
                  $(EACSL_PLUGIN_DIR)/contrib/libdlmalloc/dlmalloc.c
-	headache -c $(EACSL_PLUGIN_DIR)/license/headache_config.txt \
-                 -h $(EACSL_PLUGIN_DIR)/headers/$(EACSL_HEADERS)/MODIFIED_LIB_GMP \
-                 $(EACSL_PLUGIN_DIR)/contrib/libgmp/mini-gmp.[ch]
 
 endif
 

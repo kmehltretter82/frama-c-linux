@@ -222,7 +222,7 @@ let dup_global loc actions spec bhv sound_verdict_vi kf vi new_vi =
 (* Visitor *)
 (* ********************************************************************** *)
 
-type position = Before_gmp | Gmp | After_gmp | Memory_model | Code
+type position = Before_gmp | Gmpz | After_gmp | Memory_model | Code
 
 class dup_functions_visitor prj = object (self)
   inherit Visitor.frama_c_copy prj
@@ -253,7 +253,7 @@ class dup_functions_visitor prj = object (self)
     vi
 
   method private before_memory_model = match before_memory_model with
-  | Before_gmp | Gmp | After_gmp -> true
+  | Before_gmp | Gmpz | After_gmp -> true
   | Memory_model | Code -> false
 
   method private insert_libc l =
@@ -275,7 +275,7 @@ class dup_functions_visitor prj = object (self)
   method private next () =
     match before_memory_model with
     | Before_gmp -> ()
-    | Gmp -> before_memory_model <- After_gmp
+    | Gmpz -> before_memory_model <- After_gmp
     | After_gmp -> ()
     | Memory_model -> before_memory_model <- Code
     | Code -> ()
@@ -380,8 +380,8 @@ if there are memory-related annotations.@]"
   | GVarDecl(_, loc) | GFunDecl(_, _, loc) | GFun(_, loc)
     when Misc.is_library_loc loc ->
     (match before_memory_model with
-    | Before_gmp -> before_memory_model <- Gmp
-    | Gmp | Memory_model -> ()
+    | Before_gmp -> before_memory_model <- Gmpz
+    | Gmpz | Memory_model -> ()
     | After_gmp -> before_memory_model <- Memory_model
     | Code -> () (* still processing the GMP and memory model headers,
                     but reading some libc code *));

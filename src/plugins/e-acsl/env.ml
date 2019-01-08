@@ -34,44 +34,49 @@ type scope =
   | Function
   | Local_block
 
-type mpz_tbl = {   
-  new_exps: (varinfo * exp) Term.Map.t; (* generated mpz variables as exp from
-					   terms *)
-  clear_stmts: stmt list; (* stmts freeing the memory before exiting the 
-			     block *) 
+type mp_tbl = {
+  new_exps: (varinfo * exp) Term.Map.t;
+  (* generated mp variables as exp from terms *)
+  clear_stmts: stmt list;
+  (* stmts freeing the memory before exiting the block *)
 }
 
 type block_info = {
-  new_block_vars: varinfo list; (* generated variables local to the block *)
-  new_stmts: stmt list; (* generated stmts to put at the beginning of the 
-			   block *) 
-  pre_stmts: stmt list; (* stmts already inserted into the current stmt, but
-			   which should be before [new_stmts]. *)
+  new_block_vars: varinfo list;
+  (* generated variables local to the block *)
+  new_stmts: stmt list;
+  (* generated stmts to put at the beginning of the block *)
+  pre_stmts: stmt list;
+  (* stmts already inserted into the current stmt,
+     but which should be before [new_stmts]. *)
   post_stmts: stmt list;
 }
 
-type local_env = 
-    { block_info: block_info; 
-      mpz_tbl: mpz_tbl;
-      rte: bool }
+type local_env = {
+  block_info: block_info;
+  mp_tbl: mp_tbl;
+  rte: bool
+}
 
-type t = 
-    { visitor: Visitor.frama_c_visitor;
-      lscope: Lscope.t;
-      lscope_reset: bool;
-      annotation_kind: Misc.annotation_kind;
-      new_global_vars: (varinfo * localized_scope) list;
-      (* generated variables. The scope indicates the level where the variable
-         should be added. *)
-      global_mpz_tbl: mpz_tbl;
-      env_stack: local_env list;
-      var_mapping: Varinfo.t Stack.t Logic_var.Map.t;
-      (* records of C bindings for logic vars *)
-      loop_invariants: predicate list list;
-      (* list of loop invariants for each currently visited loops *) 
-      cpt: int; (* counter used when generating variables *) }
+type t = {
+  visitor: Visitor.frama_c_visitor;
+  lscope: Lscope.t;
+  lscope_reset: bool;
+  annotation_kind: Misc.annotation_kind;
+  new_global_vars: (varinfo * localized_scope) list;
+  (* generated variables. The scope indicates the level where the variable
+     should be added. *)
+  global_mp_tbl: mp_tbl;
+  env_stack: local_env list;
+  var_mapping: Varinfo.t Stack.t Logic_var.Map.t;
+  (* records of C bindings for logic vars *)
+  loop_invariants: predicate list list;
+  (* list of loop invariants for each currently visited loops *)
+  cpt: int;
+  (* counter used when generating variables *)
+}
 
-module Varname: sig 
+module Varname: sig
   val get: scope:scope -> string -> string
   val clear: unit -> unit
 end = struct
@@ -80,7 +85,7 @@ end = struct
   let tbl = H.create 7
   let globals = H.create 7
 
-  let get ~scope s = 
+  let get ~scope s =
     let _, u =
       Extlib.make_unique_name
         (fun s -> H.mem tbl s || H.mem globals s)
@@ -102,16 +107,15 @@ let empty_block =
   { new_block_vars = [];
     new_stmts = [];
     pre_stmts = [];
-    post_stmts = []
-}
+    post_stmts = [] }
 
-let empty_mpz_tbl =
+let empty_mp_tbl =
   { new_exps = Term.Map.empty;
     clear_stmts = [] }
 
 let empty_local_env =
   { block_info = empty_block;
-    mpz_tbl = empty_mpz_tbl;
+    mp_tbl = empty_mp_tbl;
     rte = true }
 
 let dummy =
@@ -120,7 +124,7 @@ let dummy =
     lscope_reset = true;
     annotation_kind = Misc.Assertion;
     new_global_vars = [];
-    global_mpz_tbl = empty_mpz_tbl;
+    global_mp_tbl = empty_mp_tbl;
     env_stack = [];
     var_mapping = Logic_var.Map.empty;
     loop_invariants = [];
@@ -132,7 +136,7 @@ let empty v =
     lscope_reset = true;
     annotation_kind = Misc.Assertion;
     new_global_vars = [];
-    global_mpz_tbl = empty_mpz_tbl;
+    global_mp_tbl = empty_mp_tbl;
     env_stack = [];
     var_mapping = Logic_var.Map.empty;
     loop_invariants = [];
@@ -194,8 +198,10 @@ let acc_list_rev acc l = List.fold_left (fun acc x -> x :: acc) acc l
 let do_new_var ~loc ?(scope=Local_block) ?(name="") env t ty mk_stmts =
   let local_env, tl_env = top env in
   let local_block = local_env.block_info in
-  let is_t = Gmpz.is_t ty in
-  if is_t then Gmpz.is_now_referenced ();
+  let is_z_t = Gmp.is_z_t ty in
+  if is_z_t then Gmp.is_z_now_referenced ();
+  let is_q_t = Gmp.is_q_t ty in
+  if is_q_t then Gmp.is_q_now_referenced ();
   let n = succ env.cpt in
   let v =
     Cil.makeVarinfo
@@ -220,50 +226,50 @@ let do_new_var ~loc ?(scope=Local_block) ?(name="") env t ty mk_stmts =
     | Global | Function -> local_block.new_block_vars
     | Local_block -> v :: local_block.new_block_vars
   in
-  let new_block = 
-    { new_block_vars = new_block_vars; 
+  let new_block =
+    { new_block_vars = new_block_vars;
       new_stmts = new_stmts;
       pre_stmts = local_block.pre_stmts;
       post_stmts = local_block.post_stmts
   }
   in
   v,
-  e, 
-  if is_t then begin
-    let extend_tbl tbl = 
-(*      Options.feedback "memoizing %a for term %a" 
-	Varinfo.pretty v (fun fmt t -> match t with None -> Format.fprintf fmt
-	  "NONE" | Some t -> Term.pretty fmt t) t;*)
-      { clear_stmts = Gmpz.clear ~loc e :: tbl.clear_stmts;
-	new_exps = match t with
-	| None -> tbl.new_exps
-	| Some t -> Term.Map.add t (v, e) tbl.new_exps }
+  e,
+  if is_z_t || is_q_t then begin
+    let extend_tbl tbl =
+(*      Options.feedback "memoizing %a for term %a"
+        Varinfo.pretty v (fun fmt t -> match t with None -> Format.fprintf fmt
+        "NONE" | Some t -> Term.pretty fmt t) t;*)
+      { clear_stmts = Gmp.clear ~loc e :: tbl.clear_stmts;
+        new_exps = match t with
+          | None -> tbl.new_exps
+          | Some t -> Term.Map.add t (v, e) tbl.new_exps }
     in
     match scope with
     | Global | Function ->
       let local_env = { local_env with block_info = new_block } in
       (* also memoize the new variable, but must never be used *)
       { env with
-	cpt = n;
+        cpt = n;
         new_global_vars = (v, lscope) :: env.new_global_vars;
-	global_mpz_tbl = extend_tbl env.global_mpz_tbl;
-	env_stack = local_env :: tl_env }
+        global_mp_tbl = extend_tbl env.global_mp_tbl;
+        env_stack = local_env :: tl_env }
     | Local_block ->
-      let local_env = 
-	{ block_info = new_block; 
-	  mpz_tbl = extend_tbl local_env.mpz_tbl;
-	  rte = false (* must be already checked by mk_stmts *) }
+      let local_env =
+        { block_info = new_block;
+          mp_tbl = extend_tbl local_env.mp_tbl;
+          rte = false (* must be already checked by mk_stmts *) }
       in
-      { env with 
-	cpt = n; 
-	env_stack = local_env :: tl_env;
+      { env with
+        cpt = n;
+        env_stack = local_env :: tl_env;
         new_global_vars = (v, lscope) :: env.new_global_vars }
   end else
     let new_global_vars = (v, lscope) :: env.new_global_vars in
-    let local_env = 
-      { local_env with 
-	block_info = new_block; 
-	rte = false (* must be already checked by mk_stmts *) } 
+    let local_env =
+      { local_env with
+        block_info = new_block;
+        rte = false (* must be already checked by mk_stmts *) }
     in
     { env with
       new_global_vars = new_global_vars;
@@ -285,8 +291,8 @@ let new_var ~loc ?(scope=Local_block) ?name env t ty mk_stmts =
       do_new_var ~loc ~scope ?name env t ty mk_stmts
   in
   match scope with
-  | Global | Function -> memo env.global_mpz_tbl
-  | Local_block -> memo local_env.mpz_tbl
+  | Global | Function -> memo env.global_mp_tbl
+  | Local_block -> memo local_env.mp_tbl
 
 let new_var_and_mpz_init ~loc ?scope ?name env t mk_stmts =
   new_var
@@ -295,8 +301,8 @@ let new_var_and_mpz_init ~loc ?scope ?name env t mk_stmts =
     ?name
     env
     t
-    (Gmpz.t ())
-    (fun v e -> Gmpz.init ~loc e :: mk_stmts v e)
+    (Gmp.z_t ())
+    (fun v e -> Gmp.init ~loc e :: mk_stmts v e)
 
 module Logic_binding = struct
 
@@ -316,11 +322,12 @@ module Logic_binding = struct
       | Some ty -> ty
       | None -> match logic_v.lv_type with
         | Ctype ty -> ty
-        | Linteger -> Gmpz.t ()
+        | Linteger -> Gmp.z_t ()
         | Ltype _ as ty when Logic_const.is_boolean_type ty -> Cil.charType
         | Ltype _ | Lvar _ | Lreal | Larrow _ as lty ->
           let msg =
-            Format.asprintf "logic variable of type %a" Logic_type.pretty lty
+            Format.asprintf
+              "logic variable of type %a" Logic_type.pretty lty
           in
           Error.not_yet msg
     in
@@ -360,10 +367,10 @@ module Logic_scope = struct
     else env
 end
 
-let emitter = 
+let emitter =
   Emitter.create
-    "E_ACSL" 
-    [ Emitter.Code_annot ] 
+    "E_ACSL"
+    [ Emitter.Code_annot ]
     ~correctness:[ Options.Gmp_only.parameter ]
     ~tuning:[]
 
@@ -371,7 +378,7 @@ let add_assert env stmt annot = match current_kf env with
   | None -> assert false
   | Some kf ->
     Queue.add
-      (fun () -> Annotations.add_assert emitter ~kf stmt annot) 
+      (fun () -> Annotations.add_assert emitter ~kf stmt annot)
       env.visitor#get_filling_actions
 
 let add_stmt ?(post=false) ?before env stmt =
@@ -406,7 +413,7 @@ let extend_stmt_in_place env stmt ~label block =
   else
     env
 
-let push env = 
+let push env =
 (*  Options.feedback "push (was %d)" (List.length env.env_stack);*)
   { env with env_stack = empty_local_env :: env.env_stack }
 
@@ -418,7 +425,7 @@ let pop env =
 let transfer ~from env = match from.env_stack, env.env_stack with
   | { block_info = from_blk } :: _, ({ block_info = env_blk } as local) :: tl
     ->
-    let new_blk = 
+    let new_blk =
       { new_block_vars = from_blk.new_block_vars @ env_blk.new_block_vars;
         new_stmts = from_blk.new_stmts @ env_blk.new_stmts;
         pre_stmts = from_blk.pre_stmts @ env_blk.pre_stmts;
@@ -436,9 +443,9 @@ let pop_and_get ?(split=false) env stmt ~global_clear where =
   let clear =
     if global_clear then begin
       Varname.clear ();
-      env.global_mpz_tbl.clear_stmts @ local_env.mpz_tbl.clear_stmts
+      env.global_mp_tbl.clear_stmts @ local_env.mp_tbl.clear_stmts
     end else
-      local_env.mpz_tbl.clear_stmts
+      local_env.mp_tbl.clear_stmts
   in
 (*  Options.feedback "clearing %d mpz (global_clear: %b)"
     (List.length clear) global_clear;*)
@@ -511,23 +518,23 @@ module Context = struct
 
   let ctx = ref []
   let save env = ctx := env.new_global_vars
-  let restore env = 
+  let restore env =
     if !ctx <> [] then begin
       let vars = env.new_global_vars in
       let env =
-	{ env with new_global_vars = 
+	{ env with new_global_vars =
 	    List.filter
               (fun (v, scope) ->
                 (match scope with
                 | LGlobal | LFunction _ -> true
                 | LLocal_block _ -> false)
                 && List.for_all (fun (v', _) -> v != v') vars)
-	      !ctx 
+	      !ctx
 	      @ vars }
       in
       ctx := [];
       env
-    end else     
+    end else
       env
 
 end
@@ -536,9 +543,9 @@ end
 let pretty fmt env =
   let local_env, _ = top env in
   Format.fprintf fmt "local new_stmts %t"
-    (fun fmt -> 
+    (fun fmt ->
       List.iter
-	(fun s -> Printer.pp_stmt fmt s) 
+	(fun s -> Printer.pp_stmt fmt s)
 	local_env.block_info.new_stmts)
 
 (*

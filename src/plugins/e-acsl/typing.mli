@@ -50,46 +50,50 @@ open Cil_types
 (** {2 Datatypes} *)
 (******************************************************************************)
 
-(** Possible types inferred by the system. *)
-type integer_ty = private
-  | Gmp
-  | C_type of ikind
-  | Other (** Any non-integral type *)
+(** Possible types infered by the system. *)
 
-module Datatype: Datatype.S_with_collections with type t = integer_ty
+type number_ty = private
+  | C_type of ikind
+  | Gmpz
+  | Libr
+  | Nan
+
+module Datatype: Datatype.S_with_collections with type t = number_ty
 
 (** {3 Smart constructors} *)
 
-val gmp: integer_ty
-val c_int: integer_ty
-val ikind: ikind -> integer_ty
-val other: integer_ty
+val c_int: number_ty
+val ikind: ikind -> number_ty
+val gmpz: number_ty
+val libr: number_ty
+val nan: number_ty
 
-(** {3 Useful operations over {!integer_ty}} *)
+(** {3 Useful operations over {!number_ty}} *)
 
-exception Not_an_integer
-val typ_of_integer_ty: integer_ty -> typ
-(** @return the C type corresponding to an {!integer_ty}. That is [Gmpz.t ()]
-    for [Gmp] and [TInt(ik, [[]])] for [Ctype ik].
-    @raise Not_an_integer in case of {!Other}. *)
+exception Not_a_number
+val typ_of_number_ty: number_ty -> typ
+(** @return the C type corresponding to an {!number_ty}. That is [Gmp.z_t ()]
+    for [Gmpz], [Libr.t ()] for [Libr] and [TInt(ik, [[]])] for [Ctype ik].
+    @raise Not_a_number in case of [Nan]. *)
 
-val integer_ty_of_typ: typ -> integer_ty
-(** Reverse of [typ_of_integer_ty] *)
+val number_ty_of_typ: typ -> number_ty
+(** Reverse of [typ_of_number_ty] *)
 
-val ty_of_logic_ty: logic_type -> integer_ty
+val ty_of_logic_ty: logic_type -> number_ty
 (** @return the {!integer_ty} that correponds to the given logic type. *)
 
-val join: integer_ty -> integer_ty -> integer_ty
-(** {!integer_ty} is a join-semi-lattice if you do not consider [Other]. If
+val join: number_ty -> number_ty -> number_ty
+(** {!number_ty} is a join-semi-lattice if you do not consider [Other]. If
     there is no [Other] in argument, this function computes the join of this
     semi-lattice. If one of the argument is {!Other}, the function assumes that
-    the other argument is also {!Other}. In this case, the result is [Other]. *)
+    the other argument is also {!Other}. In this case, the result is [Other].
+    TODO: is now extended to support reals *)
 
 (******************************************************************************)
 (** {2 Typing} *)
 (******************************************************************************)
 
-val type_term: use_gmp_opt:bool -> ?ctx:integer_ty -> term -> unit
+val type_term: use_gmp_opt:bool -> ?ctx:number_ty -> term -> unit
 (** Compute the type of each subterm of the given term in the given context. If
     [use_gmp_opt] is false, then the conversion to the given context is done
     even if -e-acsl-gmp-only is set. *)
@@ -107,16 +111,16 @@ val clear: unit -> unit
     {!type_named_predicate} has been previously computed for the given term or
     predicate. *)
 
-val get_integer_ty: term -> integer_ty
-(** @return the inferred type for the given term. *)
+val get_number_ty: term -> number_ty
+(** @return the infered type for the given term. *)
 
-val get_integer_op: term -> integer_ty
-(** @return the inferred type for the top operation of the given term.
+val get_integer_op: term -> number_ty
+(** @return the infered type for the top operation of the given term.
     It is meaningless to call this function over a non-arithmetical/logical
     operator. *)
 
-val get_integer_op_of_predicate: predicate -> integer_ty
-(** @return the inferred type for the top operation of the given predicate. *)
+val get_integer_op_of_predicate: predicate -> number_ty
+(** @return the infered type for the top operation of the given predicate. *)
 
 val get_typ: term -> typ
 (** Get the type which the given term must be generated to. *)
@@ -131,7 +135,7 @@ val get_cast: term -> typ option
 val get_cast_of_predicate: predicate -> typ option
 (** Like {!get_cast}, but for predicates. *)
 
-val unsafe_set: term -> ?ctx:integer_ty -> integer_ty -> unit
+val unsafe_set: term -> ?ctx:number_ty -> number_ty -> unit
 (** Register that the given term has the given type in the given context (if
     any). No verification is done. *)
 
@@ -139,7 +143,7 @@ val unsafe_set: term -> ?ctx:integer_ty -> integer_ty -> unit
 (** {2 Typing/types-related utils} *)
 (*****************************************************************************)
 
-val ty_of_interv: ?ctx:integer_ty -> Ival.t -> integer_ty
+val ty_of_interv: ?ctx:number_ty -> Ival.t -> number_ty
 (* Compute the smallest type (bigger than [int]) which can contain the whole
    interval. It is the \theta operator of the JFLA's paper. *)
 

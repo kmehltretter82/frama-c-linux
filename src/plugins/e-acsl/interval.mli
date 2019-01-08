@@ -28,8 +28,9 @@
     outside before computing the interval of a term containing such variables
     (see module {!Interval.Env}).
 
-    It implement Figure 3 of J. Signoles' JFLA'15 paper "Rester statique pour
+    It implements Figure 3 of J. Signoles' JFLA'15 paper "Rester statique pour
     devenir plus rapide, plus précis et plus mince".
+    Also implements a partial support for real numbers.
 
     Example: consider a variable [x] of type [int] on a (strange) architecture
     in which values of type [int] belongs to the interval \[-128;127\] and a
@@ -50,7 +51,8 @@
 (** {3 Useful operations on intervals} *)
 (* ************************************************************************** *)
 
-exception Not_an_integer
+exception Is_a_real
+exception Not_a_number
 
 val ikind_of_interv: Ival.t -> Cil_types.ikind
 (** @return the smallest ikind that contains the given interval.
@@ -59,7 +61,9 @@ val ikind_of_interv: Ival.t -> Cil_types.ikind
 
 val interv_of_typ: Cil_types.typ -> Ival.t
 (** @return the smallest interval which contains the given C type.
-    @raise Not_an_integer if the given type is not an integral type. *)
+    @raise Is_a_real if the given type is a float type.
+      (* TODO: also return is_real=true if ty=Libr.t *)
+    @raise Not_a_number if the given type does not represent numbers. *)
 
 (* ************************************************************************** *)
 (** {3 Environment for interval computations} *)
@@ -81,8 +85,8 @@ end
 val infer: Cil_types.term -> Ival.t
 (** [infer t] infers the smallest possible integer interval which the values
     of the term can fit in.
-    @raise Not_an_integer if the type of the term is not a subtype of
-    [Linteger]. *)
+    @raise Is_a_real if the term is a float or a real
+    @raise Not_a_number if the term does not represent a number. *)
 
 (*
 Local Variables:
