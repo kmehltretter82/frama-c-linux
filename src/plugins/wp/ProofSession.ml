@@ -40,13 +40,13 @@ let exists wpo =
 
 let load wpo =
   let f = filename wpo in
-  if Sys.file_exists f then Json.load_file f else Json.Null
+  if Sys.file_exists f then Json.load_file f else `Null
 
 let save wpo js =
   let f = filename wpo in
   let empty =
     match js with
-    | Json.Null | Json.Array [] | Json.Assoc [] -> true
+    | `Null | `List [] | `Assoc [] -> true
     | _ -> false
   in
   ( if empty
