@@ -360,7 +360,9 @@ struct
     Tree.iter reset w.widening_tree
 
   let reset_widening_counter (w : widening) : unit =
-    let reset w = w.widening_counter <- widening_delay in
+    let reset w =
+      w.widening_counter <- max w.widening_counter (widening_period - 1)
+    in
     Tree.iter reset w.widening_tree
 
   (* Operators *)

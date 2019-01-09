@@ -183,7 +183,7 @@ struct
     w.widening_counter <- widening_delay
 
   let reset_widening_counter (w : widening) : unit =
-    w.widening_counter <- widening_delay
+    w.widening_counter <- max w.widening_counter (widening_period - 1)
 
   (* Operators *)
 
