@@ -369,6 +369,8 @@
 [eva] tests/idct/ieee_1180_1990.c:215: starting to merge loop iterations
 [eva] tests/idct/ieee_1180_1990.c:234: starting to merge loop iterations
 [eva] tests/idct/ieee_1180_1990.c:233: starting to merge loop iterations
+[eva] tests/idct/ieee_1180_1990.c:235: Warning: 
+  2's complement assumed for overflow
 [eva] computing for function IEEE_1180_1990_dctf <- main.
   Called from tests/idct/ieee_1180_1990.c:236.
 [eva] Recording results for IEEE_1180_1990_dctf
@@ -446,6 +448,8 @@
 [eva] tests/idct/ieee_1180_1990.c:277: Warning: 
   2's complement assumed for overflow
 [eva] tests/idct/ieee_1180_1990.c:261: starting to merge loop iterations
+[eva] tests/idct/ieee_1180_1990.c:281: Warning: 
+  2's complement assumed for overflow
 [eva] tests/idct/ieee_1180_1990.c:280: starting to merge loop iterations
 [eva] tests/idct/ieee_1180_1990.c:279: starting to merge loop iterations
 [eva] tests/idct/ieee_1180_1990.c:282: 
@@ -518,6 +522,8 @@
 [eva] tests/idct/ieee_1180_1990.c:323: Warning: 
   2's complement assumed for overflow
 [eva] tests/idct/ieee_1180_1990.c:307: starting to merge loop iterations
+[eva] tests/idct/ieee_1180_1990.c:327: Warning: 
+  2's complement assumed for overflow
 [eva] tests/idct/ieee_1180_1990.c:326: starting to merge loop iterations
 [eva] tests/idct/ieee_1180_1990.c:325: starting to merge loop iterations
 [eva] tests/idct/ieee_1180_1990.c:328: 
@@ -898,7 +904,7 @@
 [eva:final-states] Values at end of function IEEE_1180_1990_mkbk:
   i ∈ {8}
   j ∈ {8} or UNINITIALIZED
-  M1[0..7][0..7] ∈ [-2147483647..2147483647]
+  M1[0..7][0..7] ∈ [--..--]
   IEEE_1180_1990_rand_randx ∈ [--..--]
 [eva:final-states] Values at end of function IEEE_1180_1990_dctf:
   i ∈ {8}
@@ -951,7 +957,7 @@
   omse ∈ [--..--] or UNINITIALIZED
   ome ∈ [--..--] or UNINITIALIZED
   err ∈ [--..--] or UNINITIALIZED
-  M1[0..7][0..7] ∈ [-2147483647..2147483647]
+  M1[0..7][0..7] ∈ [--..--]
   IEEE_1180_1990_rand_randx ∈ [--..--]
   IEEE_1180_1990_dctf_mcos[0..7][0..7] ∈
                           [-1.0000000000000000*2^-1 .. 1.0000000000000000*2^-1]

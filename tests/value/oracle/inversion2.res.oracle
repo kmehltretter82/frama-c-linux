@@ -21,7 +21,7 @@
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
-  G ∈ {5; 7; 15; 99}
+  G ∈ [5..99],1%2
   i ∈ {3}
   j ∈ {1; 2; 3; 4; 77}
 [from] Computing for function main
