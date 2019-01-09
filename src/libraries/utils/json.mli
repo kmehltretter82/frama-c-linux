@@ -23,17 +23,17 @@
 (** Json Library
 
     Remarks:
-     - UTF-8 escaping is not supported;
-     - Parsers are less {i strict} than Json format;
-     - Printers are supposed to {i strictly} conforms to Json format;
-     - [Number] can be used to encode non OCaml-primitive numbers,
+    - UTF-8 escaping is not supported;
+    - Parsers are less {i strict} than Json format;
+    - Printers are supposed to {i strictly} conforms to Json format;
+    - [Number] can be used to encode non OCaml-primitive numbers,
        for instance Zarith.
 *)
 
 (** Json Objects
 
     Same type than [Yojson.Basic.json]
-    *)
+*)
 type json =
   [ `Assoc of (string * json) list
   | `Bool of bool

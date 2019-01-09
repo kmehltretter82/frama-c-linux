@@ -286,12 +286,12 @@ let jtactic ~title (tac : tactical) (sel : selection) =
 
 let json_of_tactic t js =
   `Assoc [
-      "header" , `String t.header ;
-      "tactic" , `String t.tactic ;
-      "params" , t.params ;
-      "select" , t.select ;
-      "children" , `Assoc js ;
-    ]
+    "header" , `String t.header ;
+    "tactic" , `String t.tactic ;
+    "params" , t.params ;
+    "select" , t.select ;
+    "children" , `Assoc js ;
+  ]
 
 let children_of_json = function
   | `List js ->
