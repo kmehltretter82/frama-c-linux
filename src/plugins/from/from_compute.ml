@@ -463,7 +463,6 @@ struct
               let init = Cil.is_mutable_or_initialized lv in
               transfer_assign stmt ~init lv comp_vars state
         | Local_init(v, AssignInit i, _) ->
-          let implicit = true in
           let rec aux lv i acc =
             let doinit o i _ state = aux (Cil.addOffsetLval o lv) i state in
             match i with
@@ -471,7 +470,21 @@ struct
               let comp_vars = find stmt acc.deps_table e in
               transfer_assign stmt ~init:true lv comp_vars acc
             | CompoundInit (ct, initl) ->
-              Cil.foldLeftCompound ~implicit ~doinit ~ct ~initl ~acc
+              (* To avoid a performance issue, do not fold implicit initializers
+                 of scalar or large arrays. We still use implicit initializers
+                 for small struct arrays, as this may be more precise in case of
+                 padding bits. The 100 limit is arbitrary. *)
+              let implicit =
+                not (Cil.isArrayType ct &&
+                     (Cil.isArithmeticOrPointerType (Cil.typeOf_array_elem ct)
+                      || Ast_info.array_size ct > (Integer.of_int 100)))
+              in
+              let r = Cil.foldLeftCompound ~implicit ~doinit ~ct ~initl ~acc in
+              if implicit then r else
+                (* If implicit zero-initializers have been skipped, also mark
+                   the entire array as initialized from no dependency (nothing
+                   is read by the implicit zero-initializers). *)
+                transfer_assign stmt ~init:true lv Function_Froms.Deps.bottom r
           in
           aux (Cil.var v) i state
         | Call (lvaloption,funcexp,argl,loc) ->
