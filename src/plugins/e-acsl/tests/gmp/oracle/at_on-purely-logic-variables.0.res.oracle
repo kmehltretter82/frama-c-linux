@@ -39,13 +39,6 @@
   starting to merge loop iterations
 [eva] tests/gmp/at_on-purely-logic-variables.c:57: 
   starting to merge loop iterations
-[eva:alarm] tests/gmp/at_on-purely-logic-variables.c:57: Warning: 
-  out of bounds write.
-  assert
-  \valid(__gen_e_acsl_at_7 +
-         (int)((int)((int)(__gen_e_acsl_u_6 - 10) * 300) +
-               (int)((int)((int)((int)(__gen_e_acsl_v_6 - -10) - 1) * 100) +
-                     (int)((int)(__gen_e_acsl_w_2 - 100) - 1))));
 [eva] tests/gmp/at_on-purely-logic-variables.c:45: 
   starting to merge loop iterations
 [eva] tests/gmp/at_on-purely-logic-variables.c:34: 
