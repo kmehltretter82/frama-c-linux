@@ -1534,7 +1534,67 @@ class main_window () : main_window_extension_points =
                     self#reset ();
                     (* give some time for the sourceview to recompute
                        its height, otherwise scrolling is broken. *)
-                    Unix.sleep 1;
+                    let has_stabilized = ref false in
+                    (* According to the blog post here
+                       https://picheta.me/articles/2013/08/gtk-plus--a-method-to-guarantee-scrolling.html
+                       the best way to check whether we have correctly scrolled
+                       is to retrieve the rectangle corresponding to the mark,
+                       the rectangle effectively displayed, and see whether
+                       the former is included in the latter.
+                    *)
+                    let check () =
+                      (* not entirely accurate because of
+                         the (un)fold action, but should do the trick.
+                         We will do the real scroll after stabilization
+                         anyway.
+                      *)
+                      let iter =
+                        source_viewer#buffer#get_iter (`LINE line)
+                      in
+                      let my_rect = source_viewer#get_iter_location iter in
+                      let visible_rect = source_viewer#visible_rect in
+                      (* in Gdk, x,y represents the top left corner of the
+                         rectangle. We just check whether the beginning of the
+                         selection is visible (we only have one line of text
+                         anyway). *)
+                      let res =
+                        Gdk.Rectangle.(
+                          y my_rect >= y visible_rect &&
+                          y my_rect <= y visible_rect + height visible_rect
+                        )
+                      in
+                      Gdk.Rectangle.(Gui_parameters.debug ~dkey:dkey_scroll
+                        "my  rect is %d (+%d) %d (+%d)@\n\
+                         vis rect is  %d (+%d) %d (+%d)@\n\
+                         my rect is visible: %B@."
+                        (x my_rect) (width my_rect) (y my_rect) (height my_rect)
+                        (x visible_rect) (width visible_rect) (y visible_rect)
+                        (height visible_rect) res);
+                      has_stabilized := res;
+                      (* when added as an idle procedure below, check will
+                         be removed whenever it returns false. *)
+                      not res
+                    in
+                    (* in case we were lucky and have stabilized directly. *)
+                    ignore (check());
+                    let proc = Glib.Idle.add check in
+                    (* in case we are unlucky, stop waiting after
+                       0.5 second and hope for the best. *)
+                    let alarm =
+                      Glib.Timeout.add
+                        ~ms:500
+                        ~callback:
+                          (fun () ->
+                             has_stabilized := true;
+                             Glib.Idle.remove proc;
+                             false)
+                    in
+                    while (not !has_stabilized) do
+                      (* do one main loop step so that buffer gets
+                         a chance to recompute its height. *)
+                      ignore (Glib.Main.iteration false)
+                    done;
+                    Glib.Timeout.remove alarm;
                     self#view_stmt stmt;
                  with Not_found -> Format.printf "call not found@."
                 end;
