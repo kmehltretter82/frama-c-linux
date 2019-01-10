@@ -976,10 +976,10 @@ let select_file ?title ?(dir=default_dir) ?(filename="") () =
     GWindow.file_chooser_dialog
       ~action:`OPEN
       ?title
-      ~filename
       ~modal:true
       ()
   in
+  ignore (dialog#set_filename filename);
   let result = ref None in
   let action r =
     (match r with

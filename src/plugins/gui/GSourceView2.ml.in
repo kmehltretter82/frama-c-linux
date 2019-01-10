@@ -9,6 +9,7 @@ let make_marker_attributes
   ?(pixbuf:GdkPixbuf.pixbuf option)
   ?(icon_name:string option)
   () =
+  ignore icon_name; (* not in lablgtk2. *)
   source#set_mark_category_priority ~category priority;
   source#set_mark_category_pixbuf ~category pixbuf;
   source#set_mark_category_background ~category background
