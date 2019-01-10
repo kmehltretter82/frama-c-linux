@@ -381,7 +381,7 @@ let forward_binop_float fkind ev1 op ev2 =
    This is left to the caller *)
 let forward_uneg v t =
   try
-    match Cil. unrollType t with
+    match Cil.unrollType t with
     | TFloat _ ->
       let v = V.project_float v in
       V.inject_ival (Ival.inject_float (Fval.neg v))
