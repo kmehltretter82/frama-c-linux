@@ -1184,6 +1184,10 @@ class main_window () : main_window_extension_points =
       let show o =
         history (fun () -> History.push (History.Localizable loc));
         let iter = self#source_viewer#buffer#get_iter (`OFFSET o) in
+        Gui_parameters.debug
+          ~dkey:dkey_scroll "scrolling in current view at iter %d,%d"
+          iter#line iter#line_offset
+        ;
         ignore (self#source_viewer#backward_display_line_start iter);
         self#source_viewer#buffer#place_cursor iter;
         ignore (self#source_viewer#scroll_to_mark
@@ -1494,11 +1498,22 @@ class main_window () : main_window_extension_points =
               let abs_x = int_of_float (GdkEvent.Button.x_root ev) in
               (* This function returns the absolute position of the top window,
                  or the relative position of an intern widget. *)
+              let rec get_rel_from_main acc win =
+                let x = fst (Gdk.Window.get_position win) in
+                let acc = acc + x in
+                let win = Gdk.Window.get_parent win in
+                if Gobject.get_oid win =
+                   Gobject.get_oid main_window#misc#window
+                then acc
+                else get_rel_from_main acc win
+              in
               let get_x obj = fst (Gdk.Window.get_position obj#misc#window) in
               (* Absolute position of the main window on the screen. *)
               let window_abs_x = get_x main_window in
               (* Relative position of the source_viewer in the main windows. *)
-              let viewer_rel_x = get_x source_viewer in
+              let viewer_rel_x =
+                get_rel_from_main 0 source_viewer#misc#window
+              in
               (* Width of the bullet column in the source viewer. *)
               Format.printf "viewer_rel_x: %d@." viewer_rel_x;
               Format.printf "window_abs_x: %d@." window_abs_x;
@@ -1514,16 +1529,17 @@ class main_window () : main_window_extension_points =
                   Format.printf "line is %d@." line;
                   try
                     let stmt = Hashtbl.find Feedback.call_sites line in
-                    Format.printf "stmt found@.";
-                    let kf = Kernel_function.find_englobing_kf stmt in
+                    Format.printf "stmt found@\n%a@." Printer.pp_stmt stmt;
                     Pretty_source.fold_preconds_at_callsite stmt;
-                    self#reactive_buffer#redisplay;
-                    self#scroll (PStmt (kf, stmt))
-                  with Not_found -> Format.printf "call not found@."
+                    self#reset ();
+                    (* give some time for the sourceview to recompute
+                       its height, otherwise scrolling is broken. *)
+                    Unix.sleep 1;
+                    self#view_stmt stmt;
+                 with Not_found -> Format.printf "call not found@."
                 end;
               false)
       in
-
       let extra_accel_group = GtkData.AccelGroup.create () in
       GtkData.AccelGroup.connect extra_accel_group
         ~key:GdkKeysyms._F
