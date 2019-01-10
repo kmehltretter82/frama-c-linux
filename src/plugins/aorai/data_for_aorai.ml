@@ -133,7 +133,7 @@ let rec is_same_expression e1 e2 =
     | PVar _,_ | _,PVar _ -> false
     | PCst cst1, PCst cst2 -> Logic_utils.is_same_pconstant cst1 cst2
     | PCst _,_ | _,PCst _ -> false
-    | PPrm (f1,x1), PPrm(f2,x2) -> f1 = x1 && f2 = x2
+    | PPrm (f1,x1), PPrm(f2,x2) -> f1 = f2 && x1 = x2
     | PPrm _,_ | _,PPrm _ -> false
     | PMetavar x, PMetavar y -> x = y
     | PMetavar _,_ | _,PMetavar _ -> false
@@ -1555,8 +1555,7 @@ let setAutomata auto =
 let getState num =
   List.find (fun st -> st.nums = num) (getAutomata ()).states
 
-let getStateName num =
-  (getState num).name
+let getStateName num = (getState num).name
 
 let getTransition num =
   List.find (fun trans -> trans.numt = num) (getAutomata ()).trans

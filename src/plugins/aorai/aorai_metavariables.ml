@@ -114,7 +114,7 @@ struct
       let diff = Set.diff used initialized in
       if not (Set.is_empty diff) then
         alarm edge diff;
-      (* Add variables intialized by the condition *)
+      (* Add variables initialized by the condition *)
       let add_initialized set = function
         | Copy_value ((TVar({lv_origin = Some vi}),_),_) -> Set.add vi set
         | _ -> set
@@ -132,7 +132,7 @@ let checkInitialization auto =
   struct
     let is_metavariable vi =
       let module Map = Datatype.String.Map in
-      Map.exists (fun _ vi' -> (vi'.vid = vi.vid)) auto.metavariables
+      Map.exists (fun _ -> Cil_datatype.Varinfo.equal vi) auto.metavariables
   end
   in
   let module A = InitAnalysis (P) in
