@@ -269,8 +269,9 @@ let rec zone_of_expr find_loc expr =
 (* dereference of an lvalue: first, its address must be computed,
    then its contents themselves are read *)
 and zone_of_lval find_loc lval =
-  let loc = find_loc lval in
-  let zone = Locations.enumerate_bits (Precise_locs.imprecise_location loc) in
+  let ploc = find_loc lval in
+  let loc = Precise_locs.imprecise_location ploc in
+  let zone = Locations.enumerate_valid_bits ~for_writing:false loc in
   Locations.Zone.join zone
     (indirect_zone_of_lval find_loc lval)
 

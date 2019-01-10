@@ -116,10 +116,6 @@ diff tests/value/oracle/alias.6.res.oracle tests/value/oracle_equalities/alias.6
 <   x ∈ {0; 4; 33}
 ---
 >   x ∈ {33}
-diff tests/value/oracle/assigns.res.oracle tests/value/oracle_equalities/assigns.res.oracle
-143a144,145
->   more than 200(4294967296) elements to enumerate. Approximating.
-> [kernel] tests/value/assigns.i:104: 
 diff tests/value/oracle/backward_add_ptr.res.oracle tests/value/oracle_equalities/backward_add_ptr.res.oracle
 12c12
 <   Frama_C_show_each_only_a: {0; 1}, {{ &a }}, {0}
@@ -237,6 +233,11 @@ diff tests/value/oracle/backward_add_ptr.res.oracle tests/value/oracle_equalitie
 >     (origin: Arithmetic {tests/value/backward_add_ptr.c:178}) }}
 >   {{ garbled mix of &{b; c}
 >     (origin: Arithmetic {tests/value/backward_add_ptr.c:178}) }}
+diff tests/value/oracle/bitfield.res.oracle tests/value/oracle_equalities/bitfield.res.oracle
+132a133,135
+> [eva] tests/value/bitfield.i:71: 
+>   Frama_C_show_each:
+>   {{ garbled mix of &{b} (origin: Misaligned {tests/value/bitfield.i:70}) }}
 diff tests/value/oracle/bitwise_pointer.res.oracle tests/value/oracle_equalities/bitwise_pointer.res.oracle
 58c58
 <   x ∈ [0..9]
