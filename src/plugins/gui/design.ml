@@ -1515,10 +1515,7 @@ class main_window () : main_window_extension_points =
                 get_rel_from_main 0 source_viewer#misc#window
               in
               (* Width of the bullet column in the source viewer. *)
-              Format.printf "viewer_rel_x: %d@." viewer_rel_x;
-              Format.printf "window_abs_x: %d@." window_abs_x;
-              Format.printf "abs_x:        %d@." abs_x;
-             if abs_x - (window_abs_x + viewer_rel_x) < 20 then
+              if abs_x - (window_abs_x + viewer_rel_x) < 20 then
                 begin
                   let x, y = GdkEvent.Button.(x ev, y ev) in
                   let (xbuf, ybuf) = source_viewer#window_to_buffer_coords
@@ -1526,10 +1523,8 @@ class main_window () : main_window_extension_points =
                   in
                   let iterpos = source_viewer#get_iter_at_location xbuf ybuf in
                   let line = iterpos#line in
-                  Format.printf "line is %d@." line;
                   try
                     let stmt = Hashtbl.find Feedback.call_sites line in
-                    Format.printf "stmt found@\n%a@." Printer.pp_stmt stmt;
                     Pretty_source.fold_preconds_at_callsite stmt;
                     self#reset ();
                     (* give some time for the sourceview to recompute
@@ -1596,7 +1591,7 @@ class main_window () : main_window_extension_points =
                     done;
                     Glib.Timeout.remove alarm;
                     self#view_stmt stmt;
-                 with Not_found -> Format.printf "call not found@."
+                 with Not_found -> ()
                 end;
               false)
       in
