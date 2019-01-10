@@ -17,6 +17,8 @@
 Open Source Release <next-release>
 ##################################
 
+-   Eva       [2019/01/10] Improved precision on nested loops (by postponing
+              the widening on inner loops according to -eva-widening-period).
 -   Kernel    [2019/01/03] Add attributes for loop statements to allow
               distinguishing between for, while and dowhile loops.
 -!  Kernel    [2019/01/03] Add statement attributes (sattr) to the AST. They
