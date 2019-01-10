@@ -106,7 +106,7 @@ struct
   let alarm (src,tr,dst) vars =
     Aorai_option.abort
       "The metavariables %a may not be initialized before the transition \
-       from %a to %a (%a)."
+       from %a to %a:@\n%a"
       pretty_set vars
       pretty_state src
       pretty_state dst
