@@ -89,6 +89,12 @@ struct
   let pretty_state fmt st =
     Format.pp_print_string fmt st.Promelaast.name
 
+  let pretty_trans fmt tr =
+    let cond,act = tr.cross in
+    Promelaoutput.print_condition fmt cond;
+    if act <> [] then
+      Format.fprintf fmt "{@[%a@]}" Promelaoutput.print_action act
+
   let pretty_set fmt set =
     let l = Set.elements set in
     Pretty_utils.pp_list ~sep:", " Cil_printer.pp_varinfo fmt l
@@ -97,13 +103,14 @@ struct
     | Bottom -> Format.printf "Bottom"
     | InitializedSet set -> pretty_set fmt set
 
-  let alarm (src,_tr,dst) vars =
+  let alarm (src,tr,dst) vars =
     Aorai_option.abort
       "The metavariables %a may not be initialized before the transition \
-       from %a to %a."
+       from %a to %a (%a)."
       pretty_set vars
       pretty_state src
       pretty_state dst
+      pretty_trans tr
 
   let analyze ((src,tr,dst) as edge) = function
     | Bottom -> Bottom
