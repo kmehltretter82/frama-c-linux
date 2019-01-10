@@ -4042,6 +4042,9 @@ char *strndup(char const *s, size_t n);
 
 /*@ requires valid_memory_area: \valid((char *)s + (0 .. n - 1));
     ensures
+      s_initialized: initialization:
+        \initialized((char *)\old(s) + (0 .. \old(n) - 1));
+    ensures
       zero_initialized: \subset(*((char *)\old(s) + (0 .. \old(n) - 1)), {0});
     assigns *((char *)s + (0 .. n - 1));
     assigns *((char *)s + (0 .. n - 1)) \from \nothing;
