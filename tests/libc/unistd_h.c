@@ -73,5 +73,10 @@ int main() {
   r = setregid(rgid, egid);
   r = setreuid(ruid, euid);
 
+  r = isatty(1);
+  //@ assert r == 0 || r == 1;
+  char *tty = ttyname(1);
+
+  r = chown("/tmp/a.txt", 01000, 01000);
   return 0;
 }

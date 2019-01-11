@@ -118,5 +118,11 @@ int main(int argc, char **argv)
   test_strtok_r();
   char *a = strdup("bla"); // unsound; specification currently unsupported
   char *b = strndup("bla", 2); // unsound; specification currently unsupported
+
+  char buf[16];
+  char buf2[32];
+  size_t r1 = strlcpy(buf, "longer than buffer", 16);
+  size_t r2 = strlcpy(buf2, "short", 16);
+  size_t r3 = strlcat(buf2, buf, 32);
   return 0;
 }

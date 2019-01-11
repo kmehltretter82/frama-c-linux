@@ -747,7 +747,18 @@ extern unsigned int alarm(unsigned int);
 extern int          brk(void *);
 extern int          chdir(const char *path);
 extern int          chroot(const char *path);
-extern int          chown(const char *, uid_t, gid_t);
+
+
+/*@ // missing: may assign to errno: EACCES, ELOOP, ENAMETOOLONG, ENOENT,
+    //                               ENOTDIR, EROFS, EIO, EINTR, EINVAL
+    // missing: assigns \result \from 'filesystem, permissions'
+    // missing: assigns 'file permissions' \from owner, group;
+  requires valid_string_path: valid_read_string(path);
+  assigns \result \from indirect:path, indirect:path[0..], indirect:owner,
+                        indirect:group;
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+*/
+extern int          chown(const char *path, uid_t owner, gid_t group);
 
 /*@
   requires valid_fd: 0 <= fd < __FC_MAX_OPEN_FILES;
@@ -812,7 +823,12 @@ extern int          execve(const char *path, char *const argv[], char *const env
 */
 extern int          execvp(const char *path, char *const argv[]);
 
+/*@
+  assigns \nothing;
+  ensures never_terminates: \false;
+*/
 extern void         _exit(int) __attribute__ ((__noreturn__));
+
 extern int          fchown(int, uid_t, gid_t);
 extern int          fchdir(int);
 extern int          fdatasync(int);
@@ -908,7 +924,13 @@ extern pid_t        getsid(pid_t);
 extern uid_t        getuid(void);
 
 extern char        *getwd(char *);
-extern int          isatty(int);
+
+/*@ //missing: may assign to errno: EBADF, ENOTTY (POSIX) / EINVAL (Linux)
+  assigns \result \from indirect:fd, indirect:__fc_fds[fd];
+  ensures result_true_or_false: \result == 0 || \result == 1;
+ */
+extern int          isatty(int fd);
+
 extern int          lchown(const char *, uid_t, gid_t);
 extern int          link(const char *, const char *);
 extern int          lockf(int, int, off_t);
@@ -1028,7 +1050,17 @@ extern long int     sysconf(int name);
 extern pid_t        tcgetpgrp(int);
 extern int          tcsetpgrp(int, pid_t);
 extern int          truncate(const char *, off_t);
-extern char        *ttyname(int);
+
+extern volatile char __fc_ttyname[TTY_NAME_MAX];
+extern char *__fc_p_ttyname = __fc_ttyname;
+
+/*@
+  // missing: may assign to errno: EBADF, ENOTTY
+  assigns \result \from __fc_p_ttyname, indirect:fildes;
+  ensures result_name_or_null: \result == __fc_p_ttyname || \result == \null;
+ */
+extern char        *ttyname(int fildes);
+
 extern int          ttyname_r(int, char *, size_t);
 extern useconds_t   ualarm(useconds_t, useconds_t);
 extern int          unlink(const char *);

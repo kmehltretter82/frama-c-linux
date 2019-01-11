@@ -374,6 +374,18 @@ extern char *strcpy(char *restrict dest, const char *restrict src);
 extern char *strncpy(char *restrict dest,
 		     const char *restrict src, size_t n);
 
+/*@ // Non-POSIX, but often present
+  @ requires valid_string_src: valid_read_string(src);
+  @ requires room_nstring: \valid(dest+(0..n-1));
+  @ requires separation:
+  @   \separated(dest+(0..n-1), src+(0..\max(n-1,strlen(src))));
+  @ assigns dest[0..n-1] \from src[0..n-1];
+  @ assigns \result \from indirect:src, indirect:src[0..n-1], indirect:n;
+  @ ensures initialization: \initialized(dest+(0..\min(strlen(src),n-1)));
+  @ ensures bounded_result: \result == strlen(src);
+ */
+size_t strlcpy(char * restrict dest, const char * restrict src, size_t n);
+
 // stpcpy is POSIX.1-2008
 #ifdef _POSIX_C_SOURCE
 # if _POSIX_C_SOURCE >= 200809L
@@ -428,6 +440,17 @@ extern char *strcat(char *restrict dest, const char *restrict src);
   @   ensures sum_of_bounded_lengths: strlen(dest) == \old(strlen(dest)) + n;
   @*/
 extern char *strncat(char *restrict dest, const char *restrict src, size_t n);
+
+/*@ // Non-POSIX, but often present
+  @ // missing: separation
+  @ requires valid_string_src: valid_read_string(src);
+  @ requires valid_string_dest: valid_string(dest);
+  @ requires room_nstring: \valid(dest+(0..n-1));
+  @ assigns dest[strlen(dest)..n] \from indirect:n, src[0..strlen(src)];
+  @ assigns \result \from indirect:src, indirect:src[0..n-1], indirect:n;
+  @ ensures bounded_result: \result == strlen(dest) + strlen(src);
+  @*/
+extern size_t strlcat(char *restrict dest, const char *restrict src, size_t n);
 
 /*@ // missing: separation
   @ requires valid_dest: \valid(dest+(0..n - 1));
