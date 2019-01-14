@@ -20,8 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** {2 Sanitizer} 
-    
+(** {2 Sanitizer}
+
     Keeps only alpha-numerical characters.
     Separator ['_'] is allowed, but leading, trailing and consecutive
     separators are removed.

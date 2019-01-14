@@ -24,9 +24,9 @@
 (* --- Sanitizer                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-(* 
+(*
    Keeps only alphanumerical characters,
-   remove consecutive, trailing and leading `_` 
+   remove consecutive, trailing and leading `_`
 *)
 
 type state = START | SEP | CHAR | TRUNCATE
