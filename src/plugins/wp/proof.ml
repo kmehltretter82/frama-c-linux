@@ -220,7 +220,7 @@ let find_script_for_goal ~gid ~legacy =
     Some(proof,qed)
   with Not_found ->
     None
-  
+
 let update_hints_for_goal goal hints =
   try
     let old_hints,script,qed = Hashtbl.find scriptbase goal in
@@ -283,7 +283,7 @@ let script_for ~pid ~gid ~legacy =
       let all = List.merge String.compare required hints in
       update_hints_for_goal gid all ) ;
   found
-  
+
 let rec head n = function [] -> []
                         | x::xs -> if n > 0 then x :: head (pred n) xs else []
 

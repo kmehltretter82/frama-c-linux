@@ -31,7 +31,7 @@ open Cil_datatype
  * depending on which part of the computation is involved.
  * For instance, properties on loops are split in 2 parts : establishment and
  * preservation.
- *)
+*)
 
 type prop_kind =
   | PKTactic      (** tactical sub-goal *)
@@ -352,7 +352,7 @@ struct
             Annotations.global_state ]
         let size = 97
       end)
-      
+
   let compute_ip ip =
     let truncate = max 20 (Wp_parameters.TruncPropIdFileName.get ()) in
     let basename = Property.Names.get_prop_basename ~truncate ip in
@@ -371,7 +371,7 @@ struct
       let unique_name = compute_ip ip in
       IndexTbl.add ip unique_name ;
       unique_name
-    
+
   let get_prop_id_base p =
     match p.p_kind , p.p_prop with
     | (PKTactic | PKCheck | PKProp | PKPropLoop) , p -> get_ip p

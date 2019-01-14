@@ -33,7 +33,7 @@ val delete_script_for : gid:string -> unit
 (** [delete_script ~gid] remove known script for goal. *)
 
 val add_script_for : gid:string -> string list -> string -> string -> unit
-(** [new_script goal keys proof qed] registers the script [proof] 
+(** [new_script goal keys proof qed] registers the script [proof]
     terminated by [qed] for goal [gid] and keywords [keys] *)
 
 val parse_coqproof : string -> (string * string) option

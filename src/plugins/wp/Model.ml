@@ -105,7 +105,7 @@ let register ~id ?(descr=id) ?(tuning=[]) ?(hypotheses=nohyp) () =
 let get_id m = m.id
 let get_descr m = m.descr
 let get_hypotheses m = m.hypotheses
-  
+
 type scope = Kernel_function.t option
 let scope : scope Context.value = Context.create "Wp.Scope"
 let model : model Context.value = Context.create "Wp.Model"
@@ -232,7 +232,7 @@ struct
       e.index <- MAP.remove k e.index ;
       e.lock <- SET.remove k e.lock ;
     end
-  
+
   let mem k = let e = entries () in MAP.mem k e.index || SET.mem k e.lock
   let find k = let e = entries () in MAP.find k e.index
 
@@ -338,7 +338,7 @@ struct
       e.index <- MAP.remove k e.index ;
       e.lock <- SET.remove k e.lock ;
     end
-  
+
   let mem k = let e = entries () in MAP.mem k e.index || SET.mem k e.lock
 
   let find k = let e = entries () in MAP.find k e.index
@@ -366,7 +366,7 @@ struct
       e.index <- MAP.add k d e.index ;
       fire k d ;
     end
-  
+
   let memoize f k =
     let e = entries () in
     try MAP.find k e.index

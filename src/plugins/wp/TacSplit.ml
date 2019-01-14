@@ -366,14 +366,14 @@ class split =
                           end
                       | _ -> Not_applicable
                     end
-                  | Or xs -> 
+                  | Or xs ->
                       let n = List.length xs in
                       feedback#set_title "Split (or)" ;
                       feedback#set_descr "Distinguish the %d parts of the Disjunction" n ;
                       let hyp i n e = Printf.sprintf "Case %d/%d" i n , When (F.p_bool e) in
                       let cases = Tactical.mapi hyp xs in
                       Applicable (Tactical.replace ~at:step.id cases)
-                  | Eq(x,y) when (F.is_prop x)&&(F.is_prop y) -> 
+                  | Eq(x,y) when (F.is_prop x)&&(F.is_prop y) ->
                       feedback#set_title "Split (iff)";
                       feedback#set_descr "Decompose Equivalence into both True/False" ;
                       let p = F.p_bool x in
@@ -383,7 +383,7 @@ class split =
                         "Both False" , When F.(p_and (p_not p) (p_not q)) ;
                       ] in
                       Applicable (Tactical.replace ~at:step.id cases)
-                  | Neq(x,y) when (F.is_prop x)&&(F.is_prop y) -> 
+                  | Neq(x,y) when (F.is_prop x)&&(F.is_prop y) ->
                       feedback#set_title "Split (xor)";
                       feedback#set_descr "Decompose Dis-Equivalence into alternated True/False" ;
                       let p = F.p_bool x in

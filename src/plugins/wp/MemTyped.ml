@@ -265,7 +265,7 @@ let is_separated args = F.is_true (r_separated args)
 logic a : int
 logic b : int
 
-predicate R =     p.base = q.base 
+predicate R =     p.base = q.base
               /\ (q.offset <= p.offset)
               /\ (p.offset + a <= q.offset + b)
 
@@ -368,19 +368,19 @@ let phi_addr_of_int p =
 (* -------------------------------------------------------------------------- *)
 
 let () = Context.register
-  begin fun () ->
-    F.set_builtin_1   f_base   phi_base ;
-    F.set_builtin_1   f_offset phi_offset ;
-    F.set_builtin_2   f_shift  (phi_shift f_shift) ;
-    F.set_builtin_eqp f_shift  eq_shift ;
-    F.set_builtin_eqp f_global eq_shift ;
-    F.set_builtin p_separated r_separated ;
-    F.set_builtin p_included  r_included ;
-    F.set_builtin f_havoc r_havoc ;
-    F.set_builtin_get f_havoc r_get_havoc ;
-    F.set_builtin_1 a_addr_of_int phi_addr_of_int ;
-    F.set_builtin_1 a_int_of_addr phi_int_of_addr ;
-  end
+    begin fun () ->
+      F.set_builtin_1   f_base   phi_base ;
+      F.set_builtin_1   f_offset phi_offset ;
+      F.set_builtin_2   f_shift  (phi_shift f_shift) ;
+      F.set_builtin_eqp f_shift  eq_shift ;
+      F.set_builtin_eqp f_global eq_shift ;
+      F.set_builtin p_separated r_separated ;
+      F.set_builtin p_included  r_included ;
+      F.set_builtin f_havoc r_havoc ;
+      F.set_builtin_get f_havoc r_get_havoc ;
+      F.set_builtin_1 a_addr_of_int phi_addr_of_int ;
+      F.set_builtin_1 a_int_of_addr phi_int_of_addr ;
+    end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Model Parameters                                                   --- *)
@@ -707,7 +707,7 @@ module STRING = Model.Generator(LITERAL)
       let fresh () =
         let eid = succ (EID.get ()) in
         EID.set eid ; eid
-      
+
       let compile (_,cst) =
         let eid = fresh () in
         let lfun = Lang.generated_f ~result:L.Int "Str_%d" eid in
@@ -875,7 +875,7 @@ struct
         [Trigger.of_pred eqmem ; Trigger.of_term phi ] ;
         [Trigger.of_pred eqmem ; Trigger.of_term phi'] ;
       ] ;
-      l_forall = F.p_vars lemma ; 
+      l_forall = F.p_vars lemma ;
       l_lemma = lemma ;
       l_cluster = cluster_memory () ;
     }
@@ -1274,7 +1274,7 @@ let stored s obj l v =
   | C_float _ -> updated s M_float l v
   | C_pointer _ -> updated s M_pointer l v
   | C_comp _ | C_array _ ->
-      Set(loadvalue s.post obj l, v) :: 
+      Set(loadvalue s.post obj l, v) ::
       (List.map (fun p -> Assert p) (havoc s obj l))
 
 let copied s obj p q = stored s obj p (loadvalue s.pre obj q)
@@ -1288,7 +1288,7 @@ let assigned_loc s obj l =
   | C_int _ | C_float _ | C_pointer _ ->
       let x = Lang.freshvar ~basename:"v" (Lang.tau_of_object obj) in
       List.map Cvalues.equation (stored s obj l (e_var x))
-  | C_comp _ | C_array _ -> 
+  | C_comp _ | C_array _ ->
       havoc s obj l
 
 let equal_loc s obj l =
@@ -1462,7 +1462,7 @@ and lookup_f f es =
     | RS_Field(fd,_) , [e] -> Mstate.field (lookup_lv e) fd
     | RS_Shift _ , [e;k] -> Mstate.index (lookup_lv e) k
     | _ -> raise Not_found
-  with Not_found when es = [] -> 
+  with Not_found when es = [] ->
     Sigs.(Mvar (RegisterBASE.find f),[])
 
 and lookup_lv e = try lookup_a e with Not_found -> Sigs.(Mmem e,[])
