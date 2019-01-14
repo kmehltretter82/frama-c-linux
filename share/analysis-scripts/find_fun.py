@@ -43,6 +43,10 @@ if len(sys.argv) < 2:
    sys.exit(1)
 else:
    fname = sys.argv[1]
+   if re.match('[a-zA-Z_][a-zA-Z0-9_]*$', fname) == None:
+      print("error: function name contains invalid characters: %s" % fname)
+      print("       (only letters/digits/underscore allowed)")
+      sys.exit(1)
 
 dirs = set()
 if len(sys.argv) < 3:
@@ -78,7 +82,7 @@ c_identifier = "[a-zA-Z_][a-zA-Z0-9_]*"
 c_id_maybe_pointer = c_identifier + "\**"
 type_prefix = c_id_maybe_pointer + "(?:\s+\**" + c_id_maybe_pointer + ")*\s+\**"
 parentheses_suffix = "\s*\([^)]*\)"
-re_fun = re.compile("^(?:" + type_prefix + ")?" + fname + parentheses_suffix + "\s*(?:" + c_identifier + ")?\s*(;|{)", flags=re.MULTILINE)
+re_fun = re.compile("^(?:" + type_prefix + "\s*)?" + fname + parentheses_suffix + "\s*(?:" + c_identifier + ")?\s*(;|{)", flags=re.MULTILINE)
 for f in files:
     with open(f, encoding="ascii", errors='ignore') as content_file:
         content = content_file.read()
