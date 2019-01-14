@@ -52,21 +52,6 @@ FRAMAC_SRC_DIRS= plugins/pdg_types plugins/value_types \
 	       plugins/gui
 FRAMAC_SRC_DIRS:= $(addprefix src/, $(FRAMAC_SRC_DIRS))
 
-#################
-# OCaml version #
-#################
-
-# Cumulative semantics: HAS_OCAMLnnn should be set if OCaml version is mmm
-# with mmm >= nnn
-
-# findstring returns an empty string if it does not match, and the value it
-# searches if it matches. Hence we compare with the empty string
-HAS_OCAML403=no
-ifeq ($(findstring 4.02,$(OCAMLVERSION)),)
-  HAS_OCAML403 = yes
-endif
-
-
 ##################
 # Flags          #
 ##################
@@ -183,8 +168,12 @@ eval last=\$${$$\#}; \
 mv $$new_temp $$last' sed_inplace
 SED	= LC_ALL=C sed
 RM	= rm -f
-TAR	= tar
-TOUCH	= touch
+ifeq ($(shell uname -s 2> /dev/null),Darwin)
+TAR     = gtar
+else
+TAR     = tar
+endif
+TOUCH   = touch
 GIT	= git
 
 ##################

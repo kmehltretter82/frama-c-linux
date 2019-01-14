@@ -107,21 +107,8 @@
 # define __wur /* Ignore */
 #endif
 
-#ifndef __STDC_VERSION__
-#define restrict
-#else
-#define __restrict__
-#define __restrict
-# if __STDC_VERSION__ >= 199901L && defined (FRAMA_C_C99)
-#define restrict restrict
-#define __restrict__ restrict
-#define __restrict restrict
-#  else
-#define restrict
-#define __restrict__
-#define __restrict
-# endif
-#endif
+#define restrict __restrict
+#define __restrict__ __restrict
 
 #define __USE_ISOC99	1
 

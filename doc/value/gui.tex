@@ -1,5 +1,5 @@
 
-This chapter presents some aspects of the graphical interface of EVA. More
+This chapter presents some aspects of the graphical interface of \Eva{}. More
 information can be found in the Frama-C blog, under the keyword
 \texttt{tutorial}.
 Some examples shown in this section are taken from the Monocypher tutorial,
@@ -16,9 +16,9 @@ presented in the blog.
 As a general recommendation,
   \textbf{do not} start your analyses within the GUI.
   Use the command-line. You should
-  consider Frama-C/EVA as a command-line tool with a viewer (the GUI).
+  consider Frama-C/\Eva{} as a command-line tool with a viewer (the GUI).
   The Frama-C GUI is not an IDE (e.g.~you cannot edit code with it), and
-  EVA does not use the GUI for anything else other than rendering its
+  \Eva{} does not use the GUI for anything else other than rendering its
   results. It is recommended to run the value analysis using the command line,
   and then saving the result to a Frama-C save file
   (see Section~\ref{saving-result}).
@@ -34,13 +34,13 @@ frama-c-gui -load value.sav
 
 In the screenshot of Figure~\ref{fig:gui-eva},
 we indicate some parts of the GUI that are
-useful when inspecting EVA results (besides the source view). We also
-indicate some parts that are never (or rarely) used with EVA.
+useful when inspecting \Eva{} results (besides the source view). We also
+indicate some parts that are never (or rarely) used with \Eva{}.
 
 \begin{figure}[hbt]
 \centering
 \includegraphics[width=\textwidth]{gui1-annotated.pdf}
-\caption{Frama-C GUI for EVA}
+\caption{Frama-C GUI for \Eva{}}
 \label{fig:gui-eva}
 \end{figure}
 
@@ -48,7 +48,7 @@ Note that the Properties tab (between Console and Values) is not updated
 automatically: you need to click on the \emph{Refresh} button before it
 outputs anything, and after changing filters.
 
-Like many GUI-integrated plug-ins, EVA also has a side panel
+Like many GUI-integrated plug-ins, \Eva{} also has a side panel
 that is displayed below the globals list, on the lower left corner of the GUI.
 This panel can be folded/unfolded using the arrow button on the left,
 and when unfolded (Figure~\ref{fig:gui-side-panel}) it displays some controls.
@@ -65,7 +65,7 @@ The checkbox {\em Show list of red alarms} shows or hides the
 \begin{figure}
 \centering
 \includegraphics[scale=0.7]{gui-side-panel.png}
-\caption{GUI side panel for EVA}
+\caption{GUI side panel for \Eva{}}
 \label{fig:gui-side-panel}
 \end{figure}
 
@@ -116,7 +116,7 @@ show precisely which callstack led to the non-termination.
 \section{Values Panel}\label{values-panel}
 
 The Values panel, depicted in Figure~\ref{fig:values-panel}, is arguably
-the most powerful inspection tool for the EVA plug-in in the Frama-C GUI.
+the most powerful inspection tool for the \Eva{} plug-in in the Frama-C GUI.
 
 \begin{figure}[hbtp]
 \centering
@@ -220,7 +220,7 @@ is \texttt{\textless{}BOTTOM\textgreater{}}.
 \label{studia}
 
 The Studia\footnote{The name \emph{Studia} is related to its applicability
-to case studies.} plug-in is used to track the origins of values computed by EVA.
+to case studies.} plug-in is used to track the origins of values computed by \Eva{}.
 For a given lvalue, it highlights all statements that may have written/read
 it.
 

@@ -1,6 +1,6 @@
 This directory contains a set of a Makefile and several bash scripts which
 can be used to simplify non-trivial analyses with Frama-C and some of its
-plugins, in particular EVA.
+plugins, in particular Eva.
 This Makefile can be included in your own Makefile for the following advantages.
 
 1.  It ensures that no unnecessary work is done. If you change the Makefile,
@@ -10,12 +10,12 @@ This Makefile can be included in your own Makefile for the following advantages.
     you can still append new parameters or completely redefine them.
 3.  It splits between parsing and analysis, storing outputs in separate
     repositories: <target>.parse for parsing-related outputs, and
-    <target>.eva for EVA-related outputs.
-4.  It produces several additional outputs after parsing and after an EVA
+    <target>.eva for Eva-related outputs.
+4.  It produces several additional outputs after parsing and after an Eva
     analysis:
     *   `<target>.parse/parse.log`, or `<target>.eva/eva.log`:
         contain the entire output of the parsing/analysis command,
-    *   `warnings.log`: only the warnings emitted by Frama-C/EVA,
+    *   `warnings.log`: only the warnings emitted by Frama-C/Eva,
     *   `alarms.csv`: list of emitted alarms in csv form,
     *   `metrics.log`: various metrics about the analysis,
     *   `stats.txt`: stats about the analysis, such as user time,

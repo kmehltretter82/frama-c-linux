@@ -111,10 +111,13 @@ plug-in's documentation.
 provides common functionalities and collaborative data structures.
 
 Several ready-to-use analyses are included in the \FramaC distribution. This
-manual covers the set of features common to all plug-ins.
+manual covers the set of features common to all plug-ins, plus some plug-ins
+which are used by several others, such as the graphical user interface
+(\GUI) and reporting tools (\Report).
 It does not cover use of the plug-ins that come in the \FramaC
-distribution (Value Analysis, Functional Dependencies, Functional Verification,
-Slicing, \etc). Each of these analyses has its own specific
+distribution: value analysis (\Value), functional dependencies (\From),
+functional verification (\WP), program slicing (\Slicing), \etc.
+Each of these analyses has its own specific
 documentation~\cite{value,wp,slicing}.
 
 Additional plug-ins can be provided by third-party developers and installed
@@ -131,8 +134,9 @@ Each plug-in may interact with other plug-ins of his choosing.
 The kernel centralizes information and conducts the
 analysis. This makes for robustness in the development of \FramaC while
 allowing a wide functionality spectrum.
-For instance, the Slicing plug-in uses the results
-of the Value Analysis plug-in and of the Functional Dependencies plug-in.
+For instance, the \Slicing plug-in uses the results
+of the \Eva (value analysis) plug-in and of the \From (functional dependencies)
+plug-in.
 
 Analyzers may also exchange information
 through \acsl annotations~\cite{acsl}. A plug-in that needs to
@@ -141,16 +145,16 @@ this assumption as an \acsl property. Because \acsl is the
 {\em lingua franca} of all plug-ins, another plug-in can later
 be used to establish the property.
 
-With Frama-C, it will be possible to take advantage of the
+With \FramaC, it is possible to take advantage of the
 complementarity of existing analysis approaches.
-It will be possible to apply the most sophisticated techniques
+It is possible to apply the most sophisticated techniques
 only on those parts of the analyzed program that require them.
 The low-level constructs can for instance effectively be hidden
 from them by high-level specifications, verified by other,
 adapted plug-ins.
 Note that the sound collaboration of plug-ins on different parts of
 a same program that require different modelizations of C is
-work in progress. At this time, a safe restriction
+a work in progress. At this time, a safe restriction
 for using plug-in collaboration is to limit the analyzed
 program and annotations to those \C and \acsl constructs
 that are understood by all involved plug-ins.
@@ -161,8 +165,8 @@ that are understood by all involved plug-ins.
 The collaborative and extensible approach of \FramaC allows powerful
 plug-ins to be written with relatively little effort.
 
-There are a number of reasons for a user of \FramaC also to be interested in
-writing his/her own plug-in:
+There are a number of reasons for a user of \FramaC to be also interested in
+writing their own plug-in:
 \begin{itemize}
 \item a custom plug-in can emit very specific queries for the existing
   plug-ins, and in this way obtain information which is not easily available
@@ -177,7 +181,7 @@ using \FramaC as a testbed for your ideas is a choice to consider.
 You may benefit from the ready-made parser for C programs with \acsl
 annotations. The results of existing analyses may simplify the problems
 that are orthogonal to those you want to consider (in particular, the
-Value Analysis provides sets of possible targets of every pointer
+value analysis provides sets of possible targets of every pointer
 in the analyzed C program).
 And lastly, being available as a \FramaC plug-in increases
 your work's visibility among existing industrial users of \FramaC.
@@ -186,7 +190,7 @@ Plug-in Development Guide~\cite{plugin-dev-guide}.
 
 \section{\FramaC as an Educational Platform}
 
-\FramaC is already being used as part of courses on formal verification,
+\FramaC is being used as part of courses on formal verification,
 program specification, testing, static analysis, and abstract interpretation,
 with audiences ranging from Master's students to active professionals, in
 institutions world-wide.  \FramaC is part of the curriculum at several

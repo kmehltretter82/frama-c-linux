@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 
-DEFAULT_TESTS=(float value idct non-free)
+DEFAULT_TESTS=(float value idct builtins)
 CONFIGS=( apron equalities bitwise symblocs gauges)
 
 ARGS=("${@-}")

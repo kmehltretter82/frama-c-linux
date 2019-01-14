@@ -1,9 +1,0 @@
-diff tests/non-free/oracle/Longinit_sequencer.res.oracle tests/non-free/oracle_bitwise/Longinit_sequencer.res.oracle
-385c385
-<   tests/non-free/result/Longinit_sequencer.sav
----
->   tests/non-free/result_bitwise/Longinit_sequencer.sav
-624c624
-<   tests/non-free/result/Longinit_sequencer.sav
----
->   tests/non-free/result_bitwise/Longinit_sequencer.sav

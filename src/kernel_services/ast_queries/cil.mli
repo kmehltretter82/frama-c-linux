@@ -215,13 +215,6 @@ val getFormalsDecl: varinfo -> varinfo list
 (** A dummy file *)
 val dummyFile: file
 
-(** Get the global initializer and create one if it does not already exist.
-    When it creates a global initializer it attempts to place a call to it in
-    the main function named by the optional argument (default "main").
-    @deprecated using this function is incorrect since it modifies the
-    current AST (see Plug-in Development Guide, Section "Using Projects"). *)
-val getGlobInit: ?main_name:string -> file -> fundec
-
 (** Iterate over all globals, including the global initializer *)
 val iterGlobals: file -> (global -> unit) -> unit
 
@@ -466,11 +459,20 @@ val compFullName: compinfo -> string
 (** Returns true if this is a complete type.
    This means that sizeof(t) makes sense.
    Incomplete types are not yet defined
-   structures and empty arrays. 
-   @param allowZeroSizeArrays defaults to [false]. When [true], arrays of
-   size 0 (a gcc extension) are considered as complete
+   structures and empty arrays.
+   @param allowZeroSizeArrays indicates whether arrays of
+   size 0 (a gcc extension) are considered as complete. Default value
+   depends on the current machdep.
 *)
 val isCompleteType: ?allowZeroSizeArrays:bool -> typ -> bool
+
+(** [true] iff the given type is a [struct] whose last field is a flexible
+    array member. When in gcc mode, a zero-sized array is identified with a
+    FAM for this purpose.
+
+    @since 18.0-Argon
+*)
+val has_flexible_array_member: typ -> bool
 
 (** Unroll a type until it exposes a non
  * [TNamed]. Will collect all attributes appearing in [TNamed]!!! *)
@@ -496,12 +498,12 @@ val arithmeticConversion : Cil_types.typ -> Cil_types.typ -> Cil_types.typ
 val integralPromotion : Cil_types.typ -> Cil_types.typ
 
 (** True if the argument is a character type (i.e. plain, signed or unsigned)
-    @since Frama-C+dev *)
+    @since Chlorine-20180501 *)
 val isAnyCharType: typ -> bool
 
 (** True if the argument is a plain character type
     (but neither [signed char] nor [unsigned char]).
-    @modify Frama-C+dev old behavior renamed as [isAnyCharType] *)
+    @modify Chlorine-20180501 old behavior renamed as [isAnyCharType] *)
 val isCharType: typ -> bool
 
 (** True if the argument is a short type (i.e. signed or unsigned) *)
@@ -509,27 +511,27 @@ val isShortType: typ -> bool
 
 (** True if the argument is a pointer to a character type
     (i.e. plain, signed or unsigned).
-    @since Frama-C+dev *)
+    @since Chlorine-20180501 *)
 val isAnyCharPtrType: typ -> bool
 
 (** True if the argument is a pointer to a plain character type
     (but neither [signed char] nor [unsigned char]).
-    @modify Frama-C+dev old behavior renamed as [isAnyCharPtrType] *)
+    @modify Chlorine-20180501 old behavior renamed as [isAnyCharPtrType] *)
 val isCharPtrType: typ -> bool
 
 (** True if the argument is a pointer to a constant character type,
     e.g. a string literal.
-    @since Frama-C+dev *)
+    @since Chlorine-20180501 *)
 val isCharConstPtrType: typ -> bool
 
 (** True if the argument is an array of a character type
     (i.e. plain, signed or unsigned)
-    @since Frama-C+dev *)
+    @since Chlorine-20180501 *)
 val isAnyCharArrayType: typ -> bool
 
 (** True if the argument is an array of a character type
     (i.e. plain, signed or unsigned)
-    @modify Frama-C+dev old behavior renamed as [isAnyCharArrayType] *)
+    @modify Chlorine-20180501 old behavior renamed as [isAnyCharArrayType] *)
 val isCharArrayType: typ -> bool
 
 (** True if the argument is an integral type (i.e. integer or enum) *)
@@ -539,19 +541,28 @@ val isIntegralType: typ -> bool
 val isIntegralOrPointerType: typ -> bool
 
 (** True if the argument is an integral type (i.e. integer or enum), either
-    C or mathematical one *)
+    C or mathematical one.
+    @modify 18.0-Argon expands the logic type definition if necessary. *)
 val isLogicIntegralType: logic_type -> bool
 
-(** True if the argument is a floating point type *)
+(** True if the argument is a boolean type, either integral C type or
+    mathematical boolean one.
+    @modify 18.0-Argon expands the logic type definition if necessary. *)
+val isLogicBooleanType: logic_type -> bool
+
+(** True if the argument is a floating point type. *)
 val isFloatingType: typ -> bool
 
-(** True if the argument is a floating point type *)
+(** True if the argument is a floating point type.
+    @modify 18.0-Argon expands the logic type definition if necessary. *)
 val isLogicFloatType: logic_type -> bool
 
-(** True if the argument is a C floating point type or logic 'real' type *)
+(** True if the argument is a C floating point type or logic 'real' type.
+    @modify 18.0-Argon expands the logic type definition if necessary. *)
 val isLogicRealOrFloatType: logic_type -> bool
 
-(** True if the argument is the logic 'real' type *)
+(** True if the argument is the logic 'real' type.
+    @modify 18.0-Argon expands the logic type definition if necessary. *)
 val isLogicRealType: logic_type -> bool
 
 (** True if the argument is an arithmetic type (i.e. integer, enum or
@@ -563,17 +574,33 @@ val isArithmeticType: typ -> bool
 val isArithmeticOrPointerType: typ -> bool
 
 (** True if the argument is a logic arithmetic type (i.e. integer, enum or
-    floating point, either C or mathematical one *)
+    floating point, either C or mathematical one.
+    @modify 18.0-Argon expands the logic type definition if necessary. *)
 val isLogicArithmeticType: logic_type -> bool
 
-(** True if the argument is a pointer type *)
+(** True if the argument is a function type *)
+val isFunctionType: typ -> bool
+
+(** True if the argument is the logic function type.
+    Expands the logic type definition if necessary.
+    @since 18.0-Argon *)
+val isLogicFunctionType: logic_type -> bool
+
+(** True if the argument is a pointer type. *)
 val isPointerType: typ -> bool
 
-(** True if the argument is the type for reified C types *)
-val isTypeTagType: logic_type -> bool
+(** True if the argument is a function pointer type.
+    @since 18.0-Argon *)
+val isFunPtrType: typ -> bool
 
-(** True if the argument is a function type. *)
-val isFunctionType: typ -> bool
+(** True if the argument is the logic function pointer type.
+    Expands the logic type definition if necessary.
+    @since 18.0-Argon *)
+val isLogicFunPtrType: logic_type -> bool
+
+(** True if the argument is the type for reified C types.
+    @modify 18.0-Argon expands the logic type definition if necessary. *)
+val isTypeTagType: logic_type -> bool
 
 (** True if the argument denotes the type of ... in a variadic function.
     @since Nitrogen-20111001 moved from cabs2cil *)
@@ -666,7 +693,7 @@ val makeFormalVar: fundec -> ?where:string -> string -> typ -> varinfo
     If the name passed as argument already exists within the function,
     a fresh name will be generated for the varinfo.
 
-    @modify Frama-C+dev the name of the variable is guaranteed to be fresh.
+    @modify Chlorine-20180501 the name of the variable is guaranteed to be fresh.
 *)
 val makeLocalVar:
   fundec -> ?scope:block -> ?temp:bool -> ?insert:bool
@@ -675,7 +702,7 @@ val makeLocalVar:
 (** if needed, rename the given varinfo so that its [vname] does not
     clash with the one of a local or formal variable of the given function.
 
-    @since Frama-C+dev
+    @since Chlorine-20180501
 *)
 val refresh_local_name: fundec -> varinfo -> unit
 
@@ -896,7 +923,7 @@ val mkMem: addr:exp -> off:offset -> lval
     casts between arithmetic types as needed, or between pointer
     types, but do not attempt to cast pointer to int or
     vice-versa. Use appropriate binop (PlusPI & friends) for that.
-    @modify Frama-C+dev no systematic cast to uintptr_t for ptr comparisons.
+    @modify Chlorine-20180501 no systematic cast to uintptr_t for ptr comparisons.
 *)
 val mkBinOp: loc:location -> binop -> exp -> exp -> exp
 
@@ -905,7 +932,7 @@ val mkBinOp: loc:location -> binop -> exp -> exp -> exp
     making such operation defined even if the pointers do not share
     the same base. This was the behavior of {!mkBinOp} prior to the
     introduction of this function.
-    @since Frama-C+dev
+    @since Chlorine-20180501
  *)
 val mkBinOp_safe_ptr_cmp: loc:location -> binop -> exp -> exp -> exp
 
@@ -998,7 +1025,8 @@ val appears_in_expr: varinfo -> exp -> bool
     if [valid_sid] is false (the default),
     or to a valid sid if [valid_sid] is true,
     and [labels], [succs] and [preds] to the empty list *)
-val mkStmt: ?ghost:bool -> ?valid_sid:bool -> stmtkind -> stmt
+val mkStmt: ?ghost:bool -> ?valid_sid:bool -> ?sattr:attributes -> stmtkind ->
+  stmt
 
 (* make the [new_stmtkind] changing the CFG relatively to [ref_stmt] *)
 val mkStmtCfg: before:bool -> new_stmtkind:stmtkind -> ref_stmt:stmt -> stmt
@@ -1021,7 +1049,8 @@ val mkStmtCfgBlock: stmt list -> stmt
 (** Construct a statement consisting of just one instruction
     See {!Cil.mkStmt} for the signification of the optional args.
  *)
-val mkStmtOneInstr: ?ghost:bool -> ?valid_sid:bool -> instr -> stmt
+val mkStmtOneInstr: ?ghost:bool -> ?valid_sid:bool -> ?sattr:attributes ->
+  instr -> stmt
 
 (** Try to compress statements so as to get maximal basic blocks.
  * use this instead of List.@ because you get fewer basic blocks *)
@@ -1030,7 +1059,8 @@ val mkStmtOneInstr: ?ghost:bool -> ?valid_sid:bool -> instr -> stmt
 (** Returns an empty statement (of kind [Instr]). See [mkStmt] for [ghost] and
     [valid_sid] arguments.
     @modify Neon-20130301 adds the [valid_sid] optional argument. *)
-val mkEmptyStmt: ?ghost:bool -> ?valid_sid:bool -> ?loc:location -> unit -> stmt
+val mkEmptyStmt: ?ghost:bool -> ?valid_sid:bool -> ?sattr:attributes ->
+  ?loc:location -> unit -> stmt
 
 (** A instr to serve as a placeholder *)
 val dummyInstr: instr
@@ -1055,15 +1085,17 @@ val mkPureExprInstr:
     See {!Cil.mkStmt} for information about [ghost] and [valid_sid], and
     {!Cil.mkPureExprInstr} for information about [loc].
 
-    @modify Frama-C+dev lift optional arg valid_sid from [mkStmt] instead
+    @modify Chlorine-20180501 lift optional arg valid_sid from [mkStmt] instead
     of relying on ill-fated default.
 *)
 val mkPureExpr:
   ?ghost:bool -> ?valid_sid:bool -> fundec:fundec ->
   ?loc:location -> exp -> stmt
 
-(** Make a while loop. Can contain Break or Continue *)
-val mkWhile: guard:exp -> body:stmt list -> stmt list
+(** Make a loop. Can contain Break or Continue.
+    The kind of loop (While, For, DoWhile) is given by [sattr];
+    it is a While loop if unspecified. *)
+val mkLoop: ?sattr:attributes -> guard:exp -> body:stmt list -> stmt list
 
 (** Make a for loop for(i=start; i<past; i += incr) \{ ... \}. The body
     can contain Break but not Continue. Can be used with i a pointer
@@ -1154,10 +1186,30 @@ val dropAttribute: string -> attributes -> attributes
  *  Maintains the attributes in sorted order *)
 val dropAttributes: string list -> attributes -> attributes
 
+(** a field struct marked with this attribute is known to be mutable, i.e.
+    it can be modified even on a const object.
+
+    @since 18.0-Argon
+*)
+val frama_c_mutable: string
+
+(** a formal marked with this attribute is known to be a pointer to an
+    object being initialized by the current function, which can thus assign
+    any sub-object regardless of const status.
+
+    @since 18.0-Argon
+ *)
+val frama_c_init_obj: string
+
+(** [true] if the given lval is allowed to be assigned to thanks to
+    a [frama_c_init_obj] or a [frama_c_mutable] attribute.
+*)
+val is_mutable_or_initialized: lval -> bool
+
 (** Remove attributes whose name appears in the first argument that are
     present anywhere in the fully expanded version of the type.
     @since Oxygen-20120901
-    @deprecated Frama-C+dev use {!Cil.typeRemoveAttributesDeep} instead,
+    @deprecated Chlorine-20180501 use {!Cil.typeRemoveAttributesDeep} instead,
     which does not traverse pointers and function types, or
     {!Cil.typeDeepDropAllAttributes}, which will give a pristine version of the
     type, without any attributes.
@@ -1241,7 +1293,7 @@ val typeHasAttributeDeep: string -> typ -> bool
 (** Does the type or one of its subtypes have the given attribute. Does
     not recurse through pointer types, nor inside function prototypes.
     @since Oxygen-20120901
-    @deprecated Frama-C+dev see {!Cil.typeHasAttributeMemoryBlock}
+    @deprecated Chlorine-20180501 see {!Cil.typeHasAttributeMemoryBlock}
  *)
 [@@ deprecated "Use Cil.typeHasAttributeMemoryBlock instead"]
 
@@ -1251,7 +1303,7 @@ val typeHasAttributeMemoryBlock: string -> typ -> bool
     [attr]. In other words, it searches for [attr] under aggregates, but not
     under pointers.
 
-    @since Frama-C+dev replaces typeHasAttributeDeep (name too ambiguous)
+    @since Chlorine-20180501 replaces typeHasAttributeDeep (name too ambiguous)
 *)
 
 (** Remove all attributes relative to const, volatile and restrict attributes
@@ -1304,7 +1356,7 @@ exception NotAnAttrParam of exp
 val isConstType : typ -> bool
 (** Check for ["const"] qualifier from the type of an l-value (do not follow pointer)
     @return true iff a part of the related l-value has ["const"] qualifier
-    @since Frama-C+dev *)
+    @since Chlorine-20180501 *)
 
 (* ************************************************************************* *)
 (** {2 Volatile Attribute} *)

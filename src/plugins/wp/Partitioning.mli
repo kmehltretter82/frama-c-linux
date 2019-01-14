@@ -36,4 +36,3 @@ val collect : partition -> F.pred -> unit
 val classes : partition -> classeq list
 val filter_hyp : classeq -> F.pred -> F.pred
 val filter_goal : classeq -> F.pred -> F.pred
-

@@ -1,7 +1,8 @@
 % rubber: depend ../../VERSION
 \documentclass{frama-c-book}
 \usepackage{amsmath}
-\newcommand{\framacversion}{\input{../../VERSION}}
+\newcommand{\framacversion}%
+           {\input{../../VERSION} (\input{../../VERSION_CODENAME}\unskip)}
 
 \begin{document}
 \coverpage{Metrics}
@@ -62,10 +63,10 @@ Let us now detail some of them:
   file. As of now, only {\sf .html} or {\sf .txt} outputs are supported.
 
 \item[-metrics-cover] specifies a set of functions from which to compute a
-coverage estimate. This item is detailed in Section \ref{sec:value-analysis-cover}.
+coverage estimate. This item is detailed in Section \ref{sec:eva-cover}.
 
-\item[-metrics-value-cover] activates the value coverage estimation.
-  This item is detailed in Section \ref{sec:value-analysis-cover}.
+\item[-metrics-eva-cover] activates the Eva coverage estimation.
+  This item is detailed in Section \ref{sec:eva-cover}.
 
 \item[-metrics-libc] controls whether functions from Frama-C's standard
   library are shown within the results. By default, this option is not set,
@@ -203,27 +204,27 @@ and {\sf foo} are reachable from the {\sf main} function.
 
 
 
-\subsection{Value analysis coverage}
-\label{sec:value-analysis-cover}
+\subsection{Eva coverage}
+\label{sec:eva-cover}
 
-The {\sf -metrics-value-cover} option can be used to compare the code
-effectively analyzed by the Value Analysis with what {\sf Metrics}
+The {\sf -metrics-eva-cover} option can be used to compare the code
+effectively analyzed by Eva with what {\sf Metrics}
 considers reachable from the {\sf main} function (wrt.\ the criterion
 described in Section~\ref{sec:analysis-cover}).  The results of this option on our
 example are given in Figure~\ref{fig:value-cover}. This particular
 feature is activated by the following command:
 
 \begin{shell}[escapechar={\#}]
-%  frama-c -metrics -metrics-value-cover #\pgname#
+%  frama-c -metrics -metrics-eva-cover #\pgname#
 \end{shell}
 
 Syntactic reachability is an over-approximation of what is actually
-reachable by the value analysis. Thus, the coverage estimation will
+reachable by Eva. Thus, the coverage estimation will
 always be equal to or less than $100\%$, especially if the source
 code relies a lot on the use of function pointers.
 
 For all functions that are considered syntactically reachable, but that
-are not analyzed by the value analysis, the plug-in indicates the
+are not analyzed by Eva, the plug-in indicates the
 locations in the code where a call \emph{might} have been analyzed.
 In our example, this consists in the call to {\sf foo} at ligne 24.
 Also, since the address of {\sf baz} is contained in
@@ -231,13 +232,13 @@ the initializer of the array {\sf t} (itself referenced in {\sf main}),
 {\sf baz} is considered as callable; thus the plug-in signals the
 initializer of {\sf t} as a possible calling point.
 %
-Finally, the plug-in displays the percentage of statements analyzed by Value
+Finally, the plug-in displays the percentage of statements analyzed by Eva
 for each function.
 
 \begin{figure}[!ht]
   \centering
     \lstinputlisting[language=Logs, basicstyle=\lp@basic, firstline=42]{./cover.log}
-  \caption{Value coverage estimate for \pgname}
+  \caption{Eva coverage estimate for \pgname}
   \label{fig:value-cover}
 \end{figure}
 
@@ -391,21 +392,21 @@ follows:
 It is important to note that the measure of bugs delivered is considered
 under-approximated for programs written in C.
 
-\section{Value coverage}
+\section{Eva coverage}
 
 This part of the Metrics plug-in is thought of as a help for new code
-exploration with Frama-C's value analysis plug-in. The first steps into a new
+exploration with Frama-C's Eva plug-in. The first steps into a new
 code can
-be quite complicated and, more often than not, the value analysis stops from too
+be quite complicated and, more often than not, Eva stops due to too
 much imprecision. This imprecision can have a lot of different causes (body of
 library functions missing, imprecisions of reads in memory, \ldots).
 
-The graphical user interface helps visualizing where the value analysis has
+The graphical user interface helps visualizing where Eva has
 stopped. The penetration estimate of Metrics aims to complement that by giving a
-rough approximate of the percentage of code that the value analysis has
-seen. This is especially interesting when comparing two runs of the value
-analysis on the same code, after performing some tweaks and improvements to help
-the value analysis: one can thusly quantify the added penetration due
+rough approximate of the percentage of code that Eva has
+seen. This is especially interesting when comparing two runs of Eva
+on the same code, after performing some tweaks and improvements to help
+Eva: one can thusly quantify the added penetration due
 to the tweaks.
 
 

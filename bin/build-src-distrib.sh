@@ -30,10 +30,13 @@ if test \! -f VERSION ; then
     echo "This script must be run at the root of a Frama-C repository"
     exit 1
 fi
-FRAMAC_VERSION=`cat VERSION`
-FRAMAC_TAG=`git describe --tag`
+FRAMAC_VERSION=$(cat VERSION)
+FRAMAC_TAG=$(git describe --tag)
+FRAMAC_VERSION_CODENAME=$(cat VERSION_CODENAME)
+FRAMAC_VERSION_AND_CODENAME="${FRAMAC_VERSION}-${FRAMAC_VERSION_CODENAME}"
+TARGZ_FILENAME=frama-c-${FRAMAC_VERSION_AND_CODENAME}.tar.gz
 
-VERSION_MODIFIER=$(cat VERSION | sed -e s/[A-Za-z]*-[0-9]*\\\(.*\\\)/\\1/)
+VERSION_MODIFIER=$(cat VERSION | sed -e s/[0-9.]*\\\(.*\\\)/\\1/)
 
 if test -n "$VERSION_MODIFIER"; then FINAL_RELEASE=no; else FINAL_RELEASE=yes; fi
 
@@ -224,6 +227,19 @@ case "${STEP}" in
     ;&
   2)
     step 2 "BUILDING THE SOURCE DISTRIBUTION"
+    if ! git diff-index --quiet HEAD --; then
+        echo ""
+        echo "### WARNING: uncommitted git changes will be discarded when creating archive!"
+        echo "Proceed anyway? [y/N]"
+        read CHOICE
+        case "${CHOICE}" in
+            "Y"|"y")
+                ;;
+            *)
+                echo "Stash or commit local changes, then run the script again."
+                exit 1
+        esac
+    fi
     run "mkdir -p $BUILD_DIR_ROOT"
     run "rm -rf $BUILD_DIR"
     run "git worktree add --detach $BUILD_DIR $FRAMAC_BRANCH"
@@ -236,30 +252,31 @@ case "${STEP}" in
         run "rm $GITHUB_DIR/$file";
     done
     run "git -C $GITHUB_DIR clean -fx"
-    run "cd $GITHUB_DIR; tar --strip-components=1 -xzvf $BUILD_DIR/frama-c-${FRAMAC_VERSION}.tar.gz"
+    run "cd $GITHUB_DIR; tar --strip-components=1 -xzvf $BUILD_DIR/$TARGZ_FILENAME"
     run "git -C $GITHUB_DIR add -A"
     run "mkdir -p $GITHUB_WIKI/downloads"
-    run "cp $BUILD_DIR/frama-c-${FRAMAC_VERSION}.tar.gz $GITHUB_WIKI/downloads/"
+    run "cp $BUILD_DIR/$TARGZ_FILENAME $GITHUB_WIKI/downloads/"
     if test "$FINAL_RELEASE" = "yes"; then
-        SPEC_FILE="$DOWNLOAD_DIR/frama-c-${FRAMAC_VERSION}.tar.gz"
+        SPEC_FILE="$DOWNLOAD_DIR/$TARGZ_FILENAME"
         run "rm -f $WEBSITE_DIR/$SPEC_FILE"
-        run "cp $BUILD_DIR/frama-c-${FRAMAC_VERSION}.tar.gz $WEBSITE_DIR/$SPEC_FILE"
+        run "cp $BUILD_DIR/$TARGZ_FILENAME $WEBSITE_DIR/$SPEC_FILE"
         run "git -C $WEBSITE_DIR add $SPEC_FILE"
         run "cp Changelog $WEBSITE_DIR/src/last-release/Changelog"
+        run "cp src/plugins/wp/Changelog $WEBSITE_DIR/src/wpChangelog"
         run "cp src/plugins/wp/Changelog $WEBSITE_DIR/src/last-release/wpChangelog"
     fi
     ;&
   3)
     #note: this step may fail if step 4 was performed,
     #      because it will erase BUILD_DIR
-    step 4 "BUILDING THE API BUNDLE"
+    step 3 "BUILDING THE API BUNDLE"
     if test \! -d "$BUILD_DIR" ; then
         echo "ERROR: $BUILD_DIR does not exist, possibly removed by another step"
         exit 1
     fi
     run "cd $BUILD_DIR; make -j doc-distrib"
     if test "$FINAL_RELEASE" = "yes"; then
-        SPEC_FILE="$DOWNLOAD_DIR/frama-c-${FRAMAC_VERSION}_api.tar.gz"
+        SPEC_FILE="$DOWNLOAD_DIR/frama-c-${FRAMAC_VERSION_AND_CODENAME}-api.tar.gz"
         run "rm -f $WEBSITE_DIR/$SPEC_FILE"
         run "cp $BUILD_DIR/frama-c-api.tar.gz $WEBSITE_DIR/$SPEC_FILE"
         run "git -C $WEBSITE_DIR add $SPEC_FILE"
@@ -273,12 +290,12 @@ case "${STEP}" in
     fi
     run "cd $BUILD_DIR; make -j doc-companions"
     if test "$FINAL_RELEASE" = "yes"; then
-        SPEC_FILE="$DOWNLOAD_DIR/hello-${FRAMAC_VERSION}.tar.gz"
+        SPEC_FILE="$DOWNLOAD_DIR/hello-${FRAMAC_VERSION_AND_CODENAME}.tar.gz"
         RELE_FILE="$DOWNLOAD_DIR/hello.tar.gz"
         run "rm -f $WEBSITE_DIR/$SPEC_FILE $WEBSITE_DIR/$RELE_FILE"
-        run "cp $BUILD_DIR/hello-${FRAMAC_VERSION}.tar.gz $WEBSITE_DIR/$SPEC_FILE"
+        run "cp $BUILD_DIR/hello-${FRAMAC_VERSION_AND_CODENAME}.tar.gz $WEBSITE_DIR/$SPEC_FILE"
         run "git -C $WEBSITE_DIR add $SPEC_FILE"
-        run "ln -s $WEBSITE_DIR/$SPEC_FILE $WEBSITE_DIR/$RELE_FILE";
+        run "ln -s hello-${FRAMAC_VERSION_AND_CODENAME}.tar.gz $WEBSITE_DIR/$RELE_FILE";
         run "git -C $WEBSITE_DIR add $RELE_FILE"
         run "rm -rf $BUILD_DIR"
         run "git worktree prune"
@@ -286,79 +303,79 @@ case "${STEP}" in
     ;&
   5)
     step 5 "COPYING AND STAGING THE DISTRIBUTED MANUALS"
-      PAGE_NAME=Frama-C-$FRAMAC_VERSION.md
+      PAGE_NAME=Frama-C-${FRAMAC_VERSION_AND_CODENAME}.md
       WIKI_PAGE=$GITHUB_WIKI/$PAGE_NAME
       run "mkdir -p $GITHUB_WIKI/manuals"
       run "sed -i -e '/<!-- LAST RELEASE -->/a \
-- [${FRAMAC_VERSION}](Frama-C-${FRAMAC_VERSION})' $GITHUB_WIKI/Home.md"
-      echo "# Frama-C release ${FRAMAC_VERSION}" > $WIKI_PAGE
+- [${FRAMAC_VERSION} (${FRAMAC_VERSION_CODENAME})](Frama-C-${FRAMAC_VERSION_AND_CODENAME})' $GITHUB_WIKI/Home.md"
+      echo "# Frama-C release ${FRAMAC_VERSION} (${FRAMAC_VERSION_CODENAME})" > $WIKI_PAGE
       echo "## Sources" >> $WIKI_PAGE
-      echo " - [frama-c-${FRAMAC_VERSION}.tar.gz](downloads/frama-c-${FRAMAC_VERSION}.tar.gz)" >> $WIKI_PAGE
+      echo " - [$TARGZ_FILENAME](downloads/$TARGZ_FILENAME)" >> $WIKI_PAGE
       echo "" >> $WIKI_PAGE
       echo "## Manuals" >> $WIKI_PAGE
-    for f in "user-manual" "acsl-implementation" "value-analysis" "plugin-development-guide" "rte-manual" "wp-manual" "metrics-manual" "aorai-manual"; do
-        echo "- [$f](manuals/$f-${FRAMAC_VERSION}.pdf)" >> $WIKI_PAGE
-        run "cp $MANUALS_DIR/$f.pdf $GITHUB_WIKI/manuals/$f-${FRAMAC_VERSION}.pdf"
-        run "git -C $GITHUB_WIKI add manuals/$f-${FRAMAC_VERSION}.pdf"
+    for f in "user-manual" "acsl-implementation" "eva-manual" "plugin-development-guide" "rte-manual" "wp-manual" "metrics-manual" "aorai-manual"; do
+        echo "- [$f](manuals/$f-${FRAMAC_VERSION_AND_CODENAME}.pdf)" >> $WIKI_PAGE
+        run "cp $MANUALS_DIR/$f.pdf $GITHUB_WIKI/manuals/$f-${FRAMAC_VERSION_AND_CODENAME}.pdf"
+        run "git -C $GITHUB_WIKI add manuals/$f-${FRAMAC_VERSION_AND_CODENAME}.pdf"
         if test "$FINAL_RELEASE" = "yes"; then
-            SPEC_FILE="$DOWNLOAD_DIR/$f-${FRAMAC_VERSION}.pdf"
+            SPEC_FILE="$DOWNLOAD_DIR/$f-${FRAMAC_VERSION_AND_CODENAME}.pdf"
             RELE_FILE="$DOWNLOAD_DIR/frama-c-$f.pdf"
             run "rm -f $WEBSITE_DIR/$SPEC_FILE $WEBSITE_DIR/$RELE_FILE"
             run "cp $MANUALS_DIR/$f.pdf $WEBSITE_DIR/$SPEC_FILE";
-            run "ln -s $f-${FRAMAC_VERSION}.pdf $WEBSITE_DIR/$RELE_FILE";
+            run "ln -s $f-${FRAMAC_VERSION_AND_CODENAME}.pdf $WEBSITE_DIR/$RELE_FILE";
             run "git -C $WEBSITE_DIR add $SPEC_FILE"
             run "git -C $WEBSITE_DIR add $RELE_FILE"
         fi
     done
     for f in "aorai-example"; do
         if test "$FINAL_RELEASE" = "yes"; then
-            SPEC_FILE="$DOWNLOAD_DIR/$f-${FRAMAC_VERSION}.tgz"
+            SPEC_FILE="$DOWNLOAD_DIR/$f-${FRAMAC_VERSION_AND_CODENAME}.tgz"
             RELE_FILE="$DOWNLOAD_DIR/frama-c-$f.tgz"
             run "rm -f $WEBSITE_DIR/$SPEC_FILE $WEBSITE_DIR/$RELE_FILE"
             run "cp $MANUALS_DIR/$f.tgz $WEBSITE_DIR/$SPEC_FILE";
-            run "ln -s $f-${FRAMAC_VERSION}.tgz $WEBSITE_DIR/$RELE_FILE";
+            run "ln -s $f-${FRAMAC_VERSION_AND_CODENAME}.tgz $WEBSITE_DIR/$RELE_FILE";
             run "git -C $WEBSITE_DIR add $SPEC_FILE"
             run "git -C $WEBSITE_DIR add $RELE_FILE"
         fi
     done
 
     for f in "acsl"; do
-      ACSL_VERSION=`cat doc/acsl/VERSION`
+      ACSL_VERSION=`cat doc/acsl/ACSL_VERSION`
       if test "$FINAL_RELEASE" = "yes"; then
-          SPEC_FILE="$DOWNLOAD_DIR/${f}_${ACSL_VERSION}.pdf"
+          SPEC_FILE="$DOWNLOAD_DIR/${f}-${ACSL_VERSION}.pdf"
           RELE_FILE="$DOWNLOAD_DIR/$f.pdf"
           run "rm -f $WEBSITE_DIR/$SPEC_FILE $WEBSITE_DIR/$RELE_FILE"
           run "cp $MANUALS_DIR/$f.pdf $WEBSITE_DIR/$SPEC_FILE";
-          run "ln -s ${f}_${ACSL_VERSION}.pdf $WEBSITE_DIR/$RELE_FILE";
+          run "ln -s ${f}-${ACSL_VERSION}.pdf $WEBSITE_DIR/$RELE_FILE";
           run "git -C $WEBSITE_DIR add $SPEC_FILE"
           run "git -C $WEBSITE_DIR add $RELE_FILE"
       fi
     done
     for f in "e-acsl-manual" "e-acsl-implementation"; do
-        echo "- [$f](manuals/${f}_${FRAMAC_VERSION}.pdf)" >> $WIKI_PAGE
-        run "cp $EACSL_DIR/doc/manuals/$f.pdf $GITHUB_WIKI/manuals/${f}_${FRAMAC_VERSION}.pdf"
-        run "git -C $GITHUB_WIKI add manuals/${f}_${FRAMAC_VERSION}.pdf"
+        echo "- [$f](manuals/${f}-${FRAMAC_VERSION_AND_CODENAME}.pdf)" >> $WIKI_PAGE
+        run "cp $EACSL_DIR/doc/manuals/$f.pdf $GITHUB_WIKI/manuals/${f}-${FRAMAC_VERSION_AND_CODENAME}.pdf"
+        run "git -C $GITHUB_WIKI add manuals/${f}-${FRAMAC_VERSION_AND_CODENAME}.pdf"
         if test "$FINAL_RELEASE" = "yes"; then
-            SPEC_FILE="$DOWNLOAD_DIR/e-acsl/${f}_${FRAMAC_VERSION}.pdf"
+            SPEC_FILE="$DOWNLOAD_DIR/e-acsl/${f}-${FRAMAC_VERSION_AND_CODENAME}.pdf"
             RELE_FILE="$DOWNLOAD_DIR/e-acsl/$f.pdf"
             run "rm -f $WEBSITE_DIR/$SPEC_FILE $WEBSITE_DIR/$RELE_FILE"
             run "cp $EACSL_DIR/doc/manuals/$f.pdf $WEBSITE_DIR/$SPEC_FILE"
-            run "ln -s ${f}_${ACSL_VERSION}.pdf $WEBSITE_DIR/$RELE_FILE";
+            run "ln -s ${f}-${FRAMAC_VERSION_AND_CODENAME}.pdf $WEBSITE_DIR/$RELE_FILE";
             run "git -C $WEBSITE_DIR add $SPEC_FILE"
             run "git -C $WEBSITE_DIR add $RELE_FILE"
         fi
     done
     # E-ACSL manuals based on ACSL version number
     for f in "e-acsl"; do
-        echo "- [$f](manuals/${f}_${FRAMAC_VERSION}.pdf)" >> $WIKI_PAGE
-        run "cp $EACSL_DIR/doc/manuals/$f.pdf $GITHUB_WIKI/manuals/${f}_${FRAMAC_VERSION}.pdf"
-        run "git -C $GITHUB_WIKI add manuals/${f}_${FRAMAC_VERSION}.pdf"
+        echo "- [$f](manuals/${f}-${ACSL_VERSION}.pdf)" >> $WIKI_PAGE
+        run "cp $EACSL_DIR/doc/manuals/$f.pdf $GITHUB_WIKI/manuals/${f}-${ACSL_VERSION}.pdf"
+        run "git -C $GITHUB_WIKI add manuals/${f}-${ACSL_VERSION}.pdf"
         if test "$FINAL_RELEASE" = "yes"; then
-            SPEC_FILE="$DOWNLOAD_DIR/e-acsl/${f}_${ACSL_VERSION}.pdf"
+            SPEC_FILE="$DOWNLOAD_DIR/e-acsl/${f}-${ACSL_VERSION}.pdf"
             RELE_FILE="$DOWNLOAD_DIR/e-acsl/$f.pdf"
             run "rm -f $WEBSITE_DIR/$SPEC_FILE $WEBSITE_DIR/$RELE_FILE"
             run "cp $EACSL_DIR/doc/manuals/$f.pdf $WEBSITE_DIR/$SPEC_FILE"
-            run "ln -s ${f}_${ACSL_VERSION}.pdf $WEBSITE_DIR/$RELE_FILE";
+            run "ln -s ${f}-${ACSL_VERSION}.pdf $WEBSITE_DIR/$RELE_FILE";
             run "git -C $WEBSITE_DIR add $SPEC_FILE"
             run "git -C $WEBSITE_DIR add $RELE_FILE"
         fi

@@ -68,26 +68,12 @@ All \FramaC plug-ins define the following set of common options.
   subcategories. An enabled category \texttt{cat} can be disabled by using
   \texttt{-cat} in the list of \texttt{keys}. Several occurrences of the option
   may appear on the command line and will be processed in order.
-\item[\texttt{-<plug-in shortname>-warn-<stat> <keys>}]
+\item[\texttt{-<plug-in shortname>-warn-key <keys>}]
 \optionidxdef{-}{<plug-in>-warn-key}
 \optionidxdef{-}{kernel-warn-key}
-\optionidxdef{-}{<plug-in>-warn-once}
-\optionidxdef{-}{kernel-warn-once}
-\optionidxdef{-}{<plug-in>-warn-feedback}
-\optionidxdef{-}{kernel-warn-feedback}
-\optionidxdef{-}{<plug-in>-warn-error}
-\optionidxdef{-}{kernel-warn-error}
-\optionidxdef{-}{<plug-in>-warn-abort}
-\optionidxdef{-}{kernel-warn-abort}
-\optionidxdef{-}{<plug-in>-warn-feedback-once}
-\optionidxdef{-}{kernel-warn-feedback-once}
-\optionidxdef{-}{<plug-in>-warn-err-once}
-\optionidxdef{-}{kernel-warn-err-once}
-(where \texttt{stat}
-is one of \texttt{key}, \texttt{once}, \texttt{feedback}, \texttt{error},
-\texttt{abort}, \texttt{feedback-once}, \texttt{err-once})
-allows to set the status of a category of warnings. There are eight possible
-statuses:
+allows setting the status of a category of warnings. The argument \texttt{keys} is a comma-separated
+list of \texttt{key} of the form \texttt{<category>=<status>}, where category is a warning
+category (possibly a sub-category as for messages categories above), and status is one of:
 \index{warning status}
 \begin{description}
 \item[inactive] no message is emitted for the category
@@ -105,40 +91,18 @@ statuses:
 \item[err-once] combines the actions of \texttt{error} and \texttt{once}
   statuses.
 \end{description}
-The table below indicates what will be the new status associated to warning
-category \texttt{a} when it is present in \texttt{<keys>}, either in positive
-form (\texttt{a} or \texttt{+a}), or in negative form (\texttt{-a}).
 
-\begin{tabular}{|c|c|c|}
-\hline
-\texttt{stat} & status if positive & status if negative \\
-\hline
-\texttt{key} & active & inactive \\
-\hline
-\texttt{once} & once & inactive \\
-\hline
-\texttt{feedback} & feedback & active \\
-\hline
-\texttt{error} & error & active \\
-\hline
-\texttt{abort} & abort & active \\
-\hline
-\texttt{feedback-once} & feedback-once & once \\
-\hline
-\texttt{err-once} & err-once & once \\
-\hline
-\end{tabular}
-
+The \texttt{=<status>} part might be omitted, which is equivalent to asking for \texttt{active} status.
 The new status will be propagated to subcategories, with one exception: statuses
 ``abort'', ``error'' and ``err-once'' will only be propagated to subcategories
 whose current status is not ``inactive''.
 
-Finally, as for debug categories, passing \texttt{help} in the list of
+Finally, as for debug categories, passing \texttt{help} (without status) in the list of
 \texttt{keys} will list the available categories, together with their
 current status. Passing \texttt{*} in the list of keys will change the status
 of all warning categories, and affect warnings that do not have a category.
-Hence, \texttt{-kernel-warn-abort=*} will stop \FramaC's execution at the first
-warning triggered by the kernel.
+Hence, \texttt{-kernel-warn-key *=abort} will stop \FramaC's execution at the
+first warning triggered by the kernel.
 \end{description}
 
 The two following options modify the behavior of output messages:
@@ -153,7 +117,7 @@ The two following options modify the behavior of output messages:
 \section{Customizing Analyzers}\label{sec:customizing-analyzers}
 
 The descriptions of the analysis options follow. For the first two, the
-description comes from the Value Analysis manual~\cite{value}. Note that
+description comes from the \Value manual~\cite{value}. Note that
 these options are very likely to be modified in future versions of \FramaC.
 
 \begin{description}
@@ -255,6 +219,19 @@ option, no error is detected.
   \texttt{-warn-signed-overflow} for operations over unsigned integers. This
   option is \emph{not} set by default.
 
+\item \optiondef{-}{warn-left-shift-negative} can be used to check that the
+  code does not perform signed left shifts on negative values, i.e.,
+  \lstinline|x << n| with \lstinline|x| having signed type and negative
+  value. This is set by default, and can be disabled with option
+  \texttt{-no-warn-left-shift-negative}.
+
+\item \optiondef{-}{warn-right-shift-negative}, as its left-shift counterpart,
+  can be used to check for negative {\em right} shifts, i.e.,
+  \lstinline|x >> n| with \lstinline|x| having signed type and negative value.
+  This is {\em not} set by default.
+  \texttt{-no-warn-right-shift-negative} can be used to disable the option if
+  previously enabled.
+
 \item \optiondef{-}{warn-special-float} \texttt{<type>} may be used to allow
   or forbid special floating-point values, generating alarms when they are
   produced. \texttt{<type>} can be one of the following values:
@@ -263,6 +240,13 @@ option, no error is detected.
   \item[\texttt{nan}]: warn on NaN only
   \item[\texttt{none}]: no warnings
   \end{description}
+
+\item \optiondef{-}{warn-invalid-bool} may be used to check that the code
+  does not use invalid \_Bool values by reading trap representations
+  from lvalues of \_Bool types. A trap representation does not represent
+  a valid value of the \_Bool type, which can only be 0 or 1.
+  This option is set by default, and can be disabled with
+  \texttt{-no-warn-invalid-bool}.
 \end{description}
 
 % Local Variables:

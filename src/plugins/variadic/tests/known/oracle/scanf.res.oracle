@@ -1,28 +1,28 @@
-[variadic] FRAMAC_SHARE/libc/stdio.h:153: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:165: 
   Declaration of variadic function fprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:155: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:167: 
   Declaration of variadic function fscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:157: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:169: 
   Declaration of variadic function printf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:158: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:170: 
   Declaration of variadic function scanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:159: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:171: 
   Declaration of variadic function snprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:161: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:173: 
   Declaration of variadic function sprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:163: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:175: 
   Declaration of variadic function sscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:353: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:369: 
   Declaration of variadic function dprintf.
 [variadic] tests/known/scanf.c:7: 
   Translating call to scanf to a call to the specialized version scanf_va_1.
-[value] Analyzing a complete application starting at main
-[value] Computing initial state
-[value] Initial state computed
-[value] using specification for function scanf_va_1
-[value] done for function main
-[value] ====== VALUES COMPUTED ======
-[value:final-states] Values at end of function main:
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva] using specification for function scanf_va_1
+[eva] done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function main:
   c[0] ∈ [--..--]
    [1..9] ∈ [--..--] or UNINITIALIZED
   i ∈ [--..--]
@@ -56,7 +56,8 @@
       \from (indirect: __fc_stdin->__fc_FILE_id), __fc_stdin->__fc_FILE_data,
             (indirect: *(format + (0 ..)));
  */
-int scanf_va_1(char const *format, char *param0, char *param1, int *param2);
+int scanf_va_1(char const * __restrict format, char *param0, char *param1,
+               int *param2);
 
 int main(void)
 {

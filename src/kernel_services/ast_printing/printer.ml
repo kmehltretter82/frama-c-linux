@@ -244,7 +244,7 @@ class printer_with_annot () = object (self)
             self#pp_acsl_keyword "ghost";
           is_ghost <- true
 	end;
-	self#stmtkind next fmt s.skind;
+	self#stmtkind s.sattr next fmt s.skind;
 	if not was_ghost && s.ghost then begin
           self#pp_close_annotation ~suf:"@,*/@]" fmt;
           is_ghost <- false;
@@ -257,7 +257,7 @@ class printer_with_annot () = object (self)
           (fun fmt -> self#pp_open_annotation ~block:false fmt)
           self#code_annotation a
           (fun fmt -> self#pp_close_annotation ~block:false fmt)
-          (self#stmtkind next) s.skind;
+          (self#stmtkind s.sattr next) s.skind;
       | _ ->
 	let loop_annot, stmt_annot =
           List.partition Logic_utils.is_loop_annot all_annot
@@ -266,11 +266,11 @@ class printer_with_annot () = object (self)
 	self#loop_annotations fmt loop_annot;
 	pGhost fmt s)
     end else
-      self#stmtkind next fmt s.skind;
+      self#stmtkind s.sattr next fmt s.skind;
     Format.pp_close_box fmt ()
   
-  method! stmtkind (next: stmt) fmt skind =
-    super#stmtkind next fmt
+  method! stmtkind sattr (next: stmt) fmt skind =
+    super#stmtkind sattr next fmt
       begin
         match skind with
         | Goto({ contents = { skind = (Return _) as return }},_)

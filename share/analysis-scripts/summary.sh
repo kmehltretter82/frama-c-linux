@@ -4,11 +4,11 @@ declare -A stats
 
 function pretty_size()
 {
-  ([[ $# -lt 1 ]] || ! [[ $1 =~ ^[0-9]+$ ]]) && break
+  ([[ $# -lt 1 ]] || ! [[ $1 =~ ^[0-9]+$ ]]) && return
   KB=$1
-  [ $KB -lt 4096 ] && echo ${KB} kiB && break
+  [ $KB -lt 4096 ] && echo ${KB} kiB && return
   MB=$(((KB+512)/1024))
-  [ $MB -lt 4096 ] && echo ${MB} MiB && break
+  [ $MB -lt 4096 ] && echo ${MB} MiB && return
   GB=$(((MB+512)/1024))
   echo $GB GiB
 }
@@ -23,29 +23,56 @@ function pretty_coverage()
 
 function print_results()
 {
-    local s
     local t
+    local format
+
+    format="%20s %10s %10s %10s %10s %10s\n"
 
     if [ -z "$quiet" ]
     then
         echo -e '\e\0143'
-        printf "%20s %10s %10s %10s %10s %10s\n" 'target' 'coverage' 'alarms' 'warnings' 'time' 'memory'
+        printf "$format" 'target' 'coverage' 'alarms' 'warnings' 'time' 'memory'
         printf "%s\n" " ----------------------------------------------------------------------------"
         for t in $targets
         do
-            printf "%20s %10s %10s %10s %10s %10s\n" $t \
+            printf "$format" $t \
               "${stats["$t,coverage"]-}" \
               "${stats["$t,alarms"]-}" \
               "${stats["$t,warnings"]-}" \
               "${stats["$t,user_time"]-}" \
               "${stats["$t,memory"]-}"
         done
+        printf "%s\n" " ----------------------------------------------------------------------------"
+        printf "$format" 'total' '' "${stats["total_alarms"]-}" "${stats["total_warnings"]-}" "${stats["total_user_time"]-}" ''
         printf "\n"
     fi
 }
 
+function print_csv()
+{
+    local t
+    local format
+
+    format="%s\t%s\t%s\t%s\t%s\t%s\n"
+
+    printf "$format" 'target' 'coverage' 'alarms' 'warnings' 'time' 'memory'
+    for t in $targets
+    do
+        printf "$format" $t \
+          "${stats["$t,coverage"]-}" \
+          "${stats["$t,alarms"]-}" \
+          "${stats["$t,warnings"]-}" \
+          "${stats["$t,user_time"]-}" \
+          "${stats["$t,memory"]-}"
+    done
+}
+
 function poll_results()
 {
+  stats["total_alarms"]=0
+  stats["total_warnings"]=0
+  stats["total_user_time"]=0
+
   for t in $targets
   do
       if [ -f "$t/stats.txt" ]
@@ -60,6 +87,9 @@ function poll_results()
           )
           stats["$t,coverage"]=$(pretty_coverage ${stats["$t,syn_reach"]} ${stats["$t,sem_reach"]})
           stats["$t,memory"]=$(pretty_size ${stats["$t,mem_bytes"]})
+          stats["total_alarms"]=$(bc <<<"${stats["total_alarms"]} + ${stats["$t,alarms"]-0}")
+          stats["total_warnings"]=$(bc <<<"${stats["total_warnings"]} + ${stats["$t,warnings"]-0}")
+          stats["total_user_time"]=$(bc <<<"${stats["total_user_time"]} + ${stats["$t,user_time"]-0}")
       fi
   done
 }
@@ -122,3 +152,4 @@ done
 
 cat summary.log >&2
 rm -f summary.log
+print_csv > summary.csv

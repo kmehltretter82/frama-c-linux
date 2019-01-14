@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Main memory locations of EVA: *)
+(** Main memory locations of Eva: *)
 
 (** Abstract locations built over Precise_locs. *)
 module PLoc : sig

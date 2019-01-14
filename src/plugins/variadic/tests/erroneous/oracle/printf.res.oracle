@@ -1,18 +1,18 @@
-[variadic] FRAMAC_SHARE/libc/stdio.h:153: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:165: 
   Declaration of variadic function fprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:155: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:167: 
   Declaration of variadic function fscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:157: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:169: 
   Declaration of variadic function printf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:158: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:170: 
   Declaration of variadic function scanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:159: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:171: 
   Declaration of variadic function snprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:161: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:173: 
   Declaration of variadic function sprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:163: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:175: 
   Declaration of variadic function sscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:353: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:369: 
   Declaration of variadic function dprintf.
 [variadic] tests/erroneous/printf.c:8: Warning: Multiple usage of flag '-'.
 [variadic] tests/erroneous/printf.c:8: Warning: 

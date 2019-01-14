@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -load-script tests/saveload/load_one.ml -val-show-progress
+   OPT: -load-script tests/saveload/load_one.ml -eva-show-progress
 */
 
 int G;

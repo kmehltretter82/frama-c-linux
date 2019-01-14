@@ -975,17 +975,21 @@ let lemma g =
   let cc g = let hs,p = forall_intro g in sequence hs , p
   in Lang.local ~vars:(F.varsp g) cc g
 
-let introduction ((hs,g) as s) =
-  let cc s =
-    let flag = ref true in
+let introduction sequent =
+  let cc (hs,g) =
+    let flag = ref false in
     let intro p = let q = exist_intro p in if q != p then flag := true ; q in
     let hj = List.map (map_step intro) hs.seq_list in
     let hi,p = forall_intro g in
     if not !flag && hi == [] then
-      if p == g then s else hs , p
+      if p == g then None else Some (hs , p)
     else
-      sequence (hi @ hj) , p
-  in Lang.local ~vars:(vars_seq s) cc s
+      Some (sequence (hi @ hj) , p)
+  in Lang.local ~vars:(vars_seq sequent) cc sequent
+
+let introduction_eq s = match introduction s with
+  | Some s' -> s'
+  | None -> s
 
 (* -------------------------------------------------------------------------- *)
 (* --- Constant Folder                                                    --- *)
@@ -1110,14 +1114,16 @@ let rec fixpoint limit solvers sigma s0 =
 
 let letify_hsp ?(solvers=[]) hsp = fixpoint 10 solvers Sigma.empty hsp
 
-let rec simplify ?(solvers=[]) ?(intros=10) (seq,p) =
-  let hs,p = fixpoint 10 solvers Sigma.empty (seq.seq_list,p) in
+let rec simplify ?(solvers=[]) ?(intros=10) (seq,p0) =
+  let hs,p = fixpoint 10 solvers Sigma.empty (seq.seq_list,p0) in
   let sequent = sequence hs , p in
-  let introduced = introduction sequent in
-  if sequent != introduced && intros > 0 then
-    simplify ~solvers ~intros:(pred intros) introduced
-  else
-    introduced
+  match introduction sequent with
+  | Some introduced ->
+      if intros > 0 then
+        simplify ~solvers ~intros:(pred intros) introduced
+      else introduced
+  | None ->
+      sequent
 
 (* -------------------------------------------------------------------------- *)
 (* --- Pruning                                                            --- *)

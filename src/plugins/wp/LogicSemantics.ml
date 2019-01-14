@@ -300,7 +300,7 @@ struct
     | EQ_incomparable
 
   let eqsort_of_type t =
-    match Logic_utils.unroll_type t with
+    match Logic_utils.unroll_type ~unroll_typedef:false t with
     | Ltype({lt_name="set"},[_]) -> EQ_set
     | Linteger | Lreal | Lvar _ | Larrow _ | Ltype _ -> EQ_plain
     | Ctype t ->
@@ -461,51 +461,47 @@ struct
     | L_cint of c_int
     | L_cfloat of c_float
     | L_pointer of typ
+    | L_array of arrayinfo
 
-  let rec cvsort_of_type t =
-    match Logic_utils.unroll_type t with
-    | Ltype({lt_name="set"},[t]) -> (cvsort_of_type t)
-    | Ltype _ as b when Logic_const.is_boolean_type b -> L_bool
+  let rec cvsort_of_ltype src_ltype =
+    match Logic_utils.unroll_type ~unroll_typedef:false src_ltype with
     | Linteger -> L_integer
     | Lreal -> L_real
-    | Ctype c ->
+    | Ctype src_ctype ->
         begin
-          match Ctypes.object_of c with
+          match Ctypes.object_of src_ctype with
           | C_int i -> L_cint i
           | C_float f -> L_cfloat f
           | C_pointer te -> L_pointer te
-          | C_array a -> L_pointer a.arr_element
-          | obj -> Warning.error "cast from (%a) not implemented yet"
-                     Ctypes.pretty obj
+          | C_array a -> L_array a (* into the logic, C array = logic array *)
+          | C_comp c when c.cstruct ->
+              Warning.error "@[Logic cast from struct (%a) not implemented yet@]"
+                Printer.pp_typ src_ctype
+          | C_comp _ ->
+              Warning.error "@[Logic cast from union (%a) not implemented yet@]"
+                Printer.pp_typ src_ctype
         end
-    | _ -> Warning.error "cast from (%a) not implemented yet"
-             Printer.pp_logic_type t
-
-  (** cast to a logic type *)
-  let term_logic_cast env typ t =
-    match cvsort_of_type typ , cvsort_of_type t.term_type with
-    | L_integer, L_real ->
-        L.map Cmath.int_of_real (C.logic env t)
-    | L_real, L_integer ->
-        L.map Cmath.real_of_int (C.logic env t)
-    | L_cfloat f, L_real ->
-        L.map (Cfloat.float_of_real f) (C.logic env t)
-    | L_real, L_cfloat f ->
-        L.map (Cfloat.real_of_float f) (C.logic env t)
-    | L_cint i, L_real ->
-        L.map (Cint.of_real i) (C.logic env t)
-    | L_real, L_cint _ ->
-        L.map (fun x -> Cmath.real_of_int (Cint.to_integer x)) (C.logic env t)
-    | L_integer, L_cint _ ->
-        L.map Cint.to_integer (C.logic env t)
-    | L_cint i, L_integer ->
-        L.map (Cint.of_integer i) (C.logic env t)
-    | _ ->
-        C.logic env t
+    | Ltype _ as b when Logic_const.is_boolean_type b -> L_bool
+    | Ltype({lt_name="set"},[elt_ltype]) -> (* lifting or set of elements ? *)
+        cvsort_of_ltype elt_ltype
+    | (Ltype _ | Lvar _ | Larrow _) as typ ->
+        Warning.error "@[Logic cast from (%a) not implemented yet@]"
+          Printer.pp_logic_type typ
 
   (** cast to a C type *)
-  let term_cast env typ t =
-    match Ctypes.object_of typ , cvsort_of_type t.term_type with
+  let term_cast_to_ctype env dst_ctype t =
+    let cast_ptr ty t0 =
+      let value = C.logic env t in
+      let o_src = Ctypes.object_of t0 in
+      let o_dst = Ctypes.object_of ty in
+      if Ctypes.compare o_src o_dst = 0
+      then value
+      else L.map_loc (M.cast { pre=o_src ; post=o_dst }) value
+    in
+    match Ctypes.object_of dst_ctype , cvsort_of_ltype t.term_type with
+    (* Cast to C integers from ...*)
+    | C_int _ , L_bool ->
+        L.map Cvalues.bool_val (C.logic env t)
     | C_int i , L_cint i0 ->
         let v = C.logic env t in
         if (Ctypes.sub_c_int i0 i) then v
@@ -516,6 +512,10 @@ struct
         L.map_l2t (M.int_of_loc i) (C.logic env t)
     | C_int i , (L_cfloat _ | L_real) ->
         L.map (Cint.of_real i) (C.logic env t)
+    | C_int _, L_array _ ->
+        Warning.error "@[Logic cast to sized integer (%a) from (%a) not implemented yet@]"
+          Printer.pp_typ dst_ctype Printer.pp_logic_type t.term_type
+    (* Cast to C float from ... *)
     | C_float f , L_real ->
         L.map (Cfloat.float_of_real f) (C.logic env t)
     | C_float ft,  L_cfloat ff ->
@@ -523,21 +523,84 @@ struct
         L.map map (C.logic env t)
     | C_float f , (L_cint _ | L_integer) ->
         L.map (Cfloat.float_of_int f) (C.logic env t)
-    | C_pointer ty , L_pointer t0 ->
-        let value = C.logic env t in
-        let o_src = Ctypes.object_of t0 in
-        let o_dst = Ctypes.object_of ty in
-        if Ctypes.compare o_src o_dst = 0
-        then value
-        else L.map_loc (M.cast { pre=o_src ; post=o_dst }) value
+    | C_float _, (L_bool|L_pointer _|L_array _) ->
+        Warning.error "@[Logic cast to float (%a) from (%a) not implemented yet@]"
+          Printer.pp_typ dst_ctype Printer.pp_logic_type t.term_type
+    (* Cast to C pointer from ...  *)
     | C_pointer ty , (L_integer | L_cint _) ->
         let obj = Ctypes.object_of ty in
         L.map_t2l (M.loc_of_int obj) (C.logic env t)
-    | C_int _ , L_bool ->
-        L.map Cvalues.bool_val (C.logic env t)
-    | _ ->
-        Warning.error "@[Cast from (%a) to (%a) not implemented yet@]"
-          Printer.pp_logic_type t.term_type Printer.pp_typ typ
+    | C_pointer ty , L_pointer t0 ->
+        cast_ptr ty t0
+    | C_pointer _, (L_bool|L_real|L_cfloat _|L_array _) ->
+        Warning.error "@[Logic cast to pointer (%a) from (%a) not implemented yet@]"
+          Printer.pp_typ dst_ctype Printer.pp_logic_type t.term_type
+    (* Cast to C array from ... *)
+    | C_array _, L_pointer t0 ->
+        (* cast to an array `(T[])(p)` is equivalent
+           to a deref of a cast to a pointer `*(T( * )[])(p)` *)
+        let cast = cast_ptr dst_ctype t0 in
+        L.load (C.current env) (Ctypes.object_of dst_ctype) cast
+    | C_array {arr_flat=Some _}, (L_integer|L_cint _|L_bool|L_real|L_cfloat _|L_array _) ->
+        Warning.error "@[Logic cast to sized array (%a) from (%a) not implemented yet@]"
+          Printer.pp_typ dst_ctype Printer.pp_logic_type t.term_type
+    | C_array {arr_flat=None}, (L_integer|L_cint _|L_bool|L_real|L_cfloat _|L_array _) ->
+        Warning.error "@[Logic cast to unsized array (%a) from (%a) not implemented yet@]"
+          Printer.pp_typ dst_ctype Printer.pp_logic_type t.term_type
+    (* Cast to C compound from ... *)
+    | C_comp c, (L_integer|L_cint _|L_bool|L_real|L_cfloat _|L_array _|L_pointer _) when c.cstruct ->
+        Warning.error "@[Logic cast to struct (%a) from (%a) not implemented yet@]"
+          Printer.pp_typ dst_ctype Printer.pp_logic_type t.term_type
+    | C_comp _, (L_integer|L_cint _|L_bool|L_real|L_cfloat _|L_array _|L_pointer _) ->
+        Warning.error "@[Logic cast to union (%a) from (%a) not implemented yet@]"
+          Printer.pp_typ dst_ctype Printer.pp_logic_type t.term_type
+
+  let term_cast_to_real env t =
+    let src_ltype = Logic_utils.unroll_type ~unroll_typedef:false t.term_type in
+    match cvsort_of_ltype src_ltype with
+    | L_cint _ ->
+        L.map (fun x -> Cmath.real_of_int (Cint.to_integer x)) (C.logic env t)
+    | L_integer ->
+        L.map Cmath.real_of_int (C.logic env t)
+    | L_cfloat f ->
+        L.map (Cfloat.real_of_float f) (C.logic env t)
+    | L_real -> C.logic env t
+    | L_bool|L_pointer _|L_array _ ->
+        Warning.error "@[Logic cast from (%a) to (%a) not implemented yet@]"
+          Printer.pp_logic_type src_ltype Printer.pp_logic_type Lreal
+
+  let term_cast_to_integer env t =
+    let src_ltype = Logic_utils.unroll_type ~unroll_typedef:false t.term_type in
+    match cvsort_of_ltype src_ltype with
+    | L_real ->
+        L.map Cmath.int_of_real (C.logic env t)
+    | L_cint _ ->
+        L.map Cint.to_integer (C.logic env t)
+    | L_integer -> C.logic env t
+    | L_cfloat _|L_bool|L_pointer _|L_array _ ->
+        Warning.error "@[Logic cast from (%a) to (%a) not implemented yet@]"
+          Printer.pp_logic_type src_ltype Printer.pp_logic_type Linteger
+
+  let term_cast_to_boolean env t =
+    let src_ltype = Logic_utils.unroll_type ~unroll_typedef:false t.term_type in
+    match cvsort_of_ltype src_ltype with
+    | L_bool -> C.logic env t
+    | L_integer | L_cint _ | L_real | L_cfloat _ | L_pointer _ | L_array _ ->
+        Warning.error "@[Logic cast from (%a) to (%a) not implemented yet@]"
+          Printer.pp_logic_type src_ltype Printer.pp_logic_type Logic_const.boolean_type
+
+  let rec term_cast_to_ltype env dst_ltype t =
+    match Logic_utils.unroll_type ~unroll_typedef:false dst_ltype with
+    | Ctype typ-> term_cast_to_ctype env typ t
+    | Linteger -> term_cast_to_integer env t
+    | Lreal -> term_cast_to_real env t
+    | Ltype _ as b when Logic_const.is_boolean_type b -> term_cast_to_boolean env t
+    | Ltype({lt_name="set"},[elt_ltype]) -> (* lifting, set of elements ? *)
+        term_cast_to_ltype env elt_ltype t
+    | (Ltype _ | Lvar _ | Larrow _) as dst_ltype ->
+        let src_ltype = Logic_utils.unroll_type ~unroll_typedef:false t.term_type in
+        Warning.error "@[Logic cast to (%a) from (%a) not implemented yet@]"
+          Printer.pp_logic_type dst_ltype Printer.pp_logic_type src_ltype
 
 
   (* -------------------------------------------------------------------------- *)
@@ -588,7 +651,10 @@ struct
     | TUnOp(unop,t) -> term_unop unop (C.logic env t)
     | TBinOp(binop,a,b) -> term_binop env binop a b
 
-    | TCastE(ty,t) -> term_cast env ty t
+    | TCoerceE (t,e) -> term_cast_to_ltype env e.term_type t (** Jessie only, to be deprecated *)
+    | TCoerce (t,ty) -> term_cast_to_ctype env ty t (** Jessie only, to be deprecated *)
+    | TCastE(ty,t) -> term_cast_to_ctype env ty t
+    | TLogic_coerce(typ,t) -> term_cast_to_ltype env typ t
 
     | Tapp(f,ls,ts) ->
         let vs = List.map (val_of_term env) ts in
@@ -626,9 +692,9 @@ struct
         ignore label ;
         L.map_loc M.base_addr (C.logic env t)
 
-    | Toffset (label, _t) ->
+    | Toffset (label,t) ->
         ignore label ;
-        Warning.error "Offset construct not implemented yet"
+        L.map_l2t M.base_offset (C.logic env t)
 
     | Tblock_length (label,t) ->
         let obj = object_of (Logic_typing.ctype_of_pointed t.term_type) in
@@ -637,10 +703,6 @@ struct
 
     | Tnull ->
         Vloc M.null
-
-    | TCoerce (_,_)
-    | TCoerceE (_,_) ->
-        Wp_parameters.fatal "Jessie constructs"
 
     | TUpdate(a,offset,b) ->
         Vexp (update_offset env (val_of_term env a) offset (val_of_term env b))
@@ -681,7 +743,6 @@ struct
 
     | Ttypeof _ | Ttype _ ->
         Warning.error "Type tag not implemented yet"
-    | TLogic_coerce(typ,t) -> term_logic_cast env typ t
 
   (* -------------------------------------------------------------------------- *)
   (* --- Separated                                                          --- *)
@@ -872,19 +933,18 @@ struct
         Warning.error "Complex let-binding not implemented yet (%a)"
           Printer.pp_term t
 
+    | TCoerce (t,_)  (** Jessie only, to be deprecated *)
+    | TCoerceE (t,_) (** Jessie only, to be deprecated *)
+    | TCastE (_,t)
     | TLogic_coerce(_,t) -> C.region env ~unfold t
 
     | TBinOp _ | TUnOp _ | Trange _ | TUpdate _ | Tapp _ | Tif _
     | TConst _ | Tnull | TDataCons _ | Tlambda _
-    | Ttype _ | Ttypeof _ | TCastE _
+    | Ttype _ | Ttypeof _
     | TAlignOfE _ | TAlignOf _ | TSizeOfStr _ | TSizeOfE _ | TSizeOf _
     | Tblock_length _ | Tbase_addr _ | Toffset _ | TAddrOf _ | TStartOf _
       -> Wp_parameters.abort ~current:true
            "Non-assignable term (%a)" Printer.pp_term t
-
-    | TCoerce (_,_)
-    | TCoerceE (_,_) ->
-        Wp_parameters.fatal "Jessie constructs"
 
   (* -------------------------------------------------------------------------- *)
   (* --- Protection                                                         --- *)

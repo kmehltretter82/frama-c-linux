@@ -66,7 +66,7 @@ include Lattice_type.Full_AI_Lattice_with_cardinality
   and type widen_hint = size_widen_hint * generic_widen_hint
 
 val is_bottom : t -> bool
-val partially_overlaps : size:Integer.t -> t -> t -> bool
+val overlaps: partial:bool -> size:Integer.t -> t -> t -> bool
 
 val add_int : t -> t -> t
 (** Addition of two integer (ie. not [Float]) ivals. *)
@@ -91,6 +91,9 @@ val min_max_r_mod :
 
 val min_and_max :
   t -> Integer.t option * Integer.t option
+(** Returns the minimal and maximal integers represented by an ival.
+    [None] means the argument is unbounded.
+    @raise Abstract_interp.Error_Bottom if the argument is bottom. *)
 
 val min_and_max_float : t -> (Fval.F.t * Fval.F.t) option * bool
 (** returns the bounds of the float interval, (or None if the argument is
@@ -98,14 +101,15 @@ val min_and_max_float : t -> (Fval.F.t * Fval.F.t) option * bool
     may be NaN. *)
 
 
-val bitwise_and : size:int -> signed:bool -> t -> t -> t
+val bitwise_and : t -> t -> t
 val bitwise_or : t -> t -> t
 val bitwise_xor : t -> t -> t
-val bitwise_not: t -> t
+val bitwise_signed_not: t -> t
+(* For the two following functions, the argument is assumed to fit within the
+   given size. *)
+val bitwise_unsigned_not: size:int -> t -> t
+val bitwise_not: size:int -> signed:bool -> t -> t
 
-val bitwise_not_size: size:int -> signed:bool -> t -> t
-(** bitwise negation on a finite integer type. The argument is assumed to
-    fit within the type. *)
 
 val zero : t
 (** The lattice element that contains only the integer 0. *)
@@ -294,8 +298,9 @@ val cast_int_to_int : size:Integer.t -> signed:bool -> t -> t
 
 val cast_int_to_float : Fval.kind -> t -> t
 
-val cast_float_to_int :
-    signed:bool -> size:int -> t -> (** NaN *) alarm * (** Overflow, in each direction *) (alarm * alarm) * t
+val cast_float_to_int : signed:bool -> size:int -> t -> t
+(** Casts the given float into an integer. NaN and out-of-bounds values are
+    ignored. *)
 
 val cast_float_to_float : Fval.kind -> t -> t
 (** Cast the given float to the given size. *)

@@ -43,14 +43,18 @@ autom4te.cache
 #tests
 /tests/ptests_config
 /tests/*/result/
+/tests/*/*/result/
 /tests/*/result_*/
 /tests/journal/intra.byte
 /tests/misc/my_visitor_plugin/my_visitor.opt
 /tests/misc/my_visitor.sav
 /tests/*/*.opt
 /tests/pdg/*.dot
+/tests/crowbar/output-*
+/tests/crowbar/mutable
 /devel_tools/fc-time
 /devel_tools/fc-memuse
+/bin/ocamldep_transitive_closure
 
 #share
 /share/Makefile.config
@@ -181,6 +185,7 @@ Makefile.plugin.generated
 /src/kernel_internals/parsing/cparser.ml
 /src/kernel_internals/parsing/cparser.mli
 /src/plugins/value/domains/apron/apron_domain.ml
+/src/plugins/value/domains/numerors/numerors_domain.ml
 /src/kernel_services/ast_queries/json_compilation_database.ml
 /src/libraries/stdlib/transitioning.ml
 

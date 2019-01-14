@@ -41,7 +41,7 @@ let configure () =
   end
 
 (* TODO: compute actual separation hypotheses *)
-let separation () = []
+let hypotheses () = []
 
 (* -------------------------------------------------------------------------- *)
 (* --- Chunks                                                             --- *)
@@ -156,6 +156,7 @@ let field l f = Field(l,f)
 let shift l _obj k = Array(l,k)
 
 let base_addr _l = Warning.error ~source "No Base Addr"
+let base_offset _l = Warning.error ~source "No Offset Addr"
 let block_length _s _obj _l = Warning.error ~source "No Block Length"
 
 let cast _ _l = Warning.error ~source "No Cast"

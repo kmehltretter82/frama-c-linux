@@ -48,8 +48,8 @@ struct timezone {
 extern int utimes(const char *path, const struct timeval times[2]);
 
 /*@ assigns tv->tv_sec, tv->tv_usec \from __fc_time;
-  @ assigns *tz \from __fc_tz;
-  @ assigns \result \from indirect:tv, indirect:tz, *tv, *tz, __fc_tz;
+  @ assigns *(struct timezone *)tz \from __fc_tz;
+  @ assigns \result \from indirect:tv, indirect:tz, *tv, *(struct timezone *)tz, __fc_tz;
   @ ensures result_ok_or_error: \result == 0 || \result == -1;
   @ behavior tv_and_tz_null:
   @   assumes null_tv_tz: tv == \null && tz == \null;
@@ -65,23 +65,23 @@ extern int utimes(const char *path, const struct timeval times[2]);
   @
   @ behavior tz_not_null:
   @   assumes null_tv_non_null_tz: tv == \null && tz != \null;
-  @   assigns *tz \from __fc_tz;
-  @   assigns \result \from indirect:*tz, indirect:__fc_tz;
-  @   ensures initialization:tz: \initialized(tz);
+  @   assigns *(struct timezone *)tz \from __fc_tz;
+  @   assigns \result \from indirect:*(struct timezone *)tz, indirect:__fc_tz;
+  @   ensures initialization:tz: \initialized((struct timezone *)tz);
   @
   @ behavior tv_and_tz_not_null:
   @   assumes non_null_tv_tz: tv != \null && tz != \null;
   @   assigns tv->tv_sec, tv->tv_usec \from indirect:__fc_time;
-  @   assigns *tz \from __fc_tz;
-  @   assigns \result \from indirect:*tv, indirect:*tz, indirect:__fc_tz;
+  @   assigns *(struct timezone *)tz \from __fc_tz;
+  @   assigns \result \from indirect:*tv, indirect:*(struct timezone *)tz, indirect:__fc_tz;
   @   ensures initialization:tv_sec:tv_usec:
   @     \initialized(&tv->tv_sec) && \initialized(&tv->tv_usec);
-  @   ensures initialization:tz: \initialized(&tz);
+  @   ensures initialization:tz: \initialized((struct timezone *)tz);
   @
   @ complete behaviors;
   @ disjoint behaviors;
   @*/
-extern int gettimeofday(struct timeval *tv, struct timezone *tz);
+extern int gettimeofday(struct timeval * restrict tv, void * restrict tz);
 
 /*@ assigns \result,__fc_time,__fc_tz 
   @            \from      tv->tv_sec, tv->tv_usec,

@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -no-autoload-plugins -load-module inout,value -val @VALUECONFIG@ -lib-entry -context-width 4 -val-initialization-padding-globals no
+   OPT: -no-autoload-plugins -load-module inout,eva -eva @VALUECONFIG@ -lib-entry -context-width 4 -eva-initialization-padding-globals no
 */
 
 typedef struct {

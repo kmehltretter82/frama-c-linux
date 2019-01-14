@@ -27,7 +27,7 @@
 (** Are apron domains available? *)
 val ok : bool
 
-(** Signature of an Apron domain in EVA. *)
+(** Signature of an Apron domain in Eva. *)
 module type S = Abstract_domain.Internal
   with type value = Main_values.Interval.t
    and type location = Precise_locs.precise_location

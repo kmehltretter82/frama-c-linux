@@ -18,14 +18,14 @@
          openat(int, char const *, int, double)
 [variadic] tests/known/openat.c:10: 
   Generic translation of call to variadic function.
-[value] Analyzing a complete application starting at main
-[value] Computing initial state
-[value] Initial state computed
-[value] using specification for function __va_openat_mode_t
-[value] using specification for function openat
-[value] done for function main
-[value] ====== VALUES COMPUTED ======
-[value:final-states] Values at end of function main:
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva] using specification for function __va_openat_mode_t
+[eva] using specification for function openat
+[eva] done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function main:
   flag ∈ {0}
   mode1 ∈ {0}
   mode2 ∈ {0}

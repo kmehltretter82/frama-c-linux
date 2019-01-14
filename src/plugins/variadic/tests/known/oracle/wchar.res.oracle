@@ -10,21 +10,21 @@
   Declaration of variadic function fwscanf.
 [variadic] FRAMAC_SHARE/libc/wchar.h:206: 
   Declaration of variadic function swscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:153: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:165: 
   Declaration of variadic function fprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:155: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:167: 
   Declaration of variadic function fscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:157: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:169: 
   Declaration of variadic function printf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:158: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:170: 
   Declaration of variadic function scanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:159: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:171: 
   Declaration of variadic function snprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:161: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:173: 
   Declaration of variadic function sprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:163: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:175: 
   Declaration of variadic function sscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:353: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:369: 
   Declaration of variadic function dprintf.
 [variadic] tests/known/wchar.c:11: 
   Translating call to wprintf to a call to the specialized version wprintf_va_1.
@@ -46,22 +46,22 @@
   Translating call to wscanf to a call to the specialized version wscanf_va_2.
 [variadic] tests/known/wchar.c:23: 
   Translating call to swscanf to a call to the specialized version swscanf_va_1.
-[value] Analyzing a complete application starting at main
-[value] Computing initial state
-[value] Initial state computed
-[value] using specification for function wprintf_va_1
-[value] using specification for function wprintf_va_2
-[value] using specification for function wprintf_va_3
-[value] using specification for function wprintf_va_4
-[value] using specification for function wprintf_va_5
-[value] using specification for function wprintf_va_6
-[value] using specification for function swprintf_va_1
-[value] using specification for function wscanf_va_1
-[value] using specification for function wscanf_va_2
-[value] using specification for function swscanf_va_1
-[value] done for function main
-[value] ====== VALUES COMPUTED ======
-[value:final-states] Values at end of function main:
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva] using specification for function wprintf_va_1
+[eva] using specification for function wprintf_va_2
+[eva] using specification for function wprintf_va_3
+[eva] using specification for function wprintf_va_4
+[eva] using specification for function wprintf_va_5
+[eva] using specification for function wprintf_va_6
+[eva] using specification for function swprintf_va_1
+[eva] using specification for function wscanf_va_1
+[eva] using specification for function wscanf_va_2
+[eva] using specification for function swscanf_va_1
+[eva] done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function main:
   input[0] ∈ {102}
        [1] ∈ {111}
        [2] ∈ {114}

@@ -1,9 +1,9 @@
 /* run.config
-   OPT: -val-show-progress  -calldeps -slice-return send1 -journal-disable -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-calldeps -val-show-progress
-   OPT: -val-show-progress  -calldeps -slice-return send2 -journal-disable -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-calldeps -val-show-progress
-   OPT: -val-show-progress  -calldeps -slice-return send3 -journal-disable -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-calldeps -val-show-progress
-   OPT: -val-show-progress  -calldeps -slice-return send4 -journal-disable -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-calldeps -val-show-progress
-   OPT: -val-show-progress  -calldeps -slice-return send1 -slice-return send4 -journal-disable -then-on 'Slicing export' -val-show-progress -calldeps -slice-return send1_slice_1 -print  -then-on 'Slicing export 2' -print  -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-calldeps -val-show-progress
+   OPT: -eva-show-progress  -calldeps -slice-return send1 -journal-disable -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-calldeps -eva-show-progress
+   OPT: -eva-show-progress  -calldeps -slice-return send2 -journal-disable -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-calldeps -eva-show-progress
+   OPT: -eva-show-progress  -calldeps -slice-return send3 -journal-disable -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-calldeps -eva-show-progress
+   OPT: -eva-show-progress  -calldeps -slice-return send4 -journal-disable -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-calldeps -eva-show-progress
+   OPT: -eva-show-progress  -calldeps -slice-return send1 -slice-return send4 -journal-disable -then-on 'Slicing export' -eva-show-progress -calldeps -slice-return send1_slice_1 -print  -then-on 'Slicing export 2' -print  -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-calldeps -eva-show-progress
 
 
 
@@ -49,7 +49,7 @@ int send4 (int x) {
   return x;
 }
 
-main()
+int main()
 {
 	int		input1,input2,input3,cond1,cond2;
 	int		a,b,c;
@@ -76,4 +76,5 @@ main()
 	send2 (output2);
 	send3 (output3);
 	send4 (cond2);
+        return 0;
 }

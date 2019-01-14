@@ -75,7 +75,7 @@ class printerClass optional_ff = object(self)
             str_m
             super#vdecl var
 
-  method! stmtkind next fmt kind =
+  method! stmtkind sattr next fmt kind =
     let stmt_info fmt stmt = match opt_ff with
       | None -> Format.fprintf fmt "@[/* %d */@]" stmt.Cil_types.sid
       | Some ff ->
@@ -94,7 +94,7 @@ class printerClass optional_ff = object(self)
     try
       Format.fprintf fmt "@[<v>%a@ %a@]"
         stmt_info s
-        (fun fmt -> super#stmtkind next fmt) kind
+        (fun fmt -> super#stmtkind sattr next fmt) kind
     with Not_found -> 
       (* some sub statements may be visible *)
       let sub_stmts = find_sub_stmts s in
@@ -117,7 +117,7 @@ end
 let print_fct_from_pdg fmt ?ff pdg  =
   let kf = PdgTypes.Pdg.get_kf pdg in
   let fct = Kernel_function.get_definition kf in
-  let loc = Lexing.dummy_pos,Lexing.dummy_pos in
+  let loc = Cil_datatype.Location.unknown in
   let glob = Cil_types.GFun (fct, loc) in (* TODO : make it cleaner *)
   let printer = new printerClass ff in
   printer#global fmt glob

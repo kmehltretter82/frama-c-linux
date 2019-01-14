@@ -268,8 +268,6 @@ let float_zeros = Float Fval.zeros
 let positive_integers = Top(Some Int.zero, None, Int.zero, Int.one)
 let negative_integers =
   Top(None, Some Int.zero, Int.zero, Int.one)
-let strictly_negative_integers =
-  Top(None, Some Int.minus_one, Int.zero, Int.one)
 
 let is_zero x = x == zero
 
@@ -315,7 +313,7 @@ let inject_float_interval flow fup =
   (* make sure that zero float is also zero int *)
   if Fval.F.equal Fval.F.plus_zero flow && Fval.F.equal Fval.F.plus_zero fup
   then zero
-  else Float (Fval.inject Fval.Float64 flow fup)
+  else Float (Fval.inject Fval.Double flow fup)
 
 (*  let minus_zero = Float (Fval.minus_zero, Fval.minus_zero) *)
 
@@ -481,8 +479,8 @@ let subdiv_int v =
 let subdivide ~size = function
   | Float fval ->
     let fkind = match Integer.to_int size with
-      | 32 -> Fval.Float32
-      | 64 -> Fval.Float64
+      | 32 -> Fval.Single
+      | 64 -> Fval.Double
       | _ -> raise Can_not_subdiv (* see Value/Value#105 *)
     in
     let f1, f2 = Fval.subdiv_float_interval fkind fval in
@@ -580,9 +578,10 @@ let min_max_r_mod t =
 let min_and_max t =
   match t with
   | Set s ->
-      let l = Array.length s in
-      assert (l >= 1);
-      Some s.(0), Some s.(pred l)
+    let l = Array.length s in
+    if l = 0
+    then raise Error_Bottom
+    else Some s.(0), Some s.(pred l)
   | Top (a,b,_,_) -> a, b
   | Float _ -> None, None
 
@@ -624,48 +623,54 @@ let widen (bitsize,wh) t1 t2 =
   if equal t1 t2 || cardinal_zero_or_one t1 then t2
   else
     match t2 with
-      | Float f2 ->
-        let f1 = project_float t1 in
-        Float (Fval.widen f1 f2)
-      | Top _ | Set _ ->
-          (* Add possible interval limits deducted from the bitsize *)
-          let wh = if Integer.is_zero bitsize 
-          then wh
-          else
-            let limits = [
-                Integer.neg (Integer.two_power (Integer.pred bitsize));
-                Integer.pred (Integer.two_power (Integer.pred bitsize));
-                Integer.pred (Integer.two_power bitsize);
-              ] in
-            let module ISet = Datatype.Integer.Set in
-            ISet.union wh (ISet.of_list limits)
-          in
-          let (mn2,mx2,r2,m2) = min_max_r_mod t2 in
-          let (mn1,mx1,r1,m1) = min_max_r_mod t1 in
-          let new_mod = Int.pgcd (Int.pgcd m1 m2) (Int.abs (Int.sub r1 r2)) in
-          let new_rem = Int.rem r1 new_mod in
-          let new_min = if bound_compare mn1 mn2 = 0 then mn2 else
-            match mn2 with
-              | None -> None
-              | Some mn2 ->
-                  try
-                    let v = Widen_Hints.nearest_elt_le mn2 wh
-                    in Some (Int.round_up_to_r ~r:new_rem ~modu:new_mod ~min:v)
-                  with Not_found -> None
-          in
-          let new_max = if bound_compare mx1 mx2 = 0 then mx2 else
-            match mx2 with None -> None
-              | Some mx2 ->
-                  try
-                    let v = Widen_Hints.nearest_elt_ge mx2 wh
-                    in Some (Int.round_down_to_r ~r:new_rem ~modu:new_mod ~max:v)
-                  with Not_found -> None
-          in
-          let result = inject_top new_min new_max new_rem new_mod in
-          (* Format.printf "%a -- %a --> %a (thx to %a)@."
-            pretty t1 pretty t2 pretty result
-            Widen_Hints.pretty wh; *)
-          result
+    | Float f2 ->
+      let f1 = project_float t1 in
+      Float (Fval.widen f1 f2)
+    | Top _ | Set _ ->
+      (* Add possible interval limits deducted from the bitsize *)
+      let wh =
+        (* If bitsize > 128, the values do not correspond to a scalar type.
+           This can (rarely) happen on structures or arrays that have been
+           reinterpreted as one value by the offsetmaps. In this case, do not
+           use limits, and do not create arbitrarily large integers. *)
+        if Integer.gt bitsize (Integer.of_int 128)
+        then Datatype.Integer.Set.empty
+        else if Integer.is_zero bitsize
+        then wh
+        else
+          let limits = [
+            Integer.neg (Integer.two_power (Integer.pred bitsize));
+            Integer.pred (Integer.two_power (Integer.pred bitsize));
+            Integer.pred (Integer.two_power bitsize);
+          ] in
+          Datatype.Integer.Set.(union wh (of_list limits))
+      in
+      let (mn2,mx2,r2,m2) = min_max_r_mod t2 in
+      let (mn1,mx1,r1,m1) = min_max_r_mod t1 in
+      let new_mod = Int.pgcd (Int.pgcd m1 m2) (Int.abs (Int.sub r1 r2)) in
+      let new_rem = Int.rem r1 new_mod in
+      let new_min = if bound_compare mn1 mn2 = 0 then mn2 else
+          match mn2 with
+          | None -> None
+          | Some mn2 ->
+            try
+              let v = Widen_Hints.nearest_elt_le mn2 wh
+              in Some (Int.round_up_to_r ~r:new_rem ~modu:new_mod ~min:v)
+            with Not_found -> None
+      in
+      let new_max = if bound_compare mx1 mx2 = 0 then mx2 else
+          match mx2 with None -> None
+                       | Some mx2 ->
+                         try
+                           let v = Widen_Hints.nearest_elt_ge mx2 wh
+                           in Some (Int.round_down_to_r ~r:new_rem ~modu:new_mod ~max:v)
+                         with Not_found -> None
+      in
+      let result = inject_top new_min new_max new_rem new_mod in
+      (* Format.printf "%a -- %a --> %a (thx to %a)@."
+         pretty t1 pretty t2 pretty result
+         Widen_Hints.pretty wh; *)
+      result
 
 let compute_first_common mn1 mn2 r modu =
   if mn1 = None && mn2 = None
@@ -785,6 +790,29 @@ let array_truncate r i =
       assert (Array.length r = i);
       Set r
     end
+
+let array_filter (f : Int.t -> bool) (a : Int.t array) : t =
+  let l = Array.length a in
+  let r = Array.make l Int.zero in
+  let j = ref 0 in
+  for i = 0 to l  - 1 do
+    let x = a.(i) in
+    if f x then begin
+      r.(!j) <- x;
+      incr j;
+    end
+  done;
+  array_truncate r !j
+
+let array_map_reduce (f : 'a -> 'b) (g : 'b -> 'b -> 'b) (set : 'a array) : 'b =
+  if Array.length set <= 0 then
+    raise Error_Bottom
+  else
+    let acc = ref (f set.(0)) in
+    for i = 1 to Array.length set - 1 do
+      acc := g !acc (f set.(i))
+    done;
+    !acc
 
 let array_inter a1 a2 =
   let l1 = Array.length a1 in
@@ -1217,34 +1245,6 @@ let is_included t1 t2 =
   | Set _, Float f -> is_zero t1 && Fval.contains_plus_zero f
   | Top _, Float _ -> false
 
-let partially_overlaps ~size t1 t2 =
-  match t1, t2 with
-    Set s1, Set s2 ->
-      not 
-	(array_for_all
-	    (fun e1 ->
-	      array_for_all 
-		(fun e2 ->
-		  Int.equal e1 e2 ||
-		    Int.le e1 (Int.sub e2 size) ||
-		    Int.ge e1 (Int.add e2 size))
-		s2)
-	    s1)
-  | Set s, Top(mi, ma, r, modu) | Top(mi, ma, r, modu), Set s ->
-      not
-	(array_for_all
-	    (fun e ->
-	      let psize = Int.pred size in
-	      (not (min_le_elt mi (Int.add e psize))) ||
-		(not (max_ge_elt ma (Int.sub e psize))) ||
-		( Int.ge modu size &&
-		    let re = Int.pos_rem (Int.sub e r) modu in
-		    Int.is_zero re ||
-		      (Int.ge re size &&
-			  Int.le re (Int.sub modu size)) ))
-	    s)
-  | _ -> false (* TODO *)
-
 let map_set_exnsafe_acc f acc (s : Integer.t array) =
   Array.fold_left
     (fun acc v -> add_ps acc (f v))
@@ -1279,13 +1279,6 @@ let apply2_n f (s1 : Integer.t array) (s2 : Integer.t array) =
     done
   done;
   inject_ps !ps
-
-let apply2_v f s1 s2 =
-  match s1, s2 with
-    [| x1 |], [| x2 |] -> 
-      inject_singleton (f x1 x2)
-  | _ -> apply2_n f s1 s2
-
 
 let apply_set f v1 v2 =
   match v1,v2 with
@@ -1536,156 +1529,6 @@ let max_int s =
 	Some s.(pred l)
   | Float _ -> None
 
-
-exception No_such_element
-
-let smallest_above min x = (* TODO: improve for Set *)
-  match x with
-  | Set s ->
-      let r = ref None in
-      Array.iter
-        (fun e ->
-          if Int.ge e min
-          then match !r with
-          | Some rr when Int.lt e rr -> r := Some e
-          | None -> r := Some e
-          | _ -> ())
-        s;
-      begin match !r with
-        None -> raise No_such_element
-      | Some r -> r
-      end
-  | Top(mn,mx,r,modu) ->
-      let some_min = Some min in
-      if not (max_is_greater mx some_min)
-      then raise No_such_element;
-      if min_is_lower some_min mn
-      then Extlib.the mn
-      else Int.round_up_to_r ~min ~r ~modu
-  | Float _ -> raise No_such_element
-
-let largest_below max x = (* TODO: improve for Set *)
-  match x with
-  | Float _ -> raise No_such_element
-  | Set s ->
-      let r = ref None in
-      Array.iter
-        (fun e ->
-          if Int.le e max
-          then match !r with
-          | Some rr when Int.gt e rr -> r := Some e
-          | None -> r := Some e
-          | _ -> ())
-        s;
-      begin match !r with
-        None -> raise No_such_element
-      | Some r -> r
-      end
-  | Top(mn,mx,r,modu) ->
-      let some_max = Some max in
-      if not (min_is_lower mn some_max)
-      then raise No_such_element;
-      if max_is_greater some_max mx
-      then Extlib.the mx
-      else Int.round_down_to_r ~max ~r ~modu
-
-(* Rounds up (x+1) to the next power of two, then subtracts one; optimized. *)
-let next_pred_power_of_two x =
-  (* Unroll the first iterations, and skip the tests. *)
-  let x = Int.logor x (Int.shift_right x Int.one) in
-  let x = Int.logor x (Int.shift_right x Int.two) in
-  let x = Int.logor x (Int.shift_right x Int.four) in
-  let x = Int.logor x (Int.shift_right x Int.eight) in
-  let x = Int.logor x (Int.shift_right x Int.sixteen) in
-  let shift = Int.thirtytwo in
-  let rec loop old shift =
-    let x = Int.logor old (Int.shift_right old shift) in
-    if Int.equal old x then x
-    else loop x (Int.shift_left shift Int.one) in
-  loop x shift
-
-(* [different_bits min max] returns an overapproximation of the mask
-   of the bits that can be different for different numbers
-   in the interval [min]..[max] *)
-let different_bits min max =
-  let x = Int.logxor min max in
-  next_pred_power_of_two x
-
-(* [pos_max_land min1 max1 min2 max2] computes an upper bound for
-   [x1 land x2] where [x1] is in [min1]..[max1] and [x2] is in [min2]..[max2].
-   Precondition : [min1], [max1], [min2], [max2] must all have the
-   same sign.
-   Note: the algorithm below is optimal for the problem as stated.
-   It is possible to compute this optimal solution faster but it does not
-   seem worth the time necessary to think about it as long as integers
-   are at most 64-bit. *)
-let pos_max_land min1 max1 min2 max2 =
-  let x1 = different_bits min1 max1 in
-  let x2 = different_bits min2 max2 in
-(*      Format.printf "pos_max_land %a %a -> %a |  %a %a -> %a@."
-        Int.pretty min1 Int.pretty max1 Int.pretty x1
-        Int.pretty min2 Int.pretty max2 Int.pretty x2; *)
-  let fold_maxs max1 p f acc =
-    let rec aux p acc =
-      let p = Int.shift_right p Int.one in
-      if Int.is_zero p
-      then f max1 acc
-      else if Int.is_zero (Int.logand p max1) 
-      then aux p acc
-      else 
-	let c = Int.logor (Int.sub max1 p) (Int.pred p) in
-	aux p (f c acc)
-    in aux p acc
-  in
-  let sx1 = Int.succ x1 in
-  let n1 = fold_maxs max1 sx1 (fun _ y -> succ y) 0 in
-  let maxs1 = Array.make n1 sx1 in
-  let _ = fold_maxs max1 sx1 (fun x i -> Array.set maxs1 i x; succ i) 0 in
-  fold_maxs max2 (Int.succ x2)
-    (fun max2 acc -> 
-      Array.fold_left
-	(fun acc max1 -> Int.max (Int.logand max1 max2) acc)
-	acc
-	maxs1)
-    (Int.logand max1 max2)
-
-let bitwise_or v1 v2 =
-  if is_bottom v1 || is_bottom v2
-  then bottom
-  else
-    match v1, v2 with
-      | Float _, _ | _, Float _ -> top
-      | Set s1, Set s2 -> apply2_v Int.logor s1 s2
-      | Set [|s|],(Top _ as v) | (Top _ as v),Set [|s|] when Int.is_zero s -> v
-      | Top _, _ | _, Top _ ->
-        ( match min_and_max v1 with
-           Some mn1, Some mx1 when Int.ge mn1 Int.zero ->
-             ( match min_and_max v2 with
-               Some mn2, Some mx2 when Int.ge mn2 Int.zero ->
-                 let new_max = next_pred_power_of_two (Int.logor mx1 mx2) in
-		 let new_min = Int.max mn1 mn2 in (* Or can only add bits *)
-                 inject_range (Some new_min) (Some new_max)
-             | _ -> top )
-         | _ -> top )
-
-
-let bitwise_xor v1 v2 =
-  if is_bottom v1 || is_bottom v2
-  then bottom
-  else
-    match v1, v2 with
-     | Float _, _ | _, Float _ -> top
-     | Set s1, Set s2 -> apply2_v Int.logxor s1 s2
-     | Top _, _ | _, Top _ ->
-       (match min_and_max v1 with
-         | Some mn1, Some mx1 when Int.ge mn1 Int.zero ->
-           (match min_and_max v2 with
-             | Some mn2, Some mx2 when Int.ge mn2 Int.zero ->
-               let new_max = next_pred_power_of_two (Int.logor mx1 mx2) in
-	       let new_min = Int.zero in
-               inject_range (Some new_min) (Some new_max)
-             | _ -> top )
-         | _ -> top )
 
 (* TODO: rename this function to scale_int *)
 let scale f v =
@@ -2067,8 +1910,8 @@ let cast_float_to_float fkind v =
   match v with
   | Float f ->
     begin match fkind with
-    | Fval.Real | Fval.Float64 -> v
-    | Fval.Float32 ->
+    | Fval.Real | Fval.Long_Double | Fval.Double -> v
+    | Fval.Single ->
       inject_float (Fval.round_to_single_precision_float f)
     end
   | Set _ when is_zero v -> zero
@@ -2480,27 +2323,26 @@ let cast_float_to_int_non_nan ~signed ~size (min, max) =
       else FtI_Overflow Floating_point.Neg
     with Floating_point.Float_Non_representable_as_Int64 sign ->
       FtI_Overflow sign
-  in    
+  in
   let min_int = conv (Fval.F.to_float min) in
   let max_int = conv (Fval.F.to_float max) in
   match min_int, max_int with
   | FtI_Ok min_int, FtI_Ok max_int -> (* no overflow *)
-    (NoAlarm, NoAlarm), inject_range (Some min_int) (Some max_int)
+    inject_range (Some min_int) (Some max_int)
 
   | FtI_Overflow Floating_point.Neg, FtI_Ok max_int -> (* one overflow *)
-    (Alarm, NoAlarm), inject_range (Some min_all) (Some max_int)
+    inject_range (Some min_all) (Some max_int)
   | FtI_Ok min_int, FtI_Overflow Floating_point.Pos -> (* one overflow *)
-    (NoAlarm, Alarm), inject_range (Some min_int) (Some max_all)
+    inject_range (Some min_int) (Some max_all)
 
   (* two overflows *)
   | FtI_Overflow Floating_point.Neg, FtI_Overflow Floating_point.Pos ->
-    (Alarm, Alarm), inject_range (Some min_all) (Some max_all)
+    inject_range (Some min_all) (Some max_all)
 
   (* Completely out of range *)
-  | FtI_Overflow Floating_point.Pos, FtI_Overflow Floating_point.Pos ->
-    (NoAlarm, SureAlarm), bottom
+  | FtI_Overflow Floating_point.Pos, FtI_Overflow Floating_point.Pos
   | FtI_Overflow Floating_point.Neg, FtI_Overflow Floating_point.Neg ->
-    (SureAlarm, NoAlarm), bottom
+    bottom
 
   | FtI_Overflow Floating_point.Pos, FtI_Overflow Floating_point.Neg
   | FtI_Overflow Floating_point.Pos, FtI_Ok _
@@ -2509,11 +2351,8 @@ let cast_float_to_int_non_nan ~signed ~size (min, max) =
 
 let cast_float_to_int ~signed ~size iv =
   match Fval.min_and_max (project_float iv) with
-  | Some (min, max), nan ->
-    let ov, r = cast_float_to_int_non_nan ~signed ~size (min, max)in
-    (if nan then Alarm else NoAlarm), ov, r
-  | None, _ -> (* means NaN *)
-    SureAlarm, (NoAlarm, NoAlarm), bottom
+  | Some (min, max), _nan -> cast_float_to_int_non_nan ~signed ~size (min, max)
+  | None, _ -> bottom (* means NaN *)
 
 
 (* These are the bounds of the range of integers that can be represented
@@ -2540,7 +2379,7 @@ let cast_float_to_int_inverse ~single_precision i =
     then single_min_exact_integer, single_max_exact_integer
     else double_min_exact_integer, double_max_exact_integer
   in
-  let fkind = if single_precision then Fval.Float32 else Fval.Float64 in
+  let fkind = if single_precision then Fval.Single else Fval.Double in
   match min_and_max i with
   | Some min, Some max when Int.lt exact_min min && Int.lt max exact_max ->
     let minf =
@@ -2674,216 +2513,409 @@ let reinterpret_as_float kind i =
     | Cil_types.FDouble ->
       let conv v = Fval.F.of_float (Int64.float_of_bits (Int.to_int64 v)) in
       reinterpret
-        64 Fval.Float64 conv bits_of_most_negative_double bits_of_max_double
+        64 Fval.Double conv bits_of_most_negative_double bits_of_max_double
     | Cil_types.FFloat ->
       let conv v = Fval.F.of_float(Int32.float_of_bits (Int.to_int32 v)) in
       reinterpret
-        32 Fval.Float32 conv bits_of_most_negative_float bits_of_max_float
+        32 Fval.Single conv bits_of_most_negative_float bits_of_max_float
     | Cil_types.FLongDouble ->
       (* currently always imprecise *)
       top_float
 
-let set_bits mn mx =
-  match mn, mx with
-    Some mn, Some mx ->
-      Int.logand (Int.lognot (different_bits mn mx)) mn
-  | _ -> Int.zero
+let overlaps ~partial ~size t1 t2 =
+  let diff = sub_int t1 t2 in
+  match diff with
+  | Set array ->
+    not (array_for_all
+           (fun i -> Int.ge (Int.abs i) size || (partial && Int.is_zero i))
+           array)
+  | Top (min, max, _r, _modu) ->
+    let pred_size = Int.pred size in
+    min_le_elt min pred_size && max_ge_elt max (Int.neg pred_size)
+  | Float _ -> assert false
 
-let sub_bits x = (* TODO: can be improved *)
-  let popcnt = Int.popcount x in
-  let rec aux cursor acc =
-    if Int.gt cursor x 
-    then acc
-    else 
-      let acc = 
-	if Int.is_zero (Int.logand cursor x)
-	then acc
-	else O.fold (fun e acc -> O.add (Int.logor cursor e) acc) acc acc
-      in
-      aux (Int.shift_left cursor Int.one) acc
-  in
-  let o = aux Int.one o_zero in
-  let s = 1 lsl popcnt in
-  (* assert (O.cardinal o = s); *)
-  inject_ps (Pre_set (o, s))
 
-let bitwise_and_intervals ~size ~signed v1 v2 =
-  let max_int_v1, max_int_v2 as max_int_v1_v2 = max_int v1, max_int v2 in
-  let min_int_v1, min_int_v2 as min_int_v1_v2 = min_int v1, min_int v2 in
-  let half_range = Int.two_power_of_int (pred size) in
-  let minint = Int.neg half_range in
-  let vmax =
-    match max_int_v1_v2 with
-    | Some maxv1, Some maxv2 ->
-      if Int.lt maxv1 Int.zero && Int.lt maxv2 Int.zero
-      then begin
-        Some (match min_int_v1_v2 with
-          Some minv1, Some minv2 ->
-            pos_max_land minv1 maxv1 minv2 maxv2
-        | _ -> assert false)
-      end
-      else
-        let max1 = (* improved min of maxv1 and maxv2*)
-          try
-            let bi1 = smallest_above Int.zero v1 in
-            let bi2 = smallest_above Int.zero v2 in
-            pos_max_land bi1 maxv1 bi2 maxv2
-          with No_such_element -> minint
-        in
-        let max2 = (* improved min of maxv1 and altmax2*)
-          try
-            let altmax2 =
-              Int.add half_range (largest_below Int.minus_one v2)
-            in
-            let bi1 = smallest_above Int.zero v1 in
-            let bi2 =
-              Int.add half_range (smallest_above minint v2)
-            in
-            pos_max_land bi1 maxv1 bi2 altmax2
-          with No_such_element -> minint
-        in
-        let max3 = (* improved min of maxv2 and altmax1*)
-          try
-            let altmax1 =
-              Int.add half_range (largest_below Int.minus_one v1)
-            in
-            let bi2 = smallest_above Int.zero v2 in
-            let bi1 =
-              Int.add half_range (smallest_above minint v1)
-            in
-            pos_max_land bi2 maxv2 bi1 altmax1
-          with No_such_element -> minint
-        in
-          (* Format.printf "bitwise_and v1 %a v2 %a maxv1 %a maxv2 %a \
-             max1 max2 max3 %a %a %a@."
-             pretty v1 pretty v2
-             Int.pretty maxv1 Int.pretty maxv2
-             Int.pretty max1 Int.pretty max2 Int.pretty max3; *)
-        Some (Int.max max1 (Int.max max2 max3))
-    | _ -> None
-  in
-  let somenegativev1 = intersects v1 strictly_negative_integers in
-  let somenegativev2 = intersects v2 strictly_negative_integers in
-  let vmin =
-    if somenegativev1 && somenegativev2
-    then Some minint
-    else if somenegativev1 || somenegativev2
-    then some_zero
-    else begin
-      let bits1 = set_bits min_int_v1 max_int_v1 in
-      let bits2 = set_bits min_int_v2 max_int_v2 in
-      let min_a = Int.logand bits1 bits2 in
-      let min_a =
-        if not signed
-        then
-          let rec find_mask x bit acc =
-            if Int.is_zero (Int.logand x bit)
-            then acc
-            else
-              find_mask
-                x
-                (Int.shift_right bit Int.one)
-                (Int.logor bit acc)
-          in
-          match min_int_v1_v2 with
-            Some m1, Some m2 ->
-              let mask1 = find_mask bits1 half_range Int.zero in
-              let min_b = Int.logand mask1 m2 in
-              let mask2 = find_mask bits2 half_range Int.zero in
-              let min_c = Int.logand mask2 m1 in
-                      (* Format.printf
-                         "bitwise_and v1 %a v2 %a min_b %a min_c %a@."
-                         pretty v1 pretty v2
-                         Int.pretty min_b Int.pretty min_c; *)
-              Int.max (Int.max min_a min_b) min_c
-          | _ -> assert false
-        else min_a
-      in
-              (* Format.printf "bitwise_and v1 %a v2 %a bits1 %a bits2 %a@."
-                 pretty v1 pretty v2
-                 Int.pretty bits1 Int.pretty bits2; *)
-      Some min_a
+
+(* ------------------------------------------------------------------------ *)
+(* --- Bitwise operators                                                --- *)
+(* ------------------------------------------------------------------------ *)
+
+(* --- Bit lattice --- *)
+
+type bit_value = On | Off | Both
+
+module Bit =
+struct
+  type t = bit_value
+
+  let to_string = function
+    | Off -> "0"
+    | On -> "1"
+    | Both -> "T"
+
+  let _pretty (fmt : Format.formatter) (b :t) =
+    Format.pp_print_string fmt (to_string b)
+
+  let union (b1 : t) (b2 : t) : t =
+    if b1 = b2 then b1 else Both
+
+  let not : t -> t = function
+    | On -> Off
+    | Off -> On
+    | Both -> Both
+end
+
+
+(* --- Bit operators --- *)
+
+module type BitOperator =
+sig
+  (* Printable version of the operator *)
+  val representation : string
+  (* forward is given here as the lifted function of some bit operator op
+     where op
+     1. is assumed to be commutative (backward functions do not assume the
+        position of the arguments)
+     2. must ensure  0 op 0 = 0  as otherwise applying op on a sign bit may
+        produce a negative result from two positive operands; but we don't
+        want to produce a negative result when the operation is unsigned which
+        we don't know unless one of the operands is negative;
+     3. is not constant, otherwise nothing of all of this makes sense.
+     forward is defined as
+     forward b1 b2 = { x1 op x2 | x1 \in b1, x2 \in b2 } *)
+  val forward : bit_value -> bit_value -> bit_value
+  (* backward_off b = { x | \exist y \in b . x op y = y op x = 1 } *)
+  val backward_off : bit_value -> bit_value
+  (* backward_on b = { x | \exist y \in b . x op y = y op x = 0 } *)
+  val backward_on : bit_value -> bit_value
+end
+
+module And : BitOperator =
+struct
+  let representation = "&"
+
+  let forward v1 v2 =
+    match v1 with
+    | Off -> Off
+    | On -> v2
+    | Both -> if v2 = Off then Off else Both
+
+  let backward_off = function
+    | (Off | Both) -> Both
+    | On -> Off
+
+  let backward_on = function
+    | Off -> assert false
+    | (On | Both) -> On
+end
+
+module Or : BitOperator =
+struct
+  let representation = "|"
+
+  let forward v1 v2 =
+    match v1 with
+    | On -> On
+    | Off -> v2
+    | Both -> if v2 = On then On else Both
+
+  let backward_off = function
+    | On -> assert false
+    | (Off | Both) -> Off
+
+  let backward_on = function
+    | (On | Both) -> Both
+    | Off -> On
+end
+
+module Xor : BitOperator =
+struct
+  let representation = "^"
+
+  let forward v1 v2 =
+    match v1 with
+    | Both -> Both
+    | Off -> v2
+    | On -> Bit.not v2
+
+  let backward_on v = Bit.not v
+
+  let backward_off v = v
+end
+
+
+(* --- Bit extraction and mutation --- *)
+
+let significant_bits (v : t) : int option =
+  match min_and_max v with
+  | None, _ | _, None -> None
+  | Some l, Some u -> Some (max (Z.numbits l) (Z.numbits u))
+
+let extract_sign (v : t) : bit_value =
+  match min_and_max v with
+  | _, Some u when Int.(lt u zero) -> On
+  | Some l, _ when Int.(ge l zero) -> Off
+  | _, _ -> Both
+
+let extract_bit (i : int) (v : t) : bit_value =
+  let bit_value x = if Z.testbit x i then On else Off in
+  match v with
+  | Float _ -> Both
+  | Set s -> array_map_reduce bit_value Bit.union s
+  | Top (None, _, _r, _m) | Top (_, None, _r, _m) -> Both
+  | Top (Some l, Some u, _r, _m) ->
+    (* It does not take modulo into account *)
+    if Int.(ge (sub u l) (two_power_of_int i)) (* u - l >= mask *)
+    then Both
+    else Bit.union (bit_value l) (bit_value u)
+
+let reduce_sign (v : t) (b : bit_value) : t =
+  match b with
+  | Both -> v
+  | On ->
+    begin match v with
+      | Float _ -> v
+      | Set s -> array_filter Int.(gt zero) s
+      | Top (_l, Some u, _r, _modu) when Int.(lt u zero) -> v
+      | Top (l, _u, r, modu) ->
+        let u = Some Int.(round_down_to_r ~max:minus_one ~r ~modu) in
+        inject_top l u r modu
     end
+  | Off ->
+    begin match v with
+      | Float _ -> v
+      | Set s -> array_filter Int.(le zero) s
+      | Top (Some l, _u, _r, _modu) when Int.(ge l zero) -> v
+      | Top (_l, u, r, modu) ->
+        let l = Some Int.(round_up_to_r ~min:zero ~r ~modu) in
+        inject_top l u r modu
+    end
+
+let reduce_bit (i : int) (v : t) (b : bit_value) : t =
+  let bit_value x = if Z.testbit x i then On else Off in
+  if b = Both
+  then v
+  else match v with
+    | Float _ -> v
+    | Set s -> array_filter (fun x -> bit_value x = b) s
+    | Top (l, u, r, modu) ->
+      let power = Int.(two_power_of_int i) in (* 001000 *)
+      let mask = Int.(pred (two_power_of_int (i+1))) in (* 001111 *)
+      (* Reduce bounds to the nearest satisfying bound *)
+      let l' = match l with
+        | Some l when bit_value l <> b ->
+          let min = match b with
+            | On ->  Int.(logor (logand l (lognot mask)) power) (* ll1000 *)
+            | Off -> Int.(succ (logor l mask)) (* ll1111 + 1 *)
+            | Both -> assert false
+          in
+          Some (Int.round_up_to_r ~min ~r ~modu)
+        | _ -> l
+      and u' = match u with
+        | Some u when bit_value u <> b ->
+          let max = match b with
+            | On ->  Int.(pred (logand u (lognot mask))) (* uu0000 - 1 *)
+            | Off -> Int.(logand (logor u mask) (lognot power)) (* uu0111 *)
+            | Both -> assert false
+          in
+          Some (Int.round_down_to_r ~max ~r ~modu)
+        | _ -> u
+      in
+      inject_top l' u' r modu
+
+type bit = Sign | Bit of int
+
+let extract_bit = function
+  | Sign -> extract_sign
+  | Bit i -> extract_bit i
+
+let set_bit_on ~size bit =
+  let mask = match bit with
+    | Sign -> Int.(neg (two_power_of_int size))
+    | Bit i -> Int.(two_power_of_int i)
   in
-  vmin, vmax
+  fun v -> Int.logor mask v
 
-(* [common_low_bits v] returns the common pattern between the 
-   least-significant bits of all the elements of the Ival [v]. 
-   The pattern is in the form [lower_bits, mask] where [mask]
-   indicates the consecutive least significant bits that are
-   common between all elements, and
-   [lower_bits] indicates their values. *)
-let common_low_bits v =
+let reduce_bit = function
+  | Sign -> reduce_sign
+  | Bit i -> reduce_bit i
+
+(* --- Bitwise binary operators --- *)
+
+module BitwiseOperator (Op : BitOperator) =
+struct
+
+  let backward (b : bit_value) = function
+    | On -> Op.backward_on b
+    | Off -> Op.backward_off b
+    | Both -> assert false
+
+  (** Bit masks are composed of an array of significant bit values where index 0
+      represents the lowest bit, and a single bit_value to represent the
+      possible leading bits. *)
+  type bit_mask = bit_value array * bit_value
+
+  (* Converts an integer [x] into a bit array of size [n]. *)
+  let int_to_bit_array n (x : Int.t) =
+    let make i = if Z.testbit x i then On else Off in
+    Array.init n make
+
+  (* Computes a bit_mask for the lowest bits of an ival, using the modulo
+     information for non singleton values. *)
+  let low_bit_mask : t -> bit_mask = function
+    | Set [| |] -> raise Error_Bottom
+    | Set [| x |] -> (* singleton : build a full mask  *)
+      let n = Z.numbits x in
+      int_to_bit_array n x, if Int.(ge x zero) then Off else On
+    | v ->
+      let _,_,r,modu = min_max_r_mod v in (* requires cardinal > 1 *)
+      (* Find how much [modu] can be divided by two. *)
+      let n = Z.trailing_zeros modu in
+      int_to_bit_array n r, Both
+
+  (* Computes a remainder and modulo for the result of [v1 op v2]. *)
+  let compute_modulo v1 v2 =
+    let b1, s1 = low_bit_mask v1
+    and b2, s2 = low_bit_mask v2 in
+    let size = max (Array.length b1) (Array.length b2) in
+    (* Sets the [i] nth bits of [rem] until an uncertainty appears. *)
+    let rec step i rem =
+      let b1 = try b1.(i) with _ -> s1
+      and b2 = try b2.(i) with _ -> s2 in
+      let b = Op.forward b1 b2 in
+      if i >= size || b = Both
+      then rem, Int.two_power_of_int i
+      else
+        (* [rem] starts at 0, so we only need to turn on the 1 bits. *)
+        let rem = if b = On then set_bit_on ~size (Bit i) rem else rem in
+        step (i+1) rem
+    in
+    step 0 Int.zero
+
+  (* The number of bits on which the result should be significant *)
+  let result_size (v1 : t) (v2 : t) : int option =
+    let n1 = significant_bits v1 and n2 = significant_bits v2 in
+    let n1_greater =
+      match n1, n2 with
+      | None, _ -> true
+      | _, None -> false
+      | Some n1, Some n2 -> n1 >= n2
+    in
+    (* whether n1 or n2 is greater, look if the sign bit oped with anything is
+       not constant. If it is constant, then the highest bits are irrelevant. *)
+    if n1_greater
+    then if Op.forward Both (extract_sign v2) = Both then n1 else n2
+    else if Op.forward (extract_sign v1) Both = Both then n2 else n1
+
+  exception Do_not_fit_small_sets
+
+  (* Try to build a small set.
+     It is basically enumerating the possible results, by choosing the possible
+     bits from left to right. This function aborts if it ever exceeds the small
+     set size. The algorithm is probably not complete, as it is not always
+     possible to reduce the operands leading to a result (without an
+     exponential cost)  meaning that sometimes small sets can be obtained but
+     the algorithm will fail to find them. *)
+  let compute_small_set ~size (v1 : t) (v2 : t) (r : Int.t) (modu : Int.t) =
+    let set_bit i acc (r, v1, v2) =
+      let b1 = extract_bit i v1
+      and b2 = extract_bit i v2 in
+      match Op.forward b1 b2 with
+      | On -> (set_bit_on ~size i r, v1, v2) :: acc
+      | Off -> (r, v1, v2) :: acc
+      | Both ->
+        let v1_off = reduce_bit i v1 (Op.backward_off b2)
+        and v2_off = reduce_bit i v2 (Op.backward_off b1) in
+        let v1_on = reduce_bit i v1 (Op.backward_on b2)
+        and v2_on = reduce_bit i v2 (Op.backward_on b1) in
+        (set_bit_on ~size i r, v1_on, v2_on) :: (r, v1_off, v2_off) :: acc
+    in
+    let acc = ref (set_bit Sign [] (r, v1, v2)) in
+    for i = size - 1 downto Z.numbits modu - 1 do
+      acc := List.fold_left (set_bit (Bit i)) [] !acc;
+      if List.length !acc > !small_cardinal then raise Do_not_fit_small_sets
+    done;
+    let o = List.fold_left (fun o (r,_,_) -> O.add r o) O.empty !acc in
+    share_set o (O.cardinal o)
+
+  (* If lower is true (resp. false), compute the lower (resp. upper) bound of
+     the result interval when applying the bitwise operator to [v1] and [v2].
+     [size] is the number of bits of the result.
+     This function should be exact when the operands are small sets or tops
+     with modulo 1. Otherwise, it is an overapproximation of the bound. *)
+  let compute_bound ~size v1 v2 lower =
+    (* Sets the [i]-nth bit of the currently computed bound [r] of [v1 op v2].
+       If possible, reduces [v1] and [v2] accordingly. *)
+    let set_bit i (r, v1, v2) =
+      let b1 = extract_bit i v1
+      and b2 = extract_bit i v2 in
+      let b, v1, v2 =
+        match Op.forward b1 b2 with
+        | On | Off as b -> b, v1, v2 (* Constant bit, no reduction. *)
+        | Both ->
+          (* Choose the best bit for the searched bound, and reduces [v1] and
+             [v2] accordingly. *)
+          let b = match i with
+            | Sign -> if lower then On else Off
+            | Bit _ -> if lower then Off else On
+          in
+          let v1 = reduce_bit i v1 (backward b2 b)
+          and v2 = reduce_bit i v2 (backward b1 b) in
+          b, v1, v2
+      in
+      (* Only sets 1 bit, as [r] is 0 at the beginning. *)
+      let r = if b = On then set_bit_on ~size i r else r in
+      r, v1, v2
+    in
+    (* The result is 0 at the beginning, and [set_bit] turns on the 1 bits. *)
+    let r = ref (Int.zero, v1, v2) in
+    (* Sets the sign bit, and then the bits from size to 0. *)
+    r := set_bit Sign !r;
+    for i = (size - 1) downto 0 do
+      r := set_bit (Bit i) !r;
+    done;
+    let bound, _v1, _v2 = !r in
+    bound
+
+  let bitwise_forward (v1 : t) (v2 : t) : t =
+    try
+      let r, modu = compute_modulo v1 v2 in
+      match result_size v1 v2 with
+      | None ->
+        (* We could do better here, as one of the bound may be finite. However,
+           this case should occur rarely or not at all. *)
+        inject_interval None None r modu
+      | Some size ->
+        try compute_small_set ~size v1 v2 r modu
+        with Do_not_fit_small_sets ->
+          let min = compute_bound ~size v1 v2 true
+          and max = compute_bound ~size v1 v2 false in
+          inject_interval (Some min) (Some max) r modu
+    with Error_Bottom -> bottom
+end
+
+let bitwise_or = let module M = BitwiseOperator (Or) in M.bitwise_forward
+let bitwise_and = let module M = BitwiseOperator (And) in M.bitwise_forward
+let bitwise_xor = let module M = BitwiseOperator (Xor) in M.bitwise_forward
+
+
+(* --- Bitwise not --- *)
+
+let bitwise_signed_not v =
   match v with
   | Float _ -> assert false
-  | Top(_,_,r,m) -> 
-    if Int.is_zero (Int.logand m (Int.pred m))
-    then (* m is a power of two *)
-      r, Int.pred m
-    else Int.zero, Int.zero (* TODO *)
-  | Set [| v |] ->
-    v, next_pred_power_of_two v
-  | Set _ -> Int.zero, Int.zero (* TODO *)
-
-let bitwise_and ~size ~signed v1 v2 =
-  if is_bottom v1 || is_bottom v2
-  then bottom
-  else
-    match v1, v2 with
-    | Float _, _ | _, Float _ -> assert false
-    | Set s1, Set s2 ->
-      apply2_v Int.logand s1 s2
-    | Top _, other | other, Top _ ->
-      let min, max = bitwise_and_intervals ~signed ~size v1 v2 in
-      let lower_bits1, mask1 = common_low_bits v1 in
-      let lower_bits2, mask2 = common_low_bits v2 in
-      let mask = Int.logand mask1 mask2 in
-      let modu = Int.succ mask in
-      let r = Int.logand lower_bits1 (Int.logand lower_bits2 mask) in
-      let min = match min with
-        | Some min -> Some (Int.round_up_to_r ~min ~r ~modu)
-        | _ -> min 
-      in
-      let max = match max with
-        | Some max -> Some (Int.round_down_to_r ~max ~r ~modu)
-        | _ -> max 
-      in
-      let result = inject_top min max r modu in
-      ( match other with
-	Top _ | Float _ -> result
-      | Set s ->
-	if 
-	  array_for_all
-	    (fun elt -> 
-	      Int.ge elt Int.zero && 
-		Int.popcount elt <= !small_cardinal_log) 
-	    s 
-	then
-	  let result2 = 
-	    Array.fold_left
-	      (fun acc elt ->
-		join 
-		  (sub_bits elt)
-		  acc)
-	      bottom
-	      s
-	  in
-	  narrow result result2
-	else result)
-
-let bitwise_not v =
-  (* the result is [-v - 1] *)
-  match v with
-  | Float _ -> assert false
-  | Top _ -> add_int (neg_int v) minus_one
+  | Top _ -> add_int (neg_int v) minus_one (* [-v - 1] *)
   | Set s -> map_set_strict_decr Int.lognot s
 
-let bitwise_not_size ~size ~signed v =
-  let nv = bitwise_not v in
-  if not signed then
-    cast_int_to_int ~size:(Integer.of_int size) ~signed nv
-  else nv (* always fits in the type if the argument fitted. *)
+let bitwise_unsigned_not ~size v =
+  let size = Int.of_int size in
+  cast_int_to_int ~size ~signed:false (bitwise_signed_not v)
 
+let bitwise_not ~size ~signed v =
+  if signed then
+    bitwise_signed_not v
+  else
+    bitwise_unsigned_not ~size v
 
 let pretty_debug = pretty
 let name = "ival"

@@ -213,7 +213,7 @@
        id="tspan4269"
        x="30.780487"
        y="213.53029"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:30px;line-height:1.25;font-family:'Noto Sans';-inkscape-font-specification:'Noto Sans Bold';fill:#ff0000;stroke:#000000;stroke-width:1;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">Not used by EVA</tspan></text>
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:30px;line-height:1.25;font-family:'Noto Sans';-inkscape-font-specification:'Noto Sans Bold';fill:#ff0000;stroke:#000000;stroke-width:1;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">Not used by Eva</tspan></text>
   <text
      xml:space="preserve"
      style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -335,7 +335,7 @@
        id="tspan4323"
        x="556.8175"
        y="364.08261"
-       style="font-size:30px;line-height:1.25">Values computed by EVA</tspan></text>
+       style="font-size:30px;line-height:1.25">Values computed by Eva</tspan></text>
   <path
      style="fill:none;stroke:#ff0000;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
      d="M 197.24265,185.60197 297.21427,77.041294"

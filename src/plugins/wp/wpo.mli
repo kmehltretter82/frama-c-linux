@@ -219,4 +219,3 @@ val pp_goal_flow : Format.formatter -> t -> unit
 
 (** Dynamically exported. *)
 val prover_of_name : string -> prover option
-

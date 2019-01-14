@@ -434,28 +434,25 @@ module V = struct
       else topify_arith_origin pointer_part, false      
     in
     if ok_garbled && integer_part' == integer_part then
-      v (* both pointer and integer part are unchanged *), true
+      v (* both pointer and integer part are unchanged *)
     else
-      join (inject_ival integer_part') pointer_part', false
+      join (inject_ival integer_part') pointer_part'
 
   let cast_int_to_int ~size ~signed v =
     to_int Ival.cast_int_to_int ~size ~signed v
-  
+
   let reinterpret_as_int ~signed ~size v =
-    fst (to_int Ival.reinterpret_as_int ~size ~signed v)
+    to_int Ival.reinterpret_as_int ~size ~signed v
 
   let cast_float_to_int ~signed ~size v =
    try
      let v1 = project_ival v in
-     let alarm_use_as_float, alarm_overflow, r =
-       Ival.cast_float_to_int ~signed ~size v1
-     in
-     alarm_use_as_float, alarm_overflow, inject_ival r
+     let r = Ival.cast_float_to_int ~signed ~size v1 in
+     inject_ival r
    with Not_based_on_null ->
-     if is_bottom v then
-       NoAlarm, (NoAlarm, NoAlarm), v
-     else
-       Alarm, (Alarm, Alarm), topify_arith_origin v
+     if is_bottom v
+     then v
+     else topify_arith_origin v
 
  let cast_float_to_int_inverse ~single_precision i =
    try
@@ -500,16 +497,7 @@ module V = struct
   let arithmetic_function = import_function ~topify:Origin.K_Arith
 
   (* Compute the pointwise difference between two Locations_Bytes.t. *)
-  let sub_untyped_pointwise ?factor v1 v2 =
-    let offsets = sub_pointwise ?factor v1 v2 in
-    let warn =
-      try
-        let b1, _ = find_lonely_key v1
-        and b2, _ = find_lonely_key v2 in
-        not (Base.equal b1 b2)
-      with Not_found -> true
-    in
-    offsets, warn
+  let sub_untyped_pointwise = sub_pointwise
 
   (* compute [e1+factor*e2] using C semantic for +, i.e.
      [ptr+v] is [add_untyped sizeof_in_octets( *ptr) ptr v]. This function
@@ -598,27 +586,27 @@ module V = struct
     else
       import_function ~topify:Origin.K_Arith Ival.bitwise_or v1 v2
 
-  let bitwise_and ~signed ~size v1 v2 =
+  let bitwise_and v1 v2 =
     if equal v1 v2 && cardinal_zero_or_one v1 then v1
     else
-      let f i1 i2 = Ival.bitwise_and ~size ~signed i1 i2 in
+      let f i1 i2 = Ival.bitwise_and i1 i2 in
       import_function ~topify:Origin.K_Arith f v1 v2
 
   let shift_right e1 e2 =
     arithmetic_function Ival.shift_right e1 e2
 
-  let bitwise_not v =
+  let bitwise_signed_not v =
     try
       let i = project_ival v in
-      inject_ival (Ival.bitwise_not i)
+      inject_ival (Ival.bitwise_signed_not i)
     with Not_based_on_null -> topify_arith_origin v
 
-  let bitwise_not_size ~signed ~size v =
+  let bitwise_not ~size ~signed v =
     try
       let i = project_ival v in
-      inject_ival (Ival.bitwise_not_size ~size ~signed i)
+      inject_ival (Ival.bitwise_not ~size ~signed i)
     with Not_based_on_null -> topify_arith_origin v
-  
+
   let extract_bits ~topify ~start ~stop ~size v =
     try
       let i = project_ival_bottom v in

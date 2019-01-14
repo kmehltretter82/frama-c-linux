@@ -67,7 +67,7 @@ When loading, the following actions are done in sequence:
 
 Consider for instance the following command.
 \begin{shell}
-\$ frama-c -load foo.sav -val
+\$ frama-c -load foo.sav -eva
 \end{shell}
 It loads all projects saved in the file \texttt{foo.sav}. Then, it runs the
 value analysis in the new current project if and only if it was not already
@@ -104,7 +104,7 @@ Consider the two following
 commands.\optionidx{-}{save}\optionidx{-}{load}\optionidx{-}{absolute-valid-range}%
 \optionidx{-}{ulevel}
 \begin{shell}
-\$ frama-c -save foo.sav -ulevel 5 -absolute-valid-range 0-0x1000 -val foo.c
+\$ frama-c -save foo.sav -ulevel 5 -absolute-valid-range 0-0x1000 -eva foo.c
 \$ frama-c -load foo.sav
 \end{shell}
 \FramaC runs the value analysis plug-in on the file \texttt{foo.c} where loops
@@ -122,7 +122,7 @@ Consider now the two following commands.
 \optionidx{-}{save}\optionidx{-}{load}\optionidx{-}{absolute-valid-range}%
 \optionidx{-}{ulevel}
 \begin{shell}
-\$ frama-c -save foo.sav -ulevel 5 -absolute-valid-range 0-0x1000 -val foo.c
+\$ frama-c -save foo.sav -ulevel 5 -absolute-valid-range 0-0x1000 -eva foo.c
 \$ frama-c -load foo.sav -absolute-valid-range 0-0x2000
 \end{shell}
 The first command produces the very same result than above. However, in the

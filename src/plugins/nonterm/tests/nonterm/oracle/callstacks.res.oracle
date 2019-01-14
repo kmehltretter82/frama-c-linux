@@ -1,169 +1,49 @@
 [kernel] Parsing tests/nonterm/callstacks.i (no preprocessing)
-[value] Analyzing a complete application starting at main
-[value] Computing initial state
-[value] Initial state computed
-[value:initial-state] Values of globals at initialization
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
-[value] computing for function h <- main.
+[eva] computing for function h <- main.
   Called from tests/nonterm/callstacks.i:23.
-[value] computing for function g <- h <- main.
+[eva] computing for function g <- h <- main.
   Called from tests/nonterm/callstacks.i:18.
-[value] computing for function f <- g <- h <- main.
+[eva] computing for function f <- g <- h <- main.
   Called from tests/nonterm/callstacks.i:13.
-[value] computing for function nt <- f <- g <- h <- main.
+[eva] computing for function nt <- f <- g <- h <- main.
   Called from tests/nonterm/callstacks.i:8.
-[value] tests/nonterm/callstacks.i:4: entering loop for the first time
-[value] Recording results for nt
-[value] Done for function nt
-[value] computing for function nt <- f <- g <- h <- main.
-  Called from tests/nonterm/callstacks.i:9.
-[value] Recording results for nt
-[value] Done for function nt
-[value] Recording results for f
-[value] Done for function f
-[value] computing for function f <- g <- h <- main.
-  Called from tests/nonterm/callstacks.i:14.
-[value] computing for function nt <- f <- g <- h <- main.
-  Called from tests/nonterm/callstacks.i:8.
-[value] Recording results for nt
-[value] Done for function nt
-[value] computing for function nt <- f <- g <- h <- main.
-  Called from tests/nonterm/callstacks.i:9.
-[value] Recording results for nt
-[value] Done for function nt
-[value] Recording results for f
-[value] Done for function f
-[value] Recording results for g
-[value] Done for function g
-[value] computing for function g <- h <- main.
-  Called from tests/nonterm/callstacks.i:19.
-[value] computing for function f <- g <- h <- main.
-  Called from tests/nonterm/callstacks.i:13.
-[value] computing for function nt <- f <- g <- h <- main.
-  Called from tests/nonterm/callstacks.i:8.
-[value] Recording results for nt
-[value] Done for function nt
-[value] computing for function nt <- f <- g <- h <- main.
-  Called from tests/nonterm/callstacks.i:9.
-[value] Recording results for nt
-[value] Done for function nt
-[value] Recording results for f
-[value] Done for function f
-[value] computing for function f <- g <- h <- main.
-  Called from tests/nonterm/callstacks.i:14.
-[value] computing for function nt <- f <- g <- h <- main.
-  Called from tests/nonterm/callstacks.i:8.
-[value] Recording results for nt
-[value] Done for function nt
-[value] computing for function nt <- f <- g <- h <- main.
-  Called from tests/nonterm/callstacks.i:9.
-[value] Recording results for nt
-[value] Done for function nt
-[value] Recording results for f
-[value] Done for function f
-[value] Recording results for g
-[value] Done for function g
-[value] Recording results for h
-[value] Done for function h
-[value] computing for function g <- main.
-  Called from tests/nonterm/callstacks.i:24.
-[value] computing for function f <- g <- main.
-  Called from tests/nonterm/callstacks.i:13.
-[value] computing for function nt <- f <- g <- main.
-  Called from tests/nonterm/callstacks.i:8.
-[value] Recording results for nt
-[value] Done for function nt
-[value] computing for function nt <- f <- g <- main.
-  Called from tests/nonterm/callstacks.i:9.
-[value] Recording results for nt
-[value] Done for function nt
-[value] Recording results for f
-[value] Done for function f
-[value] computing for function f <- g <- main.
-  Called from tests/nonterm/callstacks.i:14.
-[value] computing for function nt <- f <- g <- main.
-  Called from tests/nonterm/callstacks.i:8.
-[value] Recording results for nt
-[value] Done for function nt
-[value] computing for function nt <- f <- g <- main.
-  Called from tests/nonterm/callstacks.i:9.
-[value] Recording results for nt
-[value] Done for function nt
-[value] Recording results for f
-[value] Done for function f
-[value] Recording results for g
-[value] Done for function g
-[value] Recording results for main
-[value] done for function main
-[value] ====== VALUES COMPUTED ======
-[value:final-states] Values at end of function nt:
+[eva] Recording results for nt
+[eva] Done for function nt
+[eva] tests/nonterm/callstacks.i:9: Reusing old results for call to nt
+[eva] Recording results for f
+[eva] Done for function f
+[eva] tests/nonterm/callstacks.i:14: Reusing old results for call to f
+[eva] Recording results for g
+[eva] Done for function g
+[eva] tests/nonterm/callstacks.i:19: Reusing old results for call to g
+[eva] Recording results for h
+[eva] Done for function h
+[eva] tests/nonterm/callstacks.i:24: Reusing old results for call to g
+[eva] Recording results for main
+[eva] done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function nt:
   NON TERMINATING FUNCTION
-[value:final-states] Values at end of function f:
+[eva:final-states] Values at end of function f:
   NON TERMINATING FUNCTION
-[value:final-states] Values at end of function g:
+[eva:final-states] Values at end of function g:
   NON TERMINATING FUNCTION
-[value:final-states] Values at end of function h:
+[eva:final-states] Values at end of function h:
   NON TERMINATING FUNCTION
-[value:final-states] Values at end of function main:
+[eva:final-states] Values at end of function main:
   NON TERMINATING FUNCTION
 [nonterm] tests/nonterm/callstacks.i:4: Warning: 
   non-terminating loop
-  stack 1: nt :: tests/nonterm/callstacks.i:8 <-
-           f :: tests/nonterm/callstacks.i:13 <-
-           g :: tests/nonterm/callstacks.i:18 <-
-           h :: tests/nonterm/callstacks.i:23 <-
-           main
-  stack 2: nt :: tests/nonterm/callstacks.i:9 <-
-           f :: tests/nonterm/callstacks.i:13 <-
-           g :: tests/nonterm/callstacks.i:18 <-
-           h :: tests/nonterm/callstacks.i:23 <-
-           main
-  stack 3: nt :: tests/nonterm/callstacks.i:8 <-
-           f :: tests/nonterm/callstacks.i:14 <-
-           g :: tests/nonterm/callstacks.i:18 <-
-           h :: tests/nonterm/callstacks.i:23 <-
-           main
-  stack 4: nt :: tests/nonterm/callstacks.i:9 <-
-           f :: tests/nonterm/callstacks.i:14 <-
-           g :: tests/nonterm/callstacks.i:18 <-
-           h :: tests/nonterm/callstacks.i:23 <-
-           main
-  stack 5: nt :: tests/nonterm/callstacks.i:8 <-
-           f :: tests/nonterm/callstacks.i:13 <-
-           g :: tests/nonterm/callstacks.i:19 <-
-           h :: tests/nonterm/callstacks.i:23 <-
-           main
-  stack 6: nt :: tests/nonterm/callstacks.i:9 <-
-           f :: tests/nonterm/callstacks.i:13 <-
-           g :: tests/nonterm/callstacks.i:19 <-
-           h :: tests/nonterm/callstacks.i:23 <-
-           main
-  stack 7: nt :: tests/nonterm/callstacks.i:8 <-
-           f :: tests/nonterm/callstacks.i:14 <-
-           g :: tests/nonterm/callstacks.i:19 <-
-           h :: tests/nonterm/callstacks.i:23 <-
-           main
-  stack 8: nt :: tests/nonterm/callstacks.i:9 <-
-           f :: tests/nonterm/callstacks.i:14 <-
-           g :: tests/nonterm/callstacks.i:19 <-
-           h :: tests/nonterm/callstacks.i:23 <-
-           main
-  stack 9: nt :: tests/nonterm/callstacks.i:8 <-
-           f :: tests/nonterm/callstacks.i:13 <-
-           g :: tests/nonterm/callstacks.i:24 <-
-           main
-  stack 10: nt :: tests/nonterm/callstacks.i:9 <-
-            f :: tests/nonterm/callstacks.i:13 <-
-            g :: tests/nonterm/callstacks.i:24 <-
-            main
-  stack 11: nt :: tests/nonterm/callstacks.i:8 <-
-            f :: tests/nonterm/callstacks.i:14 <-
-            g :: tests/nonterm/callstacks.i:24 <-
-            main
-  stack 12: nt :: tests/nonterm/callstacks.i:9 <-
-            f :: tests/nonterm/callstacks.i:14 <-
-            g :: tests/nonterm/callstacks.i:24 <-
-            main
+  stack: nt :: tests/nonterm/callstacks.i:8 <-
+         f :: tests/nonterm/callstacks.i:13 <-
+         g :: tests/nonterm/callstacks.i:18 <-
+         h :: tests/nonterm/callstacks.i:23 <-
+         main
 [nonterm] tests/nonterm/callstacks.i:8: Warning: unreachable return
 [nonterm] tests/nonterm/callstacks.i:13: Warning: unreachable return
 [nonterm] tests/nonterm/callstacks.i:18: Warning: unreachable return

@@ -54,6 +54,9 @@ theory Cint
   predicate is_uint64(x:int) = 0 <= x < max_uint64
   predicate is_sint64(x:int) = -max_sint64 <= x < max_sint64
 
+  lemma is_bool0: is_bool(0)
+  lemma is_bool1: is_bool(1)
+
   (* meta "def_into_axiom" predicate is_bool *)
   meta "def_into_axiom" predicate is_uint8
   meta "def_into_axiom" predicate is_sint8

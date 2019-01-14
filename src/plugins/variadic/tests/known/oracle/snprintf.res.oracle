@@ -1,40 +1,42 @@
-[variadic] FRAMAC_SHARE/libc/stdio.h:153: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:165: 
   Declaration of variadic function fprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:155: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:167: 
   Declaration of variadic function fscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:157: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:169: 
   Declaration of variadic function printf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:158: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:170: 
   Declaration of variadic function scanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:159: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:171: 
   Declaration of variadic function snprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:161: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:173: 
   Declaration of variadic function sprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:163: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:175: 
   Declaration of variadic function sscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:353: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:369: 
   Declaration of variadic function dprintf.
 [variadic] tests/known/snprintf.c:12: 
   Translating call to snprintf to a call to the specialized version snprintf_va_1.
 [variadic] tests/known/snprintf.c:15: 
   Translating call to snprintf to a call to the specialized version snprintf_va_2.
-[value] Analyzing a complete application starting at main
-[value] Computing initial state
-[value] Initial state computed
-[value] using specification for function snprintf_va_1
-[value] tests/known/snprintf.c:12: 
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva] FRAMAC_SHARE/libc/string.h:118: 
+  cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
+[eva] using specification for function snprintf_va_1
+[eva] tests/known/snprintf.c:12: 
   Cannot evaluate range bound format_length(format) - 1
   (unsupported ACSL construct: logic function format_length). Approximating
-[value:alarm] tests/known/snprintf.c:12: Warning: 
+[eva:alarm] tests/known/snprintf.c:12: Warning: 
   function snprintf_va_1: precondition \valid(s + (0 .. n - 1)) ∨
                                        \valid(s +
                                               (0 .. format_length(format) - 1)) got status unknown.
-[value:alarm] tests/known/snprintf.c:13: Warning: 
+[eva:alarm] tests/known/snprintf.c:13: Warning: 
   assertion got status invalid (stopping propagation).
-[value] using specification for function snprintf_va_2
-[value] done for function main
-[value] ====== VALUES COMPUTED ======
-[value:final-states] Values at end of function main:
+[eva] using specification for function snprintf_va_2
+[eva] done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function main:
   data[0..98] ∈ {65}
       [99] ∈ {0}
   dest[0..49] ∈ [--..--]
@@ -58,7 +60,8 @@ int volatile nondet;
     assigns *(s + (0 ..))
       \from (indirect: n), (indirect: *(format + (0 ..))), *(param0 + (0 ..));
  */
-int snprintf_va_1(char *s, size_t n, char const *format, char *param0);
+int snprintf_va_1(char * __restrict s, size_t n,
+                  char const * __restrict format, char *param0);
 
 /*@ requires
       \valid(s + (0 .. n - 1)) ∨
@@ -71,7 +74,8 @@ int snprintf_va_1(char *s, size_t n, char const *format, char *param0);
     assigns *(s + (0 ..))
       \from (indirect: n), (indirect: *(format + (0 ..))), *(param0 + (0 ..));
  */
-int snprintf_va_2(char *s, size_t n, char const *format, char *param0);
+int snprintf_va_2(char * __restrict s, size_t n,
+                  char const * __restrict format, char *param0);
 
 int main(void)
 {

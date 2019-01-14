@@ -102,7 +102,7 @@ optionally present in the program. Together, these steps form the
 
 \FramaC aborts whenever any error occurs during one of these steps. However
 users can use the option
-\texttt{-kernel-warn-abort=-annot-error}\footnote{%
+\texttt{-kernel-warn-key annot-error=active}\footnote{%
 See section~\ref{sec:feedback-options} for more information on warning statuses.}
 in order to
 continue after emitting a warning when an \acsl annotation fails to type-check.
@@ -185,9 +185,9 @@ the expression \texttt{1+2} is replaced by \texttt{3}.
   is now managed by warning category (Section~\ref{sec:feedback-options})
 \texttt{annot-error}, whose default status is ``abort''. Behavior of
 \texttt{-continue-annot-error} can thus be obtained with
-\texttt{-kernel-warn-abort=-annot-error}, or even
-\texttt{-kernel-warn-key=-annot-error} to silently ignoring any ill-formed
-annotation.
+\texttt{-kernel-warn-key annot-error=active}, or even
+\texttt{-kernel-warn-key annot-error=inactive} to silently ignore any ill-formed
+annotations.
 
 \item \texttt{\optiondef{-}{enums} <repr name>} specifies which representation
 should be used for a given enumerated type. Namely, the C standard allows the use
@@ -214,9 +214,16 @@ a negative value, and choose the smallest rank possible starting from
   option is set by default.
 
 \item \texttt{\optiondef{-}{inline-calls} <f1,...,fn>} inlines calls to
-  functions \texttt{f1,...,fn}. For recursive functions, only the first level
+  functions. Use \texttt{@inline} to select all functions with attribute
+  \texttt{inline}.
+  For recursive functions, only the first level
   is inlined (e.g., the function will contain an inlined version of itself with
   a recursive call inside it). Calls via function pointers are ignored.
+
+\item \texttt{\optiondef{-}{remove-inlined} <f1,...,fn>} removes from the AST
+  functions \texttt{f1,...,fn}, which must have been given to
+  \optionuse{-}{inline-calls}. Note: this option does not check if the given
+  functions were fully inlined.
 
 \item \optiondef{-}{keep-switch} preserves \texttt{switch} statements in the
   source code. Without this option, they are transformed into \texttt{if}

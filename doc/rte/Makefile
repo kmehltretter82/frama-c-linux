@@ -7,7 +7,7 @@ include ../MakeLaTeXModern
 DWNLDDIR=../manuals
 DOCNAME=rte-manual.pdf
 
-main.pdf: $(FRAMAC_MODERN) framacversion.tex \
+main.pdf: $(FRAMAC_MODERN) \
 	main.tex rte.tex \
 	biblio.bib \
 	stmtannot.c fcontract.c
@@ -15,14 +15,6 @@ main.pdf: $(FRAMAC_MODERN) framacversion.tex \
 ifndef FRAMAC_VERSION
 FRAMAC_VERSION=$(shell sed -e 's/\\(.*\\)/\\1/' ../../VERSION)
 endif
-
-framacversion.tex: ../../VERSION Makefile
-	@echo "making version $(FRAMAC_VERSION)"
-	rm -f $@
-	printf '\\newcommand{\\framacversion}{' > $@
-	echo $(FRAMAC_VERSION) >> $@
-	echo '}' >> $@
-	chmod a-w $@
 
 %.pdf : %.tex
 	pdflatex $*

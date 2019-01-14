@@ -132,11 +132,12 @@ are provided in the figure.
 
    "classid": "<identifier>" ; // Default is "unclassified"
    "plugin": "<identifier>" ;  // Default is "kernel"
+   "category": "<category>" ; // Default is "*" for all categories
    "title": "<free text>" ;    // Default is a short name of the event
    "descr": "<free text>" ;    // Default is the entire text of the event
    "action": "<SKIP|INFO|REVIEW|ERROR>" ; Default is 'REVIEW'
 
-   // Mandatory Pattern Field
+   // Mandatory Pattern Field (unless a category is specified)
 
    [ "error"        // Applies to error messages
    | "warning"      // Applies to warning messages
@@ -150,6 +151,18 @@ are provided in the figure.
 \caption{Classification Rule JSON Format}
 \label{report-classification-rule}
 \end{figure}
+
+Plug-ins are identified by their short name, typically \verb+"rte"+ for the \verb+Rtegen+ plug-in,
+see \verb+frama-c -plugins+ for details.
+
+Category filters apply to active warning categories\footnote{Warning categories
+  are described in section~\ref{sec:feedback-options}.}
+or warning categories promoted to errors.
+Use option \verb+frama-c -[plugin]-warn-key help+ to display the list of available warning categories for a given plugin.
+Category filters use the same syntax and meaning than warning control options: category \verb+a:b+ applies to all messages
+with category \verb+a:b[:...]+, but \emph{not} to messages with category \verb+a+ or \verb+c[:...]+.
+
+When using a category filter, the pattern field can be omitted to match all warning messages of this category.
 
 \subsection{Regular Expressions}
 

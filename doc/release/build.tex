@@ -18,6 +18,12 @@ The procedure for creating the source distribution.
 
 
 \item Check the contents of \texttt{INSTALL.md} \todo{Should always be up to date}
+  \begin{itemize}
+  \item In particular, check and update a full known good configuration for
+    opam packages, including alt-ergo, why3, coq, etc.
+    Use \verb+ptests.opt -config qualif src/plugins/wp/tests+ to help check if
+    the configuration is ok.
+  \end{itemize}
 \item Check the contents of \texttt{README.md} \todo{Should always be up to date}
 \item Check the contents of \texttt{Changelog}
   \todo{Should always be up to date}
@@ -33,7 +39,13 @@ There are many administrative steps, coordinated by the release manager.
 \item Ensure that you have a clone of \texttt{e-acsl}
   (\texttt{git@git.frama-c.com:frama-c/e-acsl}) in the \texttt{src/plugins}
   directory
-\item Set \texttt{VERSION} file (for beta releases, add suffix \texttt{-beta}).
+\item If a new version of the ACSL manual is to be released, make sure you also
+  have a clone of the \texttt{acsl} manual Github repository
+  (\url{git@github.com:acsl-language/acsl.git}) in the \texttt{doc}
+  directory
+\item Set \texttt{VERSION} file (for beta releases, add suffix \texttt{-beta}) for
+  all \texttt{VERSION} files present in the platform: both Frama-C's and E-ACSL's
+  version
 \item Update file \texttt{ALL\_VERSIONS} (nothing to do for beta releases). \todo{This section must be put somewhere else in the release manual}
 \item Update files
   \texttt{src/plugins/wp/Changelog} and
@@ -128,33 +140,25 @@ manuals.
 %\texttt{doc/manuals} in order to update the manuals (required by the
 %\texttt{install} target below).
 
-In each directory:
+Run the script \texttt{doc/build-manuals.sh} to compile and install all manuals,
+even for E-ACSL.
+
+Otherwise, if you want to do it \textbf{manually}, in each directory:
 \begin{shell}
 make
 make install
 \end{shell}
 
-The result is installed in doc/manuals/.
+The result is installed in \texttt{doc/manuals/}.
 
-Finally, E-ACSL manuals must also be generated and installed: in both
-directories \texttt{src/plugins/e-acsl/doc/refman}\footnote{If you followed
-instructions from section~\ref{sec:update-sources}, you have already cloned
-the E-ACSL repository under \texttt{src/plugins/e-acsl}.
-Otherwise, it's time to do it}
-and
-\texttt{src/plugins/e-acsl/doc/userman}, do
-\begin{shell}
-make
-make install
-\end{shell}
+For E-ACSL, the \textbf{manual} steps (ignore if you used the script)
+are slightly different: \texttt{make} and
+\texttt{make install} must be run in the following directories:
 
-
-The script \texttt{doc/build-manuals.sh} performs this for all the current
-manuals (including E-ACSL).
-
-\begin{shell}
-./doc/build-manuals.sh
-\end{shell}
+\begin{itemize}
+\item \texttt{src/plugins/e-acsl/doc/refman}
+\item \texttt{src/plugins/e-acsl/doc/userman}
+\end{itemize}
 
 % No longer use git annex (as recommended by VP)
 %\paragraph{Getting the manuals on the web (ultimately)}
@@ -198,6 +202,13 @@ check consistency of API documentation. (the plug-in development guide
 
 This steps creates the tarball of Frama-C, the tarball of the API and
 copy them to the website. It also copies the manuals.
+
+If you have never run \verb+make src-distrib+, you can try a standalone build
+of the \verb+.tar.gz+ itself, before doing the rest.
+Refer to Appendix \ref{chap:make-src-distrib} if you have problems when
+doing so. In any case, the archive will be recreated by a script, so you can
+skip this step.
+
 You need to have installed \texttt{git-lfs}, otherwise the build
 script will not correctly use lfs when putting large files in the
 website git.
@@ -213,9 +224,9 @@ website git.
 in the root directory of Frama-C. The last one is only needed when creating a
 final release. Release candidates are only put on github and require only
 \texttt{Frama-C-snapshot} and its associated wiki. Branch on
-\texttt{Frama-C-snapshot} should be \texttt{master} for a final release and
-\texttt{release-candidates} for a release candidate. For \texttt{website},
-a new branch should be created over \texttt{online}.
+\texttt{Frama-C-snapshot} should be \texttt{latest} for every release
+(for final releases, \texttt{latest} is merged into \texttt{master} at the end).
+For \texttt{website}, a new branch should be created over \texttt{online}.
 
 Finally, ensure that locale \verb+en_US.UTF-8+ is available on your system,
 as it is used by the script to ensure a proper encoding of the generated files.
@@ -229,17 +240,21 @@ Now, run the script:
 
 Please check that the distribution (sources and API) is OK:
 \begin{enumerate}
-\item Inspect the contents of the \texttt{tar.gz}.
-  This is done in two steps:
+\item Inspect the contents of the \texttt{tar.gz}:
   \begin{enumerate}
-    \item run \texttt{doc/release/checktar.sh}. Fix issues and/or update
-      the script if needed.
-    \item On a pristine clone of the Github Frama-C-snapshot repository,
+  \item Extract it to a new directory.
+  \item run \texttt{<path-to-frama-c-git-clone>/doc/release/checktar.sh}
+    (CWD must be where the tar was extracted). Fix issues and/or update
+    the script if needed.
+  \item On a pristine clone of the Github Frama-C-snapshot repository
+    (e.g. the one created a few steps before),
   compare the untared directory and the Github clone using e.g. \texttt{meld},
   to see if there are suspicious newly-added files or directories (indicating
   e.g. that the .tar.gz was created on a non-clean environment).
   Note that comparing file contents is irrelevant at this stage, since
-  there are likely too many differences between this and the last release.
+  there are likely too many differences between this and the last release
+  (unless the previous one was a beta, in which case differences should be
+  small).
   However, check for post-release commits (namely to \texttt{opam/opam}) and
   see if there are changes that were forgotten to be ported back to Frama-C's git.
 \end{enumerate}
@@ -249,9 +264,21 @@ Please check that the distribution (sources and API) is OK:
 \item check that \texttt{./configure \&\& make \&\& sudo make install} works fine;
 \item test the installed binaries (especially the GUI). (On Linux, OCI tests
   everything but the GUI);
-\item redo the two steps above on Windows \expertise{André}, Mac OS X
+\item redo the two steps above on Windows \expertise{André}, macOS
   \expertise{Loïc/Thibaud};
-\item have a look at the documentation of the API. \todo{What, precisely}
+  \begin{itemize}
+  \item In Cygwin, after installing opam-repository-mingw
+    (https://fdopen.github.io/opam-repository-mingw/),
+    installing Frama-C dependencies, etc., uncompress the .tar.gz and run:
+  \item \verb+./configure --prefix="$(cygpath -a -m $PWD)"/build+
+  \item Then \verb+make+;
+  \item Then \verb+make install+;
+  \item Then try e.g. running \verb+build/bin/frama-c-gui tests/idct/*.c -val -wp -wp-rte+ and click around, see if things work.
+  \end{itemize}
+\item have a look at the documentation of the API (untar, open
+  \texttt{index.html} in a browser, click on a few links, etc).
+  If there are minor bugs/typos, note them for later, but it's not
+  worth delaying the release to fix them.
 \end{enumerate}
 
 

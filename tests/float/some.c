@@ -1,12 +1,12 @@
 /* run.config*
-   OPT: -val-show-slevel 10 -slevel 100 -val @VALUECONFIG@ -cpp-extra-args="-DFLOAT=double -DN=55" -float-normal -journal-disable -no-results
-   OPT: -slevel 100 -val @VALUECONFIG@ -cpp-extra-args="-DFLOAT=float -DN=26"  -float-normal -journal-disable -no-results
+   OPT: -eva-show-slevel 10 -slevel 100 -eva @VALUECONFIG@ -cpp-extra-args="-DFLOAT=double -DN=55" -float-normal -journal-disable -no-results
+   OPT: -slevel 100 -eva @VALUECONFIG@ -cpp-extra-args="-DFLOAT=float -DN=26"  -float-normal -journal-disable -no-results
 */
 
 FLOAT t[N] = { 1. } ;
 FLOAT y = 0.5;
 
-main(){ 
+int main(){
   int i;
   for (i=1 ; i<N; i++)
     {

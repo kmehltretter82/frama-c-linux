@@ -12,13 +12,13 @@
          open(char const *, int, char const *)
 [variadic] tests/known/open_wrong.c:13: 
   Generic translation of call to variadic function.
-[value] Analyzing a complete application starting at main
-[value] Computing initial state
-[value] Initial state computed
-[value] using specification for function open
-[value] done for function main
-[value] ====== VALUES COMPUTED ======
-[value:final-states] Values at end of function main:
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva] using specification for function open
+[eva] done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function main:
   file ∈ {{ "file" }}
   flag ∈ {0}
   __retres ∈ {0}

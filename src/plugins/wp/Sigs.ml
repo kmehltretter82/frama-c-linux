@@ -194,7 +194,7 @@ sig
       variable of the other environment. When both environments don't agree
       on a chunk, their variables are added to the passive form. *)
 
-  val assigned : t -> t -> domain -> pred Bag.t
+  val assigned : pre:t -> post:t -> domain -> pred Bag.t
   (** Make chunks equal outside of some domain.
 
       This is similar to [join], but outside the given footprint of an
@@ -270,8 +270,9 @@ sig
   val datatype : string
   (** For projectification. Must be unique among models. *)
 
-  val separation : unit -> Separation.clause list
-  (** Computes the separation clauses to be verified for this model. *)
+  val hypotheses : unit -> MemoryContext.clause list
+  (** Computes the memory model hypotheses including separation and validity
+      clauses to be verified for this model. *)
 
   module Chunk : Chunk
   (** Memory model chunks. *)
@@ -365,6 +366,9 @@ sig
   val base_addr : loc -> loc
   (** Return the memory location of the base address of a given memory
       location. *)
+
+  val base_offset : loc -> term
+  (** Return the offset of the location, in bytes, from its base_addr. *)
 
   val block_length : sigma -> c_object -> loc -> term
   (**  Returns the length (in bytes) of the allocated block containing

@@ -71,7 +71,7 @@ module type S = sig
   (** [memo tbl k f] returns the binding of [k] in [tbl]. If there is
       no binding, add the binding [f k] associated to [k] in [tbl] and return
       it.
-      @since frama-c-dev
+      @since Chlorine-20180501
   *)
 
 end

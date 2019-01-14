@@ -2018,7 +2018,8 @@ let removeUnusedTransitionsAndStates () =
       (Aorai_state.Set.add state set)
   in
   let reached _ state set = Aorai_state.Map.fold treat_one_state state set in
-  let reached_states = Pre_state.fold reached Aorai_state.Set.empty in
+  let init = Path_analysis.get_init_states (getAutomata ()) in
+  let reached_states = Pre_state.fold reached (Aorai_state.Set.of_list init) in
   let reached_states = Post_state.fold reached reached_states in
   let reached_states = Loop_init_state.fold reached reached_states in
   let reached_states = Loop_invariant_state.fold reached reached_states in

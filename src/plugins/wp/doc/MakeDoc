@@ -1,7 +1,7 @@
 # --------------------------------------------------------------------------
 # ---  Resources                                                         ---
 # --------------------------------------------------------------------------
-FRAMAC_DOC= .make-class .make-images .make-icons VERSION
+FRAMAC_DOC= .make-class .make-images .make-icons VERSION VERSION_CODENAME
 # --------------------------------------------------------------------------
 FRAMAC_CLASS=frama-c-book.cls frama-c-cover.pdf frama-c-left.pdf frama-c-right.pdf
 FRAMAC_BULLETS=never_tried.png unknown.png valid_under_hyp.png surely_valid.png
@@ -31,6 +31,11 @@ RES_ICONS=$(addprefix $(FRAMAC_TRUNK)/share/theme/default/,$(FRAMAC_BULLETS))
 
 VERSION: $(FRAMAC_TRUNK)/VERSION
 	@echo "Importing Frama-C Version"
+	@cp -fv $< $@
+	@chmod a-w $@
+
+VERSION_CODENAME: $(FRAMAC_TRUNK)/VERSION_CODENAME
+	@echo "Importing Frama-C Version Codename"
 	@cp -fv $< $@
 	@chmod a-w $@
 

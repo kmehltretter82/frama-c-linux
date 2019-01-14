@@ -118,7 +118,7 @@ struct
     mutable backtrack : int ;
     mutable backtracking : backtracking option ;
   }
-
+  
   and backtracking = {
     bk_node : ProofEngine.node ;
     bk_depth : int ; (* depth of search *)
@@ -181,7 +181,7 @@ struct
               bk_depth = depth ;
               bk_pending = pending env ;
             }
-
+  
   let search env node ~depth =
     if env.auto <> [] && depth < env.depth && pending env < env.width
     then
@@ -211,7 +211,7 @@ struct
               with None -> None | Some fork -> Some (point.bk_depth,fork)
 
   let provers env = env.provers
-
+  
   let make tree
       ~valid ~failed ~provers
       ~depth ~width ~backtrack ~auto
@@ -242,7 +242,11 @@ let rec zip order nodes scripts =
          zip order o_nodes o_scripts)
 
 let reconcile nodes scripts =
-  if List.for_all (fun (k,_) -> k = "") scripts
+  match nodes , scripts with
+  | [] , [] -> ()
+  | [_,n] , [_,s] -> ProofEngine.bind n s
+  | _ ->
+  if List.for_all (fun (k,_) -> k = "") scripts 
   then zip fst_order nodes scripts
   else zip key_order
       (List.stable_sort key_order nodes)
@@ -273,35 +277,35 @@ let prove_node env node prv =
 let rec auto env ?(depth=0) node : bool Task.task =
   exists (prove_node env node) (Env.provers env) >>= fun ok ->
   if ok then Task.return true else
-  if depth > 0 then
-    autosearch env ~depth node
-  else
-    begin
-      autosearch env ~depth node >>= fun ok ->
-      if ok then Task.return true else
-        match Env.backtrack env with
-        | Some (depth,fork) ->
-            Env.progress env "Backtracking" ;
-            autofork env ~depth fork
-        | None ->
-            Task.return false
-    end
+    if depth > 0 then
+      autosearch env ~depth node
+    else
+      begin
+        autosearch env ~depth node >>= fun ok ->
+        if ok then Task.return true else
+          match Env.backtrack env with
+          | Some (depth,fork) ->
+              Env.progress env "Backtracking" ;
+              autofork env ~depth fork
+  | None ->
+      Task.return false
+      end
 
 and autosearch env ~depth node : bool Task.task =
   match Env.search env node ~depth with
-  | None -> Task.return false
+      | None -> Task.return false
   | Some fork -> autofork env ~depth fork
 
 and autofork env ~depth fork =
-  let _,children = ProofEngine.commit ~resolve:true fork in
-  let pending = Env.pending env in
-  if pending > 0 then
-    begin
-      Env.progress env (Printf.sprintf "Auto %d" pending) ;
-      let depth = succ depth in
-      forall (auto env ~depth) (List.map snd children)
-    end
-  else
+          let _,children = ProofEngine.commit ~resolve:true fork in
+          let pending = Env.pending env in
+          if pending > 0 then
+            begin
+              Env.progress env (Printf.sprintf "Auto %d" pending) ;
+              let depth = succ depth in
+              forall (auto env ~depth) (List.map snd children)
+            end
+          else
     ( Env.validate env ; Task.return true )
 
 (* -------------------------------------------------------------------------- *)
@@ -309,13 +313,13 @@ and autofork env ~depth fork =
 (* -------------------------------------------------------------------------- *)
 
 let rec crawl env on_child node = function
-
+  
   | [] ->
       let node = ProofEngine.anchor (Env.tree env) ?node () in
       auto env node >>= fun ok ->
       if ok then Env.validate env else Env.stuck env ;
       Task.return ()
-
+        
   | Error(msg,json) :: alternative ->
       Wp_parameters.error "@[<hov 2>Script Error %S: %a@]@." msg Json.pp json ;
       crawl env on_child node alternative
@@ -457,7 +461,7 @@ let has_proof wpo =
   try Hashtbl.find proofs wid
   with Not_found ->
     if ProofSession.exists wpo then
-      let ok =
+      let ok = 
         try
           let script = ProofScript.decode (ProofSession.load wpo) in
           ProofScript.status script = 0

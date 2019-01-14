@@ -1,6 +1,59 @@
 stages:
+ - update_docker
+ - lint
  - frama_c_and_plugins
  - distrib_and_compatibility
+
+variables:
+  OPAM_PACKAGES: ocamlfind zarith ocamlgraph ocp-indent
+
+# update the cache
+update_docker:
+  stage: update_docker
+  image: ocaml/opam:debian
+  variables:
+   GIT_STRATEGY: none
+  before_script:
+   - sudo apt-get install -y -qq rsync
+   - mkdir -p .gitlab_oci_cache/.opam/
+   - rsync -a .gitlab_oci_cache/.opam/ /home/opam/.opam/
+   - opam list
+   - opam depext -i $OPAM_PACKAGES
+  after_script:
+   - rsync -a --delete /home/opam/.opam/ .gitlab_oci_cache/.opam/
+  cache:
+   key: "frama-c"
+   paths:
+     - .gitlab_oci_cache/
+  script:
+   - exit 0
+  tags:
+   - docker
+
+#lint uses the cache but doesn't modify it
+lint:
+  stage: lint
+  image: ocaml/opam:debian
+  before_script:
+   - sudo apt-get install -y -qq rsync autoconf build-essential bc
+   - mkdir -p .gitlab_oci_cache/.opam/
+   - rsync -a .gitlab_oci_cache/.opam/ /home/opam/.opam/
+   - opam list
+   - opam depext -i $OPAM_PACKAGES
+  cache:
+   key: "frama-c"
+   paths:
+     - .gitlab_oci_cache/
+  script:
+   - autoconf
+   - ./configure
+   - make lint
+   - make stats-lint
+#   - make check-headers OPEN_SOURCE=yes STRICT_HEADERS=yes
+  coverage: '/lint coverage: \d+\.\d+/'
+  tags:
+   - docker
+
 
 frama-c-external:
   stage: frama_c_and_plugins

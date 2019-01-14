@@ -131,7 +131,7 @@ this option) when a typechecking error occurs is to reject the source file as
 is the case for typechecking errors within the C code. With this option on,
 the typechecker will only output a warning and discard the annotation but
 type‐checking will continue (errors in C code are still fatal, though). \
-**Deprecated**: use **-kernel-warn-abort=-annot-error** instead.
+**Deprecated**: use **-kernel-warn-key annot-error** instead.
 
 -cpp-command *cmd*
 : uses *cmd* as the command to pre-process C files.
@@ -206,9 +206,10 @@ instead.
 If false, padding bits are left uninitialized. Defaults to yes.
 
 -inline-calls *f1,...,fn*
-: syntactically inlines calls to functions *f1,...,fn*. Recursive functions
-are inlined only at the first level. Calls via function pointers are not
-inlined.
+: syntactically inlines calls to functions *f1,...,fn*.
+Use **@inline** to select all functions with attribute *inline*.
+Recursive functions are inlined only at the first level.
+Calls via function pointers are not inlined.
 
 -journal-disable
 : do not output a journal of the current session. See **-journal-enable**.
@@ -259,31 +260,17 @@ Can also be set on a per-plugin basis, with option -*\<plugin>*-**log**.
   Can also be set on a per-plugin basis, with option -*\<plugin>*-**msg-key**.
   Note that each plugin has its own set of categories.
 
-Options **-kernel-warn-***\<action>* below follow the same rules as
-**-kernel-msg-key**. Message categories and warning categories may have the
-same name, but they are independent from each other.
-Warning categories can also be set on a per-plugin basis,
-with options -*\<plugin>***-warn-***\<action>*.
-
-For the first three options, a negative form
-(**-k1**) will lead **k1** to generate warnings, while for **-kernel-warn-key**,
-it will disable category **k1** entirely (no related message will be emitted).
-
--kernel-warn-abort *k1,...,kn*
-: warning categories *k1,...,kn* abort the execution.
-
--kernel-warn-error *k1,...,kn*
-: warning categories *k1,...,kn* change Frama-C's exit status.
-
--kernel-warn-feedback *k1,...,kn*
-: warning categories *k1,...,kn* produce only a feedback message.
-
--kernel-warn-key *k1,...,kn*
-: warning categories *k1,...,kn* generate warnings.
-
-Finally, there are three variants of the options above which emit a single
-message per category: **-kernel-warn-err-once**,
-**-kernel-warn-feedback-once**, and **-kernel-warn-once**.
+-kernel-warn-key *k1=a1,...,kn=an*
+: controls the emission of warnings based on categories: for each warning
+  category *k*, associate action *a*.
+  Use **-kernel-warn-key help** to get a list of available warning categories
+  and their currently associated actions.
+  The following actions can be set per category:
+  **active** (warn), **feedback**, **error**, **abort**,
+  **once**, **feedback-once**, **err-once**.
+  Omitting the action is equivalent to setting it to **active**.
+  Warning categories can also be set on a per-plugin basis,
+  with option -*\<plugin>***-warn-key**.
 
 [-no]-lib-entry
 : indicates that the entry point is called during program execution.
@@ -359,6 +346,11 @@ by the **FRAMAC_PLUGIN** variable and the **-add-path** option).
 : transforms throw and try/catch statements into normal C functions.
 Defaults to no, unless the input source language has an exception mechanism.
 
+-remove-inlined *f1,...,fn*
+: removes inlined functions *f1,...,fn* from the AST, which must have been
+given to **-inline-calls**. Note: this option does not check if the given
+functions were fully inlined.
+
 -remove-projects *p1,...,pn*
 : removes the given projects *p1,...,pn*.
 **@all_but_current** removes all projects but the current one.
@@ -416,7 +408,7 @@ the analysis is launched).
 
 -ulevel *n*
 : syntactically unroll loops *n* times before the analysis. This can be quite
-costly and some plugins (e.g. EVA) provide more efficient ways to perform the
+costly and some plugins (e.g. Eva) provide more efficient ways to perform the
 same thing. See their respective manuals for more information. This can also be
 activated on a per-loop basis via the **loop pragma unroll <m>** directive.
 A negative value for *n* will inhibit such pragmas.
@@ -444,8 +436,14 @@ the case (this is the default).
 -warn-decimal-float *freq*
 : warns when a floating-point constant cannot be exactly represented
 (e.g. 0.1). *freq* can be one of **none**, **once**, or **all**. \
-**Deprecated**: use **-kernel-warn-once parser:decimal-float** (and variants)
-instead.
+**Deprecated**: use **-kernel-warn-key parser:decimal-float=once**
+(and variants) instead.
+
+[-no]-warn-left-shift-negative
+: generate alarms for signed left shifts on negative values. Defaults to yes.
+
+[-no]-warn-right-shift-negative
+: generate alarms for signed right shifts on negative values. Defaults to no.
 
 [-no]-warn-signed-downcast
 : generates alarms when signed downcasts may exceed the destination range.
@@ -460,6 +458,10 @@ Defaults to no.
 
 [-no]-warn-unsigned-overflow
 : generates alarms for unsigned operations that overflow. Defaults to no.
+
+[-no]-warn-invalid-bool
+: generates alarms for reads of trap representations of _Bool lvalues.
+Defaults to yes.
 
 ## Plugin-specific options
 

@@ -245,7 +245,8 @@ let cast_obj tgt src =
 
 let cast_ctyp tgt src =
   cast_obj (Ctypes.object_of tgt) (Ctypes.object_of src)
-let cast_ltyp tgt src = match Logic_utils.unroll_type src with
+let cast_ltyp tgt src =
+  match Logic_utils.unroll_type ~unroll_typedef:false src with
   | Ctype src -> cast_ctyp tgt src
   | _ -> Cast
 

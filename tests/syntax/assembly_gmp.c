@@ -52,7 +52,7 @@ File modified by CEA LIST for inclusion in Frama-C test suite
 
 #include "stddef.h"
 
-#ifdef __FC_MACHDEP_X86_32
+#ifdef __FC_MACHDEP_GCC_X86_32
 #define GMP_LIMB_BITS 32
 #define add_mssaaaa(m, s1, s0, a1, a0, b1, b0)				\
   __asm__ (  "add	%6, %k2\n\t"					\
@@ -63,7 +63,7 @@ File modified by CEA LIST for inclusion in Frama-C test suite
 	     "%2" ((USItype)(a0)), "g" ((USItype)(b0)))
 #endif
 
-#ifdef __FC_MACHDEP_X86_64
+#ifdef __FC_MACHDEP_GCC_X86_64
 #define GMP_LIMB_BITS 64
 #define add_mssaaaa(m, s1, s0, a1, a0, b1, b0)				\
   __asm__ (  "add	%6, %q2\n\t"					\
@@ -178,4 +178,17 @@ mpn_mod_1_1p (mp_srcptr ap, mp_size_t n, mp_limb_t b, const mp_limb_t bmodb[4])
 
   udiv_rnnd_preinv (r, r1, r0, b, bi);
   return r >> cnt;
+}
+
+int loc[10];
+
+void f(void) {
+
+unsigned long ulValue;
+unsigned long* pulValue = &ulValue;
+
+asm("sidt %0\n" : :"m"(loc));
+
+asm ("movq $36, (%0)": : "r"(pulValue));
+
 }

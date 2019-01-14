@@ -214,6 +214,11 @@ class autosplit =
         let open Qed.Logic in
         match F.e_expr goal with
         | And _ | If _ -> true
+        | Bind (Exists,_,phi) -> let rec is_split = function
+            | Bind (Exists,_,phi) -> is_split (F.repr (F.QED.lc_repr phi))
+            | And _ | Or _ | If _ | Imply _ -> true
+            | _ -> false
+            in is_split (F.repr (F.QED.lc_repr phi))
         | Neq(x,y) | Eq(x,y) -> (F.is_prop x) && (F.is_prop y)
         | _ -> false
       in

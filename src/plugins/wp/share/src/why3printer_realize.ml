@@ -77,53 +77,53 @@ let print_gen
       path prefix (id_unique ?sanitizer (getprinter ipr) id)
   with Not_found ->
     let ipr = (!info).local_printers in
-      Format.pp_print_string fmt prefix;
-      Format.pp_print_string fmt (id_unique ?sanitizer (getprinter ipr) id)
+    Format.pp_print_string fmt prefix;
+    Format.pp_print_string fmt (id_unique ?sanitizer (getprinter ipr) id)
 
 (* type variables always start with a quote *)
 let print_tv fmt x = print_gen
-  ~getid:(fun tv -> tv.tv_name)
-  ~getprinter:(fun p -> p.aprinter)
-  ~prefix:"'"
-  fmt x
+    ~getid:(fun tv -> tv.tv_name)
+    ~getprinter:(fun p -> p.aprinter)
+    ~prefix:"'"
+    fmt x
 
 (* logic variables always start with a lower case letter *)
 let print_vs fmt x = print_gen
-  ~getid:(fun vs -> vs.vs_name)
-  ~getprinter:(fun p -> p.iprinter)
-  ~sanitizer:String.uncapitalize_ascii
-  fmt x
+    ~getid:(fun vs -> vs.vs_name)
+    ~getprinter:(fun p -> p.iprinter)
+    ~sanitizer:String.uncapitalize_ascii
+    fmt x
 
 let forget_var vs = forget_id (!info).local_printers.iprinter vs.vs_name
 
 (* theory names always start with an upper case letter *)
 let print_th fmt x = print_gen
-  ~getid:(fun th -> th.th_name)
-  ~getprinter:(fun p -> p.cprinter)
-  ~sanitizer:String.capitalize_ascii
-  fmt x
+    ~getid:(fun th -> th.th_name)
+    ~getprinter:(fun p -> p.cprinter)
+    ~sanitizer:String.capitalize_ascii
+    fmt x
 
 let print_ts fmt x = print_gen
-  ~getid:(fun ts -> ts.ts_name)
-  ~getprinter:(fun p -> p.tprinter)
-  fmt x
+    ~getid:(fun ts -> ts.ts_name)
+    ~getprinter:(fun p -> p.tprinter)
+    fmt x
 
 let print_ls fmt x = print_gen
-  ~getid:(fun ls -> ls.ls_name)
-  ~getprinter:(fun p -> p.iprinter)
-  fmt x
+    ~getid:(fun ls -> ls.ls_name)
+    ~getprinter:(fun p -> p.iprinter)
+    fmt x
 
 (* constructor names always start with an upper case letter *)
 let print_cs fmt x = print_gen
-  ~getid:(fun ls -> ls.ls_name)
-  ~getprinter:(fun p -> p.cprinter)
-  ~sanitizer:String.capitalize_ascii
-  fmt x
+    ~getid:(fun ls -> ls.ls_name)
+    ~getprinter:(fun p -> p.cprinter)
+    ~sanitizer:String.capitalize_ascii
+    fmt x
 
 let print_pr fmt x = print_gen
-  ~getid:(fun pr -> pr.pr_name)
-  ~getprinter:(fun p -> p.pprinter)
-  fmt x
+    ~getid:(fun pr -> pr.pr_name)
+    ~getprinter:(fun p -> p.pprinter)
+    fmt x
 
 let query_syntax id = query_syntax !info.info_syn id
 let query_remove id = Mid.mem id !info.info_syn
@@ -139,9 +139,9 @@ let rec print_ty_node inn fmt ty = match ty.ty_node with
       | None -> begin match tl with
           | [] -> print_ts fmt ts
           | tl -> fprintf fmt (protect_on inn "%a@ %a")
-              print_ts ts (print_list space (print_ty_node true)) tl
-          end
-      end
+                    print_ts ts (print_list space (print_ty_node true)) tl
+        end
+    end
 
 let print_ty = print_ty_node false
 
@@ -176,9 +176,9 @@ let rec print_pat_node pri fmt p = match p.pat_node with
       | None -> begin match pl with
           | [] -> print_cs fmt cs
           | pl -> fprintf fmt (protect_on (pri > 1) "%a@ %a")
-              print_cs cs (print_list space (print_pat_node 2)) pl
-          end
-      end
+                    print_cs cs (print_list space (print_pat_node 2)) pl
+        end
+    end
 
 let print_pat = print_pat_node 0
 
@@ -210,20 +210,20 @@ and print_lterm pri fmt t =
 
 and print_app pri fs fmt tl =
   match query_syntax fs.ls_name with
-    | Some s -> syntax_arguments s print_term fmt tl
-    | None ->
+  | Some s -> syntax_arguments s print_term fmt tl
+  | None ->
       let print_symb = if fs.ls_constr > 0 then print_cs else print_ls in
       begin match tl with
         | [] -> print_symb fmt fs
         | tl -> fprintf fmt (protect_on (pri > 5) "%a@ %a")
-            print_symb fs (print_list space (print_lterm 6)) tl
-        end
+                  print_symb fs (print_list space (print_lterm 6)) tl
+      end
 
 and print_tnode pri fmt t = match t.t_node with
   | Tvar v ->
       print_vs fmt v
   | Tconst c ->
-      Number.print_constant fmt c                                               
+      Number.print_constant fmt c
   | Tapp (fs, tl) when unambig_fs fs ->
       print_app pri fs fmt tl
   | Tapp (fs, tl) ->
@@ -269,7 +269,7 @@ and print_tbranch fmt br =
 
 and print_tl fmt tl =
   if tl = [] then () else fprintf fmt "@ [%a]"
-    (print_list alt (print_list comma print_term)) tl
+      (print_list alt (print_list comma print_term)) tl
 
 (** Declarations *)
 
@@ -404,9 +404,9 @@ let print_meta_arg fmt = function
 
 let print_qt fmt th =
   if th.th_path = [] then print_th fmt th else
-  fprintf fmt "%a.%a"
-    (print_list (constant_string ".") string) th.th_path
-    print_th th
+    fprintf fmt "%a.%a"
+      (print_list (constant_string ".") string) th.th_path
+      print_th th
 
 let print_tdecl fmt td = match td.td_node with
   | Decl d ->
@@ -421,8 +421,8 @@ let print_tdecl fmt td = match td.td_node with
       let pm = Mpr.fold (fun x y a -> (x,y)::a) sm.sm_pr [] in
       fprintf fmt "@[<hov 2>(* clone %a with %a,@ %a,@ %a *)@]@\n@\n"
         print_qt th (print_list comma print_inst_ts) tm
-                    (print_list comma print_inst_ls) lm
-                    (print_list comma print_inst_pr) pm
+        (print_list comma print_inst_ls) lm
+        (print_list comma print_inst_pr) pm
   | Meta (m,al) ->
       fprintf fmt "@[<hov 2>(* meta %s %a *)@]@\n@\n"
         m.meta_name (print_list comma print_meta_arg) al
@@ -463,39 +463,39 @@ let print_task printer_args fmt task =
   (* find theories that are both used and realized from metas *)
   let realized_theories =
     Task.on_meta meta_realized_theory (fun mid args ->
-      match args with
-      | [Theory.MAstr src; Theory.MAstr dst] ->
-        (* TODO: do not split string; in fact, do not even use a
-           string argument *)
-        let f,id =
-          let l = Strings.rev_split '.' src in
-          List.rev (List.tl l), List.hd l in
-        let th = Env.read_theory printer_args.env f id in
-        let id =
-          let l = Strings.rev_split '.' dst in
-          List.hd l in
-        Mid.add th.Theory.th_name (th, dst, id) mid
-      | _ -> assert false
-    ) Mid.empty task in
+        match args with
+        | [Theory.MAstr src; Theory.MAstr dst] ->
+            (* TODO: do not split string; in fact, do not even use a
+               string argument *)
+            let f,id =
+              let l = Strings.rev_split '.' src in
+              List.rev (List.tl l), List.hd l in
+            let th = Env.read_theory printer_args.env f id in
+            let id =
+              let l = Strings.rev_split '.' dst in
+              List.hd l in
+            Mid.add th.Theory.th_name (th, dst, id) mid
+        | _ -> assert false
+      ) Mid.empty task in
   (* 2 cases: goal is clone T with [] or goal is a real goal *)
   let rec upd_realized_theories = function
     (** not realized *)
     | Some { Task.task_decl = { Theory.td_node =
-               Theory.Decl { Decl.d_node = Decl.Dprop (Decl.Pgoal, _, _) }}} ->
-      fprintf fmt "theory Task@\n";
-      realized_theories
+                                  Theory.Decl { Decl.d_node = Decl.Dprop (Decl.Pgoal, _, _) }}} ->
+        fprintf fmt "theory Task@\n";
+        realized_theories
     (** realized *)
     | Some { Task.task_decl = { Theory.td_node = Theory.Clone (th,_) }} ->
-      (** reserve the name used in the local theory in a consistent order *)
+        (** reserve the name used in the local theory in a consistent order *)
         Sid.iter (reserve_ident (!info).local_printers) th.Theory.th_local;
-      begin
-        try
-          let (_,_, id) = Mid.find th.Theory.th_name realized_theories in
-          fprintf fmt "theory %s@\n" id;
-        with Not_found ->
-          raise (NotInRealizedTheories(th))
-      end;
-      Mid.remove th.Theory.th_name realized_theories
+        begin
+          try
+            let (_,_, id) = Mid.find th.Theory.th_name realized_theories in
+            fprintf fmt "theory %s@\n" id;
+          with Not_found ->
+            raise (NotInRealizedTheories(th))
+        end;
+        Mid.remove th.Theory.th_name realized_theories
     | Some { Task.task_decl = { Theory.td_node = Theory.Meta _ };
              Task.task_prev = task } ->
         upd_realized_theories task
@@ -513,19 +513,19 @@ let print_task printer_args fmt task =
   let symbol_printers =
     let printers =
       Mid.map (fun th ->
-        let pr = fresh_printers () in
-        (** reserve all symbols in a consistent order *)
-        Sid.iter (reserve_ident pr) th.Theory.th_local;
-        pr
-      ) realized_theories' in
+          let pr = fresh_printers () in
+          (** reserve all symbols in a consistent order *)
+          Sid.iter (reserve_ident pr) th.Theory.th_local;
+          pr
+        ) realized_theories' in
     Mid.map (fun th ->
-      let _,_,s2 = Mid.find th.Theory.th_name realized_theories in
-      (s2, Mid.find th.Theory.th_name printers)
-    ) realized_symbols in
+        let _,_,s2 = Mid.find th.Theory.th_name realized_theories in
+        (s2, Mid.find th.Theory.th_name printers)
+      ) realized_symbols in
   info := { !info with
-    info_syn = get_syntax_map task;
-    symbol_printers = symbol_printers;
-  };
+            info_syn = get_syntax_map task;
+            symbol_printers = symbol_printers;
+          };
   let print_decls fmt dl =
     fprintf fmt "@\n@[<hov>%a@]" (print_list nothing print_decl) dl in
   print_decls fmt local_decls;
@@ -544,12 +544,12 @@ let print_realize args ?old:_ fmt task =
 
 
 let () = register_printer "why3-realize" print_realize
-  ~desc:"Printer@ for@ the@ logical@ format@ of@ Why3.
+    ~desc:"Printer@ for@ the@ logical@ format@ of@ Why3.
          @ Used for printing theories."
 
 let () = Exn_printer.register (fun fmt -> function
-  | NotInRealizedTheories th -> fprintf fmt
-    "The@ theory %s@ is@ asked@ to@ be@ realized@ but@ it@ is@ specified \
-     in no \"realized_theory\" meta." th.th_name.id_string
-  | exn -> raise exn
-)
+    | NotInRealizedTheories th -> fprintf fmt
+                                    "The@ theory %s@ is@ asked@ to@ be@ realized@ but@ it@ is@ specified \
+                                     in no \"realized_theory\" meta." th.th_name.id_string
+    | exn -> raise exn
+  )

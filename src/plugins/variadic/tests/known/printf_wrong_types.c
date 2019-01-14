@@ -29,4 +29,8 @@ int main(){
   printf("%Lf", f); // Type too short
   printf("%s", i); // Wrong type
   printf("%d", string); // Wrong type
+
+  typedef enum { OK, ERROR } RC;
+  RC rc = OK;
+  printf("%u", rc); // Wrong type (in strict mode)
 }

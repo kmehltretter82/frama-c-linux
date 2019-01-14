@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-load-module report -report -warn-signed-downcast -lib-entry -print -then -no-warn-signed-downcast -warn-unsigned-downcast -then -no-warn-unsigned-downcast -val-warn-signed-converted-downcast -then -main main5_wrap_signed -slevel 2 -no-print"
+   STDOPT: +"-load-module report -report -warn-signed-downcast -lib-entry -print -then -no-warn-signed-downcast -warn-unsigned-downcast -then -no-warn-unsigned-downcast -eva-warn-signed-converted-downcast -then -main main5_wrap_signed -slevel 2 -no-print"
 */
 
 signed char sx,sy,sz;
@@ -65,7 +65,7 @@ void main5_wrap_signed() {
 }
 
 
-/* Tests for the relaxed downcast semantics -val-warn-signed-converted-downcast */
+/* Tests for the relaxed downcast semantics -eva-warn-signed-converted-downcast */
 void main6_val_warn_converted_signed() {
   if (v) {
     short s = 65300u; // warning (overflow)
@@ -104,7 +104,7 @@ struct bitf {
   signed int i2: 6;
 };
 
-/* Tests for the relaxed downcast semantics -val-warn-signed-converted-downcast with bitfields */
+/* Tests for the relaxed downcast semantics -eva-warn-signed-converted-downcast with bitfields */
 void main8_bitfields() {
   struct bitf S;
   signed char c;

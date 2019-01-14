@@ -540,7 +540,8 @@ class why3 ~timeout ~prover ~pid ~file ~includes ~logout ~logerr =
       else
         match error with
         | Error_Generated(pos,message) ->
-            Wp_parameters.error ~source:pos "Why3 error:@\n%s" message ;
+            let source = Cil_datatype.Position.of_lexing_pos pos in
+            Wp_parameters.error ~source "Why3 error:@\n%s" message ;
             VCS.failed ~pos message
         | Error_No ->
             if r = 0 then

@@ -68,35 +68,6 @@ let backward_relation typ ~positive op =
     backward_float_relation (Fval.kind fk) ~positive op
   | _ -> assert false (* should never occur anyway *)
 
-let backward_shift_rhs typ_e1 v1 v2 =
-  let size = Cil.bitsSizeOf typ_e1 in
-  let size_int = Integer.pred (Integer.of_int size) in
-  let valid_range_rhs =
-    V.inject_ival (Ival.inject_range (Some Integer.zero) (Some size_int))
-  in
-  if not (V.is_arithmetic v2) || V.is_included v2 valid_range_rhs
-  then None
-  else Some (v1, V.narrow v2 valid_range_rhs)
-
-let backward_shift_left typ_e1 v1 v2 =
-  let res = backward_shift_rhs typ_e1 v1 v2 in
-  let warn_negative =
-    Value_parameters.WarnLeftShiftNegative.get() &&
-    Bit_utils.is_signed_int_enum_pointer typ_e1
-  in
-  if warn_negative then
-    let v1, v2 = match res with
-      | None -> v1, v2
-      | Some (v1, v2) -> v1, v2
-    in
-    let valid_range_lhs =
-      V.inject_ival (Ival.inject_range (Some Integer.zero) None)
-    in
-    if not (V.is_arithmetic v1) || V.is_included v1 valid_range_lhs
-    then res
-    else Some (V.narrow v1 valid_range_lhs, v2)
-  else res
-
 (* res == v1 +/- v2 *)
 let backward_add_int typ ~res_value ~v1 ~v2 pos =
   (* v1 == res -/+ v2 *)
@@ -134,7 +105,7 @@ let unsafe_backward_add_ptr size ~res_value ~v1 ~v2 pos =
   let scale = Int_Base.project size in
   let i1 = V.find Base.null v1 in
   (* Compute the reduced value for v2 = (+/- (res - v1)) / size. *)
-  let i2', _ =
+  let i2' =
     if pos
     then V.sub_untyped_pointwise res_value v1
     else V.sub_untyped_pointwise v1 res_value
@@ -162,7 +133,7 @@ let unsafe_backward_add_ptr size ~res_value ~v1 ~v2 pos =
   (* Compute the reduced value for v1 = res +/- size * v2. *)
   let i2 = V.find Base.null v2 in
   let factor = if pos then size else Int_Base.neg size in
-  let i1', _ = V.sub_untyped_pointwise ~factor res_value v2 in
+  let i1' = V.sub_untyped_pointwise ~factor res_value v2 in
   let factor = if pos then Int_Base.neg size else size in
   let p1' = V.add_untyped ~factor res_value (Cvalue.V.inject_ival i2) in
   let v1 = V.add Base.null i1' p1' in
@@ -229,7 +200,6 @@ let _backward_mult typ v1 v2 res_value =
 let backward_band ~v1 ~v2 ~res typ =
   let size = Cil.bitsSizeOf typ in
   let signed = Bit_utils.is_signed_int_enum_pointer typ in
-  let bitwise_and = V.bitwise_and ~size ~signed in
   (* Reduction of a when a & b = res. *)
   let backward_band_aux a b =
     (* For each bit, if a & _ = 1 then a = 1. [a1] is [a] with all such bits at 1
@@ -239,21 +209,18 @@ let backward_band ~v1 ~v2 ~res typ =
        (for the others, not (xor res b) = 1 and this bitwise_and has no effect
        on a). *)
     let a2 =
-      bitwise_and a (V.bitwise_not_size ~size ~signed (V.bitwise_xor res b))
+      V.bitwise_and a (V.bitwise_not ~size ~signed (V.bitwise_xor res b))
     in
     V.narrow a1 a2
   in
   backward_band_aux v1 v2, backward_band_aux v2 v1
 
-let backward_bor ~v1 ~v2 ~res typ =
-  let size = Cil.bitsSizeOf typ in
-  let signed = Bit_utils.is_signed_int_enum_pointer typ in
-  let bitwise_and = V.bitwise_and ~size ~signed in
+let backward_bor ~v1 ~v2 ~res =
   (* Reduction of a when a | b = res. *)
   let backward_bor_aux a b =
     (* For each bit, if a | _ = 0 then a = 0. [a1] is [a] with all such bits at 0
        (for the others, res = 1 and this bitwise_and has no effect on a). *)
-    let a1 = bitwise_and res a in
+    let a1 = V.bitwise_and res a in
     (* For each bit, if a | 0 = 1 then a = 1. [a2] is [a] with all such bits at 1
        (for the others, xor res b = 0 and this bitwise_or has no effect on a). *)
     let a2 = V.bitwise_or (V.bitwise_xor res b) a in
@@ -298,8 +265,8 @@ let backward_binop ~typ_res ~res_value ~typ_e1 v1 binop v2 =
     end
 
   | (Shiftrt | Shiftlt), TFloat _ -> None
-  | Shiftrt, _ -> backward_shift_rhs typ_e1 v1 v2
-  | Shiftlt, _ -> backward_shift_left typ_e1 v1 v2
+  | Shiftrt, _
+  | Shiftlt, _ -> None
 
   | Mod, TInt _ ->
     (* the following equality only holds when v1 does not change sign, which
@@ -334,7 +301,7 @@ let backward_binop ~typ_res ~res_value ~typ_e1 v1 binop v2 =
 
   | BAnd, TInt _ -> Some (backward_band ~v1 ~v2 ~res:res_value typ)
 
-  | BOr, TInt _ -> Some (backward_bor ~v1 ~v2 ~res:res_value typ)
+  | BOr, TInt _ -> Some (backward_bor ~v1 ~v2 ~res:res_value)
 
   | _, _ -> None
 
@@ -400,23 +367,18 @@ let backward_cast ~src_typ ~dst_typ ~src_val ~dst_val =
       | exception V.Not_based_on_null -> None
       | dst_f ->
         match f_dst, f_src with
-        | Fval.Float64,  Fval.Float64
-        | Fval.Float32,  Fval.Float32
-        | Fval.Real,     Fval.Real (* the cases above are dummy casts *)
-        | Fval.Float32, (Fval.Float64 | Fval.Real)
-        | Fval.Float64,  Fval.Real (* these two cases are downcasts *)
-          ->
-          (* beware that we must return a float32 when f_src is float32, so
-             that the result remains "well-typed". This is the case here. *)
-          Some dst_val
-        | (Fval.Float64 | Fval.Real), Fval.Float32 ->
+        | (Fval.Double | Fval.Real | Fval.Long_Double), Fval.Single ->
           begin
             match Fval.backward_cast_float_to_double dst_f with
             | `Bottom -> Some V.bottom
             | `Value fval ->  Some (V.inject_float fval)
           end
-        | Fval.Real, Fval.Float64 ->
+        | (Fval.Real | Fval.Long_Double), Fval.Double ->
           Some (V.inject_float (Fval.backward_cast_double_to_real dst_f))
+        | _, _ -> (* downcasts or dummy casts. *)
+          (* beware that we must return a float32 when f_src is float32, so
+             that the result remains "well-typed". This is the case here. *)
+          Some dst_val
     end
 
   | TInt _, TFloat (fkind, _) ->

@@ -1,6 +1,6 @@
 /* run.config
-  OPT: -val-show-progress -fct-pdg f1 -main f1 -journal-disable -pdg-print -pdg-verbose 2
-  OPT: -val-show-progress -fct-pdg loop -main loop -journal-disable -pdg-print -pdg-verbose 2
+  OPT: -eva-show-progress -fct-pdg f1 -main f1 -journal-disable -pdg-print -pdg-verbose 2
+  OPT: -eva-show-progress -fct-pdg loop -main loop -journal-disable -pdg-print -pdg-verbose 2
 */
 
 int G;

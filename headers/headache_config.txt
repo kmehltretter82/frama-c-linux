@@ -43,6 +43,8 @@
 | ".*frama-c" -> skip match:"#!.*"
 | "frama-c-config" -> frame open:"#"  line:"#" close:"#"
 | ".*frama-c-config" -> skip match:"#!.*"
+| "frama-c-script" -> frame open:"#"  line:"#" close:"#"
+| ".*frama-c-script" -> skip match:"#!.*"
 | "frama-c-gui" -> frame open:"#"  line:"#" close:"#"
 | ".*frama-c-gui" -> skip match:"#!.*"
 | "frama-c-gui.byte" -> frame open:"#"  line:"#" close:"#"
@@ -56,6 +58,8 @@
 # Perl scripts #
 ################
 | ".*\.perl" -> frame open:"#"  line:"#" close:"#"
+| "flamegraph.pl" -> frame open:"#"  line:"#" close:"#"
+| ".*flamegraph.pl" -> skip match:"#!.*"
 
 #########################
 # MS-Windows Resources #

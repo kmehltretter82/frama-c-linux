@@ -1,9 +1,14 @@
 [
   {
+    "classid": "Parsing",
+    "category": "annot-error",
+    "action": "ERROR"
+  },
+  {
     "classid": "RTE",
     "plugin": "wp",
     "warning": "Missing RTE guards",
-    "descr": "Shall run EVA plug-in"
+    "descr": "Shall run Eva plug-in"
   },
   {
     "classid": "GOAL",

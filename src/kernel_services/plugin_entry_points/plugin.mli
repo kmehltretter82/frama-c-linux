@@ -24,7 +24,7 @@
 (** Special signature for Kernel services, whose messages are handled in
     an ad'hoc manner. Should not be of any use for a standard plug-in,
     who would rather rely on {!Plugin.S} below.
-    @since Frama-C+dev
+    @since Chlorine-20180501
     @plugin development guide
 *)
 module type S_no_log = sig
@@ -64,11 +64,17 @@ module type S_no_log = sig
     (** The group containing options -*-debug and -*-verbose.
         @since Boron-20100401 *)
 
+  val add_plugin_output_aliases: string list -> unit
+  (** Adds aliases to the options -plugin-help, -plugin-verbose, -plugin-log,
+      -plugin-msg-key, and -plugin-warn-key.
+      [add_plugin_output_aliases [alias]] adds the aliases -alias-help,
+      -alias-verbose, etc.
+      @since 18.0-Argon *)
 end
 
 (** Provided plug-general services for plug-ins.
     @since Beryllium-20090601-beta1
-    @modify Frama-C+dev removed programmatic access to [Debug_category]:
+    @modify Chlorine-20180501 removed programmatic access to [Debug_category]:
     managing categories is now entirely done by Log.Messages
     @plugin development guide *)
 module type S = sig
@@ -133,7 +139,7 @@ val plugin_subpath: string -> unit
 val default_msg_keys: string list -> unit
 (** Debug message keys set by default for the plugin.
     @since Silicon-20161101
-    @deprecated since Frama-C+dev use directly functions from Log
+    @deprecated since Chlorine-20180501 use directly functions from Log
      (add_debug_keys and del_debug_keys) to manage the default status of each
      category
  *)

@@ -1,8 +1,9 @@
 \documentclass[a4paper,11pt,twoside,openright,web]{frama-c-book}
 
+\newcommand{\framacversion}%
+           {\input{../../VERSION} (\input{../../VERSION_CODENAME}\unskip)}
 %%\usepackage{microtype}
 \input{macros_modern}
-%%\input{framacversion.tex}
 %%modern \usepackage{pslatex}
 %%modern \usepackage{a4wide}
 
@@ -46,18 +47,17 @@
 % définition des marques pour les itemize
 %%modern \renewcommand{\labelitemi}{$\bullet$}
 \renewcommand{\labelitemii}{$\triangleright$}
-\input{framacversion.tex}
 %==============================================================================
 \begin{document}
 
-\coverpage{Annotation Generation}
+\coverpage{RTE --- Runtime Error Annotation Generation}
 
 \begin{titlepage}
 \begin{flushleft}
 \includegraphics[height=14mm]{cealistlogo.jpg}
 \end{flushleft}
 \vfill
-\title{Frama-C's annotation generator plug-in}{for Frama-C \framacversion}
+\title{Frama-C's RTE plug-in}{for Frama-C \framacversion}
 \author{Philippe Herrmann and Julien Signoles}
 \begin{tabular}{l}
 CEA LIST, Software Safety Laboratory, Saclay, F-91191 \\

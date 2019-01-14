@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -val -val-show-progress -slevel-function main:10 -load-script tests/misc/issue109.ml
+   OPT: -eva -eva-show-progress -slevel-function main:10 -load-script tests/misc/issue109.ml
 */
 
 void main() {

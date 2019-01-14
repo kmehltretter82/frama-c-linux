@@ -268,7 +268,7 @@ sig
       the left-margin of the source buffer.
       These icons depend on the GUI theme, and must be reset when the
       theme is changed.
-      @since Frama-C+dev *)
+      @since Chlorine-20180501 *)
 
   val mark : GSourceView2.source_buffer
     -> ?call_site:stmt

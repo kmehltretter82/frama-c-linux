@@ -1,34 +1,31 @@
 [kernel] Parsing tests/nonterm/n9.i (no preprocessing)
-[value] Analyzing a complete application starting at main
-[value] Computing initial state
-[value] Initial state computed
-[value:initial-state] Values of globals at initialization
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
-[value] computing for function f <- main.
+[eva] computing for function f <- main.
   Called from tests/nonterm/n9.i:41.
-[value] tests/nonterm/n9.i:7: entering loop for the first time
-[value] Recording results for f
-[value] Done for function f
-[value] computing for function g <- main.
+[eva] Recording results for f
+[eva] Done for function f
+[eva] computing for function g <- main.
   Called from tests/nonterm/n9.i:42.
-[value] tests/nonterm/n9.i:19: entering loop for the first time
-[value] Recording results for g
-[value] Done for function g
-[value] computing for function f_explicit_break <- main.
+[eva] Recording results for g
+[eva] Done for function g
+[eva] computing for function f_explicit_break <- main.
   Called from tests/nonterm/n9.i:43.
-[value] tests/nonterm/n9.i:29: entering loop for the first time
-[value] Recording results for f_explicit_break
-[value] Done for function f_explicit_break
-[value] Recording results for main
-[value] done for function main
-[value] ====== VALUES COMPUTED ======
-[value:final-states] Values at end of function f:
+[eva] Recording results for f_explicit_break
+[eva] Done for function f_explicit_break
+[eva] Recording results for main
+[eva] done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function f:
   NON TERMINATING FUNCTION
-[value:final-states] Values at end of function f_explicit_break:
+[eva:final-states] Values at end of function f_explicit_break:
   NON TERMINATING FUNCTION
-[value:final-states] Values at end of function g:
+[eva:final-states] Values at end of function g:
   NON TERMINATING FUNCTION
-[value:final-states] Values at end of function main:
+[eva:final-states] Values at end of function main:
   res ∈ {0}
   __retres ∈ {0}
 [nonterm] tests/nonterm/n9.i:7: Warning: 

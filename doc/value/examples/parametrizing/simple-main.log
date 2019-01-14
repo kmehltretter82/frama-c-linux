@@ -1,20 +1,21 @@
 [kernel] Parsing simple-main.c (with preprocessing)
-[value] Analyzing a complete application starting at main
-[value] Computing initial state
-[value] Initial state computed
-[value] Values of globals at initialization
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
   
-[value] DUMPING STATE of file simple-main.c line 3
-        argc ∈ [--..--]
-        argv ∈ {{ NULL ; &S_argv[0] }}
-        __retres ∈ UNINITIALIZED
-        S_argv[0] ∈ {{ NULL ; &S_0_S_argv[0] }}
-              [1] ∈ {{ NULL ; &S_1_S_argv[0] }}
-        S_0_S_argv[0..1] ∈ [--..--]
-        S_1_S_argv[0..1] ∈ [--..--]
-        =END OF DUMP==
-[value] Recording results for main
-[value] done for function main
-[value] ====== VALUES COMPUTED ======
-[value] Values at end of function main:
+[eva] simple-main.c:3: 
+  Frama_C_dump_each:
+  # Cvalue domain:
+  argc ∈ [--..--]
+  argv ∈ {{ NULL ; &S_argv[0] }}
+  __retres ∈ UNINITIALIZED
+  S_argv[0] ∈ {{ NULL ; &S_0_S_argv[0] }}
+        [1] ∈ {{ NULL ; &S_1_S_argv[0] }}
+  S_0_S_argv[0..1] ∈ [--..--]
+  S_1_S_argv[0..1] ∈ [--..--]
+  ==END OF DUMP==
+[eva] done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function main:
   __retres ∈ {0}

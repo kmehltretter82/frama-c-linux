@@ -15,7 +15,7 @@ if [[ $rcexec != 152 && $rcexec != 137 ]]
 then
     if grep "user.0m0.0[01]" time$N
     then
-	( ulimit -S -t 18000 -m 2500000 ; exec ~/ppc/bin/toplevel.opt -warn-signed-overflow -val t$N.i -stop-at-first-alarm -no-val-show-progress -machdep $FRAMAC3264 -obviously-terminates -precise-unions > res$N.value )
+	( ulimit -S -t 18000 -m 2500000 ; exec ~/ppc/bin/toplevel.opt -warn-signed-overflow -eva t$N.i -stop-at-first-alarm -eva-no-show-progress -machdep $FRAMAC3264 -obviously-terminates -precise-unions > res$N.value )
 	rc=$?
 	if grep imprecise res$N.value
 	then  

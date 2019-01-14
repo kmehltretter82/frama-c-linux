@@ -1,4 +1,4 @@
-# frama-c -wp [...]
+# frama-c -wp -wp-timeout 90 -wp-steps 50 [...]
 [kernel] Parsing tests/wp_store/nonaliasing.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Loading driver 'share/wp.driver'
@@ -7,7 +7,7 @@
 [wp] [Alt-Ergo] Goal typed_f_ensures_qed_ko_P_oracle_ko : Unknown
 [wp] [Alt-Ergo] Goal typed_f_ensures_qed_ko_Q_oracle_ko : Unknown
 [wp] Proved goals:    0 / 2
-  Alt-Ergo:        0  (unknown: 2)
+  Alt-Ergo:        0  (interrupted: 2)
 [wp] Report 'tests/wp_store/nonaliasing.i.1.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success

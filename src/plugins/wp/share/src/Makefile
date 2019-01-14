@@ -167,7 +167,7 @@ aux/%.coq-why3.aux: %.why %.why_theory Makefile aux
 	@rm -f $@.tmp;
 	@for theory in $$(cat $*.why_theory); do\
 	 NAMELOWER=`ocaml lower.ml "$$theory"`; \
-	 echo 'theory $*.'"$$theory"' meta "realized_theory" "'"$$NAMELOWER"'.'"$$theory"'", "'"$$theory"'" end' >> $@.tmp;\
+	 echo 'theory '"$$NAMELOWER"'.'"$$theory"' meta "realized_theory" "'"$$NAMELOWER"'.'"$$theory"'", "'"$$theory"'" end' >> $@.tmp;\
 	 done;
 	@mv $@.tmp $@
 

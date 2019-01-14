@@ -4,7 +4,7 @@
 [wp] Loading driver 'share/wp.driver'
 [rte] annotating function BinaryMultiplication
 [wp] Goal typed_lemma_ax1_lack : not tried
-[wp] Goal typed_lemma_ax2_ok : not tried
+[wp] Goal typed_lemma_ax2_lack : not tried
 [wp] Goal typed_lemma_ax3_lack : not tried
 [wp] Goal typed_lemma_ax4_lack : not tried
 [wp] Goal typed_lemma_ax5_ok : not tried

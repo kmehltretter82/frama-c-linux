@@ -132,7 +132,7 @@ struct lconv
                                   )
 
 extern struct lconv* __frama_c_locale;
-extern char*__frama_c_locale_names[];
+extern char*__frama_c_locale_names[512];
 
 /*@ 
   requires locale_null_or_valid_string: locale == \null || valid_read_string(locale);

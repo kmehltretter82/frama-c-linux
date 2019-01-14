@@ -2,7 +2,7 @@
 
 # This scripts creates the ptests config files for the alternative testing
 # configurations of Eva. You must create the tests/test_config and
-# tests/non-free/test_config yourselves. The other files are created
+# tests/builtins/test_config yourselves. The other files are created
 # accordingly. The syntax for the root test_config files is as follows
 # (2 lines):
 #
@@ -31,9 +31,9 @@ arraylength=${#domains[@]}
 cd tests
 CUR=`pwd`
 
-#TODO: générer le test_config de non-free à partir de celui racine ?
+#TODO: générer le test_config de builtins à partir de celui racine ?
 
-for A in  . non-free
+for A in  . builtins
 do
     cd $CUR/$A
 

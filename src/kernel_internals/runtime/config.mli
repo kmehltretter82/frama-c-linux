@@ -24,7 +24,23 @@
     The body of this module is generated from Makefile. *)
 
 val version: string
-  (** Frama-C Version identifier. *)
+(** Frama-C Version identifier. *)
+
+val codename: string
+(** Frama-C version codename.
+    @since 18.0-Argon *)
+
+val version_and_codename: string
+(** Frama-C version and codename.
+    @since 18.0-Argon *)
+
+val major_version: int
+(** Frama-C major version number.
+    @since Frama-C+dev *)
+
+val minor_version: int
+(** Frama-C minor version number.
+    @since Frama-C+dev *)
 
 val is_gui: bool ref
   (** Is the Frama-C GUI running?
@@ -40,7 +56,7 @@ val ocamlopt: string
 
 val ocaml_wflags: string
   (** Warning flags used when compiling Frama-C.
-      @since Frama-C+dev *)
+      @since Chlorine-20180501 *)
 
 val datadir: string
   (** Directory where architecture independent files are. *)
@@ -106,7 +122,7 @@ val dot: string option
 
 val has_yojson: bool
 (** [true] if Frama-C has been compiled with yojson support.
-    @since Frama-C+dev
+    @since Chlorine-20180501
 *)
 
 (*

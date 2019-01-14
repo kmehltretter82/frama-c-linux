@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-value-msg-key d-symblocs"
+   STDOPT: +"-eva-msg-key d-symblocs"
 */
 
 volatile v;

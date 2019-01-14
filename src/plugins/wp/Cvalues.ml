@@ -73,8 +73,10 @@ and constant_term t =
 (* -------------------------------------------------------------------------- *)
 
 (* The type contains C-integers *)
-let rec is_constrained ty =
-  match Ctypes.object_of ty with
+let rec is_constrained typ =
+  is_constrained_obj (Ctypes.object_of typ)
+
+and is_constrained_obj = function
   | C_int _ -> true
   | C_float _ -> false
   | C_pointer _ -> false
@@ -198,7 +200,7 @@ module TYPE = STRUCTURAL
 let has_ctype = TYPE.is_typ
 
 let has_ltype ltype e =
-  match Logic_utils.unroll_type ltype with
+  match Logic_utils.unroll_type ~unroll_typedef:false ltype with
   | Ctype typ -> has_ctype typ e
   | Ltype _ | Lvar _ | Linteger | Lreal | Larrow _ -> p_true
 
@@ -206,12 +208,12 @@ let is_object obj = function
   | Loc _ -> p_true
   | Val e -> TYPE.is_obj obj e
 
-let cdomain typ =
-  if is_constrained typ then Some(has_ctype typ) else None
+let cdomain obj =
+  if is_constrained_obj obj then Some(TYPE.is_obj obj) else None
 
 let ldomain ltype =
-  match Logic_utils.unroll_type ltype with
-  | Ctype typ -> cdomain typ
+  match Logic_utils.unroll_type ~unroll_typedef:false ltype with
+  | Ctype typ -> cdomain (Ctypes.object_of typ)
   | Ltype _ | Lvar _ | Linteger | Lreal | Larrow _ -> None
 
 (* -------------------------------------------------------------------------- *)

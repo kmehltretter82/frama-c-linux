@@ -392,22 +392,11 @@ let range i a =
       else F.p_leq F.e_zero a
   | Machine -> p_call (p_is_int i) [a]
 
-let check_rte () =
-  if Wp_parameters.RTE.get () ||
-     Dynamic.Parameter.Bool.get "-rte" ()
+let ensures warn i a =
+  if warn i
   then
-    (Wp_parameters.warning ~once:true
-       "Option -wp-overflows incompatiable with RTE (ignored)" ;
-     false)
-  else true
-
-let ensures error i a =
-  if error i
-  then
-    (if Wp_parameters.Overflows.get () && Lang.has_gamma () &&
-        check_rte ()
-     then
-       Lang.assume (range i a) ;
+    (if Lang.has_gamma () && Wp_parameters.get_overflows ()
+     then Lang.assume (range i a) ;
      a)
   else e_fun (f_to_int i) [a]
 

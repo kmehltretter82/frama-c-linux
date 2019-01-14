@@ -25,9 +25,6 @@ for:
   or invalid memory access;
 \item unsigned integer overflows, which are allowed by the C language but may
   pose problem to solvers;
-\item precondition checking ({\it requires} and {\it assumes} clauses) at
-  function's call sites, as well as postconditions ({\it ensures} clauses) and
-  {\it assigns}, for functions having an ACSL specification.
 \end{itemize}
 
 In a modular proof setting, the main purpose of the \rte{} plug-in is to seed
@@ -137,9 +134,6 @@ by making such wide-ranging and easily checkable assumptions.  {\bf Therefore
 
 \item absence of unsigned overflows checking. Although unsigned overflows are
   well-defined, some plug-ins may wish to avoid them.
-
-\item generating call sites statement contracts, based on the called function's
-  contract. This is useful for modular verification.
 
 \item accesses to arrays that are embedded in a struct occur withing valid
   bounds. This is stricter than verifying that the accesses occurs within the
@@ -779,103 +773,6 @@ considered:
 %% Value analysis rounds to nearest lower silently (?).
 %% demote a real floating type to another and procuce a value outside the range = undefined
 
-\chapter{Precondition annotation generation}
-
-%%\section{Preconditions at call sites}
-Using ACSL, the Frama-C frameworks allows the user to write contracts for C
-functions. These contracts contain in particular:
-
-\begin{itemize}
-\item \lstinline|requires| clauses \lstinline|$R_1$, $R_2$, $\ldots$|
-  (preconditions),
-\item \lstinline|ensures| clauses \lstinline|$E_1$, $E_2$, $\ldots$|
-  (postconditions),
-\item \lstinline|assigns| clauses \lstinline|$A_1$, $A_2$, $\ldots$| (set of
-  locations assigned by the function).
-\end{itemize}
-
- The intended behavior is that any caller must make sure that the function is
- called in a state where the required property 
-\lstinline|$R_1$ && $R_2$ && $\ldots$| holds, to ensure that
- \lstinline|$E_1$ && $E_2$ && $\ldots$| holds in 
- the state returned by the function call.  Contracts may contain several named
- behaviors as well, see the ACSL manual.
-
-For a function having a contract, the \rte{} plug-in generates a statement
-annotation corresponding to the contract at each call site, if the option
-\texttt{-rte-precond} is specified.  It does so by substituting formal
-parameters of the contract with actual parameters at the call site.  The
-generated statement annotation ensures that the function is called in the proper
-state and specifies its return state.
-
-\begin{example} ~
-
-Consider function \lstinline|f| with the following contract:
-
-\listinginput{1}{fcontract.c}
-
-Here is the output of \rte{} with the option \texttt{-rte-precond}: 
-\listinginput{1}{stmtannot.c}
-
-The generated behaviors names are \lstinline|pre_f, pre_f_pos, pre_f_neg|).
-Notice that \lstinline|assigns| clauses are also taken into account, and that
-the formal \lstinline|\result| is substituted with the assigned left-value.
-
-\end{example}
-
-The main restriction is that the \rte{} plug-in only performs syntactic
-detection of function calls: functions called through pointers are warned about
-but no statement annotation is generated. This is unlikely to change until ACSL
-introduces contracts on function pointers.
-
-%% Another restriction concerns statements in which the returned value of a
-%% function is assigned to a left value with an intermediate cast. In that case, no
-%% statement annotation is generated and a warning is issued as can be checked on
-%% the following example:
-
-%% \begin{listing-nonumber}
-%% > cat castoncall.i
-%% /*@ ensures \result > 0;
-%%     assigns \result; */
-%% int f();
-
-%% int main() {
-%%   char c;
-%%   c = f ();
-%%   return 0;
-%% }
-
-%% > frama-c -rte -rte-precond castoncall.c
-
-%% [kernel] preprocessing with "gcc -C -E -I.  /tmp/castoncall.c''
-%% [rte] annotating function main
-%% /tmp/castoncall.c:9:[rte] warning: (c = (char)f();) function call with 
-%% intermediate cast: not treated
-%% \end{listing-nonumber}
-
-%% This comes from the fact that by default, the statement \lstinline|c = f();|  is
-%% translated to 
-
-%% \lstinline|c = (char) f();|
-
-%% To overcome this restriction, use the \lstinline|-no-collapse-call-cast|
-%% option. This will transform the statement into an equivalent sequence on
-%% which the annotation generation won't fail:
-
-%% \begin{listing-nonumber}
-%% /*@ behavior pre_f_0:
-%%     ensures tmp > 0;
-%%     assigns tmp; */
-%% tmp = f();
-%% c = (char) tmp;
-%% \end{listing-nonumber}
-
-
-%%Adding annotation based on preconditions at functions call sites.
-%%Preconditions usually refer to the function's formal parameters (and may also refer to global variables, 
-%%which are not a problem w.r.t. annotation generation), hence the assertion to be checked at a function's call site 
-%%is obtained by substituting the formal parameters with the actual parameters used for the call. 
-
 \chapter{Plug-in Options}
 
 Enabling \rte{} plug-in is done by adding \lstinline|-rte| on the command-line
@@ -903,14 +800,12 @@ implementation-defined behaviors) it handles. The user should explicitly add
 \lstinline|-warn-unsigned-overflow| and \lstinline|-warn-unsigned-downcast| (not
 entailed by \lstinline|-rte-all|) to generated unsigned overflows annotations
 and unsigned downcasts annotations respectively, which are valid as of
-\cnn{}. In a similar way, \lstinline|-rte-precond| must be explictly used to
-generate precondition annotations.
+\cnn{}.
 
 On the other hand, to generate only a subset of possible annotations, one has to
 use \lstinline|-rte-no-all| in conjunction with other positive options. For
-instance, used in conjunction with \lstinline|-rte-precond| alone, only
-precondition annotations would be generated. Adding \lstinline|-rte-mem|,
-annotations for the validity of memory access would also be generated.
+instance, used in conjunction with \lstinline|-rte-mem| alone,
+only annotations for the validity of memory access would be generated.
 
 Some examples:
 
@@ -918,8 +813,8 @@ Some examples:
 
 \item
 
-\lstinline|frama-c -rte -rte-select f,g -rte-no-all -rte-precond|: only generate
-precondition annotations, and only for call-sites found in functions
+\lstinline|frama-c -rte -rte-select f,g -rte-no-all -rte-mem|: only generate
+annotations for memory accesses, and only for call-sites found in functions
 \lstinline|f| and \lstinline|g|.
 
 \item
@@ -929,10 +824,9 @@ annotations for unsigned overflows, for the whole C program.
 
 \item
 
-\texttt{frama-c -rte -warn-unsigned-overflow -rte-precond
-  -rte-no-trivial-annotations}: generate all possible annotations (unsigned
-overflows and precondition annotations included), but do not try to evaluate
-their status through constant folding.
+\texttt{frama-c -rte -warn-unsigned-overflow -rte-no-trivial-annotations}:
+generate all possible annotations (unsigned overflows included),
+but do not try to evaluate their status through constant folding.
 
 \end{itemize}
 
@@ -983,9 +877,6 @@ casts from floating-point to integer \\
 \hline
 \lstinline |-rte-trivial-annotations| & boolean (true) & Generate status for
 annotation through constant folding \\
-\hline
-\lstinline |-rte-precond| & boolean (false) & Generate contract-based statement
-behaviors based at call sites \\
 \hline
 \lstinline |-rte-warn| & boolean (true) & Emit warning on broken annotations \\
 \hline

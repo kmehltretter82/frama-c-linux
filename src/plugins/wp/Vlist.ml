@@ -136,6 +136,9 @@ let rewrite_length e =
   | L.Fun( elt , [_] ) when elt == f_elt -> F.e_one
   | L.Fun( concat , es ) when concat == f_concat ->
       F.e_sum (List.map v_length es)
+  | L.Fun( repeat , [ u ; n ] ) when repeat == f_repeat &&
+                                     Cint.is_positive_or_null n ->
+      F.e_mul (v_length u) n
   | _ -> raise Not_found
 
 let rec get_nth k e =
@@ -222,12 +225,39 @@ let rewrite_is_nil a =
       F.p_or (F.p_leq n F.e_zero) (p_is_nil u)
   | _ -> raise Not_found
 
+let elements a =
+  match F.repr a with
+  | L.Fun( nil , [] ) when nil == f_nil -> []
+  | L.Fun( concat , es ) when concat == f_concat -> es
+  | _ -> [a]
+
+(* [omit rs x ys]: if ys = u.x.v returns (rs+u,v) with r in reverse order *)
+
+let rec omit rs x = function
+  | [] -> raise Not_found
+  | y::ys -> if x == y then rs,ys else omit (y::rs) x ys
+
+let rec subsequence xs rs ys =
+  match xs with
+  | [] -> List.rev_append rs ys
+  | x::xs ->
+      let rs,ys = omit rs x ys in
+      subsequence xs rs ys
+
 let rewrite_eq a b =
   match F.repr a , F.repr b with
   | L.Fun(nil,[]) , _ when nil == f_nil -> rewrite_is_nil b
   | _ , L.Fun(nil,[]) when nil == f_nil -> rewrite_is_nil a
   | _ ->
-      try leftmost_eq a b with Not_found -> rightmost_eq a b
+      try leftmost_eq a b with Not_found ->
+      try rightmost_eq a b with Not_found ->
+        let xs = elements a in
+        let ys = elements b in
+        if List.length xs < List.length ys
+        then F.p_all p_is_nil (subsequence xs [] ys)
+        else F.p_all p_is_nil (subsequence ys [] xs)
+
+(* All Simplifications *)
 
 let () =
   Context.register

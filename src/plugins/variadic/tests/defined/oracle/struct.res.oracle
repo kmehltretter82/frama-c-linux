@@ -1,16 +1,16 @@
 [variadic] tests/defined/struct.c:18: Declaration of variadic function inter.
 [variadic] tests/defined/struct.c:41: 
   Generic translation of call to variadic function.
-[value] Analyzing a complete application starting at main
-[value] Computing initial state
-[value] Initial state computed
-[value] done for function main
-[value] ====== VALUES COMPUTED ======
-[value:final-states] Values at end of function max:
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva] done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function max:
   
-[value:final-states] Values at end of function min:
+[eva:final-states] Values at end of function min:
   
-[value:final-states] Values at end of function inter:
+[eva:final-states] Values at end of function inter:
   ret.left ∈ {10}
      .top ∈ {30}
      .right ∈ {20}
@@ -21,7 +21,7 @@
      .bottom ∈ {60}
   i ∈ {2}
   list ∈ {{ &__va_args[1] }}
-[value:final-states] Values at end of function main:
+[eva:final-states] Values at end of function main:
   r.left ∈ {10}
    .top ∈ {30}
    .right ∈ {20}

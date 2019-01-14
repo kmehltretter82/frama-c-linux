@@ -459,6 +459,9 @@ by any plug-in.
 \texttt{PLUGIN\_NAME} is the capitalized name of your plug-in while
 \texttt{PLUGIN\_CMO} is the list of the files $.cmo$ generated from your \caml
 sources.
+Note that, by default, during compilation of your plug-in all warnings are
+disabled; it is recommended to define environment variable
+\texttt{DEVELOPMENT=yes} to enable the standard set of compilation warnings.
 \end{example}
 
 \begin{important}
@@ -1309,7 +1312,12 @@ plug-in. The main routines of interest are:
   however.
 
   The \lstinline{abort} routine is a variant that raises an exception
-  and thus aborts the computation.
+  and thus immediately aborts the computation\footnote{The raised
+  exception is not supposed to be caught by anything else than the
+  main entry point of Frama-C.}.
+  If you use \lstinline{error},
+  execution will continue until the end of current stage or current
+  group of the running phase (see section~\ref{adv:init}).
 
 %%item
   \logprintfvariant{failure}{fatal}%
@@ -1318,6 +1326,8 @@ plug-in. The main routines of interest are:
   computation. Typically, you have just discovered a bug in your plug-in!
 
   The \lstinline{fatal} routine is a variant that raises an exception.
+  \lstinline{failure} has a behavior similar to \lstinline{error} above,
+  except that it denotes an internal error instead of a user error.
 
 %%item
   \logprintf{verify}{ (condition)}%
@@ -3863,16 +3873,34 @@ directly stored in the AST. These modules and functions are the following.
 
 \framac supports the possibility of adding specific ACSL annotations in the
 form of special clauses.
-Such clauses can be found in two places: in a contract, where they are
+Such clauses can be of different categories, as described by
+\scodeidx{Cil\_types}{ext\_category}\texttt{Cil\_types.ext\_category}.
+\begin{itemize}
+\item A contract extension will be
 stored in the \texttt{b\_extended}\sscodeidx{Cil\_types}{behavior}{b\_extended} field of
-\texttt{Cil\_types.behavior}\scodeidx{Cil\_types.behavior}, or
-in a loop annotation, a special form of
-\texttt{code\_annotation}\scodeidx{Cil\_types}{code\_annotation} introduced by the
-\texttt{AExtended} constructor. Such annotations
-must be introduced by a keyword \texttt{kw}
-(or \texttt{loop kw} for loop annotations) that will be used to identify them
-in the AST. An \texttt{acsl\_extension}\scodeidx{Cil\_types}{acsl\_extension} is a pair
-\texttt{(kw, ext)} where \texttt{kw} identifies the extension and ext is an
+\texttt{Cil\_types.behavior}\scodeidx{Cil\_types}{behavior}.
+\item A global extension will be found as a global ACSL annotation in the form of a
+\scodeidx{Cil\_types}{Dextended}\texttt{Cil\_types.Dextended} constructor.
+\item A code annotation extension will be stored with an
+\scodeidx{Cil\_types}{AExtended}\texttt{Cil\_types.AExtended} constructor. Such an extension has itself
+different flavors, determined by the \scodeidx{Cil\_types}{ext\_code\_annot\_context} type:
+\begin{itemize}
+\item it can be meant to be evaluated exactly at the current program point
+ (like an ACSL \texttt{assert}), or
+\item it can be related to the next statement (or block), like an ACSL statement contract, or
+\item it can be a loop extension, or
+\item it can be used both as a loop extension or be related to the next (non-loop) statement.
+\end{itemize}
+\end{itemize}
+
+An extension is characterized by its introducing keyword \texttt{kw}, or \texttt{loop kw} for a loop
+extension. It is not possible to have the same keyword for two distinct extensions, especially if
+they belong to different categories, as this would lead to ambiguities in the parser.
+
+An \texttt{acsl\_extension}\scodeidx{Cil\_types}{acsl\_extension} is a triple
+\texttt{(id, kw, ext)} where \texttt{id} is its unique ID, used in annotation tables and generated
+by \scodeidx{Logic\_const}{new\_acsl\_extension}\texttt{Logic\_const.new\_acsl\_extension},
+\texttt{kw} identifies the extension, and \texttt{ext} is an
 \texttt{acsl\_extension\_kind}\scodeidx{Cil\_types}{acsl\_extension\_kind}
 and can take three forms:
 \begin{itemize}
@@ -3890,35 +3918,54 @@ the corresponding list is traversed normally by the visitor
 (see section~\ref{adv:visitors}).
 
 In order for the extension to be recognized by the parser, it must be
-registered by the
-\texttt{Logic\_typing.register\_behavior\_extension}%
+registered by one of the following functions, depending on its category:
+\begin{itemize}
+\item \texttt{Logic\_typing.register\_behavior\_extension}%
 \scodeidx{Logic\_typing}{register\_behavior\_extension}
-function.
-After a call to
-\verb|Logic_typing.register_behavior_extension kw f|,
+\item \texttt{Logic\_typing.register\_global\_extension}%
+\scodeidx{Logic\_typing}{register\_global\_extension}
+\item \texttt{Logic\_typing.register\_code\_annot\_extension}%
+\scodeidx{Logic\_typing}{register\_code\_annot\_extension}
+\item \texttt{Logic\_typing.register\_code\_annot\_next\_stmt\_extension}%
+\scodeidx{Logic\_typing}{register\_code\_annot\_next\_stmt\_extension}
+\item \texttt{Logic\_typing.register\_code\_annot\_next\_loop\_extension}%
+\scodeidx{Logic\_typing}{register\_code\_annot\_next\_both\_extension}
+\item \texttt{Logic\_typing.register\_code\_annot\_next\_both\_extension}%
+\scodeidx{Logic\_typing}{register\_code\_annot\_next\_loop\_extension}
+\end{itemize}
+After a call to the appropriate registration function,
 a clause of the form \verb|kw e1,...,en;|, where each \verb|ei| can be
 any syntactically valid ACSL term or predicate,
 will be treated by the parser
-as belonging to the extension \verb|kw|. Extensions clauses must occur after
-\verb|assumes| and \verb|requires| clauses if any, must can be freely
+as belonging to the extension \verb|kw|. Contract extension clauses must occur after
+\verb|assumes| and \verb|requires| clauses if any, but can be freely
 mixed with other behavior clauses (post-conditions, \verb|assigns|,
 \verb|frees| and \verb|allocates|).
+
 Similarly, in a loop annotation,
 \verb|loop kw e1, ..., en;| will be treated as belonging to the \verb|kw|
 extension. In case the loop annotation has a \verb|loop variant|, the
 extension must occur before. Otherwise, there is no ordering constraint with
-other loop annotations clauses. Extensions can be made specific to a
+other loop annotations clauses.
+
+Global extensions can appear either alone in a global annotation, or as part of an axiomatic with
+a set of other global annotations.
+
+Finally, a code annotation extension must appear as a single code annotation, like any code annotation.
+
+Code (and loop) extensions can be made specific to a
 set of existing behaviors using the standard ACSL \verb|for| construction.
 Namely, \verb|for bhv: loop kw e1, ..., en;| will indicate that the
-extension is supposed to be considered only when behavior \verb|bhv| is
+(loop) extension is supposed to be considered only when behavior \verb|bhv| is
 active (although it is ultimately up to the plugin to decide what to do with
 this information).
 
 During type-checking,
 the list \verb|[e1;...;en]| will be given to \verb|f|, together
-with the current typing environment (which allows to discriminate
-between contract and loop extension). \verb|f| must return the corresponding
-\verb|acsl_extension_kind| (possibly adding a entry for key \verb|id|
+with the current typing environment (which allows discriminating
+between contract and loop extensions and will have the appropriate logic labels
+set in the local environment). \verb|f| must return the corresponding
+\verb|acsl_extension_kind| (possibly adding an entry for key \verb|id|
 in an internal table if it chooses to return \verb|Ext_id id|).
 
 The first argument of \verb|f| is a \verb|Logic_typing.typing_context|%
@@ -3930,7 +3977,7 @@ as argument a \verb|typing_context| \verb|ctxt| and will use the functions
 of \verb|ctxt| to type-check the children of the current node. Extensions
 can take advantage of this open recursion to recognize only subtrees of an
 otherwise normal ACSL predicate or term. For instance, the following code will
-let extension \verb|foo| replace all occurrences of \verb|\foo| by \verb|42|
+let extension \verb|foo| replace all occurrences of \verb|\foo| by \verb|42|.
 
 \ocamlinput{./examples/acsl_extension.ml}
 

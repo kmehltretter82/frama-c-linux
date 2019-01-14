@@ -11,7 +11,7 @@ if [ $res -ne 0 ]; then
     exit 1
 fi
 
-TESTS=(float value idct non-free)
+TESTS=(float value idct builtins)
 CONFIGS=(apron equalities bitwise symblocs gauges)
 
 for C in ${CONFIGS[@]}

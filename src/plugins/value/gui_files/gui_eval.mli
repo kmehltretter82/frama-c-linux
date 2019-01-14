@@ -53,7 +53,7 @@ val gui_selection_data_empty: 'a gui_selection_data
 (** Default value. All the fields contain empty or dummy values *)
 
 (** The types and function below depend on the abstract domains and values
-    currently available in EVA. *)
+    currently available in Eva. *)
 module type S = sig
 
   module Analysis : Analysis.S

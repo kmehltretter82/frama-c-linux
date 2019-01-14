@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"-copy -val -val-show-progress"
+   STDOPT: +"-copy -eva -eva-show-progress"
  */
 struct S {
   int a;

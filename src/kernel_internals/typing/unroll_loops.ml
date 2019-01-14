@@ -322,7 +322,8 @@ let copy_block kf switch_label_action break_continue_must_change bl =
         succs = []; 
         preds = []; 
         skind = stmt.skind; 
-        ghost = stmt.ghost}
+        ghost = stmt.ghost;
+        sattr = []}
     in
     let labelled_stmt_tbl =
       if stmt.labels = [] then

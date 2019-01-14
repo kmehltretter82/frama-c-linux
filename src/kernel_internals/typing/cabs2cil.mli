@@ -76,7 +76,7 @@ val register_new_global_hook: (Cil_types.varinfo -> bool -> unit) -> unit
     already existing (it is [false] if this is the first declaration/definition
     of [vi] in the file).
     @since Silicon-20161101
- *)
+*)
 
 (** new hook called when encountering a definition of a local function. The hook
     take as argument the varinfo of the local function.
@@ -85,8 +85,8 @@ val register_new_global_hook: (Cil_types.varinfo -> bool -> unit) -> unit
 val register_local_func_hook: (Cil_types.varinfo -> unit) -> unit
 
 (** new hook called when side-effects are dropped.
-The first argument is the original expression, the second one
-the (side-effect free) normalized expression.
+    The first argument is the original expression, the second one
+    the (side-effect free) normalized expression.
 *)
 val register_ignore_side_effect_hook:
   (Cabs.expression -> Cil_types.exp -> unit) -> unit
@@ -103,10 +103,10 @@ val register_ignore_side_effect_hook:
 val register_conditional_side_effect_hook:
   (Cabs.expression -> Cabs.expression -> unit) -> unit
 
-(** new hook that will be called when processing a for loop. 
-    Arguments are the four elements of the for clause 
+(** new hook that will be called when processing a for loop.
+    Arguments are the four elements of the for clause
     (init, test, increment, body)
-    @since Oxygen-20120901 
+    @since Oxygen-20120901
 *)
 val register_for_loop_all_hook:
   (Cabs.for_clause ->
@@ -114,7 +114,7 @@ val register_for_loop_all_hook:
 
 (** new hook that will be called when processing a for loop. Argument is
     the initializer of the for loop.
-    @since Oxygen-20120901 
+    @since Oxygen-20120901
 *)
 val register_for_loop_init_hook: (Cabs.for_clause -> unit) -> unit
 
@@ -151,13 +151,13 @@ val frama_c_destructor: string
 
 (** Name of the attribute used to indicate that a given static variable has a
     local syntactic scope (despite a global lifetime).
-    @since Frama-C+dev
- *)
+    @since Chlorine-20180501
+*)
 val fc_local_static: string
 
 (** A hook into the code that creates temporary local vars.  By default this
-  is the identity function, but you can overwrite it if you need to change the
-  types of cabs2cil-introduced temp variables. *)
+    is the identity function, but you can overwrite it if you need to change the
+    types of cabs2cil-introduced temp variables. *)
 val typeForInsertedVar: (Cil_types.typ -> Cil_types.typ) ref
 
 (** Like [typeForInsertedVar], but for casts.
@@ -186,11 +186,11 @@ val find_field_offset:
 (** returns the offset (can be more than one field in case of unnamed members)
     corresponding to the first field matching the condition.
     @raise Not_found if no such field exists.
- *)
+*)
 
 (** returns the type of the result of a logic operator applied to values of
     the corresponding input types.
- *)
+*)
 val logicConditionalConversion: Cil_types.typ -> Cil_types.typ -> Cil_types.typ
 
 (** returns the type of the result of an arithmetic operator applied to
@@ -206,27 +206,27 @@ val integralPromotion : Cil_types.typ -> Cil_types.typ
 
 (** local information needed to typecheck expressions and statements *)
 type local_env = private
-    { authorized_reads: Cil_datatype.Lval.Set.t;
-      (** sets of lvalues that can be read regardless of a potential
-          write access between sequence points. Mainly for tmp variables
-          introduced by the normalization.
-       *)
-      known_behaviors: string list;
-      (** list of known behaviors at current point. *)
-      is_ghost: bool;
-      (** whether we're analyzing ghost code or not *)
-      is_paren: bool;
-      (** is the current expr a child of A.PAREN *)
-      inner_paren: bool;
-      (** used internally for normalizations of unop and binop. *)
-    }
+  { authorized_reads: Cil_datatype.Lval.Set.t;
+    (** sets of lvalues that can be read regardless of a potential
+        write access between sequence points. Mainly for tmp variables
+        introduced by the normalization.
+    *)
+    known_behaviors: string list;
+    (** list of known behaviors at current point. *)
+    is_ghost: bool;
+    (** whether we're analyzing ghost code or not *)
+    is_paren: bool;
+    (** is the current expr a child of A.PAREN *)
+    inner_paren: bool;
+    (** used internally for normalizations of unop and binop. *)
+  }
 
 (** an empty local environment. *)
 val empty_local_env: local_env
 
 (** same as [empty_local_env], but sets the ghost status to the value of its
     argument
- *)
+*)
 val ghost_local_env: bool -> local_env
 
 (** Applies [mkAddrOf] after marking variable whose address is taken. *)
@@ -266,7 +266,7 @@ val areCompatibleTypes: Cil_types.typ -> Cil_types.typ -> bool
 
     @since Neon-20140301
     @modify Phosphorus-20170501-beta1
-    @modify Frama-C+dev refined notion
+    @modify Chlorine-20180501 refined notion
 *)
 
 val stmtFallsThrough: Cil_types.stmt -> bool
@@ -274,7 +274,11 @@ val stmtFallsThrough: Cil_types.stmt -> bool
     syntactical one.
 
     @since Phosphorus-20170501-beta1 exported
- *)
+*)
+
+(**/**)
+
+val fieldsToInit: Cil_types.compinfo -> string option -> Cil_types.offset list
 
 (*
 Local Variables:

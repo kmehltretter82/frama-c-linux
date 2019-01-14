@@ -1,9 +1,9 @@
 /* run.config
-   OPT: -val-show-progress  -slice-calls printf1 -journal-disable -float-normal -remove-redundant-alarms -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  
-   OPT: -val-show-progress  -slice-calls printf2 -journal-disable -float-normal -remove-redundant-alarms -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  
-   OPT: -val-show-progress  -slice-calls printf3 -journal-disable -float-normal -remove-redundant-alarms -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  
-   OPT: -val-show-progress  -slice-calls printf4 -journal-disable -float-normal -remove-redundant-alarms -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  
-   OPT: -val-show-progress  -slice-calls printf5 -journal-disable -float-normal -remove-redundant-alarms -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  
+   OPT: -eva-show-progress  -slice-calls printf1 -journal-disable -float-normal -remove-redundant-alarms -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  
+   OPT: -eva-show-progress  -slice-calls printf2 -journal-disable -float-normal -remove-redundant-alarms -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  
+   OPT: -eva-show-progress  -slice-calls printf3 -journal-disable -float-normal -remove-redundant-alarms -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  
+   OPT: -eva-show-progress  -slice-calls printf4 -journal-disable -float-normal -remove-redundant-alarms -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  
+   OPT: -eva-show-progress  -slice-calls printf5 -journal-disable -float-normal -remove-redundant-alarms -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  
    */
 /* Small example devired from examples given for UNRAVEL tool : */
 
@@ -14,7 +14,7 @@ int printf3 (char const *, int);
 int printf4 (char const *, int);
 int printf5 (char const *, int);
 
-main()
+int main()
 {
       float x[1024];
       float var2, var3, var4 ;
@@ -54,4 +54,5 @@ main()
          printf3("variance (one pass, using average, sum): %f \n",var4);
          printf4("variance (two pass, corrected): %f \n",var5);
          printf5("variance (two pass): %f \n",var1);
+         return 0;
 }

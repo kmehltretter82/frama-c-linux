@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: #"-value-msg-key widen-hints"
+   STDOPT: #"-eva-msg-key widen-hints"
    OPT: -print
  */
 
@@ -43,8 +43,8 @@ int y; // used to force renaming of local variable
 int main() {
   int y;
   int m = 10;
-  /*@ widen_hints global:m, N; // useless, just syntactic test
-      widen_hints y, 5; // useless, just syntactic test */
+  //@ widen_hints global:m, N; // useless, just syntactic test
+  //@ widen_hints y, 5; // useless, just syntactic test
   int n = 33+m;
   /*@ loop widen_hints a, 2; // useless, just syntactic test */
   for (int a = 0; a < n*2+1; a++) { // uses global hint

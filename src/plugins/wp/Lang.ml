@@ -163,7 +163,7 @@ let sort_of_object = function
 
 let sort_of_ctype t = sort_of_object (Ctypes.object_of t)
 
-let sort_of_ltype t = match Logic_utils.unroll_type t with
+let sort_of_ltype t = match Logic_utils.unroll_type ~unroll_typedef:false t with
   | Ctype typ -> sort_of_ctype typ
   | Ltype _ | Lvar _ | Larrow _ -> Logic.Sdata
   | Linteger -> Logic.Sint
@@ -197,7 +197,7 @@ let rec varpoly k x = function
 
 let builtins = Hashtbl.create 131
 
-let rec tau_of_ltype t = match Logic_utils.unroll_type t with
+let rec tau_of_ltype t = match Logic_utils.unroll_type ~unroll_typedef:false t with
   | Linteger -> Logic.Int
   | Lreal -> Logic.Real
   | Ctype typ -> tau_of_ctype typ

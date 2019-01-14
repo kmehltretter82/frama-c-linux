@@ -42,14 +42,14 @@ let meta_remove_ =
 
 let elim_abstract remove_pr d = match d.d_node with
   | Dprop (Paxiom,pr,_) when Spr.mem pr remove_pr ->
-    (* Format.eprintf "Remove %a@." Pretty.print_pr pr; *)
-    []
+      (* Format.eprintf "Remove %a@." Pretty.print_pr pr; *)
+      []
   | Dprop (Paxiom,pr,_) ->
-    (* Format.eprintf "Not Remove %a@." Pretty.print_pr pr; *)
-    [d]
+      (* Format.eprintf "Not Remove %a@." Pretty.print_pr pr; *)
+      [d]
   | _ ->
-    (* Format.eprintf "Not Seen %a@." Pretty.print_decl d; *)
-    [d]
+      (* Format.eprintf "Not Seen %a@." Pretty.print_decl d; *)
+      [d]
 
 let remove_prop meta =
   Trans.on_tagged_pr meta
@@ -94,39 +94,39 @@ let rec t_replace_all defs s t =
   let t = t_map (t_replace_all defs s) t in
   match t.t_node with
   | Tapp (fs,tl) when Sls.mem fs s ->
-    t_label_copy t (t_unfold defs fs tl t.t_ty)
+      t_label_copy t (t_unfold defs fs tl t.t_ty)
   | _ -> t
 
 let fold mpr sls d (defs, task) =
   (** replace *)
   let d = match d.d_node with
     | Dprop (k,pr,f) ->
-      let s = Mpr.find_def Sls.empty pr mpr in
-      if Sls.is_empty s then d
-      else create_prop_decl k pr (t_replace_all defs s f)
+        let s = Mpr.find_def Sls.empty pr mpr in
+        if Sls.is_empty s then d
+        else create_prop_decl k pr (t_replace_all defs s f)
     | _ -> d
   in
   (** add to defs if needed *)
   match d.d_node with
-    | Dlogic [ls,ld] when Sls.mem ls sls ->
-        let vl,e = open_ls_defn ld in
-        Mls.add ls (vl,e) defs, Task.add_decl task d
-    | _ ->
-        defs, Task.add_decl task d
+  | Dlogic [ls,ld] when Sls.mem ls sls ->
+      let vl,e = open_ls_defn ld in
+      Mls.add ls (vl,e) defs, Task.add_decl task d
+  | _ ->
+      defs, Task.add_decl task d
 
 let fold mpr sls task_hd (defs, task) =
   match task_hd.Task.task_decl.Theory.td_node with
   | Theory.Decl d ->
-    fold mpr sls d (defs, task)
+      fold mpr sls d (defs, task)
   | _ ->
-    defs, Task.add_tdecl task task_hd.Task.task_decl
+      defs, Task.add_tdecl task task_hd.Task.task_decl
 
 let trans =
   let add (mpr,sls) = function
     | [Theory.MAls ls; Theory.MApr pr] ->
-      Mpr.change (function None -> Some (Sls.singleton ls)
-                         | Some s -> Some (Sls.add ls s)) pr mpr,
-      Sls.add ls sls
+        Mpr.change (function None -> Some (Sls.singleton ls)
+                           | Some s -> Some (Sls.add ls s)) pr mpr,
+        Sls.add ls sls
     | _ -> assert false
   in
   Trans.on_meta meta_inline_in (fun l ->

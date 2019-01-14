@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Main numeric values of EVA. *)
+(** Main numeric values of Eva. *)
 
 (** Abstract values built over Cvalue.V *)
 module CVal : Abstract_value.Internal with type t = Cvalue.V.t

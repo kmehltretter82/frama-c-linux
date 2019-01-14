@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +" -load-module frama-c-constant_propagation -slevel-function main2:100000 -print -then -scf -then-on propagated -val -val-show-progress -no-scf"
+   STDOPT: +" -load-module frama-c-constant_propagation -slevel-function main2:100000 -print -then -scf -then-on propagated -eva -eva-show-progress -no-scf"
 */
 
 int *p;
@@ -8,7 +8,8 @@ void main1() {
   int v;
   unsigned int r = 0;
   for (int i=0; i<80; i++) {
-    //@ slevel 50; assigns v; ensures \true;  // Also test the pretty-printer
+    //@ assigns v; ensures \true;  // Also test the pretty-printer
+    //@ slevel 50;
     if (i%2) {
       v = 1;
     } else {

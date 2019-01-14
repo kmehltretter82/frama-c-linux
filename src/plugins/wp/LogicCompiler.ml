@@ -778,7 +778,7 @@ struct
               ax.ax_name Printer.pp_logic_var phi.l_var_info
 
   let rec logic_type t =
-    match Logic_utils.unroll_type t with
+    match Logic_utils.unroll_type ~unroll_typedef:false t with
     | Ctype _ -> ()
     | Linteger | Lreal | Lvar _ | Larrow _ -> ()
     | Ltype(lt,ps) ->

@@ -28,7 +28,7 @@ open Cil_types
 open Cil_datatype
 open Ctypes
 
-open Separation
+open MemoryContext
 open Lang
 open Lang.F
 open Sigs
@@ -36,8 +36,8 @@ open Sigs
 module type VarUsage =
 sig
   val datatype : string
-  val param : varinfo -> Separation.param
-  val separation : unit -> Separation.clause
+  val param : varinfo -> MemoryContext.param
+  val hypotheses : unit -> MemoryContext.clause list
 end
 
 module Make(V : VarUsage)(M : Sigs.Model) =
@@ -50,7 +50,7 @@ struct
   let datatype = "MemVar." ^ V.datatype ^ M.datatype
   let configure = M.configure
 
-  let separation () = V.separation () :: M.separation ()
+  let hypotheses () = V.hypotheses () @ M.hypotheses ()
 
   (* -------------------------------------------------------------------------- *)
   (* ---  Chunk                                                             --- *)
@@ -251,11 +251,11 @@ struct
     let domain_mem ms =
       M.Heap.Set.fold (fun m s -> Heap.Set.add (Mem m) s) ms Heap.Set.empty
 
-    let assigned s1 s2 w =
+    let assigned ~pre ~post w =
       let w_vars , w_alloc , w_mem = domain_partition w in
-      let h_vars = SIGMA.assigned s1.vars s2.vars w_vars in
-      let h_alloc = ALLOC.assigned s1.alloc s2.alloc w_alloc in
-      let h_mem = M.Sigma.assigned s1.mem s2.mem w_mem in
+      let h_vars = SIGMA.assigned ~pre:pre.vars ~post:post.vars w_vars in
+      let h_alloc = ALLOC.assigned ~pre:pre.alloc ~post:post.alloc w_alloc in
+      let h_mem = M.Sigma.assigned ~pre:pre.mem ~post:post.mem w_mem in
       Bag.ulist [h_vars;h_alloc;h_mem]
 
     let havoc s r =
@@ -473,6 +473,10 @@ struct
     | Loc l -> M.occurs x l
     | Val(_,_,ofs) -> ofs_occurs x ofs
 
+  let byte_offset n = function
+    | Field fd -> F.e_add n (F.e_int (Ctypes.field_offset fd))
+    | Shift(obj,k) -> F.e_add n (F.e_fact (Ctypes.sizeof_object obj) k)
+
   (* -------------------------------------------------------------------------- *)
   (* ---  Variable and Context                                              --- *)
   (* -------------------------------------------------------------------------- *)
@@ -591,6 +595,11 @@ struct
     | Loc l -> Loc (M.base_addr l)
     | Ref x -> noref ~op:"base address of" x (* ??? ~suggest:ByValue *)
     | Val(m,x,_) -> Val(m,x,[])
+
+  let base_offset = function
+    | Loc l -> M.base_offset l
+    | Ref x -> noref ~op:"offset address of" x (* ??? ~suggest:ByValue *)
+    | Val(_,_,ofs) -> List.fold_left byte_offset e_zero ofs
 
   let block_length sigma obj = function
     | Loc l -> M.block_length sigma.mem obj l

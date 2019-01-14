@@ -58,7 +58,7 @@ module Icon: sig
   val clear: unit -> unit
   (** Reloads the builtin icons from the theme specified in the configuration.
       Used when the theme is changed.
-      @since Frama-C+dev *)
+      @since Chlorine-20180501 *)
 end
 
 (** Configuration module for the GUI: all magic visual constants should
@@ -362,7 +362,7 @@ val make_text_page:
     contents changes.
     @since Beryllium-20090901 *)
 
-val open_in_external_viewer : ?line:int -> string -> unit
+val open_in_external_viewer : ?line:int -> Datatype.Filepath.t -> unit
 (** Opens [file] in an external viewer, optionally centered on line [line]
     (if supported by the viewer). The viewer is executed in the
     background (i.e. it does not block the execution of Frama-C).

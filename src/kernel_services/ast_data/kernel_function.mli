@@ -62,7 +62,7 @@ val find_label : t -> string -> stmt ref
 
 val find_all_labels: t -> Datatype.String.Set.t
   (** returns all labels present in a given function.
-      @since Frama-C+dev
+      @since Chlorine-20180501
   *)
 
 val clear_sid_info: unit -> unit
@@ -76,7 +76,7 @@ val clear_sid_info: unit -> unit
 val find_defining_kf: varinfo -> t option
 (** Finds the kernel function defining the given varinfo as a local or a formal.
     Returns None if no such function exists.
-    @since Frama-C+dev *)
+    @since Chlorine-20180501 *)
 
 val find_from_sid : int -> stmt * t
   (** @return the stmt and its kernel function from its identifier.
@@ -158,6 +158,10 @@ val get_global : t -> global
 
 val get_formals : t -> varinfo list
 val get_locals : t -> varinfo list
+
+val get_statics : t -> varinfo list
+(** Returns the list of static variables declared inside the function.
+    @since 18.0-Argon *)
 
 exception No_Definition
 val get_definition : t -> fundec

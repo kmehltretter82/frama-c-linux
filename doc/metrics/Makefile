@@ -28,7 +28,7 @@ cabs.log:
 	$(FC) -metrics-ast cabs $(EXAMPLE_FILE) | tee $(LOGDIR)/cabs.log
 
 cover.log:
-	$(FCBIN) -metrics -metrics-value-cover $(EXAMPLE_FILE) | tee $(LOGDIR)/cover.log
+	$(FCBIN) -metrics -metrics-eva-cover $(EXAMPLE_FILE) | tee $(LOGDIR)/cover.log
 
 reach.log:
 	$(FCBIN) -metrics -metrics-cover main,foo $(EXAMPLE_FILE) | tee $(LOGDIR)/reach.log

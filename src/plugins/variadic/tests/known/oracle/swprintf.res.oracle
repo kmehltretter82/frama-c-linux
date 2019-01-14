@@ -10,44 +10,44 @@
   Declaration of variadic function fwscanf.
 [variadic] FRAMAC_SHARE/libc/wchar.h:206: 
   Declaration of variadic function swscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:153: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:165: 
   Declaration of variadic function fprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:155: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:167: 
   Declaration of variadic function fscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:157: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:169: 
   Declaration of variadic function printf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:158: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:170: 
   Declaration of variadic function scanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:159: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:171: 
   Declaration of variadic function snprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:161: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:173: 
   Declaration of variadic function sprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:163: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:175: 
   Declaration of variadic function sscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:353: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:369: 
   Declaration of variadic function dprintf.
 [variadic] tests/known/swprintf.c:12: 
   Translating call to swprintf to a call to the specialized version swprintf_va_1.
 [variadic] tests/known/swprintf.c:15: 
   Translating call to swprintf to a call to the specialized version swprintf_va_2.
-[value] Analyzing a complete application starting at main
-[value] Computing initial state
-[value] Initial state computed
-[value] using specification for function wmemset
-[value] using specification for function swprintf_va_1
-[value] tests/known/swprintf.c:12: 
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva] using specification for function wmemset
+[eva] using specification for function swprintf_va_1
+[eva] tests/known/swprintf.c:12: 
   Cannot evaluate range bound wformat_length(format) - 1
   (unsupported ACSL construct: logic function wformat_length). Approximating
-[value:alarm] tests/known/swprintf.c:12: Warning: 
+[eva:alarm] tests/known/swprintf.c:12: Warning: 
   function swprintf_va_1: precondition \valid(ws + (0 .. n - 1)) ∨
                                        \valid(ws +
                                               (0 .. wformat_length(format) - 1)) got status unknown.
-[value:alarm] tests/known/swprintf.c:13: Warning: 
+[eva:alarm] tests/known/swprintf.c:13: Warning: 
   assertion got status invalid (stopping propagation).
-[value] using specification for function swprintf_va_2
-[value] done for function main
-[value] ====== VALUES COMPUTED ======
-[value:final-states] Values at end of function main:
+[eva] using specification for function swprintf_va_2
+[eva] done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function main:
   data[0..98] ∈ {65}
       [99] ∈ {0}
   dest[0..49] ∈ [--..--]

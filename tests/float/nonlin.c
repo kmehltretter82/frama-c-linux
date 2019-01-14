@@ -1,8 +1,8 @@
 /* run.config*
-   OPT: -value-msg-key nonlin -slevel 30 -val @VALUECONFIG@ -cpp-extra-args="-DFLOAT=double" -float-hex -journal-disable -val-subdivide-non-linear 0
-   OPT: -value-msg-key nonlin -slevel 30 -val @VALUECONFIG@ -cpp-extra-args="-DFLOAT=double" -float-hex -journal-disable -val-subdivide-non-linear 10
-   OPT: -value-msg-key nonlin -slevel 30 -val @VALUECONFIG@ -cpp-extra-args="-DFLOAT=float" -float-hex -journal-disable -val-subdivide-non-linear 0
-   OPT: -value-msg-key nonlin -slevel 30 -val @VALUECONFIG@ -cpp-extra-args="-DFLOAT=float" -float-hex -journal-disable -val-subdivide-non-linear 10
+   OPT: -eva-msg-key nonlin -slevel 30 -eva @VALUECONFIG@ -cpp-extra-args="-DFLOAT=double" -float-hex -journal-disable -eva-subdivide-non-linear 0
+   OPT: -eva-msg-key nonlin -slevel 30 -eva @VALUECONFIG@ -cpp-extra-args="-DFLOAT=double" -float-hex -journal-disable -eva-subdivide-non-linear 10
+   OPT: -eva-msg-key nonlin -slevel 30 -eva @VALUECONFIG@ -cpp-extra-args="-DFLOAT=float" -float-hex -journal-disable -eva-subdivide-non-linear 0
+   OPT: -eva-msg-key nonlin -slevel 30 -eva @VALUECONFIG@ -cpp-extra-args="-DFLOAT=float" -float-hex -journal-disable -eva-subdivide-non-linear 10
 */
 
 #include "__fc_builtin.h"
@@ -88,10 +88,24 @@ void garbled() {
   float f = a + a;
 }
 
+// Tests possible bugs of the subdivision around the zero values.
+void around_zeros() {
+  /* [f1] is the smallest positive float, and [f] has values in [-0 .. f1].
+     While [next_float_ieee -0. = f1], the interval [-0. .. f1] contains three
+     float values, so its subdivision should not forget +0. */
+  float f1 = 1.4E-45;
+  float f = Frama_C_float_interval(-0, f1);
+  /* The +f-f is needed to activate the subdivisions.
+     The [f1] value is removed from [f], which must become [-0. .. 0.]
+     and not the singleton {-0.}.  */
+  float res = f1 / (f+f-f - f1);
+}
+
 void main() {
   nonlin_f();
   other ();
   split_alarm();
   norm();
   garbled();
+  around_zeros();
 }

@@ -11,15 +11,15 @@ be the release manager.
 You need the following applications:
 \begin{itemize}
 \item \texttt{pandoc}>=2.0; if your distribution has an older
-version, you can find installation instructions at \url{https://github.com/jgm/pandoc/blob/master/INSTALL.md}
+  version, you can find installation instructions at
+  \url{https://github.com/jgm/pandoc/blob/master/INSTALL.md}
 \item \texttt{tidy}
 \item \texttt{linkchecker}
 \end{itemize}
 
 \section{Authoring the Pages}
-To edit the web pages of the site, developers only need the
-\texttt{trunk} branch of the repository. The web site sources are in
-\texttt{src} or the checkout of the \texttt{website} tree.
+
+The website sources are in \texttt{src}. Go to this directory.
 
 \subsection{Editing Web Pages}
 
@@ -59,21 +59,28 @@ The current (\emph{awkward}) procedure is as follows:
 \begin{enumerate}
 \item In case a new release of ACSL is done together with Frama-C's release;
   \begin{itemize}
-  \item add \texttt{distrib/download/acsl\_X\_Y.pdf} (using
-    \texttt{git annex add}; \todo{Fait par le script \texttt{build-src-distrib.sh}? Check with FB}
-  \item update \texttt{www/download/acsl.pdf};
+  \item copy the ACSL manual using the ``numeric'' version
+    (\texttt{www/download/acsl\_x.y.pdf}) and add it via \texttt{git add}
+    (\texttt{git lfs} should automatically handle it, since it's a .pdf);
+  \item check that \texttt{www/download/acsl.pdf} was updated by the build script;
 %  \item update \texttt{src/download.def} (can't find where???);
   \item update \texttt{src/acsl.prehtml}: add a new entry for the new version of ACSL
  \end{itemize}
-\item Update the \texttt{Makefile} in \texttt{src}.
-  Add the new files to export (if any) in the \texttt{PAGES} variable of the
-  \texttt{Makefile}.
-\item Add the previous latest version to the \texttt{DOWNLOAD\_PAGES}
-  variable for adding a specific downloading page related to that
-  previous release.
+\item Copy the file \texttt{INSTALL.md} from Frama-C to
+  \texttt{INSTALL-NAME.md} where \texttt{NAME} is the version name of the
+  distribution.
+\item Update the \texttt{Makefile} in \texttt{src}:
+  \begin{itemize}
+  \item Add to variable \texttt{PAGES} the new files to export (at least
+    install-<version>.html, following the pattern already present). This will
+    create a target that will generate it from the previous .md file.
+  \item Add the previous latest version to the \texttt{DOWNLOAD\_PAGES}
+    variable for adding a specific downloading page related to that
+    previous release.
+  \end{itemize}
 \item Update also some macros of \texttt{download.def} file:
   \begin{enumerate}
-  \item Add an entry into \texttt{selector-previous-versions} macro.
+  \item Add an entry after the \texttt{selector-previous-versions} macro.
   \item Update macros \texttt{latest-No-Version}, \texttt{previous-version} and
     \texttt{previous-No-Version}.
   \item Move the definition of \texttt{download-last-version} macro
@@ -89,23 +96,27 @@ The current (\emph{awkward}) procedure is as follows:
   You should at least update the links to reference documentation from the
   \texttt{support.prehtml} page.
   \end{enumerate}
-\item Copy the file \texttt{INSTALL.md} from Frama-C to
-  \texttt{INSTALL-NAME.md} where \texttt{NAME} is the version name of the
-  distribution.
 \item Build the web site:
   \begin{shell}[gobble=4]
     \$ make local
     \$ make distrib
   \end{shell}
-  You get a snap-shot of the repository in the \texttt{www} directory.
-  Test it carefully.\\
-
-  Automatic testing for compliance to \textsf{W3C} and links consistency
-  was launched (install the required tools before if necessary).
-  \textbf{You must check that all the verifications are ok:}
+  You get a snapshot of the repository in the \texttt{www} directory.
+  Before going there, check for compliance with \textsf{W3C} and link
+  consistency by running:
   \begin{shell}
     \$ make check_link
   \end{shell}
+  Run it and check the result, fixing broken links if necessary.
+  Go to \texttt{../www}, then open \texttt{index.html} and test the website
+  carefully, especially:
+  \begin{itemize}
+  \item the new Downloads page;
+  \item the previous Downloads page;
+  \item Compilation instructions;
+  \item Changelog (check parsing, for all plug-ins).
+  \end{itemize}
+
 \item Commit the web site:
   \begin{shell}
     \$ cd ..
@@ -121,9 +132,21 @@ The current (\emph{awkward}) procedure is as follows:
 You have to create a merge request on the website repository that will be published when Florent
 accepts it on the online branch.
 
+\textbf{Note:} the following steps are done only after the release is live on the website.
+
+\section{Announcements}
+
+\begin{itemize}
+\item Send an e-mail to \texttt{frama-c-discuss} announcing the release.
+\item Tweet the release, pointing to the Downloads page.
+\item Ideally, a blog post should arrive in a few days, with some interesting
+  new features.
+\end{itemize}
+
 \section{Opam package}
 
-You'll need a GitHub account to create a pull request.
+You'll need a GitHub account to create a pull request on the official opam repository,
+\texttt{ocaml/opam-repository.git}.
 
 \begin{itemize}
 \item Clone \texttt{opam-repository}: \texttt{git clone git@github.com:ocaml/opam-repository.git}
@@ -137,7 +160,11 @@ You'll need a GitHub account to create a pull request.
 \item Compute the MD5sum of the .tar.gz file and update this file: \\
   \texttt{packages/frama-c/frama-c.<version>/url} (and also update the filename inside it)
 \item Create a branch with any name you want (e.g. frama-c.<version>) and push it to your remote Github
-\item Create a pull request to opam-repository
+\item Create a pull request to opam-repository. If all tests pass,
+  someone from opam should merge it for you.
+  \textbf{Note:} some opam tests may fail due to external circumstances; if the
+  error log makes no sense to you, wait to see if someone will contact you
+  about it, or ask directly on the merge request.
 \end{itemize}
 
 \section{Updating Frama-C-snapshot}
@@ -147,8 +174,14 @@ The release script \texttt{bin/build-src-distrib.sh} has prepared both the
 repository and the associated wiki (see section~\ref{sec:build-source-distr}).
 
 \begin{itemize}
-\item ensure that the sources in \texttt{Frama-C-snapshot} compile (\texttt{./configure --prefix=/tmp/frama-c \&\& make \&\& make install} must work).
-\item commit and push the changes
+\item ensure that the sources in \texttt{Frama-C-snapshot} compile;
+  the following command must work:\\
+  \verb+./configure --prefix=/tmp/frama-c && make && make install+
+\item commit in branch \texttt{latest}
+\item tag the commit with the version number (including suffix for beta
+  releases), then push
+\item for a final release, merge \texttt{latest} into \texttt{master},
+  and push \texttt{master}
 \item in \texttt{Frama-C-snapshot.wiki}, update the new
 \texttt{Frama-C-VERSION.md} page with the list of main changes.
 \item Add your changes, commit and push
@@ -174,9 +207,19 @@ resolved in the next release.
 %% Update references of the Wiki, especially pointers to manuals of this page:
 %% \url{http://bts.frama-c.com/dokuwiki/doku.php?id=mantis:frama-c:publications}
 
+\section{Other repositories to update}
+
+Check if other Frama-C (and related) repositories need to be updated:
+
+\begin{itemize}
+\item \texttt{acsl-language/acsl} (if last minute patches were applied)
+\item \texttt{Frama-C/open-source-case-studies}
+\item \texttt{Frama-C/sate-vi}
+\end{itemize}
+
 \section{Preparing the Next Release}
 
-Just update the \texttt{VERSION} file in \texttt{trunk}, by adding
+Just update the \texttt{VERSION} file in \texttt{master}, by adding
 \texttt{"+dev"}. Do not add any newline at the end of the
 \texttt{VERSION} file.
 
