@@ -133,21 +133,21 @@ let add_qedstat (ts:float) (s:stats) =
   if ts > s.time then s.time <- ts
 
 let get_field js fd =
-  try Json.field fd js with Not_found | Invalid_argument _ -> Json.Null
+  try Json.field fd js with Not_found | Invalid_argument _ -> `Null
 
 let json_assoc fields =
-  let fields = List.filter (fun (_,d) -> d<>Json.Null) fields in
-  if fields = [] then Json.Null else Json.Assoc fields
+  let fields = List.filter (fun (_,d) -> d<>`Null) fields in
+  if fields = [] then `Null else `Assoc fields
 
 let json_of_stats s =
-  let add fd v w = if v > 0 then (fd , Json.Int v)::w else w in
+  let add fd v w = if v > 0 then (fd , `Int v)::w else w in
   json_assoc
     begin
       add "total" s.total @@
       add "valid" s.valid @@
       add "failed" s.inconclusive @@
       add "unknown" s.unsuccess @@
-      (if s.rank >= 0 then [ "rank" , Json.Int s.rank ] else [])
+      (if s.rank >= 0 then [ "rank" , `Int s.rank ] else [])
     end
 
 let rankify_stats s js =
@@ -870,11 +870,11 @@ let export_json gstat jfile =
     let js =
       try
         if Sys.file_exists jfile
-        then Json.load_file jfile else Json.Null
+        then Json.load_file jfile else `Null
       with Json.Error(file,line,msg) ->
         let source = Log.source ~file ~line in
         Wp_parameters.error ~source "Incorrect json file: %s" msg ;
-        Json.Null
+        `Null
     in
     rankify_fcstat gstat js ;
     Json.save_file jfile (json_of_fcstat gstat) ;
