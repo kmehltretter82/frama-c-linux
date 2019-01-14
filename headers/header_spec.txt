@@ -672,6 +672,8 @@ src/libraries/utils/rgmap.ml: CEA_LGPL
 src/libraries/utils/rgmap.mli: CEA_LGPL
 src/libraries/utils/rich_text.ml: CEA_LGPL
 src/libraries/utils/rich_text.mli: CEA_LGPL
+src/libraries/utils/sanitizer.ml: CEA_LGPL
+src/libraries/utils/sanitizer.mli: CEA_LGPL
 src/libraries/utils/task.ml: CEA_LGPL
 src/libraries/utils/task.mli: CEA_LGPL
 src/libraries/utils/unicode.ml: CEA_LGPL
@@ -989,8 +991,6 @@ src/plugins/report/csv.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/report/csv.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/report/dump.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/report/dump.mli: CEA_LGPL_OR_PROPRIETARY
-src/plugins/report/property_names.ml: CEA_LGPL_OR_PROPRIETARY
-src/plugins/report/property_names.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/report/register.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/report/register.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/report/report_parameters.ml: CEA_LGPL_OR_PROPRIETARY

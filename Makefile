@@ -427,6 +427,7 @@ LIB_CMO =\
 	src/libraries/datatype/type \
 	src/libraries/datatype/descr \
 	src/libraries/utils/filepath \
+	src/libraries/utils/sanitizer \
 	src/libraries/utils/pretty_utils \
 	src/libraries/utils/hook \
 	src/libraries/utils/bag \

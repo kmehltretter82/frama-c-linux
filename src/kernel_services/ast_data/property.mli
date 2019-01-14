@@ -461,23 +461,32 @@ val source: identified_property -> Filepath.position option
 (** {2 names} *)
 (**************************************************************************)
 
+
+(** @since Frama-C+dev deprecated old naming scheeme, 
+    to be removed in future versions. *)
+module LegacyNames :
+sig
+  val self: State.t
+  val get_prop_basename: identified_property -> string
+  val get_prop_name_id: identified_property -> string
+end
+
 (** @since Oxygen-20120901 *)
-module Names: sig
+module Names :
+sig
 
   val self: State.t
 
   val get_prop_name_id: identified_property -> string
     (** returns a unique name identifying the property.
-	This name is built from the basename of the property. *)
+      This name is built from the basename of the property. 
+      @modify Frama-C+dev new naming scheme, Cf. LegacyNames
+  *)
     
-  val get_prop_basename: identified_property -> string
-    (** returns the basename of the property. *)
-    
-  val reserve_name_id: string -> string
-(** returns the name that should be returned by the function
-    [get_prop_name_id] if the given property has [name] as basename. That name
-    is reserved so that [get_prop_name_id prop] can never return an identical
-    name. *)
+  val get_prop_basename: ?truncate:int -> identified_property -> string
+  (** returns the basename of the property. 
+      @modify Frama-C+dev additional truncation parameter
+  *)
 
 end
 

@@ -20,20 +20,21 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
+(** {2 Sanitizer}
 
-type part =
-  | B of behavior
-  | K of kernel_function
-  | A of string
-  | I of identified_predicate
-  | P of predicate
-  | T of term
-  | S of stmt
+    Keeps only alpha-numerical characters.
+    Separator ['_'] is allowed, but leading, trailing and consecutive
+    separators are removed.
+*)
 
-val is_name : string -> bool
-val join : string list -> string
+type buffer
 
-val string_of_part : part -> string
-val string_of_parts : part list -> string
-val parts_of_property : Property.t -> part list
+val create : ?truncate:bool -> int -> buffer
+val clear : buffer -> unit
+
+val add_sep : buffer -> unit (** Adds ['_'] character *)
+val add_char : buffer -> char -> unit
+val add_string : buffer -> string -> unit
+val add_list : buffer -> string list -> unit (** Separated with ['_'] *)
+
+val contents : buffer -> string

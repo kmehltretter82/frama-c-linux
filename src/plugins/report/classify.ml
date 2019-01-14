@@ -74,7 +74,7 @@ let errors = {
 type props = {
   ps_name : string ;
   ps_rules : rule Queue.t ;
-  ps_action : (unit -> string) ;
+  ps_action : (unit -> string) ; (* plugin option getter *)
 }
 
 let props ps_name ps_action =
@@ -408,19 +408,50 @@ let pending f pending =
         (fun _ ips -> Property.Set.iter f ips) m)
     pending
 
+let rec monitored_property ip =
+  let open Cil_types in
+  let open Property in
+  match ip with
+  | IPBehavior _ -> false
+  | IPPredicate (PKAssumes _,_,_,_) -> false
+  | IPPredicate (PKRequires _,_,_,_) -> true
+  | IPPredicate (PKEnsures _,_,_,_) -> true
+  | IPPredicate (PKTerminates,_,_,_) -> true
+  | IPAllocation(_,_,_,_) -> true
+  | IPAssigns(_,_,_,_) -> true
+  | IPFrom(_,_,_,_) -> true
+  | IPDecrease (_,_,_,_) -> true
+  | IPCodeAnnot (_,_, { annot_content = AStmtSpec _ } ) -> false
+  | IPCodeAnnot (_,_, { annot_content = APragma _ } ) -> false
+  | IPCodeAnnot (_,_, { annot_content = AExtended _ } ) -> true
+  | IPCodeAnnot (_,_, { annot_content = AAssert _ } ) -> true
+  | IPCodeAnnot (_,_, { annot_content = AInvariant _ } ) -> true
+  | IPCodeAnnot (_,_, { annot_content = AVariant _ } ) -> true
+  | IPCodeAnnot (_,_, { annot_content = AAssigns _ } ) -> true
+  | IPCodeAnnot (_,_, { annot_content = AAllocation _ } ) -> true
+  | IPComplete (_,_,_,_) -> true
+  | IPDisjoint(_,_,_,_) -> true
+  | IPReachable (None,_,_) -> false
+  | IPReachable (Some _,_,_) -> true
+  | IPAxiomatic _ | IPAxiom _ -> false
+  | IPLemma(_,_,_,_,_) -> true
+  | IPTypeInvariant(_,_,_,_) | IPGlobalInvariant(_,_,_) -> true
+  | IPOther(_,_) -> true
+  | IPExtended _ -> true
+  | IPPropertyInstance (_, _, _, ip) -> monitored_property ip
+
 let monitor_status properties ip =
-  let ps = Property_names.parts_of_property ip in
-  if ps = [] then () else
-    let msg = Property_names.string_of_parts ps in
+  if monitored_property ip then
+    let name = Property.Names.get_prop_name_id ip in
     let lookup = find properties.ps_rules in
     let source = Property.source ip in
     let unclassified () =
       let e_id = "unclassified." ^ properties.ps_name in
-      let e_title = msg in
+      let e_title = name in
       let e_action = properties.ps_action () |> action in
       let e_descr = T.String.capitalize_ascii properties.ps_name ^ " status" in
       { unclassified with e_id ; e_action ; e_title ; e_descr }
-    in monitor ~lookup ~category:[] ~msg ~source unclassified
+    in monitor ~lookup ~category:[] ~msg:name ~source unclassified
 
 let monitor_property pool push ip =
   begin
