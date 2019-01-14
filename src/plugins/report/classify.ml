@@ -94,14 +94,14 @@ let failwith msg =
   Pretty_utils.ksfprintf (fun s -> raise (WrongFormat s)) msg
 
 let default = `NONE , {
-  r_id = "unclassified" ;
-  r_plugin = "kernel" ;
+    r_id = "unclassified" ;
+    r_plugin = "kernel" ;
     r_category = "*" ; (* all *)
-  r_title = "\\0" ;
-  r_descr = "\\*" ;
-  r_action = REVIEW ;
-  r_regexp = Str.regexp ""
-}
+    r_title = "\\0" ;
+    r_descr = "\\*" ;
+    r_action = REVIEW ;
+    r_regexp = Str.regexp ""
+  }
 
 let has_pattern = function
   | `NONE | `CATEGORY -> false
@@ -405,7 +405,7 @@ let status ip =
 let pending f pending =
   E.Map.iter
     (fun _ m -> E.Map.iter
-	(fun _ ips -> Property.Set.iter f ips) m)
+        (fun _ ips -> Property.Set.iter f ips) m)
     pending
 
 let rec monitored_property ip =
