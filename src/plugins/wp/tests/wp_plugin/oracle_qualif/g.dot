@@ -2,15 +2,9 @@ digraph g {
   rankdir = TB ;
   node [ style = filled, shape = box ] ;
   N000 [ color = red, shape = circle, label = "*" ] ;
-  N046 [ color=red , label="Prove g_ensures_2" ] ;
-  N046 -> N000 [ style=dotted ] ;
-  N047 [ color=lightblue , label="F-out { a b }" ] ;
- N047 -> N046 ;
-  N048 [ label="Label wp:post" ] ;
- N048 -> N047 ;
-  N049 [ color=lightblue , label="B-out { __retres }" ] ;
- N049 -> N048 ;
-  N050 [ color=orange , label="Return __retres" ] ;
+  N049 [ color=red , label="Prove g_ensures_2" ] ;
+  N049 -> N000 [ style=dotted ] ;
+  N050 [ color=lightblue , label="F-out { a b }" ] ;
  N050 -> N049 ;
   N051 [ label="Label wp:post" ] ;
  N051 -> N050 ;

@@ -20,5 +20,5 @@
 [wp] Goal typed_nat_job_assert_rte_signed_overflow : not tried
 [wp] Goal typed_nat_job_assert_rte_signed_overflow_2 : not tried
 [wp] Goal typed_nat_job2_ensures : not tried
-[wp] Goal typed_nat_job3_post : not tried
+[wp] Goal typed_nat_job3_ensures : not tried
 [wp] Goal typed_nat_job3_assert_rte_bool_value : not tried

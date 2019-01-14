@@ -49,7 +49,7 @@
 [wp] Report 'tests/wp_plugin/sequence.i.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
-no_calls             5      5 (4..16)       10       100%
+no_calls             5      5 (8..20)       10       100%
 sequence             8      2 (12..24)      10       100%
 loops               12      7 (48..60)      19       100%
 -------------------------------------------------------------

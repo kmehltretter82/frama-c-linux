@@ -46,10 +46,10 @@
                                            "memcpy_alias_vars_ensures_unmodified": 
                                              { "alt-ergo": { "total": 1,
                                                              "valid": 1,
-                                                             "rank": 31 },
+                                                             "rank": 29 },
                                                "wp:main": { "total": 1,
                                                             "valid": 1,
-                                                            "rank": 31 } },
+                                                            "rank": 29 } },
                                            "memcpy_alias_vars_ensures_memcpy": 
                                              { "alt-ergo": { "total": 1,
                                                              "valid": 1,
@@ -112,10 +112,10 @@
                                              "memcpy_context_vars_ensures_unmodified_ok": 
                                                { "alt-ergo": { "total": 1,
                                                                "valid": 1,
-                                                               "rank": 31 },
+                                                               "rank": 29 },
                                                  "wp:main": { "total": 1,
                                                               "valid": 1,
-                                                              "rank": 31 } },
+                                                              "rank": 29 } },
                                              "memcpy_context_vars_ensures_memcpy_ok": 
                                                { "alt-ergo": { "total": 1,
                                                                "valid": 1,

@@ -20,7 +20,7 @@
 [wp] Report 'tests/wp_gallery/frama_c_exo1_solved.c.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
-exo1                 6      4 (176..200)    10       100%
+exo1                 6      4 (176..224)    10       100%
 -------------------------------------------------------------
 [wp] Running WP plugin...
 [rte] annotating function exo1
@@ -46,5 +46,5 @@ exo1                 6      4 (176..200)    10       100%
 [wp] Report 'tests/wp_gallery/frama_c_exo1_solved.c.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
-exo1                 6      9 (176..200)    15       100%
+exo1                 6      9 (176..224)    15       100%
 -------------------------------------------------------------

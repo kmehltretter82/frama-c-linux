@@ -6,14 +6,14 @@
   "wp:functions": { "init": { "init_loop_invariant_qed_ok_2": { "alt-ergo": 
                                                                   { "total": 1,
                                                                     "valid": 1,
-                                                                    "rank": 8 },
+                                                                    "rank": 9 },
                                                                 "qed": 
                                                                   { "total": 1,
                                                                     "valid": 1 },
                                                                 "wp:main": 
                                                                   { "total": 2,
                                                                     "valid": 2,
-                                                                    "rank": 8 } },
+                                                                    "rank": 9 } },
                               "init_loop_invariant_qed_ok": { "alt-ergo": 
                                                                 { "total": 2,
                                                                   "valid": 2,
@@ -36,10 +36,10 @@
                                                                   "rank": 22 } },
                               "init_ensures_qed_ok": { "alt-ergo": { "total": 1,
                                                                     "valid": 1,
-                                                                    "rank": 7 },
+                                                                    "rank": 8 },
                                                        "wp:main": { "total": 1,
                                                                     "valid": 1,
-                                                                    "rank": 7 } },
+                                                                    "rank": 8 } },
                               "wp:section": { "alt-ergo": { "total": 6,
                                                             "valid": 5,
                                                             "unknown": 1,

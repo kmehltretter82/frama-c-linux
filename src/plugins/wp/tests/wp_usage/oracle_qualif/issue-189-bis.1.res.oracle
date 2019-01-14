@@ -5,7 +5,7 @@
 [wp] Warning: Missing RTE guards
 [wp] 10 goals scheduled
 [wp] [Alt-Ergo] Goal typed_memcpy_context_vars_ensures_memcpy_ok : Valid
-[wp] [Alt-Ergo] Goal typed_memcpy_context_vars_ensures_unmodified_ok : Valid
+[wp] [Qed] Goal typed_memcpy_context_vars_ensures_unmodified_ok : Valid
 [wp] [Alt-Ergo] Goal typed_memcpy_context_vars_loop_invariant_ok_cpy_preserved : Valid
 [wp] [Qed] Goal typed_memcpy_context_vars_loop_invariant_ok_cpy_established : Valid
 [wp] [Qed] Goal typed_memcpy_context_vars_loop_invariant_ok_dst_preserved : Valid
@@ -20,7 +20,7 @@
 [wp] Report 'tests/wp_usage/issue-189-bis.i.1.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
-memcpy_context_vars   7     3 (88..112)     10       100%
+memcpy_context_vars   7     3 (96..120)     10       100%
 -------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'memcpy_context_vars':
   /*@

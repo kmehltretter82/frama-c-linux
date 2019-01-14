@@ -10,10 +10,6 @@
 [wp] [Qed] Goal typed_lemma_sizeof_uint64_t_ok : Valid
 [wp] [Alt-Ergo] Goal typed_BinaryMultiplication_ensures_product : Valid
 [wp] [Alt-Ergo] Goal typed_BinaryMultiplication_assert_a1_ok_deductible : Valid
-[wp] [Alt-Ergo] Goal typed_BinaryMultiplication_loop_invariant_inv1_ok_preserved : Timeout
-[wp] [Qed] Goal typed_BinaryMultiplication_loop_invariant_inv1_ok_established : Valid
-[wp] [Alt-Ergo] Goal typed_BinaryMultiplication_loop_invariant_inv2_ok_preserved : Timeout
-[wp] [Qed] Goal typed_BinaryMultiplication_loop_invariant_inv2_ok_established : Valid
 [wp] [Alt-Ergo] Goal typed_BinaryMultiplication_assert_a2_ok : Valid
 [wp] [Alt-Ergo] Goal typed_BinaryMultiplication_assert_a3_ok : Valid
 [wp] [Qed] Goal typed_BinaryMultiplication_loop_assigns : Valid
@@ -39,10 +35,6 @@ BinaryMultiplication   1    6 (208..256)     7       100%
 [wp] [Qed] Goal typed_lemma_sizeof_uint64_t_ok : Valid
 [wp] [Alt-Ergo] Goal typed_BinaryMultiplication_ensures_product : Valid
 [wp] [Alt-Ergo] Goal typed_BinaryMultiplication_assert_a1_ok_deductible : Valid
-[wp] [Alt-Ergo] Goal typed_BinaryMultiplication_loop_invariant_inv1_ok_preserved : Timeout
-[wp] [Qed] Goal typed_BinaryMultiplication_loop_invariant_inv1_ok_established : Valid
-[wp] [Alt-Ergo] Goal typed_BinaryMultiplication_loop_invariant_inv2_ok_preserved : Timeout
-[wp] [Qed] Goal typed_BinaryMultiplication_loop_invariant_inv2_ok_established : Valid
 [wp] [Alt-Ergo] Goal typed_BinaryMultiplication_assert_a2_ok : Valid
 [wp] [Alt-Ergo] Goal typed_BinaryMultiplication_assert_a3_ok : Valid
 [wp] [Qed] Goal typed_BinaryMultiplication_loop_assigns : Valid

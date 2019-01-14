@@ -13,10 +13,10 @@
 [wp] Goal typed_lemma_sizeof_uint64_t_ok : trivial
 [wp] Goal typed_BinaryMultiplication_ensures_product : not tried
 [wp] Goal typed_BinaryMultiplication_assert_a1_ok_deductible : not tried
-[wp] Goal typed_BinaryMultiplication_loop_invariant_inv1_ok_preserved : not tried
-[wp] Goal typed_BinaryMultiplication_loop_invariant_inv1_ok_established : not tried
-[wp] Goal typed_BinaryMultiplication_loop_invariant_inv2_ok_preserved : not tried
-[wp] Goal typed_BinaryMultiplication_loop_invariant_inv2_ok_established : not tried
+[wp] Goal typed_BinaryMultiplication_loop_invariant_inv1_lack_preserved : not tried
+[wp] Goal typed_BinaryMultiplication_loop_invariant_inv1_lack_established : not tried
+[wp] Goal typed_BinaryMultiplication_loop_invariant_inv2_lack_preserved : not tried
+[wp] Goal typed_BinaryMultiplication_loop_invariant_inv2_lack_established : not tried
 [wp] Goal typed_BinaryMultiplication_assert_a2_ok : not tried
 [wp] Goal typed_BinaryMultiplication_assert_a3_ok : not tried
 [wp] Goal typed_BinaryMultiplication_loop_assigns : trivial

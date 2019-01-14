@@ -16,7 +16,7 @@
 [wp] Report 'tests/wp_bts/bts_1828.i.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
-local_frame         -       1 (1..12)        1       100%
+local_frame         -       1 (8..20)        1       100%
 global_frame         3     -                 5      60.0%
 -------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'global_frame':

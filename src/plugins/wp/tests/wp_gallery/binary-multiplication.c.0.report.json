@@ -55,10 +55,10 @@
                                               "BinaryMultiplication_loop_variant": 
                                                 { "alt-ergo": { "total": 2,
                                                                 "valid": 2,
-                                                                "rank": 20 },
+                                                                "rank": 19 },
                                                   "wp:main": { "total": 2,
                                                                "valid": 2,
-                                                               "rank": 20 } },
+                                                               "rank": 19 } },
                                               "BinaryMultiplication_loop_assigns": 
                                                 { "qed": { "total": 1,
                                                            "valid": 1 },

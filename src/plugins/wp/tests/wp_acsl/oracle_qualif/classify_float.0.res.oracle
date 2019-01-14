@@ -12,5 +12,5 @@
 [wp] Report 'tests/wp_acsl/classify_float.c.0.report.json'
 -------------------------------------------------------------
 Axiomatics          WP     Alt-Ergo        Total   Success
-Lemma               -       3 (4..16)        3       100%
+Lemma               -       3 (8..20)        3       100%
 -------------------------------------------------------------

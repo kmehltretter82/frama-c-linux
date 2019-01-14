@@ -23,7 +23,7 @@
 module R = Report_parameters
 module T = Transitioning
 
-type action = SKIP | INFO | ERROR | REVIEW 
+type action = SKIP | INFO | ERROR | REVIEW
 
 let action s =
   match T.String.uppercase_ascii s with
@@ -156,7 +156,7 @@ let add_rule jvalue =
         if rule.r_plugin <> (snd default).r_plugin then
           failwith "Unexpected 'plugin' for property-rule" ;
         p.ps_rules in
-      let queues = 
+      let queues =
         match tgt with
         | `NONE -> failwith "Missing pattern"
         | `ERROR -> [get_queue errors rule.r_plugin]
@@ -359,7 +359,7 @@ let monitor_log_event (evt : Log.event) =
       let e_title =
         Printf.sprintf "Unclassified %s (Plugin '%s')"
           (T.String.capitalize_ascii env.rs_name) evt.evt_plugin in
-      let e_action = action (env.rs_action ()) in 
+      let e_action = action (env.rs_action ()) in
       { unclassified with e_id ; e_title ; e_action } in
     monitor ~lookup ~category ~msg ~source unclassified
   with Exit -> ()
@@ -393,7 +393,7 @@ let status ip =
   match Status.get ip with
   | Never_tried -> `UNTRIED
   | Unknown _ -> `UNKNOWN
-  | Considered_valid | Valid _ 
+  | Considered_valid | Valid _
   | Valid_but_dead _ | Unknown_but_dead _ | Invalid_but_dead _
     -> `PROVED
   | Valid_under_hyp pending
@@ -436,7 +436,7 @@ let rec monitored_property ip =
   | IPAxiomatic _ | IPAxiom _ -> false
   | IPLemma(_,_,_,_,_) -> true
   | IPTypeInvariant(_,_,_,_) | IPGlobalInvariant(_,_,_) -> true
-  | IPOther(_,_,_) -> true
+  | IPOther(_,_) -> true
   | IPExtended _ -> true
   | IPPropertyInstance (_, _, _, ip) -> monitored_property ip
 
@@ -451,7 +451,7 @@ let monitor_status properties ip =
       let e_action = properties.ps_action () |> action in
       let e_descr = T.String.capitalize_ascii properties.ps_name ^ " status" in
       { unclassified with e_id ; e_action ; e_title ; e_descr }
-    in monitor ~lookup ~category:[] ~msg ~source unclassified
+    in monitor ~lookup ~category:[] ~msg:name ~source unclassified
 
 let monitor_property pool push ip =
   begin
@@ -463,7 +463,7 @@ let monitor_property pool push ip =
     | `UNKNOWN -> monitor_status unknown ip
     | `INVALID -> monitor_status invalid ip
   end
-    
+
 let consolidate () =
   let pool = ref Pset.empty in
   let queue = Queue.create () in
@@ -476,7 +476,7 @@ let consolidate () =
         monitor_property pool push ip
     done
   end
-  
+
 (* -------------------------------------------------------------------------- *)
 (* --- Run Classification                                                 --- *)
 (* -------------------------------------------------------------------------- *)
@@ -565,14 +565,14 @@ let classify, _ =
     ] classify
 
 let register () =
-  if R.Rules.is_set () || 
+  if R.Rules.is_set () ||
      R.Warning.is_set () ||
      R.Error.is_set ()
   then monitor_log ()
 
 let main () =
   if R.Classify.get () then classify ()
-  
+
 let () =
   begin
     Cmdline.run_after_configuring_stage register ;

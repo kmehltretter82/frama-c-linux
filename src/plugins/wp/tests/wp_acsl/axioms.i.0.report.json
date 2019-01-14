@@ -6,13 +6,13 @@
   "wp:functions": { "f": { "f_loop_invariant_Positive": { "alt-ergo": 
                                                             { "total": 1,
                                                               "valid": 1,
-                                                              "rank": 8 },
+                                                              "rank": 9 },
                                                           "qed": { "total": 1,
                                                                    "valid": 1 },
                                                           "wp:main": 
                                                             { "total": 2,
                                                               "valid": 2,
-                                                              "rank": 8 } },
+                                                              "rank": 9 } },
                            "f_loop_invariant_Index": { "alt-ergo": { "total": 2,
                                                                     "valid": 2,
                                                                     "rank": 5 },

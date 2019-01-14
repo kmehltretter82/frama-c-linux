@@ -15,6 +15,6 @@
 [wp] Report 'tests/wp_hoare/logicref.i.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
-fvrange_n            2      1 (88..112)      3       100%
+fvrange_n            2      1 (96..120)      3       100%
 gcd                  2     -                 2       100%
 -------------------------------------------------------------

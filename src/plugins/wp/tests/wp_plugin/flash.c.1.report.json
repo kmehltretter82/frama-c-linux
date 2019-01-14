@@ -4,11 +4,11 @@
   "wp:functions": { "job": { "job_ensures_WriteValues": { "alt-ergo": 
                                                             { "total": 1,
                                                               "valid": 1,
-                                                              "rank": 19 },
+                                                              "rank": 20 },
                                                           "wp:main": 
                                                             { "total": 1,
                                                               "valid": 1,
-                                                              "rank": 19 } },
+                                                              "rank": 20 } },
                              "job_ensures_ReadValues": { "alt-ergo": 
                                                            { "total": 1,
                                                              "valid": 1,
@@ -18,10 +18,10 @@
                                                                     "rank": 20 } },
                              "job_ensures_B_writes": { "alt-ergo": { "total": 1,
                                                                     "valid": 1,
-                                                                    "rank": 12 },
+                                                                    "rank": 13 },
                                                        "wp:main": { "total": 1,
                                                                     "valid": 1,
-                                                                    "rank": 12 } },
+                                                                    "rank": 13 } },
                              "job_ensures_B_reads": { "alt-ergo": { "total": 1,
                                                                     "valid": 1,
                                                                     "rank": 19 },
