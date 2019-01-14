@@ -1,0 +1,2 @@
+File "../why3/Cmath.why", line 6, characters 6-13:
+warning: axiom abs_def does not contain any local abstract symbol

@@ -1,0 +1,49 @@
+[kernel] Parsing tests/non-free/watch.c (with preprocessing)
+[kernel:typing:implicit-function-declaration] tests/non-free/watch.c:5: Warning: 
+  Calling undeclared function Frama_C_watch_value. Old style K&R code?
+[kernel:typing:implicit-function-declaration] tests/non-free/watch.c:11: Warning: 
+  Calling undeclared function u. Old style K&R code?
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value:initial-state] Values of globals at initialization
+  x ∈ {0}
+  y ∈ {0}
+  z ∈ {0}
+[kernel:annot:missing-spec] tests/non-free/watch.c:5: Warning: 
+  Neither code nor specification for function Frama_C_watch_value, generating default assigns from the prototype
+[value] Call to builtin Frama_C_add_watch(({{ &c }},{4},{2000000000},{5}))
+[value] tests/non-free/watch.c:8: Watchpoint: & c [--..--]
+[value] tests/non-free/watch.c:9: Watchpoint: & c [--..--]
+[value] computing for function u <- main.
+  Called from tests/non-free/watch.c:11.
+[kernel:annot:missing-spec] tests/non-free/watch.c:11: Warning: 
+  Neither code nor specification for function u, generating default assigns from the prototype
+[value] using specification for function u
+[value] Done for function u
+[value] tests/non-free/watch.c:12: Watchpoint: & c [--..--]
+[value] tests/non-free/watch.c:13: Watchpoint: & c [--..--]
+[value] tests/non-free/watch.c:14: Watchpoint: & c [--..--]
+[value] User Error: Degeneration occurred:
+  results are not correct for lines of code that can be reached from the degeneration point.
+[from] Computing for function main
+[from] Computing for function Frama_C_watch_value <-main
+[from] Done for function Frama_C_watch_value
+[from] Computing for function u <-main
+[from] Done for function u
+[from] Non-terminating function main (no dependencies)
+[from] Done for function main
+[from] ====== DEPENDENCIES COMPUTED ======
+  These dependencies hold at termination for the executions that terminate:
+[from] Function Frama_C_watch_value:
+  c FROM c; x_1; x_2; x_3 (and SELF)
+  \result FROM c; x_1; x_2; x_3
+[from] Function u:
+  \result FROM \nothing
+[from] Function main:
+  NON TERMINATING - NO EFFECTS
+[from] ====== END OF DEPENDENCIES ======
+[inout] Out (internal) for function main:
+    x; c
+[inout] Inputs for function main:
+    x

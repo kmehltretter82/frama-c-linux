@@ -1,0 +1,2 @@
+CMD: @frama-c@ @LIB_PATH@ -journal-disable
+OPT: -wp -wp-par 1 -wp-msg-key shell -wp-verbose 0 -wp-rte -wp-report console.report

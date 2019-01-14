@@ -1,0 +1,64 @@
+[kernel] Parsing tests/non-free/memcpy_invalid.c (with preprocessing)
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value:initial-state] Values of globals at initialization
+  __fc_heap_status ∈ [--..--]
+  __fc_strtok_ptr ∈ {0}
+[value] computing for function test <- main.
+  Called from tests/non-free/memcpy_invalid.c:22.
+[value] computing for function Frama_C_interval <- test <- main.
+  Called from tests/non-free/memcpy_invalid.c:16.
+[value] using specification for function Frama_C_interval
+[value] Done for function Frama_C_interval
+[value:alarm] tests/non-free/memcpy_invalid.c:17: Warning: 
+  function memcpy: precondition 'valid_dest' got status unknown.
+[value:alarm] tests/non-free/memcpy_invalid.c:17: Warning: 
+  function memcpy: precondition 'valid_src' got status unknown.
+[value] tests/non-free/memcpy_invalid.c:17: 
+  function memcpy: precondition 'separation' got status valid.
+[value] tests/non-free/memcpy_invalid.c:17: 
+  Call to builtin memcpy(({{ (void *)&dst }},
+                          {{ &src + {0; 2; 4; 6; 8; 10; 12; 14} }},
+                          {1; 4294967283; 4294967285; 4294967287; 4294967289;
+                           4294967291; 4294967293; 4294967295}))
+[value] Recording results for test
+[from] Computing for function test
+[from] Done for function test
+[value] Done for function test
+[value] computing for function test <- main.
+  Called from tests/non-free/memcpy_invalid.c:23.
+[value] computing for function Frama_C_interval <- test <- main.
+  Called from tests/non-free/memcpy_invalid.c:16.
+[value] Done for function Frama_C_interval
+[value] tests/non-free/memcpy_invalid.c:17: 
+  Call to builtin memcpy(({{ (void *)&dst }},{{ &src + [0..16],0%2 }},
+                          [1..4294967295],1%2))
+[value] Recording results for test
+[from] Computing for function test
+[from] Done for function test
+[value] Done for function test
+[value] Recording results for main
+[from] Computing for function main
+[from] Done for function main
+[value] done for function main
+[value] ====== VALUES COMPUTED ======
+[value:final-states] Values at end of function test:
+  dst ∈ {0}
+  src ∈ {0}
+  i ∈ [0..16],0%2
+[value:final-states] Values at end of function main:
+  __retres ∈ {0}
+[from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
+[from] call to Frama_C_interval at tests/non-free/memcpy_invalid.c:16 (by test):
+  \result FROM min; max
+[from] call to memcpy at tests/non-free/memcpy_invalid.c:17 (by test):
+  dst FROM src
+  \result FROM dest
+[from] call to test at tests/non-free/memcpy_invalid.c:22 (by main):
+  NO EFFECTS
+[from] call to test at tests/non-free/memcpy_invalid.c:23 (by main):
+  NO EFFECTS
+[from] entry point:
+  \result FROM \nothing
+[from] ====== END OF CALLWISE DEPENDENCIES ======

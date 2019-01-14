@@ -1,0 +1,9 @@
+/toplevel.byte
+/viewer.byte
+/*.opt
+/toplevel.top
+/fc-config
+*.byte
+*.opt
+toplevel.top
+/machdep.exe

@@ -1,0 +1,31 @@
+[kernel] Parsing tests/nonterm/builtin_termination.c (with preprocessing)
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value:initial-state] Values of globals at initialization
+  __fc_heap_status ∈ [--..--]
+  __fc_strtok_ptr ∈ {0}
+  nondet ∈ [--..--]
+[value] tests/nonterm/builtin_termination.c:15: 
+  function strlen: precondition 'valid_string_s' got status valid.
+[value] tests/nonterm/builtin_termination.c:15: 
+  Call to builtin Frama_C_strlen(({{ &str1[0] }}))
+[value:alarm] tests/nonterm/builtin_termination.c:16: Warning: 
+  function strlen: precondition 'valid_string_s' got status invalid.
+[value] Recording results for main
+[value] done for function main
+[value] ====== VALUES COMPUTED ======
+[value:final-states] Values at end of function main:
+  str1[0] ∈ {111}
+      [1] ∈ {107}
+      [2..3] ∈ {0}
+  str2[0] ∈ {111}
+      [1] ∈ {107}
+      [2..3] ∈ UNINITIALIZED
+  len1 ∈ {2} or UNINITIALIZED
+  len2 ∈ UNINITIALIZED
+  __retres ∈ {0}
+[nonterm] tests/nonterm/builtin_termination.c:16: Warning: 
+  non-terminating function call
+  stack: main
+[nonterm] Analysis done.

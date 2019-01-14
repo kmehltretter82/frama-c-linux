@@ -1,0 +1,20 @@
+File "../why3/Memory.why", line 65, characters 6-17:
+warning: axiom valid_rw_rd does not contain any local abstract symbol
+File "../why3/Memory.why", line 68, characters 6-18:
+warning: axiom valid_string does not contain any local abstract symbol
+File "../why3/Memory.why", line 72, characters 6-17:
+warning: axiom separated_1 does not contain any local abstract symbol
+File "../why3/Memory.why", line 87, characters 6-24:
+warning: axiom separated_included does not contain any local abstract symbol
+File "../why3/Memory.why", line 91, characters 6-20:
+warning: axiom included_trans does not contain any local abstract symbol
+File "../why3/Memory.why", line 95, characters 6-21:
+warning: axiom separated_trans does not contain any local abstract symbol
+File "../why3/Memory.why", line 99, characters 6-19:
+warning: axiom separated_sym does not contain any local abstract symbol
+File "../why3/Memory.why", line 102, characters 6-20:
+warning: axiom eqmem_included does not contain any local abstract symbol
+File "../why3/Memory.why", line 106, characters 6-15:
+warning: axiom eqmem_sym does not contain any local abstract symbol
+File "../why3/Memory.why", line 109, characters 6-15:
+warning: axiom havoc_sym does not contain any local abstract symbol

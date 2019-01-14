@@ -1,0 +1,22 @@
+/*@
+  axiomatic WhitherRemove_Function
+  {
+    logic integer WhitherRemove{L}(value_type* a, value_type v,
+                    integer i) reads a[0..(i-1)];
+    
+    axiom whither_1:
+      \forall value_type *a, v; WhitherRemove(a, v, 0) == 0;
+
+    axiom whither_2:
+      \forall value_type *a, v, integer i; a[i] == v ==>
+        WhitherRemove(a, v, i+1) == WhitherRemove(a, v, i);
+
+    axiom whither_3:
+      \forall value_type *a, v, integer i; a[i] != v ==>
+        WhitherRemove(a, v, i+1) == WhitherRemove(a, v, i) + 1;
+
+    axiom whither_lemma:
+      \forall value_type *a, v, integer i, j; i < j && a[i] != v ==>
+        WhitherRemove(a, v, i) < WhitherRemove(a, v, j);
+  }
+*/

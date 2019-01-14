@@ -1,0 +1,17 @@
+[kernel] Parsing tests/nonterm/n1.i (no preprocessing)
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value:initial-state] Values of globals at initialization
+  
+[value] tests/nonterm/n1.i:6: entering loop for the first time
+[value:alarm] tests/nonterm/n1.i:7: Warning: 
+  signed overflow. assert res + i ≤ 2147483647;
+[value] Recording results for main
+[value] done for function main
+[value] ====== VALUES COMPUTED ======
+[value:final-states] Values at end of function main:
+  i ∈ {10}
+  res ∈ [0..2147483647]
+  __retres ∈ {0}
+[nonterm] Analysis done.

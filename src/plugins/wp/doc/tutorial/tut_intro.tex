@@ -1,0 +1,49 @@
+\chapter{Introduction}
+
+This book is a guided tour on how to use \textsf{WP} plug-in of
+\textsf{Frama-C} for proving \textsf{C} programs annotated with
+\textsf{ACSL} notations. It is based on the excellent ``ACSL By
+Example'' book produced by the Fraunhofer FIRST Institute for 
+the Device-Soft project\footnote{Version 7.1.0 of December 2011, 
+  see \url{http://www.first.fraunhofer.de}}.
+
+We assume the reader to be familiar with \textsf{ACSL} in general and
+already equipped with the \textsf{WP} plug-in, which is distributed
+with \textsf{Frama-C} releases. Please refer to the \textsf{WP} user's
+manual\footnote{\url{http://frama-c.com/download/frama-c-wp-manual.pdf}}
+for installation and general overview of the plug-in.
+
+\section{Library}
+
+The case studies presented in this document are exact copies of the
+ones presented in the original ``ACSL By Example'' book. Sometimes, we
+indicate some modifications of the specification that makes
+\textsf{WP} better prove the programs.
+
+All examples uses the following \emph{library} of \textsf{C} and
+\textsf{ACSL} definitions:
+
+\listingname{library.h}
+\cinput{library.h}
+
+\section{Examples}
+
+Source of case studies are generally presented in two separated files:
+one for the header and specification of the algorithm, and one of its
+implementation.  To ease the presentation in the book, we have omitted
+the necessary \texttt{include} lines from sources.
+
+Thus, a header file \texttt{A.h} should be enclosed by the following lines:
+\begin{ccode}
+  #ifndef _A_H
+  #define _A_H
+  #include "../library.h"
+  [...]
+  #endif
+\end{ccode}
+
+Similarly, an implementation file \texttt{A.c} should start by including its header:
+\begin{ccode}
+  #include "A.h"
+  [...]
+\end{ccode}

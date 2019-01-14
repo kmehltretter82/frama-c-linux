@@ -1,0 +1,172 @@
+stages:
+ - frama_c_and_plugins
+ - distrib_and_compatibility
+
+frama-c-external:
+  stage: frama_c_and_plugins
+  script:
+  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --frama-c $CI_BUILD_REF --branch $CI_BUILD_REF_NAME frama-c-external --cppo 07d2bcee50670aecae7e094d92f68fd18314073a --ocamlgraph 9286b375c005d1d504a1def0c5986f54c7f12251 --url ocamlfind,git@git.frama-c.com:bobot/ocamlfind.git
+  tags:
+  except:
+  - tags
+  retry: 2
+
+frama-c:
+  stage: frama_c_and_plugins
+  script:
+  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --frama-c $CI_BUILD_REF --branch $CI_BUILD_REF_NAME frama-c --cppo 07d2bcee50670aecae7e094d92f68fd18314073a --ocamlgraph 9286b375c005d1d504a1def0c5986f54c7f12251  --url ocamlfind,git@git.frama-c.com:bobot/ocamlfind.git
+  tags:
+  except:
+  - tags
+  retry: 2
+
+frama-c-ocaml-4.03:
+  stage: distrib_and_compatibility
+  script:
+  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --ocaml 4.03 --camlp4 4.03 --frama-c $CI_BUILD_REF --branch $CI_BUILD_REF_NAME frama-c --cppo 07d2bcee50670aecae7e094d92f68fd18314073a --ocamlgraph 9286b375c005d1d504a1def0c5986f54c7f12251  --url ocamlfind,git@git.frama-c.com:bobot/ocamlfind.git
+  tags:
+  except:
+  - tags
+  retry: 2
+
+frama-c-ocaml-4.04:
+  stage: distrib_and_compatibility
+  script:
+  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --ocaml 4.04 --camlp4 4.04 --lablgtk 4bbd5cf1990aa8b775cf247fbfe5be321e13cc61 --frama-c $CI_BUILD_REF --branch $CI_BUILD_REF_NAME frama-c  --cppo 07d2bcee50670aecae7e094d92f68fd18314073a --ocamlgraph 9286b375c005d1d504a1def0c5986f54c7f12251  --url ocamlfind,git@git.frama-c.com:bobot/ocamlfind.git
+  tags:
+  except:
+  - tags
+  retry: 2
+
+frama-c-ocaml-4.05:
+  stage: distrib_and_compatibility
+  script:
+  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --ocaml 4.05 --camlp4 4.05 --lablgtk 4bbd5cf1990aa8b775cf247fbfe5be321e13cc61 --camomile 3f4d657d50c17213f3338ca75efb30d728704df3 --frama-c $CI_BUILD_REF --branch $CI_BUILD_REF_NAME frama-c  --cppo 07d2bcee50670aecae7e094d92f68fd18314073a --ocamlgraph 9286b375c005d1d504a1def0c5986f54c7f12251  --url ocamlfind,git@git.frama-c.com:bobot/ocamlfind.git
+  tags:
+  except:
+  - tags
+  retry: 2
+  allow_failure: true
+
+frama-c-internal:
+  stage: distrib_and_compatibility
+  script:
+  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --frama-c $CI_BUILD_REF --branch $CI_BUILD_REF_NAME frama-c-internal  --cppo 07d2bcee50670aecae7e094d92f68fd18314073a --ocamlgraph 9286b375c005d1d504a1def0c5986f54c7f12251  --url ocamlfind,git@git.frama-c.com:bobot/ocamlfind.git
+  tags:
+  only:
+   - master
+   - stable/silicium
+  except:
+  - tags
+  retry: 2
+
+frama-c-distrib:
+  stage: distrib_and_compatibility
+  script:
+  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --frama-c $CI_BUILD_REF --branch $CI_BUILD_REF_NAME frama-c-distrib  --cppo 07d2bcee50670aecae7e094d92f68fd18314073a --ocamlgraph 9286b375c005d1d504a1def0c5986f54c7f12251  --url ocamlfind,git@git.frama-c.com:bobot/ocamlfind.git
+  tags:
+  except:
+  - tags
+  retry: 2
+
+
+Genassigns:
+  stage: frama_c_and_plugins
+  script:
+  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --frama-c $CI_BUILD_REF --branch $CI_BUILD_REF_NAME Genassigns  --cppo 07d2bcee50670aecae7e094d92f68fd18314073a --ocamlgraph 9286b375c005d1d504a1def0c5986f54c7f12251  --url ocamlfind,git@git.frama-c.com:bobot/ocamlfind.git
+  tags:
+  except:
+  - tags
+  retry: 2
+
+Mthread:
+  stage: frama_c_and_plugins
+  script:
+  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --frama-c $CI_BUILD_REF --branch $CI_BUILD_REF_NAME Mthread  --cppo 07d2bcee50670aecae7e094d92f68fd18314073a --ocamlgraph 9286b375c005d1d504a1def0c5986f54c7f12251  --url ocamlfind,git@git.frama-c.com:bobot/ocamlfind.git
+  tags:
+  except:
+  - tags
+  retry: 2
+
+a3export:
+  stage: frama_c_and_plugins
+  script:
+  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --frama-c $CI_BUILD_REF --branch $CI_BUILD_REF_NAME a3export  --cppo 07d2bcee50670aecae7e094d92f68fd18314073a --ocamlgraph 9286b375c005d1d504a1def0c5986f54c7f12251  --url ocamlfind,git@git.frama-c.com:bobot/ocamlfind.git
+  tags:
+  except:
+  - tags
+  retry: 2
+
+PathCrawler:
+  stage: frama_c_and_plugins
+  script:
+  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --frama-c $CI_BUILD_REF --branch $CI_BUILD_REF_NAME PathCrawler  --cppo 07d2bcee50670aecae7e094d92f68fd18314073a --ocamlgraph 9286b375c005d1d504a1def0c5986f54c7f12251  --url ocamlfind,git@git.frama-c.com:bobot/ocamlfind.git
+  tags:
+  except:
+  - tags
+  retry: 2
+
+Security:
+  stage: frama_c_and_plugins
+  script:
+  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --frama-c $CI_BUILD_REF --branch $CI_BUILD_REF_NAME Security  --cppo 07d2bcee50670aecae7e094d92f68fd18314073a --ocamlgraph 9286b375c005d1d504a1def0c5986f54c7f12251  --url ocamlfind,git@git.frama-c.com:bobot/ocamlfind.git
+  tags:
+  except:
+  - tags
+  retry: 2
+
+E-ACSL:
+  stage: frama_c_and_plugins
+  script:
+  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --frama-c $CI_BUILD_REF --branch $CI_BUILD_REF_NAME E-ACSL  --cppo 07d2bcee50670aecae7e094d92f68fd18314073a --ocamlgraph 9286b375c005d1d504a1def0c5986f54c7f12251  --url ocamlfind,git@git.frama-c.com:bobot/ocamlfind.git
+  tags:
+  except:
+  - tags
+  allow_failure: true
+  retry: 2
+
+context-from-precondition:
+  stage: frama_c_and_plugins
+  script:
+  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --frama-c $CI_BUILD_REF --branch $CI_BUILD_REF_NAME context-from-precondition  --cppo 07d2bcee50670aecae7e094d92f68fd18314073a --ocamlgraph 9286b375c005d1d504a1def0c5986f54c7f12251  --url ocamlfind,git@git.frama-c.com:bobot/ocamlfind.git
+  tags:
+  except:
+  - tags
+  retry: 2
+
+open-source-case-studies:
+  stage: frama_c_and_plugins
+  script:
+  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --frama-c $CI_BUILD_REF --url open-source-case-studies,git@git.frama-c.com:frama-c/open-source-case-studies.git --commit open-source-case-studies,master open-source-case-studies  --cppo 07d2bcee50670aecae7e094d92f68fd18314073a --ocamlgraph 9286b375c005d1d504a1def0c5986f54c7f12251  --url ocamlfind,git@git.frama-c.com:bobot/ocamlfind.git
+  tags:
+  except:
+  - tags
+  when: manual
+  retry: 2
+
+ACSL-importer:
+  stage: frama_c_and_plugins
+  script:
+  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --frama-c $CI_BUILD_REF --branch $CI_BUILD_REF_NAME ACSL-importer  --cppo 07d2bcee50670aecae7e094d92f68fd18314073a --ocamlgraph 9286b375c005d1d504a1def0c5986f54c7f12251  --url ocamlfind,git@git.frama-c.com:bobot/ocamlfind.git
+  tags:
+  except:
+  - tags
+  retry: 2
+
+Caveat-importer:
+  stage: frama_c_and_plugins
+  script:
+  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --frama-c $CI_BUILD_REF --branch $CI_BUILD_REF_NAME Caveat-importer  --cppo 07d2bcee50670aecae7e094d92f68fd18314073a --ocamlgraph 9286b375c005d1d504a1def0c5986f54c7f12251  --url ocamlfind,git@git.frama-c.com:bobot/ocamlfind.git
+  tags:
+  except:
+  - tags
+  retry: 2
+
+Volatile:
+  stage: frama_c_and_plugins
+  script:
+  - ~oci/oci/bin/bf_client.native run --socket ~oci/data/oci-data/oci.socket --frama-c $CI_BUILD_REF --branch $CI_BUILD_REF_NAME Volatile  --cppo 07d2bcee50670aecae7e094d92f68fd18314073a --ocamlgraph 9286b375c005d1d504a1def0c5986f54c7f12251  --url ocamlfind,git@git.frama-c.com:bobot/ocamlfind.git
+  tags:
+  except:
+  - tags
+  retry: 2

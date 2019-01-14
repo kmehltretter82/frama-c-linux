@@ -1,0 +1,104 @@
+[kernel] Parsing tests/non-free/malloc-size-zero.i (no preprocessing)
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value:initial-state] Values of globals at initialization
+  foo ∈ [--..--]
+[value] computing for function my_calloc <- main.
+  Called from tests/non-free/malloc-size-zero.i:16.
+[kernel:annot:missing-spec] tests/non-free/malloc-size-zero.i:10: Warning: 
+  Neither code nor specification for function malloc, generating default assigns from the prototype
+[value] tests/non-free/malloc-size-zero.i:10: 
+  allocating variable __malloc_my_calloc_l10
+[value] Recording results for my_calloc
+[value] Done for function my_calloc
+[value] tests/non-free/malloc-size-zero.i:20: Frama_C_show_each_not_NULL_p1:
+[value:alarm] tests/non-free/malloc-size-zero.i:24: Warning: 
+  pointer comparison. assert \pointer_comparable((void *)(p1 + 1), (void *)0);
+[value] tests/non-free/malloc-size-zero.i:27: entering loop for the first time
+[value] computing for function my_calloc <- main.
+  Called from tests/non-free/malloc-size-zero.i:29.
+[value] tests/non-free/malloc-size-zero.i:10: 
+  allocating variable __malloc_my_calloc_l10_0
+[value] Recording results for my_calloc
+[value] Done for function my_calloc
+[value] computing for function my_calloc <- main.
+  Called from tests/non-free/malloc-size-zero.i:29.
+[value] tests/non-free/malloc-size-zero.i:10: 
+  allocating variable __malloc_my_calloc_l10_1
+[value] Recording results for my_calloc
+[value] Done for function my_calloc
+[value] computing for function my_calloc <- main.
+  Called from tests/non-free/malloc-size-zero.i:29.
+[value] tests/non-free/malloc-size-zero.i:10: 
+  allocating variable __malloc_my_calloc_l10_2
+[value] Recording results for my_calloc
+[value] Done for function my_calloc
+[value] computing for function my_calloc <- main.
+  Called from tests/non-free/malloc-size-zero.i:29.
+[value] tests/non-free/malloc-size-zero.i:10: 
+  allocating variable __malloc_my_calloc_l10_3
+[value] Recording results for my_calloc
+[value] Done for function my_calloc
+[value] computing for function my_calloc <- main.
+  Called from tests/non-free/malloc-size-zero.i:29.
+[value:malloc] tests/non-free/malloc-size-zero.i:10: 
+  marking variable `__malloc_my_calloc_l10_3' as weak
+[value] Recording results for my_calloc
+[value] Done for function my_calloc
+[value] tests/non-free/malloc-size-zero.i:33: 
+  Frama_C_dump_each:
+  # Cvalue domain:
+  foo ∈ [--..--]
+  p1 ∈ {{ &__malloc_my_calloc_l10[0] }}
+  q1 ∈
+    {{ &__malloc_my_calloc_l10_0[0] ; &__malloc_my_calloc_l10_1[0] ;
+       &__malloc_my_calloc_l10_2[0] ; &__malloc_w_my_calloc_l10_3[0] }} or UNINITIALIZED
+  __malloc_my_calloc_l10∈ ∅
+  __malloc_my_calloc_l10_0∈ ∅
+  __malloc_my_calloc_l10_1∈ ∅
+  __malloc_my_calloc_l10_2∈ ∅
+  __malloc_w_my_calloc_l10_3∈ ∅
+  ==END OF DUMP==
+[value:alarm] tests/non-free/malloc-size-zero.i:35: Warning: 
+  out of bounds write. assert \valid(p1);
+[kernel] tests/non-free/malloc-size-zero.i:35: Warning: 
+  all target addresses were invalid. This path is assumed to be dead.
+[kernel] tests/non-free/malloc-size-zero.i:37: Warning: 
+  No code nor implicit assigns clause for function free, generating default assigns from the prototype
+[value] tests/non-free/malloc-size-zero.i:37: 
+  function free: precondition got status valid.
+[value:malloc] tests/non-free/malloc-size-zero.i:37: 
+  strong free on bases: {__malloc_my_calloc_l10}
+[value] tests/non-free/malloc-size-zero.i:39: 
+  Frama_C_show_each:
+  {{ &__malloc_my_calloc_l10_0 ; &__malloc_my_calloc_l10_1 ;
+     &__malloc_my_calloc_l10_2 ; &__malloc_w_my_calloc_l10_3 }}
+[value] tests/non-free/malloc-size-zero.i:40: assertion got status valid.
+[value:alarm] tests/non-free/malloc-size-zero.i:42: Warning: 
+  accessing uninitialized left-value. assert \initialized(&q1);
+[value:alarm] tests/non-free/malloc-size-zero.i:42: Warning: 
+  out of bounds write. assert \valid(q1);
+[kernel] tests/non-free/malloc-size-zero.i:42: Warning: 
+  all target addresses were invalid. This path is assumed to be dead.
+[value:alarm] tests/non-free/malloc-size-zero.i:44: Warning: 
+  accessing uninitialized left-value. assert \initialized(&q1);
+[value] tests/non-free/malloc-size-zero.i:44: 
+  function free: precondition got status valid.
+[value:malloc] tests/non-free/malloc-size-zero.i:44: 
+  weak free on bases: {__malloc_my_calloc_l10_0, __malloc_my_calloc_l10_1,
+                       __malloc_my_calloc_l10_2, __malloc_w_my_calloc_l10_3}
+[value] Recording results for main
+[value] done for function main
+[value] tests/non-free/malloc-size-zero.i:35: 
+  assertion 'Value,mem_access' got final status invalid.
+[value] tests/non-free/malloc-size-zero.i:42: 
+  assertion 'Value,mem_access' got final status invalid.
+[value] ====== VALUES COMPUTED ======
+[value:final-states] Values at end of function my_calloc:
+  
+[value:final-states] Values at end of function main:
+  p1 ∈ ESCAPINGADDR
+  q1 ∈
+    {{ &__malloc_my_calloc_l10_0[0] ; &__malloc_my_calloc_l10_1[0] ;
+       &__malloc_my_calloc_l10_2[0] ; &__malloc_w_my_calloc_l10_3[0] }} or ESCAPINGADDR

@@ -1,0 +1,480 @@
+[kernel] Parsing tests/loop_analysis/with_value.i (no preprocessing)
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value:initial-state] Values of globals at initialization
+  nondet ∈ [--..--]
+[value] computing for function f1 <- main.
+  Called from tests/loop_analysis/with_value.i:187.
+[value] tests/loop_analysis/with_value.i:6: entering loop for the first time
+[value] Recording results for f1
+[value] Done for function f1
+[value] computing for function f2 <- main.
+  Called from tests/loop_analysis/with_value.i:188.
+[value] tests/loop_analysis/with_value.i:10: entering loop for the first time
+[value] Recording results for f2
+[value] Done for function f2
+[value] computing for function f3 <- main.
+  Called from tests/loop_analysis/with_value.i:189.
+[value] tests/loop_analysis/with_value.i:14: entering loop for the first time
+[value] Recording results for f3
+[value] Done for function f3
+[value] computing for function f4 <- main.
+  Called from tests/loop_analysis/with_value.i:190.
+[value] tests/loop_analysis/with_value.i:18: entering loop for the first time
+[value] Recording results for f4
+[value] Done for function f4
+[value] computing for function f5 <- main.
+  Called from tests/loop_analysis/with_value.i:191.
+[value] tests/loop_analysis/with_value.i:22: entering loop for the first time
+[value] Recording results for f5
+[value] Done for function f5
+[value] computing for function f6 <- main.
+  Called from tests/loop_analysis/with_value.i:192.
+[value] tests/loop_analysis/with_value.i:26: entering loop for the first time
+[value] Recording results for f6
+[value] Done for function f6
+[value] computing for function f7 <- main.
+  Called from tests/loop_analysis/with_value.i:193.
+[value] tests/loop_analysis/with_value.i:30: entering loop for the first time
+[value] Recording results for f7
+[value] Done for function f7
+[value] computing for function f8 <- main.
+  Called from tests/loop_analysis/with_value.i:194.
+[value] tests/loop_analysis/with_value.i:34: entering loop for the first time
+[value] Recording results for f8
+[value] Done for function f8
+[value] computing for function g1 <- main.
+  Called from tests/loop_analysis/with_value.i:195.
+[value] tests/loop_analysis/with_value.i:38: entering loop for the first time
+[value:alarm] tests/loop_analysis/with_value.i:38: Warning: 
+  signed overflow. assert n + 2 ≤ 2147483647;
+[value] Recording results for g1
+[value] Done for function g1
+[value] computing for function g2 <- main.
+  Called from tests/loop_analysis/with_value.i:196.
+[value] tests/loop_analysis/with_value.i:42: entering loop for the first time
+[value:alarm] tests/loop_analysis/with_value.i:42: Warning: 
+  signed overflow. assert n + 2 ≤ 2147483647;
+[value:alarm] tests/loop_analysis/with_value.i:42: Warning: 
+  signed overflow. assert i + 1 ≤ 2147483647;
+[value] Recording results for g2
+[value] Done for function g2
+[value] computing for function g3 <- main.
+  Called from tests/loop_analysis/with_value.i:197.
+[value] tests/loop_analysis/with_value.i:46: entering loop for the first time
+[value:alarm] tests/loop_analysis/with_value.i:46: Warning: 
+  signed overflow. assert n + 2 ≤ 2147483647;
+[value:alarm] tests/loop_analysis/with_value.i:46: Warning: 
+  signed overflow. assert i + 1 ≤ 2147483647;
+[value] Recording results for g3
+[value] Done for function g3
+[value] computing for function g4 <- main.
+  Called from tests/loop_analysis/with_value.i:198.
+[value] tests/loop_analysis/with_value.i:50: entering loop for the first time
+[value:alarm] tests/loop_analysis/with_value.i:50: Warning: 
+  signed overflow. assert n + 2 ≤ 2147483647;
+[value] Recording results for g4
+[value] Done for function g4
+[value] computing for function g5 <- main.
+  Called from tests/loop_analysis/with_value.i:199.
+[value:alarm] tests/loop_analysis/with_value.i:54: Warning: 
+  signed overflow. assert n + 2 ≤ 2147483647;
+[value] tests/loop_analysis/with_value.i:54: entering loop for the first time
+[value] Recording results for g5
+[value] Done for function g5
+[value] computing for function g6 <- main.
+  Called from tests/loop_analysis/with_value.i:200.
+[value:alarm] tests/loop_analysis/with_value.i:58: Warning: 
+  signed overflow. assert n + 2 ≤ 2147483647;
+[value] tests/loop_analysis/with_value.i:58: entering loop for the first time
+[value] Recording results for g6
+[value] Done for function g6
+[value] computing for function g7 <- main.
+  Called from tests/loop_analysis/with_value.i:201.
+[value:alarm] tests/loop_analysis/with_value.i:62: Warning: 
+  signed overflow. assert n + 2 ≤ 2147483647;
+[value] tests/loop_analysis/with_value.i:62: entering loop for the first time
+[value] Recording results for g7
+[value] Done for function g7
+[value] computing for function g8 <- main.
+  Called from tests/loop_analysis/with_value.i:202.
+[value:alarm] tests/loop_analysis/with_value.i:66: Warning: 
+  signed overflow. assert n + 2 ≤ 2147483647;
+[value] tests/loop_analysis/with_value.i:66: entering loop for the first time
+[value] Recording results for g8
+[value] Done for function g8
+[value] computing for function h1 <- main.
+  Called from tests/loop_analysis/with_value.i:203.
+[value] tests/loop_analysis/with_value.i:70: entering loop for the first time
+[value] Recording results for h1
+[value] Done for function h1
+[value] computing for function h1 <- main.
+  Called from tests/loop_analysis/with_value.i:204.
+[value] Recording results for h1
+[value] Done for function h1
+[value] computing for function h2 <- main.
+  Called from tests/loop_analysis/with_value.i:205.
+[value] tests/loop_analysis/with_value.i:74: entering loop for the first time
+[value] Recording results for h2
+[value] Done for function h2
+[value] computing for function h2 <- main.
+  Called from tests/loop_analysis/with_value.i:206.
+[value] Recording results for h2
+[value] Done for function h2
+[value] computing for function h3 <- main.
+  Called from tests/loop_analysis/with_value.i:207.
+[value] tests/loop_analysis/with_value.i:78: entering loop for the first time
+[value] Recording results for h3
+[value] Done for function h3
+[value] computing for function h3 <- main.
+  Called from tests/loop_analysis/with_value.i:208.
+[value] Recording results for h3
+[value] Done for function h3
+[value] computing for function h4 <- main.
+  Called from tests/loop_analysis/with_value.i:209.
+[value] tests/loop_analysis/with_value.i:82: entering loop for the first time
+[value] Recording results for h4
+[value] Done for function h4
+[value] computing for function h4 <- main.
+  Called from tests/loop_analysis/with_value.i:210.
+[value] Recording results for h4
+[value] Done for function h4
+[value] computing for function h5 <- main.
+  Called from tests/loop_analysis/with_value.i:211.
+[value] tests/loop_analysis/with_value.i:86: entering loop for the first time
+[value] Recording results for h5
+[value] Done for function h5
+[value] computing for function h5 <- main.
+  Called from tests/loop_analysis/with_value.i:212.
+[value] Recording results for h5
+[value] Done for function h5
+[value] computing for function h6 <- main.
+  Called from tests/loop_analysis/with_value.i:213.
+[value] tests/loop_analysis/with_value.i:90: entering loop for the first time
+[value] Recording results for h6
+[value] Done for function h6
+[value] computing for function h6 <- main.
+  Called from tests/loop_analysis/with_value.i:214.
+[value] Recording results for h6
+[value] Done for function h6
+[value] computing for function h7 <- main.
+  Called from tests/loop_analysis/with_value.i:215.
+[value] tests/loop_analysis/with_value.i:94: entering loop for the first time
+[value] Recording results for h7
+[value] Done for function h7
+[value] computing for function h7 <- main.
+  Called from tests/loop_analysis/with_value.i:216.
+[value] Recording results for h7
+[value] Done for function h7
+[value] computing for function h8 <- main.
+  Called from tests/loop_analysis/with_value.i:217.
+[value] tests/loop_analysis/with_value.i:98: entering loop for the first time
+[value] Recording results for h8
+[value] Done for function h8
+[value] computing for function h8 <- main.
+  Called from tests/loop_analysis/with_value.i:218.
+[value] Recording results for h8
+[value] Done for function h8
+[value] computing for function i1 <- main.
+  Called from tests/loop_analysis/with_value.i:219.
+[value] tests/loop_analysis/with_value.i:102: entering loop for the first time
+[value] Recording results for i1
+[value] Done for function i1
+[value] computing for function i2 <- main.
+  Called from tests/loop_analysis/with_value.i:220.
+[value] tests/loop_analysis/with_value.i:106: entering loop for the first time
+[value] Recording results for i2
+[value] Done for function i2
+[value] computing for function i3 <- main.
+  Called from tests/loop_analysis/with_value.i:221.
+[value] tests/loop_analysis/with_value.i:110: entering loop for the first time
+[value] Recording results for i3
+[value] Done for function i3
+[value] computing for function i4 <- main.
+  Called from tests/loop_analysis/with_value.i:222.
+[value] tests/loop_analysis/with_value.i:114: entering loop for the first time
+[value] Recording results for i4
+[value] Done for function i4
+[value] computing for function j1 <- main.
+  Called from tests/loop_analysis/with_value.i:223.
+[value] tests/loop_analysis/with_value.i:118: entering loop for the first time
+[value] Recording results for j1
+[value] Done for function j1
+[value] computing for function j2 <- main.
+  Called from tests/loop_analysis/with_value.i:224.
+[value] tests/loop_analysis/with_value.i:122: entering loop for the first time
+[value] Recording results for j2
+[value] Done for function j2
+[value] computing for function j3 <- main.
+  Called from tests/loop_analysis/with_value.i:225.
+[value] tests/loop_analysis/with_value.i:126: entering loop for the first time
+[value] Recording results for j3
+[value] Done for function j3
+[value] computing for function j4 <- main.
+  Called from tests/loop_analysis/with_value.i:226.
+[value] tests/loop_analysis/with_value.i:130: entering loop for the first time
+[value] Recording results for j4
+[value] Done for function j4
+[value] computing for function j1 <- main.
+  Called from tests/loop_analysis/with_value.i:227.
+[value] Recording results for j1
+[value] Done for function j1
+[value] computing for function j2 <- main.
+  Called from tests/loop_analysis/with_value.i:228.
+[value] Recording results for j2
+[value] Done for function j2
+[value] computing for function j3 <- main.
+  Called from tests/loop_analysis/with_value.i:229.
+[value] Recording results for j3
+[value] Done for function j3
+[value] computing for function j4 <- main.
+  Called from tests/loop_analysis/with_value.i:230.
+[value] Recording results for j4
+[value] Done for function j4
+[value] computing for function f2_u_const <- main.
+  Called from tests/loop_analysis/with_value.i:232.
+[value] tests/loop_analysis/with_value.i:134: entering loop for the first time
+[value] Recording results for f2_u_const
+[value] Done for function f2_u_const
+[value] computing for function ne1 <- main.
+  Called from tests/loop_analysis/with_value.i:234.
+[value] tests/loop_analysis/with_value.i:138: entering loop for the first time
+[value:alarm] tests/loop_analysis/with_value.i:138: Warning: 
+  signed overflow. assert i + 4 ≤ 2147483647;
+[value] Recording results for ne1
+[value] Done for function ne1
+[value] computing for function ne2 <- main.
+  Called from tests/loop_analysis/with_value.i:235.
+[value] tests/loop_analysis/with_value.i:142: entering loop for the first time
+[value:alarm] tests/loop_analysis/with_value.i:142: Warning: 
+  signed overflow. assert i + 4 ≤ 2147483647;
+[value] Recording results for ne2
+[value] Done for function ne2
+[value] computing for function ne3 <- main.
+  Called from tests/loop_analysis/with_value.i:236.
+[value] tests/loop_analysis/with_value.i:146: entering loop for the first time
+[value:alarm] tests/loop_analysis/with_value.i:146: Warning: 
+  signed overflow. assert -2147483648 ≤ i - 1;
+[value] Recording results for ne3
+[value] Done for function ne3
+[value] computing for function ne4 <- main.
+  Called from tests/loop_analysis/with_value.i:237.
+[value] tests/loop_analysis/with_value.i:150: entering loop for the first time
+[value:alarm] tests/loop_analysis/with_value.i:150: Warning: 
+  signed overflow. assert -2147483648 ≤ i - 1;
+[value] Recording results for ne4
+[value] Done for function ne4
+[value] computing for function nev1 <- main.
+  Called from tests/loop_analysis/with_value.i:238.
+[value] tests/loop_analysis/with_value.i:154: entering loop for the first time
+[value:alarm] tests/loop_analysis/with_value.i:154: Warning: 
+  signed overflow. assert i + 4 ≤ 2147483647;
+[value] Recording results for nev1
+[value] Done for function nev1
+[value] computing for function nev2 <- main.
+  Called from tests/loop_analysis/with_value.i:239.
+[value] tests/loop_analysis/with_value.i:158: entering loop for the first time
+[value:alarm] tests/loop_analysis/with_value.i:158: Warning: 
+  signed overflow. assert i + 4 ≤ 2147483647;
+[value] Recording results for nev2
+[value] Done for function nev2
+[value] computing for function nev3 <- main.
+  Called from tests/loop_analysis/with_value.i:240.
+[value] tests/loop_analysis/with_value.i:162: entering loop for the first time
+[value:alarm] tests/loop_analysis/with_value.i:162: Warning: 
+  signed overflow. assert -2147483648 ≤ i - 1;
+[value] Recording results for nev3
+[value] Done for function nev3
+[value] computing for function nev4 <- main.
+  Called from tests/loop_analysis/with_value.i:241.
+[value] tests/loop_analysis/with_value.i:166: entering loop for the first time
+[value:alarm] tests/loop_analysis/with_value.i:166: Warning: 
+  signed overflow. assert -2147483648 ≤ i - 1;
+[value] Recording results for nev4
+[value] Done for function nev4
+[value] computing for function nev5 <- main.
+  Called from tests/loop_analysis/with_value.i:242.
+[value] tests/loop_analysis/with_value.i:170: entering loop for the first time
+[value:alarm] tests/loop_analysis/with_value.i:170: Warning: 
+  signed overflow. assert i + 4 ≤ 2147483647;
+[value] Recording results for nev5
+[value] Done for function nev5
+[value] computing for function nev6 <- main.
+  Called from tests/loop_analysis/with_value.i:243.
+[value] tests/loop_analysis/with_value.i:174: entering loop for the first time
+[value:alarm] tests/loop_analysis/with_value.i:174: Warning: 
+  signed overflow. assert i + 4 ≤ 2147483647;
+[value] Recording results for nev6
+[value] Done for function nev6
+[value] computing for function nev7 <- main.
+  Called from tests/loop_analysis/with_value.i:244.
+[value] tests/loop_analysis/with_value.i:178: entering loop for the first time
+[value:alarm] tests/loop_analysis/with_value.i:178: Warning: 
+  signed overflow. assert -2147483648 ≤ i - 1;
+[value] Recording results for nev7
+[value] Done for function nev7
+[value] computing for function nev8 <- main.
+  Called from tests/loop_analysis/with_value.i:245.
+[value] tests/loop_analysis/with_value.i:182: entering loop for the first time
+[value:alarm] tests/loop_analysis/with_value.i:182: Warning: 
+  signed overflow. assert -2147483648 ≤ i - 1;
+[value] Recording results for nev8
+[value] Done for function nev8
+[value] Recording results for main
+[value] done for function main
+[value] ====== VALUES COMPUTED ======
+[value:final-states] Values at end of function f1:
+  i ∈ [7..2147483647]
+[value:final-states] Values at end of function f2:
+  i ∈ [8..2147483647]
+[value:final-states] Values at end of function f2_u_const:
+  i ∈ {8}
+[value:final-states] Values at end of function f3:
+  i ∈ [8..2147483647]
+[value:final-states] Values at end of function f4:
+  i ∈ [7..2147483647]
+[value:final-states] Values at end of function f5:
+  i ∈ {3}
+[value:final-states] Values at end of function f6:
+  i ∈ {2}
+[value:final-states] Values at end of function f7:
+  i ∈ {2}
+[value:final-states] Values at end of function f8:
+  i ∈ {3}
+[value:final-states] Values at end of function g1:
+  i ∈ [1..2147483647]
+[value:final-states] Values at end of function g2:
+  i ∈ [1..2147483647]
+[value:final-states] Values at end of function g3:
+  i ∈ [1..2147483647]
+[value:final-states] Values at end of function g4:
+  i ∈ [1..2147483647]
+[value:final-states] Values at end of function g5:
+  i ∈ [-2147483646..1]
+[value:final-states] Values at end of function g6:
+  i ∈ [-2147483646..0]
+[value:final-states] Values at end of function g7:
+  i ∈ [-2147483646..0]
+[value:final-states] Values at end of function g8:
+  i ∈ [-2147483646..1]
+[value:final-states] Values at end of function h1:
+  i ∈ [12..2147483647]
+[value:final-states] Values at end of function h2:
+  i ∈ [13..2147483647]
+[value:final-states] Values at end of function h3:
+  i ∈ [13..2147483647]
+[value:final-states] Values at end of function h4:
+  i ∈ [12..2147483647]
+[value:final-states] Values at end of function h5:
+  i ∈ {1}
+[value:final-states] Values at end of function h6:
+  i ∈ {0}
+[value:final-states] Values at end of function h7:
+  i ∈ {0}
+[value:final-states] Values at end of function h8:
+  i ∈ {1}
+[value:final-states] Values at end of function i1:
+  i ∈ [15..2147483647]
+[value:final-states] Values at end of function i2:
+  i ∈ [16..2147483647]
+[value:final-states] Values at end of function i3:
+  i ∈ {1; 2; 3; 4; 5; 6; 7}
+[value:final-states] Values at end of function i4:
+  i ∈ {1; 2; 3; 4; 5; 6}
+[value:final-states] Values at end of function j1:
+  i ∈ [37..2147483647]
+[value:final-states] Values at end of function j2:
+  i ∈ [38..2147483647]
+[value:final-states] Values at end of function j3:
+  i ∈ [1..26]
+[value:final-states] Values at end of function j4:
+  i ∈ [1..26]
+[value:final-states] Values at end of function ne1:
+  i ∈ {46}
+[value:final-states] Values at end of function ne2:
+  i ∈ {46}
+[value:final-states] Values at end of function ne3:
+  i ∈ {46}
+[value:final-states] Values at end of function ne4:
+  i ∈ {-154}
+[value:final-states] Values at end of function nev1:
+  i ∈ {46}
+[value:final-states] Values at end of function nev2:
+  i ∈ {46}
+[value:final-states] Values at end of function nev3:
+  i ∈ {46}
+[value:final-states] Values at end of function nev4:
+  i ∈ {-154}
+[value:final-states] Values at end of function nev5:
+  i ∈ {46}
+[value:final-states] Values at end of function nev6:
+  i ∈ {46}
+[value:final-states] Values at end of function nev7:
+  i ∈ {46}
+[value:final-states] Values at end of function nev8:
+  i ∈ {-154}
+[value:final-states] Values at end of function main:
+  __retres ∈ {0}
+[loop] Functions with loops whose bounds we could not find:
+  g1
+  g2
+  g3
+  g4
+[loop] Functions with loops whose estimated bounds were larger than -loop-max-slevel
+  (we recommend setting their slevel to 0 to avoid wasting time):
+  g5 (estimated bounds: 2147483646)
+  g6 (estimated bounds: 2147483647)
+  g7 (estimated bounds: 2147483647)
+  g8 (estimated bounds: 2147483646)
+[loop] Add this to your command line:
+  -val-slevel-merge-after-loop g1 \
+  -val-slevel-merge-after-loop g2 \
+  -val-slevel-merge-after-loop g3 \
+  -val-slevel-merge-after-loop g4 \
+  -slevel-function g1:0 \
+  -slevel-function g2:0 \
+  -slevel-function g3:0 \
+  -slevel-function g4:0 \
+  -slevel-function g5:0 \
+  -slevel-function g6:0 \
+  -slevel-function g7:0 \
+  -slevel-function g8:0 \
+  -slevel-function f1:6 \
+  -slevel-function f2:7 \
+  -slevel-function f2_u_const:7 \
+  -slevel-function f3:7 \
+  -slevel-function f4:6 \
+  -slevel-function f5:4 \
+  -slevel-function f6:5 \
+  -slevel-function f7:5 \
+  -slevel-function f8:4 \
+  -slevel-function h1:21 \
+  -slevel-function h2:22 \
+  -slevel-function h3:22 \
+  -slevel-function h4:21 \
+  -slevel-function h5:21 \
+  -slevel-function h6:22 \
+  -slevel-function h7:22 \
+  -slevel-function h8:21 \
+  -slevel-function i1:13 \
+  -slevel-function i2:14 \
+  -slevel-function i3:3 \
+  -slevel-function i4:4 \
+  -slevel-function j1:41 \
+  -slevel-function j2:42 \
+  -slevel-function j3:19 \
+  -slevel-function j4:20 \
+  -slevel-function main:1 \
+  -slevel-function ne1:43 \
+  -slevel-function ne2:146 \
+  -slevel-function ne3:46 \
+  -slevel-function ne4:46 \
+  -slevel-function nev1:43 \
+  -slevel-function nev2:146 \
+  -slevel-function nev3:46 \
+  -slevel-function nev4:46 \
+  -slevel-function nev5:43 \
+  -slevel-function nev6:146 \
+  -slevel-function nev7:46 \
+  -slevel-function nev8:46

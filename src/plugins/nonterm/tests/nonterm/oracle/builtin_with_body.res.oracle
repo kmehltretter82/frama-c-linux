@@ -1,0 +1,23 @@
+[kernel] Parsing tests/nonterm/builtin_with_body.c (with preprocessing)
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value:initial-state] Values of globals at initialization
+  __fc_heap_status ∈ [--..--]
+  __fc_strtok_ptr ∈ {0}
+[value] tests/nonterm/builtin_with_body.c:13: 
+  function memcpy: precondition 'valid_dest' got status valid.
+[value] tests/nonterm/builtin_with_body.c:13: 
+  function memcpy: precondition 'valid_src' got status valid.
+[value] tests/nonterm/builtin_with_body.c:13: 
+  function memcpy: precondition 'separation' got status valid.
+[value] tests/nonterm/builtin_with_body.c:13: 
+  Call to builtin memcpy(({{ (void *)&a }},{{ (void const *)&b }},{4}))
+[value] Recording results for main
+[value] done for function main
+[value] ====== VALUES COMPUTED ======
+[value:final-states] Values at end of function main:
+  a ∈ {2}
+  b ∈ {2}
+  __retres ∈ {0}
+[nonterm] Analysis done.

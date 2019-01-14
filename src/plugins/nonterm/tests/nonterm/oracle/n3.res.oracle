@@ -1,0 +1,12 @@
+[kernel] Parsing tests/nonterm/n3.i (no preprocessing)
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value:initial-state] Values of globals at initialization
+  
+[value] Recording results for main
+[value] done for function main
+[value] ====== VALUES COMPUTED ======
+[value:final-states] Values at end of function main:
+  __retres ∈ {0}
+[nonterm] Analysis done.

@@ -1,0 +1,517 @@
+# NAME
+
+frama-c[.byte] - a static analyzer for C programs
+
+frama-c-gui[.byte] - the graphical interface of frama-c
+
+# SYNOPSIS
+
+**frama-c** [ *options* ] *files*
+
+# DESCRIPTION
+
+**frama-c** is a suite of tools dedicated to the analysis of source code
+written in C. It gathers several analysis techniques in a single collaborative
+framework. This framework can be extended by additional plugins placed in the
+**$FRAMAC_PLUGIN** directory. The command
+
+> frama-c -\-plugins
+
+will provide the full list of the plugins that are currently installed.
+
+**frama-c-gui** is the graphical user interface of **frama-c**.
+It features the same options as the command-line version.
+
+**frama-c.byte** and **frama-c-gui.byte** are the OCaml bytecode versions
+of the command-line and graphical user interface respectively.
+
+By default, Frama-C recognizes *.c* files as C files needing pre-processing
+and *.i* files as C files having been already pre-processed.
+Some plugins may extend the list of recognized files.
+Pre-processing can be customized through the **-cpp-command** and
+**-cpp-extra-args** options.
+
+# OPTIONS
+
+## Syntax
+
+Options taking an additional parameter can also be written under the form
+
+> -*option*=*param*
+
+This form is mandatory when *param* starts with a dash ('-').
+
+Most options that take no parameter have a corresponding
+
+> -no-*option*
+
+option which has the opposite effect.
+
+## Help options
+
+-help
+: gives a short usage notice.
+
+-kernel-help
+: prints the list of options recognized by Frama-C's kernel
+
+-verbose *n*
+: sets verbosity level. Defaults to 1.
+Setting it to 0 will output less progress messages.
+This level can also be set on a per-*plugin* basis, with option
+-*plugin*-**verbose** *n*.
+Verbosity level of the kernel can be controlled with option
+**-kernel-verbose** *n*.
+
+-debug *n*
+: sets debugging level. Defaults to 0, meaning no debugging messages.
+This option has the same per-plugin (and kernel) specializations as
+**-verbose**.
+
+-quiet
+: sets verbosity and debugging level to 0.
+
+## Options controlling Frama-C's kernel
+
+-absolute-valid-range *min-max*
+: considers that all numerical addresses in the range *min-max* are valid.
+Bounds are parsed as OCaml integer constants.
+By default, all numerical addresses are considered invalid.
+
+-add-path *p1[,p2[...,pn]]*
+: adds directories *p1* through *pn* to the list of directories in which
+plugins are searched.
+
+[-no]-aggressive-merging
+: merges function definitions modulo renaming. Defaults to no.
+
+[-no]-allow-duplication
+: allows duplication of small blocks during normalization of tests and loops.
+Otherwise, normalization uses labels and gotos. Bigger blocks and blocks
+with non-trivial control flow are never duplicated. Defaults to yes.
+
+[-no]-annot
+: reads ACSL annotations. This is the default. Annotations are pre-processed
+by default. Use -no-pp-annot if you don't want to expand macros in annotations.
+
+-big-ints-hex *max*
+: integers larger than *max* are displayed in hexadecimal
+(by default, all integers are displayed in decimal).
+
+-check
+: performs integrity checks on the internal AST (for developers only).
+
+[-no]-asm-contracts
+: generates contracts for assembly code written according to gcc's extended
+syntax. Defaults to yes.
+
+[-no]-asm-contracts-auto-validate
+: automatically marks contracts generated from asm as valid. Defaults to no.
+
+-c11
+: enables (partial) C11 compatibility, e.g. typedef redefinitions.
+Defaults to no.
+
+[-no]-collapse-call-cast
+: allows implicit cast between the value returned by a function and the lvalue
+it is assigned to. Otherwise, a temporary variable is used and the cast is made
+explicit. Defaults to yes.
+
+[-no]-constfold
+: folds all syntactically constant expressions in the code before analyses.
+Defaults to no.
+
+-const-readonly
+: variables with const qualifier must be actually constant. Defaults to yes.
+The opposite option is **-unsafe-writable**.
+
+[-no]-continue-annot-error
+: when analyzing an annotation, the default behavior (the **-no** version of
+this option) when a typechecking error occurs is to reject the source file as
+is the case for typechecking errors within the C code. With this option on,
+the typechecker will only output a warning and discard the annotation but
+type‐checking will continue (errors in C code are still fatal, though). \
+**Deprecated**: use **-kernel-warn-abort=-annot-error** instead.
+
+-cpp-command *cmd*
+: uses *cmd* as the command to pre-process C files.
+Defaults to the **CPP** environment variable or to
+
+> gcc -C -E -I.
+
+if it is not set. If unset, the command is built as follows:
+
+> CPP -o <preprocessed file> <source file>
+
+*%1* and *%2* can be used into the **CPP** string to mark the
+position of *<source file>* and *<preprocessed file>* respectively.
+Note that this option is often better replaced by **-cpp-extra-args**.
+
+-cpp-extra-args *args*
+: gives additional arguments to the pre-processor.
+Pre-processing annotations is done in two separate pre-processing stages.
+The first one is a normal pass on the C code which retains macro definitions.
+These are then used in the second pass during which annotations are
+pre-processed. *args* are used only for the first pass, so that arguments that
+should not be used twice (such as additional include directives or macro
+definitions) must thus go there instead of **-cpp-command**.
+
+[-no]-cpp-frama-c-compliant
+: indicates that the chosen preprocessor complies to some Frama-C requirements,
+such as accepting the same set of options as GNU cpp, and accepting
+architecture-specific options such as -m32/-m64.
+Default values depend on the installed preprocessor at configure time.
+See also **-pp-annot**.
+
+[-no]-autoload-plugins
+: when on, load all the dynamic plugins found in the search path
+(see **-print-plugin-path** for more information on the default search path).
+Otherwise, only plugins requested by **-load-module** will be loaded.
+Defaults to on.
+
+-enums *repr*
+: choose the way the representation of enumerated types is determined.
+**frama-c -enums help** gives the list of available options.
+Default is **gcc-enums**.
+
+-float-digits *n*
+: when outputting floating-point numbers, display *n* digits. Defaults to 12.
+
+-float-flush-to-zero
+: floating point operations flush to zero.
+
+-float-hex
+: display floats as hexadecimal.
+
+-float-normal
+: display floats with the standard OCaml routine.
+
+-float-relative
+: display float intervals as [ *lower_bound*++*width* ].
+
+[-no]-frama-c-stdlib
+: adds **-I$FRAMAC_SHARE/libc** to the options given to the cpp command.
+If **-cpp-frama-c-compliant** is not false, also adds **-nostdinc** to prevent
+an inconsistent mix of system and Frama-C header files. Defaults to yes.
+
+-implicit-function-declaration *action*
+: warns or aborts when a function is called before it has been declared.
+*action* can be one of **ignore**, **warn**, or **error**.
+Defaults to **warn**.\
+**Deprecated**: use **-kernel-warn-key typing:implicit-function-declaration**
+instead.
+
+-initialized-padding-locals
+: implicit initialization of locals sets padding bits to 0.
+If false, padding bits are left uninitialized. Defaults to yes.
+
+-inline-calls *f1,...,fn*
+: syntactically inlines calls to functions *f1,...,fn*. Recursive functions
+are inlined only at the first level. Calls via function pointers are not
+inlined.
+
+-journal-disable
+: do not output a journal of the current session. See **-journal-enable**.
+
+-journal-enable
+: on by default, dumps a journal of all the actions performed during the
+current Frama-C session in the form of an OCaml script that can be replayed
+with **-load-script**. The name of the script can be set with the
+**-journal-name** option.
+
+-journal-name *name*
+: sets the name of the journal file (without the *.ml* extension).
+Defaults to **frama_c_journal**.
+
+-json-compilation-database *path*
+: use *path* as a JSON compilation database
+(see <https://clang.llvm.org/docs/JSONCompilationDatabase.html>
+for more information): each file preprocessed by Frama-C will include
+corresponding **-I** and **-D** flags according to the specifications in *path*.
+If *path* is a directory, use **\<path>/compile_commands.json**.
+Disabled by default. **Note**: this option is only available if Frama-C was
+compiled with yojson support.
+
+[-no]-keep-comments
+: tries to preserve comments when pretty-printing the source code.
+Defaults to no.
+
+[-no]-keep-switch
+: when **-simplify-cfg** is set, keeps switch statements. Defaults to no.
+
+-keep-unused-specified-functions
+: see **-remove-unused-specified-functions**.
+
+-kernel-log *kind:file*
+: copies log messages from the Frama-C's kernel to file. *kind* specifies which
+kinds of messages to be copied (e.g. **w** for warnings, **e** for errors,
+etc.). See **-kernel-help** for more details.
+Can also be set on a per-plugin basis, with option -*\<plugin>*-**log**.
+
+-kernel-msg-key *k1,...,kn*
+: controls the emission of messages based on categories.
+  Use **-kernel-msg-key help** to get a list of available categories,
+  and **-kernel-msg-key="\*"** to control all categories.
+  To disable a category, add a **-** before its name; to enable a category,
+  simply add its name, with an optional **+** before it.
+  For instance, **-kernel-msg-key=-k1,k2** will disable messages from
+  category **k1** and enable those from category **k2**.
+  Can also be set on a per-plugin basis, with option -*\<plugin>*-**msg-key**.
+  Note that each plugin has its own set of categories.
+
+Options **-kernel-warn-***\<action>* below follow the same rules as
+**-kernel-msg-key**. Message categories and warning categories may have the
+same name, but they are independent from each other.
+Warning categories can also be set on a per-plugin basis,
+with options -*\<plugin>***-warn-***\<action>*.
+
+For the first three options, a negative form
+(**-k1**) will lead **k1** to generate warnings, while for **-kernel-warn-key**,
+it will disable category **k1** entirely (no related message will be emitted).
+
+-kernel-warn-abort *k1,...,kn*
+: warning categories *k1,...,kn* abort the execution.
+
+-kernel-warn-error *k1,...,kn*
+: warning categories *k1,...,kn* change Frama-C's exit status.
+
+-kernel-warn-feedback *k1,...,kn*
+: warning categories *k1,...,kn* produce only a feedback message.
+
+-kernel-warn-key *k1,...,kn*
+: warning categories *k1,...,kn* generate warnings.
+
+Finally, there are three variants of the options above which emit a single
+message per category: **-kernel-warn-err-once**,
+**-kernel-warn-feedback-once**, and **-kernel-warn-once**.
+
+[-no]-lib-entry
+: indicates that the entry point is called during program execution.
+This implies in particular that global variables cannot be assumed to have
+their initial values. The default is **-no-lib-entry**: the entry point is also
+the starting point of the program and globals have their initial value.
+
+-load *file*
+: loads the (previously saved) state contained in *file*.
+
+-load-module *SPEC*
+: dynamically load OCaml plug-ins, modules and scripts. Each *SPEC* can be an
+OCaml source or object file, with or without extension, or a Findlib package.
+Loading order is preserved and additional dependencies can be listed in
+***.depend** files.
+
+-load-script *SPEC*
+: alias for option **-load-module**.
+
+-machdep *machine*
+: uses *machine* as the current machine-dependent configuration (size of the
+various integer types, endiandness, ...). The list of currently supported
+machines is available through option *-machdep help*. Default is **x86_32**.
+
+-main *f*
+: sets *f* as the entry point of the analysis. Defaults to **main**.
+By default, it is considered as the starting point of the program under
+analysis. Use **-lib-entry** if *f* is supposed to be called in the middle
+of an execution.
+
+-obfuscate
+: prints an obfuscated version of the code (where original identifiers are
+replaced by meaningless ones) and exits. The correspondence table between
+original and new symbols is kept at the beginning of the result.
+
+-ocode *file*
+: redirects pretty-printed code to *file* instead of standard output.
+
+[-no]-orig-name
+: During the normalization phase, some variables may get renamed when
+different variables with the same name can co-exist (e.g. a global variable
+and a formal parameter). When this option is on, a message is printed each
+time this occurs. Defaults to no.
+
+[-no]-pp-annot
+: pre-processes annotations. This is currently only possible when using gcc
+(or GNU cpp) pre-processor. The default is to pre-process annotations when the
+default pre-processor is identified as GNU or GNU-like.
+See also **-cpp-frama-c-compliant**.
+
+[-no]-print
+: pretty-prints the source code as normalized by CIL. Defaults to no.
+
+[-no]-print-libc
+: expands **#include** directives in the pretty-printed CIL code for files in
+the Frama-C standard library. Defaults to no.
+
+-print-libpath
+: outputs the directory where the Frama-C kernel library is installed.
+
+-print-path
+: alias of **-print-share-path**.
+
+-print-plugin-path
+: outputs the directory where Frama-C searches its plugins (can be overridden
+by the **FRAMAC_PLUGIN** variable and the **-add-path** option).
+
+-print-share-path
+: outputs the directory where Frama-C stores its data (can be overridden by the
+**FRAMAC_SHARE** variable).
+
+[-no]-remove-exn
+: transforms throw and try/catch statements into normal C functions.
+Defaults to no, unless the input source language has an exception mechanism.
+
+-remove-projects *p1,...,pn*
+: removes the given projects *p1,...,pn*.
+**@all_but_current** removes all projects but the current one.
+
+-remove-unused-specified-functions
+: keeps function prototypes that have an ACSL specification but are not used
+in the code. This is the default. Functions having the attribute
+**FRAMAC_BUILTIN** are always kept.
+
+-safe-arrays
+: for multidimensional arrays or arrays that are fields inside structs,
+assumes that all accesses must be in bound (set by default).
+The opposite option is **-unsafe-arrays**.
+
+-save *file*
+: saves Frama-C's state into *file* after analyses have taken place.
+
+-session *s*
+: sets *s* as the directory in which session files are searched.
+
+[-no]-set-project-as-default
+: the current project becomes the default one (and so future **-then**
+sequences are applied on it). Defaults to no.
+
+[-no]-simplify-cfg
+: removes **break**, **continue** and **switch** statements before analyses.
+Defaults to no.
+
+[-no]-simplify-trivial-loops
+: simplifies trivial loops such as **do ... while (0)** loops. Defaults to yes.
+
+-then
+: allows one to compose analyses: a first run of Frama-C will occur with the
+options before **-then** and a second run will be done with the options after
+**-then** on the current project from the first run.
+
+-then-last
+: like **-then**, but the second group of actions is executed on the
+last project created by a program transformer.
+
+-then-on *prj*
+: similar to **-then** except that the second run is performed in project
+*prj*. If no such project exists, Frama-C exits with an error.
+
+-then-replace
+: like **-then-last**, but also removes the previous current project.
+
+-time *file*
+: appends user time and date in the given file when Frama-C exits.
+
+-typecheck
+: forces  typechecking  of the source files. This option is only relevant if no
+further analysis is requested (as typechecking will implicitly occur before
+the analysis is launched).
+
+-ulevel *n*
+: syntactically unroll loops *n* times before the analysis. This can be quite
+costly and some plugins (e.g. EVA) provide more efficient ways to perform the
+same thing. See their respective manuals for more information. This can also be
+activated on a per-loop basis via the **loop pragma unroll <m>** directive.
+A negative value for *n* will inhibit such pragmas.
+
+[-no]-ulevel-force
+: ignores **UNROLL** loop pragmas disabling unrolling.
+
+[-no]-unicode
+outputs ACSL formulas with UTF-8 characters. This is the default.
+When given the **-no-unicode** option, Frama-C will use the ASCII version
+instead. See the ACSL manual for the correspondence.
+
+-unsafe-arrays
+: see **-safe-arrays**.
+
+[-no]-unspecified-access
+: checks that read/write accesses occurring in an unspecified order
+(according to the C standard's notion of sequence points) are performed on
+separate locations. With **-no-unspecified-access**, assumes that it is always
+the case (this is the default).
+
+-version
+: outputs the version string of Frama-C.
+
+-warn-decimal-float *freq*
+: warns when a floating-point constant cannot be exactly represented
+(e.g. 0.1). *freq* can be one of **none**, **once**, or **all**. \
+**Deprecated**: use **-kernel-warn-once parser:decimal-float** (and variants)
+instead.
+
+[-no]-warn-signed-downcast
+: generates alarms when signed downcasts may exceed the destination range.
+Defaults to no.
+
+[-no]-warn-signed-overflow
+: generates alarms for signed operations that overflow. Defaults to yes.
+
+[-no]-warn-unsigned-downcast
+: generates alarms when unsigned downcasts may exceed the destination range.
+Defaults to no.
+
+[-no]-warn-unsigned-overflow
+: generates alarms for unsigned operations that overflow. Defaults to no.
+
+## Plugin-specific options
+
+For each plugin, the command
+
+> frama-c -plugin-help
+
+will give the list of options that are specific to the plugin.
+
+# EXIT STATUS
+
+0
+: Successful execution
+
+1
+: Invalid user input
+
+2
+: User interruption (kill or equivalent)
+
+3
+: Unimplemented feature
+
+4 5 6
+: Internal error
+
+125
+: Unknown error
+
+Exit statuses greater than 2 can be considered as a bug (or a feature request
+for the case of exit status 3) and may be reported on Frama-C's BTS (see below).
+
+# ENVIRONMENT VARIABLES
+
+It is possible to control the places where Frama-C looks for its files through
+the following variables.
+
+FRAMAC_LIB
+: The directory where kernel's compiled interfaces are installed.
+
+FRAMAC_PLUGIN
+: The directory where Frama-C can find standard plugins.
+If you wish to have plugins in several places, use **-add-path** instead.
+
+FRAMAC_SHARE
+: The directory where Frama-C data (e.g. its version of the standard library)
+is installed.
+
+# SEE ALSO
+
+Frama-C user manual: http://frama-c.com/download/frama-c-user-manual.pdf
+
+Frama-C homepage: http://frama-c.com
+
+Frama-C BTS: http://bts.frama-c.com

@@ -1,0 +1,39 @@
+[kernel] Parsing tests/nonterm/n5.i (no preprocessing)
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value:initial-state] Values of globals at initialization
+  nondet ∈ [--..--]
+[value] computing for function may_not_terminate <- main.
+  Called from tests/nonterm/n5.i:21.
+[kernel] tests/nonterm/n5.i:21: Warning: 
+  No code nor implicit assigns clause for function may_not_terminate, generating default assigns from the prototype
+[value] using specification for function may_not_terminate
+[value] Done for function may_not_terminate
+[value] computing for function f <- main.
+  Called from tests/nonterm/n5.i:22.
+[value] computing for function never_terminates <- f <- main.
+  Called from tests/nonterm/n5.i:12.
+[kernel] tests/nonterm/n5.i:12: Warning: 
+  No code nor implicit assigns clause for function never_terminates, generating default assigns from the prototype
+[value] using specification for function never_terminates
+[value] Done for function never_terminates
+[value] Recording results for f
+[value] Done for function f
+[value] computing for function never_terminates <- main.
+  Called from tests/nonterm/n5.i:23.
+[value] Done for function never_terminates
+[value] Recording results for main
+[value] done for function main
+[value] ====== VALUES COMPUTED ======
+[value:final-states] Values at end of function f:
+  NON TERMINATING FUNCTION
+[value:final-states] Values at end of function main:
+  NON TERMINATING FUNCTION
+[nonterm] tests/nonterm/n5.i:12: Warning: 
+  non-terminating function call
+  stack: f :: tests/nonterm/n5.i:22 <- main
+[nonterm] tests/nonterm/n5.i:23: Warning: 
+  non-terminating function call
+  stack: main
+[nonterm] Analysis done.

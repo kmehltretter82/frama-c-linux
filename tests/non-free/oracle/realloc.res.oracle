@@ -1,0 +1,759 @@
+[kernel] Parsing tests/non-free/realloc.c (with preprocessing)
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value:initial-state] Values of globals at initialization
+  __fc_heap_status ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {32767}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  v ∈ [--..--]
+[value] computing for function main1 <- main.
+  Called from tests/non-free/realloc.c:160.
+[value] tests/non-free/realloc.c:12: allocating variable __malloc_main1_l12
+[value] tests/non-free/realloc.c:15: 
+  Frama_C_dump_each:
+  # Cvalue domain:
+  __fc_heap_status ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {32767}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  p ∈ {{ &__malloc_main1_l12 }}
+  pp ∈ {{ &__malloc_main1_l12 }}
+  v ∈ [--..--]
+  __malloc_main1_l12 ∈ {17}
+  ==END OF DUMP==
+[value] tests/non-free/realloc.c:16: 
+  function realloc: precondition 'freeable' got status valid.
+[value:malloc] bases_to_realloc: {__malloc_main1_l12}
+[value] tests/non-free/realloc.c:16: allocating variable __realloc_main1_l16
+[value:malloc] tests/non-free/realloc.c:16: 
+  strong free on bases: {__malloc_main1_l12}
+[value] tests/non-free/realloc.c:17: 
+  Frama_C_dump_each:
+  # Cvalue domain:
+  __fc_heap_status ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {32767}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  p ∈ ESCAPINGADDR
+  pp ∈ ESCAPINGADDR
+  q ∈ {{ &__realloc_main1_l16[0] }}
+  v ∈ [--..--]
+  __realloc_main1_l16[0] ∈ {17}
+                     [1] ∈ UNINITIALIZED
+  ==END OF DUMP==
+[value] tests/non-free/realloc.c:18: 
+  function free: precondition 'freeable' got status valid.
+[value:malloc] tests/non-free/realloc.c:18: 
+  strong free on bases: {__realloc_main1_l16}
+[value] Recording results for main1
+[value] Done for function main1
+[value] computing for function main2 <- main.
+  Called from tests/non-free/realloc.c:161.
+[value] computing for function Frama_C_interval <- main2 <- main.
+  Called from tests/non-free/realloc.c:22.
+[value] using specification for function Frama_C_interval
+[value] tests/non-free/realloc.c:22: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[value] Done for function Frama_C_interval
+[value] tests/non-free/realloc.c:23: allocating variable __malloc_main2_l23
+[value:alarm] tests/non-free/realloc.c:24: Warning: 
+  out of bounds write. assert \valid(r + i);
+[value] tests/non-free/realloc.c:26: 
+  function realloc: precondition 'freeable' got status valid.
+[value:malloc] bases_to_realloc: {__malloc_main2_l23}
+[value] tests/non-free/realloc.c:26: allocating variable __realloc_main2_l26
+[value:malloc] tests/non-free/realloc.c:26: 
+  strong free on bases: {__malloc_main2_l23}
+[value] tests/non-free/realloc.c:27: 
+  Frama_C_dump_each:
+  # Cvalue domain:
+  __fc_heap_status ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {32767}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  x ∈ {3; 4}
+  r ∈ ESCAPINGADDR
+  s ∈ {{ &__realloc_main2_l26[0] }}
+  v ∈ [--..--]
+  __realloc_main2_l26[0..2] ∈ {6}
+                     [3] ∈ {6} or UNINITIALIZED
+                     [4..5] ∈ UNINITIALIZED
+  ==END OF DUMP==
+[value] tests/non-free/realloc.c:28: 
+  function free: precondition 'freeable' got status valid.
+[value:malloc] tests/non-free/realloc.c:28: 
+  strong free on bases: {__realloc_main2_l26}
+[value] Recording results for main2
+[value] Done for function main2
+[value] computing for function main3 <- main.
+  Called from tests/non-free/realloc.c:162.
+[value] tests/non-free/realloc.c:32: allocating variable __malloc_main3_l32
+[value] tests/non-free/realloc.c:35: allocating variable __malloc_main3_l35
+[value] computing for function Frama_C_interval <- main3 <- main.
+  Called from tests/non-free/realloc.c:39.
+[value] tests/non-free/realloc.c:39: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[value] Done for function Frama_C_interval
+[value] tests/non-free/realloc.c:44: 
+  Frama_C_dump_each:
+  # Cvalue domain:
+  __fc_heap_status ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {32767}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  q ∈ {{ &__malloc_main3_l32[0] }}
+  r ∈ {{ &__malloc_main3_l35[0] }}
+  p ∈ {{ &__malloc_main3_l32[0] ; &__malloc_main3_l35[0] }}
+  x ∈ {0; 1}
+  v ∈ [--..--]
+  __malloc_main3_l32[0..4] ∈ {5}
+  __malloc_main3_l35[0..5] ∈ {6}
+  ==END OF DUMP==
+[value] tests/non-free/realloc.c:46: 
+  function realloc: precondition 'freeable' got status valid.
+[value:malloc] bases_to_realloc: {__malloc_main3_l32, __malloc_main3_l35}
+[value] tests/non-free/realloc.c:46: allocating variable __realloc_main3_l46
+[value:malloc] tests/non-free/realloc.c:46: 
+  weak free on bases: {__malloc_main3_l32, __malloc_main3_l35}
+[value] tests/non-free/realloc.c:48: 
+  Frama_C_dump_each:
+  # Cvalue domain:
+  __fc_heap_status ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {32767}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  q ∈ {{ &__malloc_main3_l32[0] }} or ESCAPINGADDR
+  r ∈ {{ &__malloc_main3_l35[0] }} or ESCAPINGADDR
+  p ∈ {{ &__malloc_main3_l32[0] ; &__malloc_main3_l35[0] }} or ESCAPINGADDR
+  x ∈ {0; 1}
+  s ∈ {{ &__realloc_main3_l46[0] }}
+  v ∈ [--..--]
+  __malloc_main3_l32[0..4] ∈ {5}
+  __malloc_main3_l35[0..5] ∈ {6}
+  __realloc_main3_l46[0..4] ∈ {5; 6}
+                     [5] ∈ {6} or UNINITIALIZED
+                     [6] ∈ UNINITIALIZED
+  ==END OF DUMP==
+[value:alarm] tests/non-free/realloc.c:49: Warning: 
+  accessing left-value that contains escaping addresses.
+  assert ¬\dangling(&q);
+[value] tests/non-free/realloc.c:49: 
+  function free: precondition 'freeable' got status valid.
+[value:malloc] tests/non-free/realloc.c:49: 
+  strong free on bases: {__malloc_main3_l32}
+[value:alarm] tests/non-free/realloc.c:49: Warning: 
+  accessing left-value that contains escaping addresses.
+  assert ¬\dangling(&r);
+[value] tests/non-free/realloc.c:49: 
+  function free: precondition 'freeable' got status valid.
+[value:malloc] tests/non-free/realloc.c:49: 
+  strong free on bases: {__malloc_main3_l35}
+[value] tests/non-free/realloc.c:49: 
+  function free: precondition 'freeable' got status valid.
+[value:malloc] tests/non-free/realloc.c:49: 
+  strong free on bases: {__realloc_main3_l46}
+[value] Recording results for main3
+[value] Done for function main3
+[value] computing for function main4 <- main.
+  Called from tests/non-free/realloc.c:163.
+[value] computing for function Frama_C_interval <- main4 <- main.
+  Called from tests/non-free/realloc.c:53.
+[value] tests/non-free/realloc.c:53: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[value] Done for function Frama_C_interval
+[value] computing for function Frama_C_interval <- main4 <- main.
+  Called from tests/non-free/realloc.c:54.
+[value] tests/non-free/realloc.c:54: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[value] Done for function Frama_C_interval
+[value] tests/non-free/realloc.c:55: allocating variable __malloc_main4_l55
+[value] tests/non-free/realloc.c:56: allocating variable __malloc_main4_l56
+[value:alarm] tests/non-free/realloc.c:59: Warning: 
+  out of bounds write. assert \valid(q + i);
+[value:alarm] tests/non-free/realloc.c:58: Warning: 
+  out of bounds write. assert \valid(p + i);
+[value] tests/non-free/realloc.c:57: entering loop for the first time
+[value] tests/non-free/realloc.c:61: 
+  Frama_C_dump_each:
+  # Cvalue domain:
+  __fc_heap_status ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {32767}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  sizep ∈ [2..10]
+  sizeq ∈ [0..10]
+  p ∈ {{ &__malloc_main4_l55[0] }}
+  q ∈ {{ &__malloc_main4_l56[0] }}
+  v ∈ [--..--]
+  __malloc_main4_l55[0] ∈ {0}
+                    [1] ∈ {1}
+                    [2] ∈ {2}
+                    [3] ∈ {3}
+                    [4] ∈ {4}
+                    [5] ∈ {5}
+                    [6] ∈ {6}
+                    [7] ∈ {7}
+                    [8] ∈ {8}
+                    [9] ∈ {9}
+  __malloc_main4_l56[0] ∈ {0}
+                    [1] ∈ {1}
+                    [2] ∈ {2}
+                    [3] ∈ {3}
+                    [4] ∈ {4}
+                    [5] ∈ {5}
+                    [6] ∈ {6}
+                    [7] ∈ {7}
+                    [8] ∈ {8}
+                    [9] ∈ {9}
+  ==END OF DUMP==
+[value] tests/non-free/realloc.c:67: 
+  function realloc: precondition 'freeable' got status valid.
+[value:malloc] bases_to_realloc: {__malloc_main4_l55}
+[value] tests/non-free/realloc.c:67: allocating variable __realloc_main4_l67
+[value:malloc] tests/non-free/realloc.c:67: 
+  strong free on bases: {__malloc_main4_l55}
+[value] tests/non-free/realloc.c:68: 
+  function realloc: precondition 'freeable' got status valid.
+[value:malloc] bases_to_realloc: {__malloc_main4_l56}
+[value] tests/non-free/realloc.c:68: allocating variable __realloc_main4_l68
+[value:malloc] tests/non-free/realloc.c:68: 
+  strong free on bases: {__malloc_main4_l56}
+[value] tests/non-free/realloc.c:69: 
+  Frama_C_dump_each:
+  # Cvalue domain:
+  __fc_heap_status ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {32767}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  sizep ∈ [2..10]
+  sizeq ∈ [0..10]
+  p ∈ ESCAPINGADDR
+  q ∈ ESCAPINGADDR
+  rp ∈ {{ &__realloc_main4_l67[0] }}
+  rq ∈ {{ &__realloc_main4_l68[0] }}
+  v ∈ [--..--]
+  __realloc_main4_l67[0] ∈ {0}
+                     [1] ∈ {1}
+                     [2] ∈ {2} or UNINITIALIZED
+                     [3] ∈ {3} or UNINITIALIZED
+                     [4] ∈ {4} or UNINITIALIZED
+                     [5] ∈ {5} or UNINITIALIZED
+                     [6] ∈ {6} or UNINITIALIZED
+                     [7] ∈ {7} or UNINITIALIZED
+                     [8] ∈ {8} or UNINITIALIZED
+                     [9] ∈ {9} or UNINITIALIZED
+                     [10..14] ∈ UNINITIALIZED
+  __realloc_main4_l68[0] ∈ {0} or UNINITIALIZED
+                     [1] ∈ {1} or UNINITIALIZED
+                     [2] ∈ {2} or UNINITIALIZED
+                     [3] ∈ {3} or UNINITIALIZED
+                     [4] ∈ {4} or UNINITIALIZED
+                     [5] ∈ {5} or UNINITIALIZED
+                     [6] ∈ {6} or UNINITIALIZED
+                     [7] ∈ {7} or UNINITIALIZED
+  ==END OF DUMP==
+[value] tests/non-free/realloc.c:72: 
+  function free: precondition 'freeable' got status valid.
+[value:malloc] tests/non-free/realloc.c:72: 
+  strong free on bases: {__realloc_main4_l67}
+[value] tests/non-free/realloc.c:72: 
+  function free: precondition 'freeable' got status valid.
+[value:malloc] tests/non-free/realloc.c:72: 
+  strong free on bases: {__realloc_main4_l68}
+[value] Recording results for main4
+[value] Done for function main4
+[value] computing for function main5 <- main.
+  Called from tests/non-free/realloc.c:164.
+[value] tests/non-free/realloc.c:76: allocating variable __malloc_main5_l76
+[value] computing for function Frama_C_interval <- main5 <- main.
+  Called from tests/non-free/realloc.c:78.
+[value] tests/non-free/realloc.c:78: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[value] Done for function Frama_C_interval
+[value] tests/non-free/realloc.c:83: 
+  Frama_C_dump_each:
+  # Cvalue domain:
+  __fc_heap_status ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {32767}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  p ∈ {{ &__malloc_main5_l76 }}
+  c ∈ {0; 1}
+  q ∈ {{ NULL ; &__malloc_main5_l76 }}
+  v ∈ [--..--]
+  __malloc_main5_l76 ∈ {1}
+  ==END OF DUMP==
+[value] tests/non-free/realloc.c:85: 
+  function realloc: precondition 'freeable' got status valid.
+[value:malloc] bases_to_realloc: {__malloc_main5_l76}
+[value] tests/non-free/realloc.c:85: allocating variable __realloc_main5_l85
+[value:malloc] tests/non-free/realloc.c:85: 
+  weak free on bases: {__malloc_main5_l76}
+[value] tests/non-free/realloc.c:86: 
+  Frama_C_dump_each:
+  # Cvalue domain:
+  __fc_heap_status ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {32767}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  p ∈ {{ &__malloc_main5_l76 }} or ESCAPINGADDR
+  c ∈ {0; 1}
+  q ∈ {{ NULL ; &__malloc_main5_l76 }} or ESCAPINGADDR
+  r ∈ {{ &__realloc_main5_l85[0] }}
+  v ∈ [--..--]
+  __malloc_main5_l76 ∈ {1}
+  __realloc_main5_l85[0] ∈ {1} or UNINITIALIZED
+                     [1] ∈ UNINITIALIZED
+  ==END OF DUMP==
+[value:alarm] tests/non-free/realloc.c:88: Warning: 
+  accessing left-value that contains escaping addresses.
+  assert ¬\dangling(&p);
+[value] tests/non-free/realloc.c:88: 
+  function free: precondition 'freeable' got status valid.
+[value:malloc] tests/non-free/realloc.c:88: 
+  strong free on bases: {__malloc_main5_l76}
+[value] tests/non-free/realloc.c:88: 
+  function free: precondition 'freeable' got status valid.
+[value:malloc] tests/non-free/realloc.c:88: 
+  strong free on bases: {__realloc_main5_l85}
+[value] Recording results for main5
+[value] Done for function main5
+[value] computing for function main6 <- main.
+  Called from tests/non-free/realloc.c:165.
+[value] computing for function Frama_C_interval <- main6 <- main.
+  Called from tests/non-free/realloc.c:92.
+[value] tests/non-free/realloc.c:92: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[value] Done for function Frama_C_interval
+[value] tests/non-free/realloc.c:93: allocating variable __malloc_main6_l93
+[value] tests/non-free/realloc.c:102: 
+  Frama_C_show_each: {{ &x ; &__malloc_main6_l93 + {4} }}
+[value:alarm] tests/non-free/realloc.c:103: Warning: 
+  function realloc: precondition 'freeable' got status invalid.
+[value] tests/non-free/realloc.c:106: 
+  function free: precondition 'freeable' got status valid.
+[value:malloc] tests/non-free/realloc.c:106: 
+  strong free on bases: {__malloc_main6_l93}
+[value] Recording results for main6
+[value] Done for function main6
+[value] computing for function main7 <- main.
+  Called from tests/non-free/realloc.c:166.
+[value] tests/non-free/realloc.c:110: allocating variable __malloc_main7_l110
+[value] tests/non-free/realloc.c:115: 
+  function realloc: precondition 'freeable' got status valid.
+[value:malloc] bases_to_realloc: {__malloc_main7_l110}
+[value] tests/non-free/realloc.c:115: allocating variable __realloc_main7_l115
+[value:malloc] tests/non-free/realloc.c:115: 
+  strong free on bases: {__malloc_main7_l110}
+[value] tests/non-free/realloc.c:116: 
+  Frama_C_dump_each:
+  # Cvalue domain:
+  __fc_heap_status ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {32767}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  p ∈ ESCAPINGADDR
+  q ∈ {{ &__realloc_main7_l115[0] }}
+  x ∈ UNINITIALIZED
+  v ∈ [--..--]
+  __realloc_main7_l115[0] ∈ {{ &x }}
+                      [1] ∈ UNINITIALIZED
+  ==END OF DUMP==
+[value] tests/non-free/realloc.c:116: Warning: 
+  locals {x} escaping the scope of a block of main7 through __realloc_main7_l115
+[value] tests/non-free/realloc.c:118: 
+  Frama_C_dump_each:
+  # Cvalue domain:
+  __fc_heap_status ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {32767}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  p ∈ ESCAPINGADDR
+  q ∈ {{ &__realloc_main7_l115[0] }}
+  v ∈ [--..--]
+  __realloc_main7_l115[0] ∈ ESCAPINGADDR
+                      [1] ∈ UNINITIALIZED
+  ==END OF DUMP==
+[value] tests/non-free/realloc.c:119: 
+  function free: precondition 'freeable' got status valid.
+[value:malloc] tests/non-free/realloc.c:119: 
+  strong free on bases: {__realloc_main7_l115}
+[value] Recording results for main7
+[value] Done for function main7
+[value] computing for function main8 <- main.
+  Called from tests/non-free/realloc.c:167.
+[value] tests/non-free/realloc.c:123: allocating variable __malloc_main8_l123
+[value] tests/non-free/realloc.c:126: 
+  function realloc: precondition 'freeable' got status valid.
+[value:malloc] bases_to_realloc: {__malloc_main8_l123}
+[value] tests/non-free/realloc.c:126: allocating variable __realloc_main8_l126
+[value:malloc] tests/non-free/realloc.c:126: 
+  strong free on bases: {__malloc_main8_l123}
+[value] tests/non-free/realloc.c:127: 
+  Frama_C_dump_each:
+  # Cvalue domain:
+  __fc_heap_status ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {32767}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  p ∈ ESCAPINGADDR
+  q ∈ {{ &__realloc_main8_l126[0] }}
+  v ∈ [--..--]
+  __realloc_main8_l126∈ ∅
+  ==END OF DUMP==
+[value] tests/non-free/realloc.c:128: 
+  function free: precondition 'freeable' got status valid.
+[value:malloc] tests/non-free/realloc.c:128: 
+  strong free on bases: {__realloc_main8_l126}
+[value] Recording results for main8
+[value] Done for function main8
+[value] computing for function main9 <- main.
+  Called from tests/non-free/realloc.c:168.
+[value] tests/non-free/realloc.c:132: allocating variable __malloc_main9_l132
+[value] tests/non-free/realloc.c:135: 
+  function realloc: precondition 'freeable' got status valid.
+[value:malloc] bases_to_realloc: {__malloc_main9_l132}
+[value] tests/non-free/realloc.c:135: allocating variable __realloc_main9_l135
+[value:malloc] tests/non-free/realloc.c:135: 
+  strong free on bases: {__malloc_main9_l132}
+[value] tests/non-free/realloc.c:136: 
+  Frama_C_dump_each:
+  # Cvalue domain:
+  __fc_heap_status ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {32767}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  p ∈ ESCAPINGADDR
+  q ∈ {{ (int *)&__realloc_main9_l135 }}
+  v ∈ [--..--]
+  __realloc_main9_l135# ∈ {1}%32, bits 0 to 7 
+  ==END OF DUMP==
+[value] tests/non-free/realloc.c:137: 
+  function free: precondition 'freeable' got status valid.
+[value:malloc] tests/non-free/realloc.c:137: 
+  strong free on bases: {__realloc_main9_l135}
+[value] Recording results for main9
+[value] Done for function main9
+[value] computing for function main10 <- main.
+  Called from tests/non-free/realloc.c:169.
+[value] tests/non-free/realloc.c:147: allocating variable __malloc_main10_l147
+[value] tests/non-free/realloc.c:152: 
+  function realloc: precondition 'freeable' got status valid.
+[value:malloc] bases_to_realloc: {__malloc_main10_l147}
+[value] tests/non-free/realloc.c:152: allocating variable __realloc_main10_l152
+[value:malloc] tests/non-free/realloc.c:152: 
+  strong free on bases: {__malloc_main10_l147}
+[value] tests/non-free/realloc.c:154: Frama_C_show_each_main10: {4}
+[value] tests/non-free/realloc.c:155: 
+  Frama_C_dump_each:
+  # Cvalue domain:
+  __fc_heap_status ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {32767}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  v ∈ [--..--]
+  p ∈ {{ &__realloc_main10_l152[0] }}
+  q ∈ ESCAPINGADDR
+  __realloc_main10_l152[0] ∈ {4}
+                       [1] ∈ UNINITIALIZED
+  ==END OF DUMP==
+[value:malloc] bases_to_realloc: {__realloc_main10_l152}
+[value:malloc] tests/non-free/realloc.c:152: 
+  marking variable `__realloc_main10_l152' as weak
+[value:malloc] tests/non-free/realloc.c:152: 
+  weak free on bases: {__realloc_w_main10_l152}
+[value] tests/non-free/realloc.c:154: Frama_C_show_each_main10: {4}
+[value] tests/non-free/realloc.c:155: 
+  Frama_C_dump_each:
+  # Cvalue domain:
+  __fc_heap_status ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {32767}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  v ∈ [--..--]
+  p ∈ {{ &__realloc_w_main10_l152[0] }}
+  q ∈ {{ &__realloc_w_main10_l152[0] }} or ESCAPINGADDR
+  __realloc_w_main10_l152[0] ∈ {4}
+                         [1] ∈ UNINITIALIZED
+  ==END OF DUMP==
+[value] Recording results for main10
+[value] Done for function main10
+[value] Recording results for main
+[value] done for function main
+[value] ====== VALUES COMPUTED ======
+[value:final-states] Values at end of function main1:
+  __fc_heap_status ∈ [--..--]
+  p ∈ ESCAPINGADDR
+  pp ∈ ESCAPINGADDR
+  q ∈ ESCAPINGADDR
+[value:final-states] Values at end of function main10:
+  __fc_heap_status ∈ [--..--]
+  p ∈ {{ &__malloc_main10_l147 ; &__realloc_w_main10_l152[0] }}
+  q ∈ {{ &__realloc_w_main10_l152[0] }} or UNINITIALIZED or ESCAPINGADDR
+  __malloc_main10_l147 ∈ {4}
+  __realloc_w_main10_l152[0] ∈ {4}
+                         [1] ∈ UNINITIALIZED
+[value:final-states] Values at end of function main2:
+  __fc_heap_status ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  x ∈ {3; 4}
+  r ∈ ESCAPINGADDR
+  s ∈ ESCAPINGADDR
+[value:final-states] Values at end of function main3:
+  __fc_heap_status ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  q ∈ ESCAPINGADDR
+  r ∈ ESCAPINGADDR
+  p ∈ ESCAPINGADDR
+  x ∈ {0; 1}
+  s ∈ ESCAPINGADDR
+[value:final-states] Values at end of function main4:
+  __fc_heap_status ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  sizep ∈ [2..10]
+  sizeq ∈ [0..10]
+  p ∈ ESCAPINGADDR
+  q ∈ ESCAPINGADDR
+  rp ∈ ESCAPINGADDR
+  rq ∈ ESCAPINGADDR
+[value:final-states] Values at end of function main5:
+  __fc_heap_status ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  p ∈ ESCAPINGADDR
+  c ∈ {0; 1}
+  q ∈ {0} or ESCAPINGADDR
+  r ∈ ESCAPINGADDR
+[value:final-states] Values at end of function main6:
+  __fc_heap_status ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  c ∈ {0}
+  m ∈ ESCAPINGADDR
+[value:final-states] Values at end of function main7:
+  __fc_heap_status ∈ [--..--]
+  p ∈ ESCAPINGADDR
+  q ∈ ESCAPINGADDR
+[value:final-states] Values at end of function main8:
+  __fc_heap_status ∈ [--..--]
+  p ∈ ESCAPINGADDR
+  q ∈ ESCAPINGADDR
+[value:final-states] Values at end of function main9:
+  __fc_heap_status ∈ [--..--]
+  p ∈ ESCAPINGADDR
+  q ∈ ESCAPINGADDR
+[value:final-states] Values at end of function main:
+  __fc_heap_status ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  __malloc_main10_l147 ∈ {4}
+  __realloc_w_main10_l152[0] ∈ {4}
+                         [1] ∈ UNINITIALIZED
+[from] Computing for function main1
+[from] Computing for function malloc <-main1
+[from] Done for function malloc
+[from] Computing for function realloc <-main1
+[from] Done for function realloc
+[from] Computing for function free <-main1
+[from] Done for function free
+[from] Done for function main1
+[from] Computing for function main10
+[from] Done for function main10
+[from] Computing for function main2
+[from] Computing for function Frama_C_interval <-main2
+[from] Done for function Frama_C_interval
+[from] Done for function main2
+[from] Computing for function main3
+[from] Done for function main3
+[from] Computing for function main4
+[from] Done for function main4
+[from] Computing for function main5
+[from] Done for function main5
+[from] Computing for function main6
+[from] Done for function main6
+[from] Computing for function main7
+[from] Done for function main7
+[from] Computing for function main8
+[from] Done for function main8
+[from] Computing for function main9
+[from] Done for function main9
+[from] Computing for function main
+[from] Done for function main
+[from] ====== DEPENDENCIES COMPUTED ======
+  These dependencies hold at termination for the executions that terminate:
+[from] Function Frama_C_interval:
+  Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
+  \result FROM Frama_C_entropy_source; min; max
+[from] Function free:
+  __fc_heap_status FROM __fc_heap_status (and SELF)
+[from] Function malloc:
+  __fc_heap_status FROM __fc_heap_status; size (and SELF)
+  \result FROM __fc_heap_status; size
+[from] Function realloc:
+  __fc_heap_status FROM __fc_heap_status (and SELF)
+  \result FROM __fc_heap_status; ptr; size
+[from] Function main1:
+  __fc_heap_status FROM __fc_heap_status (and SELF)
+  __malloc_main1_l12 FROM __fc_heap_status
+[from] Function main10:
+  __fc_heap_status FROM __fc_heap_status; v (and SELF)
+  __malloc_main10_l147 FROM __fc_heap_status
+  __realloc_w_main10_l152[0]
+                         FROM __fc_heap_status; v;
+                              __realloc_w_main10_l152[0] (and SELF)
+[from] Function main2:
+  __fc_heap_status FROM __fc_heap_status; Frama_C_entropy_source (and SELF)
+  Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
+  __malloc_main2_l23[0..3]
+                    FROM __fc_heap_status; Frama_C_entropy_source (and SELF)
+[from] Function main3:
+  __fc_heap_status FROM __fc_heap_status (and SELF)
+  Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
+  __malloc_main3_l32[0..4] FROM __fc_heap_status (and SELF)
+  __malloc_main3_l35[0..5] FROM __fc_heap_status (and SELF)
+[from] Function main4:
+  __fc_heap_status FROM __fc_heap_status; Frama_C_entropy_source (and SELF)
+  Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
+  __malloc_main4_l55[0..9]
+                    FROM __fc_heap_status; Frama_C_entropy_source (and SELF)
+  __malloc_main4_l56[0..9]
+                    FROM __fc_heap_status; Frama_C_entropy_source (and SELF)
+[from] Function main5:
+  __fc_heap_status FROM __fc_heap_status (and SELF)
+  Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
+  __malloc_main5_l76 FROM __fc_heap_status
+[from] Function main6:
+  __fc_heap_status FROM __fc_heap_status (and SELF)
+  Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
+[from] Function main7:
+  __fc_heap_status FROM __fc_heap_status (and SELF)
+  __malloc_main7_l110 FROM __fc_heap_status
+[from] Function main8:
+  __fc_heap_status FROM __fc_heap_status (and SELF)
+  __malloc_main8_l123[0..1] FROM __fc_heap_status
+[from] Function main9:
+  __fc_heap_status FROM __fc_heap_status (and SELF)
+  __malloc_main9_l132[0..1] FROM __fc_heap_status
+[from] Function main:
+  __fc_heap_status FROM __fc_heap_status; Frama_C_entropy_source;
+                        v (and SELF)
+  Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
+  __malloc_main1_l12 FROM __fc_heap_status
+  __malloc_main2_l23[0..3]
+                    FROM __fc_heap_status; Frama_C_entropy_source (and SELF)
+  __malloc_main3_l32[0..4] FROM __fc_heap_status;
+                                Frama_C_entropy_source (and SELF)
+  __malloc_main3_l35[0..5] FROM __fc_heap_status;
+                                Frama_C_entropy_source (and SELF)
+  __malloc_main4_l55[0..9]
+                    FROM __fc_heap_status; Frama_C_entropy_source (and SELF)
+  __malloc_main4_l56[0..9]
+                    FROM __fc_heap_status; Frama_C_entropy_source (and SELF)
+  __malloc_main5_l76 FROM __fc_heap_status; Frama_C_entropy_source
+  __malloc_main7_l110 FROM __fc_heap_status; Frama_C_entropy_source
+  __malloc_main8_l123[0..1] FROM __fc_heap_status; Frama_C_entropy_source
+  __malloc_main9_l132[0..1] FROM __fc_heap_status; Frama_C_entropy_source
+  __malloc_main10_l147 FROM __fc_heap_status; Frama_C_entropy_source
+  __realloc_w_main10_l152[0]
+                         FROM __fc_heap_status; Frama_C_entropy_source; 
+                              v; __realloc_w_main10_l152[0] (and SELF)
+[from] ====== END OF DEPENDENCIES ======
+[inout] Out (internal) for function main1:
+    __fc_heap_status; p; pp; q; __malloc_main1_l12
+[inout] Inputs for function main1:
+    __fc_heap_status
+[inout] Out (internal) for function main10:
+    __fc_heap_status; p; q; __malloc_main10_l147; __realloc_w_main10_l152[0]
+[inout] Inputs for function main10:
+    __fc_heap_status; v; __realloc_w_main10_l152[0]
+[inout] Out (internal) for function main2:
+    __fc_heap_status; Frama_C_entropy_source; x; r; i; s;
+    __malloc_main2_l23[0..3]
+[inout] Inputs for function main2:
+    __fc_heap_status; Frama_C_entropy_source
+[inout] Out (internal) for function main3:
+    __fc_heap_status; Frama_C_entropy_source; q; i; r; i_0; p; x; s;
+    __malloc_main3_l32[0..4]; __malloc_main3_l35[0..5]
+[inout] Inputs for function main3:
+    __fc_heap_status; Frama_C_entropy_source
+[inout] Out (internal) for function main4:
+    __fc_heap_status; Frama_C_entropy_source; sizep; sizeq; p; q; i; rp; 
+    rq; __malloc_main4_l55[0..9]; __malloc_main4_l56[0..9]
+[inout] Inputs for function main4:
+    __fc_heap_status; Frama_C_entropy_source
+[inout] Out (internal) for function main5:
+    __fc_heap_status; Frama_C_entropy_source; p; c; q; r; __malloc_main5_l76
+[inout] Inputs for function main5:
+    __fc_heap_status; Frama_C_entropy_source
+[inout] Out (internal) for function main6:
+    __fc_heap_status; Frama_C_entropy_source; c; m; x; p; q
+[inout] Inputs for function main6:
+    __fc_heap_status; Frama_C_entropy_source
+[inout] Out (internal) for function main7:
+    __fc_heap_status; p; q; __malloc_main7_l110
+[inout] Inputs for function main7:
+    __fc_heap_status
+[inout] Out (internal) for function main8:
+    __fc_heap_status; p; q; __malloc_main8_l123[0..1]
+[inout] Inputs for function main8:
+    __fc_heap_status
+[inout] Out (internal) for function main9:
+    __fc_heap_status; p; q; __malloc_main9_l132[0..1]
+[inout] Inputs for function main9:
+    __fc_heap_status
+[inout] Out (internal) for function main:
+    __fc_heap_status; Frama_C_entropy_source; __malloc_main1_l12;
+    __malloc_main2_l23[0..3]; __malloc_main3_l32[0..4];
+    __malloc_main3_l35[0..5]; __malloc_main4_l55[0..9];
+    __malloc_main4_l56[0..9]; __malloc_main5_l76; __malloc_main7_l110;
+    __malloc_main8_l123[0..1]; __malloc_main9_l132[0..1]; __malloc_main10_l147;
+    __realloc_w_main10_l152[0]
+[inout] Inputs for function main:
+    __fc_heap_status; Frama_C_entropy_source; v; __realloc_w_main10_l152[0]

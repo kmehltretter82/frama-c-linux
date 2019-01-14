@@ -1,0 +1,50 @@
+[kernel] Parsing tests/nonterm/n8.i (no preprocessing)
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value:initial-state] Values of globals at initialization
+  nondet ∈ [--..--]
+[value] tests/nonterm/n8.i:41: entering loop for the first time
+[value] computing for function main2 <- main.
+  Called from tests/nonterm/n8.i:42.
+[value] computing for function loop <- main2 <- main.
+  Called from tests/nonterm/n8.i:35.
+[value:alarm] tests/nonterm/n8.i:15: Warning: 
+  signed overflow. assert i + 1 ≤ 2147483647;
+[value] Recording results for loop
+[value] Done for function loop
+[value] computing for function loop2 <- main2 <- main.
+  Called from tests/nonterm/n8.i:36.
+[value] Recording results for loop2
+[value] Done for function loop2
+[value] computing for function loop3 <- main2 <- main.
+  Called from tests/nonterm/n8.i:36.
+[value] Recording results for loop3
+[value] Done for function loop3
+[value] Recording results for main2
+[value] Done for function main2
+[value] Recording results for main
+[value] done for function main
+[value] ====== VALUES COMPUTED ======
+[value:final-states] Values at end of function loop:
+  NON TERMINATING FUNCTION
+[value:final-states] Values at end of function loop2:
+  NON TERMINATING FUNCTION
+[value:final-states] Values at end of function loop3:
+  NON TERMINATING FUNCTION
+[value:final-states] Values at end of function main2:
+  NON TERMINATING FUNCTION
+[value:final-states] Values at end of function main:
+  NON TERMINATING FUNCTION
+[nonterm] tests/nonterm/n8.i:13: Warning: statement is syntactically unreachable
+[nonterm] tests/nonterm/n8.i:17: Warning: statement is syntactically unreachable
+[nonterm] tests/nonterm/n8.i:22: Warning: 
+  implicit return is syntactically unreachable
+[nonterm] tests/nonterm/n8.i:31: Warning: 
+  implicit return is syntactically unreachable
+[nonterm] tests/nonterm/n8.i:41: Warning: 
+  non-terminating loop
+  stack: main
+[nonterm] tests/nonterm/n8.i:41: Warning: 
+  implicit return is syntactically unreachable
+[nonterm] Analysis done.

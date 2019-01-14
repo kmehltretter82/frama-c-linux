@@ -1,0 +1,8 @@
+# frama-c -wp -wp-rte [...]
+[kernel] Parsing tests/binary/upperbound.i (no preprocessing)
+[kernel] Parsing upperbound/upperbound.c (with preprocessing)
+[rte] annotating function upper_bound
+------------------------------------------------
+Module               #VC   WP   Ergo   Success
+upper_bound           22    8    14      100%
+------------------------------------------------

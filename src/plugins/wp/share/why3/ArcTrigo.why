@@ -1,0 +1,19 @@
+theory ArcTrigo
+use real.Real as Real
+use real.Abs as Abs
+use real.Square as Square
+use real.Trigonometry as Trigonometry
+
+function atan (x:real) : real = Trigonometry.atan x
+
+function asin real : real
+
+function acos real : real
+
+axiom Sin_asin : forall x:real. (Real.(<=) ((Real.(-_) (1.0))) (x)) /\
+  (Real.(<=) (x) (1.0)) -> ((Trigonometry.sin (asin x)) = (x))
+
+axiom Cos_acos : forall x:real. (Real.(<=) ((Real.(-_) (1.0))) (x)) /\
+  (Real.(<=) (x) (1.0)) -> ((Trigonometry.cos (acos x)) = (x))
+
+end

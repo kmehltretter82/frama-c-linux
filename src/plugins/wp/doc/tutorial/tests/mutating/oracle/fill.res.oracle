@@ -1,0 +1,9 @@
+# frama-c -wp [...]
+[kernel] Parsing tests/mutating/fill.i (no preprocessing)
+[kernel] Parsing fill/fill.c (with preprocessing)
+[wp] warning: Missing RTE guards
+[rte] annotating function fill
+------------------------------------------------
+Module               #VC   WP   Ergo   Success
+fill                  14    5     9      100%
+------------------------------------------------

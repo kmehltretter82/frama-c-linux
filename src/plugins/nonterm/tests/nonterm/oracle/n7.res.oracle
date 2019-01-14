@@ -1,0 +1,17 @@
+[kernel] Parsing tests/nonterm/n7.i (no preprocessing)
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value:initial-state] Values of globals at initialization
+  
+[value] tests/nonterm/n7.i:4: entering loop for the first time
+[value] tests/nonterm/n7.i:5: entering loop for the first time
+[value] Recording results for main
+[value] done for function main
+[value] ====== VALUES COMPUTED ======
+[value:final-states] Values at end of function main:
+  NON TERMINATING FUNCTION
+[nonterm] tests/nonterm/n7.i:4: Warning: 
+  non-terminating loop
+  stack: main
+[nonterm] Analysis done.

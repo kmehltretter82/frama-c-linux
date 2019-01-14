@@ -1,0 +1,80 @@
+[kernel] Parsing tests/non-free/malloc_memexec.c (with preprocessing)
+[value] Analyzing a complete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value:initial-state] Values of globals at initialization
+  v ∈ [--..--]
+[value] tests/non-free/malloc_memexec.c:19: 
+  allocating variable __malloc_main_l19
+[value] computing for function f <- main.
+  Called from tests/non-free/malloc_memexec.c:21.
+[value] Recording results for f
+[value] Done for function f
+[value] computing for function f <- main.
+  Called from tests/non-free/malloc_memexec.c:22.
+[value] Recording results for f
+[value] Done for function f
+[value] computing for function f <- main.
+  Called from tests/non-free/malloc_memexec.c:24.
+[value] Recording results for f
+[value] Done for function f
+[value] tests/non-free/malloc_memexec.c:27: 
+  allocating weak variable __malloc_w_main_l27
+[value] computing for function f <- main.
+  Called from tests/non-free/malloc_memexec.c:29.
+[value] Recording results for f
+[value] Done for function f
+[value] computing for function f <- main.
+  Called from tests/non-free/malloc_memexec.c:30.
+[value] Recording results for f
+[value] Done for function f
+[value] computing for function f <- main.
+  Called from tests/non-free/malloc_memexec.c:32.
+[value] Recording results for f
+[value] Done for function f
+[value] Recording results for main
+[value] done for function main
+[value] ====== VALUES COMPUTED ======
+[value:final-states] Values at end of function f:
+  __malloc_main_l19 ∈ {1; 2}
+  __malloc_w_main_l27[0] ∈ {1; 2} or UNINITIALIZED
+[value:final-states] Values at end of function main:
+  p ∈ {{ &__malloc_main_l19 }}
+  q ∈ {{ &__malloc_w_main_l27[0] }}
+  __malloc_main_l19 ∈ {1}
+  __malloc_w_main_l27[0] ∈ {1; 2} or UNINITIALIZED
+[from] Computing for function f
+[from] Done for function f
+[from] Computing for function main
+[from] Computing for function Frama_C_malloc_fresh <-main
+[from] Done for function Frama_C_malloc_fresh
+[from] Computing for function Frama_C_malloc_fresh_weak <-main
+[from] Done for function Frama_C_malloc_fresh_weak
+[from] Done for function main
+[from] ====== DEPENDENCIES COMPUTED ======
+  These dependencies hold at termination for the executions that terminate:
+[from] Function Frama_C_malloc_fresh:
+  \result FROM ANYTHING(origin:Unknown)
+[from] Function Frama_C_malloc_fresh_weak:
+  \result FROM ANYTHING(origin:Unknown)
+[from] Function f:
+  __malloc_main_l19 FROM p; i (and SELF)
+  __malloc_w_main_l27[0] FROM p; i (and SELF)
+[from] Function main:
+  __malloc_main_l19 FROM ANYTHING(origin:Unknown) (and SELF)
+  __malloc_w_main_l27[0] FROM ANYTHING(origin:Unknown) (and SELF)
+[from] ====== END OF DEPENDENCIES ======
+[inout] InOut (internal) for function f:
+  Operational inputs:
+    p; i
+  Operational inputs on termination:
+    p; i
+  Sure outputs:
+    \nothing
+[inout] InOut (internal) for function main:
+  Operational inputs:
+    v
+  Operational inputs on termination:
+    v
+  Sure outputs:
+    p; q; __malloc_main_l19

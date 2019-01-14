@@ -1,0 +1,29 @@
+# frama-c -wp -wp-model 'Typed' [...]
+[kernel] Parsing tests/wp_plugin/float_real.i (no preprocessing)
+[kernel:parser:decimal-float] tests/wp_plugin/float_real.i:19: Warning:
+  Floating-point constant 1e-5 is not represented exactly. Will use 0x1.4f8b588e368f1p-17.
+  (warn-once: no further messages from category 'parser:decimal-float' will be emitted)
+[wp] Running WP plugin...
+[wp] Loading driver 'share/wp.driver'
+[wp] Warning: Missing RTE guards
+------------------------------------------------------------
+  Function dequal
+------------------------------------------------------------
+
+Goal Post-condition (file tests/wp_plugin/float_real.i, line 14) in 'dequal':
+Let r = -y.
+Let r_1 = add_float64(x, r).
+Assume {
+  Type: is_sint32(dequal_0) /\ is_float64(x) /\ is_float64(y) /\
+      is_float64(r_1).
+  If r_1 < (5902958103587057.0/590295810358705651712)
+  Then {
+    If (-5902958103587057.0/590295810358705651712) < r_1
+    Then { (* Return *) Have: dequal_0 = 1. }
+    Else { (* Return *) Have: dequal_0 = 0. }
+  }
+  Else { (* Return *) Have: dequal_0 = 0. }
+}
+Prove: (abs_real(x - y) < (1.0/100000)) <-> (dequal_0 != 0).
+
+------------------------------------------------------------
