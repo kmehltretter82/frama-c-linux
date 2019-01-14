@@ -587,6 +587,8 @@ KERNEL_CMO=\
 	src/kernel_services/abstract_interp/fc_float.cmo                \
 	src/kernel_services/abstract_interp/float_interval.cmo          \
 	src/kernel_services/abstract_interp/fval.cmo                    \
+	src/kernel_services/abstract_interp/int_interval.cmo            \
+	src/kernel_services/abstract_interp/int_set.cmo                 \
 	src/kernel_services/abstract_interp/ival.cmo                    \
 	src/kernel_services/abstract_interp/base.cmo                    \
 	src/kernel_services/abstract_interp/origin.cmo                  \
@@ -633,6 +635,7 @@ MLI_ONLY+=\
 	src/kernel_services/abstract_interp/float_sig.mli                    \
 	src/kernel_services/abstract_interp/float_interval_sig.mli           \
 	src/kernel_services/abstract_interp/lattice_type.mli                 \
+	src/kernel_services/abstract_interp/eva_lattice_type.mli             \
 	src/kernel_services/abstract_interp/int_Intervals_sig.mli            \
 	src/kernel_services/abstract_interp/offsetmap_lattice_with_isotropy.mli \
 	src/kernel_services/abstract_interp/offsetmap_sig.mli                \
