@@ -50,17 +50,17 @@ else:
 
 dirs = set()
 if len(sys.argv) < 3:
-    pwd = os.getcwd()
-    dirs = [pwd, "/usr/include"]
+   pwd = os.getcwd()
+   dirs = [pwd, "/usr/include"]
 else:
-    dirs = set(sys.argv[2:])
+   dirs = set(sys.argv[2:])
 
 if debug:
-    print("Looking for files in dirs (and their subdirs): %s" % dirs)
+   print("Looking for files in dirs (and their subdirs): %s" % dirs)
 
 files = []
 for d in dirs:
-    files += glob.glob(d + "/**/*.[ich]", recursive=True)
+   files += glob.glob(d + "/**/*.[ich]", recursive=True)
 
 print("Looking for '%s' inside %d file(s)..." % (fname, len(files)))
 #print("\n".join(files))
@@ -82,24 +82,27 @@ c_identifier = "[a-zA-Z_][a-zA-Z0-9_]*"
 c_id_maybe_pointer = c_identifier + "\**"
 type_prefix = c_id_maybe_pointer + "(?:\s+\**" + c_id_maybe_pointer + ")*\s+\**"
 parentheses_suffix = "\s*\([^)]*\)"
-re_fun = re.compile("^(?:" + type_prefix + "\s*)?" + fname + parentheses_suffix + "\s*(?:" + c_identifier + ")?\s*(;|{)", flags=re.MULTILINE)
+re_fun = re.compile("^(?:" + type_prefix + "\s*)?" + fname + parentheses_suffix
+                  + "\s*(?:" + c_identifier + ")?\s*(;|{)", flags=re.MULTILINE)
 for f in files:
-    with open(f, encoding="ascii", errors='ignore') as content_file:
-        content = content_file.read()
-        has_decl_or_def = re_fun.search(content)
-        if has_decl_or_def is not None:
-            is_decl = has_decl_or_def.group(1) == ";"
-            if is_decl:
-                possible_declarators.append(f)
-            else:
-                possible_definers.append(f)
+   with open(f, encoding="ascii", errors='ignore') as content_file:
+      content = content_file.read()
+      has_decl_or_def = re_fun.search(content)
+      if has_decl_or_def is not None:
+         is_decl = has_decl_or_def.group(1) == ";"
+         if is_decl:
+            possible_declarators.append(f)
+         else:
+            possible_definers.append(f)
 
 if possible_declarators == [] and possible_definers == []:
-    print("No declaration/definition found for function '%s'" % fname)
+   print("No declaration/definition found for function '%s'" % fname)
 else:
-    if possible_declarators != []:
-        print("Possible declarations for function '%s' in the following file(s):" % fname)
-        print("  " + "\n  ".join(possible_declarators))
-    if possible_definers != []:
-        print("Possible definitions for function '%s' in the following file(s):" % fname)
-        print("  " + "\n  ".join(possible_definers))
+   if possible_declarators != []:
+      print("Possible declarations for function '%s' in the following file(s):"
+            % fname)
+      print("  " + "\n  ".join(possible_declarators))
+   if possible_definers != []:
+      print("Possible definitions for function '%s' in the following file(s):"
+            % fname)
+      print("  " + "\n  ".join(possible_definers))
