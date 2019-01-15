@@ -90,14 +90,16 @@ module DoPointerCall =
     end)
 
 (* uses results of basic constant propagation in order to check
-   validity / invalidity of generated assertions, emitting a status if possible
+   validity / invalidity of generated assertions, emitting a status if possible.
+   Notice that annotations that can be considered valid from syntaxical rules
+   are also considered as trivial.
 *)
 module Trivial =
   False
     (struct
       let option_name = "-rte-trivial-annotations"
-      let help = "generate annotations for constant expressions, even when \
-                  they trivially hold"
+      let help = "generate all annotations even when they trivially hold \
+                  (from evaluation of constant expressions, syntactical rules...)"
       (* if on, evaluates constants in order to check if assertions
          are trivially true / false *)
     end)
