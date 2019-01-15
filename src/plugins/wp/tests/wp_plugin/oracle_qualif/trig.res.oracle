@@ -7,7 +7,7 @@
 [wp] [Alt-Ergo] Goal typed_foo_assert_qed_ok_S : Valid
 [wp] [Alt-Ergo] Goal typed_foo_assert_qed_ok_A : Valid
 [wp] [Alt-Ergo] Goal typed_foo_assert_qed_ok_B : Unknown
-[wp] [Qed] Goal typed_foo_call_fconcat_pre_qed_ok : Valid
+[wp] [Qed] Goal typed_foo_call_fconcat_requires_qed_ok : Valid
 [wp] Proved goals:    3 / 4
   Qed:             1 
   Alt-Ergo:        2  (unknown: 1)
