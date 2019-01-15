@@ -1,18 +1,36 @@
-{ "wp:global": { "wp:main": { "total": 5, "unknown": 5 } },
-  "wp:functions": { "split": { "split_ensures_Hyp_Forall_Or_bis": { "wp:main": 
+{ "wp:global": { "script": { "total": 5, "unknown": 5 },
+                 "wp:main": { "total": 5, "unknown": 5 } },
+  "wp:functions": { "split": { "split_ensures_Hyp_Forall_Or_bis": { "script": 
+                                                                    { "total": 1,
+                                                                    "unknown": 1 },
+                                                                    "wp:main": 
                                                                     { "total": 1,
                                                                     "unknown": 1 } },
-                               "split_ensures_Hyp_Forall_And": { "wp:main": 
+                               "split_ensures_Hyp_Forall_And": { "script": 
+                                                                   { "total": 1,
+                                                                    "unknown": 1 },
+                                                                 "wp:main": 
                                                                    { "total": 1,
                                                                     "unknown": 1 } },
-                               "split_ensures_Goal_Exist_And_bis": { "wp:main": 
+                               "split_ensures_Goal_Exist_And_bis": { "script": 
+                                                                    { "total": 1,
+                                                                    "unknown": 1 },
+                                                                    "wp:main": 
                                                                     { "total": 1,
                                                                     "unknown": 1 } },
-                               "split_ensures_Goal_Exist_And": { "wp:main": 
+                               "split_ensures_Goal_Exist_And": { "script": 
+                                                                   { "total": 1,
+                                                                    "unknown": 1 },
+                                                                 "wp:main": 
                                                                    { "total": 1,
                                                                     "unknown": 1 } },
-                               "split_ensures_Goal_Exist_Or": { "wp:main": 
+                               "split_ensures_Goal_Exist_Or": { "script": 
+                                                                  { "total": 1,
+                                                                    "unknown": 1 },
+                                                                "wp:main": 
                                                                   { "total": 1,
                                                                     "unknown": 1 } },
-                               "wp:section": { "wp:main": { "total": 5,
+                               "wp:section": { "script": { "total": 5,
+                                                           "unknown": 5 },
+                                               "wp:main": { "total": 5,
                                                             "unknown": 5 } } } } }
