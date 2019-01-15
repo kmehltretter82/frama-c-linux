@@ -1,25 +1,25 @@
 { "wp:global": { "qed": { "total": 8, "valid": 8 },
                  "wp:main": { "total": 8, "valid": 8 } },
-  "wp:functions": { "g": { "g_assign": { "qed": { "total": 4, "valid": 4 },
-                                         "wp:main": { "total": 4,
-                                                      "valid": 4 } },
-                           "g_loop_assign": { "qed": { "total": 1,
-                                                       "valid": 1 },
-                                              "wp:main": { "total": 1,
-                                                           "valid": 1 } },
-                           "g_exit_ok": { "qed": { "total": 1, "valid": 1 },
-                                          "wp:main": { "total": 1,
-                                                       "valid": 1 } },
+  "wp:functions": { "g": { "g_assigns": { "qed": { "total": 4, "valid": 4 },
+                                          "wp:main": { "total": 4,
+                                                       "valid": 4 } },
+                           "g_loop_assigns": { "qed": { "total": 1,
+                                                        "valid": 1 },
+                                               "wp:main": { "total": 1,
+                                                            "valid": 1 } },
+                           "g_exits_ok": { "qed": { "total": 1, "valid": 1 },
+                                           "wp:main": { "total": 1,
+                                                        "valid": 1 } },
                            "wp:section": { "qed": { "total": 6, "valid": 6 },
                                            "wp:main": { "total": 6,
                                                         "valid": 6 } } },
-                    "unreachable_smt_with_contract": { "specialization_f_with_precond_pre_ok_at_unreachable_smt_with_contract_stmt_10": 
+                    "unreachable_smt_with_contract": { "f_with_precond_requires_ok_2": 
                                                          { "qed": { "total": 1,
                                                                     "valid": 1 },
                                                            "wp:main": 
                                                              { "total": 1,
                                                                "valid": 1 } },
-                                                       "unreachable_smt_with_contract_post_ok": 
+                                                       "unreachable_smt_with_contract_ensures_ok_2": 
                                                          { "qed": { "total": 1,
                                                                     "valid": 1 },
                                                            "wp:main": 

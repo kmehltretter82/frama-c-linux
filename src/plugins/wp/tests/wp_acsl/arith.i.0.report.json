@@ -106,7 +106,7 @@
                                            "wp:main": { "total": 21,
                                                         "valid": 21,
                                                         "rank": 0 } } } },
-  "wp:functions": { "cast_sgn_usgn": { "cast_sgn_usgn_post_qed_ok_nat": 
+  "wp:functions": { "cast_sgn_usgn": { "cast_sgn_usgn_ensures_qed_ok_nat": 
                                          { "qed": { "total": 1, "valid": 1 },
                                            "wp:main": { "total": 1,
                                                         "valid": 1 } },
