@@ -12,6 +12,6 @@
 [wp:rte] function job3: missing rte for memory access
 [wp:rte] function job3: missing rte for division by zero
 [wp:rte] function job3: missing rte for signed overflow
-[wp] Goal typed_nat_job_post : not tried
-[wp] Goal typed_nat_job2_post : not tried
-[wp] Goal typed_nat_job3_post : not tried
+[wp] Goal typed_nat_job_ensures : not tried
+[wp] Goal typed_nat_job2_ensures : not tried
+[wp] Goal typed_nat_job3_ensures : not tried
