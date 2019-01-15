@@ -150,8 +150,21 @@ val popcount: t -> int
 
 val pretty : ?hexa:bool -> t Pretty_utils.formatter
 
+val pp_bin : ?nbits:int -> ?sep:string -> t Pretty_utils.formatter
+(** Print binary format. Digits are output by blocs of 4 bits 
+    separated by [~sep] with at least [~nbits] total bits.
+    
+    Positive values are preffixed with ["0b"] and negative values 
+    are printed as their 2-complement ([lnot]) with prefix ["1b"]. *)
 
+val pp_hex : ?nbits:int -> ?sep:string -> t Pretty_utils.formatter
+(** Print hexadecimal format. Digits are output by blocs of 16 bits 
+    (4 hex digits) separated by [~sep] with at least [~nbits] total bits.
+    
+    Positive values are preffixed with ["0x"] and negative values 
+    are printed as their 2-complement ([lnot]) with prefix ["1x"]. *)
 (*
+
 Local Variables:
 compile-command: "make -C ../../.."
 End:

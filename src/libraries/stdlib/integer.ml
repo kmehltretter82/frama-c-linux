@@ -120,6 +120,74 @@ let popcount = Z.popcount
     try Z.of_float z
     with Z.Overflow -> raise Too_big
 
+  let bdigits = [|
+    "0000" ; (* 0 *)
+    "0001" ; (* 1 *)
+    "0010" ; (* 2 *)
+    "0011" ; (* 3 *)
+    "0100" ; (* 4 *)
+    "0101" ; (* 5 *)
+    "0110" ; (* 6 *)
+    "0111" ; (* 7 *)
+    "1000" ; (* 8 *)
+    "1001" ; (* 9 *)
+    "1010" ; (* 10 *)
+    "1011" ; (* 11 *)
+    "1100" ; (* 12 *)
+    "1101" ; (* 13 *)
+    "1110" ; (* 14 *)
+    "1111" ; (* 15 *)
+  |]
+
+  let pp_bin_pos fmt r = Format.pp_print_string fmt bdigits.(r)
+  let pp_bin_neg fmt r = Format.pp_print_string fmt bdigits.(15-r)
+
+  let pp_hex_pos fmt r = Format.fprintf fmt "%04X" r
+  let pp_hex_neg fmt r = Format.fprintf fmt "%04X" (0xFFFF-r)
+
+  let bmask_bin = Z.of_int 15
+  let bmask_hex = Z.of_int 0xFFFF
+
+  type digits = {
+    nbits : int ; (* max number of bits *)
+    bsize : int ; (* bits in each bloc *)
+    bmask : Z.t ; (* block mask *)
+    sep : string ;
+    pp : Format.formatter -> int -> unit ; (* print one block *)
+  }
+
+  let rec pp_digits d fmt n v =
+    if gt v zero || n < d.nbits then
+      begin
+        let r = Z.to_int (Z.logand v d.bmask) in
+        let k = d.bsize in
+        pp_digits d fmt (n + k) (Z.shift_right_trunc v k) ;
+        if gt v d.bmask || (n + k) < d.nbits
+        then Format.pp_print_string fmt d.sep ;
+        d.pp fmt r ;
+      end
+
+  let pp_bin ?(nbits=0) ?(sep="") fmt v =
+    if le zero v then
+      ( Format.pp_print_string fmt "0b" ;
+        pp_digits { nbits ; sep ; bsize=4 ;
+                    bmask = bmask_bin ; pp = pp_bin_pos } fmt 0 v )
+    else
+      ( Format.pp_print_string fmt "1b" ;
+        pp_digits { nbits ; sep ; bsize=4 ;
+                    bmask = bmask_bin ; pp = pp_bin_neg } fmt 0 (Z.lognot v) )
+
+  let pp_hex ?(nbits=0) ?(sep="") fmt v =
+    if le zero v then
+      ( Format.pp_print_string fmt "0x" ;
+        pp_digits { nbits ; sep ; bsize=16 ;
+                    bmask = bmask_hex ; pp = pp_hex_pos } fmt 0 v )
+
+    else
+      ( Format.pp_print_string fmt "1x" ;
+        pp_digits { nbits ; sep ; bsize=16 ;
+                    bmask = bmask_hex ; pp = pp_hex_neg } fmt 0 (Z.lognot v) )
+
   let pretty ?(hexa=false) fmt v =
     let rec aux v =
       if gt v two_power_60 then
