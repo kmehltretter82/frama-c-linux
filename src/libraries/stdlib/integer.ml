@@ -109,10 +109,8 @@ let popcount = Z.popcount
        raises multiple [Failure _] exceptions *)
       failwith "Integer.of_string"
 
-
   let max_int64 = of_int64 Int64.max_int
   let min_int64 = of_int64 Int64.min_int
-
 
   let to_string = Z.to_string
   let to_float = Z.to_float
@@ -145,13 +143,13 @@ let popcount = Z.popcount
   let pp_hex_pos fmt r = Format.fprintf fmt "%04X" r
   let pp_hex_neg fmt r = Format.fprintf fmt "%04X" (0xFFFF-r)
 
-  let bmask_bin = Z.of_int 15
-  let bmask_hex = Z.of_int 0xFFFF
+  let bmask_bin = Z.of_int 0xF     (* 4 bits mask *)
+  let bmask_hex = Z.of_int 0xFFFF (* 64 bits mask *)
 
   type digits = {
     nbits : int ; (* max number of bits *)
     bsize : int ; (* bits in each bloc *)
-    bmask : Z.t ; (* block mask *)
+    bmask : Z.t ; (* block mask, must be (1 << bsize) - 1 *)
     sep : string ;
     pp : Format.formatter -> int -> unit ; (* print one block *)
   }
