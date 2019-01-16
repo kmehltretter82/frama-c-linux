@@ -122,6 +122,7 @@ share/analysis-scripts/examples/example.mk: .ignore
 share/analysis-scripts/examples/example-multi.mk: .ignore
 share/analysis-scripts/examples/example-slevel.mk: .ignore
 share/analysis-scripts/examples/Makefile: .ignore
+share/analysis-scripts/find_fun.py: .ignore
 share/analysis-scripts/flamegraph.pl: CDDL
 share/analysis-scripts/list_files.py: .ignore
 share/analysis-scripts/parse-coverage.sh: .ignore

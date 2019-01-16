@@ -254,6 +254,7 @@ DISTRIB_FILES:=\
       share/analysis-scripts/cmd-dep.sh                                 \
       share/analysis-scripts/concat-csv.sh                              \
       $(wildcard share/analysis-scripts/examples/*)                     \
+      share/analysis-scripts/find_fun.py                                \
       share/analysis-scripts/flamegraph.pl                              \
       share/analysis-scripts/frama-c.mk                                 \
       share/analysis-scripts/list_files.py                              \
@@ -1804,6 +1805,7 @@ install:: install-lib
 	$(MKDIR) $(FRAMAC_DATADIR)/analysis-scripts
 	$(CP) share/analysis-scripts/cmd-dep.sh \
 	  share/analysis-scripts/concat-csv.sh \
+	  share/analysis-scripts/find_fun.py \
 	  share/analysis-scripts/flamegraph.pl \
 	  share/analysis-scripts/frama-c.mk \
 	  share/analysis-scripts/parse-coverage.sh \
