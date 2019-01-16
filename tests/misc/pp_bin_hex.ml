@@ -1,6 +1,6 @@
 let pp_dec fmt z = Integer.pretty ~hexa:false fmt z
-let pp_hex fmt z = Integer.pp_hex ~nbits:16 fmt z
-let pp_bin fmt z = Integer.pp_bin ~nbits:8  fmt z
+let pp_hex fmt z = Integer.pp_hex ~nbits:16 ~sep:"_" fmt z
+let pp_bin fmt z = Integer.pp_bin ~nbits:8  ~sep:"_" fmt z
 
 let hrule () =
   Format.printf "--------------------------------------------------@."
