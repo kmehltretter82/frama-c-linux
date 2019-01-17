@@ -205,7 +205,8 @@ SHELL        := /bin/bash
 	  printf 'timestamp=%q\n' "$(HR_TIMESTAMP)";
 	  printf 'warnings=%s\n' "`cat $@/warnings.log | grep ':\[\(eva\|kernel\|from\)\]' | wc -l`";
 	  printf 'alarms=%s\n' "`expr $$(cat $@/alarms.csv | wc -l) - 1`";
-	  printf 'cmd_args=%q\n' "$(subst ",\",$(wordlist 2,999,$(EVA)))"
+	  printf 'cmd_args=%q\n' "$(subst ",\",$(wordlist 2,999,$(EVA)))";
+	  printf 'benchmark_tag=%s' "$(BENCHMARK)"
 	} >> $@/stats.txt
 	if [ ! -z $${FLAMEGRAPH+x} ]; then
 	  NOGUI=1 $(FRAMAC_SCRIPT) flamegraph $@/flamegraph.txt $@/
