@@ -212,10 +212,18 @@ let compute () =
 (* --- Registry                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let get ?(bhv=Cil.default_behavior_name) stmt =
+let get ?bhv stmt =
   compute () ;
-  try CallPoints.find (bhv,stmt)
-  with Not_found -> []
+  let get bhv =
+    try CallPoints.find (bhv,stmt)
+    with Not_found -> []
+  in
+  match bhv with
+  | None -> get Cil.default_behavior_name
+  | Some bhv ->
+      (match get bhv with
+       | [] -> get Cil.default_behavior_name
+       | l -> l)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Registry                                                           --- *)

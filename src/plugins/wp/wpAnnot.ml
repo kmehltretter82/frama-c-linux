@@ -769,7 +769,7 @@ let get_call_annots config v s fct =
       if calls=[] then
         begin
           Wp_parameters.warning ~once:true ~source:(fst (Stmt.loc s))
-            "Ignored function pointer (see -wp-dynamic)" ;
+            "Missigns 'calls' clause dedicated to dynamic calls (see WP manual)";
           let annots = WpStrategy.add_call_assigns_any WpStrategy.empty_acc s in
           WpStrategy.empty_acc, (annots , annots)
         end

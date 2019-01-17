@@ -4,19 +4,17 @@
 [wp] Computing dynamic calls.
 [wp] Dynamic call(s): 5.
 [wp] Loading driver 'share/wp.driver'
-[wp] tests/wp_plugin/dynamic.i:65: Warning: 
-  Ignored function pointer (see -wp-dynamic)
-[wp] tests/wp_plugin/dynamic.i:78: Warning: 
-  Ignored function pointer (see -wp-dynamic)
 [wp] Warning: Missing RTE guards
-[wp] tests/wp_plugin/dynamic.i:65: Warning: 
-  Missing assigns clause (assigns 'everything' instead)
-[wp] tests/wp_plugin/dynamic.i:78: Warning: 
-  Missing assigns clause (assigns 'everything' instead)
-[wp] 22 goals scheduled
-[wp] [Alt-Ergo] Goal typed_behavior_bhv1_post : Unknown
-[wp] [Alt-Ergo] Goal typed_behavior_bhv1_assign_exit : Unknown
-[wp] [Alt-Ergo] Goal typed_behavior_bhv1_assign_normal : Unknown
+[wp] 46 goals scheduled
+[wp] [Qed] Goal typed_behavior_stmt_for_bhv1_calls_h1_h2 : Valid
+[wp] [Qed] Goal typed_behavior_bhv1_post_part1 : Valid
+[wp] [Qed] Goal typed_behavior_bhv1_post_part2 : Valid
+[wp] [Qed] Goal typed_behavior_bhv1_assign_exit_part1 : Valid
+[wp] [Qed] Goal typed_behavior_bhv1_assign_exit_part2 : Valid
+[wp] [Qed] Goal typed_behavior_bhv1_assign_normal_part1 : Valid
+[wp] [Qed] Goal typed_behavior_bhv1_assign_normal_part2 : Valid
+[wp] [Qed] Goal typed_behavior_bhv1_assign_normal_part3 : Valid
+[wp] [Qed] Goal typed_behavior_bhv1_assign_normal_part4 : Valid
 [wp] [Alt-Ergo] Goal typed_call_stmt_calls_f1_f2 : Valid
 [wp] [Qed] Goal typed_call_post_part1 : Valid
 [wp] [Qed] Goal typed_call_post_part2 : Valid
@@ -30,22 +28,40 @@
 [wp] [Qed] Goal typed_no_call_post_part1 : Valid
 [wp] [Qed] Goal typed_no_call_post_part2 : Valid
 [wp] [Qed] Goal typed_no_call_call_unreachable_g_pre : Valid
-[wp] [Alt-Ergo] Goal typed_some_behaviors_bhv0_post : Unknown
-[wp] [Alt-Ergo] Goal typed_some_behaviors_bhv0_assign_exit : Unknown
-[wp] [Alt-Ergo] Goal typed_some_behaviors_bhv0_assign_normal : Unknown
-[wp] [Alt-Ergo] Goal typed_some_behaviors_bhv1_post : Unknown
-[wp] [Alt-Ergo] Goal typed_some_behaviors_bhv1_assign_exit : Unknown
-[wp] [Alt-Ergo] Goal typed_some_behaviors_bhv1_assign_normal : Unknown
-[wp] Proved goals:   13 / 22
-  Qed:            10 
-  Alt-Ergo:        3  (unknown: 9)
+[wp] [Qed] Goal typed_some_behaviors_stmt_for_bhv0_calls_h1_h2_h0 : Valid
+[wp] [Qed] Goal typed_some_behaviors_bhv0_post_part1 : Valid
+[wp] [Qed] Goal typed_some_behaviors_bhv0_post_part2 : Valid
+[wp] [Qed] Goal typed_some_behaviors_bhv0_post_part3 : Valid
+[wp] [Qed] Goal typed_some_behaviors_bhv0_assign_exit_part1 : Valid
+[wp] [Qed] Goal typed_some_behaviors_bhv0_assign_exit_part2 : Valid
+[wp] [Qed] Goal typed_some_behaviors_bhv0_assign_exit_part3 : Valid
+[wp] [Qed] Goal typed_some_behaviors_bhv0_assign_normal_part1 : Valid
+[wp] [Qed] Goal typed_some_behaviors_bhv0_assign_normal_part2 : Valid
+[wp] [Qed] Goal typed_some_behaviors_bhv0_assign_normal_part3 : Valid
+[wp] [Qed] Goal typed_some_behaviors_bhv0_assign_normal_part4 : Valid
+[wp] [Qed] Goal typed_some_behaviors_bhv0_assign_normal_part5 : Valid
+[wp] [Qed] Goal typed_some_behaviors_bhv0_assign_normal_part6 : Valid
+[wp] [Qed] Goal typed_some_behaviors_stmt_for_bhv1_calls_h1_h2_h0 : Valid
+[wp] [Qed] Goal typed_some_behaviors_bhv1_post_part1 : Valid
+[wp] [Qed] Goal typed_some_behaviors_bhv1_post_part2 : Valid
+[wp] [Qed] Goal typed_some_behaviors_bhv1_post_part3 : Valid
+[wp] [Qed] Goal typed_some_behaviors_bhv1_assign_exit_part1 : Valid
+[wp] [Qed] Goal typed_some_behaviors_bhv1_assign_exit_part2 : Valid
+[wp] [Qed] Goal typed_some_behaviors_bhv1_assign_normal_part1 : Valid
+[wp] [Qed] Goal typed_some_behaviors_bhv1_assign_normal_part2 : Valid
+[wp] [Qed] Goal typed_some_behaviors_bhv1_assign_normal_part3 : Valid
+[wp] [Qed] Goal typed_some_behaviors_bhv1_assign_normal_part4 : Valid
+[wp] [Qed] Goal typed_some_behaviors_bhv1_assign_normal_part5 : Valid
+[wp] Proved goals:   46 / 46
+  Qed:            43 
+  Alt-Ergo:        3
 [wp] Report 'tests/wp_plugin/dynamic.i.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
-call                 2      2 (52..64)       4       100%
+call                 2      2 (56..80)       4       100%
 guarded_call         4      1 (16..28)       5       100%
-behavior            -      -                 3       0.0%
-some_behaviors      -      -                 6       0.0%
+behavior             9     -                 9       100%
+some_behaviors      24     -                24       100%
 no_call              4     -                 4       100%
 -------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'guarded_call':
