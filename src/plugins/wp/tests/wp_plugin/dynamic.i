@@ -45,6 +45,40 @@ void guarded_call (struct S * p) {
 }
 
 //-----------------------------------------------------------------------------
+int X1;
+//@ assigns X1; ensures X1==1;
+int h1(void);
+
+int X2;
+//@ assigns X2; ensures X2==2;
+int h2(void);
+
+//@ assigns \nothing;
+int h0(void);
+
+/*@ behavior bhv1:
+  @   assumes p == &h1;
+  @   assigns X1;
+  @   ensures X1==1; */
+int behavior (int (*p)(void)) {
+  //@ calls h1, h2;
+  return (*p)();
+}
+
+/*@ behavior bhv1:
+  @   assumes p == &h1;
+  @   assigns X1;
+  @   ensures X1==1;
+  @ behavior bhv0:
+  @   assumes p == &h0;
+  @   assigns \nothing;
+  @   ensures X1==\old(X1); */
+int some_behaviors (int (*p)(void)) {
+  //@ calls h1, h2, h0;
+  return (*p)();
+}
+
+//-----------------------------------------------------------------------------
 //@ requires \false; ensures \false; exits \false; assigns \nothing;
 int unreachable_g(int x);
 

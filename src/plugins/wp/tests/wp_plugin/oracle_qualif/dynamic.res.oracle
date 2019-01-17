@@ -2,10 +2,21 @@
 [kernel] Parsing tests/wp_plugin/dynamic.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Computing dynamic calls.
-[wp] Dynamic call(s): 3.
+[wp] Dynamic call(s): 5.
 [wp] Loading driver 'share/wp.driver'
+[wp] tests/wp_plugin/dynamic.i:65: Warning: 
+  Ignored function pointer (see -wp-dynamic)
+[wp] tests/wp_plugin/dynamic.i:78: Warning: 
+  Ignored function pointer (see -wp-dynamic)
 [wp] Warning: Missing RTE guards
-[wp] 13 goals scheduled
+[wp] tests/wp_plugin/dynamic.i:65: Warning: 
+  Missing assigns clause (assigns 'everything' instead)
+[wp] tests/wp_plugin/dynamic.i:78: Warning: 
+  Missing assigns clause (assigns 'everything' instead)
+[wp] 22 goals scheduled
+[wp] [Alt-Ergo] Goal typed_behavior_bhv1_post : Unknown
+[wp] [Alt-Ergo] Goal typed_behavior_bhv1_assign_exit : Unknown
+[wp] [Alt-Ergo] Goal typed_behavior_bhv1_assign_normal : Unknown
 [wp] [Alt-Ergo] Goal typed_call_stmt_calls_f1_f2 : Valid
 [wp] [Qed] Goal typed_call_post_part1 : Valid
 [wp] [Qed] Goal typed_call_post_part2 : Valid
@@ -19,16 +30,30 @@
 [wp] [Qed] Goal typed_no_call_post_part1 : Valid
 [wp] [Qed] Goal typed_no_call_post_part2 : Valid
 [wp] [Qed] Goal typed_no_call_call_unreachable_g_pre : Valid
-[wp] Proved goals:   13 / 13
+[wp] [Alt-Ergo] Goal typed_some_behaviors_bhv0_post : Unknown
+[wp] [Alt-Ergo] Goal typed_some_behaviors_bhv0_assign_exit : Unknown
+[wp] [Alt-Ergo] Goal typed_some_behaviors_bhv0_assign_normal : Unknown
+[wp] [Alt-Ergo] Goal typed_some_behaviors_bhv1_post : Unknown
+[wp] [Alt-Ergo] Goal typed_some_behaviors_bhv1_assign_exit : Unknown
+[wp] [Alt-Ergo] Goal typed_some_behaviors_bhv1_assign_normal : Unknown
+[wp] Proved goals:   13 / 22
   Qed:            10 
-  Alt-Ergo:        3
+  Alt-Ergo:        3  (unknown: 9)
 [wp] Report 'tests/wp_plugin/dynamic.i.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 call                 2      2 (52..64)       4       100%
-guarded_call         4      1 (8..20)        5       100%
+guarded_call         4      1 (16..28)       5       100%
+behavior            -      -                 3       0.0%
+some_behaviors      -      -                 6       0.0%
 no_call              4     -                 4       100%
 -------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'guarded_call':
   /*@ behavior typed: requires \separated(&X,p); */
   void guarded_call(struct S *p);
+[wp] Warning: Memory model hypotheses for function 'behavior':
+  /*@ behavior typed: requires \separated(&X1,p); */
+  int behavior(int (*p)(void));
+[wp] Warning: Memory model hypotheses for function 'some_behaviors':
+  /*@ behavior typed: requires \separated(&X1,p); */
+  int some_behaviors(int (*p)(void));
