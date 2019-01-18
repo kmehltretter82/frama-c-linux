@@ -74,7 +74,7 @@ int behavior (int (*p)(void)) {
   @   assigns \nothing;
   @   ensures X1==\old(X1); */
 int some_behaviors (int (*p)(void)) {
-  //@ calls h1, h2, h0;
+  //@ for bhv1,bhv0: calls h1, h2, h0;
   return (*p)();
 }
 

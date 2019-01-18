@@ -5,10 +5,13 @@
 [wp] tests/wp_plugin/dynamic.i:30: Calls f1 f2
 [wp] tests/wp_plugin/dynamic.i:44: Calls g
 [wp] tests/wp_plugin/dynamic.i:65: Calls h1 h2
-[wp] tests/wp_plugin/dynamic.i:78: Calls h1 h2 h0
+[wp] tests/wp_plugin/dynamic.i:78: Calls (for bhv1) h1 h2 h0
+[wp] tests/wp_plugin/dynamic.i:78: Calls (for bhv0) h1 h2 h0
 [wp] tests/wp_plugin/dynamic.i:91: Calls unreachable_g
 [wp:calls] Dynamic call(s): 5.
 [wp] Loading driver 'share/wp.driver'
+[wp] tests/wp_plugin/dynamic.i:78: Warning: 
+  Missigns 'calls' clause dedicated to dynamic calls (see WP manual)
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function behavior with behavior bhv1
