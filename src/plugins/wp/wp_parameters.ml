@@ -313,7 +313,7 @@ module SplitDepth =
 
 let () = Parameter_customize.set_group wp_strategy
 module DynCall =
-  False(struct
+  True(struct
     let option_name = "-wp-dynamic"
     let help = "Handle dynamic calls with specific annotations."
   end)

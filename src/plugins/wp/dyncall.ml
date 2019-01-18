@@ -192,21 +192,22 @@ class dyncall =
 
   end
 
-let once = ref false
-
-let compute () =
-  if not !once && Wp_parameters.DynCall.get () then
-    begin
-      once := true ;
-      Wp_parameters.feedback "Computing dynamic calls." ;
-      let d = new dyncall in
-      Visitor .visitFramacFile (d :> Visitor.frama_c_visitor) (Ast.get()) ;
-      let n = d#count in
-      if n > 0 then
-        Wp_parameters.feedback "Dynamic call(s): %d." n
-      else
-        Wp_parameters.feedback "No dynamic call."
-    end
+let compute =
+  let compute () =
+    if Wp_parameters.DynCall.get () then
+      begin
+        Wp_parameters.feedback ~dkey:dkey_calls "Computing dynamic calls." ;
+        let d = new dyncall in
+        Visitor .visitFramacFile (d :> Visitor.frama_c_visitor) (Ast.get()) ;
+        let n = d#count in
+        if n > 0 then
+          Wp_parameters.feedback ~dkey:dkey_calls "Dynamic call(s): %d." n
+        else
+          Wp_parameters.feedback ~dkey:dkey_calls "No dynamic call."
+      end
+  in fst (State_builder.apply_once "Wp.Dyncall.compute"
+            [Ast.self ;
+             Wp_parameters.DynCall.self] compute)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Registry                                                           --- *)
@@ -229,10 +230,14 @@ let get ?bhv stmt =
 (* --- Registry                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let register () =
-  if Wp_parameters.DynCall.get () then begin
-    Logic_typing.register_code_annot_next_stmt_extension "calls" typecheck;
-    Logic_typing.register_behavior_extension "instanceof" typecheck ;
-  end
+let register =
+  let once = ref false in
+  fun () ->
+    if (not !once) &&
+       Wp_parameters.DynCall.get () then begin
+      once := true;
+      Logic_typing.register_code_annot_next_stmt_extension "calls" typecheck;
+      Logic_typing.register_behavior_extension "instanceof" typecheck ;
+    end
 
 let () = Cmdline.run_after_configuring_stage register

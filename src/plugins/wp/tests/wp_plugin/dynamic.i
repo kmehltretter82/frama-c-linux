@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -wp-dynamic
+   OPT: -wp-dynamic -wp-msg-key "calls"
 */
 
 /* run.config_qualif
