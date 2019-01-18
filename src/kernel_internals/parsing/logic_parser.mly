@@ -880,7 +880,7 @@ full_zones:
 ;
 
 full_ne_zones:
-| enter_kw_c_mode zones exit_kw_c_mode { $2 }
+| enter_kw_c_mode ne_zones exit_kw_c_mode { $2 }
 ;
 
 full_ne_lexpr_list:
@@ -1758,6 +1758,8 @@ identifier_or_typename:
 
 identifier:
 | IDENTIFIER { $1 }
+| READS { "reads" }
+| WRITES { "writes" }
 ;
 
 bounded_var:
@@ -1798,7 +1800,7 @@ acsl_c_keyword:
 ;
 
 post_cond:
-| ENSURES { Normal, "normal" }
+| ENSURES { Normal, "ensures" }
 | EXITS   { Exits, "exits" }
 | BREAKS  { Breaks, "breaks" }
 | CONTINUES { Continues, "continues" }
