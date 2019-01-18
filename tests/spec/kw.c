@@ -9,6 +9,7 @@ assert behavior = 0;
     ensures behavior >= 0;
 */
 int main () {
+  //@ slevel 4;
   behavior++;
   return 0;
 }
@@ -31,6 +32,10 @@ model{L}(l1,ll1) ==> model(Cons(0,l1),Cons(0,ll1));
 volatile int assigns;
 
 int ensures(volatile int* a) { return *a; }
-void requires(volatile int*a, int v) { *a = v; }
+int requires(volatile int*a, int v) { *a = v; return v; }
 
 /*@ volatile assigns reads ensures writes requires; */
+
+int slevel = 1000000;
+
+//@ lemma bar: slevel >= 0;
