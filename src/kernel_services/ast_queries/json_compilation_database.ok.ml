@@ -20,10 +20,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module StringList = Datatype.List(Datatype.String)
+
 module Flags =
   State_builder.Hashtbl
     (Datatype.Filepath.Hashtbl)
-    (Datatype.String)
+    (StringList)
     (struct
       let name ="JsonCompilationDatabase.Flags"
       let dependencies = [Kernel.JsonCompilationDatabase.self]
@@ -205,18 +207,28 @@ let parse_entry ?(cwd=Sys.getcwd()) (r : Yojson.Basic.json) =
   (* Note: the same file may be compiled several times, under different
      (and possibly incompatible) configurations, leading to multiple
      occurrences in the list. Since we cannot infer which of them is the
-     "right" one, we pick the first and warn the user if there are
-     others. *)
-  let flags = String.concat " " (List.rev res) in
+     "right" one, we replace them with the latest ones found, warning the
+     user if previous flags were different. *)
+  let flags = List.rev res in
   try
     let previous_flags = Flags.find path in
     if previous_flags <> flags then
+      let removed_flags = List.filter (fun e -> not (List.mem e previous_flags)) flags in
+      let removed_str =
+        if removed_flags = [] then "" else
+          Format.asprintf "@ Old flags no longer present: %a"
+            (Pretty_utils.pp_list ~sep:" " Format.pp_print_string) removed_flags
+      in
+      let added_flags = List.filter (fun e -> not (List.mem e flags)) previous_flags in
+      let added_str =
+        if added_flags = [] then "" else
+          Format.asprintf "@ New flags not previously present: %a"
+            (Pretty_utils.pp_list ~sep:" " Format.pp_print_string) added_flags
+      in
       Kernel.warning ~wkey:Kernel.wkey_jcdb
-        "@[<v>found duplicate flags for '%a'.\
-         @ Previous flags: %s\
-         @      New flags: %s@]" Datatype.Filepath.pretty path
-        previous_flags flags;
-    Flags.replace path flags
+        "@[<v>found duplicate flags for '%a', replacing old flags.%s%s@]"
+        Datatype.Filepath.pretty path removed_str added_str;
+      Flags.replace path flags
   with
   | Not_found ->
     Flags.add path flags
@@ -250,11 +262,11 @@ let get_flags f =
     try
       let flags = Flags.find f in
       Kernel.feedback ~dkey:Kernel.dkey_compilation_db
-        "flags found for '%a': %s"  Datatype.Filepath.pretty f flags;
+        "flags found for '%a': %a"  Datatype.Filepath.pretty f StringList.pretty flags;
       flags
     with Not_found ->
       Kernel.feedback ~dkey:Kernel.dkey_compilation_db
         "no flags found for '%a'"  Datatype.Filepath.pretty f;
-      ""
+      []
   end
-  else ""
+  else []
