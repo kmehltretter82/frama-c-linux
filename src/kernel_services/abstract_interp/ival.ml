@@ -1225,15 +1225,6 @@ let fold_int f v acc =
   | Set s ->
       Array.fold_left (fun acc x -> f x acc) acc s
 
-let fold_int_decrease f v acc =
-  match v with
-    Top(None,_,_,_) | Top(_,None,_,_) | Float _ ->
-      raise Error_Top
-  | Top(Some inf, Some sup, _, step) ->
-      Int.fold f ~inf ~sup ~step:(Int.neg step) acc
-  | Set s ->
-      Array.fold_right (fun x acc -> f x acc) s acc
-
 let fold_enum f v acc =
   match v with
   | Float fl when Fval.is_singleton fl -> f v acc
@@ -1342,16 +1333,6 @@ let apply2_n f (s1 : Integer.t array) (s2 : Integer.t array) =
     done
   done;
   inject_ps !ps
-
-let apply_set f v1 v2 =
-  match v1,v2 with
-  | Set s1, Set s2 -> apply2_n f s1 s2
-  | _ -> top
-
-let apply_set_unary f v =
-  match v with
-  | Set s -> map_set_exnsafe f s
-  | _ -> top
 
 let apply_bin_1_strict_incr f x (s : Integer.t array) =
   let l = Array.length s in

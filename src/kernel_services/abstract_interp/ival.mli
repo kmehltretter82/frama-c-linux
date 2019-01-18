@@ -195,11 +195,6 @@ val fold_int : (Integer.t -> 'a -> 'a) -> t -> 'a -> 'a
     Raise {!Abstract_interp.Error_Top} if the argument is a float or a
     potentially infinite integer. *)
 
-val fold_int_decrease : (Integer.t -> 'a -> 'a) -> t -> 'a -> 'a
-(** Iterate on the integer values of the ival in decreasing order.
-    Raise {!Abstract_Interp.Error_Top} if the argument is a float or a
-    potentially infinite integer. *)
-
 val fold_enum : (t -> 'a -> 'a) -> t -> 'a -> 'a
 (** Iterate on every value of the ival. Raise {!Abstract_intrep.Error_Top} if
     the argument is a non-singleton float or a potentially infinite integer. *)
@@ -210,10 +205,6 @@ val fold_int_bounds: (t -> 'a -> 'a) -> t -> 'a -> 'a
     is [i] from which [min] and [max] have been removed. If [min] and/or
     [max] are infinite, [f] is called with an argument [i'] unreduced
     in the corresponding direction(s). *)
-
-val apply_set: (Integer.t -> Integer.t -> Integer.t ) -> t -> t -> t
-val apply_set_unary: (Integer.t -> Integer.t ) -> t -> t
-
 
 (** Subdivisions into two intervals *)
 val subdivide: size:Integer.t -> t -> t * t
