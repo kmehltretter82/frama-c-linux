@@ -26,16 +26,7 @@
 
 open Abstract_interp
 
-type t = private
-  | Set of Int.t array
-  | Float of Fval.t
-  (** [Top(min, max, rem, modulo)] represents the interval between
-      [min] and [max], congruent to [rem] modulo [modulo]. A value of
-      [None] for [min] (resp. [max]) represents -infinity
-      (resp. +infinity). [modulo] is > 0, and [0 <= rem < modulo].
-
-      Actual [Top] is thus represented by Top(None,None,Int.zero,Int.one) *)
-  | Top of Int.t option * Int.t option * Int.t * Int.t
+type t
 
 (** {2 General guidelines of this module}
 
@@ -67,6 +58,9 @@ include Lattice_type.Full_AI_Lattice_with_cardinality
 
 val is_bottom : t -> bool
 val overlaps: partial:bool -> size:Integer.t -> t -> t -> bool
+
+val is_float: t -> bool
+val is_int: t -> bool
 
 val add_int : t -> t -> t
 (** Addition of two integer (ie. not [Float]) ivals. *)
@@ -174,6 +168,10 @@ exception Not_Singleton_Int
 val project_int : t -> Integer.t
     (** @raise Not_Singleton_Int when the cardinal of the argument is not 1,
         or if it is not an integer. *)
+
+val is_small_set: t -> bool
+
+val project_small_set: t -> Integer.t list option
 
 val cardinal: t -> Integer.t option
 (** [cardinal v] returns [n] if [v] has finite cardinal [n], or [None] if

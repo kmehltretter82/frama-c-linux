@@ -52,18 +52,9 @@ let offsetmap_matches_type typ_lv o =
       try typ_matches (V.project_ival_bottom v)
       with V.Not_based_on_null -> true (* Do not mess with pointers *)
   in
-  let is_float = function
-    | Ival.Float _ -> true
-    | Ival.Top _ -> false
-    | Ival.Set _ as i -> Ival.(equal zero i || equal bottom i)
-  in
-  let is_int = function
-    | Ival.Top _ | Ival.Set _ -> true
-    | Ival.Float _ -> false
-  in
   match Cil.unrollType typ_lv with
-  | TFloat _ -> aux is_float
-  | TInt _ | TEnum _ | TPtr _ -> aux is_int
+  | TFloat _ -> aux Ival.is_float
+  | TInt _ | TEnum _ | TPtr _ -> aux Ival.is_int
   | _ -> true
 
 

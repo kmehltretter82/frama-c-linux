@@ -337,12 +337,12 @@ let reduce_apron_itv cvalue ival =
   | Some ival ->
     try
       let ival' = Cvalue.V.project_ival cvalue in
-      (match ival' with
-       | Ival.Float _ -> raise Cvalue.V.Not_based_on_null
-       | _ -> ());
-      let reduced_ival = Ival.narrow ival ival' in
-      let cvalue = Cvalue.V.inject_ival reduced_ival in
-      cvalue, Some reduced_ival
+      if Ival.is_int ival'
+      then
+        let reduced_ival = Ival.narrow ival ival' in
+        let cvalue = Cvalue.V.inject_ival reduced_ival in
+        cvalue, Some reduced_ival
+      else cvalue, Some ival
     with Cvalue.V.Not_based_on_null -> cvalue, Some ival
 
 let () =

@@ -92,6 +92,12 @@ type pre_set =
 type t =
   | Set of Int.t array
   | Float of Fval.t
+  (* [Top(min, max, rem, modulo)] represents the interval between
+     [min] and [max], congruent to [rem] modulo [modulo]. A value of
+     [None] for [min] (resp. [max]) represents -infinity
+     (resp. +infinity). [modulo] is > 0, and [0 <= rem < modulo].
+
+     Actual [Top] is thus represented by Top(None,None,Int.zero,Int.one) *)
   | Top of Int.t option * Int.t option * Int.t * Int.t
 (* Binary abstract operations do not model precisely float/integer operations.
    It is the responsibility of the callers to have two operands of the same
@@ -326,6 +332,15 @@ let project_float v =
     | Float f -> f
     | Top _ | Set _ -> assert false (* by hypothesis that it is a float *)
 
+let is_float = function
+  | Float _ -> true
+  | Top _ -> false
+  | Set _ as i -> equal zero i || equal bottom i
+
+let is_int = function
+  | Top _ | Set _ -> true
+  | Float _ -> false
+
 let in_interval x min max r modu =
   Int.equal (Int.e_rem x modu) r && min_le_elt min x && max_ge_elt max x
 
@@ -361,6 +376,14 @@ exception Not_Singleton_Int
 let project_int v = match v with
 | Set [| e |] -> e
 | _ -> raise Not_Singleton_Int
+
+let is_small_set = function
+  | Set _ -> true
+  | _ -> false
+
+let project_small_set = function
+  | Set a -> Some (Array.to_list a)
+  | _ -> None
 
 let cardinal v =
   match v with
@@ -590,12 +613,8 @@ let min_and_max_float t =
   | Float f -> Fval.min_and_max f
   | _ -> assert false
 
-let is_float = function
-  | Float _ -> true
-  | Set _ | Top _ -> false
-
 let has_greater_min_bound t1 t2 =
-  if is_float t1 || is_float t2
+  if is_float t1 && is_float t2
   then Fval.has_greater_min_bound (project_float t1) (project_float t2)
   else
     let m1, _ = min_and_max t1 in
@@ -607,7 +626,7 @@ let has_greater_min_bound t1 t2 =
     | Some m1, Some m2 -> Int.compare m1 m2
 
 let has_smaller_max_bound t1 t2 =
-  if is_float t1 || is_float t2
+  if is_float t1 && is_float t2
   then Fval.has_smaller_max_bound (project_float t1) (project_float t2)
   else
     let _, m1 = min_and_max t1 in

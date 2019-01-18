@@ -80,13 +80,14 @@ let read_exact_char ~offset ~from =
   let min = Integer.max (the_max_int from) (pos_min_int offset) in
   let offset = backward_comp_left Comp.Le offset min in
   let length = Ival.sub_int offset from in
-  match offset with
-  | Ival.Top (_min, _max, _rem, modu) ->
+  if not (Ival.is_singleton_int offset)
+  then
+    let _, _, _, modu = Ival.min_max_r_mod offset in
     let start_length = Integer.sub (pos_min_int offset) (pos_min_int from) in
     let max_length = Integer.max start_length modu in
     let length = backward_comp_left Comp.Lt length max_length in
     offset, length
-  | _ -> offset, length
+  else offset, length
 
 (* Checks if some limits are reached after a read at [offset]. In this case,
    adds these limits as possible lengths in [t], and adds null to [t]. *)

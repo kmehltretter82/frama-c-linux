@@ -47,10 +47,10 @@ let reduce_offset_by_validity origin ival size validity =
       let max_valid = Int.sub max (Int.pred size) in
       let valid_range = Ival.inject_range (Some min) (Some max_valid) in
       let reduced_ival = Ival.narrow ival valid_range in
-      match reduced_ival with
-      | Ival.Float _ -> assert false
-      | Ival.Set s -> if s = [||] then Invalid else Set (Array.to_list s)
-      | Ival.Top (min, max, _r, modu) ->
+      match Ival.project_small_set reduced_ival with
+      | Some l -> if l = [] then Invalid else Set l
+      | None ->
+        let min, max, _r, modu = Ival.min_max_r_mod reduced_ival in
         (* The bounds are finite thanks to the narrow with the valid range. *)
         let min = Extlib.the min and max = Extlib.the max in
         if Int.lt modu size

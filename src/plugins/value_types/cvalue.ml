@@ -173,8 +173,8 @@ module V = struct
              type. Find a matching offset with potentially the wrong type *)
           find_match Bit_utils.MatchFirst, false
       in
-      match i with
-      | Ival.Set [|o|] ->
+      match Ival.project_small_set i with
+      | Some [o] ->
         (* One single offset. Use a short notation, and an even shorter one
            if we represent [&b] *)
         let o, ok = conv_offset o in
@@ -183,7 +183,7 @@ module V = struct
         else
           Format.fprintf fmt "@[%a%a%a@]"
             pretty_cast ok Base.pretty_addr b Printer.pp_offset o
-      | Ival.Set a -> (* Multiple offsets. We use a set notation *)
+      | Some a -> (* Multiple offsets. We use a set notation *)
         (* Catch NoOffset, which we would be printed as '{, [1], [2]}. Instead,
            we find a slightly deeper offset. We should never be in a different
            case from array/comp, as the other types cannot have multiple
@@ -199,7 +199,7 @@ module V = struct
           else o, ok
         in
         let arr_off, ok =
-          Array.fold_right
+          List.fold_right
             (fun o (l, ok)-> let o', ok' = conv_offset' o in o' :: l, ok && ok')
             a ([], true)
         in
@@ -208,10 +208,9 @@ module V = struct
           Base.pretty_addr b
           (Pretty_utils.pp_iter
              ~sep:",@ " List.iter Printer.pp_offset) arr_off
-      | Ival.Top _ ->
+      | None ->
         (* Too many offsets. Currently, we use the basic notation. *)
         pretty_base_offsets_default fmt b i
-      | Ival.Float _ -> assert false
     with
     (* Strange looking base, or no offset found. Use default printing *)
     | Base.Not_a_C_variable | Bit_utils.NoMatchingOffset ->

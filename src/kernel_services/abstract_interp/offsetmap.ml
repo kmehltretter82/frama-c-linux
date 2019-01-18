@@ -2061,14 +2061,17 @@ let update_under ~validity ~exact ~offsets ~size v t =
   let paste_slice ~validity ~exact ~from:src ~size ~offsets dst =
     if Int.(equal size zero) then (* nothing to do *) `Value dst
     else
-      match offsets, src with
+      let size_ok =
+        Ival.is_singleton_int offsets
+        || let _, _, _, modu = Ival.min_max_r_mod offsets in size =~ modu
+      in
+      match src with
       (*Special case: [from] contains a single (aligned) binding [v], and [size]
         matches the periodicity of [offsets] and the size of [v]. In this case,
         it is more efficient to perform an interval update instead of an
         offsetmap copy. *)
-      | Ival.Top (_,_,_, offperiod), Node(_,_, Empty,_, Empty, vrem, vsize, v,_)
-        when Rel.is_zero vrem && size =~ offperiod &&
-             (size =~ vsize || V.is_isotropic v)
+      | Node (_,_, Empty,_, Empty, vrem, vsize, v,_)
+        when Rel.is_zero vrem && size_ok && (size =~ vsize || V.is_isotropic v)
         ->
         update ~validity ~exact ~offsets ~size v dst
       | _ ->
@@ -2708,15 +2711,11 @@ module Int_Intervals = struct
         in
         Intervals (curr_off', i, min, max)
       in
-      match ival with
-      | Ival.Top(None, _, _, _) | Ival.Top(_, None, _, _) | Ival.Float _ -> top
-      | Ival.Top(Some mn, Some mx, _r, _m) ->
-        aux_min_max mn mx
-      | Ival.Set(s) ->
-        if Array.length s > 0 then
-          aux_min_max s.(0) s.(Array.length s - 1)
-        else
-          bottom
+      try
+        match Ival.min_and_max ival with
+        | None, _ | _, None -> top
+        | Some min, Some max -> aux_min_max min max
+      with Error_Bottom -> bottom
     in
     Cache.merge from_ival_size_aux
 
@@ -2735,18 +2734,19 @@ module Int_Intervals = struct
     match size with
     | Int_Base.Top -> Bottom (* imprecise *)
     | Int_Base.Value size ->
-      match ival with
-      | Ival.Top(None, _, _, _) | Ival.Top(_, None, _, _) | Ival.Float _ ->
-        Bottom (* imprecise *)
-      | Ival.Set _ -> from_ival_size_over_cached ival size (* precise *)
-      | Ival.Top (Some min, Some start_max, _, _) ->
-        (* See if using [from_ival_size] would cause an approximation *)
-        let max = pred (start_max +~ size) in
-        let validity = Base.Known (min, max) in
-        let offsets = Tr_offset.trim_by_validity ival size validity in
-        if Int_Intervals_Map.update_aux_tr_offsets_approximates offsets size
-        then bottom (* imprecise *)
-        else from_ival_size_over_cached ival size (* precise *)
+      if Ival.is_small_set ival
+      then from_ival_size_over_cached ival size (* precise *)
+      else
+        match Ival.min_and_max ival with
+        | None, _ | _, None -> Bottom (* imprecise *)
+        | Some min, Some start_max ->
+          (* See if using [from_ival_size] would cause an approximation *)
+          let max = pred (start_max +~ size) in
+          let validity = Base.Known (min, max) in
+          let offsets = Tr_offset.trim_by_validity ival size validity in
+          if Int_Intervals_Map.update_aux_tr_offsets_approximates offsets size
+          then bottom (* imprecise *)
+          else from_ival_size_over_cached ival size (* precise *)
 
   let range_covers_whole_type typ itvs =
     match project_singleton itvs with
