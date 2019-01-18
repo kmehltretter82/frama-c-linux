@@ -1656,7 +1656,7 @@ logic_decl_loc:
 
 reads_clause:
 | /* epsilon */ { None }
-| READS full_ne_zones { Some $2 }
+| READS full_zones { Some $2 }
 ;
 
 typedef:
