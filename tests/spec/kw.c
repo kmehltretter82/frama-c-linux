@@ -23,3 +23,14 @@ model{L}(l1,ll1) ==> model(Cons(0,l1),Cons(0,ll1));
 
 } */
 
+/*@ axiomatic foo {
+ logic integer func(integer i) reads behavior;
+}
+*/
+
+volatile int assigns;
+
+int ensures(volatile int* a) { return *a; }
+void requires(volatile int*a, int v) { *a = v; }
+
+/*@ volatile assigns reads ensures writes requires; */

@@ -879,6 +879,10 @@ full_zones:
 | enter_kw_c_mode zones exit_kw_c_mode  { $2 }
 ;
 
+full_ne_zones:
+| enter_kw_c_mode zones exit_kw_c_mode { $2 }
+;
+
 full_ne_lexpr_list:
 enter_kw_c_mode ne_lexpr_list exit_kw_c_mode { $2 }
 ;
@@ -1476,7 +1480,7 @@ decl_list:
 decl:
 | GLOBAL INVARIANT any_identifier COLON full_lexpr SEMICOLON
     { LDinvariant ($3, $5) }
-| VOLATILE ne_zones volatile_opt SEMICOLON { LDvolatile ($2, $3) }
+| VOLATILE full_ne_zones volatile_opt SEMICOLON { LDvolatile ($2, $3) }
 | type_annot {LDtype_annot $1}
 | model_annot {LDmodel_annot $1}
 | logic_def  { $1 }
@@ -1652,7 +1656,7 @@ logic_decl_loc:
 
 reads_clause:
 | /* epsilon */ { None }
-| READS zones { Some $2 }
+| READS full_ne_zones { Some $2 }
 ;
 
 typedef:
