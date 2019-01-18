@@ -1110,7 +1110,9 @@ clause_kw:
 /* often, we'll be in c_kw_mode, where these keywords are 
    recognized as identifiers... */
 | IDENTIFIER { $1 }
+| EXT_CONTRACT { $1 }
 | EOF { "end of annotation" }
+;
 
 requires:
 | /* epsilon */ { [] }
@@ -1270,41 +1272,31 @@ custom_tree:
 ;
 
 custom_tree_list:
-| custom_tree   { [$1] } 
-| custom_tree COMMA custom_tree_list  { $1::$3 } 
+| custom_tree   { [$1] }
+| custom_tree COMMA custom_tree_list  { $1::$3 }
+;
 
 annotation:
 | loop_annotations
       { let (b,v,p) = $1 in
-	(* TODO: do better, do not lose the structure ! *)
-	let l = b@v@p in
+        (* TODO: do better, do not lose the structure ! *)
+        let l = b@v@p in
         Aloop_annot (loc (), l) }
-| FOR ne_behavior_name_list COLON contract
-      { let s, pos = $4 in Acode_annot (pos, AStmtSpec ($2,s)) }
-| code_annotation { Acode_annot (loc(),$1) }
-| code_annotation beg_code_annotation
+| FOR ne_behavior_name_list COLON contract_or_code_annotation
+      { $4 $2 }
+| pragma_or_code_annotation { Acode_annot (loc(),$1) }
+| pragma_or_code_annotation beg_pragma_or_code_annotation
       { raise
           (Not_well_formed (loc(),
                             "Only one code annotation is allowed per comment"))
       }
-| EXT_CODE_ANNOT grammar_extension SEMICOLON
-  {
-    let open Cil_types in
-    let ext = $1 in
-    match Logic_env.extension_category ext with
-    | Some (Ext_code_annot (Ext_here | Ext_next_stmt | Ext_next_both)) ->
-      Acode_annot (loc(), Logic_ptree.AExtended([],false,(ext,$2)))
-    | Some (Ext_code_annot Ext_next_loop) ->
-      raise
-        (Not_well_formed
-          (lexeme_loc 1,
-             ext ^ " is not a loop annotation extension. It can't be used as \
-                     plain code annotation extension"))
-    | Some (Ext_contract | Ext_global) | None ->
-      Kernel.fatal ~source:(lexeme_start 1)
-        "%s is not a code annotation extension. Parser got wrong lexeme" ext
-  }
 | full_identifier_or_typename { Aattribute_annot (loc (), $1) }
+;
+
+contract_or_code_annotation:
+| contract
+      { fun bhvs -> let s, pos = $1 in Acode_annot (pos, AStmtSpec (bhvs,s)) }
+| code_annotation { fun bhvs -> Acode_annot (loc(), ($1 bhvs)) }
 ;
 
 /*** loop annotations ***/
@@ -1433,23 +1425,42 @@ loop_pragma:
 
 /*** code annotations ***/
 
-beg_code_annotation:
+beg_pragma_or_code_annotation:
 | IMPACT {}
 | SLICE {}
 | FOR {}
 | ASSERT {}
 | INVARIANT {}
+| EXT_CODE_ANNOT {}
+;
+
+pragma_or_code_annotation:
+| slice_pragma     { APragma (Slice_pragma $1) }
+| impact_pragma    { APragma (Impact_pragma $1) }
+| code_annotation  { $1 []  }
 ;
 
 code_annotation:
-| slice_pragma     { APragma (Slice_pragma $1) }
-| impact_pragma    { APragma (Impact_pragma $1) }
-| FOR ne_behavior_name_list COLON ASSERT full_lexpr SEMICOLON
-      { AAssert ($2,$5) }
-| FOR ne_behavior_name_list COLON INVARIANT full_lexpr SEMICOLON
-      { AInvariant ($2,false,$5) }
-| ASSERT full_lexpr SEMICOLON    { AAssert ([],$2) }
-| INVARIANT full_lexpr SEMICOLON { AInvariant ([],false,$2) }
+| ASSERT full_lexpr SEMICOLON
+      { fun bhvs -> AAssert (bhvs,$2) }
+| INVARIANT full_lexpr SEMICOLON { fun bhvs -> AInvariant (bhvs,false,$2) }
+| EXT_CODE_ANNOT grammar_extension SEMICOLON
+  { fun bhvs ->
+    let open Cil_types in
+    let ext = $1 in
+    match Logic_env.extension_category ext with
+    | Some (Ext_code_annot (Ext_here | Ext_next_stmt | Ext_next_both)) ->
+      Logic_ptree.AExtended(bhvs,false,(ext,$2))
+    | Some (Ext_code_annot Ext_next_loop) ->
+      raise
+        (Not_well_formed
+          (lexeme_loc 1,
+             ext ^ " is not a loop annotation extension. It can't be used as \
+                     plain code annotation extension"))
+    | Some (Ext_contract | Ext_global) | None ->
+      Kernel.fatal ~source:(lexeme_start 1)
+        "%s is not a code annotation extension. Parser got wrong lexeme" ext
+  }
 ;
 
 slice_pragma:
@@ -1822,8 +1833,10 @@ is_acsl_spec:
 ;
 
 is_acsl_decl_or_code_annot:
-| ASSERT    { "assert" }
+| EXT_CODE_ANNOT { $1 }
+| EXT_GLOBAL     { $1 }
 | ASSUMES   { "assumes" }
+| ASSERT    { "assert" }
 | GLOBAL    { "global" }
 | IMPACT    { "impact" }
 | INDUCTIVE { "inductive" }
@@ -1861,6 +1874,7 @@ is_ext_spec:
 keyword:
 | LOGIC     { "logic" }
 | non_logic_keyword { $1 }
+;
 
 non_logic_keyword:
 | c_keyword      { $1 }
@@ -1969,8 +1983,6 @@ wildcard:
 | STRING_LITERAL { () }
 | TILDE { () }
 | IN { () }
-| EXT_GLOBAL { () }
-| EXT_CODE_ANNOT { () }
 ;
 
 any:
