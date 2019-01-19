@@ -180,7 +180,13 @@ val wkey_builtins_override: warn_category
 val wkey_libc_unsupported_spec : warn_category
 
 (** Warning category used for "loop not completely unrolled" *)
-val wkey_loop_unrolling : warn_category
+val wkey_loop_unroll : warn_category
+
+(** Warning category used to identify loops without unroll annotations *)
+val wkey_missing_loop_unroll : warn_category
+
+(** Warning category used to identify for loops without unroll annotations *)
+val wkey_missing_loop_unroll_for : warn_category
 
 (** Debug category used to print information about invalid pointer comparisons*)
 val dkey_pointer_comparison: category
