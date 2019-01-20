@@ -59,7 +59,8 @@
 [eva] Done for function test_strstr
 [eva] computing for function test_strncat <- main.
   Called from tests/libc/string_h.c:115.
-[eva] Semantic level unrolling superposing up to 100 states
+[eva] tests/libc/string_h.c:34: 
+  Semantic level unrolling superposing up to 100 states
 [eva] computing for function strncat <- test_strncat <- main.
   Called from tests/libc/string_h.c:36.
 [eva] using specification for function strncat

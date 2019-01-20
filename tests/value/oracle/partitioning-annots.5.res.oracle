@@ -10,8 +10,8 @@
 [eva] tests/value/partitioning-annots.c:125: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/value/partitioning-annots.c:131: Frama_C_show_each: {1}, {1}
 [eva] tests/value/partitioning-annots.c:131: Frama_C_show_each: {0}, {0}
+[eva] tests/value/partitioning-annots.c:131: Frama_C_show_each: {1}, {1}
 [eva] Recording results for test_history
 [eva] done for function test_history
 [eva] ====== VALUES COMPUTED ======

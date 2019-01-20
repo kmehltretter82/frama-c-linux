@@ -29,12 +29,12 @@
   Called from tests/value/split_return.i:48.
 [eva] Recording results for f2
 [eva] Done for function f2
-[eva] tests/value/split_return.i:49: Frama_C_show_each_f2: {0}, {0}
-[eva] tests/value/split_return.i:49: Frama_C_show_each_f2: {5}, {5}
 [eva] tests/value/split_return.i:49: Frama_C_show_each_f2: {7}, {5}
+[eva] tests/value/split_return.i:49: Frama_C_show_each_f2: {5}, {5}
+[eva] tests/value/split_return.i:49: Frama_C_show_each_f2: {0}, {0}
 [eva] tests/value/split_return.i:51: assertion got status valid.
-[eva] tests/value/split_return.i:53: Frama_C_show_each_f2_2: {5}, {5}
 [eva] tests/value/split_return.i:53: Frama_C_show_each_f2_2: {7}, {5}
+[eva] tests/value/split_return.i:53: Frama_C_show_each_f2_2: {5}, {5}
 [eva] tests/value/split_return.i:54: assertion got status valid.
 [eva] Recording results for main2
 [eva] Done for function main2
@@ -44,8 +44,8 @@
   Called from tests/value/split_return.i:73.
 [eva] Recording results for f3
 [eva] Done for function f3
-[eva] tests/value/split_return.i:74: Frama_C_show_each_f3: {7}, {5}
 [eva] tests/value/split_return.i:74: Frama_C_show_each_f3: {-2}, {0}
+[eva] tests/value/split_return.i:74: Frama_C_show_each_f3: {7}, {5}
 [eva] tests/value/split_return.i:76: assertion got status valid.
 [eva] tests/value/split_return.i:78: assertion got status valid.
 [eva] Recording results for main3
@@ -56,8 +56,8 @@
   Called from tests/value/split_return.i:73.
 [eva] Recording results for f3
 [eva] Done for function f3
-[eva] tests/value/split_return.i:74: Frama_C_show_each_f3: {7}, {5}
 [eva] tests/value/split_return.i:74: Frama_C_show_each_f3: {-2}, {0}
+[eva] tests/value/split_return.i:74: Frama_C_show_each_f3: {7}, {5}
 [eva] Recording results for main3
 [eva] Done for function main3
 [eva] computing for function main4 <- main.
@@ -66,8 +66,8 @@
   Called from tests/value/split_return.i:94.
 [eva] Recording results for f4
 [eva] Done for function f4
-[eva] tests/value/split_return.i:95: Frama_C_show_each_f4: {4}, {0}
 [eva] tests/value/split_return.i:95: Frama_C_show_each_f4: {7}, {5}
+[eva] tests/value/split_return.i:95: Frama_C_show_each_f4: {4}, {0}
 [eva] tests/value/split_return.i:97: assertion got status valid.
 [eva] tests/value/split_return.i:99: assertion got status valid.
 [eva] Recording results for main4
@@ -78,8 +78,8 @@
   Called from tests/value/split_return.i:94.
 [eva] Recording results for f4
 [eva] Done for function f4
-[eva] tests/value/split_return.i:95: Frama_C_show_each_f4: {4}, {0}
 [eva] tests/value/split_return.i:95: Frama_C_show_each_f4: {7}, {5}
+[eva] tests/value/split_return.i:95: Frama_C_show_each_f4: {4}, {0}
 [eva] Recording results for main4
 [eva] Done for function main4
 [eva] computing for function main4 <- main.
@@ -88,8 +88,8 @@
   Called from tests/value/split_return.i:94.
 [eva] Recording results for f4
 [eva] Done for function f4
-[eva] tests/value/split_return.i:95: Frama_C_show_each_f4: {4}, {0}
 [eva] tests/value/split_return.i:95: Frama_C_show_each_f4: {7}, {5}
+[eva] tests/value/split_return.i:95: Frama_C_show_each_f4: {4}, {0}
 [eva] Recording results for main4
 [eva] Done for function main4
 [eva] computing for function main4 <- main.
@@ -98,8 +98,8 @@
   Called from tests/value/split_return.i:94.
 [eva] Recording results for f4
 [eva] Done for function f4
-[eva] tests/value/split_return.i:95: Frama_C_show_each_f4: {4}, {0}
 [eva] tests/value/split_return.i:95: Frama_C_show_each_f4: {7}, {5}
+[eva] tests/value/split_return.i:95: Frama_C_show_each_f4: {4}, {0}
 [eva] Recording results for main4
 [eva] Done for function main4
 [eva] computing for function main5 <- main.
@@ -108,8 +108,8 @@
   Called from tests/value/split_return.i:117.
 [eva] Recording results for f5
 [eva] Done for function f5
-[eva] tests/value/split_return.i:118: Frama_C_show_each_f5: {7}, {5}
 [eva] tests/value/split_return.i:118: Frama_C_show_each_f5: {-2}, {0}
+[eva] tests/value/split_return.i:118: Frama_C_show_each_f5: {7}, {5}
 [eva] tests/value/split_return.i:120: assertion got status valid.
 [eva] tests/value/split_return.i:122: assertion got status valid.
 [eva] Recording results for main5
@@ -158,8 +158,8 @@
   Called from tests/value/split_return.i:171.
 [eva] Recording results for f8
 [eva] Done for function f8
-[eva] tests/value/split_return.i:172: Frama_C_show_each_then8: {4}, {{ &x }}
 [eva] tests/value/split_return.i:172: Frama_C_show_each_then8: {-1}, {0}
+[eva] tests/value/split_return.i:172: Frama_C_show_each_then8: {4}, {{ &x }}
 [eva] Recording results for main8
 [eva] Done for function main8
 [eva] computing for function main8 <- main.
@@ -168,8 +168,8 @@
   Called from tests/value/split_return.i:171.
 [eva] Recording results for f8
 [eva] Done for function f8
-[eva] tests/value/split_return.i:172: Frama_C_show_each_then8: {4}, {{ &x }}
 [eva] tests/value/split_return.i:172: Frama_C_show_each_then8: {-1}, {0}
+[eva] tests/value/split_return.i:172: Frama_C_show_each_then8: {4}, {{ &x }}
 [eva] Recording results for main8
 [eva] Done for function main8
 [eva] computing for function main8 <- main.
@@ -178,8 +178,8 @@
   Called from tests/value/split_return.i:171.
 [eva] Recording results for f8
 [eva] Done for function f8
-[eva] tests/value/split_return.i:172: Frama_C_show_each_then8: {4}, {{ &x }}
 [eva] tests/value/split_return.i:172: Frama_C_show_each_then8: {-1}, {0}
+[eva] tests/value/split_return.i:172: Frama_C_show_each_then8: {4}, {{ &x }}
 [eva] Recording results for main8
 [eva] Done for function main8
 [eva] computing for function main8 <- main.
@@ -188,8 +188,8 @@
   Called from tests/value/split_return.i:171.
 [eva] Recording results for f8
 [eva] Done for function f8
-[eva] tests/value/split_return.i:172: Frama_C_show_each_then8: {4}, {{ &x }}
 [eva] tests/value/split_return.i:172: Frama_C_show_each_then8: {-1}, {0}
+[eva] tests/value/split_return.i:172: Frama_C_show_each_then8: {4}, {{ &x }}
 [eva] Recording results for main8
 [eva] Done for function main8
 [eva] computing for function main9 <- main.
@@ -483,8 +483,8 @@
   Called from tests/value/split_return.i:73.
 [eva] Recording results for f3
 [eva] Done for function f3
-[eva] tests/value/split_return.i:74: Frama_C_show_each_f3: {7}, {5}
 [eva] tests/value/split_return.i:74: Frama_C_show_each_f3: {-2}, {0}
+[eva] tests/value/split_return.i:74: Frama_C_show_each_f3: {7}, {5}
 [eva] Recording results for main3
 [eva] Done for function main3
 [eva] computing for function main3 <- main.
@@ -493,8 +493,8 @@
   Called from tests/value/split_return.i:73.
 [eva] Recording results for f3
 [eva] Done for function f3
-[eva] tests/value/split_return.i:74: Frama_C_show_each_f3: {7}, {5}
 [eva] tests/value/split_return.i:74: Frama_C_show_each_f3: {-2}, {0}
+[eva] tests/value/split_return.i:74: Frama_C_show_each_f3: {7}, {5}
 [eva] Recording results for main3
 [eva] Done for function main3
 [eva] computing for function main4 <- main.
@@ -503,8 +503,8 @@
   Called from tests/value/split_return.i:94.
 [eva] Recording results for f4
 [eva] Done for function f4
-[eva] tests/value/split_return.i:95: Frama_C_show_each_f4: {4}, {0}
 [eva] tests/value/split_return.i:95: Frama_C_show_each_f4: {7}, {5}
+[eva] tests/value/split_return.i:95: Frama_C_show_each_f4: {4}, {0}
 [eva] Recording results for main4
 [eva] Done for function main4
 [eva] computing for function main4 <- main.
@@ -513,8 +513,8 @@
   Called from tests/value/split_return.i:94.
 [eva] Recording results for f4
 [eva] Done for function f4
-[eva] tests/value/split_return.i:95: Frama_C_show_each_f4: {4}, {0}
 [eva] tests/value/split_return.i:95: Frama_C_show_each_f4: {7}, {5}
+[eva] tests/value/split_return.i:95: Frama_C_show_each_f4: {4}, {0}
 [eva] Recording results for main4
 [eva] Done for function main4
 [eva] computing for function main4 <- main.
@@ -523,8 +523,8 @@
   Called from tests/value/split_return.i:94.
 [eva] Recording results for f4
 [eva] Done for function f4
-[eva] tests/value/split_return.i:95: Frama_C_show_each_f4: {4}, {0}
 [eva] tests/value/split_return.i:95: Frama_C_show_each_f4: {7}, {5}
+[eva] tests/value/split_return.i:95: Frama_C_show_each_f4: {4}, {0}
 [eva] Recording results for main4
 [eva] Done for function main4
 [eva] computing for function main4 <- main.
@@ -533,8 +533,8 @@
   Called from tests/value/split_return.i:94.
 [eva] Recording results for f4
 [eva] Done for function f4
-[eva] tests/value/split_return.i:95: Frama_C_show_each_f4: {4}, {0}
 [eva] tests/value/split_return.i:95: Frama_C_show_each_f4: {7}, {5}
+[eva] tests/value/split_return.i:95: Frama_C_show_each_f4: {4}, {0}
 [eva] Recording results for main4
 [eva] Done for function main4
 [eva] computing for function main5 <- main.
@@ -543,8 +543,8 @@
   Called from tests/value/split_return.i:117.
 [eva] Recording results for f5
 [eva] Done for function f5
-[eva] tests/value/split_return.i:118: Frama_C_show_each_f5: {7}, {5}
 [eva] tests/value/split_return.i:118: Frama_C_show_each_f5: {-2}, {0}
+[eva] tests/value/split_return.i:118: Frama_C_show_each_f5: {7}, {5}
 [eva] Recording results for main5
 [eva] Done for function main5
 [eva] computing for function main6 <- main.
@@ -589,8 +589,8 @@
   Called from tests/value/split_return.i:171.
 [eva] Recording results for f8
 [eva] Done for function f8
-[eva] tests/value/split_return.i:172: Frama_C_show_each_then8: {4}, {{ &x }}
 [eva] tests/value/split_return.i:172: Frama_C_show_each_then8: {-1}, {0}
+[eva] tests/value/split_return.i:172: Frama_C_show_each_then8: {4}, {{ &x }}
 [eva] Recording results for main8
 [eva] Done for function main8
 [eva] computing for function main8 <- main.
@@ -599,8 +599,8 @@
   Called from tests/value/split_return.i:171.
 [eva] Recording results for f8
 [eva] Done for function f8
-[eva] tests/value/split_return.i:172: Frama_C_show_each_then8: {4}, {{ &x }}
 [eva] tests/value/split_return.i:172: Frama_C_show_each_then8: {-1}, {0}
+[eva] tests/value/split_return.i:172: Frama_C_show_each_then8: {4}, {{ &x }}
 [eva] Recording results for main8
 [eva] Done for function main8
 [eva] computing for function main8 <- main.
@@ -609,8 +609,8 @@
   Called from tests/value/split_return.i:171.
 [eva] Recording results for f8
 [eva] Done for function f8
-[eva] tests/value/split_return.i:172: Frama_C_show_each_then8: {4}, {{ &x }}
 [eva] tests/value/split_return.i:172: Frama_C_show_each_then8: {-1}, {0}
+[eva] tests/value/split_return.i:172: Frama_C_show_each_then8: {4}, {{ &x }}
 [eva] Recording results for main8
 [eva] Done for function main8
 [eva] computing for function main8 <- main.
@@ -619,8 +619,8 @@
   Called from tests/value/split_return.i:171.
 [eva] Recording results for f8
 [eva] Done for function f8
-[eva] tests/value/split_return.i:172: Frama_C_show_each_then8: {4}, {{ &x }}
 [eva] tests/value/split_return.i:172: Frama_C_show_each_then8: {-1}, {0}
+[eva] tests/value/split_return.i:172: Frama_C_show_each_then8: {4}, {{ &x }}
 [eva] Recording results for main8
 [eva] Done for function main8
 [eva] computing for function main9 <- main.

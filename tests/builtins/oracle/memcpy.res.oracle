@@ -78,7 +78,8 @@
 [eva] Done for function many
 [eva] computing for function init <- main <- main_all.
   Called from tests/builtins/memcpy.c:65.
-[eva] Semantic level unrolling superposing up to 100 states
+[eva] tests/builtins/memcpy.c:20: 
+  Semantic level unrolling superposing up to 100 states
 [eva] Recording results for init
 [from] Computing for function init
 [from] Done for function init

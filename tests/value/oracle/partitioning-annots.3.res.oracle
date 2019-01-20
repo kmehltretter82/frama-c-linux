@@ -28,16 +28,16 @@
 [eva] Done for function Frama_C_interval
 [eva:alarm] tests/value/partitioning-annots.c:110: Warning: 
   accessing uninitialized left-value. assert \initialized(&A[i]);
-[eva] tests/value/partitioning-annots.c:115: Frama_C_show_each: {0}, {42}
-[eva] tests/value/partitioning-annots.c:115: Frama_C_show_each: {1}, {42}
-[eva] tests/value/partitioning-annots.c:115: Frama_C_show_each: {2}, {42}
-[eva] tests/value/partitioning-annots.c:115: Frama_C_show_each: {3}, {42}
-[eva] tests/value/partitioning-annots.c:115: Frama_C_show_each: {4}, {42}
-[eva] tests/value/partitioning-annots.c:115: Frama_C_show_each: {5}, {42}
-[eva] tests/value/partitioning-annots.c:115: Frama_C_show_each: {6}, {42}
-[eva] tests/value/partitioning-annots.c:115: Frama_C_show_each: {7}, {42}
-[eva] tests/value/partitioning-annots.c:115: Frama_C_show_each: {8}, {42}
 [eva] tests/value/partitioning-annots.c:115: Frama_C_show_each: {9}, {42}
+[eva] tests/value/partitioning-annots.c:115: Frama_C_show_each: {8}, {42}
+[eva] tests/value/partitioning-annots.c:115: Frama_C_show_each: {7}, {42}
+[eva] tests/value/partitioning-annots.c:115: Frama_C_show_each: {6}, {42}
+[eva] tests/value/partitioning-annots.c:115: Frama_C_show_each: {5}, {42}
+[eva] tests/value/partitioning-annots.c:115: Frama_C_show_each: {4}, {42}
+[eva] tests/value/partitioning-annots.c:115: Frama_C_show_each: {3}, {42}
+[eva] tests/value/partitioning-annots.c:115: Frama_C_show_each: {2}, {42}
+[eva] tests/value/partitioning-annots.c:115: Frama_C_show_each: {1}, {42}
+[eva] tests/value/partitioning-annots.c:115: Frama_C_show_each: {0}, {42}
 [eva] tests/value/partitioning-annots.c:116: assertion got status valid.
 [eva] tests/value/partitioning-annots.c:119: 
   Frama_C_show_each: {{ "Value 42 not found" }}
