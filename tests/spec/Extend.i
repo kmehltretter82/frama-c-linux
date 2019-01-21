@@ -43,9 +43,9 @@ int k(int z) {
 /*@ global_foo \forall integer x; x < x + 1
 ; */
 
-
+//@ behavior ca_foo: ensures ca_foo: \true;
 void loop (void) {
-  //@ ca_foo \true;
+  //@ for ca_foo: ca_foo \true;
   //@ ns_foo \true;
   //@ baz \true;
   /*@ loop invariant \true; */
