@@ -646,20 +646,6 @@ GENERATED += $(addprefix src/kernel_internals/parsing/,\
 		logic_parser.mli logic_preprocess.ml)
 
 
-ifeq ($(HAS_YOJSON),yes)
-src/kernel_services/ast_queries/json_compilation_database.ml: \
-	src/kernel_services/ast_queries/json_compilation_database.ok.ml share/Makefile.config
-	$(CP_IF_DIFF) $< $@
-	$(CHMOD_RO) $@
-else
-src/kernel_services/ast_queries/json_compilation_database.ml: \
-	src/kernel_services/ast_queries/json_compilation_database.ko.ml share/Makefile.config
-	$(CP_IF_DIFF) $< $@
-	$(CHMOD_RO) $@
-endif
-GENERATED += src/kernel_services/ast_queries/json_compilation_database.ml
-
-
 .PHONY: check-logic-parser-wildcard
 check-logic-parser-wildcard:
 	cd src/kernel_internals/parsing && ocaml check_logic_parser.ml

@@ -3,7 +3,7 @@
 
 let mk_buildInputs = { opamPackages ? [] } :
     [ pkgs.gnugrep pkgs.gnused  pkgs.autoconf pkgs.gnumake pkgs.gcc pkgs.ncurses pkgs.time pkgs.python3 pkgs.perl pkgs.file] ++ opam2nix.build {
-           specs = opam2nix.toSpecs ([ "ocamlfind" "zarith" "ocamlgraph"
+           specs = opam2nix.toSpecs ([ "ocamlfind" "zarith" "ocamlgraph" "yojson"
                 { name = "coq"; constraint = "=8.7.2"; }
                 ] ++ opamPackages ++
                 (if ocaml_version == "pkgs.ocaml-ng.ocamlPackages_4_02.ocaml"

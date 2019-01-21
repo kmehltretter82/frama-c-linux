@@ -322,6 +322,17 @@ else
   AC_MSG_RESULT(found)
 fi
 
+# yojson
+########
+
+AC_MSG_CHECKING(for Yojson)
+
+YOJSON=$($OCAMLFIND query yojson -format %v)
+if test -z "$YOJSON" ; then
+  AC_MSG_ERROR(Cannot find yojson via ocamlfind \
+(requires yojson 1.4.1 or higher).)
+fi
+
 #################################################
 # Check for other (optional) tools/libraries    #
 #################################################
@@ -343,21 +354,6 @@ else
 fi
 
 AC_CHECK_PROG(OTAGS,otags,otags,)
-
-# yojson
-########
-
-AC_MSG_CHECKING(for Yojson)
-
-YOJSON_PATH=$($OCAMLFIND query yojson 2>/dev/null | tr -d '\r\n')
-if test -f "$YOJSON_PATH/yojson.$OBJ_SUFFIX"; then
-  HAS_YOJSON="yes";
-  AC_MSG_RESULT(found)
-else
-  HAS_YOJSON="no";
-  AC_MSG_RESULT(yojson not found. Kernel option -json-compilation-database won't be available.)
-fi;
-
 
 # apron
 ########
@@ -1024,7 +1020,6 @@ AC_SUBST(VERBOSEMAKE)
 AC_SUBST(DEVELOPMENT)
 AC_SUBST(DOT)
 AC_SUBST(HAS_DOT)
-AC_SUBST(HAS_YOJSON)
 AC_SUBST(HAS_APRON)
 AC_SUBST(HAS_MPFR)
 AC_SUBST(HAS_LANDMARKS)

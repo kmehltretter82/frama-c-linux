@@ -120,9 +120,6 @@ endif
 # lablgnomecanvas
 HAS_GNOMECANVAS	?=@HAS_GNOMECANVAS@
 
-# yojson
-HAS_YOJSON	?=@HAS_YOJSON@
-
 # apron
 HAS_APRON	?=@HAS_APRON@
 
@@ -160,9 +157,7 @@ THREAD_IS_KEYWORD ?=@THREAD_IS_KEYWORD@
 TEST_DIRS_AS_PLUGIN:=\
   dynamic dynamic_plugin journal saveload spec misc syntax cil \
   pretty_printing builtins libc value fc_script
-ifeq ("$(HAS_YOJSON)","yes")
 TEST_DIRS_AS_PLUGIN+=jcdb
-endif
 PLUGIN_TESTS_LIST+=$(TEST_DIRS_AS_PLUGIN)
 
 ##########################
@@ -190,14 +185,10 @@ ENABLE_USERS	                  ?=@ENABLE_USERS@
 ENABLE_EVA                      ?=@ENABLE_EVA@
 
 #bytes is part of the stdlib, but is used as a transitional package.
-LIBRARY_NAMES := findlib ocamlgraph unix str dynlink bytes zarith
+LIBRARY_NAMES := findlib ocamlgraph unix str dynlink bytes zarith yojson
 
 ifeq ($(HAS_LANDMARKS),yes)
 LIBRARY_NAMES += landmarks landmarks.ppx
-endif
-
-ifeq ($(HAS_YOJSON),yes)
-LIBRARY_NAMES += yojson
 endif
 
 ifneq ($(ENABLE_GUI),no)

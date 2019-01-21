@@ -230,8 +230,7 @@ Defaults to **frama_c_journal**.
 for more information): each file preprocessed by Frama-C will include
 corresponding **-I** and **-D** flags according to the specifications in *path*.
 If *path* is a directory, use **\<path>/compile_commands.json**.
-Disabled by default. **Note**: this option is only available if Frama-C was
-compiled with yojson support.
+Disabled by default.
 
 [-no]-keep-comments
 : tries to preserve comments when pretty-printing the source code.

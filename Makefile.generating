@@ -64,7 +64,6 @@ $(CONFIG_FILE): $(CONFIG_FILE).in VERSION VERSION_CODENAME share/Makefile.config
           -e "s|@COMPILATION_UNITS@|$(COMPILATION_UNITS)|" \
           -e "s|@LIBRARY_NAMES@|$(foreach p,$(ALL_LIBRARY_NAMES),\"$p\";)|" \
 	  -e "s|@OPTDOT@|$(OPTDOT)|" \
-          -e "s|@HAS_YOJSON@|$(if $(filter yes,$(HAS_YOJSON)),true,false)|" \
           -e "s|@EXE@|$(EXE)|" \
           -e "s|@MAJOR_VERSION@|$(MAJOR_VERSION)|" \
           -e "s|@MINOR_VERSION@|$(MINOR_VERSION)|" \
