@@ -71,13 +71,6 @@ module Widen_Arithmetic_Value_Set = struct
 
 end
 
-exception Infinity
-
-let opt2 f m1 m2 =
-  match m1, m2 with
-    None, _ | _, None -> raise Infinity
-  | Some m1, Some m2 -> f m1 m2
-
 let opt1 f m =
   match m with
     None -> None
@@ -92,13 +85,7 @@ type pre_set =
 type t =
   | Set of Int.t array
   | Float of Fval.t
-  (* [Itv(min, max, rem, modulo)] represents the interval between
-     [min] and [max], congruent to [rem] modulo [modulo]. A value of
-     [None] for [min] (resp. [max]) represents -infinity
-     (resp. +infinity). [modulo] is > 0, and [0 <= rem < modulo].
-
-     Actual [Itv] is thus represented by Itv(None,None,Int.zero,Int.one) *)
-  | Itv of Int.t option * Int.t option * Int.t * Int.t
+  | Itv of Int_interval.t
 (* Binary abstract operations do not model precisely float/integer operations.
    It is the responsibility of the callers to have two operands of the same
    implicit type. The only exception is for [singleton_zero], which is the
@@ -110,29 +97,15 @@ type size_widen_hint = Integer.t
 type numerical_widen_hint = Widen_Hints.t * Fc_float.Widen_Hints.t
 type widen_hint = size_widen_hint * numerical_widen_hint
 
-let some_zero = Some Int.zero
-
 let bottom = Set (Array.make 0 Int.zero)
-let top = Itv(None, None, Int.zero, Int.one)
-
-let hash_v_option v =
-  match v with None -> 97 | Some v -> Int.hash v
+let top = Itv Int_interval.top
 
 let hash v =
   match v with
     Set s -> Array.fold_left (fun acc v -> 1031 * acc + (Int.hash v)) 17 s
-  | Itv(mn,mx,r,m) ->
-      hash_v_option mn + 5501 * (hash_v_option mx) +
-        59 * (Int.hash r) + 13031 * (Int.hash m)
+  | Itv i -> Int_interval.hash i
   | Float(f) ->
       3 + 17 * Fval.hash f
-
-let bound_compare x y =
-  match x,y with
-    None, None -> 0
-  | None, Some _ -> 1
-  | Some _, None -> -1
-  | Some x, Some y -> Int.compare x y
 
 exception Unequal of int
 
@@ -155,14 +128,7 @@ let compare e1 e2 =
 
   | _, Set _ -> 1
   | Set _, _ -> -1
-  | Itv(mn,mx,r,m), Itv(mn',mx',r',m') ->
-      let r1 = bound_compare mn mn' in
-      if r1 <> 0 then r1
-      else let r2 = bound_compare mx mx' in
-      if r2 <> 0 then r2
-      else let r3 = Int.compare r r' in
-      if r3 <> 0 then r3
-      else Int.compare m m'
+  | Itv i1, Itv i2 -> Int_interval.compare i1 i2
   | _, Itv _ -> 1
   | Itv _, _ -> -1
   | Float(f1), Float(f2) ->
@@ -174,21 +140,7 @@ let equal e1 e2 = compare e1 e2 = 0
 
 let pretty fmt t =
   match t with
-  | Itv(mn,mx,r,m) ->
-      let print_bound fmt =
-        function 
-	    None -> Format.fprintf fmt "--"
-          | Some v -> Int.pretty fmt v
-      in
-        Format.fprintf fmt "[%a..%a]%t"
-	  print_bound mn
-          print_bound mx
-          (fun fmt ->
-            if Int.is_zero r && Int.is_one m then
-              Format.fprintf fmt ""
-            else Format.fprintf fmt ",%a%%%a"
-                Int.pretty r
-                Int.pretty m)
+  | Itv i -> Int_interval.pretty fmt i
   | Float (f) ->
       Fval.pretty fmt f
   | Set s ->
@@ -210,16 +162,6 @@ let max_ge_elt max elt =
   match max with
   | None -> true
   | Some m -> Int.ge m elt
-
-let all_positives min =
-  match min with
-  | None -> false
-  | Some m -> Int.ge m Int.zero
-
-let all_negatives max =
-  match max with
-  | None -> false
-  | Some m -> Int.le m Int.zero
 
 
 let fail min max r modu =
@@ -270,9 +212,8 @@ let minus_one = Set [| Int.minus_one |]
 let zero_or_one = Set [| Int.zero ; Int.one |]
 let float_zeros = Float Fval.zeros
 
-let positive_integers = Itv(Some Int.zero, None, Int.zero, Int.one)
-let negative_integers =
-  Itv(None, Some Int.zero, Int.zero, Int.one)
+let positive_integers = Itv (Int_interval.inject_range (Some Int.zero) None)
+let negative_integers = Itv (Int_interval.inject_range None (Some Int.zero))
 
 let is_zero x = x == zero
 
@@ -341,9 +282,6 @@ let is_int = function
   | Itv _ | Set _ -> true
   | Float _ -> false
 
-let in_interval x min max r modu =
-  Int.equal (Int.e_rem x modu) r && min_le_elt min x && max_ge_elt max x
-
 let array_mem v a =
   let l = Array.length a in
   let rec c i =
@@ -360,7 +298,7 @@ let array_mem v a =
 
 let contains_zero s =
   match s with
-  | Itv(mn,mx,r,m) -> in_interval Int.zero mn mx r m
+  | Itv i -> Int_interval.mem Int.zero i
   | Set s -> (array_mem Int.zero s)>=0
   | Float f -> Fval.contains_a_zero f
 
@@ -387,18 +325,14 @@ let project_small_set = function
 
 let cardinal v =
   match v with
-    | Itv (None,_,_,_) | Itv (_,None,_,_) -> None
-    | Itv (Some mn, Some mx,_,m) ->
-        Some (Int.succ ((Int.e_div (Int.sub mx mn) m)))
+    | Itv i -> Int_interval.cardinal i
     | Set s -> Some (Int.of_int (Array.length s))
     | Float f -> if Fval.is_singleton f then Some Int.one else None
 
 let cardinal_estimate v ~size =
   match v with
   | Set s -> Int.of_int (Array.length s)
-  | Itv (None, _, _, _)
-  | Itv (_, None, _, _) -> Int.two_power size
-  | Itv (Some mn, Some mx, _, d) -> Int.(succ (e_div (sub mx mn) d))
+  | Itv i -> Extlib.opt_conv (Int.two_power size) (Int_interval.cardinal i)
   | Float f ->
     if Fval.is_singleton f
     then Int.one
@@ -417,9 +351,7 @@ let cardinal_estimate v ~size =
 let cardinal_less_than v n =
   let c =
     match v with
-    | Itv (None,_,_,_) | Itv (_,None,_,_) -> raise Not_less_than
-    | Itv (Some mn, Some mx,_,m) ->
-        Int.succ ((Int.e_div (Int.sub mx mn) m))
+    | Itv i -> Extlib.the ~exn:Not_less_than (Int_interval.cardinal i)
     | Set s -> Int.of_int (Array.length s)
     | Float f -> 
 	if Fval.is_singleton f then Int.one else raise Not_less_than
@@ -432,10 +364,6 @@ let cardinal_is_less_than v n =
   match cardinal v with
   | None -> false
   | Some c -> Int.le c (Int.of_int n)
-
-let share_top min max r modu =
-  let r = Itv (min, max, r, modu) in
-  if equal r top then top else r
 
 let make ~min ~max ~rem ~modu =
   match min, max with
@@ -456,12 +384,11 @@ let make ~min ~max ~rem ~modu =
         done;
 	assert (Int.equal !v (Int.add modu mx));
         share_array s l
-      else Itv (min, max, rem, modu)
+      else Itv (Int_interval.make ~min ~max ~rem ~modu)
     else if Int.equal mx mn
     then inject_singleton mn
     else bottom
-  | _ ->
-    share_top min max rem modu
+  | _ -> Itv (Int_interval.make ~min ~max ~rem ~modu)
 
 let inject_top min max rem modu =
   check min max rem modu;
@@ -478,6 +405,19 @@ let inject_interval ~min ~max ~rem:r ~modu =
   make ~min ~max ~rem:r ~modu
 
 
+let inject_itv_or_bottom = function
+  | `Bottom -> bottom
+  | `Value i ->
+    match Int_interval.cardinal i with
+    | None -> Itv i
+    | Some card ->
+      if Int.le card !small_cardinal_Int
+      then
+        let min, max, rem, modu = Int_interval.min_max_rem_modu i in
+        make ~min ~max ~rem ~modu
+      else Itv i
+
+
 let subdiv_int v =
   match v with
   | Float _ -> raise Can_not_subdiv
@@ -491,12 +431,17 @@ let subdiv_int v =
       let hi = Array.sub arr m lenhi in
       share_array lo m,
       share_array hi lenhi
-  | Itv (Some lo, Some hi, rem, modu) ->
-      let mean = Int.e_div (Int.add lo hi) Int.two in
-      let succmean = Int.succ mean in
-      inject_interval ~min:(Some lo) ~max:(Some mean) ~rem ~modu,
-      inject_interval ~min:(Some succmean) ~max:(Some hi) ~rem ~modu
-  | Itv _ -> raise Can_not_subdiv
+  | Itv i ->
+    let i1, i2 = Int_interval.subdivide i in
+    (* Redo make in case an interval should be converted into a set. *)
+    let t1 =
+      let min, max, rem, modu = Int_interval.min_max_rem_modu i1 in
+      make ~min ~max ~rem ~modu
+    and t2 =
+      let min, max, rem, modu = Int_interval.min_max_rem_modu i2 in
+      make ~min ~max ~rem ~modu
+    in
+    t1, t2
 
 let subdivide ~size = function
   | Float fval ->
@@ -549,9 +494,19 @@ let unsafe_make_top_from_array_4 s =
   check min max r modu;
   (min,max,r,modu)
 
-let unsafe_make_top_from_array s =
-  let min, max, r, modu = unsafe_make_top_from_array_4 s in
-  share_top min max r modu
+let make_itv_from_set s =
+  let min, max, rem, modu = unsafe_make_top_from_array_4 s in
+  Int_interval.make ~min ~max ~rem ~modu
+
+let make_itv = function
+  | Itv i -> i
+  | Set s -> make_itv_from_set s
+  | Float _ -> Int_interval.top
+
+let make_range = function
+  | Itv i -> i
+  | Set s -> Int_interval.inject_range (Some s.(0)) (Some s.(Array.length s - 1))
+  | Float _ -> Int_interval.top
 
 let empty_ps = Pre_set (O.empty, 0)
 
@@ -587,14 +542,17 @@ let inject_ps ps =
   match ps with
     Pre_set(o, s) -> share_set o s
   | Pre_top (min, max, modu) -> 
-      Itv(Some min, Some max, Int.e_rem min modu, modu)
+    let min = Some min
+    and max = Some max
+    and rem = Int.e_rem min modu in
+    Itv (Int_interval.make ~min ~max ~rem ~modu)
 
 let min_max_r_mod t =
   match t with
   | Set s ->
       assert (Array.length s >= 2);
       unsafe_make_top_from_array_4 s
-  | Itv (a,b,c,d) -> a,b,c,d
+  | Itv i-> Int_interval.min_max_rem_modu i
   | Float _ -> None, None, Int.zero, Int.one
 
 let min_and_max t =
@@ -604,7 +562,7 @@ let min_and_max t =
     if l = 0
     then raise Error_Bottom
     else Some s.(0), Some s.(pred l)
-  | Itv (a,b,_,_) -> a, b
+  | Itv i -> Int_interval.min_and_max i
   | Float _ -> None, None
 
 let min_and_max_float t =
@@ -654,158 +612,9 @@ let widen (bitsize,(wh,fh)) t1 t2 =
       in
       Float (Fval.widen fh prec f1 f2)
     | Itv _ | Set _ ->
-      (* Add possible interval limits deducted from the bitsize *)
-      let wh =
-        (* If bitsize > 128, the values do not correspond to a scalar type.
-           This can (rarely) happen on structures or arrays that have been
-           reinterpreted as one value by the offsetmaps. In this case, do not
-           use limits, and do not create arbitrarily large integers. *)
-        if Integer.gt bitsize (Integer.of_int 128)
-        then Datatype.Integer.Set.empty
-        else if Integer.is_zero bitsize
-        then wh
-        else
-          let limits = [
-            Integer.neg (Integer.two_power (Integer.pred bitsize));
-            Integer.pred (Integer.two_power (Integer.pred bitsize));
-            Integer.pred (Integer.two_power bitsize);
-          ] in
-          Datatype.Integer.Set.(union wh (of_list limits))
-      in
-      let (mn2,mx2,r2,m2) = min_max_r_mod t2 in
-      let (mn1,mx1,r1,m1) = min_max_r_mod t1 in
-      let new_mod = Int.pgcd (Int.pgcd m1 m2) (Int.abs (Int.sub r1 r2)) in
-      let new_rem = Int.e_rem r1 new_mod in
-      let new_min = if bound_compare mn1 mn2 = 0 then mn2 else
-          match mn2 with
-          | None -> None
-          | Some mn2 ->
-            try
-              let v = Widen_Hints.nearest_elt_le mn2 wh
-              in Some (Int.round_up_to_r ~r:new_rem ~modu:new_mod ~min:v)
-            with Not_found -> None
-      in
-      let new_max = if bound_compare mx1 mx2 = 0 then mx2 else
-          match mx2 with None -> None
-                       | Some mx2 ->
-                         try
-                           let v = Widen_Hints.nearest_elt_ge mx2 wh
-                           in Some (Int.round_down_to_r ~r:new_rem ~modu:new_mod ~max:v)
-                         with Not_found -> None
-      in
-      let result = inject_top new_min new_max new_rem new_mod in
-      (* Format.printf "%a -- %a --> %a (thx to %a)@."
-         pretty t1 pretty t2 pretty result
-         Widen_Hints.pretty wh; *)
-      result
-
-let compute_first_common mn1 mn2 r modu =
-  if mn1 = None && mn2 = None
-  then None
-  else
-    let m =
-      match (mn1, mn2) with
-      | Some m, None | None, Some m -> m
-      | Some m1, Some m2 ->
-          Int.max m1 m2
-      | None, None -> assert false (* already tested above *)
-    in
-    Some (Int.round_up_to_r m r modu)
-
-let compute_last_common mx1 mx2 r modu =
-  if mx1 = None && mx2 = None
-  then None
-  else
-    let m =
-      match (mx1, mx2) with
-      | Some m, None | None, Some m -> m
-      | Some m1, Some m2 ->
-          Int.min m1 m2
-      | None, None -> assert false (* already tested above *)
-    in
-    Some (Int.round_down_to_r m r modu)
-
-
-let min_min x y =
-  match x,y with
-  | None,_ | _,None -> None
-  | Some x, Some y -> Some (Int.min x y)
-
-let max_max x y =
-  match x,y with
-  | None,_ | _,None -> None
-  | Some x, Some y -> Some (Int.max x y)
-
-(* [extended_euclidian_algorithm a b] returns x,y,gcd such that a*x+b*y=gcd(x,y). *)
-let extended_euclidian_algorithm a b =
-  assert (Int.gt a Int.zero);
-  assert (Int.gt b Int.zero);
-  let a = ref a and b = ref b in
-  let x = ref Int.zero and lastx = ref Int.one in
-  let y = ref Int.one and lasty = ref Int.zero in
-  while not (Int.is_zero !b) do
-    let (q,r) = Int.e_div_rem !a !b in
-    a := !b;
-    b := r;
-    let tmpx = !x in
-    (x:= Int.sub !lastx (Int.mul q !x); lastx := tmpx);
-    let tmpy = !y in
-    (y:= Int.sub !lasty (Int.mul q !y); lasty := tmpy);
-  done;
-  (!lastx,!lasty,!a)
-
-(* [JS 2013/05/23] unused right now 
-   [modular_inverse a m] returns [x] such that a*x is congruent to 1 mod m. *)
-let _modular_inverse a m =
-  let (x,_,gcd) = extended_euclidian_algorithm a m in
-  assert (Int.equal Int.one gcd);
-  x
-
-(* This function provides solutions to the Chinese remainder theorem,
-   i.e. it finds the solutions x such that:
-   x == r1 mod m1 && x == r2 mod m2.
-
-   If no such solution exists, it raises Error_Bottom; else it returns
-   (r,m) such that all solutions x are such that x == r mod m. *)
-let compute_r_common r1 m1 r2 m2 =
-
-  (* (E1) x == r1 mod m1 && x == r2 mod m2
-     <=> \E k1,k2: x = r1 + k1*m1 && x = r2 + k2*m2
-     <=> \E k1,k2: x = r1 + k1*m1 && k1*m1 - k2*m2 = r2 - r1
-
-     Let r = r2 - r1. The equation (E2): k1*m1 - k2*m2 = r is
-     diophantine; there are solutions x to (E1) iff there are
-     solutions (k1,k2) to (E2).
-
-     Let d = pgcd(m1,m2). There are solutions to (E2) only if d
-     divides r (because d divides k1*m1 - k2*m2). Else we raise
-     [Error_Bottom]. *)
-  let (x1,_,pgcd) = extended_euclidian_algorithm m1 m2 in
-  let r = Int.sub r2 r1 in
-  let r_div,r_rem = Int.e_div_rem r pgcd in
-  if not (Int.equal r_rem Int.zero)
-  then raise Error_Bottom
-
-  (* The extended euclidian algorithm has provided solutions x1,x2 to
-     the Bezout identity x1*m1 + x2*m2 = d.
-
-     x1*m1 + x2*m2 = d ==> x1*(r/d)*m1 + x2*(r/d)*m2 = d*(r/d).
-
-     Thus, k1 = x1*(r/d), k2=-x2*(r/d) are solutions to (E2)
-     Thus, x = r1 + x1*(r/d)*m1 is a particular solution to (E1). *)
-  else let k1 = Int.mul x1 r_div in
-       let x = Int.add r1 (Int.mul k1 m1) in
-
-       (* If two solutions x and y exist, they are equal modulo ppcm(m1,m2).
-	  We have x == r1 mod m1 && y == r1 mod m1 ==> \E k1: x - y = k1*m1
-	          x == r2 mod m2 && y == r2 mod m2 ==> \E k2: x - y = k2*m2
-
-	  Thus k1*m1 = k2*m2 is a multiple of m1 and m2, i.e. is a multiple
-	  of ppcm(m1,m2). Thus x = y mod ppcm(m1,m2). *)
-       let ppcm = Integer.ppcm m1 m2 in
-       (* x may be bigger than the ppcm, we normalize it. *)
-       (Int.e_rem x ppcm, ppcm)
-;;
+      let i1 = make_itv t1
+      and i2 = make_itv t2 in
+      inject_itv_or_bottom (`Value (Int_interval.widen (bitsize, wh) i1 i2))
 
 let array_truncate r i =
   if i = 0 
@@ -883,23 +692,10 @@ let meet v1 v2 =
   if v1 == v2 then v1 else
   let result =
     match v1,v2 with
-    | Itv(min1,max1,r1,modu1), Itv(min2,max2,r2,modu2) ->
-        begin
-          try
-            let r,modu = compute_r_common r1 modu1 r2 modu2 in
-            inject_top
-              (compute_first_common min1 min2 r modu)
-              (compute_last_common max1 max2 r modu)
-              r
-              modu
-          with Error_Bottom ->
-            (*Format.printf "meet to bottom: %a /\\ %a@\n"
-              pretty v1 pretty v2;*)
-            bottom
-        end
+    | Itv i1, Itv i2 -> inject_itv_or_bottom (Int_interval.meet i1 i2)
     | Set s1 , Set s2 -> array_inter s1 s2
-    | Set s, Itv(min, max, rm, modu)
-    | Itv(min, max, rm, modu), Set s ->
+    | Set s, Itv itv
+    | Itv itv, Set s ->
 	let l = Array.length s in
 	let r = Array.make l Int.zero in
 	let rec c i j =
@@ -909,7 +705,7 @@ let meet v1 v2 =
 	  else
 	    let si = succ i in
 	    let x = s.(i) in
-	    if in_interval x min max rm modu
+	    if Int_interval.mem x itv
 	    then begin
 		r.(j) <- x;
 		c si (succ j)
@@ -938,8 +734,8 @@ let intersects v1 v2 =
   match v1, v2 with
   | Itv _, Itv _ -> not (is_bottom (meet v1 v2)) (* YYY: slightly inefficient *)
   | Set s1 , Set s2 -> arrays_intersect s1 s2
-  | Set s, Itv (min, max, rm, modu) | Itv (min, max, rm, modu), Set s ->
-    Extlib.array_exists (fun x -> in_interval x min max rm modu) s
+  | Set s, Itv itv | Itv itv, Set s ->
+    Extlib.array_exists (fun x -> Int_interval.mem x itv) s
   | Float f1, Float f2 -> begin
       match Fval.forward_comp Comp.Eq f1 f2 with
       | Comp.False -> false
@@ -981,10 +777,11 @@ let set_to_ival_under set =
     if (Int.equal
 	  (Int.sub (Int.Set.max_elt set)  (Int.Set.min_elt set))
 	  (Int.of_int (card - 1)))
-    then Itv( Some(Int.Set.min_elt set),
-	      Some(Int.Set.max_elt set),
-	      Int.one,
-	      Int.zero)
+    then Itv( Int_interval.make
+                ~min:(Some(Int.Set.min_elt set))
+                ~max:(Some(Int.Set.max_elt set))
+                ~rem:Int.one
+                ~modu:Int.zero)
     (* Else: arbitrarily drop some elements of the under approximation. *)
     else
       let a = Array.make !small_cardinal Int.zero in
@@ -1003,18 +800,9 @@ let link v1 v2 = match v1, v2 with
     let s1 = Array.fold_right Int.Set.add a1 Int.Set.empty in
     let s2 = Array.fold_right Int.Set.add a2 s1 in
     set_to_ival_under s2
-  | Itv(mn1,mx1,r1,m1), Itv(mn2,mx2,r2,m2) ->
-     if Int.equal r1 r2 && Int.equal m1 m2
-     then
-       let min = match mn1,mn2 with
-         | Some(a), Some(b) -> Some(Int.min a b)
-         | _ -> None in
-       let max = match mx1,mx2 with
-         | Some(a), Some(b) -> Some(Int.max a b)
-         | _ -> None in
-       inject_top min max r1 m1
-     else v1 (* No best abstraction anyway. *)
-  | Itv(mn,mx,r,m), Set s | Set s, Itv(mn,mx,r,m) ->
+  | Itv i1, Itv i2 -> Itv (Int_interval.link i1 i2)
+  | Itv i, Set s | Set s, Itv i ->
+    let mn, mx, r, m = Int_interval.min_max_rem_modu i in
      let max = match mx with
        | None -> None
        | Some(max) ->
@@ -1044,33 +832,26 @@ let join v1 v2 =
   let result =
     if v1 == v2 then v1 else
       match v1,v2 with
-      | Itv(mn1,mx1,r1,m1), Itv(mn2,mx2,r2,m2) ->
-          check mn1 mx1 r1 m1;
-          check mn2 mx2 r2 m2;
-          let modu = Int.pgcd (Int.pgcd m1 m2) (Int.abs(Int.sub r1 r2)) in
-          let r = Int.e_rem r1 modu in
-          let min = min_min mn1 mn2 in
-          let max = max_max mx1 mx2 in
-          let r  = inject_top min max r modu in
-          r
-      | Set s, (Itv(min, max, r, modu) as t)
-      | (Itv(min, max, r, modu) as t), Set s ->
+      | Itv i1, Itv i2 -> Itv (Int_interval.join i1 i2)
+      | Set s, (Itv i as t)
+      | (Itv i as t), Set s ->
+        let min, max, r, modu = Int_interval.min_max_rem_modu i  in
 	  let l = Array.length s in
           if l = 0 then t
           else
             let f modu elt = Int.pgcd modu (Int.abs(Int.sub r elt)) in
-            let new_modu = Array.fold_left f modu s in
-            let new_r = Int.e_rem r new_modu in
-            let new_min = match min with
+            let modu = Array.fold_left f modu s in
+            let rem = Int.e_rem r modu in
+            let min = match min with
               None -> None
             | Some m -> Some (Int.min m s.(0))
             in
-            let new_max = match max with
+            let max = match max with
               None -> None
             | Some m -> Some (Int.max m s.(pred l))
             in
-            check new_min new_max new_r new_modu;
-            share_top new_min new_max new_r new_modu
+            check min max rem modu;
+            Itv (Int_interval.make ~min ~max ~rem ~modu)
       | Set s1 , Set s2 ->
 	  let l1 = Array.length s1 in
 	  if l1 = 0 
@@ -1218,10 +999,8 @@ let complement_int_under ~size ~signed i =
 
 let fold_int f v acc =
   match v with
-    Itv(None,_,_,_) | Itv(_,None,_,_) | Float _ ->
-      raise Error_Top
-  | Itv(Some inf, Some sup, _, step) ->
-      Int.fold f ~inf ~sup ~step acc
+  | Float _ -> raise Error_Top
+  | Itv i -> Int_interval.fold_int f i acc
   | Set s ->
       Array.fold_left (fun acc x -> f x acc) acc s
 
@@ -1230,25 +1009,6 @@ let fold_enum f v acc =
   | Float fl when Fval.is_singleton fl -> f v acc
   | Float _ -> raise Error_Top
   | Set _ | Itv _ -> fold_int (fun x acc -> f (inject_singleton x) acc) v acc
-
-(** [min_is_lower mn1 mn2] is true iff mn1 is a lower min than mn2 *)
-let min_is_lower mn1 mn2 =
-  match mn1, mn2 with
-    None, _ -> true
-  | _, None -> false
-  | Some m1, Some m2 ->
-      Int.le m1 m2
-
-(** [max_is_greater mx1 mx2] is true iff mx1 is a greater max than mx2 *)
-let max_is_greater mx1 mx2 =
-  match mx1, mx2 with
-    None, _ -> true
-  | _, None -> false
-  | Some m1, Some m2 ->
-      Int.ge m1 m2
-
-let rem_is_included r1 m1 r2 m2 =
-  (Int.is_zero (Int.e_rem m1 m2)) && (Int.equal (Int.e_rem r1 m2) r2)
 
 let array_for_all f (a : Integer.t array) =
   let l = Array.length a in
@@ -1282,13 +1042,11 @@ let is_included t1 t2 =
   (t1 == t2) ||
   match t1,t2 with
   | Set [||], _ -> true
-  | Itv(mn1,mx1,r1,m1), Itv(mn2,mx2,r2,m2) ->
-      (min_is_lower mn2 mn1) &&
-      (max_is_greater mx2 mx1) &&
-      rem_is_included r1 m1 r2 m2
+  | Itv i1, Itv i2 -> Int_interval.is_included i1 i2
   | Itv _, Set _ -> false (* Itv _ represents more elements
                              than can be represented by Set _ *)
-  | Set s, Itv(min, max, r, modu) ->
+  | Set s, Itv i ->
+    let min, max, r, modu = Int_interval.min_max_rem_modu i in
     (* Inclusion of bounds is needed for the entire inclusion *)
     min_le_elt min s.(0) && max_ge_elt max s.(Array.length s-1)
     && (Int.equal Int.one modu || (*Itv side contains all integers, we're done*)
@@ -1425,36 +1183,17 @@ let map_set_incr f (s : Integer.t array) =
 let add_singleton_int i v = match v with
   | Float _ -> assert false
   | Set s -> apply_bin_1_strict_incr Int.add i s
-  | Itv (mn, mx, r, m) ->
-    let incr v = Int.add i v in
-    let new_mn = opt1 incr mn in
-    let new_mx = opt1 incr mx in
-    let new_r = Int.e_rem (incr r) m in
-    share_top new_mn new_mx new_r m
+  | Itv itv -> Itv (Int_interval.add_singleton_int i itv)
 
-
-let rec add_int v1 v2 =
+let add_int v1 v2 =
   match v1,v2 with
   | Float _, _ | _, Float _ -> assert false
   | Set [| x |], Set s | Set s, Set [| x |]->
       apply_bin_1_strict_incr Int.add x s 
   | Set s1, Set s2 ->
       apply2_n Int.add s1 s2
-  | Itv(mn1,mx1,r1,m1), Itv(mn2,mx2,r2,m2) ->
-      let m = Int.pgcd m1 m2 in
-      let r = Int.e_rem (Int.add r1 r2) m in
-      let mn =
-        try
-          Some (Int.round_up_to_r (opt2 Int.add mn1 mn2) r m)
-        with Infinity -> None
-      in
-      let mx =
-        try
-          Some (Int.round_down_to_r (opt2 Int.add mx1 mx2) r m)
-        with Infinity -> None
-      in
-      inject_top mn mx r m
-  | Set s, (Itv _ as t) | (Itv _ as t), Set s ->
+  | Itv i1, Itv i2 -> Itv (Int_interval.add i1 i2)
+  | Set s, (Itv i as t) | (Itv i as t), Set s ->
       let l = Array.length s in
       if l = 0
       then bottom
@@ -1462,7 +1201,7 @@ let rec add_int v1 v2 =
       then (* only one element *)
         add_singleton_int s.(0) t
       else
-        add_int t (unsafe_make_top_from_array s)
+        Itv (Int_interval.add i (make_itv_from_set s))
 
 let add_int_under v1 v2 = match v1,v2 with
   | Float _, _ | _, Float _ -> assert false
@@ -1475,25 +1214,7 @@ let add_int_under v1 v2 = match v1,v2 with
 	  Int.Set.add (Int.add i1 i2) acc) acc s2)
 	Int.Set.empty s1
     in set_to_ival_under set
-  | Itv(min1,max1,r1,modu1) , Itv(min2,max2,r2,modu2)
-    when Int.equal modu1 modu2 ->
-    (* Note: min1+min2 % modu = max1 + max2 % modu = r1 + r2 % modu;
-       no need to trim the bounds here.  *)
-    let r = Int.e_rem (Int.add r1 r2) modu1 in
-    let min = match min1, min2 with
-      | Some min1, Some min2 -> Some (Int.add min1 min2)
-      | _ -> None in
-    let max = match max1, max2 with
-      | Some max1, Some max2 -> Some (Int.add max1 max2)
-      | _ -> None in
-    inject_top min max r modu1
-
-  (* In many cases, there is no best abstraction; for instance when
-     modu1 divides modu2, a part of the resulting interval is
-     congruent to modu1, and a larger part is congruent to modu2.  In
-     general, one can take the intersection. In any case, this code
-     should be rarely called. *)
-  | Itv _, Itv _ -> bottom
+  | Itv i1, Itv i2 -> inject_itv_or_bottom (Int_interval.add_under i1 i2)
   | Set s, (Itv _ as t) | (Itv _ as t), Set s ->
       let l = Array.length s in
       if l = 0
@@ -1513,47 +1234,14 @@ let neg_int v =
   match v with
   | Float _ -> assert false
   | Set s -> map_set_strict_decr Int.neg s
-  | Itv(mn,mx,r,m) ->
-      share_top
-        (opt1 Int.neg mx)
-        (opt1 Int.neg mn)
-        (Int.e_rem (Int.neg r) m)
-        m
+  | Itv i -> Itv (Int_interval.neg i)
 
 let sub_int v1 v2 = add_int v1 (neg_int v2)
 let sub_int_under v1 v2 = add_int_under v1 (neg_int v2)
 
-type ext_value = Ninf | Pinf | Val of Int.t
-let inject_min = function None -> Ninf | Some m -> Val m
-let inject_max = function None -> Pinf | Some m -> Val m
-let ext_neg = function Ninf -> Pinf | Pinf -> Ninf | Val v -> Val (Int.neg v)
-let ext_mul x y =
-  match x, y with
-  | Ninf, Ninf | Pinf, Pinf -> Pinf
-  | Ninf, Pinf | Pinf, Ninf -> Ninf
-  | Val v1, Val v2 -> Val (Int.mul v1 v2)
-  | (Ninf | Pinf as x), Val v | Val v, (Ninf | Pinf as x) ->
-     if Int.gt v Int.zero then x
-     else if Int.lt v Int.zero then ext_neg x
-     else Val Int.zero
-
-let ext_min x y =
-  match x,y with
-    Ninf, _ | _, Ninf -> Ninf
-  | Pinf, x | x, Pinf -> x
-  | Val x, Val y -> Val(Int.min x y)
-
-let ext_max x y =
-  match x,y with
-    Pinf, _ | _, Pinf -> Pinf
-  | Ninf, x | x, Ninf -> x
-  | Val x, Val y -> Val(Int.max x y)
-
-let ext_proj = function Val x -> Some x | _ -> None
-
 let min_int s =
   match s with
-  | Itv (min,_,_,_) -> min
+  | Itv i -> fst (Int_interval.min_and_max i)
   | Set s -> 
       if Array.length s = 0
       then raise Error_Bottom
@@ -1564,7 +1252,7 @@ let min_int s =
 
 let max_int s =
   match s with
-  | Itv (_,max,_,_) -> max
+  | Itv i -> snd (Int_interval.min_and_max i)
   | Set s -> 
       let l = Array.length s in
       if l = 0
@@ -1581,19 +1269,7 @@ let scale f v =
   else
     match v with
     | Float _ -> top
-    | Itv(mn1,mx1,r1,m1) ->
-        let incr = Int.mul f in
-	if Int.gt f Int.zero
-        then
-          let modu = incr m1 in
-          share_top
-            (opt1 incr mn1) (opt1 incr mx1)
-            (Int.e_rem (incr r1) modu) modu
-        else
-          let modu = Int.neg (incr m1) in
-          share_top
-            (opt1 incr mx1) (opt1 incr mn1)
-            (Int.e_rem (incr r1) modu) modu
+    | Itv i-> Itv (Int_interval.scale f i)
     | Set s ->
 	if Int.ge f Int.zero 
 	then apply_bin_1_strict_incr Int.mul f s
@@ -1601,7 +1277,7 @@ let scale f v =
 
 
 
-let scale_div_common ~pos f v degenerate_ival degenerate_float =
+let scale_div_common ~pos f v scale_interval degenerate_float =
   assert (not (Int.is_zero f));
   let div_f =
     if pos
@@ -1609,30 +1285,8 @@ let scale_div_common ~pos f v degenerate_ival degenerate_float =
     else fun a -> Int.c_div a f
   in
   match v with
-  | Itv(mn1,mx1,r1,m1) ->
-      let r, modu =
-	let negative = max_is_greater (some_zero) mx1 in
-        if (negative (* all negative *) ||
-	     pos (* good div *) ||
-       	     (min_is_lower (some_zero) mn1)  (* all positive *) ||
-             (Int.is_zero (Int.e_rem r1 f)) (* exact *) )	 
-	  && (Int.is_zero (Int.e_rem m1 f))
-        then
-          let modu = Int.abs (div_f m1) in
-	  let r = if negative then Int.sub r1 m1 else r1 in
-          (Int.e_rem (div_f r) modu), modu
-        else (* degeneration*)
-	  degenerate_ival r1 m1
-      in
-      let divf_mn1 = opt1 div_f mn1 in
-      let divf_mx1 = opt1 div_f mx1 in
-      let mn, mx =
-        if Int.gt f Int.zero
-        then divf_mn1, divf_mx1
-        else divf_mx1, divf_mn1
-      in
-      inject_top mn mx r modu
-  | Set s -> 
+  | Itv i -> inject_itv_or_bottom (scale_interval ~pos f i)
+  | Set s ->
       if Int.lt f Int.zero
       then
 	map_set_decr div_f s
@@ -1641,17 +1295,14 @@ let scale_div_common ~pos f v degenerate_ival degenerate_float =
   | Float _ -> degenerate_float
 
 let scale_div ~pos f v =
-  scale_div_common ~pos f v (fun _ _ -> Int.zero, Int.one) top
-;;
+  let scale_div ~pos f x = `Value (Int_interval.scale_div ~pos f x) in
+  scale_div_common ~pos f v scale_div top
 
 let scale_div_under ~pos f v =
-  try
     (* TODO: a more precise result could be obtained by transforming
        Itv(min,max,r,m) into Itv(min,max,r/f,m/gcd(m,f)). But this is
        more complex to implement when pos or f is negative. *)
-    scale_div_common ~pos f v (fun _r _m -> raise Exit) bottom
-  with Exit -> bottom
-;;
+  scale_div_common ~pos f v Int_interval.scale_div_under bottom
 
 let div_set x sy =
   Array.fold_left
@@ -1662,64 +1313,14 @@ let div_set x sy =
     bottom
     sy
 
-(* ymin and ymax must be the same sign *)
-let div_range x ymn ymx =
-  match min_and_max x with
-  | Some xmn, Some xmx ->
-      let c1 = Int.c_div xmn ymn in
-      let c2 = Int.c_div xmx ymn in
-      let c3 = Int.c_div xmn ymx in
-      let c4 = Int.c_div xmx ymx in
-      let min = Int.min (Int.min c1 c2) (Int.min c3 c4) in
-      let max = Int.max (Int.max c1 c2) (Int.max c3 c4) in
-
-          (*     Format.printf "div: %a %a %a %a@."
-                 Int.pretty mn Int.pretty mx Int.pretty xmn Int.pretty xmx; *)
-          inject_range (Some min) (Some max)
-
-  | _ ->
-     log_imprecision "Ival.div_range";
-     top
-
 let div x y =
   (*if (intersects y negative || intersects x negative) then ignore
     (CilE.warn_once "using 'round towards zero' semantics for '/',
     which only became specified in C99."); *)
   match y with
-    Set sy ->
-      div_set x sy
-  | Itv (Some mn,Some mx, r, modu) ->
-      let result_pos =
-        if Int.gt mx Int.zero
-        then
-          let lpos =
-            if Int.gt mn Int.zero
-            then mn
-            else
-              Int.round_up_to_r ~min:Int.one ~r ~modu
-          in
-          div_range x lpos mx
-        else
-          bottom
-      in
-      let result_neg =
-        if Int.lt mn Int.zero
-        then
-          let gneg =
-            if Int.lt mx Int.zero
-            then mx
-            else
-              Int.round_down_to_r ~max:Int.minus_one ~r ~modu
-          in
-          div_range x mn gneg
-        else
-          bottom
-      in
-      join result_neg result_pos
+  | Set sy -> div_set x sy
+  | Itv iy -> inject_itv_or_bottom (Int_interval.div (make_range x) iy)
   | Float _ -> assert false
-  | Itv (None, _, _, _) | Itv (_, None, _, _) ->
-      log_imprecision "Ival.div";
-      top
 
 (* [scale_rem ~pos:false f v] is an over-approximation of the set of
    elements [x mod f] for [x] in [v].
@@ -1728,88 +1329,24 @@ let div x y =
    elements [x e_rem f] for [x] in [v].
 *)
 let scale_rem ~pos f v =
-(*     Format.printf "scale_rem %b %a %a@."
-    pos
-    Int.pretty f
-    pretty v; *)
   if Int.is_zero f then bottom
   else
-    let f = if Int.lt f Int.zero then Int.neg f else f in
-    let rem_f a =
-      if pos then Int.e_rem a f else Int.c_rem a f
-    in
     match v with
-    | Itv(mn,mx,r,m) ->
-        let modu = Int.pgcd f m in
-        let rr = Int.e_rem r modu in
-        let binf,bsup =
-          if pos
-          then (Int.round_up_to_r ~min:Int.zero ~r:rr ~modu),
-          (Int.round_down_to_r ~max:(Int.pred f) ~r:rr ~modu)
-          else
-            let min =
-              if all_positives mn then Int.zero else Int.neg (Int.pred f)
-            in
-            let max =
-              if all_negatives mx then Int.zero else Int.pred f
-            in
-            (Int.round_up_to_r ~min ~r:rr ~modu,
-            Int.round_down_to_r ~max ~r:rr ~modu)
-        in
-        let mn_rem,mx_rem =
-          match mn,mx with
-          | Some mn,Some mx ->
-            let div_f a =
-              if pos then Int.e_div a f else Int.c_div a f
-            in
-            (* See if [mn..mx] is included in [k*f..(k+1)*f] for some [k]. In
-               this case, [%] is monotonic and [mn%f .. mx%f] is a more precise
-               result. *)
-            if Int.equal (div_f mn) (div_f mx) then
-              rem_f mn, rem_f mx
-            else binf,bsup
-          | _ -> binf,bsup
-        in
-        inject_top (Some mn_rem) (Some mx_rem) rr modu
-    | Set s -> map_set_exnsafe rem_f s
+    | Itv i -> inject_itv_or_bottom (`Value (Int_interval.scale_rem ~pos f i))
+    | Set s ->
+      let f = if Int.lt f Int.zero then Int.neg f else f in
+      let rem_f a =
+        if pos then Int.e_rem a f else Int.c_rem a f
+      in
+      map_set_exnsafe rem_f s
     | Float _ -> top
-
 
 let c_rem x y =
   match y with
-  | Itv (None, _, _, _) | Itv (_, None, _, _)
   | Float _ -> top
-
-  | Itv (Some mn, Some mx, _, _) ->
-      if Int.equal mx Int.zero then
-        bottom (* completely undefined. *)
-      else
-        (* Result is of the sign of x. Also, compute |x| to bound the result *)
-        let neg, pos, max_x = match x with
-          | Float _ -> true, true, None
-          | Set set ->
-              let s = Array.length set in
-              if s = 0 then (* Bottom *) false, false, None
-              else
-                Int.le set.(0) Int.minus_one,
-                Int.ge set.(s-1) Int.one,
-                Some (Int.max (Int.abs set.(0)) (Int.abs set.(s-1)))
-          | Itv (mn, mx, _, _) ->
-              min_le_elt mn Int.minus_one,
-              max_ge_elt mx Int.one,
-              (match mn, mx with
-                | Some mn, Some mx -> Some (Int.max (Int.abs mn) (Int.abs mx))
-                | _ -> None)
-        in
-        (* Bound the result: no more than |x|, and no more than |y|-1 *)
-        let pos_rem = Integer.max (Int.abs mn) (Int.abs mx) in
-        let bound = Int.pred pos_rem in
-        let bound = Extlib.may_map (Int.min bound) ~dft:bound max_x in
-        (* Compute result bounds using sign information *)
-        let mn = if neg then Some (Int.neg bound) else Some Int.zero in
-        let mx = if pos then Some bound else Some Int.zero in
-        inject_top  mn mx Int.zero Int.one
-
+  | Itv iy ->
+    if is_bottom x then bottom
+    else inject_itv_or_bottom (Int_interval.c_rem (make_range x) iy)
   | Set yy ->
       ( match x with
         Set xx -> apply2_notzero Int.c_rem xx yy
@@ -1857,10 +1394,10 @@ let create_all_values ~signed ~size =
   else
   if signed then
     let b = Int.two_power_of_int (size-1) in
-    Itv (Some (Int.neg b), Some (Int.pred b), Int.zero, Int.one)
+    Itv (Int_interval.inject_range (Some (Int.neg b)) (Some (Int.pred b)))
   else
     let b = Int.two_power_of_int size in
-    Itv (Some Int.zero, Some (Int.pred b), Int.zero, Int.one)
+    Itv (Int_interval.inject_range (Some Int.zero) (Some (Int.pred b)))
 
 let big_int_64 = Int.of_int 64
 let big_int_32 = Int.thirtytwo
@@ -1893,25 +1430,29 @@ let cast_int_to_int ~size ~signed value =
       inject_top min_val max_val rr modu
     in
     match value with
-    | Itv(Some mn,Some mx,r,m) ->
-        let highbits_mn,highbits_mx =
-          if signed then
-            Int.logand (Int.add mn mask) not_p_factor,
-            Int.logand (Int.add mx mask) not_p_factor
-          else
-            Int.logand mn not_p_factor, Int.logand mx not_p_factor
-        in
-        if Int.equal highbits_mn highbits_mx
-        then
-          if Int.is_zero highbits_mn
-          then value
-          else
-            let new_min = rem_f mn in
-            let new_r = Int.e_rem new_min m in
-            inject_top (Some new_min) (Some (rem_f mx)) new_r m
-        else best_effort r m
-    | Itv (_,_,r,m) ->
-        best_effort r m
+    | Itv i->
+      begin
+        let mn, mx, r, m = Int_interval.min_max_rem_modu i in
+        match mn, mx with
+        | Some mn, Some mx ->
+          let highbits_mn,highbits_mx =
+            if signed then
+              Int.logand (Int.add mn mask) not_p_factor,
+              Int.logand (Int.add mx mask) not_p_factor
+            else
+              Int.logand mn not_p_factor, Int.logand mx not_p_factor
+          in
+          if Int.equal highbits_mn highbits_mx
+          then
+            if Int.is_zero highbits_mn
+            then value
+            else
+              let new_min = rem_f mn in
+              let new_r = Int.e_rem new_min m in
+              inject_top (Some new_min) (Some (rem_f mx)) new_r m
+          else best_effort r m
+        | _, _ -> best_effort r m
+      end
     | Set s -> begin
       let all =
         create_all_values ~size:(Int.to_int size) ~signed
@@ -1963,7 +1504,7 @@ let cast_float_to_float fkind v =
 
 
     (* TODO rename to mul_int *)
-let rec mul v1 v2 =
+let mul v1 v2 =
   (*    Format.printf "mul. Args: '%a' '%a'@\n" pretty v1 pretty v2; *)
   let result =
     if is_one v1 then v2 
@@ -1979,40 +1520,14 @@ let rec mul v1 v2 =
 	    else apply_bin_1_strict_decr Int.mul x s1
       | Set s1, Set s2 ->
           apply2_n Int.mul s1 s2
-      | Itv(mn1,mx1,r1,m1), Itv(mn2,mx2,r2,m2) ->
-          check mn1 mx1 r1 m1;
-          check mn2 mx2 r2 m2;
-          let mn1 = inject_min mn1 in
-          let mx1 = inject_max mx1 in
-          let mn2 = inject_min mn2 in
-          let mx2 = inject_max mx2 in
-          let a = ext_mul mn1 mn2 in
-          let b = ext_mul mn1 mx2 in
-          let c = ext_mul mx1 mn2 in
-          let d = ext_mul mx1 mx2 in
-
-          let min = ext_min (ext_min a b) (ext_min c d) in
-          let max = ext_max (ext_max a b) (ext_max c d) in
-
-          (*      let multipl1 = Int.pgcd m1 r1 in
-		  let multipl2 = Int.pgcd m2 r2 in
-		  let modu1 = Int.pgcd m1 m2 in
-		  let modu2 = Int.mul multipl1 multipl2 in
-		  let modu = Int.ppcm modu1 modu2 in    *)
-          let modu = Int.(pgcd (pgcd (mul m1 m2) (mul r1 m2)) (mul r2 m1))
-          in
-          let r = Int.e_rem (Int.mul r1 r2) modu in
-          (*      let t = Itv (ext_proj min, ext_proj max, r, modu) in
-		  Format.printf "mul. Result: '%a'@\n" pretty t; *)
-          inject_top (ext_proj min) (ext_proj max) r modu
-      | Set s, (Itv(_,_,_,_) as t) | (Itv(_,_,_,_) as t), Set s ->
+      | Itv i1, Itv i2 -> Itv (Int_interval.mul i1 i2)
+      | Set s, Itv i | Itv i, Set s ->
 	  let l = Array.length s in
 	  if l = 0 
           then bottom
           else if l = 1
-          then (* only one element *)
-            scale s.(0) t
-          else mul t (unsafe_make_top_from_array s)
+          then Itv (Int_interval.scale s.(0) i)
+          else Itv (Int_interval.mul i (make_itv_from_set s))
   in
   (* Format.printf "mul. result : %a@\n" pretty result;*)
   result
@@ -2116,14 +1631,12 @@ let backward_mult_int_left ~right ~result =
 let backward_le_int max v =
   match v with
   | Float _ -> v
-  | Set _ | Itv _ ->
-      narrow v (Itv(None,max,Int.zero,Int.one))
+  | Set _ | Itv _ -> narrow v (Itv (Int_interval.inject_range None max))
 
 let backward_ge_int min v =
   match v with
   | Float _ -> v
-  | Set _ | Itv _ ->
-      narrow v (Itv(min,None,Int.zero,Int.one))
+  | Set _ | Itv _ -> narrow v (Itv (Int_interval.inject_range min None))
 
 let backward_lt_int max v = backward_le_int (opt1 Int.pred max) v
 let backward_gt_int min v = backward_ge_int (opt1 Int.succ min) v
@@ -2141,25 +1654,30 @@ let diff_if_one value rem =
 	Array.blit a (succ index) r index (pl-index);
 	share_array r pl
       else value
-  | Set [| v |], Itv (Some mn, mx, r, m) when Int.equal v mn ->
-      inject_top (Some (Int.add mn m)) mx r m
-  | Set [| v |], Itv (mn, Some mx, r, m) when Int.equal v mx ->
-      inject_top mn (Some (Int.sub mx m)) r m
-  | Set [| v |], Itv ((Some mn as min), (Some mx as max), r, m) when 
-	Int.equal (Int.sub mx mn) (Int.mul m !small_cardinal_Int) &&
-	  in_interval v min max r m ->
-      let r = ref mn in
-      Set 
-	(Array.init
-	    !small_cardinal
-	    (fun _ -> 
-	      let c = !r in
-	      let corrected_c = 
-		if Int.equal c v then Int.add c m else c
-	      in
-	      r := Int.add corrected_c m;
-	      corrected_c))
-	      
+  | Set [| v |], Itv i ->
+    begin
+      let min, max, rem, modu = Int_interval.min_max_rem_modu i in
+      match min, max with
+      | Some mn, _ when Int.equal v mn ->
+        inject_top (Some (Int.add mn modu)) max rem modu
+      | _, Some mx when Int.equal v mx ->
+        inject_top min (Some (Int.sub mx modu)) rem modu
+      | Some mn, Some mx when
+          Int.equal (Int.sub mx mn) (Int.mul modu !small_cardinal_Int)
+          && Int_interval.mem v i ->
+        let r = ref mn in
+        Set 
+          (Array.init
+             !small_cardinal
+             (fun _ -> 
+                let c = !r in
+                let corrected_c = 
+                  if Int.equal c v then Int.add c modu else c
+                in
+                r := Int.add corrected_c modu;
+                corrected_c))
+      | _, _ -> value
+    end
   | _ -> value (* TODO: more cases: Float *)
 
 let diff value rem =
@@ -2239,7 +1757,7 @@ let rec extract_bits ~start ~stop ~size v =
     in
     let bits = List.map (extract_bits ~start ~stop ~size) itvs in
     List.fold_left join bottom bits
-  | Itv(_,_,_,_) as d ->
+  | Itv _ as d ->
     try
       let dived = scale_div ~pos:true (Int.two_power start) d in
       scale_rem ~pos:true (Int.two_power (Int.length start stop)) dived
@@ -2256,13 +1774,17 @@ let all_values ~size v =
   else
     match v with
     | Float _ -> false
-    | Itv (None,_,_,modu) | Itv (_,None,_,modu) ->
-        Int.is_one modu
-    | Itv (Some mn, Some mx,_,modu) ->
-        Int.is_one modu &&
+    | Itv i ->
+      begin
+      let min, max, _, modu = Int_interval.min_max_rem_modu i in
+        match min, max with
+        | None, _ | _, None -> Int.is_one modu
+        | Some mn, Some mx ->
+          Int.is_one modu &&
           Int.le
-          (Int.two_power size)
-          (Int.length mn mx)
+            (Int.two_power size)
+            (Int.length mn mx)
+      end
     | Set s ->
 	let siz = Int.to_int size in
 	Array.length s >= 1 lsl siz &&
@@ -2325,10 +1847,7 @@ include (
           [|
             [| pack (t_array s_int) |];
             [| Fval.packed_descr |];
-            [| pack (t_option s_int);
-               pack (t_option s_int);
-               Int.packed_descr;
-               Int.packed_descr |]
+            [| Int_interval.packed_descr |]
           |]
       let reprs = [ top ; bottom ]
       let equal = equal
@@ -2573,7 +2092,8 @@ let overlaps ~partial ~size t1 t2 =
     not (array_for_all
            (fun i -> Int.ge (Int.abs i) size || (partial && Int.is_zero i))
            array)
-  | Itv (min, max, _r, _modu) ->
+  | Itv i ->
+    let min, max = Int_interval.min_and_max i in
     let pred_size = Int.pred size in
     min_le_elt min pred_size && max_ge_elt max (Int.neg pred_size)
   | Float _ -> assert false
@@ -2706,12 +2226,14 @@ let extract_bit (i : int) (v : t) : bit_value =
   match v with
   | Float _ -> Both
   | Set s -> array_map_reduce bit_value Bit.union s
-  | Itv (None, _, _r, _m) | Itv (_, None, _r, _m) -> Both
-  | Itv (Some l, Some u, _r, _m) ->
-    (* It does not take modulo into account *)
-    if Int.(ge (sub u l) (two_power_of_int i)) (* u - l >= mask *)
-    then Both
-    else Bit.union (bit_value l) (bit_value u)
+  | Itv itv ->
+    match Int_interval.min_and_max itv with
+    | None, _ | _, None -> Both
+    | Some l, Some u ->
+      (* It does not take modulo into account *)
+      if Int.(ge (sub u l) (two_power_of_int i)) (* u - l >= mask *)
+      then Both
+      else Bit.union (bit_value l) (bit_value u)
 
 let reduce_sign (v : t) (b : bit_value) : t =
   match b with
@@ -2720,19 +2242,13 @@ let reduce_sign (v : t) (b : bit_value) : t =
     begin match v with
       | Float _ -> v
       | Set s -> array_filter Int.(gt zero) s
-      | Itv (_l, Some u, _r, _modu) when Int.(lt u zero) -> v
-      | Itv (l, _u, r, modu) ->
-        let u = Some Int.(round_down_to_r ~max:minus_one ~r ~modu) in
-        inject_top l u r modu
+      | Itv itv -> inject_itv_or_bottom (Int_interval.reduce_sign itv true)
     end
   | Off ->
     begin match v with
       | Float _ -> v
       | Set s -> array_filter Int.(le zero) s
-      | Itv (Some l, _u, _r, _modu) when Int.(ge l zero) -> v
-      | Itv (_l, u, r, modu) ->
-        let l = Some Int.(round_up_to_r ~min:zero ~r ~modu) in
-        inject_top l u r modu
+      | Itv itv -> inject_itv_or_bottom (Int_interval.reduce_sign itv false)
     end
 
 let reduce_bit (i : int) (v : t) (b : bit_value) : t =
@@ -2742,30 +2258,7 @@ let reduce_bit (i : int) (v : t) (b : bit_value) : t =
   else match v with
     | Float _ -> v
     | Set s -> array_filter (fun x -> bit_value x = b) s
-    | Itv (l, u, r, modu) ->
-      let power = Int.(two_power_of_int i) in (* 001000 *)
-      let mask = Int.(pred (two_power_of_int (i+1))) in (* 001111 *)
-      (* Reduce bounds to the nearest satisfying bound *)
-      let l' = match l with
-        | Some l when bit_value l <> b ->
-          let min = match b with
-            | On ->  Int.(logor (logand l (lognot mask)) power) (* ll1000 *)
-            | Off -> Int.(succ (logor l mask)) (* ll1111 + 1 *)
-            | Both -> assert false
-          in
-          Some (Int.round_up_to_r ~min ~r ~modu)
-        | _ -> l
-      and u' = match u with
-        | Some u when bit_value u <> b ->
-          let max = match b with
-            | On ->  Int.(pred (logand u (lognot mask))) (* uu0000 - 1 *)
-            | Off -> Int.(logand (logor u mask) (lognot power)) (* uu0111 *)
-            | Both -> assert false
-          in
-          Some (Int.round_down_to_r ~max ~r ~modu)
-        | _ -> u
-      in
-      inject_top l' u' r modu
+    | Itv itv -> inject_itv_or_bottom (Int_interval.reduce_bit i itv (b = On))
 
 type bit = Sign | Bit of int
 
