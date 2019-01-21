@@ -65,7 +65,7 @@ let share_array_or_bottom a s =
 
 let inject_array = share_array
 
-let project_array t = t
+let to_list = Array.to_list
 
 (* ------------------------------- Datatype --------------------------------- *)
 

@@ -31,7 +31,7 @@ val bottom: t
 val inject_singleton: Integer.t -> t
 val inject_array: Integer.t array -> int -> t
 
-val project_array: t -> Integer.t array
+val to_list: t -> Integer.t list
 
 val remove: t -> Integer.t -> t or_bottom
 
