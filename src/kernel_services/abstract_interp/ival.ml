@@ -41,40 +41,15 @@ let set_small_cardinal i =
 
 let get_small_cardinal () = !small_cardinal
 
-let emitter = Lattice_messages.register "Ival";;
-
-let log_imprecision s =
-  Lattice_messages.emit_imprecision emitter s
-;;
+let emitter = Lattice_messages.register "Ival"
+let log_imprecision s = Lattice_messages.emit_imprecision emitter s
 
 module Widen_Arithmetic_Value_Set = struct
-
   include Datatype.Integer.Set
-
-  let pretty fmt s =
-    if not (is_empty s) then
-      Pretty_utils.pp_iter
-        ~pre:"@[<hov 1>{"
-        ~suf:"}@]"
-        ~sep:";@ "
-        iter Int.pretty fmt s
-
-  let of_list l =
-    match l with
-    | [] -> empty
-    | [e] -> singleton e
-    | e :: q ->
-      List.fold_left (fun acc x -> add x acc) (singleton e) q
 
   let default_widen_hints =
     of_list (List.map Int.of_int [-1;0;1])
-
 end
-
-let opt1 f m =
-  match m with
-    None -> None
-  | Some m -> Some (f m)
 
 module O = FCSet.Make(Integer)
 
@@ -99,30 +74,24 @@ let top = Itv Int_interval.top
 let hash = function
   | Set s -> Int_set.hash s
   | Itv i -> Int_interval.hash i
-  | Float(f) ->
-    3 + 17 * Fval.hash f
+  | Float f -> 3 + 17 * Fval.hash f
 
 let compare e1 e2 =
   if e1==e2 then 0 else
-    match e1,e2 with
+    match e1, e2 with
     | Set s1, Set s2 -> Int_set.compare s1 s2
+    | Itv i1, Itv i2 -> Int_interval.compare i1 i2
+    | Float f1, Float f2 -> Fval.compare f1 f2
     | _, Set _ -> 1
     | Set _, _ -> -1
-    | Itv i1, Itv i2 -> Int_interval.compare i1 i2
     | _, Itv _ -> 1
     | Itv _, _ -> -1
-    | Float(f1), Float(f2) ->
-      Fval.compare f1 f2
-(*| _, Float _ -> 1
-  | Float _, _ -> -1 *)
 
 let equal e1 e2 = compare e1 e2 = 0
 
-let pretty fmt t =
-  match t with
+let pretty fmt = function
   | Itv i -> Int_interval.pretty fmt i
-  | Float (f) ->
-    Fval.pretty fmt f
+  | Float f -> Fval.pretty fmt f
   | Set s -> Int_set.pretty fmt s
 
 let min_le_elt min elt =
@@ -139,7 +108,7 @@ let max_ge_elt max elt =
 let fail min max r modu =
   let bound fmt = function
     | None -> Format.fprintf fmt "--"
-    | Some(x) -> Int.pretty fmt x
+    | Some x -> Int.pretty fmt x
   in
   Kernel.fatal "Ival: broken Itv, min=%a max=%a r=%a modu=%a"
     bound min bound max Int.pretty r Int.pretty modu
@@ -159,8 +128,7 @@ let check min max r modu =
   then fail min max r modu
 
 
-let cardinal_zero_or_one v =
-  match v with
+let cardinal_zero_or_one = function
   | Itv _ -> false
   | Set s -> Int_set.cardinal s <= 1
   | Float f -> Fval.is_singleton f
@@ -219,22 +187,20 @@ let is_int = function
   | Itv _ | Set _ -> true
   | Float _ -> false
 
-let contains_zero s =
-  match s with
+let contains_zero = function
   | Itv i -> Int_interval.mem Int.zero i
   | Set s -> Int_set.mem Int.zero s >= 0
   | Float f -> Fval.contains_a_zero f
 
-let contains_non_zero s =
-  match s with
+let contains_non_zero = function
   | Itv _ -> true (* at least two values *)
-  | Set _ -> not (is_zero s || is_bottom s)
+  | Set _ as s -> not (is_zero s || is_bottom s)
   | Float f -> Fval.contains_non_zero f
 
 
 exception Not_Singleton_Int
 
-let project_int v = match v with
+let project_int = function
   | Set s ->
     if Int_set.cardinal s = 1 then Int_set.min s else raise Not_Singleton_Int
   | _ -> raise Not_Singleton_Int
@@ -247,8 +213,7 @@ let project_small_set = function
   | Set a -> Some (Int_set.to_list a)
   | _ -> None
 
-let cardinal v =
-  match v with
+let cardinal = function
   | Itv i -> Int_interval.cardinal i
   | Set s -> Some (Int.of_int (Int_set.cardinal s))
   | Float f -> if Fval.is_singleton f then Some Int.one else None
@@ -277,7 +242,7 @@ let cardinal_less_than v n =
     match v with
     | Itv i -> Extlib.the ~exn:Not_less_than (Int_interval.cardinal i)
     | Set s -> Int.of_int (Int_set.cardinal s)
-    | Float f -> 
+    | Float f ->
       if Fval.is_singleton f then Int.one else raise Not_less_than
   in
   if Int.le c (Int.of_int n)
@@ -558,7 +523,6 @@ let link v1 v2 = match v1, v2 with
     and max = move_bound Int.add max in
     inject_top min max rem modu
   | _ -> bottom
-;;
 
 
 let join v1 v2 =
@@ -1087,8 +1051,8 @@ let backward_ge_int min v =
   | Float _ -> v
   | Set _ | Itv _ -> narrow v (Itv (Int_interval.inject_range min None))
 
-let backward_lt_int max v = backward_le_int (opt1 Int.pred max) v
-let backward_gt_int min v = backward_ge_int (opt1 Int.succ min) v
+let backward_lt_int max v = backward_le_int (Extlib.opt_map Int.pred max) v
+let backward_gt_int min v = backward_ge_int (Extlib.opt_map Int.succ min) v
 
 let diff_if_one value rem =
   match rem with
