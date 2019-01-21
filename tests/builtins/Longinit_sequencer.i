@@ -1,4 +1,4 @@
 /* run.config*
-EXECNOW: make tests/builtins/Longinit_sequencer.cmxs
-OPT: -load-module tests/builtins/Longinit_sequencer.cmxs -eva-show-progress -res-file @PTEST_RESULT@
+EXECNOW: make @PTEST_DIR@/@PTEST_NAME@.cmxs
+OPT: -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs -eva-show-progress -res-file @PTEST_RESULT@
 */

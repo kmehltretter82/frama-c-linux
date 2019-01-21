@@ -1,6 +1,6 @@
 /* run.config
 EXECNOW: make @PTEST_DIR@/@PTEST_NAME@.cmxs
-OPT: -load-module @PTEST_DIR@/@PTEST_NAME@ -copy -kernel-warn-key=annot-error=active
+OPT: -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs -copy -kernel-warn-key=annot-error=active
 */
 
 /*@ foo x == 0;
