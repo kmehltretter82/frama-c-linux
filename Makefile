@@ -839,6 +839,7 @@ NUMERORS_FILES:= \
 ifeq ($(HAS_MPFR),yes)
 PLUGIN_REQUIRES+= gmp
 PLUGIN_TESTS_DIRS+=value/numerors
+PLUGIN_TESTS_LIB=tests/float/fval_test.ml
 NUMERORS_CMO:= $(NUMERORS_FILES)
 src/plugins/value/domains/numerors/numerors_domain.ml: \
 		src/plugins/value/domains/numerors/numerors_domain.ok.ml \
@@ -1001,6 +1002,7 @@ $(eval $(call include_generic_plugin_Makefile,$(PLUGIN_NAME)))
 PLUGIN_ENABLE:=$(ENABLE_CONSTANT_PROPAGATION)
 PLUGIN_NAME:=Constant_Propagation
 PLUGIN_DIR:=src/plugins/constant_propagation
+PLUGIN_TESTS_LIB:=tests/constant_propagation/introduction_of_non_explicit_cast.ml
 PLUGIN_CMO:= propagationParameters \
 	api
 PLUGIN_DISTRIBUTED:=yes
@@ -1064,6 +1066,8 @@ $(eval $(call include_generic_plugin_Makefile,$(PLUGIN_NAME)))
 PLUGIN_ENABLE:=$(ENABLE_PDG)
 PLUGIN_NAME:=Pdg
 PLUGIN_DIR:=src/plugins/pdg
+PLUGIN_TESTS_LIB:=tests/pdg/dyn_dpds.ml \
+                  tests/pdg/sets.ml
 PLUGIN_CMO:= pdg_parameters \
 	    ctrlDpds \
 	    pdg_state \
@@ -1092,6 +1096,8 @@ $(eval $(call include_generic_plugin_Makefile,$(PLUGIN_NAME)))
 PLUGIN_ENABLE:=$(ENABLE_SCOPE)
 PLUGIN_NAME:=Scope
 PLUGIN_DIR:=src/plugins/scope
+PLUGIN_TESTS_LIB:=tests/scope/bts971.ml \
+                  tests/scope/zones.ml
 PLUGIN_CMO:= datascope zones defs
 PLUGIN_GUI_CMO:=dpds_gui
 PLUGIN_DEPENDENCIES:=Eva Inout

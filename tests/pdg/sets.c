@@ -1,7 +1,7 @@
 /* run.config
-   OPT: -eva-show-progress -load-script tests/pdg/sets.ml -lib-entry -main f -pdg -inout -journal-disable  -pdg-print -pdg-verbose 2
+#   EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
+   OPT: -eva-show-progress -load-script @PTEST_DIR@/@PTEST_NAME@.ml -lib-entry -main f -pdg -inout -journal-disable  -pdg-print -pdg-verbose 2
 */
-
 
 
 int b, c, x, y, z, t;
