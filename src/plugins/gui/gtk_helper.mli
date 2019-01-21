@@ -162,11 +162,11 @@ val make_tag :
     create_tag : ?name:string -> GText.tag_property list -> GText.tag ; .. >
   -> name:string -> GText.tag_property list -> GText.tag
 
-val apply_tag : GSourceView2.source_buffer -> GText.tag -> int -> int -> unit
-val remove_tag : GSourceView2.source_buffer -> GText.tag -> int -> int -> unit
-val cleanup_tag : GSourceView2.source_buffer -> GText.tag -> unit
+val apply_tag : GSourceView.source_buffer -> GText.tag -> int -> int -> unit
+val remove_tag : GSourceView.source_buffer -> GText.tag -> int -> int -> unit
+val cleanup_tag : GSourceView.source_buffer -> GText.tag -> unit
 
-val cleanup_all_tags : GSourceView2.source_buffer -> unit
+val cleanup_all_tags : GSourceView.source_buffer -> unit
 
 (* ************************************************************************** *)
 (** {2 Channels} *)
@@ -321,6 +321,15 @@ val source_files_chooser:
   (string list -> unit) ->
   unit
 
+(** Launches a standard gtk file chooser window and returns the name
+    of the selected file. Replaces GToolbox.select_file that has not been
+    ported to lablgtk3.
+
+    @since Frama-C+dev
+*)
+val select_file:
+  ?title:string -> ?dir:(string ref)-> ?filename:string -> unit -> string option
+
 (* ************************************************************************** *)
 (** {2 Miscellaneous} *)
 (* ************************************************************************** *)
@@ -431,6 +440,16 @@ val graph_window_through_dot:
   title:string ->
   (Format.formatter -> unit) ->
   unit
+
+(** calls the packing function to append a new menu item
+    with an icon and a label.
+    replaces GMenu.image_menu_item that has been deprecated in GTK3
+*)
+val image_menu_item:
+  image:GObj.widget ->
+  text: string ->
+  packing: (GMenu.menu_item -> unit) ->
+  GMenu.menu_item
 
 (*
 Local Variables:

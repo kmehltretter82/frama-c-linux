@@ -217,7 +217,7 @@ class ['a] dialog ~title ~window ?(resize=false) () =
   let shell = GWindow.window
       ~title ~kind:`TOPLEVEL ~modal:true
       ~show:false ~decorated:true ~position:`CENTER_ON_PARENT
-      ~allow_grow:resize ()
+      ~resizable:resize ()
   in
 
   let hclip = GBin.alignment ~packing:shell#add () in

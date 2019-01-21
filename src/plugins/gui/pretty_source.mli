@@ -59,7 +59,7 @@ val are_preconds_unfolded: stmt -> bool
 
 val display_source :
   global list ->
-  GSourceView2.source_buffer ->
+  GSourceView.source_buffer ->
   host:Gtk_helper.host ->
   highlighter:(localizable -> start:int -> stop:int -> unit) ->
   selector:(button:int -> localizable -> unit) ->

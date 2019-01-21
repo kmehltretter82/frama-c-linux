@@ -680,8 +680,59 @@ STARTUP_CMX=$(STARTUP_CMO:.cmo=.cmx)
 WTOOLKIT= \
 	wutil widget wbox wfile wpane wpalette wtext wtable
 
+ifeq ($(strip $(GTKSOURCEVIEW)),lablgtk3.sourceview3)
+
+src/plugins/gui/GSourceView.ml: src/plugins/gui/GSourceView3.ml.in
+	$(CP) $< $@
+	$(CHMOD_RO) $@
+
+src/plugins/gui/GSourceView.mli: src/plugins/gui/GSourceView3.mli.in
+	$(CP) $< $@
+	$(CHMOD_RO) $@
+
+else
+src/plugins/gui/GSourceView.ml: src/plugins/gui/GSourceView2.ml.in
+	$(CP) $< $@
+	$(CHMOD_RO) $@
+
+src/plugins/gui/GSourceView.mli: src/plugins/gui/GSourceView2.mli.in
+	$(CP) $< $@
+	$(CHMOD_RO) $@
+
+endif
+
+SOURCEVIEWCOMPAT:=GSourceView
+GENERATED+=src/plugins/gui/GSourceView.ml src/plugins/gui/GSourceView.mli
+
+DGRAPHCOMPAT:=
+ifeq ($(HAS_GNOMECANVAS),no)
+DGRAPHCOMPAT:=dgraph
+src/plugins/gui/dgraph.ml: src/plugins/gui/dgraph.ml.in
+	$(CP) $< $@
+	$(CHMOD_RO) $@
+src/plugins/gui/dgraph.mli: src/plugins/gui/dgraph.mli.in
+	$(CP) $< $@
+	$(CHMOD_RO) $@
+
+GENERATED+=src/plugins/gui/dgraph.ml src/plugins/gui/dgraph.mli
+endif
+
+ifeq ($(LABLGTK),lablgtk3)
+src/plugins/gui/gtk_compat.ml: src/plugins/gui/gtk_compat.3.ml
+	$(CP) $< $@
+	$(CHMOD_RO) $@
+else
+src/plugins/gui/gtk_compat.ml: src/plugins/gui/gtk_compat.2.ml
+	$(CP) $< $@
+	$(CHMOD_RO) $@
+endif
+GENERATED+=src/plugins/gui/gtk_compat.ml
+
 SINGLE_GUI_CMO:= \
+	gtk_compat \
 	$(WTOOLKIT) \
+	$(SOURCEVIEWCOMPAT) \
+	$(DGRAPHCOMPAT) \
 	gui_parameters \
 	gtk_helper gtk_form \
 	source_viewer pretty_source source_manager book_manager \
@@ -734,7 +785,12 @@ PLUGIN_NAME:=Callgraph
 PLUGIN_DISTRIBUTED:=yes
 PLUGIN_DIR:=src/plugins/callgraph
 PLUGIN_CMO:= options journalize subgraph cg services uses register
+#GTK3: no DGraph available.
+ifeq ($(HAS_GNOMECANVAS),yes)
 PLUGIN_GUI_CMO:=cg_viewer
+else
+PLUGIN_GUI_CMO:=
+endif
 PLUGIN_CMI:= callgraph_api
 PLUGIN_INTERNAL_TEST:=yes
 PLUGIN_TESTS_DIRS:=callgraph

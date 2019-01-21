@@ -359,9 +359,7 @@ type 'a chooser =
 
 let do_tooltip ?tooltip obj = match tooltip with
   | None -> ()
-  | Some text ->
-      let tooltip = GData.tooltips () in
-      tooltip#set_tip ~text obj#coerce
+  | Some text -> obj#coerce#misc#set_tooltip_text text
 
 let on_bool ?tooltip ?use_markup (container:GPack.box) label get set =
   let result = ref (get ()) in
@@ -550,10 +548,13 @@ let trace_event (w:GObj.event_ops) =
     | `DROP_FINISHED -> "drop-finish"
     | `CLIENT_EVENT -> "client-event"
     | `VISIBILITY_NOTIFY -> "visibility-notify"
-    | `NO_EXPOSE-> "no-expose"
+    (*GTK3 Event does not exist anymore *)
+    (*    | `NO_EXPOSE-> "no-expose" *)
     | `SCROLL -> "scroll"
     | `WINDOW_STATE -> "window-state"
     | `SETTING -> "setting"
+    (*GTK3: leave room for more events. *)
+    | _ -> "unknown-gtk3-event"
   in
   ignore (w#connect#any
             ~callback:(fun e ->
@@ -959,6 +960,45 @@ let source_files_chooser (main_ui: source_files_chooser_host) defaults f =
   dialog#show ();
   ()
 
+let default_dir = ref ""
+
+let select_file ?title ?(dir=default_dir) ?(filename="") () =
+  let filename =
+    if Filename.is_relative filename then
+      if !dir <> "" then !dir ^ "/" ^ filename
+      else ""
+    else begin
+      dir:= Filename.dirname filename;
+      filename
+    end
+  in
+  let dialog: GWindow.Buttons.file_selection GWindow.file_chooser_dialog =
+    GWindow.file_chooser_dialog
+      ~action:`OPEN
+      ?title
+      ~modal:true
+      ()
+  in
+  ignore (dialog#set_filename filename);
+  let result = ref None in
+  let action r =
+    (match r with
+     | `OK ->
+       let file = dialog#filename in
+       (match file with
+        | None -> ()
+        | Some file ->
+          dir := Filename.dirname file;
+          result := Some file)
+     | _ -> ());
+    dialog#destroy ()
+  in
+  dialog#add_select_button "Open" `OK;
+  dialog#add_button "Cancel" `CANCEL;
+  dialog#show ();
+  action (dialog#run ());
+  !result
+
 let spawn_command ?(timeout=0) ?stdout ?stderr s args f =
   let check_result = Command.command_async s ?stdout ?stderr args in
   let has_timeout = timeout > 0 in
@@ -984,8 +1024,8 @@ let graph_window ~parent ~title make_view =
   let width = int_of_float (float parent#default_width *. 3. /. 4.) in
   let graph_window =
     GWindow.window
-      ~width ~height ~title ~allow_shrink:true ~allow_grow:true
-      ~position:`CENTER () in
+      ~width ~height ~title ~resizable:true ~position:`CENTER ()
+  in
   let view = make_view ~packing:graph_window#add () in
   graph_window#show();
   view#adapt_zoom();
@@ -1016,6 +1056,16 @@ let graph_window_through_dot ~parent ~title dot_formatter =
       "@[cannot display dot graph:@ %s@]"
       (Printexc.to_string exn)
 ;;
+
+let image_menu_item ~(image:GObj.widget) ~text ~packing =
+  let mi = GMenu.menu_item () in
+  let box =
+    GPack.hbox ~spacing:2 ~border_width:0 ~packing:mi#add ()
+  in
+  box#add image;
+  box#add (GMisc.label ~justify:`LEFT ~xalign:0. ~xpad:0 ~text ())#coerce;
+  packing mi;
+  mi
 
 (*
 Local Variables:

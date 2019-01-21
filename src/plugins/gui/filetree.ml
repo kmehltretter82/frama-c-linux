@@ -630,7 +630,7 @@ let make (tree_view:GTree.view) =
       let column = GTree.view_column ~renderer:(renderer,[]) () in
       ignore (tree_view#append_column column);
       let label = GMisc.label ~text:title () in
-      (GData.tooltips ())#set_tip ~text:tooltip label#coerce;
+      Gtk_helper.do_tooltip ~tooltip label;
       column#set_widget (Some label#coerce);
       column#set_alignment 0.5;
       column#set_reorderable true;

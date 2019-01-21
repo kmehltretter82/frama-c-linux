@@ -40,7 +40,7 @@ include $(PLUGIN_DIR)/share/Makefile.resources
 
 # Extension of the GUI for wp is compilable
 # only if gnomecanvas is available
-ifeq ($(HAS_GNOMECANVAS),yes)
+#ifeq ($(HAS_GNOMECANVAS),yes)
 PLUGIN_GUI_CMO:= \
 	GuiConfig \
 	GuiList \
@@ -53,7 +53,7 @@ PLUGIN_GUI_CMO:= \
 	GuiSource \
 	GuiPanel \
 	GuiNavigator
-endif
+#endif
 
 PLUGIN_ENABLE:=@ENABLE_WP@
 PLUGIN_NAME:=Wp

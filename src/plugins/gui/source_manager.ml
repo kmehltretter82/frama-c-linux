@@ -25,7 +25,7 @@ type tab = {
   tab_file : Datatype.Filepath.t ;
   tab_page : int ;
   tab_select : line:int -> unit ;
-  tab_source_view : GSourceView2.source_view;
+  tab_source_view : GSourceView.source_view;
 }
 
 type t = {

@@ -746,7 +746,7 @@ let buffer_formatter state source =
   gtk_fmt
 
 let display_source globals
-    (source:GSourceView2.source_buffer) ~(host:Gtk_helper.host)
+    (source:GSourceView.source_buffer) ~(host:Gtk_helper.host)
     ~highlighter ~selector state =
   Locs.clear state;
   host#protect

@@ -74,7 +74,12 @@ class pane (proverpane : GuiConfig.provers) =
   let composer = new GuiComposer.composer printer in
   let browser = new GuiComposer.browser printer in
   let layout = new Wutil.layout in
+  let scroll_palette =
+    GBin.scrolled_window ~vpolicy:`AUTOMATIC ~hpolicy:`NEVER ()
+  in
+  let scroll_palette_widget = new Wutil.gobj_widget scroll_palette in
   let palette = new Wpalette.panel () in
+  let () = scroll_palette#add palette#coerce in
   let help = new Widget.button
     ~label:"Tactics" ~border:false ~tooltip:"List Available Tactics" () in
   let delete = new Widget.button
@@ -107,7 +112,7 @@ class pane (proverpane : GuiConfig.provers) =
                     w autofocus ; w play_script ; w save_script ;
                     w ~padding:6 icon ; h ~padding:6 status ]
                   [ w help ; w delete ]) in
-        layout#populate (Wbox.panel ~top:toolbar ~right:palette#widget text) ;
+        layout#populate (Wbox.panel ~top:toolbar ~right:scroll_palette_widget text) ;
         provers <-
           VCS.([ new GuiProver.prover ~console:text ~prover:AltErgo ] @
                List.map

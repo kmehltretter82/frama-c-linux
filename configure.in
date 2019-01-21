@@ -741,7 +741,7 @@ plugin_require(from_analysis,callgraph)
 check_plugin(gui,src/plugins/gui,[support for gui],yes)
 
 plugin_require_external(gui,lablgtk)
-plugin_require_external(gui,gnomecanvas)
+plugin_use_external(gui,gnomecanvas)
 plugin_require_external(gui,gtksourceview)
 plugin_use_external(gui,dot)
 
@@ -921,22 +921,46 @@ new_section "configure tools and libraries used by some plug-ins"
 # lablgtk2
 ##########
 
+define([ENABLE_LABLGTK3_HELP],
+  AC_HELP_STRING([--disable-lablgtk3],
+  [in case lablgtk2 and lablgtk3 are available, the default is to compile
+   against lablgtk3. Use this option to force compiling against lablgtk2]))
+
+AC_ARG_ENABLE(
+  lablgtk3,[ENABLE_LABLGTK3_HELP],
+  [ENABLE_LABLGTK3=$enableval],[ENABLE_LABLGTK3=yes])
+
 REQUIRE_LABLGTK="$REQUIRE_LABLGTK$REQUIRE_GNOMECANVAS"
 USE_LABLGTK="$USE_LABLGTK$USE_GNOMECANVAS"
 
+LABLGTK_PATH=""
+
+if test "$ENABLE_LABLGTK3" = "yes"; then
+  LABLGTK_PATH=`ocamlfind query lablgtk3 | tr -d '\\r\\n'`;
+fi
+
+if test "$LABLGTK_PATH" = ""; then
+  LABLGTK_VERSION=2
   LABLGTK_PATH=`ocamlfind query lablgtk2 | tr -d '\\r\\n'`
-  if test "$LABLGTK_PATH" = "" -o "$LABLGTK_PATH" -ef "$OCAMLLIB/lablgtk2" ; then
-     echo "Ocamlfind -> using +lablgtk2.($LABLGTK_PATH,$OCAMLLIB/lablgtk2)"
-     LABLGTK_PATH=+lablgtk2
-     LABLGTKPATH_FOR_CONFIGURE=$OCAMLLIB/lablgtk2
+  if test "$LABLGTK_PATH" = "" -o \
+          "$LABLGTK_PATH" -ef "$OCAMLLIB/lablgtk2" ; then
+       echo "Ocamlfind -> using +lablgtk2.($LABLGTK_PATH,$OCAMLLIB/lablgtk2)"
+       LABLGTK_PATH=+lablgtk2
+       LABLGTKPATH_FOR_CONFIGURE=$OCAMLLIB/lablgtk2
   else
-     echo "Ocamlfind -> using $LABLGTK_PATH"
-     LABLGTKPATH_FOR_CONFIGURE=$LABLGTK_PATH
-  fi
+       echo "Ocamlfind -> using $LABLGTK_PATH"
+       LABLGTKPATH_FOR_CONFIGURE=$LABLGTK_PATH
+  fi;
+else
+  LABLGTK_VERSION=3
+  echo "ocamlfind -> using $LABLGTK_PATH"
+  LABLGTKPATH_FOR_CONFIGURE=$LABLGTK_PATH;
+fi
 
 configure_library([GTKSOURCEVIEW],
-                  [$LABLGTKPATH_FOR_CONFIGURE/lablgtksourceview2.$LIB_SUFFIX],
-                  [lablgtksourceview2.$LIB_SUFFIX not found],
+                  [$LABLGTKPATH_FOR_CONFIGURE/lablgtksourceview2.$LIB_SUFFIX,
+                   $LABLGTKPATH_FOR_CONFIGURE/lablgtksourceview3.$LIB_SUFFIX],
+                  [lablgtksourceview not found],
                   no)
 
 configure_library([GNOMECANVAS],
@@ -991,6 +1015,7 @@ AC_SUBST(HAS_YOJSON)
 AC_SUBST(HAS_APRON)
 AC_SUBST(HAS_MPFR)
 AC_SUBST(HAS_LANDMARKS)
+AC_SUBST(LABLGTK_VERSION)
 AC_SUBST(OCAMLBEST)
 AC_SUBST(OCAMLVERSION)
 AC_SUBST(OCAMLLIB)
