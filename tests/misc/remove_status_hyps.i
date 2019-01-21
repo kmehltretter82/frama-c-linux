@@ -1,5 +1,6 @@
 /* run.config
-   OPT: -load-script tests/misc/remove_status_hyps.ml
+   EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
+   OPT: -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs
 */
 
 int main(void) {

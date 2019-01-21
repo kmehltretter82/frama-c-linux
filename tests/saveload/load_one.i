@@ -1,7 +1,7 @@
 /* run.config
-   OPT: -load-script tests/saveload/load_one.ml -eva-show-progress
+   EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
+   OPT: -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs -eva-show-progress
 */
-
 int G;
 
 int f (int x, int y) {

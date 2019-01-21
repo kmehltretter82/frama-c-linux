@@ -1,5 +1,6 @@
 /* run.config
-OPT: -load-script tests/syntax/reorder.ml
+EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
+OPT: -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs
 */
 
 int x;

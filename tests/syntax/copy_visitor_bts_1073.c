@@ -1,6 +1,7 @@
 /* run.config
-OPT: -load-script tests/syntax/copy_visitor_bts_1073.ml
-OPT: -load-script tests/syntax/copy_visitor_bts_1073_bis.ml -test -then-on filtered -print
+EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
+OPT: -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs
+OPT: -load-script @PTEST_DIR@/@PTEST_NAME@_bis.ml -test -then-on filtered -print
 */
 
 #include "stdio.h"

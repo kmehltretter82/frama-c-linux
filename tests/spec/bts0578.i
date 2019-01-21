@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -print -load-script ./tests/spec/bts0578.ml
+   OPT: -print -load-script ./@PTEST_DIR@/@PTEST_NAME@.ml
 */
 
 /*@ behavior foo: ensures \true; */

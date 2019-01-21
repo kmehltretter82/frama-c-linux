@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -load-script tests/misc/log_twice -eva-show-progress
+   OPT: -load-script @PTEST_DIR@/@PTEST_NAME@ -eva-show-progress
 */
 
 int* f() {

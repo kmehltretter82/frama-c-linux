@@ -1,5 +1,6 @@
 /* run.config
-   OPT: -load-script @PTEST_DIR@/@PTEST_NAME@.ml
+   EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
+   OPT: -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs
  */
 int main(void) {
     int x = 0;

@@ -1,5 +1,6 @@
 /* run.config
-OPT: -load-script tests/syntax/vdescr_bts1387.ml
+EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
+OPT: -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs
 */
 int f(int);
 int g(int);

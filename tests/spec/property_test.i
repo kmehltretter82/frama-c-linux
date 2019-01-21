@@ -1,5 +1,6 @@
 /* run.config
-   OPT: -load-script tests/spec/property_test.ml
+   EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
+   OPT: -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs
 */
 
 int X;
