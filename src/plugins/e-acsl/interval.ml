@@ -61,6 +61,7 @@ module Env = struct
   let clear () = Logic_var.Hashtbl.clear tbl
   let add = Logic_var.Hashtbl.add tbl
   let remove = Logic_var.Hashtbl.remove tbl
+  let replace = Logic_var.Hashtbl.replace tbl
   let find = Logic_var.Hashtbl.find tbl
 end
 
@@ -98,7 +99,7 @@ let rec infer t =
   | TUnOp (Neg, t) ->
     Ival.neg_int (infer t)
   | TUnOp (BNot, t) ->
-    Ival.bitwise_not (infer t)
+    Ival.bitwise_signed_not (infer t)
   | TUnOp (LNot, _)
 
   | TBinOp ((Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr), _, _) ->

@@ -205,7 +205,7 @@ let coerce ~arith_operand ~ctx ~op ty =
   end else
     (* only add an explicit cast if the context is [Gmp] and [ty] is not;
        or if the term corresponding to [ty] is an operand of an arithmetic
-       operation which must be explicitely coerced in order to force the
+       operation which must be explicitly coerced in order to force the
        operation to be of the expected type. *)
     if (ctx = Gmp && ty <> Gmp) || arith_operand
     then { ty; op; cast = Some ctx }
@@ -340,7 +340,7 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
         with Interval.Not_an_integer ->
           dup Other (* real *)
       in
-      (* it is enough to explicitely coerce when required one operand to [ctx]
+      (* it is enough to explicitly coerce when required one operand to [ctx]
          (through [arith_operand]) in order to force the type of the operation.
          Heuristic: coerce the operand which is not a lval in order to lower
          the number of explicit casts *)

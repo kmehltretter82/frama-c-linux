@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Transformations to detect temporal memory errors (e.g., derererence of
+(** Transformations to detect temporal memory errors (e.g., dereference of
     stale pointers). *)
 
 val enable: bool -> unit

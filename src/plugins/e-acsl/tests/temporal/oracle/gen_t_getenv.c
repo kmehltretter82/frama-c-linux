@@ -40,7 +40,7 @@ int main(int argc, char const **argv)
   {
     int __gen_e_acsl_or;
     /*@ assert
-        Value: ptr_comparison: \pointer_comparable((void *)g1, (void *)0);
+        Eva: ptr_comparison: \pointer_comparable((void *)g1, (void *)0);
     */
     if (g1 == (char *)0) __gen_e_acsl_or = 1;
     else {
@@ -64,7 +64,7 @@ int main(int argc, char const **argv)
   {
     int __gen_e_acsl_or_2;
     /*@ assert
-        Value: ptr_comparison: \pointer_comparable((void *)g2, (void *)0);
+        Eva: ptr_comparison: \pointer_comparable((void *)g2, (void *)0);
     */
     if (g2 == (char *)0) __gen_e_acsl_or_2 = 1;
     else {
