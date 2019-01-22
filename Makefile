@@ -589,6 +589,7 @@ KERNEL_CMO=\
 	src/kernel_services/abstract_interp/fval.cmo                    \
 	src/kernel_services/abstract_interp/int_interval.cmo            \
 	src/kernel_services/abstract_interp/int_set.cmo                 \
+	src/kernel_services/abstract_interp/int_val.cmo                 \
 	src/kernel_services/abstract_interp/ival.cmo                    \
 	src/kernel_services/abstract_interp/base.cmo                    \
 	src/kernel_services/abstract_interp/origin.cmo                  \
