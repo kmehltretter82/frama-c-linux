@@ -789,60 +789,18 @@ let cast_int_to_int ~size ~signed value =
   then create_all_values ~size:(Int.to_int size) ~signed
   else
     let result =
-      let factor = Int.two_power size in
-      let mask = Int.two_power (Int.pred size) in
-      let rem_f value = Int.cast ~size ~signed ~value
-      in
-      let not_p_factor = Int.neg factor in
-      let best_effort r m =
-        let modu = Int.pgcd factor m in
-        let rr = Int.e_rem r modu in
-        let min_val = Some (if signed then
-                              Int.round_up_to_r ~min:(Int.neg mask) ~r:rr ~modu
-                            else
-                              Int.round_up_to_r ~min:Int.zero ~r:rr ~modu)
-        in
-        let max_val = Some (if signed then
-                              Int.round_down_to_r ~max:(Int.pred mask) ~r:rr ~modu
-                            else
-                              Int.round_down_to_r ~max:(Int.pred factor)
-                                ~r:rr
-                                ~modu)
-        in
-        inject_top min_val max_val rr modu
-      in
       match value with
-      | Itv i->
-        begin
-          let mn, mx, r, m = Int_interval.min_max_rem_modu i in
-          match mn, mx with
-          | Some mn, Some mx ->
-            let highbits_mn,highbits_mx =
-              if signed then
-                Int.logand (Int.add mn mask) not_p_factor,
-                Int.logand (Int.add mx mask) not_p_factor
-              else
-                Int.logand mn not_p_factor, Int.logand mx not_p_factor
-            in
-            if Int.equal highbits_mn highbits_mx
-            then
-              if Int.is_zero highbits_mn
-              then value
-              else
-                let new_min = rem_f mn in
-                let new_r = Int.e_rem new_min m in
-                inject_top (Some new_min) (Some (rem_f mx)) new_r m
-            else best_effort r m
-          | _, _ -> best_effort r m
-        end
-      | Set s -> begin
-          let all =
-            create_all_values ~size:(Int.to_int size) ~signed
-          in
-          if is_included value all
-          then value
-          else Set (Int_set.map rem_f s)
-        end
+      | Itv i ->
+        inject_itv_or_bottom (`Value (Int_interval.cast ~size ~signed i))
+      | Set s ->
+        let all =
+          create_all_values ~size:(Int.to_int size) ~signed
+        in
+        if is_included value all
+        then value
+        else
+          let rem_f value = Int.cast ~size ~signed ~value in
+          Set (Int_set.map rem_f s)
       | Float _ -> assert false
     in
     (* If sharing is no longer preserved, please change Cvalue.V.cast *)

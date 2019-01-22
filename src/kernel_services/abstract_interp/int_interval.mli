@@ -63,6 +63,8 @@ val mul: t -> t -> t
 val div: t -> t -> t or_bottom
 val c_rem: t -> t -> t or_bottom
 
+val cast: size:Integer.t -> signed:bool -> t -> t
+
 val subdivide: t -> t * t
 
 val reduce_sign: t -> bool -> t or_bottom

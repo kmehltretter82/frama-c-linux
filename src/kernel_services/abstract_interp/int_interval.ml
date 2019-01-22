@@ -685,6 +685,46 @@ let div x y =
 
 (* ----------------------------------- Misc --------------------------------- *)
 
+let cast ~size ~signed t =
+  let factor = Int.two_power size
+  and mask = Int.two_power (Int.pred size) in
+  let best_effort () =
+    let modu = Int.pgcd factor t.modu in
+    let rem = Int.e_rem t.rem modu in
+    let min =
+      if signed
+      then Int.round_up_to_r ~min:(Int.neg mask) ~r:rem ~modu
+      else Int.round_up_to_r ~min:Int.zero ~r:rem ~modu
+    and max =
+      if signed
+      then Int.round_down_to_r ~max:(Int.pred mask) ~r:rem ~modu
+      else Int.round_down_to_r ~max:(Int.pred factor) ~r:rem ~modu
+    in
+    make ~min:(Some min) ~max:(Some max) ~rem ~modu
+  in
+  match t.min, t.max with
+  | Some min, Some max ->
+    let not_p_factor = Int.neg factor in
+    let highbits_mn, highbits_mx =
+      if signed then
+        Int.logand (Int.add min mask) not_p_factor,
+        Int.logand (Int.add max mask) not_p_factor
+      else
+        Int.logand min not_p_factor,
+        Int.logand max not_p_factor
+    in
+    if Int.equal highbits_mn highbits_mx
+    then
+      if Int.is_zero highbits_mn
+      then t
+      else
+        let rem_f value = Int.cast ~size ~signed ~value in
+        let min, max = rem_f min, rem_f max in
+        let rem = Int.e_rem min t.modu in
+        make ~min:(Some min) ~max:(Some max) ~rem ~modu:t.modu
+    else best_effort ()
+  | _, _ -> best_effort ()
+
 let subdivide t =
   match t.min, t.max with
   | Some min, Some max ->
