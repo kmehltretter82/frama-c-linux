@@ -1,12 +1,27 @@
 stages:
+ - git-update
  - build
  - tests
+
+
+#avoid a nix error https://github.com/NixOS/nix/issues/2087
+git-update:
+  stage: git-update
+  variables:
+    CURRENT: $CI_COMMIT_REF_NAME
+    DEFAULT: "master"
+    OCAML: "4_05"
+    FRAMA_CI_OPT: "--override e-acsl:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
+  script:
+   - nix/frama-ci.sh instantiate --eval -A e-acsl.src.outPath
+  tags:
+   - nix
 
 E-ACSL:
   stage: build
   variables:
     CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "test-nix"
+    DEFAULT: "master"
     OCAML: "4_05"
     FRAMA_CI_OPT: "--override e-acsl:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
@@ -18,7 +33,7 @@ CheckHeaders:
   stage: build
   variables:
     CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "test-nix"
+    DEFAULT: "master"
     OCAML: "4_05"
     FRAMA_CI_OPT: "--override genassigns:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
@@ -30,7 +45,7 @@ Tests:
   stage: tests
   variables:
     CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "test-nix"
+    DEFAULT: "master"
     OCAML: "4_05"
     FRAMA_CI_OPT: "--override e-acsl:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
@@ -42,7 +57,7 @@ Cfp:
   stage: tests
   variables:
     CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "test-nix"
+    DEFAULT: "master"
     OCAML: "4_05"
     FRAMA_CI_OPT: "--override e-acsl:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
@@ -54,7 +69,7 @@ Security:
   stage: tests
   variables:
     CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "test-nix"
+    DEFAULT: "master"
     OCAML: "4_05"
     FRAMA_CI_OPT: "--override e-acsl:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
   script:
