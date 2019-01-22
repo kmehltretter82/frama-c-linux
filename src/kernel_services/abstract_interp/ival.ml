@@ -766,47 +766,20 @@ let c_rem x y =
       in
       Int_set.fold f bottom yy
 
-module AllValueHashtbl =
-  Hashtbl.Make
-    (struct
-      type t = Int.t * bool * int
-      let equal (a,b,c:t) (d,e,f:t) = b=e && c=f && Int.equal a d
-      let hash (a,b,c:t) = 
-        257 * (Hashtbl.hash b) + 17 * (Hashtbl.hash c) + Int.hash a
-    end)
-
-let all_values_table = AllValueHashtbl.create 7
-
-let create_all_values_modu ~modu ~signed ~size =
-  let t = modu, signed, size in
-  try
-    AllValueHashtbl.find all_values_table t
-  with Not_found ->
-    let mn, mx =
-      if signed then
-        let b = Int.two_power_of_int (size-1) in
-        (Int.round_up_to_r ~min:(Int.neg b) ~modu ~r:Int.zero,
-         Int.round_down_to_r ~max:(Int.pred b) ~modu ~r:Int.zero)
-      else
-        let b = Int.two_power_of_int size in
-        Int.zero,
-        Int.round_down_to_r ~max:(Int.pred b) ~modu ~r:Int.zero
-    in
-    let r = inject_top (Some mn) (Some mx) Int.zero modu in
-    AllValueHashtbl.add all_values_table t r;
-    r
-
 let create_all_values ~signed ~size =
-  if size <= !small_cardinal_log then
-    (* We may need to create a set. Use slow path *)
-    create_all_values_modu ~signed ~size ~modu:Int.one
-  else
-  if signed then
-    let b = Int.two_power_of_int (size-1) in
-    Itv (Int_interval.inject_range (Some (Int.neg b)) (Some (Int.pred b)))
-  else
-    let b = Int.two_power_of_int size in
-    Itv (Int_interval.inject_range (Some Int.zero) (Some (Int.pred b)))
+  let min, max =
+    if signed then
+      let b = Int.two_power_of_int (size - 1) in
+      Int.neg b, Int.pred b
+    else
+      let b = Int.two_power_of_int size in
+      Int.zero, Int.pred b
+  in
+  let min = Some min
+  and max = Some max in
+  if size <= !small_cardinal_log
+  then make ~min ~max ~rem:Int.zero ~modu:Int.one
+  else Itv (Int_interval.inject_range min max)
 
 let big_int_64 = Int.of_int 64
 let big_int_32 = Int.thirtytwo

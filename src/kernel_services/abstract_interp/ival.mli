@@ -247,7 +247,6 @@ val interp_boolean : contains_zero:bool -> contains_non_zero:bool -> t
 (** Extract bits from [start] to [stop] from the given Ival, [start]
     and [stop] being included. [size]  is the size of the entire ival. *)
 val extract_bits: start:Integer.t -> stop:Integer.t -> size:Integer.t -> t -> t
-val create_all_values_modu: modu:Integer.t -> signed:bool -> size:int -> t
 val create_all_values: signed:bool -> size:int -> t
 
 (** [all_values ~size v] returns true iff v contains all integer values
