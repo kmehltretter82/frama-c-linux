@@ -77,5 +77,9 @@ int main() {
     char *v = getenv("MUTABLE");
     if (v[8] != 'n') return 1; // possible only if imprecise
   }*/
+
+  char tempFilename[] = "blaXXXXXX";
+  int r = mkstemp(tempFilename);
+
   return 0;
 }

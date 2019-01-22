@@ -502,15 +502,24 @@ extern char *strdup (const char *s);
 extern char *strndup (const char *s, size_t n);
 
 // More POSIX, non-C99 functions
-#ifdef _POSIX_C_SOURCE
 extern char *stpncpy(char *restrict dest, const char *restrict src, size_t n);
 //extern int strcoll_l(const char *s1, const char *s2, locale_t locale);
 //extern char *strerror_l(int errnum, locale_t locale);
 extern int strerror_r(int errnum, char *strerrbuf, size_t buflen);
-extern char *strsignal(int sig);
+
+extern char __fc_strsignal[64];
+char * const __fc_p_strsignal = __fc_strsignal;
+
+/*@ //missing: requires valid_signal(signum);
+  @ assigns \result \from __fc_p_strsignal, indirect:signum;
+  @ ensures result_internal_str: \result == __fc_p_strsignal;
+  @ ensures result_nul_terminated: \result[63] == 0;
+  @ ensures result_valid_string: valid_read_string(\result);
+  @*/
+extern char *strsignal(int signum);
+
 //extern size_t strxfrm_l(char *restrict s1, const char *restrict s2, size_t n,
 //                        locale_t locale);
-#endif
 
 __END_DECLS
 

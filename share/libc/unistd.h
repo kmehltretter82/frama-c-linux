@@ -900,7 +900,15 @@ extern char        *getlogin(void);
 extern int          getlogin_r(char *, size_t);
 extern int          getpagesize(void);
 extern char        *getpass(const char *);
-extern pid_t        getpgid(pid_t);
+
+/*@ //missing: assigns \result \from 'process PGID'
+  assigns \result \from indirect:pid;
+*/
+extern pid_t        getpgid(pid_t pid);
+
+/*@ //missing: assigns \result \from 'calling process PGID'
+  assigns \result \from \nothing;
+*/
 extern pid_t        getpgrp(void);
 
 /*@ //missing: assigns \result \from 'process id'
@@ -998,7 +1006,13 @@ extern int seteuid(uid_t uid);
 */
 extern int          setgid(gid_t gid);
 
-extern int          setpgid(pid_t, pid_t);
+/*@ // missing: may assign to errno
+  // missing: assigns \result \from 'processes'
+  assigns \result \from indirect:pid, indirect:pgid;
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+*/
+extern int          setpgid(pid_t pid, pid_t pgid);
+
 extern pid_t        setpgrp(void);
 
 /*@ // missing: may assign errno to EINVAL, EPERM or EAGAIN
@@ -1063,20 +1077,22 @@ extern char        *ttyname(int fildes);
 
 extern int          ttyname_r(int, char *, size_t);
 extern useconds_t   ualarm(useconds_t, useconds_t);
-extern int          unlink(const char *);
 
-// usleep is not POSIX anymore since 200809
-#if (_XOPEN_SOURCE >= 500) && ! (_POSIX_C_SOURCE >= 200809L) \
-  || /* Glibc since 2.19: */ defined _DEFAULT_SOURCE \
-  || /* Glibc versions <= 2.19: */ defined _BSD_SOURCE
+/*@ // missing: may assign errno
+  // missing: assigns 'filesystem' \from path[0..];
+  // missing: assigns \result \from 'filesystem';
+  requires valid_string_path: valid_read_string(path);
+  assigns \result \from path[0..];
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+ */
+extern int          unlink(const char *path);
+
 /*@
   assigns \result \from indirect:usec, indirect:Frama_C_entropy_source;
   assigns Frama_C_entropy_source \from Frama_C_entropy_source;
   ensures result_ok_or_error: \result == 0 || \result == -1;
  */
 extern int          usleep(useconds_t usec);
-
-#endif
 
 extern pid_t        vfork(void);
 

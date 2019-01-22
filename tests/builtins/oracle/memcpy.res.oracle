@@ -400,6 +400,8 @@
   __fc_strtok_ptr ∈ {0}
   __fc_strerror[0..63] ∈ [--..--]
   __fc_p_strerror ∈ {{ &__fc_strerror[0] }}
+  __fc_strsignal[0..63] ∈ [--..--]
+  __fc_p_strsignal ∈ {{ &__fc_strsignal[0] }}
   i ∈ [--..--]
   src[0..19] ∈ {0}
   dst1[0..19] ∈ {0}
@@ -1719,6 +1721,23 @@
             Unverifiable but considered Valid.
 
 --------------------------------------------------------------------------------
+--- Properties of Function 'strsignal'
+--------------------------------------------------------------------------------
+
+[ Extern  ] Post-condition 'result_internal_str'
+            Unverifiable but considered Valid.
+[ Extern  ] Post-condition 'result_nul_terminated'
+            Unverifiable but considered Valid.
+[ Extern  ] Post-condition 'result_valid_string'
+            Unverifiable but considered Valid.
+[ Extern  ] Assigns nothing
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file share/libc/string.h, line 514)
+            Unverifiable but considered Valid.
+[  Valid  ] Default behavior
+            by Frama-C kernel.
+
+--------------------------------------------------------------------------------
 --- Properties of Function 'bzero'
 --------------------------------------------------------------------------------
 
@@ -2166,9 +2185,9 @@
 --------------------------------------------------------------------------------
 --- Status Report Summary
 --------------------------------------------------------------------------------
-   158 Completely validated
-   225 Considered valid
+   159 Completely validated
+   230 Considered valid
     29 To be validated
      4 Alarms emitted
-   416 Total
+   422 Total
 --------------------------------------------------------------------------------

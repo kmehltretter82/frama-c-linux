@@ -232,6 +232,12 @@
   function bsearch: precondition 'valid_function_compar' got status valid.
 [eva] Done for function bsearch
 [eva:alarm] tests/libc/stdlib_h.c:68: Warning: assertion got status unknown.
+[eva] computing for function mkstemp <- main.
+  Called from tests/libc/stdlib_h.c:82.
+[eva] using specification for function mkstemp
+[eva] tests/libc/stdlib_h.c:82: 
+  function mkstemp: precondition 'valid_template' got status valid.
+[eva] Done for function mkstemp
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -261,4 +267,6 @@
     [3] ∈ {20}
   key ∈ {-1}
   p ∈ {{ &ai[1] }}
+  tempFilename[0..9] ∈ [--..--]
+  r ∈ [-1..19]
   __retres ∈ {0}

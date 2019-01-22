@@ -47,6 +47,8 @@
   __fc_strtok_ptr ∈ {0}
   __fc_strerror[0..63] ∈ [--..--]
   __fc_p_strerror ∈ {{ &__fc_strerror[0] }}
+  __fc_strsignal[0..63] ∈ [--..--]
+  __fc_p_strsignal ∈ {{ &__fc_strsignal[0] }}
   t1[0] ∈ {97}
     [1] ∈ {98}
     [2] ∈ {99}

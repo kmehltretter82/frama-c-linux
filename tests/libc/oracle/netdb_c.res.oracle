@@ -33,6 +33,7 @@
   \return(strncat) == 0 (auto)
   \return(strdup) == 0 (auto)
   \return(strndup) == 0 (auto)
+  \return(strsignal) == 0 (auto)
   \return(bind) == 0 (auto)
   \return(socket) == -1 (auto)
   \return(signal) == 0 (auto)

@@ -593,7 +593,6 @@ extern size_t wcstombs(char * restrict s,
      const wchar_t * restrict pwcs,
      size_t n);
 
-
 // Note: this specification should ideally use a more specific predicate,
 //       such as 'is_allocable_aligned(alignment, size)'.
 /*@
@@ -621,6 +620,17 @@ extern size_t wcstombs(char * restrict s,
   disjoint behaviors;
  */
 extern int posix_memalign(void **memptr, size_t alignment, size_t size);
+
+/*@
+  // missing: requires 'last 6 characters of template must be XXXXXX'
+  // missing: assigns \result, template[0..] \from 'filesystem', 'RNG';
+  requires valid_template: valid_string(template);
+  assigns template[0..] \from \nothing;
+  assigns \result \from \nothing;
+  ensures result_error_or_valid_fd: \result == -1 ||
+                                    0 <= \result < __FC_FOPEN_MAX;
+ */
+extern int mkstemp(char *template);
 
 __END_DECLS
 
