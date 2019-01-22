@@ -44,13 +44,6 @@ let get_small_cardinal () = !small_cardinal
 let emitter = Lattice_messages.register "Ival"
 let log_imprecision s = Lattice_messages.emit_imprecision emitter s
 
-module Widen_Arithmetic_Value_Set = struct
-  include Datatype.Integer.Set
-
-  let default_widen_hints =
-    of_list (List.map Int.of_int [-1;0;1])
-end
-
 module O = FCSet.Make(Integer)
 
 type t =
@@ -63,7 +56,7 @@ type t =
      correct representation of [0.] *)
 
 
-module Widen_Hints = Widen_Arithmetic_Value_Set
+module Widen_Hints = Datatype.Integer.Set
 type size_widen_hint = Integer.t
 type numerical_widen_hint = Widen_Hints.t * Fc_float.Widen_Hints.t
 type widen_hint = size_widen_hint * numerical_widen_hint

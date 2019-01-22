@@ -39,15 +39,7 @@ type t
     and exact operations.
 *)
 
-
-
-module Widen_Hints : sig
-  include FCSet.S with type elt = Integer.t
-  include Datatype.S with type t:=t
-
-  val default_widen_hints: t
-end
-
+module Widen_Hints = Datatype.Integer.Set
 type size_widen_hint = Integer.t
 type numerical_widen_hint = Widen_Hints.t * Fc_float.Widen_Hints.t
 
