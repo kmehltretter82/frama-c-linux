@@ -816,6 +816,7 @@ PLUGIN_DIR:=src/plugins/value
 PLUGIN_EXTRA_DIRS:=engine values domains domains/cvalue domains/apron \
 	domains/gauges domains/equality legacy slevel utils gui_files \
 	values/numerors domains/numerors domains/traces
+PLUGIN_TESTS_DIRS+=value/traces
 
 # Files for the binding to Apron domains. Only available if Apron is available.
 ifeq ($(HAS_APRON),yes)
