@@ -97,6 +97,31 @@ end
 module Shape(Key: Id_Datatype) = struct
   type 'b t = (Key.t, 'b) tree
 
+  let compare_v cmp t1 t2 =
+    match t1, t2 with
+    | Empty, Empty -> 0
+    | Empty, _ -> -1
+    | _, Empty -> 1
+    | Leaf (k1,x1,_), Leaf (k2,x2,_) ->
+      let c = Key.compare k1 k2 in
+      if c <> 0 then c else cmp x1 x2
+    | Leaf _, Branch _ -> -1
+    | Branch _, Leaf _ -> 1
+    | Branch (_p1,_m1,_l1,_r1,t1), Branch (_p2,_m2,_l2,_r2,t2) ->
+      let t1 = Tag_comp.get_tag t1 in
+      let t2 = Tag_comp.get_tag t2 in
+      Datatype.Int.compare t1 t2
+      (* Taken and adapted from JCF code for the implementation
+         without tag *)
+      (*let c = Datatype.Int.compare p1 p2 in
+        if c <> 0 then c else
+        let c = Big_endian.compare m1 m2 in
+        if c <> 0 then c else
+        let c = compare l1 l2 in
+        if c <> 0 then c else
+        compare r1 r2
+      *)
+
   let compare =
       if Key.compare == Datatype.undefined
       then (
@@ -106,32 +131,7 @@ module Shape(Key: Id_Datatype) = struct
             (Key.compare == Datatype.undefined);
           Datatype.undefined
         )
-      else
-	let compare cmp t1 t2 =
-	  match t1, t2 with
-          | Empty, Empty -> 0
-          | Empty, _ -> -1
-          | _, Empty -> 1
-          | Leaf (k1,x1,_), Leaf (k2,x2,_) ->
-	      let c = Key.compare k1 k2 in
-	      if c <> 0 then c else cmp x1 x2
-          | Leaf _, Branch _ -> -1
-          | Branch _, Leaf _ -> 1
-          | Branch (_p1,_m1,_l1,_r1,t1), Branch (_p2,_m2,_l2,_r2,t2) ->
-	      let t1 = Tag_comp.get_tag t1 in
-	      let t2 = Tag_comp.get_tag t2 in
-              Datatype.Int.compare t1 t2
-		(* Taken and adapted from JCF code for the implementation
-                   without tag *)
-		(*let c = Datatype.Int.compare p1 p2 in
-	          if c <> 0 then c else
-	          let c = Big_endian.compare m1 m2 in
-	          if c <> 0 then c else
-                  let c = compare l1 l2 in
-                  if c <> 0 then c else
-                  compare r1 r2
-		*)
-	in compare
+      else compare_v
 
   let rec iter f htr =
     match htr with
@@ -209,32 +209,7 @@ struct
             (V.compare == Datatype.undefined);
           Datatype.undefined
         )
-      else 
-	let compare t1 t2 = 
-	  match t1, t2 with
-          | Empty, Empty -> 0
-          | Empty, _ -> -1
-          | _, Empty -> 1
-          | Leaf (k1,x1,_), Leaf (k2,x2,_) ->
-	      let c = Key.compare k1 k2 in 
-	      if c <> 0 then c else V.compare x1 x2
-          | Leaf _, Branch _ -> -1
-          | Branch _, Leaf _ -> 1
-          | Branch (_p1,_m1,_l1,_r1,t1), Branch (_p2,_m2,_l2,_r2,t2) ->
-	      let t1 = Tag_comp.get_tag t1 in
-	      let t2 = Tag_comp.get_tag t2 in
-              Datatype.Int.compare t1 t2
-		(* Taken and adapted from JCF code for the implementation
-                   without tag *)
-		(*let c = Datatype.Int.compare p1 p2 in
-	          if c <> 0 then c else
-	          let c = Big_endian.compare m1 m2 in
-	          if c <> 0 then c else
-                  let c = compare l1 l2 in
-                  if c <> 0 then c else
-                  compare r1 r2
-		*)
-	in compare
+      else Shape.compare_v V.compare
 
     let compositional_bool t = 
       match t with
