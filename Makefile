@@ -958,6 +958,11 @@ PLUGIN_CMO:= options generator rte visit register
 PLUGIN_DISTRIBUTED:=yes
 PLUGIN_INTERNAL_TEST:=yes
 PLUGIN_TESTS_DIRS:=rte rte_manual
+PLUGIN_TESTS_LIB:=\
+  tests/rte/my_annotation/my_annotation.ml \
+  tests/rte/rte_api/rte_get_annot.ml \
+  tests/rte/compute_annot/compute_annot.ml \
+  tests/rte/my_annot_proxy/my_annot_proxy.ml
 $(eval $(call include_generic_plugin_Makefile,$(PLUGIN_NAME)))
 
 #################
@@ -1406,17 +1411,18 @@ acsl_tests: byte
 	$(PRINT_EXEC) acsl_tests
 	find doc/speclang -name \*.c -exec ./bin/toplevel.byte$(EXE) {} \; > /dev/null
 
-LONELY_TESTS_ML_FILES=$(wildcard $(TEST_DIRS_AS_PLUGIN:%=tests/%/*.ml))
-LONELY_TESTS_BYTE_FILES=$(LONELY_TESTS_ML_FILES:%.ml=%.cmo)
-LONELY_TESTS_OPT_FILES=$(LONELY_TESTS_ML_FILES:%.ml=%.cmx)
-LONELY_TESTS_DYN_FILES=$(LONELY_TESTS_ML_FILES:%.ml=%.cmxs)
-$(LONELY_TESTS_BYTE_FILES): BFLAGS+=$(TEST_DIRS_AS_PLUGIN:%=-I tests/%)
-$(LONELY_TESTS_OPT_FILES): OFLAGS+=$(TEST_DIRS_AS_PLUGIN:%=-I tests/%)
-$(LONELY_TESTS_DYN_FILES): OFLAGS+=$(TEST_DIRS_AS_PLUGIN:%=-I tests/%)
-.PRECIOUS: $(LONELY_TESTS_OPT_FILES) \
-           $(LONELY_TESTS_DYN_FILES) \
-           $(LONELY_TESTS_BYTE_FILES) \
-           $(LONELY_TESTS_BYTE_FILES:%.cmo=%.cmi)
+LONELY_TESTS_ML_FILES:=\
+  $(shell find $(TEST_DIRS_AS_PLUGIN:%=tests/%) -name '*.ml')
+$(foreach file,$(LONELY_TESTS_ML_FILES),\
+  $(eval $(file:%.ml=%.cmo): BFLAGS+=-I $(dir $(file))))
+$(foreach file,$(LONELY_TESTS_ML_FILES),\
+  $(eval $(file:%.ml=%.cmx): OFLAGS+=-I $(dir $(file))))
+$(foreach file,$(LONELY_TESTS_ML_FILES),\
+  $(eval $(file:%.ml=%.cmxs): OFLAGS+=-I $(dir $(file))))
+.PRECIOUS: $(LONELY_TESTS_ML_FILES:%.ml=%.cmx) \
+           $(LONELY_TESTS_DYN_FILES:%.ml=%.cmxs) \
+           $(LONELY_TESTS_BYTE_FILES:%.ml=%.cmo) \
+           $(LONELY_TESTS_BYTE_FILES:%.ml=%.cmi)
 
 bin/ocamldep_transitive_closure: devel_tools/ocamldep_transitive_closure.ml
 	$(OCAMLOPT) -package ocamlgraph -package str -linkpkg -o $@ $<

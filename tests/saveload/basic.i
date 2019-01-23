@@ -6,8 +6,9 @@
    CMD: @frama-c@ -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs
    OPT: -load ./tests/saveload/result/basic.1.sav -eva -out -input -deps -journal-disable -print
    OPT: -load ./tests/saveload/result/basic.1.sav -eva -out -input -deps -journal-disable
-   EXECNOW: LOG status_sav.res LOG status_sav.err BIN status.sav @frama-c@ -load-script tests/saveload/status.ml -save ./tests/saveload/result/status.sav @PTEST_DIR@/@PTEST_NAME@.i > ./tests/saveload/result/status_sav.res 2> ./tests/saveload/result/status_sav.err
-   OPT: -load-script tests/saveload/status.ml -load ./tests/saveload/result/status.sav
+   EXECNOW: make -s @PTEST_DIR@/status.cmxs
+   EXECNOW: LOG status_sav.res LOG status_sav.err BIN status.sav @frama-c@ -load-module @PTEST_DIR@/status -save ./tests/saveload/result/status.sav @PTEST_DIR@/@PTEST_NAME@.i > ./tests/saveload/result/status_sav.res 2> ./tests/saveload/result/status_sav.err
+   OPT: -load-module @PTEST_DIR@/status -load ./tests/saveload/result/status.sav
    OPT: -load ./tests/saveload/result/status.sav
 */
 
