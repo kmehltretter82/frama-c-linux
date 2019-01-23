@@ -699,7 +699,7 @@ module FunctionWise = struct
       let module Computer = Computer(Fenv)(struct
         let _version = "functionwise"
         let _kf = kf
-        let stmt_state = Db.Value.get_stmt_state
+        let stmt_state s = Db.Value.get_stmt_state s
         let at_call stmt kf = get_external_aux ~stmt kf
       end) in
       Stack.iter

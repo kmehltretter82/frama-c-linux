@@ -316,6 +316,13 @@ module Value = struct
         let size = size
         let dependencies = [ Table_By_Callstack.self ]
        end)
+  module AfterTable =
+    Cil_state_builder.Stmt_hashtbl(Cvalue.Model)
+      (struct
+        let name = "Db.Value.AfterTable"
+        let size = size
+        let dependencies = [ AfterTable_By_Callstack.self ]
+      end)
 
 
   let self = Table_By_Callstack.self
@@ -519,13 +526,21 @@ module Value = struct
 
   let add_formals_to_state = mk_fun "add_formals_to_state"
 
-  let noassert_get_stmt_state s =
+  let noassert_get_stmt_state ~after s =
     if !no_results (Kernel_function.(get_definition (find_englobing_kf s)))
     then Cvalue.Model.top
     else
-      try Table.find s
+      let tbl : (module State_builder.Hashtbl with type key = Cil_types.stmt
+                                               and type data = Cvalue.Model.t) =
+        if after then (module AfterTable) else (module Table) in
+      let module Tbl = (val tbl) in
+      try Tbl.find s
       with Not_found ->
-        let ho = try Some (Table_By_Callstack.find s) with Not_found -> None in
+        let ho =
+          try
+            Some (if after then AfterTable_By_Callstack.find s else
+                    Table_By_Callstack.find s)
+          with Not_found -> None in
         let state =
           match ho with
           | None -> Cvalue.Model.bottom
@@ -534,21 +549,24 @@ module Value = struct
               Cvalue.Model.join acc state
             ) h Cvalue.Model.bottom
         in
-        Table.add s state;
+        Tbl.add s state;
         state
 
-  let noassert_get_state k =
+  let noassert_get_state ?(after=false) k =
     match k with
       | Kglobal -> globals_state ()
-      | Kstmt s -> noassert_get_stmt_state s
+      | Kstmt s ->
+        noassert_get_stmt_state ~after s
 
-  let get_stmt_state s =
+  let get_stmt_state ?(after=false) s =
+    (* [QB]: false was previous default. *)
     assert (is_computed ()); (* this assertion fails during value analysis *)
-    noassert_get_stmt_state s
+    noassert_get_stmt_state ~after s
 
-  let get_state k =
+  let get_state ?(after=false) k =
+    (* [QB]: false was previous default. *)
     assert (is_computed ()); (* this assertion fails during value analysis *)
-    noassert_get_state k
+    noassert_get_state ~after k
 
   let get_stmt_state_callstack ~after stmt =
     assert (is_computed ()); (* this assertion fails during value analysis *)

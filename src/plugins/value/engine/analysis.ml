@@ -28,8 +28,8 @@ module type Results = sig
   type value
   type location
 
-  val get_stmt_state : stmt -> state or_bottom
-  val get_kinstr_state: kinstr -> state or_bottom
+  val get_stmt_state : after:bool -> stmt -> state or_bottom
+  val get_kinstr_state: after:bool -> kinstr -> state or_bottom
   val get_stmt_state_by_callstack:
     after:bool -> stmt -> state Value_types.Callstack.Hashtbl.t or_top_or_bottom
   val get_initial_state_by_callstack:
@@ -67,15 +67,15 @@ module Make (Abstract: Abstractions.S) = struct
   include Abstract
   include Compute_functions.Make (Abstract)
 
-  let get_stmt_state stmt =
+  let get_stmt_state ~after stmt =
     let fundec = Kernel_function.(get_definition (find_englobing_kf stmt)) in
     if Mark_noresults.should_memorize_function fundec && Db.Value.is_computed ()
-    then Abstract.Dom.Store.get_stmt_state stmt
+    then Abstract.Dom.Store.get_stmt_state ~after stmt
     else `Value Abstract.Dom.top
 
-  let get_kinstr_state = function
+  let get_kinstr_state ~after = function
     | Kglobal -> Abstract.Dom.Store.get_global_state ()
-    | Kstmt stmt -> get_stmt_state stmt
+    | Kstmt stmt -> get_stmt_state ~after stmt
 
   let get_stmt_state_by_callstack =
     Abstract.Dom.Store.get_stmt_state_by_callstack

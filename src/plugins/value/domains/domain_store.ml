@@ -208,7 +208,7 @@ module Make (Domain: InputDomain) = struct
       try `Value (Called_Functions_By_Callstack.find kf)
       with Not_found -> `Bottom
 
-  let get_stmt_state ?(after=false) s =
+  let get_stmt_state ~after s =
     if not (Storage.get ())
     then `Value Domain.top
     else
