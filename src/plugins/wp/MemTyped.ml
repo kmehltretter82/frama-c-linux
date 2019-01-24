@@ -391,6 +391,8 @@ let configure () =
     Context.set Lang.pointer (fun _ -> t_addr) ;
     Context.set Cvalues.null (p_equal a_null) ;
   end
+let no_binder = { bind = fun _ f v -> f v }
+let configure_ia _ = no_binder
 
 type pointer = NoCast | Fits | Unsafe
 let pointer = Context.create "MemTyped.pointer"

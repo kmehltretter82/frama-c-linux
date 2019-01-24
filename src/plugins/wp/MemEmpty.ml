@@ -35,6 +35,8 @@ let configure () =
     Context.set Lang.pointer (fun _typ -> Logic.Int) ;
     Context.set Cvalues.null (p_equal e_zero) ;
   end
+let no_binder = { bind = fun _ f v -> f v }
+let configure_ia _ = no_binder
 
 let hypotheses () = []
 
