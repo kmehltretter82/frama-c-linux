@@ -1,6 +1,8 @@
-{ "wp:global": { "alt-ergo": { "total": 3, "valid": 3, "rank": 16 },
-                 "qed": { "total": 43, "valid": 43 },
-                 "wp:main": { "total": 46, "valid": 46, "rank": 16 } },
+{ "wp:global": { "alt-ergo": { "total": 4, "valid": 3, "unknown": 1,
+                               "rank": 16 },
+                 "qed": { "total": 47, "valid": 47 },
+                 "wp:main": { "total": 51, "valid": 50, "unknown": 1,
+                              "rank": 16 } },
   "wp:functions": { "call": { "specialization_f1_pre_at_call_stmt_3": 
                                 { "alt-ergo": { "total": 1, "valid": 1,
                                                 "rank": 16 },
@@ -104,7 +106,32 @@
                                                                  "valid": 24 },
                                                         "wp:main": { "total": 24,
                                                                     "valid": 24 } } },
-                    "no_call": { "specialization_unreachable_g_pre_at_no_call_stmt_27": 
+                    "missing_context": { "missing_context_stmt_calls_h1": 
+                                           { "alt-ergo": { "total": 1,
+                                                           "unknown": 1 },
+                                             "wp:main": { "total": 1,
+                                                          "unknown": 1 } },
+                                         "missing_context_assign": { "qed": 
+                                                                    { "total": 3,
+                                                                    "valid": 3 },
+                                                                    "wp:main": 
+                                                                    { "total": 3,
+                                                                    "valid": 3 } },
+                                         "missing_context_post": { "qed": 
+                                                                    { "total": 1,
+                                                                    "valid": 1 },
+                                                                   "wp:main": 
+                                                                    { "total": 1,
+                                                                    "valid": 1 } },
+                                         "wp:section": { "alt-ergo": 
+                                                           { "total": 1,
+                                                             "unknown": 1 },
+                                                         "qed": { "total": 4,
+                                                                  "valid": 4 },
+                                                         "wp:main": { "total": 5,
+                                                                    "valid": 4,
+                                                                    "unknown": 1 } } },
+                    "no_call": { "specialization_unreachable_g_pre_at_no_call_stmt_32": 
                                    { "qed": { "total": 1, "valid": 1 },
                                      "wp:main": { "total": 1, "valid": 1 } },
                                  "no_call_stmt_calls_unreachable_g": 

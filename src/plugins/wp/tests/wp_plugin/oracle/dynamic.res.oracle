@@ -7,8 +7,9 @@
 [wp] tests/wp_plugin/dynamic.i:65: Calls h1 h2
 [wp] tests/wp_plugin/dynamic.i:78: Calls (for bhv1) h1 h2 h0
 [wp] tests/wp_plugin/dynamic.i:78: Calls (for bhv0) h1 h2 h0
-[wp] tests/wp_plugin/dynamic.i:91: Calls unreachable_g
-[wp:calls] Dynamic call(s): 5.
+[wp] tests/wp_plugin/dynamic.i:87: Calls h1
+[wp] tests/wp_plugin/dynamic.i:100: Calls unreachable_g
+[wp:calls] Dynamic call(s): 6.
 [wp] Loading driver 'share/wp.driver'
 [wp] tests/wp_plugin/dynamic.i:78: Warning: 
   Missigns 'calls' clause dedicated to dynamic calls (see WP manual)
@@ -160,26 +161,58 @@ Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
+  Function missing_context
+------------------------------------------------------------
+
+Goal Calls h1 in 'missing_context' at instruction (file tests/wp_plugin/dynamic.i, line 87):
+Assume { (* Heap *) Have: region(p.base) <= 0. }
+Prove: global(G_h1_57) = p.
+
+------------------------------------------------------------
+
+Goal Post-condition (file tests/wp_plugin/dynamic.i, line 82) in 'missing_context':
+Tags: Call h1.
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_plugin/dynamic.i, line 83) in 'missing_context':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_plugin/dynamic.i, line 83) in 'missing_context' (1/2):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_plugin/dynamic.i, line 83) in 'missing_context' (2/2):
+Call Result at line 87
+Tags: Call h1.
+Prove: true.
+
+------------------------------------------------------------
+------------------------------------------------------------
   Function no_call
 ------------------------------------------------------------
 
-Goal Calls unreachable_g in 'no_call' at instruction (file tests/wp_plugin/dynamic.i, line 91):
+Goal Calls unreachable_g in 'no_call' at instruction (file tests/wp_plugin/dynamic.i, line 100):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_plugin/dynamic.i, line 85) in 'no_call' (1/2):
+Goal Post-condition (file tests/wp_plugin/dynamic.i, line 94) in 'no_call' (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_plugin/dynamic.i, line 85) in 'no_call' (2/2):
+Goal Post-condition (file tests/wp_plugin/dynamic.i, line 94) in 'no_call' (2/2):
 Tags: Call unreachable_g.
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_plugin/dynamic.i, line 82) in 'unreachable_g'' in 'no_call' at instruction (file tests/wp_plugin/dynamic.i, line 91)
+Goal Instance of 'Pre-condition (file tests/wp_plugin/dynamic.i, line 91) in 'unreachable_g'' in 'no_call' at instruction (file tests/wp_plugin/dynamic.i, line 100)
 :
 Tags: Call unreachable_g.
 Prove: true.
@@ -350,3 +383,6 @@ Prove: true.
 [wp] Warning: Memory model hypotheses for function 'some_behaviors':
   /*@ behavior typed: requires \separated(&X1,p); */
   int some_behaviors(int (*p)(void));
+[wp] Warning: Memory model hypotheses for function 'missing_context':
+  /*@ behavior typed: requires \separated(&X1,p); */
+  int missing_context(int (*p)(void));

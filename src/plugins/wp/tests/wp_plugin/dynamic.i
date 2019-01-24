@@ -6,10 +6,10 @@
    OPT: -wp-dynamic -wp
 */
 //-----------------------------------------------------------------------------
-/*@ 
+/*@
   requires -10<=x<=10;
-  ensures \result == x+1; 
-  assigns \nothing; 
+  ensures \result == x+1;
+  assigns \nothing;
 */
 int f1(int x);
 
@@ -22,7 +22,7 @@ typedef struct S {
 } ;
 
 /*@
-  requires (closure->f == &f1 && \abs(closure->param)<=5) || closure->f == &f2 ; 
+  requires (closure->f == &f1 && \abs(closure->param)<=5) || closure->f == &f2 ;
   ensures \abs(\result - closure->param) <= 1 ;
  */
 int call(struct S * closure) {
@@ -75,6 +75,15 @@ int behavior (int (*p)(void)) {
   @   ensures X1==\old(X1); */
 int some_behaviors (int (*p)(void)) {
   //@ for bhv1,bhv0: calls h1, h2, h0;
+  return (*p)();
+}
+
+/*@
+  ensures X1==1;
+  assigns X1 ;
+*/
+int missing_context (int (*p)(void)) {
+  //@ calls h1 ;
   return (*p)();
 }
 
