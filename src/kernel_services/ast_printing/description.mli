@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Describe items of Source and Properties. 
+(** Describe items of Source and Properties.
     @since Nitrogen-20111001 *)
 
 open Cil_types
@@ -36,7 +36,7 @@ val pp_idpred : bool -> Format.formatter -> identified_predicate -> unit
 
 val pp_region : bool -> Format.formatter -> from list -> unit
 (** prints message "nothing" or the "'<names>'" or the "(<location>)" of the
-    relation *) 
+    relation *)
 
 val pp_named: Format.formatter -> predicate -> unit
 (** prints the name of a named logic structure (if any), separated by ','. *)
