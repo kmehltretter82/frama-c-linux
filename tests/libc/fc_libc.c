@@ -4,7 +4,7 @@
    EXECNOW: make -s @PTEST_DIR@/check_parsing_individual_headers.cmxs
    OPT: -load-module @PTEST_DIR@/check_libc_naming_conventions -print -cpp-extra-args='-nostdinc -Ishare/libc' -metrics -metrics-libc -load-module @PTEST_DIR@/check_const -load-module metrics -eva @VALUECONFIG@ -then -lib-entry -no-print -metrics-no-libc
    OPT: -print -print-libc
-   OPT: -load-module @PTEST_DIR@/check_parsing_individual_headers.ml
+   OPT: -load-module @PTEST_DIR@/check_parsing_individual_headers
    CMD: ./tests/libc/check_full_libc.sh
    OPT:
 **/
