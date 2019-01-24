@@ -1906,6 +1906,8 @@ extern size_t mbstowcs(wchar_t * __restrict pwcs, char const * __restrict s,
 extern size_t wcstombs(char * __restrict s, wchar_t const * __restrict pwcs,
                        size_t n);
 
+int posix_memalign(void **memptr, size_t alignment, size_t size);
+
 int glob(char const *pattern, int flags,
          int (*errfunc)(char const *epath, int eerrno), glob_t *pglob)
 {
@@ -4341,6 +4343,59 @@ int unsetenv(char const *name)
     int tmp_1;
     tmp_1 = Frama_C_interval(0,4096 - 1);
     __fc_env[tmp_1] = (char *)0;
+  }
+  __retres = 0;
+  return_label: return __retres;
+}
+
+/*@ requires valid_memptr: \valid(memptr);
+    requires
+      alignment_is_a_suitable_power_of_two:
+        alignment ≥ sizeof(void *) ∧
+        ((unsigned int)alignment & ((unsigned int)alignment - 1)) ≡ 0;
+    assigns __fc_heap_status, \result;
+    assigns __fc_heap_status
+      \from (indirect: alignment), size, __fc_heap_status;
+    assigns \result
+      \from (indirect: alignment), (indirect: size),
+            (indirect: __fc_heap_status);
+    allocates *\old(memptr);
+    
+    behavior allocation:
+      assumes can_allocate: is_allocable(size);
+      ensures allocation: \fresh{Old, Here}(*\old(memptr),\old(size));
+      ensures result_zero: \result ≡ 0;
+      assigns __fc_heap_status, \result;
+      assigns __fc_heap_status
+        \from (indirect: alignment), size, __fc_heap_status;
+      assigns \result
+        \from (indirect: alignment), (indirect: size),
+              (indirect: __fc_heap_status);
+    
+    behavior no_allocation:
+      assumes cannot_allocate: ¬is_allocable(size);
+      ensures result_non_zero: \result < 0 ∨ \result > 0;
+      assigns \result;
+      assigns \result \from (indirect: alignment);
+      allocates \nothing;
+    
+    complete behaviors no_allocation, allocation;
+    disjoint behaviors no_allocation, allocation;
+ */
+int posix_memalign(void **memptr, size_t alignment, size_t size)
+{
+  int __retres;
+  /*@
+  assert
+  alignment_is_a_suitable_power_of_two:
+    alignment ≥ sizeof(void *) ∧
+    ((unsigned int)alignment & ((unsigned int)alignment - 1)) ≡ 0;
+   */
+  ;
+  *memptr = malloc(size);
+  if (! *memptr) {
+    __retres = 12;
+    goto return_label;
   }
   __retres = 0;
   return_label: return __retres;
