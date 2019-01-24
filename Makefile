@@ -839,7 +839,6 @@ NUMERORS_FILES:= \
 ifeq ($(HAS_MPFR),yes)
 PLUGIN_REQUIRES+= gmp
 PLUGIN_TESTS_DIRS+=value/numerors
-PLUGIN_TESTS_LIB=tests/float/fval_test.ml
 NUMERORS_CMO:= $(NUMERORS_FILES)
 src/plugins/value/domains/numerors/numerors_domain.ml: \
 		src/plugins/value/domains/numerors/numerors_domain.ok.ml \
@@ -924,6 +923,7 @@ PLUGIN_GUI_CMO:=$(VALUE_GUI_AUX) gui_files/gui_callstacks_manager \
 		gui_files/gui_red gui_files/register_gui
 
 PLUGIN_INTERNAL_TEST:= yes
+PLUGIN_TESTS_LIB=tests/float/fval_test.ml
 PLUGIN_DISTRIBUTED:=yes
 VALUE_TYPES:=$(addprefix src/plugins/value_types/,\
 		cilE cvalue precise_locs value_types widen_type)
