@@ -285,7 +285,9 @@ Assume {
   (* Initializer *)
   Init: forall i_1 : Z. ((5 <= i_1) -> ((i_1 <= 6) -> (t1_0[i_1] = 2))).
   (* Initializer *)
-  Init: forall i_1 : Z. ((6 <= i_1) -> ((i_1 <= 9) -> (t1_0[i_1] = 0))).
+  Init: forall i_1 : Z. ((4 <= i_1) -> ((i_1 <= 4) -> (t1_0[i_1] = 0))).
+  (* Initializer *)
+  Init: forall i_1 : Z. ((7 <= i_1) -> ((i_1 <= 9) -> (t1_0[i_1] = 0))).
 }
 Prove: t1_0[i] = 1.
 
@@ -300,7 +302,9 @@ Assume {
   (* Initializer *)
   Init: forall i : Z. ((5 <= i) -> ((i <= 6) -> (t1_0[i] = 2))).
   (* Initializer *)
-  Init: forall i : Z. ((6 <= i) -> ((i <= 9) -> (t1_0[i] = 0))).
+  Init: forall i : Z. ((4 <= i) -> ((i <= 4) -> (t1_0[i] = 0))).
+  (* Initializer *)
+  Init: forall i : Z. ((7 <= i) -> ((i <= 9) -> (t1_0[i] = 0))).
 }
 Prove: x = 0.
 
@@ -316,7 +320,9 @@ Assume {
   (* Initializer *)
   Init: forall i_1 : Z. ((5 <= i_1) -> ((i_1 <= 6) -> (t1_0[i_1] = 2))).
   (* Initializer *)
-  Init: forall i_1 : Z. ((6 <= i_1) -> ((i_1 <= 9) -> (t1_0[i_1] = 0))).
+  Init: forall i_1 : Z. ((4 <= i_1) -> ((i_1 <= 4) -> (t1_0[i_1] = 0))).
+  (* Initializer *)
+  Init: forall i_1 : Z. ((7 <= i_1) -> ((i_1 <= 9) -> (t1_0[i_1] = 0))).
 }
 Prove: t1_0[i] = 2.
 
@@ -332,7 +338,9 @@ Assume {
   (* Initializer *)
   Init: forall i_1 : Z. ((5 <= i_1) -> ((i_1 <= 6) -> (t1_0[i_1] = 2))).
   (* Initializer *)
-  Init: forall i_1 : Z. ((6 <= i_1) -> ((i_1 <= 9) -> (t1_0[i_1] = 0))).
+  Init: forall i_1 : Z. ((4 <= i_1) -> ((i_1 <= 4) -> (t1_0[i_1] = 0))).
+  (* Initializer *)
+  Init: forall i_1 : Z. ((7 <= i_1) -> ((i_1 <= 9) -> (t1_0[i_1] = 0))).
 }
 Prove: t1_0[i] = 0.
 

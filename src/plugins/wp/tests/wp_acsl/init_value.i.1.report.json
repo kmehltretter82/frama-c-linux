@@ -1,18 +1,17 @@
-{ "wp:global": { "alt-ergo": { "total": 8, "unknown": 8 },
-                 "qed": { "total": 1, "valid": 1 },
-                 "wp:main": { "total": 9, "valid": 1, "unknown": 8 } },
+{ "wp:global": { "alt-ergo": { "total": 9, "unknown": 9 },
+                 "wp:main": { "total": 9, "unknown": 9 } },
   "wp:functions": { "main_ko": { "main_ko_pre_qed_ko_indirect_init_union_t": 
                                    { "alt-ergo": { "total": 1, "unknown": 1 },
                                      "wp:main": { "total": 1, "unknown": 1 } },
                                  "main_ko_pre_qed_ko_indirect_init_union_b": 
                                    { "alt-ergo": { "total": 1, "unknown": 1 },
                                      "wp:main": { "total": 1, "unknown": 1 } },
-                                 "main_ko_pre_qed_ko_T1_6": { "qed": 
+                                 "main_ko_pre_qed_ko_T1_6": { "alt-ergo": 
                                                                 { "total": 1,
-                                                                  "valid": 1 },
+                                                                  "unknown": 1 },
                                                               "wp:main": 
                                                                 { "total": 1,
-                                                                  "valid": 1 } },
+                                                                  "unknown": 1 } },
                                  "main_ko_pre_qed_ko_Simple_Array_1": 
                                    { "alt-ergo": { "total": 1, "unknown": 1 },
                                      "wp:main": { "total": 1, "unknown": 1 } },
@@ -43,10 +42,7 @@
                                                                   "wp:main": 
                                                                     { "total": 1,
                                                                     "unknown": 1 } },
-                                 "wp:section": { "alt-ergo": { "total": 8,
-                                                               "unknown": 8 },
-                                                 "qed": { "total": 1,
-                                                          "valid": 1 },
+                                 "wp:section": { "alt-ergo": { "total": 9,
+                                                               "unknown": 9 },
                                                  "wp:main": { "total": 9,
-                                                              "valid": 1,
-                                                              "unknown": 8 } } } } }
+                                                              "unknown": 9 } } } } }

@@ -32,6 +32,7 @@ open Sigs
 open Lang
 open Lang.F
 
+module WpLog = Wp_parameters
 let constfold_ctyp = function
   | TArray (_,Some {enode = (Const CInt64 _) },_,_) as ct -> ct
   | TArray (ty,Some len,cache,attr) as ct -> begin
@@ -469,15 +470,11 @@ struct
     | CompoundInit ( ct , initl ) ->
         let ct = constfold_ctyp ct in
         let len = List.length initl in
-        let acc = (* unintialized field *)
+        let acc = (* updated acc with default init of structure *)
           match ct with
-          | TArray (ty,Some {enode = (Const CInt64 (size,_,_))},_,_)
-            when Integer.lt (Integer.of_int len) size  ->
-              init_range ~sigma lv ty (Integer.of_int len) size None :: acc
-
           | TComp (cp,_,_) when cp.cstruct &&
                                 len < (List.length cp.cfields) ->
-              (* struct with unintialized field *)
+              (* default init for unintialized field of a struct *)
               List.fold_left
                 (fun acc f ->
                    if List.exists
@@ -497,8 +494,15 @@ struct
           | _ -> acc
         in
         match ct with
-        | TArray (ty,_,_,_)
-          when Wp_parameters.InitWithForall.get () ->
+        | TArray (ty,len,_,_) ->
+            let len = (* number of required elements *)
+              match len with
+              | Some {enode = (Const CInt64 (size,_,_))} -> size
+              | Some len ->
+                  WpLog.fatal "Non-constant expression (%a) for an array size"
+                    Printer.pp_exp len
+              | _ ->  WpLog.fatal "Undefined array size"
+            in
             (* delayed: the last consecutive index have the same value
                and are not yet initialized.
                 (i0,pred,il) =def \forall x. x \in [il;i0] t[x] == pred
@@ -513,32 +517,48 @@ struct
                   let lv = Cil.addOffsetLval off lv in
                   init_value ~sigma lv ty (Some exp) :: acc
             in
-            let acc, delayed =
+            let add_missing_indexes acc i0 i1 =
+              if Integer.lt i1 i0 then acc
+              else
+                init_range ~sigma lv ty i0 i1 None :: acc
+            in
+            let pos, acc, delayed =
               List.fold_left
-                (fun (acc,delayed) (off,init) ->
+                (fun (pos,acc,delayed) (off,init) ->
                    let off = constfold_coffset off in
-                   match delayed, off, init with
-                   | None, Index({enode=Const (CInt64 (i0,_,_))}, NoOffset),
-                     SingleInit curr ->
-                       (acc,Some(off,curr,i0))
-                   | Some (i0,prev,ip), Index({enode=Const (CInt64 (i,_,_))}, NoOffset),
-                     SingleInit curr
-                     when ExpStructEq.equal prev curr
-                       && Integer.equal (Integer.pred ip) i ->
-                       (acc,Some(i0,prev,i))
-                   | _, _,_ ->
-                       let acc = make_quant acc delayed in
-                       begin match off, init with
-                         | Index({enode=Const (CInt64 (i0,_,_))}, NoOffset),
-                           SingleInit curr ->
-                             acc, Some (off,curr,i0)
-                         | _ ->
-                             let lv = Cil.addOffsetLval off lv in
-                             init_variable ~sigma lv init acc, None
-                       end)
-                (acc,None)
-                (List.rev initl) in
-            (make_quant acc delayed)
+                   let idx = match off with
+                     | Index({enode=Const (CInt64 (idx,_,_))}, _) ->
+                         if Integer.lt pos idx then
+                           WpLog.fatal "Unordered initializer";
+                         idx
+                     | Index(idx, _) ->
+                         WpLog.fatal "Non-constant index (%a) into an initializer"
+                           Printer.pp_exp idx
+                     | _ ->  WpLog.fatal "Kernel invariant broken into an initializer"
+                   in
+            let acc = add_missing_indexes acc (Integer.succ idx) pos in
+                   match off, init with
+                   | Index(_,NoOffset), SingleInit curr -> begin
+                       match delayed with
+                       | None -> idx,acc,Some(off,curr,idx)
+                       | Some (i0,prev,ip)
+                         when Wp_parameters.InitWithForall.get ()
+                           && Integer.equal (Integer.pred ip) idx
+                           && ExpStructEq.equal prev curr ->
+                           idx,acc,Some(i0,prev,idx)
+                       | _ ->
+                           let acc = make_quant acc delayed in
+                           idx, acc, Some (off,curr,idx)
+                     end
+                   | _ ->
+                       let lv = Cil.addOffsetLval off lv in
+                       idx, (init_variable ~sigma lv init acc), None
+                )
+                (len,acc,None)
+                (List.rev initl)
+            in
+            let acc = make_quant acc delayed in
+            add_missing_indexes acc Integer.zero pos
         | _ ->
             List.fold_left
               (fun acc (off,init) ->

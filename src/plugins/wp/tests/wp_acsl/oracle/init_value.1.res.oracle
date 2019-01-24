@@ -132,7 +132,9 @@ Assume {
   (* Initializer *)
   Init: forall i : Z. ((5 <= i) -> ((i <= 6) -> (t1_0[i] = 2))).
   (* Initializer *)
-  Init: forall i : Z. ((6 <= i) -> ((i <= 9) -> (t1_0[i] = 0))).
+  Init: forall i : Z. ((4 <= i) -> ((i <= 4) -> (t1_0[i] = 0))).
+  (* Initializer *)
+  Init: forall i : Z. ((7 <= i) -> ((i <= 9) -> (t1_0[i] = 0))).
 }
 Prove: x = 0.
 
