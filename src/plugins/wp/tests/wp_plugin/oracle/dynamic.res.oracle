@@ -11,8 +11,7 @@
 [wp] tests/wp_plugin/dynamic.i:100: Calls unreachable_g
 [wp:calls] Dynamic call(s): 6.
 [wp] Loading driver 'share/wp.driver'
-[wp] tests/wp_plugin/dynamic.i:78: Warning: 
-  Missigns 'calls' clause dedicated to dynamic calls (see WP manual)
+[wp] tests/wp_plugin/dynamic.i:78: Warning: Missing 'calls' for default behavior
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function behavior with behavior bhv1
