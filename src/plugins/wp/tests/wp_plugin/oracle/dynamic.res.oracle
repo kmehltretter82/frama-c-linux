@@ -17,7 +17,7 @@
   Function behavior with behavior bhv1
 ------------------------------------------------------------
 
-Goal for bhv1 calls h1 h2 in 'behavior' at instruction (file tests/wp_plugin/dynamic.i, line 65):
+Goal Calls h1 h2 for bhv1 in 'behavior' at instruction (file tests/wp_plugin/dynamic.i, line 65):
 Prove: true.
 
 ------------------------------------------------------------
@@ -75,7 +75,7 @@ Prove: true.
   Function call
 ------------------------------------------------------------
 
-Goal calls f1 f2 in 'call' at instruction (file tests/wp_plugin/dynamic.i, line 30):
+Goal Calls f1 f2 in 'call' at instruction (file tests/wp_plugin/dynamic.i, line 30):
 Let a = Mptr_0[shiftfield_F1_S_f(closure_0)].
 Let a_1 = global(G_f2_26).
 Let a_2 = global(G_f1_20).
@@ -114,6 +114,7 @@ Assume {
   (* Pre-condition *)
   Have: abs_int(x) <= 5.
   (* Instance of 'f1' *)
+  (* Calls f1 f2 *)
   Have: Mptr_0[shiftfield_F1_S_f(closure_0)] = global(G_f1_20).
 }
 Prove: ((-10) <= x) /\ (x <= 10).
@@ -123,7 +124,7 @@ Prove: ((-10) <= x) /\ (x <= 10).
   Function guarded_call
 ------------------------------------------------------------
 
-Goal calls g in 'guarded_call' at instruction (file tests/wp_plugin/dynamic.i, line 44):
+Goal Calls g in 'guarded_call' at instruction (file tests/wp_plugin/dynamic.i, line 44):
 Prove: true.
 
 ------------------------------------------------------------
@@ -162,7 +163,7 @@ Prove: true.
   Function no_call
 ------------------------------------------------------------
 
-Goal calls unreachable_g in 'no_call' at instruction (file tests/wp_plugin/dynamic.i, line 91):
+Goal Calls unreachable_g in 'no_call' at instruction (file tests/wp_plugin/dynamic.i, line 91):
 Prove: true.
 
 ------------------------------------------------------------
@@ -188,7 +189,7 @@ Prove: true.
   Function some_behaviors with behavior bhv0
 ------------------------------------------------------------
 
-Goal for bhv0 calls h1 h2 h0 in 'some_behaviors' at instruction (file tests/wp_plugin/dynamic.i, line 78):
+Goal Calls h1 h2 h0 for bhv0 in 'some_behaviors' at instruction (file tests/wp_plugin/dynamic.i, line 78):
 Prove: true.
 
 ------------------------------------------------------------
@@ -273,7 +274,7 @@ Prove: true.
   Function some_behaviors with behavior bhv1
 ------------------------------------------------------------
 
-Goal for bhv1 calls h1 h2 h0 in 'some_behaviors' at instruction (file tests/wp_plugin/dynamic.i, line 78):
+Goal Calls h1 h2 h0 for bhv1 in 'some_behaviors' at instruction (file tests/wp_plugin/dynamic.i, line 78):
 Prove: true.
 
 ------------------------------------------------------------

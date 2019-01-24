@@ -6,7 +6,7 @@
   Missigns 'calls' clause dedicated to dynamic calls (see WP manual)
 [wp] Warning: Missing RTE guards
 [wp] 46 goals scheduled
-[wp] [Qed] Goal typed_behavior_stmt_for_bhv1_calls_h1_h2 : Valid
+[wp] [Qed] Goal typed_behavior_stmt_calls_h1_h2_for_bhv1 : Valid
 [wp] [Qed] Goal typed_behavior_bhv1_post_part1 : Valid
 [wp] [Qed] Goal typed_behavior_bhv1_post_part2 : Valid
 [wp] [Qed] Goal typed_behavior_bhv1_assign_exit_part1 : Valid
@@ -28,7 +28,7 @@
 [wp] [Qed] Goal typed_no_call_post_part1 : Valid
 [wp] [Qed] Goal typed_no_call_post_part2 : Valid
 [wp] [Qed] Goal typed_no_call_call_unreachable_g_pre : Valid
-[wp] [Qed] Goal typed_some_behaviors_stmt_for_bhv0_calls_h1_h2_h0 : Valid
+[wp] [Qed] Goal typed_some_behaviors_stmt_calls_h1_h2_h0_for_bhv0 : Valid
 [wp] [Qed] Goal typed_some_behaviors_bhv0_post_part1 : Valid
 [wp] [Qed] Goal typed_some_behaviors_bhv0_post_part2 : Valid
 [wp] [Qed] Goal typed_some_behaviors_bhv0_post_part3 : Valid
@@ -41,7 +41,7 @@
 [wp] [Qed] Goal typed_some_behaviors_bhv0_assign_normal_part4 : Valid
 [wp] [Qed] Goal typed_some_behaviors_bhv0_assign_normal_part5 : Valid
 [wp] [Qed] Goal typed_some_behaviors_bhv0_assign_normal_part6 : Valid
-[wp] [Qed] Goal typed_some_behaviors_stmt_for_bhv1_calls_h1_h2_h0 : Valid
+[wp] [Qed] Goal typed_some_behaviors_stmt_calls_h1_h2_h0_for_bhv1 : Valid
 [wp] [Qed] Goal typed_some_behaviors_bhv1_post_part1 : Valid
 [wp] [Qed] Goal typed_some_behaviors_bhv1_post_part2 : Valid
 [wp] [Qed] Goal typed_some_behaviors_bhv1_post_part3 : Valid

@@ -98,7 +98,7 @@ module CallPoints = State_builder.Hashtbl(Point.Hashtbl)(Calls)(CInfo)
 let property ~kf ?bhv ~stmt ~calls =
   let fact = match bhv with
     | None -> Format.asprintf "@[<hov 2>calls%a@]" pp_calls calls
-    | Some b -> Format.asprintf "@[<hov 2>for %s calls%a@]" b pp_calls calls
+    | Some b -> Format.asprintf "@[<hov 2>calls%a for %s@]" pp_calls calls b
   in
   Property.(ip_other fact (OLStmt (kf,stmt)))
 

@@ -55,7 +55,7 @@
                                                       "wp:main": { "total": 5,
                                                                    "valid": 5,
                                                                    "rank": 5 } } },
-                    "behavior": { "behavior_stmt_for_bhv1_calls_h1_h2": 
+                    "behavior": { "behavior_stmt_calls_h1_h2_for_bhv1": 
                                     { "qed": { "total": 1, "valid": 1 },
                                       "wp:main": { "total": 1, "valid": 1 } },
                                   "behavior_bhv1_assign": { "qed": { "total": 6,
@@ -72,11 +72,11 @@
                                                            "valid": 9 },
                                                   "wp:main": { "total": 9,
                                                                "valid": 9 } } },
-                    "some_behaviors": { "some_behaviors_stmt_for_bhv1_calls_h1_h2_h0": 
+                    "some_behaviors": { "some_behaviors_stmt_calls_h1_h2_h0_for_bhv1": 
                                           { "qed": { "total": 1, "valid": 1 },
                                             "wp:main": { "total": 1,
                                                          "valid": 1 } },
-                                        "some_behaviors_stmt_for_bhv0_calls_h1_h2_h0": 
+                                        "some_behaviors_stmt_calls_h1_h2_h0_for_bhv0": 
                                           { "qed": { "total": 1, "valid": 1 },
                                             "wp:main": { "total": 1,
                                                          "valid": 1 } },
