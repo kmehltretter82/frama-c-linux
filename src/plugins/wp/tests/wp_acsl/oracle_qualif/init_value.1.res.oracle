@@ -3,7 +3,7 @@
 [wp] Running WP plugin...
 [wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
-[wp] 7 goals scheduled
+[wp] 9 goals scheduled
 [wp] [Alt-Ergo] Goal typed_main_ko_pre_qed_ko_Sc_eq_ko : Unknown
 [wp] [Alt-Ergo] Goal typed_main_ko_pre_qed_ko_Sc_t : Unknown
 [wp] [Alt-Ergo] Goal typed_main_ko_pre_qed_ko_Sc_c_2 : Unknown
@@ -11,11 +11,13 @@
 [wp] [Alt-Ergo] Goal typed_main_ko_pre_qed_ko_With_Array_Struct_3 : Unknown
 [wp] [Alt-Ergo] Goal typed_main_ko_pre_qed_ko_Simple_Array_1 : Unknown
 [wp] [Qed] Goal typed_main_ko_pre_qed_ko_T1_6 : Valid
-[wp] Proved goals:    1 / 7
+[wp] [Alt-Ergo] Goal typed_main_ko_pre_qed_ko_indirect_init_union_b : Unknown
+[wp] [Alt-Ergo] Goal typed_main_ko_pre_qed_ko_indirect_init_union_t : Unknown
+[wp] Proved goals:    1 / 9
   Qed:             1 
-  Alt-Ergo:        0  (unknown: 6)
+  Alt-Ergo:        0  (unknown: 8)
 [wp] Report 'tests/wp_acsl/init_value.i.1.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
-main_ko              1     -                 7      14.3%
+main_ko              1     -                 9      11.1%
 -------------------------------------------------------------

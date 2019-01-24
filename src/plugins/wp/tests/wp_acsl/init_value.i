@@ -11,7 +11,7 @@
 /* --- GOAL: partial and complete initialization of value                 --- */
 /* -------------------------------------------------------------------------- */
 
-struct S { int a; int b;}; 
+struct S { int a; int b;};
 
 struct S s = {2};
 
@@ -33,7 +33,11 @@ struct Sc sq1 = {.b={2,2}};
 
 unsigned char tab[32];
 
-int u [];
+union U {
+  short t[4];
+  short a;
+  long long b;
+} u = {.a=-1 };
 
 /*@ requires qed_ok: Struct_Simple_a: s.a == 2 ;
     requires qed_ok: Struct_Simple_b: s.b == 0 ;
@@ -54,6 +58,7 @@ int u [];
     requires qed_ok: todo: t1[4] == 0;
     requires qed_ok: \forall integer i; 5 <  i <= 6 ==> t1[i] == 2;
     requires qed_ok: \forall integer i; 6 <  i <= 9 ==> t1[i] == 0;
+    requires qed_ok: direct_init_union: u.a == -1;
  */
 void main (int a){return;};
 
@@ -64,5 +69,7 @@ void main (int a){return;};
     requires qed_ko: With_Array_Struct_3 : st.tab[3] == 3 ; 
     requires qed_ko: Simple_Array_1 : t[1] == 1 ; 
     requires qed_ko: T1_6: t1[6] == 0;
+    requires qed_ko: indirect_init_union_b: u.b == 0;
+    requires qed_ko: indirect_init_union_t: u.t[0] == 0;
  */
 void main_ko (void){return;}

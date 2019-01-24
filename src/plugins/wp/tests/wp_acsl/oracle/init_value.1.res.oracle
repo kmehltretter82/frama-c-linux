@@ -137,3 +137,25 @@ Assume {
 Prove: x = 0.
 
 ------------------------------------------------------------
+
+Goal Pre-condition 'qed_ko,indirect_init_union_b' in 'main_ko':
+Let x = u.F4_U_b.
+Assume {
+  Type: is_sint64(x) /\ is_sint16((u.F4_U_t)[0]).
+  (* Initializer *)
+  Init: (u.F4_U_a) = (-1).
+}
+Prove: x = 0.
+
+------------------------------------------------------------
+
+Goal Pre-condition 'qed_ko,indirect_init_union_t' in 'main_ko':
+Let a = (u.F4_U_t)[0].
+Assume {
+  Type: is_sint64(u.F4_U_b) /\ is_sint16(a).
+  (* Initializer *)
+  Init: (u.F4_U_a) = (-1).
+}
+Prove: a = 0.
+
+------------------------------------------------------------

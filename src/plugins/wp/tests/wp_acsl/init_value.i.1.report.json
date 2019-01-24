@@ -1,7 +1,13 @@
-{ "wp:global": { "alt-ergo": { "total": 6, "unknown": 6 },
+{ "wp:global": { "alt-ergo": { "total": 8, "unknown": 8 },
                  "qed": { "total": 1, "valid": 1 },
-                 "wp:main": { "total": 7, "valid": 1, "unknown": 6 } },
-  "wp:functions": { "main_ko": { "main_ko_pre_qed_ko_T1_6": { "qed": 
+                 "wp:main": { "total": 9, "valid": 1, "unknown": 8 } },
+  "wp:functions": { "main_ko": { "main_ko_pre_qed_ko_indirect_init_union_t": 
+                                   { "alt-ergo": { "total": 1, "unknown": 1 },
+                                     "wp:main": { "total": 1, "unknown": 1 } },
+                                 "main_ko_pre_qed_ko_indirect_init_union_b": 
+                                   { "alt-ergo": { "total": 1, "unknown": 1 },
+                                     "wp:main": { "total": 1, "unknown": 1 } },
+                                 "main_ko_pre_qed_ko_T1_6": { "qed": 
                                                                 { "total": 1,
                                                                   "valid": 1 },
                                                               "wp:main": 
@@ -37,10 +43,10 @@
                                                                   "wp:main": 
                                                                     { "total": 1,
                                                                     "unknown": 1 } },
-                                 "wp:section": { "alt-ergo": { "total": 6,
-                                                               "unknown": 6 },
+                                 "wp:section": { "alt-ergo": { "total": 8,
+                                                               "unknown": 8 },
                                                  "qed": { "total": 1,
                                                           "valid": 1 },
-                                                 "wp:main": { "total": 7,
+                                                 "wp:main": { "total": 9,
                                                               "valid": 1,
-                                                              "unknown": 6 } } } } }
+                                                              "unknown": 8 } } } } }

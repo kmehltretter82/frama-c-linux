@@ -32,6 +32,25 @@ open Sigs
 open Lang
 open Lang.F
 
+let constfold_ctyp = function
+  | TArray (_,Some {enode = (Const CInt64 _) },_,_) as ct -> ct
+  | TArray (ty,Some len,cache,attr) as ct -> begin
+      match Cil.constFold true len with
+      | {enode = (Const CInt64 _) } as len ->
+          TArray(ty,Some len,cache,attr)
+      | _ -> ct
+    end
+  | ct -> ct
+
+let constfold_coffset = function
+  | Index({enode=Const (CInt64 _)}, _) as off -> off
+  | Index(idx, next) as off -> begin
+      match Cil.constFold true idx with
+      | {enode = (Const CInt64 _) } as idx -> Index(idx, next)
+      | _ -> off
+    end
+  | off -> off
+
 module Make(M : Sigs.Model) =
 struct
 
@@ -448,16 +467,17 @@ struct
         init_value ~sigma lv (Cil.typeOfLval lv) (Some exp) :: acc
 
     | CompoundInit ( ct , initl ) ->
-
+        let ct = constfold_ctyp ct in
         let len = List.length initl in
-        let acc =
+        let acc = (* unintialized field *)
           match ct with
           | TArray (ty,Some {enode = (Const CInt64 (size,_,_))},_,_)
             when Integer.lt (Integer.of_int len) size  ->
               init_range ~sigma lv ty (Integer.of_int len) size None :: acc
 
-          | TComp (cp,_,_) when len < (List.length cp.cfields) ->
-
+          | TComp (cp,_,_) when cp.cstruct &&
+                                len < (List.length cp.cfields) ->
+              (* struct with unintialized field *)
               List.fold_left
                 (fun acc f ->
                    if List.exists
@@ -496,6 +516,7 @@ struct
             let acc, delayed =
               List.fold_left
                 (fun (acc,delayed) (off,init) ->
+                   let off = constfold_coffset off in
                    match delayed, off, init with
                    | None, Index({enode=Const (CInt64 (i0,_,_))}, NoOffset),
                      SingleInit curr ->

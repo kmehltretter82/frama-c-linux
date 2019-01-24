@@ -337,3 +337,10 @@ Assume {
 Prove: t1_0[i] = 0.
 
 ------------------------------------------------------------
+
+Goal Pre-condition 'qed_ok,direct_init_union' in 'main':
+Let x = u.F4_U_a.
+Assume { Type: is_sint16(x). (* Initializer *) Init: x = (-1). }
+Prove: x = (-1).
+
+------------------------------------------------------------
