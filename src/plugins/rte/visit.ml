@@ -53,6 +53,7 @@ open Cil_datatype
 *)
 
 type to_annotate = {
+  remove_trivial: bool;
   initialized: bool;
   mem_access: bool;
   div_mod: bool;
@@ -70,6 +71,7 @@ type to_annotate = {
 }
 
 let annotate_all = {
+  remove_trivial = false;
   initialized = true;
   mem_access = true;
   div_mod = true;
@@ -89,6 +91,7 @@ let annotate_all = {
 (** Which annotations should be added, deduced from the options of RTE and
     the kernel itself. *)
 let annotate_from_options () = {
+  remove_trivial = Options.Trivial.get ();
   initialized = Options.DoInitialized.get ();
   mem_access = Options.DoMemAccess.get ();
   div_mod = Options.DoDivMod.get ();
@@ -182,10 +185,9 @@ class annot_visitor kf to_annot on_alarm = object (self)
       self#get_filling_actions
 
   method private generate_assertion: 'a. 'a Rte.alarm_gen -> 'a -> unit =
-    let remove_trivial = not (Options.Trivial.get ()) in
     fun fgen ->
       let on_alarm ?status a = on_alarm self#current_kinstr ?status a in
-      fgen ~remove_trivial ~on_alarm
+      fgen ~remove_trivial:to_annot.remove_trivial ~on_alarm
 
   method! vstmt s = match s.skind with
     | UnspecifiedSequence l ->
@@ -421,7 +423,6 @@ let rte_annotations stmt =
     (fun e a acc -> if Emitter.equal e Generator.emitter then a ::acc else acc)
     stmt
     []
-
 
 (** {2 List of all RTEs on a given Cil object} *)
 
