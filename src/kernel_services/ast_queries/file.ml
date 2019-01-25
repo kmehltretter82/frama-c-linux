@@ -477,7 +477,7 @@ let parse_cabs = function
       (* Hypothesis: the preprocessor is POSIX compliant,
          hence understands -I and -D. *)
       let include_args =
-        if Kernel.FramaCStdLib.get () then [Config.datadir ^ "/libc"]
+        if Kernel.FramaCStdLib.get () then [Config.framac_libc]
         else []
       in
       let define_args =
