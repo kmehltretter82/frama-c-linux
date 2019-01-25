@@ -471,7 +471,7 @@ struct
         let ct = constfold_ctyp ct in
         let acc = (* updated acc with default init of structure *)
           match ct with
-          | TComp (cp,_,_) when cp.cstruct &&
+          | TComp (cp,_,_) when cp.cstruct && (* not for union... *)
                                 (List.length initl) < (List.length cp.cfields) ->
               (* default init for unintialized field of a struct *)
               List.fold_left
@@ -500,23 +500,28 @@ struct
                   Some (size, None)
               | _ -> None
             in
-            (* delayed contents info about the last consecutive indices having
-               the same value, but that have not yet initialized. *)
             let make_quant acc = function
+              (* adds delayed initializations from info about 
+                 the last consecutive indices having
+                 the same value, but that have not yet initialized. *)
               | None -> acc  (* nothing was delayed *)
               | Some (_,None) -> acc (* nothing was delayed *)
               | Some (il,Some (i0,_,exp)) when Integer.lt il i0 ->
-                  (* \forall i \in [il .. i0] ; t[i]==exp *)
+                  (* Added pred: \forall i \in [il .. i0] ; t[i]==exp *)
                   let i2 = Integer.succ i0 in
                   init_range ~sigma lv ty il i2 (Some exp) :: acc
-              | Some (_il,Some (_i0,off,exp)) -> (* case _il=_i0 *)
+              | Some (_il,Some (_i0,off,exp)) ->
+                  (* case [_il=_i0], so uses [off] corresponding to [_i0]
+                     Added pred: t[i]==exp*)
                   let lv = Cil.addOffsetLval off lv in
                   init_value ~sigma lv ty (Some exp) :: acc
             in
             let add_missing_indices acc i0 = function
+              (* adds eventual default value for missing indices. *)
               | Some (i1, _) ->
                   if Integer.ge i0 i1 then (* no hole *) acc
-                  else (* defaults values *)
+                  else (* defaults values
+                          Added pred: \forall i \in [i0 .. i1[ ; t[i]==default *)
                     init_range ~sigma lv ty i0 i1 None :: acc
               | _ -> (* last bound is unknown. *) acc
             in
@@ -528,15 +533,16 @@ struct
                      | Index({enode=Const CInt64 (idx,_,_)}, _) ->
                          (match delayed with
                           | Some (iprev, _) when Integer.lt iprev idx ->
-                              (* an algo with a 2sd pass is required
-                                 for introducing default values *)
+                              (* otherwice, an algo with a 2sd pass is
+                                 required for introducing default values *)
                               WpLog.fatal "Unordered initializer";
                           | _ -> ()) ;
-                         Some (idx,None), (* adds eventual default values *)
+                         Some (idx,None),
+                         (* adds default values for missing indices *)
                          add_missing_indices acc (Integer.succ idx) delayed
                      | _ -> None,acc
                    in
-                   match idx, off, init with
+                   match idx, off, init with (* only simple init can be delayed *)
                    | Some (idx,_), Index(_, NoOffset), SingleInit init -> begin
                        match delayed with
                        | None -> acc,Some (idx,Some(idx,off,init))
@@ -545,11 +551,12 @@ struct
                            && Integer.equal (Integer.pred i_prev) idx
                            && ExpStructEq.equal init_delayed init ->
                            acc,Some (idx,delayed_info)
-                       | _ ->
+                       | _ -> (* flush the delayed init, and store the new one *)
                            let acc = make_quant acc delayed in
                            acc, Some (idx, Some (idx,off,init))
                      end
                    | _, Index(_, _),_ ->
+                       (* flush the delayed init, and adds the current one *)
                        let acc = make_quant acc delayed in
                        let lv = Cil.addOffsetLval off lv in
                        (init_variable ~sigma lv init acc), idx
