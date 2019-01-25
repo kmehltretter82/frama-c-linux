@@ -1,9 +1,9 @@
 /* run.config
-   OPT: -wp-no-let
+   OPT: -wp-init-const -wp-no-let
    OPT: -main main_ko -wp-no-let
 */
 /* run.config_qualif
-   OPT: -wp -wp-par 1 -wp-prop="-qed_ko"
+   OPT: -wp-init-const -wp -wp-par 1 -wp-prop="-qed_ko"
    OPT: -main main_ko -wp-par 1 -wp-prop qed_ko -wp-steps 50
 */
 
@@ -25,7 +25,7 @@ struct Sc {int a; int b[2+1]; int c;};
 
 struct Sc sc0 = {1,{2,3,4},5};
 struct Sc sc1 = {1,2,3,4,5};
-struct Sc sc2 = {1,{2,3},4}; 
+struct Sc sc2 = {1,{2,3},4};
 struct Sc sc3 = {1,2,3,4};
 
 struct Sc sq0 = {2,{2,2},2};
@@ -73,3 +73,28 @@ void main (int a){return;};
     requires qed_ko: indirect_init_union_t: u.t[0] == 0;
  */
 void main_ko (void){return;}
+
+const int ta1[5] = { [2]=1,[4]=1 };
+/*@ ensures qed_ok: ta1[0]==ta1[1] && ta1[1]==ta1[3];
+  @ ensures qed_ko: ta1[4]==0;
+  @ ensures qed_ko: ta1[3]==1; */
+void fa1(void) {return ;}
+
+const int ta2[5] = { [2 ... 3]=1 };
+/*@ ensures qed_ok: ta2[0]==ta2[1] && ta2[1]==ta2[4];
+  @ ensures qed_ko: ta2[4]==1;
+  @ ensures qed_ko: ta2[1]==1; */
+void fa2(void) {return ;}
+
+const int ta3[5] = { [1]=1, [3]=1};
+/*@ ensures qed_ok: ta3[0]==ta3[2] && ta1[2]==ta1[4];
+  @ ensures qed_ko: ta3[0]==1;
+  @ ensures qed_ko: ta3[2]==1;
+  @ ensures qed_ko: ta2[4]==1; */
+void fa3(void) {return ;}
+
+const struct { int a, b, c; } ts1[4] = { [2].a=1, [2].b=1 };
+/*@ ensures qed_ok: ts1[0]==ts1[1] && ts1[1]==ts1[3] && ts1[2].a ==ts1[2].b;
+  @ ensures qed_ko: ts1[2].c==1;
+  @ ensures qed_ko: ts1[0].a==1;*/
+void fs1(void) {return ;}

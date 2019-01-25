@@ -469,18 +469,17 @@ struct
 
     | CompoundInit ( ct , initl ) ->
         let ct = constfold_ctyp ct in
-        let len = List.length initl in
         let acc = (* updated acc with default init of structure *)
           match ct with
           | TComp (cp,_,_) when cp.cstruct &&
-                                len < (List.length cp.cfields) ->
+                                (List.length initl) < (List.length cp.cfields) ->
               (* default init for unintialized field of a struct *)
               List.fold_left
                 (fun acc f ->
                    if List.exists
                        (function
                          | Field(g,_),_ -> Fieldinfo.equal f g
-                         | _ -> false)
+                         | _ ->  WpLog.fatal "Kernel invariant broken into an initializer")
                        initl
                    then acc
                    else
@@ -495,70 +494,72 @@ struct
         in
         match ct with
         | TArray (ty,len,_,_) ->
-            let len = (* number of required elements *)
-              match len with
-              | Some {enode = (Const CInt64 (size,_,_))} -> size
-              | Some len ->
-                  WpLog.fatal "Non-constant expression (%a) for an array size"
-                    Printer.pp_exp len
-              | _ ->  WpLog.fatal "Undefined array size"
+            let delayed =
+              match len with (* number of required elements *)
+              | Some {enode = (Const CInt64 (size,_,_))} ->
+                  Some (size, None)
+              | _ -> None
             in
-            (* delayed: the last consecutive index have the same value
-               and are not yet initialized.
-                (i0,pred,il) =def \forall x. x \in [il;i0] t[x] == pred
-            *)
+            (* delayed contents info about the last consecutive indices having
+               the same value, but that have not yet initialized. *)
             let make_quant acc = function
-              | None -> acc
-              | Some (Index({enode=Const (CInt64 (i0,_,_))}, NoOffset),exp,il)
-                when Integer.lt il i0 ->
+              | None -> acc  (* nothing was delayed *)
+              | Some (_,None) -> acc (* nothing was delayed *)
+              | Some (il,Some (i0,_,exp)) when Integer.lt il i0 ->
+                  (* \forall i \in [il .. i0] ; t[i]==exp *)
                   let i2 = Integer.succ i0 in
                   init_range ~sigma lv ty il i2 (Some exp) :: acc
-              | Some (off,exp,_) ->
+              | Some (_il,Some (_i0,off,exp)) -> (* case _il=_i0 *)
                   let lv = Cil.addOffsetLval off lv in
                   init_value ~sigma lv ty (Some exp) :: acc
             in
-            let add_missing_indexes acc i0 i1 =
-              if Integer.lt i1 i0 then acc
-              else
-                init_range ~sigma lv ty i0 i1 None :: acc
+            let add_missing_indices acc i0 = function
+              | Some (i1, _) ->
+                  if Integer.ge i0 i1 then (* no hole *) acc
+                  else (* defaults values *)
+                    init_range ~sigma lv ty i0 i1 None :: acc
+              | _ -> (* last bound is unknown. *) acc
             in
-            let pos, acc, delayed =
+            let acc, delayed =
               List.fold_left
-                (fun (pos,acc,delayed) (off,init) ->
+                (fun (acc,delayed) (off,init) ->
                    let off = constfold_coffset off in
-                   let idx = match off with
-                     | Index({enode=Const (CInt64 (idx,_,_))}, _) ->
-                         if Integer.lt pos idx then
-                           WpLog.fatal "Unordered initializer";
-                         idx
-                     | Index(idx, _) ->
-                         WpLog.fatal "Non-constant index (%a) into an initializer"
-                           Printer.pp_exp idx
-                     | _ ->  WpLog.fatal "Kernel invariant broken into an initializer"
+                   let idx,acc = match off with
+                     | Index({enode=Const CInt64 (idx,_,_)}, _) ->
+                         (match delayed with
+                          | Some (iprev, _) when Integer.lt iprev idx ->
+                              (* an algo with a 2sd pass is required
+                                 for introducing default values *)
+                              WpLog.fatal "Unordered initializer";
+                          | _ -> ()) ;
+                         Some (idx,None), (* adds eventual default values *)
+                         add_missing_indices acc (Integer.succ idx) delayed
+                     | _ -> None,acc
                    in
-            let acc = add_missing_indexes acc (Integer.succ idx) pos in
-                   match off, init with
-                   | Index(_,NoOffset), SingleInit curr -> begin
+                   match idx, off, init with
+                   | Some (idx,_), Index(_, NoOffset), SingleInit init -> begin
                        match delayed with
-                       | None -> idx,acc,Some(off,curr,idx)
-                       | Some (i0,prev,ip)
+                       | None -> acc,Some (idx,Some(idx,off,init))
+                       | Some (i_prev,(Some (_,_,init_delayed) as delayed_info))
                          when Wp_parameters.InitWithForall.get ()
-                           && Integer.equal (Integer.pred ip) idx
-                           && ExpStructEq.equal prev curr ->
-                           idx,acc,Some(i0,prev,idx)
+                           && Integer.equal (Integer.pred i_prev) idx
+                           && ExpStructEq.equal init_delayed init ->
+                           acc,Some (idx,delayed_info)
                        | _ ->
                            let acc = make_quant acc delayed in
-                           idx, acc, Some (off,curr,idx)
+                           acc, Some (idx, Some (idx,off,init))
                      end
-                   | _ ->
+                   | _, Index(_, _),_ ->
+                       let acc = make_quant acc delayed in
                        let lv = Cil.addOffsetLval off lv in
-                       idx, (init_variable ~sigma lv init acc), None
+                       (init_variable ~sigma lv init acc), idx
+                   | _ ->  WpLog.fatal "Kernel invariant broken into an initializer"
                 )
-                (len,acc,None)
+                (acc,delayed)
                 (List.rev initl)
             in
             let acc = make_quant acc delayed in
-            add_missing_indexes acc Integer.zero pos
+            add_missing_indices acc Integer.zero delayed
         | _ ->
             List.fold_left
               (fun acc (off,init) ->

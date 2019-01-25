@@ -4,6 +4,142 @@
 [wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
+  Function fa1
+------------------------------------------------------------
+
+Goal Post-condition 'qed_ok' in 'fa1':
+Let x = ta1_0[0].
+Let x_1 = ta1_0[1].
+Let x_2 = ta1_0[3].
+Assume {
+  Type: is_sint32(x) /\ is_sint32(x_1) /\ is_sint32(x_2) /\
+      is_sint32(ta1_0[4]).
+}
+Prove: (x_1 = x) /\ (x_2 = x_1).
+
+------------------------------------------------------------
+
+Goal Post-condition 'qed_ko' in 'fa1':
+Let x = ta1_0[4].
+Assume {
+  Type: is_sint32(ta1_0[0]) /\ is_sint32(ta1_0[1]) /\ is_sint32(ta1_0[3]) /\
+      is_sint32(x).
+}
+Prove: x = 0.
+
+------------------------------------------------------------
+
+Goal Post-condition 'qed_ko' in 'fa1':
+Let x = ta1_0[3].
+Assume {
+  Type: is_sint32(ta1_0[0]) /\ is_sint32(ta1_0[1]) /\ is_sint32(x) /\
+      is_sint32(ta1_0[4]).
+}
+Prove: x = 1.
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function fa2
+------------------------------------------------------------
+
+Goal Post-condition 'qed_ok' in 'fa2':
+Let x = ta2_0[0].
+Let x_1 = ta2_0[1].
+Let x_2 = ta2_0[4].
+Assume { Type: is_sint32(x) /\ is_sint32(x_1) /\ is_sint32(x_2). }
+Prove: (x_1 = x) /\ (x_2 = x_1).
+
+------------------------------------------------------------
+
+Goal Post-condition 'qed_ko' in 'fa2':
+Let x = ta2_0[4].
+Assume { Type: is_sint32(ta2_0[0]) /\ is_sint32(ta2_0[1]) /\ is_sint32(x). }
+Prove: x = 1.
+
+------------------------------------------------------------
+
+Goal Post-condition 'qed_ko' in 'fa2':
+Let x = ta2_0[1].
+Assume { Type: is_sint32(ta2_0[0]) /\ is_sint32(x) /\ is_sint32(ta2_0[4]). }
+Prove: x = 1.
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function fa3
+------------------------------------------------------------
+
+Goal Post-condition 'qed_ok' in 'fa3':
+Let x = ta1_0[2].
+Let x_1 = ta1_0[4].
+Let x_2 = ta3_0[0].
+Let x_3 = ta3_0[2].
+Assume {
+  Type: is_sint32(x) /\ is_sint32(x_1) /\ is_sint32(x_2) /\ is_sint32(x_3).
+}
+Prove: (x_1 = x) /\ (x_3 = x_2).
+
+------------------------------------------------------------
+
+Goal Post-condition 'qed_ko' in 'fa3':
+Let x = ta3_0[0]. Assume { Type: is_sint32(x) /\ is_sint32(ta3_0[2]). }
+Prove: x = 1.
+
+------------------------------------------------------------
+
+Goal Post-condition 'qed_ko' in 'fa3':
+Let x = ta3_0[2]. Assume { Type: is_sint32(ta3_0[0]) /\ is_sint32(x). }
+Prove: x = 1.
+
+------------------------------------------------------------
+
+Goal Post-condition 'qed_ko' in 'fa3':
+Let x = ta2_0[4]. Assume { Type: is_sint32(x). }
+Prove: x = 1.
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function fs1
+------------------------------------------------------------
+
+Goal Post-condition 'qed_ok' in 'fs1':
+Let a = ts1_0[0].
+Let a_1 = ts1_0[1].
+Let a_2 = ts1_0[3].
+Let a_3 = ts1_0[2].
+Let x = a_3.F5_a.
+Let x_1 = a_3.F5_b.
+Assume {
+  Type: IsS5(a) /\ IsS5(a_1) /\ IsS5(a_2) /\ is_sint32(a.F5_a) /\
+      is_sint32(x) /\ is_sint32(x_1) /\ is_sint32(a_3.F5_c).
+}
+Prove: (x_1 = x) /\ EqS5(a, a_1) /\ EqS5(a_1, a_2).
+
+------------------------------------------------------------
+
+Goal Post-condition 'qed_ko' in 'fs1':
+Let a = ts1_0[0].
+Let a_1 = ts1_0[2].
+Let x = a_1.F5_c.
+Assume {
+  Type: IsS5(a) /\ IsS5(ts1_0[1]) /\ IsS5(ts1_0[3]) /\ is_sint32(a.F5_a) /\
+      is_sint32(a_1.F5_a) /\ is_sint32(a_1.F5_b) /\ is_sint32(x).
+}
+Prove: x = 1.
+
+------------------------------------------------------------
+
+Goal Post-condition 'qed_ko' in 'fs1':
+Let a = ts1_0[0].
+Let x = a.F5_a.
+Let a_1 = ts1_0[2].
+Assume {
+  Type: IsS5(a) /\ IsS5(ts1_0[1]) /\ IsS5(ts1_0[3]) /\ is_sint32(x) /\
+      is_sint32(a_1.F5_a) /\ is_sint32(a_1.F5_b) /\ is_sint32(a_1.F5_c).
+}
+Prove: x = 1.
+
+------------------------------------------------------------
+------------------------------------------------------------
   Function main_ko
 ------------------------------------------------------------
 
