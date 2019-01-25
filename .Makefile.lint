@@ -215,7 +215,6 @@ ML_LINT_KO+=src/libraries/utils/hptset.ml
 ML_LINT_KO+=src/libraries/utils/hptset.mli
 ML_LINT_KO+=src/libraries/utils/indexer.ml
 ML_LINT_KO+=src/libraries/utils/indexer.mli
-ML_LINT_KO+=src/libraries/utils/json.mli
 ML_LINT_KO+=src/libraries/utils/leftistheap.mli
 ML_LINT_KO+=src/libraries/utils/pretty_utils.ml
 ML_LINT_KO+=src/libraries/utils/pretty_utils.mli

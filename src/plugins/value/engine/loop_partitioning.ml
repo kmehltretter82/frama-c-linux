@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -522,7 +522,7 @@ struct
               let merge t1 t2 =
                 if not (is_empty_propagation_tree t2) then
                   Value_parameters.warning ~once:true ~current:true
-                    ~wkey:Value_parameters.wkey_loop_unrolling
+                    ~wkey:Value_parameters.wkey_loop_unroll
                     "loop not completely unrolled";
                 join_propagation_tree t1 t2
               in

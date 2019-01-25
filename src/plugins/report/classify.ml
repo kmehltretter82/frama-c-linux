@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -150,7 +150,7 @@ let get_queue env plugin =
 let add_rule jvalue =
   try
     match jvalue with
-    | Json.Assoc fields ->
+    | `Assoc fields ->
       let tgt , rule = List.fold_left rule_of_fields default fields in
       let properties p =
         if rule.r_plugin <> (snd default).r_plugin then
@@ -177,7 +177,7 @@ let configure file =
     R.feedback "Loading '%a'" Datatype.Filepath.pretty path;
     try
       match Json.load_file file with
-      | Json.Array values -> List.iter add_rule values
+      | `List values -> List.iter add_rule values
       | _ -> failwith "Array expected"
     with
     | Json.Error(file,line,msg) ->
@@ -230,7 +230,7 @@ let json_of_source = function
     ]
 
 let json_of_event e =
-  Json.Assoc
+  `Assoc
     begin [
       "classid" , Json.of_string e.e_id ;
       "action" , Json.of_string @@ string_of_action e.e_action ;
