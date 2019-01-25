@@ -374,7 +374,7 @@ ifeq ("$(DEVELOPMENT)","yes")
 all:: share/.gitignore
 endif
 
-clean::
+clean_share_link:
 	if test -f share/.gitignore; then \
 	  for link in $$(cat share/.gitignore); do \
 	    if test -L share$$link; then \
@@ -385,6 +385,8 @@ clean::
 	  done; \
 	  rm share/.gitignore; \
 	fi
+
+clean:: clean_share_link
 
 ##############
 # Ocamlgraph #
@@ -1221,6 +1223,16 @@ bin/toplevel.opt$(EXE): $(ALL_BATCH_CMX) $(GEN_OPT_LIBS) \
 	$(PRINT_LINKING) $@
 	$(OCAMLOPT) $(OLINKFLAGS) -o $@ $(OPT_LIBS) $(ALL_BATCH_CMX)
 
+LIB_KERNEL_CMO= $(filter-out src/kernel_internals/runtime/gui_init.cmo, $(CMO))
+LIB_KERNEL_CMX= $(filter-out src/kernel_internals/runtime/gui_init.cmx, $(CMX))
+
+lib/fc/frama-c.cma: $(LIB_KERNEL_CMO) $(GEN_OPT_LIBS) $(LIB_KERNEL_CMX) lib/fc/META.frama-c
+	$(PRINT_LINKING) $@ and lib/fc/frama-c.cmxa
+	$(MKDIR) $(FRAMAC_LIB)
+	$(OCAMLMKLIB) -o lib/fc/frama-c $(OPT_LIBS) $(LIB_KERNEL_CMO) $(LIB_KERNEL_CMX)
+
+lib/fc/frama-c.cmxa: lib/fc/frama-c.cma
+
 ####################
 # (Ocaml) Toplevel #
 ####################
@@ -1826,6 +1838,7 @@ install-lib: clean-install
 	$(PRINT_INSTALL) kernel API
 	$(MKDIR) $(FRAMAC_LIBDIR)
 	$(CP) $(LIB_BYTE_TO_INSTALL) $(LIB_OPT_TO_INSTALL) $(FRAMAC_LIBDIR)
+	$(CP) $(addprefix lib/fc/,dllframa-c.so libframa-c.a frama-c.cma frama-c.a frama-c.cmxa META.frama-c)  $(FRAMAC_LIBDIR)
 
 install-doc-code:
 	$(PRINT_INSTALL) API documentation
@@ -2398,15 +2411,15 @@ clean-distrib: dist-clean
 
 create_lib_to_install_list = $(addprefix $(FRAMAC_LIB)/,$(call map,notdir,$(1)))
 
-byte:: bin/toplevel.byte$(EXE) share/Makefile.dynamic_config \
+byte:: bin/toplevel.byte$(EXE) lib/fc/frama-c.cma share/Makefile.dynamic_config \
 	$(call create_lib_to_install_list,$(LIB_BYTE_TO_INSTALL)) \
-      $(PLUGIN_META_LIST)
+      $(PLUGIN_META_LIST) lib/fc/META.frama-c
 
-opt:: bin/toplevel.opt$(EXE) share/Makefile.dynamic_config \
+opt:: bin/toplevel.opt$(EXE) lib/fc/frama-c.cmxa share/Makefile.dynamic_config \
 	$(call create_lib_to_install_list,$(LIB_OPT_TO_INSTALL)) \
 	$(filter %.o %.cmi,\
 	   $(call create_lib_to_install_list,$(LIB_BYTE_TO_INSTALL))) \
-      $(PLUGIN_META_LIST)
+      $(PLUGIN_META_LIST) lib/fc/META.frama-c
 
 top: bin/toplevel.top$(EXE) \
 	$(call create_lib_to_install_list,$(LIB_BYTE_TO_INSTALL)) \
