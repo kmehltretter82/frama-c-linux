@@ -57,9 +57,12 @@
                                                       "wp:main": { "total": 5,
                                                                    "valid": 5,
                                                                    "rank": 5 } } },
-                    "behavior": { "behavior_stmt_calls_h1_h2_for_bhv1": 
-                                    { "qed": { "total": 1, "valid": 1 },
-                                      "wp:main": { "total": 1, "valid": 1 } },
+                    "behavior": { "behavior_stmt_calls_h1_h2": { "qed": 
+                                                                   { "total": 1,
+                                                                    "valid": 1 },
+                                                                 "wp:main": 
+                                                                   { "total": 1,
+                                                                    "valid": 1 } },
                                   "behavior_bhv1_assign": { "qed": { "total": 6,
                                                                     "valid": 6 },
                                                             "wp:main": 

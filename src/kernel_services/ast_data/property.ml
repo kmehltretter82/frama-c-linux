@@ -858,11 +858,15 @@ module Names = struct
       Format.asprintf  "%sextended%a" (extended_loc_prefix le) pp_names [name]
     | IPCodeAnnot (kf,_, ca) ->
         let name = match ca.annot_content with
-          | AAssert _ -> "assert" 
+          | AAssert _ -> "assert"
           | AInvariant (_,true,_) -> "loop_inv"
           | AInvariant _ -> "inv"
           | APragma _ -> "pragma"
-          | _ -> assert false
+          | AStmtSpec _ -> "contract"
+          | AAssigns _ -> "assigns"
+          | AVariant _ -> "variant"
+          | AAllocation _ -> "allocates"
+          | AExtended(_,_,(_,clause,_,_)) -> clause
         in Format.asprintf "%s%s%a" (kf_prefix kf) name pp_code_annot_names ca
     | IPComplete (kf, ki, a, lb) ->
         Format.asprintf  "%s%s%acomplete%a"
@@ -1125,7 +1129,7 @@ let ip_property_instance kf stmt ipred iprop =
 let ip_of_code_annot kf stmt ca =
   let ki = Kstmt stmt in
   match ca.annot_content with
-  | AAssert _ | AInvariant _ -> [ IPCodeAnnot(kf, stmt, ca) ]
+  | AAssert _ | AInvariant _ | AExtended _ -> [ IPCodeAnnot(kf, stmt, ca) ]
   | AStmtSpec (active,s) -> ip_of_spec kf ki active s
   | AVariant t -> [ IPDecrease (kf,ki,(Some ca),t) ]
   | AAllocation _ -> 
@@ -1137,7 +1141,6 @@ let ip_of_code_annot kf stmt ca =
   | APragma p when Logic_utils.is_property_pragma p ->
     [ IPCodeAnnot (kf,stmt,ca) ]
   | APragma _ -> []
-  | AExtended _ -> []
 
 let ip_of_code_annot_single kf stmt ca = match ip_of_code_annot kf stmt ca with
   | [] ->

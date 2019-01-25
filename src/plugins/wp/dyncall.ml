@@ -86,7 +86,7 @@ let pp_calls fmt calls =
 
 module PInfo = struct let module_name = "Dyncall.Point" end
 module Point = Datatype.Pair_with_collections(Datatype.String)(Stmt)(PInfo)
-module Calls = Datatype.List(Kernel_function)
+module Calls = Datatype.Pair(Property)(Datatype.List(Kernel_function))
 module CInfo =
 struct
   let name = "Dyncall.CallPoints"
@@ -95,10 +95,12 @@ struct
 end
 module CallPoints = State_builder.Hashtbl(Point.Hashtbl)(Calls)(CInfo)
 
-let property ~kf ?bhv ~stmt ~calls =
-  let fact = match bhv with
-    | None -> Format.asprintf "@[<hov 2>calls%a@]" pp_calls calls
-    | Some b -> Format.asprintf "@[<hov 2>calls%a for %s@]" pp_calls calls b
+let property ~kf ~bhv ~stmt calls =
+  let fact =
+    if bhv = Cil.default_behavior_name then
+      Format.asprintf "@[<hov 2>calls%a@]" pp_calls calls
+    else
+      Format.asprintf "@[<hov 2>calls%a for %s@]" pp_calls calls bhv
   in
   Property.(ip_other fact (OLStmt (kf,stmt)))
 
@@ -116,6 +118,9 @@ class dyncall =
 
     method count = count
 
+    method private kf =
+      match self#current_kf with None -> assert false | Some kf -> kf
+
     method private stmt =
       match self#current_stmt with None -> assert false | Some stmt -> stmt
 
@@ -128,32 +133,39 @@ class dyncall =
       | Cil_types.AExtended (bhvs,_,(_, "calls", _,Ext_terms calls)) ->
           if calls <> [] && (scope <> [] || not (Stack.is_empty block_calls))
           then begin
+            let kf = self#kf in
             let bhvs =
               match bhvs with
               | [] -> [ Cil.default_behavior_name ]
               | bhvs -> bhvs
             in
+            let debug_calls bhv stmt kfs =
+              if Wp_parameters.has_dkey dkey_calls then
+                let source = snd (Stmt.loc stmt) in
+                if Cil.default_behavior_name = bhv then
+                  Wp_parameters.result ~source
+                    "@[<hov 2>Calls%a@]" pp_calls kfs
+                else
+                  Wp_parameters.result ~source
+                    "@[<hov 2>Calls (for %s)%a@]" bhv pp_calls kfs
+            in
+            let pool = ref [] in (* collect emitted properties *)
             let add_calls_info stmt =
               count <- succ count ;
               List.iter
                 (fun bhv ->
                    let kfs = List.map get_call calls in
-                   begin
-                     if Wp_parameters.has_dkey dkey_calls then
-                       let source = snd (Stmt.loc stmt) in
-                       if Cil.default_behavior_name = bhv then
-                         Wp_parameters.result ~source
-                           "@[<hov 2>Calls%a@]" pp_calls kfs
-                       else
-                         Wp_parameters.result ~source
-                           "@[<hov 2>Calls (for %s)%a@]" bhv pp_calls kfs
-                   end;
-                   CallPoints.add (bhv,stmt) kfs)
+                   debug_calls bhv stmt kfs ;
+                   let prop = property ~kf ~bhv ~stmt kfs in
+                   pool := prop :: !pool ;
+                   CallPoints.add (bhv,stmt) (prop,kfs))
                 bhvs
             in
-            if scope <> [] then List.iter add_calls_info scope
-            else
-              List.iter add_calls_info (Stack.top block_calls)
+            let callpoints =
+              if scope <> [] then scope else Stack.top block_calls in
+            List.iter add_calls_info callpoints ;
+            let annot = Property.ip_of_code_annot_single kf self#stmt ca in
+            ignore (annot,!pool) ;
           end;
           SkipChildren
       | _ -> SkipChildren
@@ -216,15 +228,15 @@ let compute =
 let get ?bhv stmt =
   compute () ;
   let get bhv =
-    try CallPoints.find (bhv,stmt)
-    with Not_found -> []
+    try Some (CallPoints.find (bhv,stmt))
+    with Not_found -> None
   in
   match bhv with
   | None -> get Cil.default_behavior_name
   | Some bhv ->
       (match get bhv with
-       | [] -> get Cil.default_behavior_name
-       | l -> l)
+       | None -> get Cil.default_behavior_name
+       | result -> result)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Registry                                                           --- *)

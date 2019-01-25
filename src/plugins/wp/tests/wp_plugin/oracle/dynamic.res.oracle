@@ -17,7 +17,7 @@
   Function behavior with behavior bhv1
 ------------------------------------------------------------
 
-Goal Calls h1 h2 for bhv1 in 'behavior' at instruction (file tests/wp_plugin/dynamic.i, line 65):
+Goal Calls h1 h2 in 'behavior' at instruction (file tests/wp_plugin/dynamic.i, line 65):
 Prove: true.
 
 ------------------------------------------------------------
