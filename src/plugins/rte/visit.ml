@@ -445,6 +445,49 @@ let rte_annotations stmt =
     stmt
     []
 
+(** {2 Iterate over Alarms on Cil elements} *)
+
+type 'a generator =
+  ?remove_trivial:bool ->
+  ?initialized:Options.DoInitialized.t ->
+  ?mem_access:Options.DoMemAccess.t ->
+  ?div_mod:Options.DoDivMod.t ->
+  ?shift:Options.DoShift.t ->
+  ?left_shift_negative:Kernel.LeftShiftNegative.t ->
+  ?right_shift_negative:Kernel.RightShiftNegative.t ->
+  ?signed_overflow:Kernel.SignedOverflow.t ->
+  ?unsigned_overflow:Kernel.UnsignedOverflow.t ->
+  ?signed_downcast:Kernel.SignedDowncast.t ->
+  ?unsigned_downcast:Kernel.UnsignedDowncast.t ->
+  ?float_to_int:Options.DoFloatToInt.t ->
+  ?finite_float:bool ->
+  ?pointer_call:Options.DoPointerCall.t ->
+  ?bool_value:Kernel.InvalidBool.t ->
+  (Cil_types.kinstr ->
+   ?status:Property_status.emitted_status -> Alarms.alarm -> unit) ->
+  Kernel_function.t ->
+  Cil_types.stmt ->
+  'a -> unit
+
+let iter_alarms visit to_annot on_alarm kf stmt element =
+  let visitor = object (self)
+    inherit annot_visitor kf to_annot on_alarm
+    initializer self#push_stmt stmt
+  end in
+  ignore (visit (visitor :> Cil.cilVisitor) element)
+
+let iter_lval : lval generator =
+  annotate_from_options (iter_alarms Cil.visitCilLval)
+
+let iter_exp : exp generator =
+  annotate_from_options (iter_alarms Cil.visitCilExpr)
+
+let iter_instr : instr generator =
+  annotate_from_options (iter_alarms Cil.visitCilInstr)
+
+let iter_stmt : stmt generator =
+  annotate_from_options (iter_alarms Cil.visitCilStmt)
+
 (** {2 List of all RTEs on a given Cil object} *)
 
 let get_annotations from kf stmt x =
