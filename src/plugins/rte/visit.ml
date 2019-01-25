@@ -60,8 +60,8 @@ type to_annotate = {
   shift: bool;
   left_shift_negative: bool;
   right_shift_negative: bool;
-  signed_ov: bool;
-  unsigned_ov: bool;
+  signed_overflow: bool;
+  unsigned_overflow: bool;
   signed_downcast: bool;
   unsigned_downcast: bool;
   float_to_int: bool;
@@ -71,15 +71,15 @@ type to_annotate = {
 }
 
 let annotate_all = {
-  remove_trivial = false;
+  remove_trivial = true;
   initialized = true;
   mem_access = true;
   div_mod = true;
   shift = true;
   left_shift_negative = true;
   right_shift_negative = true;
-  signed_ov = true;
-  unsigned_ov = true;
+  signed_overflow = true;
+  unsigned_overflow = true;
   signed_downcast = true;
   unsigned_downcast = true;
   float_to_int = true;
@@ -88,25 +88,46 @@ let annotate_all = {
   bool_value = true;
 }
 
-(** Which annotations should be added, deduced from the options of RTE and
-    the kernel itself. *)
-let annotate_from_options () = {
-  remove_trivial = Options.Trivial.get ();
-  initialized = Options.DoInitialized.get ();
-  mem_access = Options.DoMemAccess.get ();
-  div_mod = Options.DoDivMod.get ();
-  shift = Options.DoShift.get ();
-  left_shift_negative = Kernel.LeftShiftNegative.get ();
-  right_shift_negative = Kernel.RightShiftNegative.get ();
-  signed_ov = Kernel.SignedOverflow.get ();
-  unsigned_ov = Kernel.UnsignedOverflow.get ();
-  signed_downcast = Kernel.SignedDowncast.get ();
-  unsigned_downcast = Kernel.UnsignedDowncast.get ();
-  float_to_int = Options.DoFloatToInt.get ();
-  finite_float = Kernel.SpecialFloat.get () <> "none";
-  pointer_call = Options.DoPointerCall.get ();
-  bool_value = Kernel.InvalidBool.get ();
-}
+(* Which annotations should be added,
+   from local options, or deduced from the options of RTE and the kernel *)
+
+let option get = function None -> get () | Some flag -> flag
+
+let annotate_from_options
+    job
+    ?remove_trivial
+    ?initialized
+    ?mem_access
+    ?div_mod
+    ?shift
+    ?left_shift_negative
+    ?right_shift_negative
+    ?signed_overflow
+    ?unsigned_overflow
+    ?signed_downcast
+    ?unsigned_downcast
+    ?float_to_int
+    ?finite_float
+    ?pointer_call
+    ?bool_value
+    data =
+  job {
+    remove_trivial = option (fun () -> not (Options.Trivial.get ())) remove_trivial ;
+    initialized = option Options.DoInitialized.get initialized ;
+    mem_access = option Options.DoMemAccess.get mem_access ;
+    div_mod = option Options.DoDivMod.get div_mod ;
+    shift = option Options.DoShift.get shift;
+    left_shift_negative = option Kernel.LeftShiftNegative.get left_shift_negative ;
+    right_shift_negative = option Kernel.RightShiftNegative.get right_shift_negative ;
+    signed_overflow = option Kernel.SignedOverflow.get signed_overflow ;
+    unsigned_overflow = option Kernel.UnsignedOverflow.get unsigned_overflow ;
+    signed_downcast = option Kernel.SignedDowncast.get signed_downcast ;
+    unsigned_downcast = option Kernel.UnsignedDowncast.get unsigned_downcast ;
+    float_to_int = option Options.DoFloatToInt.get float_to_int ;
+    finite_float = option (fun () -> Kernel.SpecialFloat.get () <> "none") finite_float ;
+    pointer_call = option Options.DoPointerCall.get pointer_call ;
+    bool_value = option Kernel.InvalidBool.get bool_value ;
+  } data
 
 (** [kf]: function to annotate
     [to_annot]: which RTE to generate.
@@ -152,10 +173,10 @@ class annot_visitor kf to_annot on_alarm = object (self)
     && not (Generator.Right_shift_negative.is_computed kf)
 
   method private do_signed_overflow () =
-    to_annot.signed_ov && not (Generator.Signed_overflow.is_computed kf)
+    to_annot.signed_overflow && not (Generator.Signed_overflow.is_computed kf)
 
   method private do_unsigned_overflow () =
-    to_annot.unsigned_ov && not (Generator.Unsigned_overflow.is_computed kf)
+    to_annot.unsigned_overflow && not (Generator.Unsigned_overflow.is_computed kf)
 
   method private do_signed_downcast () =
     to_annot.signed_downcast && not (Generator.Signed_downcast.is_computed kf)
@@ -427,7 +448,7 @@ let rte_annotations stmt =
 (** {2 List of all RTEs on a given Cil object} *)
 
 let get_annotations from kf stmt x =
-  let to_annot = annotate_from_options () in
+  let to_annot = annotate_from_options (fun flags () -> flags) () in
   (* Accumulator containing all the code_annots corresponding to an alarm
      emitted so far. *)
   let code_annots = ref [] in
@@ -478,9 +499,9 @@ let annotate_kf_aux to_annot kf =
        comp Shift.accessor to_annot.shift |||
        comp Left_shift_negative.accessor to_annot.left_shift_negative |||
        comp Right_shift_negative.accessor to_annot.right_shift_negative |||
-       comp Signed_overflow.accessor to_annot.signed_ov |||
+       comp Signed_overflow.accessor to_annot.signed_overflow |||
        comp Signed_downcast.accessor to_annot.signed_downcast |||
-       comp Unsigned_overflow.accessor to_annot.unsigned_ov |||
+       comp Unsigned_overflow.accessor to_annot.unsigned_overflow |||
        comp Unsigned_downcast.accessor to_annot.unsigned_downcast |||
        comp Float_to_int.accessor to_annot.float_to_int |||
        comp Finite_float.accessor to_annot.finite_float
@@ -502,8 +523,7 @@ let annotate_kf_aux to_annot kf =
     end
 
 (* generates annotation for function kf on the basis of command-line options *)
-let annotate_kf kf =
-  annotate_kf_aux (annotate_from_options ()) kf
+let annotate_kf kf = annotate_from_options annotate_kf_aux kf
 
 (* annotate for all rte + unsigned overflows (which are not rte), for a given
    function *)
@@ -520,7 +540,7 @@ let do_all_rte kf =
 let do_rte kf =
   let to_annot =
     { annotate_all with
-      unsigned_ov = false;
+      unsigned_overflow = false;
       signed_downcast = false;
       unsigned_downcast = false; }
   in
