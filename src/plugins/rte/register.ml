@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let journal_register ?comment is_dyn name ty_arg fctref fct = 
+let journal_register ?comment is_dyn name ty_arg fctref fct =
   let ty = Datatype.func ty_arg Datatype.unit in
   Db.register (Db.Journalize("RteGen." ^ name, ty)) fctref fct;
   if is_dyn then
@@ -29,21 +29,21 @@ let journal_register ?comment is_dyn name ty_arg fctref fct =
     in
     ()
 
-let nojournal_register fctref fct = 
+let nojournal_register fctref fct =
   Db.register Db.Journalization_not_required fctref (fun () -> fct)
 
-let () = 
+let () =
   journal_register false
     "annotate_kf" Kernel_function.ty Db.RteGen.annotate_kf Visit.annotate_kf;
-  journal_register false "compute" Datatype.unit Db.RteGen.compute 
+  journal_register false "compute" Datatype.unit Db.RteGen.compute
     Visit.compute;
   journal_register true
     ~comment:"Generate all RTE annotations in the \
-  given function."
+              given function."
     "do_all_rte" Kernel_function.ty Db.RteGen.do_all_rte Visit.do_all_rte;
   journal_register false
     ~comment:"Generate all RTE annotations except pre-conditions \
-    in the given function."
+              in the given function."
     "do_rte" Kernel_function.ty Db.RteGen.do_rte Visit.do_rte;
   let open Generator in
   let open Db.RteGen in
@@ -76,7 +76,7 @@ let _ =
 let _ =
   Dynamic.register
     ~comment:"Get the list of annotations previously emitted by RTE for the \
-given statement."
+              given statement."
     ~plugin:"RteGen"
     "get_rte_annotations"
     (Datatype.func
@@ -88,7 +88,7 @@ given statement."
 let _ =
   Dynamic.register
     ~comment:"Generate RTE annotations corresponding to the given stmt of \
-the given function."
+              the given function."
     ~plugin:"RteGen"
     "stmt_annotations"
     (Datatype.func2 Kernel_function.ty Cil_datatype.Stmt.ty
@@ -99,10 +99,10 @@ the given function."
 let _ =
   Dynamic.register
     ~comment:"Generate RTE annotations corresponding to the given exp \
-of the given stmt in the given function."
+              of the given stmt in the given function."
     ~plugin:"RteGen"
     "exp_annotations"
-    (Datatype.func3 Kernel_function.ty Cil_datatype.Stmt.ty Cil_datatype.Exp.ty 
+    (Datatype.func3 Kernel_function.ty Cil_datatype.Stmt.ty Cil_datatype.Exp.ty
        (let module L = Datatype.List(Cil_datatype.Code_annotation) in L.ty))
     ~journalize:false
     Visit.do_exp_annotations
