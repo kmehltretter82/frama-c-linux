@@ -261,7 +261,7 @@ let rec pp_prop kfopt kiopt kloc fmt = function
       pp_named np
       (pp_kloc kloc) np.pred_loc
   | IPCodeAnnot(_,stmt,{annot_content=AExtended(bs,_,(_,clause,_,_))}) ->
-    Format.fprintf fmt "%a%a%a"
+    Format.fprintf fmt "%a%a %a"
       pp_capitalize clause pp_for bs (pp_stmt kloc) stmt
   | IPCodeAnnot(_,stmt,_) ->
     Format.fprintf fmt "Annotation %a" (pp_stmt kloc) stmt

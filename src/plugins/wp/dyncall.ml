@@ -108,6 +108,11 @@ let property ~kf ~bhv ~stmt calls =
 (* --- Detection                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
+let emitter = Emitter.create "Wp.Dyncall"
+    [ Emitter.Property_status ]
+    ~correctness:[]
+    ~tuning:[ Wp_parameters.DynCall.parameter ]
+
 class dyncall =
   object(self)
     inherit Visitor.frama_c_inplace
@@ -165,7 +170,7 @@ class dyncall =
               if scope <> [] then scope else Stack.top block_calls in
             List.iter add_calls_info callpoints ;
             let annot = Property.ip_of_code_annot_single kf self#stmt ca in
-            ignore (annot,!pool) ;
+            Property_status.logical_consequence emitter annot !pool ;
           end;
           SkipChildren
       | _ -> SkipChildren
