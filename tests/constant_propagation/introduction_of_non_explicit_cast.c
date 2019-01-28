@@ -1,7 +1,7 @@
 /* run.config
-   OPT: -load-script tests/constant_propagation/introduction_of_non_explicit_cast.ml -eva -eva-show-progress -deps -journal-disable
+   EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
+   OPT: -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs -eva -eva-show-progress -deps -journal-disable
 */
-
 
 int x,y,z;
 int TAB[10];
