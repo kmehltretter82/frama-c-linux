@@ -98,9 +98,11 @@ module CallPoints = State_builder.Hashtbl(Point.Hashtbl)(Calls)(CInfo)
 let property ~kf ~bhv ~stmt calls =
   let fact =
     if bhv = Cil.default_behavior_name then
-      Format.asprintf "@[<hov 2>calls%a@]" pp_calls calls
+      Format.asprintf "@[<hov 2>calls%a at s%d@]"
+        pp_calls calls stmt.sid
     else
-      Format.asprintf "@[<hov 2>calls%a for %s@]" pp_calls calls bhv
+      Format.asprintf "@[<hov 2>calls%a for %s at s%d@]"
+        pp_calls calls bhv stmt.sid
   in
   Property.(ip_other fact (OLStmt (kf,stmt)))
 
@@ -170,10 +172,13 @@ class dyncall =
             List.iter
               (add_calls_info kf)
               (if scope <> [] then scope else Stack.top block_calls) ;
-            let eloc = Property.ELStmt(kf,self#stmt) in
-            let annot = Property.ip_of_extended eloc extended in
-            Property_status.register annot ;
-            Property_status.logical_consequence emitter annot !pool ;
+            if !pool <> [] then
+              begin
+                let eloc = Property.ELStmt(kf,self#stmt) in
+                let annot = Property.ip_of_extended eloc extended in
+                Property_status.register annot ;
+                Property_status.logical_consequence emitter annot !pool ;
+              end
           end;
           SkipChildren
       | _ -> SkipChildren

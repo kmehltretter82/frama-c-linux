@@ -638,7 +638,7 @@ let make_panel (main_ui:main_window_extension_points) =
         invariant.get ()
     | Property.IPCodeAnnot(_,_,{annot_content = APragma p}) ->
         Logic_utils.is_property_pragma p (* currently always false. *)
-    | Property.IPCodeAnnot(_, _, _) -> assert false
+    | Property.IPCodeAnnot(_, _, _) -> false (* status of inner nodes *)
     | Property.IPAllocation (_,Kglobal,_,_) -> allocations.get ()
     | Property.IPAllocation (_,Kstmt _,Property.Id_loop _,_) ->
         allocations.get ()
