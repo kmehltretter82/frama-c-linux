@@ -2,7 +2,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2018                                               #
+#  Copyright (C) 2007-2019                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -41,6 +41,8 @@ tests/ptests_config: Makefile.generating share/Makefile.config
 	$(CHMOD_RO) $@
 
 ALL_LIBRARY_NAMES=$(shell ocamlfind query -r -p-format $(LIBRARY_NAMES) $(LIBRARY_NAMES_GUI))
+MAJOR_VERSION=$(shell $(SED) 's/^\([0-9]\+\)\..*/\1/' VERSION)
+MINOR_VERSION=$(shell $(SED) 's/^[0-9]\+\.\([0-9]\+\).*/\1/' VERSION)
 
 $(CONFIG_FILE): $(CONFIG_FILE).in VERSION VERSION_CODENAME share/Makefile.config Makefile.generating configure.in
 	$(SED) \
@@ -64,6 +66,8 @@ $(CONFIG_FILE): $(CONFIG_FILE).in VERSION VERSION_CODENAME share/Makefile.config
 	  -e "s|@OPTDOT@|$(OPTDOT)|" \
           -e "s|@HAS_YOJSON@|$(if $(filter yes,$(HAS_YOJSON)),true,false)|" \
           -e "s|@EXE@|$(EXE)|" \
+          -e "s|@MAJOR_VERSION@|$(MAJOR_VERSION)|" \
+          -e "s|@MINOR_VERSION@|$(MINOR_VERSION)|" \
           $< > $@.tmp
 	@touch -r $@.tmp $<
 	$(CP_IF_DIFF) $@.tmp $@
@@ -204,6 +208,12 @@ endif
 ifeq ("$(DEVELOPMENT)","yes")
 all:: .merlin
 endif
+
+lib/fc/META.frama-c: share/META.frama-c share/Makefile.config Makefile.generating
+	$(MKDIR) lib/fc/
+	$(SED) $< -e "s/@REQUIRES/$(LIBRARY_NAMES)/" > $@
+
+GENERATED += lib/fc/META.frama-c
 
 
 # Local Variables:

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -69,7 +69,7 @@ module type S_no_log = sig
       -plugin-msg-key, and -plugin-warn-key.
       [add_plugin_output_aliases [alias]] adds the aliases -alias-help,
       -alias-verbose, etc.
-      @since Frama-C+dev *)
+      @since 18.0-Argon *)
 end
 
 (** Provided plug-general services for plug-ins.

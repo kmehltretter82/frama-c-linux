@@ -12,7 +12,7 @@
       \from (indirect: __fc_stdout->__fc_FILE_id),
             __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..)));
  */
-int printf_va_1(char const *format);
+int printf_va_1(char const * __restrict format);
 
 int main(void)
 {
@@ -37,7 +37,7 @@ int main(void)
       \from (indirect: __fc_stdout->__fc_FILE_id),
             __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..)));
  */
-int printf_va_1(char const *format);
+int printf_va_1(char const * __restrict format);
 
 int main(void)
 {

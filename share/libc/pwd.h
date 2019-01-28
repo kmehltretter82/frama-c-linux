@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2018                                               */
+/*  Copyright (C) 2007-2019                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -41,8 +41,35 @@ struct passwd {
   char    *pw_shell;
 };
 
+extern char __fc_getpwuid_pw_name[64];
+extern char __fc_getpwuid_pw_passwd[64];
+extern uid_t __fc_getpwuid_pw_uid;
+extern gid_t __fc_getpwuid_pw_gid;
+extern char __fc_getpwuid_pw_dir[64];
+extern char __fc_getpwuid_pw_shell[64];
+
+struct passwd __fc_getpwuid =
+  {.pw_name = __fc_getpwuid_pw_name,
+   .pw_passwd = __fc_getpwuid_pw_passwd,
+   .pw_uid = __fc_getpwuid_pw_uid,
+   .pw_gid = __fc_getpwuid_pw_gid,
+   .pw_dir = __fc_getpwuid_pw_dir,
+   .pw_shell = __fc_getpwuid_pw_shell};
+
+struct passwd *__fc_p_getpwuid = & __fc_getpwuid;
+
+
 extern struct passwd *getpwnam(const char *);
-extern struct passwd *getpwuid(uid_t);
+
+/*@ // missing: assigns \result, __fc_getpwuid[0..] \from 'password database'
+  assigns \result \from __fc_p_getpwuid, indirect:uid;
+  assigns __fc_getpwuid \from indirect:uid;
+  ensures result_null_or_internal_struct:
+    \result == \null || \result == __fc_p_getpwuid;
+*/
+extern struct passwd *getpwuid(uid_t uid);
+
+
 extern int            getpwnam_r(const char *, struct passwd *, char *,
 			  size_t, struct passwd **);
 extern int            getpwuid_r(uid_t, struct passwd *, char *,

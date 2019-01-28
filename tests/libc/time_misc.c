@@ -22,10 +22,21 @@ void test_strftime(void)
   }
 }
 
+volatile int v;
+
+void test_ctime(void)
+{
+  time_t t;
+  if (v) t = 42;
+  char *s = ctime(&t); // warn about initialization
+  //@ assert valid_read_string(s);
+}
+
 int main(int argc, char **argv)
 {
   test_gettimeofday();
   test_strftime();
+  test_ctime();
   return 0;
 }
 

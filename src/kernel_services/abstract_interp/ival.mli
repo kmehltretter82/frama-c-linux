@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -91,6 +91,9 @@ val min_max_r_mod :
 
 val min_and_max :
   t -> Integer.t option * Integer.t option
+(** Returns the minimal and maximal integers represented by an ival.
+    [None] means the argument is unbounded.
+    @raise Abstract_interp.Error_Bottom if the argument is bottom. *)
 
 val min_and_max_float : t -> (Fval.F.t * Fval.F.t) option * bool
 (** returns the bounds of the float interval, (or None if the argument is
@@ -98,14 +101,15 @@ val min_and_max_float : t -> (Fval.F.t * Fval.F.t) option * bool
     may be NaN. *)
 
 
-val bitwise_and : size:int -> signed:bool -> t -> t -> t
+val bitwise_and : t -> t -> t
 val bitwise_or : t -> t -> t
 val bitwise_xor : t -> t -> t
-val bitwise_not: t -> t
+val bitwise_signed_not: t -> t
+(* For the two following functions, the argument is assumed to fit within the
+   given size. *)
+val bitwise_unsigned_not: size:int -> t -> t
+val bitwise_not: size:int -> signed:bool -> t -> t
 
-val bitwise_not_size: size:int -> signed:bool -> t -> t
-(** bitwise negation on a finite integer type. The argument is assumed to
-    fit within the type. *)
 
 val zero : t
 (** The lattice element that contains only the integer 0. *)

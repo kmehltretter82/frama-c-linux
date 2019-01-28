@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -774,6 +774,7 @@ let highlighter (buffer:reactive_buffer) localizable ~start ~stop =
       in
       let ips_sure, ips_unsure = Kernel_function.Hptset.fold
           (fun kf (ips_sure, ips_unsure) ->
+             Statuses_by_call.setup_all_preconditions_proxies kf;
              let ips_kf =
                Statuses_by_call.all_call_preconditions_at ~warn_missing:false kf stmt
              in

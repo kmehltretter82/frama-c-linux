@@ -470,7 +470,7 @@ val isCompleteType: ?allowZeroSizeArrays:bool -> typ -> bool
     array member. When in gcc mode, a zero-sized array is identified with a
     FAM for this purpose.
 
-    @since Frama-C+dev
+    @since 18.0-Argon
 *)
 val has_flexible_array_member: typ -> bool
 
@@ -542,27 +542,27 @@ val isIntegralOrPointerType: typ -> bool
 
 (** True if the argument is an integral type (i.e. integer or enum), either
     C or mathematical one.
-    @modify Frama-C+dev expands the logic type definition if necessary. *)
+    @modify 18.0-Argon expands the logic type definition if necessary. *)
 val isLogicIntegralType: logic_type -> bool
 
 (** True if the argument is a boolean type, either integral C type or
     mathematical boolean one.
-    @modify Frama-C+dev expands the logic type definition if necessary. *)
+    @modify 18.0-Argon expands the logic type definition if necessary. *)
 val isLogicBooleanType: logic_type -> bool
 
 (** True if the argument is a floating point type. *)
 val isFloatingType: typ -> bool
 
 (** True if the argument is a floating point type.
-    @modify Frama-C+dev expands the logic type definition if necessary. *)
+    @modify 18.0-Argon expands the logic type definition if necessary. *)
 val isLogicFloatType: logic_type -> bool
 
 (** True if the argument is a C floating point type or logic 'real' type.
-    @modify Frama-C+dev expands the logic type definition if necessary. *)
+    @modify 18.0-Argon expands the logic type definition if necessary. *)
 val isLogicRealOrFloatType: logic_type -> bool
 
 (** True if the argument is the logic 'real' type.
-    @modify Frama-C+dev expands the logic type definition if necessary. *)
+    @modify 18.0-Argon expands the logic type definition if necessary. *)
 val isLogicRealType: logic_type -> bool
 
 (** True if the argument is an arithmetic type (i.e. integer, enum or
@@ -575,7 +575,7 @@ val isArithmeticOrPointerType: typ -> bool
 
 (** True if the argument is a logic arithmetic type (i.e. integer, enum or
     floating point, either C or mathematical one.
-    @modify Frama-C+dev expands the logic type definition if necessary. *)
+    @modify 18.0-Argon expands the logic type definition if necessary. *)
 val isLogicArithmeticType: logic_type -> bool
 
 (** True if the argument is a function type *)
@@ -583,23 +583,23 @@ val isFunctionType: typ -> bool
 
 (** True if the argument is the logic function type.
     Expands the logic type definition if necessary.
-    @since Frama-C+dev *)
+    @since 18.0-Argon *)
 val isLogicFunctionType: logic_type -> bool
 
 (** True if the argument is a pointer type. *)
 val isPointerType: typ -> bool
 
 (** True if the argument is a function pointer type.
-    @since Frama-C+dev *)
+    @since 18.0-Argon *)
 val isFunPtrType: typ -> bool
 
 (** True if the argument is the logic function pointer type.
     Expands the logic type definition if necessary.
-    @since Frama-C+dev *)
+    @since 18.0-Argon *)
 val isLogicFunPtrType: logic_type -> bool
 
 (** True if the argument is the type for reified C types.
-    @modify Frama-C+dev expands the logic type definition if necessary. *)
+    @modify 18.0-Argon expands the logic type definition if necessary. *)
 val isTypeTagType: logic_type -> bool
 
 (** True if the argument denotes the type of ... in a variadic function.
@@ -1025,7 +1025,8 @@ val appears_in_expr: varinfo -> exp -> bool
     if [valid_sid] is false (the default),
     or to a valid sid if [valid_sid] is true,
     and [labels], [succs] and [preds] to the empty list *)
-val mkStmt: ?ghost:bool -> ?valid_sid:bool -> stmtkind -> stmt
+val mkStmt: ?ghost:bool -> ?valid_sid:bool -> ?sattr:attributes -> stmtkind ->
+  stmt
 
 (* make the [new_stmtkind] changing the CFG relatively to [ref_stmt] *)
 val mkStmtCfg: before:bool -> new_stmtkind:stmtkind -> ref_stmt:stmt -> stmt
@@ -1048,7 +1049,8 @@ val mkStmtCfgBlock: stmt list -> stmt
 (** Construct a statement consisting of just one instruction
     See {!Cil.mkStmt} for the signification of the optional args.
  *)
-val mkStmtOneInstr: ?ghost:bool -> ?valid_sid:bool -> instr -> stmt
+val mkStmtOneInstr: ?ghost:bool -> ?valid_sid:bool -> ?sattr:attributes ->
+  instr -> stmt
 
 (** Try to compress statements so as to get maximal basic blocks.
  * use this instead of List.@ because you get fewer basic blocks *)
@@ -1057,7 +1059,8 @@ val mkStmtOneInstr: ?ghost:bool -> ?valid_sid:bool -> instr -> stmt
 (** Returns an empty statement (of kind [Instr]). See [mkStmt] for [ghost] and
     [valid_sid] arguments.
     @modify Neon-20130301 adds the [valid_sid] optional argument. *)
-val mkEmptyStmt: ?ghost:bool -> ?valid_sid:bool -> ?loc:location -> unit -> stmt
+val mkEmptyStmt: ?ghost:bool -> ?valid_sid:bool -> ?sattr:attributes ->
+  ?loc:location -> unit -> stmt
 
 (** A instr to serve as a placeholder *)
 val dummyInstr: instr
@@ -1089,8 +1092,10 @@ val mkPureExpr:
   ?ghost:bool -> ?valid_sid:bool -> fundec:fundec ->
   ?loc:location -> exp -> stmt
 
-(** Make a while loop. Can contain Break or Continue *)
-val mkWhile: guard:exp -> body:stmt list -> stmt list
+(** Make a loop. Can contain Break or Continue.
+    The kind of loop (While, For, DoWhile) is given by [sattr];
+    it is a While loop if unspecified. *)
+val mkLoop: ?sattr:attributes -> guard:exp -> body:stmt list -> stmt list
 
 (** Make a for loop for(i=start; i<past; i += incr) \{ ... \}. The body
     can contain Break but not Continue. Can be used with i a pointer
@@ -1184,7 +1189,7 @@ val dropAttributes: string list -> attributes -> attributes
 (** a field struct marked with this attribute is known to be mutable, i.e.
     it can be modified even on a const object.
 
-    @since Frama-C+dev
+    @since 18.0-Argon
 *)
 val frama_c_mutable: string
 
@@ -1192,7 +1197,7 @@ val frama_c_mutable: string
     object being initialized by the current function, which can thus assign
     any sub-object regardless of const status.
 
-    @since Frama-C+dev
+    @since 18.0-Argon
  *)
 val frama_c_init_obj: string
 

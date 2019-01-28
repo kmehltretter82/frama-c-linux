@@ -1062,7 +1062,11 @@ and stmt = {
   mutable preds: stmt list;
   (** The inverse of the succs function. *)
 
-  mutable ghost : bool
+  mutable ghost : bool;
+
+  mutable sattr : attributes
+  (** Statement attributes.
+      @since Frama-C+dev *)
 }
 
 (** Labels *)
@@ -1671,7 +1675,7 @@ and acsl_extension_kind =
 
 (** Where are we expected to find corresponding extension keyword.
     @plugin development guide
-    @since Frama-C+dev
+    @since 18.0-Argon
 *)
 and ext_category =
   | Ext_contract

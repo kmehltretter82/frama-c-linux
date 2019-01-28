@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2018                                               */
+/*  Copyright (C) 2007-2019                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -24,7 +24,7 @@
 #error "Frama-C: This file shall not be directly included"
 #endif
 /* This file contains common machine specific values between 
- Linux/GCC x86 32-bit, AMD64 and x86 16-bit.*/
+   Linux x86 32-bit, AMD64 and x86 16-bit.*/
 
 #ifndef __FC_MACHDEP_LINUX_SHARED
 #define __FC_MACHDEP_LINUX_SHARED
@@ -116,7 +116,7 @@
 #define __FC_INTMAX_MAX 9223372036854775807LL
 #define __FC_UINTMAX_MAX 18446744073709551615ULL
 
-// Linux/GCC usually defines wchar_t as a signed int, but this is not required
+// Linux usually defines wchar_t as a signed int, but this is not required
 #define __WCHAR_T int
 
 /* stdio.h */

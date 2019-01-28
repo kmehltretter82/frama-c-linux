@@ -1,13 +1,13 @@
 [kernel] Parsing out-of-bound.c (with preprocessing)
-[value] Analyzing a complete application starting at main
-[value] Computing initial state
-[value] Initial state computed
-[value] Values of globals at initialization
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
   t[0..9][0..9] ∈ {0}
-out-of-bound.c:4:[kernel] warning: accessing out of bounds index. assert 12 < 10;
-[value] Recording results for main
-[value] done for function main
-out-of-bound.c:4:[value] assertion 'Value,index_bound' got final status invalid.
-[value] ====== VALUES COMPUTED ======
-[value] Values at end of function main:
+[eva:alarm] out-of-bound.c:4: Warning: 
+  accessing out of bounds index. assert 12 < 10;
+[eva] done for function main
+[eva] out-of-bound.c:4: assertion 'Eva,index_bound' got final status invalid.
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function main:
   NON TERMINATING FUNCTION

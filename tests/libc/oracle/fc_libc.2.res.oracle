@@ -34,9 +34,10 @@
 [kernel] Parsing share/libc/__fc_define_useconds_t.h (with preprocessing)
 [kernel] Parsing share/libc/__fc_define_wchar_t.h (with preprocessing)
 [kernel] Parsing share/libc/__fc_define_wint_t.h (with preprocessing)
+[kernel] Parsing share/libc/__fc_gcc_builtins.h (with preprocessing)
 [kernel] Parsing share/libc/__fc_inet.h (with preprocessing)
 [kernel] Parsing share/libc/__fc_machdep.h (with preprocessing)
-skipping share/libc/__fc_machdep_linux_gcc_shared.h
+skipping share/libc/__fc_machdep_linux_shared.h
 [kernel] Parsing share/libc/__fc_select.h (with preprocessing)
 [kernel] Parsing share/libc/__fc_string_axiomatic.h (with preprocessing)
 [kernel] Parsing share/libc/alloca.h (with preprocessing)

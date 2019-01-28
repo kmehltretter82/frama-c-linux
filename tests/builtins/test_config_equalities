@@ -1,2 +1,2 @@
-MACRO: VALUECONFIG -val-show-progress  -no-autoload-plugins -load-module from,inout,eva,scope,variadic -value-msg-key malloc -value-warn-key malloc:weak=feedback -no-val-alloc-returns-null -eva-equality-domain
-OPT: -val @VALUECONFIG@ -journal-disable -out -input -deps
+MACRO: VALUECONFIG -eva-show-progress  -no-autoload-plugins -load-module from,inout,eva,scope,variadic -eva-msg-key malloc -eva-warn-key malloc:weak=feedback -eva-no-alloc-returns-null -eva-equality-domain
+OPT: -eva @VALUECONFIG@ -journal-disable -out -input -deps

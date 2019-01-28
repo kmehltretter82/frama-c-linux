@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -167,7 +167,7 @@ class model_selector (main : Design.main_window_extension_points) =
 let wp_dir = ref (Sys.getcwd())
 
 let wp_script () =
-  let file = GToolbox.select_file
+  let file = Gtk_helper.select_file
       ~title:"Script File for Coq proofs"
       ~dir:wp_dir ~filename:"wp.script" ()
   in

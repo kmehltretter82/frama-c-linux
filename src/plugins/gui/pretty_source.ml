@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -641,11 +641,11 @@ module TagPrinterClassDeferred (X: Printer.PrinterClass) = struct
           Format.fprintf fmt "@{<%s>%a@}"
             (Tag.create (PIP ip)) (super#allocation ~isloop) a;
 
-    method! stmtkind next fmt sk =
+    method! stmtkind sattr next fmt sk =
       (* Special tag denoting the start of the statement, WITHOUT any ACSL
          assertion/statement contract, etc. *)
       let s = Extlib.the self#current_stmt in
-      Format.fprintf fmt "@{<gui:stmt_start%d>%a@}" s.sid (super#stmtkind next) sk
+      Format.fprintf fmt "@{<gui:stmt_start%d>%a@}" s.sid (super#stmtkind sattr next) sk
 
     initializer force_brace <- true
 
@@ -746,7 +746,7 @@ let buffer_formatter state source =
   gtk_fmt
 
 let display_source globals
-    (source:GSourceView2.source_buffer) ~(host:Gtk_helper.host)
+    (source:GSourceView.source_buffer) ~(host:Gtk_helper.host)
     ~highlighter ~selector state =
   Locs.clear state;
   host#protect

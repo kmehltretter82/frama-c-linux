@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -156,8 +156,9 @@ module G = struct
     let zero = Some Integer.zero, Some Integer.zero
 
     (* Widening between two bounds. Unstable bounds are widened to infty
-       aggressively. This widening does not assumes that [is_included i1 i2]
-       holds, unlike the widening of Ival. *)
+       aggressively, unless [threshold] is supplied. This widening
+       does not assumes that [is_included i1 i2] holds, unlike the
+       widening of Ival. *)
     let widen ?threshold (min1, max1: t) (min2, max2: t) : t =
       let widen_unstable_min b1 b2 =
         if Extlib.opt_equal Integer.equal b1 b2 then b1 else None
@@ -213,7 +214,7 @@ module G = struct
 
     (* Computes the possible [n] such that [(add b)^n = r], when [f^n]
        is [f] consecutive applications of [f]. *)
-    let backward_nb ~(b:t) ~(r:Ival.t)  =
+    let backward_nb ~(b:t) ~(r:Ival.t) =
       let r = from_ival r in
       let nb_max =
         match classify_sign b with
@@ -466,6 +467,14 @@ module G = struct
           let threshold =
             None (* LoopAnalysis.Loop_analysis.get_bounds _stmt *)
           in
+          (* TODO: since we cannot easily use LoopAnalysis here, we
+             should instead:
+             - collect the conditionals that exit the loop, as done
+               for syntactic hints, if possible in a structured way
+               (i.e. base + interval for which we exit the loop)
+             - invert this interval using the gauges domain, to
+               deduce the number of iterations from which we exit
+             - use the max of those values as threshold. *)
           let threshold = Extlib.opt_map Integer.of_int threshold in
           let (min, max as w) = Bounds.widen ?threshold i1.nb i2.nb in
           (* Limit min bound to 0 *)
@@ -905,7 +914,10 @@ module G = struct
     let shift = Cvalue.V.inject_ival (Bounds.to_ival (aux l lg)) in
     Cvalue.V.add_untyped ctg ~factor:Int_Base.one shift
 
-  let backward_loop (ct, l: t) b v : t option =
+  (* Assuming [b] has value [v], backward-propagate this information to
+     the number of iterations in [t]. Reduce [None] if no reduction
+     occurred. *)
+  let backward_loop (ct, l: t) b v : t or_bottom option =
     (* This function gather the non-zero coefficients for [b], together
        with the number of iterations of the relevant loops. *)
     let rec gather = function
@@ -941,14 +953,14 @@ module G = struct
       | _ :: _ :: _ -> None (* TODO: linearize and solve *)
       | [(stmt, c, nb)] ->
         match Bounds.backward_nb ~b:c ~r:d with
-        | `Bottom -> None (* TODO: return bottom *)
+        | `Bottom -> Some `Bottom
         | `Value n_iter ->
           match Bounds.narrow n_iter nb with
-          | `Bottom -> None (* TODO: return bottom *)
+          | `Bottom -> Some `Bottom
           | `Value n_iter ->
             if not (Bounds.equal nb n_iter) then
               let l' = replace stmt n_iter l in
-              Some (ct, l')
+              Some (`Value (ct, l'))
             else None
     with Not_found -> None
 
@@ -1188,24 +1200,29 @@ module D_Impl : Abstract_domain.S_with_Structure
         match e.enode with
         | Lval lv -> begin
             match Valuation.find_loc valuation lv with
-            | `Top -> state
+            | `Top -> `Value state
             | `Value {loc} ->
               let loc = Precise_locs.imprecise_location loc in
               try
                 let b = loc_to_base loc (Cil.typeOfLval lv) in
                 match r.value.v with
-                | `Bottom -> state
+                | `Bottom -> `Value state
                 | `Value v ->
                   match backward_loop state b v with
-                  | Some state -> state
-                  | None -> state
-              with Untranslatable -> state
+                  | Some `Bottom -> `Bottom
+                  | Some (`Value _ as s) -> s
+                  | None -> `Value state
+              with Untranslatable -> `Value state
           end
-        | _ -> state
-      else state
+        | _ -> `Value state
+      else `Value state
+
+    let assume_exp_bot valuation e r state =
+      state >>- assume_exp valuation e r
 
     let assume _ _ _ valuation state =
-      `Value (Valuation.fold (assume_exp valuation) valuation state)
+      let assume_one = assume_exp_bot valuation in
+      Valuation.fold assume_one valuation (`Value state)
 
     let finalize_call _stmt _call ~pre ~post =
       let state =

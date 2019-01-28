@@ -1,38 +1,33 @@
 [kernel] Parsing nor.c (with preprocessing)
-[value] Analyzing a complete application starting at main
-[value] Computing initial state
-[value] Initial state computed
-[value] Values of globals at initialization
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
   t[0..1999] ∈ {0}
   i ∈ {0}
-[value] computing for function irrelevant_function <- main.
-        Called from nor.c:11.
-[value] Semantic level unrolling superposing up to 100 states
-[value] Semantic level unrolling superposing up to 200 states
-[value] Semantic level unrolling superposing up to 300 states
-[value] Semantic level unrolling superposing up to 400 states
-[value] Semantic level unrolling superposing up to 500 states
-[value] Semantic level unrolling superposing up to 600 states
-[value] Semantic level unrolling superposing up to 700 states
-[value] Semantic level unrolling superposing up to 800 states
-[value] Semantic level unrolling superposing up to 900 states
-[value] Semantic level unrolling superposing up to 1000 states
-[value] Semantic level unrolling superposing up to 1100 states
-[value] Semantic level unrolling superposing up to 1200 states
-[value] Semantic level unrolling superposing up to 1300 states
-[value] Semantic level unrolling superposing up to 1400 states
-[value] Semantic level unrolling superposing up to 1500 states
-[value] Semantic level unrolling superposing up to 1600 states
-[value] Semantic level unrolling superposing up to 1700 states
-[value] Semantic level unrolling superposing up to 1800 states
-[value] Semantic level unrolling superposing up to 1900 states
-[value] Semantic level unrolling superposing up to 2000 states
-[value] Recording results for irrelevant_function
-[value] Done for function irrelevant_function
-[value] Recording results for main
-[value] done for function main
-[value] ====== VALUES COMPUTED ======
-[value] Values at end of function irrelevant_function:
+[eva] Semantic level unrolling superposing up to 100 states
+[eva] Semantic level unrolling superposing up to 200 states
+[eva] Semantic level unrolling superposing up to 300 states
+[eva] Semantic level unrolling superposing up to 400 states
+[eva] Semantic level unrolling superposing up to 500 states
+[eva] Semantic level unrolling superposing up to 600 states
+[eva] Semantic level unrolling superposing up to 700 states
+[eva] Semantic level unrolling superposing up to 800 states
+[eva] Semantic level unrolling superposing up to 900 states
+[eva] Semantic level unrolling superposing up to 1000 states
+[eva] Semantic level unrolling superposing up to 1100 states
+[eva] Semantic level unrolling superposing up to 1200 states
+[eva] Semantic level unrolling superposing up to 1300 states
+[eva] Semantic level unrolling superposing up to 1400 states
+[eva] Semantic level unrolling superposing up to 1500 states
+[eva] Semantic level unrolling superposing up to 1600 states
+[eva] Semantic level unrolling superposing up to 1700 states
+[eva] Semantic level unrolling superposing up to 1800 states
+[eva] Semantic level unrolling superposing up to 1900 states
+[eva] Semantic level unrolling superposing up to 2000 states
+[eva] done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function irrelevant_function:
   t[0] ∈ {0}
    [1] ∈ {1}
    [2] ∈ {2}
@@ -2034,7 +2029,7 @@
    [1998] ∈ {1998}
    [1999] ∈ {1999}
   i ∈ {2000}
-[value] Values at end of function main:
+[eva:final-states] Values at end of function main:
   t[0] ∈ {0}
    [1] ∈ {1}
    [2] ∈ {2}
@@ -4038,4 +4033,4 @@
   i ∈ {2000}
   __retres ∈ {143}
 
-user time: 2.86s
+user time: 0.61s

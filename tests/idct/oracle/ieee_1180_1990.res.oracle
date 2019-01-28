@@ -49,6 +49,10 @@
 [eva] tests/idct/idct.c:91: Call to builtin Frama_C_cos for function cos
 [eva] tests/idct/idct.c:90: Call to builtin Frama_C_sqrt for function sqrt
 [eva] tests/idct/idct.c:91: Call to builtin Frama_C_cos for function cos
+[eva] tests/idct/idct.c:90: Call to builtin Frama_C_sqrt for function sqrt
+[eva] tests/idct/idct.c:91: Call to builtin Frama_C_cos for function cos
+[eva] tests/idct/idct.c:90: Call to builtin Frama_C_sqrt for function sqrt
+[eva] tests/idct/idct.c:91: Call to builtin Frama_C_cos for function cos
 [eva] tests/idct/idct.c:128: starting to merge loop iterations
 [eva] tests/idct/idct.c:126: starting to merge loop iterations
 [eva:alarm] tests/idct/idct.c:129: Warning: 
@@ -148,6 +152,10 @@
   Reusing old results for call to IEEE_1180_1990_rand
 [eva] tests/idct/ieee_1180_1990.c:85: 
   Reusing old results for call to IEEE_1180_1990_rand
+[eva] tests/idct/ieee_1180_1990.c:85: 
+  Reusing old results for call to IEEE_1180_1990_rand
+[eva] tests/idct/ieee_1180_1990.c:85: 
+  Reusing old results for call to IEEE_1180_1990_rand
 [eva] Recording results for IEEE_1180_1990_mkbk
 [eva] Done for function IEEE_1180_1990_mkbk
 [eva] computing for function IEEE_1180_1990_dctf <- main.
@@ -180,6 +188,14 @@
 [eva] tests/idct/ieee_1180_1990.c:101: 
   Call to builtin Frama_C_cos for function cos
 [eva] tests/idct/ieee_1180_1990.c:98: starting to merge loop iterations
+[eva] tests/idct/ieee_1180_1990.c:100: 
+  Call to builtin Frama_C_sqrt for function sqrt
+[eva] tests/idct/ieee_1180_1990.c:101: 
+  Call to builtin Frama_C_cos for function cos
+[eva] tests/idct/ieee_1180_1990.c:100: 
+  Call to builtin Frama_C_sqrt for function sqrt
+[eva] tests/idct/ieee_1180_1990.c:101: 
+  Call to builtin Frama_C_cos for function cos
 [eva] tests/idct/ieee_1180_1990.c:100: 
   Call to builtin Frama_C_sqrt for function sqrt
 [eva] tests/idct/ieee_1180_1990.c:101: 
@@ -278,6 +294,14 @@
   Call to builtin Frama_C_sqrt for function sqrt
 [eva] tests/idct/ieee_1180_1990.c:141: 
   Call to builtin Frama_C_cos for function cos
+[eva] tests/idct/ieee_1180_1990.c:140: 
+  Call to builtin Frama_C_sqrt for function sqrt
+[eva] tests/idct/ieee_1180_1990.c:141: 
+  Call to builtin Frama_C_cos for function cos
+[eva] tests/idct/ieee_1180_1990.c:140: 
+  Call to builtin Frama_C_sqrt for function sqrt
+[eva] tests/idct/ieee_1180_1990.c:141: 
+  Call to builtin Frama_C_cos for function cos
 [eva:alarm] tests/idct/ieee_1180_1990.c:150: Warning: 
   accessing uninitialized left-value. assert \initialized(&(*(m1 + k))[j]);
 [eva] tests/idct/ieee_1180_1990.c:149: starting to merge loop iterations
@@ -345,6 +369,8 @@
 [eva] tests/idct/ieee_1180_1990.c:215: starting to merge loop iterations
 [eva] tests/idct/ieee_1180_1990.c:234: starting to merge loop iterations
 [eva] tests/idct/ieee_1180_1990.c:233: starting to merge loop iterations
+[eva] tests/idct/ieee_1180_1990.c:235: Warning: 
+  2's complement assumed for overflow
 [eva] computing for function IEEE_1180_1990_dctf <- main.
   Called from tests/idct/ieee_1180_1990.c:236.
 [eva] Recording results for IEEE_1180_1990_dctf
@@ -422,6 +448,8 @@
 [eva] tests/idct/ieee_1180_1990.c:277: Warning: 
   2's complement assumed for overflow
 [eva] tests/idct/ieee_1180_1990.c:261: starting to merge loop iterations
+[eva] tests/idct/ieee_1180_1990.c:281: Warning: 
+  2's complement assumed for overflow
 [eva] tests/idct/ieee_1180_1990.c:280: starting to merge loop iterations
 [eva] tests/idct/ieee_1180_1990.c:279: starting to merge loop iterations
 [eva] tests/idct/ieee_1180_1990.c:282: 
@@ -494,6 +522,8 @@
 [eva] tests/idct/ieee_1180_1990.c:323: Warning: 
   2's complement assumed for overflow
 [eva] tests/idct/ieee_1180_1990.c:307: starting to merge loop iterations
+[eva] tests/idct/ieee_1180_1990.c:327: Warning: 
+  2's complement assumed for overflow
 [eva] tests/idct/ieee_1180_1990.c:326: starting to merge loop iterations
 [eva] tests/idct/ieee_1180_1990.c:325: starting to merge loop iterations
 [eva] tests/idct/ieee_1180_1990.c:328: 
@@ -593,119 +623,39 @@
 [eva] Recording results for IEEE_1180_1990_idctf
 [eva] Done for function IEEE_1180_1990_idctf
 [eva] tests/idct/ieee_1180_1990.c:214: Reusing old results for call to idct
-[eva] tests/idct/ieee_1180_1990.c:235: Warning: 
-  2's complement assumed for overflow
-[eva] computing for function IEEE_1180_1990_dctf <- main.
-  Called from tests/idct/ieee_1180_1990.c:236.
-[eva] Recording results for IEEE_1180_1990_dctf
-[eva] Done for function IEEE_1180_1990_dctf
+[eva] tests/idct/ieee_1180_1990.c:236: 
+  Reusing old results for call to IEEE_1180_1990_dctf
 [eva] tests/idct/ieee_1180_1990.c:237: 
   Reusing old results for call to IEEE_1180_1990_idctf
 [eva] tests/idct/ieee_1180_1990.c:238: Reusing old results for call to idct
-[eva] computing for function IEEE_1180_1990_mkbk <- main.
-  Called from tests/idct/ieee_1180_1990.c:257.
-[eva] tests/idct/ieee_1180_1990.c:85: 
-  Reusing old results for call to IEEE_1180_1990_rand
-[eva] tests/idct/ieee_1180_1990.c:85: 
-  Reusing old results for call to IEEE_1180_1990_rand
-[eva] tests/idct/ieee_1180_1990.c:85: 
-  Reusing old results for call to IEEE_1180_1990_rand
-[eva] tests/idct/ieee_1180_1990.c:85: 
-  Reusing old results for call to IEEE_1180_1990_rand
-[eva] tests/idct/ieee_1180_1990.c:85: 
-  Reusing old results for call to IEEE_1180_1990_rand
-[eva] tests/idct/ieee_1180_1990.c:85: 
-  Reusing old results for call to IEEE_1180_1990_rand
-[eva] tests/idct/ieee_1180_1990.c:85: 
-  Reusing old results for call to IEEE_1180_1990_rand
-[eva] Recording results for IEEE_1180_1990_mkbk
-[eva] Done for function IEEE_1180_1990_mkbk
+[eva] tests/idct/ieee_1180_1990.c:257: 
+  Reusing old results for call to IEEE_1180_1990_mkbk
 [eva] tests/idct/ieee_1180_1990.c:258: 
   Reusing old results for call to IEEE_1180_1990_dctf
 [eva] tests/idct/ieee_1180_1990.c:259: 
   Reusing old results for call to IEEE_1180_1990_idctf
 [eva] tests/idct/ieee_1180_1990.c:260: Reusing old results for call to idct
-[eva] tests/idct/ieee_1180_1990.c:281: Warning: 
-  2's complement assumed for overflow
 [eva] tests/idct/ieee_1180_1990.c:282: 
   Reusing old results for call to IEEE_1180_1990_dctf
 [eva] tests/idct/ieee_1180_1990.c:283: 
   Reusing old results for call to IEEE_1180_1990_idctf
 [eva] tests/idct/ieee_1180_1990.c:284: Reusing old results for call to idct
-[eva] computing for function IEEE_1180_1990_mkbk <- main.
-  Called from tests/idct/ieee_1180_1990.c:303.
-[eva] tests/idct/ieee_1180_1990.c:85: 
-  Reusing old results for call to IEEE_1180_1990_rand
-[eva] tests/idct/ieee_1180_1990.c:85: 
-  Reusing old results for call to IEEE_1180_1990_rand
-[eva] tests/idct/ieee_1180_1990.c:85: 
-  Reusing old results for call to IEEE_1180_1990_rand
-[eva] tests/idct/ieee_1180_1990.c:85: 
-  Reusing old results for call to IEEE_1180_1990_rand
-[eva] tests/idct/ieee_1180_1990.c:85: 
-  Reusing old results for call to IEEE_1180_1990_rand
-[eva] tests/idct/ieee_1180_1990.c:85: 
-  Reusing old results for call to IEEE_1180_1990_rand
-[eva] tests/idct/ieee_1180_1990.c:85: 
-  Reusing old results for call to IEEE_1180_1990_rand
-[eva] Recording results for IEEE_1180_1990_mkbk
-[eva] Done for function IEEE_1180_1990_mkbk
+[eva] tests/idct/ieee_1180_1990.c:303: 
+  Reusing old results for call to IEEE_1180_1990_mkbk
 [eva] tests/idct/ieee_1180_1990.c:304: 
   Reusing old results for call to IEEE_1180_1990_dctf
 [eva] tests/idct/ieee_1180_1990.c:305: 
   Reusing old results for call to IEEE_1180_1990_idctf
 [eva] tests/idct/ieee_1180_1990.c:306: Reusing old results for call to idct
-[eva] tests/idct/ieee_1180_1990.c:327: Warning: 
-  2's complement assumed for overflow
 [eva] tests/idct/ieee_1180_1990.c:328: 
   Reusing old results for call to IEEE_1180_1990_dctf
 [eva] tests/idct/ieee_1180_1990.c:329: 
   Reusing old results for call to IEEE_1180_1990_idctf
 [eva] tests/idct/ieee_1180_1990.c:330: Reusing old results for call to idct
-[eva] computing for function IEEE_1180_1990_mkbk <- main.
-  Called from tests/idct/ieee_1180_1990.c:211.
-[eva] tests/idct/ieee_1180_1990.c:85: 
-  Reusing old results for call to IEEE_1180_1990_rand
-[eva] tests/idct/ieee_1180_1990.c:85: 
-  Reusing old results for call to IEEE_1180_1990_rand
-[eva] tests/idct/ieee_1180_1990.c:85: 
-  Reusing old results for call to IEEE_1180_1990_rand
-[eva] tests/idct/ieee_1180_1990.c:85: 
-  Reusing old results for call to IEEE_1180_1990_rand
-[eva] tests/idct/ieee_1180_1990.c:85: 
-  Reusing old results for call to IEEE_1180_1990_rand
-[eva] tests/idct/ieee_1180_1990.c:85: 
-  Reusing old results for call to IEEE_1180_1990_rand
-[eva] tests/idct/ieee_1180_1990.c:85: 
-  Reusing old results for call to IEEE_1180_1990_rand
-[eva] Recording results for IEEE_1180_1990_mkbk
-[eva] Done for function IEEE_1180_1990_mkbk
-[eva] computing for function IEEE_1180_1990_dctf <- main.
-  Called from tests/idct/ieee_1180_1990.c:212.
-[eva] tests/idct/ieee_1180_1990.c:100: 
-  Call to builtin Frama_C_sqrt for function sqrt
-[eva] tests/idct/ieee_1180_1990.c:101: 
-  Call to builtin Frama_C_cos for function cos
-[eva] tests/idct/ieee_1180_1990.c:101: 
-  Call to builtin Frama_C_cos for function cos
-[eva] tests/idct/ieee_1180_1990.c:101: 
-  Call to builtin Frama_C_cos for function cos
-[eva] tests/idct/ieee_1180_1990.c:101: 
-  Call to builtin Frama_C_cos for function cos
-[eva] tests/idct/ieee_1180_1990.c:100: 
-  Call to builtin Frama_C_sqrt for function sqrt
-[eva] tests/idct/ieee_1180_1990.c:101: 
-  Call to builtin Frama_C_cos for function cos
-[eva] tests/idct/ieee_1180_1990.c:100: 
-  Call to builtin Frama_C_sqrt for function sqrt
-[eva] tests/idct/ieee_1180_1990.c:101: 
-  Call to builtin Frama_C_cos for function cos
-[eva] tests/idct/ieee_1180_1990.c:100: 
-  Call to builtin Frama_C_sqrt for function sqrt
-[eva] tests/idct/ieee_1180_1990.c:101: 
-  Call to builtin Frama_C_cos for function cos
-[eva] Recording results for IEEE_1180_1990_dctf
-[eva] Done for function IEEE_1180_1990_dctf
+[eva] tests/idct/ieee_1180_1990.c:211: 
+  Reusing old results for call to IEEE_1180_1990_mkbk
+[eva] tests/idct/ieee_1180_1990.c:212: 
+  Reusing old results for call to IEEE_1180_1990_dctf
 [eva] tests/idct/ieee_1180_1990.c:213: 
   Reusing old results for call to IEEE_1180_1990_idctf
 [eva] tests/idct/ieee_1180_1990.c:214: Reusing old results for call to idct
@@ -889,6 +839,35 @@
 [eva] tests/idct/ieee_1180_1990.c:213: 
   Reusing old results for call to IEEE_1180_1990_idctf
 [eva] tests/idct/ieee_1180_1990.c:214: Reusing old results for call to idct
+[eva] tests/idct/ieee_1180_1990.c:236: 
+  Reusing old results for call to IEEE_1180_1990_dctf
+[eva] tests/idct/ieee_1180_1990.c:237: 
+  Reusing old results for call to IEEE_1180_1990_idctf
+[eva] tests/idct/ieee_1180_1990.c:238: Reusing old results for call to idct
+[eva] tests/idct/ieee_1180_1990.c:257: 
+  Reusing old results for call to IEEE_1180_1990_mkbk
+[eva] tests/idct/ieee_1180_1990.c:258: 
+  Reusing old results for call to IEEE_1180_1990_dctf
+[eva] tests/idct/ieee_1180_1990.c:259: 
+  Reusing old results for call to IEEE_1180_1990_idctf
+[eva] tests/idct/ieee_1180_1990.c:260: Reusing old results for call to idct
+[eva] tests/idct/ieee_1180_1990.c:282: 
+  Reusing old results for call to IEEE_1180_1990_dctf
+[eva] tests/idct/ieee_1180_1990.c:283: 
+  Reusing old results for call to IEEE_1180_1990_idctf
+[eva] tests/idct/ieee_1180_1990.c:284: Reusing old results for call to idct
+[eva] tests/idct/ieee_1180_1990.c:303: 
+  Reusing old results for call to IEEE_1180_1990_mkbk
+[eva] tests/idct/ieee_1180_1990.c:304: 
+  Reusing old results for call to IEEE_1180_1990_dctf
+[eva] tests/idct/ieee_1180_1990.c:305: 
+  Reusing old results for call to IEEE_1180_1990_idctf
+[eva] tests/idct/ieee_1180_1990.c:306: Reusing old results for call to idct
+[eva] tests/idct/ieee_1180_1990.c:328: 
+  Reusing old results for call to IEEE_1180_1990_dctf
+[eva] tests/idct/ieee_1180_1990.c:329: 
+  Reusing old results for call to IEEE_1180_1990_idctf
+[eva] tests/idct/ieee_1180_1990.c:330: Reusing old results for call to idct
 [eva:alarm] tests/idct/ieee_1180_1990.c:357: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[i].pmse[j][k]);
 [eva:alarm] tests/idct/ieee_1180_1990.c:368: Warning: 
@@ -917,7 +896,7 @@
 [scope:rm_asserts] removing 16 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function IEEE_1180_1990_rand:
-  i ∈ [0..2147483646]
+  i ∈ [0..2147483646],0%2
   j ∈ [0..600]
   x ∈ [0.0000000000000000 .. 600.9999997201375663]
   IEEE_1180_1990_rand_randx ∈ [--..--]

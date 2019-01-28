@@ -31,6 +31,10 @@
 [eva] tests/value/gauges.c:21: Frama_C_show_each_1: {{ "in" }}
 [eva] tests/value/gauges.c:19: Frama_C_show_each_0: {{ "in" }}
 [eva] tests/value/gauges.c:21: Frama_C_show_each_1: {{ "in" }}
+[eva] tests/value/gauges.c:19: Frama_C_show_each_0: {{ "in" }}
+[eva] tests/value/gauges.c:21: Frama_C_show_each_1: {{ "in" }}
+[eva] tests/value/gauges.c:19: Frama_C_show_each_0: {{ "in" }}
+[eva] tests/value/gauges.c:21: Frama_C_show_each_1: {{ "in" }}
 [eva:alarm] tests/value/gauges.c:26: Warning: 
   signed overflow. assert l + 1 ≤ 2147483647;
 [eva] Recording results for main0
@@ -53,6 +57,10 @@
 [eva:alarm] tests/value/gauges.c:45: Warning: 
   signed overflow. assert -2147483648 ≤ j - 4;
 [eva] tests/value/gauges.c:38: starting to merge loop iterations
+[eva] tests/value/gauges.c:41: Frama_C_show_each_0: {{ "in" }}
+[eva] tests/value/gauges.c:43: Frama_C_show_each_1: {{ "in" }}
+[eva] tests/value/gauges.c:41: Frama_C_show_each_0: {{ "in" }}
+[eva] tests/value/gauges.c:43: Frama_C_show_each_1: {{ "in" }}
 [eva] tests/value/gauges.c:41: Frama_C_show_each_0: {{ "in" }}
 [eva] tests/value/gauges.c:43: Frama_C_show_each_1: {{ "in" }}
 [eva] tests/value/gauges.c:41: Frama_C_show_each_0: {{ "in" }}

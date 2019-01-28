@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -val @VALUECONFIG@ -journal-disable -calldeps
+   OPT: -eva @VALUECONFIG@ -journal-disable -calldeps
 */
 
 /*@ assigns \result \from min, max;

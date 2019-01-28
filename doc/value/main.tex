@@ -450,9 +450,9 @@ Once we are convinced that all functions have either a body or a specification,
 we can focus on functions without bodies:
 \begin{listing-nonumber}
 grep "using specification for function" log
-[value] using specification for function memset
-[value] using specification for function memcpy
-[value] using specification for function printf
+[eva] using specification for function memset
+[eva] using specification for function memcpy
+[eva] using specification for function printf
 \end{listing-nonumber}
 We find three functions. Not having a body for \verb|printf| is fine,
 since calls to this function have no observable effects for the analysis.
@@ -492,7 +492,10 @@ All functions included from \verb+string.h+ are undefined, but only
 \verb+memcpy+, \verb+memset+ and \verb+printf+ are called.
 
 
-To handle the absence of functions \lstinline|memset| and \lstinline|memcpy|,
+To handle the absence of functions \lstinline|memset| and \lstinline|memcpy|%
+\footnote{Since \FramaC 18 (Argon), \Eva{} includes builtin functions for
+  \lstinline|memset| and \lstinline|memcpy|,
+  thus providing source code for them is no longer necessary.},
 we will provide source code for them.
 Sometimes it is a good idea to provide the
 exact source code that will actually be used in an actual
@@ -582,7 +585,7 @@ The next line in the log is a progression message, that indicates
 that \Eva{} has encountered a loop and is performing an approximations.
 Those messages can be ignored for now.
 \begin{logs}
-lib.c:17:[value] entering loop for the first time
+lib.c:17:[eva] entering loop for the first time
 \end{logs}
 
 The next log entry which is not a progression message is a
@@ -798,14 +801,14 @@ but when it is almost done (after the analysis of function
 ...
 main_1.c:14:[kernel] warning: Neither code nor specification for function printf, 
             generating default assigns from the prototype
-[value] using specification for function printf
-[value] Done for function printf
-main_1.c:14:[value] completely invalid value in evaluation of
-                      argument (int)hash[i]
+[eva] using specification for function printf
+[eva] Done for function printf
+main_1.c:14:[eva] completely invalid value in evaluation of
+                  argument (int)hash[i]
 main_1.c:14:[kernel] warning: accessing uninitialized left-value.
-                       assert \initialized(&hash[i]);
-[value] Recording results for main
-[value] done for function main
+                     assert \initialized(&hash[i]);
+[eva] Recording results for main
+[eva] done for function main
 ...
 \end{logs}
 
@@ -1593,7 +1596,7 @@ range of the integer type it is converted to.
 ov_float_int.c:6:[kernel] warning: overflow in conversion from floating-point 
  to integer. assert -2147483649 < f < 2147483648;
 
-[value] Values at end of function main:
+[eva] Values at end of function main:
 f $\in$ [2000000000. .. 3000000000.]
 __retres $\in$ [2000000000..2147483647]
 \end{logs}
@@ -1876,15 +1879,15 @@ and \lstinline|int *| are \emph{not} compatible).
 \listinginput{1}{valid_function.c}
 
 \begin{logs}
-valid_function.c:9:[kernel] warning: pointer to function with incompatible type.
-        assert \valid_function(p);
-valid_function.c:9:[kernel] warning: Neither code nor specification for
-        function f1, generating default assigns from the prototype
-[value] using specification for function f1
-valid_function.c:12:[kernel] warning: pointer to function with incompatible type.
-        assert \valid_function(p);
-valid_function.c:12:[value] assertion 'Value,function_pointer' got final status
-        invalid.
+[eva:alarm] valid_function.c:9: Warning:
+  pointer to function with incompatible type. assert \valid_function(p);
+[kernel:annot:missing-spec] valid_function.c:9: Warning:
+  Neither code nor specification for function f1, generating default assigns from the prototype
+[eva] using specification for function f1
+[eva:alarm] valid_function.c:12: Warning:
+  pointer to function with incompatible type. assert \valid_function(p);
+[eva] valid_function.c:12:
+  assertion 'Eva,function_pointer' got final status invalid.
 \end{logs}
 
 %TODO: alarm for pointer subtraction
@@ -1933,10 +1936,10 @@ is imprecise.
 Examples of messages that result from the apparition of imprecision in the
 analysis are:
 \begin{logs}
-origin.c:14:[value] assigning imprecise value to pa1.
+origin.c:14:[eva] assigning imprecise value to pa1.
         The imprecision originates from Arithmetic {origin.c:14}
 
-origin.c:15:[value] writing somewhere in {ta1} 
+origin.c:15:[eva] writing somewhere in {ta1} 
         because of Arithmetic {origin.c:14}.
 \end{logs}
 
@@ -2202,7 +2205,7 @@ Besides, the source code of some of the functions used by
 the application may not be available (library functions for instance).
 The plug-in can be used, usually with more work, in all these circumstances.
 The options for specifying the entry point of the analysis are detailed
-in this manual, section \ref{trait_fonctions}.
+in this manual, section \ref{val-use-spec}.
 
 \subsection{Entry point of a complete application}
 
@@ -2561,7 +2564,7 @@ the following program does not terminate:
 If this program is analyzed
 with the default options of \Eva{}, the analysis finds
 that every time execution reaches the end of \lstinline|main|, the value
-of \lstinline|x| is in  $\bropen 100..127\brclose$. This does
+of \lstinline|x| is $\geq 100$. This does
 not mean that the function always terminates or even that it may
 sometimes terminate (it does neither). When \Eva{}
 proposes an interval for \lstinline|x| at a point P, 
@@ -2588,7 +2591,7 @@ int x, y, z;
 main(int c){
   ...
   ...
-/* At this point \Eva{} guarantees:
+/* At this point Eva guarantees:
    x IN {0; 1} 
    y IN {0; 1}; */
   z = 10 / (x - y);
@@ -2631,7 +2634,27 @@ Just in case.}
 
 \vspace{2cm}
 
+Parameterization of \Eva{} involves two main kinds of options:
+{\em correctness options} and {\em performance tuning options}.
+The former require understanding of their meaning and of the extra hypotheses
+they entail; used incorrectly, they can lead to a wrong analysis.
+The latter control the tradeoff between the quality of the results and the
+resources taken by the analyzer to provide them (CPU time and memory usage).
+These options cannot be used wrongly, in the sense that they do not affect the
+correctness of the results. However, using them efficiently is essential for
+scalability of the analysis.
+
+Section \ref{command-line} presents the general usage options of \Eva{} in the
+command-line.
+The options described in section \ref{context} are correctness options,
+while the remaining sections (\ref{boucles-traitement},
+\ref{controlling-approximations} and \ref{sec:eva}) deal with performance
+tuning options. Finally, \ref{nonterm} presents a derived analysis to
+obtain information about non-termination.
+
+
 \section{Command line}
+\label{command-line}
 
 The parameters that determine Frama-C's behavior can be
 set through the command line.
@@ -2795,7 +2818,7 @@ prototype of \lstinline|main| is:
   {examples/parametrizing/simple-main.c}
 The types of arguments \lstinline|argc| and \lstinline|argv| 
 translate into the following initial values:
-\lstinputlisting[linerange={9-15}]
+\lstinputlisting[linerange={10-16}]
   {examples/parametrizing/simple-main.log}
 
 This is generally not what is wanted, but then again, embedded applications
@@ -2903,7 +2926,7 @@ also decided by the value of option \lstinline|-eva-context-width|.
 Example: with the default value \lstinline|2| for option
 \lstinline|-eva-context-width|, the declaration \lstinline|int *(t[5]);|
 causes the following array to be allocated:
-\lstinputlisting[linerange={9-14}]
+\lstinputlisting[linerange={10-15}]
   {examples/parametrizing/context-width.log}
       
 Note that for both arrays of pointers and pointers to pointers,
@@ -2930,7 +2953,7 @@ two is plenty for most programs.
 For instance, here is the initial state displayed by \Eva{}
 in \lstinline|-lib-entry| mode if a global variable \lstinline|s| 
 has type \lstinline|struct S| defined above:
-\lstinputlisting[linerange={7-13}]
+\lstinputlisting[linerange={6-13}]
   {examples/parametrizing/context-depth.1.log}
 \lstinputlisting[linerange={17-20},breaklines=true]
   {examples/parametrizing/context-depth.1.log}
@@ -2947,7 +2970,7 @@ Below are the initial contents for a variable \lstinline|s| of type \lstinline|s
 with options \lstinline|-eva-context-width 1|
 \lstinline|-eva-context-depth 1|:
 
-\lstinputlisting[linerange={7-17}]
+\lstinputlisting[linerange={6-16}]
   {examples/parametrizing/context-depth.2.log}
                                            
 \subsubsection{The possibility of invalid pointers}
@@ -2982,7 +3005,7 @@ a variable \lstinline|s| of
 type \lstinline|struct S| receives  the following initial contents,
 modeling a chained list of length exactly 3:
 
-\lstinputlisting[linerange={7-12}]
+\lstinputlisting[linerange={6-11}]
   {examples/parametrizing/context-depth.3.log}
 
 \subsection{State of the IEEE 754 environment}
@@ -3148,24 +3171,58 @@ informed assumptions. However, no guarantee is made that those assumptions
 over-approximate the real behavior of the function. The inferred
 contract should be verified carefully by the user.
 
+\subsection{Using the specification of a function instead of its body}
+\label{val-use-spec}
+
+In some cases, one can estimate that the analysis of a given function \verb+f+
+takes too much time. This can be caused by a very complex
+function, or because \verb+f+ is called many times during the analysis.
+Another situation is when a function already has a functional specification,
+proved for instance with the \textsf{WP} plug-in, and we do not want/need
+to analyze it with \Eva{}.
+
+In the cases above, a somewhat radical
+approach consists in replacing the entire body of the function
+by an ACSL contract that describes its behavior. See for example
+section~\ref{annot_assigns} for how to specify which values the function
+reads and writes.
+
+Alternatively, one can leave the body of the function untouched, but
+still write a contract. Then it is possible to use the option
+\verb+-eva-use-spec f+. This instructs \Eva{} to use the
+specification of \verb+f+ instead of its body each time a call to
+\verb+f+ is encountered. This is equivalent\footnote{Except for a few
+  properties, as described in the next paragraph.} to deleting the body
+of \verb+f+ for \Eva{}, but not for the other plug-ins of \FramaC,
+that may study the body of \verb+f+ on their own.
+
+Notice that option \verb+-eva-use-spec f+ loses some guarantees. In particular,
+the body of \verb+f+ is not studied at all by \Eva{}. Neither
+are the functions that \verb+f+ calls, unless they are used by some other
+functions than \verb+f+. Moreover, \Eva{} does not attempt
+to check that \verb+f+ conforms to its specification. In particular,
+postconditions are marked as {\em unknown} with \verb+-eva-use-spec+,
+while they are {\em considered valid} for functions without body.
+It is the responsibility
+of the user to verify those facts, for example by studying \verb+f+
+on its own in a generic context.
 
 
-\section{Controlling approximations}
 
-Unlike options of section \ref{context}, which used wrongly may cause
-\Eva{} to produce incorrect results, all the options
-in this section give the user control over the tradeoff between the
-quality of the results and the resources taken by the analyzer to
-provide them. The options described in this section can, so to speak,
-not be used wrongly. They may cause Frama-C to exhaust the available
-memory, to take a nearly infinite time, or, in the other direction,
-to produce results so imprecise that they are useless, but {\bf never}
-to produce incorrect results.
+%\section{Controlling approximations}
+%
+%Unlike options of section \ref{context}, which used wrongly may cause
+%\Eva{} to produce incorrect results, all the options
+%in this section give the user control over the tradeoff between the
+%quality of the results and the resources taken by the analyzer to
+%provide them. The options described in this section can, so to speak,
+%not be used wrongly. They may cause Frama-C to exhaust the available
+%memory, to take a nearly infinite time, or, in the other direction,
+%to produce results so imprecise that they are useless, but {\bf never}
+%to produce incorrect results.
 
-\subsection{Treatment of loops}
+\section{Improving precision in loops}
 \label{boucles-traitement}
-
-\subsubsection{Default treatment of loops}
 
 The default treatment of loops by the analyzer may produce
 results that are too approximate. Tuning 
@@ -3178,8 +3235,181 @@ entering the loop. This englobing state may be too imprecise
 by construction: typically, if the analyzed loop is initializing
 an array, the user does not expect to see the initial values of
 the array appear in the state computed by the analyzer.
-The solution in this case is to use one of the two unrolling options,
-as described in this section.
+The solution in this case is to either unroll loops, using one of several
+available methods, or to add annotations (widening hints or loop invariants)
+that enable the analyzer to maintain precision while ensuring the analysis
+time remains bounded.
+
+\subsection{Loop unrolling}
+
+Loop unrolling is often easier to apply, since it does not require much
+knowledge about the loop, other than an estimate of the number of iterations.
+This estimate may not improve precision if too low
+or lead to unnecessary work if too high,
+but will never affect its correctness.
+
+\subsubsection{Loop unroll annotations}
+
+Whenever a loop has a fixed number of iterations (or a known upper bound),
+an easy and precise way to handle it is to include a
+\lstinline|loop unroll <n>| annotation, where
+\lstinline|<n>| is the number of iterations of the loop.
+It will indicate \Eva{} to analyze the loop by semantically unrolling each
+iteration, avoiding merging states from different iterations.
+This leads to increased cost in terms of analysis, but usually the cost
+increase is worth the improvement in precision.
+
+Such annotations must be placed before just before the loop (i.e. before the
+\lstinline|while|, \lstinline|for| or \lstinline|do| introducing the loop),
+and one annotation is required per loop, including nested ones. For instance:
+
+\begin{lstlisting}
+#define NROWS 10
+void main() {
+  int a[NROWS][20] = {0};
+  //@ loop unroll NROWS;
+  for (int i = 0; i < 10; i++) {
+    //@ loop unroll (10+10);
+    for (int j = 0; j < 20; j++) {
+      a[i][j] += i + j;
+    }
+  }
+}
+\end{lstlisting}
+
+Note that constants obtained via \lstinline|#define| macros can be used in
+annotations, as well as constant expressions. The annotations above will ensure
+that \Eva{} will unroll the loops and keep the analysis precise; otherwise,
+the array access \lstinline|a[i][j]| might generate alarms due to imprecisions.
+
+The unrolling mechanism is independent of \lstinline|-eva-slevel|
+(see next subsection): annotated loops are always unrolled at least the specified
+number of times. If the loop has not been entirely unrolled, however,
+remaining \lstinline|-eva-slevel| may be used to unroll more iterations.
+
+While it is sometimes useful to unroll only the first iterations, the usual
+objective is full unrolling; the user can enable option
+\lstinline|-value-msg-key=loop-unroll| to be informed whenever the specified
+unrolling value is insufficient to unroll the loop entirely:
+
+\begin{lstlisting}
+void main() {
+  //@ loop unroll 20; // should be 21
+  for (int i = 0 ; i <= 20 ; i ++) {
+  }
+}
+\end{lstlisting}
+
+\begin{lstlisting}
+[eva:loop-unroll] insuf-loop.c:3: loop not completely unrolled
+\end{lstlisting}
+
+Note that using an unrolling parameter which is higher than the actual number
+of iterations of a loop doesn't generally have an effect on the analysis.
+The analyzer will usually detect that further iterations are not useful.
+
+If all loops in a program need to be unrolled, one way to do it quickly
+consists in using option \lstinline|-eva-min-loop-unroll <n>|,
+where \lstinline|<n>| is the number of iterations to unroll in each loop.
+This option has lower precedence than \lstinline|loop unroll| annotations:
+\Eva{} will always consider the latter if it is present in a loop.
+This allows, for instance, to prevent unrolling of an infinite loop by
+adding \lstinline|loop unroll 0| before it, while unrolling the remaining
+loops by the specified amount in \lstinline|-eva-min-loop-unroll|.
+
+\subsubsection{Unrolling via option {\em -eva-slevel}}
+\label{slevel}
+
+The option \lstinline|-eva-slevel n| indicates that the analyzer is allowed
+to separate, in each point of the analyzed code,
+up to \lstinline|n| states from different execution paths before starting
+to compute the unions of said states. An effect of this option
+is that the states corresponding to the first, second,\ldots
+iterations in a loop remain separated, as if the loop had been unrolled.
+
+Unlike with \lstinline|loop unroll| annotations, the number \lstinline|n|
+to use with \lstinline|-eva-slevel| depends on the nature of the control flow
+graph of the function to analyze.
+If the only control structure is a loop of \lstinline|m| iterations,
+then \texttt{-eva-slevel \textsf{m+1}} allows to unroll the loop completely.
+The presence of other loops or of \lstinline|if-then-else| constructs
+multiplies the number of paths a state may correspond to,
+and thus the number of states it is necessary to keep separated
+in order to unroll a loop completely.
+For instance, the
+nested simple loops in the following example require the
+option \lstinline|-eva-slevel 55| in order to be completely unrolled:
+\lstinputlisting[numbers=left]
+  {examples/parametrizing/slevel.c}
+
+When the loops are sufficiently unrolled, the result obtained for the
+contents of array \lstinline|t| are the optimally precise:
+\lstinputlisting[linerange={14-14}]
+  {examples/parametrizing/slevel.1.log}
+
+The number to pass the option \lstinline|-eva-slevel|  is of the magnitude of
+the number of values for \lstinline|i| (the 6 integers between 0 and 5)
+times the number of possible values for \lstinline|j| (the 11
+integers comprised between 0 and 10). If a value much lower than
+this is passed, the result of the initialization of array \lstinline|t|
+will only be precise for the first cells. The option \lstinline|-eva-slevel 28|
+gives for instance the following result for array \lstinline|t|:
+\lstinputlisting[linerange={15-16}]
+  {examples/parametrizing/slevel.2.log}
+
+In this result, the effects of the first iterations of the loops
+(for the whole of \lstinline|t[0]|, the whole of \lstinline|t[1]| and the first
+half of \lstinline|t[2]|) have been computed precisely. The
+effects on the rest of \lstinline|t| were computed with
+approximations. Because of these approximations, the analyzer can not
+tell whether each of those cells contains 1 or its original value 0.
+The value proposed for the cells \lstinline|t[2][5]| and following
+is imprecise but correct. The set \lstinline|{0; 1}| does
+contain the actual value \lstinline|1| of the cells.
+
+The option \lstinline|-eva-slevel-function f:n| tells the analyzer to apply 
+semantic unrolling level \lstinline|n| to function \lstinline|f|.
+This fine-tuning option allows to 
+force the analyzer to invest time precisely analyzing functions that matter,
+for instance \lstinline|-eva-slevel-function crucial_initialization:2000|.
+Oppositely, options \lstinline|-eva-slevel 100 -eva-slevel-function trifle:0| 
+can be used together to avoid squandering resources over irrelevant parts of 
+the analyzed application. The \lstinline|-eva-slevel-function| option can be used 
+several times to set the semantic unrolling level of several functions.
+
+Overall, \lstinline|-eva-slevel| has the advantage of being quick to setup.
+However, it does not allow fine grained control as loop unrolling annotations,
+it is context-dependent (e.g. for nested loops), unstable (minor changes in
+control flow may affect the usage of slevel) and hard to estimate in presence
+of complex control flows.
+
+\subsubsection{Syntactic unrolling}
+
+Syntactic unrolling (option \lstinline|-ulevel n|, provided by the \FramaC
+kernel), while not recommended when using \Eva{}, is another way to unroll
+loops for a more precise analysis. The only advantage of syntactic unrolling
+is that the GUI will show separate statements, allowing
+the user to see the values of variables at each iteration.
+However, this method is slower and leads to code which may become less
+readable, due to the introduction of extra variables, labels and statements.
+
+The value \lstinline$n$ is the number of times to unroll the loop before starting
+any analysis (if larger than the number of loop iterations, the extra code will
+still be generated, but it may end up being considered unreachable by \Eva{}).
+In any case, a large value for \lstinline|n| makes the analyzed code larger,
+especially for nested loops. This may cause the analyzer to use more time and
+memory.
+
+It is possible to control syntactic unrolling for each loop in the analyzed code
+with the annotation \lstinline|//@loop pragma UNROLL n;|, placed before the loop.
+
+
+\subsection{Widening hints and loop invariants}
+
+Besides loop unrolling, another technique to improve precision in loops
+consists in using the standard computation by accumulation mechanism present in
+tools based on abstract interpretation. This mechanism requires a more involved
+setup, but can lead to more efficient analyses.
 
 As compared to loop unrolling, the advantage of the computation
 by accumulation is that it generally requires less iterations
@@ -3196,7 +3426,7 @@ parameters in the widening process, it may (rarely) be appropriate
 to help it by providing it with the bounds that are likely to
 be reached, for a given variable modified inside a loop.
 
-\subsubsection{Stipulating bounds}
+\subsubsection{Widening hints}
 \label{subsub:widen-hints}
 
 The user may place an annotation \lstinline|//@ widen_hints $v$, $e_1,\ldots,e_m$ ;|
@@ -3268,103 +3498,10 @@ Example:
 \lstinputlisting[numbers=left]
   {examples/parametrizing/pragma-widen-hints.c}
 
-\subsubsection{Loop unrolling}\label{deroulage}
-
-There are two different options for forcing \Eva{}
-to unroll the effects of the body of the loop, as many times as
-specified, in order to obtain a precise representation of the effects
-of the loop itself. If the number of iterations is sufficient,
-the analyzer is thus able to determine that each cell in the array
-is initialized, as opposed to the approximation techniques
-from the previous section.
-
-\paragraph{Syntactic unrolling}
-
-The option \lstinline|-ulevel n| indicates that Frama-C should unroll
-the loops syntactically \lstinline$n$ times before starting any analysis.
-If the provided number \lstinline|n| is larger than the number of iterations
-of the loop, then the loop is completely unrolled and the analysis will
-not observe any loop in that part of the code.
-
-Providing a large value for \lstinline|n| makes the analyzed code bigger:
-this may cause the analyzer to use more time and memory. This option
-can also make the code notably bigger in presence of
-nested loops (polynomially bigger in the depth of nested loops). A large value
-should therefore not be used in this case.
-
-It is possible to control the syntactic unrolling for each
-loop in the analyzed code with the annotation
-\lstinline|//@ loop pragma UNROLL n;|.  The user should place 
-this annotation in the source code, just before
-the loop. This annotation causes Frama-C's front-end to unroll 
-the loop \lstinline|n| times.
-
-\paragraph{Semantic unrolling}
-\label{slevel}
-
-The option \lstinline|-eva-slevel n| indicates that the analyzer is allowed
-to separate, in each point of the analyzed code,
-up to \lstinline|n| states from different execution paths before starting
-to compute the unions of said states. An effect of this option
-is that the states corresponding to the first, second,\ldots
-iterations in the loop remain separated, as if the loop had been
-unrolled.
-
-The number \lstinline|n| to use depends on the
-nature of the control flow graph of the function to analyze.
-If the only control structure is a loop of \lstinline|m| iterations,
-then \texttt{-eva-slevel \textsf{m+1}} allows to unroll the loop completely.
-The presence of other loops or of \lstinline|if-then-else| constructs
-multiplies the number of paths a state may correspond to,
-and thus the number of states it is necessary to keep separated
-in order to unroll a loop completely.
-For instance, the
-nested simple loops in the following example require the
-option \lstinline|-eva-slevel 55| in order to be completely unrolled:
-\lstinputlisting[numbers=left]
-  {examples/parametrizing/slevel.c}
-
-When the loops are sufficiently unrolled, the result obtained for the
-contents of array \lstinline|t| are the optimally precise:
-\lstinputlisting[linerange={16-16}]
-  {examples/parametrizing/slevel.1.log}
-
-The number to pass the option \lstinline|-eva-slevel|  is of the magnitude of
-the number of values for \lstinline|i| (the 6 integers between 0 and 5)
-times the number of possible values for \lstinline|j| (the 11
-integers comprised between 0 and 10). If a value much lower than
-this is passed, the result of the initialization of array \lstinline|t|
-will only be precise for the first cells. The option \lstinline|-eva-slevel 28|
-gives for instance the following result for array \lstinline|t|:
-\lstinputlisting[linerange={17-18}]
-  {examples/parametrizing/slevel.2.log}
-
-In this result, the effects of the first iterations of the loops
-(for the whole of \lstinline|t[0]|, the whole of \lstinline|t[1]| and the first
-half of \lstinline|t[2]|) have been computed precisely. The
-effects on the rest of \lstinline|t| were computed with
-approximations. Because of these approximations, the analyzer can not
-tell whether each of those cells contains 1 or its original value 0.
-The value proposed for the cells \lstinline|t[2][5]| and following
-is imprecise but correct. The set \lstinline|{0; 1}| does
-contain the actual value \lstinline|1| of the cells.
-
-The option \lstinline|-eva-slevel-function f:n| tells the analyzer to apply 
-semantic unrolling level \lstinline|n| to function \lstinline|f|.
-This fine-tuning option allows to 
-force the analyzer to invest time precisely analyzing functions that matter,
-for instance \lstinline|-eva-slevel-function crucial_initialization:2000|.
-Oppositely, options \lstinline|-eva-slevel 100 -eva-slevel-function trifle:0| 
-can be used together to avoid squandering resources over irrelevant parts of 
-the analyzed application. The \lstinline|-eva-slevel-function| option can be used 
-several times to set the semantic unrolling level of several functions.
-
-
 \subsubsection{Loop invariants}
 
-A last technique, complementary to the unrolling ones above, 
-consists in using the loop invariant construct of ACSL. Loop invariants
-describe some
+A last technique consists in using the loop invariant construct of ACSL.
+Loop invariants describe some
 properties that hold at the beginning of each execution of a loop,
 as explained in the ACSL specification, \S2.4.2.
 %\url{http://frama-c.com/download/acsl.pdf}
@@ -3427,126 +3564,99 @@ We have effectively replaced an alarm, the possible out-of-bounds access at
 line~7, by an invariant, that remains to be proven.
 
 
-\subsection{Treatment of functions}
-\label{trait_fonctions}
+%% \section{Treatment of functions}
+%% \label{trait_fonctions}
 
-\subsubsection{Skipping the recording of the results of a function}
-\label{noresults}
-
-When a function \lstinline|f|
-is called many times, or, in presence of semantic unrolling,
-if \lstinline|f| contains large/nested loops, significant 
-time may be spent recording the values taken by the program's variables
-at each of \lstinline|f|'s statements.
-If the user knows that these values will not be useful later,
-ey can instruct \Eva{} not to record these with the
-\lstinline|-eva-no-results-function f| option.
-The \lstinline|-eva-no-results-function| option
-can be used several times, to omit the results of several functions.
-The option \lstinline|-eva-no-results| can be used to omit all
-results.
-The time savings can be important, as in the following example.
-
-\lstinputlisting[numbers=left]
-  {examples/parametrizing/nor.c}
-
-\begin{shell}
-time frama-c -eva nor.c -eva-slevel 2001
-\end{shell}
-
-\lstinputlisting[linerange={36-39},numbers=left,firstnumber=36]
-  {examples/parametrizing/nor.1.log}
-\lstinputlisting[linerange={2036-2041},numbers=left,firstnumber=2036]
-  {examples/parametrizing/nor.1.log}
-\lstinputlisting[linerange={4038-4042},numbers=left,firstnumber=4038]
-  {examples/parametrizing/nor.1.log}
-
-Launched with option \lstinline|-eva-slevel 2001| so that the value returned
-by \lstinline|main| can be computed precisely, the analysis takes 3 seconds.
- Contrast with:
-
-\begin{shell}                                             
-time frama-c -eva nor.c -eva-slevel 2001 -eva-no-results-function irrelevant_function
-\end{shell}
-
-\lstinputlisting[linerange={36-40},numbers=left,firstnumber=36]
-  {examples/parametrizing/nor.2.log}
-\lstinputlisting[linerange={2037-2041},numbers=left,firstnumber=2037]
-  {examples/parametrizing/nor.2.log}
-
-When instructed, with 
-option \lstinline|-eva-no-results-function irrelevant_function|,
-that the values for the function
-\lstinline|irrelevant_function| do not need to be kept, \Eva{}
-takes less than a second to produce its results. This shows
-that in the earlier analysis, most of the time was not spent in the
-analysis itself but in recording the values
-of \lstinline|irrelevant_function|.
-
-Note that the function \lstinline|irrelevant_function| was analyzed with
-as much precision as before, and that the result for \lstinline|main| is
-as precise as before. The recording of some results 
-is omitted, but this does not cause any loss of precision {\em during}
-the analysis\footnote{The emission of run-time error alarms and the evaluation
-of user-provided ACSL properties are done during the analysis and are 
-not influenced by the {\tt -eva-no-results*} options. If you make use
-of only these functionalities, then you can speed up the analysis 
-with option {\tt -eva-no-results} without detrimental effects.}.
-The results for \verb|irrelevant_function| are, as expected, unavailable.
-The ``outputs'' of \verb|main| (the ``outputs'' computation is
-described in chapter \ref{inoutdeps}) cannot be computed, because
-they depend on the outputs of \lstinline|irrelevant_function|, which
-require the values of that function to be computed.
-These outputs would automatically be used for
-displaying only the relevant variables if they were available.
-Instead, all the program's variables are displayed.
-
-The meaning of option \lstinline|-eva-no-results-function irrelevant_function|
-is different from that of option 
-\lstinline|-eva-slevel-function irrelevant_function:0|. In the case of the latter,
-values
-are computed with less precision for \verb|irrelevant_function|
-but the computed values are kept in memory as usual.
-All derived analyses (such as outputs)
-are available, but the values predicted by the analysis are
-less precise, because \verb|irrelevant_function| has been analyzed
-less precisely.
-
-\subsubsection{Using the specification of a function instead of its body}
-\label{val-use-spec}
-
-In some cases, one can estimate that the analysis of a given function \verb+f+
-takes too much time. This can be caused by a very complex
-function, or because \verb+f+ is called many times during the analysis.
-If the solutions of the previous section are not sufficient, a radical
-approach consists in replacing the entire body of the function
-by an ACSL contract, that describes its behavior. See for example
-section~\ref{annot_assigns} for how to specify which values the function
-reads and writes.
-
-Alternatively, one can leave the body of the function untouched, but
-still write a contract. Then it is possible to use the option
-\verb+-eva-use-spec f+. This instructs \Eva{} to use the
-specification of \verb+f+ instead of its body each time a call to
-\verb+f+ is encountered. This is equivalent\footnote{Except for a few
-  properties, as described in the next paragraph.} to deleting the body
-of \verb+f+ for \Eva{}, but not for the other plug-ins of \FramaC,
-that may study the body of \verb+f+ on their own.
-
-Notice that option \verb+-eva-use-spec f+ loses some guarantees. In particular,
-the body of \verb+f+ is not studied at all by \Eva{}. Neither
-are the functions that \verb+f+ calls, unless they are used by some other
-functions than \verb+f+. Moreover, \Eva{} does not attempt
-to check that \verb+f+ conforms to its specification. In particular,
-postconditions are marked as {\em unknown} with \verb+-eva-use-spec+,
-while they are {\em considered valid} for functions without body.
-It is the responsibility
-of the user to verify those facts, for example by studying \verb+f+
-on its own in a generic context.
+%% Some \Eva{} options can be used to handle certain functions in a special
+%% way, to improve the efficiency of the analysis.
 
 
+%% \subsubsection{Skipping the recording of the results of a function}
+%% \label{noresults}
 
-\section{Analysis cutoff values}
+%% When a function \lstinline|f|
+%% is called many times, or, in presence of semantic unrolling,
+%% if \lstinline|f| contains large/nested loops, significant 
+%% time may be spent recording the values taken by the program's variables
+%% at each of \lstinline|f|'s statements.
+%% If the user knows that these values will not be useful later,
+%% ey can instruct \Eva{} not to record these with the
+%% \lstinline|-eva-no-results-function f| option.
+%% The \lstinline|-eva-no-results-function| option
+%% can be used several times, to omit the results of several functions.
+%% The option \lstinline|-eva-no-results| can be used to omit all
+%% results.
+%% It can result in a significant saving of time, as in the following example.
+
+%% \lstinputlisting[numbers=left]
+%%   {examples/parametrizing/nor.c}
+
+%% \begin{shell}
+%% time frama-c -eva nor.c -eva-slevel 2001
+%% \end{shell}
+
+%% \lstinputlisting[linerange={30-33},numbers=left,firstnumber=36]
+%%   {examples/parametrizing/nor.1.log}
+%% \lstinputlisting[linerange={2032-2035},numbers=left,firstnumber=2036]
+%%   {examples/parametrizing/nor.1.log}
+%% \lstinputlisting[linerange={4032-4036},numbers=left,firstnumber=4038]
+%%   {examples/parametrizing/nor.1.log}
+
+%% Launched with option \lstinline|-eva-slevel 2001| so that the value returned
+%% by \lstinline|main| can be computed precisely, the analysis takes more than
+%% half a second.
+%%  Contrast with:
+
+%% \begin{shell}                                             
+%% time frama-c -eva nor.c -eva-slevel 2001 -eva-no-results-function irrelevant_function
+%% \end{shell}
+
+%% \lstinputlisting[linerange={30-34},numbers=left,firstnumber=36]
+%%   {examples/parametrizing/nor.2.log}
+%% \lstinputlisting[linerange={2031-2035},numbers=left,firstnumber=2037]
+%%   {examples/parametrizing/nor.2.log}
+
+%% When instructed, with 
+%% option \lstinline|-eva-no-results-function irrelevant_function|,
+%% that the values for the function
+%% \lstinline|irrelevant_function| do not need to be kept, \Eva{}
+%% takes less than half the time to produce its results. This shows
+%% that in the earlier analysis, most of the time was not spent in the
+%% analysis itself but in recording the values
+%% of \lstinline|irrelevant_function|.
+
+%% Note that the function \lstinline|irrelevant_function| was analyzed with
+%% as much precision as before, and that the result for \lstinline|main| is
+%% as precise as before. The recording of some results 
+%% is omitted, but this does not cause any loss of precision {\em during}
+%% the analysis\footnote{The emission of run-time error alarms and the evaluation
+%% of user-provided ACSL properties are done during the analysis and are 
+%% not influenced by the {\tt -eva-no-results*} options. If you make use
+%% of only these functionalities, then you can speed up the analysis 
+%% with option {\tt -eva-no-results} without detrimental effects.}.
+%% The results for \verb|irrelevant_function| are, as expected, unavailable.
+%% The ``outputs'' of \verb|main| (the ``outputs'' computation is
+%% described in chapter \ref{inoutdeps}) cannot be computed, because
+%% they depend on the outputs of \lstinline|irrelevant_function|, which
+%% require the values of that function to be computed.
+%% These outputs would automatically be used for
+%% displaying only the relevant variables if they were available.
+%% Instead, all the program's variables are displayed.
+
+%% The meaning of option \lstinline|-eva-no-results-function irrelevant_function|
+%% is different from that of option 
+%% \lstinline|-eva-slevel-function irrelevant_function:0|. In the case of the latter,
+%% values
+%% are computed with less precision for \verb|irrelevant_function|
+%% but the computed values are kept in memory as usual.
+%% All derived analyses (such as outputs)
+%% are available, but the values predicted by the analysis are
+%% less precise, because \verb|irrelevant_function| has been analyzed
+%% less precisely.
+
+
+\section{Controlling approximations}
+\label{controlling-approximations}
 
 \subsection{Cutoff between integer sets and integer intervals}
 
@@ -3562,15 +3672,45 @@ Example:
 With the default limit of 8 elements for sets of integers, the
 analysis of the program shows a correct but approximated result:
 
-\lstinputlisting[linerange={28-30}]
+\lstinputlisting[linerange={23-23}]
   {examples/parametrizing/ilevel.1.log}
 
 Studying the program, the user may decide to improve the precision of
 the result by adding \verb|-eva-ilevel 16| to the command line. The
 analysis result then becomes:
 
-\lstinputlisting[linerange={28-30}]
+\lstinputlisting[linerange={23-23}]
   {examples/parametrizing/ilevel.2.log}
+
+\subsection{Maximum number of precise items in arrays}
+
+Option \verb|-eva-plevel <n>| is used to limit the number of elements
+in an array that can be considered precisely during assignments.
+When assigning a value to an array element, if the index is imprecise,
+it may be very costly to update each array element individually.
+Instead, if the range of indices to be accessed is larger than {\em plevel},
+some approximations are made and a message is emitted:
+
+\begin{lstlisting}
+[kernel] arrays.c:32:
+  more than 200(300) elements to enumerate. Approximating.
+\end{lstlisting}
+
+This message means that the array to be updated had 300 elements, and
+\verb|-eva-plevel| was set to 200 (the default value). In this case, it
+might be reasonable to increase the plevel to 300, especially if some alarms
+could be caused by the imprecision. In other cases, however, there is little
+hope of obtaining a reasonable bound:
+
+\begin{lstlisting}
+more than 200(0x20000000) elements to enumerate. Approximating.
+\end{lstlisting}
+
+In some cases, lowering the plevel can improve performance, but it is rarely
+a significant factor. Most of the time, this option has little impact in the
+analysis, both in terms of precision and performance. However, when dealing
+with large arrays and matrices, it is worth considering its usage.
+
 
 \section{Advanced analyses}
 \label{sec:eva}
@@ -3831,7 +3971,7 @@ interpreted as leading to any possible value.
 Moreover, the domain only infers error values for scalar variables. Structure
 and union fields, as well as arrays, are ignored.
 
-\section{Non-termination}
+\section{Non-termination}\label{nonterm}
 
 The parameterization of \Eva{} can lead to situations where the
 analysis stops abruptly due to the absence of valid states. For instance,
@@ -4134,7 +4274,7 @@ to prove is therefore the assertion at line 8.
 
 \subsubsection{Case analysis}
 
-When using {\em semantic unrolling} (section \ref{deroulage}), if an
+When using {\em slevel-based unrolling} (section \ref{slevel}), if an
 assertion is a disjunction, then the reduction of the state by the
 assertion may be computed independently for each disjunct.  This
 multiplies the number of states to propagate in the same way that
@@ -4637,8 +4777,8 @@ analysis starts diverging, it will print (by default) several messages of this
 form:
 
 \begin{listing-nonumber}
-[value] allocating variable __malloc_main_l42_2981
-[value] allocating variable __malloc_main_l42_2982
+[eva] allocating variable __malloc_main_l42_2981
+[eva] allocating variable __malloc_main_l42_2982
 \end{listing-nonumber}
 
 This indicates that new bases are being created.

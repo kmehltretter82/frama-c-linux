@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -load-script tests/libc/check_libc_naming_conventions.ml -print -cpp-extra-args='-nostdinc -Ishare/libc' -metrics -metrics-libc -load-script tests/libc/check_const.ml -load-module metrics -val @VALUECONFIG@ -then -lib-entry -no-print -metrics-no-libc
+   OPT: -load-script tests/libc/check_libc_naming_conventions.ml -print -cpp-extra-args='-nostdinc -Ishare/libc' -metrics -metrics-libc -load-script tests/libc/check_const.ml -load-module metrics -eva @VALUECONFIG@ -then -lib-entry -no-print -metrics-no-libc
    OPT: -print -print-libc
    OPT: -load-script tests/libc/check_parsing_individual_headers.ml
    CMD: ./tests/libc/check_full_libc.sh
@@ -13,7 +13,7 @@
 // functions.
 #define _XOPEN_SOURCE 600
 #define _POSIX_C_SOURCE 200112L
-
+#define _GNU_SOURCE 1
 
 #include "share/libc/fc_runtime.c"
 
@@ -63,9 +63,10 @@
 #include "__fc_define_useconds_t.h"
 #include "__fc_define_wchar_t.h"
 #include "__fc_define_wint_t.h"
+#include "__fc_gcc_builtins.h"
 #include "__fc_inet.h"
 #include "__fc_machdep.h"
-//#include "__fc_machdep_linux_gcc_shared.h"
+//#include "__fc_machdep_linux_shared.h"
 #include "fcntl.h"
 #include "__fc_select.h"
 #include "__fc_string_axiomatic.h"

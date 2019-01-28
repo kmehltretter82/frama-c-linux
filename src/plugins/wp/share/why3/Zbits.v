@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -2023,6 +2023,12 @@ Proof.
   intros x y z.
   generalize (land_discrimination_inv x y z).
   intuition.
+Qed.
+
+Lemma lxor_discrimination_inv: forall x y z:Z,
+  x = lxor y z -> lxor x y = z.
+Proof.
+  linear3.
 Qed.
 
 Lemma land_system: forall x1 x2 y1 y2 z:Z,

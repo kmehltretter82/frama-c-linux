@@ -23,5 +23,5 @@ clean:
 	rm -f $(GENERATED)
 
 install:
-	rm -f ../manuals/value-analysis.pdf
-	cp main.pdf ../manuals/value-analysis.pdf
+	rm -f ../manuals/eva-manual.pdf
+	cp main.pdf ../manuals/eva-manual.pdf

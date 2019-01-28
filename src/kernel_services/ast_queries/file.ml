@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -311,9 +311,12 @@ let existing_machdep_macro () =
   with Not_found -> false
 
 let machdep_macro = function
-  | "x86_16" | "gcc_x86_16" -> "__FC_MACHDEP_X86_16"
-  | "x86_32" | "gcc_x86_32" -> "__FC_MACHDEP_X86_32"
-  | "x86_64" | "gcc_x86_64" -> "__FC_MACHDEP_X86_64"
+  | "x86_16"                -> "__FC_MACHDEP_X86_16"
+  | "gcc_x86_16"            -> "__FC_MACHDEP_GCC_X86_16"
+  | "x86_32"                -> "__FC_MACHDEP_X86_32"
+  | "gcc_x86_32"            -> "__FC_MACHDEP_GCC_X86_32"
+  | "x86_64"                -> "__FC_MACHDEP_X86_64"
+  | "gcc_x86_64"            -> "__FC_MACHDEP_GCC_X86_64"
   | "ppc_32"                -> "__FC_MACHDEP_PPC_32"
   | "msvc_x86_64"           -> "__FC_MACHDEP_MSVC_X86_64"
   | s ->
@@ -474,7 +477,7 @@ let parse_cabs = function
       (* Hypothesis: the preprocessor is POSIX compliant,
          hence understands -I and -D. *)
       let include_args =
-        if Kernel.FramaCStdLib.get () then [Config.datadir ^ "/libc"]
+        if Kernel.FramaCStdLib.get () then [Config.framac_libc]
         else []
       in
       let define_args =
@@ -915,7 +918,7 @@ let cleanup file =
     method! vstmt_aux st =
       self#remove_lexical_annotations st;
       let loc = Stmt.loc st in
-      if Annotations.has_code_annot st || st.labels <> [] then
+      if Annotations.has_code_annot st || st.labels <> [] || st.sattr <> [] then
         keep_stmt <- Stmt.Set.add st keep_stmt;
       match st.skind with
       | Block b ->
