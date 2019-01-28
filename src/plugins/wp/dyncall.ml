@@ -135,10 +135,10 @@ class dyncall =
 
     method! vcode_annot ca =
       match ca.annot_content with
-      | Cil_types.AExtended (bhvs,_,(_, "calls", _,Ext_terms calls)) ->
+      | Cil_types.AExtended
+          (bhvs,_,((_, "calls", _,Ext_terms calls) as extended)) ->
           if calls <> [] && (scope <> [] || not (Stack.is_empty block_calls))
           then begin
-            let kf = self#kf in
             let bhvs =
               match bhvs with
               | [] -> [ Cil.default_behavior_name ]
@@ -155,7 +155,7 @@ class dyncall =
                     "@[<hov 2>Calls (for %s)%a@]" bhv pp_calls kfs
             in
             let pool = ref [] in (* collect emitted properties *)
-            let add_calls_info stmt =
+            let add_calls_info kf stmt =
               count <- succ count ;
               List.iter
                 (fun bhv ->
@@ -166,10 +166,13 @@ class dyncall =
                    CallPoints.add (bhv,stmt) (prop,kfs))
                 bhvs
             in
-            let callpoints =
-              if scope <> [] then scope else Stack.top block_calls in
-            List.iter add_calls_info callpoints ;
-            let annot = Property.ip_of_code_annot_single kf self#stmt ca in
+            let kf = self#kf in
+            List.iter
+              (add_calls_info kf)
+              (if scope <> [] then scope else Stack.top block_calls) ;
+            let eloc = Property.ELStmt(kf,self#stmt) in
+            let annot = Property.ip_of_extended eloc extended in
+            Property_status.register annot ;
             Property_status.logical_consequence emitter annot !pool ;
           end;
           SkipChildren
