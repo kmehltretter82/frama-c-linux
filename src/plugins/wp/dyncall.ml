@@ -176,7 +176,6 @@ class dyncall =
               begin
                 let eloc = Property.ELStmt(kf,self#stmt) in
                 let annot = Property.ip_of_extended eloc extended in
-                Property_status.register annot ;
                 Property_status.logical_consequence emitter annot !pool ;
               end
           end;

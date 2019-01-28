@@ -1129,7 +1129,8 @@ let ip_property_instance kf stmt ipred iprop =
 let ip_of_code_annot kf stmt ca =
   let ki = Kstmt stmt in
   match ca.annot_content with
-  | AAssert _ | AInvariant _ | AExtended _ -> [ IPCodeAnnot(kf, stmt, ca) ]
+  | AAssert _ | AInvariant _ -> [ IPCodeAnnot(kf, stmt, ca) ]
+  | AExtended(_,_,e) -> [ IPExtended(ELStmt(kf,stmt),e) ]
   | AStmtSpec (active,s) -> ip_of_spec kf ki active s
   | AVariant t -> [ IPDecrease (kf,ki,(Some ca),t) ]
   | AAllocation _ -> 
