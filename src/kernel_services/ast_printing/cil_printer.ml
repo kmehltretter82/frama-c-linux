@@ -2932,7 +2932,7 @@ class cil_printer () = object (self)
       let prefix = if is_loop then "loop " else "" in
       fprintf fmt "@[<2>%a%s%a@]"
         pp_for_behavs behav prefix
-        (Behavior_extensions.pp (self:>Printer_api.extensible_printer_type)) e
+        self#extended e
 
   method private logicPrms fmt arg =
     let pvar fmt = self#logic_var fmt arg in
