@@ -165,7 +165,8 @@ let popcount = Z.popcount
         d.pp fmt r ;
       end
 
-  let pp_bin ?(nbits=0) ?(sep="") fmt v =
+  let pp_bin ?(nbits=1) ?(sep="") fmt v =
+    let nbits = if nbits <= 0 then 1 else nbits in
     if le zero v then
       ( Format.pp_print_string fmt "0b" ;
         pp_digits { nbits ; sep ; bsize=4 ;
@@ -175,7 +176,8 @@ let popcount = Z.popcount
         pp_digits { nbits ; sep ; bsize=4 ;
                     bmask = bmask_bin ; pp = pp_bin_neg } fmt 0 (Z.lognot v) )
 
-  let pp_hex ?(nbits=0) ?(sep="") fmt v =
+  let pp_hex ?(nbits=1) ?(sep="") fmt v =
+    let nbits = if nbits <= 0 then 1 else nbits in
     if le zero v then
       ( Format.pp_print_string fmt "0x" ;
         pp_digits { nbits ; sep ; bsize=16 ;
