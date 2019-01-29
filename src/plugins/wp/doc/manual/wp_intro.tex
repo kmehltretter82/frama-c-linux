@@ -340,12 +340,15 @@ For tackling this complexity, the \textsf{WP} plug-in relies on several
   or \texttt{-wp-rte} will generate a warning if some annotation might be not
   generated.
 
-\item[Float Model:] floating-point operations are \emph{defined} to be
-  the mathematical ones \emph{with} a rounding operation. This is fully
-  consistent with the \textsf{IEEE} semantics. Most automated provers
-  are not able to discharge the generated proof obligations. Special
-  support for the \textsf{Gappa} theorem prover is available through
-  \textsf{Why3}.
+\item[Float Model:] floating-point values are represent in a special
+  theory with dedicated operations over \texttt{float} and \texttt{double}
+  values and conversion from and to their \texttt{real} representation \emph{via}
+  rounding, as defined by the \textsc{C/ACSL} semantics.
+
+  Although correct with respect to the \textsc{IEEE} specifications, this
+  model still provides very little support for proving properties with automated
+  provers. You may add additional properties using \emph{drivers}
+  as explained later.
 
 \item[Real Model:] floating-point operations are \emph{transformed} on
   reals, with \emph{no} rounding. This is completely unsound with
