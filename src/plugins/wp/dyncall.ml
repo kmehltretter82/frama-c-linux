@@ -98,11 +98,11 @@ module CallPoints = State_builder.Hashtbl(Point.Hashtbl)(Calls)(CInfo)
 let property ~kf ~bhv ~stmt calls =
   let fact =
     if bhv = Cil.default_behavior_name then
-      Format.asprintf "@[<hov 2>calls%a at s%d@]"
-        pp_calls calls stmt.sid
+      Format.asprintf "@[<hov 2>call point%a@]"
+        pp_calls calls
     else
-      Format.asprintf "@[<hov 2>calls%a for %s at s%d@]"
-        pp_calls calls bhv stmt.sid
+      Format.asprintf "@[<hov 2>call point%a for %s@]"
+        pp_calls calls bhv
   in
   Property.(ip_other fact (OLStmt (kf,stmt)))
 

@@ -8,13 +8,14 @@
                                                 "rank": 16 },
                                   "wp:main": { "total": 1, "valid": 1,
                                                "rank": 16 } },
-                              "call_stmt_calls_f1_f2": { "alt-ergo": 
-                                                           { "total": 1,
-                                                             "valid": 1,
-                                                             "rank": 8 },
-                                                         "wp:main": { "total": 1,
-                                                                    "valid": 1,
-                                                                    "rank": 8 } },
+                              "call_stmt_call_point_f1_f2": { "alt-ergo": 
+                                                                { "total": 1,
+                                                                  "valid": 1,
+                                                                  "rank": 8 },
+                                                              "wp:main": 
+                                                                { "total": 1,
+                                                                  "valid": 1,
+                                                                  "rank": 8 } },
                               "call_post": { "qed": { "total": 2,
                                                       "valid": 2 },
                                              "wp:main": { "total": 2,
@@ -27,12 +28,10 @@
                                               "wp:main": { "total": 4,
                                                            "valid": 4,
                                                            "rank": 16 } } },
-                    "guarded_call": { "guarded_call_stmt_calls_g": { "qed": 
-                                                                    { "total": 1,
-                                                                    "valid": 1 },
-                                                                    "wp:main": 
-                                                                    { "total": 1,
-                                                                    "valid": 1 } },
+                    "guarded_call": { "guarded_call_stmt_call_point_g": 
+                                        { "qed": { "total": 1, "valid": 1 },
+                                          "wp:main": { "total": 1,
+                                                       "valid": 1 } },
                                       "guarded_call_post_2": { "qed": 
                                                                  { "total": 2,
                                                                    "valid": 2 },
@@ -57,11 +56,11 @@
                                                       "wp:main": { "total": 5,
                                                                    "valid": 5,
                                                                    "rank": 5 } } },
-                    "behavior": { "behavior_stmt_calls_h1_h2": { "qed": 
-                                                                   { "total": 1,
+                    "behavior": { "behavior_stmt_call_point_h1_h2": { "qed": 
+                                                                    { "total": 1,
                                                                     "valid": 1 },
-                                                                 "wp:main": 
-                                                                   { "total": 1,
+                                                                    "wp:main": 
+                                                                    { "total": 1,
                                                                     "valid": 1 } },
                                   "behavior_bhv1_assign": { "qed": { "total": 6,
                                                                     "valid": 6 },
@@ -77,11 +76,11 @@
                                                            "valid": 9 },
                                                   "wp:main": { "total": 9,
                                                                "valid": 9 } } },
-                    "some_behaviors": { "some_behaviors_stmt_calls_h1_h2_h0_for_bhv1": 
+                    "some_behaviors": { "some_behaviors_stmt_call_point_h1_h2_h0_for_bhv1": 
                                           { "qed": { "total": 1, "valid": 1 },
                                             "wp:main": { "total": 1,
                                                          "valid": 1 } },
-                                        "some_behaviors_stmt_calls_h1_h2_h0_for_bhv0": 
+                                        "some_behaviors_stmt_call_point_h1_h2_h0_for_bhv0": 
                                           { "qed": { "total": 1, "valid": 1 },
                                             "wp:main": { "total": 1,
                                                          "valid": 1 } },
@@ -109,7 +108,7 @@
                                                                  "valid": 24 },
                                                         "wp:main": { "total": 24,
                                                                     "valid": 24 } } },
-                    "missing_context": { "missing_context_stmt_calls_h1": 
+                    "missing_context": { "missing_context_stmt_call_point_h1": 
                                            { "alt-ergo": { "total": 1,
                                                            "unknown": 1 },
                                              "wp:main": { "total": 1,
@@ -137,7 +136,7 @@
                     "no_call": { "specialization_unreachable_g_pre_at_no_call_stmt_32": 
                                    { "qed": { "total": 1, "valid": 1 },
                                      "wp:main": { "total": 1, "valid": 1 } },
-                                 "no_call_stmt_calls_unreachable_g": 
+                                 "no_call_stmt_call_point_unreachable_g": 
                                    { "qed": { "total": 1, "valid": 1 },
                                      "wp:main": { "total": 1, "valid": 1 } },
                                  "no_call_post": { "qed": { "total": 2,
