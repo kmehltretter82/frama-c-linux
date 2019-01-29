@@ -755,6 +755,10 @@ src/plugins/from/from_register_gui.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/from/from_register_gui.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/from/functionwise.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/from/functionwise.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/gui/GSourceView2.ml.in: CEA_LGPL_OR_PROPRIETARY
+src/plugins/gui/GSourceView2.mli.in: CEA_LGPL_OR_PROPRIETARY
+src/plugins/gui/GSourceView3.ml.in: CEA_LGPL_OR_PROPRIETARY
+src/plugins/gui/GSourceView3.mli.in: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/analyses_manager.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/analyses_manager.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/book_manager.ml: CEA_LGPL_OR_PROPRIETARY
@@ -763,10 +767,15 @@ src/plugins/gui/debug_manager.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/debug_manager.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/design.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/design.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/gui/dgraph.ml.in: CEA_LGPL_OR_PROPRIETARY
+src/plugins/gui/dgraph.mli.in: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/file_manager.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/file_manager.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/filetree.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/filetree.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/gui/gtk_compat.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/gui/gtk_compat.2.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/gui/gtk_compat.3.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/gtk_form.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/gtk_form.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/gtk_helper.ml: CEA_LGPL_OR_PROPRIETARY

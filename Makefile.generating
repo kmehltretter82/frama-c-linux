@@ -2,7 +2,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2018                                               #
+#  Copyright (C) 2007-2019                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -208,6 +208,12 @@ endif
 ifeq ("$(DEVELOPMENT)","yes")
 all:: .merlin
 endif
+
+lib/fc/META.frama-c: share/META.frama-c share/Makefile.config Makefile.generating
+	$(MKDIR) lib/fc/
+	$(SED) $< -e "s/@REQUIRES/$(LIBRARY_NAMES)/" > $@
+
+GENERATED += lib/fc/META.frama-c
 
 
 # Local Variables:

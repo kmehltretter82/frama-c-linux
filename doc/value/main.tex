@@ -3289,7 +3289,7 @@ remaining \lstinline|-eva-slevel| may be used to unroll more iterations.
 
 While it is sometimes useful to unroll only the first iterations, the usual
 objective is full unrolling; the user can enable option
-\lstinline|-value-msg-key=loop-unrolling| to be informed whenever the specified
+\lstinline|-value-msg-key=loop-unroll| to be informed whenever the specified
 unrolling value is insufficient to unroll the loop entirely:
 
 \begin{lstlisting}
@@ -3301,7 +3301,7 @@ void main() {
 \end{lstlisting}
 
 \begin{lstlisting}
-[eva:loop-unrolling] insuf-loop.c:3: loop not completely unrolled
+[eva:loop-unroll] insuf-loop.c:3: loop not completely unrolled
 \end{lstlisting}
 
 Note that using an unrolling parameter which is higher than the actual number

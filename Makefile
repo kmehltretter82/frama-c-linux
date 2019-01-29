@@ -2,7 +2,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2018                                               #
+#  Copyright (C) 2007-2019                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -374,7 +374,7 @@ ifeq ("$(DEVELOPMENT)","yes")
 all:: share/.gitignore
 endif
 
-clean::
+clean_share_link:
 	if test -f share/.gitignore; then \
 	  for link in $$(cat share/.gitignore); do \
 	    if test -L share$$link; then \
@@ -385,6 +385,8 @@ clean::
 	  done; \
 	  rm share/.gitignore; \
 	fi
+
+clean:: clean_share_link
 
 ##############
 # Ocamlgraph #
@@ -680,8 +682,59 @@ STARTUP_CMX=$(STARTUP_CMO:.cmo=.cmx)
 WTOOLKIT= \
 	wutil widget wbox wfile wpane wpalette wtext wtable
 
+ifeq ($(strip $(GTKSOURCEVIEW)),lablgtk3.sourceview3)
+
+src/plugins/gui/GSourceView.ml: src/plugins/gui/GSourceView3.ml.in
+	$(CP) $< $@
+	$(CHMOD_RO) $@
+
+src/plugins/gui/GSourceView.mli: src/plugins/gui/GSourceView3.mli.in
+	$(CP) $< $@
+	$(CHMOD_RO) $@
+
+else
+src/plugins/gui/GSourceView.ml: src/plugins/gui/GSourceView2.ml.in
+	$(CP) $< $@
+	$(CHMOD_RO) $@
+
+src/plugins/gui/GSourceView.mli: src/plugins/gui/GSourceView2.mli.in
+	$(CP) $< $@
+	$(CHMOD_RO) $@
+
+endif
+
+SOURCEVIEWCOMPAT:=GSourceView
+GENERATED+=src/plugins/gui/GSourceView.ml src/plugins/gui/GSourceView.mli
+
+DGRAPHCOMPAT:=
+ifeq ($(HAS_GNOMECANVAS),no)
+DGRAPHCOMPAT:=dgraph
+src/plugins/gui/dgraph.ml: src/plugins/gui/dgraph.ml.in
+	$(CP) $< $@
+	$(CHMOD_RO) $@
+src/plugins/gui/dgraph.mli: src/plugins/gui/dgraph.mli.in
+	$(CP) $< $@
+	$(CHMOD_RO) $@
+
+GENERATED+=src/plugins/gui/dgraph.ml src/plugins/gui/dgraph.mli
+endif
+
+ifeq ($(LABLGTK),lablgtk3)
+src/plugins/gui/gtk_compat.ml: src/plugins/gui/gtk_compat.3.ml
+	$(CP) $< $@
+	$(CHMOD_RO) $@
+else
+src/plugins/gui/gtk_compat.ml: src/plugins/gui/gtk_compat.2.ml
+	$(CP) $< $@
+	$(CHMOD_RO) $@
+endif
+GENERATED+=src/plugins/gui/gtk_compat.ml
+
 SINGLE_GUI_CMO:= \
+	gtk_compat \
 	$(WTOOLKIT) \
+	$(SOURCEVIEWCOMPAT) \
+	$(DGRAPHCOMPAT) \
 	gui_parameters \
 	gtk_helper gtk_form \
 	source_viewer pretty_source source_manager book_manager \
@@ -734,7 +787,12 @@ PLUGIN_NAME:=Callgraph
 PLUGIN_DISTRIBUTED:=yes
 PLUGIN_DIR:=src/plugins/callgraph
 PLUGIN_CMO:= options journalize subgraph cg services uses register
+#GTK3: no DGraph available.
+ifeq ($(HAS_GNOMECANVAS),yes)
 PLUGIN_GUI_CMO:=cg_viewer
+else
+PLUGIN_GUI_CMO:=
+endif
 PLUGIN_CMI:= callgraph_api
 PLUGIN_INTERNAL_TEST:=yes
 PLUGIN_TESTS_DIRS:=callgraph
@@ -865,6 +923,7 @@ PLUGIN_GUI_CMO:=$(VALUE_GUI_AUX) gui_files/gui_callstacks_manager \
 		gui_files/gui_red gui_files/register_gui
 
 PLUGIN_INTERNAL_TEST:= yes
+PLUGIN_TESTS_LIB=tests/float/fval_test.ml
 PLUGIN_DISTRIBUTED:=yes
 VALUE_TYPES:=$(addprefix src/plugins/value_types/,\
 		cilE cvalue precise_locs value_types widen_type)
@@ -899,6 +958,11 @@ PLUGIN_CMO:= options generator rte visit register
 PLUGIN_DISTRIBUTED:=yes
 PLUGIN_INTERNAL_TEST:=yes
 PLUGIN_TESTS_DIRS:=rte rte_manual
+PLUGIN_TESTS_LIB:=\
+  tests/rte/my_annotation/my_annotation.ml \
+  tests/rte/rte_api/rte_get_annot.ml \
+  tests/rte/compute_annot/compute_annot.ml \
+  tests/rte/my_annot_proxy/my_annot_proxy.ml
 $(eval $(call include_generic_plugin_Makefile,$(PLUGIN_NAME)))
 
 #################
@@ -943,6 +1007,7 @@ $(eval $(call include_generic_plugin_Makefile,$(PLUGIN_NAME)))
 PLUGIN_ENABLE:=$(ENABLE_CONSTANT_PROPAGATION)
 PLUGIN_NAME:=Constant_Propagation
 PLUGIN_DIR:=src/plugins/constant_propagation
+PLUGIN_TESTS_LIB:=tests/constant_propagation/introduction_of_non_explicit_cast.ml
 PLUGIN_CMO:= propagationParameters \
 	api
 PLUGIN_DISTRIBUTED:=yes
@@ -1006,6 +1071,8 @@ $(eval $(call include_generic_plugin_Makefile,$(PLUGIN_NAME)))
 PLUGIN_ENABLE:=$(ENABLE_PDG)
 PLUGIN_NAME:=Pdg
 PLUGIN_DIR:=src/plugins/pdg
+PLUGIN_TESTS_LIB:=tests/pdg/dyn_dpds.ml \
+                  tests/pdg/sets.ml
 PLUGIN_CMO:= pdg_parameters \
 	    ctrlDpds \
 	    pdg_state \
@@ -1034,6 +1101,8 @@ $(eval $(call include_generic_plugin_Makefile,$(PLUGIN_NAME)))
 PLUGIN_ENABLE:=$(ENABLE_SCOPE)
 PLUGIN_NAME:=Scope
 PLUGIN_DIR:=src/plugins/scope
+PLUGIN_TESTS_LIB:=tests/scope/bts971.ml \
+                  tests/scope/zones.ml
 PLUGIN_CMO:= datascope zones defs
 PLUGIN_GUI_CMO:=dpds_gui
 PLUGIN_DEPENDENCIES:=Eva Inout
@@ -1164,6 +1233,16 @@ bin/toplevel.opt$(EXE): $(ALL_BATCH_CMX) $(GEN_OPT_LIBS) \
 			$(PLUGIN_DYN_CMX_LIST)
 	$(PRINT_LINKING) $@
 	$(OCAMLOPT) $(OLINKFLAGS) -o $@ $(OPT_LIBS) $(ALL_BATCH_CMX)
+
+LIB_KERNEL_CMO= $(filter-out src/kernel_internals/runtime/gui_init.cmo, $(CMO))
+LIB_KERNEL_CMX= $(filter-out src/kernel_internals/runtime/gui_init.cmx, $(CMX))
+
+lib/fc/frama-c.cma: $(LIB_KERNEL_CMO) $(GEN_OPT_LIBS) $(LIB_KERNEL_CMX) lib/fc/META.frama-c
+	$(PRINT_LINKING) $@ and lib/fc/frama-c.cmxa
+	$(MKDIR) $(FRAMAC_LIB)
+	$(OCAMLMKLIB) -o lib/fc/frama-c $(OPT_LIBS) $(LIB_KERNEL_CMO) $(LIB_KERNEL_CMX)
+
+lib/fc/frama-c.cmxa: lib/fc/frama-c.cma
 
 ####################
 # (Ocaml) Toplevel #
@@ -1332,17 +1411,18 @@ acsl_tests: byte
 	$(PRINT_EXEC) acsl_tests
 	find doc/speclang -name \*.c -exec ./bin/toplevel.byte$(EXE) {} \; > /dev/null
 
-LONELY_TESTS_ML_FILES=$(wildcard $(TEST_DIRS_AS_PLUGIN:%=tests/%/*.ml))
-LONELY_TESTS_BYTE_FILES=$(LONELY_TESTS_ML_FILES:%.ml=%.cmo)
-LONELY_TESTS_OPT_FILES=$(LONELY_TESTS_ML_FILES:%.ml=%.cmx)
-LONELY_TESTS_DYN_FILES=$(LONELY_TESTS_ML_FILES:%.ml=%.cmxs)
-$(LONELY_TESTS_BYTE_FILES): BFLAGS+=$(TEST_DIRS_AS_PLUGIN:%=-I tests/%)
-$(LONELY_TESTS_OPT_FILES): OFLAGS+=$(TEST_DIRS_AS_PLUGIN:%=-I tests/%)
-$(LONELY_TESTS_DYN_FILES): OFLAGS+=$(TEST_DIRS_AS_PLUGIN:%=-I tests/%)
-.PRECIOUS: $(LONELY_TESTS_OPT_FILES) \
-           $(LONELY_TESTS_DYN_FILES) \
-           $(LONELY_TESTS_BYTE_FILES) \
-           $(LONELY_TESTS_BYTE_FILES:%.cmo=%.cmi)
+LONELY_TESTS_ML_FILES:=\
+  $(shell find $(TEST_DIRS_AS_PLUGIN:%=tests/%) -name '*.ml')
+$(foreach file,$(LONELY_TESTS_ML_FILES),\
+  $(eval $(file:%.ml=%.cmo): BFLAGS+=-I $(dir $(file))))
+$(foreach file,$(LONELY_TESTS_ML_FILES),\
+  $(eval $(file:%.ml=%.cmx): OFLAGS+=-I $(dir $(file))))
+$(foreach file,$(LONELY_TESTS_ML_FILES),\
+  $(eval $(file:%.ml=%.cmxs): OFLAGS+=-I $(dir $(file))))
+.PRECIOUS: $(LONELY_TESTS_ML_FILES:%.ml=%.cmx) \
+           $(LONELY_TESTS_DYN_FILES:%.ml=%.cmxs) \
+           $(LONELY_TESTS_BYTE_FILES:%.ml=%.cmo) \
+           $(LONELY_TESTS_BYTE_FILES:%.ml=%.cmi)
 
 bin/ocamldep_transitive_closure: devel_tools/ocamldep_transitive_closure.ml
 	$(OCAMLOPT) -package ocamlgraph -package str -linkpkg -o $@ $<
@@ -1770,6 +1850,7 @@ install-lib: clean-install
 	$(PRINT_INSTALL) kernel API
 	$(MKDIR) $(FRAMAC_LIBDIR)
 	$(CP) $(LIB_BYTE_TO_INSTALL) $(LIB_OPT_TO_INSTALL) $(FRAMAC_LIBDIR)
+	$(CP) $(addprefix lib/fc/,dllframa-c.so libframa-c.a frama-c.cma frama-c.a frama-c.cmxa META.frama-c)  $(FRAMAC_LIBDIR)
 
 install-doc-code:
 	$(PRINT_INSTALL) API documentation
@@ -2342,15 +2423,15 @@ clean-distrib: dist-clean
 
 create_lib_to_install_list = $(addprefix $(FRAMAC_LIB)/,$(call map,notdir,$(1)))
 
-byte:: bin/toplevel.byte$(EXE) share/Makefile.dynamic_config \
+byte:: bin/toplevel.byte$(EXE) lib/fc/frama-c.cma share/Makefile.dynamic_config \
 	$(call create_lib_to_install_list,$(LIB_BYTE_TO_INSTALL)) \
-      $(PLUGIN_META_LIST)
+      $(PLUGIN_META_LIST) lib/fc/META.frama-c
 
-opt:: bin/toplevel.opt$(EXE) share/Makefile.dynamic_config \
+opt:: bin/toplevel.opt$(EXE) lib/fc/frama-c.cmxa share/Makefile.dynamic_config \
 	$(call create_lib_to_install_list,$(LIB_OPT_TO_INSTALL)) \
 	$(filter %.o %.cmi,\
 	   $(call create_lib_to_install_list,$(LIB_BYTE_TO_INSTALL))) \
-      $(PLUGIN_META_LIST)
+      $(PLUGIN_META_LIST) lib/fc/META.frama-c
 
 top: bin/toplevel.top$(EXE) \
 	$(call create_lib_to_install_list,$(LIB_BYTE_TO_INSTALL)) \

@@ -1,6 +1,6 @@
 /* run.config
 EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-OPT: -load-module @PTEST_DIR@/@PTEST_NAME@ -eva-show-progress
+OPT: -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs -eva-show-progress
 */
 
 struct S { int i; };

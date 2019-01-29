@@ -5,9 +5,9 @@
 [eva:initial-state] Values of globals at initialization
   a[0..9] ∈ {0}
   b[0..9] ∈ {0}
-[eva:loop-unrolling] tests/misc/unroll_annots.c:8: loop not completely unrolled
+[eva:loop-unroll] tests/misc/unroll_annots.c:8: loop not completely unrolled
 [eva] tests/misc/unroll_annots.c:8: starting to merge loop iterations
-[eva:loop-unrolling] tests/misc/unroll_annots.c:14: loop not completely unrolled
+[eva:loop-unroll] tests/misc/unroll_annots.c:14: loop not completely unrolled
 [eva] tests/misc/unroll_annots.c:14: starting to merge loop iterations
 [eva] tests/misc/unroll_annots.c:16: starting to merge loop iterations
 [eva] Recording results for main

@@ -2,7 +2,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2018                                               #
+#  Copyright (C) 2007-2019                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -46,6 +46,7 @@ ifeq ($(FRAMAC_INTERNAL),yes)
 PLUGIN_RESET	:=yes
 
 else
+
 # The plugin is compiled from an installed frama-c
 PLUGIN_RESET	:=no
 include $(MAKECONFIG_DIR)/Makefile.common
@@ -186,11 +187,11 @@ $(eval $(call include_generic_plugin_Makefile,$(PLUGIN_NAME)))
 
 TARGETS := $(TARGET_META) $(TARGET_CMI)
 TARGETS_TOP := $(TARGET_TOP_CMO) $(TARGET_TOP_CMX) \
-	       $(TARGET_TOP_CMA) $(TARGET_TOP_CMXS)
+	       $(TARGET_TOP_CMA) $(TARGET_TOP_CMXS) $(TARGET_TOP_O)
 TARGETS_GUI_BYTE := $(TARGET_GUI_CMI) $(TARGET_GUI_CMO)
-TARGETS_GUI := $(TARGETS_GUI_BYTE) $(TARGET_GUI_CMX) $(TARGET_GUI_CMXS)
+TARGETS_GUI := $(TARGETS_GUI_BYTE) $(TARGET_GUI_CMX) $(TARGET_GUI_CMXS) $(TARGET_GUI_O)
 TARGETS_BYTE:= $(TARGET_META) $(TARGET_CMI) $(TARGET_TOP_CMO) $(TARGET_TOP_CMA)
-TARGETS_OPT:=  $(TARGET_META) $(TARGET_CMI) $(TARGET_TOP_CMX) $(TARGET_TOP_CMXS)
+TARGETS_OPT:=  $(TARGET_META) $(TARGET_CMI) $(TARGET_TOP_CMX) $(TARGET_TOP_CMXS) $(TARGET_TOP_O)
 
 byte:: $(TARGETS_BYTE)
 opt:: $(TARGETS_OPT)
