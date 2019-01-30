@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -167,6 +167,7 @@ val t_farray : tau -> tau -> tau
 val t_datatype : adt -> tau list -> tau
 
 val pointer : (typ -> tau) Context.value (** type of pointers *)
+val floats : (c_float -> tau) Context.value (** type of floats *)
 val poly : string list Context.value (** polymorphism *)
 val parameters : (lfun -> sort list) -> unit (** definitions *)
 

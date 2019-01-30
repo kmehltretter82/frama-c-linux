@@ -100,6 +100,8 @@ Plugin WP Sulfur-20171101
  - Wp         [2017/03/12] Reduction of equalities with logic functions
  - Wp         [2017/03/12] More simplifications wrt integer domains
 
+-  Wp         [2019/01/28] New floating-point model
+
 ######################
 Plugin WP 18.0 (Argon)
 ######################

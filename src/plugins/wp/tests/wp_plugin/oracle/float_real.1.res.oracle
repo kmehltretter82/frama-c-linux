@@ -11,19 +11,18 @@
 ------------------------------------------------------------
 
 Goal Post-condition (file tests/wp_plugin/float_real.i, line 14) in 'dequal':
-Let r = -y.
-Let r_1 = add_float64(x, r).
 Assume {
-  Type: is_sint32(dequal_0) /\ is_float64(x) /\ is_float64(y) /\
-      is_float64(r_1).
-  If r_1 < (5902958103587057.0/590295810358705651712)
+  Type: is_sint32(dequal_0).
+  If lt_f64(add_f64(x, neg_f64(y)),
+       to_f64((5902958103587057.0/590295810358705651712)))
   Then {
-    If (-5902958103587057.0/590295810358705651712) < r_1
+    If lt_f64(to_f64((-5902958103587057.0/590295810358705651712)),
+         add_f64(x, neg_f64(y)))
     Then { (* Return *) Have: dequal_0 = 1. }
     Else { (* Return *) Have: dequal_0 = 0. }
   }
   Else { (* Return *) Have: dequal_0 = 0. }
 }
-Prove: (abs_real(x - y) < (1.0/100000)) <-> (dequal_0 != 0).
+Prove: (abs_real(of_f64(x) - of_f64(y)) < (1.0/100000)) <-> (dequal_0 != 0).
 
 ------------------------------------------------------------

@@ -1,6 +1,7 @@
 /* run.config*
+EXECNOW: make -s @PTEST_DIR@/big_local_array_script.cmxs
 OPT: -eva-show-progress -print -journal-disable -eva -report
-OPT: -load-script tests/builtins/big_local_array_script.ml -then-on prj -print -report
+OPT: -load-module @PTEST_DIR@/big_local_array_script -then-on prj -print -report
 OPT: -eva-show-progress -print -journal-disable -no-initialized-padding-locals -eva
 */
 

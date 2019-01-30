@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -142,6 +142,7 @@ and field =
 and tau = (field,adt) Logic.datatype
 
 let pointer = Context.create "Lang.pointer"
+let floats = Context.create "Lang.floats"
 
 let new_extern_id = ref (-1)
 let new_extern ~debug ~library ~link =
@@ -182,7 +183,7 @@ let t_datatype adt ts = Logic.Data(adt,ts)
 
 let rec tau_of_object = function
   | C_int _ -> Logic.Int
-  | C_float _ -> Logic.Real
+  | C_float f -> Context.get floats f
   | C_pointer t -> Context.get pointer t
   | C_comp c -> tau_of_comp c
   | C_array { arr_element = typ } -> t_array (tau_of_ctype typ)

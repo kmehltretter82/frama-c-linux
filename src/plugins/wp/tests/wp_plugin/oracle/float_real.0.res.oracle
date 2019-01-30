@@ -11,10 +11,8 @@
 ------------------------------------------------------------
 
 Goal Post-condition (file tests/wp_plugin/float_real.i, line 14) in 'dequal':
-Let r = x - y.
 Assume {
-  Type: is_sint32(dequal_0) /\ is_float64(x) /\ is_float64(y) /\
-      is_float64(r).
+  Type: is_sint32(dequal_0).
   If x < ((1.0/100000) + y)
   Then {
     If y < ((1.0/100000) + x)
@@ -23,6 +21,6 @@ Assume {
   }
   Else { (* Return *) Have: dequal_0 = 0. }
 }
-Prove: (abs_real(r) < (1.0/100000)) <-> (dequal_0 != 0).
+Prove: (abs_real(x - y) < (1.0/100000)) <-> (dequal_0 != 0).
 
 ------------------------------------------------------------

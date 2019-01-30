@@ -197,3 +197,11 @@ hello-*.tar.gz
 #######################
 # should remain empty #
 #######################
+/src/plugins/gui/GSourceView2.mli
+/src/plugins/gui/GSourceView2.ml
+/src/plugins/gui/dgraph.ml
+/src/plugins/gui/dgraph.mli
+/src/plugins/gui/gtk_compat.ml
+/src/plugins/gui/GSourceView.ml
+/src/plugins/gui/GSourceView.mli
+/tests/crowbar/integer_bb_pretty

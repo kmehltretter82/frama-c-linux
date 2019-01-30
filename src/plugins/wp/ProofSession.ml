@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -55,8 +55,9 @@ let exists wpo =
 
 let load wpo =
   match status wpo with
-  | NoScript -> Json.Null
-  | Script f | Deprecated f -> Json.load_file f
+  | NoScript -> `Null
+  | Script f | Deprecated f ->
+      if Sys.file_exists f then Json.load_file f else `Null
 
 let remove wpo =
   match status wpo with
@@ -77,7 +78,7 @@ let remove wpo =
 let save wpo js =
   let empty =
     match js with
-    | Json.Null | Json.Array [] | Json.Assoc [] -> true
+    | `Null | `List [] | `Assoc [] -> true
     | _ -> false in
   if empty then remove wpo else
     match status wpo with

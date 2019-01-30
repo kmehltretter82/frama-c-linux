@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -2540,7 +2540,8 @@ struct
     | (Bool|Prop) , (Bool|Prop) -> Prop
     | Int , Int -> Int
     | (Int|Real) , (Int|Real) -> Real
-    | _ -> raise Not_found
+    | _ ->
+        if Tau.equal a b then a else raise Not_found
 
   let rec merge_list t f = function
     | [] -> t

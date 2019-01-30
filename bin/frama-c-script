@@ -3,7 +3,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2018                                               #
+#  Copyright (C) 2007-2019                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -49,6 +49,11 @@ if [ $# -lt 1 ]; then
    echo "      Generates flamegraph.svg and flamegraph.html in [dir]"
    echo "      (or in the FRAMAC_SESSION directory by default)."
    echo "      Also opens it in a browser, unless variable NOGUI is set."
+   echo ""
+   echo "  - find-fun <function-name> [dirs]"
+   echo "      Lists files in [dirs] declaring or defining <function-name>"
+   echo "      (defaults to PWD + /usr/include)."
+   echo "      Heuristics-based: neither correct nor complete."
    exit
 fi
 
@@ -187,6 +192,10 @@ case "$command" in
     "list-files")
         shift;
         ${FRAMAC_SHARE}/analysis-scripts/list_files.py "$@";
+        ;;
+    "find-fun")
+        shift;
+        ${FRAMAC_SHARE}/analysis-scripts/find_fun.py "$@";
         ;;
     "flamegraph")
         shift;

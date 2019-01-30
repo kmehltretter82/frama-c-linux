@@ -1,6 +1,6 @@
 /* run.config
-   EXECNOW: make -s tests/slicing/select_by_annot.cmxs
-   CMD: @frama-c@ -load-module tests/slicing/libSelect.cmxs -load-module tests/slicing/select_by_annot.cmxs
+   EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
+   CMD: @frama-c@ -load-module tests/slicing/libSelect.cmxs -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs
    OPT: -eva-show-progress -deps -lib-entry -main main -journal-disable
    CMD: bin/toplevel.opt
    OPT: -eva-show-progress -check -deps -lib-entry -main main -slice-pragma main -journal-disable -then-on 'Slicing export' -set-project-as-default -print -check -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check -no-deps

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -109,10 +109,8 @@ let popcount = Z.popcount
        raises multiple [Failure _] exceptions *)
       failwith "Integer.of_string"
 
-
   let max_int64 = of_int64 Int64.max_int
   let min_int64 = of_int64 Int64.min_int
-
 
   let to_string = Z.to_string
   let to_float = Z.to_float
@@ -145,13 +143,13 @@ let popcount = Z.popcount
   let pp_hex_pos fmt r = Format.fprintf fmt "%04X" r
   let pp_hex_neg fmt r = Format.fprintf fmt "%04X" (0xFFFF-r)
 
-  let bmask_bin = Z.of_int 15
-  let bmask_hex = Z.of_int 0xFFFF
+  let bmask_bin = Z.of_int 0xF     (* 4 bits mask *)
+  let bmask_hex = Z.of_int 0xFFFF (* 64 bits mask *)
 
   type digits = {
     nbits : int ; (* max number of bits *)
     bsize : int ; (* bits in each bloc *)
-    bmask : Z.t ; (* block mask *)
+    bmask : Z.t ; (* block mask, must be (1 << bsize) - 1 *)
     sep : string ;
     pp : Format.formatter -> int -> unit ; (* print one block *)
   }
@@ -167,7 +165,8 @@ let popcount = Z.popcount
         d.pp fmt r ;
       end
 
-  let pp_bin ?(nbits=0) ?(sep="") fmt v =
+  let pp_bin ?(nbits=1) ?(sep="") fmt v =
+    let nbits = if nbits <= 0 then 1 else nbits in
     if le zero v then
       ( Format.pp_print_string fmt "0b" ;
         pp_digits { nbits ; sep ; bsize=4 ;
@@ -177,7 +176,8 @@ let popcount = Z.popcount
         pp_digits { nbits ; sep ; bsize=4 ;
                     bmask = bmask_bin ; pp = pp_bin_neg } fmt 0 (Z.lognot v) )
 
-  let pp_hex ?(nbits=0) ?(sep="") fmt v =
+  let pp_hex ?(nbits=1) ?(sep="") fmt v =
+    let nbits = if nbits <= 0 then 1 else nbits in
     if le zero v then
       ( Format.pp_print_string fmt "0x" ;
         pp_digits { nbits ; sep ; bsize=16 ;
@@ -187,6 +187,7 @@ let popcount = Z.popcount
       ( Format.pp_print_string fmt "1x" ;
         pp_digits { nbits ; sep ; bsize=16 ;
                     bmask = bmask_hex ; pp = pp_hex_neg } fmt 0 (Z.lognot v) )
+
   let pretty ?(hexa=false) fmt v =
     let rec aux v =
       if gt v two_power_60 then

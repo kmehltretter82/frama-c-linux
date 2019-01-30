@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -477,7 +477,7 @@ let parse_cabs = function
       (* Hypothesis: the preprocessor is POSIX compliant,
          hence understands -I and -D. *)
       let include_args =
-        if Kernel.FramaCStdLib.get () then [Config.datadir ^ "/libc"]
+        if Kernel.FramaCStdLib.get () then [Config.framac_libc]
         else []
       in
       let define_args =
