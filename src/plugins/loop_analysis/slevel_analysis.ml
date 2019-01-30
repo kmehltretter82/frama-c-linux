@@ -123,9 +123,9 @@ module Specific(KF:sig val kf: Kernel_function.t end) = struct
             then Some result
             else raise Exit
         with
-        | Invalid_argument _ (* Possible exponent too big *)
-        | Failure _          (* Integer too big *)
-        | Exit  ->          (* Above MaxIterations. *)
+        | Invalid_argument _ (* Possible negative exponent *)
+        | Z.Overflow         (* Integer too big *)
+        | Exit  ->           (* Above MaxIterations. *)
           update_max_slevel_encountered
             (Some (Integer.mul entry (Integer.mul in_loop
                                         (Integer.of_int max_iteration))));
@@ -197,8 +197,7 @@ module SpecificNoBranches(KF:sig val kf: Kernel_function.t end) = struct
             Some Integer.(pred (mul (succ (of_int in_loop_i))
                                   (of_int max_iteration)))
         with
-        | Invalid_argument _ (* Possible exponent too big *)
-        | Failure _          (* Integer too big *)
+        | Z.Overflow         (* Integer too big *)
           -> update_max_slevel_encountered
                (Some (Integer.mul entry (Integer.mul in_loop
                                            (Integer.of_int max_iteration))));

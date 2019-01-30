@@ -22,25 +22,17 @@
 
 type t = Z.t
 
-exception Too_big
-
 let equal = Z.equal
 
 let compare = Z.compare
 
-
 let two_power_of_int k =
-  Z.shift_left Z.one k
+  if k > 1024 then
+    raise Z.Overflow
+  else
+    Z.shift_left Z.one k
 
-let two_power y =
-  try
-    let k = Z.to_int y in
-    if k > 1024 then
-      (* avoid memory explosion *)
-      raise Too_big
-    else
-      two_power_of_int k
-  with Z.Overflow -> raise Too_big
+let two_power n = two_power_of_int (Z.to_int n)
 
 let popcount = Z.popcount
 
@@ -78,7 +70,7 @@ let shift_left x y = Z.shift_left x (Z.to_int y)
 let shift_right x y = Z.shift_right x (Z.to_int y)
 let shift_right_logical x y = (* no meaning for negative value of x *)
   if (Z.lt x Z.zero)
-  then failwith "log_shift_right_big_int"
+  then raise (Invalid_argument "Integer.shift_right_logical")
   else Z.shift_right x (Z.to_int y)
 
 let logand = Z.logand
@@ -91,32 +83,22 @@ let ge a b = Z.compare a b >= 0
 let lt a b = Z.compare a b < 0
 let gt a b = Z.compare a b > 0
 
-
 let of_int = Z.of_int
-
 let of_int64 = Z.of_int64
 let of_int32 = Z.of_int32
 
-(* Return the same exceptions as [Big_int] *)
 let to_int = Big_int_Z.int_of_big_int
 let to_int64 = Big_int_Z.int64_of_big_int
 let to_int32 = Big_int_Z.int32_of_big_int
 
-let of_string s =
-  try Z.of_string s
-  with Invalid_argument _ ->
-    (* We intentionally do NOT specify a string in the .mli, as Big_int
-       raises multiple [Failure _] exceptions *)
-    failwith "Integer.of_string"
+let of_string = Z.of_string
+let to_string = Z.to_string
 
+let of_float = Z.of_float
+let to_float = Z.to_float
 let max_int64 = of_int64 Int64.max_int
 let min_int64 = of_int64 Int64.min_int
 
-let to_string = Z.to_string
-let to_float = Z.to_float
-let of_float z =
-  try Z.of_float z
-  with Z.Overflow -> raise Too_big
 
 let bdigits = [|
   "0000" ; (* 0 *)
@@ -187,7 +169,6 @@ let pp_hex ?(nbits=1) ?(sep="") fmt v =
     ( Format.pp_print_string fmt "1x" ;
       pp_digits { nbits ; sep ; bsize=16 ;
                   bmask = bmask_hex ; pp = pp_hex_neg } fmt 0 (Z.lognot v) )
-
 let pretty ?(hexa=false) fmt v =
   let rec aux v =
     if gt v two_power_60 then
@@ -205,13 +186,14 @@ let pretty ?(hexa=false) fmt v =
     Format.pp_print_string fmt (to_string v)
 
 let is_one v = equal one v
-let pos_div  = div
 
+let pos_div  = div
 let pos_rem = rem
 let native_div = div
 let divexact = Z.divexact
 let div_rem = Z.div_rem
 
+(*
 let _c_div u v =
   let bad_div = div u v in
   if (lt u zero) && not (is_zero (rem u v))
@@ -231,9 +213,11 @@ let _c_div u v =
                 Z.sprint res
                 Z.sprint res2)
   else res2
+*)
 
 let c_div = Z.div
 
+(*
 let _c_rem u v =
   sub u (mul v (c_div u v))
 
@@ -247,6 +231,7 @@ let _c_rem u v =
                 Z.sprint res
                 Z.sprint res2)
   else res2
+*)
 
 let c_rem = Z.rem
 

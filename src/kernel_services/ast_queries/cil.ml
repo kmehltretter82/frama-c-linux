@@ -5309,7 +5309,7 @@ and offsetOfFieldAcc_GCC last (fi: fieldinfo) (sofar: offsetAcc) : offsetAcc =
 		  let sz' =
                     try 
                       Integer.to_int sz 
-                    with Failure _ ->
+                    with Z.Overflow ->
 		      raise
                         (SizeOfError
                            ("Array is so long that its size can't be "

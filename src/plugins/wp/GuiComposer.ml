@@ -91,7 +91,7 @@ class composer (focused : GuiSequent.focused) =
 
     method private get_int = function
       | Tactical.Compose(Tactical.Cint z) ->
-          (try Some (Integer.to_int z) with _ -> None)
+          (try Some (Integer.to_int z) with Z.Overflow -> None)
       | _ -> None
 
     method private op1 title job args fmt = match args with
