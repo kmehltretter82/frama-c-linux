@@ -20,6 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Bottom.Type
 
 type t
 
@@ -28,7 +29,7 @@ type size_widen_hint = Integer.t
 type generic_widen_hint = Widen_Hints.t
 
 include Datatype.S_with_collections with type t := t
-include Lattice_type.Full_AI_Lattice_with_cardinality
+include Eva_lattice_type.Full_AI_Lattice_with_cardinality
   with type t := t
    and type widen_hint = size_widen_hint * generic_widen_hint
 
@@ -74,30 +75,28 @@ val cardinal_estimate: size:Integer.t -> t -> Integer.t
 val cardinal_less_than : t -> int -> int
 val cardinal_is_less_than: t -> int -> bool
 
-val is_bottom: t -> bool
-
 val is_zero: t -> bool
 val contains_zero : t -> bool
 val contains_non_zero : t -> bool
 
 val add : t -> t -> t
-val add_under : t -> t -> t
+val add_under : t -> t -> t or_bottom
 val add_singleton: Integer.t -> t -> t
 
 val neg : t -> t
 val sub : t -> t -> t
-val sub_under: t -> t -> t
+val sub_under: t -> t -> t or_bottom
 
 val scale : Integer.t -> t -> t
 val scale_div : pos:bool -> Integer.t -> t -> t
-val scale_div_under : pos:bool -> Integer.t -> t -> t
+val scale_div_under : pos:bool -> Integer.t -> t -> t or_bottom
 val scale_rem : pos:bool -> Integer.t -> t -> t
 
 val mul : t -> t -> t
-val div : t -> t -> t
-val c_rem : t -> t -> t
-val shift_left:  t -> t -> t
-val shift_right: t -> t -> t
+val div : t -> t -> t or_bottom
+val c_rem : t -> t -> t or_bottom
+val shift_left:  t -> t -> t or_bottom
+val shift_right: t -> t -> t or_bottom
 
 val bitwise_and : t -> t -> t
 val bitwise_or : t -> t -> t

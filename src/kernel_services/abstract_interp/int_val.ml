@@ -21,6 +21,7 @@
 (**************************************************************************)
 
 open Abstract_interp
+open Bottom.Type
 
 (* Make sure all this is synchronized with the default value of -ilevel *)
 let small_cardinal = ref 8
@@ -56,7 +57,6 @@ type int_val =
   | Set of Int_set.t
   | Itv of Int_interval.t
 
-let bottom = Set Int_set.bottom
 let top = Itv Int_interval.top
 
 let hash = function
@@ -89,7 +89,7 @@ include Datatype.Make_with_collections
         t_sum
           [| [| Int_set.packed_descr |];
              [| Int_interval.packed_descr |] |]
-      let reprs = [ top ; bottom ]
+      let reprs = [ top ]
       let equal = equal
       let compare = compare
       let hash = hash
@@ -139,7 +139,10 @@ let inject_singleton e = Set (Int_set.inject_singleton e)
 let make ~min ~max ~rem ~modu =
   match min, max with
   | Some mn, Some mx ->
-    if Int.gt mx mn then
+    assert (Int.le mn mx);
+    if Int.equal mx mn
+    then inject_singleton mn
+    else
       let l = Int.succ (Int.e_div (Int.sub mx mn) modu) in
       if Int.le l !small_cardinal_Int
       then
@@ -156,9 +159,6 @@ let make ~min ~max ~rem ~modu =
         assert (Int.equal !v (Int.add modu mx));
         Set (Int_set.inject_array s l)
       else Itv (Int_interval.make ~min ~max ~rem ~modu)
-    else if Int.equal mx mn
-    then inject_singleton mn
-    else bottom
   | _ -> Itv (Int_interval.make ~min ~max ~rem ~modu)
 
 let check_make ~min ~max ~rem ~modu =
@@ -177,25 +177,26 @@ let inject_interval ~min ~max ~rem:r ~modu =
 
 let inject_range min max = check_make ~min ~max ~rem:Int.zero ~modu:Int.one
 
+let check_make_or_bottom ~min ~max ~rem ~modu =
+  match min, max with
+  | Some mn, Some mx when Int.gt mn mx -> `Bottom
+  | _, _ -> `Value (check_make ~min ~max ~rem ~modu)
+
 (* ------------------------- Sets and Intervals ---------------------------- *)
 
 (* TODO: comments *)
 
-let inject_set_or_bottom = function
-  | `Bottom -> bottom
-  | `Value s -> Set s
+let inject_itv i =
+  match Int_interval.cardinal i with
+  | None -> Itv i
+  | Some card ->
+    if Int.le card !small_cardinal_Int
+    then
+      let min, max, rem, modu = Int_interval.min_max_rem_modu i in
+      make ~min ~max ~rem ~modu
+    else Itv i
 
-let inject_itv_or_bottom = function
-  | `Bottom -> bottom
-  | `Value i ->
-    match Int_interval.cardinal i with
-    | None -> Itv i
-    | Some card ->
-      if Int.le card !small_cardinal_Int
-      then
-        let min, max, rem, modu = Int_interval.min_max_rem_modu i in
-        make ~min ~max ~rem ~modu
-      else Itv i
+let inject_set s = Set s
 
 let inject_pre_itv ~min ~max ~modu =
   let rem = Int.e_rem min modu in
@@ -204,6 +205,11 @@ let inject_pre_itv ~min ~max ~modu =
 let inject_set_or_top = function
   | `Set s -> Set s
   | `Top (min, max, modu) -> inject_pre_itv ~min ~max ~modu
+
+let inject_set_or_top_or_bottom = function
+  | `Bottom -> `Bottom
+  | `Set s -> `Value (Set s)
+  | `Top (min, max, modu) -> `Value (inject_pre_itv ~min ~max ~modu)
 
 (* TODO: more comment *)
 
@@ -249,8 +255,6 @@ let max_ge_elt max elt =
   | None -> true
   | Some m -> Int.ge m elt
 
-(* TODO *)
-let is_bottom x = equal x bottom
 let is_zero x = equal x zero
 let is_one = equal one
 
@@ -260,7 +264,7 @@ let contains_zero = function
 
 let contains_non_zero = function
   | Itv _ -> true (* at least two values *)
-  | Set _ as s -> not (is_zero s || is_bottom s)
+  | Set _ as s -> not (is_zero s)
 
 let fold_int f v acc =
   match v with
@@ -352,14 +356,14 @@ let diff_if_one value rem =
     begin
       let v = Int_set.min s in
       match value with
-      | Set s -> inject_set_or_bottom (Int_set.remove s v)
+      | Set s -> Int_set.remove s v >>-: fun s -> Set s
       | Itv i ->
         let min, max, rem, modu = Int_interval.min_max_rem_modu i in
         match min, max with
         | Some mn, _ when Int.equal v mn ->
-          check_make ~min:(Some (Int.add mn modu)) ~max ~rem ~modu
+          check_make_or_bottom ~min:(Some (Int.add mn modu)) ~max ~rem ~modu
         | _, Some mx when Int.equal v mx ->
-          check_make ~min ~max:(Some (Int.sub mx modu)) ~rem ~modu
+          check_make_or_bottom ~min ~max:(Some (Int.sub mx modu)) ~rem ~modu
         | Some mn, Some mx when
             Int.equal (Int.sub mx mn) (Int.mul modu !small_cardinal_Int)
             && Int_interval.mem v i ->
@@ -372,10 +376,10 @@ let diff_if_one value rem =
                  r := Int.add corrected_c modu;
                  corrected_c)
           in
-          Set (Int_set.inject_array array !small_cardinal)
-        | _, _ -> value
+          `Value (Set (Int_set.inject_array array !small_cardinal))
+        | _, _ -> `Value value
     end
-  | _ -> value
+  | _ -> `Value value
 
 let diff value rem =
   log_imprecision "Ival.diff";
@@ -441,17 +445,17 @@ let link v1 v2 =
     check_make ~min ~max ~rem ~modu
 
 let meet v1 v2 =
-  if v1 == v2 then v1 else
+  if v1 == v2 then `Value v1 else
     match v1, v2 with
-    | Itv i1, Itv i2 -> inject_itv_or_bottom (Int_interval.meet i1 i2)
-    | Set s1 , Set s2 -> inject_set_or_bottom (Int_set.meet s1 s2)
+    | Itv i1, Itv i2 -> Int_interval.meet i1 i2 >>-: inject_itv
+    | Set s1 , Set s2 -> Int_set.meet s1 s2 >>-: inject_set
     | Set s, Itv itv
     | Itv itv, Set s ->
-      inject_set_or_bottom (Int_set.filter (fun i -> Int_interval.mem i itv) s)
+      Int_set.filter (fun i -> Int_interval.mem i itv) s >>-: inject_set
 
 let narrow v1 v2 =
   match v1, v2 with
-  | Set s1, Set s2 -> inject_set_or_bottom (Int_set.narrow s1 s2)
+  | Set s1, Set s2 -> Int_set.narrow s1 s2 >>-: inject_set
   | (Itv _| Set _), (Itv _ | Set _) -> meet v1 v2 (* meet is exact *)
 
 let widen widen_hints t1 t2 =
@@ -461,12 +465,12 @@ let widen widen_hints t1 t2 =
     | Itv _ | Set _ ->
       let i1 = make_itv t1
       and i2 = make_itv t2 in
-      inject_itv_or_bottom (`Value (Int_interval.widen widen_hints i1 i2))
+      inject_itv (Int_interval.widen widen_hints i1 i2)
 
 let intersects v1 v2 =
   v1 == v2 ||
   match v1, v2 with
-  | Itv _, Itv _ -> not (is_bottom (meet v1 v2)) (* YYY: slightly inefficient *)
+  | Itv _, Itv _ -> not (meet v1 v2 = `Bottom) (* YYY: slightly inefficient *)
   | Set s1 , Set s2 -> Int_set.intersects s1 s2
   | Set s, Itv itv | Itv itv, Set s ->
     Int_set.exists (fun i -> Int_interval.mem i itv) s
@@ -483,28 +487,23 @@ let add v1 v2 =
   | Itv i1, Itv i2 -> Itv (Int_interval.add i1 i2)
   | Set s, Itv i | Itv i, Set s ->
     let l = Int_set.cardinal s in
-    if l = 0
-    then bottom
-    else if l = 1
+    assert (l > 0);
+    if l = 1
     then Itv (Int_interval.add_singleton_int (Int_set.min s) i)
     else Itv (Int_interval.add i (make_itv_from_set s))
 
 let add_under v1 v2 =
   match v1, v2 with
-  | Set s1, Set s2 -> inject_set_or_top (Int_set.add_under s1 s2)
-  | Itv i1, Itv i2 -> inject_itv_or_bottom (Int_interval.add_under i1 i2)
+  | Set s1, Set s2 -> `Value (inject_set_or_top (Int_set.add_under s1 s2))
+  | Itv i1, Itv i2 -> Int_interval.add_under i1 i2 >>-: inject_itv
   | Set s, Itv i | Itv i, Set s ->
     let l = Int_set.cardinal s in
-    if l = 0
-    then bottom
-    else
-      begin
-        if l <> 1
-        then log_imprecision "Ival.add_int_under";
-        (* This is precise if [s] has only one element. Otherwise, this is not worse
-           than another computation. *)
-        Itv (Int_interval.add_singleton_int (Int_set.min s) i)
-      end
+    assert (l > 0);
+    if l <> 1
+    then log_imprecision "Ival.add_int_under";
+    (* This is precise if [s] has only one element. Otherwise, this is not worse
+       than another computation. *)
+    `Value (Itv (Int_interval.add_singleton_int (Int_set.min s) i))
 
 let neg = function
   | Set s -> Set (Int_set.neg s)
@@ -522,21 +521,23 @@ let scale f v =
     | Set s -> Set (Int_set.scale f s)
     | Itv i-> Itv (Int_interval.scale f i)
 
-let scale_div_common ~pos f v scale_interval =
+let scale_div ~pos f v =
   assert (not (Int.is_zero f));
   match v with
-  | Set s -> inject_set_or_bottom (Int_set.scale_div ~pos f s)
-  | Itv i -> inject_itv_or_bottom (scale_interval ~pos f i)
+  | Set s -> Set (Int_set.scale_div ~pos f s)
+  | Itv i -> inject_itv (Int_interval.scale_div ~pos f i)
 
-let scale_div ~pos f v =
-  let scale_div ~pos f v = `Value (Int_interval.scale_div ~pos f v) in
-  scale_div_common ~pos f v scale_div
+let scale_div_or_bottom ~pos f v =
+  if Int.is_zero f then `Bottom else `Value (scale_div ~pos f v)
 
 (* TODO: a more precise result could be obtained by transforming
    Itv(min,max,r,m) into Itv(min,max,r/f,m/gcd(m,f)). But this is
    more complex to implement when pos or f is negative. *)
 let scale_div_under ~pos f v =
-  scale_div_common ~pos f v Int_interval.scale_div_under
+  assert (not (Int.is_zero f));
+  match v with
+  | Set s -> `Value (Set (Int_set.scale_div ~pos f s))
+  | Itv i -> Int_interval.scale_div_under ~pos f i >>-: inject_itv
 
 let mul v1 v2 =
   if is_one v1 then v2
@@ -548,9 +549,8 @@ let mul v1 v2 =
     | Itv i1, Itv i2 -> Itv (Int_interval.mul i1 i2)
     | Set s, Itv i | Itv i, Set s ->
       let l = Int_set.cardinal s in
-      if l = 0
-      then bottom
-      else if l = 1
+      assert (l > 0);
+      if l = 1
       then Itv (Int_interval.scale (Int_set.min s) i)
       else Itv (Int_interval.mul i (make_itv_from_set s))
 
@@ -559,44 +559,41 @@ let div x y =
   | Set sy ->
     Int_set.fold
       (fun acc elt ->
-         if Int.is_zero elt then acc else join acc (scale_div ~pos:false elt x))
-      bottom sy
-  | Itv iy -> inject_itv_or_bottom (Int_interval.div (make_range x) iy)
+         Bottom.join join acc (scale_div_or_bottom ~pos:false elt x))
+      `Bottom sy
+  | Itv iy -> Int_interval.div (make_range x) iy >>-: inject_itv
 
 (* [scale_rem ~pos:false f v] is an over-approximation of the set of
    elements [x mod f] for [x] in [v].
    [scale_rem ~pos:true f v] is an over-approximation of the set of
    elements [x pos_rem f] for [x] in [v]. *)
-let scale_rem ~pos f v =
-  if Int.is_zero f then bottom
-  else
-    match v with
-    | Set s -> inject_set_or_top (Int_set.scale_rem ~pos f s)
-    | Itv i -> inject_itv_or_bottom (`Value (Int_interval.scale_rem ~pos f i))
+let scale_rem ~pos f = function
+  | Set s -> inject_set (Int_set.scale_rem ~pos f s)
+  | Itv i -> inject_itv (Int_interval.scale_rem ~pos f i)
+
+let scale_rem_or_bottom ~pos f v =
+  if Int.is_zero f then `Bottom else `Value (scale_rem ~pos f v)
 
 let c_rem x y =
   match y with
-  | Itv iy ->
-    if is_bottom x then bottom
-    else inject_itv_or_bottom (Int_interval.c_rem (make_range x) iy)
+  | Itv iy -> Int_interval.c_rem (make_range x) iy >>-: inject_itv
   | Set yy ->
     match x with
-    | Set xx -> inject_set_or_top (Int_set.c_rem xx yy)
+    | Set xx -> inject_set_or_top_or_bottom (Int_set.c_rem xx yy)
     | Itv _ ->
       let f acc y =
-        join (scale_rem ~pos:false y x) acc
+        Bottom.join join (scale_rem_or_bottom ~pos:false y x) acc
       in
-      Int_set.fold f bottom yy
+      Int_set.fold f `Bottom yy
 
 (** Computes [x (op) ({y >= 0} * 2^n)], as an auxiliary function for
     [shift_left] and [shift_right]. [op] and [scale] must verify
     [scale a b == op (inject_singleton a) b] *)
 let shift_aux scale op (x: t) (y: t) =
-  let y = narrow (inject_range (Some Int.zero) None) y in
+  narrow (inject_range (Some Int.zero) None) y >>-: fun y ->
   try
     match y with
-    | Set s ->
-      Int_set.fold (fun acc n -> join acc (scale (Int.two_power n) x)) bottom s
+    | Set s -> Int_set.map_reduce (fun n -> scale (Int.two_power n) x) join s
     | Itv _ ->
       let min = Extlib.opt_map Int.two_power (min_int y) in
       let max = Extlib.opt_map Int.two_power (max_int y) in
@@ -611,8 +608,12 @@ let shift_aux scale op (x: t) (y: t) =
     if is_included x negative_integers then negative_integers
     else top
 
-let shift_right x y = shift_aux (scale_div ~pos:true) div x y
+let shift_right x y =
+  let div a b = Bottom.non_bottom (div a b) in
+  shift_aux (scale_div ~pos:true) div x y
+
 let shift_left x y = shift_aux scale mul x y
+
 
 (* ----------------------------------- Misc --------------------------------- *)
 
@@ -637,8 +638,7 @@ let cast_int_to_int ~size ~signed value =
   else
     let result =
       match value with
-      | Itv i ->
-        inject_itv_or_bottom (`Value (Int_interval.cast ~size ~signed i))
+      | Itv i -> inject_itv (Int_interval.cast ~size ~signed i)
       | Set s ->
         let all =
           create_all_values ~size:(Int.to_int size) ~signed
@@ -690,7 +690,8 @@ let extract_bits ~start ~stop = function
   | Itv _ as d ->
     try
       let dived = scale_div ~pos:true (Int.two_power start) d in
-      scale_rem ~pos:true (Int.two_power (Int.length start stop)) dived
+      let factor = Int.two_power (Int.length start stop) in
+      scale_rem ~pos:true factor dived
     with Z.Overflow ->
       Lattice_messages.emit_imprecision emitter "Ival.extract_bits";
       top
@@ -843,27 +844,26 @@ let extract_bit (i : int) (v : t) : bit_value =
       then Both
       else Bit.union (bit_value l) (bit_value u)
 
-let reduce_sign (v : t) (b : bit_value) : t =
-  match b with
-  | Both -> v
+let reduce_sign v = function
+  | Both -> `Value v
   | On ->
     begin match v with
-      | Set s -> inject_set_or_bottom (Int_set.filter Int.(gt zero) s)
-      | Itv itv -> inject_itv_or_bottom (Int_interval.reduce_sign itv true)
+      | Set s -> Int_set.filter Int.(gt zero) s >>-: inject_set
+      | Itv itv -> Int_interval.reduce_sign itv true >>-: inject_itv
     end
   | Off ->
     begin match v with
-      | Set s -> inject_set_or_bottom (Int_set.filter Int.(le zero) s)
-      | Itv itv -> inject_itv_or_bottom (Int_interval.reduce_sign itv false)
+      | Set s -> Int_set.filter Int.(le zero) s >>-: inject_set
+      | Itv itv -> Int_interval.reduce_sign itv false >>-: inject_itv
     end
 
-let reduce_bit (i : int) (v : t) (b : bit_value) : t =
+let reduce_bit (i : int) (v : t) (b : bit_value) : t or_bottom =
   let bit_value x = if Z.testbit x i then On else Off in
   if b = Both
-  then v
+  then `Value v
   else match v with
-    | Set s -> inject_set_or_bottom (Int_set.filter (fun x -> bit_value x = b) s)
-    | Itv itv -> inject_itv_or_bottom (Int_interval.reduce_bit i itv (b = On))
+    | Set s -> Int_set.filter (fun x -> bit_value x = b) s >>-: inject_set
+    | Itv itv -> Int_interval.reduce_bit i itv (b = On) >>-: inject_itv
 
 type bit = Sign | Bit of int
 
@@ -905,7 +905,6 @@ struct
   (* Computes a bit_mask for the lowest bits of an ival, using the modulo
      information for non singleton values. *)
   let low_bit_mask : t -> bit_mask = function
-    | Set s when Int_set.cardinal s = 0 -> raise Error_Bottom
     | Set s when Int_set.cardinal s = 1 -> (* singleton : build a full mask  *)
       let x = Int_set.min s in
       let n = Z.numbits x in
@@ -969,10 +968,10 @@ struct
       | On -> (set_bit_on ~size i r, v1, v2) :: acc
       | Off -> (r, v1, v2) :: acc
       | Both ->
-        let v1_off = reduce_bit i v1 (Op.backward_off b2)
-        and v2_off = reduce_bit i v2 (Op.backward_off b1) in
-        let v1_on = reduce_bit i v1 (Op.backward_on b2)
-        and v2_on = reduce_bit i v2 (Op.backward_on b1) in
+        let v1_off = Bottom.non_bottom (reduce_bit i v1 (Op.backward_off b2))
+        and v2_off = Bottom.non_bottom (reduce_bit i v2 (Op.backward_off b1)) in
+        let v1_on = Bottom.non_bottom (reduce_bit i v1 (Op.backward_on b2))
+        and v2_on = Bottom.non_bottom (reduce_bit i v2 (Op.backward_on b1)) in
         (set_bit_on ~size i r, v1_on, v2_on) :: (r, v1_off, v2_off) :: acc
     in
     let acc = ref (set_bit Sign [] (r, v1, v2)) in
@@ -982,11 +981,11 @@ struct
     done;
     let o = List.fold_left (fun o (r,_,_) -> O.add r o) O.empty !acc in
     let cardinal = O.cardinal o in
-    if cardinal = 0 then bottom else
-      let a = Array.make cardinal Int.zero in
-      let i = ref 0 in
-      O.iter (fun e -> a.(!i) <- e; incr i) o;
-      Set (Int_set.inject_array a cardinal)
+    assert (cardinal > 0);
+    let a = Array.make cardinal Int.zero in
+    let i = ref 0 in
+    O.iter (fun e -> a.(!i) <- e; incr i) o;
+    Set (Int_set.inject_array a cardinal)
 
   (* If lower is true (resp. false), compute the lower (resp. upper) bound of
      the result interval when applying the bitwise operator to [v1] and [v2].
@@ -1009,8 +1008,8 @@ struct
             | Sign -> if lower then On else Off
             | Bit _ -> if lower then Off else On
           in
-          let v1 = reduce_bit i v1 (backward b2 b)
-          and v2 = reduce_bit i v2 (backward b1 b) in
+          let v1 = Bottom.non_bottom (reduce_bit i v1 (backward b2 b))
+          and v2 = Bottom.non_bottom (reduce_bit i v2 (backward b1 b)) in
           b, v1, v2
       in
       (* Only sets 1 bit, as [r] is 0 at the beginning. *)
@@ -1028,20 +1027,18 @@ struct
     bound
 
   let bitwise_forward (v1 : t) (v2 : t) : t =
-    try
-      let r, modu = compute_modulo v1 v2 in
-      match result_size v1 v2 with
-      | None ->
-        (* We could do better here, as one of the bound may be finite. However,
-           this case should occur rarely or not at all. *)
-        inject_interval None None r modu
-      | Some size ->
-        try compute_small_set ~size v1 v2 r modu
-        with Do_not_fit_small_sets ->
-          let min = compute_bound ~size v1 v2 true
-          and max = compute_bound ~size v1 v2 false in
-          inject_interval (Some min) (Some max) r modu
-    with Error_Bottom -> bottom
+    let r, modu = compute_modulo v1 v2 in
+    match result_size v1 v2 with
+    | None ->
+      (* We could do better here, as one of the bound may be finite. However,
+         this case should occur rarely or not at all. *)
+      inject_interval None None r modu
+    | Some size ->
+      try compute_small_set ~size v1 v2 r modu
+      with Do_not_fit_small_sets ->
+        let min = compute_bound ~size v1 v2 true
+        and max = compute_bound ~size v1 v2 false in
+        inject_interval (Some min) (Some max) r modu
 end
 
 let bitwise_or = let module M = BitwiseOperator (Or) in M.bitwise_forward

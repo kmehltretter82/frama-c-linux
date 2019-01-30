@@ -34,8 +34,6 @@ let log_imprecision s = Lattice_messages.emit_imprecision emitter s
 
 type set = Int.t array
 
-let bottom = Array.make 0 Int.zero
-
 let small_nums = Array.init 33 (fun i -> [| (Integer.of_int i) |])
 
 let zero = small_nums.(0)
@@ -48,7 +46,8 @@ let inject_singleton e =
   then small_nums.(Int.to_int e)
   else [| e |]
 
-let unsafe_share_array a s =
+let share_array a s =
+  assert (s > 0);
   let e = a.(0) in
   if s = 1 && Int.le Int.zero e && Int.le e Int.thirtytwo
   then small_nums.(Int.to_int e)
@@ -56,12 +55,8 @@ let unsafe_share_array a s =
   then zero_or_one
   else a
 
-(* TODO: assert s <> 0 *)
-let share_array a s =
-  if s = 0 then bottom else unsafe_share_array a s
-
 let share_array_or_bottom a s =
-  if s = 0 then `Bottom else `Value (unsafe_share_array a s)
+  if s = 0 then `Bottom else `Value (share_array a s)
 
 let inject_array = share_array
 
@@ -93,14 +88,11 @@ let compare s1 s2 =
 let equal e1 e2 = compare e1 e2 = 0
 
 let pretty fmt s =
-  if Array.length s = 0 then Format.fprintf fmt "BottomMod"
-  else begin
-    Pretty_utils.pp_iter
-      ~pre:"@[<hov 1>{"
-      ~suf:"}@]"
-      ~sep:";@ "
-      Array.iter Int.pretty fmt s
-  end
+  Pretty_utils.pp_iter
+    ~pre:"@[<hov 1>{"
+    ~suf:"}@]"
+    ~sep:";@ "
+    Array.iter Int.pretty fmt s
 
 include Datatype.Make_with_collections
     (struct
@@ -134,28 +126,26 @@ let exists = Extlib.array_exists
 let iter = Array.iter
 let fold = Array.fold_left
 
-let truncate r i =
-  if i = 0
-  then `Bottom
-  else if i = 1
-  then `Value (inject_singleton r.(0))
+let truncate_no_bottom r i =
+  assert (i > 0);
+  if i = 1
+  then inject_singleton r.(0)
   else begin
     (Obj.truncate (Obj.repr r) i);
     assert (Array.length r = i);
-    `Value r
+    r
   end
 
-exception Empty
+let truncate_or_bottom r i =
+  if i = 0 then `Bottom else `Value (truncate_no_bottom r i)
 
 let map_reduce (f : 'a -> 'b) (g : 'b -> 'b -> 'b) (set : 'a array) : 'b =
-  if Array.length set <= 0 then
-    raise Empty
-  else
-    let acc = ref (f set.(0)) in
-    for i = 1 to Array.length set - 1 do
-      acc := g !acc (f set.(i))
-    done;
-    !acc
+  assert (Array.length set > 0);
+  let acc = ref (f set.(0)) in
+  for i = 1 to Array.length set - 1 do
+    acc := g !acc (f set.(i))
+  done;
+  !acc
 
 let filter (f : Int.t -> bool) (a : Int.t array) : t or_bottom =
   let l = Array.length a in
@@ -168,7 +158,7 @@ let filter (f : Int.t -> bool) (a : Int.t array) : t or_bottom =
       incr j;
     end
   done;
-  truncate r !j
+  truncate_or_bottom r !j
 
 let mem v a =
   let l = Array.length a in
@@ -187,6 +177,7 @@ let mem v a =
 (* ------------------------------- Set or top ------------------------------- *)
 
 type set_or_top = [ `Set of t | `Top of Integer.t * Integer.t * Integer.t ]
+type set_or_top_or_bottom = [ `Bottom | set_or_top ]
 
 module O = FCSet.Make (Integer)
 
@@ -239,8 +230,8 @@ let o_one = O.singleton Int.one
 let o_zero_or_one = O.union o_zero o_one
 
 let share_set o s =
-  if s = 0 then bottom
-  else if s = 1
+  assert (s > 0);
+  if s = 1
   then begin
     let e = O.min_elt o in
     inject_singleton e
@@ -256,6 +247,10 @@ let share_set o s =
 
 let inject_ps = function
   | Pre_set (o, s) -> `Set (share_set o s)
+  | Pre_top (min, max, modu) -> `Top (min, max, modu)
+
+let inject_ps_or_bottom = function
+  | Pre_set (o, s) -> if s = 0 then `Bottom else `Set (share_set o s)
   | Pre_top (min, max, modu) -> `Top (min, max, modu)
 
 (* Given a set of elements that is an under-approximation, returns an
@@ -327,7 +322,7 @@ let apply2_n f (s1 : Integer.t array) (s2 : Integer.t array) =
   inject_ps !ps
 
 let apply2_notzero f (s1 : Integer.t array) s2 =
-  inject_ps
+  inject_ps_or_bottom
     (Array.fold_left
        (fun acc v1 ->
           Array.fold_left
@@ -342,27 +337,25 @@ let apply2_notzero f (s1 : Integer.t array) s2 =
 
 let map_set_decr f (s : Integer.t array) =
   let l = Array.length s in
-  if l = 0
-  then `Bottom
-  else
-    let r = Array.make l Int.zero in
-    let rec c srcindex dstindex last =
-      if srcindex < 0
-      then begin
+  assert (l > 0);
+  let r = Array.make l Int.zero in
+  let rec c srcindex dstindex last =
+    if srcindex < 0
+    then begin
+      r.(dstindex) <- last;
+      truncate_no_bottom r (succ dstindex)
+    end
+    else
+      let v = f s.(srcindex) in
+      if Int.equal v last
+      then
+        c (pred srcindex) dstindex last
+      else begin
         r.(dstindex) <- last;
-        truncate r (succ dstindex)
+        c (pred srcindex) (succ dstindex) v
       end
-      else
-        let v = f s.(srcindex) in
-        if Int.equal v last
-        then
-          c (pred srcindex) dstindex last
-        else begin
-          r.(dstindex) <- last;
-          c (pred srcindex) (succ dstindex) v
-        end
-    in
-    c (l-2) 0 (f s.(pred l))
+  in
+  c (l-2) 0 (f s.(pred l))
 
 let map_set_strict_decr f (s : Integer.t array) =
   let l = Array.length s in
@@ -379,27 +372,25 @@ let map_set_strict_decr f (s : Integer.t array) =
 
 let map_set_incr f (s : Integer.t array) =
   let l = Array.length s in
-  if l = 0
-  then `Bottom
-  else
-    let r = Array.make l Int.zero in
-    let rec c srcindex dstindex last =
-      if srcindex = l
-      then begin
+  assert (l > 0);
+  let r = Array.make l Int.zero in
+  let rec c srcindex dstindex last =
+    if srcindex = l
+    then begin
+      r.(dstindex) <- last;
+      truncate_no_bottom r (succ dstindex)
+    end
+    else
+      let v = f s.(srcindex) in
+      if Int.equal v last
+      then
+        c (succ srcindex) dstindex last
+      else begin
         r.(dstindex) <- last;
-        truncate r (succ dstindex)
+        c (succ srcindex) (succ dstindex) v
       end
-      else
-        let v = f s.(srcindex) in
-        if Int.equal v last
-        then
-          c (succ srcindex) dstindex last
-        else begin
-          r.(dstindex) <- last;
-          c (succ srcindex) (succ dstindex) v
-        end
-    in
-    c 1 0 (f s.(0))
+  in
+  c 1 0 (f s.(0))
 
 let map f s =
   let pre_set =
@@ -522,7 +513,7 @@ let meet s1 s2 =
   let r = Array.make lr_max Int.zero in
   let rec c i i1 i2 =
     if i1 = l1 || i2 = l2
-    then truncate r i
+    then truncate_or_bottom r i
     else
       let e1 = s1.(i1) in
       let e2 = s2.(i2) in
@@ -601,6 +592,7 @@ let mul s1 s2 =
   | _, _ -> apply2_n Int.mul s1 s2
 
 let scale_div ~pos f s =
+  assert (not (Int.is_zero f));
   let div_f =
     if pos
     then fun a -> Int.e_div a f
@@ -611,17 +603,10 @@ let scale_div ~pos f s =
   else map_set_incr div_f s
 
 let scale_rem ~pos f s =
+  assert (not (Int.is_zero f));
   let f = if Int.lt f Int.zero then Int.neg f else f in
-  let rem_f a =
-    if pos then Int.e_rem a f else Int.c_rem a f
-  in
-  let pre_set =
-    Array.fold_left
-      (fun acc v -> add_ps acc (rem_f v))
-      empty_ps
-      s
-  in
-  inject_ps pre_set
+  let rem_f a = if pos then Int.e_rem a f else Int.c_rem a f in
+  map rem_f s
 
 let c_rem s1 s2 = apply2_notzero Int.c_rem s1 s2
 
@@ -631,7 +616,7 @@ let bitwise_signed_not = map_set_strict_decr Int.lognot
 
 let subdivide s =
   let len = Array.length s in
-  assert (len > 0 );
+  assert (len > 0);
   if len <= 1 then raise Can_not_subdiv;
   let m = len lsr 1 in
   let lenhi = len - m in

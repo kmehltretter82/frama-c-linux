@@ -29,6 +29,7 @@ let emitter = Lattice_messages.register "Ival"
 let log_imprecision s = Lattice_messages.emit_imprecision emitter s
 
 type t =
+  | Bottom
   | Int of Int_val.t
   | Float of Fval.t
   (* Binary abstract operations do not model precisely float/integer operations.
@@ -42,37 +43,43 @@ type size_widen_hint = Integer.t
 type numerical_widen_hint = Widen_Hints.t * Fc_float.Widen_Hints.t
 type widen_hint = size_widen_hint * numerical_widen_hint
 
-let bottom = Int Int_val.bottom
+let bottom = Bottom
 let top = Int Int_val.top
 
 let hash = function
+  | Bottom -> 311
   | Int i -> Int_val.hash i
   | Float f -> 3 + 17 * Fval.hash f
 
 let compare e1 e2 =
   if e1==e2 then 0 else
     match e1, e2 with
+    | Bottom, Bottom -> 0
     | Int i1, Int i2 -> Int_val.compare i1 i2
     | Float f1, Float f2 -> Fval.compare f1 f2
+    | _, Bottom -> 1
+    | Bottom, _ -> -1
     | _, Int _ -> 1
     | Int _, _ -> -1
 
 let equal e1 e2 = compare e1 e2 = 0
 
 let pretty fmt = function
+  | Bottom -> Format.fprintf fmt "BottomMod"
   | Int i -> Int_val.pretty fmt i
   | Float f -> Fval.pretty fmt f
 
 
 let cardinal_zero_or_one = function
+  | Bottom -> true
   | Int i -> Int_val.cardinal_zero_or_one i
   | Float f -> Fval.is_singleton f
 
 let is_singleton_int = function
+  | Bottom -> false
   | Float _ -> false
   | Int i -> Int_val.is_singleton i
 
-(* TODO *)
 let is_bottom x = equal x bottom
 
 let zero = Int Int_val.zero
@@ -101,6 +108,10 @@ let inject_float_interval flow fup =
   then zero
   else Float (Fval.inject Fval.Double flow fup)
 
+let inject_int_or_bottom = function
+  | `Bottom -> bottom
+  | `Value i -> Int i
+
 (*  let minus_zero = Float (Fval.minus_zero, Fval.minus_zero) *)
 
 let is_one = equal one
@@ -111,21 +122,23 @@ let project_float v =
   else
     match v with
     | Float f -> f
-    | Int _ -> assert false (* by hypothesis that it is a float *)
+    | Bottom | Int _ -> assert false (* by hypothesis that it is a float *)
 
 let is_float = function
-  | Float _ -> true
-  | Int _ as i -> equal zero i || equal bottom i
+  | Bottom | Float _ -> true
+  | Int _ as i -> equal zero i
 
 let is_int = function
-  | Int _ -> true
+  | Bottom | Int _ -> true
   | Float _ -> false
 
 let contains_zero = function
+  | Bottom -> false
   | Int i -> Int_val.contains_zero i
   | Float f -> Fval.contains_a_zero f
 
 let contains_non_zero = function
+  | Bottom -> false
   | Int i -> Int_val.contains_non_zero i
   | Float f -> Fval.contains_non_zero f
 
@@ -134,22 +147,26 @@ exception Not_Singleton_Int = Int_val.Not_Singleton_Int
 
 let project_int = function
   | Int i -> Int_val.project_int i
-  | Float _ -> raise Not_Singleton_Int
+  | Bottom | Float _ -> raise Not_Singleton_Int
 
 let is_small_set = function
+  | Bottom -> true
   | Int i -> Int_val.is_small_set i
   | Float _ -> false
 
 let project_small_set = function
+  | Bottom -> Some []
   | Int i -> Int_val.project_small_set i
   | Float _ -> None
 
 let cardinal = function
+  | Bottom -> Some Int.zero
   | Int i -> Int_val.cardinal i
   | Float f -> if Fval.is_singleton f then Some Int.one else None
 
 let cardinal_estimate v ~size =
   match v with
+  | Bottom -> Int.zero
   | Int i -> Int_val.cardinal_estimate ~size i
   | Float f ->
     if Fval.is_singleton f
@@ -168,21 +185,27 @@ let cardinal_estimate v ~size =
 
 let cardinal_less_than v n =
   match v with
+  | Bottom -> 0
   | Int i -> Int_val.cardinal_less_than i n
-  | Float f ->
-    if Fval.is_singleton f then 1 else raise Not_less_than
+  | Float f -> if Fval.is_singleton f then 1 else raise Not_less_than
 
 let cardinal_is_less_than v n =
   match cardinal v with
   | None -> false
   | Some c -> Int.le c (Int.of_int n)
 
-let inject_top min max rem modu = Int (Int_val.make ~min ~max ~rem ~modu)
+let inject_top min max rem modu =
+  match min, max with
+  | Some mn, Some mx when Int.gt mn mx -> Bottom
+  | _, _ -> Int (Int_val.make ~min ~max ~rem ~modu)
 
 let inject_interval ~min ~max ~rem ~modu =
-  Int (Int_val.inject_interval ~min ~max ~rem ~modu)
+  match min, max with
+  | Some mn, Some mx when Int.gt mn mx -> Bottom
+  | _, _ -> Int (Int_val.inject_interval ~min ~max ~rem ~modu)
 
 let subdivide ~size = function
+  | Bottom -> raise Can_not_subdiv
   | Float fval ->
     let fkind = match Integer.to_int size with
       | 32 -> Fval.Single
@@ -200,10 +223,12 @@ let top_single_precision_float = Float Fval.top
 
 
 let min_max_r_mod = function
+  | Bottom -> raise Error_Bottom
   | Int i -> Int_val.min_max_rem_modu i
   | Float _ -> None, None, Int.zero, Int.one
 
 let min_and_max = function
+  | Bottom -> raise Error_Bottom
   | Int i -> Int_val.min_and_max i
   | Float _ -> None, None
 
@@ -238,9 +263,10 @@ let has_smaller_max_bound t1 t2 =
     | Some m1, Some m2 -> Int.compare m2 m1
 
 let widen (bitsize,(wh,fh)) t1 t2 =
-  if equal t1 t2 || cardinal_zero_or_one t1 then t2
+  if equal t1 t2 || cardinal_zero_or_one t1 || is_bottom t1 then t2
   else
     match t2 with
+    | Bottom -> t2
     | Float f2 ->
       let f1 = project_float t1 in
       let prec =
@@ -255,6 +281,7 @@ let widen (bitsize,(wh,fh)) t1 t2 =
       Float (Fval.widen fh prec f1 f2)
     | Int i2 ->
       let i1 = match t1 with
+        | Bottom -> assert false
         | Int i1 -> i1
         | Float _ -> Int_val.top
       in
@@ -264,7 +291,8 @@ let meet v1 v2 =
   if v1 == v2 then v1 else
     let result =
       match v1, v2 with
-      | Int i1, Int i2 -> Int (Int_val.meet i1 i2)
+      | Bottom, _ | _, Bottom -> bottom
+      | Int i1, Int i2 -> inject_int_or_bottom (Int_val.meet i1 i2)
       | Float(f1), Float(f2) -> begin
           match Fval.meet f1 f2 with
           | `Value f -> inject_float f
@@ -283,6 +311,7 @@ let meet v1 v2 =
 let intersects v1 v2 =
   v1 == v2 ||
   match v1, v2 with
+  | Bottom, _ | _, Bottom -> false
   | Int i1, Int i2 -> Int_val.intersects i1 i2
   | Float f1, Float f2 -> begin
       match Fval.forward_comp Comp.Eq f1 f2 with
@@ -294,10 +323,11 @@ let intersects v1 v2 =
 
 let narrow v1 v2 =
   match v1, v2 with
+  | Bottom, _ | _, Bottom -> bottom
   | Float _, Float _ -> meet v1 v2 (* meet is exact *)
   | v, (Int _ as t) when equal t top -> v
   | (Int _ as t), v when equal t top -> v
-  | Int i1, Int i2 -> Int (Int_val.narrow i1 i2)
+  | Int i1, Int i2 -> inject_int_or_bottom (Int_val.narrow i1 i2)
   | Float f, (Int _ as s) | (Int _ as s), Float f when is_zero s -> begin
       match Fval.narrow f Fval.zeros with
       | `Value f -> inject_float f
@@ -315,6 +345,7 @@ let join v1 v2 =
   let result =
     if v1 == v2 then v1 else
       match v1,v2 with
+      | Bottom, t | t, Bottom -> t
       | Int i1, Int i2 -> Int (Int_val.join i1 i2)
       | Float(f1), Float(f2) ->
         inject_float (Fval.join f1 f2)
@@ -366,11 +397,13 @@ let complement_int_under ~size ~signed i =
 
 let fold_int f v acc =
   match v with
+  | Bottom -> acc
   | Float _ -> raise Error_Top
   | Int i -> Int_val.fold_int f i acc
 
 let fold_enum f v acc =
   match v with
+  | Bottom -> acc
   | Float fl when Fval.is_singleton fl -> f v acc
   | Float _ -> raise Error_Top
   | Int _ -> fold_int (fun x acc -> f (inject_singleton x) acc) v acc
@@ -378,26 +411,32 @@ let fold_enum f v acc =
 let is_included t1 t2 =
   (t1 == t2) ||
   match t1, t2 with
+  | Bottom, _ -> true
+  | _, Bottom -> false
   | Int i1, Int i2 -> Int_val.is_included i1 i2
   | Float f1, Float f2 -> Fval.is_included f1 f2
   | Float _, _ -> equal t2 top
   | Int i, Float f -> Int_val.is_zero i && Fval.contains_plus_zero f
 
 let add_singleton_int i = function
+  | Bottom -> bottom
   | Float _ -> assert false
   | Int itv -> Int (Int_val.add_singleton i itv)
 
 let add_int v1 v2 =
   match v1, v2 with
+  | Bottom, _ | _, Bottom -> bottom
   | Float _, _ | _, Float _ -> assert false
   | Int i1, Int i2 -> Int (Int_val.add i1 i2)
 
 let add_int_under v1 v2 =
   match v1, v2 with
+  | Bottom, _ | _, Bottom -> bottom
   | Float _, _ | _, Float _ -> assert false
-  | Int i1, Int i2 -> Int (Int_val.add_under i1 i2)
+  | Int i1, Int i2 -> inject_int_or_bottom (Int_val.add_under i1 i2)
 
 let neg_int = function
+  | Bottom -> bottom
   | Float _ -> assert false
   | Int i -> Int (Int_val.neg i)
 
@@ -405,10 +444,12 @@ let sub_int v1 v2 = add_int v1 (neg_int v2)
 let sub_int_under v1 v2 = add_int_under v1 (neg_int v2)
 
 let min_int = function
+  | Bottom -> raise Error_Bottom
   | Int i -> fst (Int_val.min_and_max i)
   | Float _ -> None
 
 let max_int = function
+  | Bottom -> raise Error_Bottom
   | Int i -> snd (Int_val.min_and_max i)
   | Float _ -> None
 
@@ -419,20 +460,24 @@ let scale f v =
   then zero
   else
     match v with
+    | Bottom -> bottom
     | Float _ -> top
     | Int i -> Int (Int_val.scale f i)
 
 let scale_div ~pos f = function
+  | Bottom -> bottom
   | Int i -> Int (Int_val.scale_div ~pos f i)
   | Float _ -> top
 
 let scale_div_under ~pos f = function
-  | Int i -> Int (Int_val.scale_div_under ~pos f i)
+  | Bottom -> bottom
+  | Int i -> inject_int_or_bottom (Int_val.scale_div_under ~pos f i)
   | Float _ -> bottom
 
 let div v1 v2 =
   match v1, v2 with
-  | Int i1, Int i2 -> Int (Int_val.div i1 i2)
+  | Bottom, _ | _, Bottom -> bottom
+  | Int i1, Int i2 -> inject_int_or_bottom (Int_val.div i1 i2)
   | Float _, _ | _, Float _ -> assert false
 
 (* [scale_rem ~pos:false f v] is an over-approximation of the set of
@@ -445,13 +490,15 @@ let scale_rem ~pos f v =
   if Int.is_zero f then bottom
   else
     match v with
+    | Bottom -> bottom
     | Int i -> Int (Int_val.scale_rem ~pos f i)
     | Float _ -> top
 
 let c_rem v1 v2 =
   match v1, v2 with
+  | Bottom, _ | _, Bottom -> bottom
   | Float _, _ | _, Float _ -> top
-  | Int i1, Int i2 -> Int (Int_val.c_rem i1 i2)
+  | Int i1, Int i2 -> inject_int_or_bottom (Int_val.c_rem i1 i2)
 
 let create_all_values ~signed ~size =
   Int (Int_val.create_all_values ~signed ~size)
@@ -460,6 +507,7 @@ let big_int_64 = Int.of_int 64
 let big_int_32 = Int.thirtytwo
 
 let cast_int_to_int ~size ~signed = function
+  | Bottom -> bottom
   | Int i -> Int (Int_val.cast_int_to_int ~size ~signed i)
   | Float _ -> assert false
 
@@ -485,6 +533,7 @@ let reinterpret_float_as_int ~signed ~size f =
 
 let reinterpret_as_int ~size ~signed i =
   match i with
+  | Bottom -> bottom
   | Int _ ->
     (* On integers, cast and reinterpretation are the same operation *)
     cast_int_to_int ~signed ~size i
@@ -492,6 +541,7 @@ let reinterpret_as_int ~size ~signed i =
 
 let cast_float_to_float fkind v =
   match v with
+  | Bottom -> bottom
   | Float f ->
     begin match fkind with
       | Fval.Real | Fval.Long_Double | Fval.Double -> v
@@ -509,17 +559,20 @@ let mul v1 v2 =
   else if is_one v2 then v1
   else
     match v1, v2 with
+    | Bottom, _ | _, Bottom -> bottom
     | Float _, _ | _, Float _ -> top
     | Int i1, Int i2 -> Int (Int_val.mul i1 i2)
 
 let shift_right v1 v2 =
   match v1, v2 with
-  | Int i1, Int i2 -> Int (Int_val.shift_right i1 i2)
+  | Bottom, _ | _, Bottom -> bottom
+  | Int i1, Int i2 -> inject_int_or_bottom (Int_val.shift_right i1 i2)
   | _, _ -> top
 
 let shift_left v1 v2 =
   match v1, v2 with
-  | Int i1, Int i2 -> Int (Int_val.shift_left i1 i2)
+  | Bottom, _ | _, Bottom -> bottom
+  | Int i1, Int i2 -> inject_int_or_bottom (Int_val.shift_left i1 i2)
   | _, _ -> top
 
 
@@ -594,11 +647,13 @@ let backward_mult_int_left ~right ~result =
 
 let backward_le_int max v =
   match v with
+  | Bottom -> bottom
   | Float _ -> v
   | Int _ -> narrow v (Int (Int_val.inject_range None max))
 
 let backward_ge_int min v =
   match v with
+  | Bottom -> bottom
   | Float _ -> v
   | Int _ -> narrow v (Int (Int_val.inject_range min None))
 
@@ -607,7 +662,7 @@ let backward_gt_int min v = backward_ge_int (Extlib.opt_map Int.succ min) v
 
 let diff_if_one value rem =
   match value, rem with
-  | Int i1, Int i2 -> Int (Int_val.diff_if_one i1 i2)
+  | Int i1, Int i2 -> inject_int_or_bottom (Int_val.diff_if_one i1 i2)
   | _, _ -> value
 
 let diff value rem =
@@ -617,6 +672,7 @@ let diff value rem =
 (* This function is an iterator, but it needs [diff_if_one] just above. *)
 let fold_int_bounds f v acc =
   match v with
+  | Bottom -> acc
   | Float _ -> f v acc
   | Int _ ->
     if cardinal_zero_or_one v then f v acc
@@ -669,6 +725,7 @@ let backward_comp_float_left_false op fkind f1 f2  =
 
 let rec extract_bits ~start ~stop ~size v =
   match v with
+  | Bottom -> bottom
   | Int i -> Int (Int_val.extract_bits ~start ~stop i)
   | Float f ->
     let inject (b, e) = inject_range (Some b) (Some e) in
@@ -690,7 +747,7 @@ let all_values ~size v =
   *)
   else
     match v with
-    | Float _ -> false
+    | Bottom | Float _ -> false
     | Int i -> Int_val.all_values ~size i
 
 let compare_min_max min max =
@@ -912,6 +969,7 @@ let cast_int_to_float fkind v =
 
 let reinterpret_as_float kind i =
   match i with
+  | Bottom -> bottom
   | Float _ ->  i
   | Int _ when is_zero i || is_bottom i -> i
   | Int _ ->
@@ -997,10 +1055,12 @@ let bitwise_and = bitwise_int Int_val.bitwise_and
 let bitwise_xor = bitwise_int Int_val.bitwise_xor
 
 let bitwise_signed_not = function
+  | Bottom -> bottom
   | Float _ -> assert false
   | Int i -> Int (Int_val.bitwise_signed_not i)
 
 let bitwise_unsigned_not ~size = function
+  | Bottom -> bottom
   | Float _ -> assert false
   | Int i -> Int (Int_val.bitwise_unsigned_not ~size i)
 
