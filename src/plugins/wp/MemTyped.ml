@@ -404,7 +404,8 @@ let pointer = Context.create "MemTyped.pointer"
 type chunk =
   | M_int
   | M_char
-  | M_float
+  | M_f32
+  | M_f64
   | M_pointer
   | T_alloc
 
@@ -415,33 +416,36 @@ struct
   let rank = function
     | M_int -> 0
     | M_char -> 1
-    | M_float -> 2
-    | M_pointer -> 3
-    | T_alloc -> 4
+    | M_f32 -> 2
+    | M_f64 -> 3
+    | M_pointer -> 4
+    | T_alloc -> 5
   let hash = rank
   let name = function
     | M_int -> "Mint"
     | M_char -> "Mchar"
-    | M_float -> "Mflt"
+    | M_f32 -> "Mf32"
+    | M_f64 -> "Mf64"
     | M_pointer -> "Mptr"
     | T_alloc -> "Malloc"
   let compare a b = rank a - rank b
   let equal = (=)
   let pretty fmt c = Format.pp_print_string fmt (name c)
   let key_of_chunk = function
-    | M_int | M_char | M_float | M_pointer -> t_addr
+    | M_int | M_char | M_f32 | M_f64 | M_pointer -> t_addr
     | T_alloc -> L.Int
   let val_of_chunk = function
     | M_int | M_char -> L.Int
-    | M_float -> L.Real
+    | M_f32 -> Cfloat.tau_of_float Ctypes.Float32
+    | M_f64 -> Cfloat.tau_of_float Ctypes.Float64
     | M_pointer -> t_addr
     | T_alloc -> L.Int
-  let tau_of_chunk =
-    let m = Array.make 5 L.Int in
-    List.iter
-      (fun c -> m.(rank c) <- L.Array(key_of_chunk c,val_of_chunk c))
-      [M_int;M_char;M_float;M_pointer;T_alloc] ;
-    fun c -> m.(rank c)
+  let tau_of_chunk = function
+    | M_int | M_char -> L.Array(t_addr,L.Int)
+    | M_pointer -> L.Array(t_addr,t_addr)
+    | M_f32 -> L.Array(t_addr,Cfloat.tau_of_float Ctypes.Float32)
+    | M_f64 -> L.Array(t_addr,Cfloat.tau_of_float Ctypes.Float64)
+    | T_alloc -> L.Array(L.Int,L.Int)
   let basename_of_chunk = name
   let is_framed _ = false
 end
@@ -456,10 +460,11 @@ type loc = term (* of type addr *)
 (* -------------------------------------------------------------------------- *)
 
 let m_int i = if Ctypes.is_char i then M_char else M_int
+let m_float = function Float32 -> M_f32 | Float64 -> M_f64
 
 let rec footprint = function
   | C_int i -> Heap.Set.singleton (m_int i)
-  | C_float _ -> Heap.Set.singleton M_float
+  | C_float f -> Heap.Set.singleton (m_float f)
   | C_pointer _ -> Heap.Set.singleton M_pointer
   | C_array a -> footprint (object_of a.arr_element)
   | C_comp c -> footprint_comp c
@@ -1007,7 +1012,7 @@ module ARRAY = Model.Generator(Matrix.NATURAL)
 
 let loadvalue sigma obj l = match obj with
   | C_int i -> F.e_get (Sigma.value sigma (m_int i)) l
-  | C_float _ -> F.e_get (Sigma.value sigma M_float) l
+  | C_float f -> F.e_get (Sigma.value sigma (m_float f)) l
   | C_pointer _ -> F.e_get (Sigma.value sigma M_pointer) l
   | C_comp c ->
       let phi,cs = COMP.get c in
@@ -1273,7 +1278,7 @@ let eqmem s obj l =
 let stored s obj l v =
   match obj with
   | C_int i -> updated s (m_int i) l v
-  | C_float _ -> updated s M_float l v
+  | C_float f -> updated s (m_float f) l v
   | C_pointer _ -> updated s M_pointer l v
   | C_comp _ | C_array _ ->
       Set(loadvalue s.post obj l, v) ::
