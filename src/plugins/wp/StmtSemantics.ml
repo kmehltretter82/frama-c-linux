@@ -625,27 +625,27 @@ struct
     let rec component nodes paths = function
       | Wto.Node ((n, _) as v) -> bind n (do_node nodes v) paths
       | Wto.Component ((n, _) as v, l) ->
-        let do_component (v, l) =
-          assert (not (Automata.Map.mem v nodes.local));
-          let invariants,l = get_invariants g v l in
-          let n = get_node {nodes with local = Automata.Map.empty} v in
-          (* initialization *)
-          let n,paths = do_list ~fresh_nodes:true paths nodes n invariants in
-          (* preservation *)
-          let n_loop = Cfg.node () in
-          let _,paths = do_list ~fresh_nodes:true paths nodes n_loop invariants in
-          (* arbitrary number of loop *)
-          let n_havoc = Cfg.node () in
-          let havoc = Cfg.havoc n ~effects:{pre=n_havoc;post=n_loop} n_havoc in
-          let paths = (havoc |> paths_of_cfg) @^ paths in
-          (* body *)
-          let invariants_as_assumes = as_assumes invariants in
-          let _,paths =
-            do_list ~fresh_nodes:false paths (add_local nodes v n_havoc)
-              n_havoc invariants_as_assumes in
-          partition (add_local nodes v n_loop) paths l
-        in
-        bind n do_component (v, l)
+          let do_component (v, l) =
+            assert (not (Automata.Map.mem v nodes.local));
+            let invariants,l = get_invariants g v l in
+            let n = get_node {nodes with local = Automata.Map.empty} v in
+            (* initialization *)
+            let n,paths = do_list ~fresh_nodes:true paths nodes n invariants in
+            (* preservation *)
+            let n_loop = Cfg.node () in
+            let _,paths = do_list ~fresh_nodes:true paths nodes n_loop invariants in
+            (* arbitrary number of loop *)
+            let n_havoc = Cfg.node () in
+            let havoc = Cfg.havoc n ~effects:{pre=n_havoc;post=n_loop} n_havoc in
+            let paths = (havoc |> paths_of_cfg) @^ paths in
+            (* body *)
+            let invariants_as_assumes = as_assumes invariants in
+            let _,paths =
+              do_list ~fresh_nodes:false paths (add_local nodes v n_havoc)
+                n_havoc invariants_as_assumes in
+            partition (add_local nodes v n_loop) paths l
+          in
+          bind n do_component (v, l)
 
     and partition nodes paths l =
       List.fold_left (component nodes) paths l
