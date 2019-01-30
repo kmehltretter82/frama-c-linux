@@ -204,3 +204,4 @@ hello-*.tar.gz
 /src/plugins/gui/gtk_compat.ml
 /src/plugins/gui/GSourceView.ml
 /src/plugins/gui/GSourceView.mli
+/tests/crowbar/integer_bb_pretty
