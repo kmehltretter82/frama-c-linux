@@ -263,10 +263,6 @@ module PrintReturn : Parameter_sig.Bool
   (** Behavior of option "-print-return"
       @since Sulfur-20171101 *)
 
-module SplitExternInline : Parameter_sig.Bool
-  (** Behavior of Cil on extern inline declarations 
-      @since Frama-C+dev *)
-
 (** Behavior of option "-ocode".
     @plugin development guide *)
 module CodeOutput : sig

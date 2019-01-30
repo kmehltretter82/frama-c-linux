@@ -9908,8 +9908,7 @@ let copy_spec (old_f,new_f) formals_map spec =
 let split_extern_inline_def acc g =
   match g with
   | GFun ( { svar; sformals; sspec }, loc)
-    when svar.vinline && svar.vstorage = NoStorage &&
-         Kernel.SplitExternInline.get () ->
+    when svar.vinline && svar.vstorage = NoStorage ->
     (* we have an inline definition, which is also an implicit external
        _declaration_ (see C11 6.7.4§7). Just rename its uses in the current
        translation unit, and leave a new, unrelated, external declaration for

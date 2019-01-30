@@ -579,18 +579,6 @@ module PrintReturn =
       let help = "inline gotos to return statement"
      end)
 
-let () = Parameter_customize.set_group inout_source
-module SplitExternInline =
-  True
-    (struct
-      let module_name = "SplitExternInline"
-      let option_name = "-split-extern-inline"
-      let help = "If set (by default), duplicate extern inline declarations \
-                  to be compliant with C11 6.7.4§7 ; the internal inline \
-                  function receives the specification and is suffixed \
-                  with '__fc_inline'"
-     end)
-
 module CodeOutput = struct
 
   let () = Parameter_customize.set_group inout_source
