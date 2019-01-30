@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Extension of [Big_int] compatible with [Zarith]. 
+(** Extension of [Big_int] compatible with [Zarith].
     @since Nitrogen-20111001 *)
 
 type t = Z.t
@@ -154,16 +154,16 @@ val pp_bin : ?nbits:int -> ?sep:string -> t Pretty_utils.formatter
 (** Print binary format. Digits are output by blocs of 4 bits
     separated by [~sep] with at least [~nbits] total bits. If [nbits] is
     non positive, it will be ignored.
-    
-    Positive values are prefixed with ["0b"] and negative values 
+
+    Positive values are prefixed with ["0b"] and negative values
     are printed as their 2-complement ([lnot]) with prefix ["1b"]. *)
 
 val pp_hex : ?nbits:int -> ?sep:string -> t Pretty_utils.formatter
-(** Print hexadecimal format. Digits are output by blocs of 16 bits 
-    (4 hex digits) separated by [~sep] with at least [~nbits] total bits. 
+(** Print hexadecimal format. Digits are output by blocs of 16 bits
+    (4 hex digits) separated by [~sep] with at least [~nbits] total bits.
     If [nbits] is non positive, it will be ignored.
-    
-    Positive values are preffixed with ["0x"] and negative values 
+
+    Positive values are preffixed with ["0x"] and negative values
     are printed as their 2-complement ([lnot]) with prefix ["1x"]. *)
 (*
 
