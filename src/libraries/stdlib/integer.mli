@@ -54,34 +54,35 @@ val lognot : t -> t
 val min : t -> t -> t
 val max : t -> t -> t
 
-val native_div : t -> t -> t
+val e_div : t -> t -> t
+(** Euclidean division (that returns a positive rem).
+    Implemented by [Z.ediv]
 
-val div : t -> t -> t
-(** Euclidean division (that returns a positive rem) *)
-
-val pos_div : t -> t -> t
-(** Euclidean division. Equivalent to C division if both operands are positive.
+    Equivalent to C division if both operands are positive.
     Equivalent to a floored division if b > 0 (rounds downwards),
     otherwise rounds upwards.
-    Note: it is possible that pos_div (-a) b <> pos_div a (-b). *)
+    Note: it is possible that pos_div (-a) b <> pos_div a (-b).
+*)
 
-val divexact: t -> t -> t
-(** Faster, but produces correct results only when b evenly divides a. *)
+val e_rem : t -> t -> t
+(** Remainder of the Euclidean division (always positive).
+    Implemented by [Z.erem] *)
+
+val e_div_rem: t -> t -> (t * t)
+(** [e_div_rem a b] returns [(e_div a b, e_rem a b)].
+    Implemented by [Z.ediv_rem] *)
 
 val c_div : t -> t -> t
-(** Truncated division towards 0 (like in C99) *)
-
-val rem : t -> t -> t
-(** Remainder of the Euclidean division (always positive) *)
+(** Truncated division towards 0 (like in C99).
+    Implemented by [Z.div] *)
 
 val c_rem : t -> t -> t
-(** Remainder of the truncated division towards 0 (like in C99) *)
+(** Remainder of the truncated division towards 0 (like in C99).
+    Implemented by [Z.rem] *)
 
-val div_rem: t -> t -> (t * t)
-(** [div_rem a b] returns [(pos_div a b, pos_rem a b)] *)
-
-val pos_rem : t -> t -> t
-(** Remainder of the Euclidean division (always positive) *)
+val c_div_rem : t -> t -> t * t
+(** Remainder of the truncated division towards 0 (like in C99.
+    Implemented by [Z.div_rem] *)
 
 val pgcd : t -> t -> t
 (** [pgcd v 0 == pgcd 0 v == abs v]. Result is always positive *)

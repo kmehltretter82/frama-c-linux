@@ -439,7 +439,7 @@ module Store(* (B:sig *)
               may be missed;
            2. in '<=' and '>=' loops, to adjust for the last iteration *)
         let divident = Integer.sub bound offset in
-        let remainder = Integer.rem divident increment in
+        let remainder = Integer.e_rem divident increment in
         (* check if induction variable may miss termination condition *)
         if binop = Cil_types.Ne && not Integer.(equal remainder zero) then
           Options.warning ~current:true

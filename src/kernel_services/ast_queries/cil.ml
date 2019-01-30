@@ -3995,7 +3995,7 @@ let truncateInteger64 (k: ikind) i =
     let i' = 
       let nrBits = Integer.of_int (8 * (bytesSizeOfInt k)) in
       let max_strict_bound = Integer.shift_left Integer.one nrBits in
-      let modulo = Integer.pos_rem i max_strict_bound in
+      let modulo = Integer.e_rem i max_strict_bound in
       let signed = isSigned k in
       if signed then 
         let max_signed_strict_bound = 
