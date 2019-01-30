@@ -497,20 +497,20 @@ struct
             let delayed =
               match len with (* number of required elements *)
               | Some {enode = (Const CInt64 (size,_,_))} ->
-                  Some (size, None)
-              | _ -> None
+                  (size, None)
+              | _ -> (* CIL invariant broken. *)
+                  WpLog.fatal "CIL invariant broken: unknown initialized array size"
             in
             let make_quant acc = function
-              (* adds delayed initializations from info about 
+              (* adds delayed initializations from info about
                  the last consecutive indices having
                  the same value, but that have not yet initialized. *)
-              | None -> acc  (* nothing was delayed *)
-              | Some (_,None) -> acc (* nothing was delayed *)
-              | Some (il,Some (i0,_,exp)) when Integer.lt il i0 ->
+              | (_,None) -> acc (* nothing was delayed *)
+              | (il,Some (i0,_,exp)) when Integer.lt il i0 ->
                   (* Added pred: \forall i \in [il .. i0] ; t[i]==exp *)
                   let i2 = Integer.succ i0 in
                   init_range ~sigma lv ty il i2 (Some exp) :: acc
-              | Some (_il,Some (_i0,off,exp)) ->
+              | (_il,Some (_i0,off,exp)) ->
                   (* case [_il=_i0], so uses [off] corresponding to [_i0]
                      Added pred: t[i]==exp*)
                   let lv = Cil.addOffsetLval off lv in
@@ -518,12 +518,11 @@ struct
             in
             let add_missing_indices acc i0 = function
               (* adds eventual default value for missing indices. *)
-              | Some (i1, _) ->
+              | (i1, _) ->
                   if Integer.ge i0 i1 then (* no hole *) acc
                   else (* defaults values
                           Added pred: \forall i \in [i0 .. i1[ ; t[i]==default *)
                     init_range ~sigma lv ty i0 i1 None :: acc
-              | _ -> (* last bound is unknown. *) acc
             in
             let acc, delayed =
               List.fold_left
@@ -532,35 +531,36 @@ struct
                    let idx,acc = match off with
                      | Index({enode=Const CInt64 (idx,_,_)}, _) ->
                          (match delayed with
-                          | Some (iprev, _) when Integer.lt iprev idx ->
-                              (* otherwice, an algo with a 2sd pass is
-                                 required for introducing default values *)
-                              WpLog.fatal "Unordered initializer";
+                          | (iprev, _) when Integer.lt iprev idx ->
+                              (* CIL invariant broken.
+                                 without that invariant, an algo with a 2sd pass
+                                 is required for introducing default values *)
+                              WpLog.fatal "CIL invariant broken: unordered initializer";
                           | _ -> ()) ;
-                         Some (idx,None),
+                         idx,
                          (* adds default values for missing indices *)
                          add_missing_indices acc (Integer.succ idx) delayed
-                     | _ -> None,acc
+                     | _ -> (* CIL invariant broken. *)
+                         WpLog.fatal "CIL invariant broken: unknown initialized index"
                    in
-                   match idx, off, init with (* only simple init can be delayed *)
-                   | Some (idx,_), Index(_, NoOffset), SingleInit init -> begin
+                   match off, init with (* only simple init can be delayed *)
+                   | Index(_, NoOffset), SingleInit init -> begin
                        match delayed with
-                       | None -> acc,Some (idx,Some(idx,off,init))
-                       | Some (i_prev,(Some (_,_,init_delayed) as delayed_info))
+                       | (i_prev,(Some (_,_,init_delayed) as delayed_info))
                          when Wp_parameters.InitWithForall.get ()
                            && Integer.equal (Integer.pred i_prev) idx
                            && ExpStructEq.equal init_delayed init ->
-                           acc,Some (idx,delayed_info)
+                           acc, (idx,delayed_info)
                        | _ -> (* flush the delayed init, and store the new one *)
                            let acc = make_quant acc delayed in
-                           acc, Some (idx, Some (idx,off,init))
+                           acc, (idx, Some (idx,off,init))
                      end
-                   | _, Index(_, _),_ ->
+                   | Index(_, _),_ ->
                        (* flush the delayed init, and adds the current one *)
                        let acc = make_quant acc delayed in
                        let lv = Cil.addOffsetLval off lv in
-                       (init_variable ~sigma lv init acc), idx
-                   | _ ->  WpLog.fatal "Kernel invariant broken into an initializer"
+                       (init_variable ~sigma lv init acc), (idx, None)
+                   | _ -> WpLog.fatal "CIL invariant broken: not an index"
                 )
                 (acc,delayed)
                 (List.rev initl)
