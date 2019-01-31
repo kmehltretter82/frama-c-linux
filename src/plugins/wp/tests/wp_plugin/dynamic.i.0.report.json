@@ -7,12 +7,12 @@
                                                  "wp:main": { "total": 1,
                                                               "valid": 1,
                                                               "rank": 14 } },
-                              "call_s3_callsf1f2": { "alt-ergo": { "total": 1,
-                                                                   "valid": 1,
-                                                                   "rank": 6 },
-                                                     "wp:main": { "total": 1,
-                                                                  "valid": 1,
-                                                                  "rank": 6 } },
+                              "call_calls_f1_f2_s3": { "alt-ergo": { "total": 1,
+                                                                    "valid": 1,
+                                                                    "rank": 6 },
+                                                       "wp:main": { "total": 1,
+                                                                    "valid": 1,
+                                                                    "rank": 6 } },
                               "call_ensures": { "qed": { "total": 2,
                                                          "valid": 2 },
                                                 "wp:main": { "total": 2,
@@ -25,10 +25,10 @@
                                               "wp:main": { "total": 4,
                                                            "valid": 4,
                                                            "rank": 14 } } },
-                    "guarded_call": { "guarded_call_s9_callsg": { "qed": 
+                    "guarded_call": { "guarded_call_calls_g_s9": { "qed": 
                                                                     { "total": 1,
                                                                     "valid": 1 },
-                                                                  "wp:main": 
+                                                                   "wp:main": 
                                                                     { "total": 1,
                                                                     "valid": 1 } },
                                       "guarded_call_ensures_2": { "qed": 
@@ -62,7 +62,7 @@
                                                                "wp:main": 
                                                                  { "total": 1,
                                                                    "valid": 1 } },
-                                 "no_call_s17_callsunreachable_g": { "qed": 
+                                 "no_call_calls_unreachable_g_s17": { "qed": 
                                                                     { "total": 1,
                                                                     "valid": 1 },
                                                                     "wp:main": 
