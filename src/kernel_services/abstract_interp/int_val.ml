@@ -23,28 +23,11 @@
 open Abstract_interp
 open Bottom.Type
 
-(* Make sure all this is synchronized with the default value of -ilevel *)
-let small_cardinal = ref 8
-let small_cardinal_Int = ref (Int.of_int !small_cardinal)
-let small_cardinal_log = ref 3
-
-let set_small_cardinal i =
-  assert (2 <= i && i <= 1024);
-  let rec log j p =
-    if i <= p then j
-    else log (j+1) (2*p)
-  in
-  small_cardinal := i;
-  small_cardinal_Int := Int.of_int i;
-  small_cardinal_log := log 1 2;
-  (* TODO: share this code with Int_set *)
-  Int_set.set_small_cardinal i
-
-let get_small_cardinal () = !small_cardinal
+let small_cardinal = Int_set.get_small_cardinal
+let small_cardinal_Int () = Int.of_int (small_cardinal ())
 
 let emitter = Lattice_messages.register "Int_val"
 let log_imprecision s = Lattice_messages.emit_imprecision emitter s
-
 
 module Widen_Hints = Datatype.Integer.Set
 type size_widen_hint = Integer.t
@@ -144,7 +127,7 @@ let make ~min ~max ~rem ~modu =
     then inject_singleton mn
     else
       let l = Int.succ (Int.e_div (Int.sub mx mn) modu) in
-      if Int.le l !small_cardinal_Int
+      if Int.le l (small_cardinal_Int ())
       then
         let l = Int.to_int l in
         let s = Array.make l Int.zero in
@@ -190,7 +173,7 @@ let inject_itv i =
   match Int_interval.cardinal i with
   | None -> Itv i
   | Some card ->
-    if Int.le card !small_cardinal_Int
+    if Int.le card (small_cardinal_Int ())
     then
       let min, max, rem, modu = Int_interval.min_max_rem_modu i in
       make ~min ~max ~rem ~modu
@@ -365,18 +348,19 @@ let diff_if_one value rem =
         | _, Some mx when Int.equal v mx ->
           check_make_or_bottom ~min ~max:(Some (Int.sub mx modu)) ~rem ~modu
         | Some mn, Some mx when
-            Int.equal (Int.sub mx mn) (Int.mul modu !small_cardinal_Int)
+            Int.equal (Int.sub mx mn) (Int.mul modu (small_cardinal_Int ()))
             && Int_interval.mem v i ->
           let r = ref mn in
+          let small_cardinal = small_cardinal () in
           let array =
-            Array.init !small_cardinal
+            Array.init small_cardinal
               (fun _ ->
                  let c = !r in
                  let corrected_c = if Int.equal c v then Int.add c modu else c in
                  r := Int.add corrected_c modu;
                  corrected_c)
           in
-          `Value (Set (Int_set.inject_array array !small_cardinal))
+          `Value (Set (Int_set.inject_array array small_cardinal))
         | _, _ -> `Value value
     end
   | _ -> `Value value
@@ -628,7 +612,7 @@ let create_all_values ~signed ~size =
   in
   let min = Some min
   and max = Some max in
-  if size <= !small_cardinal_log
+  if size < Z.numbits (small_cardinal_Int ())
   then make ~min ~max ~rem:Int.zero ~modu:Int.one
   else Itv (Int_interval.inject_range min max)
 
@@ -977,7 +961,7 @@ struct
     let acc = ref (set_bit Sign [] (r, v1, v2)) in
     for i = size - 1 downto Z.numbits modu - 1 do
       acc := List.fold_left (set_bit (Bit i)) [] !acc;
-      if List.length !acc > !small_cardinal then raise Do_not_fit_small_sets
+      if List.length !acc > small_cardinal () then raise Do_not_fit_small_sets
     done;
     let o = List.fold_left (fun o (r,_,_) -> O.add r o) O.empty !acc in
     let cardinal = O.cardinal o in

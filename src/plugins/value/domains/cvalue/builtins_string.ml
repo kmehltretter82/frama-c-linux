@@ -259,7 +259,7 @@ let search_offsm kind ~validity ~offset offsetmap =
 
 (* Generic function to fold a search according to a small set of integers. *)
 let search_by_folding ival search =
-  if Ival.cardinal_is_less_than ival (Ival.get_small_cardinal ())
+  if Ival.cardinal_is_less_than ival (Int_set.get_small_cardinal ())
   then Ival.fold_enum (fun ival acc -> join acc (search ival)) ival empty
   else search ival
 

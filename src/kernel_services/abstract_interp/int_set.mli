@@ -87,5 +87,7 @@ val subdivide: t -> t * t
 
 (**/**)
 
+val get_small_cardinal: unit -> int
+
 (* This is used by the Value plugin. Do not use. *)
 val set_small_cardinal: int -> unit

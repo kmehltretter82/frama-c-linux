@@ -305,13 +305,7 @@ val complement_int_under: size:int -> signed:bool -> t -> t Bottom.or_bottom
 
 val pretty_debug : Format.formatter -> t -> unit
 
-val get_small_cardinal: unit -> int
-(** Value of option -ilevel *)
-
 (**/**)
-
-(* This is used by the Value plugin. Do not use. *)
-val set_small_cardinal: int -> unit
 
 val rehash: t -> t (* Low-level operation for demarshalling *)
 (**/**)

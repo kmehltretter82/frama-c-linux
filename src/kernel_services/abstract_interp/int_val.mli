@@ -116,7 +116,4 @@ val overlaps: partial:bool -> size:Integer.t -> t -> t -> bool
 
 val fold_int : (Integer.t -> 'a -> 'a) -> t -> 'a -> 'a
 
-val get_small_cardinal: unit -> int
-val set_small_cardinal: int -> unit
-
 val rehash: t -> t

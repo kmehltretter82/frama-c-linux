@@ -898,7 +898,7 @@ module Make
           then Bottom.join Value.join (`Value subvalue) acc else acc
         in
         let cvalue = get_cval v in
-        let upto = succ (Ival.get_small_cardinal ()) in
+        let upto = succ (Int_set.get_small_cardinal ()) in
         fold_enumerate upto process cvalue `Bottom >>-: fun value ->
         if Value.equal v value
         then valuation

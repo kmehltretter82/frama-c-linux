@@ -947,7 +947,7 @@ module ILevel =
     end)
 let () = add_precision_dep ILevel.parameter
 let () = ILevel.add_aliases ["-val-ilevel"]
-let () = ILevel.add_update_hook (fun _ i -> Ival.set_small_cardinal i)
+let () = ILevel.add_update_hook (fun _ i -> Int_set.set_small_cardinal i)
 let () = ILevel.set_range 4 256
 
 let () = Parameter_customize.set_group precision_tuning

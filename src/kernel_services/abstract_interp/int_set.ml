@@ -25,6 +25,7 @@ open Bottom.Type
 
 (* Make sure all this is synchronized with the default value of -ilevel *)
 let small_cardinal = ref 8
+let get_small_cardinal () = !small_cardinal
 let set_small_cardinal i = small_cardinal := i
 
 let debug_cardinal = false

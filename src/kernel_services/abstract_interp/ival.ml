@@ -22,9 +22,6 @@
 
 open Abstract_interp
 
-let set_small_cardinal i = Int_val.set_small_cardinal i
-let get_small_cardinal = Int_val.get_small_cardinal
-
 let emitter = Lattice_messages.register "Ival"
 let log_imprecision s = Lattice_messages.emit_imprecision emitter s
 

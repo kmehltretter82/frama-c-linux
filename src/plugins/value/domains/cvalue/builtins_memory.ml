@@ -533,7 +533,7 @@ let memset_typ_offsm_int full_typ i =
 let memset_typ_offsm typ v =
   try
     let i = V.project_ival v in
-    ignore (Ival.cardinal_less_than i (Ival.get_small_cardinal ()));
+    ignore (Ival.cardinal_less_than i (Int_set.get_small_cardinal ()));
     let aux_i i offsm =
       let offsm_i = memset_typ_offsm_int typ i in
       match offsm with
