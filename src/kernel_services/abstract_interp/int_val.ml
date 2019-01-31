@@ -637,14 +637,8 @@ let subdivide = function
   | Set s -> let s1, s2 = Int_set.subdivide s in Set s1, Set s2
   | Itv i ->
     let i1, i2 = Int_interval.subdivide i in
-    (* Redo make in case an interval should be converted into a set. *)
-    let t1 =
-      let min, max, rem, modu = Int_interval.min_max_rem_modu i1 in
-      make ~min ~max ~rem ~modu
-    and t2 =
-      let min, max, rem, modu = Int_interval.min_max_rem_modu i2 in
-      make ~min ~max ~rem ~modu
-    in
+    let t1 = inject_itv i1
+    and t2 = inject_itv i2 in
     t1, t2
 
 let extract_bits ~start ~stop = function
