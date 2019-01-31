@@ -2619,11 +2619,15 @@ let rec combineTypes (what: combineWhat) (oldt: typ) (t: typ) : typ =
     let newargs, olda' =
       if oldargs = None then args, olda else
       if args = None then oldargs, olda else
-        let oldargslist = argsToList oldargs in
-        let argslist = argsToList args in
+        let (oldargslist, oldghostargslist) = argsToPairOfLists oldargs in
+        let (argslist, ghostargslist) = argsToPairOfLists args in
         if List.length oldargslist <> List.length argslist then
           raise (Cannot_combine "different number of arguments")
+        else if List.length oldghostargslist <> List.length ghostargslist then
+          raise (Cannot_combine "different number of ghost arguments")
         else begin
+          let oldargslist = oldargslist @ oldghostargslist in
+          let argslist = argslist @ ghostargslist in
           (* Construct a mapping between old and new argument names. *)
           let map = H.create 5 in
           List.iter2
@@ -3035,7 +3039,10 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
              let old_formals_env = getFormalsDecl oldvi in
              List.iter2
                (fun old (name,typ,attr) ->
-                  if name <> "" then begin
+                  let new_ghost = Cil.hasAttribute Cil.frama_c_ghost attr in
+                  if old.vghost <> new_ghost then
+                    raise (Invalid_argument "Incompatible ghost status")
+                  else if name <> "" then begin
                     Kernel.debug ~dkey:Kernel.dkey_typing_global
                       "replacing formal %s with %s" old.vname name;
                     old.vname <- name;
