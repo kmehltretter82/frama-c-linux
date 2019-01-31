@@ -137,11 +137,11 @@ val round_down_to_r : max:t -> r:t -> modu:t -> t
     [n]<=[m] and [n] = [r] modulo [modu] *)
 
 val two_power : t -> t
-(** [two_power x] computes 2^x.
+(** Computes [2^n]
     @raise Z.Overflow for exponents greater than 1024 *)
 
 val two_power_of_int : int -> t
-(** Similar to [two_power x], but x is an OCaml int. *)
+(** Computes [2^n] *)
 
 val power_int_positive_int: int -> int -> t
 (** Exponentiation *)

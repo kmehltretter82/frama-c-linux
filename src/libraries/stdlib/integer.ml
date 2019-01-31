@@ -27,12 +27,16 @@ let equal = Z.equal
 let compare = Z.compare
 
 let two_power_of_int k =
+  Z.shift_left Z.one k
+
+let two_power n =
+  let k = Z.to_int n in
   if k > 1024 then
     raise Z.Overflow
   else
-    Z.shift_left Z.one k
+    two_power_of_int k
 
-let two_power n = two_power_of_int (Z.to_int n)
+let power_int_positive_int = Big_int_Z.power_int_positive_int
 
 let popcount = Z.popcount
 
@@ -279,5 +283,3 @@ let round_up_to_r ~min:m ~r ~modu =
 
 let round_down_to_r ~max:m ~r ~modu =
   add (round_down_to_zero (sub m r) modu) r
-
-let power_int_positive_int = Big_int_Z.power_int_positive_int
