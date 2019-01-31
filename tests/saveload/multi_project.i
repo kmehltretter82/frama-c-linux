@@ -1,8 +1,8 @@
 /* run.config
-   EXECNOW: BIN multi_project.sav LOG multi_project_sav.res LOG multi_project_sav.err ./bin/toplevel.opt -save ./tests/saveload/result/multi_project.sav -eva-show-progress -semantic-const-folding ./tests/saveload/multi_project.i > tests/saveload/result/multi_project_sav.res 2> tests/saveload/result/multi_project_sav.err
-   EXECNOW: make -s ./tests/saveload/multi_project.cmxs
+   EXECNOW: BIN multi_project.sav LOG multi_project_sav.res LOG multi_project_sav.err ./bin/toplevel.opt -save ./tests/saveload/result/multi_project.sav -eva-show-progress -semantic-const-folding @PTEST_DIR@/@PTEST_NAME@.i > tests/saveload/result/multi_project_sav.res 2> tests/saveload/result/multi_project_sav.err
+   EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
    OPT: -load ./tests/saveload/result/multi_project.sav -journal-disable
-   CMD: @frama-c@ -load-module ./tests/saveload/multi_project
+   CMD: @frama-c@ -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs
    OPT: -eva -eva-show-progress
 */
 int f(int x) {

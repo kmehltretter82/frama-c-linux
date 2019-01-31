@@ -510,8 +510,10 @@ struct
         L.map (Cint.convert i) (C.logic env t)
     | C_int i , L_pointer _ ->
         L.map_l2t (M.int_of_loc i) (C.logic env t)
-    | C_int i , (L_cfloat _ | L_real) ->
+    | C_int i , L_real ->
         L.map (Cint.of_real i) (C.logic env t)
+    | C_int i , L_cfloat f ->
+        L.map (fun v -> Cint.of_real i (Cfloat.real_of_float f v)) (C.logic env t)
     | C_int _, L_array _ ->
         Warning.error "@[Logic cast to sized integer (%a) from (%a) not implemented yet@]"
           Printer.pp_typ dst_ctype Printer.pp_logic_type t.term_type

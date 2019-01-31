@@ -6,16 +6,16 @@
 [wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 [wp] 13 goals scheduled
-[wp] [Alt-Ergo] Goal typed_call_s3_callsf1f2 : Valid
+[wp] [Alt-Ergo] Goal typed_call_calls_f1_f2_s3 : Valid
 [wp] [Qed] Goal typed_call_ensures_part1 : Valid
 [wp] [Qed] Goal typed_call_ensures_part2 : Valid
 [wp] [Alt-Ergo] Goal typed_call_call_f1_requires : Valid
-[wp] [Qed] Goal typed_guarded_call_s9_callsg : Valid
+[wp] [Qed] Goal typed_guarded_call_calls_g_s9 : Valid
 [wp] [Alt-Ergo] Goal typed_guarded_call_ensures_part1 : Valid
 [wp] [Qed] Goal typed_guarded_call_ensures_part2 : Valid
 [wp] [Qed] Goal typed_guarded_call_ensures_2_part1 : Valid
 [wp] [Qed] Goal typed_guarded_call_ensures_2_part2 : Valid
-[wp] [Qed] Goal typed_no_call_s17_callsunreachable_g : Valid
+[wp] [Qed] Goal typed_no_call_calls_unreachable_g_s17 : Valid
 [wp] [Qed] Goal typed_no_call_ensures_part1 : Valid
 [wp] [Qed] Goal typed_no_call_ensures_part2 : Valid
 [wp] [Qed] Goal typed_no_call_call_unreachable_g_requires : Valid
