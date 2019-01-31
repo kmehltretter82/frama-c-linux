@@ -118,7 +118,7 @@ Definition is_infinite_f32 (f:f32): Prop := ((classify_f32 f) = Inf_pos) \/
   ((classify_f32 f) = Inf_neg).
 
 (* Why3 assumption *)
-Definition is_infinite_f36 (d:f64): Prop := ((classify_f64 d) = Inf_pos) \/
+Definition is_infinite_f64 (d:f64): Prop := ((classify_f64 d) = Inf_pos) \/
   ((classify_f64 d) = Inf_neg).
 
 (* Why3 assumption *)

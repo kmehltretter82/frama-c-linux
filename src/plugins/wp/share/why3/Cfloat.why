@@ -76,7 +76,7 @@ predicate is_NaN_f64 (d:f64) = ((classify_f64 d) = (NaN))
 predicate is_infinite_f32 (f:f32) = ("asym_split" ((classify_f32
   f) = (Inf_pos))) || ((classify_f32 f) = (Inf_neg))
 
-predicate is_infinite_f36 (d:f64) = ("asym_split" ((classify_f64
+predicate is_infinite_f64 (d:f64) = ("asym_split" ((classify_f64
   d) = (Inf_pos))) || ((classify_f64 d) = (Inf_neg))
 
 predicate is_positive_infinite_f32 (f:f32) = ((classify_f32 f) = (Inf_pos))
