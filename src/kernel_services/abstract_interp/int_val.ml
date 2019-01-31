@@ -128,19 +128,7 @@ let make ~min ~max ~rem ~modu =
     else
       let l = Int.succ (Int.e_div (Int.sub mx mn) modu) in
       if Int.le l (small_cardinal_Int ())
-      then
-        let l = Int.to_int l in
-        let s = Array.make l Int.zero in
-        let v = ref mn in
-        let i = ref 0 in
-        while (!i < l)
-        do
-          s.(!i) <- !v;
-          v := Int.add modu !v;
-          incr i
-        done;
-        assert (Int.equal !v (Int.add modu mx));
-        Set (Int_set.inject_array s l)
+      then Set (Int_set.inject_periodic ~from:mn ~period:modu ~number:l)
       else Itv (Int_interval.make ~min ~max ~rem ~modu)
   | _ -> Itv (Int_interval.make ~min ~max ~rem ~modu)
 
@@ -158,7 +146,7 @@ let inject_interval ~min ~max ~rem:r ~modu =
   and max = fix_bound (fun max -> Int.round_down_to_r ~max ~r ~modu) max in
   make ~min ~max ~rem:r ~modu
 
-let inject_range min max = check_make ~min ~max ~rem:Int.zero ~modu:Int.one
+let inject_range min max = make ~min ~max ~rem:Int.zero ~modu:Int.one
 
 let check_make_or_bottom ~min ~max ~rem ~modu =
   match min, max with
@@ -350,17 +338,11 @@ let diff_if_one value rem =
         | Some mn, Some mx when
             Int.equal (Int.sub mx mn) (Int.mul modu (small_cardinal_Int ()))
             && Int_interval.mem v i ->
-          let r = ref mn in
-          let small_cardinal = small_cardinal () in
-          let array =
-            Array.init small_cardinal
-              (fun _ ->
-                 let c = !r in
-                 let corrected_c = if Int.equal c v then Int.add c modu else c in
-                 r := Int.add corrected_c modu;
-                 corrected_c)
-          in
-          `Value (Set (Int_set.inject_array array small_cardinal))
+          (* We create a set with an element in excess, but we remove [v]
+             just after, so the resulting set is correct. *)
+          let number = Int.succ (small_cardinal_Int ()) in
+          let set = Int_set.inject_periodic ~from:mn ~period:modu ~number in
+          Int_set.remove set v >>-: inject_set
         | _, _ -> `Value value
     end
   | _ -> `Value value
@@ -610,11 +592,7 @@ let create_all_values ~signed ~size =
       let b = Int.two_power_of_int size in
       Int.zero, Int.pred b
   in
-  let min = Some min
-  and max = Some max in
-  if size < Z.numbits (small_cardinal_Int ())
-  then make ~min ~max ~rem:Int.zero ~modu:Int.one
-  else Itv (Int_interval.inject_range min max)
+  inject_range (Some min) (Some max)
 
 let cast_int_to_int ~size ~signed value =
   if equal top value
@@ -933,8 +911,6 @@ struct
     then if Op.forward Both (extract_sign v2) = Both then n1 else n2
     else if Op.forward (extract_sign v1) Both = Both then n2 else n1
 
-  module O = FCSet.Make(Integer)
-
   exception Do_not_fit_small_sets
 
   (* Try to build a small set.
@@ -963,13 +939,8 @@ struct
       acc := List.fold_left (set_bit (Bit i)) [] !acc;
       if List.length !acc > small_cardinal () then raise Do_not_fit_small_sets
     done;
-    let o = List.fold_left (fun o (r,_,_) -> O.add r o) O.empty !acc in
-    let cardinal = O.cardinal o in
-    assert (cardinal > 0);
-    let a = Array.make cardinal Int.zero in
-    let i = ref 0 in
-    O.iter (fun e -> a.(!i) <- e; incr i) o;
-    Set (Int_set.inject_array a cardinal)
+    let list = List.map (fun (r, _, _) -> r) !acc in
+    Set (Int_set.inject_list list)
 
   (* If lower is true (resp. false), compute the lower (resp. upper) bound of
      the result interval when applying the bitwise operator to [v1] and [v2].

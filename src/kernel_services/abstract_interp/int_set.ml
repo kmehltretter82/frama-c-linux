@@ -59,7 +59,29 @@ let share_array a s =
 let share_array_or_bottom a s =
   if s = 0 then `Bottom else `Value (share_array a s)
 
-let inject_array = share_array
+let inject_periodic ~from ~period ~number =
+  let l = Int.to_int number in
+  let s = Array.make l Int.zero in
+  let v = ref from in
+  let i = ref 0 in
+  while (!i < l)
+  do
+    s.(!i) <- !v;
+    v := Int.add period !v;
+    incr i
+  done;
+  share_array s l
+
+module O = FCSet.Make (Integer)
+
+let inject_list list =
+  let o = List.fold_left (fun o r -> O.add r o) O.empty list in
+  let cardinal = O.cardinal o in
+  assert (cardinal > 0 && cardinal <= !small_cardinal);
+  let a = Array.make cardinal Int.zero in
+  let i = ref 0 in
+  O.iter (fun e -> a.(!i) <- e; incr i) o;
+  share_array a cardinal
 
 let to_list = Array.to_list
 
@@ -179,8 +201,6 @@ let mem v a =
 
 type set_or_top = [ `Set of t | `Top of Integer.t * Integer.t * Integer.t ]
 type set_or_top_or_bottom = [ `Bottom | set_or_top ]
-
-module O = FCSet.Make (Integer)
 
 type pre_set =
   | Pre_set of O.t * int

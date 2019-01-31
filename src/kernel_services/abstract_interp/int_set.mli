@@ -29,10 +29,9 @@ open Bottom.Type
 
 include Datatype.S_with_collections
 
-val rehash: t -> t
-
 val inject_singleton: Integer.t -> t
-val inject_array: Integer.t array -> int -> t
+val inject_periodic: from:Integer.t -> period:Integer.t -> number:Integer.t -> t
+val inject_list: Integer.t list -> t
 
 val to_list: t -> Integer.t list
 
@@ -91,3 +90,5 @@ val get_small_cardinal: unit -> int
 
 (* This is used by the Value plugin. Do not use. *)
 val set_small_cardinal: int -> unit
+
+val rehash: t -> t
