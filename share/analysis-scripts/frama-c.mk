@@ -186,16 +186,17 @@ SHELL        := /bin/bash
 	    $(EVA) \
 	      -load $(PARSE_RESULT)/framac.sav -save $@/framac.sav \
 	      -eva-flamegraph $@/flamegraph.txt \
-	      -report-csv $@/alarms.csv -report-no-proven \
 	      -kernel-log w:$@/warnings.log \
 	      -from-log w:$@/warnings.log \
 	      -inout-log w:$@/warnings.log \
-	      -report-log w:$@/warnings.log \
 	      -scope-log w:$@/warnings.log \
 	      -eva-log w:$@/warnings.log \
-	      -metrics-log a:$@/metrics.log \
+	      -then \
+	      -report-csv $@/alarms.csv -report-no-proven \
+	      -report-log w:$@/warnings.log \
 	      -metrics-eva-cover \
-	      -then -nonterm -nonterm-log a:$@/nonterm.log \
+	      -metrics-log a:$@/metrics.log \
+	      -nonterm -nonterm-log a:$@/nonterm.log \
 	    || ($(RM) $@/stats.txt && false) # Prevents having error code reporting in stats.txt
 	} 2>&1 |
 	  $(SED_UNBUFFERED) '/\[eva\] Values at end of function/,999999d' |
