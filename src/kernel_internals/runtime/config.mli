@@ -59,7 +59,17 @@ val ocaml_wflags: string
       @since Chlorine-20180501 *)
 
 val datadir: string
-  (** Directory where architecture independent files are. *)
+  (** Directory where architecture independent files are.
+      Main directory, use {!datadirs} for the others *)
+
+val datadirs: string list
+  (** Directories where architecture independent files are in order of
+      priority.
+      @since Frama-C-trunk*)
+
+val framac_libc: string
+  (** Directory where Frama-C libc headers are.
+      @since Frama-C-trunk*)
 
 val libdir: string
   (** Directory where the Frama-C kernel library is.

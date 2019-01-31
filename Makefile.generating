@@ -209,6 +209,12 @@ ifeq ("$(DEVELOPMENT)","yes")
 all:: .merlin
 endif
 
+lib/fc/META.frama-c: share/META.frama-c share/Makefile.config Makefile.generating
+	$(MKDIR) lib/fc/
+	$(SED) $< -e "s/@REQUIRES/$(LIBRARY_NAMES)/" > $@
+
+GENERATED += lib/fc/META.frama-c
+
 
 # Local Variables:
 # mode: makefile

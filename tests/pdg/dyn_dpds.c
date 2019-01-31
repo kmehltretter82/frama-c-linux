@@ -1,16 +1,16 @@
 /* run.config
-   OPT: -load-script tests/pdg/dyn_dpds.ml -eva-show-progress -deps -journal-disable -pdg-print -pdg-verbose 2
+   EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
+   OPT: -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs -eva-show-progress -deps -journal-disable -pdg-print -pdg-verbose 2
 */
 
 
 /*
    To have a look at the dot PDG :
-   bin/toplevel.byte -deps -pdg-dot pdg -eva-show-progress -fct-pdg main tests/pdg/dyn_dpds.c ;
+   bin/toplevel.byte -deps -pdg-dot pdg -eva-show-progress -fct-pdg main @PTEST_DIR@/@PTEST_NAME@.c ;
    zgrviewer pdg.main.dot
 
-   or use tests/pdg/dyn_dpds.ml to test the dynamic dependencies.
+   or use @PTEST_DIR@/@PTEST_NAME@.ml to test the dynamic dependencies.
 */
-
 
 int G;
 

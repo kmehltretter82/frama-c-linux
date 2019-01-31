@@ -1,6 +1,6 @@
 /*  run.config
-   EXECNOW: make -s tests/slicing/switch.cmxs
-   CMD: @frama-c@ -load-module tests/slicing/libSelect.cmxs -load-module tests/slicing/switch.cmxs
+   EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
+   CMD: @frama-c@ -load-module tests/slicing/libSelect.cmxs -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs
    OPT: -eva-show-progress -deps -journal-disable
 */
 int main (char choix) {

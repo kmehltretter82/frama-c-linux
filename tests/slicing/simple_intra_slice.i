@@ -1,6 +1,6 @@
 /* run.config
-   EXECNOW: make -s tests/slicing/simple_intra_slice.cmxs
-   CMD: @frama-c@ -load-module tests/slicing/libSelect.cmxs -load-module tests/slicing/simple_intra_slice.cmxs
+   EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
+   CMD: @frama-c@ -load-module tests/slicing/libSelect.cmxs -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs
    OPT: -eva-show-progress -deps -no-slice-callers -journal-disable 
 */
 int Unknown;
