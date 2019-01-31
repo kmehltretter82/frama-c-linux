@@ -231,7 +231,7 @@ let is_one = equal one
 
 let contains_zero = function
   | Itv i -> Int_interval.mem Int.zero i
-  | Set s -> Int_set.mem Int.zero s >= 0
+  | Set s -> Int_set.mem Int.zero s
 
 let contains_non_zero = function
   | Itv _ -> true (* at least two values *)

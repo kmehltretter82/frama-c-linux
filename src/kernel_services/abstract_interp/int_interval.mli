@@ -20,6 +20,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Integer intervals with congruence.
+    An interval defined by [min, max, rem, modu] represents all integers
+    between the bounds [min] and [max] and congruent to [rem] modulo [modu].
+    A value of [None] for [min] (resp. [max]) represents -infinity
+    (resp. +infinity). [modu] is > 0, and [0 <= rem < modu]. *)
+
 open Bottom.Type
 
 include Datatype.S_with_collections
@@ -28,31 +34,40 @@ include Eva_lattice_type.Full_AI_Lattice_with_cardinality
   with type t := t
    and type widen_hint = Integer.t * Datatype.Integer.Set.t
 
+(** Makes the interval of all integers between [min] and [max] and congruent
+    to [rem] modulo [modu]. Fails if these conditions does not hold:
+    - min ≤ max
+    - 0 ≤ rem < modu
+    - min ≅ rem [modu] ∧ max ≅ rem [modu] *)
 val make:
   min:Integer.t option -> max:Integer.t option ->
   rem:Integer.t -> modu:Integer.t -> t
 
+(** Makes the interval of all integers between [min] and [max]. *)
 val inject_range: Integer.t option -> Integer.t option -> t
 
+(** Returns the bounds of the given interval. [None] means infinity. *)
 val min_and_max: t -> Integer.t option * Integer.t option
 
+(** Returns the bounds and the modulo of the given interval. *)
 val min_max_rem_modu:
   t -> Integer.t option * Integer.t option * Integer.t * Integer.t
 
+(** [mem i t] returns true iff the integer [i] is in the interval [t]. *)
 val mem: Integer.t -> t -> bool
 
+(** Returns the number of integers represented by the given interval.
+    Returns [None] if the interval represents an infinite number of integers. *)
 val cardinal: t -> Integer.t option
 
-val add : t -> t -> t
-(** Addition of two integer (ie. not [Float]) ivals. *)
-val add_under : t -> t -> t or_bottom
-(** Underapproximation of the same operation *)
+(** {2 Interval semantics.} *)
+
+(** See {!Int_val} for more details. *)
+
 val add_singleton_int: Integer.t -> t -> t
-(** Addition of an integer ival with an integer. Exact operation. *)
-
-val neg : t -> t
-(** Negation of an integer ival. Exact operation. *)
-
+val add: t -> t -> t
+val add_under: t -> t -> t or_bottom
+val neg: t -> t
 
 val scale: Integer.t -> t -> t
 val scale_div: pos:bool -> Integer.t -> t -> t
@@ -64,6 +79,8 @@ val div: t -> t -> t or_bottom
 val c_rem: t -> t -> t or_bottom
 
 val cast: size:Integer.t -> signed:bool -> t -> t
+
+(** {2 Misc.} *)
 
 val subdivide: t -> t * t
 

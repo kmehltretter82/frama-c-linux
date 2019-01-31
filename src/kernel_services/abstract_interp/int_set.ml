@@ -61,6 +61,7 @@ let share_array_or_bottom a s =
 
 let inject_periodic ~from ~period ~number =
   let l = Int.to_int number in
+  assert (l > 0);
   let s = Array.make l Int.zero in
   let v = ref from in
   let i = ref 0 in
@@ -208,7 +209,6 @@ type pre_set =
 
 let empty_ps = Pre_set (O.empty, 0)
 
-(* TODO: share this code with ival2.make_itv_from_set? *)
 let make_top_from_set s =
   if debug_cardinal then assert (O.cardinal s >= 2);
   let min = O.min_elt s in
@@ -651,3 +651,5 @@ let subdivide s =
 
 let min t = t.(0)
 let max t = t.(Array.length t - 1)
+
+let mem i t = mem i t >= 0

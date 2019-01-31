@@ -27,27 +27,50 @@
 
 open Bottom.Type
 
+(** Returns the limit above which integer sets are converted into intervals. *)
+val get_small_cardinal: unit -> int
+
+(** Sets the limit above which integer sets are converted into intervals.
+    This is used by the Eva plugin according to the -eva-ilevel option.
+    Do not use. *)
+val set_small_cardinal: int -> unit
+
 include Datatype.S_with_collections
 
+(** Creates the set containing only the given integer. *)
 val inject_singleton: Integer.t -> t
+
+(** Creates the set with integers [from + k*period] for [k] in {0 ... number-1}.
+    The resulting set contains [number] integers. There is no verification
+    about [number], but it should be stritly positive. *)
 val inject_periodic: from:Integer.t -> period:Integer.t -> number:Integer.t -> t
+
+(** Creates a set from an integer list. The list must not be empty, and the list
+    length must not exceed the small cardinal limit. *)
 val inject_list: Integer.t list -> t
 
+(** Returns the set as an integer list. *)
 val to_list: t -> Integer.t list
 
+(** Removes an integer from a set.
+    Returns Bottom if the resulting set is empty. *)
 val remove: t -> Integer.t -> t or_bottom
+
+(** [mem i s] is true iff the set [s] contains the integer [i]. *)
+val mem: Integer.t -> t -> bool
 
 val one: t
 val zero: t
 val minus_one: t
 val zero_or_one: t
 
-val min: t -> Integer.t
-val max: t -> Integer.t
+val min: t -> Integer.t (** Returns the smallest integer of a set. *)
+val max: t -> Integer.t (** Returns the highest integer of a set. *)
 
+(** Returns the number of integers in a set. *)
 val cardinal: t -> int
 
-val mem: Integer.t -> t -> int
+(** {2 Iterators on the integers of a set.} *)
 
 val for_all: (Integer.t -> bool) -> t -> bool
 val exists: (Integer.t -> bool) -> t -> bool
@@ -57,8 +80,19 @@ val map: (Integer.t -> Integer.t) -> t -> t
 val filter: (Integer.t -> bool) -> t -> t or_bottom
 val map_reduce: (Integer.t -> 'a) -> ('a -> 'a -> 'a) -> t -> 'a
 
-type set_or_top = [ `Set of t | `Top of Integer.t * Integer.t * Integer.t ]
+(** Sets whose cardinal exceeds a certain limit must be converted into
+    intervals. Functions that make sets grow returns either a set small enough,
+    or the information needed to construct the corresponding interval: the
+    smallest and highest elements, and the periodicity of the integers of
+    the set. *)
+type set_or_top =
+  [ `Set of t                                  (** Small set. *)
+  | `Top of Integer.t * Integer.t * Integer.t  (** Interval: min, max, modu *)
+  ]
+
 type set_or_top_or_bottom = [ `Bottom | set_or_top ]
+
+(** {2 Lattice structure.} *)
 
 val is_included: t -> t -> bool
 val join: t -> t -> set_or_top
@@ -67,6 +101,10 @@ val meet: t -> t -> t or_bottom
 val narrow: t -> t -> t or_bottom
 val intersects: t -> t -> bool
 val diff_if_one: t -> t -> t or_bottom
+
+(** {2 Semantics.} *)
+
+(** See {!Int_val} for more details. *)
 
 val add_singleton: Integer.t -> t -> t
 val add: t -> t -> set_or_top
@@ -82,13 +120,8 @@ val scale_rem: pos:bool -> Integer.t -> t -> t
 
 val bitwise_signed_not: t -> t
 
+(** {2 Misc} *)
+
 val subdivide: t -> t * t
-
-(**/**)
-
-val get_small_cardinal: unit -> int
-
-(* This is used by the Value plugin. Do not use. *)
-val set_small_cardinal: int -> unit
 
 val rehash: t -> t

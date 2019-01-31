@@ -412,8 +412,8 @@ let cardinal_zero_or_one t =
   | Some min, Some max -> Integer.equal min max
 
 (* TODO? *)
-let diff _ _ = assert false
-let diff_if_one _ _ = assert false
+let diff v _ = `Value v
+let diff_if_one v _ = `Value v
 
 let fold_int f t acc =
   match t.min, t.max with
