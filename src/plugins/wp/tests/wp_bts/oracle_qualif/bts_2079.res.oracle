@@ -4,8 +4,8 @@
 [wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 [wp] 2 goals scheduled
-[wp] [Qed] Goal typed_main_post_Eval_P : Valid
-[wp] [Qed] Goal typed_main_post_Eval_Q : Valid
+[wp] [Qed] Goal typed_main_ensures_Eval_P : Valid
+[wp] [Qed] Goal typed_main_ensures_Eval_Q : Valid
 [wp] Proved goals:    2 / 2
   Qed:             2
 [wp] Report 'tests/wp_bts/bts_2079.i.0.report.json'

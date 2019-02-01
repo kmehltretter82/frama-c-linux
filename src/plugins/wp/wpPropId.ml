@@ -334,38 +334,31 @@ let code_annot_names ca = match ca.annot_content with
   | AAssert (_, named_pred)  -> "@assert"::(ident_names named_pred.pred_name)
   | AInvariant (_,_,named_pred) -> "@invariant"::(ident_names named_pred.pred_name)
   | AVariant (term, _) -> "@variant"::(ident_names term.term_name)
+  | AExtended(_,_,(_,name,_,_)) -> [Printf.sprintf "@%s" name]
   | _ -> [] (* TODO : add some more names ? *)
 
 (** This is used to give the name of the property that the user can give
  * to select it from the command line (-wp-prop option) *)
 let user_prop_names p = match p with
   | Property.IPPredicate (kind,_,_,idp) ->
-      let kind_name =
-        Format.asprintf  "%c%a" '@' Property.pretty_predicate_kind kind
-      in
-      kind_name::idp.ip_content.pred_name
-  | Property.IPExtended(_,(_,name,_,_)) ->
-      let kind_name = Format.asprintf "%s_extension" name in [kind_name]
+      Format.asprintf  "@@%a" Property.pretty_predicate_kind kind ::
+      idp.ip_content.pred_name
+  | Property.IPExtended(_,(_,name,_,_)) -> [ Printf.sprintf "@%s" name ]
   | Property.IPCodeAnnot (_,_, ca) -> code_annot_names ca
   | Property.IPComplete (_, _,_,lb) ->
       let kind_name = "@complete_behaviors" in
-      let name =
-        Format.asprintf  "complete_behaviors%a" pp_names lb
+      let name = Format.asprintf "complete_behaviors%a" pp_names lb
       in kind_name::[name]
   | Property.IPDisjoint (_, _,_, lb) ->
       let kind_name = "@disjoint_behaviors" in
-      let name = Format.asprintf  "disjoint_behaviors%a" pp_names lb
+      let name = Format.asprintf "disjoint_behaviors%a" pp_names lb
       in kind_name::[name]
   | Property.IPAssigns (_, _, _, l) ->
-      let kind_name = "@assigns" in
       List.fold_left
-        (fun acc (t,_) -> (ident_names t.it_content.term_name) @ acc) [kind_name] l
-  | Property.IPDecrease (_,_, Some ca,_) ->
-      let kind_name = "@decreases"
-      in kind_name::code_annot_names ca
-  | Property.IPDecrease _ ->
-      let kind_name = "@decreases"
-      in kind_name::[] (*TODO: add more names ? *)
+        (fun acc (t,_) -> (ident_names t.it_content.term_name) @ acc)
+        ["@assigns"] l
+  | Property.IPDecrease (_,_, Some ca,_) -> "@decreases"::code_annot_names ca
+  | Property.IPDecrease _ -> [ "@decreases" ]
   | Property.IPLemma (a,_,_,l,_) ->
       let names = "@lemma"::a::(ident_names l.pred_name)
       in begin

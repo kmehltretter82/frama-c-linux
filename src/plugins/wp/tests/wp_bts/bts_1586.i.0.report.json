@@ -1,7 +1,7 @@
 { "wp:global": { "alt-ergo": { "total": 2, "unknown": 2 },
                  "qed": { "total": 2, "valid": 2 },
                  "wp:main": { "total": 4, "valid": 2, "unknown": 2 } },
-  "wp:functions": { "compute_bizarre": { "compute_bizarre_Bizarre_post_TRANS": 
+  "wp:functions": { "compute_bizarre": { "compute_bizarre_Bizarre_ensures_TRANS": 
                                            { "qed": { "total": 1,
                                                       "valid": 1 },
                                              "wp:main": { "total": 1,
@@ -10,7 +10,7 @@
                                                                   "valid": 1 },
                                                          "wp:main": { "total": 1,
                                                                     "valid": 1 } } },
-                    "compute_normal": { "compute_normal_Normal_post_TRANS": 
+                    "compute_normal": { "compute_normal_Normal_ensures_TRANS": 
                                           { "qed": { "total": 1, "valid": 1 },
                                             "wp:main": { "total": 1,
                                                          "valid": 1 } },

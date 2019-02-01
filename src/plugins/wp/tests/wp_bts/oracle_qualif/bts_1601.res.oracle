@@ -11,7 +11,7 @@
 [wp] [Qed] Goal typed_foo_assert_5 : Valid
 [wp] [Qed] Goal typed_foo_assert_6 : Valid
 [wp] [Qed] Goal typed_foo_assert_7 : Valid
-[wp] [Qed] Goal typed_foo_basic_post : Valid
+[wp] [Qed] Goal typed_foo_basic_ensures : Valid
 [wp] Proved goals:    8 / 8
   Qed:             7 
   Alt-Ergo:        1

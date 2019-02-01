@@ -1,6 +1,6 @@
 { "wp:global": { "alt-ergo": { "total": 1, "unknown": 1 },
                  "wp:main": { "total": 1, "unknown": 1 } },
-  "wp:functions": { "cast_sgn_usgn": { "cast_sgn_usgn_post_qed_ko_KO": 
+  "wp:functions": { "cast_sgn_usgn": { "cast_sgn_usgn_ensures_qed_ko_KO": 
                                          { "alt-ergo": { "total": 1,
                                                          "unknown": 1 },
                                            "wp:main": { "total": 1,

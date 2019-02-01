@@ -8,7 +8,7 @@
   (r1: \initialized(Y + (0 .. 99)))
 [wp] 2 goals scheduled
 [wp] [Qed] Goal typed_f_assert_a1 : Valid
-[wp] [Alt-Ergo] Goal typed_f_call_cp_pre_r1 : Unknown (Degenerated)
+[wp] [Alt-Ergo] Goal typed_f_call_cp_requires_r1 : Unknown (Degenerated)
 [wp] Proved goals:    1 / 2
   Qed:             1 
   Alt-Ergo:        0  (unknown: 1)

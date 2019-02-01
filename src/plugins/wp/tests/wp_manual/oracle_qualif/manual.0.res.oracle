@@ -6,8 +6,8 @@
 [wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 [wp] 2 goals scheduled
-[wp] [Alt-Ergo] Goal typed_swap_post_A : Valid
-[wp] [Qed] Goal typed_swap_post_B : Valid
+[wp] [Alt-Ergo] Goal typed_swap_ensures_A : Valid
+[wp] [Qed] Goal typed_swap_ensures_B : Valid
 [wp] Proved goals:    2 / 2
   Qed:             1 
   Alt-Ergo:        1

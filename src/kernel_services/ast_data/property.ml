@@ -764,7 +764,14 @@ let rec pretty_debug fmt = function
       Cil_types_debug.pp_string s
       pp_other_loc ol
 
-module Names = struct
+(* -------------------------------------------------------------------------- *)
+(* --- Legacy Property Names                                              --- *)
+(* -------------------------------------------------------------------------- *)
+
+(* Shall be deprecated *)
+module LegacyNames =
+struct
+
   module NamesTbl = 
     State_builder.Hashtbl(Datatype.String.Hashtbl)(Datatype.Int)
       (struct
@@ -949,18 +956,199 @@ module Names = struct
 	IndexTbl.add ip unique_name ;
 	unique_name
 
-(* 
-  (** force computation of the unique name identifying the property *)
-  let make_prop_name_id ip =
-    ignore (get_prop_name_id ip)
-      
-  let remove_prop_name_id ip =
-    try 
-      ignore (IndexTbl.find ip);
-      IndexTbl.remove ip
-  with Not_found -> ()
-*)
 end
+      
+(* -------------------------------------------------------------------------- *)
+(* --- Property Names                                                     --- *)
+(* -------------------------------------------------------------------------- *)
+
+module Names =
+struct
+
+  open Cil_types
+
+  type part =
+    | B of behavior
+    | K of kernel_function
+    | A of string
+    | I of identified_predicate
+    | P of predicate
+    | T of term
+    | S of stmt
+
+  let add_part buffer = function
+    | B bhv ->
+      if not (Cil.is_default_behavior bhv)
+      then Sanitizer.add_string buffer bhv.b_name
+    | K kf -> Sanitizer.add_string buffer (Kernel_function.get_name kf)
+    | A msg -> Sanitizer.add_string buffer msg
+    | S stmt -> Sanitizer.add_string buffer (Printf.sprintf "s%d" stmt.sid)
+    | I { ip_content = { pred_name = a } }
+    | P { pred_name = a } | T { term_name = a } -> Sanitizer.add_list buffer a
+
+  let rec add_parts buffer = function
+    | [] -> ()
+    | p::ps ->
+      let open Sanitizer in
+      add_part buffer p ; add_sep buffer ; add_parts buffer ps
+
+  let rec parts_of_property ip : part list =
+    match ip with
+    | IPBehavior(kf,Kglobal,_,bhv) ->
+      [ K kf ; B bhv ]
+    | IPBehavior(kf,Kstmt s,_,bhv) ->
+      [ K kf ; B bhv ; S s ]
+
+    | IPPredicate (PKAssumes bhv,kf,_,ip) ->
+      [ K kf ; B bhv ; A "assumes" ; I ip ]
+    | IPPredicate (PKRequires bhv,kf,_,ip) ->
+      [ K kf ; B bhv ; A "requires" ; I ip ]
+    | IPPredicate (PKEnsures(bhv,Normal),kf,_,ip) ->
+      [ K kf ; B bhv ; A "ensures" ; I ip ]
+    | IPPredicate (PKEnsures(bhv,Exits),kf,_,ip) ->
+      [ K kf ; B bhv ; A "exits" ; I ip ]
+    | IPPredicate (PKEnsures(bhv,Breaks),kf,_,ip) ->
+      [ K kf ; B bhv ; A "breaks" ; I ip ]
+    | IPPredicate (PKEnsures(bhv,Continues),kf,_,ip) ->
+      [ K kf ; B bhv ; A "continues" ; I ip ]
+    | IPPredicate (PKEnsures(bhv,Returns),kf,_,ip) ->
+      [ K kf ; B bhv ; A "returns" ; I ip ]
+    | IPPredicate (PKTerminates,kf,_,ip) ->
+      [ K kf ; A "terminates" ; I ip ]
+
+    | IPAllocation(kf,_,Id_contract(_,bhv),_) ->
+      [ K kf ; B bhv ; A "allocates" ]
+    | IPAllocation(kf,_,Id_loop _,_) ->
+      [ K kf ; A "loop_allocates" ]
+
+    | IPAssigns(kf,_,Id_contract(_,bhv),_) ->
+      [ K kf ; B bhv ; A "assigns" ]
+
+    | IPAssigns(kf,_,Id_loop _,_) ->
+      [ K kf ; A "loop_assigns" ]
+
+    | IPFrom(kf,_,Id_contract(_,bhv),_) ->
+      [ K kf ; B bhv ; A "assigns_from" ]
+
+    | IPFrom(kf,_,Id_loop _,_) ->
+      [ K kf ; A "loop_assigns_from" ]
+
+    | IPDecrease (kf,_,None,_) ->
+      [ K kf ; A "variant" ]
+
+    | IPDecrease (kf,_,Some _,_) ->
+      [ K kf ; A "loop_variant" ]
+
+    | IPCodeAnnot (kf,stmt, { annot_content = AStmtSpec _ } ) ->
+      [ K kf ; A "contract" ; S stmt ]
+
+    | IPCodeAnnot (kf,stmt, { annot_content = APragma _ } ) ->
+      [ K kf ; A "pragma" ; S stmt ]
+
+    | IPCodeAnnot (kf,stmt, { annot_content = AExtended(_,_,(_,clause,_,_)) } )
+      -> [ K kf ; A clause ; S stmt ]
+
+    | IPCodeAnnot (kf,_, { annot_content = AAssert(_,p) } ) ->
+      [K kf ; A "assert" ; P p ]
+    | IPCodeAnnot (kf,_, { annot_content = AInvariant(_,true,p) } ) ->
+      [K kf ; A "loop_invariant" ; P p ]
+    | IPCodeAnnot (kf,_, { annot_content = AInvariant(_,false,p) } ) ->
+      [K kf ; A "invariant" ; P p ]
+    | IPCodeAnnot (kf,_, { annot_content = AVariant(e,_) } ) ->
+      [K kf ; A "loop_variant" ; T e ]
+    | IPCodeAnnot (kf,_, { annot_content = AAssigns _ } ) ->
+      [K kf ; A "loop_assigns" ]
+    | IPCodeAnnot (kf,_, { annot_content = AAllocation _ } ) ->
+      [K kf ; A "loop_allocates" ]
+
+    | IPComplete (kf,_,_,cs) ->
+      (K kf :: A "complete" :: List.map (fun a -> A a) cs)
+    | IPDisjoint(kf,_,_,cs) ->
+      (K kf :: A "disjoint" :: List.map (fun a -> A a) cs)
+
+    | IPReachable (None, _, _) -> []
+    | IPReachable (Some kf,Kglobal,Before) ->
+      [ K kf ; A "reachable" ]
+    | IPReachable (Some kf,Kglobal,After) ->
+      [ K kf ; A "reachable_post" ]
+    | IPReachable (Some kf,Kstmt s,Before) ->
+      [ K kf ; A "reachable" ; S s ]
+    | IPReachable (Some kf,Kstmt s,After) ->
+      [ K kf ; A "reachable_after" ; S s ]
+
+    | IPAxiomatic _
+    | IPAxiom _ -> []
+    | IPLemma(name,_,_,p,_) ->
+      [ A "lemma" ; A name ; P p ]
+
+    | IPTypeInvariant(name,_,_,_)
+    | IPGlobalInvariant(name,_,_) ->
+      [ A "invariant" ; A name ]
+
+    | IPOther(name,OLGlob _) -> [ A name ]
+    | IPOther(name,OLContract kf) -> [ K kf ; A name ]
+    | IPOther(name,OLStmt(kf,s)) -> [ K kf ; A name ; S s ]
+
+    | IPExtended(ELGlob,(_,name,_,_)) -> [ A name ]
+    | IPExtended(ELContract(kf),(_,name,_,_)) -> [ K kf ; A name ]
+    | IPExtended(ELStmt(kf,s),(_,name,_,_)) -> [ K kf ; A name ; S s ]
+
+    | IPPropertyInstance (_, _, _, ip) -> parts_of_property ip
+
+  let get_prop_basename ?truncate ip =
+    let buffer =
+      match truncate with
+      | None -> Sanitizer.create ~truncate:false 20
+      | Some n -> Sanitizer.create ~truncate:true n
+    in
+    add_parts buffer (parts_of_property ip) ;
+    Sanitizer.contents buffer
+
+  (* Numerotation of properties with same basename *)
+  module NamesTbl =
+    State_builder.Hashtbl(Datatype.String.Hashtbl)(Datatype.Int)
+      (struct
+	let name = "Property.Names.NamesTbl"
+        let dependencies = [ ]
+        let size = 97
+      end)
+
+  (* Computed name of properties *)
+  module IndexTbl = (* indexed by Property *)
+    State_builder.Hashtbl(Hashtbl)(Datatype.String)
+      (struct
+	let name = "Property.Names.IndexTbl"
+	let dependencies = [ Ast.self; NamesTbl.self; Globals.Functions.self ]
+	let size = 97
+      end)
+
+  let self = IndexTbl.self
+
+  let compute_name_id basename =
+    try 
+      let speed_up_start = NamesTbl.find basename in
+      (* this basename is already reserved *)
+      let n,unique_name = Extlib.make_unique_name NamesTbl.mem ~sep:"_" ~start:speed_up_start basename
+      in NamesTbl.replace basename (succ n) ; (* to speed up Extlib.make_unique_name for next time *)
+      unique_name
+    with Not_found -> (* first time that basename is reserved *)
+      NamesTbl.add basename 2 ;
+      basename
+
+  let get_prop_name_id ip =
+    try IndexTbl.find ip
+    with Not_found -> (* first time we are asking for a name for that [ip] *)
+      let basename = get_prop_basename ip in
+      let unique_name = compute_name_id basename in
+      IndexTbl.add ip unique_name ;
+      unique_name
+
+end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Smart Constructors                                                 --- *)
+(* -------------------------------------------------------------------------- *)
+
 
 let ip_other s le = IPOther(s,le)
 

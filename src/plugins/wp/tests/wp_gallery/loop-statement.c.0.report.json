@@ -13,47 +13,49 @@
                                                 "wp:main": { "total": 1,
                                                              "valid": 1,
                                                              "rank": 31 } } } },
-  "wp:functions": { "loop_statement": { "loop_statement_loop_inv_Iloop": 
+  "wp:functions": { "loop_statement": { "loop_statement_loop_invariant_Iloop": 
                                           { "alt-ergo": { "total": 2,
                                                           "valid": 2,
                                                           "rank": 16 },
                                             "wp:main": { "total": 2,
                                                          "valid": 2,
                                                          "rank": 16 } },
-                                        "loop_statement_assign": { "qed": 
+                                        "loop_statement_assigns_2": { "qed": 
                                                                     { "total": 4,
                                                                     "valid": 4 },
-                                                                   "wp:main": 
+                                                                    "wp:main": 
                                                                     { "total": 4,
                                                                     "valid": 4 } },
-                                        "loop_statement_stmt_assign": 
-                                          { "qed": { "total": 1, "valid": 1 },
-                                            "wp:main": { "total": 1,
-                                                         "valid": 1 } },
-                                        "loop_statement_loop_assign": 
+                                        "loop_statement_assigns": { "qed": 
+                                                                    { "total": 1,
+                                                                    "valid": 1 },
+                                                                    "wp:main": 
+                                                                    { "total": 1,
+                                                                    "valid": 1 } },
+                                        "loop_statement_loop_assigns": 
                                           { "qed": { "total": 2, "valid": 2 },
                                             "wp:main": { "total": 2,
                                                          "valid": 2 } },
-                                        "loop_statement_stmt_post_Sbody": 
+                                        "loop_statement_ensures_Sbody": 
                                           { "qed": { "total": 1, "valid": 1 },
                                             "wp:main": { "total": 1,
                                                          "valid": 1 } },
-                                        "loop_statement_stmt_pre_Scond": 
+                                        "loop_statement_requires_Scond": 
                                           { "qed": { "total": 1, "valid": 1 },
                                             "wp:main": { "total": 1,
                                                          "valid": 1 } },
-                                        "loop_statement_stmt_pre_Rinv": 
+                                        "loop_statement_requires_Rinv": 
                                           { "alt-ergo": { "total": 1,
                                                           "valid": 1,
                                                           "rank": 20 },
                                             "wp:main": { "total": 1,
                                                          "valid": 1,
                                                          "rank": 20 } },
-                                        "loop_statement_post_Sloop": 
+                                        "loop_statement_ensures_Sloop": 
                                           { "qed": { "total": 1, "valid": 1 },
                                             "wp:main": { "total": 1,
                                                          "valid": 1 } },
-                                        "loop_statement_post_Scond": 
+                                        "loop_statement_ensures_Scond": 
                                           { "qed": { "total": 1, "valid": 1 },
                                             "wp:main": { "total": 1,
                                                          "valid": 1 } },
