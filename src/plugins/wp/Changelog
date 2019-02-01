@@ -20,6 +20,7 @@
 #   <Prover>: prover
 ###############################################################################
 
+ -  Wp         [2019/01/28] New floating-point model
  - WP          [2018/02/16] Filter out some variables from separation
  - TIP         [2018/02/15] Extend bitwise-eq auto-strategy on hypotheses
  - TIP         [2018/02/15] Fix wrong reconciliation of sub-scripts during replay
@@ -49,36 +50,18 @@
  - Wp          [2017/03/12] Reduction of equalities with logic functions
  - Wp          [2017/03/12] More simplifications wrt integer domains
 
-###################################
-Plugin WP / Frama-C 15 - Phosphorus
-###################################
+######################
+Plugin WP 18.0 (Argon)
+######################
 
- -! Wp          [2017/03/24] Remove support for generalized invariants (-wp-invariants)
- -o Ergo       [2017/01/12] Update qualif tests to Alt-Ergo 1.30
- - Qed         [2016/12/09] Add E_fun constructor for neutral and absorbent
- - Wp          [2016/12/07] Trivial simplification for truncate
- - Wp          [2016/12/07] Fix bug on negative 0x float constants
- - Wp          [2016/11/04] Improved comparison of logic compounds
- - Wp          [2016/11/04] Improved filtering (prevents loss of init clauses)
- - WP          [2016/10/26] Generated HTML API (make wp-doc-api)
- - WP          [2016/10/26] Extensible Proof Engine
- -! WP         [2016/10/11] Deprecated Dynamic API
- - WP          [2016/09/20] Improved sequent simplifier
- - Qed         [2016/09/02] Negation of forall/exists qualitifers
- - GUI         [2016/08/26] Pretty-print of memory side effects
- - WP          [2016/08/23] Fixed bug #2246 (unsound switch)
- - Gui         [2016/07/23] Interactive Proof Engine
- - WP          [2016/07/21] Improved Sequent API (Conditions)
- - WP          [2016/05/26] Simplification of ACSL sequences
- - Qed         [2016/05/17] Mutualized type inference in Term
- - Qed         [2016/04/12] Improved simplifiers
- - WP          [2017/05/15] Extract inductive predicates as Inductive in Coq
- -! Wp         [2017/03/24] Remove support for generalized invariants (-wp-invariants)
- - WP         [2018/02/12] Optional support for _Bool range (-wp-bool-range)
- - WP         [2018/01/15] Upgrade to Alt-Ergo 2.0.0
- - WP         [2018/01/15] Upgrade to Coq 8.7.1
- - WP         [2018/01/15] Upgrade to Why-3 0.88.3
- - Qed        [2017/12/13] Transforms some quantifications into let constructs
+-  Wp         [2018/10/25] Added support for ACSL \offset construct
+-  Wp         [2018/09/04] Option -wp-warn-separation changed into -wp-warn-memory-model
+                           Adding memory model hypotheses related to pointer validity
+-  Wp         [2018/06/28] Use functional havoc instead of a predicate in Typed model
+-  Qed        [2018/06/28] Added builtin simplification on array operations
+-  Wp         [2018/06/20] Added more simplifications on list operations
+-  Qed        [2018/06/20] Added more simplifications for invertible functions
+-  TIP        [2018/06/07] Extends tactical 'Split' to distribution of qualitifiers
 
 #########################
 Plugin WP Sulfur-20171101
@@ -99,21 +82,6 @@ Plugin WP Sulfur-20171101
  - TIP        [2017/04/25] New tactical Rewrite (two apply equalities)
  - Wp         [2017/03/12] Reduction of equalities with logic functions
  - Wp         [2017/03/12] More simplifications wrt integer domains
-
--  Wp         [2019/01/28] New floating-point model
-
-######################
-Plugin WP 18.0 (Argon)
-######################
-
--  Wp         [2018/10/25] Added support for ACSL \offset construct
--  Wp         [2018/09/04] Option -wp-warn-separation changed into -wp-warn-memory-model
-                           Adding memory model hypotheses related to pointer validity
--  Wp         [2018/06/28] Use functional havoc instead of a predicate in Typed model
--  Qed        [2018/06/28] Added builtin simplification on array operations
--  Wp         [2018/06/20] Added more simplifications on list operations
--  Qed        [2018/06/20] Added more simplifications for invertible functions
--  TIP        [2018/06/07] Extends tactical 'Split' to distribution of qualitifiers
 
 ###########################
 Plugin WP Chlorine-20180501
@@ -166,6 +134,7 @@ Plugin WP Sulfur-20171101
 Plugin WP Phosphorus-20170501
 #############################
 
+- Qed         [2017/12/13] Transforms some quantifications into let constructs
 -  WP         [2017/05/15] Extract inductive predicates as Inductive in Coq
 -! WP         [2017/03/24] Remove support for generalized invariants (-wp-invariants)
 -o Ergo       [2017/01/12] Update qualif tests to Alt-Ergo 1.30
