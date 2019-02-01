@@ -53,7 +53,7 @@ val new_predicate: predicate -> identified_predicate
     @plugin development guide
     @since Chlorine-20180501
 *)
-val new_acsl_extension: string -> location -> acsl_extension_kind -> acsl_extension
+val new_acsl_extension: string -> location -> bool -> acsl_extension_kind -> acsl_extension
 
 (** Gives a new id to an existing predicate. 
     @since Oxygen-20120901

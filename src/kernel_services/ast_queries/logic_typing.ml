@@ -507,19 +507,20 @@ module Extensions = struct
   let typer_tbl = Hashtbl.create 5
   let find_typer name = Hashtbl.find typer_tbl name
   let is_extension name = Hashtbl.mem typer_tbl name
-  let register name category typer =
+  let register name category status typer =
     if is_extension name then
       Kernel.warning ~wkey:Kernel.wkey_acsl_extension
         "Trying to register ACSL extension %s twice. Ignoring second extension"
         name
     else begin
       Logic_env.register_extension name category;
-      Hashtbl.add typer_tbl name typer
+      Hashtbl.add typer_tbl name (status,typer)
     end
 
   let typer name ~typing_context:typing_context ~loc p =
-    try let typ = find_typer name in
-      typ ~typing_context ~loc p
+    try
+      let status,typer = find_typer name in
+      status, typer ~typing_context ~loc p
     with Not_found ->
       Kernel.fatal ~source:(fst loc) "unsupported clause of name '%s'" name
 end
@@ -3554,7 +3555,8 @@ struct
       | p::_ -> p.lexpr_loc
     in
     if Extensions.is_extension name then
-      Logic_const.new_acsl_extension name loc (Extensions.typer name ~typing_context ~loc ps)
+      let status , kind = Extensions.typer name ~typing_context ~loc ps in
+      Logic_const.new_acsl_extension name loc status kind
     else
       C.error
         loc "No type-checking function registered for extension %s" name
@@ -4176,8 +4178,8 @@ struct
       Dvolatile (tsets, rvi_opt, wvi_opt, [], loc)
     | LDextended (kind, content) ->
       let typing_context = base_ctxt (Lenv.empty ()) in
-      let tcontent = Extensions.typer kind ~typing_context ~loc content in
-      let textended = Logic_const.new_acsl_extension kind loc tcontent in
+      let status,tcontent = Extensions.typer kind ~typing_context ~loc content in
+      let textended = Logic_const.new_acsl_extension kind loc status tcontent in
       Dextended (textended, [], loc)
 
   let annot a =

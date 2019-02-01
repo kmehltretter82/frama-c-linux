@@ -615,7 +615,7 @@ class check ?(is_normalized=true) what : Visitor.frama_c_visitor =
       in
       let my_labels =
         match ca.annot_content with
-        | AExtended (_, is_loop, (_, name, _, _)) ->
+        | AExtended (_, is_loop, (_, name, _, _, _)) ->
           (match Logic_env.extension_category name, is_loop with
            | Some (Ext_code_annot (Ext_next_stmt | Ext_next_both)), false ->
              Logic_const.post_label :: my_labels

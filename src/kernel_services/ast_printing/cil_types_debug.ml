@@ -879,7 +879,7 @@ and pp_spec fmt _spec = Format.fprintf fmt "pp_spec_TODO" (*{
   mutable spec_disjoint_behaviors: string_list_list;
 }*)
 
-and pp_acsl_extension fmt = pp_tuple4 pp_int pp_string pp_location pp_acsl_extension_kind fmt
+and pp_acsl_extension fmt = pp_tuple5 pp_int pp_string pp_location pp_bool pp_acsl_extension_kind fmt
 
 and pp_acsl_extension_kind fmt = function
   | Ext_id(int) -> Format.fprintf fmt "Ext_id(%a)"  pp_int int

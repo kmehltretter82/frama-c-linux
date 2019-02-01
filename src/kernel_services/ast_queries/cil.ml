@@ -2931,14 +2931,14 @@ and childrenBehavior vis b =
    b.b_extended <- mapNoCopy (visitCilExtended vis) b.b_extended;
    b
 
-and visitCilExtended vis (i,s,l,p as orig) =
+and visitCilExtended vis (i,a,l,s,e as orig) =
   let visit =
-    try Hashtbl.find visitor_tbl s
+    try Hashtbl.find visitor_tbl a
     with Not_found -> (fun _ _ -> DoChildren)
   in
-  let p' = doVisitCil vis id (visit vis) childrenCilExtended p in
-  if is_fresh_behavior vis#behavior then Logic_const.new_acsl_extension s l p
-  else if p == p' then orig else (i,s,l,p')
+  let e' = doVisitCil vis id (visit vis) childrenCilExtended e in
+  if is_fresh_behavior vis#behavior then Logic_const.new_acsl_extension a l s e
+  else if e == e' then orig else (i,a,l,s,e')
 
 and childrenCilExtended vis p =
   match p with
