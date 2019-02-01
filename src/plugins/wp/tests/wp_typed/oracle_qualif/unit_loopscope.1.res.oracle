@@ -6,8 +6,8 @@
 [wp] tests/wp_typed/unit_loopscope.i:14: Warning: 
   Missing assigns clause (assigns 'everything' instead)
 [wp] 2 goals scheduled
-[wp] [Qed] Goal typed_ref_f_loop_inv_preserved : Valid
-[wp] [Alt-Ergo] Goal typed_ref_f_loop_inv_established : Unknown
+[wp] [Qed] Goal typed_ref_f_loop_invariant_preserved : Valid
+[wp] [Alt-Ergo] Goal typed_ref_f_loop_invariant_established : Unknown
 [wp] Proved goals:    1 / 2
   Qed:             1 
   Alt-Ergo:        0  (unknown: 1)

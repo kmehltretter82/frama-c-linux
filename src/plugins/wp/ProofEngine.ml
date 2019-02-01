@@ -69,6 +69,7 @@ let get wpo =
     | Some { script = Tactic _ } -> if proof.saved then `Saved else `Proof
   with Not_found ->
     if ProofSession.exists wpo then `Script else `None
+
 let iter_all f ns = List.iter (fun (_,n) -> f n) ns
 let map_all f ns = List.map (fun (k,n) -> k,f n) ns
 
@@ -277,6 +278,7 @@ let mk_goal t ~title ~part ~axioms sequent =
   let sid = Printf.sprintf "%s-%d" t.main.Wpo.po_sid id in
   Wpo.({
       po_gid = gid ;
+      po_leg = "" ; (* no use for legacy name *)
       po_sid = sid ;
       po_name = Printf.sprintf "%s (%s)" title part ;
       po_idx = t.main.po_idx ;

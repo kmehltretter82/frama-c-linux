@@ -119,7 +119,7 @@ let from_filename ?cpp f =
         | None -> get_preprocessor_command ()
         | Some cpp -> cpp, cpp_opt_kind ()
       in
-      (if flags = "" then cpp else cpp ^ " " ^ flags), gnu
+      (if flags = [] then cpp else cpp ^ " " ^ String.concat " " flags), gnu
   in
   if Filename.check_suffix f ".i" then begin
     NoCPP f

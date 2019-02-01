@@ -22,8 +22,10 @@
 
 theory Cfloat
 use bool.Bool as Bool
+use int.Int as Int
 use real.Real as Real
 use real.Abs as Abs
+use real.FromInt as FromInt
 use real.Square as Square
 
 type f32
@@ -37,6 +39,14 @@ function of_f32 f32 : real
 function to_f64 real : f64
 
 function of_f64 f64 : real
+
+axiom to_f32_zero : ((of_f32 (to_f32 0.0)) = (0.0))
+
+axiom to_f32_one : ((of_f32 (to_f32 1.0)) = (1.0))
+
+axiom to_f64_zero : ((of_f64 (to_f64 0.0)) = (0.0))
+
+axiom to_f64_one : ((of_f64 (to_f64 1.0)) = (1.0))
 
 type rounding_mode =
   | Up
@@ -76,7 +86,7 @@ predicate is_NaN_f64 (d:f64) = ((classify_f64 d) = (NaN))
 predicate is_infinite_f32 (f:f32) = ("asym_split" ((classify_f32
   f) = (Inf_pos))) || ((classify_f32 f) = (Inf_neg))
 
-predicate is_infinite_f36 (d:f64) = ("asym_split" ((classify_f64
+predicate is_infinite_f64 (d:f64) = ("asym_split" ((classify_f64
   d) = (Inf_pos))) || ((classify_f64 d) = (Inf_neg))
 
 predicate is_positive_infinite_f32 (f:f32) = ((classify_f32 f) = (Inf_pos))

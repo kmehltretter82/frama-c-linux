@@ -300,6 +300,7 @@ let children_of_json = function
       List.map (fun j -> "",j) js
   | `Assoc fs -> fs
   | _ -> []
+
 let tactic_of_json js =
   try
     let header = js >? "header" |> Json.string in
@@ -382,7 +383,7 @@ let rec subgoals n = function
   | (_,a)::s -> subgoals (n + status a) s
 
 let a_prover p r = Prover(p,r)
-let a_tactic tac children = Tactic(subgoals 0 children,tac,children)
+let a_tactic tac children  = Tactic(subgoals 0 children,tac,children)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Codecs                                                             --- *)

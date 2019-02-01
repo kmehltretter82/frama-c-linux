@@ -14,14 +14,16 @@
                                    "foo_wrong_assert_rte_mem_access": 
                                      { "qed": { "total": 1, "valid": 1 },
                                        "wp:main": { "total": 1, "valid": 1 } },
-                                   "foo_wrong_assign": { "qed": { "total": 1,
-                                                                  "valid": 1 },
-                                                         "wp:main": { "total": 1,
-                                                                    "valid": 1 } },
-                                   "foo_wrong_post": { "qed": { "total": 1,
-                                                                "valid": 1 },
-                                                       "wp:main": { "total": 1,
-                                                                    "valid": 1 } },
+                                   "foo_wrong_assigns": { "qed": { "total": 1,
+                                                                   "valid": 1 },
+                                                          "wp:main": 
+                                                            { "total": 1,
+                                                              "valid": 1 } },
+                                   "foo_wrong_ensures": { "qed": { "total": 1,
+                                                                   "valid": 1 },
+                                                          "wp:main": 
+                                                            { "total": 1,
+                                                              "valid": 1 } },
                                    "wp:section": { "alt-ergo": { "total": 1,
                                                                  "unknown": 1 },
                                                    "qed": { "total": 4,
@@ -43,16 +45,18 @@
                                                        "rank": 4 },
                                          "wp:main": { "total": 1, "valid": 1,
                                                       "rank": 4 } },
-                                     "foo_correct_assign": { "qed": { "total": 1,
-                                                                    "valid": 1 },
-                                                             "wp:main": 
-                                                               { "total": 1,
-                                                                 "valid": 1 } },
-                                     "foo_correct_post": { "qed": { "total": 1,
-                                                                    "valid": 1 },
-                                                           "wp:main": 
-                                                             { "total": 1,
-                                                               "valid": 1 } },
+                                     "foo_correct_assigns": { "qed": 
+                                                                { "total": 1,
+                                                                  "valid": 1 },
+                                                              "wp:main": 
+                                                                { "total": 1,
+                                                                  "valid": 1 } },
+                                     "foo_correct_ensures": { "qed": 
+                                                                { "total": 1,
+                                                                  "valid": 1 },
+                                                              "wp:main": 
+                                                                { "total": 1,
+                                                                  "valid": 1 } },
                                      "wp:section": { "alt-ergo": { "total": 1,
                                                                    "valid": 1,
                                                                    "rank": 4 },

@@ -30,6 +30,7 @@ theory Cfloat
   use import real.RealInfix
   use import real.Abs
   use import real.Square
+  use import real.FromInt
 
   (* -------------------------------------------------------------------------- *)
   (* --- C-Integer Arithmetics for Alt-Ergo                                 --- *)
@@ -45,6 +46,11 @@ theory Cfloat
 
   function to_f64 real : f64
   function of_f64 f64 : real
+
+  axiom to_f32_zero: of_f32 (to_f32 0.0) = 0.0
+  axiom to_f32_one:  of_f32 (to_f32 1.0) = 1.0
+  axiom to_f64_zero: of_f64 (to_f64 0.0) = 0.0
+  axiom to_f64_one:  of_f64 (to_f64 1.0) = 1.0
 
   (* C-Float Rounding Modes *)
 
@@ -113,7 +119,6 @@ theory Cfloat
   function eq_f64b (x:f64) (y:f64) : bool
   predicate eq_f32 (x:f32) (y:f32) = (eq_f32b x y = true)
   predicate eq_f64 (x:f64) (y:f64) = (eq_f64b x y = true)
-
   axiom eq_finite_f32 : forall x,y:f32 [eq_f32 x y]. is_finite_f32 x -> is_finite_f32 y ->
                                         eq_f32 x y <-> of_f32 x = of_f32 y
 

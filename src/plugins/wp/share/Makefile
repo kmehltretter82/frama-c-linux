@@ -32,6 +32,7 @@ WPLSHARE=$(Wp_DIR)/share
 wp-coq-clean:
 	find $(Wp_DIR) \( -name "*.vo" -or -name "*.glob" \) -print -delete
 	rm -f $(WPLSHARE)/coqwp/.depend $(WPLSHARE)/why3/.depend
+clean:: wp-coq-clean
 
 clean:: wp-coq-clean
 
@@ -81,7 +82,7 @@ COQWPINCLUDES= -R $(WPLSHARE)/coqwp ''
 
 $(WPLSHARE)/coqwp/%.vo: $(WPLSHARE)/coqwp/%.v
 	echo "Coqc         $<"
-	@coqc -w none $(COQWPINCLUDES) $<
+	coqc -w none $(COQWPINCLUDES) $<
 
 $(WPLSHARE)/coqwp/.depend: $(addprefix $(WPLSHARE)/, $(WP_COQ_SOURCES))
 	echo "Coqdep for $(WPLSHARE)/coqwp"

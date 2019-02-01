@@ -52,19 +52,19 @@
                                                   "wp:main": { "total": 1,
                                                                "valid": 1,
                                                                "rank": 3 } },
-                                              "BinaryMultiplication_loop_term": 
+                                              "BinaryMultiplication_loop_variant": 
                                                 { "alt-ergo": { "total": 2,
                                                                 "valid": 2,
-                                                                "rank": 20 },
+                                                                "rank": 19 },
                                                   "wp:main": { "total": 2,
                                                                "valid": 2,
-                                                               "rank": 20 } },
-                                              "BinaryMultiplication_loop_assign": 
+                                                               "rank": 19 } },
+                                              "BinaryMultiplication_loop_assigns": 
                                                 { "qed": { "total": 1,
                                                            "valid": 1 },
                                                   "wp:main": { "total": 1,
                                                                "valid": 1 } },
-                                              "BinaryMultiplication_post_product": 
+                                              "BinaryMultiplication_ensures_product": 
                                                 { "alt-ergo": { "total": 1,
                                                                 "valid": 1,
                                                                 "rank": 34 },

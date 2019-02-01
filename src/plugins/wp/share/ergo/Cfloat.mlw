@@ -24,9 +24,11 @@
 (** The theory BuiltIn_ must be appended to this file*)
 (** The theory Bool_ must be appended to this file*)
 (** The theory bool_Bool_ must be appended to this file*)
+(** The theory int_Int_ must be appended to this file*)
 (** The theory real_Real_ must be appended to this file*)
 (** The theory real_RealInfix_ must be appended to this file*)
 (** The theory real_Abs_ must be appended to this file*)
+(** The theory real_FromInt_ must be appended to this file*)
 (** The theory real_Square_ must be appended to this file*)
 type f32
 
@@ -39,6 +41,14 @@ logic of_f32 : f32 -> real
 logic to_f64 : real -> f64
 
 logic of_f64 : f64 -> real
+
+axiom to_f32_zero : (of_f32(to_f32(0.0)) = 0.0)
+
+axiom to_f32_one : (of_f32(to_f32(1.0)) = 1.0)
+
+axiom to_f64_zero : (of_f64(to_f64(0.0)) = 0.0)
+
+axiom to_f64_one : (of_f64(to_f64(1.0)) = 1.0)
 
 type rounding_mode = Up | Down | ToZero | NearestTiesToAway
   | NearestTiesToEven
@@ -112,7 +122,7 @@ predicate is_NaN_f64(d: f64) = (classify_f64(d) = NaN)
 predicate is_infinite_f32(f: f32) = ((classify_f32(f) = Inf_pos) or
   (classify_f32(f) = Inf_neg))
 
-predicate is_infinite_f36(d: f64) = ((classify_f64(d) = Inf_pos) or
+predicate is_infinite_f64(d: f64) = ((classify_f64(d) = Inf_pos) or
   (classify_f64(d) = Inf_neg))
 
 predicate is_positive_infinite_f32(f: f32) = (classify_f32(f) = Inf_pos)

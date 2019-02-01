@@ -106,6 +106,17 @@ let selected = function
   | Clause c -> e_prop (head c)
   | Compose code -> composed code
 
+let get_int_z z =
+  try Some (Integer.to_int z) with Z.Overflow -> None
+
+let get_int = function
+  | Empty -> None
+  | Compose(Cint a) -> get_int_z a
+  | s ->
+      match Lang.F.repr (selected s) with
+      | Qed.Logic.Kint z -> get_int_z z
+      | _ -> None
+
 let subclause clause p =
   match clause with
   | Step s ->

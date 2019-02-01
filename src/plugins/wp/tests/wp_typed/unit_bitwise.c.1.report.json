@@ -10,22 +10,22 @@
                                                                 "unknown": 1 },
                                                   "wp:main": { "total": 1,
                                                                "unknown": 1 } } },
-                    "bnot_uint": { "bnot_uint_post_ko": { "alt-ergo": 
-                                                            { "total": 1,
-                                                              "unknown": 1 },
-                                                          "wp:main": 
-                                                            { "total": 1,
-                                                              "unknown": 1 } },
+                    "bnot_uint": { "bnot_uint_ensures_ko": { "alt-ergo": 
+                                                               { "total": 1,
+                                                                 "unknown": 1 },
+                                                             "wp:main": 
+                                                               { "total": 1,
+                                                                 "unknown": 1 } },
                                    "wp:section": { "alt-ergo": { "total": 1,
                                                                  "unknown": 1 },
                                                    "wp:main": { "total": 1,
                                                                 "unknown": 1 } } },
-                    "bnot_uchar": { "bnot_uchar_post_ko": { "alt-ergo": 
-                                                              { "total": 1,
-                                                                "unknown": 1 },
-                                                            "wp:main": 
-                                                              { "total": 1,
-                                                                "unknown": 1 } },
+                    "bnot_uchar": { "bnot_uchar_ensures_ko": { "alt-ergo": 
+                                                                 { "total": 1,
+                                                                   "unknown": 1 },
+                                                               "wp:main": 
+                                                                 { "total": 1,
+                                                                   "unknown": 1 } },
                                     "wp:section": { "alt-ergo": { "total": 1,
                                                                   "unknown": 1 },
                                                     "wp:main": { "total": 1,

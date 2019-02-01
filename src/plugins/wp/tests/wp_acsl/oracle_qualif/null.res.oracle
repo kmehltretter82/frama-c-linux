@@ -6,7 +6,7 @@
 [wp] 3 goals scheduled
 [wp] [Alt-Ergo] Goal typed_lemma_valid_non_null : Valid
 [wp] [Alt-Ergo] Goal typed_lemma_valid_read_non_null : Valid
-[wp] [Qed] Goal typed_null_is_zero_post : Valid
+[wp] [Qed] Goal typed_null_is_zero_ensures : Valid
 [wp] Proved goals:    3 / 3
   Qed:             1 
   Alt-Ergo:        2

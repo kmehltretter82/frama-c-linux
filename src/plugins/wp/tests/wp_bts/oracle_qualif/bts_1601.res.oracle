@@ -11,12 +11,12 @@
 [wp] [Qed] Goal typed_foo_assert_5 : Valid
 [wp] [Qed] Goal typed_foo_assert_6 : Valid
 [wp] [Qed] Goal typed_foo_assert_7 : Valid
-[wp] [Qed] Goal typed_foo_basic_post : Valid
+[wp] [Qed] Goal typed_foo_basic_ensures : Valid
 [wp] Proved goals:    8 / 8
   Qed:             7 
   Alt-Ergo:        1
 [wp] Report 'tests/wp_bts/bts_1601.c.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
-foo                  7      1 (12..24)       8       100%
+foo                  7      1 (16..28)       8       100%
 -------------------------------------------------------------

@@ -27,9 +27,11 @@ Require Reals.Rbasic_fun.
 Require Reals.R_sqrt.
 Require BuiltIn.
 Require bool.Bool.
+Require int.Int.
 Require real.Real.
 Require real.RealInfix.
 Require real.Abs.
+Require real.FromInt.
 Require real.Square.
 
 (* Why3 goal *)
@@ -54,6 +56,22 @@ Admitted.
 
 (* Why3 goal *)
 Definition of_f64: f64 -> R.
+Admitted.
+
+(* Why3 goal *)
+Lemma to_f32_zero : ((of_f32 (to_f32 0%R)) = 0%R).
+Admitted.
+
+(* Why3 goal *)
+Lemma to_f32_one : ((of_f32 (to_f32 1%R)) = 1%R).
+Admitted.
+
+(* Why3 goal *)
+Lemma to_f64_zero : ((of_f64 (to_f64 0%R)) = 0%R).
+Admitted.
+
+(* Why3 goal *)
+Lemma to_f64_one : ((of_f64 (to_f64 1%R)) = 1%R).
 Admitted.
 
 (* Why3 assumption *)
@@ -118,7 +136,7 @@ Definition is_infinite_f32 (f:f32): Prop := ((classify_f32 f) = Inf_pos) \/
   ((classify_f32 f) = Inf_neg).
 
 (* Why3 assumption *)
-Definition is_infinite_f36 (d:f64): Prop := ((classify_f64 d) = Inf_pos) \/
+Definition is_infinite_f64 (d:f64): Prop := ((classify_f64 d) = Inf_pos) \/
   ((classify_f64 d) = Inf_neg).
 
 (* Why3 assumption *)
