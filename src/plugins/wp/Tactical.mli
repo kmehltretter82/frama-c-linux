@@ -51,6 +51,7 @@ val int : int -> selection
 val cint : Integer.t -> selection
 val range : int -> int -> selection
 val compose : string -> selection list -> selection
+val get_int : selection -> int option
 val destruct : selection -> selection list
 
 val head : clause -> pred

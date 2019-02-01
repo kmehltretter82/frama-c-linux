@@ -116,6 +116,7 @@ type formula =
 
 type po = t and t = {
     po_gid   : string ;  (** goal identifier *)
+    po_leg   : string ; (** legacy goal identifier *)
     po_sid   : string ;  (** goal short identifier (without model) *)
     po_name  : string ;  (** goal informal name *)
     po_idx   : index ;   (** goal index *)

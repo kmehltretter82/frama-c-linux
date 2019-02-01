@@ -273,6 +273,11 @@ let array = function
   | `List es -> Array.of_list es
   | _ -> invalid "array"
 
+let assoc = function
+  | `Null -> []
+  | `Assoc fs -> fs
+  | _ -> invalid "assoc"
+
 let field f = function
   | `Null -> raise Not_found
   | `Assoc fs -> List.assoc f fs

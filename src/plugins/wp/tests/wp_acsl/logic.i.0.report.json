@@ -1,8 +1,8 @@
 { "wp:global": { "alt-ergo": { "total": 18, "valid": 2, "unknown": 16,
-                               "rank": 15 },
+                               "rank": 16 },
                  "qed": { "total": 3, "valid": 3 },
                  "wp:main": { "total": 21, "valid": 5, "unknown": 16,
-                              "rank": 15 } },
+                              "rank": 16 } },
   "wp:functions": { "h": { "h_assigns": { "qed": { "total": 2, "valid": 2 },
                                           "wp:main": { "total": 2,
                                                        "valid": 2 } },
@@ -129,10 +129,10 @@
                               "wp:section": { "alt-ergo": { "total": 17,
                                                             "valid": 2,
                                                             "unknown": 15,
-                                                            "rank": 15 },
+                                                            "rank": 16 },
                                               "qed": { "total": 1,
                                                        "valid": 1 },
                                               "wp:main": { "total": 18,
                                                            "valid": 3,
                                                            "unknown": 15,
-                                                           "rank": 15 } } } } }
+                                                           "rank": 16 } } } } }

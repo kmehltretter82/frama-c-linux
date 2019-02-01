@@ -93,17 +93,17 @@
                                                                "valid": 1 },
                                                       "wp:main": { "total": 1,
                                                                    "valid": 1 } },
-                                 "spec_if_ensures_qed_ok": { "qed": { "total": 1,
-                                                                    "valid": 1 },
-                                                             "wp:main": 
-                                                               { "total": 1,
-                                                                 "valid": 1 } },
                                  "spec_if_ensures_qed_ok_2": { "qed": 
                                                                  { "total": 1,
                                                                    "valid": 1 },
                                                                "wp:main": 
                                                                  { "total": 1,
                                                                    "valid": 1 } },
+                                 "spec_if_ensures_qed_ok": { "qed": { "total": 1,
+                                                                    "valid": 1 },
+                                                             "wp:main": 
+                                                               { "total": 1,
+                                                                 "valid": 1 } },
                                  "wp:section": { "alt-ergo": { "total": 2,
                                                                "unknown": 2 },
                                                  "qed": { "total": 5,

@@ -27,8 +27,8 @@
 [wp] Report 'tests/wp_acsl/assigns_range.i.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
-call_assigns_all    12      2 (4..16)       14       100%
-call_assigns_t1     -       1 (1..12)        1       100%
-call_assigns_t2     -       1 (1..12)        1       100%
+call_assigns_all    12      2 (8..20)       14       100%
+call_assigns_t1     -       1 (4..16)        1       100%
+call_assigns_t2     -       1 (4..16)        1       100%
 call_assigns_t4     -       1 (4..16)        1       100%
 -------------------------------------------------------------

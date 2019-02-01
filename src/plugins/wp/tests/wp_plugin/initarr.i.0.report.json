@@ -1,5 +1,5 @@
-{ "wp:global": { "alt-ergo": { "total": 2, "valid": 2, "rank": 10 },
-                 "wp:main": { "total": 2, "valid": 2, "rank": 10 } },
+{ "wp:global": { "alt-ergo": { "total": 2, "valid": 2, "rank": 11 },
+                 "wp:main": { "total": 2, "valid": 2, "rank": 11 } },
   "wp:functions": { "job": { "job_ensures_ALT": { "alt-ergo": { "total": 1,
                                                                 "valid": 1,
                                                                 "rank": 8 },
@@ -14,7 +14,7 @@
                                                                "rank": 11 } },
                              "wp:section": { "alt-ergo": { "total": 2,
                                                            "valid": 2,
-                                                           "rank": 10 },
+                                                           "rank": 11 },
                                              "wp:main": { "total": 2,
                                                           "valid": 2,
-                                                          "rank": 10 } } } } }
+                                                          "rank": 11 } } } } }

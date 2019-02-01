@@ -1,6 +1,6 @@
-{ "wp:global": { "alt-ergo": { "total": 3, "valid": 3, "rank": 20 },
+{ "wp:global": { "alt-ergo": { "total": 3, "valid": 3, "rank": 21 },
                  "qed": { "total": 7, "valid": 7 },
-                 "wp:main": { "total": 10, "valid": 10, "rank": 20 } },
+                 "wp:main": { "total": 10, "valid": 10, "rank": 21 } },
   "wp:functions": { "memcpy_context_vars": { "memcpy_context_vars_loop_invariant_ok_cpy": 
                                                { "alt-ergo": { "total": 1,
                                                                "valid": 1,
@@ -44,10 +44,10 @@
                                              "wp:section": { "alt-ergo": 
                                                                { "total": 3,
                                                                  "valid": 3,
-                                                                 "rank": 20 },
+                                                                 "rank": 21 },
                                                              "qed": { "total": 7,
                                                                     "valid": 7 },
                                                              "wp:main": 
                                                                { "total": 10,
                                                                  "valid": 10,
-                                                                 "rank": 20 } } } } }
+                                                                 "rank": 21 } } } } }

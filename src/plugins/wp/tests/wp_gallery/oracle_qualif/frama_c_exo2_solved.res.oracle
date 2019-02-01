@@ -32,7 +32,7 @@
 [wp] Report 'tests/wp_gallery/frama_c_exo2_solved.c.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
-max_subarray         9     13 (256..304)    22       100%
+max_subarray         9     13 (272..320)    22       100%
 -------------------------------------------------------------
 [wp] Running WP plugin...
 [rte] annotating function max_subarray
@@ -66,5 +66,5 @@ max_subarray         9     13 (256..304)    22       100%
 [wp] Report 'tests/wp_gallery/frama_c_exo2_solved.c.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
-max_subarray         9     14 (256..304)    23       100%
+max_subarray         9     14 (272..320)    23       100%
 -------------------------------------------------------------

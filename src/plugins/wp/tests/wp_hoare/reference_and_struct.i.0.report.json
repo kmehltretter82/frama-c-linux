@@ -13,11 +13,10 @@
                                                         "valid": 2 },
                                                "wp:main": { "total": 2,
                                                             "valid": 2 } } },
-                    "call_reset": { "reset_requires_2": { "qed": { "total": 1,
-                                                                   "valid": 1 },
-                                                          "wp:main": 
-                                                            { "total": 1,
-                                                              "valid": 1 } },
+                    "call_reset": { "reset_requires": { "qed": { "total": 1,
+                                                                 "valid": 1 },
+                                                        "wp:main": { "total": 1,
+                                                                    "valid": 1 } },
                                     "call_reset_assigns": { "qed": { "total": 3,
                                                                     "valid": 3 },
                                                             "wp:main": 
@@ -32,12 +31,11 @@
                                                              "valid": 5 },
                                                     "wp:main": { "total": 5,
                                                                  "valid": 5 } } },
-                    "call_reset_5": { "reset_5_requires_2": { "qed": 
-                                                                { "total": 1,
-                                                                  "valid": 1 },
-                                                              "wp:main": 
-                                                                { "total": 1,
-                                                                  "valid": 1 } },
+                    "call_reset_5": { "reset_5_requires": { "qed": { "total": 1,
+                                                                    "valid": 1 },
+                                                            "wp:main": 
+                                                              { "total": 1,
+                                                                "valid": 1 } },
                                       "call_reset_5_assigns": { "qed": 
                                                                   { "total": 2,
                                                                     "valid": 2 },
@@ -59,7 +57,7 @@
                                                       "wp:main": { "total": 4,
                                                                    "valid": 4,
                                                                    "rank": 1 } } },
-                    "call_reset_5_tps": { "reset_5_requires_3": { "qed": 
+                    "call_reset_5_tps": { "reset_5_requires_2": { "qed": 
                                                                     { "total": 1,
                                                                     "valid": 1 },
                                                                   "wp:main": 
@@ -87,11 +85,11 @@
                                                             { "total": 4,
                                                               "valid": 4,
                                                               "rank": 5 } } },
-                    "call_reset_1_5": { "reset_1_5_requires_2": { "qed": 
-                                                                    { "total": 1,
+                    "call_reset_1_5": { "reset_1_5_requires": { "qed": 
+                                                                  { "total": 1,
                                                                     "valid": 1 },
-                                                                  "wp:main": 
-                                                                    { "total": 1,
+                                                                "wp:main": 
+                                                                  { "total": 1,
                                                                     "valid": 1 } },
                                         "call_reset_1_5_assigns": { "qed": 
                                                                     { "total": 2,
@@ -114,7 +112,7 @@
                                                         "wp:main": { "total": 4,
                                                                     "valid": 4,
                                                                     "rank": 1 } } },
-                    "call_reset_5_dim2": { "reset_5_requires_4": { "qed": 
+                    "call_reset_5_dim2": { "reset_5_requires_3": { "qed": 
                                                                     { "total": 1,
                                                                     "valid": 1 },
                                                                    "wp:main": 
@@ -142,7 +140,7 @@
                                                              { "total": 4,
                                                                "valid": 4,
                                                                "rank": 1 } } },
-                    "call_on_array_in_struct_global": { "load_5_requires_2": 
+                    "call_on_array_in_struct_global": { "load_5_requires": 
                                                           { "qed": { "total": 1,
                                                                     "valid": 1 },
                                                             "wp:main": 
@@ -174,7 +172,7 @@
                                                               { "total": 4,
                                                                 "valid": 4,
                                                                 "rank": 2 } } },
-                    "call_array_in_struct_param": { "load_5_requires_3": 
+                    "call_array_in_struct_param": { "load_5_requires_2": 
                                                       { "qed": { "total": 1,
                                                                  "valid": 1 },
                                                         "wp:main": { "total": 1,

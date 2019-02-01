@@ -228,10 +228,15 @@ module PropId =
     let varname = Datatype.undefined
   end)
 
-module Names:
+(* -------------------------------------------------------------------------- *)
+(* --- Lagacy Naming                                                      --- *)
+(* -------------------------------------------------------------------------- *)
+
+module LegacyNames :
 sig
   val get_prop_id_name: prop_id -> string
 end = struct
+
   module NamesTbl = State_builder.Hashtbl(Datatype.String.Hashtbl)(Datatype.Int)
       (struct
         let name = "WpPropertyNames"
@@ -253,7 +258,7 @@ end = struct
         let size = 97
       end)
 
-  let base_id_prop_txt = Property.Names.get_prop_name_id
+  let base_id_prop_txt = Property.LegacyNames.get_prop_name_id
 
   let basename_of_prop_id p =
     match p.p_kind , p.p_prop with
@@ -316,6 +321,90 @@ end = struct
       unique_name
 
 end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Naming Properties                                                  --- *)
+(* -------------------------------------------------------------------------- *)
+
+module Names:
+sig
+  val get_prop_id_name: prop_id -> string
+end =
+struct
+
+  module NamesTbl = State_builder.Hashtbl(Datatype.String.Hashtbl)(Datatype.Int)
+      (struct
+        let name = "Wp.WpPropId.Names.NamesTbl"
+        let dependencies = [ ]
+        let size = 97
+      end)
+
+  module IndexTbl =
+    State_builder.Hashtbl(Property.Hashtbl)(Datatype.String)
+      (struct
+        let name = "Wp.WpPropId.Names.IndexTbl"
+        let dependencies =
+          [ Ast.self;
+            NamesTbl.self;
+            Globals.Functions.self;
+            Annotations.code_annot_state;
+            Annotations.funspec_state;
+            Annotations.global_state ]
+        let size = 97
+      end)
+
+  let compute_ip ip =
+    let truncate = max 20 (Wp_parameters.TruncPropIdFileName.get ()) in
+    let basename = Property.Names.get_prop_basename ~truncate ip in
+    try
+      let speed_up_start = NamesTbl.find basename in
+      let n,unique_name = Extlib.make_unique_name
+          NamesTbl.mem ~sep:"_" ~start:speed_up_start basename
+      in NamesTbl.replace basename (succ n) ;
+      unique_name
+    with Not_found -> (* first time that basename is reserved *)
+      NamesTbl.add basename 2 ; basename
+
+  let get_ip ip =
+    try IndexTbl.find ip
+    with Not_found -> (* first time we are asking for a name for that [ip] *)
+      let unique_name = compute_ip ip in
+      IndexTbl.add ip unique_name ;
+      unique_name
+
+  let get_prop_id_base p =
+    match p.p_kind , p.p_prop with
+    | (PKTactic | PKCheck | PKProp | PKPropLoop) , p -> get_ip p
+    | PKEstablished , p -> get_ip p ^ "_established"
+    | PKPreserved , p -> get_ip p ^ "_preserved"
+    | PKVarDecr , p -> get_ip p ^ "_decrease"
+    | PKVarPos , p -> get_ip p ^ "_positive"
+    | PKAFctOut , p -> get_ip p ^ "_normal"
+    | PKAFctExit , p -> get_ip p ^ "_exit"
+    | PKPre(_kf,stmt,pre) , _ ->
+        let kf_name_of_stmt =
+          Kernel_function.get_name
+            (Kernel_function.find_englobing_kf stmt)
+        in Printf.sprintf "%s_call_%s" kf_name_of_stmt (get_ip pre)
+
+  let get_prop_id_name p =
+    let basename = get_prop_id_base p in
+    match p.p_part with
+    | None -> basename
+    | Some(k,n) ->
+        if n < 10 then Printf.sprintf "%s_part%d" basename (succ k) else
+        if n < 100 then Printf.sprintf "%s_part%02d" basename (succ k) else
+        if n < 1000 then Printf.sprintf "%s_part%03d" basename (succ k) else
+          Printf.sprintf "%s_part%06d" basename (succ k)
+
+end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Naming Accessors                                                   --- *)
+(* -------------------------------------------------------------------------- *)
+
+let get_legacy = LegacyNames.get_prop_id_name
+(** Legacy property PO name *)
 
 let get_propid = Names.get_prop_id_name
 (** Name related to a property PO *)

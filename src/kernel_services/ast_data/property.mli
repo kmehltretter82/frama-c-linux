@@ -478,7 +478,7 @@ sig
   val self: State.t
 
   val get_prop_name_id: identified_property -> string
-    (** returns a unique name identifying the property.
+  (** returns a unique name identifying the property.
       This name is built from the basename of the property. 
       @modify Frama-C+dev new naming scheme, Cf. LegacyNames
   *)

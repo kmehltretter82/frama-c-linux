@@ -44,14 +44,14 @@
                                    "induction_loop_invariant": { "alt-ergo": 
                                                                    { "total": 1,
                                                                     "valid": 1,
-                                                                    "rank": 5 },
+                                                                    "rank": 4 },
                                                                  "qed": 
                                                                    { "total": 1,
                                                                     "valid": 1 },
                                                                  "wp:main": 
                                                                    { "total": 2,
                                                                     "valid": 2,
-                                                                    "rank": 5 } },
+                                                                    "rank": 4 } },
                                    "induction_assigns": { "qed": { "total": 3,
                                                                    "valid": 3 },
                                                           "wp:main": 

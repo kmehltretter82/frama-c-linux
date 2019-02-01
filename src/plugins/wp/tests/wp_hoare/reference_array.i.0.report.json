@@ -1,11 +1,10 @@
 { "wp:global": { "alt-ergo": { "total": 12, "valid": 12, "rank": 5 },
                  "qed": { "total": 24, "valid": 24 },
                  "wp:main": { "total": 36, "valid": 36, "rank": 5 } },
-  "wp:functions": { "reset_1_5": { "reset_5_requires_2": { "qed": { "total": 1,
-                                                                    "valid": 1 },
-                                                           "wp:main": 
-                                                             { "total": 1,
-                                                               "valid": 1 } },
+  "wp:functions": { "reset_1_5": { "reset_5_requires": { "qed": { "total": 1,
+                                                                  "valid": 1 },
+                                                         "wp:main": { "total": 1,
+                                                                    "valid": 1 } },
                                    "reset_1_5_assigns": { "qed": { "total": 2,
                                                                    "valid": 2 },
                                                           "wp:main": 
@@ -27,9 +26,9 @@
                                                    "wp:main": { "total": 4,
                                                                 "valid": 4,
                                                                 "rank": 5 } } },
-                    "load_1_5": { "load_5_requires_2": { "qed": { "total": 1,
-                                                                  "valid": 1 },
-                                                         "wp:main": { "total": 1,
+                    "load_1_5": { "load_5_requires": { "qed": { "total": 1,
+                                                                "valid": 1 },
+                                                       "wp:main": { "total": 1,
                                                                     "valid": 1 } },
                                   "load_1_5_assigns": { "qed": { "total": 2,
                                                                  "valid": 2 },
@@ -37,10 +36,10 @@
                                                                     "valid": 2 } },
                                   "load_1_5_ensures": { "alt-ergo": { "total": 1,
                                                                     "valid": 1,
-                                                                    "rank": 5 },
+                                                                    "rank": 4 },
                                                         "wp:main": { "total": 1,
                                                                     "valid": 1,
-                                                                    "rank": 5 } },
+                                                                    "rank": 4 } },
                                   "wp:section": { "alt-ergo": { "total": 1,
                                                                 "valid": 1,
                                                                 "rank": 4 },
@@ -49,20 +48,20 @@
                                                   "wp:main": { "total": 4,
                                                                "valid": 4,
                                                                "rank": 4 } } },
-                    "add_1_5": { "add_5_requires_2": { "qed": { "total": 1,
-                                                                "valid": 1 },
-                                                       "wp:main": { "total": 1,
-                                                                    "valid": 1 } },
+                    "add_1_5": { "add_5_requires": { "qed": { "total": 1,
+                                                              "valid": 1 },
+                                                     "wp:main": { "total": 1,
+                                                                  "valid": 1 } },
                                  "add_1_5_assigns": { "qed": { "total": 2,
                                                                "valid": 2 },
                                                       "wp:main": { "total": 2,
                                                                    "valid": 2 } },
                                  "add_1_5_ensures": { "alt-ergo": { "total": 1,
                                                                     "valid": 1,
-                                                                    "rank": 5 },
+                                                                    "rank": 4 },
                                                       "wp:main": { "total": 1,
                                                                    "valid": 1,
-                                                                   "rank": 5 } },
+                                                                   "rank": 4 } },
                                  "wp:section": { "alt-ergo": { "total": 1,
                                                                "valid": 1,
                                                                "rank": 4 },
@@ -71,19 +70,19 @@
                                                  "wp:main": { "total": 4,
                                                               "valid": 4,
                                                               "rank": 4 } } },
-                    "calls_on_array_dim_1": { "add_5_requires_3": { "qed": 
+                    "calls_on_array_dim_1": { "add_5_requires_2": { "qed": 
                                                                     { "total": 1,
                                                                     "valid": 1 },
                                                                     "wp:main": 
                                                                     { "total": 1,
                                                                     "valid": 1 } },
-                                              "reset_5_requires_3": { "qed": 
+                                              "reset_5_requires_2": { "qed": 
                                                                     { "total": 1,
                                                                     "valid": 1 },
                                                                     "wp:main": 
                                                                     { "total": 1,
                                                                     "valid": 1 } },
-                                              "load_5_requires_3": { "qed": 
+                                              "load_5_requires_2": { "qed": 
                                                                     { "total": 1,
                                                                     "valid": 1 },
                                                                     "wp:main": 
@@ -126,17 +125,17 @@
                                                                 { "total": 8,
                                                                   "valid": 8,
                                                                   "rank": 3 } } },
-                    "calls_on_array_dim_2_to_1": { "add_5_requires_4": 
+                    "calls_on_array_dim_2_to_1": { "add_5_requires_3": 
                                                      { "qed": { "total": 1,
                                                                 "valid": 1 },
                                                        "wp:main": { "total": 1,
                                                                     "valid": 1 } },
-                                                   "reset_5_requires_4": 
+                                                   "reset_5_requires_3": 
                                                      { "qed": { "total": 1,
                                                                 "valid": 1 },
                                                        "wp:main": { "total": 1,
                                                                     "valid": 1 } },
-                                                   "load_5_requires_4": 
+                                                   "load_5_requires_3": 
                                                      { "qed": { "total": 1,
                                                                 "valid": 1 },
                                                        "wp:main": { "total": 1,
@@ -178,22 +177,24 @@
                                                                     { "total": 8,
                                                                     "valid": 8,
                                                                     "rank": 3 } } },
-                    "calls_on_array_dim_2": { "add_1_5_requires_2": { "qed": 
+                    "calls_on_array_dim_2": { "add_1_5_requires": { "qed": 
                                                                     { "total": 1,
                                                                     "valid": 1 },
                                                                     "wp:main": 
                                                                     { "total": 1,
                                                                     "valid": 1 } },
-                                              "reset_1_5_requires_2": 
-                                                { "qed": { "total": 1,
-                                                           "valid": 1 },
-                                                  "wp:main": { "total": 1,
-                                                               "valid": 1 } },
-                                              "load_1_5_requires_2": 
-                                                { "qed": { "total": 1,
-                                                           "valid": 1 },
-                                                  "wp:main": { "total": 1,
-                                                               "valid": 1 } },
+                                              "reset_1_5_requires": { "qed": 
+                                                                    { "total": 1,
+                                                                    "valid": 1 },
+                                                                    "wp:main": 
+                                                                    { "total": 1,
+                                                                    "valid": 1 } },
+                                              "load_1_5_requires": { "qed": 
+                                                                    { "total": 1,
+                                                                    "valid": 1 },
+                                                                    "wp:main": 
+                                                                    { "total": 1,
+                                                                    "valid": 1 } },
                                               "calls_on_array_dim_2_assigns": 
                                                 { "qed": { "total": 2,
                                                            "valid": 2 },

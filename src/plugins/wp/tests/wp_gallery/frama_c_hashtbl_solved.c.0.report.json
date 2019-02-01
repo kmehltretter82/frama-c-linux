@@ -254,10 +254,10 @@
                                               "wp:main": { "total": 18,
                                                            "valid": 18,
                                                            "rank": 31 } } },
-                    "add": { "hash_requires_2": { "qed": { "total": 1,
-                                                           "valid": 1 },
-                                                  "wp:main": { "total": 1,
-                                                               "valid": 1 } },
+                    "add": { "hash_requires": { "qed": { "total": 1,
+                                                         "valid": 1 },
+                                                "wp:main": { "total": 1,
+                                                             "valid": 1 } },
                              "add_disjoint_full_nominal": { "alt-ergo": 
                                                               { "total": 1,
                                                                 "valid": 1,
@@ -450,21 +450,20 @@
                                              "wp:main": { "total": 54,
                                                           "valid": 54,
                                                           "rank": 45 } } },
-                    "mem_binding": { "eq_string_requires_4": { "alt-ergo": 
+                    "mem_binding": { "eq_string_requires_2": { "alt-ergo": 
                                                                  { "total": 1,
                                                                    "valid": 1,
-                                                                   "rank": 28 },
+                                                                   "rank": 27 },
                                                                "wp:main": 
                                                                  { "total": 1,
                                                                    "valid": 1,
-                                                                   "rank": 28 } },
-                                     "eq_string_requires_3": { "qed": 
-                                                                 { "total": 1,
-                                                                   "valid": 1 },
-                                                               "wp:main": 
-                                                                 { "total": 1,
-                                                                   "valid": 1 } },
-                                     "hash_requires_3": { "qed": { "total": 1,
+                                                                   "rank": 27 } },
+                                     "eq_string_requires": { "qed": { "total": 1,
+                                                                    "valid": 1 },
+                                                             "wp:main": 
+                                                               { "total": 1,
+                                                                 "valid": 1 } },
+                                     "hash_requires_2": { "qed": { "total": 1,
                                                                    "valid": 1 },
                                                           "wp:main": 
                                                             { "total": 1,
@@ -478,9 +477,9 @@
                                      "mem_binding_complete_not_found_found": 
                                        { "alt-ergo": { "total": 1,
                                                        "valid": 1,
-                                                       "rank": 18 },
+                                                       "rank": 19 },
                                          "wp:main": { "total": 1, "valid": 1,
-                                                      "rank": 18 } },
+                                                      "rank": 19 } },
                                      "mem_binding_assert_rte_signed_overflow": 
                                        { "alt-ergo": { "total": 1,
                                                        "valid": 1,

@@ -70,17 +70,17 @@
                                                                "valid": 8 },
                                                       "wp:main": { "total": 8,
                                                                    "valid": 8 } } },
-                    "call_ref_valid": { "ref_valid_requires_3": { "qed": 
+                    "call_ref_valid": { "ref_valid_requires_2": { "qed": 
                                                                     { "total": 1,
                                                                     "valid": 1 },
                                                                   "wp:main": 
                                                                     { "total": 1,
                                                                     "valid": 1 } },
-                                        "ref_valid_requires_2": { "qed": 
-                                                                    { "total": 1,
+                                        "ref_valid_requires": { "qed": 
+                                                                  { "total": 1,
                                                                     "valid": 1 },
-                                                                  "wp:main": 
-                                                                    { "total": 1,
+                                                                "wp:main": 
+                                                                  { "total": 1,
                                                                     "valid": 1 } },
                                         "call_ref_valid_assigns": { "qed": 
                                                                     { "total": 8,
@@ -124,10 +124,10 @@
                                                                  "valid": 9 },
                                                         "wp:main": { "total": 9,
                                                                     "valid": 9 } } },
-                    "call_ref_ctr_nr": { "ref_ctr_nr_requires_2": { "qed": 
+                    "call_ref_ctr_nr": { "ref_ctr_nr_requires": { "qed": 
                                                                     { "total": 1,
                                                                     "valid": 1 },
-                                                                    "wp:main": 
+                                                                  "wp:main": 
                                                                     { "total": 1,
                                                                     "valid": 1 } },
                                          "call_ref_ctr_nr_assigns": { "qed": 

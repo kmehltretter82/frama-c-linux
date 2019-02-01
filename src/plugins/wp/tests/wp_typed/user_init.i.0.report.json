@@ -15,13 +15,13 @@
                               "init_loop_invariant_Range": { "alt-ergo": 
                                                                { "total": 1,
                                                                  "valid": 1,
-                                                                 "rank": 5 },
+                                                                 "rank": 4 },
                                                              "qed": { "total": 1,
                                                                     "valid": 1 },
                                                              "wp:main": 
                                                                { "total": 2,
                                                                  "valid": 2,
-                                                                 "rank": 5 } },
+                                                                 "rank": 4 } },
                               "init_assigns": { "qed": { "total": 1,
                                                          "valid": 1 },
                                                 "wp:main": { "total": 1,

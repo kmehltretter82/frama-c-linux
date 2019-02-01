@@ -8,8 +8,8 @@
 [wp] [Qed] Goal typed_lemma_sizeof_uint64_t_ok : Valid
 [wp] [Alt-Ergo] Goal typed_BinaryMultiplication_ensures_product : Valid
 [wp] [Alt-Ergo] Goal typed_BinaryMultiplication_assert_a1_ok_deductible : Valid
-[wp] [Alt-Ergo] Goal typed_BinaryMultiplication_loop_invariant_inv2_ok_deductible_pr___ : Valid
-[wp] [Alt-Ergo] Goal typed_BinaryMultiplication_loop_invariant_inv2_ok_deductible_es___ : Valid
+[wp] [Alt-Ergo] Goal typed_BinaryMultiplication_loop_invariant_inv2_ok_deductible_preserved : Valid
+[wp] [Alt-Ergo] Goal typed_BinaryMultiplication_loop_invariant_inv2_ok_deductible_established : Valid
 [wp] [Qed] Goal typed_BinaryMultiplication_loop_assigns : Valid
 [wp] [Alt-Ergo] Goal typed_BinaryMultiplication_loop_variant_decrease : Valid
 [wp] [Alt-Ergo] Goal typed_BinaryMultiplication_loop_variant_positive : Valid
@@ -22,7 +22,7 @@ Axiomatics          WP     Alt-Ergo        Total   Success
 Axiomatic mult       2     -                 2       100%
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
-BinaryMultiplication   1    6 (56..80)       7       100%
+BinaryMultiplication   1    6 (64..88)       7       100%
 -------------------------------------------------------------
 [wp] Running WP plugin...
 [rte] annotating function BinaryMultiplication
@@ -31,8 +31,8 @@ BinaryMultiplication   1    6 (56..80)       7       100%
 [wp] [Qed] Goal typed_lemma_sizeof_uint64_t_ok : Valid
 [wp] [Alt-Ergo] Goal typed_BinaryMultiplication_ensures_product : Valid
 [wp] [Alt-Ergo] Goal typed_BinaryMultiplication_assert_a1_ok_deductible : Valid
-[wp] [Alt-Ergo] Goal typed_BinaryMultiplication_loop_invariant_inv2_ok_deductible_pr___ : Valid
-[wp] [Alt-Ergo] Goal typed_BinaryMultiplication_loop_invariant_inv2_ok_deductible_es___ : Valid
+[wp] [Alt-Ergo] Goal typed_BinaryMultiplication_loop_invariant_inv2_ok_deductible_preserved : Valid
+[wp] [Alt-Ergo] Goal typed_BinaryMultiplication_loop_invariant_inv2_ok_deductible_established : Valid
 [wp] [Alt-Ergo] Goal typed_BinaryMultiplication_assert_rte_unsigned_overflow : Valid
 [wp] [Alt-Ergo] Goal typed_BinaryMultiplication_assert_rte_unsigned_overflow_2 : Valid
 [wp] [Alt-Ergo] Goal typed_BinaryMultiplication_assert_rte_unsigned_overflow_3 : Valid
@@ -49,5 +49,5 @@ Axiomatics          WP     Alt-Ergo        Total   Success
 Axiomatic mult       2     -                 2       100%
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
-BinaryMultiplication   1   10 (56..80)      11       100%
+BinaryMultiplication   1   10 (64..88)      11       100%
 -------------------------------------------------------------

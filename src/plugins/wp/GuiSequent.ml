@@ -526,6 +526,9 @@ class focused (wtext : Wtext.text) =
     method get_state_mode = pcond#get_state
     method set_state_mode = pcond#set_state
 
+    method set_iformat = plang#set_iformat
+    method get_iformat = plang#get_iformat
+
     method selected =
       begin
         self#set_target self#selection ;

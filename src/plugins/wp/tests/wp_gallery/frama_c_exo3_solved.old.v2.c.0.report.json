@@ -1,6 +1,6 @@
-{ "wp:global": { "alt-ergo": { "total": 23, "valid": 23, "rank": 38 },
+{ "wp:global": { "alt-ergo": { "total": 23, "valid": 23, "rank": 39 },
                  "qed": { "total": 28, "valid": 28 },
-                 "wp:main": { "total": 51, "valid": 51, "rank": 38 } },
+                 "wp:main": { "total": 51, "valid": 51, "rank": 39 } },
   "wp:functions": { "equal_elements": { "equal_elements_assert_rte_signed_overflow_2": 
                                           { "alt-ergo": { "total": 1,
                                                           "valid": 1,
@@ -212,9 +212,9 @@
                                                          "rank": 14 } },
                                         "wp:section": { "alt-ergo": { "total": 23,
                                                                     "valid": 23,
-                                                                    "rank": 38 },
+                                                                    "rank": 39 },
                                                         "qed": { "total": 28,
                                                                  "valid": 28 },
                                                         "wp:main": { "total": 51,
                                                                     "valid": 51,
-                                                                    "rank": 38 } } } } }
+                                                                    "rank": 39 } } } } }

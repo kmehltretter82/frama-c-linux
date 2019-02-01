@@ -8,19 +8,19 @@
 [wp] [Alt-Ergo] Goal typed_caller_ensures_P1 : Valid
 [wp] [Alt-Ergo] Goal typed_caller_ensures_P2 : Valid
 [wp] [Alt-Ergo] Goal typed_caller_call_job_requires : Valid
-[wp] [Alt-Ergo] Goal typed_caller_call_job_requires_2 : Valid
+[wp] [Alt-Ergo] Goal typed_caller_call_job_requires : Valid
 [wp] [Qed] Goal typed_caller2_ensures_K : Valid
 [wp] [Alt-Ergo] Goal typed_caller2_ensures_Q1 : Valid
 [wp] [Alt-Ergo] Goal typed_caller2_ensures_Q2 : Valid
 [wp] [Alt-Ergo] Goal typed_caller2_ensures_R : Valid
 [wp] [Alt-Ergo] Goal typed_caller2_call_job2_requires : Valid
-[wp] [Alt-Ergo] Goal typed_caller2_call_job2_requires_2 : Valid
+[wp] [Alt-Ergo] Goal typed_caller2_call_job2_requires : Valid
 [wp] [Qed] Goal typed_caller3_ensures_K : Valid
 [wp] [Alt-Ergo] Goal typed_caller3_ensures_Q1 : Valid
 [wp] [Alt-Ergo] Goal typed_caller3_ensures_Q2 : Valid
 [wp] [Alt-Ergo] Goal typed_caller3_ensures_R : Valid
 [wp] [Alt-Ergo] Goal typed_caller3_call_job3_requires : Valid
-[wp] [Alt-Ergo] Goal typed_caller3_call_job3_requires_2 : Valid
+[wp] [Alt-Ergo] Goal typed_caller3_call_job3_requires : Valid
 [wp] [Qed] Goal typed_job_ensures_K : Valid
 [wp] [Qed] Goal typed_job_ensures_P : Valid
 [wp] [Qed] Goal typed_job_assigns_part1 : Valid
@@ -46,6 +46,6 @@ job                  5     -                 5       100%
 job2                 5     -                 5       100%
 job3                 4      1 (16..28)       5       100%
 caller               1      4 (32..44)       5       100%
-caller2              1      5 (44..56)       6       100%
-caller3              1      5 (44..56)       6       100%
+caller2              1      5 (48..60)       6       100%
+caller3              1      5 (48..60)       6       100%
 -------------------------------------------------------------

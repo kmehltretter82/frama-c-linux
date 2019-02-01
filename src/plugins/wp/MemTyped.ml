@@ -149,7 +149,6 @@ let a_addr b k = a_shift (a_global b) k
 (* --- Qed Simplifiers                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
-
 (*
     Pointer arithmetic for structure access and array access could be
     defined directly using the record [{ base = p.base; offset = p.offset
@@ -367,6 +366,7 @@ let phi_addr_of_int p =
 (* -------------------------------------------------------------------------- *)
 (* --- Simplifier Registration                                            --- *)
 (* -------------------------------------------------------------------------- *)
+
 let () = Context.register
     begin fun () ->
       F.set_builtin_1   f_base   phi_base ;
@@ -1030,7 +1030,7 @@ let load sigma obj l = Val (loadvalue sigma obj l)
 (* --- Locations                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-let null = a_null
+let null = a_null (* as a loc *)
 
 let literal ~eid cst =
   shift (a_global (STRING.get (eid,cst))) (C_int (Ctypes.c_char ())) e_zero

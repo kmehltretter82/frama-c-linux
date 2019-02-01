@@ -1,6 +1,6 @@
-{ "wp:global": { "alt-ergo": { "total": 5, "valid": 5, "rank": 11 },
+{ "wp:global": { "alt-ergo": { "total": 5, "valid": 5, "rank": 13 },
                  "qed": { "total": 7, "valid": 7 },
-                 "wp:main": { "total": 12, "valid": 12, "rank": 11 } },
+                 "wp:main": { "total": 12, "valid": 12, "rank": 13 } },
   "wp:functions": { "reset": { "reset_loop_invariant_3": { "alt-ergo": 
                                                              { "total": 1,
                                                                "valid": 1,
@@ -24,12 +24,12 @@
                                "reset_loop_invariant": { "alt-ergo": 
                                                            { "total": 1,
                                                              "valid": 1,
-                                                             "rank": 4 },
+                                                             "rank": 5 },
                                                          "qed": { "total": 1,
                                                                   "valid": 1 },
                                                          "wp:main": { "total": 2,
                                                                     "valid": 2,
-                                                                    "rank": 4 } },
+                                                                    "rank": 5 } },
                                "reset_assigns": { "qed": { "total": 1,
                                                            "valid": 1 },
                                                   "wp:main": { "total": 1,
@@ -52,9 +52,9 @@
                                                                "rank": 5 } },
                                "wp:section": { "alt-ergo": { "total": 5,
                                                              "valid": 5,
-                                                             "rank": 11 },
+                                                             "rank": 13 },
                                                "qed": { "total": 7,
                                                         "valid": 7 },
                                                "wp:main": { "total": 12,
                                                             "valid": 12,
-                                                            "rank": 11 } } } } }
+                                                            "rank": 13 } } } } }

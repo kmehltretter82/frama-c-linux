@@ -13,13 +13,13 @@
                            "wp:section": { "qed": { "total": 6, "valid": 6 },
                                            "wp:main": { "total": 6,
                                                         "valid": 6 } } },
-                    "unreachable_smt_with_contract": { "f_with_precond_requires_ok_2": 
+                    "unreachable_smt_with_contract": { "f_with_precond_requires_ok": 
                                                          { "qed": { "total": 1,
                                                                     "valid": 1 },
                                                            "wp:main": 
                                                              { "total": 1,
                                                                "valid": 1 } },
-                                                       "unreachable_smt_with_contract_ensures_ok_2": 
+                                                       "unreachable_smt_with_contract_ensures_ok": 
                                                          { "qed": { "total": 1,
                                                                     "valid": 1 },
                                                            "wp:main": 

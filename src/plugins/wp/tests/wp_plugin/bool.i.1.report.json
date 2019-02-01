@@ -16,11 +16,11 @@
                     "bor_bool": { "bor_bool_false_ensures": { "alt-ergo": 
                                                                 { "total": 1,
                                                                   "valid": 1,
-                                                                  "rank": 3 },
+                                                                  "rank": 4 },
                                                               "wp:main": 
                                                                 { "total": 1,
                                                                   "valid": 1,
-                                                                  "rank": 3 } },
+                                                                  "rank": 4 } },
                                   "bor_bool_true_ensures": { "alt-ergo": 
                                                                { "total": 1,
                                                                  "valid": 1,
@@ -31,10 +31,10 @@
                                                                  "rank": 2 } },
                                   "wp:section": { "alt-ergo": { "total": 2,
                                                                 "valid": 2,
-                                                                "rank": 2 },
+                                                                "rank": 4 },
                                                   "wp:main": { "total": 2,
                                                                "valid": 2,
-                                                               "rank": 2 } } },
+                                                               "rank": 4 } } },
                     "band_bool": { "band_bool_false_ensures": { "alt-ergo": 
                                                                   { "total": 1,
                                                                     "valid": 1,
@@ -73,9 +73,9 @@
                                                                    "valid": 1 } },
                                    "wp:section": { "alt-ergo": { "total": 1,
                                                                  "valid": 1,
-                                                                 "rank": 2 },
+                                                                 "rank": 3 },
                                                    "qed": { "total": 1,
                                                             "valid": 1 },
                                                    "wp:main": { "total": 2,
                                                                 "valid": 2,
-                                                                "rank": 2 } } } } }
+                                                                "rank": 3 } } } } }

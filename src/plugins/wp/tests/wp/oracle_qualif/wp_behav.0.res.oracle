@@ -60,7 +60,7 @@
 Functions           WP     Alt-Ergo        Total   Success
 f                    5     -                 5       100%
 min                  4     -                 4       100%
-bhv                  2      1 (1..12)        3       100%
+bhv                  2      1 (8..20)        3       100%
 stmt_contract        3     -                 3       100%
 stmt_contract_label   2    -                 2       100%
 stmt_contract_assigns   5   -                5       100%
@@ -68,7 +68,7 @@ local_named_behavior   2   -                 2       100%
 assert_needed        1     -                 2      50.0%
 bts0513             -      -                 2       0.0%
 stmt_assigns         1     -                 2      50.0%
-razT                 1      1 (8..20)        3      66.7%
+razT                 1      1 (12..24)       3      66.7%
 more_stmt_assigns    3     -                 3       100%
 part_stmt_bhv        1     -                 2      50.0%
 -------------------------------------------------------------

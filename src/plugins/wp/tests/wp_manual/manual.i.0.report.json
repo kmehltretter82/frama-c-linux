@@ -1,6 +1,6 @@
-{ "wp:global": { "alt-ergo": { "total": 1, "valid": 1, "rank": 3 },
+{ "wp:global": { "alt-ergo": { "total": 1, "valid": 1, "rank": 4 },
                  "qed": { "total": 1, "valid": 1 },
-                 "wp:main": { "total": 2, "valid": 2, "rank": 3 } },
+                 "wp:main": { "total": 2, "valid": 2, "rank": 4 } },
   "wp:functions": { "swap": { "swap_ensures_B": { "qed": { "total": 1,
                                                            "valid": 1 },
                                                   "wp:main": { "total": 1,
@@ -13,9 +13,9 @@
                                                                "rank": 4 } },
                               "wp:section": { "alt-ergo": { "total": 1,
                                                             "valid": 1,
-                                                            "rank": 3 },
+                                                            "rank": 4 },
                                               "qed": { "total": 1,
                                                        "valid": 1 },
                                               "wp:main": { "total": 2,
                                                            "valid": 2,
-                                                           "rank": 3 } } } } }
+                                                           "rank": 4 } } } } }

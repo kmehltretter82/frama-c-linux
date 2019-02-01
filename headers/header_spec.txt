@@ -667,6 +667,8 @@ src/libraries/utils/pretty_utils.ml: CEA_LGPL
 src/libraries/utils/pretty_utils.mli: CEA_LGPL
 src/libraries/utils/qstack.ml: CEA_LGPL
 src/libraries/utils/qstack.mli: CEA_LGPL
+src/libraries/utils/sanitizer.ml: CEA_LGPL
+src/libraries/utils/sanitizer.mli: CEA_LGPL
 src/libraries/utils/rangemap.ml: OCAML_STDLIB
 src/libraries/utils/rangemap.mli: OCAML_STDLIB
 src/libraries/utils/rgmap.ml: CEA_LGPL

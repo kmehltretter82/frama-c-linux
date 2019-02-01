@@ -35,30 +35,38 @@ type mode = [ `Refresh | `Autofocus | `ViewModel | `ViewAll | `ViewRaw ]
 
 module Config = Gtk_helper.Configuration
 
-class autofocus =
-  let options = [
-    `Refresh , "Refresh" ;
-    `Autofocus , "Autofocus" ;
-    `ViewAll , "Full Context" ;
-    `ViewModel , "Unmangled Memory" ;
-    `ViewRaw , "Raw Obligation" ;
-  ] in
-  let values = [
-    `Refresh , "REFRESH" ;
-    `Autofocus , "AUTOFOCUS" ;
-    `ViewAll , "VIEW_ALL" ;
-    `ViewModel , "VIEW_MODEL" ;
-    `ViewRaw , "VIEW_RAW" ;
-  ] in
+class ['a] menu ~(data : ('a * string * string) list) ~key ~default =
+  let options = List.map (fun (v,d,_) -> v,d) data in
+  let values = List.map (fun (v,_,k) -> v,k) data in
   object(self)
-    inherit [mode] Widget.menu ~default:`Autofocus ~options ()
+    inherit ['a] Widget.menu ~default ~options ()
     initializer
-      Wutil.later
-        begin fun () ->
-          Config.config_values
-            ~key:"GuiGoal.autofocus"
-            ~default:`Autofocus ~values self
-        end
+      Wutil.later (fun () -> Config.config_values ~key ~default ~values self)
+  end
+
+
+class autofocus =
+  object inherit [mode] menu
+      ~key:"GuiGoal.autofocus"
+      ~default:`Autofocus
+      ~data:[
+        `Refresh , "Refresh" , "REFRESH" ;
+        `Autofocus , "Autofocus" , "AUTOFOCUS" ;
+        `ViewAll , "Full Context" , "VIEW_ALL" ;
+        `ViewModel , "Unmangled Memory" , "VIEW_MODEL" ;
+        `ViewRaw , "Raw Obligation" , "VIEW_RAW" ;
+      ]
+  end
+
+class iformat =
+  object inherit [Plang.iformat] menu
+      ~key:"GuiGoal.iformat"
+      ~default:`Dec
+      ~data:[
+        `Dec , "Decimal" , "DEC" ;
+        `Hex , "Hexa" , "HEX" ;
+        `Bin , "Binary" , "BIN" ;
+      ]
   end
 
 (* -------------------------------------------------------------------------- *)
@@ -97,6 +105,7 @@ class pane (proverpane : GuiConfig.provers) =
   let save_script = new Widget.button
     ~icon:`SAVE ~tooltip:"Save Script" () in
   let autofocus = new autofocus in
+  let iformat = new iformat in
   let strategies = new GuiTactic.strategies () in
   object(self)
 
@@ -109,7 +118,8 @@ class pane (proverpane : GuiConfig.provers) =
         let toolbar =
           Wbox.(toolbar
                   [ w prev ; w next ; w cancel ; w forward ;
-                    w autofocus ; w play_script ; w save_script ;
+                    w autofocus ; w iformat ;
+                    w play_script ; w save_script ;
                     w ~padding:6 icon ; h ~padding:6 status ]
                   [ w help ; w delete ]) in
         layout#populate (Wbox.panel ~top:toolbar ~right:scroll_palette_widget text) ;
@@ -140,6 +150,7 @@ class pane (proverpane : GuiConfig.provers) =
         save_script#connect (fun () -> self#save_script) ;
         play_script#connect (fun () -> self#play_script) ;
         autofocus#connect self#autofocus ;
+        iformat#connect self#iformat ;
         composer#connect (fun () -> self#update) ;
         browser#connect (fun () -> self#update) ;
         help#connect (fun () -> self#open_help) ;
@@ -208,6 +219,8 @@ class pane (proverpane : GuiConfig.provers) =
           | `Leaf (k,_) -> ProofEngine.goto p (`Leaf(f k)) ; self#update
           | `Main | `Internal _ -> ()
 
+    method private iformat f = printer#set_iformat f ; self#update
+
     method private autofocus = function
       | `Autofocus ->
           printer#set_focus_mode true ;
@@ -242,6 +255,7 @@ class pane (proverpane : GuiConfig.provers) =
       | Proof p ->
           ProofEngine.reset p ;
           ProverScript.spawn
+            ~provers:[ VCS.AltErgo ]
             ~result:
               (fun wpo prv res ->
                  text#printf "[%a] %a : %a@."

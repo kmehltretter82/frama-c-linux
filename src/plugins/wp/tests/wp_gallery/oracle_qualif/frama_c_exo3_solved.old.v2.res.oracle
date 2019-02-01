@@ -45,7 +45,7 @@
 [wp] Report 'tests/wp_gallery/frama_c_exo3_solved.old.v2.c.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
-equal_elements      17     18 (272..320)    35       100%
+equal_elements      17     18 (288..336)    35       100%
 -------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'equal_elements':
   /*@
@@ -115,7 +115,7 @@ equal_elements      17     18 (272..320)    35       100%
 [wp] Report 'tests/wp_gallery/frama_c_exo3_solved.old.v2.c.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
-equal_elements      28     23 (272..320)    51       100%
+equal_elements      28     23 (288..336)    51       100%
 -------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'equal_elements':
   /*@

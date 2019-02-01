@@ -102,6 +102,7 @@ open Task
 
 module Env =
 struct
+
   type t = {
     tree : ProofEngine.tree ;
     valid : bool ; (* play valid provers *)
@@ -410,6 +411,7 @@ type 'a process =
 let skip1 _ = ()
 let skip2 _ _ = ()
 let skip3 _ _ _ = ()
+
 let prove
     ?(valid = true) ?(failed = true) ?(provers = [])
     ?(depth = 0) ?(width = 0) ?(backtrack = 0) ?(auto = [])
