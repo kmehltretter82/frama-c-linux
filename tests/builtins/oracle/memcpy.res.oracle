@@ -1690,6 +1690,8 @@
 --- Properties of Function 'bzero'
 --------------------------------------------------------------------------------
 
+[ Extern  ] Post-condition 's_initialized,initialization'
+            Unverifiable but considered Valid.
 [ Extern  ] Post-condition 'zero_initialized'
             Unverifiable but considered Valid.
 [ Extern  ] Assigns (file share/libc/strings.h, line 37)
@@ -1705,7 +1707,7 @@
 
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/strings.h, line 47)
+[ Extern  ] Froms (file share/libc/strings.h, line 48)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1716,7 +1718,7 @@
 
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/strings.h, line 54)
+[ Extern  ] Froms (file share/libc/strings.h, line 55)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -2133,8 +2135,8 @@
 --- Status Report Summary
 --------------------------------------------------------------------------------
    156 Completely validated
-   215 Considered valid
+   216 Considered valid
     29 To be validated
      4 Alarms emitted
-   404 Total
+   405 Total
 --------------------------------------------------------------------------------
