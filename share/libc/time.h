@@ -105,7 +105,7 @@ extern time_t mktime(struct tm *timeptr);
 extern time_t time(time_t *timer);
 
 char __fc_ctime[26];
-char * const  __fc_p_ctime = &__fc_ctime;
+char * const  __fc_p_ctime = __fc_ctime;
 
 extern char *asctime(const struct tm *timeptr);
 
