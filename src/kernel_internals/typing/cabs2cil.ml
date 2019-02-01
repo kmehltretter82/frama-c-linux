@@ -1163,21 +1163,23 @@ end
 let constFoldType (t:typ) : typ =
   visitCilType constFoldTypeVisitor t
 
-let get_temp_name () =
+let get_temp_name ?(ghost=false) () =
   let undolist = ref [] in
   let data = CurrentLoc.get() in
+  let name = if ghost then "g_tmp" else "tmp" in
   let name, _ =
-    Alpha.newAlphaName ~alphaTable ~undolist ~lookupname:"tmp" ~data
+    Alpha.newAlphaName ~alphaTable ~undolist ~lookupname:name ~data
   in
   let undolist = !undolist in
   Alpha.undoAlphaChanges ~alphaTable ~undolist;
   name
 
 (* Create a new temporary variable *)
-let newTempVar descr (descrpure:bool) typ =
+let newTempVar ~ghost descr (descrpure:bool) typ =
   let t' = (!typeForInsertedVar) typ in
-  let name = get_temp_name () in
+  let name = get_temp_name ~ghost () in
   let vi = makeVarinfo ~temp:true false false name t' in
+  vi.vghost <- ghost;
   vi.vdescr <- Some descr;
   vi.vdescrpure <- descrpure;
   alphaConvertVarAndAddToEnv false vi
@@ -1565,7 +1567,7 @@ struct
               match Cil_datatype.Varinfo.Hashtbl.find_opt replacements vi with
               | None ->
                 let vi' =
-                  newTempVar (vi.vname ^ " initialization") true vi.vtype
+                  newTempVar (vi.vname ^ " initialization") ~ghost true vi.vtype
                 in
                 Cil_datatype.Varinfo.Hashtbl.add replacements vi vi';
                 vars := vi' :: !vars;
@@ -6157,7 +6159,7 @@ and doExp local_env
                   Format.asprintf "%a%s"
                     Cil_descriptive_printer.pp_exp  e'
                     (if uop = A.POSINCR then "++" else "--") in
-                let tmp = newTempVar descr true t in
+                let tmp = newTempVar ~ghost descr true t in
                 ([var tmp],
                  local_var_chunk se' tmp +++
                  (mkStmtOneInstr ~ghost:local_env.is_ghost ~valid_sid
@@ -6239,7 +6241,7 @@ and doExp local_env
                 let descr =
                   Format.asprintf "%a" Cil_descriptive_printer.pp_lval lv
                 in
-                let tmp = newTempVar descr true lvt in
+                let tmp = newTempVar ~ghost descr true lvt in
                 let chunk =
                   i2c
                     (mkStmtOneInstr ~ghost:local_env.is_ghost ~valid_sid
@@ -6361,7 +6363,7 @@ and doExp local_env
           finishExp [] se e' intType
         | _ ->
           let tmp =
-            newTempVar "<boolean expression>" true intType
+            newTempVar ~ghost "<boolean expression>" true intType
           in
           let condChunk =
             compileCondExp ~ghost ce
@@ -6720,7 +6722,7 @@ and doExp local_env
                      match !pwhat with
                      | ASet (is_real,lv, r, lvt) -> is_real, lv, r, lvt
                      | _ ->
-                       let v = newTempVar "vararg" true resTyp in
+                       let v = newTempVar ~ghost "vararg" true resTyp in
                        locals := v::!locals;
                        false, var v, [], resTyp
                    in
@@ -7023,7 +7025,7 @@ and doExp local_env
                    Cil_descriptive_printer.pp_exp)
                 !pargs
             in
-            let tmp = newTempVar descr false restype'' in
+            let tmp = newTempVar ~ghost descr false restype'' in
             tmp.vdecl <- loc;
             locals:=tmp::!locals;
             (* Remember that this variable has been created for this
@@ -7163,7 +7165,7 @@ and doExp local_env
                let descr =
                  Format.asprintf "%a" Cprint.print_expression e1
                in
-               let tmp = newTempVar descr true tresult in
+               let tmp = newTempVar ~ghost descr true tresult in
                let tmp_var = var tmp in
                let tmp_lval = new_exp ~loc:e.expr_loc (Lval (tmp_var)) in
                let (r1, se1, _, _) =
@@ -7232,7 +7234,7 @@ and doExp local_env
                 let descr =
                   Format.asprintf "%a" Cprint.print_expression e1
                 in
-                let tmp = newTempVar descr true tresult in
+                let tmp = newTempVar ~ghost descr true tresult in
                 let tmp_var = var tmp in
                 let tmp_lval = new_exp ~loc:e.expr_loc (Lval (tmp_var)) in
                 let (r1,se1, _, _) =
@@ -7261,7 +7263,7 @@ and doExp local_env
                         Cil_descriptive_printer.pp_exp e2'
                         Cil_descriptive_printer.pp_exp e3'
                     in
-                    let tmp = newTempVar descr true tresult in
+                    let tmp = newTempVar ~ghost descr true tresult in
                     false, var tmp, [], tresult,
                     local_var_chunk empty tmp
                 in
@@ -7334,7 +7336,7 @@ and doExp local_env
           let se, e =
             match se.stmts with
             | [ { skind = Block b},_, _, _, _ ] ->
-              let vi = newTempVar "GNU.body" true t in
+              let vi = newTempVar ~ghost "GNU.body" true t in
               b.bstmts <-
                 b.bstmts @
                 [Cil.mkStmtOneInstr ~ghost:local_env.is_ghost ~valid_sid
@@ -8533,7 +8535,8 @@ and cleanup_autoreference vi chunk =
           match !temp with
           | Some v' -> ChangeTo v'
           | None ->
-            let v' = newTempVar (vi.vname ^ " initialization") true vi.vtype in
+            let ghost = v.vghost in
+            let v' = newTempVar ~ghost (vi.vname ^ " initialization") true vi.vtype in
             temp := Some v';
             ChangeTo v'
         end else SkipChildren
@@ -8733,7 +8736,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
           (* do it in two *)
           let rt, _, _, _ = splitFunctionType alloca.vtype in
           let tmp =
-            newTempVar
+            newTempVar ~ghost
               (Format.asprintf "alloca(%a)" Cil_printer.pp_exp alloca_size)
               false rt
           in
