@@ -429,8 +429,8 @@ LIB_CMO =\
 	src/libraries/datatype/structural_descr \
 	src/libraries/datatype/type \
 	src/libraries/datatype/descr \
-	src/libraries/utils/sanitizer \
 	src/libraries/utils/filepath \
+	src/libraries/utils/sanitizer \
 	src/libraries/utils/pretty_utils \
 	src/libraries/utils/hook \
 	src/libraries/utils/bag \
@@ -2335,7 +2335,7 @@ DISTRIB_TESTS:=$(filter-out $(CEA_PROPRIETARY_FILES) ,\
                   $(DISTRIB_TESTS))
 # DISTRIB_FILES contents files that can be distributed with header checking
 DISTRIB_FILES:=$(filter-out $(CEA_PROPRIETARY_FILES) ,\
-                    $(DISTRIB_FILES))
+                  $(DISTRIB_FILES))
 endif
 
 # Set some variables for `headers`target.

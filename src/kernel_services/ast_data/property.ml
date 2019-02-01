@@ -1072,9 +1072,9 @@ struct
     | IPReachable (Some kf,Kglobal,After) ->
       [ K kf ; A "reachable_post" ]
     | IPReachable (Some kf,Kstmt s,Before) ->
-      [ K kf ; S s ; A "reachable" ]
+      [ K kf ; A "reachable" ; S s ]
     | IPReachable (Some kf,Kstmt s,After) ->
-      [ K kf ; S s ; A "reachable_after" ]
+      [ K kf ; A "reachable_after" ; S s ]
 
     | IPAxiomatic _
     | IPAxiom _ -> []
@@ -1087,11 +1087,11 @@ struct
 
     | IPOther(name,OLGlob _) -> [ A name ]
     | IPOther(name,OLContract kf) -> [ K kf ; A name ]
-    | IPOther(name,OLStmt(kf,s)) -> [ K kf ; S s ; A name ]
+    | IPOther(name,OLStmt(kf,s)) -> [ K kf ; A name ; S s ]
 
     | IPExtended(ELGlob,(_,name,_,_)) -> [ A name ]
     | IPExtended(ELContract(kf),(_,name,_,_)) -> [ K kf ; A name ]
-    | IPExtended(ELStmt(kf,s),(_,name,_,_)) -> [ K kf ; S s ; A name ]
+    | IPExtended(ELStmt(kf,s),(_,name,_,_)) -> [ K kf ; A name ; S s ]
 
     | IPPropertyInstance (_, _, _, ip) -> parts_of_property ip
 
@@ -1144,6 +1144,11 @@ struct
       unique_name
 
 end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Smart Constructors                                                 --- *)
+(* -------------------------------------------------------------------------- *)
+
 
 (* -------------------------------------------------------------------------- *)
 (* --- Smart Constructors                                                 --- *)

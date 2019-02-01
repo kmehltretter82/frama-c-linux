@@ -27,12 +27,15 @@
 open Cil_types
 open Ctypes
 open Lang.F
+open Interpreted_automata
 
 (* -------------------------------------------------------------------------- *)
 (** {1 General Definitions} *)
 (* -------------------------------------------------------------------------- *)
 
 type 'a sequence = { pre : 'a ; post : 'a }
+
+type 'a binder = { bind: 'b 'c. 'a -> ('b -> 'c) -> 'b -> 'c }
 
 (** Oriented equality or arbitrary relation *)
 type equation =
@@ -266,6 +269,11 @@ sig
   val configure : Model.tuning
   (** Initializers to be run before using the model.
       Typically sets {!Context} values. *)
+
+  val configure_ia: automaton -> vertex binder
+  (** Given an automaton, return a vertex's binder.
+      Currently used by the automata compiler to bind current vertex.
+      See {!StmtSemantics}. *)
 
   val datatype : string
   (** For projectification. Must be unique among models. *)

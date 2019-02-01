@@ -81,7 +81,8 @@ let add_char buffer = function
         Buffer.add_char buffer.content c
       | TRUNCATE -> ()
     end
-  | '_' -> add_sep buffer
+  | '_' | '-' | ' ' | '\t' | ',' | ';' | '.' | '/' | '\\' | ':' ->
+    add_sep buffer
   | _ -> ()
 
 let add_string buffer s = String.iter (add_char buffer) s

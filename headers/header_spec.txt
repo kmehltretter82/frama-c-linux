@@ -675,6 +675,8 @@ src/libraries/utils/rgmap.ml: CEA_LGPL
 src/libraries/utils/rgmap.mli: CEA_LGPL
 src/libraries/utils/rich_text.ml: CEA_LGPL
 src/libraries/utils/rich_text.mli: CEA_LGPL
+src/libraries/utils/sanitizer.ml: CEA_LGPL
+src/libraries/utils/sanitizer.mli: CEA_LGPL
 src/libraries/utils/task.ml: CEA_LGPL
 src/libraries/utils/task.mli: CEA_LGPL
 src/libraries/utils/unicode.ml: CEA_LGPL

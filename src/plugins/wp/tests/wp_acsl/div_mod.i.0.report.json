@@ -121,17 +121,17 @@
                            "f_ensures_d5_div_x_minus1": { "alt-ergo": 
                                                             { "total": 1,
                                                               "valid": 1,
-                                                              "rank": 3 },
+                                                              "rank": 2 },
                                                           "wp:main": 
                                                             { "total": 1,
                                                               "valid": 1,
-                                                              "rank": 3 } },
+                                                              "rank": 2 } },
                            "f_ensures_d4_div_x_1": { "alt-ergo": { "total": 1,
                                                                    "valid": 1,
-                                                                   "rank": 3 },
+                                                                   "rank": 2 },
                                                      "wp:main": { "total": 1,
                                                                   "valid": 1,
-                                                                  "rank": 3 } },
+                                                                  "rank": 2 } },
                            "f_ensures_d3_div_neg_neg": { "alt-ergo": 
                                                            { "total": 1,
                                                              "valid": 1,
