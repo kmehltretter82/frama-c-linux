@@ -1,6 +1,5 @@
 /* run.config
-EXECNOW: make -s tests/syntax/ghost_parameters_formals_status.cmxs
-OPT: -load-module tests/syntax/ghost_parameters_formals_status.cmxs
+OPT: -load-script tests/syntax/ghost_parameters_formals_status.ml
 */
 
 void declaration_void(void) /*@ ghost (int x, int y) */ ;
