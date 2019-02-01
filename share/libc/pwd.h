@@ -25,6 +25,7 @@
 #include "features.h"
 __PUSH_FC_STDLIB
 
+#include "__fc_builtin.h"
 #include "__fc_define_uid_and_gid.h"
 #include "__fc_string_axiomatic.h"
 
@@ -45,16 +46,12 @@ struct passwd {
 
 extern char __fc_getpwuid_pw_name[64];
 extern char __fc_getpwuid_pw_passwd[64];
-extern uid_t __fc_getpwuid_pw_uid;
-extern gid_t __fc_getpwuid_pw_gid;
 extern char __fc_getpwuid_pw_dir[64];
 extern char __fc_getpwuid_pw_shell[64];
 
 struct passwd __fc_pwd =
   {.pw_name = __fc_getpwuid_pw_name,
    .pw_passwd = __fc_getpwuid_pw_passwd,
-   .pw_uid = __fc_getpwuid_pw_uid,
-   .pw_gid = __fc_getpwuid_pw_gid,
    .pw_dir = __fc_getpwuid_pw_dir,
    .pw_shell = __fc_getpwuid_pw_shell};
 
