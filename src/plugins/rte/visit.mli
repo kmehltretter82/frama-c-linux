@@ -22,46 +22,81 @@
 
 open Cil_types
 
-(** Low-level iterator
+(** Low-level control over iterators *)
 
-    [generator ~options:... on_alarm kf stmt element] iterates over
-    potential alarms for Cil element, located in the given
-    kernel_function and stmt.
+type flags = {
+  remove_trivial: bool;
+  initialized: bool;
+  mem_access: bool;
+  div_mod: bool;
+  shift: bool;
+  left_shift_negative: bool;
+  right_shift_negative: bool;
+  signed_overflow: bool;
+  unsigned_overflow: bool;
+  signed_downcast: bool;
+  unsigned_downcast: bool;
+  float_to_int: bool;
+  finite_float: bool;
+  pointer_call: bool;
+  bool_value: bool;
+}
+
+(** Defaults are taken from the Kernel and RTE plug-in options *)
+val default :
+  ?remove_trivial:bool ->
+  ?initialized:bool ->
+  ?mem_access:bool ->
+  ?div_mod:bool ->
+  ?shift:bool ->
+  ?left_shift_negative:bool ->
+  ?right_shift_negative:bool ->
+  ?signed_overflow:bool ->
+  ?unsigned_overflow:bool ->
+  ?signed_downcast:bool ->
+  ?unsigned_downcast:bool ->
+  ?float_to_int:bool ->
+  ?finite_float:bool ->
+  ?pointer_call:bool ->
+  ?bool_value:bool ->
+  unit -> flags
+
+(** All flags set to [true] *)
+val flags_all : flags
+
+(** All flags set to [false] *)
+val flags_none : flags
+
+(** Low-level iterators callback.
+
+    The [on_alarm stmt ?status alarm] callback is invoked with
+    the [stmt] originating the alarm and the already known status,
+    if any.
+*)
+type on_alarm =
+  kinstr -> ?status:Property_status.emitted_status ->
+  Alarms.alarm -> unit
+
+(** Low-level iterators
 
     The [on_alarm ki ?status alarm] callback is invoked with
     the k-instruction originating the alarm and the already known status,
     if any.
 
-    Potential alarms can be specified by the provided options,
-    with defaults generated from the Kernel options and the RTE plug-in
-    options.
+    Potential alarms can be specified by the provided flags,
+    with defaults from the Kernel and RTE plug-in options.
 *)
-type 'a generator =
-  ?remove_trivial:bool ->
-  ?initialized:Options.DoInitialized.t ->
-  ?mem_access:Options.DoMemAccess.t ->
-  ?div_mod:Options.DoDivMod.t ->
-  ?shift:Options.DoShift.t ->
-  ?left_shift_negative:Kernel.LeftShiftNegative.t ->
-  ?right_shift_negative:Kernel.RightShiftNegative.t ->
-  ?signed_overflow:Kernel.SignedOverflow.t ->
-  ?unsigned_overflow:Kernel.UnsignedOverflow.t ->
-  ?signed_downcast:Kernel.SignedDowncast.t ->
-  ?unsigned_downcast:Kernel.UnsignedDowncast.t ->
-  ?float_to_int:Options.DoFloatToInt.t ->
-  ?finite_float:bool ->
-  ?pointer_call:Options.DoPointerCall.t ->
-  ?bool_value:Kernel.InvalidBool.t ->
-  (Cil_types.kinstr ->
-   ?status:Property_status.emitted_status -> Alarms.alarm -> unit) ->
+
+type 'a iterator =
+  ?flags:flags -> on_alarm ->
   Kernel_function.t ->
   Cil_types.stmt ->
   'a -> unit
 
-val iter_lval : lval generator
-val iter_exp : exp generator
-val iter_instr : instr generator
-val iter_stmt : stmt generator
+val iter_lval : lval iterator
+val iter_exp : exp iterator
+val iter_instr : instr iterator
+val iter_stmt : stmt iterator
 
 (** Generates RTE for a single function. Uses the status of the various
       RTE options do decide which kinds of annotations must be generated.

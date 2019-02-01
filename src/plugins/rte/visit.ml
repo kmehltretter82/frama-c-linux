@@ -52,7 +52,7 @@ open Cil_datatype
    and is stronger)
 *)
 
-type to_annotate = {
+type flags = {
   remove_trivial: bool;
   initialized: bool;
   mem_access: bool;
@@ -70,7 +70,7 @@ type to_annotate = {
   bool_value: bool;
 }
 
-let annotate_all = {
+let flags_all = {
   remove_trivial = true;
   initialized = true;
   mem_access = true;
@@ -88,13 +88,30 @@ let annotate_all = {
   bool_value = true;
 }
 
+let flags_none = {
+  remove_trivial = false;
+  initialized = false;
+  mem_access = false;
+  div_mod = false;
+  shift = false;
+  left_shift_negative = false;
+  right_shift_negative = false;
+  signed_overflow = false;
+  unsigned_overflow = false;
+  signed_downcast = false;
+  unsigned_downcast = false;
+  float_to_int = false;
+  finite_float = false;
+  pointer_call = false;
+  bool_value = false;
+}
+
 (* Which annotations should be added,
    from local options, or deduced from the options of RTE and the kernel *)
 
-let option get = function None -> get () | Some flag -> flag
+let option (get : unit -> bool) = function None -> get () | Some flag -> flag
 
-let annotate_from_options
-    job
+let default
     ?remove_trivial
     ?initialized
     ?mem_access
@@ -110,8 +127,8 @@ let annotate_from_options
     ?finite_float
     ?pointer_call
     ?bool_value
-    data =
-  job {
+    () =
+  {
     remove_trivial = option (fun () -> not (Options.Trivial.get ())) remove_trivial ;
     initialized = option Options.DoInitialized.get initialized ;
     mem_access = option Options.DoMemAccess.get mem_access ;
@@ -127,12 +144,12 @@ let annotate_from_options
     finite_float = option (fun () -> Kernel.SpecialFloat.get () <> "none") finite_float ;
     pointer_call = option Options.DoPointerCall.get pointer_call ;
     bool_value = option Kernel.InvalidBool.get bool_value ;
-  } data
+  }
 
 (** [kf]: function to annotate
-    [to_annot]: which RTE to generate.
+    [flags]: which RTE to generate.
     [register]: the action to perform on each RTE alarm *)
-class annot_visitor kf to_annot on_alarm = object (self)
+class annot_visitor kf flags on_alarm = object (self)
 
   inherit Visitor.frama_c_inplace
 
@@ -153,49 +170,49 @@ class annot_visitor kf to_annot on_alarm = object (self)
     r
 
   method private do_initialized () =
-    to_annot.initialized && not (Generator.Initialized.is_computed kf)
+    flags.initialized && not (Generator.Initialized.is_computed kf)
 
   method private do_mem_access () =
-    to_annot.mem_access && not (Generator.Mem_access.is_computed kf)
+    flags.mem_access && not (Generator.Mem_access.is_computed kf)
 
   method private do_div_mod () =
-    to_annot.div_mod && not (Generator.Div_mod.is_computed kf)
+    flags.div_mod && not (Generator.Div_mod.is_computed kf)
 
   method private do_shift () =
-    to_annot.shift && not (Generator.Shift.is_computed kf)
+    flags.shift && not (Generator.Shift.is_computed kf)
 
   method private do_left_shift_negative () =
-    to_annot.left_shift_negative
+    flags.left_shift_negative
     && not (Generator.Left_shift_negative.is_computed kf)
 
   method private do_right_shift_negative () =
-    to_annot.right_shift_negative
+    flags.right_shift_negative
     && not (Generator.Right_shift_negative.is_computed kf)
 
   method private do_signed_overflow () =
-    to_annot.signed_overflow && not (Generator.Signed_overflow.is_computed kf)
+    flags.signed_overflow && not (Generator.Signed_overflow.is_computed kf)
 
   method private do_unsigned_overflow () =
-    to_annot.unsigned_overflow && not (Generator.Unsigned_overflow.is_computed kf)
+    flags.unsigned_overflow && not (Generator.Unsigned_overflow.is_computed kf)
 
   method private do_signed_downcast () =
-    to_annot.signed_downcast && not (Generator.Signed_downcast.is_computed kf)
+    flags.signed_downcast && not (Generator.Signed_downcast.is_computed kf)
 
   method private do_unsigned_downcast () =
-    to_annot.unsigned_downcast &&
+    flags.unsigned_downcast &&
     not (Generator.Unsigned_downcast.is_computed kf)
 
   method private do_float_to_int () =
-    to_annot.float_to_int && not (Generator.Float_to_int.is_computed kf)
+    flags.float_to_int && not (Generator.Float_to_int.is_computed kf)
 
   method private do_finite_float () =
-    to_annot.finite_float && not (Generator.Finite_float.is_computed kf)
+    flags.finite_float && not (Generator.Finite_float.is_computed kf)
 
   method private do_pointer_call () =
-    to_annot.pointer_call && not (Generator.Pointer_call.is_computed kf)
+    flags.pointer_call && not (Generator.Pointer_call.is_computed kf)
 
   method private do_bool_value () =
-    to_annot.bool_value && not (Generator.Bool_value.is_computed kf)
+    flags.bool_value && not (Generator.Bool_value.is_computed kf)
 
   method private queue_stmt_spec spec =
     let stmt = Extlib.the (self#current_stmt) in
@@ -208,7 +225,7 @@ class annot_visitor kf to_annot on_alarm = object (self)
   method private generate_assertion: 'a. 'a Rte.alarm_gen -> 'a -> unit =
     fun fgen ->
       let on_alarm ?status a = on_alarm self#current_kinstr ?status a in
-      fgen ~remove_trivial:to_annot.remove_trivial ~on_alarm
+      fgen ~remove_trivial:flags.remove_trivial ~on_alarm
 
   method! vstmt s = match s.skind with
     | UnspecifiedSequence l ->
@@ -447,51 +464,35 @@ let rte_annotations stmt =
 
 (** {2 Iterate over Alarms on Cil elements} *)
 
-type 'a generator =
-  ?remove_trivial:bool ->
-  ?initialized:Options.DoInitialized.t ->
-  ?mem_access:Options.DoMemAccess.t ->
-  ?div_mod:Options.DoDivMod.t ->
-  ?shift:Options.DoShift.t ->
-  ?left_shift_negative:Kernel.LeftShiftNegative.t ->
-  ?right_shift_negative:Kernel.RightShiftNegative.t ->
-  ?signed_overflow:Kernel.SignedOverflow.t ->
-  ?unsigned_overflow:Kernel.UnsignedOverflow.t ->
-  ?signed_downcast:Kernel.SignedDowncast.t ->
-  ?unsigned_downcast:Kernel.UnsignedDowncast.t ->
-  ?float_to_int:Options.DoFloatToInt.t ->
-  ?finite_float:bool ->
-  ?pointer_call:Options.DoPointerCall.t ->
-  ?bool_value:Kernel.InvalidBool.t ->
-  (Cil_types.kinstr ->
-   ?status:Property_status.emitted_status -> Alarms.alarm -> unit) ->
-  Kernel_function.t ->
-  Cil_types.stmt ->
-  'a -> unit
+type on_alarm =
+  kinstr -> ?status:Property_status.emitted_status ->
+  Alarms.alarm -> unit
 
-let iter_alarms visit to_annot on_alarm kf stmt element =
+let iter_alarms visit ?flags (on_alarm:on_alarm) kf stmt element =
+  let flags = match flags with
+    | None -> default ()
+    | Some opt -> opt in
   let visitor = object (self)
-    inherit annot_visitor kf to_annot on_alarm
+    inherit annot_visitor kf flags on_alarm
     initializer self#push_stmt stmt
   end in
   ignore (visit (visitor :> Cil.cilVisitor) element)
 
-let iter_lval : lval generator =
-  annotate_from_options (iter_alarms Cil.visitCilLval)
+type 'a iterator =
+  ?flags:flags -> on_alarm ->
+  Kernel_function.t ->
+  Cil_types.stmt ->
+  'a -> unit
 
-let iter_exp : exp generator =
-  annotate_from_options (iter_alarms Cil.visitCilExpr)
-
-let iter_instr : instr generator =
-  annotate_from_options (iter_alarms Cil.visitCilInstr)
-
-let iter_stmt : stmt generator =
-  annotate_from_options (iter_alarms Cil.visitCilStmt)
+let iter_lval : lval iterator = iter_alarms Cil.visitCilLval
+let iter_exp : exp iterator = iter_alarms Cil.visitCilExpr
+let iter_instr : instr iterator = iter_alarms Cil.visitCilInstr
+let iter_stmt : stmt iterator = iter_alarms Cil.visitCilStmt
 
 (** {2 List of all RTEs on a given Cil object} *)
 
 let get_annotations from kf stmt x =
-  let to_annot = annotate_from_options (fun flags () -> flags) () in
+  let flags = default () in
   (* Accumulator containing all the code_annots corresponding to an alarm
      emitted so far. *)
   let code_annots = ref [] in
@@ -500,7 +501,7 @@ let get_annotations from kf stmt x =
     code_annots := ca :: !code_annots;
   in
   let o = object (self)
-    inherit annot_visitor kf to_annot on_alarm
+    inherit annot_visitor kf flags on_alarm
     initializer self#push_stmt stmt
   end in
   ignore (from (o :> Cil.cilVisitor) x);
@@ -514,8 +515,8 @@ let do_exp_annotations = get_annotations Cil.visitCilExpr
 
 (** {2 Annotations of kernel_functions for a given type of RTE} *)
 
-(* generates annotation for function kf on the basis of [to_annot] *)
-let annotate_kf_aux to_annot kf =
+(* generates annotation for function kf on the basis of [flags] *)
+let annotate_kf_aux flags kf =
   Options.debug "annotating function %a" Kernel_function.pretty kf;
   match kf.fundec with
   | Declaration _ -> ()
@@ -535,19 +536,19 @@ let annotate_kf_aux to_annot kf =
     (* Strict version of ||, because [comp] has side-effects *)
     let (|||) a b = a || b in
     let open Generator in
-    if comp Initialized.accessor to_annot.initialized |||
-       comp Mem_access.accessor to_annot.mem_access |||
-       comp Pointer_call.accessor to_annot.pointer_call |||
-       comp Div_mod.accessor to_annot.div_mod |||
-       comp Shift.accessor to_annot.shift |||
-       comp Left_shift_negative.accessor to_annot.left_shift_negative |||
-       comp Right_shift_negative.accessor to_annot.right_shift_negative |||
-       comp Signed_overflow.accessor to_annot.signed_overflow |||
-       comp Signed_downcast.accessor to_annot.signed_downcast |||
-       comp Unsigned_overflow.accessor to_annot.unsigned_overflow |||
-       comp Unsigned_downcast.accessor to_annot.unsigned_downcast |||
-       comp Float_to_int.accessor to_annot.float_to_int |||
-       comp Finite_float.accessor to_annot.finite_float
+    if comp Initialized.accessor flags.initialized |||
+       comp Mem_access.accessor flags.mem_access |||
+       comp Pointer_call.accessor flags.pointer_call |||
+       comp Div_mod.accessor flags.div_mod |||
+       comp Shift.accessor flags.shift |||
+       comp Left_shift_negative.accessor flags.left_shift_negative |||
+       comp Right_shift_negative.accessor flags.right_shift_negative |||
+       comp Signed_overflow.accessor flags.signed_overflow |||
+       comp Signed_downcast.accessor flags.signed_downcast |||
+       comp Unsigned_overflow.accessor flags.unsigned_overflow |||
+       comp Unsigned_downcast.accessor flags.unsigned_downcast |||
+       comp Float_to_int.accessor flags.float_to_int |||
+       comp Finite_float.accessor flags.finite_float
     then begin
       Options.feedback "annotating function %a" Kernel_function.pretty kf;
       let warn = Options.Warn.get () in
@@ -559,35 +560,35 @@ let annotate_kf_aux to_annot kf =
             Printer.pp_code_annotation ca
         | _ -> ()
       in
-      let vis = new annot_visitor kf to_annot on_alarm in
+      let vis = new annot_visitor kf flags on_alarm in
       let nkf = Visitor.visitFramacFunction vis f in
       assert(nkf == f);
       List.iter (fun f -> f ()) !to_update;
     end
 
 (* generates annotation for function kf on the basis of command-line options *)
-let annotate_kf kf = annotate_from_options annotate_kf_aux kf
+let annotate_kf kf = annotate_kf_aux (default ()) kf
 
 (* annotate for all rte + unsigned overflows (which are not rte), for a given
    function *)
 let do_all_rte kf =
-  let to_annot =
-    { annotate_all with
+  let flags =
+    { flags_all with
       signed_downcast = false;
       unsigned_downcast = false; }
   in
-  annotate_kf_aux to_annot kf
+  annotate_kf_aux flags kf
 
 (* annotate for rte only (not unsigned overflows and downcasts) for a given
    function *)
 let do_rte kf =
-  let to_annot =
-    { annotate_all with
+  let flags =
+    { flags_all with
       unsigned_overflow = false;
       signed_downcast = false;
       unsigned_downcast = false; }
   in
-  annotate_kf_aux to_annot kf
+  annotate_kf_aux flags kf
 
 let compute () =
   (* compute RTE annotations, whether Enabled is set or not *)
