@@ -113,8 +113,8 @@ class engine =
       with Integer.Too_big ->
       match iformat with
       | `Dec -> Integer.pretty ~hexa:false fmt z
-      | `Hex -> Integer.pp_hex ~sep:"." fmt z
-      | `Bin -> Integer.pp_bin ~sep:"." fmt z
+      | `Hex -> Integer.pp_hex ~sep:"," fmt z
+      | `Bin -> Integer.pp_bin ~sep:"," fmt z
 
     method pp_real fmt q =
       match Q.classify q with
