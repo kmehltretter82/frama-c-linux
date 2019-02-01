@@ -3970,6 +3970,8 @@ let empty_local_env =
   }
 
 let ghost_local_env ghost = {empty_local_env with is_ghost = ghost }
+let add_ghost_to_local_env env ghost =
+  { env with is_ghost = env.is_ghost || ghost }
 
 let paren_local_env env = { env with is_paren = true }
 let no_paren_local_env env = { env with is_paren = false }
@@ -6541,6 +6543,7 @@ and doExp local_env
            * test/small1/union5, in which a transparent union is passed
            * as an argument *)
           let (sa, a', att) =
+            let local_env = add_ghost_to_local_env local_env are_ghost in
             let (r, c, e, t) =
               doExp (no_paren_local_env local_env) CNoConst a (AExp None)
             in
