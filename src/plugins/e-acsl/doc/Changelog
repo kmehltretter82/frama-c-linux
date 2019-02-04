@@ -19,8 +19,11 @@
 #   configure	configure
 ###############################################################################
 
--* E-ACSL       [2019/01/02] Fix overlap of TLS with other memory
-                segments for big memory spaces
+-* runtime      [2019/02/04] Fix initialization of the E-ACSL runtime in
+	        presence of multiple calls to its initializer (for
+	        instance, if the main is a recursive function).
+-* runtime      [2019/01/02] Fix overlap of TLS with other memory
+                segments for large memory spaces.
 -  E-ACSL       [2018/11/15] Predicates with empty quantifications
                 directly generate \true or \false instead of nested loops.
 
