@@ -1950,10 +1950,11 @@ struct
   let rec lc_open m k v e =
     if not (Bvars.contains k e.bind) then e else
       match e.repr with
-      | Bvar _ -> v
+      | Bvar _ -> v (* e.bind is a singleton that can only contains k *)
       | _ ->
-          try cache_find m e
-          with Not_found -> cache_bind m e (rebuild (lc_open m k v) e)
+          if is_simple e then e else
+            try cache_find m e
+            with Not_found -> cache_bind m e (rebuild (lc_open m k v) e)
 
   let lc_open_term t e =
     let k = Bvars.order e.bind in

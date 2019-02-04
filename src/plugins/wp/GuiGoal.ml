@@ -357,13 +357,13 @@ class pane (proverpane : GuiConfig.provers) =
           printer#set_target Tactical.Empty ;
           strategies#connect None ;
           List.iter (fun tactic -> tactic#clear) tactics
-      | Some(model,sequent,sel) ->
+      | Some(model,tree,sequent,sel) ->
           strategies#connect (Some (self#strategies sequent)) ;
           let select (tactic : GuiTactic.tactic) =
             let process = self#apply in
             let composer = self#compose in
             let browser = self#browse in
-            tactic#select ~process ~composer ~browser sel
+            tactic#select ~process ~composer ~browser ~tree sel
           in
           Model.with_model model (List.iter select) tactics ;
           let tgt =
@@ -470,7 +470,7 @@ class pane (proverpane : GuiConfig.provers) =
               let sequent = printer#sequent in
               let select = printer#selection in
               let model = wpo.Wpo.po_model in
-              self#update_tactics (Some(model,sequent,select)) ;
+              self#update_tactics (Some(model,proof,sequent,select)) ;
             end
       | Composer _ | Browser _ -> ()
 
