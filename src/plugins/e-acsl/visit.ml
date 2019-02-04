@@ -450,7 +450,6 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
             in
             Extlib.may handle_main main_fct
           in
-(*    self#add_generated_variables_in_function fundec;*) (* TODO*)
           Project.on prj build_mmodel_initializer ();
           (* reset copied states at the end to be observationally
               equivalent to a standard visitor. *)
