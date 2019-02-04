@@ -4,8 +4,12 @@
 char array[1024];
 void __e_acsl_globals_init(void)
 {
-  __e_acsl_store_block((void *)(array),(size_t)1024);
-  __e_acsl_full_init((void *)(& array));
+  static char __e_acsl_already_run = 0;
+  if (! __e_acsl_already_run) {
+    __e_acsl_already_run = 1;
+    __e_acsl_store_block((void *)(array),(size_t)1024);
+    __e_acsl_full_init((void *)(& array));
+  }
   return;
 }
 

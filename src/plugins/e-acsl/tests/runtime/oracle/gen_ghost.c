@@ -5,10 +5,14 @@ int G = 0;
 int *P;
 void __e_acsl_globals_init(void)
 {
-  __e_acsl_store_block((void *)(& P),(size_t)8);
-  __e_acsl_full_init((void *)(& P));
-  __e_acsl_store_block((void *)(& G),(size_t)4);
-  __e_acsl_full_init((void *)(& G));
+  static char __e_acsl_already_run = 0;
+  if (! __e_acsl_already_run) {
+    __e_acsl_already_run = 1;
+    __e_acsl_store_block((void *)(& P),(size_t)8);
+    __e_acsl_full_init((void *)(& P));
+    __e_acsl_store_block((void *)(& G),(size_t)4);
+    __e_acsl_full_init((void *)(& G));
+  }
   return;
 }
 
