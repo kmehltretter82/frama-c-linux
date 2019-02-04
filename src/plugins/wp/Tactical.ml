@@ -316,6 +316,7 @@ type 'a formatter = ('a,Format.formatter,unit) format -> 'a
 
 class type feedback =
   object
+    method pool : pool
     method interactive : bool
     method get_title : string
     method has_error : bool

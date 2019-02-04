@@ -78,7 +78,9 @@ let jconfigure (console : #Tactical.feedback) jtactic goal =
       end
 
 let jfork tree ?node jtactic =
-  let console = new ProofScript.console ~title:jtactic.header in
+  let console = new ProofScript.console
+    ~pool:(ProofEngine.pool tree)
+    ~title:jtactic.header in
   try
     let anchor = ProofEngine.anchor tree ?node () in
     let goal = ProofEngine.goal anchor in

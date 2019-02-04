@@ -64,6 +64,7 @@ class tactic : Tactical.t -> (Format.formatter -> Tactical.selection -> unit) ->
       process:(tactical -> selection -> process -> unit) ->
       browser:(browser -> unit) ->
       composer:(composer -> unit) ->
+      tree:ProofEngine.tree ->
       selection -> unit
   end
 
