@@ -91,9 +91,9 @@ let of_int = Z.of_int
 let of_int64 = Z.of_int64
 let of_int32 = Z.of_int32
 
-let to_int = Big_int_Z.int_of_big_int
-let to_int64 = Big_int_Z.int64_of_big_int
-let to_int32 = Big_int_Z.int32_of_big_int
+let to_int = Z.to_int
+let to_int64 = Z.to_int64
+let to_int32 = Z.to_int32
 
 let of_string = Z.of_string
 let to_string = Z.to_string
