@@ -5034,7 +5034,7 @@ and intOfAttrparam (a:attrparam) : int option =
     let n = doit a in
     ignoreAlignmentAttrs := false;
     Some n
-  with Failure _ | SizeOfError _ -> (* Can't compile *)
+  with Z.Overflow | SizeOfError _ -> (* Can't compile *)
     ignoreAlignmentAttrs := false;
     None
 and process_aligned_attribute (pp:Format.formatter->unit) ~may_reduce attrs default_align =
