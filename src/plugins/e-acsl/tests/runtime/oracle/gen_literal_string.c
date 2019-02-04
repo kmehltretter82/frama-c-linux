@@ -7,7 +7,6 @@ char *__gen_e_acsl_literal_string;
 char *__gen_e_acsl_literal_string_4;
 char *__gen_e_acsl_literal_string_3;
 char *__gen_e_acsl_literal_string_2;
-_Bool __e_acsl_GLOBALS_INIT = 0;
 int main(void);
 
 char *T = (char *)"bar";
@@ -38,7 +37,9 @@ char const *l_str = "the dog and the cat";
 char *U = (char *)"baz";
 void __e_acsl_globals_init(void)
 {
-  if (! __e_acsl_GLOBALS_INIT) {
+  static char __e_acsl_already_run = 0;
+  if (! __e_acsl_already_run) {
+    __e_acsl_already_run = 1;
     __gen_e_acsl_literal_string_6 = "the dog and the cat";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_6,
                          sizeof("the dog and the cat"));
@@ -76,7 +77,6 @@ void __e_acsl_globals_init(void)
     __e_acsl_full_init((void *)(& S));
     __e_acsl_store_block((void *)(& T),(size_t)8);
     __e_acsl_full_init((void *)(& T));
-    __e_acsl_GLOBALS_INIT = 1;
   }
   return;
 }

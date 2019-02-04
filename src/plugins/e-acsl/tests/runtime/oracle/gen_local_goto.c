@@ -5,10 +5,11 @@ char *__gen_e_acsl_literal_string;
 char *__gen_e_acsl_literal_string_3;
 char *__gen_e_acsl_literal_string_2;
 char *__gen_e_acsl_literal_string_4;
-_Bool __e_acsl_GLOBALS_INIT = 0;
 void __e_acsl_globals_init(void)
 {
-  if (! __e_acsl_GLOBALS_INIT) {
+  static char __e_acsl_already_run = 0;
+  if (! __e_acsl_already_run) {
+    __e_acsl_already_run = 1;
     __gen_e_acsl_literal_string = "t is %d, going to %s\n";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string,
                          sizeof("t is %d, going to %s\n"));
@@ -27,7 +28,6 @@ void __e_acsl_globals_init(void)
                          sizeof("AGAIN"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_4);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_4);
-    __e_acsl_GLOBALS_INIT = 1;
   }
   return;
 }

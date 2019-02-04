@@ -6,7 +6,6 @@ char *__gen_e_acsl_literal_string;
 char *__gen_e_acsl_literal_string_2;
 char *__gen_e_acsl_literal_string_4;
 char *__gen_e_acsl_literal_string_5;
-_Bool __e_acsl_GLOBALS_INIT = 0;
 struct ST {
    char *str ;
    int num ;
@@ -23,7 +22,9 @@ struct ST _G[2] =
   {{.str = (char *)"First", .num = 99}, {.str = (char *)"Second", .num = 147}};
 void __e_acsl_globals_init(void)
 {
-  if (! __e_acsl_GLOBALS_INIT) {
+  static char __e_acsl_already_run = 0;
+  if (! __e_acsl_already_run) {
+    __e_acsl_already_run = 1;
     __gen_e_acsl_literal_string_3 = "ZZ";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_3,sizeof("ZZ"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_3);
@@ -60,7 +61,6 @@ void __e_acsl_globals_init(void)
     __e_acsl_full_init((void *)(& _A));
     __e_acsl_store_block((void *)(& _F),(size_t)4);
     __e_acsl_full_init((void *)(& _F));
-    __e_acsl_GLOBALS_INIT = 1;
   }
   return;
 }

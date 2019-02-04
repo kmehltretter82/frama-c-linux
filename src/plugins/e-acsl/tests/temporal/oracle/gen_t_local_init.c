@@ -8,7 +8,6 @@ char *__gen_e_acsl_literal_string_2;
 char *__gen_e_acsl_literal_string_5;
 char *__gen_e_acsl_literal_string_7;
 char *__gen_e_acsl_literal_string_6;
-_Bool __e_acsl_GLOBALS_INIT = 0;
 struct tree_desc {
    int *extra_bits ;
 };
@@ -53,7 +52,9 @@ char *Strings[2][2] =
 char *Str[4] = {(char *)"foo", (char *)"bar", (char *)"baz", (char *)0};
 void __e_acsl_globals_init(void)
 {
-  if (! __e_acsl_GLOBALS_INIT) {
+  static char __e_acsl_already_run = 0;
+  if (! __e_acsl_already_run) {
+    __e_acsl_already_run = 1;
     __gen_e_acsl_literal_string_4 = "tho";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_4,sizeof("tho"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_4);
@@ -101,7 +102,6 @@ void __e_acsl_globals_init(void)
                                    (void *)__gen_e_acsl_literal_string_3);
     __e_acsl_temporal_store_nblock((void *)(& Strings[1][1]),
                                    (void *)__gen_e_acsl_literal_string_4);
-    __e_acsl_GLOBALS_INIT = 1;
   }
   return;
 }

@@ -34,14 +34,15 @@ char *__gen_e_acsl_literal_string_22;
 char *__gen_e_acsl_literal_string_20;
 char *__gen_e_acsl_literal_string_18;
 char *__gen_e_acsl_literal_string_17;
-_Bool __e_acsl_GLOBALS_INIT = 0;
 /*@ assigns \result;
     assigns \result \from \nothing; */
 extern int ( /* missing proto */ fork)(void);
 
 void __e_acsl_globals_init(void)
 {
-  if (! __e_acsl_GLOBALS_INIT) {
+  static char __e_acsl_already_run = 0;
+  if (! __e_acsl_already_run) {
+    __e_acsl_already_run = 1;
     __gen_e_acsl_literal_string_31 = "tests/format/fprintf.c:46";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_31,
                          sizeof("tests/format/fprintf.c:46"));
@@ -217,7 +218,6 @@ void __e_acsl_globals_init(void)
     __e_acsl_full_init((void *)(& stdout));
     __e_acsl_store_block((void *)(& __fc_rand_max),(size_t)8);
     __e_acsl_full_init((void *)(& __fc_rand_max));
-    __e_acsl_GLOBALS_INIT = 1;
   }
   return;
 }

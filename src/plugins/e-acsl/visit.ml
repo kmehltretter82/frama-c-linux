@@ -98,6 +98,241 @@ end = struct
 
 end
 
+(* Observation of literal strings in C expressions *)
+module Literal_observer: sig
+
+  val exp: Env.t -> exp -> exp * Env.t
+  (* replace the given exp by an observed variable if it is a literal string *)
+
+  val exp_in_depth: Env.t -> exp -> exp * Env.t
+  (* replace any sub-expression of the given exp that is a literal string by an
+     observed variable   *)
+
+end =
+struct
+
+  let literal loc env s =
+    try
+      let vi = Literal_strings.find s in
+      (* if the literal string was already created, just get it. *)
+      Cil.evar ~loc vi, env
+    with Not_found ->
+      (* never seen this string before: replace it by a new global var *)
+      let vi, exp, env =
+        Env.new_var
+          ~loc
+          ~scope:Env.Global
+          ~name:"literal_string"
+          env
+          None
+          Cil.charPtrType
+          (fun _ _ -> [] (* done in the initializer, see {!vglob_aux} *))
+      in
+      Literal_strings.add s vi;
+      exp, env
+
+  let exp env e = match e.enode with
+    (* the guard below could be optimized: if no annotation **depends on this
+       string**, then it is not required to monitor it.
+       (currently, the guard says: "no annotation uses the memory model" *)
+    | Const (CStr s) when Mmodel_analysis.use_model () -> literal e.eloc env s
+    | _ -> e, env
+
+  let exp_in_depth env e =
+    let env_ref = ref env in
+    let o = object
+      inherit Cil.genericCilVisitor (Cil.copy_visit (Project.current ()))
+      method !vexpr e = match e.enode with
+      (* the guard below could be optimized: if no annotation **depends on this
+         string**, then it is not required to monitor it.
+         (currently, the guard says: "no annotation uses the memory model" *)
+      | Const (CStr s) when Mmodel_analysis.use_model () ->
+        let e, env = literal e.eloc !env_ref s in
+        env_ref := env;
+        Cil.ChangeTo e
+      | _ ->
+        Cil.DoChildren
+    end in
+    let e = Cil.visitCilExpr o e in
+    e, !env_ref
+
+end
+
+(* Observation of global variables. *)
+module Global_observer: sig
+  val function_name: string (* name of the function in which [mk_init] generates
+                               the code *)
+  val reset: unit -> unit
+  val is_empty: unit -> bool
+
+  val add: varinfo -> unit (* observes the given variable if necessary *)
+  val add_initializer: varinfo -> offset -> init -> unit
+  (* add the initializer for the given observed variable *)
+
+  val mk_init: Cil.visitor_behavior -> Env.t -> varinfo * fundec * Env.t
+  (* generates a new C function containing the observers for global variable
+     declaration and initialization *)
+
+  val mk_delete: Cil.visitor_behavior -> stmt list -> stmt list
+  (* generates the observers for global variable de-allocation *)
+
+end = struct
+
+  let function_name = RTL.mk_api_name "globals_init"
+
+  (* Hashtable mapping global variables (as Cil_type.varinfo) to their
+     initializers (if any).
+
+     NOTE: here, varinfos as keys belong to the original project while values
+     belong to the new one *)
+  let tbl
+      : (offset (* compound initializers *) * init) list ref Varinfo.Hashtbl.t
+      = Varinfo.Hashtbl.create 7
+
+  let reset () = Varinfo.Hashtbl.reset tbl
+
+  let is_empty () = Varinfo.Hashtbl.length tbl = 0
+
+  let add vi =
+    if Mmodel_analysis.must_model_vi vi then
+      Varinfo.Hashtbl.replace tbl vi (ref [])
+
+  let add_initializer vi offset init =
+    if Mmodel_analysis.must_model_vi vi then
+      try
+        let l = Varinfo.Hashtbl.find tbl vi in
+        l := (offset, init) :: !l
+      with Not_found ->
+        assert false
+
+  let rec literal_in_initializer env = function
+    | SingleInit exp -> snd (Literal_observer.exp_in_depth env exp)
+    | CompoundInit (_, l) ->
+      List.fold_left (fun env (_, i) -> literal_in_initializer env i) env l
+
+  let mk_init bhv env =
+    (* Create [__e_acsl_globals_init] function with definition
+       for initialization of global variables *)
+    let vi =
+      Cil.makeGlobalVar ~source:true
+        function_name
+        (TFun(Cil.voidType, Some [], false, []))
+    in
+    vi.vdefined <- true;
+    (* There is no contract associated with the function *)
+    let spec = Cil.empty_funspec () in
+    (* Create function definition which no stmt yet: they will be added
+       afterwards *)
+    let blk = Cil.mkBlock [] in
+    let fundec =
+      { svar = vi;
+        sformals = [];
+        slocals = [];
+        smaxid = 0;
+        sbody = blk;
+        smaxstmtid = None;
+        sallstmts = [];
+        sspec = spec }
+    in
+    let fct = Definition(fundec, Location.unknown) in
+    (* Create and register [__e_acsl_globals_init] as kernel
+       function *)
+    let kf =
+      { fundec = fct; spec = spec }
+    in
+    Globals.Functions.register kf;
+    Globals.Functions.replace_by_definition spec fundec Location.unknown;
+    (* Now generate the statements. The generation is done only now because it
+       depends on the local variable [already_run] whose generation required the
+       existence of [fundec] *)
+    let env = Env.push env in
+    (* 2-stage observation of initializers: temporal analysis must be performed
+       after generating observers of **all** globals *)
+    let env, stmts =
+      Varinfo.Hashtbl.fold_sorted
+        (fun old_vi l stmts ->
+          let new_vi = Cil.get_varinfo bhv old_vi in
+          List.fold_left
+            (fun (env, stmts) (off, init) ->
+              let env = literal_in_initializer env init in
+              let stmt = Temporal.generate_global_init new_vi off init env in
+              env, match stmt with None -> stmts | Some stmt -> stmt :: stmts)
+            stmts
+            !l)
+        tbl
+        (env, [])
+    in
+    (* allocation and initialization of globals *)
+    let stmts =
+      Varinfo.Hashtbl.fold_sorted
+        (fun old_vi _ stmts ->
+          let new_vi = Cil.get_varinfo bhv old_vi in
+          (* a global is both allocated and initialized *)
+          Misc.mk_store_stmt new_vi
+          :: Misc.mk_initialize ~loc:Location.unknown (Cil.var new_vi)
+          :: stmts)
+        tbl
+        stmts
+    in
+    (* literal strings allocations and initializations *)
+    let stmts =
+      Literal_strings.fold
+        (fun s vi stmts ->
+          let loc = Location.unknown in
+          let e = Cil.new_exp ~loc:loc (Const (CStr s)) in
+          let str_size = Cil.new_exp loc (SizeOfStr s) in
+          Cil.mkStmtOneInstr ~valid_sid:true (Set(Cil.var vi, e, loc))
+          :: Misc.mk_store_stmt ~str_size vi
+          :: Misc.mk_full_init_stmt ~addr:false vi
+          :: Misc.mk_mark_readonly vi
+          :: stmts)
+        stmts
+    in
+    (* Create a new code block with generated statements *)
+    let (b, env), stmts = match stmts with
+      | [] -> assert false
+      | stmt :: stmts ->
+        Env.pop_and_get env stmt ~global_clear:true Env.Before, stmts
+    in
+    let stmts = Cil.mkStmt ~valid_sid:true (Block b) :: stmts in
+    (* Prevent multiple calls to globals_init *)
+    let loc = Location.unknown in
+    let vi_already_run =
+      Cil.makeLocalVar fundec (RTL.mk_api_name "already_run") (TInt(IChar, []))
+    in
+    vi_already_run.vdefined <- true;
+    vi_already_run.vreferenced <- true;
+    vi_already_run.vstorage <- Static;
+    let init = AssignInit (SingleInit (Cil.zero ~loc)) in
+    let init_stmt =
+      Cil.mkStmtOneInstr ~valid_sid:true
+        (Local_init (vi_already_run, init, loc))
+    in
+    let already_run =
+      Cil.mkStmtOneInstr ~valid_sid:true
+        (Set (Cil.var vi_already_run, Cil.one ~loc, loc))
+    in
+    let stmts = already_run :: stmts in
+    let guard =
+      Cil.mkStmt
+        ~valid_sid:true
+        (If (Cil.evar vi_already_run, Cil.mkBlock [], Cil.mkBlock stmts, loc))
+    in
+    let return = Cil.mkStmt ~valid_sid:true (Return (None, loc)) in
+    let stmts = [ init_stmt; guard; return ] in
+    blk.bstmts <- stmts;
+    vi, fundec, env
+
+    let mk_delete bhv stmts =
+      Varinfo.Hashtbl.fold_sorted
+        (fun old_vi _l acc ->
+          let new_vi = Cil.get_varinfo bhv old_vi in
+          Misc.mk_delete_stmt new_vi :: acc)
+        tbl
+        stmts
+
+end
+
 (* the main visitor performing e-acsl checking and C code generator *)
 class e_acsl_visitor prj generate = object (self)
 
@@ -112,21 +347,6 @@ class e_acsl_visitor prj generate = object (self)
   val mutable is_initializer = false
   (* Global flag set to [true] if a currently visited node
      belongs to a global initializer and set to [false] otherwise *)
-
-  val global_vars: (offset * init option) Varinfo.Hashtbl.t =
-    Varinfo.Hashtbl.create 7
-  (* Hashtable mapping global variables (as Cil_type.varinfo) to their
-     initializers aiming to capture memory allocated by global variable
-     declarations and initialization. At runtime the memory blocks
-     corresponding to space occupied by global are recorded via a call to
-     [__gen_e_acsl_globals_init] instrumented at the beginning of the
-     [main] function. Each variable stored by [global_vars] will be handled in
-     the body of [__gen_e_acsl_globals_init] as follows:
-     __e_acsl_store_block(...); // Record a memory block used by the variable
-     __e_acsl_full_init(...);   // ... and mark it as initialized memory
-
-     NOTE: In [global_vars] keys belong to the original project while values
-     belong to the new one *)
 
   method private reset_env () =
     function_env := Env.empty (self :> Visitor.frama_c_visitor)
@@ -148,147 +368,14 @@ class e_acsl_visitor prj generate = object (self)
       (fun f ->
         (* extend [main] with forward initialization and put it at end *)
         if generate then begin
-          let must_init =
-            not (Literal_strings.is_empty ())
-            ||
-              try
-                Varinfo.Hashtbl.iter
-                  (fun old_vi (_, i) -> match i with None | Some _ ->
-                    if Mmodel_analysis.must_model_vi old_vi then raise Exit)
-                  global_vars;
-                false
-              with Exit ->
-                true
-          in
-          if must_init then begin
+          if not (Global_observer.is_empty () && Literal_strings.is_empty ())
+          then begin
             let build_initializer () =
               Options.feedback ~dkey ~level:2 "building global initializer.";
-              let env = Env.push !function_env in
-              let stmts, env =
-                Varinfo.Hashtbl.fold_sorted
-                  (fun old_vi (_, i) (stmts, env) ->
-                    let new_vi = Cil.get_varinfo self#behavior old_vi in
-                    (* [model] creates an initialization statement
-                       of the form [__e_acsl_full_init(...)] for every global
-                       variable which needs to be tracked and is not a Frama-C
-                       builtin. Further the statement is appended to the
-                       provided list of statements ([blk]) *)
-                    let model blk =
-                      if Mmodel_analysis.must_model_vi old_vi then
-                        let blk =
-                          if Kernel.LibEntry.get () then blk
-                          else
-                            Misc.mk_initialize ~loc:Location.unknown
-                              (Cil.var new_vi)
-                            :: blk
-                        in
-                        Misc.mk_store_stmt new_vi :: blk
-                      else
-                        stmts
-                    in
-                    match i with
-                    | None -> model stmts, env
-                    | Some (CompoundInit _) -> assert false
-                    | Some (SingleInit e) ->
-                      let _, env = self#literal_string env e in stmts, env)
-                  global_vars
-                  ([ ], env)
-              in
-              let stmts =
-                (* literal strings initialization *)
-                Literal_strings.fold
-                  (fun s vi stmts ->
-                    let loc = Location.unknown in
-                    let e = Cil.new_exp ~loc:loc (Const (CStr s)) in
-                    let str_size = Cil.new_exp loc (SizeOfStr s) in
-                    Cil.mkStmtOneInstr ~valid_sid:true (Set(Cil.var vi, e, loc))
-                    :: Misc.mk_store_stmt ~str_size vi
-                    :: Misc.mk_full_init_stmt ~addr:false vi
-                    :: Misc.mk_mark_readonly vi
-                    :: stmts)
-                  stmts
-              in
-              (* Generate init statements for temporal analysis *)
-              let tinit_stmts = Varinfo.Hashtbl.fold_sorted
-                (fun vi (off, init) acc ->
-                  match init with
-                  | Some init ->
-                    let stmt = Temporal.generate_global_init vi off init env in
-                      (match stmt with | Some stmt -> stmt :: acc | None -> acc)
-                  | None -> acc)
-                global_vars
-                []
-              in
-              let stmts = stmts @ tinit_stmts in
-              (* Create a new code block with generated statements *)
-              let (b, env), stmts = match stmts with
-                | [] -> assert false
-                | stmt :: stmts ->
-                  Env.pop_and_get env stmt ~global_clear:true Env.Before, stmts
+              let vi, fundec, env =
+                Global_observer.mk_init self#behavior !function_env
               in
               function_env := env;
-              let stmts = Cil.mkStmt ~valid_sid:true (Block b) :: stmts in
-              (* Prevent multiple calls to globals_init *)
-              let loc = Location.unknown in
-              let vi_globals_init =
-                Cil.makeGlobalVar ~source:true
-                  (RTL.mk_api_name "GLOBALS_INIT")
-                  (TInt(IBool, []))
-              in
-              vi_globals_init.vdefined <- true;
-              let init = { init = Some (SingleInit (Cil.zero ~loc)) } in
-              Globals.Vars.add vi_globals_init init;
-              let new_global = GVar (vi_globals_init, init, loc) in
-              f.globals <- new_global :: f.globals;
-              let set_globals_init = Cil.mkStmtOneInstr
-                ~valid_sid:true
-                (Set (Cil.var vi_globals_init, Cil.one ~loc, loc))
-              in
-              let stmts = stmts @ [ set_globals_init ] in
-              let guard = Cil.mkStmt
-                ~valid_sid:true
-                (If (
-                  Cil.evar vi_globals_init,
-                  Cil.mkBlock [],
-                  Cil.mkBlock stmts,
-                  loc))
-              in
-              let return = Cil.mkStmt ~valid_sid:true (Return (None, loc)) in
-              let stmts = guard :: [ return ] in
-              let blk = Cil.mkBlock stmts in
-              (* Create [__e_acsl_globals_init] function with definition
-               for initialization of global variables *)
-              let fname = (RTL.mk_api_name "globals_init") in
-              let vi =
-                Cil.makeGlobalVar ~source:true
-                  fname
-                  (TFun(Cil.voidType, Some [], false, []))
-              in
-              vi.vdefined <- true;
-              (* There is no contract associated with the function *)
-              let spec = Cil.empty_funspec () in
-              (* Create function definition which has the list of the
-               * generated initialization statements *)
-              let fundec =
-                { svar = vi;
-                  sformals = [];
-                  slocals = [];
-                  smaxid = 0;
-                  sbody = blk;
-                  smaxstmtid = None;
-                  sallstmts = [];
-                  sspec = spec }
-              in
-              self#add_generated_variables_in_function fundec;
-              let fct = Definition(fundec, Location.unknown) in
-              (* Create and register [__e_acsl_globals_init] as kernel
-                 function *)
-              let kf =
-                { fundec = fct; spec = spec }
-              in
-              Globals.Functions.register kf;
-              Globals.Functions.replace_by_definition
-                spec fundec Location.unknown;
               let cil_fct = GFun(fundec, Location.unknown) in
               if Mmodel_analysis.use_model () then
                 match main_fct with
@@ -300,8 +387,8 @@ class e_acsl_visitor prj generate = object (self)
                       (Call(None, exp, [], Location.unknown))
                   in
                   vi.vreferenced <- true;
-                  (* Add [__e_acsl_globals_init();] call as the first statement
-                   to the [main] function *)
+                  (* insert [__e_acsl_globals_init ();] as first statement of
+                     [main] *)
                   main.sbody.bstmts <- stmt :: main.sbody.bstmts;
                   let new_globals =
                     List.fold_right
@@ -325,7 +412,7 @@ class e_acsl_visitor prj generate = object (self)
                 | None ->
                   Kernel.warning "@[no entry point specified:@ \
 you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
-                    fname;
+                    Global_observer.function_name;
                   f.globals <- f.globals @ [ cil_fct ]
             in
             Project.on prj build_initializer ()
@@ -363,6 +450,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
             in
             Extlib.may handle_main main_fct
           in
+(*    self#add_generated_variables_in_function fundec;*) (* TODO*)
           Project.on prj build_mmodel_initializer ();
           (* reset copied states at the end to be observationally
               equivalent to a standard visitor. *)
@@ -416,10 +504,9 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
          internally via RTL *)
         when vi.vorig_name <> Kernel.MainFunction.get () ->
       (* Make a unique mapping for each global variable omitting initializers.
-       Initializers (used to capture literal strings) are added to
-       [global_vars] via the [vinit] visitor method (see comments below). *)
-        Varinfo.Hashtbl.replace global_vars
-          (Cil.get_original_varinfo self#behavior vi) (NoOffset, None)
+         Initializers (used to capture literal strings) are added to
+         [global_vars] via the [vinit] visitor method (see comments below). *)
+      Global_observer.add (Cil.get_original_varinfo self#behavior vi)
     | _ -> ());
     if generate then Cil.DoChildrenPost(fun g -> List.iter do_it g; g)
     else Cil.DoChildren
@@ -435,16 +522,16 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         Cil.DoChildrenPost
           (fun i ->
             (match is_initializer with
-            (* Note the use of [add] instead of [replace]. This is because a
-             single variable can be associated with multiple initializers
-             and all of them need to be captured. *)
             | true ->
               (match i with
-              (* Case of an empty CompoundInit, treat it as if there were
-               * no initializer at all *)
-              | CompoundInit(_,[]) -> ()
+              | CompoundInit(_,[]) ->
+                (* Case of an empty CompoundInit, treat it as if there were
+                   no initializer at all *)
+                ()
               | CompoundInit(_,_) | SingleInit _ ->
-                Varinfo.Hashtbl.add global_vars vi (off, (Some i)))
+                (* TODO: [off] should be the one of the new project while it is
+                   from the old project *)
+                Global_observer.add_initializer vi off i)
             | false-> ());
             is_initializer <- false;
           i)
@@ -535,43 +622,6 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
               @[The generated program may be incomplete.@]"
               s;*)
       false
-
-  method private literal_string env e =
-    assert generate;
-    let env_ref = ref env in
-    let o = object
-      inherit Cil.genericCilVisitor (Cil.copy_visit (Project.current ()))
-      method !vexpr e = match e.enode with
-      (* the guard below could be optimized: if no annotation **depends on this
-         string**, then it is not required to monitor it.
-         (currently, the guard says: "no annotation uses the memory model" *)
-      | Const(CStr s) when Mmodel_analysis.use_model () ->
-        (try
-           let vi = Literal_strings.find s in
-           (* if the literal string was already created, just get it. *)
-           let exp = Cil.evar ~loc:e.eloc vi in
-           Cil.ChangeTo exp
-         with Not_found ->
-           (* never seen this string before: replace it by a new global var *)
-           let loc = e.eloc in
-           let vi, exp, env =
-             Env.new_var
-               ~loc
-               ~scope:Env.Global
-               ~name:"literal_string"
-               env
-               None
-               Cil.charPtrType
-               (fun _ _ -> [] (* done in the initializer, see {!vglob_aux} *))
-           in
-           Literal_strings.add s vi;
-           env_ref := env;
-           Cil.ChangeTo exp)
-      | _ ->
-        Cil.DoChildren
-    end in
-    let e = Cil.visitCilExpr o e in
-    e, !env_ref
 
   method !vstmt_aux stmt =
     Options.debug ~level:4 "proceeding stmt (sid %d) %a@."
@@ -701,19 +751,8 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
               | ret :: l ->
                 let loc = Stmt.loc stmt in
                 let delete_stmts =
-                  Varinfo.Hashtbl.fold_sorted
-                    (fun old_vi (_, i) acc ->
-                      if Mmodel_analysis.must_model_vi old_vi then
-                        let new_vi = Cil.get_varinfo self#behavior old_vi in
-                        (* Since there are multiple entries for same variables
-                         do delete only variables without initializers, this
-                         ensures that each variable is released once only *)
-                         (match i with
-                         | None -> Misc.mk_delete_stmt new_vi :: acc
-                         | Some _ -> acc)
-                      else
-                        acc)
-                    global_vars
+                  Global_observer.mk_delete
+                    self#behavior
                     [ Misc.mk_call ~loc mclean []; ret ]
                 in
                 b.bstmts <- List.rev l @ delete_stmts
@@ -930,17 +969,19 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       (* Do not touch global initializers because they accept only constants *)
       | true -> Cil.DoChildren
       (* Replace literal strings elsewhere *)
-      | false -> Cil.DoChildrenPost
-        (fun e ->
-          let e, env = self#literal_string !function_env e in
-          function_env := env;
-          e)
+      | false ->
+        Cil.DoChildrenPost
+          (fun e ->
+            let e, env = Literal_observer.exp !function_env e in
+            function_env := env;
+            e)
     end else
       Cil.SkipChildren
 
   initializer
     Misc.reset ();
     Literal_strings.reset ();
+    Global_observer.reset ();
     Keep_status.before_translation ();
     self#reset_env ();
     Translate.set_original_project (Project.current ())
