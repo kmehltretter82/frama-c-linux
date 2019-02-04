@@ -801,7 +801,9 @@ struct
     else
       match Context.get_opt context_pp with
       | Some env -> Pretty.pp_term_env env  fmt e
-      | None -> Pretty.pp_term Pretty.empty fmt e
+      | None ->
+          let env = Pretty.known Pretty.empty (QED.vars e) in
+          Pretty.pp_term env fmt e
   let pp_pred = pp_term
   let pp_var fmt x = pp_term fmt (e_var x)
   let pp_vars fmt xs =
