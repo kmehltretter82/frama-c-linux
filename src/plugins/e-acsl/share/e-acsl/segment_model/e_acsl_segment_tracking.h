@@ -894,10 +894,7 @@ extern int MSPACES_INIT;
  *    behaviour is as if the size were some non-zero value, except that the
  *    returned pointer shall not be used to access an object." */
 void* malloc(size_t size) {
-  if(! MSPACES_INIT) {
-    mspaces_init();
-    MSPACES_INIT = 1;
-  }
+  mspaces_init();
   size_t alloc_size = ALLOC_SIZE(size);
 
   /* Return NULL if the size is too large to be aligned */
