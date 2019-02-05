@@ -366,7 +366,7 @@ type state =
 (** {2 Functions for pretty printing} *)
 (* ********************************************************************* *)
 
-module type S = sig
+module type S_pp = sig
 
   val pp_varname: Format.formatter -> string -> unit
 
@@ -474,8 +474,14 @@ module type S = sig
     Format.formatter ->
     'a ->
     unit
-  (** [self#force_brace printer fmt x] pretty prints [x] by using [printer],
-      but add some extra braces '\{' and '\}' which are hidden by default. *)
+    (** [self#force_brace printer fmt x] pretty prints [x] by using [printer],
+        but add some extra braces '\{' and '\}' which are hidden by default. *)
+
+end
+
+module type S = sig
+
+  include S_pp
 
   (* ********************************************************************* *)
   (** {3 Extensible printer} *)
