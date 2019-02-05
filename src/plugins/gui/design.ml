@@ -841,7 +841,7 @@ class main_window () : main_window_extension_points =
       width, if final_h then height else new_height
   in
   let main_window =
-    GWindow.window
+    Gtk_compat.window
       ?icon:framac_icon
       ~title:"Frama-C"
       ~width
