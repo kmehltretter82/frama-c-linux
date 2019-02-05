@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -val -val-show-progress -scf -val-show-progress -journal-disable
+   OPT: -eva -eva-show-progress -scf -eva-show-progress -journal-disable
 */
 
 struct S {

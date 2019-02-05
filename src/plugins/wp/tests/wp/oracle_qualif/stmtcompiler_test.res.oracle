@@ -30,9 +30,9 @@
 [wp] [Qed] Goal typed_one_if_assert : Valid
 [wp] [Qed] Goal typed_some_seq_assert : Valid
 [wp] [Qed] Goal typed_some_seq_assert_2 : Valid
-[wp] [Qed] Goal typed_zloop_post : Valid
-[wp] [Alt-Ergo] Goal typed_zloop_loop_inv_preserved : Unknown
-[wp] [Qed] Goal typed_zloop_loop_inv_established : Valid
+[wp] [Qed] Goal typed_zloop_ensures : Valid
+[wp] [Alt-Ergo] Goal typed_zloop_loop_invariant_preserved : Unknown
+[wp] [Qed] Goal typed_zloop_loop_invariant_established : Valid
 [wp] [Qed] Goal typed_zloop_assert : Valid
 [wp] [Qed] Goal typed_zloop_assert_2 : Valid
 [wp] [Alt-Ergo] Goal typed_zloop_assert_3 : Unknown
@@ -56,6 +56,6 @@ behavior2            1     -                 1       100%
 behavior3            1     -                 1       100%
 behavior4            1     -                 1       100%
 behavior5           -      -                 1       0.0%
-if_assert            1      1 (1..12)        4      50.0%
+if_assert            1      1 (4..16)        4      50.0%
 compare              1     -                 1       100%
 -------------------------------------------------------------

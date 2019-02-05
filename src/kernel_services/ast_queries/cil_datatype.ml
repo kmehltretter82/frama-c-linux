@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -271,7 +271,8 @@ module Stmt_Id = struct
 	    sid = -1;
 	    succs = [];
 	    preds = [];
-	    ghost  = false } ]
+	    ghost  = false;
+	    sattr = [] } ]
       let compare t1 t2 = Datatype.Int.compare t1.sid t2.sid
       let hash t1 = t1.sid
       let equal t1 t2 = t1.sid = t2.sid

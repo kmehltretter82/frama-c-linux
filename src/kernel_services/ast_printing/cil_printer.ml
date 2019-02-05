@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -495,7 +495,7 @@ class cil_printer () = object (self)
   method private current_stmt =
     try Some (Stack.top current_stmt) with Stack.Empty -> None
 
-  method private may_be_skipped s = s.labels = []
+  method private may_be_skipped s = s.labels = [] && s.sattr = []
 
   method location fmt loc =
     Format.fprintf fmt "%a" Filepath.pp_pos (fst loc)
@@ -1058,7 +1058,7 @@ class cil_printer () = object (self)
     pp_open_hvbox fmt 0;
     self#stmt_labels fmt s;
     (* print the statement. *)
-    if Cil.is_skip s.skind && not s.ghost then begin
+    if Cil.is_skip s.skind && not s.ghost && s.sattr = [] then begin
       if verbose || s.labels <> [] then fprintf fmt ";"
     end else begin
       let was_ghost = is_ghost in
@@ -1068,7 +1068,7 @@ class cil_printer () = object (self)
         Format.fprintf fmt "%t %a "
           (fun fmt -> self#pp_open_annotation fmt) self#pp_acsl_keyword "ghost"
       end;
-      self#stmtkind next fmt s.skind ;
+      self#stmtkind s.sattr next fmt s.skind ;
       if display_ghost then begin
 	is_ghost <- false;
         self#pp_close_annotation fmt
@@ -1234,7 +1234,7 @@ class cil_printer () = object (self)
       fprintf fmt "@[@<0>\n@<0>%s@<0> @<0>%d@<0> @<0>%s@]@\n" 
 	directive (fst l).Filepath.pos_lnum filename
 
-  method stmtkind (next: stmt) fmt = function
+  method stmtkind sattr (next: stmt) fmt = function
     | UnspecifiedSequence seq ->
       let ctxt =
         match self#current_stmt with None -> Other | Some s -> Stmt_block s
@@ -1374,6 +1374,11 @@ class cil_printer () = object (self)
         Pretty_utils.pp_list ~sep:"@\n" self#code_annotation fmt a;
         Format.fprintf fmt "@ %t" (fun fmt -> self#pp_close_annotation fmt);
       end;
+      let pp_sattr fmt =
+        if sattr <> [] && Kernel.is_debug_key_enabled Kernel.dkey_print_attrs
+        then Format.fprintf fmt "@[/*%a */ @]" self#attributes sattr
+        else Format.ifprintf fmt ""
+      in
       ((* Maybe the first thing is a conditional. Turn it into a WHILE *)
         try
 	  let rec skipEmpty = function
@@ -1409,15 +1414,17 @@ class cil_printer () = object (self)
 	      [{ skind=Block b} as s ] when self#may_be_skipped s -> b
 	    | _ -> { b with bstmts = bodystmts }
 	  in
-	  Format.fprintf fmt "%a@[<v 2>%a (%a) %a@]"
+	  Format.fprintf fmt "%a@[<v 2>%a (%a) %t%a@]"
 	    (fun fmt -> self#line_directive fmt) l
             self#pp_keyword "while"
 	    self#exp term
+	    pp_sattr
 	    (self#unboxed_block Other) b;
         with Not_found ->
-	  Format.fprintf fmt "%a@[<v 2>%a (1) %a@]"
+	  Format.fprintf fmt "%a@[<v 2>%a (1) %t%a@]"
 	    (fun fmt -> self#line_directive fmt) l
             self#pp_keyword "while"
+            pp_sattr
 	    (self#unboxed_block Other) b);
       Format.pp_close_box fmt ()
 

@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2018                                               */
+/*  Copyright (C) 2007-2019                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -104,8 +104,19 @@ extern time_t mktime(struct tm *timeptr);
 */
 extern time_t time(time_t *timer);
 
+char __fc_ctime[26];
+char * const  __fc_p_ctime = __fc_ctime;
+
 extern char *asctime(const struct tm *timeptr);
 
+/*@
+  requires valid_timer: \valid_read(timer);
+  requires initialization:init_timer: \initialized(timer);
+  assigns __fc_ctime[0..25] \from indirect:*timer, indirect:__fc_time;
+  assigns \result \from indirect:*timer, indirect:__fc_time, __fc_p_ctime;
+  ensures result_points_to_ctime: \result == __fc_p_ctime;
+  ensures result_valid_string: valid_read_string(__fc_p_ctime);
+*/
 extern char *ctime(const time_t *timer);
 
 struct tm __fc_time_tm;

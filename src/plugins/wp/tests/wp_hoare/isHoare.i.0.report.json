@@ -1,6 +1,6 @@
 { "wp:global": { "qed": { "total": 1, "valid": 1 },
                  "wp:main": { "total": 1, "valid": 1 } },
-  "wp:functions": { "cmp_invalid_addr_as_int": { "cmp_invalid_addr_as_int_post_ok": 
+  "wp:functions": { "cmp_invalid_addr_as_int": { "cmp_invalid_addr_as_int_ensures_ok": 
                                                    { "qed": { "total": 1,
                                                               "valid": 1 },
                                                      "wp:main": { "total": 1,

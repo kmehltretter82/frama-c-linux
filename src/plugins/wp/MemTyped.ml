@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -148,7 +148,6 @@ let a_addr b k = a_shift (a_global b) k
 (* -------------------------------------------------------------------------- *)
 (* --- Qed Simplifiers                                                    --- *)
 (* -------------------------------------------------------------------------- *)
-
 
 (*
     Pointer arithmetic for structure access and array access could be
@@ -367,6 +366,7 @@ let phi_addr_of_int p =
 (* -------------------------------------------------------------------------- *)
 (* --- Simplifier Registration                                            --- *)
 (* -------------------------------------------------------------------------- *)
+
 let () = Context.register
     begin fun () ->
       F.set_builtin_1   f_base   phi_base ;
@@ -391,6 +391,8 @@ let configure () =
     Context.set Lang.pointer (fun _ -> t_addr) ;
     Context.set Cvalues.null (p_equal a_null) ;
   end
+let no_binder = { bind = fun _ f v -> f v }
+let configure_ia _ = no_binder
 
 type pointer = NoCast | Fits | Unsafe
 let pointer = Context.create "MemTyped.pointer"
@@ -1028,7 +1030,7 @@ let load sigma obj l = Val (loadvalue sigma obj l)
 (* --- Locations                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-let null = a_null
+let null = a_null (* as a loc *)
 
 let literal ~eid cst =
   shift (a_global (STRING.get (eid,cst))) (C_int (Ctypes.c_char ())) e_zero

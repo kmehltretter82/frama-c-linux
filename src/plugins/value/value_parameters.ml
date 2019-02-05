@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -90,8 +90,12 @@ let () = set_warn_status wkey_garbled_mix Log.Winactive
 let wkey_builtins_missing_spec = register_warn_category "builtins:missing-spec"
 let wkey_builtins_override = register_warn_category "builtins:override"
 let wkey_libc_unsupported_spec = register_warn_category "libc:unsupported-spec"
-let wkey_loop_unrolling = register_warn_category "loop-unrolling"
-let () = set_warn_status wkey_loop_unrolling Log.Wfeedback
+let wkey_loop_unroll = register_warn_category "loop-unroll"
+let () = set_warn_status wkey_loop_unroll Log.Wfeedback
+let wkey_missing_loop_unroll = register_warn_category "missing-loop-unroll"
+let () = set_warn_status wkey_missing_loop_unroll Log.Winactive
+let wkey_missing_loop_unroll_for = register_warn_category "missing-loop-unroll:for"
+let () = set_warn_status wkey_missing_loop_unroll_for Log.Winactive
 
 module ForceValues =
   WithOutput

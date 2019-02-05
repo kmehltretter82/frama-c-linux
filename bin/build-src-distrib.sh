@@ -36,7 +36,7 @@ FRAMAC_VERSION_CODENAME=$(cat VERSION_CODENAME)
 FRAMAC_VERSION_AND_CODENAME="${FRAMAC_VERSION}-${FRAMAC_VERSION_CODENAME}"
 TARGZ_FILENAME=frama-c-${FRAMAC_VERSION_AND_CODENAME}.tar.gz
 
-VERSION_MODIFIER=$(cat VERSION | sed -e s/[A-Za-z]*-[0-9]*\\\(.*\\\)/\\1/)
+VERSION_MODIFIER=$(cat VERSION | sed -e s/[0-9.]*\\\(.*\\\)/\\1/)
 
 if test -n "$VERSION_MODIFIER"; then FINAL_RELEASE=no; else FINAL_RELEASE=yes; fi
 
@@ -313,7 +313,7 @@ case "${STEP}" in
       echo " - [$TARGZ_FILENAME](downloads/$TARGZ_FILENAME)" >> $WIKI_PAGE
       echo "" >> $WIKI_PAGE
       echo "## Manuals" >> $WIKI_PAGE
-    for f in "user-manual" "acsl-implementation" "value-analysis" "plugin-development-guide" "rte-manual" "wp-manual" "metrics-manual" "aorai-manual"; do
+    for f in "user-manual" "acsl-implementation" "eva-manual" "plugin-development-guide" "rte-manual" "wp-manual" "metrics-manual" "aorai-manual"; do
         echo "- [$f](manuals/$f-${FRAMAC_VERSION_AND_CODENAME}.pdf)" >> $WIKI_PAGE
         run "cp $MANUALS_DIR/$f.pdf $GITHUB_WIKI/manuals/$f-${FRAMAC_VERSION_AND_CODENAME}.pdf"
         run "git -C $GITHUB_WIKI add manuals/$f-${FRAMAC_VERSION_AND_CODENAME}.pdf"

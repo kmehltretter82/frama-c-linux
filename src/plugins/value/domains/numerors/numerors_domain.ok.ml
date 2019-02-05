@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -110,7 +110,7 @@ let add_numerors_value (module Value: Abstract_value.Internal) =
                     Numerors_value.of_ints ~prec min max
                   | _, _ -> num
                 (* Integer.to_int may fail for too big integers. *)
-                with Cvalue.V.Not_based_on_null | Failure _ -> num
+                with Cvalue.V.Not_based_on_null | Z.Overflow -> num
               end
             | _, _ -> num
           in

@@ -12,6 +12,7 @@ assert behavior = 0;
 int main(void)
 {
   int __retres;
+  /*@ slevel 4; */
   behavior ++;
   __retres = 0;
   return __retres;
@@ -25,6 +26,32 @@ inductive model{L}(List<ℤ>  root, List<ℤ>  logic_list) {
   case cons{L}: ∀ List<ℤ>  l1, List<ℤ>  ll1;
                   model(l1, ll1) ⇒ model(Cons(0, l1), Cons(0, ll1));
   }
+ */
+/*@ axiomatic foo {
+      logic ℤ func{L}(ℤ i) 
+        reads behavior;
+      
+      }
+
+*/
+int volatile assigns;
+int ensures(int volatile *a)
+{
+  int __retres;
+  __retres = *a;
+  return __retres;
+}
+
+int requires(int volatile *a, int v)
+{
+  *a = v;
+  return v;
+}
+
+/*@ volatile assigns reads ensures writes requires;
+*/
+int slevel = 1000000;
+/*@ lemma bar{L}: slevel ≥ 0;
 
 */
 

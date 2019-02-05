@@ -4,15 +4,15 @@
 [wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 [wp] 9 goals scheduled
-[wp] [Alt-Ergo] Goal typed_init_post_qed_ok : Valid
-[wp] [Alt-Ergo] Goal typed_init_loop_inv_qed_ok_preserved : Valid
-[wp] [Alt-Ergo] Goal typed_init_loop_inv_qed_ok_established : Valid
-[wp] [Alt-Ergo] Goal typed_init_loop_inv_qed_ok_2_preserved : Valid
-[wp] [Qed] Goal typed_init_loop_inv_qed_ok_2_established : Valid
-[wp] [Qed] Goal typed_init_loop_assign_part1 : Valid
-[wp] [Qed] Goal typed_init_loop_assign_part2 : Valid
-[wp] [Alt-Ergo] Goal typed_init_loop_assign_part3 : Valid
-[wp] [Alt-Ergo] Goal typed_init_assign : Unknown
+[wp] [Alt-Ergo] Goal typed_init_ensures_qed_ok : Valid
+[wp] [Alt-Ergo] Goal typed_init_loop_invariant_qed_ok_preserved : Valid
+[wp] [Alt-Ergo] Goal typed_init_loop_invariant_qed_ok_established : Valid
+[wp] [Alt-Ergo] Goal typed_init_loop_invariant_qed_ok_2_preserved : Valid
+[wp] [Qed] Goal typed_init_loop_invariant_qed_ok_2_established : Valid
+[wp] [Qed] Goal typed_init_loop_assigns_part1 : Valid
+[wp] [Qed] Goal typed_init_loop_assigns_part2 : Valid
+[wp] [Alt-Ergo] Goal typed_init_loop_assigns_part3 : Valid
+[wp] [Alt-Ergo] Goal typed_init_assigns : Unknown
 [wp] Proved goals:    8 / 9
   Qed:             3 
   Alt-Ergo:        5  (unknown: 1)

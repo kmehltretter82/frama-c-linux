@@ -1,5 +1,5 @@
 /* run.config
-  OPT: -val -inout -val-show-progress -pdg -pdg-print -calldeps -deps -then -slice-return main -then-last -print -val-show-progress
+  OPT: -eva -inout -eva-show-progress -pdg -pdg-print -calldeps -deps -then -slice-return main -then-last -print -eva-show-progress
 */
 
 int Y, X;

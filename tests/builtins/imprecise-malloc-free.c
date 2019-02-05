@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: #" -val-mlevel 0 -no-val-alloc-returns-null"
+   STDOPT: #" -eva-mlevel 0 -eva-no-alloc-returns-null"
 */
 
 extern int i;

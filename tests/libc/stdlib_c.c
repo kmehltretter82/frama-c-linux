@@ -1,7 +1,7 @@
 /* run.config
-   STDOPT: #"-no-val-builtins-auto -slevel 10 -val-builtin calloc:Frama_C_calloc_by_stack -value-msg-key malloc"
-   STDOPT: #"-no-val-builtins-auto -slevel 10 -val-builtin calloc:Frama_C_calloc_by_stack -no-val-alloc-returns-null -value-msg-key malloc"
-   STDOPT: #"-no-val-builtins-auto"
+   STDOPT: #"-eva-no-builtins-auto -slevel 10 -eva-builtin calloc:Frama_C_calloc_by_stack -eva-msg-key malloc"
+   STDOPT: #"-eva-no-builtins-auto -slevel 10 -eva-builtin calloc:Frama_C_calloc_by_stack -eva-no-alloc-returns-null -eva-msg-key malloc"
+   STDOPT: #"-eva-no-builtins-auto"
 */ // slevel is used to unroll loops
 
 #define malloc(n) Frama_C_malloc_by_stack(n)
@@ -10,7 +10,7 @@
 #include <stdint.h>
 
 int main() {
-  // always succeeds if -no-val-alloc-returns-null, otherwise may succeed
+  // always succeeds if -eva-no-alloc-returns-null, otherwise may succeed
   int *p = calloc(1, sizeof(int));
   if (p) {
     //@ assert \valid(p);

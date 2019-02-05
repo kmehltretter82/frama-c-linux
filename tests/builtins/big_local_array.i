@@ -1,7 +1,8 @@
 /* run.config*
-OPT: -val-show-progress -print -journal-disable -val -report
-OPT: -load-script tests/builtins/big_local_array_script.ml -then-on prj -print -report
-OPT: -val-show-progress -print -journal-disable -no-initialized-padding-locals -val
+EXECNOW: make -s @PTEST_DIR@/big_local_array_script.cmxs
+OPT: -eva-show-progress -print -journal-disable -eva -report
+OPT: -load-module @PTEST_DIR@/big_local_array_script -then-on prj -print -report
+OPT: -eva-show-progress -print -journal-disable -no-initialized-padding-locals -eva
 */
 
 struct S {

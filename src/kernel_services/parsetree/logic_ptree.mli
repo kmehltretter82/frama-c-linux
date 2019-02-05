@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA   (Commissariat à l'énergie atomique et aux énergies            *)
 (*           alternatives)                                                *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -369,7 +369,7 @@ type code_annot =
   | AExtended of string list * bool * extension
     (** extension in a code or loop (when boolean flag is true) annotation.
         @since Silicon-20161101
-        @modify Frama-C+dev
+        @modify 18.0-Argon
     *)
 
 (** custom trees *)

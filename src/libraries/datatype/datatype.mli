@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -345,7 +345,7 @@ val integer: Integer.t Type.t
 
 (** Type-safe strings representing normalized filepaths.
     See module {!Filepath.Normalized}.
-    @since Frama-C+dev *)
+    @since 18.0-Argon *)
 module Filepath: sig
   include S_with_collections with type t = Filepath.Normalized.t
   val of_string: ?base_name:string -> string -> t

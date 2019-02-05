@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -val @VALUECONFIG@ -then -main main_log_exp
+   OPT: -eva @VALUECONFIG@ -then -main main_log_exp
 */
 
 #include <__fc_builtin.h>

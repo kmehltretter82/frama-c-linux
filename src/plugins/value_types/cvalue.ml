@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -586,27 +586,27 @@ module V = struct
     else
       import_function ~topify:Origin.K_Arith Ival.bitwise_or v1 v2
 
-  let bitwise_and ~signed ~size v1 v2 =
+  let bitwise_and v1 v2 =
     if equal v1 v2 && cardinal_zero_or_one v1 then v1
     else
-      let f i1 i2 = Ival.bitwise_and ~size ~signed i1 i2 in
+      let f i1 i2 = Ival.bitwise_and i1 i2 in
       import_function ~topify:Origin.K_Arith f v1 v2
 
   let shift_right e1 e2 =
     arithmetic_function Ival.shift_right e1 e2
 
-  let bitwise_not v =
+  let bitwise_signed_not v =
     try
       let i = project_ival v in
-      inject_ival (Ival.bitwise_not i)
+      inject_ival (Ival.bitwise_signed_not i)
     with Not_based_on_null -> topify_arith_origin v
 
-  let bitwise_not_size ~signed ~size v =
+  let bitwise_not ~size ~signed v =
     try
       let i = project_ival v in
-      inject_ival (Ival.bitwise_not_size ~size ~signed i)
+      inject_ival (Ival.bitwise_not ~size ~signed i)
     with Not_based_on_null -> topify_arith_origin v
-  
+
   let extract_bits ~topify ~start ~stop ~size v =
     try
       let i = project_ival_bottom v in
@@ -635,7 +635,7 @@ module V = struct
       if Integer.is_zero factor
       then v
       else topify_with_origin_kind topify v
-    | Integer.Too_big -> top_int
+    | Z.Overflow -> top_int
 
   let restrict_topint_to_size value size =
     if is_topint value

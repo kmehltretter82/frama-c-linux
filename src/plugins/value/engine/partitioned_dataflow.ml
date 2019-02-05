@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -110,7 +110,22 @@ module Make_Dataflow
 
   let unroll (stmt : stmt) : int =
     let local_unroll = match Unroll_annots.get_unroll_terms stmt with
-      | [] -> None
+      | [] ->
+        let is_attribute a = Cil.hasAttribute a stmt.sattr in
+        begin
+          match List.filter is_attribute ["for" ; "while" ; "dowhile"] with
+          | [] -> ()
+          | loop_kind :: _ ->
+            let wkey =
+              if loop_kind = "for"
+              then Value_parameters.wkey_missing_loop_unroll_for
+              else Value_parameters.wkey_missing_loop_unroll
+            in
+            Value_parameters.warning
+              ~wkey ~source:(fst (Cil_datatype.Stmt.loc stmt)) ~once:true
+              "%s loop without unroll annotation" loop_kind
+        end;
+        None
       | [t] ->
         (* Inlines the value of const variables in [t]. *)
         let global_init vi =
@@ -623,9 +638,12 @@ module Make_Dataflow
     | Wto.Node v ->
       ignore (process_vertex v)
     | Wto.Component (v, w) as component ->
-      (* Reset the component if hierachical_convergence is set *)
-      if hierachical_convergence then
-        reset_component (v :: Wto.flatten w);
+      (* Reset the component if hierachical_convergence is set.
+         Otherwise, only resets the widening counter for this component. This
+         is especially useful for nested loops. *)
+      if hierachical_convergence
+      then reset_component (v :: Wto.flatten w)
+      else Partition.reset_widening_counter (get_vertex_widening v);
       (* Iterate until convergence *)
       let iteration_count = ref 0 in
       while

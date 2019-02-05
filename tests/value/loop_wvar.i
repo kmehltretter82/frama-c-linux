@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -no-autoload-plugins -load-module eva,inout -no-annot -eva @VALUECONFIG@ -then -kernel-warn-key=annot-error=active -annot -val -journal-disable
+   OPT: -no-autoload-plugins -load-module eva,inout -no-annot -eva @VALUECONFIG@ -then -kernel-warn-key=annot-error=active -annot -eva -journal-disable
    OPT: -no-autoload-plugins -load-module from,inout,eva -kernel-warn-key=annot-error=active -eva @VALUECONFIG@ -main main3 -journal-disable
    OPT: -no-autoload-plugins -load-module eva,inout -kernel-warn-key=annot-error=active -eva @VALUECONFIG@ -main main_err1 -journal-disable
    OPT: -no-autoload-plugins -load-module eva,inout -kernel-warn-key=annot-error=active -eva @VALUECONFIG@ -main main_err2 -journal-disable

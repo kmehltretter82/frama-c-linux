@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -68,6 +68,7 @@ val select_call_pre : stmt -> Property.t option -> prop_id -> bool
 val prop_id_keys : prop_id -> string list * string list (* required , hints *)
 
 val get_propid : prop_id -> string (** Unique identifier of [prop_id] *)
+val get_legacy : prop_id -> string (** Unique legacy identifier of [prop_id] *)
 val pp_propid : Format.formatter -> prop_id -> unit (** Print unique id of [prop_id] *)
 
 type prop_kind =

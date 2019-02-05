@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -338,10 +338,7 @@ let forward_binop_int ~typ ev1 op ev2 =
   | Shiftlt -> V.shift_left ev1 ev2
   | BXor    -> V.bitwise_xor ev1 ev2
   | BOr     -> V.bitwise_or ev1 ev2
-  | BAnd    ->
-    let size = Cil.bitsSizeOf typ in
-    let signed = Bit_utils.is_signed_int_enum_pointer typ in
-    V.bitwise_and ~size ~signed ev1 ev2
+  | BAnd    -> V.bitwise_and ev1 ev2
   (* Strict evaluation. The caller of this function is supposed to take
      into account the laziness of those operators itself *)
   | LOr  ->
@@ -404,7 +401,7 @@ let forward_unop typ op value =
       | TInt (ik, _) | TEnum ({ekind=ik}, _) ->
         let size = Cil.bitsSizeOfInt ik in
         let signed = Cil.isSigned ik in
-        V.bitwise_not_size ~signed ~size value
+        V.bitwise_not ~signed ~size value
       | _ -> assert false
     end
   | LNot ->

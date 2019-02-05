@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -301,7 +301,7 @@ let buffer_formatter state source =
   gtk_fmt
 
 let display_source globals
-    (source:GSourceView2.source_buffer) ~(host:Gtk_helper.host)
+    (source:GSourceView.source_buffer) ~(host:Gtk_helper.host)
     ~highlighter ~selector state =
   Locs.clear state;
   host#protect

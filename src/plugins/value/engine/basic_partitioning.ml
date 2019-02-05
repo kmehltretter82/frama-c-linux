@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -181,6 +181,9 @@ struct
     w.widened_state <- `Bottom;
     w.previous_state <- `Bottom;
     w.widening_counter <- widening_delay
+
+  let reset_widening_counter (w : widening) : unit =
+    w.widening_counter <- max w.widening_counter (widening_period - 1)
 
   (* Operators *)
 

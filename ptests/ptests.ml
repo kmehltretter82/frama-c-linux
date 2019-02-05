@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -707,11 +707,12 @@ let config_options =
     (fun _ s current ->
        let new_top =
          List.map
-           (fun (cmd,opts, log) -> cmd, make_custom_opts opts s, current.dc_default_log)
+           (fun (cmd,opts, log) -> cmd, make_custom_opts opts s, log)
            !current_default_cmds
        in
        { current with dc_toplevels = new_top @ current.dc_toplevels;
-                      dc_default_log = !current_default_log });
+                      dc_default_log = !current_default_log @
+                                       current.dc_default_log });
 
     "FILEREG",
     (fun _ s current -> { current with dc_test_regexp = s });

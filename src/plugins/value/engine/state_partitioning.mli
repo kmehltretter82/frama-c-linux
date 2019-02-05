@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -90,6 +90,12 @@ sig
   val reset_propagation : propagation -> unit
   val reset_shadow : shadow -> unit
   val reset_widening : widening -> unit
+
+  (** Resets (or just delays) the widening counter. Used on nested loops, to
+      postpone the widening of the inner loop when iterating on the outer
+      loops. This is especially useful when the inner loop fixpoint does not
+      depend on the outer loop. *)
+  val reset_widening_counter : widening -> unit
 
 
   (* --- Partition transfer functions --- *)

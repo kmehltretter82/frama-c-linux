@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -45,7 +45,7 @@ let ftau = function
   | Float32 -> t32
   | Float64 -> t64
 
-let suffix fmt = function
+let pp_suffix fmt = function
   | Float32 -> Format.pp_print_string fmt "f32"
   | Float64 -> Format.pp_print_string fmt "f64"
 
@@ -55,9 +55,9 @@ let link phi = Lang.infoprover (Qed.Engine.F_call phi)
 let fq32 = extern_f ~library ~result:t32 ~link:(link "to_f32") "q32"
 let fq64 = extern_f ~library ~result:t64 ~link:(link "to_f64") "q64"
 
-let f_model ft = extern_f ~library ~result:(ftau ft) "model_%a" suffix ft
-let f_delta ft = extern_f ~library ~result:(ftau ft) "delta_%a" suffix ft
-let f_epsilon ft = extern_f ~library ~result:(ftau ft) "epsilon_%a" suffix ft
+let f_model ft = extern_f ~library ~result:(ftau ft) "model_%a" pp_suffix ft
+let f_delta ft = extern_f ~library ~result:(ftau ft) "delta_%a" pp_suffix ft
+let f_epsilon ft = extern_f ~library ~result:(ftau ft) "epsilon_%a" pp_suffix ft
 
 (* -------------------------------------------------------------------------- *)
 (* --- Model Setting                                                      --- *)
@@ -135,39 +135,45 @@ let fmake ulp value = match ulp with
   | Float64 -> F.e_fun fq64 [F.e_float value]
 
 let qmake ulp q = fmake ulp (Transitioning.Q.to_float q)
-
 let mantissa = "\\([-+]?[0-9]*\\)"
 let comma = "\\(.\\(\\(0*[1-9]\\)*\\)0*\\)?"
 let exponent = "\\([eE]\\([-+]?[0-9]*\\)\\)?"
-let real = Str.regexp (mantissa ^ comma ^ exponent ^ "$")
+let suffix = "\\([flFL]\\)?"
+let real = Str.regexp (mantissa ^ comma ^ exponent ^ suffix ^ "$")
 
-let parse_literal v r =
+let parse_literal ~model v r =
   try
     if Str.string_match real r 0 then
-      let ma = Str.matched_group 1 r in
-      let mb = try Str.matched_group 3 r with Not_found -> "" in
-      let me = try Str.matched_group 6 r with Not_found -> "0" in
-      let n = int_of_string me - String.length mb in
-      let d n =
-        let s = Bytes.make (succ n) '0' in
-        Bytes.set s 0 '1' ; Q.of_string (Bytes.to_string s) in
-      let m = Q.of_string (ma ^ mb) in
-      if n < 0 then Q.div m (d (-n)) else
-      if n > 0 then Q.mul m (d n) else m
+      let has_suffix =
+        try ignore (Str.matched_group 7 r) ; true
+        with Not_found -> false in
+      if has_suffix && model = Float then
+        Q.of_float v
+      else
+        let ma = Str.matched_group 1 r in
+        let mb = try Str.matched_group 3 r with Not_found -> "" in
+        let me = try Str.matched_group 6 r with Not_found -> "0" in
+        let n = int_of_string me - String.length mb in
+        let d n =
+          let s = Bytes.make (succ n) '0' in
+          Bytes.set s 0 '1' ; Q.of_string (Bytes.to_string s) in
+        let m = Q.of_string (ma ^ mb) in
+        if n < 0 then Q.div m (d (-n)) else
+        if n > 0 then Q.mul m (d n) else m
     else Q.of_float v
   with Failure _ ->
     Warning.error "Unexpected constant literal %S" r
 
 let acsl_lit l =
   let open Cil_types in
-  F.e_real (parse_literal l.r_nearest l.r_literal)
+  F.e_real (parse_literal ~model:(Context.get model) l.r_nearest l.r_literal)
 
 let code_lit ulp value original =
   match Context.get model , ulp , original with
   | Float , Float32 , _ -> F.e_fun fq32 [F.e_float value]
   | Float , Float64 , _ -> F.e_fun fq64 [F.e_float value]
   | Real , _ , None -> F.e_float value
-  | Real , _ , Some r -> F.e_real (parse_literal value r)
+  | Real , _ , Some r -> F.e_real (parse_literal ~model:Real value r)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Computations                                                       --- *)
@@ -200,13 +206,13 @@ let compute op ulp xs =
 
 let make_fun_float ?result name op ft =
   let result = match result with None -> ftau ft | Some r -> r in
-  let phi = extern_f ~library ~result "%s_%a" name suffix ft in
+  let phi = extern_f ~library ~result "%s_%a" name pp_suffix ft in
   Lang.F.set_builtin phi (compute op ft) ;
   REGISTRY.define phi (op,ft) ; phi
 
 let make_pred_float name op ft =
-  let prop = Pretty_utils.sfprintf "%s_%a" name suffix ft in
-  let bool = Pretty_utils.sfprintf "%s_%ab" name suffix ft in
+  let prop = Pretty_utils.sfprintf "%s_%a" name pp_suffix ft in
+  let bool = Pretty_utils.sfprintf "%s_%ab" name pp_suffix ft in
   let phi = extern_p ~library ~bool ~prop () in
   Lang.F.set_builtin phi (compute op ft) ;
   REGISTRY.define phi (op,ft) ; phi

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -205,7 +205,8 @@ let () =
               (mul_CHAR_BIT (Int.of_string min));
             MaxValidAbsoluteAddress.set
               ((Int.pred (mul_CHAR_BIT (Int.succ (Int.of_string max))))))
-       with End_of_file | Scanf.Scan_failure _ | Failure _ as e ->
+       with End_of_file | Scanf.Scan_failure _ | Failure _
+          | Invalid_argument _ as e ->
          Kernel.abort "Invalid -absolute-valid-range integer-integer: each integer may be in decimal, hexadecimal (0x, 0X), octal (0o) or binary (0b) notation and has to hold in 64 bits. A correct example is -absolute-valid-range 1-0xFFFFFF0.@\nError was %S@."
            (Printexc.to_string e))
 

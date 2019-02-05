@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -280,7 +280,7 @@ let state_pretty cas fmt m =
               begin
                 try offsetmap_pretty cas name print_ampamp fmt offs
                 with
-                | Failure _
+                | Z.Overflow
                 | Too_large_to_enumerate ->
                   Value_parameters.warning "base %s too large, \
                                             will not print it" name

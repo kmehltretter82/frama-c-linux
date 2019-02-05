@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -153,6 +153,7 @@ let () = set_warn_status wkey_cert_exp_10 Log.Winactive
 let wkey_check_volatile = register_warn_category "check:volatile"
 
 let wkey_jcdb = register_warn_category "pp:compilation-db"
+let () = set_warn_status wkey_jcdb Log.Wonce
 
 let wkey_implicit_function_declaration = register_warn_category
     "typing:implicit-function-declaration"

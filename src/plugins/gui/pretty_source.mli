@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -57,7 +57,7 @@ val are_preconds_unfolded: stmt -> bool
 
 val display_source :
   global list ->
-  GSourceView2.source_buffer ->
+  GSourceView.source_buffer ->
   host:Gtk_helper.host ->
   highlighter:(localizable -> start:int -> stop:int -> unit) ->
   selector:(button:int -> localizable -> unit) ->

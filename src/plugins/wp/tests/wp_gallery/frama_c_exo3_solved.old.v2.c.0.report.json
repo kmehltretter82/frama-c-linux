@@ -1,6 +1,6 @@
-{ "wp:global": { "alt-ergo": { "total": 23, "valid": 23, "rank": 38 },
+{ "wp:global": { "alt-ergo": { "total": 23, "valid": 23, "rank": 39 },
                  "qed": { "total": 28, "valid": 28 },
-                 "wp:main": { "total": 51, "valid": 51, "rank": 38 } },
+                 "wp:main": { "total": 51, "valid": 51, "rank": 39 } },
   "wp:functions": { "equal_elements": { "equal_elements_assert_rte_signed_overflow_2": 
                                           { "alt-ergo": { "total": 1,
                                                           "valid": 1,
@@ -80,35 +80,35 @@
                                           { "qed": { "total": 1, "valid": 1 },
                                             "wp:main": { "total": 1,
                                                          "valid": 1 } },
-                                        "equal_elements_loop_inv_v2_sound2": 
+                                        "equal_elements_loop_invariant_v2_sound2": 
                                           { "alt-ergo": { "total": 2,
                                                           "valid": 2,
-                                                          "rank": 36 },
+                                                          "rank": 37 },
                                             "wp:main": { "total": 2,
                                                          "valid": 2,
-                                                         "rank": 36 } },
-                                        "equal_elements_loop_inv_v1_sound2": 
+                                                         "rank": 37 } },
+                                        "equal_elements_loop_invariant_v1_sound2": 
                                           { "alt-ergo": { "total": 2,
                                                           "valid": 2,
-                                                          "rank": 20 },
+                                                          "rank": 22 },
                                             "wp:main": { "total": 2,
                                                          "valid": 2,
-                                                         "rank": 20 } },
-                                        "equal_elements_loop_inv_seen_sound2": 
+                                                         "rank": 22 } },
+                                        "equal_elements_loop_invariant_seen_sound2": 
                                           { "alt-ergo": { "total": 2,
                                                           "valid": 2,
                                                           "rank": 32 },
                                             "wp:main": { "total": 2,
                                                          "valid": 2,
                                                          "rank": 32 } },
-                                        "equal_elements_loop_inv_seen_sound1": 
+                                        "equal_elements_loop_invariant_seen_sound1": 
                                           { "alt-ergo": { "total": 2,
                                                           "valid": 2,
-                                                          "rank": 38 },
+                                                          "rank": 39 },
                                             "wp:main": { "total": 2,
                                                          "valid": 2,
-                                                         "rank": 38 } },
-                                        "equal_elements_loop_inv_v1_v2_diff": 
+                                                         "rank": 39 } },
+                                        "equal_elements_loop_invariant_v1_v2_diff": 
                                           { "alt-ergo": { "total": 1,
                                                           "valid": 1,
                                                           "rank": 15 },
@@ -116,7 +116,7 @@
                                             "wp:main": { "total": 2,
                                                          "valid": 2,
                                                          "rank": 15 } },
-                                        "equal_elements_loop_inv_v2_sound1": 
+                                        "equal_elements_loop_invariant_v2_sound1": 
                                           { "alt-ergo": { "total": 1,
                                                           "valid": 1,
                                                           "rank": 32 },
@@ -124,26 +124,26 @@
                                             "wp:main": { "total": 2,
                                                          "valid": 2,
                                                          "rank": 32 } },
-                                        "equal_elements_loop_inv_v1_sound1": 
+                                        "equal_elements_loop_invariant_v1_sound1": 
                                           { "alt-ergo": { "total": 1,
                                                           "valid": 1,
-                                                          "rank": 24 },
+                                                          "rank": 25 },
                                             "qed": { "total": 1, "valid": 1 },
                                             "wp:main": { "total": 2,
                                                          "valid": 2,
-                                                         "rank": 24 } },
-                                        "equal_elements_loop_inv_v1_first": 
+                                                         "rank": 25 } },
+                                        "equal_elements_loop_invariant_v1_first": 
                                           { "qed": { "total": 2, "valid": 2 },
                                             "wp:main": { "total": 2,
                                                          "valid": 2 } },
-                                        "equal_elements_loop_inv_bound": 
+                                        "equal_elements_loop_invariant_bound": 
                                           { "alt-ergo": { "total": 1,
                                                           "valid": 1,
-                                                          "rank": 10 },
+                                                          "rank": 11 },
                                             "qed": { "total": 1, "valid": 1 },
                                             "wp:main": { "total": 2,
                                                          "valid": 2,
-                                                         "rank": 10 } },
+                                                         "rank": 11 } },
                                         "equal_elements_assert_set_at_1": 
                                           { "alt-ergo": { "total": 1,
                                                           "valid": 1,
@@ -151,7 +151,7 @@
                                             "wp:main": { "total": 1,
                                                          "valid": 1,
                                                          "rank": 7 } },
-                                        "equal_elements_loop_inv_set_at_0": 
+                                        "equal_elements_loop_invariant_set_at_0": 
                                           { "alt-ergo": { "total": 1,
                                                           "valid": 1,
                                                           "rank": 10 },
@@ -159,67 +159,62 @@
                                             "wp:main": { "total": 2,
                                                          "valid": 2,
                                                          "rank": 10 } },
-                                        "equal_elements_loop_inv": { "alt-ergo": 
-                                                                    { "total": 1,
-                                                                    "valid": 1,
-                                                                    "rank": 7 },
-                                                                    "qed": 
-                                                                    { "total": 1,
-                                                                    "valid": 1 },
-                                                                    "wp:main": 
-                                                                    { "total": 2,
-                                                                    "valid": 2,
-                                                                    "rank": 7 } },
-                                        "equal_elements_loop_term_2": 
+                                        "equal_elements_loop_invariant": 
+                                          { "alt-ergo": { "total": 1,
+                                                          "valid": 1,
+                                                          "rank": 7 },
+                                            "qed": { "total": 1, "valid": 1 },
+                                            "wp:main": { "total": 2,
+                                                         "valid": 2,
+                                                         "rank": 7 } },
+                                        "equal_elements_loop_variant_2": 
                                           { "qed": { "total": 2, "valid": 2 },
                                             "wp:main": { "total": 2,
                                                          "valid": 2 } },
-                                        "equal_elements_loop_term": { "qed": 
-                                                                    { "total": 2,
-                                                                    "valid": 2 },
-                                                                    "wp:main": 
-                                                                    { "total": 2,
-                                                                    "valid": 2 } },
-                                        "equal_elements_assign": { "qed": 
+                                        "equal_elements_loop_variant": 
+                                          { "qed": { "total": 2, "valid": 2 },
+                                            "wp:main": { "total": 2,
+                                                         "valid": 2 } },
+                                        "equal_elements_assigns": { "qed": 
                                                                     { "total": 3,
                                                                     "valid": 3 },
-                                                                   "wp:main": 
+                                                                    "wp:main": 
                                                                     { "total": 3,
                                                                     "valid": 3 } },
-                                        "equal_elements_loop_assign_2": 
+                                        "equal_elements_loop_assigns_2": 
                                           { "qed": { "total": 1, "valid": 1 },
                                             "wp:main": { "total": 1,
                                                          "valid": 1 } },
-                                        "equal_elements_loop_assign": 
+                                        "equal_elements_loop_assigns": 
                                           { "qed": { "total": 1, "valid": 1 },
                                             "wp:main": { "total": 1,
                                                          "valid": 1 } },
-                                        "equal_elements_post_v1_v2_diff": 
+                                        "equal_elements_ensures_v1_v2_diff": 
                                           { "alt-ergo": { "total": 1,
                                                           "valid": 1,
-                                                          "rank": 11 },
+                                                          "rank": 12 },
                                             "wp:main": { "total": 1,
                                                          "valid": 1,
-                                                         "rank": 11 } },
-                                        "equal_elements_post_v2_good": 
+                                                         "rank": 12 } },
+                                        "equal_elements_ensures_v2_good": 
                                           { "alt-ergo": { "total": 1,
                                                           "valid": 1,
                                                           "rank": 25 },
                                             "wp:main": { "total": 1,
                                                          "valid": 1,
                                                          "rank": 25 } },
-                                        "equal_elements_post_v1_good": 
+                                        "equal_elements_ensures_v1_good": 
                                           { "alt-ergo": { "total": 1,
                                                           "valid": 1,
-                                                          "rank": 13 },
+                                                          "rank": 14 },
                                             "wp:main": { "total": 1,
                                                          "valid": 1,
-                                                         "rank": 13 } },
+                                                         "rank": 14 } },
                                         "wp:section": { "alt-ergo": { "total": 23,
                                                                     "valid": 23,
-                                                                    "rank": 38 },
+                                                                    "rank": 39 },
                                                         "qed": { "total": 28,
                                                                  "valid": 28 },
                                                         "wp:main": { "total": 51,
                                                                     "valid": 51,
-                                                                    "rank": 38 } } } } }
+                                                                    "rank": 39 } } } } }

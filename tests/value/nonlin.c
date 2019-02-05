@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-val-subdivide-non-linear 14 -value-msg-key nonlin"
+   STDOPT: +"-eva-subdivide-non-linear 14 -eva-msg-key nonlin"
 */
 
 #include "__fc_builtin.h"

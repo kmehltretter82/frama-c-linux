@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2018                                               *)
+(*  Copyright (C) 2007-2019                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -380,6 +380,7 @@ type formula =
 
 type po = t and t = {
     po_gid   : string ;  (* goal identifier *)
+    po_leg   : string ;  (* legacy goal identifier *)
     po_sid   : string ;  (* goal short identifier (without model) *)
     po_name  : string ;  (* goal informal name *)
     po_idx   : index ;   (* goal index *)
@@ -453,8 +454,9 @@ module S =
         [{
           po_idx = Function(List.hd Kernel_function.reprs,Some "default") ;
           po_pid = List.hd WpPropId.PropId.reprs;
-          po_sid = "xxx";
-          po_gid = "xxx";
+          po_sid = "";
+          po_gid = "";
+          po_leg = "";
           po_model = Model.repr ;
           po_name = "dummy";
           po_formula = GoalAnnot VC_Annot.repr ;

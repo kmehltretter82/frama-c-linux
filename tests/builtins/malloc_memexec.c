@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -val @VALUECONFIG@ -memexec-all -deps -inout -val-mlevel 0
+   OPT: -eva @VALUECONFIG@ -eva-memexec -deps -inout -eva-mlevel 0
 */
 
 //@ assigns \result;
