@@ -813,7 +813,7 @@ let highlighter (buffer:reactive_buffer) localizable ~start ~stop =
         in
         Design.Feedback.mark buffer#buffer ~call_site:stmt ~offset validity
 
-  | Pretty_source.PStmt _
+  | Pretty_source.PStmt _ | Pretty_source.PStmtStart _
   | Pretty_source.PGlobal _| Pretty_source.PVDecl _
   | Pretty_source.PTermLval _| Pretty_source.PLval _
   | Pretty_source.PExp _ -> ()
