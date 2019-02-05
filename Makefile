@@ -725,15 +725,23 @@ ifeq ($(LABLGTK),lablgtk3)
 src/plugins/gui/gtk_compat.ml: src/plugins/gui/gtk_compat.3.ml
 	$(CP) $< $@
 	$(CHMOD_RO) $@
+src/plugins/gui/pango_compat.ml: src/plugins/gui/pango_compat.3.ml
+	$(CP) $< $@
+	$(CHMOD_RO) $@
 else
 src/plugins/gui/gtk_compat.ml: src/plugins/gui/gtk_compat.2.ml
 	$(CP) $< $@
 	$(CHMOD_RO) $@
+src/plugins/gui/pango_compat.ml: src/plugins/gui/pango_compat.2.ml
+	$(CP) $< $@
+	$(CHMOD_RO) $@
 endif
-GENERATED+=src/plugins/gui/gtk_compat.ml
+GENERATED+=src/plugins/gui/gtk_compat.ml src/plugins/gui/pango_compat.ml
 
 SINGLE_GUI_CMO:= \
 	gtk_compat \
+        wutil_once \
+        pango_compat \
 	$(WTOOLKIT) \
 	$(SOURCEVIEWCOMPAT) \
 	$(DGRAPHCOMPAT) \

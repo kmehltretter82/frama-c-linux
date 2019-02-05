@@ -786,6 +786,9 @@ src/plugins/gui/launcher.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/launcher.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/menu_manager.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/menu_manager.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/gui/pango_compat.2.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/gui/pango_compat.3.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/gui/pango_compat.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/pretty_source.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/pretty_source.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/project_manager.ml: CEA_LGPL_OR_PROPRIETARY
@@ -814,6 +817,8 @@ src/plugins/gui/wtext.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/wtext.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/wutil.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/wutil.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/gui/wutil_once.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/gui/wutil_once.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/impact/Impact.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/impact/compute_impact.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/impact/compute_impact.mli: CEA_LGPL_OR_PROPRIETARY
