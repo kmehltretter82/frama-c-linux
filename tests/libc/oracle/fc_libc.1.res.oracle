@@ -261,7 +261,7 @@ struct DIR {
 };
 typedef struct DIR DIR;
 struct __anonstruct_fd_set_25 {
-   char __fc_fd_set ;
+   long __fc_fd_set[(unsigned int)1024 / ((unsigned int)8 * sizeof(long))] ;
 };
 typedef struct __anonstruct_fd_set_25 fd_set;
 typedef unsigned int useconds_t;
