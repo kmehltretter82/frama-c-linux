@@ -5365,7 +5365,7 @@ and isIntegerConstant ghost (aexp) : int option =
   match doExp (ghost_local_env ghost) true aexp (AExp None) with
   | (_, c, e, _) when isEmpty c -> begin
       match Cil.constFoldToInt e with
-      | Some i64 -> Some (Integer.to_int i64)
+      | Some n -> (try Some (Integer.to_int n) with Z.Overflow -> None)
       | _ -> None
     end
   | _ -> None

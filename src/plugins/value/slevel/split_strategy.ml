@@ -80,7 +80,7 @@ let of_string s =
     let r = Str.regexp ":" in
     let conv s =
       try Integer.of_string s
-      with Failure _ -> raise (ParseFailure s)
+      with Invalid_argument _ -> raise (ParseFailure s)
     in SplitEqList (List.map conv (Str.split r s))
 
 let to_string = function

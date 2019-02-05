@@ -107,7 +107,7 @@ let selected = function
   | Compose code -> composed code
 
 let get_int_z z =
-  try Some (Integer.to_int z) with _ -> None
+  try Some (Integer.to_int z) with Z.Overflow -> None
 
 let get_int = function
   | Empty -> None

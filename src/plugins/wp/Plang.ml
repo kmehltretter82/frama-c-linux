@@ -109,8 +109,8 @@ class engine =
         if -256 <= n && n <= 256 then
           Format.pp_print_int fmt n
         else
-          raise Integer.Too_big
-      with Integer.Too_big ->
+          raise Z.Overflow
+      with Z.Overflow ->
       match iformat with
       | `Dec -> Integer.pretty ~hexa:false fmt z
       | `Hex -> Integer.pp_hex ~sep:"," fmt z

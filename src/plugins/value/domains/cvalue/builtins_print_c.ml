@@ -280,7 +280,7 @@ let state_pretty cas fmt m =
               begin
                 try offsetmap_pretty cas name print_ampamp fmt offs
                 with
-                | Failure _
+                | Z.Overflow
                 | Too_large_to_enumerate ->
                   Value_parameters.warning "base %s too large, \
                                             will not print it" name
