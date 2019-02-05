@@ -224,13 +224,7 @@ share/libc/inttypes.c: CEA_LGPL
 share/libc/inttypes.h: CEA_LGPL
 share/libc/iso646.h: CEA_LGPL
 share/libc/libgen.h: CEA_LGPL
-share/libc/libintl.h: CEA_LGPL
 share/libc/limits.h: CEA_LGPL
-share/libc/linux/fs.h: CEA_LGPL
-share/libc/linux/if_addr.h: CEA_LGPL
-share/libc/linux/if_netlink.h: CEA_LGPL
-share/libc/linux/netlink.h: CEA_LGPL
-share/libc/linux/rtnetlink.h: CEA_LGPL
 share/libc/locale.c: CEA_LGPL
 share/libc/locale.h: CEA_LGPL
 share/libc/malloc.h: CEA_LGPL
@@ -243,9 +237,6 @@ share/libc/net/if.h: CEA_LGPL
 share/libc/netdb.c: CEA_LGPL
 share/libc/netdb.h: CEA_LGPL
 share/libc/netinet/in.h: CEA_LGPL
-share/libc/netinet/in_systm.h: CEA_LGPL
-share/libc/netinet/ip.h: CEA_LGPL
-share/libc/netinet/ip_icmp.h: CEA_LGPL
 share/libc/netinet/tcp.h: CEA_LGPL
 share/libc/nl_types.h: CEA_LGPL
 share/libc/poll.h: CEA_LGPL
@@ -273,7 +264,6 @@ share/libc/sys/file.h: CEA_LGPL
 share/libc/sys/ioctl.h: CEA_LGPL
 share/libc/sys/ipc.h: CEA_LGPL
 share/libc/sys/mman.h: CEA_LGPL
-share/libc/sys/param.h: CEA_LGPL
 share/libc/sys/random.h: CEA_LGPL
 share/libc/sys/resource.h: CEA_LGPL
 share/libc/sys/select.h: CEA_LGPL
@@ -281,7 +271,6 @@ share/libc/sys/shm.h: CEA_LGPL
 share/libc/sys/signal.h: CEA_LGPL
 share/libc/sys/socket.h: CEA_LGPL
 share/libc/sys/stat.h: CEA_LGPL
-share/libc/sys/sysctl.h: CEA_LGPL
 share/libc/sys/time.h: CEA_LGPL
 share/libc/sys/times.h: CEA_LGPL
 share/libc/sys/timex.h: CEA_LGPL
@@ -293,9 +282,8 @@ share/libc/sys/wait.h: CEA_LGPL
 share/libc/syslog.h: CEA_LGPL
 share/libc/termios.h: CEA_LGPL
 share/libc/tgmath.h: CEA_LGPL
-share/libc/time.h: CEA_LGPL
 share/libc/time.c: CEA_LGPL
-share/libc/uchar.h: CEA_LGPL
+share/libc/time.h: CEA_LGPL
 share/libc/unistd.h: CEA_LGPL
 share/libc/utime.h: CEA_LGPL
 share/libc/utmpx.h: CEA_LGPL
