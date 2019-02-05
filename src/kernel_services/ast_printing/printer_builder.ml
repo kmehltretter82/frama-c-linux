@@ -95,7 +95,7 @@ end
 
 
 module Make
-  (P: sig class printer: unit -> Printer_api.extensible_printer_type end) =
+    (P: sig class printer: unit -> Printer_api.extensible_printer_type end) =
 struct
 
   module type PrinterClass = sig
