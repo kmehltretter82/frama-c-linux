@@ -1,0 +1,2 @@
+File "../why3/ExpLog.why", line 5, characters 6-13:
+warning: axiom exp_pos does not contain any local abstract symbol

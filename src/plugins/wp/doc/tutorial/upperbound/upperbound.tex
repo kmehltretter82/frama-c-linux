@@ -1,0 +1,19 @@
+\clearpage
+\section{The \textsf{upper-bound} algorithm}
+
+We study here the \texttt{upper-bound}
+algorithm from ``ACSL By Example''. 
+Its specification is:
+
+\listingname{upperbound.h}
+\cinput{upperbound/upperbound.spec}
+
+The implementation of the algorithm is:
+
+\listingname{upperbound.c}
+\cinput{upperbound/upperbound.impl}
+
+The implementation is proved correct against its specification by
+simply running the \textsf{WP} plug-in:
+\fclogs{binary}{upperbound}
+

@@ -1,0 +1,16 @@
+[kernel] Parsing context-depth.c (with preprocessing)
+[value] Analyzing an incomplete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value] Values of globals at initialization
+  s.v ∈ [--..--]
+   .next ∈ {{ &S_next_s[0] }}
+  S_next_s[0].v ∈ [--..--]
+          [0].next ∈ {{ &S_next_0_S_next_s[0] }}
+  S_next_0_S_next_s[0].v ∈ [--..--]
+                   [0].next ∈ {0}
+[value] Recording results for main
+[value] done for function main
+[value] ====== VALUES COMPUTED ======
+[value] Values at end of function main:
+  

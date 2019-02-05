@@ -1,0 +1,131 @@
+[kernel] Parsing tests/libc/wchar_c_h.c (with preprocessing)
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
+  wc ∈ {-1}
+  wi ∈ {4294967295}
+  t ∈ {0}
+  nondet ∈ [--..--]
+[eva] tests/libc/wchar_c_h.c:31: Call to builtin wmemchr
+[eva] computing for function wmemcmp <- main.
+  Called from tests/libc/wchar_c_h.c:32.
+[eva] using specification for function wmemcmp
+[eva] Done for function wmemcmp
+[eva] computing for function wmemcpy <- main.
+  Called from tests/libc/wchar_c_h.c:33.
+[eva] using specification for function wmemcpy
+[eva] tests/libc/wchar_c_h.c:33: 
+  function wmemcpy: precondition 'separation,dest,src' got status valid.
+[eva] Done for function wmemcpy
+[eva] computing for function wmemmove <- main.
+  Called from tests/libc/wchar_c_h.c:34.
+[eva] using specification for function wmemmove
+[eva] Done for function wmemmove
+[eva] computing for function wmemset <- main.
+  Called from tests/libc/wchar_c_h.c:35.
+[eva] using specification for function wmemset
+[eva] Done for function wmemset
+[eva] tests/libc/wchar_c_h.c:36: Call to builtin wcschr
+[eva] tests/libc/wchar_c_h.c:36: 
+  function wcschr: precondition 'valid_wstring_src' got status valid.
+[eva] computing for function wcscmp <- main.
+  Called from tests/libc/wchar_c_h.c:37.
+[eva] using specification for function wcscmp
+[eva] Done for function wcscmp
+[eva] computing for function wcscpy <- main.
+  Called from tests/libc/wchar_c_h.c:38.
+[eva] using specification for function wcscpy
+[eva] Done for function wcscpy
+[eva] computing for function wcscspn <- main.
+  Called from tests/libc/wchar_c_h.c:39.
+[eva] using specification for function wcscspn
+[eva] Done for function wcscspn
+[eva] computing for function wcslcat <- main.
+  Called from tests/libc/wchar_c_h.c:40.
+[eva] using specification for function wcslcat
+[eva] Done for function wcslcat
+[eva] computing for function wcslcpy <- main.
+  Called from tests/libc/wchar_c_h.c:41.
+[eva] using specification for function wcslcpy
+[eva] tests/libc/wchar_c_h.c:41: 
+  function wcslcpy: precondition 'separation,dest,src' got status valid.
+[eva] Done for function wcslcpy
+[eva] tests/libc/wchar_c_h.c:42: Call to builtin wcslen
+[eva] tests/libc/wchar_c_h.c:42: 
+  function wcslen: precondition 'valid_string_s' got status valid.
+[eva] computing for function wcsncmp <- main.
+  Called from tests/libc/wchar_c_h.c:43.
+[eva] using specification for function wcsncmp
+[eva] Done for function wcsncmp
+[eva] computing for function wcsncpy <- main.
+  Called from tests/libc/wchar_c_h.c:44.
+[eva] using specification for function wcsncpy
+[eva] tests/libc/wchar_c_h.c:44: 
+  function wcsncpy: precondition 'separation,dest,src' got status valid.
+[eva] Done for function wcsncpy
+[eva] computing for function wcspbrk <- main.
+  Called from tests/libc/wchar_c_h.c:45.
+[eva] using specification for function wcspbrk
+[eva] Done for function wcspbrk
+[eva] computing for function wcsrchr <- main.
+  Called from tests/libc/wchar_c_h.c:46.
+[eva] using specification for function wcsrchr
+[eva] Done for function wcsrchr
+[eva] computing for function wcsspn <- main.
+  Called from tests/libc/wchar_c_h.c:47.
+[eva] using specification for function wcsspn
+[eva] Done for function wcsspn
+[eva] computing for function wcsstr <- main.
+  Called from tests/libc/wchar_c_h.c:48.
+[eva] using specification for function wcsstr
+[eva] Done for function wcsstr
+[eva] computing for function wcscat <- main.
+  Called from tests/libc/wchar_c_h.c:52.
+[eva] using specification for function wcscat
+[eva] Done for function wcscat
+[eva] computing for function wcsncat <- main.
+  Called from tests/libc/wchar_c_h.c:54.
+[eva] using specification for function wcsncat
+[eva] Done for function wcsncat
+[eva] tests/libc/wchar_c_h.c:57: Call to builtin wcslen
+[eva:alarm] tests/libc/wchar_c_h.c:57: Warning: 
+  function wcslen: precondition 'valid_string_s' got status invalid.
+[eva] tests/libc/wchar_c_h.c:58: Call to builtin wcslen
+[eva:alarm] tests/libc/wchar_c_h.c:58: Warning: 
+  function wcslen: precondition 'valid_string_s' got status invalid.
+[eva] tests/libc/wchar_c_h.c:59: Call to builtin wcslen
+[eva:alarm] tests/libc/wchar_c_h.c:59: Warning: 
+  function wcslen: precondition 'valid_string_s' got status invalid.
+[eva] tests/libc/wchar_c_h.c:61: Call to builtin wcschr
+[eva:alarm] tests/libc/wchar_c_h.c:61: Warning: 
+  function wcschr: precondition 'valid_wstring_src' got status invalid.
+[eva] tests/libc/wchar_c_h.c:62: Call to builtin wcschr
+[eva:alarm] tests/libc/wchar_c_h.c:62: Warning: 
+  function wcschr: precondition 'valid_wstring_src' got status invalid.
+[eva] tests/libc/wchar_c_h.c:63: Call to builtin wcschr
+[eva:alarm] tests/libc/wchar_c_h.c:63: Warning: 
+  function wcschr: precondition 'valid_wstring_src' got status invalid.
+[eva] tests/libc/wchar_c_h.c:68: Call to builtin wcschr
+[eva] tests/libc/wchar_c_h.c:68: 
+  function wcschr: precondition 'valid_wstring_src' got status valid.
+[eva] tests/libc/wchar_c_h.c:69: Call to builtin wmemchr
+[eva] tests/libc/wchar_c_h.c:70: Call to builtin wmemchr
+[eva] Recording results for main
+[eva] done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function main:
+  sc1 ∈ {{ L"Needle" }}
+  sc2 ∈ {{ L"Haystack" }}
+  buf[0..19] ∈ [--..--] or UNINITIALIZED
+  c ∈ [--..--]
+  n ∈ {5}
+  r ∈ [--..--] or UNINITIALIZED
+  i ∈ [--..--]
+  res ∈ {{ NULL ; &buf[0] ; L"Needle" + [0..--],0%4 }}
+  wc_0 ∈ {{ L"ABC" }}
+  p ∈ {{ L"ABC" + {4} }}
+  wcr ∈ {{ L"ABC" + {8} }}
+  wmr1 ∈ {0}
+  wmr2 ∈ {{ L"ABC" + {8} }}
+  __retres ∈ {0}

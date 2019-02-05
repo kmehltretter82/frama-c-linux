@@ -1,0 +1,300 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  This file is part of WP plug-in of Frama-C.                           *)
+(*                                                                        *)
+(*  Copyright (C) 2007-2018                                               *)
+(*    CEA (Commissariat a l'energie atomique et aux energies              *)
+(*         alternatives)                                                  *)
+(*                                                                        *)
+(*  you can redistribute it and/or modify it under the terms of the GNU   *)
+(*  Lesser General Public License as published by the Free Software       *)
+(*  Foundation, version 2.1.                                              *)
+(*                                                                        *)
+(*  It is distributed in the hope that it will be useful,                 *)
+(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
+(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *)
+(*  GNU Lesser General Public License for more details.                   *)
+(*                                                                        *)
+(*  See the GNU Lesser General Public License version 2.1                 *)
+(*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
+(*                                                                        *)
+(**************************************************************************)
+
+(* -------------------------------------------------------------------------- *)
+(* --- Floats Arithmetic Model                                            --- *)
+(* -------------------------------------------------------------------------- *)
+
+open Ctypes
+open Qed
+open Lang
+open Lang.F
+
+(* -------------------------------------------------------------------------- *)
+(* --- Library                                                            --- *)
+(* -------------------------------------------------------------------------- *)
+
+let library = "cfloat"
+
+let f32 = datatype ~library "f32"
+let f64 = datatype ~library "f64"
+
+let t32 = Lang.(t_datatype f32 [])
+let t64 = Lang.(t_datatype f64 [])
+
+let ftau = function
+  | Float32 -> t32
+  | Float64 -> t64
+
+let suffix fmt = function
+  | Float32 -> Format.pp_print_string fmt "f32"
+  | Float64 -> Format.pp_print_string fmt "f64"
+
+let link phi = Lang.infoprover (Qed.Engine.F_call phi)
+
+(* Qed exact representations, linked to f32/f64 *)
+let fq32 = extern_f ~library ~result:t32 ~link:(link "to_f32") "q32"
+let fq64 = extern_f ~library ~result:t64 ~link:(link "to_f64") "q64"
+
+let f_model ft = extern_f ~library ~result:(ftau ft) "model_%a" suffix ft
+let f_delta ft = extern_f ~library ~result:(ftau ft) "delta_%a" suffix ft
+let f_epsilon ft = extern_f ~library ~result:(ftau ft) "epsilon_%a" suffix ft
+
+(* -------------------------------------------------------------------------- *)
+(* --- Model Setting                                                      --- *)
+(* -------------------------------------------------------------------------- *)
+
+type model = Real | Float
+
+let model = Context.create ~default:Float "Cfloat.model"
+
+let tau_of_float f =
+  match Context.get model with
+  | Real -> Logic.Real
+  | Float -> ftau f
+
+(* -------------------------------------------------------------------------- *)
+(* --- Operators                                                          --- *)
+(* -------------------------------------------------------------------------- *)
+
+type op =
+  | LT
+  | EQ
+  | LE
+  | NE
+  | NEG
+  | ADD
+  | MUL
+  | DIV
+  | REAL
+  | ROUND
+  | EXACT
+
+[@@@ warning "-32"]
+let op_name = function
+  | LT -> "flt"
+  | EQ -> "feq"
+  | LE -> "fle"
+  | NE -> "fne"
+  | NEG -> "fneg"
+  | ADD -> "fadd"
+  | MUL -> "fmul"
+  | DIV -> "fdiv"
+  | REAL -> "freal"
+  | ROUND -> "fround"
+  | EXACT -> "fexact"
+[@@@ warning "+32"]
+
+(* -------------------------------------------------------------------------- *)
+(* --- Registry                                                           --- *)
+(* -------------------------------------------------------------------------- *)
+
+module REGISTRY = Model.Static
+    (struct
+      type key = lfun
+      type data = op * c_float
+      let name = "Wp.Cfloat.REGISTRY"
+      include Lang.Fun
+    end)
+
+let find = REGISTRY.find
+
+let () = Context.register
+    begin fun () ->
+      REGISTRY.define fq32 (EXACT,Float32) ;
+      REGISTRY.define fq64 (EXACT,Float64) ;
+    end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Literals                                                           --- *)
+(* -------------------------------------------------------------------------- *)
+
+let rfloat = Floating_point.round_to_single_precision_float
+
+let fmake ulp value = match ulp with
+  | Float32 -> F.e_fun fq32 [F.e_float (rfloat value)]
+  | Float64 -> F.e_fun fq64 [F.e_float value]
+
+let qmake ulp q = fmake ulp (Transitioning.Q.to_float q)
+
+let mantissa = "\\([-+]?[0-9]*\\)"
+let comma = "\\(.\\(\\(0*[1-9]\\)*\\)0*\\)?"
+let exponent = "\\([eE]\\([-+]?[0-9]*\\)\\)?"
+let real = Str.regexp (mantissa ^ comma ^ exponent ^ "$")
+
+let parse_literal v r =
+  try
+    if Str.string_match real r 0 then
+      let ma = Str.matched_group 1 r in
+      let mb = try Str.matched_group 3 r with Not_found -> "" in
+      let me = try Str.matched_group 6 r with Not_found -> "0" in
+      let n = int_of_string me - String.length mb in
+      let d n =
+        let s = Bytes.make (succ n) '0' in
+        Bytes.set s 0 '1' ; Q.of_string (Bytes.to_string s) in
+      let m = Q.of_string (ma ^ mb) in
+      if n < 0 then Q.div m (d (-n)) else
+      if n > 0 then Q.mul m (d n) else m
+    else Q.of_float v
+  with Failure _ ->
+    Warning.error "Unexpected constant literal %S" r
+
+let acsl_lit l =
+  let open Cil_types in
+  F.e_real (parse_literal l.r_nearest l.r_literal)
+
+let code_lit ulp value original =
+  match Context.get model , ulp , original with
+  | Float , Float32 , _ -> F.e_fun fq32 [F.e_float value]
+  | Float , Float64 , _ -> F.e_fun fq64 [F.e_float value]
+  | Real , _ , None -> F.e_float value
+  | Real , _ , Some r -> F.e_real (parse_literal value r)
+
+(* -------------------------------------------------------------------------- *)
+(* --- Computations                                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
+let rec exact e =
+  match F.repr e with
+  | Qed.Logic.Kreal r -> r
+  | Qed.Logic.Kint z -> Q.of_bigint z
+  | Qed.Logic.Fun( f , [ q ] ) when f == fq32 || f == fq64 -> exact q
+  | _ -> raise Not_found
+
+let compute op ulp xs =
+  match op , xs with
+  | NEG , [ x ] -> qmake ulp (Q.neg (exact x))
+  | ADD , [ x ; y ] -> qmake ulp (Q.add (exact x) (exact y))
+  | MUL , [ x ; y ] -> qmake ulp (Q.mul (exact x) (exact y))
+  | DIV , [ x ; y ] -> qmake ulp (Q.div (exact x) (exact y))
+  | ROUND , [ x ] -> qmake ulp (exact x)
+  | REAL , [ x ] -> F.e_real (exact x)
+  | LE , [ x ; y ] -> F.e_bool (Q.leq (exact x) (exact y))
+  | LT , [ x ; y ] -> F.e_bool (Q.lt (exact x) (exact y))
+  | EQ , [ x ; y ] -> F.e_bool (Q.equal (exact x) (exact y))
+  | NE , [ x ; y ] -> F.e_bool (not (Q.equal (exact x) (exact y)))
+  | _ -> raise Not_found
+
+(* -------------------------------------------------------------------------- *)
+(* --- Operations                                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
+let make_fun_float ?result name op ft =
+  let result = match result with None -> ftau ft | Some r -> r in
+  let phi = extern_f ~library ~result "%s_%a" name suffix ft in
+  Lang.F.set_builtin phi (compute op ft) ;
+  REGISTRY.define phi (op,ft) ; phi
+
+let make_pred_float name op ft =
+  let prop = Pretty_utils.sfprintf "%s_%a" name suffix ft in
+  let bool = Pretty_utils.sfprintf "%s_%ab" name suffix ft in
+  let phi = extern_p ~library ~bool ~prop () in
+  Lang.F.set_builtin phi (compute op ft) ;
+  REGISTRY.define phi (op,ft) ; phi
+
+let register = Ctypes.f_memo
+
+let real_of_flt  = register (make_fun_float ~result:Logic.Real "of" REAL)
+let flt_of_real  = register (make_fun_float "to" ROUND)
+let flt_add  = register (make_fun_float "add" ADD)
+let flt_mul  = register (make_fun_float "mul" MUL)
+let flt_div  = register (make_fun_float "div" DIV)
+let flt_neg  = register (make_fun_float "neg" NEG)
+
+let flt_lt = register (make_pred_float "lt" LT)
+let flt_eq = register (make_pred_float "eq" EQ)
+let flt_le = register (make_pred_float "le" LE)
+let flt_neq = register (make_pred_float "ne" NE)
+
+(* -------------------------------------------------------------------------- *)
+(* --- Models                                                             --- *)
+(* -------------------------------------------------------------------------- *)
+
+let () =
+  begin
+    let open LogicBuiltins in
+    let register ft =
+      add_builtin "\\model" [F ft] (f_model ft) ;
+      add_builtin "\\delta" [F ft] (f_delta ft) ;
+      add_builtin "\\epsilon" [F ft] (f_epsilon ft) ;
+    in
+    register Float32 ;
+    register Float64 ;
+  end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Conversion Symbols                                                 --- *)
+(* -------------------------------------------------------------------------- *)
+
+let real_of_float f a =
+  match Context.get model with
+  | Real -> a
+  | Float -> e_fun (real_of_flt f) [a]
+
+let float_of_real f a =
+  match Context.get model with
+  | Real -> a
+  | Float -> e_fun (flt_of_real f) [a]
+
+let float_of_int f a = float_of_real f (Cmath.real_of_int a)
+
+(* -------------------------------------------------------------------------- *)
+(* --- Float Arithmetics                                                  --- *)
+(* -------------------------------------------------------------------------- *)
+
+let fbinop rop fop f x y =
+  match Context.get model with
+  | Real -> rop x y
+  | Float -> e_fun (fop f) [x;y]
+
+let fcmp rop fop f x y =
+  match Context.get model with
+  | Real -> rop x y
+  | Float -> p_call (fop f) [x;y]
+
+let fadd = fbinop e_add flt_add
+let fmul = fbinop e_mul flt_mul
+let fdiv = fbinop e_div flt_div
+
+let fopp f x =
+  match Context.get model with
+  | Real -> e_opp x
+  | Float -> e_fun (flt_neg f) [x]
+
+let fsub f x y = fadd f x (fopp f y)
+
+let flt = fcmp p_lt flt_lt
+let fle = fcmp p_leq flt_le
+let feq = fcmp p_equal flt_eq
+let fneq = fcmp p_neq flt_neq
+
+(* -------------------------------------------------------------------------- *)
+(* --- Registry                                                           --- *)
+(* -------------------------------------------------------------------------- *)
+
+let configure m =
+  begin
+    Context.set model m ;
+    Context.set Lang.floats tau_of_float ;
+  end
+
+(* -------------------------------------------------------------------------- *)

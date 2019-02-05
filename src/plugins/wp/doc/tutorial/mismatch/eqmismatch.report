@@ -1,0 +1,5 @@
+@SUFFIX "_report.tex"
+@ZERO "-"
+@FUNCTION
+\verb+equal+ (mismatch) & %total & %wp & %ergo & %success\% (%time) \\
+@END

@@ -1,0 +1,33 @@
+void reverse(value_type* a, size_type n) {
+  size_type first = 0;
+  size_type last = n-1;
+  
+  /*@
+    loop invariant 0 <= first;
+    loop invariant last < n;
+     // next 2 are added for proving "normal" assigns with alt-ergo
+    loop invariant n > 0 ==> first <= n ;
+    loop invariant n <= 0 ==> first == 0;
+
+     // false, though simplify is ok with it ...
+     //  loop invariant n > 0 ==> first <= last;
+
+    loop invariant first + last == n - 1;
+    
+    loop invariant \forall integer k;
+      0 <= k < first ==> a[k] == \at(a[n-1-k], Pre);
+      
+    loop invariant \forall integer k;
+      last < k < n ==> a[k] == \at(a[n-1-k], Pre);
+
+    loop assigns a[0..(first-1)];
+    loop assigns a[(last+1)..(n-1)];
+    loop assigns first, last;
+
+    loop variant last;
+  */
+  while (first < last) {
+    swap_values(a, n, first++, last--);
+  }
+
+}

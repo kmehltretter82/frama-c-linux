@@ -1,0 +1,14 @@
+[kernel] Parsing global-initial-values.c (with preprocessing)
+[value] Analyzing an incomplete application starting at main
+[value] Computing initial state
+[value] Initial state computed
+[value] Values of globals at initialization
+  s.i ∈ [--..--]
+   .f ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
+   .p ∈ {{ NULL ; &S_p_s[0] }}
+  S_p_s[0..1] ∈ [--..--]
+[value] Recording results for main
+[value] done for function main
+[value] ====== VALUES COMPUTED ======
+[value] Values at end of function main:
+  

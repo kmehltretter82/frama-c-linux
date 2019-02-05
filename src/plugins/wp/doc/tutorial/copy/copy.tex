@@ -1,0 +1,20 @@
+\clearpage
+\section{The \textsf{copy} Algorithm}
+\label{copy}
+
+We now study the \texttt{copy} algorithm from ``ACSL By Example''.
+This algorithm copies the contents from a source sequence to a destination sequence.
+
+The specification of the \texttt{copy} algorithm is as follows:
+
+\listingname{copy.h}
+\cinput{copy/copy.spec}
+
+The implementation of the algorithm is:
+
+\listingname{copy.c}
+\cinput{copy/copy.impl}
+
+The implementation is proved correct against its specification by
+simply running the \textsf{WP} plug-in: 
+\fclogs{mutating}{copy}
