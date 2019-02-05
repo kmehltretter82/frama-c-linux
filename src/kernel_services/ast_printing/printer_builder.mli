@@ -20,11 +20,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Build a full pretty-printer from a pretty-printing class. 
+(** Build a full pretty-printer from a pretty-printing class.
     @since Fluorine-20130401 *)
 
 module Make
-  (P: sig class printer: unit -> Printer_api.extensible_printer_type end):
+    (P: sig class printer: unit -> Printer_api.extensible_printer_type end):
   Printer_api.S
 
 (*
