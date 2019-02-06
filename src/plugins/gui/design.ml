@@ -844,8 +844,6 @@ class main_window () : main_window_extension_points =
     Gtk_compat.window
       ?icon:framac_icon
       ~title:"Frama-C"
-      ~width
-      ~height
       ~position:`CENTER
       ~resizable:true
       ~show:false
