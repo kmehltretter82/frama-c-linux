@@ -852,6 +852,7 @@ class main_window () : main_window_extension_points =
       ()
   in
   let () = main_window#set_default_size ~width ~height in
+  let () = main_window#set_geometry_hints ~min_size:(1,1) main_window#coerce in
   let watch_cursor = Gdk.Cursor.create `WATCH in
   let arrow_cursor = Gdk.Cursor.create `ARROW in
 
