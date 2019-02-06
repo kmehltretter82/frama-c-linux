@@ -79,6 +79,7 @@ let unsupported_specifications =
     "strdup", "string.c";
     "strndup", "string.c";
     "getenv", "stdlib.c";
+    "posix_memalign", "stdlib.c";
     "putenv", "stdlib.c";
     "setenv", "stdlib.c";
     "unsetenv", "stdlib.c"
