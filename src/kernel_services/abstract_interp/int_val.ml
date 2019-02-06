@@ -155,8 +155,9 @@ let check_make_or_bottom ~min ~max ~rem ~modu =
 
 (* ------------------------- Sets and Intervals ---------------------------- *)
 
-(* TODO: comments *)
-
+(* If an interval represents less than [small_cardinal_Int] integers, then
+   converts the interval into a set. Used for the return of Int_interval
+   functions that may reduce intervals.*)
 let inject_itv i =
   match Int_interval.cardinal i with
   | None -> Itv i
@@ -168,6 +169,10 @@ let inject_itv i =
     else Itv i
 
 let inject_set s = Set s
+
+(* Int_set functions that enlarge sets returns either a small integer set,
+   or an interval as `Top (min, max, modu). The following functions inject
+   these results as proper integer abstractions of type t.*)
 
 let inject_pre_itv ~min ~max ~modu =
   let rem = Int.e_rem min modu in
@@ -182,8 +187,7 @@ let inject_set_or_top_or_bottom = function
   | `Set s -> `Value (Set s)
   | `Top (min, max, modu) -> `Value (inject_pre_itv ~min ~max ~modu)
 
-(* TODO: more comment *)
-
+(* Computes [min], [max], [rem] and [modu] from an integer set. *)
 let make_top_from_set s =
   let min = Int_set.min s in
   let modu =
@@ -200,6 +204,8 @@ let make_top_from_set s =
   let min = Some min in
   min, max, rem, modu
 
+(* Converts an integer set into an interval, regardless of the set cardinal.
+   Useful for functions not implemented (or irrelevant) in Int_set. *)
 let make_itv_from_set s =
   let min, max, rem, modu = make_top_from_set s in
   Int_interval.make ~min ~max ~rem ~modu
@@ -274,11 +280,11 @@ let min_max_rem_modu = function
     make_top_from_set s
   | Itv i -> Int_interval.min_max_rem_modu i
 
-exception Not_Singleton_Int
+exception Not_Singleton
 let project_int = function
   | Set s ->
-    if Int_set.cardinal s = 1 then Int_set.min s else raise Not_Singleton_Int
-  | Itv _ -> raise Not_Singleton_Int
+    if Int_set.cardinal s = 1 then Int_set.min s else raise Not_Singleton
+  | Itv _ -> raise Not_Singleton
 
 let is_small_set = function
   | Set _ -> true
@@ -475,9 +481,6 @@ let neg = function
   | Set s -> Set (Int_set.neg s)
   | Itv i -> Itv (Int_interval.neg i)
 
-let sub v1 v2 = add v1 (neg v2)
-let sub_under v1 v2 = add_under v1 (neg v2)
-
 
 let scale f v =
   if Int.is_zero f
@@ -653,7 +656,7 @@ let extract_bits ~start ~stop = function
       top
 
 let overlaps ~partial ~size t1 t2 =
-  let diff = sub t1 t2 in
+  let diff = add t1 (neg t2) in
   match diff with
   | Set array ->
     not (Int_set.for_all

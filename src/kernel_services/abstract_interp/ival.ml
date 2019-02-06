@@ -140,7 +140,7 @@ let contains_non_zero = function
   | Float f -> Fval.contains_non_zero f
 
 
-exception Not_Singleton_Int = Int_val.Not_Singleton_Int
+exception Not_Singleton_Int = Int_val.Not_Singleton
 
 let project_int = function
   | Int i -> Int_val.project_int i
