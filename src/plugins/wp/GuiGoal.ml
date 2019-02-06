@@ -87,7 +87,7 @@ class pane (proverpane : GuiConfig.provers) =
   in
   let scroll_palette_widget = new Wutil.gobj_widget scroll_palette in
   let palette = new Wpalette.panel () in
-  let () = scroll_palette#add palette#coerce in
+  let () = scroll_palette#add_with_viewport palette#coerce in
   let help = new Widget.button
     ~label:"Tactics" ~border:false ~tooltip:"List Available Tactics" () in
   let delete = new Widget.button
