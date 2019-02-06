@@ -2937,7 +2937,8 @@ and visitCilExtended vis (i,a,l,s,e as orig) =
     with Not_found -> (fun _ _ -> DoChildren)
   in
   let e' = doVisitCil vis id (visit vis) childrenCilExtended e in
-  if is_fresh_behavior vis#behavior then Logic_const.new_acsl_extension a l s e
+  if is_fresh_behavior vis#behavior then
+    Logic_const.new_acsl_extension a l s e'
   else if e == e' then orig else (i,a,l,s,e')
 
 and childrenCilExtended vis p =
