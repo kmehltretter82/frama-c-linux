@@ -490,14 +490,14 @@ struct
         Format.fprintf fmt "@{<%s>%a@}"
           (Tag.create (PIP ip)) (super#allocation ~isloop) a;
 
-    method! stmtkind next fmt sk =
+    method! stmtkind attrs next fmt sk =
       (* Special tag denoting the start of the statement, WITHOUT any ACSL
          assertion/statement contract, etc. *)
       let s = Extlib.the self#current_stmt in
       let f = Extlib.the self#current_kf in
       let tag = Tag.create (PStart(f,s)) in
       (* gui:stmt_start%d sk.sid *)
-      Format.fprintf fmt "@{<%s>%a@}" tag (super#stmtkind next) sk
+      Format.fprintf fmt "@{<%s>%a@}" tag (super#stmtkind attrs next) sk
 
     initializer force_brace <- true
 
