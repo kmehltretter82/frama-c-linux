@@ -49,13 +49,14 @@ val refresh_spec: funspec -> funspec
 (** creates a new identified predicate with a fresh id. *)
 val new_predicate: predicate -> identified_predicate
 
-(** creat a new acsl_extension with a fresh id.
+(** creates a new acsl_extension with a fresh id.
     @plugin development guide
     @since Chlorine-20180501
 *)
-val new_acsl_extension: string -> location -> bool -> acsl_extension_kind -> acsl_extension
+val new_acsl_extension:
+  string -> location -> bool -> acsl_extension_kind -> acsl_extension
 
-(** Gives a new id to an existing predicate. 
+(** Gives a new id to an existing predicate.
     @since Oxygen-20120901
 *)
 val refresh_predicate: identified_predicate -> identified_predicate
