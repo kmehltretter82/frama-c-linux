@@ -15,20 +15,20 @@
                                 "memcpy_loop_invariant_no_eva": { "alt-ergo": 
                                                                     { "total": 2,
                                                                     "valid": 2,
-                                                                    "rank": 17 },
+                                                                    "rank": 16 },
                                                                   "wp:main": 
                                                                     { "total": 2,
                                                                     "valid": 2,
-                                                                    "rank": 17 } },
+                                                                    "rank": 16 } },
                                 "memcpy_loop_variant": { "alt-ergo": 
                                                            { "total": 1,
                                                              "valid": 1,
-                                                             "rank": 17 },
+                                                             "rank": 16 },
                                                          "qed": { "total": 1,
                                                                   "valid": 1 },
                                                          "wp:main": { "total": 2,
                                                                     "valid": 2,
-                                                                    "rank": 17 } },
+                                                                    "rank": 16 } },
                                 "memcpy_assigns": { "qed": { "total": 1,
                                                              "valid": 1 },
                                                     "wp:main": { "total": 1,
@@ -36,12 +36,12 @@
                                 "memcpy_loop_assigns": { "alt-ergo": 
                                                            { "total": 1,
                                                              "valid": 1,
-                                                             "rank": 43 },
+                                                             "rank": 40 },
                                                          "qed": { "total": 2,
                                                                   "valid": 2 },
                                                          "wp:main": { "total": 3,
                                                                     "valid": 3,
-                                                                    "rank": 43 } },
+                                                                    "rank": 40 } },
                                 "memcpy_ensures_result_ptr": { "qed": 
                                                                  { "total": 1,
                                                                    "valid": 1 },
@@ -94,14 +94,14 @@
                                  "memmove_loop_invariant_no_eva_3": { "alt-ergo": 
                                                                     { "total": 1,
                                                                     "valid": 1,
-                                                                    "rank": 82 },
+                                                                    "rank": 81 },
                                                                     "qed": 
                                                                     { "total": 1,
                                                                     "valid": 1 },
                                                                     "wp:main": 
                                                                     { "total": 2,
                                                                     "valid": 2,
-                                                                    "rank": 82 } },
+                                                                    "rank": 81 } },
                                  "memmove_loop_invariant_no_eva_2": { "alt-ergo": 
                                                                     { "total": 1,
                                                                     "valid": 1,

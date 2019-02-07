@@ -869,7 +869,11 @@ struct
           | AInvariant (_,true,_) -> "loop_inv"
           | AInvariant _ -> "inv"
           | APragma _ -> "pragma"
-          | _ -> assert false
+          | AStmtSpec _ -> "contract"
+          | AAssigns _ -> "assigns"
+          | AVariant _ -> "variant"
+          | AAllocation _ -> "allocates"
+          | AExtended(_,_,(_,clause,_,_,_)) -> clause
         in Format.asprintf "%s%s%a" (kf_prefix kf) name pp_code_annot_names ca
     | IPComplete (kf, ki, a, lb) ->
         Format.asprintf  "%s%s%acomplete%a"

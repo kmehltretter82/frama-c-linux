@@ -219,6 +219,10 @@ let name_of_asked_bhv = function
   | FunBhv None -> Cil.default_behavior_name
   | StmtBhv (_, _, _, bhv) -> bhv.b_name
 
+let asked_bhv = function
+  | FunBhv None -> None
+  | FunBhv (Some bhv) | StmtBhv (_,_,_,bhv) -> Some bhv.b_name
+
 (* This is to code what properties the user asked for in a given behavior. *)
 type asked_prop =
   | AllProps
@@ -765,20 +769,20 @@ let get_call_annots config v s fct =
   | Cil2cfg.Static kf -> add_call_annots config s kf l_post empty
 
   | Cil2cfg.Dynamic _ ->
-      let calls = Dyncall.get ~bhv:(name_of_asked_bhv config.cur_bhv) s in
-      if calls=[] then
-        begin
+      let bhv = asked_bhv config.cur_bhv in
+      match Dyncall.get ?bhv s with
+      | None | Some(_,[]) ->
           Wp_parameters.warning ~once:true ~source:(fst (Stmt.loc s))
-            "Ignored function pointer (see -wp-dynamic)" ;
+            "Missing 'calls' for %s"
+            (match bhv with
+             | None -> "default behavior"
+             | Some b -> b) ;
           let annots = WpStrategy.add_call_assigns_any WpStrategy.empty_acc s in
           WpStrategy.empty_acc, (annots , annots)
-        end
-      else
-        begin
+      | Some(_,calls) ->
           List.fold_left
             (fun acc kf -> add_call_annots config s kf l_post acc)
             empty calls
-        end
 
 (*----------------------------------------------------------------------------*)
 let add_variant_annot config s ca var_exp loop_entry loop_back =
