@@ -8,8 +8,8 @@
 [wp] tests/wp_bts/bts_1588.i:5: Warning: 
   Missing assigns clause (assigns 'everything' instead)
 [wp] 3 goals scheduled
-[wp] [Qed] Goal typed_f_loop_inv_l1_2_preserved : Valid
-[wp] [Qed] Goal typed_f_loop_inv_l1_2_established : Valid
+[wp] [Qed] Goal typed_f_loop_invariant_l1_2_preserved : Valid
+[wp] [Qed] Goal typed_f_loop_invariant_l1_2_established : Valid
 [wp] [Qed] Goal typed_f_assert_a1 : Valid
 [wp] Proved goals:    3 / 3
   Qed:             3

@@ -4,12 +4,12 @@
 [wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 [wp] 6 goals scheduled
-[wp] [Qed] Goal typed_job_post_Events : Valid
-[wp] [Alt-Ergo] Goal typed_job_post_A_reads : Unknown
-[wp] [Alt-Ergo] Goal typed_job_post_B_reads : Unknown
-[wp] [Alt-Ergo] Goal typed_job_post_B_writes : Unknown
-[wp] [Alt-Ergo] Goal typed_job_post_ReadValues : Unknown
-[wp] [Alt-Ergo] Goal typed_job_post_WriteValues : Unknown
+[wp] [Qed] Goal typed_job_ensures_Events : Valid
+[wp] [Alt-Ergo] Goal typed_job_ensures_A_reads : Unknown
+[wp] [Alt-Ergo] Goal typed_job_ensures_B_reads : Unknown
+[wp] [Alt-Ergo] Goal typed_job_ensures_B_writes : Unknown
+[wp] [Alt-Ergo] Goal typed_job_ensures_ReadValues : Unknown
+[wp] [Alt-Ergo] Goal typed_job_ensures_WriteValues : Unknown
 [wp] Proved goals:    1 / 6
   Qed:             1 
   Alt-Ergo:        0  (unknown: 5)

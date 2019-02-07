@@ -635,7 +635,7 @@ module V = struct
       if Integer.is_zero factor
       then v
       else topify_with_origin_kind topify v
-    | Integer.Too_big -> top_int
+    | Z.Overflow -> top_int
 
   let restrict_topint_to_size value size =
     if is_topint value

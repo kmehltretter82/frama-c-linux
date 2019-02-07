@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 val pretty : Format.formatter -> Wpo.t -> unit
-val filename : Wpo.t -> string
+val filename : ?legacy:bool -> Wpo.t -> string
 val exists : Wpo.t -> bool
 val save : Wpo.t -> Json.t -> unit
 val load : Wpo.t -> Json.t

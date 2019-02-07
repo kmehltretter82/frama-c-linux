@@ -209,7 +209,7 @@ let pp_active fmt active =
 let pp_capitalize fmt s =
   Format.pp_print_string fmt (Transitioning.String.capitalize_ascii s)
 
-let pp_acsl_extension fmt (_,s,_,_) = pp_capitalize fmt s
+let pp_acsl_extension fmt (_,s,_,_,_) = pp_capitalize fmt s
 
 let rec pp_prop kfopt kiopt kloc fmt = function
   | IPAxiom (s,_,_,_,_) -> Format.fprintf fmt "Axiom '%s'" s
@@ -229,9 +229,9 @@ let rec pp_prop kfopt kiopt kloc fmt = function
       pp_predicate kind
       (pp_idpred kloc) idpred
       (pp_kinstr kloc) ki
-  | IPExtended(le,(_,_,loc,_ as pred)) ->
+  | IPExtended(le,(_,_,loc,_,_ as ext)) ->
     Format.fprintf fmt "%a%a"
-      pp_acsl_extension pred
+      pp_acsl_extension ext
       (pp_extended_loc kfopt kiopt kloc) (loc,le)
   | IPBehavior(_,ki, active, bhv) ->
     if Cil.is_default_behavior bhv then
@@ -260,7 +260,7 @@ let rec pp_prop kfopt kiopt kloc fmt = function
       pp_for bs
       pp_named np
       (pp_kloc kloc) np.pred_loc
-  | IPCodeAnnot(_,stmt,{annot_content=AExtended(bs,_,(_,clause,_,_))}) ->
+  | IPCodeAnnot(_,stmt,{annot_content=AExtended(bs,_,(_,clause,_,_,_))}) ->
     Format.fprintf fmt "%a%a %a"
       pp_capitalize clause pp_for bs (pp_stmt kloc) stmt
   | IPCodeAnnot(_,stmt,_) ->
@@ -486,10 +486,10 @@ let rec ip_order = function
   | IPPropertyInstance (kf, s, _, ip) -> [I 18; F kf; K (Kstmt s)] @ ip_order ip
   | IPTypeInvariant(a,_,_,_) -> [I 19; S a]
   | IPGlobalInvariant(a,_,_) -> [I 20; S a]
-  | IPExtended(ELContract kf,(_,n,_,_)) -> [I 21;F kf; S n]
-  | IPExtended(ELStmt (kf, stmt), (_, n, _,_)) ->
+  | IPExtended(ELContract kf,(_,n,_,_,_)) -> [I 21;F kf; S n]
+  | IPExtended(ELStmt (kf, stmt), (_,n,_,_,_)) ->
     [ I 22; F kf; K (Kstmt stmt); S n]
-  | IPExtended(ELGlob, (_, n, _,_)) -> [ I 23; S n]
+  | IPExtended(ELGlob, (_,n,_,_,_)) -> [ I 23; S n]
 
 let pp_compare p q = cmp (ip_order p) (ip_order q)
 

@@ -68,5 +68,10 @@ int main() {
 
   freeaddrinfo(result);           /* No longer needed */
 
+  struct hostent *h = gethostbyname("localhost");
+  if (h) {
+    char *addrs = h->h_addr;
+    int l = h->h_length;
+  }
   return 0;
 }

@@ -119,7 +119,7 @@ let from_filename ?cpp f =
         | None -> get_preprocessor_command ()
         | Some cpp -> cpp, cpp_opt_kind ()
       in
-      (if flags = "" then cpp else cpp ^ " " ^ flags), gnu
+      (if flags = [] then cpp else cpp ^ " " ^ String.concat " " flags), gnu
   in
   if Filename.check_suffix f ".i" then begin
     NoCPP f
@@ -733,7 +733,7 @@ let synchronize_source_annot has_new_stmt kf =
           match annot.annot_content with
           | AStmtSpec _ | APragma (Slice_pragma SPstmt | Impact_pragma IPstmt)
             -> true
-          | AExtended(_,is_loop,(_,name,_,_)) ->
+          | AExtended(_,is_loop,(_,name,_,_,_)) ->
             (match Logic_env.extension_category name with
              | Some (Ext_code_annot (Ext_here | Ext_next_loop)) -> false
              | Some (Ext_code_annot Ext_next_stmt) -> true

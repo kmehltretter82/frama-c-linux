@@ -445,7 +445,7 @@ let to_do_on_select
         main_ui#pretty_information "This is a requires clause.@.%a@."
           pretty_predicate_status ip;
         main_ui#view_original (Property.location ip)
-    | PIP (Property.IPExtended(_,(_,name,_,_)) as ip) ->
+    | PIP (Property.IPExtended(_,(_,name,_,_,_)) as ip) ->
         main_ui#pretty_information "This clause is a %s extension.@.%a@."
           name
           pretty_predicate_status ip;

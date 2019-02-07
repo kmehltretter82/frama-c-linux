@@ -462,7 +462,7 @@ module Store(* (B:sig *)
                 success := true;
                 add_loop_bound stmt adjusted_value
               end
-          with Failure _ -> (* overflow in Integer.to_int *)
+          with Z.Overflow -> (* overflow in Integer.to_int *)
             ()
       (* TODO: check if this is useful and does not cause false alarms
          else

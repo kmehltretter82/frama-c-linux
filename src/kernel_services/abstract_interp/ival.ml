@@ -1988,7 +1988,7 @@ let shift_aux scale op (x: t) (y: t) =
     let modu = match min_factor with None -> Int.one | Some m -> m in
     let factor = inject_top min_factor max_factor Int.zero modu in
     op x factor
-  with Integer.Too_big ->
+  with Z.Overflow ->
     Lattice_messages.emit_imprecision emitter "Ival.shift_aux";
     (* We only preserve the sign of the result *)
     if is_included x positive_integers then positive_integers
@@ -2199,7 +2199,7 @@ let rec extract_bits ~start ~stop ~size v =
     try
       let dived = scale_div ~pos:true (Int.two_power start) d in
       scale_rem ~pos:true (Int.two_power (Int.length start stop)) dived
-    with Integer.Too_big ->
+    with Z.Overflow ->
       Lattice_messages.emit_imprecision emitter "Ival.extract_bits";
       top
 ;;
@@ -2428,7 +2428,7 @@ let cast_int_to_float_inverse_not_nan ~single_precision (min, max) =
        values on each extremity. *)
     let min = ceil min in
     let max = floor max in
-    let conv f = try  Some (Integer.of_float f) with Integer.Too_big -> None in
+    let conv f = try  Some (Integer.of_float f) with Z.Overflow -> None in
     let r = inject_range (conv min) (conv max) in
     (* Kernel.result "Cast I->F inv:  %a -> %a@." pretty f pretty r; *)
     r

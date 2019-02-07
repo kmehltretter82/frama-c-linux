@@ -142,6 +142,7 @@ and field =
 and tau = (field,adt) Logic.datatype
 
 let pointer = Context.create "Lang.pointer"
+let floats = Context.create "Lang.floats"
 
 let new_extern_id = ref (-1)
 let new_extern ~debug ~library ~link =
@@ -182,7 +183,7 @@ let t_datatype adt ts = Logic.Data(adt,ts)
 
 let rec tau_of_object = function
   | C_int _ -> Logic.Int
-  | C_float _ -> Logic.Real
+  | C_float f -> Context.get floats f
   | C_pointer t -> Context.get pointer t
   | C_comp c -> tau_of_comp c
   | C_array { arr_element = typ } -> t_array (tau_of_ctype typ)
@@ -800,7 +801,9 @@ struct
     else
       match Context.get_opt context_pp with
       | Some env -> Pretty.pp_term_env env  fmt e
-      | None -> Pretty.pp_term Pretty.empty fmt e
+      | None ->
+          let env = Pretty.known Pretty.empty (QED.vars e) in
+          Pretty.pp_term env fmt e
   let pp_pred = pp_term
   let pp_var fmt x = pp_term fmt (e_var x)
   let pp_vars fmt xs =

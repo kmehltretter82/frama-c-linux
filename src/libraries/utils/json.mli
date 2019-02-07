@@ -109,6 +109,11 @@ val list : t -> t list
     [Null] is considered an empty list.
     @raise Invalid_argument if the object is not a list. *)
 
+val assoc : t -> (string * t) list
+(** Extract the list of an [Assoc] object.
+    [Null] is considered an empty assoc.
+    @raise Invalid_argument if the object is not a list. *)
+
 val fold : (string -> t -> 'a -> 'a) -> t -> 'a -> 'a
 (** Fold over all fields of the object.
     [Null] is considered an empty object.

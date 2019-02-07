@@ -22,15 +22,13 @@
 
 open Lang
 
-
 let select_op f =
-  let rewrite descr u v = Tactical.rewrite [ descr , F.p_true , u , v ]
-  in
+  let rewrite descr u v = Tactical.rewrite [ descr , F.p_true , u , v ] in
   let rewrite_lsl e a n =
     (* from selection e='a<<n', rewrites the sequent 'Hs |- G' into:
        - Hs[e := a*2^n] |- G[e := a*2^n)] *)
     let b = F.e_mul a (F.e_int (1 lsl n)) in
-    rewrite "left shift into mult" e b
+    rewrite "shift" e b
   in
   let rewrite_lsr e a n =
     (* from selection e='a>>n', rewrites the sequent 'Hs |- G' into:
@@ -38,7 +36,7 @@ let select_op f =
        - Hs[e := a*2^n] |- G[e := a*2^n] *)
     let b = F.e_div a (F.e_int (1 lsl n)) in
     (fun seq -> ("positive" , (fst seq , F.p_leq F.e_zero a)) ::
-                rewrite "right shift into div" e b seq)
+                rewrite "shift" e b seq)
   in
   if f == Cint.f_lsl then rewrite_lsl else
   if f == Cint.f_lsr then rewrite_lsr else
@@ -47,7 +45,7 @@ let select_op f =
 let select_int n =
   match F.repr n with
   | Qed.Logic.Kint n ->
-      (try Integer.to_int n with Integer.Too_big -> raise Not_found)
+      (try Integer.to_int n with Z.Overflow -> raise Not_found)
   | _ -> raise Not_found
 
 class shift =

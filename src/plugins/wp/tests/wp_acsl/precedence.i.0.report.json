@@ -1,117 +1,111 @@
 { "wp:global": { "alt-ergo": { "total": 1, "valid": 1, "rank": 2 },
                  "qed": { "total": 51, "valid": 51 },
                  "wp:main": { "total": 52, "valid": 52, "rank": 2 } },
-  "wp:functions": { "predicate": { "predicate_post_r_precedence_ite_naming": 
+  "wp:functions": { "predicate": { "predicate_ensures_r_precedence_ite_naming": 
                                      { "qed": { "total": 1, "valid": 1 },
                                        "wp:main": { "total": 1, "valid": 1 } },
-                                   "predicate_post_scope_let_2": { "qed": 
-                                                                    { "total": 1,
-                                                                    "valid": 1 },
-                                                                   "wp:main": 
-                                                                    { "total": 1,
-                                                                    "valid": 1 } },
-                                   "predicate_post_scope_let": { "qed": 
-                                                                   { "total": 1,
-                                                                    "valid": 1 },
-                                                                 "wp:main": 
-                                                                   { "total": 1,
-                                                                    "valid": 1 } },
-                                   "predicate_post_r_assoc_let": { "qed": 
-                                                                    { "total": 1,
-                                                                    "valid": 1 },
-                                                                   "wp:main": 
-                                                                    { "total": 1,
-                                                                    "valid": 1 } },
-                                   "predicate_post_l_precedence_ite_let": 
-                                     { "qed": { "total": 1, "valid": 1 },
-                                       "wp:main": { "total": 1, "valid": 1 } },
-                                   "predicate_post_m_precedence_ite_let": 
-                                     { "qed": { "total": 1, "valid": 1 },
-                                       "wp:main": { "total": 1, "valid": 1 } },
-                                   "predicate_post_r_precedence_ite_let": 
-                                     { "qed": { "total": 1, "valid": 1 },
-                                       "wp:main": { "total": 1, "valid": 1 } },
-                                   "predicate_post_r_assoc_exist": { "qed": 
+                                   "predicate_ensures_scope_let_2": { "qed": 
                                                                     { "total": 1,
                                                                     "valid": 1 },
                                                                     "wp:main": 
                                                                     { "total": 1,
                                                                     "valid": 1 } },
-                                   "predicate_post_l_precedence_ite_exists": 
-                                     { "qed": { "total": 1, "valid": 1 },
-                                       "wp:main": { "total": 1, "valid": 1 } },
-                                   "predicate_post_m_precedence_ite_exists": 
-                                     { "qed": { "total": 1, "valid": 1 },
-                                       "wp:main": { "total": 1, "valid": 1 } },
-                                   "predicate_post_r_precedence_ite_exists": 
-                                     { "qed": { "total": 1, "valid": 1 },
-                                       "wp:main": { "total": 1, "valid": 1 } },
-                                   "predicate_post_r_assoc_forall": { "qed": 
+                                   "predicate_ensures_scope_let": { "qed": 
                                                                     { "total": 1,
                                                                     "valid": 1 },
                                                                     "wp:main": 
                                                                     { "total": 1,
                                                                     "valid": 1 } },
-                                   "predicate_post_l_precedence_ite_forall": 
+                                   "predicate_ensures_r_assoc_let": { "qed": 
+                                                                    { "total": 1,
+                                                                    "valid": 1 },
+                                                                    "wp:main": 
+                                                                    { "total": 1,
+                                                                    "valid": 1 } },
+                                   "predicate_ensures_l_precedence_ite_let": 
                                      { "qed": { "total": 1, "valid": 1 },
                                        "wp:main": { "total": 1, "valid": 1 } },
-                                   "predicate_post_m_precedence_ite_forall": 
+                                   "predicate_ensures_m_precedence_ite_let": 
                                      { "qed": { "total": 1, "valid": 1 },
                                        "wp:main": { "total": 1, "valid": 1 } },
-                                   "predicate_post_r_precedence_ite_forall": 
+                                   "predicate_ensures_r_precedence_ite_let": 
                                      { "qed": { "total": 1, "valid": 1 },
                                        "wp:main": { "total": 1, "valid": 1 } },
-                                   "predicate_post_r_assoc_ite": { "qed": 
+                                   "predicate_ensures_r_assoc_exist": 
+                                     { "qed": { "total": 1, "valid": 1 },
+                                       "wp:main": { "total": 1, "valid": 1 } },
+                                   "predicate_ensures_l_precedence_ite_exists": 
+                                     { "qed": { "total": 1, "valid": 1 },
+                                       "wp:main": { "total": 1, "valid": 1 } },
+                                   "predicate_ensures_m_precedence_ite_exists": 
+                                     { "qed": { "total": 1, "valid": 1 },
+                                       "wp:main": { "total": 1, "valid": 1 } },
+                                   "predicate_ensures_r_precedence_ite_exists": 
+                                     { "qed": { "total": 1, "valid": 1 },
+                                       "wp:main": { "total": 1, "valid": 1 } },
+                                   "predicate_ensures_r_assoc_forall": 
+                                     { "qed": { "total": 1, "valid": 1 },
+                                       "wp:main": { "total": 1, "valid": 1 } },
+                                   "predicate_ensures_l_precedence_ite_forall": 
+                                     { "qed": { "total": 1, "valid": 1 },
+                                       "wp:main": { "total": 1, "valid": 1 } },
+                                   "predicate_ensures_m_precedence_ite_forall": 
+                                     { "qed": { "total": 1, "valid": 1 },
+                                       "wp:main": { "total": 1, "valid": 1 } },
+                                   "predicate_ensures_r_precedence_ite_forall": 
+                                     { "qed": { "total": 1, "valid": 1 },
+                                       "wp:main": { "total": 1, "valid": 1 } },
+                                   "predicate_ensures_r_assoc_ite": { "qed": 
+                                                                    { "total": 1,
+                                                                    "valid": 1 },
+                                                                    "wp:main": 
+                                                                    { "total": 1,
+                                                                    "valid": 1 } },
+                                   "predicate_ensures_l_precedence_equiv_ite": 
+                                     { "qed": { "total": 1, "valid": 1 },
+                                       "wp:main": { "total": 1, "valid": 1 } },
+                                   "predicate_ensures_m_precedence_equiv_ite": 
+                                     { "qed": { "total": 1, "valid": 1 },
+                                       "wp:main": { "total": 1, "valid": 1 } },
+                                   "predicate_ensures_r_precedence_equiv_ite": 
+                                     { "qed": { "total": 1, "valid": 1 },
+                                       "wp:main": { "total": 1, "valid": 1 } },
+                                   "predicate_ensures_l_precedence_implies_equiv": 
+                                     { "qed": { "total": 1, "valid": 1 },
+                                       "wp:main": { "total": 1, "valid": 1 } },
+                                   "predicate_ensures_r_precedence_implies_equiv": 
+                                     { "qed": { "total": 1, "valid": 1 },
+                                       "wp:main": { "total": 1, "valid": 1 } },
+                                   "predicate_ensures_r_assoc_implies": 
+                                     { "qed": { "total": 1, "valid": 1 },
+                                       "wp:main": { "total": 1, "valid": 1 } },
+                                   "predicate_ensures_ok_since": { "qed": 
                                                                     { "total": 1,
                                                                     "valid": 1 },
                                                                    "wp:main": 
                                                                     { "total": 1,
                                                                     "valid": 1 } },
-                                   "predicate_post_l_precedence_equiv_ite": 
-                                     { "qed": { "total": 1, "valid": 1 },
-                                       "wp:main": { "total": 1, "valid": 1 } },
-                                   "predicate_post_m_precedence_equiv_ite": 
-                                     { "qed": { "total": 1, "valid": 1 },
-                                       "wp:main": { "total": 1, "valid": 1 } },
-                                   "predicate_post_r_precedence_equiv_ite": 
-                                     { "qed": { "total": 1, "valid": 1 },
-                                       "wp:main": { "total": 1, "valid": 1 } },
-                                   "predicate_post_l_precedence_implies_equiv": 
-                                     { "qed": { "total": 1, "valid": 1 },
-                                       "wp:main": { "total": 1, "valid": 1 } },
-                                   "predicate_post_r_precedence_implies_equiv": 
-                                     { "qed": { "total": 1, "valid": 1 },
-                                       "wp:main": { "total": 1, "valid": 1 } },
-                                   "predicate_post_r_assoc_implies": 
-                                     { "qed": { "total": 1, "valid": 1 },
-                                       "wp:main": { "total": 1, "valid": 1 } },
-                                   "predicate_post_ok_since": { "qed": 
-                                                                  { "total": 1,
-                                                                    "valid": 1 },
-                                                                "wp:main": 
-                                                                  { "total": 1,
-                                                                    "valid": 1 } },
-                                   "predicate_post_ok_r_precedence_implies_or": 
+                                   "predicate_ensures_ok_r_precedence_implies_or": 
                                      { "alt-ergo": { "total": 1, "valid": 1,
                                                      "rank": 2 },
                                        "wp:main": { "total": 1, "valid": 1,
                                                     "rank": 2 } },
-                                   "predicate_post_l_precedence_or_implies": 
+                                   "predicate_ensures_l_precedence_or_implies": 
                                      { "qed": { "total": 1, "valid": 1 },
                                        "wp:main": { "total": 1, "valid": 1 } },
-                                   "predicate_post_r_precedence_or_implies": 
+                                   "predicate_ensures_r_precedence_or_implies": 
                                      { "qed": { "total": 1, "valid": 1 },
                                        "wp:main": { "total": 1, "valid": 1 } },
-                                   "predicate_post_l_precedence_xor_or": 
+                                   "predicate_ensures_l_precedence_xor_or": 
                                      { "qed": { "total": 1, "valid": 1 },
                                        "wp:main": { "total": 1, "valid": 1 } },
-                                   "predicate_post_r_precedence_xor_or": 
+                                   "predicate_ensures_r_precedence_xor_or": 
                                      { "qed": { "total": 1, "valid": 1 },
                                        "wp:main": { "total": 1, "valid": 1 } },
-                                   "predicate_post_l_precedence_and_xor": 
+                                   "predicate_ensures_l_precedence_and_xor": 
                                      { "qed": { "total": 1, "valid": 1 },
                                        "wp:main": { "total": 1, "valid": 1 } },
-                                   "predicate_post_r_precedence_and_xor": 
+                                   "predicate_ensures_r_precedence_and_xor": 
                                      { "qed": { "total": 1, "valid": 1 },
                                        "wp:main": { "total": 1, "valid": 1 } },
                                    "wp:section": { "alt-ergo": { "total": 1,
@@ -122,85 +116,86 @@
                                                    "wp:main": { "total": 30,
                                                                 "valid": 30,
                                                                 "rank": 2 } } },
-                    "comparison": { "comparison_post_l_precedence_neq_and": 
+                    "comparison": { "comparison_ensures_l_precedence_neq_and": 
                                       { "qed": { "total": 1, "valid": 1 },
                                         "wp:main": { "total": 1, "valid": 1 } },
-                                    "comparison_post_r_precedence_neq_and": 
+                                    "comparison_ensures_r_precedence_neq_and": 
                                       { "qed": { "total": 1, "valid": 1 },
                                         "wp:main": { "total": 1, "valid": 1 } },
-                                    "comparison_post_l_precedence_eq_and": 
+                                    "comparison_ensures_l_precedence_eq_and": 
                                       { "qed": { "total": 1, "valid": 1 },
                                         "wp:main": { "total": 1, "valid": 1 } },
-                                    "comparison_post_r_precedence_eq_and": 
+                                    "comparison_ensures_r_precedence_eq_and": 
                                       { "qed": { "total": 1, "valid": 1 },
                                         "wp:main": { "total": 1, "valid": 1 } },
-                                    "comparison_post_chainable_eq_eq": 
+                                    "comparison_ensures_chainable_eq_eq": 
                                       { "qed": { "total": 1, "valid": 1 },
                                         "wp:main": { "total": 1, "valid": 1 } },
-                                    "comparison_post_chainable_ge_ge": 
+                                    "comparison_ensures_chainable_ge_ge": 
                                       { "qed": { "total": 1, "valid": 1 },
                                         "wp:main": { "total": 1, "valid": 1 } },
-                                    "comparison_post_chainable_gt_gt": 
+                                    "comparison_ensures_chainable_gt_gt": 
                                       { "qed": { "total": 1, "valid": 1 },
                                         "wp:main": { "total": 1, "valid": 1 } },
-                                    "comparison_post_chainable_le_le": 
+                                    "comparison_ensures_chainable_le_le": 
                                       { "qed": { "total": 1, "valid": 1 },
                                         "wp:main": { "total": 1, "valid": 1 } },
-                                    "comparison_post_chainable_lt_lt": 
+                                    "comparison_ensures_chainable_lt_lt": 
                                       { "qed": { "total": 1, "valid": 1 },
                                         "wp:main": { "total": 1, "valid": 1 } },
                                     "wp:section": { "qed": { "total": 9,
                                                              "valid": 9 },
                                                     "wp:main": { "total": 9,
                                                                  "valid": 9 } } },
-                    "bitwise": { "bitwise_post_l_precedence_implies_equiv": 
+                    "bitwise": { "bitwise_ensures_l_precedence_implies_equiv": 
                                    { "qed": { "total": 1, "valid": 1 },
                                      "wp:main": { "total": 1, "valid": 1 } },
-                                 "bitwise_post_r_precedence_implies_equiv": 
+                                 "bitwise_ensures_r_precedence_implies_equiv": 
                                    { "qed": { "total": 1, "valid": 1 },
                                      "wp:main": { "total": 1, "valid": 1 } },
-                                 "bitwise_post_r_assoc_implies": { "qed": 
+                                 "bitwise_ensures_r_assoc_implies": { "qed": 
                                                                     { "total": 1,
                                                                     "valid": 1 },
-                                                                   "wp:main": 
+                                                                    "wp:main": 
                                                                     { "total": 1,
                                                                     "valid": 1 } },
-                                 "bitwise_post_ok_since": { "qed": { "total": 1,
-                                                                    "valid": 1 },
-                                                            "wp:main": 
-                                                              { "total": 1,
-                                                                "valid": 1 } },
-                                 "bitwise_post_ok_r_precedence_implies_or": 
+                                 "bitwise_ensures_ok_since": { "qed": 
+                                                                 { "total": 1,
+                                                                   "valid": 1 },
+                                                               "wp:main": 
+                                                                 { "total": 1,
+                                                                   "valid": 1 } },
+                                 "bitwise_ensures_ok_r_precedence_implies_or": 
                                    { "qed": { "total": 1, "valid": 1 },
                                      "wp:main": { "total": 1, "valid": 1 } },
-                                 "bitwise_post_l_precedence_or_implies": 
+                                 "bitwise_ensures_l_precedence_or_implies": 
                                    { "qed": { "total": 1, "valid": 1 },
                                      "wp:main": { "total": 1, "valid": 1 } },
-                                 "bitwise_post_r_precedence_or_implies": 
+                                 "bitwise_ensures_r_precedence_or_implies": 
                                    { "qed": { "total": 1, "valid": 1 },
                                      "wp:main": { "total": 1, "valid": 1 } },
-                                 "bitwise_post_l_precedence_xor_or": 
+                                 "bitwise_ensures_l_precedence_xor_or": 
                                    { "qed": { "total": 1, "valid": 1 },
                                      "wp:main": { "total": 1, "valid": 1 } },
-                                 "bitwise_post_r_precedence_xor_or": 
+                                 "bitwise_ensures_r_precedence_xor_or": 
                                    { "qed": { "total": 1, "valid": 1 },
                                      "wp:main": { "total": 1, "valid": 1 } },
-                                 "bitwise_post_l_precedence_and_xor": 
+                                 "bitwise_ensures_l_precedence_and_xor": 
                                    { "qed": { "total": 1, "valid": 1 },
                                      "wp:main": { "total": 1, "valid": 1 } },
-                                 "bitwise_post_r_precedence_and_xor": 
+                                 "bitwise_ensures_r_precedence_and_xor": 
                                    { "qed": { "total": 1, "valid": 1 },
                                      "wp:main": { "total": 1, "valid": 1 } },
                                  "wp:section": { "qed": { "total": 11,
                                                           "valid": 11 },
                                                  "wp:main": { "total": 11,
                                                               "valid": 11 } } },
-                    "predicate_bitwise": { "predicate_bitwise_post_l_precedence_equiv_Pand": 
+                    "predicate_bitwise": { "predicate_bitwise_ensures_l_precedence_equiv_Pand": 
                                              { "qed": { "total": 1,
                                                         "valid": 1 },
                                                "wp:main": { "total": 1,
                                                             "valid": 1 } },
-                                           "predicate_bitwise_post_r_precedence_equiv_Pand": 
+                                           "predicate_bitwise_ensures_r_precedence_equiv_Pand": 
                                              { "qed": { "total": 1,
                                                         "valid": 1 },
                                                "wp:main": { "total": 1,

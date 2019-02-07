@@ -147,9 +147,14 @@ type typing_context = {
   on_error: 'a 'b. ('a -> 'b) -> (unit -> unit) -> 'a -> 'b
 }
 
-(** [register_behavior_extension name f] registers a typing function [f] to
+(** [register_behavior_extension name status f] registers a
+    typing function [f] to
     be used to type function contract clause with name [name].
+    The boolean flags specifies if the extension can be assigned
+    a property status or not.
+
     Here is a basic example:
+
     let count = ref 0 in
     let foo_typer ~typing_context ~loc ps =
     match ps with p::[] ->
@@ -161,7 +166,7 @@ type typing_context = {
                 p)])
       | [] -> let id = !count in incr count; Ext_id id
       | _ -> typing_context.error loc "expecting a predicate after keyword FOO"
-    let () = register_behavior_extension "FOO" foo_typer
+    let () = register_behavior_extension "FOO" false foo_typer
 
     @plugin development guide
 
@@ -169,7 +174,7 @@ type typing_context = {
     @modify Silicon-20161101 change type of the function
 *)
 val register_behavior_extension:
-  string ->
+  string -> bool ->
   (typing_context:typing_context -> loc:location ->
    Logic_ptree.lexpr list -> acsl_extension_kind) -> unit
 
@@ -180,7 +185,7 @@ val register_behavior_extension:
     @since 18.0-Argon
 *)
 val register_global_extension:
-  string ->
+  string -> bool ->
   (typing_context:typing_context -> loc: location ->
    Logic_ptree.lexpr list -> acsl_extension_kind) -> unit
 
@@ -192,7 +197,7 @@ val register_global_extension:
     @since 18.0-Argon
 *)
 val register_code_annot_extension:
-  string ->
+  string -> bool ->
   (typing_context: typing_context -> loc: location ->
    Logic_ptree.lexpr list -> acsl_extension_kind) -> unit
 
@@ -204,7 +209,7 @@ val register_code_annot_extension:
     @since 18.0-Argon
 *)
 val register_code_annot_next_stmt_extension:
-  string ->
+  string -> bool ->
   (typing_context: typing_context -> loc: location ->
    Logic_ptree.lexpr list -> acsl_extension_kind) -> unit
 
@@ -215,7 +220,7 @@ val register_code_annot_next_stmt_extension:
     @since 18.0-Argon
 *)
 val register_code_annot_next_loop_extension:
-  string ->
+  string -> bool ->
   (typing_context: typing_context -> loc: location ->
    Logic_ptree.lexpr list -> acsl_extension_kind) -> unit
 
@@ -227,7 +232,7 @@ val register_code_annot_next_loop_extension:
     @since 18.0-Argon
 *)
 val register_code_annot_next_both_extension:
-  string ->
+  string -> bool ->
   (typing_context: typing_context -> loc: location ->
    Logic_ptree.lexpr list -> acsl_extension_kind) -> unit
 

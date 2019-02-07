@@ -42,7 +42,7 @@ module Behavior_extensions = struct
     | Ext_preds preds ->
       Pretty_utils.pp_list ~sep:",@ " printer#predicate fmt preds
 
-  let pp (printer) fmt (_, name, _, ext) =
+  let pp (printer) fmt (_,name,_,_,ext) =
     let pp =
       try
         Hashtbl.find printer_tbl name
@@ -2675,8 +2675,8 @@ class cil_printer () = object (self)
       self#pp_acsl_keyword "requires"
       self#identified_predicate p
 
-  method extended fmt (id, name, l,ext) =
-    Behavior_extensions.pp (self :> extensible_printer_type) fmt (id,name,l,ext)
+  method extended fmt (ext : acsl_extension) =
+    Behavior_extensions.pp (self :> extensible_printer_type) fmt ext
 
   method post_cond fmt (k,p) =
     let kw = get_termination_kind_name k in

@@ -187,4 +187,19 @@ int unsetenv(const char *name)
 char __fc_strerror[64];
 #endif
 
+// Note: this implementation does not check the alignment, since it cannot
+//       currently be specified in the memory model of most plug-ins
+int posix_memalign(void **memptr, size_t alignment, size_t size) {
+  // By default, specifications in the libc are ignored for defined functions,
+  // and since we do not actually use alignment, we need to check its validity.
+  // The assertion below is the requires in the specification.
+  /*@ assert alignment_is_a_suitable_power_of_two:
+      alignment >= sizeof(void*) &&
+      ((size_t)alignment & ((size_t)alignment - 1)) == 0;
+  */
+  *memptr = malloc(size);
+  if (!*memptr) return ENOMEM;
+  return 0;
+}
+
 __POP_FC_STDLIB

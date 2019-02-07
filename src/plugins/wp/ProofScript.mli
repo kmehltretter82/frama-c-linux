@@ -23,7 +23,7 @@
 open Tactical
 open Conditions
 
-class console : title:string -> Tactical.feedback
+class console : pool:Lang.F.pool -> title:string -> Tactical.feedback
 
 type jscript = alternative list
 and alternative = private

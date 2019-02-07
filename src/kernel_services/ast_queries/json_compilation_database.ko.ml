@@ -31,4 +31,4 @@ let get_flags _ =
       "Attempt to parse json compilation database %s \
        with a Frama-C compiled without Yojson support." db
   end;
-  ""
+  []

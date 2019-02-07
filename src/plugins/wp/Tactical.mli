@@ -51,6 +51,7 @@ val int : int -> selection
 val cint : Integer.t -> selection
 val range : int -> int -> selection
 val compose : string -> selection list -> selection
+val get_int : selection -> int option
 val destruct : selection -> selection list
 
 val head : clause -> pred
@@ -141,6 +142,9 @@ type 'a formatter = ('a,Format.formatter,unit) format -> 'a
 
 class type feedback =
   object
+    (** Global fresh variable pool *)
+    method pool : pool
+
     (** Interactive mode.
         If [false] the GUI is not activated.
         Hence, detailed feedback is not reported to the user. *)

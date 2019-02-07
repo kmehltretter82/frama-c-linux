@@ -78,7 +78,9 @@ let jconfigure (console : #Tactical.feedback) jtactic goal =
       end
 
 let jfork tree ?node jtactic =
-  let console = new ProofScript.console ~title:jtactic.header in
+  let console = new ProofScript.console
+    ~pool:(ProofEngine.pool tree)
+    ~title:jtactic.header in
   try
     let anchor = ProofEngine.anchor tree ?node () in
     let goal = ProofEngine.goal anchor in
@@ -102,6 +104,7 @@ open Task
 
 module Env =
 struct
+
   type t = {
     tree : ProofEngine.tree ;
     valid : bool ; (* play valid provers *)
@@ -410,6 +413,7 @@ type 'a process =
 let skip1 _ = ()
 let skip2 _ _ = ()
 let skip3 _ _ _ = ()
+
 let prove
     ?(valid = true) ?(failed = true) ?(provers = [])
     ?(depth = 0) ?(width = 0) ?(backtrack = 0) ?(auto = [])

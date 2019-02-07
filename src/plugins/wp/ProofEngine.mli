@@ -40,6 +40,7 @@ type state = [ `Opened | `Proved | `Pending of int | `Script of int ]
 type current = [ `Main | `Internal of node | `Leaf of int * node ]
 type position = [ `Main | `Node of node | `Leaf of int ]
 
+val pool : tree -> Lang.F.pool
 val saved : tree -> bool
 val set_saved : tree -> bool -> unit
 

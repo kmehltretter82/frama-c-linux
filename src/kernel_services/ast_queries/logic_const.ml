@@ -55,8 +55,8 @@ let refresh_predicate p = { p with ip_id = PredicateId.next () }
 let new_identified_term t =
   { it_id = TermId.next (); it_content = t }
 
-let new_acsl_extension name l p =
-  ExtendedId.next (),name, l, p
+let new_acsl_extension name l s k : acsl_extension =
+  ExtendedId.next (), name, l, s , k
 
 let fresh_term_id = TermId.next
 

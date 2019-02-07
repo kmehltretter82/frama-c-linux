@@ -94,7 +94,11 @@ end
 module HCE = struct
   module S =
     State_builder.Hashcons(E)
-      (struct let dependencies = [Ast.self] let name = "" end)
+      (struct
+        let dependencies = [Ast.self]
+        let name = ""
+        let initial_values = []
+      end)
 
   include S
 

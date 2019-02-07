@@ -33,5 +33,11 @@ int main() {
     if (s) s[i-1] = 42;
   }
 
+  char *p_al0, *p_al1;
+  int p_memal_res = posix_memalign((void**)&p_al0, 32, 0);
+  free(p_al0);
+  int p_memal_res2 = posix_memalign((void**)&p_al1, 32, 42);
+  free(p_al1);
+
   return 0;
 }

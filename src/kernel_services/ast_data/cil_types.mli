@@ -1646,6 +1646,11 @@ and spec = {
 
 
 (** Extension to standard ACSL clause with an unique identifier.
+
+    The integer is a (unique) identifier.
+    The boolean flag is [true] if the annotation can be assigned a
+    property status.
+
     Use {!Logic_const.new_acsl_extension} to create new acsl extension with
     a fresh id.
     Each extension is associated with a keyword, and can be either a global
@@ -1664,7 +1669,7 @@ and spec = {
     grammar ambiguous.
 
     @plugin development guide *)
-and acsl_extension = int * string * location * acsl_extension_kind
+and acsl_extension = int * string * location * bool * acsl_extension_kind
 
 (** @plugin development guide *)
 and acsl_extension_kind =
