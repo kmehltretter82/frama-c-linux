@@ -25,9 +25,10 @@ type dependency_kind = Callee | Data | Address | Control
 type location_kind = Precise | Imprecise | Folded
 
 type symbolic_location = {
-  sl_lval : Cil_types.lval;
-  sl_location : Locations.location;
-  sl_owner : Cil_types.kernel_function option;
   sl_kind : location_kind;
+  sl_location : Locations.location;
+  sl_lval : Cil_types.lval;
+  sl_file : string;
+  sl_function : Cil_types.kernel_function option;
 }
 

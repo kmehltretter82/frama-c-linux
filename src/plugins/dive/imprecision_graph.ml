@@ -100,13 +100,25 @@ let ouptput_to_dot out_channel g =
 
   let label s = `HtmlLabel (Extlib.html_escape s) in
 
-  let module Table = Kernel_function.Hashtbl in
-  let table = Table.create 13 in
-  let build_subgraph kf = {
-    sg_name = "f" ^ (string_of_int (Kernel_function.get_id kf));
-    sg_attributes = [label (Kernel_function.get_name kf) ];
+  let module FileTable = Datatype.String.Hashtbl in
+  let module FunctionTable = Kernel_function.Hashtbl in
+  let file_table = FileTable.create 13
+  and function_table = FunctionTable.create 13 in
+  let build_file_subgraph filename = {
+    sg_name = "file_" ^ filename;
+    sg_attributes = [label filename];
     sg_parent = None;
   }
+  and build_function_subgraph _filename kf = {
+    sg_name = "function_" ^ (string_of_int (Kernel_function.get_id kf));
+    sg_attributes = [label (Kernel_function.get_name kf)];
+    sg_parent = None;
+  }
+  in
+  let get_file_subgraph filename =
+    FileTable.memo file_table filename build_file_subgraph
+  and get_function_subgraph filename kf =
+    FunctionTable.memo function_table kf (build_function_subgraph filename)
   in
 
   let module Dot = Graph.Graphviz.Dot (
@@ -129,8 +141,10 @@ let ouptput_to_dot out_channel g =
                  `Style `Filled ; `Fillcolor 0xffbbbb ] @ !l;
         !l
       let get_subgraph v =
-        let kf = v.vertex_location.sl_owner in
-        Extlib.opt_map (fun kf -> Table.memo table kf build_subgraph) kf
+        let filename = v.vertex_location.sl_file in
+        match v.vertex_location.sl_function with
+        | Some kf -> Some (get_function_subgraph filename kf)
+        | None -> Some (get_file_subgraph filename)
       let default_edge_attributes _g = []
       let edge_attributes (_v1,e,_v2) =
         let kind_attribute = match e.edge_kind with

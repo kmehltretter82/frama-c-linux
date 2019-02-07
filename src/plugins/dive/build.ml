@@ -65,7 +65,8 @@ let is_imprecise_data kinstr lval =
 
 (* --- Locations handling --- *)
 
-exception Not_simple_location
+let get_loc_filename loc =
+  Filepath.(Normalized.to_pretty_string (fst loc).pos_path)
 
 let is_foldable_type typ =
   match Cil.unrollType typ with
@@ -74,51 +75,55 @@ let is_foldable_type typ =
   | TBuiltin_va_list _ -> false
   | TNamed _ -> assert false (* the type have been unrolled *)
 
-let to_simple_location (l : Locations.location) : Base.t * Ival.t =
+exception Complex_location
+
+let to_simple_location (l : Locations.location) : Cil_types.varinfo * Ival.t =
   let open Locations in
   match l.loc with
   | Location_Bits.Map m ->
     let one_couple base ival acc =
-      if Extlib.has_some acc then raise Not_simple_location;
-      Some (base, ival)
+      if Extlib.has_some acc then raise Complex_location;
+      match base with
+      | Base.Var (vi,_) -> Some (vi, ival)
+      | _ -> raise Complex_location
     in
     Extlib.the (Location_Bits.M.fold one_couple m None)
-  | _ -> raise Not_simple_location
+  | _ -> raise Complex_location
 
 let to_symbolic_location ~is_folded_base kinstr lval =
-  let location = !Db.Value.lval_to_loc kinstr lval in
+  let sl_location = !Db.Value.lval_to_loc kinstr lval in
   let typ = Cil.typeOfLval lval in
-  try match to_simple_location location with
-    | Base.Var (vi,_), ival ->
-      let sl_owner = Kernel_function.find_defining_kf vi in
-      let base' = Var vi in
-      let sl_kind, sl_lval, sl_location =
-        try
-          let kind, offset' =
-            if is_foldable_type vi.vtype && is_folded_base vi then
-              Folded, NoOffset
-            else
-              let offset = Ival.project_int ival
-              and matching = Bit_utils.MatchType typ in
-              let offset', _ = Bit_utils.find_offset vi.vtype ~offset matching in
-              Precise, offset'
-          in
-          let lval' = (base',offset') in
-          let location' = !Db.Value.lval_to_loc kinstr lval' in
-          kind, lval', location'
+  match to_simple_location sl_location with
+  | vi, ival ->
+    let sl_function = Kernel_function.find_defining_kf vi in
+    let sl_file = get_loc_filename vi.vdecl in 
+    let default = {
+      sl_kind=Imprecise ; sl_location;
+      sl_lval=lval ; sl_function ; sl_file
+    } in
+    let base' = Var vi in
+    if is_foldable_type vi.vtype && is_folded_base vi then
+      {default with sl_kind=Folded ; sl_lval=(base',NoOffset)}
+    else
+      begin try
+          let offset = Ival.project_int ival
+          and matching = Bit_utils.MatchType typ in
+          let offset', _ = Bit_utils.find_offset vi.vtype ~offset matching in
+          {default with sl_kind=Precise ; sl_lval=(base',offset')}
         with Ival.Not_Singleton_Int ->
-          Imprecise, lval, location
-      in
-      { sl_lval; sl_location; sl_owner; sl_kind}
-  | _ -> raise Not_simple_location
-  with
-  | Not_simple_location ->
-    {
-      sl_lval = lval;
-      sl_location = location;
-      sl_owner = None;
-      sl_kind = Imprecise;
-    }
+          default
+      end
+  | exception Complex_location ->
+    match kinstr with
+    | Kglobal -> assert false
+    | Kstmt stmt ->
+      let kf = Kernel_function.find_englobing_kf stmt in
+      let loc = Kernel_function.get_location kf in
+      let sl_file = get_loc_filename loc in 
+      {
+        sl_kind=Imprecise ; sl_location;
+        sl_lval=lval ; sl_function=Some kf ; sl_file
+      }
 
 
 (* --- Graph building --- *)
@@ -151,7 +156,7 @@ let create ?(is_folded_base=no_folded_base) () =
   }
 
 
-let add_lval ({graph; table; is_folded_base} as context)  kinstr lval =
+let add_lval ({graph; table; is_folded_base} as context) kinstr lval =
   (* TODO: derecursify if necessary *)
   let rec update_vertex kinstr lval =
     (* If possible, refine the lval to a non-symbolic one *)
