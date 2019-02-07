@@ -67,7 +67,7 @@ let get_calls ecmd bhvs : (string * Kernel_function.t list) list =
        let fs = ref [] in
        List.iter
          (function
-           | _,cmd, _, Ext_terms ts when cmd = ecmd ->
+           | _,cmd, _, _, Ext_terms ts when cmd = ecmd ->
                fs := !fs @ List.map get_call ts
            | _ -> ())
          bhv.Cil_types.b_extended ;
@@ -125,7 +125,7 @@ class dyncall =
 
     method! vcode_annot ca =
       match ca.annot_content with
-      | Cil_types.AExtended (bhvs,_,(_, "calls", _,Ext_terms calls)) ->
+      | Cil_types.AExtended (bhvs,_,(_,"calls",_,_,Ext_terms calls)) ->
           if calls <> [] && (scope <> [] || not (Stack.is_empty block_calls))
           then begin
             let bhvs =
@@ -223,8 +223,8 @@ let get ?(bhv=Cil.default_behavior_name) stmt =
 
 let register () =
   if Wp_parameters.DynCall.get () then begin
-    Logic_typing.register_code_annot_next_stmt_extension "calls" typecheck;
-    Logic_typing.register_behavior_extension "instanceof" typecheck ;
+    Logic_typing.register_code_annot_next_stmt_extension "calls" true typecheck;
+    Logic_typing.register_behavior_extension "instanceof" true typecheck ;
   end
 
 let () = Cmdline.run_after_configuring_stage register
