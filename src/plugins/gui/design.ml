@@ -419,6 +419,7 @@ let to_do_on_select
   in
   if button = 1 then begin
     match selected with
+    | PStmtStart _ -> ()
     | PStmt (kf, stmt) ->
         current_statement_msg (Some kf) (Kstmt stmt);
         print_code_annotations main_ui kf stmt;
@@ -1175,7 +1176,7 @@ class main_window () : main_window_extension_points =
          varinfo or a global for [loc], then scroll to [loc]. *)
     method scroll loc =
       Gui_parameters.debug ~dkey:dkey_scroll
-        "main_ui: scroll: localizable %a" Pretty_source.Localizable.pretty loc;
+        "main_ui: scroll: localizable %a" Printer_tag.Localizable.pretty loc;
       (* Used to avoid having two different history events, one created
          by [select_global], the other by [scroll] *)
       let history = History.on_current_history () in

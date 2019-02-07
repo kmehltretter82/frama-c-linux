@@ -162,7 +162,7 @@ let truncate_text buffer size =
 
 (* All text added shall go through this function *)
 let append buffer s k n =
-  FCBuffer.add_substring buffer.content s k n ; 
+  FCBuffer.add_substring buffer.content s k n ;
   if FCBuffer.length buffer.content > tgr_buffer then
     truncate_text buffer max_buffer
 
@@ -210,11 +210,11 @@ let create ?indent ?margin () =
   end ;
   let open Format in
   pp_set_formatter_tag_functions fmt {
-      print_open_tag = push_tag buffer ;
-      print_close_tag = pop_tag buffer ;
-      mark_open_tag = no_mark ;
-      mark_close_tag = no_mark ;
-    } ;
+    print_open_tag = push_tag buffer ;
+    print_close_tag = pop_tag buffer ;
+    mark_open_tag = no_mark ;
+    mark_close_tag = no_mark ;
+  } ;
   pp_set_print_tags fmt true ;
   pp_set_mark_tags fmt false ;
   buffer
@@ -244,4 +244,3 @@ let bprintf buffer text = Format.fprintf buffer.formatter text
 let kprintf kjob buffer text = Format.kfprintf kjob buffer.formatter text
 
 (* -------------------------------------------------------------------------- *)
-

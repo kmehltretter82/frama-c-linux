@@ -41,7 +41,7 @@ val register_behavior_extension:
    Cil_types.acsl_extension_kind -> unit) -> unit
 (** Register a pretty-printer used for behavior extension.
     @plugin development guide
- *)
+*)
 
 val register_global_extension:
   string ->
@@ -49,7 +49,7 @@ val register_global_extension:
    Cil_types.acsl_extension_kind -> unit) -> unit
 (** Register a pretty-printer used for behavior extension.
     @plugin development guide
- *)
+*)
 
 val register_code_annot_extension:
   string ->
@@ -57,7 +57,7 @@ val register_code_annot_extension:
    Cil_types.acsl_extension_kind -> unit) -> unit
 (** Register a pretty-printer used for behavior extension.
     @plugin development guide
- *)
+*)
 
 val register_loop_annot_extension:
   string ->
@@ -65,7 +65,7 @@ val register_loop_annot_extension:
    Cil_types.acsl_extension_kind -> unit) -> unit
 (** Register a pretty-printer used for behavior extension.
     @plugin development guide
- *)
+*)
 
 val state: Printer_api.state
 
