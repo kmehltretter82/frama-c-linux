@@ -263,7 +263,7 @@ let add_lval ({graph; table; is_folded_base} as context) kinstr lval =
     (* Do not add dependency to constants or functions *)
     if Cil.is_modifiable_lval lval || true then
       let dst = update_vertex kinstr lval in
-      Graph.create_edge ~allow_folding:true graph src kind dst
+      Graph.create_edge ~allow_folding:true graph dst kind src
   in
   context.roots <- (update_vertex kinstr lval) :: context.roots
 
