@@ -87,7 +87,12 @@ let to_simple_location (l : Locations.location) : Cil_types.varinfo * Ival.t =
       | Base.Var (vi,_) -> Some (vi, ival)
       | _ -> raise Complex_location
     in
-    Extlib.the (Location_Bits.M.fold one_couple m None)
+    let r = Location_Bits.M.fold one_couple m None in
+    if not (Extlib.has_some r) then begin
+      Self.warning "Cannot resolve location %a" Cil_printer.pp_lval lval;
+      raise Not_simple_location
+    end;
+    Extlib.the r
   | _ -> raise Complex_location
 
 let to_symbolic_location ~is_folded_base kinstr lval =
