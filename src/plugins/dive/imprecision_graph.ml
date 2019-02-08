@@ -26,6 +26,7 @@ type vertex_label = {
   vertex_key : int;
   vertex_location : symbolic_location;
   vertex_depth : int; (* depth from originating root *)
+  mutable vertex_deps_computed : bool;
   mutable vertex_imprecise_data : bool;
 }
 
@@ -70,6 +71,7 @@ let create_vertex g vertex_depth vertex_location =
     vertex_depth;
     vertex_location;
     vertex_imprecise_data = false;
+    vertex_deps_computed = false;
   }
   in
   incr vertex_count;
@@ -141,6 +143,8 @@ let ouptput_to_dot out_channel g =
         if v.vertex_imprecise_data then
           l := [ `Color 0xff0000 ; `Style `Bold ;
                  `Style `Filled ; `Fillcolor 0xffbbbb ] @ !l;
+        if not v.vertex_deps_computed then
+          l := [ `Style `Dotted ] @ !l;
         !l
       let get_subgraph v =
         let filename = v.vertex_location.sl_file in

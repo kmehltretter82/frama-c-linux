@@ -182,6 +182,7 @@ let add_lval ?(depth_limit=1) ({graph; table; is_folded_base} as context)
   in
 
   let rec build_vertex_deps v =
+    v.Graph.vertex_deps_computed <- true;
     let lval = v.Graph.vertex_location.sl_lval in
     if v.Graph.vertex_location.sl_kind != Imprecise then
       build_writes_deps v lval;
