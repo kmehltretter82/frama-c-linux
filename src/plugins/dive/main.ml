@@ -42,7 +42,8 @@ let add_target graph lval_text sid =
       Self.abort "The given term is not an lvalue: %s" lval_text
   in
   let kinstr = Cil_types.Kstmt stmt in
-  Build.add_lval graph kinstr lval
+  let depth_limit = Self.DepthLimit.get () in
+  Build.add_lval ~depth_limit graph kinstr lval
 
 let is_folded_base vi =
   not (Self.UnfoldedBases.mem vi.Cil_types.vname)

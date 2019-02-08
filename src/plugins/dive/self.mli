@@ -27,4 +27,6 @@ module Targets : Parameter_sig.Multiple_map
   and type value = Integer.t
   and type t = Integer.t list Datatype.String.Map.t
 
+module DepthLimit : Parameter_sig.Int
+
 module UnfoldedBases : Parameter_sig.String_set

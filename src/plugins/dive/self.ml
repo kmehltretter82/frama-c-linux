@@ -27,6 +27,14 @@ include Plugin.Register
       let help = "An interactive imprecision graph generator."
     end)
 
+module DepthLimit = Int
+    (struct
+      let default = 5
+      let option_name = "-dive-depth-limit"
+      let help = "Build dependencies up to a depth of N."
+      let arg_name = "N"
+    end)
+
 module Targets = String_multiple_map
     (struct
       include Datatype.Integer

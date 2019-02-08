@@ -30,4 +30,4 @@ type t = private {
 }
 
 val create : ?is_folded_base:(Cil_types.varinfo -> bool) -> unit -> t
-val add_lval : t -> Cil_types.kinstr -> Cil_types.lval -> unit
+val add_lval : ?depth_limit:int -> t -> Cil_types.kinstr -> Cil_types.lval -> unit

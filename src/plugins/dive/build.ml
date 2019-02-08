@@ -156,32 +156,38 @@ let create ?(is_folded_base=no_folded_base) () =
   }
 
 
-let add_lval ({graph; table; is_folded_base} as context) kinstr lval =
-  (* TODO: derecursify if necessary *)
-  let rec update_vertex kinstr lval =
+let add_lval ?(depth_limit=1) ({graph; table; is_folded_base} as context)
+    kinstr lval =
+
+  (* Queue of vertices for which we need to compute the dependencies *)
+  let queue = Queue.create () in
+
+  (* Create a new vertex inside the graph and add it to the queue *)
+  let create_vertex ~depth symbolic_location =
+    let v = Graph.create_vertex graph depth symbolic_location in
+    Queue.add v queue;
+    v
+  in
+
+  (* Update a vertex associated to an lvalue, creating one if needed *)
+  let update_vertex ~depth kinstr lval =
     (* If possible, refine the lval to a non-symbolic one *)
     let symbolic_location = to_symbolic_location ~is_folded_base kinstr lval in
-    (* Not exactly as Table.memo as Table.add is done before recursive calls *)
-    let v = try
-        Table.find table symbolic_location
-      with Not_found ->
-        create_vertex symbolic_location
-    in
+    (* Add a vertex if necessary *)
+    let v = Table.memo table symbolic_location (create_vertex ~depth) in
+    (* Update the precision information *)
     if is_imprecise_data kinstr lval then
       v.Graph.vertex_imprecise_data <- true;
     v
+  in
 
-  and create_vertex symbolic_location =
-    let v = Graph.create_vertex graph symbolic_location in
-    Table.add table symbolic_location v;
-    let lval = symbolic_location.sl_lval in
-    if symbolic_location.sl_kind != Imprecise then
+  let rec build_vertex_deps v =
+    let lval = v.Graph.vertex_location.sl_lval in
+    if v.Graph.vertex_location.sl_kind != Imprecise then
       build_writes_deps v lval;
-    begin match lval with
+    match lval with
     | Var vi, NoOffset when vi.vformal -> build_arg_deps v vi
     | _ -> ()
-    end;
-    v
 
   and build_writes_deps src lval =
     let zone = !Db.Value.lval_to_zone kinstr lval in
@@ -189,7 +195,7 @@ let add_lval ({graph; table; is_folded_base} as context) kinstr lval =
     and add_deps (stmt,effects) =
       match stmt.skind with
       | Instr instr when effects.Studia.Writes.direct ->
-        build_instr_deps src (Kstmt stmt) instr
+        build_instr_deps src stmt instr
       | _ -> ()
     in
     List.iter add_deps writes;
@@ -204,66 +210,73 @@ let add_lval ({graph; table; is_folded_base} as context) kinstr lval =
       | Instr (Call (_,_,args,_))
       | Instr (Local_init (_, ConsInit (_, args, _), _)) ->
         let exp = List.nth args pos in
-        build_exp_deps src (Kstmt stmt) Data exp
+        build_exp_deps src stmt Data exp
       | _ ->
         assert false (* Callsites can only be Call or ConsInit *)
     in
     List.iter add_deps callsites
 
-  and build_return_deps src kinstr args kf =
+  and build_return_deps src stmt args kf =
     match Kernel_function.find_return kf with
     | {skind = Return (Some {enode = Lval lval_res},_)} ->
-      build_lval_deps src kinstr Data lval_res
+      build_lval_deps src stmt Data lval_res
     | _ -> assert false (* Cil invariant *)
     | exception Kernel_function.No_Statement -> (* the function is only a prototype *)
       (* TODO: read assigns instead *)
-      List.iter (build_exp_deps src kinstr Data) args
+      List.iter (build_exp_deps src stmt Data) args
 
-  and build_call_deps src kinstr callee args =
-    (* build_exp_deps src kinstr Callee callee; *)
+  and build_call_deps src stmt callee args =
+    (* build_exp_deps src stmt Callee callee; *)
+    let kinstr = Kstmt stmt in
     let _,set = !Db.Value.expr_to_kernel_function kinstr ~deps:None callee in
-    Kernel_function.Hptset.iter (build_return_deps src kinstr args) set
+    Kernel_function.Hptset.iter (build_return_deps src stmt args) set
 
-  and build_instr_deps src kinstr = function
+  and build_instr_deps src stmt = function
     | Set (_, exp, _) ->
-      build_exp_deps src kinstr Data exp
-    | Call (_, callee, args, _) -> build_call_deps src kinstr callee args
+      build_exp_deps src stmt Data exp
+    | Call (_, callee, args, _) -> build_call_deps src stmt callee args
     | Local_init (dest, ConsInit (f, args, k), loc) ->
       let as_func _dest callee args _loc =
-        build_call_deps src kinstr callee args
+        build_call_deps src stmt callee args
       in
       Cil.treat_constructor_as_func as_func dest f args k loc
     | Local_init (_, AssignInit init, _)  ->
-      build_init_deps src kinstr init
+      build_init_deps src stmt init
     | Asm _ -> () (* TODO : tell the user it's not supported *)
     | Skip _ | Code_annot _ -> ()
 
-  and build_init_deps src kinstr = function
+  and build_init_deps src stmt = function
     | SingleInit exp ->
-      build_exp_deps src kinstr Data exp
+      build_exp_deps src stmt Data exp
     | CompoundInit (_typ, initl) ->
-      List.iter (fun (_offset, init) -> build_init_deps src kinstr init) initl
+      List.iter (fun (_offset, init) -> build_init_deps src stmt init) initl
 
-  and build_exp_deps src kinstr kind exp =
+  and build_exp_deps src stmt kind exp =
     match exp.enode with
     | Const _
     | SizeOf _ | SizeOfE _ | SizeOfStr _
     | AlignOf _ -> () | AlignOfE _
     | AddrOf _ | StartOf _     -> ()
     | Lval lval ->
-      build_lval_deps src kinstr kind lval
+      build_lval_deps src stmt kind lval
     | UnOp (_,e,_) | CastE (_,e) | Info (e,_) ->
-      build_exp_deps src kinstr kind e
+      build_exp_deps src stmt kind e
     | BinOp (_,e1,e2,_) ->
-      build_exp_deps src kinstr kind e1;
-      build_exp_deps  src kinstr kind e2
+      build_exp_deps src stmt kind e1;
+      build_exp_deps  src stmt kind e2
 
-  and build_lval_deps src kinstr kind lval =
-    Self.feedback "lval %a" Cil_printer.pp_lval lval;
+  and build_lval_deps src stmt kind lval =
     (* Do not add dependency to constants or functions *)
     if Cil.is_modifiable_lval lval || true then
-      let dst = update_vertex kinstr lval in
+      let depth = src.Graph.vertex_depth + 1 in
+      let dst = update_vertex ~depth (Kstmt stmt) lval in
       Graph.create_edge ~allow_folding:true graph dst kind src
   in
-  context.roots <- (update_vertex kinstr lval) :: context.roots
+
+  context.roots <- (update_vertex ~depth:0 kinstr lval) :: context.roots;
+  while not (Queue.is_empty queue) do
+    let v = Queue.take queue in
+    if v.Graph.vertex_depth < depth_limit then
+      build_vertex_deps v
+  done
 
