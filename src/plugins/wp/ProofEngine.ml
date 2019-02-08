@@ -116,7 +116,7 @@ let saved t = t.saved
 let set_saved t s = t.saved <- s
 
 (* -------------------------------------------------------------------------- *)
-(* --- Indexing                                                           --- *)
+(* --- Walking                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
 let rec walk f node =
@@ -124,6 +124,24 @@ let rec walk f node =
     match node.script with
     | Tactic (_,children) -> iter_all (walk f) children
     | Opened | Script _ -> f node
+
+let rec witer f node =
+  let proved = Wpo.is_proved node.goal in
+  if proved then f ~proved node else
+    match node.script with
+    | Tactic (_,children) -> iter_all (witer f) children
+    | Opened | Script _ -> f ~proved node
+
+let iteri f tree =
+  match tree.root with
+  | None -> ()
+  | Some r ->
+      let k = ref 0 in
+      walk (fun node -> f !k node ; incr k) r
+
+(* -------------------------------------------------------------------------- *)
+(* --- Consolidating                                                      --- *)
+(* -------------------------------------------------------------------------- *)
 
 let pending n =
   let k = ref 0 in
@@ -133,22 +151,26 @@ let has_pending n =
   try walk (fun _ -> raise Exit) n ; false
   with Exit -> true
 
-let iteri f tree =
-  match tree.root with
-  | None -> ()
-  | Some r ->
-      let k = ref 0 in
-      walk (fun node -> f !k node ; incr k) r
+let consolidate root =
+  let result = ref VCS.valid in
+  witer
+    (fun ~proved:_ node ->
+       let rs = List.map snd (Wpo.get_results node.goal) in
+       result := VCS.merge !result (VCS.best rs) ;
+    ) root ;
+  !result
 
-let validate ?(unknown=false) tree =
+let validate ?(incomplete=false) tree =
   match tree.root with
   | None -> ()
-  | Some r ->
+  | Some root ->
       if not (Wpo.is_proved tree.main) then
-        if not (has_pending r) then
+        if incomplete then
+          let result = consolidate root in
+          Wpo.set_result tree.main VCS.Tactical result
+        else
+        if not (has_pending root) then
           Wpo.set_result tree.main VCS.Tactical VCS.valid
-        else if unknown then
-          Wpo.set_result tree.main VCS.Tactical VCS.unknown
 
 (* -------------------------------------------------------------------------- *)
 (* --- Accessors                                                          --- *)

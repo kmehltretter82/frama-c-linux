@@ -31,7 +31,7 @@ val get : Wpo.t -> [ `Script | `Proof | `Saved | `None ]
 val proof : main:Wpo.t -> tree
 val reset : tree -> unit
 val remove : Wpo.t -> unit
-val validate : ?unknown:bool -> tree -> unit
+val validate : ?incomplete:bool -> tree -> unit
 
 (** Leaves are numbered from 0 to n-1 *)
 

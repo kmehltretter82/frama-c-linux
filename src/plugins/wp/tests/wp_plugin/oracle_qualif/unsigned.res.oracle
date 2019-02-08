@@ -10,5 +10,5 @@
 [wp] Report 'tests/wp_plugin/unsigned.i.0.report.json'
 -------------------------------------------------------------
 Axiomatics          WP     Alt-Ergo        Total   Success
-Lemma               -      -                 1       100%
+Lemma               -      -  (4..16)        1       100%
 -------------------------------------------------------------
