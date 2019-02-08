@@ -147,20 +147,26 @@ type t = {
   graph: Graph.t;
   table: Graph.vertex Table.t;
   is_folded_base: Cil_types.varinfo -> bool;
+  is_hidden_base: Cil_types.varinfo -> bool;
   mutable roots: Graph.vertex list;
 }
 
-let no_folded_base _vi = false
+let no_base _vi = false
 
-let create ?(is_folded_base=no_folded_base) () =
+let create ?(is_folded_base=no_base) ?(is_hidden_base=no_base) () =
   !Db.Value.compute ();
   {
     graph = Graph.create ();
     table = Table.create 13;
     is_folded_base;
+    is_hidden_base;
     roots = [];
   }
 
+let is_hidden_location context sl =
+  match sl.sl_lval with
+  | Var vi, _ when context.is_hidden_base vi -> true
+  | _ -> false
 
 let add_lval ?(depth_limit=1) context kinstr lval =
   let {graph; table; is_folded_base} = context in
@@ -169,12 +175,16 @@ let add_lval ?(depth_limit=1) context kinstr lval =
   let update_vertex kinstr lval =
     (* If possible, refine the lval to a non-symbolic one *)
     let symbolic_location = to_symbolic_location ~is_folded_base kinstr lval in
-    (* Add a vertex if necessary *)
-    let v = Table.memo table symbolic_location (Graph.create_vertex graph) in
-    (* Update the precision information *)
-    if is_imprecise_data kinstr lval then
-      v.Graph.vertex_imprecise_data <- true;
-    v
+    if is_hidden_location context symbolic_location then
+      None
+    else begin
+      (* Add a vertex if necessary *)
+      let v = Table.memo table symbolic_location (Graph.create_vertex graph) in
+      (* Update the precision information *)
+      if is_imprecise_data kinstr lval then
+        v.Graph.vertex_imprecise_data <- true;
+      Some v
+    end
   in
 
   let rec build_vertex_deps v =
@@ -264,17 +274,21 @@ let add_lval ?(depth_limit=1) context kinstr lval =
   and build_lval_deps src stmt kind lval =
     (* Do not add dependency to constants or functions *)
     if Cil.is_modifiable_lval lval || true then
-      let dst = update_vertex (Kstmt stmt) lval in
-      Graph.create_edge ~allow_folding:true graph dst kind src
+      match update_vertex (Kstmt stmt) lval with
+      | Some dst -> Graph.create_edge ~allow_folding:true graph dst kind src
+      | None -> ()
   in
 
 
   let queue : (Graph.vertex_label * int) Queue.t = Queue.create () in
 
   (* Create the root *)
-  let root = update_vertex kinstr lval in
-  context.roots <- root :: context.roots;
-  Queue.add (root,0) queue;
+  begin match update_vertex kinstr lval with
+    | Some root ->
+      context.roots <- root :: context.roots;
+      Queue.add (root,0) queue;
+    | None -> ()
+  end;
 
   (* Breadth first search *)
   while not (Queue.is_empty queue) do

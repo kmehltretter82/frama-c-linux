@@ -49,7 +49,7 @@ module Targets = String_multiple_map
     (struct
       let option_name = "-dive"
       let help = "Defines the lvalues for which the dependency graph must be \
-                  generated"
+                  generated."
       let default = Datatype.String.Map.empty
       let arg_name = "lval:sid"
     end)
@@ -58,6 +58,15 @@ module UnfoldedBases = String_set
     (struct
       let option_name = "-dive-unfold"
       let help = "Defines the names of the composite variables which should be \
-                  unfolded into each individual cell"
+                  unfolded into each individual cell."
+      let arg_name = "lval:sid"
+    end)
+
+module HiddenBases = String_set
+    (struct
+      let option_name = "-dive-hide"
+      let help = "Defines the names of the variables which must not be \
+                  displayed in the graph. The dependencies for these bases \
+                  are not computed either."
       let arg_name = "lval:sid"
     end)

@@ -48,10 +48,13 @@ let add_target graph lval_text sid =
 let is_folded_base vi =
   not (Self.UnfoldedBases.mem vi.Cil_types.vname)
 
+let is_hidden_base vi =
+  Self.HiddenBases.mem vi.Cil_types.vname
+
 let main () =
   if not (Self.Targets.is_empty ()) then begin
     (* Create the initial graph  *)
-    let graph = Build.create ~is_folded_base () in
+    let graph = Build.create ~is_folded_base ~is_hidden_base () in
     (* Add targets to it *)
     let add_target' (lval,sids) =
       List.iter (add_target graph lval) sids

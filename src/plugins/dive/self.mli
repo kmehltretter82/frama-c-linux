@@ -30,3 +30,5 @@ module Targets : Parameter_sig.Multiple_map
 module DepthLimit : Parameter_sig.Int
 
 module UnfoldedBases : Parameter_sig.String_set
+
+module HiddenBases : Parameter_sig.String_set
