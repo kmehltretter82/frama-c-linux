@@ -18,6 +18,10 @@ int main(void)
     /*@ ghost x ++; */
   }
   ;
+  if (i) ;
+  /*@ ghost ; */
+  /*@ ghost if (j) ; */
+  ;
   __retres = 0;
   return __retres;
 }

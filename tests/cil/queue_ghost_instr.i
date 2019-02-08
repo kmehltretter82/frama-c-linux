@@ -14,4 +14,13 @@ int main(){
     //@ ghost int x = 0;
     //@ ghost x++ ;
   }
+
+  if(i){
+    ;
+  }
+
+  /*@ ghost if(j){
+
+    }
+  */
 }
