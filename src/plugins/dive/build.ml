@@ -175,45 +175,64 @@ let add_lval ({graph; table; is_folded_base} as context) kinstr lval =
     let v = Graph.create_vertex graph symbolic_location in
     Table.add table symbolic_location v;
     let lval = symbolic_location.sl_lval in
+    if symbolic_location.sl_kind != Imprecise then
+      build_writes_deps v lval;
     begin match lval with
-      | Var vi, NoOffset when vi.vformal ->
-        let kf = Extlib.the (Kernel_function.find_defining_kf vi) in
-        let pos = Kernel_function.get_formal_position vi kf in
-        let callsites = Kernel_function.find_syntactic_callsites kf
-        and add_argument_dependencies (_caller_kf, stmt) =
-          match stmt.skind with
-          | Instr (Call (_,_,args,_))
-          | Instr (Local_init (_, ConsInit (_, args, _), _)) ->
-            let exp = List.nth args pos in
-            build_exp_deps v (Kstmt stmt) Data exp
-          | _ ->
-            assert false (* Callsites can only be Call or ConsInit *)
-        in
-        List.iter add_argument_dependencies callsites
-      | _ -> ()
-    end;
-
-    if symbolic_location.sl_kind != Imprecise then begin
-      let zone = !Db.Value.lval_to_zone kinstr lval in
-      let writes = Studia.Writes.compute zone
-      and add_write_dependencies (stmt,effects) =
-        match stmt.skind with
-        | Instr instr when effects.Studia.Writes.direct ->
-          build_instr_deps v (Kstmt stmt) instr
-        | _ -> ()
-      in
-      List.iter add_write_dependencies writes;
+    | Var vi, NoOffset when vi.vformal -> build_arg_deps v vi
+    | _ -> ()
     end;
     v
+
+  and build_writes_deps src lval =
+    let zone = !Db.Value.lval_to_zone kinstr lval in
+    let writes = Studia.Writes.compute zone
+    and add_deps (stmt,effects) =
+      match stmt.skind with
+      | Instr instr when effects.Studia.Writes.direct ->
+        build_instr_deps src (Kstmt stmt) instr
+      | _ -> ()
+    in
+    List.iter add_deps writes;
+
+  and build_arg_deps src vi =
+    assert vi.vformal;
+    let kf = Extlib.the (Kernel_function.find_defining_kf vi) in
+    let pos = Kernel_function.get_formal_position vi kf in
+    let callsites = Kernel_function.find_syntactic_callsites kf
+    and add_deps (_caller_kf, stmt) =
+      match stmt.skind with
+      | Instr (Call (_,_,args,_))
+      | Instr (Local_init (_, ConsInit (_, args, _), _)) ->
+        let exp = List.nth args pos in
+        build_exp_deps src (Kstmt stmt) Data exp
+      | _ ->
+        assert false (* Callsites can only be Call or ConsInit *)
+    in
+    List.iter add_deps callsites
+
+  and build_return_deps src kinstr args kf =
+    match Kernel_function.find_return kf with
+    | {skind = Return (Some {enode = Lval lval_res},_)} ->
+      build_lval_deps src kinstr Data lval_res
+    | _ -> assert false (* Cil invariant *)
+    | exception Kernel_function.No_Statement -> (* the function is only a prototype *)
+      (* TODO: read assigns instead *)
+      List.iter (build_exp_deps src kinstr Data) args
+
+  and build_call_deps src kinstr callee args =
+    (* build_exp_deps src kinstr Callee callee; *)
+    let _,set = !Db.Value.expr_to_kernel_function kinstr ~deps:None callee in
+    Kernel_function.Hptset.iter (build_return_deps src kinstr args) set
 
   and build_instr_deps src kinstr = function
     | Set (_, exp, _) ->
       build_exp_deps src kinstr Data exp
-    | Call (_, _callee, args, _) ->
-      (* build_exp_deps src kinstr Callee callee; *)
-      List.iter (build_exp_deps src kinstr Data) args
-    | Local_init (_, ConsInit (_, args, _), _) ->
-      List.iter (build_exp_deps src kinstr Data) args
+    | Call (_, callee, args, _) -> build_call_deps src kinstr callee args
+    | Local_init (dest, ConsInit (f, args, k), loc) ->
+      let as_func _dest callee args _loc =
+        build_call_deps src kinstr callee args
+      in
+      Cil.treat_constructor_as_func as_func dest f args k loc
     | Local_init (_, AssignInit init, _)  ->
       build_init_deps src kinstr init
     | Asm _ -> () (* TODO : tell the user it's not supported *)
@@ -240,8 +259,11 @@ let add_lval ({graph; table; is_folded_base} as context) kinstr lval =
       build_exp_deps  src kinstr kind e2
 
   and build_lval_deps src kinstr kind lval =
-    let dst = update_vertex kinstr lval in
-    Graph.create_edge ~allow_folding:true graph src kind dst
+    Self.feedback "lval %a" Cil_printer.pp_lval lval;
+    (* Do not add dependency to constants or functions *)
+    if Cil.is_modifiable_lval lval || true then
+      let dst = update_vertex kinstr lval in
+      Graph.create_edge ~allow_folding:true graph src kind dst
   in
   context.roots <- (update_vertex kinstr lval) :: context.roots
 
