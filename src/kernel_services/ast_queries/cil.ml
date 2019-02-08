@@ -265,6 +265,25 @@ let mkBlock (slst: stmt list) : block =
 
 let mkBlockNonScoping l = let b = mkBlock l in b.bscoping <- false; b
 
+let rec enforceGhostStmtCoherency ?(force_ghost=false) stmt =
+  let force_ghost = force_ghost || stmt.ghost in
+  stmt.ghost <- force_ghost ;
+  begin match stmt.skind with
+    | Break(_) | Continue(_) | Goto(_) | Throw(_)
+    | Instr(_) | Return(_) -> ()
+    | UnspecifiedSequence(_) -> ()
+    | If(_, b1, b2, _) | TryFinally(b1, b2, _) | TryExcept(b1, _, b2, _) ->
+      enforceGhostBlockCoherency ~force_ghost b1 ;
+      enforceGhostBlockCoherency ~force_ghost b2
+    | Switch(_, b, _, _) | Loop(_, b, _, _, _) | Block(b) ->
+      enforceGhostBlockCoherency ~force_ghost b
+    | TryCatch(b, l, _) ->
+      enforceGhostBlockCoherency ~force_ghost b ;
+      List.iter (fun (_, b) -> enforceGhostBlockCoherency ~force_ghost b) l
+  end
+and enforceGhostBlockCoherency ?force_ghost block =
+  List.iter (enforceGhostStmtCoherency ?force_ghost) block.bstmts
+
 let mkStmt ?(ghost=false) ?(valid_sid=false) ?(sattr=[]) (sk: stmtkind) : stmt =
   { skind = sk;
     labels = [];
@@ -277,19 +296,12 @@ let mkStmt ?(ghost=false) ?(valid_sid=false) ?(sattr=[]) (sk: stmtkind) : stmt =
     ghost = ghost;
     sattr = sattr;}
 
-(* This function is considered unsafe since the ghost parameter can only be
-   taken in account if the list contains at least two elements.
-   It should not be exposed by the API.
-*)
-let unsafe_stmt_of_instr_list ?(loc=Location.unknown) ?(ghost=false) = function
+let stmt_of_instr_list ?(loc=Location.unknown) = function
    | [] -> Instr (Skip loc)
    | [i] -> Instr i
    | il ->
-     let b = mkBlockNonScoping (List.map (fun i -> mkStmt ~ghost (Instr i)) il) in
+     let b = mkBlockNonScoping (List.map (fun i -> mkStmt (Instr i)) il) in
      Block b
-
-let stmt_of_instr_list ?(loc=Location.unknown) =
-  unsafe_stmt_of_instr_list ~loc ~ghost:false
 
  (**** Utility functions ******)
 
@@ -2225,8 +2237,8 @@ let flatten_transient_sub_blocks b =
   b.bstmts <- List.concat (List.map treat_one_stmt b.bstmts);
   b
 
-let stmt_of_instr_list_visitor ?loc ?ghost l =
-  let res = unsafe_stmt_of_instr_list ?loc ?ghost l in
+let stmt_of_instr_list_visitor ?loc l =
+  let res =  stmt_of_instr_list ?loc l in
   match res with
   | Block b -> Block (transient_block b)
   | _ -> res
@@ -3455,8 +3467,7 @@ and childrenExp (vis: cilVisitor) (e: exp) : exp =
      | Instr i ->
 	 begin match fInst i with
 	   | [i'] when i' == i -> s.skind
-           | il -> stmt_of_instr_list_visitor
-                   ~ghost:s.ghost ~loc:(Cil_datatype.Instr.loc i) il
+	   | il -> stmt_of_instr_list_visitor ~loc:(Cil_datatype.Instr.loc i) il
 	 end
      | Block b ->
 	 let b' = fBlock b in
@@ -3503,6 +3514,7 @@ and childrenExp (vis: cilVisitor) (e: exp) : exp =
 	 else s.skind
    in
    if skind' != s.skind then s.skind <- skind';
+   enforceGhostStmtCoherency s ;
    (* Visit the labels *)
    let labels' =
      let fLabel = function
@@ -6646,9 +6658,8 @@ let childrenFileSameGlobals vis f =
    in
    List.iter
      (fun s ->
-       match s.skind with
-       | Instr i -> s.skind <-
-           unsafe_stmt_of_instr_list ~ghost:s.ghost (doInstrList [i])
+       begin match s.skind with
+       | Instr i -> s.skind <- stmt_of_instr_list (doInstrList [i])
        | If (_e, tb, eb, _) ->
 	   peepHole1 doone tb.bstmts;
 	   peepHole1 doone eb.bstmts
@@ -6667,7 +6678,9 @@ let childrenFileSameGlobals vis f =
 	   peepHole1 doone b.bstmts;
 	   peepHole1 doone h.bstmts;
 	   s.skind <- TryExcept(b, (doInstrList il, e), h, l);
-       | Return _ | Goto _ | Break _ | Continue _ | Throw _ -> ())
+       | Return _ | Goto _ | Break _ | Continue _ | Throw _ -> ()
+       end ;
+       enforceGhostStmtCoherency s)
      ss
 
  (* Process two statements and possibly replace them both *)
