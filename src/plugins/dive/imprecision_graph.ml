@@ -25,7 +25,6 @@ open Dependency_types
 type vertex_label = {
   vertex_key : int;
   vertex_location : symbolic_location;
-  vertex_depth : int; (* depth from originating root *)
   mutable vertex_deps_computed : bool;
   mutable vertex_imprecise_data : bool;
 }
@@ -65,10 +64,9 @@ include G
 let vertex_count = ref 0
 let edge_count = ref 0
 
-let create_vertex g vertex_depth vertex_location =
+let create_vertex g vertex_location =
   let v = {
     vertex_key = !vertex_count;
-    vertex_depth;
     vertex_location;
     vertex_imprecise_data = false;
     vertex_deps_computed = false;

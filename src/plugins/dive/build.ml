@@ -77,7 +77,8 @@ let is_foldable_type typ =
 
 exception Complex_location
 
-let to_simple_location (l : Locations.location) : Cil_types.varinfo * Ival.t =
+let to_simple_location lval (l : Locations.location)
+  : Cil_types.varinfo * Ival.t =
   let open Locations in
   match l.loc with
   | Location_Bits.Map m ->
@@ -90,7 +91,7 @@ let to_simple_location (l : Locations.location) : Cil_types.varinfo * Ival.t =
     let r = Location_Bits.M.fold one_couple m None in
     if not (Extlib.has_some r) then begin
       Self.warning "Cannot resolve location %a" Cil_printer.pp_lval lval;
-      raise Not_simple_location
+      raise Complex_location
     end;
     Extlib.the r
   | _ -> raise Complex_location
@@ -98,7 +99,7 @@ let to_simple_location (l : Locations.location) : Cil_types.varinfo * Ival.t =
 let to_symbolic_location ~is_folded_base kinstr lval =
   let sl_location = !Db.Value.lval_to_loc kinstr lval in
   let typ = Cil.typeOfLval lval in
-  match to_simple_location sl_location with
+  match to_simple_location lval sl_location with
   | vi, ival ->
     let sl_function = Kernel_function.find_defining_kf vi in
     let sl_file = get_loc_filename vi.vdecl in 
@@ -161,25 +162,15 @@ let create ?(is_folded_base=no_folded_base) () =
   }
 
 
-let add_lval ?(depth_limit=1) ({graph; table; is_folded_base} as context)
-    kinstr lval =
-
-  (* Queue of vertices for which we need to compute the dependencies *)
-  let queue = Queue.create () in
-
-  (* Create a new vertex inside the graph and add it to the queue *)
-  let create_vertex ~depth symbolic_location =
-    let v = Graph.create_vertex graph depth symbolic_location in
-    Queue.add v queue;
-    v
-  in
+let add_lval ?(depth_limit=1) context kinstr lval =
+  let {graph; table; is_folded_base} = context in
 
   (* Update a vertex associated to an lvalue, creating one if needed *)
-  let update_vertex ~depth kinstr lval =
+  let update_vertex kinstr lval =
     (* If possible, refine the lval to a non-symbolic one *)
     let symbolic_location = to_symbolic_location ~is_folded_base kinstr lval in
     (* Add a vertex if necessary *)
-    let v = Table.memo table symbolic_location (create_vertex ~depth) in
+    let v = Table.memo table symbolic_location (Graph.create_vertex graph) in
     (* Update the precision information *)
     if is_imprecise_data kinstr lval then
       v.Graph.vertex_imprecise_data <- true;
@@ -187,7 +178,6 @@ let add_lval ?(depth_limit=1) ({graph; table; is_folded_base} as context)
   in
 
   let rec build_vertex_deps v =
-    v.Graph.vertex_deps_computed <- true;
     let lval = v.Graph.vertex_location.sl_lval in
     if v.Graph.vertex_location.sl_kind != Imprecise then
       build_writes_deps v lval;
@@ -261,8 +251,8 @@ let add_lval ?(depth_limit=1) ({graph; table; is_folded_base} as context)
     match exp.enode with
     | Const _
     | SizeOf _ | SizeOfE _ | SizeOfStr _
-    | AlignOf _ -> () | AlignOfE _
-    | AddrOf _ | StartOf _     -> ()
+    | AlignOf _  | AlignOfE _
+    | AddrOf _ | StartOf _ -> ()
     | Lval lval ->
       build_lval_deps src stmt kind lval
     | UnOp (_,e,_) | CastE (_,e) | Info (e,_) ->
@@ -274,15 +264,25 @@ let add_lval ?(depth_limit=1) ({graph; table; is_folded_base} as context)
   and build_lval_deps src stmt kind lval =
     (* Do not add dependency to constants or functions *)
     if Cil.is_modifiable_lval lval || true then
-      let depth = src.Graph.vertex_depth + 1 in
-      let dst = update_vertex ~depth (Kstmt stmt) lval in
+      let dst = update_vertex (Kstmt stmt) lval in
       Graph.create_edge ~allow_folding:true graph dst kind src
   in
 
-  context.roots <- (update_vertex ~depth:0 kinstr lval) :: context.roots;
+
+  let queue : (Graph.vertex_label * int) Queue.t = Queue.create () in
+
+  (* Create the root *)
+  let root = update_vertex kinstr lval in
+  context.roots <- root :: context.roots;
+  Queue.add (root,0) queue;
+
+  (* Breadth first search *)
   while not (Queue.is_empty queue) do
-    let v = Queue.take queue in
-    if v.Graph.vertex_depth < depth_limit then
-      build_vertex_deps v
-  done
+    let v,depth = Queue.take queue in
+    if not (v.Graph.vertex_deps_computed) && depth < depth_limit then begin
+      build_vertex_deps v;
+      v.Graph.vertex_deps_computed <- true;
+      Graph.iter_pred (fun w -> Queue.add (w,depth+1) queue) graph v
+    end;
+  done;
 
