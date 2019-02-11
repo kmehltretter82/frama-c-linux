@@ -65,7 +65,7 @@ typedef double double_t;
 #define FP_SUBNORMAL 3
 #define FP_NORMAL 4
 
-#include <float.h> // for DBL_MIN and FLT_MIN
+#include "float.h" // for DBL_MIN and FLT_MIN
 
 /*@
   assigns \result \from x;

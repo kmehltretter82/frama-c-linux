@@ -246,7 +246,7 @@ __PUSH_FC_STDLIB
 
 __BEGIN_DECLS
 
-typedef struct
+typedef struct __fc_imaxdiv_t
   {
     intmax_t quot;		/* Quotient.  */
     intmax_t rem;		/* Remainder.  */

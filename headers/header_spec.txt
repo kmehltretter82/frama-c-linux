@@ -191,6 +191,7 @@ share/libc/__fc_gcc_builtins.h: CEA_LGPL
 share/libc/__fc_inet.h: CEA_LGPL
 share/libc/__fc_machdep.h: CEA_LGPL
 share/libc/__fc_machdep_linux_shared.h: CEA_LGPL
+share/libc/__fc_runtime.c: CEA_LGPL
 share/libc/__fc_select.h: CEA_LGPL
 share/libc/__fc_string_axiomatic.h: CEA_LGPL
 share/libc/alloca.h: CEA_LGPL
@@ -206,7 +207,6 @@ share/libc/dlfcn.h: CEA_LGPL
 share/libc/endian.h: CEA_LGPL
 share/libc/errno.c: CEA_LGPL
 share/libc/errno.h: CEA_LGPL
-share/libc/fc_runtime.c: CEA_LGPL
 share/libc/fcntl.h: CEA_LGPL
 share/libc/features.h: CEA_LGPL
 share/libc/fenv.h: CEA_LGPL
@@ -247,6 +247,7 @@ share/libc/resolv.h: CEA_LGPL
 share/libc/sched.h: CEA_LGPL
 share/libc/semaphore.h: CEA_LGPL
 share/libc/setjmp.h: CEA_LGPL
+share/libc/signal.c: CEA_LGPL
 share/libc/signal.h: CEA_LGPL
 share/libc/stdarg.h: CEA_LGPL
 share/libc/stdbool.h: CEA_LGPL

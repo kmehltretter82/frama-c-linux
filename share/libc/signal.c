@@ -20,19 +20,9 @@
 /*                                                                        */
 /**************************************************************************/
 
-#include "__fc_builtin.h"
-#include "assert.c"
-#include "ctype.c"
-#include "errno.c"
-#include "fenv.c"
-#include "getopt.c"
-#include "glob.c"
-#include "inttypes.c"
-#include "locale.c"
-#include "math.c"
-#include "netdb.c"
-#include "stdio.c"
-#include "stdlib.c"
-#include "string.c"
-#include "wchar.c"
-#include "__fc_builtin.c"
+#include "signal.h"
+__PUSH_FC_STDLIB
+
+struct sigaction __fc_sigaction[SIGRTMAX+1];
+
+__POP_FC_STDLIB

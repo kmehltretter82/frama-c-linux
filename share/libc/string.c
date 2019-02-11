@@ -20,6 +20,7 @@
 /*                                                                        */
 /**************************************************************************/
 
+#include "__fc_builtin.h"
 #include "string.h"
 #include "stdint.h" // for uintptr_t
 #include "stdlib.h" // for malloc()
@@ -59,7 +60,14 @@ void* memcpy(void* restrict dest, const void* restrict src, size_t n)
   complete behaviors;
   disjoint behaviors;
 */
-static int memoverlap(char const *p, char const *q, size_t n);
+static int memoverlap(char const *p, char const *q, size_t n) {
+  uintptr_t
+    p1 = (uintptr_t)p, p2 = (uintptr_t)(p+n),
+    q1 = (uintptr_t)q, q2 = (uintptr_t)(q+n);
+  if (p1 <= q1 && p2 > q1) return -1;
+  else if (q1 <= p1 && q2 > p1) return 1;
+  else return 0;
+}
 
 void* memmove(void* dest, const void* src, size_t n)
 {

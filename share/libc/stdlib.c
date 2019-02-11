@@ -182,10 +182,9 @@ int unsetenv(const char *name)
   return 0;
 }
 
-#ifndef __FRAMAC__
-// declar __fc_strerror to ensure GCC can compile this file (for debugging and tests)
-char __fc_strerror[64];
-#endif
+
+unsigned short __fc_random48_counter[3];
+
 
 // Note: this implementation does not check the alignment, since it cannot
 //       currently be specified in the memory model of most plug-ins

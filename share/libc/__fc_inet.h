@@ -103,7 +103,7 @@ struct in6_pktinfo
 
 
 /* Standard well-defined IP protocols.  */
-enum
+enum __fc_ipproto
   {
     IPPROTO_IP = 0,        /* Dummy protocol for TCP.  */
 #define IPPROTO_IP IPPROTO_IP

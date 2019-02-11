@@ -160,7 +160,7 @@
   function strncpy: precondition 'room_nstring' got status valid.
 [eva] tests/libc/string_c_generic.c:73: 
   function strncpy: precondition 'separation' got status valid.
-[eva] share/libc/string.c:212: starting to merge loop iterations
+[eva] share/libc/string.c:220: starting to merge loop iterations
 [eva] share/libc/string.h:363: 
   function strncpy: postcondition 'result_ptr' got status valid.
 [eva] share/libc/string.h:364: 
@@ -211,7 +211,7 @@
   function strncmp: precondition 'valid_string_s1' got status valid.
 [eva] tests/libc/string_c_generic.c:82: 
   function strncmp: precondition 'valid_string_s2' got status valid.
-[eva] share/libc/string.c:130: starting to merge loop iterations
+[eva] share/libc/string.c:138: starting to merge loop iterations
 [eva] share/libc/string.h:147: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strncmp
 [eva:alarm] share/libc/string.h:147: Warning: 
@@ -245,8 +245,8 @@
 [eva] tests/libc/string_c_generic.c:86: 
   function strncat, behavior partial: precondition 'room_string' got status valid.
 [eva] computing for function strlen <- strncat <- main.
-  Called from share/libc/string.c:185.
-[eva] share/libc/string.c:185: 
+  Called from share/libc/string.c:193.
+[eva] share/libc/string.c:193: 
   function strlen: precondition 'valid_string_s' got status valid.
 [eva] share/libc/string.h:127: 
   function strlen: postcondition 'acsl_c_equiv' got status valid.
@@ -307,8 +307,8 @@
 [eva] tests/libc/string_c_generic.c:93: 
   function strrchr: precondition 'valid_string_s' got status valid.
 [eva] computing for function strlen <- strrchr <- main.
-  Called from share/libc/string.c:229.
-[eva] share/libc/string.c:229: 
+  Called from share/libc/string.c:237.
+[eva] share/libc/string.c:237: 
   function strlen: precondition 'valid_string_s' got status valid.
 [eva] Recording results for strlen
 [eva] Done for function strlen
@@ -326,8 +326,8 @@
   Called from tests/libc/string_c_generic.c:94.
 [eva] tests/libc/string_c_generic.c:94: 
   function strrchr: precondition 'valid_string_s' got status valid.
-[eva] share/libc/string.c:229: Reusing old results for call to strlen
-[eva] share/libc/string.c:229: starting to merge loop iterations
+[eva] share/libc/string.c:237: Reusing old results for call to strlen
+[eva] share/libc/string.c:237: starting to merge loop iterations
 [eva] share/libc/string.h:184: 
   function strrchr, behavior not_found: postcondition 'result_null' got status valid.
 [eva] Recording results for strrchr
