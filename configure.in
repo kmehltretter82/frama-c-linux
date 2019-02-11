@@ -940,12 +940,17 @@ REQUIRE_LABLGTK="$REQUIRE_LABLGTK$REQUIRE_GNOMECANVAS"
 USE_LABLGTK="$USE_LABLGTK$USE_GNOMECANVAS"
 
 LABLGTK_PATH=""
+SOURCEVIEW_PATH=""
 
 if test "$ENABLE_LABLGTK3" = "yes"; then
   LABLGTK_PATH=`ocamlfind query lablgtk3 | tr -d '\\r\\n'`;
 fi
 
-if test "$LABLGTK_PATH" = ""; then
+if test "$LABLGTK_PATH" != ""; then
+  SOURCEVIEW_PATH=`ocamlfind query lablgtk3-sourceview3 | tr -d '\\r\\n'`;
+fi
+
+if test "$SOURCEVIEW_PATH" = ""; then
   LABLGTK_VERSION=2
   LABLGTK_PATH=`ocamlfind query lablgtk2 | tr -d '\\r\\n'`
   if test "$LABLGTK_PATH" = "" -o \
@@ -957,6 +962,7 @@ if test "$LABLGTK_PATH" = ""; then
        echo "Ocamlfind -> using $LABLGTK_PATH"
        LABLGTKPATH_FOR_CONFIGURE=$LABLGTK_PATH
   fi;
+  SOURCEVIEW_PATH=$LABLGTK_PATH;
 else
   LABLGTK_VERSION=3
   echo "ocamlfind -> using $LABLGTK_PATH"
@@ -964,8 +970,8 @@ else
 fi
 
 configure_library([GTKSOURCEVIEW],
-                  [$LABLGTKPATH_FOR_CONFIGURE/lablgtksourceview2.$LIB_SUFFIX,
-                   $LABLGTKPATH_FOR_CONFIGURE/lablgtksourceview3.$LIB_SUFFIX],
+                  [$SOURCEVIEW_PATH/lablgtksourceview2.$LIB_SUFFIX,
+                   $SOURCEVIEW_PATH/lablgtk3_sourceview3.$LIB_SUFFIX],
                   [lablgtksourceview not found],
                   no)
 
@@ -975,7 +981,8 @@ configure_library([GNOMECANVAS],
                   no)
 
 configure_library([LABLGTK],
-                  [$LABLGTKPATH_FOR_CONFIGURE/lablgtk.$LIB_SUFFIX],
+                  [$LABLGTKPATH_FOR_CONFIGURE/lablgtk.$LIB_SUFFIX,
+                   $LABLGTKPATH_FOR_CONFIGURE/lablgtk3.$LIB_SUFFIX],
                   [$LABLGTKPATH_FOR_CONFIGURE/lablgtk.$LIB_SUFFIX not found.],
                   no)
 
