@@ -106,16 +106,20 @@ let ouptput_to_dot out_channel g =
   let module FunctionTable = Kernel_function.Hashtbl in
   let file_table = FileTable.create 13
   and function_table = FunctionTable.create 13 in
-  let build_file_subgraph filename = {
-    sg_name = "file_" ^ filename;
-    sg_attributes = [label filename];
-    sg_parent = None;
-  }
-  and build_function_subgraph _filename kf = {
-    sg_name = "function_" ^ (string_of_int (Kernel_function.get_id kf));
-    sg_attributes = [label (Kernel_function.get_name kf)];
-    sg_parent = None;
-  }
+  let file_counter = ref 0 in
+  let build_file_subgraph filename =
+    incr file_counter;
+    {
+      sg_name = "file_" ^ (string_of_int !file_counter);
+      sg_attributes = [label filename];
+      sg_parent = None;
+    }
+  and build_function_subgraph _filename kf =
+    {
+      sg_name = "function_" ^ (string_of_int (Kernel_function.get_id kf));
+      sg_attributes = [label (Kernel_function.get_name kf)];
+      sg_parent = None;
+    }
   in
   let get_file_subgraph filename =
     FileTable.memo file_table filename build_file_subgraph
