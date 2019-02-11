@@ -21,6 +21,40 @@
 (**************************************************************************)
 
 (**************************************************************************)
+(** {3 Consistency} *)
+(**************************************************************************)
+
+open Cil_types
+
+let may_have_status_ext ((_,_,_,status,_) : Cil_types.acsl_extension) = status
+
+let may_have_status_ca = function
+  | AAssert _ | AStmtSpec _ | AInvariant _ | AVariant _ | AAllocation _
+  | AAssigns _ -> true
+  | AExtended(_,_,e) -> may_have_status_ext e
+  | APragma _ -> false
+
+let may_have_status_pkind = function
+  | Property.PKAssumes _ -> false
+  | Property.PKEnsures _ | Property.PKRequires _ | Property.PKTerminates
+    -> true
+
+let rec may_have_status ip =
+  match ip with
+  | Property.IPAxiom _ -> false
+  | Property.IPPredicate(pkind, _, _, _) -> may_have_status_pkind pkind
+  | Property.IPExtended(_,e) -> may_have_status_ext e
+  | Property.IPCodeAnnot(_,_, { annot_content = ca }) -> may_have_status_ca ca
+  | Property.IPPropertyInstance(_,_,_,ip) -> may_have_status ip
+  | Property.IPOther _ | Property.IPReachable _
+  | Property.IPAxiomatic _ | Property.IPBehavior _
+  | Property.IPDisjoint _ | Property.IPComplete _
+  | Property.IPAssigns _ | Property.IPFrom _
+  | Property.IPAllocation _ | Property.IPDecrease _ | Property.IPLemma _
+  | Property.IPTypeInvariant _ | Property.IPGlobalInvariant _
+    -> true
+
+(**************************************************************************)
 (** {3 Datatypes} *)
 (**************************************************************************)
 
