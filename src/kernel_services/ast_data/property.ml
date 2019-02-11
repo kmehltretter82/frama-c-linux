@@ -20,6 +20,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* -------------------------------------------------------------------------- *)
+(* --- Property Type                                                      --- *)
+(* -------------------------------------------------------------------------- *)
+
 open Cil_types
 open Cil_datatype
 
@@ -144,6 +148,10 @@ and identified_property =
   | IPTypeInvariant of identified_type_invariant
   | IPGlobalInvariant of identified_global_invariant
   | IPOther of string * other_loc
+
+(* -------------------------------------------------------------------------- *)
+(* --- Getters                                                            --- *)
+(* -------------------------------------------------------------------------- *)
 
 let ki_of_e_loc = function
   | ELContract _ | ELGlob -> Kglobal
@@ -290,6 +298,41 @@ let get_behavior = function
   | IPTypeInvariant _
   | IPGlobalInvariant _
   | IPOther _ -> None
+
+(* -------------------------------------------------------------------------- *)
+(* --- Property Status                                                    --- *)
+(* -------------------------------------------------------------------------- *)
+
+let has_status_ext ((_,_,_,status,_) : Cil_types.acsl_extension) = status
+
+let has_status_ca = function
+  | AAssert _ | AStmtSpec _ | AInvariant _ | AVariant _ | AAllocation _
+  | AAssigns _ -> true
+  | AExtended(_,_,e) -> has_status_ext e
+  | APragma _ -> false
+
+let has_status_pkind = function
+  | PKAssumes _ -> false
+  | PKEnsures _ | PKRequires _ | PKTerminates
+    -> true
+
+let rec has_status = function
+  | IPAxiom _ -> false
+  | IPPredicate(pkind, _, _, _) -> has_status_pkind pkind
+  | IPExtended(_,e) -> has_status_ext e
+  | IPCodeAnnot(_,_, { annot_content = ca }) -> has_status_ca ca
+  | IPPropertyInstance(_,_,_,ip) -> has_status ip
+  | IPOther _ | IPReachable _
+  | IPAxiomatic _ | IPBehavior _
+  | IPDisjoint _ | IPComplete _
+  | IPAssigns _ | IPFrom _
+  | IPAllocation _ | IPDecrease _ | IPLemma _
+  | IPTypeInvariant _ | IPGlobalInvariant _
+    -> true
+
+(* -------------------------------------------------------------------------- *)
+(* --- Datatype                                                           --- *)
+(* -------------------------------------------------------------------------- *)
 
 include Datatype.Make_with_collections
     (struct
@@ -1152,12 +1195,6 @@ end
 (* -------------------------------------------------------------------------- *)
 (* --- Smart Constructors                                                 --- *)
 (* -------------------------------------------------------------------------- *)
-
-
-(* -------------------------------------------------------------------------- *)
-(* --- Smart Constructors                                                 --- *)
-(* -------------------------------------------------------------------------- *)
-
 
 let ip_other s le = IPOther(s,le)
 

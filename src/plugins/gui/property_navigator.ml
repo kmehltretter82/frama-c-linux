@@ -753,7 +753,7 @@ let make_panel (main_ui:main_window_extension_points) =
 let highlighter (buffer:reactive_buffer) localizable ~start ~stop =
   match localizable with
   | Pretty_source.PIP ppt ->
-      if Property_status.may_have_status ppt then
+      if Property.has_status ppt then
         Design.Feedback.mark
           buffer#buffer ~offset:start (Property_status.Feedback.get ppt)
   | Pretty_source.PStmt(_,({ skind=Instr(Call _| Local_init (_, ConsInit _, _)) } as stmt)) ->

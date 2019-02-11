@@ -271,7 +271,7 @@ let filetree_selector
   end
 
 let pretty_predicate_status fmt p =
-  if Property_status.may_have_status p then
+  if Property.has_status p then
     let s = Property_status.get p in
     Format.fprintf fmt "Status: %a@." Property_status.pretty s
 
