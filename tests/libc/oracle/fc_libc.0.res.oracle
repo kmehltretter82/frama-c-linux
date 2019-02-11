@@ -38,7 +38,7 @@
    wcslen (2 calls); wcsncat (0 call); wcsncpy (0 call); wmemcpy (0 call);
    wmemset (0 call); 
   
-  Undefined functions (377)
+  Undefined functions (384)
   =========================
    FD_CLR (0 call); FD_ISSET (0 call); FD_SET (0 call); FD_ZERO (0 call);
    Frama_C_abort (1 call); Frama_C_char_interval (1 call);
@@ -77,45 +77,46 @@
    clock_nanosleep (0 call); close (0 call); closedir (0 call);
    closelog (0 call); connect (0 call); cos (0 call); cosf (0 call);
    cosl (0 call); creat (0 call); ctime (0 call); difftime (0 call);
-   dirname (0 call); div (0 call); dup (0 call); dup2 (0 call); execl (0 call);
-   execle (0 call); execlp (0 call); execv (0 call); execve (0 call);
-   execvp (0 call); exit (0 call); exp (0 call); expf (0 call); fabsl (0 call);
-   fclose (0 call); fcntl (0 call); fdopen (0 call); feof (2 calls);
-   feof_unlocked (0 call); ferror (2 calls); ferror_unlocked (0 call);
-   fflush (0 call); fgetc (1 call); fgetpos (0 call); fgets (0 call);
-   fgetws (0 call); fileno (0 call); fileno_unlocked (0 call); flock (0 call);
-   flockfile (0 call); floor (0 call); floorf (0 call); floorl (0 call);
-   fmod (0 call); fmodf (0 call); fopen (0 call); fork (0 call);
-   fputc (0 call); fputs (0 call); fread (0 call); free (1 call);
-   freeaddrinfo (0 call); freopen (0 call); fseek (0 call); fsetpos (0 call);
-   ftell (0 call); ftrylockfile (0 call); funlockfile (0 call);
-   fwrite (0 call); gai_strerror (0 call); getc (0 call);
-   getc_unlocked (0 call); getchar (0 call); getchar_unlocked (0 call);
-   getcwd (0 call); getegid (0 call); geteuid (0 call); getgid (0 call);
-   gethostname (0 call); getitimer (0 call); getopt (0 call);
-   getopt_long (0 call); getopt_long_only (0 call); getpgid (0 call);
-   getpgrp (0 call); getpid (0 call); getppid (0 call); getpriority (0 call);
-   getpwnam (0 call); getpwuid (0 call); getresgid (0 call);
-   getresuid (0 call); getrlimit (0 call); getrusage (0 call); gets (0 call);
-   getsid (0 call); getsockopt (0 call); gettimeofday (0 call);
-   getuid (0 call); gmtime (0 call); htonl (0 call); htons (0 call);
-   iconv (0 call); iconv_close (0 call); iconv_open (0 call);
-   inet_addr (2 calls); inet_ntoa (0 call); inet_ntop (0 call);
-   inet_pton (0 call); isascii (0 call); isatty (0 call); kill (0 call);
-   killpg (0 call); labs (0 call); ldiv (0 call); listen (0 call);
-   llabs (0 call); lldiv (0 call); localtime (0 call); log (0 call);
-   log10 (0 call); log10f (0 call); log10l (0 call); log2 (0 call);
-   log2f (0 call); log2l (0 call); logf (0 call); logl (0 call);
+   dirname (0 call); div (0 call); drand48 (0 call); dup (0 call);
+   dup2 (0 call); erand48 (0 call); execl (0 call); execle (0 call);
+   execlp (0 call); execv (0 call); execve (0 call); execvp (0 call);
+   exit (0 call); exp (0 call); expf (0 call); fabsl (0 call); fclose (0 call);
+   fcntl (0 call); fdopen (0 call); feof (2 calls); feof_unlocked (0 call);
+   ferror (2 calls); ferror_unlocked (0 call); fflush (0 call); fgetc (1 call);
+   fgetpos (0 call); fgets (0 call); fgetws (0 call); fileno (0 call);
+   fileno_unlocked (0 call); flock (0 call); flockfile (0 call);
+   floor (0 call); floorf (0 call); floorl (0 call); fmod (0 call);
+   fmodf (0 call); fopen (0 call); fork (0 call); fputc (0 call);
+   fputs (0 call); fread (0 call); free (1 call); freeaddrinfo (0 call);
+   freopen (0 call); fseek (0 call); fsetpos (0 call); ftell (0 call);
+   ftrylockfile (0 call); funlockfile (0 call); fwrite (0 call);
+   gai_strerror (0 call); getc (0 call); getc_unlocked (0 call);
+   getchar (0 call); getchar_unlocked (0 call); getcwd (0 call);
+   getegid (0 call); geteuid (0 call); getgid (0 call); gethostname (0 call);
+   getitimer (0 call); getopt (0 call); getopt_long (0 call);
+   getopt_long_only (0 call); getpgid (0 call); getpgrp (0 call);
+   getpid (0 call); getppid (0 call); getpriority (0 call); getpwnam (0 call);
+   getpwuid (0 call); getresgid (0 call); getresuid (0 call);
+   getrlimit (0 call); getrusage (0 call); gets (0 call); getsid (0 call);
+   getsockopt (0 call); gettimeofday (0 call); getuid (0 call);
+   gmtime (0 call); htonl (0 call); htons (0 call); iconv (0 call);
+   iconv_close (0 call); iconv_open (0 call); inet_addr (2 calls);
+   inet_ntoa (0 call); inet_ntop (0 call); inet_pton (0 call);
+   isascii (0 call); isatty (0 call); jrand48 (0 call); kill (0 call);
+   killpg (0 call); labs (0 call); lcong48 (0 call); ldiv (0 call);
+   listen (0 call); llabs (0 call); lldiv (0 call); localtime (0 call);
+   log (0 call); log10 (0 call); log10f (0 call); log10l (0 call);
+   log2 (0 call); log2f (0 call); log2l (0 call); logf (0 call); logl (0 call);
    longjmp (0 call); lrand48 (0 call); malloc (7 calls); mblen (0 call);
    mbstowcs (0 call); mbtowc (0 call); memoverlap (1 call); mkdir (0 call);
-   mkstemp (0 call); mktime (0 call); nan (0 call); nanf (0 call);
-   nanl (0 call); nanosleep (0 call); ntohl (0 call); ntohs (0 call);
-   open (0 call); openat (0 call); opendir (0 call); openlog (0 call);
-   pathconf (0 call); pclose (0 call); perror (0 call); pipe (0 call);
-   poll (0 call); popen (0 call); pow (0 call); powf (0 call);
-   pthread_cond_broadcast (0 call); pthread_cond_destroy (0 call);
-   pthread_cond_init (0 call); pthread_cond_wait (0 call);
-   pthread_create (0 call); pthread_join (0 call);
+   mkstemp (0 call); mktime (0 call); mrand48 (0 call); nan (0 call);
+   nanf (0 call); nanl (0 call); nanosleep (0 call); nrand48 (0 call);
+   ntohl (0 call); ntohs (0 call); open (0 call); openat (0 call);
+   opendir (0 call); openlog (0 call); pathconf (0 call); pclose (0 call);
+   perror (0 call); pipe (0 call); poll (0 call); popen (0 call); pow (0 call);
+   powf (0 call); pthread_cond_broadcast (0 call);
+   pthread_cond_destroy (0 call); pthread_cond_init (0 call);
+   pthread_cond_wait (0 call); pthread_create (0 call); pthread_join (0 call);
    pthread_mutex_destroy (0 call); pthread_mutex_init (0 call);
    pthread_mutex_lock (0 call); pthread_mutex_unlock (0 call); putc (0 call);
    putc_unlocked (0 call); putchar (0 call); putchar_unlocked (0 call);
@@ -123,9 +124,9 @@
    rand (0 call); random (0 call); read (0 call); readdir (0 call);
    readv (0 call); realloc (3 calls); recv (0 call); recvmsg (0 call);
    remove (0 call); rename (0 call); rewind (0 call); round (0 call);
-   roundf (0 call); roundl (0 call); select (0 call); send (0 call);
-   setbuf (0 call); setegid (0 call); seteuid (0 call); setgid (0 call);
-   sethostname (0 call); setitimer (0 call); setjmp (0 call);
+   roundf (0 call); roundl (0 call); seed48 (0 call); select (0 call);
+   send (0 call); setbuf (0 call); setegid (0 call); seteuid (0 call);
+   setgid (0 call); sethostname (0 call); setitimer (0 call); setjmp (0 call);
    setlogmask (0 call); setpgid (0 call); setpriority (0 call);
    setregid (0 call); setresgid (0 call); setresuid (0 call);
    setreuid (0 call); setrlimit (0 call); setsid (0 call); setsockopt (0 call);
@@ -170,13 +171,13 @@
   ============== 
   Sloc = 1026
   Decision point = 195
-  Global variables = 65
+  Global variables = 66
   If = 186
   Loop = 42
   Goto = 84
   Assignment = 415
   Exit point = 76
-  Function = 453
+  Function = 460
   Function call = 84
   Pointer dereferencing = 157
   Cyclomatic complexity = 271

@@ -1662,17 +1662,6 @@ unsigned long const __fc_rand_max = (unsigned long)32767;
  */
 extern int rand(void);
 
-/*@ ensures result_range: 0 ≤ \result < 2147483648;
-    assigns \result, __fc_random_counter;
-    assigns \result \from __fc_random_counter;
-    assigns __fc_random_counter \from __fc_random_counter;
- */
-extern long lrand48(void);
-
-/*@ assigns __fc_random_counter;
-    assigns __fc_random_counter \from seed; */
-extern void srand48(long seed);
-
 /*@ assigns __fc_random_counter;
     assigns __fc_random_counter \from seed; */
 extern void srand(unsigned int seed);
@@ -1686,6 +1675,93 @@ extern long random(void);
 /*@ assigns __fc_random_counter;
     assigns __fc_random_counter \from seed; */
 extern void srandom(unsigned int seed);
+
+int __fc_random48_init __attribute__((__FRAMA_C_MODEL__));
+extern unsigned short __fc_random48_counter[3] __attribute__((__FRAMA_C_MODEL__));
+
+unsigned short *__fc_p_random48_counter = __fc_random48_counter;
+/*@ ensures random48_initialized: __fc_random48_init ≡ 1;
+    assigns __fc_random48_counter[0 .. 2], __fc_random48_init;
+    assigns __fc_random48_counter[0 .. 2] \from seed;
+    assigns __fc_random48_init \from \nothing;
+ */
+extern void srand48(long seed);
+
+/*@ requires
+      initialization: initialized_seed16v: \initialized(seed16v + (0 .. 2));
+    ensures random48_initialized: __fc_random48_init ≡ 1;
+    ensures result_counter: \result ≡ __fc_p_random48_counter;
+    assigns __fc_random48_counter[0 .. 2], __fc_random48_init, \result;
+    assigns __fc_random48_counter[0 .. 2]
+      \from (indirect: *(seed16v + (0 .. 2)));
+    assigns __fc_random48_init \from \nothing;
+    assigns \result \from __fc_p_random48_counter;
+ */
+extern unsigned short *seed48(unsigned short * /*[3]*/ seed16v);
+
+/*@ ensures random48_initialized: __fc_random48_init ≡ 1;
+    assigns __fc_random48_counter[0 .. 2], __fc_random48_init;
+    assigns __fc_random48_counter[0 .. 2] \from *(param + (0 .. 5));
+    assigns __fc_random48_init \from \nothing;
+ */
+extern void lcong48(unsigned short * /*[7]*/ param);
+
+/*@ requires random48_initialized: __fc_random48_init ≡ 1;
+    ensures result_range: \is_finite(\result) ∧ 0.0 ≤ \result < 1.0;
+    assigns __fc_random48_counter[0 .. 2], \result;
+    assigns __fc_random48_counter[0 .. 2]
+      \from __fc_random48_counter[0 .. 2];
+    assigns \result \from __fc_random48_counter[0 .. 2];
+ */
+extern double drand48(void);
+
+/*@ requires
+      initialization: initialized_xsubi: \initialized(xsubi + (0 .. 2));
+    ensures result_range: \is_finite(\result) ∧ 0.0 ≤ \result < 1.0;
+    assigns __fc_random48_counter[0 .. 2], \result;
+    assigns __fc_random48_counter[0 .. 2]
+      \from __fc_random48_counter[0 .. 2];
+    assigns \result \from __fc_random48_counter[0 .. 2];
+ */
+extern double erand48(unsigned short * /*[3]*/ xsubi);
+
+/*@ requires random48_initialized: __fc_random48_init ≡ 1;
+    ensures result_range: 0 ≤ \result < 2147483648;
+    assigns __fc_random48_counter[0 .. 2], \result;
+    assigns __fc_random48_counter[0 .. 2]
+      \from __fc_random48_counter[0 .. 2];
+    assigns \result \from __fc_random48_counter[0 .. 2];
+ */
+extern long lrand48(void);
+
+/*@ requires
+      initialization: initialized_xsubi: \initialized(xsubi + (0 .. 2));
+    ensures result_range: 0 ≤ \result < 2147483648;
+    assigns __fc_random48_counter[0 .. 2], \result;
+    assigns __fc_random48_counter[0 .. 2]
+      \from __fc_random48_counter[0 .. 2];
+    assigns \result \from __fc_random48_counter[0 .. 2];
+ */
+extern long nrand48(unsigned short * /*[3]*/ xsubi);
+
+/*@ requires random48_initialized: __fc_random48_init ≡ 1;
+    ensures result_range: -2147483648 ≤ \result < 2147483648;
+    assigns __fc_random48_counter[0 .. 2], \result;
+    assigns __fc_random48_counter[0 .. 2]
+      \from __fc_random48_counter[0 .. 2];
+    assigns \result \from __fc_random48_counter[0 .. 2];
+ */
+extern long mrand48(void);
+
+/*@ requires
+      initialization: initialized_xsubi: \initialized(xsubi + (0 .. 2));
+    ensures result_range: -2147483648 ≤ \result < 2147483648;
+    assigns __fc_random48_counter[0 .. 2], \result;
+    assigns __fc_random48_counter[0 .. 2]
+      \from __fc_random48_counter[0 .. 2];
+    assigns \result \from __fc_random48_counter[0 .. 2];
+ */
+extern long jrand48(unsigned short * /*[3]*/ xsubi);
 
 void *calloc(size_t nmemb, size_t size);
 

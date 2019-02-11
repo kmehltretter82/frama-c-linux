@@ -8,6 +8,7 @@
   \return(fgets) == 0 (auto)
   \return(gets) == 0 (auto)
   \return(popen) == 0 (auto)
+  \return(seed48) == 0 (auto)
   \return(calloc) == 0 (auto)
   \return(malloc) == 0 (auto)
   \return(realloc) == 0 (auto)
