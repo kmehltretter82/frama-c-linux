@@ -3297,12 +3297,17 @@ let rec collectInitializer
       (if len_used then newtype else thistype),
       reads
 
-    | TComp (comp, _, _), CompoundPre (pMaxIdx, pArray) when comp.cstruct ->
+    | TComp (comp, _, _) as t,
+      CompoundPre (pMaxIdx, pArray) when comp.cstruct ->
       Kernel.debug ~dkey
         "Initialization of an object of type %a with at least %d components"
         Cil_printer.pp_typ thistype !pMaxIdx;
       let rec collect (idx: int) reads = function
           [] -> [], reads
+        | [ _ ] when Cil.has_flexible_array_member t && idx > !pMaxIdx ->
+          (* Do not add an empty initializer to the FAM, making an ill-formed
+             AST. An explicit initialization is allowed in gcc-mode. *)
+          [], reads
         | f :: restf ->
           if f.fname = missingFieldName then
             collect (idx + 1) reads restf
