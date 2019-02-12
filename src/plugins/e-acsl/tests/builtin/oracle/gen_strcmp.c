@@ -219,6 +219,12 @@ void __e_acsl_globals_init(void)
     __e_acsl_full_init((void *)(& __fc_fopen));
     __e_acsl_store_block((void *)(& stderr),(size_t)8);
     __e_acsl_full_init((void *)(& stderr));
+    __e_acsl_store_block((void *)(& __fc_p_random48_counter),(size_t)8);
+    __e_acsl_full_init((void *)(& __fc_p_random48_counter));
+    __e_acsl_store_block((void *)(random48_counter),(size_t)6);
+    __e_acsl_full_init((void *)(& random48_counter));
+    __e_acsl_store_block((void *)(& __fc_random48_init),(size_t)4);
+    __e_acsl_full_init((void *)(& __fc_random48_init));
     __e_acsl_store_block((void *)(& __fc_rand_max),(size_t)8);
     __e_acsl_full_init((void *)(& __fc_rand_max));
   }
@@ -1383,6 +1389,9 @@ int main(int argc, char const **argv)
   __e_acsl_delete_block((void *)(& __fc_p_fopen));
   __e_acsl_delete_block((void *)(__fc_fopen));
   __e_acsl_delete_block((void *)(& stderr));
+  __e_acsl_delete_block((void *)(& __fc_p_random48_counter));
+  __e_acsl_delete_block((void *)(random48_counter));
+  __e_acsl_delete_block((void *)(& __fc_random48_init));
   __e_acsl_delete_block((void *)(& __fc_rand_max));
   __e_acsl_delete_block((void *)(nar));
   __e_acsl_delete_block((void *)(nal));
