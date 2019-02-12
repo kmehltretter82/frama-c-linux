@@ -5158,7 +5158,13 @@ and doType (ghost:bool) isFuncArg
         | None -> None
         | Some argl ->
           fixupArgumentTypes 0 argl;
-          Some (List.map (fun a -> (a.vname, a.vtype, a.vattr)) argl)
+          let arg_type_from_vi vi =
+            let attrs =
+              if vi.vghost then addAttribute (Attr (frama_c_ghost, [])) vi.vattr
+              else vi.vattr
+            in (vi.vname, vi.vtype, attrs)
+          in
+          Some (List.map arg_type_from_vi argl)
       in
       let tres =
         match unrollType bt with
