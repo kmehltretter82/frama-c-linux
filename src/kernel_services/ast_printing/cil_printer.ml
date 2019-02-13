@@ -1906,11 +1906,15 @@ class cil_printer () = object (self)
         else if nameOpt = None then printAttributes fmt a
         else fprintf fmt "(%a%a)" printAttributes a pname (a <> [])
       in
-      let partition_ghosts is_ghost args =
+      let partition_ghosts ghost_arg args =
         match args with
         | None -> None, []
         | Some l ->
-          let ghost_args, args = List.partition is_ghost l in
+          let ghost_args, args = if is_ghost then
+              [], l
+            else
+              List.partition ghost_arg l
+          in
           Some args, ghost_args
       in
       let pp_params fmt (args, ghost_args) pp_args =
