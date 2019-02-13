@@ -446,6 +446,9 @@ val ip_of_global_annotation_single:
 (**************************************************************************)
 
 val has_status: identified_property -> bool
+(** Does the property has a logical status (which may be Never_tried)?
+    False for pragma, assumes clauses and some ACSL extensions.
+    @since Frama-C+dev *)
 
 val get_kinstr: identified_property -> kinstr
 val get_kf: identified_property -> kernel_function option
