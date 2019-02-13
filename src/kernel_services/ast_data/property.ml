@@ -317,13 +317,12 @@ let has_status_pkind = function
     -> true
 
 let rec has_status = function
-  | IPAxiom _ -> false
   | IPPredicate(pkind, _, _, _) -> has_status_pkind pkind
   | IPExtended(_,e) -> has_status_ext e
   | IPCodeAnnot(_,_, { annot_content = ca }) -> has_status_ca ca
   | IPPropertyInstance(_,_,_,ip) -> has_status ip
   | IPOther _ | IPReachable _
-  | IPAxiomatic _ | IPBehavior _
+  | IPAxiom _ | IPAxiomatic _ | IPBehavior _
   | IPDisjoint _ | IPComplete _
   | IPAssigns _ | IPFrom _
   | IPAllocation _ | IPDecrease _ | IPLemma _
