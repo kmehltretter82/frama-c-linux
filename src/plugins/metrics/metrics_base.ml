@@ -265,7 +265,7 @@ let get_file_type filename =
 
 module VarinfoByName = struct
   type t = Cil_types.varinfo
-  let compare v1 v2 = Pervasives.compare v1.vname v2.vname
+  let compare v1 v2 = Transitioning.Stdlib.compare v1.vname v2.vname
 end
 
 (** Map and sets of varinfos sorted by name (and not by ids) *)

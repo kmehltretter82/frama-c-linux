@@ -344,7 +344,7 @@ let () =
     ((Arg.align
         (List.sort
         (fun (optname1, _, _) (optname2, _, _) ->
-          Pervasives.compare optname1 optname2
+          compare optname1 optname2
         ) argspec)
      ) @ ["", Arg.Unit (fun () -> ()), example_msg;])
     make_test_suite umsg
@@ -1103,7 +1103,7 @@ module Make_Report(M:sig type t end)=struct
     (struct
       type t = toplevel_command
       let project cmd = (cmd.directory,cmd.file,cmd.n)
-      let compare c1 c2 = Pervasives.compare (project c1) (project c2)
+      let compare c1 c2 = compare (project c1) (project c2)
       let equal c1 c2 =  (project c1)=(project c2)
       let hash c = Hashtbl.hash (project c)
      end)

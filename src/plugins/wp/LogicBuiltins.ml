@@ -43,7 +43,7 @@ type kind =
   | F of Ctypes.c_float
   | A (* abstract data *)
 
-(* [LC] kinds can be compared by Pervasives.compare *)
+(* [LC] kinds can be compared by Stdlib.compare *)
 
 let okind = function
   | C_int i -> I i
@@ -157,14 +157,14 @@ let iter_table f =
   Hashtbl.iter
     (fun a sigs -> List.iter (fun (ks,lnk) -> items := (a,ks,lnk)::!items) sigs)
     (cdriver ()).hlogic ;
-  List.iter f (List.sort Pervasives.compare !items)
+  List.iter f (List.sort Transitioning.Stdlib.compare !items)
 
 let iter_libs f =
   let items = ref [] in
   Hashtbl.iter
     (fun a libs -> items := (a,libs) :: !items)
     (cdriver ()).hdeps ;
-  List.iter f (List.sort Pervasives.compare !items)
+  List.iter f (List.sort Transitioning.Stdlib.compare !items)
 
 let dump () =
   Log.print_on_output

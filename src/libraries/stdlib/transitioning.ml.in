@@ -57,6 +57,12 @@ let _: ('a -> bool) -> 'a list -> 'a option = find_opt
 let _: 'a -> ('a * 'b) list -> 'b option = assoc_opt
 let _: 'a -> ('a * 'b) list -> 'b option = assq_opt
 
+let stdlib_compare = compare (* Pervasives/Stdlib compare *)
+
+module Stdlib = struct
+  let compare = stdlib_compare
+end
+
 [@@@ warning "-3"]
 
 module String = struct

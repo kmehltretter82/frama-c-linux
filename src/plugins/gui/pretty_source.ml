@@ -164,8 +164,8 @@ struct
            if (pe1 = pe2) then 0
            else
              (* most englobing comes first *)
-             Pervasives.compare pe2 pe1
-         else Pervasives.compare pb1 pb2
+             Transitioning.Stdlib.compare pe2 pe1
+         else Transitioning.Stdlib.compare pb1 pb2
       ) arr
     ;
     arr
