@@ -166,7 +166,7 @@ struct
       let oc = open_out normalized_filename in
       let fmt = Format.formatter_of_out_channel oc in
       Hashtbl.add file_formatters normalized_filename fmt;
-      Extlib.safe_at_exit (fun () -> Pervasives.close_out oc);
+      Extlib.safe_at_exit (fun () -> close_out oc);
       fmt
 end
 
@@ -608,6 +608,7 @@ struct
 
   let debug_optname = output_mode "Debug" "debug"
   module Debug = struct
+    let pervasives_incr = incr (* before 'incr' is shadowed by the one in Int *)
     include
       Int(struct
             let default = !debug_level ()
@@ -627,8 +628,8 @@ struct
         (fun old n ->
           (* the level of verbose is at least the level of debug *)
           if n > Verbose.get () then Verbose.set n;
-          if n = 0 then Pervasives.decr positive_debug_ref
-          else if old = 0 then Pervasives.incr positive_debug_ref);
+          if n = 0 then decr positive_debug_ref
+          else if old = 0 then pervasives_incr positive_debug_ref);
       if is_kernel () then begin
         Cmdline.kernel_debug_atleast_ref := (fun n -> get () >= n);
         match !Cmdline.Kernel_debug_level.value_if_set with

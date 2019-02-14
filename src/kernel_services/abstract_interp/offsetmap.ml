@@ -22,6 +22,7 @@
 
 open Abstract_interp
 
+let pervasives_succ = succ
 (* This module uses Bigints everywhere. Set up some notations *)
 let pretty_int = Int.pretty
 let ( =~ ) = Integer.equal
@@ -308,7 +309,7 @@ module Make (V : module type of Offsetmap_lattice_with_isotropy) = struct
       then begin
          if current_counter = max_int 
          then Kernel.fatal "Offsetmap(%s): internal maximum exeeded" V.name;
-         counter := Pervasives.succ current_counter;
+         counter := pervasives_succ current_counter;
       end;
       hashed_node
 

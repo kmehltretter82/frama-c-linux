@@ -230,8 +230,8 @@ let catch_toplevel_run ~f ~at_normal_exit ~on_error =
     (* write again on stdout *)
     Log.set_output
       ~isatty:(Unix.isatty Unix.stdout)
-      (Pervasives.output_substring stdout)
-      (fun () -> Pervasives.flush stdout);
+      (output_substring stdout)
+      (fun () -> flush stdout);
     cleanup ();
   with
   | Exit ->

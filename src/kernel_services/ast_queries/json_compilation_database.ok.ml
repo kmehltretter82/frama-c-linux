@@ -127,7 +127,7 @@ let split_command_args s =
     never need quotes. *)
 let quote_define_argument arg = Format.sprintf "%S" arg
 
-let parse_entry ?(cwd=Sys.getcwd()) (r : Yojson.Basic.json) =
+let parse_entry ?(cwd=Sys.getcwd()) (r : Yojson.Basic.t) =
   let open Yojson.Basic.Util in
   let filename = r |> member "file" |> to_string in
   let dirname  = r |> member "directory" |> to_string_option |> Extlib.opt_conv "" in

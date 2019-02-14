@@ -151,6 +151,12 @@ else
   ASSQ_OPT=assq_opt
 endif
 
+ifeq ($(HAS_OCAML408),yes)
+  DYNLINK_INIT=fun () -> ()
+else
+  DYNLINK_INIT=Dynlink.init
+endif
+
 src/libraries/stdlib/transitioning.ml: \
   src/libraries/stdlib/transitioning.ml.in \
   Makefile.generating share/Makefile.config
@@ -163,6 +169,7 @@ src/libraries/stdlib/transitioning.ml: \
          -e 's/@FIND_OPT@/$(FIND_OPT)/g' \
          -e 's/@ASSOC_OPT@/$(ASSOC_OPT)/g' \
          -e 's/@ASSQ_OPT@/$(ASSQ_OPT)/g' \
+         -e 's/@DYNLINK_INIT@/$(DYNLINK_INIT)/g' \
         $< > $@
 	$(CHMOD_RO) $@
 

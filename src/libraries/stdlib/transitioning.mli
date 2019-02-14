@@ -65,6 +65,14 @@ module List: sig
   val assq_opt: 'a -> ('a * 'b) list -> 'b option (** 4.05 *)
 end
 
+module Stdlib: sig
+  val compare: 'a -> 'a -> int
+end
+
+module Dynlink: sig
+  val init: unit -> unit
+end
+
 (** {1 Zarith} *)
 
 (** Function [Q.to_float] was introduced in Zarith 1.5 *)

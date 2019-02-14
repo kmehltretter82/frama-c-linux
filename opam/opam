@@ -96,7 +96,7 @@ depends: [
 ]
 
 depopts: [
-  "yojson" { build }
+  "yojson" { build & >= "1.6.0" }
   "coq" { build }
   "why3" { build }
   "mlgmpidl" { build }

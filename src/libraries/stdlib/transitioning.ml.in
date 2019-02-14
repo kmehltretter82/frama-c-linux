@@ -83,6 +83,10 @@ module List = struct
   let assq_opt = @ASSQ_OPT@
 end
 
+module Dynlink = struct
+  let init = @DYNLINK_INIT@
+end
+
 module Q = struct
 
   let round_to_float x exact =

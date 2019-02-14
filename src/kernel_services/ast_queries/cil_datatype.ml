@@ -1443,7 +1443,7 @@ end
 
 (* @return [true] is the given logic real represents an exact float *)
 let is_exact_float r =
-  Pervasives.classify_float r.r_upper = FP_normal &&
+  classify_float r.r_upper = FP_normal &&
   Datatype.Float.equal r.r_upper r.r_lower
 
 let compare_logic_constant c1 c2 = match c1,c2 with
