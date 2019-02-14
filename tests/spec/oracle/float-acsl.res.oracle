@@ -22,6 +22,17 @@ double minus_one(void);
  */
 float minus_onef(void);
 
+/*@ requires
+      /* (coercion to:ℝ */x/* ) */ ≤ /* (coercion to:ℝ */y/* ) */;
+    ensures
+      /* (coercion to:ℝ */\old(x)/* ) */ ≤
+      /* (coercion to:ℝ */\result/* ) */ ≤
+      /* (coercion to:ℝ */\old(y)/* ) */;
+    assigns \result;
+    assigns \result \from x, y;
+ */
+float test(float x, float y);
+
 void main(void)
 {
   double mone = minus_one();

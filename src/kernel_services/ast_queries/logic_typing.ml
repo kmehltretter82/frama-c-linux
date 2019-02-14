@@ -1710,10 +1710,10 @@ struct
     in
     let rec aux lty1 lty2 =
       match (unroll_type lty1), (unroll_type lty2) with
-      | t1, t2 when is_same_type t1 t2 -> t1
       | Ctype ty1, Ctype ty2 ->
         if isIntegralType ty1 && isIntegralType ty2 then
-          if (isSignedInteger ty1) <> (isSignedInteger ty2) then
+          if is_same_type lty1 lty2 then lty1
+          else if (isSignedInteger ty1) <> (isSignedInteger ty2) then
             (* in ACSL, the comparison between 0xFFFFFFFF seen as int and
                unsigned int is not true: we really have to operate at
                the integer level.
@@ -1760,6 +1760,7 @@ struct
       (* implicit conversion to set *)
       | Ltype ({lt_name = "set"} as lt,[t1]), t2
       | t1, Ltype({lt_name="set"} as lt,[t2]) -> Ltype(lt,[aux t1 t2])
+      | t1, t2 when is_same_type t1 t2 -> t1
       | _ ->
         C.error loc "types %a and %a are not convertible"
           Cil_printer.pp_logic_type lty1 Cil_printer.pp_logic_type lty2
