@@ -20,6 +20,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module Pango : sig
+  val set_small_font : #GObj.widget -> unit (** makes the font smaller. *)
+  val set_bold_font : #GObj.widget -> unit (** makes the font bold. *)
+end
+
 val get_toolbar_index: GButton.toolbar -> GButton.tool_item -> int
 
 val window:

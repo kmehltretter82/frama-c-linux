@@ -26,16 +26,21 @@
 
 let on x f = match x with None -> () | Some x -> f x
 let fire fs x = List.iter (fun f -> f x) fs
+let once = Wutil_once.once
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Pango Properties                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
-include Pango_compat
+include Gtk_compat.Pango
+
+let set_font w name = w#misc#modify_font_by_name name
+let set_monospace w = set_font w "monospace"
 
 (* -------------------------------------------------------------------------- *)
 (* --- Misc                                                               --- *)
 (* -------------------------------------------------------------------------- *)
+
 let set_tooltip w m = on m w#misc#set_tooltip_text
 let set_enabled (w : #GObj.widget) = w#misc#set_sensitive
 let set_visible (w : #GObj.widget) e =

@@ -205,4 +205,3 @@ hello-*.tar.gz
 /src/plugins/gui/GSourceView.ml
 /src/plugins/gui/GSourceView.mli
 /tests/crowbar/integer_bb_pretty
-/src/plugins/gui/pango_compat.ml

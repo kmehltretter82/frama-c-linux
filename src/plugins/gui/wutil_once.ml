@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* belongs to Wutil, but used by Pango_compat.{2,3}.ml *)
+(* belongs to Wutil, but used by gtk_compat.{2,3}.ml *)
 
 type ('a,'b) cell = Value of 'b | Fun of ('a -> 'b)
 let get p x =

@@ -786,9 +786,6 @@ src/plugins/gui/launcher.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/launcher.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/menu_manager.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/menu_manager.mli: CEA_LGPL_OR_PROPRIETARY
-src/plugins/gui/pango_compat.2.ml: CEA_LGPL_OR_PROPRIETARY
-src/plugins/gui/pango_compat.3.ml: CEA_LGPL_OR_PROPRIETARY
-src/plugins/gui/pango_compat.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/pretty_source.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/pretty_source.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/project_manager.ml: CEA_LGPL_OR_PROPRIETARY
