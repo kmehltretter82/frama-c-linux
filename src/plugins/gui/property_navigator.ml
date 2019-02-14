@@ -752,13 +752,10 @@ let make_panel (main_ui:main_window_extension_points) =
    Aka. "bullets" in left margin *)
 let highlighter (buffer:reactive_buffer) localizable ~start ~stop =
   match localizable with
-  | Pretty_source.PIP (Property.IPPredicate (Property.PKAssumes _,_,_,_)) ->
-      (* Assumes clause do not get a bullet: there is nothing
-         to prove about them.*)
-      ()
   | Pretty_source.PIP ppt ->
-      Design.Feedback.mark
-        buffer#buffer ~offset:start (Property_status.Feedback.get ppt)
+      if Property.has_status ppt then
+        Design.Feedback.mark
+          buffer#buffer ~offset:start (Property_status.Feedback.get ppt)
   | Pretty_source.PStmt(_,({ skind=Instr(Call _| Local_init (_, ConsInit _, _)) } as stmt)) ->
       let kfs = Statuses_by_call.all_functions_with_preconditions stmt in
       (* We separate the consolidated statuses of the preconditions inside

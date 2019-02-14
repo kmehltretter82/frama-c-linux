@@ -271,8 +271,9 @@ let filetree_selector
   end
 
 let pretty_predicate_status fmt p =
-  let s = Property_status.get p in
-  Format.fprintf fmt "Status: %a@." Property_status.pretty s
+  if Property.has_status p then
+    let s = Property_status.get p in
+    Format.fprintf fmt "Status: %a@." Property_status.pretty s
 
 (* This is called when a localizable is selected in the pretty-printed source
    buffer *)
