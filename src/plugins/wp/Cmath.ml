@@ -82,6 +82,41 @@ let builtin_truncate f e =
       end
   | Fun( f , [e] ) when f == f_real_of_int -> e
   | _ -> raise Not_found
+(* -------------------------------------------------------------------------- *)
+(* --- Float comparisons                                                  --- *)
+(* -------------------------------------------------------------------------- *)
+
+let f_lt_float = f_builtin ~library:"cfloat" ~result:Prop "\\lt_float"
+let f_gt_float =
+  generated_f ~params:[Sdata; Sdata] ~sort:Sprop "\\gt_float"
+let () =
+  LogicBuiltins.(
+    add_builtin "\\gt_float" [F Ctypes.Float32; F Ctypes.Float32] f_gt_float)
+let builtin_gt_float x y = e_fun f_lt_float [y; x]
+
+let f_le_float = f_builtin ~library:"cfloat" ~result:Prop "\\le_float"
+let f_ge_float =
+  generated_f ~params:[Sdata; Sdata] ~sort:Sprop "\\ge_float"
+let () =
+  LogicBuiltins.(
+    add_builtin "\\ge_float" [F Ctypes.Float32; F Ctypes.Float32] f_ge_float)
+let builtin_ge_float x y = e_fun f_le_float [y; x]
+
+let f_lt_double = f_builtin ~library:"cfloat" ~result:Prop "\\lt_double"
+let f_gt_double =
+  generated_f ~params:[Sdata; Sdata] ~sort:Sprop "\\gt_double"
+let () =
+  LogicBuiltins.(
+    add_builtin "\\gt_double" [F Ctypes.Float64; F Ctypes.Float64] f_gt_double)
+let builtin_gt_double x y = e_fun f_lt_double [y; x]
+
+let f_le_double = f_builtin ~library:"cfloat" ~result:Prop "\\le_double"
+let f_ge_double =
+  generated_f ~params:[Sdata; Sdata] ~sort:Sprop "\\ge_double"
+let () =
+  LogicBuiltins.(
+    add_builtin "\\ge_double" [F Ctypes.Float64; F Ctypes.Float64] f_ge_double)
+let builtin_ge_double x y = e_fun f_le_double [y; x]
 
 (* -------------------------------------------------------------------------- *)
 (* --- Conversions                                                        --- *)
@@ -346,6 +381,11 @@ let () =
 
 let () = Context.register
     begin fun () ->
+
+      F.set_builtin_2 f_gt_float builtin_gt_float;
+      F.set_builtin_2 f_ge_float builtin_ge_float;
+      F.set_builtin_2 f_gt_double builtin_gt_double;
+      F.set_builtin_2 f_ge_double builtin_ge_double;
 
       F.set_builtin_1 f_real_of_int builtin_real_of_int ;
       F.set_builtin_1 f_truncate (builtin_truncate f_truncate) ;
