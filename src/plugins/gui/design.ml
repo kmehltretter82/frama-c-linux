@@ -842,17 +842,16 @@ class main_window () : main_window_extension_points =
       width, if final_h then height else new_height
   in
   let main_window =
-    GWindow.window
+    Gtk_compat.window
       ?icon:framac_icon
       ~title:"Frama-C"
-      ~width
-      ~height
       ~position:`CENTER
       ~resizable:true
       ~show:false
       ()
   in
   let () = main_window#set_default_size ~width ~height in
+  let () = main_window#set_geometry_hints ~min_size:(1,1) main_window#coerce in
   let watch_cursor = Gdk.Cursor.create `WATCH in
   let arrow_cursor = Gdk.Cursor.create `ARROW in
 

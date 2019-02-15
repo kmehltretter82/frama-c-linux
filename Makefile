@@ -733,6 +733,7 @@ endif
 GENERATED+=src/plugins/gui/gtk_compat.ml
 
 SINGLE_GUI_CMO:= \
+	wutil_once \
 	gtk_compat \
 	$(WTOOLKIT) \
 	$(SOURCEVIEWCOMPAT) \

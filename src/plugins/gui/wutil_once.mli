@@ -20,27 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Pango : sig
-  val set_small_font : #GObj.widget -> unit (** makes the font smaller. *)
-  val set_bold_font : #GObj.widget -> unit (** makes the font bold. *)
-end
-
-val get_toolbar_index: GButton.toolbar -> GButton.tool_item -> int
-
-val window:
-  ?kind:Gtk.Tags.window_type ->
-  ?title:string ->
-  ?decorated:bool ->
-  ?deletable:bool ->
-  ?focus_on_map:bool ->
-  ?icon:GdkPixbuf.pixbuf ->
-  ?icon_name:string ->
-  ?modal:bool ->
-  ?position:Gtk.Tags.window_position ->
-  ?resizable:bool ->
-  ?screen:Gdk.screen ->
-  ?type_hint:Gdk.Tags.window_type_hint ->
-  ?urgency_hint:bool ->
-  ?wmclass:(string * string) ->
-  ?border_width:int ->
-  ?width:int -> ?height:int -> ?show:bool -> unit -> GWindow.window
+(** [once f] returns a function that will only be applied once per
+    execution of the program and returns the same value afterwards. *)
+val once: ('a -> 'b) -> 'a -> 'b
