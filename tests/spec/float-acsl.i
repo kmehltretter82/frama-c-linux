@@ -1,5 +1,5 @@
 /* run.config*
-STDOPT: +"-kernel-msg-key printer:logic-coercions"
+STDOPT: +"-kernel-msg-key printer:logic-coercions" +"-kernel-warn-key acsl-float-compare=active"
 */
 
 /*@

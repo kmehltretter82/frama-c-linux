@@ -131,6 +131,9 @@ let dkey_visitor = register_category "visitor"
 let wkey_annot_error = register_warn_category "annot-error"
 let () = set_warn_status wkey_annot_error Log.Wabort
 
+let wkey_acsl_float_compare = register_warn_category "acsl-float-compare"
+let () = set_warn_status wkey_acsl_float_compare Log.Winactive
+
 let wkey_drop_unused = register_warn_category "linker:drop-conflicting-unused"
 
 let wkey_implicit_conv_void_ptr =
