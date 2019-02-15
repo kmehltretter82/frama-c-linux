@@ -71,7 +71,7 @@ let filter_accesses l =
         let f = consider_access () in
         List.filter (fun access -> f (Register.classify_accesses access)) l
 
-let _ =
+let _ignore =
   Dynamic.register
     ~plugin:"Occurrence"
     ~journalize:false
@@ -79,7 +79,7 @@ let _ =
     (Datatype.func Datatype.bool Datatype.unit)
     Enabled.set
 
-let _ =
+let _ignore =
   Dynamic.register
     ~plugin:"Occurrence"
     ~journalize:false

@@ -63,7 +63,7 @@ let journal_register ?comment is_dyn name ty_arg fctref fct =
   let ty = Datatype.func ty_arg Datatype.unit in
   Db.register (Db.Journalize("RteGen." ^ name, ty)) fctref fct;
   if is_dyn then
-    let _ =
+    let _ignore =
       Dynamic.register ?comment ~plugin:"RteGen" name ty ~journalize:true fct
     in
     ()
@@ -111,7 +111,7 @@ let _ =
 
 (* retrieve list of generated rte annotations (not precond) for
    a given stmt *)
-let _ =
+let _ignore =
   Dynamic.register
     ~comment:"Get the list of annotations previously emitted by RTE for the \
               given statement."
@@ -123,7 +123,7 @@ let _ =
     ~journalize:true
     Generator.get_registered_annotations
 
-let _ =
+let _ignore =
   Dynamic.register
     ~comment:"Generate RTE annotations corresponding to the given stmt of \
               the given function."
@@ -134,7 +134,7 @@ let _ =
     ~journalize:false
     Visit.get_annotations_stmt
 
-let _ =
+let _ignore =
   Dynamic.register
     ~comment:"Generate RTE annotations corresponding to the given exp \
               of the given stmt in the given function."

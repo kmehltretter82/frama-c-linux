@@ -84,7 +84,7 @@ let is_shift e =
     let open Qed.Logic in
     match F.repr e with
     | Fun( f , [_;n] ) ->
-        let _ = select_op f in
+        let _ignore = select_op f in
         let _ = select_int n in
         true
     | _ -> false
