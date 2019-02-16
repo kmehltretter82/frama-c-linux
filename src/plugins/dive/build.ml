@@ -89,7 +89,7 @@ let build_simple_location lval (l : Locations.location)
     begin try
         let r = Location_Bits.M.fold one_couple m None in
         if not (Extlib.has_some r) then
-          Self.warning "Cannot resolve location %a" Cil_printer.pp_lval lval;
+          Self.failure "Cannot resolve location %a" Cil_printer.pp_lval lval;
         r
       with Exit -> None
     end
@@ -232,7 +232,14 @@ and build_return_deps context src stmt args kf =
     List.iter (build_exp_deps context src stmt Data) args
 
 and build_call_deps context src stmt callee args =
-  build_exp_deps context src stmt Callee callee;
+  begin match callee.enode with
+  | Lval (Var _vi, _offset) -> ()
+  | Lval (Mem exp, _offset) ->
+    build_exp_deps context src stmt Callee exp
+  | _ ->
+    Self.failure "Cannot compute all callee dependencies for %a"
+      Cil_printer.pp_stmt stmt;
+  end;
   let kinstr = Kstmt stmt in
   let _,set = !Db.Value.expr_to_kernel_function kinstr ~deps:None callee in
   Kernel_function.Hptset.iter (build_return_deps context src stmt args) set
