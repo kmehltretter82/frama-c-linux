@@ -20,52 +20,26 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let add_target graph lval_text sid =
-  let sid = Integer.to_int sid in
-  let stmt, kf =
-    try
-      Kernel_function.find_from_sid sid
-    with Not_found ->
-      Self.abort "Cannot find the statement with sid %d." sid
-  in
-  let lval =
-    try
-      let loc = Cil_datatype.Stmt.loc stmt in
-      let term = !Db.Properties.Interp.term kf ~loc lval_text in
-      !Db.Properties.Interp.term_to_lval ~result:None term
-    with
-    | Parsing.Parse_error ->
-      Self.abort "Syntax error when parsing: %s" lval_text
-    | Logic_interp.Error (_, s) ->
-      Self.abort "%s" s
-    | Db.Properties.Interp.No_conversion ->
-      Self.abort "The given term is not an lvalue: %s" lval_text
-  in
-  let kinstr = Cil_types.Kstmt stmt in
-  let depth_limit = Self.DepthLimit.get () in
-  Build.add_lval ~depth_limit graph kinstr lval
+open Graph_types
 
-let is_folded_base vi =
-  not (Self.UnfoldedBases.mem vi.Cil_types.vname)
+let get_base = function
+  | Scalar (vi,_) | Composite (vi) -> Some vi
+  | Scattered _ | Alarm _ | File -> None
 
-let is_hidden_base vi =
-  Self.HiddenBases.mem vi.Cil_types.vname
+let is_precise = function
+  | Scalar _ | Composite _ -> true
+  | Scattered _ | Alarm _ | File -> false
 
-let main () =
-  if not (Self.Targets.is_empty ()) then begin
-    (* Create the initial graph  *)
-    let context = Build.create ~is_folded_base ~is_hidden_base () in
-    (* Add targets to it *)
-    let add_target' (lval,sids) =
-      List.iter (add_target context lval) sids
-    in
-    Self.Targets.iter add_target';
-    (* Output it *)
-    let out_channel = open_out "imprecisions.dot" in
-    Imprecision_graph.ouptput_to_dot out_channel (Build.get_graph context);
-    close_out out_channel
-  end
+let to_cil = function
+  | Scalar (vi,offset) -> `Lval (Cil_types.Var vi, offset)
+  | Composite (vi) -> `Lval (Cil_types.Var vi, Cil_types.NoOffset)
+  | Scattered (lval) -> `Lval lval
+  | Alarm (_stmt,exp) -> `Exp exp
+  | File -> `None
 
-let () =
-  Db.Main.extend main
+let pretty fmt kind =
+  match to_cil kind with
+  | `Lval lval -> Cil_printer.pp_lval fmt lval
+  | `Exp exp -> Cil_printer.pp_exp fmt exp
+  | `None -> ()
 

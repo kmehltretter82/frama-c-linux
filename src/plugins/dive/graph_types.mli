@@ -20,15 +20,30 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type dependency_kind = Callee | Data | Address | Control
+type node_kind =
+  | Scalar of Cil_types.varinfo * Cil_types.offset
+  | Composite of Cil_types.varinfo
+  | Scattered of Cil_types.lval
+  | Alarm of Cil_types.stmt * Cil_types.exp
+  | File (* Dummy node, hack for Ocamlgraph Graphviz Dot module *)
 
-type location_kind = Precise | Imprecise | Folded
-
-type symbolic_location = {
-  sl_kind : location_kind;
-  sl_location : Locations.location;
-  sl_lval : Cil_types.lval;
-  sl_file : string;
-  sl_function : Cil_types.kernel_function option;
+type node_locality = {
+  loc_file : string;
+  loc_function : Cil_types.kernel_function option;
 }
 
+type node = {
+  node_key : int;
+  node_kind : node_kind;
+  node_locality : node_locality;
+  mutable node_imprecise : bool;
+  mutable node_deps_computed : bool;
+}
+
+type dependency_kind = Callee | Data | Address | Control
+
+type dependency = {
+  dependency_key : int;
+  dependency_kind : dependency_kind;
+  mutable dependency_multiple : bool;
+}

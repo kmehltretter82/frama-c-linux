@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 open Cil_types
-open Dependency_types
+open Graph_types
 
 
 (* --- Precision evaluation --- *)
@@ -75,81 +75,212 @@ let is_foldable_type typ =
   | TBuiltin_va_list _ -> false
   | TNamed _ -> assert false (* the type have been unrolled *)
 
-exception Complex_location
-
-let to_simple_location lval (l : Locations.location)
-  : Cil_types.varinfo * Ival.t =
+let build_simple_location lval (l : Locations.location)
+  : (Cil_types.varinfo * Ival.t) option =
   let open Locations in
   match l.loc with
   | Location_Bits.Map m ->
     let one_couple base ival acc =
-      if Extlib.has_some acc then raise Complex_location;
+      if Extlib.has_some acc then raise Exit;
       match base with
       | Base.Var (vi,_) -> Some (vi, ival)
-      | _ -> raise Complex_location
+      | _ -> raise Exit
     in
-    let r = Location_Bits.M.fold one_couple m None in
-    if not (Extlib.has_some r) then begin
-      Self.warning "Cannot resolve location %a" Cil_printer.pp_lval lval;
-      raise Complex_location
-    end;
-    Extlib.the r
-  | _ -> raise Complex_location
+    begin try
+        let r = Location_Bits.M.fold one_couple m None in
+        if not (Extlib.has_some r) then
+          Self.warning "Cannot resolve location %a" Cil_printer.pp_lval lval;
+        r
+      with Exit -> None
+    end
+  | _ -> None
 
-let to_symbolic_location ~is_folded_base kinstr lval =
-  let sl_location = !Db.Value.lval_to_loc kinstr lval in
-  let typ = Cil.typeOfLval lval in
-  match to_simple_location lval sl_location with
-  | vi, ival ->
-    let sl_function = Kernel_function.find_defining_kf vi in
-    let sl_file = get_loc_filename vi.vdecl in 
-    let default = {
-      sl_kind=Imprecise ; sl_location;
-      sl_lval=lval ; sl_function ; sl_file
-    } in
-    let base' = Var vi in
+let build_node_kind ~is_folded_base lval location =
+  match build_simple_location lval location with
+  | Some (vi, ival) ->
     if is_foldable_type vi.vtype && is_folded_base vi then
-      {default with sl_kind=Folded ; sl_lval=(base',NoOffset)}
+      Composite (vi)
     else
       begin try
+          let typ = Cil.typeOfLval lval in
           let offset = Ival.project_int ival
           and matching = Bit_utils.MatchType typ in
           let offset', _ = Bit_utils.find_offset vi.vtype ~offset matching in
-          {default with sl_kind=Precise ; sl_lval=(base',offset')}
+          Scalar (vi, offset')
         with Ival.Not_Singleton_Int ->
-          default
+          Scattered (lval)
       end
-  | exception Complex_location ->
+  | None ->
+    Scattered (lval)
+
+let build_node_locality kinstr kind =
+  match Node_kind.get_base kind with
+  | Some vi ->
+    let loc_function = Kernel_function.find_defining_kf vi
+    and loc_file = get_loc_filename vi.vdecl in
+    { loc_file ; loc_function }
+  | None ->
     match kinstr with
     | Kglobal -> assert false
     | Kstmt stmt ->
       let kf = Kernel_function.find_englobing_kf stmt in
-      let loc = Kernel_function.get_location kf in
-      let sl_file = get_loc_filename loc in 
-      {
-        sl_kind=Imprecise ; sl_location;
-        sl_lval=lval ; sl_function=Some kf ; sl_file
-      }
+      let file = get_loc_filename (Kernel_function.get_location kf) in
+      { loc_file = file ; loc_function = Some kf }
+
+
+(* --- Context object --- *)
+
+module Graph = Imprecision_graph
+module NodeTable = FCHashtbl.Make (Locations.Location)
+module FileTable = Datatype.String.Hashtbl
+
+type t = {
+  graph: Graph.t;
+  node_table: node NodeTable.t;
+  file_table: node FileTable.t;
+  is_folded_base: Cil_types.varinfo -> bool;
+  is_hidden_base: Cil_types.varinfo -> bool;
+  mutable roots: node list;
+}
+
+let reference_file context loc_file =
+  if not (FileTable.mem context.file_table loc_file) then begin
+    let node_kind = File
+    and node_locality = { loc_file ; loc_function = None } in
+    let node = Graph.create_vertex context.graph node_kind node_locality in
+    FileTable.add context.file_table loc_file node
+  end
+
+let is_hidden context node_kind =
+  match Node_kind.get_base node_kind with
+  | Some vi when context.is_hidden_base vi -> true
+  | _ -> false
 
 
 (* --- Graph building --- *)
 
-module Graph = Imprecision_graph
-module Table = FCHashtbl.Make
-    (struct
-      module L = Locations.Location
-      type t = symbolic_location
-      let equal a b = L.equal a.sl_location b.sl_location
-      let hash a = L.hash a.sl_location
-    end)
+(* Update a vertex associated to an lvalue, creating one if needed *)
+let build_lval context kinstr lval =
+  (* If possible, refine the lval to a non-symbolic one *)
+  let location = !Db.Value.lval_to_loc kinstr lval in
+  let is_folded_base = context.is_folded_base in
+  let node_kind = build_node_kind ~is_folded_base lval location in
+  if is_hidden context node_kind then
+    None
+  else begin
+    (* Add a vertex if necessary *)
+    let build_new_node _location =
+      let node_locality = build_node_locality kinstr node_kind in
+      reference_file context node_locality.loc_file;
+      Graph.create_vertex context.graph ~node_kind ~node_locality
+    in
+    let node = NodeTable.memo context.node_table location build_new_node in
+    (* Update the precision information *)
+    if is_imprecise_data kinstr lval then
+      node.node_imprecise <- true;
+    Some node
+  end
 
-type t = {
-  graph: Graph.t;
-  table: Graph.vertex Table.t;
-  is_folded_base: Cil_types.varinfo -> bool;
-  is_hidden_base: Cil_types.varinfo -> bool;
-  mutable roots: Graph.vertex list;
-}
+let rec build_node_deps context node =
+  match node.node_kind with
+  | Scalar (vi,offset) ->
+    build_writes_deps context node (Cil_types.Var vi, offset);
+    if vi.vformal then build_arg_deps context node vi
+  | Composite (vi) ->
+    build_writes_deps context node (Cil_types.Var vi, Cil_types.NoOffset);
+    if vi.vformal then build_arg_deps context node vi
+  | Scattered (_lval) -> () (* TODO: implements *)
+  | Alarm (stmt,exp) ->
+    build_exp_deps context node stmt Data exp
+  | File -> ()
+
+and build_writes_deps context src lval =
+  let zone = !Db.Value.lval_to_zone Kglobal lval in
+  let writes = Studia.Writes.compute zone
+  and add_deps (stmt,effects) =
+    match stmt.skind with
+    | Instr instr when effects.Studia.Writes.direct ->
+      build_instr_deps context src stmt instr
+    | _ -> ()
+  in
+  List.iter add_deps writes;
+
+and build_arg_deps context src vi =
+  assert vi.vformal;
+  let kf = Extlib.the (Kernel_function.find_defining_kf vi) in
+  let pos = Kernel_function.get_formal_position vi kf in
+  let callsites = Kernel_function.find_syntactic_callsites kf
+  and add_deps (_caller_kf, stmt) =
+    match stmt.skind with
+    | Instr (Call (_,_,args,_))
+    | Instr (Local_init (_, ConsInit (_, args, _), _)) ->
+      let exp = List.nth args pos in
+      build_exp_deps context src stmt Data exp
+    | _ ->
+      assert false (* Callsites can only be Call or ConsInit *)
+  in
+  List.iter add_deps callsites
+
+and build_return_deps context src stmt args kf =
+  match Kernel_function.find_return kf with
+  | {skind = Return (Some {enode = Lval lval_res},_)} ->
+    build_lval_deps context src stmt Data lval_res
+  | _ -> assert false (* Cil invariant *)
+  | exception Kernel_function.No_Statement ->
+    (* the function is only a prototype *)
+    (* TODO: read assigns instead *)
+    List.iter (build_exp_deps context src stmt Data) args
+
+and build_call_deps context src stmt callee args =
+  build_exp_deps context src stmt Callee callee;
+  let kinstr = Kstmt stmt in
+  let _,set = !Db.Value.expr_to_kernel_function kinstr ~deps:None callee in
+  Kernel_function.Hptset.iter (build_return_deps context src stmt args) set
+
+and build_instr_deps context src stmt = function
+  | Set (_, exp, _) ->
+    build_exp_deps context src stmt Data exp
+  | Call (_, callee, args, _) -> build_call_deps context src stmt callee args
+  | Local_init (dest, ConsInit (f, args, k), loc) ->
+    let as_func _dest callee args _loc =
+      build_call_deps context src stmt callee args
+    in
+    Cil.treat_constructor_as_func as_func dest f args k loc
+  | Local_init (_, AssignInit init, _)  ->
+    build_init_deps context src stmt init
+  | Asm _ | Skip _ | Code_annot _ -> () (* Cases not returned by Studia *)
+
+and build_init_deps context src stmt = function
+  | SingleInit exp ->
+    build_exp_deps context src stmt Data exp
+  | CompoundInit (_typ, initl) ->
+    List.iter (fun (_off,init) -> build_init_deps context src stmt init) initl
+
+and build_exp_deps context src stmt kind exp =
+  match exp.enode with
+  | Const _
+  | SizeOf _ | SizeOfE _ | SizeOfStr _
+  | AlignOf _  | AlignOfE _
+  | AddrOf _ | StartOf _ -> ()
+  | Lval lval ->
+    build_lval_deps context src stmt kind lval
+  | UnOp (_,e,_) | CastE (_,e) | Info (e,_) ->
+    build_exp_deps context src stmt kind e
+  | BinOp (_,e1,e2,_) ->
+    build_exp_deps context src stmt kind e1;
+    build_exp_deps context src stmt kind e2
+
+and build_lval_deps context src stmt dependency_kind lval =
+  (* Do not add dependency to constants or functions *)
+  if Cil.is_modifiable_lval lval then
+    match build_lval context (Kstmt stmt) lval with
+    | None -> ()
+    | Some dst ->
+      let allow_folding = true in
+      Graph.create_edge ~allow_folding context.graph dst ~dependency_kind src
+
+
+(* --- Exported interface --- *)
 
 let no_base _vi = false
 
@@ -157,133 +288,27 @@ let create ?(is_folded_base=no_base) ?(is_hidden_base=no_base) () =
   !Db.Value.compute ();
   {
     graph = Graph.create ();
-    table = Table.create 13;
+    node_table = NodeTable.create 13;
+    file_table = FileTable.create 13;
     is_folded_base;
     is_hidden_base;
     roots = [];
   }
 
-let is_hidden_location context sl =
-  match sl.sl_lval with
-  | Var vi, _ when context.is_hidden_base vi -> true
-  | _ -> false
+let get_roots context =
+  context.roots
+
+let get_graph context =
+  context.graph
+
+let should_auto_explore node =
+  Node_kind.is_precise node.node_kind
 
 let add_lval ?(depth_limit=1) context kinstr lval =
-  let {graph; table; is_folded_base} = context in
-
-  (* Update a vertex associated to an lvalue, creating one if needed *)
-  let update_vertex kinstr lval =
-    (* If possible, refine the lval to a non-symbolic one *)
-    let symbolic_location = to_symbolic_location ~is_folded_base kinstr lval in
-    if is_hidden_location context symbolic_location then
-      None
-    else begin
-      (* Add a vertex if necessary *)
-      let v = Table.memo table symbolic_location (Graph.create_vertex graph) in
-      (* Update the precision information *)
-      if is_imprecise_data kinstr lval then
-        v.Graph.vertex_imprecise_data <- true;
-      Some v
-    end
-  in
-
-  let rec build_vertex_deps v =
-    let lval = v.Graph.vertex_location.sl_lval in
-    if v.Graph.vertex_location.sl_kind != Imprecise then
-      build_writes_deps v lval;
-    match lval with
-    | Var vi, NoOffset when vi.vformal -> build_arg_deps v vi
-    | _ -> ()
-
-  and build_writes_deps src lval =
-    let zone = !Db.Value.lval_to_zone kinstr lval in
-    let writes = Studia.Writes.compute zone
-    and add_deps (stmt,effects) =
-      match stmt.skind with
-      | Instr instr when effects.Studia.Writes.direct ->
-        build_instr_deps src stmt instr
-      | _ -> ()
-    in
-    List.iter add_deps writes;
-
-  and build_arg_deps src vi =
-    assert vi.vformal;
-    let kf = Extlib.the (Kernel_function.find_defining_kf vi) in
-    let pos = Kernel_function.get_formal_position vi kf in
-    let callsites = Kernel_function.find_syntactic_callsites kf
-    and add_deps (_caller_kf, stmt) =
-      match stmt.skind with
-      | Instr (Call (_,_,args,_))
-      | Instr (Local_init (_, ConsInit (_, args, _), _)) ->
-        let exp = List.nth args pos in
-        build_exp_deps src stmt Data exp
-      | _ ->
-        assert false (* Callsites can only be Call or ConsInit *)
-    in
-    List.iter add_deps callsites
-
-  and build_return_deps src stmt args kf =
-    match Kernel_function.find_return kf with
-    | {skind = Return (Some {enode = Lval lval_res},_)} ->
-      build_lval_deps src stmt Data lval_res
-    | _ -> assert false (* Cil invariant *)
-    | exception Kernel_function.No_Statement -> (* the function is only a prototype *)
-      (* TODO: read assigns instead *)
-      List.iter (build_exp_deps src stmt Data) args
-
-  and build_call_deps src stmt callee args =
-    (* build_exp_deps src stmt Callee callee; *)
-    let kinstr = Kstmt stmt in
-    let _,set = !Db.Value.expr_to_kernel_function kinstr ~deps:None callee in
-    Kernel_function.Hptset.iter (build_return_deps src stmt args) set
-
-  and build_instr_deps src stmt = function
-    | Set (_, exp, _) ->
-      build_exp_deps src stmt Data exp
-    | Call (_, callee, args, _) -> build_call_deps src stmt callee args
-    | Local_init (dest, ConsInit (f, args, k), loc) ->
-      let as_func _dest callee args _loc =
-        build_call_deps src stmt callee args
-      in
-      Cil.treat_constructor_as_func as_func dest f args k loc
-    | Local_init (_, AssignInit init, _)  ->
-      build_init_deps src stmt init
-    | Asm _ -> () (* TODO : tell the user it's not supported *)
-    | Skip _ | Code_annot _ -> ()
-
-  and build_init_deps src stmt = function
-    | SingleInit exp ->
-      build_exp_deps src stmt Data exp
-    | CompoundInit (_typ, initl) ->
-      List.iter (fun (_offset, init) -> build_init_deps src stmt init) initl
-
-  and build_exp_deps src stmt kind exp =
-    match exp.enode with
-    | Const _
-    | SizeOf _ | SizeOfE _ | SizeOfStr _
-    | AlignOf _  | AlignOfE _
-    | AddrOf _ | StartOf _ -> ()
-    | Lval lval ->
-      build_lval_deps src stmt kind lval
-    | UnOp (_,e,_) | CastE (_,e) | Info (e,_) ->
-      build_exp_deps src stmt kind e
-    | BinOp (_,e1,e2,_) ->
-      build_exp_deps src stmt kind e1;
-      build_exp_deps  src stmt kind e2
-
-  and build_lval_deps src stmt kind lval =
-    (* Do not add dependency to constants or functions *)
-    if Cil.is_modifiable_lval lval || true then
-      match update_vertex (Kstmt stmt) lval with
-      | Some dst -> Graph.create_edge ~allow_folding:true graph dst kind src
-      | None -> ()
-  in
-
-
-  let queue : (Graph.vertex_label * int) Queue.t = Queue.create () in
+  let queue : (node * int) Queue.t = Queue.create () in
 
   (* Create the root *)
-  begin match update_vertex kinstr lval with
+  begin match build_lval context kinstr lval with
     | Some root ->
       context.roots <- root :: context.roots;
       Queue.add (root,0) queue;
@@ -293,10 +318,11 @@ let add_lval ?(depth_limit=1) context kinstr lval =
   (* Breadth first search *)
   while not (Queue.is_empty queue) do
     let v,depth = Queue.take queue in
-    if not (v.Graph.vertex_deps_computed) && depth < depth_limit then begin
-      build_vertex_deps v;
-      v.Graph.vertex_deps_computed <- true;
-      Graph.iter_pred (fun w -> Queue.add (w,depth+1) queue) graph v
+    if depth < depth_limit then begin
+      if not (v.node_deps_computed) && should_auto_explore v then begin
+        build_node_deps context v;
+        v.node_deps_computed <- true;
+      end;
+      Graph.iter_pred (fun w -> Queue.add (w,depth+1) queue) context.graph v
     end;
-  done;
-
+  done

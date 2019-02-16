@@ -20,18 +20,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Table : FCHashtbl.S with type key = Dependency_types.symbolic_location
-
-type t = private {
-  graph: Imprecision_graph.t;
-  table: Imprecision_graph.vertex Table.t;
-  is_folded_base: Cil_types.varinfo -> bool;
-  is_hidden_base: Cil_types.varinfo -> bool;
-  mutable roots: Imprecision_graph.vertex list;
-}
+type t
 
 val create :
   ?is_folded_base:(Cil_types.varinfo -> bool) ->
   ?is_hidden_base:(Cil_types.varinfo -> bool) -> unit -> t
+
+val get_roots : t -> Graph_types.node list
+
+val get_graph : t -> Imprecision_graph.t
 
 val add_lval : ?depth_limit:int -> t -> Cil_types.kinstr -> Cil_types.lval -> unit

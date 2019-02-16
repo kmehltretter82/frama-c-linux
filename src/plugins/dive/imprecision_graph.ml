@@ -20,108 +20,98 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Dependency_types
-
-type vertex_label = {
-  vertex_key : int;
-  vertex_location : symbolic_location;
-  mutable vertex_deps_computed : bool;
-  mutable vertex_imprecise_data : bool;
-}
-
-type edge_label = {
-  edge_key : int;
-  edge_kind : dependency_kind;
-  mutable edge_folded : bool;
-}
-
-let dummy_edge = {
-  edge_key = -1;
-  edge_kind = Data;
-  edge_folded = false;
-}
+open Graph_types
 
 module Vertex =
 struct
-  type t = vertex_label
-  let compare v1 v2 = v1.vertex_key - v2.vertex_key
-  let hash v = v.vertex_key
-  let equal v1 v2 = v1.vertex_key = v2.vertex_key
+  type t = node
+  let compare v1 v2 = v1.node_key - v2.node_key
+  let hash v = v.node_key
+  let equal v1 v2 = v1.node_key = v2.node_key
 end
 
 module Edge =
 struct
-  type t = edge_label
-  let compare e1 e2 = e1.edge_key - e2.edge_key
-  let hash e = e.edge_key
-  let equal e1 e2 = e1.edge_key = e2.edge_key
-  let default = dummy_edge
+  type t = dependency
+  let compare e1 e2 = e1.dependency_key - e2.dependency_key
+  let hash e = e.dependency_key
+  let equal e1 e2 = e1.dependency_key = e2.dependency_key
+  let default = {
+    dependency_key = -1;
+    dependency_kind = Data;
+    dependency_multiple = false;
+  }
 end
 
 module G = Graph.Imperative.Digraph.ConcreteBidirectionalLabeled (Vertex) (Edge)
 include G
 
-let vertex_count = ref 0
-let edge_count = ref 0
+let next_node_key = ref 0
+let next_dependency_key = ref 0
 
-let create_vertex g vertex_location =
+let create_vertex g ~node_kind ~node_locality =
   let v = {
-    vertex_key = !vertex_count;
-    vertex_location;
-    vertex_imprecise_data = false;
-    vertex_deps_computed = false;
+    node_key = !next_node_key;
+    node_kind;
+    node_locality;
+    node_imprecise = false;
+    node_deps_computed = false;
   }
   in
-  incr vertex_count;
+  incr next_node_key;
   add_vertex g v;
   v
 
-let create_edge ~allow_folding g v1 edge_kind v2 =
-  try
+let create_edge ~allow_folding g v1 ~dependency_kind v2 =
+  let same_kind (_,e,_) =
+    e.dependency_kind = dependency_kind
+  in
+  let matching_edge =
     try
       if allow_folding then
-        let _,e,_ = G.find_edge g v1 v2 in
-        if e.edge_kind = edge_kind then begin
-          e.edge_folded <- true;
-          raise Exit;
-        end;
-    with Not_found -> ();
+        Some (List.find same_kind (G.find_all_edges g v1 v2))
+      else
+        None
+    with Not_found -> None
+  in
+  match matching_edge with
+  | Some (_,e,_) -> 
+    e.dependency_multiple <- true
+  | None ->
     let e = {
-      edge_key = !edge_count;
-      edge_kind;
-      edge_folded = false;
+      dependency_key = !next_dependency_key;
+      dependency_kind;
+      dependency_multiple = false;
     }
     in
-    incr edge_count;
+    incr next_dependency_key;
     add_edge_e g (v1,e,v2)
-  with Exit -> ()
 
 
 let ouptput_to_dot out_channel g =
   let open Graph.Graphviz.DotAttributes in
 
-  let label s = `HtmlLabel (Extlib.html_escape s) in
+  let build_label s = `HtmlLabel (Extlib.html_escape s) in
 
   let module FileTable = Datatype.String.Hashtbl in
   let module FunctionTable = Kernel_function.Hashtbl in
   let file_table = FileTable.create 13
   and function_table = FunctionTable.create 13 in
   let file_counter = ref 0 in
-  let build_file_subgraph filename =
+  let rec build_file_subgraph filename =
     incr file_counter;
     {
       sg_name = "file_" ^ (string_of_int !file_counter);
-      sg_attributes = [label filename];
+      sg_attributes = [build_label filename];
       sg_parent = None;
     }
-  and build_function_subgraph _filename kf =
+  and build_function_subgraph filename kf =
     {
       sg_name = "function_" ^ (string_of_int (Kernel_function.get_id kf));
-      sg_attributes = [label (Kernel_function.get_name kf)];
-      sg_parent = None;
+      sg_attributes = [build_label (Kernel_function.get_name kf)];
+      sg_parent = Some (get_file_subgraph filename).sg_name;
     }
-  in
-  let get_file_subgraph filename =
+  and get_file_subgraph filename =
     FileTable.memo file_table filename build_file_subgraph
   and get_function_subgraph filename kf =
     FunctionTable.memo function_table kf (build_function_subgraph filename)
@@ -132,33 +122,37 @@ let ouptput_to_dot out_channel g =
       include G
       let graph_attributes _g = []
       let default_vertex_attributes _g = []
-      let vertex_name v = "cp" ^ (string_of_int v.vertex_key)
-      let vertex_label v =
-        Pretty_utils.to_string Cil_printer.pp_lval v.vertex_location.sl_lval
+      let vertex_name v = "cp" ^ (string_of_int v.node_key)
       let vertex_attributes v =
-        let shape = match v.vertex_location.sl_kind with
-        | Precise -> [`Shape `Box]
-        | Imprecise -> [ `Shape `Parallelogram ]
-        | Folded -> [ `Shape `Box3d ]
+        let l = ref [] in
+        let text = Pretty_utils.to_string Node_kind.pretty v.node_kind in
+        if text <> "" then
+          l := build_label text :: !l;
+        let shape = match v.node_kind with
+        | Scalar _ -> [`Shape `Box]
+        | Composite _ -> [ `Shape `Parallelogram ]
+        | Scattered _ -> [ `Shape `Box3d ]
+        | Alarm _ ->  [ `Shape `Doubleoctagon ; `Style `Bold ]
+        | File -> [ `Style `Invis ]
         in
-        let l = ref ([ label (vertex_label v) ] @ shape) in
-        if v.vertex_imprecise_data then
-          l := [ `Color 0xff0000 ; `Style `Bold ;
+        l := shape @ !l;
+        if v.node_imprecise then
+          l := [ `Color 0xff0000 ;
                  `Style `Filled ; `Fillcolor 0xffbbbb ] @ !l;
-        if not v.vertex_deps_computed then
+        if not v.node_deps_computed then
           l := [ `Style `Dotted ] @ !l;
         !l
       let get_subgraph v =
-        let filename = v.vertex_location.sl_file in
-        match v.vertex_location.sl_function with
-        | Some kf -> Some (get_function_subgraph filename kf)
-        | None -> Some (get_file_subgraph filename)
+        let {loc_file ; loc_function} = v.node_locality in
+          match loc_function with
+            | None -> Some (get_file_subgraph loc_file)
+            | Some kf -> Some (get_function_subgraph loc_file kf)
       let default_edge_attributes _g = []
       let edge_attributes (_v1,e,_v2) =
-        let kind_attribute = match e.edge_kind with
-          | Callee -> [`Color 0xff0000 ]
+        let kind_attribute = match e.dependency_kind with
+          | Callee -> [`Color 0x00ff00 ]
           | _ -> []
-        and folding_attribute = match e.edge_folded with
+        and folding_attribute = match e.dependency_multiple with
           | true -> [ `Style `Bold ]
           | false -> []
         in kind_attribute @ folding_attribute 
