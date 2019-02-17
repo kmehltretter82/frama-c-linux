@@ -106,7 +106,7 @@ let build_node_kind ~is_folded_base lval location =
           let offset = Ival.project_int ival
           and matching = Bit_utils.MatchType typ in
           let offset', _ = Bit_utils.find_offset vi.vtype ~offset matching in
-          Scalar (vi, offset')
+          Scalar (vi, typ, offset')
         with Ival.Not_Singleton_Int ->
           Scattered (lval)
       end
@@ -175,7 +175,13 @@ let build_node context kinstr location lval  =
       reference_file context node_locality.loc_file;
       Graph.create_vertex context.graph ~node_kind ~node_locality
     in
-    let node = NodeTable.memo context.node_table location build_new_node in
+    (* Compute the new location which might have changed after folding *)
+    let location' =
+      match Node_kind.to_location node_kind with
+      | None -> location
+      | Some location' -> location'
+    in
+    let node = NodeTable.memo context.node_table location' build_new_node in
     Some node
   end
 
@@ -199,7 +205,7 @@ exception Too_many_deps of lval
 
 let rec build_node_deps context node =
   match node.node_kind with
-  | Scalar (vi,offset) ->
+  | Scalar (vi,_typ,offset) ->
     build_writes_deps context node (Cil_types.Var vi, offset);
     if vi.vformal then build_arg_deps context node vi
   | Composite (vi) ->
@@ -220,8 +226,9 @@ and build_writes_deps context src lval =
     | _ -> ()
   in
   if List.length writes > 20 then
-    raise (Too_many_deps lval);
-  List.iter add_deps writes;
+    raise (Too_many_deps lval)
+  else
+    List.iter add_deps writes
 
 and build_arg_deps context src vi =
   assert vi.vformal;

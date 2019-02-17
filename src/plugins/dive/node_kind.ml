@@ -23,15 +23,23 @@
 open Graph_types
 
 let get_base = function
-  | Scalar (vi,_) | Composite (vi) -> Some vi
+  | Scalar (vi,_,_) | Composite (vi) -> Some vi
   | Scattered _ | Alarm _ | File -> None
 
 let is_precise = function
   | Scalar _ | Composite _ -> true
   | Scattered _ | Alarm _ | File -> false
 
+let to_location = function
+  | Scalar (vi,typ,offset) ->
+    let base = Base.of_varinfo vi in
+    Some (Locations.loc_of_typoffset base typ offset)
+  | Composite (vi) ->
+    Some (Locations.loc_of_varinfo vi)
+  | Scattered _ | Alarm _ | File -> None
+
 let to_cil = function
-  | Scalar (vi,offset) -> `Lval (Cil_types.Var vi, offset)
+  | Scalar (vi,_typ,offset) -> `Lval (Cil_types.Var vi, offset)
   | Composite (vi) -> `Lval (Cil_types.Var vi, Cil_types.NoOffset)
   | Scattered (lval) -> `Lval lval
   | Alarm (_stmt,exp) -> `Exp exp
@@ -42,4 +50,3 @@ let pretty fmt kind =
   | `Lval lval -> Cil_printer.pp_lval fmt lval
   | `Exp exp -> Cil_printer.pp_exp fmt exp
   | `None -> ()
-
