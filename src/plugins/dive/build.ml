@@ -195,6 +195,8 @@ let build_lval context kinstr lval =
       node.node_imprecise <- true;
     Some node
 
+exception Too_many_deps of lval
+
 let rec build_node_deps context node =
   match node.node_kind with
   | Scalar (vi,offset) ->
@@ -217,6 +219,8 @@ and build_writes_deps context src lval =
       build_instr_deps context src stmt instr
     | _ -> ()
   in
+  if List.length writes > 20 then
+    raise (Too_many_deps lval);
   List.iter add_deps writes;
 
 and build_arg_deps context src vi =
@@ -348,7 +352,12 @@ let complete_in_depth ~depth_limit context root =
     let v,depth = Queue.take queue in
     if depth < depth_limit then begin
       if not (v.node_deps_computed) && should_auto_explore v then begin
-        build_node_deps context v;
+        begin try
+            build_node_deps context v;
+          with Too_many_deps lval ->
+            Self.warning "Too many dependencies for %a ; throwing them out"
+              Cil_printer.pp_lval lval;
+        end;
         v.node_deps_computed <- true;
       end;
       Graph.iter_pred (fun w -> Queue.add (w,depth+1) queue) context.graph v
