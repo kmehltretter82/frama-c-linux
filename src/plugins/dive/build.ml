@@ -292,13 +292,11 @@ and build_exp_deps context src stmt kind exp =
     build_exp_deps context src stmt kind e2
 
 and build_lval_deps context src stmt dependency_kind lval =
-  (* Do not add dependency to constants or functions *)
-  if Cil.is_modifiable_lval lval then
-    match build_lval context (Kstmt stmt) lval with
-    | None -> ()
-    | Some dst ->
-      let allow_folding = true in
-      Graph.create_edge ~allow_folding context.graph dst ~dependency_kind src
+  match build_lval context (Kstmt stmt) lval with
+  | None -> ()
+  | Some dst ->
+    let allow_folding = true in
+    Graph.create_edge ~allow_folding context.graph dst ~dependency_kind src
 
 
 (* --- Graph initialization --- *)
