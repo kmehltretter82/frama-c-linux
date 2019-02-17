@@ -48,7 +48,7 @@ struct
   include Cil_datatype.Varinfo
 
   let of_string s =
-    let regexp = Str.regexp "\\([a-zA-Z0-9]+\\)::\\([a-zA-Z0-9]+\\)" in
+    let regexp = Str.regexp "^\\([_a-zA-Z0-9]+\\)::\\([_a-zA-Z0-9]+\\)$" in
     let name, localisation, error_suffix =
       if Str.string_match regexp s 0 then
         let function_name = Str.matched_group 1 s
@@ -59,7 +59,11 @@ struct
         with Not_found -> 
           raise (Cannot_build ("no function '" ^ function_name ^ "'"))
       else
-        s, VGlobal, ""
+        let regexp = Str.regexp "^[_a-zA-Z0-9]+$" in
+        if Str.string_match regexp s 0 then
+          s, VGlobal, ""
+        else
+          raise (Cannot_build ("wrong syntax: '" ^ s ^ "'"))
     in
     try
       Globals.Vars.find_from_astinfo name localisation
