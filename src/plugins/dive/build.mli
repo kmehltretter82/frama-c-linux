@@ -22,14 +22,15 @@
 
 type t
 
-val create :
-  ?is_folded_base:(Cil_types.varinfo -> bool) ->
-  ?is_hidden_base:(Cil_types.varinfo -> bool) -> unit -> t
-
-val get_roots : t -> Graph_types.node list
+val create : unit -> t
 
 val get_graph : t -> Imprecision_graph.t
+val get_roots : t -> Graph_types.node list
+
+val unfold_base : t -> Cil_types.varinfo -> unit
+val fold_base : t -> Cil_types.varinfo -> unit
+val hide_base : t -> Cil_types.varinfo -> unit
+val unhide_base : t -> Cil_types.varinfo -> unit
 
 val add_lval : ?depth_limit:int -> t -> Cil_types.kinstr -> Cil_types.lval -> unit
-
 val add_var :  ?depth_limit:int -> t -> Cil_types.varinfo -> unit

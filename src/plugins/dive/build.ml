@@ -133,13 +133,14 @@ let build_node_locality kinstr kind =
 module Graph = Imprecision_graph
 module NodeTable = FCHashtbl.Make (Locations.Location)
 module FileTable = Datatype.String.Hashtbl
+module BaseSet = Cil_datatype.Varinfo.Set
 
 type t = {
   graph: Graph.t;
   node_table: node NodeTable.t;
   file_table: node FileTable.t;
-  is_folded_base: Cil_types.varinfo -> bool;
-  is_hidden_base: Cil_types.varinfo -> bool;
+  mutable unfolded_bases: BaseSet.t;
+  mutable hidden_bases: BaseSet.t;
   mutable roots: node list;
 }
 
@@ -151,9 +152,12 @@ let reference_file context loc_file =
     FileTable.add context.file_table loc_file node
   end
 
+let is_folded context vi =
+  not (BaseSet.mem vi context.unfolded_bases)
+
 let is_hidden context node_kind =
   match Node_kind.get_base node_kind with
-  | Some vi when context.is_hidden_base vi -> true
+  | Some vi when BaseSet.mem vi context.hidden_bases -> true
   | _ -> false
 
 
@@ -161,7 +165,7 @@ let is_hidden context node_kind =
 
 (* Update or create a node *)
 let build_node context kinstr location lval  =
-  let is_folded_base = context.is_folded_base in
+  let is_folded_base = is_folded context in
   let node_kind = build_node_kind ~is_folded_base lval location in
   if is_hidden context node_kind then
     None
@@ -297,26 +301,42 @@ and build_lval_deps context src stmt dependency_kind lval =
       Graph.create_edge ~allow_folding context.graph dst ~dependency_kind src
 
 
-(* --- Exported interface --- *)
+(* --- Graph initialization --- *)
 
-let no_base _vi = false
-
-let create ?(is_folded_base=no_base) ?(is_hidden_base=no_base) () =
+let create () =
   !Db.Value.compute ();
   {
     graph = Graph.create ();
     node_table = NodeTable.create 13;
     file_table = FileTable.create 13;
-    is_folded_base;
-    is_hidden_base;
+    unfolded_bases = BaseSet.empty;
+    hidden_bases = BaseSet.empty;
     roots = [];
   }
+
+
+(* --- Accessors --- *)
+
+let get_graph context =
+  context.graph
 
 let get_roots context =
   context.roots
 
-let get_graph context =
-  context.graph
+
+(* --- Mutators --- *)
+
+let unfold_base context vi =
+  context.unfolded_bases <- BaseSet.add vi context.unfolded_bases
+
+let fold_base context vi =
+  context.unfolded_bases <- BaseSet.remove vi context.unfolded_bases
+
+let hide_base context vi =
+  context.hidden_bases <- BaseSet.add vi context.hidden_bases
+
+let unhide_base context vi =
+  context.hidden_bases <- BaseSet.add vi context.hidden_bases
 
 let should_auto_explore node =
   Node_kind.is_precise node.node_kind

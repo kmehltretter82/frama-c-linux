@@ -20,16 +20,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let is_folded_base vi =
-  not (Self.UnfoldedBases.mem vi)
-
-let is_hidden_base vi =
-  Self.HiddenBases.mem vi
-
 let main () =
   if not (Self.FromBases.is_empty ()) then begin
     (* Create the initial graph  *)
-    let context = Build.create ~is_folded_base ~is_hidden_base () in
+    let context = Build.create () in
+    (* Handle parameters *)
+    Self.UnfoldedBases.iter (Build.unfold_base context);
+    Self.HiddenBases.iter (Build.hide_base context);
     (* Add targeted vars to it *)
     let depth_limit = Self.DepthLimit.get () in
     Self.FromBases.iter (Build.add_var ~depth_limit context);
