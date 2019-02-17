@@ -130,8 +130,8 @@ let ouptput_to_dot out_channel g =
           l := build_label text :: !l;
         let shape = match v.node_kind with
         | Scalar _ -> [`Shape `Box]
-        | Composite _ -> [ `Shape `Parallelogram ]
-        | Scattered _ -> [ `Shape `Box3d ]
+        | Composite _ -> [ `Shape `Box3d ]
+        | Scattered _ -> [ `Shape `Parallelogram ]
         | Alarm _ ->  [ `Shape `Doubleoctagon ; `Style `Bold ]
         | File -> [ `Style `Invis ]
         in
