@@ -159,27 +159,37 @@ let is_hidden context node_kind =
 
 (* --- Graph building --- *)
 
-(* Update a vertex associated to an lvalue, creating one if needed *)
-let build_lval context kinstr lval =
-  (* If possible, refine the lval to a non-symbolic one *)
-  let location = !Db.Value.lval_to_loc kinstr lval in
+(* Update or create a node *)
+let build_node context kinstr location lval  =
   let is_folded_base = context.is_folded_base in
   let node_kind = build_node_kind ~is_folded_base lval location in
   if is_hidden context node_kind then
     None
   else begin
-    (* Add a vertex if necessary *)
+    let node_locality = build_node_locality kinstr node_kind in
     let build_new_node _location =
-      let node_locality = build_node_locality kinstr node_kind in
       reference_file context node_locality.loc_file;
       Graph.create_vertex context.graph ~node_kind ~node_locality
     in
     let node = NodeTable.memo context.node_table location build_new_node in
+    Some node
+  end
+
+let build_var context varinfo =
+  let location = Locations.loc_of_varinfo varinfo
+  and lval = Var varinfo, NoOffset in
+  build_node context Kglobal location lval
+
+let build_lval context kinstr lval =
+  (* If possible, refine the lval to a non-symbolic one *)
+  let location = !Db.Value.lval_to_loc kinstr lval in
+  match build_node context kinstr location lval with
+  | None -> None
+  | Some node ->
     (* Update the precision information *)
     if is_imprecise_data kinstr lval then
       node.node_imprecise <- true;
     Some node
-  end
 
 let rec build_node_deps context node =
   match node.node_kind with
@@ -311,18 +321,11 @@ let get_graph context =
 let should_auto_explore node =
   Node_kind.is_precise node.node_kind
 
-let add_lval ?(depth_limit=1) context kinstr lval =
-  let queue : (node * int) Queue.t = Queue.create () in
-
-  (* Create the root *)
-  begin match build_lval context kinstr lval with
-    | Some root ->
-      context.roots <- root :: context.roots;
-      Queue.add (root,0) queue;
-    | None -> ()
-  end;
-
+let complete_in_depth ~depth_limit context root =
+  context.roots <- root :: context.roots;
   (* Breadth first search *)
+  let queue : (node * int) Queue.t = Queue.create () in
+  Queue.add (root,0) queue;
   while not (Queue.is_empty queue) do
     let v,depth = Queue.take queue in
     if depth < depth_limit then begin
@@ -333,3 +336,11 @@ let add_lval ?(depth_limit=1) context kinstr lval =
       Graph.iter_pred (fun w -> Queue.add (w,depth+1) queue) context.graph v
     end;
   done
+
+let add_var ?(depth_limit=1) context varinfo =
+  let node = build_var context varinfo in
+  Extlib.may (complete_in_depth ~depth_limit context) node
+
+let add_lval ?(depth_limit=1) context kinstr lval =
+  let node = build_lval context kinstr lval in
+  Extlib.may (complete_in_depth ~depth_limit context) node

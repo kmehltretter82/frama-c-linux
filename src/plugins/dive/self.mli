@@ -22,13 +22,12 @@
 
 include Plugin.S
 
-module Targets : Parameter_sig.Multiple_map
-  with type key = string
-  and type value = Integer.t
-  and type t = Integer.t list Datatype.String.Map.t
+module type Varinfo_set = Parameter_sig.Set
+  with type elt = Cil_types.varinfo
+   and type t = Cil_datatype.Varinfo.Set.t
 
 module DepthLimit : Parameter_sig.Int
-
-module UnfoldedBases : Parameter_sig.String_set
-
-module HiddenBases : Parameter_sig.String_set
+module FromAlarms : Parameter_sig.Bool
+module FromBases : Varinfo_set
+module UnfoldedBases : Varinfo_set
+module HiddenBases : Varinfo_set

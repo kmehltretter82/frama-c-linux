@@ -31,3 +31,5 @@ val get_roots : t -> Graph_types.node list
 val get_graph : t -> Imprecision_graph.t
 
 val add_lval : ?depth_limit:int -> t -> Cil_types.kinstr -> Cil_types.lval -> unit
+
+val add_var :  ?depth_limit:int -> t -> Cil_types.varinfo -> unit

@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Cil_types
+
 include Plugin.Register
     (struct
       let name = "dive"
@@ -35,38 +37,76 @@ module DepthLimit = Int
       let arg_name = "N"
     end)
 
-module Targets = String_multiple_map
+module FromAlarms = True
     (struct
-      include Datatype.Integer
-      type key = string
-      let of_string ~key:_ ~prev:_ arg =
-        try
-          Extlib.opt_map Integer.of_string arg
-        with Failure _ ->
-          raise (Cannot_build "expecting an integer")
-      let to_string ~key:_ = Extlib.opt_map Integer.to_string
-    end)
-    (struct
-      let option_name = "-dive"
-      let help = "Defines the lvalues for which the dependency graph must be \
-                  generated."
-      let default = Datatype.String.Map.empty
-      let arg_name = "lval:sid"
+      let option_name = "-dive-from-alarms"
+      let help = "Build the graph from alarms presents in the code."
     end)
 
-module UnfoldedBases = String_set
+module Varinfo =
+struct
+  include Cil_datatype.Varinfo
+
+  let of_string s =
+    let regexp = Str.regexp "\\([a-zA-Z0-9]+\\)::\\([a-zA-Z0-9]+\\)" in
+    let name, localisation, error_suffix =
+      if Str.string_match regexp s 0 then
+        let function_name = Str.matched_group 1 s
+        and variable_name = Str.matched_group 2 s in
+        try
+          let kf = Globals.Functions.find_by_name function_name in
+          variable_name, VLocal kf, " in function " ^ function_name
+        with Not_found -> 
+          raise (Cannot_build ("no function '" ^ function_name ^ "'"))
+      else
+        s, VGlobal, ""
+    in
+    try
+      Globals.Vars.find_from_astinfo name localisation
+    with Not_found ->
+      raise (Cannot_build ("no variable '" ^ name ^ "'" ^ error_suffix))
+
+  let to_string vi =
+    match Kernel_function.find_defining_kf vi with
+    | None -> vi.vname
+    | Some kf -> Kernel_function.get_name kf ^ "::" ^ vi.vname
+
+  let of_singleton_string = no_element_of_string
+end
+
+module type Varinfo_set = Parameter_sig.Set
+  with type elt = Cil_types.varinfo
+   and type t = Cil_datatype.Varinfo.Set.t
+
+module Varinfo_set (X: Parameter_sig.Input_with_arg) =
+  Make_set
+      (Varinfo)
+      (struct
+        include X
+        let dependencies = []
+        let default = Cil_datatype.Varinfo.Set.empty
+      end)
+
+module FromBases = Varinfo_set
+    (struct
+      let option_name = "-dive-from"
+      let help = "Build the graph from these local variables."
+      let arg_name = "f::v,..."
+    end)
+
+module UnfoldedBases = Varinfo_set
     (struct
       let option_name = "-dive-unfold"
-      let help = "Defines the names of the composite variables which should be \
+      let help = "Defines the composite variables which should be \
                   unfolded into each individual cell."
-      let arg_name = "lval:sid"
+      let arg_name = "f::v,..."
     end)
 
-module HiddenBases = String_set
+module HiddenBases = Varinfo_set
     (struct
       let option_name = "-dive-hide"
-      let help = "Defines the names of the variables which must not be \
+      let help = "Defines the variables which must not be \
                   displayed in the graph. The dependencies for these bases \
                   are not computed either."
-      let arg_name = "lval:sid"
+      let arg_name = "f::v,..."
     end)
