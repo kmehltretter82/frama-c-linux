@@ -31,7 +31,7 @@ val get : Wpo.t -> [ `Script | `Proof | `Saved | `None ]
 val proof : main:Wpo.t -> tree
 val reset : tree -> unit
 val remove : Wpo.t -> unit
-val validate : ?unknown:bool -> tree -> unit
+val validate : ?incomplete:bool -> tree -> unit
 
 (** Leaves are numbered from 0 to n-1 *)
 
@@ -71,7 +71,7 @@ type fork
 val anchor : tree -> ?node:node -> unit -> node
 val fork : tree -> anchor:node -> ProofScript.jtactic -> Tactical.process -> fork
 val iter : (Wpo.t -> unit) -> fork -> unit
-val commit : resolve:bool -> fork -> node * (string * node) list
+val commit : fork -> node * (string * node) list
 val pretty : Format.formatter -> fork -> unit
 
 val script : tree -> ProofScript.jscript

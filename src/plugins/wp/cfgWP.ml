@@ -1466,7 +1466,7 @@ struct
                 begin
                   Wp_parameters.feedback ~ontty:`Transient "Collecting checks" ;
                   Bag.iter
-                    (fun w -> ignore (Wpo.resolve w))
+                    (fun w -> ignore (Wpo.reduce w))
                     !collection ;
                   Lang.F.Check.iter (add_qed_check collection m) ;
                 end
