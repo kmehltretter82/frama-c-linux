@@ -105,14 +105,6 @@ predicate "\\is_plus_infinity"(float32) = "is_positive_infinite_f32";
 predicate "\\is_plus_infinity"(float64) = "is_positive_infinite_f64";
 predicate "\\is_minus_infinity"(float32) = "is_negative_infinite_f32";
 predicate "\\is_minus_infinity"(float64) = "is_negative_infinite_f64";
-predicate "\\le_float"(float32,float32) = "le_f32";
-predicate "\\lt_float"(float32,float32) = "lt_f32";
-predicate "\\eq_float"(float32,float32) = "eq_f32";
-predicate "\\ne_float"(float32,float32) = "ne_f64";
-predicate "\\le_double"(float64,float64) = "le_f64";
-predicate "\\lt_double"(float64,float64) = "lt_f64";
-predicate "\\eq_double"(float64,float64) = "eq_f64";
-predicate "\\ne_double"(float64,float64) = "ne_f64";
 logic bool "\\round_float"(rounding_mode,real) = "round_float";
 logic bool "\\round_double"(rounding_mode,real) = "round_double";
 
