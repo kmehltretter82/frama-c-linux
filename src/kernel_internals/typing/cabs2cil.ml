@@ -1185,10 +1185,7 @@ let mkAddrOfAndMark loc ((b, off) as lval) : exp =
   begin match lastOffset off with
     | NoOffset ->
       (match b with
-       | Var vi ->
-         (* Do not mark arrays as having their address taken. *)
-         if not (isArrayType vi.vtype) then
-           vi.vaddrof <- true
+       | Var vi -> vi.vaddrof <- true
        | _ -> ())
     | Index _ -> ()
     | Field(fi,_) -> fi.faddrof <- true
