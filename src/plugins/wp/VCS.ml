@@ -27,6 +27,7 @@
 let dkey_no_time_info = Wp_parameters.register_category "no-time-info"
 let dkey_no_step_info = Wp_parameters.register_category "no-step-info"
 let dkey_no_goals_info = Wp_parameters.register_category "no-goals-info"
+let dkey_success_only = Wp_parameters.register_category "success-only"
 
 type prover =
   | Why3 of string (* Prover via WHY *)
@@ -339,8 +340,12 @@ let pp_res ~extended fmt r =
   | NoResult -> Format.pp_print_string fmt (if extended then "No Result" else "-")
   | Invalid -> Format.pp_print_string fmt "Invalid"
   | Computing _ -> Format.pp_print_string fmt "Computing"
-  | Valid -> Format.fprintf fmt "Valid%a" (pp_perf ~extended) r
   | Checked -> Format.fprintf fmt "Typechecked"
+  | Valid when Wp_parameters.has_dkey dkey_success_only ->
+      Format.pp_print_string fmt "Valid"
+  | (Timeout|Stepout|Unknown) when Wp_parameters.has_dkey dkey_success_only ->
+      Format.pp_print_string fmt "Unsuccess"
+  | Valid -> Format.fprintf fmt "Valid%a" (pp_perf ~extended) r
   | Unknown -> Format.fprintf fmt "Unknown%a" (pp_perf ~extended) r
   | Timeout -> Format.fprintf fmt "Timeout%a" (pp_perf ~extended) r
   | Stepout -> Format.fprintf fmt "Step limit%a" (pp_perf ~extended) r

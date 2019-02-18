@@ -135,3 +135,4 @@ val compare : result -> result -> int (* best is minimal *)
 val dkey_no_time_info: Wp_parameters.category
 val dkey_no_step_info: Wp_parameters.category
 val dkey_no_goals_info: Wp_parameters.category
+val dkey_success_only: Wp_parameters.category

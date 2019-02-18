@@ -363,39 +363,62 @@ let do_wpo_success goal s =
           Wp_parameters.feedback ~ontty:`Silent
             "[%a] Goal %s : Valid" VCS.pp_prover prover (Wpo.get_gid goal)
 
+let do_report_time fmt s =
+  begin
+    if s.n_time > 0 &&
+       s.u_time > Rformat.epsilon &&
+       not (Wp_parameters.has_dkey VCS.dkey_no_time_info) &&
+       not (Wp_parameters.has_dkey VCS.dkey_success_only)
+    then
+      let mean = s.a_time /. float s.n_time in
+      let epsilon = 0.05 *. mean in
+      let delta = s.u_time -. s.d_time in
+      if delta < epsilon then
+        Format.fprintf fmt " (%a)" Rformat.pp_time mean
+      else
+        let middle = (s.u_time +. s.d_time) *. 0.5 in
+        if abs_float (middle -. mean) < epsilon then
+          Format.fprintf fmt " (%a-%a)"
+            Rformat.pp_time s.d_time
+            Rformat.pp_time s.u_time
+        else
+          Format.fprintf fmt " (%a-%a-%a)"
+            Rformat.pp_time s.d_time
+            Rformat.pp_time mean
+            Rformat.pp_time s.u_time
+  end
+
+let do_report_steps fmt s =
+  begin
+    if s.steps > 0 &&
+       not (Wp_parameters.has_dkey VCS.dkey_no_step_info) &&
+       not (Wp_parameters.has_dkey VCS.dkey_success_only)
+    then
+      Format.fprintf fmt " (%d)" s.steps ;
+  end
+
+let do_report_stopped fmt s =
+  if Wp_parameters.has_dkey VCS.dkey_success_only then
+    begin
+      let n = s.interrupted + s.unknown + s.failed in
+      if n > 0 then
+        Format.fprintf fmt " (unsuccess: %d)" n ;
+    end
+  else
+    begin
+      if s.interrupted > 0 then
+        Format.fprintf fmt " (interrupted: %d)" s.interrupted ;
+      if s.unknown > 0 then
+        Format.fprintf fmt " (unknown: %d)" s.unknown ;
+    end
+
 let do_report_prover_stats pp_prover fmt (p,s) =
   begin
     let name = VCS.title_of_prover p in
     Format.fprintf fmt "%a %4d " pp_prover name s.proved ;
-    begin
-      if s.n_time > 0 &&
-         s.u_time > Rformat.epsilon &&
-         not (Wp_parameters.has_dkey VCS.dkey_no_time_info)
-      then
-        let mean = s.a_time /. float s.n_time in
-        let epsilon = 0.05 *. mean in
-        let delta = s.u_time -. s.d_time in
-        if delta < epsilon then
-          Format.fprintf fmt " (%a)" Rformat.pp_time mean
-        else
-          let middle = (s.u_time +. s.d_time) *. 0.5 in
-          if abs_float (middle -. mean) < epsilon then
-            Format.fprintf fmt " (%a-%a)"
-              Rformat.pp_time s.d_time
-              Rformat.pp_time s.u_time
-          else
-            Format.fprintf fmt " (%a-%a-%a)"
-              Rformat.pp_time s.d_time
-              Rformat.pp_time mean
-              Rformat.pp_time s.u_time
-    end ;
-    if s.steps > 0  &&
-       not (Wp_parameters.has_dkey VCS.dkey_no_step_info) then
-      Format.fprintf fmt " (%d)" s.steps ;
-    if s.interrupted > 0 then
-      Format.fprintf fmt " (interrupted: %d)" s.interrupted ;
-    if s.unknown > 0 then
-      Format.fprintf fmt " (unknown: %d)" s.unknown ;
+    do_report_time fmt s ;
+    do_report_steps fmt s ;
+    do_report_stopped fmt s ;
     if s.failed > 0 then
       Format.fprintf fmt " (failed: %d)" s.failed ;
     Format.fprintf fmt "@\n" ;
