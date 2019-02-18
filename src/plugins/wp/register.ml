@@ -400,7 +400,7 @@ let do_report_steps fmt s =
 let do_report_stopped fmt s =
   if Wp_parameters.has_dkey VCS.dkey_success_only then
     begin
-      let n = s.interrupted + s.unknown + s.failed in
+      let n = s.interrupted + s.unknown in
       if n > 0 then
         Format.fprintf fmt " (unsuccess: %d)" n ;
     end

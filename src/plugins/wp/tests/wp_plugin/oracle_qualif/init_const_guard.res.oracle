@@ -10,10 +10,10 @@
 [wp] [Qed] Goal typed_f_ensures_Q_NotWrite : Valid
 [wp] [Qed] Goal typed_g_ensures_P_not_Const : Valid
 [wp] [Alt-Ergo] Goal typed_g_assert_Read : Valid
-[wp] [Alt-Ergo] Goal typed_g_assert_Guard_against_Const : Unknown
+[wp] [Alt-Ergo] Goal typed_g_assert_Guard_against_Const : Unsuccess
 [wp] Proved goals:    6 / 7
   Qed:             4 
-  Alt-Ergo:        2  (unknown: 1)
+  Alt-Ergo:        2  (unsuccess: 1)
 [wp] Report 'tests/wp_plugin/init_const_guard.i.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success

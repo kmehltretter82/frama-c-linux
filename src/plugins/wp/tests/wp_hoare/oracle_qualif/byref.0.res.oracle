@@ -15,10 +15,10 @@
 [wp] [Qed] Goal typed_pointer_ensures : Valid
 [wp] [Qed] Goal typed_pointer_call_f_requires : Valid
 [wp] [Qed] Goal typed_wrong_without_ref_ensures : Valid
-[wp] [Alt-Ergo] Goal typed_wrong_without_ref_call_f_requires : Unknown
+[wp] [Alt-Ergo] Goal typed_wrong_without_ref_call_f_requires : Unsuccess
 [wp] Proved goals:   11 / 12
   Qed:            11 
-  Alt-Ergo:        0  (unknown: 1)
+  Alt-Ergo:        0  (unsuccess: 1)
 [wp] Report 'tests/wp_hoare/byref.i.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
