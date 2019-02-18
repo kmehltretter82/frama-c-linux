@@ -1694,7 +1694,8 @@ struct
 
 
 
-  let conditional_conversion loc env t1 t2 =
+  let conditional_conversion loc env rel t1 t2 =
+    let is_rel = Extlib.has_some rel in
     (* a comparison is mainly a function of type 'a -> 'a -> Bool/Prop.
        performs the needed unifications on both sides.*)
     let var = fresh_type_var "cmp" in
@@ -1710,10 +1711,10 @@ struct
     in
     let rec aux lty1 lty2 =
       match (unroll_type lty1), (unroll_type lty2) with
-      | t1, t2 when is_same_type t1 t2 -> t1
       | Ctype ty1, Ctype ty2 ->
         if isIntegralType ty1 && isIntegralType ty2 then
-          if (isSignedInteger ty1) <> (isSignedInteger ty2) then
+          if is_same_type lty1 lty2 then lty1
+          else if (isSignedInteger ty1) <> (isSignedInteger ty2) then
             (* in ACSL, the comparison between 0xFFFFFFFF seen as int and
                unsigned int is not true: we really have to operate at
                the integer level.
@@ -1725,9 +1726,25 @@ struct
           else if is_enum_cst t1 lty2 then lty2
           else if is_enum_cst t2 lty1 then lty1
           else Ctype (C.conditionalConversion ty1 ty2)
-        else if isArithmeticType ty1 && isArithmeticType ty2 then
-          Lreal
-        else if is_same_ptr_type ty1 ty2 || is_same_array_type ty1 ty2 then
+        else if isArithmeticType ty1 && isArithmeticType ty2 then begin
+          if is_same_type lty1 lty2 then begin
+            if is_rel then begin
+              let rel = Extlib.the rel in
+              let kind =
+                match Cil.unrollType ty1 with
+                | TFloat (FFloat,_) -> "float"
+                | TFloat (FDouble,_) -> "double"
+                | TFloat (FLongDouble,_) -> "long double"
+                | _ -> Kernel.fatal "floating point type expected"
+              in
+              let source = fst loc in
+              Kernel.warning ~source ~wkey:Kernel.wkey_acsl_float_compare
+                "comparing two %s values as real values. You might \
+                 want to use \\%s_%s instead" kind rel kind;
+              Lreal
+            end else lty1
+          end else Lreal
+        end else if is_same_ptr_type ty1 ty2 || is_same_array_type ty1 ty2 then
           Ctype (C.conditionalConversion ty1 ty2)
         else if
           (isPointerType ty1 || isArrayType ty1) &&
@@ -1760,6 +1777,7 @@ struct
       (* implicit conversion to set *)
       | Ltype ({lt_name = "set"} as lt,[t1]), t2
       | t1, Ltype({lt_name="set"} as lt,[t2]) -> Ltype(lt,[aux t1 t2])
+      | t1, t2 when is_same_type t1 t2 -> t1
       | _ ->
         C.error loc "types %a and %a are not convertible"
           Cil_printer.pp_logic_type lty1 Cil_printer.pp_logic_type lty2
@@ -2736,7 +2754,7 @@ struct
       let t2 = term env t2 in
       let t3 = term env t3 in
       let env,ty,ty2,ty3 =
-        conditional_conversion loc env t2 t3 in
+        conditional_conversion loc env None t2 t3 in
       let t2 = { t2 with term_type = instantiate env t2.term_type } in
       let _,t2 =
         implicit_conversion
@@ -2977,7 +2995,6 @@ struct
   and type_relation:
     'a. _ -> _ -> (_ -> _ -> _ -> _ -> 'a) -> _ -> _ -> _ -> 'a =
     fun ctxt env f t1 op t2 ->
-      let module C = struct end in
       let loc1 = t1.lexpr_loc in
       let loc2 = t2.lexpr_loc in
       let loc = loc_join t1.lexpr_loc t2.lexpr_loc in
@@ -2985,9 +3002,17 @@ struct
       let ty1 = t1.term_type in
       let t2 = ctxt.type_term ctxt env t2 in
       let ty2 = t2.term_type in
+      let rel = match op with
+        | Eq -> "eq"
+        | Neq -> "ne"
+        | Le -> "le"
+        | Lt -> "lt"
+        | Ge -> "ge"
+        | Gt -> "gt"
+      in
       let conditional_conversion t1 t2 =
         let env,t,ty1,ty2 =
-          conditional_conversion loc env t1 t2
+          conditional_conversion loc env (Some rel) t1 t2
         in
         let t1 = { t1 with term_type = instantiate env t1.term_type } in
         let _,t1 =

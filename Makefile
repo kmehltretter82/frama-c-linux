@@ -1423,9 +1423,9 @@ $(foreach file,$(LONELY_TESTS_ML_FILES),\
 $(foreach file,$(LONELY_TESTS_ML_FILES),\
   $(eval $(file:%.ml=%.cmxs): OFLAGS+=-I $(dir $(file))))
 .PRECIOUS: $(LONELY_TESTS_ML_FILES:%.ml=%.cmx) \
-           $(LONELY_TESTS_DYN_FILES:%.ml=%.cmxs) \
-           $(LONELY_TESTS_BYTE_FILES:%.ml=%.cmo) \
-           $(LONELY_TESTS_BYTE_FILES:%.ml=%.cmi)
+           $(LONELY_TESTS_ML_FILES:%.ml=%.cmxs) \
+           $(LONELY_TESTS_ML_FILES:%.ml=%.cmo) \
+           $(LONELY_TESTS_ML_FILES:%.ml=%.cmi)
 
 bin/ocamldep_transitive_closure: devel_tools/ocamldep_transitive_closure.ml
 	$(OCAMLOPT) -package ocamlgraph -package str -linkpkg -o $@ $<
