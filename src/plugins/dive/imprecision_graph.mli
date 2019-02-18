@@ -20,32 +20,19 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type node_kind =
-  | Scalar of Cil_types.varinfo * Cil_types.typ * Cil_types.offset
-  | Composite of Cil_types.varinfo
-  | Scattered of Cil_types.lval
-  | Alarm of Cil_types.stmt * Cil_types.exp
-  | File (* Dummy node, hack for Ocamlgraph Graphviz Dot module *)
+open Graph_types
 
-type node_locality = {
-  loc_file : string;
-  loc_function : Cil_types.kernel_function option;
-}
+include Graph.Sig.G with type V.t = node
 
-type node_precision = Singleton | Normal | Wide | Critical
+val create : ?size:int -> unit -> t
 
-type node = {
-  node_key : int;
-  node_kind : node_kind;
-  node_locality : node_locality;
-  mutable node_precision : node_precision;
-  mutable node_deps_computed : bool;
-}
+val create_node : t ->
+  node_kind:node_kind ->
+  node_locality:node_locality -> node
 
-type dependency_kind = Callee | Data | Address | Control
+val update_node_precision : node -> node_precision -> unit
 
-type dependency = {
-  dependency_key : int;
-  dependency_kind : dependency_kind;
-  mutable dependency_multiple : bool;
-}
+val create_dependency : allow_folding:bool -> t -> node -> dependency_kind ->
+  node -> unit
+
+val ouptput_to_dot : out_channel -> t -> unit

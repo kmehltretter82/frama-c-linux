@@ -34,8 +34,8 @@ module Edge =
 struct
   type t = dependency
   let compare e1 e2 = e1.dependency_key - e2.dependency_key
-  let hash e = e.dependency_key
-  let equal e1 e2 = e1.dependency_key = e2.dependency_key
+  let _hash e = e.dependency_key
+  let _equal e1 e2 = e1.dependency_key = e2.dependency_key
   let default = {
     dependency_key = -1;
     dependency_kind = Data;
@@ -49,20 +49,28 @@ include G
 let next_node_key = ref 0
 let next_dependency_key = ref 0
 
-let create_vertex g ~node_kind ~node_locality =
-  let v = {
+let create_node g ~node_kind ~node_locality =
+  let node = {
     node_key = !next_node_key;
     node_kind;
     node_locality;
-    node_imprecise = false;
+    node_precision = Singleton;
     node_deps_computed = false;
   }
   in
   incr next_node_key;
-  add_vertex g v;
-  v
+  add_vertex g node;
+  node
 
-let create_edge ~allow_folding g v1 ~dependency_kind v2 =
+let update_node_precision node new_precision =
+  node.node_precision <-
+    match node.node_precision, new_precision with
+    | Critical, _ | _, Critical -> Critical
+    | Wide, _ | _, Wide -> Wide
+    | Normal, _ | _, Normal -> Normal
+    | Singleton, Singleton -> Singleton
+
+let create_dependency ~allow_folding g v1 dependency_kind v2 =
   let same_kind (_,e,_) =
     e.dependency_kind = dependency_kind
   in
@@ -128,17 +136,22 @@ let ouptput_to_dot out_channel g =
         let text = Pretty_utils.to_string Node_kind.pretty v.node_kind in
         if text <> "" then
           l := build_label text :: !l;
-        let shape = match v.node_kind with
-        | Scalar _ -> [`Shape `Box]
-        | Composite _ -> [ `Shape `Box3d ]
-        | Scattered _ -> [ `Shape `Parallelogram ]
-        | Alarm _ ->  [ `Shape `Doubleoctagon ; `Style `Bold ]
-        | File -> [ `Style `Invis ]
+        let kind = match v.node_kind with
+          | Scalar _ -> [`Shape `Box]
+          | Composite _ -> [ `Shape `Box3d ]
+          | Scattered _ -> [ `Shape `Parallelogram ]
+          | Alarm _ ->  [ `Shape `Doubleoctagon ; `Style `Bold ]
+          | File -> [ `Style `Invis ]
+        and precision = match v.node_precision with
+          | Singleton -> [`Color 0x88aaff ;
+                          `Style `Filled ; `Fillcolor 0xaaccff]
+          | Normal -> []
+          | Wide -> [ `Color 0xff0000 ;
+                      `Style `Filled ; `Fillcolor 0xffbbbb ]
+          | Critical -> [ `Color 0xff0000 ; `Style `Bold ;
+                          `Style `Filled ; `Fillcolor 0xffbbbb ]
         in
-        l := shape @ !l;
-        if v.node_imprecise then
-          l := [ `Color 0xff0000 ;
-                 `Style `Filled ; `Fillcolor 0xffbbbb ] @ !l;
+        l := precision @ kind @ !l;
         if not v.node_deps_computed then
           l := [ `Style `Dotted ] @ !l;
         !l

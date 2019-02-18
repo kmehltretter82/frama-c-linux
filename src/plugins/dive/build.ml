@@ -52,15 +52,20 @@ let fval_has_large_range fkind fval =
     else
       min' <= -.limit || max' >= limit
 
-let is_imprecise_data kinstr lval =
+let compute_node_precision kinstr lval =
   let typ = Cil.typeOfLval lval in
   let state = Db.Value.get_state kinstr in
   let _,cvalue = !Db.Value.eval_lval None state lval in
-  match Cvalue.V.project_ival cvalue, typ with
-  | Ival.Float fval, TFloat (fkind,_) ->
-    fval_has_large_range fkind fval
-  | _ -> false
-  | exception Cvalue.V.Not_based_on_null -> false
+  let size = Integer.of_int (Cil.bitsSizeOf typ) in
+  let cardinal = Cvalue.V.cardinal_estimate ~size cvalue in
+  if Integer.(le cardinal one)
+  then Singleton
+  else
+    match Cvalue.V.project_ival cvalue, typ with
+    | Ival.Float fval, TFloat (fkind,_) ->
+      if fval_has_large_range fkind fval then Wide else Normal
+    | _ -> Normal
+    | exception Cvalue.V.Not_based_on_null -> Normal
 
 
 (* --- Locations handling --- *)
@@ -148,7 +153,7 @@ let reference_file context loc_file =
   if not (FileTable.mem context.file_table loc_file) then begin
     let node_kind = File
     and node_locality = { loc_file ; loc_function = None } in
-    let node = Graph.create_vertex context.graph node_kind node_locality in
+    let node = Graph.create_node context.graph ~node_kind ~node_locality in
     FileTable.add context.file_table loc_file node
   end
 
@@ -173,7 +178,7 @@ let build_node context kinstr location lval  =
     let node_locality = build_node_locality kinstr node_kind in
     let build_new_node _location =
       reference_file context node_locality.loc_file;
-      Graph.create_vertex context.graph ~node_kind ~node_locality
+      Graph.create_node context.graph ~node_kind ~node_locality
     in
     (* Compute the new location which might have changed after folding *)
     let location' =
@@ -197,8 +202,8 @@ let build_lval context kinstr lval =
   | None -> None
   | Some node ->
     (* Update the precision information *)
-    if is_imprecise_data kinstr lval then
-      node.node_imprecise <- true;
+    let node_precision = compute_node_precision kinstr lval in
+    Graph.update_node_precision node node_precision;
     Some node
 
 exception Too_many_deps of lval
@@ -302,12 +307,12 @@ and build_exp_deps context src stmt kind exp =
     build_exp_deps context src stmt kind e1;
     build_exp_deps context src stmt kind e2
 
-and build_lval_deps context src stmt dependency_kind lval =
+and build_lval_deps context src stmt kind lval =
   match build_lval context (Kstmt stmt) lval with
   | None -> ()
   | Some dst ->
     let allow_folding = true in
-    Graph.create_edge ~allow_folding context.graph dst ~dependency_kind src
+    Graph.create_dependency ~allow_folding context.graph dst kind src
 
 
 (* --- Graph initialization --- *)
