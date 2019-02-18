@@ -1000,3 +1000,24 @@ struct
 end
 
 (* -------------------------------------------------------------------------- *)
+(* --- Simplifier                                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
+exception Contradiction
+
+class type simplifier =
+  object
+    method name : string
+    method copy : simplifier
+    method assume : F.pred -> unit
+    method target : F.pred -> unit
+    method fixpoint : unit
+    method infer : F.pred list
+
+    method simplify_exp : F.term -> F.term
+    method simplify_hyp : F.pred -> F.pred
+    method simplify_branch : F.pred -> F.pred
+    method simplify_goal : F.pred -> F.pred
+  end
+
+(* -------------------------------------------------------------------------- *)
