@@ -551,7 +551,7 @@ class pane (proverpane : GuiConfig.provers) =
           let n = Task.size pool in
           if n = 0 then
             begin
-              ignore (ProofEngine.commit ~resolve:false fork) ;
+              ignore (ProofEngine.commit fork) ;
               ProofEngine.validate proof ;
               ProofEngine.forward proof ;
               state <- Proof proof ;

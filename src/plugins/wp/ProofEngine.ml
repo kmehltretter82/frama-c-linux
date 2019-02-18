@@ -52,13 +52,15 @@ module PROOFS = Model.StaticGenerator(Wpo.S)
       type key = Wpo.S.t
       type data = tree
       let name = "Wp.ProofEngine.Proofs"
-      let compile main = {
-        main ; gid = 0 ;
-        pool = None ;
-        head = None ;
-        root = None ;
-        saved = false ;
-      }
+      let compile main =
+        ignore (Wpo.resolve main) ;
+        {
+          main ; gid = 0 ;
+          pool = None ;
+          head = None ;
+          root = None ;
+          saved = false ;
+        }
     end)
 
 let () = Wpo.on_remove PROOFS.remove
@@ -143,6 +145,8 @@ let iteri f tree =
 (* --- Consolidating                                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
+let proved n = Wpo.is_proved n.goal
+
 let pending n =
   let k = ref 0 in
   walk (fun _ -> incr k) n ; !k
@@ -212,7 +216,6 @@ let status t : status =
       `Pending (pending root)
 
 
-let proved n = Wpo.is_proved n.goal
 let opened n = not (Wpo.is_proved n.goal)
 
 let state n =
@@ -387,14 +390,11 @@ let anchor tree ?node () =
           | Some n -> n
           | None -> mk_root tree
 
-let commit ~resolve fork =
-  let resolved (_,wp) =
-    Wpo.is_proved wp || ( resolve && Wpo.resolve wp ) in
-  let resolved , residual = List.partition resolved fork.Fork.goals in
-  iter_all Wpo.remove resolved ;
+let commit fork =
+  List.iter (fun (_,wp) -> ignore (Wpo.resolve wp)) fork.Fork.goals ;
   let tree = fork.Fork.tree in
   let anchor = fork.Fork.anchor in
-  let children = map_all (mk_tree_node ~tree ~anchor) residual in
+  let children = map_all (mk_tree_node ~tree ~anchor) fork.Fork.goals in
   tree.saved <- false ;
   anchor.script <- Tactic( fork.Fork.tactic , children ) ;
   anchor , children

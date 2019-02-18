@@ -157,7 +157,8 @@ val on_remove : (t -> unit) -> unit
 val add : t -> unit
 val age : t -> int (* generation *)
 
-val resolve : t -> bool (** tries simplification *)
+val reduce : t -> bool (** tries simplification *)
+val resolve : t -> bool (** tries simplification and set result if valid *)
 val set_result : t -> prover -> result -> unit
 val clear_results : t -> unit
 

@@ -71,7 +71,7 @@ type fork
 val anchor : tree -> ?node:node -> unit -> node
 val fork : tree -> anchor:node -> ProofScript.jtactic -> Tactical.process -> fork
 val iter : (Wpo.t -> unit) -> fork -> unit
-val commit : resolve:bool -> fork -> node * (string * node) list
+val commit : fork -> node * (string * node) list
 val pretty : Format.formatter -> fork -> unit
 
 val script : tree -> ProofScript.jscript
