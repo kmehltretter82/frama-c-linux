@@ -73,6 +73,24 @@ module Dynlink: sig
   val init: unit -> unit
 end
 
+module Format: sig
+  type stag
+  val string_of_stag: stag -> string
+  val stag_of_string: string -> stag
+  type formatter_stag_functions = {
+    mark_open_stag : stag -> string;
+    mark_close_stag : stag -> string;
+    print_open_stag : stag -> unit;
+    print_close_stag : stag -> unit;
+  }
+  val pp_set_formatter_stag_functions:
+    Format.formatter -> formatter_stag_functions -> unit
+  val pp_get_formatter_stag_functions:
+    Format.formatter -> unit -> formatter_stag_functions
+  val pp_open_stag : Format.formatter -> stag -> unit
+  val pp_close_stag : Format.formatter -> unit -> unit
+end
+
 (** {1 Zarith} *)
 
 (** Function [Q.to_float] was introduced in Zarith 1.5 *)

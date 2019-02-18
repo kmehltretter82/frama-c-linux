@@ -153,8 +153,16 @@ endif
 
 ifeq ($(HAS_OCAML408),yes)
   DYNLINK_INIT=fun () -> ()
+  FORMAT_STAG=stag
+  FORMAT_STRING_OF_STAG=match s with\n\
+      | Format.String_tag str -> str\n\
+      | _ -> raise (Invalid_argument "unsupported tag extension")
+  FORMAT_STAG_OF_STRING=Format.String_tag s
 else
   DYNLINK_INIT=Dynlink.init
+  FORMAT_STAG=tag
+  FORMAT_STRING_OF_STAG=s
+  FORMAT_STAG_OF_STRING=s
 endif
 
 src/libraries/stdlib/transitioning.ml: \
@@ -170,6 +178,9 @@ src/libraries/stdlib/transitioning.ml: \
          -e 's/@ASSOC_OPT@/$(ASSOC_OPT)/g' \
          -e 's/@ASSQ_OPT@/$(ASSQ_OPT)/g' \
          -e 's/@DYNLINK_INIT@/$(DYNLINK_INIT)/g' \
+         -e 's/@FORMAT_STAG@/$(FORMAT_STAG)/g' \
+         -e 's/@FORMAT_STRING_OF_STAG@/$(FORMAT_STRING_OF_STAG)/g' \
+         -e 's/@FORMAT_STAG_OF_STRING@/$(FORMAT_STAG_OF_STRING)/g' \
         $< > $@
 	$(CHMOD_RO) $@
 
