@@ -237,25 +237,25 @@ val scale : Integer.t -> t -> t
 
 val scale_div : pos:bool -> Integer.t -> t -> t
 (** [scale_div ~pos:false f v] is an over-approximation of the set of
-    elements [x / f] for [x] in [v].
+    elements [x c_div f] for [x] in [v].
 
     [scale_div ~pos:true f v] is an over-approximation of the set of
-    elements [x pos_div f] for [x] in [v]. *)
+    elements [x e_div f] for [x] in [v]. *)
 
 val scale_div_under : pos:bool -> Integer.t -> t -> t
 (** [scale_div_under ~pos:false f v] is an under-approximation of the
-    set of elements [x / f] for [x] in [v].
+    set of elements [x c_div f] for [x] in [v].
 
     [scale_div_under ~pos:true f v] is an under-approximation of the
-    set of elements [x pos_div f] for [x] in [v]. *)
+    set of elements [x e_div f] for [x] in [v]. *)
 
 val div : t -> t -> t (** Integer division *)
 val scale_rem : pos:bool -> Integer.t -> t -> t
 (** [scale_rem ~pos:false f v] is an over-approximation of the set of
-    elements [x mod f] for [x] in [v].
+    elements [x c_rem f] for [x] in [v].
 
     [scale_rem ~pos:true f v] is an over-approximation of the set of
-    elements [x pos_rem f] for [x] in [v]. *)
+    elements [x e_rem f] for [x] in [v]. *)
 
 val c_rem : t -> t -> t
 val mul : t -> t -> t

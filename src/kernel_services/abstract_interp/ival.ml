@@ -751,7 +751,7 @@ let compute_r_common r1 m1 r2 m2 =
      solutions (k1,k2) to (E2).
 
      Let d = pgcd(m1,m2). There are solutions to (E2) only if d
-     divides c (because d divides k1*m1 - k2*m2). Else we raise
+     divides r (because d divides k1*m1 - k2*m2). Else we raise
      [Error_Bottom]. *)
   let (x1,_,pgcd) = extended_euclidian_algorithm m1 m2 in
   let r = Int.sub r2 r1 in
@@ -762,7 +762,7 @@ let compute_r_common r1 m1 r2 m2 =
   (* The extended euclidian algorithm has provided solutions x1,x2 to
      the Bezout identity x1*m1 + x2*m2 = d.
 
-     x1*m1 + x2*m2 = d ==> x1*(c/d)*m1 + x2*(r/d)*m2 = d*(r/d).
+     x1*m1 + x2*m2 = d ==> x1*(r/d)*m1 + x2*(r/d)*m2 = d*(r/d).
 
      Thus, k1 = x1*(r/d), k2=-x2*(r/d) are solutions to (E2)
      Thus, x = r1 + x1*(r/d)*m1 is a particular solution to (E1). *)
@@ -1681,7 +1681,7 @@ let div x y =
    elements [x mod f] for [x] in [v].
 
    [scale_rem ~pos:true f v] is an over-approximation of the set of
-   elements [x pos_rem f] for [x] in [v].
+   elements [x e_rem f] for [x] in [v].
 *)
 let scale_rem ~pos f v =
 (*     Format.printf "scale_rem %b %a %a@."

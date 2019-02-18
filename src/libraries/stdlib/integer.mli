@@ -61,7 +61,7 @@ val e_div : t -> t -> t
     Equivalent to C division if both operands are positive.
     Equivalent to a floored division if b > 0 (rounds downwards),
     otherwise rounds upwards.
-    Note: it is possible that pos_div (-a) b <> pos_div a (-b).
+    Note: it is possible that e_div (-a) b <> e_div a (-b).
 *)
 
 val e_rem : t -> t -> t
@@ -81,7 +81,7 @@ val c_rem : t -> t -> t
     Implemented by [Z.rem] *)
 
 val c_div_rem : t -> t -> t * t
-(** Remainder of the truncated division towards 0 (like in C99.
+(** [c_div_rem a b] returns [(c_div a b, c_rem a b)].
     Implemented by [Z.div_rem] *)
 
 val pgcd : t -> t -> t
