@@ -8,7 +8,7 @@
     assigns *x \from *x, x;
     
     behavior b1:
-      assumes *y ≡ 1;
+      assumes *x ≡ 1;
       ensures *\old(x) < 0;
       assigns \nothing;
     
@@ -83,7 +83,7 @@ int main(void)
     assigns *x \from *x, x;
     
     behavior b1:
-      assumes *y ≡ 1;
+      assumes *x ≡ 1;
       ensures *\old(x) < 0;
       assigns \nothing;
     
@@ -96,8 +96,6 @@ int main(void)
  */
 void __gen_e_acsl_f(int *x, int *y)
 {
-  int *__gen_e_acsl_at_2;
-  int __gen_e_acsl_at;
   {
     int __gen_e_acsl_valid;
     __e_acsl_store_block((void *)(& y),(size_t)8);
@@ -107,36 +105,10 @@ void __gen_e_acsl_f(int *x, int *y)
     __e_acsl_assert(__gen_e_acsl_valid,(char *)"Precondition",(char *)"f",
                     (char *)"\\valid(y)",12);
   }
-  __gen_e_acsl_at_2 = x;
-  {
-    int __gen_e_acsl_valid_read;
-    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)y,sizeof(int),
-                                                  (void *)y,(void *)(& y));
-    __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"f",
-                    (char *)"mem_access: \\valid_read(y)",17);
-    __gen_e_acsl_at = *y == 1;
-  }
   f(x,y);
-  {
-    int __gen_e_acsl_implies;
-    if (! __gen_e_acsl_at) __gen_e_acsl_implies = 1;
-    else {
-      int __gen_e_acsl_valid_read_2;
-      __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)__gen_e_acsl_at_2,
-                                                      sizeof(int),
-                                                      (void *)__gen_e_acsl_at_2,
-                                                      (void *)(& __gen_e_acsl_at_2));
-      __e_acsl_assert(__gen_e_acsl_valid_read_2,(char *)"RTE",(char *)"f",
-                      (char *)"mem_access: \\valid_read(__gen_e_acsl_at_2)",
-                      19);
-      __gen_e_acsl_implies = *__gen_e_acsl_at_2 < 0;
-    }
-    __e_acsl_assert(__gen_e_acsl_implies,(char *)"Postcondition",(char *)"f",
-                    (char *)"\\old(*y == 1) ==> *\\old(x) < 0",19);
-    __e_acsl_delete_block((void *)(& y));
-    __e_acsl_delete_block((void *)(& x));
-    return;
-  }
+  __e_acsl_delete_block((void *)(& y));
+  __e_acsl_delete_block((void *)(& x));
+  return;
 }
 
 

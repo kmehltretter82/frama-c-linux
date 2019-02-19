@@ -8,7 +8,7 @@
     assigns *x \from *x, x;
     
     behavior b1:
-      assumes *y ≡ 1;
+      assumes *x ≡ 1;
       ensures *\old(x) < 0;
       assigns \nothing;
     
@@ -107,7 +107,7 @@ int main(void)
     assigns *x \from *x, x;
     
     behavior b1:
-      assumes *y ≡ 1;
+      assumes *x ≡ 1;
       ensures *\old(x) < 0;
       assigns \nothing;
     
@@ -126,17 +126,6 @@ void __gen_e_acsl_f(int *x, int *y)
   int __gen_e_acsl_at_3;
   int *__gen_e_acsl_at_2;
   int __gen_e_acsl_at;
-  {
-    int __gen_e_acsl_valid;
-    __e_acsl_store_block((void *)(& y),(size_t)8);
-    __e_acsl_store_block((void *)(& x),(size_t)8);
-    __gen_e_acsl_valid = __e_acsl_valid((void *)y,sizeof(int),(void *)y,
-                                        (void *)(& y));
-    __e_acsl_assert(__gen_e_acsl_valid,(char *)"Precondition",(char *)"f",
-                    (char *)"\\valid(y)",12);
-    __e_acsl_assert(*x >= 0,(char *)"Precondition",(char *)"f",
-                    (char *)"*x >= 0",13);
-  }
   {
     int __gen_e_acsl_valid_read_5;
     __gen_e_acsl_valid_read_5 = __e_acsl_valid_read((void *)x,sizeof(int),
@@ -158,11 +147,22 @@ void __gen_e_acsl_f(int *x, int *y)
   __gen_e_acsl_at_2 = x;
   {
     int __gen_e_acsl_valid_read;
-    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)y,sizeof(int),
-                                                  (void *)y,(void *)(& y));
+    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)x,sizeof(int),
+                                                  (void *)x,(void *)(& x));
     __e_acsl_assert(__gen_e_acsl_valid_read,(char *)"RTE",(char *)"f",
-                    (char *)"mem_access: \\valid_read(y)",17);
-    __gen_e_acsl_at = *y == 1;
+                    (char *)"mem_access: \\valid_read(x)",17);
+    __gen_e_acsl_at = *x == 1;
+  }
+  {
+    int __gen_e_acsl_valid;
+    __e_acsl_store_block((void *)(& y),(size_t)8);
+    __e_acsl_store_block((void *)(& x),(size_t)8);
+    __gen_e_acsl_valid = __e_acsl_valid((void *)y,sizeof(int),(void *)y,
+                                        (void *)(& y));
+    __e_acsl_assert(__gen_e_acsl_valid,(char *)"Precondition",(char *)"f",
+                    (char *)"\\valid(y)",12);
+    __e_acsl_assert(*x >= 0,(char *)"Precondition",(char *)"f",
+                    (char *)"*x >= 0",13);
   }
   f(x,y);
   {
@@ -181,7 +181,7 @@ void __gen_e_acsl_f(int *x, int *y)
       __gen_e_acsl_implies = *__gen_e_acsl_at_2 < 0;
     }
     __e_acsl_assert(__gen_e_acsl_implies,(char *)"Postcondition",(char *)"f",
-                    (char *)"\\old(*y == 1) ==> *\\old(x) < 0",19);
+                    (char *)"\\old(*x == 1) ==> *\\old(x) < 0",19);
     if (! __gen_e_acsl_at_3) __gen_e_acsl_implies_2 = 1;
     else {
       int __gen_e_acsl_valid_read_4;
