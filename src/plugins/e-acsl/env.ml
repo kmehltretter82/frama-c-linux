@@ -93,7 +93,7 @@ end = struct
 
 end
 
-let empty_block = 
+let empty_block =
   { new_block_vars = [];
     new_stmts = [];
     pre_stmts = [];
@@ -104,19 +104,19 @@ let empty_mpz_tbl =
   { new_exps = Term.Map.empty;
     clear_stmts = [] }
 
-let empty_local_env = 
-  { block_info = empty_block; 
+let empty_local_env =
+  { block_info = empty_block;
     mpz_tbl = empty_mpz_tbl;
     rte = true }
 
-let dummy = 
+let dummy =
   { visitor = new Visitor.generic_frama_c_visitor (Cil.inplace_visit ());
     lscope = Lscope.empty;
     lscope_reset = true;
     annotation_kind = Misc.Assertion;
     new_global_vars = [];
-    global_mpz_tbl = empty_mpz_tbl; 
-    env_stack = []; 
+    global_mpz_tbl = empty_mpz_tbl;
+    env_stack = [];
     var_mapping = Logic_var.Map.empty;
     loop_invariants = [];
     cpt = 0; }
@@ -127,15 +127,15 @@ let empty v =
     lscope_reset = true;
     annotation_kind = Misc.Assertion;
     new_global_vars = [];
-    global_mpz_tbl = empty_mpz_tbl; 
-    env_stack = []; 
+    global_mpz_tbl = empty_mpz_tbl;
+    env_stack = [];
     var_mapping = Logic_var.Map.empty;
     loop_invariants = [];
     cpt = 0 }
 
-
-let top env =
-  match env.env_stack with [] -> assert false | hd :: tl -> hd, tl
+let top env = match env.env_stack with
+  | [] -> Options.fatal "Empty environment. That is unexpected."
+  | hd :: tl -> hd, tl
 
 let has_no_new_stmt env =
   let local, _ = top env in
@@ -145,7 +145,7 @@ let has_no_new_stmt env =
 (** {2 Loop invariants} *)
 (* ************************************************************************** *)
 
-let push_loop env = 
+let push_loop env =
   { env with loop_invariants = [] :: env.loop_invariants }
 
 let add_loop_invariant env inv = match env.loop_invariants with

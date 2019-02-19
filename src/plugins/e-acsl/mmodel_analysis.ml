@@ -453,35 +453,43 @@ let register_predicate kf pred state =
       (fun state ->
         let state = Env.default_varinfos state in
         let state =
-          if (is_first || is_last) && Functions.RTL.is_generated_kf kf then
-            Annotations.fold_behaviors
-              (fun _ bhv s ->
-                let handle_annot test f s =
-                  if test then
-                    f (fun _ p s -> register_predicate kf p s) kf bhv.b_name s
-                  else
-                    s
-                in
-                let s = handle_annot is_first Annotations.fold_requires s in
-                let s = handle_annot is_first Annotations.fold_assumes s in
-                handle_annot
-                  is_last
-                  (fun f -> Annotations.fold_ensures (fun e (_, p) -> f e p)) s)
-              kf
+          if Functions.check kf then
+            let state =
+              if (is_first || is_last) && Functions.RTL.is_generated_kf kf then
+                Annotations.fold_behaviors
+                  (fun _ bhv s ->
+                    let handle_annot test f s =
+                      if test then
+                        f
+                          (fun _ p s -> register_predicate kf p s)
+                          kf
+                          bhv.b_name
+                          s
+                      else
+                        s
+                  in
+                    let s = handle_annot is_first Annotations.fold_requires s in
+                    let s = handle_annot is_first Annotations.fold_assumes s in
+                    handle_annot
+                      is_last
+                      (fun f ->
+                        Annotations.fold_ensures (fun e (_, p) -> f e p)) s)
+                  kf
+                  state
+              else
+                state
+            in
+            let state =
+              Annotations.fold_code_annot
+                (fun _ -> register_code_annot kf) stmt state
+            in
+            if stmt.ghost then
+              let rtes = Rte.stmt kf stmt in
+              List.fold_left
+                (fun state a -> register_code_annot kf a state) state rtes
+            else
               state
-          else
-            state
-        in
-        let state =
-          Annotations.fold_code_annot
-            (fun _ -> register_code_annot kf) stmt state
-        in
-        let state =
-          if stmt.ghost then
-            let rtes = Rte.stmt kf stmt in
-            List.fold_left
-              (fun state a -> register_code_annot kf a state) state rtes
-          else
+          else (* not (Options.Functions.check kf): do not monitor [kf] *)
             state
         in
         let state =
