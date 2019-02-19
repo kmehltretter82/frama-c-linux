@@ -1,67 +1,86 @@
-tests/builtin/strcmp.c:32:[kernel] warning: Calling undeclared function fork. Old style K&R code?
+[kernel:typing:implicit-function-declaration] tests/builtin/strcmp.c:32: Warning: 
+  Calling undeclared function fork. Old style K&R code?
 [e-acsl] beginning translation.
-[e-acsl] warning: annotating undefined function `abort':
-    the generated program may miss memory instrumentation
-    if there are memory-related annotations.
-[e-acsl] warning: annotating undefined function `exit':
-    the generated program may miss memory instrumentation
-    if there are memory-related annotations.
-[e-acsl] warning: annotating undefined function `strcmp':
-    the generated program may miss memory instrumentation
-    if there are memory-related annotations.
-[e-acsl] warning: annotating undefined function `strncmp':
-    the generated program may miss memory instrumentation
-    if there are memory-related annotations.
-[e-acsl] warning: annotating undefined function `strdup':
-    the generated program may miss memory instrumentation
-    if there are memory-related annotations.
-FRAMAC_SHARE/libc/stdio.h:146:[kernel] warning: Neither code nor specification for function fprintf, generating default assigns from the prototype
-FRAMAC_SHARE/libc/stdio.h:150:[kernel] warning: Neither code nor specification for function printf, generating default assigns from the prototype
-FRAMAC_SHARE/libc/sys/wait.h:60:[kernel] warning: Neither code nor specification for function waitpid, generating default assigns from the prototype
-tests/builtin/strcmp.c:32:[kernel] warning: Neither code nor specification for function fork, generating default assigns from the prototype
-FRAMAC_SHARE/libc/string.h:396:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-    Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:396:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-    Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:399:[e-acsl] warning: E-ACSL construct `trange' is not yet supported. Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:127:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-    Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:128:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-    Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:128:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-    Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:130:[e-acsl] warning: E-ACSL construct `logic function returning an integer' is not yet supported.
-    Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:120:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-    Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:121:[e-acsl] warning: E-ACSL construct `logic function application' is not yet supported.
-    Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:121:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-    Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:123:[e-acsl] warning: E-ACSL construct `logic function returning an integer' is not yet supported.
-    Ignoring annotation.
-FRAMAC_SHARE/libc/string.h:123:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-    Ignoring annotation.
-FRAMAC_SHARE/libc/stdlib.h:415:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-    Ignoring annotation.
+[e-acsl] Warning: annotating undefined function `abort':
+  the generated program may miss memory instrumentation
+  if there are memory-related annotations.
+[e-acsl] Warning: annotating undefined function `exit':
+  the generated program may miss memory instrumentation
+  if there are memory-related annotations.
+[e-acsl] Warning: annotating undefined function `waitpid':
+  the generated program may miss memory instrumentation
+  if there are memory-related annotations.
+[e-acsl] Warning: annotating undefined function `strcmp':
+  the generated program may miss memory instrumentation
+  if there are memory-related annotations.
+[e-acsl] Warning: annotating undefined function `strncmp':
+  the generated program may miss memory instrumentation
+  if there are memory-related annotations.
+[e-acsl] Warning: annotating undefined function `strdup':
+  the generated program may miss memory instrumentation
+  if there are memory-related annotations.
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/stdio.h:165: Warning: 
+  Neither code nor specification for function fprintf, generating default assigns from the prototype
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/stdio.h:169: Warning: 
+  Neither code nor specification for function printf, generating default assigns from the prototype
+[kernel:annot:missing-spec] tests/builtin/strcmp.c:32: Warning: 
+  Neither code nor specification for function fork, generating default assigns from the prototype
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:394: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:446: Warning: 
+  E-ACSL construct `logic function application' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:446: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:453: Warning: 
+  E-ACSL construct `logic function application' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:144: Warning: 
+  E-ACSL construct `logic function application' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:145: Warning: 
+  E-ACSL construct `logic function application' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:145: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:147: Warning: 
+  E-ACSL construct `logic function returning an integer' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:137: Warning: 
+  E-ACSL construct `logic function application' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:138: Warning: 
+  E-ACSL construct `logic function application' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:138: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:140: Warning: 
+  E-ACSL construct `logic function returning an integer' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/sys/wait.h:92: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/sys/wait.h:86: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:406: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[value] Analyzing a complete application starting at main
-[value] Computing initial state
-[value] Initial state computed
-[value:initial-state] Values of globals at initialization
-  __fc_rand_max ∈ {32767}
-  __fc_heap_status ∈ [--..--]
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
   __e_acsl_init ∈ [--..--]
-  stderr ∈ {{ NULL ; &S___fc_stderr[0] }}
-  __fc_fopen[0..15] ∈ {0}
-  __fc_p_fopen ∈ {{ &__fc_fopen[0] }}
   __e_acsl_heap_allocation_size ∈ [--..--]
   __e_acsl_math_HUGE_VAL ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
   __e_acsl_math_HUGE_VALF ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
   __e_acsl_math_INFINITY ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
-  __fc_time ∈ [--..--]
   testno ∈ {0}
-  __fc_strtok_ptr ∈ {0}
   __gen_e_acsl_literal_string ∈ {0}
   __gen_e_acsl_literal_string_2 ∈ {0}
   __gen_e_acsl_literal_string_3 ∈ {0}
@@ -94,14 +113,149 @@ FRAMAC_SHARE/libc/stdlib.h:415:[e-acsl] warning: E-ACSL construct `assigns claus
   __gen_e_acsl_literal_string_30 ∈ {0}
   __gen_e_acsl_literal_string_31 ∈ {0}
   __gen_e_acsl_literal_string_32 ∈ {0}
-  S___fc_stderr[0..1] ∈ [--..--]
-[value] using specification for function __e_acsl_memory_init
-[value] using specification for function __e_acsl_store_block
-[value] using specification for function __e_acsl_full_init
-[value] using specification for function __e_acsl_mark_readonly
-[value] using specification for function strdup
-FRAMAC_SHARE/libc/string.h:396:[value] warning: ignoring unsupported \allocates clause
-FRAMAC_SHARE/libc/string.h:399:[value] warning: function strdup: this postcondition evaluates to false in this context.
-    If it is valid, either a precondition was not verified for this call,
-    or some assigns/from clauses are incomplete (or incorrect).
-[value] done for function main
+[eva] using specification for function __e_acsl_memory_init
+[eva] using specification for function __e_acsl_store_block
+[eva] using specification for function __e_acsl_full_init
+[eva] using specification for function __e_acsl_mark_readonly
+[eva] using specification for function strdup
+[eva:libc:unsupported-spec] FRAMAC_SHARE/libc/string.h:443: Warning: 
+  The specification of function 'strdup' is currently not supported by Eva.
+  Consider adding FRAMAC_SHARE/libc/string.c
+  to the analyzed source files.
+[eva] FRAMAC_SHARE/libc/string.h:443: Warning: 
+  ignoring unsupported \allocates clause
+[eva] using specification for function __e_acsl_delete_block
+[eva:alarm] FRAMAC_SHARE/libc/string.h:449: Warning: 
+  function __gen_e_acsl_strdup, behavior allocation: postcondition 'allocation' got status unknown. (Behavior may be inactive, no reduction performed.)
+[eva:alarm] FRAMAC_SHARE/libc/string.h:451: Warning: 
+  function __gen_e_acsl_strdup, behavior allocation: postcondition 'result_valid_string_and_same_contents' got status invalid. (Behavior may be inactive, no reduction performed.)
+[eva:alarm] FRAMAC_SHARE/libc/string.h:456: Warning: 
+  function __gen_e_acsl_strdup, behavior no_allocation: postcondition 'result_null' got status unknown. (Behavior may be inactive, no reduction performed.)
+[eva] using specification for function fork
+[eva] using specification for function __e_acsl_builtin_strcmp
+[eva] FRAMAC_SHARE/libc/string.h:140: 
+  cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
+[eva:alarm] FRAMAC_SHARE/libc/string.h:140: Warning: 
+  function __gen_e_acsl_strcmp: postcondition 'acsl_c_equiv' got status unknown.
+[eva] using specification for function fprintf
+[eva] using specification for function abort
+[eva] using specification for function exit
+[eva] using specification for function __e_acsl_valid
+[eva] using specification for function __e_acsl_assert
+[eva] using specification for function waitpid
+[eva] using specification for function __e_acsl_initialized
+[eva:alarm] FRAMAC_SHARE/libc/sys/wait.h:86: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/sys/wait.h:86: Warning: 
+  function __gen_e_acsl_waitpid: postcondition 'initialization,stat_loc_init_on_success' got status unknown.
+[eva:alarm] tests/builtin/strcmp.c:32: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status);
+[eva] using specification for function printf
+[eva:alarm] tests/builtin/strcmp.c:33: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_0);
+[eva:alarm] tests/builtin/strcmp.c:34: Warning: 
+  function __gen_e_acsl_strcmp: precondition 'valid_string_s1' got status invalid.
+[eva:alarm] tests/builtin/strcmp.c:34: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_1);
+[eva] using specification for function __e_acsl_initialize
+[eva:alarm] tests/builtin/strcmp.c:36: Warning: 
+  function __gen_e_acsl_strcmp: precondition 'valid_string_s1' got status invalid.
+[eva:alarm] tests/builtin/strcmp.c:36: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_2);
+[eva:alarm] tests/builtin/strcmp.c:37: Warning: 
+  function __gen_e_acsl_strcmp: precondition 'valid_string_s2' got status invalid.
+[eva:alarm] tests/builtin/strcmp.c:37: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_3);
+[eva:alarm] tests/builtin/strcmp.c:38: Warning: 
+  out of bounds write. assert \valid(dl + 3);
+[kernel] tests/builtin/strcmp.c:38: Warning: 
+  all target addresses were invalid. This path is assumed to be dead.
+[eva:alarm] tests/builtin/strcmp.c:38: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_4);
+[eva:alarm] tests/builtin/strcmp.c:39: Warning: 
+  out of bounds write. assert \valid(dr + 3);
+[kernel] tests/builtin/strcmp.c:39: Warning: 
+  all target addresses were invalid. This path is assumed to be dead.
+[eva:alarm] tests/builtin/strcmp.c:39: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_5);
+[eva:alarm] tests/builtin/strcmp.c:41: Warning: 
+  function __gen_e_acsl_strcmp: precondition 'valid_string_s1' got status invalid.
+[eva:alarm] tests/builtin/strcmp.c:41: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_6);
+[eva:alarm] tests/builtin/strcmp.c:42: Warning: 
+  function __gen_e_acsl_strcmp: precondition 'valid_string_s1' got status invalid.
+[eva:alarm] tests/builtin/strcmp.c:42: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_7);
+[eva:alarm] tests/builtin/strcmp.c:44: Warning: 
+  function free: precondition 'freeable' got status unknown.
+[eva:alarm] tests/builtin/strcmp.c:45: Warning: 
+  function free: precondition 'freeable' got status unknown.
+[eva:alarm] tests/builtin/strcmp.c:47: Warning: 
+  function __gen_e_acsl_strcmp: precondition 'valid_string_s1' got status invalid.
+[eva:alarm] tests/builtin/strcmp.c:47: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_8);
+[eva:alarm] tests/builtin/strcmp.c:48: Warning: 
+  function __gen_e_acsl_strcmp: precondition 'valid_string_s2' got status invalid.
+[eva:alarm] tests/builtin/strcmp.c:48: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_9);
+[eva] using specification for function __e_acsl_builtin_strncmp
+[eva] FRAMAC_SHARE/libc/string.h:147: 
+  cannot evaluate ACSL term, unsupported ACSL construct: logic function strncmp
+[eva:alarm] FRAMAC_SHARE/libc/string.h:147: Warning: 
+  function __gen_e_acsl_strncmp: postcondition 'acsl_c_equiv' got status unknown.
+[eva:alarm] tests/builtin/strcmp.c:57: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_10);
+[eva:alarm] tests/builtin/strcmp.c:58: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_11);
+[eva:alarm] tests/builtin/strcmp.c:59: Warning: 
+  function __gen_e_acsl_strncmp: precondition 'valid_string_s1' got status invalid.
+[eva:alarm] tests/builtin/strcmp.c:59: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_12);
+[eva:alarm] tests/builtin/strcmp.c:61: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_13);
+[eva:alarm] tests/builtin/strcmp.c:62: Warning: 
+  function __gen_e_acsl_strncmp: precondition 'valid_string_s1' got status invalid.
+[eva:alarm] tests/builtin/strcmp.c:62: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_14);
+[eva:alarm] tests/builtin/strcmp.c:65: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_15);
+[eva:alarm] tests/builtin/strcmp.c:66: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_16);
+[eva:alarm] tests/builtin/strcmp.c:67: Warning: 
+  out of bounds write. assert \valid(dl + 3);
+[kernel] tests/builtin/strcmp.c:67: Warning: 
+  all target addresses were invalid. This path is assumed to be dead.
+[eva:alarm] tests/builtin/strcmp.c:67: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_17);
+[eva:alarm] tests/builtin/strcmp.c:68: Warning: 
+  out of bounds write. assert \valid(dr + 3);
+[kernel] tests/builtin/strcmp.c:68: Warning: 
+  all target addresses were invalid. This path is assumed to be dead.
+[eva:alarm] tests/builtin/strcmp.c:68: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_18);
+[eva:alarm] tests/builtin/strcmp.c:71: Warning: 
+  function __gen_e_acsl_strncmp: precondition 'valid_string_s1' got status invalid.
+[eva:alarm] tests/builtin/strcmp.c:71: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_19);
+[eva:alarm] tests/builtin/strcmp.c:72: Warning: 
+  function __gen_e_acsl_strncmp: precondition 'valid_string_s2' got status invalid.
+[eva:alarm] tests/builtin/strcmp.c:72: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_20);
+[eva:alarm] tests/builtin/strcmp.c:73: Warning: 
+  out of bounds write. assert \valid(dl + 3);
+[kernel] tests/builtin/strcmp.c:73: Warning: 
+  all target addresses were invalid. This path is assumed to be dead.
+[eva:alarm] tests/builtin/strcmp.c:73: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_21);
+[eva:alarm] tests/builtin/strcmp.c:74: Warning: 
+  out of bounds write. assert \valid(dr + 3);
+[kernel] tests/builtin/strcmp.c:74: Warning: 
+  all target addresses were invalid. This path is assumed to be dead.
+[eva:alarm] tests/builtin/strcmp.c:74: Warning: 
+  accessing uninitialized left-value. assert \initialized(&process_status_22);
+[eva:alarm] tests/builtin/strcmp.c:76: Warning: 
+  function free: precondition 'freeable' got status unknown.
+[eva:alarm] tests/builtin/strcmp.c:77: Warning: 
+  function free: precondition 'freeable' got status unknown.
+[eva] using specification for function __e_acsl_memory_clean
+[eva] done for function main
