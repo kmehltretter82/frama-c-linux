@@ -124,16 +124,7 @@ sig
   *)
   type on_alarm = kernel_function -> stmt -> invalid:bool -> Alarms.alarm -> unit
 
-  (** Low-level iterators
-
-      The [on_alarm ki ?status alarm] callback is invoked with
-      the k-instruction originating the alarm and the already known status,
-      if any.
-
-      Potential alarms can be specified by the provided flags,
-      with defaults from the Kernel and RTE plug-in options.
-  *)
-
+  (** Type of low-level iterators visiting an element ['a] of the AST *)
   type 'a iterator =
     ?flags:flags -> on_alarm ->
     Kernel_function.t -> Cil_types.stmt -> 'a -> unit
