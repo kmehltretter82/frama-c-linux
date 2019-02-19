@@ -32,5 +32,6 @@ val fold_base : t -> Cil_types.varinfo -> unit
 val hide_base : t -> Cil_types.varinfo -> unit
 val unhide_base : t -> Cil_types.varinfo -> unit
 
-val add_lval : ?depth_limit:int -> t -> Cil_types.kinstr -> Cil_types.lval -> unit
-val add_var :  ?depth_limit:int -> t -> Cil_types.varinfo -> unit
+val add_lval : ?depth:int -> t -> Cil_types.kinstr -> Cil_types.lval -> unit
+val add_var : ?depth:int -> t -> Cil_types.varinfo -> unit
+val add_alarm : ?depth:int -> t -> Cil_types.stmt -> Alarms.alarm -> unit

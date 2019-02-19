@@ -44,10 +44,11 @@ module DepthLimit = Int
       let default = 3
     end)
 
-module FromAlarms = True
+module FromFunctionAlarms = Kernel_function_set
     (struct
-      let option_name = "-dive-from-alarms"
-      let help = "Build the graph from alarms presents in the code."
+      let option_name = "-dive-from-function-alarms"
+      let help = "Build the graph from alarms presents in the functions."
+      let arg_name = "f1,..."
     end)
 
 module Varinfo =

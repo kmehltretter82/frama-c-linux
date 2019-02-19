@@ -118,6 +118,11 @@ let build_node_kind ~is_folded_base lval location =
   | None ->
     Scattered (lval)
 
+let stmt_to_node_locality stmt =
+  let kf = Kernel_function.find_englobing_kf stmt in
+  let file = get_loc_filename (Kernel_function.get_location kf) in
+  { loc_file = file ; loc_function = Some kf }
+
 let build_node_locality kinstr kind =
   match Node_kind.get_base kind with
   | Some vi ->
@@ -127,10 +132,7 @@ let build_node_locality kinstr kind =
   | None ->
     match kinstr with
     | Kglobal -> assert false
-    | Kstmt stmt ->
-      let kf = Kernel_function.find_englobing_kf stmt in
-      let file = get_loc_filename (Kernel_function.get_location kf) in
-      { loc_file = file ; loc_function = Some kf }
+    | Kstmt stmt -> stmt_to_node_locality stmt
 
 
 (* --- Context object --- *)
@@ -206,6 +208,12 @@ let build_lval context kinstr lval =
     Graph.update_node_precision node node_precision;
     Some node
 
+let build_alarm context stmt alarm =
+  let node_kind = Alarm (stmt,alarm)
+  and node_locality = stmt_to_node_locality stmt
+  and node_precision = Critical in
+  Graph.create_node context.graph ~node_precision ~node_kind ~node_locality
+
 exception Too_many_deps of lval
 
 let rec build_node_deps context node =
@@ -217,8 +225,8 @@ let rec build_node_deps context node =
     build_writes_deps context node (Cil_types.Var vi, Cil_types.NoOffset);
     if vi.vformal then build_arg_deps context node vi
   | Scattered (_lval) -> () (* TODO: implements *)
-  | Alarm (stmt,exp) ->
-    build_exp_deps context node stmt Data exp
+  | Alarm (stmt,alarm) ->
+    build_alarm_deps context node stmt alarm
   | File -> ()
 
 and build_writes_deps context src lval =
@@ -273,6 +281,22 @@ and build_call_deps context src stmt callee args =
   let kinstr = Kstmt stmt in
   let _,set = !Db.Value.expr_to_kernel_function kinstr ~deps:None callee in
   Kernel_function.Hptset.iter (build_return_deps context src stmt args) set
+
+and build_alarm_deps context src stmt alarm =
+  let for_exp e =
+    build_exp_deps context src stmt Data e
+  in
+  let open Alarms in
+  match alarm with
+  | Division_by_zero e | Index_out_of_bound (e, _) | Invalid_shift (e,_)
+  | Overflow (_,e,_,_) | Float_to_int (e,_,_) | Is_nan_or_infinite (e,_)
+  | Is_nan (e,_) | Function_pointer (e,_) -> for_exp e
+  | Pointer_comparison (opt_e1,e2) -> Extlib.may for_exp opt_e1; for_exp e2
+  | Differing_blocks (e1,e2) -> for_exp e1; for_exp e2
+  | Memory_access _ | Not_separated _ | Overlap _
+  | Uninitialized _ | Dangling _ | Uninitialized_union _ -> ()
+    (* TODO: adress depencies inside lval *)
+  | Invalid_bool lv -> build_lval_deps context src stmt Data lv
 
 and build_instr_deps context src stmt = function
   | Set (_, exp, _) ->
@@ -353,33 +377,39 @@ let unhide_base context vi =
   context.hidden_bases <- BaseSet.add vi context.hidden_bases
 
 let should_auto_explore node =
-  Node_kind.is_precise node.node_kind
+  match node.node_kind with
+  | Scalar _ | Composite _ | Alarm _ -> true
+  | Scattered _ | File -> false
 
-let complete_in_depth ~depth_limit context root =
+let complete_in_depth ~depth context root =
   context.roots <- root :: context.roots;
   (* Breadth first search *)
   let queue : (node * int) Queue.t = Queue.create () in
   Queue.add (root,0) queue;
   while not (Queue.is_empty queue) do
-    let v,depth = Queue.take queue in
-    if depth < depth_limit then begin
-      if not (v.node_deps_computed) && should_auto_explore v then begin
+    let (n,d) = Queue.take queue in
+    if d < depth then begin
+      if not (n.node_deps_computed) && should_auto_explore n then begin
         begin try
-            build_node_deps context v;
+            build_node_deps context n;
           with Too_many_deps lval ->
             Self.warning "Too many dependencies for %a ; throwing them out"
               Cil_printer.pp_lval lval;
         end;
-        v.node_deps_computed <- true;
+        n.node_deps_computed <- true;
       end;
-      Graph.iter_pred (fun w -> Queue.add (w,depth+1) queue) context.graph v
+      Graph.iter_pred (fun n' -> Queue.add (n',d+1) queue) context.graph n
     end;
   done
 
-let add_var ?(depth_limit=1) context varinfo =
+let add_var ?(depth=1) context varinfo =
   let node = build_var context varinfo in
-  Extlib.may (complete_in_depth ~depth_limit context) node
+  Extlib.may (complete_in_depth ~depth context) node
 
-let add_lval ?(depth_limit=1) context kinstr lval =
+let add_lval ?(depth=1) context kinstr lval =
   let node = build_lval context kinstr lval in
-  Extlib.may (complete_in_depth ~depth_limit context) node
+  Extlib.may (complete_in_depth ~depth context) node
+
+let add_alarm ?(depth=1) context stmt alarm =
+  let node = build_alarm context stmt alarm in
+  complete_in_depth ~depth context node

@@ -49,12 +49,12 @@ include G
 let next_node_key = ref 0
 let next_dependency_key = ref 0
 
-let create_node g ~node_kind ~node_locality =
+let create_node ?(node_precision=Singleton) ~node_kind ~node_locality g =
   let node = {
     node_key = !next_node_key;
     node_kind;
     node_locality;
-    node_precision = Singleton;
+    node_precision;
     node_deps_computed = false;
   }
   in

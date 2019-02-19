@@ -28,7 +28,7 @@ module type Varinfo_set = Parameter_sig.Set
 
 module OutputBasename : Parameter_sig.String
 module DepthLimit : Parameter_sig.Int
-module FromAlarms : Parameter_sig.Bool
+module FromFunctionAlarms : Parameter_sig.Kernel_function_set
 module FromBases : Varinfo_set
 module UnfoldedBases : Varinfo_set
 module HiddenBases : Varinfo_set

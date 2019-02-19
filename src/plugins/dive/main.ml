@@ -21,15 +21,23 @@
 (**************************************************************************)
 
 let main () =
-  if not (Self.FromBases.is_empty ()) then begin
+  if not (Self.FromBases.is_empty () &&
+          Self.FromFunctionAlarms.is_empty ()) then begin
     (* Create the initial graph  *)
     let context = Build.create () in
     (* Handle parameters *)
     Self.UnfoldedBases.iter (Build.unfold_base context);
     Self.HiddenBases.iter (Build.hide_base context);
+    let depth = Self.DepthLimit.get () in
     (* Add targeted vars to it *)
-    let depth_limit = Self.DepthLimit.get () in
-    Self.FromBases.iter (Build.add_var ~depth_limit context);
+    Self.FromBases.iter (Build.add_var ~depth context);
+    (* Add alarms *)
+    let add_alarm _emitter kf stmt ~rank:_ alarm _code_annot =
+      if Self.FromFunctionAlarms.mem kf then
+        Build.add_alarm ~depth context stmt alarm
+    in
+    if not (Self.FromFunctionAlarms.is_empty ()) then
+      Alarms.iter add_alarm;
     (* Output it *)
     let output_basename = Self.OutputBasename.get () in
     if output_basename <> "" then begin

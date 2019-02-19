@@ -2,7 +2,7 @@
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
-[eva:alarm] tests/dive/assigned_param.i:18: Warning: 
+[eva:alarm] tests/dive/assigned_param.i:17: Warning: 
   signed overflow. assert w + 1 ≤ 2147483647;
 [eva] done for function main
 [dive] output to tests/dive/result/assigned_param.dot

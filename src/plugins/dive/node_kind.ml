@@ -26,10 +26,6 @@ let get_base = function
   | Scalar (vi,_,_) | Composite (vi) -> Some vi
   | Scattered _ | Alarm _ | File -> None
 
-let is_precise = function
-  | Scalar _ | Composite _ -> true
-  | Scattered _ | Alarm _ | File -> false
-
 let to_location = function
   | Scalar (vi,typ,offset) ->
     let base = Base.of_varinfo vi in
@@ -38,15 +34,15 @@ let to_location = function
     Some (Locations.loc_of_varinfo vi)
   | Scattered _ | Alarm _ | File -> None
 
-let to_cil = function
-  | Scalar (vi,_typ,offset) -> `Lval (Cil_types.Var vi, offset)
-  | Composite (vi) -> `Lval (Cil_types.Var vi, Cil_types.NoOffset)
-  | Scattered (lval) -> `Lval lval
-  | Alarm (_stmt,exp) -> `Exp exp
-  | File -> `None
+let to_lval = function
+  | Scalar (vi,_typ,offset) -> Some (Cil_types.Var vi, offset)
+  | Composite (vi) -> Some (Cil_types.Var vi, Cil_types.NoOffset)
+  | Scattered (lval) -> Some lval
+  | Alarm (_,_) | File -> None
 
-let pretty fmt kind =
-  match to_cil kind with
-  | `Lval lval -> Cil_printer.pp_lval fmt lval
-  | `Exp exp -> Cil_printer.pp_exp fmt exp
-  | `None -> ()
+let pretty fmt = function
+  | (Scalar _ | Composite _ | Scattered _) as kind ->
+    Cil_printer.pp_lval fmt (Extlib.the (to_lval kind))
+  | Alarm (_stmt,alarm) ->
+    Cil_printer.pp_predicate fmt (Alarms.create_predicate alarm)
+  | File -> ()

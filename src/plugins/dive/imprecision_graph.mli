@@ -26,9 +26,10 @@ include Graph.Sig.G with type V.t = node
 
 val create : ?size:int -> unit -> t
 
-val create_node : t ->
+val create_node :
+  ?node_precision:node_precision ->
   node_kind:node_kind ->
-  node_locality:node_locality -> node
+  node_locality:node_locality -> t -> node
 
 val update_node_precision : node -> node_precision -> unit
 
