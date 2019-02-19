@@ -19,6 +19,8 @@
 #   configure	configure
 ###############################################################################
 
+-  E-ACSL       [2019/02/19] New option -e-acsl-functions to monitor only
+	        annotations in a white list of functions.
 -* runtime      [2019/02/04] Fix initialization of the E-ACSL runtime in
 	        presence of multiple calls to its initializer (for
 	        instance, if the main is a recursive function).

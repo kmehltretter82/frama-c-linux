@@ -736,17 +736,21 @@ Abort
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%>>>
-\section{Incomplete Programs} % <<<
+\section{Incomplete Verification} % <<<
 \label{sec:incomplete}
 
 Executing a \C program requires to have a complete application. However, the
 \eacsl plug-in does not necessarily require to have it to generate the
 instrumented code. It is still possible to instrument a partial program with no
-entry point or in which some functions remain undefined.
+entry point (Section~\ref{sec:no-main}) or in which some functions remain
+undefined (Section~\ref{sec:no-code}).
+
+It is also possible to partially instrument an application in order to reduce
+the runtime overhead.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Programs without Main}
+\subsection{Programs with no Main Function}
 \label{sec:no-main}
 \index{Program!Without main}
 
@@ -786,7 +790,7 @@ x = 65536
 \end{shell}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\
+
 \subsection{Undefined Functions}
 \label{sec:no-code}
 \index{Function!Undefined}
@@ -835,6 +839,19 @@ Aborted
 The execution of the corresponding binary fails at runtime: actually, our
 implementation of the function \texttt{my\_pow} overflows in case of large
 exponentiations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Providing a White List of Functions}
+\label{sec:white-list}
+\index{Function!White List}
+
+By default, the E-ACSL plug-in generates code for checking at runtime all the
+annotations of the analyzed files. Yet, it is possible to handle only
+annotations of a given set of functions through the option
+\shortopt{e-acsl-functions}. This way, no runtime check is generated for
+annotations of all the other functions. It allows the user to focus on a
+particular part of the code, while reducing the global runtime overhead.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

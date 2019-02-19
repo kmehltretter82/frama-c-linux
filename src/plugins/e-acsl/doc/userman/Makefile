@@ -4,7 +4,7 @@ C_CODE=$(wildcard examples/*.[ci])
 VERSION_FILE=../../../../../VERSION
 ifeq ("$(wildcard $(VERSION_FILE))", "")
 VERSION_FILE=../../VERSION
-FC_VERSION= Chlorine
+FC_VERSION= 18.0
 else
 #internal mode
 FC_VERSION=$(shell cat $(VERSION_FILE))
