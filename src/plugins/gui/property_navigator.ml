@@ -638,7 +638,7 @@ let make_panel (main_ui:main_window_extension_points) =
         invariant.get ()
     | Property.IPCodeAnnot(_,_,{annot_content = APragma p}) ->
         Logic_utils.is_property_pragma p (* currently always false. *)
-    | Property.IPCodeAnnot(_, _, _) -> assert false
+    | Property.IPCodeAnnot(_, _, _) -> false (* status of inner nodes *)
     | Property.IPAllocation (_,Kglobal,_,_) -> allocations.get ()
     | Property.IPAllocation (_,Kstmt _,Property.Id_loop _,_) ->
         allocations.get ()
@@ -752,13 +752,10 @@ let make_panel (main_ui:main_window_extension_points) =
    Aka. "bullets" in left margin *)
 let highlighter (buffer:reactive_buffer) localizable ~start ~stop =
   match localizable with
-  | Pretty_source.PIP (Property.IPPredicate (Property.PKAssumes _,_,_,_)) ->
-      (* Assumes clause do not get a bullet: there is nothing
-         to prove about them.*)
-      ()
   | Pretty_source.PIP ppt ->
-      Design.Feedback.mark
-        buffer#buffer ~offset:start (Property_status.Feedback.get ppt)
+      if Property.has_status ppt then
+        Design.Feedback.mark
+          buffer#buffer ~offset:start (Property_status.Feedback.get ppt)
   | Pretty_source.PStmt(_,({ skind=Instr(Call _| Local_init (_, ConsInit _, _)) } as stmt)) ->
       let kfs = Statuses_by_call.all_functions_with_preconditions stmt in
       (* We separate the consolidated statuses of the preconditions inside
@@ -813,7 +810,7 @@ let highlighter (buffer:reactive_buffer) localizable ~start ~stop =
         in
         Design.Feedback.mark buffer#buffer ~call_site:stmt ~offset validity
 
-  | Pretty_source.PStmt _
+  | Pretty_source.PStmt _ | Pretty_source.PStmtStart _
   | Pretty_source.PGlobal _| Pretty_source.PVDecl _
   | Pretty_source.PTermLval _| Pretty_source.PLval _
   | Pretty_source.PExp _ -> ()

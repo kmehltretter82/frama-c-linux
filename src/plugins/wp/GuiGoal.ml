@@ -87,7 +87,7 @@ class pane (proverpane : GuiConfig.provers) =
   in
   let scroll_palette_widget = new Wutil.gobj_widget scroll_palette in
   let palette = new Wpalette.panel () in
-  let () = scroll_palette#add palette#coerce in
+  let () = scroll_palette#add_with_viewport palette#coerce in
   let help = new Widget.button
     ~label:"Tactics" ~border:false ~tooltip:"List Available Tactics" () in
   let delete = new Widget.button
@@ -357,13 +357,13 @@ class pane (proverpane : GuiConfig.provers) =
           printer#set_target Tactical.Empty ;
           strategies#connect None ;
           List.iter (fun tactic -> tactic#clear) tactics
-      | Some(model,sequent,sel) ->
+      | Some(model,tree,sequent,sel) ->
           strategies#connect (Some (self#strategies sequent)) ;
           let select (tactic : GuiTactic.tactic) =
             let process = self#apply in
             let composer = self#compose in
             let browser = self#browse in
-            tactic#select ~process ~composer ~browser sel
+            tactic#select ~process ~composer ~browser ~tree sel
           in
           Model.with_model model (List.iter select) tactics ;
           let tgt =
@@ -470,7 +470,7 @@ class pane (proverpane : GuiConfig.provers) =
               let sequent = printer#sequent in
               let select = printer#selection in
               let model = wpo.Wpo.po_model in
-              self#update_tactics (Some(model,sequent,select)) ;
+              self#update_tactics (Some(model,proof,sequent,select)) ;
             end
       | Composer _ | Browser _ -> ()
 
@@ -551,7 +551,7 @@ class pane (proverpane : GuiConfig.provers) =
           let n = Task.size pool in
           if n = 0 then
             begin
-              ignore (ProofEngine.commit ~resolve:false fork) ;
+              ignore (ProofEngine.commit fork) ;
               ProofEngine.validate proof ;
               ProofEngine.forward proof ;
               state <- Proof proof ;

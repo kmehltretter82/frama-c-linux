@@ -42,7 +42,7 @@ and call = {
 }
 
 let selection_of_localizable = function
-  | PStmt( kf , stmt )
+  | PStmt( kf , stmt ) | PStmtStart( kf , stmt )
   | PLval( Some kf , Kstmt stmt , _ )
   | PTermLval( Some kf , Kstmt stmt , _, _ ) ->
       begin
@@ -250,7 +250,8 @@ class highlighter (main:Design.main_window_extension_points) =
                   if DEPS.mem ip deps then
                     apply_depend buffer start stop
             end
-        | PGlobal _|PVDecl _|PTermLval _|PLval _| PExp _ -> ()
+        | PStmtStart _ | PGlobal _
+        | PVDecl _ | PTermLval _ | PLval _ | PExp _ -> ()
       end
 
   end

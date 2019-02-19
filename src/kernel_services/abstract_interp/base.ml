@@ -205,7 +205,8 @@ let () =
               (mul_CHAR_BIT (Int.of_string min));
             MaxValidAbsoluteAddress.set
               ((Int.pred (mul_CHAR_BIT (Int.succ (Int.of_string max))))))
-       with End_of_file | Scanf.Scan_failure _ | Failure _ as e ->
+       with End_of_file | Scanf.Scan_failure _ | Failure _
+          | Invalid_argument _ as e ->
          Kernel.abort "Invalid -absolute-valid-range integer-integer: each integer may be in decimal, hexadecimal (0x, 0X), octal (0o) or binary (0b) notation and has to hold in 64 bits. A correct example is -absolute-valid-range 1-0xFFFFFF0.@\nError was %S@."
            (Printexc.to_string e))
 
@@ -291,9 +292,9 @@ let is_aligned_by b alignment =
   else
     match b with
     | Var (v,_) | Allocated(v,_,_) ->
-        Int.is_zero (Int.rem (Int.of_int (Cil.bytesAlignOf v.vtype)) alignment)
+        Int.is_zero (Int.e_rem (Int.of_int (Cil.bytesAlignOf v.vtype)) alignment)
     | CLogic_Var (_, ty, _) ->
-      Int.is_zero (Int.rem (Int.of_int (Cil.bytesAlignOf ty)) alignment)
+      Int.is_zero (Int.e_rem (Int.of_int (Cil.bytesAlignOf ty)) alignment)
     | Null -> true
     | String _ -> Int.is_one alignment
 

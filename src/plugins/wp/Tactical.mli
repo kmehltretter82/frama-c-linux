@@ -142,6 +142,9 @@ type 'a formatter = ('a,Format.formatter,unit) format -> 'a
 
 class type feedback =
   object
+    (** Global fresh variable pool *)
+    method pool : pool
+
     (** Interactive mode.
         If [false] the GUI is not activated.
         Hence, detailed feedback is not reported to the user. *)

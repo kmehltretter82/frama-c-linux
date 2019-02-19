@@ -45,9 +45,8 @@ let ftau = function
   | Float32 -> t32
   | Float64 -> t64
 
-let pp_suffix fmt = function
-  | Float32 -> Format.pp_print_string fmt "f32"
-  | Float64 -> Format.pp_print_string fmt "f64"
+let ft_suffix = function Float32 -> "f32" | Float64 -> "f64"
+let pp_suffix fmt ft = Format.pp_print_string fmt (ft_suffix ft)
 
 let link phi = Lang.infoprover (Qed.Engine.F_call phi)
 
@@ -135,15 +134,16 @@ let fmake ulp value = match ulp with
   | Float64 -> F.e_fun fq64 [F.e_float value]
 
 let qmake ulp q = fmake ulp (Transitioning.Q.to_float q)
-let mantissa = "\\([-+]?[0-9]*\\)"
-let comma = "\\(.\\(\\(0*[1-9]\\)*\\)0*\\)?"
-let exponent = "\\([eE]\\([-+]?[0-9]*\\)\\)?"
-let suffix = "\\([flFL]\\)?"
-let real = Str.regexp (mantissa ^ comma ^ exponent ^ suffix ^ "$")
+let re_mantissa = "\\([-+]?[0-9]*\\)"
+let re_comma = "\\(.\\(\\(0*[1-9]\\)*\\)0*\\)?"
+let re_exponent = "\\([eE]\\([-+]?[0-9]*\\)\\)?"
+let re_suffix = "\\([flFL]\\)?"
+let re_real =
+  Str.regexp (re_mantissa ^ re_comma ^ re_exponent ^ re_suffix ^ "$")
 
 let parse_literal ~model v r =
   try
-    if Str.string_match real r 0 then
+    if Str.string_match re_real r 0 then
       let has_suffix =
         try ignore (Str.matched_group 7 r) ; true
         with Not_found -> false in
@@ -217,19 +217,52 @@ let make_pred_float name op ft =
   Lang.F.set_builtin phi (compute op ft) ;
   REGISTRY.define phi (op,ft) ; phi
 
-let register = Ctypes.f_memo
+let f_memo = Ctypes.f_memo
 
-let real_of_flt  = register (make_fun_float ~result:Logic.Real "of" REAL)
-let flt_of_real  = register (make_fun_float "to" ROUND)
-let flt_add  = register (make_fun_float "add" ADD)
-let flt_mul  = register (make_fun_float "mul" MUL)
-let flt_div  = register (make_fun_float "div" DIV)
-let flt_neg  = register (make_fun_float "neg" NEG)
+let real_of_flt  = f_memo (make_fun_float ~result:Logic.Real "of" REAL)
+let flt_of_real  = f_memo (make_fun_float "to" ROUND)
+let flt_add  = f_memo (make_fun_float "add" ADD)
+let flt_mul  = f_memo (make_fun_float "mul" MUL)
+let flt_div  = f_memo (make_fun_float "div" DIV)
+let flt_neg  = f_memo (make_fun_float "neg" NEG)
 
-let flt_lt = register (make_pred_float "lt" LT)
-let flt_eq = register (make_pred_float "eq" EQ)
-let flt_le = register (make_pred_float "le" LE)
-let flt_neq = register (make_pred_float "ne" NE)
+let flt_lt = f_memo (make_pred_float "lt" LT)
+let flt_eq = f_memo (make_pred_float "eq" EQ)
+let flt_le = f_memo (make_pred_float "le" LE)
+let flt_neq = f_memo (make_pred_float "ne" NE)
+
+(* -------------------------------------------------------------------------- *)
+(* --- Builtins                                                           --- *)
+(* -------------------------------------------------------------------------- *)
+
+let register_builtin_comparison suffix ft =
+  begin
+    let open Qed.Logic in
+    let params = [Sdata;Sdata] in
+    let sort = Sprop in
+    let gt = generated_f ~params ~sort "\\gt_%s" suffix in
+    let ge = generated_f ~params ~sort "\\ge_%s" suffix in
+    let open LogicBuiltins in
+    let signature = [F ft;F ft] in
+    add_builtin ("\\eq_" ^ suffix) signature (flt_eq ft) ;
+    add_builtin ("\\ne_" ^ suffix) signature (flt_neq ft) ;
+    add_builtin ("\\lt_" ^ suffix) signature (flt_lt ft) ;
+    add_builtin ("\\le_" ^ suffix) signature (flt_le ft) ;
+    add_builtin ("\\gt_" ^ suffix) signature gt ;
+    add_builtin ("\\ge_" ^ suffix) signature ge ;
+    Context.register
+      begin fun () ->
+        let compute phi x y = e_fun phi [y;x] in
+        Lang.F.set_builtin_2 gt (compute (flt_lt ft)) ;
+        Lang.F.set_builtin_2 ge (compute (flt_le ft)) ;
+      end
+  end
+
+let () =
+  begin
+    register_builtin_comparison "float" Float32 ;
+    register_builtin_comparison "double" Float64 ;
+  end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Models                                                             --- *)
@@ -238,13 +271,13 @@ let flt_neq = register (make_pred_float "ne" NE)
 let () =
   begin
     let open LogicBuiltins in
-    let register ft =
+    let register_builtin ft =
       add_builtin "\\model" [F ft] (f_model ft) ;
       add_builtin "\\delta" [F ft] (f_delta ft) ;
       add_builtin "\\epsilon" [F ft] (f_epsilon ft) ;
     in
-    register Float32 ;
-    register Float64 ;
+    register_builtin Float32 ;
+    register_builtin Float64 ;
   end
 
 (* -------------------------------------------------------------------------- *)

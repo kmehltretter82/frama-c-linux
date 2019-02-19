@@ -609,7 +609,7 @@ let smp_eq_with_lnot a b = (* b1==~e <==> ~b1==e *)
 
 let two_power_k_minus1 k =
   try Integer.pred (Integer.two_power k)
-  with Integer.Too_big -> raise Not_found
+  with Z.Overflow -> raise Not_found
 
 let smp_eq_with_lsl_cst a0 b0 =
   let b1 = match_integer b0 in

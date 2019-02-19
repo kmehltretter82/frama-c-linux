@@ -77,10 +77,10 @@ val f_bitwised : lfun list (** All except f_bit *)
 
 (** Simplifiers *)
 
-val is_cint_simplifier: Conditions.simplifier
+val is_cint_simplifier: simplifier
 (** Remove the [is_cint] in formulas that are
     redundant with other conditions. *)
 
-val mask_simplifier: Conditions.simplifier
+val mask_simplifier: simplifier
 
 val is_positive_or_null: term -> bool

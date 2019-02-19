@@ -78,7 +78,9 @@ let jconfigure (console : #Tactical.feedback) jtactic goal =
       end
 
 let jfork tree ?node jtactic =
-  let console = new ProofScript.console ~title:jtactic.header in
+  let console = new ProofScript.console
+    ~pool:(ProofEngine.pool tree)
+    ~title:jtactic.header in
   try
     let anchor = ProofEngine.anchor tree ?node () in
     let goal = ProofEngine.goal anchor in
@@ -136,13 +138,13 @@ struct
   let stuck env =
     if not env.signaled then
       begin
-        ProofEngine.validate ~unknown:true env.tree ;
+        ProofEngine.validate ~incomplete:true env.tree ;
         env.success (ProofEngine.main env.tree) None ;
         env.signaled <- true ;
       end
 
   let validate ?(finalize=false) env =
-    ProofEngine.validate ~unknown:true env.tree ;
+    ProofEngine.validate ~incomplete:true env.tree ;
     if not env.signaled then
       let wpo = ProofEngine.main env.tree in
       let proved = Wpo.is_proved wpo in
@@ -297,7 +299,7 @@ and autosearch env ~depth node : bool Task.task =
   | Some fork -> autofork env ~depth fork
 
 and autofork env ~depth fork =
-  let _,children = ProofEngine.commit ~resolve:true fork in
+  let _,children = ProofEngine.commit fork in
   let pending = Env.pending env in
   if pending > 0 then
     begin
@@ -344,7 +346,7 @@ let rec crawl env on_child node = function
       begin
         match jfork (Env.tree env) ?node jtactic with
         | None ->
-            Wp_parameters.error
+            Wp_parameters.warning
               "Script Error: can not apply '%s'@\n\
                @[<hov 2>Params: %a@]@\n\
                @[<hov 2>Select: %a@]@."
@@ -354,9 +356,12 @@ let rec crawl env on_child node = function
             crawl env on_child node alternative
         | Some fork ->
             (*TODO: saveback forgiven script *)
-            let _,children = ProofEngine.commit ~resolve:true fork in
+            let _,children = ProofEngine.commit fork in
             reconcile children subscripts ;
-            if children = [] then
+            let residual = List.filter
+                (fun (_,node) -> not (ProofEngine.proved node))
+                children in
+            if residual = [] then
               Env.validate env
             else
               List.iter (fun (_,n) -> on_child n) children ;
@@ -373,8 +378,11 @@ let schedule job =
 let rec process env node =
   schedule
     begin fun () ->
-      let script = Priority.sort (ProofEngine.bound node) in
-      crawl env (process env) (Some node) script
+      if ProofEngine.proved node then
+        ( Env.validate env ; Task.return () )
+      else
+        let script = Priority.sort (ProofEngine.bound node) in
+        crawl env (process env) (Some node) script
     end
 
 let task

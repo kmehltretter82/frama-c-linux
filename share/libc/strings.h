@@ -35,6 +35,7 @@ extern void   bcopy(const void *, void *, size_t);
 
 /*@ requires valid_memory_area: \valid (((char*) s)+(0 .. n-1));
   assigns ((char*) s)[0 .. n-1] \from \nothing;
+  ensures s_initialized:initialization:\initialized(((char*) s)+(0 .. n-1));
   ensures zero_initialized: \subset(((char*) s)[0 .. n-1], {0}); */
 extern void   bzero(void *s, size_t n);
 extern int    ffs(int);

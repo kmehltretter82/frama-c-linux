@@ -34,7 +34,7 @@ let print_locations = false
 
 (* compinfo, fieldinfo, enuminfo, typeinfo and varinfo are shortened by default.
    Setting several to true may result in infinite mutually recursive calls!
- *)
+*)
 let print_full_compinfo = false
 let print_full_fieldinfo = false
 let print_full_enuminfo = false
@@ -413,9 +413,9 @@ and pp_exp_node fmt = function
   | Info(exp,exp_info) -> Format.fprintf fmt "Info(%a,%a)"        pp_exp exp  pp_exp_info exp_info
 
 and pp_exp_info fmt _exp_info = Format.fprintf fmt "pp_exp_info_TODO" (*{
-  exp_type : logic_type;
-  exp_name: string_list;
-}*)
+                                                                        exp_type : logic_type;
+                                                                        exp_name: string_list;
+                                                                        }*)
 
 and pp_constant fmt = function
   | CInt64(integer,ikind,string_option) ->
@@ -476,21 +476,21 @@ and pp_init fmt = function
 and pp_initinfo fmt _initinfo = Format.fprintf fmt "pp_initinfo_TODO" (*{ mutable init : init_option }*)
 
 and pp_fundec fmt _fundec = Format.fprintf fmt "pp_fundec_TODO" (*{
-  mutable svar: varinfo;
-  mutable sformals: varinfo_list;
-  mutable slocals: varinfo_list;
-  mutable smaxid: int;
-  mutable sbody: block;
-  mutable smaxstmtid: int_option;
-  mutable sallstmts: stmt_list;
-  mutable sspec: funspec;
-}*)
+                                                                  mutable svar: varinfo;
+                                                                  mutable sformals: varinfo_list;
+                                                                  mutable slocals: varinfo_list;
+                                                                  mutable smaxid: int;
+                                                                  mutable sbody: block;
+                                                                  mutable smaxstmtid: int_option;
+                                                                  mutable sallstmts: stmt_list;
+                                                                  mutable sspec: funspec;
+                                                                  }*)
 
 and pp_block fmt _block = Format.fprintf fmt "pp_block_TODO" (*{
-  mutable battrs: attributes;
-  mutable blocals: varinfo_list;
-  mutable bstmts: stmt_list;
-}*)
+                                                               mutable battrs: attributes;
+                                                               mutable blocals: varinfo_list;
+                                                               mutable bstmts: stmt_list;
+                                                               }*)
 
 and pp_stmt fmt stmt = Format.fprintf fmt
     "{sid=%a;labels=%a;skind=%a;ghost=%a;TODO}"
@@ -570,12 +570,12 @@ and pp_instr fmt = function
     Format.fprintf fmt "Local_init(%a,%a,%a)" pp_varinfo vi pp_local_init i pp_location location
 
 and pp_extended_asm fmt _extended_asm = Format.fprintf fmt "pp_extended_asm_TODO" (*{
-  {
-    asm_outputs: (string_option * string * lval)_list;
-    asm_inputs: (string_option * string * exp)_list;
-    asm_clobbers: string_list;
-    asm_gotos: (stmt ref)_list;
-}*)
+                                                                                    {
+                                                                                    asm_outputs: (string_option * string * lval)_list;
+                                                                                    asm_inputs: (string_option * string * exp)_list;
+                                                                                    asm_clobbers: string_list;
+                                                                                    asm_gotos: (stmt ref)_list;
+                                                                                    }*)
 
 and pp_filepath_position fmt filepath_position =
   Format.fprintf fmt "{pos_path=%s;pos_lnum=%d;pos_bol=%d;pos_cnum=%d}"
@@ -606,11 +606,11 @@ and pp_logic_constant fmt = function
   | LEnum(enumitem) -> Format.fprintf fmt "LEnum(%a)"  pp_enumitem enumitem
 
 and pp_logic_real fmt _logic_real = Format.fprintf fmt "pp_logic_real_TODO" (*{
-  r_literal : string ;
-  r_nearest : float ;
-  r_upper : float ;
-  r_lower : float ;
-}*)
+                                                                              r_literal : string ;
+                                                                              r_nearest : float ;
+                                                                              r_upper : float ;
+                                                                              r_lower : float ;
+                                                                              }*)
 
 and pp_logic_type fmt = function
   | Ctype(typ) -> Format.fprintf fmt "Ctype(%a)"  pp_typ typ
@@ -710,13 +710,13 @@ and pp_term_lhost fmt = function
   | TMem(term) -> Format.fprintf fmt "TMem(%a)"  pp_term term
 
 and pp_model_info fmt _model_info = Format.fprintf fmt "pp_model_info_TODO" (*{
-  mi_name: string;
-  mi_field_type: logic_type;
-  mi_base_type: typ;
-  mi_decl: location;
-  mutable mi_attr: attributes;
+                                                                              mi_name: string;
+                                                                              mi_field_type: logic_type;
+                                                                              mi_base_type: typ;
+                                                                              mi_decl: location;
+                                                                              mutable mi_attr: attributes;
 
-}*)
+                                                                              }*)
 
 and pp_term_offset fmt = function
   | TNoOffset -> Format.fprintf fmt "TNoOffset"
@@ -740,15 +740,15 @@ and pp_logic_info fmt logic_info =
   mutable l_type : logic_type_option;
   mutable l_profile : logic_var_list;
   mutable l_body : logic_body;
-}*)
+  }*)
 
 and pp_builtin_logic_info fmt _builtin_logic_info = Format.fprintf fmt "pp_builtin_logic_info_TODO" (*{
-  mutable bl_name: string;
-  mutable bl_labels: logic_label_list;
-  mutable bl_params: string_list;
-  mutable bl_type: logic_type_option;
-  mutable bl_profile: (string * logic_type)_list;
-}*)
+                                                                                                      mutable bl_name: string;
+                                                                                                      mutable bl_labels: logic_label_list;
+                                                                                                      mutable bl_params: string_list;
+                                                                                                      mutable bl_type: logic_type_option;
+                                                                                                      mutable bl_profile: (string * logic_type)_list;
+                                                                                                      }*)
 
 and pp_logic_body fmt = function
   | LBnone -> Format.fprintf fmt "LBnone"
@@ -789,7 +789,7 @@ and pp_logic_var fmt logic_var =
   mutable lv_kind: logic_var_kind;
   mutable lv_origin : varinfo_option;
   mutable lv_attr: attributes
-}*)
+  }*)
 
 and pp_logic_ctor_info fmt logic_ctor_info =
   Format.fprintf fmt "{ctor_name=%a;ctor_type=TODO;ctor_params=%a}"
@@ -860,7 +860,7 @@ and pp_predicate_node fmt = function
     Format.fprintf fmt "Pfresh(%a,%a,%a,%a)"  pp_logic_label logic_label1  pp_logic_label logic_label2
       pp_term term1  pp_term term2
   | Psubtype(term1,term2) ->
- Format.fprintf fmt "Psubtype(%a,%a)"  pp_term term1  pp_term term2
+    Format.fprintf fmt "Psubtype(%a,%a)"  pp_term term1  pp_term term2
 
 and pp_identified_predicate fmt identified_predicate =
   Format.fprintf fmt "{ip_id=%d;ip_content=%a}"
@@ -872,14 +872,14 @@ and pp_predicate fmt predicate = Format.fprintf fmt "{%a%apred_content=%a}"
     pp_predicate_node predicate.pred_content
 
 and pp_spec fmt _spec = Format.fprintf fmt "pp_spec_TODO" (*{
-  mutable spec_behavior : behavior_list;
-  mutable spec_variant : term variant_option;
-  mutable spec_terminates: identified_predicate_option;
-  mutable spec_complete_behaviors: string_list_list;
-  mutable spec_disjoint_behaviors: string_list_list;
-}*)
+                                                            mutable spec_behavior : behavior_list;
+                                                            mutable spec_variant : term variant_option;
+                                                            mutable spec_terminates: identified_predicate_option;
+                                                            mutable spec_complete_behaviors: string_list_list;
+                                                            mutable spec_disjoint_behaviors: string_list_list;
+                                                            }*)
 
-and pp_acsl_extension fmt = pp_tuple4 pp_int pp_string pp_location pp_acsl_extension_kind fmt
+and pp_acsl_extension fmt = pp_tuple5 pp_int pp_string pp_location pp_bool pp_acsl_extension_kind fmt
 
 and pp_acsl_extension_kind fmt = function
   | Ext_id(int) -> Format.fprintf fmt "Ext_id(%a)"  pp_int int
@@ -887,14 +887,14 @@ and pp_acsl_extension_kind fmt = function
   | Ext_preds(predicate_list) -> Format.fprintf fmt "Ext_preds(%a)"  (pp_list pp_predicate) predicate_list
 
 and pp_behavior fmt _behavior = Format.fprintf fmt "pp_behavior_TODO" (*{
-  mutable b_name : string;
-  mutable b_requires : identified_predicate_list;
-  mutable b_assumes : identified_predicate_list;
-  mutable b_post_cond : (termination_kind * identified_predicate)_list;
-  mutable b_assigns : assigns;
-  mutable b_allocation : allocation;
-  mutable b_extended : acsl_extension_list
-}*)
+                                                                        mutable b_name : string;
+                                                                        mutable b_requires : identified_predicate_list;
+                                                                        mutable b_assumes : identified_predicate_list;
+                                                                        mutable b_post_cond : (termination_kind * identified_predicate)_list;
+                                                                        mutable b_assigns : assigns;
+                                                                        mutable b_allocation : allocation;
+                                                                        mutable b_extended : acsl_extension_list
+                                                                        }*)
 
 and pp_termination_kind fmt = function
   | Normal -> Format.fprintf fmt "Normal"
@@ -946,9 +946,9 @@ and pp_code_annotation_node fmt = function
 and pp_funspec fmt _funspec = Format.fprintf fmt "pp_funspec_TODO"
 
 and pp_code_annotation fmt _code_annotation = Format.fprintf fmt "pp_code_annotation_TODO" (*{
-  annot_id: int;
-  annot_content : code_annotation_node;
-}*)
+                                                                                             annot_id: int;
+                                                                                             annot_content : code_annotation_node;
+                                                                                             }*)
 
 and pp_funbehavior fmt = pp_behavior fmt
 
@@ -998,9 +998,9 @@ let pp_cil_function fmt = function
       (pp_option (pp_list pp_varinfo)) varinfo_list_option  pp_location location
 
 let pp_kernel_function fmt _kernel_function = Format.fprintf fmt "pp_kernel_function_TODO" (*{
-  mutable fundec : cil_function;
-  mutable spec : funspec;
-}*)
+                                                                                             mutable fundec : cil_function;
+                                                                                             mutable spec : funspec;
+                                                                                             }*)
 
 let pp_localisation fmt = function
   | VGlobal -> Format.fprintf fmt "VGlobal"
@@ -1008,37 +1008,37 @@ let pp_localisation fmt = function
   | VFormal(kernel_function) -> Format.fprintf fmt "VFormal(%a)"  pp_kernel_function kernel_function
 
 let pp_mach fmt _mach = Format.fprintf fmt "pp_mach_TODO" (*{
-  sizeof_short: int;
-  sizeof_int: int;
-  sizeof_long: int ;
-  sizeof_longlong: int;
-  sizeof_ptr: int;
-  sizeof_float: int;
-  sizeof_double: int;
-  sizeof_longdouble: int;
-  sizeof_void: int;
-  sizeof_fun: int;
-  size_t: string;
-  wchar_t: string;
-  ptrdiff_t: string;
-  alignof_short: int;
-  alignof_int: int;
-  alignof_long: int;
-  alignof_longlong: int;
-  alignof_ptr: int;
-  alignof_float: int;
-  alignof_double: int;
-  alignof_longdouble: int;
-  alignof_str: int;
-  alignof_fun: int;
-  char_is_unsigned: bool;
-  underscore_name: bool;
-  const_string_literals: bool;
-  little_endian: bool;
-  alignof_aligned: int;
-  has__builtin_va_list: bool;
-  __thread_is_keyword: bool;
-  compiler: string;
-  cpp_arch_flags: string_list;
-  version: string;
-}*)
+                                                            sizeof_short: int;
+                                                            sizeof_int: int;
+                                                            sizeof_long: int ;
+                                                            sizeof_longlong: int;
+                                                            sizeof_ptr: int;
+                                                            sizeof_float: int;
+                                                            sizeof_double: int;
+                                                            sizeof_longdouble: int;
+                                                            sizeof_void: int;
+                                                            sizeof_fun: int;
+                                                            size_t: string;
+                                                            wchar_t: string;
+                                                            ptrdiff_t: string;
+                                                            alignof_short: int;
+                                                            alignof_int: int;
+                                                            alignof_long: int;
+                                                            alignof_longlong: int;
+                                                            alignof_ptr: int;
+                                                            alignof_float: int;
+                                                            alignof_double: int;
+                                                            alignof_longdouble: int;
+                                                            alignof_str: int;
+                                                            alignof_fun: int;
+                                                            char_is_unsigned: bool;
+                                                            underscore_name: bool;
+                                                            const_string_literals: bool;
+                                                            little_endian: bool;
+                                                            alignof_aligned: int;
+                                                            has__builtin_va_list: bool;
+                                                            __thread_is_keyword: bool;
+                                                            compiler: string;
+                                                            cpp_arch_flags: string_list;
+                                                            version: string;
+                                                            }*)

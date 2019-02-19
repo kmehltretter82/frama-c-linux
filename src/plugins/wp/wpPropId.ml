@@ -423,7 +423,7 @@ let code_annot_names ca = match ca.annot_content with
   | AAssert (_, named_pred)  -> "@assert"::(ident_names named_pred.pred_name)
   | AInvariant (_,_,named_pred) -> "@invariant"::(ident_names named_pred.pred_name)
   | AVariant (term, _) -> "@variant"::(ident_names term.term_name)
-  | AExtended(_,_,(_,name,_,_)) -> [Printf.sprintf "@%s" name]
+  | AExtended(_,_,(_,name,_,_,_)) -> [Printf.sprintf "@%s" name]
   | _ -> [] (* TODO : add some more names ? *)
 
 (** This is used to give the name of the property that the user can give
@@ -432,7 +432,7 @@ let user_prop_names p = match p with
   | Property.IPPredicate (kind,_,_,idp) ->
       Format.asprintf  "@@%a" Property.pretty_predicate_kind kind ::
       idp.ip_content.pred_name
-  | Property.IPExtended(_,(_,name,_,_)) -> [ Printf.sprintf "@%s" name ]
+  | Property.IPExtended(_,(_,name,_,_,_)) -> [ Printf.sprintf "@%s" name ]
   | Property.IPCodeAnnot (_,_, ca) -> code_annot_names ca
   | Property.IPComplete (_, _,_,lb) ->
       let kind_name = "@complete_behaviors" in
@@ -605,7 +605,7 @@ let property_hints hs = function
       List.iter (add_required hs) ps
   | Property.IPPredicate(_,_,_,ipred) ->
       List.iter (add_hint hs) ipred.ip_content.pred_name
-  | Property.IPExtended(_,(_,name,_,_)) -> List.iter (add_hint hs) [name]
+  | Property.IPExtended(_,(_,name,_,_,_)) -> List.iter (add_hint hs) [name]
   | Property.IPCodeAnnot(_,_,ca) -> annot_hints hs ca.annot_content
   | Property.IPAssigns(_,_,_,froms) -> assigns_hints hs froms
   | Property.IPAllocation _ (* TODO *)

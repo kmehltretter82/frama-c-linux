@@ -20,6 +20,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* -------------------------------------------------------------------------- *)
+(* --- Property Type                                                      --- *)
+(* -------------------------------------------------------------------------- *)
+
 open Cil_types
 open Cil_datatype
 
@@ -145,6 +149,10 @@ and identified_property =
   | IPGlobalInvariant of identified_global_invariant
   | IPOther of string * other_loc
 
+(* -------------------------------------------------------------------------- *)
+(* --- Getters                                                            --- *)
+(* -------------------------------------------------------------------------- *)
+
 let ki_of_e_loc = function
   | ELContract _ | ELGlob -> Kglobal
   | ELStmt (_,s) -> Kstmt s
@@ -246,7 +254,7 @@ let rec location = function
       | [] -> Cil_datatype.Location.unknown
       | p :: _ -> location p)
   | IPLemma (_,_,_,_,loc) -> loc
-  | IPExtended(_,(_,_,loc,_)) -> loc
+  | IPExtended(_,(_,_,loc,_,_)) -> loc
   | IPOther(_,loc_e) -> loc_of_loc_o loc_e
   | IPTypeInvariant(_,_,_,loc) | IPGlobalInvariant(_,_,loc) -> loc
 
@@ -290,6 +298,40 @@ let get_behavior = function
   | IPTypeInvariant _
   | IPGlobalInvariant _
   | IPOther _ -> None
+
+(* -------------------------------------------------------------------------- *)
+(* --- Property Status                                                    --- *)
+(* -------------------------------------------------------------------------- *)
+
+let has_status_ext ((_,_,_,status,_) : Cil_types.acsl_extension) = status
+
+let has_status_ca = function
+  | AAssert _ | AStmtSpec _ | AInvariant _ | AVariant _ | AAllocation _
+  | AAssigns _ -> true
+  | AExtended(_,_,e) -> has_status_ext e
+  | APragma _ -> false
+
+let has_status_pkind = function
+  | PKAssumes _ -> false
+  | PKEnsures _ | PKRequires _ | PKTerminates
+    -> true
+
+let rec has_status = function
+  | IPPredicate(pkind, _, _, _) -> has_status_pkind pkind
+  | IPExtended(_,e) -> has_status_ext e
+  | IPCodeAnnot(_,_, { annot_content = ca }) -> has_status_ca ca
+  | IPPropertyInstance(_,_,_,ip) -> has_status ip
+  | IPOther _ | IPReachable _
+  | IPAxiom _ | IPAxiomatic _ | IPBehavior _
+  | IPDisjoint _ | IPComplete _
+  | IPAssigns _ | IPFrom _
+  | IPAllocation _ | IPDecrease _ | IPLemma _
+  | IPTypeInvariant _ | IPGlobalInvariant _
+    -> true
+
+(* -------------------------------------------------------------------------- *)
+(* --- Datatype                                                           --- *)
+(* -------------------------------------------------------------------------- *)
 
 include Datatype.Make_with_collections
     (struct
@@ -413,7 +455,7 @@ include Datatype.Make_with_collections
 	| IPOther(s,_) -> Hashtbl.hash (15, (s:string))
 	| IPTypeInvariant(s,_,_,_) -> Hashtbl.hash (16, (s:string))
 	| IPGlobalInvariant(s,_,_) -> Hashtbl.hash (17, (s:string))
-        | IPExtended (_,(i,_,_,_)) -> Hashtbl.hash (18, i)
+        | IPExtended (_,(i,_,_,_,_)) -> Hashtbl.hash (18, i)
 
       let rec equal p1 p2 =
 	let eq_bhv (f1,ki1,b1) (f2,ki2,b2) =
@@ -430,7 +472,7 @@ include Datatype.Make_with_collections
 	in
 	match p1, p2 with
 	| IPPredicate (_,_,_,s1), IPPredicate (_,_,_,s2) -> s1.ip_id = s2.ip_id
-	| IPExtended (_,(i1,_,_,_)), IPExtended (_,(i2,_,_,_)) -> Datatype.Int.equal i1 i2
+	| IPExtended (_,(i1,_,_,_,_)), IPExtended (_,(i2,_,_,_,_)) -> Datatype.Int.equal i1 i2
 	| IPAxiom (s1,_,_,_,_), IPAxiom (s2,_,_,_,_)
 	| IPAxiomatic(s1, _), IPAxiomatic(s2, _)
 	| IPTypeInvariant(s1,_,_,_), IPTypeInvariant(s2,_,_,_)
@@ -490,7 +532,7 @@ include Datatype.Make_with_collections
 	match x, y with
 	| IPPredicate (_,_,_,s1), IPPredicate (_,_,_,s2) ->
           Datatype.Int.compare s1.ip_id s2.ip_id
-        | IPExtended (_,(i1,_,_,_)), IPExtended (_,(i2,_,_,_)) ->
+        | IPExtended (_,(i1,_,_,_,_)), IPExtended (_,(i2,_,_,_,_)) ->
           Datatype.Int.compare i1 i2
 	| IPCodeAnnot(_,_,ca1), IPCodeAnnot(_,_,ca2) ->
           Datatype.Int.compare ca1.annot_id ca2.annot_id
@@ -572,7 +614,7 @@ let rec short_pretty fmt p = match p with
   | IPPredicate (_,_,_,{ ip_content = {pred_name = name :: _ }}) ->
     Format.pp_print_string fmt name
   | IPPredicate _ -> pretty fmt p
-  | IPExtended (_,(_,name,_,_)) -> Format.pp_print_string fmt name
+  | IPExtended (_,(_,name,_,_,_)) -> Format.pp_print_string fmt name
   | IPAxiom (name,_,_,_,_) | IPLemma(name,_,_,_,_)
   | IPTypeInvariant(name,_,_,_) -> Format.pp_print_string fmt name
   | IPGlobalInvariant(name,_,_) -> Format.pp_print_string fmt name
@@ -861,7 +903,7 @@ struct
         Format.asprintf "%s%s%a"
           (kf_prefix kf) (predicate_kind_txt pk ki)
           pp_names idp.ip_content.pred_name
-    | IPExtended (le,(_,name,_,_)) ->
+    | IPExtended (le,(_,name,_,_,_)) ->
       Format.asprintf  "%sextended%a" (extended_loc_prefix le) pp_names [name]
     | IPCodeAnnot (kf,_, ca) ->
         let name = match ca.annot_content with
@@ -869,7 +911,11 @@ struct
           | AInvariant (_,true,_) -> "loop_inv"
           | AInvariant _ -> "inv"
           | APragma _ -> "pragma"
-          | _ -> assert false
+          | AStmtSpec _ -> "contract"
+          | AAssigns _ -> "assigns"
+          | AVariant _ -> "variant"
+          | AAllocation _ -> "allocates"
+          | AExtended(_,_,(_,clause,_,_,_)) -> clause
         in Format.asprintf "%s%s%a" (kf_prefix kf) name pp_code_annot_names ca
     | IPComplete (kf, ki, a, lb) ->
         Format.asprintf  "%s%s%acomplete%a"
@@ -1045,7 +1091,7 @@ struct
     | IPCodeAnnot (kf,stmt, { annot_content = APragma _ } ) ->
       [ K kf ; A "pragma" ; S stmt ]
 
-    | IPCodeAnnot (kf,stmt, { annot_content = AExtended(_,_,(_,clause,_,_)) } )
+    | IPCodeAnnot (kf,stmt, { annot_content = AExtended(_,_,(_,clause,_,_,_)) } )
       -> [ K kf ; A clause ; S stmt ]
 
     | IPCodeAnnot (kf,_, { annot_content = AAssert(_,p) } ) ->
@@ -1089,9 +1135,9 @@ struct
     | IPOther(name,OLContract kf) -> [ K kf ; A name ]
     | IPOther(name,OLStmt(kf,s)) -> [ K kf ; A name ; S s ]
 
-    | IPExtended(ELGlob,(_,name,_,_)) -> [ A name ]
-    | IPExtended(ELContract(kf),(_,name,_,_)) -> [ K kf ; A name ]
-    | IPExtended(ELStmt(kf,s),(_,name,_,_)) -> [ K kf ; A name ; S s ]
+    | IPExtended(ELGlob,(_,name,_,_,_)) -> [ A name ]
+    | IPExtended(ELContract(kf),(_,name,_,_,_)) -> [ K kf ; A name ]
+    | IPExtended(ELStmt(kf,s),(_,name,_,_,_)) -> [ K kf ; A name ; S s ]
 
     | IPPropertyInstance (_, _, _, ip) -> parts_of_property ip
 
@@ -1148,12 +1194,6 @@ end
 (* -------------------------------------------------------------------------- *)
 (* --- Smart Constructors                                                 --- *)
 (* -------------------------------------------------------------------------- *)
-
-
-(* -------------------------------------------------------------------------- *)
-(* --- Smart Constructors                                                 --- *)
-(* -------------------------------------------------------------------------- *)
-
 
 let ip_other s le = IPOther(s,le)
 
@@ -1330,7 +1370,8 @@ let ip_of_code_annot kf stmt ca =
   | APragma p when Logic_utils.is_property_pragma p ->
     [ IPCodeAnnot (kf,stmt,ca) ]
   | APragma _ -> []
-  | AExtended _ -> []
+  | AExtended(_,_,(_,_,_,status,_ as ext)) ->
+    if status then [IPExtended(ELStmt(kf,stmt),ext)] else []
 
 let ip_of_code_annot_single kf stmt ca = match ip_of_code_annot kf stmt ca with
   | [] ->

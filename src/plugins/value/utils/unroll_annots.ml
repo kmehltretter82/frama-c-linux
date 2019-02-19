@@ -26,7 +26,7 @@ exception Parse_error of string option
 
 let parse_error ?msg () = raise (Parse_error msg)
 
-let () = Logic_typing.register_code_annot_next_loop_extension "unroll"
+let () = Logic_typing.register_code_annot_next_loop_extension "unroll" false
     begin fun ~typing_context ~loc:_ args ->
       match args with
       | [arg] ->
@@ -48,7 +48,7 @@ let get_unroll_terms stmt =
     (fun _emitter annot acc ->
        match annot with
        | {annot_content =
-            AExtended (_, true, (_, "unroll", _,Ext_terms [term]))} ->
+            AExtended (_, true, (_, "unroll", _,_,Ext_terms [term]))} ->
          term :: acc
        | _ -> acc
     ) stmt []

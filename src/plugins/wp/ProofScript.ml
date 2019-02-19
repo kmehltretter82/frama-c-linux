@@ -429,11 +429,12 @@ let configure jtactic sequent =
 (* --- Console                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
-class console ~title =
+class console ~pool ~title =
   object
 
     val mutable the_title = title
 
+    method pool : Lang.F.pool = pool
     method interactive = false
     method get_title = the_title
     method set_title : 'a. 'a formatter =

@@ -594,6 +594,34 @@ extern size_t wcstombs(char * restrict s,
      size_t n);
 
 
+// Note: this specification should ideally use a more specific predicate,
+//       such as 'is_allocable_aligned(alignment, size)'.
+/*@
+  requires valid_memptr: \valid(memptr);
+  requires alignment_is_a_suitable_power_of_two:
+    alignment >= sizeof(void*) &&
+    ((size_t)alignment & ((size_t)alignment - 1)) == 0;
+  allocates *memptr;
+  assigns __fc_heap_status \from indirect:alignment, size, __fc_heap_status;
+  assigns \result \from indirect:alignment, indirect:size,
+                        indirect:__fc_heap_status;
+  behavior allocation:
+    assumes can_allocate: is_allocable(size);
+    assigns __fc_heap_status \from indirect:alignment, size, __fc_heap_status;
+    assigns \result \from indirect:alignment, indirect:size,
+                          indirect:__fc_heap_status;
+    ensures allocation: \fresh(*memptr,size);
+    ensures result_zero: \result == 0;
+  behavior no_allocation:
+    assumes cannot_allocate: !is_allocable(size);
+    assigns \result \from indirect:alignment;
+    allocates \nothing;
+    ensures result_non_zero: \result < 0 || \result > 0;
+  complete behaviors;
+  disjoint behaviors;
+ */
+extern int posix_memalign(void **memptr, size_t alignment, size_t size);
+
 __END_DECLS
 
 __POP_FC_STDLIB

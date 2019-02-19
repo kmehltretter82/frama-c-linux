@@ -134,7 +134,7 @@ let occurrence_highlighter buffer loc ~start ~stop =
             if List.exists same_tlval result then highlight ()
         | PVDecl(_, _,vi') when Varinfo.equal vi vi' ->
             highlight ()
-        | PExp _ | PVDecl _ | PStmt _ | PGlobal _ | PIP _ -> ()
+        | PExp _ | PVDecl _ | PStmt _ | PStmtStart _ | PGlobal _ | PIP _ -> ()
 
 module FollowFocus =
   State_builder.Ref

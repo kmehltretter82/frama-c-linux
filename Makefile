@@ -188,7 +188,7 @@ THEME_ICONS_FLAT:= \
   $(addprefix share/theme/flat/,$(THEME_ICON_NAMES))
 
 ROOT_LIBC_DIR:= share/libc
-LIBC_SUBDIRS:= sys netinet linux net arpa
+LIBC_SUBDIRS:= sys netinet net arpa
 LIBC_DIR:= $(ROOT_LIBC_DIR) $(addprefix $(ROOT_LIBC_DIR)/,$(LIBC_SUBDIRS))
 LIBC_FILES:= \
 	$(wildcard share/*.h share/*.c) \
@@ -576,6 +576,7 @@ KERNEL_CMO=\
 	src/kernel_services/abstract_interp/lmap_bitwise.cmo            \
 	src/kernel_services/visitors/visitor.cmo                        \
 	src/kernel_services/ast_data/statuses_by_call.cmo               \
+	src/kernel_services/ast_printing/printer_tag.cmo                \
 	$(PLUGIN_TYPES_CMO_LIST)                                        \
 	src/kernel_services/plugin_entry_points/db.cmo                  \
 	src/libraries/utils/command.cmo                                 \
@@ -732,6 +733,7 @@ endif
 GENERATED+=src/plugins/gui/gtk_compat.ml
 
 SINGLE_GUI_CMO:= \
+	wutil_once \
 	gtk_compat \
 	$(WTOOLKIT) \
 	$(SOURCEVIEWCOMPAT) \
@@ -1421,9 +1423,9 @@ $(foreach file,$(LONELY_TESTS_ML_FILES),\
 $(foreach file,$(LONELY_TESTS_ML_FILES),\
   $(eval $(file:%.ml=%.cmxs): OFLAGS+=-I $(dir $(file))))
 .PRECIOUS: $(LONELY_TESTS_ML_FILES:%.ml=%.cmx) \
-           $(LONELY_TESTS_DYN_FILES:%.ml=%.cmxs) \
-           $(LONELY_TESTS_BYTE_FILES:%.ml=%.cmo) \
-           $(LONELY_TESTS_BYTE_FILES:%.ml=%.cmi)
+           $(LONELY_TESTS_ML_FILES:%.ml=%.cmxs) \
+           $(LONELY_TESTS_ML_FILES:%.ml=%.cmo) \
+           $(LONELY_TESTS_ML_FILES:%.ml=%.cmi)
 
 bin/ocamldep_transitive_closure: devel_tools/ocamldep_transitive_closure.ml
 	$(OCAMLOPT) -package ocamlgraph -package str -linkpkg -o $@ $<
@@ -1874,7 +1876,6 @@ install:: install-lib
 	$(MKDIR) $(FRAMAC_DATADIR)/theme/flat
 	$(MKDIR) $(FRAMAC_DATADIR)/libc/sys
 	$(MKDIR) $(FRAMAC_DATADIR)/libc/netinet
-	$(MKDIR) $(FRAMAC_DATADIR)/libc/linux
 	$(MKDIR) $(FRAMAC_DATADIR)/libc/net
 	$(MKDIR) $(FRAMAC_DATADIR)/libc/arpa
 	$(PRINT_INSTALL) shared files
@@ -1917,7 +1918,6 @@ install:: install-lib
 	$(CP) share/libc/arpa/*.[ch] $(FRAMAC_DATADIR)/libc/arpa
 	$(CP) share/libc/net/*.[ch] $(FRAMAC_DATADIR)/libc/net
 	$(CP) share/libc/netinet/*.[ch] $(FRAMAC_DATADIR)/libc/netinet
-	$(CP) share/libc/linux/*.[ch] $(FRAMAC_DATADIR)/libc/linux
 	$(PRINT_INSTALL) binaries
 	$(CP) bin/toplevel.$(OCAMLBEST) $(BINDIR)/frama-c$(EXE)
 	$(CP) bin/toplevel.byte$(EXE) $(BINDIR)/frama-c.byte$(EXE)

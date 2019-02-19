@@ -635,7 +635,7 @@ module V = struct
       if Integer.is_zero factor
       then v
       else topify_with_origin_kind topify v
-    | Integer.Too_big -> top_int
+    | Z.Overflow -> top_int
 
   let restrict_topint_to_size value size =
     if is_topint value
@@ -979,7 +979,7 @@ module V_Offsetmap = struct
         if Integer.is_zero cardinal then Integer.one else cardinal
       in
       let cardinalf = CardinalEstimate.of_integer cardinal in
-      let repeat = Integer.(div (length start stop) size) in
+      let repeat = Integer.(e_div (length start stop) size) in
       (* If a value is "cut", we still count it as if it were whole. *)
       let repeat = Integer.(max repeat one) in
       let cardinalf_repeated = CardinalEstimate.power cardinalf repeat in

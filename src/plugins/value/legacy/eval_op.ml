@@ -102,7 +102,7 @@ let reduce_by_initialized_defined f loc state =
       if v' != v then begin
         if V_Or_Uninitialized.is_bottom v' then raise Reduce_to_bottom;
         let il = Int.max offl ll and ih = Int.min offh lh in
-        let abs_shift = Integer.pos_rem (Rel.add_abs offl shift) modu in
+        let abs_shift = Integer.e_rem (Rel.add_abs offl shift) modu in
         (* il and ih are the bounds of the interval to reduce.
            We change the initialized flags in the following cases:
            - either we overwrite entire values, or the partly overwritten
@@ -110,12 +110,12 @@ let reduce_by_initialized_defined f loc state =
            - or we do not lose information on misaligned or partial values:
            the result is a singleton *)
         if V_Or_Uninitialized.(cardinal_zero_or_one v' || is_isotropic v') ||
-           ((Int.equal offl il || Int.equal (Int.pos_rem ll modu) abs_shift) &&
+           ((Int.equal offl il || Int.equal (Int.e_rem ll modu) abs_shift) &&
             (Int.equal offh ih ||
-             Int.equal (Int.pos_rem (Int.succ lh) modu) abs_shift))
+             Int.equal (Int.e_rem (Int.succ lh) modu) abs_shift))
         then
           let diff = Rel.sub_abs il offl in
-          let shift_il = Rel.pos_rem (Rel.sub shift diff) modu in
+          let shift_il = Rel.e_rem (Rel.sub shift diff) modu in
           V_Offsetmap.add (il, ih) (v', modu, shift_il) acc
         else acc
       end
@@ -234,7 +234,7 @@ let find_offsm_under validity ival size offsm acc =
   | Tr_offset.Interval (min, max, modu) ->
     let process (start, _stop) (v, v_size, v_offset) acc =
       if Rel.(equal v_offset zero) && Int.equal v_size size
-         && Int.equal (Int.pos_rem (Int.sub start min) modu) Int.zero
+         && Int.equal (Int.e_rem (Int.sub start min) modu) Int.zero
       then add_if_singleton v acc
       else acc
     in

@@ -47,8 +47,8 @@ val pretty : ?vbox:int -> Format.formatter -> message -> unit
 (** Pretty-print the message onto the given formatter, with the tags.
     The original message has been {i already} laidout with respect to
     horizontal and vertical boxes, and this layout will be output as-it-is
-    into the formatter. 
-    
+    into the formatter.
+
     Here, you have two different strategies to render the message properly.
     If [~vbox] is specified, a vertical box is opened around the message,
     and newlines are emitted with a ["@\n"] and the given indentation.
@@ -61,16 +61,16 @@ val pretty : ?vbox:int -> Format.formatter -> message -> unit
 (* -------------------------------------------------------------------------- *)
 
 (** Buffer for creating messages.
-    
+
     The buffer grows on demand, but is protected against huge mesages.
     Maximal size is around 2 billions ASCII characters, which sould be enough
     to store more than 25kloc source text. *)
 type buffer
 
-(** Create a buffer. 
+(** Create a buffer.
 
-    The right-margin is set to [~margin] and 
-    maximum indentation to [~indent]. 
+    The right-margin is set to [~margin] and
+    maximum indentation to [~indent].
     Default values are those of [Format.make_formatter], which are
     [~indent:68] and [~margin:78] in OCaml 4.05.
 *)

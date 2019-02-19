@@ -123,7 +123,7 @@ class behavior
     method reload () =
       begin
         list#reload ;
-        let to_prove g = not (Wpo.is_proved g || Wpo.resolve g) in
+        let to_prove g = not (Wpo.is_proved g || Wpo.reduce g) in
         let has_proof g =
           match ProofEngine.get g with
           | `None -> false

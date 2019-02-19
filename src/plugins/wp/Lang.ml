@@ -801,7 +801,9 @@ struct
     else
       match Context.get_opt context_pp with
       | Some env -> Pretty.pp_term_env env  fmt e
-      | None -> Pretty.pp_term Pretty.empty fmt e
+      | None ->
+          let env = Pretty.known Pretty.empty (QED.vars e) in
+          Pretty.pp_term env fmt e
   let pp_pred = pp_term
   let pp_var fmt x = pp_term fmt (e_var x)
   let pp_vars fmt xs =
@@ -996,5 +998,26 @@ struct
   let p_apply s p = s.p_apply p
 
 end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Simplifier                                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
+exception Contradiction
+
+class type simplifier =
+  object
+    method name : string
+    method copy : simplifier
+    method assume : F.pred -> unit
+    method target : F.pred -> unit
+    method fixpoint : unit
+    method infer : F.pred list
+
+    method simplify_exp : F.term -> F.term
+    method simplify_hyp : F.pred -> F.pred
+    method simplify_branch : F.pred -> F.pred
+    method simplify_goal : F.pred -> F.pred
+  end
 
 (* -------------------------------------------------------------------------- *)

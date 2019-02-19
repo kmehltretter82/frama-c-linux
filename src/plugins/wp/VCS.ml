@@ -366,3 +366,32 @@ let compare p q =
       let t = Pervasives.compare p.prover_time q.prover_time in
       if t <> 0 then t else
         Pervasives.compare p.solver_time q.solver_time
+
+let combine v1 v2 =
+  match v1 , v2 with
+  | Valid , Valid -> Valid
+  | Failed , _ | _ , Failed -> Failed
+  | Invalid , _ | _ , Invalid -> Invalid
+  | Timeout , _ | _ , Timeout -> Timeout
+  | Stepout , _ | _ , Stepout -> Stepout
+  | _ -> Unknown
+
+let merge r1 r2 =
+  let err = if r1.prover_errmsg <> "" then r1 else r2 in
+  {
+    verdict = combine r1.verdict r2.verdict ;
+    solver_time = max r1.solver_time r2.solver_time ;
+    prover_time = max r1.prover_time r2.prover_time ;
+    prover_steps = max r1.prover_steps r2.prover_steps ;
+    prover_depth = max r1.prover_depth r2.prover_depth ;
+    prover_errpos = err.prover_errpos ;
+    prover_errmsg = err.prover_errmsg ;
+  }
+
+let choose r1 r2 =
+  match is_valid r1 , is_valid r2 with
+  | true , false -> r1
+  | false , true -> r2
+  | _ -> if compare r1 r2 <= 0 then r1 else r2
+
+let best = List.fold_left choose no_result

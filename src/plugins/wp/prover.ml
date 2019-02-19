@@ -76,7 +76,7 @@ let simplify ?start ?result wpo =
        VCS.( r.verdict == Valid ) ||
        begin
          started ?start wpo ;
-         if resolve wpo then
+         if Wpo.reduce wpo then
            let time = qed_time wpo in
            let res = VCS.result ~time VCS.Valid in
            (update ?result wpo VCS.Qed res ; true)

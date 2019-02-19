@@ -53,7 +53,6 @@ type bindings = (F.var * selection) list
 type env = {
   binder : L.binder ;
   feedback : Tactical.feedback ;
-  pool : Lang.F.pool ;
   mutable index : int ;
 }
 
@@ -154,7 +153,7 @@ class instance =
           bindings, F.e_imply hs property
       | L.Bind(q,tau,phi) , fd :: fields when q = env.binder ->
           env.index <- succ env.index ;
-          let x = F.fresh env.pool tau in
+          let x = F.fresh env.feedback#pool tau in
           let v = self#get_field fd in
           let range = match tau with L.Int -> true | _ -> false in
           let tooltip = fieldname ~range env.index x in
@@ -171,9 +170,7 @@ class instance =
       let binder = match side with None -> L.Exists | Some _ -> L.Forall in
       let lemma = F.e_prop p in
       if has_binder binder lemma then
-        let vars = F.vars lemma in
-        let pool = Lang.new_pool ~vars () in
-        let env = { index = 0 ; feedback ; binder ; pool } in
+        let env = { index = 0 ; feedback ; binder } in
         let bindings,phi = self#wrap env lemma fields in
         if List.exists (fun (_,v) -> not (Tactical.is_empty v)) bindings
         then

@@ -168,10 +168,6 @@ let pp_warnings fmt wpo =
       | false , _ -> Format.fprintf fmt " (Stronger, %d warnings)" n
     end
 
-let auto_check = function
-  | { Wpo.po_formula = Wpo.GoalCheck _ } -> true
-  | _ -> false
-
 let launch task =
   let server = ProverTask.server () in
   (** Do on_server_stop save why3 session *)
@@ -359,7 +355,7 @@ let do_wpo_success goal s =
                   end
           end
     | Some prover ->
-        if not (auto_check goal) then
+        if not (Wpo.is_check goal) then
           Wp_parameters.feedback ~ontty:`Silent
             "[%a] Goal %s : Valid" VCS.pp_prover prover (Wpo.get_gid goal)
 

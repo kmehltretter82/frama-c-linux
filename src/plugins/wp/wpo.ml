@@ -805,11 +805,19 @@ let is_trivial g =
   | GoalAnnot vc -> VC_Annot.is_trivial vc
   | GoalCheck _ -> false
 
-let resolve g =
+
+let reduce g =
   match g.po_formula with
-  | GoalAnnot vc -> Model.with_model g.po_model VC_Annot.resolve vc
-  | GoalLemma vc -> Model.with_model g.po_model VC_Lemma.is_trivial vc
   | GoalCheck _ -> false
+  | GoalLemma vc -> Model.with_model g.po_model VC_Lemma.is_trivial vc
+  | GoalAnnot vc -> Model.with_model g.po_model VC_Annot.resolve vc
+
+let resolve g =
+  let valid = reduce g in
+  if valid then
+    ( let solver = qed_time g in
+      set_result g VCS.Qed (VCS.result ~solver VCS.Valid) ) ;
+  valid
 
 let compute g =
   match g.po_formula with

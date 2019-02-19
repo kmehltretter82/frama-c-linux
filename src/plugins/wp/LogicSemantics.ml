@@ -579,7 +579,11 @@ struct
     | L_cint _ ->
         L.map Cint.to_integer (C.logic env t)
     | L_integer -> C.logic env t
-    | L_cfloat _|L_bool|L_pointer _|L_array _ ->
+    | L_cfloat f ->
+        L.map
+          (fun x -> Cmath.int_of_real (Cfloat.real_of_float f x))
+          (C.logic env t)
+    | L_bool|L_pointer _|L_array _ ->
         Warning.error "@[Logic cast from (%a) to (%a) not implemented yet@]"
           Printer.pp_logic_type src_ltype Printer.pp_logic_type Linteger
 

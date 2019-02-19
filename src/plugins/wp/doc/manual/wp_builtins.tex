@@ -235,6 +235,20 @@ polar coordinates. Definitions imported from the reference implementation of
 
 %---------------------------------------------------------------------------------------------
 
+\vskip 1em
+\hrule
+\label{builtin-fpcmp}
+\paragraph{$\builtin{le\_float}(x,y)$, $\builtin{ge\_float}(x,y)$,
+$\builtin{lt\_float}(x,y)$, $\builtin{gt\_float}(x,y)$, $\builtin{eq\_float}(x,y)$,
+$\builtin{ne\_float}(x,y)$, $\builtin{le\_double}(x,y)$,
+$\builtin{ge\_double}(x,y)$, $\builtin{lt\_double}(x,y)$,
+$\builtin{gt\_double}(x,y)$, $\builtin{eq\_double}(x,y)$, and
+$\builtin{ne\_double}(x,y)$} for dealing with floating point
+comparisons. They are similar to comparisons over the real numbers if both
+$x$ and $y$ are finite, but obey IEEE semantics for infinities and NaNs
+
+%---------------------------------------------------------------------------------------------
+
 \section{Custom Extensions}
 
 As explained in Section~\ref{drivers}, it is possible to extend all the properties mentioned

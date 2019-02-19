@@ -252,7 +252,7 @@ let translate_lval = function
 let translate_constant = function
   | CInt64 (i, _, _) -> begin
       try Coeff.s_of_int (Integer.to_int i) (* TODO: skip OCaml int type *)
-      with Failure _ -> raise (Out_of_Scope "translate_constant big int")
+      with Z.Overflow | Failure _ -> raise (Out_of_Scope "translate_constant big int")
     end
   | _ -> raise (Out_of_Scope "translate_constant not integer")
 
@@ -501,7 +501,7 @@ module Make
       (* May happen when evaluating an expression in the GUI, while the states
          of Apron have not been saved. In this case, we evaluate in the top
          apron state, whose environment raises the Failure exception. *)
-      | Failure _ -> top
+      | Z.Overflow | Failure _ -> top
 
   let extract_expr _oracle state expr =
     compute state expr (Cil.typeOf expr)
