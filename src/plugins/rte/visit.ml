@@ -224,7 +224,8 @@ class annot_visitor kf flags on_alarm = object (self)
 
   method private generate_assertion: 'a. 'a Rte.alarm_gen -> 'a -> unit =
     fun fgen ->
-      let on_alarm ?status a = on_alarm self#current_kinstr ?status a in
+      let stmt = Extlib.the (self#current_stmt) in
+      let on_alarm ~invalid a = on_alarm stmt ~invalid a in
       fgen ~remove_trivial:flags.remove_trivial ~on_alarm
 
   method! vstmt s = match s.skind with
@@ -464,30 +465,38 @@ let rte_annotations stmt =
 
 (** {2 Iterate over Alarms on Cil elements} *)
 
-type on_alarm =
-  kinstr -> ?status:Property_status.emitted_status ->
-  Alarms.alarm -> unit
+type on_alarm = kernel_function -> stmt -> invalid:bool -> Alarms.alarm -> unit
 
 let iter_alarms visit ?flags (on_alarm:on_alarm) kf stmt element =
   let flags = match flags with
     | None -> default ()
     | Some opt -> opt in
   let visitor = object (self)
-    inherit annot_visitor kf flags on_alarm
+    inherit annot_visitor kf flags (on_alarm kf)
     initializer self#push_stmt stmt
   end in
   ignore (visit (visitor :> Cil.cilVisitor) element)
 
 type 'a iterator =
   ?flags:flags -> on_alarm ->
-  Kernel_function.t ->
-  Cil_types.stmt ->
-  'a -> unit
+  Kernel_function.t -> Cil_types.stmt -> 'a -> unit
 
 let iter_lval : lval iterator = iter_alarms Cil.visitCilLval
 let iter_exp : exp iterator = iter_alarms Cil.visitCilExpr
 let iter_instr : instr iterator = iter_alarms Cil.visitCilInstr
 let iter_stmt : stmt iterator = iter_alarms Cil.visitCilStmt
+
+(** {2 Regitration} *)
+
+let status ~invalid =
+  if invalid then Some Property_status.False_if_reachable else None
+
+let annotation emitter kf stmt ~invalid alarm =
+  let status = status ~invalid in
+  Alarms.register emitter ~kf (Kstmt stmt) ?status alarm
+
+let register emitter kf stmt ~invalid alarm =
+  ignore (annotation emitter kf stmt ~invalid alarm)
 
 (** {2 List of all RTEs on a given Cil object} *)
 
@@ -496,8 +505,8 @@ let get_annotations from kf stmt x =
   (* Accumulator containing all the code_annots corresponding to an alarm
      emitted so far. *)
   let code_annots = ref [] in
-  let on_alarm ki ?status:_ alarm =
-    let ca, _ = Alarms.to_annot ki alarm in
+  let on_alarm stmt ~invalid:_ alarm =
+    let ca, _ = Alarms.to_annot (Kstmt stmt) alarm in
     code_annots := ca :: !code_annots;
   in
   let o = object (self)
@@ -511,7 +520,6 @@ let do_stmt_annotations kf stmt =
   get_annotations Cil.visitCilStmt kf stmt stmt
 
 let do_exp_annotations = get_annotations Cil.visitCilExpr
-
 
 (** {2 Annotations of kernel_functions for a given type of RTE} *)
 
@@ -552,13 +560,11 @@ let annotate_kf_aux flags kf =
     then begin
       Options.feedback "annotating function %a" Kernel_function.pretty kf;
       let warn = Options.Warn.get () in
-      let on_alarm ki ?status alarm =
-        let ca, _ = Alarms.register Generator.emitter ~kf ki ?status alarm in
-        match warn, status with
-        | true, Some Property_status.False_if_reachable ->
+      let on_alarm stmt ~invalid alarm =
+        let ca, _ = annotation Generator.emitter kf stmt ~invalid alarm in
+        if warn && invalid then
           Options.warn "@[guaranteed RTE:@ %a@]"
             Printer.pp_code_annotation ca
-        | _ -> ()
       in
       let vis = new annot_visitor kf flags on_alarm in
       let nkf = Visitor.visitFramacFunction vis f in
