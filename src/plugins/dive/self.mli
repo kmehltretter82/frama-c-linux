@@ -26,6 +26,7 @@ module type Varinfo_set = Parameter_sig.Set
   with type elt = Cil_types.varinfo
    and type t = Cil_datatype.Varinfo.Set.t
 
+module OutputBasename : Parameter_sig.String
 module DepthLimit : Parameter_sig.Int
 module FromAlarms : Parameter_sig.Bool
 module FromBases : Varinfo_set

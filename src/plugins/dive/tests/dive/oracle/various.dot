@@ -1,0 +1,40 @@
+digraph G {
+  cp0 [fillcolor="#AACCFF", color="#88AAFF", style="invis,filled,dotted", ];
+  cp1 [label=<x2>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+       style="filled", ];
+  cp2 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+       style="filled", ];
+  cp3 [label=<x>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+       style="filled", ];
+  cp4 [label=<g>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+       style="filled", ];
+  cp5 [label=<z>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+       style="filled", ];
+  cp6 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+       style="filled", ];
+  cp7 [label=<w>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+       style="filled", ];
+  cp8 [label=<tmp_0>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+       style="filled", ];
+  cp9 [label=<pf>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+       style="filled,dotted", ];
+  
+  subgraph cluster_file_1 { label=<tests/dive/various.i>; cp4;cp0;
+    subgraph cluster_function_19 { label=<f>; cp2;cp1;
+       };
+    subgraph cluster_function_24 { label=<main>; cp9;cp8;cp7;cp6;cp5;cp3;
+       };
+     };
+  
+  cp1 -> cp2;
+  cp1 -> cp6;
+  cp1 -> cp8;
+  cp2 -> cp1;
+  cp3 -> cp1;
+  cp4 -> cp3;
+  cp6 -> cp5;
+  cp7 -> cp5;
+  cp8 -> cp7;
+  cp9 -> cp8 [color="#00FF00", ];
+  
+  }

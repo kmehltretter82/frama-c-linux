@@ -31,9 +31,14 @@ let main () =
     let depth_limit = Self.DepthLimit.get () in
     Self.FromBases.iter (Build.add_var ~depth_limit context);
     (* Output it *)
-    let out_channel = open_out "imprecisions.dot" in
-    Imprecision_graph.ouptput_to_dot out_channel (Build.get_graph context);
-    close_out out_channel
+    let output_basename = Self.OutputBasename.get () in
+    if output_basename <> "" then begin
+      let filename = output_basename ^ ".dot" in
+      Self.result "output to %s" filename;
+      let out_channel = open_out filename in
+      Imprecision_graph.ouptput_to_dot out_channel (Build.get_graph context);
+      close_out out_channel
+    end;
   end
 
 let () =

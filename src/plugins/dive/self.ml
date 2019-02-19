@@ -29,12 +29,19 @@ include Plugin.Register
       let help = "An interactive imprecision graph generator."
     end)
 
+module OutputBasename = Empty_string
+    (struct
+      let option_name = "-dive-output"
+      let help = "Outputs the built graph into a file with this basename."
+      let arg_name = "basename"
+    end)
+
 module DepthLimit = Int
     (struct
-      let default = 5
       let option_name = "-dive-depth-limit"
       let help = "Build dependencies up to a depth of N."
       let arg_name = "N"
+      let default = 3
     end)
 
 module FromAlarms = True
@@ -49,26 +56,27 @@ struct
 
   let of_string s =
     let regexp = Str.regexp "^\\([_a-zA-Z0-9]+\\)::\\([_a-zA-Z0-9]+\\)$" in
-    let name, localisation, error_suffix =
-      if Str.string_match regexp s 0 then
-        let function_name = Str.matched_group 1 s
-        and variable_name = Str.matched_group 2 s in
-        try
-          let kf = Globals.Functions.find_by_name function_name in
-          variable_name, VLocal kf, " in function " ^ function_name
+    if Str.string_match regexp s 0 then
+      let function_name = Str.matched_group 1 s
+      and variable_name = Str.matched_group 2 s in
+      let kf = try Globals.Functions.find_by_name function_name
         with Not_found -> 
           raise (Cannot_build ("no function '" ^ function_name ^ "'"))
-      else
-        let regexp = Str.regexp "^[_a-zA-Z0-9]+$" in
-        if Str.string_match regexp s 0 then
-          s, VGlobal, ""
-        else
-          raise (Cannot_build ("wrong syntax: '" ^ s ^ "'"))
-    in
-    try
-      Globals.Vars.find_from_astinfo name localisation
-    with Not_found ->
-      raise (Cannot_build ("no variable '" ^ name ^ "'" ^ error_suffix))
+      in
+      try Globals.Vars.find_from_astinfo variable_name (VLocal kf)
+      with Not_found ->
+      try Globals.Vars.find_from_astinfo variable_name (VFormal kf)
+      with Not_found ->
+        raise (Cannot_build ("no variable '" ^ name ^ "' in function"
+                             ^ function_name))
+    else
+      let regexp = Str.regexp "^[_a-zA-Z0-9]+$" in
+      if not (Str.string_match regexp s 0) then
+        raise (Cannot_build ("wrong syntax: '" ^ s ^ "'"));
+      try
+        Globals.Vars.find_from_astinfo name VGlobal
+      with Not_found ->
+        raise (Cannot_build ("no global variable '" ^ name ^ "'"))
 
   let to_string vi =
     match Kernel_function.find_defining_kf vi with

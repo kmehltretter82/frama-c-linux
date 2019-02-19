@@ -1,0 +1,28 @@
+digraph G {
+  cp0 [fillcolor="#AACCFF", color="#88AAFF", style="invis,filled,dotted", ];
+  cp1 [label=<res>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+       style="filled", ];
+  cp2 [fillcolor="#AACCFF", color="#88AAFF", style="invis,filled,dotted", ];
+  cp3 [label=<__retres>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+       style="filled", ];
+  cp4 [label=<c>, shape=box, ];
+  cp5 [label=<w>, shape=box, ];
+  cp6 [label=<x>, shape=box, style="dotted", ];
+  cp7 [label=<y>, shape=box, style="dotted", ];
+  
+  subgraph cluster_file_1 { label=<tests/dive/const.i>; cp0;
+    subgraph cluster_function_25 { label=<main>; cp1;
+       };
+     };
+  subgraph cluster_file_2 { label=<>; cp2;
+    subgraph cluster_function_18 { label=<f>; cp7;cp6;cp5;cp4;cp3;
+       };
+     };
+  
+  cp3 -> cp1;
+  cp4 -> cp3;
+  cp5 -> cp3;
+  cp6 -> cp4;
+  cp7 -> cp5;
+  
+  }
