@@ -12,7 +12,7 @@
 [wp] [Qed] Goal typed_band_bit2_ensures_band4 : Valid
 [wp] [Qed] Goal typed_band_bit3_ensures_band5 : Valid
 [wp] [Qed] Goal typed_band_bit4_ensures_band6 : Valid
-[wp] [Alt-Ergo] Goal typed_band_bool_false_ensures : Unknown
+[wp] [Alt-Ergo] Goal typed_band_bool_false_ensures : Unsuccess
 [wp] [Qed] Goal typed_band_bool_true_ensures : Valid
 [wp] [Qed] Goal typed_bnot_ensures : Valid
 [wp] [Qed] Goal typed_bor_ensures : Valid
@@ -20,12 +20,12 @@
 [wp] [Qed] Goal typed_bor_bit1_ensures_bor1 : Valid
 [wp] [Qed] Goal typed_bor_bit2_ensures_bor2 : Valid
 [wp] [Qed] Goal typed_bor_bit3_ensures_bor3 : Valid
-[wp] [Alt-Ergo] Goal typed_bor_bool_false_ensures : Unknown
+[wp] [Alt-Ergo] Goal typed_bor_bool_false_ensures : Unsuccess
 [wp] [Alt-Ergo] Goal typed_bor_bool_true_ensures : Valid
 [wp] [Qed] Goal typed_bxor_ensures : Valid
 [wp] [Qed] Goal typed_bxor_bit1_ensures : Valid
 [wp] [Qed] Goal typed_bxor_bit2_ensures : Valid
-[wp] [Alt-Ergo] Goal typed_bxor_bool_false_ensures : Unknown
+[wp] [Alt-Ergo] Goal typed_bxor_bool_false_ensures : Unsuccess
 [wp] [Qed] Goal typed_bxor_bool_true_ensures : Valid
 [wp] [Qed] Goal typed_lshift_ensures : Valid
 [wp] [Qed] Goal typed_lshift_shift1_ensures_lsl1 : Valid
@@ -35,7 +35,7 @@
 [wp] [Qed] Goal typed_rshift_shift1_ensures_lsr1 : Valid
 [wp] Proved goals:   26 / 29
   Qed:            25 
-  Alt-Ergo:        1  (unknown: 3)
+  Alt-Ergo:        1  (unsuccess: 3)
 [wp] Report 'tests/wp_acsl/bitwise.i.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success

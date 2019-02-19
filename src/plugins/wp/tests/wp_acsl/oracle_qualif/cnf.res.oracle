@@ -308,4 +308,4 @@
 Functions           WP     Alt-Ergo        Total   Success
 f                   11     32 (336..384)    43       100%
 -------------------------------------------------------------
-[wp] Logging keys: shell,no-time-info,no-step-info,cnf.
+[wp] Logging keys: success-only,shell,cnf.
