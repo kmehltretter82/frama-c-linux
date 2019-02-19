@@ -112,7 +112,7 @@ module Specific(KF:sig val kf: Kernel_function.t end) = struct
                 Integer.power_int_positive_int in_loop_i (max_iteration + 1)
             in
             let slevel_inside_loop =
-              Integer.div (Integer.pred s) (Integer.pred in_loop)
+              Integer.e_div (Integer.pred s) (Integer.pred in_loop)
             in
             let result = Integer.mul entry slevel_inside_loop in
             (* Kernel.feedback "s %a slevel_inside_loop %a result %a" *)

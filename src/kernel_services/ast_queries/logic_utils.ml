@@ -2346,9 +2346,9 @@ and constFoldBinOpToInt ~machdep bop e1 e2 =
       | PlusPI | IndexPI | MinusPI | MinusPP -> None
       | Mult -> Some (Integer.mul i1 i2)
       | Div ->
-        if Integer.(equal zero i2) && Integer.(is_zero (rem i1 i2)) then None
-        else Some (Integer.div i1 i2)
-      | Mod -> if Integer.(equal zero i2) then None else Some (Integer.rem i1 i2)
+        if Integer.(equal zero i2) && Integer.(is_zero (e_rem i1 i2)) then None
+        else Some (Integer.e_div i1 i2)
+      | Mod -> if Integer.(equal zero i2) then None else Some (Integer.e_rem i1 i2)
       | BAnd -> Some (Integer.logand i1 i2)
       | BOr -> Some (Integer.logor i1 i2)
       | BXor -> Some (Integer.logxor i1 i2)
@@ -2377,8 +2377,8 @@ and constFoldToffset t =
       try
         let start, _width = bitsLogicOffset v.lv_type offset in
         let size_char = Integer.eight in
-        if Integer.(is_zero (rem start size_char)) then
-          Some (Integer.div start size_char)
+        if Integer.(is_zero (e_rem start size_char)) then
+          Some (Integer.e_div start size_char)
         else None (* bitfields *)
       with Cil.SizeOfError _ -> None
     end

@@ -390,7 +390,7 @@ module Int = struct
   let fold f ~inf ~sup ~step acc =
 (*    Format.printf "Int.fold: inf:%a sup:%a step:%a@\n"
        pretty inf pretty sup pretty step; *)
-    let nb_loop = div (sub sup inf) step in
+    let nb_loop = e_div (sub sup inf) step in
     let rec fold_incr ~counter ~inf acc =
       if equal counter onethousand then
         Lattice_messages.emit_costly msg_emitter

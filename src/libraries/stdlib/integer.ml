@@ -62,9 +62,15 @@ let succ = Z.succ
 let pred = Z.pred
 let neg = Z.neg
 
-let rem = Z.erem
-let div = Z.ediv
 let mul = Z.mul
+
+let e_div = Z.ediv
+let e_rem = Z.erem
+let e_div_rem = Z.ediv_rem
+
+let c_div = Z.div
+let c_rem = Z.rem
+let c_div_rem = Z.div_rem
 
 let abs = Z.abs
 
@@ -191,54 +197,6 @@ let pretty ?(hexa=false) fmt v =
 
 let is_one v = equal one v
 
-let pos_div  = div
-let pos_rem = rem
-let native_div = div
-let divexact = Z.divexact
-let div_rem = Z.div_rem
-
-(*
-let _c_div u v =
-  let bad_div = div u v in
-  if (lt u zero) && not (is_zero (rem u v))
-  then
-    if lt v zero
-    then pred bad_div
-    else succ bad_div
-  else bad_div
-
-let _c_div u v =
-  let res = _c_div u v in
-  let res2 = Z.div u v in
-  if not (equal res res2) then
-    failwith (Printf.sprintf "division of %a %a c_div %a div %a"
-                Z.sprint u
-                Z.sprint v
-                Z.sprint res
-                Z.sprint res2)
-  else res2
-*)
-
-let c_div = Z.div
-
-(*
-let _c_rem u v =
-  sub u (mul v (c_div u v))
-
-let _c_rem u v =
-  let res = _c_rem u v in
-  let res2 = Z.rem u v in
-  if not (equal res res2) then
-    failwith (Printf.sprintf "division of %a %a c_rem %a rem %a"
-                Z.sprint u
-                Z.sprint v
-                Z.sprint res
-                Z.sprint res2)
-  else res2
-*)
-
-let c_rem = Z.rem
-
 let cast ~size ~signed ~value =
   if (not signed)
   then
@@ -276,7 +234,7 @@ let min = Z.min
 let max = Z.max
 
 let round_down_to_zero v modu =
-  mul (pos_div v modu) modu
+  mul (e_div v modu) modu
 
 let round_up_to_r ~min:m ~r ~modu =
   add (add (round_down_to_zero (pred (sub m r)) modu) r) modu

@@ -939,11 +939,11 @@ let rec eval_term ~alarm_mode env t =
            frontiers are always 0 or 8*k-1 (because validity is in bits and
            starts on zero), so we add 1 everywhere, then divide by eight. *)
         let convert start_bits end_bits =
-          let congr_succ i = Int.(equal zero (rem (succ i) eight)) in
+          let congr_succ i = Int.(equal zero (e_rem (succ i) eight)) in
           let congr_or_zero i = Int.(equal zero i || congr_succ i) in
           assert (congr_or_zero start_bits || congr_or_zero end_bits);
-          let start_bytes = Int.(pos_div (Int.succ start_bits) eight) in
-          let end_bytes =   Int.(pos_div (Int.succ end_bits)   eight) in
+          let start_bytes = Int.(e_div (Int.succ start_bits) eight) in
+          let end_bytes =   Int.(e_div (Int.succ end_bits)   eight) in
           Ival.inject_range (Some start_bytes) (Some end_bytes)
         in
         match Base.validity b with
