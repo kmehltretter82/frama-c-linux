@@ -77,7 +77,7 @@ struct
       try
         Globals.Vars.find_from_astinfo name VGlobal
       with Not_found ->
-        raise (Cannot_build ("no global variable '" ^ name ^ "'"))
+        raise (Cannot_build ("no global variable '" ^ s ^ "'"))
 
   let to_string vi =
     match Kernel_function.find_defining_kf vi with
