@@ -1,15 +1,21 @@
-tests/special/e-acsl-valid.c:39:[value:alarm] warning: function f: precondition \valid(y) got status unknown.
-tests/special/e-acsl-valid.c:19:[value:alarm] warning: function f, behavior b1: postcondition got status invalid. (Behavior may be inactive, no reduction performed.)
+[eva:alarm] tests/special/e-acsl-valid.c:39: Warning: 
+  function f: precondition \valid(y) got status unknown.
 [e-acsl] beginning translation.
-tests/special/e-acsl-valid.c:27:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-    Ignoring annotation.
-tests/special/e-acsl-valid.c:28:[e-acsl] warning: E-ACSL construct `variant' is not yet supported. Ignoring annotation.
-tests/special/e-acsl-valid.c:31:[e-acsl] warning: E-ACSL construct `complete behaviors' is not yet supported.
-    Ignoring annotation.
-tests/special/e-acsl-valid.c:31:[e-acsl] warning: E-ACSL construct `disjoint behaviors' is not yet supported.
-    Ignoring annotation.
-tests/special/e-acsl-valid.c:13:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-    Ignoring annotation.
-tests/special/e-acsl-valid.c:22:[e-acsl] warning: E-ACSL construct `assigns clause in behavior' is not yet supported.
-    Ignoring annotation.
+[e-acsl] tests/special/e-acsl-valid.c:27: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] tests/special/e-acsl-valid.c:28: Warning: 
+  E-ACSL construct `variant' is not yet supported. Ignoring annotation.
+[e-acsl] tests/special/e-acsl-valid.c:31: Warning: 
+  E-ACSL construct `complete behaviors' is not yet supported.
+  Ignoring annotation.
+[e-acsl] tests/special/e-acsl-valid.c:31: Warning: 
+  E-ACSL construct `disjoint behaviors' is not yet supported.
+  Ignoring annotation.
+[e-acsl] tests/special/e-acsl-valid.c:13: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] tests/special/e-acsl-valid.c:22: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".

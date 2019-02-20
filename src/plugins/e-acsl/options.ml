@@ -114,6 +114,15 @@ module Builtins =
       let help = "C functions which can be used in the E-ACSL specifications"
      end)
 
+module Functions =
+  Kernel_function_set
+    (struct
+      let option_name = "-e-acsl-functions"
+      let arg_name ="f1, ..., fn"
+      let help = "only annotations in functions f1, ..., fn are checked at \
+runtime"
+     end)
+
 let () = Parameter_customize.set_group help
 module Version =
   False

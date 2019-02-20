@@ -263,13 +263,15 @@ class dup_functions_visitor prj = object (self)
   method !vglob_aux = function
   | GVarDecl(vi, loc) | GFunDecl(_, vi, loc) | GFun({ svar = vi }, loc)
       when self#is_unvariadic_function vi
-	&& not (Misc.is_library_loc loc) 
-	&& not (Cil.is_builtin vi)
-	&& not (Cil_datatype.Varinfo.Hashtbl.mem fct_tbl vi)
-	&& not (Cil.is_empty_funspec
-		  (Annotations.funspec ~populate:false
-		     (Extlib.the self#current_kf)))
-	-> 
+        && not (Misc.is_library_loc loc)
+        && not (Cil.is_builtin vi)
+        && not (Cil_datatype.Varinfo.Hashtbl.mem fct_tbl vi)
+        && not (Cil.is_empty_funspec
+                  (Annotations.funspec ~populate:false
+                     (Extlib.the self#current_kf)))
+        && Functions.check
+          (try Globals.Functions.get vi with Not_found -> assert false)
+        ->
     self#next ();
     let name = Functions.RTL.mk_gen_name vi.vname in
     let new_vi = 

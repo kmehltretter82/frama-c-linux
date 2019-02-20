@@ -14,7 +14,7 @@
   @ ensures *x == \old(*x)+1;
   @ assigns *x \from *x,x;
   @ behavior b1:
-  @   assumes *y == 1;
+  @   assumes *x == 1;
   @   assigns \nothing;
   @   ensures *x < 0;
   @ behavior b2:

@@ -643,25 +643,31 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
             env
         in
         (* translate the precondition of the function *)
-        Project.on prj (Translate.translate_pre_spec kf env) !funspec
+        if Functions.check kf then
+          Project.on prj (Translate.translate_pre_spec kf env) !funspec
+        else
+          env
       else
         env
     in
 
     let env, new_annots =
-      Annotations.fold_code_annot
-        (fun _ old_a (env, new_annots) ->
-          let a =
-            (* [VP] Don't use Visitor here, as it will fill the queue in the
-               middle of the computation... *)
-            Cil.visitCilCodeAnnotation (self :> Cil.cilVisitor) old_a
-          in
-          let env =
-            Project.on prj (Translate.translate_pre_code_annotation kf env) a
-          in
-          env, a :: new_annots)
-        (Cil.get_original_stmt self#behavior stmt)
-        (env, [])
+      if Functions.check kf then
+        Annotations.fold_code_annot
+          (fun _ old_a (env, new_annots) ->
+            let a =
+              (* [VP] Don't use Visitor here, as it will fill the queue in the
+                 middle of the computation... *)
+              Cil.visitCilCodeAnnotation (self :> Cil.cilVisitor) old_a
+            in
+            let env =
+              Project.on prj (Translate.translate_pre_code_annotation kf env) a
+            in
+            env, a :: new_annots)
+          (Cil.get_original_stmt self#behavior stmt)
+          (env, [])
+      else
+        env, []
     in
 
     (* Add [__e_acsl_store_duplicate] calls for local variables which
@@ -686,18 +692,32 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
           let env = Temporal.handle_stmt stmt env in
           (* Add initialization statements and store_block statements stemming
              from Local_init *)
-            self#handle_instructions stmt env kf
+          self#handle_instructions stmt env kf
         else
           env
       in
-      let env =
-        if stmt.ghost && generate then begin
-          stmt.ghost <- false;
-          (* translate potential RTEs of ghost code *)
-          let rtes = Rte.stmt ~warn:false kf stmt in
-          Translate.translate_rte_annots Printer.pp_stmt stmt kf env rtes
-        end else
-          env
+      let new_stmt, env, must_mv =
+        if Functions.check kf then
+          let env =
+            (* handle ghost statement *)
+            if stmt.ghost then begin
+              stmt.ghost <- false;
+              (* translate potential RTEs of ghost code *)
+              let rtes = Rte.stmt ~warn:false kf stmt in
+              Translate.translate_rte_annots Printer.pp_stmt stmt kf env rtes
+            end else
+              env
+          in
+          (* handle loop invariants *)
+          let new_stmt, env, must_mv =
+            Loops.preserve_invariant prj env kf stmt
+          in
+          let orig = Cil.get_original_stmt self#behavior stmt in
+          Cil.set_orig_stmt self#behavior new_stmt orig;
+          Cil.set_stmt self#behavior orig new_stmt;
+          new_stmt, env, must_mv
+        else
+          stmt, env, false
       in
       let mk_post_env env =
         (* [fold_right] to preserve order of generation of pre_conditions *)
@@ -708,11 +728,6 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
              new_annots)
           env
       in
-      (* handle loop invariants *)
-      let new_stmt, env, must_mv = Loops.preserve_invariant prj env kf stmt in
-      let orig = Cil.get_original_stmt self#behavior stmt in
-      Cil.set_orig_stmt self#behavior new_stmt orig;
-      Cil.set_stmt self#behavior orig new_stmt;
       let new_stmt, env =
         (* Remove local variables which scopes ended via goto/break/continue. *)
         let del_vars = Exit_points.delete_vars stmt in
@@ -721,13 +736,20 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
           else env
         in
         if self#is_return kf stmt then
-          (* must generate the post_block before including [stmt] (the 'return')
-             since no code is executed after it. However, since this statement
-             is pure (Cil invariant), that is semantically correct. *)
-          let env = mk_post_env env in
-          (* also handle the postcondition of the function and clear the env *)
           let env =
-            Project.on prj (Translate.translate_post_spec kf env) !funspec
+            if Functions.check kf then
+              (* must generate the post_block before including [stmt] (the
+                 'return') since no code is executed after it. However, since
+                 this statement is pure (Cil invariant), that is semantically
+                 correct. *)
+              (* [JS 2019/2/19] TODO: what about the other ways of early exiting
+                 a block? *)
+              let env = mk_post_env env in
+              (* also handle the postcondition of the function and clear the
+                 env *)
+              Project.on prj (Translate.translate_post_spec kf env) !funspec
+            else
+              env
           in
           (* de-allocating memory previously allocating by the kf *)
           (* JS: should be done in the new project? *)
@@ -778,7 +800,15 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
                 ~global_clear:false
                 Env.After
             in
-            let env = mk_post_env (Env.push env) in
+            let env =
+              (* if [kf] is not monitored, do not translate any postcondition,
+                 but still push an empty environment consumed by
+                 [Env.pop_and_get] below. This [Env.pop_and_get] call is always
+                 required in order to generate the code not directly related to
+                 the annotations of the current stmt in anycase. *)
+              if Functions.check kf then mk_post_env (Env.push env)
+              else Env.push env
+            in
             let post_block, env =
               Env.pop_and_get
                 env
@@ -795,6 +825,7 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
             if not (Cil_datatype.Stmt.equal new_stmt res) then
               E_acsl_label.move (self :> Visitor.generic_frama_c_visitor)
                 new_stmt res;
+            let orig = Cil.get_original_stmt self#behavior stmt in
             Cil.set_stmt self#behavior orig res;
             Cil.set_orig_stmt self#behavior res orig;
             res, env

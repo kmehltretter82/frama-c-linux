@@ -152,7 +152,8 @@ PLUGIN_TESTS_DIRS := \
 	no-main \
 	full-mmodel \
 	temporal \
-	builtin
+	builtin \
+	special
 
 endif
 
