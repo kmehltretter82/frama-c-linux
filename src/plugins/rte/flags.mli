@@ -20,32 +20,53 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Consult internal plug-in documentation for more details *)
+(* -------------------------------------------------------------------------- *)
+(** Filtering Categories of Alarms *)
+(* -------------------------------------------------------------------------- *)
 
-(** Flags for filtering Alarms *)
-module Flags : module type of Flags
+(** Flags for controling the low-level API. Each flag control whether
+    a category of alarms will be visited or not. *)
+type t = {
+  remove_trivial: bool;
+  initialized: bool;
+  mem_access: bool;
+  div_mod: bool;
+  shift: bool;
+  left_shift_negative: bool;
+  right_shift_negative: bool;
+  signed_overflow: bool;
+  unsigned_overflow: bool;
+  signed_downcast: bool;
+  unsigned_downcast: bool;
+  float_to_int: bool;
+  finite_float: bool;
+  pointer_call: bool;
+  bool_value: bool;
+}
 
-(** RTE Generator Status & Emitters *)
-module Generator : module type of Generator
+(** Defaults flags are taken from the Kernel and RTE plug-in options. *)
+val default :
+  ?remove_trivial:bool ->
+  ?initialized:bool ->
+  ?mem_access:bool ->
+  ?div_mod:bool ->
+  ?shift:bool ->
+  ?left_shift_negative:bool ->
+  ?right_shift_negative:bool ->
+  ?signed_overflow:bool ->
+  ?unsigned_overflow:bool ->
+  ?signed_downcast:bool ->
+  ?unsigned_downcast:bool ->
+  ?float_to_int:bool ->
+  ?finite_float:bool ->
+  ?pointer_call:bool ->
+  ?bool_value:bool ->
+  unit -> t
 
-(** Visitors to iterate over Alarms and/or generate Code-Annotations *)
-module Visit : sig
-  open Cil_types
-  val annotate_kf: kernel_function -> unit
-  val do_all_rte: kernel_function -> unit
-  val do_rte: kernel_function -> unit
-  val do_stmt_annotations: kernel_function -> stmt -> code_annotation list
-  val do_exp_annotations: kernel_function -> stmt -> exp -> code_annotation list
-  val compute: unit -> unit
-  type on_alarm = kernel_function -> stmt -> invalid:bool -> Alarms.alarm -> unit
-  type 'a iterator = ?flags:Flags.t -> on_alarm ->
-    Kernel_function.t -> Cil_types.stmt -> 'a -> unit
-  val iter_lval : lval iterator
-  val iter_exp : exp iterator
-  val iter_instr : instr iterator
-  val iter_stmt : stmt iterator
-  val annotation :
-    Emitter.t -> kernel_function -> stmt -> invalid:bool -> Alarms.alarm ->
-    code_annotation * bool
-  val register : Emitter.t -> on_alarm
-end
+(** All flags set to [true]. *)
+val all : t
+
+(** All flags set to [false]. *)
+val none : t
+
+(* -------------------------------------------------------------------------- *)

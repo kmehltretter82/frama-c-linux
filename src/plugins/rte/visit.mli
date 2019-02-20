@@ -49,53 +49,6 @@ val do_exp_annotations: kernel_function -> stmt -> exp -> code_annotation list
 *)
 val compute: unit -> unit
 
-(** {2 Low Level Iterator Control} *)
-
-(** Flags for controling the low-level API. Each flag control whether
-    a category of alarms will be visited or not. *)
-type flags = {
-  remove_trivial: bool;
-  initialized: bool;
-  mem_access: bool;
-  div_mod: bool;
-  shift: bool;
-  left_shift_negative: bool;
-  right_shift_negative: bool;
-  signed_overflow: bool;
-  unsigned_overflow: bool;
-  signed_downcast: bool;
-  unsigned_downcast: bool;
-  float_to_int: bool;
-  finite_float: bool;
-  pointer_call: bool;
-  bool_value: bool;
-}
-
-(** Defaults flags are taken from the Kernel and RTE plug-in options. *)
-val default :
-  ?remove_trivial:bool ->
-  ?initialized:bool ->
-  ?mem_access:bool ->
-  ?div_mod:bool ->
-  ?shift:bool ->
-  ?left_shift_negative:bool ->
-  ?right_shift_negative:bool ->
-  ?signed_overflow:bool ->
-  ?unsigned_overflow:bool ->
-  ?signed_downcast:bool ->
-  ?unsigned_downcast:bool ->
-  ?float_to_int:bool ->
-  ?finite_float:bool ->
-  ?pointer_call:bool ->
-  ?bool_value:bool ->
-  unit -> flags
-
-(** All flags set to [true]. *)
-val flags_all : flags
-
-(** All flags set to [false]. *)
-val flags_none : flags
-
 (** {2 Low-Level RTE Iterators}
 
     RTE Iterators allow to traverse a Cil AST fragment (stmt, expr, l-value)
@@ -120,8 +73,7 @@ val flags_none : flags
 type on_alarm = kernel_function -> stmt -> invalid:bool -> Alarms.alarm -> unit
 
 (** Type of low-level iterators visiting an element ['a] of the AST *)
-type 'a iterator =
-  ?flags:flags -> on_alarm ->
+type 'a iterator = ?flags:Flags.t -> on_alarm ->
   Kernel_function.t -> Cil_types.stmt -> 'a -> unit
 
 val iter_lval : lval iterator

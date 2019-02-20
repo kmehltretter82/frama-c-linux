@@ -957,7 +957,7 @@ $(eval $(call include_generic_plugin_Makefile,$(PLUGIN_NAME)))
 PLUGIN_ENABLE:=$(ENABLE_RTEGEN)
 PLUGIN_NAME:=RteGen
 PLUGIN_DIR:=src/plugins/rte
-PLUGIN_CMO:= options generator rte visit register
+PLUGIN_CMO:= options generator rte flags visit register
 PLUGIN_DISTRIBUTED:=yes
 PLUGIN_INTERNAL_TEST:=yes
 PLUGIN_TESTS_DIRS:=rte rte_manual
