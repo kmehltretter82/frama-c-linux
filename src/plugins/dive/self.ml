@@ -74,9 +74,9 @@ struct
       let regexp = Str.regexp "^[_a-zA-Z0-9]+$" in
       if not (Str.string_match regexp s 0) then
         raise (Cannot_build ("wrong syntax: '" ^ s ^ "'"));
-      try
-        Globals.Vars.find_from_astinfo name VGlobal
-      with Not_found ->
+      match Globals.Syntactic_search.find_in_scope s Cil_types.Program with
+      | Some vi -> vi
+      | None ->
         raise (Cannot_build ("no global variable '" ^ s ^ "'"))
 
   let to_string vi =
