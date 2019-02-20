@@ -94,7 +94,7 @@ let build_simple_location lval (l : Locations.location)
     begin try
         let r = Location_Bits.M.fold one_couple m None in
         if not (Extlib.has_some r) then
-          Self.failure "Cannot resolve location %a" Cil_printer.pp_lval lval;
+          Self.warning "Cannot resolve location %a" Cil_printer.pp_lval lval;
         r
       with Exit -> None
     end
@@ -275,7 +275,7 @@ and build_call_deps context src stmt callee args =
   | Lval (Mem exp, _offset) ->
     build_exp_deps context src stmt Callee exp
   | _ ->
-    Self.failure "Cannot compute all callee dependencies for %a"
+    Self.warning "Cannot compute all callee dependencies for %a"
       Cil_printer.pp_stmt stmt;
   end;
   let kinstr = Kstmt stmt in
