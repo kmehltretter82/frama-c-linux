@@ -83,7 +83,7 @@ let _ =
        Cil_datatype.Stmt.ty
        (let module L = Datatype.List(Cil_datatype.Code_annotation) in L.ty))
     ~journalize:true
-    Visit.rte_annotations
+    Generator.get_registered_annotations
 
 let _ =
   Dynamic.register

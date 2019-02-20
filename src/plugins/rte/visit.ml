@@ -457,12 +457,6 @@ class annot_visitor kf flags on_alarm = object (self)
 
 end
 
-let rte_annotations stmt =
-  Annotations.fold_code_annot
-    (fun e a acc -> if Emitter.equal e Generator.emitter then a ::acc else acc)
-    stmt
-    []
-
 (** {2 Iterate over Alarms on Cil elements} *)
 
 type on_alarm = kernel_function -> stmt -> invalid:bool -> Alarms.alarm -> unit

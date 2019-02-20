@@ -40,7 +40,6 @@ val do_all_rte: kernel_function -> unit
 (** Generates all RTEs except preconditions for a given function. *)
 val do_rte: kernel_function -> unit
 
-val rte_annotations: stmt -> code_annotation list
 val do_stmt_annotations: kernel_function -> stmt -> code_annotation list
 val do_exp_annotations: kernel_function -> stmt -> exp -> code_annotation list
 

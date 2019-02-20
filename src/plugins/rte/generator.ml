@@ -197,6 +197,12 @@ let emitter =
     ~correctness:[ Kernel.SafeArrays.parameter ]
     ~tuning:[]
 
+let get_registered_annotations stmt =
+  Annotations.fold_code_annot
+    (fun e a acc -> if Emitter.equal e emitter then a ::acc else acc)
+    stmt
+    []
+
 (*
   Local Variables:
   compile-command: "make -C ../../.."
