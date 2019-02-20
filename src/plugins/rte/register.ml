@@ -20,6 +20,47 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* -------------------------------------------------------------------------- *)
+(* dedicated computations *)
+(* -------------------------------------------------------------------------- *)
+
+open Flags
+
+(* annotate for all rte + unsigned overflows (which are not rte), for a given
+   function *)
+let do_all_rte kf =
+  let flags =
+    { Flags.all with
+      signed_downcast = false;
+      unsigned_downcast = false; }
+  in
+  Visit.annotate ~flags kf
+
+(* annotate for rte only (not unsigned overflows and downcasts) for a given
+   function *)
+let do_rte kf =
+  let flags =
+    { Flags.all with
+      unsigned_overflow = false;
+      signed_downcast = false;
+      unsigned_downcast = false; }
+  in
+  Visit.annotate ~flags kf
+
+let compute () =
+  (* compute RTE annotations, whether Enabled is set or not *)
+  Ast.compute () ;
+  let include_function kf =
+    let fsel = Options.FunctionSelection.get () in
+    Kernel_function.Set.is_empty fsel
+    || Kernel_function.Set.mem kf fsel
+  in
+  Globals.Functions.iter
+    (fun kf -> if include_function kf then !Db.RteGen.annotate_kf kf)
+
+
+(* journal utilities *)
+
 let journal_register ?comment is_dyn name ty_arg fctref fct =
   let ty = Datatype.func ty_arg Datatype.unit in
   Db.register (Db.Journalize("RteGen." ^ name, ty)) fctref fct;
@@ -34,17 +75,16 @@ let nojournal_register fctref fct =
 
 let () =
   journal_register false
-    "annotate_kf" Kernel_function.ty Db.RteGen.annotate_kf Visit.annotate_kf;
-  journal_register false "compute" Datatype.unit Db.RteGen.compute
-    Visit.compute;
+    "annotate_kf" Kernel_function.ty Db.RteGen.annotate_kf Visit.annotate;
+  journal_register false "compute" Datatype.unit Db.RteGen.compute compute;
   journal_register true
     ~comment:"Generate all RTE annotations in the \
               given function."
-    "do_all_rte" Kernel_function.ty Db.RteGen.do_all_rte Visit.do_all_rte;
+    "do_all_rte" Kernel_function.ty Db.RteGen.do_all_rte do_all_rte;
   journal_register false
     ~comment:"Generate all RTE annotations except pre-conditions \
               in the given function."
-    "do_rte" Kernel_function.ty Db.RteGen.do_rte Visit.do_rte;
+    "do_rte" Kernel_function.ty Db.RteGen.do_rte do_rte;
   let open Generator in
   let open Db.RteGen in
   nojournal_register get_signedOv_status Signed_overflow.accessor;
@@ -94,7 +134,7 @@ let _ =
     (Datatype.func2 Kernel_function.ty Cil_datatype.Stmt.ty
        (let module L = Datatype.List(Cil_datatype.Code_annotation) in L.ty))
     ~journalize:false
-    Visit.do_stmt_annotations
+    Visit.get_annotations_stmt
 
 let _ =
   Dynamic.register
@@ -105,7 +145,7 @@ let _ =
     (Datatype.func3 Kernel_function.ty Cil_datatype.Stmt.ty Cil_datatype.Exp.ty
        (let module L = Datatype.List(Cil_datatype.Code_annotation) in L.ty))
     ~journalize:false
-    Visit.do_exp_annotations
+    Visit.get_annotations_exp
 
 let main () =
   (* reset "rte generated"/"called precond generated" properties for all

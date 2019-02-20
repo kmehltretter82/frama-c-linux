@@ -24,30 +24,27 @@
 
 open Cil_types
 
-(** {2 RTE Generator API}
+(** {2 RTE Generator API} *)
 
-    The all-in-one entry points of the RTE plugin.
-*)
+(** Annotate kernel-function with respect to options
+    and current generator status. *)
+val annotate: ?flags:Flags.t -> kernel_function -> unit
 
-(** Generates RTE for a single function. Uses the status of the various
-      RTE options do decide which kinds of annotations must be generated.
-*)
-val annotate_kf: kernel_function -> unit
+(** Returns annotations associated to alarms {i without} registering them. *)
+val get_annotations_kf:
+  ?flags:Flags.t -> kernel_function -> code_annotation list
 
-(** Generates all RTEs for a given function. *)
-val do_all_rte: kernel_function -> unit
+(** Returns annotations associated to alarms {i without} registering them. *)
+val get_annotations_stmt:
+  ?flags:Flags.t -> kernel_function -> stmt -> code_annotation list
 
-(** Generates all RTEs except preconditions for a given function. *)
-val do_rte: kernel_function -> unit
+(** Returns annotations associated to alarms {i without} registering them. *)
+val get_annotations_exp:
+  ?flags:Flags.t -> kernel_function -> stmt -> exp -> code_annotation list
 
-val do_stmt_annotations: kernel_function -> stmt -> code_annotation list
-val do_exp_annotations: kernel_function -> stmt -> exp -> code_annotation list
-
-(** Main entry point of the plug-in, used by [-rte] option: computes
-    RTE on the whole AST. Which kind of RTE is generated depends on the
-    options given on the command line.
-*)
-val compute: unit -> unit
+(** Returns annotations associated to alarms {i without} registering them. *)
+val get_annotations_lval:
+  ?flags:Flags.t -> kernel_function -> stmt -> lval -> code_annotation list
 
 (** {2 Low-Level RTE Iterators}
 
@@ -88,13 +85,11 @@ val status : invalid:bool -> Property_status.emitted_status option
 
 (** Registers and returns the annotation associated with the alarm,
     and a boolean flag indicating whether it has been freshly generated
-    or not. *)
-val annotation :
-  Emitter.t -> kernel_function -> stmt -> invalid:bool -> Alarms.alarm ->
+    or not. Simple wrapper over [Alarms.register]. *)
+val register :
+  Emitter.t ->
+  kernel_function -> stmt -> invalid:bool -> Alarms.alarm ->
   code_annotation * bool
-
-(** A callback that simply register the annotation associated with the alarm. *)
-val register : Emitter.t -> on_alarm
 
 (*
 Local Variables:

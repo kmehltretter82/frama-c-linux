@@ -343,12 +343,11 @@ end
 
 type on_alarm = kernel_function -> stmt -> invalid:bool -> Alarms.alarm -> unit
 
+let filter = function None -> Flags.default () | Some flags -> flags
+
 let iter_alarms visit ?flags (on_alarm:on_alarm) kf stmt element =
-  let flags = match flags with
-    | None -> default ()
-    | Some opt -> opt in
   let visitor = object (self)
-    inherit annot_visitor kf flags (on_alarm kf)
+    inherit annot_visitor kf (filter flags) (on_alarm kf)
     initializer self#push_stmt stmt
   end in
   ignore (visit (visitor :> Cil.cilVisitor) element)
@@ -367,40 +366,51 @@ let iter_stmt : stmt iterator = iter_alarms Cil.visitCilStmt
 let status ~invalid =
   if invalid then Some Property_status.False_if_reachable else None
 
-let annotation emitter kf stmt ~invalid alarm =
+let register emitter kf stmt ~invalid alarm =
   let status = status ~invalid in
   Alarms.register emitter ~kf (Kstmt stmt) ?status alarm
 
-let register emitter kf stmt ~invalid alarm =
-  ignore (annotation emitter kf stmt ~invalid alarm)
+(* -------------------------------------------------------------------------- *)
+(* --- List Code Annotations                                              --- *)
+(* -------------------------------------------------------------------------- *)
 
-(** {2 List of all RTEs on a given Cil object} *)
-
-let get_annotations from kf stmt x =
-  let flags = default () in
-  (* Accumulator containing all the code_annots corresponding to an alarm
-     emitted so far. *)
-  let code_annots = ref [] in
+let collector () =
+  let pool = ref [] in
   let on_alarm stmt ~invalid:_ alarm =
     let ca, _ = Alarms.to_annot (Kstmt stmt) alarm in
-    code_annots := ca :: !code_annots;
-  in
-  let o = object (self)
-    inherit annot_visitor kf flags on_alarm
+    pool := ca :: !pool ;
+  in pool , on_alarm
+
+let get_annotations_kf ?flags kf =
+  match kf.fundec with
+  | Declaration _ -> []
+  | Definition(f, _) ->
+    let pool,on_alarm = collector () in
+    let visitor = new annot_visitor kf (filter flags) on_alarm in
+    ignore (Visitor.visitFramacFunction visitor f) ; !pool
+
+let collect from flags kf stmt elt =
+  let pool,on_alarm = collector () in
+  let visitor = object (self)
+    inherit annot_visitor kf (filter flags) on_alarm
     initializer self#push_stmt stmt
   end in
-  ignore (from (o :> Cil.cilVisitor) x);
-  !code_annots
+  ignore (from (visitor :> Cil.cilVisitor) elt); !pool
 
-let do_stmt_annotations kf stmt =
-  get_annotations Cil.visitCilStmt kf stmt stmt
+let get_annotations_stmt ?flags kf stmt =
+  collect Cil.visitCilStmt flags kf stmt stmt
 
-let do_exp_annotations = get_annotations Cil.visitCilExpr
+let get_annotations_exp ?flags kf stmt exp =
+  collect Cil.visitCilExpr flags kf stmt exp
+
+let get_annotations_lval ?flags kf stmt lv =
+  collect Cil.visitCilLval flags kf stmt lv
 
 (** {2 Annotations of kernel_functions for a given type of RTE} *)
 
 (* generates annotation for function kf on the basis of [flags] *)
-let annotate_kf_aux flags kf =
+let annotate ?flags kf =
+  let flags = filter flags in
   Options.debug "annotating function %a" Kernel_function.pretty kf;
   match kf.fundec with
   | Declaration _ -> ()
@@ -437,7 +447,7 @@ let annotate_kf_aux flags kf =
       Options.feedback "annotating function %a" Kernel_function.pretty kf;
       let warn = Options.Warn.get () in
       let on_alarm stmt ~invalid alarm =
-        let ca, _ = annotation Generator.emitter kf stmt ~invalid alarm in
+        let ca, _ = register Generator.emitter kf stmt ~invalid alarm in
         if warn && invalid then
           Options.warn "@[guaranteed RTE:@ %a@]"
             Printer.pp_code_annotation ca
@@ -447,41 +457,6 @@ let annotate_kf_aux flags kf =
       assert(nkf == f);
       List.iter (fun f -> f ()) !to_update;
     end
-
-(* generates annotation for function kf on the basis of command-line options *)
-let annotate_kf kf = annotate_kf_aux (default ()) kf
-
-(* annotate for all rte + unsigned overflows (which are not rte), for a given
-   function *)
-let do_all_rte kf =
-  let flags =
-    { Flags.all with
-      signed_downcast = false;
-      unsigned_downcast = false; }
-  in
-  annotate_kf_aux flags kf
-
-(* annotate for rte only (not unsigned overflows and downcasts) for a given
-   function *)
-let do_rte kf =
-  let flags =
-    { Flags.all with
-      unsigned_overflow = false;
-      signed_downcast = false;
-      unsigned_downcast = false; }
-  in
-  annotate_kf_aux flags kf
-
-let compute () =
-  (* compute RTE annotations, whether Enabled is set or not *)
-  Ast.compute () ;
-  let include_function kf =
-    let fsel = Options.FunctionSelection.get () in
-    Kernel_function.Set.is_empty fsel
-    || Kernel_function.Set.mem kf fsel
-  in
-  Globals.Functions.iter
-    (fun kf -> if include_function kf then !Db.RteGen.annotate_kf kf)
 
 (*
 Local Variables:
