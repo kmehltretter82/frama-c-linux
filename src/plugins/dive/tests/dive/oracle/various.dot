@@ -1,5 +1,5 @@
 digraph G {
-  cp0 [fillcolor="#AACCFF", color="#88AAFF", style="invis,filled,dotted", ];
+  cp0 [style="invis,dotted", ];
   cp1 [label=<x2>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
        style="filled", ];
   cp2 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
@@ -8,8 +8,7 @@ digraph G {
        style="filled", ];
   cp4 [label=<g>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
        style="filled", ];
-  cp5 [label=<z>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
-       style="filled", ];
+  cp5 [label=<z>, shape=box, ];
   cp6 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
        style="filled", ];
   cp7 [label=<w>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
@@ -17,12 +16,12 @@ digraph G {
   cp8 [label=<tmp_0>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
        style="filled", ];
   cp9 [label=<pf>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
-       style="filled,dotted", ];
+       style="filled", ];
   cp10 [label=<is_nan_or_infinite: \is_finite((float)((double)((double)y * 2.0)))>,
-        shape=doubleoctagon, fillcolor="#FFBBBB", color="#FF0000",
+        shape=doubleoctagon, fillcolor="#FF0000", color="#FF0000",
         style="bold,filled,bold", ];
   cp11 [label=<is_nan_or_infinite: \is_finite((float)(y + w))>,
-        shape=doubleoctagon, fillcolor="#FFBBBB", color="#FF0000",
+        shape=doubleoctagon, fillcolor="#FF0000", color="#FF0000",
         style="bold,filled,bold", ];
   
   subgraph cluster_file_1 { label=<tests/dive/various.i>; cp4;cp0;

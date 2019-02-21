@@ -49,7 +49,7 @@ include G
 let next_node_key = ref 0
 let next_dependency_key = ref 0
 
-let create_node ?(node_precision=Singleton) ~node_kind ~node_locality g =
+let create_node ?(node_precision=Unevaluated) ~node_kind ~node_locality g =
   let node = {
     node_key = !next_node_key;
     node_kind;
@@ -68,7 +68,8 @@ let update_node_precision node new_precision =
     | Critical, _ | _, Critical -> Critical
     | Wide, _ | _, Wide -> Wide
     | Normal, _ | _, Normal -> Normal
-    | Singleton, Singleton -> Singleton
+    | Singleton, _ | _, Singleton -> Singleton
+    | Unevaluated, Unevaluated -> Unevaluated
 
 let create_dependency ~allow_folding g v1 dependency_kind v2 =
   let same_kind (_,e,_) =
@@ -143,13 +144,15 @@ let ouptput_to_dot out_channel g =
           | Alarm _ ->  [ `Shape `Doubleoctagon ; `Style `Bold ]
           | File -> [ `Style `Invis ]
         and precision = match v.node_precision with
+          | Unevaluated -> []
           | Singleton -> [`Color 0x88aaff ;
                           `Style `Filled ; `Fillcolor 0xaaccff]
-          | Normal -> []
+          | Normal -> [ `Color 0x004400 ;
+                        `Style `Filled ; `Fillcolor 0xeeffee ]
           | Wide -> [ `Color 0xff0000 ;
                       `Style `Filled ; `Fillcolor 0xffbbbb ]
           | Critical -> [ `Color 0xff0000 ; `Style `Bold ;
-                          `Style `Filled ; `Fillcolor 0xffbbbb ]
+                          `Style `Filled ; `Fillcolor 0xff0000 ]
         in
         l := precision @ kind @ !l;
         if not v.node_deps_computed then

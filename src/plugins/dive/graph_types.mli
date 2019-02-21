@@ -32,7 +32,7 @@ type node_locality = {
   loc_function : Cil_types.kernel_function option;
 }
 
-type node_precision = Singleton | Normal | Wide | Critical
+type node_precision = Unevaluated | Singleton | Normal | Wide | Critical
 
 type node = {
   node_key : int;

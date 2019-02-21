@@ -1,12 +1,14 @@
 digraph G {
-  cp0 [fillcolor="#AACCFF", color="#88AAFF", style="invis,filled,dotted", ];
-  cp1 [label=<w>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
-       style="filled", ];
+  cp0 [style="invis,dotted", ];
+  cp1 [label=<w>, shape=box, ];
   cp2 [label=<x>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
        style="filled", ];
-  cp3 [label=<z>, shape=box, ];
-  cp4 [label=<x>, shape=box, ];
-  cp5 [label=<z>, shape=box, style="dotted", ];
+  cp3 [label=<z>, shape=box, fillcolor="#EEFFEE", color="#004400",
+       style="filled", ];
+  cp4 [label=<x>, shape=box, fillcolor="#EEFFEE", color="#004400",
+       style="filled", ];
+  cp5 [label=<z>, shape=box, fillcolor="#EEFFEE", color="#004400",
+       style="filled", ];
   
   subgraph cluster_file_1 { label=<tests/dive/assigned_param.i>; cp0;
     subgraph cluster_function_19 { label=<f>; cp3;cp2;

@@ -1,17 +1,22 @@
 digraph G {
-  cp0 [fillcolor="#AACCFF", color="#88AAFF", style="invis,filled,dotted", ];
-  cp1 [label=<res>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
-       style="filled", ];
-  cp2 [fillcolor="#AACCFF", color="#88AAFF", style="invis,filled,dotted", ];
+  cp0 [style="invis,dotted", ];
+  cp1 [label=<res>, shape=box, ];
+  cp2 [style="invis,dotted", ];
   cp3 [label=<__retres>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
        style="filled", ];
-  cp4 [label=<c>, shape=box, ];
-  cp5 [label=<w>, shape=box, ];
-  cp6 [label=<x>, shape=box, style="dotted", ];
-  cp7 [label=<y>, shape=box, style="dotted", ];
+  cp4 [label=<c>, shape=box, fillcolor="#EEFFEE", color="#004400",
+       style="filled", ];
+  cp5 [label=<w>, shape=box, fillcolor="#EEFFEE", color="#004400",
+       style="filled", ];
+  cp6 [label=<x>, shape=box, fillcolor="#EEFFEE", color="#004400",
+       style="filled", ];
+  cp7 [label=<y>, shape=box, fillcolor="#EEFFEE", color="#004400",
+       style="filled", ];
+  cp8 [label=<i>, shape=box, fillcolor="#EEFFEE", color="#004400",
+       style="filled", ];
   
   subgraph cluster_file_1 { label=<tests/dive/const.i>; cp0;
-    subgraph cluster_function_25 { label=<main>; cp1;
+    subgraph cluster_function_25 { label=<main>; cp8;cp1;
        };
      };
   subgraph cluster_file_2 { label=<>; cp2;
@@ -24,5 +29,7 @@ digraph G {
   cp5 -> cp3;
   cp6 -> cp4;
   cp7 -> cp5;
+  cp8 -> cp6;
+  cp8 -> cp7;
   
   }
