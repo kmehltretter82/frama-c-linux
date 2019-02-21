@@ -12,10 +12,10 @@
 [wp] [Qed] Goal typed_ref_s_ensures_3 : Valid
 [wp] [Qed] Goal typed_ref_s_ensures_4 : Valid
 [wp] [Qed] Goal typed_ref_s_ensures_5 : Valid
-[wp] [Alt-Ergo] Goal typed_ref_s_ensures_KO : Unknown
+[wp] [Alt-Ergo] Goal typed_ref_s_ensures_KO : Unsuccess
 [wp] Proved goals:    8 / 9
   Qed:             7 
-  Alt-Ergo:        1  (unknown: 1)
+  Alt-Ergo:        1  (unsuccess: 1)
 [wp] Report 'tests/wp_hoare/refguards.i.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
