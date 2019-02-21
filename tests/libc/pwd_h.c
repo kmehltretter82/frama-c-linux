@@ -15,4 +15,12 @@ int main() {
     //@ assert valid_read_string(pw->pw_dir);
     //@ assert valid_read_string(pw->pw_shell);
   }
+  pw = getpwnam("root");
+  if (pw) {
+    //Note: the assertions below are currently imprecise
+    //@ assert valid_read_string(pw->pw_name);
+    //@ assert valid_read_string(pw->pw_passwd);
+    //@ assert valid_read_string(pw->pw_dir);
+    //@ assert valid_read_string(pw->pw_shell);
+  }
 }

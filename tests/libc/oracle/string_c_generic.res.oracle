@@ -252,9 +252,9 @@
   function strlen: postcondition 'acsl_c_equiv' got status valid.
 [eva] Recording results for strlen
 [eva] Done for function strlen
-[eva] share/libc/string.h:413: 
+[eva] share/libc/string.h:425: 
   function strncat: postcondition 'result_ptr' got status valid.
-[eva] share/libc/string.h:428: 
+[eva] share/libc/string.h:440: 
   function strncat, behavior partial: postcondition 'sum_of_bounded_lengths' got status valid.
 [eva] Recording results for strncat
 [eva] Done for function strncat

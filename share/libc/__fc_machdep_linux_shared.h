@@ -102,6 +102,7 @@
 #define __FC_PATH_MAX 256
 // Note: POSIX requires HOST_NAME_MAX >= 255, but Linux uses 64
 #define __FC_HOST_NAME_MAX 64
+#define __FC_TTY_NAME_MAX 32
 
 /* for stdarg.h */
 #define __FC_VA_LIST_T __builtin_va_list

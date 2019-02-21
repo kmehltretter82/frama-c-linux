@@ -1,9 +1,11 @@
 [kernel] Parsing tests/libc/unistd_h.c (with preprocessing)
 [eva] Splitting return states on:
   \return(access) == 0 (auto)
+  \return(chown) == 0 (auto)
   \return(dup) == -1 (auto)
   \return(getcwd) == 0 (auto)
   \return(gethostname) == 0 (auto)
+  \return(isatty) == 0 (auto)
   \return(setegid) == 0 (auto)
   \return(seteuid) == 0 (auto)
   \return(setgid) == 0 (auto)
@@ -11,6 +13,7 @@
   \return(setreuid) == 0 (auto)
   \return(setsid) == 0 (auto)
   \return(setuid) == 0 (auto)
+  \return(ttyname) == 0 (auto)
   \return(usleep) == 0 (auto)
   \return(getresuid) == 0 (auto)
   \return(setresuid) == 0 (auto)
@@ -468,6 +471,36 @@
 [eva] computing for function setreuid <- main.
   Called from tests/libc/unistd_h.c:74.
 [eva] Done for function setreuid
+[eva] computing for function isatty <- main.
+  Called from tests/libc/unistd_h.c:76.
+[eva] using specification for function isatty
+[eva] Done for function isatty
+[eva] computing for function isatty <- main.
+  Called from tests/libc/unistd_h.c:76.
+[eva] Done for function isatty
+[eva] tests/libc/unistd_h.c:77: assertion got status valid.
+[eva] computing for function ttyname <- main.
+  Called from tests/libc/unistd_h.c:78.
+[eva] using specification for function ttyname
+[eva] Done for function ttyname
+[eva] computing for function ttyname <- main.
+  Called from tests/libc/unistd_h.c:78.
+[eva] Done for function ttyname
+[eva] computing for function chown <- main.
+  Called from tests/libc/unistd_h.c:80.
+[eva] using specification for function chown
+[eva] tests/libc/unistd_h.c:80: 
+  function chown: precondition 'valid_string_path' got status valid.
+[eva] Done for function chown
+[eva] computing for function chown <- main.
+  Called from tests/libc/unistd_h.c:80.
+[eva] Done for function chown
+[eva] computing for function chown <- main.
+  Called from tests/libc/unistd_h.c:80.
+[eva] Done for function chown
+[eva] computing for function chown <- main.
+  Called from tests/libc/unistd_h.c:80.
+[eva] Done for function chown
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -491,4 +524,5 @@
   egid ∈ [--..--] or UNINITIALIZED
   sgid ∈ [--..--] or UNINITIALIZED
   p ∈ [--..--]
+  tty ∈ {{ NULL ; &__fc_ttyname[0] }}
   __retres ∈ {0; 1}

@@ -310,6 +310,7 @@ struct passwd {
    char *pw_passwd ;
    uid_t pw_uid ;
    gid_t pw_gid ;
+   char *pw_gecos ;
    char *pw_dir ;
    char *pw_shell ;
 };
@@ -3473,9 +3474,41 @@ char *strcpy(char *dest, char const *src);
 
 char *strncpy(char *dest, char const *src, size_t n);
 
+/*@ requires valid_string_src: valid_read_string(src);
+    requires room_nstring: \valid(dest + (0 .. n - 1));
+    requires
+      separation:
+        \separated(
+          dest + (0 .. n - 1), src + (0 .. \max(n - 1, strlen(src)))
+          );
+    ensures
+      initialization:
+        \initialized(\old(dest) + (0 .. \min(strlen(\old(src)), \old(n) - 1)));
+    ensures bounded_result: \result ≡ strlen(\old(src));
+    assigns *(dest + (0 .. n - 1)), \result;
+    assigns *(dest + (0 .. n - 1)) \from *(src + (0 .. n - 1));
+    assigns \result
+      \from (indirect: src), (indirect: *(src + (0 .. n - 1))), (indirect: n);
+ */
+size_t strlcpy(char * __restrict dest, char const * __restrict src, size_t n);
+
 char *strcat(char *dest, char const *src);
 
 char *strncat(char *dest, char const *src, size_t n);
+
+/*@ requires valid_string_src: valid_read_string(src);
+    requires valid_string_dest: valid_string(dest);
+    requires room_nstring: \valid(dest + (0 .. n - 1));
+    ensures
+      bounded_result: \result ≡ strlen(\old(dest)) + strlen(\old(src));
+    assigns *(dest + (strlen{Old}(dest) .. n)), \result;
+    assigns *(dest + (strlen{Old}(dest) .. n))
+      \from (indirect: n), *(src + (0 .. strlen{Old}(src)));
+    assigns \result
+      \from (indirect: src), (indirect: *(src + (0 .. n - 1))), (indirect: n);
+ */
+extern size_t strlcat(char * __restrict dest, char const * __restrict src,
+                      size_t n);
 
 /*@ requires valid_dest: \valid(dest + (0 .. n - 1));
     requires valid_string_src: valid_read_string(src);
@@ -6758,20 +6791,31 @@ extern char __fc_getpwuid_pw_dir[64];
 
 extern char __fc_getpwuid_pw_shell[64];
 
-struct passwd __fc_getpwuid =
+struct passwd __fc_pwd =
   {.pw_name = __fc_getpwuid_pw_name,
    .pw_passwd = __fc_getpwuid_pw_passwd,
    .pw_uid = __fc_getpwuid_pw_uid,
    .pw_gid = __fc_getpwuid_pw_gid,
+   .pw_gecos = (char *)0,
    .pw_dir = __fc_getpwuid_pw_dir,
    .pw_shell = __fc_getpwuid_pw_shell};
-struct passwd *__fc_p_getpwuid = & __fc_getpwuid;
+struct passwd *__fc_p_pwd = & __fc_pwd;
+/*@ requires valid_name: valid_read_string(name);
+    ensures
+      result_null_or_internal_struct:
+        \result ≡ \null ∨ \result ≡ __fc_p_pwd;
+    assigns \result, __fc_pwd;
+    assigns \result \from __fc_p_pwd, (indirect: *(name + (0 ..)));
+    assigns __fc_pwd \from (indirect: *(name + (0 ..)));
+ */
+extern struct passwd *getpwnam(char const *name);
+
 /*@ ensures
       result_null_or_internal_struct:
-        \result ≡ \null ∨ \result ≡ __fc_p_getpwuid;
-    assigns \result, __fc_getpwuid;
-    assigns \result \from __fc_p_getpwuid, (indirect: uid);
-    assigns __fc_getpwuid \from (indirect: uid);
+        \result ≡ \null ∨ \result ≡ __fc_p_pwd;
+    assigns \result, __fc_pwd;
+    assigns \result \from __fc_p_pwd, (indirect: uid);
+    assigns __fc_pwd \from (indirect: uid);
  */
 extern struct passwd *getpwuid(uid_t uid);
 
@@ -7011,6 +7055,15 @@ extern int tcsetattr(int fd, int optional_actions, struct termios *termios_p);
  */
 extern int access(char const *path, int amode);
 
+/*@ requires valid_string_path: valid_read_string(path);
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result
+      \from (indirect: path), (indirect: *(path + (0 ..))),
+            (indirect: owner), (indirect: group);
+ */
+extern int chown(char const *path, uid_t owner, gid_t group);
+
 /*@ requires valid_fd: 0 ≤ fd < 1024;
     ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
     assigns __fc_fds[fd], \result;
@@ -7084,6 +7137,10 @@ extern int execve(char const *path, char * const *argv, char * const *env);
  */
 extern int execvp(char const *path, char * const *argv);
 
+/*@ ensures never_terminates: \false;
+    assigns \nothing; */
+extern  __attribute__((__noreturn__)) void _exit(int);
+
 /*@ ensures
       result_ok_child_or_error:
         \result ≡ 0 ∨ \result > 0 ∨ \result ≡ -1;
@@ -7149,6 +7206,12 @@ extern pid_t getsid(pid_t);
 /*@ assigns \result;
     assigns \result \from \nothing; */
 extern uid_t getuid(void);
+
+/*@ ensures result_true_or_false: \result ≡ 0 ∨ \result ≡ 1;
+    assigns \result;
+    assigns \result \from (indirect: fd), (indirect: __fc_fds[fd]);
+ */
+extern int isatty(int fd);
 
 /*@ requires valid_path: valid_read_string(path);
     assigns \result;
@@ -7230,6 +7293,16 @@ extern void sync(void);
 /*@ assigns \result;
     assigns \result \from (indirect: name); */
 extern long sysconf(int name);
+
+extern char volatile __fc_ttyname[32];
+
+char *__fc_p_ttyname = (char *)(__fc_ttyname);
+/*@ ensures
+      result_name_or_null: \result ≡ __fc_p_ttyname ∨ \result ≡ \null;
+    assigns \result;
+    assigns \result \from __fc_p_ttyname, (indirect: fildes);
+ */
+extern char *ttyname(int fildes);
 
 /*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
     assigns \result, Frama_C_entropy_source;
