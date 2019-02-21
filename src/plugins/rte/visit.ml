@@ -24,7 +24,6 @@
 
 open Cil_types
 open Cil_datatype
-open Flags
 
 (* AST inplace visitor for runtime annotation generation *)
 
@@ -52,49 +51,52 @@ class annot_visitor kf flags on_alarm = object (self)
     r
 
   method private do_initialized () =
-    flags.initialized && not (Generator.Initialized.is_computed kf)
+    flags.Flags.initialized && not (Generator.Initialized.is_computed kf)
 
   method private do_mem_access () =
-    flags.mem_access && not (Generator.Mem_access.is_computed kf)
+    flags.Flags.mem_access && not (Generator.Mem_access.is_computed kf)
 
   method private do_div_mod () =
-    flags.div_mod && not (Generator.Div_mod.is_computed kf)
+    flags.Flags.div_mod && not (Generator.Div_mod.is_computed kf)
 
   method private do_shift () =
-    flags.shift && not (Generator.Shift.is_computed kf)
+    flags.Flags.shift && not (Generator.Shift.is_computed kf)
 
   method private do_left_shift_negative () =
-    flags.left_shift_negative
+    flags.Flags.left_shift_negative
     && not (Generator.Left_shift_negative.is_computed kf)
 
   method private do_right_shift_negative () =
-    flags.right_shift_negative
+    flags.Flags.right_shift_negative
     && not (Generator.Right_shift_negative.is_computed kf)
 
   method private do_signed_overflow () =
-    flags.signed_overflow && not (Generator.Signed_overflow.is_computed kf)
+    flags.Flags.signed_overflow
+  && not (Generator.Signed_overflow.is_computed kf)
 
   method private do_unsigned_overflow () =
-    flags.unsigned_overflow && not (Generator.Unsigned_overflow.is_computed kf)
+    flags.Flags.unsigned_overflow
+  && not (Generator.Unsigned_overflow.is_computed kf)
 
   method private do_signed_downcast () =
-    flags.signed_downcast && not (Generator.Signed_downcast.is_computed kf)
+    flags.Flags.signed_downcast
+  && not (Generator.Signed_downcast.is_computed kf)
 
   method private do_unsigned_downcast () =
-    flags.unsigned_downcast &&
-    not (Generator.Unsigned_downcast.is_computed kf)
+    flags.Flags.unsigned_downcast
+  && not (Generator.Unsigned_downcast.is_computed kf)
 
   method private do_float_to_int () =
-    flags.float_to_int && not (Generator.Float_to_int.is_computed kf)
+    flags.Flags.float_to_int && not (Generator.Float_to_int.is_computed kf)
 
   method private do_finite_float () =
-    flags.finite_float && not (Generator.Finite_float.is_computed kf)
+    flags.Flags.finite_float && not (Generator.Finite_float.is_computed kf)
 
   method private do_pointer_call () =
-    flags.pointer_call && not (Generator.Pointer_call.is_computed kf)
+    flags.Flags.pointer_call && not (Generator.Pointer_call.is_computed kf)
 
   method private do_bool_value () =
-    flags.bool_value && not (Generator.Bool_value.is_computed kf)
+    flags.Flags.bool_value && not (Generator.Bool_value.is_computed kf)
 
   method private queue_stmt_spec spec =
     let stmt = Extlib.the (self#current_stmt) in
@@ -108,7 +110,7 @@ class annot_visitor kf flags on_alarm = object (self)
     fun fgen ->
       let stmt = Extlib.the (self#current_stmt) in
       let on_alarm ~invalid a = on_alarm stmt ~invalid a in
-      fgen ~remove_trivial:flags.remove_trivial ~on_alarm
+      fgen ~remove_trivial:flags.Flags.remove_trivial ~on_alarm
 
   method! vstmt s = match s.skind with
     | UnspecifiedSequence l ->
@@ -430,6 +432,7 @@ let annotate ?flags kf =
     (* Strict version of ||, because [comp] has side-effects *)
     let (|||) a b = a || b in
     let open Generator in
+    let open Flags in
     if comp Initialized.accessor flags.initialized |||
        comp Mem_access.accessor flags.mem_access |||
        comp Pointer_call.accessor flags.pointer_call |||

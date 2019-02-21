@@ -24,14 +24,12 @@
 (* dedicated computations *)
 (* -------------------------------------------------------------------------- *)
 
-open Flags
-
 (* annotate for all rte + unsigned overflows (which are not rte), for a given
    function *)
 let do_all_rte kf =
   let flags =
     { Flags.all with
-      signed_downcast = false;
+      Flags.signed_downcast = false;
       unsigned_downcast = false; }
   in
   Visit.annotate ~flags kf
@@ -41,7 +39,7 @@ let do_all_rte kf =
 let do_rte kf =
   let flags =
     { Flags.all with
-      unsigned_overflow = false;
+      Flags.unsigned_overflow = false;
       signed_downcast = false;
       unsigned_downcast = false; }
   in
