@@ -72,19 +72,19 @@ class annot_visitor kf flags on_alarm = object (self)
 
   method private do_signed_overflow () =
     flags.Flags.signed_overflow
-  && not (Generator.Signed_overflow.is_computed kf)
+    && not (Generator.Signed_overflow.is_computed kf)
 
   method private do_unsigned_overflow () =
     flags.Flags.unsigned_overflow
-  && not (Generator.Unsigned_overflow.is_computed kf)
+    && not (Generator.Unsigned_overflow.is_computed kf)
 
   method private do_signed_downcast () =
     flags.Flags.signed_downcast
-  && not (Generator.Signed_downcast.is_computed kf)
+    && not (Generator.Signed_downcast.is_computed kf)
 
   method private do_unsigned_downcast () =
     flags.Flags.unsigned_downcast
-  && not (Generator.Unsigned_downcast.is_computed kf)
+    && not (Generator.Unsigned_downcast.is_computed kf)
 
   method private do_float_to_int () =
     flags.Flags.float_to_int && not (Generator.Float_to_int.is_computed kf)
