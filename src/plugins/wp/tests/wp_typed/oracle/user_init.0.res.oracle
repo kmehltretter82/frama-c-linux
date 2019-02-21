@@ -2,6 +2,8 @@
 [kernel] Parsing tests/wp_typed/user_init.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Loading driver 'share/wp.driver'
+[wp] [CFG] Goal init_t1_exits : Valid (Unreachable)
+[wp] [CFG] Goal init_t2_exits : Valid (Unreachable)
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function init
@@ -113,6 +115,781 @@ Prove: included(a_2, 1, a_1, n).
 
 Goal Assigns (file tests/wp_typed/user_init.i, line 4) in 'init':
 Effect at line 12
+Prove: true.
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function init_t1
+------------------------------------------------------------
+
+Goal Post-condition (file tests/wp_typed/user_init.i, line 16) in 'init_t1':
+Assume {
+  Type: is_uint32(i_1).
+  (* Goal *)
+  When: (0 <= i) /\ (i <= 9).
+  (* Invariant 'Partial' *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) -> (t1_0[i_2] = v))).
+  (* Invariant 'Range' *)
+  Have: (0 <= i_1) /\ (i_1 <= 10).
+  (* Else *)
+  Have: 10 <= i_1.
+}
+Prove: t1_0[i] = v.
+
+------------------------------------------------------------
+
+Goal Preservation of Invariant 'Partial' (file tests/wp_typed/user_init.i, line 23):
+Assume {
+  Type: is_uint32(i).
+  (* Goal *)
+  When: (0 <= i_1) /\ (i_1 < to_uint32(1 + i)).
+  (* Invariant 'Partial' *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) -> (t1_0[i_2] = v))).
+  (* Invariant 'Range' *)
+  Have: (0 <= i) /\ (i <= 10).
+  (* Then *)
+  Have: i <= 9.
+}
+Prove: t1_0[i <- v][i_1] = v.
+
+------------------------------------------------------------
+
+Goal Establishment of Invariant 'Partial' (file tests/wp_typed/user_init.i, line 23):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Preservation of Invariant 'Range' (file tests/wp_typed/user_init.i, line 22):
+Assume {
+  Type: is_uint32(i).
+  (* Invariant 'Partial' *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) -> (t1_0[i_1] = v))).
+  (* Invariant 'Range' *)
+  Have: (0 <= i) /\ (i <= 10).
+  (* Then *)
+  Have: i <= 9.
+}
+Prove: to_uint32(1 + i) <= 10.
+
+------------------------------------------------------------
+
+Goal Establishment of Invariant 'Range' (file tests/wp_typed/user_init.i, line 22):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Loop assigns (file tests/wp_typed/user_init.i, line 24):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_typed/user_init.i, line 18) in 'init_t1' (1/2):
+Effect at line 26
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_typed/user_init.i, line 18) in 'init_t1' (2/2):
+Effect at line 26
+Prove: true.
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function init_t2
+------------------------------------------------------------
+
+Goal Post-condition (file tests/wp_typed/user_init.i, line 30) in 'init_t2':
+Assume {
+  (* Goal *)
+  When: (0 <= i) /\ (0 <= i_1) /\ (i <= 9) /\ (i_1 <= 19).
+  (* Loop assigns ... *)
+  Have: forall i_3,i_2 : Z. ((0 <= i_2) -> ((0 <= i_3) -> ((i_3 <= 9) ->
+      ((i_2 <= 19) ->
+      (((i_2 < 0) \/ (i_3 < 0) \/ (10 <= i_3) \/ (20 <= i_2)) ->
+      (t2_1[i_3][i_2] = t2_0[i_3][i_2])))))).
+  (* Invariant 'Partial_i' *)
+  Have: forall i_3,i_2 : Z. ((0 <= i_2) -> ((0 <= i_3) -> ((i_3 <= 9) ->
+      ((i_2 <= 19) -> (t2_0[i_3][i_2] = v))))).
+}
+Prove: t2_0[i][i_1] = v.
+
+------------------------------------------------------------
+
+Goal Preservation of Invariant 'Partial_i' (file tests/wp_typed/user_init.i, line 39):
+Let m = t2_0[i].
+Assume {
+  Type: is_uint32(i).
+  (* Goal *)
+  When: (0 <= i_1) /\ (0 <= i_2) /\ (i_1 < to_uint32(1 + i)) /\ (i_2 <= 19).
+  (* Loop assigns ... *)
+  Have: forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 <= 9) ->
+      ((i_3 <= 19) ->
+      (((i_3 < 0) \/ (i_4 < 0) \/ (10 <= i_4) \/ (20 <= i_3)) ->
+      (t2_1[i_4][i_3] = t2_2[i_4][i_3])))))).
+  (* Invariant 'Partial_i' *)
+  Have: forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 < i) ->
+      ((i_3 <= 19) -> (t2_2[i_4][i_3] = v))))).
+  (* Invariant 'Range_i' *)
+  Have: (0 <= i) /\ (i <= 10).
+  (* Then *)
+  Have: i <= 9.
+  (* Loop assigns ... *)
+  Have: forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 <= 9) ->
+      ((i_3 <= 19) ->
+      (((i_3 < 0) \/ (i_4 < 0) \/ (10 <= i_4) \/ (20 <= i_3)) ->
+      (t2_0[i_4][i_3] = t2_2[i_4][i_3])))))).
+  (* Invariant 'Previous_i' *)
+  Have: forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 < i) ->
+      ((i_3 <= 19) -> (t2_0[i_4][i_3] = t2_2[i_4][i_3]))))).
+  (* Invariant 'Partial_j' *)
+  Have: forall i_3 : Z. ((0 <= i_3) -> ((i_3 <= 19) -> (m[i_3] = v))).
+}
+Prove: m[0] = t2_0[i_1][i_2].
+
+------------------------------------------------------------
+
+Goal Establishment of Invariant 'Partial_i' (file tests/wp_typed/user_init.i, line 39):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Preservation of Invariant 'Range_i' (file tests/wp_typed/user_init.i, line 38):
+Assume {
+  Type: is_uint32(i).
+  (* Loop assigns ... *)
+  Have: forall i_2,i_1 : Z. ((0 <= i_1) -> ((0 <= i_2) -> ((i_2 <= 9) ->
+      ((i_1 <= 19) ->
+      (((i_1 < 0) \/ (i_2 < 0) \/ (10 <= i_2) \/ (20 <= i_1)) ->
+      (t2_0[i_2][i_1] = t2_1[i_2][i_1])))))).
+  (* Invariant 'Partial_i' *)
+  Have: forall i_2,i_1 : Z. ((0 <= i_1) -> ((0 <= i_2) -> ((i_2 < i) ->
+      ((i_1 <= 19) -> (t2_1[i_2][i_1] = v))))).
+  (* Invariant 'Range_i' *)
+  Have: (0 <= i) /\ (i <= 10).
+  (* Then *)
+  Have: i <= 9.
+  (* Loop assigns ... *)
+  Have: forall i_2,i_1 : Z. ((0 <= i_1) -> ((0 <= i_2) -> ((i_2 <= 9) ->
+      ((i_1 <= 19) ->
+      (((i_1 < 0) \/ (i_2 < 0) \/ (10 <= i_2) \/ (20 <= i_1)) ->
+      (t2_2[i_2][i_1] = t2_1[i_2][i_1])))))).
+  (* Invariant 'Previous_i' *)
+  Have: forall i_2,i_1 : Z. ((0 <= i_1) -> ((0 <= i_2) -> ((i_2 < i) ->
+      ((i_1 <= 19) -> (t2_2[i_2][i_1] = t2_1[i_2][i_1]))))).
+  (* Invariant 'Partial_j' *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 19) -> (t2_2[i][i_1] = v))).
+}
+Prove: to_uint32(1 + i) <= 10.
+
+------------------------------------------------------------
+
+Goal Establishment of Invariant 'Range_i' (file tests/wp_typed/user_init.i, line 38):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Preservation of Invariant 'Partial_j' (file tests/wp_typed/user_init.i, line 44):
+Let m = t2_0[i].
+Assume {
+  Type: is_uint32(i) /\ is_uint32(j).
+  (* Goal *)
+  When: (0 <= i_1) /\ (i_1 < to_uint32(1 + j)).
+  (* Loop assigns ... *)
+  Have: forall i_3,i_2 : Z. ((0 <= i_2) -> ((0 <= i_3) -> ((i_3 <= 9) ->
+      ((i_2 <= 19) ->
+      (((i_2 < 0) \/ (i_3 < 0) \/ (10 <= i_3) \/ (20 <= i_2)) ->
+      (t2_1[i_3][i_2] = t2_2[i_3][i_2])))))).
+  (* Invariant 'Partial_i' *)
+  Have: forall i_3,i_2 : Z. ((0 <= i_2) -> ((0 <= i_3) -> ((i_3 < i) ->
+      ((i_2 <= 19) -> (t2_2[i_3][i_2] = v))))).
+  (* Invariant 'Range_i' *)
+  Have: (0 <= i) /\ (i <= 10).
+  (* Then *)
+  Have: i <= 9.
+  (* Loop assigns ... *)
+  Have: forall i_3,i_2 : Z. ((0 <= i_2) -> ((0 <= i_3) -> ((i_3 <= 9) ->
+      ((i_2 <= 19) ->
+      (((i_2 < 0) \/ (i_3 < 0) \/ (10 <= i_3) \/ (20 <= i_2)) ->
+      (t2_0[i_3][i_2] = t2_2[i_3][i_2])))))).
+  (* Invariant 'Previous_i' *)
+  Have: forall i_3,i_2 : Z. ((0 <= i_2) -> ((0 <= i_3) -> ((i_3 < i) ->
+      ((i_2 <= 19) -> (t2_0[i_3][i_2] = t2_2[i_3][i_2]))))).
+  (* Invariant 'Partial_j' *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < j) -> (m[i_2] = v))).
+  (* Invariant 'Range_j' *)
+  Have: (0 <= j) /\ (j <= 20).
+  (* Then *)
+  Have: j <= 19.
+}
+Prove: m[j <- v][i_1] = v.
+
+------------------------------------------------------------
+
+Goal Establishment of Invariant 'Partial_j' (file tests/wp_typed/user_init.i, line 44):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Preservation of Invariant 'Previous_i' (file tests/wp_typed/user_init.i, line 45):
+Let m = t2_0[i].
+Assume {
+  Type: is_uint32(i) /\ is_uint32(j).
+  (* Goal *)
+  When: (0 <= i_1) /\ (i_1 < i) /\ (0 <= i_2) /\ (i_2 <= 19).
+  (* Loop assigns ... *)
+  Have: forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 <= 9) ->
+      ((i_3 <= 19) ->
+      (((i_3 < 0) \/ (i_4 < 0) \/ (10 <= i_4) \/ (20 <= i_3)) ->
+      (t2_2[i_4][i_3] = t2_1[i_4][i_3])))))).
+  (* Invariant 'Partial_i' *)
+  Have: forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 < i) ->
+      ((i_3 <= 19) -> (t2_1[i_4][i_3] = v))))).
+  (* Invariant 'Range_i' *)
+  Have: (0 <= i) /\ (i <= 10).
+  (* Then *)
+  Have: i <= 9.
+  (* Loop assigns ... *)
+  Have: forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 <= 9) ->
+      ((i_3 <= 19) ->
+      (((i_3 < 0) \/ (i_4 < 0) \/ (10 <= i_4) \/ (20 <= i_3)) ->
+      (t2_0[i_4][i_3] = t2_1[i_4][i_3])))))).
+  (* Invariant 'Previous_i' *)
+  Have: forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 < i) ->
+      ((i_3 <= 19) -> (t2_0[i_4][i_3] = t2_1[i_4][i_3]))))).
+  (* Invariant 'Partial_j' *)
+  Have: forall i_3 : Z. ((0 <= i_3) -> ((i_3 < j) -> (m[i_3] = v))).
+  (* Invariant 'Range_j' *)
+  Have: (0 <= j) /\ (j <= 20).
+  (* Then *)
+  Have: j <= 19.
+}
+Prove: t2_0[i <- m[j <- v]][i_1][i_2] = t2_1[i_1][i_2].
+
+------------------------------------------------------------
+
+Goal Establishment of Invariant 'Previous_i' (file tests/wp_typed/user_init.i, line 45):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Preservation of Invariant 'Range_j' (file tests/wp_typed/user_init.i, line 43):
+Assume {
+  Type: is_uint32(i) /\ is_uint32(j).
+  (* Loop assigns ... *)
+  Have: forall i_2,i_1 : Z. ((0 <= i_1) -> ((0 <= i_2) -> ((i_2 <= 9) ->
+      ((i_1 <= 19) ->
+      (((i_1 < 0) \/ (i_2 < 0) \/ (10 <= i_2) \/ (20 <= i_1)) ->
+      (t2_0[i_2][i_1] = t2_1[i_2][i_1])))))).
+  (* Invariant 'Partial_i' *)
+  Have: forall i_2,i_1 : Z. ((0 <= i_1) -> ((0 <= i_2) -> ((i_2 < i) ->
+      ((i_1 <= 19) -> (t2_1[i_2][i_1] = v))))).
+  (* Invariant 'Range_i' *)
+  Have: (0 <= i) /\ (i <= 10).
+  (* Then *)
+  Have: i <= 9.
+  (* Loop assigns ... *)
+  Have: forall i_2,i_1 : Z. ((0 <= i_1) -> ((0 <= i_2) -> ((i_2 <= 9) ->
+      ((i_1 <= 19) ->
+      (((i_1 < 0) \/ (i_2 < 0) \/ (10 <= i_2) \/ (20 <= i_1)) ->
+      (t2_2[i_2][i_1] = t2_1[i_2][i_1])))))).
+  (* Invariant 'Previous_i' *)
+  Have: forall i_2,i_1 : Z. ((0 <= i_1) -> ((0 <= i_2) -> ((i_2 < i) ->
+      ((i_1 <= 19) -> (t2_2[i_2][i_1] = t2_1[i_2][i_1]))))).
+  (* Invariant 'Partial_j' *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < j) -> (t2_2[i][i_1] = v))).
+  (* Invariant 'Range_j' *)
+  Have: (0 <= j) /\ (j <= 20).
+  (* Then *)
+  Have: j <= 19.
+}
+Prove: to_uint32(1 + j) <= 20.
+
+------------------------------------------------------------
+
+Goal Establishment of Invariant 'Range_j' (file tests/wp_typed/user_init.i, line 43):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assertion 'j' (file tests/wp_typed/user_init.i, line 50):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assertion 'i' (file tests/wp_typed/user_init.i, line 53):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Loop assigns (file tests/wp_typed/user_init.i, line 37) (1/3):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Loop assigns (file tests/wp_typed/user_init.i, line 37) (2/3):
+Effect at line 41
+Assume {
+  Type: is_uint32(i).
+  (* Goal *)
+  When: (0 <= i_1) /\ (0 <= i_2) /\ (i_1 <= 9) /\ (i_2 <= 19).
+  (* Loop assigns ... *)
+  Have: forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 <= 9) ->
+      ((i_3 <= 19) ->
+      (((i_3 < 0) \/ (i_4 < 0) \/ (10 <= i_4) \/ (20 <= i_3)) ->
+      (t2_0[i_4][i_3] = t2_1[i_4][i_3])))))).
+  (* Invariant 'Partial_i' *)
+  Have: forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 < i) ->
+      ((i_3 <= 19) -> (t2_1[i_4][i_3] = v))))).
+  (* Invariant 'Range_i' *)
+  Have: (0 <= i) /\ (i <= 10).
+  (* Then *)
+  Have: i <= 9.
+  (* Loop assigns ... *)
+  Have: forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 <= 9) ->
+      ((i_3 <= 19) ->
+      (((i_3 < 0) \/ (i_4 < 0) \/ (10 <= i_4) \/ (20 <= i_3)) ->
+      (t2_2[i_4][i_3] = t2_1[i_4][i_3])))))).
+  (* Invariant 'Previous_i' *)
+  Have: forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 < i) ->
+      ((i_3 <= 19) -> (t2_2[i_4][i_3] = t2_1[i_4][i_3]))))).
+  (* Invariant 'Partial_j' *)
+  Have: forall i_3 : Z. ((0 <= i_3) -> ((i_3 <= 19) -> (t2_2[i][i_3] = v))).
+}
+Prove: (forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 <= 9) ->
+        ((i_3 <= 19) -> false))))) \/
+    (forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 <= 9) ->
+     ((i_3 <= 19) ->
+     (exists i_6,i_5 : Z. (0 <= i_5) /\ (i_3 <= i_5) /\ (0 <= i_6) /\
+      (i_4 <= i_6) /\ (i_5 <= i_3) /\ (i_6 <= i_4) /\ (i_6 <= 9) /\
+      (i_5 <= 19))))))).
+
+------------------------------------------------------------
+
+Goal Loop assigns (file tests/wp_typed/user_init.i, line 37) (3/3):
+Effect at line 47
+Assume {
+  Type: is_uint32(i).
+  (* Goal *)
+  When: (0 <= i_1) /\ (0 <= i_2) /\ (i_1 <= 9) /\ (i_2 <= 19).
+  (* Loop assigns ... *)
+  Have: forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 <= 9) ->
+      ((i_3 <= 19) ->
+      (((i_3 < 0) \/ (i_4 < 0) \/ (10 <= i_4) \/ (20 <= i_3)) ->
+      (t2_0[i_4][i_3] = t2_1[i_4][i_3])))))).
+  (* Invariant 'Partial_i' *)
+  Have: forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 < i) ->
+      ((i_3 <= 19) -> (t2_1[i_4][i_3] = v))))).
+  (* Invariant 'Range_i' *)
+  Have: (0 <= i) /\ (i <= 10).
+  (* Then *)
+  Have: i <= 9.
+  (* Loop assigns ... *)
+  Have: forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 <= 9) ->
+      ((i_3 <= 19) ->
+      (((i_3 < 0) \/ (i_4 < 0) \/ (10 <= i_4) \/ (20 <= i_3)) ->
+      (t2_2[i_4][i_3] = t2_1[i_4][i_3])))))).
+  (* Invariant 'Previous_i' *)
+  Have: forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 < i) ->
+      ((i_3 <= 19) -> (t2_2[i_4][i_3] = t2_1[i_4][i_3]))))).
+  (* Invariant 'Partial_j' *)
+  Have: forall i_3 : Z. ((0 <= i_3) -> ((i_3 <= 19) -> (t2_2[i][i_3] = v))).
+}
+Prove: (forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 <= 9) ->
+        ((i_3 <= 19) -> false))))) \/
+    (forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 <= 9) ->
+     ((i_3 <= 19) ->
+     (exists i_6,i_5 : Z. (0 <= i_5) /\ (i_3 <= i_5) /\ (0 <= i_6) /\
+      (i_4 <= i_6) /\ (i_5 <= i_3) /\ (i_6 <= i_4) /\ (i_6 <= 9) /\
+      (i_5 <= 19))))))).
+
+------------------------------------------------------------
+
+Goal Loop assigns (file tests/wp_typed/user_init.i, line 42) (1/3):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Loop assigns (file tests/wp_typed/user_init.i, line 42) (2/3):
+Effect at line 47
+Assume {
+  Type: is_uint32(i) /\ is_uint32(j).
+  (* Goal *)
+  When: (0 <= i_1) /\ (0 <= i_2) /\ (i_1 <= 9) /\ (i_2 <= 19).
+  (* Loop assigns ... *)
+  Have: forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 <= 9) ->
+      ((i_3 <= 19) ->
+      (((i_3 < 0) \/ (i_4 < 0) \/ (10 <= i_4) \/ (20 <= i_3)) ->
+      (t2_0[i_4][i_3] = t2_1[i_4][i_3])))))).
+  (* Invariant 'Partial_i' *)
+  Have: forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 < i) ->
+      ((i_3 <= 19) -> (t2_1[i_4][i_3] = v))))).
+  (* Invariant 'Range_i' *)
+  Have: (0 <= i) /\ (i <= 10).
+  (* Then *)
+  Have: i <= 9.
+  (* Loop assigns ... *)
+  Have: forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 <= 9) ->
+      ((i_3 <= 19) ->
+      (((i_3 < 0) \/ (i_4 < 0) \/ (10 <= i_4) \/ (20 <= i_3)) ->
+      (t2_2[i_4][i_3] = t2_1[i_4][i_3])))))).
+  (* Invariant 'Previous_i' *)
+  Have: forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 < i) ->
+      ((i_3 <= 19) -> (t2_2[i_4][i_3] = t2_1[i_4][i_3]))))).
+  (* Invariant 'Partial_j' *)
+  Have: forall i_3 : Z. ((0 <= i_3) -> ((i_3 < j) -> (t2_2[i][i_3] = v))).
+  (* Invariant 'Range_j' *)
+  Have: (0 <= j) /\ (j <= 20).
+  (* Then *)
+  Have: j <= 19.
+}
+Prove: (forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 <= 9) ->
+        ((i_3 <= 19) -> false))))) \/
+    (forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 <= 9) ->
+     ((i_3 <= 19) ->
+     (exists i_6,i_5 : Z. (0 <= i_5) /\ (i_3 <= i_5) /\ (0 <= i_6) /\
+      (i_4 <= i_6) /\ (i_5 <= i_3) /\ (i_6 <= i_4) /\ (i_6 <= 9) /\
+      (i_5 <= 19))))))).
+
+------------------------------------------------------------
+
+Goal Loop assigns (file tests/wp_typed/user_init.i, line 42) (3/3):
+Effect at line 48
+Assume {
+  Type: is_uint32(i) /\ is_uint32(j).
+  (* Goal *)
+  When: (0 <= i) /\ (0 <= j) /\ (i <= 9) /\ (j <= 19).
+  (* Loop assigns ... *)
+  Have: forall i_2,i_1 : Z. ((0 <= i_1) -> ((0 <= i_2) -> ((i_2 <= 9) ->
+      ((i_1 <= 19) ->
+      (((i_1 < 0) \/ (i_2 < 0) \/ (10 <= i_2) \/ (20 <= i_1)) ->
+      (t2_0[i_2][i_1] = t2_1[i_2][i_1])))))).
+  (* Invariant 'Partial_i' *)
+  Have: forall i_2,i_1 : Z. ((0 <= i_1) -> ((0 <= i_2) -> ((i_2 < i) ->
+      ((i_1 <= 19) -> (t2_1[i_2][i_1] = v))))).
+  (* Invariant 'Range_i' *)
+  Have: i <= 10.
+  (* Loop assigns ... *)
+  Have: forall i_2,i_1 : Z. ((0 <= i_1) -> ((0 <= i_2) -> ((i_2 <= 9) ->
+      ((i_1 <= 19) ->
+      (((i_1 < 0) \/ (i_2 < 0) \/ (10 <= i_2) \/ (20 <= i_1)) ->
+      (t2_2[i_2][i_1] = t2_1[i_2][i_1])))))).
+  (* Invariant 'Previous_i' *)
+  Have: forall i_2,i_1 : Z. ((0 <= i_1) -> ((0 <= i_2) -> ((i_2 < i) ->
+      ((i_1 <= 19) -> (t2_2[i_2][i_1] = t2_1[i_2][i_1]))))).
+  (* Invariant 'Partial_j' *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < j) -> (t2_2[i][i_1] = v))).
+  (* Invariant 'Range_j' *)
+  Have: j <= 20.
+}
+Prove: exists i_2,i_1 : Z. (i_2 <= i) /\ (i_1 <= j) /\ (0 <= i_1) /\
+    (j <= i_1) /\ (0 <= i_2) /\ (i <= i_2) /\ (i_2 <= 9) /\ (i_1 <= 19).
+
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_typed/user_init.i, line 32) in 'init_t2' (1/2):
+Effect at line 41
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_typed/user_init.i, line 32) in 'init_t2' (2/2):
+Effect at line 41
+Assume {
+  Have: 0 <= i_2.
+  Have: 0 <= i_3.
+  Have: i_2 <= 9.
+  Have: i_3 <= 19.
+  Have: 0 <= i.
+  Have: 0 <= i_1.
+  Have: i <= 9.
+  Have: i_1 <= 19.
+  (* Loop assigns ... *)
+  Have: forall i_5,i_4 : Z. ((0 <= i_4) -> ((0 <= i_5) -> ((i_5 <= 9) ->
+      ((i_4 <= 19) ->
+      (((i_4 < 0) \/ (i_5 < 0) \/ (10 <= i_5) \/ (20 <= i_4)) ->
+      (t2_0[i_5][i_4] = t2_1[i_5][i_4])))))).
+}
+Prove: exists i_5,i_4 : Z. (i_5 <= i) /\ (i_4 <= i_1) /\ (0 <= i_4) /\
+    (i_1 <= i_4) /\ (0 <= i_5) /\ (i <= i_5) /\ (i_5 <= 9) /\ (i_4 <= 19).
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function init_t2_bis
+------------------------------------------------------------
+
+Goal Post-condition (file tests/wp_typed/user_init.i, line 57) in 'init_t2_bis':
+Assume {
+  Type: is_sint32(v).
+  (* Goal *)
+  When: (0 <= i) /\ (0 <= i_1) /\ (i <= 9) /\ (i_1 <= 19).
+  (* Loop assigns ... *)
+  Have: forall i_3,i_2 : Z. ((0 <= i_2) -> ((0 <= i_3) -> ((i_3 <= 9) ->
+      ((i_2 <= 19) ->
+      (((i_2 < 0) \/ (i_3 < 0) \/ (10 <= i_3) \/ (20 <= i_2)) ->
+      (t2_1[i_3][i_2] = t2_0[i_3][i_2])))))).
+  (* Invariant 'Partial_i' *)
+  Have: forall i_3,i_2 : Z. ((0 <= i_2) -> ((0 <= i_3) -> ((i_3 <= 9) ->
+      ((i_2 <= 19) -> (t2_0[i_3][i_2] = v))))).
+}
+Prove: t2_0[i][i_1] = v.
+
+------------------------------------------------------------
+
+Goal Exit-condition (file tests/wp_typed/user_init.i, line 59) in 'init_t2_bis':
+Assume {
+  Type: is_uint32(i) /\ is_sint32(v).
+  (* Loop assigns ... *)
+  Have: forall i_2,i_1 : Z. ((0 <= i_1) -> ((0 <= i_2) -> ((i_2 <= 9) ->
+      ((i_1 <= 19) ->
+      (((i_1 < 0) \/ (i_2 < 0) \/ (10 <= i_2) \/ (20 <= i_1)) ->
+      (t2_0[i_2][i_1] = t2_1[i_2][i_1])))))).
+  (* Invariant 'Partial_i' *)
+  Have: forall i_2,i_1 : Z. ((0 <= i_1) -> ((0 <= i_2) -> ((i_2 < i) ->
+      ((i_1 <= 19) -> (t2_1[i_2][i_1] = v))))).
+  (* Invariant 'Range_i' *)
+  Have: (0 <= i) /\ (i <= 10).
+  (* Then *)
+  Have: i <= 9.
+  (* Exit Effects *)
+  Have: (forall i_1 : Z. ((i_1 != i) -> (t2_2[i_1] = t2_1[i_1]))) /\
+      (forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 19) ->
+       (((i_1 < 0) \/ (20 <= i_1)) -> (t2_2[i][i_1] = t2_1[i][i_1]))))).
+}
+Prove: false.
+
+------------------------------------------------------------
+
+Goal Preservation of Invariant 'Partial_i' (file tests/wp_typed/user_init.i, line 66):
+Let m = t2_0[i].
+Assume {
+  Type: is_uint32(i) /\ is_sint32(v).
+  (* Goal *)
+  When: (0 <= i_1) /\ (0 <= i_2) /\ (i_1 < to_uint32(1 + i)) /\ (i_2 <= 19).
+  (* Loop assigns ... *)
+  Have: forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 <= 9) ->
+      ((i_3 <= 19) ->
+      (((i_3 < 0) \/ (i_4 < 0) \/ (10 <= i_4) \/ (20 <= i_3)) ->
+      (t2_1[i_4][i_3] = t2_2[i_4][i_3])))))).
+  (* Invariant 'Partial_i' *)
+  Have: forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 < i) ->
+      ((i_3 <= 19) -> (t2_2[i_4][i_3] = v))))).
+  (* Invariant 'Range_i' *)
+  Have: (0 <= i) /\ (i <= 10).
+  (* Then *)
+  Have: i <= 9.
+  (* Call 'init' *)
+  Have: forall i_3 : Z. ((0 <= i_3) -> ((i_3 <= 19) -> (m[i_3] = v))).
+  (* Call Effects *)
+  Have: (forall i_3 : Z. ((i_3 != i) -> (t2_2[i_3] = t2_0[i_3]))) /\
+      (forall i_3 : Z. ((0 <= i_3) -> ((i_3 <= 19) ->
+       (((i_3 < 0) \/ (20 <= i_3)) -> (t2_2[i][i_3] = m[i_3]))))).
+}
+Prove: m[0] = t2_0[i_1][i_2].
+
+------------------------------------------------------------
+
+Goal Establishment of Invariant 'Partial_i' (file tests/wp_typed/user_init.i, line 66):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Preservation of Invariant 'Range_i' (file tests/wp_typed/user_init.i, line 65):
+Let m = t2_2[i].
+Assume {
+  Type: is_uint32(i) /\ is_sint32(v).
+  (* Loop assigns ... *)
+  Have: forall i_2,i_1 : Z. ((0 <= i_1) -> ((0 <= i_2) -> ((i_2 <= 9) ->
+      ((i_1 <= 19) ->
+      (((i_1 < 0) \/ (i_2 < 0) \/ (10 <= i_2) \/ (20 <= i_1)) ->
+      (t2_0[i_2][i_1] = t2_1[i_2][i_1])))))).
+  (* Invariant 'Partial_i' *)
+  Have: forall i_2,i_1 : Z. ((0 <= i_1) -> ((0 <= i_2) -> ((i_2 < i) ->
+      ((i_1 <= 19) -> (t2_1[i_2][i_1] = v))))).
+  (* Invariant 'Range_i' *)
+  Have: (0 <= i) /\ (i <= 10).
+  (* Then *)
+  Have: i <= 9.
+  (* Call 'init' *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 19) -> (m[i_1] = v))).
+  (* Call Effects *)
+  Have: (forall i_1 : Z. ((i_1 != i) -> (t2_1[i_1] = t2_2[i_1]))) /\
+      (forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 19) ->
+       (((i_1 < 0) \/ (20 <= i_1)) -> (t2_1[i][i_1] = m[i_1]))))).
+}
+Prove: to_uint32(1 + i) <= 10.
+
+------------------------------------------------------------
+
+Goal Establishment of Invariant 'Range_i' (file tests/wp_typed/user_init.i, line 65):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assertion 'i' (file tests/wp_typed/user_init.i, line 71):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Loop assigns (file tests/wp_typed/user_init.i, line 64) (1/3):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Loop assigns (file tests/wp_typed/user_init.i, line 64) (2/3):
+Effect at line 68
+Let m = t2_2[i].
+Assume {
+  Type: is_uint32(i) /\ is_sint32(v).
+  (* Goal *)
+  When: (0 <= i_1) /\ (0 <= i_2) /\ (i_1 <= 9) /\ (i_2 <= 19).
+  (* Loop assigns ... *)
+  Have: forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 <= 9) ->
+      ((i_3 <= 19) ->
+      (((i_3 < 0) \/ (i_4 < 0) \/ (10 <= i_4) \/ (20 <= i_3)) ->
+      (t2_0[i_4][i_3] = t2_1[i_4][i_3])))))).
+  (* Invariant 'Partial_i' *)
+  Have: forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 < i) ->
+      ((i_3 <= 19) -> (t2_1[i_4][i_3] = v))))).
+  (* Invariant 'Range_i' *)
+  Have: (0 <= i) /\ (i <= 10).
+  (* Then *)
+  Have: i <= 9.
+  (* Call 'init' *)
+  Have: forall i_3 : Z. ((0 <= i_3) -> ((i_3 <= 19) -> (m[i_3] = v))).
+  (* Call Effects *)
+  Have: (forall i_3 : Z. ((i_3 != i) -> (t2_1[i_3] = t2_2[i_3]))) /\
+      (forall i_3 : Z. ((0 <= i_3) -> ((i_3 <= 19) ->
+       (((i_3 < 0) \/ (20 <= i_3)) -> (t2_1[i][i_3] = m[i_3]))))).
+}
+Prove: (forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 <= 9) ->
+        ((i_3 <= 19) -> false))))) \/
+    (forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 <= 9) ->
+     ((i_3 <= 19) ->
+     (exists i_6,i_5 : Z. (0 <= i_5) /\ (i_3 <= i_5) /\ (0 <= i_6) /\
+      (i_4 <= i_6) /\ (i_5 <= i_3) /\ (i_6 <= i_4) /\ (i_6 <= 9) /\
+      (i_5 <= 19))))))).
+
+------------------------------------------------------------
+
+Goal Loop assigns (file tests/wp_typed/user_init.i, line 64) (3/3):
+Call Effect at line 69
+Let m = t2_2[i].
+Assume {
+  Type: is_uint32(i) /\ is_sint32(v).
+  (* Goal *)
+  When: (0 <= i) /\ (0 <= i_1) /\ (i <= 9) /\ (i_1 <= 19).
+  (* Loop assigns ... *)
+  Have: forall i_3,i_2 : Z. ((0 <= i_2) -> ((0 <= i_3) -> ((i_3 <= 9) ->
+      ((i_2 <= 19) ->
+      (((i_2 < 0) \/ (i_3 < 0) \/ (10 <= i_3) \/ (20 <= i_2)) ->
+      (t2_0[i_3][i_2] = t2_1[i_3][i_2])))))).
+  (* Invariant 'Partial_i' *)
+  Have: forall i_3,i_2 : Z. ((0 <= i_2) -> ((0 <= i_3) -> ((i_3 < i) ->
+      ((i_2 <= 19) -> (t2_1[i_3][i_2] = v))))).
+  (* Invariant 'Range_i' *)
+  Have: i <= 10.
+  (* Call 'init' *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 19) -> (m[i_2] = v))).
+  (* Call Effects *)
+  Have: (forall i_2 : Z. ((i_2 != i) -> (t2_1[i_2] = t2_2[i_2]))) /\
+      (forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 19) ->
+       (((i_2 < 0) \/ (20 <= i_2)) -> (t2_1[i][i_2] = m[i_2]))))).
+}
+Prove: exists i_3,i_2 : Z. (i_3 <= i) /\ (i_2 <= i_1) /\ (0 <= i_2) /\
+    (i_1 <= i_2) /\ (0 <= i_3) /\ (i <= i_3) /\ (i_3 <= 9) /\ (i_2 <= 19).
+
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_typed/user_init.i, line 58) in 'init_t2_bis' (1/3):
+Effect at line 68
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_typed/user_init.i, line 58) in 'init_t2_bis' (2/3):
+Effect at line 68
+Assume {
+  Have: 0 <= i_2.
+  Have: 0 <= i_3.
+  Have: i_2 <= 9.
+  Have: i_3 <= 19.
+  Have: 0 <= i.
+  Have: 0 <= i_1.
+  Have: i <= 9.
+  Have: i_1 <= 19.
+  (* Loop assigns ... *)
+  Have: forall i_5,i_4 : Z. ((0 <= i_4) -> ((0 <= i_5) -> ((i_5 <= 9) ->
+      ((i_4 <= 19) ->
+      (((i_4 < 0) \/ (i_5 < 0) \/ (10 <= i_5) \/ (20 <= i_4)) ->
+      (t2_0[i_5][i_4] = t2_1[i_5][i_4])))))).
+}
+Prove: exists i_5,i_4 : Z. (i_5 <= i) /\ (i_4 <= i_1) /\ (0 <= i_4) /\
+    (i_1 <= i_4) /\ (0 <= i_5) /\ (i <= i_5) /\ (i_5 <= 9) /\ (i_4 <= 19).
+
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_typed/user_init.i, line 58) in 'init_t2_bis' (3/3):
+Call Effect at line 69
+Assume {
+  Type: is_uint32(i) /\ is_sint32(v).
+  (* Goal *)
+  When: (0 <= i) /\ (0 <= i_1) /\ (i <= 9) /\ (i_1 <= 19).
+  (* Loop assigns ... *)
+  Have: forall i_3,i_2 : Z. ((0 <= i_2) -> ((0 <= i_3) -> ((i_3 <= 9) ->
+      ((i_2 <= 19) ->
+      (((i_2 < 0) \/ (i_3 < 0) \/ (10 <= i_3) \/ (20 <= i_2)) ->
+      (t2_0[i_3][i_2] = t2_1[i_3][i_2])))))).
+  (* Invariant 'Partial_i' *)
+  Have: forall i_3,i_2 : Z. ((0 <= i_2) -> ((0 <= i_3) -> ((i_3 < i) ->
+      ((i_2 <= 19) -> (t2_1[i_3][i_2] = v))))).
+  (* Invariant 'Range_i' *)
+  Have: i <= 10.
+  (* Exit Effects *)
+  Have: (forall i_2 : Z. ((i_2 != i) -> (t2_2[i_2] = t2_1[i_2]))) /\
+      (forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 19) ->
+       (((i_2 < 0) \/ (20 <= i_2)) -> (t2_2[i][i_2] = t2_1[i][i_2]))))).
+}
+Prove: exists i_3,i_2 : Z. (i_3 <= i) /\ (i_2 <= i_1) /\ (0 <= i_2) /\
+    (i_1 <= i_2) /\ (0 <= i_3) /\ (i <= i_3) /\ (i_3 <= 9) /\ (i_2 <= 19).
+
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_typed/user_init.i, line 58) in 'init_t2_bis' (1/2):
+Effect at line 68
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_typed/user_init.i, line 58) in 'init_t2_bis' (2/2):
+Effect at line 68
+Assume {
+  Have: 0 <= i_2.
+  Have: 0 <= i_3.
+  Have: i_2 <= 9.
+  Have: i_3 <= 19.
+  Have: 0 <= i.
+  Have: 0 <= i_1.
+  Have: i <= 9.
+  Have: i_1 <= 19.
+  (* Loop assigns ... *)
+  Have: forall i_5,i_4 : Z. ((0 <= i_4) -> ((0 <= i_5) -> ((i_5 <= 9) ->
+      ((i_4 <= 19) ->
+      (((i_4 < 0) \/ (i_5 < 0) \/ (10 <= i_5) \/ (20 <= i_4)) ->
+      (t2_0[i_5][i_4] = t2_1[i_5][i_4])))))).
+}
+Prove: exists i_5,i_4 : Z. (i_5 <= i) /\ (i_4 <= i_1) /\ (0 <= i_4) /\
+    (i_1 <= i_4) /\ (0 <= i_5) /\ (i <= i_5) /\ (i_5 <= 9) /\ (i_4 <= 19).
+
+------------------------------------------------------------
+
+Goal Instance of 'Pre-condition (file tests/wp_typed/user_init.i, line 1) in 'init'' in 'init_t2_bis' at call 'init' (file tests/wp_typed/user_init.i, line 69)
+:
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Instance of 'Pre-condition (file tests/wp_typed/user_init.i, line 2) in 'init'' in 'init_t2_bis' at call 'init' (file tests/wp_typed/user_init.i, line 69)
+:
 Prove: true.
 
 ------------------------------------------------------------
