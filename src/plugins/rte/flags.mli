@@ -20,35 +20,53 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
+(* -------------------------------------------------------------------------- *)
+(** Filtering Categories of Alarms *)
+(* -------------------------------------------------------------------------- *)
 
-type 'a alarm_gen =
-  remove_trivial:bool ->
-  on_alarm:(invalid:bool -> Alarms.alarm -> unit) ->
-  'a -> unit
-(** ['a alarm_gen] is an abstraction over the process of generating a certain
-    kind of RTEs over something of type ['a].
-    The [on_alarm] argument receives all corresponding alarms, with
-    optionally a status indicating that the alarm is red. *)
+(** Flags for controling the low-level API. Each flag control whether
+    a category of alarms will be visited or not. *)
+type t = {
+  remove_trivial: bool;
+  initialized: bool;
+  mem_access: bool;
+  div_mod: bool;
+  shift: bool;
+  left_shift_negative: bool;
+  right_shift_negative: bool;
+  signed_overflow: bool;
+  unsigned_overflow: bool;
+  signed_downcast: bool;
+  unsigned_downcast: bool;
+  float_to_int: bool;
+  finite_float: bool;
+  pointer_call: bool;
+  bool_value: bool;
+}
 
-val lval_assertion: read_only: Alarms.access_kind -> lval alarm_gen
-val lval_initialized_assertion: lval alarm_gen
-val divmod_assertion: exp alarm_gen
-val signed_div_assertion: (exp * exp * exp) alarm_gen
-val shift_width_assertion: (exp * typ) alarm_gen
-val shift_negative_assertion: exp alarm_gen
-val shift_overflow_assertion: signed:bool -> (exp * binop * exp * exp) alarm_gen
-val mult_sub_add_assertion: signed:bool -> (exp * binop * exp * exp) alarm_gen
-val uminus_assertion: exp alarm_gen
-val signed_downcast_assertion: (typ * exp) alarm_gen
-val unsigned_downcast_assertion: (typ * exp) alarm_gen
-val float_to_int_assertion: (typ * exp) alarm_gen
-val finite_float_assertion: (fkind * exp) alarm_gen
-val pointer_call: (exp * exp list) alarm_gen
-val bool_value: lval alarm_gen
+(** Defaults flags are taken from the Kernel and RTE plug-in options. *)
+val default :
+  ?remove_trivial:bool ->
+  ?initialized:bool ->
+  ?mem_access:bool ->
+  ?div_mod:bool ->
+  ?shift:bool ->
+  ?left_shift_negative:bool ->
+  ?right_shift_negative:bool ->
+  ?signed_overflow:bool ->
+  ?unsigned_overflow:bool ->
+  ?signed_downcast:bool ->
+  ?unsigned_downcast:bool ->
+  ?float_to_int:bool ->
+  ?finite_float:bool ->
+  ?pointer_call:bool ->
+  ?bool_value:bool ->
+  unit -> t
 
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)
+(** All flags set to [true]. *)
+val all : t
+
+(** All flags set to [false]. *)
+val none : t
+
+(* -------------------------------------------------------------------------- *)
