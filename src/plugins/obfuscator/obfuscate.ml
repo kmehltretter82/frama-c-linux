@@ -38,7 +38,8 @@ class visitor = object
 
   method! vglob_aux = function
   | GType (ty,_) ->
-    ty.tname <- Dictionary.fresh Obfuscator_kind.Type ty.tname; 
+    if not (Cil.typeHasAttribute "fc_stdlib" ty.ttype) then
+      ty.tname <- Dictionary.fresh Obfuscator_kind.Type ty.tname;
     Cil.DoChildren
   | GVarDecl (v, _) | GVar (v, _, _) | GFun ({svar = v}, _) | GFunDecl (_, v, _)
       when Cil.is_unused_builtin v ->
@@ -83,10 +84,13 @@ class visitor = object
     if Varinfo.Hashtbl.mem varinfos_visited vi then
       Cil.SkipChildren
     else begin
-      if Cil.isFunctionType vi.vtype then begin
-	if vi.vname <> "main" then 
-	  vi.vname <- Dictionary.fresh Obfuscator_kind.Function vi.vname
-      end else begin
+      if Cil.isFunctionType vi.vtype then
+        try
+          if vi.vname <> "main"
+          && Kernel_function.is_definition (Globals.Functions.get vi) then
+            vi.vname <- Dictionary.fresh Obfuscator_kind.Function vi.vname
+        with Not_found -> assert false
+      else begin
 	let add =
           if vi.vglob then Dictionary.fresh Obfuscator_kind.Global_var
           else if vi.vformal then Dictionary.fresh Obfuscator_kind.Formal_var
