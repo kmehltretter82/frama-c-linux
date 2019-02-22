@@ -1487,7 +1487,7 @@ and logic_body =
 (** Description of a logic type.
     @plugin development guide *)
 and logic_type_info = {
-  lt_name: string;
+  mutable lt_name: string;
   lt_params : string list; (** type parameters*)
   mutable lt_def: logic_type_def option;
     (** definition of the type. None for abstract types. *)
@@ -1528,7 +1528,7 @@ and logic_var = {
 (** Description of a constructor of a logic sum-type.
     @plugin development guide *)
 and logic_ctor_info =
- { ctor_name: string; (** name of the constructor. *)
+ { mutable ctor_name: string; (** name of the constructor. *)
    ctor_type: logic_type_info; (** type to which the constructor belongs. *)
    ctor_params: logic_type list 
  (** types of the parameters of the constructor. *)
