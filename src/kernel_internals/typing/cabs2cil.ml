@@ -7597,11 +7597,11 @@ and compileCondExp ~ghost ce st sf =
       match e.enode with
       | Const(CInt64(i,_,_))
         when (not (Integer.equal i Integer.zero)) && canDrop sf ->
-        clean_up_chunk_locals sf;
+        full_clean_up_chunk_locals sf;
         se @@ (st, ghost)
       | Const(CInt64(z,_,_))
         when (Integer.equal z Integer.zero) && canDrop st ->
-        clean_up_chunk_locals st;
+        full_clean_up_chunk_locals st;
         se @@ (sf, ghost)
       | _ -> (empty @@ (se, ghost)) @@ (ifChunk ~ghost e e.eloc st sf, ghost)
     end
