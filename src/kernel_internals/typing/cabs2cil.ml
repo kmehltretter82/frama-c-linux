@@ -2737,7 +2737,6 @@ let rec castTo ?(fromsource=false)
     (* Taking numerical address or calling an absolute location. Also
        accepted by gcc albeit with a warning. *)
     | TInt _, TPtr (TFun _, _) -> result
-    | TPtr (TFun _, _), TInt _ -> result
 
     (* pointer to potential function type. Note that we do not
        use unrollTypeDeep above in order to avoid needless divergence with
@@ -2770,7 +2769,14 @@ let rec castTo ?(fromsource=false)
 
     | TInt _, TPtr _ -> result
 
-    | TPtr _, TInt _ -> result
+    | TPtr _, TInt _ ->
+      if not fromsource
+      then
+        Kernel.warning
+          ~wkey:Kernel.wkey_int_conversion
+          ~current:true
+          "Conversion from a pointer to an integer without an explicit cast";
+      result
 
     | TArray _, TPtr _ -> result
 

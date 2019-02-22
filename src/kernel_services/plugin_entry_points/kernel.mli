@@ -138,6 +138,8 @@ val wkey_incompatible_types_call: warn_category
 
 val wkey_incompatible_pointer_types: warn_category
 
+val wkey_int_conversion: warn_category
+
 val wkey_cert_exp_46: warn_category
 
 val wkey_cert_msc_38: warn_category
