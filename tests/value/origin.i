@@ -18,7 +18,7 @@ void origin_arithmetic_1(void) {
 void origin_arithmetic_2(int c1) {
   pa2 = (int*)(-(int)ta2);
   qa2 = c1 ? pa2 : (int*)(-(int)tta2);
-  *qa2 = &aa2;
+  *qa2 = (int) &aa2;
 }
 /************/
 void origin_arithmetic_3(void) {

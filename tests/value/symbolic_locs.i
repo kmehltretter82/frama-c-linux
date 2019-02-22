@@ -51,7 +51,7 @@ void main4_scope_right() {
   unsigned int i = v;  //@ assert i <= 8;
   {
     int x;
-    t[i] = &x;
+    t[i] = (int) &x;
     Frama_C_dump_each();
   }
   Frama_C_dump_each(); // Should be empty, x out-of-scope

@@ -20,7 +20,7 @@ void subdivide_pointer () {
      reduction, as it cannot improve the bounds of the result). */
   y = *(p + i - i);
   /* The splitted lvalue contains a pointer value: no subdivision. */
-  i = v ? i : &x;
+  i = v ? i : (int) &x;
   y = *(p + i - i);
 }
 

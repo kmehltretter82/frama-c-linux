@@ -20,7 +20,7 @@ int main (int u) {
   
   if (p >= &(T[5])) {*p=88;*q=77;}
   x = !(&y+2);
-  *(int*)&ff = &y + 2;
+  *(int*)&ff = (int) (&y + 2);
   y = !ff;
 
   
