@@ -33,10 +33,14 @@ int main(int argc, const char **argv) {
   OK(EQ(strcmp(al, ar),0)); // valid comparison of stack strings [ok]
   OK(EQ(strcmp(dl, dr),0)); // valid comparison of heap strings [ok]
 
-  ABRT(al[3] = 'a'; EQ(strcmp(al, ar),0)); // unterminated in left stack [ok]
-  ABRT(ar[3] = 'a'; EQ(strcmp(al, ar),0)); // unterminated in right stack [ok]
-  ABRT(dl[3] = 'a'; EQ(strcmp(dl, dr),0)); // unterminated in left heap [ok]
-  ABRT(dr[3] = 'a'; EQ(strcmp(dl, dr),0)); // unterminated in right heap [ok]
+  al[3] = 'a';
+  ABRT(EQ(strcmp(al, ar),0)); // unterminated in left stack [ok]
+  ar[3] = 'a'; al[3] = 0;
+  ABRT(EQ(strcmp(al, ar),0)); // unterminated in right stack [ok]
+  dl[3] = 'a';
+  ABRT(EQ(strcmp(dl, dr),0)); // unterminated in left heap [ok]
+  dr[3] = 'a'; dl[3] = 0;
+  ABRT(EQ(strcmp(dl, dr),0)); // unterminated in right heap [ok]
 
   ABRT(EQ(strcmp(dl, NULL),0)); // NULL in left  [ok]
   ABRT(EQ(strcmp(NULL, dr),0)); // NULL in right [ok]
@@ -54,24 +58,33 @@ int main(int argc, const char **argv) {
   dl = strdup("abc"),
   dr = strdup("abc");
 
+  char nal[4] = "abc",
+       nar[4] = "abc";
+
   OK(EQ(strncmp(cl, cr, 3),0)); // valid comparison of constants [ok]
-  OK(EQ(strncmp(al, ar, 3),0)); // valid comparison of stack strings [ok]
+  OK(EQ(strncmp(nal, nar, 3),0)); // valid comparison of stack strings [ok]
   OK(EQ(strncmp(dl, dr, 3),0)); // valid comparison of heap strings [ok]
   // Still ok because there is a terminator
-  OK(EQ(strncmp(al, ar, 6),0)); // valid comparison of stack strings [ok]
+  OK(EQ(strncmp(nal, nar, 6),0)); // valid comparison of stack strings [ok]
   OK(EQ(strncmp(dl, dr, 6),0)); // valid comparison of heap strings [ok]
 
+  nal[3] = 'd';
   // no terminator but within allocated length [ok]
-  OK(al[3] = 'd'; NEQ(strncmp(al, ar, 4),0));
-  OK(ar[3] = 'd'; NEQ(strncmp(al, ar, 4),0));
-  OK(dl[3] = 'd'; NEQ(strncmp(dl, dr, 4),0));
-  OK(dr[3] = 'd'; NEQ(strncmp(dl, dr, 4),0));
+  OK(NEQ(strncmp(nal, nar, 4),0));
+  nar[3] = 'd'; nal[3] = 0;
+  OK(NEQ(strncmp(nal, nar, 4),0));
+  dl[3] = 'd';
+  OK(NEQ(strncmp(dl, dr, 4),0));
+  dr[3] = 'd'; dl[3] = 0;
+  OK(NEQ(strncmp(dl, dr, 4),0));
 
   // no terminator but outside allocated length [abort]
-  ABRT(al[3] = 'd'; res = strncmp(al, ar, 5));
-  ABRT(ar[3] = 'd'; res = strncmp(al, ar, 5));
-  ABRT(dl[3] = 'd'; res = strncmp(dl, dr, 5));
-  ABRT(dr[3] = 'd'; res = strncmp(dl, dr, 5));
+  ABRT(res = strncmp(nal, nar, 5));
+  nal[3] = 'd'; nar[3] = 0;
+  ABRT(res = strncmp(al, ar, 5));
+  ABRT(res = strncmp(dl, dr, 5));
+  dl[3] = 'd'; dr[3] = 0;
+  ABRT(res = strncmp(dl, dr, 5));
 
   free(dl);
   free(dr);

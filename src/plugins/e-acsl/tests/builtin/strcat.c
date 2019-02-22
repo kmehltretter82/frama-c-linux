@@ -9,9 +9,10 @@
 int main(int argc, const char **argv) {
   char *const_str = "abcd";
   char *unalloc_str = malloc(5);
+  char *_barrier = malloc(1);
   char *empty_str = "";
   free(unalloc_str);
-
+  {
   /* strcat */
   char dest1[9] = "dcba";
   char dest2[8] = "dcba";
@@ -35,7 +36,17 @@ int main(int argc, const char **argv) {
   ABRT(strcat(pd1 + 3, pd1)); // overlapping spaces [abort]
   ABRT(strcat(pd4 + 4, pd4)); // overlapping spaces [abort]
   OK(pd4[5] = '\0'; strcat(pd4 + 5, pd4)); // non-overlapping
-
+  }
+  {
+  /* strncat */
+  char dest1[9] = "dcba";
+  char dest2[8] = "dcba";
+  char dest3[5] = "----";
+  char dest4[10] = "dcba";
+  char *pd1 = &dest1;
+  char *pd2 = &dest2;
+  char *pd3 = &dest3;
+  char *pd4 = &dest4;
   /* strncat */
   OK(strncat(dest1, const_str, 4)); // enough space in dest
   ABRT(strncat(dest2, const_str, 4)); // insufficient space in dest
@@ -48,6 +59,7 @@ int main(int argc, const char **argv) {
   ABRT(strncat(pd1, pd1, 1)); // overlapping spaces (same address) [abort]
   ABRT(strncat(pd1 + 3, pd1, 5)); // overlapping spaces [abort]
   ABRT(strncat(pd4 + 4, pd4, 5)); // overlapping spaces [abort]
+  }
   return 0;
 }
 
