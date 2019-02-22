@@ -325,7 +325,7 @@ struct
 
     let mk_dir d =
       try
-        Unix.mkdir d 0o755;
+        Extlib.mkdir ~parents:true d 0o755;
         L.warning "creating %s directory `%s'" O.option_name d;
         d
       with Unix.Unix_error _ -> 
