@@ -58,15 +58,20 @@ static void exec_abort(int line, const char *file) {
   trace();
 #endif
 #endif
-  kill(getpid(), SIGABRT);
+ raise(SIGABRT);
 }
 
 /*! \brief Print a message to stderr and abort the execution */
 static void vabort(char *fmt, ...) {
   va_list va;
+  sigset_t defer_abrt;
+  sigemptyset(&defer_abrt);
+  sigaddset(&defer_abrt,SIGABRT);
+  sigprocmask(SIG_BLOCK,&defer_abrt,NULL);
   va_start(va,fmt);
   _format(NULL,_charc_stderr,fmt,va);
   va_end(va);
+  sigprocmask(SIG_UNBLOCK,&defer_abrt,NULL);
   runtime_abort();
 }
 

@@ -15,7 +15,7 @@ int main(int argc, const char **argv) {
   char dest3[256] = "abcd";
   size_t len = 0;
 
-  char *unalloc_str = malloc(5); free(unalloc_str);
+  char *unalloc_str = malloc(5); char* _barrier = malloc(1); free(unalloc_str);
 
   /* strcpy */
   OK(strcpy(dest1, src)); // heap allocated, sufficient space [ok]
