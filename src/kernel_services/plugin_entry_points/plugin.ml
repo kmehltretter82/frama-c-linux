@@ -734,7 +734,7 @@ struct
       let arg_name="k1[=s1][,...,kn[=sn]]"
       let help =
         "set warning status for category <k1> to <s1>,...,<kn> to <sn>. Use "
-        ^ debug_category_optname
+        ^ warn_category_optname
         ^ " help to get a list of available categories, and * to enable \
            all categories. Possible statuses are inactive, feedback-once, \
            once, active, error-once, error, and abort. Defaults to active"
