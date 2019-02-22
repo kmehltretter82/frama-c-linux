@@ -841,6 +841,21 @@ let env : (string, envdata * location) H.t = H.create 307
 (* We also keep a global environment. This is always a subset of the env *)
 let genv : (string, envdata * location) H.t = H.create 307
 
+let label_env = Datatype.String.Hashtbl.create 307
+
+let add_label_env lab =
+  let add_if_absent v (d,_) map =
+    match d with
+    | EnvVar vi when not (Datatype.String.Map.mem v map) ->
+      Datatype.String.Map.add v vi map
+    | _ -> map
+  in
+  let lab_env = H.fold add_if_absent env Datatype.String.Map.empty in
+  Datatype.String.Hashtbl.add label_env lab lab_env
+
+let remove_label_env lab =
+  Datatype.String.Hashtbl.remove label_env lab
+
 (* In the scope we keep the original name, so we can remove them from the
  * hash table easily *)
 type undoScope =
@@ -1021,6 +1036,7 @@ let constrExprId = ref 0
 
 
 let startFile () =
+  Datatype.String.Hashtbl.clear label_env;
   H.clear env;
   H.clear genv;
   H.clear alphaTable;
@@ -3719,9 +3735,27 @@ struct
   let anonCompFieldName = anonCompFieldName
   let conditionalConversion = logicConditionalConversion
   let find_macro _ = raise Not_found
-  let find_var x = match H.find env x with
-    | EnvVar vi, _ -> cvar_to_lvar vi
-    | _ -> raise Not_found
+  let find_var ?label ~var =
+    let find_from_curr_env test =
+      match H.find env var with
+      | EnvVar vi, _ when test vi -> cvar_to_lvar vi
+      | _ -> raise Not_found
+    in
+    match label with
+    | None -> find_from_curr_env (fun _ -> true)
+    | Some "Here" | Some "Old" | Some "Post" ->
+      (* the last two labels can only be found in contracts and refer
+         to the pre/post state of the contracts: all local variables
+         in scope at current point are also in scope in the labels. *)
+      find_from_curr_env (fun _ -> true)
+    | Some "Pre" ->
+      find_from_curr_env (fun vi -> vi.vformal || vi.vglob)
+    | Some "Init" -> find_from_curr_env (fun vi -> vi.vglob)
+    | Some lab ->
+      cvar_to_lvar
+        (Datatype.String.Map.find var
+           (Datatype.String.Hashtbl.find label_env lab))
+
   let find_enum_tag x = match H.find env x with
     | EnvEnum item,_ ->
       dummy_exp (Const (CEnum item)), typeOf item.eival
@@ -3764,6 +3798,8 @@ module Ltyping = Logic_typing.Make (C_logic_env)
 
 let startLoop iswhile =
   incr C_logic_env.nb_loop;
+  add_label_env "LoopEntry";
+  add_label_env "LoopCurrent";
   continues :=
     (if iswhile then While (ref "") else NotWhile (ref "")) :: !continues;
   enter_break_env ()
@@ -3771,6 +3807,8 @@ let startLoop iswhile =
 let exitLoop () =
   decr C_logic_env.nb_loop;
   exit_break_env ();
+  remove_label_env "LoopEntry";
+  remove_label_env "LoopCurrent";
   match !continues with
   | [] -> Kernel.error ~once:true ~current:true "exit Loop not in a loop"
   | _ :: rest -> continues := rest
@@ -9663,6 +9701,7 @@ and doStatement local_env (s : A.statement) : chunk =
   | A.LABEL (l, s, loc) ->
     let loc' = convLoc loc in
     CurrentLoc.set loc';
+    add_label_env l;
     C_logic_env.add_current_label l;
     (* Lookup the label because it might have been locally defined *)
     let chunk =
