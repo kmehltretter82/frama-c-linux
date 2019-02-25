@@ -216,7 +216,7 @@ let local_printer: Printer.extensible_printer =
     method! code_annotation fmt ca =
       temporaries <- Cil_datatype.Varinfo.Set.empty;
       match ca.annot_content with
-      | AAssert(_, p) ->
+      | AAssert (_, _, p) ->
         (* ignore the ACSL name *)
         Format.fprintf fmt "@[<v>@[assert@ %a;@]" self#predicate_node p.pred_content;
         (* print temporary variables information *)

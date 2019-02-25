@@ -420,7 +420,7 @@ let ident_names names =
                       | _ as n -> '\"' <> (String.get n 0) ) names
 
 let code_annot_names ca = match ca.annot_content with
-  | AAssert (_, named_pred)  -> "@assert"::(ident_names named_pred.pred_name)
+  | AAssert (_, _, named_pred)  -> "@assert"::(ident_names named_pred.pred_name)
   | AInvariant (_,_,named_pred) -> "@invariant"::(ident_names named_pred.pred_name)
   | AVariant (term, _) -> "@variant"::(ident_names term.term_name)
   | AExtended(_,_,(_,name,_,_,_)) -> [Printf.sprintf "@%s" name]
@@ -588,7 +588,7 @@ let assigns_hints hs froms =
   List.iter (fun ({it_content=t},_) -> term_hints hs t) froms
 
 let annot_hints hs = function
-  | AAssert(bs,ipred) | AInvariant(bs,_,ipred) ->
+  | AAssert(bs,_,ipred) | AInvariant(bs,_,ipred) ->
       List.iter (add_hint hs) (ident_names ipred.pred_name) ;
       List.iter (add_hint hs) bs
   | AAssigns(bs,Writes froms) ->

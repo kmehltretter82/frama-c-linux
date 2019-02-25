@@ -3777,9 +3777,12 @@ struct
   let code_annot loc current_behaviors current_return_type ca =
     let source = fst loc in
     let annot = match ca with
-      | AAssert (behav,p) ->
+      | AAssert (behav,Assert,p) ->
         check_behavior_names loc current_behaviors behav;
-        Cil_types.AAssert (behav,predicate (code_annot_env()) p)
+        Cil_types.AAssert (behav, Cil_types.Assert, predicate (code_annot_env()) p)
+      | AAssert (behav,Check,p) ->
+        check_behavior_names loc current_behaviors behav;
+        Cil_types.AAssert (behav, Cil_types.Check, predicate (code_annot_env()) p)
       | APragma (Impact_pragma sp) ->
         Cil_types.APragma (Cil_types.Impact_pragma (impact_pragma (code_annot_env()) sp))
       | APragma (Slice_pragma sp) ->

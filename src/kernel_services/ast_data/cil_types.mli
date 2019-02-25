@@ -1739,11 +1739,17 @@ and pragma =
   | Slice_pragma of slice_pragma
   | Impact_pragma of impact_pragma
 
+(** Kind of an assertion:
+    - an assert is both evaluated and used as hypothesis afterwards;
+    - a check is only evaluated, but is not used as an hypothesis: it does not
+      affect the analyses. *)
+and assertion_kind = Assert | Check
+
 (** all annotations that can be found in the code.
     This type shares the name of its constructors with
     {!Logic_ptree.code_annot}. *)
 and code_annotation_node =
-  | AAssert of string list * predicate
+  | AAssert of string list * assertion_kind * predicate
   (** assertion to be checked. The list of strings is the list of
       behaviors to which this assertion applies. *)
 

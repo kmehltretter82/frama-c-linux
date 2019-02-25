@@ -1021,8 +1021,8 @@ let is_same_extension (_,e1,_,s1,c1) (_,e2,_,s2,c2) =
 
 let is_same_code_annotation (ca1:code_annotation) (ca2:code_annotation) =
   match ca1.annot_content, ca2.annot_content with
-  | AAssert(l1,p1), AAssert(l2,p2) ->
-    is_same_list (=) l1 l2 && is_same_predicate p1 p2
+  | AAssert(l1,k1,p1), AAssert(l2,k2,p2) ->
+    is_same_list (=) l1 l2 && k1 = k2 && is_same_predicate p1 p2
   | AStmtSpec (l1,s1), AStmtSpec (l2,s2) ->
     is_same_list (=) l1 l2 && is_same_spec s1 s2
   | AInvariant(l1,b1,p1), AInvariant(l2,b2,p2) ->
@@ -2057,7 +2057,11 @@ let lhost_c_type thost =
      | _ -> assert false)
   | TResult ty -> ty
 
-let is_assert ca = match ca.annot_content with AAssert _ -> true | _ -> false
+let is_assert ca =
+  match ca.annot_content with AAssert (_, Assert, _) -> true | _ -> false
+
+let is_check ca =
+  match ca.annot_content with AAssert (_, Check, _) -> true | _ -> false
 
 let is_contract ca =
   match ca.annot_content with AStmtSpec _ -> true | _ -> false
@@ -2101,7 +2105,7 @@ let is_loop_annot s =
 
 let is_trivial_annotation a =
   match a.annot_content with
-  | AAssert (_,a) -> is_trivially_true a
+  | AAssert (_,_,a) -> is_trivially_true a
   | APragma _ | AStmtSpec _ | AInvariant _ | AVariant _
   | AAssigns _| AAllocation _ | AExtended _
     -> false

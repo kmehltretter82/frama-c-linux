@@ -2178,7 +2178,7 @@ module Code_annotation = struct
      end)
 
   let loc ca = match ca.annot_content with
-    | AAssert(_,{pred_loc=loc})
+    | AAssert(_,_,{pred_loc=loc})
     | AInvariant(_,_,{pred_loc=loc})
     | AVariant({term_loc=loc},_) -> Some loc
     | AAssigns _ | AAllocation _ | APragma _ | AExtended _

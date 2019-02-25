@@ -902,7 +902,7 @@ let get_stmt_annots config v s =
               Printer.pp_code_annotation a;
             acc
           end
-    | AAssert (b_list,p) ->
+    | AAssert (b_list,_,p) ->
         let kf = config.kf in
         let acc = match is_annot_for_config config v s b_list with
           | TBRno -> acc
@@ -1385,7 +1385,7 @@ let get_id_prop_strategies ~model ?(assigns=WithAssigns) p =
   match p with
   | Property.IPCodeAnnot (kf,_,ca) ->
       let bhvs = match ca.annot_content with
-        | AAssert (l, _) | AInvariant (l, _, _) | AAssigns (l, _) -> l
+        | AAssert (l, _, _) | AInvariant (l, _, _) | AAssigns (l, _) -> l
         | _ -> []
       in get_strategies assigns kf model bhvs None (IdProp p)
   | Property.IPAssigns (kf, _, Property.Id_loop _, _)

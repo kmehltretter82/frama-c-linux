@@ -628,7 +628,7 @@ let rec short_pretty fmt p = match p with
   | IPDisjoint (kf,_,_,_) ->
     Format.fprintf fmt "disjoint clause in function %a"
       Kernel_function.pretty kf
-  | IPCodeAnnot (_,_,{ annot_content = AAssert (_, { pred_name = name :: _ })}) ->
+  | IPCodeAnnot (_,_,{ annot_content = AAssert (_, _, { pred_name = name :: _ })}) ->
     Format.pp_print_string fmt name
   | IPCodeAnnot(_,_,{annot_content =
                        AInvariant (_,_, { pred_name = name :: _ })})->
@@ -845,7 +845,7 @@ struct
 
   let pp_code_annot_names fmt ca =
     match ca.annot_content with
-      | AAssert(for_bhv,named_pred) | AInvariant(for_bhv,_,named_pred) ->
+      | AAssert(for_bhv,_,named_pred) | AInvariant(for_bhv,_,named_pred) ->
         let pp_for_bhv fmt l =
           match l with
           | [] -> ()
@@ -907,7 +907,8 @@ struct
       Format.asprintf  "%sextended%a" (extended_loc_prefix le) pp_names [name]
     | IPCodeAnnot (kf,_, ca) ->
         let name = match ca.annot_content with
-          | AAssert _ -> "assert"
+          | AAssert (_, Assert, _) -> "assert"
+          | AAssert (_, Check, _) -> "check"
           | AInvariant (_,true,_) -> "loop_inv"
           | AInvariant _ -> "inv"
           | APragma _ -> "pragma"
@@ -1094,8 +1095,10 @@ struct
     | IPCodeAnnot (kf,stmt, { annot_content = AExtended(_,_,(_,clause,_,_,_)) } )
       -> [ K kf ; A clause ; S stmt ]
 
-    | IPCodeAnnot (kf,_, { annot_content = AAssert(_,p) } ) ->
+    | IPCodeAnnot (kf,_, { annot_content = AAssert(_,Assert,p) } ) ->
       [K kf ; A "assert" ; P p ]
+    | IPCodeAnnot (kf,_, { annot_content = AAssert(_,Check,p) } ) ->
+      [K kf ; A "check" ; P p ]
     | IPCodeAnnot (kf,_, { annot_content = AInvariant(_,true,p) } ) ->
       [K kf ; A "loop_invariant" ; P p ]
     | IPCodeAnnot (kf,_, { annot_content = AInvariant(_,false,p) } ) ->
