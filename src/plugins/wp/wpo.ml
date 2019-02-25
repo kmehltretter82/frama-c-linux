@@ -965,7 +965,7 @@ let get_logfile w prover result =
   let model = get_model w in
   DISK.cache_log ~pid:w.po_pid ~model ~prover ~result
 
-let _ =
+let _ignore =
   Dynamic.register ~plugin:"Wp" "Wpo.file_for_log_proof" ~journalize:false
     (Datatype.func2
        WpoType.ty ProverType.ty

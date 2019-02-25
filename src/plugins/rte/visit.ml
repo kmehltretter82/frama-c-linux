@@ -315,7 +315,7 @@ class annot_visitor kf flags on_alarm = object (self)
              self#generate_assertion Rte.finite_float_assertion (to_fkind,exp)
            | _ -> ());
         | Const (CReal(f,fkind,_)) when self#do_finite_float () ->
-          begin match Pervasives.classify_float f with
+          begin match classify_float f with
             | FP_normal
             | FP_subnormal
             | FP_zero -> ()

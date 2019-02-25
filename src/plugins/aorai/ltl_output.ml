@@ -23,7 +23,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Format open Pervasives
+open Format
 open Ltlast
 
 let out_fmt=ref (formatter_of_out_channel stdout)

@@ -341,11 +341,11 @@ let try_finally ~finally f x =
 
   The alternative, such as registering an daemon that raises an exception,
   hence interrupting the process, might not work: child processes still need to
-  run some daemons, such as [Pervasives.flush_all] which is registered by default. *)
+  run some daemons, such as [flush_all] which is registered by default. *)
 
 let pid = Unix.getpid ()
 let safe_at_exit f =
-  Pervasives.at_exit
+  at_exit
     begin fun () ->
       let child = Unix.getpid () in
       if child = pid then f ()

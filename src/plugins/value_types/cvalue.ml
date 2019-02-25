@@ -32,7 +32,7 @@ module CardinalEstimate = struct
 
   let zero = None
   let one = Some 0.0
-  let of_integer x = Some(Pervasives.log10 (Integer.to_float x))
+  let of_integer x = Some(log10 (Integer.to_float x))
   let infinite = Some(infinity)
   let mul a b = match (a,b) with
     | None, _ | _, None -> None

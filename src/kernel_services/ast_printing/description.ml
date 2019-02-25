@@ -409,7 +409,7 @@ type order =
   | A of Datatype.String.Set.t
 
 let cmp_order a b = match a , b with
-  | I a , I b -> Pervasives.compare a b
+  | I a , I b -> Transitioning.Stdlib.compare a b
   | I _ , _ -> (-1)
   | _ , I _ -> 1
   | S a , S b -> String.compare a b

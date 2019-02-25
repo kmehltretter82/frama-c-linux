@@ -48,7 +48,7 @@ struct
           match w1.severe , w2.severe with
           | true , false -> (-1)
           | false , true -> 1
-          | _ -> Pervasives.compare w1 w2
+          | _ -> Transitioning.Stdlib.compare w1 w2
 
 end
 

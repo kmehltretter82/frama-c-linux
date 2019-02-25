@@ -77,9 +77,9 @@ struct
   let compare x y =
     let cmp = String.compare x.vbase y.vbase in
     if cmp <> 0 then cmp else
-      let cmp = Pervasives.compare x.vrank y.vrank in
+      let cmp = Transitioning.Stdlib.compare x.vrank y.vrank in
       if cmp <> 0 then cmp else
-        Pervasives.compare x.vid y.vid
+        Transitioning.Stdlib.compare x.vid y.vid
 
   (* POOL *)
 

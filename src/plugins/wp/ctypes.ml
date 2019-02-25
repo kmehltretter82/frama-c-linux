@@ -317,7 +317,7 @@ module AinfoComparable = struct
     let c = !cmp obj_a obj_b in
     if c <> 0 then c
     else match a.arr_flat , b.arr_flat with
-      | Some a , Some b -> Pervasives.compare a.arr_size b.arr_size
+      | Some a , Some b -> Transitioning.Stdlib.compare a.arr_size b.arr_size
       | None , Some _ -> (-1)
       | Some _ , None -> 1
       | None , None -> 0
@@ -574,7 +574,7 @@ and compare_array_ptr_conflated a b =
   let c = compare_ptr_conflated obj_a obj_b in
   if c <> 0 then c
   else match a.arr_flat , b.arr_flat with
-    | Some a , Some b -> Pervasives.compare a.arr_size b.arr_size
+    | Some a , Some b -> Transitioning.Stdlib.compare a.arr_size b.arr_size
     | None , Some _ -> (-1)
     | Some _ , None -> 1
     | None , None -> 0

@@ -732,7 +732,7 @@ let deprecated name =
     "Dynamic '%s' now is deprecated. Use `Wp.VC` api instead." name
 
 let register name ty code =
-  let _ =
+  let _ignore =
     Dynamic.register ~plugin:"Wp" name ty
       ~journalize:false (*LC: Because of Property is not journalizable. *)
       (fun x -> deprecated name ; code x)
