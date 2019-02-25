@@ -46,7 +46,8 @@
 [wp] Proved goals:   39 / 39
   Qed:            25 
   Alt-Ergo:       14
-[wp] Report 'tests/wp_plugin/sequence.i.0.report.json'
+[wp] Report in:  'tests/wp_plugin/oracle_qualif/sequence.0.report.json'
+[wp] Report out: 'tests/wp_plugin/result_qualif/sequence.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 no_calls             5      5 (8..20)       10       100%

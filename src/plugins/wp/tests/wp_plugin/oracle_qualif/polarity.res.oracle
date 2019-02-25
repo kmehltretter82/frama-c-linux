@@ -10,7 +10,8 @@
 [wp] [Alt-Ergo] Goal typed_f_assert : Unsuccess (Stronger)
 [wp] Proved goals:    0 / 1
   Alt-Ergo:        0  (unsuccess: 1)
-[wp] Report 'tests/wp_plugin/polarity.i.0.report.json'
+[wp] Report in:  'tests/wp_plugin/oracle_qualif/polarity.0.report.json'
+[wp] Report out: 'tests/wp_plugin/result_qualif/polarity.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 f                   -      -                 1       0.0%

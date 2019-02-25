@@ -9,7 +9,8 @@
 [wp] Proved goals:    2 / 2
   Qed:             0 
   Alt-Ergo:        2
-[wp] Report 'tests/wp_store/nonaliasing.i.0.report.json'
+[wp] Report in:  'tests/wp_store/oracle_qualif/nonaliasing.0.report.json'
+[wp] Report out: 'tests/wp_store/result_qualif/nonaliasing.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 f                   -       2 (24..36)       2       100%

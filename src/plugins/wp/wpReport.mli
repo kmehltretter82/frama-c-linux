@@ -47,4 +47,4 @@ type fcstat
 val fcstat : unit -> fcstat
 
 val export : fcstat -> string -> unit
-val export_json : fcstat -> string -> unit
+val export_json : fcstat -> ?jinput:string -> joutput:string -> unit -> unit

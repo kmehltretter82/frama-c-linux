@@ -84,7 +84,8 @@
 [wp] [Qed] Goal typed_ref_ref_bd_assigns : Valid
 [wp] Proved goals:   78 / 78
   Qed:            78
-[wp] Report 'tests/wp_hoare/dispatch_var.i.0.report.json'
+[wp] Report in:  'tests/wp_hoare/oracle_qualif/dispatch_var.0.report.json'
+[wp] Report out: 'tests/wp_hoare/result_qualif/dispatch_var.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 call_ref_ctr         4     -                 4       100%

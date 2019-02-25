@@ -19,7 +19,8 @@
 [wp] Proved goals:    1 / 6
   Qed:             1 
   Alt-Ergo:        0  (unsuccess: 5)
-[wp] Report 'tests/wp_plugin/rte.i.0.report.json'
+[wp] Report in:  'tests/wp_plugin/oracle_qualif/rte.0.report.json'
+[wp] Report out: 'tests/wp_plugin/result_qualif/rte.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 job                  1     -                 5      20.0%

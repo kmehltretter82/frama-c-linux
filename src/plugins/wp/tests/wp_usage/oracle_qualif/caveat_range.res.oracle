@@ -19,7 +19,8 @@
 [wp] Proved goals:   12 / 12
   Qed:             7 
   Alt-Ergo:        5
-[wp] Report 'tests/wp_usage/caveat_range.i.0.report.json'
+[wp] Report in:  'tests/wp_usage/oracle_qualif/caveat_range.0.report.json'
+[wp] Report out: 'tests/wp_usage/result_qualif/caveat_range.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 reset                7      5 (48..60)      12       100%

@@ -9,7 +9,8 @@
 [wp] [Qed] Goal typed_f_assigns_part2 : Valid
 [wp] Proved goals:    3 / 3
   Qed:             3
-[wp] Report 'tests/wp_store/natural.i.0.report.json'
+[wp] Report in:  'tests/wp_store/oracle_qualif/natural.0.report.json'
+[wp] Report out: 'tests/wp_store/result_qualif/natural.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 f                    3     -                 3       100%

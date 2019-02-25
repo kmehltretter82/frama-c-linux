@@ -9,7 +9,8 @@
 [wp] [Qed] Goal typed_g_call_f_requires : Valid
 [wp] Proved goals:    1 / 1
   Qed:             1
-[wp] Report 'tests/wp_typed/avar.i.0.report.json'
+[wp] Report in:  'tests/wp_typed/oracle_qualif/avar.0.report.json'
+[wp] Report out: 'tests/wp_typed/result_qualif/avar.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 g                    1     -                 1       100%

@@ -12,8 +12,9 @@
 [wp] Proved goals:    4 / 5
   Qed:             3 
   Alt-Ergo:        1  (unsuccess: 1)
-[wp] Report 'tests/wp_plugin/subset_fopen.c.0.report.json'
+[wp] Report in:  'tests/wp_plugin/oracle_qualif/subset_fopen.0.report.json'
+[wp] Report out: 'tests/wp_plugin/result_qualif/subset_fopen.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
-f                    3      1 (80..104)      5      80.0%
+f                    3      1 (88..112)      5      80.0%
 -------------------------------------------------------------
