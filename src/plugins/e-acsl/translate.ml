@@ -798,7 +798,7 @@ and translate_rte_annots:
     let env =
       List.fold_left
         (fun env a -> match a.annot_content with
-        | AAssert(_, p) ->
+        | AAssert(_, _, p) ->
 	  handle_error
 	    (fun env ->
 	      Options.feedback ~dkey ~level:4 "prevent RTE from %a" pp elt;
@@ -1018,7 +1018,7 @@ let translate_post_spec kf env spec =
 
 let translate_pre_code_annotation kf env annot =
   let convert env = match annot.annot_content with
-    | AAssert(l, p) ->
+    | AAssert(l, _, p) ->
       if Keep_status.must_translate kf Keep_status.K_Assert then
 	let env = Env.set_annotation_kind env Misc.Assertion in
 	if l <> [] then

@@ -49,7 +49,7 @@ let search_assert_or_invariant kf =
     Annotations.iter_all_code_annot
       (fun stmt _ a ->
 	match a.annot_content with
-        | AAssert(_, p) | AInvariant(_, _, p) ->
+        | AAssert(_, _, p) | AInvariant(_, _, p) ->
 	  let line = Ppt_line.get () in
 	  if (fst (p.loc)).Lexing.pos_lnum = line then 
 	    raise (Found(Property.ip_of_code_annot_single kf stmt a, line))
