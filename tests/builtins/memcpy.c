@@ -87,7 +87,7 @@ void main (int a, int b){
   memcpy(&v3, t+(int)t, sizeof(v1));
 
   memcpy(&v4 + (int)&v4, &v1, sizeof(v1)-20);
-  v4.y = &t[0];
+  v4.y = (int) &t[0];
   memcpy(&v5 + (int)&v5, &v4, sizeof(v4)-20);
 
   if (maybe) {

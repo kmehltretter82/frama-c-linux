@@ -145,6 +145,9 @@ let wkey_incompatible_types_call =
 let wkey_incompatible_pointer_types =
   register_warn_category "typing:incompatible-pointer-types"
 
+let wkey_int_conversion =
+  register_warn_category "typing:int-conversion"
+
 let wkey_cert_exp_46 = register_warn_category "CERT:EXP:46"
 
 let wkey_cert_msc_38 = register_warn_category "CERT:MSC:38"

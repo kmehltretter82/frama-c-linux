@@ -88,9 +88,9 @@ void main6_val_warn_converted_signed() {
   }
   if (v) {
     int *p = &v;
-    int x = p; // No warning as an address fits in an integer.
-    short y = p; // Warnings, as an address may not fit in short.
-    unsigned short z = p; // No warninng on unsigned casts.
+    int x = (int) p; // No warning as an address fits in an integer.
+    short y = (short) p; // Warnings, as an address may not fit in short.
+    unsigned short z = (unsigned short) p; // No warninng on unsigned casts.
   }
 }
 
