@@ -19,6 +19,12 @@
 #   configure	configure
 ###############################################################################
 
+-  runtime      [2019/02/26] The behavior of __e_acsl_assert now depends on the
+	        runtime value of the global variable __e_acsl_sound_verdict:
+	        if 0, it means that its verdict is possibly incorrect.
+-  E-ACSL       [2019/02/26] New option -e-acsl-instrument to instrument
+	        only a specified set of functions. It may lead to incorrect
+	        verdicts.
 -  E-ACSL       [2019/02/19] New option -e-acsl-functions to monitor only
 	        annotations in a white list of functions.
 -* runtime      [2019/02/04] Fix initialization of the E-ACSL runtime in
