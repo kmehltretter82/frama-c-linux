@@ -1062,8 +1062,8 @@ or
   line. Once such a directive has been encountered, each occurrence of
   \texttt{@macro-name@} in a \texttt{CMD}, \texttt{LOG}, \texttt{OPT},
   \texttt{STDOPT} or \texttt{EXECNOW} directive at this configuration level
-  or in any level below it will be replaced by \texttt{content}. Existing 
-  pre-defined macros are listed in section~\ref{sec:ptests-macros}.
+  or in any level below it will be replaced by \texttt{content}. Existing
+  pre-defined macros are listed in section~\ref{sec:ptests-macros}. 
 \item The \texttt{FILEREG}\sscodeidxdef{Test}{Directive}{FILEREG}
   directive contains a regular expression indicating which files in
   the directory containing the current test suite are actually part of
@@ -1071,6 +1071,14 @@ or
   usable in a \texttt{test\_config}\codeidx{test\_config}
   configuration file.
 \end{itemize}
+
+\begin{important}
+\paragraph{\texttt{@} in the text of a directive}
+As mentioned above, \texttt{@} is recognized by \ptests as the beginning of
+a macro. If you need to have a literal \texttt{@} in the text of the directive
+itself, it needs to be doubled, {\it i.e.} \texttt{@@} will be translated as
+\texttt{@}.
+\end{important}
 
 \begin{important}
   \textbf{Summary: ordering of test executions}
