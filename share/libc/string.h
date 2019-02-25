@@ -222,7 +222,6 @@ extern char *strpbrk(const char *s, const char *accept);
   @*/
 extern char *strstr(const char *haystack, const char *needle);
 
-#ifdef __USE_GNU
 /*@ requires valid_string_haystack: valid_read_string(haystack);
   @ requires valid_string_needle: valid_read_string(needle);
   @ assigns \result \from haystack, indirect:haystack[0..],
@@ -232,7 +231,6 @@ extern char *strstr(const char *haystack, const char *needle);
   @   || (\subset(\result, haystack+(0..)) && \valid_read(\result));
   @*/
 extern char *strcasestr (const char *haystack, const char *needle);
-#endif
 
 // internal state of strtok
 char *__fc_strtok_ptr;
@@ -387,8 +385,6 @@ extern char *strncpy(char *restrict dest,
 size_t strlcpy(char * restrict dest, const char * restrict src, size_t n);
 
 // stpcpy is POSIX.1-2008
-#ifdef _POSIX_C_SOURCE
-# if _POSIX_C_SOURCE >= 200809L
 /*@ requires valid_string_src: valid_read_string(src);
   @ requires room_string: \valid(dest+(0..strlen(src)));
   @ requires separation:
@@ -399,8 +395,6 @@ size_t strlcpy(char * restrict dest, const char * restrict src, size_t n);
   @ ensures points_to_end: \result == dest + strlen(dest);
   @*/
 extern char *stpcpy(char *restrict dest, const char *restrict src);
-# endif
-#endif
 
 /*@ // missing: separation
   @ requires valid_string_src: valid_read_string(src);

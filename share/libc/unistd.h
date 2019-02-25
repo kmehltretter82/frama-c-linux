@@ -1109,7 +1109,6 @@ extern ssize_t      write(int fd, const void *buf, size_t count);
 extern int setgroups(size_t size, const gid_t *list);
 
 // The following functions are GNU extensions
-#ifdef _GNU_SOURCE
 
 /*@
   // missing: assigns \result, *ruid, *euid, *suid \from 'process'
@@ -1159,7 +1158,6 @@ int getresgid(gid_t *rgid, gid_t *egid, gid_t *sgid);
  */
 int setresgid(gid_t rgid, gid_t egid, gid_t sgid);
 
-#endif
 
 __END_DECLS
 

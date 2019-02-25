@@ -44,9 +44,7 @@ typedef void (*__fc_sighandler_t) (int);
 #define sighandler_t __fc_sighandler_t
 
 /* for BSD 4.4 */
-#ifdef __USE_MISC
 typedef __fc_sighandler_t sig_t;
-#endif
 
 #define SIG_DFL ((__fc_sighandler_t)0)     /* default signal handling */
 #define SIG_IGN ((__fc_sighandler_t)1)     /* ignore signal */

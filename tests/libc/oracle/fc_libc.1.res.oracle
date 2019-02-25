@@ -3391,6 +3391,19 @@ extern char *strpbrk(char const *s, char const *accept);
 
 char *strstr(char const *haystack, char const *needle);
 
+/*@ requires valid_string_haystack: valid_read_string(haystack);
+    requires valid_string_needle: valid_read_string(needle);
+    ensures
+      result_null_or_in_haystack:
+        \result ≡ \null ∨
+        (\subset(\result, \old(haystack) + (0 ..)) ∧ \valid_read(\result));
+    assigns \result;
+    assigns \result
+      \from haystack, (indirect: *(haystack + (0 ..))),
+            (indirect: *(needle + (0 ..)));
+ */
+extern char *strcasestr(char const *haystack, char const *needle);
+
 char *__fc_strtok_ptr;
 /*@ requires valid_string_delim: valid_read_string(delim);
     assigns *(s + (0 ..)), *(__fc_strtok_ptr + (0 ..)), \result,
@@ -3555,6 +3568,20 @@ char *strncpy(char *dest, char const *src, size_t n);
       \from (indirect: src), (indirect: *(src + (0 .. n - 1))), (indirect: n);
  */
 size_t strlcpy(char * __restrict dest, char const * __restrict src, size_t n);
+
+/*@ requires valid_string_src: valid_read_string(src);
+    requires room_string: \valid(dest + (0 .. strlen(src)));
+    requires
+      separation:
+        \separated(dest + (0 .. strlen(src)), src + (0 .. strlen(src)));
+    ensures equal_contents: strcmp(\old(dest), \old(src)) ≡ 0;
+    ensures points_to_end: \result ≡ \old(dest) + strlen(\old(dest));
+    assigns *(dest + (0 .. strlen{Old}(src))), \result;
+    assigns *(dest + (0 .. strlen{Old}(src)))
+      \from *(src + (0 .. strlen{Old}(src)));
+    assigns \result \from dest;
+ */
+extern char *stpcpy(char * __restrict dest, char const * __restrict src);
 
 char *strcat(char *dest, char const *src);
 
