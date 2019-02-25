@@ -1519,13 +1519,13 @@ struct
       try
         ref (H.find labels s)
       with Not_found when List.mem s !label_current ->
-        let my_ref =
-          ref
-            (mkEmptyStmt
-               (* just a placeholder that will never be used. no need to
-                  check for ghost status here. *)
-               ~ghost:false ~valid_sid ~loc:(cabslu "_find_label") ())
+        (* just a placeholder that will never be used. no need to
+           check for ghost status here. *)
+        let my_stmt =
+          mkEmptyStmt ~ghost:false ~valid_sid ~loc:(cabslu "_find_label") ()
         in
+        my_stmt.labels <- [Label(s,cabslu "_find_label",true)];
+        let my_ref = ref my_stmt in
         addGoto s my_ref; my_ref
   end
 
