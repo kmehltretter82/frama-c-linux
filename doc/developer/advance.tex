@@ -3926,7 +3926,7 @@ the corresponding list is traversed normally by the visitor
 (see section~\ref{adv:visitors}).
 
 In order for the extension to be recognized by the parser, it must be
-registered by one of the following functions, depending on its category:
+registered by one of the following functions, depending on its category.
 \begin{itemize}
 \item \texttt{Logic\_typing.register\_behavior\_extension}%
 \scodeidx{Logic\_typing}{register\_behavior\_extension}
@@ -3941,6 +3941,15 @@ registered by one of the following functions, depending on its category:
 \item \texttt{Logic\_typing.register\_code\_annot\_next\_both\_extension}%
 \scodeidx{Logic\_typing}{register\_code\_annot\_next\_loop\_extension}
 \end{itemize}
+
+Each function takes three arguments:
+\begin{itemize}
+\item \texttt{kw} the name of the extension,
+\item \texttt{status}, a boolean flag indicating whether the extended annotation
+  may have a validity status, and
+\item \texttt{f} the type-checking function itself.
+\end{itemize}
+
 After a call to the appropriate registration function,
 a clause of the form \verb|kw e1,...,en;|, where each \verb|ei| can be
 any syntactically valid ACSL term or predicate,

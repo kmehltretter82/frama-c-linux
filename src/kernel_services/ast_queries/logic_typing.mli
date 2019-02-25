@@ -172,6 +172,7 @@ type typing_context = {
 
     @since Carbon-20101201
     @modify Silicon-20161101 change type of the function
+    @Frama-C+dev add [status] argument
 *)
 val register_behavior_extension:
   string -> bool ->
