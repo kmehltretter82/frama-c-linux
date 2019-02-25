@@ -161,11 +161,15 @@ class visitor = object
     Cil.DoChildren
 
   method! vlogic_type_info_decl lti =
-    lti.lt_name <- Dictionary.fresh Obfuscator_kind.Logic_type lti.lt_name ;
+    if not (Logic_env.is_builtin_logic_type lti.lt_name)
+    then lti.lt_name <- Dictionary.fresh Obfuscator_kind.Logic_type lti.lt_name ;
     Cil.DoChildren
 
   method! vlogic_ctor_info_decl lci =
-    lci.ctor_name <- Dictionary.fresh Obfuscator_kind.Logic_constructor lci.ctor_name ;
+    if not (Logic_env.is_builtin_logic_ctor lci.ctor_name)
+    then
+      lci.ctor_name <-
+        Dictionary.fresh Obfuscator_kind.Logic_constructor lci.ctor_name ;
     Cil.DoChildren
 
   method! vattr = function
