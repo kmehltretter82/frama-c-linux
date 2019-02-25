@@ -65,14 +65,21 @@ module List: sig
   val assq_opt: 'a -> ('a * 'b) list -> 'b option (** 4.05 *)
 end
 
+(** 4.08 *)
 module Stdlib: sig
   val compare: 'a -> 'a -> int
+  val succ: int -> int
+  val incr: int ref -> unit
+  val min: 'a -> 'a -> 'a
+  val max: 'a -> 'a -> 'a
 end
 
+(** 4.08 *)
 module Dynlink: sig
   val init: unit -> unit
 end
 
+(** 4.08 *)
 module Format: sig
   type stag
   val string_of_stag: stag -> string

@@ -309,7 +309,7 @@ module Make (V : module type of Offsetmap_lattice_with_isotropy) = struct
       then begin
          if current_counter = max_int 
          then Kernel.fatal "Offsetmap(%s): internal maximum exeeded" V.name;
-         counter := pervasives_succ current_counter;
+         counter := Transitioning.Stdlib.succ current_counter;
       end;
       hashed_node
 
