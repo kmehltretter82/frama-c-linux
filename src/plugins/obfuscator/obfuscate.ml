@@ -87,7 +87,9 @@ class visitor = object
       if Cil.isFunctionType vi.vtype then
         try
           if vi.vname <> "main"
-          && Kernel_function.is_definition (Globals.Functions.get vi) then
+          && not (Cil.is_builtin vi)
+          && not (Cil.is_special_builtin vi.vname)
+          && not (Cil.hasAttribute "fc_stdlib" vi.vattr) then
             vi.vname <- Dictionary.fresh Obfuscator_kind.Function vi.vname
         with Not_found -> assert false
       else begin
