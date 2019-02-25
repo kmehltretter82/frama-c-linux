@@ -80,6 +80,13 @@
   __e_acsl_math_HUGE_VAL ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
   __e_acsl_math_HUGE_VALF ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
   __e_acsl_math_INFINITY ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+<<<<<<< HEAD
+||||||| merged common ancestors
+  testno ∈ {0}
+=======
+  testno ∈ {0}
+  __e_acsl_sound_verdict ∈ [--..--]
+>>>>>>> new option -e-acsl-instrument
   __gen_e_acsl_literal_string ∈ {0}
   __gen_e_acsl_literal_string_2 ∈ {0}
   __gen_e_acsl_literal_string_3 ∈ {0}

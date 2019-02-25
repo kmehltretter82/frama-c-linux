@@ -56,7 +56,7 @@ let get_lib_fun_vi fname =
     with Not_found ->
       try Builtins.find fname
       with Not_found ->
-        (* could not happen in normal mode, but could be raised when E-ACSL is
+        (* should not happen in normal mode, but could be raised when E-ACSL is
            used as a library *)
         raise (Unregistered_library_function fname)
 

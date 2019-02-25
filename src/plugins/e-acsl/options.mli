@@ -35,6 +35,7 @@ module Validate_format_strings: Parameter_sig.Bool
 module Replace_libc_functions: Parameter_sig.Bool
 
 module Functions: Parameter_sig.Kernel_function_set
+module Instrument: Parameter_sig.Kernel_function_set
 
 val parameter_states: State.t list
 

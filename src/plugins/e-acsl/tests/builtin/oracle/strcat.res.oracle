@@ -20,49 +20,49 @@
   Neither code nor specification for function set_handler, generating default assigns from the prototype
 [kernel:annot:missing-spec] tests/builtin/signalled.h:22: Warning: 
   Neither code nor specification for function test_successful, generating default assigns from the prototype
-[e-acsl] FRAMAC_SHARE/libc/string.h:409: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:421: Warning: 
   E-ACSL construct `logic function application' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:410: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:422: Warning: 
   E-ACSL construct `logic function application' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:427: Warning: 
+  E-ACSL construct `logic function application' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:435: Warning: 
+  E-ACSL construct `logic function application' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:435: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:427: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:425: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:406: Warning: 
+  E-ACSL construct `logic function application' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:407: Warning: 
+  E-ACSL construct `logic function application' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:408: Warning: 
+  E-ACSL construct `logic function returning an integer' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:408: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:411: Warning: 
+  E-ACSL construct `logic function returning an integer' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:414: Warning: 
+  E-ACSL construct `logic function returning an integer' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:415: Warning: 
-  E-ACSL construct `logic function application' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:423: Warning: 
-  E-ACSL construct `logic function application' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:423: Warning: 
-  E-ACSL construct `assigns clause in behavior' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:415: Warning: 
-  E-ACSL construct `assigns clause in behavior' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:413: Warning: 
-  E-ACSL construct `assigns clause in behavior' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:394: Warning: 
-  E-ACSL construct `logic function application' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:395: Warning: 
-  E-ACSL construct `logic function application' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:396: Warning: 
   E-ACSL construct `logic function returning an integer' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:396: Warning: 
-  E-ACSL construct `assigns clause in behavior' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:399: Warning: 
-  E-ACSL construct `logic function returning an integer' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:402: Warning: 
-  E-ACSL construct `logic function returning an integer' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:403: Warning: 
-  E-ACSL construct `logic function returning an integer' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:404: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:416: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
@@ -75,6 +75,7 @@
   __e_acsl_math_HUGE_VAL ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
   __e_acsl_math_HUGE_VALF ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
   __e_acsl_math_INFINITY ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
+  __e_acsl_sound_verdict ∈ [--..--]
   __gen_e_acsl_literal_string ∈ {0}
   __gen_e_acsl_literal_string_2 ∈ {0}
   __gen_e_acsl_literal_string_3 ∈ {0}

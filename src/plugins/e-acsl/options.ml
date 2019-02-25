@@ -118,10 +118,20 @@ module Functions =
   Kernel_function_set
     (struct
       let option_name = "-e-acsl-functions"
-      let arg_name ="f1, ..., fn"
+      let arg_name = "f1, ..., fn"
       let help = "only annotations in functions f1, ..., fn are checked at \
 runtime"
      end)
+
+module Instrument =
+  Kernel_function_set
+    (struct
+      let option_name = "-e-acsl-instrument"
+      let arg_name = "f1, ..., fn"
+      let help = "only instrument functions f1, ..., fn. \
+Be aware that runtime verdicts may become partial."
+    end)
+
 
 let () = Parameter_customize.set_group help
 module Version =
@@ -148,7 +158,10 @@ let parameter_states =
     Gmp_only.self;
     Full_mmodel.self;
     Builtins.self;
-    Temporal_validity.self]
+    Temporal_validity.self;
+    Validate_format_strings.self;
+    Functions.self;
+    Instrument.self ]
 
 let must_visit () = Run.get () || Check.get ()
 
