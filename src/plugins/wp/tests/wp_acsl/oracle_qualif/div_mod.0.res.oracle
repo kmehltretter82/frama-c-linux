@@ -29,7 +29,8 @@
 [wp] Proved goals:   22 / 22
   Qed:             0 
   Alt-Ergo:       22
-[wp] Report 'tests/wp_acsl/div_mod.i.0.report.json'
+[wp] Report in:  'tests/wp_acsl/oracle_qualif/div_mod.0.report.json'
+[wp] Report out: 'tests/wp_acsl/result_qualif/div_mod.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 f                   -      22 (8..20)       22       100%

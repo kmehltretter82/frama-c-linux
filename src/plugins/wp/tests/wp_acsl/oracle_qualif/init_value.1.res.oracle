@@ -24,7 +24,8 @@
 [wp] [Alt-Ergo] Goal typed_main_ko_requires_qed_ko_indirect_init_union_t : Unsuccess
 [wp] Proved goals:    0 / 18
   Alt-Ergo:        0  (unsuccess: 18)
-[wp] Report 'tests/wp_acsl/init_value.i.1.report.json'
+[wp] Report in:  'tests/wp_acsl/oracle_qualif/init_value.1.report.json'
+[wp] Report out: 'tests/wp_acsl/result_qualif/init_value.1.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 main_ko             -      -                 9       0.0%

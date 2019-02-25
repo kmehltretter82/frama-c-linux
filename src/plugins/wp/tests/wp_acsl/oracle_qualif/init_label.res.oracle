@@ -13,7 +13,8 @@
 [wp] Proved goals:    3 / 4
   Qed:             2 
   Alt-Ergo:        1  (unsuccess: 1)
-[wp] Report 'tests/wp_acsl/init_label.i.0.report.json'
+[wp] Report in:  'tests/wp_acsl/oracle_qualif/init_label.0.report.json'
+[wp] Report out: 'tests/wp_acsl/result_qualif/init_label.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 main                 1     -                 1       100%

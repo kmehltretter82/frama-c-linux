@@ -10,7 +10,8 @@
 [wp] Proved goals:    3 / 3
   Qed:             2 
   Alt-Ergo:        1
-[wp] Report 'tests/wp_plugin/unsafe-arrays.i.0.report.json'
+[wp] Report in:  'tests/wp_plugin/oracle_qualif/unsafe-arrays.0.report.json'
+[wp] Report out: 'tests/wp_plugin/result_qualif/unsafe-arrays.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 f                    2      1 (16..28)       3       100%

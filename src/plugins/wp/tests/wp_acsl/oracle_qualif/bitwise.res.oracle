@@ -36,7 +36,8 @@
 [wp] Proved goals:   26 / 29
   Qed:            25 
   Alt-Ergo:        1  (unsuccess: 3)
-[wp] Report 'tests/wp_acsl/bitwise.i.0.report.json'
+[wp] Report in:  'tests/wp_acsl/oracle_qualif/bitwise.0.report.json'
+[wp] Report out: 'tests/wp_acsl/result_qualif/bitwise.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 band                 8     -                 8       100%

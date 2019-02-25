@@ -79,7 +79,8 @@
 [wp] [Alt-Ergo] Goal typed_predicate_ensures_ko_l_assoc_naming : Unsuccess
 [wp] Proved goals:    0 / 37
   Alt-Ergo:        0  (unsuccess: 37)
-[wp] Report 'tests/wp_acsl/precedence.i.1.report.json'
+[wp] Report in:  'tests/wp_acsl/oracle_qualif/precedence.1.report.json'
+[wp] Report out: 'tests/wp_acsl/result_qualif/precedence.1.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 predicate           -      -                23       0.0%

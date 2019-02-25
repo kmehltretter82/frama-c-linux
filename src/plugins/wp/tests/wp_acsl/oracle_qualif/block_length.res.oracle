@@ -16,7 +16,8 @@
 [wp] [Qed] Goal typed_f_ensures_Pts1 : Valid
 [wp] Proved goals:   10 / 10
   Qed:            10
-[wp] Report 'tests/wp_acsl/block_length.i.0.report.json'
+[wp] Report in:  'tests/wp_acsl/oracle_qualif/block_length.0.report.json'
+[wp] Report out: 'tests/wp_acsl/result_qualif/block_length.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 f                   10     -                10       100%

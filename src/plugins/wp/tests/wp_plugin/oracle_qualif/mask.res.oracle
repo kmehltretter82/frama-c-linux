@@ -8,7 +8,8 @@
 [wp] [Qed] Goal typed_compute_ensures_B : Valid
 [wp] Proved goals:    2 / 2
   Qed:             2
-[wp] Report 'tests/wp_plugin/mask.i.0.report.json'
+[wp] Report in:  'tests/wp_plugin/oracle_qualif/mask.0.report.json'
+[wp] Report out: 'tests/wp_plugin/result_qualif/mask.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 compute              2     -                 2       100%

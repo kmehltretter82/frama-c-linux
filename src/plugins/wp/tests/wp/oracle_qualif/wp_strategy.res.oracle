@@ -39,7 +39,8 @@
 [wp] Proved goals:   17 / 25
   Qed:            17 
   Alt-Ergo:        0  (unsuccess: 8)
-[wp] Report 'tests/wp/wp_strategy.c.0.report.json'
+[wp] Report in:  'tests/wp/oracle_qualif/wp_strategy.0.report.json'
+[wp] Report out: 'tests/wp/result_qualif/wp_strategy.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 bts0513             -      -                 2       0.0%
