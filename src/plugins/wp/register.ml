@@ -139,13 +139,22 @@ let do_wp_print_for goals =
 
 let do_wp_report () =
   begin
-    let rfiles = Wp_parameters.Report.get () in
-    if rfiles <> [] then
+    let reports = Wp_parameters.Report.get () in
+    let jreport = Wp_parameters.ReportJson.get () in
+    if reports <> [] || jreport <> "" then
       begin
         let stats = WpReport.fcstat () in
-        let jfile = Wp_parameters.ReportJson.get () in
-        if jfile <> "" then WpReport.export_json stats jfile ;
-        List.iter (WpReport.export stats) rfiles ;
+        begin
+          match Transitioning.String.split_on_char ':' jreport with
+          | [] | [""] -> ()
+          | [joutput] ->
+              WpReport.export_json stats ~joutput () ;
+          | [jinput;joutput] ->
+              WpReport.export_json stats ~jinput ~joutput () ;
+          | _ ->
+              Wp_parameters.error "Invalid format for option -wp-report-json"
+        end ;
+        List.iter (WpReport.export stats) reports ;
       end ;
     if Wp_parameters.MemoryContext.get () then
       wp_warn_memory_context ()
