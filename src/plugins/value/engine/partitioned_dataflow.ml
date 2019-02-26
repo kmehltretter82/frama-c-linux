@@ -406,9 +406,9 @@ module Make_Dataflow
       (transition : vertex transition) (f : flow) : unit =
     (* Split return *)
     begin match transition with
-    | Return (return_exp, _) ->
-      Partition.split_return f return_exp
-    | _ -> ()
+      | Return (return_exp, _) ->
+        Partition.split_return f return_exp
+      | _ -> ()
     end;
     (* Loop transitions *)
     let the_stmt v = Extlib.the v.vertex_start_of in

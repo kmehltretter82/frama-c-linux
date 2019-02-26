@@ -314,9 +314,9 @@ struct
     let transfer acc (k,x) =
       let add =
         match k.ration_stamp with
-          (* No ration stam, just add the state to the list *)
+        (* No ration stam, just add the state to the list *)
         | None -> fun l y -> (k,y) :: l
-          (* There is a ration stamp, set the second part of the stamp to a unique transfer number *)
+        (* There is a ration stamp, set the second part of the stamp to a unique transfer number *)
         | Some (s,_) -> fun l y ->
           let k' = { k with ration_stamp = Some (s, !n) } in
           incr n;
