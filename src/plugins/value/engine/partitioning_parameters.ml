@@ -81,7 +81,18 @@ struct
     try match get_unroll_annot stmt with
       | [] -> warn_no_loop_unroll stmt; default
       | [None] -> Partition.IntLimit default_loop_unroll
-      | [(Some t)] -> Partition.ExpLimit (term_to_exp t)
+      | [(Some t)] -> begin
+          (* Inlines the value of const variables in [t]. *)
+          let global_init vi =
+            try (Globals.Vars.find vi).init with Not_found -> None
+          in
+          let t =
+            Cil.visitCilTerm (new Logic_utils.simplify_const_lval global_init) t
+          in
+          match Logic_utils.constFoldTermToInt t with
+          | Some n -> Partition.IntLimit (Integer.to_int n)
+          | None   -> Partition.ExpLimit (term_to_exp t)
+        end
       | _ ->
         warn "ignoring invalid unroll annotation";
         raise Exit
