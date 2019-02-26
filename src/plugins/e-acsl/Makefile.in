@@ -152,8 +152,12 @@ PLUGIN_TESTS_DIRS := \
 	no-main \
 	full-mmodel \
 	temporal \
-	builtin \
 	special
+
+# [JS 2019/02/26] deactivate tests 'builtin' as long as setjmp/longjmp is not
+# supported.
+#	builtin \
+
 
 endif
 
