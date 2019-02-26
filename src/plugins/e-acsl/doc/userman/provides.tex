@@ -618,12 +618,16 @@ to deactivate it and systematically instrument the code as explained above.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Runtime Monitor Behavior}
+\label{sec:monitor-behavior}
 
-When a predicate is checked at runtime function
-\texttt{\_\_e\_acsl\_assert}\codeidxdef{e\_acsl\_assert} is called.  By
-default this function does nothing if the predicate is valid, and prints
-an error message and aborts the execution (by raising an \texttt{ABORT}
-signal via a call to the \C function \texttt{abort}) if the predicate is invalid.
+When a predicate is checked at runtime, function
+\texttt{\_\_e\_acsl\_assert}\codeidxdef{e\_acsl\_assert} is called.  By default
+this function does nothing if the predicate is valid, and prints an error
+message and aborts the execution (by raising an \texttt{ABORT} signal via a call
+to the \C function \texttt{abort}) if the predicate is invalid. If \eacsl
+detects that its verdict is not trustable (see
+Section~\ref{sec:partial-instrumentation}), it prints a warning with its guess
+and continues the execution.
 
 The default behavior of \texttt{\_\_e\_acsl\_assert}\codeidxdef{e\_acsl\_assert}
 can be altered using \longopt{fail-with-code=CODE} option of \eacslgcc
@@ -650,6 +654,12 @@ following signature:
 
 \cinput{examples/assert_sign.c}
 
+Additionally, it may depends on the global variable
+\texttt{\_\_e\_acsl\_sound\_verdict}\codeidxdef{e\_acsl\_sound\_verdict}. This
+variable of type \texttt{int} is set to \texttt{0} as soon as the verdict
+provided by \eacsl is not trustable anymore (see
+Section~\ref{sec:partial-instrumentation}).
+
 Below is an example which prints the validity status of each property but never
 exits.
 
@@ -663,11 +673,11 @@ default implementation of \texttt{\_\_e\_acsl\_assert}\codeidxdef{e\_acsl\_asser
 with the customized one specified in \texttt{my\_assert.c}
 
 \begin{shell}
-\$ e-acsl-gcc.sh -c first.i my_assert.c -Ofirst --external-assert=my\_assert.c
+\$ e-acsl-gcc.sh -c -X first.i -Ofirst --external-assert=my_assert.c
 \$ ./first.e-acsl
-Assertion at line 3 in function main is valid.
+Assertion at line 3 in function main is valid (trustable).
 The verified predicate was: `x == 0'.
-Assertion at line 4 in function main is invalid.
+Assertion at line 4 in function main is invalid (trustable).
 The verified predicate was: `x == 1'.
 \end{shell}
 
@@ -903,8 +913,8 @@ The considered predicate is:
 
 First, there is no message for the first assertion about the initialization of
 \texttt{\&t[0]}, meaning that this assertion is silently checked as valid by
-\eacsl. It was made possible because of the complete instrumentation of
-functions \texttt{f} and \texttt{main}.
+\eacsl (see Section~\ref{sec:monitor-behavior}). It was made possible because of
+the complete instrumentation of functions \texttt{f} and \texttt{main}.
 
 Second, since function \texttt{g} was not instrumented, no sound verdict may be
 provided after executing it. It leads to the printed warnings for the two last
