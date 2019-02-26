@@ -2,6 +2,8 @@
 #include "stdio.h"
 #include "stdlib.h"
 char *__gen_e_acsl_literal_string;
+extern int __e_acsl_sound_verdict;
+
 int a;
 char *n = (char *)"134";
 void __e_acsl_globals_init(void)

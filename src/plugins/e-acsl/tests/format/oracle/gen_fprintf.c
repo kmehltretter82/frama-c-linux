@@ -34,6 +34,8 @@ char *__gen_e_acsl_literal_string_22;
 char *__gen_e_acsl_literal_string_20;
 char *__gen_e_acsl_literal_string_18;
 char *__gen_e_acsl_literal_string_17;
+extern int __e_acsl_sound_verdict;
+
 /*@ assigns \result;
     assigns \result \from \nothing; */
 extern int ( /* missing proto */ fork)(void);

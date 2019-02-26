@@ -3,6 +3,8 @@
 #include "stdlib.h"
 char *__gen_e_acsl_literal_string;
 char *__gen_e_acsl_literal_string_2;
+extern int __e_acsl_sound_verdict;
+
 /*@ behavior exists:
       assumes ∃ ℤ i; 0 ≤ i < (int)n ∧ (int)*((char *)buf + i) ≡ c;
       ensures

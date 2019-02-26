@@ -50,15 +50,18 @@ module Memory: sig
 end = struct
 
   let tracking_stmt ?before fold mk_stmt env kf vars =
-    fold
-      (fun vi env ->
-      if Mmodel_analysis.must_model_vi ~kf vi then
-        let vi = Cil.get_varinfo (Env.get_behavior env) vi in
-          Env.add_stmt ?before env (mk_stmt vi)
-      else
-        env)
-      vars
-    env
+    if Functions.instrument kf then
+      fold
+        (fun vi env ->
+           if Mmodel_analysis.must_model_vi ~kf vi then
+             let vi = Cil.get_varinfo (Env.get_behavior env) vi in
+             Env.add_stmt ?before env (mk_stmt vi)
+           else
+             env)
+        vars
+        env
+    else
+      env
 
   let store ?before env kf vars =
     tracking_stmt
@@ -580,8 +583,8 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
 
   method !vfunc f =
     if generate then begin
-      Exit_points.generate f;
       let kf = Extlib.the self#current_kf in
+      if Functions.instrument kf then Exit_points.generate f;
       Options.feedback ~dkey ~level:2 "entering in function %a."
         Kernel_function.pretty kf;
       List.iter (fun vi -> vi.vghost <- false) f.slocals;
@@ -843,27 +846,30 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
   method private handle_instructions stmt env kf =
     let add_initializer loc ?vi lv ?(post=false) stmt env kf =
       assert generate;
-      let may_safely_ignore = function
-        | Var vi, NoOffset -> vi.vglob || vi.vformal
-        | _ -> false
-      in
-      let must_model = Mmodel_analysis.must_model_lval ~stmt ~kf lv in
-      if not (may_safely_ignore lv) && must_model then
-        let before = Cil.mkStmt stmt.skind in
-        let new_stmt =
-          (* Bitfields are not yet supported ==> no initializer.
-             A not_yet will be raised in [Translate]. *)
-          if Cil.isBitfield lv then Project.on prj Cil.mkEmptyStmt ()
-          else Project.on prj (Misc.mk_initialize ~loc) lv
+      if Functions.instrument kf then
+        let may_safely_ignore = function
+          | Var vi, NoOffset -> vi.vglob || vi.vformal
+          | _ -> false
         in
-        let env = Env.add_stmt ~post ~before env new_stmt in
-        let env = match vi with
-          | None -> env
-          | Some vi ->
-            let new_stmt = Project.on prj Misc.mk_store_stmt vi in
-            Env.add_stmt ~post ~before env new_stmt
-        in
-        env
+        let must_model = Mmodel_analysis.must_model_lval ~stmt ~kf lv in
+        if not (may_safely_ignore lv) && must_model then
+          let before = Cil.mkStmt stmt.skind in
+          let new_stmt =
+            (* Bitfields are not yet supported ==> no initializer.
+               A not_yet will be raised in [Translate]. *)
+            if Cil.isBitfield lv then Project.on prj Cil.mkEmptyStmt ()
+            else Project.on prj (Misc.mk_initialize ~loc) lv
+          in
+          let env = Env.add_stmt ~post ~before env new_stmt in
+          let env = match vi with
+            | None -> env
+            | Some vi ->
+              let new_stmt = Project.on prj Misc.mk_store_stmt vi in
+              Env.add_stmt ~post ~before env new_stmt
+          in
+          env
+        else
+          env
       else
         env
     in
@@ -947,14 +953,17 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
         new_blk
       | [], _ :: _ | _ :: _, [] | _ :: _, _ :: _ ->
         let add_locals stmts =
-          List.fold_left
-            (fun acc vi ->
-              if Mmodel_analysis.must_model_vi ~bhv:self#behavior ~kf vi then
-                Misc.mk_delete_stmt vi :: acc
-              else
-                acc)
+          if Functions.instrument kf then
+            List.fold_left
+              (fun acc vi ->
+                 if Mmodel_analysis.must_model_vi ~bhv:self#behavior ~kf vi then
+                   Misc.mk_delete_stmt vi :: acc
+                 else
+                   acc)
+              stmts
+              new_blk.blocals
+          else
             stmts
-            new_blk.blocals
         in
         let rec insert_in_innermost_last_block blk = function
           | { skind = Return _ } as ret :: ((potential_clean :: tl) as l) ->
@@ -978,15 +987,16 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
             List.fold_left (fun acc v -> v :: acc) (add_locals []) l
         in
         insert_in_innermost_last_block new_blk (List.rev new_blk.bstmts);
-        new_blk.bstmts <-
-          List.fold_left
-          (fun acc vi ->
-            if Mmodel_analysis.must_model_vi vi && not vi.vdefined then
-              let vi = Cil.get_varinfo self#behavior vi in
-              Misc.mk_store_stmt vi :: acc
-            else acc)
-          new_blk.bstmts
-          blk.blocals;
+        if Functions.instrument kf then
+          new_blk.bstmts <-
+            List.fold_left
+              (fun acc vi ->
+                 if Mmodel_analysis.must_model_vi vi && not vi.vdefined then
+                   let vi = Cil.get_varinfo self#behavior vi in
+                   Misc.mk_store_stmt vi :: acc
+                 else acc)
+              new_blk.bstmts
+              blk.blocals;
         new_blk
     in
     if generate then Cil.DoChildrenPost handle_memory else Cil.DoChildren

@@ -15,6 +15,12 @@ char *__gen_e_acsl_literal_string_6;
 char *__gen_e_acsl_literal_string_4;
 char *__gen_e_acsl_literal_string_5;
 char *__gen_e_acsl_literal_string;
+extern int __e_acsl_sound_verdict;
+
+/*@ assigns \result;
+    assigns \result \from \nothing; */
+extern int ( /* missing proto */ fork)(void);
+
 void __e_acsl_globals_init(void)
 {
   static char __e_acsl_already_run = 0;

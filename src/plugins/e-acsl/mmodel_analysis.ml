@@ -26,13 +26,16 @@ open Cil_datatype
 module Dataflow = Dataflow2
 
 let must_never_monitor vi =
+  (* E-ACSL, please do not monitor yourself! *)
+  Functions.RTL.is_rtl_name vi.vname
+  ||
   (* extern ghost variables are usually used (by the Frama-C libc) to
-     represent some internal invisible states in ACSL specifications. They do
-     not correspond to something concrete *)
+       represent some internal invisible states in ACSL specifications. They do
+       not correspond to something concrete *)
   (vi.vghost && vi.vstorage = Extern)
   ||
-    (* incomplete types cannot be properly monitored. See BTS #2406. *)
-    not (Cil.isCompleteType vi.vtype)
+  (* incomplete types cannot be properly monitored. See BTS #2406. *)
+  not (Cil.isCompleteType vi.vtype)
 
 (* ********************************************************************** *)
 (* Backward dataflow analysis to compute a sound over-approximation of what

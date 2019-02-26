@@ -618,12 +618,16 @@ to deactivate it and systematically instrument the code as explained above.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Runtime Monitor Behavior}
+\label{sec:monitor-behavior}
 
-When a predicate is checked at runtime function
-\texttt{\_\_e\_acsl\_assert}\codeidxdef{e\_acsl\_assert} is called.  By
-default this function does nothing if the predicate is valid, and prints
-an error message and aborts the execution (by raising an \texttt{ABORT}
-signal via a call to the \C function \texttt{abort}) if the predicate is invalid.
+When a predicate is checked at runtime, function
+\texttt{\_\_e\_acsl\_assert}\codeidxdef{e\_acsl\_assert} is called.  By default
+this function does nothing if the predicate is valid, and prints an error
+message and aborts the execution (by raising an \texttt{ABORT} signal via a call
+to the \C function \texttt{abort}) if the predicate is invalid. If \eacsl
+detects that its verdict is not trustable (see
+Section~\ref{sec:partial-instrumentation}), it prints a warning with its guess
+and continues the execution.
 
 The default behavior of \texttt{\_\_e\_acsl\_assert}\codeidxdef{e\_acsl\_assert}
 can be altered using \longopt{fail-with-code=CODE} option of \eacslgcc
@@ -650,6 +654,12 @@ following signature:
 
 \cinput{examples/assert_sign.c}
 
+Additionally, it may depends on the global variable
+\texttt{\_\_e\_acsl\_sound\_verdict}\codeidxdef{e\_acsl\_sound\_verdict}. This
+variable of type \texttt{int} is set to \texttt{0} as soon as the verdict
+provided by \eacsl is not trustable anymore (see
+Section~\ref{sec:partial-instrumentation}).
+
 Below is an example which prints the validity status of each property but never
 exits.
 
@@ -663,11 +673,11 @@ default implementation of \texttt{\_\_e\_acsl\_assert}\codeidxdef{e\_acsl\_asser
 with the customized one specified in \texttt{my\_assert.c}
 
 \begin{shell}
-\$ e-acsl-gcc.sh -c first.i my_assert.c -Ofirst --external-assert=my\_assert.c
+\$ e-acsl-gcc.sh -c -X first.i -Ofirst --external-assert=my_assert.c
 \$ ./first.e-acsl
-Assertion at line 3 in function main is valid.
+Assertion at line 3 in function main is valid (trustable).
 The verified predicate was: `x == 0'.
-Assertion at line 4 in function main is invalid.
+Assertion at line 4 in function main is invalid (trustable).
 The verified predicate was: `x == 1'.
 \end{shell}
 
@@ -852,6 +862,71 @@ annotations of a given set of functions through the option
 \shortopt{e-acsl-functions}. This way, no runtime check is generated for
 annotations of all the other functions. It allows the user to focus on a
 particular part of the code, while reducing the global runtime overhead.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Partial Instrumentation (\experimentalword)}
+\label{sec:partial-instrumentation}
+\index{Function!Not Instrumented}
+
+\experimental{Partial instrumentation}
+
+By default, the E-ACSL plug-in generates all the necessary pieces of code for
+checking at runtime the provided annotations. This amount of instrumentation
+may be quite large. It is possible to reduce it by manually specifying the set
+of functions to be instrumented through the option \shortopt{e-acsl-instrument}.
+
+This way, contrary to the option \shortopt{e-acsl-functions}, all the
+annotations are still checked at runtime. However, since less code is generated,
+the generated program usually runs faster. However, it may lead to unsound
+verdicts if it would have been necessary to generate the instrumentation for one
+of the uninstrumented functions.
+
+A typical usage of this option consists in specifying the set of functions to be
+\emph{not} instrumented. For instance, to instrument all functions except
+functions \texttt{f} and \texttt{g}, you should specify
+\texttt{-e-acsl-instrument=+@all,-f,-g}.
+
+Consider the following example in which all assertions are valid.
+
+\listingname{partial.i}
+\cinput{examples/instrument.i}
+
+One can ask to not instrument function \texttt{g} (\emph{i.e.} to instrument
+only functions \texttt{f} and \texttt{main}) through the following command.
+\begin{shell}
+\$ e-acsl-gcc.sh \
+    -c --oexec-e-acsl partial.out \
+    --e-acsl-extra="-e-acsl-instrument=+@all,-g"' \
+    partial.i
+\end{shell}
+
+Therefore, running the generated executable \texttt{partial.out} leads to the
+following verdicts.
+\begin{shell}
+\$ ./partial.out
+warning: no sound verdict (guess: ok) at line 16 (function main).
+The considered predicate is:
+\initialized(&t[1]).
+warning: no sound verdict (guess: FAIL) at line 17 (function main).
+The considered predicate is:
+\initialized(&t[2]).
+\end{shell}
+
+First, there is no message for the first assertion about the initialization of
+\texttt{\&t[0]}, meaning that this assertion is silently checked as valid by
+\eacsl (see Section~\ref{sec:monitor-behavior}). It was made possible because of
+the complete instrumentation of functions \texttt{f} and \texttt{main}.
+
+Second, since function \texttt{g} was not instrumented, no sound verdict may be
+provided after executing it. It leads to the printed warnings for the two last
+assertions. The indicated guesses (\texttt{ok} for the first assertion and
+\texttt{FAIL} for the second one) are the verdicts computed by \eacsl. They can
+be trusted if and only if the \eacsl instrumentation is not necessary for
+validating the considered annotations. In that particular case, it is not
+true. For instance, the second guess is incorrect since \texttt{\&t[2]} is
+actually initialized through function \texttt{g}. \eacsl missed it since this
+function is not instrumented..
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
