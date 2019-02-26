@@ -22,7 +22,6 @@
 
 open Abstract_interp
 
-let pervasives_succ = succ
 (* This module uses Bigints everywhere. Set up some notations *)
 let pretty_int = Int.pretty
 let ( =~ ) = Integer.equal
