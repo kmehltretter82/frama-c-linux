@@ -902,18 +902,20 @@ let get_stmt_annots config v s =
               Printer.pp_code_annotation a;
             acc
           end
-    | AAssert (b_list,_,p) ->
+    | AAssert (b_list, kind, p) ->
         let kf = config.kf in
         let acc = match is_annot_for_config config v s b_list with
           | TBRno -> acc
           | TBRhyp ->
-              let b_acc =
-                WpStrategy.add_prop_assert b_acc WpStrategy.Ahyp kf s a p
-              in (b_acc, (a_acc, e_acc))
+              if kind = Check then acc
+              else
+                let b_acc =
+                  WpStrategy.add_prop_assert b_acc WpStrategy.Ahyp kf s a p
+                in (b_acc, (a_acc, e_acc))
           | TBRok | TBRpart ->
               let id = WpPropId.mk_assert_id config.kf s a in
               let kind =
-                if Wp_parameters.Assert_check_only.get () then
+                if kind = Check || Wp_parameters.Assert_check_only.get () then
                   WpStrategy.Agoal
                 else
                   WpStrategy.Aboth (goal_to_select config id)
