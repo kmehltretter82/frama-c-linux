@@ -493,7 +493,7 @@ end = struct
 
 end
 
-let macro_regex = Str.regexp "\\([^@]*\\)@\\([^@]+\\)@\\(.*\\)"
+let macro_regex = Str.regexp "\\([^@]*\\)@\\([^@]*\\)@\\(.*\\)"
 
 type execnow =
     {
@@ -585,15 +585,19 @@ let replace_macros macros s =
       let rest = Str.matched_group 3 s in
       let new_n = Str.group_end 1 in
       let n, new_s =
-        try
-          if !verbosity >= 2 then lock_printf "macro is %s\n%!" macro;
-          let replacement =  StringMap.find macro macros in
-          if !verbosity >= 1 then
-            lock_printf "replacement for %s is %s\n%!" macro replacement;
-          new_n,
-          String.sub s 0 n ^ start ^ replacement ^ rest
-        with
+        if macro = "" then begin
+          new_n + 1, String.sub s 0 new_n ^ "@" ^ rest
+        end else begin
+          try
+            if !verbosity >= 2 then lock_printf "macro is %s\n%!" macro;
+            let replacement =  StringMap.find macro macros in
+            if !verbosity >= 1 then
+              lock_printf "replacement for %s is %s\n%!" macro replacement;
+            new_n,
+            String.sub s 0 n ^ start ^ replacement ^ rest
+          with
           | Not_found -> Str.group_end 2 + 1, s
+        end
       in
        if !verbosity >= 2 then lock_printf "new string is %s\n%!" new_s;
       let new_acc = ptest_file_matched, new_s in
