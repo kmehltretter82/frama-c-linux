@@ -119,7 +119,7 @@ void runtime_assert(int predicate, char *kind, char *fct, char *pred_txt, int li
 #endif
     }
   } else
-    STDERR("warning: no accurate verdict (guess: %s) at line %d "
+    STDERR("warning: no sound verdict (guess: %s) at line %d "
            "(function %s).\nThe considered predicate is:\n%s.\n",
            predicate ? "ok" : "FAIL",
            line, fct, pred_txt);
