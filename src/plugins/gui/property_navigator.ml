@@ -112,6 +112,7 @@ module Refreshers: sig
   val assigns: check
   val from: check
   val user_assertions: check
+  val user_checks: check
   val rte: check
   val invariant: check
   val variant: check
@@ -239,6 +240,8 @@ struct
       ~hint:"Show functional dependencies in function assigns"
   let user_assertions =
     add ~name:"User assertions" ~hint:"Show user assertions" ()
+  let user_checks =
+    add ~name:"User checks" ~hint:"Show user checks" ()
   (* Function called when RTEs are enabled or disabled. *)
   let set_rte = ref (fun _b -> ())
   let rte = add ~set:(fun b -> !set_rte b) ~name:"RTEs"
@@ -360,6 +363,7 @@ struct
     assigns.add hb;
     from.add hb;
     user_assertions.add hb;
+    user_checks.add hb;
     rte.add hb;
     invariant.add hb;
     variant.add hb;
@@ -630,10 +634,15 @@ let make_panel (main_ui:main_window_extension_points) =
     | Property.IPLemma _ -> lemmas.get ()
     | Property.IPComplete _ -> complete_disjoint.get ()
     | Property.IPDisjoint _ -> complete_disjoint.get ()
-    | Property.IPCodeAnnot(_,_,({annot_content = AAssert _} as ca)) ->
-      (match Alarms.find ca with
-       | None -> user_assertions.get ()
-       | Some a -> rte.get () && active_alarm a)
+    | Property.IPCodeAnnot(_,_,({annot_content = AAssert (_, kind, _)} as ca)) ->
+      begin
+        match Alarms.find ca with
+        | Some a -> rte.get () && active_alarm a
+        | None ->
+          match kind with
+          | Assert -> user_assertions.get ()
+          | Check -> user_checks.get ()
+      end
     | Property.IPCodeAnnot(_,_,{annot_content = AInvariant _}) ->
         invariant.get ()
     | Property.IPCodeAnnot(_,_,{annot_content = APragma p}) ->
