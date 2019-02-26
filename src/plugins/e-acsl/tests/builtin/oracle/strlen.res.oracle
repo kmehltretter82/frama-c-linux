@@ -26,13 +26,13 @@
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:394: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:446: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:469: Warning: 
   E-ACSL construct `logic function application' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:446: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:469: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:453: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:476: Warning: 
   E-ACSL construct `logic function application' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:125: Warning: 
@@ -78,18 +78,18 @@
 [eva] using specification for function __e_acsl_full_init
 [eva] using specification for function __e_acsl_mark_readonly
 [eva] using specification for function strdup
-[eva:libc:unsupported-spec] FRAMAC_SHARE/libc/string.h:443: Warning: 
+[eva:libc:unsupported-spec] FRAMAC_SHARE/libc/string.h:466: Warning: 
   The specification of function 'strdup' is currently not supported by Eva.
   Consider adding FRAMAC_SHARE/libc/string.c
   to the analyzed source files.
-[eva] FRAMAC_SHARE/libc/string.h:443: Warning: 
+[eva] FRAMAC_SHARE/libc/string.h:466: Warning: 
   ignoring unsupported \allocates clause
 [eva] using specification for function __e_acsl_delete_block
-[eva:alarm] FRAMAC_SHARE/libc/string.h:449: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:472: Warning: 
   function __gen_e_acsl_strdup, behavior allocation: postcondition 'allocation' got status unknown. (Behavior may be inactive, no reduction performed.)
-[eva:alarm] FRAMAC_SHARE/libc/string.h:451: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:474: Warning: 
   function __gen_e_acsl_strdup, behavior allocation: postcondition 'result_valid_string_and_same_contents' got status invalid. (Behavior may be inactive, no reduction performed.)
-[eva:alarm] FRAMAC_SHARE/libc/string.h:456: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:479: Warning: 
   function __gen_e_acsl_strdup, behavior no_allocation: postcondition 'result_null' got status unknown. (Behavior may be inactive, no reduction performed.)
 [eva] using specification for function get_jmp_ctxt
 [eva:alarm] tests/builtin/strlen.c:18: Warning: 
