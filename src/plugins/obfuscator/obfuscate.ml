@@ -84,14 +84,13 @@ class visitor = object
     if Varinfo.Hashtbl.mem varinfos_visited vi then
       Cil.SkipChildren
     else begin
-      if Cil.isFunctionType vi.vtype then
-        try
-          if vi.vname <> "main"
-          && not (Cil.is_builtin vi)
-          && not (Cil.is_special_builtin vi.vname)
-          && not (Cil.hasAttribute "fc_stdlib" vi.vattr) then
-            vi.vname <- Dictionary.fresh Obfuscator_kind.Function vi.vname
-        with Not_found -> assert false
+      if Cil.isFunctionType vi.vtype then begin
+        if vi.vname <> "main"
+        && not (Cil.is_builtin vi)
+        && not (Cil.is_special_builtin vi.vname)
+        && not (Cil.hasAttribute "fc_stdlib" vi.vattr) then
+          vi.vname <- Dictionary.fresh Obfuscator_kind.Function vi.vname
+      end
       else begin
 	let add =
           if vi.vglob then Dictionary.fresh Obfuscator_kind.Global_var
