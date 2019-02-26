@@ -38,7 +38,8 @@ class visitor = object
 
   method! vglob_aux = function
   | GType (ty,_) ->
-    ty.tname <- Dictionary.fresh Obfuscator_kind.Type ty.tname; 
+    if not (Cil.typeHasAttribute "fc_stdlib" ty.ttype) then
+      ty.tname <- Dictionary.fresh Obfuscator_kind.Type ty.tname;
     Cil.DoChildren
   | GVarDecl (v, _) | GVar (v, _, _) | GFun ({svar = v}, _) | GFunDecl (_, v, _)
       when Cil.is_unused_builtin v ->
@@ -83,10 +84,15 @@ class visitor = object
     if Varinfo.Hashtbl.mem varinfos_visited vi then
       Cil.SkipChildren
     else begin
-      if Cil.isFunctionType vi.vtype then begin
-	if vi.vname <> "main" then 
-	  vi.vname <- Dictionary.fresh Obfuscator_kind.Function vi.vname
-      end else begin
+      if Cil.isFunctionType vi.vtype then
+        try
+          if vi.vname <> "main"
+          && not (Cil.is_builtin vi)
+          && not (Cil.is_special_builtin vi.vname)
+          && not (Cil.hasAttribute "fc_stdlib" vi.vattr) then
+            vi.vname <- Dictionary.fresh Obfuscator_kind.Function vi.vname
+        with Not_found -> assert false
+      else begin
 	let add =
           if vi.vglob then Dictionary.fresh Obfuscator_kind.Global_var
           else if vi.vformal then Dictionary.fresh Obfuscator_kind.Formal_var
@@ -157,11 +163,15 @@ class visitor = object
     Cil.DoChildren
 
   method! vlogic_type_info_decl lti =
-    warn "logic type" lti.lt_name;
+    if not (Logic_env.is_builtin_logic_type lti.lt_name)
+    then lti.lt_name <- Dictionary.fresh Obfuscator_kind.Logic_type lti.lt_name ;
     Cil.DoChildren
 
   method! vlogic_ctor_info_decl lci =
-    warn "logic constructor" lci.ctor_name;
+    if not (Logic_env.is_builtin_logic_ctor lci.ctor_name)
+    then
+      lci.ctor_name <-
+        Dictionary.fresh Obfuscator_kind.Logic_constructor lci.ctor_name ;
     Cil.DoChildren
 
   method! vattr = function
