@@ -1057,7 +1057,14 @@ let block_length sigma obj l =
 (* --- Cast                                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Layout =
+module Layout : sig
+  val pretty : Format.formatter -> c_object -> unit
+
+  val fits: dst:c_object -> src:c_object -> bool
+  (* returns [true] in these cases:
+     - [dst] fits into [src]
+     - [dst] equals    [src] *)
+end =
 struct
 
   type atom = P of typ | I of c_int | F of c_float
@@ -1144,10 +1151,10 @@ struct
   let add_array ly n w =
     if n=1 then ly @ w else add_many ly n w
 
-  let rec compare l1 l2 =
-    match l1 , l2 with
-    | [] , [] -> Equal
-    | [] , _ -> Fit
+  let rec compare ~dst ~src =
+    match dst , src with
+    | [] , [] -> Equal (* src = dst *)
+    | [] , _ -> Fit    (* exists obj ;  src = dst concat obj *)
     | _ , [] -> Mismatch
     | p::w1 , q::w2 ->
         match p , q with
@@ -1166,7 +1173,7 @@ struct
             else Mismatch
         | Arr(u,n) , Arr(v,m) ->
             begin
-              match compare u v with
+              match compare ~dst:u ~src:v with
               | Mismatch -> Mismatch
               | Fit -> Mismatch
               | Equal ->
@@ -1181,18 +1188,18 @@ struct
                     compare w1 w2
             end
         | Arr(v,n) , Str _ ->
-            compare (v @ add_array v (n-1) w1) l2
+            compare ~dst:(v @ add_array v (n-1) w1) ~src
         | Str _ , Arr(v,n) ->
-            compare l1 (v @ add_array v (n-1) w2)
+            compare ~dst ~src:(v @ add_array v (n-1) w2)
 
-  let fits obj1 obj2 =
-    match obj1 , obj2 with
+  let fits ~dst ~src =
+    match dst , src with
     | C_int i1 , C_int i2 -> i1 = i2
     | C_float f1 , C_float f2 -> f1 = f2
     | C_comp c , C_comp d when Compinfo.equal c d -> true
     | C_pointer _ , C_pointer _ -> true
     | _ ->
-        match compare (layout obj1) (layout obj2) with
+        match compare ~dst:(layout dst) ~src:(layout src) with
         | Equal | Fit -> true
         | Mismatch -> false
 
@@ -1223,10 +1230,10 @@ let cast s l =
       match Context.get pointer with
       | NoCast -> Warning.error ~source:"Typed Model" "%a" pp_mismatch s
       | Fits ->
-          if Layout.fits s.post s.pre then l else
+          if Layout.fits ~dst:s.post ~src:s.pre then l else
             Warning.error ~source:"Typed Model" "%a" pp_mismatch s
       | Unsafe ->
-          if not (Layout.fits s.post s.pre) then
+          if not (Layout.fits ~dst:s.post ~src:s.pre) then
             Warning.emit ~severe:false ~source:"Typed Model"
               ~effect:"Keep pointer value"
               "%a" pp_mismatch s ; l
