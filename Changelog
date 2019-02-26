@@ -17,6 +17,7 @@
 Open Source Release <next-release>
 ##################################
 
+-*  Obfuscator [2019/02/26] Obfuscate logic types and logic constructors.
 -   Eva       [2019/01/10] Improved precision on nested loops (by postponing
               the widening on inner loops according to -eva-widening-period).
 -   Kernel    [2019/01/03] Add attributes for loop statements to allow
