@@ -464,9 +464,12 @@ let sizeof_object = function
             WpLog.fatal ~current:true "Sizeof unknown-size array"
 
 let field_offset fd =
-  let ctype = TComp(fd.fcomp,Cil.empty_size_cache(),[]) in
-  let offset = Field(fd,NoOffset) in
-  fst (Cil.bitsOffset ctype offset) / 8
+  if fd.fcomp.cstruct then (* C struct *)
+    let ctype = TComp(fd.fcomp,Cil.empty_size_cache(),[]) in
+    let offset = Field(fd,NoOffset) in
+    fst (Cil.bitsOffset ctype offset) / 8
+  else (* CIL invariant: all C union fields start at offset 0 *)
+    0
 
 (* Conforms to C-ISO 6.3.1.8        *)
 (* If same sign => greater rank.    *)
