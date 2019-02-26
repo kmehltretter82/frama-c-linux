@@ -854,6 +854,69 @@ annotations of all the other functions. It allows the user to focus on a
 particular part of the code, while reducing the global runtime overhead.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Partial Instrumentation}
+\label{sec:partial-instrumentation}
+\index{Function!Not Instrumented}
+
+By default, the E-ACSL plug-in generates all the necessary pieces of code for
+checking at runtime the provided annotations. This amount of instrumentation
+may be quite large. It is possible to reduce it by manually specifying the set
+of functions to be instrumented through the option \shortopt{e-acsl-instrument}.
+
+This way, contrary to the option \shortopt{e-acsl-functions}, all the
+annotations are still checked at runtime. However, since less code is generated,
+the generated program usually runs faster. However, it may lead to unsound
+verdicts if it would have been necessary to generate the instrumentation for one
+of the uninstrumented functions.
+
+A typical usage of this option consists in specifying the set of functions to be
+\emph{not} instrumented. For instance, to instrument all functions except
+functions \texttt{f} and \texttt{g}, you should specify
+\texttt{-e-acsl-instrument=+@all,-f,-g}.
+
+Consider the following example in which all assertions are valid.
+
+\listingname{partial.i}
+\cinput{examples/instrument.i}
+
+One can ask to not instrument function \texttt{g} (\emph{i.e.} to instrument
+only functions \texttt{f} and \texttt{main}) through the following command.
+\begin{shell}
+\$ e-acsl-gcc.sh \
+    -c --oexec-e-acsl partial.out \
+    --e-acsl-extra="-e-acsl-instrument=+@all,-g"' \
+    partial.i
+\end{shell}
+
+Therefore, running the generated executable \texttt{partial.out} leads to the
+following verdicts.
+\begin{shell}
+\$ ./partial.out
+warning: no sound verdict (guess: ok) at line 16 (function main).
+The considered predicate is:
+\initialized(&t[1]).
+warning: no sound verdict (guess: FAIL) at line 17 (function main).
+The considered predicate is:
+\initialized(&t[2]).
+\end{shell}
+
+First, there is no message for the first assertion about the initialization of
+\texttt{\&t[0]}, meaning that this assertion is silently checked as valid by
+\eacsl. It was made possible because of the complete instrumentation of
+functions \texttt{f} and \texttt{main}.
+
+Second, since function \texttt{g} was not instrumented, no sound verdict may be
+provided after executing it. It leads to the printed warnings for the two last
+assertions. The indicated guesses (\texttt{ok} for the first assertion and
+\texttt{FAIL} for the second one) are the verdicts computed by \eacsl. They can
+be trusted if and only if the \eacsl instrumentation is not necessary for
+validating the considered annotations. In that particular case, it is not
+true. For instance, the second guess is incorrect since \texttt{\&t[2]} is
+actually initialized through function \texttt{g}. \eacsl missed it since this
+function is not instrumented..
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%>>>
 \section{Combining E-ACSL with Other Plug-ins} % <<<
