@@ -339,7 +339,8 @@ module Lenv = struct
       | BuiltinLabel LoopEntry -> Some "LoopEntry"
       | StmtLabel s ->
         (match
-           List.find_opt (function Label (_,_,b) -> b | _ -> false) !s.labels
+           Transitioning.List.find_opt
+             (function Label (_,_,b) -> b | _ -> false) !s.labels
          with
          | None -> None
          | Some (Label (lab,_,_)) -> Some lab
