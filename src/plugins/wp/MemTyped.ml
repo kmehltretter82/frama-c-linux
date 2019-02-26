@@ -1062,14 +1062,15 @@ module Layout : sig
 
   val fits: dst:c_object -> src:c_object -> bool
   (* returns [true] in these cases:
-     - [dst] fits into [src]
-     - [dst] equals    [src] *)
+     - [dst] fits into [src] (exists cobj; [src] = [dst] concat cobj)
+     - [dst] equals    [src] ([dst] = [src]) *)
 end =
 struct
 
-  type atom = P of typ | I of c_int | F of c_float
+  type atom = P of typ | I of c_int | F of c_float | U of Cil_types.compinfo
 
   let pp_atom fmt = function
+    | U ci -> Format.fprintf fmt "union %a" Printer.pp_compinfo ci
     | P ty -> Printer.pp_typ fmt (TPtr(ty,[]))
     | I i -> Ctypes.pp_int fmt i
     | F f -> Ctypes.pp_float fmt f
@@ -1077,7 +1078,10 @@ struct
   let eqatom a1 a2 =
     match a1 , a2 with
     | P _ , P _ -> true
-    | _ -> (a1 = a2)
+    | U u1 , U u2 -> Compinfo.equal u1 u2
+    | I i1 , I i2 -> i1 = i2
+    | F f1 , F f2 -> f1 = f2
+    | _ -> false
 
   type block =
     | Str of atom * int
@@ -1124,12 +1128,13 @@ struct
     | C_int i -> add_atom (I i) w
     | C_float f -> add_atom (F f) w
     | C_pointer t -> add_atom (P t) w
+    | C_comp { cfields = [f] } ->
+        flayout w f (* unions containing only one field are
+                       considered as structures *)
     | C_comp c ->
         if c.cstruct
         then List.fold_left flayout w c.cfields
-        else
-          (* TODO: can be the longest common prefix *)
-          add_block Garbled w
+        else add_atom (U c) w (* unions with several fields *)
     | C_array { arr_flat = Some a } ->
         let ly = rlayout [] (Ctypes.object_of a.arr_cell) in
         if a.arr_cell_nbr = 1
@@ -1146,21 +1151,34 @@ struct
 
   let layout (obj : c_object) : layout = List.rev (rlayout [] obj)
 
-  type comparison = Fit | Equal | Mismatch
+  let add_compound (c: Cil_types.compinfo) w : layout =
+    List.fold_left flayout w (List.rev c.cfields)
+
+  let ulayout (c: Cil_types.compinfo) : layout = add_compound c []
+
+  type comparison = Srem of layout | Drem of layout | Equal | Mismatch
 
   let add_array ly n w =
     if n=1 then ly @ w else add_many ly n w
 
-  let rec compare ~dst ~src =
+  let rec equal_atom a b =
+    (eqatom a b) ||
+    (match a,b with
+     | U u1, U u2 -> (* for union, the layouts must be equal *)
+         (match compare ~dst:(ulayout u1) ~src:(ulayout u2) with
+          | Equal -> true
+          | _ -> false)
+     | _, _ -> false)
+  and compare ~dst ~src =
     match dst , src with
     | [] , [] -> Equal (* src = dst *)
-    | [] , _ -> Fit    (* exists obj ;  src = dst concat obj *)
-    | _ , [] -> Mismatch
+    | [] , obj -> Srem obj    (* src = dst @ obj *)
+    | obj , [] -> Drem obj    (* dst = src @ obj *)
     | p::w1 , q::w2 ->
         match p , q with
         | Garbled , _ | _ , Garbled -> Mismatch
         | Str(a,n) , Str(b,m) ->
-            if eqatom a b then
+            if equal_atom a b then
               if n < m then
                 let w2 = Str(a,m-n)::w2 in
                 compare w1 w2
@@ -1175,7 +1193,14 @@ struct
             begin
               match compare ~dst:u ~src:v with
               | Mismatch -> Mismatch
-              | Fit -> Mismatch
+              | Drem u' ->
+                    let w1 = u' @ add_array u (n-1) w1 in
+                    let w2 = add_array v (m-1) w2 in
+                    compare w1 w2
+              | Srem v' ->
+                    let w1 = add_array u (n-1) w1 in
+                    let w2 = v' @ add_array v (m-1) w2 in
+                    compare w1 w2
               | Equal ->
                   if n < m then
                     let w2 = add_array v (m-n) w2 in
@@ -1200,8 +1225,8 @@ struct
     | C_pointer _ , C_pointer _ -> true
     | _ ->
         match compare ~dst:(layout dst) ~src:(layout src) with
-        | Equal | Fit -> true
-        | Mismatch -> false
+        | Equal | Srem _ -> true
+        | Drem _ | Mismatch -> false
 
   let rec pretty fmt = function
     | C_pointer ty -> Format.fprintf fmt "%a*" pretty (Ctypes.object_of ty)
