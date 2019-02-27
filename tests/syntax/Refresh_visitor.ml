@@ -1,5 +1,5 @@
 open Cil_types
-open Cil
+open Visitor_behavior
 
 let category = Kernel.register_category "refresh-test"
 
