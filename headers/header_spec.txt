@@ -586,6 +586,8 @@ src/kernel_services/visitors/cabsvisit.ml: CIL
 src/kernel_services/visitors/cabsvisit.mli: CIL
 src/kernel_services/visitors/visitor.ml: CEA_LGPL
 src/kernel_services/visitors/visitor.mli: CEA_LGPL
+src/kernel_services/visitors/visitor_behavior.ml: CEA_INRIA_LGPL
+src/kernel_services/visitors/visitor_behavior.mli: CEA_INRIA_LGPL
 src/libraries/README.md: .ignore
 src/libraries/datatype/README.md: .ignore
 src/libraries/datatype/datatype.ml: CEA_LGPL
