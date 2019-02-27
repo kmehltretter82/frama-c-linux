@@ -78,28 +78,28 @@ struct
 
   let unroll stmt =
     let default = Partition.IntLimit min_loop_unroll in
-    try match get_unroll_annot stmt with
-      | [] -> warn_no_loop_unroll stmt; default
-      | [None] -> Partition.IntLimit default_loop_unroll
-      | [(Some t)] -> begin
-          (* Inlines the value of const variables in [t]. *)
-          let global_init vi =
-            try (Globals.Vars.find vi).init with Not_found -> None
-          in
-          let t =
-            Cil.visitCilTerm (new Logic_utils.simplify_const_lval global_init) t
-          in
-          match Logic_utils.constFoldTermToInt t with
-          | Some n -> Partition.IntLimit (Integer.to_int n)
-          | None   -> Partition.ExpLimit (term_to_exp t)
-        end
-      | _ ->
-        warn "ignoring invalid unroll annotation";
-        raise Exit
-    with
-    | Exit -> default
-    | Db.Properties.Interp.No_conversion ->
-      warn "loop unrolling parameters must be valid expressions";
+    match get_unroll_annot stmt with
+    | [] -> warn_no_loop_unroll stmt; default
+    | [None] -> Partition.IntLimit default_loop_unroll
+    | [(Some t)] -> begin
+        (* Inlines the value of const variables in [t]. *)
+        let global_init vi =
+          try (Globals.Vars.find vi).init with Not_found -> None
+        in
+        let t =
+          Cil.visitCilTerm (new Logic_utils.simplify_const_lval global_init) t
+        in
+        match Logic_utils.constFoldTermToInt t with
+        | Some n -> Partition.IntLimit (Integer.to_int n)
+        | None   ->
+          try
+            Partition.ExpLimit (term_to_exp t)
+          with Db.Properties.Interp.No_conversion ->
+            warn "loop unrolling parameters must be valid expressions";
+            default
+      end
+    | _ ->
+      warn "ignoring invalid unroll annotation";
       default
 
   let history_size = HistoryPartitioning.get ()

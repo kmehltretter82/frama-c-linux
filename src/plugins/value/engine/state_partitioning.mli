@@ -22,8 +22,8 @@
 
 open Bottom.Type
 
-type branch = Partition.branch
-type loop = Cil_types.stmt
+type branch = Partition.branch (* Junction branch id in the control flow *)
+type loop = Cil_types.stmt (* Loop head id *)
 
 module type Kf =
 sig
@@ -50,7 +50,6 @@ sig
   type tank        (** An organized temporary accumulation of flows *)
   type widening    (** Widening informations *)
 
-
   (* --- Constructors --- *)
 
   val empty_store : stmt:Cil_types.stmt option -> store
@@ -61,12 +60,10 @@ sig
   (** Build the initial tank for the entry point of a function. *)
   val initial_tank : state list -> tank
 
-
   (* --- Pretty printing --- *)
 
   val pretty_store : Format.formatter -> store -> unit
   val pretty_flow : Format.formatter -> flow -> unit
-
 
   (* --- Accessors --- *)
 
@@ -80,12 +77,10 @@ sig
   val flow_size : flow -> int
   val tank_size : tank -> int
 
-
   (* --- Reset state (for hierchical convergence) --- *)
 
   (* These functions reset the part of the state of the analysis which has
      been obtained after a widening. *)
-
   val reset_store : store -> unit
   val reset_flow : flow -> unit
   val reset_tank : tank -> unit
@@ -97,14 +92,12 @@ sig
       depend on the outer loop. *)
   val reset_widening_counter : widening -> unit
 
-
   (* --- Partition transfer functions --- *)
 
   val enter_loop : flow -> loop -> unit
   val leave_loop : flow -> loop -> unit
   val next_loop_iteration : flow -> loop -> unit
   val split_return : flow -> Cil_types.exp option -> unit
-
 
   (* --- Operators --- *)
 
@@ -133,12 +126,12 @@ sig
       current partitioning. *)
   val join : (branch * flow) list -> store -> flow
 
-  (** Widen a tank. The widening object keeps track of the previous widenings to
-      ensure termination. The result is true when it is correct to end the
-      propagation here, i.e. when the current tank is only containng
-      states which are included into already propagated states. *)
+  (** Widen a flow. The widening object keeps track of the previous widenings
+      and previous propagated states to ensure termination. The result is true
+      when it is correct to end the propagation here, i.e. when the flow
+      object is only containng states which are included into already propagated
+      states. *)
   val widen : widening -> flow -> bool
-
 end
 
 module type Domain = Partitioning.Domain

@@ -124,7 +124,7 @@ struct
   (* Pretty printing *)
 
   let pretty_store (fmt : Format.formatter) (s : store) : unit =
-    Partition.iter (Domain.pretty fmt) s.store_partition
+    Partition.iter (fun _key state -> Domain.pretty fmt state) s.store_partition
 
   let pretty_flow (fmt : Format.formatter) (p : flow) =
     Flow.iter (Domain.pretty fmt) p.flow_states
@@ -158,6 +158,7 @@ struct
 
   let tank_size (t : tank) : int =
     Partition.size t.tank_states
+
 
   (* Partition transfer functions *)
 
@@ -197,10 +198,10 @@ struct
   (* Reset state (for hierchical convergence) *)
 
   let reset_store (s : store) : unit =
-    let is_eternal key =
+    let is_eternal key _state =
       key.ration_stamp <> None
     in
-    s.store_partition <- Partition.filter_keys is_eternal s.store_partition
+    s.store_partition <- Partition.filter is_eternal s.store_partition
 
   let reset_flow (f : flow) : unit =
     f.flow_states <- Flow.empty
@@ -215,7 +216,7 @@ struct
     let reset w =
       { w with widening_counter = max w.widening_counter (widening_period - 1) }
     in
-    w.widening_partition <- Partition.map_states reset w.widening_partition
+    w.widening_partition <- Partition.map reset w.widening_partition
 
 
   (* Operators *)
@@ -226,7 +227,7 @@ struct
     { flow_states }
 
   let fill ~(into : tank) (f : flow) : unit =
-    let erase dest src =
+    let erase _key dest src =
       if Extlib.has_some src
       then src
       else dest
@@ -248,7 +249,7 @@ struct
       match sources with
       | [(_,p)] -> [p.flow_states]
       | sources ->
-        (* Several branches ; partition according to the incoming branch *)
+        (* Several branches -> partition according to the incoming branch *)
         let get (b,p) =
           Flow.transfer_keys p.flow_states (Branch (b,history_size))
         in
@@ -332,7 +333,7 @@ struct
           previous_state = curr;
           widening_counter = wstate.widening_counter - 1
         };
-        (* Propagated state decreases, stop to propagate *)
+        (* Propagated state decreases, stop propagating *)
         if Domain.is_included curr wstate.previous_state then
           None
           (* Widening is delayed *)
@@ -359,7 +360,7 @@ struct
           Some next
         end
       with Not_found ->
-        (* The key is not in the widening state; add it if slevel is not
+        (* The key is not in the widening state; add the state if slevel is
            exceeded *)
         if key.ration_stamp = None then
           update key {

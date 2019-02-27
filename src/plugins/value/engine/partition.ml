@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* --- Keys --- *)
+
 module ExpMap = Cil_datatype.ExpStructEq.Map
 module IntPair = Datatype.Pair (Datatype.Int) (Datatype.Int)
 module LoopList = Datatype.List (IntPair)
@@ -35,38 +37,18 @@ type key = {
   dynamic_split : Integer.t ExpMap.t;
 }
 
-let zero_key : key = {
-  ration_stamp = None;
-  branches = [];
-  loops = [];
-  static_split = ExpMap.empty;
-  dynamic_split = ExpMap.empty;
-}
-
-let pretty_key fmt key =
-  begin match key.ration_stamp with
-    | Some (n,_) -> Format.fprintf fmt "#%d" n
-    | None -> ()
-  end;
-  Pretty_utils.pp_list ~pre:"[@[" ~sep:" ;@ " ~suf:"@]]"
-    Format.pp_print_int
-    fmt
-    key.branches;
-  Pretty_utils.pp_list ~pre:"(@[" ~sep:" ;@ " ~suf:"@])"
-    (fun fmt (i,_j) -> Format.pp_print_int fmt i)
-    fmt
-    key.loops;
-  Pretty_utils.pp_list ~pre:"{@[" ~sep:" ;@ " ~suf:"@]}"
-    (fun fmt (e,i) -> Format.fprintf fmt "%a:%a"
-        Cil_printer.pp_exp e
-        (Integer.pretty ~hexa:false) i)
-    fmt
-    (ExpMap.bindings key.static_split @ ExpMap.bindings key.dynamic_split)
-
-
 module Key =
 struct
   type t = key
+
+  (* Initial key, before any partitioning *)
+  let zero = {
+    ration_stamp = None;
+    branches = [];
+    loops = [];
+    static_split = ExpMap.empty;
+    dynamic_split = ExpMap.empty;
+  }
 
   let compare k1 k2 =
     let (<?>) c (cmp,x,y) =
@@ -77,12 +59,57 @@ struct
     <?> (ExpMap.compare Integer.compare, k1.static_split, k2.static_split)
     <?> (ExpMap.compare Integer.compare, k1.dynamic_split, k2.dynamic_split)
     <?> (BranchList.compare, k1.branches, k2.branches)
+
+  let pretty fmt key =
+    begin match key.ration_stamp with
+      | Some (n,_) -> Format.fprintf fmt "#%d" n
+      | None -> ()
+    end;
+    Pretty_utils.pp_list ~pre:"[@[" ~sep:" ;@ " ~suf:"@]]"
+      Format.pp_print_int
+      fmt
+      key.branches;
+    Pretty_utils.pp_list ~pre:"(@[" ~sep:" ;@ " ~suf:"@])"
+      (fun fmt (i,_j) -> Format.pp_print_int fmt i)
+      fmt
+      key.loops;
+    Pretty_utils.pp_list ~pre:"{@[" ~sep:" ;@ " ~suf:"@]}"
+      (fun fmt (e,i) -> Format.fprintf fmt "%a:%a"
+          Cil_printer.pp_exp e
+          (Integer.pretty ~hexa:false) i)
+      fmt
+      (ExpMap.bindings key.static_split @ ExpMap.bindings key.dynamic_split)
 end
+
+
+(* --- Partitions --- *)
 
 module KMap = Map.Make (Key)
 
-
 type 'a partition = 'a KMap.t
+
+let empty = KMap.empty
+let find = KMap.find
+let replace = KMap.add
+let is_empty = KMap.is_empty
+let size = KMap.cardinal
+let iter = KMap.iter
+let map = KMap.map
+let filter = KMap.filter
+let merge = KMap.merge
+
+let to_list (p : 'a partition) : 'a list =
+  KMap.fold (fun _k x l -> x :: l) p []
+
+let map_filter (f : key -> 'a -> 'b option) (p : 'a partition) : 'b partition =
+  let opt_flatten (type a) (o : a option option) : a option =
+    Extlib.opt_conv None o
+  in
+  KMap.merge (fun k o _ -> opt_flatten (Extlib.opt_map (f k) o)) p KMap.empty
+
+
+(* --- Partitioning actions --- *)
+
 type 'a transfer_function = (key * 'a) list -> (key * 'a) list
 
 type unroll_limit =
@@ -105,6 +132,8 @@ type action =
 exception InvalidAction
 
 
+(* --- Flows --- *)
+
 module type InputDomain =
 sig
   type t
@@ -116,47 +145,6 @@ sig
   val eval_exp_to_int : t -> Cil_types.exp -> int
 end
 
-
-let empty : 'a partition =
-  KMap.empty
-
-let is_empty (p : 'a partition) : bool =
-  KMap.is_empty p
-
-let size (p : 'a partition) : int =
-  KMap.fold (fun _k _x n -> n + 1) p 0
-
-let to_list (p : 'a partition) : 'a list =
-  KMap.fold (fun _k x l -> x :: l) p []
-
-let find = KMap.find
-let replace = KMap.add
-
-let merge (f : 'a option -> 'b option -> 'c option) (p1 : 'a partition)
-    (p2 : 'b partition) : 'c partition =
-  KMap.merge (fun _k o1 o2 -> f o1 o2) p1 p2
-
-let iter (f : 'a -> unit) (p : 'a partition) : unit =
-  KMap.iter (fun _k x -> f x) p
-
-let iteri (f : key -> 'a -> unit) (p : 'a partition) : unit =
-  KMap.iter f p
-
-
-(* Utility function on options *)
-let opt_flatten (type a) (o : a option option) : a option =
-  Extlib.opt_conv None o
-
-let map_states (f : 'a -> 'a) (p : 'a partition) : 'a partition =
-  KMap.map f p
-
-let filter_keys (f : key -> bool) (p : 'a partition) : 'a partition =
-  KMap.filter (fun k _x -> f k) p
-
-let map_filter (f : key -> 'a -> 'b option) (p : 'a partition) : 'b partition =
-  KMap.merge (fun k o _ -> opt_flatten (Extlib.opt_map (f k) o)) p KMap.empty
-
-
 module MakeFlow (Domain : InputDomain) =
 struct
   type state = Domain.t
@@ -165,7 +153,7 @@ struct
   let empty = []
 
   let initial (p : 'a list) : t =
-    List.map (fun state -> zero_key, state) p
+    List.map (fun state -> Key.zero, state) p
 
   let to_list (f : t) : state list =
     List.map snd f
@@ -314,7 +302,7 @@ struct
     let transfer acc (k,x) =
       let add =
         match k.ration_stamp with
-        (* No ration stam, just add the state to the list *)
+        (* No ration stamp, just add the state to the list *)
         | None -> fun l y -> (k,y) :: l
         (* There is a ration stamp, set the second part of the stamp to a unique transfer number *)
         | Some (s,_) -> fun l y ->

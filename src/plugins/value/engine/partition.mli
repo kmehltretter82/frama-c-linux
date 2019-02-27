@@ -30,24 +30,29 @@
     The key have several fields, one for each kind of partitioning.
 
     - Ration stamps: These modelize the legacy slevel. Each state is given
-      a ration stamp (represented by an integer) until there is no slevel left.
+      a ration stamp (represented by two integers) until there is no slevel
+      left. The first number is attributed by the store it comes from, the
+      second one is attributed by the last transfer.
       It is an option type, when there is no more ration stamp, this field is
       set to None; each new state will not be distinguished by this field.
-    - Branches: This field enumerate the last branches taken to reach this
-      state. The partitioning may chose how the branches are identified, but it
+    - Branches: This field enumerate the last junctions points passed through.
+      The partitioning may chose how the branches are identified, but it
       is a First-In-First-Out set.
     - Loops: This field stores the loop iterations needed to reach this state
       for each loop we are currently in. It is stored in reverse order
-      (innermost loop first)
-    - Static/Dynamic splits:
+      (innermost loop first) It also stores the maximum number of unrolling ;
+      this number varies from a state to another, as it is computed from
+      an expression evaluated when we enter the loop.
+    - Static/Dynamic splits: track the splits applied to the state as a map
+      from the expression of the split to the value of this expression. Since
+      the split creates states in which the expression evalutates to a
+      singleton, the values of the map are integers.
+      Static splits are only evaluated when the annotation is encountered
+      whereas dynamic splits are reevaluated regularly.
 
-    Note on implementation. These partitions are implemented as map from keys
-    to states. We chose to have the same partition for stores, propagation and
-    widenings so the combination of propagation + store or propagation +
-    widening can be done as a map2 operation. However, this involve some tricks
-    to make keys be always distinguished in propagation, like giving them new
-    ration stamps. It may have been more natural to consider that propagations
-    are lists, allowing states to have the same key.
+    A flow is a list of states accompanied by their key. It is used to
+    transfer states from one partition to another. It doesn't enforce unicity
+    of keys.
 *)
 
 type branch = int
@@ -55,17 +60,32 @@ type branch = int
 module ExpMap = Cil_datatype.ExpStructEq.Map
 
 type key = private {
-  ration_stamp : (int * int) option;
+  ration_stamp : (int * int) option; (* store stamp / transfer stamp *)
   branches : branch list;
-  loops : (int * int) list;
+  loops : (int * int) list; (* current iteration / max unrolling *)
   static_split : Integer.t ExpMap.t;
   dynamic_split : Integer.t ExpMap.t;
 }
 
-val pretty_key : Format.formatter -> key -> unit
-
-
 type 'a partition
+
+val empty : 'a partition
+val is_empty : 'a partition -> bool
+val size : 'a partition -> int
+val to_list : 'a partition -> 'a list
+val find : key -> 'a partition -> 'a
+val replace : key -> 'a -> 'a partition -> 'a partition
+val merge : (key -> 'a option -> 'b option -> 'c option) -> 'a partition ->
+  'b partition -> 'c partition
+val iter : (key -> 'a -> unit) -> 'a partition -> unit
+val filter : (key -> 'a -> bool) -> 'a partition -> 'a partition
+val map : ('a  -> 'a) -> 'a partition -> 'a partition
+val map_filter : (key -> 'a -> 'b option) -> 'a partition -> 'b partition
+
+
+
+(* Partitioning actions *)
+
 type 'a transfer_function = (key * 'a) list -> (key * 'a) list
 
 type unroll_limit =
@@ -88,24 +108,7 @@ type action =
 exception InvalidAction
 
 
-val empty : 'a partition
-val is_empty : 'a partition -> bool
-val size : 'a partition -> int
-
-val to_list : 'a partition -> 'a list
-
-val find : key -> 'a partition -> 'a
-val replace : key -> 'a -> 'a partition -> 'a partition
-
-val merge : ('a option -> 'b option -> 'c option) -> 'a partition ->
-  'b partition -> 'c partition
-
-val iter : ('a -> unit) -> 'a partition -> unit
-val iteri : (key -> 'a -> unit) -> 'a partition -> unit
-val filter_keys : (key -> bool) -> 'a partition -> 'a partition
-val map_states : ('a  -> 'a) -> 'a partition -> 'a partition
-val map_filter : (key -> 'a -> 'b option) -> 'a partition -> 'b partition
-
+(* Flows *)
 
 module type InputDomain =
 sig
