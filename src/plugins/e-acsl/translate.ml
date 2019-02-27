@@ -484,7 +484,7 @@ and context_insensitive_term_to_exp kf env t =
             | Typing.C_type _ | Typing.Other -> Ctype (Typing.get_typ targ))
           targs
         in
-        Lfunctions.generate ~loc env t li (List.rev args) args_lty
+        Logic_functions.generate ~loc env t li (List.rev args) args_lty
     in
     e, env, false, "app"
   | Tapp(_, _ :: _, _) ->
@@ -875,9 +875,9 @@ let () =
   At_with_lscope.predicate_to_exp_ref := named_predicate_to_exp;
   Mmodel_translate.term_to_exp_ref := term_to_exp;
   Mmodel_translate.predicate_to_exp_ref := named_predicate_to_exp;
-  Lfunctions.term_to_exp_ref := term_to_exp;
-  Lfunctions.predicate_to_exp_ref := named_predicate_to_exp;
-  Lfunctions.add_cast_ref := add_cast_lfunctions
+  Logic_functions.term_to_exp_ref := term_to_exp;
+  Logic_functions.predicate_to_exp_ref := named_predicate_to_exp;
+  Logic_functions.add_cast_ref := add_cast_lfunctions
 
 (* This function is used by Guillaume.
    However, it is correct to use it only in specific contexts. *)

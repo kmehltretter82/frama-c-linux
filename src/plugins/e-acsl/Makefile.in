@@ -80,7 +80,7 @@ PLUGIN_CMO:= local_config \
 	quantif \
 	at_with_lscope \
 	mmodel_translate \
-	lfunctions \
+	logic_functions \
 	translate \
 	temporal \
 	prepare_ast \

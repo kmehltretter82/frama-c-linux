@@ -33,8 +33,6 @@ keep_status.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 keep_status.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 label.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 label.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-lfunctions.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-lfunctions.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 license/CEA_LGPL: .ignore
 license/LGPLv2.1: .ignore
 license/SPARETIMELABS: .ignore
@@ -43,6 +41,8 @@ literal_strings.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 literal_strings.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 local_config.ml: .ignore
 local_config.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+logic_functions.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+logic_functions.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 loops.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 loops.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 lscope.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
