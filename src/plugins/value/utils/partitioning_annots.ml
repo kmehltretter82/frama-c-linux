@@ -37,6 +37,22 @@ type flow_annotation =
   | FlowMerge of term
 
 
+(* We use two representations for annotations :
+   - the high level representation (HL) which is exported from this module
+   - the low level representation (Cil) which is used by the kernel to store
+     any annotation
+
+   Annotations in this module define the export and import function to go from
+   one to another. Then, the parse and print functions works directly on the
+   high level representation.
+
+             add  --+
+                    |
+   ACSL --> parse --+--> HL --> export --> Cil --> import --+--> HL --> print
+                                                            |
+                                                            +--> get
+*)
+
 exception Parse_error
 
 module type Annotation =
@@ -81,6 +97,13 @@ struct
       | _ -> acc
     in
     List.rev (Annotations.fold_code_annot filter_add stmt [])
+
+  let add ~emitter ~loc stmt annot =
+    let param = M.export annot in
+    let extension = Logic_const.new_acsl_extension "slevel" loc false param in
+    let annot_node = Cil_types.AExtended ([], false, extension) in
+    let code_annotation = Logic_const.new_code_annotation annot_node in
+    Annotations.add_code_annot emitter stmt code_annotation
 end
 
 
@@ -113,8 +136,8 @@ module Slevel = Register (struct
           | TConst (LStr "default") -> SlevelDefault
           | TConst (LStr "merge") -> SlevelMerge
           | TConst (Integer (i, _)) -> SlevelLocal (Integer.to_int i)
-          | _ -> SlevelDefault (* be kind. Someone is bound to write a visitor that
-                                  will simplify our term into something
+          | _ -> SlevelDefault (* be kind. Someone is bound to write a visitor
+                                  that will simplify our term into something
                                   unrecognizable... *)
         end
       | _ -> assert false
@@ -194,3 +217,12 @@ let get_unroll_annot stmt = Unroll.get stmt
 let get_flow_annot stmt =
   List.map (fun a -> FlowSplit a) (Split.get stmt) @
   List.map (fun a -> FlowMerge a) (Merge.get stmt)
+
+
+let add_slevel_annot = Slevel.add
+
+let add_unroll_annot = Unroll.add
+
+let add_flow_annot ~emitter ~loc stmt = function
+  | FlowSplit annot -> Split.add ~emitter ~loc stmt annot
+  | FlowMerge annot -> Merge.add ~emitter ~loc stmt annot
