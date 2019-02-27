@@ -1222,7 +1222,9 @@ let createCompInfo (iss: bool) (n: string) ~(norig: string) : compinfo * bool =
     H.find compInfoNameEnv key, false (* Only if not already in *)
   with Not_found -> begin
       (* Create a compinfo. This will have "cdefined" false. *)
-      let res = mkCompInfo iss n ~norig (fun _ ->[]) (fc_stdlib_attribute []) in
+      let res =
+        Cil_const.mkCompInfo iss n ~norig (fun _ ->[]) (fc_stdlib_attribute [])
+      in
       H.add compInfoNameEnv key res;
       res, true
     end
@@ -9995,7 +9997,7 @@ and doStatement local_env (s : A.statement) : chunk =
 
 let copy_spec (old_f,new_f) formals_map spec =
   let obj = object
-    inherit Cil.genericCilVisitor (Cil.refresh_visit (Project.current()))
+    inherit Cil.genericCilVisitor (Visitor_behavior.refresh_visit (Project.current()))
     method! vlogic_var_use lv =
       match lv.lv_origin with
       | None -> DoChildren
