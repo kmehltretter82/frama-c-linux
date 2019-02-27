@@ -346,10 +346,10 @@ let copy_visit_gen fresh prj =
   let orig_kernel_functions = Cil_datatype.Kf.Hashtbl.create 17 in
   let orig_fundecs = Cil_datatype.Varinfo.Hashtbl.create 17 in
   let temp_set_logic_var x new_x =
-      Cil_datatype.Logic_var.Hashtbl.add logic_vars x new_x
+    Cil_datatype.Logic_var.Hashtbl.add logic_vars x new_x
   in
   let temp_set_orig_logic_var new_x x =
-      Cil_datatype.Logic_var.Hashtbl.add orig_logic_vars new_x x
+    Cil_datatype.Logic_var.Hashtbl.add orig_logic_vars new_x x
   in
   let temp_unset_logic_var x =
     Cil_datatype.Logic_var.Hashtbl.remove logic_vars x
@@ -358,31 +358,31 @@ let copy_visit_gen fresh prj =
     Cil_datatype.Logic_var.Hashtbl.remove orig_logic_vars new_x
   in
   let temp_memo_logic_var x =
-(*    Format.printf "search for %s#%d@." x.lv_name x.lv_id;*)
+    (*    Format.printf "search for %s#%d@." x.lv_name x.lv_id;*)
     let res =
-    try Cil_datatype.Logic_var.Hashtbl.find logic_vars x
-    with Not_found ->
-(*      Format.printf "Not found@.";*)
-      let id = if fresh then Cil_const.new_raw_id () else x.lv_id in
-      let new_x = { x with lv_id = id } in
-      temp_set_logic_var x new_x; temp_set_orig_logic_var new_x x; new_x
+      try Cil_datatype.Logic_var.Hashtbl.find logic_vars x
+      with Not_found ->
+        (*      Format.printf "Not found@.";*)
+        let id = if fresh then Cil_const.new_raw_id () else x.lv_id in
+        let new_x = { x with lv_id = id } in
+        temp_set_logic_var x new_x; temp_set_orig_logic_var new_x x; new_x
     in
-(*    Format.printf "res is %s#%d@." res.lv_name res.lv_id;*)
+    (*    Format.printf "res is %s#%d@." res.lv_name res.lv_id;*)
     res
   in
   let temp_set_varinfo x new_x =
     Cil_datatype.Varinfo.Hashtbl.add varinfos x new_x;
     match x.vlogic_var_assoc, new_x.vlogic_var_assoc with
-          | None, _ | _, None -> ()
-          | Some lx, Some new_lx ->
-            Cil_datatype.Logic_var.Hashtbl.add logic_vars lx new_lx
+    | None, _ | _, None -> ()
+    | Some lx, Some new_lx ->
+      Cil_datatype.Logic_var.Hashtbl.add logic_vars lx new_lx
   in
   let temp_set_orig_varinfo new_x x =
     Cil_datatype.Varinfo.Hashtbl.add orig_varinfos new_x x;
     match new_x.vlogic_var_assoc, x.vlogic_var_assoc with
-      | None, _ | _, None -> ()
-      | Some new_lx, Some lx ->
-        Cil_datatype.Logic_var.Hashtbl.add orig_logic_vars new_lx lx
+    | None, _ | _, None -> ()
+    | Some new_lx, Some lx ->
+      Cil_datatype.Logic_var.Hashtbl.add orig_logic_vars new_lx lx
   in
   let temp_unset_varinfo x =
     Cil_datatype.Varinfo.Hashtbl.remove varinfos x;
@@ -393,9 +393,9 @@ let copy_visit_gen fresh prj =
   let temp_unset_orig_varinfo new_x =
     Cil_datatype.Varinfo.Hashtbl.remove orig_varinfos new_x;
     match new_x.vlogic_var_assoc with
-      | None -> ()
-      | Some new_lx ->
-        Cil_datatype.Logic_var.Hashtbl.remove orig_logic_vars new_lx
+    | None -> ()
+    | Some new_lx ->
+      Cil_datatype.Logic_var.Hashtbl.remove orig_logic_vars new_lx
   in
   let temp_memo_varinfo x =
     try Cil_datatype.Varinfo.Hashtbl.find varinfos x
@@ -404,10 +404,10 @@ let copy_visit_gen fresh prj =
         if fresh then Cil_const.copy_with_new_vid x else begin
           let new_x = { x with vid = x.vid } in
           (match x.vlogic_var_assoc with
-            | None -> ()
-            | Some lv ->
-              let new_lv = { lv with lv_origin = Some new_x } in
-              new_x.vlogic_var_assoc <- Some new_lv);
+           | None -> ()
+           | Some lv ->
+             let new_lv = { lv with lv_origin = Some new_x } in
+             new_x.vlogic_var_assoc <- Some new_lv);
           new_x
         end
       in
@@ -435,46 +435,46 @@ let copy_visit_gen fresh prj =
   let temp_set_kernel_function kf new_kf =
     Cil_datatype.Kf.Hashtbl.replace kernel_functions kf new_kf;
     match kf.fundec, new_kf.fundec with
-      | Declaration(_,vi,_,_), Declaration(_,new_vi,_,_)
-      | Declaration(_,vi,_,_), Definition({ svar = new_vi }, _)
-      | Definition({svar = vi},_), Declaration(_,new_vi,_,_) ->
-        temp_set_varinfo vi new_vi
-      | Definition (fundec,_), Definition(new_fundec,_) ->
-        temp_set_fundec fundec new_fundec
+    | Declaration(_,vi,_,_), Declaration(_,new_vi,_,_)
+    | Declaration(_,vi,_,_), Definition({ svar = new_vi }, _)
+    | Definition({svar = vi},_), Declaration(_,new_vi,_,_) ->
+      temp_set_varinfo vi new_vi
+    | Definition (fundec,_), Definition(new_fundec,_) ->
+      temp_set_fundec fundec new_fundec
   in
   let temp_set_orig_kernel_function new_kf kf =
     Cil_datatype.Kf.Hashtbl.replace orig_kernel_functions new_kf kf;
     match new_kf.fundec, kf.fundec with
-      | Declaration(_,new_vi,_,_), Declaration(_,vi,_,_)
-      | Declaration(_,new_vi,_,_), Definition({ svar = vi }, _)
-      | Definition({svar = new_vi},_), Declaration(_,vi,_,_) ->
-        temp_set_orig_varinfo new_vi vi
-      | Definition (new_fundec,_), Definition(fundec,_) ->
-        temp_set_orig_fundec new_fundec fundec
+    | Declaration(_,new_vi,_,_), Declaration(_,vi,_,_)
+    | Declaration(_,new_vi,_,_), Definition({ svar = vi }, _)
+    | Definition({svar = new_vi},_), Declaration(_,vi,_,_) ->
+      temp_set_orig_varinfo new_vi vi
+    | Definition (new_fundec,_), Definition(fundec,_) ->
+      temp_set_orig_fundec new_fundec fundec
   in
   let temp_unset_kernel_function kf =
     Cil_datatype.Kf.Hashtbl.remove kernel_functions kf;
     match kf.fundec with
-      | Declaration(_,vi,_,_) -> temp_unset_varinfo vi
-      | Definition (fundec,_) -> temp_unset_fundec fundec
+    | Declaration(_,vi,_,_) -> temp_unset_varinfo vi
+    | Definition (fundec,_) -> temp_unset_fundec fundec
   in
   let temp_unset_orig_kernel_function new_kf =
     Cil_datatype.Kf.Hashtbl.remove orig_kernel_functions new_kf;
     match new_kf.fundec with
-      | Declaration(_,new_vi,_,_) -> temp_unset_orig_varinfo new_vi
-      | Definition (new_fundec,_) -> temp_unset_orig_fundec new_fundec
+    | Declaration(_,new_vi,_,_) -> temp_unset_orig_varinfo new_vi
+    | Definition (new_fundec,_) -> temp_unset_orig_fundec new_fundec
   in
   let temp_memo_kernel_function kf =
     try Cil_datatype.Kf.Hashtbl.find kernel_functions kf
     with Not_found ->
       let new_kf =
         match kf.fundec with
-          | Declaration (spec,vi,prms,loc) ->
-            let new_vi = temp_memo_varinfo vi in
-            { kf with fundec = Declaration(spec,new_vi,prms,loc) }
-          | Definition(f,loc) ->
-            let new_f = temp_memo_fundec f in
-            { kf with fundec = Definition(new_f,loc) }
+        | Declaration (spec,vi,prms,loc) ->
+          let new_vi = temp_memo_varinfo vi in
+          { kf with fundec = Declaration(spec,new_vi,prms,loc) }
+        | Definition(f,loc) ->
+          let new_f = temp_memo_fundec f in
+          { kf with fundec = Definition(new_f,loc) }
       in
       temp_set_kernel_function kf new_kf;
       temp_set_orig_kernel_function new_kf kf;
@@ -488,10 +488,10 @@ let copy_visit_gen fresh prj =
   in
   let temp_set_orig_compinfo new_c c =
     Cil_datatype.Compinfo.Hashtbl.add orig_compinfos new_c c;
-      List.iter2
-        (fun new_f f ->
-          Cil_datatype.Fieldinfo.Hashtbl.add orig_fieldinfos new_f f)
-        new_c.cfields c.cfields
+    List.iter2
+      (fun new_f f ->
+         Cil_datatype.Fieldinfo.Hashtbl.add orig_fieldinfos new_f f)
+      new_c.cfields c.cfields
   in
   let temp_unset_compinfo c =
     Cil_datatype.Compinfo.Hashtbl.remove compinfos c;
@@ -500,10 +500,10 @@ let copy_visit_gen fresh prj =
   in
   let temp_unset_orig_compinfo new_c =
     Cil_datatype.Compinfo.Hashtbl.remove orig_compinfos new_c;
-      List.iter
-        (fun new_f ->
-          Cil_datatype.Fieldinfo.Hashtbl.remove orig_fieldinfos new_f)
-        new_c.cfields
+    List.iter
+      (fun new_f ->
+         Cil_datatype.Fieldinfo.Hashtbl.remove orig_fieldinfos new_f)
+      new_c.cfields
   in
   let temp_memo_compinfo c =
     try Cil_datatype.Compinfo.Hashtbl.find compinfos c
@@ -516,100 +516,100 @@ let copy_visit_gen fresh prj =
   { cfile = (fun x -> { x with fileName = x.fileName });
     get_compinfo =
       (fun x ->
-        try Cil_datatype.Compinfo.Hashtbl.find compinfos x with Not_found -> x);
+         try Cil_datatype.Compinfo.Hashtbl.find compinfos x with Not_found -> x);
     get_fieldinfo =
       (fun x ->
-        try Cil_datatype.Fieldinfo.Hashtbl.find fieldinfos x
-        with Not_found -> x);
+         try Cil_datatype.Fieldinfo.Hashtbl.find fieldinfos x
+         with Not_found -> x);
     get_model_info =
       (fun x ->
-        try Cil_datatype.Model_info.Hashtbl.find model_infos x
-        with Not_found -> x);
+         try Cil_datatype.Model_info.Hashtbl.find model_infos x
+         with Not_found -> x);
     get_enuminfo =
       (fun x ->
-        try Cil_datatype.Enuminfo.Hashtbl.find enuminfos x with Not_found -> x);
+         try Cil_datatype.Enuminfo.Hashtbl.find enuminfos x with Not_found -> x);
     get_enumitem =
       (fun x ->
-        try Cil_datatype.Enumitem.Hashtbl.find enumitems x with Not_found -> x);
+         try Cil_datatype.Enumitem.Hashtbl.find enumitems x with Not_found -> x);
     get_typeinfo =
       (fun x ->
-        try Cil_datatype.Typeinfo.Hashtbl.find typeinfos x with Not_found -> x);
+         try Cil_datatype.Typeinfo.Hashtbl.find typeinfos x with Not_found -> x);
     get_varinfo =
       (fun x ->
-        try Cil_datatype.Varinfo.Hashtbl.find varinfos x with Not_found -> x);
+         try Cil_datatype.Varinfo.Hashtbl.find varinfos x with Not_found -> x);
     get_stmt =
       (fun x -> try Cil_datatype.Stmt.Hashtbl.find stmts x with Not_found -> x);
     get_logic_info =
       (fun x ->
-        try Cil_datatype.Logic_info.Hashtbl.find logic_infos x
-        with Not_found -> x);
+         try Cil_datatype.Logic_info.Hashtbl.find logic_infos x
+         with Not_found -> x);
     get_logic_type_info =
       (fun x ->
-        try Cil_datatype.Logic_type_info.Hashtbl.find logic_type_infos x
-        with Not_found -> x);
+         try Cil_datatype.Logic_type_info.Hashtbl.find logic_type_infos x
+         with Not_found -> x);
     get_logic_var =
       (fun x ->
-        try Cil_datatype.Logic_var.Hashtbl.find logic_vars x
-        with Not_found -> x);
+         try Cil_datatype.Logic_var.Hashtbl.find logic_vars x
+         with Not_found -> x);
     get_kernel_function =
       (fun x ->
-        try Cil_datatype.Kf.Hashtbl.find kernel_functions x
-        with Not_found -> x);
+         try Cil_datatype.Kf.Hashtbl.find kernel_functions x
+         with Not_found -> x);
     get_fundec =
       (fun x ->
-        try Cil_datatype.Varinfo.Hashtbl.find fundecs x.svar
-        with Not_found -> x);
+         try Cil_datatype.Varinfo.Hashtbl.find fundecs x.svar
+         with Not_found -> x);
     get_original_compinfo =
       (fun x ->
-        try Cil_datatype.Compinfo.Hashtbl.find orig_compinfos x
-        with Not_found -> x);
+         try Cil_datatype.Compinfo.Hashtbl.find orig_compinfos x
+         with Not_found -> x);
     get_original_fieldinfo =
       (fun x ->
-        try Cil_datatype.Fieldinfo.Hashtbl.find orig_fieldinfos x
-        with Not_found -> x);
+         try Cil_datatype.Fieldinfo.Hashtbl.find orig_fieldinfos x
+         with Not_found -> x);
     get_original_model_info =
       (fun x ->
-        try Cil_datatype.Model_info.Hashtbl.find orig_model_infos x
-        with Not_found -> x);
+         try Cil_datatype.Model_info.Hashtbl.find orig_model_infos x
+         with Not_found -> x);
     get_original_enuminfo =
       (fun x ->
-        try Cil_datatype.Enuminfo.Hashtbl.find orig_enuminfos x
-        with Not_found -> x);
+         try Cil_datatype.Enuminfo.Hashtbl.find orig_enuminfos x
+         with Not_found -> x);
     get_original_enumitem =
       (fun x ->
-        try Cil_datatype.Enumitem.Hashtbl.find orig_enumitems x
-        with Not_found -> x);
+         try Cil_datatype.Enumitem.Hashtbl.find orig_enumitems x
+         with Not_found -> x);
     get_original_typeinfo =
       (fun x ->
-        try Cil_datatype.Typeinfo.Hashtbl.find orig_typeinfos x
-        with Not_found -> x);
+         try Cil_datatype.Typeinfo.Hashtbl.find orig_typeinfos x
+         with Not_found -> x);
     get_original_varinfo =
       (fun x ->
-        try Cil_datatype.Varinfo.Hashtbl.find orig_varinfos x
-        with Not_found -> x);
+         try Cil_datatype.Varinfo.Hashtbl.find orig_varinfos x
+         with Not_found -> x);
     get_original_stmt =
       (fun x ->
-        try Cil_datatype.Stmt.Hashtbl.find orig_stmts x with Not_found -> x);
+         try Cil_datatype.Stmt.Hashtbl.find orig_stmts x with Not_found -> x);
     get_original_logic_var =
       (fun x ->
-        try Cil_datatype.Logic_var.Hashtbl.find orig_logic_vars x
-        with Not_found -> x);
+         try Cil_datatype.Logic_var.Hashtbl.find orig_logic_vars x
+         with Not_found -> x);
     get_original_logic_info =
       (fun x ->
-        try Cil_datatype.Logic_info.Hashtbl.find orig_logic_infos x
-       with Not_found -> x);
+         try Cil_datatype.Logic_info.Hashtbl.find orig_logic_infos x
+         with Not_found -> x);
     get_original_logic_type_info =
       (fun x ->
-        try Cil_datatype.Logic_type_info.Hashtbl.find orig_logic_type_infos x
-        with Not_found -> x);
+         try Cil_datatype.Logic_type_info.Hashtbl.find orig_logic_type_infos x
+         with Not_found -> x);
     get_original_kernel_function =
       (fun x ->
-        try Cil_datatype.Kf.Hashtbl.find orig_kernel_functions x
-        with Not_found -> x);
+         try Cil_datatype.Kf.Hashtbl.find orig_kernel_functions x
+         with Not_found -> x);
     get_original_fundec =
       (fun x ->
-        try Cil_datatype.Varinfo.Hashtbl.find orig_fundecs x.svar
-        with Not_found -> x);
+         try Cil_datatype.Varinfo.Hashtbl.find orig_fundecs x.svar
+         with Not_found -> x);
     cinitinfo = (fun x -> { init = x.init });
     cblock = (fun x -> { x with battrs = x.battrs });
     cfunspec = (fun x -> { x with spec_behavior = x.spec_behavior});
@@ -625,62 +625,62 @@ let copy_visit_gen fresh prj =
       else (fun x -> { x with it_id = x.it_id});
     cexpr =
       (fun x ->
-        let id = if fresh then Cil_const.Eid.next () else x.eid in { x with eid = id });
+         let id = if fresh then Cil_const.Eid.next () else x.eid in { x with eid = id });
     is_copy_behavior = true;
     is_fresh_behavior = fresh;
     project = Some prj;
     reset_behavior_varinfo =
       (fun () ->
-        Cil_datatype.Varinfo.Hashtbl.clear varinfos;
-        Cil_datatype.Varinfo.Hashtbl.clear orig_varinfos);
+         Cil_datatype.Varinfo.Hashtbl.clear varinfos;
+         Cil_datatype.Varinfo.Hashtbl.clear orig_varinfos);
     reset_behavior_compinfo =
       (fun () ->
-        Cil_datatype.Compinfo.Hashtbl.clear compinfos;
-        Cil_datatype.Compinfo.Hashtbl.clear orig_compinfos);
+         Cil_datatype.Compinfo.Hashtbl.clear compinfos;
+         Cil_datatype.Compinfo.Hashtbl.clear orig_compinfos);
     reset_behavior_enuminfo =
       (fun () ->
-        Cil_datatype.Enuminfo.Hashtbl.clear enuminfos;
-        Cil_datatype.Enuminfo.Hashtbl.clear orig_enuminfos);
+         Cil_datatype.Enuminfo.Hashtbl.clear enuminfos;
+         Cil_datatype.Enuminfo.Hashtbl.clear orig_enuminfos);
     reset_behavior_enumitem =
       (fun () ->
-        Cil_datatype.Enumitem.Hashtbl.clear enumitems;
-        Cil_datatype.Enumitem.Hashtbl.clear orig_enumitems);
+         Cil_datatype.Enumitem.Hashtbl.clear enumitems;
+         Cil_datatype.Enumitem.Hashtbl.clear orig_enumitems);
     reset_behavior_typeinfo =
       (fun () ->
-        Cil_datatype.Typeinfo.Hashtbl.clear typeinfos;
-        Cil_datatype.Typeinfo.Hashtbl.clear orig_typeinfos);
+         Cil_datatype.Typeinfo.Hashtbl.clear typeinfos;
+         Cil_datatype.Typeinfo.Hashtbl.clear orig_typeinfos);
     reset_behavior_logic_info =
       (fun () ->
-        Cil_datatype.Logic_info.Hashtbl.clear logic_infos;
-        Cil_datatype.Logic_info.Hashtbl.clear orig_logic_infos);
+         Cil_datatype.Logic_info.Hashtbl.clear logic_infos;
+         Cil_datatype.Logic_info.Hashtbl.clear orig_logic_infos);
     reset_behavior_logic_type_info =
       (fun () ->
-        Cil_datatype.Logic_type_info.Hashtbl.clear logic_type_infos;
-        Cil_datatype.Logic_type_info.Hashtbl.clear orig_logic_type_infos);
+         Cil_datatype.Logic_type_info.Hashtbl.clear logic_type_infos;
+         Cil_datatype.Logic_type_info.Hashtbl.clear orig_logic_type_infos);
     reset_behavior_fieldinfo =
       (fun () ->
-        Cil_datatype.Fieldinfo.Hashtbl.clear fieldinfos;
-        Cil_datatype.Fieldinfo.Hashtbl.clear orig_fieldinfos);
+         Cil_datatype.Fieldinfo.Hashtbl.clear fieldinfos;
+         Cil_datatype.Fieldinfo.Hashtbl.clear orig_fieldinfos);
     reset_behavior_model_info =
       (fun () ->
-        Cil_datatype.Model_info.Hashtbl.clear model_infos;
-        Cil_datatype.Model_info.Hashtbl.clear orig_model_infos);
+         Cil_datatype.Model_info.Hashtbl.clear model_infos;
+         Cil_datatype.Model_info.Hashtbl.clear orig_model_infos);
     reset_behavior_stmt =
       (fun () ->
-        Cil_datatype.Stmt.Hashtbl.clear stmts;
-        Cil_datatype.Stmt.Hashtbl.clear orig_stmts);
+         Cil_datatype.Stmt.Hashtbl.clear stmts;
+         Cil_datatype.Stmt.Hashtbl.clear orig_stmts);
     reset_logic_var =
       (fun () ->
-        Cil_datatype.Logic_var.Hashtbl.clear logic_vars;
-        Cil_datatype.Logic_var.Hashtbl.clear orig_logic_vars);
+         Cil_datatype.Logic_var.Hashtbl.clear logic_vars;
+         Cil_datatype.Logic_var.Hashtbl.clear orig_logic_vars);
     reset_behavior_kernel_function =
       (fun () ->
-        Cil_datatype.Kf.Hashtbl.clear kernel_functions;
-        Cil_datatype.Kf.Hashtbl.clear orig_kernel_functions);
+         Cil_datatype.Kf.Hashtbl.clear kernel_functions;
+         Cil_datatype.Kf.Hashtbl.clear orig_kernel_functions);
     reset_behavior_fundec =
       (fun () ->
-        Cil_datatype.Varinfo.Hashtbl.clear fundecs;
-        Cil_datatype.Varinfo.Hashtbl.clear orig_fundecs);
+         Cil_datatype.Varinfo.Hashtbl.clear fundecs;
+         Cil_datatype.Varinfo.Hashtbl.clear orig_fundecs);
     memo_varinfo = temp_memo_varinfo;
     memo_compinfo = temp_memo_compinfo;
     memo_enuminfo =
@@ -711,7 +711,7 @@ let copy_visit_gen fresh prj =
       (fun x ->
          try Cil_datatype.Logic_info.Hashtbl.find logic_infos x
          with Not_found ->
-	   let new_v = temp_memo_logic_var x.l_var_info in
+           let new_v = temp_memo_logic_var x.l_var_info in
            let new_x = { x with l_var_info = new_v } in
            Cil_datatype.Logic_info.Hashtbl.add logic_infos x new_x;
            Cil_datatype.Logic_info.Hashtbl.add orig_logic_infos new_x x;
@@ -746,12 +746,12 @@ let copy_visit_gen fresh prj =
            new_x);
     memo_model_info =
       (fun x ->
-        try Cil_datatype.Model_info.Hashtbl.find model_infos x
-        with Not_found ->
-          let new_x = { x with mi_name = x.mi_name } in
-          Cil_datatype.Model_info.Hashtbl.add model_infos x new_x;
-          Cil_datatype.Model_info.Hashtbl.add orig_model_infos new_x x;
-          new_x
+         try Cil_datatype.Model_info.Hashtbl.find model_infos x
+         with Not_found ->
+           let new_x = { x with mi_name = x.mi_name } in
+           Cil_datatype.Model_info.Hashtbl.add model_infos x new_x;
+           Cil_datatype.Model_info.Hashtbl.add orig_model_infos new_x x;
+           new_x
       );
     memo_logic_var = temp_memo_logic_var;
     memo_kernel_function = temp_memo_kernel_function;
@@ -847,13 +847,13 @@ let copy_visit_gen fresh prj =
       (fun f -> Cil_datatype.Kf.Hashtbl.iter f kernel_functions);
     iter_visitor_fundec =
       (fun f ->
-        let f _ new_fundec =
-          let old_fundec =
-            Cil_datatype.Varinfo.Hashtbl.find orig_fundecs new_fundec.svar
-          in
-          f old_fundec new_fundec
-        in
-        Cil_datatype.Varinfo.Hashtbl.iter f fundecs);
+         let f _ new_fundec =
+           let old_fundec =
+             Cil_datatype.Varinfo.Hashtbl.find orig_fundecs new_fundec.svar
+           in
+           f old_fundec new_fundec
+         in
+         Cil_datatype.Varinfo.Hashtbl.iter f fundecs);
     fold_visitor_varinfo =
       (fun f i -> Cil_datatype.Varinfo.Hashtbl.fold f varinfos i);
     fold_visitor_compinfo =
@@ -870,7 +870,7 @@ let copy_visit_gen fresh prj =
       (fun f i -> Cil_datatype.Logic_info.Hashtbl.fold f logic_infos i);
     fold_visitor_logic_type_info =
       (fun f i ->
-        Cil_datatype.Logic_type_info.Hashtbl.fold f logic_type_infos i);
+         Cil_datatype.Logic_type_info.Hashtbl.fold f logic_type_infos i);
     fold_visitor_fieldinfo =
       (fun f i -> Cil_datatype.Fieldinfo.Hashtbl.fold f fieldinfos i);
     fold_visitor_model_info =
@@ -879,16 +879,16 @@ let copy_visit_gen fresh prj =
       (fun f i -> Cil_datatype.Logic_var.Hashtbl.fold f logic_vars i);
     fold_visitor_kernel_function =
       (fun f i ->
-        Cil_datatype.Kf.Hashtbl.fold f kernel_functions i);
+         Cil_datatype.Kf.Hashtbl.fold f kernel_functions i);
     fold_visitor_fundec =
       (fun f i ->
-        let f _ new_fundec acc =
-          let old_fundec =
-            Cil_datatype.Varinfo.Hashtbl.find orig_fundecs new_fundec.svar
-          in
-          f old_fundec new_fundec acc
-        in
-        Cil_datatype.Varinfo.Hashtbl.fold f fundecs i);
+         let f _ new_fundec acc =
+           let old_fundec =
+             Cil_datatype.Varinfo.Hashtbl.find orig_fundecs new_fundec.svar
+           in
+           f old_fundec new_fundec acc
+         in
+         Cil_datatype.Varinfo.Hashtbl.fold f fundecs i);
   }
 
 let copy_visit = copy_visit_gen false

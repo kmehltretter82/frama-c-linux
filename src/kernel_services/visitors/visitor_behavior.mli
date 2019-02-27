@@ -1,20 +1,19 @@
 open Cil_types
 
-(** {3 Visitor behavior} *)
 type t
-  (** How the visitor should behave in front of mutable fields: in
-      place modification or copy of the structure. This type is abstract.
-      Use one of the two values below in your classes.
-      @plugin development guide *)
+(** How the visitor should behave in front of mutable fields: in
+    place modification or copy of the structure. This type is abstract.
+    Use one of the two values below in your classes.
+    @plugin development guide *)
 
 val inplace_visit: unit -> t
-  (** In-place modification. Behavior of the original cil visitor.
-      @plugin development guide *)
+(** In-place modification. Behavior of the original cil visitor.
+    @plugin development guide *)
 
 val copy_visit: Project.t -> t
-  (** Makes fresh copies of the mutable structures.
-      - preserves sharing for varinfo.
-      - makes fresh copy of varinfo only for declarations. Variables that are
+(** Makes fresh copies of the mutable structures.
+    - preserves sharing for varinfo.
+    - makes fresh copy of varinfo only for declarations. Variables that are
       only used in the visited AST are thus still shared with the original
       AST. This allows for instance to copy a function with its
       formals and local variables, and to keep the references to other
@@ -22,11 +21,11 @@ val copy_visit: Project.t -> t
       @plugin development guide *)
 
 val refresh_visit: Project.t -> t
-  (** Makes fresh copies of the mutable structures and provides fresh id
-      for the structures that have ids. Note that as for {!copy_visit}, only
-      varinfo that are declared in the scope of the visit will be copied and
-      provided with a new id.
-   *)
+(** Makes fresh copies of the mutable structures and provides fresh id
+    for the structures that have ids. Note that as for {!copy_visit}, only
+    varinfo that are declared in the scope of the visit will be copied and
+    provided with a new id.
+*)
 
 (** true iff the behavior provides fresh id for copied structs with id.
     Always [false] for an inplace visitor.
@@ -43,7 +42,7 @@ val reset_varinfo: t -> unit
     fresh instances of visitor for each round of transformation, this should
     not be needed. In place modifications do not need that at all.
     @plugin development guide
- *)
+*)
 
 val reset_compinfo: t -> unit
 val reset_enuminfo: t -> unit
@@ -62,7 +61,7 @@ val get_varinfo: t -> varinfo -> varinfo
 (** retrieve the representative of a given varinfo in the current
     state of the visitor
     @plugin development guide
- *)
+*)
 
 val get_compinfo: t -> compinfo -> compinfo
 val get_enuminfo: t -> enuminfo -> enuminfo
@@ -82,10 +81,10 @@ val get_kernel_function: t -> kernel_function -> kernel_function
 val get_fundec: t -> fundec -> fundec
 
 val get_original_varinfo: t -> varinfo -> varinfo
-  (** retrieve the original representative of a given copy of a varinfo
-      in the current state of the visitor.
+(** retrieve the original representative of a given copy of a varinfo
+    in the current state of the visitor.
     @plugin development guide
-   *)
+*)
 
 val get_original_compinfo: t -> compinfo -> compinfo
 val get_original_enuminfo: t -> enuminfo -> enuminfo
@@ -103,11 +102,11 @@ val get_original_kernel_function:
 val get_original_fundec: t -> fundec -> fundec
 
 val set_varinfo: t -> varinfo -> varinfo -> unit
-  (** change the representative of a given varinfo in the current
-      state of the visitor. Use with care (i.e. makes sure that the old one
-      is not referenced anywhere in the AST, or sharing will be lost.
-      @plugin development guide
-  *)
+(** change the representative of a given varinfo in the current
+    state of the visitor. Use with care (i.e. makes sure that the old one
+    is not referenced anywhere in the AST, or sharing will be lost.
+    @plugin development guide
+*)
 val set_compinfo: t -> compinfo -> compinfo -> unit
 val set_enuminfo: t -> enuminfo -> enuminfo -> unit
 val set_enumitem: t -> enumitem -> enumitem -> unit
@@ -124,9 +123,9 @@ val set_kernel_function:
 val set_fundec: t -> fundec -> fundec -> unit
 
 val set_orig_varinfo: t -> varinfo -> varinfo -> unit
-  (** change the reference of a given new varinfo in the current
-      state of the visitor. Use with care
-  *)
+(** change the reference of a given new varinfo in the current
+    state of the visitor. Use with care
+*)
 val set_orig_compinfo: t -> compinfo -> compinfo -> unit
 val set_orig_enuminfo: t -> enuminfo -> enuminfo -> unit
 val set_orig_enumitem: t -> enumitem -> enumitem -> unit
@@ -143,11 +142,11 @@ val set_orig_kernel_function:
 val set_orig_fundec: t -> fundec -> fundec -> unit
 
 val unset_varinfo: t -> varinfo -> unit
-  (** remove the entry associated to the given varinfo in the current
-      state of the visitor. Use with care (i.e. make sure that you will never
-      visit again this varinfo in the same visiting context).
-      @plugin development guide
-  *)
+(** remove the entry associated to the given varinfo in the current
+    state of the visitor. Use with care (i.e. make sure that you will never
+    visit again this varinfo in the same visiting context).
+    @plugin development guide
+*)
 val unset_compinfo: t -> compinfo -> unit
 val unset_enuminfo: t -> enuminfo -> unit
 val unset_enumitem: t -> enumitem -> unit
@@ -162,9 +161,9 @@ val unset_kernel_function: t -> kernel_function -> unit
 val unset_fundec: t -> fundec -> unit
 
 val unset_orig_varinfo: t -> varinfo -> unit
-  (** remove the entry associated with the given new varinfo in the current
-      state of the visitor. Use with care
-  *)
+(** remove the entry associated with the given new varinfo in the current
+    state of the visitor. Use with care
+*)
 val unset_orig_compinfo: t -> compinfo -> unit
 val unset_orig_enuminfo: t -> enuminfo -> unit
 val unset_orig_enumitem: t -> enumitem -> unit
@@ -179,8 +178,8 @@ val unset_orig_kernel_function: t -> kernel_function -> unit
 val unset_orig_fundec: t -> fundec -> unit
 
 val memo_varinfo: t -> varinfo -> varinfo
-  (** finds a binding in new project for the given varinfo, creating one
-      if it does not already exists. *)
+(** finds a binding in new project for the given varinfo, creating one
+    if it does not already exists. *)
 val memo_compinfo: t -> compinfo -> compinfo
 val memo_enuminfo: t -> enuminfo -> enuminfo
 val memo_enumitem: t -> enumitem -> enumitem
