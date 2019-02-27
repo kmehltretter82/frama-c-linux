@@ -10,18 +10,21 @@
 [eva] tests/value/hierarchical_convergence.c:7: 
   starting to merge loop iterations
 [eva] tests/value/hierarchical_convergence.c:8: Frama_C_show_each: {0; 1}
+[eva] tests/value/hierarchical_convergence.c:10: Frama_C_show_each: {1}, {0}
 [eva] tests/value/hierarchical_convergence.c:9: 
   starting to merge loop iterations
-[eva] tests/value/hierarchical_convergence.c:10: Frama_C_show_each: {1}, {0}
 [eva] tests/value/hierarchical_convergence.c:8: Frama_C_show_each: {0; 1; 2}
+[eva] tests/value/hierarchical_convergence.c:10: Frama_C_show_each: {1; 2}, {0}
 [eva] tests/value/hierarchical_convergence.c:10: 
-  Frama_C_show_each: [1..2147483647], {0; 1}
+  Frama_C_show_each: {1; 2}, {0; 1}
+[eva] tests/value/hierarchical_convergence.c:8: Frama_C_show_each: [0..99]
+[eva] tests/value/hierarchical_convergence.c:10: Frama_C_show_each: [1..99], {0}
 [eva] tests/value/hierarchical_convergence.c:10: 
-  Frama_C_show_each: [1..2147483647], {0; 1; 2}
+  Frama_C_show_each: [1..99], {0; 1}
 [eva] tests/value/hierarchical_convergence.c:10: 
-  Frama_C_show_each: [1..2147483647], [0..2147483646]
-[eva:alarm] tests/value/hierarchical_convergence.c:7: Warning: 
-  signed overflow. assert i + 1 ≤ 2147483647;
+  Frama_C_show_each: [1..99], {0; 1; 2}
+[eva] tests/value/hierarchical_convergence.c:10: 
+  Frama_C_show_each: [1..99], [0..98]
 [eva] tests/value/hierarchical_convergence.c:8: Frama_C_show_each: [0..99]
 [eva:alarm] tests/value/hierarchical_convergence.c:15: Warning: 
   accessing uninitialized left-value. assert \initialized(&j);
@@ -45,7 +48,7 @@
 [from] ====== DEPENDENCIES COMPUTED ======
   These dependencies hold at termination for the executions that terminate:
 [from] Function f:
-  \result FROM n
+  \result FROM \nothing
 [from] Function main:
   NO EFFECTS
 [from] ====== END OF DEPENDENCIES ======

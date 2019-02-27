@@ -465,7 +465,8 @@ module Make_Dataflow
       | Some stmt ->
         (* Set location *)
         current_ki := Kstmt stmt;
-        Cil.CurrentLoc.set (Cil_datatype.Stmt.loc stmt);
+        let current_loc = Cil_datatype.Stmt.loc stmt in
+        Cil.CurrentLoc.set current_loc
       | None -> ()
     end;
     (* Get vertex store *)
@@ -545,6 +546,20 @@ module Make_Dataflow
     | _ -> (* Several successors - failure *)
       Value_parameters.abort "Do not know which branch to take. Stopping."
 
+  let reset_component (vertex_list : vertex list) : unit =
+    let reset_edge (_,e,_) =
+      let t,_ = get_edge_data e in
+      Partition.reset_tank t
+    in
+    let reset_vertex v =
+      let s = get_vertex_store v
+      and w = get_vertex_widening v in
+      Partition.reset_store s;
+      Partition.reset_widening w;
+      List.iter reset_edge (G.succ_e graph v)
+    in
+    List.iter reset_vertex vertex_list
+
   let rec iterate_list (l : wto) =
     List.iter iterate_element l
   and iterate_element = function
@@ -555,7 +570,7 @@ module Make_Dataflow
          Otherwise, only resets the widening counter for this component. This
          is especially useful for nested loops. *)
       if hierachical_convergence
-      then () (* reset_component (v :: Wto.flatten w) *)
+      then reset_component (v :: Wto.flatten w)
       else Partition.reset_widening_counter (get_vertex_widening v);
       (* Iterate until convergence *)
       let iteration_count = ref 0 in
