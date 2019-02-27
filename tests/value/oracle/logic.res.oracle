@@ -253,8 +253,7 @@
 [eva:alarm] tests/value/logic.c:301: Warning: assertion got status unknown.
 [eva:alarm] tests/value/logic.c:303: Warning: 
   assertion got status invalid (stopping propagation).
-[eva:alarm] tests/value/logic.c:306: Warning: 
-  check got status invalid (stopping propagation).
+[eva:alarm] tests/value/logic.c:306: Warning: check got status invalid.
 [eva] tests/value/logic.c:307: Frama_C_show_each_reachable: {42}
 [eva] Recording results for check_and_assert
 [eva] Done for function check_and_assert

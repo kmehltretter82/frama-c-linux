@@ -629,7 +629,7 @@ module Make
               "valid"
             | Alarmset.False, `True ->
               change_status Property_status.False_if_reachable;
-              "invalid (stopping propagation)"
+              "invalid" ^ (if reduce then " (stopping propagation)" else "")
             | Alarmset.False, `Unknown ->
               change_status Property_status.False_if_reachable;
               "invalid"
