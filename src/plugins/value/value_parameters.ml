@@ -1319,6 +1319,88 @@ module MallocLevel =
 let () = MallocLevel.add_aliases ["-val-mlevel"]
 
 (* -------------------------------------------------------------------------- *)
+(* --- Meta options                                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
+let () = Parameter_customize.set_negative_option_name ""
+module Fast =
+  False
+    (struct
+      let option_name = "-eva-fast"
+      let help = "Quick configuration for a fast (but rather imprecise) analysis. \
+                  Opposite of (and incompatible with) -eva-precise. \
+                  Equivalent to -eva-power 0."
+    end)
+
+let () = Parameter_customize.set_negative_option_name ""
+module Precise =
+  False
+    (struct
+      let option_name = "-eva-precise"
+      let help = "Quick configuration for a precise (but rather slow) analysis. \
+                  Opposite of (and incompatible with) -eva-fast. \
+                  Equivalent to -eva-power 5."
+    end)
+
+module Power =
+  Int
+    (struct
+      let option_name = "-eva-power"
+      let arg_name = "n"
+      let default = -1
+      let help = "Meta-option that automatically sets up some Eva parameters \
+                  for a quick configuration of an analysis, \
+                  from 0 (fastest but rather imprecise analysis) \
+                  to 10 (accurate but potentially slow analysis)."
+    end)
+let () = Power.set_range (-1) 10
+
+let incompatible_meta_options () =
+  abort "The meta options %s, %s and %s are mutually incompatible."
+    Fast.name Precise.name Power.name
+
+(* Sets a parameter, unless is is already set. *)
+let set (type t) (module P: Parameter_sig.S with type t = t) t =
+  if P.is_set ()
+  then printf "  option %s has already been set, and is not modified." P.name
+  else
+    begin
+      P.set t;
+      let str = Typed_parameter.get_value P.parameter in
+      if P.is_default ()
+      then printf "  option %s kept at its default value: %s." P.name str
+      else printf "  option %s set to %s." P.name str;
+    end
+
+let slevel_power = [| 0; 10; 25; 50; 75; 100; 150; 200; 300; 400; 500; |]
+
+let set_analysis option_name n =
+  if Fast.is_set () && option_name <> Fast.name
+  || Precise.is_set () && option_name <> Precise.name
+  || Power.is_set () && option_name <> Power.name
+  then incompatible_meta_options ();
+  feedback "Option %s detected, \
+            automatic configuration of the analysis:" option_name;
+  set (module (MinLoopUnroll)) (n / 2);
+  set (module (SemanticUnrollingLevel)) (slevel_power.(n));
+  set (module (WideningDelay)) (1 + n / 2);
+  set (module (ILevel)) (8 + 12 * n);
+  set (module (ArrayPrecisionLevel)) (50 * (n+1));
+  set (module (LinearLevel)) (20 * n);
+  set (module (RmAssert)) (n > 0);
+  set (module (SymbolicLocsDomain)) (n > 0);
+  set (module (EqualityDomain)) (n > 1);
+  set (module (EqualityCall)) (if n > 2 then "formals" else "none");
+  set (module (GaugesDomain)) (n > 3);
+  set (module (SplitReturn)) (if n > 4 then "auto" else "");
+  ()
+
+let () =
+  Fast.add_update_hook (fun _ n -> if n then set_analysis Fast.name 0);
+  Precise.add_update_hook (fun _ n -> if n then set_analysis Precise.name 5);
+  Power.add_update_hook (fun _ n -> if n >= 0 then set_analysis Power.name n)
+
+(* -------------------------------------------------------------------------- *)
 (* --- Freeze parameters. MUST GO LAST                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
