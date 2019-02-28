@@ -2150,10 +2150,25 @@ let assertEmptyQueue vis =
 
 let vis_tmp_attr = "FRAMAC_VIS_TMP_ATTR"
 
+let wkey_transient = Kernel.register_warn_category "transient-block"
+let () = Kernel.set_warn_status wkey_transient Log.Winactive
+
 let transient_block b =
-  if b.blocals <> [] then
+  if b.blocals <> [] then begin
+    if List.exists
+        (function
+          | { skind = Instr (Local_init (v,_,_)) } ->
+            not (List.exists (Cil_datatype.Varinfo.equal v) b.blocals)
+          | _ -> false)
+        b.bstmts
+    then
     Kernel.fatal
       "Attempting to mark as transient a block that declares local variables";
+    Kernel.warning
+      ~wkey:wkey_transient
+      "ignoring request to mark transient a block with local variables:@\n%a"
+      Cil_datatype.Block.pretty b
+  end else
   b.battrs <- addAttribute (Attr (vis_tmp_attr,[])) b.battrs; b
 
 let block_of_transient b =
@@ -4546,7 +4561,7 @@ let isCharConstPtrType t =
    | Ltype ({lt_name = "typetag"},[]) -> true
    | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
      isTypeTagType (unroll_ltdef ty)
-   | _ -> false
+     | _ -> false
 
  let getReturnType t =
    match unrollType t with
@@ -4682,7 +4697,7 @@ let isCharConstPtrType t =
 	 | Ctype typ ->
 	     begin match unrollType typ with
                | TPtr (t, _) -> typeTermOffset (Ctype t) off
-               | _ ->
+	       | _ -> 
 		 Kernel.fatal ~current:true
 		   "typeOfTermLval: Mem on a non-pointer"
 	     end
@@ -4690,7 +4705,7 @@ let isCharConstPtrType t =
 	   Kernel.fatal ~current:true "typeOfTermLval: Mem on a logic type"
          | Ltype (s,_) as ty when is_unrollable_ltdef s ->
            type_of_pointed (unroll_ltdef ty)
-         | Ltype (s,_) ->
+	 | Ltype (s,_) -> 
            Kernel.fatal ~current:true
 	     "typeOfTermLval: Mem on a non-C type (%s)" s.lt_name
 	 | Lvar s -> 
@@ -4715,7 +4730,7 @@ let isCharConstPtrType t =
 	     "typeTermOffset: Attribute on a logic type"
          | Ltype (s,_) as ty when is_unrollable_ltdef s ->
            putAttributes (unroll_ltdef ty)
-         | Ltype (s,_) ->
+         | Ltype (s,_) -> 
            Kernel.fatal ~current:true
 	     "typeTermOffset: Attribute on a non-C type (%s)" s.lt_name
          | Lvar s -> 
@@ -4744,8 +4759,8 @@ let isCharConstPtrType t =
 	   | Linteger | Lreal -> Kernel.fatal ~current:true "typeTermOffset: Index on a logic type"
            | Ltype (s,_) as ty when is_unrollable_ltdef s ->
              elt_type (unroll_ltdef ty)
-           | Ltype (s,_) ->
-              Kernel.fatal ~current:true "typeTermOffset: Index on a non-C type (%s)" s.lt_name
+	   | Ltype (s,_) -> 
+             Kernel.fatal ~current:true "typeTermOffset: Index on a non-C type (%s)" s.lt_name
 	   | Lvar s -> Kernel.fatal ~current:true "typeTermOffset: Index on a non-C type ('%s)" s
 	   | Larrow _ -> Kernel.fatal ~current:true "typeTermOffset: Index on a function type"
        in
@@ -4765,7 +4780,7 @@ let isCharConstPtrType t =
 	   | Linteger | Lreal -> Kernel.fatal ~current:true "typeTermOffset: Field on a logic type"
            | Ltype (s,_) as ty when is_unrollable_ltdef s ->
              elt_type (unroll_ltdef ty)
-           | Ltype (s,_) ->
+	   | Ltype (s,_) ->
              Kernel.fatal ~current:true "typeTermOffset: Field on a non-C type (%s)" s.lt_name
 	   | Lvar s ->  Kernel.fatal ~current:true "typeTermOffset: Field on a non-C type ('%s)" s
 	   | Larrow _ -> Kernel.fatal ~current:true "typeTermOffset: Field on a function type"
