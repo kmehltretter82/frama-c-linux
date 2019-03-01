@@ -477,42 +477,53 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
       dup Other
 
     | Tapp(li, _, args) ->
-      List.iter
-        (fun arg -> ignore (type_term ~use_gmp_opt:true arg))
-        args;
-      begin match li.l_body with
-      | LBpred _ ->
-        (* We can have an [LBpred] here because we transformed
-          [Papp] into [Tapp] *)
-        dup c_int
-      | LBterm _ ->
-        begin  match li.l_type with
-        | None ->
-          assert false
-        | Some lty ->
-          begin match lty with
-          | Linteger ->
-            let i = Interval.infer t in
-            if Options.Gmp_only.get () then dup Gmp
-            else dup (ty_of_interv i)
-          | Ctype TInt(ik, _ ) ->
-            dup (C_type ik)
-          | Ctype TFloat _ -> (* TODO: handle in MR !226 *)
-            dup Other
-          | Lreal ->
-            Error.not_yet "real numbers"
-          | Ctype _ ->
-            dup Other
-          | Ltype _ | Lvar _ | Larrow _ ->
-            Options.fatal "unexpected type"
+      if Builtins.mem li.l_var_info.lv_name then
+        let typ_arg lvi arg =
+          (* a built-in is a C function, so the context is necessarily a C
+             type. *)
+          let ctx = ty_of_logic_ty lvi.lv_type in
+          ignore (type_term ~use_gmp_opt:false ~ctx arg)
+        in
+        List.iter2 typ_arg li.l_profile args;
+        (* [li.l_type is [None] for predicate only: not possible here.
+           Thus using [Extlib.the] is fine *)
+        dup (ty_of_logic_ty (Extlib.the li.l_type))
+      else begin
+        List.iter
+          (fun arg -> ignore (type_term ~use_gmp_opt:true arg))
+          args;
+        match li.l_body with
+        | LBpred _ ->
+          (* We can have an [LBpred] here because we transformed
+             [Papp] into [Tapp] *)
+          dup c_int
+        | LBterm _ ->
+          begin match li.l_type with
+          | None ->
+            assert false
+          | Some lty ->
+            match lty with
+            | Linteger ->
+              let i = Interval.infer t in
+              if Options.Gmp_only.get () then dup Gmp
+              else dup (ty_of_interv i)
+            | Ctype TInt(ik, _ ) ->
+              dup (C_type ik)
+            | Ctype TFloat _ -> (* TODO: handle in MR !226 *)
+              dup Other
+            | Lreal ->
+              Error.not_yet "real numbers"
+            | Ctype _ ->
+              dup Other
+            | Ltype _ | Lvar _ | Larrow _ ->
+              Options.fatal "unexpected type"
           end
-        end
-      | LBnone ->
-        Error.not_yet "logic functions with no definition nor reads clause"
-      | LBreads _ ->
-        Error.not_yet "logic functions performing read accesses"
-      | LBinductive _ ->
-        Error.not_yet "logic functions inductively defined"
+        | LBnone ->
+          Error.not_yet "logic functions with no definition nor reads clause"
+        | LBreads _ ->
+          Error.not_yet "logic functions performing read accesses"
+        | LBinductive _ ->
+          Error.not_yet "logic functions inductively defined"
       end
 
     | Tunion _ -> Error.not_yet "tset union"

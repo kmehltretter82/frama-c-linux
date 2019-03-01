@@ -470,8 +470,9 @@ you must call function `%s' and `__e_acsl_memory_clean by yourself.@]"
       Cil.JustCopyPost
         (fun l ->
           let new_vi = Cil.get_varinfo self#behavior vi in
-          Misc.register_library_function new_vi;
-          Builtins.update vi.vname new_vi;
+          if Misc.is_library_loc vi.vdecl then
+            Misc.register_library_function new_vi;
+          if Builtins.mem vi.vname then Builtins.update vi.vname new_vi;
           l)
     else begin
       Misc.register_library_function vi;
