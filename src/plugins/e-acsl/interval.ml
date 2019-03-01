@@ -52,7 +52,6 @@ module Env: sig
   val find: Cil_types.logic_var -> Ival.t
   val remove: Cil_types.logic_var -> unit
   val replace: Cil_types.logic_var -> Ival.t -> unit
-  val find_all: Cil_types.logic_var -> Ival.t list
 end = struct
   open Cil_datatype
   let tbl: Ival.t Logic_var.Hashtbl.t = Logic_var.Hashtbl.create 7
@@ -60,7 +59,6 @@ end = struct
   let add = Logic_var.Hashtbl.add tbl
   let remove = Logic_var.Hashtbl.remove tbl
   let replace = Logic_var.Hashtbl.replace tbl
-  let find_all = Logic_var.Hashtbl.find_all tbl
   let find = Logic_var.Hashtbl.find tbl
 end
 
