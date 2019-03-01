@@ -231,7 +231,7 @@ Prove: true.
   Function init_t2_bis_v1
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_typed/user_init.i, line 125) in 'init_t2_bis_v1':
+Goal Post-condition (file tests/wp_typed/user_init.i, line 127) in 'init_t2_bis_v1':
 Let a = global(G_t2_48).
 Assume {
   Type: is_uint32(i_2) /\ is_sint32(v).
@@ -256,12 +256,12 @@ Prove: Mint_0[shift_sint32(shift_A20_sint32(a, i), i_1)] = v.
 
 ------------------------------------------------------------
 
-Goal Exit-condition (file tests/wp_typed/user_init.i, line 127) in 'init_t2_bis_v1':
+Goal Exit-condition (file tests/wp_typed/user_init.i, line 129) in 'init_t2_bis_v1':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'Partial' (file tests/wp_typed/user_init.i, line 134):
+Goal Preservation of Invariant 'Partial' (file tests/wp_typed/user_init.i, line 136):
 Let a = global(G_t2_48).
 Let a_1 = shift_A20_sint32(a, i).
 Let a_2 = shift_sint32(a_1, 0).
@@ -292,12 +292,12 @@ Prove: a_3[shift_sint32(shift_A20_sint32(a, i_1), i_2)] = Mint_undef_0[a_2].
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Partial' (file tests/wp_typed/user_init.i, line 134):
+Goal Establishment of Invariant 'Partial' (file tests/wp_typed/user_init.i, line 136):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'Range' (file tests/wp_typed/user_init.i, line 133):
+Goal Preservation of Invariant 'Range' (file tests/wp_typed/user_init.i, line 135):
 Let a = global(G_t2_48).
 Let a_1 = shift_A20_sint32(a, i).
 Assume {
@@ -325,12 +325,12 @@ Prove: to_uint32(1 + i) <= 10.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Range' (file tests/wp_typed/user_init.i, line 133):
+Goal Establishment of Invariant 'Range' (file tests/wp_typed/user_init.i, line 135):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'Offset' (file tests/wp_typed/user_init.i, line 139):
+Goal Assertion 'Offset' (file tests/wp_typed/user_init.i, line 141):
 Prove: true.
 
 ------------------------------------------------------------
@@ -341,7 +341,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Loop assigns 'lack,Zone' (2/3):
-Effect at line 137
+Effect at line 139
 Let a = global(G_t2_48).
 Let a_1 = shift_A20_sint32(a, i).
 Assume {
@@ -378,7 +378,7 @@ Prove: (forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 <= 9) ->
 ------------------------------------------------------------
 
 Goal Loop assigns 'lack,Zone' (3/3):
-Call Effect at line 138
+Call Effect at line 140
 Let a = global(G_t2_48).
 Let a_1 = shift_A20_sint32(a, i).
 Assume {
@@ -408,13 +408,13 @@ Prove: exists i_3,i_2 : Z. (i_3 <= i) /\ (i_2 <= i_1) /\ (0 <= i_2) /\
 ------------------------------------------------------------
 
 Goal Assigns 'lack' in 'init_t2_bis_v1' (1/3):
-Effect at line 137
+Effect at line 139
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Assigns 'lack' in 'init_t2_bis_v1' (2/3):
-Effect at line 137
+Effect at line 139
 Assume {
   Have: 0 <= i_2.
   Have: 0 <= i_3.
@@ -437,19 +437,19 @@ Prove: exists i_5,i_4 : Z. (i_5 <= i) /\ (i_4 <= i_1) /\ (0 <= i_4) /\
 ------------------------------------------------------------
 
 Goal Assigns 'lack' in 'init_t2_bis_v1' (3/3):
-Call Effect at line 138
+Call Effect at line 140
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Assigns 'lack' in 'init_t2_bis_v1' (1/2):
-Effect at line 137
+Effect at line 139
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Assigns 'lack' in 'init_t2_bis_v1' (2/2):
-Effect at line 137
+Effect at line 139
 Assume {
   Have: 0 <= i_2.
   Have: 0 <= i_3.
@@ -471,7 +471,7 @@ Prove: exists i_5,i_4 : Z. (i_5 <= i) /\ (i_4 <= i_1) /\ (0 <= i_4) /\
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file tests/wp_typed/user_init.i, line 137):
+Goal Decreasing of Loop variant at loop (file tests/wp_typed/user_init.i, line 139):
 Let a = global(G_t2_48).
 Let a_1 = shift_A20_sint32(a, i).
 Assume {
@@ -499,18 +499,18 @@ Prove: i < to_uint32(1 + i).
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file tests/wp_typed/user_init.i, line 137):
+Goal Positivity of Loop variant at loop (file tests/wp_typed/user_init.i, line 139):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_typed/user_init.i, line 7) in 'init'' in 'init_t2_bis_v1' at call 'init' (file tests/wp_typed/user_init.i, line 138)
+Goal Instance of 'Pre-condition (file tests/wp_typed/user_init.i, line 7) in 'init'' in 'init_t2_bis_v1' at call 'init' (file tests/wp_typed/user_init.i, line 140)
 :
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_typed/user_init.i, line 8) in 'init'' in 'init_t2_bis_v1' at call 'init' (file tests/wp_typed/user_init.i, line 138)
+Goal Instance of 'Pre-condition (file tests/wp_typed/user_init.i, line 8) in 'init'' in 'init_t2_bis_v1' at call 'init' (file tests/wp_typed/user_init.i, line 140)
 :
 Prove: true.
 
@@ -519,13 +519,13 @@ Prove: true.
   Function init_t2_bis_v2
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_typed/user_init.i, line 143) in 'init_t2_bis_v2':
+Goal Post-condition (file tests/wp_typed/user_init.i, line 145) in 'init_t2_bis_v2':
 Let a = global(G_t2_48).
 Assume {
   Type: is_uint32(i_2) /\ is_sint32(v).
   (* Goal *)
   When: (0 <= i) /\ (0 <= i_1) /\ (i <= 9) /\ (i_1 <= 19).
-  (* Loop assigns 'lack,Zone' *)
+  (* Loop assigns 'tactic,Zone' *)
   Have: forall a_1 : addr.
       ((forall i_4,i_3 : Z. ((0 <= i_4) -> ((i_4 <= 9) ->
         (shift_sint32(shift_A20_sint32(a, i_4), i_3) != a_1)))) ->
@@ -543,12 +543,12 @@ Prove: Mint_0[shift_sint32(shift_A20_sint32(a, i), i_1)] = v.
 
 ------------------------------------------------------------
 
-Goal Exit-condition (file tests/wp_typed/user_init.i, line 145) in 'init_t2_bis_v2':
+Goal Exit-condition (file tests/wp_typed/user_init.i, line 147) in 'init_t2_bis_v2':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'Partial' (file tests/wp_typed/user_init.i, line 152):
+Goal Preservation of Invariant 'Partial' (file tests/wp_typed/user_init.i, line 154):
 Let a = global(G_t2_48).
 Let a_1 = shift_A20_sint32(a, i).
 Let a_2 = shift_sint32(a_1, 0).
@@ -557,7 +557,7 @@ Assume {
   Type: is_uint32(i) /\ is_sint32(v).
   (* Goal *)
   When: (0 <= i_1) /\ (0 <= i_2) /\ (i_1 < to_uint32(1 + i)) /\ (i_2 <= 19).
-  (* Loop assigns 'lack,Zone' *)
+  (* Loop assigns 'tactic,Zone' *)
   Have: forall a_4 : addr.
       ((forall i_4,i_3 : Z. ((0 <= i_4) -> ((i_4 <= 9) ->
         (shift_sint32(shift_A20_sint32(a, i_4), i_3) != a_4)))) ->
@@ -578,17 +578,17 @@ Prove: a_3[shift_sint32(shift_A20_sint32(a, i_1), i_2)] = Mint_undef_0[a_2].
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Partial' (file tests/wp_typed/user_init.i, line 152):
+Goal Establishment of Invariant 'Partial' (file tests/wp_typed/user_init.i, line 154):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'Range' (file tests/wp_typed/user_init.i, line 151):
+Goal Preservation of Invariant 'Range' (file tests/wp_typed/user_init.i, line 153):
 Let a = global(G_t2_48).
 Let a_1 = shift_A20_sint32(a, i).
 Assume {
   Type: is_uint32(i) /\ is_sint32(v).
-  (* Loop assigns 'lack,Zone' *)
+  (* Loop assigns 'tactic,Zone' *)
   Have: forall a_2 : addr.
       ((forall i_2,i_1 : Z. ((0 <= i_2) -> ((i_2 <= 9) ->
         (shift_sint32(shift_A20_sint32(a, i_2), i_1) != a_2)))) ->
@@ -610,23 +610,23 @@ Prove: to_uint32(1 + i) <= 10.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Range' (file tests/wp_typed/user_init.i, line 151):
+Goal Establishment of Invariant 'Range' (file tests/wp_typed/user_init.i, line 153):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'Offset_i' (file tests/wp_typed/user_init.i, line 157):
+Goal Assertion 'Offset_i' (file tests/wp_typed/user_init.i, line 159):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns 'lack,Zone' (1/3):
+Goal Loop assigns 'tactic,Zone' (1/3):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns 'lack,Zone' (2/3):
-Effect at line 155
+Goal Loop assigns 'tactic,Zone' (2/3):
+Effect at line 157
 Let a = global(G_t2_48).
 Let a_1 = shift_A20_sint32(a, i_2).
 Assume {
@@ -635,7 +635,7 @@ Assume {
   Type: is_uint32(i_2) /\ is_sint32(v).
   (* Goal *)
   When: (0 <= i_3) /\ (0 <= i_4) /\ (i_3 <= 9) /\ (i_4 <= 19).
-  (* Loop assigns 'lack,Zone' *)
+  (* Loop assigns 'tactic,Zone' *)
   Have: forall a_2 : addr.
       ((forall i_6,i_5 : Z. ((0 <= i_6) -> ((i_6 <= 9) ->
         (shift_sint32(shift_A20_sint32(a, i_6), i_5) != a_2)))) ->
@@ -658,15 +658,15 @@ Prove: exists i_6,i_5 : Z. (i_6 <= i) /\ (i_5 <= i_1) /\ (i_1 <= i_5) /\
 
 ------------------------------------------------------------
 
-Goal Loop assigns 'lack,Zone' (3/3):
-Call Effect at line 156
+Goal Loop assigns 'tactic,Zone' (3/3):
+Call Effect at line 158
 Let a = global(G_t2_48).
 Let a_1 = shift_A20_sint32(a, i).
 Assume {
   Type: is_uint32(i) /\ is_sint32(v).
   (* Goal *)
   When: (0 <= i) /\ (0 <= i_1) /\ (i <= 9) /\ (i_1 <= 19).
-  (* Loop assigns 'lack,Zone' *)
+  (* Loop assigns 'tactic,Zone' *)
   Have: forall a_2 : addr.
       ((forall i_3,i_2 : Z. ((0 <= i_3) -> ((i_3 <= 9) ->
         (shift_sint32(shift_A20_sint32(a, i_3), i_2) != a_2)))) ->
@@ -687,14 +687,14 @@ Prove: exists i_3,i_2 : Z. (i_3 <= i) /\ (i_2 <= i_1) /\ (i_1 <= i_2) /\
 
 ------------------------------------------------------------
 
-Goal Assigns 'lack' in 'init_t2_bis_v2' (1/3):
-Effect at line 155
+Goal Assigns 'tactic' in 'init_t2_bis_v2' (1/3):
+Effect at line 157
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns 'lack' in 'init_t2_bis_v2' (2/3):
-Effect at line 155
+Goal Assigns 'tactic' in 'init_t2_bis_v2' (2/3):
+Effect at line 157
 Assume {
   Have: 0 <= i_2.
   Have: 0 <= i_3.
@@ -702,7 +702,7 @@ Assume {
   Have: i_3 <= 19.
   Have: 0 <= i.
   Have: i <= 9.
-  (* Loop assigns 'lack,Zone' *)
+  (* Loop assigns 'tactic,Zone' *)
   Have: forall a : addr.
       ((forall i_5,i_4 : Z. ((0 <= i_5) -> ((i_5 <= 9) ->
         (shift_sint32(shift_A20_sint32(global(G_t2_48), i_5), i_4) != a)))) ->
@@ -713,20 +713,20 @@ Prove: exists i_5,i_4 : Z. (i_5 <= i) /\ (i_4 <= i_1) /\ (i_1 <= i_4) /\
 
 ------------------------------------------------------------
 
-Goal Assigns 'lack' in 'init_t2_bis_v2' (3/3):
-Call Effect at line 156
+Goal Assigns 'tactic' in 'init_t2_bis_v2' (3/3):
+Call Effect at line 158
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns 'lack' in 'init_t2_bis_v2' (1/2):
-Effect at line 155
+Goal Assigns 'tactic' in 'init_t2_bis_v2' (1/2):
+Effect at line 157
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns 'lack' in 'init_t2_bis_v2' (2/2):
-Effect at line 155
+Goal Assigns 'tactic' in 'init_t2_bis_v2' (2/2):
+Effect at line 157
 Assume {
   Have: 0 <= i_2.
   Have: 0 <= i_3.
@@ -734,7 +734,7 @@ Assume {
   Have: i_3 <= 19.
   Have: 0 <= i.
   Have: i <= 9.
-  (* Loop assigns 'lack,Zone' *)
+  (* Loop assigns 'tactic,Zone' *)
   Have: forall a : addr.
       ((forall i_5,i_4 : Z. ((0 <= i_5) -> ((i_5 <= 9) ->
         (shift_sint32(shift_A20_sint32(global(G_t2_48), i_5), i_4) != a)))) ->
@@ -745,12 +745,12 @@ Prove: exists i_5,i_4 : Z. (i_5 <= i) /\ (i_4 <= i_1) /\ (i_1 <= i_4) /\
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file tests/wp_typed/user_init.i, line 155):
+Goal Decreasing of Loop variant at loop (file tests/wp_typed/user_init.i, line 157):
 Let a = global(G_t2_48).
 Let a_1 = shift_A20_sint32(a, i).
 Assume {
   Type: is_uint32(i) /\ is_sint32(v).
-  (* Loop assigns 'lack,Zone' *)
+  (* Loop assigns 'tactic,Zone' *)
   Have: forall a_2 : addr.
       ((forall i_2,i_1 : Z. ((0 <= i_2) -> ((i_2 <= 9) ->
         (shift_sint32(shift_A20_sint32(a, i_2), i_1) != a_2)))) ->
@@ -772,18 +772,18 @@ Prove: i < to_uint32(1 + i).
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file tests/wp_typed/user_init.i, line 155):
+Goal Positivity of Loop variant at loop (file tests/wp_typed/user_init.i, line 157):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_typed/user_init.i, line 7) in 'init'' in 'init_t2_bis_v2' at call 'init' (file tests/wp_typed/user_init.i, line 156)
+Goal Instance of 'Pre-condition (file tests/wp_typed/user_init.i, line 7) in 'init'' in 'init_t2_bis_v2' at call 'init' (file tests/wp_typed/user_init.i, line 158)
 :
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_typed/user_init.i, line 8) in 'init'' in 'init_t2_bis_v2' at call 'init' (file tests/wp_typed/user_init.i, line 156)
+Goal Instance of 'Pre-condition (file tests/wp_typed/user_init.i, line 8) in 'init'' in 'init_t2_bis_v2' at call 'init' (file tests/wp_typed/user_init.i, line 158)
 :
 Prove: true.
 
@@ -1745,124 +1745,143 @@ Prove: true.
   Function init_t2_v3
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_typed/user_init.i, line 97) in 'init_t2_v3':
+Goal Post-condition (file tests/wp_typed/user_init.i, line 99) in 'init_t2_v3':
 Assume {
+  Type: is_sint32(v).
   (* Goal *)
-  When: (0 <= i) /\ (0 <= i_1) /\ (i <= 9) /\ (i_1 <= 19).
-  (* Loop assigns 'lack,Zone_i' *)
-  Have: forall i_3,i_2 : Z. ((0 <= i_2) -> ((0 <= i_3) -> ((i_3 <= 9) ->
-      ((i_2 <= 19) -> (((i_3 < 0) \/ (10 <= i_3)) ->
-      (t2_1[i_3][i_2] = t2_0[i_3][i_2])))))).
-  (* Invariant 'lack,Partial_i' *)
-  Have: forall i_3,i_2 : Z. ((0 <= i_2) -> ((0 <= i_3) -> ((i_3 <= 9) ->
-      ((i_2 <= 19) -> (t2_0[i_3][i_2] = v))))).
+  When: (0 <= i) /\ (i <= 9).
+  (* Loop assigns 'tactic,Zone_i' *)
+  Have: forall i_2,i_1 : Z. ((0 <= i_1) -> ((0 <= i_2) -> ((i_2 <= 9) ->
+      ((i_1 <= 19) -> (((i_2 < 0) \/ (10 <= i_2)) ->
+      (t2_1[i_2][i_1] = t2_0[i_2][i_1])))))).
+  (* Invariant 'Partial_i' *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 9) ->
+      P_MemSet20(t2_0[i_1], 20, v))).
 }
-Prove: t2_0[i][i_1] = v.
+Prove: P_MemSet20(t2_0[i], 20, v).
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'Range_i' (file tests/wp_typed/user_init.i, line 105):
+Goal Preservation of Invariant 'Partial_i' (file tests/wp_typed/user_init.i, line 108):
 Assume {
-  Type: is_uint32(i).
-  (* Loop assigns 'lack,Zone_i' *)
-  Have: forall i_2,i_1 : Z. ((0 <= i_1) -> ((0 <= i_2) -> ((i_2 <= 9) ->
-      ((i_1 <= 19) -> (((i_2 < 0) \/ (10 <= i_2)) ->
-      (t2_0[i_2][i_1] = t2_1[i_2][i_1])))))).
-  (* Invariant 'lack,Partial_i' *)
-  Have: forall i_2,i_1 : Z. ((0 <= i_1) -> ((0 <= i_2) -> ((i_2 < i) ->
-      ((i_1 <= 19) -> (t2_1[i_2][i_1] = v))))).
+  Type: IsArray1_sint32(v) /\ is_uint32(i) /\ is_sint32(v_1) /\
+      IsArray1_sint32(t2_0[i]).
+  (* Goal *)
+  When: (0 <= i_1) /\ (i_1 < to_uint32(1 + i)).
+  (* Loop assigns 'tactic,Zone_i' *)
+  Have: forall i_3,i_2 : Z. ((0 <= i_2) -> ((0 <= i_3) -> ((i_3 <= 9) ->
+      ((i_2 <= 19) -> (((i_3 < 0) \/ (10 <= i_3)) ->
+      (t2_1[i_3][i_2] = t2_0[i_3][i_2])))))).
+  (* Invariant 'Partial_i' *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      P_MemSet20(t2_0[i_2], 20, v_1))).
   (* Invariant 'Range_i' *)
   Have: (0 <= i) /\ (i <= 10).
   (* Then *)
   Have: i <= 9.
   (* Invariant 'Partial_j' *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 19) -> (v_1[i_1] = v))).
+  Have: P_MemSet20(v, 20, v_1).
+}
+Prove: P_MemSet20(t2_0[i <- v][i_1], 20, v_1).
+
+------------------------------------------------------------
+
+Goal Establishment of Invariant 'Partial_i' (file tests/wp_typed/user_init.i, line 108):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Preservation of Invariant 'Range_i' (file tests/wp_typed/user_init.i, line 107):
+Assume {
+  Type: IsArray1_sint32(v) /\ is_uint32(i) /\ is_sint32(v_1) /\
+      IsArray1_sint32(t2_0[i]).
+  (* Loop assigns 'tactic,Zone_i' *)
+  Have: forall i_2,i_1 : Z. ((0 <= i_1) -> ((0 <= i_2) -> ((i_2 <= 9) ->
+      ((i_1 <= 19) -> (((i_2 < 0) \/ (10 <= i_2)) ->
+      (t2_1[i_2][i_1] = t2_0[i_2][i_1])))))).
+  (* Invariant 'Partial_i' *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      P_MemSet20(t2_0[i_1], 20, v_1))).
+  (* Invariant 'Range_i' *)
+  Have: (0 <= i) /\ (i <= 10).
+  (* Then *)
+  Have: i <= 9.
+  (* Invariant 'Partial_j' *)
+  Have: P_MemSet20(v, 20, v_1).
 }
 Prove: to_uint32(1 + i) <= 10.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Range_i' (file tests/wp_typed/user_init.i, line 105):
+Goal Establishment of Invariant 'Range_i' (file tests/wp_typed/user_init.i, line 107):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'lack,Partial_i' (file tests/wp_typed/user_init.i, line 106):
+Goal Preservation of Invariant 'Partial_j' (file tests/wp_typed/user_init.i, line 114):
+Let m = v[j <- v_1].
 Assume {
-  Type: is_uint32(i).
-  (* Goal *)
-  When: (0 <= i_1) /\ (0 <= i_2) /\ (i_1 < to_uint32(1 + i)) /\ (i_2 <= 19).
-  (* Loop assigns 'lack,Zone_i' *)
-  Have: forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 <= 9) ->
-      ((i_3 <= 19) -> (((i_4 < 0) \/ (10 <= i_4)) ->
-      (t2_1[i_4][i_3] = t2_0[i_4][i_3])))))).
-  (* Invariant 'lack,Partial_i' *)
-  Have: forall i_4,i_3 : Z. ((0 <= i_3) -> ((0 <= i_4) -> ((i_4 < i) ->
-      ((i_3 <= 19) -> (t2_0[i_4][i_3] = v_1))))).
+  Type: IsArray1_sint32(v) /\ is_uint32(i) /\ is_uint32(j) /\
+      is_sint32(v_1) /\ IsArray1_sint32(t2_0[i]) /\ IsArray1_sint32(m).
+  (* Loop assigns 'tactic,Zone_i' *)
+  Have: forall i_2,i_1 : Z. ((0 <= i_1) -> ((0 <= i_2) -> ((i_2 <= 9) ->
+      ((i_1 <= 19) -> (((i_2 < 0) \/ (10 <= i_2)) ->
+      (t2_1[i_2][i_1] = t2_0[i_2][i_1])))))).
+  (* Invariant 'Partial_i' *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      P_MemSet20(t2_0[i_1], 20, v_1))).
   (* Invariant 'Range_i' *)
   Have: (0 <= i) /\ (i <= 10).
   (* Then *)
   Have: i <= 9.
   (* Invariant 'Partial_j' *)
-  Have: forall i_3 : Z. ((0 <= i_3) -> ((i_3 <= 19) -> (v[i_3] = v_1))).
-}
-Prove: t2_0[i <- v][i_1][i_2] = v[0].
-
-------------------------------------------------------------
-
-Goal Establishment of Invariant 'lack,Partial_i' (file tests/wp_typed/user_init.i, line 106):
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Preservation of Invariant 'Partial_j' (file tests/wp_typed/user_init.i, line 112):
-Assume {
-  Type: is_uint32(i_1) /\ is_uint32(j).
-  (* Goal *)
-  When: (0 <= i) /\ (i < to_uint32(1 + j)).
-  (* Loop assigns 'lack,Zone_i' *)
-  Have: forall i_3,i_2 : Z. ((0 <= i_2) -> ((0 <= i_3) -> ((i_3 <= 9) ->
-      ((i_2 <= 19) -> (((i_3 < 0) \/ (10 <= i_3)) ->
-      (t2_0[i_3][i_2] = t2_1[i_3][i_2])))))).
-  (* Invariant 'lack,Partial_i' *)
-  Have: forall i_3,i_2 : Z. ((0 <= i_2) -> ((0 <= i_3) -> ((i_3 < i_1) ->
-      ((i_2 <= 19) -> (t2_1[i_3][i_2] = v_1))))).
-  (* Invariant 'Range_i' *)
-  Have: (0 <= i_1) /\ (i_1 <= 10).
-  (* Then *)
-  Have: i_1 <= 9.
-  (* Invariant 'Partial_j' *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < j) -> (v[i_2] = v_1))).
+  Have: P_MemSet20(v, j, v_1).
   (* Invariant 'Range_j' *)
   Have: (0 <= j) /\ (j <= 20).
   (* Then *)
   Have: j <= 19.
 }
-Prove: v[j <- v_1][i] = v_1.
+Prove: P_MemSet20(m, to_uint32(1 + j), v_1).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Partial_j' (file tests/wp_typed/user_init.i, line 112):
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Preservation of Invariant 'Range_j' (file tests/wp_typed/user_init.i, line 111):
+Goal Establishment of Invariant 'Partial_j' (file tests/wp_typed/user_init.i, line 114):
+Let m = t2_0[i].
 Assume {
-  Type: is_uint32(i) /\ is_uint32(j).
-  (* Loop assigns 'lack,Zone_i' *)
+  Type: is_uint32(i) /\ is_sint32(v) /\ IsArray1_sint32(m).
+  (* Loop assigns 'tactic,Zone_i' *)
   Have: forall i_2,i_1 : Z. ((0 <= i_1) -> ((0 <= i_2) -> ((i_2 <= 9) ->
       ((i_1 <= 19) -> (((i_2 < 0) \/ (10 <= i_2)) ->
-      (t2_0[i_2][i_1] = t2_1[i_2][i_1])))))).
-  (* Invariant 'lack,Partial_i' *)
-  Have: forall i_2,i_1 : Z. ((0 <= i_1) -> ((0 <= i_2) -> ((i_2 < i) ->
-      ((i_1 <= 19) -> (t2_1[i_2][i_1] = v))))).
+      (t2_1[i_2][i_1] = t2_0[i_2][i_1])))))).
+  (* Invariant 'Partial_i' *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      P_MemSet20(t2_0[i_1], 20, v))).
+  (* Invariant 'Range_i' *)
+  Have: (0 <= i) /\ (i <= 10).
+  (* Then *)
+  Have: i <= 9.
+}
+Prove: P_MemSet20(m, 0, v).
+
+------------------------------------------------------------
+
+Goal Preservation of Invariant 'Range_j' (file tests/wp_typed/user_init.i, line 113):
+Assume {
+  Type: IsArray1_sint32(v) /\ is_uint32(i) /\ is_uint32(j) /\
+      is_sint32(v_1) /\ IsArray1_sint32(t2_0[i]).
+  (* Loop assigns 'tactic,Zone_i' *)
+  Have: forall i_2,i_1 : Z. ((0 <= i_1) -> ((0 <= i_2) -> ((i_2 <= 9) ->
+      ((i_1 <= 19) -> (((i_2 < 0) \/ (10 <= i_2)) ->
+      (t2_1[i_2][i_1] = t2_0[i_2][i_1])))))).
+  (* Invariant 'Partial_i' *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      P_MemSet20(t2_0[i_1], 20, v_1))).
   (* Invariant 'Range_i' *)
   Have: (0 <= i) /\ (i <= 10).
   (* Then *)
   Have: i <= 9.
   (* Invariant 'Partial_j' *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < j) -> (v_1[i_1] = v))).
+  Have: P_MemSet20(v, j, v_1).
   (* Invariant 'Range_j' *)
   Have: (0 <= j) /\ (j <= 20).
   (* Then *)
@@ -1872,95 +1891,97 @@ Prove: to_uint32(1 + j) <= 20.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Range_j' (file tests/wp_typed/user_init.i, line 111):
+Goal Establishment of Invariant 'Range_j' (file tests/wp_typed/user_init.i, line 113):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'Last_j' (file tests/wp_typed/user_init.i, line 118):
+Goal Assertion 'Last_j' (file tests/wp_typed/user_init.i, line 120):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'Last_i' (file tests/wp_typed/user_init.i, line 121):
+Goal Assertion 'Last_i' (file tests/wp_typed/user_init.i, line 123):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns 'lack,Zone_i' (1/3):
+Goal Loop assigns 'tactic,Zone_i' (1/3):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns 'lack,Zone_i' (2/3):
-Effect at line 109
+Goal Loop assigns 'tactic,Zone_i' (2/3):
+Effect at line 111
 Assume {
   Have: 0 <= i.
   Have: i <= 9.
-  Type: is_uint32(i_2).
+  Type: IsArray1_sint32(v) /\ is_uint32(i_2) /\ is_sint32(v_1) /\
+      IsArray1_sint32(t2_0[i_2]).
   (* Goal *)
   When: (0 <= i_3) /\ (0 <= i_4) /\ (i_3 <= 9) /\ (i_4 <= 19).
-  (* Loop assigns 'lack,Zone_i' *)
+  (* Loop assigns 'tactic,Zone_i' *)
   Have: forall i_6,i_5 : Z. ((0 <= i_5) -> ((0 <= i_6) -> ((i_6 <= 9) ->
       ((i_5 <= 19) -> (((i_6 < 0) \/ (10 <= i_6)) ->
-      (t2_0[i_6][i_5] = t2_1[i_6][i_5])))))).
-  (* Invariant 'lack,Partial_i' *)
-  Have: forall i_6,i_5 : Z. ((0 <= i_5) -> ((0 <= i_6) -> ((i_6 < i_2) ->
-      ((i_5 <= 19) -> (t2_1[i_6][i_5] = v))))).
+      (t2_1[i_6][i_5] = t2_0[i_6][i_5])))))).
+  (* Invariant 'Partial_i' *)
+  Have: forall i_5 : Z. ((0 <= i_5) -> ((i_5 < i_2) ->
+      P_MemSet20(t2_0[i_5], 20, v_1))).
   (* Invariant 'Range_i' *)
   Have: (0 <= i_2) /\ (i_2 <= 10).
   (* Then *)
   Have: i_2 <= 9.
   (* Invariant 'Partial_j' *)
-  Have: forall i_5 : Z. ((0 <= i_5) -> ((i_5 <= 19) -> (v_1[i_5] = v))).
+  Have: P_MemSet20(v, 20, v_1).
 }
 Prove: exists i_6,i_5 : Z. (i_6 <= i) /\ (i_5 <= i_1) /\ (i_1 <= i_5) /\
     (0 <= i_6) /\ (i <= i_6) /\ (i_6 <= 9).
 
 ------------------------------------------------------------
 
-Goal Loop assigns 'lack,Zone_i' (3/3):
-Effect at line 115
+Goal Loop assigns 'tactic,Zone_i' (3/3):
+Effect at line 117
 Assume {
-  Type: is_uint32(i).
+  Type: IsArray1_sint32(v) /\ is_uint32(i) /\ is_sint32(v_1) /\
+      IsArray1_sint32(t2_0[i]).
   (* Goal *)
   When: (0 <= i) /\ (0 <= i_1) /\ (i <= 9) /\ (i_1 <= 19).
-  (* Loop assigns 'lack,Zone_i' *)
+  (* Loop assigns 'tactic,Zone_i' *)
   Have: forall i_3,i_2 : Z. ((0 <= i_2) -> ((0 <= i_3) -> ((i_3 <= 9) ->
       ((i_2 <= 19) -> (((i_3 < 0) \/ (10 <= i_3)) ->
-      (t2_0[i_3][i_2] = t2_1[i_3][i_2])))))).
-  (* Invariant 'lack,Partial_i' *)
-  Have: forall i_3,i_2 : Z. ((0 <= i_2) -> ((0 <= i_3) -> ((i_3 < i) ->
-      ((i_2 <= 19) -> (t2_1[i_3][i_2] = v))))).
+      (t2_1[i_3][i_2] = t2_0[i_3][i_2])))))).
+  (* Invariant 'Partial_i' *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      P_MemSet20(t2_0[i_2], 20, v_1))).
   (* Invariant 'Range_i' *)
   Have: i <= 10.
   (* Invariant 'Partial_j' *)
-  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 19) -> (v_1[i_2] = v))).
+  Have: P_MemSet20(v, 20, v_1).
 }
 Prove: exists i_3,i_2 : Z. (i_3 <= i) /\ (i_2 <= i_1) /\ (i_1 <= i_2) /\
     (0 <= i_3) /\ (i <= i_3) /\ (i_3 <= 9).
 
 ------------------------------------------------------------
 
-Goal Loop assigns 'lack,Zone_j' (1/2):
+Goal Loop assigns 'tactic,Zone_j' (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns 'lack,Zone_j' (2/2):
-Effect at line 115
+Goal Loop assigns 'tactic,Zone_j' (2/2):
+Effect at line 117
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns 'lack' in 'init_t2_v3' (1/2):
-Effect at line 109
+Goal Assigns 'tactic' in 'init_t2_v3' (1/2):
+Effect at line 111
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns 'lack' in 'init_t2_v3' (2/2):
-Effect at line 109
+Goal Assigns 'tactic' in 'init_t2_v3' (2/2):
+Effect at line 111
 Assume {
   Have: 0 <= i_2.
   Have: 0 <= i_3.
@@ -1968,7 +1989,7 @@ Assume {
   Have: i_3 <= 19.
   Have: 0 <= i.
   Have: i <= 9.
-  (* Loop assigns 'lack,Zone_i' *)
+  (* Loop assigns 'tactic,Zone_i' *)
   Have: forall i_5,i_4 : Z. ((0 <= i_4) -> ((0 <= i_5) -> ((i_5 <= 9) ->
       ((i_4 <= 19) -> (((i_5 < 0) \/ (10 <= i_5)) ->
       (t2_0[i_5][i_4] = t2_1[i_5][i_4])))))).
@@ -1978,48 +1999,50 @@ Prove: exists i_5,i_4 : Z. (i_5 <= i) /\ (i_4 <= i_1) /\ (i_1 <= i_4) /\
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file tests/wp_typed/user_init.i, line 109):
+Goal Decreasing of Loop variant at loop (file tests/wp_typed/user_init.i, line 111):
 Assume {
-  Type: is_uint32(i).
-  (* Loop assigns 'lack,Zone_i' *)
+  Type: IsArray1_sint32(v) /\ is_uint32(i) /\ is_sint32(v_1) /\
+      IsArray1_sint32(t2_0[i]).
+  (* Loop assigns 'tactic,Zone_i' *)
   Have: forall i_2,i_1 : Z. ((0 <= i_1) -> ((0 <= i_2) -> ((i_2 <= 9) ->
       ((i_1 <= 19) -> (((i_2 < 0) \/ (10 <= i_2)) ->
-      (t2_0[i_2][i_1] = t2_1[i_2][i_1])))))).
-  (* Invariant 'lack,Partial_i' *)
-  Have: forall i_2,i_1 : Z. ((0 <= i_1) -> ((0 <= i_2) -> ((i_2 < i) ->
-      ((i_1 <= 19) -> (t2_1[i_2][i_1] = v))))).
+      (t2_1[i_2][i_1] = t2_0[i_2][i_1])))))).
+  (* Invariant 'Partial_i' *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      P_MemSet20(t2_0[i_1], 20, v_1))).
   (* Invariant 'Range_i' *)
   Have: (0 <= i) /\ (i <= 10).
   (* Then *)
   Have: i <= 9.
   (* Invariant 'Partial_j' *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 19) -> (v_1[i_1] = v))).
+  Have: P_MemSet20(v, 20, v_1).
 }
 Prove: i < to_uint32(1 + i).
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file tests/wp_typed/user_init.i, line 109):
+Goal Positivity of Loop variant at loop (file tests/wp_typed/user_init.i, line 111):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file tests/wp_typed/user_init.i, line 115):
+Goal Decreasing of Loop variant at loop (file tests/wp_typed/user_init.i, line 117):
 Assume {
-  Type: is_uint32(i) /\ is_uint32(j).
-  (* Loop assigns 'lack,Zone_i' *)
+  Type: IsArray1_sint32(v) /\ is_uint32(i) /\ is_uint32(j) /\
+      is_sint32(v_1) /\ IsArray1_sint32(t2_0[i]).
+  (* Loop assigns 'tactic,Zone_i' *)
   Have: forall i_2,i_1 : Z. ((0 <= i_1) -> ((0 <= i_2) -> ((i_2 <= 9) ->
       ((i_1 <= 19) -> (((i_2 < 0) \/ (10 <= i_2)) ->
-      (t2_0[i_2][i_1] = t2_1[i_2][i_1])))))).
-  (* Invariant 'lack,Partial_i' *)
-  Have: forall i_2,i_1 : Z. ((0 <= i_1) -> ((0 <= i_2) -> ((i_2 < i) ->
-      ((i_1 <= 19) -> (t2_1[i_2][i_1] = v))))).
+      (t2_1[i_2][i_1] = t2_0[i_2][i_1])))))).
+  (* Invariant 'Partial_i' *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      P_MemSet20(t2_0[i_1], 20, v_1))).
   (* Invariant 'Range_i' *)
   Have: (0 <= i) /\ (i <= 10).
   (* Then *)
   Have: i <= 9.
   (* Invariant 'Partial_j' *)
-  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < j) -> (v_1[i_1] = v))).
+  Have: P_MemSet20(v, j, v_1).
   (* Invariant 'Range_j' *)
   Have: (0 <= j) /\ (j <= 20).
   (* Then *)
@@ -2029,7 +2052,7 @@ Prove: j < to_uint32(1 + j).
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file tests/wp_typed/user_init.i, line 115):
+Goal Positivity of Loop variant at loop (file tests/wp_typed/user_init.i, line 117):
 Prove: true.
 
 ------------------------------------------------------------

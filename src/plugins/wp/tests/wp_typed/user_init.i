@@ -1,7 +1,7 @@
 /* run.config_qualif
-   EXECNOW: rm -rf @PTEST_DIR@/result@PTEST_CONFIG@/@PTEST_NAME@-session/
+   EXECNOW: rm -rf @PTEST_DIR@/result@PTEST_CONFIG@/@PTEST_NAME@-session-1/
    OPT: -wp-prop=-lack,-tactic
-   OPT: -wp-prop=tactic -wp-auto=wp:split -session @PTEST_DIR@/result@PTEST_CONFIG@/@PTEST_NAME@-session/test-@PTEST_NUMBER@
+   OPT: -wp-prop=tactic -wp-auto=wp:split -session @PTEST_DIR@/result@PTEST_CONFIG@/@PTEST_NAME@-session-@PTEST_NUMBER@
    OPT: -wp-prop=lack -wp-steps 300
  */
 /*@ requires \valid(a+(0..n-1)) ;
@@ -94,22 +94,24 @@ void init_t2_v2(int v) {
   ;
 }
 //-------------------------
-/*@ ensures \forall integer k, l; 0 <= k < 10 && 0 <= l < 20  ==> t2[k][l] == v;
+//@ predicate MemSet20(int t2[20], integer n, integer v) = n <= 20 && \forall integer k ; 0 <= k < n ==> t2[k] == v;
+
+/*@ ensures \forall integer k; 0 <= k < 10 ==> MemSet20(t2[k], 20, v);
   @ exits \false;
-  @ assigns lack: t2[..][..];
+  @ assigns tactic: t2[..][..];
   */
 void init_t2_v3(int v) {
 
   unsigned i,j;
-  /*@ loop assigns   lack: Zone_i:  i, j, t2[..][..];
+  /*@ loop assigns   tactic: Zone_i:  i, j, t2[..][..];
     @ loop invariant Range_i: 0 <= i <= 10 ;
-    @ loop invariant lack: Partial_i: \forall integer k,l; 0 <= k < i && 0 <= l < 20 ==> t2[k][l] == v;
+    @ loop invariant Partial_i: \forall integer k; 0 <= k < i ==> MemSet20(t2[k], 20, v);
     @ loop variant   V_i: 10 - i ;
    */
   for(i = 0; i <= 9; i++) {
-    /*@ loop assigns   lack: Zone_j:  j, t2[i][..];
+    /*@ loop assigns   tactic: Zone_j:  j, t2[i][..];
       @ loop invariant Range_j: 0 <= j <= 20 ;
-      @ loop invariant Partial_j: \forall integer l; 0 <= l < j ==> t2[i][l] == v;
+      @ loop invariant Partial_j: MemSet20(t2[i], j, v);
       @ loop variant   Decr_j: 20 - j ;
     */
     for(j = 0; j <= 19; j++) {
@@ -141,13 +143,13 @@ void init_t2_bis_v1(int v) {
 }
 //-------------------------
 /*@ ensures \forall integer k, l; 0 <= k < 10 && 0 <= l < 20  ==> t2[k][l] == v;
-  @ assigns lack: t2[..][..];
+  @ assigns tactic: t2[..][..];
   @ exits \false;
   */
 void init_t2_bis_v2(int v) {
 
   unsigned i;
-  /*@ loop assigns   lack: Zone:  i, t2[..][..];
+  /*@ loop assigns   tactic: Zone:  i, t2[..][..];
     @ loop invariant Range: 0 <= i <= 10 ;
     @ loop invariant Partial: \forall integer k,l; 0 <= k < i && 0 <= l < 20 ==> t2[k][l] == v;
     @ loop variant   Decr: 10 - i ;
