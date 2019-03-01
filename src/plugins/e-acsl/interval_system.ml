@@ -60,7 +60,7 @@ module Ivar =
   end)
 
 (**************************************************************************)
-(***************************** Solver *************************************)
+(***************************** Helpers ************************************)
 (**************************************************************************)
 
 exception Not_an_integer
@@ -135,6 +135,10 @@ let interv_of_typ_containing_interv i =
     (* infinity *)
     Ival.inject_range None None
 
+(**************************************************************************)
+(***************************** Solver *************************************)
+(**************************************************************************)
+
 (* Build the system of interval equations for the logic function called
   through [t].
   Example: the following function:
@@ -149,96 +153,72 @@ let interv_of_typ_containing_interv i =
   and Z the for the f(Z) (from long-1, long-2 and long-3) *)
 let build ~infer t =
   let rec aux ieqs ivars t = match t.term_node with
-  | Tapp(li, _, args) ->
-    if li.l_type = Some Linteger && is_recursive li then begin
-      let args_lty = List.map2
-        (fun lv arg ->
-          try
-            (* speed-up convergence; because of this approximation, no need to
-               associate [i] to [lv] in [Interval.Env]: the very same interval
-               will be computed anyway. *)
-            let i = interv_of_typ_containing_interv (infer arg) in
-            Ctype (TInt(ikind_of_interv i, []))
-          with
-          | Cil.Not_representable -> Linteger
-          | Not_an_integer -> lv.lv_type)
-        li.l_profile
-        args
-      in
-      (* x *)
-      let ivar =
-        { iv_name = li.l_var_info.lv_name; iv_types = args_lty }
-      in
-      (* Adding x = g(x) if it is not yet in the system of equations.
-        Without this check, the algorithm would not terminate. *)
-      let ieqs, ivars =
-        if List.exists (fun ivar' -> Ivar.equal ivar ivar') ivars
-        then ieqs, ivars
-        else
-          let (iexp:ival_exp), ieqs, ivars =
-            aux ieqs (ivar :: ivars) (Misc.term_of_li li)
-          in
-          (* Adding x = g(x) *)
-          let ieqs = Ivar.Map.add ivar iexp ieqs in
-          ieqs, ivars
-      in
-      Ivar ivar, ieqs, ivars
-    end else
+    | Tapp(li, _, args) ->
+      if li.l_type = Some Linteger && is_recursive li then begin
+        let args_lty =
+          List.map2
+            (fun lv arg ->
+               try
+                 (* speed-up convergence; because of this approximation, no need
+                    to associate [i] to [lv] in [Interval.Env]: the very same
+                    interval will be computed anyway. *)
+                 let i = interv_of_typ_containing_interv (infer arg) in
+                 Ctype (TInt(ikind_of_interv i, []))
+               with
+               | Cil.Not_representable -> Linteger
+               | Not_an_integer -> lv.lv_type)
+            li.l_profile
+            args
+        in
+        let ivar = { iv_name = li.l_var_info.lv_name; iv_types = args_lty } in
+        (* Adding x = g(x) if it is not yet in the system of equations.
+           Without this check, the algorithm would not terminate. *)
+        let ieqs, ivars =
+          if List.exists (fun ivar' -> Ivar.equal ivar ivar') ivars
+          then ieqs, ivars
+          else
+            let iexp, ieqs, ivars =
+              aux ieqs (ivar :: ivars) (Misc.term_of_li li)
+            in
+            (* Adding x = g(x) *)
+            let ieqs = Ivar.Map.add ivar iexp ieqs in
+            ieqs, ivars
+        in
+        Ivar ivar, ieqs, ivars
+      end else begin
+        try Iconst (infer t), ieqs, ivars
+        with Not_an_integer -> Iunsupported, ieqs, ivars
+      end
+    | TConst _ ->
       (try Iconst(infer t), ieqs, ivars
-      with Not_an_integer -> Iunsupported, ieqs, ivars)
-  | TConst _ ->
-    (try Iconst(infer t), ieqs, ivars
-    with Not_an_integer -> Iunsupported, ieqs, ivars)
-  | TLval(TVar _, _) ->
-    (try Iconst(infer t), ieqs, ivars
-    with Not_an_integer -> Iunsupported, ieqs, ivars)
-  | TBinOp (PlusA, t1, t2) ->
-    let iexp1, ieqs, ivars = aux ieqs ivars t1 in
-    let iexp2, ieqs, ivars = aux ieqs ivars t2 in
-    Ibinop(Ival_add, iexp1, iexp2), ieqs, ivars
-  | TBinOp (MinusA, t1, t2) ->
-    let iexp1, ieqs, ivars = aux ieqs ivars t1 in
-    let iexp2, ieqs, ivars = aux ieqs ivars t2 in
-    Ibinop(Ival_min, iexp1, iexp2), ieqs, ivars
-  | TBinOp (Mult, t1, t2) ->
-    let iexp1, ieqs, ivars = aux ieqs ivars t1 in
-    let iexp2, ieqs, ivars = aux ieqs ivars t2 in
-    Ibinop(Ival_mul, iexp1, iexp2), ieqs, ivars
-  | TBinOp (Div, t1, t2) ->
-    let iexp1, ieqs, ivars = aux ieqs ivars t1 in
-    let iexp2, ieqs, ivars = aux ieqs ivars t2 in
-    Ibinop(Ival_div, iexp1, iexp2), ieqs, ivars
-  | Tif(_, t1, t2) ->
-    let iexp1, ieqs, ivars = aux ieqs ivars t1 in
-    let iexp2, ieqs, ivars = aux ieqs ivars t2 in
-    Ibinop(Ival_union, iexp1, iexp2), ieqs, ivars
-  | _ ->
-    Iunsupported, ieqs, ivars
+       with Not_an_integer -> Iunsupported, ieqs, ivars)
+    | TLval(TVar _, _) ->
+      (try Iconst(infer t), ieqs, ivars
+       with Not_an_integer -> Iunsupported, ieqs, ivars)
+    | TBinOp (PlusA, t1, t2) ->
+      let iexp1, ieqs, ivars = aux ieqs ivars t1 in
+      let iexp2, ieqs, ivars = aux ieqs ivars t2 in
+      Ibinop(Ival_add, iexp1, iexp2), ieqs, ivars
+    | TBinOp (MinusA, t1, t2) ->
+      let iexp1, ieqs, ivars = aux ieqs ivars t1 in
+      let iexp2, ieqs, ivars = aux ieqs ivars t2 in
+      Ibinop(Ival_min, iexp1, iexp2), ieqs, ivars
+    | TBinOp (Mult, t1, t2) ->
+      let iexp1, ieqs, ivars = aux ieqs ivars t1 in
+      let iexp2, ieqs, ivars = aux ieqs ivars t2 in
+      Ibinop(Ival_mul, iexp1, iexp2), ieqs, ivars
+    | TBinOp (Div, t1, t2) ->
+      let iexp1, ieqs, ivars = aux ieqs ivars t1 in
+      let iexp2, ieqs, ivars = aux ieqs ivars t2 in
+      Ibinop(Ival_div, iexp1, iexp2), ieqs, ivars
+    | Tif(_, t1, t2) ->
+      let iexp1, ieqs, ivars = aux ieqs ivars t1 in
+      let iexp2, ieqs, ivars = aux ieqs ivars t2 in
+      Ibinop(Ival_union, iexp1, iexp2), ieqs, ivars
+    | _ ->
+      Iunsupported, ieqs, ivars
   in
   aux Ivar.Map.empty [] t
-
-(* Normalize the expression.
-  An expression is said to be normalized if it is:
-    - either Iunsupported
-    - or an expression that contains no Iunsupported *)
-let normalize_iexp iexp =
-  let rec has_unsupported iexp = match iexp with
-    | Iunsupported | Ibinop(_, Iunsupported, _) | Ibinop(_, _, Iunsupported) ->
-      true
-    | Ibinop(_, (Iconst _ | Ivar _), (Iconst _ | Ivar _))
-    | Iconst _ | Ivar _ ->
-      false
-    | Ibinop(_, iexp1, iexp2) ->
-      has_unsupported iexp1 || has_unsupported iexp2
-  in
-  if has_unsupported iexp then Iunsupported else iexp
-
-let normalize_ieqs ieqs =
-  Ivar.Map.map (fun iexp -> normalize_iexp iexp) ieqs
-
-let get_ival_of_iconst ieqs ivar = match Ivar.Map.find ieqs ivar with
-  | Iconst i -> i
-  | Ivar _ | Ibinop _| Iunsupported -> Options.fatal "not an Iconst"
 
 (*************************************************************************)
 (******************************** Solver *********************************)
@@ -277,7 +257,7 @@ let iterate indexes max =
       [-chain_of_ivalmax.(index), chain_of_ivalmax.(index)]
     - a variable that is associated to an index [index] equaling [max] will
       be given the whole interval of integers [Z]. *)
-let to_iconsts indexes ieqs chain_of_ivalmax =
+let to_iconsts chain_of_ivalmax indexes ieqs: Ival.t Ivar.Map.t =
   let max = Array.length chain_of_ivalmax in
   let indexes_i = ref 0 in
   Ivar.Map.map
@@ -293,73 +273,48 @@ let to_iconsts indexes ieqs chain_of_ivalmax =
           assert false
       in
       indexes_i := !indexes_i + 1;
-      Iconst ival)
+      ival)
     ieqs
 
-(* Assumes [iexp] to be a normalized [ival_exp] and evaluates it when each of
-  its variable is replaced by the corresponding interval from [iconsts]. *)
-let rec eval_iexp iexp iconsts =
-  match iexp with
-  | Iunsupported ->
-    Iconst (Ival.inject_range None None)
-  | Iconst _ ->
-    iexp
-  | Ivar iv ->
-    Ivar.Map.find iv iconsts
-  | Ibinop(_, Iunsupported, _) | Ibinop(_, _, Iunsupported) ->
-    assert false (* because [iexp] has been normalized *)
+let rec eval_iexp env = function
+  | Iunsupported | Ibinop(_, Iunsupported, _) | Ibinop(_, _, Iunsupported) ->
+    Ival.inject_range None None
+  | Iconst i -> i
+  | Ivar iv -> Ivar.Map.find iv env
   | Ibinop(ibinop, iexp1, iexp2) ->
-    let i1 = match eval_iexp iexp1 iconsts with
-      | Iconst i -> i
-      | Iunsupported | Ivar _ | Ibinop _ -> assert false
-    in
-    let i2 = match eval_iexp iexp2 iconsts with
-      | Iconst i -> i
-      | Iunsupported | Ivar _ | Ibinop _ -> assert false
-    in
+    let i1 = eval_iexp env iexp1 in
+    let i2 = eval_iexp env iexp2 in
     match ibinop with
-      | Ival_add -> Iconst (Ival.add_int i1 i2)
-      | Ival_min -> Iconst (Ival.sub_int i1 i2)
-      | Ival_mul -> Iconst (Ival.mul i1 i2)
-      | Ival_div -> Iconst (Ival.div i1 i2)
-      | Ival_union -> Iconst (Ival.join i1 i2)
+    | Ival_add -> Ival.add_int i1 i2
+    | Ival_min -> Ival.sub_int i1 i2
+    | Ival_mul -> Ival.mul i1 i2
+    | Ival_div -> Ival.div i1 i2
+    | Ival_union -> Ival.join i1 i2
 
-let equal_iconst iconst1 iconst2 =
-  let i1 = match iconst1 with
-    | Iconst i -> i
-    | Iunsupported | Ivar _ | Ibinop _ -> assert false
-  in
-  let i2 = match iconst2 with
-    | Iconst i -> i
-    | Iunsupported | Ivar _ | Ibinop _ -> assert false
-  in
-  Ival.is_included i1 i2
-
-let is_post_fixpoint ieqs iconsts =
+let is_post_fixpoint ieqs env =
   Ivar.Map.for_all
     (fun ivar iexp ->
-       let iconst1 = eval_iexp iexp iconsts in
-       let iconst2 = Ivar.Map.find ivar iconsts in
-       equal_iconst iconst1 iconst2)
+       let i1 = eval_iexp env iexp in
+       let i2 = Ivar.Map.find ivar env in
+       Ival.is_included i1 i2)
     ieqs
 
-let rec iterate_till_post_fixpoint ieqs indexes chain_of_ivalmax =
-  let iconsts = to_iconsts indexes ieqs chain_of_ivalmax in
+let rec iterate_till_post_fixpoint chain_of_ivalmax indexes ieqs =
+  let iconsts = to_iconsts chain_of_ivalmax indexes ieqs in
   if is_post_fixpoint ieqs iconsts then
     iconsts
   else
     let index_max = Array.length chain_of_ivalmax in
     iterate indexes index_max;
-    iterate_till_post_fixpoint ieqs indexes chain_of_ivalmax
+    iterate_till_post_fixpoint chain_of_ivalmax indexes ieqs
 
-let solve ieqs ivar chain_of_ivalmax =
-  let ieqs = normalize_ieqs ieqs in
+let solve chain_of_ivalmax ivar ieqs =
   let dim = Ivar.Map.cardinal ieqs in
   let bottom = Array.make dim 0 in
   let post_fixpoint =
-    iterate_till_post_fixpoint ieqs bottom chain_of_ivalmax
+    iterate_till_post_fixpoint chain_of_ivalmax bottom ieqs
   in
-  get_ival_of_iconst ivar post_fixpoint
+  Ivar.Map.find ivar post_fixpoint
 
 let build_and_solve ~infer t =
   (* 1) Build a system of interval equations that constrain the solution: do so
@@ -373,7 +328,7 @@ let build_and_solve ~infer t =
 
      TODO: I do not understand the remark above. The interval of a C global
      variable is computed from its type. *)
-  let iexp, ieqs, _ = build ~infer t in
+  let iexp, ieqs, _ivars = build ~infer t in
   (*  2) Solve it:
       The problem is probably undecidable in the general case.
       Thus we just look for reasonably precise approximations
@@ -386,5 +341,6 @@ let build_and_solve ~infer t =
        but it works fine for now. *)
   in
   match iexp with
-  | Ivar ivar -> solve ieqs ivar chain_of_ivalmax
+  | Ivar ivar -> solve chain_of_ivalmax ivar ieqs
   | Iconst _ | Ibinop _ | Iunsupported -> assert false
+    (* TODO: check this assert false carefully *)
