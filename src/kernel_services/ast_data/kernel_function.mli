@@ -127,6 +127,14 @@ val find_syntactic_callsites : t -> (t * stmt) list
       [stmt].
       @since Carbon-20110201 *)
 
+val var_is_in_scope: stmt -> varinfo -> bool
+  (** [var_is_in_scope kf stmt vi] returns [true] iff the local variable [vi]
+      is syntactically visible from statement [stmt] in function [kf]. Note
+      that on the contrary to {!Globals.Syntactic_search.find_in_scope}, the
+      variable is searched according to its [vid], not its [vorig_name].
+
+      @since Frama-C+dev *)
+
 (* ************************************************************************* *)
 (** {2 Checkers} *)
 (* ************************************************************************* *)

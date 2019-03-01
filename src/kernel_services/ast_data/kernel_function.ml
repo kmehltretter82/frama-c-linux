@@ -425,6 +425,12 @@ let find_syntactic_callsites kf =
   try CallSites.find table kf
   with Not_found -> []
 
+let var_is_in_scope stmt vi =
+  let blocks = find_all_enclosing_blocks stmt in
+  List.exists
+    (fun b -> List.exists (Cil_datatype.Varinfo.equal vi) b.blocals)
+    blocks
+
 (* ************************************************************************* *)
 (** {2 Checkers} *)
 (* ************************************************************************* *)
