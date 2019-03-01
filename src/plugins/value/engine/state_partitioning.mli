@@ -38,7 +38,8 @@ sig
   val merge : Cil_types.stmt -> bool
   val unroll : loop -> Partition.unroll_limit
   val history_size : int
-  val universal_splits : Cil_types.exp list
+  val split_limit : int
+  val universal_splits : Partition.action list
   val flow_actions : Cil_types.stmt -> Partition.action list
 end
 

@@ -88,6 +88,7 @@ module MinLoopUnroll : Parameter_sig.Int
 module DefaultLoopUnroll : Parameter_sig.Int
 module HistoryPartitioning : Parameter_sig.Int
 module ValuePartitioning : Parameter_sig.String_set
+module SplitLimit : Parameter_sig.Int
 
 module ArrayPrecisionLevel: Parameter_sig.Int
 

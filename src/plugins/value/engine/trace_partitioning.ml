@@ -112,12 +112,9 @@ struct
     }
 
   let initial_tank (states : state list) : tank =
-    let propagation = Flow.initial states in
+    let flow = Flow.initial states in
     (* Split the initial partition according to the global split seetings *)
-    let split propagation lval =
-      Flow.transfer_keys propagation (Dynamic_split lval)
-    in
-    let states = List.fold_left split propagation universal_splits in
+    let states = List.fold_left Flow.transfer_keys flow universal_splits in
     { tank_states = Flow.to_partition states }
 
 

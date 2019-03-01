@@ -53,7 +53,8 @@ module type S = sig
 
   exception Operation_failed
 
-  val split_by_value: state -> exp -> (Integer.t * state) list
+  val split_by_value: monitor:Partition.split_monitor ->
+    state -> exp -> (Integer.t * state) list
   val eval_exp_to_int: state -> exp -> int
 
   type call_result = {

@@ -41,7 +41,8 @@ module type S = sig
     unit or_bottom
   val enter_scope: kernel_function -> varinfo list -> state -> state
   exception Operation_failed
-  val split_by_value: state -> exp -> (Integer.t * state) list
+  val split_by_value: monitor:Partition.split_monitor ->
+    state -> exp -> (Integer.t * state) list
   val eval_exp_to_int: state -> exp -> int
   type call_result = {
     states: state list or_bottom;
@@ -883,49 +884,88 @@ module Make (Abstract: Abstractions.Eva) = struct
   exception Operation_failed
 
   let fail ~exp message =
-    Value_parameters.warning ~source:(fst exp.eloc) ~once:true message;
-    raise Operation_failed
+    let warn_and_raise message =
+      Value_parameters.warning ~source:(fst exp.eloc) ~once:true "%s" message;
+      raise Operation_failed
+    in
+    Pretty_utils.ksfprintf warn_and_raise message
 
-  let evaluate_exp_to_ival state exp =
+  let evaluate_exp_to_ival ?valuation state exp =
     (* Evaluate the expression *)
-    let valuation, value = match Eval.evaluate ~reduction:false state exp with
+    let valuation, value =
+      match Eval.evaluate ?valuation ~reduction:false state exp with
       | `Value (valuation, value), alarms when Alarmset.is_empty alarms ->
         valuation, value
       | _ ->
-        fail ~exp "this partitioning parameter cannot be evaluated safely on all states"
+        fail ~exp "this partitioning parameter cannot be evaluated safely on \
+                   all states"
     in
     (* Get the cvalue *)
     let cvalue = match Value.get Main_values.cvalue_key with
       | Some get_cvalue -> get_cvalue value
-      | None -> fail ~exp "partitioning is disabled when the CValue domain is not active"
+      | None -> fail ~exp "partitioning is disabled when the CValue domain is \
+                           not active"
     in
     (* Extract the ival *)
     let ival =
       try
         Cvalue.V.project_ival cvalue
       with Cvalue.V.Not_based_on_null ->
-        fail ~exp "this partitioning parameter must evaluate to an integer"
+        fail ~exp "this partitioning parameter must evaluatassumee to an integer"
     in
     valuation, ival
 
-  let split_by_value state exp =
+  exception Split_limit of Integer.t option
+
+  let split_by_value ~monitor state exp =
+    let module SplitValues = Datatype.Integer.Set in
     let valuation, ival = evaluate_exp_to_ival state exp in
     (* Build a state with the lvalue set to a singleton *)
     let build i acc =
       let value = Value.inject_int (Cil.typeOf exp) i in
       match Eval.assume ~valuation state exp value with
       | `Value valuation ->
-        (i, TF.update valuation state) :: acc
+        (* Check the reduction *)
+        let state = TF.update valuation state in
+        let _,new_ival = evaluate_exp_to_ival ~valuation state exp in
+        if not (Ival.is_singleton_int new_ival) then
+          fail ~exp "failing to learn perfectly from split" ;
+        monitor.Partition.split_values <-
+          SplitValues.add i monitor.Partition.split_values;
+        (i, state) :: acc
       | _ -> (* This value cannot be set in the state ; the evaluation of
                 expr was unprecise *)
         acc
     in
-    (* For each integer of the ival, build a new state *)
-    begin try
-        Ival.fold_int build ival []
-      with Abstract_interp.Error_Top ->
-        fail ~exp "too many values to partition by value on"
-    end
+    try
+      (* Check the size of the ival *)
+      begin match Ival.cardinal ival with
+        | None -> raise (Split_limit None)
+        | Some c as count ->
+          if Integer.(gt c (of_int monitor.Partition.split_limit)) then
+            raise (Split_limit count)
+      end;
+      (* For each integer of the ival, build a new state *)
+      try
+        let result = Ival.fold_int build ival [] in
+        let c = SplitValues.cardinal monitor.Partition.split_values in
+        if c > monitor.Partition.split_limit then
+          raise (Split_limit (Some (Integer.of_int c)));
+        result
+      with Abstract_interp.Error_Top -> (* The ival is float *)
+        raise (Split_limit None)
+    with
+    | Split_limit count ->
+      let pp_count fmt =
+        match count with
+        | None -> ()
+        | Some c -> Format.fprintf fmt " (%a)" (Integer.pretty ~hexa:false) c
+      in
+      fail ~exp "split on more than %d values%t prevented ; try to improve \
+                 the analysis precision or look at the option -eva-split-limit \
+                 to increase this limit."
+        monitor.Partition.split_limit pp_count
+
 
   let eval_exp_to_int state exp =
     let _valuation, ival = evaluate_exp_to_ival state exp in

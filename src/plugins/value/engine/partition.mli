@@ -20,6 +20,16 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* Split monitor : prevents splits from generating too many states *)
+
+type split_monitor = {
+  split_limit : int;
+  mutable split_values : Datatype.Integer.Set.t;
+}
+
+val new_monitor : split_limit:int -> split_monitor
+
+
 (*  A state partition is a collection of states, each of which is identified
     by a unique key. The key identifies the reason for which we want to keep
     the state separate from the others. The partitioning method will involve
@@ -63,9 +73,16 @@ type key = private {
   ration_stamp : (int * int) option; (* store stamp / transfer stamp *)
   branches : branch list;
   loops : (int * int) list; (* current iteration / max unrolling *)
-  static_split : Integer.t ExpMap.t;
-  dynamic_split : Integer.t ExpMap.t;
+  static_split : (Integer.t * split_monitor) ExpMap.t; (* exp->value*monitor *)
+  dynamic_split : (Integer.t * split_monitor) ExpMap.t; (* exp->value*monitor *)
 }
+
+module Key : sig
+  type t = key
+  val zero : t
+  val compare : t -> t -> int
+  val pretty : Format.formatter -> t -> unit
+end
 
 type 'a partition
 
@@ -83,7 +100,6 @@ val map : ('a  -> 'a) -> 'a partition -> 'a partition
 val map_filter : (key -> 'a -> 'b option) -> 'a partition -> 'b partition
 
 
-
 (* Partitioning actions *)
 
 type 'a transfer_function = (key * 'a) list -> (key * 'a) list
@@ -99,8 +115,8 @@ type action =
   | Branch of branch * int (* branch taken, max branches in history *)
   | Ration of int (* starting ration stamp *)
   | Ration_merge of (int * int) option (* new ration stamp for the merge state *)
-  | Static_split of Cil_types.exp
-  | Dynamic_split of Cil_types.exp
+  | Static_split of (Cil_types.exp * split_monitor)
+  | Dynamic_split of (Cil_types.exp * split_monitor)
   | Static_merge of Cil_types.exp
   | Dynamic_merge of Cil_types.exp
   | Update_dynamic_splits
@@ -117,7 +133,8 @@ sig
   exception Operation_failed
 
   val join : t -> t -> t
-  val split : t -> Cil_types.exp -> (Integer.t * t) list
+  val split : monitor:split_monitor ->
+    t -> Cil_types.exp -> (Integer.t * t) list
   val eval_exp_to_int : t -> Cil_types.exp -> int
 end
 

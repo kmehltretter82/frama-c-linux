@@ -104,11 +104,14 @@ struct
 
   let history_size = HistoryPartitioning.get ()
 
+  let split_limit = SplitLimit.get ()
+
   let universal_splits =
     let add name l =
       try
         let vi = Globals.Vars.find_from_astinfo name VGlobal in
-        Cil.evar vi :: l
+        let m = Partition.new_monitor split_limit in
+        Partition.Dynamic_split (Cil.evar vi, m) :: l
       with Not_found ->
         warn ~current:false "cannot find the global variable %s for value \
                              partitioning" name;
@@ -119,8 +122,9 @@ struct
   let flow_actions stmt =
     let map_annot acc t =
       try
+        let m = Partition.new_monitor split_limit in
         match t with
-        | FlowSplit t -> Partition.Static_split (term_to_exp t) :: acc
+        | FlowSplit t -> Partition.Static_split (term_to_exp t,m) :: acc
         | FlowMerge t -> Partition.Static_merge (term_to_exp t) :: acc
       with
         Db.Properties.Interp.No_conversion ->

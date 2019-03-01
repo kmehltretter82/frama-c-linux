@@ -20,6 +20,19 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* --- Split monitors --- *)
+
+type split_monitor = {
+  split_limit : int;
+  mutable split_values : Datatype.Integer.Set.t;
+}
+
+let new_monitor ~split_limit = {
+  split_limit;
+  split_values = Datatype.Integer.Set.empty;
+}
+
+
 (* --- Keys --- *)
 
 module ExpMap = Cil_datatype.ExpStructEq.Map
@@ -33,8 +46,8 @@ type key = {
   ration_stamp : (int * int) option;
   branches : branch list;
   loops : (int * int) list;
-  static_split : Integer.t ExpMap.t;
-  dynamic_split : Integer.t ExpMap.t;
+  static_split : (Integer.t*split_monitor) ExpMap.t;
+  dynamic_split : (Integer.t*split_monitor) ExpMap.t;
 }
 
 module Key =
@@ -54,10 +67,13 @@ struct
     let (<?>) c (cmp,x,y) =
       if c = 0 then cmp x y else c
     in
+    let compare_split (i1,_m1) (i2,_m2) =
+      Integer.compare i1 i2
+    in
     Extlib.opt_compare IntPair.compare k1.ration_stamp k2.ration_stamp
     <?> (LoopList.compare, k1.loops, k2.loops)
-    <?> (ExpMap.compare Integer.compare, k1.static_split, k2.static_split)
-    <?> (ExpMap.compare Integer.compare, k1.dynamic_split, k2.dynamic_split)
+    <?> (ExpMap.compare compare_split, k1.static_split, k2.static_split)
+    <?> (ExpMap.compare compare_split, k1.dynamic_split, k2.dynamic_split)
     <?> (BranchList.compare, k1.branches, k2.branches)
 
   let pretty fmt key =
@@ -74,7 +90,7 @@ struct
       fmt
       key.loops;
     Pretty_utils.pp_list ~pre:"{@[" ~sep:" ;@ " ~suf:"@]}"
-      (fun fmt (e,i) -> Format.fprintf fmt "%a:%a"
+      (fun fmt (e,(i,_m)) -> Format.fprintf fmt "%a:%a"
           Cil_printer.pp_exp e
           (Integer.pretty ~hexa:false) i)
       fmt
@@ -123,8 +139,8 @@ type action =
   | Branch of branch * int
   | Ration of int
   | Ration_merge of (int*int) option
-  | Static_split of Cil_types.exp
-  | Dynamic_split of Cil_types.exp
+  | Static_split of (Cil_types.exp * split_monitor)
+  | Dynamic_split of (Cil_types.exp * split_monitor)
   | Static_merge of Cil_types.exp
   | Dynamic_merge of Cil_types.exp
   | Update_dynamic_splits
@@ -141,7 +157,8 @@ sig
   exception Operation_failed
 
   val join : t -> t -> t
-  val split : t -> Cil_types.exp -> (Integer.t * t) list
+  val split : monitor:split_monitor ->
+    t -> Cil_types.exp -> (Integer.t * t) list
   val eval_exp_to_int : t -> Cil_types.exp -> int
 end
 
@@ -182,25 +199,26 @@ struct
   let union (p1 : t) (p2 : t) : t =
     p1 @ p2
 
-  let split_state ~(static : bool) (exp : Cil_types.exp)
+  let split_state ~monitor ~(static : bool) (exp : Cil_types.exp)
       (key : key) (state : state) : (key * state) list =
     try
       let update_key (v,x) =
         let k =
+          let m = monitor in
           if static then
-            { key with static_split = ExpMap.add exp v key.static_split }
+            { key with static_split = ExpMap.add exp (v,m) key.static_split }
           else
-            { key with dynamic_split = ExpMap.add exp v key.dynamic_split }
+            { key with dynamic_split = ExpMap.add exp (v,m) key.dynamic_split }
         in
         (k,x)
       in
-      List.map update_key (Domain.split state exp)
+      List.map update_key (Domain.split ~monitor state exp)
     with Domain.Operation_failed ->
       [(key,state)]
 
-  let split ~(static : bool) (p : t) (exp : Cil_types.exp) =
+  let split ~monitor ~(static : bool) (p : t) (exp : Cil_types.exp) =
     let add_split acc (key,state) =
-      split_state ~static exp key state @ acc
+      split_state ~monitor ~static exp key state @ acc
     in
     List.fold_left add_split [] p
 
@@ -208,9 +226,11 @@ struct
     (* Update one state *)
     let update_state acc (key,state) =
       (* Split the states in the list l for the given exp *)
-      let update_exp exp _ l =
-        let static = false in
-        List.fold_left (fun l (k,x) -> split_state ~static exp k x @ l) [] l
+      let update_exp exp (_i,monitor) l =
+        let resplit acc (k,x) =
+          split_state ~monitor ~static:false exp k x @ acc
+        in
+        List.fold_left resplit [] l
       in
       (* Foreach exp in original state: split *)
       ExpMap.fold update_exp key.dynamic_split [(key,state)] @ acc
@@ -224,11 +244,11 @@ struct
     f p
 
   let transfer_keys p = function
-    | Static_split exp ->
-      split ~static:true p exp
+    | Static_split (exp,monitor) ->
+      split ~monitor ~static:true p exp
 
-    | Dynamic_split exp ->
-      split ~static:false p exp
+    | Dynamic_split (exp,monitor) ->
+      split ~monitor ~static:false p exp
 
     | Update_dynamic_splits ->
       update_dynamic_splits p

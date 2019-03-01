@@ -754,6 +754,19 @@ module ValuePartitioning =
 let () = add_precision_dep ValuePartitioning.parameter
 
 let () = Parameter_customize.set_group precision_tuning
+module SplitLimit =
+  Int
+    (struct
+      let option_name = "-eva-split-limit"
+      let arg_name = "N"
+      let default = 100
+      let help = "prevents the split annotations or -eva-partition-value to \
+                  enumerate more than N cases"
+    end)
+let () = add_precision_dep SplitLimit.parameter
+let () = SplitLimit.set_range 0 max_int
+
+let () = Parameter_customize.set_group precision_tuning
 let () = Parameter_customize.argument_may_be_fundecl ()
 module SplitReturnFunction =
   Kernel_function_map
