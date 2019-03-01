@@ -347,6 +347,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       Value_parameters.feedback "done for function %a" Kernel_function.pretty kf;
       post_analysis ();
       Abstract.Dom.post_analysis final_state;
+      Value_results.print_summary ();
     with
     | Db.Value.Aborted ->
       post_analysis_cleanup ~aborted:true;

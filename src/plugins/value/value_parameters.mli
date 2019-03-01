@@ -166,6 +166,7 @@ val parameters_abstractions: Typed_parameter.t list
     -value-msg-key="-initial_state,-final_state" *)
 val dkey_initial_state : category
 val dkey_final_states : category
+val dkey_summary : category
 
 (** Warning category used when emitting an alarm in "warning" mode. *)
 val wkey_alarm: warn_category
