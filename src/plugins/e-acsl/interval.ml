@@ -191,7 +191,7 @@ let rec infer t =
       | LBterm t' ->
         (* TODO: should not be necessary to distinguish the recursive case.
            Stack overflow if not distingued *)
-        if Misc.is_recursive li then
+        if Interval_system.is_recursive li then
           Interval_system.build_and_solve ~infer t
         else begin (* non-recursive case *)
           (* add the arguments to the context *)

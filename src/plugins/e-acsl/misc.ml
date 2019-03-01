@@ -315,43 +315,6 @@ let finite_min_and_max i = match Ival.min_and_max i with
   | Some min, Some max -> min, max
   | None, _ | _, None -> assert false
 
-let is_recursive li =
-  match li.l_body with
-  | LBpred _ | LBnone | LBreads _ | LBinductive _ -> false
-  | LBterm t ->
-    let rec has_recursive_call t = match t.term_node with
-    | TConst _ | TLval _ | TSizeOf _ | TSizeOfStr _ | TAlignOf _
-    | Tnull | TAddrOf _ | TStartOf _ | Tempty_set | Ttypeof _
-    | Ttype _->
-      false
-    | Tapp(li', _, ts) ->
-      if li.l_var_info.lv_name = li'.l_var_info.lv_name then true
-      else List.fold_left (fun b t -> b || has_recursive_call t) false ts
-    | TUnOp(_, t) | TSizeOfE t | TCastE(_, t) | Tat(t, _) | Tlambda(_, t)
-    | Toffset(_, t) | Tbase_addr(_, t) | TAlignOfE t | Tblock_length(_, t)
-    | TLogic_coerce(_, t) | TCoerce(t, _) | Tcomprehension(t, _, _)
-    | Tlet(_, t) ->
-      has_recursive_call t
-    | TBinOp(_, t1, t2) | TCoerceE(t1, t2) | TUpdate(t1, _, t2) ->
-      has_recursive_call t1 || has_recursive_call t2
-    | Trange(t1_opt, t2_opt) ->
-      begin match t1_opt with
-      | None -> begin match t2_opt with
-        | None -> false
-        | Some t2 -> has_recursive_call t2
-        end
-      | Some t1 -> begin match t2_opt with
-        | None -> has_recursive_call t1
-        | Some t2 -> has_recursive_call t1 || has_recursive_call t2
-        end
-      end
-    | Tif(t0, t1, t2) ->
-      has_recursive_call t0 || has_recursive_call t1 || has_recursive_call t2
-    | TDataCons(_, ts) | Tunion ts | Tinter ts ->
-      List.fold_left (fun b t -> b || has_recursive_call t) false ts
-    in
-    has_recursive_call t
-
 (*
 Local Variables:
 compile-command: "make"

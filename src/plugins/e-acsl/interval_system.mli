@@ -33,6 +33,7 @@ val build_and_solve: infer:(term -> Ival.t) -> term -> Ival.t
     break mutual module dependencies *)
 
 exception Not_an_integer
+val is_recursive: logic_info -> bool
 val interv_of_typ: typ -> Ival.t
 val ikind_of_interv: Ival.t -> Cil_types.ikind
 (*/*)
