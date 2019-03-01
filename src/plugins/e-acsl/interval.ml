@@ -222,25 +222,30 @@ let rec infer t =
           (* 1) Build a system of interval equations that constrain the
                 solution: do so by returning a variable when encoutering a call
                 of a recursive function instead of performing the usual interval
-                inference BEWARE: we might be tempted to memoize the solution
-                for a given function signature HOWEVER: it cannot be done in a
-                straightforward manner due to the cases of functions that use C
-                (global) variables in their definition (as the values of those
-                variables can change between two function calls). *)
-          let ieqs = Fixpoint.Ieqs.empty in
+                inference.
+
+             BEWARE: we might be tempted to memoize the solution for a given
+             function signature HOWEVER: it cannot be done in a straightforward
+             manner due to the cases of functions that use C (global) variables
+             in their definition (as the values of those variables can change
+             between two function calls).
+
+             TODO: I do not understand the remark above. The interval of a C
+             global variable is computed from its type. *)
+          let ieqs = Interval_system_solver.Ieqs.empty in
           let ivar, ieqs, _ = build_ieqs t ieqs [] in
           (*  2) Solve it:
               The problem is probably undecidable in the general case.
               Thus we just look for reasonably precise approximations
               without being too computationally expensive:
               simply iterate over a finite set of pre-defined intervals.
-              See [Fixpoint.solve] for details. *)
+              See [Interval_system_solver.solve] for details. *)
           let chain_of_ivalmax =
             [| Integer.one; Integer.billion_one; Integer.max_int64 |]
             (* This set can be changed based on experimental evidences,
                but it works fine for now. *)
           in
-          Fixpoint.solve ieqs ivar chain_of_ivalmax
+          Interval_system_solver.solve ieqs ivar chain_of_ivalmax
         else begin (* non-recursive case *)
           (* add the arguments to the context *)
           List.iter2
@@ -359,51 +364,51 @@ and build_ieqs t ieqs ivars =
         args
       in
       (* x *)
-      let ivar = Fixpoint.Ivar(li.l_var_info.lv_name, args_lty) in
+      let ivar = Interval_system_solver.Ivar(li.l_var_info.lv_name, args_lty) in
       (* Adding x = g(x) if it is not yet in the system of equations.
         Without this check, the algorithm would not terminate. *)
       let ieqs, ivars =
-        if Fixpoint.ivars_contains_ivar ivars ivar then ieqs, ivars
+        if Interval_system_solver.ivars_contains_ivar ivars ivar then ieqs, ivars
         else
           let iexp, ieqs, ivars =
             build_ieqs (Misc.term_of_li li) ieqs (ivar :: ivars)
           in
-          let ieqs = Fixpoint.Ieqs.add ivar iexp ieqs in (* Adding x = g(x) *)
+          let ieqs = Interval_system_solver.Ieqs.add ivar iexp ieqs in (* Adding x = g(x) *)
           ieqs, ivars
       in
       List.iter (fun lv -> Env.remove lv) li.l_profile;
       ivar, ieqs, ivars
     end else
-      (try Fixpoint.Iconst(infer t), ieqs, ivars
-      with Not_an_integer -> Fixpoint.Iunsupported, ieqs, ivars)
+      (try Interval_system_solver.Iconst(infer t), ieqs, ivars
+      with Not_an_integer -> Interval_system_solver.Iunsupported, ieqs, ivars)
   | TConst _ ->
-    (try Fixpoint.Iconst(infer t), ieqs, ivars
-    with Not_an_integer -> Fixpoint.Iunsupported, ieqs, ivars)
+    (try Interval_system_solver.Iconst(infer t), ieqs, ivars
+    with Not_an_integer -> Interval_system_solver.Iunsupported, ieqs, ivars)
   | TLval(TVar _, _) ->
-    (try Fixpoint.Iconst(infer t), ieqs, ivars
-    with Not_an_integer -> Fixpoint.Iunsupported, ieqs, ivars)
+    (try Interval_system_solver.Iconst(infer t), ieqs, ivars
+    with Not_an_integer -> Interval_system_solver.Iunsupported, ieqs, ivars)
   | TBinOp (PlusA, t1, t2) ->
     let iexp1, ieqs, ivars = build_ieqs t1 ieqs ivars in
     let iexp2, ieqs, ivars = build_ieqs t2 ieqs ivars in
-    Fixpoint.Ibinop(Fixpoint.Ival_add, iexp1, iexp2), ieqs, ivars
+    Interval_system_solver.Ibinop(Interval_system_solver.Ival_add, iexp1, iexp2), ieqs, ivars
   | TBinOp (MinusA, t1, t2) ->
     let iexp1, ieqs, ivars = build_ieqs t1 ieqs ivars in
     let iexp2, ieqs, ivars = build_ieqs t2 ieqs ivars in
-    Fixpoint.Ibinop(Fixpoint.Ival_min, iexp1, iexp2), ieqs, ivars
+    Interval_system_solver.Ibinop(Interval_system_solver.Ival_min, iexp1, iexp2), ieqs, ivars
   | TBinOp (Mult, t1, t2) ->
     let iexp1, ieqs, ivars = build_ieqs t1 ieqs ivars in
     let iexp2, ieqs, ivars = build_ieqs t2 ieqs ivars in
-    Fixpoint.Ibinop(Fixpoint.Ival_mul, iexp1, iexp2), ieqs, ivars
+    Interval_system_solver.Ibinop(Interval_system_solver.Ival_mul, iexp1, iexp2), ieqs, ivars
   | TBinOp (Div, t1, t2) ->
     let iexp1, ieqs, ivars = build_ieqs t1 ieqs ivars in
     let iexp2, ieqs, ivars = build_ieqs t2 ieqs ivars in
-    Fixpoint.Ibinop(Fixpoint.Ival_div, iexp1, iexp2), ieqs, ivars
+    Interval_system_solver.Ibinop(Interval_system_solver.Ival_div, iexp1, iexp2), ieqs, ivars
   | Tif(_, t1, t2) ->
     let iexp1, ieqs, ivars = build_ieqs t1 ieqs ivars in
     let iexp2, ieqs, ivars = build_ieqs t2 ieqs ivars in
-    Fixpoint.Ibinop(Fixpoint.Ival_union, iexp1, iexp2), ieqs, ivars
+    Interval_system_solver.Ibinop(Interval_system_solver.Ival_union, iexp1, iexp2), ieqs, ivars
   | _ ->
-    Fixpoint.Iunsupported, ieqs, ivars
+    Interval_system_solver.Iunsupported, ieqs, ivars
 
 (*
 Local Variables:
