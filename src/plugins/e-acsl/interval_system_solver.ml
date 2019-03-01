@@ -41,29 +41,18 @@ let equal_ivar ivar1 ivar2  = match ivar1, ivar2 with
   | _ ->
     Options.fatal "not an ivar"
 
-module Ieqs: sig
-  type t
-  val empty: t
-  val add: ival_exp -> ival_exp -> t -> t
-  val find: ival_exp -> t -> ival_exp
-  val cardinal: t -> int
-  val fold: (ival_exp -> ival_exp -> 'a -> 'a) -> t -> 'a -> 'a
-  val map: (ival_exp -> ival_exp) -> t -> t
-end = struct
-  module H = Map.Make(struct
-    type t = ival_exp (* an Ivar to be precise *)
-    let compare ivar1 ivar2 = if equal_ivar ivar1 ivar2 then 0 else 1
-  end)
-  type t = ival_exp H.t
-  let empty = H.empty
-  let add ivar iexp ieqs = match ivar with
-    | Ivar _ -> H.add ivar iexp ieqs
-    | _ -> Options.fatal "left-hand side is NOT an ivar"
-  let find = H.find
-  let map = H.map
-  let fold = H.fold
-  let cardinal = H.cardinal
-end
+module System = Map.Make(struct
+  type t = ival_exp (* an Ivar to be precise *)
+  let compare ivar1 ivar2 = if equal_ivar ivar1 ivar2 then 0 else 1
+end)
+
+type t = ival_exp System.t
+
+let empty = System.empty
+
+let add_equation ivar iexp ieqs = match ivar with
+  | Ivar _ -> System.add ivar iexp ieqs
+  | _ -> Options.fatal "left-hand side is NOT an ivar"
 
 (* Normalize the expression.
   An expression is said to be normalized if it is:
@@ -82,12 +71,12 @@ let normalize_iexp iexp =
   if has_unsupported iexp then Iunsupported else iexp
 
 let normalize_ieqs ieqs =
-  Ieqs.map (fun iexp -> normalize_iexp iexp) ieqs
+  System.map (fun iexp -> normalize_iexp iexp) ieqs
 
 let ivars_contains_ivar ivars ivar =
   List.fold_left (fun b ivar' -> b || equal_ivar ivar ivar') false ivars
 
-let get_ival_of_iconst ieqs ivar = match Ieqs.find ieqs ivar with
+let get_ival_of_iconst ieqs ivar = match System.find ieqs ivar with
   | Iconst i -> i
   | Ivar _ | Ibinop _| Iunsupported -> Options.fatal "not an Iconst"
 
@@ -131,7 +120,7 @@ let iterate indexes max =
 let to_iconsts indexes ieqs chain_of_ivalmax =
   let max = Array.length chain_of_ivalmax in
   let indexes_i = ref 0 in
-  Ieqs.map
+  System.map
     (fun _ ->
       let ival =
         let index = indexes.(!indexes_i) in
@@ -156,7 +145,7 @@ let rec eval_iexp iexp iconsts =
   | Iconst _ ->
     iexp
   | Ivar _ ->
-    Ieqs.find iexp iconsts
+    System.find iexp iconsts
   | Ibinop(_, Iunsupported, _) | Ibinop(_, _, Iunsupported) ->
     assert false (* because [iexp] has been normalized *)
   | Ibinop(ibinop, iexp1, iexp2) ->
@@ -186,10 +175,10 @@ let equal_iconst iconst1 iconst2 =
   in
   Ival.is_included i1 i2
 
-let is_post_fixpoint ieqs iconsts = Ieqs.fold
+let is_post_fixpoint ieqs iconsts = System.fold
   (fun ivar iexp b ->
     let iconst1 = eval_iexp iexp iconsts in
-    let iconst2 = Ieqs.find ivar iconsts in
+    let iconst2 = System.find ivar iconsts in
     b && equal_iconst iconst1 iconst2)
   ieqs
   true
@@ -205,7 +194,7 @@ let rec iterate_till_post_fixpoint ieqs indexes chain_of_ivalmax =
 
 let solve ieqs ivar chain_of_ivalmax =
   let ieqs = normalize_ieqs ieqs in
-  let dim = Ieqs.cardinal ieqs in
+  let dim = System.cardinal ieqs in
   let bottom = Array.make dim 0 in
   let post_fixpoint =
     iterate_till_post_fixpoint ieqs bottom chain_of_ivalmax

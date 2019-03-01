@@ -26,7 +26,7 @@ open Cil_types
   recursively defined logic functions *)
 
 (**************************************************************************)
-(*************************** Constructors *********************************)
+(******************************* Types ************************************)
 (**************************************************************************)
 
 type ival_binop = Ival_add | Ival_min | Ival_mul | Ival_div | Ival_union
@@ -39,25 +39,27 @@ type ival_exp =
   | Ibinop of ival_binop * ival_exp * ival_exp
   | Iunsupported
 
-module Ieqs: sig
-  type t
-  (** [Ieqs.t] represents systems of equations over [ival_exp] expressions in
-    which the variables to be found are the [Ivar] constructs.
-    [Ieqs.t] can be viewed as a fixpoint equation in the sense that the left-
-    hand side of the equation MUST be an [Ivar]:
-      solving the system [(S): x1=f1(x1, ..., xn) /\ ... /\ xn=fn(x1, ..., xn)]
-      is equivalent to solving the fixpoint equation [(E): X=F(X)] where
-      X=(x1, ..., xn) and F=(f1, ..., fn). *)
-  val empty: t
-  val add:
-    ival_exp (* left-hand side, MUST be an [Ivar] *) -> ival_exp -> t -> t
-end
+type t
+(** type of systems of equations over [ival_exp] expressions in which the
+    variables to be found are the [Ivar] constructs. [Equations.t] can be viewed
+    as a fixpoint equation in the sense that the left-hand side of the equation
+    MUST be an [Ivar]: solving the system [(S): x1=f1(x1, ..., xn) /\ ... /\
+    xn=fn(x1, ..., xn)] is equivalent to solving the fixpoint equation [(E):
+    X=F(X)] where X=(x1, ..., xn) and F=(f1, ..., fn). *)
+
+(**************************************************************************)
+(*************************** Constructors *********************************)
+(**************************************************************************)
+
+val empty: t
+val add_equation:
+  ival_exp (* left-hand side, MUST be an [Ivar] *) -> ival_exp -> t -> t
 
 (**************************************************************************)
 (***************************** Solver *************************************)
 (**************************************************************************)
 
-val solve: Ieqs.t -> ival_exp -> Integer.t array -> Ival.t
+val solve: t -> ival_exp -> Integer.t array -> Ival.t
 (** [solve ieqs ivar chain] finds an interval for the variable [ivar]
   that satisfies the fixpoint equation [ieqs]. The solver is parameterized
   by the increasingly sorted array [chain] of positive integers.

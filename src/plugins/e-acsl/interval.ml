@@ -232,7 +232,7 @@ let rec infer t =
 
              TODO: I do not understand the remark above. The interval of a C
              global variable is computed from its type. *)
-          let ieqs = Interval_system_solver.Ieqs.empty in
+          let ieqs = Interval_system_solver.empty in
           let ivar, ieqs, _ = build_ieqs t ieqs [] in
           (*  2) Solve it:
               The problem is probably undecidable in the general case.
@@ -373,7 +373,8 @@ and build_ieqs t ieqs ivars =
           let iexp, ieqs, ivars =
             build_ieqs (Misc.term_of_li li) ieqs (ivar :: ivars)
           in
-          let ieqs = Interval_system_solver.Ieqs.add ivar iexp ieqs in (* Adding x = g(x) *)
+          (* Adding x = g(x) *)
+          let ieqs = Interval_system_solver.add_equation ivar iexp ieqs in
           ieqs, ivars
       in
       List.iter (fun lv -> Env.remove lv) li.l_profile;
