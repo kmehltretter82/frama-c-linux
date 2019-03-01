@@ -31,11 +31,15 @@ open Cil_types
 
 type ival_binop = Ival_add | Ival_min | Ival_mul | Ival_div | Ival_union
 
+(* variables of the system represents functions of a given names and types for
+   its parameters.
+   No need to store the type of the return value since it is computable from the
+   type of its parameters. *)
+type ivar = { iv_name: string; iv_types: logic_type list }
+
 type ival_exp =
   | Iconst of Ival.t
-  | Ivar of string (* function name *) * logic_type list (* args lty *)
-    (** Example: to the function signature f(int, long) corresponds
-      the expression Ivar("f", [int; long]) *)
+  | Ivar of ivar
   | Ibinop of ival_binop * ival_exp * ival_exp
   | Iunsupported
 
@@ -52,14 +56,13 @@ type t
 (**************************************************************************)
 
 val empty: t
-val add_equation:
-  ival_exp (* left-hand side, MUST be an [Ivar] *) -> ival_exp -> t -> t
+val add_equation: ivar -> ival_exp -> t -> t
 
 (**************************************************************************)
 (***************************** Solver *************************************)
 (**************************************************************************)
 
-val solve: t -> ival_exp -> Integer.t array -> Ival.t
+val solve: t -> ivar -> Integer.t array -> Ival.t
 (** [solve ieqs ivar chain] finds an interval for the variable [ivar]
   that satisfies the fixpoint equation [ieqs]. The solver is parameterized
   by the increasingly sorted array [chain] of positive integers.
@@ -75,6 +78,6 @@ val solve: t -> ival_exp -> Integer.t array -> Ival.t
 (****************************** Utils *************************************)
 (**************************************************************************)
 
-val ivars_contains_ivar: ival_exp list -> ival_exp -> bool
+val ivars_contains_ivar: ivar list -> ivar -> bool
 (** [contains ivars ivar] checks whether the list of Ivar [ivars] contains the
   Ivar [ivar]. *)

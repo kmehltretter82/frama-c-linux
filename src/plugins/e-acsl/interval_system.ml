@@ -22,37 +22,47 @@
 
 open Cil_types
 
+(**************************************************************************)
+(******************************* Types ************************************)
+(**************************************************************************)
+
 type ival_binop = Ival_add | Ival_min | Ival_mul | Ival_div | Ival_union
+
+type ivar = { iv_name: string; iv_types: logic_type list }
 
 type ival_exp =
   | Iconst of Ival.t
-  | Ivar of string * logic_type list
+  | Ivar of ivar
   | Ibinop of ival_binop * ival_exp * ival_exp
   | Iunsupported
 
-let equal_ivar ivar1 ivar2  = match ivar1, ivar2 with
-  | Ivar(str1, ltys1), Ivar(str2, ltys2) ->
-    str1 = str2 &&
-    List.fold_left2
-      (fun b lty1 lty2 -> b && Cil_datatype.Logic_type.equal lty1 lty2)
-      true
-      ltys1
-      ltys2
-  | _ ->
-    Options.fatal "not an ivar"
+module LT_List =
+  Datatype.List_with_collections
+    (Cil_datatype.Logic_type)
+    (struct let module_name = "E_ACSL.Interval_system.LT_List" end)
 
-module System = Map.Make(struct
-  type t = ival_exp (* an Ivar to be precise *)
-  let compare ivar1 ivar2 = if equal_ivar ivar1 ivar2 then 0 else 1
-end)
+module Ivar =
+  Datatype.Make_with_collections(struct
+    type t = ivar
+    let name = "E_ACSL.Interval_system.Ivar"
+    let reprs = [ { iv_name = "a"; iv_types = Cil_datatype.Logic_type.reprs } ]
+    include Datatype.Undefined
+    let compare iv1 iv2 =
+      let n = Datatype.String.compare iv1.iv_name iv2.iv_name in
+      if n = 0 then LT_List.compare iv1.iv_types iv2.iv_types
+      else n
+    let equal = Datatype.from_compare
+    let hash iv = Datatype.String.hash iv.iv_name + 7 * LT_List.hash iv.iv_types
+  end)
 
-type t = ival_exp System.t
+type t = ival_exp Ivar.Map.t
 
-let empty = System.empty
+(**************************************************************************)
+(***************************** Solver *************************************)
+(**************************************************************************)
 
-let add_equation ivar iexp ieqs = match ivar with
-  | Ivar _ -> System.add ivar iexp ieqs
-  | _ -> Options.fatal "left-hand side is NOT an ivar"
+let empty = Ivar.Map.empty
+let add_equation = Ivar.Map.add
 
 (* Normalize the expression.
   An expression is said to be normalized if it is:
@@ -71,12 +81,12 @@ let normalize_iexp iexp =
   if has_unsupported iexp then Iunsupported else iexp
 
 let normalize_ieqs ieqs =
-  System.map (fun iexp -> normalize_iexp iexp) ieqs
+  Ivar.Map.map (fun iexp -> normalize_iexp iexp) ieqs
 
 let ivars_contains_ivar ivars ivar =
-  List.fold_left (fun b ivar' -> b || equal_ivar ivar ivar') false ivars
+  List.fold_left (fun b ivar' -> b || Ivar.equal ivar ivar') false ivars
 
-let get_ival_of_iconst ieqs ivar = match System.find ieqs ivar with
+let get_ival_of_iconst ieqs ivar = match Ivar.Map.find ieqs ivar with
   | Iconst i -> i
   | Ivar _ | Ibinop _| Iunsupported -> Options.fatal "not an Iconst"
 
@@ -120,7 +130,7 @@ let iterate indexes max =
 let to_iconsts indexes ieqs chain_of_ivalmax =
   let max = Array.length chain_of_ivalmax in
   let indexes_i = ref 0 in
-  System.map
+  Ivar.Map.map
     (fun _ ->
       let ival =
         let index = indexes.(!indexes_i) in
@@ -144,8 +154,8 @@ let rec eval_iexp iexp iconsts =
     Iconst (Ival.inject_range None None)
   | Iconst _ ->
     iexp
-  | Ivar _ ->
-    System.find iexp iconsts
+  | Ivar iv ->
+    Ivar.Map.find iv iconsts
   | Ibinop(_, Iunsupported, _) | Ibinop(_, _, Iunsupported) ->
     assert false (* because [iexp] has been normalized *)
   | Ibinop(ibinop, iexp1, iexp2) ->
@@ -175,10 +185,10 @@ let equal_iconst iconst1 iconst2 =
   in
   Ival.is_included i1 i2
 
-let is_post_fixpoint ieqs iconsts = System.fold
+let is_post_fixpoint ieqs iconsts = Ivar.Map.fold
   (fun ivar iexp b ->
     let iconst1 = eval_iexp iexp iconsts in
-    let iconst2 = System.find ivar iconsts in
+    let iconst2 = Ivar.Map.find ivar iconsts in
     b && equal_iconst iconst1 iconst2)
   ieqs
   true
@@ -194,7 +204,7 @@ let rec iterate_till_post_fixpoint ieqs indexes chain_of_ivalmax =
 
 let solve ieqs ivar chain_of_ivalmax =
   let ieqs = normalize_ieqs ieqs in
-  let dim = System.cardinal ieqs in
+  let dim = Ivar.Map.cardinal ieqs in
   let bottom = Array.make dim 0 in
   let post_fixpoint =
     iterate_till_post_fixpoint ieqs bottom chain_of_ivalmax

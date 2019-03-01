@@ -233,7 +233,7 @@ let rec infer t =
              TODO: I do not understand the remark above. The interval of a C
              global variable is computed from its type. *)
           let ieqs = Interval_system.empty in
-          let ivar, ieqs, _ = build_ieqs t ieqs [] in
+          let iexp, ieqs, _ = build_ieqs t ieqs [] in
           (*  2) Solve it:
               The problem is probably undecidable in the general case.
               Thus we just look for reasonably precise approximations
@@ -245,7 +245,13 @@ let rec infer t =
             (* This set can be changed based on experimental evidences,
                but it works fine for now. *)
           in
-          Interval_system.solve ieqs ivar chain_of_ivalmax
+          match iexp with
+          | Interval_system.Ivar ivar ->
+            Interval_system.solve ieqs ivar chain_of_ivalmax
+          | Interval_system.Iconst _
+          | Interval_system.Ibinop _
+          | Interval_system.Iunsupported ->
+            assert false
         else begin (* non-recursive case *)
           (* add the arguments to the context *)
           List.iter2
@@ -364,13 +370,16 @@ and build_ieqs t ieqs ivars =
         args
       in
       (* x *)
-      let ivar = Interval_system.Ivar(li.l_var_info.lv_name, args_lty) in
+      let ivar =
+        { Interval_system.iv_name = li.l_var_info.lv_name;
+          iv_types = args_lty }
+      in
       (* Adding x = g(x) if it is not yet in the system of equations.
         Without this check, the algorithm would not terminate. *)
       let ieqs, ivars =
         if Interval_system.ivars_contains_ivar ivars ivar then ieqs, ivars
         else
-          let iexp, ieqs, ivars =
+          let (iexp:Interval_system.ival_exp), ieqs, ivars =
             build_ieqs (Misc.term_of_li li) ieqs (ivar :: ivars)
           in
           (* Adding x = g(x) *)
@@ -378,7 +387,7 @@ and build_ieqs t ieqs ivars =
           ieqs, ivars
       in
       List.iter (fun lv -> Env.remove lv) li.l_profile;
-      ivar, ieqs, ivars
+      Interval_system.Ivar ivar, ieqs, ivars
     end else
       (try Interval_system.Iconst(infer t), ieqs, ivars
       with Not_an_integer -> Interval_system.Iunsupported, ieqs, ivars)
