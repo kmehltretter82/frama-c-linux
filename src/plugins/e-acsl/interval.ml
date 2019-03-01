@@ -192,38 +192,7 @@ let rec infer t =
         (* TODO: should not be necessary to distinguish the recursive case.
            Stack overflow if not distingued *)
         if Misc.is_recursive li then
-          (* 1) Build a system of interval equations that constrain the
-                solution: do so by returning a variable when encoutering a call
-                of a recursive function instead of performing the usual interval
-                inference.
-
-             BEWARE: we might be tempted to memoize the solution for a given
-             function signature HOWEVER: it cannot be done in a straightforward
-             manner due to the cases of functions that use C (global) variables
-             in their definition (as the values of those variables can change
-             between two function calls).
-
-             TODO: I do not understand the remark above. The interval of a C
-             global variable is computed from its type. *)
-          let iexp, ieqs = Interval_system.build ~infer t in
-          (*  2) Solve it:
-              The problem is probably undecidable in the general case.
-              Thus we just look for reasonably precise approximations
-              without being too computationally expensive:
-              simply iterate over a finite set of pre-defined intervals.
-              See [Interval_system_solver.solve] for details. *)
-          let chain_of_ivalmax =
-            [| Integer.one; Integer.billion_one; Integer.max_int64 |]
-            (* This set can be changed based on experimental evidences,
-               but it works fine for now. *)
-          in
-          match iexp with
-          | Interval_system.Ivar ivar ->
-            Interval_system.solve ieqs ivar chain_of_ivalmax
-          | Interval_system.Iconst _
-          | Interval_system.Ibinop _
-          | Interval_system.Iunsupported ->
-            assert false
+          Interval_system.build_and_solve ~infer t
         else begin (* non-recursive case *)
           (* add the arguments to the context *)
           List.iter2

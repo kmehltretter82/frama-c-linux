@@ -22,64 +22,17 @@
 
 open Cil_types
 
-(** Fixpoint equation solver for infering intervals of
-  recursively defined logic functions *)
+(** Fixpoint equation solver for infering intervals of recursively defined logic
+    functions. *)
 
-(**************************************************************************)
-(******************************* Types ************************************)
-(**************************************************************************)
+val build_and_solve: infer:(term -> Ival.t) -> term -> Ival.t
+(** @return the interval of the given term denoting a recursive function. *)
 
-type ival_binop = Ival_add | Ival_min | Ival_mul | Ival_div | Ival_union
-
-(* variables of the system represents functions of a given names and types for
-   its parameters.
-   No need to store the type of the return value since it is computable from the
-   type of its parameters. *)
-type ivar = { iv_name: string; iv_types: logic_type list }
-
-type ival_exp =
-  | Iconst of Ival.t
-  | Ivar of ivar
-  | Ibinop of ival_binop * ival_exp * ival_exp
-  | Iunsupported
-
-type t
-(** type of systems of equations over [ival_exp] expressions in which the
-    variables to be found are the [Ivar] constructs. [Equations.t] can be viewed
-    as a fixpoint equation in the sense that the left-hand side of the equation
-    MUST be an [Ivar]: solving the system [(S): x1=f1(x1, ..., xn) /\ ... /\
-    xn=fn(x1, ..., xn)] is equivalent to solving the fixpoint equation [(E):
-    X=F(X)] where X=(x1, ..., xn) and F=(f1, ..., fn). *)
-
-(**************************************************************************)
-(*************************** Constructors *********************************)
-(**************************************************************************)
-
-val build: infer:(term -> Ival.t) -> term -> ival_exp * t
-
-(**************************************************************************)
-(***************************** Solver *************************************)
-(**************************************************************************)
-
-val solve: t -> ivar -> Integer.t array -> Ival.t
-(** [solve ieqs ivar chain] finds an interval for the variable [ivar]
-  that satisfies the fixpoint equation [ieqs]. The solver is parameterized
-  by the increasingly sorted array [chain] of positive integers.
-  For chain=[n1; n2; ...; nk] where n1 < ... < nk, [solve] will
-  consider the following set S of intervals as potential solution:
-  S={[-n1, n1], [-n2, n2]... [-nk; nk]}. Then [solve] will iteratively
-  affect intervals from S to the different variables of [ieqs],
-  starting from the smallest interval [-n1, n1] to the biggest one [-nk,
-  nk], until finding the smallest combination that satisfies [ieqs].
-  If no combination is found then [solve] returns Z. *)
-
-(**************************************************************************)
-(****************************** Utils *************************************)
-(**************************************************************************)
-
-(* the following functions should be defined in [Interval] but are here to break
-   mutual module dependencies *)
+(*/*)
+(** The following functions should be defined in [Interval] but are here to
+    break mutual module dependencies *)
 
 exception Not_an_integer
 val interv_of_typ: typ -> Ival.t
 val ikind_of_interv: Ival.t -> Cil_types.ikind
+(*/*)

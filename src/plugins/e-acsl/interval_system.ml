@@ -59,8 +59,6 @@ module Ivar =
     let hash iv = Datatype.String.hash iv.iv_name + 7 * LT_List.hash iv.iv_types
   end)
 
-type t = ival_exp Ivar.Map.t
-
 (**************************************************************************)
 (***************************** Solver *************************************)
 (**************************************************************************)
@@ -184,8 +182,7 @@ let build ~infer t =
   | _ ->
     Iunsupported, ieqs, ivars
   in
-  let iexp, ieqs, _ = aux Ivar.Map.empty [] t in
-  iexp, ieqs
+  aux Ivar.Map.empty [] t
 
 
 (* Normalize the expression.
@@ -331,3 +328,31 @@ let solve ieqs ivar chain_of_ivalmax =
     iterate_till_post_fixpoint ieqs bottom chain_of_ivalmax
   in
   get_ival_of_iconst ivar post_fixpoint
+
+let build_and_solve ~infer t =
+  (* 1) Build a system of interval equations that constrain the solution: do so
+     by returning a variable when encoutering a call of a recursive function
+     instead of performing the usual interval inference.
+
+     BEWARE: we might be tempted to memoize the solution for a given function
+     signature HOWEVER: it cannot be done in a straightforward manner due to the
+     cases of functions that use C (global) variables in their definition (as
+     the values of those variables can change between two function calls).
+
+     TODO: I do not understand the remark above. The interval of a C global
+     variable is computed from its type. *)
+  let iexp, ieqs, _ = build ~infer t in
+  (*  2) Solve it:
+      The problem is probably undecidable in the general case.
+      Thus we just look for reasonably precise approximations
+      without being too computationally expensive:
+      simply iterate over a finite set of pre-defined intervals.
+      See [Interval_system_solver.solve] for details. *)
+  let chain_of_ivalmax =
+    [| Integer.one; Integer.billion_one; Integer.max_int64 |]
+    (* This set can be changed based on experimental evidences,
+       but it works fine for now. *)
+  in
+  match iexp with
+  | Ivar ivar -> solve ieqs ivar chain_of_ivalmax
+  | Iconst _ | Ibinop _ | Iunsupported -> assert false
