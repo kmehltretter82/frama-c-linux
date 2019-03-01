@@ -79,8 +79,14 @@ let interv_of_unknown_block =
     (Ival.inject_range (Some Integer.zero) (Some (Bit_utils.max_byte_address ())))
 
 (* imperative environments *)
-
-module Env = struct
+module Env: sig
+  val clear: unit -> unit
+  val add: Cil_types.logic_var -> Ival.t -> unit
+  val find: Cil_types.logic_var -> Ival.t
+  val remove: Cil_types.logic_var -> unit
+  val replace: Cil_types.logic_var -> Ival.t -> unit
+  val find_all: Cil_types.logic_var -> Ival.t list
+end = struct
   open Cil_datatype
   let tbl: Ival.t Logic_var.Hashtbl.t = Logic_var.Hashtbl.create 7
   let clear () = Logic_var.Hashtbl.clear tbl
@@ -360,6 +366,7 @@ and build_ieqs t ieqs ivars =
       let args_lty = List.map2
         (fun lv arg ->
           try
+            (* speed-up convergence *)
             let i = interv_of_typ_containing_interv (infer arg) in
             Env.add lv i;
             Ctype (TInt(ikind_of_interv i, []))
@@ -371,8 +378,7 @@ and build_ieqs t ieqs ivars =
       in
       (* x *)
       let ivar =
-        { Interval_system.iv_name = li.l_var_info.lv_name;
-          iv_types = args_lty }
+        { Interval_system.iv_name = li.l_var_info.lv_name; iv_types = args_lty }
       in
       (* Adding x = g(x) if it is not yet in the system of equations.
         Without this check, the algorithm would not terminate. *)

@@ -28,7 +28,11 @@ open Cil_types
 
 type ival_binop = Ival_add | Ival_min | Ival_mul | Ival_div | Ival_union
 
-type ivar = { iv_name: string; iv_types: logic_type list }
+type ivar =
+  (* it would be possible to get more precise results by storing an ival for
+     each argument instead of a logic type, but the system would converge too
+     slowly to a solution. *)
+    { iv_name: string; iv_types: logic_type list }
 
 type ival_exp =
   | Iconst of Ival.t
