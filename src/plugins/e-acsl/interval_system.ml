@@ -100,9 +100,6 @@ let interv_of_typ_containing_interv i =
     (* infinity *)
     Ival.inject_range None None
 
-let ivars_contains_ivar ivars ivar =
-  List.fold_left (fun b ivar' -> b || Ivar.equal ivar ivar') false ivars
-
 (* Build the system of interval equations for the logic function called
   through [t].
   Example: the following function:
@@ -140,7 +137,8 @@ let build ~infer t =
       (* Adding x = g(x) if it is not yet in the system of equations.
         Without this check, the algorithm would not terminate. *)
       let ieqs, ivars =
-        if ivars_contains_ivar ivars ivar then ieqs, ivars
+        if List.exists (fun ivar' -> Ivar.equal ivar ivar') ivars
+        then ieqs, ivars
         else
           let (iexp:ival_exp), ieqs, ivars =
             aux ieqs (ivar :: ivars) (Misc.term_of_li li)
@@ -183,7 +181,6 @@ let build ~infer t =
     Iunsupported, ieqs, ivars
   in
   aux Ivar.Map.empty [] t
-
 
 (* Normalize the expression.
   An expression is said to be normalized if it is:
@@ -303,13 +300,13 @@ let equal_iconst iconst1 iconst2 =
   in
   Ival.is_included i1 i2
 
-let is_post_fixpoint ieqs iconsts = Ivar.Map.fold
-  (fun ivar iexp b ->
-    let iconst1 = eval_iexp iexp iconsts in
-    let iconst2 = Ivar.Map.find ivar iconsts in
-    b && equal_iconst iconst1 iconst2)
-  ieqs
-  true
+let is_post_fixpoint ieqs iconsts =
+  Ivar.Map.for_all
+    (fun ivar iexp ->
+       let iconst1 = eval_iexp iexp iconsts in
+       let iconst2 = Ivar.Map.find ivar iconsts in
+       equal_iconst iconst1 iconst2)
+    ieqs
 
 let rec iterate_till_post_fixpoint ieqs indexes chain_of_ivalmax =
   let iconsts = to_iconsts indexes ieqs chain_of_ivalmax in
