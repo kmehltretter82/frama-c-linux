@@ -73,7 +73,7 @@ PLUGIN_CMO:= local_config \
 	env \
 	keep_status \
 	dup_functions \
-	interval_system_solver \
+	interval_system \
 	interval \
 	typing \
 	loops \

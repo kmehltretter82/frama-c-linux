@@ -232,7 +232,7 @@ let rec infer t =
 
              TODO: I do not understand the remark above. The interval of a C
              global variable is computed from its type. *)
-          let ieqs = Interval_system_solver.empty in
+          let ieqs = Interval_system.empty in
           let ivar, ieqs, _ = build_ieqs t ieqs [] in
           (*  2) Solve it:
               The problem is probably undecidable in the general case.
@@ -245,7 +245,7 @@ let rec infer t =
             (* This set can be changed based on experimental evidences,
                but it works fine for now. *)
           in
-          Interval_system_solver.solve ieqs ivar chain_of_ivalmax
+          Interval_system.solve ieqs ivar chain_of_ivalmax
         else begin (* non-recursive case *)
           (* add the arguments to the context *)
           List.iter2
@@ -364,52 +364,52 @@ and build_ieqs t ieqs ivars =
         args
       in
       (* x *)
-      let ivar = Interval_system_solver.Ivar(li.l_var_info.lv_name, args_lty) in
+      let ivar = Interval_system.Ivar(li.l_var_info.lv_name, args_lty) in
       (* Adding x = g(x) if it is not yet in the system of equations.
         Without this check, the algorithm would not terminate. *)
       let ieqs, ivars =
-        if Interval_system_solver.ivars_contains_ivar ivars ivar then ieqs, ivars
+        if Interval_system.ivars_contains_ivar ivars ivar then ieqs, ivars
         else
           let iexp, ieqs, ivars =
             build_ieqs (Misc.term_of_li li) ieqs (ivar :: ivars)
           in
           (* Adding x = g(x) *)
-          let ieqs = Interval_system_solver.add_equation ivar iexp ieqs in
+          let ieqs = Interval_system.add_equation ivar iexp ieqs in
           ieqs, ivars
       in
       List.iter (fun lv -> Env.remove lv) li.l_profile;
       ivar, ieqs, ivars
     end else
-      (try Interval_system_solver.Iconst(infer t), ieqs, ivars
-      with Not_an_integer -> Interval_system_solver.Iunsupported, ieqs, ivars)
+      (try Interval_system.Iconst(infer t), ieqs, ivars
+      with Not_an_integer -> Interval_system.Iunsupported, ieqs, ivars)
   | TConst _ ->
-    (try Interval_system_solver.Iconst(infer t), ieqs, ivars
-    with Not_an_integer -> Interval_system_solver.Iunsupported, ieqs, ivars)
+    (try Interval_system.Iconst(infer t), ieqs, ivars
+    with Not_an_integer -> Interval_system.Iunsupported, ieqs, ivars)
   | TLval(TVar _, _) ->
-    (try Interval_system_solver.Iconst(infer t), ieqs, ivars
-    with Not_an_integer -> Interval_system_solver.Iunsupported, ieqs, ivars)
+    (try Interval_system.Iconst(infer t), ieqs, ivars
+    with Not_an_integer -> Interval_system.Iunsupported, ieqs, ivars)
   | TBinOp (PlusA, t1, t2) ->
     let iexp1, ieqs, ivars = build_ieqs t1 ieqs ivars in
     let iexp2, ieqs, ivars = build_ieqs t2 ieqs ivars in
-    Interval_system_solver.Ibinop(Interval_system_solver.Ival_add, iexp1, iexp2), ieqs, ivars
+    Interval_system.Ibinop(Interval_system.Ival_add, iexp1, iexp2), ieqs, ivars
   | TBinOp (MinusA, t1, t2) ->
     let iexp1, ieqs, ivars = build_ieqs t1 ieqs ivars in
     let iexp2, ieqs, ivars = build_ieqs t2 ieqs ivars in
-    Interval_system_solver.Ibinop(Interval_system_solver.Ival_min, iexp1, iexp2), ieqs, ivars
+    Interval_system.Ibinop(Interval_system.Ival_min, iexp1, iexp2), ieqs, ivars
   | TBinOp (Mult, t1, t2) ->
     let iexp1, ieqs, ivars = build_ieqs t1 ieqs ivars in
     let iexp2, ieqs, ivars = build_ieqs t2 ieqs ivars in
-    Interval_system_solver.Ibinop(Interval_system_solver.Ival_mul, iexp1, iexp2), ieqs, ivars
+    Interval_system.Ibinop(Interval_system.Ival_mul, iexp1, iexp2), ieqs, ivars
   | TBinOp (Div, t1, t2) ->
     let iexp1, ieqs, ivars = build_ieqs t1 ieqs ivars in
     let iexp2, ieqs, ivars = build_ieqs t2 ieqs ivars in
-    Interval_system_solver.Ibinop(Interval_system_solver.Ival_div, iexp1, iexp2), ieqs, ivars
+    Interval_system.Ibinop(Interval_system.Ival_div, iexp1, iexp2), ieqs, ivars
   | Tif(_, t1, t2) ->
     let iexp1, ieqs, ivars = build_ieqs t1 ieqs ivars in
     let iexp2, ieqs, ivars = build_ieqs t2 ieqs ivars in
-    Interval_system_solver.Ibinop(Interval_system_solver.Ival_union, iexp1, iexp2), ieqs, ivars
+    Interval_system.Ibinop(Interval_system.Ival_union, iexp1, iexp2), ieqs, ivars
   | _ ->
-    Interval_system_solver.Iunsupported, ieqs, ivars
+    Interval_system.Iunsupported, ieqs, ivars
 
 (*
 Local Variables:
