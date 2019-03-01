@@ -55,8 +55,7 @@ type t
 (*************************** Constructors *********************************)
 (**************************************************************************)
 
-val empty: t
-val add_equation: ivar -> ival_exp -> t -> t
+val build: infer:(term -> Ival.t) -> term -> ival_exp * t
 
 (**************************************************************************)
 (***************************** Solver *************************************)
@@ -78,6 +77,9 @@ val solve: t -> ivar -> Integer.t array -> Ival.t
 (****************************** Utils *************************************)
 (**************************************************************************)
 
-val ivars_contains_ivar: ivar list -> ivar -> bool
-(** [contains ivars ivar] checks whether the list of Ivar [ivars] contains the
-  Ivar [ivar]. *)
+(* the following functions should be defined in [Interval] but are here to break
+   mutual module dependencies *)
+
+exception Not_an_integer
+val interv_of_typ: typ -> Ival.t
+val ikind_of_interv: Ival.t -> Cil_types.ikind

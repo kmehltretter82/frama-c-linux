@@ -25,58 +25,25 @@ open Cil_types
 (* Implement Figure 3 of J. Signoles' JFLA'15 paper "Rester statique pour
    devenir plus rapide, plus précis et plus mince". *)
 
-exception Not_an_integer
-
 (* ********************************************************************* *)
 (* Basic datatypes and operations *)
 (* ********************************************************************* *)
+
+exception Not_an_integer = Interval_system.Not_an_integer
+let interv_of_typ = Interval_system.interv_of_typ
+let ikind_of_interv = Interval_system.ikind_of_interv
 
 (* constructors *)
 
 let singleton_of_int n = Ival.inject_singleton (Integer.of_int n)
 
-let rec interv_of_typ ty = match Cil.unrollType ty with
-  | TInt (k,_) as ty ->
-    let n = Cil.bitsSizeOf ty in
-    let l, u =
-      if Cil.isSigned k then Cil.min_signed_number n, Cil.max_signed_number n
-      else Integer.zero, Cil.max_unsigned_number n
-    in
-    Ival.inject_range (Some l) (Some u)
-  | TEnum(enuminfo, _) -> interv_of_typ (TInt (enuminfo.ekind, []))
-  | _ ->
-    raise Not_an_integer
-
-let ikind_of_interv i =
-  if Ival.is_bottom i then IInt
-  else match Ival.min_and_max i with
-    | Some l, Some u ->
-      let is_pos = Integer.ge l Integer.zero in
-      let lkind = Cil.intKindForValue l is_pos in
-      let ukind = Cil.intKindForValue u is_pos in
-      (* kind corresponding to the interval *)
-      let kind = if Cil.intTypeIncluded lkind ukind then ukind else lkind in
-      (* convert the kind to [IInt] whenever smaller. *)
-      if Cil.intTypeIncluded kind IInt then IInt else kind
-    | None, None -> raise Cil.Not_representable (* GMP *)
-    | None, Some _ | Some _, None ->
-      Kernel.fatal ~current:true "ival: %a" Ival.pretty i
-
-(* TODO: why is it useful? Crash if not here, but why? *)
-(* Return the interval over which ranges the smallest typ containing [i]. *)
-let interv_of_typ_containing_interv i =
-  try
-    let kind = ikind_of_interv i in
-    interv_of_typ (TInt(kind, []))
-  with Cil.Not_representable ->
-    (* infinity *)
-    Ival.inject_range None None
-
 let interv_of_unknown_block =
   (* since we have no idea of the size of this block, we take the largest
      possible one which is unfortunately quite large *)
   lazy
-    (Ival.inject_range (Some Integer.zero) (Some (Bit_utils.max_byte_address ())))
+    (Ival.inject_range
+       (Some Integer.zero)
+       (Some (Bit_utils.max_byte_address ())))
 
 (* imperative environments *)
 module Env: sig
@@ -238,8 +205,7 @@ let rec infer t =
 
              TODO: I do not understand the remark above. The interval of a C
              global variable is computed from its type. *)
-          let ieqs = Interval_system.empty in
-          let iexp, ieqs, _ = build_ieqs t ieqs [] in
+          let iexp, ieqs = Interval_system.build ~infer t in
           (*  2) Solve it:
               The problem is probably undecidable in the general case.
               Thus we just look for reasonably precise approximations
@@ -325,18 +291,18 @@ and infer_term_lval (host, offset as tlv) =
 and infer_term_host h = match h with
   | TVar v ->
     (try Env.find v
-    with Not_found ->
-      match v.lv_type with
-      | Linteger ->
-        Ival.inject_range None None
-      | Ctype (TFloat _) -> (* TODO: handle in MR !226 *)
-        raise Not_an_integer
-      | Lreal ->
-        Error.not_yet "real numbers"
-      | Ctype _ ->
-        interv_of_typ (Logic_utils.logicCType v.lv_type)
-      | Ltype _ | Lvar _ | Larrow _ ->
-        Options.fatal "unexpected logic type")
+     with Not_found ->
+     match v.lv_type with
+     | Linteger ->
+       Ival.inject_range None None
+     | Ctype (TFloat _) -> (* TODO: handle in MR !226 *)
+       raise Not_an_integer
+     | Lreal ->
+       Error.not_yet "real numbers"
+     | Ctype _ ->
+       interv_of_typ (Logic_utils.logicCType v.lv_type)
+     | Ltype _ | Lvar _ | Larrow _ ->
+       Options.fatal "unexpected logic type")
   | TResult ty -> interv_of_typ ty
   | TMem t ->
     let ty = Logic_utils.logicCType t.term_type in
@@ -346,85 +312,6 @@ and infer_term_host h = match h with
       Options.fatal "unexpected type %a for term %a"
         Printer.pp_typ ty
         Printer.pp_term t
-
-(* Build the system of interval equations for the logic function called
-  through [t].
-  Example: the following function:
-  f(Z n) = n < 0 ? 1 : f(n - 1) * f(n - 2) / f(n - 3)
-  when called with f(37)
-  will generate the following system of equations:
-  X = [1; 1] U Y*Y/Y /\
-  Y = [1; 1] U Z*Z/Z /\
-  Z = [1; 1] U Z*Z/Z
-  where X is the interval for f(int) (since 37 \in int),
-  Y the one for f(long) (from int-1, int-2 and int-3)
-  and Z the for the f(Z) (from long-1, long-2 and long-3) *)
-and build_ieqs t ieqs ivars =
-  match t.term_node with
-  | Tapp(li, _, args) ->
-    if li.l_type = Some Linteger && Misc.is_recursive li then begin
-      let args_lty = List.map2
-        (fun lv arg ->
-          try
-            (* speed-up convergence *)
-            let i = interv_of_typ_containing_interv (infer arg) in
-            Env.add lv i;
-            Ctype (TInt(ikind_of_interv i, []))
-          with
-          | Cil.Not_representable -> Linteger
-          | Not_an_integer -> lv.lv_type)
-        li.l_profile
-        args
-      in
-      (* x *)
-      let ivar =
-        { Interval_system.iv_name = li.l_var_info.lv_name; iv_types = args_lty }
-      in
-      (* Adding x = g(x) if it is not yet in the system of equations.
-        Without this check, the algorithm would not terminate. *)
-      let ieqs, ivars =
-        if Interval_system.ivars_contains_ivar ivars ivar then ieqs, ivars
-        else
-          let (iexp:Interval_system.ival_exp), ieqs, ivars =
-            build_ieqs (Misc.term_of_li li) ieqs (ivar :: ivars)
-          in
-          (* Adding x = g(x) *)
-          let ieqs = Interval_system.add_equation ivar iexp ieqs in
-          ieqs, ivars
-      in
-      List.iter (fun lv -> Env.remove lv) li.l_profile;
-      Interval_system.Ivar ivar, ieqs, ivars
-    end else
-      (try Interval_system.Iconst(infer t), ieqs, ivars
-      with Not_an_integer -> Interval_system.Iunsupported, ieqs, ivars)
-  | TConst _ ->
-    (try Interval_system.Iconst(infer t), ieqs, ivars
-    with Not_an_integer -> Interval_system.Iunsupported, ieqs, ivars)
-  | TLval(TVar _, _) ->
-    (try Interval_system.Iconst(infer t), ieqs, ivars
-    with Not_an_integer -> Interval_system.Iunsupported, ieqs, ivars)
-  | TBinOp (PlusA, t1, t2) ->
-    let iexp1, ieqs, ivars = build_ieqs t1 ieqs ivars in
-    let iexp2, ieqs, ivars = build_ieqs t2 ieqs ivars in
-    Interval_system.Ibinop(Interval_system.Ival_add, iexp1, iexp2), ieqs, ivars
-  | TBinOp (MinusA, t1, t2) ->
-    let iexp1, ieqs, ivars = build_ieqs t1 ieqs ivars in
-    let iexp2, ieqs, ivars = build_ieqs t2 ieqs ivars in
-    Interval_system.Ibinop(Interval_system.Ival_min, iexp1, iexp2), ieqs, ivars
-  | TBinOp (Mult, t1, t2) ->
-    let iexp1, ieqs, ivars = build_ieqs t1 ieqs ivars in
-    let iexp2, ieqs, ivars = build_ieqs t2 ieqs ivars in
-    Interval_system.Ibinop(Interval_system.Ival_mul, iexp1, iexp2), ieqs, ivars
-  | TBinOp (Div, t1, t2) ->
-    let iexp1, ieqs, ivars = build_ieqs t1 ieqs ivars in
-    let iexp2, ieqs, ivars = build_ieqs t2 ieqs ivars in
-    Interval_system.Ibinop(Interval_system.Ival_div, iexp1, iexp2), ieqs, ivars
-  | Tif(_, t1, t2) ->
-    let iexp1, ieqs, ivars = build_ieqs t1 ieqs ivars in
-    let iexp2, ieqs, ivars = build_ieqs t2 ieqs ivars in
-    Interval_system.Ibinop(Interval_system.Ival_union, iexp1, iexp2), ieqs, ivars
-  | _ ->
-    Interval_system.Iunsupported, ieqs, ivars
 
 (*
 Local Variables:

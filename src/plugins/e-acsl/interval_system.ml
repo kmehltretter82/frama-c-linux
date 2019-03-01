@@ -65,8 +65,129 @@ type t = ival_exp Ivar.Map.t
 (***************************** Solver *************************************)
 (**************************************************************************)
 
-let empty = Ivar.Map.empty
-let add_equation = Ivar.Map.add
+exception Not_an_integer
+
+let rec interv_of_typ ty = match Cil.unrollType ty with
+  | TInt (k,_) as ty ->
+    let n = Cil.bitsSizeOf ty in
+    let l, u =
+      if Cil.isSigned k then Cil.min_signed_number n, Cil.max_signed_number n
+      else Integer.zero, Cil.max_unsigned_number n
+    in
+    Ival.inject_range (Some l) (Some u)
+  | TEnum(enuminfo, _) -> interv_of_typ (TInt (enuminfo.ekind, []))
+  | _ ->
+    raise Not_an_integer
+
+let ikind_of_interv i =
+  if Ival.is_bottom i then IInt
+  else match Ival.min_and_max i with
+    | Some l, Some u ->
+      let is_pos = Integer.ge l Integer.zero in
+      let lkind = Cil.intKindForValue l is_pos in
+      let ukind = Cil.intKindForValue u is_pos in
+      (* kind corresponding to the interval *)
+      let kind = if Cil.intTypeIncluded lkind ukind then ukind else lkind in
+      (* convert the kind to [IInt] whenever smaller. *)
+      if Cil.intTypeIncluded kind IInt then IInt else kind
+    | None, None -> raise Cil.Not_representable (* GMP *)
+    | None, Some _ | Some _, None ->
+      Kernel.fatal ~current:true "ival: %a" Ival.pretty i
+
+let interv_of_typ_containing_interv i =
+  try
+    let kind = ikind_of_interv i in
+    interv_of_typ (TInt(kind, []))
+  with Cil.Not_representable ->
+    (* infinity *)
+    Ival.inject_range None None
+
+let ivars_contains_ivar ivars ivar =
+  List.fold_left (fun b ivar' -> b || Ivar.equal ivar ivar') false ivars
+
+(* Build the system of interval equations for the logic function called
+  through [t].
+  Example: the following function:
+  f(Z n) = n < 0 ? 1 : f(n - 1) * f(n - 2) / f(n - 3)
+  when called with f(37)
+  will generate the following system of equations:
+  X = [1; 1] U Y*Y/Y /\
+  Y = [1; 1] U Z*Z/Z /\
+  Z = [1; 1] U Z*Z/Z
+  where X is the interval for f(int) (since 37 \in int),
+  Y the one for f(long) (from int-1, int-2 and int-3)
+  and Z the for the f(Z) (from long-1, long-2 and long-3) *)
+let build ~infer t =
+  let rec aux ieqs ivars t = match t.term_node with
+  | Tapp(li, _, args) ->
+    if li.l_type = Some Linteger && Misc.is_recursive li then begin
+      let args_lty = List.map2
+        (fun lv arg ->
+          try
+            (* speed-up convergence *)
+            let i = interv_of_typ_containing_interv (infer arg) in
+  (* TODO: *)
+(*            Env.add lv i;*)
+            Ctype (TInt(ikind_of_interv i, []))
+          with
+          | Cil.Not_representable -> Linteger
+          | Not_an_integer -> lv.lv_type)
+        li.l_profile
+        args
+      in
+      (* x *)
+      let ivar =
+        { iv_name = li.l_var_info.lv_name; iv_types = args_lty }
+      in
+      (* Adding x = g(x) if it is not yet in the system of equations.
+        Without this check, the algorithm would not terminate. *)
+      let ieqs, ivars =
+        if ivars_contains_ivar ivars ivar then ieqs, ivars
+        else
+          let (iexp:ival_exp), ieqs, ivars =
+            aux ieqs (ivar :: ivars) (Misc.term_of_li li)
+          in
+          (* Adding x = g(x) *)
+          let ieqs = Ivar.Map.add ivar iexp ieqs in
+          ieqs, ivars
+      in
+(*      List.iter (fun lv -> Env.remove lv) li.l_profile;*)
+      Ivar ivar, ieqs, ivars
+    end else
+      (try Iconst(infer t), ieqs, ivars
+      with Not_an_integer -> Iunsupported, ieqs, ivars)
+  | TConst _ ->
+    (try Iconst(infer t), ieqs, ivars
+    with Not_an_integer -> Iunsupported, ieqs, ivars)
+  | TLval(TVar _, _) ->
+    (try Iconst(infer t), ieqs, ivars
+    with Not_an_integer -> Iunsupported, ieqs, ivars)
+  | TBinOp (PlusA, t1, t2) ->
+    let iexp1, ieqs, ivars = aux ieqs ivars t1 in
+    let iexp2, ieqs, ivars = aux ieqs ivars t2 in
+    Ibinop(Ival_add, iexp1, iexp2), ieqs, ivars
+  | TBinOp (MinusA, t1, t2) ->
+    let iexp1, ieqs, ivars = aux ieqs ivars t1 in
+    let iexp2, ieqs, ivars = aux ieqs ivars t2 in
+    Ibinop(Ival_min, iexp1, iexp2), ieqs, ivars
+  | TBinOp (Mult, t1, t2) ->
+    let iexp1, ieqs, ivars = aux ieqs ivars t1 in
+    let iexp2, ieqs, ivars = aux ieqs ivars t2 in
+    Ibinop(Ival_mul, iexp1, iexp2), ieqs, ivars
+  | TBinOp (Div, t1, t2) ->
+    let iexp1, ieqs, ivars = aux ieqs ivars t1 in
+    let iexp2, ieqs, ivars = aux ieqs ivars t2 in
+    Ibinop(Ival_div, iexp1, iexp2), ieqs, ivars
+  | Tif(_, t1, t2) ->
+    let iexp1, ieqs, ivars = aux ieqs ivars t1 in
+    let iexp2, ieqs, ivars = aux ieqs ivars t2 in
+    Ibinop(Ival_union, iexp1, iexp2), ieqs, ivars
+  | _ ->
+    Iunsupported, ieqs, ivars
+  in
+  let iexp, ieqs, _ = aux Ivar.Map.empty [] t in
+  iexp, ieqs
+
 
 (* Normalize the expression.
   An expression is said to be normalized if it is:
@@ -86,9 +207,6 @@ let normalize_iexp iexp =
 
 let normalize_ieqs ieqs =
   Ivar.Map.map (fun iexp -> normalize_iexp iexp) ieqs
-
-let ivars_contains_ivar ivars ivar =
-  List.fold_left (fun b ivar' -> b || Ivar.equal ivar ivar') false ivars
 
 let get_ival_of_iconst ieqs ivar = match Ivar.Map.find ieqs ivar with
   | Iconst i -> i
