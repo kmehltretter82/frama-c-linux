@@ -315,10 +315,6 @@ let finite_min_and_max i = match Ival.min_and_max i with
   | Some min, Some max -> min, max
   | None, _ | _, None -> assert false
 
-let fundec_of_kf kf = match kf.fundec with
-  | Definition(fundec, _) -> fundec
-  | Declaration _ -> Options.fatal "fundec_of_kf on Declaration"
-
 let is_recursive li =
   match li.l_body with
   | LBpred _ | LBnone | LBreads _ | LBinductive _ -> false

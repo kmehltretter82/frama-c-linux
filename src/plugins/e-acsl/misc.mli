@@ -127,8 +127,6 @@ val mk_ptr_sizeof: typ -> location -> exp
 val finite_min_and_max: Ival.t -> Integer.t * Integer.t
 (** [finite_min_and_max i] takes the finite ival [i] and returns its bounds *)
 
-val fundec_of_kf: kernel_function -> fundec
-
 val is_recursive: logic_info -> bool
 (** [is_recursive li] returns true iff [li] is defined recursively. *)
 

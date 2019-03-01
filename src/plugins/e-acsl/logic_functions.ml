@@ -49,6 +49,11 @@ let add_cast_ref
 (****************** Generation of function bodies ****************************)
 (*****************************************************************************)
 
+let get_fundec kf =
+  try Kernel_function.get_definition kf
+  with Kernel_function.No_Definition ->
+    Options.fatal "no definition for function %a" Kernel_function.pretty kf
+
 (* Determine the C typ corresponding to a formal argument based on its logic
   type. In particular, [arg_typ_from_lty] MUST NOT return arrays:
   they should be converted into pointers. *)
@@ -164,7 +169,7 @@ let retype lfs = match lfs.lfs_li.l_body with
 let add_varinfo_bindings ~loc kf env lfs =
   (* Handle typs that cannot be returned *)
   let vi_args =
-    let fundec = Misc.fundec_of_kf kf in
+    let fundec = get_fundec kf in
     let vi_ty = match fundec.svar.vtype with
       | TFun(ty, _, _, _) -> ty
       | _ -> assert false
@@ -211,7 +216,7 @@ let pred_to_block ~loc kf env p =
   (* Create the variable [retres] to be returned,
     the stmt [set_retres] setting it,
     and the stmt [return_retres] returning it. *)
-  let fundec = Misc.fundec_of_kf kf in
+  let fundec = get_fundec kf in
   let retres = Cil.makeLocalVar fundec "__retres" Cil.intType in
   let set_retres =
     Cil.mkStmtOneInstr ~valid_sid:true (Set (Cil.var retres, e, loc))
@@ -238,7 +243,7 @@ let term_to_block ~loc kf env t lty (* the return type *) =
   let add_cast = !add_cast_ref in
   let e, env = add_cast loc env (Some ctx) false e in
   (* The body itself *)
-  let fundec = Misc.fundec_of_kf kf in
+  let fundec = get_fundec kf in
   begin match Typing.ty_of_logic_ty lty with
   | Typing.C_type _ | Typing.Other ->
     let typ = Typing.get_typ t in
@@ -301,7 +306,7 @@ let fill_kf lfs kf =
       Error.not_yet "logic functions inductively defined"
   in
   (* Fill the fundec *)
-  let fundec = Misc.fundec_of_kf kf in
+  let fundec = get_fundec kf in
   fundec.sbody <- b;
   let new_vars =
     List.map (fun (vi, _) -> vi) (Env.get_generated_variables env)
@@ -342,7 +347,7 @@ let memo lfs typ =
     (* Step 3 *)
     fill_kf lfs kf;
     (* Kernel details *)
-    let fundec = Misc.fundec_of_kf kf in
+    let fundec = get_fundec kf in
     fundec.svar.vdefined <- true;
     Globals.Functions.register kf;
     (* Return *)
@@ -423,7 +428,7 @@ let generate ~loc env t li args args_lty =
     remove_interv_bindings lfs;
     retype lfs;
     (* The call stmt *)
-    let fundec = Misc.fundec_of_kf kf in
+    let fundec = get_fundec kf in
     let vi_f = fundec.svar in
     Cil.mkStmtOneInstr
       (Call (
@@ -475,7 +480,7 @@ let lfunctions_visitor = object (self)
             let loc = Cil_datatype.Location.unknown in
             let new_decls = List.map
               (fun kf ->
-                let fundec = Misc.fundec_of_kf kf in
+                let fundec = get_fundec kf in
                 let new_g = GFun(fundec, loc) in
                 new_definitions <- new_g :: new_definitions;
                 GFunDecl(Cil.empty_funspec (), fundec.svar, loc))
