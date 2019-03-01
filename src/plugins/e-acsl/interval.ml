@@ -208,7 +208,7 @@ let rec infer t =
     let i2 = infer t2 in
     Ival.meet i1 i2
 
-  | Tapp (li, _, _args) ->
+  | Tapp (li, _, args) ->
     (match li.l_type with
     | None -> assert false (* [None] only possible for predicates *)
     | Some Linteger ->
@@ -216,53 +216,47 @@ let rec infer t =
       | LBpred _ ->
         Ival.zero_or_one
       | LBterm t' ->
-        let i =
-          if Misc.is_recursive li then
-            (*  1) Build a system of interval equations that
-                constrain the solution:
-                do so by returning a variable when encoutering
-                a call of a recursive function instead of
-                performing the usual interval inference
-                BEWARE: we might be tempted to memoize the
-                  solution for a given function signature
-                  HOWEVER: it cannot be done in a straightforward
-                    manner due to the cases of functions that use
-                    C (global) variables in their definition (as the values of
-                    those variables can change between two function calls). *)
-            let ieqs = Fixpoint.Ieqs.empty in
-            let ivar, ieqs, _ = build_ieqs t ieqs [] in
-            (*  2) Solve it:
-                The problem is probably undecidable in the general case.
-                Thus we just look for reasonably precise approximations
-                without being too computationally expensive:
-                simply iterate over a finite set of pre-defined intervals.
-                See [Fixpoint.solve] for details. *)
-            let chain_of_ivalmax =
-              [| Integer.one; Integer.billion_one; Integer.max_int64 |]
-              (* This set can be changed based on experimental evidences,
-                 but it works fine for now. *)
-            in
-            let i = Fixpoint.solve ieqs ivar chain_of_ivalmax in
-            i
-          else begin
-            List.iter2
-              (fun lv arg ->
-                try
-                  let i = interv_of_typ_containing_interv (infer arg) in
-                  Env.add lv i
-                with Not_an_integer ->
-                  ())
-              li.l_profile
-              _args;
-            let i =
-              try infer t'
-              with Not_an_integer -> Ival.inject_range None None
-            in
-            List.iter (fun lv -> Env.remove lv) li.l_profile;
-            i
-          end
-        in
-        i
+        (* TODO: should not be necessary to distinguish the recursive case.
+           Stack overflow if not distingued *)
+        if Misc.is_recursive li then
+          (* 1) Build a system of interval equations that constrain the
+                solution: do so by returning a variable when encoutering a call
+                of a recursive function instead of performing the usual interval
+                inference BEWARE: we might be tempted to memoize the solution
+                for a given function signature HOWEVER: it cannot be done in a
+                straightforward manner due to the cases of functions that use C
+                (global) variables in their definition (as the values of those
+                variables can change between two function calls). *)
+          let ieqs = Fixpoint.Ieqs.empty in
+          let ivar, ieqs, _ = build_ieqs t ieqs [] in
+          (*  2) Solve it:
+              The problem is probably undecidable in the general case.
+              Thus we just look for reasonably precise approximations
+              without being too computationally expensive:
+              simply iterate over a finite set of pre-defined intervals.
+              See [Fixpoint.solve] for details. *)
+          let chain_of_ivalmax =
+            [| Integer.one; Integer.billion_one; Integer.max_int64 |]
+            (* This set can be changed based on experimental evidences,
+               but it works fine for now. *)
+          in
+          Fixpoint.solve ieqs ivar chain_of_ivalmax
+        else begin (* non-recursive case *)
+          (* add the arguments to the context *)
+          List.iter2
+            (fun lv arg ->
+               try
+                 let i = infer arg in
+                 Env.add lv i
+               with Not_an_integer ->
+                 ())
+            li.l_profile
+            args;
+          let i = infer t' in
+          (* remove arguments from the context *)
+          List.iter (fun lv -> Env.remove lv) li.l_profile;
+          i
+        end
       | LBnone ->
         Error.not_yet "logic functions with no definition nor reads clause"
       | LBreads _ ->

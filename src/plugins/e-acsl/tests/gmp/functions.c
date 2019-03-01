@@ -20,7 +20,7 @@ typedef struct mystruct mystruct;
 /*@ logic mystruct t1(mystruct m) = m; */
 /*@ logic integer t2(mystruct m) = m.k + m.l; */
 
-// To test function call in other than assert:
+// To test function call in other clauses than assert:
 /*@ predicate k_pred(integer x) = x > 0; */
 /*@ requires k_pred(x); */
 void k(int x) {}

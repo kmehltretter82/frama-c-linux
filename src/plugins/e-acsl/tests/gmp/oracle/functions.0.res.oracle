@@ -32,8 +32,6 @@
 [eva] using specification for function __gmpz_clear
 [eva:alarm] tests/gmp/functions.c:44: Warning: 
   function __e_acsl_assert: precondition got status unknown.
-[eva:alarm] tests/gmp/functions.c:47: Warning: 
-  function __e_acsl_assert: precondition got status unknown.
 [eva:alarm] tests/gmp/functions.c:48: Warning: 
   accessing uninitialized left-value.
   assert \initialized((__e_acsl_mpz_struct *)__gen_e_acsl_f1_tapp_3);
