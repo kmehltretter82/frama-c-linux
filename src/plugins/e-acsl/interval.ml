@@ -47,14 +47,29 @@ let rec interv_of_typ ty = match Cil.unrollType ty with
   | _ ->
     raise Not_an_integer
 
+let ikind_of_interv i =
+  if Ival.is_bottom i then IInt
+  else match Ival.min_and_max i with
+    | Some l, Some u ->
+      let is_pos = Integer.ge l Integer.zero in
+      let lkind = Cil.intKindForValue l is_pos in
+      let ukind = Cil.intKindForValue u is_pos in
+      (* kind corresponding to the interval *)
+      let kind = if Cil.intTypeIncluded lkind ukind then ukind else lkind in
+      (* convert the kind to [IInt] whenever smaller. *)
+      if Cil.intTypeIncluded kind IInt then IInt else kind
+    | None, None -> raise Cil.Not_representable (* GMP *)
+    | None, Some _ | Some _, None ->
+      Kernel.fatal ~current:true "ival: %a" Ival.pretty i
+
+(* TODO: why is it useful? Crash if not here, but why? *)
 (* Return the interval over which ranges the smallest typ containing [i]. *)
 let interv_of_typ_containing_interv i =
   try
-    let itv_kind = Misc.itv_kind i in
-    (* convert the kind to [IInt] whenever smaller. *)
-    let kind = if Cil.intTypeIncluded itv_kind IInt then IInt else itv_kind in
+    let kind = ikind_of_interv i in
     interv_of_typ (TInt(kind, []))
   with Cil.Not_representable ->
+    (* infinity *)
     Ival.inject_range None None
 
 let interv_of_unknown_block =
@@ -235,7 +250,8 @@ let rec infer t =
                 try
                   let i = interv_of_typ_containing_interv (infer arg) in
                   Env.add lv i
-                with Not_an_integer -> ())
+                with Not_an_integer ->
+                  ())
               li.l_profile
               _args;
             let i =
@@ -341,10 +357,10 @@ and build_ieqs t ieqs ivars =
           try
             let i = interv_of_typ_containing_interv (infer arg) in
             Env.add lv i;
-            Ctype (TInt(Misc.itv_kind i, []))
+            Ctype (TInt(ikind_of_interv i, []))
           with
-            | Cil.Not_representable -> Linteger
-            | Not_an_integer -> lv.lv_type)
+          | Cil.Not_representable -> Linteger
+          | Not_an_integer -> lv.lv_type)
         li.l_profile
         args
       in

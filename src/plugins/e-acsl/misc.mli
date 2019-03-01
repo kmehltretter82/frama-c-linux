@@ -132,9 +132,6 @@ val fundec_of_kf: kernel_function -> fundec
 val is_recursive: logic_info -> bool
 (** [is_recursive li] returns true iff [li] is defined recursively. *)
 
-val itv_kind: Ival.t -> ikind
-(** Return the smallest iking that contains the given interval. *)
-
 (*
 Local Variables:
 compile-command: "make"

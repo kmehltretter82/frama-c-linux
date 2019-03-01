@@ -356,19 +356,6 @@ let is_recursive li =
     in
     has_recursive_call t
 
-let itv_kind i =
-  if Ival.is_bottom i then IInt
-  else match Ival.min_and_max i with
-    | Some l, Some u ->
-      let is_pos = Integer.ge l Integer.zero in
-      let lkind = Cil.intKindForValue l is_pos in
-      let ukind = Cil.intKindForValue u is_pos in
-      (* kind corresponding to the interval *)
-      if Cil.intTypeIncluded lkind ukind then ukind else lkind
-    | None, None -> raise Cil.Not_representable (* GMP *)
-    | None, Some _ | Some _, None ->
-      Kernel.fatal ~current:true "ival: %a" Ival.pretty i
-
 (*
 Local Variables:
 compile-command: "make"

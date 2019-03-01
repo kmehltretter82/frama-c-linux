@@ -198,15 +198,13 @@ let integer_ty_of_typ ty = ty_of_logic_ty (Ctype ty)
    interval. It is the \theta operator of the JFLA's paper. *)
 let ty_of_interv ?ctx i =
   try
-    let itv_kind = Misc.itv_kind i in
-    (* convert the kind to [IInt] whenever smaller. *)
-    let kind = if Cil.intTypeIncluded itv_kind IInt then IInt else itv_kind in
+    let kind = Interval.ikind_of_interv i in
     (* ctx type whenever possible to prevent superfluous casts in the generated
        code *)
     (match ctx with
      | None | Some (Gmp | Other) -> C_type kind
      | Some (C_type ik as ctx) ->
-       if Cil.intTypeIncluded itv_kind ik then ctx else C_type kind)
+       if Cil.intTypeIncluded kind ik then ctx else C_type kind)
   with Cil.Not_representable ->
     Gmp
 
