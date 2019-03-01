@@ -185,7 +185,7 @@ let add_varinfo_bindings ~loc kf env lfs =
         match Typing.ty_of_logic_ty lty with
         | Typing.C_type _ | Typing.Other ->
           (* Case A *)
-          Env.Logic_binding.add_existing_vi env lv vi_arg
+          Env.Logic_binding.add_binding env lv vi_arg
         | Typing.Gmp ->
           (* Case B *)
           let ty = Typing.typ_of_lty lv.lv_type in

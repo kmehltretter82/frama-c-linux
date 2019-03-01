@@ -279,19 +279,30 @@ let new_var_and_mpz_init ~loc ?scope ?name env t mk_stmts =
 
 module Logic_binding = struct
 
+  let add_binding env logic_v vi =
+    try
+      let varinfos = Logic_var.Map.find logic_v env.var_mapping in
+      Stack.push vi varinfos;
+      env
+    with Not_found | Stack.Empty ->
+      let varinfos = Stack.create () in
+      Stack.push vi varinfos;
+      let var_mapping = Logic_var.Map.add logic_v varinfos env.var_mapping in
+      { env with var_mapping = var_mapping }
+
   let add ?ty env logic_v =
     let ty = match ty with
       | Some ty -> ty
       | None -> match logic_v.lv_type with
-	| Ctype ty -> ty
-	| Linteger -> Gmpz.t ()
-	| Ltype _ as ty when Logic_const.is_boolean_type ty -> Cil.charType
-	| Ltype _ | Lvar _ | Lreal | Larrow _ as lty ->
-	  let msg =
-	    Format.asprintf
-	      "logic variable of type %a" Logic_type.pretty lty
-	  in
-	  Error.not_yet msg
+        | Ctype ty -> ty
+        | Linteger -> Gmpz.t ()
+        | Ltype _ as ty when Logic_const.is_boolean_type ty -> Cil.charType
+        | Ltype _ | Lvar _ | Lreal | Larrow _ as lty ->
+          let msg =
+            Format.asprintf
+              "logic variable of type %a" Logic_type.pretty lty
+          in
+          Error.not_yet msg
     in
     let v, e, env = new_var
       ~loc:Location.unknown
@@ -301,29 +312,7 @@ module Logic_binding = struct
       ty
       (fun _ _ -> [])
     in
-    let env =
-      try
-        let varinfos = Logic_var.Map.find logic_v env.var_mapping in
-        Stack.push v varinfos;
-        env
-      with Not_found ->
-        let varinfos = Stack.create () in
-        Stack.push v varinfos;
-        let var_mapping = Logic_var.Map.add logic_v varinfos env.var_mapping in
-        { env with var_mapping = var_mapping }
-    in
-    v, e, env
-
-  let add_existing_vi env lv vi =
-    try
-      let varinfos = Logic_var.Map.find lv env.var_mapping in
-      Stack.push vi varinfos;
-      env
-    with Not_found | Stack.Empty ->
-      let varinfos = Stack.create () in
-      Stack.push vi varinfos;
-      let var_mapping = Logic_var.Map.add lv varinfos env.var_mapping in
-      { env with var_mapping = var_mapping }
+    v, e, add_binding env logic_v v
 
   let get env logic_v =
     try

@@ -68,8 +68,9 @@ module Logic_binding: sig
   val add: ?ty:typ -> t -> logic_var -> varinfo * exp * t
   (* Add a new C binding to the list of bindings for the logic variable. *)
 
-  val add_existing_vi: t -> logic_var -> varinfo -> t
-  (* [add_existing_vi env lv vi] defines [vi] as latest C binding for [lv]. *)
+  val add_binding: t -> logic_var -> varinfo -> t
+  (* [add_binding env lv vi] defines [vi] as the latest C binding for
+     [lv]. *)
 
   val get: t -> logic_var -> varinfo
   (* Return the latest C binding. *)
