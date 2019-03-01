@@ -23,6 +23,8 @@
 open Cil_types
 open Graph_types
 
+let dkey = Self.register_category "build"
+
 
 (* --- Precision evaluation --- *)
 
@@ -230,6 +232,7 @@ let rec build_node_deps context node =
   | File -> ()
 
 and build_writes_deps context src lval =
+  Self.debug ~dkey "computing deps for %a" Cil_printer.pp_lval lval;
   let zone = !Db.Value.lval_to_zone Kglobal lval in
   let writes = Studia.Writes.compute zone
   and add_deps (stmt,effects) =
@@ -238,7 +241,9 @@ and build_writes_deps context src lval =
       build_instr_deps context src stmt instr
     | _ -> ()
   in
-  if List.length writes > 20 then
+  let count = List.length writes in
+  Self.debug ~dkey "%d found" count;
+  if count > 20 then
     raise (Too_many_deps lval)
   else
     List.iter add_deps writes
