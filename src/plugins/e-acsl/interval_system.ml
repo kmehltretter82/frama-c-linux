@@ -26,7 +26,7 @@ open Cil_types
 (******************************* Types ************************************)
 (**************************************************************************)
 
-type ival_binop = Ival_add | Ival_min | Ival_mul | Ival_div | Ival_union
+type ival_binop = Ival_add | Ival_min | Ival_mul | Ival_div | Ival_join
 
 type ivar =
   (* it would be possible to get more precise results by storing an ival for
@@ -62,6 +62,21 @@ module Ivar =
 (**************************************************************************)
 (***************************** Helpers ************************************)
 (**************************************************************************)
+
+let rec eval_iexp env = function
+  | Iunsupported | Ibinop(_, Iunsupported, _) | Ibinop(_, _, Iunsupported) ->
+    Ival.inject_range None None
+  | Iconst i -> i
+  | Ivar iv -> Ivar.Map.find iv env
+  | Ibinop(ibinop, iexp1, iexp2) ->
+    let i1 = eval_iexp env iexp1 in
+    let i2 = eval_iexp env iexp2 in
+    match ibinop with
+    | Ival_add -> Ival.add_int i1 i2
+    | Ival_min -> Ival.sub_int i1 i2
+    | Ival_mul -> Ival.mul i1 i2
+    | Ival_div -> Ival.div i1 i2
+    | Ival_join -> Ival.join i1 i2
 
 exception Not_an_integer
 
@@ -136,7 +151,7 @@ let interv_of_typ_containing_interv i =
     Ival.inject_range None None
 
 (**************************************************************************)
-(***************************** Solver *************************************)
+(***************************** Builder ************************************)
 (**************************************************************************)
 
 (* Build the system of interval equations for the logic function called
@@ -214,7 +229,7 @@ let build ~infer t =
     | Tif(_, t1, t2) ->
       let iexp1, ieqs, ivars = aux ieqs ivars t1 in
       let iexp2, ieqs, ivars = aux ieqs ivars t2 in
-      Ibinop(Ival_union, iexp1, iexp2), ieqs, ivars
+      Ibinop(Ival_join, iexp1, iexp2), ieqs, ivars
     | _ ->
       Iunsupported, ieqs, ivars
   in
@@ -225,9 +240,9 @@ let build ~infer t =
 (*************************************************************************)
 
 (* [iterate indexes max] increases by 1 the leftmost element of [indexes] that
-  is less or equal to [max].
-  Eg: from index=[| 0; 0; 0 |] and max=2, the successive iterates
-    until reaching index=[| max; max; max |] are as follows:
+   is less or equal to [max].
+   Eg: from index=[| 0; 0; 0 |] and max=2, the successive iterates
+   until reaching index=[| max; max; max |] are as follows:
       [| 0; 0; 0 |]
       [| 1; 0; 0 |]
       [| 1; 1; 0 |]
@@ -250,14 +265,13 @@ let iterate indexes max =
     indexes.(!min_i) <- indexes.(!min_i) + 1
 
 (* Returns an assignement to each variable of [ieqs] such that:
-    - the first (resp. the second... the last) element of [indexes] is
-      associated to the first (resp. the second... the last) variable of [ieqs]
-    - a variable that is associated to an index [index] ranging in
-      [0..max-1] will be given the interval of finite bounds:
-      [-chain_of_ivalmax.(index), chain_of_ivalmax.(index)]
-    - a variable that is associated to an index [index] equaling [max] will
-      be given the whole interval of integers [Z]. *)
-let to_iconsts chain_of_ivalmax indexes ieqs: Ival.t Ivar.Map.t =
+   - the n-th element of [indexes] is associated to the n-th variable of [ieqs]
+   - a variable that is associated to an index [index] ranging in [0..max-1] is
+   associated to the finite interval
+   [-chain_of_ivalmax.(index), chain_of_ivalmax.(index)]
+   - a variable that is associated to an index [index] equals to [max] is
+   associated to [Z]. *)
+let to_iconsts chain_of_ivalmax indexes ieqs =
   let max = Array.length chain_of_ivalmax in
   let indexes_i = ref 0 in
   Ivar.Map.map
@@ -267,29 +281,12 @@ let to_iconsts chain_of_ivalmax indexes ieqs: Ival.t Ivar.Map.t =
         if index < max then
           let ivalmax = chain_of_ivalmax.(index) in
           Ival.inject_range (Some (Integer.neg ivalmax)) (Some ivalmax)
-        else if
-          index = max then Ival.inject_range None None
-        else
-          assert false
+        else if index = max then Ival.inject_range None None
+        else assert false
       in
       indexes_i := !indexes_i + 1;
       ival)
     ieqs
-
-let rec eval_iexp env = function
-  | Iunsupported | Ibinop(_, Iunsupported, _) | Ibinop(_, _, Iunsupported) ->
-    Ival.inject_range None None
-  | Iconst i -> i
-  | Ivar iv -> Ivar.Map.find iv env
-  | Ibinop(ibinop, iexp1, iexp2) ->
-    let i1 = eval_iexp env iexp1 in
-    let i2 = eval_iexp env iexp2 in
-    match ibinop with
-    | Ival_add -> Ival.add_int i1 i2
-    | Ival_min -> Ival.sub_int i1 i2
-    | Ival_mul -> Ival.mul i1 i2
-    | Ival_div -> Ival.div i1 i2
-    | Ival_union -> Ival.join i1 i2
 
 let is_post_fixpoint ieqs env =
   Ivar.Map.for_all
@@ -342,5 +339,6 @@ let build_and_solve ~infer t =
   in
   match iexp with
   | Ivar ivar -> solve chain_of_ivalmax ivar ieqs
-  | Iconst _ | Ibinop _ | Iunsupported -> assert false
+  | Iconst _ | Ibinop _ | Iunsupported ->
     (* TODO: check this assert false carefully *)
+    assert false
