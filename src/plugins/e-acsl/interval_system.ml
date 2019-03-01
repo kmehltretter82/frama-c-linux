@@ -124,10 +124,10 @@ let build ~infer t =
       let args_lty = List.map2
         (fun lv arg ->
           try
-            (* speed-up convergence *)
+            (* speed-up convergence; because of this approximation, no need to
+               associate [i] to [lv] in [Interval.Env]: the very same interval
+               will be computed anyway. *)
             let i = interv_of_typ_containing_interv (infer arg) in
-  (* TODO: *)
-(*            Env.add lv i;*)
             Ctype (TInt(ikind_of_interv i, []))
           with
           | Cil.Not_representable -> Linteger
@@ -151,7 +151,6 @@ let build ~infer t =
           let ieqs = Ivar.Map.add ivar iexp ieqs in
           ieqs, ivars
       in
-(*      List.iter (fun lv -> Env.remove lv) li.l_profile;*)
       Ivar ivar, ieqs, ivars
     end else
       (try Iconst(infer t), ieqs, ivars
