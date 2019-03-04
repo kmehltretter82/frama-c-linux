@@ -22,71 +22,6 @@
 
 open Cil_types
 
-let find_stmt_in_block b s =
-  let has_stmt l =
-    List.exists (fun (s',_,_,_,_) -> Cil_datatype.Stmt.equal s s') l
-  in
-  let rec aux = function
-    | [] ->
-      Kernel.fatal "statement %a is not inside block@\n%a"
-        Printer.pp_stmt s Printer.pp_block b
-    | s' :: _ when Cil_datatype.Stmt.equal s s' -> s'
-    | { skind = UnspecifiedSequence l } as s':: _ when has_stmt l -> s'
-    | _ :: l -> aux l
-  in aux b.bstmts
-
-let find_stmt_of_block outer inner =
-  let rec is_stmt_of_block s =
-    match s.skind with
-    | Block b -> b == inner
-    | If (_,b1,b2,_) -> b1 == inner || b2 == inner
-    | Switch (_,b,_,_) -> b == inner
-    | Loop (_,b,_,_,_) -> b == inner
-    | UnspecifiedSequence l -> is_stmt_of_unspecified l
-    | TryCatch (b, l, _) ->
-      b == inner || List.exists (fun (_,b) -> b == inner) l
-    | TryFinally (b1,b2,_) -> b1 == inner || b2 == inner
-    | TryExcept (b1,_,b2,_) -> b1 == inner || b2 == inner
-    | _ -> false
-  and is_stmt_of_unspecified l =
-    List.exists (fun (s,_,_,_,_) -> is_stmt_of_block s) l
-  in
-  try
-    List.find is_stmt_of_block outer.bstmts
-  with Not_found ->
-    Kernel.fatal "inner block@\n%a@\nis not a direct child of outer block@\n%a"
-      Printer.pp_block inner Printer.pp_block outer
-
-let find_direct_enclosing b s =
-  let blocks = Kernel_function.find_all_enclosing_blocks s in
-  let rec aux prev l =
-    match l, prev with
-    | [], _ ->
-      Kernel.fatal "statement %a is not part of block@\n%a"
-        Printer.pp_stmt s Printer.pp_block b
-    | b' :: _, None when b' == b -> find_stmt_in_block b s
-    | b' :: _, Some prev when b' == b -> find_stmt_of_block b prev
-    | b' :: l, _ -> aux (Some b') l
-  in
-  aux None blocks
-
-let is_between b s1 s2 s3 =
-  let s1 = find_direct_enclosing b s1 in
-  let s2 = find_direct_enclosing b s2 in
-  let s3 = find_direct_enclosing b s3 in
-  let rec aux has_s1 l =
-    match l with
-    | [] ->
-      Kernel.fatal
-        "Unexpected end of block while looking for %a"
-        Printer.pp_stmt s3
-    | s :: l when Cil_datatype.Stmt.equal s s1 -> aux true l
-    | s :: _ when Cil_datatype.Stmt.equal s s2 -> has_s1
-    | s :: _ when Cil_datatype.Stmt.equal s s3 -> false
-    | _ :: l -> aux has_s1 l
-  in
-  aux false b.bstmts
-
 let add_destructor (_, l as acc) var =
   let loc = var.vdecl in
   match Cil.findAttribute Cabs2cil.frama_c_destructor var.vattr with
@@ -294,7 +229,7 @@ class vis flag = object(self)
     let inspect_var_current_block kind b s succ v =
       if v.vdefined then begin
         let def = Cil.find_def_stmt b v in
-        if is_between b s def succ then
+        if Kernel_function.is_between b s def succ then
           (* we are forward-jumping over def *)
           abort_if_non_trivial_type kind v
       end else abort_if_non_trivial_type kind v
