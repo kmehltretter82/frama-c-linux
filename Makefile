@@ -684,7 +684,7 @@ STARTUP_CMX=$(STARTUP_CMO:.cmo=.cmx)
 WTOOLKIT= \
 	wutil widget wbox wfile wpane wpalette wtext wtable
 
-ifeq ($(strip $(GTKSOURCEVIEW)),lablgtk3.sourceview3)
+ifeq ("$(LABLGTK_VERSION)","3")
 
 src/plugins/gui/GSourceView.ml: src/plugins/gui/GSourceView3.ml.in
 	$(CP) $< $@
@@ -1299,7 +1299,7 @@ bin/viewer.byte$(EXE): $(filter-out $(GRAPH_GUICMO),$(ALL_GUI_CMO)) \
 			$(GEN_BYTE_LIBS) \
 			$(PLUGIN_DYN_CMO_LIST) $(PLUGIN_DYN_GUI_CMO_LIST)
 	$(PRINT_LINKING) $@
-	$(OCAMLC) $(BLINKFLAGS) -o $@ $(BYTE_LIBS) \
+	$(OCAMLC) $(BLINKFLAGS) $(THREAD) -o $@ $(BYTE_LIBS) \
 	  $(CMO) \
 	  $(filter-out \
 	    $(patsubst $(PLUGIN_GUI_LIB_DIR)/%,$(PLUGIN_LIB_DIR)/%,\
@@ -1313,7 +1313,7 @@ bin/viewer.opt$(EXE): $(filter-out $(GRAPH_GUICMX),$(ALL_GUI_CMX)) \
 			$(PLUGIN_DYN_CMX_LIST) $(PLUGIN_DYN_GUI_CMX_LIST) \
 			$(PLUGIN_CMX_LIST) $(PLUGIN_GUI_CMX_LIST)
 	$(PRINT_LINKING) $@
-	$(OCAMLOPT) $(OLINKFLAGS) -o $@ $(OPT_LIBS) \
+	$(OCAMLOPT) $(OLINKFLAGS) $(THREAD) -o $@ $(OPT_LIBS) \
 	  $(CMX) \
 	  $(filter-out \
 	    $(patsubst $(PLUGIN_GUI_LIB_DIR)/%,$(PLUGIN_LIB_DIR)/%,\
