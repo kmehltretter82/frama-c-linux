@@ -121,6 +121,10 @@ let split ~dir w1 w2 =
   in (splitter :> splitter)
 
 let scroll ?(hpolicy=`AUTOMATIC) ?(vpolicy=`AUTOMATIC) w =
+  (* Explicit conversion needed for lablgtk3, as policy_type has been extended
+     with another constructor but we still export the lablgtk2 type. *)
+  let vpolicy = (vpolicy :> Gtk.Tags.policy_type) in
+  let hpolicy = (hpolicy :> Gtk.Tags.policy_type) in
   let scrolled = GBin.scrolled_window ~vpolicy ~hpolicy () in
   scrolled#add_with_viewport w#coerce ;
   new Wutil.gobj_widget scrolled
