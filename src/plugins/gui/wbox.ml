@@ -78,7 +78,7 @@ let vgroup (ws : widget list) =
   let box = GPack.vbox ~show:true ~homogeneous:true () in
   List.iter (fun w -> box#pack ~expand:false w#coerce) ws ;
   new Wutil.gobj_widget box
-    
+
 let (<|>) xs ys = if ys = [] then xs else (xs @ (ToEnd::ys))
 
 let toolbar xs ys = hbox (xs <|> ys)
@@ -96,3 +96,17 @@ let panel ?top ?left ?right ?bottom center =
   | Some t , None -> vbox [ h t ; hv middle ]
   | None , Some t -> vbox [ hv middle ; w t ]
   | Some a , Some b -> vbox [ h a ; hv middle ; h b ]
+
+let split ~dir ?get ?set w1 w2 =
+  let pane = GPack.paned dir () in
+  pane#add1 w1#coerce ;
+  pane#add2 w2#coerce ;
+  begin match get with None -> () | Some fget ->
+    Wutil.set_pane_ratio pane (fget())
+  end ;
+  begin match set with None -> () | Some fset ->
+    let callback _ =
+      fset (Wutil.get_pane_ratio pane) ; false in
+    ignore (pane#event#connect#button_release ~callback) ;
+  end ;
+  new Wutil.gobj_widget pane

@@ -497,20 +497,10 @@ let on_combo
 (* ------------------------------------------------------------------------ *)
 
 let save_paned_ratio key (paned:GPack.paned) =
-  let paned_min_pos = paned#min_position in
-  let paned_max_pos = paned#max_position in
-  let length = paned_max_pos - paned_min_pos in
-  let ratio = if length = 0 then 0.5
-    else (float_of_int paned#position)/.(float_of_int length)
-  in
+  let ratio = Wutil.get_pane_ratio paned in
   Configuration.set key (Configuration.ConfFloat ratio)
 
-let place_paned (paned:GPack.paned) factor =
-  let paned_min_pos = paned#min_position in
-  let offset =
-    int_of_float (float (paned#max_position - paned_min_pos)*.factor)
-  in
-  paned#set_position (paned_min_pos + offset)
+let place_paned = Wutil.set_pane_ratio
 
 let old_gtk_compat f x = try f x with Not_found -> ()
 

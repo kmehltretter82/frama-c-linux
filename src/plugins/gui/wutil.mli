@@ -43,6 +43,11 @@ val set_small_font : #GObj.widget -> unit
 val set_bold_font : #GObj.widget -> unit
 val to_utf8 : string -> string
 
+(** {2 Ratios} *)
+
+val get_pane_ratio : GPack.paned -> float
+val set_pane_ratio : GPack.paned -> float -> unit
+
 (** {2 Timing} *)
 
 val later : (unit -> unit) -> unit
