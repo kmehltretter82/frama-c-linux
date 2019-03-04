@@ -154,11 +154,7 @@ let truncate_no_bottom r i =
   assert (i > 0);
   if i = 1
   then inject_singleton r.(0)
-  else begin
-    (Obj.truncate (Obj.repr r) i);
-    assert (Array.length r = i);
-    r
-  end
+  else Array.sub r 0 i
 
 let truncate_or_bottom r i =
   if i = 0 then `Bottom else `Value (truncate_no_bottom r i)
