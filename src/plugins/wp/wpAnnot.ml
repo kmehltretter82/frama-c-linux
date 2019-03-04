@@ -914,14 +914,13 @@ let get_stmt_annots config v s =
                 in (b_acc, (a_acc, e_acc))
           | TBRok | TBRpart ->
               let id = WpPropId.mk_assert_id config.kf s a in
-              let kind =
-                if kind = Check || Wp_parameters.Assert_check_only.get () then
-                  WpStrategy.Agoal
-                else
-                  WpStrategy.Aboth (goal_to_select config id)
-              in
-              let b_acc = WpStrategy.add_prop_assert b_acc kind kf s a p in
-              (b_acc, (a_acc, e_acc))
+              let check = kind = Check || Wp_parameters.Assert_check_only.get ()
+              and goal = goal_to_select config id in
+              if check && not goal then acc
+              else
+                let kind = WpStrategy.(if check then Agoal else Aboth goal) in
+                let b_acc = WpStrategy.add_prop_assert b_acc kind kf s a p in
+                (b_acc, (a_acc, e_acc))
         in acc
     | AAllocation (_b_list, _frees_allocates) ->
         (* [PB] TODO *) acc

@@ -7,18 +7,8 @@
   Function main
 ------------------------------------------------------------
 
-Goal Check 'c1' (file tests/wp_acsl/checks.i, line 14):
-Prove: P_P.
-
-------------------------------------------------------------
-
 Goal Assertion 'a1' (file tests/wp_acsl/checks.i, line 15):
 Prove: P_P.
-
-------------------------------------------------------------
-
-Goal Check 'c2' (file tests/wp_acsl/checks.i, line 16):
-Prove: true.
 
 ------------------------------------------------------------
 
