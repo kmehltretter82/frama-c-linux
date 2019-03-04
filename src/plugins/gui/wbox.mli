@@ -82,11 +82,17 @@ val sidebar : box list -> box list -> widget
     The main (non-optional) widget is centered with full expansion in both directions. *)
 val panel : ?top:widget -> ?left:widget -> ?right:widget -> ?bottom:widget -> #widget -> widget
 
+class type splitter =
+  object
+    inherit Wutil.widget
+    method get : float
+    method set : float -> unit
+    method connect : (float -> unit) -> unit
+  end
+
 val split :
   dir:[`HORIZONTAL|`VERTICAL] ->
-  ?get:(unit -> float) ->
-  ?set:(float -> unit) ->
-  widget -> widget -> widget
+  widget -> widget -> splitter
 
 (** default policy is AUTOMATIC *)
 val scroll:

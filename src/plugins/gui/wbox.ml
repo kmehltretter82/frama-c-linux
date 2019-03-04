@@ -97,19 +97,28 @@ let panel ?top ?left ?right ?bottom center =
   | None , Some t -> vbox [ hv middle ; w t ]
   | Some a , Some b -> vbox [ h a ; hv middle ; h b ]
 
-let split ~dir ?get ?set w1 w2 =
+class type splitter =
+  object
+    inherit Wutil.widget
+    method get : float
+    method set : float -> unit
+    method connect : (float -> unit) -> unit
+  end
+
+let split ~dir w1 w2 =
   let pane = GPack.paned dir () in
   pane#add1 w1#coerce ;
   pane#add2 w2#coerce ;
-  begin match get with None -> () | Some fget ->
-    Wutil.set_pane_ratio pane (fget())
-  end ;
-  begin match set with None -> () | Some fset ->
-    let callback _ =
-      fset (Wutil.get_pane_ratio pane) ; false in
-    ignore (pane#event#connect#button_release ~callback) ;
-  end ;
-  new Wutil.gobj_widget pane
+  let splitter =
+    object
+      inherit (Wutil.gobj_widget pane)
+      method get = Wutil.get_pane_ratio pane
+      method set = Wutil.set_pane_ratio pane
+      method connect f =
+        let callback _ = f (Wutil.get_pane_ratio pane) ; false in
+        ignore (pane#event#connect#button_release ~callback)
+    end
+  in (splitter :> splitter)
 
 let scroll ?(hpolicy=`AUTOMATIC) ?(vpolicy=`AUTOMATIC) w =
   let scrolled = GBin.scrolled_window ~vpolicy ~hpolicy () in

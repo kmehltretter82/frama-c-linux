@@ -121,6 +121,11 @@ module Configuration = struct
     widget#set init ;
     widget#connect (set_bool key)
 
+  let config_float ~key ~default widget =
+    let init = find_float ~default key in
+    widget#set init ;
+    widget#connect (set_float key)
+
   let config_values ~key ~default ~values widget =
     begin
       let of_string s = fst (List.find (fun e -> snd e = s) values) in
@@ -366,7 +371,7 @@ let on_bool ?tooltip ?use_markup (container:GPack.box) label get set =
   let container = GPack.hbox ~packing:container#pack () in
   do_tooltip ?tooltip container;
   let button =
-    GButton.check_button ~packing:container#pack ~active:!result () 
+    GButton.check_button ~packing:container#pack ~active:!result ()
   in
   ignore (mk_label ?use_markup container ~xalign:0. label);
   ignore (button#connect#toggled ~callback:(fun () -> set button#active));
@@ -428,7 +433,7 @@ let on_string ?tooltip ?use_markup ?(validator=(fun _ -> true)) ?width
   ignore (entry#event#connect#focus_out ~callback);
   ignore (entry#connect#activate ~callback:(fun () -> ignore (callback ())));
   ignore (mk_label ?use_markup ~xalign:0. container label);
-  (fun () -> 
+  (fun () ->
      if not (Gobject.Property.get entry#as_widget GtkBase.Widget.P.has_focus)
      then entry#set_text (get ()))
 
@@ -440,7 +445,7 @@ let on_string_set ?tooltip ?use_markup ?width (container:GPack.box) label get se
   ignore (entry#event#connect#focus_out ~callback);
   ignore (entry#connect#activate ~callback:(fun () -> ignore (callback ())));
   ignore (mk_label ?use_markup ~xalign:0. container (label ^ " (list)"));
-  (fun () -> 
+  (fun () ->
      if not (Gobject.Property.get entry#as_widget GtkBase.Widget.P.has_focus)
      then entry#set_text (get()))
 
@@ -713,7 +718,7 @@ class type host = object
   method private set_reset: (unit -> unit) -> unit
 end
 
-class error_manager ?reset (o_parent:GWindow.window_skel) : host = 
+class error_manager ?reset (o_parent:GWindow.window_skel) : host =
   object (self: #host)
 
     val mutable f_reset = match reset with
@@ -859,11 +864,11 @@ let open_in_external_viewer ?(line=1) (file : Datatype.Filepath.t) =
     ignore (Sys.command cmd)
 
 exception Too_many_events
-let refresh_gui () = 
+let refresh_gui () =
   let counter = ref 0 in
-  try 
-    while Glib.Main.iteration false do 
-      if !counter >= 10 then raise Too_many_events 
+  try
+    while Glib.Main.iteration false do
+      if !counter >= 10 then raise Too_many_events
       else incr counter
     done
   with Too_many_events -> ()
@@ -906,7 +911,7 @@ let source_files_chooser (main_ui: source_files_chooser_host) defaults f =
       ~packing:(hbox#pack ~expand:true ~fill:true)
       ()
   in
-  Configuration.use_string "last_opened_dir" 
+  Configuration.use_string "last_opened_dir"
     (fun s -> ignore (filechooser#set_current_folder s));
   filechooser#set_select_multiple true;
   filechooser#add_filter (accepted_source_files ());
@@ -1033,8 +1038,8 @@ let graph_window_through_dot ~parent ~title dot_formatter =
     let fmt = Format.formatter_of_out_channel (open_out temp_file) in
     dot_formatter fmt;
     Format.pp_print_flush fmt ();
-    let view = 
-      snd 
+    let view =
+      snd
         (Dgraph.DGraphContainer.Dot.from_dot_with_commands ~packing temp_file)
     in
     view
