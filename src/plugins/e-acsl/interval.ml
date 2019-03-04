@@ -29,9 +29,7 @@ open Cil_types
 (* Basic datatypes and operations *)
 (* ********************************************************************* *)
 
-exception Not_an_integer = Interval_system.Not_an_integer
-let interv_of_typ = Interval_system.interv_of_typ
-let ikind_of_interv = Interval_system.ikind_of_interv
+exception Not_an_integer
 
 (* constructors *)
 
@@ -45,8 +43,35 @@ let interv_of_unknown_block =
        (Some Integer.zero)
        (Some (Bit_utils.max_byte_address ())))
 
-(* imperative environments *)
-module Env: sig
+let rec interv_of_typ ty = match Cil.unrollType ty with
+  | TInt (k,_) as ty ->
+    let n = Cil.bitsSizeOf ty in
+    let l, u =
+      if Cil.isSigned k then Cil.min_signed_number n, Cil.max_signed_number n
+      else Integer.zero, Cil.max_unsigned_number n
+    in
+    Ival.inject_range (Some l) (Some u)
+  | TEnum(enuminfo, _) -> interv_of_typ (TInt (enuminfo.ekind, []))
+  | _ ->
+    raise Not_an_integer
+
+let ikind_of_interv i =
+  if Ival.is_bottom i then IInt
+  else match Ival.min_and_max i with
+    | Some l, Some u ->
+      let is_pos = Integer.ge l Integer.zero in
+      let lkind = Cil.intKindForValue l is_pos in
+      let ukind = Cil.intKindForValue u is_pos in
+      (* kind corresponding to the interval *)
+      let kind = if Cil.intTypeIncluded lkind ukind then ukind else lkind in
+      (* convert the kind to [IInt] whenever smaller. *)
+      if Cil.intTypeIncluded kind IInt then IInt else kind
+    | None, None -> raise Cil.Not_representable (* GMP *)
+    | None, Some _ | Some _, None ->
+      Kernel.fatal ~current:true "ival: %a" Ival.pretty i
+
+(* Imperative environments *)
+module rec Env: sig
   val clear: unit -> unit
   val add: Cil_types.logic_var -> Ival.t -> unit
   val find: Cil_types.logic_var -> Ival.t
@@ -55,11 +80,85 @@ module Env: sig
 end = struct
   open Cil_datatype
   let tbl: Ival.t Logic_var.Hashtbl.t = Logic_var.Hashtbl.create 7
-  let clear () = Logic_var.Hashtbl.clear tbl
+
   let add = Logic_var.Hashtbl.add tbl
   let remove = Logic_var.Hashtbl.remove tbl
   let replace = Logic_var.Hashtbl.replace tbl
   let find = Logic_var.Hashtbl.find tbl
+
+  let clear () =
+    Logic_var.Hashtbl.clear tbl;
+    Logic_function_env.clear ()
+
+end
+
+(* Environment for handling recursive logic functions *)
+and Logic_function_env: sig
+  val widen: infer:(term -> Ival.t) -> term -> Ival.t -> bool * Ival.t
+  val clear: unit -> unit
+end = struct
+
+  module Profile =
+    Datatype.List_with_collections
+      (Ival)
+      (struct
+        let module_name = "E_ACSL.Interval.Logic_function_env.Profile"
+      end)
+
+  module LF =
+    Datatype.Pair_with_collections
+      (Datatype.String)
+      (Profile)
+      (struct
+        let module_name = "E_ACSL.Interval.Logic_function_env.LF"
+      end)
+
+  let tbl = LF.Hashtbl.create 7
+
+  let clear () = LF.Hashtbl.clear tbl
+
+  let interv_of_typ_containing_interv i =
+    try
+      let kind = ikind_of_interv i in
+      interv_of_typ (TInt(kind, []))
+    with Cil.Not_representable ->
+      (* infinity *)
+      Ival.inject_range None None
+
+  let extract_profile ~infer t = match t.term_node with
+    | Tapp(li, _, args) ->
+      li.l_var_info.lv_name,
+      List.map2
+        (fun param arg ->
+           try
+             let i = infer arg in
+             (* over-approximation of the interval to reach the fixpoint
+                faster, and to generate fewer specialized functions *)
+             let larger_i = interv_of_typ_containing_interv i in
+             Env.add param larger_i;
+             larger_i
+           with Not_an_integer ->
+             (* no need to add [param] to the environment *)
+             Ival.bottom)
+        li.l_profile
+        args
+    | _ ->
+      assert false
+
+  let widen ~infer t i =
+    let p = extract_profile ~infer t in
+    try
+      let old_i = LF.Hashtbl.find tbl p in
+      if Ival.is_included i old_i then true, old_i
+      else begin
+        let j = Ival.join i old_i in
+        LF.Hashtbl.replace tbl p j;
+        false, j
+      end
+    with Not_found ->
+      LF.Hashtbl.add tbl p i;
+      false, i
+
 end
 
 (* ********************************************************************* *)
@@ -179,43 +278,28 @@ let rec infer t =
     let i2 = infer t2 in
     Ival.meet i1 i2
 
-  | Tapp (li, _, args) ->
-    (match li.l_type with
-    | None -> assert false (* [None] only possible for predicates *)
-    | Some Linteger ->
-      begin match li.l_body with
-      | LBpred _ ->
-        Ival.zero_or_one
-      | LBterm t' ->
-        (* TODO: should not be necessary to distinguish the recursive case.
-           Stack overflow if not distingued *)
-        if Interval_system.is_recursive li then
-          Interval_system.build_and_solve ~infer t
-        else begin (* non-recursive case *)
-          (* add the arguments to the context *)
-          List.iter2
-            (fun lv arg ->
-               try
-                 let i = infer arg in
-                 Env.add lv i
-               with Not_an_integer ->
-                 ())
-            li.l_profile
-            args;
-          let i = infer t' in
-          (* remove arguments from the context *)
-          List.iter (fun lv -> Env.remove lv) li.l_profile;
-          i
-        end
-      | LBnone ->
-        Error.not_yet "logic functions with no definition nor reads clause"
-      | LBreads _ ->
-        Error.not_yet "logic functions performing read accesses"
-      | LBinductive _ ->
-        Error.not_yet "logic functions inductively defined"
-      end
-    | Some (Ctype ty) -> interv_of_typ ty
-    | Some _ -> raise Not_an_integer)
+  | Tapp (li, _, _args) ->
+    (match li.l_body with
+     | LBpred _ ->
+       Ival.zero_or_one
+     | LBterm t' ->
+       let rec fixpoint i =
+         let is_included, new_i = Logic_function_env.widen ~infer t i in
+         if is_included then begin
+           List.iter (fun lv -> Env.remove lv) li.l_profile;
+           new_i
+         end else
+           let i = infer t' in
+           List.iter (fun lv -> Env.remove lv) li.l_profile;
+           fixpoint i
+       in
+       fixpoint Ival.bottom
+     | LBnone ->
+       Error.not_yet "logic functions with no definition nor reads clause"
+     | LBreads _ ->
+       Error.not_yet "logic functions performing read accesses"
+     | LBinductive _ ->
+       Error.not_yet "logic functions inductively defined")
   | Tunion _ -> Error.not_yet "tset union"
   | Tinter _ -> Error.not_yet "tset intersection"
   | Tcomprehension (_,_,_) -> Error.not_yet "tset comprehension"

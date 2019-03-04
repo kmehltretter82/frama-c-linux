@@ -78,8 +78,6 @@ int glob = 5;
  */
 /*@ logic double f2(double x) = (double)(1 / x);
  */
-double __gen_e_acsl_f2(double __gen_e_acsl_x_arg);
-
 /*@ predicate p_notyet{L}(ℤ x) = x > 0;
  */
 /*@ logic ℤ f_notyet{L}(ℤ x) = x;
@@ -264,16 +262,6 @@ int main(void)
     __gmpz_clear(__gen_e_acsl__12);
   }
   __gen_e_acsl_k(9);
-  double d = 2.0;
-  /*@ assert f2(d) > 0; */
-  {
-    double __gen_e_acsl_f2_tapp;
-    __gen_e_acsl_f2_tapp = __gen_e_acsl_f2(d);
-    __e_acsl_assert(__gen_e_acsl_f2_tapp > (double)0,(char *)"Assertion",
-                    (char *)"main",(char *)"f2(d) > 0",68);
-  }
-  /*@ assert p_notyet(27); */ ;
-  /*@ assert f_notyet(27) ≡ 27; */ ;
   __retres = 0;
   return __retres;
 }
@@ -289,13 +277,6 @@ void __gen_e_acsl_k(int x)
   }
   k(x);
   return;
-}
-
-double __gen_e_acsl_f2(double __gen_e_acsl_x_arg)
-{
-  double __retres;
-  __retres = (double)((long double)1 / __gen_e_acsl_x_arg);
-  return __retres;
 }
 
 int __gen_e_acsl_k_pred(int __gen_e_acsl_x_arg)

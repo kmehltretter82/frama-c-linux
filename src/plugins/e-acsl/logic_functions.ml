@@ -320,10 +320,10 @@ let fill_kf lfs kf =
 module Memo = Hashtbl.Make(struct
   type t = lfsig_info
   let equal lfs1 lfs2 =
-    Cil_datatype.Logic_info.equal lfs1.lfs_li lfs2.lfs_li &&
-    List.fold_left2
-      (fun b lty1 lty2 -> b && Cil_datatype.Logic_type.equal lty1 lty2)
-      true
+    Cil_datatype.Logic_info.equal lfs1.lfs_li lfs2.lfs_li
+    && Cil_datatype.Logic_type.equal lfs1.lfs_lty lfs2.lfs_lty
+    && List.for_all2
+      Cil_datatype.Logic_type.equal
       lfs1.lfs_args_lty
       lfs2.lfs_args_lty
   let hash = Hashtbl.hash
@@ -370,34 +370,32 @@ let find_kfs li =
 let generate ~loc env t li args args_lty =
   let name = li.l_var_info.lv_name ^ "_tapp" in
   let mk_call vi =
-    (* Building the arguments 1/3:
-      If the result is an array (eg gmp), then it cannot be returned.
-      Thus we let it be the (additional) first argument. *)
+    (* Building the arguments 1/3: If the result is an array (e.g. gmp), then it
+       cannot be returned.  Thus we let it be the (additional) first
+       argument. *)
     let vi_f_typ = Typing.get_typ t in
     let args, lvl_opt =
-      if Cil.isArrayType vi_f_typ then
-        (Cil.evar ~loc vi) :: args, None
-      else
-        args, Some (Cil.var vi)
+      if Cil.isArrayType vi_f_typ then Cil.evar ~loc vi :: args, None
+      else args, Some (Cil.var vi)
     in
-    (* Building the arguments 2/3:
-      AST sanity: arrays that are given as arguments of functions
-                  must be explicitely indicated as being pointers *)
-    let args = List.map
-      (fun arg ->
-        if Cil_datatype.Typ.equal (Cil.typeOf arg) (Gmpz.t ()) then
-          (* TODO: real numbers *)
-          Cil.mkCast ~force:true ~e:arg ~newt:(Gmpz.t_ptr ())
-        else
-          arg)
-      args
+    (* Building the arguments 2/3: AST sanity: arrays that are given as
+       arguments of functions must be explicitely indicated as being pointers *)
+    let args =
+      List.map
+        (fun arg ->
+           if Cil_datatype.Typ.equal (Cil.typeOf arg) (Gmpz.t ()) then
+             (* TODO: real numbers *)
+             Cil.mkCast ~force:true ~e:arg ~newt:(Gmpz.t_ptr ())
+           else
+             arg)
+        args
     in
-    (* Building the arguments 3/3:
-      E-ACSL typing: short and other integer types less than in
-                     are cast into int *)
-    let args = List.map
-      (fun arg ->
-        match Cil.typeOf arg with
+    (* Building the arguments 3/3: E-ACSL typing: short and other integer types
+       less than int are casted into int *)
+    let args =
+      List.map
+        (fun arg ->
+           match Cil.typeOf arg with
         | TInt(kind, _) ->
           if Cil.intTypeIncluded kind IInt then
             Cil.mkCast ~force:false ~e:arg ~newt:Cil.intType
@@ -413,12 +411,7 @@ let generate ~loc env t li args args_lty =
       | Typing.C_type ik -> Ctype (TInt (ik, []))
       | Typing.Other -> t.term_type
     in
-    let lfs = {
-        lfs_li = li;
-        lfs_lty = lty;
-        lfs_args_lty = args_lty;
-      }
-    in
+    let lfs = { lfs_li = li; lfs_lty = lty; lfs_args_lty = args_lty } in
     (* Memoization. We MUST guarantee that interval and type bindings
       for logic vars, terms and predicates from the logic definition of
       the function are restored after memoization. *)
@@ -430,12 +423,7 @@ let generate ~loc env t li args args_lty =
     (* The call stmt *)
     let fundec = get_fundec kf in
     let vi_f = fundec.svar in
-    Cil.mkStmtOneInstr
-      (Call (
-        lvl_opt,
-        (Cil.evar vi_f),
-        args,
-        loc))
+    Cil.mkStmtOneInstr (Call (lvl_opt, Cil.evar vi_f, args, loc))
   in
   match Typing.get_integer_ty t with
   | Typing.C_type _ | Typing.Other ->

@@ -487,9 +487,10 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
            Thus using [Extlib.the] is fine *)
         dup (ty_of_logic_ty (Extlib.the li.l_type))
       else begin
-        List.iter
-          (fun arg -> ignore (type_term ~use_gmp_opt:true arg))
-          args;
+        (* TODO: what if the type of the parameter is smaller than the infered
+           type of the argument? For now, it is silently ignored (both
+           statically and at runtime)... *)
+        List.iter (fun arg -> ignore (type_term ~use_gmp_opt:true arg)) args;
         match li.l_body with
         | LBpred _ ->
           (* We can have an [LBpred] here because we transformed
@@ -503,8 +504,7 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
             match lty with
             | Linteger ->
               let i = Interval.infer t in
-              if Options.Gmp_only.get () then dup Gmp
-              else dup (ty_of_interv i)
+              if Options.Gmp_only.get () then dup Gmp else dup (ty_of_interv i)
             | Ctype TInt(ik, _ ) ->
               dup (C_type ik)
             | Ctype TFloat _ -> (* TODO: handle in MR !226 *)

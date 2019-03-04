@@ -477,12 +477,13 @@ and context_insensitive_term_to_exp kf env t =
           [ Misc.mk_call ~loc ~result:(Cil.var vi) fname (List.rev args) ])
       end
       else
-        let args_lty = List.map
-          (fun targ ->
-            match Typing.get_integer_ty targ with
-            | Typing.Gmp -> Linteger
-            | Typing.C_type _ | Typing.Other -> Ctype (Typing.get_typ targ))
-          targs
+        let args_lty =
+          List.map
+            (fun targ ->
+               match Typing.get_integer_ty targ with
+               | Typing.Gmp -> Linteger
+               | Typing.C_type _ | Typing.Other -> Ctype (Typing.get_typ targ))
+            targs
         in
         Logic_functions.generate ~loc env t li (List.rev args) args_lty
     in
