@@ -87,3 +87,15 @@ val split :
   ?get:(unit -> float) ->
   ?set:(float -> unit) ->
   widget -> widget -> widget
+
+(** default policy is AUTOMATIC *)
+val scroll:
+  ?hpolicy:[`AUTOMATIC|`ALWAYS|`NEVER] ->
+  ?vpolicy:[`AUTOMATIC|`ALWAYS|`NEVER] ->
+  widget -> widget
+
+(** Same as [scroll ~vpolicy:`NEVER] *)
+val hscroll : widget -> widget
+
+(** Same as [scroll ~volicy:`NEVER] *)
+val vscroll : widget -> widget

@@ -110,3 +110,11 @@ let split ~dir ?get ?set w1 w2 =
     ignore (pane#event#connect#button_release ~callback) ;
   end ;
   new Wutil.gobj_widget pane
+
+let scroll ?(hpolicy=`AUTOMATIC) ?(vpolicy=`AUTOMATIC) w =
+  let scrolled = GBin.scrolled_window ~vpolicy ~hpolicy () in
+  scrolled#add_with_viewport w#coerce ;
+  new Wutil.gobj_widget scrolled
+
+let hscroll w = scroll ~vpolicy:`NEVER w
+let vscroll w = scroll ~hpolicy:`NEVER w
