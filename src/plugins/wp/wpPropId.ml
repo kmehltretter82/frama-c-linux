@@ -420,7 +420,8 @@ let ident_names names =
                       | _ as n -> '\"' <> (String.get n 0) ) names
 
 let code_annot_names ca = match ca.annot_content with
-  | AAssert (_, _, named_pred)  -> "@assert"::(ident_names named_pred.pred_name)
+  | AAssert (_, Check, named_pred)  -> "@check"::(ident_names named_pred.pred_name)
+  | AAssert (_, Assert, named_pred)  -> "@assert"::(ident_names named_pred.pred_name)
   | AInvariant (_,_,named_pred) -> "@invariant"::(ident_names named_pred.pred_name)
   | AVariant (term, _) -> "@variant"::(ident_names term.term_name)
   | AExtended(_,_,(_,name,_,_,_)) -> [Printf.sprintf "@%s" name]
