@@ -1754,12 +1754,24 @@ indent: $(INDENT_TARGET)
 
 lint: $(LINT_TARGET)
 
+check-ocp-indent-version:
+	if command -v ocp-indent >/dev/null; then \
+		$(eval ocp_version_major := $(shell ocp-indent --version | $(SED) -E "s/^([0-9]+)\.[0-9]+\..*/\1/")) \
+		$(eval ocp_version_minor := $(shell ocp-indent --version | $(SED) -E "s/^[0-9]+\.([0-9]+)\..*/\1/")) \
+		if [ "$(ocp_version_major)" -gt 1 -o "$(ocp_version_minor)" -gt 7 ]; then \
+			echo "error: ocp-indent <1.7.0 required for linting (got $(ocp_version_major).$(ocp_version_minor))"; \
+			exit 1; \
+		fi; \
+	else \
+		exit 1; \
+	fi;
+
 fix-syntax: $(FIX_SYNTAX_TARGET)
 
-$(INDENT_TARGET): %.indent: %
+$(INDENT_TARGET): %.indent: % check-ocp-indent-version
 	ocp-indent -i $<
 
-$(LINT_TARGET): %.lint: %
+$(LINT_TARGET): %.lint: % check-ocp-indent-version
 	# See SO 1825552 on mixing grep and \t (and cry)
 	# For OK_NL, we have three cases:
 	# - for empty files, the computation boils down to 0 - 0 == 0
