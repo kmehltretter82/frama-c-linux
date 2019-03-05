@@ -1193,15 +1193,12 @@ let mkAddrOfAndMark loc ((b, off) as lval) : exp =
   mkAddrOf ~loc lval
 
 (* Call only on arrays *)
-let mkStartOfAndMark loc ((_b, _off) as lval) : exp =
+let mkStartOfAndMark loc ((b, _off) as lval) : exp =
   (* Mark the vaddrof flag if b is a variable *)
-  (* Do not mark arrays as having their address taken.
-     (match b with
-     | Var vi -> vi.vaddrof <- true
-     | _ -> ());
-  *)
-  let res = new_exp ~loc (StartOf lval) in
-  res
+  (match b with
+   | Var vi -> vi.vaddrof <- true
+   | _ -> ());
+  new_exp ~loc (StartOf lval)
 
 (* Keep a set of self compinfo for composite types *)
 let compInfoNameEnv : (string, compinfo) H.t = H.create 113
