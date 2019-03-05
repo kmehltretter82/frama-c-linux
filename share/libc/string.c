@@ -271,9 +271,19 @@ char *strstr(const char *haystack, const char *needle)
   return NULL;
 }
 
+char __fc_strerror[64];
+static int __fc_strerror_init;
+
 char *strerror(int errnum)
 {
-  return "strerror message by Frama-C";
+#ifdef __FRAMAC__
+  if (!__fc_strerror_init) {
+    Frama_C_make_unknown(__fc_strerror, 63);
+    __fc_strerror[63] = 0;
+    __fc_strerror_init = 1;
+  }
+#endif
+  return __fc_strerror;
 }
 
 /* Warning: read considerations about malloc() in Frama-C */
@@ -305,6 +315,21 @@ char *strndup(const char *s, size_t n)
   memcpy(p, s, l);
   p[l] = 0;
   return p;
+}
+
+char __fc_strsignal[64];
+static int __fc_strsignal_init;
+
+char *strsignal(int signum)
+{
+#ifdef __FRAMAC__
+  if (!__fc_strsignal_init) {
+    Frama_C_make_unknown(__fc_strsignal, 63);
+    __fc_strsignal[63] = 0;
+    __fc_strsignal_init = 1;
+  }
+#endif
+  return __fc_strsignal;
 }
 
 __POP_FC_STDLIB
