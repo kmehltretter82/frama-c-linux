@@ -1600,7 +1600,7 @@ let init_project_from_visitor ?(reorder=false) prj
   then
     Kernel.fatal
       "Visitor does not copy or does not operate on correct project.";
-  Project.on prj (fun () -> Cil.initCIL (fun () -> ()) (get_machdep ())) ();
+  Project.on prj init_cil ();
   let old_ast = Ast.get () in
   let ast = visitFramacFileCopy vis old_ast in
   let finalize ast =
@@ -1637,7 +1637,6 @@ let create_project_from_visitor ?reorder ?(last=true) prj_name visitor =
   Project.copy
     ~selection:(Parameter_state.get_reset_selection ()) ~src:temp prj;
   Project.remove ~project:temp ();
-  Project.on prj init_cil ();
   prepare_from_visitor ?reorder prj visitor;
   prj
 
