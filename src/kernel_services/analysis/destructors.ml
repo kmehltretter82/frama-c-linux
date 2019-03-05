@@ -219,8 +219,23 @@ class vis flag = object(self)
           Kernel_function.pretty (Extlib.the self#current_kf)
     in
     let treat_succ_open kind s succ =
+      (* The jump must not bypass a vla initialization in the opened blocks. *)
       let blocks = Kernel_function.blocks_opened_by_edge s succ in
-      List.iter (fun b -> inspect_local_vars kind b succ b.blocals) blocks
+      if blocks <> []
+      then List.iter (fun b -> inspect_local_vars kind b succ b.blocals) blocks
+      else begin
+        (* If there is no opened block, check that the jump does not bypass a
+           vla initialization in the destination block. [s] is in this block. *)
+        let block = Kernel_function.find_enclosing_block succ in
+        (* Does the definition of variable [v] dominates the statement [s]? *)
+        let dominate_s v =
+          v.vdefined && Dominators.dominates (Cil.find_def_stmt block v) s
+        in
+        (* Only consider variables defined after statement [s]. *)
+        let lvs = List.filter (fun v -> not (dominate_s v)) block.blocals in
+        (* Check that they are not defined before statement [succ]. *)
+        inspect_local_vars kind block succ lvs
+      end
     in
     let treat_jump_open k s = List.iter (treat_succ_open k s) s.succs in
     match s.skind with
