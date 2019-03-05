@@ -222,7 +222,6 @@ extern char *strpbrk(const char *s, const char *accept);
   @*/
 extern char *strstr(const char *haystack, const char *needle);
 
-#ifdef __USE_GNU
 /*@ requires valid_string_haystack: valid_read_string(haystack);
   @ requires valid_string_needle: valid_read_string(needle);
   @ assigns \result \from haystack, indirect:haystack[0..],
@@ -232,7 +231,6 @@ extern char *strstr(const char *haystack, const char *needle);
   @   || (\subset(\result, haystack+(0..)) && \valid_read(\result));
   @*/
 extern char *strcasestr (const char *haystack, const char *needle);
-#endif
 
 // internal state of strtok
 char *__fc_strtok_ptr;
@@ -387,8 +385,6 @@ extern char *strncpy(char *restrict dest,
 size_t strlcpy(char * restrict dest, const char * restrict src, size_t n);
 
 // stpcpy is POSIX.1-2008
-#ifdef _POSIX_C_SOURCE
-# if _POSIX_C_SOURCE >= 200809L
 /*@ requires valid_string_src: valid_read_string(src);
   @ requires room_string: \valid(dest+(0..strlen(src)));
   @ requires separation:
@@ -399,8 +395,6 @@ size_t strlcpy(char * restrict dest, const char * restrict src, size_t n);
   @ ensures points_to_end: \result == dest + strlen(dest);
   @*/
 extern char *stpcpy(char *restrict dest, const char *restrict src);
-# endif
-#endif
 
 /*@ // missing: separation
   @ requires valid_string_src: valid_read_string(src);
@@ -502,15 +496,24 @@ extern char *strdup (const char *s);
 extern char *strndup (const char *s, size_t n);
 
 // More POSIX, non-C99 functions
-#ifdef _POSIX_C_SOURCE
 extern char *stpncpy(char *restrict dest, const char *restrict src, size_t n);
 //extern int strcoll_l(const char *s1, const char *s2, locale_t locale);
 //extern char *strerror_l(int errnum, locale_t locale);
 extern int strerror_r(int errnum, char *strerrbuf, size_t buflen);
-extern char *strsignal(int sig);
+
+extern char __fc_strsignal[64];
+char * const __fc_p_strsignal = __fc_strsignal;
+
+/*@ //missing: requires valid_signal(signum);
+  @ assigns \result \from __fc_p_strsignal, indirect:signum;
+  @ ensures result_internal_str: \result == __fc_p_strsignal;
+  @ ensures result_nul_terminated: \result[63] == 0;
+  @ ensures result_valid_string: valid_read_string(\result);
+  @*/
+extern char *strsignal(int signum);
+
 //extern size_t strxfrm_l(char *restrict s1, const char *restrict s2, size_t n,
 //                        locale_t locale);
-#endif
 
 __END_DECLS
 

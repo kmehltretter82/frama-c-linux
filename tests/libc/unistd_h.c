@@ -72,6 +72,10 @@ int main() {
   r = setuid(ruid);
   r = setregid(rgid, egid);
   r = setreuid(ruid, euid);
+  r = setpgid(p, getpgid(0));
+  r = getpgrp();
+
+  r = unlink("/tmp/test_unlink");
 
   r = isatty(1);
   //@ assert r == 0 || r == 1;
