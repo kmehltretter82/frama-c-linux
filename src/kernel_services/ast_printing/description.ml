@@ -466,11 +466,13 @@ let for_order k = function
   | [] -> [I k]
   | bs -> I (succ k) :: named_order bs
 let annot_order = function
-  | {annot_content=AAssert(bs,_kind,np)} ->
+  | {annot_content=AAssert(bs,Check,np)} ->
     for_order 0 bs @ named_order np.pred_name
-  | {annot_content=AInvariant(bs,_,np)} ->
+  | {annot_content=AAssert(bs,Assert,np)} ->
     for_order 2 bs @ named_order np.pred_name
-  | _ -> [I 4]
+  | {annot_content=AInvariant(bs,_,np)} ->
+    for_order 4 bs @ named_order np.pred_name
+  | _ -> [I 6]
 let loop_order = function
   | Id_contract (active,b) -> [B b; A active]
   | Id_loop _ -> []
