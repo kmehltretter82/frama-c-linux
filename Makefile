@@ -1959,15 +1959,19 @@ install:: install-lib
 	if [ -d "$(FRAMAC_PLUGIN)" ]; then \
 	  $(CP)  $(PLUGIN_DYN_CMI_LIST) $(PLUGIN_META_LIST) \
 		 $(FRAMAC_PLUGINDIR); \
-	  $(CP)  $(PLUGIN_DYN_CMO_LIST) $(PLUGIN_DYN_CMX_LIST) \
-		 $(FRAMAC_PLUGINDIR)/top; \
+	  $(CP)  $(PLUGIN_DYN_CMO_LIST) $(FRAMAC_PLUGINDIR)/top; \
+	  if [ "$(OCAMLBEST)" = "opt" ]; then \
+	    $(CP) $(PLUGIN_DYN_CMX_LIST) $(FRAMAC_PLUGINDIR)/top; \
+	  fi; \
 	fi
 	$(PRINT_INSTALL) gui plug-ins
 	if [ -d "$(FRAMAC_PLUGIN_GUI)" -a "$(PLUGIN_DYN_GUI_EXISTS)" = "yes" ]; \
 	then \
 	  $(CP) $(patsubst %.cma,%.cmi,$(PLUGIN_DYN_GUI_CMO_LIST:.cmo=.cmi)) \
-		$(PLUGIN_DYN_GUI_CMO_LIST) $(PLUGIN_DYN_GUI_CMX_LIST) \
-		$(FRAMAC_PLUGINDIR)/gui; \
+		$(PLUGIN_DYN_GUI_CMO_LIST) $(FRAMAC_PLUGINDIR)/gui; \
+	  if [ "$(OCAMLBEST)" = "opt" ]; then \
+	    $(CP) $(PLUGIN_DYN_GUI_CMX_LIST) $(FRAMAC_PLUGINDIR)/gui; \
+	  fi; \
 	fi
 	$(PRINT_INSTALL) man pages
 	$(CP) man/frama-c.1 $(MANDIR)/man1/frama-c.1
