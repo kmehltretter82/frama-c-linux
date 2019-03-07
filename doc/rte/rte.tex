@@ -788,48 +788,6 @@ check existing annotations before generation. This behaviour does not happen if
 \rte{} is used in the context of a Frama-C project~\cite{framacdev}: the
 annotations are not generated twice.
 
-The option \lstinline|-rte-all| has a special behavior: if selected, the options
-\lstinline|-warn-signed-overflow|, \lstinline|-warn-signed-downcast|,
-\lstinline|-rte-div|, \lstinline|-rte-shift|, \lstinline|-rte-mem|
-and \lstinline|-rte-float-to-int| are also selected. The option
-\lstinline|-rte-all| is selected by default.
-
-The special behavior of \lstinline|-rte-all| implies that \rte{} generates by
-default annotations for all the runtime-errors (more precisely, undefined and
-implementation-defined behaviors) it handles. The user should explicitly add
-\lstinline|-warn-unsigned-overflow| and \lstinline|-warn-unsigned-downcast| (not
-entailed by \lstinline|-rte-all|) to generated unsigned overflows annotations
-and unsigned downcasts annotations respectively, which are valid as of
-\cnn{}.
-
-On the other hand, to generate only a subset of possible annotations, one has to
-use \lstinline|-rte-no-all| in conjunction with other positive options. For
-instance, used in conjunction with \lstinline|-rte-mem| alone,
-only annotations for the validity of memory access would be generated.
-
-Some examples:
-
-\begin{itemize}
-
-\item
-
-\lstinline|frama-c -rte -rte-select f,g -rte-no-all -rte-mem|: only generate
-annotations for memory accesses, and only for call-sites found in functions
-\lstinline|f| and \lstinline|g|.
-
-\item
-
-\lstinline|frama-c -rte -rte-no-all -warn-unsigned-overflow|: only generate
-annotations for unsigned overflows, for the whole C program.
-
-\item
-
-\texttt{frama-c -rte -warn-unsigned-overflow -rte-no-trivial-annotations}:
-generate all possible annotations (unsigned overflows included),
-but do not try to evaluate their status through constant folding.
-
-\end{itemize}
-
 \begin{table}
 \begin{center}
 \begin{tabular}{|l|l|p{8cm}|}
@@ -872,9 +830,6 @@ special floats are produced: infinite floats or NaN (by default), only on NaN or
 {\bf Option} & {\bf Type (Default)} & {\bf Description} \\
 \hline
 \lstinline|-rte| & boolean (false) & Enable \rte{} plug-in \\
-\hline
-\lstinline|-rte-all| & boolean (true) & Enable all runtime-errors annotations
-\\
 \hline
 \lstinline|-rte-div| & boolean (false) & Generate annotations for division by
 zero \\
