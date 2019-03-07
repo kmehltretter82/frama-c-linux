@@ -455,7 +455,8 @@ module Make
     else
       let v = Value.rewrap_integer range value in
       if range.Eval_typ.i_signed && not (Value.equal value v)
-      then Value_util.warning_once_current "2's complement assumed for overflow";
+      then Value_parameters.warning ~wkey:Value_parameters.wkey_signed_overflow
+          ~current:true ~once:true "2's complement assumed for overflow";
       return v
 
   let restrict_float ?(reduce=false) ~assume_finite expr fkind value =

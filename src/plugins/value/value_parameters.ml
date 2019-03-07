@@ -96,6 +96,7 @@ let wkey_missing_loop_unroll = register_warn_category "missing-loop-unroll"
 let () = set_warn_status wkey_missing_loop_unroll Log.Winactive
 let wkey_missing_loop_unroll_for = register_warn_category "missing-loop-unroll:for"
 let () = set_warn_status wkey_missing_loop_unroll_for Log.Winactive
+let wkey_signed_overflow = register_warn_category "signed-overflow"
 
 module ForceValues =
   WithOutput

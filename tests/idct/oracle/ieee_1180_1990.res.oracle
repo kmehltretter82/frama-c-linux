@@ -66,9 +66,11 @@
   accessing uninitialized left-value. assert \initialized(&tmp1[i][j]);
 [eva:alarm] tests/idct/idct.c:150: Warning: 
   accessing uninitialized left-value. assert \initialized(&tmp1[i][j]);
-[eva] tests/idct/idct.c:141: Warning: 2's complement assumed for overflow
+[eva:signed-overflow] tests/idct/idct.c:141: Warning: 
+  2's complement assumed for overflow
 [eva] tests/idct/idct.c:125: starting to merge loop iterations
-[eva] tests/idct/idct.c:163: Warning: 2's complement assumed for overflow
+[eva:signed-overflow] tests/idct/idct.c:163: Warning: 
+  2's complement assumed for overflow
 [eva:alarm] tests/idct/idct.c:163: Warning: 
   accessing uninitialized left-value. assert \initialized(&tmp2[k][j]);
 [eva] tests/idct/idct.c:162: starting to merge loop iterations
@@ -77,7 +79,8 @@
   accessing uninitialized left-value. assert \initialized(&tmp1[i][j]);
 [eva:alarm] tests/idct/idct.c:166: Warning: 
   accessing uninitialized left-value. assert \initialized(&tmp1[i][j]);
-[eva] tests/idct/idct.c:176: Warning: 2's complement assumed for overflow
+[eva:signed-overflow] tests/idct/idct.c:176: Warning: 
+  2's complement assumed for overflow
 [eva:alarm] tests/idct/idct.c:176: Warning: 
   accessing uninitialized left-value. assert \initialized(&tmp1[i][j]);
 [eva:alarm] tests/idct/idct.c:178: Warning: 
@@ -116,7 +119,7 @@
 [eva] tests/idct/ieee_1180_1990.c:84: starting to merge loop iterations
 [eva] computing for function IEEE_1180_1990_rand <- IEEE_1180_1990_mkbk <- main.
   Called from tests/idct/ieee_1180_1990.c:85.
-[eva] tests/idct/ieee_1180_1990.c:69: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:69: Warning: 
   2's complement assumed for overflow
 [eva] Recording results for IEEE_1180_1990_rand
 [eva] Done for function IEEE_1180_1990_rand
@@ -339,12 +342,13 @@
 [eva] Done for function IEEE_1180_1990_idctf
 [eva] computing for function idct <- main.
   Called from tests/idct/ieee_1180_1990.c:214.
-[eva] tests/idct/idct.c:129: Warning: 2's complement assumed for overflow
+[eva:signed-overflow] tests/idct/idct.c:129: Warning: 
+  2's complement assumed for overflow
 [eva:alarm] tests/idct/idct.c:129: Warning: 
   accessing uninitialized left-value. assert \initialized(&(*(m1 + k))[j]);
 [eva] Recording results for idct
 [eva] Done for function idct
-[eva] tests/idct/ieee_1180_1990.c:218: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:218: Warning: 
   2's complement assumed for overflow
 [eva:alarm] tests/idct/ieee_1180_1990.c:218: Warning: 
   accessing uninitialized left-value. assert \initialized(&m3[j][k]);
@@ -352,21 +356,21 @@
   accessing uninitialized left-value. assert \initialized(&m4[j][k]);
 [eva:alarm] tests/idct/ieee_1180_1990.c:219: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[0].pme[j][k]);
-[eva] tests/idct/ieee_1180_1990.c:220: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:220: Warning: 
   2's complement assumed for overflow
-[eva] tests/idct/ieee_1180_1990.c:230: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:230: Warning: 
   2's complement assumed for overflow
 [eva:alarm] tests/idct/ieee_1180_1990.c:231: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[0].pmse[j][k]);
 [eva] tests/idct/ieee_1180_1990.c:216: starting to merge loop iterations
-[eva] tests/idct/ieee_1180_1990.c:219: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:219: Warning: 
   2's complement assumed for overflow
-[eva] tests/idct/ieee_1180_1990.c:231: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:231: Warning: 
   2's complement assumed for overflow
 [eva] tests/idct/ieee_1180_1990.c:215: starting to merge loop iterations
 [eva] tests/idct/ieee_1180_1990.c:234: starting to merge loop iterations
 [eva] tests/idct/ieee_1180_1990.c:233: starting to merge loop iterations
-[eva] tests/idct/ieee_1180_1990.c:235: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:235: Warning: 
   2's complement assumed for overflow
 [eva] computing for function IEEE_1180_1990_dctf <- main.
   Called from tests/idct/ieee_1180_1990.c:236.
@@ -380,7 +384,7 @@
   Called from tests/idct/ieee_1180_1990.c:238.
 [eva] Recording results for idct
 [eva] Done for function idct
-[eva] tests/idct/ieee_1180_1990.c:242: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:242: Warning: 
   2's complement assumed for overflow
 [eva:alarm] tests/idct/ieee_1180_1990.c:242: Warning: 
   accessing uninitialized left-value. assert \initialized(&m3[j][k]);
@@ -388,16 +392,16 @@
   accessing uninitialized left-value. assert \initialized(&m4[j][k]);
 [eva:alarm] tests/idct/ieee_1180_1990.c:243: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[3].pme[j][k]);
-[eva] tests/idct/ieee_1180_1990.c:244: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:244: Warning: 
   2's complement assumed for overflow
-[eva] tests/idct/ieee_1180_1990.c:254: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:254: Warning: 
   2's complement assumed for overflow
 [eva:alarm] tests/idct/ieee_1180_1990.c:255: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[3].pmse[j][k]);
 [eva] tests/idct/ieee_1180_1990.c:240: starting to merge loop iterations
-[eva] tests/idct/ieee_1180_1990.c:243: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:243: Warning: 
   2's complement assumed for overflow
-[eva] tests/idct/ieee_1180_1990.c:255: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:255: Warning: 
   2's complement assumed for overflow
 [eva] tests/idct/ieee_1180_1990.c:239: starting to merge loop iterations
 [eva] computing for function IEEE_1180_1990_mkbk <- main.
@@ -425,7 +429,7 @@
 [eva] tests/idct/ieee_1180_1990.c:259: 
   Reusing old results for call to IEEE_1180_1990_idctf
 [eva] tests/idct/ieee_1180_1990.c:260: Reusing old results for call to idct
-[eva] tests/idct/ieee_1180_1990.c:264: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:264: Warning: 
   2's complement assumed for overflow
 [eva:alarm] tests/idct/ieee_1180_1990.c:264: Warning: 
   accessing uninitialized left-value. assert \initialized(&m3[j][k]);
@@ -433,19 +437,19 @@
   accessing uninitialized left-value. assert \initialized(&m4[j][k]);
 [eva:alarm] tests/idct/ieee_1180_1990.c:265: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[1].pme[j][k]);
-[eva] tests/idct/ieee_1180_1990.c:266: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:266: Warning: 
   2's complement assumed for overflow
-[eva] tests/idct/ieee_1180_1990.c:276: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:276: Warning: 
   2's complement assumed for overflow
 [eva:alarm] tests/idct/ieee_1180_1990.c:277: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[1].pmse[j][k]);
 [eva] tests/idct/ieee_1180_1990.c:262: starting to merge loop iterations
-[eva] tests/idct/ieee_1180_1990.c:265: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:265: Warning: 
   2's complement assumed for overflow
-[eva] tests/idct/ieee_1180_1990.c:277: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:277: Warning: 
   2's complement assumed for overflow
 [eva] tests/idct/ieee_1180_1990.c:261: starting to merge loop iterations
-[eva] tests/idct/ieee_1180_1990.c:281: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:281: Warning: 
   2's complement assumed for overflow
 [eva] tests/idct/ieee_1180_1990.c:280: starting to merge loop iterations
 [eva] tests/idct/ieee_1180_1990.c:279: starting to merge loop iterations
@@ -454,7 +458,7 @@
 [eva] tests/idct/ieee_1180_1990.c:283: 
   Reusing old results for call to IEEE_1180_1990_idctf
 [eva] tests/idct/ieee_1180_1990.c:284: Reusing old results for call to idct
-[eva] tests/idct/ieee_1180_1990.c:288: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:288: Warning: 
   2's complement assumed for overflow
 [eva:alarm] tests/idct/ieee_1180_1990.c:288: Warning: 
   accessing uninitialized left-value. assert \initialized(&m3[j][k]);
@@ -462,16 +466,16 @@
   accessing uninitialized left-value. assert \initialized(&m4[j][k]);
 [eva:alarm] tests/idct/ieee_1180_1990.c:289: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[4].pme[j][k]);
-[eva] tests/idct/ieee_1180_1990.c:290: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:290: Warning: 
   2's complement assumed for overflow
-[eva] tests/idct/ieee_1180_1990.c:300: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:300: Warning: 
   2's complement assumed for overflow
 [eva:alarm] tests/idct/ieee_1180_1990.c:301: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[4].pmse[j][k]);
 [eva] tests/idct/ieee_1180_1990.c:286: starting to merge loop iterations
-[eva] tests/idct/ieee_1180_1990.c:289: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:289: Warning: 
   2's complement assumed for overflow
-[eva] tests/idct/ieee_1180_1990.c:301: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:301: Warning: 
   2's complement assumed for overflow
 [eva] tests/idct/ieee_1180_1990.c:285: starting to merge loop iterations
 [eva] computing for function IEEE_1180_1990_mkbk <- main.
@@ -499,7 +503,7 @@
 [eva] tests/idct/ieee_1180_1990.c:305: 
   Reusing old results for call to IEEE_1180_1990_idctf
 [eva] tests/idct/ieee_1180_1990.c:306: Reusing old results for call to idct
-[eva] tests/idct/ieee_1180_1990.c:310: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:310: Warning: 
   2's complement assumed for overflow
 [eva:alarm] tests/idct/ieee_1180_1990.c:310: Warning: 
   accessing uninitialized left-value. assert \initialized(&m3[j][k]);
@@ -507,19 +511,19 @@
   accessing uninitialized left-value. assert \initialized(&m4[j][k]);
 [eva:alarm] tests/idct/ieee_1180_1990.c:311: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[2].pme[j][k]);
-[eva] tests/idct/ieee_1180_1990.c:312: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:312: Warning: 
   2's complement assumed for overflow
-[eva] tests/idct/ieee_1180_1990.c:322: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:322: Warning: 
   2's complement assumed for overflow
 [eva:alarm] tests/idct/ieee_1180_1990.c:323: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[2].pmse[j][k]);
 [eva] tests/idct/ieee_1180_1990.c:308: starting to merge loop iterations
-[eva] tests/idct/ieee_1180_1990.c:311: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:311: Warning: 
   2's complement assumed for overflow
-[eva] tests/idct/ieee_1180_1990.c:323: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:323: Warning: 
   2's complement assumed for overflow
 [eva] tests/idct/ieee_1180_1990.c:307: starting to merge loop iterations
-[eva] tests/idct/ieee_1180_1990.c:327: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:327: Warning: 
   2's complement assumed for overflow
 [eva] tests/idct/ieee_1180_1990.c:326: starting to merge loop iterations
 [eva] tests/idct/ieee_1180_1990.c:325: starting to merge loop iterations
@@ -528,7 +532,7 @@
 [eva] tests/idct/ieee_1180_1990.c:329: 
   Reusing old results for call to IEEE_1180_1990_idctf
 [eva] tests/idct/ieee_1180_1990.c:330: Reusing old results for call to idct
-[eva] tests/idct/ieee_1180_1990.c:334: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:334: Warning: 
   2's complement assumed for overflow
 [eva:alarm] tests/idct/ieee_1180_1990.c:334: Warning: 
   accessing uninitialized left-value. assert \initialized(&m3[j][k]);
@@ -536,16 +540,16 @@
   accessing uninitialized left-value. assert \initialized(&m4[j][k]);
 [eva:alarm] tests/idct/ieee_1180_1990.c:335: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[5].pme[j][k]);
-[eva] tests/idct/ieee_1180_1990.c:336: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:336: Warning: 
   2's complement assumed for overflow
-[eva] tests/idct/ieee_1180_1990.c:346: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:346: Warning: 
   2's complement assumed for overflow
 [eva:alarm] tests/idct/ieee_1180_1990.c:347: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[5].pmse[j][k]);
 [eva] tests/idct/ieee_1180_1990.c:332: starting to merge loop iterations
-[eva] tests/idct/ieee_1180_1990.c:335: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:335: Warning: 
   2's complement assumed for overflow
-[eva] tests/idct/ieee_1180_1990.c:347: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:347: Warning: 
   2's complement assumed for overflow
 [eva] tests/idct/ieee_1180_1990.c:331: starting to merge loop iterations
 [eva] tests/idct/ieee_1180_1990.c:202: starting to merge loop iterations
@@ -869,14 +873,14 @@
   accessing uninitialized left-value. assert \initialized(&res[i].pmse[j][k]);
 [eva:alarm] tests/idct/ieee_1180_1990.c:368: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[i].pme[j][k]);
-[eva] tests/idct/ieee_1180_1990.c:369: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:369: Warning: 
   2's complement assumed for overflow
 [eva] tests/idct/ieee_1180_1990.c:355: starting to merge loop iterations
-[eva] tests/idct/ieee_1180_1990.c:357: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:357: Warning: 
   2's complement assumed for overflow
 [eva:alarm] tests/idct/ieee_1180_1990.c:358: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[i].pmse[j][k]);
-[eva] tests/idct/ieee_1180_1990.c:368: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:368: Warning: 
   2's complement assumed for overflow
 [eva:alarm] tests/idct/ieee_1180_1990.c:369: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[i].pme[j][k]);
@@ -885,7 +889,7 @@
 [eva:alarm] tests/idct/ieee_1180_1990.c:369: Warning: 
   accessing uninitialized left-value. assert \initialized(&res[i].pme[j][k]);
 [eva] tests/idct/ieee_1180_1990.c:354: starting to merge loop iterations
-[eva] tests/idct/ieee_1180_1990.c:389: Warning: 
+[eva:signed-overflow] tests/idct/ieee_1180_1990.c:389: Warning: 
   2's complement assumed for overflow
 [eva] tests/idct/ieee_1180_1990.c:350: starting to merge loop iterations
 [eva] Recording results for main
