@@ -418,6 +418,13 @@ let extract_acsl_list t =
 let is_cfg_block =
   function Stmt_block _ -> false | Then_with_else | Other | Body -> true
 
+let rec has_unprotected_local_init s =
+  match s.skind with
+  | Instr (Local_init _) -> true
+  | UnspecifiedSequence((s,_,_,_,_) :: _) -> has_unprotected_local_init s
+  | Block { bscoping = false; bstmts = s :: _ } -> has_unprotected_local_init s
+  | _ -> false
+
 class cil_printer () = object (self)
 
   val mutable logic_printer_enabled = true
@@ -1020,9 +1027,8 @@ class cil_printer () = object (self)
 
   method stmt_labels fmt (s:stmt) =
     let suf =
-      match s.skind with
-      | Instr (Local_init _) -> format_of_string ";@]@ "
-      | _ -> format_of_string "@]@ "
+      if has_unprotected_local_init s then format_of_string ";@]@ "
+      else format_of_string "@]@ "
     in
     if s.labels <> [] then
       Pretty_utils.pp_list
