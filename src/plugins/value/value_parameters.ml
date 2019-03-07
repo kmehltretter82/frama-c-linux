@@ -658,7 +658,7 @@ module ILevel =
 let () = add_precision_dep ILevel.parameter
 let () = ILevel.add_aliases ["-val-ilevel"]
 let () = ILevel.add_update_hook (fun _ i -> Ival.set_small_cardinal i)
-let () = ILevel.set_range 4 128
+let () = ILevel.set_range 4 256
 
 let () = Parameter_customize.set_group precision_tuning
 module SemanticUnrollingLevel =
@@ -1372,7 +1372,11 @@ let set (type t) (module P: Parameter_sig.S with type t = t) t =
       else printf "  option %s set to %s." P.name str;
     end
 
-let slevel_power = [| 0; 10; 25; 50; 75; 100; 150; 200; 300; 400; 500; |]
+(*  power             0   1   2   3   4    5    6    7     8     9     10 *)
+let slevel_power = [| 0;  10; 20; 50; 100; 200; 500; 1000; 2000; 5000; 10000 |]
+let ilevel_power = [| 8;  12; 16; 24; 32;  64;  128; 256;  256;  256;  256 |]
+let plevel_power = [| 10; 20; 40; 70; 100; 150; 200; 300;  500;  700;  1000 |]
+
 
 let set_analysis option_name n =
   if Fast.is_set () && option_name <> Fast.name
@@ -1381,11 +1385,11 @@ let set_analysis option_name n =
   then incompatible_meta_options ();
   feedback "Option %s detected, \
             automatic configuration of the analysis:" option_name;
-  set (module (MinLoopUnroll)) (n / 2);
+  set (module (MinLoopUnroll)) (max 0 (n - 4));
   set (module (SemanticUnrollingLevel)) (slevel_power.(n));
   set (module (WideningDelay)) (1 + n / 2);
-  set (module (ILevel)) (8 + 12 * n);
-  set (module (ArrayPrecisionLevel)) (50 * (n+1));
+  set (module (ILevel)) (ilevel_power.(n));
+  set (module (ArrayPrecisionLevel)) (plevel_power.(n));
   set (module (LinearLevel)) (20 * n);
   set (module (RmAssert)) (n > 0);
   set (module (SymbolicLocsDomain)) (n > 0);
