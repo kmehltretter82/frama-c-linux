@@ -848,8 +848,17 @@ signed overflows \\
 \lstinline|-warn-signed-downcast| & boolean (false) & Generate annotations for
 signed integer downcast \\
 \hline
+\lstinline|-warn-left-shift-negative| & boolean (true) & Generate annotations for
+left shift on negative values \\
+\hline
+\lstinline|-warn-right-shift-negative| & boolean (false) & Generate annotations for
+right shift on negative values \\
+\hline
 \lstinline|-warn-invalid-bool| & boolean (true) & Generate annotations for
 \lstinline|_Bool| trap representations \\
+\hline
+\lstinline|-warn-special-float| &  string: \lstinline|non-finite|, (\lstinline|nan|) or \lstinline|none|  & generate annotations when
+special floats are produced: infinite floats or NaN (by default), only on NaN or never. \\
 \hline
 \end{tabular}
 \caption{\framac kernel options, impacting \rte{}} \label{kernel}
