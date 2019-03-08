@@ -265,7 +265,7 @@ let mkBlock (slst: stmt list) : block =
 
 let mkBlockNonScoping l = let b = mkBlock l in b.bscoping <- false; b
 
-let rec enforceGhostStmtCoherency ?(force_ghost=false) stmt =
+let rec enforceGhostStmtCoherence ?(force_ghost=false) stmt =
   let force_ghost = force_ghost || stmt.ghost in
   stmt.ghost <- force_ghost ;
   begin match stmt.skind with
@@ -273,16 +273,16 @@ let rec enforceGhostStmtCoherency ?(force_ghost=false) stmt =
     | Instr(_) | Return(_) -> ()
     | UnspecifiedSequence(_) -> ()
     | If(_, b1, b2, _) | TryFinally(b1, b2, _) | TryExcept(b1, _, b2, _) ->
-      enforceGhostBlockCoherency ~force_ghost b1 ;
-      enforceGhostBlockCoherency ~force_ghost b2
+      enforceGhostBlockCoherence ~force_ghost b1 ;
+      enforceGhostBlockCoherence ~force_ghost b2
     | Switch(_, b, _, _) | Loop(_, b, _, _, _) | Block(b) ->
-      enforceGhostBlockCoherency ~force_ghost b
+      enforceGhostBlockCoherence ~force_ghost b
     | TryCatch(b, l, _) ->
-      enforceGhostBlockCoherency ~force_ghost b ;
-      List.iter (fun (_, b) -> enforceGhostBlockCoherency ~force_ghost b) l
+      enforceGhostBlockCoherence ~force_ghost b ;
+      List.iter (fun (_, b) -> enforceGhostBlockCoherence ~force_ghost b) l
   end
-and enforceGhostBlockCoherency ?force_ghost block =
-  List.iter (enforceGhostStmtCoherency ?force_ghost) block.bstmts
+and enforceGhostBlockCoherence ?force_ghost block =
+  List.iter (enforceGhostStmtCoherence ?force_ghost) block.bstmts
 
 let mkStmt ?(ghost=false) ?(valid_sid=false) ?(sattr=[]) (sk: stmtkind) : stmt =
   { skind = sk;
@@ -3514,7 +3514,7 @@ and childrenExp (vis: cilVisitor) (e: exp) : exp =
 	 else s.skind
    in
    if skind' != s.skind then s.skind <- skind';
-   enforceGhostStmtCoherency s ;
+   enforceGhostStmtCoherence s ;
    (* Visit the labels *)
    let labels' =
      let fLabel = function
@@ -6680,7 +6680,7 @@ let childrenFileSameGlobals vis f =
 	   s.skind <- TryExcept(b, (doInstrList il, e), h, l);
        | Return _ | Goto _ | Break _ | Continue _ | Throw _ -> ()
        end ;
-       enforceGhostStmtCoherency s)
+       enforceGhostStmtCoherence s)
      ss
 
  (* Process two statements and possibly replace them both *)
