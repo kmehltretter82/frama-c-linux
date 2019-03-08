@@ -17,6 +17,8 @@
 Open Source Release <next-release>
 ##################################
 
+-   ACSL      [2019/03/08] Add check annotation, similar to assert except that
+              it does not introduce additional hypotheses on the program state
 -*  Makefile  [2019/03/07] Do not attempt to install .cmx on bytecode-only
               architectures. Patch by M. Dogguy backported from Debian package
 -*  Kernel    [2019/03/05] Better detection of invalid goto in presence of VLA
