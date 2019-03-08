@@ -175,3 +175,64 @@ let ouptput_to_dot out_channel g =
     end)
   in
   Dot.output_graph out_channel g
+
+let ouptput_to_json out_channel g =
+  let output_node_kind kind =
+    let s = match kind with
+      | Scalar _ -> "scalar"
+      | Composite _ -> "composite"
+      | Scattered _ -> "scattered"
+      | Alarm _ -> "alarm"
+      | File -> "dummy"
+    in
+    Json.of_string s
+  and output_node_locality { loc_file ; loc_function } =
+    let f1 = ("file", Json.of_string loc_file) in
+    let fields = match loc_function with
+      | None -> [f1]
+      | Some kf -> [f1 ; ("fun", Json.of_string (Kernel_function.get_name kf))]
+    in
+    Json.of_fields fields
+  and output_node_precision precision =
+    let s = match precision with
+      | Unevaluated -> "unevaluated"
+      | Singleton -> "singleton"
+      | Normal -> "normal"
+      | Wide -> "wide"
+      | Critical -> "critical"
+    in
+    Json.of_string s
+  and output_dep_kind kind =
+    let s = match kind with
+      | Callee -> "callee"
+      | Data -> "data"
+      | Address -> "addr"
+      | Control -> "ctrl"
+    in
+    Json.of_string s
+  in
+  let output_node node acc =
+    if node.node_kind = File then acc
+    else
+      let label = Pretty_utils.to_string Node_kind.pretty node.node_kind in
+      Json.of_fields [
+        ("id", Json.of_int node.node_key) ;
+        ("label", Json.of_string label) ;
+        ("kind", output_node_kind node.node_kind) ;
+        ("locality", output_node_locality node.node_locality) ;
+        ("precision", output_node_precision node.node_precision) ;
+        ("explored", Json.of_bool node.node_deps_computed)
+      ] :: acc
+  and output_dep (n1,dep,n2) acc =
+    Json.of_fields [
+      ("id", Json.of_int dep.dependency_key) ;
+      ("src", Json.of_int n1.node_key) ;
+      ("dst", Json.of_int n2.node_key) ;
+      ("kind", output_dep_kind dep.dependency_kind) ;
+      ("multiple", Json.of_bool dep.dependency_multiple)
+    ] :: acc
+  in
+  let nodes = Json.of_list (fold_vertex output_node g [])
+  and deps = Json.of_list (fold_edges_e output_dep g []) in
+  let json = Json.of_fields [("nodes", nodes) ; ("deps", deps)] in
+  Json.save_channel ~pretty:true out_channel json

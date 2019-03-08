@@ -37,3 +37,4 @@ val create_dependency : allow_folding:bool -> t -> node -> dependency_kind ->
   node -> unit
 
 val ouptput_to_dot : out_channel -> t -> unit
+val ouptput_to_json : out_channel -> t -> unit

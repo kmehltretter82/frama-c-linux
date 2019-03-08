@@ -29,10 +29,17 @@ include Plugin.Register
       let help = "An interactive imprecision graph generator."
     end)
 
-module OutputBasename = Empty_string
+module OutputDot = Empty_string
     (struct
-      let option_name = "-dive-output"
-      let help = "Outputs the built graph into a file with this basename."
+      let option_name = "-dive-output-dot"
+      let help = "Outputs the built graph into a dot file with this basename."
+      let arg_name = "basename"
+    end)
+
+module OutputJson = Empty_string
+    (struct
+      let option_name = "-dive-output-json"
+      let help = "Outputs the built graph into a json file with this basename."
       let arg_name = "basename"
     end)
 

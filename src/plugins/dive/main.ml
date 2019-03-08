@@ -20,6 +20,18 @@
 (*                                                                        *)
 (**************************************************************************)
 
+type format = Dot | Json
+
+let output format context basename =
+  let filename, output_function = match format with
+    | Dot -> basename ^ ".dot", Imprecision_graph.ouptput_to_dot
+    | Json -> basename ^ ".json", Imprecision_graph.ouptput_to_json
+  in
+  Self.result "output to %s" filename;
+  let out_channel = open_out filename in
+  output_function out_channel (Build.get_graph context);
+  close_out out_channel
+
 let main () =
   if not (Self.FromBases.is_empty () &&
           Self.FromFunctionAlarms.is_empty ()) then begin
@@ -39,14 +51,10 @@ let main () =
     if not (Self.FromFunctionAlarms.is_empty ()) then
       Alarms.iter add_alarm;
     (* Output it *)
-    let output_basename = Self.OutputBasename.get () in
-    if output_basename <> "" then begin
-      let filename = output_basename ^ ".dot" in
-      Self.result "output to %s" filename;
-      let out_channel = open_out filename in
-      Imprecision_graph.ouptput_to_dot out_channel (Build.get_graph context);
-      close_out out_channel
-    end;
+    if Self.OutputDot.get () <> "" then
+      output Dot context (Self.OutputDot.get ());
+    if Self.OutputJson.get () <> "" then
+      output Json context (Self.OutputJson.get ());
   end
 
 let () =
