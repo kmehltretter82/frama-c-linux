@@ -3370,7 +3370,6 @@ and childrenExp (vis: cilVisitor) (e: exp) : exp =
 
  (* visit all nodes in a Cil statement tree in preorder *)
  and visitCilStmt (vis:cilVisitor) (s: stmt) : stmt =
-   let ghost = s.ghost in
    let oldloc = CurrentLoc.get () in
    CurrentLoc.set (Stmt.loc s) ;
    vis#push_stmt s; (*(vis#behavior.memo_stmt s);*)
@@ -3379,6 +3378,7 @@ and childrenExp (vis: cilVisitor) (e: exp) : exp =
    let res =
      doVisitCil vis
        vis#behavior.memo_stmt vis#vstmt (childrenStmt toPrepend) s in
+   let ghost = res.ghost in
    (* Now see if we have saved some instructions *)
    toPrepend := !toPrepend @ vis#unqueueInstr ();
    (match !toPrepend with
