@@ -325,8 +325,15 @@ let process_stdlib_pragma name args =
 let fc_stdlib_attribute attrs =
   let s = get_current_stdheader () in
   if s = "" then attrs
-  else Cil.addAttribute (Attr (fc_stdlib, [AStr s])) attrs
-
+  else begin
+    let payload, attrs =
+      if Cil.hasAttribute fc_stdlib attrs then begin
+        AStr s :: Cil.findAttribute fc_stdlib attrs,
+        Cil.dropAttribute fc_stdlib attrs
+      end else [AStr s], attrs
+    in
+    Cil.addAttribute (Attr (fc_stdlib, payload)) attrs
+  end
 (* ICC align/noalign pragmas (not supported by GCC/MSVC with this syntax).
    Implemented by translating them to 'aligned' attributes. Currently,
    only default and noalign are supported, not explicit alignment values.
@@ -3004,6 +3011,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
         (* always favor the location of the definition.*)
         oldvi.vdecl <- vi.vdecl;
         oldvi.vdefined <- true;
+        oldvi.vattr <- fc_stdlib_attribute oldvi.vattr
       end;
       (* notice that [vtemp] is immutable, and cannot be updated. Hopefully,
          temporaries have sufficiently fresh names that this is not a problem *)

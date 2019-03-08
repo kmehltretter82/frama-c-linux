@@ -1743,6 +1743,17 @@ let oneFilePass1 (f:file) : unit =
             end else Kernel.abort "%s" msg (* Fail if both variables are used. *)
         end
       in
+      if Cil.hasAttribute "fc_stdlib" oldvi.vattr then begin
+        let attrprm = Cil.findAttribute "fc_stdlib" oldvi.vattr in
+        let attrprm =
+          if Cil.hasAttribute "fc_stdlib" vi.vattr then begin
+            Cil.findAttribute "fc_stdlib" vi.vattr @ attrprm
+          end else attrprm
+        in
+        let attrs = Cil.dropAttribute "fc_stdlib" newrep.ndata.vattr in
+        let attrs = Cil.addAttribute (Attr ("fc_stdlib", attrprm)) attrs in
+        newrep.ndata.vattr <- attrs;
+      end;
       newrep.ndata.vdefined <- vi.vdefined || oldvi.vdefined;
       newrep.ndata.vreferenced <- vi.vreferenced || oldvi.vreferenced;
       (* We do not want to turn non-"const" globals into "const" one. That
