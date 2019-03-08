@@ -947,7 +947,7 @@ to function contracts."
         (* to preserve the effect of the statement *)
         pragmas :=
           { !pragmas with stmt = Stmt.Set.add ki !pragmas.stmt}
-      | AAssert (_behav,pred) ->
+      | AAssert (_behav,_,pred) ->
         (* to preserve the interpretation of the assertion *)
         get_zone_from_pred ki pred;
       | AInvariant (_behav,true,pred) -> (* loop invariant *)

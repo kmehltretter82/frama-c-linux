@@ -2893,10 +2893,15 @@ class cil_printer () = object (self)
           (Pretty_utils.pp_list ~sep:",@ " pp_print_string) l
     in
     match ca.annot_content with
-    | AAssert (behav,p) ->
+    | AAssert (behav,Assert,p) ->
       fprintf fmt "@[%a%a@ %a;@]"
         pp_for_behavs behav
         self#pp_acsl_keyword "assert"
+        self#predicate p
+    | AAssert (behav,Check,p) ->
+      fprintf fmt "@[%a%a@ %a;@]"
+        pp_for_behavs behav
+        self#pp_acsl_keyword "check"
         self#predicate p
     | APragma (Slice_pragma sp) ->
       fprintf fmt "@[%a@ %a;@]"

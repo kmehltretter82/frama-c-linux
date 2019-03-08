@@ -669,7 +669,7 @@ let to_annot_aux kinstr ?(loc=Kinstr.loc kinstr) alarm =
 (*  Kernel.debug "registering alarm %a" D.pretty alarm;*)
   let add alarm =
     let pred = create_predicate ~loc alarm in
-    Logic_const.new_code_annotation (AAssert([], pred))
+    Logic_const.new_code_annotation (AAssert([], Assert, pred))
   in
   try
     let by_emitter = State.find kinstr in

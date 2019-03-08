@@ -454,7 +454,7 @@ module Select (Eval: Eval) = struct
         let lv = (Var vi, NoOffset) in
         select_lv main_ui (GL_Stmt (kf, stmt)) lv
       | PIP (IPCodeAnnot (kf, stmt,
-                          ({annot_content = AAssert (_, p) | AInvariant (_, true, p)} as ca)) as ip) ->
+                          ({annot_content = AAssert (_, _, p) | AInvariant (_, true, p)} as ca)) as ip) ->
         begin
           let loc = GL_Stmt (kf, stmt) in
           let alarm_or_property =
@@ -623,7 +623,7 @@ let add_keybord_shortcut_evaluate main_ui =
           select (find_loc kf fdec bl)
       end
     | PIP (Property.IPCodeAnnot (kf, stmt,
-                                 {annot_content = AAssert (_, _) | AInvariant (_, true, _)} )) ->
+                                 {annot_content = AAssert _ | AInvariant (_, true, _)} )) ->
       select (Some (GL_Stmt (kf, stmt)))
     | PIP (Property.IPPredicate (_, kf, Kglobal, _) as ip) ->
       select (Gui_eval.classify_pre_post kf ip)

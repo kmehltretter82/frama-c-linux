@@ -648,7 +648,7 @@ class check ?(is_normalized=true) what : Visitor.frama_c_visitor =
          names of statement contracts. *)
       if is_normalized then begin
         match ca.annot_content with
-        | AAssert(bhvs,_) | AStmtSpec(bhvs,_) | AInvariant (bhvs,_,_)
+        | AAssert(bhvs,_,_) | AStmtSpec(bhvs,_) | AInvariant (bhvs,_,_)
         | AAssigns(bhvs,_) | AAllocation(bhvs,_) | AExtended (bhvs,_,_) ->
           List.iter
             (fun b ->

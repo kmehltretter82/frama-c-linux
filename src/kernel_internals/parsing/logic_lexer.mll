@@ -94,6 +94,7 @@
         "breaks", BREAKS, false;
 	"case", CASE, true;
         "char", CHAR, true;
+        "check", CHECK, false;
         "complete", COMPLETE, false;
         "const", CONST, true;
         "continues", CONTINUES, false;

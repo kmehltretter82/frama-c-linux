@@ -3113,9 +3113,9 @@ and childrenSpec vis s =
    let vSpec s = visitCilFunspec vis s in
    let change_content annot = { ca with annot_content = annot } in
    match ca.annot_content with
-       AAssert (behav,p) ->
+       AAssert (behav,kind,p) ->
 	 let p' = vPred p in if p' != p then
-	   change_content (AAssert (behav,p'))
+	   change_content (AAssert (behav,kind,p'))
 	 else ca
      | APragma (Impact_pragma t) ->
 	 let t' = visitCilImpactPragma vis t in
