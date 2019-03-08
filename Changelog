@@ -52,6 +52,8 @@ o   Kernel    [2019/02/05] Integer API moving closer to Zarith
               are not printed by default, use -kernel-msg-key printer:attrs
 -!  Kernel    [2019/01/03] Improved precision of integer abstract bitwise
               operators.
+-*  Eva       [2018/12/17] Fixes -eva-split-return on uninitialized or escaping
+              function returns when -eva-warn-copy-indeterminate is disabled.
 o   Kernel    [2018/12/11] New functions for retrieving major and minor version
 -*  Kernel    [2018/12/04] Fixes AST integrity check wrt volatile accesses
 -*  Kernel    [2018/11/21] Fixes #@553 - pretty-printing of basic asm template
